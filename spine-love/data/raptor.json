@@ -1,5 +1,12 @@
 {
-"skeleton": { "hash": "xc68H5wnObEhNawCC1Fp/vJNrv4", "spine": "3.4.02", "width": 1223.72, "height": 1055.62, "images": "./images/" },
+"skeleton": {
+	"hash": "zrg6DHB3FpFaxGVeK2pcpSN87L8",
+	"spine": "3.5.01-beta",
+	"width": 1223.72,
+	"height": 1055.62,
+	"fps": 30,
+	"images": "./images/"
+},
 "bones": [
 	{ "name": "root" },
 	{ "name": "hip", "parent": "root", "rotation": 3.15, "x": -136.78, "y": 415.47, "color": "fbff00ff" },
@@ -37,7 +44,7 @@
 		"rotation": 9.2,
 		"x": 43.68,
 		"y": 0.06,
-		"inheritRotation": false,
+		"transform": "noRotation",
 		"color": "ffffffff"
 	},
 	{ "name": "spineboy_rear_arm_goal", "parent": "saddle", "x": -30.43, "y": -100.08, "color": "ff0001ff" },
@@ -81,7 +88,7 @@
 		"y": -0.02,
 		"scaleX": 0.73,
 		"scaleY": 0.823,
-		"inheritRotation": false,
+		"transform": "noRotation",
 		"color": "15ff00ff"
 	},
 	{
@@ -102,7 +109,7 @@
 		"rotation": 13.9,
 		"x": 39.98,
 		"y": -0.89,
-		"inheritRotation": false,
+		"transform": "noRotation",
 		"color": "ffffffff"
 	},
 	{ "name": "spineboy_front_arm_goal", "parent": "saddle", "x": -50.7, "y": -96.93, "color": "ff0004ff" },
@@ -145,7 +152,7 @@
 		"rotation": -6.13,
 		"x": 84.49,
 		"y": -0.34,
-		"inheritRotation": false,
+		"transform": "noRotation",
 		"color": "e07800ff"
 	},
 	{ "name": "rear_hand", "parent": "rear_arm2", "length": 45.8, "rotation": -76.28, "x": 85.8, "y": 0.1, "color": "e07800ff" },
@@ -236,50 +243,59 @@
 "ik": [
 	{
 		"name": "front_arm_goal",
+		"order": 0,
 		"bones": [ "front_arm", "front_bracer" ],
 		"target": "front_arm_target"
 	},
 	{
 		"name": "front_foot_goal",
+		"order": 2,
 		"bones": [ "front_leg3", "front_foot1" ],
 		"target": "front_foot_goal"
 	},
 	{
 		"name": "front_leg_goal",
+		"order": 1,
 		"bones": [ "front_leg1", "front_leg2" ],
 		"target": "front_leg_goal",
 		"bendPositive": false
 	},
 	{
 		"name": "rear_arm_goal",
+		"order": 3,
 		"bones": [ "back_arm", "back_bracer" ],
 		"target": "rear_arm_target"
 	},
 	{
 		"name": "rear_foot_goal",
+		"order": 5,
 		"bones": [ "rear_leg3", "rear_foot1" ],
 		"target": "rear_foot_goal"
 	},
 	{
 		"name": "rear_leg_goal",
+		"order": 4,
 		"bones": [ "rear_leg1", "rear_leg2" ],
 		"target": "rear_leg_goal",
 		"bendPositive": false
 	},
 	{
 		"name": "spineboy_front_leg_goal",
+		"order": 6,
 		"bones": [ "front_thigh", "lower_leg" ],
 		"target": "spineboy_front_arm_goal",
 		"bendPositive": false
 	},
 	{
 		"name": "spineboy_rear_leg_goal",
+		"order": 7,
 		"bones": [ "back_thigh", "back_knee" ],
 		"target": "spineboy_rear_arm_goal",
 		"bendPositive": false
 	},
 	{
 		"name": "stirrup",
+		"order": 8,
 		"bones": [ "stirrup_strap1", "stirrup_strap2" ],
 		"target": "stirrup"
 	}

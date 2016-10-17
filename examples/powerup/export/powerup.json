@@ -1,5 +1,12 @@
 {
-"skeleton": { "hash": "NDIwB/eCc9kyjtXoMAlUrSBw0+Q", "spine": "3.4.02", "width": 413.18, "height": 195.71, "images": "./images/" },
+"skeleton": {
+	"hash": "DRH0bKbb0s4lzWxWdYTHHpv4S4I",
+	"spine": "3.5.01-beta",
+	"width": 413.18,
+	"height": 195.71,
+	"fps": 30,
+	"images": "./images/"
+},
 "bones": [
 	{ "name": "root" },
 	{ "name": "powerup", "parent": "root", "x": 1.48, "y": 134.02 },

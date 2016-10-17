@@ -1,5 +1,12 @@
 {
-"skeleton": { "hash": "6mxwgn4gKXrDy2eixknadUxKY1c", "spine": "3.4.02", "width": 1914.53, "height": 964.05, "images": "./images/" },
+"skeleton": {
+	"hash": "0UIG2J7xkCGB8IcGummuvCJ/jOk",
+	"spine": "3.5.01-beta",
+	"width": 1914.53,
+	"height": 964.05,
+	"fps": 30,
+	"images": "./images/"
+},
 "bones": [
 	{ "name": "root" },
 	{ "name": "tankRoot", "parent": "root", "y": 200 },
@@ -305,11 +312,13 @@
 "ik": [
 	{
 		"name": "cannonTarget",
+		"order": 0,
 		"bones": [ "cannon" ],
 		"target": "cannonTarget"
 	},
 	{
 		"name": "machineGunTarget",
+		"order": 1,
 		"bones": [ "machinegun" ],
 		"target": "machineGunTarget",
 		"mix": 0
@@ -318,6 +327,7 @@
 "transform": [
 	{
 		"name": "wheel-big",
+		"order": 8,
 		"bones": [ "wheel-big2" ],
 		"target": "wheel-big1",
 		"rotation": 65.6,
@@ -327,6 +337,7 @@
 	},
 	{
 		"name": "wheel-mid1",
+		"order": 3,
 		"bones": [ "wheel-mid2", "wheel-mid4" ],
 		"target": "wheel-mid1",
 		"rotation": 93,
@@ -336,6 +347,7 @@
 	},
 	{
 		"name": "wheel-mid2",
+		"order": 4,
 		"bones": [ "wheel-mid3", "wheel-mid5" ],
 		"target": "wheel-mid1",
 		"rotation": -89,
@@ -345,6 +357,7 @@
 	},
 	{
 		"name": "wheel-mid3",
+		"order": 5,
 		"bones": [ "wheel-mid6" ],
 		"target": "wheel-mid1",
 		"rotation": -152.6,
@@ -354,6 +367,7 @@
 	},
 	{
 		"name": "wheel-small1",
+		"order": 6,
 		"bones": [ "wheel-small2" ],
 		"target": "wheel-small1",
 		"rotation": 87,
@@ -363,6 +377,7 @@
 	},
 	{
 		"name": "wheel-small2",
+		"order": 7,
 		"bones": [ "wheel-small3" ],
 		"target": "wheel-small1",
 		"rotation": 54.9,
@@ -374,6 +389,7 @@
 "path": [
 	{
 		"name": "treads",
+		"order": 2,
 		"bones": [
 			"tread",
 			"tread2",

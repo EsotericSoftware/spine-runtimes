@@ -1,5 +1,12 @@
 {
-"skeleton": { "hash": "xbu5IFg+2tCx4+2MavNPurEogzA", "spine": "3.4.02", "width": 1333.78, "height": 1112.91, "images": "./images/" },
+"skeleton": {
+	"hash": "+nr+/UurpEhPVMSpFMWU2Yof3Ek",
+	"spine": "3.5.01-beta",
+	"width": 1333.78,
+	"height": 1112.91,
+	"fps": 30,
+	"images": "./images/"
+},
 "bones": [
 	{ "name": "root", "x": 28.68, "y": -105.71 },
 	{ "name": "attachment", "parent": "root", "x": -267.71, "y": -366.62 },
@@ -11,8 +18,8 @@
 	{ "name": "rotate", "parent": "root", "x": -305, "y": 201 },
 	{ "name": "scale", "parent": "root", "x": 183.99, "y": -138 },
 	{ "name": "shear", "parent": "root", "x": -304, "y": -146 },
-	{ "name": "transformconstrainttarget", "parent": "root", "x": 604.27, "y": 420.7, "color": "abe323ff" },
 	{ "name": "transformconstrained", "parent": "root", "x": 169.6, "y": 420.7 },
+	{ "name": "transformconstrainttarget", "parent": "root", "x": 604.27, "y": 420.7, "color": "abe323ff" },
 	{ "name": "translate", "parent": "root", "x": 190.99, "y": 201, "color": "abe323ff" }
 ],
 "slots": [
@@ -34,6 +41,7 @@
 "transform": [
 	{
 		"name": "transformconstraint",
+		"order": 1,
 		"bones": [ "transformconstrained" ],
 		"target": "transformconstrainttarget",
 		"x": -400,
@@ -46,6 +54,7 @@
 "path": [
 	{
 		"name": "pathconstraint",
+		"order": 0,
 		"bones": [ "pathfollower" ],
 		"target": "path2",
 		"rotation": 34.2

@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "F8rkPuRWVWWeoK90PmJAvIALFjY", "spine": "3.4.02", "width": 0, "height": 0, "images": "./images/" },
+"skeleton": { "hash": "mb9RZEJVw/MaT0MU9ZTBXq45AU4", "spine": "3.5.01-beta", "width": 0, "height": 0, "fps": 30, "images": "./images/" },
 "bones": [
 	{ "name": "root" },
 	{ "name": "hip", "parent": "root", "y": 247.26 },
@@ -15,7 +15,7 @@
 		"rotation": -0.85,
 		"x": 51.16,
 		"y": 0.23,
-		"inheritRotation": false,
+		"transform": "noRotation",
 		"color": "ff000dff"
 	},
 	{ "name": "front_foot_ik", "parent": "root", "x": -13.52, "y": 0.04, "color": "ff3f00ff" },
@@ -42,7 +42,7 @@
 		"rotation": -1.67,
 		"x": 41.42,
 		"y": -0.08,
-		"inheritRotation": false,
+		"transform": "noRotation",
 		"color": "00ff04ff"
 	},
 	{ "name": "rear_upper_arm", "parent": "torso", "length": 51.93, "rotation": -169.55, "x": 92.35, "y": -19.22, "color": "ff000dff" },
@@ -81,23 +81,27 @@
 "ik": [
 	{
 		"name": "front_ankle_ik",
+		"order": 0,
 		"bones": [ "front_thigh", "front_shin" ],
 		"target": "front_ankle_ik",
 		"bendPositive": false
 	},
 	{
 		"name": "front_foot_ik",
+		"order": 2,
 		"bones": [ "front_foot" ],
 		"target": "front_foot_ik"
 	},
 	{
 		"name": "rear_ankle_ik",
+		"order": 1,
 		"bones": [ "rear_thigh", "rear_shin" ],
 		"target": "rear_ankle_ik",
 		"bendPositive": false
 	},
 	{
 		"name": "rear_foot_ik",
+		"order": 3,
 		"bones": [ "rear_foot" ],
 		"target": "rear_foot_ik"
 	}

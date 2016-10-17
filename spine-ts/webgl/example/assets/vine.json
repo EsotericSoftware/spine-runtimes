@@ -1,5 +1,12 @@
 {
-"skeleton": { "hash": "OTxn8PebJnSmjY8665bH7m360tk", "spine": "3.4.02", "width": 227.32, "height": 841.06, "images": "./images/" },
+"skeleton": {
+	"hash": "Lb8yfqsfTuFiRtjhPw5ZzTEPxik",
+	"spine": "3.5.01-beta",
+	"width": 227.32,
+	"height": 841.06,
+	"fps": 30,
+	"images": "./images/"
+},
 "bones": [
 	{ "name": "root" },
 	{ "name": "vine1", "parent": "root", "length": 74, "rotation": 90, "x": 339.09, "y": -467.15, "color": "f700ffff" },
@@ -27,6 +34,7 @@
 "path": [
 	{
 		"name": "vine-path",
+		"order": 0,
 		"bones": [ "vine1", "vine2", "vine3", "vine4", "vine5", "vine6", "vine7", "vine8", "vine9", "vine10", "vine11", "vine12", "vine13" ],
 		"target": "vine-path",
 		"rotateMode": "chainScale"

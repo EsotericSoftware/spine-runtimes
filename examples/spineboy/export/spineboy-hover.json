@@ -1,5 +1,12 @@
 {
-"skeleton": { "hash": "nDTxthz7F1MUanXoQEA0PWcoY6I", "spine": "3.4.02", "width": 511.47, "height": 739.87, "images": "./images/" },
+"skeleton": {
+	"hash": "sbtQZDjv5ozJwLM5hVv0tMC0v/s",
+	"spine": "3.5.01-beta",
+	"width": 511.47,
+	"height": 739.87,
+	"fps": 30,
+	"images": "./images/"
+},
 "bones": [
 	{ "name": "root" },
 	{ "name": "hip", "parent": "root", "x": -49.89, "y": 290.95 },
@@ -56,7 +63,7 @@
 		"rotation": -29.03,
 		"x": 95.77,
 		"y": -2.7,
-		"inheritRotation": false
+		"transform": "noRotation"
 	},
 	{
 		"name": "hoverboard_thruster_rear",
@@ -64,7 +71,7 @@
 		"rotation": -29.03,
 		"x": -76.46,
 		"y": -5.11,
-		"inheritRotation": false
+		"transform": "noRotation"
 	},
 	{ "name": "hoverglow_front", "parent": "hoverboard_thruster_front", "x": -1.89, "y": -37.78 },
 	{ "name": "hoverglow_rear", "parent": "hoverboard_thruster_rear", "x": 0.95, "y": -35.66 }
@@ -101,33 +108,39 @@
 "ik": [
 	{
 		"name": "front_ankle_ik",
+		"order": 0,
 		"bones": [ "front_thigh", "front_shin" ],
 		"target": "front_ankle_ik",
 		"bendPositive": false
 	},
 	{
 		"name": "front_foot_ik",
+		"order": 1,
 		"bones": [ "front_foot" ],
 		"target": "front_foot_ik"
 	},
 	{
 		"name": "front_toe_ik",
+		"order": 2,
 		"bones": [ "front_foot_tip" ],
 		"target": "front_toe_ik"
 	},
 	{
 		"name": "rear_ankle_ik",
+		"order": 3,
 		"bones": [ "rear_thigh", "rear_shin" ],
 		"target": "rear_ankle_ik",
 		"bendPositive": false
 	},
 	{
 		"name": "rear_foot_ik",
+		"order": 4,
 		"bones": [ "rear_foot" ],
 		"target": "rear_foot_ik"
 	},
 	{
 		"name": "rear_toe_ik",
+		"order": 5,
 		"bones": [ "back_foot_tip" ],
 		"target": "rear_toe_ik"
 	}
