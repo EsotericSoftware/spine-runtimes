@@ -94,9 +94,9 @@ void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
 	func(skeletonData, atlas);
 	SkeletonData_dispose(skeletonData);
 
-	skeletonData = readSkeletonBinaryData(binaryName, atlas, scale);
-	func(skeletonData, atlas);
-	SkeletonData_dispose(skeletonData);
+	// skeletonData = readSkeletonBinaryData(binaryName, atlas, scale);
+	// func(skeletonData, atlas);
+	// SkeletonData_dispose(skeletonData);
 
 	Atlas_dispose(atlas);
 }
@@ -294,7 +294,7 @@ void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
 	skeleton->flipX = false;
 	skeleton->flipY = false;
 
-	skeleton->x = 320;
+	skeleton->x = 100;
 	skeleton->y = 590;
 	Skeleton_updateWorldTransform(skeleton);
 
@@ -353,6 +353,6 @@ int main () {
 	testcase(raptor, "data/raptor.json", "data/raptor.skel", "data/raptor.atlas", 0.5f);
 	testcase(spineboy, "data/spineboy.json", "data/spineboy.skel", "data/spineboy.atlas", 0.6f);
 	testcase(goblins, "data/goblins-mesh.json", "data/goblins-mesh.skel", "data/goblins.atlas", 1.4f);
-	testcase(stretchyman, "data/stretchyman.json", "data/stretchyman.skel", "data/stretchyman.atlas", 1.4f);
+	testcase(stretchyman, "data/stretchyman.json", "data/stretchyman.skel", "data/stretchyman.atlas", 0.6f);
 	return 0;
 }

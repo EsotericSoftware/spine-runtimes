@@ -604,6 +604,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	skeletonData->bones = MALLOC(spBoneData*, bones->size);
 	for (boneMap = bones->child, i = 0; boneMap; boneMap = boneMap->next, ++i) {
 		spBoneData* data;
+		const char* transformMode;
 
 		spBoneData* parent = 0;
 		const char* parentName = Json_getString(boneMap, "parent", 0);
@@ -625,8 +626,18 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 		data->scaleY = Json_getFloat(boneMap, "scaleY", 1);
 		data->shearX = Json_getFloat(boneMap, "shearX", 0);
 		data->shearY = Json_getFloat(boneMap, "shearY", 0);
-		data->inheritRotation = Json_getInt(boneMap, "inheritRotation", 1);
-		data->inheritScale = Json_getInt(boneMap, "inheritScale", 1);
+		transformMode = Json_getString(boneMap, "transform", "normal");
+		data->transformMode = SP_TRANSFORMMODE_NORMAL;
+		if (strcmp(transformMode, "normal") == 0)
+			data->transformMode = SP_TRANSFORMMODE_NORMAL;
+		if (strcmp(transformMode, "onlyTranslation") == 0)
+			data->transformMode = SP_TRANSFORMMODE_ONLYTRANSLATION;
+		if (strcmp(transformMode, "noRotationOrReflection") == 0)
+			data->transformMode = SP_TRANSFORMMODE_NOROTATIONORREFLECTION;
+		if (strcmp(transformMode, "noScale") == 0)
+			data->transformMode = SP_TRANSFORMMODE_NOSCALE;
+		if (strcmp(transformMode, "noScaleOrReflection") == 0)
+			data->transformMode = SP_TRANSFORMMODE_NOSCALEORREFLECTION;
 
 		skeletonData->bones[i] = data;
 		skeletonData->bonesCount++;
@@ -688,6 +699,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			const char* targetName;
 
 			spIkConstraintData* data = spIkConstraintData_create(Json_getString(constraintMap, "name", 0));
+			data->order = Json_getInt(constraintMap, "order", 0);
 
 			boneMap = Json_getItem(constraintMap, "bones");
 			data->bonesCount = boneMap->size;
@@ -726,6 +738,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			const char* name;
 
 			spTransformConstraintData* data = spTransformConstraintData_create(Json_getString(constraintMap, "name", 0));
+			data->order = Json_getInt(constraintMap, "order", 0);
 
 			boneMap = Json_getItem(constraintMap, "bones");
 			data->bonesCount = boneMap->size;
@@ -774,6 +787,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			const char* item;
 
 			spPathConstraintData* data = spPathConstraintData_create(Json_getString(constraintMap, "name", 0));
+			data->order = Json_getInt(constraintMap, "order", 0);
 
 			boneMap = Json_getItem(constraintMap, "bones");
 			data->bonesCount = boneMap->size;
