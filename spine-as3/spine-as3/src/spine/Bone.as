@@ -150,34 +150,28 @@ public class Bone implements Updatable {
 			break;
 		}
 		case TransformMode.noRotationOrReflection: {
-			var psx:Number = Math.sqrt(pa * pa + pc * pc);
-			var psy:Number = 0;
+			s = pa * pa + pc * pc;
 			var prx:Number = 0;
-			if (psx > 0.0001) {
-				psy = Math.abs((pa * pd - pb * pc) / psx);
+			if (s > 0.0001) {
+				s = Math.abs(pa * pd - pb * pc) / s;
+				pb = pc * s;
+				pd = pa * s;
 				prx = Math.atan2(pc, pa) * MathUtils.radDeg;
 			} else {
-				psx = 0;
-				psy = Math.sqrt(pb * pb + pd * pd);
+				pa = 0;
+				pc = 0;
 				prx = 90 - Math.atan2(pd, pb) * MathUtils.radDeg;
 			}
-			cos = MathUtils.cosDeg(prx);
-			sin = MathUtils.sinDeg(prx);
-			pa = cos * psx;
-			pb = -sin * psy;
-			pc = sin * psx;
-			pd = cos * psy;
 			var rx:Number = rotation + shearX - prx;
 			var ry:Number = rotation + shearY - prx + 90;
 			la = MathUtils.cosDeg(rx) * scaleX;
 			lb = MathUtils.cosDeg(ry) * scaleY;
 			lc = MathUtils.sinDeg(rx) * scaleX;
 			ld = MathUtils.sinDeg(ry) * scaleY;
-			_a = pa * la + pb * lc;
-			_b = pa * lb + pb * ld;
+			_a = pa * la - pb * lc;
+			_b = pa * lb - pb * ld;
 			_c = pc * la + pd * lc;
 			_d = pc * lb + pd * ld;
-						
 			break;
 		}
 		case TransformMode.noScale:
