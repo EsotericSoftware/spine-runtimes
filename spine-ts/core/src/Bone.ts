@@ -127,31 +127,26 @@ module spine {
 				break;
 			}
 			case TransformMode.NoRotationOrReflection: {
-				let psx = Math.sqrt(pa * pa + pc * pc)
-				let psy = 0;
+				let s = pa * pa + pc * pc;
 				let prx = 0;
-				if (psx > 0.0001) {
-					psy = Math.abs((pa * pd - pb * pc) / psx);
+				if (s > 0.0001) {
+					s = Math.abs(pa * pd - pb * pc) / s;
+					pb = pc * s;
+					pd = pa * s;
 					prx = Math.atan2(pc, pa) * MathUtils.radDeg;
 				} else {
-					psx = 0;
-					psy = Math.sqrt(pb * pb + pd * pd);
+					pa = 0;
+					pc = 0;
 					prx = 90 - Math.atan2(pd, pb) * MathUtils.radDeg;
 				}
-				let cos = MathUtils.cosDeg(prx);
-				let sin = MathUtils.sinDeg(prx);
-				pa = cos * psx;
-				pb = -sin * psy;
-				pc = sin * psx;
-				pd = cos * psy;
 				let rx = rotation + shearX - prx;
 				let ry = rotation + shearY - prx + 90;
 				let la = MathUtils.cosDeg(rx) * scaleX;
 				let lb = MathUtils.cosDeg(ry) * scaleY;
 				let lc = MathUtils.sinDeg(rx) * scaleX;
 				let ld = MathUtils.sinDeg(ry) * scaleY;
-				this.a = pa * la + pb * lc;
-				this.b = pa * lb + pb * ld;
+				this.a = pa * la - pb * lc;
+				this.b = pa * lb - pb * ld;
 				this.c = pc * la + pd * lc;
 				this.d = pc * lb + pd * ld;
 				break;
