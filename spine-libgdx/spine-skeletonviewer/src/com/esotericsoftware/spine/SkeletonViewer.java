@@ -447,6 +447,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				table.add(new Label("", skin, "default", Color.LIGHT_GRAY)); // Version.
 			}
 
+			// Events.
 			window.addListener(new InputListener() {
 				public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 					event.cancel();

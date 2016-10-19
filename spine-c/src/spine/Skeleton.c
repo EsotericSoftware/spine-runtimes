@@ -199,6 +199,7 @@ static void _sortPathConstraintAttachmentBones(_spSkeleton* const internal, spAt
 		int i = 0, n;
 		while (i < pathBonesCount) {
 			int boneCount = pathBones[i++];
+			int n;
 			for (n = i + boneCount; i < n; i++)
 				_sortBone(internal, bones[pathBones[i]]);
 		}
