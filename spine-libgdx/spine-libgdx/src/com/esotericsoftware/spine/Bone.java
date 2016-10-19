@@ -153,28 +153,25 @@ public class Bone implements Updatable {
 			break;
 		}
 		case noRotationOrReflection: {
-			float psx = (float)Math.sqrt(pa * pa + pc * pc), psy, prx;
-			if (psx > 0.0001f) {
-				psy = Math.abs((pa * pd - pb * pc) / psx);
+			float s = pa * pa + pc * pc, prx;
+			if (s > 0.0001f) {
+				s = Math.abs(pa * pd - pb * pc) / s;
+				pb = pc * s;
+				pd = pa * s;
 				prx = atan2(pc, pa) * radDeg;
 			} else {
-				psx = 0;
-				psy = (float)Math.sqrt(pb * pb + pd * pd);
+				pa = 0;
+				pc = 0;
 				prx = 90 - atan2(pd, pb) * radDeg;
 			}
-			float cos = cosDeg(prx), sin = sinDeg(prx);
-			pa = cos * psx;
-			pb = -sin * psy;
-			pc = sin * psx;
-			pd = cos * psy;
 			float rx = rotation + shearX - prx;
 			float ry = rotation + shearY - prx + 90;
 			float la = cosDeg(rx) * scaleX;
 			float lb = cosDeg(ry) * scaleY;
 			float lc = sinDeg(rx) * scaleX;
 			float ld = sinDeg(ry) * scaleY;
-			a = pa * la + pb * lc;
-			b = pa * lb + pb * ld;
+			a = pa * la - pb * lc;
+			b = pa * lb - pb * ld;
 			c = pc * la + pd * lc;
 			d = pc * lb + pd * ld;
 			break;

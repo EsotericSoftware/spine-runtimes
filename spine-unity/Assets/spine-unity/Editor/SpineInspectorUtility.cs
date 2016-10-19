@@ -30,6 +30,7 @@
 
 using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace Spine.Unity.Editor {
@@ -41,6 +42,10 @@ namespace Spine.Unity.Editor {
 
 		public static string PluralThenS (int n) {
 			return n == 1 ? "" : "s";
+		}
+
+		public static string EmDash {
+			get { return "\u2014"; }
 		}
 
 		public static void PropertyFieldWideLabel (SerializedProperty property, GUIContent label = null, float minimumLabelWidth = 150) {
@@ -70,25 +75,72 @@ namespace Spine.Unity.Editor {
 			public SerializedProperty sortingLayerID;
 			public SerializedProperty sortingOrder;
 
-			public SerializedSortingProperties (Renderer r) {
-				renderer = new SerializedObject(r);
+			public SerializedSortingProperties (Renderer r) : this(new SerializedObject(r)) {}
+			public SerializedSortingProperties (Object[] renderers) : this(new SerializedObject(renderers)) {}
+			public SerializedSortingProperties (SerializedObject rendererSerializedObject) {
+				renderer = rendererSerializedObject;
 				sortingLayerID = renderer.FindProperty("m_SortingLayerID");
 				sortingOrder = renderer.FindProperty("m_SortingOrder");
 			}
 
 			public void ApplyModifiedProperties () {
 				renderer.ApplyModifiedProperties();
+				this.SetDirty();
 			}
+
+			internal void SetDirty () {
+				if (renderer.isEditingMultipleObjects)
+					foreach (var o in renderer.targetObjects)
+						EditorUtility.SetDirty(o);
+				else
+					EditorUtility.SetDirty(renderer.targetObject);
+			}
+		}
+
+		public static SerializedObject GetRenderersSerializedObject (SerializedObject serializedObject) {
+			if (serializedObject.isEditingMultipleObjects) {
+				var renderers = new List<Object>();
+				foreach (var o in serializedObject.targetObjects) {
+					var component = o as Component;
+					if (component != null) {
+						var renderer = component.GetComponent<Renderer>();
+						if (renderer != null) 
+							renderers.Add(renderer);
+					}
+				}
+				return new SerializedObject(renderers.ToArray());
+			} else {
+				var component = serializedObject.targetObject as Component;
+				if (component != null) {
+					var renderer = component.GetComponent<Renderer>();
+					if (renderer != null)
+						return new SerializedObject(renderer);
+				}
+			}
+
+			return null;
+		}
+
+		public static bool TargetsUseSameData (SerializedObject so) {
+			bool multi = so.isEditingMultipleObjects;
+			if (multi) {
+				int n = so.targetObjects.Length;
+				var first = so.targetObjects[0] as SkeletonRenderer;
+				for (int i = 1; i < n; i++) {
+					var sr = so.targetObjects[i] as SkeletonRenderer;
+					if (sr != null && sr.skeletonDataAsset != first.skeletonDataAsset)
+						return false;
+				}
+			}
+			return true;
 		}
 
 		public static void SortingPropertyFields (SerializedSortingProperties prop, bool applyModifiedProperties) {
 			if (applyModifiedProperties) {
 				EditorGUI.BeginChangeCheck();
 				SortingPropertyFields(prop.sortingLayerID, prop.sortingOrder);
-				if(EditorGUI.EndChangeCheck()) {
+				if(EditorGUI.EndChangeCheck())
 					prop.ApplyModifiedProperties();
-					EditorUtility.SetDirty(prop.renderer.targetObject);
-				}
 			} else {
 				SortingPropertyFields(prop.sortingLayerID, prop.sortingOrder);
 			}
