@@ -867,7 +867,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		data->shearX = readFloat(input);
 		data->shearY = readFloat(input);
 		data->length = readFloat(input) * self->scale;
-		mode = readInt(input);
+		mode = readVarint(input, 1);
 		switch (mode) {
 			case 0: data->transformMode = SP_TRANSFORMMODE_NORMAL; break;
 			case 1: data->transformMode = SP_TRANSFORMMODE_ONLYTRANSLATION; break;
@@ -901,7 +901,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		const char* name = readString(input);
 		/* TODO Avoid copying of name */
 		spIkConstraintData* data = spIkConstraintData_create(name);
-		data->order = readInt(input);
+		data->order = readVarint(input, 1);
 		FREE(name);
 		data->bonesCount = readVarint(input, 1);
 		data->bones = MALLOC(spBoneData*, data->bonesCount);
@@ -921,7 +921,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		const char* name = readString(input);
 		/* TODO Avoid copying of name */
 		spTransformConstraintData* data = spTransformConstraintData_create(name);
-		data->order = readInt(input);
+		data->order = readVarint(input, 1);
 		FREE(name);
 		data->bonesCount = readVarint(input, 1);
 		CONST_CAST(spBoneData**, data->bones) = MALLOC(spBoneData*, data->bonesCount);
@@ -948,7 +948,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		const char* name = readString(input);
 		/* TODO Avoid copying of name */
 		spPathConstraintData* data = spPathConstraintData_create(name);
-		data->order = readInt(input);
+		data->order = readVarint(input, 1);
 		FREE(name);
 		data->bonesCount = readVarint(input, 1);
 		CONST_CAST(spBoneData**, data->bones) = MALLOC(spBoneData*, data->bonesCount);

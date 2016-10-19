@@ -94,9 +94,9 @@ void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
 	func(skeletonData, atlas);
 	SkeletonData_dispose(skeletonData);
 
-	// skeletonData = readSkeletonBinaryData(binaryName, atlas, scale);
-	// func(skeletonData, atlas);
-	// SkeletonData_dispose(skeletonData);
+	skeletonData = readSkeletonBinaryData(binaryName, atlas, scale);
+	func(skeletonData, atlas);
+	SkeletonData_dispose(skeletonData);
 
 	Atlas_dispose(atlas);
 }
