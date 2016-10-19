@@ -128,29 +128,26 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 			break;
 		}
 		case SP_TRANSFORMMODE_NOROTATIONORREFLECTION: {
-			float psx = SQRT(pa * pa + pc * pc), psy, prx;
-			float rx, ry, la, lb, lc, ld;
-			if (psx > 0.0001f) {
-				psy = ABS((pa * pd - pb * pc) / psx);
+			float s = pa * pa + pc * pc;
+			float prx, rx, ry, la, lb, lc, ld;
+			if (s > 0.0001f) {
+				s = ABS(pa * pd - pb * pc) / s;
+				pb = pc * s;
+				pd = pa * s;
 				prx = ATAN2(pc, pa) * RAD_DEG;
 			} else {
-				psx = 0;
-				psy = SQRT(pb * pb + pd * pd);
-				prx = 90 - atan2(pd, pb) * RAD_DEG;
+				pa = 0;
+				pc = 0;
+				prx = 90 - ATAN2(pd, pb) * RAD_DEG;
 			}
-			cosine = COS_DEG(prx), sine = SIN_DEG(prx);
-			pa = cosine * psx;
-			pb = -sine * psy;
-			pc = sine * psx;
-			pd = cosine * psy;
 			rx = rotation + shearX - prx;
 			ry = rotation + shearY - prx + 90;
 			la = COS_DEG(rx) * scaleX;
 			lb = COS_DEG(ry) * scaleY;
 			lc = SIN_DEG(rx) * scaleX;
 			ld = SIN_DEG(ry) * scaleY;
-			CONST_CAST(float, self->a) = pa * la + pb * lc;
-			CONST_CAST(float, self->b) = pa * lb + pb * ld;
+			CONST_CAST(float, self->a) = pa * la - pb * lc;
+			CONST_CAST(float, self->b) = pa * lb - pb * ld;
 			CONST_CAST(float, self->c) = pc * la + pd * lc;
 			CONST_CAST(float, self->d) = pc * lb + pd * ld;
 			break;
