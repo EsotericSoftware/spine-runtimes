@@ -114,6 +114,8 @@ namespace Spine.Unity.Editor {
 				skeleton = skeletonRenderer.skeleton;
 			}
 
+			if (!skeletonRenderer.valid) return;
+
 			UpdateAttachments();
 			isPrefab |= PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab;
 		}
@@ -142,7 +144,6 @@ namespace Spine.Unity.Editor {
 
 		void UpdateAttachments () {
 			attachmentTable = new Dictionary<Slot, List<Attachment>>();
-
 			Skin skin = skeleton.Skin ?? skeletonRenderer.skeletonDataAsset.GetSkeletonData(true).DefaultSkin;
 			for (int i = skeleton.Slots.Count-1; i >= 0; i--) {
 				List<Attachment> attachments = new List<Attachment>();
@@ -176,20 +177,22 @@ namespace Spine.Unity.Editor {
 				return;
 			}
 
+			if (!skeletonRenderer.valid) {
+				GUILayout.Label(new GUIContent("Spine Component invalid. Check Skeleton Data Asset.", SpineEditorUtilities.Icons.warning));
+				return;	
+			}
+
 			skeletonUtility.boneRoot = (Transform)EditorGUILayout.ObjectField("Bone Root", skeletonUtility.boneRoot, typeof(Transform), true);
 
-			GUILayout.BeginHorizontal();
-			EditorGUI.BeginDisabledGroup(skeletonUtility.boneRoot != null);
-			{
-				if (GUILayout.Button(new GUIContent("Spawn Hierarchy", SpineEditorUtilities.Icons.skeleton), GUILayout.Width(150), GUILayout.Height(24)))
-					SpawnHierarchyContextMenu();
+			using (new GUILayout.HorizontalScope()) {
+				using (new EditorGUI.DisabledGroupScope(skeletonUtility.boneRoot != null)) {
+					if (GUILayout.Button(new GUIContent("Spawn Hierarchy", SpineEditorUtilities.Icons.skeleton), GUILayout.Width(150), GUILayout.Height(24)))
+						SpawnHierarchyContextMenu();
+				}
+
+				// if (GUILayout.Button(new GUIContent("Spawn Submeshes", SpineEditorUtilities.Icons.subMeshRenderer), GUILayout.Width(150), GUILayout.Height(24)))
+				// skeletonUtility.SpawnSubRenderers(true);
 			}
-			EditorGUI.EndDisabledGroup();
-
-			//		if (GUILayout.Button(new GUIContent("Spawn Submeshes", SpineEditorUtilities.Icons.subMeshRenderer), GUILayout.Width(150), GUILayout.Height(24)))
-			//			skeletonUtility.SpawnSubRenderers(true);
-
-			GUILayout.EndHorizontal();
 
 			EditorGUI.BeginChangeCheck();
 			skeleton.FlipX = EditorGUILayout.ToggleLeft("Flip X", skeleton.FlipX);

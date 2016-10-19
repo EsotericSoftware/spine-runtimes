@@ -31,10 +31,10 @@
 // Contributed by: Mitch Thompson
 
 using UnityEditor;
-using UnityEngine;
 
 namespace Spine.Unity.Editor {
 	[CustomEditor(typeof(SkeletonAnimator))]
+	[CanEditMultipleObjects]
 	public class SkeletonAnimatorInspector : SkeletonRendererInspector {
 		protected SerializedProperty layerMixModes;
 		protected override void OnEnable () {
@@ -42,22 +42,14 @@ namespace Spine.Unity.Editor {
 			layerMixModes = serializedObject.FindProperty("layerMixModes");
 		}
 
-		protected override void DrawInspectorGUI () {
-			base.DrawInspectorGUI();
+		protected override void DrawInspectorGUI (bool multi) {
+			base.DrawInspectorGUI(multi);
 			EditorGUILayout.PropertyField(layerMixModes, true);
-			var component = (SkeletonAnimator)target;
-			if (!component.valid)
-				return;
 
-			EditorGUILayout.Space();
+			if (!TargetIsValid) return;
 
-			if (!isInspectingPrefab) {
-				if (component.GetComponent<SkeletonUtility>() == null) {
-					if (GUILayout.Button(new GUIContent("Add Skeleton Utility", SpineEditorUtilities.Icons.skeletonUtility), GUILayout.Height(30))) {
-						component.gameObject.AddComponent<SkeletonUtility>();
-					}
-				}
-			}
+			if (!isInspectingPrefab)
+				DrawSkeletonUtilityButton(multi);
 		}
 	}
 }
