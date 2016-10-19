@@ -212,10 +212,10 @@ public class AnimationState {
 		Array<Event> events = mix < from.eventThreshold ? this.events : null;
 		boolean attachments = mix < from.attachmentThreshold, drawOrder = mix < from.drawOrderThreshold;
 		float animationLast = from.animationLast, animationTime = from.getAnimationTime();
+		alpha = from.alpha * (1 - mix);
 		int timelineCount = from.animation.timelines.size;
 		Object[] timelines = from.animation.timelines.items;
-		boolean[] timelinesFirst = from.timelinesFirst.items, timelinesLast = from.timelinesLast.items;
-		float alphaFull = from.alpha, alphaMix = alphaFull * (1 - mix);
+		boolean[] timelinesFirst = from.timelinesFirst.items;
 
 		boolean firstFrame = from.timelinesRotation.size == 0;
 		if (firstFrame) from.timelinesRotation.setSize(timelineCount << 1);
@@ -224,16 +224,14 @@ public class AnimationState {
 		for (int i = 0; i < timelineCount; i++) {
 			Timeline timeline = (Timeline)timelines[i];
 			boolean setupPose = timelinesFirst[i];
-			// If there's a higher timeline for the property, use full alpha to avoid a dip during the mix.
-			float a = timelinesLast[i] ? alphaMix : alphaFull;
 			if (timeline instanceof RotateTimeline)
-				applyRotateTimeline(timeline, skeleton, animationTime, a, setupPose, timelinesRotation, i << 1, firstFrame);
+				applyRotateTimeline(timeline, skeleton, animationTime, alpha, setupPose, timelinesRotation, i << 1, firstFrame);
 			else {
 				if (!setupPose) {
 					if (!attachments && timeline instanceof AttachmentTimeline) continue;
 					if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
 				}
-				timeline.apply(skeleton, animationLast, animationTime, events, a, setupPose, true);
+				timeline.apply(skeleton, animationLast, animationTime, events, alpha, setupPose, true);
 			}
 		}
 
@@ -566,32 +564,6 @@ public class AnimationState {
 			TrackEntry entry = tracks.get(i);
 			if (entry != null) checkTimelinesFirst(entry);
 		}
-
-		// Compute timelinesLast from highest to lowest track entries that have mixingFrom.
-		propertyIDs.clear();
-		int lowestMixingFrom = n;
-		for (i = 0; i < n; i++) { // Find lowest with a mixingFrom entry.
-			TrackEntry entry = tracks.get(i);
-			if (entry == null) continue;
-			if (entry.mixingFrom != null) {
-				lowestMixingFrom = i;
-				break;
-			}
-		}
-		for (i = n - 1; i >= lowestMixingFrom; i--) {
-			TrackEntry entry = tracks.get(i);
-			if (entry == null) continue;
-
-			Array<Timeline> timelines = entry.animation.timelines;
-			for (int ii = 0, nn = timelines.size; ii < nn; ii++)
-				propertyIDs.add(timelines.get(ii).getPropertyId());
-
-			entry = entry.mixingFrom;
-			while (entry != null) {
-				checkTimelinesUsage(entry, entry.timelinesLast);
-				entry = entry.mixingFrom;
-			}
-		}
 	}
 
 	/** From last to first mixingFrom entries, sets timelinesFirst to true on last, calls checkTimelineUsage on rest. */
@@ -701,7 +673,7 @@ public class AnimationState {
 		float animationStart, animationEnd, animationLast, nextAnimationLast;
 		float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
 		float alpha, mixTime, mixDuration, mixAlpha;
-		final BooleanArray timelinesFirst = new BooleanArray(), timelinesLast = new BooleanArray();
+		final BooleanArray timelinesFirst = new BooleanArray();
 		final FloatArray timelinesRotation = new FloatArray();
 
 		public void reset () {
@@ -710,7 +682,6 @@ public class AnimationState {
 			animation = null;
 			listener = null;
 			timelinesFirst.clear();
-			timelinesLast.clear();
 			timelinesRotation.clear();
 		}
 
