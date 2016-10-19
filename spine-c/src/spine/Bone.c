@@ -189,7 +189,7 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 		CONST_CAST(float, self->a) = -self->a;
 		CONST_CAST(float, self->b) = -self->b;
 	}
-	if (self->skeleton->flipY) {
+	if (self->skeleton->flipY != yDown) {
 		CONST_CAST(float, self->c) = -self->c;
 		CONST_CAST(float, self->d) = -self->d;
 	}

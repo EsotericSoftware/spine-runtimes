@@ -174,7 +174,7 @@ static void _addToUpdateCacheReset(_spSkeleton* const internal, spBone* bone) {
 		internal->updateCacheResetCapacity *= 2;
 		internal->updateCacheReset = realloc(internal->updateCacheReset, sizeof(spBone*) * internal->updateCacheResetCapacity);
 	}
-	internal->updateCacheReset[internal->updateCacheResetCount++] = bone;
+	internal->updateCacheReset[internal->updateCacheResetCount] = bone;
 	++internal->updateCacheResetCount;
 }
 
@@ -244,7 +244,8 @@ static void _sortIkConstraint (_spSkeleton* const internal, spIkConstraint* cons
 				break;
 			}
 		}
-		if (!contains) _addToUpdateCacheReset(internal, child);
+		if (!contains)
+			_addToUpdateCacheReset(internal, child);
 	}
 
 	_addToUpdateCache(internal, SP_UPDATE_IK_CONSTRAINT, constraint);
@@ -331,11 +332,14 @@ void spSkeleton_updateCache (spSkeleton* self) {
 	ikCount = self->ikConstraintsCount; transformCount = self->transformConstraintsCount; pathCount = self->pathConstraintsCount;
 	constraintCount = ikCount + transformCount + pathCount;
 
-	for (i = 0; i < constraintCount; i++) {
+	i = 0;
+	outer:
+	for (; i < constraintCount; i++) {
 		for (ii = 0; ii < ikCount; ii++) {
 			spIkConstraint* ikConstraint = ikConstraints[ii];
 			if (ikConstraint->data->order == i) {
 				_sortIkConstraint(internal, ikConstraint);
+				i++;
 				goto outer;
 			}
 		}
@@ -344,6 +348,7 @@ void spSkeleton_updateCache (spSkeleton* self) {
 			spTransformConstraint* transformConstraint = transformConstraints[ii];
 			if (transformConstraint->data->order == i) {
 				_sortTransformConstraint(internal, transformConstraint);
+				i++;
 				goto outer;
 			}
 		}
@@ -352,11 +357,11 @@ void spSkeleton_updateCache (spSkeleton* self) {
 			spPathConstraint* pathConstraint = pathConstraints[ii];
 			if (pathConstraint->data->order == i) {
 				_sortPathConstraint(internal, pathConstraint);
+				i++;
 				goto outer;
 			}
 		}
 	}
-	outer:
 
 	for (i = 0; i < self->bonesCount; ++i)
 		_sortBone(internal, self->bones[i]);
