@@ -38,14 +38,14 @@ namespace Spine.Unity {
 	public class AtlasAsset : ScriptableObject {
 		public TextAsset atlasFile;
 		public Material[] materials;
-		private Atlas atlas;
+		protected Atlas atlas;
 
-		public void Reset () {
+		public virtual void Reset () {
 			atlas = null;
 		}
 
 		/// <returns>The atlas or null if it could not be loaded.</returns>
-		public Atlas GetAtlas () {
+		public virtual Atlas GetAtlas () {
 			if (atlasFile == null) {
 				Debug.LogError("Atlas file not set for atlas asset: " + name, this);
 				Reset();

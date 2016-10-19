@@ -40,6 +40,7 @@ namespace Spine.Unity.Editor {
 
 	[InitializeOnLoad]
 	[CustomEditor(typeof(SkeletonGraphic))]
+	[CanEditMultipleObjects]
 	public class SkeletonGraphicInspector : UnityEditor.Editor {
 		SerializedProperty material_, color_;
 		SerializedProperty skeletonDataAsset_, initialSkinName_;
