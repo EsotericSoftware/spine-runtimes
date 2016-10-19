@@ -53,8 +53,11 @@ namespace Spine.Unity.Editor {
 		internal const string NoneLabel = "<None>";
 
 		protected T TargetAttribute { get { return (T)attribute; } }
+		protected SerializedProperty SerializedProperty { get; private set; }
 
 		public override void OnGUI (Rect position, SerializedProperty property, GUIContent label) {
+			SerializedProperty = property;
+
 			if (property.propertyType != SerializedPropertyType.String) {
 				EditorGUI.LabelField(position, "ERROR:", "May only apply to type string");
 				return;
@@ -87,7 +90,7 @@ namespace Spine.Unity.Editor {
 
 			position = EditorGUI.PrefixLabel(position, label);
 
-			var propertyStringValue = property.stringValue;
+			var propertyStringValue = (property.hasMultipleDifferentValues) ? SpineInspectorUtility.EmDash : property.stringValue;
 			if (GUI.Button(position, string.IsNullOrEmpty(propertyStringValue) ? NoneLabel : propertyStringValue, EditorStyles.popup))
 				Selector(property);
 
@@ -302,7 +305,6 @@ namespace Spine.Unity.Editor {
 
 	[CustomPropertyDrawer(typeof(SpineBone))]
 	public class SpineBoneDrawer : SpineTreeItemDrawerBase<SpineBone> {
-
 		protected override void PopulateMenu (GenericMenu menu, SerializedProperty property, SpineBone targetAttribute, SkeletonData data) {
 			menu.AddDisabledItem(new GUIContent(skeletonDataAsset.name));
 			menu.AddSeparator("");

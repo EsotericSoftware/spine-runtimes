@@ -563,7 +563,7 @@ function SkeletonJson.new (attachmentLoader)
 				end
 				local frameIndex = 0
 				for i,valueMap in ipairs(values) do
-					timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, "rotateMix", 1), getValue(valueMap, "translateMix", 1), getValue(valueMap, "scaleMix", 1) getValue(valueMap, "shearMix", 1))
+					timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, "rotateMix", 1), getValue(valueMap, "translateMix", 1), getValue(valueMap, "scaleMix", 1), getValue(valueMap, "shearMix", 1))
 					readCurve(valueMap, timeline, frameIndex)
 					frameIndex = frameIndex + 1
 				end
