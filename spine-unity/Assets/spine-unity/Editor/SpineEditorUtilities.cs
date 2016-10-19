@@ -1162,7 +1162,7 @@ namespace Spine.Unity.Editor {
 				var skeletonInfo = (Dictionary<string, object>)root["skeleton"];
 				object jv;
 				skeletonInfo.TryGetValue("spine", out jv);
-				string jsonVersion = (jv == null) ? (string)jv : null;
+				string jsonVersion = jv as string;
 				if (!string.IsNullOrEmpty(jsonVersion)) {
 					string[] jsonVersionSplit = jsonVersion.Split('.');
 					bool match = false;
