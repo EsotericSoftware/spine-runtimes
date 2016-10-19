@@ -179,8 +179,8 @@ function RegionAttachment:updateWorldVertices (slot, premultipliedAlpha)
 	local vertices = self.vertices
 	local offset = self.offset
 	local bone = slot.bone
-	local x = skeleton.x + bone.worldX
-	local y = skeleton.y + bone.worldY
+	local x = bone.worldX
+	local y = bone.worldY
 	local a = bone.a
 	local b = bone.b
 	local c = bone.c

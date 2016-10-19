@@ -115,8 +115,6 @@ function MeshAttachment:updateWorldVertices(slot, premultipliedAlpha)
 		skeletonColor.b * slotColor.b * meshColor.b * multiplier,
 		alpha)
 
-	local x = skeleton.x
-	local y = skeleton.y
 	local deformArray = slot.attachmentVertices
 	local vertices = self.vertices
 	local worldVertices = self.worldVertices
@@ -125,8 +123,8 @@ function MeshAttachment:updateWorldVertices(slot, premultipliedAlpha)
 		local verticesLength = #vertices
 		if #deformArray > 0 then vertices = deformArray end
 		local bone = slot.bone;
-		x = x + bone.worldX
-		y = y + bone.worldY
+		local x = bone.worldX
+		local y = bone.worldY
 		local a = bone.a
 		local b = bone.b
 		local c = bone.c
@@ -155,8 +153,8 @@ function MeshAttachment:updateWorldVertices(slot, premultipliedAlpha)
 		local b = 0
 		local n = #bones
 		while v < n do
-			local wx = x
-			local wy = y
+			local wx = 0
+			local wy = 0
 			local nn = bones[v + 1];
 			v = v + 1
 			nn = nn + v
@@ -186,8 +184,8 @@ function MeshAttachment:updateWorldVertices(slot, premultipliedAlpha)
 		local f = 0
 		local n = #bones
 		while v < n do
-			local wx = x
-			local wy = y
+			local wx = 0
+			local wy = 0
 			local nn = bones[v + 1]
 			v = v + 1
 			nn = nn + v

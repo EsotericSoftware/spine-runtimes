@@ -45,6 +45,7 @@ local EventData = require "spine-lua.EventData"
 local Event = require "spine-lua.Event"
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local BlendMode = require "spine-lua.BlendMode"
+local TransformMode = require "spine-lua.TransformMode"
 local utils = require "spine-lua.utils"
 
 local SkeletonJson = {}
@@ -84,6 +85,7 @@ function SkeletonJson.new (attachmentLoader)
 			skeletonData.version = skeletonMap["spine"]
 			skeletonData.width = skeletonMap["width"]
 			skeletonData.height = skeletonMap["height"]
+			skeletonData.fps = skeletonMap["fps"]
 			skeletonData.imagesPath = skeletonMap["images"]
 		end
 
@@ -106,8 +108,7 @@ function SkeletonJson.new (attachmentLoader)
 			data.scaleY = getValue(boneMap, "scaleY", 1);
 			data.shearX = getValue(boneMap, "shearX", 0);
 			data.shearY = getValue(boneMap, "shearY", 0);
-			data.inheritRotation = getValue(boneMap, "inheritRotation", true);
-			data.inheritScale = getValue(boneMap, "inheritScale", true);
+			data.transformMode = TransformMode[getValue(boneMap, "transform", "normal")]
 
 			table_insert(skeletonData.bones, data)
 		end
@@ -142,6 +143,7 @@ function SkeletonJson.new (attachmentLoader)
 		if root["ik"] then
 			for i,constraintMap in ipairs(root["ik"]) do
 				local data = IkConstraintData.new(constraintMap["name"])
+				data.order = getValue(constraintMap, "order", 0)
 
 				for i,boneName in ipairs(constraintMap["bones"]) do
 					local bone = skeletonData:findBone(boneName)
@@ -164,6 +166,7 @@ function SkeletonJson.new (attachmentLoader)
 		if root["transform"] then
 			for i,constraintMap in ipairs(root["transform"]) do
 				data = TransformConstraintData.new(constraintMap.name)
+				data.order = getValue(constraintMap, "order", 0)
 
 				for i,boneName in ipairs(constraintMap.bones) do
 					local bone = skeletonData:findBone(boneName)
@@ -195,6 +198,7 @@ function SkeletonJson.new (attachmentLoader)
 		if root["path"] then
 			for i,constraintMap in ipairs(root.path) do
 				local data = PathConstraintData.new(constraintMap.name);
+				data.order = getValue(constraintMap, "order", 0)
 
 				for i,boneName in ipairs(constraintMap.bones) do
 					local bone = skeletonData:findBone(boneName)
@@ -563,7 +567,7 @@ function SkeletonJson.new (attachmentLoader)
 				end
 				local frameIndex = 0
 				for i,valueMap in ipairs(values) do
-					timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, "rotateMix", 1), getValue(valueMap, "translateMix", 1), getValue(valueMap, "scaleMix", 1) getValue(valueMap, "shearMix", 1))
+					timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, "rotateMix", 1), getValue(valueMap, "translateMix", 1), getValue(valueMap, "scaleMix", 1), getValue(valueMap, "shearMix", 1))
 					readCurve(valueMap, timeline, frameIndex)
 					frameIndex = frameIndex + 1
 				end
