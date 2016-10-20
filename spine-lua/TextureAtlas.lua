@@ -74,10 +74,15 @@ function TextureAtlas:parse (atlasContent, imageLoader)
 	if not atlasContent then error("atlasContent cannot be nil.", 2) end
 	if not imageLoader then error("imageLoader cannot be nil.", 2) end
 
+	function lineIterator(s)
+		if s:sub(-1)~="\n" then s=s.."\n" end
+		return s:gmatch("(.-)\n")
+	end
+
 	local lines = {}
 	local index = 0
 	local numLines = 0
-	for line in atlasContent:gmatch("[^\r\n]+") do
+	for line in lineIterator(atlasContent) do
 		lines[numLines] = line
 		numLines = numLines + 1
 	end
@@ -99,7 +104,9 @@ function TextureAtlas:parse (atlasContent, imageLoader)
 	local readTuple = function ()
 		local line = readLine()
 		local idx = line:find(":")
-		if not idx then error("Invalid line: " .. line, 2) end
+		if not idx then 
+			error("Invalid line: " .. line, 2)
+		end
 		local i = 1
 		local lastMatch = idx + 1
 		local tuple = {}
