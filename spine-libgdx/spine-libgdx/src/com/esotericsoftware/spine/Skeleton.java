@@ -292,6 +292,9 @@ public class Skeleton {
 
 	/** Updates the world transform for each bone and applies constraints. */
 	public void updateWorldTransform () {
+		// This partial update avoids computing the world transform for constrained bones when 1) the bone is not updated
+		// before the constraint, 2) the constraint only needs to access the applied local transform, and 3) the constraint calls
+		// updateWorldTransform.
 		Array<Bone> updateCacheReset = this.updateCacheReset;
 		for (int i = 0, n = updateCacheReset.size; i < n; i++) {
 			Bone bone = updateCacheReset.get(i);
