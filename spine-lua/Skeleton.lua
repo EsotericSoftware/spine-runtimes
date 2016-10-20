@@ -439,7 +439,7 @@ function Skeleton:getBounds(offset, size)
 			for i, slot in ipairs(drawOrder) do
 				local vertices = nil
 				local attachment = slot.attachment
-				if attachment.type == AttachmentType.region or attachment.type == AttachmentType.mesh then
+				if attachment and (attachment.type == AttachmentType.region or attachment.type == AttachmentType.mesh) then
 					vertices = attachment:updateWorldVertices(slot, false);
 				end
 				if vertices then
