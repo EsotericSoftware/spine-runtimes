@@ -1656,32 +1656,27 @@ var spine;
 					break;
 				}
 				case spine.TransformMode.NoRotationOrReflection: {
-					var psx = Math.sqrt(pa * pa + pc * pc);
-					var psy = 0;
+					var s = pa * pa + pc * pc;
 					var prx = 0;
-					if (psx > 0.0001) {
-						psy = Math.abs((pa * pd - pb * pc) / psx);
+					if (s > 0.0001) {
+						s = Math.abs(pa * pd - pb * pc) / s;
+						pb = pc * s;
+						pd = pa * s;
 						prx = Math.atan2(pc, pa) * spine.MathUtils.radDeg;
 					}
 					else {
-						psx = 0;
-						psy = Math.sqrt(pb * pb + pd * pd);
+						pa = 0;
+						pc = 0;
 						prx = 90 - Math.atan2(pd, pb) * spine.MathUtils.radDeg;
 					}
-					var cos = spine.MathUtils.cosDeg(prx);
-					var sin = spine.MathUtils.sinDeg(prx);
-					pa = cos * psx;
-					pb = -sin * psy;
-					pc = sin * psx;
-					pd = cos * psy;
 					var rx = rotation + shearX - prx;
 					var ry = rotation + shearY - prx + 90;
 					var la = spine.MathUtils.cosDeg(rx) * scaleX;
 					var lb = spine.MathUtils.cosDeg(ry) * scaleY;
 					var lc = spine.MathUtils.sinDeg(rx) * scaleX;
 					var ld = spine.MathUtils.sinDeg(ry) * scaleY;
-					this.a = pa * la + pb * lc;
-					this.b = pa * lb + pb * ld;
+					this.a = pa * la - pb * lc;
+					this.b = pa * lb - pb * ld;
 					this.c = pc * la + pd * lc;
 					this.d = pc * lb + pd * ld;
 					break;
@@ -1921,6 +1916,8 @@ var spine;
 			}
 		};
 		IkConstraint.prototype.apply1 = function (bone, targetX, targetY, alpha) {
+			if (!bone.appliedValid)
+				bone.updateAppliedTransform();
 			var p = bone.parent;
 			var id = 1 / (p.a * p.d - p.b * p.c);
 			var x = targetX - p.worldX, y = targetY - p.worldY;
