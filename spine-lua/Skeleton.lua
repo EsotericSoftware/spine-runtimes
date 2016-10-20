@@ -40,6 +40,8 @@ local Color = require "spine-lua.Color"
 local setmetatable = setmetatable
 local ipairs = ipairs
 local table_insert = table.insert
+local math_min = math.min
+local math_max = math.max
 
 local Skeleton = {}
 Skeleton.__index = Skeleton
