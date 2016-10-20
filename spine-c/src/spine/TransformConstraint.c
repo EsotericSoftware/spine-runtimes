@@ -57,11 +57,13 @@ void spTransformConstraint_apply (spTransformConstraint* self) {
 	float rotateMix = self->rotateMix, translateMix = self->translateMix, scaleMix = self->scaleMix, shearMix = self->shearMix;
 	spBone* target = self->target;
 	float ta = target->a, tb = target->b, tc = target->c, td = target->d;
+	int /*bool*/ modified;
 	int i;
 	for (i = 0; i < self->bonesCount; ++i) {
 		spBone* bone = self->bones[i];
+		modified = 0;
 
-		if (rotateMix > 0) {
+		if (rotateMix != 0) {
 			float a = bone->a, b = bone->b, c = bone->c, d = bone->d;
 			float r = ATAN2(tc, ta) - ATAN2(c, a) + self->data->offsetRotation * DEG_RAD;
 			float cosine, sine;
@@ -74,26 +76,29 @@ void spTransformConstraint_apply (spTransformConstraint* self) {
 			CONST_CAST(float, bone->b) = cosine * b - sine * d;
 			CONST_CAST(float, bone->c) = sine * a + cosine * c;
 			CONST_CAST(float, bone->d) = sine * b + cosine * d;
+			modified = 1;
 		}
 
-		if (translateMix > 0) {
+		if (translateMix != 0) {
 			float x, y;
 			spBone_localToWorld(target, self->data->offsetX, self->data->offsetY, &x, &y);
 			CONST_CAST(float, bone->worldX) += (x - bone->worldX) * translateMix;
 			CONST_CAST(float, bone->worldY) += (y - bone->worldY) * translateMix;
+			modified = 1;
 		}
 
 		if (scaleMix > 0) {
-			float bs = SQRT(bone->a * bone->a + bone->c * bone->c);
+			float s = SQRT(bone->a * bone->a + bone->c * bone->c);
 			float ts = SQRT(ta * ta + tc * tc);
-			float s = bs > 0.00001f ? (bs + (ts - bs + self->data->offsetScaleX) * scaleMix) / bs : 0;
+			if (s > 0.00001f) s = (s + (ts - s + self->data->offsetScaleX) * scaleMix) / s;
 			CONST_CAST(float, bone->a) *= s;
 			CONST_CAST(float, bone->c) *= s;
-			bs = SQRT(bone->b * bone->b + bone->d * bone->d);
+			s = SQRT(bone->b * bone->b + bone->d * bone->d);
 			ts = SQRT(tb * tb + td * td);
-			s = bs > 0.00001f ? (bs + (ts - bs + self->data->offsetScaleY) * scaleMix) / bs : 0;
+			if (s > 0.00001f) s = (s + (ts - s + self->data->offsetScaleY) * scaleMix) / s;
 			CONST_CAST(float, bone->b) *= s;
 			CONST_CAST(float, bone->d) *= s;
+			modified = 1;
 		}
 
 		if (shearMix > 0) {
@@ -106,6 +111,9 @@ void spTransformConstraint_apply (spTransformConstraint* self) {
 			r = by + (r + self->data->offsetShearY * DEG_RAD) * shearMix;
 			CONST_CAST(float, bone->b) = COS(r) * s;
 			CONST_CAST(float, bone->d) = SIN(r) * s;
+			modified = 1;
 		}
+
+		if (modified) CONST_CAST(int, bone->appliedValid) = 0;
 	}
 }
