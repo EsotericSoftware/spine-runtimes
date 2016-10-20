@@ -35,6 +35,8 @@ local math_sin = math.sin
 local math_cos = math.cos
 local math_atan2 = math.atan2
 local math_sqrt = math.sqrt
+local math_abs = math.abs
+local math_pi = math.pi
 
 local TransformMode = require "spine-lua.TransformMode"
 
@@ -167,10 +169,10 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		local lb = math_cos(math_rad(ry)) * scaleY
 		local lc = math_sin(math_rad(rx)) * scaleX
 		local ld = math_sin(math_rad(ry)) * scaleY
-		a = pa * la - pb * lc
-		b = pa * lb - pb * ld
-		c = pc * la + pd * lc
-		d = pc * lb + pd * ld	
+		self.a = pa * la - pb * lc
+		self.b = pa * lb - pb * ld
+		self.c = pc * la + pd * lc
+		self.d = pc * lb + pd * ld	
 	elseif transformMode == TransformMode.noScale or transformMode == TransformMode.noScaleOrReflection then
 		local cos = math_cos(math_rad(rotation))
 		local sin = math_sin(math_rad(rotation))
@@ -192,7 +194,7 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		self.b = za * lb + zb * ld
 		self.c = zc * la + zd * lc
 		self.d = zc * lb + zd * ld
-		local flip = skeleton.flipX ~= skeleton.flipY
+		local flip = self.skeleton.flipX ~= self.skeleton.flipY
 		if transformMode ~= TransformMode.noScaleOrReflection then flip = pa * pd - pb * pc < 0 end
 		if flip then
 			self.b = -self.b
@@ -201,11 +203,11 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		return
 	end
 	
-	if skeleton.flipX then
+	if self.skeleton.flipX then
 		self.a = -self.a
 		self.b = -self.b
 	end
-	if skeleton.flipY then
+	if self.skeleton.flipY then
 		self.c = -self.c
 		self.d = -self.d
 	end
