@@ -97,7 +97,7 @@ module spine {
 				this.c = lc;
 				this.d = ld;
 				this.worldX = x + skeleton.x;
-				this.worldY = y + skeleton.y;				
+				this.worldY = y + skeleton.y;
 				return;
 			}
 
@@ -253,7 +253,7 @@ module spine {
 				this.ay = this.worldY;
 				this.arotation = Math.atan2(this.c, this.a) * MathUtils.radDeg;
 				this.ascaleX = Math.sqrt(this.a * this.a + this.c * this.c);
-				this.ascaleY = Math.sqrt(this.b * this.b + this.d * this.d);				
+				this.ascaleY = Math.sqrt(this.b * this.b + this.d * this.d);
 				this.ashearX = 0;
 				this.ashearY = Math.atan2(this.a * this.b + this.c * this.d, this.a * this.d - this.b * this.c) * MathUtils.radDeg;
 				return;
@@ -283,7 +283,7 @@ module spine {
 				this.ascaleY = Math.sqrt(rb * rb + rd * rd);
 				this.ashearY = 0;
 				this.arotation = 90 - Math.atan2(rd, rb) * MathUtils.radDeg;
-			}			
+			}
 		}
 
 		worldToLocal (world: Vector2) {

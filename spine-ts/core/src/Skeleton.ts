@@ -73,7 +73,7 @@ module spine {
 				this.drawOrder.push(slot);
 			}
 
-			this.ikConstraints = new Array<IkConstraint>();			
+			this.ikConstraints = new Array<IkConstraint>();
 			for (let i = 0; i < data.ikConstraints.length; i++) {
 				let ikConstraintData = data.ikConstraints[i];
 				this.ikConstraints.push(new IkConstraint(ikConstraintData, this));
@@ -109,7 +109,7 @@ module spine {
 			let pathConstraints = this.pathConstraints;
 			let ikCount = ikConstraints.length, transformCount = transformConstraints.length, pathCount = pathConstraints.length;
 			let constraintCount = ikCount + transformCount + pathCount;
-			
+
 			outer:
 			for (let i = 0; i < constraintCount; i++) {
 				for (let ii = 0; ii < ikCount; ii++) {
@@ -136,7 +136,7 @@ module spine {
 			}
 
 			for (let i = 0, n = bones.length; i < n; i++)
-				this.sortBone(bones[i]);			
+				this.sortBone(bones[i]);
 		}
 
 		sortIkConstraint (constraint: IkConstraint) {
@@ -217,7 +217,7 @@ module spine {
 				let bones = this.bones;
 				let i = 0;
 				while (i < pathBones.length) {
-					let boneCount = pathBones[i++]; 
+					let boneCount = pathBones[i++];
 					for (let n = i + boneCount; i < n; i++) {
 						let boneIndex = pathBones[i];
 						this.sortBone(bones[boneIndex]);

@@ -58,7 +58,7 @@ module spine {
 		 * @param offset The worldVertices index to begin writing values. */
 		computeWorldVerticesWith (slot: Slot, start: number, count: number, worldVertices: ArrayLike<number>, offset: number) {
 			count += offset;
-			let skeleton = slot.bone.skeleton;			
+			let skeleton = slot.bone.skeleton;
 			let deformArray = slot.attachmentVertices;
 			let vertices = this.vertices;
 			let bones = this.bones;
