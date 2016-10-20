@@ -57,16 +57,14 @@ end
 function VertexAttachment:computeWorldVerticesWith (slot, start, count, worldVertices, offset)
 	count = count + offset
 	local skeleton = slot.bone.skeleton
-	local x = skeleton.x
-	local y = skeleton.y
 	local deformArray = slot.attachmentVertices
 	local vertices = self.vertices
 	local bones = self.bones
 	if not bones then
 		if #deformArray > 0 then vertices = deformArray end
 		local bone = slot.bone
-		x = x + bone.worldX
-		y = y + bone.worldY
+		x = bone.worldX
+		y = bone.worldY
 		local a = bone.a
 		local b = bone.b
 		local c = bone.c
@@ -97,8 +95,8 @@ function VertexAttachment:computeWorldVerticesWith (slot, start, count, worldVer
 		local w = offset
 		local b = skip * 3
 		while w < count do
-			local wx = x
-			local wy = y
+			local wx = 0
+			local wy = 0
 			local n = bones[v + 1]
 			v = v + 1
 			n = n + v
@@ -122,8 +120,8 @@ function VertexAttachment:computeWorldVerticesWith (slot, start, count, worldVer
 		local b = skip * 3
 		local f = skip * 2
 		while w < count do
-			local wx = x
-			local wy = y
+			local wx = 0
+			local wy = 0
 			local n = bones[v + 1]
 			v = v + 1
 			n = n + v

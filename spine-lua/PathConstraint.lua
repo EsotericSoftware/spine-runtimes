@@ -134,9 +134,6 @@ function PathConstraint:update ()
 	end
 
 	local positions = self:computeWorldPositions(attachment, spacesCount, tangents, data.positionMode == PathConstraintData.PositionMode.percent, spacingMode == PathConstraintData.SpacingMode.percent)
-	local skeleton = self.target.bone.skeleton
-	local skeletonX = skeleton.x
-	local skeletonY = skeleton.y
 	local boneX = positions[1]
 	local boneY = positions[2]
 	local offsetRotation = data.offsetRotation
@@ -145,8 +142,8 @@ function PathConstraint:update ()
 	local p = 3
 	while i < boneCount do
 		local bone = bones[i + 1]
-		bone.worldX = bone.worldX + (boneX - skeletonX - bone.worldX) * translateMix
-		bone.worldY = bone.worldY + (boneY - skeletonY - bone.worldY) * translateMix
+		bone.worldX = bone.worldX + (boneX - bone.worldX) * translateMix
+		bone.worldY = bone.worldY + (boneY - bone.worldY) * translateMix
 		local x = positions[p + 1]
 		local y = positions[p + 2]
 		local dx = x - boneX
@@ -197,6 +194,7 @@ function PathConstraint:update ()
 			bone.c = sin * a + cos * c
 			bone.d = sin * b + cos * d
 		end
+		bone.appliedValid = false
 		i = i + 1
 		p = p + 3
 	end
@@ -496,7 +494,7 @@ function PathConstraint:addAfterPosition(p, temp, i, out, o)
 end
 
 function PathConstraint:addCurvePosition(p, x1, y1, cx1, cy1, cx2, cy2, x2, y2, out, o, tangents)
-	if p == 0 then p = 0.0001 end
+	if p == 0 or (p ~= p) then p = 0.0001 end
 	local tt = p * p
 	local ttt = tt * p
 	local u = 1 - p

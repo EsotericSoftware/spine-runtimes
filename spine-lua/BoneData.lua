@@ -28,6 +28,9 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
+local setmetatable = setmetatable
+local TransformMode = require "spine-lua.TransformMode"
+
 local BoneData = {}
 function BoneData.new (index, name, parent)
 	if index < 0 then error("index must be >= 0", 2) end
@@ -36,6 +39,7 @@ function BoneData.new (index, name, parent)
 	local self = {
 		index = index,
 		name = name,
+		transformMode = TransformMode.normal,
 		parent = parent,
 		length = 0,
 		x = 0, y = 0,
