@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "9MKo2cmJTDc3IPV4B3LRJxWbl04", "spine": "3.4.02", "width": 897, "height": 716.36, "images": "./images/" },
+"skeleton": { "hash": "Mc0suer5LoUZv7DvFA3mLFATKFU", "spine": "3.5.03-beta", "width": 897, "height": 716.36, "fps": 30, "images": "./images/" },
 "bones": [
 	{ "name": "root", "y": -176.12 },
 	{ "name": "COG", "parent": "root", "y": 176.12 },
@@ -200,7 +200,7 @@
 					{ "time": 0.8, "name": "L_wing03" },
 					{ "time": 0.8333, "name": "L_wing04" },
 					{ "time": 0.8666, "name": "L_wing05" },
-					{ "time": 0.9, "name": "L_wing06" },
+					{ "time": 0.8999, "name": "L_wing06" },
 					{ "time": 0.9333, "name": "L_wing07" },
 					{ "time": 0.9666, "name": "L_wing08" },
 					{ "time": 1, "name": "L_wing01" }
@@ -223,7 +223,7 @@
 					{ "time": 0.8, "name": "R_wing03" },
 					{ "time": 0.8333, "name": "R_wing04" },
 					{ "time": 0.8666, "name": "R_wing05" },
-					{ "time": 0.9, "name": "R_wing06" },
+					{ "time": 0.8999, "name": "R_wing06" },
 					{ "time": 0.9333, "name": "R_wing07" },
 					{ "time": 0.9666, "name": "R_wing08" },
 					{ "time": 1, "name": "R_wing01" }
@@ -757,7 +757,7 @@
 					{ "time": 0.3333, "angle": 23.93 },
 					{
 						"time": 0.6666,
-						"angle": 337.8,
+						"angle": 337.79,
 						"curve": [ 0.41, 0, 0.887, 0.75 ]
 					},
 					{ "time": 1, "angle": 0 }
