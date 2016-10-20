@@ -136,8 +136,8 @@ public class Animation {
 	static public interface Timeline {
 		/** Sets the value(s) for the specified time.
 		 * @param events May be null to not collect fired events.
-		 * @param setupPose If true, the timeline is mixed with the setup pose, else it is mixed with the current pose. Passing true
-		 *           when alpha is 1 is slightly more efficient.
+		 * @param setupPose True when the timeline is mixed with the setup pose, false when it is mixed with the current pose.
+		 *           Passing true when alpha is 1 is slightly more efficient.
 		 * @param mixingOut True when mixing over time toward the setup or current pose, false when mixing toward the keyed pose.
 		 *           Irrelevant when alpha is 1. */
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
@@ -916,7 +916,7 @@ public class Animation {
 			if (time < frames[0]) return; // Time is before first frame.
 
 			// BOZO - Finish timelines handling setupPose and mixingOut from here down.
-			
+
 			IkConstraint constraint = skeleton.ikConstraints.get(ikConstraintIndex);
 
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
