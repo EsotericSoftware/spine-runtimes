@@ -35,11 +35,11 @@ module spine {
 		parent: Bone;
 		children = new Array<Bone>();
 		x = 0; y = 0; rotation = 0; scaleX = 0; scaleY = 0; shearX = 0; shearY = 0;
-		appliedRotation = 0;
+		ax = 0; ay = 0; arotation = 0; ascaleX = 0; ascaleY = 0; ashearX = 0; ashearY = 0;
+		appliedValid = false;
 
 		a = 0; b = 0; worldX = 0;
 		c = 0; d = 0; worldY = 0;
-		worldSignX = 0; worldSignY = 0;
 
 		sorted = false;
 
@@ -65,14 +65,22 @@ module spine {
 
 		/** Computes the world transform using the parent bone and the specified local transform. */
 		updateWorldTransformWith (x: number, y: number, rotation: number, scaleX: number, scaleY: number, shearX: number, shearY: number) {
-			this.appliedRotation = rotation;
-
-			let rotationY = rotation + 90 + shearY;
-			let la = MathUtils.cosDeg(rotation + shearX) * scaleX, lb = MathUtils.cosDeg(rotationY) * scaleY;
-			let lc = MathUtils.sinDeg(rotation + shearX) * scaleX, ld = MathUtils.sinDeg(rotationY) * scaleY;
+			this.ax = x;
+			this.ay = y;
+			this.arotation = rotation;
+			this.ascaleX = scaleX;
+			this.ascaleY = scaleY;
+			this.ashearX = shearX;
+			this.ashearY = shearY;
+			this.appliedValid = true;
 
 			let parent = this.parent;
 			if (parent == null) { // Root bone.
+				let rotationY = rotation + 90 + shearY;
+				let la = MathUtils.cosDeg(rotation + shearX) * scaleX;
+				let lb = MathUtils.cosDeg(rotationY) * scaleY;
+				let lc = MathUtils.sinDeg(rotation + shearX) * scaleX;
+				let ld = MathUtils.sinDeg(rotationY) * scaleY;
 				let skeleton = this.skeleton;
 				if (skeleton.flipX) {
 					x = -x;
@@ -88,91 +96,97 @@ module spine {
 				this.b = lb;
 				this.c = lc;
 				this.d = ld;
-				this.worldX = x;
-				this.worldY = y;
-				this.worldSignX = MathUtils.signum(scaleX);
-				this.worldSignY = MathUtils.signum(scaleY);
+				this.worldX = x + skeleton.x;
+				this.worldY = y + skeleton.y;
 				return;
 			}
 
 			let pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 			this.worldX = pa * x + pb * y + parent.worldX;
 			this.worldY = pc * x + pd * y + parent.worldY;
-			this.worldSignX = parent.worldSignX * MathUtils.signum(scaleX);
-			this.worldSignY = parent.worldSignY * MathUtils.signum(scaleY);
 
-			if (this.data.inheritRotation && this.data.inheritScale) {
+			switch (this.data.transformMode) {
+			case TransformMode.Normal: {
+				let rotationY = rotation + 90 + shearY;
+				let la = MathUtils.cosDeg(rotation + shearX) * scaleX;
+				let lb = MathUtils.cosDeg(rotationY) * scaleY;
+				let lc = MathUtils.sinDeg(rotation + shearX) * scaleX;
+				let ld = MathUtils.sinDeg(rotationY) * scaleY;
 				this.a = pa * la + pb * lc;
 				this.b = pa * lb + pb * ld;
 				this.c = pc * la + pd * lc;
 				this.d = pc * lb + pd * ld;
-			} else {
-				if (this.data.inheritRotation) { // No scale inheritance.
-					pa = 1;
-					pb = 0;
-					pc = 0;
-					pd = 1;
-					do {
-						let cos = MathUtils.cosDeg(parent.appliedRotation), sin = MathUtils.sinDeg(parent.appliedRotation);
-						let temp = pa * cos + pb * sin;
-						pb = pb * cos - pa * sin;
-						pa = temp;
-						temp = pc * cos + pd * sin;
-						pd = pd * cos - pc * sin;
-						pc = temp;
-
-						if (!parent.data.inheritRotation) break;
-						parent = parent.parent;
-					} while (parent != null);
-					this.a = pa * la + pb * lc;
-					this.b = pa * lb + pb * ld;
-					this.c = pc * la + pd * lc;
-					this.d = pc * lb + pd * ld;
-				} else if (this.data.inheritScale) { // No rotation inheritance.
-					pa = 1;
-					pb = 0;
-					pc = 0;
-					pd = 1;
-					do {
-						let cos = MathUtils.cosDeg(parent.appliedRotation), sin = MathUtils.sinDeg(parent.appliedRotation);
-						let psx = parent.scaleX, psy = parent.scaleY;
-						let za = cos * psx, zb = sin * psy, zc = sin * psx, zd = cos * psy;
-						let temp = pa * za + pb * zc;
-						pb = pb * zd - pa * zb;
-						pa = temp;
-						temp = pc * za + pd * zc;
-						pd = pd * zd - pc * zb;
-						pc = temp;
-
-						if (psx >= 0) sin = -sin;
-						temp = pa * cos + pb * sin;
-						pb = pb * cos - pa * sin;
-						pa = temp;
-						temp = pc * cos + pd * sin;
-						pd = pd * cos - pc * sin;
-						pc = temp;
-
-						if (!parent.data.inheritScale) break;
-						parent = parent.parent;
-					} while (parent != null);
-					this.a = pa * la + pb * lc;
-					this.b = pa * lb + pb * ld;
-					this.c = pc * la + pd * lc;
-					this.d = pc * lb + pd * ld;
+				return;
+			}
+			case TransformMode.OnlyTranslation: {
+				let rotationY = rotation + 90 + shearY;
+				this.a = MathUtils.cosDeg(rotation + shearX) * scaleX;
+				this.b = MathUtils.cosDeg(rotationY) * scaleY;
+				this.c = MathUtils.sinDeg(rotation + shearX) * scaleX;
+				this.d = MathUtils.sinDeg(rotationY) * scaleY;
+				break;
+			}
+			case TransformMode.NoRotationOrReflection: {
+				let s = pa * pa + pc * pc;
+				let prx = 0;
+				if (s > 0.0001) {
+					s = Math.abs(pa * pd - pb * pc) / s;
+					pb = pc * s;
+					pd = pa * s;
+					prx = Math.atan2(pc, pa) * MathUtils.radDeg;
 				} else {
-					this.a = la;
-					this.b = lb;
-					this.c = lc;
-					this.d = ld;
+					pa = 0;
+					pc = 0;
+					prx = 90 - Math.atan2(pd, pb) * MathUtils.radDeg;
 				}
-				if (this.skeleton.flipX) {
-					this.a = -this.a;
+				let rx = rotation + shearX - prx;
+				let ry = rotation + shearY - prx + 90;
+				let la = MathUtils.cosDeg(rx) * scaleX;
+				let lb = MathUtils.cosDeg(ry) * scaleY;
+				let lc = MathUtils.sinDeg(rx) * scaleX;
+				let ld = MathUtils.sinDeg(ry) * scaleY;
+				this.a = pa * la - pb * lc;
+				this.b = pa * lb - pb * ld;
+				this.c = pc * la + pd * lc;
+				this.d = pc * lb + pd * ld;
+				break;
+			}
+			case TransformMode.NoScale:
+			case TransformMode.NoScaleOrReflection: {
+				let cos = MathUtils.cosDeg(rotation);
+				let sin = MathUtils.sinDeg(rotation);
+				let za = pa * cos + pb * sin;
+				let zc = pc * cos + pd * sin;
+				let s = Math.sqrt(za * za + zc * zc);
+				if (s > 0.00001) s = 1 / s;
+				za *= s;
+				zc *= s;
+				s = Math.sqrt(za * za + zc * zc);
+				let r = Math.PI / 2 + Math.atan2(zc, za);
+				let zb = Math.cos(r) * s;
+				let zd = Math.sin(r) * s;
+				let la = MathUtils.cosDeg(shearX) * scaleX;
+				let lb = MathUtils.cosDeg(90 + shearY) * scaleY;
+				let lc = MathUtils.sinDeg(shearX) * scaleX;
+				let ld = MathUtils.sinDeg(90 + shearY) * scaleY;
+				this.a = za * la + zb * lc;
+				this.b = za * lb + zb * ld;
+				this.c = zc * la + zd * lc;
+				this.d = zc * lb + zd * ld;
+				if (this.data.transformMode != TransformMode.NoScaleOrReflection ? pa * pd - pb * pc < 0 : this.skeleton.flipX != this.skeleton.flipY) {
 					this.b = -this.b;
-				}
-				if (this.skeleton.flipY) {
-					this.c = -this.c;
 					this.d = -this.d;
 				}
+				return;
+			}
+			}
+			if (this.skeleton.flipX) {
+				this.a = -this.a;
+				this.b = -this.b;
+			}
+			if (this.skeleton.flipY) {
+				this.c = -this.c;
+				this.d = -this.d;
 			}
 		}
 
@@ -196,23 +210,23 @@ module spine {
 		}
 
 		getWorldScaleX () {
-			return Math.sqrt(this.a * this.a + this.b * this.b) * this.worldSignX;
+			return Math.sqrt(this.a * this.a + this.c * this.c);
 		}
 
 		getWorldScaleY () {
-			return Math.sqrt(this.c * this.c + this.d * this.d) * this.worldSignY;
+			return Math.sqrt(this.b * this.b + this.d * this.d);
 		}
 
 		worldToLocalRotationX () {
 			let parent = this.parent;
-			if (parent == null) return this.rotation;
+			if (parent == null) return this.arotation;
 			let pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, a = this.a, c = this.c;
 			return Math.atan2(pa * c - pc * a, pd * a - pb * c) * MathUtils.radDeg;
 		}
 
 		worldToLocalRotationY () {
 			let parent = this.parent;
-			if (parent == null) return this.rotation;
+			if (parent == null) return this.arotation;
 			let pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, b = this.b, d = this.d;
 			return Math.atan2(pa * d - pc * b, pd * b - pb * d) * MathUtils.radDeg;
 		}
@@ -224,31 +238,31 @@ module spine {
 			this.b = cos * b - sin * d;
 			this.c = sin * a + cos * c;
 			this.d = sin * b + cos * d;
+			this.appliedValid = false;
 		}
 
-		/** Computes the local transform from the world transform. This can be useful to perform processing on the local transform
-		 * after the world transform has been modified directly (eg, by a constraint).
-		 * <p>
-		 * Some redundant information is lost by the world transform, such as -1,-1 scale versus 180 rotation. The computed local
-		 * transform values may differ from the original values but are functionally the same. */
-		updateLocalTransform () {
+		/** Computes the individual applied transform values from the world transform. This can be useful to perform processing using
+	 	 * the applied transform after the world transform has been modified directly (eg, by a constraint).
+	 	 * <p>
+	 	 * Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. */
+		updateAppliedTransform () {
+			this.appliedValid = true;
 			let parent = this.parent;
 			if (parent == null) {
-				this.x = this.worldX;
-				this.y = this.worldY;
-				this.rotation = Math.atan2(this.c, this.a) * MathUtils.radDeg;
-				this.scaleX = Math.sqrt(this.a * this.a + this.c * this.c);
-				this.scaleY = Math.sqrt(this.b * this.b + this.d * this.d);
-				let det = this.a * this.d - this.b * this.c;
-				this.shearX = 0;
-				this.shearY = Math.atan2(this.a * this.b + this.c * this.d, det) * MathUtils.radDeg;
+				this.ax = this.worldX;
+				this.ay = this.worldY;
+				this.arotation = Math.atan2(this.c, this.a) * MathUtils.radDeg;
+				this.ascaleX = Math.sqrt(this.a * this.a + this.c * this.c);
+				this.ascaleY = Math.sqrt(this.b * this.b + this.d * this.d);
+				this.ashearX = 0;
+				this.ashearY = Math.atan2(this.a * this.b + this.c * this.d, this.a * this.d - this.b * this.c) * MathUtils.radDeg;
 				return;
 			}
 			let pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 			let pid = 1 / (pa * pd - pb * pc);
 			let dx = this.worldX - parent.worldX, dy = this.worldY - parent.worldY;
-			this.x = (dx * pd * pid - dy * pb * pid);
-			this.y = (dy * pa * pid - dx * pc * pid);
+			this.ax = (dx * pd * pid - dy * pb * pid);
+			this.ay = (dy * pa * pid - dx * pc * pid);
 			let ia = pid * pd;
 			let id = pid * pa;
 			let ib = pid * pb;
@@ -257,20 +271,19 @@ module spine {
 			let rb = ia * this.b - ib * this.d;
 			let rc = id * this.c - ic * this.a;
 			let rd = id * this.d - ic * this.b;
-			this.shearX = 0;
-			this.scaleX = Math.sqrt(ra * ra + rc * rc);
-			if (this.scaleX > 0.0001) {
+			this.ashearX = 0;
+			this.ascaleX = Math.sqrt(ra * ra + rc * rc);
+			if (this.ascaleX > 0.0001) {
 				let det = ra * rd - rb * rc;
-				this.scaleY = det / this.scaleX;
-				this.shearY = Math.atan2(ra * rb + rc * rd, det) * MathUtils.radDeg;
-				this.rotation = Math.atan2(rc, ra) * MathUtils.radDeg;
+				this.ascaleY = det / this.ascaleX;
+				this.ashearY = Math.atan2(ra * rb + rc * rd, det) * MathUtils.radDeg;
+				this.arotation = Math.atan2(rc, ra) * MathUtils.radDeg;
 			} else {
-				this.scaleX = 0;
-				this.scaleY = Math.sqrt(rb * rb + rd * rd);
-				this.shearY = 0;
-				this.rotation = 90 - Math.atan2(rd, rb) * MathUtils.radDeg;
+				this.ascaleX = 0;
+				this.ascaleY = Math.sqrt(rb * rb + rd * rd);
+				this.ashearY = 0;
+				this.arotation = 90 - Math.atan2(rd, rb) * MathUtils.radDeg;
 			}
-			this.appliedRotation = this.rotation;
 		}
 
 		worldToLocal (world: Vector2) {

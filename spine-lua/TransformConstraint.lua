@@ -81,7 +81,8 @@ function TransformConstraint:update ()
 	local td = target.d
 	local bones = self.bones
 	for i, bone in ipairs(bones) do
-		if rotateMix > 0 then
+		local modified = false
+		if rotateMix ~= 0 then
 			local a = bone.a
 			local b = bone.b
 			local c = bone.c
@@ -99,15 +100,17 @@ function TransformConstraint:update ()
 			bone.b = cos * b - sin * d
 			bone.c = sin * a + cos * c
 			bone.d = sin * b + cos * d
+			modified = true
 		end
 
-		if translateMix > 0 then
+		if translateMix ~= 0 then
 			local temp = self.temp
 			temp[1] = self.data.offsetX
 			temp[2] = self.data.offsetY
 			target:localToWorld(temp)
 			bone.worldX = bone.worldX + (temp[1] - bone.worldX) * translateMix
 			bone.worldY = bone.worldY + (temp[2] - bone.worldY) * translateMix
+			modified = true
 		end
 
 		if scaleMix > 0 then
@@ -127,6 +130,7 @@ function TransformConstraint:update ()
 			end
 			bone.b = bone.b * s
 			bone.d = bone.d * s
+			modified = true
 		end
 
 		if shearMix > 0 then
@@ -143,7 +147,10 @@ function TransformConstraint:update ()
 			local s = math_sqrt(b * b + d * d)
 			bone.b = math_cos(r) * s
 			bone.d = math_sin(r) * s
+			modified = true
 		end
+		
+		if modified then bone.appliedValid = false end
 	end
 end
 

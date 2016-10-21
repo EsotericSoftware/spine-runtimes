@@ -42,8 +42,7 @@ public class BoneData {
 	public var scaleY:Number = 1;
 	public var shearX:Number;
 	public var shearY:Number;	
-	public var inheritRotation:Boolean = true;
-	public var inheritScale:Boolean = true;
+	public var transformMode:TransformMode = TransformMode.normal;
 
 	/** @param parent May be null. */
 	public function BoneData (index:int, name:String, parent:BoneData) {

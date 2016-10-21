@@ -34,6 +34,7 @@ function PathConstraintData.new (name)
 
 	local self = {
 		name = name,
+		order = 0,
 		bones = {},
 		target = nil,
 		positionMode = nil,

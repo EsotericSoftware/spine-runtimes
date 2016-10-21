@@ -43,8 +43,9 @@ public class Main extends Sprite {
 		// example = SpineboyExample;
 		// example = GoblinsExample;
 		// example = RaptorExample;
-		example = TankExample;
+		// example = TankExample;
 		// example = VineExample;
+		example = StretchymanExample;
 
 		_starling = new Starling(example, stage);
 		_starling.enableErrorChecking = true;

@@ -77,8 +77,7 @@ void spPathConstraint_apply (spPathConstraint* self) {
 	float length, x, y, dx, dy, s;
 	float* spaces, *lengths, *positions;
 	float spacing;
-	spSkeleton* skeleton;
-	float skeletonX, skeletonY, boneX, boneY, offsetRotation;
+	float boneX, boneY, offsetRotation;
 	int/*bool*/tip;
 	float rotateMix = self->rotateMix, translateMix = self->translateMix;
 	int/*bool*/ translate = translateMix > 0, rotate = rotateMix > 0;
@@ -127,14 +126,12 @@ void spPathConstraint_apply (spPathConstraint* self) {
 
 	positions = spPathConstraint_computeWorldPositions(self, attachment, spacesCount, tangents,
 		data->positionMode == SP_POSITION_MODE_PERCENT, spacingMode == SP_SPACING_MODE_PERCENT);
-	skeleton = self->target->bone->skeleton;
-	skeletonX = skeleton->x, skeletonY = skeleton->y;
 	boneX = positions[0], boneY = positions[1], offsetRotation = self->data->offsetRotation;
 	tip = rotateMode == SP_ROTATE_MODE_CHAIN_SCALE && offsetRotation == 0;
 	for (i = 0, p = 3; i < boneCount; i++, p += 3) {
 		spBone* bone = bones[i];
-		CONST_CAST(float, bone->worldX) += (boneX - skeletonX - bone->worldX) * translateMix;
-		CONST_CAST(float, bone->worldY) += (boneY - skeletonY - bone->worldY) * translateMix;
+		CONST_CAST(float, bone->worldX) += (boneX - bone->worldX) * translateMix;
+		CONST_CAST(float, bone->worldY) += (boneY - bone->worldY) * translateMix;
 		x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
 		if (scale) {
 			length = lengths[i];
@@ -174,6 +171,7 @@ void spPathConstraint_apply (spPathConstraint* self) {
 			CONST_CAST(float, bone->c) = sine * a + cosine * c;
 			CONST_CAST(float, bone->d) = sine * b + cosine * d;
 		}
+		CONST_CAST(int, bone->appliedValid) = -1;
 	}
 }
 

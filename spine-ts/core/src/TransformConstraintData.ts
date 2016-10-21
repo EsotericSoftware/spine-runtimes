@@ -31,6 +31,7 @@
 module spine {
 	export class TransformConstraintData {
 		name: string;
+		order = 0;
 		bones = new Array<BoneData>();
 		target: BoneData;
 		rotateMix = 0; translateMix = 0; scaleMix = 0; shearMix = 0;

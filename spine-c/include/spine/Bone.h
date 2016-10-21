@@ -47,11 +47,11 @@ struct spBone {
 	int childrenCount;
 	spBone** const children;
 	float x, y, rotation, scaleX, scaleY, shearX, shearY;
-	float appliedRotation;
+	float ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY;
+	int /*bool*/ appliedValid;
 
 	float const a, b, worldX;
 	float const c, d, worldY;
-	float const worldSignX, worldSignY;
 
 	int/*bool*/ sorted;
 
@@ -62,11 +62,11 @@ struct spBone {
 		parent(0),
 		childrenCount(0), children(0),
 		x(0), y(0), rotation(0), scaleX(0), scaleY(0),
-		appliedRotation(0),
+		ax(0), ay(0), arotation(0), ascaleX(0), ascaleY(0), ashearX(0), ashearY(0),
+		appliedValid(0),
 
 		a(0), b(0), worldX(0),
 		c(0), d(0), worldY(0),
-		worldSignX(0), worldSignY(0),
 
 		sorted(0) {
 	}
@@ -93,7 +93,7 @@ float spBone_getWorldScaleY (spBone* self);
 float spBone_worldToLocalRotationX (spBone* self);
 float spBone_worldToLocalRotationY (spBone* self);
 void spBone_rotateWorld (spBone* self, float degrees);
-void spBone_updateLocalTransform (spBone* self);
+void spBone_updateAppliedTransform (spBone* self);
 
 void spBone_worldToLocal (spBone* self, float worldX, float worldY, float* localX, float* localY);
 void spBone_localToWorld (spBone* self, float localX, float localY, float* worldX, float* worldY);
@@ -114,7 +114,7 @@ typedef spBone Bone;
 #define Bone_worldToLocalRotationX(...) spBone_worldToLocalRotationX(__VA_ARGS__)
 #define Bone_worldToLocalRotationY(...) spBone_worldToLocalRotationY(__VA_ARGS__)
 #define Bone_rotateWorld(...) spBone_rotateWorld(__VA_ARGS__)
-#define Bone_updateLocalTransform(...) spBone_updateLocalTransform(__VA_ARGS__)
+#define Bone_updateAppliedTransform(...) spBone_updateAppliedTransform(__VA_ARGS__)
 #define Bone_worldToLocal(...) spBone_worldToLocal(__VA_ARGS__)
 #define Bone_localToWorld(...) spBone_localToWorld(__VA_ARGS__)
 #endif

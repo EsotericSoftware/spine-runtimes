@@ -38,8 +38,7 @@ spBoneData* spBoneData_create (int index, const char* name, spBoneData* parent) 
 	CONST_CAST(spBoneData*, self->parent) = parent;
 	self->scaleX = 1;
 	self->scaleY = 1;
-	self->inheritRotation = 1;
-	self->inheritScale = 1;
+	self->transformMode = SP_TRANSFORMMODE_NORMAL;
 	return self;
 }
 

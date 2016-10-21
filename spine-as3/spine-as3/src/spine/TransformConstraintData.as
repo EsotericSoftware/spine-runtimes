@@ -32,6 +32,7 @@ package spine {
 
 public class TransformConstraintData {
 	internal var _name:String;
+	public var order:Number;
 	internal var _bones:Vector.<BoneData> = new Vector.<BoneData>();
 	public var target:BoneData;
 	public var rotateMix:Number;

@@ -68,6 +68,36 @@ cp -f ../tank/export/tank.json ../../spine-cocos2dx/example/Resources/common/
 cp -f ../tank/export/tank.atlas ../../spine-cocos2dx/example/Resources/common/
 cp -f ../tank/export/tank.png ../../spine-cocos2dx/example/Resources/common/
 
+echo "spine-corona"
+rm -f ../../spine-corona/data/*
+cp -f ../goblins/export/goblins-mesh.json ../../spine-corona/data
+cp -f ../goblins/export/goblins.atlas ../../spine-corona/data
+cp -f ../goblins/export/goblins.png ../../spine-corona/data
+
+cp -f ../raptor/export/raptor.json ../../spine-corona/data
+cp -f ../raptor/export/raptor.atlas ../../spine-corona/data
+cp -f ../raptor/export/raptor.png ../../spine-corona/data
+
+cp -f ../spineboy/export/spineboy.json ../../spine-corona/data
+cp -f ../spineboy/export/spineboy.atlas ../../spine-corona/data
+cp -f ../spineboy/export/spineboy.png ../../spine-corona/data
+
+cp -f ../tank/export/tank.json ../../spine-corona/data
+cp -f ../tank/export/tank.atlas ../../spine-corona/data
+cp -f ../tank/export/tank.png ../../spine-corona/data
+
+cp -f ../vine/export/vine.json ../../spine-corona/data
+cp -f ../vine/export/vine.atlas ../../spine-corona/data
+cp -f ../vine/export/vine.png ../../spine-corona/data
+
+cp -f ../stretchyman/export/stretchyman.json ../../spine-corona/data
+cp -f ../stretchyman/export/stretchyman.atlas ../../spine-corona/data
+cp -f ../stretchyman/export/stretchyman.png ../../spine-corona/data
+
+cp -f ../test/export/test.json ../../spine-corona/data
+cp -f ../test/export/test.atlas ../../spine-corona/data
+cp -f ../test/export/test.png ../../spine-corona/data
+
 echo "spine-love"
 rm -f ../../spine-love/data/*
 cp -f ../goblins/export/goblins-mesh.json ../../spine-love/data
@@ -151,6 +181,10 @@ cp -f ../tank/export/tank.png ../../spine-starling/spine-starling-example/src/
 cp -f ../vine/export/vine.json ../../spine-starling/spine-starling-example/src/
 cp -f ../vine/export/vine.atlas ../../spine-starling/spine-starling-example/src/
 cp -f ../vine/export/vine.png ../../spine-starling/spine-starling-example/src/
+
+cp -f ../stretchyman/export/stretchyman.json ../../spine-starling/spine-starling-example/src/
+cp -f ../stretchyman/export/stretchyman.atlas ../../spine-starling/spine-starling-example/src/
+cp -f ../stretchyman/export/stretchyman.png ../../spine-starling/spine-starling-example/src/
 
 
 echo "spine-ts"
