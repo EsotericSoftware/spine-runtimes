@@ -63,13 +63,8 @@ public class Animation {
 		this.duration = duration;
 	}
 
-	/** Poses the skeleton at the specified time for this animation mixed with the current or setup pose.
-	 * @param lastTime The last time the animation was applied.
-	 * @param events Any triggered events are added. May be null.
-	 * @param alpha The percentage between this animation's pose and the current pose.
-	 * @param setupPose If true, the animation is mixed with the setup pose, else it is mixed with the current pose. Passing true
-	 *           when alpha is 1 is slightly more efficient.
-	 * @param mixingOut True when mixing over time toward the setup or current pose, false when mixing toward the keyed pose. */
+	/** Applies all the animation's timelines to the specified skeleton.
+	 * @see Timeline#apply(Skeleton, float, float, Array, float, boolean, boolean) */
 	public void apply (Skeleton skeleton, float lastTime, float time, boolean loop, Array<Event> events, float alpha,
 		boolean setupPose, boolean mixingOut) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
@@ -380,8 +375,8 @@ public class Animation {
 				bone.x = bone.data.x + x * alpha;
 				bone.y = bone.data.y + y * alpha;
 			} else {
-				bone.x += bone.data.x + (x - bone.x) * alpha;
-				bone.y += bone.data.y + (y - bone.y) * alpha;
+				bone.x += (bone.data.x + x - bone.x) * alpha;
+				bone.y += (bone.data.y + y - bone.y) * alpha;
 			}
 		}
 	}
