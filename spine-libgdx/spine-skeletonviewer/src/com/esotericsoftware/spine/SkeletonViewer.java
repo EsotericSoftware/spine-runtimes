@@ -62,7 +62,9 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -73,7 +75,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.esotericsoftware.spine.AnimationState.AnimationStateAdapter;
 import com.esotericsoftware.spine.AnimationState.TrackEntry;
@@ -94,6 +98,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 	FileHandle skeletonFile;
 	long lastModified;
 	float lastModifiedCheck, reloadTimer;
+	StringBuilder status = new StringBuilder();
 	Preferences prefs;
 
 	public void create () {
@@ -114,17 +119,16 @@ public class SkeletonViewer extends ApplicationAdapter {
 		ui.loadPrefs();
 
 		loadSkeleton(
-			Gdx.files.internal(Gdx.app.getPreferences("spine-skeletonviewer").getString("lastFile", "spineboy/spineboy.json")),
-			false);
+			Gdx.files.internal(Gdx.app.getPreferences("spine-skeletonviewer").getString("lastFile", "spineboy/spineboy.json")));
 
 		ui.loadPrefs();
 	}
 
-	void loadSkeleton (final FileHandle skeletonFile, boolean reload) {
+	void loadSkeleton (final FileHandle skeletonFile) {
 		if (skeletonFile == null) return;
 
 		try {
-			// A regular texture atlas would normally usually be used. This returns a white image for images not found in the atlas.
+			// Setup a texture atlas that uses a white image for images not found in the atlas.
 			Pixmap pixmap = new Pixmap(32, 32, Format.RGBA8888);
 			pixmap.setColor(new Color(1, 1, 1, 0.33f));
 			pixmap.fill();
@@ -153,6 +157,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				}
 			};
 
+			// Load skeleton data.
 			String extension = skeletonFile.extension();
 			if (extension.equalsIgnoreCase("json") || extension.equalsIgnoreCase("txt")) {
 				SkeletonJson json = new SkeletonJson(atlas);
@@ -178,6 +183,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		state = new AnimationState(new AnimationStateData(skeletonData));
 		state.addListener(new AnimationStateAdapter() {
+
 			public void event (TrackEntry entry, Event event) {
 				ui.toast(event.getData().getName());
 			}
@@ -193,6 +199,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		ui.window.getTitleLabel().setText(skeletonFile.name());
 		{
+
 			Array<String> items = new Array();
 			for (Skin skin : skeletonData.getSkins())
 				items.add(skin.getName());
@@ -204,27 +211,29 @@ public class SkeletonViewer extends ApplicationAdapter {
 				items.add(animation.getName());
 			ui.animationList.setItems(items);
 		}
+		ui.trackButtons.getButtons().first().setChecked(true);
 
 		// Configure skeleton from UI.
 
 		if (ui.skinList.getSelected() != null) skeleton.setSkin(ui.skinList.getSelected());
 		setAnimation();
-
-		if (reload) ui.toast("Reloaded.");
 	}
 
 	void setAnimation () {
 		if (ui.animationList.getSelected() == null) return;
-		TrackEntry current = state.getCurrent(0);
+		int track = ui.trackButtons.getCheckedIndex();
+		TrackEntry current = state.getCurrent(track);
+		TrackEntry entry;
 		if (current == null) {
-			state.setEmptyAnimation(0, 0);
-			TrackEntry entry = state.addAnimation(0, ui.animationList.getSelected(), ui.loopCheckbox.isChecked(), 0);
+			state.setEmptyAnimation(track, 0);
+			entry = state.addAnimation(track, ui.animationList.getSelected(), ui.loopCheckbox.isChecked(), 0);
 			entry.setMixDuration(ui.mixSlider.getValue());
 			entry.setTrackEnd(Integer.MAX_VALUE);
 		} else {
-			TrackEntry entry = state.setAnimation(0, ui.animationList.getSelected(), ui.loopCheckbox.isChecked());
+			entry = state.setAnimation(track, ui.animationList.getSelected(), ui.loopCheckbox.isChecked());
 			entry.setTrackEnd(Integer.MAX_VALUE);
 		}
+		entry.setAlpha(ui.alphaSlider.getValue());
 	}
 
 	public void render () {
@@ -253,21 +262,23 @@ public class SkeletonViewer extends ApplicationAdapter {
 				}
 			} else {
 				reloadTimer -= delta;
-				if (reloadTimer <= 0) loadSkeleton(skeletonFile, true);
+				if (reloadTimer <= 0) {
+					loadSkeleton(skeletonFile);
+					ui.toast("Reloaded.");
+				}
 			}
 
 			// Pose and render skeleton.
 			state.getData().setDefaultMix(ui.mixSlider.getValue());
 			renderer.setPremultipliedAlpha(ui.premultipliedCheckbox.isChecked());
 
+			skeleton.setFlip(ui.flipXCheckbox.isChecked(), ui.flipYCheckbox.isChecked());
+			skeleton.setPosition(skeletonX, skeletonY);
+
 			delta = Math.min(delta, 0.032f) * ui.speedSlider.getValue();
 			skeleton.update(delta);
-			skeleton.setFlip(ui.flipXCheckbox.isChecked(), ui.flipYCheckbox.isChecked());
-			if (!ui.pauseButton.isChecked()) {
-				state.update(delta);
-				state.apply(skeleton);
-			}
-			skeleton.setPosition(skeletonX, skeletonY);
+			state.update(delta);
+			state.apply(skeleton);
 			skeleton.updateWorldTransform();
 
 			batch.setColor(Color.WHITE);
@@ -284,9 +295,22 @@ public class SkeletonViewer extends ApplicationAdapter {
 			debugRenderer.draw(skeleton);
 		}
 
+		// AnimationState status.
+		status.setLength(0);
+		for (int i = 0, n = state.getTracks().size; i < n; i++) {
+			TrackEntry entry = state.getTracks().get(i);
+			if (entry == null) continue;
+			status.append(i);
+			status.append(": [LIGHT_GRAY]");
+			status(entry);
+			status.append("[WHITE]");
+			status.append(entry.animation.name);
+			status.append('\n');
+		}
+		ui.statusLabel.setText(status);
+
 		// Render UI.
-		ui.stage.act();
-		ui.stage.draw();
+		ui.render();
 
 		// Draw indicator lines for animation and mix times.
 		if (state != null) {
@@ -297,16 +321,26 @@ public class SkeletonViewer extends ApplicationAdapter {
 				float percent = entry.getAnimationTime() / entry.getAnimationEnd();
 				float x = ui.window.getRight() + (Gdx.graphics.getWidth() - ui.window.getRight()) * percent;
 				shapes.setColor(Color.CYAN);
-				shapes.line(x, 0, x, 20);
+				shapes.line(x, 0, x, 12);
 
 				percent = entry.getMixDuration() == 0 ? 1 : Math.min(1, entry.getMixTime() / entry.getMixDuration());
 				x = ui.window.getRight() + (Gdx.graphics.getWidth() - ui.window.getRight()) * percent;
 				shapes.setColor(Color.RED);
-				shapes.line(x, 0, x, 20);
+				shapes.line(x, 0, x, 12);
 
 				shapes.end();
 			}
 		}
+	}
+
+	void status (TrackEntry entry) {
+		TrackEntry from = entry.mixingFrom;
+		if (from == null) return;
+		status(from);
+		status.append(from.animation.name);
+		status.append(' ');
+		status.append(Math.min(100, (int)(entry.mixTime / entry.mixDuration * 100)));
+		status.append("% -> ");
 	}
 
 	public void resize (int width, int height) {
@@ -325,7 +359,9 @@ public class SkeletonViewer extends ApplicationAdapter {
 		Table root = new Table(skin);
 		TextButton openButton = new TextButton("Open", skin);
 		List<String> animationList = new List(skin);
+		ScrollPane animationScroll = new ScrollPane(animationList, skin, "bg");
 		List<String> skinList = new List(skin);
+		ScrollPane skinScroll = new ScrollPane(skinList, skin, "bg");
 		CheckBox loopCheckbox = new CheckBox("Loop", skin);
 		CheckBox premultipliedCheckbox = new CheckBox("Premultiplied", skin);
 		Slider mixSlider = new Slider(0, 4, 0.01f, false, skin);
@@ -342,15 +378,29 @@ public class SkeletonViewer extends ApplicationAdapter {
 		CheckBox debugPathsCheckbox = new CheckBox("Paths", skin);
 		Slider scaleSlider = new Slider(0.1f, 3, 0.01f, false, skin);
 		Label scaleLabel = new Label("1.0", skin);
-		TextButton pauseButton = new TextButton("Pause", skin, "toggle");
 		TextButton minimizeButton = new TextButton("-", skin);
 		TextButton bonesSetupPoseButton = new TextButton("Bones", skin);
 		TextButton slotsSetupPoseButton = new TextButton("Slots", skin);
 		TextButton setupPoseButton = new TextButton("Both", skin);
+		Label statusLabel = new Label("", skin);
 		WidgetGroup toasts = new WidgetGroup();
+		ButtonGroup<TextButton> trackButtons = new ButtonGroup();
+		Slider alphaSlider = new Slider(0, 1, 0.01f, false, skin);
+		Label alphaLabel = new Label("1.0", skin);
 		boolean prefsLoaded;
 
-		public UI () {
+		UI () {
+			initialize();
+			layout();
+			events();
+		}
+
+		void initialize () {
+			skin.getFont("default").getData().markupEnabled = true;
+
+			for (int i = 0; i < 6; i++)
+				trackButtons.add(new TextButton(i + "", skin, "toggle"));
+
 			animationList.getSelection().setRequired(false);
 
 			premultipliedCheckbox.setChecked(true);
@@ -366,6 +416,9 @@ public class SkeletonViewer extends ApplicationAdapter {
 			speedSlider.setValue(1);
 			speedSlider.setSnapToValues(new float[] {0.5f, 0.75f, 1, 1.25f, 1.5f, 2, 2.5f}, 0.1f);
 
+			alphaSlider.setValue(1);
+			alphaSlider.setDisabled(true);
+
 			window.setMovable(false);
 			window.setResizable(false);
 			window.setKeepWithinStage(false);
@@ -376,14 +429,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 			window.getTitleTable().add(openButton).space(3);
 			window.getTitleTable().add(minimizeButton).width(20);
 
-			ScrollPane skinScroll = new ScrollPane(skinList, skin, "bg");
 			skinScroll.setFadeScrollBars(false);
 
-			ScrollPane animationScroll = new ScrollPane(animationList, skin, "bg");
 			animationScroll.setFadeScrollBars(false);
+		}
 
-			// Layout.
-
+		void layout () {
 			root.defaults().space(6);
 			root.columnDefaults(0).top().right().padTop(3);
 			root.columnDefaults(1).left();
@@ -400,15 +451,38 @@ public class SkeletonViewer extends ApplicationAdapter {
 			root.add(table(debugBonesCheckbox, debugRegionsCheckbox, debugBoundingBoxesCheckbox)).row();
 			root.add();
 			root.add(table(debugMeshHullCheckbox, debugMeshTrianglesCheckbox, debugPathsCheckbox)).row();
-			root.add("Alpha:");
+			root.add("Atlas alpha:");
 			root.add(premultipliedCheckbox).row();
-			root.add("Skin:");
-			root.add(skinScroll).expand().fill().minHeight(75).row();
+
+			root.add(new Image(skin.newDrawable("white", new Color(0x4e4e4eff)))).height(1).fillX().colspan(2).pad(-3, 0, 1, 0)
+				.row();
+
 			root.add("Setup pose:");
 			root.add(table(bonesSetupPoseButton, slotsSetupPoseButton, setupPoseButton)).row();
+			root.add("Skin:");
+			root.add(skinScroll).expand().fill().row();
+
+			root.add(new Image(skin.newDrawable("white", new Color(0x4e4e4eff)))).height(1).fillX().colspan(2).pad(1,0,1,0)
+				.row();
+
+			root.add("Track:");
+			{
+				Table table = table();
+				for (TextButton button : trackButtons.getButtons())
+					table.add(button);
+				table.add(loopCheckbox);
+				root.add(table).row();
+			}
+			root.add("Entry alpha:");
+			{
+				Table table = table();
+				table.add(alphaLabel).width(29);
+				table.add(alphaSlider).fillX().expandX();
+				root.add(table).fill().row();
+			}
 			root.add("Animation:");
-			root.add(animationScroll).expand().fill().minHeight(75).row();
-			root.add("Mix:");
+			root.add(animationScroll).expand().fill().row();
+			root.add("Default mix:");
 			{
 				Table table = table();
 				table.add(mixLabel).width(29);
@@ -422,19 +496,19 @@ public class SkeletonViewer extends ApplicationAdapter {
 				table.add(speedSlider).fillX().expandX();
 				root.add(table).fill().row();
 			}
-			root.add("Playback:");
-			root.add(table(pauseButton, loopCheckbox)).row();
 
 			window.add(root).expand().fill();
 			window.pack();
 			stage.addActor(window);
+
+			stage.addActor(statusLabel);
 
 			{
 				Table table = new Table();
 				table.setFillParent(true);
 				table.setTouchable(Touchable.disabled);
 				stage.addActor(table);
-				table.pad(10).bottom().right();
+				table.pad(10, 10, 22, 10).bottom().right();
 				table.add(toasts);
 			}
 
@@ -444,10 +518,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 				table.setTouchable(Touchable.disabled);
 				stage.addActor(table);
 				table.pad(10).top().right();
+				table.defaults().right();
 				table.add(new Label("", skin, "default", Color.LIGHT_GRAY)); // Version.
 			}
+		}
 
-			// Events.
+		void events () {
 			window.addListener(new InputListener() {
 				public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 					event.cancel();
@@ -463,7 +539,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 					String name = fileDialog.getFile();
 					String dir = fileDialog.getDirectory();
 					if (name == null || dir == null) return;
-					loadSkeleton(new FileHandle(new File(dir, name).getAbsolutePath()), false);
+					loadSkeleton(new FileHandle(new File(dir, name).getAbsolutePath()));
 				}
 			});
 
@@ -505,13 +581,24 @@ public class SkeletonViewer extends ApplicationAdapter {
 			scaleSlider.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
 					scaleLabel.setText(Float.toString((int)(scaleSlider.getValue() * 100) / 100f));
-					if (!scaleSlider.isDragging()) loadSkeleton(skeletonFile, false);
+					if (!scaleSlider.isDragging()) loadSkeleton(skeletonFile);
 				}
 			});
 
 			speedSlider.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
 					speedLabel.setText(Float.toString((int)(speedSlider.getValue() * 100) / 100f));
+				}
+			});
+
+			alphaSlider.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					alphaLabel.setText(Float.toString((int)(alphaSlider.getValue() * 100) / 100f));
+					int track = trackButtons.getCheckedIndex();
+					if (track > 0) {
+						TrackEntry current = state.getCurrent(track);
+						if (current != null) current.setAlpha(alphaSlider.getValue());
+					}
 				}
 			});
 
@@ -527,7 +614,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 					if (state != null) {
 						String name = animationList.getSelected();
 						if (name == null)
-							state.setEmptyAnimation(0, ui.mixSlider.getValue());
+							state.setEmptyAnimation(trackButtons.getCheckedIndex(), ui.mixSlider.getValue());
 						else
 							setAnimation();
 					}
@@ -552,6 +639,22 @@ public class SkeletonViewer extends ApplicationAdapter {
 					}
 				}
 			});
+
+			ChangeListener trackButtonListener = new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					int track = ui.trackButtons.getCheckedIndex();
+					if (track == -1) return;
+					TrackEntry current = state.getCurrent(track);
+					animationList.getSelection().setProgrammaticChangeEvents(false);
+					animationList.setSelected(current == null ? null : current.animation.name);
+					animationList.getSelection().setProgrammaticChangeEvents(true);
+
+					alphaSlider.setDisabled(track == 0);
+					alphaSlider.setValue(current == null ? 1 : current.alpha);
+				}
+			};
+			for (TextButton button : trackButtons.getButtons())
+				button.addListener(trackButtonListener);
 
 			Gdx.input.setInputProcessor(new InputMultiplexer(stage, new InputAdapter() {
 				public boolean touchDown (int screenX, int screenY, int pointer, int button) {
@@ -591,11 +694,22 @@ public class SkeletonViewer extends ApplicationAdapter {
 			skinList.addListener(savePrefsListener);
 		}
 
-		private Table table (Actor... actors) {
+		Table table (Actor... actors) {
 			Table table = new Table();
 			table.defaults().space(6);
 			table.add(actors);
 			return table;
+		}
+
+		void render () {
+			statusLabel.pack();
+			if (minimizeButton.isChecked())
+				statusLabel.setPosition(10, 25, Align.bottom | Align.left);
+			else
+				statusLabel.setPosition(window.getWidth() + 6, 5, Align.bottom | Align.left);
+
+			stage.act();
+			stage.draw();
 		}
 
 		void toast (String text) {
@@ -630,7 +744,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 			prefs.putFloat("scale", scaleSlider.getValue());
 			prefs.putInteger("x", skeletonX);
 			prefs.putInteger("y", skeletonY);
-			if (animationList.getSelected() != null) prefs.putString("animationName", animationList.getSelected());
+			TrackEntry current = state.getCurrent(0);
+			if (current != null) {
+				String name = current.animation.name;
+				if (name.equals("<empty>")) name = current.next == null ? "" : current.next.animation.name;
+				prefs.putString("animationName", name);
+			}
 			if (skinList.getSelected() != null) prefs.putString("skinName", skinList.getSelected());
 			prefs.flush();
 		}
