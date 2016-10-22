@@ -787,7 +787,7 @@ public class AnimationState {
 			return Math.min(trackTime + animationStart, animationEnd);
 		}
 
-		/** Multiplier for the delta time when the animation state is updated, causing time for this animation to play slower or
+		/** Multiplier for the delta time when the animation state is updated, causing time for this animation to pass slower or
 		 * faster. Defaults to 1. */
 		public float getTimeScale () {
 			return timeScale;
@@ -807,8 +807,8 @@ public class AnimationState {
 			this.listener = listener;
 		}
 
-		/** Values < 1 mix this animation with the last skeleton pose. Defaults to 1, which overwrites the last skeleton pose with
-		 * this animation.
+		/** Values < 1 mix this animation with the setup pose or the skeleton's last pose. Defaults to 1, which overwrites the
+		 * skeleton's last pose with this animation.
 		 * <p>
 		 * Typically track 0 is used to completely pose the skeleton, then alpha can be used on higher tracks. It doesn't make sense
 		 * to use alpha on track 0 if the skeleton pose is from the last frame render. */
@@ -863,7 +863,8 @@ public class AnimationState {
 		}
 
 		/** Seconds from 0 to the mix duration when mixing from the previous animation to this animation. May be slightly more than
-		 * {@link #getMixDuration()}. */
+		 * {@link #getMixDuration()} when the mix is complete. The mix time can be set manually rather than use the value from
+		 * AnimationStateData. */
 		public float getMixTime () {
 			return mixTime;
 		}
@@ -885,7 +886,7 @@ public class AnimationState {
 		}
 
 		/** The track entry for the previous animation when mixing from the previous animation to this animation, or null if no
-		 * mixing is currently occuring. */
+		 * mixing is currently occuring. If mixing from multiple animations, mixing from makes up a linked list. */
 		public TrackEntry getMixingFrom () {
 			return mixingFrom;
 		}
@@ -1001,8 +1002,8 @@ public class AnimationState {
 		/** Invoked when this entry is no longer the current entry and will never be applied again. */
 		public void end (TrackEntry entry);
 
-		/** Invoked when this entry will be disposed. References to the entry should not be kept after dispose is called, as it may
-		 * be destroyed or reused. */
+		/** Invoked when this entry will be disposed. This may occur without the entry ever being set as the current entry.
+		 * References to the entry should not be kept after dispose is called, as it may be destroyed or reused. */
 		public void dispose (TrackEntry entry);
 
 		/** Invoked every time this entry's animation completes a loop. */
