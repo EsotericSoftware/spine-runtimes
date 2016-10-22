@@ -131,9 +131,10 @@ public class Animation {
 		/** Sets the value(s) for the specified time.
 		 * @param events May be null to not collect fired events.
 		 * @param setupPose True when the timeline is mixed with the setup pose, false when it is mixed with the current pose.
-		 *           Passing true when alpha is 1 is slightly more efficient.
-		 * @param mixingOut True when mixing over time toward the setup or current pose, false when mixing toward the keyed pose.
-		 *           Used for timelines with instant transitions, eg draw order, attachment visibility, scale sign. */
+		 *           Passing true when alpha is 1 is slightly more efficient for most timelines.
+		 * @param mixingOut True when changing alpha over time toward 0 (the setup or current pose), false when changing alpha
+		 *           toward 1 (the timeline's pose). Used for timelines with instant transitions, eg draw order, attachment
+		 *           visibility, scale sign. */
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
 			boolean mixingOut);
 
