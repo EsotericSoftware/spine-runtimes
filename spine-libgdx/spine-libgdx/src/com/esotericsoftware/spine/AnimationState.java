@@ -944,12 +944,12 @@ public class AnimationState {
 				TrackEntry entry = (TrackEntry)objects.get(i + 1);
 				switch (type) {
 				case start:
-					if (entry.listener != null) entry.listener.end(entry);
+					if (entry.listener != null) entry.listener.start(entry);
 					for (int ii = 0; ii < listeners.size; ii++)
 						listeners.get(ii).start(entry);
 					break;
 				case interrupt:
-					if (entry.listener != null) entry.listener.end(entry);
+					if (entry.listener != null) entry.listener.interrupt(entry);
 					for (int ii = 0; ii < listeners.size; ii++)
 						listeners.get(ii).interrupt(entry);
 					break;
@@ -959,7 +959,7 @@ public class AnimationState {
 						listeners.get(ii).end(entry);
 					// Fall through.
 				case dispose:
-					if (entry.listener != null) entry.listener.end(entry);
+					if (entry.listener != null) entry.listener.dispose(entry);
 					for (int ii = 0; ii < listeners.size; ii++)
 						listeners.get(ii).dispose(entry);
 					trackEntryPool.free(entry);
