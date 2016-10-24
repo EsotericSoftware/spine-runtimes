@@ -361,7 +361,7 @@ module spine {
 		setAnimation (trackIndex: number, animationName: string, loop: boolean) {
 			let animation = this.data.skeletonData.findAnimation(animationName);
 			if (animation == null) throw new Error("Animation not found: " + animationName);
-			return this.setAnimation(trackIndex, animation, loop);
+			return this.setAnimationWith(trackIndex, animation, loop);
 		}
 
 		setAnimationWith (trackIndex: number, animation: Animation, loop: boolean) {
@@ -420,7 +420,7 @@ module spine {
 		}
 
 		setEmptyAnimation (trackIndex: number, mixDuration: number) {
-			let entry = this.setAnimation(trackIndex, AnimationState.emptyAnimation, false);
+			let entry = this.setAnimationWith(trackIndex, AnimationState.emptyAnimation, false);
 			entry.mixDuration = mixDuration;
 			entry.trackEnd = mixDuration;
 			return entry;
