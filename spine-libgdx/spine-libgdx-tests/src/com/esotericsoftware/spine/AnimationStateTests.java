@@ -30,6 +30,8 @@
 
 package com.esotericsoftware.spine;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.backends.lwjgl.LwjglFileHandle;
 import com.badlogic.gdx.math.MathUtils;
@@ -647,7 +649,7 @@ public class AnimationStateTests {
 
 			expect(0, "end", 0.8f, 0.9f), //
 			expect(0, "dispose", 0.8f, 0.9f), //
-			
+
 			expect(-1, "end", 0.1f, 0.9f), //
 			expect(-1, "dispose", 0.1f, 0.9f) //
 		);
@@ -657,6 +659,42 @@ public class AnimationStateTests {
 				if (MathUtils.isEqual(time, 0.7f)) state.setEmptyAnimation(0, 0);
 			}
 		});
+
+		setup("TrackEntry listener"); // 26
+		final AtomicInteger counter = new AtomicInteger();
+		state.addAnimation(0, "events1", false, 0).setListener(new AnimationStateListener() {
+			public void start (TrackEntry entry) {
+				counter.addAndGet(1 << 1);
+			}
+
+			public void interrupt (TrackEntry entry) {
+				counter.addAndGet(1 << 5);
+			}
+
+			public void end (TrackEntry entry) {
+				counter.addAndGet(1 << 9);
+			}
+
+			public void dispose (TrackEntry entry) {
+				counter.addAndGet(1 << 13);
+			}
+
+			public void complete (TrackEntry entry) {
+				counter.addAndGet(1 << 17);
+			}
+
+			public void event (TrackEntry entry, Event event) {
+				counter.addAndGet(1 << 21);
+			}
+		});
+		state.addAnimation(0, "events1", false, 0);
+		state.addAnimation(0, "events2", false, 0);
+		state.setAnimation(1, "events2", false);
+		run(0.1f, 10, null);
+		if (counter.get() != 15082016) {
+			log("TEST 26 FAILED! " + counter);
+			System.exit(0);
+		}
 
 		System.out.println("AnimationState tests passed.");
 	}
