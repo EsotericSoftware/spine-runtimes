@@ -358,13 +358,13 @@ module spine {
 			this.queue.start(current);
 		}
 
-		setAnimationByName (trackIndex: number, animationName: string, loop: boolean) {
+		setAnimation (trackIndex: number, animationName: string, loop: boolean) {
 			let animation = this.data.skeletonData.findAnimation(animationName);
 			if (animation == null) throw new Error("Animation not found: " + animationName);
 			return this.setAnimation(trackIndex, animation, loop);
 		}
 
-		setAnimation (trackIndex: number, animation: Animation, loop: boolean) {
+		setAnimationWith (trackIndex: number, animation: Animation, loop: boolean) {
 			if (animation == null) throw new Error("animation cannot be null.");
 			let current = this.expandToIndex(trackIndex);
 			if (current != null) {
