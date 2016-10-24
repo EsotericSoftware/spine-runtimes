@@ -92,13 +92,29 @@ declare module spine {
 		timelines: Array<Timeline>;
 		duration: number;
 		constructor(name: string, timelines: Array<Timeline>, duration: number);
-		apply(skeleton: Skeleton, lastTime: number, time: number, loop: boolean, events: Array<Event>): void;
-		mix(skeleton: Skeleton, lastTime: number, time: number, loop: boolean, events: Array<Event>, alpha: number): void;
+		apply(skeleton: Skeleton, lastTime: number, time: number, loop: boolean, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 		static binarySearch(values: ArrayLike<number>, target: number, step?: number): number;
 		static linearSearch(values: ArrayLike<number>, target: number, step: number): number;
 	}
 	interface Timeline {
-		apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number): void;
+		apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
+		getPropertyId(): number;
+	}
+	enum TimelineType {
+		rotate = 0,
+		translate = 1,
+		scale = 2,
+		shear = 3,
+		attachment = 4,
+		color = 5,
+		deform = 6,
+		event = 7,
+		drawOrder = 8,
+		ikConstraint = 9,
+		transformConstraint = 10,
+		pathConstraintPosition = 11,
+		pathConstraintSpacing = 12,
+		pathConstraintMix = 13,
 	}
 	abstract class CurveTimeline implements Timeline {
 		static LINEAR: number;
@@ -106,6 +122,7 @@ declare module spine {
 		static BEZIER: number;
 		static BEZIER_SIZE: number;
 		private curves;
+		abstract getPropertyId(): number;
 		constructor(frameCount: number);
 		getFrameCount(): number;
 		setLinear(frameIndex: number): void;
@@ -113,7 +130,7 @@ declare module spine {
 		getCurveType(frameIndex: number): number;
 		setCurve(frameIndex: number, cx1: number, cy1: number, cx2: number, cy2: number): void;
 		getCurvePercent(frameIndex: number, percent: number): number;
-		abstract apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number): void;
+		abstract apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 	}
 	class RotateTimeline extends CurveTimeline {
 		static ENTRIES: number;
@@ -123,8 +140,9 @@ declare module spine {
 		boneIndex: number;
 		frames: ArrayLike<number>;
 		constructor(frameCount: number);
+		getPropertyId(): number;
 		setFrame(frameIndex: number, time: number, degrees: number): void;
-		apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number): void;
+		apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 	}
 	class TranslateTimeline extends CurveTimeline {
 		static ENTRIES: number;
@@ -136,16 +154,19 @@ declare module spine {
 		boneIndex: number;
 		frames: ArrayLike<number>;
 		constructor(frameCount: number);
+		getPropertyId(): number;
 		setFrame(frameIndex: number, time: number, x: number, y: number): void;
-		apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number): void;
+		apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 	}
 	class ScaleTimeline extends TranslateTimeline {
 		constructor(frameCount: number);
-		apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number): void;
+		getPropertyId(): number;
+		apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 	}
 	class ShearTimeline extends TranslateTimeline {
 		constructor(frameCount: number);
-		apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number): void;
+		getPropertyId(): number;
+		apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 	}
 	class ColorTimeline extends CurveTimeline {
 		static ENTRIES: number;
@@ -161,42 +182,47 @@ declare module spine {
 		slotIndex: number;
 		frames: ArrayLike<number>;
 		constructor(frameCount: number);
+		getPropertyId(): number;
 		setFrame(frameIndex: number, time: number, r: number, g: number, b: number, a: number): void;
-		apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number): void;
+		apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 	}
 	class AttachmentTimeline implements Timeline {
 		slotIndex: number;
 		frames: ArrayLike<number>;
 		attachmentNames: Array<string>;
 		constructor(frameCount: number);
+		getPropertyId(): number;
 		getFrameCount(): number;
 		setFrame(frameIndex: number, time: number, attachmentName: string): void;
-		apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number): void;
+		apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 	}
 	class EventTimeline implements Timeline {
 		frames: ArrayLike<number>;
 		events: Array<Event>;
 		constructor(frameCount: number);
+		getPropertyId(): number;
 		getFrameCount(): number;
 		setFrame(frameIndex: number, event: Event): void;
-		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number): void;
+		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 	}
 	class DrawOrderTimeline implements Timeline {
 		frames: ArrayLike<number>;
 		drawOrders: Array<Array<number>>;
 		constructor(frameCount: number);
+		getPropertyId(): number;
 		getFrameCount(): number;
 		setFrame(frameIndex: number, time: number, drawOrder: Array<number>): void;
-		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number): void;
+		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 	}
 	class DeformTimeline extends CurveTimeline {
-		frames: ArrayLike<number>;
-		frameVertices: Array<ArrayLike<number>>;
 		slotIndex: number;
 		attachment: VertexAttachment;
+		frames: ArrayLike<number>;
+		frameVertices: Array<ArrayLike<number>>;
 		constructor(frameCount: number);
+		getPropertyId(): number;
 		setFrame(frameIndex: number, time: number, vertices: ArrayLike<number>): void;
-		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number): void;
+		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 	}
 	class IkConstraintTimeline extends CurveTimeline {
 		static ENTRIES: number;
@@ -208,8 +234,9 @@ declare module spine {
 		ikConstraintIndex: number;
 		frames: ArrayLike<number>;
 		constructor(frameCount: number);
+		getPropertyId(): number;
 		setFrame(frameIndex: number, time: number, mix: number, bendDirection: number): void;
-		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number): void;
+		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 	}
 	class TransformConstraintTimeline extends CurveTimeline {
 		static ENTRIES: number;
@@ -225,8 +252,9 @@ declare module spine {
 		transformConstraintIndex: number;
 		frames: ArrayLike<number>;
 		constructor(frameCount: number);
+		getPropertyId(): number;
 		setFrame(frameIndex: number, time: number, rotateMix: number, translateMix: number, scaleMix: number, shearMix: number): void;
-		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number): void;
+		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 	}
 	class PathConstraintPositionTimeline extends CurveTimeline {
 		static ENTRIES: number;
@@ -236,12 +264,14 @@ declare module spine {
 		pathConstraintIndex: number;
 		frames: ArrayLike<number>;
 		constructor(frameCount: number);
+		getPropertyId(): number;
 		setFrame(frameIndex: number, time: number, value: number): void;
-		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number): void;
+		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 	}
 	class PathConstraintSpacingTimeline extends PathConstraintPositionTimeline {
 		constructor(frameCount: number);
-		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number): void;
+		getPropertyId(): number;
+		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 	}
 	class PathConstraintMixTimeline extends CurveTimeline {
 		static ENTRIES: number;
@@ -253,62 +283,121 @@ declare module spine {
 		pathConstraintIndex: number;
 		frames: ArrayLike<number>;
 		constructor(frameCount: number);
+		getPropertyId(): number;
 		setFrame(frameIndex: number, time: number, rotateMix: number, translateMix: number): void;
-		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number): void;
+		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 	}
 }
 declare module spine {
 	class AnimationState {
+		static emptyAnimation: Animation;
 		data: AnimationStateData;
 		tracks: TrackEntry[];
 		events: Event[];
-		listeners: AnimationStateListener[];
+		listeners: AnimationStateListener2[];
+		queue: EventQueue;
+		propertyIDs: IntSet;
+		animationsChanged: boolean;
 		timeScale: number;
-		constructor(data?: AnimationStateData);
+		trackEntryPool: Pool<TrackEntry>;
+		constructor(data: AnimationStateData);
 		update(delta: number): void;
+		updateMixingFrom(entry: TrackEntry, delta: number, canEnd: boolean): void;
 		apply(skeleton: Skeleton): void;
+		applyMixingFrom(entry: TrackEntry, skeleton: Skeleton, alpha: number): number;
+		applyRotateTimeline(timeline: Timeline, skeleton: Skeleton, time: number, alpha: number, setupPose: boolean, timelinesRotation: Array<number>, i: number, firstFrame: boolean): void;
+		queueEvents(entry: TrackEntry, animationTime: number): void;
 		clearTracks(): void;
 		clearTrack(trackIndex: number): void;
-		freeAll(entry: TrackEntry): void;
+		setCurrent(index: number, current: TrackEntry): void;
+		setAnimationByName(trackIndex: number, animationName: string, loop: boolean): TrackEntry;
+		setAnimation(trackIndex: number, animation: Animation, loop: boolean): TrackEntry;
+		addAnimationByName(trackIndex: number, animationName: string, loop: boolean, delay: number): TrackEntry;
+		addAnimation(trackIndex: number, animation: Animation, loop: boolean, delay: number): TrackEntry;
+		setEmptyAnimation(trackIndex: number, mixDuration: number): TrackEntry;
+		addEmptyAnimation(trackIndex: number, mixDuration: number, delay: number): TrackEntry;
+		setEmptyAnimations(mixDuration: number): void;
 		expandToIndex(index: number): TrackEntry;
-		setCurrent(index: number, entry: TrackEntry): void;
-		setAnimation(trackIndex: number, animationName: string, loop: boolean): TrackEntry;
-		setAnimationWith(trackIndex: number, animation: Animation, loop: boolean): TrackEntry;
-		addAnimation(trackIndex: number, animationName: string, loop: boolean, delay: number): TrackEntry;
-		addAnimationWith(trackIndex: number, animation: Animation, loop: boolean, delay: number): TrackEntry;
+		trackEntry(trackIndex: number, animation: Animation, loop: boolean, last: TrackEntry): TrackEntry;
+		disposeNext(entry: TrackEntry): void;
+		_animationsChanged(): void;
+		setTimelinesFirst(entry: TrackEntry): void;
+		checkTimelinesFirst(entry: TrackEntry): void;
+		checkTimelinesUsage(entry: TrackEntry, usageArray: Array<boolean>): void;
 		getCurrent(trackIndex: number): TrackEntry;
-		addListener(listener: AnimationStateListener): void;
-		removeListener(listener: AnimationStateListener): void;
+		addListener(listener: AnimationStateListener2): void;
+		removeListener(listener: AnimationStateListener2): void;
 		clearListeners(): void;
+		clearListenerNotifications(): void;
 	}
 	class TrackEntry {
-		next: TrackEntry;
-		previous: TrackEntry;
 		animation: Animation;
+		next: TrackEntry;
+		mixingFrom: TrackEntry;
+		listener: AnimationStateListener2;
+		trackIndex: number;
 		loop: boolean;
+		eventThreshold: number;
+		attachmentThreshold: number;
+		drawOrderThreshold: number;
+		animationStart: number;
+		animationEnd: number;
+		animationLast: number;
+		nextAnimationLast: number;
 		delay: number;
-		time: number;
-		lastTime: number;
-		endTime: number;
+		trackTime: number;
+		trackLast: number;
+		nextTrackLast: number;
+		trackEnd: number;
 		timeScale: number;
+		alpha: number;
 		mixTime: number;
 		mixDuration: number;
-		listener: AnimationStateListener;
-		mix: number;
+		mixAlpha: number;
+		timelinesFirst: boolean[];
+		timelinesRotation: number[];
 		reset(): void;
+		getAnimationTime(): number;
+		setAnimationLast(animationLast: number): void;
 		isComplete(): boolean;
 	}
-	abstract class AnimationStateAdapter implements AnimationStateListener {
-		event(trackIndex: number, event: Event): void;
-		complete(trackIndex: number, loopCount: number): void;
-		start(trackIndex: number): void;
-		end(trackIndex: number): void;
+	class EventQueue {
+		objects: Array<any>;
+		drainDisabled: boolean;
+		animState: AnimationState;
+		constructor(animState: AnimationState);
+		start(entry: TrackEntry): void;
+		interrupt(entry: TrackEntry): void;
+		end(entry: TrackEntry): void;
+		dispose(entry: TrackEntry): void;
+		complete(entry: TrackEntry): void;
+		event(entry: TrackEntry, event: Event): void;
+		drain(): void;
+		clear(): void;
 	}
-	interface AnimationStateListener {
-		event(trackIndex: number, event: Event): void;
-		complete(trackIndex: number, loopCount: number): void;
-		start(trackIndex: number): void;
-		end(trackIndex: number): void;
+	enum EventType {
+		start = 0,
+		interrupt = 1,
+		end = 2,
+		dispose = 3,
+		complete = 4,
+		event = 5,
+	}
+	interface AnimationStateListener2 {
+		start(entry: TrackEntry): void;
+		interrupt(entry: TrackEntry): void;
+		end(entry: TrackEntry): void;
+		dispose(entry: TrackEntry): void;
+		complete(entry: TrackEntry): void;
+		event(entry: TrackEntry, event: Event): void;
+	}
+	abstract class AnimationStateAdapter2 implements AnimationStateListener2 {
+		start(entry: TrackEntry): void;
+		interrupt(entry: TrackEntry): void;
+		end(entry: TrackEntry): void;
+		dispose(entry: TrackEntry): void;
+		complete(entry: TrackEntry): void;
+		event(entry: TrackEntry, event: Event): void;
 	}
 }
 declare module spine {
@@ -898,6 +987,13 @@ declare module spine {
 	interface Map<T> {
 		[key: string]: T;
 	}
+	class IntSet {
+		array: number[];
+		add(value: number): boolean;
+		contains(value: number): boolean;
+		remove(value: number): void;
+		clear(): void;
+	}
 	interface Disposable {
 		dispose(): void;
 	}
@@ -936,6 +1032,7 @@ declare module spine {
 		static SUPPORTS_TYPED_ARRAYS: boolean;
 		static arrayCopy<T>(source: ArrayLike<T>, sourceStart: number, dest: ArrayLike<T>, destStart: number, numElements: number): void;
 		static setArraySize<T>(array: Array<T>, size: number, value?: any): Array<T>;
+		static ensureArrayCapacity<T>(array: Array<T>, size: number, value?: any): Array<T>;
 		static newArray<T>(size: number, defaultValue: T): Array<T>;
 		static newFloatArray(size: number): ArrayLike<number>;
 		static toFloatArray(array: Array<number>): number[] | Float32Array;
