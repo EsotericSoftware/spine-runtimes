@@ -38,8 +38,8 @@ function init () {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 	var config = { alpha: false };
-	gl = canvas.getContext("webgl", config) || canvas.getContext("experimental-webgl", config);	
-	
+	gl = canvas.getContext("webgl", config) || canvas.getContext("experimental-webgl", config);
+
 	// Create a simple shader, mesh, model-view-projection matrix and SkeletonRenderer.
 	shader = spine.webgl.Shader.newColoredTextured(gl);
 	batcher = new spine.webgl.PolygonBatcher(gl);
@@ -71,7 +71,7 @@ function init () {
 	assetManager.loadTexture("assets/goblins.png");
 	assetManager.loadText("assets/vine.json");
 	assetManager.loadText("assets/vine.atlas");
-	assetManager.loadTexture("assets/vine.png");	
+	assetManager.loadTexture("assets/vine.png");
 	assetManager.loadText("assets/stretchyman.json");
 	assetManager.loadText("assets/stretchyman.atlas");
 	assetManager.loadTexture("assets/stretchyman.png");
@@ -82,11 +82,11 @@ function load () {
 	// Wait until the AssetManager has loaded all resources, then load the skeletons.
 	if (assetManager.isLoadingComplete()) {
 		skeletons["raptor"] = loadSkeleton("raptor", "walk", false);
-		skeletons["spineboy"] = loadSkeleton("spineboy", "run", false);		
+		skeletons["spineboy"] = loadSkeleton("spineboy", "run", false);
 		skeletons["tank"] = loadSkeleton("tank", "drive", false);
 		skeletons["goblins"] = loadSkeleton("goblins-mesh", "walk", false, "goblin");
 		skeletons["vine"] = loadSkeleton("vine", "animation", false);
-		skeletons["stretchyman"] = loadSkeleton("stretchyman", "sneak", false);				
+		skeletons["stretchyman"] = loadSkeleton("stretchyman", "sneak", false);
 		setupUI();
 		requestAnimationFrame(render);
 	} else {
@@ -100,7 +100,7 @@ function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 	// Load the texture atlas using name.atlas and name.png from the AssetManager.
 	// The function passed to TextureAtlas is used to resolve relative paths.
 	atlas = new spine.TextureAtlas(assetManager.get("assets/" + name + ".atlas"), function(path) {
-		return assetManager.get("assets/" + path);		
+		return assetManager.get("assets/" + path);
 	});
 
 	// Create a AtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
@@ -108,28 +108,34 @@ function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 
 	// Create a SkeletonJson instance for parsing the .json file.
 	var skeletonJson = new spine.SkeletonJson(atlasLoader);
-	
-	// Set the scale to apply during parsing, parse the file, and create a new skeleton.	
+
+	// Set the scale to apply during parsing, parse the file, and create a new skeleton.
 	var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/" + name + ".json"));
 	var skeleton = new spine.Skeleton(skeletonData);
 	skeleton.setSkinByName(skin);
-	var bounds = calculateBounds(skeleton);	
+	var bounds = calculateBounds(skeleton);
 
 	// Create an AnimationState, and set the initial animation in looping mode.
 	var animationState = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 	animationState.setAnimation(0, initialAnimation, true);
 	animationState.addListener({
-		event: function(trackIndex, event) {
-			// console.log("Event on track " + trackIndex + ": " + JSON.stringify(event));
+		start: function(track) {
+			console.log("Animation on track " + track.trackIndex + " started");
 		},
-		complete: function(trackIndex, loopCount) {
-			// console.log("Animation on track " + trackIndex + " completed, loop count: " + loopCount);
+		interrupt: function(track) {
+			console.log("Animation on track " + track.trackIndex + " interrupted");
 		},
-		start: function(trackIndex) {
-			// console.log("Animation on track " + trackIndex + " started");
+		end: function(track) {
+			console.log("Animation on track " + track.trackIndex + " ended");
 		},
-		end: function(trackIndex) {
-			// console.log("Animation on track " + trackIndex + " ended");
+		disposed: function(track) {
+			console.log("Animation on track " + track.trackIndex + " disposed");
+		},
+		complete: function(track) {
+			console.log("Animation on track " + track.trackIndex + " completed");
+		},
+		event: function(track, event) {
+			console.log("Event on track " + track.trackIndex + ": " + JSON.stringify(event));
 		}
 	})
 
@@ -137,7 +143,7 @@ function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 	return { skeleton: skeleton, state: animationState, bounds: bounds, premultipliedAlpha: premultipliedAlpha };
 }
 
-function calculateBounds(skeleton) {	
+function calculateBounds(skeleton) {
 	skeleton.setToSetupPose();
 	skeleton.updateWorldTransform();
 	var offset = new spine.Vector2();
@@ -173,7 +179,7 @@ function setupUI () {
 			var skeleton = skeletons[activeSkeleton].skeleton;
 			var animationName = $("#animationList option:selected").text();
 			skeleton.setToSetupPose();
-			state.setAnimation(0, animationName, true);			
+			state.setAnimation(0, animationName, true);
 		})
 	}
 
@@ -190,7 +196,7 @@ function setupUI () {
 			skinList.append(option);
 		}
 
-		skinList.change(function() {			
+		skinList.change(function() {
 			var skeleton = skeletons[activeSkeleton].skeleton;
 			var skinName = $("#skinList option:selected").text();
 			skeleton.setSkinByName(skinName);
@@ -236,7 +242,7 @@ function render () {
 	skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
 	skeletonRenderer.draw(batcher, skeleton);
 	batcher.end();
-		
+
 	shader.unbind();
 
 	// draw debug information

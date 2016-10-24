@@ -5,7 +5,7 @@ var spritesheetsDemo = function(loadingComplete, bgColor) {
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, animationState, offset, bounds;
 	var skeletonSeq, walkAnim, walkLastTime = 0, walkLastTimePrecise = 0;
-	var skeletonAtlas;	
+	var skeletonAtlas;
 	var viewportWidth, viewportHeight;
 	var frames = [], currFrame = 0, frameTime = 0, frameScale = 0, FPS = 30;
 	var timeKeeper, loadingScreen, input;
@@ -17,17 +17,17 @@ var spritesheetsDemo = function(loadingComplete, bgColor) {
 
 	function init () {
 		canvas = document.getElementById("spritesheets-canvas");
-		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;	
-		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
+		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
+		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = spineDemos.assetManager;
-		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };		
+		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
 		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas1.png");
 		assetManager.loadText(DEMO_NAME, "atlas1.atlas");
-		assetManager.loadJson(DEMO_NAME, "demos.json");	
+		assetManager.loadJson(DEMO_NAME, "demos.json");
 		timeKeeper = new spine.TimeKeeper();
-		input = new spine.webgl.Input(canvas);	
+		input = new spine.webgl.Input(canvas);
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
 		requestAnimationFrame(load);
 	}
@@ -36,8 +36,8 @@ var spritesheetsDemo = function(loadingComplete, bgColor) {
 		timeKeeper.update();
 		if (assetManager.isLoadingComplete(DEMO_NAME)) {
 			skeletonAtlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas1.atlas"), function(path) {
-				return assetManager.get(DEMO_NAME, path);		
-			});			
+				return assetManager.get(DEMO_NAME, path);
+			});
 			var atlasLoader = new spine.AtlasAttachmentLoader(skeletonAtlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
 			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").raptor);
@@ -55,9 +55,9 @@ var spritesheetsDemo = function(loadingComplete, bgColor) {
 
 			skeletonSeq = new spine.Skeleton(skeletonData);
 			walkAnim = skeletonSeq.data.findAnimation("walk");
-			walkAnim.apply(skeletonSeq, 0, 0, true, null);
+			walkAnim.apply(skeletonSeq, 0, 0, true, null, 1, true, false);
 			skeletonSeq.x += bounds.x + 150;
-			
+
 			viewportWidth = ((700 + bounds.x) - offset.x);
 			viewportHeight = ((0 + bounds.y) - offset.y);
 			resize();
@@ -71,7 +71,7 @@ var spritesheetsDemo = function(loadingComplete, bgColor) {
 			loadingScreen.draw();
 			requestAnimationFrame(load);
 		}
-	}	
+	}
 
 	function setupUI () {
 		timeSlider = $("#spritesheets-timeslider").data("slider");
@@ -95,7 +95,7 @@ var spritesheetsDemo = function(loadingComplete, bgColor) {
 			setAnimation("jump");
 		});
 	}
-	
+
 	function setAnimation (name) {
 		animationState.setAnimation(0, name, false);
 		animationState.addAnimation(0, "walk", true, 0);
@@ -103,7 +103,7 @@ var spritesheetsDemo = function(loadingComplete, bgColor) {
 
 	function resize () {
 		renderer.camera.position.x = offset.x + viewportWidth / 2 - 25;
-		renderer.camera.position.y = offset.y + viewportHeight / 2  - 160;	
+		renderer.camera.position.y = offset.y + viewportHeight / 2  - 160;
 		renderer.camera.viewportWidth = viewportWidth * 1.2;
 		renderer.camera.viewportHeight = viewportHeight * 1.2;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
@@ -120,21 +120,21 @@ var spritesheetsDemo = function(loadingComplete, bgColor) {
 			var oldValue = timeSliderLabel.textContent;
 			var newValue = Math.round(timeSlider.get() * 100) + "%";
 			if (oldValue !== newValue) timeSliderLabel.textContent = newValue;
-		} 	
+		}
 
 		var animationDuration = animationState.getCurrent(0).animation.duration;
-		playTime += delta;			
+		playTime += delta;
 		while (playTime >= animationDuration) {
 			playTime -= animationDuration;
 		}
 
-		walkLastTimePrecise += delta;				
+		walkLastTimePrecise += delta;
 		while (walkLastTimePrecise - walkLastTime > 1 / FPS) {
 			var newWalkTime = walkLastTime + 1 / FPS;
-			walkAnim.apply(skeletonSeq, walkLastTime, newWalkTime, true, null);
+			walkAnim.apply(skeletonSeq, walkLastTime, newWalkTime, true, null, 1, true, false);
 			walkLastTime = newWalkTime;
-		}								
-		skeletonSeq.updateWorldTransform();					
+		}
+		skeletonSeq.updateWorldTransform();
 
 		animationState.update(delta);
 		var current = animationState.getCurrent(0);
@@ -143,12 +143,12 @@ var spritesheetsDemo = function(loadingComplete, bgColor) {
 		skeleton.updateWorldTransform();
 
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
-		gl.clear(gl.COLOR_BUFFER_BIT);	
+		gl.clear(gl.COLOR_BUFFER_BIT);
 
 		renderer.begin();
 		var frame = frames[currFrame];
 		renderer.drawSkeleton(skeleton, true);
-		renderer.drawSkeleton(skeletonSeq, true);		
+		renderer.drawSkeleton(skeletonSeq, true);
 		renderer.end();
 
 		loadingScreen.draw(true);

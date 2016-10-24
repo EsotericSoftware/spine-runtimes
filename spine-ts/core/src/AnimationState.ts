@@ -238,9 +238,9 @@ module spine {
 					1 - (time - frameTime) / (frames[frame + RotateTimeline.PREV_TIME] - frameTime));
 
 				r2 = frames[frame + RotateTimeline.ROTATION] - prevRotation;
-				r2 -= (16384 - Math.floor((16384.499999999996 - r2 / 360))) * 360;
+				r2 -= (16384 - ((16384.499999999996 - r2 / 360) | 0)) * 360;
 				r2 = prevRotation + r2 * percent + bone.data.rotation;
-				r2 -= (16384 - Math.floor((16384.499999999996 - r2 / 360))) * 360;
+				r2 -= (16384 - ((16384.499999999996 - r2 / 360) | 0)) * 360;
 			}
 
 			// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
@@ -253,7 +253,7 @@ module spine {
 				} else
 					total = timelinesRotation[i];
 			} else {
-				diff -= (16384 - Math.floor((16384.499999999996 - diff / 360))) * 360;
+				diff -= (16384 - ((16384.499999999996 - diff / 360) | 0)) * 360;
 				let lastTotal = 0, lastDiff = 0;
 				if (firstFrame) {
 					lastTotal = 0;
@@ -275,7 +275,7 @@ module spine {
 			}
 			timelinesRotation[i + 1] = diff;
 			r1 += total * alpha;
-			bone.rotation = r1 - (16384 - Math.floor((16384.499999999996 - r1 / 360))) * 360;
+			bone.rotation = r1 - (16384 - ((16384.499999999996 - r1 / 360) | 0)) * 360;
 		}
 
 		queueEvents (entry: TrackEntry, animationTime: number) {
@@ -384,13 +384,13 @@ module spine {
 			return entry;
 		}
 
-		addAnimationByName (trackIndex: number, animationName: string, loop: boolean, delay: number) {
+		addAnimation (trackIndex: number, animationName: string, loop: boolean, delay: number) {
 			let animation = this.data.skeletonData.findAnimation(animationName);
 			if (animation == null) throw new Error("Animation not found: " + animationName);
-			return this.addAnimation(trackIndex, animation, loop, delay);
+			return this.addAnimationWith(trackIndex, animation, loop, delay);
 		}
 
-		addAnimation (trackIndex: number, animation: Animation, loop: boolean, delay: number) {
+		addAnimationWith (trackIndex: number, animation: Animation, loop: boolean, delay: number) {
 			if (animation == null) throw new Error("animation cannot be null.");
 
 			let last = this.expandToIndex(trackIndex);
@@ -409,7 +409,7 @@ module spine {
 				if (delay <= 0) {
 					let duration = last.animationEnd - last.animationStart;
 					if (duration != 0)
-						delay += duration * (1 + Math.floor(last.trackTime / duration)) - this.data.getMix(last.animation, animation);
+						delay += duration * (1 + ((last.trackTime / duration) | 0)) - this.data.getMix(last.animation, animation);
 					else
 						delay = 0;
 				}
@@ -428,7 +428,7 @@ module spine {
 
 		addEmptyAnimation (trackIndex: number, mixDuration: number, delay: number) {
 			if (delay <= 0) delay -= mixDuration;
-			let entry = this.addAnimation(trackIndex, AnimationState.emptyAnimation, false, delay);
+			let entry = this.addAnimationWith(trackIndex, AnimationState.emptyAnimation, false, delay);
 			entry.mixDuration = mixDuration;
 			entry.trackEnd = mixDuration;
 			return entry;
@@ -446,7 +446,7 @@ module spine {
 
 		expandToIndex (index: number) {
 			if (index < this.tracks.length) return this.tracks[index];
-			Utils.ensureArrayCapacity(this.tracks, index - this.tracks.length + 1);
+			Utils.ensureArrayCapacity(this.tracks, index - this.tracks.length + 1, null);
 			this.tracks.length = index + 1;
 			return null;
 		}
@@ -659,36 +659,36 @@ module spine {
 				let entry = objects[i + 1] as TrackEntry;
 				switch (type) {
 				case EventType.start:
-					if (entry.listener != null) entry.listener.end(entry);
+					if (entry.listener != null && entry.listener.end) entry.listener.end(entry);
 					for (let ii = 0; ii < listeners.length; ii++)
-						listeners[ii].start(entry);
+						if (listeners[ii].start) listeners[ii].start(entry);
 					break;
 				case EventType.interrupt:
-					if (entry.listener != null) entry.listener.end(entry);
+					if (entry.listener != null && entry.listener.end) entry.listener.end(entry);
 					for (let ii = 0; ii < listeners.length; ii++)
-						listeners[ii].interrupt(entry);
+						if (listeners[ii].interrupt)listeners[ii].interrupt(entry);
 					break;
 				case EventType.end:
-					if (entry.listener != null) entry.listener.end(entry);
+					if (entry.listener != null && entry.listener.end) entry.listener.end(entry);
 					for (let ii = 0; ii < listeners.length; ii++)
-						listeners[ii].end(entry);
+						if (listeners[ii].end) listeners[ii].end(entry);
 					// Fall through.
 				case EventType.dispose:
-					if (entry.listener != null) entry.listener.end(entry);
+					if (entry.listener != null && entry.listener.end) entry.listener.end(entry);
 					for (let ii = 0; ii < listeners.length; ii++)
-						listeners[ii].dispose(entry);
+						if (listeners[ii].dispose) listeners[ii].dispose(entry);
 					this.animState.trackEntryPool.free(entry);
 					break;
 				case EventType.complete:
-					if (entry.listener != null) entry.listener.complete(entry);
+					if (entry.listener != null && entry.listener.complete) entry.listener.complete(entry);
 					for (let ii = 0; ii < listeners.length; ii++)
-						listeners[ii].complete(entry);
+						if (listeners[ii].complete) listeners[ii].complete(entry);
 					break;
 				case EventType.event:
 					let event = objects[i++ + 2] as Event;
-					if (entry.listener != null) entry.listener.event(entry, event);
+					if (entry.listener != null && entry.listener.event) entry.listener.event(entry, event);
 					for (let ii = 0; ii < listeners.length; ii++)
-						listeners[ii].event(entry, event);
+						if (listeners[ii].event) listeners[ii].event(entry, event);
 					break;
 				}
 			}

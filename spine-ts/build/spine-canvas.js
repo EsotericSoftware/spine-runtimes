@@ -523,7 +523,7 @@ var spine;
 					bone.rotation = bone.data.rotation + frames[frames.length + RotateTimeline.PREV_ROTATION] * alpha;
 				else {
 					var r_1 = bone.data.rotation + frames[frames.length + RotateTimeline.PREV_ROTATION] - bone.rotation;
-					r_1 -= (16384 - Math.floor(16384.499999999996 - r_1 / 360)) * 360;
+					r_1 -= (16384 - ((16384.499999999996 - r_1 / 360) | 0)) * 360;
 					bone.rotation += r_1 * alpha;
 				}
 				return;
@@ -533,15 +533,15 @@ var spine;
 			var frameTime = frames[frame];
 			var percent = this.getCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + RotateTimeline.PREV_TIME] - frameTime));
 			var r = frames[frame + RotateTimeline.ROTATION] - prevRotation;
-			r -= (16384 - Math.floor(16384.499999999996 - r / 360)) * 360;
+			r -= (16384 - ((16384.499999999996 - r / 360) | 0)) * 360;
 			r = prevRotation + r * percent;
 			if (setupPose) {
-				r -= (16384 - Math.floor(16384.499999999996 - r / 360)) * 360;
+				r -= (16384 - ((16384.499999999996 - r / 360) | 0)) * 360;
 				bone.rotation = bone.data.rotation + r * alpha;
 			}
 			else {
 				r = bone.data.rotation + r - bone.rotation;
-				r -= (16384 - Math.floor(16384.499999999996 - r / 360)) * 360;
+				r -= (16384 - ((16384.499999999996 - r / 360) | 0)) * 360;
 				bone.rotation += r * alpha;
 			}
 		};
@@ -1415,9 +1415,9 @@ var spine;
 				var frameTime = frames[frame];
 				var percent = rotateTimeline.getCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + spine.RotateTimeline.PREV_TIME] - frameTime));
 				r2 = frames[frame + spine.RotateTimeline.ROTATION] - prevRotation;
-				r2 -= (16384 - Math.floor((16384.499999999996 - r2 / 360))) * 360;
+				r2 -= (16384 - ((16384.499999999996 - r2 / 360) | 0)) * 360;
 				r2 = prevRotation + r2 * percent + bone.data.rotation;
-				r2 -= (16384 - Math.floor((16384.499999999996 - r2 / 360))) * 360;
+				r2 -= (16384 - ((16384.499999999996 - r2 / 360) | 0)) * 360;
 			}
 			var r1 = setupPose ? bone.data.rotation : bone.rotation;
 			var total = 0, diff = r2 - r1;
@@ -1430,7 +1430,7 @@ var spine;
 					total = timelinesRotation[i];
 			}
 			else {
-				diff -= (16384 - Math.floor((16384.499999999996 - diff / 360))) * 360;
+				diff -= (16384 - ((16384.499999999996 - diff / 360) | 0)) * 360;
 				var lastTotal = 0, lastDiff = 0;
 				if (firstFrame) {
 					lastTotal = 0;
@@ -1453,7 +1453,7 @@ var spine;
 			}
 			timelinesRotation[i + 1] = diff;
 			r1 += total * alpha;
-			bone.rotation = r1 - (16384 - Math.floor((16384.499999999996 - r1 / 360))) * 360;
+			bone.rotation = r1 - (16384 - ((16384.499999999996 - r1 / 360) | 0)) * 360;
 		};
 		AnimationState.prototype.queueEvents = function (entry, animationTime) {
 			var animationStart = entry.animationStart, animationEnd = entry.animationEnd;
@@ -1522,13 +1522,13 @@ var spine;
 			}
 			this.queue.start(current);
 		};
-		AnimationState.prototype.setAnimationByName = function (trackIndex, animationName, loop) {
+		AnimationState.prototype.setAnimation = function (trackIndex, animationName, loop) {
 			var animation = this.data.skeletonData.findAnimation(animationName);
 			if (animation == null)
 				throw new Error("Animation not found: " + animationName);
-			return this.setAnimation(trackIndex, animation, loop);
+			return this.setAnimationWith(trackIndex, animation, loop);
 		};
-		AnimationState.prototype.setAnimation = function (trackIndex, animation, loop) {
+		AnimationState.prototype.setAnimationWith = function (trackIndex, animation, loop) {
 			if (animation == null)
 				throw new Error("animation cannot be null.");
 			var current = this.expandToIndex(trackIndex);
@@ -1548,13 +1548,13 @@ var spine;
 			this.queue.drain();
 			return entry;
 		};
-		AnimationState.prototype.addAnimationByName = function (trackIndex, animationName, loop, delay) {
+		AnimationState.prototype.addAnimation = function (trackIndex, animationName, loop, delay) {
 			var animation = this.data.skeletonData.findAnimation(animationName);
 			if (animation == null)
 				throw new Error("Animation not found: " + animationName);
-			return this.addAnimation(trackIndex, animation, loop, delay);
+			return this.addAnimationWith(trackIndex, animation, loop, delay);
 		};
-		AnimationState.prototype.addAnimation = function (trackIndex, animation, loop, delay) {
+		AnimationState.prototype.addAnimationWith = function (trackIndex, animation, loop, delay) {
 			if (animation == null)
 				throw new Error("animation cannot be null.");
 			var last = this.expandToIndex(trackIndex);
@@ -1572,7 +1572,7 @@ var spine;
 				if (delay <= 0) {
 					var duration = last.animationEnd - last.animationStart;
 					if (duration != 0)
-						delay += duration * (1 + Math.floor(last.trackTime / duration)) - this.data.getMix(last.animation, animation);
+						delay += duration * (1 + ((last.trackTime / duration) | 0)) - this.data.getMix(last.animation, animation);
 					else
 						delay = 0;
 				}
@@ -1581,7 +1581,7 @@ var spine;
 			return entry;
 		};
 		AnimationState.prototype.setEmptyAnimation = function (trackIndex, mixDuration) {
-			var entry = this.setAnimation(trackIndex, AnimationState.emptyAnimation, false);
+			var entry = this.setAnimationWith(trackIndex, AnimationState.emptyAnimation, false);
 			entry.mixDuration = mixDuration;
 			entry.trackEnd = mixDuration;
 			return entry;
@@ -1589,7 +1589,7 @@ var spine;
 		AnimationState.prototype.addEmptyAnimation = function (trackIndex, mixDuration, delay) {
 			if (delay <= 0)
 				delay -= mixDuration;
-			var entry = this.addAnimation(trackIndex, AnimationState.emptyAnimation, false, delay);
+			var entry = this.addAnimationWith(trackIndex, AnimationState.emptyAnimation, false, delay);
 			entry.mixDuration = mixDuration;
 			entry.trackEnd = mixDuration;
 			return entry;
@@ -1607,7 +1607,7 @@ var spine;
 		AnimationState.prototype.expandToIndex = function (index) {
 			if (index < this.tracks.length)
 				return this.tracks[index];
-			spine.Utils.ensureArrayCapacity(this.tracks, index - this.tracks.length + 1);
+			spine.Utils.ensureArrayCapacity(this.tracks, index - this.tracks.length + 1, null);
 			this.tracks.length = index + 1;
 			return null;
 		};
@@ -1790,41 +1790,47 @@ var spine;
 				var entry = objects[i + 1];
 				switch (type) {
 					case EventType.start:
-						if (entry.listener != null)
+						if (entry.listener != null && entry.listener.end)
 							entry.listener.end(entry);
 						for (var ii = 0; ii < listeners.length; ii++)
-							listeners[ii].start(entry);
+							if (listeners[ii].start)
+								listeners[ii].start(entry);
 						break;
 					case EventType.interrupt:
-						if (entry.listener != null)
+						if (entry.listener != null && entry.listener.end)
 							entry.listener.end(entry);
 						for (var ii = 0; ii < listeners.length; ii++)
-							listeners[ii].interrupt(entry);
+							if (listeners[ii].interrupt)
+								listeners[ii].interrupt(entry);
 						break;
 					case EventType.end:
-						if (entry.listener != null)
+						if (entry.listener != null && entry.listener.end)
 							entry.listener.end(entry);
 						for (var ii = 0; ii < listeners.length; ii++)
-							listeners[ii].end(entry);
+							if (listeners[ii].end)
+								listeners[ii].end(entry);
 					case EventType.dispose:
-						if (entry.listener != null)
+						if (entry.listener != null && entry.listener.end)
 							entry.listener.end(entry);
 						for (var ii = 0; ii < listeners.length; ii++)
-							listeners[ii].dispose(entry);
+							if (listeners[ii].dispose)
+								listeners[ii].dispose(entry);
 						this.animState.trackEntryPool.free(entry);
 						break;
 					case EventType.complete:
-						if (entry.listener != null)
+						if (entry.listener != null && entry.listener.complete)
 							entry.listener.complete(entry);
 						for (var ii = 0; ii < listeners.length; ii++)
-							listeners[ii].complete(entry);
+							if (listeners[ii].complete)
+								listeners[ii].complete(entry);
 						break;
 					case EventType.event:
 						var event_3 = objects[i++ + 2];
-						if (entry.listener != null)
+						if (entry.listener != null && entry.listener.event)
 							entry.listener.event(entry, event_3);
 						for (var ii = 0; ii < listeners.length; ii++)
-							listeners[ii].event(entry, event_3);
+							if (listeners[ii].event)
+								listeners[ii].event(entry, event_3);
 						break;
 				}
 			}
