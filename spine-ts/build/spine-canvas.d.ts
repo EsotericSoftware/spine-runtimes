@@ -310,10 +310,10 @@ declare module spine {
 		clearTracks(): void;
 		clearTrack(trackIndex: number): void;
 		setCurrent(index: number, current: TrackEntry): void;
-		setAnimationByName(trackIndex: number, animationName: string, loop: boolean): TrackEntry;
-		setAnimation(trackIndex: number, animation: Animation, loop: boolean): TrackEntry;
-		addAnimationByName(trackIndex: number, animationName: string, loop: boolean, delay: number): TrackEntry;
-		addAnimation(trackIndex: number, animation: Animation, loop: boolean, delay: number): TrackEntry;
+		setAnimation(trackIndex: number, animationName: string, loop: boolean): TrackEntry;
+		setAnimationWith(trackIndex: number, animation: Animation, loop: boolean): TrackEntry;
+		addAnimation(trackIndex: number, animationName: string, loop: boolean, delay: number): TrackEntry;
+		addAnimationWith(trackIndex: number, animation: Animation, loop: boolean, delay: number): TrackEntry;
 		setEmptyAnimation(trackIndex: number, mixDuration: number): TrackEntry;
 		addEmptyAnimation(trackIndex: number, mixDuration: number, delay: number): TrackEntry;
 		setEmptyAnimations(mixDuration: number): void;

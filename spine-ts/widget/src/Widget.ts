@@ -143,7 +143,7 @@ module spine {
 				}
 
 				var animationState = this.state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
-				animationState.setAnimationByName(0, config.animation, true);
+				animationState.setAnimation(0, config.animation, true);
 				if (config.success) config.success(this);
 				this.loaded = true;
 				requestAnimationFrame(() => { this.render(); });
@@ -246,7 +246,7 @@ module spine {
 		setAnimation (animationName: string) {
 			if (!this.loaded) throw new Error("Widget isn't loaded yet");
 			this.skeleton.setToSetupPose();
-			this.state.setAnimationByName(0, animationName, this.config.loop);
+			this.state.setAnimation(0, animationName, this.config.loop);
 		}
 
 

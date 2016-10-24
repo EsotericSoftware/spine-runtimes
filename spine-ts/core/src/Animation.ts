@@ -215,7 +215,7 @@ module spine {
 					bone.rotation = bone.data.rotation + frames[frames.length + RotateTimeline.PREV_ROTATION] * alpha;
 				else {
 					let r = bone.data.rotation + frames[frames.length + RotateTimeline.PREV_ROTATION] - bone.rotation;
-					r -= (16384 - Math.floor(16384.499999999996 - r / 360)) * 360; // Wrap within -180 and 180.
+					r -= (16384 - ((16384.499999999996 - r / 360) | 0)) * 360; // Wrap within -180 and 180.
 					bone.rotation += r * alpha;
 				}
 				return;
@@ -229,14 +229,14 @@ module spine {
 				1 - (time - frameTime) / (frames[frame + RotateTimeline.PREV_TIME] - frameTime));
 
 			let r = frames[frame + RotateTimeline.ROTATION] - prevRotation;
-			r -= (16384 - Math.floor(16384.499999999996 - r / 360)) * 360;
+			r -= (16384 - ((16384.499999999996 - r / 360) | 0)) * 360;
 			r = prevRotation + r * percent;
 			if (setupPose) {
-				r -= (16384 - Math.floor(16384.499999999996 - r / 360)) * 360;
+				r -= (16384 - ((16384.499999999996 - r / 360) | 0)) * 360;
 				bone.rotation = bone.data.rotation + r * alpha;
 			} else {
 				r = bone.data.rotation + r - bone.rotation;
-				r -= (16384 - Math.floor(16384.499999999996 - r / 360)) * 360;
+				r -= (16384 - ((16384.499999999996 - r / 360) |0)) * 360;
 				bone.rotation += r * alpha;
 			}
 		}
