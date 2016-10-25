@@ -1,0 +1,81 @@
+<html>
+<script src="../../build/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<style>
+	* { margin: 0; padding: 0; }
+	body, html { height: 100% }
+	canvas { position: absolute; width: 100% ;height: 100%; }
+</style>
+<body>
+<canvas id="canvas"></canvas>
+</body>
+<script>
+
+var canvas, gl, renderer, input, assetManager;
+var skeleton, bounds, state;
+var timeKeeper;
+
+function init() {
+	canvas = document.getElementById("canvas");
+	canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
+	gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });
+
+	renderer = new spine.webgl.SceneRenderer(canvas, gl);
+	assetManager = new spine.webgl.AssetManager(gl, "assets/");
+	var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
+	input = new spine.webgl.Input(canvas);
+	assetManager.loadTexture("raptor.png");
+	assetManager.loadText("raptor.atlas");
+	assetManager.loadText("raptor.json");
+	timeKeeper = new spine.TimeKeeper();
+	requestAnimationFrame(load);
+}
+
+function load() {
+	timeKeeper.update();
+	if (assetManager.isLoadingComplete()) {
+		var atlas = new spine.TextureAtlas(assetManager.get("raptor.atlas"), function(path) {
+			return assetManager.get(path);
+		});
+		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+		var skeletonJson = new spine.SkeletonJson(atlasLoader);
+		skeletonJson.scale = 0.5;
+		var skeletonData = skeletonJson.readSkeletonData(JSON.parse(assetManager.get("raptor.json")));
+		skeleton = new spine.Skeleton(skeletonData);
+		var stateData = new spine.AnimationStateData(skeleton.data);
+		state = new spine.AnimationState(stateData);
+		stateData.setMix("walk", "Jump", 0.5);
+		state.setAnimation(0, "walk", false);
+		state.addAnimation(0, "Jump", false, 0);
+		state.apply(skeleton);
+		skeleton.updateWorldTransform();
+
+		requestAnimationFrame(render);
+	} else {
+		requestAnimationFrame(load);
+	}
+}
+
+function render() {
+	timeKeeper.update();
+	var delta = timeKeeper.delta;
+	delta = 0.016;
+
+	state.update(delta);
+	state.apply(skeleton);
+	skeleton.updateWorldTransform();
+
+	gl.clearColor(0, 0, 0, 1);
+	gl.clear(gl.COLOR_BUFFER_BIT);
+
+	renderer.resize(spine.webgl.ResizeMode.Fit);
+	renderer.begin();
+	renderer.drawSkeleton(skeleton);
+	renderer.end();
+
+	requestAnimationFrame(render)
+}
+
+init();
+</script>
+</html>
