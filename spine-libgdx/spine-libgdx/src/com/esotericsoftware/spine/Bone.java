@@ -357,24 +357,21 @@ public class Bone implements Updatable {
 	public float worldToLocalRotationX () {
 		Bone parent = this.parent;
 		if (parent == null) return arotation;
-		float a = this.a, c = this.c;
 		return atan2(parent.a * c - parent.c * a, parent.d * a - parent.b * c) * radDeg;
 	}
 
 	public float worldToLocalRotationY () {
 		Bone parent = this.parent;
 		if (parent == null) return arotation;
-		float b = this.b, d = this.d;
 		return atan2(parent.a * d - parent.c * b, parent.d * b - parent.b * d) * radDeg;
 	}
 
 	public void rotateWorld (float degrees) {
-		float a = this.a, b = this.b, c = this.c, d = this.d;
 		float cos = cosDeg(degrees), sin = sinDeg(degrees);
-		this.a = cos * a - sin * c;
-		this.b = cos * b - sin * d;
-		this.c = sin * a + cos * c;
-		this.d = sin * b + cos * d;
+		a = cos * a - sin * c;
+		b = cos * b - sin * d;
+		c = sin * a + cos * c;
+		d = sin * b + cos * d;
 		appliedValid = false;
 	}
 
@@ -439,7 +436,6 @@ public class Bone implements Updatable {
 	}
 
 	public Vector2 worldToLocal (Vector2 world) {
-		float a = this.a, b = this.b, c = this.c, d = this.d;
 		float invDet = 1 / (a * d - b * c);
 		float x = world.x - worldX, y = world.y - worldY;
 		world.x = (x * d * invDet - y * b * invDet);
