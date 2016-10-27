@@ -45,6 +45,10 @@ public class DrawOrderTimeline implements Timeline {
 	public function get frameCount () : int {
 		return frames.length;
 	}
+	
+	public function getPropertyId () : int {
+		return TimelineType.drawOrder.ordinal << 24;
+	}
 
 	/** Sets the time and value of the specified keyframe. */
 	public function setFrame (frameIndex:int, time:Number, drawOrder:Vector.<int>) : void {
@@ -52,7 +56,13 @@ public class DrawOrderTimeline implements Timeline {
 		drawOrders[frameIndex] = drawOrder;
 	}
 
-	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
+	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
+		if (mixingOut && setupPose) {
+			for (var ii:int = 0, n:int = skeleton.slots.length; ii < n; ii++)
+				skeleton.drawOrder[ii] = skeleton.slots[ii];
+			return;
+		}
+		
 		if (time < frames[0])
 			return; // Time is before first frame.
 

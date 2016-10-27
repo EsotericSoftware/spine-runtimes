@@ -46,7 +46,11 @@ public class CurveTimeline implements Timeline {
 		curves = new Vector.<Number>((frameCount - 1) * BEZIER_SIZE, true);
 	}
 
-	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
+	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
+	}
+	
+	public function getPropertyId () : int {
+		return 0;
 	}
 
 	public function get frameCount () : int {

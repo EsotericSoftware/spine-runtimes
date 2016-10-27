@@ -34,7 +34,9 @@ import spine.Skeleton;
 
 public interface Timeline {
 	/** Sets the value(s) for the specified time. */
-	function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void;
+	function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void;
+	
+	function getPropertyId() : int;
 }
 
 }

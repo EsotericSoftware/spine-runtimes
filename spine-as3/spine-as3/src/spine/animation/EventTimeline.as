@@ -44,6 +44,10 @@ public class EventTimeline implements Timeline {
 	public function get frameCount () : int {
 		return frames.length;
 	}
+	
+	public function getPropertyId () : int {
+		return TimelineType.event.ordinal << 24;
+	}
 
 	/** Sets the time and value of the specified keyframe. */
 	public function setFrame (frameIndex:int, event:Event) : void {
@@ -52,11 +56,11 @@ public class EventTimeline implements Timeline {
 	}
 
 	/** Fires events for frames > lastTime and <= time. */
-	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
+	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
 		if (!firedEvents) return;
 
 		if (lastTime > time) { // Fire events after last time for looped animations.
-			apply(skeleton, lastTime, int.MAX_VALUE, firedEvents, alpha);
+			apply(skeleton, lastTime, int.MAX_VALUE, firedEvents, alpha, setupPose, mixingOut);
 			lastTime = -1;
 		} else if (lastTime >= frames[int(frameCount - 1)]) // Last time is after last frame.
 			return;

@@ -29,54 +29,28 @@
  *****************************************************************************/
 
 package spine.animation {
-import spine.Slot;
-import spine.Event;
-import spine.Skeleton;
 
-public class AttachmentTimeline implements Timeline {
-	public var slotIndex:int;
-	public var frames:Vector.<Number>; // time, ...
-	public var attachmentNames:Vector.<String>;
-
-	public function AttachmentTimeline (frameCount:int) {
-		frames = new Vector.<Number>(frameCount, true);
-		attachmentNames = new Vector.<String>(frameCount, true);
-	}
-
-	public function get frameCount () : int {
-		return frames.length;
+public class TimelineType {
+	public var ordinal:int;
+	
+	public function TimelineType(order:int) {
+		this.ordinal = order;
 	}
 	
-	public function getPropertyId () : int {
-		return (TimelineType.attachment.ordinal << 24) + slotIndex;
-	}
-
-	/** Sets the time and value of the specified keyframe. */
-	public function setFrame (frameIndex:int, time:Number, attachmentName:String) : void {
-		frames[frameIndex] = time;
-		attachmentNames[frameIndex] = attachmentName;
-	}
-
-	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
-		var attachmentName:String;
-		if (mixingOut && setupPose) {
-			var slot:Slot = skeleton.slots[slotIndex];
-			attachmentName = slot.data.attachmentName;
-			slot.attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName);
-			return;
-		}
-		var frames:Vector.<Number> = this.frames;
-		if (time < frames[0]) return; // Time is before first frame.
-
-		var frameIndex:int;
-		if (time >= frames[frames.length - 1]) // Time is after last frame.
-			frameIndex = frames.length - 1;
-		else
-			frameIndex = Animation.binarySearch(frames, time, 1) - 1;
-
-		attachmentName = attachmentNames[frameIndex];
-		skeleton.slots[slotIndex].attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName);
-	}
+	public static const rotate:TimelineType = new TimelineType(0);
+	public static const translate:TimelineType = new TimelineType(1);
+	public static const scale:TimelineType = new TimelineType(2);
+	public static const shear:TimelineType = new TimelineType(3);
+	public static const attachment:TimelineType = new TimelineType(4);
+	public static const color:TimelineType = new TimelineType(5);
+	public static const deform:TimelineType = new TimelineType(6);
+	public static const event:TimelineType = new TimelineType(7);
+	public static const drawOrder:TimelineType = new TimelineType(8);
+	public static const ikConstraint:TimelineType = new TimelineType(9);
+	public static const transformConstraint:TimelineType = new TimelineType(10);
+	public static const pathConstraintPosition:TimelineType = new TimelineType(11);
+	public static const pathConstraintSpacing:TimelineType = new TimelineType(12);
+	public static const pathConstraintMix:TimelineType = new TimelineType(13);
 }
 
 }

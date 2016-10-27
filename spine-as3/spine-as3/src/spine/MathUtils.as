@@ -47,6 +47,10 @@ public class MathUtils {
 		if (value > max) return max;
 		return value;
 	}
+	
+	static public function signum (value: Number):Number {
+		return value > 0 ? 1 : value < 0 ? -1 : 0;
+	}
 }
 
 }
