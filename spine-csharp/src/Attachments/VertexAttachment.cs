@@ -32,7 +32,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Spine {
-	/// <summary>>An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's vertices.</summary> 
+	/// <summary>An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's vertices.</summary> 
 	public class VertexAttachment : Attachment {
 		internal int[] bones;
 		internal float[] vertices;
