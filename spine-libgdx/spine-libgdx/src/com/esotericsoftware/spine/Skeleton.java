@@ -40,6 +40,10 @@ import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 
+/** Stores the current pose for a skeleton.
+ * <p>
+ * See <a href="http://esotericsoftware.com/spine-runtime-architecture#Instance-objects">Instance objects</a> in the Spine
+ * Runtimes Guide. */
 public class Skeleton {
 	final SkeletonData data;
 	final Array<Bone> bones;
@@ -290,7 +294,10 @@ public class Skeleton {
 		}
 	}
 
-	/** Updates the world transform for each bone and applies constraints. */
+	/** Updates the world transform for each bone and applies all constraints.
+	 * <p>
+	 * See <a href="http://esotericsoftware.com/spine-skeleton-manipulation#World-transforms">World transforms</a> in the Spine
+	 * Runtimes Guide. */
 	public void updateWorldTransform () {
 		// This partial update avoids computing the world transform for constrained bones when 1) the bone is not updated
 		// before the constraint, 2) the constraint only needs to access the applied local transform, and 3) the constraint calls
@@ -312,7 +319,7 @@ public class Skeleton {
 			updateCache.get(i).update();
 	}
 
-	/** Sets the bones, constraints, and slots to their setup pose values. */
+	/** Sets the bones, constraints, slots, and draw order to their setup pose values. */
 	public void setToSetupPose () {
 		setBonesToSetupPose();
 		setSlotsToSetupPose();
@@ -352,6 +359,7 @@ public class Skeleton {
 		}
 	}
 
+	/** Sets the slots and draw order to their setup pose values. */
 	public void setSlotsToSetupPose () {
 		Array<Slot> slots = this.slots;
 		System.arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
@@ -359,10 +367,12 @@ public class Skeleton {
 			slots.get(i).setToSetupPose();
 	}
 
+	/** The skeleton's setup pose data. */
 	public SkeletonData getData () {
 		return data;
 	}
 
+	/** The skeleton's bones, sorted parent first. The root bone is always the first bone. */
 	public Array<Bone> getBones () {
 		return bones;
 	}
@@ -371,13 +381,15 @@ public class Skeleton {
 		return updateCache;
 	}
 
-	/** @return May return null. */
+	/** Returns the root bone, or null. */
 	public Bone getRootBone () {
 		if (bones.size == 0) return null;
 		return bones.first();
 	}
 
-	/** @return May be null. */
+	/** Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it
+	 * multiple times.
+	 * @return May be null. */
 	public Bone findBone (String boneName) {
 		if (boneName == null) throw new IllegalArgumentException("boneName cannot be null.");
 		Array<Bone> bones = this.bones;
@@ -388,11 +400,14 @@ public class Skeleton {
 		return null;
 	}
 
+	/** The skeleton's slots. */
 	public Array<Slot> getSlots () {
 		return slots;
 	}
 
-	/** @return May be null. */
+	/** Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it
+	 * multiple times.
+	 * @return May be null. */
 	public Slot findSlot (String slotName) {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
 		Array<Slot> slots = this.slots;
@@ -403,24 +418,25 @@ public class Skeleton {
 		return null;
 	}
 
-	/** Returns the slots in the order they will be drawn. The returned array may be modified to change the draw order. */
+	/** The skeleton's slots in the order they should be drawn. The returned array may be modified to change the draw order. */
 	public Array<Slot> getDrawOrder () {
 		return drawOrder;
 	}
 
-	/** Sets the slots and the order they will be drawn. */
 	public void setDrawOrder (Array<Slot> drawOrder) {
 		if (drawOrder == null) throw new IllegalArgumentException("drawOrder cannot be null.");
 		this.drawOrder = drawOrder;
 	}
 
-	/** @return May be null. */
+	/** The skeleton's current skin.
+	 * @return May be null. */
 	public Skin getSkin () {
 		return skin;
 	}
 
 	/** Sets a skin by name.
-	 * @see #setSkin(Skin) */
+	 * <p>
+	 * See {@link #setSkin(Skin)}. */
 	public void setSkin (String skinName) {
 		Skin skin = data.findSkin(skinName);
 		if (skin == null) throw new IllegalArgumentException("Skin not found: " + skinName);
@@ -428,6 +444,7 @@ public class Skeleton {
 	}
 
 	/** Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default skin}.
+	 * <p>
 	 * Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no
 	 * old skin, each slot's setup mode attachment is attached from the new skin.
 	 * @param newSkin May be null. */
@@ -450,14 +467,22 @@ public class Skeleton {
 		skin = newSkin;
 	}
 
-	/** @return May be null. */
+	/** Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot name and attachment
+	 * name.
+	 * <p>
+	 * See {@link #getAttachment(int, String)}.
+	 * @return May be null. */
 	public Attachment getAttachment (String slotName, String attachmentName) {
 		SlotData slot = data.findSlot(slotName);
 		if (slot == null) throw new IllegalArgumentException("Slot not found: " + slotName);
 		return getAttachment(slot.getIndex(), attachmentName);
 	}
 
-	/** @return May be null. */
+	/** Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot index and
+	 * attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.
+	 * <p>
+	 * See <a href="http://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide.
+	 * @return May be null. */
 	public Attachment getAttachment (int slotIndex, String attachmentName) {
 		if (attachmentName == null) throw new IllegalArgumentException("attachmentName cannot be null.");
 		if (skin != null) {
@@ -468,8 +493,8 @@ public class Skeleton {
 		return null;
 	}
 
-	/** Sets an attachment by finding the slot with {@link #findSlot(String)}, finding the attachment with
-	 * {@link #getAttachment(int, String)}, then sets the slot's {@link Slot#attachment}.
+	/** A convenience method to set an attachment by finding the slot with {@link #findSlot(String)}, finding the attachment with
+	 * {@link #getAttachment(int, String)}, then setting the slot's {@link Slot#attachment}.
 	 * @param attachmentName May be null to clear the slot. */
 	public void setAttachment (String slotName, String attachmentName) {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
@@ -484,11 +509,14 @@ public class Skeleton {
 		slot.setAttachment(attachment);
 	}
 
+	/** The skeleton's IK constraints. */
 	public Array<IkConstraint> getIkConstraints () {
 		return ikConstraints;
 	}
 
-	/** @return May be null. */
+	/** Finds an IK constraint by comparing each IK constraint's name. It is more efficient to cache the results of this method
+	 * than to call it multiple times.
+	 * @return May be null. */
 	public IkConstraint findIkConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Array<IkConstraint> ikConstraints = this.ikConstraints;
@@ -499,11 +527,14 @@ public class Skeleton {
 		return null;
 	}
 
+	/** The skeleton's transform constraints. */
 	public Array<TransformConstraint> getTransformConstraints () {
 		return transformConstraints;
 	}
 
-	/** @return May be null. */
+	/** Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of
+	 * this method than to call it multiple times.
+	 * @return May be null. */
 	public TransformConstraint findTransformConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Array<TransformConstraint> transformConstraints = this.transformConstraints;
@@ -514,11 +545,14 @@ public class Skeleton {
 		return null;
 	}
 
+	/** The skeleton's path constraints. */
 	public Array<PathConstraint> getPathConstraints () {
 		return pathConstraints;
 	}
 
-	/** @return May be null. */
+	/** Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method
+	 * than to call it multiple times.
+	 * @return May be null. */
 	public PathConstraint findPathConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Array<PathConstraint> pathConstraints = this.pathConstraints;
@@ -530,8 +564,8 @@ public class Skeleton {
 	}
 
 	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
-	 * @param offset The distance from the skeleton origin to the bottom left corner of the AABB.
-	 * @param size The width and height of the AABB. */
+	 * @param offset An output value, the distance from the skeleton origin to the bottom left corner of the AABB.
+	 * @param size An output value, the width and height of the AABB. */
 	public void getBounds (Vector2 offset, Vector2 size) {
 		if (offset == null) throw new IllegalArgumentException("offset cannot be null.");
 		if (size == null) throw new IllegalArgumentException("size cannot be null.");
@@ -559,6 +593,7 @@ public class Skeleton {
 		size.set(maxX - minX, maxY - minY);
 	}
 
+	/** The color to tint all the skeleton's attachments. */
 	public Color getColor () {
 		return color;
 	}
@@ -569,6 +604,8 @@ public class Skeleton {
 		this.color.set(color);
 	}
 
+	/** If true, the entire skeleton is flipped over the Y axis. This affects all bones, even if the bone's transform mode
+	 * disallows scale inheritance. */
 	public boolean getFlipX () {
 		return flipX;
 	}
@@ -577,6 +614,8 @@ public class Skeleton {
 		this.flipX = flipX;
 	}
 
+	/** If true, the entire skeleton is flipped over the X axis. This affects all bones, even if the bone's transform mode
+	 * disallows scale inheritance. */
 	public boolean getFlipY () {
 		return flipY;
 	}
@@ -590,6 +629,7 @@ public class Skeleton {
 		this.flipY = flipY;
 	}
 
+	/** Sets the skeleton X position, which is added to the root bone worldX position. */
 	public float getX () {
 		return x;
 	}
@@ -598,6 +638,7 @@ public class Skeleton {
 		this.x = x;
 	}
 
+	/** Sets the skeleton Y position, which is added to the root bone worldY position. */
 	public float getY () {
 		return y;
 	}
@@ -611,6 +652,9 @@ public class Skeleton {
 		this.y = y;
 	}
 
+	/** Returns the skeleton's time. This can be used for tracking, such as with Slot {@link Slot#getAttachmentTime()}.
+	 * <p>
+	 * See {@link #update(float)}. */
 	public float getTime () {
 		return time;
 	}
@@ -619,6 +663,7 @@ public class Skeleton {
 		this.time = time;
 	}
 
+	/** Increments the skeleton's {@link #time}. */
 	public void update (float delta) {
 		time += delta;
 	}

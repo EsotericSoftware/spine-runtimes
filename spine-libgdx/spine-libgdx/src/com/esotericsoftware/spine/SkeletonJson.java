@@ -69,6 +69,11 @@ import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
 
+/** Loads skeleton data in the Spine JSON format.
+ * <p>
+ * See <a href="http://esotericsoftware.com/spine-json-format">Spine JSON format</a> and
+ * <a href="http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data">JSON and binary data</a> in the Spine
+ * Runtimes Guide. */
 public class SkeletonJson {
 	private final AttachmentLoader attachmentLoader;
 	private float scale = 1;
@@ -83,11 +88,14 @@ public class SkeletonJson {
 		this.attachmentLoader = attachmentLoader;
 	}
 
+	/** Scales bone positions, image sizes, and translations as they are loaded. This allows different size images to be used at
+	 * runtime than were used in Spine.
+	 * <p>
+	 * See <a href="http://esotericsoftware.com/spine-loading-skeleton-data#Scaling">Scaling</a> in the Spine Runtimes Guide. */
 	public float getScale () {
 		return scale;
 	}
 
-	/** Scales the bones, images, and animations as they are loaded. */
 	public void setScale (float scale) {
 		this.scale = scale;
 	}

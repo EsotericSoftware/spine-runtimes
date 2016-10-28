@@ -32,6 +32,7 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.graphics.Color;
 
+/** Stores the setup pose for a {@link Slot}. */
 public class SlotData {
 	final int index;
 	final String name;
@@ -49,18 +50,22 @@ public class SlotData {
 		this.boneData = boneData;
 	}
 
+	/** The index of the slot in {@link Skeleton#getSlots()}. */
 	public int getIndex () {
 		return index;
 	}
 
+	/** The name of the slot, which is unique within the skeleton. */
 	public String getName () {
 		return name;
 	}
 
+	/** The bone this slot belongs to. */
 	public BoneData getBoneData () {
 		return boneData;
 	}
 
+	/** The color used to tint the slot's attachment. */
 	public Color getColor () {
 		return color;
 	}
@@ -70,11 +75,12 @@ public class SlotData {
 		this.attachmentName = attachmentName;
 	}
 
-	/** @return May be null. */
+	/** The name of the attachment that is visible for this slot in the setup pose, or null if no attachment is visible. */
 	public String getAttachmentName () {
 		return attachmentName;
 	}
 
+	/** The blend mode for drawing the slot's attachment. */
 	public BlendMode getBlendMode () {
 		return blendMode;
 	}

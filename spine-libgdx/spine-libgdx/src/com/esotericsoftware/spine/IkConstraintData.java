@@ -32,6 +32,9 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
 
+/** Stores the setup pose for an {@link IkConstraint}.
+ * <p>
+ * See <a href="http://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide. */
 public class IkConstraintData {
 	final String name;
 	int order;
@@ -45,10 +48,12 @@ public class IkConstraintData {
 		this.name = name;
 	}
 
+	/** The IK constraint's name, which is unique within the skeleton. */
 	public String getName () {
 		return name;
 	}
 
+	/** See {@link Constraint#getOrder()}. */
 	public int getOrder () {
 		return order;
 	}
@@ -57,10 +62,12 @@ public class IkConstraintData {
 		this.order = order;
 	}
 
+	/** The bones that are constrained by this IK constraint. */
 	public Array<BoneData> getBones () {
 		return bones;
 	}
 
+	/** The bone that is the IK target. */
 	public BoneData getTarget () {
 		return target;
 	}
@@ -70,6 +77,7 @@ public class IkConstraintData {
 		this.target = target;
 	}
 
+	/** Controls the bend direction of the IK bones, either 1 or -1. */
 	public int getBendDirection () {
 		return bendDirection;
 	}
@@ -78,6 +86,7 @@ public class IkConstraintData {
 		this.bendDirection = bendDirection;
 	}
 
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotations. */
 	public float getMix () {
 		return mix;
 	}

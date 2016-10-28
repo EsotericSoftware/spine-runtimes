@@ -37,6 +37,7 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
 
+/** A simple container for a list of timelines and a name. */
 public class Animation {
 	final String name;
 	final Array<Timeline> timelines;
@@ -54,7 +55,7 @@ public class Animation {
 		return timelines;
 	}
 
-	/** Returns the duration of the animation in seconds. */
+	/** The duration of the animation in seconds, which is the highest time of all keys in the timeline. */
 	public float getDuration () {
 		return duration;
 	}
@@ -64,7 +65,8 @@ public class Animation {
 	}
 
 	/** Applies all the animation's timelines to the specified skeleton.
-	 * @see Timeline#apply(Skeleton, float, float, Array, float, boolean, boolean) */
+	 * <p>
+	 * See Timeline {@link Timeline#apply(Skeleton, float, float, Array, float, boolean, boolean)}. */
 	public void apply (Skeleton skeleton, float lastTime, float time, boolean loop, Array<Event> events, float alpha,
 		boolean setupPose, boolean mixingOut) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
@@ -79,6 +81,7 @@ public class Animation {
 			timelines.get(i).apply(skeleton, lastTime, time, events, alpha, setupPose, false);
 	}
 
+	/** The animation's name, which is unique within the skeleton. */
 	public String getName () {
 		return name;
 	}
@@ -127,17 +130,32 @@ public class Animation {
 		return -1;
 	}
 
+	/** The interface for all timelines. */
 	static public interface Timeline {
-		/** Sets the value(s) for the specified time.
-		 * @param events May be null to not collect fired events.
-		 * @param setupPose True when the timeline is mixed with the setup pose, false when it is mixed with the current pose.
-		 *           Passing true when alpha is 1 is slightly more efficient for most timelines.
-		 * @param mixingOut True when changing alpha over time toward 0 (the setup or current pose), false when changing alpha
-		 *           toward 1 (the timeline's pose). Used for timelines with instant transitions, eg draw order, attachment
-		 *           visibility, scale sign. */
+		/** Applies this timeline to the skeleton.
+		 * @param skeleton The skeleton the timeline is being applied to. This provides access to the bones, slots, and other
+		 *           skeleton components the timeline may change.
+		 * @param lastTime The time this timeline was last applied. Timelines such as {@link EventTimeline} trigger only at specific
+		 *           times rather than every frame. In that case, the timeline triggers everything between <code>lastTime</code>
+		 *           (exclusive) and <code>time</code> (inclusive).
+		 * @param time The time within the animation. Most timelines find the key before and the key after this time so they can
+		 *           interpolate between the keys.
+		 * @param events If any events are fired, they are added to this list. Can be null to ignore firing events or if the
+		 *           timeline does not fire events.
+		 * @param alpha 0 results in the value of the current or setup pose (depending on <code>setupPose</code>). 1 results in the
+		 *           value from the timeline. Between 0 and 1 results in a value mixed between the current or setup pose and the
+		 *           value from the timeline. By adjusting <code>alpha</code> over time, an animation can be mixed in or out.
+		 *           <code>alpha</code> can also be useful to apply animations on top of each other.
+		 * @param setupPose Controls mixing when <code>alpha</code> < 1. When true the value from the timeline is mixed with the
+		 *           value from the setup pose. When false the value from the timeline is mixed with the value from the current
+		 *           pose. Passing true when <code>alpha</code> is 1 is slightly more efficient for most timelines.
+		 * @param mixingOut True when changing <code>alpha</code> over time toward 0 (the setup or current pose), false when
+		 *           changing <code>alpha</code> toward 1 (the timeline's pose). Used for timelines which perform instant
+		 *           transitions, such as {@link DrawOrderTimeline} or {@link AttachmentTimeline}. */
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
 			boolean mixingOut);
 
+		/** Uniquely encodes both the type of this timeline and the skeleton property that it affects. */
 		public int getPropertyId ();
 	}
 
@@ -149,7 +167,7 @@ public class Animation {
 		pathConstraintPosition, pathConstraintSpacing, pathConstraintMix
 	}
 
-	/** Base class for frames that use an interpolation bezier curve. */
+	/** The base class for timelines that use interpolation between key frame values. */
 	abstract static public class CurveTimeline implements Timeline {
 		static public final float LINEAR = 0, STEPPED = 1, BEZIER = 2;
 		static private final int BEZIER_SIZE = 10 * 2 - 1;
@@ -161,18 +179,23 @@ public class Animation {
 			curves = new float[(frameCount - 1) * BEZIER_SIZE];
 		}
 
+		/** The number of key frames for this timeline. */
 		public int getFrameCount () {
 			return curves.length / BEZIER_SIZE + 1;
 		}
 
+		/** Sets the specified key frame to linear interpolation. */
 		public void setLinear (int frameIndex) {
 			curves[frameIndex * BEZIER_SIZE] = LINEAR;
 		}
 
+		/** Sets the specified key frame to stepped interpolation. */
 		public void setStepped (int frameIndex) {
 			curves[frameIndex * BEZIER_SIZE] = STEPPED;
 		}
 
+		/** Returns the interpolation type for the specified key frame.
+		 * @return Linear is 0, stepped is 1, Bezier is 2. */
 		public float getCurveType (int frameIndex) {
 			int index = frameIndex * BEZIER_SIZE;
 			if (index == curves.length) return LINEAR;
@@ -182,9 +205,9 @@ public class Animation {
 			return BEZIER;
 		}
 
-		/** Sets the control handle positions for an interpolation bezier curve used to transition from this keyframe to the next.
-		 * cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
-		 * the difference between the keyframe's values. */
+		/** Sets the specified key frame to Bezier interpolation. <code>cx1</code> and <code>cx2</code> are from 0 to 1,
+		 * representing the percent of time between the two key frames. <code>cy1</code> and <code>cy2</code> are the percent of the
+		 * difference between the key frame's values. */
 		public void setCurve (int frameIndex, float cx1, float cy1, float cx2, float cy2) {
 			float tmpx = (-cx1 * 2 + cx2) * 0.03f, tmpy = (-cy1 * 2 + cy2) * 0.03f;
 			float dddfx = ((cx1 - cx2) * 3 + 1) * 0.006f, dddfy = ((cy1 - cy2) * 3 + 1) * 0.006f;
@@ -208,6 +231,7 @@ public class Animation {
 			}
 		}
 
+		/** Returns the interpolated percentage for the specified key frame and linear percentage. */
 		public float getCurvePercent (int frameIndex, float percent) {
 			percent = MathUtils.clamp(percent, 0, 1);
 			float[] curves = this.curves;
@@ -236,6 +260,7 @@ public class Animation {
 		}
 	}
 
+	/** Changes a bone's local {@link Bone#getRotation()}. */
 	static public class RotateTimeline extends CurveTimeline {
 		static public final int ENTRIES = 2;
 		static final int PREV_TIME = -2, PREV_ROTATION = -1;
@@ -258,15 +283,17 @@ public class Animation {
 			this.boneIndex = index;
 		}
 
+		/** The index of the bone in {@link Skeleton#getBones()} that will be changed. */
 		public int getBoneIndex () {
 			return boneIndex;
 		}
 
+		/** The time in seconds and rotation in degrees for each key frame. */
 		public float[] getFrames () {
 			return frames;
 		}
 
-		/** Sets the time and angle of the specified keyframe. */
+		/** Sets the time in seconds and the rotation in degrees for the specified key frame. */
 		public void setFrame (int frameIndex, float time, float degrees) {
 			frameIndex <<= 1;
 			frames[frameIndex] = time;
@@ -311,6 +338,7 @@ public class Animation {
 		}
 	}
 
+	/** Changes a bone's local {@link Bone#getX()} and {@link Bone#getY()}. */
 	static public class TranslateTimeline extends CurveTimeline {
 		static public final int ENTRIES = 3;
 		static final int PREV_TIME = -3, PREV_X = -2, PREV_Y = -1;
@@ -333,15 +361,17 @@ public class Animation {
 			this.boneIndex = index;
 		}
 
+		/** The index of the bone in {@link Skeleton#getBones()} that will be changed. */
 		public int getBoneIndex () {
 			return boneIndex;
 		}
 
+		/** The time in seconds, x, and y values for each key frame. */
 		public float[] getFrames () {
 			return frames;
 		}
 
-		/** Sets the time and value of the specified keyframe. */
+		/** Sets the time in seconds, x, and y values for the specified key frame. */
 		public void setFrame (int frameIndex, float time, float x, float y) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;
@@ -382,6 +412,7 @@ public class Animation {
 		}
 	}
 
+	/** Changes a bone's local {@link Bone#getScaleX()} and {@link Bone#getScaleY()}. */
 	static public class ScaleTimeline extends TranslateTimeline {
 		public ScaleTimeline (int frameCount) {
 			super(frameCount);
@@ -440,6 +471,7 @@ public class Animation {
 		}
 	}
 
+	/** Changes a bone's local {@link Bone#getShearX()} and {@link Bone#getShearY()}. */
 	static public class ShearTimeline extends TranslateTimeline {
 		public ShearTimeline (int frameCount) {
 			super(frameCount);
@@ -482,6 +514,7 @@ public class Animation {
 		}
 	}
 
+	/** Changes a slot's {@link Slot#getColor()}. */
 	static public class ColorTimeline extends CurveTimeline {
 		static public final int ENTRIES = 5;
 		static private final int PREV_TIME = -5, PREV_R = -4, PREV_G = -3, PREV_B = -2, PREV_A = -1;
@@ -504,15 +537,17 @@ public class Animation {
 			this.slotIndex = index;
 		}
 
+		/** The index of the slot in {@link Skeleton#getSlots()} that will be changed. */
 		public int getSlotIndex () {
 			return slotIndex;
 		}
 
+		/** The time in seconds, red, green, blue, and alpha values for each key frame. */
 		public float[] getFrames () {
 			return frames;
 		}
 
-		/** Sets the time and value of the specified keyframe. */
+		/** Sets the time in seconds, red, green, blue, and alpha for the specified key frame. */
 		public void setFrame (int frameIndex, float time, float r, float g, float b, float a) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;
@@ -561,6 +596,7 @@ public class Animation {
 		}
 	}
 
+	/** Changes a slot's {@link Slot#getAttachment()}. */
 	static public class AttachmentTimeline implements Timeline {
 		int slotIndex;
 		final float[] frames; // time, ...
@@ -575,6 +611,7 @@ public class Animation {
 			return (TimelineType.attachment.ordinal() << 24) + slotIndex;
 		}
 
+		/** The number of key frames for this timeline. */
 		public int getFrameCount () {
 			return frames.length;
 		}
@@ -584,19 +621,22 @@ public class Animation {
 			this.slotIndex = index;
 		}
 
+		/** The index of the slot in {@link Skeleton#getSlots()} that will be changed. */
 		public int getSlotIndex () {
 			return slotIndex;
 		}
 
+		/** The time in seconds for each key frame. */
 		public float[] getFrames () {
 			return frames;
 		}
 
+		/** The attachment name for each key frame. May contain null values to clear the attachment. */
 		public String[] getAttachmentNames () {
 			return attachmentNames;
 		}
 
-		/** Sets the time and value of the specified keyframe. */
+		/** Sets the time in seconds and the attachment name for the specified key frame. */
 		public void setFrame (int frameIndex, float time, String attachmentName) {
 			frames[frameIndex] = time;
 			attachmentNames[frameIndex] = attachmentName;
@@ -626,6 +666,7 @@ public class Animation {
 		}
 	}
 
+	/** Changes a slot's {@link Slot#getAttachmentVertices()} to deform a {@link VertexAttachment}. */
 	static public class DeformTimeline extends CurveTimeline {
 		int slotIndex;
 		VertexAttachment attachment;
@@ -647,6 +688,7 @@ public class Animation {
 			this.slotIndex = index;
 		}
 
+		/** The index of the slot in {@link Skeleton#getSlots()} that will be changed. */
 		public int getSlotIndex () {
 			return slotIndex;
 		}
@@ -655,19 +697,23 @@ public class Animation {
 			this.attachment = attachment;
 		}
 
+		/** The attachment that will be deformed. */
 		public VertexAttachment getAttachment () {
 			return attachment;
 		}
 
+		/** The time in seconds for each key frame. */
 		public float[] getFrames () {
 			return frames;
 		}
 
+		/** The vertices for each key frame. */
 		public float[][] getVertices () {
 			return frameVertices;
 		}
 
-		/** Sets the time of the specified keyframe. */
+		/** Sets the time in seconds and the vertices for the specified key frame.
+		 * @param vertices Vertex positions for an unweighted VertexAttachment, or deform offsets if it has weights. */
 		public void setFrame (int frameIndex, float time, float[] vertices) {
 			frames[frameIndex] = time;
 			frameVertices[frameIndex] = vertices;
@@ -755,6 +801,7 @@ public class Animation {
 		}
 	}
 
+	/** Fires an {@link Event} when specific animation times are reached. */
 	static public class EventTimeline implements Timeline {
 		private final float[] frames; // time, ...
 		private final Event[] events;
@@ -768,25 +815,28 @@ public class Animation {
 			return TimelineType.event.ordinal() << 24;
 		}
 
+		/** The number of key frames for this timeline. */
 		public int getFrameCount () {
 			return frames.length;
 		}
 
+		/** The time in seconds for each key frame. */
 		public float[] getFrames () {
 			return frames;
 		}
 
+		/** The event for each key frame. */
 		public Event[] getEvents () {
 			return events;
 		}
 
-		/** Sets the time of the specified keyframe. */
+		/** Sets the time in seconds and the event for the specified key frame. */
 		public void setFrame (int frameIndex, Event event) {
 			frames[frameIndex] = event.time;
 			events[frameIndex] = event;
 		}
 
-		/** Fires events for frames > lastTime and <= time. */
+		/** Fires events for frames > <code>lastTime</code> and <= <code>time</code>. */
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha, boolean setupPose,
 			boolean mixingOut) {
 			if (firedEvents == null) return;
@@ -816,6 +866,7 @@ public class Animation {
 		}
 	}
 
+	/** Changes a skeleton's {@link Skeleton#getDrawOrder()}. */
 	static public class DrawOrderTimeline implements Timeline {
 		private final float[] frames; // time, ...
 		private final int[][] drawOrders;
@@ -829,20 +880,24 @@ public class Animation {
 			return TimelineType.drawOrder.ordinal() << 24;
 		}
 
+		/** The number of key frames for this timeline. */
 		public int getFrameCount () {
 			return frames.length;
 		}
 
+		/** The time in seconds for each key frame. */
 		public float[] getFrames () {
 			return frames;
 		}
 
+		/** The draw order for each key frame. See {@link #setFrame(int, float, int[])}. */
 		public int[][] getDrawOrders () {
 			return drawOrders;
 		}
 
-		/** Sets the time of the specified keyframe.
-		 * @param drawOrder May be null to use bind pose draw order. */
+		/** Sets the time in seconds and the draw order for the specified key frame.
+		 * @param drawOrder For each slot in {@link Skeleton#slots}, the index of the new draw order. May be null to use setup pose
+		 *           draw order. */
 		public void setFrame (int frameIndex, float time, int[] drawOrder) {
 			frames[frameIndex] = time;
 			drawOrders[frameIndex] = drawOrder;
@@ -876,6 +931,7 @@ public class Animation {
 		}
 	}
 
+	/** Changes an IK constraint's {@link IkConstraint#getMix()} and {@link IkConstraint#getBendDirection()}. */
 	static public class IkConstraintTimeline extends CurveTimeline {
 		static public final int ENTRIES = 3;
 		static private final int PREV_TIME = -3, PREV_MIX = -2, PREV_BEND_DIRECTION = -1;
@@ -898,15 +954,17 @@ public class Animation {
 			this.ikConstraintIndex = index;
 		}
 
+		/** The index of the IK constraint slot in {@link Skeleton#getIkConstraints()} that will be changed. */
 		public int getIkConstraintIndex () {
 			return ikConstraintIndex;
 		}
 
+		/** The time in seconds, mix, and bend direction for each key frame. */
 		public float[] getFrames () {
 			return frames;
 		}
 
-		/** Sets the time, mix and bend direction of the specified keyframe. */
+		/** Sets the time in seconds, mix, and bend direction for the specified key frame. */
 		public void setFrame (int frameIndex, float time, float mix, int bendDirection) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;
@@ -949,6 +1007,7 @@ public class Animation {
 		}
 	}
 
+	/** Changes a transform constraint's mixes. */
 	static public class TransformConstraintTimeline extends CurveTimeline {
 		static public final int ENTRIES = 5;
 		static private final int PREV_TIME = -5, PREV_ROTATE = -4, PREV_TRANSLATE = -3, PREV_SCALE = -2, PREV_SHEAR = -1;
@@ -971,15 +1030,17 @@ public class Animation {
 			this.transformConstraintIndex = index;
 		}
 
+		/** The index of the transform constraint slot in {@link Skeleton#getTransformConstraints()} that will be changed. */
 		public int getTransformConstraintIndex () {
 			return transformConstraintIndex;
 		}
 
+		/** The time in seconds, rotate mix, translate mix, scale mix, and shear mix for each key frame. */
 		public float[] getFrames () {
 			return frames;
 		}
 
-		/** Sets the time and mixes of the specified keyframe. */
+		/** The time in seconds, rotate mix, translate mix, scale mix, and shear mix for the specified key frame. */
 		public void setFrame (int frameIndex, float time, float rotateMix, float translateMix, float scaleMix, float shearMix) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;
@@ -1034,6 +1095,7 @@ public class Animation {
 		}
 	}
 
+	/** Changes a path constraint's {@link PathConstraint#getPosition()}. */
 	static public class PathConstraintPositionTimeline extends CurveTimeline {
 		static public final int ENTRIES = 2;
 		static final int PREV_TIME = -2, PREV_VALUE = -1;
@@ -1057,19 +1119,21 @@ public class Animation {
 			this.pathConstraintIndex = index;
 		}
 
+		/** The index of the path constraint slot in {@link Skeleton#getPathConstraints()} that will be changed. */
 		public int getPathConstraintIndex () {
 			return pathConstraintIndex;
 		}
 
+		/** The time in seconds and path constraint position for each key frame. */
 		public float[] getFrames () {
 			return frames;
 		}
 
-		/** Sets the time and value of the specified keyframe. */
-		public void setFrame (int frameIndex, float time, float value) {
+		/** Sets the time in seconds and path constraint position for the specified key frame. */
+		public void setFrame (int frameIndex, float time, float position) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;
-			frames[frameIndex + VALUE] = value;
+			frames[frameIndex + VALUE] = position;
 		}
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
@@ -1099,6 +1163,7 @@ public class Animation {
 		}
 	}
 
+	/** Changes a path constraint's {@link PathConstraint#getSpacing()}. */
 	static public class PathConstraintSpacingTimeline extends PathConstraintPositionTimeline {
 		public PathConstraintSpacingTimeline (int frameCount) {
 			super(frameCount);
@@ -1136,6 +1201,7 @@ public class Animation {
 		}
 	}
 
+	/** Changes a path constraint's mixes. */
 	static public class PathConstraintMixTimeline extends CurveTimeline {
 		static public final int ENTRIES = 3;
 		static private final int PREV_TIME = -3, PREV_ROTATE = -2, PREV_TRANSLATE = -1;
@@ -1159,15 +1225,17 @@ public class Animation {
 			this.pathConstraintIndex = index;
 		}
 
+		/** The index of the path constraint slot in {@link Skeleton#getPathConstraints()} that will be changed. */
 		public int getPathConstraintIndex () {
 			return pathConstraintIndex;
 		}
 
+		/** The time in seconds, rotate mix, and translate mix for each key frame. */
 		public float[] getFrames () {
 			return frames;
 		}
 
-		/** Sets the time and mixes of the specified keyframe. */
+		/** The time in seconds, rotate mix, and translate mix for the specified key frame. */
 		public void setFrame (int frameIndex, float time, float rotateMix, float translateMix) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;

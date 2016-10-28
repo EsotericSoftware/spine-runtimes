@@ -30,6 +30,8 @@
 
 package com.esotericsoftware.spine;
 
+/** The interface for all constraints. */
 public interface Constraint extends Updatable {
+	/** The ordinal for the order a skeleton's constraints will be applied. */
 	public int getOrder ();
 }

@@ -35,11 +35,15 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.NumberUtils;
+import com.esotericsoftware.spine.Animation.DeformTimeline;
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.Slot;
 
-/** Attachment that displays a texture region. */
+/** An attachment that displays a textured mesh. A mesh has hull vertices and internal vertices within the hull. Holes are not
+ * supported. Each vertex has UVs (texture coordinates) and triangles are used to map an image on to the mesh.
+ * <p>
+ * See <a href="http://esotericsoftware.com/spine-meshes">Mesh attachments</a> in the Spine User Guide. */
 public class MeshAttachment extends VertexAttachment {
 	private TextureRegion region;
 	private String path;
@@ -68,6 +72,8 @@ public class MeshAttachment extends VertexAttachment {
 		return region;
 	}
 
+	/** Calculates {@link #worldVertices} UVs using {@link #regionUVs} and the {@link #region}. Must be called after changing the
+	 * region UVs or region. */
 	public void updateUVs () {
 		float[] regionUVs = this.regionUVs;
 		int verticesLength = regionUVs.length;
@@ -160,6 +166,8 @@ public class MeshAttachment extends VertexAttachment {
 		return worldVertices;
 	}
 
+	/** Returns true if the <code>sourceAttachment</code> is this mesh, else returns true if {@link #inheritDeform} is true and the
+	 * the <code>sourceAttachment</code> is the {@link #parentMesh}. */
 	public boolean applyDeform (VertexAttachment sourceAttachment) {
 		return this == sourceAttachment || (inheritDeform && parentMesh == sourceAttachment);
 	}
@@ -168,11 +176,11 @@ public class MeshAttachment extends VertexAttachment {
 		return worldVertices;
 	}
 
+	/** Triplets of vertex indices which describe the mesh's triangulation. */
 	public short[] getTriangles () {
 		return triangles;
 	}
 
-	/** Vertex number triplets which describe the mesh's triangulation. */
 	public void setTriangles (short[] triangles) {
 		this.triangles = triangles;
 	}
@@ -186,10 +194,12 @@ public class MeshAttachment extends VertexAttachment {
 		this.regionUVs = regionUVs;
 	}
 
+	/** The color to tint the mesh. */
 	public Color getColor () {
 		return color;
 	}
 
+	/** The name of the texture region for this attachment. */
 	public String getPath () {
 		return path;
 	}
@@ -198,6 +208,7 @@ public class MeshAttachment extends VertexAttachment {
 		this.path = path;
 	}
 
+	/** The number of entries at the beginning of {@link #vertices} that make up the mesh hull. */
 	public int getHullLength () {
 		return hullLength;
 	}
@@ -210,10 +221,13 @@ public class MeshAttachment extends VertexAttachment {
 		this.edges = edges;
 	}
 
+	/** Vertex index pairs describing edges for controling triangulation. Mesh triangles will never cross edges. Only available if
+	 * nonessential data was exported. Triangulation is not performed at runtime. */
 	public short[] getEdges () {
 		return edges;
 	}
 
+	/** The width of the mesh's image. Available only when nonessential data was exported. */
 	public float getWidth () {
 		return width;
 	}
@@ -222,6 +236,7 @@ public class MeshAttachment extends VertexAttachment {
 		this.width = width;
 	}
 
+	/** The height of the mesh's image. Available only when nonessential data was exported. */
 	public float getHeight () {
 		return height;
 	}
@@ -230,7 +245,9 @@ public class MeshAttachment extends VertexAttachment {
 		this.height = height;
 	}
 
-	/** Returns the source mesh if this is a linked mesh, else returns null. */
+	/** The parent mesh if this is a linked mesh, else null. A linked mesh shares the {@link #bones}, {@link #vertices},
+	 * {@link #regionUVs}, {@link #triangles}, {@link #hullLength}, {@link #edges}, {@link #width}, and {@link #height} with the
+	 * parent mesh, but may have a different {@link #name} or {@link #path} (and therefore a different texture). */
 	public MeshAttachment getParentMesh () {
 		return parentMesh;
 	}
@@ -250,6 +267,10 @@ public class MeshAttachment extends VertexAttachment {
 		}
 	}
 
+	/** When this is a linked mesh (see {@link #parentMesh}), if true, any {@link DeformTimeline} for the {@link #parentMesh} is
+	 * also applied to this mesh. If false, this linked mesh may have its own deform timelines.
+	 * <p>
+	 * See {@link #applyDeform(VertexAttachment)}. */
 	public boolean getInheritDeform () {
 		return inheritDeform;
 	}
