@@ -388,15 +388,6 @@ public class Skeleton {
 		return null;
 	}
 
-	/** @return -1 if the bone was not found. */
-	public int findBoneIndex (String boneName) {
-		if (boneName == null) throw new IllegalArgumentException("boneName cannot be null.");
-		Array<Bone> bones = this.bones;
-		for (int i = 0, n = bones.size; i < n; i++)
-			if (bones.get(i).data.name.equals(boneName)) return i;
-		return -1;
-	}
-
 	public Array<Slot> getSlots () {
 		return slots;
 	}
@@ -410,15 +401,6 @@ public class Skeleton {
 			if (slot.data.name.equals(slotName)) return slot;
 		}
 		return null;
-	}
-
-	/** @return -1 if the bone was not found. */
-	public int findSlotIndex (String slotName) {
-		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
-		Array<Slot> slots = this.slots;
-		for (int i = 0, n = slots.size; i < n; i++)
-			if (slots.get(i).data.name.equals(slotName)) return i;
-		return -1;
 	}
 
 	/** Returns the slots in the order they will be drawn. The returned array may be modified to change the draw order. */
@@ -470,7 +452,9 @@ public class Skeleton {
 
 	/** @return May be null. */
 	public Attachment getAttachment (String slotName, String attachmentName) {
-		return getAttachment(data.findSlotIndex(slotName), attachmentName);
+		SlotData slot = data.findSlot(slotName);
+		if (slot == null) throw new IllegalArgumentException("Slot not found: " + slotName);
+		return getAttachment(slot.getIndex(), attachmentName);
 	}
 
 	/** @return May be null. */
@@ -484,24 +468,20 @@ public class Skeleton {
 		return null;
 	}
 
-	/** @param attachmentName May be null. */
+	/** Sets an attachment by finding the slot with {@link #findSlot(String)}, finding the attachment with
+	 * {@link #getAttachment(int, String)}, then sets the slot's {@link Slot#attachment}.
+	 * @param attachmentName May be null to clear the slot. */
 	public void setAttachment (String slotName, String attachmentName) {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
-		Array<Slot> slots = this.slots;
-		for (int i = 0, n = slots.size; i < n; i++) {
-			Slot slot = slots.get(i);
-			if (slot.data.name.equals(slotName)) {
-				Attachment attachment = null;
-				if (attachmentName != null) {
-					attachment = getAttachment(i, attachmentName);
-					if (attachment == null)
-						throw new IllegalArgumentException("Attachment not found: " + attachmentName + ", for slot: " + slotName);
-				}
-				slot.setAttachment(attachment);
-				return;
-			}
+		Slot slot = findSlot(slotName);
+		if (slot == null) throw new IllegalArgumentException("Slot not found: " + slotName);
+		Attachment attachment = null;
+		if (attachmentName != null) {
+			attachment = getAttachment(slot.data.index, attachmentName);
+			if (attachment == null)
+				throw new IllegalArgumentException("Attachment not found: " + attachmentName + ", for slot: " + slotName);
 		}
-		throw new IllegalArgumentException("Slot not found: " + slotName);
+		slot.setAttachment(attachment);
 	}
 
 	public Array<IkConstraint> getIkConstraints () {

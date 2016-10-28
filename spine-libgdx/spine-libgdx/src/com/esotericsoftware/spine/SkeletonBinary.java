@@ -617,7 +617,7 @@ public class SkeletonBinary {
 			// Path constraint timelines.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				int index = input.readInt(true);
-				PathConstraintData data = skeletonData.getPathConstraints().get(index);
+				PathConstraintData data = skeletonData.pathConstraints.get(index);
 				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 					int timelineType = input.readByte();
 					int frameCount = input.readInt(true);
