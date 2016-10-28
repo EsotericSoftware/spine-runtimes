@@ -71,7 +71,14 @@ public class SkeletonBounds {
 			}
 		}
 
-		if (updateAabb) aabbCompute();
+		if (updateAabb)
+			aabbCompute();
+		else {
+			minX = Integer.MIN_VALUE;
+			minY = Integer.MIN_VALUE;
+			maxX = Integer.MAX_VALUE;
+			maxY = Integer.MAX_VALUE;
+		}
 	}
 
 	private void aabbCompute () {
