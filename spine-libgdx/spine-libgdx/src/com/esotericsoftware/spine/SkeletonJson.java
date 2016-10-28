@@ -273,7 +273,7 @@ public class SkeletonJson {
 			EventData data = new EventData(eventMap.name);
 			data.intValue = eventMap.getInt("int", 0);
 			data.floatValue = eventMap.getFloat("float", 0f);
-			data.stringValue = eventMap.getString("string", null);
+			data.stringValue = eventMap.getString("string", "");
 			skeletonData.events.add(data);
 		}
 
