@@ -34,7 +34,7 @@ import spine.Skeleton;
 
 public class Animation {
 	internal var _name:String;
-	private var _timelines:Vector.<Timeline>;
+	public var _timelines:Vector.<Timeline>;
 	public var duration:Number;
 
 	public function Animation (name:String, timelines:Vector.<Timeline>, duration:Number) {
@@ -50,7 +50,7 @@ public class Animation {
 	}
 
 	/** Poses the skeleton at the specified time for this animation. */
-	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, loop:Boolean, events:Vector.<Event>) : void {
+	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, loop:Boolean, events:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
 		if (skeleton == null) throw new ArgumentError("skeleton cannot be null.");
 
 		if (loop && duration != 0) {
@@ -59,21 +59,7 @@ public class Animation {
 		}
 
 		for (var i:int = 0, n:int = timelines.length; i < n; i++)
-			timelines[i].apply(skeleton, lastTime, time, events, 1);
-	}
-
-	/** Poses the skeleton at the specified time for this animation mixed with the current pose.
-	 * @param alpha The amount of this animation that affects the current pose. */
-	public function mix (skeleton:Skeleton, lastTime:Number, time:Number, loop:Boolean, events:Vector.<Event>, alpha:Number) : void {
-		if (skeleton == null) throw new ArgumentError("skeleton cannot be null.");
-
-		if (loop && duration != 0) {
-			time %= duration;
-			if (lastTime > 0) lastTime %= duration;
-		}
-
-		for (var i:int = 0, n:int = timelines.length; i < n; i++)
-			timelines[i].apply(skeleton, lastTime, time, events, alpha);
+			timelines[i].apply(skeleton, lastTime, time, events, alpha, setupPose, mixingOut);
 	}
 
 	public function get name () : String {

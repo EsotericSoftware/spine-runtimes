@@ -44,15 +44,15 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
  * runtimes.
  */
 public class Sandbox extends ApplicationAdapter {
-	static final String ATLAS = "../../examples/tank/export/tank.atlas";
-	static final String JSON = "../../examples/tank/export/tank.json";
-	static final float scale = 0.3f;
-	static final float X = 400;
-	static final float Y = 500;
-	static final String ANIMATION = "drive";
-	static final float ANIMATION_OFFSET = 0.5f;
-	static final boolean ANIMATION_UPDATE = false;
-	static final boolean Y_DOWN = true;
+	static final String ATLAS = "../../examples/raptor/export/raptor.atlas";
+	static final String JSON = "../../examples/raptor/export/raptor.json";
+	static final float scale = 0.5f;
+	static final float X = 0;
+	static final float Y = 0;
+	static final String ANIMATION = "walk";
+	static final float ANIMATION_OFFSET = 0.0f;
+	static final boolean ANIMATION_UPDATE = true;
+	static final boolean Y_DOWN = false;
 	static final boolean DRAW_DEBUG = false;
 	
 	OrthographicCamera camera;
@@ -85,7 +85,11 @@ public class Sandbox extends ApplicationAdapter {
 
 		AnimationStateData stateData = new AnimationStateData(skeletonData);
 		state = new AnimationState(stateData);
-		if (ANIMATION != null) state.setAnimation(0, ANIMATION, true);
+		if (ANIMATION != null) {
+			stateData.setMix("walk", "Jump", 0.5f);
+			state.setAnimation(0, ANIMATION, true);
+			state.addAnimation(0, "Jump", false, 0);
+		}
 		if (ANIMATION_OFFSET != 0) {
 			state.update(ANIMATION_OFFSET);
 			state.apply(skeleton);
@@ -97,7 +101,9 @@ public class Sandbox extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		if (ANIMATION_UPDATE) {
-			state.update(Gdx.graphics.getDeltaTime());
+			float delta = Gdx.graphics.getDeltaTime();
+			delta = 0.016f;
+			state.update(delta);
 			state.apply(skeleton);			
 		}
 		skeleton.updateWorldTransform();

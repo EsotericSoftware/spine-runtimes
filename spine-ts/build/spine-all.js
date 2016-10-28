@@ -5286,7 +5286,7 @@ var spine;
 			return Math.sin(degrees * MathUtils.degRad);
 		};
 		MathUtils.signum = function (value) {
-			return value >= 0 ? 1 : -1;
+			return value > 0 ? 1 : value < 0 ? -1 : 0;
 		};
 		MathUtils.toInt = function (x) {
 			return x > 0 ? Math.floor(x) : Math.ceil(x);

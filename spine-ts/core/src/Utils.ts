@@ -143,7 +143,7 @@ module spine {
 		}
 
 		static signum (value: number): number {
-			return value >= 0 ? 1 : -1;
+			return value > 0 ? 1 : value < 0 ? -1 : 0;
 		}
 
 		static toInt (x: number) {

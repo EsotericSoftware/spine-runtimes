@@ -29,8 +29,9 @@
  *****************************************************************************/
 
 package spine.examples {
-import spine.animation.AnimationStateData;
 import spine.*;
+import spine.animation.AnimationStateData;
+import spine.animation.TrackEntry;
 import spine.atlas.Atlas;
 import spine.attachments.AtlasAttachmentLoader;
 import spine.attachments.AttachmentLoader;
@@ -39,9 +40,6 @@ import spine.starling.StarlingTextureLoader;
 
 import starling.core.Starling;
 import starling.display.Sprite;
-import starling.events.Touch;
-import starling.events.TouchEvent;
-import starling.events.TouchPhase;
 
 public class StretchymanExample extends Sprite {
 	[Embed(source = "/stretchyman.json", mimeType = "application/octet-stream")]
@@ -70,17 +68,23 @@ public class StretchymanExample extends Sprite {
 		
 		skeleton.state.timeScale = 0.1;
 		
-		skeleton.state.onStart.add(function (trackIndex:int) : void {
-			trace(trackIndex + " start: " + skeleton.state.getCurrent(trackIndex));
+		skeleton.state.onStart.add(function (entry:TrackEntry) : void {
+			trace(entry.trackIndex + " start: " + entry.animation.name);
 		});
-		skeleton.state.onEnd.add(function (trackIndex:int) : void {
-			trace(trackIndex + " end: " + skeleton.state.getCurrent(trackIndex));
+		skeleton.state.onInterrupt.add(function (entry:TrackEntry) : void {
+			trace(entry.trackIndex + " interrupt: " + entry.animation.name);
 		});
-		skeleton.state.onComplete.add(function (trackIndex:int, count:int) : void {
-			trace(trackIndex + " complete: " + skeleton.state.getCurrent(trackIndex) + ", " + count);
+		skeleton.state.onEnd.add(function (entry:TrackEntry) : void {
+			trace(entry.trackIndex + " end: " + entry.animation.name);
 		});
-		skeleton.state.onEvent.add(function (trackIndex:int, event:Event) : void {
-			trace(trackIndex + " event: " + skeleton.state.getCurrent(trackIndex) + ", "
+		skeleton.state.onComplete.add(function (entry:TrackEntry) : void {
+			trace(entry.trackIndex + " complete: " + entry.animation.name);
+		});
+		skeleton.state.onDispose.add(function (entry:TrackEntry) : void {
+			trace(entry.trackIndex + " dispose: " + entry.animation.name);
+		});
+		skeleton.state.onEvent.add(function (entry:TrackEntry, event:Event) : void {
+			trace(entry.trackIndex + " event: " + entry.animation.name + ", "
 				+ event.data.name + ": " + event.intValue + ", " + event.floatValue + ", " + event.stringValue);
 		});
 
