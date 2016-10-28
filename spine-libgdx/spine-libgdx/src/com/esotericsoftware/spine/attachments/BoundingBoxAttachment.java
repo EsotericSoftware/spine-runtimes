@@ -41,10 +41,8 @@ public class BoundingBoxAttachment extends VertexAttachment {
 		super(name);
 	}
 
-	public void computeWorldVertices (Slot slot, float[] worldVertices) {
-		computeWorldVertices(slot, 0, worldVerticesLength, worldVertices, 0);
-	}
-
+	/** The color of the bounding box as it was in Spine. Available only when nonessential data was exported. Bounding boxes are
+	 * not usually rendered at runtime. */
 	public Color getColor () {
 		return color;
 	}

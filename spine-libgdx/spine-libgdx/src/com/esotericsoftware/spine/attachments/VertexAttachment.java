@@ -50,11 +50,11 @@ public class VertexAttachment extends Attachment {
 	}
 
 	/** Transforms local vertices to world coordinates.
-	 * @param start The index of the first local vertex value to transform. Each vertex has 2 values, x and y.
-	 * @param count The number of world vertex values to output. Must be <= {@link #getWorldVerticesLength()} - start.
-	 * @param worldVertices The output world vertices. Must have a length >= offset + count.
-	 * @param offset The worldVertices index to begin writing values. */
-	protected void computeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset) {
+	 * @param start The index of the first {@link #getVertices()} value to transform. Each vertex has 2 values, x and y.
+	 * @param count The number of world vertex values to output. Must be <= {@link #getWorldVerticesLength()} - <code>start</code>.
+	 * @param worldVertices The output world vertices. Must have a length >= <code>offset</code> + <code>count</code>.
+	 * @param offset The <code>worldVertices</code> index to begin writing values. */
+	public void computeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset) {
 		count += offset;
 		Skeleton skeleton = slot.getSkeleton();
 		FloatArray deformArray = slot.getAttachmentVertices();

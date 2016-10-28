@@ -397,7 +397,7 @@ public class AnimationState {
 
 	/** @see #setAnimation(int, Animation, boolean) */
 	public TrackEntry setAnimation (int trackIndex, String animationName, boolean loop) {
-		Animation animation = data.getSkeletonData().findAnimation(animationName);
+		Animation animation = data.skeletonData.findAnimation(animationName);
 		if (animation == null) throw new IllegalArgumentException("Animation not found: " + animationName);
 		return setAnimation(trackIndex, animation, loop);
 	}
@@ -427,7 +427,7 @@ public class AnimationState {
 
 	/** {@link #addAnimation(int, Animation, boolean, float)} */
 	public TrackEntry addAnimation (int trackIndex, String animationName, boolean loop, float delay) {
-		Animation animation = data.getSkeletonData().findAnimation(animationName);
+		Animation animation = data.skeletonData.findAnimation(animationName);
 		if (animation == null) throw new IllegalArgumentException("Animation not found: " + animationName);
 		return addAnimation(trackIndex, animation, loop, delay);
 	}

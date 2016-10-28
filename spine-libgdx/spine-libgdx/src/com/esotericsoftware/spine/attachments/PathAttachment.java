@@ -44,14 +44,7 @@ public class PathAttachment extends VertexAttachment {
 		super(name);
 	}
 
-	public void computeWorldVertices (Slot slot, float[] worldVertices) {
-		super.computeWorldVertices(slot, worldVertices);
-	}
-
-	public void computeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset) {
-		super.computeWorldVertices(slot, start, count, worldVertices, offset);
-	}
-
+	/** If true, the start and end knots are connected. */
 	public boolean getClosed () {
 		return closed;
 	}
