@@ -46,15 +46,16 @@ public class VertexAttachment extends Attachment {
 		super(name);
 	}
 
-	/** Transforms local {@link #getVertices()} to world coordinates, using 0 for <code>start</code> and <code>offset</code>.
+	/** Transforms the attachment's local {@link #getVertices()} to world coordinates, using 0 for <code>start</code> and
+	 * <code>offset</code>.
 	 * <p>
 	 * See {@link #computeWorldVertices(Slot, int, int, float[], int)}. */
 	public void computeWorldVertices (Slot slot, float[] worldVertices) {
 		computeWorldVertices(slot, 0, worldVerticesLength, worldVertices, 0);
 	}
 
-	/** Transforms local {@link #getVertices()} to world coordinates. If the slot has {@link Slot#getAttachmentVertices()}, they
-	 * are used to deform the vertices.
+	/** Transforms the attachment's local {@link #getVertices()} to world coordinates. If the slot has
+	 * {@link Slot#getAttachmentVertices()}, they are used to deform the vertices.
 	 * <p>
 	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide.
@@ -126,8 +127,8 @@ public class VertexAttachment extends Attachment {
 	}
 
 	/** The bones which affect the {@link #getVertices()}. The array entries are, for each vertex, the number of bones affecting
-	 * the vertex followed by that many bone indices, which is the index of the bone in {@link Skeleton#getBones()}. May be null if
-	 * this attachment has no weights. */
+	 * the vertex followed by that many bone indices, which is the index of the bone in {@link Skeleton#getBones()}. Will be null
+	 * if this attachment has no weights. */
 	public int[] getBones () {
 		return bones;
 	}
