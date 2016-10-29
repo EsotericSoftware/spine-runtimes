@@ -1024,6 +1024,10 @@ public class AnimationState {
 		start, interrupt, end, dispose, complete, event
 	}
 
+	/** The interface which can be implemented to receive TrackEntry events.
+	 * <p>
+	 * See TrackEntry {@link TrackEntry#setListener(AnimationStateListener)} and AnimationState
+	 * {@link AnimationState#addListener(AnimationStateListener)}. */
 	static public interface AnimationStateListener {
 		/** Invoked when this entry has been set as the current entry. */
 		public void start (TrackEntry entry);

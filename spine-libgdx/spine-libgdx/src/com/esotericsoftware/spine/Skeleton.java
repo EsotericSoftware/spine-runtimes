@@ -296,7 +296,7 @@ public class Skeleton {
 
 	/** Updates the world transform for each bone and applies all constraints.
 	 * <p>
-	 * See <a href="http://esotericsoftware.com/spine-skeleton-manipulation#World-transforms">World transforms</a> in the Spine
+	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide. */
 	public void updateWorldTransform () {
 		// This partial update avoids computing the world transform for constrained bones when 1) the bone is not updated

@@ -56,7 +56,7 @@ public class VertexAttachment extends Attachment {
 	/** Transforms local {@link #getVertices()} to world coordinates. If the slot has {@link Slot#getAttachmentVertices()}, they
 	 * are used to deform the vertices.
 	 * <p>
-	 * See <a href="http://esotericsoftware.com/spine-skeleton-manipulation#World-transforms">World transforms</a> in the Spine
+	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide.
 	 * @param start The index of the first {@link #getVertices()} value to transform. Each vertex has 2 values, x and y.
 	 * @param count The number of world vertex values to output. Must be <= {@link #getWorldVerticesLength()} - <code>start</code>.

@@ -94,7 +94,7 @@ public class Bone implements Updatable {
 
 	/** Computes the world transform using the parent bone and the specified local transform. Child bones are not updated.
 	 * <p>
-	 * See <a href="http://esotericsoftware.com/spine-skeleton-manipulation#World-transforms">World transforms</a> in the Spine
+	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide. */
 	public void updateWorldTransform (float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
 		ax = x;
