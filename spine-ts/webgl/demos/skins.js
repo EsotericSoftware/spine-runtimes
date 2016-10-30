@@ -100,12 +100,9 @@ var skinsDemo = function(loadingComplete, bgColor) {
 		state.addAnimation(0, "crouchIdle", true, 1.5);
 		state.addAnimation(0, "crouchWalk", true, 2);
 		state.addAnimation(0, "crouchIdle", true, 2.5).listener = {
-			event: function (trackIndex, event) {},
-			complete: function (trackIndex, loopCount) {},
 			start: function (trackIndex) {
 				setupAnimations(state);
-			},
-			end: function (trackIndex) {}
+			}
 		};
 
 		state.setAnimation(1, "empty", false, 0);

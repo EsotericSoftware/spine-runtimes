@@ -659,14 +659,14 @@ module spine {
 				let entry = objects[i + 1] as TrackEntry;
 				switch (type) {
 				case EventType.start:
-					if (entry.listener != null && entry.listener.end) entry.listener.end(entry);
+					if (entry.listener != null && entry.listener.start) entry.listener.start(entry);
 					for (let ii = 0; ii < listeners.length; ii++)
 						if (listeners[ii].start) listeners[ii].start(entry);
 					break;
 				case EventType.interrupt:
-					if (entry.listener != null && entry.listener.end) entry.listener.end(entry);
+					if (entry.listener != null && entry.listener.interrupt) entry.listener.interrupt(entry);
 					for (let ii = 0; ii < listeners.length; ii++)
-						if (listeners[ii].interrupt)listeners[ii].interrupt(entry);
+						if (listeners[ii].interrupt) listeners[ii].interrupt(entry);
 					break;
 				case EventType.end:
 					if (entry.listener != null && entry.listener.end) entry.listener.end(entry);
@@ -674,7 +674,7 @@ module spine {
 						if (listeners[ii].end) listeners[ii].end(entry);
 					// Fall through.
 				case EventType.dispose:
-					if (entry.listener != null && entry.listener.end) entry.listener.end(entry);
+					if (entry.listener != null && entry.listener.dispose) entry.listener.dispose(entry);
 					for (let ii = 0; ii < listeners.length; ii++)
 						if (listeners[ii].dispose) listeners[ii].dispose(entry);
 					this.animState.trackEntryPool.free(entry);
