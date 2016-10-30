@@ -183,7 +183,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		state = new AnimationState(new AnimationStateData(skeletonData));
 		state.addListener(new AnimationStateAdapter() {
-
 			public void event (TrackEntry entry, Event event) {
 				ui.toast(event.getData().getName());
 			}
@@ -295,19 +294,21 @@ public class SkeletonViewer extends ApplicationAdapter {
 			debugRenderer.draw(skeleton);
 		}
 
-		// AnimationState status.
-		status.setLength(0);
-		for (int i = 0, n = state.getTracks().size; i < n; i++) {
-			TrackEntry entry = state.getTracks().get(i);
-			if (entry == null) continue;
-			status.append(i);
-			status.append(": [LIGHT_GRAY]");
-			status(entry);
-			status.append("[WHITE]");
-			status.append(entry.animation.name);
-			status.append('\n');
+		if (state != null) {
+			// AnimationState status.
+			status.setLength(0);
+			for (int i = 0, n = state.getTracks().size; i < n; i++) {
+				TrackEntry entry = state.getTracks().get(i);
+				if (entry == null) continue;
+				status.append(i);
+				status.append(": [LIGHT_GRAY]");
+				status(entry);
+				status.append("[WHITE]");
+				status.append(entry.animation.name);
+				status.append('\n');
+			}
+			ui.statusLabel.setText(status);
 		}
-		ui.statusLabel.setText(status);
 
 		// Render UI.
 		ui.render();
@@ -462,8 +463,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			root.add("Skin:");
 			root.add(skinScroll).expand().fill().row();
 
-			root.add(new Image(skin.newDrawable("white", new Color(0x4e4e4eff)))).height(1).fillX().colspan(2).pad(1,0,1,0)
-				.row();
+			root.add(new Image(skin.newDrawable("white", new Color(0x4e4e4eff)))).height(1).fillX().colspan(2).pad(1, 0, 1, 0).row();
 
 			root.add("Track:");
 			{
