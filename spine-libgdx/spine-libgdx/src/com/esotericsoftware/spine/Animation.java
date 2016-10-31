@@ -78,7 +78,7 @@ public class Animation {
 
 		Array<Timeline> timelines = this.timelines;
 		for (int i = 0, n = timelines.size; i < n; i++)
-			timelines.get(i).apply(skeleton, lastTime, time, events, alpha, setupPose, false);
+			timelines.get(i).apply(skeleton, lastTime, time, events, alpha, setupPose, mixingOut);
 	}
 
 	/** The animation's name, which is unique within the skeleton. */
