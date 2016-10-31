@@ -28,7 +28,122 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
+local setmetatable = setmetatable
+local table_insert = table.insert
+local utils = require "spine-lua.utils"
+local Animation = require "spine-lua.Animation"
+local AnimationStateData = require "spine-lua.AnimationStateData"
+
+local EventType = {
+	start = 0,
+	interrupt = 1,
+	_end = 2,
+	dispose = 3,
+	complete = 4,
+	event = 5
+}
+
+local EventQueue = {}
+EventQueue.__index = EventQueue
+
+function EventQueue.new (animationState)
+	local self = {
+		objects = {},
+		animationState = animationState,
+		drainDisabled = false
+	}
+	setmetatable(self, EventQueue)
+	return self
+end
+
+function EventQueue:start (entry)
+	local objects = self.objects
+	table_insert(objects, EventType.start)
+	table_insert(objects, entry)
+	animationState.animationsChanged = true
+end
+
+function EventQueue:interrupt (entry)
+	local objects = self.objects
+	table_insert(objects, EventType.interrupt)
+	table_insert(objects, entry)
+end
+
+function EventQueue:_end (entry)
+	local objects = self.objects
+	table_insert(objects, EventType._end)
+	table_insert(objects, entry)
+	animationState.animationsChanged = true
+end
+
+function EventQueue:dispose (entry)
+	local objects = self.objects
+	table_insert(objects, EventType.dispose)
+	table_insert(objects, entry)
+end
+
+function EventQueue:complete (entry)
+	local objects = self.objects
+	table_insert(objects, EventType.complete)
+	table_insert(objects, entry)
+end
+
+function EventQueue:event (entry, event)
+	local objects = self.objects
+	table_insert(objects, EventType.event)
+	table_insert(objects, entry)
+	table_insert(objects, event)
+end
+
+function EventQueue:drain ()
+	if self.drainDisabled then return end -- Not reentrant.
+	self.drainDisabled = true
+
+	local objects = self.objects
+	local as = self.animationState
+	local i = 1
+	local n = #objects
+	while i <= n do
+		local _type = objects[i]
+		local entry = objects[i + 1]
+		if _type == EventType.start then
+			if entry.onStart then entry.onStart(entry) end
+			if as.onStart then entry.onStart(entry) end
+		elseif _type == EventType.interrupt then
+			if entry.onInterrupt then entry.onInterrupt(entry) end
+			if as.onInterrupt then entry.onInterrupt(entry) end
+		elseif _type == EventType._end then
+			if entry.onEnd then entry.onEnd(entry) end
+			if as.onEnd then entry.onEnd(entry) end
+			-- fall through in ref impl
+			if entry.onDispose then entry.onDispose(entry) end
+			if as.onDispose then entry.onDispose(entry) end
+		elseif _type == EventType._dispose then
+			if entry.onDispose then entry.onDispose(entry) end
+			if as.onDispose then entry.onDispose(entry) end
+		elseif _type == EventType.complete then
+			if entry.onComplete then entry.onComplete(entry) end
+			if as.onComplete then entry.onComplete(entry) end
+		elseif _type == EventType.event then
+			local event = objects[i + 2]
+			if entry.onEvent then entry.onEvent(entry, event) end
+			if as.onEvent then entry.onEvent(entry, event) end
+			i = i + 1
+		end
+		i = i + 2
+	end
+	self:clear()
+
+	self.drainDisabled = false;
+end
+
+function EventQueue:clear ()
+	self.objects[1] = nil -- dirty trick so we don't re-alloc, relies on using # in drain
+end
+
+
 local AnimationState = {}
+AnimationState.__index = AnimationState
 
 function AnimationState.new (data)
 	if not data then error("data cannot be nil", 2) end
@@ -36,215 +151,15 @@ function AnimationState.new (data)
 	local self = {
 		data = data,
 		tracks = {},
-		trackCount = 0,
 		events = {},
-		onStart = nil, onEnd = nil, onComplete = nil, onEvent = nil,
+		onStart = nil, onInterrupt = nil, onEnd = nil, onDispose = nil, onComplete = nil, onEvent = nil,
+		queue = nil,
+		propertyIDs = {},
+		animationsChanged = false,
 		timeScale = 1
 	}
-
-	local function setCurrent (index, entry)
-		local current = self.tracks[index]
-		if current then
-			local previous = current.previous
-			current.previous = nil
-
-			if current.onEnd then current.onEnd(index) end
-			if self.onEnd then self.onEnd(index) end
-
-			entry.mixDuration = self.data:getMix(current.animation.name, entry.animation.name)
-			if entry.mixDuration > 0 then
-				entry.mixTime = 0
-				-- If a mix is in progress, mix from the closest animation.
-				if previous and current.mixTime / current.mixDuration < 0.5 then
-					entry.previous = previous
-				else
-					entry.previous = current
-				end
-			end
-		end
-
-		self.tracks[index] = entry
-		self.trackCount = math.max(self.trackCount, index + 1)
-
-		if entry.onStart then entry.onStart(index) end
-		if self.onStart then self.onStart(index) end
-	end
-
-	function self:update (delta)
-		delta = delta * self.timeScale
-		for i = 0, self.trackCount - 1 do
-			local current = self.tracks[i]
-			if current then
-				current.time = current.time + delta * current.timeScale
-				if current.previous then
-					local previousDelta = delta * current.previous.timeScale
-					current.previous.time = current.previous.time + previousDelta
-					current.mixTime = current.mixTime + previousDelta
-				end
-
-				local next = current.next
-				if next then
-					next.time = current.lastTime - next.delay
-					if next.time >= 0 then setCurrent(i, next) end
-				else
-					-- End non-looping animation when it reaches its end time and there is no next entry.
-					if not current.loop and current.lastTime >= current.endTime then self:clearTrack(i) end
-				end
-			end
-		end
-	end
-
-	function self:apply(skeleton)
-		for i = 0, self.trackCount - 1 do
-			local current = self.tracks[i]
-			if current then
-				local time = current.time
-				local lastTime = current.lastTime
-				local endTime = current.endTime
-				local loop = current.loop
-				if not loop and time > endTime then time = endTime end
-
-				local previous = current.previous
-				if not previous then
-					if current.mix == 1 then
-						current.animation:apply(skeleton, current.lastTime, time, loop, self.events)
-					else
-						current.animation:mix(skeleton, current.lastTime, time, loop, self.events, current.mix)
-					end
-				else
-					local previousTime = previous.time
-					if not previous.loop and previousTime > previous.endTime then previousTime = previous.endTime end
-					previous.animation:apply(skeleton, previousTime, previousTime, previous.loop, nil)
-
-					local alpha = current.mixTime / current.mixDuration * current.mix
-					if alpha >= 1 then
-						alpha = 1
-						current.previous = nil
-					end
-					current.animation:mix(skeleton, current.lastTime, time, loop, self.events, alpha)
-				end
-
-				local eventCount = #self.events
-				for ii = 1, eventCount, 1 do
-					local event = self.events[ii]
-					if current.onEvent then current.onEvent(i, event) end
-					if self.onEvent then self.onEvent(i, event) end
-				end
-				for ii = 1, eventCount, 1 do
-					table.remove(self.events)
-				end
-
-				-- Check if completed the animation or a loop iteration.
-				local complete
-				if current.loop then
-					complete = lastTime % endTime > time % endTime
-				else
-					complete = lastTime < endTime and time >= endTime
-				end
-				if complete then
-					local count = math.floor(time / endTime)
-					if current.onComplete then current.onComplete(i, count) end
-					if self.onComplete then self.onComplete(i, count) end
-				end
-
-				current.lastTime = current.time
-			end
-		end
-	end
-
-	function self:clearTracks ()
-		for i,current in pairs(self.tracks) do
-			self.clearTrack(i)
-		end
-		self.tracks = {}
-		self.trackCount = 0
-	end
-
-	function self:clearTrack (trackIndex)
-		local current = self.tracks[trackIndex]
-		if not current then return end
-
-		if current.onEnd then current.onEnd(trackIndex) end
-		if self.onEnd then self.onEnd(trackIndex) end
-
-		self.tracks[trackIndex] = nil
-		if trackIndex == self.trackCount - 1 then
-			self.trackCount = self.trackCount - 1
-		end
-	end
-
-	function self:setAnimationByName (trackIndex, animationName, loop)
-		local animation = self.data.skeletonData:findAnimation(animationName)
-		if not animation then error("Animation not found: " .. animationName) end
-		return self:setAnimation(trackIndex, animation, loop)
-	end
-
-	-- Set the current animation. Any queued animations are cleared.
-	function self:setAnimation (trackIndex, animation, loop)
-		local entry = AnimationState.TrackEntry.new()
-		entry.animation = animation
-		entry.loop = loop
-		entry.endTime = animation.duration
-		setCurrent(trackIndex, entry)
-		return entry
-	end
-
-	function self:addAnimationByName (trackIndex, animationName, loop, delay)
-		local animation = self.data.skeletonData:findAnimation(animationName)
-		if not animation then error("Animation not found: " .. animationName) end
-		return self:addAnimation(trackIndex, animation, loop, delay)
-	end
-
-	-- Adds an animation to be played delay seconds after the current or last queued animation.
-	-- @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay.
-	function self:addAnimation (trackIndex, animation, loop, delay)
-		local entry = AnimationState.TrackEntry.new()
-		entry.animation = animation
-		entry.loop = loop
-		entry.endTime = animation.duration
-
-		local last = self.tracks[trackIndex]
-		if last then
-			while (last.next) do
-				last = last.next
-			end
-			last.next = entry
-		else
-			setCurrent(trackIndex, entry)
-		end
-
-		delay = delay or 0
-		if delay <= 0 then
-			if last then
-				delay = delay + last.endTime - self.data:getMix(last.animation.name, animation.name)
-			else
-				delay = 0
-			end
-		end
-		entry.delay = delay
-
-		return entry
-	end
-
-	-- May return nil.
-	function self:getCurrent (trackIndex)
-		return self.tracks[trackIndex]
-	end
-
-	return self
-end
-
-AnimationState.TrackEntry = {}
-function AnimationState.TrackEntry.new (data)
-	local self = {
-		next = nil, previous = nil,
-		animation = nil,
-		loop = false,
-		delay = 0, time = 0, lastTime = -1, endTime = 0,
-		timeScale = 1,
-		mixTime = 0, mixDuration = 0, mix = 1,
-		onStart = nil, onEnd = nil, onComplete = nil, onEvent = nil
-	}
+	queue = EventQueue.new(self)
+	setmetatable(self, AnimationState)
 	return self
 end
 
