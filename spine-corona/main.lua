@@ -32,8 +32,8 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 
 	-- create an animation state object to apply animations to the skeleton
 	local animationStateData = spine.AnimationStateData.new(skeletonData)
+	animationStateData.defaultMix = 0.2
 	local animationState = spine.AnimationState.new(animationStateData)
-	animationState:setAnimationByName(0, animation, true)
 
 	-- set the skeleton invisible
 	skeleton.group.isVisible = false
@@ -42,18 +42,26 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 	skeleton.group.name = jsonFile
 
 	-- set some event callbacks
-	animationState.onStart = function (trackIndex)
-		print(trackIndex.." start: "..animationState:getCurrent(trackIndex).animation.name)
+	animationState.onStart = function (entry)
+		print(entry.trackIndex.." start: "..entry.animation.name)
 	end
-	animationState.onEnd = function (trackIndex)
-		print(trackIndex.." end: "..animationState:getCurrent(trackIndex).animation.name)
+	animationState.onInterrupt = function (entry)
+		print(entry.trackIndex.." interrupt: "..entry.animation.name)
 	end
-	animationState.onComplete = function (trackIndex, loopCount)
-		print(trackIndex.." complete: "..animationState:getCurrent(trackIndex).animation.name..", "..loopCount)
+	animationState.onEnd = function (entry)
+		print(entry.trackIndex.." end: "..entry.animation.name)
 	end
-	animationState.onEvent = function (trackIndex, event)
-		print(trackIndex.." event: "..animationState:getCurrent(trackIndex).animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'")
+	animationState.onComplete = function (entry)
+		print(entry.trackIndex.." complete: "..entry.animation.name)
 	end
+	animationState.onDispose = function (entry)
+		print(entry.trackIndex.." dispose: "..entry.animation.name)
+	end
+	animationState.onEvent = function (entry, event)
+		print(entry.trackIndex.." event: "..entry.animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'")
+	end
+	
+	animationState:setAnimationByName(0, animation, true)
 
 	-- return the skeleton an animation state
 	return { skeleton = skeleton, state = animationState }
@@ -83,6 +91,15 @@ Runtime:addEventListener("enterFrame", function (event)
 
 	-- uncomment if you want to know how many batches a skeleton renders to
 	-- print(skeleton.batches)
+end)
+
+Runtime:addEventListener("key", function(event)
+	if activeSkeleton == 2 and event.phase == "down" then
+		state = skeletons[activeSkeleton].state
+		state:setAnimationByName(0, "Jump", false)
+		state:addAnimationByName(0, "walk", true, 0)
+	end
+	return false
 end)
 
 Runtime:addEventListener("tap", function(event)

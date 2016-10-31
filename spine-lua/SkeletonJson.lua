@@ -457,7 +457,7 @@ function SkeletonJson.new (attachmentLoader)
 
 					elseif timelineName == "attachment" then
 						local timeline = Animation.AttachmentTimeline.new(#values)
-						timeline.slotName = slotName
+						timeline.slotIndex = slotIndex
 
 						local frameIndex = 0
 						for i,valueMap in ipairs(values) do
