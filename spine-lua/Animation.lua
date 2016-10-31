@@ -228,6 +228,7 @@ function Animation.RotateTimeline.new (frameCount)
 	local self = Animation.CurveTimeline.new(frameCount)
 	self.boneIndex = -1
 	self.frames = utils.newNumberArrayZero(frameCount * 2)
+	self.type = TimelineType.rotate
 
 	function self:getPropertyId ()
 		return TimelineType.rotate * SHL_24 + self.boneIndex
@@ -291,6 +292,7 @@ function Animation.TranslateTimeline.new (frameCount)
 	local self = Animation.CurveTimeline.new(frameCount)
 	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.boneIndex = -1
+	self.type = TimelineType.translate
 	
 	function self:getPropertyId ()
 		return TimelineType.translate * SHL_24 + self.boneIndex
@@ -349,6 +351,7 @@ function Animation.ScaleTimeline.new (frameCount)
 	local Y = 2
 
 	local self = Animation.TranslateTimeline.new(frameCount)
+	self.type = TimelineType.scale
 	
 	function self:getPropertyId ()
 		return TimelineType.scale * SHL_24 + self.boneIndex
@@ -417,6 +420,7 @@ function Animation.ShearTimeline.new (frameCount)
 	local Y = 2
 
 	local self = Animation.TranslateTimeline.new(frameCount)
+	self.type = TimelineType.shear
 	
 	function self:getPropertyId ()
 		return TimelineType.shear * SHL_24 + self.boneIndex
@@ -474,6 +478,7 @@ function Animation.ColorTimeline.new (frameCount)
 	local self = Animation.CurveTimeline.new(frameCount)
 	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.slotIndex = -1
+	self.type = TimelineType.color
 	
 	function self:getPropertyId ()
 		return TimelineType.color * SHL_24 + self.slotIndex
@@ -533,7 +538,8 @@ function Animation.AttachmentTimeline.new (frameCount)
 	local self = {
 		frames = utils.newNumberArrayZero(frameCount), -- time, ...
 		attachmentNames = {},
-		slotIndex = -1
+		slotIndex = -1,
+		type = TimelineType.attachment
 	}
 
 	function self:getFrameCount ()
@@ -591,6 +597,7 @@ function Animation.DeformTimeline.new (frameCount)
 	self.frameVertices = utils.newNumberArrayZero(frameCount)
 	self.slotIndex = -1
 	self.attachment = nil
+	self.type = TimelineType.deform
 
 	function self:getPropertyId ()
 		return TimelineType.deform * SHL_24 + self.slotIndex
@@ -711,7 +718,8 @@ Animation.EventTimeline = {}
 function Animation.EventTimeline.new (frameCount)
 	local self = {
 		frames = utils.newNumberArrayZero(frameCount),
-		events = {}
+		events = {},
+		type = TimelineType.event
 	}
 	
 	function self:getPropertyId ()
@@ -767,7 +775,8 @@ Animation.DrawOrderTimeline = {}
 function Animation.DrawOrderTimeline.new (frameCount)
 	local self = {
 		frames = utils.newNumberArrayZero(frameCount),
-		drawOrders = {}
+		drawOrders = {},
+		type = TimelineType.drawOrder
 	}
 	
 	function self:getPropertyId ()
@@ -830,6 +839,7 @@ function Animation.IkConstraintTimeline.new (frameCount)
 	local self = Animation.CurveTimeline.new(frameCount)
 	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES) -- time, mix, bendDirection, ...
 	self.ikConstraintIndex = -1
+	self.type = TimelineType.ikConstraint
 	
 	function self:getPropertyId ()
 		return TimelineType.ikConstraint * SHL_24 + self.ikConstraintIndex
@@ -903,6 +913,7 @@ function Animation.TransformConstraintTimeline.new (frameCount)
 	local self = Animation.CurveTimeline.new(frameCount)
 	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.transformConstraintIndex = -1
+	self.type = TimelineType.transformConstraint
 	
 	function self:getPropertyId ()
 		return TimelineType.transformConstraint * SHL_24 + self.transformConstraintIndex
@@ -977,6 +988,7 @@ function Animation.PathConstraintPositionTimeline.new (frameCount)
 	local self = Animation.CurveTimeline.new(frameCount)
 	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.pathConstraintIndex = -1
+	self.type = TimelineType.pathConstraintPosition
 
 	function self:getPropertyId ()
 		return TimelineType.pathConstraintPosition * SHL_24 + self.pathConstraintIndex
@@ -1028,6 +1040,7 @@ function Animation.PathConstraintSpacingTimeline.new (frameCount)
 	local self = Animation.CurveTimeline.new(frameCount)
 	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.pathConstraintIndex = -1
+	self.type = TimelineType.pathConstraintSpacing
 
 	function self:getPropertyId ()
 		return TimelineType.pathConstraintSpacing * SHL_24 + self.pathConstraintIndex
@@ -1082,6 +1095,7 @@ function Animation.PathConstraintMixTimeline.new (frameCount)
 	local self = Animation.CurveTimeline.new(frameCount)
 	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.pathConstraintIndex = -1
+	self.type = TimelineType.pathConstraintMix
 	
 	function self:getPropertyId ()
 		return TimelineType.pathConstraintMix * SHL_24 + self.pathConstraintIndex
