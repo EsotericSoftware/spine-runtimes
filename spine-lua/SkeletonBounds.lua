@@ -79,6 +79,7 @@ function SkeletonBounds:update (skeleton, updateAabb)
     self.minY = 9999999
     self.maxX = -9999999
     self.maxY = -9999999
+  end
 end
 
 function SkeletonBounds:aabbCompute ()
