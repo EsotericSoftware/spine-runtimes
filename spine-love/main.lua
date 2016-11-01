@@ -54,17 +54,24 @@ function loadSkeleton (jsonFile, atlasFile, animation, skin, scale, x, y)
 	local state = spine.AnimationState.new(stateData)
 	state:setAnimationByName(0, animation, true)
 	
-	state.onStart = function (trackIndex)
-		print(trackIndex.." start: "..state:getCurrent(trackIndex).animation.name)
+	-- set some event callbacks
+	state.onStart = function (entry)
+		print(entry.trackIndex.." start: "..entry.animation.name)
 	end
-	state.onEnd = function (trackIndex)
-		print(trackIndex.." end: "..state:getCurrent(trackIndex).animation.name)
+	state.onInterrupt = function (entry)
+		print(entry.trackIndex.." interrupt: "..entry.animation.name)
 	end
-	state.onComplete = function (trackIndex, loopCount)
-		print(trackIndex.." complete: "..state:getCurrent(trackIndex).animation.name..", "..loopCount)
+	state.onEnd = function (entry)
+		print(entry.trackIndex.." end: "..entry.animation.name)
 	end
-	state.onEvent = function (trackIndex, event)
-		print(trackIndex.." event: "..state:getCurrent(trackIndex).animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'")
+	state.onComplete = function (entry)
+		print(entry.trackIndex.." complete: "..entry.animation.name)
+	end
+	state.onDispose = function (entry)
+		print(entry.trackIndex.." dispose: "..entry.animation.name)
+	end
+	state.onEvent = function (entry, event)
+		print(entry.trackIndex.." event: "..entry.animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'")
 	end
 	
 	state:update(0.5)
