@@ -43,6 +43,6 @@ namespace Spine {
 
 		public PathAttachment (String name)
 			: base(name) {
-		}
+		}			
 	}
 }

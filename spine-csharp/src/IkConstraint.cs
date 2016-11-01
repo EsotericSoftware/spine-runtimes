@@ -31,16 +31,15 @@
 using System;
 
 namespace Spine {
-	public class IkConstraint : IUpdatable {
+	public class IkConstraint : IConstraint {
 		internal IkConstraintData data;
 		internal ExposedList<Bone> bones = new ExposedList<Bone>();
 		internal Bone target;
 		internal float mix;
 		internal int bendDirection;
 
-		internal int level;
-
 		public IkConstraintData Data { get { return data; } }
+		public int Order { get { return data.order; } }
 		public ExposedList<Bone> Bones { get { return bones; } }
 		public Bone Target { get { return target; } set { target = value; } }
 		public int BendDirection { get { return bendDirection; } set { bendDirection = value; } }
@@ -83,17 +82,18 @@ namespace Spine {
 		/// <summary>Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified
 		/// in the world coordinate system.</summary>
 		static public void Apply (Bone bone, float targetX, float targetY, float alpha) {
-			Bone pp = bone.parent;
-			float id = 1 / (pp.a * pp.d - pp.b * pp.c);
-			float x = targetX - pp.worldX, y = targetY - pp.worldY;
-			float tx = (x * pp.d - y * pp.b) * id - bone.x, ty = (y * pp.a - x * pp.c) * id - bone.y;
-			float rotationIK = MathUtils.Atan2(ty, tx) * MathUtils.radDeg - bone.shearX - bone.rotation;
-			if (bone.scaleX < 0) rotationIK += 180;
+			if (!bone.appliedValid) bone.UpdateAppliedTransform();
+			Bone p = bone.parent;
+			float id = 1 / (p.a * p.d - p.b * p.c);
+			float x = targetX - p.worldX, y = targetY - p.worldY;
+			float tx = (x * p.d - y * p.b) * id - bone.ax, ty = (y * p.a - x * p.c) * id - bone.ay;
+			float rotationIK = MathUtils.Atan2(ty, tx) * MathUtils.RadDeg - bone.ashearX - bone.arotation;
+			if (bone.ascaleX < 0) rotationIK += 180;
 			if (rotationIK > 180)
 				rotationIK -= 360;
 			else if (rotationIK < -180) rotationIK += 360;
-			bone.UpdateWorldTransform(bone.x, bone.y, bone.rotation + rotationIK * alpha, bone.scaleX, bone.scaleY,
-				bone.shearX, bone.shearY);
+			bone.UpdateWorldTransform(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, bone.ascaleX, bone.ascaleY, bone.ashearX, 
+				bone.ashearY);
 		}
 
 		/// <summary>Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as
@@ -104,7 +104,10 @@ namespace Spine {
 				child.UpdateWorldTransform ();
 				return;
 			}
-			float px = parent.x, py = parent.y, psx = parent.scaleX, psy = parent.scaleY, csx = child.scaleX;
+			//float px = parent.x, py = parent.y, psx = parent.scaleX, psy = parent.scaleY, csx = child.scaleX;
+			if (!parent.appliedValid) parent.UpdateAppliedTransform();
+			if (!child.appliedValid) child.UpdateAppliedTransform();
+			float px = parent.ax, py = parent.ay, psx = parent.ascaleX, psy = parent.ascaleY, csx = child.ascaleX;
 			int os1, os2, s2;
 			if (psx < 0) {
 				psx = -psx;
@@ -123,14 +126,14 @@ namespace Spine {
 				os2 = 180;
 			} else
 				os2 = 0;
-			float cx = child.x, cy, cwx, cwy, a = parent.a, b = parent.b, c = parent.c, d = parent.d;
+			float cx = child.ax, cy, cwx, cwy, a = parent.a, b = parent.b, c = parent.c, d = parent.d;
 			bool u = Math.Abs(psx - psy) <= 0.0001f;
 			if (!u) {
 				cy = 0;
 				cwx = a * cx + parent.worldX;
 				cwy = c * cx + parent.worldY;
 			} else {
-				cy = child.y;
+				cy = child.ay;
 				cwx = a * cx + b * cy + parent.worldX;
 				cwy = c * cx + d * cy + parent.worldY;
 			}
@@ -217,18 +220,18 @@ namespace Spine {
 			}
 			outer:
 			float os = MathUtils.Atan2(cy, cx) * s2;
-			float rotation = parent.rotation;
-			a1 = (a1 - os) * MathUtils.radDeg + os1 - rotation;
+			float rotation = parent.arotation;
+			a1 = (a1 - os) * MathUtils.RadDeg + os1 - rotation;
 			if (a1 > 180)
 				a1 -= 360;
 			else if (a1 < -180) a1 += 360;
-			parent.UpdateWorldTransform(px, py, rotation + a1 * alpha, parent.scaleX, parent.scaleY, 0, 0);
-			rotation = child.rotation;
-			a2 = ((a2 + os) * MathUtils.radDeg - child.shearX) * s2 + os2 - rotation;
+			parent.UpdateWorldTransform(px, py, rotation + a1 * alpha, parent.scaleX, parent.ascaleY, 0, 0);
+			rotation = child.arotation;
+			a2 = ((a2 + os) * MathUtils.RadDeg - child.ashearX) * s2 + os2 - rotation;
 			if (a2 > 180)
 				a2 -= 360;
 			else if (a2 < -180) a2 += 360;
-			child.UpdateWorldTransform(cx, cy, rotation + a2 * alpha, child.scaleX, child.scaleY, child.shearX, child.shearY);
+			child.UpdateWorldTransform(cx, cy, rotation + a2 * alpha, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY);
 		}
 	}
 }

@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using Spine;
@@ -39,6 +40,65 @@ namespace Spine.Unity {
 		public TextAsset atlasFile;
 		public Material[] materials;
 		protected Atlas atlas;
+
+		#region Runtime Instantiation
+		/// <summary>
+		/// Creates a runtime AtlasAsset</summary>
+		public static AtlasAsset CreateRuntimeInstance (TextAsset atlasText, Material[] materials, bool initialize) {
+			AtlasAsset atlasAsset = ScriptableObject.CreateInstance<AtlasAsset>();
+			atlasAsset.Reset();
+			atlasAsset.atlasFile = atlasText;
+			atlasAsset.materials = materials;
+
+			if (initialize)
+				atlasAsset.GetAtlas();
+
+			return atlasAsset;
+		}
+			
+		/// <summary>
+		/// Creates a runtime AtlasAsset. Only providing the textures is slower because it has to search for atlas page matches. <seealso cref="Spine.Unity.AtlasAsset.CreateRuntimeInstance(TextAsset, Material[], bool)"/></summary>
+		public static AtlasAsset CreateRuntimeInstance (TextAsset atlasText, Texture2D[] textures, Shader shader, bool initialize) {
+			if (shader == null)
+				shader = Shader.Find("Spine/Skeleton");
+
+			// Get atlas page names.
+			string atlasString = atlasText.text;
+			atlasString = atlasString.Replace("\r", "");
+			string[] atlasLines = atlasString.Split('\n');
+			var pages = new List<string>();
+			for (int i = 0; i < atlasLines.Length - 1; i++) {
+				if (atlasLines[i].Trim().Length == 0)
+					pages.Add(atlasLines[i + 1].Trim().Replace(".png", ""));
+			}
+
+			// Populate Materials[] by matching texture names with page names.
+			var materials = new Material[pages.Count];
+			for (int i = 0, n = pages.Count; i < n; i++) {
+				Material mat = null;
+
+				// Search for a match.
+				string pageName = pages[i];
+				for (int j = 0, m = textures.Length; j < m; j++) {
+					if (string.Equals(pageName, textures[j].name, System.StringComparison.OrdinalIgnoreCase)) {
+						// Match found.
+						mat = new Material(shader);
+						mat.mainTexture = textures[j];
+						break;
+					}
+				}
+
+				if (mat != null)
+					materials[i] = mat;
+				else
+					throw new ArgumentException("Could not find matching atlas page in the texture array.");
+
+			}
+
+			// Create AtlasAsset normally
+			return CreateRuntimeInstance(atlasText, materials, initialize);
+		}
+		#endregion
 
 		public virtual void Reset () {
 			atlas = null;
@@ -69,19 +129,6 @@ namespace Spine.Unity {
 				Debug.LogError("Error reading atlas file for atlas asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
 				return null;
 			}
-		}
-
-		public Sprite GenerateSprite (string name, out Material material) {
-			AtlasRegion region = atlas.FindRegion(name);
-
-			Sprite sprite = null;
-			material = null;
-
-			if (region != null) {
-				//sprite.rect
-			}
-
-			return sprite;
 		}
 
 		public Mesh GenerateMesh (string name, Mesh mesh, out Material material, float scale = 0.01f) {

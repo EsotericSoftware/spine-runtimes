@@ -79,7 +79,7 @@ namespace Spine {
 			foreach (KeyValuePair<AttachmentKeyTuple, Attachment> entry in oldSkin.attachments) {
 				int slotIndex = entry.Key.slotIndex;
 				Slot slot = skeleton.slots.Items[slotIndex];
-				if (slot.attachment == entry.Value) {
+				if (slot.Attachment == entry.Value) {
 					Attachment attachment = GetAttachment(slotIndex, entry.Key.name);
 					if (attachment != null) slot.Attachment = attachment;
 				}

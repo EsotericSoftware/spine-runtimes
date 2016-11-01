@@ -81,7 +81,14 @@ namespace Spine {
 				boundingBox.ComputeWorldVertices(slot, polygon.Vertices);
 			}
 
-			if (updateAabb) aabbCompute();
+			if (updateAabb) {
+				aabbCompute();
+			} else {
+				minX = int.MinValue;
+				minY = int.MinValue;
+				maxX = int.MaxValue;
+				maxY = int.MaxValue;
+			}
 		}
 
 		private void aabbCompute () {

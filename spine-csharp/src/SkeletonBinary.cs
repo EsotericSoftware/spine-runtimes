@@ -74,7 +74,7 @@ namespace Spine {
 			this.attachmentLoader = attachmentLoader;
 			Scale = 1;
 		}
-
+			
 		#if !ISUNITY && WINDOWS_STOREAPP
 		private async Task<SkeletonData> ReadFile(string path) {
 			var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
@@ -103,6 +103,14 @@ namespace Spine {
 
 		#endif // WINDOWS_STOREAPP
 
+		public static readonly TransformMode[] TransformModeValues = {
+			TransformMode.Normal,
+			TransformMode.OnlyTranslation,
+			TransformMode.NoRotationOrReflection,
+			TransformMode.NoScale,
+			TransformMode.NoScaleOrReflection
+		};
+
 		public SkeletonData ReadSkeletonData (Stream input) {
 			if (input == null) throw new ArgumentNullException("input");
 			float scale = Scale;
@@ -118,6 +126,7 @@ namespace Spine {
 			bool nonessential = ReadBoolean(input);
 
 			if (nonessential) {
+				skeletonData.fps = ReadFloat(input);
 				skeletonData.imagesPath = ReadString(input);
 				if (skeletonData.imagesPath.Length == 0) skeletonData.imagesPath = null;
 			}
@@ -127,7 +136,7 @@ namespace Spine {
 				String name = ReadString(input);
 				BoneData parent = i == 0 ? null : skeletonData.bones.Items[ReadVarint(input, true)];
 				BoneData data = new BoneData(i, name, parent);
-				data.rotation = ReadFloat(input);
+				data.rotation = ReadFloat(input);		
 				data.x = ReadFloat(input) * scale;
 				data.y = ReadFloat(input) * scale;
 				data.scaleX = ReadFloat(input);
@@ -135,8 +144,7 @@ namespace Spine {
 				data.shearX = ReadFloat(input);
 				data.shearY = ReadFloat(input);
 				data.length = ReadFloat(input) * scale;
-				data.inheritRotation = ReadBoolean(input);
-				data.inheritScale = ReadBoolean(input);
+				data.transformMode = TransformModeValues[ReadVarint(input, true)];
 				if (nonessential) ReadInt(input); // Skip bone color.
 				skeletonData.bones.Add(data);
 			}
@@ -159,6 +167,7 @@ namespace Spine {
 			// IK constraints.
 			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {
 				IkConstraintData data = new IkConstraintData(ReadString(input));
+				data.order = ReadVarint(input, true);
 				for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
 					data.bones.Add(skeletonData.bones.Items[ReadVarint(input, true)]);
 				data.target = skeletonData.bones.Items[ReadVarint(input, true)];
@@ -170,8 +179,9 @@ namespace Spine {
 			// Transform constraints.
 			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {
 				TransformConstraintData data = new TransformConstraintData(ReadString(input));
+				data.order = ReadVarint(input, true);
 				for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
-					data.bones.Add(skeletonData.bones.Items[ReadVarint(input, true)]);
+				    data.bones.Add(skeletonData.bones.Items[ReadVarint(input, true)]);
 				data.target = skeletonData.bones.Items[ReadVarint(input, true)];
 				data.offsetRotation = ReadFloat(input);
 				data.offsetX = ReadFloat(input) * scale;
@@ -189,6 +199,7 @@ namespace Spine {
 			// Path constraints
 			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {
 				PathConstraintData data = new PathConstraintData(ReadString(input));
+				data.order = ReadVarint(input, true);
 				for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
 					data.bones.Add(skeletonData.bones.Items[ReadVarint(input, true)]);
 				data.target = skeletonData.slots.Items[ReadVarint(input, true)];
@@ -261,7 +272,8 @@ namespace Spine {
 				int slotIndex = ReadVarint(input, true);
 				for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++) {
 					String name = ReadString(input);
-					skin.AddAttachment(slotIndex, name, ReadAttachment(input, skin, slotIndex, name, nonessential));
+					Attachment attachment = ReadAttachment(input, skin, slotIndex, name, nonessential);
+					if (attachment != null) skin.AddAttachment(slotIndex, name, attachment);
 				}
 			}
 			return skin;
@@ -277,7 +289,7 @@ namespace Spine {
 			switch (type) {
 			case AttachmentType.Region: {
 					String path = ReadString(input);
-					float rotation = ReadFloat(input);
+					float rotation = ReadFloat(input);		
 					float x = ReadFloat(input);
 					float y = ReadFloat(input);
 					float scaleX = ReadFloat(input);
@@ -308,18 +320,18 @@ namespace Spine {
 					int vertexCount = ReadVarint(input, true);
 					Vertices vertices = ReadVertices(input, vertexCount);
 					if (nonessential) ReadInt(input); //int color = nonessential ? ReadInt(input) : 0; // Avoid unused local warning.
-
+					
 					BoundingBoxAttachment box = attachmentLoader.NewBoundingBoxAttachment(skin, name);
 					if (box == null) return null;
 					box.worldVerticesLength = vertexCount << 1;
 					box.vertices = vertices.vertices;
-					box.bones = vertices.bones;
+					box.bones = vertices.bones;                    
 					return box;
 				}
 			case AttachmentType.Mesh: {
 					String path = ReadString(input);
 					int color = ReadInt(input);
-					int vertexCount = ReadVarint(input, true);
+					int vertexCount = ReadVarint(input, true);					
 					float[] uvs = ReadFloatArray(input, vertexCount << 1, 1);
 					int[] triangles = ReadShortArray(input);
 					Vertices vertices = ReadVertices(input, vertexCount);
@@ -400,8 +412,8 @@ namespace Spine {
 					path.vertices = vertices.vertices;
 					path.bones = vertices.bones;
 					path.lengths = lengths;
-					return path;
-				}
+					return path;                    
+				}			
 			}
 			return null;
 		}
@@ -540,7 +552,7 @@ namespace Spine {
 			}
 
 			// IK timelines.
-			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {
+			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {				
 				int index = ReadVarint(input, true);
 				int frameCount = ReadVarint(input, true);
 				IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount);
@@ -587,7 +599,7 @@ namespace Spine {
 									if (data.positionMode == PositionMode.Fixed) timelineScale = scale;
 								}
 								timeline.pathConstraintIndex = index;
-								for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
+								for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {                                    
 									timeline.SetFrame(frameIndex, ReadFloat(input), ReadFloat(input) * timelineScale);
 									if (frameIndex < frameCount - 1) ReadCurve(input, frameIndex, timeline);
 								}
@@ -651,7 +663,7 @@ namespace Spine {
 
 							timeline.SetFrame(frameIndex, time, deform);
 							if (frameIndex < frameCount - 1) ReadCurve(input, frameIndex, timeline);
-						}
+						}							
 						timelines.Add(timeline);
 						duration = Math.Max(duration, timeline.frames[frameCount - 1]);
 					}

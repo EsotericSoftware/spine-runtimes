@@ -115,20 +115,16 @@ namespace Spine.Unity {
 		#endregion
 
 		#region Event Handlers
-		void HandleAnimationStateEventByName (AnimationState state, int trackIndex, Spine.Event e) {
-			if (state != m_AnimationState) return;
-
+		void HandleAnimationStateEventByName (Spine.TrackEntry trackEntry, Spine.Event e) {
 			m_WasFired |= (e.Data.Name == m_EventName);			// Check event name string match.
 			if (m_WasFired && m_unsubscribeAfterFiring)
-				state.Event -= HandleAnimationStateEventByName;	// Unsubscribe after correct event fires.
+				m_AnimationState.Event -= HandleAnimationStateEventByName;	// Unsubscribe after correct event fires.
 		}
 
-		void HandleAnimationStateEvent (AnimationState state, int trackIndex, Spine.Event e) {
-			if (state != m_AnimationState) return;
-
+		void HandleAnimationStateEvent (Spine.TrackEntry trackEntry, Spine.Event e) {
 			m_WasFired |= (e.Data == m_TargetEvent);			// Check event data reference match.
 			if (m_WasFired && m_unsubscribeAfterFiring)
-				state.Event -= HandleAnimationStateEvent; 		// Usubscribe after correct event fires.
+				m_AnimationState.Event -= HandleAnimationStateEvent; 		// Usubscribe after correct event fires.
 		}
 		#endregion
 

@@ -134,7 +134,7 @@ namespace Spine.Unity.Editor {
 			_customMaterialOverridesPrev = CopyList(componentCustomMaterialOverrides);
 			_customSlotMaterialsPrev = CopyList(componentCustomSlotMaterials);
 
-			if (GUILayout.Button(new GUIContent("Clear and Reapply Changes", "Removes all non-serialized overrides in the SkeletonRenderer and reapplies the overrides on this component."))) {
+			if (SpineInspectorUtility.LargeCenteredButton(new GUIContent("Clear and Reapply Changes", "Removes all non-serialized overrides in the SkeletonRenderer and reapplies the overrides on this component."))) {
 				if (skeletonRenderer != null) {
 					skeletonRenderer.CustomMaterialOverride.Clear();
 					skeletonRenderer.CustomSlotMaterials.Clear();

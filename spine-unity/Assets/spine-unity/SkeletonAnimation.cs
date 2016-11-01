@@ -36,51 +36,48 @@ namespace Spine.Unity {
 	[ExecuteInEditMode]
 	[AddComponentMenu("Spine/SkeletonAnimation")]
 	[HelpURL("http://esotericsoftware.com/spine-unity-documentation#Controlling-Animation")]
-	public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation, Spine.Unity.IAnimationStateComponent {
+	public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation, IAnimationStateComponent {
 
+		#region IAnimationStateComponent
 		/// <summary>
 		/// This is the Spine.AnimationState object of this SkeletonAnimation. You can control animations through it. 
 		/// Note that this object, like .skeleton, is not guaranteed to exist in Awake. Do all accesses and caching to it in Start</summary>
 		public Spine.AnimationState state;
+		/// <summary>
+		/// This is the Spine.AnimationState object of this SkeletonAnimation. You can control animations through it. 
+		/// Note that this object, like .skeleton, is not guaranteed to exist in Awake. Do all accesses and caching to it in Start</summary>
 		public Spine.AnimationState AnimationState { get { return this.state; } }
+		#endregion
+
+		#region Bone Callbacks ISkeletonAnimation
+		protected event UpdateBonesDelegate _UpdateLocal;
+		protected event UpdateBonesDelegate _UpdateWorld;
+		protected event UpdateBonesDelegate _UpdateComplete;
 
 		/// <summary>
 		/// Occurs after the animations are applied and before world space values are resolved.
 		/// Use this callback when you want to set bone local values.
 		/// </summary>
-		public event UpdateBonesDelegate UpdateLocal {
-			add { _UpdateLocal += value; }
-			remove { _UpdateLocal -= value; }
-		}
+		public event UpdateBonesDelegate UpdateLocal { add { _UpdateLocal += value; } remove { _UpdateLocal -= value; } }
 
 		/// <summary>
 		/// Occurs after the Skeleton's bone world space values are resolved (including all constraints).
 		/// Using this callback will cause the world space values to be solved an extra time.
-		/// Use this callback if want to use bone world space values, and also set bone local values.
-		/// </summary>
-		public event UpdateBonesDelegate UpdateWorld {
-			add { _UpdateWorld += value; }
-			remove { _UpdateWorld -= value; }
-		}
+		/// Use this callback if want to use bone world space values, and also set bone local values.</summary>
+		public event UpdateBonesDelegate UpdateWorld { add { _UpdateWorld += value; } remove { _UpdateWorld -= value; } }
 
 		/// <summary>
 		/// Occurs after the Skeleton's bone world space values are resolved (including all constraints).
 		/// Use this callback if you want to use bone world space values, but don't intend to modify bone local values.
-		/// This callback can also be used when setting world position and the bone matrix.
-		/// </summary>
-		public event UpdateBonesDelegate UpdateComplete {
-			add { _UpdateComplete += value; }
-			remove { _UpdateComplete -= value; }
-		}
+		/// This callback can also be used when setting world position and the bone matrix.</summary>
+		public event UpdateBonesDelegate UpdateComplete { add { _UpdateComplete += value; } remove { _UpdateComplete -= value; } }
+		#endregion
 
-		protected event UpdateBonesDelegate _UpdateLocal;
-		protected event UpdateBonesDelegate _UpdateWorld;
-		protected event UpdateBonesDelegate _UpdateComplete;
-
+		#region Serialized state and Beginner API
 		[SerializeField]
 		[SpineAnimation]
-		private String _animationName;
-		public String AnimationName {
+		private string _animationName;
+		public string AnimationName {
 			get {
 				if (!valid) {
 					Debug.LogWarning("You tried access AnimationName but the SkeletonAnimation was not valid. Try checking your Skeleton Data for errors.");
@@ -107,15 +104,14 @@ namespace Spine.Unity {
 			}
 		}
 
-		/// <summary>Whether or not an animation should loop. This only applies to the initial animation specified in the inspector, or any subsequent Animations played through .AnimationName. Animations set through state.SetAnimation are unaffected.</summary>
-		[Tooltip("Whether or not an animation should loop. This only applies to the initial animation specified in the inspector, or any subsequent Animations played through .AnimationName. Animations set through state.SetAnimation are unaffected.")]
+		/// <summary>Whether or not <see cref="AnimationName"/> should loop. This only applies to the initial animation specified in the inspector, or any subsequent Animations played through .AnimationName. Animations set through state.SetAnimation are unaffected.</summary>
 		public bool loop;
 
 		/// <summary>
 		/// The rate at which animations progress over time. 1 means 100%. 0.5 means 50%.</summary>
 		/// <remarks>AnimationState and TrackEntry also have their own timeScale. These are combined multiplicatively.</remarks>
-		[Tooltip("The rate at which animations progress over time. 1 means 100%. 0.5 means 50%.")]
 		public float timeScale = 1;
+		#endregion
 
 		#region Runtime Instantiation
 		/// <summary>Adds and prepares a SkeletonAnimation component to a GameObject at runtime.</summary>
@@ -130,6 +126,11 @@ namespace Spine.Unity {
 			return SkeletonRenderer.NewSpineGameObject<SkeletonAnimation>(skeletonDataAsset);
 		}
 		#endregion
+
+		protected override void ClearState () {
+			base.ClearState();
+			state.ClearTracks();
+		}
 
 		public override void Initialize (bool overwrite) {
 			if (valid && !overwrite)
@@ -150,7 +151,7 @@ namespace Spine.Unity {
 					// Assume SkeletonAnimation is valid for skeletonData and skeleton. Checked above.
 					var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(_animationName);
 					if (animationObject != null)
-						animationObject.Apply(skeleton, 0f, 0f, false, null);
+						animationObject.Apply(skeleton, 0f, 0f, false, null, 1f, true, false);
 				}
 				Update(0);
 			}

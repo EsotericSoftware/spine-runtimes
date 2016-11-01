@@ -86,11 +86,11 @@ namespace Spine.Unity.Modules {
 
 		//SkeletonAnimation
 		/*
-	 *	Int Value:		0 sets ghostingEnabled to false, 1 sets ghostingEnabled to true
-	 *	Float Value:	Values greater than 0 set the spawnRate equal the float value
-	 *	String Value:	Pass RGBA hex color values in to set the color property.  IE:   "A0FF8BFF"
-	 */
-		void OnEvent (Spine.AnimationState state, int trackIndex, Spine.Event e) {
+		 *	Int Value:		0 sets ghostingEnabled to false, 1 sets ghostingEnabled to true
+		 *	Float Value:	Values greater than 0 set the spawnRate equal the float value
+		 *	String Value:	Pass RGBA hex color values in to set the color property.  IE:   "A0FF8BFF"
+		 */
+		void OnEvent (Spine.TrackEntry trackEntry, Spine.Event e) {
 			if (e.Data.Name == "Ghosting") {
 				ghostingEnabled = e.Int > 0;
 				if (e.Float > 0)

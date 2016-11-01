@@ -51,6 +51,29 @@ namespace Spine.Unity {
 		private SkeletonData skeletonData;
 		private AnimationStateData stateData;
 
+		#region Runtime Instantiation
+		/// <summary>
+		/// Creates a runtime SkeletonDataAsset.</summary>
+		public static SkeletonDataAsset CreateRuntimeInstance (TextAsset skeletonDataFile, AtlasAsset atlasAsset, bool initialize, float scale = 0.01f) {
+			return CreateRuntimeInstance(skeletonDataFile, new [] {atlasAsset}, initialize, scale);
+		}
+
+		/// <summary>
+		/// Creates a runtime SkeletonDataAsset.</summary>
+		public static SkeletonDataAsset CreateRuntimeInstance (TextAsset skeletonDataFile, AtlasAsset[] atlasAssets, bool initialize, float scale = 0.01f) {
+			SkeletonDataAsset skeletonDataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
+			skeletonDataAsset.Reset();
+			skeletonDataAsset.skeletonJSON = skeletonDataFile;
+			skeletonDataAsset.atlasAssets = atlasAssets;
+			skeletonDataAsset.scale = scale;
+
+			if (initialize)
+				skeletonDataAsset.GetSkeletonData(true);
+
+			return skeletonDataAsset;
+		}
+		#endregion
+
 		void OnEnable () {
 			if (atlasAssets == null)
 				atlasAssets = new AtlasAsset[0];

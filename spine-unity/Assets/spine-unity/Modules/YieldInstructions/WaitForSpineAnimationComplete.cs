@@ -52,7 +52,7 @@ namespace Spine.Unity {
 			SafeSubscribe(trackEntry);
 		}
 
-		void HandleComplete (AnimationState state, int trackIndex, int loopCount) {
+		void HandleComplete (TrackEntry trackEntry) {
 			m_WasFired = true;
 		}
 

@@ -104,12 +104,12 @@ public class BasicPlatformerController : MonoBehaviour {
 	}
 
 	void Start () {
-		//register a callback for Spine Events (in this case, Footstep)
+		// Register a callback for Spine Events (in this case, Footstep)
 		skeletonAnimation.state.Event += HandleEvent;
 	}
 
-	void HandleEvent (Spine.AnimationState state, int trackIndex, Spine.Event e) {
-		//play some sound if footstep event fired
+	void HandleEvent (Spine.TrackEntry trackEntry, Spine.Event e) {
+		// Play some sound if footstep event fired
 		if (e.Data.Name == footstepEventName) {
 			footstepAudioSource.Stop();
 			footstepAudioSource.pitch = GetRandomPitch(0.2f);

@@ -31,19 +31,17 @@
 // Contributed by: Mitch Thompson
 
 #define SPINE_SKELETON_ANIMATOR
-#define SPINE_BAKING
+//#define SPINE_BAKING
 
 using System;
 using System.Collections.Generic;
 using UnityEditor;
-
-#if !UNITY_4_3
-using UnityEditor.AnimatedValues;
-#endif
 using UnityEngine;
 using Spine;
 
 namespace Spine.Unity.Editor {
+	using Event = UnityEngine.Event;
+
 	[CustomEditor(typeof(SkeletonDataAsset))]
 	public class SkeletonDataAssetInspector : UnityEditor.Editor {
 		static bool showAnimationStateData = true;
@@ -75,9 +73,10 @@ namespace Spine.Unity.Editor {
 		string m_skeletonDataAssetGUID;
 		bool needToSerialize;
 
-		List<string> warnings = new List<string>();
+		readonly List<string> warnings = new List<string>();
 
 		GUIStyle activePlayButtonStyle, idlePlayButtonStyle;
+		readonly GUIContent DefaultMixLabel = new GUIContent("Default Mix Duration", "Sets 'SkeletonDataAsset.defaultMix' in the asset and 'AnimationState.data.defaultMix' at runtime load time.");
 
 		void OnEnable () {
 			SpineEditorUtilities.ConfirmInitialization();
@@ -126,29 +125,51 @@ namespace Spine.Unity.Editor {
 			// Lazy initialization
 			{ 
 				// Accessing EditorStyles values in OnEnable during a recompile causes UnityEditor to throw null exceptions. (Unity 5.3.5)
-				idlePlayButtonStyle = idlePlayButtonStyle ?? new GUIStyle(EditorStyles.toolbarButton);
+				idlePlayButtonStyle = idlePlayButtonStyle ?? new GUIStyle(EditorStyles.miniButton);
 				if (activePlayButtonStyle == null) {
-					activePlayButtonStyle = new GUIStyle(EditorStyles.toolbarButton);
+					activePlayButtonStyle = new GUIStyle(idlePlayButtonStyle);
 					activePlayButtonStyle.normal.textColor = Color.red;
 				}
 			}
 
 			serializedObject.Update();
 
+			EditorGUILayout.LabelField(new GUIContent(target.name + " (SkeletonDataAsset)", SpineEditorUtilities.Icons.spine), EditorStyles.whiteLargeLabel);
+
 			EditorGUI.BeginChangeCheck();
-			#if !SPINE_TK2D
-			EditorGUILayout.PropertyField(atlasAssets, true);
-			#else
-			using (new EditorGUI.DisabledGroupScope(spriteCollection.objectReferenceValue != null)) {
-				EditorGUILayout.PropertyField(atlasAssets, true);
+
+			// SkeletonData
+			using (new SpineInspectorUtility.BoxScope()) {
+				EditorGUILayout.LabelField("SkeletonData", EditorStyles.boldLabel);
+				EditorGUILayout.PropertyField(skeletonJSON, new GUIContent(skeletonJSON.displayName, SpineEditorUtilities.Icons.spine));
+				EditorGUILayout.PropertyField(scale);
+
+//				if (m_skeletonData != null) {
+//					var sd = m_skeletonData;
+//					using (new GUILayout.HorizontalScope()) {
+//						GUILayout.Space(15f);
+//						GUILayout.Label(
+//							string.Format("{8} - {0} {1}\nBones: {2}\tConstraints: {5} IK + {6} Path + {7} Transform\nSlots: {3}\t\tSkins: {4}\n",
+//								sd.Version, string.IsNullOrEmpty(sd.Version) ? "" : "export", sd.Bones.Count, sd.Slots.Count, sd.Skins.Count, sd.IkConstraints.Count, sd.PathConstraints.Count, sd.TransformConstraints.Count, skeletonJSON.objectReferenceValue.name),
+//							SpineInspectorUtility.GrayMiniLabel);
+//					}
+//				}
 			}
-			EditorGUILayout.LabelField("spine-tk2d", EditorStyles.boldLabel);
-			EditorGUILayout.PropertyField(spriteCollection, true);
-			#endif
-			EditorGUILayout.Space();
-			EditorGUILayout.PropertyField(skeletonJSON);
-			EditorGUILayout.PropertyField(scale);
-			EditorGUILayout.Space();
+
+			// Atlas
+			using (new SpineInspectorUtility.BoxScope()) {
+				EditorGUILayout.LabelField("Atlas", EditorStyles.boldLabel);
+				#if !SPINE_TK2D
+				EditorGUILayout.PropertyField(atlasAssets, true);
+				#else
+				using (new EditorGUI.DisabledGroupScope(spriteCollection.objectReferenceValue != null)) {
+					EditorGUILayout.PropertyField(atlasAssets, true);
+				}
+				EditorGUILayout.LabelField("spine-tk2d", EditorStyles.boldLabel);
+				EditorGUILayout.PropertyField(spriteCollection, true);
+				#endif
+			}
+
 			if (EditorGUI.EndChangeCheck()) {
 				if (serializedObject.ApplyModifiedProperties()) {
 					if (m_previewUtility != null) {
@@ -165,9 +186,19 @@ namespace Spine.Unity.Editor {
 			// If m_skeletonAnimation is lazy-instantiated elsewhere, this can cause contents to change between Layout and Repaint events, causing GUILayout control count errors.
 			InitPreview();
 			if (m_skeletonData != null) {
-				DrawAnimationStateInfo();
+				
+				using (new SpineInspectorUtility.BoxScope()) {
+					EditorGUILayout.LabelField("Mix Settings", EditorStyles.boldLabel);
+					DrawAnimationStateInfo();
+					EditorGUILayout.Space();
+				}
+
+				EditorGUILayout.LabelField("Preview", EditorStyles.boldLabel);
 				DrawAnimationList();
+				EditorGUILayout.Space();
 				DrawSlotList();
+				EditorGUILayout.Space();
+
 				DrawUnityTools();
 			} else {
 				#if !SPINE_TK2D
@@ -185,7 +216,6 @@ namespace Spine.Unity.Editor {
 				// List warnings.
 				foreach (var line in warnings)
 					EditorGUILayout.LabelField(new GUIContent(line, SpineEditorUtilities.Icons.warning));
-				
 			}
 
 			if (!Application.isPlaying)
@@ -194,31 +224,33 @@ namespace Spine.Unity.Editor {
 
 		void DrawUnityTools () {
 			#if SPINE_SKELETON_ANIMATOR
-			isMecanimExpanded = EditorGUILayout.Foldout(isMecanimExpanded, new GUIContent("SkeletonAnimator", SpineEditorUtilities.Icons.unityIcon));
-			if (isMecanimExpanded) {
-				EditorGUI.indentLevel++;
-				EditorGUILayout.PropertyField(controller, new GUIContent("Controller", SpineEditorUtilities.Icons.controllerIcon));		
-				if (controller.objectReferenceValue == null) {
-					
-					// Generate Mecanim Controller Button
-					using (new GUILayout.HorizontalScope()) {
-						GUILayout.Space(EditorGUIUtility.labelWidth);
-						if (GUILayout.Button(new GUIContent("Generate Mecanim Controller"), GUILayout.Height(20)))
-							SkeletonBaker.GenerateMecanimAnimationClips(m_skeletonDataAsset);						
-					}
-					EditorGUILayout.HelpBox("SkeletonAnimator is the Mecanim alternative to SkeletonAnimation.\nIt is not required.", MessageType.Info);
+			using (new SpineInspectorUtility.BoxScope()) {
+				isMecanimExpanded = EditorGUILayout.Foldout(isMecanimExpanded, new GUIContent("SkeletonAnimator", SpineEditorUtilities.Icons.unityIcon));
+				if (isMecanimExpanded) {
+					EditorGUI.indentLevel++;
+					EditorGUILayout.PropertyField(controller, new GUIContent("Controller", SpineEditorUtilities.Icons.controllerIcon));		
+					if (controller.objectReferenceValue == null) {
 
-				} else {
-					
-					// Update AnimationClips button.
-					using (new GUILayout.HorizontalScope()) {
-						GUILayout.Space(EditorGUIUtility.labelWidth);
-						if (GUILayout.Button(new GUIContent("Force Update AnimationClips"), GUILayout.Height(20)))
-							SkeletonBaker.GenerateMecanimAnimationClips(m_skeletonDataAsset);				
-					}
+						// Generate Mecanim Controller Button
+						using (new GUILayout.HorizontalScope()) {
+							GUILayout.Space(EditorGUIUtility.labelWidth);
+							if (GUILayout.Button(new GUIContent("Generate Mecanim Controller"), GUILayout.Height(20)))
+								SkeletonBaker.GenerateMecanimAnimationClips(m_skeletonDataAsset);						
+						}
+						EditorGUILayout.HelpBox("SkeletonAnimator is the Mecanim alternative to SkeletonAnimation.\nIt is not required.", MessageType.Info);
 
+					} else {
+
+						// Update AnimationClips button.
+						using (new GUILayout.HorizontalScope()) {
+							GUILayout.Space(EditorGUIUtility.labelWidth);
+							if (GUILayout.Button(new GUIContent("Force Update AnimationClips"), GUILayout.Height(20)))
+								SkeletonBaker.GenerateMecanimAnimationClips(m_skeletonDataAsset);				
+						}
+
+					}
+					EditorGUI.indentLevel--;
 				}
-				EditorGUI.indentLevel--;
 			}
 			#endif
 
@@ -310,7 +342,7 @@ namespace Spine.Unity.Editor {
 				return;
 
 			EditorGUI.BeginChangeCheck();
-			EditorGUILayout.PropertyField(defaultMix);
+			SpineInspectorUtility.PropertyFieldWideLabel(defaultMix, DefaultMixLabel, 160);
 
 			var animations = new string[m_skeletonData.Animations.Count];
 			for (int i = 0; i < animations.Length; i++)
@@ -351,7 +383,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		void DrawAnimationList () {
-			showAnimationList = EditorGUILayout.Foldout(showAnimationList, new GUIContent("Animations", SpineEditorUtilities.Icons.animationRoot));
+			showAnimationList = EditorGUILayout.Foldout(showAnimationList, new GUIContent(string.Format("Animations [{0}]", m_skeletonData.Animations.Count), SpineEditorUtilities.Icons.animationRoot));
 			if (!showAnimationList)
 				return;
 
@@ -394,16 +426,10 @@ namespace Spine.Unity.Editor {
 			if (m_skeletonAnimation == null || m_skeletonAnimation.skeleton == null) return;
 
 			EditorGUI.indentLevel++;
-
-			try {
-				showAttachments = EditorGUILayout.ToggleLeft("Show Attachments", showAttachments);
-			} catch {
-				return;
-			}
-
-			List<Attachment> slotAttachments = new List<Attachment>();
-			List<string> slotAttachmentNames = new List<string>();
-			List<string> defaultSkinAttachmentNames = new List<string>();
+			showAttachments = EditorGUILayout.ToggleLeft("Show Attachments", showAttachments);
+			var slotAttachments = new List<Attachment>();
+			var slotAttachmentNames = new List<string>();
+			var defaultSkinAttachmentNames = new List<string>();
 			var defaultSkin = m_skeletonData.Skins.Items[0];
 			Skin skin = m_skeletonAnimation.skeleton.Skin ?? defaultSkin;
 
@@ -495,7 +521,7 @@ namespace Spine.Unity.Editor {
 					}
 
 					if (detectedNullAtlasEntry)
-						warnings.Add("AtlasAsset elements cannot be Null");
+						warnings.Add("AtlasAsset elements should not be null.");
 					else {
 						// Get requirements.
 						var missingPaths = SpineEditorUtilities.GetRequiredAtlasRegions(AssetDatabase.GetAssetPath((TextAsset)skeletonJSON.objectReferenceValue));
@@ -514,11 +540,10 @@ namespace Spine.Unity.Editor {
 						
 					}
 					#else
-					if (spriteCollection.objectReferenceValue == null) {
+					if (spriteCollection.objectReferenceValue == null)
 						warnings.Add("SkeletonDataAsset requires tk2DSpriteCollectionData.");
-					} else {
+					else
 						warnings.Add("Your sprite collection may have missing images.");
-					}
 					#endif
 				}
 			}
@@ -556,13 +581,11 @@ namespace Spine.Unity.Editor {
 			Spine.Animation a = m_skeletonAnimation.state.GetCurrent(0).Animation;
 			foreach (Timeline t in a.Timelines) {
 				if (t.GetType() == typeof(EventTimeline)) {
-					EventTimeline et = (EventTimeline)t;
-
+					var et = (EventTimeline)t;
 					for (int i = 0; i < et.Events.Length; i++) {
 						m_animEvents.Add(et.Events[i]);
 						m_animEventFrames.Add(et.Frames[i]);
 					}
-
 				}
 			}
 
@@ -633,7 +656,7 @@ namespace Spine.Unity.Editor {
 		public override void OnInteractivePreviewGUI (Rect r, GUIStyle background) {
 			this.InitPreview();
 
-			if (UnityEngine.Event.current.type == EventType.Repaint) {
+			if (Event.current.type == EventType.Repaint) {
 				if (m_requireRefresh) {
 					this.m_previewUtility.BeginPreview(r, background);
 					this.DoRenderPreview(true);
@@ -661,7 +684,7 @@ namespace Spine.Unity.Editor {
 
 			if (calculateMixTime) {
 				if (m_skeletonAnimation.state.GetCurrent(0) != null)
-					m_adjustFrameEndTime = EditorApplication.timeSinceStartup + m_skeletonAnimation.state.GetCurrent(0).Mix;
+					m_adjustFrameEndTime = EditorApplication.timeSinceStartup + m_skeletonAnimation.state.GetCurrent(0).Alpha;
 			}
 				
 			GameObject go = this.m_previewInstance;
@@ -724,37 +747,13 @@ namespace Spine.Unity.Editor {
 					foreach (var slot in m_skeletonAnimation.skeleton.Slots) {
 						var boundingBoxAttachment = slot.Attachment as BoundingBoxAttachment;
 						if (boundingBoxAttachment != null)
-							DrawBoundingBox (slot, boundingBoxAttachment);
+							SpineEditorUtilities.DrawBoundingBox(slot, boundingBoxAttachment);
 					}
 				}
 
 				go.GetComponent<Renderer>().enabled = false;
 			}
 				
-		}
-
-		static void DrawBoundingBox (Slot slot, BoundingBoxAttachment box) {
-			if (box.Vertices.Length <= 0) return; // Handle cases where user creates a BoundingBoxAttachment but doesn't actually define it.
-
-			var worldVerts = new float[box.Vertices.Length];
-			box.ComputeWorldVertices(slot, worldVerts);
-
-			Handles.color = Color.green;
-			Vector3 lastVert = Vector3.back;
-			Vector3 vert = Vector3.back;
-			Vector3 firstVert = new Vector3(worldVerts[0], worldVerts[1], -1);
-			for (int i = 0; i < worldVerts.Length; i += 2) {
-				vert.x = worldVerts[i];
-				vert.y = worldVerts[i + 1];
-
-				if (i > 0)
-					Handles.DrawLine(lastVert, vert);
-
-				lastVert = vert;
-			}
-
-			Handles.DrawLine(lastVert, firstVert);
-
 		}
 
 		void EditorUpdate () {
@@ -815,12 +814,12 @@ namespace Spine.Unity.Editor {
 			TrackEntry t = m_skeletonAnimation.state.GetCurrent(0);
 
 			if (t != null) {
-				int loopCount = (int)(t.Time / t.EndTime);
-				float currentTime = t.Time - (t.EndTime * loopCount);
-
+				int loopCount = (int)(t.TrackTime / t.TrackEnd);
+				float currentTime = t.TrackTime - (t.TrackEnd * loopCount);
 				float normalizedTime = currentTime / t.Animation.Duration;
+				float wrappedTime = normalizedTime % 1;
 
-				lineRect.x = barRect.x + (width * normalizedTime) - 0.5f;
+				lineRect.x = barRect.x + (width * wrappedTime) - 0.5f;
 				lineRect.width = 2;
 
 				GUI.color = Color.red;
@@ -828,34 +827,32 @@ namespace Spine.Unity.Editor {
 				GUI.color = Color.white;
 
 				for (int i = 0; i < m_animEvents.Count; i++) {
-					// MITCH: left todo: Tooltip
-					//Spine.Event spev = animEvents[i];
-
 					float fr = m_animEventFrames[i];
 					var evRect = new Rect(barRect);
-					evRect.x = Mathf.Clamp(((fr / t.Animation.Duration) * width) - (SpineEditorUtilities.Icons._event.width / 2), barRect.x, float.MaxValue);
-					evRect.width = SpineEditorUtilities.Icons._event.width;
-					evRect.height = SpineEditorUtilities.Icons._event.height;
-					evRect.y += SpineEditorUtilities.Icons._event.height;
-					GUI.DrawTexture(evRect, SpineEditorUtilities.Icons._event);
+					evRect.x = Mathf.Clamp(((fr / t.Animation.Duration) * width) - (SpineEditorUtilities.Icons.userEvent.width / 2), barRect.x, float.MaxValue);
+					evRect.width = SpineEditorUtilities.Icons.userEvent.width;
+					evRect.height = SpineEditorUtilities.Icons.userEvent.height;
+					evRect.y += SpineEditorUtilities.Icons.userEvent.height;
+					GUI.DrawTexture(evRect, SpineEditorUtilities.Icons.userEvent);
 
-					// MITCH: left todo:  Tooltip
-//					UnityEngine.Event ev = UnityEngine.Event.current;
-//					if (ev.isMouse) {
-//						if (evRect.Contains(ev.mousePosition)) {
-//							Rect tooltipRect = new Rect(evRect);
-//							tooltipRect.width = 500;
-//							tooltipRect.y -= 4;
-//							tooltipRect.x += 4;
-//							GUI.Label(tooltipRect, spev.Data.Name);
-//						}
-//					}
+					Event ev = Event.current;
+					if (ev.type == EventType.Repaint) {
+						if (evRect.Contains(ev.mousePosition)) {
+							Rect tooltipRect = new Rect(evRect);
+							GUIStyle tooltipStyle = EditorStyles.helpBox;
+							tooltipRect.width = tooltipStyle.CalcSize(new GUIContent(m_animEvents[i].Data.Name)).x;
+							tooltipRect.y -= 4;
+							tooltipRect.x += 4;
+							GUI.Label(tooltipRect,  m_animEvents[i].Data.Name, tooltipStyle);
+							GUI.tooltip = m_animEvents[i].Data.Name;
+						}
+					}
 				}
 			}
 		}
 
 		void MouseScroll (Rect position) {
-			UnityEngine.Event current = UnityEngine.Event.current;
+			Event current = Event.current;
 			int controlID = GUIUtility.GetControlID(SliderHash, FocusType.Passive);
 			switch (current.GetTypeForControl(controlID)) {
 			case EventType.ScrollWheel:
@@ -916,46 +913,36 @@ namespace Spine.Unity.Editor {
 		}
 
 		public override void OnPreviewSettings () {
+			const float SliderWidth = 100;
 			if (!m_initialized) {
-				GUILayout.HorizontalSlider(0, 0, 2, GUILayout.MaxWidth(64));
+				GUILayout.HorizontalSlider(0, 0, 2, GUILayout.MaxWidth(SliderWidth));
 			} else {
-				float speed = GUILayout.HorizontalSlider(m_skeletonAnimation.timeScale, 0, 2, GUILayout.MaxWidth(64));
+				float speed = GUILayout.HorizontalSlider(m_skeletonAnimation.timeScale, 0, 2, GUILayout.MaxWidth(SliderWidth));
 
-				//snap to nearest 0.25
-				float y = speed / 0.25f;
+				const float SliderSnap = 0.25f;
+				float y = speed / SliderSnap;
 				int q = Mathf.RoundToInt(y);
-				speed = q * 0.25f;
+				speed = q * SliderSnap;
 
 				m_skeletonAnimation.timeScale = speed;
 			}
 		}
 
-		// MITCH: left todo: Fix first-import error
-		// MITCH: left todo: Update preview without thumbnail
+
 		public override Texture2D RenderStaticPreview (string assetPath, UnityEngine.Object[] subAssets, int width, int height) {
 			var tex = new Texture2D(width, height, TextureFormat.ARGB32, false);
 
 			this.InitPreview();
-
 			if (this.m_previewUtility.m_Camera == null)
 				return null;
 
 			m_requireRefresh = true;
 			this.DoRenderPreview(false);
 			AdjustCameraGoals(false);
-
 			this.m_previewUtility.m_Camera.orthographicSize = m_orthoGoal / 2;
 			this.m_previewUtility.m_Camera.transform.position = m_posGoal;
 			this.m_previewUtility.BeginStaticPreview(new Rect(0, 0, width, height));
 			this.DoRenderPreview(false);
-
-			//MITCH: left todo:  Figure out why this is throwing errors on first attempt
-			//		if(m_previewUtility != null){
-			//			Handles.SetCamera(this.m_previewUtility.m_Camera);
-			//			Handles.BeginGUI();
-			//			GUI.DrawTexture(new Rect(40,60,width,height), SpineEditorUtilities.Icons.spine, ScaleMode.StretchToFill);
-			//			Handles.EndGUI();
-			//		}
 			tex = this.m_previewUtility.EndStaticPreview();
 			return tex;
 		}
@@ -972,11 +959,9 @@ namespace Spine.Unity.Editor {
 
 		void SetSkin (object o) {
 			Skin skin = (Skin)o;
-
 			m_skeletonAnimation.initialSkinName = skin.Name;
 			m_skeletonAnimation.Initialize(true);
 			m_requireRefresh = true;
-
 			EditorPrefs.SetString(m_skeletonDataAssetGUID + "_lastSkin", skin.Name);
 		}
 		#endregion

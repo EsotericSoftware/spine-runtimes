@@ -35,16 +35,6 @@ namespace Spine.Unity.Modules {
 	[RequireComponent(typeof(SkeletonUtilityBone)), ExecuteInEditMode]
 	public class SkeletonUtilityGroundConstraint : SkeletonUtilityConstraint {
 
-		#if UNITY_4_3
-		public LayerMask groundMask;
-		public bool use2D = false;
-		public bool useRadius = false;
-		public float castRadius = 0.1f;
-		public float castDistance = 5f;
-		public float castOffset = 0;
-		public float groundOffset = 0;
-		public float adjustSpeed = 5;
-		#else
 		[Tooltip("LayerMask for what objects to raycast against")]
 		public LayerMask groundMask;
 		[Tooltip("The 2D")]
@@ -61,8 +51,6 @@ namespace Spine.Unity.Modules {
 		public float groundOffset = 0;
 		[Tooltip("How fast the target IK position adjusts to the ground.  Use smaller values to prevent snapping")]
 		public float adjustSpeed = 5;
-		#endif
-
 
 		Vector3 rayOrigin;
 		Vector3 rayDir = new Vector3(0, -1, 0);
@@ -86,12 +74,7 @@ namespace Spine.Unity.Modules {
 				RaycastHit2D hit;
 
 				if (useRadius) {
-					#if UNITY_4_3
-					//NOTE:  Unity 4.3.x does not have CircleCast
-					hit = Physics2D.Raycast(rayOrigin , rayDir, castDistance + groundOffset, groundMask);
-					#else
 					hit = Physics2D.CircleCast(rayOrigin, castRadius, rayDir, castDistance + groundOffset, groundMask);
-					#endif
 				} else {
 					hit = Physics2D.Raycast(rayOrigin, rayDir, castDistance + groundOffset, groundMask);
 				}

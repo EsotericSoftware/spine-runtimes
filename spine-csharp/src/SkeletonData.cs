@@ -32,7 +32,7 @@ using System;
 
 namespace Spine {
 	public class SkeletonData {
-		internal String name;
+		internal string name;
 		internal ExposedList<BoneData> bones = new ExposedList<BoneData>();
 		internal ExposedList<SlotData> slots = new ExposedList<SlotData>();
 		internal ExposedList<Skin> skins = new ExposedList<Skin>();
@@ -43,7 +43,11 @@ namespace Spine {
 		internal ExposedList<TransformConstraintData> transformConstraints = new ExposedList<TransformConstraintData>();
 		internal ExposedList<PathConstraintData> pathConstraints = new ExposedList<PathConstraintData>();
 		internal float width, height;
-		internal String version, hash, imagesPath;
+		internal string version, hash;
+
+		// Nonessential.
+		internal float fps;
+		internal string imagesPath;
 
 		public String Name { get { return name; } set { name = value; } }
 		public ExposedList<BoneData> Bones { get { return bones; } } // Ordered parents first.
@@ -56,11 +60,14 @@ namespace Spine {
 		public ExposedList<IkConstraintData> IkConstraints { get { return ikConstraints; } set { ikConstraints = value; } }
 		public ExposedList<TransformConstraintData> TransformConstraints { get { return transformConstraints; } set { transformConstraints = value; } }
 		public ExposedList<PathConstraintData> PathConstraints { get { return pathConstraints; } set { pathConstraints = value; } }
+
 		public float Width { get { return width; } set { width = value; } }
 		public float Height { get { return height; } set { height = value; } }
-		/// <summary>The Spine version used to export this data.</summary>
-		public String Version { get { return version; } set { version = value; } }
-		public String Hash { get { return hash; } set { hash = value; } }
+		/// <summary>The Spine version used to export this data, or null.</summary>
+		public string Version { get { return version; } set { version = value; } }
+		public string Hash { get { return hash; } set { hash = value; } }
+		public string ImagesPath { get { return imagesPath; } set { imagesPath = value; } }
+		public float Fps { get { return fps; } set { fps = value; } }
 
 		// --- Bones.
 

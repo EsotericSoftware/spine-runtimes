@@ -103,6 +103,8 @@ namespace Spine {
 				skeletonData.version = (String)skeletonMap["spine"];
 				skeletonData.width = GetFloat(skeletonMap, "width", 0);
 				skeletonData.height = GetFloat(skeletonMap, "height", 0);
+				skeletonData.fps = GetFloat(skeletonMap, "fps", 0);
+				skeletonData.imagesPath = GetString(skeletonMap, "images", null);
 			}
 
 			// Bones.
@@ -122,8 +124,9 @@ namespace Spine {
 				data.scaleY = GetFloat(boneMap, "scaleY", 1);
 				data.shearX = GetFloat(boneMap, "shearX", 0);
 				data.shearY = GetFloat(boneMap, "shearY", 0);
-				data.inheritRotation = GetBoolean(boneMap, "inheritRotation", true);
-				data.inheritScale = GetBoolean(boneMap, "inheritScale", true);
+
+				string tm = GetString(boneMap, "transform", TransformMode.Normal.ToString());
+				data.transformMode = (TransformMode)Enum.Parse(typeof(TransformMode), tm, true);
 
 				skeletonData.bones.Add(data);
 			}
@@ -144,7 +147,7 @@ namespace Spine {
 						data.b = ToColor(color, 2);
 						data.a = ToColor(color, 3);
 					}
-
+						
 					data.attachmentName = GetString(slotMap, "attachment", null);
 					if (slotMap.ContainsKey("blend"))
 						data.blendMode = (BlendMode)Enum.Parse(typeof(BlendMode), (String)slotMap["blend"], false);
@@ -158,13 +161,14 @@ namespace Spine {
 			if (root.ContainsKey("ik")) {
 				foreach (Dictionary<String, Object> constraintMap in (List<Object>)root["ik"]) {
 					IkConstraintData data = new IkConstraintData((String)constraintMap["name"]);
+					data.order = GetInt(constraintMap, "order", 0);
 
 					foreach (String boneName in (List<Object>)constraintMap["bones"]) {
 						BoneData bone = skeletonData.FindBone(boneName);
 						if (bone == null) throw new Exception("IK constraint bone not found: " + boneName);
 						data.bones.Add(bone);
 					}
-
+					
 					String targetName = (String)constraintMap["target"];
 					data.target = skeletonData.FindBone(targetName);
 					if (data.target == null) throw new Exception("Target bone not found: " + targetName);
@@ -180,6 +184,7 @@ namespace Spine {
 			if (root.ContainsKey("transform")) {
 				foreach (Dictionary<String, Object> constraintMap in (List<Object>)root["transform"]) {
 					TransformConstraintData data = new TransformConstraintData((String)constraintMap["name"]);
+					data.order = GetInt(constraintMap, "order", 0);
 
 					foreach (String boneName in (List<Object>)constraintMap["bones"]) {
 						BoneData bone = skeletonData.FindBone(boneName);
@@ -211,6 +216,7 @@ namespace Spine {
 			if(root.ContainsKey("path")) {
 				foreach (Dictionary<String, Object> constraintMap in (List<Object>)root["path"]) {
 					PathConstraintData data = new PathConstraintData((String)constraintMap["name"]);
+					data.order = GetInt(constraintMap, "order", 0);
 
 					foreach (String boneName in (List<Object>)constraintMap["bones"]) {
 						BoneData bone = skeletonData.FindBone(boneName);
@@ -276,7 +282,7 @@ namespace Spine {
 					var data = new EventData(entry.Key);
 					data.Int = GetInt(entryMap, "int", 0);
 					data.Float = GetFloat(entryMap, "float", 0);
-					data.String = GetString(entryMap, "string", null);
+					data.String = GetString(entryMap, "string", string.Empty);
 					skeletonData.events.Add(data);
 				}
 			}
@@ -289,7 +295,7 @@ namespace Spine {
 					} catch (Exception e) {
 						throw new Exception("Error reading animation: " + entry.Key, e);
 					}
-				}
+				}   
 			}
 
 			skeletonData.bones.TrimExcess();
@@ -632,7 +638,7 @@ namespace Spine {
 							var timeline = new DeformTimeline(values.Count);
 							timeline.slotIndex = slotIndex;
 							timeline.attachment = attachment;
-
+							
 							int frameIndex = 0;
 							foreach (Dictionary<String, Object> valueMap in values) {
 								float[] deform;

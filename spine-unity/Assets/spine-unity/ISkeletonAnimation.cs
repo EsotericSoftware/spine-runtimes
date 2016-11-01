@@ -28,8 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
-
 namespace Spine.Unity {
 	public delegate void UpdateBonesDelegate (ISkeletonAnimation animatedSkeletonComponent);
 

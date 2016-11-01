@@ -33,12 +33,14 @@ using System;
 namespace Spine {
 	public class TransformConstraintData {
 		internal String name;
+		internal int order;
 		internal ExposedList<BoneData> bones = new ExposedList<BoneData>();
 		internal BoneData target;
 		internal float rotateMix, translateMix, scaleMix, shearMix;
 		internal float offsetRotation, offsetX, offsetY, offsetScaleX, offsetScaleY, offsetShearY;
 
 		public String Name { get { return name; } }
+		public int Order { get { return order; } set { order = value; } }
 		public ExposedList<BoneData> Bones { get { return bones; } }
 		public BoneData Target { get { return target; } set { target = value; } }
 		public float RotateMix { get { return rotateMix; } set { rotateMix = value; } }
