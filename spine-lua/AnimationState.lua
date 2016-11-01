@@ -183,6 +183,10 @@ function TrackEntry:getAnimationTime ()
 	return math_min(self.trackTime + self.animationStart, self.animationEnd)
 end
 
+function TrackEntry:resetRotationDirections ()
+  self.timelinesRotation = {}
+end
+
 local AnimationState = {}
 AnimationState.__index = AnimationState
 
