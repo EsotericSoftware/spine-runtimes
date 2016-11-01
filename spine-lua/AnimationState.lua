@@ -69,7 +69,7 @@ function EventQueue:start (entry)
 	local objects = self.objects
 	table_insert(objects, EventType.start)
 	table_insert(objects, entry)
-	animationState.animationsChanged = true
+	self.animationState.animationsChanged = true
 end
 
 function EventQueue:interrupt (entry)
@@ -82,7 +82,7 @@ function EventQueue:_end (entry)
 	local objects = self.objects
 	table_insert(objects, EventType._end)
 	table_insert(objects, entry)
-	animationState.animationsChanged = true
+  self.animationState.animationsChanged = true
 end
 
 function EventQueue:dispose (entry)
@@ -117,26 +117,26 @@ function EventQueue:drain ()
 		local entry = objects[i + 1]
 		if _type == EventType.start then
 			if entry.onStart then entry.onStart(entry) end
-			if as.onStart then entry.onStart(entry) end
+			if as.onStart then as.onStart(entry) end
 		elseif _type == EventType.interrupt then
 			if entry.onInterrupt then entry.onInterrupt(entry) end
-			if as.onInterrupt then entry.onInterrupt(entry) end
+			if as.onInterrupt then as.onInterrupt(entry) end
 		elseif _type == EventType._end then
 			if entry.onEnd then entry.onEnd(entry) end
-			if as.onEnd then entry.onEnd(entry) end
+			if as.onEnd then as.onEnd(entry) end
 			-- fall through in ref impl
 			if entry.onDispose then entry.onDispose(entry) end
-			if as.onDispose then entry.onDispose(entry) end
+			if as.onDispose then as.onDispose(entry) end
 		elseif _type == EventType._dispose then
 			if entry.onDispose then entry.onDispose(entry) end
-			if as.onDispose then entry.onDispose(entry) end
+			if as.onDispose then as.onDispose(entry) end
 		elseif _type == EventType.complete then
 			if entry.onComplete then entry.onComplete(entry) end
-			if as.onComplete then entry.onComplete(entry) end
+			if as.onComplete then as.onComplete(entry) end
 		elseif _type == EventType.event then
 			local event = objects[i + 2]
 			if entry.onEvent then entry.onEvent(entry, event) end
-			if as.onEvent then entry.onEvent(entry, event) end
+			if as.onEvent then as.onEvent(entry, event) end
 			i = i + 1
 		end
 		i = i + 2
@@ -173,12 +173,12 @@ function TrackEntry.new ()
 end
 
 function TrackEntry:getAnimationTime ()
-	if loop then
-		local duration = animationEnd - animationStart
-		if duration == 0 then return animationStart end
-		return (trackTime % duration) + animationStart
+	if self.loop then
+		local duration = self.animationEnd - self.animationStart
+		if duration == 0 then return self.animationStart end
+		return (self.trackTime % duration) + self.animationStart
 	end
-	return math_min(trackTime + animationStart, animationEnd)
+	return math_min(self.trackTime + self.animationStart, self.animationEnd)
 end
 
 local AnimationState = {}
@@ -197,7 +197,7 @@ function AnimationState.new (data)
 		animationsChanged = false,
 		timeScale = 1
 	}
-	queue = EventQueue.new(self)
+	self.queue = EventQueue.new(self)
 	setmetatable(self, AnimationState)
 	return self
 end
@@ -685,7 +685,7 @@ function AnimationState:disposeNext (entry)
   entry.next = nil 
 end
 
-function AnimationState:animationsChanged ()
+function AnimationState:_animationsChanged ()
   self.animationsChanged = false;
 
   self.propertyIDs = {}
@@ -693,6 +693,7 @@ function AnimationState:animationsChanged ()
 
   -- need to get the highest index cause Lua is funny
   local highest = -1
+  local tracks = self.tracks
   for i,entry in pairs(tracks) do
     if i > highest then highest = i end
   end
@@ -700,7 +701,6 @@ function AnimationState:animationsChanged ()
   -- Set timelinesFirst for all entries, from lowest track to highest.
   local i = 1
   local n = highest
-  local tracks = self.tracks
   while i <= n do
     local entry = tracks[i]
     if entry then
