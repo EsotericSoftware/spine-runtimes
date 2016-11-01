@@ -85,6 +85,7 @@ local function binarySearch (values, target, step)
 		current = math.floor((low + high) / 2)
 	end
 end
+Animation.binarySearch = binarySearch
 
 local function binarySearch1 (values, target)
 	local low = 0
