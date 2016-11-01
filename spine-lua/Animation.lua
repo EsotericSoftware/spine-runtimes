@@ -521,7 +521,7 @@ function Animation.ColorTimeline.new (frameCount)
 			b = b + (frames[frame + B] - b) * percent
 			a = a + (frames[frame + A] - a) * percent
 		end
-		local slot = skeleton.slots[slotIndex]
+		local slot = skeleton.slots[self.slotIndex]
 		if alpha == 1 then
 			slot.color:set(r, g, b, a)
 		else

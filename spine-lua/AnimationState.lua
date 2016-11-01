@@ -147,7 +147,7 @@ function EventQueue:drain ()
 end
 
 function EventQueue:clear ()
-	self.objects[1] = nil -- dirty trick so we don't re-alloc, relies on using # in drain
+	self.objects = {}
 end
 
 
