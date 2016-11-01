@@ -261,7 +261,7 @@ function SkeletonJson.new (attachmentLoader)
 				local data = EventData.new(eventName)
 				data.intValue = getValue(eventMap, "int", 0)
 				data.floatValue = getValue(eventMap, "float", 0)
-				data.stringValue = getValue(eventMap, "string", nil)
+				data.stringValue = getValue(eventMap, "string", "")
 				table_insert(skeletonData.events, data)
 			end
 		end

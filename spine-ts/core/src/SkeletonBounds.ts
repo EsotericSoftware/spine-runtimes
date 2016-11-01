@@ -65,7 +65,14 @@ module spine {
 				}
 			}
 
-			if (updateAabb) this.aabbCompute();
+			if (updateAabb) { 
+				this.aabbCompute();
+			} else {
+				this.minX = Number.POSITIVE_INFINITY;
+				this.minY = Number.POSITIVE_INFINITY;
+				this.maxX = Number.NEGATIVE_INFINITY;
+				this.maxY = Number.NEGATIVE_INFINITY;
+			}
 		}
 
 		aabbCompute () {
