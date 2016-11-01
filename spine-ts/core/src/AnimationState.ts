@@ -135,7 +135,7 @@ module spine {
 
 				// Apply mixing from entries first.
 				let mix = current.alpha;
-				if (current.mixingFrom != null) mix = this.applyMixingFrom(current, skeleton, mix);
+				if (current.mixingFrom != null) mix *= this.applyMixingFrom(current, skeleton);
 
 				// Apply current entry.
 				let animationLast = current.animationLast, animationTime = current.getAnimationTime();
@@ -167,26 +167,25 @@ module spine {
 			this.queue.drain();
 		}
 
-		applyMixingFrom (entry: TrackEntry, skeleton: Skeleton, alpha: number) {
+		applyMixingFrom (entry: TrackEntry, skeleton: Skeleton) {
 			let from = entry.mixingFrom;
-			if (from.mixingFrom != null) this.applyMixingFrom(from, skeleton, alpha);
+			if (from.mixingFrom != null) this.applyMixingFrom(from, skeleton);
 
 			let mix = 0;
 			if (entry.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
 				mix = 1;
 			else {
 				mix = entry.mixTime / entry.mixDuration;
-				if (mix > 1) mix = 1;
-				mix *= alpha;
+				if (mix > 1) mix = 1;				
 			}
 
 			let events = mix < from.eventThreshold ? this.events : null;
 			let attachments = mix < from.attachmentThreshold, drawOrder = mix < from.drawOrderThreshold;
-			let animationLast = from.animationLast, animationTime = from.getAnimationTime();
-			alpha = from.alpha * (1 - mix);
+			let animationLast = from.animationLast, animationTime = from.getAnimationTime();			
 			let timelineCount = from.animation.timelines.length;
 			let timelines = from.animation.timelines;
 			let timelinesFirst = from.timelinesFirst;
+			let alpha = from.alpha * entry.mixAlpha * (1 - mix);
 
 			let firstFrame = from.timelinesRotation.length == 0;
 			if (firstFrame) Utils.setArraySize(from.timelinesRotation, timelineCount << 1, null);
@@ -347,12 +346,10 @@ module spine {
 			if (from != null) {
 				this.queue.interrupt(from);
 				current.mixingFrom = from;
-				current.mixTime = 0;
+				current.mixTime = 0;				
 
-				from.timelinesRotation.length = 0;
-
-				// If not completely mixed in, set alpha so mixing out happens from current mix to zero.
-				if (from.mixingFrom != null) from.alpha *= Math.min(from.mixTime / from.mixDuration, 1);
+				// If not completely mixed in, set mixAlpha so mixing out happens from current mix to zero.
+				if (from.mixingFrom != null) current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
 			}
 
 			this.queue.start(current);
@@ -474,6 +471,7 @@ module spine {
 			entry.timeScale = 1;
 
 			entry.alpha = 1;
+			entry.mixAlpha = 1;
 			entry.mixTime = 0;
 			entry.mixDuration = last == null ? 0 : this.data.getMix(last.animation, animation);
 			return entry;
@@ -602,6 +600,10 @@ module spine {
 
 		isComplete () {
 			return this.trackTime >= this.animationEnd - this.animationStart;
+		}
+
+		resetRotationDirections () {
+			this.timelinesRotation.length = 0;
 		}
 	}
 

@@ -216,7 +216,7 @@ declare module spine {
 		update(delta: number): void;
 		updateMixingFrom(entry: TrackEntry, delta: number, canEnd: boolean): void;
 		apply(skeleton: Skeleton): void;
-		applyMixingFrom(entry: TrackEntry, skeleton: Skeleton, alpha: number): number;
+		applyMixingFrom(entry: TrackEntry, skeleton: Skeleton): number;
 		applyRotateTimeline(timeline: Timeline, skeleton: Skeleton, time: number, alpha: number, setupPose: boolean, timelinesRotation: Array<number>, i: number, firstFrame: boolean): void;
 		queueEvents(entry: TrackEntry, animationTime: number): void;
 		clearTracks(): void;
@@ -272,6 +272,7 @@ declare module spine {
 		getAnimationTime(): number;
 		setAnimationLast(animationLast: number): void;
 		isComplete(): boolean;
+		resetRotationDirections(): void;
 	}
 	class EventQueue {
 		objects: Array<any>;
@@ -353,6 +354,135 @@ declare module spine {
 		newMeshAttachment(skin: Skin, name: string, path: string): MeshAttachment;
 		newBoundingBoxAttachment(skin: Skin, name: string): BoundingBoxAttachment;
 		newPathAttachment(skin: Skin, name: string): PathAttachment;
+	}
+}
+declare module spine {
+	abstract class Attachment {
+		name: string;
+		constructor(name: string);
+	}
+	abstract class VertexAttachment extends Attachment {
+		bones: Array<number>;
+		vertices: ArrayLike<number>;
+		worldVerticesLength: number;
+		constructor(name: string);
+		computeWorldVertices(slot: Slot, worldVertices: ArrayLike<number>): void;
+		computeWorldVerticesWith(slot: Slot, start: number, count: number, worldVertices: ArrayLike<number>, offset: number): void;
+		applyDeform(sourceAttachment: VertexAttachment): boolean;
+	}
+}
+declare module spine {
+	interface AttachmentLoader {
+		newRegionAttachment(skin: Skin, name: string, path: string): RegionAttachment;
+		newMeshAttachment(skin: Skin, name: string, path: string): MeshAttachment;
+		newBoundingBoxAttachment(skin: Skin, name: string): BoundingBoxAttachment;
+		newPathAttachment(skin: Skin, name: string): PathAttachment;
+	}
+}
+declare module spine {
+	enum AttachmentType {
+		Region = 0,
+		BoundingBox = 1,
+		Mesh = 2,
+		LinkedMesh = 3,
+		Path = 4,
+	}
+}
+declare module spine {
+	class BoundingBoxAttachment extends VertexAttachment {
+		color: Color;
+		constructor(name: string);
+	}
+}
+declare module spine {
+	class MeshAttachment extends VertexAttachment {
+		region: TextureRegion;
+		path: string;
+		regionUVs: ArrayLike<number>;
+		worldVertices: ArrayLike<number>;
+		triangles: Array<number>;
+		color: Color;
+		hullLength: number;
+		private parentMesh;
+		inheritDeform: boolean;
+		tempColor: Color;
+		constructor(name: string);
+		updateUVs(): void;
+		updateWorldVertices(slot: Slot, premultipliedAlpha: boolean): ArrayLike<number>;
+		applyDeform(sourceAttachment: VertexAttachment): boolean;
+		getParentMesh(): MeshAttachment;
+		setParentMesh(parentMesh: MeshAttachment): void;
+	}
+}
+declare module spine {
+	class PathAttachment extends VertexAttachment {
+		lengths: Array<number>;
+		closed: boolean;
+		constantSpeed: boolean;
+		color: Color;
+		constructor(name: string);
+	}
+}
+declare module spine {
+	class RegionAttachment extends Attachment {
+		static OX1: number;
+		static OY1: number;
+		static OX2: number;
+		static OY2: number;
+		static OX3: number;
+		static OY3: number;
+		static OX4: number;
+		static OY4: number;
+		static X1: number;
+		static Y1: number;
+		static C1R: number;
+		static C1G: number;
+		static C1B: number;
+		static C1A: number;
+		static U1: number;
+		static V1: number;
+		static X2: number;
+		static Y2: number;
+		static C2R: number;
+		static C2G: number;
+		static C2B: number;
+		static C2A: number;
+		static U2: number;
+		static V2: number;
+		static X3: number;
+		static Y3: number;
+		static C3R: number;
+		static C3G: number;
+		static C3B: number;
+		static C3A: number;
+		static U3: number;
+		static V3: number;
+		static X4: number;
+		static Y4: number;
+		static C4R: number;
+		static C4G: number;
+		static C4B: number;
+		static C4A: number;
+		static U4: number;
+		static V4: number;
+		x: number;
+		y: number;
+		scaleX: number;
+		scaleY: number;
+		rotation: number;
+		width: number;
+		height: number;
+		color: Color;
+		path: string;
+		rendererObject: any;
+		region: TextureRegion;
+		offset: ArrayLike<number>;
+		vertices: ArrayLike<number>;
+		tempColor: Color;
+		constructor(name: string);
+		setRegion(region: TextureRegion): void;
+		updateOffset(): void;
+		updateWorldVertices(slot: Slot, premultipliedAlpha: boolean): ArrayLike<number>;
 	}
 }
 declare module spine {
@@ -880,7 +1010,7 @@ declare module spine {
 		static ensureArrayCapacity<T>(array: Array<T>, size: number, value?: any): Array<T>;
 		static newArray<T>(size: number, defaultValue: T): Array<T>;
 		static newFloatArray(size: number): ArrayLike<number>;
-		static toFloatArray(array: Array<number>): Float32Array | number[];
+		static toFloatArray(array: Array<number>): number[] | Float32Array;
 	}
 	class DebugUtils {
 		static logBones(skeleton: Skeleton): void;
@@ -915,135 +1045,6 @@ declare module spine {
 	interface ArrayLike<T> {
 		length: number;
 		[n: number]: T;
-	}
-}
-declare module spine {
-	abstract class Attachment {
-		name: string;
-		constructor(name: string);
-	}
-	abstract class VertexAttachment extends Attachment {
-		bones: Array<number>;
-		vertices: ArrayLike<number>;
-		worldVerticesLength: number;
-		constructor(name: string);
-		computeWorldVertices(slot: Slot, worldVertices: ArrayLike<number>): void;
-		computeWorldVerticesWith(slot: Slot, start: number, count: number, worldVertices: ArrayLike<number>, offset: number): void;
-		applyDeform(sourceAttachment: VertexAttachment): boolean;
-	}
-}
-declare module spine {
-	interface AttachmentLoader {
-		newRegionAttachment(skin: Skin, name: string, path: string): RegionAttachment;
-		newMeshAttachment(skin: Skin, name: string, path: string): MeshAttachment;
-		newBoundingBoxAttachment(skin: Skin, name: string): BoundingBoxAttachment;
-		newPathAttachment(skin: Skin, name: string): PathAttachment;
-	}
-}
-declare module spine {
-	enum AttachmentType {
-		Region = 0,
-		BoundingBox = 1,
-		Mesh = 2,
-		LinkedMesh = 3,
-		Path = 4,
-	}
-}
-declare module spine {
-	class BoundingBoxAttachment extends VertexAttachment {
-		color: Color;
-		constructor(name: string);
-	}
-}
-declare module spine {
-	class MeshAttachment extends VertexAttachment {
-		region: TextureRegion;
-		path: string;
-		regionUVs: ArrayLike<number>;
-		worldVertices: ArrayLike<number>;
-		triangles: Array<number>;
-		color: Color;
-		hullLength: number;
-		private parentMesh;
-		inheritDeform: boolean;
-		tempColor: Color;
-		constructor(name: string);
-		updateUVs(): void;
-		updateWorldVertices(slot: Slot, premultipliedAlpha: boolean): ArrayLike<number>;
-		applyDeform(sourceAttachment: VertexAttachment): boolean;
-		getParentMesh(): MeshAttachment;
-		setParentMesh(parentMesh: MeshAttachment): void;
-	}
-}
-declare module spine {
-	class PathAttachment extends VertexAttachment {
-		lengths: Array<number>;
-		closed: boolean;
-		constantSpeed: boolean;
-		color: Color;
-		constructor(name: string);
-	}
-}
-declare module spine {
-	class RegionAttachment extends Attachment {
-		static OX1: number;
-		static OY1: number;
-		static OX2: number;
-		static OY2: number;
-		static OX3: number;
-		static OY3: number;
-		static OX4: number;
-		static OY4: number;
-		static X1: number;
-		static Y1: number;
-		static C1R: number;
-		static C1G: number;
-		static C1B: number;
-		static C1A: number;
-		static U1: number;
-		static V1: number;
-		static X2: number;
-		static Y2: number;
-		static C2R: number;
-		static C2G: number;
-		static C2B: number;
-		static C2A: number;
-		static U2: number;
-		static V2: number;
-		static X3: number;
-		static Y3: number;
-		static C3R: number;
-		static C3G: number;
-		static C3B: number;
-		static C3A: number;
-		static U3: number;
-		static V3: number;
-		static X4: number;
-		static Y4: number;
-		static C4R: number;
-		static C4G: number;
-		static C4B: number;
-		static C4A: number;
-		static U4: number;
-		static V4: number;
-		x: number;
-		y: number;
-		scaleX: number;
-		scaleY: number;
-		rotation: number;
-		width: number;
-		height: number;
-		color: Color;
-		path: string;
-		rendererObject: any;
-		region: TextureRegion;
-		offset: ArrayLike<number>;
-		vertices: ArrayLike<number>;
-		tempColor: Color;
-		constructor(name: string);
-		setRegion(region: TextureRegion): void;
-		updateOffset(): void;
-		updateWorldVertices(slot: Slot, premultipliedAlpha: boolean): ArrayLike<number>;
 	}
 }
 declare module spine.webgl {
