@@ -126,4 +126,14 @@ function utils.clamp (value, min, max)
 	return value
 end
 
+function utils.signum (value)
+  if value < 0 then
+    return -1
+  elseif value > 0 then
+    return 1
+  else
+    return 0
+  end
+end
+
 return utils

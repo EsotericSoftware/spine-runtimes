@@ -36,6 +36,8 @@ local AnimationStateData = require "spine-lua.AnimationStateData"
 local math_min = math.min
 local math_abs = math.abs
 local math_signum = utils.signum
+local math_floor = math.floor
+local math_ceil = math.ceil
 
 local function zlen(array)
 	return #array + 1
@@ -282,7 +284,7 @@ function AnimationState:updateMixingFrom (entry, delta, canEnd)
 	from.trackLast = from.nextTrackLast
 	local mixingFromDelta = delta * from.timeScale
 	from.trackTime = from.trackTime + mixingFromDelta;
-	entry.mixTime = entry.mixtime + mixingFromDelta;
+	entry.mixTime = entry.mixTime + mixingFromDelta;
 
 	self:updateMixingFrom(from, delta, canEnd and from.alpha == 1)
 end
@@ -299,7 +301,7 @@ function AnimationState:apply (skeleton)
 		if not (current == nil or current.delay > 0) then
 			-- Apply mixing from entries first.
 			local mix = current.alpha
-			if current.mixingFrom then mix = mix * applyMixingFrom(current, skeleton) end
+			if current.mixingFrom then mix = mix * self:applyMixingFrom(current, skeleton) end
 
 			-- Apply current entry.
 			local animationLast = current.animationLast
@@ -315,10 +317,10 @@ function AnimationState:apply (skeleton)
 				local timelinesFirst = current.timelinesFirst
 				for i,timeline in ipairs(timelines) do
 					if timeline.type == Animation.TimelineType.rotate then
-						self:applyRotateTimeline(timeline, skeleton, animationTime, mix, timelinesFirst[ii], timelinesRotation, ii * 2,
+						self:applyRotateTimeline(timeline, skeleton, animationTime, mix, timelinesFirst[i], timelinesRotation, i * 2,
 							firstFrame) -- FIXME passing ii * 2, indexing correct?
 					else
-						timeline:apply(skeleton, animationLast, animationTime, events, mix, timelinesFirst[ii], false)
+						timeline:apply(skeleton, animationLast, animationTime, events, mix, timelinesFirst[i], false)
 					end
 				end
 			end
@@ -353,7 +355,7 @@ function AnimationState:applyMixingFrom (entry, skeleton)
 	local timelinesFirst = from.timelinesFirst;
 	local alpha = from.alpha * entry.mixAlpha * (1 - mix)
 
-	local firstFrame = #from.timelinesRotation.size == 0
+	local firstFrame = #from.timelinesRotation == 0
 	local timelinesRotation = from.timelinesRotation
 
 	local skip = false
@@ -391,16 +393,16 @@ function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, se
 
   local r2 = 0
   if time >= frames[zlen(frames) - Animation.RotateTimeline.ENTRIES] then -- Time is after last frame.
-    r2 = bone.data.rotation + frames[zlen(frames) + PREV_ROTATION]
+    r2 = bone.data.rotation + frames[zlen(frames) + Animation.RotateTimeline.PREV_ROTATION]
   else
     -- Interpolate between the previous frame and the current frame.
-    local frame = Animation.binarySearch(frames, time, ENTRIES)
-    local prevRotation = frames[frame + PREV_ROTATION]
+    local frame = Animation.binarySearch(frames, time, Animation.RotateTimeline.ENTRIES)
+    local prevRotation = frames[frame + Animation.RotateTimeline.PREV_ROTATION]
     local frameTime = frames[frame]
     local percent = rotateTimeline:getCurvePercent(math_floor(frame / 2) - 1,
-      1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
+      1 - (time - frameTime) / (frames[frame + Animation.RotateTimeline.PREV_TIME] - frameTime))
 
-    r2 = frames[frame + ROTATION] - prevRotation
+    r2 = frames[frame + Animation.RotateTimeline.ROTATION] - prevRotation
     r2 = r2 - (16384 - math_floor(16384.499999999996 - r2 / 360)) * 360
     r2 = prevRotation + r2 * percent + bone.data.rotation
     r2 = r2 - (16384 - math_floor(16384.499999999996 - r2 / 360)) * 360
@@ -438,7 +440,7 @@ function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, se
       dir = current
     end
     total = diff + lastTotal - math_ceil(lastTotal / 360 - 0.5) * 360 -- FIXME used to be %360, store loops as part of lastTotal.
-    if dir ~= current then total = total + 360 * Math.signum(lastTotal) end
+    if dir ~= current then total = total + 360 * math_signum(lastTotal) end
     timelinesRotation[i] = total
   end
   timelinesRotation[i + 1] = diff
@@ -571,13 +573,13 @@ function AnimationState:setAnimation (trackIndex, animation, loop)
 end
 
 function AnimationState:addAnimationByName (trackIndex, animationName, loop, delay)
-		local animation = data.skeletonData:findAnimation(animationName)
+		local animation = self.data.skeletonData:findAnimation(animationName)
 		if not animation then error("Animation not found: " + animationName) end
 		return self:addAnimation(trackIndex, animation, loop, delay)
 end
 
-function AnimationState:addAnimation (trackIndex, animationName, loop, delay)
-  if not nimation then error("animation cannot be null.") end
+function AnimationState:addAnimation (trackIndex, animation, loop, delay)
+  if not animation then error("animation cannot be null.") end
 
   local last = self:expandToIndex(trackIndex)
   if last then
@@ -588,6 +590,7 @@ function AnimationState:addAnimation (trackIndex, animationName, loop, delay)
 
   local entry = self:trackEntry(trackIndex, animation, loop, last)
   local queue = self.queue
+  local data = self.data
   
   if not last then
     self:setCurrent(trackIndex, entry)
