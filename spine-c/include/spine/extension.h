@@ -93,6 +93,7 @@
 #define RAD_DEG (180 / PI)
 
 #define ABS(A) ((A) < 0? -(A): (A))
+#define SIGNUM(A) ((A) < 0? -1: (A) > 0 ? 1 : 0)
 
 #ifdef __STDC_VERSION__
 #define FMOD(A,B) fmodf(A, B)
@@ -230,7 +231,8 @@ void _spVertexAttachment_deinit (spVertexAttachment* self);
 void _spTimeline_init (spTimeline* self, spTimelineType type,
 	void (*dispose) (spTimeline* self),
 	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
-		int* eventsCount, float alpha));
+		int* eventsCount, float alpha, int setupPose, int mixingOut),
+	int (*getPropertyId) (const spTimeline* self));
 void _spTimeline_deinit (spTimeline* self);
 
 #ifdef SPINE_SHORT_NAMES
@@ -242,8 +244,8 @@ void _spTimeline_deinit (spTimeline* self);
 
 void _spCurveTimeline_init (spCurveTimeline* self, spTimelineType type, int framesCount,
 	void (*dispose) (spTimeline* self),
-	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
-		int* eventsCount, float alpha));
+	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents, int* eventsCount, float alpha, int setupPose, int mixingOut),
+	int (*getPropertyId) (const spTimeline* self));
 void _spCurveTimeline_deinit (spCurveTimeline* self);
 
 #ifdef SPINE_SHORT_NAMES
