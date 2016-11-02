@@ -302,10 +302,13 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
 			boolean mixingOut) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
 
 			Bone bone = skeleton.bones.get(boneIndex);
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				if (setupPose) bone.rotation = bone.data.rotation;
+				return;
+			}
 
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
 				if (setupPose)
@@ -381,10 +384,16 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
 			boolean mixingOut) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
 
 			Bone bone = skeleton.bones.get(boneIndex);
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				if (setupPose) {
+					bone.x = bone.data.x;
+					bone.y = bone.data.y;
+				}
+				return;
+			}
 
 			float x, y;
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
@@ -424,10 +433,16 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
 			boolean mixingOut) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
 
 			Bone bone = skeleton.bones.get(boneIndex);
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				if (setupPose) {
+					bone.scaleX = bone.data.scaleX;
+					bone.scaleY = bone.data.scaleY;
+				}
+				return;
+			}
 
 			float x, y;
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
@@ -483,10 +498,16 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
 			boolean mixingOut) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
 
 			Bone bone = skeleton.bones.get(boneIndex);
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				if (setupPose) {
+					bone.shearX = bone.data.shearX;
+					bone.shearY = bone.data.shearY;
+				}
+				return;
+			}
 
 			float x, y;
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
@@ -559,8 +580,13 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
 			boolean mixingOut) {
+
+			Slot slot = skeleton.slots.get(slotIndex);
 			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
+			if (time < frames[0]) { // Time is before first frame.
+				if (setupPose) slot.color.set(slot.data.color);
+				return;
+			}
 
 			float r, g, b, a;
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
@@ -585,7 +611,6 @@ public class Animation {
 				b += (frames[frame + B] - b) * percent;
 				a += (frames[frame + A] - a) * percent;
 			}
-			Slot slot = skeleton.slots.get(slotIndex);
 			if (alpha == 1)
 				slot.color.set(r, g, b, a);
 			else {
@@ -644,15 +669,22 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
 			boolean mixingOut) {
+
+			Slot slot = skeleton.slots.get(slotIndex);
 			if (mixingOut && setupPose) {
-				Slot slot = skeleton.slots.get(slotIndex);
 				String attachmentName = slot.data.attachmentName;
 				slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slotIndex, attachmentName));
 				return;
 			}
 
 			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
+			if (time < frames[0]) { // Time is before first frame.
+				if (setupPose) {
+					String attachmentName = slot.data.attachmentName;
+					slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slotIndex, attachmentName));
+				}
+				return;
+			}
 
 			int frameIndex;
 			if (time >= frames[frames.length - 1]) // Time is after last frame.
@@ -721,17 +753,20 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha, boolean setupPose,
 			boolean mixingOut) {
+
 			Slot slot = skeleton.slots.get(slotIndex);
 			Attachment slotAttachment = slot.attachment;
 			if (!(slotAttachment instanceof VertexAttachment) || !((VertexAttachment)slotAttachment).applyDeform(attachment)) return;
 
+			FloatArray verticesArray = slot.getAttachmentVertices();
 			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
+			if (time < frames[0]) { // Time is before first frame.
+				if (setupPose) verticesArray.size = 0;
+				return;
+			}
 
 			float[][] frameVertices = this.frameVertices;
 			int vertexCount = frameVertices[0].length;
-
-			FloatArray verticesArray = slot.getAttachmentVertices();
 			if (verticesArray.size != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
 			float[] vertices = verticesArray.setSize(vertexCount);
 
@@ -839,6 +874,7 @@ public class Animation {
 		/** Fires events for frames > <code>lastTime</code> and <= <code>time</code>. */
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha, boolean setupPose,
 			boolean mixingOut) {
+
 			if (firedEvents == null) return;
 			float[] frames = this.frames;
 			int frameCount = frames.length;
@@ -905,13 +941,19 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha, boolean setupPose,
 			boolean mixingOut) {
+
+			Array<Slot> drawOrder = skeleton.drawOrder;
+			Array<Slot> slots = skeleton.slots;
 			if (mixingOut && setupPose) {
-				System.arraycopy(skeleton.slots.items, 0, skeleton.drawOrder.items, 0, skeleton.slots.size);
+				System.arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
 				return;
 			}
 
 			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
+			if (time < frames[0]) { // Time is before first frame.
+				if (setupPose) System.arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
+				return;
+			}
 
 			int frame;
 			if (time >= frames[frames.length - 1]) // Time is after last frame.
@@ -919,8 +961,6 @@ public class Animation {
 			else
 				frame = binarySearch(frames, time) - 1;
 
-			Array<Slot> drawOrder = skeleton.drawOrder;
-			Array<Slot> slots = skeleton.slots;
 			int[] drawOrderToSetupIndex = drawOrders[frame];
 			if (drawOrderToSetupIndex == null)
 				System.arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
@@ -974,10 +1014,16 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
 			boolean mixingOut) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
 
 			IkConstraint constraint = skeleton.ikConstraints.get(ikConstraintIndex);
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				if (setupPose) {
+					constraint.mix = constraint.data.mix;
+					constraint.bendDirection = constraint.data.bendDirection;
+				}
+				return;
+			}
 
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
 				if (setupPose) {
@@ -1052,10 +1098,19 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
 			boolean mixingOut) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
 
 			TransformConstraint constraint = skeleton.transformConstraints.get(transformConstraintIndex);
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				if (setupPose) {
+					TransformConstraintData data = constraint.data;
+					constraint.rotateMix = data.rotateMix;
+					constraint.translateMix = data.translateMix;
+					constraint.scaleMix = data.scaleMix;
+					constraint.shearMix = data.shearMix;
+				}
+				return;
+			}
 
 			float rotate, translate, scale, shear;
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
@@ -1138,10 +1193,13 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
 			boolean mixingOut) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
 
 			PathConstraint constraint = skeleton.pathConstraints.get(pathConstraintIndex);
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				if (setupPose) constraint.position = constraint.data.position;
+				return;
+			}
 
 			float position;
 			if (time >= frames[frames.length - ENTRIES]) // Time is after last frame.
@@ -1175,10 +1233,13 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
 			boolean mixingOut) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
 
 			PathConstraint constraint = skeleton.pathConstraints.get(pathConstraintIndex);
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				if (setupPose) constraint.spacing = constraint.data.spacing;
+				return;
+			}
 
 			float spacing;
 			if (time >= frames[frames.length - ENTRIES]) // Time is after last frame.
@@ -1245,10 +1306,16 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
 			boolean mixingOut) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
 
 			PathConstraint constraint = skeleton.pathConstraints.get(pathConstraintIndex);
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				if (setupPose) {
+					constraint.rotateMix = constraint.data.rotateMix;
+					constraint.translateMix = constraint.data.translateMix;
+				}
+				return;
+			}
 
 			float rotate, translate;
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
