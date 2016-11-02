@@ -307,7 +307,7 @@ public class Bone implements Updatable {
 	 * the applied transform after the world transform has been modified directly (eg, by a constraint).
 	 * <p>
 	 * Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. */
-	public function updateAppliedTransform () : void {
+	function updateAppliedTransform () : void {
 		appliedValid = true;
 		var parent:Bone = this.parent;
 		if (parent == null) {

@@ -68,7 +68,14 @@ public class SkeletonBounds {
 			boundingBox.computeWorldVertices(slot, polygon.vertices);
 		}
 
-		if (updateAabb) aabbCompute();
+		if (updateAabb) 
+			aabbCompute();
+		else {
+			minX = Number.MIN_VALUE;
+			minY = Number.MIN_VALUE;
+			maxX = Number.MAX_VALUE;
+			maxY = Number.MAX_VALUE;
+		}
 	}
 
 	private function aabbCompute () : void {

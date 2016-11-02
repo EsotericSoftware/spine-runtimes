@@ -253,7 +253,7 @@ public class SkeletonJson {
 				var eventData:EventData = new EventData(eventName);
 				eventData.intValue = eventMap["int"] || 0;
 				eventData.floatValue = eventMap["float"] || 0;
-				eventData.stringValue = eventMap["string"] || null;
+				eventData.stringValue = eventMap["string"] || "";
 				skeletonData.events.push(eventData);
 			}
 		}
