@@ -7398,7 +7398,7 @@ var spine;
 			element.appendChild(canvas);
 			canvas.width = element.clientWidth;
 			canvas.height = element.clientHeight;
-			var webglConfig = { alpha: false };
+			var webglConfig = { alpha: config.alpha };
 			var gl = this.gl = (canvas.getContext("webgl", webglConfig) || canvas.getContext("experimental-webgl", webglConfig));
 			this.shader = spine.webgl.Shader.newColoredTextured(gl);
 			this.batcher = new spine.webgl.PolygonBatcher(gl);
@@ -7447,6 +7447,8 @@ var spine;
 				config.premultipliedAlpha = false;
 			if (!config.debug === undefined)
 				config.debug = false;
+			if (!config.alpha === undefined)
+				config.alpha = true;
 			this.backgroundColor.setFromString(config.backgroundColor);
 			this.config = config;
 		};
@@ -7609,6 +7611,8 @@ var spine;
 				config.premultipliedAlpha = widget.getAttribute("data-premultiplied-alpha") === "true";
 			if (widget.getAttribute("data-debug"))
 				config.debug = widget.getAttribute("data-debug") === "true";
+			if (widget.getAttribute("data-alpha"))
+				config.alpha = widget.getAttribute("data-alpha") === "true";
 			new spine.SpineWidget(widget, config);
 		};
 		SpineWidget.ready = function () {
@@ -7641,6 +7645,7 @@ var spine;
 			this.scale = 1.0;
 			this.x = 0;
 			this.y = 0;
+			this.alpha = true;
 			this.fitToCanvas = true;
 			this.backgroundColor = "#555555";
 			this.premultipliedAlpha = false;

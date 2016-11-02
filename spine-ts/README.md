@@ -166,6 +166,7 @@ The configuration object has the following fields:
   * `x`: optional, the x-coordinate to display the animation at. The origin is in the bottom left corner. Defaults to `0` if omitted. Irrelevant if `data-fit-to-canvas` is `true`.
   * `y`: optional, the y-coordinate to display the animation at. The origin is in the bottom left corner with the y-axis pointing upwards. Defaults to `0` if omitted. Irrelevant if `data-fit-to-canvas` is `true`.
   * `fitToCanvas`: optional, whether to fit the animation to the canvas size or not. Defaults to `true` if omitted, in which case `data-scale`, `data-x` and `data-y` are irrelevant. This setting calculates the setup pose bounding box using the specified skin to center and scale the animation on the canvas.
+  * `alpha`: optional, whether to allow the canvas to be transparent. Defaults to `true`. Set the alpha channel in ``backgroundColor` to 0 as well, e.g. `#00000000`.
   * `backgroundColor`: optional, the background color to use. Defaults to `#000000` if omitted.
   * `premultipliedAlpha`: optional, whether the atlas pages use premultiplied alpha or not. Defaults to `false` if omitted.
   * `debug`: optional, whether to show debug information such as bones, attachments, etc. Defaults to `false` if omitted.

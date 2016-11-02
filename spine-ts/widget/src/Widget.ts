@@ -66,7 +66,7 @@ module spine {
 			(<HTMLElement> element).appendChild(canvas);
 			canvas.width = (<HTMLElement>element).clientWidth;
 			canvas.height = (<HTMLElement>element).clientHeight;
-			var webglConfig = { alpha: false };
+			var webglConfig = { alpha: config.alpha };
 			let gl = this.gl = <WebGLRenderingContext> (canvas.getContext("webgl", webglConfig) || canvas.getContext("experimental-webgl", webglConfig));
 
 			this.shader = spine.webgl.Shader.newColoredTextured(gl);
@@ -106,6 +106,7 @@ module spine {
 			}
 			if (!config.premultipliedAlpha === undefined) config.premultipliedAlpha = false;
 			if (!config.debug === undefined) config.debug = false;
+			if (!config.alpha === undefined) config.alpha = true;
 			this.backgroundColor.setFromString(config.backgroundColor);
 			this.config = config;
 		}
@@ -272,6 +273,7 @@ module spine {
 			if (widget.getAttribute("data-background-color")) config.backgroundColor = widget.getAttribute("data-background-color");
 			if (widget.getAttribute("data-premultiplied-alpha")) config.premultipliedAlpha = widget.getAttribute("data-premultiplied-alpha") === "true";
 			if (widget.getAttribute("data-debug")) config.debug = widget.getAttribute("data-debug") === "true";
+			if (widget.getAttribute("data-alpha")) config.alpha = widget.getAttribute("data-alpha") === "true";
 
 			new spine.SpineWidget(widget, config);
 		}
@@ -306,6 +308,7 @@ module spine {
 		scale = 1.0;
 		x = 0;
 		y = 0;
+		alpha = true;
 		fitToCanvas = true;
 		backgroundColor = "#555555";
 		premultipliedAlpha = false;

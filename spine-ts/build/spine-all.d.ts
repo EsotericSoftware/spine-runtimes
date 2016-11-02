@@ -1548,6 +1548,7 @@ declare module spine {
 		scale: number;
 		x: number;
 		y: number;
+		alpha: boolean;
 		fitToCanvas: boolean;
 		backgroundColor: string;
 		premultipliedAlpha: boolean;
