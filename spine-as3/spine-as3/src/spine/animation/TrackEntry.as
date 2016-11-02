@@ -71,5 +71,9 @@ public class TrackEntry implements Poolable {
 		timelinesFirst.length = 0;
 		timelinesRotation.length = 0;
 	}
+	
+	public function resetRotationDirection ():void {
+		timelinesRotation.length = 0;
+	}
 }
 }

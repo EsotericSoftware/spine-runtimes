@@ -149,7 +149,7 @@ public class AnimationState {
 
 			// Apply mixing from entries first.
 			var mix:Number = current.alpha;
-			if (current.mixingFrom != null) mix = applyMixingFrom(current, skeleton, mix);
+			if (current.mixingFrom != null) mix *= applyMixingFrom(current, skeleton);
 
 			// Apply current entry.
 			var animationLast:Number = current.animationLast, animationTime:Number = current.getAnimationTime();
@@ -182,26 +182,25 @@ public class AnimationState {
 		queue.drain();
 	}
 	
-	private function applyMixingFrom (entry:TrackEntry, skeleton:Skeleton, alpha:Number):Number {
+	private function applyMixingFrom (entry:TrackEntry, skeleton:Skeleton):Number {
 		var from:TrackEntry = entry.mixingFrom;
-		if (from.mixingFrom != null) applyMixingFrom(from, skeleton, alpha);
+		if (from.mixingFrom != null) applyMixingFrom(from, skeleton);
 
 		var mix:Number = 0;
 		if (entry.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
 			mix = 1;
 		else {
 			mix = entry.mixTime / entry.mixDuration;
-			if (mix > 1) mix = 1;
-			mix *= alpha;
+			if (mix > 1) mix = 1;			
 		}
 
 		var events:Vector.<Event> = mix < from.eventThreshold ? this.events : null;
 		var attachments:Boolean = mix < from.attachmentThreshold, drawOrder:Boolean = mix < from.drawOrderThreshold;
 		var animationLast:Number = from.animationLast, animationTime:Number = from.getAnimationTime();
-		alpha = from.alpha * (1 - mix);
 		var timelineCount:int = from.animation.timelines.length;
 		var timelines:Vector.<Timeline> = from.animation.timelines;
 		var timelinesFirst:Vector.<Boolean> = from.timelinesFirst;
+		var alpha:Number = from.alpha * entry.mixAlpha * (1 - mix);
 
 		var firstFrame:Boolean = from.timelinesRotation.length == 0;
 		if (firstFrame) from.timelinesRotation.length = timelineCount << 1;
@@ -368,8 +367,8 @@ public class AnimationState {
 
 			from.timelinesRotation.length = 0;
 
-			// If not completely mixed in, set alpha so mixing out happens from current mix to zero.
-			if (from.mixingFrom != null) from.alpha *= Math.min(from.mixTime / from.mixDuration, 1);
+			// If not completely mixed in, set mixAlpha so mixing out happens from current mix to zero.
+			if (from.mixingFrom != null) current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
 		}
 
 		queue.start(current);
@@ -490,6 +489,7 @@ public class AnimationState {
 		entry.timeScale = 1;
 
 		entry.alpha = 1;
+		entry.mixAlpha = 1;
 		entry.mixTime = 0;
 		entry.mixDuration = last == null ? 0 : data.getMix(last.animation, animation);
 		return entry;
