@@ -796,6 +796,10 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 	float percent, frameTime;
 	const float* prevVertices;
 	const float* nextVertices;
+	float* frames;
+	int framesCount;
+	const float** frameVertices;
+	float* vertices;
 	spDeformTimeline* self = (spDeformTimeline*)timeline;
 
 	spSlot *slot = skeleton->slots[self->slotIndex];
@@ -803,17 +807,22 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 	if (slot->attachment != self->attachment) {
 		if (!slot->attachment) return;
 		switch (slot->attachment->type) {
-		case SP_ATTACHMENT_MESH: {
-			spMeshAttachment* mesh = SUB_CAST(spMeshAttachment, slot->attachment);
-			if (!mesh->inheritDeform || mesh->parentMesh != (void*)self->attachment) return;
-			break;
-		}
-		default:
-			return;
+			case SP_ATTACHMENT_MESH: {
+				spMeshAttachment* mesh = SUB_CAST(spMeshAttachment, slot->attachment);
+				if (!mesh->inheritDeform || mesh->parentMesh != (void*)self->attachment) return;
+				break;
+			}
+			default:
+				return;
 		}
 	}
 
-	if (time < self->frames[0]) return; /* Time is before first frame. */
+	frames = self->frames;
+	framesCount = self->framesCount;
+	if (time < frames[0]) { /* Time is before first frame. */
+		if (setupPose) slot->attachmentVerticesCount = 0;
+		return;
+	}
 
 	vertexCount = self->frameVerticesCount;
 	if (slot->attachmentVerticesCount < vertexCount) {
@@ -826,34 +835,70 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 	if (slot->attachmentVerticesCount != vertexCount) alpha = 1; /* Don't mix from uninitialized slot vertices. */
 	slot->attachmentVerticesCount = vertexCount;
 
-	if (time >= self->frames[self->framesCount - 1]) {
-		/* Time is after last frame. */
-		const float* lastVertices = self->frameVertices[self->framesCount - 1];
-		if (alpha < 1) {
-			for (i = 0; i < vertexCount; ++i)
-				slot->attachmentVertices[i] += (lastVertices[i] - slot->attachmentVertices[i]) * alpha;
-		} else
-			memcpy(slot->attachmentVertices, lastVertices, vertexCount * sizeof(float));
+	frameVertices = self->frameVertices;
+	vertices = slot->attachmentVertices;
+
+	if (time >= frames[framesCount - 1]) { /* Time is after last frame. */
+		const float* lastVertices = self->frameVertices[framesCount - 1];
+		if (alpha == 1) {
+			/* Vertex positions or deform offsets, no alpha. */
+			memcpy(vertices, lastVertices, vertexCount * sizeof(float));
+		} else if (setupPose) {
+			spVertexAttachment* vertexAttachment = SUB_CAST(spVertexAttachment, slot->attachment);
+			if (!vertexAttachment->bones) {
+				/* Unweighted vertex positions, with alpha. */
+				float* setupVertices = vertexAttachment->vertices;
+				for (i = 0; i < vertexCount; i++) {
+					float setup = setupVertices[i];
+					vertices[i] = setup + (lastVertices[i] - setup) * alpha;
+				}
+			} else {
+				/* Weighted deform offsets, with alpha. */
+				for (i = 0; i < vertexCount; i++)
+					vertices[i] = lastVertices[i] * alpha;
+			}
+		} else {
+			/* Vertex positions or deform offsets, with alpha. */
+			for (i = 0; i < vertexCount; i++)
+				vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
+		}
 		return;
 	}
 
 	/* Interpolate between the previous frame and the current frame. */
-	frame = binarySearch1(self->frames, self->framesCount, time);
-	frameTime = self->frames[frame];
-	percent = spCurveTimeline_getCurvePercent(SUPER(self), frame - 1, 1 - (time - frameTime) / (self->frames[frame - 1] - frameTime));
+	frame = binarySearch(frames, framesCount, time, 1);
+	prevVertices = frameVertices[frame - 1];
+	nextVertices = frameVertices[frame];
+	frameTime = frames[frame];
+	percent = spCurveTimeline_getCurvePercent(SUPER(self), frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime));
 
-	prevVertices = self->frameVertices[frame - 1];
-	nextVertices = self->frameVertices[frame];
-
-	if (alpha < 1) {
-		for (i = 0; i < vertexCount; ++i) {
+	if (alpha == 1) {
+		/* Vertex positions or deform offsets, no alpha. */
+		for (i = 0; i < vertexCount; i++) {
 			float prev = prevVertices[i];
-			slot->attachmentVertices[i] += (prev + (nextVertices[i] - prev) * percent - slot->attachmentVertices[i]) * alpha;
+			vertices[i] = prev + (nextVertices[i] - prev) * percent;
+		}
+	} else if (setupPose) {
+		spVertexAttachment* vertexAttachment = SUB_CAST(spVertexAttachment, slot->attachment);
+		if (!vertexAttachment->bones) {
+			/* Unweighted vertex positions, with alpha. */
+			float* setupVertices = vertexAttachment->vertices;
+			for (i = 0; i < vertexCount; i++) {
+				float prev = prevVertices[i], setup = setupVertices[i];
+				vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+			}
+		} else {
+			/* Weighted deform offsets, with alpha. */
+			for (i = 0; i < vertexCount; i++) {
+				float prev = prevVertices[i];
+				vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
+			}
 		}
 	} else {
-		for (i = 0; i < vertexCount; ++i) {
+		/* Vertex positions or deform offsets, with alpha. */
+		for (i = 0; i < vertexCount; i++) {
 			float prev = prevVertices[i];
-			slot->attachmentVertices[i] = prev + (nextVertices[i] - prev) * percent;
+			vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
 		}
 	}
 
