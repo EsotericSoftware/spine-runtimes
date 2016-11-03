@@ -174,6 +174,8 @@ typedef struct spBaseTimeline {
 
 /**/
 
+static const int ROTATE_PREV_TIME = -2, ROTATE_PREV_ROTATION = -1;
+static const int ROTATE_ROTATION = 1;
 static const int ROTATE_ENTRIES = 2;
 
 typedef struct spBaseTimeline spRotateTimeline;

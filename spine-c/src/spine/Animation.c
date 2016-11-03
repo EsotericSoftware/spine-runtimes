@@ -192,6 +192,10 @@ static int binarySearch (float *values, int valuesLength, float target, int step
 	return 0;
 }
 
+int _spCurveTimeline_binarySearch (float *values, int valuesLength, float target, int step) {
+	return binarySearch(values, valuesLength, target, step);
+}
+
 /* @param target After the first and before the last entry. */
 static int binarySearch1 (float *values, int valuesLength, float target) {
 	int low = 0, current;
@@ -233,9 +237,6 @@ struct spBaseTimeline* _spBaseTimeline_create (int framesCount, spTimelineType t
 }
 
 /**/
-
-static const int ROTATE_PREV_TIME = -2, ROTATE_PREV_ROTATION = -1;
-static const int ROTATE_ROTATION = 1;
 
 void _spRotateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventsCount, float alpha, int setupPose, int mixingOut) {

@@ -177,8 +177,10 @@ typedef union _spEventQueueItem {
 	spEvent* event;
 } _spEventQueueItem;
 
+typedef struct _spAnimationState _spAnimationState;
+
 typedef struct _spEventQueue {
-	spAnimationState* state;
+	_spAnimationState* state;
 	_spEventQueueItem* objects;
 	int objectsCount;
 	int objectsCapacity;
@@ -189,6 +191,7 @@ typedef struct _spEventQueue {
 		state(0),
 		objects(0),
 		objectsCount(0),
+		objectsCapacity(0),
 		drainDisabled(0) {
 	}
 #endif
@@ -198,6 +201,7 @@ typedef struct _spAnimationState {
 	spAnimationState super;
 
 	int eventsCount;
+	int eventsCapacity;
 	spEvent** events;
 
 	_spEventQueue* queue;
@@ -210,6 +214,7 @@ typedef struct _spAnimationState {
 	_spAnimationState() :
 		super(),
 		eventsCount(0),
+		eventsCapacity(0),
 		events(0),
 		queue(0),
 		propertyIDs(0),
@@ -275,10 +280,12 @@ void _spCurveTimeline_init (spCurveTimeline* self, spTimelineType type, int fram
 	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents, int* eventsCount, float alpha, int setupPose, int mixingOut),
 	int (*getPropertyId) (const spTimeline* self));
 void _spCurveTimeline_deinit (spCurveTimeline* self);
+int _spCurveTimeline_binarySearch (float *values, int valuesLength, float target, int step);
 
 #ifdef SPINE_SHORT_NAMES
 #define _CurveTimeline_init(...) _spCurveTimeline_init(__VA_ARGS__)
 #define _CurveTimeline_deinit(...) _spCurveTimeline_deinit(__VA_ARGS__)
+#define _CurveTimeline_binarySearch(...) _spCurveTimeline_binarySearch(__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

@@ -96,8 +96,8 @@ struct spAnimationState {
 #ifdef __cplusplus
 	spAnimationState() :
 		data(0),
-		tracks(0),
 		tracksCount(0),
+		tracks(0),
 		listener(0),
 		timeScale(0) {
 	}
@@ -132,6 +132,8 @@ spTrackEntry* spAnimationState_setEmptyAnimations(spAnimationState* self, float 
 spTrackEntry* spAnimationState_getCurrent (spAnimationState* self, int trackIndex);
 
 spTrackEntry* spAnimationState_clearListenerNotifications(spAnimationState* self);
+
+float spTrackEntry_getAnimationTime (spTrackEntry* entry);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spEventType EventType;
