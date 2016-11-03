@@ -239,20 +239,21 @@ namespace Spine {
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, bool setupPose, bool mixingOut) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
-
 			Bone bone = skeleton.bones.Items[boneIndex];
 
-			float r;
+			float[] frames = this.frames;
+			if (time < frames[0]) {
+				if (setupPose) bone.rotation = bone.data.rotation;
+				return;
+			}
 
 			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
 				if (setupPose) {
 					bone.rotation = bone.data.rotation + frames[frames.Length + PREV_ROTATION] * alpha;
 				} else {
-					r = bone.data.rotation + frames[frames.Length + PREV_ROTATION] - bone.rotation;
-					r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360; // Wrap within -180 and 180.
-					bone.rotation += r * alpha;
+					float rr = bone.data.rotation + frames[frames.Length + PREV_ROTATION] - bone.rotation;
+					rr -= (16384 - (int)(16384.499999999996 - rr / 360)) * 360; // Wrap within -180 and 180.
+					bone.rotation += rr * alpha;
 				}
 				return;
 			}
@@ -263,7 +264,7 @@ namespace Spine {
 			float frameTime = frames[frame];
 			float percent = GetCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-			r = frames[frame + ROTATION] - prevRotation;
+			float r = frames[frame + ROTATION] - prevRotation;
 			r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
 			r = prevRotation + r * percent;
 			if (setupPose) {
@@ -306,10 +307,16 @@ namespace Spine {
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, bool setupPose, bool mixingOut) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
-
 			Bone bone = skeleton.bones.Items[boneIndex];
+
+			float[] frames = this.frames;
+			if (time < frames[0]) {
+				if (setupPose) {
+					bone.x = bone.data.x;
+					bone.y = bone.data.y;
+				}
+				return;
+			}
 
 			float x, y;
 			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
@@ -347,10 +354,16 @@ namespace Spine {
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, bool setupPose, bool mixingOut) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
-
 			Bone bone = skeleton.bones.Items[boneIndex];
+
+			float[] frames = this.frames;
+			if (time < frames[0]) {
+				if (setupPose) {
+					bone.scaleX = bone.data.scaleX;
+					bone.scaleY = bone.data.scaleY;
+				}
+				return;
+			}
 
 			float x, y;
 			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
@@ -404,10 +417,16 @@ namespace Spine {
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, bool setupPose, bool mixingOut) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
-
 			Bone bone = skeleton.bones.Items[boneIndex];
+			float[] frames = this.frames;
+			if (time < frames[0]) {
+				if (setupPose) {
+					bone.shearX = bone.data.shearX;
+					bone.shearY = bone.data.shearY;
+				}
+				return;
+			}
+
 			float x, y;
 			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
 				x = frames[frames.Length + PREV_X];
@@ -465,8 +484,18 @@ namespace Spine {
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, bool setupPose, bool mixingOut) {
+			Slot slot = skeleton.slots.Items[slotIndex];
 			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
+			if (time < frames[0]) {
+				if (setupPose) {
+					var slotData = slot.data;
+					slot.r = slotData.r;
+					slot.g = slotData.g;
+					slot.b = slotData.b;
+					slot.a = slotData.a;
+				}
+				return;
+			}
 
 			float r, g, b, a;
 			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
@@ -491,7 +520,6 @@ namespace Spine {
 				b += (frames[frame + B] - b) * percent;
 				a += (frames[frame + A] - a) * percent;
 			}
-			Slot slot = skeleton.slots.Items[slotIndex];
 			if (alpha == 1) {
 				slot.r = r;
 				slot.g = g;
@@ -545,15 +573,21 @@ namespace Spine {
 
 		public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, bool setupPose, bool mixingOut) {
 			string attachmentName;
+			Slot slot = skeleton.slots.Items[slotIndex];
 			if (mixingOut && setupPose) {
-				Slot slot = skeleton.slots.Items[slotIndex];
 				attachmentName = slot.data.attachmentName;
 				slot.Attachment = attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
 				return;
 			}
 
 			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
+			if (time < frames[0]) {
+				if (setupPose) {
+					attachmentName = slot.data.attachmentName;
+					slot.Attachment = attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
+				}
+				return;
+			}
 
 			int frameIndex;
 			if (time >= frames[frames.Length - 1]) // Time is after last frame.
@@ -562,8 +596,7 @@ namespace Spine {
 				frameIndex = Animation.BinarySearch(frames, time, 1) - 1;
 
 			attachmentName = attachmentNames[frameIndex];
-			skeleton.slots.Items[slotIndex]
-				.Attachment = attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
+			slot.Attachment = attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
 		}
 	}
 
@@ -599,13 +632,16 @@ namespace Spine {
 			VertexAttachment slotAttachment = slot.attachment as VertexAttachment;
 			if (slotAttachment == null || !slotAttachment.ApplyDeform(attachment)) return;
 
+			var verticesArray = slot.attachmentVertices;
 			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
+			if (time < frames[0]) {
+				if (setupPose) verticesArray.Clear();
+				return;
+			}
 
 			float[][] frameVertices = this.frameVertices;
 			int vertexCount = frameVertices[0].Length;
 
-			var verticesArray = slot.attachmentVertices;
 			if (verticesArray.Count != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
 			// verticesArray.SetSize(vertexCount) // Ensure size and preemptively set count.
 			if (verticesArray.Capacity < vertexCount) verticesArray.Capacity = vertexCount;
@@ -755,22 +791,25 @@ namespace Spine {
 		}
 
 		public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, bool setupPose, bool mixingOut) {
+			ExposedList<Slot> drawOrder = skeleton.drawOrder;
+			ExposedList<Slot> slots = skeleton.slots;
 			if (mixingOut && setupPose) {
-				Array.Copy(skeleton.slots.Items, 0, skeleton.drawOrder.Items, 0, skeleton.slots.Count);
+				Array.Copy(slots.Items, 0, drawOrder.Items, 0, slots.Count);
 				return;
 			}
 
 			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
+			if (time < frames[0]) {
+				if (setupPose) Array.Copy(slots.Items, 0, drawOrder.Items, 0, slots.Count);
+				return;
+			}
 
 			int frame;
 			if (time >= frames[frames.Length - 1]) // Time is after last frame.
 				frame = frames.Length - 1;
 			else
 				frame = Animation.BinarySearch(frames, time) - 1;
-
-			ExposedList<Slot> drawOrder = skeleton.drawOrder;
-			ExposedList<Slot> slots = skeleton.slots;
+			
 			int[] drawOrderToSetupIndex = drawOrders[frame];
 			if (drawOrderToSetupIndex == null) {
 				drawOrder.Clear();
@@ -814,10 +853,15 @@ namespace Spine {
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, bool setupPose, bool mixingOut) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
-
 			IkConstraint constraint = skeleton.ikConstraints.Items[ikConstraintIndex];
+			float[] frames = this.frames;
+			if (time < frames[0]) {
+				if (setupPose) {
+					constraint.mix = constraint.data.mix;
+					constraint.bendDirection = constraint.data.bendDirection;
+				}
+				return;
+			}
 
 			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
 				if (setupPose) {
@@ -877,10 +921,18 @@ namespace Spine {
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, bool setupPose, bool mixingOut) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
-
 			TransformConstraint constraint = skeleton.transformConstraints.Items[transformConstraintIndex];
+			float[] frames = this.frames;
+			if (time < frames[0]) {
+				if (setupPose) {
+					var data = constraint.data;
+					constraint.rotateMix = data.rotateMix;
+					constraint.translateMix = data.translateMix;
+					constraint.scaleMix = data.scaleMix;
+					constraint.shearMix = data.shearMix;
+				}
+				return;
+			}
 
 			float rotate, translate, scale, shear;
 			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
@@ -948,10 +1000,12 @@ namespace Spine {
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, bool setupPose, bool mixingOut) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
-
 			PathConstraint constraint = skeleton.pathConstraints.Items[pathConstraintIndex];
+			float[] frames = this.frames;
+			if (time < frames[0]) {
+				if (setupPose) constraint.position = constraint.data.position;
+				return;
+			}
 
 			float position;
 			if (time >= frames[frames.Length - ENTRIES]) // Time is after last frame.
@@ -983,10 +1037,12 @@ namespace Spine {
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, bool setupPose, bool mixingOut) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
-
 			PathConstraint constraint = skeleton.pathConstraints.Items[pathConstraintIndex];
+			float[] frames = this.frames;
+			if (time < frames[0]) {
+				if (setupPose) constraint.spacing = constraint.data.spacing;
+				return;
+			}
 
 			float spacing;
 			if (time >= frames[frames.Length - ENTRIES]) // Time is after last frame.
@@ -1038,10 +1094,15 @@ namespace Spine {
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, bool setupPose, bool mixingOut) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
-
 			PathConstraint constraint = skeleton.pathConstraints.Items[pathConstraintIndex];
+			float[] frames = this.frames;
+			if (time < frames[0]) {
+				if (setupPose) {
+					constraint.rotateMix = constraint.data.rotateMix;
+					constraint.translateMix = constraint.data.translateMix;
+				}
+				return;
+			}
 
 			float rotate, translate;
 			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
