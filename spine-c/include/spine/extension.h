@@ -171,20 +171,40 @@ char* _readFile (const char* path, int* length);
 
 /**/
 
+typedef union _spEventQueueItem {
+	int type;
+	spTrackEntry* entry;
+	spEvent* event;
+} _spEventQueueItem;
+
+typedef struct _spEventQueue {
+	spAnimationState* state;
+	_spEventQueueItem* objects;
+	int objectsCount;
+	int objectsCapacity;
+	int /*boolean*/ drainDisabled;
+
+#ifdef __cplusplus
+	_spEventQueue() :
+		state(0),
+		objects(0),
+		objectsCount(0),
+		drainDisabled(0) {
+	}
+#endif
+} _spEventQueue;
+
 typedef struct _spAnimationState {
 	spAnimationState super;
 
 	int eventsCount;
 	spEvent** events;
 
-	spEventQueue* queue;
+	_spEventQueue* queue;
 
 	void* propertyIDs;
 
 	int /*boolean*/ animationsChanged;
-
-	spTrackEntry* (*createTrackEntry) (spAnimationState* self);
-	void (*disposeTrackEntry) (spTrackEntry* entry);
 
 #ifdef __cplusplus
 	_spAnimationState() :
@@ -193,15 +213,11 @@ typedef struct _spAnimationState {
 		events(0),
 		queue(0),
 		propertyIDs(0),
-		animationsChanged(0),
-		createTrackEntry(0),
-		disposeTrackEntry(0) {
+		animationsChanged(0) {
 	}
 #endif
 } _spAnimationState;
 
-spTrackEntry* _spTrackEntry_create (spAnimationState* self);
-void _spTrackEntry_dispose (spTrackEntry* self);
 
 /**/
 

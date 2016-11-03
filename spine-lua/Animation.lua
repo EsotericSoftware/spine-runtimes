@@ -522,7 +522,7 @@ function Animation.ColorTimeline.new (frameCount)
 		local slot = skeleton.slots[self.slotIndex]
 		if time < frames[0] then 
 			if setupPose then
-				slot.color.setFromt(slot.data.color)
+				slot.color:setFrom(slot.data.color)
 			end
 			return
 		end
