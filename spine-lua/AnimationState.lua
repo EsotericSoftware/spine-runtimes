@@ -487,7 +487,7 @@ function AnimationState:queueEvents (entry, animationTime)
   while i <= n do
     local event = events[i]
     if not (event.time < animationStart) then --// Discard events outside animation start/end.
-      queue.event(entry, event)
+      queue:event(entry, event)
     end
     i = i + 1
   end
