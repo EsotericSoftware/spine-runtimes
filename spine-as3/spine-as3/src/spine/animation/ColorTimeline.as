@@ -62,7 +62,17 @@ public class ColorTimeline extends CurveTimeline {
 
 	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
 		var frames:Vector.<Number> = this.frames;
-		if (time < frames[0]) return; // Time is before first frame.
+		var slot:Slot = skeleton.slots[slotIndex];
+		
+		if (time < frames[0]) {
+			if (setupPose) {
+				slot.r = slot.data.r;
+				slot.g = slot.data.g;
+				slot.b = slot.data.b;
+				slot.a = slot.data.a;	
+			}
+			return;
+		}
 
 		var r:Number, g:Number, b:Number, a:Number;
 		if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
@@ -86,8 +96,7 @@ public class ColorTimeline extends CurveTimeline {
 			g += (frames[frame + G] - g) * percent;
 			b += (frames[frame + B] - b) * percent;
 			a += (frames[frame + A] - a) * percent;
-		}
-		var slot:Slot = skeleton.slots[slotIndex];
+		}		
 		if (alpha == 1) {
 			slot.r = r;
 			slot.g = g;

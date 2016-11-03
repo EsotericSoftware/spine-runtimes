@@ -39,22 +39,25 @@ using namespace spine;
 #include <stdio.h>
 #include <stdlib.h>
 
-void callback (AnimationState* state, int trackIndex, EventType type, Event* event, int loopCount) {
-	TrackEntry* entry = AnimationState_getCurrent(state, trackIndex);
+void callback (AnimationState* state, EventType type, TrackEntry* entry, Event* event) {
 	const char* animationName = (entry && entry->animation) ? entry->animation->name : 0;
 
 	switch (type) {
 	case ANIMATION_START:
-		printf("%d start: %s\n", trackIndex, animationName);
+		printf("%d start: %s\n", entry->trackIndex, animationName);
 		break;
+	case ANIMATION_INTERRUPT:
+		printf("%d interrupt: %s\n", entry->trackIndex, animationName);
 	case ANIMATION_END:
-		printf("%d end: %s\n", trackIndex, animationName);
+		printf("%d end: %s\n", entry->trackIndex, animationName);
 		break;
 	case ANIMATION_COMPLETE:
-		printf("%d complete: %s, %d\n", trackIndex, animationName, loopCount);
+		printf("%d complete: %s\n", entry->trackIndex, animationName);
 		break;
+	case ANIMATION_DISPOSE:
+		printf("%d dispose: %s\n", entry->trackIndex, animationName);
 	case ANIMATION_EVENT:
-		printf("%d event: %s, %s: %d, %f, %s\n", trackIndex, animationName, event->data->name, event->intValue, event->floatValue,
+		printf("%d event: %s, %s: %d, %f, %s\n", entry->trackIndex, animationName, event->data->name, event->intValue, event->floatValue,
 				event->stringValue);
 		break;
 	}

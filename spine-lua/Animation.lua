@@ -243,9 +243,14 @@ function Animation.RotateTimeline.new (frameCount)
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut)
 		local frames = self.frames
-		if time < frames[0] then return end -- Time is before first frame.
 
 		local bone = skeleton.bones[self.boneIndex]
+		if time < frames[0] then
+			if setupPose then
+				bone.rotation = bone.data.rotation
+			end
+			return
+		end
 
 		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
 			if setupPose then
@@ -308,9 +313,15 @@ function Animation.TranslateTimeline.new (frameCount)
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut)
 		local frames = self.frames
-		if time < frames[0] then return end -- Time is before first frame.
 
 		local bone = skeleton.bones[self.boneIndex]
+		if time < frames[0] then 
+			if (setupPose) then
+				bone.x = bone.data.x
+				bone.y = bone.data.y
+			end
+			return
+		end
 
 		local x = 0
 		local y = 0
@@ -360,9 +371,15 @@ function Animation.ScaleTimeline.new (frameCount)
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut)
 		local frames = self.frames
-		if time < frames[0] then return end -- Time is before first frame.
 
 		local bone = skeleton.bones[self.boneIndex]
+		if time < frames[0] then
+			if setupPose then
+				bone.scaleX = bone.data.scaleX
+				bone.scaleY = bone.data.scaleY
+			end
+			return
+		end
 
 		local x = 0
 		local y = 0
@@ -429,9 +446,15 @@ function Animation.ShearTimeline.new (frameCount)
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut)
 		local frames = self.frames
-		if time < frames[0] then return end -- Time is before first frame.
 
 		local bone = skeleton.bones[self.boneIndex]
+		if time < frames[0] then
+			if setupPose then
+				bone.shearX = bone.data.shearX
+				bone.shearY = bone.data.shearY
+			end
+			return
+		end
 
 		local x = 0
 		local y = 0
@@ -496,7 +519,13 @@ function Animation.ColorTimeline.new (frameCount)
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut)
 		local frames = self.frames
-		if time < frames[0] then return end -- Time is before first frame.
+		local slot = skeleton.slots[self.slotIndex]
+		if time < frames[0] then 
+			if setupPose then
+				slot.color:setFrom(slot.data.color)
+			end
+			return
+		end
 
 		local r, g, b, a
 		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
@@ -521,7 +550,6 @@ function Animation.ColorTimeline.new (frameCount)
 			b = b + (frames[frame + B] - b) * percent
 			a = a + (frames[frame + A] - a) * percent
 		end
-		local slot = skeleton.slots[self.slotIndex]
 		if alpha == 1 then
 			slot.color:set(r, g, b, a)
 		else
@@ -557,10 +585,9 @@ function Animation.AttachmentTimeline.new (frameCount)
 	end
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut)
-		local slot
+		local slot = skeleton.slots[self.slotIndex]
 		local attachmentName
 		if mixingOut and setupPose then
-			slot = skeleton.slots[self.slotIndex]
 			attachmentName = slot.data.attachmentName
 			if not attachmentName then
 				slot:setAttachment(nil)
@@ -571,7 +598,17 @@ function Animation.AttachmentTimeline.new (frameCount)
 		end
 		
 		local frames = self.frames
-		if time < frames[0] then return end
+		if time < frames[0] then 
+			if setupPose then
+				attachmentName = slot.data.attachmentName
+				if not attachmentName then
+					slot:setAttachment(nil)
+				else
+					skeleton:setAttachment(skeleton:getAttachmentByIndex(self.slotIndex, attachmentName))
+				end
+			end
+			return
+		end
 
 		local frameIndex = 0
 		if time >= frames[zlen(frames) - 1] then
@@ -617,12 +654,18 @@ function Animation.DeformTimeline.new (frameCount)
 		if not slotAttachment:applyDeform(self.attachment) then return end
 
 		local frames = self.frames
-		if time < frames[0] then return end -- Time is before first frame.
+		local verticesArray = slot.attachmentVertices
+		if time < frames[0] then
+			if setupPose then
+				verticesArray = {}
+				slot.attachmentVertices = verticesArray
+			end
+			return
+		end
 
 		local frameVertices = self.frameVertices
 		local vertexCount = #(frameVertices[0])
 
-		local verticesArray = slot.attachmentVertices
 		if (#verticesArray ~= vertexCount) then alpha = 1 end -- Don't mix from uninitialized slot vertices.
 		local vertices = utils.setArraySize(verticesArray, vertexCount)
 
@@ -803,7 +846,14 @@ function Animation.DrawOrderTimeline.new (frameCount)
 			return;
 		end
 		local frames = self.frames
-		if time < frames[0] then return end -- Time is before first frame.
+		if time < frames[0] then 
+			if setupPose then
+				for i,slot in ipairs(slots) do
+					drawOrder[i] = slots[i]
+				end
+			end
+			return
+		end
 
 		local frame
 		if time >= frames[zlen(frames) - 1] then -- Time is after last frame.
@@ -855,9 +905,15 @@ function Animation.IkConstraintTimeline.new (frameCount)
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut)
 		local frames = self.frames
-		if time < frames[0] then return end -- Time is before first frame.
 
 		local constraint = skeleton.ikConstraints[self.ikConstraintIndex]
+		if time < frames[0] then
+			if setupPose then
+				constraint.mix = constraint.data.mix
+				constraint.bendDirection = constraint.data.bendDirection
+			end
+			return
+		end
 
 		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
 			if setupPose then
@@ -931,9 +987,18 @@ function Animation.TransformConstraintTimeline.new (frameCount)
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut)
 		local frames = self.frames
-		if time < frames[0] then return end -- Time is before first frame.
 
 		local constraint = skeleton.transformConstraints[self.transformConstraintIndex]
+		if time < frames[0] then
+			if setupPose then
+				local data = constraint.data
+				constraint.rotateMix = data.rotateMix
+				constraint.translateMix = data.translateMix
+				constraint.scaleMix = data.scaleMix
+				constraint.shearMix = data.shearMix
+			end
+			return
+		end
 
 		local rotate = 0
 		local translate = 0
@@ -1003,9 +1068,14 @@ function Animation.PathConstraintPositionTimeline.new (frameCount)
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut)
 		local frames = self.frames
-		if (time < frames[0]) then return end -- Time is before first frame.
 
 		local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
+		if (time < frames[0]) then
+			if setupPose then
+				constraint.position = constraint.data.position	
+			end
+			return
+		end
 
 		local position = 0
 		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
@@ -1055,9 +1125,14 @@ function Animation.PathConstraintSpacingTimeline.new (frameCount)
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut)
 		local frames = self.frames
-		if (time < frames[0]) then return end -- Time is before first frame.
 
 		local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
+		if (time < frames[0]) then
+			if setupPose then
+				constraint.spacing = constraint.data.spacing
+			end
+			return
+		end
 
 		local spacing = 0
 		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
@@ -1111,9 +1186,15 @@ function Animation.PathConstraintMixTimeline.new (frameCount)
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut)
 		local frames = self.frames
-		if (time < frames[0]) then return end -- Time is before first frame.
 
 		local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
+		if (time < frames[0]) then
+			if setupPose then
+				constraint.rotateMix = constraint.data.rotateMix
+				constraint.translateMix = constraint.data.translateMix
+			end
+			return
+		end
 
 		local rotate = 0
 		local translate = 0

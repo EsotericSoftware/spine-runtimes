@@ -206,9 +206,12 @@ module spine {
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean) {
 			let frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
 
 			let bone = skeleton.bones[this.boneIndex];
+			if (time < frames[0]) {
+				if (setupPose) bone.rotation = bone.data.rotation;
+				return;
+			}
 
 			if (time >= frames[frames.length - RotateTimeline.ENTRIES]) { // Time is after last frame.
 				if (setupPose)
@@ -269,9 +272,15 @@ module spine {
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean) {
 			let frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
 
 			let bone = skeleton.bones[this.boneIndex];
+			if (time < frames[0]) {
+				if (setupPose) {
+					bone.x = bone.data.x;
+					bone.y = bone.data.y;
+				}
+				return;
+			}
 
 			let x = 0, y = 0;
 			if (time >= frames[frames.length - TranslateTimeline.ENTRIES]) { // Time is after last frame.
@@ -310,9 +319,16 @@ module spine {
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean) {
 			let frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
 
 			let bone = skeleton.bones[this.boneIndex];
+			if (time < frames[0]) {
+				if (setupPose) {
+					bone.scaleX = bone.data.scaleX;
+					bone.scaleY = bone.data.scaleY;
+				}
+				return;
+			}
+
 			let x = 0, y = 0;
 			if (time >= frames[frames.length - ScaleTimeline.ENTRIES]) { // Time is after last frame.
 				x = frames[frames.length + ScaleTimeline.PREV_X] * bone.data.scaleX;
@@ -366,9 +382,15 @@ module spine {
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean) {
 			let frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
 
 			let bone = skeleton.bones[this.boneIndex];
+			if (time < frames[0]) {
+				if (setupPose) {
+					bone.shearX = bone.data.shearX;
+					bone.shearY = bone.data.shearY;
+				}
+				return;
+			}
 
 			let x = 0, y = 0;
 			if (time >= frames[frames.length - ShearTimeline.ENTRIES]) { // Time is after last frame.
@@ -424,8 +446,12 @@ module spine {
 		}
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean) {
+			let slot = skeleton.slots[this.slotIndex];
 			let frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
+			if (time < frames[0]) {
+				if (setupPose) slot.color.setFromColor(slot.data.color);
+				return;
+			}
 
 			let r = 0, g = 0, b = 0, a = 0;
 			if (time >= frames[frames.length - ColorTimeline.ENTRIES]) { // Time is after last frame.
@@ -450,7 +476,6 @@ module spine {
 				b += (frames[frame + ColorTimeline.B] - b) * percent;
 				a += (frames[frame + ColorTimeline.A] - a) * percent;
 			}
-			let slot = skeleton.slots[this.slotIndex];
 			if (alpha == 1)
 				slot.color.set(r, g, b, a);
 			else {
@@ -486,15 +511,21 @@ module spine {
 		}
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean) {
+			let slot = skeleton.slots[this.slotIndex];
 			if (mixingOut && setupPose) {
-				let slot = skeleton.slots[this.slotIndex];
 				let attachmentName = slot.data.attachmentName;
 				slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(this.slotIndex, attachmentName));
 				return;
 			}
 
 			let frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
+			if (time < frames[0]) {
+				if (setupPose) {
+					let attachmentName = slot.data.attachmentName;
+					slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(this.slotIndex, attachmentName));
+				}
+				return;
+			}
 
 			let frameIndex = 0;
 			if (time >= frames[frames.length - 1]) // Time is after last frame.
@@ -505,6 +536,109 @@ module spine {
 			let attachmentName = this.attachmentNames[frameIndex];
 			skeleton.slots[this.slotIndex]
 				.setAttachment(attachmentName == null ? null : skeleton.getAttachment(this.slotIndex, attachmentName));
+		}
+	}
+
+	export class DeformTimeline extends CurveTimeline {
+		slotIndex: number;
+		attachment: VertexAttachment;
+		frames: ArrayLike<number>; // time, ...
+		frameVertices: Array<ArrayLike<number>>;
+
+		constructor (frameCount: number) {
+			super(frameCount);
+			this.frames = Utils.newFloatArray(frameCount);
+			this.frameVertices = new Array<ArrayLike<number>>(frameCount);
+		}
+
+		getPropertyId () {
+			return (TimelineType.deform << 24) + this.slotIndex;
+		}
+
+		/** Sets the time of the specified keyframe. */
+		setFrame (frameIndex: number, time: number, vertices: ArrayLike<number>) {
+			this.frames[frameIndex] = time;
+			this.frameVertices[frameIndex] = vertices;
+		}
+
+		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean) {
+			let slot: Slot = skeleton.slots[this.slotIndex];
+			let slotAttachment: Attachment = slot.getAttachment();
+			if (!(slotAttachment instanceof VertexAttachment) || !(<VertexAttachment>slotAttachment).applyDeform(this.attachment)) return;
+
+			let frames = this.frames;
+			let verticesArray: Array<number> = slot.attachmentVertices;
+			if (time < frames[0]) {
+				if (setupPose) Utils.setArraySize(verticesArray, 0);
+				return;
+			}
+
+			let frameVertices = this.frameVertices;
+			let vertexCount = frameVertices[0].length;
+
+			if (verticesArray.length != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
+			let vertices: Array<number> = Utils.setArraySize(verticesArray, vertexCount);
+
+			if (time >= frames[frames.length - 1]) { // Time is after last frame.
+				let lastVertices = frameVertices[frames.length - 1];
+				if (alpha == 1) {
+					Utils.arrayCopy(lastVertices, 0, vertices, 0, vertexCount);
+				} else if (setupPose) {
+					let vertexAttachment = slotAttachment as VertexAttachment;
+					if (vertexAttachment.bones == null) {
+						// Unweighted vertex positions, with alpha.
+						let setupVertices = vertexAttachment.vertices;
+						for (let i = 0; i < vertexCount; i++) {
+							let setup = setupVertices[i];
+							vertices[i] = setup + (lastVertices[i] - setup) * alpha;
+						}
+					} else {
+						// Weighted deform offsets, with alpha.
+						for (let i = 0; i < vertexCount; i++)
+							vertices[i] = lastVertices[i] * alpha;
+					}
+				} else {
+					for (let i = 0; i < vertexCount; i++)
+						vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
+				}
+				return;
+			}
+
+			// Interpolate between the previous frame and the current frame.
+			let frame = Animation.binarySearch(frames, time);
+			let prevVertices = frameVertices[frame - 1];
+			let nextVertices = frameVertices[frame];
+			let frameTime = frames[frame];
+			let percent = this.getCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime));
+
+			if (alpha == 1) {
+				for (let i = 0; i < vertexCount; i++) {
+					let prev = prevVertices[i];
+					vertices[i] = prev + (nextVertices[i] - prev) * percent;
+				}
+			} else if (setupPose) {
+				let vertexAttachment = slotAttachment as VertexAttachment;
+				if (vertexAttachment.bones == null) {
+					// Unweighted vertex positions, with alpha.
+					let setupVertices = vertexAttachment.vertices;
+					for (let i = 0; i < vertexCount; i++) {
+						let prev = prevVertices[i], setup = setupVertices[i];
+						vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+					}
+				} else {
+					// Weighted deform offsets, with alpha.
+					for (let i = 0; i < vertexCount; i++) {
+						let prev = prevVertices[i];
+						vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
+					}
+				}
+			} else {
+				// Vertex positions or deform offsets, with alpha.
+				for (let i = 0; i < vertexCount; i++) {
+					let prev = prevVertices[i];
+					vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+				}
+			}
 		}
 	}
 
@@ -585,13 +719,18 @@ module spine {
 		}
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean) {
+			let drawOrder: Array<Slot> = skeleton.drawOrder;
+			let slots: Array<Slot> = skeleton.slots;
 			if (mixingOut && setupPose) {
 				Utils.arrayCopy(skeleton.slots, 0, skeleton.drawOrder, 0, skeleton.slots.length);
 				return;
 			}
 
 			let frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
+			if (time < frames[0]) {
+				if (setupPose) Utils.arrayCopy(skeleton.slots, 0, skeleton.drawOrder, 0, skeleton.slots.length);
+				return;
+			}
 
 			let frame = 0;
 			if (time >= frames[frames.length - 1]) // Time is after last frame.
@@ -599,114 +738,12 @@ module spine {
 			else
 				frame = Animation.binarySearch(frames, time) - 1;
 
-			let drawOrder: Array<Slot> = skeleton.drawOrder;
-			let slots: Array<Slot> = skeleton.slots;
 			let drawOrderToSetupIndex = this.drawOrders[frame];
 			if (drawOrderToSetupIndex == null)
 				Utils.arrayCopy(slots, 0, drawOrder, 0, slots.length);
 			else {
 				for (let i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
 					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
-			}
-		}
-	}
-
-	export class DeformTimeline extends CurveTimeline {
-		slotIndex: number;
-		attachment: VertexAttachment;
-		frames: ArrayLike<number>; // time, ...
-		frameVertices: Array<ArrayLike<number>>;
-
-		constructor (frameCount: number) {
-			super(frameCount);
-			this.frames = Utils.newFloatArray(frameCount);
-			this.frameVertices = new Array<ArrayLike<number>>(frameCount);
-		}
-
-		getPropertyId () {
-			return (TimelineType.deform << 24) + this.slotIndex;
-		}
-
-		/** Sets the time of the specified keyframe. */
-		setFrame (frameIndex: number, time: number, vertices: ArrayLike<number>) {
-			this.frames[frameIndex] = time;
-			this.frameVertices[frameIndex] = vertices;
-		}
-
-		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean) {
-			let slot: Slot = skeleton.slots[this.slotIndex];
-			let slotAttachment: Attachment = slot.getAttachment();
-			if (!(slotAttachment instanceof VertexAttachment) || !(<VertexAttachment>slotAttachment).applyDeform(this.attachment)) return;
-
-			let frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
-
-			let frameVertices = this.frameVertices;
-			let vertexCount = frameVertices[0].length;
-
-			let verticesArray: Array<number> = slot.attachmentVertices;
-			if (verticesArray.length != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
-			let vertices: Array<number> = Utils.setArraySize(verticesArray, vertexCount);
-
-			if (time >= frames[frames.length - 1]) { // Time is after last frame.
-				let lastVertices = frameVertices[frames.length - 1];
-				if (alpha == 1) {
-					Utils.arrayCopy(lastVertices, 0, vertices, 0, vertexCount);
-				} else if (setupPose) {
-					let vertexAttachment = slotAttachment as VertexAttachment;
-					if (vertexAttachment.bones == null) {
-						// Unweighted vertex positions, with alpha.
-						let setupVertices = vertexAttachment.vertices;
-						for (let i = 0; i < vertexCount; i++) {
-							let setup = setupVertices[i];
-							vertices[i] = setup + (lastVertices[i] - setup) * alpha;
-						}
-					} else {
-						// Weighted deform offsets, with alpha.
-						for (let i = 0; i < vertexCount; i++)
-							vertices[i] = lastVertices[i] * alpha;
-					}
-				} else {
-					for (let i = 0; i < vertexCount; i++)
-						vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
-				}
-				return;
-			}
-
-			// Interpolate between the previous frame and the current frame.
-			let frame = Animation.binarySearch(frames, time);
-			let prevVertices = frameVertices[frame - 1];
-			let nextVertices = frameVertices[frame];
-			let frameTime = frames[frame];
-			let percent = this.getCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime));
-
-			if (alpha == 1) {
-				for (let i = 0; i < vertexCount; i++) {
-					let prev = prevVertices[i];
-					vertices[i] = prev + (nextVertices[i] - prev) * percent;
-				}
-			} else if (setupPose) {
-				let vertexAttachment = slotAttachment as VertexAttachment;
-				if (vertexAttachment.bones == null) {
-					// Unweighted vertex positions, with alpha.
-					let setupVertices = vertexAttachment.vertices;
-					for (let i = 0; i < vertexCount; i++) {
-						let prev = prevVertices[i], setup = setupVertices[i];
-						vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
-					}
-				} else {
-					// Weighted deform offsets, with alpha.
-					for (let i = 0; i < vertexCount; i++) {
-						let prev = prevVertices[i];
-						vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
-					}
-				}
-			} else {
-				// Vertex positions or deform offsets, with alpha.
-				for (let i = 0; i < vertexCount; i++) {
-					let prev = prevVertices[i];
-					vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
-				}
 			}
 		}
 	}
@@ -738,9 +775,14 @@ module spine {
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean) {
 			let frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
-
 			let constraint: IkConstraint = skeleton.ikConstraints[this.ikConstraintIndex];
+			if (time < frames[0]) {
+				if (setupPose) {
+					constraint.mix = constraint.data.mix;
+					constraint.bendDirection = constraint.data.bendDirection;
+				}
+				return;
+			}
 
 			if (time >= frames[frames.length - IkConstraintTimeline.ENTRIES]) { // Time is after last frame.
 				if (setupPose) {
@@ -800,9 +842,18 @@ module spine {
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean) {
 			let frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
 
 			let constraint: TransformConstraint = skeleton.transformConstraints[this.transformConstraintIndex];
+			if (time < frames[0]) {
+				if (setupPose) {
+					let data = constraint.data;
+					constraint.rotateMix = data.rotateMix;
+					constraint.translateMix = data.rotateMix;
+					constraint.scaleMix = data.scaleMix;
+					constraint.shearMix = data.shearMix;
+				}
+				return;
+			}
 
 			let rotate = 0, translate = 0, scale = 0, shear = 0;
 			if (time >= frames[frames.length - TransformConstraintTimeline.ENTRIES]) { // Time is after last frame.
@@ -869,9 +920,11 @@ module spine {
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean) {
 			let frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
-
 			let constraint: PathConstraint = skeleton.pathConstraints[this.pathConstraintIndex];
+			if (time < frames[0]) {
+				if (setupPose) constraint.position = constraint.data.position;
+				return;
+			}
 
 			let position = 0;
 			if (time >= frames[frames.length - PathConstraintPositionTimeline.ENTRIES]) // Time is after last frame.
@@ -904,9 +957,11 @@ module spine {
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean) {
 			let frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
-
 			let constraint: PathConstraint = skeleton.pathConstraints[this.pathConstraintIndex];
+			if (time < frames[0]) {
+				if (setupPose) constraint.spacing = constraint.data.spacing;
+				return;
+			}
 
 			let spacing = 0;
 			if (time >= frames[frames.length - PathConstraintSpacingTimeline.ENTRIES]) // Time is after last frame.
@@ -957,9 +1012,15 @@ module spine {
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean) {
 			let frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
-
 			let constraint: PathConstraint = skeleton.pathConstraints[this.pathConstraintIndex];
+
+			if (time < frames[0]) {
+				if (setupPose) {
+					constraint.rotateMix = constraint.data.rotateMix;
+					constraint.translateMix = constraint.data.translateMix;
+				}
+				return;
+			}
 
 			let rotate = 0, translate = 0;
 			if (time >= frames[frames.length - PathConstraintMixTimeline.ENTRIES]) { // Time is after last frame.

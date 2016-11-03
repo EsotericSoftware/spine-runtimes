@@ -59,14 +59,20 @@ public class AttachmentTimeline implements Timeline {
 
 	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
 		var attachmentName:String;
-		if (mixingOut && setupPose) {
-			var slot:Slot = skeleton.slots[slotIndex];
+		var slot:Slot = skeleton.slots[slotIndex];
+		if (mixingOut && setupPose) {			
 			attachmentName = slot.data.attachmentName;
 			slot.attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName);
 			return;
 		}
 		var frames:Vector.<Number> = this.frames;
-		if (time < frames[0]) return; // Time is before first frame.
+		if (time < frames[0]) {
+			if (setupPose) {
+				attachmentName = slot.data.attachmentName;
+				slot.attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName);
+			}
+			return;
+		}
 
 		var frameIndex:int;
 		if (time >= frames[frames.length - 1]) // Time is after last frame.

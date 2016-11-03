@@ -59,10 +59,15 @@ public class PathConstraintMixTimeline extends CurveTimeline {
 		frames[frameIndex + TRANSLATE] = translateMix;
 	}
 
-	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
-		if (time < frames[0]) return; // Time is before first frame.
-
+	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {		
 		var constraint:PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
+		if (time < frames[0]) {
+			if (setupPose) {
+				constraint.rotateMix = constraint.data.rotateMix;
+				constraint.translateMix = constraint.data.translateMix;
+			}
+			return;
+		}
 
 		var rotate:Number, translate:Number;
 		if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
