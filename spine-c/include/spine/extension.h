@@ -173,7 +173,15 @@ char* _readFile (const char* path, int* length);
 
 typedef struct _spAnimationState {
 	spAnimationState super;
+
+	int eventsCount;
 	spEvent** events;
+
+	spEventQueue* queue;
+
+	void* propertyIDs;
+
+	int /*boolean*/ animationsChanged;
 
 	spTrackEntry* (*createTrackEntry) (spAnimationState* self);
 	void (*disposeTrackEntry) (spTrackEntry* entry);
@@ -181,7 +189,11 @@ typedef struct _spAnimationState {
 #ifdef __cplusplus
 	_spAnimationState() :
 		super(),
+		eventsCount(0),
 		events(0),
+		queue(0),
+		propertyIDs(0),
+		animationsChanged(0),
 		createTrackEntry(0),
 		disposeTrackEntry(0) {
 	}

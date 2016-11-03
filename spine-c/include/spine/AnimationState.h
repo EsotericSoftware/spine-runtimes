@@ -76,24 +76,30 @@ struct spTrackEntry {
 #endif
 };
 
+typedef struct spEventQueue spEventQueue;
+
 struct spAnimationState {
 	spAnimationStateData* const data;
-	float timeScale;
-	spAnimationStateListener listener;
 
 	int tracksCount;
 	spTrackEntry** tracks;
 
-	void* rendererObject;
+	spAnimationStateListener listener;
+
+	float timeScale;
 
 #ifdef __cplusplus
 	spAnimationState() :
 		data(0),
-		timeScale(0),
-		listener(0),
-		tracksCount(0),
 		tracks(0),
-		rendererObject(0) {
+		tracksCount(0),
+		events(0),
+		eventsCount(0),
+		listener(0),
+		queue(0),
+		propertyIDs(0),
+		animationsChanged(0),
+		timeScale(0) {
 	}
 #endif
 };
@@ -119,14 +125,21 @@ spTrackEntry* spAnimationState_addAnimationByName (spAnimationState* self, int t
 		int/*bool*/loop, float delay);
 spTrackEntry* spAnimationState_addAnimation (spAnimationState* self, int trackIndex, spAnimation* animation, int/*bool*/loop,
 		float delay);
+spTrackEntry* spAnimationState_setEmptyAnimation(spAnimationState* self, int trackIndex, float mixDuration);
+spTrackEntry* spAnimationState_addEmptyAnimation(spAnimationState* self, int trackIndex, float mixDuration, float delay);
+spTrackEntry* spAnimationState_setEmptyAnimations(spAnimationState* self, float mixDuration);
 
 spTrackEntry* spAnimationState_getCurrent (spAnimationState* self, int trackIndex);
+
+spTrackEntry* spAnimationState_clearListenerNotifications(spAnimationState* self);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spEventType EventType;
 #define ANIMATION_START SP_ANIMATION_START
+#define ANIMATION_INTERRUPT SP_ANIMATION_INTERRUPT
 #define ANIMATION_END SP_ANIMATION_END
 #define ANIMATION_COMPLETE SP_ANIMATION_COMPLETE
+#define ANIMATION_DISPOSE SP_ANIMATION_DISPOSE
 #define ANIMATION_EVENT SP_ANIMATION_EVENT
 typedef spAnimationStateListener AnimationStateListener;
 typedef spTrackEntry TrackEntry;
@@ -141,7 +154,11 @@ typedef spAnimationState AnimationState;
 #define AnimationState_setAnimation(...) spAnimationState_setAnimation(__VA_ARGS__)
 #define AnimationState_addAnimationByName(...) spAnimationState_addAnimationByName(__VA_ARGS__)
 #define AnimationState_addAnimation(...) spAnimationState_addAnimation(__VA_ARGS__)
+#define AnimationState_setEmptyAnimation(...) spAnimatinState_setEmptyAnimation(__VA_ARGS__)
+#define AnimationState_addEmptyAnimation(...) spAnimatinState_addEmptyAnimation(__VA_ARGS__)
+#define AnimationState_setEmptyAnimations(...) spAnimatinState_setEmptyAnimations(__VA_ARGS__)
 #define AnimationState_getCurrent(...) spAnimationState_getCurrent(__VA_ARGS__)
+#define AnimationState_clearListenerNotifications(...) spAnimatinState_clearListenerNotifications(__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

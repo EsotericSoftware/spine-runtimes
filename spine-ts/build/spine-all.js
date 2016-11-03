@@ -515,9 +515,12 @@ var spine;
 		};
 		RotateTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha, setupPose, mixingOut) {
 			var frames = this.frames;
-			if (time < frames[0])
-				return;
 			var bone = skeleton.bones[this.boneIndex];
+			if (time < frames[0]) {
+				if (setupPose)
+					bone.rotation = bone.data.rotation;
+				return;
+			}
 			if (time >= frames[frames.length - RotateTimeline.ENTRIES]) {
 				if (setupPose)
 					bone.rotation = bone.data.rotation + frames[frames.length + RotateTimeline.PREV_ROTATION] * alpha;
@@ -569,9 +572,14 @@ var spine;
 		};
 		TranslateTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha, setupPose, mixingOut) {
 			var frames = this.frames;
-			if (time < frames[0])
-				return;
 			var bone = skeleton.bones[this.boneIndex];
+			if (time < frames[0]) {
+				if (setupPose) {
+					bone.x = bone.data.x;
+					bone.y = bone.data.y;
+				}
+				return;
+			}
 			var x = 0, y = 0;
 			if (time >= frames[frames.length - TranslateTimeline.ENTRIES]) {
 				x = frames[frames.length + TranslateTimeline.PREV_X];
@@ -614,9 +622,14 @@ var spine;
 		};
 		ScaleTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha, setupPose, mixingOut) {
 			var frames = this.frames;
-			if (time < frames[0])
-				return;
 			var bone = skeleton.bones[this.boneIndex];
+			if (time < frames[0]) {
+				if (setupPose) {
+					bone.scaleX = bone.data.scaleX;
+					bone.scaleY = bone.data.scaleY;
+				}
+				return;
+			}
 			var x = 0, y = 0;
 			if (time >= frames[frames.length - ScaleTimeline.ENTRIES]) {
 				x = frames[frames.length + ScaleTimeline.PREV_X] * bone.data.scaleX;
@@ -670,9 +683,14 @@ var spine;
 		};
 		ShearTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha, setupPose, mixingOut) {
 			var frames = this.frames;
-			if (time < frames[0])
-				return;
 			var bone = skeleton.bones[this.boneIndex];
+			if (time < frames[0]) {
+				if (setupPose) {
+					bone.shearX = bone.data.shearX;
+					bone.shearY = bone.data.shearY;
+				}
+				return;
+			}
 			var x = 0, y = 0;
 			if (time >= frames[frames.length - ShearTimeline.ENTRIES]) {
 				x = frames[frames.length + ShearTimeline.PREV_X];
@@ -717,9 +735,13 @@ var spine;
 			this.frames[frameIndex + ColorTimeline.A] = a;
 		};
 		ColorTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha, setupPose, mixingOut) {
+			var slot = skeleton.slots[this.slotIndex];
 			var frames = this.frames;
-			if (time < frames[0])
+			if (time < frames[0]) {
+				if (setupPose)
+					slot.color.setFromColor(slot.data.color);
 				return;
+			}
 			var r = 0, g = 0, b = 0, a = 0;
 			if (time >= frames[frames.length - ColorTimeline.ENTRIES]) {
 				var i = frames.length;
@@ -741,7 +763,6 @@ var spine;
 				b += (frames[frame + ColorTimeline.B] - b) * percent;
 				a += (frames[frame + ColorTimeline.A] - a) * percent;
 			}
-			var slot = skeleton.slots[this.slotIndex];
 			if (alpha == 1)
 				slot.color.set(r, g, b, a);
 			else {
@@ -780,15 +801,20 @@ var spine;
 			this.attachmentNames[frameIndex] = attachmentName;
 		};
 		AttachmentTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha, setupPose, mixingOut) {
+			var slot = skeleton.slots[this.slotIndex];
 			if (mixingOut && setupPose) {
-				var slot = skeleton.slots[this.slotIndex];
 				var attachmentName_1 = slot.data.attachmentName;
 				slot.setAttachment(attachmentName_1 == null ? null : skeleton.getAttachment(this.slotIndex, attachmentName_1));
 				return;
 			}
 			var frames = this.frames;
-			if (time < frames[0])
+			if (time < frames[0]) {
+				if (setupPose) {
+					var attachmentName_2 = slot.data.attachmentName;
+					slot.setAttachment(attachmentName_2 == null ? null : skeleton.getAttachment(this.slotIndex, attachmentName_2));
+				}
 				return;
+			}
 			var frameIndex = 0;
 			if (time >= frames[frames.length - 1])
 				frameIndex = frames.length - 1;
@@ -801,93 +827,6 @@ var spine;
 		return AttachmentTimeline;
 	}());
 	spine.AttachmentTimeline = AttachmentTimeline;
-	var EventTimeline = (function () {
-		function EventTimeline(frameCount) {
-			this.frames = spine.Utils.newFloatArray(frameCount);
-			this.events = new Array(frameCount);
-		}
-		EventTimeline.prototype.getPropertyId = function () {
-			return TimelineType.event << 24;
-		};
-		EventTimeline.prototype.getFrameCount = function () {
-			return this.frames.length;
-		};
-		EventTimeline.prototype.setFrame = function (frameIndex, event) {
-			this.frames[frameIndex] = event.time;
-			this.events[frameIndex] = event;
-		};
-		EventTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut) {
-			if (firedEvents == null)
-				return;
-			var frames = this.frames;
-			var frameCount = this.frames.length;
-			if (lastTime > time) {
-				this.apply(skeleton, lastTime, Number.MAX_VALUE, firedEvents, alpha, setupPose, mixingOut);
-				lastTime = -1;
-			}
-			else if (lastTime >= frames[frameCount - 1])
-				return;
-			if (time < frames[0])
-				return;
-			var frame = 0;
-			if (lastTime < frames[0])
-				frame = 0;
-			else {
-				frame = Animation.binarySearch(frames, lastTime);
-				var frameTime = frames[frame];
-				while (frame > 0) {
-					if (frames[frame - 1] != frameTime)
-						break;
-					frame--;
-				}
-			}
-			for (; frame < frameCount && time >= frames[frame]; frame++)
-				firedEvents.push(this.events[frame]);
-		};
-		return EventTimeline;
-	}());
-	spine.EventTimeline = EventTimeline;
-	var DrawOrderTimeline = (function () {
-		function DrawOrderTimeline(frameCount) {
-			this.frames = spine.Utils.newFloatArray(frameCount);
-			this.drawOrders = new Array(frameCount);
-		}
-		DrawOrderTimeline.prototype.getPropertyId = function () {
-			return TimelineType.drawOrder << 24;
-		};
-		DrawOrderTimeline.prototype.getFrameCount = function () {
-			return this.frames.length;
-		};
-		DrawOrderTimeline.prototype.setFrame = function (frameIndex, time, drawOrder) {
-			this.frames[frameIndex] = time;
-			this.drawOrders[frameIndex] = drawOrder;
-		};
-		DrawOrderTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut) {
-			if (mixingOut && setupPose) {
-				spine.Utils.arrayCopy(skeleton.slots, 0, skeleton.drawOrder, 0, skeleton.slots.length);
-				return;
-			}
-			var frames = this.frames;
-			if (time < frames[0])
-				return;
-			var frame = 0;
-			if (time >= frames[frames.length - 1])
-				frame = frames.length - 1;
-			else
-				frame = Animation.binarySearch(frames, time) - 1;
-			var drawOrder = skeleton.drawOrder;
-			var slots = skeleton.slots;
-			var drawOrderToSetupIndex = this.drawOrders[frame];
-			if (drawOrderToSetupIndex == null)
-				spine.Utils.arrayCopy(slots, 0, drawOrder, 0, slots.length);
-			else {
-				for (var i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
-					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
-			}
-		};
-		return DrawOrderTimeline;
-	}());
-	spine.DrawOrderTimeline = DrawOrderTimeline;
 	var DeformTimeline = (function (_super) {
 		__extends(DeformTimeline, _super);
 		function DeformTimeline(frameCount) {
@@ -908,11 +847,14 @@ var spine;
 			if (!(slotAttachment instanceof spine.VertexAttachment) || !slotAttachment.applyDeform(this.attachment))
 				return;
 			var frames = this.frames;
-			if (time < frames[0])
+			var verticesArray = slot.attachmentVertices;
+			if (time < frames[0]) {
+				if (setupPose)
+					spine.Utils.setArraySize(verticesArray, 0);
 				return;
+			}
 			var frameVertices = this.frameVertices;
 			var vertexCount = frameVertices[0].length;
-			var verticesArray = slot.attachmentVertices;
 			if (verticesArray.length != vertexCount)
 				alpha = 1;
 			var vertices = spine.Utils.setArraySize(verticesArray, vertexCount);
@@ -978,6 +920,96 @@ var spine;
 		return DeformTimeline;
 	}(CurveTimeline));
 	spine.DeformTimeline = DeformTimeline;
+	var EventTimeline = (function () {
+		function EventTimeline(frameCount) {
+			this.frames = spine.Utils.newFloatArray(frameCount);
+			this.events = new Array(frameCount);
+		}
+		EventTimeline.prototype.getPropertyId = function () {
+			return TimelineType.event << 24;
+		};
+		EventTimeline.prototype.getFrameCount = function () {
+			return this.frames.length;
+		};
+		EventTimeline.prototype.setFrame = function (frameIndex, event) {
+			this.frames[frameIndex] = event.time;
+			this.events[frameIndex] = event;
+		};
+		EventTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut) {
+			if (firedEvents == null)
+				return;
+			var frames = this.frames;
+			var frameCount = this.frames.length;
+			if (lastTime > time) {
+				this.apply(skeleton, lastTime, Number.MAX_VALUE, firedEvents, alpha, setupPose, mixingOut);
+				lastTime = -1;
+			}
+			else if (lastTime >= frames[frameCount - 1])
+				return;
+			if (time < frames[0])
+				return;
+			var frame = 0;
+			if (lastTime < frames[0])
+				frame = 0;
+			else {
+				frame = Animation.binarySearch(frames, lastTime);
+				var frameTime = frames[frame];
+				while (frame > 0) {
+					if (frames[frame - 1] != frameTime)
+						break;
+					frame--;
+				}
+			}
+			for (; frame < frameCount && time >= frames[frame]; frame++)
+				firedEvents.push(this.events[frame]);
+		};
+		return EventTimeline;
+	}());
+	spine.EventTimeline = EventTimeline;
+	var DrawOrderTimeline = (function () {
+		function DrawOrderTimeline(frameCount) {
+			this.frames = spine.Utils.newFloatArray(frameCount);
+			this.drawOrders = new Array(frameCount);
+		}
+		DrawOrderTimeline.prototype.getPropertyId = function () {
+			return TimelineType.drawOrder << 24;
+		};
+		DrawOrderTimeline.prototype.getFrameCount = function () {
+			return this.frames.length;
+		};
+		DrawOrderTimeline.prototype.setFrame = function (frameIndex, time, drawOrder) {
+			this.frames[frameIndex] = time;
+			this.drawOrders[frameIndex] = drawOrder;
+		};
+		DrawOrderTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut) {
+			var drawOrder = skeleton.drawOrder;
+			var slots = skeleton.slots;
+			if (mixingOut && setupPose) {
+				spine.Utils.arrayCopy(skeleton.slots, 0, skeleton.drawOrder, 0, skeleton.slots.length);
+				return;
+			}
+			var frames = this.frames;
+			if (time < frames[0]) {
+				if (setupPose)
+					spine.Utils.arrayCopy(skeleton.slots, 0, skeleton.drawOrder, 0, skeleton.slots.length);
+				return;
+			}
+			var frame = 0;
+			if (time >= frames[frames.length - 1])
+				frame = frames.length - 1;
+			else
+				frame = Animation.binarySearch(frames, time) - 1;
+			var drawOrderToSetupIndex = this.drawOrders[frame];
+			if (drawOrderToSetupIndex == null)
+				spine.Utils.arrayCopy(slots, 0, drawOrder, 0, slots.length);
+			else {
+				for (var i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
+					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
+			}
+		};
+		return DrawOrderTimeline;
+	}());
+	spine.DrawOrderTimeline = DrawOrderTimeline;
 	var IkConstraintTimeline = (function (_super) {
 		__extends(IkConstraintTimeline, _super);
 		function IkConstraintTimeline(frameCount) {
@@ -995,9 +1027,14 @@ var spine;
 		};
 		IkConstraintTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut) {
 			var frames = this.frames;
-			if (time < frames[0])
-				return;
 			var constraint = skeleton.ikConstraints[this.ikConstraintIndex];
+			if (time < frames[0]) {
+				if (setupPose) {
+					constraint.mix = constraint.data.mix;
+					constraint.bendDirection = constraint.data.bendDirection;
+				}
+				return;
+			}
 			if (time >= frames[frames.length - IkConstraintTimeline.ENTRIES]) {
 				if (setupPose) {
 					constraint.mix = constraint.data.mix + (frames[frames.length + IkConstraintTimeline.PREV_MIX] - constraint.data.mix) * alpha;
@@ -1053,9 +1090,17 @@ var spine;
 		};
 		TransformConstraintTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut) {
 			var frames = this.frames;
-			if (time < frames[0])
-				return;
 			var constraint = skeleton.transformConstraints[this.transformConstraintIndex];
+			if (time < frames[0]) {
+				if (setupPose) {
+					var data = constraint.data;
+					constraint.rotateMix = data.rotateMix;
+					constraint.translateMix = data.rotateMix;
+					constraint.scaleMix = data.scaleMix;
+					constraint.shearMix = data.shearMix;
+				}
+				return;
+			}
 			var rotate = 0, translate = 0, scale = 0, shear = 0;
 			if (time >= frames[frames.length - TransformConstraintTimeline.ENTRIES]) {
 				var i = frames.length;
@@ -1120,9 +1165,12 @@ var spine;
 		};
 		PathConstraintPositionTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut) {
 			var frames = this.frames;
-			if (time < frames[0])
-				return;
 			var constraint = skeleton.pathConstraints[this.pathConstraintIndex];
+			if (time < frames[0]) {
+				if (setupPose)
+					constraint.position = constraint.data.position;
+				return;
+			}
 			var position = 0;
 			if (time >= frames[frames.length - PathConstraintPositionTimeline.ENTRIES])
 				position = frames[frames.length + PathConstraintPositionTimeline.PREV_VALUE];
@@ -1155,9 +1203,12 @@ var spine;
 		};
 		PathConstraintSpacingTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut) {
 			var frames = this.frames;
-			if (time < frames[0])
-				return;
 			var constraint = skeleton.pathConstraints[this.pathConstraintIndex];
+			if (time < frames[0]) {
+				if (setupPose)
+					constraint.spacing = constraint.data.spacing;
+				return;
+			}
 			var spacing = 0;
 			if (time >= frames[frames.length - PathConstraintSpacingTimeline.ENTRIES])
 				spacing = frames[frames.length + PathConstraintSpacingTimeline.PREV_VALUE];
@@ -1193,9 +1244,14 @@ var spine;
 		};
 		PathConstraintMixTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut) {
 			var frames = this.frames;
-			if (time < frames[0])
-				return;
 			var constraint = skeleton.pathConstraints[this.pathConstraintIndex];
+			if (time < frames[0]) {
+				if (setupPose) {
+					constraint.rotateMix = constraint.data.rotateMix;
+					constraint.translateMix = constraint.data.translateMix;
+				}
+				return;
+			}
 			var rotate = 0, translate = 0;
 			if (time >= frames[frames.length - PathConstraintMixTimeline.ENTRIES]) {
 				rotate = frames[frames.length + PathConstraintMixTimeline.PREV_ROTATE];

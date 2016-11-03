@@ -108,6 +108,16 @@ declare module spine {
 		setFrame(frameIndex: number, time: number, attachmentName: string): void;
 		apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 	}
+	class DeformTimeline extends CurveTimeline {
+		slotIndex: number;
+		attachment: VertexAttachment;
+		frames: ArrayLike<number>;
+		frameVertices: Array<ArrayLike<number>>;
+		constructor(frameCount: number);
+		getPropertyId(): number;
+		setFrame(frameIndex: number, time: number, vertices: ArrayLike<number>): void;
+		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
+	}
 	class EventTimeline implements Timeline {
 		frames: ArrayLike<number>;
 		events: Array<Event>;
@@ -124,16 +134,6 @@ declare module spine {
 		getPropertyId(): number;
 		getFrameCount(): number;
 		setFrame(frameIndex: number, time: number, drawOrder: Array<number>): void;
-		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
-	}
-	class DeformTimeline extends CurveTimeline {
-		slotIndex: number;
-		attachment: VertexAttachment;
-		frames: ArrayLike<number>;
-		frameVertices: Array<ArrayLike<number>>;
-		constructor(frameCount: number);
-		getPropertyId(): number;
-		setFrame(frameIndex: number, time: number, vertices: ArrayLike<number>): void;
 		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 	}
 	class IkConstraintTimeline extends CurveTimeline {
