@@ -62,10 +62,20 @@ public class TransformConstraintTimeline extends CurveTimeline {
 	}
 
 	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
-		var frames:Vector.<Number> = this.frames;
-		if (time < frames[0]) return; // Time is before first frame.
+		var frames:Vector.<Number> = this.frames;		
 
 		var constraint:TransformConstraint  = skeleton.transformConstraints[transformConstraintIndex];
+		var data:TransformConstraintData;
+		if (time < frames[0]) {
+			if (setupPose) {
+				data = constraint.data;
+				constraint.rotateMix = constraint.data.rotateMix;
+				constraint.translateMix = constraint.data.translateMix;
+				constraint.scaleMix = constraint.data.scaleMix;
+				constraint.shearMix = constraint.data.shearMix;
+			}
+			return;
+		}
 
 		var rotate:Number, translate:Number, scale:Number, shear:Number;
 		if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
@@ -91,7 +101,7 @@ public class TransformConstraintTimeline extends CurveTimeline {
 			shear += (frames[frame + SHEAR] - shear) * percent;
 		}
 		if (setupPose) {
-			var data:TransformConstraintData = constraint.data;
+			data = constraint.data;
 			constraint.rotateMix = data.rotateMix + (rotate - data.rotateMix) * alpha;
 			constraint.translateMix = data.translateMix + (translate - data.translateMix) * alpha;
 			constraint.scaleMix = data.scaleMix + (scale - data.scaleMix) * alpha;

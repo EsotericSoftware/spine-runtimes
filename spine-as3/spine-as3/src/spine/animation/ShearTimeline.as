@@ -43,10 +43,16 @@ public class ShearTimeline extends TranslateTimeline {
 	}
 
 	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
-		var frames:Vector.<Number> = this.frames;
-		if (time < frames[0]) return; // Time is before first frame.
-
+		var frames:Vector.<Number> = this.frames;		
 		var bone:Bone = skeleton.bones[boneIndex];
+		
+		if (time < frames[0]) {
+			if (setupPose) {
+				bone.shearX = bone.data.shearX;
+				bone.shearY = bone.data.shearY;
+			}
+			return;
+		}
 
 		var x:Number, y:Number;
 		if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.

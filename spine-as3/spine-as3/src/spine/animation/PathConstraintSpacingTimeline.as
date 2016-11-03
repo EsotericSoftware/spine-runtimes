@@ -43,9 +43,11 @@ public class PathConstraintSpacingTimeline extends PathConstraintPositionTimelin
 	}
 
 	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
-		if (time < frames[0]) return; // Time is before first frame.
-
 		var constraint:PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
+		if (time < frames[0]) {
+			if (setupPose) constraint.spacing = constraint.data.spacing;
+			return;
+		}
 
 		var spacing:Number;
 		if (time >= frames[frames.length - ENTRIES]) // Time is after last frame.

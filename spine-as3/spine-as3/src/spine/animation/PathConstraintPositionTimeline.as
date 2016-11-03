@@ -58,10 +58,12 @@ public class PathConstraintPositionTimeline extends CurveTimeline {
 		frames[frameIndex + VALUE] = value;
 	}
 
-	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
-		if (time < frames[0]) return; // Time is before first frame.
-
+	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {		
 		var constraint:PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
+		if (time < frames[0]) {
+			if (setupPose) constraint.position = constraint.data.position;
+			return;
+		}
 
 		var position:Number;
 		if (time >= frames[frames.length - ENTRIES]) // Time is after last frame.

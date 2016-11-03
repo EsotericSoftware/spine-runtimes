@@ -49,6 +49,9 @@ public class TrackEntry implements Poolable {
 	public var timelinesFirst:Vector.<Boolean> = new Vector.<Boolean>();
 	public var timelinesRotation:Vector.<Number> = new Vector.<Number>();
 	
+	public function TrackEntry () {		
+	}
+	
 	public function getAnimationTime():Number {
 		if (loop) {
 			var duration:Number = animationEnd - animationStart;

@@ -59,9 +59,14 @@ public class IkConstraintTimeline extends CurveTimeline {
 	}
 
 	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
-		if (time < frames[0]) return; // Time is before first frame.
-
 		var constraint:IkConstraint = skeleton.ikConstraints[ikConstraintIndex];
+		if (time < frames[0]) {
+			if (setupPose) {
+				constraint.mix = constraint.data.mix;
+				constraint.bendDirection = constraint.data.bendDirection;
+			}
+			return;
+		}
 
 		if (time >= frames[int(frames.length - ENTRIES)]) { // Time is after last frame.
 			if (setupPose) {

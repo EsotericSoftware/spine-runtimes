@@ -58,11 +58,14 @@ public class RotateTimeline extends CurveTimeline {
 	}
                     
 	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {			
-		var frames:Vector.<Number> = this.frames;
-		if (time < frames[0]) return; // Time is before first frame.
+		var frames:Vector.<Number> = this.frames;		
 
 		var bone:Bone = skeleton.bones[boneIndex];
 		var r:Number;
+		if (time < frames[0]) {
+			if (setupPose) bone.rotation = bone.data.rotation;
+			return;
+		}
 
 		if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
 			if (setupPose)

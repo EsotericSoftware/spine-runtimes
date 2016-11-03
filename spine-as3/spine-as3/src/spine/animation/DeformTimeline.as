@@ -63,12 +63,15 @@ public class DeformTimeline extends CurveTimeline {
 		if (!(slotAttachment is VertexAttachment) || !(VertexAttachment(slotAttachment)).applyDeform(attachment)) return;
 
 		var frames:Vector.<Number> = this.frames;
-		if (time < frames[0]) return; // Time is before first frame.
+		var verticesArray:Vector.<Number> = slot.attachmentVertices;
+		if (time < frames[0]) {
+			if (setupPose) verticesArray.length = 0;
+			return;
+		}
 
 		var frameVertices:Vector.<Vector.<Number>> = this.frameVertices;
 		var vertexCount:int = frameVertices[0].length;
-
-		var verticesArray:Vector.<Number> = slot.attachmentVertices;
+		
 		if (verticesArray.length != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
 		verticesArray.length = vertexCount;
 		var vertices:Vector.<Number> = verticesArray;
