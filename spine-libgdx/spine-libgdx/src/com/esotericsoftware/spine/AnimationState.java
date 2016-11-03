@@ -248,10 +248,12 @@ public class AnimationState {
 		}
 
 		RotateTimeline rotateTimeline = (RotateTimeline)timeline;
-		float[] frames = rotateTimeline.frames;
-		if (time < frames[0]) return; // Time is before first frame.
-
 		Bone bone = skeleton.bones.get(rotateTimeline.boneIndex);
+		float[] frames = rotateTimeline.frames;
+		if (time < frames[0]) { // Time is before first frame.
+			if (setupPose) bone.rotation = bone.data.rotation;
+			return;
+		}
 
 		float r2;
 		if (time >= frames[frames.length - ENTRIES]) // Time is after last frame.
