@@ -34,10 +34,12 @@
 
 @class SkeletonAnimation;
 
-typedef void(^spStartListener)(int trackIndex);
-typedef void(^spEndListener)(int trackIndex);
-typedef void(^spCompleteListener)(int trackIndex, int loopCount);
-typedef void(^spEventListener)(int trackIndex, spEvent* event);
+typedef void(^spStartListener)(spTrackEntry* entry);
+typedef void(^spInterruptListener)(spTrackEntry* entry);
+typedef void(^spEndListener)(spTrackEntry* entry);
+typedef void(^spDisposeListener)(spTrackEntry* entry);
+typedef void(^spCompleteListener)(spTrackEntry* entry);
+typedef void(^spEventListener)(spTrackEntry* entry, spEvent* event);
 
 /** Draws an animated skeleton, providing an AnimationState for applying one or more animations and queuing animations to be
  * played later. */
@@ -47,7 +49,9 @@ typedef void(^spEventListener)(int trackIndex, spEvent* event);
 	float _timeScale;
 
 	spStartListener _startListener;
+    spInterruptListener _interruptListener;
 	spEndListener _endListener;
+    spDisposeListener _disposeListener;
 	spCompleteListener _completeListener;
 	spEventListener _eventListener;
 }
@@ -70,17 +74,21 @@ typedef void(^spEventListener)(int trackIndex, spEvent* event);
 - (void) clearTrack:(int)trackIndex;
 
 - (void) setListenerForEntry:(spTrackEntry*)entry onStart:(spStartListener)listener;
+- (void) setListenerForEntry:(spTrackEntry*)entry onInterrupt:(spInterruptListener)listener;
 - (void) setListenerForEntry:(spTrackEntry*)entry onEnd:(spEndListener)listener;
+- (void) setListenerForEntry:(spTrackEntry*)entry onDispose:(spDisposeListener)listener;
 - (void) setListenerForEntry:(spTrackEntry*)entry onComplete:(spCompleteListener)listener;
 - (void) setListenerForEntry:(spTrackEntry*)entry onEvent:(spEventListener)listener;
 
-- (void) onAnimationStateEvent:(int)trackIndex type:(spEventType)type event:(spEvent*)event loopCount:(int)loopCount;
-- (void) onTrackEntryEvent:(int)trackIndex type:(spEventType)type event:(spEvent*)event loopCount:(int)loopCount;
+- (void) onAnimationStateEvent:(spTrackEntry*)entry type:(spEventType)type event:(spEvent*)event;
+- (void) onTrackEntryEvent:(spTrackEntry*)entry type:(spEventType)type event:(spEvent*)event;
 
 @property (nonatomic, readonly) spAnimationState* state;
 @property (nonatomic) float timeScale;
 @property (nonatomic, copy) spStartListener startListener;
+@property (nonatomic, copy) spInterruptListener interruptListener;
 @property (nonatomic, copy) spEndListener endListener;
+@property (nonatomic, copy) spDisposeListener disposeListener;
 @property (nonatomic, copy) spCompleteListener completeListener;
 @property (nonatomic, copy) spEventListener eventListener;
 

@@ -48,26 +48,31 @@
 	[skeletonNode setMixFrom:@"jump" to:@"run" duration:0.2f];
 
     __weak SkeletonAnimation* node = skeletonNode;
-	skeletonNode.startListener = ^(int trackIndex) {
-		spTrackEntry* entry = spAnimationState_getCurrent(node.state, trackIndex);
-		const char* animationName = (entry && entry->animation) ? entry->animation->name : 0;
-		NSLog(@"%d start: %s", trackIndex, animationName);
+	skeletonNode.startListener = ^(spTrackEntry* entry) {
+		const char* animationName = entry->animation->name;
+		NSLog(@"%d start: %s", entry->trackIndex, animationName);
 	};
-	skeletonNode.endListener = ^(int trackIndex) {
-		NSLog(@"%d end", trackIndex);
+    skeletonNode.interruptListener = ^(spTrackEntry* entry) {
+        NSLog(@"%d interrupt", entry->trackIndex);
+    };
+	skeletonNode.endListener = ^(spTrackEntry* entry) {
+		NSLog(@"%d end", entry->trackIndex);
 	};
-	skeletonNode.completeListener = ^(int trackIndex, int loopCount) {
-		NSLog(@"%d complete: %d", trackIndex, loopCount);
+    skeletonNode.disposeListener = ^(spTrackEntry* entry) {
+        NSLog(@"%d dispose", entry->trackIndex);
+    };
+	skeletonNode.completeListener = ^(spTrackEntry* entry) {
+		NSLog(@"%d complete", entry->trackIndex);
 	};
-	skeletonNode.eventListener = ^(int trackIndex, spEvent* event) {
-		NSLog(@"%d event: %s, %d, %f, %s", trackIndex, event->data->name, event->intValue, event->floatValue, event->stringValue);
+	skeletonNode.eventListener = ^(spTrackEntry* entry, spEvent* event) {
+		NSLog(@"%d event: %s, %d, %f, %s", entry->trackIndex, event->data->name, event->intValue, event->floatValue, event->stringValue);
 	};
 
 	[skeletonNode setAnimationForTrack:0 name:@"walk" loop:YES];
 	spTrackEntry* jumpEntry = [skeletonNode addAnimationForTrack:0 name:@"jump" loop:NO afterDelay:3];
 	[skeletonNode addAnimationForTrack:0 name:@"run" loop:YES afterDelay:0];
 
-	[skeletonNode setListenerForEntry:jumpEntry onStart:^(int trackIndex) {
+	[skeletonNode setListenerForEntry:jumpEntry onStart:^(spTrackEntry* entry) {
 		CCLOG(@"jumped!");
 	}];
 
