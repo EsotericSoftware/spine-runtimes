@@ -197,7 +197,7 @@ typedef struct _spEventQueue {
 #endif
 } _spEventQueue;
 
-typedef struct _spAnimationState {
+struct _spAnimationState {
 	spAnimationState super;
 
 	int eventsCount;
@@ -215,14 +215,15 @@ typedef struct _spAnimationState {
 	_spAnimationState() :
 		super(),
 		eventsCount(0),
-		eventsCapacity(0),
 		events(0),
 		queue(0),
 		propertyIDs(0),
+		propertyIDsCount(0),
+		propertyIDsCapacity(0),
 		animationsChanged(0) {
 	}
 #endif
-} _spAnimationState;
+};
 
 
 /**/

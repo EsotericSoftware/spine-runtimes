@@ -127,11 +127,11 @@ spTrackEntry* spAnimationState_addAnimation (spAnimationState* self, int trackIn
 		float delay);
 spTrackEntry* spAnimationState_setEmptyAnimation(spAnimationState* self, int trackIndex, float mixDuration);
 spTrackEntry* spAnimationState_addEmptyAnimation(spAnimationState* self, int trackIndex, float mixDuration, float delay);
-spTrackEntry* spAnimationState_setEmptyAnimations(spAnimationState* self, float mixDuration);
+void spAnimationState_setEmptyAnimations(spAnimationState* self, float mixDuration);
 
 spTrackEntry* spAnimationState_getCurrent (spAnimationState* self, int trackIndex);
 
-spTrackEntry* spAnimationState_clearListenerNotifications(spAnimationState* self);
+void spAnimationState_clearListenerNotifications(spAnimationState* self);
 
 float spTrackEntry_getAnimationTime (spTrackEntry* entry);
 

@@ -246,12 +246,11 @@ void _spRotateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 
 	spRotateTimeline* self = SUB_CAST(spRotateTimeline, timeline);
 
+	bone = skeleton->bones[self->boneIndex];
 	if (time < self->frames[0]) {
 		if (setupPose) bone->rotation = bone->data->rotation;
 		return;
 	}
-
-	bone = skeleton->bones[self->boneIndex];
 
 	if (time >= self->frames[self->framesCount - ROTATE_ENTRIES]) { /* Time is after last frame. */
 		if (setupPose)
