@@ -30,7 +30,7 @@
 
 #include <spine/AnimationState.h>
 #include <spine/extension.h>
-#include <string.h>
+#include <limits.h>
 
 static spAnimation* SP_EMPTY_ANIMATION = 0;
 
@@ -177,9 +177,11 @@ spAnimationState* spAnimationState_create (spAnimationStateData* data) {
 	self->timeScale = 1;
 
 	internal->queue = _spEventQueue_create(self);
-	internal->events = CALLOC(spEvent*, 64);
-	internal->eventsCapacity = 64;
-	// FIXME propertyIDs
+	internal->events = CALLOC(spEvent*, 128);
+
+	internal->propertyIDs = CALLOC(int, 128);
+	internal->propertyIDsCapacity = 128;
+
 	return self;
 }
 
@@ -302,7 +304,7 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 				spTimeline_apply(timelines[ii], skeleton, animationLast, animationTime, internal->events, internal->eventsCount, 1, 1, 0);
 		} else {
 			firstFrame = current->timelinesRotationCount == 0;
-			if (firstFrame) current->timelinesRotation.setSize(timelineCount << 1);
+			if (firstFrame) _spAnimationState_resizeTimelinesRotation(current, timelineCount << 1);
 			timelinesRotation = current->timelinesRotation;
 
 			timelinesFirst = current->timelinesFirst;
@@ -361,7 +363,7 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* e
 	alpha = from->alpha * entry->mixAlpha * (1 - mix);
 
 	firstFrame = from->timelinesRotationCount == 0;
-	if (firstFrame) from->timelinesRotation.setSize(timelineCount << 1);
+	if (firstFrame) _spAnimationState_resizeTimelinesRotation(from, timelineCount << 1);
 	timelinesRotation = from->timelinesRotation;
 
 	for (int i = 0; i < timelineCount; i++) {
@@ -574,7 +576,7 @@ spTrackEntry* spAnimationState_setAnimation (spAnimationState* self, int trackIn
 		} else
 			_spAnimationState_disposeNext(self, current);
 	}
-	entry = _spAnimationstate_trackEntry(self, trackIndex, animation, loop, current);
+	entry = _spAnimationState_trackEntry(self, trackIndex, animation, loop, current);
 	_spAnimationState_setCurrent(self, trackIndex, entry);
 	_spEventQueue_drain(internal->queue);
 	return entry;
@@ -677,7 +679,7 @@ spTrackEntry* _spAnimationState_trackEntry (spAnimationState* self, int trackInd
 	entry->trackTime = 0;
 	entry->trackLast = -1;
 	entry->nextTrackLast = -1;
-	entry->trackEnd = loop ? Integer.MAX_VALUE : entry->animationEnd;
+	entry->trackEnd = loop ? (float)INT_MAX : entry->animationEnd;
 	entry->timeScale = 1;
 
 	entry->alpha = 1;
@@ -697,6 +699,109 @@ void _spAnimationState_disposeNext (spAnimationState* self, spTrackEntry* entry)
 	entry->next = 0;
 }
 
+void _spAnimationState_animationsChanged (spAnimationState* self) {
+	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
+	int i, n;
+	spTrackEntry* entry;
+	internal->animationsChanged = 0;
+
+	i = 0; n = self->tracksCount;
+	internal->propertyIDsCount = 0;
+
+	for (; i < n; i++) {
+		entry = self->tracks[i];
+		if (!entry) continue;
+		_spAnimationState_setTimelinesFirst(self, entry);
+		i++;
+		break;
+	}
+	for (; i < n; i++) {
+		entry = self->tracks[i];
+		if (entry) _spAnimationState_checkTimelinesFirst(self, entry);
+	}
+}
+
+float* _spAnimationState_resizeTimelinesRotation(spTrackEntry* entry, int newSize) {
+	if (entry->timelinesRotation != newSize) {
+		float* newTimelinesRotation = CALLOC(float, newSize);
+		FREE(entry->timelinesRotation);
+		entry->timelinesRotation = newTimelinesRotation;
+		entry->timelinesRotationCount = newSize;
+	}
+	return entry->timelinesRotation;
+}
+
+int* _spAnimationState_resizeTimelinesFirst(spTrackEntry* entry, int newSize) {
+	if (entry->timelinesFirstCount != newSize) {
+		int* newTimelinesFirst = CALLOC(int, newSize);
+		FREE(entry->timelinesFirst);
+		entry->timelinesFirst = newTimelinesFirst;
+		entry->timelinesFirstCount = newSize;
+	}
+
+	return entry->timelinesFirst;
+}
+
+void _spAnimationState_ensureCapacityPropertyIDs(spAnimationState* self, int capacity) {
+	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
+	if (internal->propertyIDsCapacity < capacity) {
+		int *newPropertyIDs = CALLOC(int, capacity << 1);
+		memcpy(newPropertyIDs, internal->propertyIDs, internal->propertyIDsCount);
+		FREE(internal->propertyIDs);
+		internal->propertyIDs = newPropertyIDs;
+		internal->propertyIDsCapacity = capacity << 1;
+	}
+}
+
+int _spAnimationState_addPropertyID(spAnimationState* self, int id) {
+	int i, n;
+	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
+
+	for (i = 0, n = internal->propertyIDsCount; i < n; i++) {
+		if (internal->propertyIDs[i] == id) return 0;
+	}
+
+	_spAnimationState_ensureCapacityPropertyIDs(self, internal->propertyIDsCount + 1);
+	internal->propertyIDs[internal->propertyIDsCount] = id;
+	return 1;
+}
+
+void _spAnimationState_setTimelinesFirst (spAnimationState* self, spTrackEntry* entry) {
+	int i, n;
+	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
+	int *propertyIDs = internal->propertyIDs;
+	spTimeline** timelines;
+
+	if (entry->mixingFrom) {
+		_spAnimationState_setTimelinesFirst(self, entry->mixingFrom);
+		_spAnimationState_checkTimelinesUsage(self, entry);
+		return;
+	}
+
+	n = entry->animation->timelinesCount;
+	timelines = entry->animation->timelines;
+	int* usage = _spAnimationState_resizeTimelinesFirst(entry, n);
+	for (int i = 0; i < n; i++) {
+		_spAnimationState_addPropertyID(self, spTimeline_getPropertyId(timelines[i]));
+		usage[i] = 1;
+	}
+}
+
+void _spAnimationState_checkTimelinesFirst (spAnimationState* self, spTrackEntry* entry) {
+	if (entry->mixingFrom) _spAnimationState_checkTimelinesFirst(self, entry->mixingFrom);
+	_spAnimationState_checkTimelinesUsage(self, entry);
+}
+
+void _spAnimationState_checkTimelinesUsage (spAnimationState* self, spTrackEntry* entry) {
+	int i, n;
+	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
+	n = entry->animation->timelinesCount;
+	spTimeline** timelines = entry->animation->timelines;
+	int* usage = _spAnimationState_resizeTimelinesFirst(entry, n);
+	for (int i = 0; i < n; i++)
+		usage[i] = _spAnimationState_addPropertyID(self, spTimeline_getPropertyId(timelines[i]));
+}
+
 spTrackEntry* spAnimationState_getCurrent (spAnimationState* self, int trackIndex) {
 	if (trackIndex >= self->tracksCount) return 0;
 	return self->tracks[trackIndex];
@@ -711,7 +816,7 @@ float spTrackEntry_getAnimationTime (spTrackEntry* entry) {
 	if (entry->loop) {
 		float duration = entry->animationEnd - entry->animationStart;
 		if (duration == 0) return entry->animationStart;
-		return (FMOD(entry->trackTime, duration) + entry->animationStart;
+		return FMOD(entry->trackTime, duration) + entry->animationStart;
 	}
 	return MIN(entry->trackTime + entry->animationStart, entry->animationEnd);
 }

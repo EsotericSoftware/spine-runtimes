@@ -201,12 +201,13 @@ typedef struct _spAnimationState {
 	spAnimationState super;
 
 	int eventsCount;
-	int eventsCapacity;
 	spEvent** events;
 
 	_spEventQueue* queue;
 
-	void* propertyIDs;
+	int* propertyIDs;
+	int propertyIDsCount;
+	int propertyIDsCapacity;
 
 	int /*boolean*/ animationsChanged;
 
