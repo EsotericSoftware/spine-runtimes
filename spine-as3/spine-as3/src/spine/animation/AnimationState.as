@@ -235,10 +235,12 @@ public class AnimationState {
 		}
 
 		var rotateTimeline:RotateTimeline = RotateTimeline(timeline);
-		var frames:Vector.<Number> = rotateTimeline.frames;
-		if (time < frames[0]) return; // Time is before first frame.
-
+		var frames:Vector.<Number> = rotateTimeline.frames;		
 		var bone:Bone = skeleton.bones[rotateTimeline.boneIndex];
+		if (time < frames[0]) {
+			if (setupPose) bone.rotation = bone.data.rotation;
+			return;
+		}
 
 		var r2:Number;
 		if (time >= frames[frames.length - RotateTimeline.ENTRIES]) // Time is after last frame.
