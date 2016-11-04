@@ -97,8 +97,8 @@ static unsigned char readByte (_dataInput* input) {
 	return *input->cursor++;
 }
 
-static char readSByte (_dataInput* input) {
-	return (char)readByte(input);
+static signed char readSByte (_dataInput* input) {
+	return (signed char)readByte(input);
 }
 
 static int readBoolean (_dataInput* input) {
