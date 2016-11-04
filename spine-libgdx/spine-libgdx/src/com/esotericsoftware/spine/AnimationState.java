@@ -583,7 +583,7 @@ public class AnimationState {
 	private void setTimelinesFirst (TrackEntry entry) {
 		if (entry.mixingFrom != null) {
 			setTimelinesFirst(entry.mixingFrom);
-			checkTimelinesUsage(entry, entry.timelinesFirst);
+			checkTimelinesUsage(entry);
 			return;
 		}
 		IntSet propertyIDs = this.propertyIDs;
@@ -599,14 +599,14 @@ public class AnimationState {
 	/** From last to first mixingFrom entries, calls checkTimelineUsage. */
 	private void checkTimelinesFirst (TrackEntry entry) {
 		if (entry.mixingFrom != null) checkTimelinesFirst(entry.mixingFrom);
-		checkTimelinesUsage(entry, entry.timelinesFirst);
+		checkTimelinesUsage(entry);
 	}
 
-	private void checkTimelinesUsage (TrackEntry entry, BooleanArray usageArray) {
+	private void checkTimelinesUsage (TrackEntry entry) {
 		IntSet propertyIDs = this.propertyIDs;
 		int n = entry.animation.timelines.size;
 		Object[] timelines = entry.animation.timelines.items;
-		boolean[] usage = usageArray.setSize(n);
+		boolean[] usage = entry.timelinesFirst.setSize(n);
 		for (int i = 0; i < n; i++)
 			usage[i] = propertyIDs.add(((Timeline)timelines[i]).getPropertyId());
 	}
