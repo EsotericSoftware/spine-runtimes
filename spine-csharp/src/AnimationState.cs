@@ -251,9 +251,12 @@ namespace Spine {
 			}
 
 			float[] frames = rotateTimeline.frames;
-			if (time < frames[0]) return; // Time is before first frame.
 
 			Bone bone = skeleton.bones.Items[rotateTimeline.boneIndex];
+			if (time < frames[0]) {
+				if (setupPose) bone.rotation = bone.data.rotation;
+				return;
+			}
 
 			float r2;
 			if (time >= frames[frames.Length - RotateTimeline.ENTRIES]) // Time is after last frame.
