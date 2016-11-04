@@ -391,9 +391,10 @@ function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, se
 
   local rotateTimeline = timeline
   local frames = rotateTimeline.frames
-  if time < frames[0] then return end -- Time is before first frame.
-
   local bone = skeleton.bones[rotateTimeline.boneIndex]
+  if time < frames[0] then
+		return
+	end
 
   local r2 = 0
   if time >= frames[zlen(frames) - Animation.RotateTimeline.ENTRIES] then -- Time is after last frame.
@@ -491,7 +492,7 @@ function AnimationState:queueEvents (entry, animationTime)
     end
     i = i + 1
   end
-  events = {}
+	self.events = {}
 end
 
 function AnimationState:clearTracks ()
