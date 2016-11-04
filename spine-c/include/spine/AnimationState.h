@@ -63,6 +63,7 @@ struct spTrackEntry {
 	int timelinesFirstCount;
 	float* timelinesRotation;
 	int timelinesRotationCount;
+	void* rendererObject;
 
 #ifdef __cplusplus
 	spTrackEntry() :
@@ -92,6 +93,8 @@ struct spAnimationState {
 	spAnimationStateListener listener;
 
 	float timeScale;
+
+	void* rendererObject;
 
 #ifdef __cplusplus
 	spAnimationState() :

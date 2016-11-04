@@ -45,19 +45,23 @@ bool SpineboyExample::init () {
 
 	skeletonNode = SkeletonAnimation::createWithJsonFile("spineboy.json", "spineboy.atlas", 0.6f);
 
-	skeletonNode->setStartListener( [this] (int trackIndex) {
-		spTrackEntry* entry = spAnimationState_getCurrent(skeletonNode->getState(), trackIndex);
-		const char* animationName = (entry && entry->animation) ? entry->animation->name : 0;
-		log("%d start: %s", trackIndex, animationName);
+    skeletonNode->setStartListener( [] (spTrackEntry* entry) {
+		log("%d start: %s", entry->trackIndex, entry->animation->name);
 	});
-	skeletonNode->setEndListener( [] (int trackIndex) {
-		log("%d end", trackIndex);
+    skeletonNode->setInterruptListener( [] (spTrackEntry* entry) {
+        log("%d interrupt", entry->trackIndex);
+    });
+	skeletonNode->setEndListener( [] (spTrackEntry* entry) {
+		log("%d end", entry->trackIndex);
 	});
-	skeletonNode->setCompleteListener( [] (int trackIndex, int loopCount) {
-		log("%d complete: %d", trackIndex, loopCount);
+	skeletonNode->setCompleteListener( [] (spTrackEntry* entry) {
+		log("%d complete", entry->trackIndex);
 	});
-	skeletonNode->setEventListener( [] (int trackIndex, spEvent* event) {
-		log("%d event: %s, %d, %f, %s", trackIndex, event->data->name, event->intValue, event->floatValue, event->stringValue);
+    skeletonNode->setDisposeListener( [] (spTrackEntry* entry) {
+        log("%d dispose", entry->trackIndex);
+    });
+	skeletonNode->setEventListener( [] (spTrackEntry* entry, spEvent* event) {
+		log("%d event: %s, %d, %f, %s", entry->trackIndex, event->data->name, event->intValue, event->floatValue, event->stringValue);
 	});
 
 	skeletonNode->setMix("walk", "jump", 0.2f);
@@ -66,7 +70,7 @@ bool SpineboyExample::init () {
 	spTrackEntry* jumpEntry = skeletonNode->addAnimation(0, "jump", false, 3);
 	skeletonNode->addAnimation(0, "run", true);
 
-	skeletonNode->setTrackStartListener(jumpEntry, [] (int trackIndex) {
+	skeletonNode->setTrackStartListener(jumpEntry, [] (spTrackEntry* entry) {
 		log("jumped!");
 	});
 
