@@ -393,6 +393,7 @@ function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, se
   local frames = rotateTimeline.frames
   local bone = skeleton.bones[rotateTimeline.boneIndex]
   if time < frames[0] then
+		if setupPose then bone.rotation = bone.data.rotation end
 		return
 	end
 
