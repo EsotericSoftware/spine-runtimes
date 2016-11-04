@@ -1458,9 +1458,12 @@ var spine;
 			}
 			var rotateTimeline = timeline;
 			var frames = rotateTimeline.frames;
-			if (time < frames[0])
-				return;
 			var bone = skeleton.bones[rotateTimeline.boneIndex];
+			if (time < frames[0]) {
+				if (setupPose)
+					bone.rotation = bone.data.rotation;
+				return;
+			}
 			var r2 = 0;
 			if (time >= frames[frames.length - spine.RotateTimeline.ENTRIES])
 				r2 = bone.data.rotation + frames[frames.length + spine.RotateTimeline.PREV_ROTATION];

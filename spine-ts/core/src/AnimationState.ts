@@ -176,12 +176,12 @@ module spine {
 				mix = 1;
 			else {
 				mix = entry.mixTime / entry.mixDuration;
-				if (mix > 1) mix = 1;				
+				if (mix > 1) mix = 1;
 			}
 
 			let events = mix < from.eventThreshold ? this.events : null;
 			let attachments = mix < from.attachmentThreshold, drawOrder = mix < from.drawOrderThreshold;
-			let animationLast = from.animationLast, animationTime = from.getAnimationTime();			
+			let animationLast = from.animationLast, animationTime = from.getAnimationTime();
 			let timelineCount = from.animation.timelines.length;
 			let timelines = from.animation.timelines;
 			let timelinesFirst = from.timelinesFirst;
@@ -221,9 +221,11 @@ module spine {
 
 			let rotateTimeline = timeline as RotateTimeline;
 			let frames = rotateTimeline.frames;
-			if (time < frames[0]) return; // Time is before first frame.
-
 			let bone = skeleton.bones[rotateTimeline.boneIndex];
+			if (time < frames[0]) {
+				if (setupPose) bone.rotation = bone.data.rotation;
+				return;
+			}
 
 			let r2 = 0;
 			if (time >= frames[frames.length - RotateTimeline.ENTRIES]) // Time is after last frame.
@@ -346,7 +348,7 @@ module spine {
 			if (from != null) {
 				this.queue.interrupt(from);
 				current.mixingFrom = from;
-				current.mixTime = 0;				
+				current.mixTime = 0;
 
 				// If not completely mixed in, set mixAlpha so mixing out happens from current mix to zero.
 				if (from.mixingFrom != null) current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
