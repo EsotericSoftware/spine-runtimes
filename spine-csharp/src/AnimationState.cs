@@ -250,9 +250,8 @@ namespace Spine {
 				return;
 			}
 
-			float[] frames = rotateTimeline.frames;
-
 			Bone bone = skeleton.bones.Items[rotateTimeline.boneIndex];
+			float[] frames = rotateTimeline.frames;
 			if (time < frames[0]) {
 				if (setupPose) bone.rotation = bone.data.rotation;
 				return;
@@ -591,7 +590,7 @@ namespace Spine {
 		private void SetTimelinesFirst (TrackEntry entry) {
 			if (entry.mixingFrom != null) {
 				SetTimelinesFirst(entry.mixingFrom);
-				CheckTimelinesUsage(entry, entry.timelinesFirst);
+				CheckTimelinesUsage(entry);
 				return;
 			}
 			var propertyIDs = this.propertyIDs;
@@ -609,13 +608,14 @@ namespace Spine {
 		/// <summary>From last to first mixingFrom entries, calls checkTimelineUsage.</summary>
 		private void CheckTimelinesFirst (TrackEntry entry) {
 			if (entry.mixingFrom != null) CheckTimelinesFirst(entry.mixingFrom);
-			CheckTimelinesUsage(entry, entry.timelinesFirst);
+			CheckTimelinesUsage(entry);
 		}
 
-		private void CheckTimelinesUsage (TrackEntry entry, ExposedList<bool> usageArray) {
+		private void CheckTimelinesUsage (TrackEntry entry) {
 			var propertyIDs = this.propertyIDs;
 			var timelines = entry.animation.timelines;
 			int n = timelines.Count;
+			var usageArray = entry.timelinesFirst;
 			usageArray.EnsureCapacity(n);
 			var usage = usageArray.Items;
 			var timelinesItems = timelines.Items;
