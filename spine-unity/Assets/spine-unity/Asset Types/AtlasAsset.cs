@@ -100,7 +100,11 @@ namespace Spine.Unity {
 		}
 		#endregion
 
-		public virtual void Reset () {
+		void Reset () {
+			Clear();
+		}
+
+		public virtual void Clear () {
 			atlas = null;
 		}
 
@@ -108,13 +112,13 @@ namespace Spine.Unity {
 		public virtual Atlas GetAtlas () {
 			if (atlasFile == null) {
 				Debug.LogError("Atlas file not set for atlas asset: " + name, this);
-				Reset();
+				Clear();
 				return null;
 			}
 
 			if (materials == null || materials.Length == 0) {
 				Debug.LogError("Materials not set for atlas asset: " + name, this);
-				Reset();
+				Clear();
 				return null;
 			}
 
@@ -142,8 +146,8 @@ namespace Spine.Unity {
 
 				Vector3[] verts = new Vector3[4];
 				Vector2[] uvs = new Vector2[4];
-				Color[] colors = new Color[4] { Color.white, Color.white, Color.white, Color.white };
-				int[] triangles = new int[6] { 0, 1, 2, 2, 3, 0 };
+				Color[] colors = { Color.white, Color.white, Color.white, Color.white };
+				int[] triangles = { 0, 1, 2, 2, 3, 0 };
 
 				float left, right, top, bottom;
 				left = region.width / -2f;

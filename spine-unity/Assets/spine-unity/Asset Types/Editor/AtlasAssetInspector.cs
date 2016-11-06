@@ -43,16 +43,24 @@ namespace Spine.Unity.Editor {
 
 	[CustomEditor(typeof(AtlasAsset))]
 	public class AtlasAssetInspector : UnityEditor.Editor {
-		private SerializedProperty atlasFile, materials;
-		private AtlasAsset atlasAsset;
+		SerializedProperty atlasFile, materials;
+		AtlasAsset atlasAsset;
 
-		readonly GUIContent SpriteSlicesLabel = new GUIContent(
-			"Apply Regions as Texture Sprite Slices",
-			SpineEditorUtilities.Icons.unityIcon,
-			"Adds Sprite slices to atlas texture(s). " +
-			"Updates existing slices if ones with matching names exist. \n\n" +
-			"If your atlas was exported with Premultiply Alpha, " +
-			"your SpriteRenderer should use the generated Spine _Material asset (or any Material with a PMA shader) instead of Sprites-Default.");
+		GUIContent spriteSlicesLabel;
+		GUIContent SpriteSlicesLabel {
+			get {
+				if (spriteSlicesLabel == null) {
+					spriteSlicesLabel = new GUIContent(
+						"Apply Regions as Texture Sprite Slices",
+						SpineEditorUtilities.Icons.unityIcon,
+						"Adds Sprite slices to atlas texture(s). " +
+						"Updates existing slices if ones with matching names exist. \n\n" +
+						"If your atlas was exported with Premultiply Alpha, " +
+						"your SpriteRenderer should use the generated Spine _Material asset (or any Material with a PMA shader) instead of Sprites-Default.");
+				}
+				return spriteSlicesLabel; 
+			}
+		}
 
 		static List<AtlasRegion> GetRegions (Atlas atlas) {
 			FieldInfo regionsField = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -100,8 +108,12 @@ namespace Spine.Unity.Editor {
 			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField(atlasFile);
 			EditorGUILayout.PropertyField(materials, true);
-			if (EditorGUI.EndChangeCheck())
+			if (EditorGUI.EndChangeCheck()) {
 				serializedObject.ApplyModifiedProperties();
+				atlasAsset.Clear();
+				atlasAsset.GetAtlas();
+			}
+				
 
 			if (materials.arraySize == 0) {
 				EditorGUILayout.LabelField(new GUIContent("Error:  Missing materials", SpineEditorUtilities.Icons.warning));
@@ -235,6 +247,7 @@ namespace Spine.Unity.Editor {
 			#else
 			if (atlasFile.objectReferenceValue != null) {
 				EditorGUILayout.LabelField("Atlas Regions", EditorStyles.boldLabel);
+				int baseIndent = EditorGUI.indentLevel;
 
 				var regions = AtlasAssetInspector.GetRegions(atlasAsset.GetAtlas());
 				AtlasPage lastPage = null;
@@ -247,29 +260,24 @@ namespace Spine.Unity.Editor {
 						lastPage = regions[i].page;
 						Material mat = ((Material)lastPage.rendererObject);
 						if (mat != null) {
-							
-							GUILayout.BeginHorizontal();
-							{
-								EditorGUI.BeginDisabledGroup(true);
+							EditorGUI.indentLevel = baseIndent;
+							using (new GUILayout.HorizontalScope())
+							using (new EditorGUI.DisabledGroupScope(true))
 								EditorGUILayout.ObjectField(mat, typeof(Material), false, GUILayout.Width(250));
-								EditorGUI.EndDisabledGroup();
-								EditorGUI.indentLevel++;
-							}
-							GUILayout.EndHorizontal();
-
+							EditorGUI.indentLevel = baseIndent + 1;
 						} else {
 							EditorGUILayout.HelpBox("Page missing material!", MessageType.Warning);
 						}
 					}
+
 					EditorGUILayout.LabelField(new GUIContent(regions[i].name, SpineEditorUtilities.Icons.image));
 				}
-				EditorGUI.indentLevel--;
+				EditorGUI.indentLevel = baseIndent;
 			}
 			#endif
 
-			if (serializedObject.ApplyModifiedProperties() || SpineInspectorUtility.UndoRedoPerformed(Event.current)) {
-				atlasAsset.Reset();
-			}
+			if (serializedObject.ApplyModifiedProperties() || SpineInspectorUtility.UndoRedoPerformed(Event.current))
+				atlasAsset.Clear();
 		}
 
 		static public void UpdateSpriteSlices (Texture texture, Atlas atlas) {

@@ -545,7 +545,7 @@ namespace Spine.Unity.Editor {
 			bool abortSkeletonImport = false;
 			foreach (string sp in skeletonPaths) {
 				if (!reimport && CheckForValidSkeletonData(sp)) {
-					ResetExistingSkeletonData(sp);
+					ClearExistingSkeletonData(sp);
 					continue;
 				}
 
@@ -610,7 +610,7 @@ namespace Spine.Unity.Editor {
 			// Any post processing of images
 		}
 
-		static void ResetExistingSkeletonData (string skeletonJSONPath) {
+		static void ClearExistingSkeletonData (string skeletonJSONPath) {
 			string dir = Path.GetDirectoryName(skeletonJSONPath);
 			TextAsset textAsset = (TextAsset)AssetDatabase.LoadAssetAtPath(skeletonJSONPath, typeof(TextAsset));
 			DirectoryInfo dirInfo = new DirectoryInfo(dir);
@@ -625,7 +625,7 @@ namespace Spine.Unity.Editor {
 						if (Selection.activeObject == skeletonDataAsset)
 							Selection.activeObject = null;
 
-						skeletonDataAsset.Reset();
+						skeletonDataAsset.Clear();
 
 						string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(skeletonDataAsset));
 						string lastHash = EditorPrefs.GetString(guid + "_hash");
@@ -970,7 +970,7 @@ namespace Spine.Unity.Editor {
 			if (AssetDatabase.GetAssetPath(atlasAsset) == "")
 				AssetDatabase.CreateAsset(atlasAsset, atlasPath);
 			else
-				atlasAsset.Reset();
+				atlasAsset.Clear();
 
 			EditorUtility.SetDirty(atlasAsset);
 			AssetDatabase.SaveAssets();
@@ -1098,7 +1098,7 @@ namespace Spine.Unity.Editor {
 					AssetDatabase.SaveAssets();
 				} else {
 					skeletonDataAsset.atlasAssets = atlasAssets;
-					skeletonDataAsset.Reset();
+					skeletonDataAsset.Clear();
 					skeletonDataAsset.GetSkeletonData(true);
 				}
 

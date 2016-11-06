@@ -134,9 +134,9 @@ namespace Spine.Unity.Editor {
 							if (component.skeletonDataAsset != null) {
 								foreach (AtlasAsset aa in component.skeletonDataAsset.atlasAssets) {
 									if (aa != null)
-										aa.Reset();
+										aa.Clear();
 								}
-								component.skeletonDataAsset.Reset();
+								component.skeletonDataAsset.Clear();
 							}
 							component.Initialize(true);
 						}
@@ -180,9 +180,9 @@ namespace Spine.Unity.Editor {
 							if (component.skeletonDataAsset != null) {
 								foreach (AtlasAsset aa in component.skeletonDataAsset.atlasAssets) {
 									if (aa != null)
-										aa.Reset();
+										aa.Clear();
 								}
-								component.skeletonDataAsset.Reset();
+								component.skeletonDataAsset.Clear();
 							}
 							component.Initialize(true);
 						}
