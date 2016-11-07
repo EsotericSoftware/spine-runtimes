@@ -125,7 +125,14 @@ public class PathConstraint implements Constraint {
 		float[] positions = computeWorldPositions((PathAttachment)attachment, spacesCount, tangents,
 			data.positionMode == PositionMode.percent, spacingMode == SpacingMode.percent);
 		float boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
-		boolean tip = rotateMode == RotateMode.chain && offsetRotation == 0;
+		boolean tip;
+		if (offsetRotation == 0)
+			tip = rotateMode == RotateMode.chain;
+		else {
+			tip = false;
+			Bone p = target.bone;
+			offsetRotation *= p.a * p.d - p.b * p.c > 0 ? -degRad : degRad;
+		}
 		for (int i = 0, p = 3; i < boneCount; i++, p += 3) {
 			Bone bone = (Bone)bones[i];
 			bone.worldX += (boneX - bone.worldX) * translateMix;
@@ -149,15 +156,15 @@ public class PathConstraint implements Constraint {
 					r = positions[p + 2];
 				else
 					r = atan2(dy, dx);
-				float det = a * d - b * c;				
-				r -= atan2(c, a) + (det > 0 ? -offsetRotation * degRad : offsetRotation * degRad);				
+				r -= atan2(c, a);
 				if (tip) {
 					cos = cos(r);
 					sin = sin(r);
 					float length = bone.data.length;
 					boneX += (length * (cos * a - sin * c) - dx) * rotateMix;
 					boneY += (length * (sin * a + cos * c) - dy) * rotateMix;
-				}
+				} else
+					r -= offsetRotation;
 				if (r > PI)
 					r -= PI2;
 				else if (r < -PI) //
