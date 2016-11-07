@@ -89,6 +89,7 @@ void spPathConstraint_apply (spPathConstraint* self) {
 	int tangents = rotateMode == SP_ROTATE_MODE_TANGENT, scale = rotateMode == SP_ROTATE_MODE_CHAIN_SCALE;
 	int boneCount = self->bonesCount, spacesCount = tangents ? boneCount : boneCount + 1;
 	spBone** bones = self->bones;
+	spBone* pa;
 
 	if (!translate && !rotate) return;
 	if ((attachment == 0) || (attachment->super.super.type != SP_ATTACHMENT_PATH)) return;
@@ -127,7 +128,14 @@ void spPathConstraint_apply (spPathConstraint* self) {
 	positions = spPathConstraint_computeWorldPositions(self, attachment, spacesCount, tangents,
 		data->positionMode == SP_POSITION_MODE_PERCENT, spacingMode == SP_SPACING_MODE_PERCENT);
 	boneX = positions[0], boneY = positions[1], offsetRotation = self->data->offsetRotation;
-	tip = rotateMode == SP_ROTATE_MODE_CHAIN_SCALE && offsetRotation == 0;
+	tip = 0;
+	if (offsetRotation == 0)
+		tip = rotateMode == SP_ROTATE_MODE_CHAIN;
+	else {
+		tip = 0;
+		pa = self->target->bone;
+		offsetRotation *= pa->a * pa->d - pa->b * pa->c > 0 ? DEG_RAD : -DEG_RAD;
+	}
 	for (i = 0, p = 3; i < boneCount; i++, p += 3) {
 		spBone* bone = bones[i];
 		CONST_CAST(float, bone->worldX) += (boneX - bone->worldX) * translateMix;
@@ -158,7 +166,8 @@ void spPathConstraint_apply (spPathConstraint* self) {
 				length = bone->data->length;
 				boneX += (length * (cosine * a - sine * c) - dx) * rotateMix;
 				boneY += (length * (sine * a + cosine * c) - dy) * rotateMix;
-			}
+			} else
+				r += offsetRotation;
 			if (r > PI)
 				r -= PI2;
 			else if (r < -PI)
