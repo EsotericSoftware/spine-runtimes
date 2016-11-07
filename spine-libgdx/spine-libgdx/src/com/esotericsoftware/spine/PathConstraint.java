@@ -149,7 +149,8 @@ public class PathConstraint implements Constraint {
 					r = positions[p + 2];
 				else
 					r = atan2(dy, dx);
-				r -= atan2(c, a) - offsetRotation * degRad;
+				float det = a * d - b * c;				
+				r -= atan2(c, a) + (det > 0 ? -offsetRotation * degRad : offsetRotation * degRad);				
 				if (tip) {
 					cos = cos(r);
 					sin = sin(r);
