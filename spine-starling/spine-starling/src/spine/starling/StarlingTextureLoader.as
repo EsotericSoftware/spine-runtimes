@@ -40,41 +40,55 @@ import flash.display.Bitmap;
 import flash.display.BitmapData;
 
 public class StarlingTextureLoader implements TextureLoader {
-	public var bitmapDatas:Object = {};
-	public var singleBitmapData:BitmapData;
+	public var bitmapDatasOrTextures:Object = {};
+	public var singleBitmapDataOrTexture:Object;	
 
-	/** @param bitmaps A Bitmap or BitmapData for an atlas that has only one page, or for a multi page atlas an object where the
-	 * key is the image path and the value is the Bitmap or BitmapData. */
-	public function StarlingTextureLoader (bitmaps:Object) {
-		if (bitmaps is BitmapData) {
-			singleBitmapData = BitmapData(bitmaps);
+	/** @param bitmaps A Bitmap or BitmapData or Texture for an atlas that has only one page, or for a multi page atlas an object where the
+	 * key is the image path and the value is the Bitmap or BitmapData or Texture. */
+	public function StarlingTextureLoader (bitmapsOrTextures:Object) {
+		if (bitmapsOrTextures is BitmapData) {
+			singleBitmapDataOrTexture = BitmapData(bitmapsOrTextures);
 			return;
 		}
-		if (bitmaps is Bitmap) {
-			singleBitmapData = Bitmap(bitmaps).bitmapData;
+		if (bitmapsOrTextures is Bitmap) {
+			singleBitmapDataOrTexture = Bitmap(bitmapsOrTextures).bitmapData;
 			return;
 		}
+		if (bitmapsOrTextures is Texture) {
+			singleBitmapDataOrTexture = Texture(bitmapsOrTextures);
+			return;
+		}		
 
-		for (var path:* in bitmaps) {
-			var object:* = bitmaps[path];
-			var bitmapData:BitmapData;
+		for (var path:* in bitmapsOrTextures) {
+			var object:* = bitmapsOrTextures[path];
+			var bitmapDataOrTexture:Object;
 			if (object is BitmapData)
-				bitmapData = BitmapData(object);
+				bitmapDataOrTexture = BitmapData(object);
 			else if (object is Bitmap)
-				bitmapData = Bitmap(object).bitmapData;
+				bitmapDataOrTexture = Bitmap(object).bitmapData;
+			else if (object is Texture)
+				bitmapDataOrTexture = Texture(object);
 			else
-				throw new ArgumentError("Object for path \"" + path + "\" must be a Bitmap or BitmapData: " + object);
-			bitmapDatas[path] = bitmapData;
+				throw new ArgumentError("Object for path \"" + path + "\" must be a Bitmap, BitmapData or Texture: " + object);
+			bitmapDatasOrTextures[path] = bitmapDataOrTexture;
 		}
 	}
 
 	public function loadPage (page:AtlasPage, path:String) : void {
-		var bitmapData:BitmapData = singleBitmapData || bitmapDatas[path];
-		if (!bitmapData)
-			throw new ArgumentError("BitmapData not found with name: " + path);
-		page.rendererObject = Texture.fromBitmapData(bitmapData);
-		page.width = bitmapData.width;
-		page.height = bitmapData.height;
+		var bitmapDataOrTexture:Object = singleBitmapDataOrTexture || bitmapDatasOrTextures[path];
+		if (!bitmapDataOrTexture)
+			throw new ArgumentError("BitmapData/Texture not found with name: " + path);
+		if (bitmapDataOrTexture is BitmapData) {
+			var bitmapData:BitmapData = BitmapData(bitmapDataOrTexture);
+			page.rendererObject = Texture.fromBitmapData(bitmapData);
+			page.width = bitmapData.width;
+			page.height = bitmapData.height;
+		} else {
+			var texture:Texture = Texture(bitmapDataOrTexture);
+			page.rendererObject = texture;
+			page.width = texture.width;
+			page.height = texture.height;
+		}		
 	}
 
 	public function loadRegion (region:AtlasRegion) : void {
