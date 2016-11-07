@@ -70,6 +70,8 @@ namespace Spine {
 			float rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
 			Bone target = this.target;
 			float ta = target.a, tb = target.b, tc = target.c, td = target.d;
+			float degRadReflect = (ta * td - tb * tc > 0) ? MathUtils.DegRad : -MathUtils.DegRad;
+			float offsetRotation = data.offsetRotation * degRadReflect, offsetShearY = data.offsetShearY * degRadReflect;
 			var bones = this.bones;
 			var bonesItems = bones.Items;
 			for (int i = 0, n = bones.Count; i < n; i++) {
@@ -78,7 +80,7 @@ namespace Spine {
 
 				if (rotateMix != 0) {
 					float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-					float r = MathUtils.Atan2(tc, ta) - MathUtils.Atan2(c, a) + data.offsetRotation * MathUtils.DegRad;
+					float r = MathUtils.Atan2(tc, ta) - MathUtils.Atan2(c, a) + offsetRotation;
 					if (r > MathUtils.PI)
 						r -= MathUtils.PI2;
 					else if (r < -MathUtils.PI) r += MathUtils.PI2;
@@ -120,7 +122,7 @@ namespace Spine {
 					if (r > MathUtils.PI)
 						r -= MathUtils.PI2;
 					else if (r < -MathUtils.PI) r += MathUtils.PI2;
-					r = by + (r + data.offsetShearY * MathUtils.DegRad) * shearMix;
+					r = by + (r + offsetShearY) * shearMix;
 					float s = (float)Math.Sqrt(b * b + d * d);
 					bone.b = MathUtils.Cos(r) * s;
 					bone.d = MathUtils.Sin(r) * s;

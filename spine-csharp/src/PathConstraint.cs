@@ -104,7 +104,14 @@ namespace Spine {
 			float[] positions = ComputeWorldPositions(attachment, spacesCount, tangents,
 				data.positionMode == PositionMode.Percent, spacingMode == SpacingMode.Percent);
 			float boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
-			bool tip = rotateMode == RotateMode.Chain && offsetRotation == 0;
+			bool tip;
+			if (offsetRotation == 0) {
+				tip = rotateMode == RotateMode.Chain;
+			} else {
+				tip = false;
+				Bone p = target.bone;
+				offsetRotation *= p.a * p.d - p.b * p.c > 0 ? MathUtils.DegRad : -MathUtils.DegRad;
+			}
 			for (int i = 0, p = 3; i < boneCount; i++, p += 3) {
 				Bone bone = (Bone)bones[i];
 				bone.worldX += (boneX - bone.worldX) * translateMix;
@@ -128,13 +135,15 @@ namespace Spine {
 						r = positions[p + 2];
 					else
 						r = MathUtils.Atan2(dy, dx);
-					r -= MathUtils.Atan2(c, a) - offsetRotation * MathUtils.DegRad;
+					r -= MathUtils.Atan2(c, a);
 					if (tip) {
 						cos = MathUtils.Cos(r);
 						sin = MathUtils.Sin(r);
 						float length = bone.data.length;
 						boneX += (length * (cos * a - sin * c) - dx) * rotateMix;
 						boneY += (length * (sin * a + cos * c) - dy) * rotateMix;
+					} else {
+						r += offsetRotation;
 					}
 					if (r > MathUtils.PI)
 						r -= MathUtils.PI2;
