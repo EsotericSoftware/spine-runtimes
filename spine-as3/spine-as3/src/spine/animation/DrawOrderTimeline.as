@@ -72,6 +72,7 @@ public class DrawOrderTimeline implements Timeline {
 				for each (slot in slots)
 					drawOrder[i++] = slot;			
 			}
+			return;
 		}
 
 		var frameIndex:int;
