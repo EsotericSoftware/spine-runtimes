@@ -84,6 +84,8 @@ public class TransformConstraint implements Constraint {
 		float rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
 		Bone target = this.target;
 		float ta = target.a, tb = target.b, tc = target.c, td = target.d;
+		float degRadReflect = ta * td - tb * tc > 0 ? degRad : -degRad;
+		float offsetRotation = data.offsetRotation * degRadReflect, offsetShearY = data.offsetShearY * degRadReflect;
 		Array<Bone> bones = this.bones;
 		for (int i = 0, n = bones.size; i < n; i++) {
 			Bone bone = bones.get(i);
@@ -91,7 +93,7 @@ public class TransformConstraint implements Constraint {
 
 			if (rotateMix != 0) {
 				float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-				float r = atan2(tc, ta) - atan2(c, a) + data.offsetRotation * degRad;
+				float r = atan2(tc, ta) - atan2(c, a) + offsetRotation;
 				if (r > PI)
 					r -= PI2;
 				else if (r < -PI) r += PI2;
@@ -133,7 +135,7 @@ public class TransformConstraint implements Constraint {
 				if (r > PI)
 					r -= PI2;
 				else if (r < -PI) r += PI2;
-				r = by + (r + data.offsetShearY * degRad) * shearMix;
+				r = by + (r + offsetShearY) * shearMix;
 				float s = (float)Math.sqrt(b * b + d * d);
 				bone.b = cos(r) * s;
 				bone.d = sin(r) * s;
