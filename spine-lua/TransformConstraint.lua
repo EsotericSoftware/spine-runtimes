@@ -29,6 +29,7 @@
 -------------------------------------------------------------------------------
 
 local setmetatable = setmetatable
+local utils = require "spine-lua.utils"
 local math_pi = math.pi
 local math_pi2 = math.pi * 2
 local math_atan2 = math.atan2
@@ -79,6 +80,10 @@ function TransformConstraint:update ()
 	local tb = target.b
 	local tc = target.c
 	local td = target.d
+	local degRadReflect = 0;
+	if ta * td - tb * tc > 0 then degRadReflect = utils.degRad else degRadReflect = -utils.degRad end
+	local offsetRotation = self.data.offsetRotation * degRadReflect
+	local offsetShearY = self.data.offsetShearY * degRadReflect
 	local bones = self.bones
 	for i, bone in ipairs(bones) do
 		local modified = false
@@ -87,7 +92,7 @@ function TransformConstraint:update ()
 			local b = bone.b
 			local c = bone.c
 			local d = bone.d
-			local r = math_atan2(tc, ta) - math_atan2(c, a) + math_rad(self.data.offsetRotation);
+			local r = math_atan2(tc, ta) - math_atan2(c, a) + offsetRotation
 			if r > math_pi then
 				r = r - math_pi2
 			elseif r < -math_pi then
@@ -143,7 +148,7 @@ function TransformConstraint:update ()
 			elseif r < -math_pi then
 				r = r + math_pi2
 			end
-			r = by + (r + math_rad(self.data.offsetShearY)) * shearMix
+			r = by + (r + offsetShearY) * shearMix
 			local s = math_sqrt(b * b + d * d)
 			bone.b = math_cos(r) * s
 			bone.d = math_sin(r) * s

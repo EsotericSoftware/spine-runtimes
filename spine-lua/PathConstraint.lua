@@ -137,7 +137,19 @@ function PathConstraint:update ()
 	local boneX = positions[1]
 	local boneY = positions[2]
 	local offsetRotation = data.offsetRotation
-	local tip = rotateMode == PathConstraintData.RotateMode.chain and offsetRotation == 0
+	local tip = false;
+	if offsetRotation == 0 then
+			tip = rotateMode == PathConstraintData.RotateMode.chain
+	else
+		tip = false;
+		local p = self.target.bone;
+		if p.a * p.d - p.b * p.c > 0 then
+			offsetRotation = offsetRotation * utils.degRad
+		else
+			offsetRotation = offsetRotation * -utils.degRad
+		end
+	end
+
 	local i = 0
 	local p = 3
 	while i < boneCount do
@@ -173,13 +185,15 @@ function PathConstraint:update ()
 			else
 				r = math_atan2(dy, dx)
 			end
-			r = r - (math_atan2(c, a) - math_rad(offsetRotation))
+			r = r - math_atan2(c, a)			
 			if tip then
 				cos = math_cos(r)
 				sin = math_sin(r)
 				local length = bone.data.length
 				boneX = boneX + (length * (cos * a - sin * c) - dx) * rotateMix;
 				boneY = boneY + (length * (sin * a + cos * c) - dy) * rotateMix;
+			else
+				r = r + offsetRotation
 			end
 			if r > math_pi then
 				r = r - math_pi2

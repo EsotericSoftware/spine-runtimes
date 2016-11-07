@@ -30,6 +30,8 @@
 
 local utils = {}
 
+utils.degRad = math.pi / 180
+
 function tablePrint (tt, indent, done)
 	done = done or {}
 	for key, value in pairs(tt) do
