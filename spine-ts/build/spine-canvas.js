@@ -3031,7 +3031,14 @@ var spine;
 			}
 			var positions = this.computeWorldPositions(attachment, spacesCount, tangents, data.positionMode == spine.PositionMode.Percent, spacingMode == spine.SpacingMode.Percent);
 			var boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
-			var tip = rotateMode == spine.RotateMode.Chain && offsetRotation == 0;
+			var tip = false;
+			if (offsetRotation == 0)
+				tip = rotateMode == spine.RotateMode.Chain;
+			else {
+				tip = false;
+				var p = this.target.bone;
+				offsetRotation *= p.a * p.d - p.b * p.c > 0 ? spine.MathUtils.degRad : -spine.MathUtils.degRad;
+			}
 			for (var i = 0, p = 3; i < boneCount; i++, p += 3) {
 				var bone = bones[i];
 				bone.worldX += (boneX - bone.worldX) * translateMix;
@@ -3055,13 +3062,16 @@ var spine;
 						r = positions[p + 2];
 					else
 						r = Math.atan2(dy, dx);
-					r -= Math.atan2(c, a) - offsetRotation * spine.MathUtils.degRad;
+					r -= Math.atan2(c, a);
 					if (tip) {
 						cos = Math.cos(r);
 						sin = Math.sin(r);
 						var length_3 = bone.data.length;
 						boneX += (length_3 * (cos * a - sin * c) - dx) * rotateMix;
 						boneY += (length_3 * (sin * a + cos * c) - dy) * rotateMix;
+					}
+					else {
+						r += offsetRotation;
 					}
 					if (r > spine.MathUtils.PI)
 						r -= spine.MathUtils.PI2;
@@ -5155,13 +5165,16 @@ var spine;
 			var rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
 			var target = this.target;
 			var ta = target.a, tb = target.b, tc = target.c, td = target.d;
+			var degRadReflect = ta * td - tb * tc > 0 ? spine.MathUtils.degRad : -spine.MathUtils.degRad;
+			var offsetRotation = this.data.offsetRotation * degRadReflect;
+			var offsetShearY = this.data.offsetShearY * degRadReflect;
 			var bones = this.bones;
 			for (var i = 0, n = bones.length; i < n; i++) {
 				var bone = bones[i];
 				var modified = false;
 				if (rotateMix != 0) {
 					var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-					var r = Math.atan2(tc, ta) - Math.atan2(c, a) + this.data.offsetRotation * spine.MathUtils.degRad;
+					var r = Math.atan2(tc, ta) - Math.atan2(c, a) + offsetRotation;
 					if (r > spine.MathUtils.PI)
 						r -= spine.MathUtils.PI2;
 					else if (r < -spine.MathUtils.PI)
@@ -5204,7 +5217,7 @@ var spine;
 						r -= spine.MathUtils.PI2;
 					else if (r < -spine.MathUtils.PI)
 						r += spine.MathUtils.PI2;
-					r = by + (r + this.data.offsetShearY * spine.MathUtils.degRad) * shearMix;
+					r = by + (r + offsetShearY) * shearMix;
 					var s = Math.sqrt(b * b + d * d);
 					bone.b = Math.cos(r) * s;
 					bone.d = Math.sin(r) * s;

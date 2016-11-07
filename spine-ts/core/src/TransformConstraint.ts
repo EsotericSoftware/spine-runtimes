@@ -58,6 +58,9 @@ module spine {
 			let rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
 			let target = this.target;
 			let ta = target.a, tb = target.b, tc = target.c, td = target.d;
+			let degRadReflect = ta * td - tb * tc > 0 ? MathUtils.degRad : -MathUtils.degRad;
+			let offsetRotation = this.data.offsetRotation * degRadReflect;
+			let offsetShearY = this.data.offsetShearY * degRadReflect;
 			let bones = this.bones;
 			for (let i = 0, n = bones.length; i < n; i++) {
 				let bone = bones[i];
@@ -65,7 +68,7 @@ module spine {
 
 				if (rotateMix != 0) {
 					let a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-					let r = Math.atan2(tc, ta) - Math.atan2(c, a) + this.data.offsetRotation * MathUtils.degRad;
+					let r = Math.atan2(tc, ta) - Math.atan2(c, a) + offsetRotation;
 					if (r > MathUtils.PI)
 						r -= MathUtils.PI2;
 					else if (r < -MathUtils.PI)
@@ -109,7 +112,7 @@ module spine {
 						r -= MathUtils.PI2;
 					else if (r < -MathUtils.PI)
 						r += MathUtils.PI2;
-					r = by + (r + this.data.offsetShearY * MathUtils.degRad) * shearMix;
+					r = by + (r + offsetShearY) * shearMix;
 					let s = Math.sqrt(b * b + d * d);
 					bone.b = Math.cos(r) * s;
 					bone.d = Math.sin(r) * s;
