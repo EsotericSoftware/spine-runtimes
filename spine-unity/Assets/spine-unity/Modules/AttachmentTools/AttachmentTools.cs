@@ -33,17 +33,43 @@ using System.Collections.Generic;
 
 namespace Spine.Unity.Modules.AttachmentTools {
 	public static class AttachmentRegionExtensions {
+		#region Get
+		/// <summary>
+		/// Tries to get the region (image) of a renderable attachment. If the attachment is not renderable, it returns null.</summary>
+		public static AtlasRegion GetRegion (this Attachment attachment) {
+			var regionAttachment = attachment as RegionAttachment;
+			if (regionAttachment != null)
+				return regionAttachment.RendererObject as AtlasRegion;
+
+			var meshAttachment = attachment as MeshAttachment;
+			if (meshAttachment != null)
+				return meshAttachment.RendererObject as AtlasRegion;
+
+			return null;
+		}
+
+		/// <summary>Gets the region (image) of a RegionAttachment</summary>
+		public static AtlasRegion GetRegion (this RegionAttachment regionAttachment) {
+			return regionAttachment.RendererObject as AtlasRegion;
+		}
+
+		/// <summary>Gets the region (image) of a MeshAttachment</summary>
+		public static AtlasRegion GetRegion (this MeshAttachment meshAttachment) {
+			return meshAttachment.RendererObject as AtlasRegion;
+		}
+		#endregion
+
+		#region Set
 		/// <summary>
 		/// Tries to set the region (image) of a renderable attachment. If the attachment is not renderable, nothing is applied.</summary>
 		public static void SetRegion (this Attachment attachment, AtlasRegion region, bool updateOffset = true) {
 			var regionAttachment = attachment as RegionAttachment;
-			if (regionAttachment != null) {
+			if (regionAttachment != null)
 				regionAttachment.SetRegion(region, updateOffset);
-			} else {
-				var meshAttachment = attachment as MeshAttachment;
-				if (meshAttachment != null)
+
+			var meshAttachment = attachment as MeshAttachment;
+			if (meshAttachment != null)
 					meshAttachment.SetRegion(region, updateOffset);
-			}
 		}
 
 		/// <summary>Sets the region (image) of a RegionAttachment</summary>
@@ -83,6 +109,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 			if (updateUVs) attachment.UpdateUVs();
 		}
+		#endregion
 
 		#region Runtime RegionAttachments
 		/// <summary>
