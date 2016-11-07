@@ -102,7 +102,14 @@ public class PathConstraint implements Constraint {
 		var positions:Vector.<Number> = computeWorldPositions(attachment, spacesCount, tangents,
 			data.positionMode == PositionMode.percent, spacingMode == SpacingMode.percent);		
 		var boneX:Number = positions[0], boneY:Number = positions[1], offsetRotation:Number = data.offsetRotation;
-		var tip:Boolean = rotateMode == RotateMode.chain && offsetRotation == 0;
+		var tip:Boolean = false;
+		if (offsetRotation == 0)
+			tip = rotateMode == RotateMode.chain;
+		else {
+			tip = false;
+			var pa:Bone = target.bone;
+			offsetRotation *= pa.a * pa.d - pa.b * pa.c > 0 ? MathUtils.degRad : -MathUtils.degRad;
+		}
 		var p:Number;
 		for (i = 0, p = 3; i < boneCount; i++, p += 3) {
 			bone = bones[i];
@@ -127,13 +134,15 @@ public class PathConstraint implements Constraint {
 					r = positions[p + 2];
 				else
 					r = Math.atan2(dy, dx);
-				r -= Math.atan2(c, a) - offsetRotation * MathUtils.degRad;
+				r -= Math.atan2(c, a);	
 				if (tip) {
 					cos = Math.cos(r);
 					sin = Math.sin(r);
 					length = bone.data.length;
 					boneX += (length * (cos * a - sin * c) - dx) * rotateMix;
 					boneY += (length * (sin * a + cos * c) - dy) * rotateMix;
+				} else {
+					r += offsetRotation;
 				}
 				if (r > Math.PI)
 					r -= (Math.PI * 2);

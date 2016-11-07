@@ -62,6 +62,9 @@ public class TransformConstraint implements Constraint {
 		var rotateMix:Number = this.rotateMix, translateMix:Number = this.translateMix, scaleMix:Number = this.scaleMix, shearMix:Number = this.shearMix;
 		var target:Bone = this.target;
 		var ta:Number = target.a, tb:Number = target.b, tc:Number = target.c, td:Number = target.d;
+		var degRadReflect:Number = ta * td - tb * tc > 0 ? MathUtils.degRad : -MathUtils.degRad;
+		var offsetRotation:Number = data.offsetRotation * degRadReflect;
+		var offsetShearY:Number = data.offsetShearY * degRadReflect;
 		var bones:Vector.<Bone> = this._bones;
 		for (var i:int = 0, n:int = bones.length; i < n; i++) {
 			var bone:Bone = bones[i];
@@ -69,7 +72,7 @@ public class TransformConstraint implements Constraint {
 
 			if (rotateMix != 0) {
 				var a:Number = bone.a, b:Number = bone.b, c:Number = bone.c, d:Number = bone.d;
-				var r:Number = Math.atan2(tc, ta) - Math.atan2(c, a) + data.offsetRotation * MathUtils.degRad;
+				var r:Number = Math.atan2(tc, ta) - Math.atan2(c, a) + offsetRotation;
 				if (r > Math.PI)
 					r -= Math.PI * 2;
 				else if (r < -Math.PI) r += Math.PI * 2;
@@ -112,7 +115,7 @@ public class TransformConstraint implements Constraint {
 				if (r > Math.PI)
 					r -= Math.PI * 2;
 				else if (r < -Math.PI) r += Math.PI * 2;
-				r = by + (r + data.offsetShearY * MathUtils.degRad) * shearMix;
+				r = by + (r + offsetShearY) * shearMix;
 				s = Math.sqrt(b * b + d * d);
 				bone._b = Math.cos(r) * s;
 				bone._d = Math.sin(r) * s;
