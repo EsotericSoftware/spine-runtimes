@@ -34,7 +34,8 @@ using System.Collections.Generic;
 namespace Spine {
 	public class AnimationStateData {
 		internal SkeletonData skeletonData;
-		private Dictionary<AnimationPair, float> animationToMixTime = new Dictionary<AnimationPair, float>(AnimationPairComparer.Instance);
+
+		readonly Dictionary<AnimationPair, float> animationToMixTime = new Dictionary<AnimationPair, float>(AnimationPairComparer.Instance);
 		internal float defaultMix;
 
 		public SkeletonData SkeletonData { get { return skeletonData; } }
