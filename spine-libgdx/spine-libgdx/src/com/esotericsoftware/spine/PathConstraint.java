@@ -131,7 +131,7 @@ public class PathConstraint implements Constraint {
 		else {
 			tip = false;
 			Bone p = target.bone;
-			offsetRotation *= p.a * p.d - p.b * p.c > 0 ? -degRad : degRad;
+			offsetRotation *= p.a * p.d - p.b * p.c > 0 ? degRad : -degRad;
 		}
 		for (int i = 0, p = 3; i < boneCount; i++, p += 3) {
 			Bone bone = (Bone)bones[i];
@@ -164,7 +164,7 @@ public class PathConstraint implements Constraint {
 					boneX += (length * (cos * a - sin * c) - dx) * rotateMix;
 					boneY += (length * (sin * a + cos * c) - dy) * rotateMix;
 				} else
-					r -= offsetRotation;
+					r += offsetRotation;
 				if (r > PI)
 					r -= PI2;
 				else if (r < -PI) //
