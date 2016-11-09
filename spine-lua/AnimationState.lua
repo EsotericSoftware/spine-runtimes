@@ -689,7 +689,7 @@ function AnimationState:disposeNext (entry)
   local queue = self.queue
   while _next do
     queue:dispose(_next)
-    _next = next.next
+    _next = _next.next
   end
   entry.next = nil 
 end
