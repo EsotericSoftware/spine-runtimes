@@ -337,7 +337,7 @@ function SkeletonJson.new (attachmentLoader)
 				mesh.inheritDeform = getValue(map, "deform", true)
 				table_insert(self.linkedMeshes, {
 						mesh = mesh,
-						skin = getValue(map, skin, nil),
+						skin = getValue(map, "skin", nil),
 						slotIndex = slotIndex,
 						parent = parent
 				})
