@@ -59,7 +59,7 @@ void _spAnimationState_disposeTrackEntry (spTrackEntry* entry) {
 spAnimationState* spAnimationState_create (spAnimationStateData* data) {
 	_spAnimationState* internal = NEW(_spAnimationState);
 	spAnimationState* self = SUPER(internal);
-	internal->events = MALLOC(spEvent*, 64);
+	internal->events = MALLOC(spEvent*, 256);
 	self->timeScale = 1;
 	CONST_CAST(spAnimationStateData*, self->data) = data;
 	internal->createTrackEntry = _spAnimationState_createTrackEntry;
