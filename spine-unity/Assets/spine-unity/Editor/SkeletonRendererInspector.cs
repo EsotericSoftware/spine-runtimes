@@ -258,7 +258,9 @@ namespace Spine.Unity.Editor {
 				//	}
 			} else {
 				EditorGUILayout.Space();
-				var component = (SkeletonAnimation)target;
+				//var component = (SkeletonAnimation)target;
+				//fix: "Add Skeleton Utility" button disapear when instantiate(mecanim)
+				var component = (SkeletonRenderer)target;
 				if (component.GetComponent<SkeletonUtility>() == null) {						
 					if (GUILayout.Button(buttonContent, GUILayout.Height(30)))
 						component.gameObject.AddComponent<SkeletonUtility>();
