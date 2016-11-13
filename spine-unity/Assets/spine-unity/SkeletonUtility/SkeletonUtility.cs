@@ -68,7 +68,7 @@ namespace Spine.Unity {
 		public static PolygonCollider2D AddBoundingBoxAsComponent (BoundingBoxAttachment box, Slot slot, GameObject gameObject, bool isTrigger = true) {
 			if (box == null) return null;
 			if (box.IsWeighted()) Debug.LogWarning("UnityEngine.PolygonCollider2D does not support weighted or animated points. Collider will not be animated. Please remove weights and animations from the bounding box in Spine editor.");
-			var verts = box.GetWorldVertices(slot, null);
+			var verts = box.GetLocalVertices(slot, null);
 			var collider = gameObject.AddComponent<PolygonCollider2D>();
 			collider.isTrigger = isTrigger;
 			collider.SetPath(0, verts);

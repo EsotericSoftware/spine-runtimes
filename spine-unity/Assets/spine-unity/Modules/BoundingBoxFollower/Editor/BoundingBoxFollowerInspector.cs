@@ -33,6 +33,7 @@ using UnityEditor;
 
 namespace Spine.Unity.Editor {
 	using Event = UnityEngine.Event;
+	using Icons = SpineEditorUtilities.Icons;
 
 	[CustomEditor(typeof(BoundingBoxFollower))]
 	public class BoundingBoxFollowerInspector : UnityEditor.Editor {
@@ -43,7 +44,13 @@ namespace Spine.Unity.Editor {
 		bool sceneRepaintRequired = false;
 		bool debugIsExpanded;
 
-		readonly GUIContent AddBoneFollowerLabel = new GUIContent("Add Bone Follower", SpineEditorUtilities.Icons.bone);
+		GUIContent addBoneFollowerLabel;
+		GUIContent AddBoneFollowerLabel {
+			get {
+				if (addBoneFollowerLabel == null) addBoneFollowerLabel = new GUIContent("Add Bone Follower", Icons.bone);
+				return addBoneFollowerLabel;
+			}
+		}
 
 		void OnEnable () {
 			skeletonRenderer = serializedObject.FindProperty("skeletonRenderer");
@@ -73,7 +80,7 @@ namespace Spine.Unity.Editor {
 				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
 					EditorGUILayout.HelpBox("It's ideal to add BoundingBoxFollower to a separate child GameObject of the Spine GameObject.", MessageType.Warning);
 
-					if (GUILayout.Button(new GUIContent("Move BoundingBoxFollower to new GameObject", SpineEditorUtilities.Icons.boundingBox), GUILayout.Height(50f))) {
+					if (GUILayout.Button(new GUIContent("Move BoundingBoxFollower to new GameObject", Icons.boundingBox), GUILayout.Height(50f))) {
 						AddBoundingBoxFollowerChild(sr, follower);
 						DestroyImmediate(follower);
 						return;
@@ -127,7 +134,7 @@ namespace Spine.Unity.Editor {
 							string attachmentName = kp.Value;
 							var collider = follower.colliderTable[kp.Key];
 							bool isPlaceholder = attachmentName != kp.Key.Name;
-							collider.enabled = EditorGUILayout.ToggleLeft(new GUIContent(!isPlaceholder ? attachmentName : attachmentName + " [" + kp.Key.Name + "]", isPlaceholder ? SpineEditorUtilities.Icons.skinPlaceholder : SpineEditorUtilities.Icons.boundingBox), collider.enabled);
+							collider.enabled = EditorGUILayout.ToggleLeft(new GUIContent(!isPlaceholder ? attachmentName : string.Format("{0} [{1}]", attachmentName, kp.Key.Name), isPlaceholder ? Icons.skinPlaceholder : Icons.boundingBox), collider.enabled);
 						}
 						sceneRepaintRequired |= EditorGUI.EndChangeCheck();
 						EditorGUI.indentLevel--;

@@ -33,7 +33,7 @@ using System.Collections.Generic;
 
 namespace Spine.Unity.Modules.AttachmentTools {
 	public static class AttachmentRegionExtensions {
-		#region Get
+		#region GetRegion
 		/// <summary>
 		/// Tries to get the region (image) of a renderable attachment. If the attachment is not renderable, it returns null.</summary>
 		public static AtlasRegion GetRegion (this Attachment attachment) {
@@ -58,8 +58,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			return meshAttachment.RendererObject as AtlasRegion;
 		}
 		#endregion
-
-		#region Set
+		#region SetRegion
 		/// <summary>
 		/// Tries to set the region (image) of a renderable attachment. If the attachment is not renderable, nothing is applied.</summary>
 		public static void SetRegion (this Attachment attachment, AtlasRegion region, bool updateOffset = true) {
@@ -69,7 +68,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 			var meshAttachment = attachment as MeshAttachment;
 			if (meshAttachment != null)
-					meshAttachment.SetRegion(region, updateOffset);
+				meshAttachment.SetRegion(region, updateOffset);
 		}
 
 		/// <summary>Sets the region (image) of a RegionAttachment</summary>

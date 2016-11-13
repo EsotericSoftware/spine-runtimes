@@ -129,6 +129,15 @@ namespace Spine.Unity {
 				m33 = 1
 			};
 		}
+
+		public static void GetWorldToLocalMatrix (this Bone bone, out float ia, out float ib, out float ic, out float id) {
+			float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
+			float invDet = 1 / (a * d - b * c);
+			ia = invDet * d;
+			ib = invDet * -b;
+			ic = invDet * -c;
+			id = invDet * a;
+		}
 		#endregion
 
 		#region Attachments
@@ -144,16 +153,50 @@ namespace Spine.Unity {
 			return null;
 		}
 
+		/// <summary>Fills a Vector2 buffer with local vertices.</summary>
+		/// <param name="va">The VertexAttachment</param>
+		/// <param name="slot">Slot where the attachment belongs.</param>
+		/// <param name="buffer">Correctly-sized buffer. Use attachment's .WorldVerticesLength to get the correct size. If null, a new Vector2[] of the correct size will be allocated.</param>
+		public static Vector2[] GetLocalVertices (this VertexAttachment va, Slot slot, Vector2[] buffer) {
+			int floatsCount = va.worldVerticesLength;
+			int bufferTargetSize = floatsCount >> 1;
+			buffer = buffer ?? new Vector2[bufferTargetSize];
+			if (buffer.Length < bufferTargetSize) throw new System.ArgumentException(string.Format("Vector2 buffer too small. {0} requires an array of size {1}. Use the attachment's .WorldVerticesLength to get the correct size.", va.Name, floatsCount), "buffer");
+
+			if (va.bones == null) {
+				var localVerts = va.vertices;
+				for (int i = 0; i < bufferTargetSize; i++) {
+					int j = i * 2;
+					buffer[i] = new Vector2(localVerts[j], localVerts[j+1]);
+				}
+			} else {
+				var floats = new float[floatsCount];
+				va.ComputeWorldVertices(slot, floats);
+
+				Bone sb = slot.bone;
+				float bwx = sb.worldX, bwy = sb.worldY, ia, ib, ic, id;
+				sb.GetWorldToLocalMatrix(out ia, out ib, out ic, out id);
+
+				for (int i = 0; i < bufferTargetSize; i++) {
+					int j = i * 2;
+					float x = floats[j] - bwx, y = floats[j+1] - bwy;
+					buffer[i] = new Vector2(x * ia + y * ic, x * ib + y * id);
+				}
+			}
+
+			return buffer;
+		}
+
 		/// <summary>Calculates world vertices and fills a Vector2 buffer.</summary>
 		/// <param name="a">The VertexAttachment</param>
-		/// <param name="slot">Slot where </param>
+		/// <param name="slot">Slot where the attachment belongs.</param>
 		/// <param name="buffer">Correctly-sized buffer. Use attachment's .WorldVerticesLength to get the correct size. If null, a new Vector2[] of the correct size will be allocated.</param>
 		public static Vector2[] GetWorldVertices (this VertexAttachment a, Slot slot, Vector2[] buffer) {
 			int worldVertsLength = a.worldVerticesLength;
 			int bufferTargetSize = worldVertsLength >> 1;
 			buffer = buffer ?? new Vector2[bufferTargetSize];
 			if (buffer.Length < bufferTargetSize) throw new System.ArgumentException(string.Format("Vector2 buffer too small. {0} requires an array of size {1}. Use the attachment's .WorldVerticesLength to get the correct size.", a.Name, worldVertsLength), "buffer");
-			
+
 			var floats = new float[worldVertsLength];
 			a.ComputeWorldVertices(slot, floats);
 
