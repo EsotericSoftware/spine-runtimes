@@ -1643,14 +1643,14 @@ var spine;
 			request.onreadystatechange = function () {
 				if (request.readyState == XMLHttpRequest.DONE) {
 					if (request.status >= 200 && request.status < 300) {
+						_this.assets[path] = request.responseText;
 						if (success)
 							success(path, request.responseText);
-						_this.assets[path] = request.responseText;
 					}
 					else {
+						_this.errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
 						if (error)
 							error(path, "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText);
-						_this.errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
 					}
 					_this.toLoad--;
 					_this.loaded++;
@@ -1666,22 +1666,22 @@ var spine;
 			path = this.pathPrefix + path;
 			this.toLoad++;
 			var img = new Image();
-			img.src = path;
 			img.crossOrigin = "anonymous";
+			img.src = path;
 			img.onload = function (ev) {
-				if (success)
-					success(path, img);
 				var texture = _this.textureLoader(img);
 				_this.assets[path] = texture;
 				_this.toLoad--;
 				_this.loaded++;
+				if (success)
+					success(path, img);
 			};
 			img.onerror = function (ev) {
-				if (error)
-					error(path, "Couldn't load image " + path);
 				_this.errors[path] = "Couldn't load image " + path;
 				_this.toLoad--;
 				_this.loaded++;
+				if (error)
+					error(path, "Couldn't load image " + path);
 			};
 		};
 		AssetManager.prototype.get = function (path) {
