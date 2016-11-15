@@ -35,6 +35,14 @@
 extern "C" {
 #endif
 
+typedef enum {
+	SP_TRANSFORMMODE_NORMAL,
+	SP_TRANSFORMMODE_ONLYTRANSLATION,
+	SP_TRANSFORMMODE_NOROTATIONORREFLECTION,
+	SP_TRANSFORMMODE_NOSCALE,
+	SP_TRANSFORMMODE_NOSCALEORREFLECTION
+} spTransformMode;
+
 typedef struct spBoneData spBoneData;
 struct spBoneData {
 	const int index;
@@ -42,7 +50,7 @@ struct spBoneData {
 	spBoneData* const parent;
 	float length;
 	float x, y, rotation, scaleX, scaleY, shearX, shearY;
-	int/*bool*/inheritRotation, inheritScale;
+	spTransformMode transformMode;
 
 #ifdef __cplusplus
 	spBoneData() :
@@ -54,7 +62,7 @@ struct spBoneData {
 		rotation(0),
 		scaleX(0), scaleY(0),
 		shearX(0), shearY(0),
-		inheritRotation(0), inheritScale(0) {
+		transformMode(SP_TRANSFORMMODE_NORMAL) {
 	}
 #endif
 };

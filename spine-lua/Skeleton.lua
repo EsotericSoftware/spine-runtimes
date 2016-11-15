@@ -55,10 +55,11 @@ function Skeleton.new (data)
 		slots = {},
 		slotsByName = {},
 		drawOrder = {},
-		ikConstraints = {}, ikConstaintsSorted = {},
+		ikConstraints = {},
 		transformConstraints = {},
 		pathConstraints = {},
 		_updateCache = {},
+		updateCacheReset = {},
 		skin = nil,
 		color = Color.newWith(1, 1, 1, 1),
 		time = 0,
@@ -115,105 +116,134 @@ function Skeleton:updateCache ()
 		bone.sorted = false
 	end
 
-	local ikConstraints = {}
-	self.ikConstraintsSorted = ikConstraints
-	for i, constraint in ipairs(self.ikConstraints) do
-		table_insert(ikConstraints, constraint)
-	end
-
-	local level = 0
-	for i, ik in ipairs(ikConstraints) do
-		local bone = ik.bones[1].parent
-		level = 0
-		while bone do
-			bone = bone.parent
-			level = level + 1
-		end
-		ik.level = level
-	end
-
-	local i = 1
+	local ikConstraints = self.ikConstraints
+	local transformConstraints = self.transformConstraints
+	local pathConstraints = self.pathConstraints
 	local ikCount = #ikConstraints
-	while i < ikCount do
-		local ik = ikConstraints[i + 1]
-		local level = ik.level
-		local ii = i - 1
-		while ii >= 0 do
-			local other = ikConstraints[ii + 1]
-			if other.level < level then break end
-			ikConstraints[ii + 1 + 1] = other
-			ii = ii - 1
+	local transformCount = #transformConstraints
+	local pathCount = #pathConstraints
+	local constraintCount = ikCount + transformCount + pathCount
+	
+	local i = 0
+	while i < constraintCount do
+		local found = false
+		local ii = 1
+		while ii <= ikCount do
+			local constraint = ikConstraints[ii]
+			if constraint.data.order == i then
+				self:sortIkConstraint(constraint)
+				found = true
+				break
+			end
+			ii = ii + 1
 		end
-		ikConstraints[ii + 1 + 1] = ik
+		
+		if not found then
+			ii = 1
+			while ii <= transformCount do
+				local constraint = transformConstraints[ii]
+				if constraint.data.order == i then
+					self:sortTransformConstraint(constraint)
+					found = true
+					break
+				end
+				ii = ii + 1
+			end
+		end
+		
+		if not found then
+			ii = 1
+			while ii <= pathCount do
+				local constraint = pathConstraints[ii]
+				if constraint.data.order == i then
+					self:sortPathConstraint(constraint)
+					break
+				end
+				ii = ii + 1
+			end
+		end
+		
 		i = i + 1
 	end
-
-	for i, constraint in ipairs(ikConstraints) do
-		local target = constraint.target
-		self:sortBone(target)
-
-		local constrained = constraint.bones
-		local parent = constrained[1]
-		self:sortBone(parent)
-
-		table_insert(updateCache, constraint)
-
-		self:sortReset(parent.children)
-		constrained[#constrained].sorted = true
-	end
-
-	-- path constraints
-	local pathConstraints = self.pathConstraints
-	for i,constraint in ipairs(pathConstraints) do
-		local slot = constraint.target
-		local slotIndex = slot.data.index
-		local slotBone = slot.bone
-		if self.skin then self:sortPathConstraintAttachment(self.skin, slotIndex, slotBone) end
-		if self.data.defaultSkin and self.data.defaultSkin ~= self.skin then self:sortPathConstraintAttachment(self.data.defaultSkin, slotIndex, slotBone) end
-		for i,skin in ipairs(self.data.skins) do
-			self:sortPathConstraintAttachment(skin, slotIndex, slotBone)
-		end
-
-		local attachment = slot.attachment
-		if attachment.type == AttachmentType.path then self:sortPathConstraintAttachmentWith(attachment, slotBone) end
-
-		local constrained = constraint.bones
-		for i,c in ipairs(constrained) do
-			self:sortBone(c)
-		end
-
-		table_insert(updateCache, constraint)
-
-		for i,c in ipairs(constrained) do
-			self:sortReset(c.children)
-		end
-		for i,c in ipairs(constrained) do
-			c.sorted = true
-		end
-	end
-
-	-- transform constraints
-	local transformConstraints = self.transformConstraints
-	for i, constraint in ipairs(transformConstraints) do
-		self:sortBone(constraint.target)
-
-		local constrained = constraint.bones
-		for i,c in ipairs(constrained) do
-			self:sortBone(c)
-		end
-
-		table_insert(updateCache, constraint)
-
-		for i,c in ipairs(constrained) do
-			self:sortReset(c.children)
-		end
-		for i,c in ipairs(constrained) do
-			c.sorted = true
-		end
-	end
-
+	
 	for i, bone in ipairs(self.bones) do
 		self:sortBone(bone)
+	end
+end
+
+function Skeleton:sortIkConstraint (constraint)
+	local target = constraint.target
+	self:sortBone(target)
+	
+	local constrained = constraint.bones
+	local parent = constrained[1]
+	self:sortBone(parent)
+	
+	if #constrained > 1 then
+		local child = constrained[#constrained]
+		local contains = false
+		for i,updatable in ipairs(self._updateCache) do
+			if updatable == child then
+				contains = true
+				break
+			end
+		end
+		if not contains then table_insert(self.updateCacheReset, child) end
+	end
+	
+	table_insert(self._updateCache, constraint)
+	
+	self:sortReset(parent.children)
+	constrained[#constrained].sorted = true
+end
+
+function Skeleton:sortPathConstraint(constraint)
+	local slot = constraint.target
+	local slotIndex = slot.data.index
+	local slotBone = slot.bone
+	if self.skin then self:sortPathConstraintAttachment(skin, slotIndex, slotBone) end
+	if self.data.defaultSkin and not (self.data.defaultSkin == skin) then
+		self:sortPathConstraintAttachment(self.data.defaultSkin, slotIndex, slotBone)
+	end
+	for ii,skin in ipairs(self.data.skins) do
+		self:sortPathConstraintAttachment(skin, slotIndex, slotBone)
+	end
+	
+	local attachment = slot.attachment
+	if attachment.type == AttachmentType.path then self:sortPathConstraintAttachmentWith(attachment, slotBone) end
+	
+	local constrained = constraint.bones
+	for ii,bone in ipairs(constrained) do
+		self:sortBone(bone)
+	end
+	
+	table_insert(self._updateCache, constraint)
+	
+	for i,bone in ipairs(constrained) do
+		self:sortReset(bone.children)
+	end
+	
+	for i,bone in ipairs(constrained) do
+		bone.sorted = true
+	end
+end
+
+function Skeleton:sortTransformConstraint(constraint)
+	self:sortBone(constraint.target)
+	
+	local constrained = constraint.bones
+	for ii,bone in ipairs(constrained) do
+		self:sortBone(bone)
+	end
+	
+	table_insert(self._updateCache, constraint)
+	
+	for i,bone in ipairs(constrained) do
+		self:sortReset(bone.children)
+	end
+	
+	for i,bone in ipairs(constrained) do
+		bone.sorted = true
 	end
 end
 
@@ -263,6 +293,18 @@ end
 
 -- Updates the world transform for each bone and applies IK constraints.
 function Skeleton:updateWorldTransform ()
+	local updateCacheReset = self.updateCacheReset
+	for i,bone in ipairs(updateCacheReset) do
+		bone.ax = bone.x
+		bone.ay = bone.y
+		bone.arotation = bone.rotation
+		bone.ascaleX = bone.scaleX
+		bone.ascaleY = bone.scaleY
+		bone.ashearX = bone.shearX
+		bone.ashearY = bone.shearY
+		bone.appliedValid = true
+	end
+	
 	local updateCache = self._updateCache
 	for i, updatable in ipairs(updateCache) do
 		updatable:update()

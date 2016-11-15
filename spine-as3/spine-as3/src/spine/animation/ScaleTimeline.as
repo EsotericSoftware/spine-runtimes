@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 package spine.animation {
+import spine.MathUtils;
 import spine.Bone;
 import spine.Event;
 import spine.Skeleton;
@@ -37,27 +38,62 @@ public class ScaleTimeline extends TranslateTimeline {
 	public function ScaleTimeline (frameCount:int) {
 		super(frameCount);
 	}
+	
+	override public function getPropertyId () : int {
+		return (TimelineType.scale.ordinal << 24) + boneIndex;
+	}
 
-	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
-		if (time < frames[0])
-			return; // Time is before first frame.
-
+	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
+		var frames:Vector.<Number> = this.frames;
 		var bone:Bone = skeleton.bones[boneIndex];
-		if (time >= frames[int(frames.length - ENTRIES)]) { // Time is after last frame.
-			bone.scaleX += (bone.data.scaleX * frames[int(frames.length + PREV_X)] - bone.scaleX) * alpha;
-			bone.scaleY += (bone.data.scaleY * frames[int(frames.length + PREV_Y)] - bone.scaleY) * alpha;
+		
+		if (time < frames[0]) {
+			if (setupPose) {
+				bone.scaleX = bone.data.scaleX;
+				bone.scaleY = bone.data.scaleY;	
+			}
 			return;
 		}
 
-		// Interpolate between the previous frame and the current frame.
-		var frame:int = Animation.binarySearch(frames, time, ENTRIES);
-		var prevX:Number = frames[frame + PREV_X];
-		var prevY:Number = frames[frame + PREV_Y];
-		var frameTime:Number = frames[frame];
-		var percent:Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+		var x:Number, y:Number;
+		if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
+			x = frames[frames.length + PREV_X] * bone.data.scaleX;
+			y = frames[frames.length + PREV_Y] * bone.data.scaleY;
+		} else {
+			// Interpolate between the previous frame and the current frame.
+			var frame:int = Animation.binarySearch(frames, time, ENTRIES);
+			x = frames[frame + PREV_X];
+			y = frames[frame + PREV_Y];
+			var frameTime:Number = frames[frame];
+			var percent:Number = getCurvePercent(frame / ENTRIES - 1,
+				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-		bone.scaleX += (bone.data.scaleX * (prevX + (frames[frame + X] - prevX) * percent) - bone.scaleX) * alpha;
-		bone.scaleY += (bone.data.scaleY * (prevY + (frames[frame + Y] - prevY) * percent) - bone.scaleY) * alpha;
+			x = (x + (frames[frame + X] - x) * percent) * bone.data.scaleX;
+			y = (y + (frames[frame + Y] - y) * percent) * bone.data.scaleY;
+		}
+		if (alpha == 1) {
+			bone.scaleX = x;
+			bone.scaleY = y;
+		} else {
+			var bx:Number, by:Number;
+			if (setupPose) {
+				bx = bone.data.scaleX;
+				by = bone.data.scaleY;
+			} else {
+				bx = bone.scaleX;
+				by = bone.scaleY;
+			}
+			// Mixing out uses sign of setup or current pose, else use sign of key.
+			if (mixingOut) {
+				x = Math.abs(x) * MathUtils.signum(bx);
+				y = Math.abs(y) * MathUtils.signum(by);
+			} else {
+				bx = Math.abs(bx) * MathUtils.signum(x);
+				by = Math.abs(by) * MathUtils.signum(y);
+			}
+			bone.scaleX = bx + (x - bx) * alpha;
+			bone.scaleY = by + (y - by) * alpha;
+		}
 	}
 }
 

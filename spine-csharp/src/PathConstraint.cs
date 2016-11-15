@@ -31,7 +31,7 @@
 using System;
 
 namespace Spine {
-	public class PathConstraint : IUpdatable {
+	public class PathConstraint : IConstraint {
 		private const int NONE = -1, BEFORE = -2, AFTER = -3;
 
 		internal PathConstraintData data;
@@ -43,6 +43,7 @@ namespace Spine {
 		internal ExposedList<float> world = new ExposedList<float>(), curves = new ExposedList<float>(), lengths = new ExposedList<float>();
 		internal float[] segments = new float[10];
 
+		public int Order { get { return data.order; } }
 		public float Position { get { return position; } set { position = value; } }
 		public float Spacing { get { return spacing; } set { spacing = value; } }
 		public float RotateMix { get { return rotateMix; } set { rotateMix = value; } }
@@ -68,7 +69,7 @@ namespace Spine {
 		public void Apply () {
 			Update();
 		}
-
+			
 		public void Update () {
 			PathAttachment attachment = target.Attachment as PathAttachment;
 			if (attachment == null) return;
@@ -102,14 +103,19 @@ namespace Spine {
 
 			float[] positions = ComputeWorldPositions(attachment, spacesCount, tangents,
 				data.positionMode == PositionMode.Percent, spacingMode == SpacingMode.Percent);
-			Skeleton skeleton = target.Skeleton;
-			float skeletonX = skeleton.x, skeletonY = skeleton.y;
 			float boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
-			bool tip = rotateMode == RotateMode.Chain && offsetRotation == 0;
+			bool tip;
+			if (offsetRotation == 0) {
+				tip = rotateMode == RotateMode.Chain;
+			} else {
+				tip = false;
+				Bone p = target.bone;
+				offsetRotation *= p.a * p.d - p.b * p.c > 0 ? MathUtils.DegRad : -MathUtils.DegRad;
+			}
 			for (int i = 0, p = 3; i < boneCount; i++, p += 3) {
 				Bone bone = (Bone)bones[i];
-				bone.worldX += (boneX - skeletonX - bone.worldX) * translateMix;
-				bone.worldY += (boneY - skeletonY - bone.worldY) * translateMix;
+				bone.worldX += (boneX - bone.worldX) * translateMix;
+				bone.worldY += (boneY - bone.worldY) * translateMix;
 				float x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
 				if (scale) {
 					float length = lengths.Items[i];
@@ -129,13 +135,15 @@ namespace Spine {
 						r = positions[p + 2];
 					else
 						r = MathUtils.Atan2(dy, dx);
-					r -= MathUtils.Atan2(c, a) - offsetRotation * MathUtils.degRad;
+					r -= MathUtils.Atan2(c, a);
 					if (tip) {
 						cos = MathUtils.Cos(r);
 						sin = MathUtils.Sin(r);
 						float length = bone.data.length;
 						boneX += (length * (cos * a - sin * c) - dx) * rotateMix;
 						boneY += (length * (sin * a + cos * c) - dy) * rotateMix;
+					} else {
+						r += offsetRotation;
 					}
 					if (r > MathUtils.PI)
 						r -= MathUtils.PI2;
@@ -149,6 +157,7 @@ namespace Spine {
 					bone.c = sin * a + cos * c;
 					bone.d = sin * b + cos * d;
 				}
+				bone.appliedValid = false;
 			}
 		}
 
@@ -387,7 +396,7 @@ namespace Spine {
 
 		private void AddCurvePosition (float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2,
 			float[] output, int o, bool tangents) {
-			if (p == 0) p = 0.0001f;
+			if (p == 0 || float.IsNaN(p)) p = 0.0001f;
 			float tt = p * p, ttt = tt * p, u = 1 - p, uu = u * u, uuu = uu * u;
 			float ut = u * p, ut3 = ut * 3, uut3 = u * ut3, utt3 = ut3 * p;
 			float x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;

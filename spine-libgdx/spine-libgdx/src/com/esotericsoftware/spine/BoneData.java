@@ -32,13 +32,14 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.graphics.Color;
 
+/** Stores the setup pose for a {@link Bone}. */
 public class BoneData {
 	final int index;
 	final String name;
 	final BoneData parent;
 	float length;
 	float x, y, rotation, scaleX = 1, scaleY = 1, shearX, shearY;
-	boolean inheritRotation = true, inheritScale = true;
+	TransformMode transformMode = TransformMode.normal;
 
 	// Nonessential.
 	final Color color = new Color(0.61f, 0.61f, 0.61f, 1);
@@ -69,10 +70,12 @@ public class BoneData {
 		shearY = bone.shearY;
 	}
 
+	/** The index of the bone in {@link Skeleton#getBones()}. */
 	public int getIndex () {
 		return index;
 	}
 
+	/** The name of the bone, which is unique within the skeleton. */
 	public String getName () {
 		return name;
 	}
@@ -82,6 +85,7 @@ public class BoneData {
 		return parent;
 	}
 
+	/** The bone's length. */
 	public float getLength () {
 		return length;
 	}
@@ -90,6 +94,7 @@ public class BoneData {
 		this.length = length;
 	}
 
+	/** The local x translation. */
 	public float getX () {
 		return x;
 	}
@@ -98,6 +103,7 @@ public class BoneData {
 		this.x = x;
 	}
 
+	/** The local y translation. */
 	public float getY () {
 		return y;
 	}
@@ -111,6 +117,7 @@ public class BoneData {
 		this.y = y;
 	}
 
+	/** The local rotation. */
 	public float getRotation () {
 		return rotation;
 	}
@@ -119,6 +126,7 @@ public class BoneData {
 		this.rotation = rotation;
 	}
 
+	/** The local scaleX. */
 	public float getScaleX () {
 		return scaleX;
 	}
@@ -127,6 +135,7 @@ public class BoneData {
 		this.scaleX = scaleX;
 	}
 
+	/** The local scaleY. */
 	public float getScaleY () {
 		return scaleY;
 	}
@@ -140,6 +149,7 @@ public class BoneData {
 		this.scaleY = scaleY;
 	}
 
+	/** The local shearX. */
 	public float getShearX () {
 		return shearX;
 	}
@@ -148,6 +158,7 @@ public class BoneData {
 		this.shearX = shearX;
 	}
 
+	/** The local shearX. */
 	public float getShearY () {
 		return shearY;
 	}
@@ -156,27 +167,29 @@ public class BoneData {
 		this.shearY = shearY;
 	}
 
-	public boolean getInheritRotation () {
-		return inheritRotation;
+	/** The transform mode for how parent world transforms affect this bone. */
+	public TransformMode getTransformMode () {
+		return transformMode;
 	}
 
-	public void setInheritRotation (boolean inheritRotation) {
-		this.inheritRotation = inheritRotation;
+	public void setTransformMode (TransformMode transformMode) {
+		this.transformMode = transformMode;
 	}
 
-	public boolean getInheritScale () {
-		return inheritScale;
-	}
-
-	public void setInheritScale (boolean inheritScale) {
-		this.inheritScale = inheritScale;
-	}
-
+	/** The color of the bone as it was in Spine. Available only when nonessential data was exported. Bones are not usually
+	 * rendered at runtime. */
 	public Color getColor () {
 		return color;
 	}
 
 	public String toString () {
 		return name;
+	}
+
+	/** Determines how a bone inherits world transforms from parent bones. */
+	static public enum TransformMode {
+		normal, onlyTranslation, noRotationOrReflection, noScale, noScaleOrReflection;
+
+		static public final TransformMode[] values = TransformMode.values();
 	}
 }

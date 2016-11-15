@@ -14,13 +14,13 @@
 <script>
 new spine.SpineWidget("spine-widget", {
 	json: "assets/spineboy.json",
-	atlas: "assets/spineboy.atlas",		
-	animation: "run",	
-	backgroundColor: "#000000",
+	atlas: "assets/spineboy.atlas",
+	animation: "run",
+	backgroundColor: "#00000000",
 	debug: true,
 	success: function (widget) {
 		var animIndex = 0;
-		widget.canvas.onclick = function () {				
+		widget.canvas.onclick = function () {
 			animIndex++;
 			let animations = widget.skeleton.data.animations;
 			if (animIndex >= animations.length) animIndex = 0;

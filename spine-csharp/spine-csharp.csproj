@@ -53,18 +53,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\Animation.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\AnimationState.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\AnimationStateData.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\Atlas.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="src\Animation.cs" />
+    <Compile Include="src\AnimationState.cs" />
+    <Compile Include="src\AnimationStateData.cs" />
+    <Compile Include="src\Atlas.cs" />
     <Compile Include="src\Attachments\AtlasAttachmentLoader.cs" />
     <Compile Include="src\Attachments\Attachment.cs" />
     <Compile Include="src\Attachments\AttachmentLoader.cs" />
@@ -74,69 +66,30 @@
     <Compile Include="src\Attachments\PathAttachment.cs" />
     <Compile Include="src\Attachments\RegionAttachment.cs" />
     <Compile Include="src\Attachments\VertexAttachment.cs" />
-    <Compile Include="src\BlendMode.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\Bone.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\BoneData.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\Event.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\EventData.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\ExposedList.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\IkConstraint.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\IkConstraintData.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\IUpdatable.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="src\BlendMode.cs" />
+    <Compile Include="src\Bone.cs" />
+    <Compile Include="src\BoneData.cs" />
+    <Compile Include="src\Event.cs" />
+    <Compile Include="src\EventData.cs" />
+    <Compile Include="src\ExposedList.cs" />
+    <Compile Include="src\IConstraint.cs" />
+    <Compile Include="src\IkConstraint.cs" />
+    <Compile Include="src\IkConstraintData.cs" />
+    <Compile Include="src\IUpdatable.cs" />
     <Compile Include="src\Json.cs" />
-    <Compile Include="src\MathUtils.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="src\MathUtils.cs" />
     <Compile Include="src\PathConstraint.cs" />
     <Compile Include="src\PathConstraintData.cs" />
-    <Compile Include="src\Skeleton.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\SkeletonBinary.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\SkeletonBounds.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\SkeletonData.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\SkeletonJson.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\Skin.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\Slot.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\SlotData.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\TransformConstraint.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\TransformConstraintData.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="src\Skeleton.cs" />
+    <Compile Include="src\SkeletonBinary.cs" />
+    <Compile Include="src\SkeletonBounds.cs" />
+    <Compile Include="src\SkeletonData.cs" />
+    <Compile Include="src\SkeletonJson.cs" />
+    <Compile Include="src\Skin.cs" />
+    <Compile Include="src\Slot.cs" />
+    <Compile Include="src\SlotData.cs" />
+    <Compile Include="src\TransformConstraint.cs" />
+    <Compile Include="src\TransformConstraintData.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

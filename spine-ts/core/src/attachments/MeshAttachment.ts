@@ -85,8 +85,7 @@ module spine {
 				skeletonColor.g * slotColor.g * meshColor.g * multiplier,
 				skeletonColor.b * slotColor.b * meshColor.b * multiplier,
 				alpha);
-
-			let x = skeleton.x, y = skeleton.y;
+			
 			let deformArray = slot.attachmentVertices;
 			let vertices = this.vertices, worldVertices = this.worldVertices;
 			let bones = this.bones;
@@ -94,8 +93,8 @@ module spine {
 				let verticesLength = vertices.length;
 				if (deformArray.length > 0) vertices = deformArray;
 				let bone = slot.bone;
-				x += bone.worldX;
-				y += bone.worldY;
+				let x = bone.worldX;
+				let y = bone.worldY;
 				let a = bone.a, b = bone.b, c = bone.c, d = bone.d;
 				for (let v = 0, w = 0; v < verticesLength; v += 2, w += 8) {
 					let vx = vertices[v], vy = vertices[v + 1];
@@ -111,7 +110,7 @@ module spine {
 			let skeletonBones = skeleton.bones;
 			if (deformArray.length == 0) {
 				for (let w = 0, v = 0, b = 0, n = bones.length; v < n; w += 8) {
-					let wx = x, wy = y;
+					let wx = 0, wy = 0;
 					let nn = bones[v++] + v;
 					for (; v < nn; v++, b += 3) {
 						let bone = skeletonBones[bones[v]];
@@ -129,7 +128,7 @@ module spine {
 			} else {
 				let deform = deformArray;
 				for (let w = 0, v = 0, b = 0, f = 0, n = bones.length; v < n; w += 8) {
-					let wx = x, wy = y;
+					let wx = 0, wy = 0;
 					let nn = bones[v++] + v;
 					for (; v < nn; v++, b += 3, f += 2) {
 						let bone = skeletonBones[bones[v]];

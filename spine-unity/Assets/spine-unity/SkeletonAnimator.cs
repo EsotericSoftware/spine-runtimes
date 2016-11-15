@@ -30,8 +30,6 @@
 
 // Contributed by: Mitch Thompson
 
-//#define USE_SPINE_EVENTS // Uncomment this define to use C# events to handle Spine events. (Does not disable Unity AnimationClip Events)
-
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -42,251 +40,146 @@ namespace Spine.Unity {
 		public enum MixMode { AlwaysMix, MixNext, SpineStyle }
 		public MixMode[] layerMixModes = new MixMode[0];
 
-		/// <summary>
-		/// Occurs after the animations are applied and before world space values are resolved.
-		/// Use this callback when you want to set bone local values.
-		/// </summary>
-		public event UpdateBonesDelegate UpdateLocal {
-			add { _UpdateLocal += value; }
-			remove { _UpdateLocal -= value; }
-		}
-
-		/// <summary>
-		/// Occurs after the Skeleton's bone world space values are resolved (including all constraints).
-		/// Using this callback will cause the world space values to be solved an extra time.
-		/// Use this callback if want to use bone world space values, and also set bone local values.
-		/// </summary>
-		public event UpdateBonesDelegate UpdateWorld {
-			add { _UpdateWorld += value; }
-			remove { _UpdateWorld -= value; }
-		}
-
-		/// <summary>
-		/// Occurs after the Skeleton's bone world space values are resolved (including all constraints).
-		/// Use this callback if you want to use bone world space values, but don't intend to modify bone local values.
-		/// This callback can also be used when setting world position and the bone matrix.
-		/// </summary>
-		public event UpdateBonesDelegate UpdateComplete {
-			add { _UpdateComplete += value; }
-			remove { _UpdateComplete -= value; }
-		}
-
+		#region Bone Callbacks (ISkeletonAnimation)
 		protected event UpdateBonesDelegate _UpdateLocal;
 		protected event UpdateBonesDelegate _UpdateWorld;
 		protected event UpdateBonesDelegate _UpdateComplete;
 
+		/// <summary>
+		/// Occurs after the animations are applied and before world space values are resolved.
+		/// Use this callback when you want to set bone local values.</summary>
+		public event UpdateBonesDelegate UpdateLocal { add { _UpdateLocal += value; } remove { _UpdateLocal -= value; } }
+
+		/// <summary>
+		/// Occurs after the Skeleton's bone world space values are resolved (including all constraints).
+		/// Using this callback will cause the world space values to be solved an extra time.
+		/// Use this callback if want to use bone world space values, and also set bone local values.</summary>
+		public event UpdateBonesDelegate UpdateWorld { add { _UpdateWorld += value; } remove { _UpdateWorld -= value; } }
+
+		/// <summary>
+		/// Occurs after the Skeleton's bone world space values are resolved (including all constraints).
+		/// Use this callback if you want to use bone world space values, but don't intend to modify bone local values.
+		/// This callback can also be used when setting world position and the bone matrix.</summary>
+		public event UpdateBonesDelegate UpdateComplete { add { _UpdateComplete += value; } remove { _UpdateComplete -= value; } }
+		#endregion
+
 		readonly Dictionary<int, Spine.Animation> animationTable = new Dictionary<int, Spine.Animation>();
 		readonly Dictionary<AnimationClip, int> clipNameHashCodeTable = new Dictionary<AnimationClip, int>();
 		Animator animator;
-		float lastTime;
-
-		#if USE_SPINE_EVENTS
-		public delegate void SkeletonAnimatorEventDelegate (Spine.Event firedEvent, float weight);
-		public event SkeletonAnimatorEventDelegate AnimationEvent;
-		public readonly ExposedList<Spine.Event> events = new ExposedList<Spine.Event>();
-		#else
-		public readonly ExposedList<Spine.Event> events = null;
-		#endif
 
 		public override void Initialize (bool overwrite) {
-			if (valid && !overwrite)
-				return;
-
+			if (valid && !overwrite) return;
 			base.Initialize(overwrite);
-
-			if (!valid)
-				return;
+			if (!valid) return;
 
 			animationTable.Clear();
 			clipNameHashCodeTable.Clear();
-
-			var data = skeletonDataAsset.GetSkeletonData(true);
-
-			foreach (var a in data.Animations) {
-				animationTable.Add(a.Name.GetHashCode(), a);
-			}
-
 			animator = GetComponent<Animator>();
-
-			lastTime = Time.time;
+			var data = skeletonDataAsset.GetSkeletonData(true);
+			foreach (var a in data.Animations)
+				animationTable.Add(a.Name.GetHashCode(), a);
 		}
 
 		void Update () {
-			if (!valid)
-				return;
+			if (!valid) return;
 
-			if (layerMixModes.Length != animator.layerCount) {
+			if (layerMixModes.Length < animator.layerCount)
 				System.Array.Resize<MixMode>(ref layerMixModes, animator.layerCount);
-			}
-			float deltaTime = Time.time - lastTime;
+			
+			//skeleton.Update(Time.deltaTime); // Doesn't actually do anything, currently. (Spine 3.5).
 
-			skeleton.Update(Time.deltaTime);
-
-			//apply
-			int layerCount = animator.layerCount;
-
-			for (int i = 0; i < layerCount; i++) {
-
-				float layerWeight = animator.GetLayerWeight(i);
-				if (i == 0)
-					layerWeight = 1;
-
-				var stateInfo = animator.GetCurrentAnimatorStateInfo(i);
-				var nextStateInfo = animator.GetNextAnimatorStateInfo(i);
+			// Apply
+			for (int layer = 0, n = animator.layerCount; layer < n; layer++) {
+				float layerWeight = (layer == 0) ? 1 : animator.GetLayerWeight(layer);
+				AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(layer);
+				AnimatorStateInfo nextStateInfo = animator.GetNextAnimatorStateInfo(layer);
 
 				#if UNITY_5
-				var clipInfo = animator.GetCurrentAnimatorClipInfo(i);
-				var nextClipInfo = animator.GetNextAnimatorClipInfo(i);
+				bool hasNext = nextStateInfo.fullPathHash != 0;
+				AnimatorClipInfo[] clipInfo = animator.GetCurrentAnimatorClipInfo(layer);
+				AnimatorClipInfo[] nextClipInfo = animator.GetNextAnimatorClipInfo(layer);
 				#else
+				bool hasNext = nextStateInfo.nameHash != 0;
 				var clipInfo = animator.GetCurrentAnimationClipState(i);
 				var nextClipInfo = animator.GetNextAnimationClipState(i);
 				#endif
-				MixMode mode = layerMixModes[i];
 
+				MixMode mode = layerMixModes[layer];
 				if (mode == MixMode.AlwaysMix) {
-					//always use Mix instead of Applying the first non-zero weighted clip
+					// Always use Mix instead of Applying the first non-zero weighted clip.
 					for (int c = 0; c < clipInfo.Length; c++) {
-						var info = clipInfo[c];
-						float weight = info.weight * layerWeight;
-						if (weight == 0)
-							continue;
-
-						float time = stateInfo.normalizedTime * info.clip.length;
-						animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, events, weight);
-						#if USE_SPINE_EVENTS
-						FireEvents(events, weight, this.AnimationEvent);
-						#endif
+						var info = clipInfo[c];	float weight = info.weight * layerWeight; if (weight == 0) continue;
+						animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length), stateInfo.loop, null, weight, false, false);
 					}
-					#if UNITY_5
-					if (nextStateInfo.fullPathHash != 0) {
-					#else
-					if (nextStateInfo.nameHash != 0) {
-					#endif
+					if (hasNext) {
 						for (int c = 0; c < nextClipInfo.Length; c++) {
-							var info = nextClipInfo[c];
-							float weight = info.weight * layerWeight;
-							if (weight == 0)
-								continue;
-
-							float time = nextStateInfo.normalizedTime * info.clip.length;
-							animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, events, weight);
-							#if USE_SPINE_EVENTS
-							FireEvents(events, weight, this.AnimationEvent);
-							#endif
+							var info = nextClipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
+							animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, nextStateInfo.normalizedTime * info.clip.length, nextStateInfo.loop, null, weight, false, false);
 						}
 					}
-				} else if (mode >= MixMode.MixNext) {
-					//apply first non-zero weighted clip
+				} else { // case MixNext || SpineStyle
+					// Apply first non-zero weighted clip
 					int c = 0;
-
 					for (; c < clipInfo.Length; c++) {
-						var info = clipInfo[c];
-						float weight = info.weight * layerWeight;
-						if (weight == 0)
-							continue;
-
-						float time = stateInfo.normalizedTime * info.clip.length;
-						animationTable[GetAnimationClipNameHashCode(info.clip)].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, events);
-						#if USE_SPINE_EVENTS
-						FireEvents(events, weight, this.AnimationEvent);
-						#endif
+						var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
+						animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length), stateInfo.loop, null, 1f, false, false);
 						break;
 					}
-
-					//mix the rest
+					// Mix the rest
 					for (; c < clipInfo.Length; c++) {
-						var info = clipInfo[c];
-						float weight = info.weight * layerWeight;
-						if (weight == 0)
-							continue;
-
-						float time = stateInfo.normalizedTime * info.clip.length;
-						animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, events, weight);
-						#if USE_SPINE_EVENTS
-						FireEvents(events, weight, this.AnimationEvent);
-						#endif
+						var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
+						animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length), stateInfo.loop, null, weight, false, false);
 					}
 
 					c = 0;
-					#if UNITY_5
-					if (nextStateInfo.fullPathHash != 0) {
-					#else
-					if (nextStateInfo.nameHash != 0) {
-					#endif
-						//apply next clip directly instead of mixing (ie:  no crossfade, ignores mecanim transition weights)
+					if (hasNext) {
+						// Apply next clip directly instead of mixing (ie: no crossfade, ignores mecanim transition weights)
 						if (mode == MixMode.SpineStyle) {
 							for (; c < nextClipInfo.Length; c++) {
-								var info = nextClipInfo[c];
-								float weight = info.weight * layerWeight;
-								if (weight == 0)
-									continue;
-
-								float time = nextStateInfo.normalizedTime * info.clip.length;
-								animationTable[GetAnimationClipNameHashCode(info.clip)].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, events);
-								#if USE_SPINE_EVENTS
-								FireEvents(events, weight, this.AnimationEvent);
-								#endif
+								var info = nextClipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
+								animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, nextStateInfo.normalizedTime * info.clip.length, nextStateInfo.loop, null, 1f, false, false);
 								break;
 							}
 						}
-
-						//mix the rest
+						// Mix the rest
 						for (; c < nextClipInfo.Length; c++) {
-							var info = nextClipInfo[c];
-							float weight = info.weight * layerWeight;
-							if (weight == 0)
-								continue;
-
-							float time = nextStateInfo.normalizedTime * info.clip.length;
-							animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, events, weight);
-							#if USE_SPINE_EVENTS
-							FireEvents(events, weight, this.AnimationEvent);
-							#endif
+							var info = nextClipInfo[c];	float weight = info.weight * layerWeight; if (weight == 0) continue;
+							animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, nextStateInfo.normalizedTime * info.clip.length, nextStateInfo.loop, null, weight, false, false);
 						}
 					}
 				}
 			}
 
-			if (_UpdateLocal != null)
-				_UpdateLocal(this);
+			// UpdateWorldTransform and Bone Callbacks
+			{
+				if (_UpdateLocal != null)
+					_UpdateLocal(this);
 
-			skeleton.UpdateWorldTransform();
-
-			if (_UpdateWorld != null) {
-				_UpdateWorld(this);
 				skeleton.UpdateWorldTransform();
-			}
 
-			if (_UpdateComplete != null) {
-				_UpdateComplete(this);
-			}
+				if (_UpdateWorld != null) {
+					_UpdateWorld(this);
+					skeleton.UpdateWorldTransform();
+				}
 
-			lastTime = Time.time;
+				if (_UpdateComplete != null)
+					_UpdateComplete(this);	
+			}
 		}
 
-		private int GetAnimationClipNameHashCode (AnimationClip clip) {
+		static float AnimationTime (float normalizedTime, float clipLength) {
+			float time = normalizedTime * clipLength;
+			const float EndSnapEpsilon = 1f/30f; // Workaround for end-duration keys not being applied.
+			return (clipLength - time < EndSnapEpsilon) ? clipLength : time; // return a time snapped to clipLength;
+		}
+
+		int NameHashCode (AnimationClip clip) {
 			int clipNameHashCode;
 			if (!clipNameHashCodeTable.TryGetValue(clip, out clipNameHashCode)) {
 				clipNameHashCode = clip.name.GetHashCode();
 				clipNameHashCodeTable.Add(clip, clipNameHashCode);
 			}
-
 			return clipNameHashCode;
 		}
-
-		#if USE_SPINE_EVENTS
-		static void FireEvents (ExposedList<Spine.Event> eventList, float weight, SkeletonAnimatorEventDelegate callback) {
-			int eventsCount = eventList.Count;
-			if (eventsCount > 0) {
-				var eventListItems = eventList.Items;
-				for (int i = 0; i < eventsCount; i++) {
-					if (callback != null)
-						callback(eventListItems[i], weight);
-				}
-
-				eventList.Clear(false);
-			}
-		}
-		#endif
 	}
 }

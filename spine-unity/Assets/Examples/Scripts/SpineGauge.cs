@@ -66,7 +66,7 @@ public class SpineGauge : MonoBehaviour {
 			if (fillAnimation == null) return;
 		}
 			
-		fillAnimation.Apply(skeleton, 0, x, false, null);
+		fillAnimation.Apply(skeleton, 0, x, false, null, 1f, true, false);
 
 		skeleton.Update(Time.deltaTime);
 		skeleton.UpdateWorldTransform();

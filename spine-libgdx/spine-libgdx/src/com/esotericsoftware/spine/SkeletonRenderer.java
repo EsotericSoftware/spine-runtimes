@@ -65,7 +65,7 @@ public class SkeletonRenderer<T extends Batch> {
 				float oldScaleX = rootBone.getScaleX();
 				float oldScaleY = rootBone.getScaleY();
 				float oldRotation = rootBone.getRotation();
-				attachmentSkeleton.setPosition(skeleton.getX() + bone.getWorldX(), skeleton.getY() + bone.getWorldY());
+				attachmentSkeleton.setPosition(bone.getWorldX(), bone.getWorldY());
 				// rootBone.setScaleX(1 + bone.getWorldScaleX() - oldScaleX);
 				// rootBone.setScaleY(1 + bone.getWorldScaleY() - oldScaleY);
 				// Set shear.

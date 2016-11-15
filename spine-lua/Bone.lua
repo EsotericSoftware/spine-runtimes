@@ -35,6 +35,10 @@ local math_sin = math.sin
 local math_cos = math.cos
 local math_atan2 = math.atan2
 local math_sqrt = math.sqrt
+local math_abs = math.abs
+local math_pi = math.pi
+
+local TransformMode = require "spine-lua.TransformMode"
 
 function math.sign(x)
 	if x<0 then
@@ -61,11 +65,11 @@ function Bone.new (data, skeleton, parent)
 		parent = parent,
 		children = { },
 		x = 0, y = 0, rotation = 0, scaleX = 1, scaleY = 1, shearX = 0, shearY = 0,
-		appliedRotation = 0,
+		ax = 0, ay = 0, arotation = 0, ascaleX = 0, ascaleY = 0, ashearX = 0, ashearY = 0,
+		appliedValid = false,
 
 		a = 0, b = 0, worldX = 0, -- a b x
 		c = 0, d = 0, worldY = 0, -- c d y
-		worldSignX = 0, worldSignY = 0,
 		sorted = false
 	}
 	setmetatable(self, Bone)
@@ -83,18 +87,24 @@ function Bone:updateWorldTransform ()
 end
 
 function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, shearY)
-	self.appliedRotation = rotation
-
-	local rotationY = rotation + 90 + shearY
-	local rotationRad = math_rad(rotation + shearX)
-	local rotationYRad = math_rad(rotationY)
-	local la = math_cos(rotationRad) * scaleX
-	local lb = math_cos(rotationYRad) * scaleY
-	local lc = math_sin(rotationRad) * scaleX
-	local ld = math_sin(rotationYRad) * scaleY
+	self.ax = x
+	self.ay = y
+	self.arotation = rotation
+	self.ascaleX = scaleX
+	self.ascaleY = scaleY
+	self.ashearX = shearX
+	self.ashearY = shearY
+	self.appliedValid = true
 
 	local parent = self.parent
 	if parent == nil then
+		local rotationY = rotation + 90 + shearY
+		local rotationRad = math_rad(rotation + shearX)
+		local rotationYRad = math_rad(rotationY)
+		local la = math_cos(rotationRad) * scaleX
+		local lb = math_cos(rotationYRad) * scaleY
+		local lc = math_sin(rotationRad) * scaleX
+		local ld = math_sin(rotationYRad) * scaleY
 		local skeleton = self.skeleton
 		if skeleton.flipX then
 			x = -x
@@ -110,10 +120,8 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		self.b = lb
 		self.c = lc
 		self.d = ld
-		self.worldX = x
-		self.worldY = y
-		self.worldSignX = math_sign(scaleX)
-		self.worldSignY = math_sign(scaleY)
+		self.worldX = x + skeleton.x
+		self.worldY = y + skeleton.y
 		return
 	end
 
@@ -123,89 +131,85 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 	local pd = parent.d
 	self.worldX = pa * x + pb * y + parent.worldX
 	self.worldY = pc * x + pd * y + parent.worldY
-	self.worldSignX = parent.worldSignX * math_sign(scaleX)
-	self.worldSignY = parent.worldSignY * math_sign(scaleY)
 
-	if self.data.inheritRotation and self.data.inheritScale then
+	local transformMode = self.data.transformMode
+	if transformMode == TransformMode.normal then
+		local rotationY = rotation + 90 + shearY
+		local la = math_cos(math_rad(rotation + shearX)) * scaleX
+		local lb = math_cos(math_rad(rotationY)) * scaleY
+		local lc = math_sin(math_rad(rotation + shearX)) * scaleX
+		local ld = math_sin(math_rad(rotationY)) * scaleY
 		self.a = pa * la + pb * lc
 		self.b = pa * lb + pb * ld
 		self.c = pc * la + pd * lc
 		self.d = pc * lb + pd * ld
-	else
-		if self.data.inheritRotation then
-			pa = 1
-			pb = 0
-			pc = 0
-			pd = 1
-			repeat
-				local appliedRotationRad = math_rad(parent.appliedRotation)
-				local cos = math_cos(appliedRotationRad)
-				local sin = math_sin(appliedRotationRad)
-				local temp = pa * cos + pb * sin
-				pb = pb * cos - pa * sin
-				pa = temp
-				temp = pc * cos + pd * sin
-				pd = pd * cos - pc * sin
-				pc = temp
-
-				if not parent.data.inheritRotation then break end
-				parent = parent.parent
-			until parent == nil
-			self.a = pa * la + pb * lc
-			self.b = pa * lb + pb * ld
-			self.c = pc * la + pd * lc
-			self.d = pc * lb + pd * ld
-		elseif self.data.inheritScale then
-			pa = 1
-			pb = 0
-			pc = 0
-			pd = 1
-			repeat
-				local appliedRotationRad = math_rad(parent.appliedRotation)
-				local cos = math_cos(appliedRotationRad)
-				local sin = math_sin(appliedRotationRad)
-				local psx = parent.scaleX
-				local psy = parent.scaleY
-				local za = cos * psx
-				local zb = sin * psy
-				local zc = sin * psx
-				local zd = cos * psy
-				local temp = pa * za + pb * zc
-				pb = pb * zd - pa * zb
-				pa = temp
-				temp = pc * za + pd * zc
-				pd = pd * zd - pc * zb
-				pc = temp
-
-				if psx >= 0 then sin = -sin end
-				temp = pa * cos + pb * sin
-				pb = pb * cos - pa * sin
-				pa = temp
-				temp = pc * cos + pd * sin
-				pd = pd * cos - pc * sin
-				pc = temp
-
-				if not parent.data.inheritScale then break end
-				parent = parent.parent
-			until parent == nil
-			self.a = pa * la + pb * lc
-			self.b = pa * lb + pb * ld
-			self.c = pc * la + pd * lc
-			self.d = pc * lb + pd * ld
+		return;
+	elseif transformMode == TransformMode.onlyTranslation then
+		local rotationY = rotation + 90 + shearY
+		self.a = math_cos(math_rad(rotation + shearX)) * scaleX
+		self.b = math_cos(math_rad(rotationY)) * scaleY
+		self.c = math_sin(math_rad(rotation + shearX)) * scaleX
+		self.d = math_sin(math_rad(rotationY)) * scaleY
+	elseif transformMode == TransformMode.noRotationOrReflection then
+		local s = pa * pa + pc * pc
+		local prx = 0
+		if s > 0.0001 then
+			s = math_abs(pa * pd - pb * pc) / s
+			pb = pc * s
+			pd = pa * s
+			prx = math_deg(math_atan2(pc, pa));
 		else
-			self.a = la
-			self.b = lb
-			self.c = lc
-			self.d = ld
+			pa = 0;
+			pc = 0;
+			prx = 90 - math_deg(math_atan2(pd, pb));
 		end
-		if self.skeleton.flipX then
-			self.a = -self.a
+		local rx = rotation + shearX - prx
+		local ry = rotation + shearY - prx + 90
+		local la = math_cos(math_rad(rx)) * scaleX
+		local lb = math_cos(math_rad(ry)) * scaleY
+		local lc = math_sin(math_rad(rx)) * scaleX
+		local ld = math_sin(math_rad(ry)) * scaleY
+		self.a = pa * la - pb * lc
+		self.b = pa * lb - pb * ld
+		self.c = pc * la + pd * lc
+		self.d = pc * lb + pd * ld	
+	elseif transformMode == TransformMode.noScale or transformMode == TransformMode.noScaleOrReflection then
+		local cos = math_cos(math_rad(rotation))
+		local sin = math_sin(math_rad(rotation))
+		local za = pa * cos + pb * sin
+		local zc = pc * cos + pd * sin
+		local s = math_sqrt(za * za + zc * zc)
+		if s > 0.00001 then s = 1 / s end
+		za = za * s
+		zc = zc * s
+		s = math_sqrt(za * za + zc * zc)
+		local r = math_pi / 2 + math_atan2(zc, za)
+		local zb = math_cos(r) * s
+		local zd = math_sin(r) * s
+		local la = math_cos(math_rad(shearX)) * scaleX;
+		local lb = math_cos(math_rad(90 + shearY)) * scaleY;
+		local lc = math_sin(math_rad(shearX)) * scaleX;
+		local ld = math_sin(90 + shearY) * scaleY;
+		self.a = za * la + zb * lc
+		self.b = za * lb + zb * ld
+		self.c = zc * la + zd * lc
+		self.d = zc * lb + zd * ld
+		local flip = self.skeleton.flipX ~= self.skeleton.flipY
+		if transformMode ~= TransformMode.noScaleOrReflection then flip = pa * pd - pb * pc < 0 end
+		if flip then
 			self.b = -self.b
-		end
-		if self.skeleton.flipY then
-			self.c = -self.c
 			self.d = -self.d
 		end
+		return
+	end
+	
+	if self.skeleton.flipX then
+		self.a = -self.a
+		self.b = -self.b
+	end
+	if self.skeleton.flipY then
+		self.c = -self.c
+		self.d = -self.d
 	end
 end
 
@@ -229,16 +233,16 @@ function Bone:getWorldRotationY ()
 end
 
 function Bone:getWorldScaleX ()
-	return math_sqrt(self.a * self.a + self.b * self.b) * self.worldSignX
+	return math_sqrt(self.a * self.a + self.c * self.c)
 end
 
 function Bone:getWorldScaleY ()
-	return math_sqrt(self.c * self.c + self.d * self.d) * self.worldSignY
+	return math_sqrt(self.b * self.b + self.d * self.d)
 end
 
 function Bone:worldToLocalRotationX ()
 	local parent = self.parent
-	if parent == nil then return self.rotation end
+	if parent == nil then return self.arotation end
 	local pa = parent.a
 	local pb = parent.b
 	local pc = parent.c
@@ -272,19 +276,19 @@ function Bone:rotateWorld (degrees)
 	self.b = cos * b - sin * d
 	self.c = sin * a + cos * c
 	self.d = sin * b + cos * d
+	self.appliedValid = false
 end
 
-function updateLocalTransform ()
+function updateAppliedTransform ()
 	local parent = self.parent
 	if parent == nil then
-		self.x = self.worldX
-		self.y = self.worldY
-		self.rotation = math_deg(math_atan2(self.c, self.a))
-		self.scaleX = math_sqrt(self.a * self.a + self.c * self.c)
-		self.scaleY = math_sqrt(self.b * self.b + self.d * self.d)
-		local det = self.a * self.d - self.b * self.c
-		self.shearX = 0
-		self.shearY = math_deg(math_atan2(self.a * self.b + self.c * self.d, det))
+		self.ax = self.worldX
+		self.ay = self.worldY
+		self.arotation = math_deg(math_atan2(self.c, self.a))
+		self.ascaleX = math_sqrt(self.a * self.a + self.c * self.c)
+		self.ascaleY = math_sqrt(self.b * self.b + self.d * self.d)
+		self.ashearX = 0
+		self.ashearY = math_deg(math_atan2(self.a * self.b + self.c * self.d, self.a * self.d - self.b * self.c))
 		return
 	end
 	local pa = parent.a
@@ -294,8 +298,8 @@ function updateLocalTransform ()
 	local pid = 1 / (pa * pd - pb * pc)
 	local dx = self.worldX - parent.worldX
 	local dy = self.worldY - parent.worldY
-	self.x = (dx * pd * pid - dy * pb * pid)
-	self.y = (dy * pa * pid - dx * pc * pid)
+	self.ax = (dx * pd * pid - dy * pb * pid)
+	self.ay = (dy * pa * pid - dx * pc * pid)
 	local ia = pid * pd
 	local id = pid * pa
 	local ib = pid * pb
@@ -304,20 +308,19 @@ function updateLocalTransform ()
 	local rb = ia * self.b - ib * self.d
 	local rc = id * self.c - ic * self.a
 	local rd = id * self.d - ic * self.b
-	self.shearX = 0
-	self.scaleX = math_sqrt(ra * ra + rc * rc)
-	if self.scaleX > 0.0001 then
+	self.ashearX = 0
+	self.ascaleX = math_sqrt(ra * ra + rc * rc)
+	if self.ascaleX > 0.0001 then
 		local det = ra * rd - rb * rc
-		self.scaleY = det / self.scaleX
-		self.shearY = math_deg(math_atan2(ra * rb + rc * rd, det))
-		self.rotation = math_deg(math_atan2(rc, ra))
+		self.ascaleY = det / self.ascaleX
+		self.ashearY = math_deg(math_atan2(ra * rb + rc * rd, det))
+		self.arotation = math_deg(math_atan2(rc, ra))
 	else
-		self.scaleX = 0
-		self.scaleY = math_sqrt(rb * rb + rd * rd)
-		self.shearY = 0
-		self.rotation = 90 - math_deg(math_atan2(rd, rb))
+		self.ascaleX = 0
+		self.ascaleY = math_sqrt(rb * rb + rd * rd)
+		self.ashearY = 0
+		self.arotation = 90 - math_deg(math_atan2(rd, rb))
 	end
-	self.appliedRotation = self.rotation
 end
 
 function Bone:worldToLocal (world)

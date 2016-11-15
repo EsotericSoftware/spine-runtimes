@@ -65,35 +65,27 @@ void spAnimation_dispose (spAnimation* self);
  * @param lastTime The last time the animation was applied.
  * @param events Any triggered events are added. May be null.*/
 void spAnimation_apply (const spAnimation* self, struct spSkeleton* skeleton, float lastTime, float time, int loop,
-		spEvent** events, int* eventsCount);
-
-/** Poses the skeleton at the specified time for this animation mixed with the current pose.
- * @param lastTime The last time the animation was applied.
- * @param events Any triggered events are added. May be null.
- * @param alpha The amount of this animation that affects the current pose. */
-void spAnimation_mix (const spAnimation* self, struct spSkeleton* skeleton, float lastTime, float time, int loop,
-		spEvent** events, int* eventsCount, float alpha);
+		spEvent** events, int* eventsCount, float alpha, int /*boolean*/ setupPose, int /*boolean*/ mixingOut);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spAnimation Animation;
 #define Animation_create(...) spAnimation_create(__VA_ARGS__)
 #define Animation_dispose(...) spAnimation_dispose(__VA_ARGS__)
 #define Animation_apply(...) spAnimation_apply(__VA_ARGS__)
-#define Animation_mix(...) spAnimation_mix(__VA_ARGS__)
 #endif
 
 /**/
 
 typedef enum {
-	SP_TIMELINE_SCALE,
 	SP_TIMELINE_ROTATE,
 	SP_TIMELINE_TRANSLATE,
+	SP_TIMELINE_SCALE,
 	SP_TIMELINE_SHEAR,
-	SP_TIMELINE_COLOR,
 	SP_TIMELINE_ATTACHMENT,
+	SP_TIMELINE_COLOR,
+	SP_TIMELINE_DEFORM,
 	SP_TIMELINE_EVENT,
 	SP_TIMELINE_DRAWORDER,
-	SP_TIMELINE_DEFORM,
 	SP_TIMELINE_IKCONSTRAINT,
 	SP_TIMELINE_TRANSFORMCONSTRAINT,
 	SP_TIMELINE_PATHCONSTRAINTPOSITION,
@@ -115,7 +107,8 @@ struct spTimeline {
 
 void spTimeline_dispose (spTimeline* self);
 void spTimeline_apply (const spTimeline* self, struct spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
-		int* eventsCount, float alpha);
+		int* eventsCount, float alpha, int /*boolean*/ setupPose, int /*boolean*/ mixingOut);
+int spTimeline_getPropertyId (const spTimeline* self);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spTimeline Timeline;
@@ -181,6 +174,8 @@ typedef struct spBaseTimeline {
 
 /**/
 
+static const int ROTATE_PREV_TIME = -2, ROTATE_PREV_ROTATION = -1;
+static const int ROTATE_ROTATION = 1;
 static const int ROTATE_ENTRIES = 2;
 
 typedef struct spBaseTimeline spRotateTimeline;

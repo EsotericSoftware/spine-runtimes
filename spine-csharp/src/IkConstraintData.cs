@@ -34,12 +34,14 @@ using System.Collections.Generic;
 namespace Spine {
 	public class IkConstraintData {
 		internal String name;
+		internal int order;
 		internal List<BoneData> bones = new List<BoneData>();
 		internal BoneData target;
 		internal int bendDirection = 1;
 		internal float mix = 1;
 
 		public String Name { get { return name; } }
+		public int Order { get { return order; } set { order = value; } }
 		public List<BoneData> Bones { get { return bones; } }
 		public BoneData Target { get { return target; } set { target = value; } }
 		public int BendDirection { get { return bendDirection; } set { bendDirection = value; } }

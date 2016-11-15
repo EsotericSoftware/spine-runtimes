@@ -52,11 +52,11 @@ module spine {
 			request.onreadystatechange = () => {
 				if (request.readyState == XMLHttpRequest.DONE) {
 					if (request.status >= 200 && request.status < 300) {
-						if (success) success(path, request.responseText);
 						this.assets[path] = request.responseText;
+						if (success) success(path, request.responseText);
 					} else {
-						if (error) error(path, `Couldn't load text ${path}: status ${request.status}, ${request.responseText}`);
 						this.errors[path] = `Couldn't load text ${path}: status ${request.status}, ${request.responseText}`;
+						if (error) error(path, `Couldn't load text ${path}: status ${request.status}, ${request.responseText}`);
 					}
 					this.toLoad--;
 					this.loaded++;
@@ -73,20 +73,20 @@ module spine {
 			path = this.pathPrefix + path;
 			this.toLoad++;
 			let img = new Image();
-			img.src = path;
 			img.crossOrigin = "anonymous";
+			img.src = path;
 			img.onload = (ev) => {
-				if (success) success(path, img);
 				let texture = this.textureLoader(img);
 				this.assets[path] = texture;
 				this.toLoad--;
 				this.loaded++;
+				if (success) success(path, img);
 			}
 			img.onerror = (ev) => {
-				if (error) error(path, `Couldn't load image ${path}`);
 				this.errors[path] = `Couldn't load image ${path}`;
 				this.toLoad--;
 				this.loaded++;
+				if (error) error(path, `Couldn't load image ${path}`);
 			}
 		}
 

@@ -31,6 +31,7 @@
 module spine {
 	export class PathConstraintData {
 		name: string;
+		order = 0;
 		bones = new Array<BoneData>();
 		target: SlotData;
 		positionMode: PositionMode;

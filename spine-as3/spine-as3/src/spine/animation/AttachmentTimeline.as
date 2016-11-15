@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 package spine.animation {
+import spine.Slot;
 import spine.Event;
 import spine.Skeleton;
 
@@ -45,6 +46,10 @@ public class AttachmentTimeline implements Timeline {
 	public function get frameCount () : int {
 		return frames.length;
 	}
+	
+	public function getPropertyId () : int {
+		return (TimelineType.attachment.ordinal << 24) + slotIndex;
+	}
 
 	/** Sets the time and value of the specified keyframe. */
 	public function setFrame (frameIndex:int, time:Number, attachmentName:String) : void {
@@ -52,9 +57,22 @@ public class AttachmentTimeline implements Timeline {
 		attachmentNames[frameIndex] = attachmentName;
 	}
 
-	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
+	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
+		var attachmentName:String;
+		var slot:Slot = skeleton.slots[slotIndex];
+		if (mixingOut && setupPose) {			
+			attachmentName = slot.data.attachmentName;
+			slot.attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName);
+			return;
+		}
 		var frames:Vector.<Number> = this.frames;
-		if (time < frames[0]) return; // Time is before first frame.
+		if (time < frames[0]) {
+			if (setupPose) {
+				attachmentName = slot.data.attachmentName;
+				slot.attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName);
+			}
+			return;
+		}
 
 		var frameIndex:int;
 		if (time >= frames[frames.length - 1]) // Time is after last frame.
@@ -62,7 +80,7 @@ public class AttachmentTimeline implements Timeline {
 		else
 			frameIndex = Animation.binarySearch(frames, time, 1) - 1;
 
-		var attachmentName:String = attachmentNames[frameIndex];
+		attachmentName = attachmentNames[frameIndex];
 		skeleton.slots[slotIndex].attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName);
 	}
 }

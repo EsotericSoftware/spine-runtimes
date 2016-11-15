@@ -14,9 +14,11 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-unity works with data exported from Spine 3.4.02.
+spine-unity works with data exported from Spine 3.5.x.
 
 spine-unity supports all Spine features.
+
+Unity's physics components do not support dynamically assigned vertices so they cannot be used to mirror bone-weighted and deformed BoundingBoxAttachments. However, BoundingBoxAttachment vertices at runtime will still deform correctly and can be used to perform manual hit detection.
 
 ## Documentation
 

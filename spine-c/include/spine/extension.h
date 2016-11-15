@@ -93,6 +93,7 @@
 #define RAD_DEG (180 / PI)
 
 #define ABS(A) ((A) < 0? -(A): (A))
+#define SIGNUM(A) ((A) < 0? -1: (A) > 0 ? 1 : 0)
 
 #ifdef __STDC_VERSION__
 #define FMOD(A,B) fmodf(A, B)
@@ -170,25 +171,60 @@ char* _readFile (const char* path, int* length);
 
 /**/
 
-typedef struct _spAnimationState {
+typedef union _spEventQueueItem {
+	int type;
+	spTrackEntry* entry;
+	spEvent* event;
+} _spEventQueueItem;
+
+typedef struct _spAnimationState _spAnimationState;
+
+typedef struct _spEventQueue {
+	_spAnimationState* state;
+	_spEventQueueItem* objects;
+	int objectsCount;
+	int objectsCapacity;
+	int /*boolean*/ drainDisabled;
+
+#ifdef __cplusplus
+	_spEventQueue() :
+		state(0),
+		objects(0),
+		objectsCount(0),
+		objectsCapacity(0),
+		drainDisabled(0) {
+	}
+#endif
+} _spEventQueue;
+
+struct _spAnimationState {
 	spAnimationState super;
+
+	int eventsCount;
 	spEvent** events;
 
-	spTrackEntry* (*createTrackEntry) (spAnimationState* self);
-	void (*disposeTrackEntry) (spTrackEntry* entry);
+	_spEventQueue* queue;
+
+	int* propertyIDs;
+	int propertyIDsCount;
+	int propertyIDsCapacity;
+
+	int /*boolean*/ animationsChanged;
 
 #ifdef __cplusplus
 	_spAnimationState() :
 		super(),
+		eventsCount(0),
 		events(0),
-		createTrackEntry(0),
-		disposeTrackEntry(0) {
+		queue(0),
+		propertyIDs(0),
+		propertyIDsCount(0),
+		propertyIDsCapacity(0),
+		animationsChanged(0) {
 	}
 #endif
-} _spAnimationState;
+};
 
-spTrackEntry* _spTrackEntry_create (spAnimationState* self);
-void _spTrackEntry_dispose (spTrackEntry* self);
 
 /**/
 
@@ -230,7 +266,8 @@ void _spVertexAttachment_deinit (spVertexAttachment* self);
 void _spTimeline_init (spTimeline* self, spTimelineType type,
 	void (*dispose) (spTimeline* self),
 	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
-		int* eventsCount, float alpha));
+		int* eventsCount, float alpha, int setupPose, int mixingOut),
+	int (*getPropertyId) (const spTimeline* self));
 void _spTimeline_deinit (spTimeline* self);
 
 #ifdef SPINE_SHORT_NAMES
@@ -242,13 +279,15 @@ void _spTimeline_deinit (spTimeline* self);
 
 void _spCurveTimeline_init (spCurveTimeline* self, spTimelineType type, int framesCount,
 	void (*dispose) (spTimeline* self),
-	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
-		int* eventsCount, float alpha));
+	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents, int* eventsCount, float alpha, int setupPose, int mixingOut),
+	int (*getPropertyId) (const spTimeline* self));
 void _spCurveTimeline_deinit (spCurveTimeline* self);
+int _spCurveTimeline_binarySearch (float *values, int valuesLength, float target, int step);
 
 #ifdef SPINE_SHORT_NAMES
 #define _CurveTimeline_init(...) _spCurveTimeline_init(__VA_ARGS__)
 #define _CurveTimeline_deinit(...) _spCurveTimeline_deinit(__VA_ARGS__)
+#define _CurveTimeline_binarySearch(...) _spCurveTimeline_binarySearch(__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

@@ -45,6 +45,10 @@ public class DrawOrderTimeline implements Timeline {
 	public function get frameCount () : int {
 		return frames.length;
 	}
+	
+	public function getPropertyId () : int {
+		return TimelineType.drawOrder.ordinal << 24;
+	}
 
 	/** Sets the time and value of the specified keyframe. */
 	public function setFrame (frameIndex:int, time:Number, drawOrder:Vector.<int>) : void {
@@ -52,9 +56,24 @@ public class DrawOrderTimeline implements Timeline {
 		drawOrders[frameIndex] = drawOrder;
 	}
 
-	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
-		if (time < frames[0])
-			return; // Time is before first frame.
+	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
+		if (mixingOut && setupPose) {
+			for (var ii:int = 0, n:int = skeleton.slots.length; ii < n; ii++)
+				skeleton.drawOrder[ii] = skeleton.slots[ii];
+			return;
+		}
+
+		var drawOrder:Vector.<Slot> = skeleton.drawOrder;
+		var slots:Vector.<Slot> = skeleton.slots;
+		var slot:Slot;
+		var i:int = 0;
+		if (time < frames[0]) {
+			if (setupPose) {
+				for each (slot in slots)
+					drawOrder[i++] = slot;			
+			}
+			return;
+		}
 
 		var frameIndex:int;
 		if (time >= frames[int(frames.length - 1)]) // Time is after last frame.
@@ -62,12 +81,10 @@ public class DrawOrderTimeline implements Timeline {
 		else
 			frameIndex = Animation.binarySearch1(frames, time) - 1;
 
-		var drawOrder:Vector.<Slot> = skeleton.drawOrder;
-		var slots:Vector.<Slot> = skeleton.slots;
 		var drawOrderToSetupIndex:Vector.<int> = drawOrders[frameIndex];
-		var i:int = 0;
+		i = 0;		
 		if (!drawOrderToSetupIndex) {
-			for each (var slot:Slot in slots)
+			for each (slot in slots)
 				drawOrder[i++] = slot;
 		} else {
 			for each (var setupIndex:int in drawOrderToSetupIndex)

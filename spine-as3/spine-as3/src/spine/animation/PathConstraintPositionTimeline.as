@@ -46,6 +46,10 @@ public class PathConstraintPositionTimeline extends CurveTimeline {
 		super(frameCount);
 		frames = new Vector.<Number>(frameCount * ENTRIES, true);
 	}
+	
+	override public function getPropertyId () : int {
+		return (TimelineType.pathConstraintPosition.ordinal << 24) + pathConstraintIndex;
+	}
 
 	/** Sets the time and value of the specified keyframe. */
 	public function setFrame (frameIndex:int, time:Number, value:Number) : void {
@@ -54,24 +58,30 @@ public class PathConstraintPositionTimeline extends CurveTimeline {
 		frames[frameIndex + VALUE] = value;
 	}
 
-	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
-		if (time < frames[0]) return; // Time is before first frame.
-
+	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {		
 		var constraint:PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
-
-		if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
-			var i:int = frames.length;
-			constraint.position += (frames[i + PREV_VALUE] - constraint.position) * alpha;
+		if (time < frames[0]) {
+			if (setupPose) constraint.position = constraint.data.position;
 			return;
 		}
 
-		// Interpolate between the previous frame and the current frame.
-		var frame:int = Animation.binarySearch(frames, time, ENTRIES);
-		var position:Number = frames[frame + PREV_VALUE];
-		var frameTime:Number = frames[frame];
-		var percent:Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+		var position:Number;
+		if (time >= frames[frames.length - ENTRIES]) // Time is after last frame.
+			position = frames[frames.length + PREV_VALUE];
+		else {
+			// Interpolate between the previous frame and the current frame.
+			var frame:int = Animation.binarySearch(frames, time, ENTRIES);
+			position = frames[frame + PREV_VALUE];
+			var frameTime:Number = frames[frame];
+			var percent:Number = getCurvePercent(frame / ENTRIES - 1,
+				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-		constraint.position += (position + (frames[frame + VALUE] - position) * percent - constraint.position) * alpha;
+			position += (frames[frame + VALUE] - position) * percent;
+		}
+		if (setupPose)
+			constraint.position = constraint.data.position + (position - constraint.data.position) * alpha;
+		else
+			constraint.position += (position - constraint.position) * alpha;
 	}
 }
 }

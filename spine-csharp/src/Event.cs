@@ -32,20 +32,26 @@ using System;
 
 namespace Spine {
 	public class Event {
-		public EventData Data { get; private set; }
-		public int Int { get; set; }
-		public float Float { get; set; }
-		public String String { get; set; }
-		public float Time { get; private set; }
+		internal readonly EventData data;
+		internal readonly float time;
+		internal int intValue;
+		internal float floatValue;
+		internal string stringValue;
+
+		public EventData Data { get { return data; } }
+		public float Time { get { return time; } }
+		public int Int { get { return intValue; } set { intValue = value; } }
+		public float Float { get { return floatValue; } set { floatValue = value; } }
+		public String String { get { return stringValue; } set { stringValue = value; } }
 
 		public Event (float time, EventData data) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
-			Time = time;
-			Data = data;
+			this.time = time;
+			this.data = data;
 		}
 
-		override public String ToString () {
-			return Data.Name;
+		override public string ToString () {
+			return this.data.Name;
 		}
 	}
 }

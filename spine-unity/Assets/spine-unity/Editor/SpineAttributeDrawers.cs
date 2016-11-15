@@ -151,8 +151,10 @@ namespace Spine.Unity.Editor {
 
 						bool hasBoundingBox = false;
 						foreach (var attachment in attachments) {
-							if (attachment is BoundingBoxAttachment) {
-								menu.AddItem(new GUIContent(name), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
+							var bbAttachment = attachment as BoundingBoxAttachment;
+							if (bbAttachment != null) {
+								string menuLabel = bbAttachment.IsWeighted() ? name + " (!)" : name;
+								menu.AddItem(new GUIContent(menuLabel), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
 								hasBoundingBox = true;
 								break;
 							}

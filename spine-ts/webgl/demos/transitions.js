@@ -86,12 +86,9 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 		state.addAnimation(0, "run", true, mix);
 		state.addAnimation(0, "jump", true, 0.5);
 		state.addAnimation(0, "run", true, mix).listener = {
-			event: function (trackIndex, event) {},
-			complete: function (trackIndex, loopCount) {},
 			start: function (trackIndex) { 
 				setAnimations(state, mix);
-			},
-			end: function (trackIndex) {}
+			}
 		};
 	}
 

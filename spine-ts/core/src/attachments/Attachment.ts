@@ -59,15 +59,14 @@ module spine {
 		computeWorldVerticesWith (slot: Slot, start: number, count: number, worldVertices: ArrayLike<number>, offset: number) {
 			count += offset;
 			let skeleton = slot.bone.skeleton;
-			let x = skeleton.x, y = skeleton.y;
 			let deformArray = slot.attachmentVertices;
 			let vertices = this.vertices;
 			let bones = this.bones;
 			if (bones == null) {
 				if (deformArray.length > 0) vertices = deformArray;
 				let bone = slot.bone;
-				x += bone.worldX;
-				y += bone.worldY;
+				let x = bone.worldX;
+				let y = bone.worldY;
 				let a = bone.a, b = bone.b, c = bone.c, d = bone.d;
 				for (let v = start, w = offset; w < count; v += 2, w += 2) {
 					let vx = vertices[v], vy = vertices[v + 1];
@@ -85,7 +84,7 @@ module spine {
 			let skeletonBones = skeleton.bones;
 			if (deformArray.length == 0) {
 				for (let w = offset, b = skip * 3; w < count; w += 2) {
-					let wx = x, wy = y;
+					let wx = 0, wy = 0;
 					let n = bones[v++];
 					n += v;
 					for (; v < n; v++, b += 3) {
@@ -100,7 +99,7 @@ module spine {
 			} else {
 				let deform = deformArray;
 				for (let w = offset, b = skip * 3, f = skip << 1; w < count; w += 2) {
-					let wx = x, wy = y;
+					let wx = 0, wy = 0;
 					let n = bones[v++];
 					n += v;
 					for (; v < n; v++, b += 3, f += 2) {

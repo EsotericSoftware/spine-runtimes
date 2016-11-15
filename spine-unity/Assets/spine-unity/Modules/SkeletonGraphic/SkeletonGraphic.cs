@@ -83,6 +83,7 @@ namespace Spine.Unity {
 		public bool startingLoop;
 		public float timeScale = 1f;
 		public bool freeze;
+		public bool unscaledTime;
 
 		#if UNITY_EDITOR
 		protected override void OnValidate () {
@@ -149,7 +150,7 @@ namespace Spine.Unity {
 
 		public virtual void Update () {
 			if (freeze) return;
-			Update(Time.deltaTime);
+			Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
 		}
 
 		public virtual void Update (float deltaTime) {

@@ -30,15 +30,16 @@
 
 package com.esotericsoftware.spine;
 
-import java.util.Iterator;
-
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.badlogic.gdx.utils.Pool;
 import com.esotericsoftware.spine.attachments.Attachment;
 
-/** Stores attachments by slot index and attachment name. */
+/** Stores attachments by slot index and attachment name.
+ * <p>
+ * See SkeletonData {@link SkeletonData#defaultSkin}, Skeleton {@link Skeleton#skin}, and
+ * <a href="http://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide. */
 public class Skin {
 	static private final Key lookup = new Key();
 
@@ -55,6 +56,7 @@ public class Skin {
 		this.name = name;
 	}
 
+	/** Adds an attachment to the skin for the specified slot index and name. */
 	public void addAttachment (int slotIndex, String name, Attachment attachment) {
 		if (attachment == null) throw new IllegalArgumentException("attachment cannot be null.");
 		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
@@ -63,7 +65,7 @@ public class Skin {
 		attachments.put(key, attachment);
 	}
 
-	/** @return May be null. */
+	/** Returns the attachment for the specified slot index and name, or null. */
 	public Attachment getAttachment (int slotIndex, String name) {
 		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
 		lookup.set(slotIndex, name);
@@ -90,12 +92,9 @@ public class Skin {
 		attachments.clear();
 	}
 
+	/** The skin's name, which is unique within the skeleton. */
 	public String getName () {
 		return name;
-	}
-
-	public Iterator<Attachment> attachments () {
-		return attachments.values().iterator();
 	}
 
 	public String toString () {

@@ -30,6 +30,8 @@
 
 local utils = {}
 
+utils.degRad = math.pi / 180
+
 function tablePrint (tt, indent, done)
 	done = done or {}
 	for key, value in pairs(tt) do
@@ -124,6 +126,16 @@ function utils.clamp (value, min, max)
 	if value < min then return min end
 	if value > max then return max end
 	return value
+end
+
+function utils.signum (value)
+  if value < 0 then
+    return -1
+  elseif value > 0 then
+    return 1
+  else
+    return 0
+  end
 end
 
 return utils

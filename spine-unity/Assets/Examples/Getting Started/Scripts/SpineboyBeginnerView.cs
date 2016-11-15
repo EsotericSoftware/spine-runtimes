@@ -60,10 +60,9 @@ public class SpineboyBeginnerView : MonoBehaviour {
 		skeletonAnimation.state.Event += HandleEvent;
 	}
 
-	void HandleEvent (Spine.AnimationState state, int trackIndex, Spine.Event e) {
-		if (e.Data.Name == footstepEventName) {
+	void HandleEvent (Spine.TrackEntry trackEntry, Spine.Event e) {
+		if (e.Data.Name == footstepEventName)
 			PlayFootstepSound();
-		}
 	}
 
 	void Update () {
@@ -113,12 +112,21 @@ public class SpineboyBeginnerView : MonoBehaviour {
 		footstepSource.pitch = GetRandomPitch(footstepPitchOffset);
 	}
 
+	[ContextMenu("Check Tracks")]
+	void CheckTracks () {
+		var state = skeletonAnimation.state;
+		Debug.Log(state.GetCurrent(0));
+		Debug.Log(state.GetCurrent(1));
+	}
+
 	#region Transient Actions
 	public void PlayShoot () {
 		// Play the shoot animation on track 1.
 		skeletonAnimation.state.SetAnimation(1, shoot, false);
+		//skeletonAnimation.state.AddEmptyAnimation(1, 0.1f, 0f);
 		gunSource.pitch = GetRandomPitch(gunsoundPitchOffset);
 		gunSource.Play();
+		gunParticles.randomSeed = (uint)Random.Range(0, 100);
 		gunParticles.Play();
 	}
 

@@ -29,14 +29,12 @@
  *****************************************************************************/
 
 module spine {
-	export class IkConstraint implements Updatable {
+	export class IkConstraint implements Constraint {
 		data: IkConstraintData;
 		bones: Array<Bone>;
 		target: Bone;
 		mix = 1;
-		bendDirection = 0;
-
-		level = 0;
+		bendDirection = 0;		
 
 		constructor (data: IkConstraintData, skeleton: Skeleton) {
 			if (data == null) throw new Error("data cannot be null.");
@@ -49,6 +47,10 @@ module spine {
 			for (let i = 0; i < data.bones.length; i++)
 				this.bones.push(skeleton.findBone(data.bones[i].name));
 			this.target = skeleton.findBone(data.target.name);
+		}
+
+		getOrder () {
+			return this.data.order;
 		}
 
 		apply () {
@@ -71,17 +73,18 @@ module spine {
 		/** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
 		 * coordinate system. */
 		apply1 (bone: Bone, targetX: number, targetY: number, alpha: number) {
-			let pp = bone.parent;
-			let id = 1 / (pp.a * pp.d - pp.b * pp.c);
-			let x = targetX - pp.worldX, y = targetY - pp.worldY;
-			let tx = (x * pp.d - y * pp.b) * id - bone.x, ty = (y * pp.a - x * pp.c) * id - bone.y;
-			let rotationIK = Math.atan2(ty, tx) * MathUtils.radDeg - bone.shearX - bone.rotation;
-			if (bone.scaleX < 0) rotationIK += 180;
+			if (!bone.appliedValid) bone.updateAppliedTransform();
+			let p = bone.parent;
+			let id = 1 / (p.a * p.d - p.b * p.c);
+			let x = targetX - p.worldX, y = targetY - p.worldY;
+			let tx = (x * p.d - y * p.b) * id - bone.ax, ty = (y * p.a - x * p.c) * id - bone.ay;
+			let rotationIK = Math.atan2(ty, tx) * MathUtils.radDeg - bone.ashearX - bone.arotation;
+			if (bone.ascaleX < 0) rotationIK += 180;
 			if (rotationIK > 180)
 				rotationIK -= 360;
 			else if (rotationIK < -180) rotationIK += 360;
-			bone.updateWorldTransformWith(bone.x, bone.y, bone.rotation + rotationIK * alpha, bone.scaleX, bone.scaleY, bone.shearX,
-				bone.shearY);
+			bone.updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, bone.ascaleX, bone.ascaleY, bone.ashearX,
+				bone.ashearY);
 		}
 
 		/** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
@@ -92,7 +95,9 @@ module spine {
 				child.updateWorldTransform();
 				return;
 			}
-			let px = parent.x, py = parent.y, psx = parent.scaleX, psy = parent.scaleY, csx = child.scaleX;
+			if (!parent.appliedValid) parent.updateAppliedTransform();
+			if (!child.appliedValid) child.updateAppliedTransform();
+			let px = parent.ax, py = parent.ay, psx = parent.ascaleX, psy = parent.ascaleY, csx = child.ascaleX;
 			let os1 = 0, os2 = 0, s2 = 0;
 			if (psx < 0) {
 				psx = -psx;
@@ -111,14 +116,14 @@ module spine {
 				os2 = 180;
 			} else
 				os2 = 0;
-			let cx = child.x, cy = 0, cwx = 0, cwy = 0, a = parent.a, b = parent.b, c = parent.c, d = parent.d;
+			let cx = child.ax, cy = 0, cwx = 0, cwy = 0, a = parent.a, b = parent.b, c = parent.c, d = parent.d;
 			let u = Math.abs(psx - psy) <= 0.0001;
 			if (!u) {
 				cy = 0;
 				cwx = a * cx + parent.worldX;
 				cwy = c * cx + parent.worldY;
 			} else {
-				cy = child.y;
+				cy = child.ay;
 				cwx = a * cx + b * cy + parent.worldX;
 				cwy = c * cx + d * cy + parent.worldY;
 			}
@@ -205,18 +210,18 @@ module spine {
 				}
 			}
 			let os = Math.atan2(cy, cx) * s2;
-			let rotation = parent.rotation;
+			let rotation = parent.arotation;
 			a1 = (a1 - os) * MathUtils.radDeg + os1 - rotation;
 			if (a1 > 180)
 				a1 -= 360;
 			else if (a1 < -180) a1 += 360;
-			parent.updateWorldTransformWith(px, py, rotation + a1 * alpha, parent.scaleX, parent.scaleY, 0, 0);
-			rotation = child.rotation;
-			a2 = ((a2 + os) * MathUtils.radDeg - child.shearX) * s2 + os2 - rotation;
+			parent.updateWorldTransformWith(px, py, rotation + a1 * alpha, parent.ascaleX, parent.ascaleY, 0, 0);
+			rotation = child.arotation;
+			a2 = ((a2 + os) * MathUtils.radDeg - child.ashearX) * s2 + os2 - rotation;
 			if (a2 > 180)
 				a2 -= 360;
 			else if (a2 < -180) a2 += 360;
-			child.updateWorldTransformWith(cx, cy, rotation + a2 * alpha, child.scaleX, child.scaleY, child.shearX, child.shearY);
+			child.updateWorldTransformWith(cx, cy, rotation + a2 * alpha, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY);
 		}
 	}
 }

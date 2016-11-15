@@ -45,6 +45,10 @@ public class TranslateTimeline extends CurveTimeline {
 		super(frameCount);
 		frames = new Vector.<Number>(frameCount * ENTRIES, true);
 	}
+	
+	override public function getPropertyId () : int {
+		return (TimelineType.translate.ordinal << 24) + boneIndex;
+	}
 
 	/** Sets the time and value of the specified keyframe. */
 	public function setFrame (frameIndex:int, time:Number, x:Number, y:Number) : void {
@@ -54,27 +58,41 @@ public class TranslateTimeline extends CurveTimeline {
 		frames[int(frameIndex + Y)] = y;
 	}
 
-	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
-		if (time < frames[0])
-			return; // Time is before first frame.
+	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
+		var frames:Vector.<Number> = this.frames;		
 
 		var bone:Bone = skeleton.bones[boneIndex];
-
-		if (time >= frames[int(frames.length - ENTRIES)]) { // Time is after last frame.
-			bone.x += (bone.data.x + frames[int(frames.length + PREV_X)] - bone.x) * alpha;
-			bone.y += (bone.data.y + frames[int(frames.length + PREV_Y)] - bone.y) * alpha;
+		if (time < frames[0]) {
+			if (setupPose) {
+				bone.x = bone.data.x;
+				bone.y = bone.data.y;
+			}
 			return;
 		}
 
-		// Interpolate between the previous frame and the current frame.
-		var frame:int = Animation.binarySearch(frames, time, ENTRIES);
-		var prevX:Number = frames[frame + PREV_X];
-		var prevY:Number = frames[frame + PREV_Y];
-		var frameTime:Number = frames[frame];
-		var percent:Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+		var x:Number, y:Number;
+		if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
+			x = frames[frames.length + PREV_X];
+			y = frames[frames.length + PREV_Y];
+		} else {
+			// Interpolate between the previous frame and the current frame.
+			var frame:int = Animation.binarySearch(frames, time, ENTRIES);
+			x = frames[frame + PREV_X];
+			y = frames[frame + PREV_Y];
+			var frameTime:Number = frames[frame];
+			var percent:Number = getCurvePercent(frame / ENTRIES - 1,
+				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-		bone.x += (bone.data.x + prevX + (frames[frame + X] - prevX) * percent - bone.x) * alpha;
-		bone.y += (bone.data.y + prevY + (frames[frame + Y] - prevY) * percent - bone.y) * alpha;
+			x += (frames[frame + X] - x) * percent;
+			y += (frames[frame + Y] - y) * percent;
+		}
+		if (setupPose) {
+			bone.x = bone.data.x + x * alpha;
+			bone.y = bone.data.y + y * alpha;
+		} else {
+			bone.x += (bone.data.x + x - bone.x) * alpha;
+			bone.y += (bone.data.y + y - bone.y) * alpha;
+		}
 	}
 }
 

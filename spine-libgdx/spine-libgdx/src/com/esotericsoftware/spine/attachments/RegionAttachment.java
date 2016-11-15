@@ -30,10 +30,6 @@
 
 package com.esotericsoftware.spine.attachments;
 
-import com.esotericsoftware.spine.Bone;
-import com.esotericsoftware.spine.Skeleton;
-import com.esotericsoftware.spine.Slot;
-
 import static com.badlogic.gdx.graphics.g2d.Batch.*;
 
 import com.badlogic.gdx.graphics.Color;
@@ -41,8 +37,13 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.NumberUtils;
+import com.esotericsoftware.spine.Bone;
+import com.esotericsoftware.spine.Skeleton;
+import com.esotericsoftware.spine.Slot;
 
-/** Attachment that displays a texture region. */
+/** An attachment that displays a textured quadrilateral.
+ * <p>
+ * See <a href="http://esotericsoftware.com/spine-regions">Region attachments</a> in the Spine User Guide. */
 public class RegionAttachment extends Attachment {
 	static public final int BLX = 0;
 	static public final int BLY = 1;
@@ -64,6 +65,7 @@ public class RegionAttachment extends Attachment {
 		super(name);
 	}
 
+	/** Calculates the {@link #offset} using the region settings. Must be called after changing region settings. */
 	public void updateOffset () {
 		float width = getWidth();
 		float height = getHeight();
@@ -162,7 +164,7 @@ public class RegionAttachment extends Attachment {
 		float[] vertices = this.vertices;
 		float[] offset = this.offset;
 		Bone bone = slot.getBone();
-		float x = skeleton.getX() + bone.getWorldX(), y = skeleton.getY() + bone.getWorldY();
+		float x = bone.getWorldX(), y = bone.getWorldY();
 		float a = bone.getA(), b = bone.getB(), c = bone.getC(), d = bone.getD();
 		float offsetX, offsetY;
 
@@ -196,10 +198,14 @@ public class RegionAttachment extends Attachment {
 		return vertices;
 	}
 
+	/** For each of the 4 vertices, a pair of <code>x,y</code> values that is the local position of the vertex.
+	 * <p>
+	 * See {@link #updateOffset()}. */
 	public float[] getOffset () {
 		return offset;
 	}
 
+	/** The local x translation. */
 	public float getX () {
 		return x;
 	}
@@ -208,6 +214,7 @@ public class RegionAttachment extends Attachment {
 		this.x = x;
 	}
 
+	/** The local y translation. */
 	public float getY () {
 		return y;
 	}
@@ -216,6 +223,7 @@ public class RegionAttachment extends Attachment {
 		this.y = y;
 	}
 
+	/** The local scaleX. */
 	public float getScaleX () {
 		return scaleX;
 	}
@@ -224,6 +232,7 @@ public class RegionAttachment extends Attachment {
 		this.scaleX = scaleX;
 	}
 
+	/** The local scaleY. */
 	public float getScaleY () {
 		return scaleY;
 	}
@@ -232,6 +241,7 @@ public class RegionAttachment extends Attachment {
 		this.scaleY = scaleY;
 	}
 
+	/** The local rotation. */
 	public float getRotation () {
 		return rotation;
 	}
@@ -240,6 +250,7 @@ public class RegionAttachment extends Attachment {
 		this.rotation = rotation;
 	}
 
+	/** The width of the region attachment in Spine. */
 	public float getWidth () {
 		return width;
 	}
@@ -248,6 +259,7 @@ public class RegionAttachment extends Attachment {
 		this.width = width;
 	}
 
+	/** The height of the region attachment in Spine. */
 	public float getHeight () {
 		return height;
 	}
@@ -256,10 +268,12 @@ public class RegionAttachment extends Attachment {
 		this.height = height;
 	}
 
+	/** The color to tint the region attachment. */
 	public Color getColor () {
 		return color;
 	}
 
+	/** The name of the texture region for this attachment. */
 	public String getPath () {
 		return path;
 	}

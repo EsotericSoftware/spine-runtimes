@@ -37,10 +37,12 @@
 
 namespace spine {
 
-typedef std::function<void(int trackIndex)> StartListener;
-typedef std::function<void(int trackIndex)> EndListener;
-typedef std::function<void(int trackIndex, int loopCount)> CompleteListener;
-typedef std::function<void(int trackIndex, spEvent* event)> EventListener;
+typedef std::function<void(spTrackEntry* entry)> StartListener;
+typedef std::function<void(spTrackEntry* entry)> InterruptListener;
+typedef std::function<void(spTrackEntry* entry)> EndListener;
+typedef std::function<void(spTrackEntry* entry)> DisposeListener;
+typedef std::function<void(spTrackEntry* entry)> CompleteListener;
+typedef std::function<void(spTrackEntry* entry, spEvent* event)> EventListener;
 
 /** Draws an animated skeleton, providing an AnimationState for applying one or more animations and queuing animations to be
   * played later. */
@@ -77,17 +79,21 @@ public:
 	void clearTrack (int trackIndex = 0);
 
 	void setStartListener (const StartListener& listener);
+    void setInterruptListener (const InterruptListener& listener);
 	void setEndListener (const EndListener& listener);
+    void setDisposeListener (const DisposeListener& listener);
 	void setCompleteListener (const CompleteListener& listener);
 	void setEventListener (const EventListener& listener);
 
 	void setTrackStartListener (spTrackEntry* entry, const StartListener& listener);
+    void setTrackInterruptListener (spTrackEntry* entry, const InterruptListener& listener);
 	void setTrackEndListener (spTrackEntry* entry, const EndListener& listener);
+    void setTrackDisposeListener (spTrackEntry* entry, const DisposeListener& listener);
 	void setTrackCompleteListener (spTrackEntry* entry, const CompleteListener& listener);
 	void setTrackEventListener (spTrackEntry* entry, const EventListener& listener);
 
-	virtual void onAnimationStateEvent (int trackIndex, spEventType type, spEvent* event, int loopCount);
-	virtual void onTrackEntryEvent (int trackIndex, spEventType type, spEvent* event, int loopCount);
+	virtual void onAnimationStateEvent (spTrackEntry* entry, spEventType type, spEvent* event);
+	virtual void onTrackEntryEvent (spTrackEntry* entry, spEventType type, spEvent* event);
 
 	spAnimationState* getState() const;
 
@@ -102,7 +108,9 @@ protected:
 	bool _ownsAnimationStateData;
 
 	StartListener _startListener;
+    InterruptListener _interruptListener;
 	EndListener _endListener;
+    DisposeListener _disposeListener;
 	CompleteListener _completeListener;
 	EventListener _eventListener;
 

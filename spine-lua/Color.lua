@@ -45,7 +45,7 @@ end
 
 function Color.newWith (r, g, b, a)
 	local self = {
-		r = a, g = g, b = b, a = a
+		r = r, g = g, b = b, a = a
 	}
 	setmetatable(self, Color)
 

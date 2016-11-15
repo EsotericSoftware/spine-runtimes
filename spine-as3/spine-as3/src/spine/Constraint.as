@@ -28,22 +28,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
-using UnityEditor;
-using Spine.Unity.Editor;
+package spine {
 
-namespace Spine.Unity.Modules {
-	[CustomEditor(typeof(SkeletonUtilitySubmeshRenderer))]
-	public class SkeletonUtilitySubmeshRendererInspector : UnityEditor.Editor {
-		public SpineInspectorUtility.SerializedSortingProperties sorting;
+public interface Constraint extends Updatable {
+	function getOrder () : Number;
+}
 
-		void OnEnable () {			
-			sorting = new SpineInspectorUtility.SerializedSortingProperties((target as Component).GetComponent<Renderer>());
-		}
-
-		public override void OnInspectorGUI () {
-			EditorGUILayout.HelpBox("SkeletonUtilitySubmeshRenderer is now obsolete. We recommend using SkeletonRenderSeparator.", MessageType.Info);
-			SpineInspectorUtility.SortingPropertyFields(sorting, true);
-		}
-	}
 }

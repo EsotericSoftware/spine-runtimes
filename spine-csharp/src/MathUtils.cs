@@ -34,43 +34,43 @@ namespace Spine {
 	public static class MathUtils {
 		public const float PI = 3.1415927f;
 		public const float PI2 = PI * 2;
-		public const float radDeg = 180f / PI;
-		public const float degRad = PI / 180;
+		public const float RadDeg = 180f / PI;
+		public const float DegRad = PI / 180;
 
 		const int SIN_BITS = 14; // 16KB. Adjust for accuracy.
 		const int SIN_MASK = ~(-1 << SIN_BITS);
 		const int SIN_COUNT = SIN_MASK + 1;
-		const float radFull = PI * 2;
-		const float degFull = 360;
-		const float radToIndex = SIN_COUNT / radFull;
-		const float degToIndex = SIN_COUNT / degFull;
+		const float RadFull = PI * 2;
+		const float DegFull = 360;
+		const float RadToIndex = SIN_COUNT / RadFull;
+		const float DegToIndex = SIN_COUNT / DegFull;
 		static float[] sin = new float[SIN_COUNT];
 
 		static MathUtils () {
 			for (int i = 0; i < SIN_COUNT; i++)
-				sin[i] = (float)Math.Sin((i + 0.5f) / SIN_COUNT * radFull);
+				sin[i] = (float)Math.Sin((i + 0.5f) / SIN_COUNT * RadFull);
 			for (int i = 0; i < 360; i += 90)
-				sin[(int)(i * degToIndex) & SIN_MASK] = (float)Math.Sin(i * degRad);
+				sin[(int)(i * DegToIndex) & SIN_MASK] = (float)Math.Sin(i * DegRad);
 		}
 
 		/// <summary>Returns the sine in radians from a lookup table.</summary>
 		static public float Sin (float radians) {
-			return sin[(int)(radians * radToIndex) & SIN_MASK];
+			return sin[(int)(radians * RadToIndex) & SIN_MASK];
 		}
 
 		/// <summary>Returns the cosine in radians from a lookup table.</summary>
 		static public float Cos (float radians) {
-			return sin[(int)((radians + PI / 2) * radToIndex) & SIN_MASK];
+			return sin[(int)((radians + PI / 2) * RadToIndex) & SIN_MASK];
 		}
-
+			
 		/// <summary>Returns the sine in radians from a lookup table.</summary>
 		static public float SinDeg (float degrees) {
-			return sin[(int)(degrees * degToIndex) & SIN_MASK];
+			return sin[(int)(degrees * DegToIndex) & SIN_MASK];
 		}
-
+			
 		/// <summary>Returns the cosine in radians from a lookup table.</summary>
 		static public float CosDeg (float degrees) {
-			return sin[(int)((degrees + 90) * degToIndex) & SIN_MASK];
+			return sin[(int)((degrees + 90) * DegToIndex) & SIN_MASK];
 		}
 
 		/// <summary>Returns atan2 in radians, faster but less accurate than Math.Atan2. Average error of 0.00231 radians (0.1323

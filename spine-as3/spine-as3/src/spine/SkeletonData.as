@@ -46,6 +46,9 @@ public class SkeletonData {
 	public var width:Number, height:Number;
 	public var version:String, hash:String;
 	
+	public var fps:Number;
+	public var imagesPath:String;
+	
 	public function SkeletonData () {		
 	}
 

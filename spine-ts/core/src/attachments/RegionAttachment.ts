@@ -160,7 +160,7 @@ module spine {
 			let vertices = this.vertices;
 			let offset = this.offset;
 			let bone = slot.bone;
-			let x = skeleton.x + bone.worldX, y = skeleton.y + bone.worldY;
+			let x = bone.worldX, y = bone.worldY;
 			let a = bone.a, b = bone.b, c = bone.c, d = bone.d;
 			let offsetX = 0, offsetY = 0;
 

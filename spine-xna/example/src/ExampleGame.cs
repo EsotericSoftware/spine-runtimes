@@ -179,27 +179,27 @@ namespace Spine {
 			base.Draw(gameTime);
 		}
 
-		public void Start (AnimationState state, int trackIndex) {
+		public void Start (TrackEntry entry) {
 #if !WINDOWS_STOREAPP
-			Console.WriteLine(trackIndex + " " + state.GetCurrent(trackIndex) + ": start");
+			Console.WriteLine(entry + ": start");
 #endif
 		}
 
-		public void End (AnimationState state, int trackIndex) {
+		public void End (TrackEntry entry) {
 #if !WINDOWS_STOREAPP	
-			Console.WriteLine(trackIndex + " " + state.GetCurrent(trackIndex) + ": end");
+			Console.WriteLine(entry + ": end");
 #endif
 		}
 
-		public void Complete (AnimationState state, int trackIndex, int loopCount) {
+		public void Complete (TrackEntry entry) {
 #if !WINDOWS_STOREAPP	
-			Console.WriteLine(trackIndex + " " + state.GetCurrent(trackIndex) + ": complete " + loopCount);
+			Console.WriteLine(entry + ": complete ");
 #endif
 		}
 
-		public void Event (AnimationState state, int trackIndex, Event e) {
+		public void Event (TrackEntry entry, Event e) {
 #if !WINDOWS_STOREAPP	
-			Console.WriteLine(trackIndex + " " + state.GetCurrent(trackIndex) + ": event " + e);
+			Console.WriteLine(entry + ": event " + e);
 #endif
 		}
 	}

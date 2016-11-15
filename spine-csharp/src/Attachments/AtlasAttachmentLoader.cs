@@ -71,7 +71,7 @@ namespace Spine {
 			attachment.regionOriginalWidth = region.originalWidth;
 			attachment.regionOriginalHeight = region.originalHeight;
 			return attachment;
-		}
+		}			
 
 		public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, String name) {
 			return new BoundingBoxAttachment(name);

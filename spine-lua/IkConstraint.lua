@@ -53,7 +53,6 @@ function IkConstraint.new (data, skeleton)
 		target = nil,
 		mix = data.mix,
 		bendDirection = data.bendDirection,
-		level = 0
 	}
 	setmetatable(self, IkConstraint)
 
@@ -82,20 +81,21 @@ function IkConstraint:update ()
 end
 
 function IkConstraint:apply1 (bone, targetX, targetY, alpha)
-	local pp = bone.parent
-	local id = 1 / (pp.a * pp.d - pp.b * pp.c)
-	local x = targetX - pp.worldX
-	local y = targetY - pp.worldY
-	local tx = (x * pp.d - y * pp.b) * id - bone.x
-	local ty = (y * pp.a - x * pp.c) * id - bone.y
-	local rotationIK = math_deg(math_atan2(ty, tx)) - bone.shearX - bone.rotation
-	if bone.scaleX < 0 then rotationIK = rotationIK + 180 end
+	if not bone.appliedValid then bone:updateAppliedTransform() end
+	local p = bone.parent
+	local id = 1 / (p.a * p.d - p.b * p.c)
+	local x = targetX - p.worldX
+	local y = targetY - p.worldY
+	local tx = (x * p.d - y * p.b) * id - bone.ax
+	local ty = (y * p.a - x * p.c) * id - bone.ay
+	local rotationIK = math_deg(math_atan2(ty, tx)) - bone.ashearX - bone.arotation
+	if bone.ascaleX < 0 then rotationIK = rotationIK + 180 end
 	if rotationIK > 180 then
 		rotationIK = rotationIK - 360
 	elseif (rotationIK < -180) then
 		rotationIK = rotationIK + 360
 	end
-	bone:updateWorldTransformWith(bone.x, bone.y, bone.rotation + rotationIK * alpha, bone.scaleX, bone.scaleY, bone.shearX, bone.shearY)
+	bone:updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, bone.ascaleX, bone.ascaleY, bone.ashearX, bone.ashearY)
 end
 
 function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
@@ -103,11 +103,13 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
 		child:updateWorldTransform()
 		return
 	end
-	local px = parent.x
-	local py = parent.y
-	local psx = parent.scaleX
-	local psy = parent.scaleY
-	local csx = child.scaleX
+	if not parent.appliedValid then parent:updateAppliedTransform() end
+	if not child.appliedValid then child:updateAppliedTransform() end
+	local px = parent.ax
+	local py = parent.ay
+	local psx = parent.ascaleX
+	local psy = parent.ascaleY
+	local csx = child.ascaleX
 	local os1 = 0
 	local os2 = 0
 	local s2 = 0
@@ -129,7 +131,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
 	else
 		os2 = 0
 	end
-	local cx = child.x
+	local cx = child.ax
 	local cy = 0
 	local cwx = 0
 	local cwy = 0
@@ -143,7 +145,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
 		cwx = a * cx + parent.worldX
 		cwy = c * cx + parent.worldY
 	else
-		cy = child.y
+		cy = child.ay
 		cwx = a * cx + b * cy + parent.worldX
 		cwy = c * cx + d * cy + parent.worldY
 	end
@@ -254,22 +256,22 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
 		end
 	end
 	local os = math_atan2(cy, cx) * s2
-	local rotation = parent.rotation
+	local rotation = parent.arotation
 	a1 = math_deg(a1 - os) + os1 - rotation
 	if a1 > 180 then
 		a1 = a1 - 360
 	elseif a1 < -180 then
 		a1 = a1 + 360
 	end
-	parent:updateWorldTransformWith(px, py, rotation + a1 * alpha, parent.scaleX, parent.scaleY, 0, 0)
+	parent:updateWorldTransformWith(px, py, rotation + a1 * alpha, parent.ascaleX, parent.ascaleY, 0, 0)
 	rotation = child.rotation
-	a2 = (math_deg(a2 + os) - child.shearX) * s2 + os2 - rotation
+	a2 = (math_deg(a2 + os) - child.ashearX) * s2 + os2 - rotation
 	if a2 > 180 then
 		a2 = a2 - 360
 	elseif a2 < -180 then
 		a2 = a2 + 360
 	end
-	child:updateWorldTransformWith(cx, cy, rotation + a2 * alpha, child.scaleX, child.scaleY, child.shearX, child.shearY);
+	child:updateWorldTransformWith(cx, cy, rotation + a2 * alpha, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY);
 end
 
 return IkConstraint

@@ -68,11 +68,10 @@ namespace Spine.Unity.Modules {
 
 		int SkeletonRendererSeparatorCount {
 			get {
-				if (Application.isPlaying) {
+				if (Application.isPlaying)
 					return component.SkeletonRenderer.separatorSlots.Count;
-				} else {
+				else
 					return separatorNamesProp == null ? 0 : separatorNamesProp.arraySize;
-				}
 			}
 		}
 
@@ -81,17 +80,18 @@ namespace Spine.Unity.Modules {
 			var componentRenderers = component.partsRenderers;
 			int totalParts;
 
-			bool componentEnabled = component.enabled;
-			bool checkBox = EditorGUILayout.Toggle("Enable Separator", componentEnabled);
-			if (checkBox != componentEnabled) {
-				component.enabled = checkBox;
+			using (new SpineInspectorUtility.LabelWidthScope()) {
+				bool componentEnabled = component.enabled;
+				bool checkBox = EditorGUILayout.Toggle("Enable Separator", componentEnabled);
+				if (checkBox != componentEnabled)
+					component.enabled = checkBox;
+
+				EditorGUILayout.PropertyField(copyPropertyBlock_);
+				EditorGUILayout.PropertyField(copyMeshRendererFlags_);
 			}
 
-			EditorGUILayout.PropertyField(copyPropertyBlock_);
-			EditorGUILayout.PropertyField(copyMeshRendererFlags_);
-
 			// SkeletonRenderer Box
-			using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
+			using (new SpineInspectorUtility.BoxScope(false)) {
 				// Fancy SkeletonRenderer foldout reference field
 				{
 					EditorGUI.indentLevel++;
@@ -149,7 +149,7 @@ namespace Spine.Unity.Modules {
 			}
 
 			// Parts renderers
-			using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
+			using (new SpineInspectorUtility.BoxScope(false)) {
 				EditorGUI.indentLevel++;
 				EditorGUILayout.PropertyField(this.partsRenderers_, true);
 				EditorGUI.indentLevel--;

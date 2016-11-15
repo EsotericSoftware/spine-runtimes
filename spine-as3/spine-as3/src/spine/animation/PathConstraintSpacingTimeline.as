@@ -37,25 +37,36 @@ public class PathConstraintSpacingTimeline extends PathConstraintPositionTimelin
 	public function PathConstraintSpacingTimeline (frameCount:int) {
 		super(frameCount);
 	}
+	
+	override public function getPropertyId () : int {
+		return (TimelineType.pathConstraintSpacing.ordinal << 24) + pathConstraintIndex;
+	}
 
-	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
-		if (time < frames[0]) return; // Time is before first frame.
-
+	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
 		var constraint:PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
-
-		if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
-			var i:int = frames.length;
-			constraint.spacing += (frames[i + PREV_VALUE] - constraint.spacing) * alpha;
+		if (time < frames[0]) {
+			if (setupPose) constraint.spacing = constraint.data.spacing;
 			return;
 		}
 
-		// Interpolate between the previous frame and the current frame.
-		var frame:int = Animation.binarySearch(frames, time, ENTRIES);
-		var spacing:Number = frames[frame + PREV_VALUE];
-		var frameTime:Number = frames[frame];
-		var percent:Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+		var spacing:Number;
+		if (time >= frames[frames.length - ENTRIES]) // Time is after last frame.
+			spacing = frames[frames.length + PREV_VALUE];
+		else {
+			// Interpolate between the previous frame and the current frame.
+			var frame:int = Animation.binarySearch(frames, time, ENTRIES);
+			spacing = frames[frame + PREV_VALUE];
+			var frameTime:Number = frames[frame];
+			var percent:Number = getCurvePercent(frame / ENTRIES - 1,
+				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-		constraint.spacing += (spacing + (frames[frame + VALUE] - spacing) * percent - constraint.spacing) * alpha;
+			spacing += (frames[frame + VALUE] - spacing) * percent;
+		}
+
+		if (setupPose)
+			constraint.spacing = constraint.data.spacing + (spacing - constraint.data.spacing) * alpha;
+		else
+			constraint.spacing += (spacing - constraint.spacing) * alpha;
 	}
 }
 }

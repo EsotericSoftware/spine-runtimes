@@ -31,6 +31,7 @@
 package com.esotericsoftware.spine;
 
 import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
+import com.esotericsoftware.spine.AnimationState.TrackEntry;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -81,24 +82,33 @@ public class SimpleTest2 extends ApplicationAdapter {
 		state = new AnimationState(stateData); // Holds the animation state for a skeleton (current animation, time, etc).
 		state.setTimeScale(0.3f); // Slow all animations down to 30% speed.
 		state.addListener(new AnimationStateListener() {
-			public void event (int trackIndex, Event event) {
-				System.out.println(trackIndex + " event: " + state.getCurrent(trackIndex) + ", " + event.getData().getName() + ", "
-					+ event.getInt());
+
+			public void start (TrackEntry entry) {
+				System.out.println(entry.getTrackIndex() + " start: " + entry);
 			}
 
-			public void complete (int trackIndex, int loopCount) {
-				System.out.println(trackIndex + " complete: " + state.getCurrent(trackIndex) + ", " + loopCount);
+			public void interrupt (TrackEntry entry) {
+				System.out.println(entry.getTrackIndex() + " interrupt: " + entry);
 			}
 
-			public void start (int trackIndex) {
-				System.out.println(trackIndex + " start: " + state.getCurrent(trackIndex));
+			public void end (TrackEntry entry) {
+				System.out.println(entry.getTrackIndex() + " end: " + entry);
 			}
 
-			public void end (int trackIndex) {
-				System.out.println(trackIndex + " end: " + state.getCurrent(trackIndex));
+			public void dispose (TrackEntry entry) {
+				System.out.println(entry.getTrackIndex() + " dispose: " + entry);
+			}
+
+			public void complete (TrackEntry entry) {
+				System.out.println(entry.getTrackIndex() + " complete: " + entry);
+			}
+
+			public void event (TrackEntry entry, Event event) {
+				System.out
+					.println(entry.getTrackIndex() + " event: " + entry + ", " + event.getData().getName() + ", " + event.getInt());
 			}
 		});
-		
+
 		// Set animation on track 0.
 		state.setAnimation(0, "run", true);
 

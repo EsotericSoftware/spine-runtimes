@@ -89,7 +89,9 @@ public class SkeletonJson {
 			skeletonData.hash = skeletonMap["hash"];
 			skeletonData.version = skeletonMap["spine"];
 			skeletonData.width = skeletonMap["width"] || 0;
-			skeletonData.height = skeletonMap["height"] || 0;			
+			skeletonData.height = skeletonMap["height"] || 0;
+			skeletonData.fps = skeletonMap["fps"] || 0;
+			skeletonData.imagesPath = skeletonMap["images"];		
 		}			
 
 		// Bones.
@@ -110,8 +112,7 @@ public class SkeletonJson {
 			boneData.scaleY = boneMap.hasOwnProperty("scaleY") ? boneMap["scaleY"] : 1;
 			boneData.shearX = Number(boneMap["shearX"] || 0);
 			boneData.shearY = Number(boneMap["shearY"] || 0);
-			boneData.inheritRotation = boneMap.hasOwnProperty("inheritRotation") ? Boolean(boneMap["inheritRotation"]) : true;
-			boneData.inheritScale = boneMap.hasOwnProperty("inheritScale") ? Boolean(boneMap["inheritScale"]) : true;			
+			boneData.transformMode = TransformMode[boneMap["transform"] || "normal"];			
 			skeletonData.bones.push(boneData);
 		}
 		
@@ -139,6 +140,7 @@ public class SkeletonJson {
 		// IK constraints.
 		for each (var constraintMap:Object in root["ik"]) {
 			var ikConstraintData:IkConstraintData = new IkConstraintData(constraintMap["name"]);
+			ikConstraintData.order = constraintMap["order"] || 0;
 
 			for each (boneName in constraintMap["bones"]) {
 				var bone:BoneData = skeletonData.findBone(boneName);
@@ -158,6 +160,7 @@ public class SkeletonJson {
 		// Transform constraints.
 		for each (constraintMap in root["transform"]) {
 			var transformConstraintData:TransformConstraintData = new TransformConstraintData(constraintMap["name"]);
+			transformConstraintData.order = constraintMap["order"] || 0;
 
 			for each (boneName in constraintMap["bones"]) {
 				bone = skeletonData.findBone(boneName);
@@ -186,6 +189,7 @@ public class SkeletonJson {
 		// Path constraints.
 		for each (constraintMap in root["path"]) {
 			var pathConstraintData:PathConstraintData = new PathConstraintData(constraintMap["name"]);
+			pathConstraintData.order = constraintMap["order"] || 0;
 
 			for each (boneName in constraintMap["bones"]) {
 				bone = skeletonData.findBone(boneName);
@@ -249,7 +253,7 @@ public class SkeletonJson {
 				var eventData:EventData = new EventData(eventName);
 				eventData.intValue = eventMap["int"] || 0;
 				eventData.floatValue = eventMap["float"] || 0;
-				eventData.stringValue = eventMap["string"] || null;
+				eventData.stringValue = eventMap["string"] || "";
 				skeletonData.events.push(eventData);
 			}
 		}

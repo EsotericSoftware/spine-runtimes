@@ -35,6 +35,11 @@ import com.esotericsoftware.spine.Skin;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 
+/** An {@link AttachmentLoader} that configures attachments using texture regions from an {@link Atlas}.
+ * <p>
+ * See <a href='http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data'>Loading skeleton data</a> in the
+ * Spine Runtimes Guide. */
+@SuppressWarnings("javadoc")
 public class AtlasAttachmentLoader implements AttachmentLoader {
 	private TextureAtlas atlas;
 

@@ -33,6 +33,28 @@ module spine {
 		[key: string]: T;
 	}
 
+	export class IntSet {
+		array = new Array<number>();
+
+		add (value: number): boolean {
+			let contains = this.contains(value);
+			this.array[value | 0] = value | 0;
+			return !contains;
+		}
+
+		contains (value: number) {
+			return this.array[value | 0] != undefined;
+		}
+
+		remove (value: number) {
+			this.array[value | 0] = undefined;
+		}
+
+		clear () {
+			this.array.length = 0;
+		}
+	}
+
 	export interface Disposable {
 		dispose (): void;
 	}
@@ -121,7 +143,7 @@ module spine {
 		}
 
 		static signum (value: number): number {
-			return value >= 0 ? 1 : -1;
+			return value > 0 ? 1 : value < 0 ? -1 : 0;
 		}
 
 		static toInt (x: number) {
@@ -151,6 +173,11 @@ module spine {
 				for (let i = oldSize; i < size; i++) array[i] = value;
 			}
 			return array;
+		}
+
+		static ensureArrayCapacity<T> (array: Array<T>, size: number, value: any = 0): Array<T> {
+			if (array.length >= size) return array;
+			return Utils.setArraySize(array, size, value);
 		}
 
 		static newArray<T> (size: number, defaultValue: T): Array<T> {
@@ -196,11 +223,15 @@ module spine {
 		}
 
 		free (item: T) {
+			if ((item as any).reset) (item as any).reset();
 			this.items.push(item);
 		}
 
 		freeAll (items: ArrayLike<T>) {
-			for (let i = 0; i < items.length; i++) this.items[i] = items[i];
+			for (let i = 0; i < items.length; i++) {
+				if ((items[i] as any).reset) (items[i] as any).reset();
+				this.items[i] = items[i];
+			}
 		}
 
 		clear () {

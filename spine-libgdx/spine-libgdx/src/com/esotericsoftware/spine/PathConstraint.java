@@ -40,7 +40,11 @@ import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 
-public class PathConstraint implements Updatable {
+/** Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the
+ * constrained bones so they follow a {@link PathAttachment}.
+ * <p>
+ * See <a href="http://esotericsoftware.com/spine-path-constraints">Path constraints</a> in the Spine User Guide. */
+public class PathConstraint implements Constraint {
 	static private final int NONE = -1, BEFORE = -2, AFTER = -3;
 
 	final PathConstraintData data;
@@ -81,6 +85,7 @@ public class PathConstraint implements Updatable {
 		translateMix = constraint.translateMix;
 	}
 
+	/** Applies the constraint to the constrained bones. */
 	public void apply () {
 		update();
 	}
@@ -119,14 +124,19 @@ public class PathConstraint implements Updatable {
 
 		float[] positions = computeWorldPositions((PathAttachment)attachment, spacesCount, tangents,
 			data.positionMode == PositionMode.percent, spacingMode == SpacingMode.percent);
-		Skeleton skeleton = target.getSkeleton();
-		float skeletonX = skeleton.x, skeletonY = skeleton.y;
 		float boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
-		boolean tip = rotateMode == RotateMode.chain && offsetRotation == 0;
+		boolean tip;
+		if (offsetRotation == 0)
+			tip = rotateMode == RotateMode.chain;
+		else {
+			tip = false;
+			Bone p = target.bone;
+			offsetRotation *= p.a * p.d - p.b * p.c > 0 ? degRad : -degRad;
+		}
 		for (int i = 0, p = 3; i < boneCount; i++, p += 3) {
 			Bone bone = (Bone)bones[i];
-			bone.worldX += (boneX - skeletonX - bone.worldX) * translateMix;
-			bone.worldY += (boneY - skeletonY - bone.worldY) * translateMix;
+			bone.worldX += (boneX - bone.worldX) * translateMix;
+			bone.worldY += (boneY - bone.worldY) * translateMix;
 			float x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
 			if (scale) {
 				float length = lengths[i];
@@ -146,14 +156,15 @@ public class PathConstraint implements Updatable {
 					r = positions[p + 2];
 				else
 					r = atan2(dy, dx);
-				r -= atan2(c, a) - offsetRotation * degRad;
+				r -= atan2(c, a);
 				if (tip) {
 					cos = cos(r);
 					sin = sin(r);
 					float length = bone.data.length;
 					boneX += (length * (cos * a - sin * c) - dx) * rotateMix;
 					boneY += (length * (sin * a + cos * c) - dy) * rotateMix;
-				}
+				} else
+					r += offsetRotation;
 				if (r > PI)
 					r -= PI2;
 				else if (r < -PI) //
@@ -166,6 +177,7 @@ public class PathConstraint implements Updatable {
 				bone.c = sin * a + cos * c;
 				bone.d = sin * b + cos * d;
 			}
+			bone.appliedValid = false;
 		}
 	}
 
@@ -402,7 +414,7 @@ public class PathConstraint implements Updatable {
 
 	private void addCurvePosition (float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2,
 		float[] out, int o, boolean tangents) {
-		if (p == 0) p = 0.0001f;
+		if (p == 0 || Float.isNaN(p)) p = 0.0001f;
 		float tt = p * p, ttt = tt * p, u = 1 - p, uu = u * u, uuu = uu * u;
 		float ut = u * p, ut3 = ut * 3, uut3 = u * ut3, utt3 = ut3 * p;
 		float x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
@@ -411,6 +423,11 @@ public class PathConstraint implements Updatable {
 		if (tangents) out[o + 2] = atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
 	}
 
+	public int getOrder () {
+		return data.order;
+	}
+
+	/** The position along the path. */
 	public float getPosition () {
 		return position;
 	}
@@ -419,6 +436,7 @@ public class PathConstraint implements Updatable {
 		this.position = position;
 	}
 
+	/** The spacing between bones. */
 	public float getSpacing () {
 		return spacing;
 	}
@@ -427,6 +445,7 @@ public class PathConstraint implements Updatable {
 		this.spacing = spacing;
 	}
 
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotations. */
 	public float getRotateMix () {
 		return rotateMix;
 	}
@@ -435,6 +454,7 @@ public class PathConstraint implements Updatable {
 		this.rotateMix = rotateMix;
 	}
 
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained translations. */
 	public float getTranslateMix () {
 		return translateMix;
 	}
@@ -443,10 +463,12 @@ public class PathConstraint implements Updatable {
 		this.translateMix = translateMix;
 	}
 
+	/** The bones that will be modified by this path constraint. */
 	public Array<Bone> getBones () {
 		return bones;
 	}
 
+	/** The slot whose path attachment will be used to constrained the bones. */
 	public Slot getTarget () {
 		return target;
 	}
@@ -455,6 +477,7 @@ public class PathConstraint implements Updatable {
 		this.target = target;
 	}
 
+	/** The path constraint's setup pose data. */
 	public PathConstraintData getData () {
 		return data;
 	}

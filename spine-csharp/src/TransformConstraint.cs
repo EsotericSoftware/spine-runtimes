@@ -31,13 +31,14 @@
 using System;
 
 namespace Spine {
-	public class TransformConstraint : IUpdatable {
+	public class TransformConstraint : IConstraint {
 		internal TransformConstraintData data;
 		internal ExposedList<Bone> bones;
 		internal Bone target;
 		internal float rotateMix, translateMix, scaleMix, shearMix;
 
 		public TransformConstraintData Data { get { return data; } }
+		public int Order { get { return data.order; } }
 		public ExposedList<Bone> Bones { get { return bones; } }
 		public Bone Target { get { return target; } set { target = value; } }
 		public float RotateMix { get { return rotateMix; } set { rotateMix = value; } }
@@ -57,7 +58,7 @@ namespace Spine {
 			bones = new ExposedList<Bone>();
 			foreach (BoneData boneData in data.bones)
 				bones.Add (skeleton.FindBone (boneData.name));
-
+			
 			target = skeleton.FindBone(data.target.name);
 		}
 
@@ -69,13 +70,17 @@ namespace Spine {
 			float rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
 			Bone target = this.target;
 			float ta = target.a, tb = target.b, tc = target.c, td = target.d;
-			ExposedList<Bone> bones = this.bones;
+			float degRadReflect = (ta * td - tb * tc > 0) ? MathUtils.DegRad : -MathUtils.DegRad;
+			float offsetRotation = data.offsetRotation * degRadReflect, offsetShearY = data.offsetShearY * degRadReflect;
+			var bones = this.bones;
+			var bonesItems = bones.Items;
 			for (int i = 0, n = bones.Count; i < n; i++) {
-				Bone bone = bones.Items[i];
+				Bone bone = bonesItems[i];
+				bool modified = false;
 
-				if (rotateMix > 0) {
+				if (rotateMix != 0) {
 					float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-					float r = (float)Math.Atan2(tc, ta) - (float)Math.Atan2(c, a) + data.offsetRotation * MathUtils.degRad;
+					float r = MathUtils.Atan2(tc, ta) - MathUtils.Atan2(c, a) + offsetRotation;
 					if (r > MathUtils.PI)
 						r -= MathUtils.PI2;
 					else if (r < -MathUtils.PI) r += MathUtils.PI2;
@@ -85,26 +90,29 @@ namespace Spine {
 					bone.b = cos * b - sin * d;
 					bone.c = sin * a + cos * c;
 					bone.d = sin * b + cos * d;
+					modified = true;
 				}
 
-				if (translateMix > 0) {
+				if (translateMix != 0) {
 					float tempx, tempy;
 					target.LocalToWorld(data.offsetX, data.offsetY, out tempx, out tempy);
 					bone.worldX += (tempx - bone.worldX) * translateMix;
 					bone.worldY += (tempy - bone.worldY) * translateMix;
+					modified = true;
 				}
 
 				if (scaleMix > 0) {
-					float bs = (float)Math.Sqrt(bone.a * bone.a + bone.c * bone.c);
+					float s = (float)Math.Sqrt(bone.a * bone.a + bone.c * bone.c);
 					float ts = (float)Math.Sqrt(ta * ta + tc * tc);
-					float s = bs > 0.00001f ? (bs + (ts - bs + data.offsetScaleX) * scaleMix) / bs : 0;
+					if (s > 0.00001f) s = (s + (ts - s + data.offsetScaleX) * scaleMix) / s;
 					bone.a *= s;
 					bone.c *= s;
-					bs = (float)Math.Sqrt(bone.b * bone.b + bone.d * bone.d);
+					s = (float)Math.Sqrt(bone.b * bone.b + bone.d * bone.d);
 					ts = (float)Math.Sqrt(tb * tb + td * td);
-					s = bs > 0.00001f ? (bs + (ts - bs + data.offsetScaleY) * scaleMix) / bs : 0;
+					if (s > 0.00001f) s = (s + (ts - s + data.offsetScaleY) * scaleMix) / s;
 					bone.b *= s;
 					bone.d *= s;
+					modified = true;
 				}
 
 				if (shearMix > 0) {
@@ -114,11 +122,14 @@ namespace Spine {
 					if (r > MathUtils.PI)
 						r -= MathUtils.PI2;
 					else if (r < -MathUtils.PI) r += MathUtils.PI2;
-					r = by + (r + data.offsetShearY * MathUtils.degRad) * shearMix;
+					r = by + (r + offsetShearY) * shearMix;
 					float s = (float)Math.Sqrt(b * b + d * d);
 					bone.b = MathUtils.Cos(r) * s;
 					bone.d = MathUtils.Sin(r) * s;
+					modified = true;
 				}
+
+				if (modified) bone.appliedValid = false;
 			}
 		}
 

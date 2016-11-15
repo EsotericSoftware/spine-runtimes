@@ -28,14 +28,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+// Contributed by: Mitch Thompson
+
 using UnityEngine;
 using System.Collections.Generic;
 using Spine;
 
 namespace Spine.Unity.Modules {
 	public class SpriteAttacher : MonoBehaviour {
-		const string DefaultPMAShader = "Spine/Skeleton";
-		const string DefaultStraightAlphaShader = "Sprites/Default";
+		public const string DefaultPMAShader = "Spine/Skeleton";
+		public const string DefaultStraightAlphaShader = "Sprites/Default";
 
 		#region Inspector
 		public bool attachOnStart = true;
@@ -218,25 +220,25 @@ namespace Spine.Unity.Modules {
 	}
 
 	public static class SpriteAttachmentExtensions {
-		public static Attachment AttachUnitySprite (this Skeleton skeleton, string slotName, Sprite sprite, string shaderName = "Spine/Skeleton", bool applyPMA = true) {
+		public static RegionAttachment AttachUnitySprite (this Skeleton skeleton, string slotName, Sprite sprite, string shaderName = SpriteAttacher.DefaultPMAShader, bool applyPMA = true) {
 			return skeleton.AttachUnitySprite(slotName, sprite, Shader.Find(shaderName), applyPMA);
 		}
 
-		public static Attachment AddUnitySprite (this SkeletonData skeletonData, string slotName, Sprite sprite, string skinName = "", string shaderName = "Spine/Skeleton", bool applyPMA = true) {
+		public static RegionAttachment AddUnitySprite (this SkeletonData skeletonData, string slotName, Sprite sprite, string skinName = "", string shaderName = SpriteAttacher.DefaultPMAShader, bool applyPMA = true) {
 			return skeletonData.AddUnitySprite(slotName, sprite, skinName, Shader.Find(shaderName), applyPMA);
 		}
 
-		public static RegionAttachment ToRegionAttachment (this Sprite sprite, string shaderName = "Spine/Skeleton", bool applyPMA = true) {
+		public static RegionAttachment ToRegionAttachment (this Sprite sprite, string shaderName = SpriteAttacher.DefaultPMAShader, bool applyPMA = true) {
 			return sprite.ToRegionAttachment(Shader.Find(shaderName), applyPMA);
 		}
 
-		public static Attachment AttachUnitySprite (this Skeleton skeleton, string slotName, Sprite sprite, Shader shader, bool applyPMA) {
+		public static RegionAttachment AttachUnitySprite (this Skeleton skeleton, string slotName, Sprite sprite, Shader shader, bool applyPMA) {
 			var att = sprite.ToRegionAttachment(shader, applyPMA);
 			skeleton.FindSlot(slotName).Attachment = att;
 			return att;
 		}
 
-		public static Attachment AddUnitySprite (this SkeletonData skeletonData, string slotName, Sprite sprite, string skinName, Shader shader, bool applyPMA) {
+		public static RegionAttachment AddUnitySprite (this SkeletonData skeletonData, string slotName, Sprite sprite, string skinName, Shader shader, bool applyPMA) {
 			var att = sprite.ToRegionAttachment(shader, applyPMA);
 
 			var slotIndex = skeletonData.FindSlotIndex(slotName);

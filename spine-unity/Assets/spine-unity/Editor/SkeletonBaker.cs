@@ -364,12 +364,13 @@ namespace Spine.Unity.Editor {
 
 					boneTransform.parent = parentTransform;
 					boneTransform.localPosition = new Vector3(boneData.X, boneData.Y, 0);
-					if (boneData.InheritRotation)
+					var tm = boneData.TransformMode;
+					if (tm.InheritsRotation())
 						boneTransform.localRotation = Quaternion.Euler(0, 0, boneData.Rotation);
 					else
 						boneTransform.rotation = Quaternion.Euler(0, 0, boneData.Rotation);
 
-					if (boneData.InheritScale)
+					if (tm.InheritsScale())
 						boneTransform.localScale = new Vector3(boneData.ScaleX, boneData.ScaleY, 1);
 				}
 
@@ -409,7 +410,7 @@ namespace Spine.Unity.Editor {
 							offset.y = regionAttachment.Y;
 							rotation = regionAttachment.Rotation;
 							mesh = ExtractRegionAttachment(attachmentMeshName, regionAttachment, mesh);
-							material = ExtractMaterial(attachment);
+							material = attachment.GetMaterial();
 							unusedMeshNames.Remove(attachmentMeshName);
 							if (newPrefab || meshTable.ContainsKey(attachmentMeshName) == false)
 								AssetDatabase.AddObjectToAsset(mesh, prefab);
@@ -425,7 +426,7 @@ namespace Spine.Unity.Editor {
 							else
 								mesh = ExtractMeshAttachment(attachmentMeshName, meshAttachment, mesh);
 							
-							material = ExtractMaterial(attachment);
+							material = attachment.GetMaterial();
 							unusedMeshNames.Remove(attachmentMeshName);
 							if (newPrefab || meshTable.ContainsKey(attachmentMeshName) == false)
 								AssetDatabase.AddObjectToAsset(mesh, prefab);
@@ -531,21 +532,6 @@ namespace Spine.Unity.Editor {
 			Slot slot = new Slot(data, bone);
 			extractionSlot = slot;
 			return extractionSlot;
-		}
-
-		static Material ExtractMaterial (Attachment attachment) {
-			if (attachment == null || attachment is BoundingBoxAttachment)
-				return null;
-
-			if (attachment is RegionAttachment) {
-				var att = (RegionAttachment)attachment;
-				return (Material)((AtlasRegion)att.RendererObject).page.rendererObject;
-			} else if (attachment is MeshAttachment) {
-				var att = (MeshAttachment)attachment;
-				return (Material)((AtlasRegion)att.RendererObject).page.rendererObject;
-			} else {
-				return null;
-			}
 		}
 
 		static Mesh ExtractRegionAttachment (string name, RegionAttachment attachment, Mesh mesh = null) {
@@ -820,7 +806,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			foreach (Bone b in skeleton.Bones) {
-				if (b.Data.InheritRotation == false) {
+				if (!b.Data.TransformMode.InheritsRotation()) {
 					int index = skeleton.FindBoneIndex(b.Data.Name);
 
 					if (ignoreRotateTimelineIndexes.Contains(index) == false) {
@@ -989,10 +975,9 @@ namespace Spine.Unity.Editor {
 
 		static void BakeBone (Bone bone, Spine.Animation animation, AnimationClip clip) {
 			Skeleton skeleton = bone.Skeleton;
-			bool inheritRotation = bone.Data.InheritRotation;
+			bool inheritRotation = bone.Data.TransformMode.InheritsRotation();
 
-			skeleton.SetToSetupPose();
-			animation.Apply(skeleton, 0, 0, true, null);
+			animation.Apply(skeleton, 0, 0, true, null, 1f, true, false);
 			skeleton.UpdateWorldTransform();
 			float duration = animation.Duration;
 
@@ -1021,7 +1006,7 @@ namespace Spine.Unity.Editor {
 				if (i == steps)
 					currentTime = duration;
 
-				animation.Apply(skeleton, lastTime, currentTime, true, null);
+				animation.Apply(skeleton, lastTime, currentTime, true, null, 1f, true, false);
 				skeleton.UpdateWorldTransform();
 
 				int pIndex = listIndex - 1;
@@ -1119,7 +1104,7 @@ namespace Spine.Unity.Editor {
 
 					currentTime = time;
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
 
 					lastTime = time;
 					listIndex++;
@@ -1146,7 +1131,7 @@ namespace Spine.Unity.Editor {
 
 					currentTime = time;
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
 
 					lastTime = time;
 					listIndex++;
@@ -1165,7 +1150,7 @@ namespace Spine.Unity.Editor {
 						if (i == steps)
 							currentTime = time;
 
-						timeline.Apply(skeleton, lastTime, currentTime, null, 1);
+						timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
 
 						px = xKeys[listIndex - 1];
 						py = yKeys[listIndex - 1];
@@ -1262,7 +1247,7 @@ namespace Spine.Unity.Editor {
 
 					currentTime = time;
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
 
 					lastTime = time;
 					listIndex++;
@@ -1289,7 +1274,7 @@ namespace Spine.Unity.Editor {
 
 					currentTime = time;
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
 
 					lastTime = time;
 					listIndex++;
@@ -1307,7 +1292,7 @@ namespace Spine.Unity.Editor {
 						if (i == steps)
 							currentTime = time;
 
-						timeline.Apply(skeleton, lastTime, currentTime, null, 1);
+						timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
 
 						px = xKeys[listIndex - 1];
 						py = yKeys[listIndex - 1];
@@ -1391,7 +1376,7 @@ namespace Spine.Unity.Editor {
 
 					currentTime = time;
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
 
 					lastTime = time;
 					listIndex++;
@@ -1416,7 +1401,7 @@ namespace Spine.Unity.Editor {
 
 					currentTime = time;
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
 
 					lastTime = time;
 					listIndex++;
@@ -1426,7 +1411,7 @@ namespace Spine.Unity.Editor {
 
 					float time = frames[f];
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
 					skeleton.UpdateWorldTransform();
 
 					rotation = frames[f + 1] + boneData.Rotation;
@@ -1440,7 +1425,7 @@ namespace Spine.Unity.Editor {
 						if (i == steps)
 							currentTime = time;
 
-						timeline.Apply(skeleton, lastTime, currentTime, null, 1);
+						timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
 						skeleton.UpdateWorldTransform();
 						pk = keys[listIndex - 1];
 
@@ -1506,3 +1491,4 @@ namespace Spine.Unity.Editor {
 	}
 
 }
+	

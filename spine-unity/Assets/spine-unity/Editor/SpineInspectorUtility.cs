@@ -49,52 +49,140 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void PropertyFieldWideLabel (SerializedProperty property, GUIContent label = null, float minimumLabelWidth = 150) {
-			using (new EditorGUILayout.HorizontalScope()) {
-				GUILayout.Label(label ?? new GUIContent(property.displayName, property.tooltip), GUILayout.MinWidth(minimumLabelWidth));
-				//GUILayout.FlexibleSpace();
-				EditorGUILayout.PropertyField(property, GUIContent.none, true, GUILayout.MinWidth(100));
-			}
+			EditorGUIUtility.labelWidth = minimumLabelWidth;
+			EditorGUILayout.PropertyField(property, label ?? new GUIContent(property.displayName, property.tooltip));
+			EditorGUIUtility.labelWidth = 0; // Resets to default
 		}
 
-		#region Sorting Layer Field Helpers
-		static readonly GUIContent SortingLayerLabel = new GUIContent("Sorting Layer");
-		static readonly GUIContent OrderInLayerLabel = new GUIContent("Order in Layer");
+		public static void PropertyFieldFitLabel (SerializedProperty property, GUIContent label = null, float extraSpace = 5f) {
+			label = label ?? new GUIContent(property.displayName, property.tooltip);
+			float width = GUI.skin.label.CalcSize(new GUIContent(label.text)).x + extraSpace;
+			if (label.image != null)
+				width += EditorGUIUtility.singleLineHeight;
+			PropertyFieldWideLabel(property, label, width);
 
-		static MethodInfo m_SortingLayerFieldMethod;
-		static MethodInfo SortingLayerFieldMethod {
+		}
+
+		public static bool UndoRedoPerformed (UnityEngine.Event current) {
+			return current.type == EventType.ValidateCommand && current.commandName == "UndoRedoPerformed";
+		}
+
+		#region Layout Scopes
+		static GUIStyle grayMiniLabel;
+		public static GUIStyle GrayMiniLabel {
 			get {
-				if (m_SortingLayerFieldMethod == null)
-					m_SortingLayerFieldMethod = typeof(EditorGUILayout).GetMethod("SortingLayerField", BindingFlags.Static | BindingFlags.NonPublic, null, new [] { typeof(GUIContent), typeof(SerializedProperty), typeof(GUIStyle) }, null);
-
-				return m_SortingLayerFieldMethod;
+				if (grayMiniLabel == null) {
+					grayMiniLabel = new GUIStyle(EditorStyles.centeredGreyMiniLabel);
+					grayMiniLabel.alignment = TextAnchor.UpperLeft;
+				}
+				return grayMiniLabel;
 			}
 		}
 
-		public struct SerializedSortingProperties {
-			public SerializedObject renderer;
-			public SerializedProperty sortingLayerID;
-			public SerializedProperty sortingOrder;
-
-			public SerializedSortingProperties (Renderer r) : this(new SerializedObject(r)) {}
-			public SerializedSortingProperties (Object[] renderers) : this(new SerializedObject(renderers)) {}
-			public SerializedSortingProperties (SerializedObject rendererSerializedObject) {
-				renderer = rendererSerializedObject;
-				sortingLayerID = renderer.FindProperty("m_SortingLayerID");
-				sortingOrder = renderer.FindProperty("m_SortingOrder");
+		public class LabelWidthScope : System.IDisposable {
+			public LabelWidthScope (float minimumLabelWidth = 190f) {
+				EditorGUIUtility.labelWidth = minimumLabelWidth;
 			}
 
-			public void ApplyModifiedProperties () {
-				renderer.ApplyModifiedProperties();
-				this.SetDirty();
+			public void Dispose () {
+				EditorGUIUtility.labelWidth = 0f;
+			}
+		}
+
+		public class IndentScope : System.IDisposable {
+			public IndentScope () { EditorGUI.indentLevel++; }
+			public void Dispose () { EditorGUI.indentLevel--; }
+		}
+
+		public class BoxScope : System.IDisposable {
+			readonly bool indent;
+
+			static GUIStyle boxScopeStyle;
+			public static GUIStyle BoxScopeStyle {
+				get {
+					if (boxScopeStyle == null) {
+						boxScopeStyle = new GUIStyle(EditorStyles.helpBox);
+						var p = boxScopeStyle.padding;
+						p.right += 6;
+						p.top += 1;
+						p.left += 3;
+					}
+
+					return boxScopeStyle;
+				}
 			}
 
-			internal void SetDirty () {
-				if (renderer.isEditingMultipleObjects)
-					foreach (var o in renderer.targetObjects)
-						EditorUtility.SetDirty(o);
-				else
-					EditorUtility.SetDirty(renderer.targetObject);
+			public BoxScope (bool indent = true) {
+				this.indent = indent;
+				EditorGUILayout.BeginVertical(BoxScopeStyle);
+				if (indent) EditorGUI.indentLevel++;
 			}
+				
+			public void Dispose () {
+				if (indent) EditorGUI.indentLevel--;
+				EditorGUILayout.EndVertical();
+			}
+		}
+		#endregion
+
+		#region Button
+		const float CenterButtonMaxWidth = 270f;
+		const float CenterButtonHeight = 35f;
+		static GUIStyle spineButtonStyle;
+		static GUIStyle SpineButtonStyle {
+			get {
+				if (spineButtonStyle == null) {
+					spineButtonStyle = new GUIStyle(GUI.skin.button);
+					spineButtonStyle.name = "Spine Button";
+					spineButtonStyle.padding = new RectOffset(10, 10, 10, 10);
+				}
+				return spineButtonStyle;
+			}
+		}
+
+		public static bool LargeCenteredButton (string label, bool sideSpace = true) {
+			if (sideSpace) {
+				bool clicked;
+				using (new EditorGUILayout.HorizontalScope()) {
+					EditorGUILayout.Space();
+					clicked = GUILayout.Button(label, SpineButtonStyle, GUILayout.MaxWidth(CenterButtonMaxWidth), GUILayout.Height(CenterButtonHeight));
+					EditorGUILayout.Space();
+				}
+				EditorGUILayout.Space();
+				return clicked;
+			} else {
+				return GUILayout.Button(label, GUILayout.MaxWidth(CenterButtonMaxWidth), GUILayout.Height(CenterButtonHeight));
+			}
+		}
+
+		public static bool LargeCenteredButton (GUIContent content, bool sideSpace = true) {
+			if (sideSpace) {
+				bool clicked;
+				using (new EditorGUILayout.HorizontalScope()) {
+					EditorGUILayout.Space();
+					clicked = GUILayout.Button(content, SpineButtonStyle, GUILayout.MaxWidth(CenterButtonMaxWidth), GUILayout.Height(CenterButtonHeight));
+					EditorGUILayout.Space();
+				}
+				EditorGUILayout.Space();
+				return clicked;
+			} else {
+				return GUILayout.Button(content, GUILayout.MaxWidth(CenterButtonMaxWidth), GUILayout.Height(CenterButtonHeight));
+			}
+		}
+		#endregion
+
+		#region Multi-Editing Helpers
+		public static bool TargetsUseSameData (SerializedObject so) {
+			if (so.isEditingMultipleObjects) {
+				int n = so.targetObjects.Length;
+				var first = so.targetObjects[0] as ISkeletonComponent;
+				for (int i = 1; i < n; i++) {
+					var sr = so.targetObjects[i] as ISkeletonComponent;
+					if (sr != null && sr.SkeletonDataAsset != first.SkeletonDataAsset)
+						return false;
+				}
+			}
+			return true;
 		}
 
 		public static SerializedObject GetRenderersSerializedObject (SerializedObject serializedObject) {
@@ -120,40 +208,67 @@ namespace Spine.Unity.Editor {
 
 			return null;
 		}
+		#endregion
 
-		public static bool TargetsUseSameData (SerializedObject so) {
-			bool multi = so.isEditingMultipleObjects;
-			if (multi) {
-				int n = so.targetObjects.Length;
-				var first = so.targetObjects[0] as SkeletonRenderer;
-				for (int i = 1; i < n; i++) {
-					var sr = so.targetObjects[i] as SkeletonRenderer;
-					if (sr != null && sr.skeletonDataAsset != first.skeletonDataAsset)
-						return false;
-				}
+		#region Sorting Layer Field Helpers
+		static readonly GUIContent SortingLayerLabel = new GUIContent("Sorting Layer", "MeshRenderer.sortingLayerID");
+		static readonly GUIContent OrderInLayerLabel = new GUIContent("Order in Layer", "MeshRenderer.sortingOrder");
+
+		static MethodInfo m_SortingLayerFieldMethod;
+		static MethodInfo SortingLayerFieldMethod {
+			get {
+				if (m_SortingLayerFieldMethod == null)
+					m_SortingLayerFieldMethod = typeof(EditorGUILayout).GetMethod("SortingLayerField", BindingFlags.Static | BindingFlags.NonPublic, null, new [] { typeof(GUIContent), typeof(SerializedProperty), typeof(GUIStyle) }, null);
+
+				return m_SortingLayerFieldMethod;
 			}
-			return true;
+		}
+
+		public struct SerializedSortingProperties {
+			public SerializedObject renderer;
+			public SerializedProperty sortingLayerID;
+			public SerializedProperty sortingOrder;
+
+			public SerializedSortingProperties (Renderer r) : this(new SerializedObject(r)) {}
+			public SerializedSortingProperties (Object[] renderers) : this(new SerializedObject(renderers)) {}
+
+			/// <summary>
+			/// Initializes a new instance of the
+			/// <see cref="Spine.Unity.Editor.SpineInspectorUtility.SerializedSortingProperties"/> struct.
+			/// </summary>
+			/// <param name="rendererSerializedObject">SerializedObject of the renderer. Use 
+			/// <see cref="Spine.Unity.Editor.SpineInspectorUtility.GetRenderersSerializedObject"/> to easily generate this.</param>
+			public SerializedSortingProperties (SerializedObject rendererSerializedObject) {
+				renderer = rendererSerializedObject;
+				sortingLayerID = renderer.FindProperty("m_SortingLayerID");
+				sortingOrder = renderer.FindProperty("m_SortingOrder");
+			}
+
+			public void ApplyModifiedProperties () {
+				renderer.ApplyModifiedProperties();
+
+				// SetDirty
+				if (renderer.isEditingMultipleObjects)
+					foreach (var o in renderer.targetObjects)
+						EditorUtility.SetDirty(o);
+				else
+					EditorUtility.SetDirty(renderer.targetObject);
+			}
 		}
 
 		public static void SortingPropertyFields (SerializedSortingProperties prop, bool applyModifiedProperties) {
-			if (applyModifiedProperties) {
+			if (applyModifiedProperties)
 				EditorGUI.BeginChangeCheck();
-				SortingPropertyFields(prop.sortingLayerID, prop.sortingOrder);
-				if(EditorGUI.EndChangeCheck())
+
+			if (SpineInspectorUtility.SortingLayerFieldMethod != null && prop.sortingLayerID != null)
+				SpineInspectorUtility.SortingLayerFieldMethod.Invoke(null, new object[] { SortingLayerLabel, prop.sortingLayerID, EditorStyles.popup } );
+			else
+				EditorGUILayout.PropertyField(prop.sortingLayerID);
+
+			EditorGUILayout.PropertyField(prop.sortingOrder, OrderInLayerLabel);
+
+			if (applyModifiedProperties && EditorGUI.EndChangeCheck())
 					prop.ApplyModifiedProperties();
-			} else {
-				SortingPropertyFields(prop.sortingLayerID, prop.sortingOrder);
-			}
-		}
-
-		public static void SortingPropertyFields (SerializedProperty m_SortingLayerID, SerializedProperty m_SortingOrder) {
-			if (SpineInspectorUtility.SortingLayerFieldMethod != null && m_SortingLayerID != null) {
-				SpineInspectorUtility.SortingLayerFieldMethod.Invoke(null, new object[] { SortingLayerLabel, m_SortingLayerID, EditorStyles.popup } );
-			} else {
-				EditorGUILayout.PropertyField(m_SortingLayerID);
-			}
-
-			EditorGUILayout.PropertyField(m_SortingOrder, OrderInLayerLabel);
 		}
 		#endregion
 	}

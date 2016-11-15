@@ -176,7 +176,7 @@ public class EventTimelineTests {
 
 			int beforeCount = firedEvents.size;
 			Array<Event> original = new Array(firedEvents);
-			timeline.apply(skeleton, lastTimeLooped, timeLooped, firedEvents, 1);
+			timeline.apply(skeleton, lastTimeLooped, timeLooped, firedEvents, 1, false, false);
 
 			while (beforeCount < firedEvents.size) {
 				char fired = firedEvents.get(beforeCount).getData().getName().charAt(0);
@@ -185,7 +185,7 @@ public class EventTimelineTests {
 				} else {
 					if (firedEvents.size > eventsCount) {
 						if (print) System.out.println(lastTimeLooped + "->" + timeLooped + ": " + fired + " == ?");
-						timeline.apply(skeleton, lastTimeLooped, timeLooped, original, 1);
+						timeline.apply(skeleton, lastTimeLooped, timeLooped, original, 1, false, false);
 						fail("Too many events fired.");
 					}
 				}
@@ -193,7 +193,7 @@ public class EventTimelineTests {
 					System.out.println(lastTimeLooped + "->" + timeLooped + ": " + fired + " == " + events[eventIndex]);
 				}
 				if (fired != events[eventIndex]) {
-					timeline.apply(skeleton, lastTimeLooped, timeLooped, original, 1);
+					timeline.apply(skeleton, lastTimeLooped, timeLooped, original, 1, false, false);
 					fail("Wrong event fired.");
 				}
 				eventIndex++;
@@ -205,7 +205,7 @@ public class EventTimelineTests {
 			i++;
 		}
 		if (firedEvents.size < eventsCount) {
-			timeline.apply(skeleton, lastTimeLooped, timeLooped, firedEvents, 1);
+			timeline.apply(skeleton, lastTimeLooped, timeLooped, firedEvents, 1, false, false);
 			if (print) System.out.println(firedEvents);
 			fail("Event not fired: " + events[eventIndex] + ", " + frames[eventIndex]);
 		}

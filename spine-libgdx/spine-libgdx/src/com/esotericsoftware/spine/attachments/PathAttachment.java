@@ -31,8 +31,11 @@
 package com.esotericsoftware.spine.attachments;
 
 import com.badlogic.gdx.graphics.Color;
-import com.esotericsoftware.spine.Slot;
+import com.esotericsoftware.spine.PathConstraint;
 
+/** An attachment whose vertices make up a composite Bezier curve.
+ * <p>
+ * See {@link PathConstraint} and <a href="http://esotericsoftware.com/spine-paths">Paths</a> in the Spine User Guide. */
 public class PathAttachment extends VertexAttachment {
 	float[] lengths;
 	boolean closed, constantSpeed;
@@ -44,14 +47,7 @@ public class PathAttachment extends VertexAttachment {
 		super(name);
 	}
 
-	public void computeWorldVertices (Slot slot, float[] worldVertices) {
-		super.computeWorldVertices(slot, worldVertices);
-	}
-
-	public void computeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset) {
-		super.computeWorldVertices(slot, start, count, worldVertices, offset);
-	}
-
+	/** If true, the start and end knots are connected. */
 	public boolean getClosed () {
 		return closed;
 	}
@@ -60,6 +56,8 @@ public class PathAttachment extends VertexAttachment {
 		this.closed = closed;
 	}
 
+	/** If true, additional calculations are performed to make calculating positions along the path more accurate. If false, fewer
+	 * calculations are performed but calculating positions along the path is less accurate. */
 	public boolean getConstantSpeed () {
 		return constantSpeed;
 	}
@@ -68,7 +66,7 @@ public class PathAttachment extends VertexAttachment {
 		this.constantSpeed = constantSpeed;
 	}
 
-	/** Returns the length in the setup pose from the start of the path to the end of each curve. */
+	/** The lengths along the path in the setup pose from the start of the path to the end of each Bezier curve. */
 	public float[] getLengths () {
 		return lengths;
 	}
@@ -77,6 +75,8 @@ public class PathAttachment extends VertexAttachment {
 		this.lengths = lengths;
 	}
 
+	/** The color of the path as it was in Spine. Available only when nonessential data was exported. Paths are not usually
+	 * rendered at runtime. */
 	public Color getColor () {
 		return color;
 	}

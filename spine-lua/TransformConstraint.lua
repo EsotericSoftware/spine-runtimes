@@ -29,6 +29,7 @@
 -------------------------------------------------------------------------------
 
 local setmetatable = setmetatable
+local utils = require "spine-lua.utils"
 local math_pi = math.pi
 local math_pi2 = math.pi * 2
 local math_atan2 = math.atan2
@@ -79,14 +80,19 @@ function TransformConstraint:update ()
 	local tb = target.b
 	local tc = target.c
 	local td = target.d
+	local degRadReflect = 0;
+	if ta * td - tb * tc > 0 then degRadReflect = utils.degRad else degRadReflect = -utils.degRad end
+	local offsetRotation = self.data.offsetRotation * degRadReflect
+	local offsetShearY = self.data.offsetShearY * degRadReflect
 	local bones = self.bones
 	for i, bone in ipairs(bones) do
-		if rotateMix > 0 then
+		local modified = false
+		if rotateMix ~= 0 then
 			local a = bone.a
 			local b = bone.b
 			local c = bone.c
 			local d = bone.d
-			local r = math_atan2(tc, ta) - math_atan2(c, a) + math_rad(self.data.offsetRotation);
+			local r = math_atan2(tc, ta) - math_atan2(c, a) + offsetRotation
 			if r > math_pi then
 				r = r - math_pi2
 			elseif r < -math_pi then
@@ -99,15 +105,17 @@ function TransformConstraint:update ()
 			bone.b = cos * b - sin * d
 			bone.c = sin * a + cos * c
 			bone.d = sin * b + cos * d
+			modified = true
 		end
 
-		if translateMix > 0 then
+		if translateMix ~= 0 then
 			local temp = self.temp
 			temp[1] = self.data.offsetX
 			temp[2] = self.data.offsetY
 			target:localToWorld(temp)
 			bone.worldX = bone.worldX + (temp[1] - bone.worldX) * translateMix
 			bone.worldY = bone.worldY + (temp[2] - bone.worldY) * translateMix
+			modified = true
 		end
 
 		if scaleMix > 0 then
@@ -127,6 +135,7 @@ function TransformConstraint:update ()
 			end
 			bone.b = bone.b * s
 			bone.d = bone.d * s
+			modified = true
 		end
 
 		if shearMix > 0 then
@@ -139,11 +148,14 @@ function TransformConstraint:update ()
 			elseif r < -math_pi then
 				r = r + math_pi2
 			end
-			r = by + (r + math_rad(self.data.offsetShearY)) * shearMix
+			r = by + (r + offsetShearY) * shearMix
 			local s = math_sqrt(b * b + d * d)
 			bone.b = math_cos(r) * s
 			bone.d = math_sin(r) * s
+			modified = true
 		end
+		
+		if modified then bone.appliedValid = false end
 	end
 end
 

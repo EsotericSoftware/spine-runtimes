@@ -36,9 +36,8 @@ using Spine;
 namespace Spine.Unity {
 	public static class SkeletonExtensions {
 
-		const float ByteToFloat = 1f / 255f;
-
 		#region Colors
+		const float ByteToFloat = 1f / 255f;
 		public static Color GetColor (this Skeleton s) { return new Color(s.r, s.g, s.b, s.a); }
 		public static Color GetColor (this RegionAttachment a) { return new Color(a.r, a.g, a.b, a.a); }
 		public static Color GetColor (this MeshAttachment a) { return new Color(a.r, a.g, a.b, a.a); }
@@ -111,6 +110,10 @@ namespace Spine.Unity {
 			bone.Y = position.y;
 		}
 
+		public static Vector2 GetLocalPosition (this Bone bone) {
+			return new Vector2(bone.x, bone.y);
+		}
+
 		public static Vector2 GetSkeletonSpacePosition (this Bone bone) {
 			return new Vector2(bone.worldX, bone.worldY);
 		}
@@ -126,26 +129,110 @@ namespace Spine.Unity {
 				m33 = 1
 			};
 		}
+
+		public static void GetWorldToLocalMatrix (this Bone bone, out float ia, out float ib, out float ic, out float id) {
+			float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
+			float invDet = 1 / (a * d - b * c);
+			ia = invDet * d;
+			ib = invDet * -b;
+			ic = invDet * -c;
+			id = invDet * a;
+		}
 		#endregion
 
+		#region Attachments
+		public static Material GetMaterial (this Attachment a) {
+			var regionAttachment = a as RegionAttachment;
+			if (regionAttachment != null)
+				return (Material)((AtlasRegion)regionAttachment.RendererObject).page.rendererObject;
+
+			var meshAttachment = a as MeshAttachment;
+			if (meshAttachment != null)
+				return (Material)((AtlasRegion)meshAttachment.RendererObject).page.rendererObject;			
+
+			return null;
+		}
+
+		/// <summary>Fills a Vector2 buffer with local vertices.</summary>
+		/// <param name="va">The VertexAttachment</param>
+		/// <param name="slot">Slot where the attachment belongs.</param>
+		/// <param name="buffer">Correctly-sized buffer. Use attachment's .WorldVerticesLength to get the correct size. If null, a new Vector2[] of the correct size will be allocated.</param>
+		public static Vector2[] GetLocalVertices (this VertexAttachment va, Slot slot, Vector2[] buffer) {
+			int floatsCount = va.worldVerticesLength;
+			int bufferTargetSize = floatsCount >> 1;
+			buffer = buffer ?? new Vector2[bufferTargetSize];
+			if (buffer.Length < bufferTargetSize) throw new System.ArgumentException(string.Format("Vector2 buffer too small. {0} requires an array of size {1}. Use the attachment's .WorldVerticesLength to get the correct size.", va.Name, floatsCount), "buffer");
+
+			if (va.bones == null) {
+				var localVerts = va.vertices;
+				for (int i = 0; i < bufferTargetSize; i++) {
+					int j = i * 2;
+					buffer[i] = new Vector2(localVerts[j], localVerts[j+1]);
+				}
+			} else {
+				var floats = new float[floatsCount];
+				va.ComputeWorldVertices(slot, floats);
+
+				Bone sb = slot.bone;
+				float bwx = sb.worldX, bwy = sb.worldY, ia, ib, ic, id;
+				sb.GetWorldToLocalMatrix(out ia, out ib, out ic, out id);
+
+				for (int i = 0; i < bufferTargetSize; i++) {
+					int j = i * 2;
+					float x = floats[j] - bwx, y = floats[j+1] - bwy;
+					buffer[i] = new Vector2(x * ia + y * ic, x * ib + y * id);
+				}
+			}
+
+			return buffer;
+		}
+
+		/// <summary>Calculates world vertices and fills a Vector2 buffer.</summary>
+		/// <param name="a">The VertexAttachment</param>
+		/// <param name="slot">Slot where the attachment belongs.</param>
+		/// <param name="buffer">Correctly-sized buffer. Use attachment's .WorldVerticesLength to get the correct size. If null, a new Vector2[] of the correct size will be allocated.</param>
+		public static Vector2[] GetWorldVertices (this VertexAttachment a, Slot slot, Vector2[] buffer) {
+			int worldVertsLength = a.worldVerticesLength;
+			int bufferTargetSize = worldVertsLength >> 1;
+			buffer = buffer ?? new Vector2[bufferTargetSize];
+			if (buffer.Length < bufferTargetSize) throw new System.ArgumentException(string.Format("Vector2 buffer too small. {0} requires an array of size {1}. Use the attachment's .WorldVerticesLength to get the correct size.", a.Name, worldVertsLength), "buffer");
+
+			var floats = new float[worldVertsLength];
+			a.ComputeWorldVertices(slot, floats);
+
+			for (int i = 0, n = worldVertsLength >> 1; i < n; i++) {
+				int j = i * 2;
+				buffer[i] = new Vector2(floats[j], floats[j + 1]);
+			}
+
+			return buffer;
+		}
+		#endregion
 	}
 }
 
 namespace Spine {
 	public static class SkeletonExtensions {
+		public static bool IsWeighted (this VertexAttachment va) {
+			return va.bones != null && va.bones.Length > 0;
+		}
+
+		#region Transform Modes
+		public static bool InheritsRotation (this TransformMode mode) {
+			const int RotationBit = 0;
+			return ((int)mode & (1U << RotationBit)) == 0;
+		}
+
+		public static bool InheritsScale (this TransformMode mode) {
+			const int ScaleBit = 1;
+			return ((int)mode & (1U << ScaleBit)) == 0;
+		}
+		#endregion
+
 		#region Posing
-		/// <summary>
-		/// Shortcut for posing a skeleton at a specific time. Time is in seconds. (frameNumber / 30f) will give you seconds.
-		/// If you need to do this often, you should get the Animation object yourself using skeleton.data.FindAnimation. and call Apply on that.</summary>
-		/// <param name = "skeleton">The skeleton to pose.</param>
-		/// <param name="animationName">The name of the animation to use.</param>
-		/// <param name = "time">The time of the pose within the animation.</param>
-		/// <param name = "loop">Wraps the time around if it is longer than the duration of the animation.</param>
-		public static void PoseWithAnimation (this Skeleton skeleton, string animationName, float time, bool loop) {
-			// Fail loud when skeleton.data is null.
-			Spine.Animation animation = skeleton.data.FindAnimation(animationName);
-			if (animation == null) return;
-			animation.Apply(skeleton, 0, time, loop, null);
+		[System.Obsolete("Old Animation.Apply method signature. Please use the 8 parameter signature. See summary to learn about the extra arguments.")]
+		public static void Apply (this Spine.Animation animation, Skeleton skeleton, float lastTime, float time, bool loop, ExposedList<Event> events) {
+			animation.Apply(skeleton, lastTime, time, loop, events, 1f, false, false);
 		}
 
 		/// <summary>Resets the DrawOrder to the Setup Pose's draw order</summary>
@@ -157,7 +244,6 @@ namespace Spine {
 			drawOrder.Clear(false);
 			drawOrder.GrowIfNeeded(n);
 			System.Array.Copy(slotsItems, drawOrder.Items, n);
-			drawOrder.Count = n;
 		}
 
 		/// <summary>Resets the color of a slot to Setup Pose value.</summary>
@@ -177,69 +263,32 @@ namespace Spine {
 		/// <summary>Resets the attachment of slot at a given slotIndex to setup pose. This is faster than Slot.SetAttachmentToSetupPose.</summary>
 		public static void SetSlotAttachmentToSetupPose (this Skeleton skeleton, int slotIndex) {
 			var slot = skeleton.slots.Items[slotIndex];
-			// Based on Slot.SetToSetupPose
-			if (slot.data.attachmentName == null)
+			var attachmentName = slot.data.attachmentName;
+			if (string.IsNullOrEmpty(attachmentName)) {
 				slot.Attachment = null;
-			else {
-				slot.attachment = null;
-				slot.Attachment = skeleton.GetAttachment(slotIndex, slot.data.attachmentName);
+			} else {
+				var attachment = skeleton.GetAttachment(slotIndex, attachmentName);
+				slot.Attachment = attachment;
 			}
+		}
+
+		/// <summary>
+		/// Shortcut for posing a skeleton at a specific time. Time is in seconds. (frameNumber / 30f) will give you seconds.
+		/// If you need to do this often, you should get the Animation object yourself using skeleton.data.FindAnimation. and call Apply on that.</summary>
+		/// <param name = "skeleton">The skeleton to pose.</param>
+		/// <param name="animationName">The name of the animation to use.</param>
+		/// <param name = "time">The time of the pose within the animation.</param>
+		/// <param name = "loop">Wraps the time around if it is longer than the duration of the animation.</param>
+		public static void PoseWithAnimation (this Skeleton skeleton, string animationName, float time, bool loop) {
+			// Fail loud when skeleton.data is null.
+			Spine.Animation animation = skeleton.data.FindAnimation(animationName);
+			if (animation == null) return;
+			animation.Apply(skeleton, 0, time, loop, null, 1f, false, false);
 		}
 
 		/// <summary>Resets Skeleton parts to Setup Pose according to a Spine.Animation's keyed items.</summary>
 		public static void SetKeyedItemsToSetupPose (this Animation animation, Skeleton skeleton) {
-			var timelinesItems = animation.timelines.Items;
-			for (int i = 0, n = timelinesItems.Length; i < n; i++)
-				timelinesItems[i].SetToSetupPose(skeleton);
-		}
-
-		public static void SetToSetupPose (this Timeline timeline, Skeleton skeleton) {
-			if (timeline != null) {
-				// sorted according to assumed likelihood here
-
-				// Bone
-				if (timeline is RotateTimeline) {
-					var bone = skeleton.bones.Items[((RotateTimeline)timeline).boneIndex];
-					bone.rotation = bone.data.rotation;
-				} else if (timeline is TranslateTimeline) {
-					var bone = skeleton.bones.Items[((TranslateTimeline)timeline).boneIndex];
-					bone.x = bone.data.x;
-					bone.y = bone.data.y;
-				} else if (timeline is ScaleTimeline) {
-					var bone = skeleton.bones.Items[((ScaleTimeline)timeline).boneIndex];
-					bone.scaleX = bone.data.scaleX;
-					bone.scaleY = bone.data.scaleY;
-
-
-				// Attachment
-				} else if (timeline is DeformTimeline) {
-					var slot = skeleton.slots.Items[((DeformTimeline)timeline).slotIndex];
-					slot.attachmentVertices.Clear(false);
-
-				// Slot
-				} else if (timeline is AttachmentTimeline) {
-					skeleton.SetSlotAttachmentToSetupPose(((AttachmentTimeline)timeline).slotIndex);
-
-				} else if (timeline is ColorTimeline) {
-					skeleton.slots.Items[((ColorTimeline)timeline).slotIndex].SetColorToSetupPose();
-
-
-				// Constraint
-				} else if (timeline is IkConstraintTimeline) {
-					var ikTimeline = (IkConstraintTimeline)timeline;
-					var ik = skeleton.ikConstraints.Items[ikTimeline.ikConstraintIndex];
-					var data = ik.data;
-					ik.bendDirection = data.bendDirection;
-					ik.mix = data.mix;
-
-				// Skeleton
-				} else if (timeline is DrawOrderTimeline) {
-					skeleton.SetDrawOrderToSetupPose();
-
-				}
-
-			}
-
+			animation.Apply(skeleton, 0, 0, false, null, 0, true, true);
 		}
 		#endregion
 	}

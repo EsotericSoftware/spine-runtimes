@@ -39,22 +39,25 @@ using namespace spine;
 #include <stdio.h>
 #include <stdlib.h>
 
-void callback (AnimationState* state, int trackIndex, EventType type, Event* event, int loopCount) {
-	TrackEntry* entry = AnimationState_getCurrent(state, trackIndex);
+void callback (AnimationState* state, EventType type, TrackEntry* entry, Event* event) {
 	const char* animationName = (entry && entry->animation) ? entry->animation->name : 0;
 
 	switch (type) {
 	case ANIMATION_START:
-		printf("%d start: %s\n", trackIndex, animationName);
+		printf("%d start: %s\n", entry->trackIndex, animationName);
 		break;
+	case ANIMATION_INTERRUPT:
+		printf("%d interrupt: %s\n", entry->trackIndex, animationName);
 	case ANIMATION_END:
-		printf("%d end: %s\n", trackIndex, animationName);
+		printf("%d end: %s\n", entry->trackIndex, animationName);
 		break;
 	case ANIMATION_COMPLETE:
-		printf("%d complete: %s, %d\n", trackIndex, animationName, loopCount);
+		printf("%d complete: %s\n", entry->trackIndex, animationName);
 		break;
+	case ANIMATION_DISPOSE:
+		printf("%d dispose: %s\n", entry->trackIndex, animationName);
 	case ANIMATION_EVENT:
-		printf("%d event: %s, %s: %d, %f, %s\n", trackIndex, animationName, event->data->name, event->intValue, event->floatValue,
+		printf("%d event: %s, %s: %d, %f, %s\n", entry->trackIndex, animationName, event->data->name, event->intValue, event->floatValue,
 				event->stringValue);
 		break;
 	}
@@ -294,7 +297,7 @@ void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
 	skeleton->flipX = false;
 	skeleton->flipY = false;
 
-	skeleton->x = 320;
+	skeleton->x = 100;
 	skeleton->y = 590;
 	Skeleton_updateWorldTransform(skeleton);
 
@@ -353,6 +356,6 @@ int main () {
 	testcase(raptor, "data/raptor.json", "data/raptor.skel", "data/raptor.atlas", 0.5f);
 	testcase(spineboy, "data/spineboy.json", "data/spineboy.skel", "data/spineboy.atlas", 0.6f);
 	testcase(goblins, "data/goblins-mesh.json", "data/goblins-mesh.skel", "data/goblins.atlas", 1.4f);
-	testcase(stretchyman, "data/stretchyman.json", "data/stretchyman.skel", "data/stretchyman.atlas", 1.4f);
+	testcase(stretchyman, "data/stretchyman.json", "data/stretchyman.skel", "data/stretchyman.atlas", 0.6f);
 	return 0;
 }

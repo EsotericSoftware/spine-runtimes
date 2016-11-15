@@ -29,22 +29,54 @@
  *****************************************************************************/
 
 package spine.animation {
+import spine.Poolable;
 
-public class TrackEntry {
-	public var next:TrackEntry;
-	internal var previous:TrackEntry;
+public class TrackEntry implements Poolable {
 	public var animation:Animation;
+	public var next:TrackEntry, mixingFrom:TrackEntry;
+	public var onStart:Listeners = new Listeners();
+	public var onInterrupt:Listeners = new Listeners();
+	public var onEnd:Listeners = new Listeners();
+	public var onDispose:Listeners = new Listeners();
+	public var onComplete:Listeners = new Listeners();
+	public var onEvent:Listeners = new Listeners();
+	public var trackIndex:int;
 	public var loop:Boolean;
-	public var delay:Number, time:Number = 0, lastTime:Number = -1, endTime:Number, timeScale:Number = 1;
-	internal var mixTime:Number, mixDuration:Number, mix:Number = 1;
-	public var onStart:Function, onEnd:Function, onComplete:Function, onEvent:Function;
-
-	public function TrackEntry () {
+	public var eventThreshold:Number, attachmentThreshold:Number, drawOrderThreshold:Number;
+	public var animationStart:Number, animationEnd:Number, animationLast:Number, nextAnimationLast:Number;
+	public var delay:Number, trackTime:Number, trackLast:Number, nextTrackLast:Number, trackEnd:Number, timeScale:Number;
+	public var alpha:Number, mixTime:Number, mixDuration:Number, mixAlpha:Number;
+	public var timelinesFirst:Vector.<Boolean> = new Vector.<Boolean>();
+	public var timelinesRotation:Vector.<Number> = new Vector.<Number>();
+	
+	public function TrackEntry () {		
 	}
-
-	public function toString () : String {
-		return animation == null ? "<none>" : animation.name;
+	
+	public function getAnimationTime():Number {
+		if (loop) {
+			var duration:Number = animationEnd - animationStart;
+			if (duration == 0) return animationStart;
+			return (trackTime % duration) + animationStart;
+		}
+		return Math.min(trackTime + animationStart, animationEnd);
+	}
+	
+	public function reset ():void {
+		next = null;
+		mixingFrom = null;
+		animation = null;
+		onStart.listeners.length = 0;
+		onInterrupt.listeners.length = 0;
+		onEnd.listeners.length = 0;
+		onDispose.listeners.length = 0;
+		onComplete.listeners.length = 0;
+		onEvent.listeners.length = 0;
+		timelinesFirst.length = 0;
+		timelinesRotation.length = 0;
+	}
+	
+	public function resetRotationDirection ():void {
+		timelinesRotation.length = 0;
 	}
 }
-
 }

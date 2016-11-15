@@ -34,10 +34,11 @@ module spine {
 		bones: Array<Bone>;
 		slots: Array<Slot>;
 		drawOrder: Array<Slot>;
-		ikConstraints: Array<IkConstraint>; ikConstraintsSorted: Array<IkConstraint>;
+		ikConstraints: Array<IkConstraint>;
 		transformConstraints: Array<TransformConstraint>;
 		pathConstraints: Array<PathConstraint>;
 		_updateCache = new Array<Updatable>();
+		updateCacheReset = new Array<Updatable>();
 		skin: Skin;
 		color: Color;
 		time = 0;
@@ -73,7 +74,6 @@ module spine {
 			}
 
 			this.ikConstraints = new Array<IkConstraint>();
-			this.ikConstraintsSorted = new Array<IkConstraint>();
 			for (let i = 0; i < data.ikConstraints.length; i++) {
 				let ikConstraintData = data.ikConstraints[i];
 				this.ikConstraints.push(new IkConstraint(ikConstraintData, this));
@@ -104,93 +104,100 @@ module spine {
 				bones[i].sorted = false;
 
 			// IK first, lowest hierarchy depth first.
-			let ikConstraints = this.ikConstraintsSorted;
-			ikConstraints.length = 0;
-			for (let i = 0; i < this.ikConstraints.length; i++)
-				ikConstraints.push(this.ikConstraints[i]);
-			let ikCount = ikConstraints.length;
-			for (let i = 0, level = 0, n = ikCount; i < n; i++) {
-				let ik = ikConstraints[i];
-				let bone = ik.bones[0].parent;
-				for (level = 0; bone != null; level++)
-					bone = bone.parent;
-				ik.level = level;
-			}
-			for (let i = 1, ii = 0; i < ikCount; i++) {
-				let ik = ikConstraints[i];
-				let level = ik.level;
-				for (ii = i - 1; ii >= 0; ii--) {
-					let other = ikConstraints[ii];
-					if (other.level < level) break;
-					ikConstraints[ii + 1] = other;
-				}
-				ikConstraints[ii + 1] = ik;
-			}
-			for (let i = 0, n = ikConstraints.length; i < n; i++) {
-				let constraint = ikConstraints[i];
-				let target = constraint.target;
-				this.sortBone(target);
-
-				let constrained = constraint.bones;
-				let parent = constrained[0];
-				this.sortBone(parent);
-
-				updateCache.push(constraint);
-
-				this.sortReset(parent.children);
-				constrained[constrained.length - 1].sorted = true;
-			}
-
-			let pathConstraints = this.pathConstraints;
-			for (let i = 0, n = pathConstraints.length; i < n; i++) {
-				let constraint = pathConstraints[i];
-
-				let slot = constraint.target;
-				let slotIndex = slot.data.index;
-				let slotBone = slot.bone;
-				if (this.skin != null) this.sortPathConstraintAttachment(this.skin, slotIndex, slotBone);
-				if (this.data.defaultSkin != null && this.data.defaultSkin != this.skin)
-					this.sortPathConstraintAttachment(this.data.defaultSkin, slotIndex, slotBone);
-				for (let ii = 0, nn = this.data.skins.length; ii < nn; ii++)
-					this.sortPathConstraintAttachment(this.data.skins[ii], slotIndex, slotBone);
-
-				let attachment = slot.getAttachment();
-				if (attachment instanceof PathAttachment) this.sortPathConstraintAttachmentWith(attachment, slotBone);
-
-				let constrained = constraint.bones;
-				let boneCount = constrained.length;
-				for (let ii = 0; ii < boneCount; ii++)
-					this.sortBone(constrained[ii]);
-
-				updateCache.push(constraint);
-
-				for (let ii = 0; ii < boneCount; ii++)
-					this.sortReset(constrained[ii].children);
-				for (let ii = 0; ii < boneCount; ii++)
-					constrained[ii].sorted = true;
-			}
-
+			let ikConstraints = this.ikConstraints;
 			let transformConstraints = this.transformConstraints;
-			for (let i = 0, n = transformConstraints.length; i < n; i++) {
-				let constraint = transformConstraints[i];
+			let pathConstraints = this.pathConstraints;
+			let ikCount = ikConstraints.length, transformCount = transformConstraints.length, pathCount = pathConstraints.length;
+			let constraintCount = ikCount + transformCount + pathCount;
 
-				this.sortBone(constraint.target);
-
-				let constrained = constraint.bones;
-				let boneCount = constrained.length;
-				for (let ii = 0; ii < boneCount; ii++)
-					this.sortBone(constrained[ii]);
-
-				updateCache.push(constraint);
-
-				for (let ii = 0; ii < boneCount; ii++)
-					this.sortReset(constrained[ii].children);
-				for (let ii = 0; ii < boneCount; ii++)
-					constrained[ii].sorted = true;
+			outer:
+			for (let i = 0; i < constraintCount; i++) {
+				for (let ii = 0; ii < ikCount; ii++) {
+					let constraint = ikConstraints[ii];
+					if (constraint.data.order == i) {
+						this.sortIkConstraint(constraint);
+						continue outer;
+					}
+				}
+				for (let ii = 0; ii < transformCount; ii++) {
+					let constraint = transformConstraints[ii];
+					if (constraint.data.order == i) {
+						this.sortTransformConstraint(constraint);
+						continue outer;
+					}
+				}
+				for (let ii = 0; ii < pathCount; ii++) {
+					let constraint = pathConstraints[ii];
+					if (constraint.data.order == i) {
+						this.sortPathConstraint(constraint);
+						continue outer;
+					}
+				}
 			}
 
 			for (let i = 0, n = bones.length; i < n; i++)
 				this.sortBone(bones[i]);
+		}
+
+		sortIkConstraint (constraint: IkConstraint) {
+			let target = constraint.target;
+			this.sortBone(target);
+
+			let constrained = constraint.bones;
+			let parent = constrained[0];
+			this.sortBone(parent);
+
+			if (constrained.length > 1) {
+				let child = constrained[constrained.length - 1];
+				if (!(this._updateCache.indexOf(child) > -1)) this.updateCacheReset.push(child);
+			}
+
+			this._updateCache.push(constraint);
+
+			this.sortReset(parent.children);
+			constrained[constrained.length - 1].sorted = true;
+		}
+
+		sortPathConstraint (constraint: PathConstraint) {
+			let slot = constraint.target;
+			let slotIndex = slot.data.index;
+			let slotBone = slot.bone;
+			if (this.skin != null) this.sortPathConstraintAttachment(this.skin, slotIndex, slotBone);
+			if (this.data.defaultSkin != null && this.data.defaultSkin != this.skin)
+				this.sortPathConstraintAttachment(this.data.defaultSkin, slotIndex, slotBone);
+			for (let ii = 0, nn = this.data.skins.length; ii < nn; ii++)
+				this.sortPathConstraintAttachment(this.data.skins[ii], slotIndex, slotBone);
+
+			let attachment = slot.getAttachment();
+			if (attachment instanceof PathAttachment) this.sortPathConstraintAttachmentWith(attachment, slotBone);
+
+			let constrained = constraint.bones;
+			let boneCount = constrained.length;
+			for (let ii = 0; ii < boneCount; ii++)
+				this.sortBone(constrained[ii]);
+
+			this._updateCache.push(constraint);
+
+			for (let ii = 0; ii < boneCount; ii++)
+				this.sortReset(constrained[ii].children);
+			for (let ii = 0; ii < boneCount; ii++)
+				constrained[ii].sorted = true;
+		}
+
+		sortTransformConstraint (constraint: TransformConstraint) {
+			this.sortBone(constraint.target);
+
+			let constrained = constraint.bones;
+			let boneCount = constrained.length;
+			for (let ii = 0; ii < boneCount; ii++)
+				this.sortBone(constrained[ii]);
+
+			this._updateCache.push(constraint);
+
+			for (let ii = 0; ii < boneCount; ii++)
+				this.sortReset(constrained[ii].children);
+			for (let ii = 0; ii < boneCount; ii++)
+				constrained[ii].sorted = true;
 		}
 
 		sortPathConstraintAttachment (skin: Skin, slotIndex: number, slotBone: Bone) {
@@ -210,7 +217,7 @@ module spine {
 				let bones = this.bones;
 				let i = 0;
 				while (i < pathBones.length) {
-					let boneCount = pathBones[i++]; 
+					let boneCount = pathBones[i++];
 					for (let n = i + boneCount; i < n; i++) {
 						let boneIndex = pathBones[i];
 						this.sortBone(bones[boneIndex]);
@@ -237,6 +244,18 @@ module spine {
 
 		/** Updates the world transform for each bone and applies constraints. */
 		updateWorldTransform () {
+			let updateCacheReset = this.updateCacheReset;
+			for (let i = 0, n = updateCacheReset.length; i < n; i++) {
+				let bone = updateCacheReset[i] as Bone;
+				bone.ax = bone.x;
+				bone.ay = bone.y;
+				bone.arotation = bone.rotation;
+				bone.ascaleX = bone.scaleX;
+				bone.ascaleY = bone.scaleY;
+				bone.ashearX = bone.shearX;
+				bone.ashearY = bone.shearY;
+				bone.appliedValid = true;
+			}
 			let updateCache = this._updateCache;
 			for (let i = 0, n = updateCache.length; i < n; i++)
 				updateCache[i].update();
