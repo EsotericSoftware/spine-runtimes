@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-cocos2d-objc works with data exported from Spine 3.4.02.
+spine-cocos2d-objc works with data exported from Spine 3.5.xx.
 
 spine-cocos2d-objc supports all Spine features.
 
