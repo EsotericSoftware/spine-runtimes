@@ -1,10 +1,9 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- * 
+ * Spine Runtimes Software License v2.5
+ *
  * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable, and
  * non-transferable license to use, install, execute, and perform the Spine
  * Runtimes software and derivative works solely for personal or internal
@@ -16,7 +15,7 @@
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -47,27 +46,27 @@ module spine.webgl {
 		premultipliedAlpha = false;
 		scale = 1;
 		boneWidth = 2;
-		
-		private gl: WebGLRenderingContext;		
+
+		private gl: WebGLRenderingContext;
 		private bounds = new SkeletonBounds();
 		private temp = new Array<number>();
 		private static LIGHT_GRAY = new Color(192 / 255, 192 / 255, 192 / 255, 1);
 		private static GREEN = new Color(0, 1, 0, 1);
-		
+
 		constructor (gl: WebGLRenderingContext) {
-			this.gl = gl;			
+			this.gl = gl;
 		}
 
 		draw (shapes: ShapeRenderer, skeleton: Skeleton, ignoredBones: Array<string> = null) {
 			let skeletonX = skeleton.x;
 			let skeletonY = skeleton.y;
-			let gl = this.gl;									
+			let gl = this.gl;
 			let srcFunc = this.premultipliedAlpha ? gl.ONE : gl.SRC_ALPHA;
-			shapes.setBlendMode(srcFunc, gl.ONE_MINUS_SRC_ALPHA);				
+			shapes.setBlendMode(srcFunc, gl.ONE_MINUS_SRC_ALPHA);
 
 			let bones = skeleton.bones;
 			if (this.drawBones) {
-				shapes.setColor(this.boneLineColor);				
+				shapes.setColor(this.boneLineColor);
 				for (let i = 0, n = bones.length; i < n; i++) {
 					let bone = bones[i];
 					if (ignoredBones && ignoredBones.indexOf(bone.data.name) > -1) continue;
@@ -75,7 +74,7 @@ module spine.webgl {
 					let x = skeletonX + bone.data.length * bone.a + bone.worldX;
 					let y = skeletonY + bone.data.length * bone.c + bone.worldY;
 					shapes.rectLine(true, skeletonX + bone.worldX, skeletonY + bone.worldY, x, y, this.boneWidth * this.scale);
-				}				
+				}
 				if (this.drawSkeletonXY) shapes.x(skeletonX, skeletonY, 4 * this.scale);
 			}
 
@@ -181,19 +180,19 @@ module spine.webgl {
 						y1 = y2;
 					}
 				}
-			}			
+			}
 
 			if (this.drawBones) {
 				shapes.setColor(this.boneOriginColor);
 				for (let i = 0, n = bones.length; i < n; i++) {
 					let bone = bones[i];
-					if (ignoredBones && ignoredBones.indexOf(bone.data.name) > -1) continue;				
+					if (ignoredBones && ignoredBones.indexOf(bone.data.name) > -1) continue;
 					shapes.circle(true, skeletonX + bone.worldX, skeletonY + bone.worldY, 3 * this.scale, SkeletonDebugRenderer.GREEN, 8);
 				}
-			}			
+			}
 		}
 
-		dispose () {			
+		dispose () {
 		}
 	}
 }

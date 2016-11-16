@@ -1,0 +1,24 @@
+<html>
+<meta charset="UTF-8">
+<title>Frame-by-frame - Spine Demo</title>
+<link rel="stylesheet" href="demos.css">
+<script src="../../build/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="utils.js"></script>
+<script src="imagechanges.js"></script>
+<body>
+
+<center>
+<div class="aspect"><div><canvas id="imagechanges-canvas"></canvas></div></div>
+<div id="imagechanges-timeline" class="slider"></div>
+<input id="imagechanges-playbutton" type="button" value="Pause"></input><br>
+<select id="imagechanges-skeleton" size="2"></select>
+</center>
+
+<script>
+spineDemos.loadSliders();
+imageChangesDemo(spineDemos.setupRendering);
+</script>
+
+</body>
+</html>

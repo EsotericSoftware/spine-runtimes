@@ -1,32 +1,31 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.3
- * 
- * Copyright (c) 2013-2015, Esoteric Software
+ * Spine Runtimes Software License v2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
- * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to use, install, execute and perform the Spine
- * Runtimes Software (the "Software") and derivative works solely for personal
- * or internal use. Without the written permission of Esoteric Software (see
- * Section 2 of the Spine Software License Agreement), you may not (a) modify,
- * translate, adapt or otherwise create derivative works, improvements of the
- * Software or develop new applications using the Software or (b) remove,
- * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
  * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 package com.esotericsoftware.spine;
@@ -58,6 +57,7 @@ import com.esotericsoftware.spine.Animation.ShearTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.Animation.TransformConstraintTimeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
+import com.esotericsoftware.spine.BoneData.TransformMode;
 import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
 import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
@@ -72,6 +72,11 @@ import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
 
+/** Loads skeleton data in the Spine binary format.
+ * <p>
+ * See <a href="http://esotericsoftware.com/spine-binary-format">Spine binary format</a> and
+ * <a href="http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data">JSON and binary data</a> in the Spine
+ * Runtimes Guide. */
 public class SkeletonBinary {
 	static public final int BONE_ROTATE = 0;
 	static public final int BONE_TRANSLATE = 1;
@@ -104,11 +109,14 @@ public class SkeletonBinary {
 		this.attachmentLoader = attachmentLoader;
 	}
 
+	/** Scales bone positions, image sizes, and translations as they are loaded. This allows different size images to be used at
+	 * runtime than were used in Spine.
+	 * <p>
+	 * See <a href="http://esotericsoftware.com/spine-loading-skeleton-data#Scaling">Scaling</a> in the Spine Runtimes Guide. */
 	public float getScale () {
 		return scale;
 	}
 
-	/** Scales the bones, images, and animations as they are loaded. */
 	public void setScale (float scale) {
 		this.scale = scale;
 	}
@@ -169,6 +177,7 @@ public class SkeletonBinary {
 			boolean nonessential = input.readBoolean();
 
 			if (nonessential) {
+				skeletonData.fps = input.readFloat();
 				skeletonData.imagesPath = input.readString();
 				if (skeletonData.imagesPath.isEmpty()) skeletonData.imagesPath = null;
 			}
@@ -186,8 +195,7 @@ public class SkeletonBinary {
 				data.shearX = input.readFloat();
 				data.shearY = input.readFloat();
 				data.length = input.readFloat() * scale;
-				data.inheritRotation = input.readBoolean();
-				data.inheritScale = input.readBoolean();
+				data.transformMode = TransformMode.values[input.readInt(true)];
 				if (nonessential) Color.rgba8888ToColor(data.color, input.readInt());
 				skeletonData.bones.add(data);
 			}
@@ -206,6 +214,7 @@ public class SkeletonBinary {
 			// IK constraints.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				IkConstraintData data = new IkConstraintData(input.readString());
+				data.order = input.readInt(true);
 				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++)
 					data.bones.add(skeletonData.bones.get(input.readInt(true)));
 				data.target = skeletonData.bones.get(input.readInt(true));
@@ -217,6 +226,7 @@ public class SkeletonBinary {
 			// Transform constraints.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				TransformConstraintData data = new TransformConstraintData(input.readString());
+				data.order = input.readInt(true);
 				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++)
 					data.bones.add(skeletonData.bones.get(input.readInt(true)));
 				data.target = skeletonData.bones.get(input.readInt(true));
@@ -236,6 +246,7 @@ public class SkeletonBinary {
 			// Path constraints.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				PathConstraintData data = new PathConstraintData(input.readString());
+				data.order = input.readInt(true);
 				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++)
 					data.bones.add(skeletonData.bones.get(input.readInt(true)));
 				data.target = skeletonData.slots.get(input.readInt(true));
@@ -315,7 +326,8 @@ public class SkeletonBinary {
 			int slotIndex = input.readInt(true);
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 				String name = input.readString();
-				skin.addAttachment(slotIndex, name, readAttachment(input, skin, slotIndex, name, nonessential));
+				Attachment attachment = readAttachment(input, skin, slotIndex, name, nonessential);
+				if (attachment != null) skin.addAttachment(slotIndex, name, attachment);
 			}
 		}
 		return skin;
@@ -613,7 +625,7 @@ public class SkeletonBinary {
 			// Path constraint timelines.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				int index = input.readInt(true);
-				PathConstraintData data = skeletonData.getPathConstraints().get(index);
+				PathConstraintData data = skeletonData.pathConstraints.get(index);
 				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 					int timelineType = input.readByte();
 					int frameCount = input.readInt(true);

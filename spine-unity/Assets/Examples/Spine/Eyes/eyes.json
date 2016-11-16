@@ -1,14 +1,8 @@
 {
-"skeleton": {
-	"hash": "4JK7uGWbzO7qeQSyyuOyKLXQ5oI",
-	"spine": "3.3.07",
-	"width": 868,
-	"height": 322,
-	"images": "C:\\Users\\John Eric\\Desktop\\old exports"
-},
+"skeleton": { "hash": "+wD3CxYNDCLBTldmA/MNGhrRDHE", "spine": "3.5.03-beta", "width": 0, "height": 0, "fps": 1, "images": "" },
 "bones": [
 	{ "name": "root" },
-	{ "name": "L_Eye", "parent": "root", "x": -223.18, "y": 2.99 },
+	{ "name": "L_Eye", "parent": "root", "x": -223.17, "y": 2.99 },
 	{ "name": "R_Eye", "parent": "root", "x": 237.32, "y": 6.4 }
 ],
 "slots": [
@@ -26,10 +20,10 @@
 			"EyeWhite": { "x": 3, "y": 2, "width": 700, "height": 148 }
 		},
 		"L_Eye": {
-			"L_Eye": { "x": -0.82, "y": 2, "width": 148, "height": 148 }
+			"L_Eye": { "x": -0.81, "y": 2, "width": 148, "height": 148 }
 		},
 		"R_Eye": {
-			"R_Eye": { "x": 0.67, "y": -1.4, "width": 148, "height": 148 }
+			"R_Eye": { "x": 0.67, "y": -1.39, "width": 148, "height": 148 }
 		}
 	}
 }

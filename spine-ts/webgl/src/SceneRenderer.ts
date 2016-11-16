@@ -1,10 +1,9 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- * 
+ * Spine Runtimes Software License v2.5
+ *
  * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable, and
  * non-transferable license to use, install, execute, and perform the Spine
  * Runtimes software and derivative works solely for personal or internal
@@ -16,7 +15,7 @@
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -33,9 +32,9 @@ module spine.webgl {
 	export class SceneRenderer implements Disposable {
 		gl: WebGLRenderingContext;
 		canvas: HTMLCanvasElement;
-		camera: OrthoCamera;		
+		camera: OrthoCamera;
+		batcher: PolygonBatcher;
 		private batcherShader: Shader;
-		private batcher: PolygonBatcher;
 		private shapes: ShapeRenderer;
 		private shapesShader: Shader;
 		private activeRenderer: PolygonBatcher | ShapeRenderer | SkeletonDebugRenderer = null;
@@ -52,7 +51,7 @@ module spine.webgl {
 
 		constructor (canvas: HTMLCanvasElement, gl: WebGLRenderingContext) {
 			this.canvas = canvas;
-			this.gl = gl;			
+			this.gl = gl;
 			this.camera = new OrthoCamera(canvas.width, canvas.height);
 			this.batcherShader = Shader.newColoredTextured(gl);
 			this.batcher = new PolygonBatcher(gl);
@@ -126,10 +125,10 @@ module spine.webgl {
 			// bottom left and top right corner points relative to origin
 			let worldOriginX = x + pivotX;
 			let worldOriginY = y + pivotY;
-			let  fx = -pivotX;
-			let  fy = -pivotY;
-			let  fx2 = width - pivotX;
-			let  fy2 = height - pivotY;			
+			let fx = -pivotX;
+			let fy = -pivotY;
+			let fx2 = width - pivotX;
+			let fy2 = height - pivotY;
 
 			// construct corner points, start from top left and go counter clockwise
 			let p1x = fx;
@@ -306,13 +305,13 @@ module spine.webgl {
 		end () {
 			if (this.activeRenderer === this.batcher) this.batcher.end();
 			else if (this.activeRenderer === this.shapes) this.shapes.end();
-			this.activeRenderer = null;		
+			this.activeRenderer = null;
 		}
 
 		resize (resizeMode: ResizeMode) {
 			let canvas = this.canvas;
 			var w = canvas.clientWidth;
-			var h = canvas.clientHeight;	
+			var h = canvas.clientHeight;
 			if (canvas.width != w || canvas.height != h) {
 				canvas.width = w;
 				canvas.height = h;
@@ -330,7 +329,7 @@ module spine.webgl {
 				let sourceRatio = sourceHeight / sourceWidth;
 				let scale = targetRatio < sourceRatio ? targetWidth / sourceWidth : targetHeight / sourceHeight;
 				this.camera.viewportWidth = sourceWidth * scale;
-				this.camera.viewportHeight = sourceHeight * scale;				
+				this.camera.viewportHeight = sourceHeight * scale;
 			}
 			this.camera.update();
 		}
@@ -358,7 +357,7 @@ module spine.webgl {
 			this.batcherShader.dispose();
 			this.shapes.dispose();
 			this.shapesShader.dispose();
-			this.skeletonDebugRenderer.dispose();		
+			this.skeletonDebugRenderer.dispose();
 		}
 	}
 

@@ -95,6 +95,15 @@ namespace Spine {
 			return this;
 		}
 
+		public void EnsureCapacity (int min) {
+			if (Items.Length < min) {
+				int newCapacity = Items.Length == 0 ? DefaultCapacity : Items.Length * 2;
+				//if ((uint)newCapacity > Array.MaxArrayLength) newCapacity = Array.MaxArrayLength;
+				if (newCapacity < min) newCapacity = min;
+				Capacity = newCapacity;
+			}
+		}
+
 		private void CheckRange (int idx, int count) {
 			if (idx < 0)
 				throw new ArgumentOutOfRangeException("index");
@@ -181,6 +190,8 @@ namespace Spine {
 			CheckRange(index, count);
 			Array.Copy(Items, index, array, arrayIndex, count);
 		}
+
+
 
 		public bool Exists (Predicate<T> match) {
 			CheckMatch(match);

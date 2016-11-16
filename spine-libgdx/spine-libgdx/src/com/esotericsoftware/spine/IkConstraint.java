@@ -1,32 +1,31 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.3
- * 
- * Copyright (c) 2013-2015, Esoteric Software
+ * Spine Runtimes Software License v2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
- * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to use, install, execute and perform the Spine
- * Runtimes Software (the "Software") and derivative works solely for personal
- * or internal use. Without the written permission of Esoteric Software (see
- * Section 2 of the Spine Software License Agreement), you may not (a) modify,
- * translate, adapt or otherwise create derivative works, improvements of the
- * Software or develop new applications using the Software or (b) remove,
- * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
  * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 package com.esotericsoftware.spine;
@@ -35,14 +34,16 @@ import static com.badlogic.gdx.math.MathUtils.*;
 
 import com.badlogic.gdx.utils.Array;
 
-public class IkConstraint implements Updatable {
+/** Stores the current pose for an IK constraint. An IK constraint adjusts the rotation of 1 or 2 constrained bones so the tip of
+ * the last bone is as close to the target bone as possible.
+ * <p>
+ * See <a href="http://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide. */
+public class IkConstraint implements Constraint {
 	final IkConstraintData data;
 	final Array<Bone> bones;
 	Bone target;
 	float mix = 1;
 	int bendDirection;
-
-	int level;
 
 	public IkConstraint (IkConstraintData data, Skeleton skeleton) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -70,6 +71,7 @@ public class IkConstraint implements Updatable {
 		bendDirection = constraint.bendDirection;
 	}
 
+	/** Applies the constraint to the constrained bones. */
 	public void apply () {
 		update();
 	}
@@ -87,10 +89,16 @@ public class IkConstraint implements Updatable {
 		}
 	}
 
+	public int getOrder () {
+		return data.order;
+	}
+
+	/** The bones that will be modified by this IK constraint. */
 	public Array<Bone> getBones () {
 		return bones;
 	}
 
+	/** The bone that is the IK target. */
 	public Bone getTarget () {
 		return target;
 	}
@@ -99,6 +107,7 @@ public class IkConstraint implements Updatable {
 		this.target = target;
 	}
 
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotations. */
 	public float getMix () {
 		return mix;
 	}
@@ -107,6 +116,7 @@ public class IkConstraint implements Updatable {
 		this.mix = mix;
 	}
 
+	/** Controls the bend direction of the IK bones, either 1 or -1. */
 	public int getBendDirection () {
 		return bendDirection;
 	}
@@ -115,6 +125,7 @@ public class IkConstraint implements Updatable {
 		this.bendDirection = bendDirection;
 	}
 
+	/** The IK constraint's setup pose data. */
 	public IkConstraintData getData () {
 		return data;
 	}
@@ -123,31 +134,32 @@ public class IkConstraint implements Updatable {
 		return data.name;
 	}
 
-	/** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
-	 * coordinate system. */
+	/** Applies 1 bone IK. The target is specified in the world coordinate system. */
 	static public void apply (Bone bone, float targetX, float targetY, float alpha) {
-		Bone pp = bone.parent;
-		float id = 1 / (pp.a * pp.d - pp.b * pp.c);
-		float x = targetX - pp.worldX, y = targetY - pp.worldY;
-		float tx = (x * pp.d - y * pp.b) * id - bone.x, ty = (y * pp.a - x * pp.c) * id - bone.y;
-		float rotationIK = atan2(ty, tx) * radDeg - bone.shearX - bone.rotation;
-		if (bone.scaleX < 0) rotationIK += 180;
+		if (!bone.appliedValid) bone.updateAppliedTransform();
+		Bone p = bone.parent;
+		float id = 1 / (p.a * p.d - p.b * p.c);
+		float x = targetX - p.worldX, y = targetY - p.worldY;
+		float tx = (x * p.d - y * p.b) * id - bone.ax, ty = (y * p.a - x * p.c) * id - bone.ay;
+		float rotationIK = atan2(ty, tx) * radDeg - bone.ashearX - bone.arotation;
+		if (bone.ascaleX < 0) rotationIK += 180;
 		if (rotationIK > 180)
 			rotationIK -= 360;
 		else if (rotationIK < -180) rotationIK += 360;
-		bone.updateWorldTransform(bone.x, bone.y, bone.rotation + rotationIK * alpha, bone.scaleX, bone.scaleY, bone.shearX,
-			bone.shearY);
+		bone.updateWorldTransform(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, bone.ascaleX, bone.ascaleY, bone.ashearX,
+			bone.ashearY);
 	}
 
-	/** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
-	 * target is specified in the world coordinate system.
+	/** Applies 2 bone IK. The target is specified in the world coordinate system.
 	 * @param child A direct descendant of the parent bone. */
 	static public void apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, float alpha) {
 		if (alpha == 0) {
 			child.updateWorldTransform();
 			return;
 		}
-		float px = parent.x, py = parent.y, psx = parent.scaleX, psy = parent.scaleY, csx = child.scaleX;
+		if (!parent.appliedValid) parent.updateAppliedTransform();
+		if (!child.appliedValid) child.updateAppliedTransform();
+		float px = parent.ax, py = parent.ay, psx = parent.ascaleX, psy = parent.ascaleY, csx = child.ascaleX;
 		int os1, os2, s2;
 		if (psx < 0) {
 			psx = -psx;
@@ -166,14 +178,14 @@ public class IkConstraint implements Updatable {
 			os2 = 180;
 		} else
 			os2 = 0;
-		float cx = child.x, cy, cwx, cwy, a = parent.a, b = parent.b, c = parent.c, d = parent.d;
+		float cx = child.ax, cy, cwx, cwy, a = parent.a, b = parent.b, c = parent.c, d = parent.d;
 		boolean u = Math.abs(psx - psy) <= 0.0001f;
 		if (!u) {
 			cy = 0;
 			cwx = a * cx + parent.worldX;
 			cwy = c * cx + parent.worldY;
 		} else {
-			cy = child.y;
+			cy = child.ay;
 			cwx = a * cx + b * cy + parent.worldX;
 			cwy = c * cx + d * cy + parent.worldY;
 		}
@@ -260,17 +272,17 @@ public class IkConstraint implements Updatable {
 			}
 		}
 		float os = atan2(cy, cx) * s2;
-		float rotation = parent.rotation;
+		float rotation = parent.arotation;
 		a1 = (a1 - os) * radDeg + os1 - rotation;
 		if (a1 > 180)
 			a1 -= 360;
 		else if (a1 < -180) a1 += 360;
-		parent.updateWorldTransform(px, py, rotation + a1 * alpha, parent.scaleX, parent.scaleY, 0, 0);
-		rotation = child.rotation;
-		a2 = ((a2 + os) * radDeg - child.shearX) * s2 + os2 - rotation;
+		parent.updateWorldTransform(px, py, rotation + a1 * alpha, parent.ascaleX, parent.ascaleY, 0, 0);
+		rotation = child.arotation;
+		a2 = ((a2 + os) * radDeg - child.ashearX) * s2 + os2 - rotation;
 		if (a2 > 180)
 			a2 -= 360;
 		else if (a2 < -180) a2 += 360;
-		child.updateWorldTransform(cx, cy, rotation + a2 * alpha, child.scaleX, child.scaleY, child.shearX, child.shearY);
+		child.updateWorldTransform(cx, cy, rotation + a2 * alpha, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY);
 	}
 }

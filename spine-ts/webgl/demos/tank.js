@@ -6,10 +6,10 @@ var tankDemo = function(loadingComplete, bgColor) {
 
 	var DEMO_NAME = "TankDemo";
 
-	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
+	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
-		canvas = document.getElementById("tankdemo-canvas");
+		canvas = document.getElementById("tank-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
@@ -21,7 +21,6 @@ var tankDemo = function(loadingComplete, bgColor) {
 		assetManager.loadJson(DEMO_NAME, "demos.json");
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		loadingScreen.backgroundColor = bgColor;
 		requestAnimationFrame(load);
 	}
 
@@ -31,7 +30,7 @@ var tankDemo = function(loadingComplete, bgColor) {
 			var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas2.atlas"), function(path) {
 				return assetManager.get(DEMO_NAME, path);	
 			});
-			var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
+			var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
 			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").tank);
 			skeleton = new spine.Skeleton(skeletonData);
@@ -59,21 +58,18 @@ var tankDemo = function(loadingComplete, bgColor) {
 	}
 
 	function setupUI() {
-		playButton = $("#tankdemo-playbutton");
+		playButton = $("#tank-playbutton");
 		var playButtonUpdate = function () {			
 			isPlaying = !isPlaying;
-			if (isPlaying) {
-				playButton.val("Pause");
-				playButton.addClass("pause").removeClass("play");		
-			} else {
-				playButton.val("Play");
+			if (isPlaying)
+				playButton.addClass("pause").removeClass("play");
+			else
 				playButton.addClass("play").removeClass("pause");
-			}		
 		}
 		playButton.click(playButtonUpdate);
 		playButton.addClass("pause");
 
-		timeLine = $("#tankdemo-timeline").data("slider");
+		timeLine = $("#tank-timeline").data("slider");
 		timeLine.changed = function (percent) {
 			if (isPlaying) playButton.click();
 			if (!isPlaying) {
@@ -88,7 +84,7 @@ var tankDemo = function(loadingComplete, bgColor) {
 
 		renderer.skeletonDebugRenderer.drawPaths = false;
 		renderer.skeletonDebugRenderer.drawBones = false;
-		$("#tankdemo-drawbones").change(function() {
+		$("#tank-drawbones").change(function() {
 			renderer.skeletonDebugRenderer.drawPaths = this.checked;
 			renderer.skeletonDebugRenderer.drawBones = this.checked;			
 		});	
@@ -125,7 +121,9 @@ var tankDemo = function(loadingComplete, bgColor) {
 		renderer.begin();				
 		renderer.drawSkeleton(skeleton, true);
 		renderer.drawSkeletonDebug(skeleton, true);		
-		renderer.end();		
+		renderer.end();
+
+		loadingScreen.draw(true);
 	}
 
 	init();

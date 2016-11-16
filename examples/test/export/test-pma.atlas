@@ -1,0 +1,20 @@
+
+test-pma.png
+size: 256,64
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+logo
+  rotate: false
+  xy: 193, 2
+  size: 60, 60
+  orig: 60, 60
+  offset: 0, 0
+  index: -1
+spine
+  rotate: false
+  xy: 2, 2
+  size: 189, 60
+  orig: 189, 60
+  offset: 0, 0
+  index: -1

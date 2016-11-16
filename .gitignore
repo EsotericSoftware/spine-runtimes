@@ -102,3 +102,5 @@ spine-starling/spine-starling-example/lib/.spine-starling.swc.stamp
 spine-turbulenz/spine-js/spine.js
 
 spine-threejs/spine-js/spine.js
+
+spine-ts/.vscode/*

@@ -1,10 +1,9 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- * 
+ * Spine Runtimes Software License v2.5
+ *
  * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable, and
  * non-transferable license to use, install, execute, and perform the Spine
  * Runtimes software and derivative works solely for personal or internal
@@ -16,7 +15,7 @@
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -39,9 +38,9 @@ module spine {
 			this.attachmentLoader = attachmentLoader;
 		}
 
-		readSkeletonData (json: string | any ): SkeletonData {
+		readSkeletonData (json: string | any): SkeletonData {
 			let scale = this.scale;
-			let skeletonData = new SkeletonData();			
+			let skeletonData = new SkeletonData();
 			let root = typeof(json) === "string" ? JSON.parse(json) : json;
 
 			// Skeleton
@@ -51,6 +50,7 @@ module spine {
 				skeletonData.version = skeletonMap.spine;
 				skeletonData.width = skeletonMap.width;
 				skeletonData.height = skeletonMap.height;
+				skeletonData.fps = skeletonMap.fps;
 				skeletonData.imagesPath = skeletonMap.images;
 			}
 
@@ -74,8 +74,7 @@ module spine {
 					data.scaleY = this.getValue(boneMap, "scaleY", 1);
 					data.shearX = this.getValue(boneMap, "shearX", 0);
 					data.shearY = this.getValue(boneMap, "shearY", 0);
-					data.inheritRotation = this.getValue(boneMap, "inheritRotation", true);
-					data.inheritScale = this.getValue(boneMap, "inheritScale", true);
+					data.transformMode = SkeletonJson.transformModeFromString(this.getValue(boneMap, "transform", "normal"));
 
 					skeletonData.bones.push(data);
 				}
@@ -105,6 +104,7 @@ module spine {
 				for (let i = 0; i < root.ik.length; i++) {
 					let constraintMap = root.ik[i];
 					let data = new IkConstraintData(constraintMap.name);
+					data.order = this.getValue(constraintMap, "order", 0);
 
 					for (let j = 0; j < constraintMap.bones.length; j++) {
 						let boneName = constraintMap.bones[j];
@@ -129,6 +129,7 @@ module spine {
 				for (let i = 0; i < root.transform.length; i++) {
 					let constraintMap = root.transform[i];
 					let data = new TransformConstraintData(constraintMap.name);
+					data.order = this.getValue(constraintMap, "order", 0);
 
 					for (let j = 0; j < constraintMap.bones.length; j++) {
 						let boneName = constraintMap.bones[j];
@@ -162,6 +163,7 @@ module spine {
 				for (let i = 0; i < root.path.length; i++) {
 					let constraintMap = root.path[i];
 					let data = new PathConstraintData(constraintMap.name);
+					data.order = this.getValue(constraintMap, "order", 0);
 
 					for (let j = 0; j < constraintMap.bones.length; j++) {
 						let boneName = constraintMap.bones[j];
@@ -227,7 +229,7 @@ module spine {
 					let data = new EventData(eventName);
 					data.intValue = this.getValue(eventMap, "int", 0);
 					data.floatValue = this.getValue(eventMap, "float", 0);
-					data.stringValue = this.getValue(eventMap, "string", null);
+					data.stringValue = this.getValue(eventMap, "string", "");
 					skeletonData.events.push(data);
 				}
 			}
@@ -702,6 +704,16 @@ module spine {
 			if (str == "chain") return RotateMode.Chain;
 			if (str == "chainscale") return RotateMode.ChainScale;
 			throw new Error(`Unknown rotate mode: ${str}`);
+		}
+
+		static transformModeFromString(str: string) {
+			str = str.toLowerCase();			
+			if (str == "normal") return TransformMode.Normal;
+			if (str == "onlytranslation") return TransformMode.OnlyTranslation;
+			if (str == "norotationorreflection") return TransformMode.NoRotationOrReflection;
+			if (str == "noscale") return TransformMode.NoScale;
+			if (str == "noscaleorreflection") return TransformMode.NoScaleOrReflection;
+			throw new Error(`Unknown transform mode: ${str}`);
 		}
 	}
 

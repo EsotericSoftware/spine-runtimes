@@ -1,9 +1,35 @@
+/******************************************************************************
+ * Spine Runtimes Software License v2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 
+// Contributed by: Mitch Thompson
 
-/*****************************************************************************
- * Skeleton Utility created by Mitch Thompson
- * Full irrevocable rights and permissions granted to Esoteric Software
-*****************************************************************************/
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -34,21 +60,16 @@ namespace Spine.Unity.Editor {
 			scale = this.serializedObject.FindProperty("scale");
 			overrideAlpha = this.serializedObject.FindProperty("overrideAlpha");
 			parentReference = this.serializedObject.FindProperty("parentReference");
-
 			EvaluateFlags();
 
-			if (utilityBone.valid == false && skeletonUtility != null && skeletonUtility.skeletonRenderer != null)
+			if (!utilityBone.valid && skeletonUtility != null && skeletonUtility.skeletonRenderer != null)
 				skeletonUtility.skeletonRenderer.Initialize(false);
 
 			canCreateHingeChain = CanCreateHingeChain();
-
 			boundingBoxTable.Clear();
 
-			if (multiObject)
-				return;
-
-			if (utilityBone.bone == null)
-				return;
+			if (multiObject) return;
+			if (utilityBone.bone == null) return;
 
 			var skeleton = utilityBone.bone.Skeleton;
 			int slotCount = skeleton.Slots.Count;
@@ -69,9 +90,8 @@ namespace Spine.Unity.Editor {
 							boundingBoxes.Add(boundingBoxAttachment);
 					}
 
-					if (boundingBoxes.Count > 0) {
+					if (boundingBoxes.Count > 0)
 						boundingBoxTable.Add(slot, boundingBoxes);
-					}
 				}
 			}
 
@@ -98,8 +118,7 @@ namespace Spine.Unity.Editor {
 					}
 				}
 
-				if (boneCount > 1)
-					multiObject = true;
+				multiObject |= (boneCount > 1);
 			}
 		}
 
@@ -141,45 +160,54 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.Space();
 
 			using (new GUILayout.HorizontalScope()) {
+				EditorGUILayout.Space();
 				using (new EditorGUI.DisabledGroupScope(multiObject || !utilityBone.valid || utilityBone.bone == null || utilityBone.bone.Children.Count == 0)) {
-					if (GUILayout.Button(new GUIContent("Add Child", SpineEditorUtilities.Icons.bone), GUILayout.Width(150), GUILayout.Height(24)))
+					if (GUILayout.Button(new GUIContent("Add Child", SpineEditorUtilities.Icons.bone), GUILayout.MinWidth(120), GUILayout.Height(24)))
 						BoneSelectorContextMenu("", utilityBone.bone.Children, "<Recursively>", SpawnChildBoneSelected);
 				}
 				using (new EditorGUI.DisabledGroupScope(multiObject || !utilityBone.valid || utilityBone.bone == null || containsOverrides)) {
-					if (GUILayout.Button(new GUIContent("Add Override", SpineEditorUtilities.Icons.poseBones), GUILayout.Width(150), GUILayout.Height(24)))
+					if (GUILayout.Button(new GUIContent("Add Override", SpineEditorUtilities.Icons.poseBones), GUILayout.MinWidth(120), GUILayout.Height(24)))
 						SpawnOverride();
 				}
+				EditorGUILayout.Space();
+			}
+			EditorGUILayout.Space();
+			using (new GUILayout.HorizontalScope()) {
+				EditorGUILayout.Space();
 				using (new EditorGUI.DisabledGroupScope(multiObject || !utilityBone.valid || !canCreateHingeChain)) {
 					if (GUILayout.Button(new GUIContent("Create Hinge Chain", SpineEditorUtilities.Icons.hingeChain), GUILayout.Width(150), GUILayout.Height(24)))
 						CreateHingeChain();
 				}
+				EditorGUILayout.Space();
 			}
 
 			using (new EditorGUI.DisabledGroupScope(multiObject || boundingBoxTable.Count == 0)) {
 				EditorGUILayout.LabelField(new GUIContent("Bounding Boxes", SpineEditorUtilities.Icons.boundingBox), EditorStyles.boldLabel);
 
 				foreach(var entry in boundingBoxTable){
+					Slot slot = entry.Key;
+					var boundingBoxes = entry.Value;
+
 					EditorGUI.indentLevel++;
-					EditorGUILayout.LabelField(entry.Key.Data.Name);
+					EditorGUILayout.LabelField(slot.Data.Name);
 					EditorGUI.indentLevel++;
 					{
-						foreach (var box in entry.Value) {
+						foreach (var box in boundingBoxes) {
 							using (new GUILayout.HorizontalScope()) {
 								GUILayout.Space(30);
 								if (GUILayout.Button(box.Name, GUILayout.Width(200))) {
 									var child = utilityBone.transform.FindChild("[BoundingBox]" + box.Name);
 									if (child != null) {
 										var originalCollider = child.GetComponent<PolygonCollider2D>();
-										var updatedCollider = SkeletonUtility.AddBoundingBoxAsComponent(box, child.gameObject, originalCollider.isTrigger);
+										var updatedCollider = SkeletonUtility.AddBoundingBoxAsComponent(box, slot, child.gameObject, originalCollider.isTrigger);
 										originalCollider.points = updatedCollider.points;
 										if (EditorApplication.isPlaying)
 											Destroy(updatedCollider);
 										else
 											DestroyImmediate(updatedCollider);
 									} else {
-										utilityBone.AddBoundingBox(currentSkinName, entry.Key.Data.Name, box.Name);
+										utilityBone.AddBoundingBox(currentSkinName, slot.Data.Name, box.Name);
 									}
-
 								}
 							}
 
@@ -194,7 +222,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void BoneSelectorContextMenu (string current, ExposedList<Bone> bones, string topValue, GenericMenu.MenuFunction2 callback) {
-			GenericMenu menu = new GenericMenu();
+			var menu = new GenericMenu();
 
 			if (topValue != "")
 				menu.AddItem(new GUIContent(topValue), current == topValue, callback, null);
@@ -211,17 +239,16 @@ namespace Spine.Unity.Editor {
 				boneName.stringValue = "";
 				serializedObject.ApplyModifiedProperties();
 			} else {
-				Bone bone = (Bone)obj;
+				var bone = (Bone)obj;
 				boneName.stringValue = bone.Data.Name;
 				serializedObject.ApplyModifiedProperties();
-
 				utilityBone.Reset();
 			}
 		}
 
 		void SpawnChildBoneSelected (object obj) {
 			if (obj == null) {
-				//add recursively
+				// Add recursively
 				foreach (var bone in utilityBone.bone.Children) {
 					GameObject go = skeletonUtility.SpawnBoneRecursively(bone, utilityBone.transform, utilityBone.mode, utilityBone.position, utilityBone.rotation, utilityBone.scale);
 					SkeletonUtilityBone[] newUtilityBones = go.GetComponentsInChildren<SkeletonUtilityBone>();
@@ -229,7 +256,7 @@ namespace Spine.Unity.Editor {
 						SkeletonUtilityInspector.AttachIcon(utilBone);
 				}
 			} else {
-				Bone bone = (Bone)obj;
+				var bone = (Bone)obj;
 				GameObject go = skeletonUtility.SpawnBone(bone, utilityBone.transform, utilityBone.mode, utilityBone.position, utilityBone.rotation, utilityBone.scale);
 				SkeletonUtilityInspector.AttachIcon(go.GetComponent<SkeletonUtilityBone>());
 				Selection.activeGameObject = go;
@@ -255,10 +282,7 @@ namespace Spine.Unity.Editor {
 
 			Rigidbody[] rigidbodies = utilityBone.GetComponentsInChildren<Rigidbody>();
 
-			if (rigidbodies.Length > 0)
-				return false;
-
-			return true;
+			return rigidbodies.Length <= 0;
 		}
 
 		void CreateHingeChain () {

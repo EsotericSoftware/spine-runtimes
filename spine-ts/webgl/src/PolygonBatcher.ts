@@ -1,10 +1,9 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- * 
+ * Spine Runtimes Software License v2.5
+ *
  * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable, and
  * non-transferable license to use, install, execute, and perform the Spine
  * Runtimes software and derivative works solely for personal or internal
@@ -16,7 +15,7 @@
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -35,7 +34,7 @@ module spine.webgl {
 		private drawCalls: number;
 		private isDrawing = false;
 		private mesh: Mesh;
-		private shader: Shader = null;		
+		private shader: Shader = null;
 		private lastTexture: GLTexture = null;
 		private verticesLength = 0;
 		private indicesLength = 0;
@@ -45,10 +44,10 @@ module spine.webgl {
 		constructor (gl: WebGLRenderingContext, maxVertices: number = 10920) {
 			if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
 			this.gl = gl;
-			this.mesh = new Mesh(gl, [new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute()], maxVertices, maxVertices * 3);			
+			this.mesh = new Mesh(gl, [new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute()], maxVertices, maxVertices * 3);
 		}
 
-		begin (shader: Shader) {			
+		begin (shader: Shader) {
 			let gl = this.gl;
 			if (this.isDrawing) throw new Error("PolygonBatch is already drawing. Call PolygonBatch.end() before calling PolygonBatch.begin()");
 			this.drawCalls = 0;
@@ -119,7 +118,7 @@ module spine.webgl {
 		getDrawCalls () { return this.drawCalls; }
 
 		dispose () {
-			this.mesh.dispose();			
+			this.mesh.dispose();
 		}
 	}
 }

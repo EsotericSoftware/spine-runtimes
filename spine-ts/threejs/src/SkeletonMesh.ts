@@ -1,10 +1,9 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- * 
+ * Spine Runtimes Software License v2.5
+ *
  * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable, and
  * non-transferable license to use, install, execute, and perform the Spine
  * Runtimes software and derivative works solely for personal or internal
@@ -16,7 +15,7 @@
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -50,8 +49,8 @@ module spine.threejs {
 			let material = this.material = new THREE.MeshBasicMaterial();
 			material.side = THREE.DoubleSide;
 			material.transparent = true;
-			material.alphaTest = 0.5;									
-			this.batcher = new MeshBatcher(this);			
+			material.alphaTest = 0.5;
+			this.batcher = new MeshBatcher(this);
 		}
 
 		update(deltaTime: number) {
@@ -70,11 +69,11 @@ module spine.threejs {
 			var numVertices = 0;
 			var verticesLength = 0;
 			var indicesLength = 0;
-			
+
 			let blendMode: BlendMode = null;
 
 			let vertices: ArrayLike<number> = null;
-			let triangles: Array<number>  = null;
+			let triangles: Array<number> = null;
 			let drawOrder = this.skeleton.drawOrder;
 			let batcher = this.batcher;
 			batcher.begin();
@@ -99,19 +98,19 @@ module spine.threejs {
 
 				if (texture != null) {
 					if (!(<THREE.MeshBasicMaterial>this.material).map) {
-						let mat = <THREE.MeshBasicMaterial>this.material;						
+						let mat = <THREE.MeshBasicMaterial>this.material;
 						mat.map = texture.texture;
-						mat.needsUpdate = true;						
+						mat.needsUpdate = true;
 					}
 					// FIXME per slot blending would require multiple material support
-					//let slotBlendMode = slot.data.blendMode;					
+					//let slotBlendMode = slot.data.blendMode;
 					//if (slotBlendMode != blendMode) {
 					//	blendMode = slotBlendMode;
 					//	batcher.setBlendMode(getSourceGLBlendMode(this._gl, blendMode, premultipliedAlpha), getDestGLBlendMode(this._gl, blendMode));
 					//}
-					
+
 					this.batcher.batch(vertices, triangles, z);
-					z += zOffset;				
+					z += zOffset;
 				}
 			}
 
@@ -144,7 +143,7 @@ module spine.threejs {
 			let mat = new THREE.MeshBasicMaterial();
 			mat.vertexColors = THREE.VertexColors;
 			mat.transparent = true;
-			mat.map = map;		
+			mat.map = map;
 			let mesh = new THREE.Mesh(geo, mat);
 			return mesh; 
 		}

@@ -18,7 +18,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-ts works with data exported from the latest Spine version.
+spine-ts works with data exported from Spine 3.5.xx.
 
 spine-ts WebGL & Widget backends supports all Spine features. The spine-ts Canvas backend does not support color tinting, mesh attachments or shearing. Mesh attachments are supported by setting `spine.canvas.SkeletonRenderer.useTriangleRendering` to true. Note that this method is slow and may lead to artifacts on some browsers. The spine-ts THREE.JS backend does not support color tinting and blend modes. The THREE.JS backend provides `SkeletonMesh.zOffset` to avoid z-fighting. Adjust to your near/far plane settings.
 
@@ -36,9 +36,8 @@ All `*.js` files are self-contained and include both the core and respective bac
 
 If you write your app with TypeScript, additionally copy the corresponding `build/spine-*.d.ts` file to your project.
 
-## Example
-To run the examples, spawn a light-weight web server in the root of spine-ts, then navigate to the respective
-`index.html` file. E.g.:
+## Examples
+To run the examples, the image, atlas, and JSON files must be served by a webserver, they can't be loaded from your local disk. Spawn a light-weight web server in the root of spine-ts, then navigate to the `index.html` file for the example you want to view. E.g.:
 
 ```
 cd spine-ts
@@ -46,6 +45,22 @@ python -m SimpleHTTPServer
 ````
 
 Then open `http://localhost:8000/webgl/example`, `http://localhost:8000/canvas/example`, `https://localhost:8000/threejs/example` or `http://localhost:8000/widget/example` in your browser.
+
+## WebGL Demos
+The spine-ts WebGL demos load their image, atlas, and JSON files from our webserver and so can be run directly, without needing a webserver. View the demos [all on one page](http://esotericsoftware.com/spine-demos/) or use the [standalone demos]() which are easy for you to explore and edit. The standalone demos can also be viewed here:
+
+- [Spine vs sprite sheets](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/spritesheets.html)
+- [Image changes](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/imagechanges.html)
+- [Transitions](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/transitions.html)
+- [Meshes](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/meshes.html)
+- [Skins](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/skins.html)
+- [Hoverboard](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/hoverboard.html)
+- [Transform constraints](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/transforms.html)
+- [Tank](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/tank.html)
+- [Vine](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/vine.html)
+- [Stretchyman](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/stretchyman.html)
+
+Please note that Chrome and possibly other browsers do not use the original CORS headers when loading cached resources. After the initial page load for a demo, you may need to forcefully refresh (hold `shift` and click refresh) or clear your browser cache.
 
 ## Development Setup
 The spine-ts runtime and the various backends are implemented in TypeScript for greater maintainability and better tooling support. To
@@ -58,7 +73,7 @@ setup a development environment, follow these steps.
 5. Start the TypeScript compiler in watcher mode for the backend you want to work on:
   * **Core**: `tsc -w -p tsconfig.core.json`, builds `core/src`, outputs `build/spine-core.js|d.ts|js.map`
   * **WebGL**: `tsc -w -p tsconfig.webgl.json`, builds `core/src` and `webgl/src`, outputs `build/spine-webgl.js|d.ts|js.map`
-  * **WebGL**: `tsc -w -p tsconfig.canvas.json`, builds `core/src` and `canvas/src`, outputs `build/spine-canvas.js|d.ts|js.map`
+  * **Canvas**: `tsc -w -p tsconfig.canvas.json`, builds `core/src` and `canvas/src`, outputs `build/spine-canvas.js|d.ts|js.map`
   * **THREE.JS**: `tsc -w -p tsconfig.threejs.json`, builds `core/src` and `threejs/src`, outputs `build/spine-threejs.js|d.ts|js.map`
   * **Widget**: `tsc -w -p tsconfig.widget.json`, builds `core/src` and `widget/src`, outputs `build/spine-widget.js|d.ts|js.map` 
 6. Open the `spine-ts` folder in Visual Studio Code. VS Code will use the `tsconfig.json` file all source files from core and all 
@@ -151,6 +166,7 @@ The configuration object has the following fields:
   * `x`: optional, the x-coordinate to display the animation at. The origin is in the bottom left corner. Defaults to `0` if omitted. Irrelevant if `data-fit-to-canvas` is `true`.
   * `y`: optional, the y-coordinate to display the animation at. The origin is in the bottom left corner with the y-axis pointing upwards. Defaults to `0` if omitted. Irrelevant if `data-fit-to-canvas` is `true`.
   * `fitToCanvas`: optional, whether to fit the animation to the canvas size or not. Defaults to `true` if omitted, in which case `data-scale`, `data-x` and `data-y` are irrelevant. This setting calculates the setup pose bounding box using the specified skin to center and scale the animation on the canvas.
+  * `alpha`: optional, whether to allow the canvas to be transparent. Defaults to `true`. Set the alpha channel in ``backgroundColor` to 0 as well, e.g. `#00000000`.
   * `backgroundColor`: optional, the background color to use. Defaults to `#000000` if omitted.
   * `premultipliedAlpha`: optional, whether the atlas pages use premultiplied alpha or not. Defaults to `false` if omitted.
   * `debug`: optional, whether to show debug information such as bones, attachments, etc. Defaults to `false` if omitted.

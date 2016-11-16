@@ -1,10 +1,9 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- * 
+ * Spine Runtimes Software License v2.5
+ *
  * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable, and
  * non-transferable license to use, install, execute, and perform the Spine
  * Runtimes software and derivative works solely for personal or internal
@@ -16,7 +15,7 @@
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -51,7 +50,7 @@ module spine.webgl {
 				if (ev instanceof MouseEvent) {
 					let rect = element.getBoundingClientRect();
 					let x = ev.clientX - rect.left;
-					let y = ev.clientY - rect.top;					
+					let y = ev.clientY - rect.top;
 
 					let listeners = this.listeners;
 					for (let i = 0; i < listeners.length; i++) {
@@ -67,7 +66,7 @@ module spine.webgl {
 				if (ev instanceof MouseEvent) {
 					let rect = element.getBoundingClientRect();
 					let x = ev.clientX - rect.left;
-					let y = ev.clientY - rect.top;					
+					let y = ev.clientY - rect.top;
 
 					let listeners = this.listeners;
 					for (let i = 0; i < listeners.length; i++) {
@@ -79,14 +78,14 @@ module spine.webgl {
 					}
 
 					this.lastX = x;
-					this.lastY = y;					
+					this.lastY = y;
 				}
 			}, true);
 			element.addEventListener("mouseup", (ev: UIEvent) => {
 				if (ev instanceof MouseEvent) {
 					let rect = element.getBoundingClientRect();
 					let x = ev.clientX - rect.left;
-					let y = ev.clientY - rect.top;					
+					let y = ev.clientY - rect.top;
 
 					let listeners = this.listeners;
 					for (let i = 0; i < listeners.length; i++) {
@@ -98,12 +97,12 @@ module spine.webgl {
 					this.buttonDown = false;
 				}
 			}, true);
-			element.addEventListener("touchstart", (ev: TouchEvent) => {								
+			element.addEventListener("touchstart", (ev: TouchEvent) => {
 				if (this.currTouch != null) return;
 
-				var touches = ev.changedTouches;				
-				for (var i = 0; i < touches.length; i++) {					
-					var touch = touches[i];									
+				var touches = ev.changedTouches;
+				for (var i = 0; i < touches.length; i++) {
+					var touch = touches[i];
 					let rect = element.getBoundingClientRect();
 					let x = touch.clientX - rect.left;
 					let y = touch.clientY - rect.top;
@@ -112,7 +111,7 @@ module spine.webgl {
 					this.currTouch.x = x;
 					this.currTouch.y = y;
 					break;
-				}												
+				}
 
 				let listeners = this.listeners;
 				for (let i = 0; i < listeners.length; i++) {
@@ -131,7 +130,7 @@ module spine.webgl {
 					if (this.currTouch.identifier === touch.identifier) {
 						let rect = element.getBoundingClientRect();
 						let x = this.currTouch.x = touch.clientX - rect.left;
-						let y = this.currTouch.y = touch.clientY - rect.top;						
+						let y = this.currTouch.y = touch.clientY - rect.top;
 						this.touchesPool.free(this.currTouch);
 						let listeners = this.listeners;
 						for (let i = 0; i < listeners.length; i++) {
@@ -147,14 +146,14 @@ module spine.webgl {
 				}
 				ev.preventDefault();
 			}, false);
-			element.addEventListener("touchcancel", (ev: TouchEvent) => {				
+			element.addEventListener("touchcancel", (ev: TouchEvent) => {
 				var touches = ev.changedTouches;
 				for (var i = 0; i < touches.length; i++) {
 					var touch = touches[i];
 					if (this.currTouch.identifier === touch.identifier) {
 						let rect = element.getBoundingClientRect();
 						let x = this.currTouch.x = touch.clientX - rect.left;
-						let y = this.currTouch.y = touch.clientY - rect.top;						
+						let y = this.currTouch.y = touch.clientY - rect.top;
 						this.touchesPool.free(this.currTouch);
 						let listeners = this.listeners;
 						for (let i = 0; i < listeners.length; i++) {
@@ -170,7 +169,7 @@ module spine.webgl {
 				}
 				ev.preventDefault();
 			}, false);
-			element.addEventListener("touchmove", (ev: TouchEvent) => {				
+			element.addEventListener("touchmove", (ev: TouchEvent) => {
 				if (this.currTouch == null) return;
 
 				var touches = ev.changedTouches;
@@ -179,7 +178,7 @@ module spine.webgl {
 					if (this.currTouch.identifier === touch.identifier) {
 						let rect = element.getBoundingClientRect();
 						let x = touch.clientX - rect.left;
-						let y = touch.clientY - rect.top;						
+						let y = touch.clientY - rect.top;
 
 						let listeners = this.listeners;
 						for (let i = 0; i < listeners.length; i++) {
@@ -208,7 +207,7 @@ module spine.webgl {
 	}
 
 	export class Touch {
-		constructor(public identifier: number, public x: number, public y: number) {			
+		constructor(public identifier: number, public x: number, public y: number) {
 		}
 	}
 

@@ -7,12 +7,12 @@ var spineDemos = {
 	demos: [],
 	loopRunning: false
 };
-(function() {
+(function () {
 	var timeKeeper = new spine.TimeKeeper();
 	function loop () {
 		timeKeeper.update();
 		if (spineDemos.log) console.log(timeKeeper.delta + ", " + timeKeeper.framesPerSecond);
-		spineDemos.requestAnimationFrame(loop);
+		requestAnimationFrame(loop);
 		var demos = spineDemos.demos;		
 		for (var i = 0; i < demos.length; i++) {
 			var demo = demos[i];
@@ -25,28 +25,7 @@ var spineDemos = {
 		}
 	}
 
-	function setupLoop () {
-		if (!spineDemos.loopRunning) {			
-			loop();
-			spineDemos.loopRunning = true;
-		}
-	}
-
-	spineDemos.setupRendering = function (canvas, renderFunc) {
-		var demo = {canvas: canvas, renderFunc: renderFunc, visible: false};
-		$(window).on('DOMContentLoaded load resize scroll', function() {
-			spineDemos.checkElementVisible(demo);
-		});
-		spineDemos.checkElementVisible(demo);
-		setupLoop();
-		spineDemos.demos.push(demo);
-	};
-
-	spineDemos.requestAnimationFrame = function(func) {
-		requestAnimationFrame(func);
-	};
-
-	spineDemos.checkElementVisible = function (demo) {
+	function checkElementVisible (demo) {
 		var rect = demo.canvas.getBoundingClientRect();
 		var x = 0, y = 0;
 		var width = (window.innerHeight || document.documentElement.clientHeight);
@@ -54,13 +33,17 @@ var spineDemos = {
 		demo.visible = rect.left < x + width && rect.right > x && rect.top < y + height && rect.bottom > y;		 
 	};
 
-	spineDemos.setupWebGLContext = function (canvas) {
-		config = {
-			alpha: false,
-			depth: false,
-			stencil: false
+	spineDemos.setupRendering = function (canvas, renderFunc) {
+		var demo = {canvas: canvas, renderFunc: renderFunc, visible: false};
+		$(window).on('DOMContentLoaded load resize scroll', function() {
+			checkElementVisible(demo);
+		});
+		checkElementVisible(demo);
+		if (!spineDemos.loopRunning) {			
+			loop();
+			spineDemos.loopRunning = true;
 		}
-		return gl = canvas.getContext("webgl", config) || canvas.getContext("experimental-webgl", config);
+		spineDemos.demos.push(demo);
 	};
 
 	spineDemos.loadSliders = function () {

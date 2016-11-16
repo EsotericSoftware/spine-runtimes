@@ -1,10 +1,9 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- * 
+ * Spine Runtimes Software License v2.5
+ *
  * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable, and
  * non-transferable license to use, install, execute, and perform the Spine
  * Runtimes software and derivative works solely for personal or internal
@@ -16,7 +15,7 @@
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -30,7 +29,7 @@
  *****************************************************************************/
 
 module spine {
-	export class PathConstraint implements Updatable {
+	export class PathConstraint implements Constraint {
 		static NONE = -1; static BEFORE = -2; static AFTER = -3;
 
 		data: PathConstraintData;
@@ -93,14 +92,19 @@ module spine {
 
 			let positions = this.computeWorldPositions(<PathAttachment>attachment, spacesCount, tangents,
 				data.positionMode == PositionMode.Percent, spacingMode == SpacingMode.Percent);
-			let skeleton = this.target.bone.skeleton;
-			let skeletonX = skeleton.x, skeletonY = skeleton.y;
 			let boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
-			let tip = rotateMode == RotateMode.Chain && offsetRotation == 0;
+			let tip = false;
+			if (offsetRotation == 0)
+				tip = rotateMode == RotateMode.Chain;
+			else {
+				tip = false;
+				let p = this.target.bone;
+				offsetRotation *= p.a * p.d - p.b * p.c > 0 ? MathUtils.degRad : -MathUtils.degRad;
+			}
 			for (let i = 0, p = 3; i < boneCount; i++, p += 3) {
 				let bone = bones[i];
-				bone.worldX += (boneX - skeletonX - bone.worldX) * translateMix;
-				bone.worldY += (boneY - skeletonY - bone.worldY) * translateMix;
+				bone.worldX += (boneX - bone.worldX) * translateMix;
+				bone.worldY += (boneY - bone.worldY) * translateMix;
 				let x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
 				if (scale) {
 					let length = lengths[i];
@@ -120,13 +124,15 @@ module spine {
 						r = positions[p + 2];
 					else
 						r = Math.atan2(dy, dx);
-					r -= Math.atan2(c, a) - offsetRotation * MathUtils.degRad;
+					r -= Math.atan2(c, a);
 					if (tip) {
 						cos = Math.cos(r);
 						sin = Math.sin(r);
 						let length = bone.data.length;
 						boneX += (length * (cos * a - sin * c) - dx) * rotateMix;
 						boneY += (length * (sin * a + cos * c) - dy) * rotateMix;
+					} else {
+						r += offsetRotation;
 					}
 					if (r > MathUtils.PI)
 						r -= MathUtils.PI2;
@@ -140,6 +146,7 @@ module spine {
 					bone.c = sin * a + cos * c;
 					bone.d = sin * b + cos * d;
 				}
+				bone.appliedValid = false;
 			}
 		}
 
@@ -376,13 +383,17 @@ module spine {
 
 		addCurvePosition (p: number, x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number,
 			out: Array<number>, o: number, tangents: boolean) {
-			if (p == 0) p = 0.0001;
+			if (p == 0 || isNaN(p)) p = 0.0001;
 			let tt = p * p, ttt = tt * p, u = 1 - p, uu = u * u, uuu = uu * u;
 			let ut = u * p, ut3 = ut * 3, uut3 = u * ut3, utt3 = ut3 * p;
 			let x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
 			out[o] = x;
 			out[o + 1] = y;
 			if (tangents) out[o + 2] = Math.atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+		}
+
+		getOrder () {
+			return this.data.order;
 		}
 	}
 }

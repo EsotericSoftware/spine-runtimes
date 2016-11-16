@@ -1,10 +1,9 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- * 
+ * Spine Runtimes Software License v2.5
+ *
  * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable, and
  * non-transferable license to use, install, execute, and perform the Spine
  * Runtimes software and derivative works solely for personal or internal
@@ -16,7 +15,7 @@
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -35,8 +34,8 @@ module spine.webgl {
 		private isDrawing = false;
 		private mesh: Mesh;
 		private shapeType = ShapeType.Filled;
-		private color = new Color(1, 1, 1, 1);		
-		private shader: Shader;		
+		private color = new Color(1, 1, 1, 1);
+		private shader: Shader;
 		private vertexIndex = 0;
 		private tmp = new Vector2();
 		private srcBlend: number = WebGLRenderingContext.SRC_ALPHA;
@@ -45,11 +44,11 @@ module spine.webgl {
 		constructor (gl: WebGLRenderingContext, maxVertices: number = 10920) {
 			if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
 			this.gl = gl;
-			this.mesh = new Mesh(gl, [new Position2Attribute(), new ColorAttribute()], maxVertices, 0);			
+			this.mesh = new Mesh(gl, [new Position2Attribute(), new ColorAttribute()], maxVertices, 0);
 		}
 
 		begin (shader: Shader) {
-			if (this.isDrawing) throw new Error("ShapeRenderer.begin() has already been called");			
+			if (this.isDrawing) throw new Error("ShapeRenderer.begin() has already been called");
 			this.shader = shader;
 			this.vertexIndex = 0;
 			this.isDrawing = true;
@@ -57,7 +56,7 @@ module spine.webgl {
 			let gl = this.gl;
 			gl.enable(gl.BLEND);
 			gl.blendFunc(this.srcBlend, this.dstBlend);
-		}		
+		}
 
 		setBlendMode (srcBlend: number, dstBlend: number) {
 			let gl = this.gl;
@@ -75,21 +74,21 @@ module spine.webgl {
 
 		setColorWith (r: number, g: number, b: number, a: number) {
 			this.color.set(r, g, b, a);
-		}		
-
-		point (x: number, y: number, color: Color = null) {			
-			this.check(ShapeType.Point, 1);			
-			if (color === null) color = this.color;
-			this.vertex(x, y, color);						
 		}
 
-		line (x: number, y: number, x2: number, y2: number, color: Color = null) {			
+		point (x: number, y: number, color: Color = null) {
+			this.check(ShapeType.Point, 1);
+			if (color === null) color = this.color;
+			this.vertex(x, y, color);
+		}
+
+		line (x: number, y: number, x2: number, y2: number, color: Color = null) {
 			this.check(ShapeType.Line, 2);
 			let vertices = this.mesh.getVertices();
 			let idx = this.vertexIndex;
-			if (color === null) color = this.color;			
+			if (color === null) color = this.color;
 			this.vertex(x, y, color);
-			this.vertex(x2, y2, color);		
+			this.vertex(x2, y2, color);
 		}
 
 		triangle (filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, color: Color = null, color2: Color = null, color3: Color = null) {
@@ -99,7 +98,7 @@ module spine.webgl {
 			if (color === null) color = this.color;
 			if (color2 === null) color2 = this.color;
 			if (color3 === null) color3 = this.color;
-			if (filled) {		
+			if (filled) {
 				this.vertex(x, y, color);
 				this.vertex(x2, y2, color2);
 				this.vertex(x3, y3, color3);
@@ -125,13 +124,13 @@ module spine.webgl {
 			if (color4 === null) color4 = this.color;
 			if (filled) {
 				this.vertex(x, y, color); this.vertex(x2, y2, color2); this.vertex(x3, y3, color3);
-				this.vertex(x3, y3, color3); this.vertex(x4, y4, color4); this.vertex(x, y, color);				
+				this.vertex(x3, y3, color3); this.vertex(x4, y4, color4); this.vertex(x, y, color);
 			} else {
 				this.vertex(x, y, color); this.vertex(x2, y2, color2);
 				this.vertex(x2, y2, color2); this.vertex(x3, y3, color3);
 				this.vertex(x3, y3, color3); this.vertex(x4, y4, color4);
 				this.vertex(x4, y4, color4); this.vertex(x, y, color);
-			}			
+			}
 		}
 
 		rect (filled: boolean, x: number, y: number, width: number, height: number, color: Color = null) {
@@ -142,26 +141,26 @@ module spine.webgl {
 			this.check(filled ? ShapeType.Filled : ShapeType.Line, 8);
 			if (color === null) color = this.color;
 			let t = this.tmp.set(y2 - y1, x1 - x2);
-			t.normalize();		
+			t.normalize();
 			width *= 0.5;
 			let tx = t.x * width;
 			let ty = t.y * width;
 			if (!filled) {
 				this.vertex(x1 + tx, y1 + ty, color);
-				this.vertex(x1 - tx, y1 - ty, color);																
-				this.vertex(x2 + tx, y2 + ty, color);				
-				this.vertex(x2 - tx, y2 - ty, color);
-				
-				this.vertex(x2 + tx, y2 + ty, color);				
-				this.vertex(x1 + tx, y1 + ty, color);
-				
-				this.vertex(x2 - tx, y2 - ty, color);				
 				this.vertex(x1 - tx, y1 - ty, color);
-			} else {				
-				this.vertex(x1 + tx, y1 + ty, color);				
-				this.vertex(x1 - tx, y1 - ty, color);				
 				this.vertex(x2 + tx, y2 + ty, color);
-				
+				this.vertex(x2 - tx, y2 - ty, color);
+
+				this.vertex(x2 + tx, y2 + ty, color);
+				this.vertex(x1 + tx, y1 + ty, color);
+
+				this.vertex(x2 - tx, y2 - ty, color);
+				this.vertex(x1 - tx, y1 - ty, color);
+			} else {
+				this.vertex(x1 + tx, y1 + ty, color);
+				this.vertex(x1 - tx, y1 - ty, color);
+				this.vertex(x2 + tx, y2 + ty, color);
+
 				this.vertex(x2 - tx, y2 - ty, color);
 				this.vertex(x2 + tx, y2 + ty, color);
 				this.vertex(x1 - tx, y1 - ty, color);
@@ -204,7 +203,7 @@ module spine.webgl {
 
 				this.vertex(x1, y1, color);
 				this.vertex(x2, y2, color);
-			}			
+			}
 		}
 
 		circle (filled: boolean, x: number, y: number, radius: number, color: Color = null, segments: number = 0) {
@@ -218,7 +217,7 @@ module spine.webgl {
 			if (!filled) {
 				this.check(ShapeType.Line, segments * 2 + 2);
 				for (let i = 0; i < segments; i++) {
-					this.vertex(x + cx, y + cy, color);					
+					this.vertex(x + cx, y + cy, color);
 					let temp = cx;
 					cx = cos * cx - sin * cy;
 					cy = sin * temp + cos * cy;
@@ -230,8 +229,8 @@ module spine.webgl {
 				this.check(ShapeType.Filled, segments * 3 + 3);
 				segments--;
 				for (let i = 0; i < segments; i++) {
-					this.vertex(x, y, color);					
-					this.vertex(x + cx, y + cy, color);					
+					this.vertex(x, y, color);
+					this.vertex(x + cx, y + cy, color);
 					let temp = cx;
 					cx = cos * cx - sin * cy;
 					cy = sin * temp + cos * cy;
@@ -250,8 +249,8 @@ module spine.webgl {
 
 		curve (x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, segments: number, color: Color = null) {
 			this.check(ShapeType.Line, segments * 2 + 2);
-			if (color === null) color = this.color;			
-			
+			if (color === null) color = this.color;
+
 			// Algorithm from: http://www.antigrain.com/research/bezier_interpolation/index.html#PAGE_BEZIER_INTERPOLATION
 			let subdiv_step = 1 / segments;
 			let subdiv_step2 = subdiv_step * subdiv_step;
@@ -303,7 +302,7 @@ module spine.webgl {
 			vertices[idx++] = color.g;
 			vertices[idx++] = color.b;
 			vertices[idx++] = color.a;
-			this.vertexIndex = idx;			
+			this.vertexIndex = idx;
 		}
 
 		end () {
@@ -317,13 +316,13 @@ module spine.webgl {
 			if (this.vertexIndex == 0) return;
 			this.mesh.setVerticesLength(this.vertexIndex);
 			this.mesh.draw(this.shader, this.shapeType);
-			this.vertexIndex = 0;			
+			this.vertexIndex = 0;
 		}
 
 		private check(shapeType: ShapeType, numVertices: number) {
 			if (!this.isDrawing) throw new Error("ShapeRenderer.begin() has not been called");
 			if (this.shapeType == shapeType) {
-				if (this.mesh.maxVertices() - this.mesh.numVertices() < numVertices) this.flush();				
+				if (this.mesh.maxVertices() - this.mesh.numVertices() < numVertices) this.flush();
 				else return;
 			} else {
 				this.flush();
@@ -332,7 +331,7 @@ module spine.webgl {
 		}
 
 		dispose () {
-			this.mesh.dispose();			
+			this.mesh.dispose();
 		}
 	}
 

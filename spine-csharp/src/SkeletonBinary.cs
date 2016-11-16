@@ -1,32 +1,31 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.3
- * 
- * Copyright (c) 2013-2015, Esoteric Software
+ * Spine Runtimes Software License v2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
- * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to use, install, execute and perform the Spine
- * Runtimes Software (the "Software") and derivative works solely for personal
- * or internal use. Without the written permission of Esoteric Software (see
- * Section 2 of the Spine Software License Agreement), you may not (a) modify,
- * translate, adapt or otherwise create derivative works, improvements of the
- * Software or develop new applications using the Software or (b) remove,
- * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
  * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #if (UNITY_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7 || UNITY_WSA || UNITY_WP8 || UNITY_WP8_1)
@@ -104,6 +103,14 @@ namespace Spine {
 
 		#endif // WINDOWS_STOREAPP
 
+		public static readonly TransformMode[] TransformModeValues = {
+			TransformMode.Normal,
+			TransformMode.OnlyTranslation,
+			TransformMode.NoRotationOrReflection,
+			TransformMode.NoScale,
+			TransformMode.NoScaleOrReflection
+		};
+
 		public SkeletonData ReadSkeletonData (Stream input) {
 			if (input == null) throw new ArgumentNullException("input");
 			float scale = Scale;
@@ -119,6 +126,7 @@ namespace Spine {
 			bool nonessential = ReadBoolean(input);
 
 			if (nonessential) {
+				skeletonData.fps = ReadFloat(input);
 				skeletonData.imagesPath = ReadString(input);
 				if (skeletonData.imagesPath.Length == 0) skeletonData.imagesPath = null;
 			}
@@ -136,8 +144,7 @@ namespace Spine {
 				data.shearX = ReadFloat(input);
 				data.shearY = ReadFloat(input);
 				data.length = ReadFloat(input) * scale;
-				data.inheritRotation = ReadBoolean(input);
-				data.inheritScale = ReadBoolean(input);
+				data.transformMode = TransformModeValues[ReadVarint(input, true)];
 				if (nonessential) ReadInt(input); // Skip bone color.
 				skeletonData.bones.Add(data);
 			}
@@ -160,6 +167,7 @@ namespace Spine {
 			// IK constraints.
 			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {
 				IkConstraintData data = new IkConstraintData(ReadString(input));
+				data.order = ReadVarint(input, true);
 				for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
 					data.bones.Add(skeletonData.bones.Items[ReadVarint(input, true)]);
 				data.target = skeletonData.bones.Items[ReadVarint(input, true)];
@@ -171,6 +179,7 @@ namespace Spine {
 			// Transform constraints.
 			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {
 				TransformConstraintData data = new TransformConstraintData(ReadString(input));
+				data.order = ReadVarint(input, true);
 				for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
 				    data.bones.Add(skeletonData.bones.Items[ReadVarint(input, true)]);
 				data.target = skeletonData.bones.Items[ReadVarint(input, true)];
@@ -190,6 +199,7 @@ namespace Spine {
 			// Path constraints
 			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {
 				PathConstraintData data = new PathConstraintData(ReadString(input));
+				data.order = ReadVarint(input, true);
 				for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
 					data.bones.Add(skeletonData.bones.Items[ReadVarint(input, true)]);
 				data.target = skeletonData.slots.Items[ReadVarint(input, true)];
@@ -262,7 +272,8 @@ namespace Spine {
 				int slotIndex = ReadVarint(input, true);
 				for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++) {
 					String name = ReadString(input);
-					skin.AddAttachment(slotIndex, name, ReadAttachment(input, skin, slotIndex, name, nonessential));
+					Attachment attachment = ReadAttachment(input, skin, slotIndex, name, nonessential);
+					if (attachment != null) skin.AddAttachment(slotIndex, name, attachment);
 				}
 			}
 			return skin;

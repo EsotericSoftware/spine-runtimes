@@ -1,10 +1,9 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- * 
+ * Spine Runtimes Software License v2.5
+ *
  * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable, and
  * non-transferable license to use, install, execute, and perform the Spine
  * Runtimes software and derivative works solely for personal or internal
@@ -16,7 +15,7 @@
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -32,12 +31,12 @@
 module spine.canvas {
 	export class SkeletonRenderer {
 		static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
-		
+
 		private ctx: CanvasRenderingContext2D;
 
 		public triangleRendering = false;
 		public debugRendering = false;
-		
+
 		constructor (context: CanvasRenderingContext2D) {
 			this.ctx = context;
 		}
@@ -51,21 +50,21 @@ module spine.canvas {
 			let ctx = this.ctx;
 			let drawOrder = skeleton.drawOrder;
 
-			if (this.debugRendering) ctx.strokeStyle = "green";			
+			if (this.debugRendering) ctx.strokeStyle = "green";
 
-			for (let i = 0, n = drawOrder.length; i < n; i++) {				
+			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				let slot = drawOrder[i];
 				let attachment = slot.getAttachment();
 				let region: TextureAtlasRegion = null;
 				let image: HTMLImageElement = null;
-				let vertices: ArrayLike<number> = null;	
+				let vertices: ArrayLike<number> = null;
 				if (attachment instanceof RegionAttachment) {
 					let regionAttachment = <RegionAttachment>attachment;
 					vertices = regionAttachment.updateWorldVertices(slot, false);
-					region = <TextureAtlasRegion>regionAttachment.region;										
+					region = <TextureAtlasRegion>regionAttachment.region;
 					image = (<CanvasTexture>(region).texture).getImage();
 
-				} else continue;							
+				} else continue;
 
 				let att = <RegionAttachment>attachment;
 				let bone = slot.bone;
@@ -76,28 +75,28 @@ module spine.canvas {
 				let xy = vertices[25] - vertices[1];
 				let yx = vertices[8] - vertices[0];
 				let yy = vertices[9] - vertices[1];
-				let w = Math.sqrt(xx * xx + xy * xy), h = -Math.sqrt(yx * yx + yy * yy);				
+				let w = Math.sqrt(xx * xx + xy * xy), h = -Math.sqrt(yx * yx + yy * yy);
 				ctx.translate(x, y);
-				ctx.rotate(rotation);				
+				ctx.rotate(rotation);
 				if (region.rotate) {
 					ctx.rotate(Math.PI / 2);
 					ctx.drawImage(image, region.x, region.y, region.height, region.width, 0, 0, h, -w);
-					ctx.rotate(-Math.PI / 2);					
+					ctx.rotate(-Math.PI / 2);
 				} else {
 					ctx.drawImage(image, region.x, region.y, region.width, region.height, 0, 0, w, h);
 				}
 				if (this.debugRendering) ctx.strokeRect(0, 0, w, h);
 				ctx.rotate(-rotation);
-				ctx.translate(-x, -y);				
-			}			
+				ctx.translate(-x, -y);
+			}
 		}
 
-		private drawTriangles (skeleton: Skeleton) {			
-			let blendMode: BlendMode = null;			
+		private drawTriangles (skeleton: Skeleton) {
+			let blendMode: BlendMode = null;
 
 			let vertices: ArrayLike<number> = null;
-			let triangles: Array<number>  = null;
-			let drawOrder = skeleton.drawOrder;			
+			let triangles: Array<number> = null;
+			let drawOrder = skeleton.drawOrder;
 
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				let slot = drawOrder[i];
@@ -116,22 +115,22 @@ module spine.canvas {
 					vertices = mesh.updateWorldVertices(slot, false);
 					triangles = mesh.triangles;
 					texture = (<TextureAtlasRegion>mesh.region.renderObject).texture.getImage();
-				} else continue;				
+				} else continue;
 
 				if (texture != null) {
 					let slotBlendMode = slot.data.blendMode;
 					if (slotBlendMode != blendMode) {
-						blendMode = slotBlendMode;						
+						blendMode = slotBlendMode;
 					}
 
-					let ctx = this.ctx;		
+					let ctx = this.ctx;
 
 					for (var j = 0; j < triangles.length; j+=3) {
 						let t1 = triangles[j] * 8, t2 = triangles[j+1] * 8, t3 = triangles[j+2] * 8;
 
 						let x0 = vertices[t1], y0 = vertices[t1 + 1], u0 = vertices[t1 + 6], v0 = vertices[t1 + 7];
 						let x1 = vertices[t2], y1 = vertices[t2 + 1], u1 = vertices[t2 + 6], v1 = vertices[t2 + 7];
-						let x2 = vertices[t3], y2 = vertices[t3 + 1], u2 = vertices[t3 + 6], v2 = vertices[t3 + 7];				
+						let x2 = vertices[t3], y2 = vertices[t3 + 1], u2 = vertices[t3 + 6], v2 = vertices[t3 + 7];
 
 						this.drawTriangle(texture, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
 
@@ -141,13 +140,13 @@ module spine.canvas {
 							ctx.moveTo(x0, y0);
 							ctx.lineTo(x1, y1);
 							ctx.lineTo(x2, y2);
-							ctx.lineTo(x0, y0);				
+							ctx.lineTo(x0, y0);
 							ctx.stroke();
 						}
-					}												
-				}				
-			}			
-		}		
+					}
+				}
+			}
+		}
 
 		// Adapted from http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 		// Apache 2 licensed
@@ -195,7 +194,7 @@ module spine.canvas {
 			ctx.transform(a, b, c, d, e, f);
 			ctx.clip();
 			ctx.drawImage(img, 0, 0);
-			ctx.restore();			
+			ctx.restore();
 		}
 	}
 }

@@ -1,9 +1,34 @@
+/******************************************************************************
+ * Spine Runtimes Software License v2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 
-
-/*****************************************************************************
- * Skeleton Utility created by Mitch Thompson
- * Full irrevocable rights and permissions granted to Esoteric Software
-*****************************************************************************/
+// Contributed by: Mitch Thompson
 
 using UnityEngine;
 using System.Collections;
@@ -14,85 +39,39 @@ namespace Spine.Unity {
 	[RequireComponent(typeof(ISkeletonAnimation))]
 	[ExecuteInEditMode]
 	public class SkeletonUtility : MonoBehaviour {
-
-		public static T GetInParent<T> (Transform origin) where T : Component {
-			#if UNITY_4_3
-			Transform parent = origin.parent;
-			while(parent.GetComponent<T>() == null){
-			parent = parent.parent;
-			if(parent == null)
-			return default(T);
-			}
-
-			return parent.GetComponent<T>();
-			#else
-			return origin.GetComponentInParent<T>();
-			#endif
-		}
-
+	
+		#region BoundingBoxAttachment
 		public static PolygonCollider2D AddBoundingBox (Skeleton skeleton, string skinName, string slotName, string attachmentName, Transform parent, bool isTrigger = true) {
-			// List<Attachment> attachments = new List<Attachment>();
-			Skin skin;
-
-			if (skinName == "")
-				skinName = skeleton.Data.DefaultSkin.Name;
-
-			skin = skeleton.Data.FindSkin(skinName);
-
+			skinName = string.IsNullOrEmpty(skinName) ? skinName : skeleton.Data.DefaultSkin.Name;
+			Skin skin = skeleton.Data.FindSkin(skinName);
 			if (skin == null) {
 				Debug.LogError("Skin " + skinName + " not found!");
 				return null;
 			}
 
 			var attachment = skin.GetAttachment(skeleton.FindSlotIndex(slotName), attachmentName);
-			if (attachment is BoundingBoxAttachment) {
-				GameObject go = new GameObject("[BoundingBox]" + attachmentName);
-				go.transform.parent = parent;
-				go.transform.localPosition = Vector3.zero;
-				go.transform.localRotation = Quaternion.identity;
-				go.transform.localScale = Vector3.one;
-				var collider = go.AddComponent<PolygonCollider2D>();
-				collider.isTrigger = isTrigger;
-				var boundingBox = (BoundingBoxAttachment)attachment;
-				float[] floats = boundingBox.Vertices;
-				int floatCount = floats.Length;
-				int vertCount = floatCount / 2;
-
-				Vector2[] verts = new Vector2[vertCount];
-				int v = 0;
-				for (int i = 0; i < floatCount; i += 2, v++) {
-					verts[v].x = floats[i];
-					verts[v].y = floats[i + 1];
-				}
-
-				collider.SetPath(0, verts);
-
-				return collider;
-
+			var box = attachment as BoundingBoxAttachment;
+			if (box != null) {
+				var go = new GameObject("[BoundingBox]" + attachmentName);
+				var got = go.transform;
+				got.parent = parent;
+				got.localPosition = Vector3.zero;
+				got.localRotation = Quaternion.identity;
+				got.localScale = Vector3.one;
+				var slot = skeleton.FindSlot(slotName);
+				return AddBoundingBoxAsComponent(box, slot, go, isTrigger);
 			}
 
 			return null;
 		}
 
-		public static PolygonCollider2D AddBoundingBoxAsComponent (BoundingBoxAttachment boundingBox, GameObject gameObject, bool isTrigger = true) {
-			if (boundingBox == null)
-				return null;
-
+		public static PolygonCollider2D AddBoundingBoxAsComponent (BoundingBoxAttachment box, Slot slot, GameObject gameObject, bool isTrigger = true) {
+			if (box == null) return null;
+			if (box.IsWeighted()) Debug.LogWarning("UnityEngine.PolygonCollider2D does not support weighted or animated points. Collider will not be animated. Please remove weights and animations from the bounding box in Spine editor.");
+			var verts = box.GetLocalVertices(slot, null);
 			var collider = gameObject.AddComponent<PolygonCollider2D>();
 			collider.isTrigger = isTrigger;
-			float[] floats = boundingBox.Vertices;
-			int floatCount = floats.Length;
-			int vertCount = floatCount / 2;
-
-			Vector2[] verts = new Vector2[vertCount];
-			int v = 0;
-			for (int i = 0; i < floatCount; i += 2, v++) {
-				verts[v].x = floats[i];
-				verts[v].y = floats[i + 1];
-			}
-
 			collider.SetPath(0, verts);
-
 			return collider;
 		}
 
@@ -101,22 +80,20 @@ namespace Spine.Unity {
 			int floatCount = floats.Length;
 
 			Bounds bounds = new Bounds();
-
 			bounds.center = new Vector3(floats[0], floats[1], 0);
-			for (int i = 2; i < floatCount; i += 2) {
+			for (int i = 2; i < floatCount; i += 2)
 				bounds.Encapsulate(new Vector3(floats[i], floats[i + 1], 0));
-			}
+
 			Vector3 size = bounds.size;
 			size.z = depth;
 			bounds.size = size;
 
 			return bounds;
 		}
+		#endregion
 
 		public delegate void SkeletonUtilityDelegate ();
-
 		public event SkeletonUtilityDelegate OnReset;
-
 		public Transform boneRoot;
 
 		void Update () {
@@ -140,7 +117,6 @@ namespace Spine.Unity {
 		public List<SkeletonUtilityBone> utilityBones = new List<SkeletonUtilityBone>();
 		[System.NonSerialized]
 		public List<SkeletonUtilityConstraint> utilityConstraints = new List<SkeletonUtilityConstraint>();
-		//	Dictionary<Bone, SkeletonUtilityBone> utilityBoneTable;
 
 		protected bool hasTransformBones;
 		protected bool hasUtilityConstraints;
@@ -165,13 +141,12 @@ namespace Spine.Unity {
 				skeletonAnimation.UpdateLocal += UpdateLocal;
 			}
 
-
 			CollectBones();
 		}
 
 		void Start () {
 			//recollect because order of operations failure when switching between game mode and edit mode...
-			//		CollectBones();
+			CollectBones();
 		}
 
 		void OnDisable () {
@@ -219,41 +194,38 @@ namespace Spine.Unity {
 		}
 
 		public void CollectBones () {
-			if (skeletonRenderer.skeleton == null)
-				return;
+			var skeleton = skeletonRenderer.skeleton;
+			if (skeleton == null) return;
 
 			if (boneRoot != null) {
-				List<string> constraintTargetNames = new List<string>();
-
-				ExposedList<IkConstraint> ikConstraints = skeletonRenderer.skeleton.IkConstraints;
+				var constraintTargets = new List<System.Object>();
+				var ikConstraints = skeleton.IkConstraints;
 				for (int i = 0, n = ikConstraints.Count; i < n; i++)
-					constraintTargetNames.Add(ikConstraints.Items[i].Target.Data.Name);
+					constraintTargets.Add(ikConstraints.Items[i].target);
+				
+				var transformConstraints = skeleton.TransformConstraints;
+				for (int i = 0, n = transformConstraints.Count; i < n; i++)
+					constraintTargets.Add(transformConstraints.Items[i].target);
 
 				var utilityBones = this.utilityBones;
 				for (int i = 0, n = utilityBones.Count; i < n; i++) {
 					var b = utilityBones[i];
 					if (b.bone == null) return;
-					if (b.mode == SkeletonUtilityBone.Mode.Override)
-						hasTransformBones = true;
-
-					if (constraintTargetNames.Contains(b.bone.Data.Name))
-						hasUtilityConstraints = true;
+					hasTransformBones |= (b.mode == SkeletonUtilityBone.Mode.Override);
+					hasUtilityConstraints |= constraintTargets.Contains(b.bone);
 				}
 
-				if (utilityConstraints.Count > 0)
-					hasUtilityConstraints = true;
+				hasUtilityConstraints |= utilityConstraints.Count > 0;
 
 				if (skeletonAnimation != null) {
 					skeletonAnimation.UpdateWorld -= UpdateWorld;
 					skeletonAnimation.UpdateComplete -= UpdateComplete;
 
-					if (hasTransformBones || hasUtilityConstraints) {
+					if (hasTransformBones || hasUtilityConstraints)
 						skeletonAnimation.UpdateWorld += UpdateWorld;
-					}
-
-					if (hasUtilityConstraints) {
+					
+					if (hasUtilityConstraints)
 						skeletonAnimation.UpdateComplete += UpdateComplete;
-					}
 				}
 
 				needToReprocessBones = false;
@@ -261,7 +233,6 @@ namespace Spine.Unity {
 				utilityBones.Clear();
 				utilityConstraints.Clear();
 			}
-
 		}
 
 		void UpdateLocal (ISkeletonAnimation anim) {
@@ -314,21 +285,15 @@ namespace Spine.Unity {
 			Skeleton skeleton = this.skeletonRenderer.skeleton;
 
 			GameObject go = SpawnBone(skeleton.RootBone, boneRoot, mode, pos, rot, sca);
-
 			CollectBones();
-
 			return go;
 		}
 
 		public GameObject SpawnHierarchy (SkeletonUtilityBone.Mode mode, bool pos, bool rot, bool sca) {
 			GetBoneRoot();
-
 			Skeleton skeleton = this.skeletonRenderer.skeleton;
-
 			GameObject go = SpawnBoneRecursively(skeleton.RootBone, boneRoot, mode, pos, rot, sca);
-
 			CollectBones();
-
 			return go;
 		}
 

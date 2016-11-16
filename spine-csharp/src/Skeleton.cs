@@ -1,32 +1,31 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.3
- * 
- * Copyright (c) 2013-2015, Esoteric Software
+ * Spine Runtimes Software License v2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
- * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to use, install, execute and perform the Spine
- * Runtimes Software (the "Software") and derivative works solely for personal
- * or internal use. Without the written permission of Esoteric Software (see
- * Section 2 of the Spine Software License Agreement), you may not (a) modify,
- * translate, adapt or otherwise create derivative works, improvements of the
- * Software or develop new applications using the Software or (b) remove,
- * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
  * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 using System;
@@ -38,10 +37,11 @@ namespace Spine {
 		internal ExposedList<Bone> bones;
 		internal ExposedList<Slot> slots;
 		internal ExposedList<Slot> drawOrder;
-		internal ExposedList<IkConstraint> ikConstraints, ikConstraintsSorted;
+		internal ExposedList<IkConstraint> ikConstraints;
 		internal ExposedList<TransformConstraint> transformConstraints;
 		internal ExposedList<PathConstraint> pathConstraints;
 		internal ExposedList<IUpdatable> updateCache = new ExposedList<IUpdatable>();
+		internal ExposedList<Bone> updateCacheReset = new ExposedList<Bone>();
 		internal Skin skin;
 		internal float r = 1, g = 1, b = 1, a = 1;
 		internal float time;
@@ -98,7 +98,6 @@ namespace Spine {
 			}
 
 			ikConstraints = new ExposedList<IkConstraint>(data.ikConstraints.Count);
-			ikConstraintsSorted = new ExposedList<IkConstraint>(data.ikConstraints.Count);
 			foreach (IkConstraintData ikConstraintData in data.ikConstraints)
 				ikConstraints.Add(new IkConstraint(ikConstraintData, this));
 
@@ -124,92 +123,101 @@ namespace Spine {
 			for (int i = 0, n = bones.Count; i < n; i++)
 				bones.Items[i].sorted = false;
 
-			ExposedList<IkConstraint> ikConstraints = this.ikConstraintsSorted;
-			ikConstraints.Clear();
-			ikConstraints.AddRange(this.ikConstraints);
-			int ikCount = ikConstraints.Count;
-			for (int i = 0, level, n = ikCount; i < n; i++) {
-				IkConstraint ik = ikConstraints.Items[i];
-				Bone bone = ik.bones.Items[0].parent;
-				for (level = 0; bone != null; level++)
-					bone = bone.parent;
-				ik.level = level;
-			}
-			for (int i = 1, ii; i < ikCount; i++) {
-				IkConstraint ik = ikConstraints.Items[i];
-				int level = ik.level;
-				for (ii = i - 1; ii >= 0; ii--) {
-					IkConstraint other = ikConstraints.Items[ii];
-					if (other.level < level) break;
-					ikConstraints.Items[ii + 1] = other;
+			ExposedList<IkConstraint> ikConstraints = this.ikConstraints;
+			var transformConstraints = this.transformConstraints;
+			var pathConstraints = this.pathConstraints;
+			int ikCount = IkConstraints.Count, transformCount = transformConstraints.Count, pathCount = pathConstraints.Count;
+			int constraintCount = ikCount + transformCount + pathCount;
+			//outer:
+			for (int i = 0; i < constraintCount; i++) {
+				for (int ii = 0; ii < ikCount; ii++) {
+					IkConstraint constraint = ikConstraints.Items[ii];
+					if (constraint.data.order == i) {
+						SortIkConstraint(constraint);
+						goto outer; //continue outer;
+					}
 				}
-				ikConstraints.Items[ii + 1] = ik;
-			}
-			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
-				IkConstraint constraint = ikConstraints.Items[i];
-				Bone target = constraint.target;
-				SortBone(target);
-
-				ExposedList<Bone> constrained = constraint.bones;
-				Bone parent = constrained.Items[0];
-				SortBone(parent);
-
-				updateCache.Add(constraint);
-
-				SortReset(parent.children);
-				constrained.Items[constrained.Count - 1].sorted = true;
-			}
-
-			ExposedList<PathConstraint> pathConstraints = this.pathConstraints;
-			for (int i = 0, n = pathConstraints.Count; i < n; i++) {
-				PathConstraint constraint = pathConstraints.Items[i];
-
-				Slot slot = constraint.target;
-				int slotIndex = slot.data.index;
-				Bone slotBone = slot.bone;
-				if (skin != null) SortPathConstraintAttachment(skin, slotIndex, slotBone);
-				if (data.defaultSkin != null && data.defaultSkin != skin)
-					SortPathConstraintAttachment(data.defaultSkin, slotIndex, slotBone);
-				for (int ii = 0, nn = data.skins.Count; ii < nn; ii++)
-					SortPathConstraintAttachment(data.skins.Items[ii], slotIndex, slotBone);
-
-				PathAttachment attachment = slot.Attachment as PathAttachment;
-				if (attachment != null) SortPathConstraintAttachment(attachment, slotBone);
-
-				ExposedList<Bone> constrained = constraint.bones;
-				int boneCount = constrained.Count;
-				for (int ii = 0; ii < boneCount; ii++)
-					SortBone(constrained.Items[ii]);
-
-				updateCache.Add(constraint);
-
-				for (int ii = 0; ii < boneCount; ii++)
-					SortReset(constrained.Items[ii].children);
-				for (int ii = 0; ii < boneCount; ii++)
-					constrained.Items[ii].sorted = true;
-			}
-
-			ExposedList<TransformConstraint> transformConstraints = this.transformConstraints;
-			for (int i = 0, n = transformConstraints.Count; i < n; i++) {
-				TransformConstraint constraint = transformConstraints.Items[i];
-
-				SortBone(constraint.target);
-
-				ExposedList<Bone> constrained = constraint.bones;
-				int boneCount = constrained.Count;
-				for (int ii = 0; ii < boneCount; ii++)
-					SortBone(constrained.Items[ii]);
-
-				updateCache.Add(constraint);
-
-				for (int ii = 0; ii < boneCount; ii++)
-					SortReset(constrained.Items[ii].children);
-				for (int ii = 0; ii < boneCount; ii++)
-					constrained.Items[ii].sorted = true;
+				for (int ii = 0; ii < transformCount; ii++) {
+					TransformConstraint constraint = transformConstraints.Items[ii];
+					if (constraint.data.order == i) {
+						SortTransformConstraint(constraint);
+						goto outer; //continue outer;
+					}
+				}
+				for (int ii = 0; ii < pathCount; ii++) {
+					PathConstraint constraint = pathConstraints.Items[ii];
+					if (constraint.data.order == i) {
+						SortPathConstraint(constraint);
+						goto outer; //continue outer;
+					}
+				}
+				outer: {}
 			}
 
 			for (int i = 0, n = bones.Count; i < n; i++)
 				SortBone(bones.Items[i]);
+		}
+
+		private void SortIkConstraint (IkConstraint constraint) {
+			Bone target = constraint.target;
+			SortBone(target);
+
+			var constrained = constraint.bones;
+			Bone parent = constrained.Items[0];
+			SortBone(parent);
+
+			if (constrained.Count > 1) {
+				Bone child = constrained.Items[constrained.Count - 1];
+				if (!updateCache.Contains(child))
+					updateCacheReset.Add(child);
+			}
+
+			updateCache.Add(constraint);
+
+			SortReset(parent.children);
+			constrained.Items[constrained.Count - 1].sorted = true;
+		}
+
+		private void SortPathConstraint (PathConstraint constraint) {
+			Slot slot = constraint.target;
+			int slotIndex = slot.data.index;
+			Bone slotBone = slot.bone;
+			if (skin != null) SortPathConstraintAttachment(skin, slotIndex, slotBone);
+			if (data.defaultSkin != null && data.defaultSkin != skin)
+				SortPathConstraintAttachment(data.defaultSkin, slotIndex, slotBone);
+			for (int ii = 0, nn = data.skins.Count; ii < nn; ii++)
+				SortPathConstraintAttachment(data.skins.Items[ii], slotIndex, slotBone);
+
+			Attachment attachment = slot.attachment;
+			if (attachment is PathAttachment) SortPathConstraintAttachment(attachment, slotBone);
+
+			var constrained = constraint.bones;
+			int boneCount = constrained.Count;
+			for (int ii = 0; ii < boneCount; ii++)
+				SortBone(constrained.Items[ii]);
+
+			updateCache.Add(constraint);
+
+			for (int ii = 0; ii < boneCount; ii++)
+				SortReset(constrained.Items[ii].children);
+			for (int ii = 0; ii < boneCount; ii++)
+				constrained.Items[ii].sorted = true;
+		}
+
+		private void SortTransformConstraint (TransformConstraint constraint) {
+			SortBone(constraint.target);
+
+			var constrained = constraint.bones;
+			int boneCount = constrained.Count;
+			for (int ii = 0; ii < boneCount; ii++)
+				SortBone(constrained.Items[ii]);
+
+			updateCache.Add(constraint);
+
+			for (int ii = 0; ii < boneCount; ii++)
+				SortReset(constrained.Items[ii].children);
+			for (int ii = 0; ii < boneCount; ii++)
+				constrained.Items[ii].sorted = true;
 		}
 
 		private void SortPathConstraintAttachment (Skin skin, int slotIndex, Bone slotBone) {
@@ -218,15 +226,18 @@ namespace Spine {
 		}
 
 		private void SortPathConstraintAttachment (Attachment attachment, Bone slotBone) {
-			var pathAttachment = attachment as PathAttachment;
-			if (pathAttachment == null) return;
-			int[] pathBones = pathAttachment.bones;
+			if (!(attachment is PathAttachment)) return;
+			int[] pathBones = ((PathAttachment)attachment).bones;
 			if (pathBones == null)
 				SortBone(slotBone);
 			else {
 				var bones = this.bones;
-				for (int i = 0, n = pathBones.Length; i < n; i++)
-					SortBone(bones.Items[pathBones[i]]);
+				for (int i = 0, n = pathBones.Length; i < n;) {
+					int nn = pathBones[i++];
+					nn += i;
+					while (i < nn)
+						SortBone(bones.Items[pathBones[i++]]);
+				}
 			}
 		}
 
@@ -249,6 +260,19 @@ namespace Spine {
 
 		/// <summary>Updates the world transform for each bone and applies constraints.</summary>
 		public void UpdateWorldTransform () {
+			var updateCacheReset = this.updateCacheReset;
+			var updateCacheResetItems = updateCacheReset.Items;
+			for (int i = 0, n = updateCacheReset.Count; i < n; i++) {
+				Bone bone = updateCacheResetItems[i];
+				bone.ax = bone.x;
+				bone.ay = bone.y;
+				bone.arotation = bone.rotation;
+				bone.ascaleX = bone.scaleX;
+				bone.ascaleY = bone.scaleY;
+				bone.ashearX = bone.shearX;
+				bone.ashearY = bone.shearY;
+				bone.appliedValid = true;
+			}
 			var updateItems = this.updateCache.Items;
 			for (int i = 0, n = updateCache.Count; i < n; i++)
 				updateItems[i].Update();

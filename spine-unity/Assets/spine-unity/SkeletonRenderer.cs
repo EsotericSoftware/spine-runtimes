@@ -1,32 +1,31 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.3
- * 
- * Copyright (c) 2013-2015, Esoteric Software
+ * Spine Runtimes Software License v2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
- * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to use, install, execute and perform the Spine
- * Runtimes Software (the "Software") and derivative works solely for personal
- * or internal use. Without the written permission of Esoteric Software (see
- * Section 2 of the Spine Software License Agreement), you may not (a) modify,
- * translate, adapt or otherwise create derivative works, improvements of the
- * Software or develop new applications using the Software or (b) remove,
- * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
  * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #define SPINE_OPTIONAL_RENDEROVERRIDE
@@ -35,7 +34,6 @@
 #define SPINE_OPTIONAL_SOLVETANGENTS
 
 //#define SPINE_OPTIONAL_FRONTFACING
-//#define SPINE_OPTIONAL_SUBMESHRENDERER // Deprecated
 
 using System;
 using System.Collections.Generic;
@@ -52,8 +50,8 @@ namespace Spine.Unity {
 		public SkeletonRendererDelegate OnRebuild;
 
 		public SkeletonDataAsset skeletonDataAsset;
-		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } }
-		public String initialSkinName;
+		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } } // ISkeletonComponent
+		public string initialSkinName;
 
 		#region Advanced
 		// Submesh Separation
@@ -66,6 +64,7 @@ namespace Spine.Unity {
 		public float zSpacing;
 		public bool renderMeshes = true, immutableTriangles;
 		public bool pmaVertexColors = true;
+		public bool clearStateOnDisable = false;
 
 		#if SPINE_OPTIONAL_NORMALS
 		public bool calculateNormals;
@@ -99,10 +98,6 @@ namespace Spine.Unity {
 				}
 			}
 		}
-		#endif
-
-		#if SPINE_OPTIONAL_SUBMESHRENDERER
-		private Spine.Unity.Modules.SkeletonUtilitySubmeshRenderer[] submeshRenderers;
 		#endif
 
 		#if SPINE_OPTIONAL_MATERIALOVERRIDE
@@ -165,6 +160,17 @@ namespace Spine.Unity {
 			Initialize(false);
 		}
 
+		void OnDisable () {
+			if (clearStateOnDisable)
+				ClearState();
+		}
+
+		protected virtual void ClearState () {
+			meshFilter.sharedMesh = null;
+			currentInstructions.Clear();
+			skeleton.SetToSetupPose();
+		}
+
 		public virtual void Initialize (bool overwrite) {
 			if (valid && !overwrite)
 				return;
@@ -213,10 +219,6 @@ namespace Spine.Unity {
 			for (int i = 0; i < separatorSlotNames.Length; i++)
 				separatorSlots.Add(skeleton.FindSlot(separatorSlotNames[i]));
 
-			#if SPINE_OPTIONAL_SUBMESHRENDERER
-			submeshRenderers = GetComponentsInChildren<Spine.Unity.Modules.SkeletonUtilitySubmeshRenderer>();
-			#endif
-
 			LateUpdate();
 
 			if (OnRebuild != null)
@@ -231,9 +233,6 @@ namespace Spine.Unity {
 				(!meshRenderer.enabled)
 				#if SPINE_OPTIONAL_RENDEROVERRIDE
 				&& this.generateMeshOverride == null
-				#endif
-				#if SPINE_OPTIONAL_SUBMESHRENDERER
-				&& submeshRenderers.Length > 0
 				#endif
 			)
 				return;
@@ -449,10 +448,12 @@ namespace Spine.Unity {
 
 				int oldSubmeshCount = submeshes.Count;
 
-				submeshes.Capacity = submeshCount;
+				if (submeshes.Capacity < submeshCount)
+					submeshes.Capacity = submeshCount;
 				for (int i = oldSubmeshCount; i < submeshCount; i++)
 					submeshes.Items[i] = new ArraysMeshGenerator.SubmeshTriangleBuffer(workingSubmeshInstructions.Items[i].triangleCount);
-
+				submeshes.Count = submeshCount;
+					
 				var mutableTriangles = !workingInstruction.immutableTriangles;
 				for (int i = 0, last = submeshCount - 1; i < submeshCount; i++) {
 					var submeshInstruction = workingSubmeshInstructions.Items[i];
@@ -527,18 +528,6 @@ namespace Spine.Unity {
 			meshFilter.sharedMesh = currentMesh;
 			currentSmartMesh.instructionUsed.Set(workingInstruction);
 
-
-			#if SPINE_OPTIONAL_SUBMESHRENDERER
-			if (submeshRenderers.Length > 0) {
-				for (int i = 0; i < submeshRenderers.Length; i++) {
-					var submeshRenderer = submeshRenderers[i];
-					if (submeshRenderer.submeshIndex < sharedMaterials.Length)
-						submeshRenderer.SetMesh(meshRenderer, currentMesh, sharedMaterials[submeshRenderer.submeshIndex]);
-					else
-						submeshRenderer.GetComponent<Renderer>().enabled = false;
-				}
-			}
-			#endif
 		}
 
 		static bool CheckIfMustUpdateMeshStructure (SmartMesh.Instruction a, SmartMesh.Instruction b) {
@@ -701,22 +690,6 @@ namespace Spine.Unity {
 
 				firstVertex += attachmentVertexCount;
 			}
-		}
-		#endif
-
-		#if UNITY_EDITOR
-		void OnDrawGizmos () {
-			// Make scene view selection easier by drawing a clear gizmo over the skeleton.
-			meshFilter = GetComponent<MeshFilter>();
-			if (meshFilter == null) return;
-
-			Mesh mesh = meshFilter.sharedMesh;
-			if (mesh == null) return;
-
-			Bounds meshBounds = mesh.bounds;
-			Gizmos.color = Color.clear;
-			Gizmos.matrix = transform.localToWorldMatrix;
-			Gizmos.DrawCube(meshBounds.center, meshBounds.size);
 		}
 		#endif
 

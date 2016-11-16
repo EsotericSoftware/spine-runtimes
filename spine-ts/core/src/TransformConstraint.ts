@@ -1,10 +1,9 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- * 
+ * Spine Runtimes Software License v2.5
+ *
  * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable, and
  * non-transferable license to use, install, execute, and perform the Spine
  * Runtimes software and derivative works solely for personal or internal
@@ -16,7 +15,7 @@
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -30,7 +29,7 @@
  *****************************************************************************/
 
 module spine {
-	export class TransformConstraint implements Updatable {
+	export class TransformConstraint implements Constraint {
 		data: TransformConstraintData;
 		bones: Array<Bone>;
 		target: Bone;
@@ -59,13 +58,17 @@ module spine {
 			let rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
 			let target = this.target;
 			let ta = target.a, tb = target.b, tc = target.c, td = target.d;
+			let degRadReflect = ta * td - tb * tc > 0 ? MathUtils.degRad : -MathUtils.degRad;
+			let offsetRotation = this.data.offsetRotation * degRadReflect;
+			let offsetShearY = this.data.offsetShearY * degRadReflect;
 			let bones = this.bones;
 			for (let i = 0, n = bones.length; i < n; i++) {
 				let bone = bones[i];
+				let modified = false;
 
-				if (rotateMix > 0) {
+				if (rotateMix != 0) {
 					let a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-					let r = Math.atan2(tc, ta) - Math.atan2(c, a) + this.data.offsetRotation * MathUtils.degRad;
+					let r = Math.atan2(tc, ta) - Math.atan2(c, a) + offsetRotation;
 					if (r > MathUtils.PI)
 						r -= MathUtils.PI2;
 					else if (r < -MathUtils.PI)
@@ -76,26 +79,29 @@ module spine {
 					bone.b = cos * b - sin * d;
 					bone.c = sin * a + cos * c;
 					bone.d = sin * b + cos * d;
+					modified = true;
 				}
 
-				if (translateMix > 0) {
+				if (translateMix != 0) {
 					let temp = this.temp;
 					target.localToWorld(temp.set(this.data.offsetX, this.data.offsetY));
 					bone.worldX += (temp.x - bone.worldX) * translateMix;
 					bone.worldY += (temp.y - bone.worldY) * translateMix;
+					modified = true;
 				}
 
 				if (scaleMix > 0) {
-					let bs = Math.sqrt(bone.a * bone.a + bone.c * bone.c);
+					let s = Math.sqrt(bone.a * bone.a + bone.c * bone.c);
 					let ts = Math.sqrt(ta * ta + tc * tc);
-					let s = bs > 0.00001 ? (bs + (ts - bs + this.data.offsetScaleX) * scaleMix) / bs : 0;
+					if (s > 0.00001) s = (s + (ts - s + this.data.offsetScaleX) * scaleMix) / s;
 					bone.a *= s;
 					bone.c *= s;
-					bs = Math.sqrt(bone.b * bone.b + bone.d * bone.d);
+					s = Math.sqrt(bone.b * bone.b + bone.d * bone.d);
 					ts = Math.sqrt(tb * tb + td * td);
-					s = bs > 0.00001 ? (bs + (ts - bs + this.data.offsetScaleY) * scaleMix) / bs : 0;
+					if (s > 0.00001) s = (s + (ts - s + this.data.offsetScaleY) * scaleMix) / s;
 					bone.b *= s;
 					bone.d *= s;
+					modified = true;
 				}
 
 				if (shearMix > 0) {
@@ -106,12 +112,19 @@ module spine {
 						r -= MathUtils.PI2;
 					else if (r < -MathUtils.PI)
 						r += MathUtils.PI2;
-					r = by + (r + this.data.offsetShearY * MathUtils.degRad) * shearMix;
+					r = by + (r + offsetShearY) * shearMix;
 					let s = Math.sqrt(b * b + d * d);
 					bone.b = Math.cos(r) * s;
 					bone.d = Math.sin(r) * s;
+					modified = true;
 				}
+
+				if (modified) bone.appliedValid = false;
 			}
+		}
+
+		getOrder () {
+			return this.data.order;
 		}
 	}
 }

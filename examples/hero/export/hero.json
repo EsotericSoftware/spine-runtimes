@@ -1,5 +1,12 @@
 {
-"skeleton": { "hash": "G8Hn+I+pLLpQJV630iP0YYkYAHQ", "spine": "3.4.02", "width": 319.35, "height": 337.01, "images": "./images/" },
+"skeleton": {
+	"hash": "A6YUo0HfQU4n+BxWujsTVoekIjA",
+	"spine": "3.5.03-beta",
+	"width": 319.35,
+	"height": 337.01,
+	"fps": 30,
+	"images": "./images/"
+},
 "bones": [
 	{ "name": "root" },
 	{ "name": "Hip", "parent": "root", "y": 94.88 },
@@ -12,10 +19,26 @@
 	{ "name": "body", "parent": "Hip", "length": 60.79, "rotation": 96.39, "x": 4.09, "y": 3.17 },
 	{ "name": "thigh1", "parent": "Hip", "length": 23.94, "rotation": -107.07, "x": -17.51, "y": -5.22 },
 	{ "name": "shin1", "parent": "thigh1", "length": 28.23, "rotation": 10.26, "x": 29.76, "y": -0.91 },
-	{ "name": "foot1", "parent": "shin1", "length": 27.07, "rotation": -90.96, "x": 28.17, "y": -0.48, "inheritRotation": false },
+	{
+		"name": "foot1",
+		"parent": "shin1",
+		"length": 27.07,
+		"rotation": -90.96,
+		"x": 28.17,
+		"y": -0.48,
+		"transform": "noRotationOrReflection"
+	},
 	{ "name": "thigh2", "parent": "Hip", "length": 23.65, "rotation": -85.46, "x": 21.85, "y": -5.86 },
 	{ "name": "shin2", "parent": "thigh2", "length": 25.35, "rotation": -2.25, "x": 31.99, "y": 2.96 },
-	{ "name": "foot2", "parent": "shin2", "length": 22.28, "rotation": -90.42, "x": 25.54, "y": 0.27, "inheritRotation": false },
+	{
+		"name": "foot2",
+		"parent": "shin2",
+		"length": 22.28,
+		"rotation": -90.42,
+		"x": 25.54,
+		"y": 0.27,
+		"transform": "noRotationOrReflection"
+	},
 	{ "name": "upperarm1", "parent": "body", "length": 19.35, "rotation": 130.11, "x": 52.49, "y": 41.84 },
 	{ "name": "forearm1", "parent": "upperarm1", "length": 22.06, "rotation": 30.56, "x": 23.97, "y": 5.16 },
 	{ "name": "upperarm2", "parent": "body", "length": 25.98, "rotation": -178.95, "x": 57.94, "y": -38.93 },
@@ -51,18 +74,21 @@
 "ik": [
 	{
 		"name": "L_Leg",
+		"order": 0,
 		"bones": [ "thigh1", "shin1" ],
 		"target": "L_Ankle",
 		"bendPositive": false
 	},
 	{
 		"name": "LookConstraint",
+		"order": 1,
 		"bones": [ "head" ],
 		"target": "LookConstraintGoal",
 		"mix": 0
 	},
 	{
 		"name": "R_Leg",
+		"order": 2,
 		"bones": [ "thigh2", "shin2" ],
 		"target": "R_Ankle",
 		"bendPositive": false
@@ -1201,8 +1227,8 @@
 					{ "time": 1, "angle": 0 }
 				],
 				"translate": [
-					{ "time": 0, "x": -6.83, "y": 12.06, "curve": "stepped" },
-					{ "time": 1, "x": -6.83, "y": 12.06 }
+					{ "time": 0, "x": -6.83, "y": 12.05, "curve": "stepped" },
+					{ "time": 1, "x": -6.83, "y": 12.05 }
 				]
 			},
 			"L_Ground": {

@@ -9,13 +9,13 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 
 	var DEMO_NAME = "TransitionsDemo";
 
-	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
+	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
-		timeSlider = $("#transitionsdemo-timeslider").data("slider");
+		timeSlider = $("#transitions-timeslider").data("slider");
 		timeSlider.set(0.5);
-		timeSliderLabel = $("#transitionsdemo-timeslider-label")[0];
-		canvas = document.getElementById("transitionsdemo-canvas");
+		timeSliderLabel = $("#transitions-timeslider-label")[0];
+		canvas = document.getElementById("transitions-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
@@ -30,7 +30,6 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 		input = new spine.webgl.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		loadingScreen.backgroundColor = bgColor;
 
 		requestAnimationFrame(load);	
 	}
@@ -50,8 +49,8 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 			bounds = { offset: new spine.Vector2(), size: new spine.Vector2() };
 			skeleton.getBounds(bounds.offset, bounds.size);
 			setupInput();
-			$("#transitionsdemo-overlay").removeClass("overlay-hide");
-			$("#transitionsdemo-overlay").addClass("overlay");	
+			$("#transitions-overlay").removeClass("overlay-hide");
+			$("#transitions-overlay").addClass("overlay");	
 			loadingComplete(canvas, render);						
 		} else {
 			loadingScreen.draw();			
@@ -87,12 +86,9 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 		state.addAnimation(0, "run", true, mix);
 		state.addAnimation(0, "jump", true, 0.5);
 		state.addAnimation(0, "run", true, mix).listener = {
-			event: function (trackIndex, event) {},
-			complete: function (trackIndex, loopCount) {},
 			start: function (trackIndex) { 
 				setAnimations(state, mix);
-			},
-			end: function (trackIndex) {}
+			}
 		};
 	}
 
@@ -100,7 +96,7 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 		var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas1.atlas"), function(path) {
 			return assetManager.get(DEMO_NAME, path);		
 		});
-		var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
+		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
 		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json")[name]);
 		var skeleton = new spine.Skeleton(skeletonData);
@@ -133,15 +129,17 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 		state.update(delta);
 		state.apply(skeleton);
 		skeleton.updateWorldTransform();
-		skeleton.x = -60;
+		skeleton.x = -10;
 		renderer.drawSkeleton(skeleton, true);
 
 		stateNoMix.update(delta);
 		stateNoMix.apply(skeletonNoMix);
 		skeletonNoMix.updateWorldTransform();
-		skeletonNoMix.x = size.x + 60;
+		skeletonNoMix.x = size.x + 45;
 		renderer.drawSkeleton(skeletonNoMix, true);
-		renderer.end();		
+		renderer.end();
+
+		loadingScreen.draw(true);
 	}
 	init();
 	return render;
