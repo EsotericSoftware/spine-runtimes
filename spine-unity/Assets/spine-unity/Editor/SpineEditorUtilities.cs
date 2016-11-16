@@ -28,8 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#pragma warning disable 0219
-
 // Contributed by: Mitch Thompson
 
 #define SPINE_SKELETONANIMATOR
@@ -929,10 +927,15 @@ namespace Spine.Unity.Editor {
 				Texture2D texture = (Texture2D)AssetDatabase.LoadAssetAtPath(texturePath, typeof(Texture2D));
 
 				TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(texturePath);
+				#if UNITY_5_5_OR_NEWER
+				texImporter.textureCompression = TextureImporterCompression.Uncompressed;
+				texImporter.alphaSource = TextureImporterAlphaSource.FromInput;
+				#else
 				texImporter.textureType = TextureImporterType.Advanced;
 				texImporter.textureFormat = TextureImporterFormat.AutomaticTruecolor;
+				#endif
 				texImporter.mipmapEnabled = false;
-				texImporter.alphaIsTransparency = false;
+				texImporter.alphaIsTransparency = false; // Prevent the texture importer from applying bleed to the transparent parts.
 				texImporter.spriteImportMode = SpriteImportMode.None;
 				texImporter.maxTextureSize = 2048;
 
