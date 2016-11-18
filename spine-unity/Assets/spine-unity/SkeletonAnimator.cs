@@ -109,7 +109,7 @@ namespace Spine.Unity {
 					// Always use Mix instead of Applying the first non-zero weighted clip.
 					for (int c = 0; c < clipInfo.Length; c++) {
 						var info = clipInfo[c];	float weight = info.weight * layerWeight; if (weight == 0) continue;
-						animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length), stateInfo.loop, null, weight, false, false);
+						animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop), stateInfo.loop, null, weight, false, false);
 					}
 					if (hasNext) {
 						for (int c = 0; c < nextClipInfo.Length; c++) {
@@ -122,13 +122,13 @@ namespace Spine.Unity {
 					int c = 0;
 					for (; c < clipInfo.Length; c++) {
 						var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-						animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length), stateInfo.loop, null, 1f, false, false);
+						animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop), stateInfo.loop, null, 1f, false, false);
 						break;
 					}
 					// Mix the rest
 					for (; c < clipInfo.Length; c++) {
 						var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-						animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length), stateInfo.loop, null, weight, false, false);
+						animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop), stateInfo.loop, null, weight, false, false);
 					}
 
 					c = 0;
@@ -167,8 +167,9 @@ namespace Spine.Unity {
 			}
 		}
 
-		static float AnimationTime (float normalizedTime, float clipLength) {
+		static float AnimationTime (float normalizedTime, float clipLength, bool loop) {
 			float time = normalizedTime * clipLength;
+			if (loop) return time;
 			const float EndSnapEpsilon = 1f/30f; // Workaround for end-duration keys not being applied.
 			return (clipLength - time < EndSnapEpsilon) ? clipLength : time; // return a time snapped to clipLength;
 		}

@@ -174,7 +174,7 @@ namespace Spine.Unity {
 				va.ComputeWorldVertices(slot, floats);
 
 				Bone sb = slot.bone;
-				float bwx = sb.worldX, bwy = sb.worldY, ia, ib, ic, id;
+				float ia, ib, ic, id, bwx = sb.worldX, bwy = sb.worldY;
 				sb.GetWorldToLocalMatrix(out ia, out ib, out ic, out id);
 
 				for (int i = 0; i < bufferTargetSize; i++) {
