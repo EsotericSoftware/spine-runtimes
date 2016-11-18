@@ -51,7 +51,7 @@ public class SkeletonData {
 	String version, hash;
 
 	// Nonessential.
-	float fps;
+	float fps = 30;
 	String imagesPath;
 
 	// --- Bones.
