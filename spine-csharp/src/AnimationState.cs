@@ -228,7 +228,7 @@ namespace Spine {
 				if (rotateTimeline != null) {
 					ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, alpha, setupPose, timelinesRotation, i << 1, firstFrame);
 				} else {
-					if (setupPose) {
+					if (!setupPose) {
 						if (!attachments && timeline is AttachmentTimeline) continue;
 						if (!drawOrder && timeline is DrawOrderTimeline) continue;
 					}
@@ -236,7 +236,7 @@ namespace Spine {
 				}
 			}
 
-			QueueEvents(entry, animationTime);
+			QueueEvents(from, animationTime);
 			from.nextAnimationLast = animationTime;
 			from.nextTrackLast = from.trackTime;
 
