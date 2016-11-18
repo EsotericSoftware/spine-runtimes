@@ -604,7 +604,7 @@ function Animation.AttachmentTimeline.new (frameCount)
 				if not attachmentName then
 					slot:setAttachment(nil)
 				else
-					skeleton:setAttachment(skeleton:getAttachmentByIndex(self.slotIndex, attachmentName))
+					slot:setAttachment(skeleton:getAttachmentByIndex(self.slotIndex, attachmentName))
 				end
 			end
 			return
@@ -619,9 +619,9 @@ function Animation.AttachmentTimeline.new (frameCount)
 
 		attachmentName = self.attachmentNames[frameIndex]
 		if not attachmentName then
-			skeleton.slots[self.slotIndex]:setAttachment(nil)
+			slot:setAttachment(nil)
 		else
-			skeleton.slots[self.slotIndex]:setAttachment(skeleton:getAttachmentByIndex(self.slotIndex, attachmentName))
+			slot:setAttachment(skeleton:getAttachmentByIndex(self.slotIndex, attachmentName))
 		end
 	end
 
