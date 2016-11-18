@@ -31,7 +31,6 @@
 // Contributed by: Mitch Thompson
 
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using Spine;
 
@@ -42,8 +41,7 @@ namespace Spine.Unity {
 	
 		#region BoundingBoxAttachment
 		public static PolygonCollider2D AddBoundingBox (Skeleton skeleton, string skinName, string slotName, string attachmentName, Transform parent, bool isTrigger = true) {
-			skinName = string.IsNullOrEmpty(skinName) ? skinName : skeleton.Data.DefaultSkin.Name;
-			Skin skin = skeleton.Data.FindSkin(skinName);
+			Skin skin = string.IsNullOrEmpty(skinName) ? skeleton.data.defaultSkin : skeleton.data.FindSkin(skinName);
 			if (skin == null) {
 				Debug.LogError("Skin " + skinName + " not found!");
 				return null;
@@ -67,7 +65,7 @@ namespace Spine.Unity {
 
 		public static PolygonCollider2D AddBoundingBoxAsComponent (BoundingBoxAttachment box, Slot slot, GameObject gameObject, bool isTrigger = true) {
 			if (box == null) return null;
-			if (box.IsWeighted()) Debug.LogWarning("UnityEngine.PolygonCollider2D does not support weighted or animated points. Collider will not be animated. Please remove weights and animations from the bounding box in Spine editor.");
+			if (box.IsWeighted()) Debug.LogWarning("UnityEngine.PolygonCollider2D does not support weighted or animated points. Collider will not be animated. If you want to use it as a collider, please remove weights and animations from the bounding box in Spine editor.");
 			var verts = box.GetLocalVertices(slot, null);
 			var collider = gameObject.AddComponent<PolygonCollider2D>();
 			collider.isTrigger = isTrigger;
