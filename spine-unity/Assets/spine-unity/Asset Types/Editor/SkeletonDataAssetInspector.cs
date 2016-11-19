@@ -263,12 +263,12 @@ namespace Spine.Unity.Editor {
 			if (isBakingExpanded) {
 				EditorGUI.indentLevel++;
 				const string BakingWarningMessage =
-					"WARNING!" +
-					"\nBaking is NOT the same as SkeletonAnimator!" +
+//					"WARNING!" +
+//					"\nBaking is NOT the same as SkeletonAnimator!" +
+//					"\n\n" + 
+					"The main use of Baking is to export Spine projects to be used without the Spine Runtime (ie: for sale on the Asset Store, or background objects that are animated only with a wind noise generator)" +
 
-					"\n\nThe main use of Baking is to export Spine projects to be used without the Spine Runtime (ie: for sale on the Asset Store, or background objects that are animated only with a wind noise generator)" +
-
-					"\n\nBaking also does not support the following:" +
+					"\n\nBaking does not support the following:" +
 					"\n\tDisabled transform inheritance" +
 					"\n\tShear" +
 					"\n\tColor Keys" +
@@ -277,7 +277,7 @@ namespace Spine.Unity.Editor {
 
 					"\n\nCurves are sampled at 60fps and are not realtime." +
 					"\nPlease read SkeletonBaker.cs comments for full details.";
-				EditorGUILayout.HelpBox(BakingWarningMessage, MessageType.Warning, true);
+				EditorGUILayout.HelpBox(BakingWarningMessage, MessageType.Info, true);
 
 				EditorGUI.indentLevel++;
 				bakeAnimations = EditorGUILayout.Toggle("Bake Animations", bakeAnimations);
