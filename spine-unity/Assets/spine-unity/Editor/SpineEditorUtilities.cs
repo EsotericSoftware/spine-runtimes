@@ -28,6 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#pragma warning disable 0219
+
 // Contributed by: Mitch Thompson
 
 #define SPINE_SKELETONANIMATOR

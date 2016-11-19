@@ -40,37 +40,53 @@ namespace Spine.Unity {
 	public class SkeletonUtility : MonoBehaviour {
 	
 		#region BoundingBoxAttachment
-		public static PolygonCollider2D AddBoundingBox (Skeleton skeleton, string skinName, string slotName, string attachmentName, Transform parent, bool isTrigger = true) {
+		public static PolygonCollider2D AddBoundingBoxGameObject (Skeleton skeleton, string skinName, string slotName, string attachmentName, Transform parent, bool isTrigger = true) {
 			Skin skin = string.IsNullOrEmpty(skinName) ? skeleton.data.defaultSkin : skeleton.data.FindSkin(skinName);
 			if (skin == null) {
 				Debug.LogError("Skin " + skinName + " not found!");
 				return null;
 			}
 
+			int slotIndex = skeleton.FindSlotIndex(slotName);
 			var attachment = skin.GetAttachment(skeleton.FindSlotIndex(slotName), attachmentName);
-			var box = attachment as BoundingBoxAttachment;
-			if (box != null) {
-				var go = new GameObject("[BoundingBox]" + attachmentName);
-				var got = go.transform;
-				got.parent = parent;
-				got.localPosition = Vector3.zero;
-				got.localRotation = Quaternion.identity;
-				got.localScale = Vector3.one;
-				var slot = skeleton.FindSlot(slotName);
-				return AddBoundingBoxAsComponent(box, slot, go, isTrigger);
+			if (attachment == null) {
+				Debug.LogFormat("Attachment in slot '{0}' named '{1}' not found in skin '{2}'.", slotName, attachmentName, skin.name);
+				return null;
 			}
 
-			return null;
+			var box = attachment as BoundingBoxAttachment;
+			if (box != null) {
+				var slot = skeleton.FindSlot(slotName);
+				return AddBoundingBoxGameObject(box.Name, box, slot, parent, isTrigger);
+			} else {
+				Debug.LogFormat("Attachment '{0}' was not a Bounding Box.", attachmentName);
+				return null;
+			}
+		}
+
+		public static PolygonCollider2D AddBoundingBoxGameObject (string name, BoundingBoxAttachment box, Slot slot, Transform parent, bool isTrigger = true) {
+			var go = new GameObject("[BoundingBox]" + (string.IsNullOrEmpty(name) ? box.Name : name));
+			var got = go.transform;
+			got.parent = parent;
+			got.localPosition = Vector3.zero;
+			got.localRotation = Quaternion.identity;
+			got.localScale = Vector3.one;
+			return AddBoundingBoxAsComponent(box, slot, go, isTrigger);
 		}
 
 		public static PolygonCollider2D AddBoundingBoxAsComponent (BoundingBoxAttachment box, Slot slot, GameObject gameObject, bool isTrigger = true) {
 			if (box == null) return null;
-			if (box.IsWeighted()) Debug.LogWarning("UnityEngine.PolygonCollider2D does not support weighted or animated points. Collider will not be animated. If you want to use it as a collider, please remove weights and animations from the bounding box in Spine editor.");
-			var verts = box.GetLocalVertices(slot, null);
 			var collider = gameObject.AddComponent<PolygonCollider2D>();
 			collider.isTrigger = isTrigger;
-			collider.SetPath(0, verts);
+			SetColliderPointsLocal(collider, slot, box);
 			return collider;
+		}
+
+		public static void SetColliderPointsLocal (PolygonCollider2D collider, Slot slot, BoundingBoxAttachment box) {
+			if (box == null) return;
+			if (box.IsWeighted()) Debug.LogWarning("UnityEngine.PolygonCollider2D does not support weighted or animated points. Collider points will not be animated and may have incorrect orientation. If you want to use it as a collider, please remove weights and animations from the bounding box in Spine editor.");
+			var verts = box.GetLocalVertices(slot, null);
+			collider.SetPath(0, verts);
 		}
 
 		public static Bounds GetBoundingBoxBounds (BoundingBoxAttachment boundingBox, float depth = 0) {
