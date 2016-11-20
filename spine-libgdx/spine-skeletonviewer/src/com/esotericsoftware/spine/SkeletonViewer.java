@@ -597,7 +597,10 @@ public class SkeletonViewer extends ApplicationAdapter {
 					int track = trackButtons.getCheckedIndex();
 					if (track > 0) {
 						TrackEntry current = state.getCurrent(track);
-						if (current != null) current.setAlpha(alphaSlider.getValue());
+						if (current != null) {
+							current.setAlpha(alphaSlider.getValue());
+							current.resetRotationDirections();
+						}
 					}
 				}
 			});
