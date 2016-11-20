@@ -180,7 +180,7 @@ namespace Spine.Unity {
 				for (int i = 0; i < bufferTargetSize; i++) {
 					int j = i * 2;
 					float x = floats[j] - bwx, y = floats[j+1] - bwy;
-					buffer[i] = new Vector2(x * ia + y * ic, x * ib + y * id);
+					buffer[i] = new Vector2(x * ia + y * ib, x * ic + y * id);
 				}
 			}
 

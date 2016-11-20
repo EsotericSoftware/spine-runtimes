@@ -581,7 +581,7 @@ namespace Spine {
 			}
 
 			float[] frames = this.frames;
-			if (time < frames[0]) {
+			if (time < frames[0]) { // Time is before first frame.
 				if (setupPose) {
 					attachmentName = slot.data.attachmentName;
 					slot.Attachment = attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);

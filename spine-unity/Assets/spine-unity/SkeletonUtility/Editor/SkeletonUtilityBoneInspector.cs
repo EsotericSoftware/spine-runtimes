@@ -184,7 +184,7 @@ namespace Spine.Unity.Editor {
 			using (new EditorGUI.DisabledGroupScope(multiObject || boundingBoxTable.Count == 0)) {
 				EditorGUILayout.LabelField(new GUIContent("Bounding Boxes", SpineEditorUtilities.Icons.boundingBox), EditorStyles.boldLabel);
 
-				foreach(var entry in boundingBoxTable){
+				foreach (var entry in boundingBoxTable){
 					Slot slot = entry.Key;
 					var boundingBoxes = entry.Value;
 
@@ -195,19 +195,21 @@ namespace Spine.Unity.Editor {
 						foreach (var box in boundingBoxes) {
 							using (new GUILayout.HorizontalScope()) {
 								GUILayout.Space(30);
-								if (GUILayout.Button(box.Name, GUILayout.Width(200))) {
-									var child = utilityBone.transform.FindChild("[BoundingBox]" + box.Name);
-									if (child != null) {
-										var originalCollider = child.GetComponent<PolygonCollider2D>();
-										var updatedCollider = SkeletonUtility.AddBoundingBoxAsComponent(box, slot, child.gameObject, originalCollider.isTrigger);
-										originalCollider.points = updatedCollider.points;
-										if (EditorApplication.isPlaying)
-											Destroy(updatedCollider);
+								string buttonLabel = box.IsWeighted() ? box.Name + " (!)" : box.Name;
+								if (GUILayout.Button(buttonLabel, GUILayout.Width(200))) {
+									utilityBone.bone.Skeleton.UpdateWorldTransform();
+									var bbTransform = utilityBone.transform.FindChild("[BoundingBox]" + box.Name);
+									if (bbTransform != null) {
+										var originalCollider = bbTransform.GetComponent<PolygonCollider2D>();
+										if (originalCollider != null)
+											SkeletonUtility.SetColliderPointsLocal(originalCollider, slot, box);
 										else
-											DestroyImmediate(updatedCollider);
+											SkeletonUtility.AddBoundingBoxAsComponent(box, slot, bbTransform.gameObject);
 									} else {
-										utilityBone.AddBoundingBox(currentSkinName, slot.Data.Name, box.Name);
+										var newPolygonCollider = SkeletonUtility.AddBoundingBoxGameObject(null, box, slot, utilityBone.transform);
+										bbTransform = newPolygonCollider.transform;
 									}
+									EditorGUIUtility.PingObject(bbTransform);
 								}
 							}
 
