@@ -232,18 +232,18 @@ function AnimationState:update (delta)
 			end
 			
 			if not skip then
-				local next = current.next
-				if next then
+				local _next = current.next
+				if _next then
 					-- When the next entry's delay is passed, change to the next entry, preserving leftover time.
-					local nextTime = current.trackLast - next.delay
+					local nextTime = current.trackLast - _next.delay
 					if nextTime >= 0 then
-						next.delay = 0
-						next.trackTime = nextTime + delta * next.timeScale
+						_next.delay = 0
+						_next.trackTime = nextTime + delta * _next.timeScale
 						current.trackTime = current.trackTime + currentDelta
-						self:setCurrent(i, next)
-						while next.mixingFrom do
-							next.mixTime = next.mixTime + currentDelta
-							next = next.mixingFrom
+						self:setCurrent(i, _next)
+						while _next.mixingFrom do
+							_next.mixTime = _next.mixTime + currentDelta
+							_next = _next.mixingFrom
 						end
 						skip = true
 					end
@@ -708,9 +708,9 @@ function AnimationState:_animationsChanged ()
   end
 
   -- Set timelinesFirst for all entries, from lowest track to highest.
-  local i = 1
-  local n = highest
-  while i <= n do
+  local i = 0
+  local n = highest + 1
+  while i < n do
     local entry = tracks[i]
     if entry then
       self:setTimelinesFirst(entry);
@@ -719,7 +719,7 @@ function AnimationState:_animationsChanged ()
     end
     i = i + 1
   end
-  while i <= n do
+  while i < n do
     local entry = tracks[i]
     if entry then self:checkTimelinesFirst(entry) end
     i = i + 1
@@ -756,6 +756,7 @@ function AnimationState:checkTimelinesUsage (entry, usageArray)
   local n = #entry.animation.timelines
   local timelines = entry.animation.timelines
   local usage = usageArray
+	local i = 1
   while i <= n do
     local id = "" .. timelines[i]:getPropertyId()
     local contained = propertyIDs[id] == id
