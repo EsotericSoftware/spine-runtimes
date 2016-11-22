@@ -67,6 +67,7 @@ _spEventQueue* _spEventQueue_create (_spAnimationState* state) {
 
 void _spEventQueue_free (_spEventQueue* self) {
 	FREE(self->objects);
+    FREE(self);
 }
 
 void _spEventQueue_ensureCapacity (_spEventQueue* self, int newElements) {
@@ -214,6 +215,7 @@ void spAnimationState_dispose (spAnimationState* self) {
 	_spEventQueue_free(internal->queue);
 	FREE(internal->events);
 	FREE(internal->propertyIDs);
+    FREE(internal);
 }
 
 void spAnimationState_update (spAnimationState* self, float delta) {
