@@ -142,9 +142,8 @@ public class AnimationState {
 
 		from.animationLast = from.nextAnimationLast;
 		from.trackLast = from.nextTrackLast;
-		float mixingFromDelta = delta * from.timeScale;
-		from.trackTime += mixingFromDelta;
-		entry.mixTime += mixingFromDelta;
+		from.trackTime += delta * from.timeScale;
+		entry.mixTime += delta * entry.timeScale;
 
 		updateMixingFrom(from, delta, canEnd && from.alpha == 1);
 	}
