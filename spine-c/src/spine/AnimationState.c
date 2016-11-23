@@ -67,6 +67,7 @@ _spEventQueue* _spEventQueue_create (_spAnimationState* state) {
 
 void _spEventQueue_free (_spEventQueue* self) {
 	FREE(self->objects);
+    FREE(self);
 }
 
 void _spEventQueue_ensureCapacity (_spEventQueue* self, int newElements) {
@@ -152,8 +153,8 @@ void _spEventQueue_drain (_spEventQueue* self) {
 				if (self->state->super.listener) self->state->super.listener(SUPER(self->state), type, entry, 0);
 				/* Fall through. */
 			case SP_ANIMATION_DISPOSE:
-				if (entry->listener) entry->listener(SUPER(self->state), type, entry, 0);
-				if (self->state->super.listener) self->state->super.listener(SUPER(self->state), type, entry, 0);
+				if (entry->listener) entry->listener(SUPER(self->state), SP_ANIMATION_DISPOSE, entry, 0);
+				if (self->state->super.listener) self->state->super.listener(SUPER(self->state), SP_ANIMATION_DISPOSE, entry, 0);
 				_spAnimationState_disposeTrackEntry(entry);
 				break;
 			case SP_ANIMATION_EVENT:
@@ -214,6 +215,7 @@ void spAnimationState_dispose (spAnimationState* self) {
 	_spEventQueue_free(internal->queue);
 	FREE(internal->events);
 	FREE(internal->propertyIDs);
+    FREE(internal);
 }
 
 void spAnimationState_update (spAnimationState* self, float delta) {
