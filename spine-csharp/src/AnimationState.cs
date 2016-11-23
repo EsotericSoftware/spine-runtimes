@@ -102,9 +102,7 @@ namespace Spine {
 						}
 						continue;
 					}
-					UpdateMixingFrom(current, delta);
 				} else {
-					UpdateMixingFrom(current, delta);
 					// Clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom.
 					if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
 						tracksItems[i] = null;
@@ -113,6 +111,7 @@ namespace Spine {
 						continue;
 					}
 				}
+				UpdateMixingFrom(current, delta);
 
 				current.trackTime += currentDelta;
 			}
@@ -155,7 +154,10 @@ namespace Spine {
 
 				// Apply mixing from entries first.
 				float mix = current.alpha;
-				if (current.mixingFrom != null) mix *= ApplyMixingFrom(current, skeleton);
+				if (current.mixingFrom != null)
+					mix *= ApplyMixingFrom(current, skeleton);
+				else if (current.trackTime >= current.trackEnd) //
+					mix = 0; // Set to setup pose the last time the entry will be applied.
 
 				// Apply current entry.
 				float animationLast = current.animationLast, animationTime = current.AnimationTime;
@@ -415,11 +417,11 @@ namespace Spine {
 			if (current != null) {
 				if (current.nextTrackLast == -1) {
 					// Don't mix from an entry that was never applied.
-					tracks.Items[trackIndex] = null;
+					tracks.Items[trackIndex] = current.mixingFrom;
 					queue.Interrupt(current);
 					queue.End(current);
 					DisposeNext(current);
-					current = null;
+					current = current.mixingFrom;
 				} else {
 					DisposeNext(current);
 				}
@@ -681,11 +683,11 @@ namespace Spine {
 		/// <summary>
 		/// The track time in seconds when this animation will be removed from the track. Defaults to the animation duration for 
 		/// non-looping animations and to <see cref="int.MaxValue"/> for looping animations. If the track end time is reached and no 
-		/// other animations are queued for playback, and mixing from any previous animations is complete, then the track is cleared, 
-		/// leaving skeletons in their previous pose.
+		/// other animations are queued for playback, and mixing from any previous animations is complete, properties keyed by the animation, 
+		/// are set to the setup pose and the track is cleared.
 		/// 
-		/// It may be desired to use <see cref="AnimationState.AddEmptyAnimation(int, float, float)"/> to mix the skeletons back to the 
-		/// setup pose, rather than leaving them in their previous pose.
+		/// It may be desired to use <see cref="AnimationState.AddEmptyAnimation(int, float, float)"/> to mix the properties back to the 
+		/// setup pose over time, rather than have it happen instantly.
 		/// </summary>
 		public float TrackEnd { get { return trackEnd; } set { trackEnd = value; } }
 
