@@ -650,8 +650,8 @@ public class AnimationStateTests {
 			expect(0, "end", 0.8f, 0.9f), //
 			expect(0, "dispose", 0.8f, 0.9f), //
 
-			expect(-1, "end", 0.1f, 0.9f), //
-			expect(-1, "dispose", 0.1f, 0.9f) //
+			expect(-1, "end", 0.2f, 1), //
+			expect(-1, "dispose", 0.2f, 1) //
 		);
 		state.addAnimation(0, "events1", false, 0);
 		run(0.1f, 10, new TestListener() {
