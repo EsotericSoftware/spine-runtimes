@@ -102,9 +102,9 @@ namespace Spine {
 						}
 						continue;
 					}
-					UpdateMixingFrom(current, delta, true);
+					UpdateMixingFrom(current, delta);
 				} else {
-					UpdateMixingFrom(current, delta, true);
+					UpdateMixingFrom(current, delta);
 					// Clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom.
 					if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
 						tracksItems[i] = null;
@@ -120,27 +120,22 @@ namespace Spine {
 			queue.Drain();
 		}
 
-		private void UpdateMixingFrom (TrackEntry entry, float delta, bool canEnd) {
+		private void UpdateMixingFrom (TrackEntry entry, float delta) {
 			TrackEntry from = entry.mixingFrom;
 			if (from == null) return;
 
-			if (canEnd && entry.mixTime >= entry.mixDuration && entry.mixTime > 0) {
+			UpdateMixingFrom(from, delta);
+
+			if (entry.mixTime >= entry.mixDuration && from.mixingFrom == null && entry.mixTime > 0) {
+				entry.mixingFrom = null;
 				queue.End(from);
-				TrackEntry newFrom = from.mixingFrom;
-				entry.mixingFrom = newFrom;
-				if (newFrom == null) return;
-				entry.mixTime = from.mixTime;
-				entry.mixDuration = from.mixDuration;
-				from = newFrom;
+				return;
 			}
 
 			from.animationLast = from.nextAnimationLast;
 			from.trackLast = from.nextTrackLast;
-			float mixingFromDelta = delta * from.timeScale;
-			from.trackTime += mixingFromDelta;
-			entry.mixTime += mixingFromDelta;
-
-			UpdateMixingFrom(from, delta, canEnd && from.alpha == 1);
+			from.trackTime += delta * from.timeScale;
+			entry.mixTime += delta * entry.timeScale;
 		}
 			
 
