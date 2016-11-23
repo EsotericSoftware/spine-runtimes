@@ -410,11 +410,11 @@ public class AnimationState {
 		if (current != null) {
 			if (current.nextTrackLast == -1) {
 				// Don't mix from an entry that was never applied.
-				tracks.set(trackIndex, null);
+				tracks.set(trackIndex, current.mixingFrom);
 				queue.interrupt(current);
 				queue.end(current);
 				disposeNext(current);
-				current = null;
+				current = current.mixingFrom;
 			} else
 				disposeNext(current);
 		}
