@@ -108,9 +108,9 @@ public class AnimationState {
 					}
 					continue;
 				}
-				updateMixingFrom(current, delta, true);
+				updateMixingFrom(current, delta);
 			} else {
-				updateMixingFrom(current, delta, true);
+				updateMixingFrom(current, delta);
 				// Clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom.
 				if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
 					tracks.set(i, null);
@@ -126,26 +126,22 @@ public class AnimationState {
 		queue.drain();
 	}
 
-	private void updateMixingFrom (TrackEntry entry, float delta, boolean canEnd) {
+	private void updateMixingFrom (TrackEntry entry, float delta) {
 		TrackEntry from = entry.mixingFrom;
 		if (from == null) return;
 
-		if (canEnd && entry.mixTime >= entry.mixDuration && entry.mixTime > 0) {
+		updateMixingFrom(from, delta);
+
+		if (entry.mixTime >= entry.mixDuration && from.mixingFrom == null && entry.mixTime > 0) {
+			entry.mixingFrom = null;
 			queue.end(from);
-			TrackEntry newFrom = from.mixingFrom;
-			entry.mixingFrom = newFrom;
-			if (newFrom == null) return;
-			entry.mixTime = from.mixTime;
-			entry.mixDuration = from.mixDuration;
-			from = newFrom;
+			return;
 		}
 
 		from.animationLast = from.nextAnimationLast;
 		from.trackLast = from.nextTrackLast;
 		from.trackTime += delta * from.timeScale;
 		entry.mixTime += delta * entry.timeScale;
-
-		updateMixingFrom(from, delta, canEnd && from.alpha == 1);
 	}
 
 	/** Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so the
