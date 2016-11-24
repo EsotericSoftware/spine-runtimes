@@ -64,9 +64,9 @@ public class SpineboyExample extends Sprite {
 		var skeletonData:SkeletonData = json.readSkeletonData(new SpineboyJson());
 
 		var stateData:AnimationStateData = new AnimationStateData(skeletonData);
-		stateData.setMixByName("run", "jump", 0.2);
+		stateData.setMixByName("run", "jump", 0.4);
 		stateData.setMixByName("jump", "run", 0.4);
-		stateData.setMixByName("jump", "jump", 0.2);
+		stateData.setMixByName("jump", "jump", 0.4);
 
 		skeleton = new SkeletonAnimation(skeletonData, stateData);
 		skeleton.x = 400;
