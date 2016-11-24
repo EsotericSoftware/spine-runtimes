@@ -38,7 +38,7 @@ static spAnimation* SP_EMPTY_ANIMATION = 0;
    the same function order in C as we have method order in Java */
 void _spAnimationState_disposeTrackEntry (spTrackEntry* entry);
 void _spAnimationState_disposeTrackEntries (spAnimationState* state, spTrackEntry* entry);
-void _spAnimationState_updateMixingFrom (spAnimationState* self, spTrackEntry* entry, float delta, int /*boolean*/ canEnd);
+void _spAnimationState_updateMixingFrom (spAnimationState* self, spTrackEntry* entry, float delta);
 float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* entry, spSkeleton* skeleton);
 void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* timeline, spSkeleton* skeleton, float time, float alpha, int /*boolean*/ setupPose, float* timelinesRotation, int i, int /*boolean*/ firstFrame);
 void _spAnimationState_queueEvents (spAnimationState* self, spTrackEntry* entry, float animationTime);
@@ -255,9 +255,7 @@ void spAnimationState_update (spAnimationState* self, float delta) {
 				}
 				continue;
 			}
-			_spAnimationState_updateMixingFrom(self, current, delta, 1);
 		} else {
-			_spAnimationState_updateMixingFrom(self, current, delta, 1);
 			/* Clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom. */
 			if (current->trackLast >= current->trackEnd && current->mixingFrom == 0) {
 				self->tracks[i] = 0;
@@ -266,6 +264,7 @@ void spAnimationState_update (spAnimationState* self, float delta) {
 				continue;
 			}
 		}
+        _spAnimationState_updateMixingFrom(self, current, delta);
 
 		current->trackTime += currentDelta;
 	}
@@ -273,30 +272,23 @@ void spAnimationState_update (spAnimationState* self, float delta) {
 	_spEventQueue_drain(internal->queue);
 }
 
-void _spAnimationState_updateMixingFrom (spAnimationState* self, spTrackEntry* entry, float delta, int /*boolean*/ canEnd) {
-	spTrackEntry* from = entry->mixingFrom;
-	spTrackEntry* newFrom;
-	float mixingFromDelta;
+void _spAnimationState_updateMixingFrom (spAnimationState* self, spTrackEntry* entry, float delta) {
+	spTrackEntry* from = entry->mixingFrom;		
 	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
 	if (!from) return;
+    
+    _spAnimationState_updateMixingFrom(self, from, delta);
 
-	if (canEnd && entry->mixTime >= entry->mixDuration && entry->mixTime > 0) {
+	if (entry->mixTime >= entry->mixDuration && from->mixingFrom == 0 && entry->mixTime > 0) {
+        entry->mixingFrom = 0;
 		_spEventQueue_end(internal->queue, from);
-		newFrom = from->mixingFrom;
-		entry->mixingFrom = newFrom;
-		if (!newFrom) return;
-		entry->mixTime = from->mixTime;
-		entry->mixDuration = from->mixDuration;
-		from = newFrom;
+        return;
 	}
 
 	from->animationLast = from->nextAnimationLast;
 	from->trackLast = from->nextTrackLast;
-	mixingFromDelta = delta * from->timeScale;
-	from->trackTime += mixingFromDelta;
-	entry->mixTime += mixingFromDelta;
-
-	_spAnimationState_updateMixingFrom(self, from, delta, canEnd && from->alpha == 1);
+	from->trackTime += delta * from->timeScale;
+	entry->mixTime += delta * entry->timeScale;
 }
 
 void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
@@ -320,7 +312,10 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 
 		/* Apply mixing from entries first. */
 		mix = current->alpha;
-		if (current->mixingFrom) mix *= _spAnimationState_applyMixingFrom(self, current, skeleton);
+		if (current->mixingFrom)
+            mix *= _spAnimationState_applyMixingFrom(self, current, skeleton);
+        else if (current->trackTime >= current->trackEnd)
+            mix = 0;
 
 		/* Apply current entry. */
 		animationLast = current->animationLast; animationTime = spTrackEntry_getAnimationTime(current);
@@ -595,11 +590,11 @@ spTrackEntry* spAnimationState_setAnimation (spAnimationState* self, int trackIn
 	if (current) {
 		if (current->nextTrackLast == -1) {
 			/* Don't mix from an entry that was never applied. */
-			self->tracks[trackIndex] = 0;
+			self->tracks[trackIndex] = current->mixingFrom;
 			_spEventQueue_interrupt(internal->queue, current);
 			_spEventQueue_end(internal->queue, current);
 			_spAnimationState_disposeNext(self, current);
-			current = 0;
+			current = current->mixingFrom;
 		} else
 			_spAnimationState_disposeNext(self, current);
 	}
