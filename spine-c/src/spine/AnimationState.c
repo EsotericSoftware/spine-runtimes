@@ -171,6 +171,7 @@ void _spEventQueue_drain (_spEventQueue* self) {
 }
 
 void _spAnimationState_disposeTrackEntry (spTrackEntry* entry) {
+    FREE(entry->timelinesFirst);
 	FREE(entry);
 }
 
