@@ -33,6 +33,9 @@
 #include <limits.h>
 
 static spAnimation* SP_EMPTY_ANIMATION = 0;
+void spAnimationState_disposeStatics () {
+	FREE(SP_EMPTY_ANIMATION);
+}
 
 /* Forward declaration of some "private" functions so we can keep
    the same function order in C as we have method order in Java */
