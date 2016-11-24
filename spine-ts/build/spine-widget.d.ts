@@ -214,7 +214,7 @@ declare module spine {
 		trackEntryPool: Pool<TrackEntry>;
 		constructor(data: AnimationStateData);
 		update(delta: number): void;
-		updateMixingFrom(entry: TrackEntry, delta: number, canEnd: boolean): void;
+		updateMixingFrom(entry: TrackEntry, delta: number): void;
 		apply(skeleton: Skeleton): void;
 		applyMixingFrom(entry: TrackEntry, skeleton: Skeleton): number;
 		applyRotateTimeline(timeline: Timeline, skeleton: Skeleton, time: number, alpha: number, setupPose: boolean, timelinesRotation: Array<number>, i: number, firstFrame: boolean): void;
