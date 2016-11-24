@@ -75,7 +75,7 @@ void _spEventQueue_ensureCapacity (_spEventQueue* self, int newElements) {
 		_spEventQueueItem* newObjects;
 		self->objectsCapacity <<= 1;
 		newObjects = CALLOC(_spEventQueueItem, self->objectsCapacity);
-		memcpy(newObjects, self->objects, self->objectsCount);
+		memcpy(newObjects, self->objects, sizeof(_spEventQueueItem) * self->objectsCount);
 		FREE(self->objects);
 		self->objects = newObjects;
 	}
@@ -768,7 +768,7 @@ void _spAnimationState_ensureCapacityPropertyIDs(spAnimationState* self, int cap
 	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
 	if (internal->propertyIDsCapacity < capacity) {
 		int *newPropertyIDs = CALLOC(int, capacity << 1);
-		memcpy(newPropertyIDs, internal->propertyIDs, internal->propertyIDsCount);
+		memcpy(newPropertyIDs, internal->propertyIDs, sizeof(int) * internal->propertyIDsCount);
 		FREE(internal->propertyIDs);
 		internal->propertyIDs = newPropertyIDs;
 		internal->propertyIDsCapacity = capacity << 1;
