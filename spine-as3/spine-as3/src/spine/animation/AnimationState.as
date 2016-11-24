@@ -95,10 +95,8 @@ public class AnimationState {
 						next = next.mixingFrom;
 					}
 					continue;
-				}
-				updateMixingFrom(current, delta, true);
+				}				
 			} else {
-				updateMixingFrom(current, delta, true);
 				// Clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom.
 				if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
 					tracks[i] = null;
@@ -107,6 +105,7 @@ public class AnimationState {
 					continue;
 				}
 			}
+			updateMixingFrom(current, delta);
 
 			current.trackTime += currentDelta;
 		}
@@ -114,27 +113,22 @@ public class AnimationState {
 		queue.drain();
 	}
 	
-	private function updateMixingFrom (entry:TrackEntry, delta:Number, canEnd:Boolean):void {
+	private function updateMixingFrom (entry:TrackEntry, delta:Number):void {
 		var from:TrackEntry = entry.mixingFrom;
 		if (from == null) return;
+		
+		updateMixingFrom(from, delta);
 
-		if (canEnd && entry.mixTime >= entry.mixDuration && entry.mixTime > 0) {
+		if (entry.mixTime >= entry.mixDuration && from.mixingFrom == null && entry.mixTime > 0) {
+			entry.mixingFrom = null;
 			queue.end(from);
-			var newFrom:TrackEntry = from.mixingFrom;
-			entry.mixingFrom = newFrom;
-			if (newFrom == null) return;
-			entry.mixTime = from.mixTime;
-			entry.mixDuration = from.mixDuration;
-			from = newFrom;
+			return;
 		}
 
 		from.animationLast = from.nextAnimationLast;
-		from.trackLast = from.nextTrackLast;
-		var mixingFromDelta:Number = delta * from.timeScale;
-		from.trackTime += mixingFromDelta;
-		entry.mixTime += mixingFromDelta;
-
-		updateMixingFrom(from, delta, canEnd && from.alpha == 1);
+		from.trackLast = from.nextTrackLast;		
+		from.trackTime += delta * from.timeScale;
+		entry.mixTime += delta * entry.timeScale;		
 	}
 	
 	public function apply (skeleton:Skeleton):void {
@@ -149,7 +143,10 @@ public class AnimationState {
 
 			// Apply mixing from entries first.
 			var mix:Number = current.alpha;
-			if (current.mixingFrom != null) mix *= applyMixingFrom(current, skeleton);
+			if (current.mixingFrom != null) 
+				mix *= applyMixingFrom(current, skeleton);
+			else if (current.trackTime >= current.trackEnd)
+				mix = 0;
 
 			// Apply current entry.
 			var animationLast:Number = current.animationLast, animationTime:Number = current.getAnimationTime();
@@ -388,11 +385,11 @@ public class AnimationState {
 		if (current != null) {
 			if (current.nextTrackLast == -1) {
 				// Don't mix from an entry that was never applied.
-				tracks[trackIndex] = null;
+				tracks[trackIndex] = current.mixingFrom;
 				queue.interrupt(current);
 				queue.end(current);
 				disposeNext(current);
-				current = null;
+				current = current.mixingFrom;
 			} else
 				disposeNext(current);
 		}
