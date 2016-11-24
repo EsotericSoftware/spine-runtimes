@@ -67,8 +67,8 @@ bool SpineboyExample::init () {
 	skeletonNode->setMix("walk", "jump", 0.4);
 	skeletonNode->setMix("jump", "run", 0.4);
 	skeletonNode->setAnimation(0, "walk", true);
-	spTrackEntry* jumpEntry = skeletonNode->addAnimation(0, "jump", false, 3);
-	skeletonNode->addAnimation(0, "run", true);
+	spTrackEntry* jumpEntry = skeletonNode->addAnimation(0, "jump", false, 1);
+	skeletonNode->addAnimation(0, "run", true);    
 
 	skeletonNode->setTrackStartListener(jumpEntry, [] (spTrackEntry* entry) {
 		log("jumped!");

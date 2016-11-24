@@ -786,6 +786,7 @@ int _spAnimationState_addPropertyID(spAnimationState* self, int id) {
 
 	_spAnimationState_ensureCapacityPropertyIDs(self, internal->propertyIDsCount + 1);
 	internal->propertyIDs[internal->propertyIDsCount] = id;
+	internal->propertyIDsCount++;
 	return 1;
 }
 
