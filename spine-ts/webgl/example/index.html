@@ -123,7 +123,7 @@ function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 		animationStateData.setMix("jump", "run", 0.4);
 		animationState.setAnimation(0, "walk", true);
 		var jumpEntry = animationState.addAnimation(0, "jump", false, 3);
-		animationState.addAnimation(0, "run", true);
+		animationState.addAnimation(0, "run", true, 0);
 	} else {
 		animationState.setAnimation(0, initialAnimation, true);
 	}
