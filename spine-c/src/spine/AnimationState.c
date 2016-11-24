@@ -34,7 +34,8 @@
 
 static spAnimation* SP_EMPTY_ANIMATION = 0;
 void spAnimationState_disposeStatics () {
-	FREE(SP_EMPTY_ANIMATION);
+	if (SP_EMPTY_ANIMATION) spAnimation_dispose(SP_EMPTY_ANIMATION);
+	SP_EMPTY_ANIMATION = 0;
 }
 
 /* Forward declaration of some "private" functions so we can keep
@@ -175,6 +176,7 @@ void _spEventQueue_drain (_spEventQueue* self) {
 
 void _spAnimationState_disposeTrackEntry (spTrackEntry* entry) {
     FREE(entry->timelinesFirst);
+	FREE(entry->timelinesRotation);
 	FREE(entry);
 }
 
