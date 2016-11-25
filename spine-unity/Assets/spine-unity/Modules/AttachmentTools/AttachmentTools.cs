@@ -146,12 +146,6 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			// (AtlasAttachmentLoader.cs)
 			var attachment = new RegionAttachment(attachmentName);
 
-			attachment.scaleX = 1;
-			attachment.scaleY = 1;
-			attachment.SetColor(Color.white);
-			attachment.width = region.width * scale;
-			attachment.height = region.height * scale;
-
 			attachment.RendererObject = region;
 			attachment.SetUVs(region.u, region.v, region.u2, region.v2, region.rotate);
 			attachment.regionOffsetX = region.offsetX;
@@ -161,8 +155,47 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			attachment.regionOriginalWidth = region.originalWidth;
 			attachment.regionOriginalHeight = region.originalHeight;
 
+			attachment.Path = region.name;
+			attachment.scaleX = 1;
+			attachment.scaleY = 1;
+			attachment.rotation = 0;
+
+			// pass OriginalWidth and OriginalHeight because UpdateOffset uses it in its calculation.
+			attachment.width = attachment.regionOriginalWidth * scale;
+			attachment.height = attachment.regionOriginalHeight * scale;
+
+			attachment.SetColor(Color.white);
 			attachment.UpdateOffset();
 			return attachment;
+		}
+
+		/// <summary> Sets the scale. Call regionAttachment.UpdateOffset to apply the change.</summary>
+		public static void SetScale (this RegionAttachment regionAttachment, Vector2 scale) {
+			regionAttachment.scaleX = scale.x;
+			regionAttachment.scaleY = scale.y;
+		}
+
+		/// <summary> Sets the scale. Call regionAttachment.UpdateOffset to apply the change.</summary>
+		public static void SetScale (this RegionAttachment regionAttachment, float x, float y) {
+			regionAttachment.scaleX = x;
+			regionAttachment.scaleY = y;
+		}
+
+		/// <summary> Sets the position offset. Call regionAttachment.UpdateOffset to apply the change.</summary>
+		public static void SetPositionOffset (this RegionAttachment regionAttachment, Vector2 offset) {
+			regionAttachment.x = offset.x;
+			regionAttachment.y = offset.y;
+		}
+
+		/// <summary> Sets the position offset. Call regionAttachment.UpdateOffset to apply the change.</summary>
+		public static void SetPositionOffset (this RegionAttachment regionAttachment, float x, float y) {
+			regionAttachment.x = x;
+			regionAttachment.y = y;
+		}
+
+		/// <summary> Sets the rotation. Call regionAttachment.UpdateOffset to apply the change.</summary>
+		public static void SetRotation (this RegionAttachment regionAttachment, float rotation) {
+			regionAttachment.rotation = rotation;
 		}
 		#endregion
 	}
@@ -265,9 +298,9 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		/// <summary>
 		/// Creates and populates a duplicate skin with cloned attachments that are backed by a new packed texture atlas comprised of all the regions from the original skin.</summary>
 		/// <remarks>No Spine.Atlas object is created so there is no way to find AtlasRegions except through the Attachments using them.</remarks>
-		public static Skin GetRepackedSkin (this Skin o, string skinName, Shader shader, out Material m, out Texture2D t, int maxAtlasSize = 1024, int padding = 2) {
+		public static Skin GetRepackedSkin (this Skin o, string newName, Shader shader, out Material m, out Texture2D t, int maxAtlasSize = 1024, int padding = 2) {
 			var skinAttachments = o.Attachments;
-			var newSkin = new Skin(skinName);
+			var newSkin = new Skin(newName);
 
 			var repackedAttachments = new List<Attachment>();
 			var texturesToPack = new List<Texture2D>();
@@ -282,14 +315,14 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			}
 
 			var newTexture = new Texture2D(maxAtlasSize, maxAtlasSize);
-			newTexture.name = skinName;
+			newTexture.name = newName;
 			var rects = newTexture.PackTextures(texturesToPack.ToArray(), padding, maxAtlasSize);
 
 			var newMaterial = new Material(shader);
-			newMaterial.name = skinName;
+			newMaterial.name = newName;
 			newMaterial.mainTexture = newTexture;
 			var page = newMaterial.ToSpineAtlasPage();
-			page.name = skinName;
+			page.name = newName;
 
 			for (int i = 0, n = repackedAttachments.Count; i < n; i++) {
 				var a = repackedAttachments[i];
@@ -308,13 +341,11 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			return Sprite.Create(ar.GetMainTexture(), ar.GetUnityRect(), new Vector2(0.5f, 0.5f), pixelsPerUnit);
 		}
 
-		static Texture2D ToTexture (this AtlasRegion ar, bool applyImmediately = true) {
+		internal static Texture2D ToTexture (this AtlasRegion ar, bool applyImmediately = true) {
 			Texture2D sourceTexture = ar.GetMainTexture();
-
-			Texture2D output = new Texture2D(ar.width, ar.height);
-			output.name = ar.name;
-
 			Rect r = ar.GetUnityRect(sourceTexture.height);
+			Texture2D output = new Texture2D((int)r.width, (int)r.height);
+			output.name = ar.name;
 			Color[] pixelBuffer = sourceTexture.GetPixels((int)r.x, (int)r.y, (int)r.width, (int)r.height);
 			output.SetPixels(pixelBuffer);
 
@@ -327,7 +358,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		static Texture2D ToTexture (this Sprite s, bool applyImmediately = true) {
 			var spriteTexture = s.texture;
 			var r = s.textureRect;
-			var spritePixels = spriteTexture.GetPixels((int)r.x, (int)r.y, (int)r.width, (int)r.height); // TODO: Test
+			var spritePixels = spriteTexture.GetPixels((int)r.x, (int)r.y, (int)r.width, (int)r.height);
 			var newTexture = new Texture2D((int)r.width, (int)r.height);
 			newTexture.SetPixels(spritePixels);
 
@@ -363,8 +394,11 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 		/// <summary>
 		/// Returns a Rect of the AtlasRegion according to Spine texture coordinates. (x-right, y-down)</summary>
-		static Rect GetSpineAtlasRect (this AtlasRegion region) {
-			return new Rect(region.x, region.y, region.width, region.height);
+		static Rect GetSpineAtlasRect (this AtlasRegion region, bool includeRotate = true) {
+			if (includeRotate && region.rotate)
+				return new Rect(region.x, region.y, region.height, region.width);				
+			else
+				return new Rect(region.x, region.y, region.width, region.height);
 		}
 
 		/// <summary>
@@ -484,7 +518,9 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 			if (includeDefaultSkin)
 				defaultSkin.CopyTo(newSkin, true, cloneAttachments, cloneMeshesAsLinked);
-			activeSkin.CopyTo(newSkin, true, cloneAttachments, cloneMeshesAsLinked);
+
+			if (activeSkin != null)
+				activeSkin.CopyTo(newSkin, true, cloneAttachments, cloneMeshesAsLinked);
 
 			return newSkin;
 		}

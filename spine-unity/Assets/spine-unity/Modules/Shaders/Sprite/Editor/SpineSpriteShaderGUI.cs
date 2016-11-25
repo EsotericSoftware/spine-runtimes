@@ -267,7 +267,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 	protected virtual void RenderTextureProperties (string label, Material material) {
 		if (showAdvanced)
 			Heading(label);
-		
+
 		_materialEditor.TexturePropertySingleLine(new GUIContent(showAdvanced ? "Albedo" : "Main Texture"), _mainTexture, _color);
 
 		if (_bumpMap != null)
@@ -289,15 +289,6 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 
 		//		if (showAdvanced)
 		//			_materialEditor.TextureScaleOffsetProperty(_mainTexture);
-	}
-
-	protected virtual void RenderDepthProperties (string label, Material material) {
-
-
-	}
-
-	protected virtual void RenderNormalsProperties (string label, Material material) {
-
 	}
 
 	bool UseMeshNormalsCheckbox (Material material) {

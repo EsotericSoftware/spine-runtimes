@@ -78,6 +78,7 @@ namespace Spine.Unity.Editor {
 		GUIStyle activePlayButtonStyle, idlePlayButtonStyle;
 		readonly GUIContent DefaultMixLabel = new GUIContent("Default Mix Duration", "Sets 'SkeletonDataAsset.defaultMix' in the asset and 'AnimationState.data.defaultMix' at runtime load time.");
 
+
 		void OnEnable () {
 			SpineEditorUtilities.ConfirmInitialization();
 
@@ -122,9 +123,9 @@ namespace Spine.Unity.Editor {
 		}
 
 		override public void OnInspectorGUI () {
-			// Lazy initialization
 			{ 
-				// Accessing EditorStyles values in OnEnable during a recompile causes UnityEditor to throw null exceptions. (Unity 5.3.5)
+				
+				// Lazy initialization because accessing EditorStyles values in OnEnable during a recompile causes UnityEditor to throw null exceptions. (Unity 5.3.5)
 				idlePlayButtonStyle = idlePlayButtonStyle ?? new GUIStyle(EditorStyles.miniButton);
 				if (activePlayButtonStyle == null) {
 					activePlayButtonStyle = new GUIStyle(idlePlayButtonStyle);
@@ -135,26 +136,32 @@ namespace Spine.Unity.Editor {
 			serializedObject.Update();
 
 			EditorGUILayout.LabelField(new GUIContent(target.name + " (SkeletonDataAsset)", SpineEditorUtilities.Icons.spine), EditorStyles.whiteLargeLabel);
+			if (m_skeletonData != null) {
+				EditorGUILayout.LabelField("(Drag and Drop to instantiate.)", EditorStyles.miniLabel);
+			}
 
 			EditorGUI.BeginChangeCheck();
 
 			// SkeletonData
 			using (new SpineInspectorUtility.BoxScope()) {
-				EditorGUILayout.LabelField("SkeletonData", EditorStyles.boldLabel);
+				using (new EditorGUILayout.HorizontalScope()) {
+					EditorGUILayout.LabelField("SkeletonData", EditorStyles.boldLabel);
+//					if (m_skeletonData != null) {
+//						var sd = m_skeletonData;
+//						string m = string.Format("{8} - {0} {1}\nBones: {2}\tConstraints: {5} IK + {6} Path + {7} Transform\nSlots: {3}\t\tSkins: {4}\n",
+//							sd.Version, string.IsNullOrEmpty(sd.Version) ? "" : "export", sd.Bones.Count, sd.Slots.Count, sd.Skins.Count, sd.IkConstraints.Count, sd.PathConstraints.Count, sd.TransformConstraints.Count, skeletonJSON.objectReferenceValue.name);						
+//						EditorGUILayout.LabelField(new GUIContent("SkeletonData"), new GUIContent("+", m), EditorStyles.boldLabel);
+//					}
+				}
+
 				EditorGUILayout.PropertyField(skeletonJSON, new GUIContent(skeletonJSON.displayName, SpineEditorUtilities.Icons.spine));
 				EditorGUILayout.PropertyField(scale);
-
-//				if (m_skeletonData != null) {
-//					var sd = m_skeletonData;
-//					using (new GUILayout.HorizontalScope()) {
-//						GUILayout.Space(15f);
-//						GUILayout.Label(
-//							string.Format("{8} - {0} {1}\nBones: {2}\tConstraints: {5} IK + {6} Path + {7} Transform\nSlots: {3}\t\tSkins: {4}\n",
-//								sd.Version, string.IsNullOrEmpty(sd.Version) ? "" : "export", sd.Bones.Count, sd.Slots.Count, sd.Skins.Count, sd.IkConstraints.Count, sd.PathConstraints.Count, sd.TransformConstraints.Count, skeletonJSON.objectReferenceValue.name),
-//							SpineInspectorUtility.GrayMiniLabel);
-//					}
-//				}
 			}
+
+//			if (m_skeletonData != null) {
+//				if (SpineInspectorUtility.CenteredButton(new GUIContent("Instantiate", SpineEditorUtilities.Icons.spine, "Creates a new Spine GameObject in the active scene using this Skeleton Data.\nYou can also instantiate by dragging the SkeletonData asset from Project view into Scene View.")))
+//					SpineEditorUtilities.ShowInstantiateContextMenu(this.m_skeletonDataAsset, Vector3.zero);
+//			}
 
 			// Atlas
 			using (new SpineInspectorUtility.BoxScope()) {
@@ -186,7 +193,8 @@ namespace Spine.Unity.Editor {
 			// If m_skeletonAnimation is lazy-instantiated elsewhere, this can cause contents to change between Layout and Repaint events, causing GUILayout control count errors.
 			InitPreview();
 			if (m_skeletonData != null) {
-				
+				GUILayout.Space(20f);
+
 				using (new SpineInspectorUtility.BoxScope()) {
 					EditorGUILayout.LabelField("Mix Settings", EditorStyles.boldLabel);
 					DrawAnimationStateInfo();

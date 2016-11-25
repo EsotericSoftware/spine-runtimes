@@ -1,9 +1,30 @@
 fileFormatVersion: 2
 guid: 6bc52290ef03f2846ba38d67e2823598
-timeCreated: 1467205225
+timeCreated: 1479419653
 licenseType: Free
 TextureImporter:
-  fileIDToRecycleName: {}
+  fileIDToRecycleName:
+    21300000: L_rear_thigh
+    21300002: L_wing01
+    21300004: L_wing02
+    21300006: L_wing03
+    21300008: L_wing05
+    21300010: L_wing06
+    21300012: R_wing01
+    21300014: R_wing02
+    21300016: R_wing03
+    21300018: R_wing05
+    21300020: R_wing06
+    21300022: R_wing07
+    21300024: R_wing08
+    21300026: R_wing09
+    21300028: back
+    21300030: chest
+    21300032: front_toeA
+    21300034: head
+    21300036: logo
+    21300038: tail01
+    21300040: tail03
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -46,10 +67,285 @@ TextureImporter:
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spritePixelsToUnits: 100
   alphaIsTransparency: 0
+  spriteTessellationDetail: -1
   textureType: 5
   buildTargetSettings: []
   spriteSheet:
-    sprites: []
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: L_rear_thigh
+      rect:
+        serializedVersion: 2
+        x: 895
+        y: 856
+        width: 91
+        height: 148
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: L_wing01
+      rect:
+        serializedVersion: 2
+        x: 814
+        y: 96
+        width: 191
+        height: 256
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: L_wing02
+      rect:
+        serializedVersion: 2
+        x: 714
+        y: 566
+        width: 179
+        height: 269
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: L_wing03
+      rect:
+        serializedVersion: 2
+        x: 785
+        y: 354
+        width: 186
+        height: 207
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: L_wing05
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 797
+        width: 213
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: L_wing06
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 464
+        width: 192
+        height: 331
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: R_wing01
+      rect:
+        serializedVersion: 2
+        x: 502
+        y: 96
+        width: 310
+        height: 219
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: R_wing02
+      rect:
+        serializedVersion: 2
+        x: 204
+        y: 358
+        width: 305
+        height: 203
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: R_wing03
+      rect:
+        serializedVersion: 2
+        x: 511
+        y: 317
+        width: 272
+        height: 247
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: R_wing05
+      rect:
+        serializedVersion: 2
+        x: 196
+        y: 563
+        width: 251
+        height: 229
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: R_wing06
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 96
+        width: 200
+        height: 366
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: R_wing07
+      rect:
+        serializedVersion: 2
+        x: 449
+        y: 566
+        width: 263
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: R_wing08
+      rect:
+        serializedVersion: 2
+        x: 467
+        y: 768
+        width: 234
+        height: 254
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: R_wing09
+      rect:
+        serializedVersion: 2
+        x: 217
+        y: 794
+        width: 248
+        height: 204
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: back
+      rect:
+        serializedVersion: 2
+        x: 703
+        y: 837
+        width: 190
+        height: 185
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: chest
+      rect:
+        serializedVersion: 2
+        x: 895
+        y: 718
+        width: 122
+        height: 136
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: front_toeA
+      rect:
+        serializedVersion: 2
+        x: 976
+        y: 2
+        width: 29
+        height: 50
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: head
+      rect:
+        serializedVersion: 2
+        x: 204
+        y: 96
+        width: 296
+        height: 260
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: logo
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 2
+        width: 897
+        height: 92
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: tail01
+      rect:
+        serializedVersion: 2
+        x: 895
+        y: 563
+        width: 120
+        height: 153
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: tail03
+      rect:
+        serializedVersion: 2
+        x: 901
+        y: 2
+        width: 73
+        height: 92
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
     outline: []
   spritePackingTag: 
   userData: 

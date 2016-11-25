@@ -49,7 +49,7 @@ namespace Spine.Unity.Editor {
 		bool canCreateHingeChain = false;
 
 		Dictionary<Slot, List<BoundingBoxAttachment>> boundingBoxTable = new Dictionary<Slot, List<BoundingBoxAttachment>>();
-		string currentSkinName = "";
+		//string currentSkinName = "";
 
 		void OnEnable () {
 			mode = this.serializedObject.FindProperty("mode");
@@ -77,7 +77,7 @@ namespace Spine.Unity.Editor {
 			if (skeleton.Skin == null)
 				skin = skeleton.Data.DefaultSkin;
 
-			currentSkinName = skin.Name;
+			//currentSkinName = skin.Name;
 			for(int i = 0; i < slotCount; i++){
 				Slot slot = skeletonUtility.skeletonRenderer.skeleton.Slots.Items[i];
 				if (slot.Bone == utilityBone.bone) {

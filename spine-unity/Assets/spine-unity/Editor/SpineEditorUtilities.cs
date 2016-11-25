@@ -321,46 +321,49 @@ namespace Spine.Unity.Editor {
 							Plane plane = (rectTransform == null) ? new Plane(Vector3.back, Vector3.zero) : new Plane(-rectTransform.forward, rectTransform.position);
 							Vector3 spawnPoint = MousePointToWorldPoint2D(mousePos, sceneview.camera, plane);
 
-							var menu = new GenericMenu();
-							// SkeletonAnimation
-							menu.AddItem(new GUIContent("SkeletonAnimation"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
-								skeletonDataAsset = skeletonDataAsset,
-								spawnPoint = spawnPoint,
-								instantiateDelegate = (data) => InstantiateSkeletonAnimation(data),
-								isUI = false
-							});
-
-							// SkeletonGraphic
-							var skeletonGraphicInspectorType = System.Type.GetType("Spine.Unity.Editor.SkeletonGraphicInspector");
-							if (skeletonGraphicInspectorType != null) {
-								var graphicInstantiateDelegate = skeletonGraphicInspectorType.GetMethod("SpawnSkeletonGraphicFromDrop", BindingFlags.Static | BindingFlags.Public);
-								if (graphicInstantiateDelegate != null)
-									menu.AddItem(new GUIContent("SkeletonGraphic (UI)"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
-										skeletonDataAsset = skeletonDataAsset,
-										spawnPoint = spawnPoint,
-										instantiateDelegate = System.Delegate.CreateDelegate(typeof(InstantiateDelegate), graphicInstantiateDelegate) as InstantiateDelegate,
-										isUI = true
-									});
-							}
-
-
-							#if SPINE_SKELETONANIMATOR
-							menu.AddSeparator("");
-							// SkeletonAnimator
-							menu.AddItem(new GUIContent("SkeletonAnimator"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
-								skeletonDataAsset = skeletonDataAsset,
-								spawnPoint = spawnPoint,
-								instantiateDelegate = (data) => InstantiateSkeletonAnimator(data)
-							});
-							#endif
-
-							menu.ShowAsContext();
+							ShowInstantiateContextMenu(skeletonDataAsset, spawnPoint);
 						}
 					}
-
 				}
 			}
 
+		}
+
+		public static void ShowInstantiateContextMenu (SkeletonDataAsset skeletonDataAsset, Vector3 spawnPoint) {
+			var menu = new GenericMenu();
+
+			// SkeletonAnimation
+			menu.AddItem(new GUIContent("SkeletonAnimation"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
+				skeletonDataAsset = skeletonDataAsset,
+				spawnPoint = spawnPoint,
+				instantiateDelegate = (data) => InstantiateSkeletonAnimation(data),
+				isUI = false
+			});
+
+			// SkeletonGraphic
+			var skeletonGraphicInspectorType = System.Type.GetType("Spine.Unity.Editor.SkeletonGraphicInspector");
+			if (skeletonGraphicInspectorType != null) {
+				var graphicInstantiateDelegate = skeletonGraphicInspectorType.GetMethod("SpawnSkeletonGraphicFromDrop", BindingFlags.Static | BindingFlags.Public);
+				if (graphicInstantiateDelegate != null)
+					menu.AddItem(new GUIContent("SkeletonGraphic (UI)"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
+						skeletonDataAsset = skeletonDataAsset,
+						spawnPoint = spawnPoint,
+						instantiateDelegate = System.Delegate.CreateDelegate(typeof(InstantiateDelegate), graphicInstantiateDelegate) as InstantiateDelegate,
+						isUI = true
+					});
+			}
+
+			#if SPINE_SKELETONANIMATOR
+			menu.AddSeparator("");
+			// SkeletonAnimator
+			menu.AddItem(new GUIContent("SkeletonAnimator"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
+				skeletonDataAsset = skeletonDataAsset,
+				spawnPoint = spawnPoint,
+				instantiateDelegate = (data) => InstantiateSkeletonAnimator(data)
+			});
+			#endif
+
+			menu.ShowAsContext();
 		}
 
 		public static void HandleSkeletonComponentDrop (object menuData) {
@@ -379,7 +382,7 @@ namespace Spine.Unity.Editor {
 			var transform = newGameObject.transform;
 
 			var activeGameObject = Selection.activeGameObject;
-			if (activeGameObject != null)
+			if (isUI && activeGameObject != null)
 				transform.SetParent(activeGameObject.transform, false);
 
 			newGameObject.transform.position = isUI ? data.spawnPoint : RoundVector(data.spawnPoint, 2);

@@ -47,7 +47,6 @@ namespace Spine.Unity {
 				return null;
 			}
 
-			int slotIndex = skeleton.FindSlotIndex(slotName);
 			var attachment = skin.GetAttachment(skeleton.FindSlotIndex(slotName), attachmentName);
 			if (attachment == null) {
 				Debug.LogFormat("Attachment in slot '{0}' named '{1}' not found in skin '{2}'.", slotName, attachmentName, skin.name);

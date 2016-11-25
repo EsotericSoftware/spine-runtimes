@@ -29,36 +29,40 @@
  *****************************************************************************/
 
 using UnityEngine;
-using System.Collections;
 using Spine;
 using Spine.Unity;
 
-public class Goblins : MonoBehaviour {
-	private bool girlSkin;
-	private SkeletonAnimation skeletonAnimation;
-	private Bone headBone;
-	
-	public void Start () {
-		skeletonAnimation = GetComponent<SkeletonAnimation>();
-		headBone = skeletonAnimation.skeleton.FindBone("head");
-		skeletonAnimation.UpdateLocal += UpdateLocal;
-	}
+namespace Spine.Unity.Examples {
+	public class Goblins : MonoBehaviour {
+		SkeletonAnimation skeletonAnimation;
+		Bone headBone;
+		bool girlSkin;
 
-	// This is called after the animation is applied to the skeleton and can be used to adjust the bones dynamically.
-	public void UpdateLocal (ISkeletonAnimation skeletonRenderer) {
-		headBone.Rotation += 15;
-	}
-	
-	public void OnMouseDown () {
-		skeletonAnimation.skeleton.SetSkin(girlSkin ? "goblin" : "goblingirl");
-		skeletonAnimation.skeleton.SetSlotsToSetupPose();
+		[Range(-360, 360)]
+		public float extraRotation;
 		
-		girlSkin = !girlSkin;
+		public void Start () {
+			skeletonAnimation = GetComponent<SkeletonAnimation>();
+			headBone = skeletonAnimation.skeleton.FindBone("head");
+			skeletonAnimation.UpdateLocal += UpdateLocal;
+		}
+
+		// This is called after the animation is applied to the skeleton and can be used to adjust the bones dynamically.
+		public void UpdateLocal (ISkeletonAnimation skeletonRenderer) {
+			headBone.Rotation += extraRotation;
+		}
 		
-		if (girlSkin) {
-			skeletonAnimation.skeleton.SetAttachment("right hand item", null);
-			skeletonAnimation.skeleton.SetAttachment("left hand item", "spear");
-		} else
-			skeletonAnimation.skeleton.SetAttachment("left hand item", "dagger");
+		public void OnMouseDown () {
+			skeletonAnimation.skeleton.SetSkin(girlSkin ? "goblin" : "goblingirl");
+			skeletonAnimation.skeleton.SetSlotsToSetupPose();
+			
+			girlSkin = !girlSkin;
+			
+			if (girlSkin) {
+				skeletonAnimation.skeleton.SetAttachment("right hand item", null);
+				skeletonAnimation.skeleton.SetAttachment("left hand item", "spear");
+			} else
+				skeletonAnimation.skeleton.SetAttachment("left hand item", "dagger");
+		}
 	}
 }
