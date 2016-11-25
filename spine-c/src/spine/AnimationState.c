@@ -175,7 +175,8 @@ void _spEventQueue_drain (_spEventQueue* self) {
 }
 
 void _spAnimationState_disposeTrackEntry (spTrackEntry* entry) {
-    FREE(entry->timelinesFirst);
+	if (entry->mixingFrom) _spAnimationState_disposeTrackEntry(entry->mixingFrom);
+	FREE(entry->timelinesFirst);
 	FREE(entry->timelinesRotation);
 	FREE(entry);
 }
