@@ -112,7 +112,7 @@ void spSkeletonBounds_update (spSkeletonBounds* self, spSkeleton* skeleton, int/
 		self->boundingBoxes = MALLOC(spBoundingBoxAttachment*, skeleton->slotsCount);
 
 		newPolygons = CALLOC(spPolygon*, skeleton->slotsCount);
-		memcpy(newPolygons, self->polygons, internal->capacity);
+		memcpy(newPolygons, self->polygons, sizeof(spPolygon*) * internal->capacity);
 		FREE(self->polygons);
 		self->polygons = newPolygons;
 

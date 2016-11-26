@@ -116,8 +116,17 @@ function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 	var bounds = calculateBounds(skeleton);
 
 	// Create an AnimationState, and set the initial animation in looping mode.
-	var animationState = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
-	animationState.setAnimation(0, initialAnimation, true);
+	animationStateData = new spine.AnimationStateData(skeleton.data);
+	var animationState = new spine.AnimationState(animationStateData);
+	if (name == "spineboy") {
+		animationStateData.setMix("walk", "jump", 0.4)		
+		animationStateData.setMix("jump", "run", 0.4);
+		animationState.setAnimation(0, "walk", true);
+		var jumpEntry = animationState.addAnimation(0, "jump", false, 3);
+		animationState.addAnimation(0, "run", true, 0);
+	} else {
+		animationState.setAnimation(0, initialAnimation, true);
+	}
 	animationState.addListener({
 		start: function(track) {
 			console.log("Animation on track " + track.trackIndex + " started");

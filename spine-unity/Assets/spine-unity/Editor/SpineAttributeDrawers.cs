@@ -322,17 +322,21 @@ namespace Spine.Unity.Editor {
 
 	[CustomPropertyDrawer(typeof(SpineAtlasRegion))]
 	public class SpineAtlasRegionDrawer : PropertyDrawer {
-		Component component;
 		SerializedProperty atlasProp;
+
+		protected SpineAtlasRegion TargetAttribute { get { return (SpineAtlasRegion)attribute; } }
 
 		public override void OnGUI (Rect position, SerializedProperty property, GUIContent label) {
 			if (property.propertyType != SerializedPropertyType.String) {
 				EditorGUI.LabelField(position, "ERROR:", "May only apply to type string");
 				return;
 			}
+				
+			string atlasAssetFieldName = TargetAttribute.atlasAssetField;
+			if (string.IsNullOrEmpty(atlasAssetFieldName))
+				atlasAssetFieldName = "atlasAsset";
 
-			component = (Component)property.serializedObject.targetObject;
-			atlasProp = component != null ? property.serializedObject.FindProperty("atlasAsset") : null;
+			atlasProp = property.serializedObject.FindProperty(atlasAssetFieldName);
 
 			if (atlasProp == null) {
 				EditorGUI.LabelField(position, "ERROR:", "Must have AtlasAsset variable!");

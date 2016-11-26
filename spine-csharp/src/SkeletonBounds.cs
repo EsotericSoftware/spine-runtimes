@@ -82,7 +82,7 @@ namespace Spine {
 			}
 
 			if (updateAabb) {
-				aabbCompute();
+				AabbCompute();
 			} else {
 				minX = int.MinValue;
 				minY = int.MinValue;
@@ -91,7 +91,7 @@ namespace Spine {
 			}
 		}
 
-		private void aabbCompute () {
+		private void AabbCompute () {
 			float minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
 			ExposedList<Polygon> polygons = Polygons;
 			for (int i = 0, n = polygons.Count; i < n; i++) {
@@ -204,7 +204,7 @@ namespace Spine {
 			return false;
 		}
 
-		public Polygon getPolygon (BoundingBoxAttachment attachment) {
+		public Polygon GetPolygon (BoundingBoxAttachment attachment) {
 			int index = BoundingBoxes.IndexOf(attachment);
 			return index == -1 ? null : Polygons.Items[index];
 		}

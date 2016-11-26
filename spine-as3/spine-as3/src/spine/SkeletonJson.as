@@ -727,7 +727,7 @@ public class SkeletonJson {
 
 import spine.attachments.MeshAttachment;
 
-internal class LinkedMesh {
+class LinkedMesh {
 	internal var parent:String, skin:String;
 	internal var slotIndex:int;
 	internal var mesh:MeshAttachment;

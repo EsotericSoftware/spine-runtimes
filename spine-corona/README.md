@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-corona works with data exported from Spine 3.4.02.
+spine-corona works with data exported from Spine 3.5.xx.
 
 spine-corona supports all Spine features.
 

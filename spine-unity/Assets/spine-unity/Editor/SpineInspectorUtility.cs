@@ -169,6 +169,21 @@ namespace Spine.Unity.Editor {
 				return GUILayout.Button(content, GUILayout.MaxWidth(CenterButtonMaxWidth), GUILayout.Height(CenterButtonHeight));
 			}
 		}
+
+		public static bool CenteredButton (GUIContent content, float height = 20f, bool sideSpace = true) {
+			if (sideSpace) {
+				bool clicked;
+				using (new EditorGUILayout.HorizontalScope()) {
+					EditorGUILayout.Space();
+					clicked = GUILayout.Button(content, GUILayout.MaxWidth(CenterButtonMaxWidth), GUILayout.Height(height));
+					EditorGUILayout.Space();
+				}
+				EditorGUILayout.Space();
+				return clicked;
+			} else {
+				return GUILayout.Button(content, GUILayout.MaxWidth(CenterButtonMaxWidth), GUILayout.Height(height));
+			}
+		}
 		#endregion
 
 		#region Multi-Editing Helpers

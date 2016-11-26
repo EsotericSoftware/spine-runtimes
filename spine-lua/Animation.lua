@@ -581,7 +581,7 @@ function Animation.AttachmentTimeline.new (frameCount)
 	end
 	
 	function self:getPropertyId ()
-		return Timeline.attachment * SHL_24 + self.slotIndex
+		return TimelineType.attachment * SHL_24 + self.slotIndex
 	end
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut)
@@ -592,7 +592,7 @@ function Animation.AttachmentTimeline.new (frameCount)
 			if not attachmentName then
 				slot:setAttachment(nil)
 			else
-				skeleton:setAttachment(skeleton:getAttachmentByIndex(self.slotIndex, attachmentName))
+				slot:setAttachment(skeleton:getAttachmentByIndex(self.slotIndex, attachmentName))
 			end
 			return;
 		end
@@ -604,7 +604,7 @@ function Animation.AttachmentTimeline.new (frameCount)
 				if not attachmentName then
 					slot:setAttachment(nil)
 				else
-					skeleton:setAttachment(skeleton:getAttachmentByIndex(self.slotIndex, attachmentName))
+					slot:setAttachment(skeleton:getAttachmentByIndex(self.slotIndex, attachmentName))
 				end
 			end
 			return
@@ -619,9 +619,9 @@ function Animation.AttachmentTimeline.new (frameCount)
 
 		attachmentName = self.attachmentNames[frameIndex]
 		if not attachmentName then
-			skeleton.slots[self.slotIndex]:setAttachment(nil)
+			slot:setAttachment(nil)
 		else
-			skeleton.slots[self.slotIndex]:setAttachment(skeleton:getAttachmentByIndex(self.slotIndex, attachmentName))
+			slot:setAttachment(skeleton:getAttachmentByIndex(self.slotIndex, attachmentName))
 		end
 	end
 
@@ -767,7 +767,7 @@ function Animation.EventTimeline.new (frameCount)
 	}
 	
 	function self:getPropertyId ()
-		return Timeline.event * SHL_24
+		return TimelineType.event * SHL_24
 	end
 
 	function self:getFrameCount ()
@@ -824,7 +824,7 @@ function Animation.DrawOrderTimeline.new (frameCount)
 	}
 	
 	function self:getPropertyId ()
-		return Timeline.drawOrder * SHL_24
+		return TimelineType.drawOrder * SHL_24
 	end
 
 	function self:getFrameCount ()

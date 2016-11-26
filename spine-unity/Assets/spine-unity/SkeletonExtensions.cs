@@ -174,13 +174,13 @@ namespace Spine.Unity {
 				va.ComputeWorldVertices(slot, floats);
 
 				Bone sb = slot.bone;
-				float bwx = sb.worldX, bwy = sb.worldY, ia, ib, ic, id;
+				float ia, ib, ic, id, bwx = sb.worldX, bwy = sb.worldY;
 				sb.GetWorldToLocalMatrix(out ia, out ib, out ic, out id);
 
 				for (int i = 0; i < bufferTargetSize; i++) {
 					int j = i * 2;
 					float x = floats[j] - bwx, y = floats[j+1] - bwy;
-					buffer[i] = new Vector2(x * ia + y * ic, x * ib + y * id);
+					buffer[i] = new Vector2(x * ia + y * ib, x * ic + y * id);
 				}
 			}
 

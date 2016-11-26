@@ -35,8 +35,6 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using Spine.Unity;
-using UnityEngine.Assertions;
 
 namespace Spine.Unity.Modules {
 	[RequireComponent(typeof(SkeletonRenderer))]
@@ -255,6 +253,7 @@ namespace Spine.Unity.Modules {
 			float startTime = Time.time;
 			float startMix = mix;
 			while (mix > 0) {
+				skeleton.SetBonesToSetupPose();
 				mix = Mathf.SmoothStep(startMix, target, (Time.time - startTime) / duration);
 				yield return null;
 			}

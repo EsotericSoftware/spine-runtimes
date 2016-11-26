@@ -1,13 +1,17 @@
 fileFormatVersion: 2
 guid: ddb89f63d0296cf4f8572b0448bb6b30
-timeCreated: 1467205225
+timeCreated: 1480096533
 licenseType: Free
 TextureImporter:
-  fileIDToRecycleName: {}
+  fileIDToRecycleName:
+    21300000: Equipment/shield1
+    21300002: Equipment/shield2
+    21300004: Equipment/sword1
+    21300006: Equipment/sword4
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
-    enableMipMap: 0
+    enableMipMap: 1
     linearTexture: 0
     correctGamma: 0
     fadeOut: 0
@@ -46,10 +50,64 @@ TextureImporter:
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spritePixelsToUnits: 100
   alphaIsTransparency: 0
-  textureType: 5
+  spriteTessellationDetail: -1
+  textureType: 0
   buildTargetSettings: []
   spriteSheet:
-    sprites: []
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Equipment/shield1
+      rect:
+        serializedVersion: 2
+        x: 220
+        y: 24
+        width: 118
+        height: 71
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Equipment/shield2
+      rect:
+        serializedVersion: 2
+        x: 340
+        y: 24
+        width: 111
+        height: 82
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Equipment/sword1
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 95
+        width: 161
+        height: 31
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Equipment/sword4
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 24
+        width: 216
+        height: 69
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
     outline: []
   spritePackingTag: 
   userData: 

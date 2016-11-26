@@ -138,6 +138,9 @@ void spAnimationState_clearListenerNotifications(spAnimationState* self);
 
 float spTrackEntry_getAnimationTime (spTrackEntry* entry);
 
+/** Use this to dispose static memory before your app exits to appease your memory leak detector*/
+void spAnimationState_disposeStatics ();
+
 #ifdef SPINE_SHORT_NAMES
 typedef spEventType EventType;
 #define ANIMATION_START SP_ANIMATION_START

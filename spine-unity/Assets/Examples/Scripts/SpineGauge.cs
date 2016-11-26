@@ -29,46 +29,47 @@
  *****************************************************************************/
 
 using UnityEngine;
-using System.Collections;
 using Spine.Unity;
 
-[ExecuteInEditMode]
-[RequireComponent(typeof(SkeletonRenderer))]
-public class SpineGauge : MonoBehaviour {
+namespace Spine.Unity.Examples {
+	[ExecuteInEditMode]
+	[RequireComponent(typeof(SkeletonRenderer))]
+	public class SpineGauge : MonoBehaviour {
 
-	#region Inspector
-	[Range(0,1)]
-	public float fillPercent = 0;
+		#region Inspector
+		[Range(0,1)]
+		public float fillPercent = 0;
 
-	[SpineAnimation]
-	public string fillAnimationName;
-	#endregion
+		[SpineAnimation]
+		public string fillAnimationName;
+		#endregion
 
-	SkeletonRenderer skeletonRenderer;
-	Spine.Animation fillAnimation;
+		SkeletonRenderer skeletonRenderer;
+		Spine.Animation fillAnimation;
 
-	void Awake () {
-		skeletonRenderer = GetComponent<SkeletonRenderer>();
-
-	}
-
-	void Update () {
-		SetGaugePercent(fillPercent);
-	}
-
-	public void SetGaugePercent (float x) {
-		if (skeletonRenderer == null) return;
-		var skeleton = skeletonRenderer.skeleton; if (skeleton == null) return;
-
-		// Make super-sure that fillAnimation isn't null. Early exit if it is.
-		if (fillAnimation == null) {
-			fillAnimation = skeleton.Data.FindAnimation(fillAnimationName);
-			if (fillAnimation == null) return;
+		void Awake () {
+			skeletonRenderer = GetComponent<SkeletonRenderer>();
 		}
-			
-		fillAnimation.Apply(skeleton, 0, x, false, null, 1f, true, false);
 
-		skeleton.Update(Time.deltaTime);
-		skeleton.UpdateWorldTransform();
+		void Update () {
+			SetGaugePercent(fillPercent);
+		}
+
+		public void SetGaugePercent (float percent) {
+			if (skeletonRenderer == null) return;
+			var skeleton = skeletonRenderer.skeleton; if (skeleton == null) return;
+
+			// Make super-sure that fillAnimation isn't null.
+			if (fillAnimation == null) {
+				fillAnimation = skeleton.Data.FindAnimation(fillAnimationName);
+				if (fillAnimation == null) return;
+			}
+
+			fillAnimation.Apply(skeleton, 0, percent, false, null, 1f, true, false);
+
+			skeleton.Update(Time.deltaTime);
+			skeleton.UpdateWorldTransform();
+		}
 	}
+
 }

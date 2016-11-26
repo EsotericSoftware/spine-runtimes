@@ -227,10 +227,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 			state.setEmptyAnimation(track, 0);
 			entry = state.addAnimation(track, ui.animationList.getSelected(), ui.loopCheckbox.isChecked(), 0);
 			entry.setMixDuration(ui.mixSlider.getValue());
-			entry.setTrackEnd(Integer.MAX_VALUE);
 		} else {
 			entry = state.setAnimation(track, ui.animationList.getSelected(), ui.loopCheckbox.isChecked());
-			entry.setTrackEnd(Integer.MAX_VALUE);
 		}
 		entry.setAlpha(ui.alphaSlider.getValue());
 	}
@@ -597,7 +595,10 @@ public class SkeletonViewer extends ApplicationAdapter {
 					int track = trackButtons.getCheckedIndex();
 					if (track > 0) {
 						TrackEntry current = state.getCurrent(track);
-						if (current != null) current.setAlpha(alphaSlider.getValue());
+						if (current != null) {
+							current.setAlpha(alphaSlider.getValue());
+							current.resetRotationDirections();
+						}
 					}
 				}
 			});
@@ -702,6 +703,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 		}
 
 		void render () {
+			if (state.getCurrent(ui.trackButtons.getCheckedIndex()) == null) {
+				ui.animationList.getSelection().setProgrammaticChangeEvents(false);
+				ui.animationList.setSelected(null);
+				ui.animationList.getSelection().setProgrammaticChangeEvents(true);
+			}
+
 			statusLabel.pack();
 			if (minimizeButton.isChecked())
 				statusLabel.setPosition(10, 25, Align.bottom | Align.left);

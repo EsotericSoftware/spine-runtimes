@@ -1,0 +1,41 @@
+
+stretchyman-diffuse-pma.png
+size: 390,454
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+back arm
+  rotate: false
+  xy: 244, 29
+  size: 72, 202
+  orig: 72, 202
+  offset: 0, 0
+  index: -1
+back leg
+  rotate: false
+  xy: 143, 135
+  size: 100, 318
+  orig: 100, 318
+  offset: 0, 0
+  index: -1
+body
+  rotate: false
+  xy: 1, 1
+  size: 141, 452
+  orig: 141, 452
+  offset: 0, 0
+  index: -1
+front arm
+  rotate: false
+  xy: 244, 232
+  size: 145, 221
+  orig: 145, 221
+  offset: 0, 0
+  index: -1
+head
+  rotate: false
+  xy: 143, 32
+  size: 87, 102
+  orig: 87, 102
+  offset: 0, 0
+  index: -1

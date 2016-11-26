@@ -63,9 +63,7 @@ namespace Spine.Unity {
 		Transform cachedTransform;
 		Transform skeletonTransform;
 		bool incompatibleTransformMode;
-		public bool IncompatibleTransformMode {
-			get { return incompatibleTransformMode; }
-		}
+		public bool IncompatibleTransformMode { get { return incompatibleTransformMode; } }
 
 		public void Reset () {
 			bone = null;
@@ -132,7 +130,7 @@ namespace Spine.Unity {
 				}
 
 				if (scale) {
-					cachedTransform.localScale = new Vector3(bone.scaleX, bone.scaleY, 1f);//, bone.WorldSignX);
+					cachedTransform.localScale = new Vector3(bone.scaleX, bone.scaleY, 1f);
 					incompatibleTransformMode = BoneTransformModeIncompatible(bone);
 				}
 			} else if (mode == Mode.Override) {
@@ -193,7 +191,7 @@ namespace Spine.Unity {
 		}
 
 		public void AddBoundingBox (string skinName, string slotName, string attachmentName) {
-			SkeletonUtility.AddBoundingBox(bone.skeleton, skinName, slotName, attachmentName, transform);
+			SkeletonUtility.AddBoundingBoxGameObject(bone.skeleton, skinName, slotName, attachmentName, transform);
 		}
 
 		#if UNITY_EDITOR

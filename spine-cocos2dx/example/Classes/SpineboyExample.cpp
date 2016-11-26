@@ -64,11 +64,11 @@ bool SpineboyExample::init () {
 		log("%d event: %s, %d, %f, %s", entry->trackIndex, event->data->name, event->intValue, event->floatValue, event->stringValue);
 	});
 
-	skeletonNode->setMix("walk", "jump", 0.2f);
-	skeletonNode->setMix("jump", "run", 0.2f);
+	skeletonNode->setMix("walk", "jump", 0.4);
+	skeletonNode->setMix("jump", "run", 0.4);
 	skeletonNode->setAnimation(0, "walk", true);
-	spTrackEntry* jumpEntry = skeletonNode->addAnimation(0, "jump", false, 3);
-	skeletonNode->addAnimation(0, "run", true);
+	spTrackEntry* jumpEntry = skeletonNode->addAnimation(0, "jump", false, 1);
+	skeletonNode->addAnimation(0, "run", true);    
 
 	skeletonNode->setTrackStartListener(jumpEntry, [] (spTrackEntry* entry) {
 		log("jumped!");

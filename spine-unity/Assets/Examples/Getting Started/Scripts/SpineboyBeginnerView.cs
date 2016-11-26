@@ -32,113 +32,115 @@ using UnityEngine;
 using System.Collections;
 using Spine.Unity;
 
-public class SpineboyBeginnerView : MonoBehaviour {
-	
-	#region Inspector
-	[Header("Components")]
-	public SpineboyBeginnerModel model;
-	public SkeletonAnimation skeletonAnimation;
-	//public ParticleSystem gunParticles;
+namespace Spine.Unity.Examples {
+	public class SpineboyBeginnerView : MonoBehaviour {
 
-	[SpineAnimation] public string run, idle, shoot, jump;
-	[SpineEvent] public string footstepEventName;
+		#region Inspector
+		[Header("Components")]
+		public SpineboyBeginnerModel model;
+		public SkeletonAnimation skeletonAnimation;
 
-	[Header("Audio")]
-	public float footstepPitchOffset = 0.2f;
-	public float gunsoundPitchOffset = 0.13f;
-	public AudioSource footstepSource, gunSource, jumpSource;
+		[SpineAnimation] public string run, idle, shoot, jump;
+		[SpineEvent] public string footstepEventName;
 
-	[Header("Effects")]
-	public ParticleSystem gunParticles;
-	#endregion
+		[Header("Audio")]
+		public float footstepPitchOffset = 0.2f;
+		public float gunsoundPitchOffset = 0.13f;
+		public AudioSource footstepSource, gunSource, jumpSource;
 
-	SpineBeginnerBodyState previousViewState;
+		[Header("Effects")]
+		public ParticleSystem gunParticles;
+		#endregion
 
-	void Start () {
-		if (skeletonAnimation == null) return;
-		model.ShootEvent += PlayShoot;
-		skeletonAnimation.state.Event += HandleEvent;
-	}
+		SpineBeginnerBodyState previousViewState;
 
-	void HandleEvent (Spine.TrackEntry trackEntry, Spine.Event e) {
-		if (e.Data.Name == footstepEventName)
-			PlayFootstepSound();
-	}
-
-	void Update () {
-		if (skeletonAnimation == null) return;
-		if (model == null) return;
-
-		if (skeletonAnimation.skeleton.FlipX != model.facingLeft) {	// Detect changes in model.facingLeft
-			Turn(model.facingLeft);
+		void Start () {
+			if (skeletonAnimation == null) return;
+			model.ShootEvent += PlayShoot;
+			skeletonAnimation.state.Event += HandleEvent;
 		}
 
-		// Detect changes in model.state
-		var currentModelState = model.state;
-
-		if (previousViewState != currentModelState) {
-			PlayNewStableAnimation();
-		}
-		
-		previousViewState = currentModelState;
-	}
-
-	void PlayNewStableAnimation () {
-		var newModelState = model.state;
-		string nextAnimation;
-
-		// Add conditionals to not interrupt transient animations.
-
-		if (previousViewState == SpineBeginnerBodyState.Jumping && newModelState != SpineBeginnerBodyState.Jumping) {
-			PlayFootstepSound();
+		void HandleEvent (Spine.TrackEntry trackEntry, Spine.Event e) {
+			if (e.Data.Name == footstepEventName)
+				PlayFootstepSound();
 		}
 
-		if (newModelState == SpineBeginnerBodyState.Jumping) {
-			jumpSource.Play();
-			nextAnimation = jump;
-		} else {
-			if (newModelState == SpineBeginnerBodyState.Running) {
-				nextAnimation = run;
-			} else {
-				nextAnimation = idle;
+		void Update () {
+			if (skeletonAnimation == null) return;
+			if (model == null) return;
+
+			if (skeletonAnimation.skeleton.FlipX != model.facingLeft) {	// Detect changes in model.facingLeft
+				Turn(model.facingLeft);
 			}
+
+			// Detect changes in model.state
+			var currentModelState = model.state;
+
+			if (previousViewState != currentModelState) {
+				PlayNewStableAnimation();
+			}
+
+			previousViewState = currentModelState;
 		}
 
-		skeletonAnimation.state.SetAnimation(0, nextAnimation, true);
+		void PlayNewStableAnimation () {
+			var newModelState = model.state;
+			string nextAnimation;
+
+			// Add conditionals to not interrupt transient animations.
+
+			if (previousViewState == SpineBeginnerBodyState.Jumping && newModelState != SpineBeginnerBodyState.Jumping) {
+				PlayFootstepSound();
+			}
+
+			if (newModelState == SpineBeginnerBodyState.Jumping) {
+				jumpSource.Play();
+				nextAnimation = jump;
+			} else {
+				if (newModelState == SpineBeginnerBodyState.Running) {
+					nextAnimation = run;
+				} else {
+					nextAnimation = idle;
+				}
+			}
+
+			skeletonAnimation.state.SetAnimation(0, nextAnimation, true);
+		}
+
+		void PlayFootstepSound () {
+			footstepSource.Play();
+			footstepSource.pitch = GetRandomPitch(footstepPitchOffset);
+		}
+
+		[ContextMenu("Check Tracks")]
+		void CheckTracks () {
+			var state = skeletonAnimation.state;
+			Debug.Log(state.GetCurrent(0));
+			Debug.Log(state.GetCurrent(1));
+		}
+
+		#region Transient Actions
+		public void PlayShoot () {
+			// Play the shoot animation on track 1.
+			skeletonAnimation.state.SetAnimation(1, shoot, false);
+			//skeletonAnimation.state.AddEmptyAnimation(1, 0.1f, 0f);
+			gunSource.pitch = GetRandomPitch(gunsoundPitchOffset);
+			gunSource.Play();
+			gunParticles.randomSeed = (uint)Random.Range(0, 100);
+			gunParticles.Play();
+		}
+
+		public void Turn (bool facingLeft) {
+			skeletonAnimation.skeleton.FlipX = facingLeft;
+			// Maybe play a transient turning animation too, then call ChangeStableAnimation.
+		}
+		#endregion
+
+		#region Utility
+		public float GetRandomPitch (float maxPitchOffset) {
+			return 1f + Random.Range(-maxPitchOffset, maxPitchOffset);
+		}
+		#endregion
 	}
 
-	void PlayFootstepSound () {
-		footstepSource.Play();
-		footstepSource.pitch = GetRandomPitch(footstepPitchOffset);
-	}
-
-	[ContextMenu("Check Tracks")]
-	void CheckTracks () {
-		var state = skeletonAnimation.state;
-		Debug.Log(state.GetCurrent(0));
-		Debug.Log(state.GetCurrent(1));
-	}
-
-	#region Transient Actions
-	public void PlayShoot () {
-		// Play the shoot animation on track 1.
-		skeletonAnimation.state.SetAnimation(1, shoot, false);
-		//skeletonAnimation.state.AddEmptyAnimation(1, 0.1f, 0f);
-		gunSource.pitch = GetRandomPitch(gunsoundPitchOffset);
-		gunSource.Play();
-		gunParticles.randomSeed = (uint)Random.Range(0, 100);
-		gunParticles.Play();
-	}
-
-	public void Turn (bool facingLeft) {
-		skeletonAnimation.skeleton.FlipX = facingLeft;
-		// Maybe play a transient turning animation too, then call ChangeStableAnimation.
-	}
-	#endregion
-
-	#region Utility
-	public float GetRandomPitch (float maxPitchOffset) {
-		return 1f + Random.Range(-maxPitchOffset, maxPitchOffset);
-	}
-	#endregion
 }

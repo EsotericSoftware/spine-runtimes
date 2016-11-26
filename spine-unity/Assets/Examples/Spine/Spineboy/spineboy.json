@@ -1,6 +1,6 @@
 {
 "skeleton": {
-	"hash": "ndYeXIOZqYovffwEsZjYOgxtFY4",
+	"hash": "sAurbGCBbk1JIYDQi3XnwA9wCnA",
 	"spine": "3.5.03-beta",
 	"width": 470.7,
 	"height": 731.57,
@@ -1162,7 +1162,11 @@
 			},
 			"front_foot": {
 				"rotate": [
-					{ "time": 0, "angle": 5.13, "curve": "stepped" },
+					{
+						"time": 0,
+						"angle": 8.87,
+						"curve": [ 0.315, 0.02, 0.648, 0.39 ]
+					},
 					{
 						"time": 0.8999,
 						"angle": 5.13,
@@ -3144,6 +3148,28 @@
 					},
 					{ "time": 1.1333, "x": -34.51, "y": 2.49 },
 					{ "time": 1.3333, "x": -34.51, "y": -78.62 }
+				]
+			}
+		}
+	},
+	"lastframehidehead": {
+		"slots": {
+			"eye": {
+				"attachment": [
+					{ "time": 0, "name": "eye_indifferent" },
+					{ "time": 2, "name": null }
+				]
+			},
+			"goggles": {
+				"attachment": [
+					{ "time": 0, "name": "goggles" },
+					{ "time": 2, "name": null }
+				]
+			},
+			"head": {
+				"attachment": [
+					{ "time": 0, "name": "head" },
+					{ "time": 2, "name": null }
 				]
 			}
 		}

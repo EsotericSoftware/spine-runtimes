@@ -61,7 +61,15 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 		print(entry.trackIndex.." event: "..entry.animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'")
 	end
 	
-	animationState:setAnimationByName(0, animation, true)
+  if atlasFile == "spineboy.atlas" then
+    animationStateData:setMix("walk", "jump", 0.4)		
+		animationStateData:setMix("jump", "run", 0.4);
+		animationState:setAnimationByName(0, "walk", true)
+		local jumpEntry = animationState:addAnimationByName(0, "jump", false, 3)
+		animationState:addAnimationByName(0, "run", true, 0)
+  else
+    animationState:setAnimationByName(0, animation, true)
+  end
 
 	-- return the skeleton an animation state
 	return { skeleton = skeleton, state = animationState }

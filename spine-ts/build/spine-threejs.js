@@ -983,10 +983,8 @@ var spine;
 						}
 						continue;
 					}
-					this.updateMixingFrom(current, delta, true);
 				}
 				else {
-					this.updateMixingFrom(current, delta, true);
 					if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
 						tracks[i] = null;
 						this.queue.end(current);
@@ -994,30 +992,25 @@ var spine;
 						continue;
 					}
 				}
+				this.updateMixingFrom(current, delta);
 				current.trackTime += currentDelta;
 			}
 			this.queue.drain();
 		};
-		AnimationState.prototype.updateMixingFrom = function (entry, delta, canEnd) {
+		AnimationState.prototype.updateMixingFrom = function (entry, delta) {
 			var from = entry.mixingFrom;
 			if (from == null)
 				return;
-			if (canEnd && entry.mixTime >= entry.mixDuration && entry.mixTime > 0) {
+			this.updateMixingFrom(from, delta);
+			if (entry.mixTime >= entry.mixDuration && from.mixingFrom != null && entry.mixTime > 0) {
+				entry.mixingFrom = null;
 				this.queue.end(from);
-				var newFrom = from.mixingFrom;
-				entry.mixingFrom = newFrom;
-				if (newFrom == null)
-					return;
-				entry.mixTime = from.mixTime;
-				entry.mixDuration = from.mixDuration;
-				from = newFrom;
+				return;
 			}
 			from.animationLast = from.nextAnimationLast;
 			from.trackLast = from.nextTrackLast;
-			var mixingFromDelta = delta * from.timeScale;
-			from.trackTime += mixingFromDelta;
-			entry.mixTime += mixingFromDelta;
-			this.updateMixingFrom(from, delta, canEnd && from.alpha == 1);
+			from.trackTime += delta * from.timeScale;
+			entry.mixTime += delta * from.timeScale;
 		};
 		AnimationState.prototype.apply = function (skeleton) {
 			if (skeleton == null)
@@ -1033,6 +1026,8 @@ var spine;
 				var mix = current.alpha;
 				if (current.mixingFrom != null)
 					mix *= this.applyMixingFrom(current, skeleton);
+				else if (current.trackTime >= current.trackEnd)
+					mix = 0;
 				var animationLast = current.animationLast, animationTime = current.getAnimationTime();
 				var timelineCount = current.animation.timelines.length;
 				var timelines = current.animation.timelines;
@@ -1244,11 +1239,11 @@ var spine;
 			var current = this.expandToIndex(trackIndex);
 			if (current != null) {
 				if (current.nextTrackLast == -1) {
-					this.tracks[trackIndex] = null;
+					this.tracks[trackIndex] = current.mixingFrom;
 					this.queue.interrupt(current);
 					this.queue.end(current);
 					this.disposeNext(current);
-					current = null;
+					current = current.mixingFrom;
 				}
 				else
 					this.disposeNext(current);

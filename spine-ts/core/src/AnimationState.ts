@@ -80,10 +80,8 @@ module spine {
 							next = next.mixingFrom;
 						}
 						continue;
-					}
-					this.updateMixingFrom(current, delta, true);
-				} else {
-					this.updateMixingFrom(current, delta, true);
+					}					
+				} else {					
 					// Clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom.
 					if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
 						tracks[i] = null;
@@ -92,6 +90,7 @@ module spine {
 						continue;
 					}
 				}
+				this.updateMixingFrom(current, delta);
 
 				current.trackTime += currentDelta;
 			}
@@ -99,27 +98,22 @@ module spine {
 			this.queue.drain();
 		}
 
-		updateMixingFrom (entry: TrackEntry, delta: number, canEnd: boolean) {
+		updateMixingFrom (entry: TrackEntry, delta: number) {
 			let from = entry.mixingFrom;
 			if (from == null) return;
 
-			if (canEnd && entry.mixTime >= entry.mixDuration && entry.mixTime > 0) {
+			this.updateMixingFrom(from, delta);
+
+			if (entry.mixTime >= entry.mixDuration && from.mixingFrom != null && entry.mixTime > 0) {
+				entry.mixingFrom = null;
 				this.queue.end(from);
-				let newFrom = from.mixingFrom;
-				entry.mixingFrom = newFrom;
-				if (newFrom == null) return;
-				entry.mixTime = from.mixTime;
-				entry.mixDuration = from.mixDuration;
-				from = newFrom;
+				return;
 			}
 
 			from.animationLast = from.nextAnimationLast;
-			from.trackLast = from.nextTrackLast;
-			let mixingFromDelta = delta * from.timeScale;
-			from.trackTime += mixingFromDelta;
-			entry.mixTime += mixingFromDelta;
-
-			this.updateMixingFrom(from, delta, canEnd && from.alpha == 1);
+			from.trackLast = from.nextTrackLast;			
+			from.trackTime += delta * from.timeScale;
+			entry.mixTime += delta * from.timeScale;			
 		}
 
 		apply (skeleton: Skeleton) {
@@ -135,7 +129,10 @@ module spine {
 
 				// Apply mixing from entries first.
 				let mix = current.alpha;
-				if (current.mixingFrom != null) mix *= this.applyMixingFrom(current, skeleton);
+				if (current.mixingFrom != null) 
+					mix *= this.applyMixingFrom(current, skeleton);
+				else if (current.trackTime >= current.trackEnd)
+					mix = 0;
 
 				// Apply current entry.
 				let animationLast = current.animationLast, animationTime = current.getAnimationTime();
@@ -369,11 +366,11 @@ module spine {
 			if (current != null) {
 				if (current.nextTrackLast == -1) {
 					// Don't mix from an entry that was never applied.
-					this.tracks[trackIndex] = null;
+					this.tracks[trackIndex] = current.mixingFrom;
 					this.queue.interrupt(current);
 					this.queue.end(current);
 					this.disposeNext(current);
-					current = null;
+					current = current.mixingFrom;
 				} else
 					this.disposeNext(current);
 			}

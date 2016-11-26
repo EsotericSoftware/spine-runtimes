@@ -32,54 +32,54 @@ using UnityEngine;
 using System.Collections;
 using Spine.Unity;
 
-public class Raptor : MonoBehaviour {
+namespace Spine.Unity.Examples {
+	public class Raptor : MonoBehaviour {
 
-	#region Inspector
-	[SpineAnimation]
-	public string walk = "walk";
+		#region Inspector
+		[SpineAnimation]
+		public string walk = "walk";
 
-	[SpineAnimation]
-	public string gungrab = "gungrab";
+		[SpineAnimation]
+		public string gungrab = "gungrab";
 
-	[SpineAnimation]
-	public string gunkeep = "gunkeep";
+		[SpineAnimation]
+		public string gunkeep = "gunkeep";
 
-	[SpineEvent]
-	public string footstepEvent = "footstep";
+		[SpineEvent]
+		public string footstepEvent = "footstep";
 
-	public AudioSource footstepAudioSource;
-	#endregion
+		public AudioSource footstepAudioSource;
+		#endregion
 
-	SkeletonAnimation skeletonAnimation;
+		SkeletonAnimation skeletonAnimation;
 
-	void Start () {
-		skeletonAnimation = GetComponent<SkeletonAnimation>();
-		skeletonAnimation.state.Event += HandleEvent;
-		StartCoroutine(GunGrabRoutine());
-	}
-
-	void HandleEvent (Spine.TrackEntry trackEntry, Spine.Event e) {
-		if (e.Data.Name == footstepEvent) {
-			footstepAudioSource.pitch = 0.5f + Random.Range(-0.2f, 0.2f);
-			footstepAudioSource.Play();
-		}
-	}
-
-	IEnumerator GunGrabRoutine () {		
-		// Play the walk animation on track 0.
-		skeletonAnimation.state.SetAnimation(0, walk, true);
-
-		// Repeatedly play the gungrab and gunkeep animation on track 1.
-		while (true) {
-			
-			yield return new WaitForSeconds(Random.Range(0.5f, 3f));
-			skeletonAnimation.state.SetAnimation(1, gungrab, false);
-
-			yield return new WaitForSeconds(Random.Range(0.5f, 3f));
-			skeletonAnimation.state.SetAnimation(1, gunkeep, false);
-
+		void Start () {
+			skeletonAnimation = GetComponent<SkeletonAnimation>();
+			skeletonAnimation.state.Event += HandleEvent;
+			StartCoroutine(GunGrabRoutine());
 		}
 
-	}
+		void HandleEvent (Spine.TrackEntry trackEntry, Spine.Event e) {
+			if (e.Data.Name == footstepEvent) {
+				footstepAudioSource.pitch = 0.5f + Random.Range(-0.2f, 0.2f);
+				footstepAudioSource.Play();
+			}
+		}
 
+		IEnumerator GunGrabRoutine () {		
+			// Play the walk animation on track 0.
+			skeletonAnimation.state.SetAnimation(0, walk, true);
+
+			// Repeatedly play the gungrab and gunkeep animation on track 1.
+			while (true) {
+				yield return new WaitForSeconds(Random.Range(0.5f, 3f));
+				skeletonAnimation.state.SetAnimation(1, gungrab, false);
+
+				yield return new WaitForSeconds(Random.Range(0.5f, 3f));
+				skeletonAnimation.state.SetAnimation(1, gunkeep, false);
+			}
+
+		}
+
+	}
 }

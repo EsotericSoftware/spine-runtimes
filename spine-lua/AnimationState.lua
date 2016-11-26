@@ -232,26 +232,22 @@ function AnimationState:update (delta)
 			end
 			
 			if not skip then
-				local next = current.next
-				if next then
+				local _next = current.next
+				if _next then
 					-- When the next entry's delay is passed, change to the next entry, preserving leftover time.
-					local nextTime = current.trackLast - next.delay
+					local nextTime = current.trackLast - _next.delay
 					if nextTime >= 0 then
-						next.delay = 0
-						next.trackTime = nextTime + delta * next.timeScale
+						_next.delay = 0
+						_next.trackTime = nextTime + delta * _next.timeScale
 						current.trackTime = current.trackTime + currentDelta
-						self:setCurrent(i, next)
-						while next.mixingFrom do
-							next.mixTime = next.mixTime + currentDelta
-							next = next.mixingFrom
+						self:setCurrent(i, _next)
+						while _next.mixingFrom do
+							_next.mixTime = _next.mixTime + currentDelta
+							_next = _next.mixingFrom
 						end
 						skip = true
 					end
-					if not skip then
-						self:updateMixingFrom(current, delta, true);
-					end
 				else
-					self:updateMixingFrom(current, delta, true)
 					-- Clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom.
 					if current.trackLast >= current.trackEnd and current.mixingFrom == nil then
 						tracks[i] = nil
@@ -261,7 +257,10 @@ function AnimationState:update (delta)
 					end
 				end
 
-				if not skip then current.trackTime = current.trackTime + currentDelta end
+				if not skip then 
+ 					self:updateMixingFrom(current, delta)
+          current.trackTime = current.trackTime + currentDelta
+        end
 			end
 		end
 	end
@@ -269,28 +268,23 @@ function AnimationState:update (delta)
 	queue:drain()
 end
 
-function AnimationState:updateMixingFrom (entry, delta, canEnd)
+function AnimationState:updateMixingFrom (entry, delta)
 	local from = entry.mixingFrom
 	if from == nil then return end
 
+ 	self:updateMixingFrom(from, delta)
+
 	local queue = self.queue
-	if canEnd and entry.mixTime >= entry.mixDuration and entry.mixTime > 0 then
+	if entry.mixTime >= entry.mixDuration and from.mixingFrom == nil and entry.mixTime > 0 then
+ 		entry.mixingFrom = null
 		queue:_end(from)
-		local newFrom = from.mixingFrom
-		entry.mixingFrom = newFrom
-		if newFrom == nil then return end
-		entry.mixTime = from.mixTime;
-		entry.mixDuration = from.mixDuration;
-		from = newFrom;
+    return
 	end
 
 	from.animationLast = from.nextAnimationLast
 	from.trackLast = from.nextTrackLast
-	local mixingFromDelta = delta * from.timeScale
-	from.trackTime = from.trackTime + mixingFromDelta;
-	entry.mixTime = entry.mixTime + mixingFromDelta;
-
-	self:updateMixingFrom(from, delta, canEnd and from.alpha == 1)
+	from.trackTime = from.trackTime + delta * from.timeScale;
+	entry.mixTime = entry.mixTime + delta * entry.timeScale;
 end
 
 function AnimationState:apply (skeleton)
@@ -305,7 +299,11 @@ function AnimationState:apply (skeleton)
 		if not (current == nil or current.delay > 0) then
 			-- Apply mixing from entries first.
 			local mix = current.alpha
-			if current.mixingFrom then mix = mix * self:applyMixingFrom(current, skeleton) end
+			if current.mixingFrom then 
+        mix = mix * self:applyMixingFrom(current, skeleton)
+      elseif current.trackTime >= current.trackEnd then
+        mix = 0
+      end
 
 			-- Apply current entry.
 			local animationLast = current.animationLast
@@ -563,11 +561,11 @@ function AnimationState:setAnimation (trackIndex, animation, loop)
   if current then
     if current.nextTrackLast == -1 then
       -- Don't mix from an entry that was never applied.
-      tracks[trackIndex] = nil
+      tracks[trackIndex] = current.mixingFrom
       queue:interrupt(current)
       queue:_end(current)
       self:disposeNext(current)
-      current = nil
+      current = current.mixingFrom
     else
       self:disposeNext(current)
     end
@@ -708,9 +706,9 @@ function AnimationState:_animationsChanged ()
   end
 
   -- Set timelinesFirst for all entries, from lowest track to highest.
-  local i = 1
-  local n = highest
-  while i <= n do
+  local i = 0
+  local n = highest + 1
+  while i < n do
     local entry = tracks[i]
     if entry then
       self:setTimelinesFirst(entry);
@@ -719,7 +717,7 @@ function AnimationState:_animationsChanged ()
     end
     i = i + 1
   end
-  while i <= n do
+  while i < n do
     local entry = tracks[i]
     if entry then self:checkTimelinesFirst(entry) end
     i = i + 1
@@ -756,6 +754,7 @@ function AnimationState:checkTimelinesUsage (entry, usageArray)
   local n = #entry.animation.timelines
   local timelines = entry.animation.timelines
   local usage = usageArray
+	local i = 1
   while i <= n do
     local id = "" .. timelines[i]:getPropertyId()
     local contained = propertyIDs[id] == id
