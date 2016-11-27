@@ -164,7 +164,8 @@ public class Animation {
 		attachment, color, deform, //
 		event, drawOrder, //
 		ikConstraint, transformConstraint, //
-		pathConstraintPosition, pathConstraintSpacing, pathConstraintMix
+		pathConstraintPosition, pathConstraintSpacing, pathConstraintMix, //
+		twoColor
 	}
 
 	/** The base class for timelines that use interpolation between key frame values. */
@@ -617,6 +618,119 @@ public class Animation {
 				Color color = slot.color;
 				if (setupPose) color.set(slot.data.color);
 				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
+			}
+		}
+	}
+
+	/** Changes a slot's {@link Slot#getColor()} and {@link Slot#getDarkColor()} for two color tinting. */
+	static public class TwoColorTimeline extends CurveTimeline {
+		static public final int ENTRIES = 9;
+		static private final int PREV_TIME = -9, PREV_R = -8, PREV_G = -7, PREV_B = -6, PREV_A = -5;
+		static private final int PREV_R2 = -4, PREV_G2 = -3, PREV_B2 = -2, PREV_A2 = -1;
+		static private final int R = 1, G = 2, B = 3, A = 4, R2 = 5, G2 = 6, B2 = 7, A2 = 8;
+
+		int slotIndex;
+		private final float[] frames; // time, r, g, b, a, r2, g2, b2, a2, ...
+
+		public TwoColorTimeline (int frameCount) {
+			super(frameCount);
+			frames = new float[frameCount * ENTRIES];
+		}
+
+		public int getPropertyId () {
+			return (TimelineType.color.ordinal() << 24) + slotIndex;
+		}
+
+		public void setSlotIndex (int index) {
+			if (index < 0) throw new IllegalArgumentException("index must be >= 0.");
+			this.slotIndex = index;
+		}
+
+		/** The index of the slot in {@link Skeleton#getSlots()} that will be changed. */
+		public int getSlotIndex () {
+			return slotIndex;
+		}
+
+		/** The time in seconds, red, green, blue, and alpha values for each key frame. */
+		public float[] getFrames () {
+			return frames;
+		}
+
+		/** Sets the time in seconds, light, and dark colors for the specified key frame. */
+		public void setFrame (int frameIndex, float time, float r, float g, float b, float a, float r2, float g2, float b2,
+			float a2) {
+			frameIndex *= ENTRIES;
+			frames[frameIndex] = time;
+			frames[frameIndex + R] = r;
+			frames[frameIndex + G] = g;
+			frames[frameIndex + B] = b;
+			frames[frameIndex + A] = a;
+			frames[frameIndex + R2] = r2;
+			frames[frameIndex + G2] = g2;
+			frames[frameIndex + B2] = b2;
+			frames[frameIndex + A2] = a2;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
+			boolean mixingOut) {
+
+			Slot slot = skeleton.slots.get(slotIndex);
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				if (setupPose) {
+					slot.color.set(slot.data.color);
+					slot.darkColor.set(slot.data.darkColor);
+				}
+				return;
+			}
+
+			float r, g, b, a, r2, g2, b2, a2;
+			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
+				int i = frames.length;
+				r = frames[i + PREV_R];
+				g = frames[i + PREV_G];
+				b = frames[i + PREV_B];
+				a = frames[i + PREV_A];
+				r2 = frames[i + PREV_R2];
+				g2 = frames[i + PREV_G2];
+				b2 = frames[i + PREV_B2];
+				a2 = frames[i + PREV_A2];
+			} else {
+				// Interpolate between the previous frame and the current frame.
+				int frame = binarySearch(frames, time, ENTRIES);
+				r = frames[frame + PREV_R];
+				g = frames[frame + PREV_G];
+				b = frames[frame + PREV_B];
+				a = frames[frame + PREV_A];
+				r2 = frames[frame + PREV_R2];
+				g2 = frames[frame + PREV_G2];
+				b2 = frames[frame + PREV_B2];
+				a2 = frames[frame + PREV_A2];
+				float frameTime = frames[frame];
+				float percent = getCurvePercent(frame / ENTRIES - 1,
+					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+
+				r += (frames[frame + R] - r) * percent;
+				g += (frames[frame + G] - g) * percent;
+				b += (frames[frame + B] - b) * percent;
+				a += (frames[frame + A] - a) * percent;
+				r2 += (frames[frame + R2] - r2) * percent;
+				g2 += (frames[frame + G2] - g2) * percent;
+				b2 += (frames[frame + B2] - b2) * percent;
+				a2 += (frames[frame + A2] - a2) * percent;
+			}
+			if (alpha == 1) {
+				slot.color.set(r, g, b, a);
+				slot.darkColor.set(r2, g2, b2, a2);
+			} else {
+				Color light = slot.color;
+				Color dark = slot.darkColor;
+				if (setupPose) {
+					light.set(slot.data.color);
+					dark.set(slot.data.darkColor);
+				}
+				light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
+				dark.add((r2 - dark.r) * alpha, (g2 - dark.g) * alpha, (b2 - dark.b) * alpha, (a2 - dark.a) * alpha);
 			}
 		}
 	}

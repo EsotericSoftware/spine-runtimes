@@ -38,6 +38,7 @@ public class SlotData {
 	final String name;
 	final BoneData boneData;
 	final Color color = new Color(1, 1, 1, 1);
+	Color darkColor;
 	String attachmentName;
 	BlendMode blendMode;
 
@@ -65,9 +66,19 @@ public class SlotData {
 		return boneData;
 	}
 
-	/** The color used to tint the slot's attachment. */
+	/** The color used to tint the slot's attachment. If {@link #getDarkColor()} is set, this is used as the light color for two
+	 * color tinting. */
 	public Color getColor () {
 		return color;
+	}
+
+	/** The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. */
+	public Color getDarkColor () {
+		return darkColor;
+	}
+
+	public void setDarkColor (Color darkColor) {
+		this.darkColor = darkColor;
 	}
 
 	/** @param attachmentName May be null. */
