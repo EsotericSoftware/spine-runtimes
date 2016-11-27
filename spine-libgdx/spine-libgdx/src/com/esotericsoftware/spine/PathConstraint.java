@@ -211,14 +211,14 @@ public class PathConstraint implements Constraint {
 				} else if (p < 0) {
 					if (prevCurve != BEFORE) {
 						prevCurve = BEFORE;
-						path.computeWorldVertices(target, 2, 4, world, 0);
+						path.computeWorldVertices(target, 2, 4, world, 0, 2);
 					}
 					addBeforePosition(p, world, 0, out, o);
 					continue;
 				} else if (p > pathLength) {
 					if (prevCurve != AFTER) {
 						prevCurve = AFTER;
-						path.computeWorldVertices(target, verticesLength - 6, 4, world, 0);
+						path.computeWorldVertices(target, verticesLength - 6, 4, world, 0, 2);
 					}
 					addAfterPosition(p - pathLength, world, 0, out, o);
 					continue;
@@ -239,10 +239,10 @@ public class PathConstraint implements Constraint {
 				if (curve != prevCurve) {
 					prevCurve = curve;
 					if (closed && curve == curveCount) {
-						path.computeWorldVertices(target, verticesLength - 4, 4, world, 0);
-						path.computeWorldVertices(target, 0, 4, world, 4);
+						path.computeWorldVertices(target, verticesLength - 4, 4, world, 0, 2);
+						path.computeWorldVertices(target, 0, 4, world, 4, 2);
 					} else
-						path.computeWorldVertices(target, curve * 6 + 2, 8, world, 0);
+						path.computeWorldVertices(target, curve * 6 + 2, 8, world, 0, 2);
 				}
 				addCurvePosition(p, world[0], world[1], world[2], world[3], world[4], world[5], world[6], world[7], out, o,
 					tangents || (i > 0 && space == 0));
@@ -254,15 +254,15 @@ public class PathConstraint implements Constraint {
 		if (closed) {
 			verticesLength += 2;
 			world = this.world.setSize(verticesLength);
-			path.computeWorldVertices(target, 2, verticesLength - 4, world, 0);
-			path.computeWorldVertices(target, 0, 2, world, verticesLength - 4);
+			path.computeWorldVertices(target, 2, verticesLength - 4, world, 0, 2);
+			path.computeWorldVertices(target, 0, 2, world, verticesLength - 4, 2);
 			world[verticesLength - 2] = world[0];
 			world[verticesLength - 1] = world[1];
 		} else {
 			curveCount--;
 			verticesLength -= 4;
 			world = this.world.setSize(verticesLength);
-			path.computeWorldVertices(target, 2, verticesLength, world, 0);
+			path.computeWorldVertices(target, 2, verticesLength, world, 0, 2);
 		}
 
 		// Curve lengths.

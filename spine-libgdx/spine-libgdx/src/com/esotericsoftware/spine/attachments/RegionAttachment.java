@@ -30,15 +30,11 @@
 
 package com.esotericsoftware.spine.attachments;
 
-import static com.badlogic.gdx.graphics.g2d.Batch.*;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.NumberUtils;
 import com.esotericsoftware.spine.Bone;
-import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.Slot;
 
 /** An attachment that displays a textured quadrilateral.
@@ -57,7 +53,7 @@ public class RegionAttachment extends Attachment {
 	private TextureRegion region;
 	private String path;
 	private float x, y, scaleX = 1, scaleY = 1, rotation, width, height;
-	private final float[] vertices = new float[20];
+	private final float[] uvs = new float[8];
 	private final float[] offset = new float[8];
 	private final Color color = new Color(1, 1, 1, 1);
 
@@ -120,25 +116,25 @@ public class RegionAttachment extends Attachment {
 	public void setRegion (TextureRegion region) {
 		if (region == null) throw new IllegalArgumentException("region cannot be null.");
 		this.region = region;
-		float[] vertices = this.vertices;
+		float[] uvs = this.uvs;
 		if (region instanceof AtlasRegion && ((AtlasRegion)region).rotate) {
-			vertices[U3] = region.getU();
-			vertices[V3] = region.getV2();
-			vertices[U4] = region.getU();
-			vertices[V4] = region.getV();
-			vertices[U1] = region.getU2();
-			vertices[V1] = region.getV();
-			vertices[U2] = region.getU2();
-			vertices[V2] = region.getV2();
+			uvs[4] = region.getU();
+			uvs[5] = region.getV2();
+			uvs[6] = region.getU();
+			uvs[7] = region.getV();
+			uvs[0] = region.getU2();
+			uvs[1] = region.getV();
+			uvs[2] = region.getU2();
+			uvs[3] = region.getV2();
 		} else {
-			vertices[U2] = region.getU();
-			vertices[V2] = region.getV2();
-			vertices[U3] = region.getU();
-			vertices[V3] = region.getV();
-			vertices[U4] = region.getU2();
-			vertices[V4] = region.getV();
-			vertices[U1] = region.getU2();
-			vertices[V1] = region.getV2();
+			uvs[2] = region.getU();
+			uvs[3] = region.getV2();
+			uvs[4] = region.getU();
+			uvs[5] = region.getV();
+			uvs[6] = region.getU2();
+			uvs[7] = region.getV();
+			uvs[0] = region.getU2();
+			uvs[1] = region.getV2();
 		}
 	}
 
@@ -147,55 +143,42 @@ public class RegionAttachment extends Attachment {
 		return region;
 	}
 
-	/** @return The updated world vertices. */
-	public float[] updateWorldVertices (Slot slot, boolean premultipliedAlpha) {
-		Skeleton skeleton = slot.getSkeleton();
-		Color skeletonColor = skeleton.getColor();
-		Color slotColor = slot.getColor();
-		Color regionColor = color;
-		float alpha = skeletonColor.a * slotColor.a * regionColor.a * 255;
-		float multiplier = premultipliedAlpha ? alpha : 255;
-		float color = NumberUtils.intToFloatColor( //
-			((int)alpha << 24) //
-				| ((int)(skeletonColor.b * slotColor.b * regionColor.b * multiplier) << 16) //
-				| ((int)(skeletonColor.g * slotColor.g * regionColor.g * multiplier) << 8) //
-				| (int)(skeletonColor.r * slotColor.r * regionColor.r * multiplier));
-
-		float[] vertices = this.vertices;
-		float[] offset = this.offset;
+	/** Transforms the attachment's four vertices to world coordinates.
+	 * <p>
+	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
+	 * Runtimes Guide.
+	 * @param worldVertices The output world vertices. Must have a length >= <code>offset</code> + 8.
+	 * @param offset The <code>worldVertices</code> index to begin writing values.
+	 * @param stride The number of <code>worldVertices</code> entries between the value pairs written. */
+	public void computeWorldVertices (Slot slot, float[] worldVertices, int offset, int stride) {
+		float[] vertexOffset = this.offset;
 		Bone bone = slot.getBone();
 		float x = bone.getWorldX(), y = bone.getWorldY();
 		float a = bone.getA(), b = bone.getB(), c = bone.getC(), d = bone.getD();
 		float offsetX, offsetY;
 
-		offsetX = offset[BRX];
-		offsetY = offset[BRY];
-		vertices[X1] = offsetX * a + offsetY * b + x; // br
-		vertices[Y1] = offsetX * c + offsetY * d + y;
-		vertices[C1] = color;
+		offsetX = vertexOffset[BRX];
+		offsetY = vertexOffset[BRY];
+		worldVertices[offset] = offsetX * a + offsetY * b + x; // br
+		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+		offset += stride;
 
-		offsetX = offset[BLX];
-		offsetY = offset[BLY];
-		vertices[X2] = offsetX * a + offsetY * b + x; // bl
-		vertices[Y2] = offsetX * c + offsetY * d + y;
-		vertices[C2] = color;
+		offsetX = vertexOffset[BLX];
+		offsetY = vertexOffset[BLY];
+		worldVertices[offset] = offsetX * a + offsetY * b + x; // bl
+		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+		offset += stride;
 
-		offsetX = offset[ULX];
-		offsetY = offset[ULY];
-		vertices[X3] = offsetX * a + offsetY * b + x; // ul
-		vertices[Y3] = offsetX * c + offsetY * d + y;
-		vertices[C3] = color;
+		offsetX = vertexOffset[ULX];
+		offsetY = vertexOffset[ULY];
+		worldVertices[offset] = offsetX * a + offsetY * b + x; // ul
+		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+		offset += stride;
 
-		offsetX = offset[URX];
-		offsetY = offset[URY];
-		vertices[X4] = offsetX * a + offsetY * b + x; // ur
-		vertices[Y4] = offsetX * c + offsetY * d + y;
-		vertices[C4] = color;
-		return vertices;
-	}
-
-	public float[] getWorldVertices () {
-		return vertices;
+		offsetX = vertexOffset[URX];
+		offsetY = vertexOffset[URY];
+		worldVertices[offset] = offsetX * a + offsetY * b + x; // ur
+		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 	}
 
 	/** For each of the 4 vertices, a pair of <code>x,y</code> values that is the local position of the vertex.
@@ -203,6 +186,10 @@ public class RegionAttachment extends Attachment {
 	 * See {@link #updateOffset()}. */
 	public float[] getOffset () {
 		return offset;
+	}
+
+	public float[] getUVs () {
+		return uvs;
 	}
 
 	/** The local x translation. */

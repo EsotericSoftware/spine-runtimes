@@ -33,6 +33,7 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.esotericsoftware.spine.Skin.Key;
 import com.esotericsoftware.spine.attachments.Attachment;
@@ -565,22 +566,30 @@ public class Skeleton {
 
 	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
 	 * @param offset An output value, the distance from the skeleton origin to the bottom left corner of the AABB.
-	 * @param size An output value, the width and height of the AABB. */
-	public void getBounds (Vector2 offset, Vector2 size) {
+	 * @param size An output value, the width and height of the AABB.
+	 * @param temp Working memory. */
+	public void getBounds (Vector2 offset, Vector2 size, FloatArray temp) {
 		if (offset == null) throw new IllegalArgumentException("offset cannot be null.");
 		if (size == null) throw new IllegalArgumentException("size cannot be null.");
 		Array<Slot> drawOrder = this.drawOrder;
 		float minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
+			int verticesLength = 0;
 			float[] vertices = null;
 			Attachment attachment = slot.attachment;
-			if (attachment instanceof RegionAttachment)
-				vertices = ((RegionAttachment)attachment).updateWorldVertices(slot, false);
-			else if (attachment instanceof MeshAttachment) //
-				vertices = ((MeshAttachment)attachment).updateWorldVertices(slot, true);
+			if (attachment instanceof RegionAttachment) {
+				verticesLength = 8;
+				vertices = temp.setSize(8);
+				((RegionAttachment)attachment).computeWorldVertices(slot, vertices, 0, 2);
+			} else if (attachment instanceof MeshAttachment) {
+				MeshAttachment mesh = (MeshAttachment)attachment;
+				verticesLength = mesh.getWorldVerticesLength();
+				vertices = temp.setSize(verticesLength);
+				mesh.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
+			}
 			if (vertices != null) {
-				for (int ii = 0, nn = vertices.length; ii < nn; ii += 5) {
+				for (int ii = 0; ii < verticesLength; ii += 2) {
 					float x = vertices[ii], y = vertices[ii + 1];
 					minX = Math.min(minX, x);
 					minY = Math.min(minY, y);

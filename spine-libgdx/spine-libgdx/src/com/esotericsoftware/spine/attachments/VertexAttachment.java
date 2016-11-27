@@ -46,14 +46,6 @@ public class VertexAttachment extends Attachment {
 		super(name);
 	}
 
-	/** Transforms the attachment's local {@link #getVertices()} to world coordinates, using 0 for <code>start</code> and
-	 * <code>offset</code>.
-	 * <p>
-	 * See {@link #computeWorldVertices(Slot, int, int, float[], int)}. */
-	public void computeWorldVertices (Slot slot, float[] worldVertices) {
-		computeWorldVertices(slot, 0, worldVerticesLength, worldVertices, 0);
-	}
-
 	/** Transforms the attachment's local {@link #getVertices()} to world coordinates. If the slot has
 	 * {@link Slot#getAttachmentVertices()}, they are used to deform the vertices.
 	 * <p>
@@ -62,9 +54,10 @@ public class VertexAttachment extends Attachment {
 	 * @param start The index of the first {@link #getVertices()} value to transform. Each vertex has 2 values, x and y.
 	 * @param count The number of world vertex values to output. Must be <= {@link #getWorldVerticesLength()} - <code>start</code>.
 	 * @param worldVertices The output world vertices. Must have a length >= <code>offset</code> + <code>count</code>.
-	 * @param offset The <code>worldVertices</code> index to begin writing values. */
-	public void computeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset) {
-		count += offset;
+	 * @param offset The <code>worldVertices</code> index to begin writing values.
+	 * @param stride The number of <code>worldVertices</code> entries between the value pairs written. */
+	public void computeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset, int stride) {
+		count = offset + (count >> 1) * stride;
 		Skeleton skeleton = slot.getSkeleton();
 		FloatArray deformArray = slot.getAttachmentVertices();
 		float[] vertices = this.vertices;
@@ -74,7 +67,7 @@ public class VertexAttachment extends Attachment {
 			Bone bone = slot.getBone();
 			float x = bone.getWorldX(), y = bone.getWorldY();
 			float a = bone.getA(), b = bone.getB(), c = bone.getC(), d = bone.getD();
-			for (int v = start, w = offset; w < count; v += 2, w += 2) {
+			for (int v = start, w = offset; w < count; v += 2, w += stride) {
 				float vx = vertices[v], vy = vertices[v + 1];
 				worldVertices[w] = vx * a + vy * b + x;
 				worldVertices[w + 1] = vx * c + vy * d + y;
@@ -89,7 +82,7 @@ public class VertexAttachment extends Attachment {
 		}
 		Object[] skeletonBones = skeleton.getBones().items;
 		if (deformArray.size == 0) {
-			for (int w = offset, b = skip * 3; w < count; w += 2) {
+			for (int w = offset, b = skip * 3; w < count; w += stride) {
 				float wx = 0, wy = 0;
 				int n = bones[v++];
 				n += v;
@@ -104,7 +97,7 @@ public class VertexAttachment extends Attachment {
 			}
 		} else {
 			float[] deform = deformArray.items;
-			for (int w = offset, b = skip * 3, f = skip << 1; w < count; w += 2) {
+			for (int w = offset, b = skip * 3, f = skip << 1; w < count; w += stride) {
 				float wx = 0, wy = 0;
 				int n = bones[v++];
 				n += v;
@@ -150,7 +143,7 @@ public class VertexAttachment extends Attachment {
 	}
 
 	/** The maximum length required of the <code>worldVertices</code> passed to
-	 * {@link #computeWorldVertices(Slot, int, int, float[], int)}. */
+	 * {@link #computeWorldVertices(Slot, int, int, float[], int, int)}. */
 	public int getWorldVerticesLength () {
 		return worldVerticesLength;
 	}

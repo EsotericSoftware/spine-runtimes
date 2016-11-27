@@ -115,7 +115,7 @@ public class Slot {
 	/** Vertices to deform the slot's attachment. For an unweighted mesh, the entries are local positions for each vertex. For a
 	 * weighted mesh, the entries are an offset for each vertex which will be added to the mesh's local vertex positions.
 	 * <p>
-	 * See {@link VertexAttachment#computeWorldVertices(Slot, int, int, float[], int)} and {@link DeformTimeline}. */
+	 * See {@link VertexAttachment#computeWorldVertices(Slot, int, int, float[], int, int)} and {@link DeformTimeline}. */
 	public FloatArray getAttachmentVertices () {
 		return attachmentVertices;
 	}

@@ -30,9 +30,12 @@
 
 package com.esotericsoftware.spine;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.NumberUtils;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.SkeletonAttachment;
@@ -41,29 +44,41 @@ import com.esotericsoftware.spine.attachments.MeshAttachment;
 public class SkeletonMeshRenderer extends SkeletonRenderer<PolygonSpriteBatch> {
 	static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
 
+	private final FloatArray vertices = new FloatArray(32);
+
 	@SuppressWarnings("null")
 	public void draw (PolygonSpriteBatch batch, Skeleton skeleton) {
 		boolean premultipliedAlpha = this.premultipliedAlpha;
 		BlendMode blendMode = null;
 
-		float[] vertices = null;
+		int verticesLength = 0;
+		float[] vertices = null, uvs = null;
 		short[] triangles = null;
+		Texture texture = null;
+		Color color = null, skeletonColor = skeleton.color;
 		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
 			Attachment attachment = slot.attachment;
-			Texture texture = null;
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment region = (RegionAttachment)attachment;
-				vertices = region.updateWorldVertices(slot, premultipliedAlpha);
+				verticesLength = 20;
+				vertices = this.vertices.items;
+				region.computeWorldVertices(slot, vertices, 0, 5);
 				triangles = quadTriangles;
 				texture = region.getRegion().getTexture();
+				uvs = region.getUVs();
+				color = region.getColor();
 
 			} else if (attachment instanceof MeshAttachment) {
 				MeshAttachment mesh = (MeshAttachment)attachment;
-				vertices = mesh.updateWorldVertices(slot, premultipliedAlpha);
+				verticesLength = (mesh.getWorldVerticesLength() >> 1) * 5;
+				vertices = this.vertices.setSize(verticesLength);
+				mesh.computeWorldVertices(slot, 0, mesh.getWorldVerticesLength(), vertices, 0, 5);
 				triangles = mesh.getTriangles();
 				texture = mesh.getRegion().getTexture();
+				uvs = mesh.getUVs();
+				color = mesh.getColor();
 
 			} else if (attachment instanceof SkeletonAttachment) {
 				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
@@ -76,7 +91,7 @@ public class SkeletonMeshRenderer extends SkeletonRenderer<PolygonSpriteBatch> {
 				attachmentSkeleton.setPosition(bone.getWorldX(), bone.getWorldY());
 				// rootBone.setScaleX(1 + bone.getWorldScaleX() - oldScaleX);
 				// rootBone.setScaleY(1 + bone.getWorldScaleY() - oldScaleY);
-				// Set shear.
+				// Also set shear.
 				rootBone.setRotation(oldRotation + bone.getWorldRotationX());
 				attachmentSkeleton.updateWorldTransform();
 
@@ -89,6 +104,18 @@ public class SkeletonMeshRenderer extends SkeletonRenderer<PolygonSpriteBatch> {
 			}
 
 			if (texture != null) {
+				Color slotColor = slot.getColor();
+				float alpha = skeletonColor.a * slotColor.a * color.a * 255;
+				float c = NumberUtils.intToFloatColor(((int)alpha << 24) //
+					| ((int)(skeletonColor.b * slotColor.b * color.b * alpha) << 16) //
+					| ((int)(skeletonColor.g * slotColor.g * color.g * alpha) << 8) //
+					| (int)(skeletonColor.r * slotColor.r * color.r * alpha));
+				for (int v = 2, u = 0; v < verticesLength; v += 5, u += 2) {
+					vertices[v] = c;
+					vertices[v + 1] = uvs[u];
+					vertices[v + 2] = uvs[u + 1];
+				}
+
 				BlendMode slotBlendMode = slot.data.getBlendMode();
 				if (slotBlendMode != blendMode) {
 					blendMode = slotBlendMode;

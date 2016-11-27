@@ -30,8 +30,6 @@
 
 package com.esotericsoftware.spine;
 
-import static com.badlogic.gdx.graphics.g2d.Batch.*;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -56,7 +54,7 @@ public class SkeletonRendererDebug {
 	private boolean drawBones = true, drawRegionAttachments = true, drawBoundingBoxes = true;
 	private boolean drawMeshHull = true, drawMeshTriangles = true, drawPaths = true;
 	private final SkeletonBounds bounds = new SkeletonBounds();
-	private final FloatArray temp = new FloatArray();
+	private final FloatArray vertices = new FloatArray(32);
 	private float scale = 1;
 	private float boneWidth = 2;
 	private boolean premultipliedAlpha;
@@ -106,12 +104,13 @@ public class SkeletonRendererDebug {
 				Slot slot = slots.get(i);
 				Attachment attachment = slot.attachment;
 				if (attachment instanceof RegionAttachment) {
-					RegionAttachment regionAttachment = (RegionAttachment)attachment;
-					float[] vertices = regionAttachment.updateWorldVertices(slot, false);
-					shapes.line(vertices[X1], vertices[Y1], vertices[X2], vertices[Y2]);
-					shapes.line(vertices[X2], vertices[Y2], vertices[X3], vertices[Y3]);
-					shapes.line(vertices[X3], vertices[Y3], vertices[X4], vertices[Y4]);
-					shapes.line(vertices[X4], vertices[Y4], vertices[X1], vertices[Y1]);
+					RegionAttachment region = (RegionAttachment)attachment;
+					float[] vertices = this.vertices.items;
+					region.computeWorldVertices(slot, vertices, 0, 2);
+					shapes.line(vertices[0], vertices[1], vertices[2], vertices[3]);
+					shapes.line(vertices[2], vertices[3], vertices[4], vertices[5]);
+					shapes.line(vertices[4], vertices[5], vertices[6], vertices[7]);
+					shapes.line(vertices[6], vertices[7], vertices[0], vertices[1]);
 				}
 			}
 		}
@@ -123,14 +122,14 @@ public class SkeletonRendererDebug {
 				Attachment attachment = slot.attachment;
 				if (!(attachment instanceof MeshAttachment)) continue;
 				MeshAttachment mesh = (MeshAttachment)attachment;
-				mesh.updateWorldVertices(slot, false);
-				float[] vertices = mesh.getWorldVertices();
+				float[] vertices = this.vertices.setSize(mesh.getWorldVerticesLength());
+				mesh.computeWorldVertices(slot, 0, mesh.getWorldVerticesLength(), vertices, 0, 2);
 				short[] triangles = mesh.getTriangles();
 				int hullLength = mesh.getHullLength();
 				if (drawMeshTriangles) {
 					shapes.setColor(triangleLineColor);
 					for (int ii = 0, nn = triangles.length; ii < nn; ii += 3) {
-						int v1 = triangles[ii] * 5, v2 = triangles[ii + 1] * 5, v3 = triangles[ii + 2] * 5;
+						int v1 = triangles[ii] * 2, v2 = triangles[ii + 1] * 2, v3 = triangles[ii + 2] * 2;
 						shapes.triangle(vertices[v1], vertices[v1 + 1], //
 							vertices[v2], vertices[v2 + 1], //
 							vertices[v3], vertices[v3 + 1] //
@@ -139,8 +138,7 @@ public class SkeletonRendererDebug {
 				}
 				if (drawMeshHull && hullLength > 0) {
 					shapes.setColor(attachmentLineColor);
-					hullLength = (hullLength >> 1) * 5;
-					float lastX = vertices[hullLength - 5], lastY = vertices[hullLength - 4];
+					float lastX = vertices[hullLength - 2], lastY = vertices[hullLength - 1];
 					for (int ii = 0, nn = hullLength; ii < nn; ii += 5) {
 						float x = vertices[ii], y = vertices[ii + 1];
 						shapes.line(x, y, lastX, lastY);
@@ -173,15 +171,15 @@ public class SkeletonRendererDebug {
 				if (!(attachment instanceof PathAttachment)) continue;
 				PathAttachment path = (PathAttachment)attachment;
 				int nn = path.getWorldVerticesLength();
-				float[] world = temp.setSize(nn);
-				path.computeWorldVertices(slot, world);
+				float[] vertices = this.vertices.setSize(nn);
+				path.computeWorldVertices(slot, 0, nn, vertices, 0, 2);
 				Color color = path.getColor();
-				float x1 = world[2], y1 = world[3], x2 = 0, y2 = 0;
+				float x1 = vertices[2], y1 = vertices[3], x2 = 0, y2 = 0;
 				if (path.getClosed()) {
 					shapes.setColor(color);
-					float cx1 = world[0], cy1 = world[1], cx2 = world[nn - 2], cy2 = world[nn - 1];
-					x2 = world[nn - 4];
-					y2 = world[nn - 3];
+					float cx1 = vertices[0], cy1 = vertices[1], cx2 = vertices[nn - 2], cy2 = vertices[nn - 1];
+					x2 = vertices[nn - 4];
+					y2 = vertices[nn - 3];
 					shapes.curve(x1, y1, cx1, cy1, cx2, cy2, x2, y2, 32);
 					shapes.setColor(Color.LIGHT_GRAY);
 					shapes.line(x1, y1, cx1, cy1);
@@ -189,9 +187,9 @@ public class SkeletonRendererDebug {
 				}
 				nn -= 4;
 				for (int ii = 4; ii < nn; ii += 6) {
-					float cx1 = world[ii], cy1 = world[ii + 1], cx2 = world[ii + 2], cy2 = world[ii + 3];
-					x2 = world[ii + 4];
-					y2 = world[ii + 5];
+					float cx1 = vertices[ii], cy1 = vertices[ii + 1], cx2 = vertices[ii + 2], cy2 = vertices[ii + 3];
+					x2 = vertices[ii + 4];
+					y2 = vertices[ii + 5];
 					shapes.setColor(color);
 					shapes.curve(x1, y1, cx1, cy1, cx2, cy2, x2, y2, 32);
 					shapes.setColor(Color.LIGHT_GRAY);

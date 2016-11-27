@@ -30,29 +30,47 @@
 
 package com.esotericsoftware.spine;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.NumberUtils;
 import com.esotericsoftware.spine.attachments.Attachment;
+import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.SkeletonAttachment;
-import com.esotericsoftware.spine.attachments.MeshAttachment;
 
 public class SkeletonRenderer<T extends Batch> {
 	boolean premultipliedAlpha;
+	private final float[] vertices = new float[20];
 
 	public void draw (T batch, Skeleton skeleton) {
 		boolean premultipliedAlpha = this.premultipliedAlpha;
 
+		float[] vertices = this.vertices;
+		Color skeletonColor = skeleton.color;
 		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
-				RegionAttachment regionAttachment = (RegionAttachment)attachment;
-				float[] vertices = regionAttachment.updateWorldVertices(slot, premultipliedAlpha);
+				RegionAttachment region = (RegionAttachment)attachment;
+				region.computeWorldVertices(slot, vertices, 0, 5);
+				Color color = region.getColor(), slotColor = slot.getColor();
+				float alpha = skeletonColor.a * slotColor.a * color.a * 255;
+				float c = NumberUtils.intToFloatColor(((int)alpha << 24) //
+					| ((int)(skeletonColor.b * slotColor.b * color.b * alpha) << 16) //
+					| ((int)(skeletonColor.g * slotColor.g * color.g * alpha) << 8) //
+					| (int)(skeletonColor.r * slotColor.r * color.r * alpha));
+				float[] uvs = region.getUVs();
+				for (int u = 0, v = 2; u < 8; u += 2, v += 5) {
+					vertices[v] = c;
+					vertices[v + 1] = uvs[u];
+					vertices[v + 2] = uvs[u + 1];
+				}
+
 				BlendMode blendMode = slot.data.getBlendMode();
 				batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
-				batch.draw(regionAttachment.getRegion().getTexture(), vertices, 0, 20);
+				batch.draw(region.getRegion().getTexture(), vertices, 0, 20);
 
 			} else if (attachment instanceof MeshAttachment) {
 				throw new RuntimeException("SkeletonMeshRenderer is required to render meshes.");
