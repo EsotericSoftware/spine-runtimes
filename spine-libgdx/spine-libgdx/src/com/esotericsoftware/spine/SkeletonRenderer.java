@@ -30,24 +30,32 @@
 
 package com.esotericsoftware.spine;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.SkeletonAttachment;
+import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
-public class SkeletonRenderer<T extends Batch> {
-	boolean premultipliedAlpha;
-	private final float[] vertices = new float[20];
+public class SkeletonRenderer {
+	static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
 
-	public void draw (T batch, Skeleton skeleton) {
+	private boolean premultipliedAlpha;
+	private final FloatArray vertices = new FloatArray(32);
+
+	public void draw (Batch batch, Skeleton skeleton) {
 		boolean premultipliedAlpha = this.premultipliedAlpha;
-
-		float[] vertices = this.vertices;
+		float[] vertices = this.vertices.items;
 		Color skeletonColor = skeleton.color;
+		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
 		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
@@ -56,11 +64,11 @@ public class SkeletonRenderer<T extends Batch> {
 				RegionAttachment region = (RegionAttachment)attachment;
 				region.computeWorldVertices(slot, vertices, 0, 5);
 				Color color = region.getColor(), slotColor = slot.getColor();
-				float alpha = skeletonColor.a * slotColor.a * color.a * 255;
+				float alpha = a * slotColor.a * color.a * 255;
 				float c = NumberUtils.intToFloatColor(((int)alpha << 24) //
-					| ((int)(skeletonColor.b * slotColor.b * color.b * alpha) << 16) //
-					| ((int)(skeletonColor.g * slotColor.g * color.g * alpha) << 8) //
-					| (int)(skeletonColor.r * slotColor.r * color.r * alpha));
+					| ((int)(b * slotColor.b * color.b * alpha) << 16) //
+					| ((int)(g * slotColor.g * color.g * alpha) << 8) //
+					| (int)(r * slotColor.r * color.r * alpha));
 				float[] uvs = region.getUVs();
 				for (int u = 0, v = 2; u < 8; u += 2, v += 5) {
 					vertices[v] = c;
@@ -97,6 +105,178 @@ public class SkeletonRenderer<T extends Batch> {
 				rootBone.setScaleX(oldScaleX);
 				rootBone.setScaleY(oldScaleY);
 				rootBone.setRotation(oldRotation);
+			}
+		}
+	}
+
+	@SuppressWarnings("null")
+	public void draw (PolygonSpriteBatch batch, Skeleton skeleton) {
+		boolean premultipliedAlpha = this.premultipliedAlpha;
+		BlendMode blendMode = null;
+		int verticesLength = 0;
+		float[] vertices = null, uvs = null;
+		short[] triangles = null;
+		Texture texture = null;
+		Color color = null, skeletonColor = skeleton.color;
+		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
+		Array<Slot> drawOrder = skeleton.drawOrder;
+		for (int i = 0, n = drawOrder.size; i < n; i++) {
+			Slot slot = drawOrder.get(i);
+			Attachment attachment = slot.attachment;
+			if (attachment instanceof RegionAttachment) {
+				RegionAttachment region = (RegionAttachment)attachment;
+				verticesLength = 20;
+				vertices = this.vertices.items;
+				region.computeWorldVertices(slot, vertices, 0, 5);
+				triangles = quadTriangles;
+				texture = region.getRegion().getTexture();
+				uvs = region.getUVs();
+				color = region.getColor();
+
+			} else if (attachment instanceof MeshAttachment) {
+				MeshAttachment mesh = (MeshAttachment)attachment;
+				int count = mesh.getWorldVerticesLength();
+				verticesLength = (count >> 1) * 5;
+				vertices = this.vertices.setSize(verticesLength);
+				mesh.computeWorldVertices(slot, 0, count, vertices, 0, 5);
+				triangles = mesh.getTriangles();
+				texture = mesh.getRegion().getTexture();
+				uvs = mesh.getUVs();
+				color = mesh.getColor();
+
+			} else if (attachment instanceof SkeletonAttachment) {
+				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
+				if (attachmentSkeleton == null) continue;
+				Bone bone = slot.getBone();
+				Bone rootBone = attachmentSkeleton.getRootBone();
+				float oldScaleX = rootBone.getScaleX();
+				float oldScaleY = rootBone.getScaleY();
+				float oldRotation = rootBone.getRotation();
+				attachmentSkeleton.setPosition(bone.getWorldX(), bone.getWorldY());
+				// rootBone.setScaleX(1 + bone.getWorldScaleX() - oldScaleX);
+				// rootBone.setScaleY(1 + bone.getWorldScaleY() - oldScaleY);
+				// Also set shear.
+				rootBone.setRotation(oldRotation + bone.getWorldRotationX());
+				attachmentSkeleton.updateWorldTransform();
+
+				draw(batch, attachmentSkeleton);
+
+				attachmentSkeleton.setPosition(0, 0);
+				rootBone.setScaleX(oldScaleX);
+				rootBone.setScaleY(oldScaleY);
+				rootBone.setRotation(oldRotation);
+				continue;
+			}
+
+			if (texture != null) {
+				Color slotColor = slot.getColor();
+				float alpha = a * slotColor.a * color.a * 255;
+				float c = NumberUtils.intToFloatColor(((int)alpha << 24) //
+					| ((int)(b * slotColor.b * color.b * alpha) << 16) //
+					| ((int)(g * slotColor.g * color.g * alpha) << 8) //
+					| (int)(r * slotColor.r * color.r * alpha));
+				for (int v = 2, u = 0; v < verticesLength; v += 5, u += 2) {
+					vertices[v] = c;
+					vertices[v + 1] = uvs[u];
+					vertices[v + 2] = uvs[u + 1];
+				}
+
+				BlendMode slotBlendMode = slot.data.getBlendMode();
+				if (slotBlendMode != blendMode) {
+					blendMode = slotBlendMode;
+					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
+				}
+				batch.draw(texture, vertices, 0, verticesLength, triangles, 0, triangles.length);
+			}
+		}
+	}
+
+	@SuppressWarnings("null")
+	public void draw (TwoColorPolygonBatch batch, Skeleton skeleton) {
+		boolean premultipliedAlpha = this.premultipliedAlpha;
+		BlendMode blendMode = null;
+		int verticesLength = 0;
+		float[] vertices = null, uvs = null;
+		short[] triangles = null;
+		Texture texture = null;
+		Color color = null, skeletonColor = skeleton.color;
+		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
+		Array<Slot> drawOrder = skeleton.drawOrder;
+		for (int i = 0, n = drawOrder.size; i < n; i++) {
+			Slot slot = drawOrder.get(i);
+			Attachment attachment = slot.attachment;
+			if (attachment instanceof RegionAttachment) {
+				RegionAttachment region = (RegionAttachment)attachment;
+				verticesLength = 24;
+				vertices = this.vertices.items;
+				region.computeWorldVertices(slot, vertices, 0, 6);
+				triangles = quadTriangles;
+				texture = region.getRegion().getTexture();
+				uvs = region.getUVs();
+				color = region.getColor();
+
+			} else if (attachment instanceof MeshAttachment) {
+				MeshAttachment mesh = (MeshAttachment)attachment;
+				int count = mesh.getWorldVerticesLength();
+				verticesLength = count * 3;
+				vertices = this.vertices.setSize(verticesLength);
+				mesh.computeWorldVertices(slot, 0, count, vertices, 0, 6);
+				triangles = mesh.getTriangles();
+				texture = mesh.getRegion().getTexture();
+				uvs = mesh.getUVs();
+				color = mesh.getColor();
+
+			} else if (attachment instanceof SkeletonAttachment) {
+				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
+				if (attachmentSkeleton == null) continue;
+				Bone bone = slot.getBone();
+				Bone rootBone = attachmentSkeleton.getRootBone();
+				float oldScaleX = rootBone.getScaleX();
+				float oldScaleY = rootBone.getScaleY();
+				float oldRotation = rootBone.getRotation();
+				attachmentSkeleton.setPosition(bone.getWorldX(), bone.getWorldY());
+				// rootBone.setScaleX(1 + bone.getWorldScaleX() - oldScaleX);
+				// rootBone.setScaleY(1 + bone.getWorldScaleY() - oldScaleY);
+				// Also set shear.
+				rootBone.setRotation(oldRotation + bone.getWorldRotationX());
+				attachmentSkeleton.updateWorldTransform();
+
+				draw(batch, attachmentSkeleton);
+
+				attachmentSkeleton.setPosition(0, 0);
+				rootBone.setScaleX(oldScaleX);
+				rootBone.setScaleY(oldScaleY);
+				rootBone.setRotation(oldRotation);
+				continue;
+			}
+
+			if (texture != null) {
+				Color lightColor = slot.getColor();
+				float alpha = a * lightColor.a * color.a * 255;
+				float light = NumberUtils.intToFloatColor(((int)alpha << 24) //
+					| ((int)(b * lightColor.b * color.b * alpha) << 16) //
+					| ((int)(g * lightColor.g * color.g * alpha) << 8) //
+					| (int)(r * lightColor.r * color.r * alpha));
+				Color darkColor = slot.getDarkColor();
+				if (darkColor == null) darkColor = Color.BLACK;
+				float dark = NumberUtils.intToFloatColor( //
+					((int)(b * darkColor.b * color.b * 255) << 16) //
+						| ((int)(g * darkColor.g * color.g * 255) << 8) //
+						| (int)(r * darkColor.r * color.r * 255));
+				for (int v = 2, u = 0; v < verticesLength; v += 6, u += 2) {
+					vertices[v] = light;
+					vertices[v + 1] = dark;
+					vertices[v + 2] = uvs[u];
+					vertices[v + 3] = uvs[u + 1];
+				}
+
+				BlendMode slotBlendMode = slot.data.getBlendMode();
+				if (slotBlendMode != blendMode) {
+					blendMode = slotBlendMode;
+					Gdx.gl.glEnable(GL20.GL_BLEND);
+					Gdx.gl.glBlendFunc(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
+				}
+				batch.draw(texture, vertices, 0, verticesLength, triangles, 0, triangles.length);
 			}
 		}
 	}

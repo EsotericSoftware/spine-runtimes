@@ -51,7 +51,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData;
@@ -81,6 +80,7 @@ import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.esotericsoftware.spine.AnimationState.AnimationStateAdapter;
 import com.esotericsoftware.spine.AnimationState.TrackEntry;
+import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
 public class SkeletonViewer extends ApplicationAdapter {
 	static final float checkModifiedInterval = 0.250f;
@@ -88,8 +88,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 	UI ui;
 
-	PolygonSpriteBatch batch;
-	SkeletonMeshRenderer renderer;
+	TwoColorPolygonBatch batch;
+	SkeletonRenderer renderer;
 	SkeletonRendererDebug debugRenderer;
 	SkeletonData skeletonData;
 	Skeleton skeleton;
@@ -111,8 +111,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		prefs = Gdx.app.getPreferences("spine-skeletonviewer");
 		ui = new UI();
-		batch = new PolygonSpriteBatch();
-		renderer = new SkeletonMeshRenderer();
+		batch = new TwoColorPolygonBatch(3100);
+		renderer = new SkeletonRenderer();
 		debugRenderer = new SkeletonRendererDebug();
 		skeletonX = (int)(ui.window.getWidth() + (Gdx.graphics.getWidth() - ui.window.getWidth()) / 2);
 		skeletonY = Gdx.graphics.getHeight() / 4;
@@ -278,7 +278,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 			state.apply(skeleton);
 			skeleton.updateWorldTransform();
 
-			batch.setColor(Color.WHITE);
 			batch.begin();
 			renderer.draw(batch, skeleton);
 			batch.end();
