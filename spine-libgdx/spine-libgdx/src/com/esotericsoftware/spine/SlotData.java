@@ -72,7 +72,8 @@ public class SlotData {
 		return color;
 	}
 
-	/** The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. */
+	/** The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark
+	 * color's alpha is not used. */
 	public Color getDarkColor () {
 		return darkColor;
 	}

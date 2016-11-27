@@ -624,13 +624,13 @@ public class Animation {
 
 	/** Changes a slot's {@link Slot#getColor()} and {@link Slot#getDarkColor()} for two color tinting. */
 	static public class TwoColorTimeline extends CurveTimeline {
-		static public final int ENTRIES = 9;
-		static private final int PREV_TIME = -9, PREV_R = -8, PREV_G = -7, PREV_B = -6, PREV_A = -5;
-		static private final int PREV_R2 = -4, PREV_G2 = -3, PREV_B2 = -2, PREV_A2 = -1;
-		static private final int R = 1, G = 2, B = 3, A = 4, R2 = 5, G2 = 6, B2 = 7, A2 = 8;
+		static public final int ENTRIES = 8;
+		static private final int PREV_TIME = -8, PREV_R = -7, PREV_G = -6, PREV_B = -5, PREV_A = -4;
+		static private final int PREV_R2 = -3, PREV_G2 = -2, PREV_B2 = -1;
+		static private final int R = 1, G = 2, B = 3, A = 4, R2 = 5, G2 = 6, B2 = 7;
 
 		int slotIndex;
-		private final float[] frames; // time, r, g, b, a, r2, g2, b2, a2, ...
+		private final float[] frames; // time, r, g, b, a, r2, g2, b2, ...
 
 		public TwoColorTimeline (int frameCount) {
 			super(frameCount);
@@ -657,8 +657,7 @@ public class Animation {
 		}
 
 		/** Sets the time in seconds, light, and dark colors for the specified key frame. */
-		public void setFrame (int frameIndex, float time, float r, float g, float b, float a, float r2, float g2, float b2,
-			float a2) {
+		public void setFrame (int frameIndex, float time, float r, float g, float b, float a, float r2, float g2, float b2) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;
 			frames[frameIndex + R] = r;
@@ -668,7 +667,6 @@ public class Animation {
 			frames[frameIndex + R2] = r2;
 			frames[frameIndex + G2] = g2;
 			frames[frameIndex + B2] = b2;
-			frames[frameIndex + A2] = a2;
 		}
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
@@ -684,7 +682,7 @@ public class Animation {
 				return;
 			}
 
-			float r, g, b, a, r2, g2, b2, a2;
+			float r, g, b, a, r2, g2, b2;
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
 				int i = frames.length;
 				r = frames[i + PREV_R];
@@ -694,7 +692,6 @@ public class Animation {
 				r2 = frames[i + PREV_R2];
 				g2 = frames[i + PREV_G2];
 				b2 = frames[i + PREV_B2];
-				a2 = frames[i + PREV_A2];
 			} else {
 				// Interpolate between the previous frame and the current frame.
 				int frame = binarySearch(frames, time, ENTRIES);
@@ -705,7 +702,6 @@ public class Animation {
 				r2 = frames[frame + PREV_R2];
 				g2 = frames[frame + PREV_G2];
 				b2 = frames[frame + PREV_B2];
-				a2 = frames[frame + PREV_A2];
 				float frameTime = frames[frame];
 				float percent = getCurvePercent(frame / ENTRIES - 1,
 					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
@@ -717,11 +713,10 @@ public class Animation {
 				r2 += (frames[frame + R2] - r2) * percent;
 				g2 += (frames[frame + G2] - g2) * percent;
 				b2 += (frames[frame + B2] - b2) * percent;
-				a2 += (frames[frame + A2] - a2) * percent;
 			}
 			if (alpha == 1) {
 				slot.color.set(r, g, b, a);
-				slot.darkColor.set(r2, g2, b2, a2);
+				slot.darkColor.set(r2, g2, b2, 1);
 			} else {
 				Color light = slot.color;
 				Color dark = slot.darkColor;
@@ -730,7 +725,7 @@ public class Animation {
 					dark.set(slot.data.darkColor);
 				}
 				light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
-				dark.add((r2 - dark.r) * alpha, (g2 - dark.g) * alpha, (b2 - dark.b) * alpha, (a2 - dark.a) * alpha);
+				dark.add((r2 - dark.r) * alpha, (g2 - dark.g) * alpha, (b2 - dark.b) * alpha, 0);
 			}
 		}
 	}
