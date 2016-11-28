@@ -348,7 +348,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 				}
 				animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
 				animation->duration = MAX(animation->duration, timeline->frames[(timelineMap->size - 1) * PATHCONSTRAINTPOSITION_ENTRIES]);
-			} else if (strcmp(timelineName, "mix")) {
+			} else if (strcmp(timelineName, "mix") == 0) {
 				spPathConstraintMixTimeline* timeline = spPathConstraintMixTimeline_create(timelineMap->size);
 				timeline->pathConstraintIndex = constraintIndex;
 				for (valueMap = timelineMap->child, frameIndex = 0; valueMap; valueMap = valueMap->next, ++frameIndex) {
@@ -683,6 +683,12 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 					data->blendMode = SP_BLEND_MODE_MULTIPLY;
 				else if (strcmp(item->valueString, "screen") == 0)
 					data->blendMode = SP_BLEND_MODE_SCREEN;
+			}
+
+			item = Json_getItem(slotMap, "additive");
+			if (item && item->type == Json_True)
+			{
+				data->blendMode = SP_BLEND_MODE_ADDITIVE;
 			}
 
 			skeletonData->slots[i] = data;
