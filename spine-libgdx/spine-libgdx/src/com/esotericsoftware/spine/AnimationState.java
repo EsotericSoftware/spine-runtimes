@@ -239,6 +239,9 @@ public class AnimationState {
 
 	private void applyRotateTimeline (Timeline timeline, Skeleton skeleton, float time, float alpha, boolean setupPose,
 		float[] timelinesRotation, int i, boolean firstFrame) {
+
+		if (firstFrame) timelinesRotation[i] = 0;
+
 		if (alpha == 1) {
 			timeline.apply(skeleton, 0, time, null, 1, setupPose, false);
 			return;
@@ -272,13 +275,9 @@ public class AnimationState {
 		// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
 		float r1 = setupPose ? bone.data.rotation : bone.rotation;
 		float total, diff = r2 - r1;
-		if (diff == 0) {
-			if (firstFrame) {
-				timelinesRotation[i] = 0;
-				total = 0;
-			} else
-				total = timelinesRotation[i];
-		} else {
+		if (diff == 0)
+			total = timelinesRotation[i];
+		else {
 			diff -= (16384 - (int)(16384.499999999996 - diff / 360)) * 360;
 			float lastTotal, lastDiff;
 			if (firstFrame) {
