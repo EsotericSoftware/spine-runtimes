@@ -30,9 +30,7 @@
 
 package com.esotericsoftware.spine;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
@@ -273,8 +271,7 @@ public class SkeletonRenderer {
 				BlendMode slotBlendMode = slot.data.getBlendMode();
 				if (slotBlendMode != blendMode) {
 					blendMode = slotBlendMode;
-					Gdx.gl.glEnable(GL20.GL_BLEND);
-					Gdx.gl.glBlendFunc(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
+					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
 				}
 				batch.draw(texture, vertices, 0, verticesLength, triangles, 0, triangles.length);
 			}

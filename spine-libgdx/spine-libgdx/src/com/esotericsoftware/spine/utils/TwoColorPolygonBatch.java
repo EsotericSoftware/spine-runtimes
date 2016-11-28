@@ -52,6 +52,8 @@ public class TwoColorPolygonBatch {
 	private int vertexIndex, triangleIndex;
 	private Texture lastTexture;
 	private boolean drawing;
+	private int blendSrcFunc = GL20.GL_SRC_ALPHA;
+	private int blendDstFunc = GL20.GL_ONE_MINUS_SRC_ALPHA;
 
 	public TwoColorPolygonBatch (int size) {
 		this(size, size * 2);
@@ -128,7 +130,7 @@ public class TwoColorPolygonBatch {
 		mesh.setVertices(vertices, 0, vertexIndex);
 		mesh.setIndices(triangles, 0, triangleIndex);
 		Gdx.gl.glEnable(GL20.GL_BLEND);
-
+		Gdx.gl.glBlendFunc(blendSrcFunc, blendDstFunc);
 		mesh.render(shader, GL20.GL_TRIANGLES, 0, triangleIndex);
 
 		vertexIndex = 0;
@@ -176,6 +178,13 @@ public class TwoColorPolygonBatch {
 			shader.begin();
 			setupMatrices();
 		}
+	}
+
+	public void setBlendFunction (int srcFunc, int dstFunc) {
+		if (blendSrcFunc == srcFunc && blendDstFunc == dstFunc) return;
+		flush();
+		blendSrcFunc = srcFunc;
+		blendDstFunc = dstFunc;
 	}
 
 	private ShaderProgram createDefaultShader () {
