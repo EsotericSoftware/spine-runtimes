@@ -240,7 +240,7 @@ function AnimationState:update (delta)
 						_next.delay = 0
 						_next.trackTime = nextTime + delta * _next.timeScale
 						current.trackTime = current.trackTime + currentDelta
-						self:setCurrent(i, _next)
+						self:setCurrent(i, _next, true)
 						while _next.mixingFrom do
 							_next.mixTime = _next.mixTime + currentDelta
 							_next = _next.mixingFrom
@@ -530,14 +530,14 @@ function AnimationState:clearTrack (trackIndex)
   queue:drain()
 end
 
-function AnimationState:setCurrent (index, current)
+function AnimationState:setCurrent (index, current, interrupt)
   local from = self:expandToIndex(index)
   local tracks = self.tracks
   local queue = self.queue
   tracks[index] = current
 
   if from then
-    queue:interrupt(from)
+    if interrupt then queue:interrupt(from) end
     current.mixingFrom = from
     current.mixTime = 0
 
@@ -556,6 +556,7 @@ end
 
 function AnimationState:setAnimation (trackIndex, animation, loop)
   if not animation then error("animation cannot be null.") end
+  local interrupt = true;
   local current = self:expandToIndex(trackIndex)
   local queue = self.queue
   if current then
@@ -566,12 +567,13 @@ function AnimationState:setAnimation (trackIndex, animation, loop)
       queue:_end(current)
       self:disposeNext(current)
       current = current.mixingFrom
+      interrupt = false;
     else
       self:disposeNext(current)
     end
   end
   local entry = self:trackEntry(trackIndex, animation, loop, current)
-  self:setCurrent(trackIndex, entry)
+  self:setCurrent(trackIndex, entry, interrupt)
   queue:drain()
   return entry
 end
@@ -597,7 +599,7 @@ function AnimationState:addAnimation (trackIndex, animation, loop, delay)
   local data = self.data
   
   if not last then
-    self:setCurrent(trackIndex, entry)
+    self:setCurrent(trackIndex, entry, true)
     queue:drain()
   else
     last.next = entry
