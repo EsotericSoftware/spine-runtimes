@@ -59,7 +59,7 @@ public class AnimationState {
 	boolean animationsChanged;
 	private float timeScale = 1;
 
-	final Pool<TrackEntry> trackEntryPool = new Pool() {
+	Pool<TrackEntry> trackEntryPool = new Pool() {
 		protected Object newObject () {
 			return new TrackEntry();
 		}
