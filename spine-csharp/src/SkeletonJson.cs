@@ -58,7 +58,7 @@ namespace Spine {
 			Scale = 1;
 		}
 
-		#if !(IS_UNITY) && WINDOWS_STOREAPP
+		#if !IS_UNITY && WINDOWS_STOREAPP
 		private async Task<SkeletonData> ReadFile(string path) {
 			var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
 			var file = await folder.GetFileAsync(path).AsTask().ConfigureAwait(false);
@@ -75,17 +75,16 @@ namespace Spine {
 		#else
 		public SkeletonData ReadSkeletonData (String path) {
 		#if WINDOWS_PHONE
-			Stream stream = Microsoft.Xna.Framework.TitleContainer.OpenStream(path);
-			using (StreamReader reader = new StreamReader(stream)) {
+			using (var reader = new StreamReader(Microsoft.Xna.Framework.TitleContainer.OpenStream(path))) {
 		#else
-			using (var reader = new StreamReader(path)) {
-		#endif // WINDOWS_PHONE
+			using (var reader = new StreamReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))) {
+		#endif
 				SkeletonData skeletonData = ReadSkeletonData(reader);
 				skeletonData.name = Path.GetFileNameWithoutExtension(path);
 				return skeletonData;
 			}
 		}
-		#endif // WINDOWS_STOREAPP
+		#endif
 
 		public SkeletonData ReadSkeletonData (TextReader reader) {
 			if (reader == null) throw new ArgumentNullException("reader", "reader cannot be null.");
