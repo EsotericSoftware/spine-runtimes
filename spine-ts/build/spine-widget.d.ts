@@ -221,7 +221,7 @@ declare module spine {
 		queueEvents(entry: TrackEntry, animationTime: number): void;
 		clearTracks(): void;
 		clearTrack(trackIndex: number): void;
-		setCurrent(index: number, current: TrackEntry): void;
+		setCurrent(index: number, current: TrackEntry, interrupt: boolean): void;
 		setAnimation(trackIndex: number, animationName: string, loop: boolean): TrackEntry;
 		setAnimationWith(trackIndex: number, animation: Animation, loop: boolean): TrackEntry;
 		addAnimation(trackIndex: number, animationName: string, loop: boolean, delay: number): TrackEntry;
