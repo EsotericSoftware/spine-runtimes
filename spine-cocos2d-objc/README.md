@@ -20,8 +20,8 @@ spine-cocos2d-objc does not yet support loading the binary format.
 
 1. Create a new cocos2d-obj project. See the [cocos2d-objc documentation](http://cocos2d-objc.org/started/) or have a look at the example in this repository.
 2. Download the Spine Runtimes source using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip)
-3. Add the sources from `spine-c/src/spine` and `spine-cocos2d-objc/src/spine` to your project
-4. Add the folders `spine-c/include` and `spine-cocos2d-objc/src` to your header search path. Note that includes are specified as `#inclue <spine/file.h>`, so the `spine` directory cannot be omitted when copying the source files.
+3. Add the sources from `spine-c/spine-c/src/spine` and `spine-cocos2d-objc/src/spine` to your project
+4. Add the folders `spine-c/spine-c/include` and `spine-cocos2d-objc/src` to your header search path. Note that includes are specified as `#inclue <spine/file.h>`, so the `spine` directory cannot be omitted when copying the source files.
 
 See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documentation#runtimesTitle) on how to use the APIs or check out the Spine cocos2d-objc example.
 
