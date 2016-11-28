@@ -95,7 +95,7 @@ namespace Spine {
 						next.delay = 0;
 						next.trackTime = nextTime + (delta * next.timeScale);
 						current.trackTime += currentDelta;
-						SetCurrent(i, next);
+						SetCurrent(i, next, true);
 						while (next.mixingFrom != null) {
 							next.mixTime += currentDelta;
 							next = next.mixingFrom;
@@ -378,12 +378,12 @@ namespace Spine {
 			queue.Drain();
 		}
 
-		private void SetCurrent (int index, TrackEntry current) {
+		private void SetCurrent (int index, TrackEntry current, bool interrupt) {
 			TrackEntry from = ExpandToIndex(index);
 			tracks.Items[index] = current;
 
 			if (from != null) {
-				queue.Interrupt(from);
+				if (interrupt) queue.Interrupt(from);
 				current.mixingFrom = from;
 				current.mixTime = 0;
 
@@ -413,6 +413,7 @@ namespace Spine {
 		/// after <see cref="AnimationState.Dispose"/>.</returns>
 		public TrackEntry SetAnimation (int trackIndex, Animation animation, bool loop) {
 			if (animation == null) throw new ArgumentNullException("animation", "animation cannot be null.");
+			bool interrupt = true;
 			TrackEntry current = ExpandToIndex(trackIndex);
 			if (current != null) {
 				if (current.nextTrackLast == -1) {
@@ -422,12 +423,13 @@ namespace Spine {
 					queue.End(current);
 					DisposeNext(current);
 					current = current.mixingFrom;
+					interrupt = false;
 				} else {
 					DisposeNext(current);
 				}
 			}
 			TrackEntry entry = NewTrackEntry(trackIndex, animation, loop, current);
-			SetCurrent(trackIndex, entry);
+			SetCurrent(trackIndex, entry, interrupt);
 			queue.Drain();
 			return entry;
 		}
@@ -460,7 +462,7 @@ namespace Spine {
 			TrackEntry entry = NewTrackEntry(trackIndex, animation, loop, last);
 
 			if (last == null) {
-				SetCurrent(trackIndex, entry);
+				SetCurrent(trackIndex, entry, true);
 				queue.Drain();
 			} else {
 				last.next = entry;
