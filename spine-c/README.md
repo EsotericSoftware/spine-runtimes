@@ -21,7 +21,7 @@ spine-c supports all Spine features.
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
 1. Open the `spine-c.sln` Visual C++ 2010 Express project file. For other IDEs, you will need to create a new project and import the source.
 
-Alternatively, the contents of the `spine-c/src` and `spine-c/include` directories can be copied into your project. Be sure your header search is configured to find the contents of the `spine-c/include` directory. Note that the includes use `spine/Xxx.h`, so the `spine` directory cannot be omitted when copying the files.
+Alternatively, the contents of the `spine-c/spine-c/src` and `spine-c/spine-c/include` directories can be copied into your project. Be sure your header search is configured to find the contents of the `spine-c/spine-c/include` directory. Note that the includes use `spine/Xxx.h`, so the `spine` directory cannot be omitted when copying the files.
 
 If `SPINE_SHORT_NAMES` is defined, the `sp` prefix for all structs and functions is optional. Only use this if the spine-c names won't cause a conflict.
 
@@ -39,7 +39,7 @@ For example, `AtlasAttachmentLoader` is typically used to load attachments when 
 
 [spine-sfml](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-sfml/src/spine/spine-sfml.cpp#L39) serves as a simple example of extending spine-c.
 
-spine-c uses an OOP style of programming where each "class" is made up of a struct and a number of functions prefixed with the struct name. More detals about how this works are available in [extension.h](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-c/include/spine/extension.h#L2). This mechanism allows you to provide your own implementations for `spAttachmentLoader`, `spAttachment` and `spTimeline`, if necessary.
+spine-c uses an OOP style of programming where each "class" is made up of a struct and a number of functions prefixed with the struct name. More detals about how this works are available in [extension.h](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-c/spine-c/include/spine/extension.h#L2). This mechanism allows you to provide your own implementations for `spAttachmentLoader`, `spAttachment` and `spTimeline`, if necessary.
 
 ## Runtimes extending spine-c
 

@@ -25,42 +25,42 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../../src/spine/SkeletonBatch.cpp \
                    ../../../src/spine/SkeletonRenderer.cpp \
                    ../../../src/spine/spine-cocos2dx.cpp \
-                   ../../../../spine-c/src/spine/Animation.c \
-				   ../../../../spine-c/src/spine/AnimationState.c \
-				   ../../../../spine-c/src/spine/AnimationStateData.c \
-				   ../../../../spine-c/src/spine/Atlas.c \
-				   ../../../../spine-c/src/spine/AtlasAttachmentLoader.c \
-				   ../../../../spine-c/src/spine/Attachment.c \
-				   ../../../../spine-c/src/spine/AttachmentLoader.c \
-				   ../../../../spine-c/src/spine/Bone.c \
-				   ../../../../spine-c/src/spine/BoneData.c \
-				   ../../../../spine-c/src/spine/BoundingBoxAttachment.c \
-				   ../../../../spine-c/src/spine/Event.c \
-				   ../../../../spine-c/src/spine/EventData.c \
-				   ../../../../spine-c/src/spine/IkConstraint.c \
-				   ../../../../spine-c/src/spine/IkConstraintData.c \
-				   ../../../../spine-c/src/spine/Json.c \
-				   ../../../../spine-c/src/spine/MeshAttachment.c \
-				   ../../../../spine-c/src/spine/PathAttachment.c \
-				   ../../../../spine-c/src/spine/PathConstraint.c \
-				   ../../../../spine-c/src/spine/PathConstraintData.c \
-				   ../../../../spine-c/src/spine/RegionAttachment.c \
-				   ../../../../spine-c/src/spine/Skeleton.c \
-				   ../../../../spine-c/src/spine/SkeletonBinary.c \
-				   ../../../../spine-c/src/spine/SkeletonBounds.c \
-				   ../../../../spine-c/src/spine/SkeletonData.c \
-				   ../../../../spine-c/src/spine/SkeletonJson.c \
-				   ../../../../spine-c/src/spine/Skin.c \
-				   ../../../../spine-c/src/spine/Slot.c \
-				   ../../../../spine-c/src/spine/SlotData.c \
-				   ../../../../spine-c/src/spine/TransformConstraint.c \
-				   ../../../../spine-c/src/spine/TransformConstraintData.c \
-				   ../../../../spine-c/src/spine/VertexAttachment.c \
-				   ../../../../spine-c/src/spine/extension.c
+                   ../../../../spine-c/spine-c/src/spine/Animation.c \
+				   ../../../../spine-c/spine-c/src/spine/AnimationState.c \
+				   ../../../../spine-c/spine-c/src/spine/AnimationStateData.c \
+				   ../../../../spine-c/spine-c/src/spine/Atlas.c \
+				   ../../../../spine-c/spine-c/src/spine/AtlasAttachmentLoader.c \
+				   ../../../../spine-c/spine-c/src/spine/Attachment.c \
+				   ../../../../spine-c/spine-c/src/spine/AttachmentLoader.c \
+				   ../../../../spine-c/spine-c/src/spine/Bone.c \
+				   ../../../../spine-c/spine-c/src/spine/BoneData.c \
+				   ../../../../spine-c/spine-c/src/spine/BoundingBoxAttachment.c \
+				   ../../../../spine-c/spine-c/src/spine/Event.c \
+				   ../../../../spine-c/spine-c/src/spine/EventData.c \
+				   ../../../../spine-c/spine-c/src/spine/IkConstraint.c \
+				   ../../../../spine-c/spine-c/src/spine/IkConstraintData.c \
+				   ../../../../spine-c/spine-c/src/spine/Json.c \
+				   ../../../../spine-c/spine-c/src/spine/MeshAttachment.c \
+				   ../../../../spine-c/spine-c/src/spine/PathAttachment.c \
+				   ../../../../spine-c/spine-c/src/spine/PathConstraint.c \
+				   ../../../../spine-c/spine-c/src/spine/PathConstraintData.c \
+				   ../../../../spine-c/spine-c/src/spine/RegionAttachment.c \
+				   ../../../../spine-c/spine-c/src/spine/Skeleton.c \
+				   ../../../../spine-c/spine-c/src/spine/SkeletonBinary.c \
+				   ../../../../spine-c/spine-c/src/spine/SkeletonBounds.c \
+				   ../../../../spine-c/spine-c/src/spine/SkeletonData.c \
+				   ../../../../spine-c/spine-c/src/spine/SkeletonJson.c \
+				   ../../../../spine-c/spine-c/src/spine/Skin.c \
+				   ../../../../spine-c/spine-c/src/spine/Slot.c \
+				   ../../../../spine-c/spine-c/src/spine/SlotData.c \
+				   ../../../../spine-c/spine-c/src/spine/TransformConstraint.c \
+				   ../../../../spine-c/spine-c/src/spine/TransformConstraintData.c \
+				   ../../../../spine-c/spine-c/src/spine/VertexAttachment.c \
+				   ../../../../spine-c/spine-c/src/spine/extension.c
 
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \
-				   $(LOCAL_PATH)/../../../../spine-c/include \
+				   $(LOCAL_PATH)/../../../../spine-c/spine-c/include \
 				   $(LOCAL_PATH)/../../../../spine-cocos2dx/src
 
 # _COCOS_HEADER_ANDROID_BEGIN

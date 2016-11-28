@@ -976,7 +976,7 @@ var spine;
 						next.delay = 0;
 						next.trackTime = nextTime + delta * next.timeScale;
 						current.trackTime += currentDelta;
-						this.setCurrent(i, next);
+						this.setCurrent(i, next, true);
 						while (next.mixingFrom != null) {
 							next.mixTime += currentDelta;
 							next = next.mixingFrom;
@@ -1215,11 +1215,12 @@ var spine;
 			this.tracks[current.trackIndex] = null;
 			this.queue.drain();
 		};
-		AnimationState.prototype.setCurrent = function (index, current) {
+		AnimationState.prototype.setCurrent = function (index, current, interrupt) {
 			var from = this.expandToIndex(index);
 			this.tracks[index] = current;
 			if (from != null) {
-				this.queue.interrupt(from);
+				if (interrupt)
+					this.queue.interrupt(from);
 				current.mixingFrom = from;
 				current.mixTime = 0;
 				if (from.mixingFrom != null)
@@ -1236,6 +1237,7 @@ var spine;
 		AnimationState.prototype.setAnimationWith = function (trackIndex, animation, loop) {
 			if (animation == null)
 				throw new Error("animation cannot be null.");
+			var interrupt = true;
 			var current = this.expandToIndex(trackIndex);
 			if (current != null) {
 				if (current.nextTrackLast == -1) {
@@ -1244,12 +1246,13 @@ var spine;
 					this.queue.end(current);
 					this.disposeNext(current);
 					current = current.mixingFrom;
+					interrupt = false;
 				}
 				else
 					this.disposeNext(current);
 			}
 			var entry = this.trackEntry(trackIndex, animation, loop, current);
-			this.setCurrent(trackIndex, entry);
+			this.setCurrent(trackIndex, entry, interrupt);
 			this.queue.drain();
 			return entry;
 		};
@@ -1269,7 +1272,7 @@ var spine;
 			}
 			var entry = this.trackEntry(trackIndex, animation, loop, last);
 			if (last == null) {
-				this.setCurrent(trackIndex, entry);
+				this.setCurrent(trackIndex, entry, true);
 				this.queue.drain();
 			}
 			else {
