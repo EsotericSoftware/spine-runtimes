@@ -101,7 +101,7 @@ public class AnimationState {
 					next.delay = 0;
 					next.trackTime = nextTime + delta * next.timeScale;
 					current.trackTime += currentDelta;
-					setCurrent(i, next);
+					setCurrent(i, next, true);
 					while (next.mixingFrom != null) {
 						next.mixTime += currentDelta;
 						next = next.mixingFrom;
@@ -374,12 +374,12 @@ public class AnimationState {
 		queue.drain();
 	}
 
-	private void setCurrent (int index, TrackEntry current) {
+	private void setCurrent (int index, TrackEntry current, boolean interrupt) {
 		TrackEntry from = expandToIndex(index);
 		tracks.set(index, current);
 
 		if (from != null) {
-			queue.interrupt(from);
+			if (interrupt) queue.interrupt(from);
 			current.mixingFrom = from;
 			current.mixTime = 0;
 
@@ -406,6 +406,7 @@ public class AnimationState {
 	 *         after the {@link AnimationStateListener#dispose(TrackEntry)} event occurs. */
 	public TrackEntry setAnimation (int trackIndex, Animation animation, boolean loop) {
 		if (animation == null) throw new IllegalArgumentException("animation cannot be null.");
+		boolean interrupt = true;
 		TrackEntry current = expandToIndex(trackIndex);
 		if (current != null) {
 			if (current.nextTrackLast == -1) {
@@ -415,11 +416,12 @@ public class AnimationState {
 				queue.end(current);
 				disposeNext(current);
 				current = current.mixingFrom;
+				interrupt = false; // mixingFrom is current again, but don't interrupt it twice.
 			} else
 				disposeNext(current);
 		}
 		TrackEntry entry = trackEntry(trackIndex, animation, loop, current);
-		setCurrent(trackIndex, entry);
+		setCurrent(trackIndex, entry, interrupt);
 		queue.drain();
 		return entry;
 	}
@@ -451,7 +453,7 @@ public class AnimationState {
 		TrackEntry entry = trackEntry(trackIndex, animation, loop, last);
 
 		if (last == null) {
-			setCurrent(trackIndex, entry);
+			setCurrent(trackIndex, entry, true);
 			queue.drain();
 		} else {
 			last.next = entry;
