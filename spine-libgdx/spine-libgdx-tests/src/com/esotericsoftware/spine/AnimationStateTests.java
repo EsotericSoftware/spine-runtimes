@@ -36,6 +36,7 @@ import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.backends.lwjgl.LwjglFileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
 import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
 import com.esotericsoftware.spine.AnimationState.TrackEntry;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
@@ -109,6 +110,7 @@ public class AnimationStateTests {
 
 	AnimationStateData stateData;
 	AnimationState state;
+	int entryCount;
 	float time = 0;
 	boolean fail;
 	int test;
@@ -358,7 +360,9 @@ public class AnimationStateTests {
 			expect(0, "event 14", 3.5f, 3.5f), //
 			expect(0, "event 30", 4, 4), //
 			expect(0, "complete", 4, 4), //
-			expect(0, "event 0", 4, 4) //
+			expect(0, "event 0", 4, 4), //
+			expect(0, "end", 4.1f, 4.1f), //
+			expect(0, "dispose", 4.1f, 4.1f) //
 		);
 		state.setAnimation(0, "events0", true);
 		run(0.1f, 4, null);
@@ -450,7 +454,9 @@ public class AnimationStateTests {
 			expect(0, "event 30", 0.8f, 0.8f), //
 			expect(0, "complete", 0.8f, 0.8f), //
 			expect(0, "event 30", 1.2f, 1.2f), //
-			expect(0, "complete", 1.2f, 1.2f) //
+			expect(0, "complete", 1.2f, 1.2f), //
+			expect(0, "end", 1.4f, 1.4f), //
+			expect(0, "dispose", 1.4f, 1.4f) //
 		);
 		entry = state.setAnimation(0, "events0", true);
 		entry.setAnimationLast(0.6f);
@@ -463,7 +469,9 @@ public class AnimationStateTests {
 			expect(0, "complete", 0.6f, 0.6f), //
 			expect(0, "event 14", 0.9f, 0.9f), //
 			expect(0, "complete", 1.2f, 1.2f), //
-			expect(0, "event 14", 1.5f, 1.5f) //
+			expect(0, "event 14", 1.5f, 1.5f), //
+			expect(0, "end", 1.8f, 1.8f), //
+			expect(0, "dispose", 1.8f, 1.8f) //
 		);
 		entry = state.setAnimation(0, "events0", true);
 		entry.setAnimationStart(0.2f);
@@ -708,6 +716,24 @@ public class AnimationStateTests {
 		expected.addAll(expectedArray);
 		stateData = new AnimationStateData(skeletonData);
 		state = new AnimationState(stateData);
+		state.trackEntryPool = new Pool<TrackEntry>() {
+			public TrackEntry obtain () {
+				TrackEntry entry = super.obtain();
+				entryCount++;
+				// System.out.println("+1: " + entryCount + " " + entry.hashCode());
+				return entry;
+			}
+
+			protected TrackEntry newObject () {
+				return new TrackEntry();
+			}
+
+			public void free (TrackEntry entry) {
+				entryCount--;
+				// System.out.println("-1: " + entryCount + " " + entry.hashCode());
+				super.free(entry);
+			}
+		};
 		time = 0;
 		fail = false;
 		log(test + ": " + description);
@@ -743,11 +769,22 @@ public class AnimationStateTests {
 
 			if (listener != null) listener.frame(time);
 		}
+		state.clearTracks();
+
 		// Expecting more than actual is a failure.
 		for (int i = actual.size, n = expected.size; i < n; i++) {
 			log(String.format("%-29s", "<none>") + "FAIL: " + expected.get(i));
 			fail = true;
 		}
+
+		// Check all allocated entries were freed.
+		if (!fail) {
+			if (entryCount != 0) {
+				log("FAIL: Pool balance: " + entryCount);
+				fail = true;
+			}
+		}
+
 		actual.clear();
 		expected.clear();
 		log("");
