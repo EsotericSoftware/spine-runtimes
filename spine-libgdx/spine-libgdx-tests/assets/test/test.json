@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "C7XH8P2ZH7KYz8kafheHFboZI1Q", "spine": "3.5.32", "width": 0, "height": 0 },
+"skeleton": { "hash": "aAa4C8T7UXyn4KV5wPxfo2zYuiA", "spine": "3.5.32", "width": 0, "height": 0 },
 "bones": [
 	{ "name": "root" }
 ],
@@ -15,6 +15,13 @@
 		]
 	},
 	"events1": {
+		"events": [
+			{ "time": 0, "name": "event", "string": "0" },
+			{ "time": 0.4667, "name": "event", "string": "14" },
+			{ "time": 1, "name": "event", "string": "30" }
+		]
+	},
+	"events2": {
 		"events": [
 			{ "time": 0, "name": "event", "string": "0" },
 			{ "time": 0.4667, "name": "event", "string": "14" },

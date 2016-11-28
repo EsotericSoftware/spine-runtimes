@@ -562,13 +562,17 @@ public class AnimationStateTests {
 			expect(0, "end", 0, 0.8f), //
 			expect(0, "dispose", 0, 0.8f), //
 
-			expect(1, "start", 0, 0.8f), //
-			expect(1, "event 0", 0.1f, 0.9f), //
-			expect(1, "event 14", 0.5f, 1.3f), //
-			expect(1, "event 30", 1, 1.8f), //
-			expect(1, "complete", 1, 1.8f), //
-			expect(1, "end", 1, 1.9f), //
-			expect(1, "dispose", 1, 1.9f) //
+			expect(2, "start", 0, 0.8f), //
+			expect(2, "event 0", 0.1f, 0.9f), //
+
+			expect(1, "end", 0.9f, 1), //
+			expect(1, "dispose", 0.9f, 1), //
+
+			expect(2, "event 14", 0.5f, 1.3f), //
+			expect(2, "event 30", 1, 1.8f), //
+			expect(2, "complete", 1, 1.8f), //
+			expect(2, "end", 1, 1.9f), //
+			expect(2, "dispose", 1, 1.9f) //
 		);
 		state.setAnimation(0, "events0", false); // First should be ignored.
 		state.setAnimation(0, "events1", false);
@@ -576,7 +580,7 @@ public class AnimationStateTests {
 			public void frame (float time) {
 				if (MathUtils.isEqual(time, 0.8f)) {
 					state.setAnimation(0, "events0", false); // First should be ignored.
-					state.setAnimation(0, "events1", false);
+					state.setAnimation(0, "events2", false);
 				}
 			}
 		});
