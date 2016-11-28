@@ -55,6 +55,7 @@ import com.esotericsoftware.spine.Animation.ShearTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.Animation.TransformConstraintTimeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
+import com.esotericsoftware.spine.Animation.TwoColorTimeline;
 import com.esotericsoftware.spine.BoneData.TransformMode;
 import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
@@ -156,6 +157,9 @@ public class SkeletonJson {
 
 			String color = slotMap.getString("color", null);
 			if (color != null) data.getColor().set(Color.valueOf(color));
+
+			String dark = slotMap.getString("dark", null);
+			if (dark != null) data.setDarkColor(Color.valueOf(dark));
 
 			data.attachmentName = slotMap.getString("attachment", null);
 			data.blendMode = BlendMode.valueOf(slotMap.getString("blend", BlendMode.normal.name()));
@@ -429,7 +433,17 @@ public class SkeletonJson {
 			if (slot == null) throw new SerializationException("Slot not found: " + slotMap.name);
 			for (JsonValue timelineMap = slotMap.child; timelineMap != null; timelineMap = timelineMap.next) {
 				String timelineName = timelineMap.name;
-				if (timelineName.equals("color")) {
+				if (timelineName.equals("attachment")) {
+					AttachmentTimeline timeline = new AttachmentTimeline(timelineMap.size);
+					timeline.slotIndex = slot.index;
+
+					int frameIndex = 0;
+					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next)
+						timeline.setFrame(frameIndex++, valueMap.getFloat("time"), valueMap.getString("name"));
+					timelines.add(timeline);
+					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
+
+				} else if (timelineName.equals("color")) {
 					ColorTimeline timeline = new ColorTimeline(timelineMap.size);
 					timeline.slotIndex = slot.index;
 
@@ -443,15 +457,22 @@ public class SkeletonJson {
 					timelines.add(timeline);
 					duration = Math.max(duration, timeline.getFrames()[(timeline.getFrameCount() - 1) * ColorTimeline.ENTRIES]);
 
-				} else if (timelineName.equals("attachment")) {
-					AttachmentTimeline timeline = new AttachmentTimeline(timelineMap.size);
+				} else if (timelineName.equals("twoColor")) {
+					TwoColorTimeline timeline = new TwoColorTimeline(timelineMap.size);
 					timeline.slotIndex = slot.index;
 
 					int frameIndex = 0;
-					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next)
-						timeline.setFrame(frameIndex++, valueMap.getFloat("time"), valueMap.getString("name"));
+					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next) {
+						Color light = Color.valueOf(valueMap.getString("light"));
+						Color dark = Color.valueOf(valueMap.getString("dark"));
+						timeline.setFrame(frameIndex, valueMap.getFloat("time"), light.r, light.g, light.b, light.a, dark.r, dark.g,
+							dark.b);
+						readCurve(valueMap, timeline, frameIndex);
+						frameIndex++;
+					}
 					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
+					duration = Math.max(duration, timeline.getFrames()[(timeline.getFrameCount() - 1) * TwoColorTimeline.ENTRIES]);
+
 				} else
 					throw new RuntimeException("Invalid timeline type for a slot: " + timelineName + " (" + slotMap.name + ")");
 			}

@@ -57,6 +57,7 @@ import com.esotericsoftware.spine.Animation.ShearTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.Animation.TransformConstraintTimeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
+import com.esotericsoftware.spine.Animation.TwoColorTimeline;
 import com.esotericsoftware.spine.BoneData.TransformMode;
 import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
@@ -85,6 +86,7 @@ public class SkeletonBinary {
 
 	static public final int SLOT_ATTACHMENT = 0;
 	static public final int SLOT_COLOR = 1;
+	static public final int SLOT_TWO_COLOR = 2;
 
 	static public final int PATH_POSITION = 0;
 	static public final int PATH_SPACING = 1;
@@ -94,7 +96,7 @@ public class SkeletonBinary {
 	static public final int CURVE_STEPPED = 1;
 	static public final int CURVE_BEZIER = 2;
 
-	static private final Color tempColor = new Color();
+	static private final Color tempColor1 = new Color(), tempColor2 = new Color();
 
 	private final AttachmentLoader attachmentLoader;
 	private float scale = 1;
@@ -206,6 +208,10 @@ public class SkeletonBinary {
 				BoneData boneData = skeletonData.bones.get(input.readInt(true));
 				SlotData data = new SlotData(i, slotName, boneData);
 				Color.rgba8888ToColor(data.color, input.readInt());
+
+				int darkColor = input.readInt();
+				if (darkColor != -1) Color.rgb888ToColor(data.darkColor = new Color(), darkColor);
+
 				data.attachmentName = input.readString();
 				data.blendMode = BlendMode.values[input.readInt(true)];
 				skeletonData.slots.add(data);
@@ -523,20 +529,7 @@ public class SkeletonBinary {
 					int timelineType = input.readByte();
 					int frameCount = input.readInt(true);
 					switch (timelineType) {
-					case SLOT_COLOR: {
-						ColorTimeline timeline = new ColorTimeline(frameCount);
-						timeline.slotIndex = slotIndex;
-						for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-							float time = input.readFloat();
-							Color.rgba8888ToColor(tempColor, input.readInt());
-							timeline.setFrame(frameIndex, time, tempColor.r, tempColor.g, tempColor.b, tempColor.a);
-							if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
-						}
-						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getFrames()[(frameCount - 1) * ColorTimeline.ENTRIES]);
-						break;
-					}
-					case SLOT_ATTACHMENT:
+					case SLOT_ATTACHMENT: {
 						AttachmentTimeline timeline = new AttachmentTimeline(frameCount);
 						timeline.slotIndex = slotIndex;
 						for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
@@ -544,6 +537,35 @@ public class SkeletonBinary {
 						timelines.add(timeline);
 						duration = Math.max(duration, timeline.getFrames()[frameCount - 1]);
 						break;
+					}
+					case SLOT_COLOR: {
+						ColorTimeline timeline = new ColorTimeline(frameCount);
+						timeline.slotIndex = slotIndex;
+						for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
+							float time = input.readFloat();
+							Color.rgba8888ToColor(tempColor1, input.readInt());
+							timeline.setFrame(frameIndex, time, tempColor1.r, tempColor1.g, tempColor1.b, tempColor1.a);
+							if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
+						}
+						timelines.add(timeline);
+						duration = Math.max(duration, timeline.getFrames()[(frameCount - 1) * ColorTimeline.ENTRIES]);
+						break;
+					}
+					case SLOT_TWO_COLOR: {
+						TwoColorTimeline timeline = new TwoColorTimeline(frameCount);
+						timeline.slotIndex = slotIndex;
+						for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
+							float time = input.readFloat();
+							Color.rgba8888ToColor(tempColor1, input.readInt());
+							Color.rgb888ToColor(tempColor2, input.readInt());
+							timeline.setFrame(frameIndex, time, tempColor1.r, tempColor1.g, tempColor1.b, tempColor1.a, tempColor2.r,
+								tempColor2.g, tempColor2.b);
+							if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
+						}
+						timelines.add(timeline);
+						duration = Math.max(duration, timeline.getFrames()[(frameCount - 1) * TwoColorTimeline.ENTRIES]);
+						break;
+					}
 					}
 				}
 			}
