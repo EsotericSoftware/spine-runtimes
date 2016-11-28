@@ -35,12 +35,26 @@ using UnityEditor;
 using SpineInspectorUtility = Spine.Unity.Editor.SpineInspectorUtility;
 
 public class SpineSpriteShaderGUI : ShaderGUI {
-	static readonly string kShaderVertexLit = "Spine/Sprite/Vertex Lit";
-	static readonly string kShaderPixelLit = "Spine/Sprite/Pixel Lit";
-	static readonly string kShaderUnlit = "Spine/Sprite/Unlit";
-	static readonly int kSolidQueue = 2000;
-	static readonly int kAlphaTestQueue = 2450;
-	static readonly int kTransparentQueue = 3000;
+	
+	#region Constants
+	const string ShaderVertexLit = "Spine/Sprite/Vertex Lit";
+	const string ShaderPixelLit = "Spine/Sprite/Pixel Lit";
+	const string ShaderUnlit = "Spine/Sprite/Unlit";
+
+	const int SolidQueue = 2000;
+	const int AlphaTestQueue = 2450;
+	const int TransparentQueue = 3000;
+
+	const string PremultipledAlpha = "_ALPHAPREMULTIPLY_ON";
+	const string Multiply = "_MULTIPLYBLEND";
+	const string Multiply2x = "_MULTIPLYBLEND_X2";
+	const string Additive = "_ADDITIVEBLEND";
+	const string SoftAdditive = "_ADDITIVEBLEND_SOFT";
+
+	const string _FIXED_NORMALS = "_FIXED_NORMALS";
+	const string _FIXED_NORMALS_BACK_RENDERING = "_FIXED_NORMALS_BACK_RENDERING";
+
+	const string _SPHERICAL_HARMONICS = "_SPHERICAL_HARMONICS";
 
 	enum eBlendMode {
 		PreMultipliedAlpha,
@@ -59,10 +73,10 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 		Back = 2,
 		Front = 1,
 	}
+	#endregion
 
 	MaterialProperty _mainTexture = null;
 	MaterialProperty _color = null;
-	MaterialProperty _blendMode = null;
 
 	MaterialProperty _emissionMap = null;
 	MaterialProperty _emissionColor = null;
@@ -116,16 +130,21 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 
 	public override void AssignNewShaderToMaterial (Material material, Shader oldShader, Shader newShader) {
 		base.AssignNewShaderToMaterial(material, oldShader, newShader);
+
+		if (!(oldShader == Shader.Find(ShaderPixelLit) || oldShader == Shader.Find(ShaderVertexLit) || oldShader == Shader.Find(ShaderUnlit)))
+			SetDefaultSpriteKeywords(material, newShader);
+
 		SetMaterialKeywords(material);
 		SetLightModeFromShader(material);
 	}
+
+
 	#endregion
 
 	#region Virtual Interface
 	protected virtual void FindProperties (MaterialProperty[] props) {
 		_mainTexture = FindProperty("_MainTex", props);
 		_color = FindProperty("_Color", props);
-		_blendMode = FindProperty("_BlendMode", props);
 
 		_emissionMap = FindProperty("_EmissionMap", props, false);
 		_emissionColor = FindProperty("_EmissionColor", props, false);
@@ -184,6 +203,16 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 				EditorGUI.BeginChangeCheck();
 				bool fog = EditorGUILayout.Toggle("Use fog", material.IsKeywordEnabled("_FOG"));
 				if (EditorGUI.EndChangeCheck()) SetKeyword(material, "_FOG", fog);
+
+				EditorGUI.BeginChangeCheck();
+				bool enabled = EditorGUILayout.Toggle(
+					new GUIContent(
+						"Use Spherical Harmonics",
+						"Enable to use spherical harmonics to calculate ambient light / light probes. In vertex-lit mode this will be approximated from scenes ambient trilight settings."),
+					material.IsKeywordEnabled(_SPHERICAL_HARMONICS)
+				);
+				if (EditorGUI.EndChangeCheck())
+					SetKeyword(material, _SPHERICAL_HARMONICS, enabled);
 			}
 
 			using (new SpineInspectorUtility.BoxScope())
@@ -220,13 +249,13 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 							EditorGUI.BeginChangeCheck();
 							if (showAdvanced) {
 								backRendering = EditorGUILayout.Toggle(new GUIContent("Fixed Normal Back Rendering", "Tick only if you are going to rotate the sprite to face away from the camera, the fixed normal will be flipped to compensate."), 
-									material.IsKeywordEnabled("_FIXED_NORMALS_BACK_RENDERING"));
+									material.IsKeywordEnabled(_FIXED_NORMALS_BACK_RENDERING));
 							} else {
-								backRendering = material.IsKeywordEnabled("_FIXED_NORMALS_BACK_RENDERING");
+								backRendering = material.IsKeywordEnabled(_FIXED_NORMALS_BACK_RENDERING);
 							}
 							if (EditorGUI.EndChangeCheck()) {
-								SetKeyword(material, "_FIXED_NORMALS_BACK_RENDERING", backRendering);
-								SetKeyword(material, "_FIXED_NORMALS", !backRendering);
+								SetKeyword(material, _FIXED_NORMALS_BACK_RENDERING, backRendering);
+								SetKeyword(material, _FIXED_NORMALS, !backRendering);
 							}
 						}
 					}
@@ -259,8 +288,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 			}
 		}
 		if (EditorGUI.EndChangeCheck())	{
-			foreach (var obj in _blendMode.targets)
-				MaterialChanged((Material)obj);
+			MaterialChanged(material);
 		}
 	}
 
@@ -293,13 +321,13 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 
 	bool UseMeshNormalsCheckbox (Material material) {
 		EditorGUI.BeginChangeCheck();
-		bool fixedNormals = material.IsKeywordEnabled("_FIXED_NORMALS");
-		bool fixedNormalsBackRendering = material.IsKeywordEnabled("_FIXED_NORMALS_BACK_RENDERING");
+		bool fixedNormals = material.IsKeywordEnabled(_FIXED_NORMALS);
+		bool fixedNormalsBackRendering = material.IsKeywordEnabled(_FIXED_NORMALS_BACK_RENDERING);
 		bool meshNormals = EditorGUILayout.Toggle(new GUIContent("Use Mesh Normals", "If this is unticked, a Fixed Normal value will be used instead of the vertex normals on the mesh. Using a fixed normal is better for performance and can result in better looking lighting effects on 2d objects."), 
 			!fixedNormals && !fixedNormalsBackRendering);
 		if (EditorGUI.EndChangeCheck()) {
-			SetKeyword(material, "_FIXED_NORMALS", meshNormals ? false : fixedNormalsBackRendering ? false : true);
-			SetKeyword(material, "_FIXED_NORMALS_BACK_RENDERING", meshNormals ? false : fixedNormalsBackRendering);
+			SetKeyword(material, _FIXED_NORMALS, meshNormals ? false : fixedNormalsBackRendering ? false : true);
+			SetKeyword(material, _FIXED_NORMALS_BACK_RENDERING, meshNormals ? false : fixedNormalsBackRendering);
 		}
 		return meshNormals;
 	}
@@ -331,20 +359,37 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 	}
 	#endregion
 
+	static void SetDefaultSpriteKeywords (Material material, Shader shader) {
+		SetKeyword(material, "_EMISSION", false); // Disabled. standard shader sets this on by default.
+		SetKeyword(material, PremultipledAlpha, true); // PMA by default
+		SetKeyword(material, _FIXED_NORMALS, true); // Fixed normals by default, best for Spine.
+		SetKeyword(material, _SPHERICAL_HARMONICS, true);
+	}
+
 	void SetLightModeFromShader (Material material) {
-		if (material.shader.name == kShaderPixelLit)
+		if (material.shader.name == ShaderPixelLit)
 			_lightMode = eLightMode.PixelLit;
-		else if (material.shader.name == kShaderUnlit)
+		else if (material.shader.name == ShaderUnlit)
 			_lightMode = eLightMode.Unlit;
 		else
 			_lightMode = eLightMode.VertexLit;
 	}
 
-	static void SetMaterialKeywords (Material material) {
-		eBlendMode blendMode = (eBlendMode)material.GetFloat("_BlendMode");
+	static void SetRenderQueue (Material material, string queue) {
+		bool meshNormal = true;
 
+		if (material.HasProperty("_FixedNormal")) {
+			bool fixedNormals = material.IsKeywordEnabled(_FIXED_NORMALS);
+			bool fixedNormalsBackRendering = material.IsKeywordEnabled(_FIXED_NORMALS_BACK_RENDERING);
+			meshNormal = !fixedNormals && !fixedNormalsBackRendering;
+		}
+
+		material.SetOverrideTag("RenderType", meshNormal ? queue : "Sprite");
+	}
+
+	static void SetMaterialKeywords (Material material) {
 		bool normalMap = material.HasProperty("_BumpMap") && material.GetTexture("_BumpMap") != null;
-		SetKeyword (material, "_NORMALMAP", normalMap);
+		SetKeyword(material, "_NORMALMAP", normalMap);
 
 		bool zWrite = material.GetFloat("_ZWrite") > 0.0f;
 		bool clipAlpha = zWrite && material.GetFloat("_Cutoff") > 0.0f;
@@ -356,11 +401,41 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 		bool blendTexture = material.HasProperty("_BlendTex") && material.GetTexture("_BlendTex") != null;
 		SetKeyword(material, "_TEXTURE_BLEND", blendTexture);
 
-		SetKeyword(material, "_ALPHAPREMULTIPLY_ON", blendMode == eBlendMode.PreMultipliedAlpha);
-		SetKeyword(material, "_MULTIPLYBLEND", blendMode == eBlendMode.Multiply);
-		SetKeyword(material, "_MULTIPLYBLEND_X2", blendMode == eBlendMode.Multiplyx2);
-		SetKeyword(material, "_ADDITIVEBLEND", blendMode == eBlendMode.Additive);
-		SetKeyword(material, "_ADDITIVEBLEND_SOFT", blendMode == eBlendMode.SoftAdditive);
+		eBlendMode blendMode = GetMaterialBlendMode(material);
+		SetBlendMode(material, blendMode);
+	}
+
+	static eBlendMode GetMaterialBlendMode (Material material) {
+		if (material.IsKeywordEnabled(PremultipledAlpha))
+			return eBlendMode.PreMultipliedAlpha;
+		if (material.IsKeywordEnabled(Multiply))
+			return eBlendMode.Multiply;
+		if (material.IsKeywordEnabled(Multiply2x))
+			return eBlendMode.Multiplyx2;
+		if (material.IsKeywordEnabled(Additive))
+			return eBlendMode.Additive;
+		if (material.IsKeywordEnabled(SoftAdditive))
+			return eBlendMode.SoftAdditive;
+
+		return eBlendMode.StandardAlpha;
+	}
+
+	void BlendModePopup () {
+		var material = _materialEditor.target as Material;
+		eBlendMode blendMode = GetMaterialBlendMode(material);
+		EditorGUI.BeginChangeCheck();
+		blendMode = (eBlendMode)EditorGUILayout.Popup("Blend Mode", (int)blendMode, Enum.GetNames(typeof(eBlendMode)));
+
+		if (EditorGUI.EndChangeCheck())
+			SetBlendMode(material, blendMode);
+	}
+
+	static void SetBlendMode (Material material, eBlendMode blendMode) {
+		SetKeyword(material, PremultipledAlpha, blendMode == eBlendMode.PreMultipliedAlpha);
+		SetKeyword(material, Multiply, blendMode == eBlendMode.Multiply);
+		SetKeyword(material, Multiply2x, blendMode == eBlendMode.Multiplyx2);
+		SetKeyword(material, Additive, blendMode == eBlendMode.Additive);
+		SetKeyword(material, SoftAdditive, blendMode == eBlendMode.SoftAdditive);
 
 		int renderQueue;
 
@@ -369,50 +444,51 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 			{
 				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
 				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
-				material.SetOverrideTag("RenderType", "Opaque");
-				renderQueue = kSolidQueue;
+				SetRenderQueue(material, "Opaque");
+				renderQueue = SolidQueue;
 			}
 			break;
 		case eBlendMode.Additive:
 			{ 
 				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
 				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.One);
-				material.SetOverrideTag("RenderType", "Transparent");
-				renderQueue = kTransparentQueue;
+				SetRenderQueue(material, "Transparent");
+				renderQueue = TransparentQueue;
 			}
 			break;
 		case eBlendMode.SoftAdditive:
 			{
 				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
 				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcColor);
-				material.SetOverrideTag("RenderType", "Transparent");
-				renderQueue = kTransparentQueue;
+				SetRenderQueue(material, "Transparent");
+				renderQueue = TransparentQueue;
 			}
 			break;
 		case eBlendMode.Multiply:
 			{
 				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
 				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.SrcColor);
-				material.SetOverrideTag("RenderType", "Transparent");
-				renderQueue = kTransparentQueue;
+				SetRenderQueue(material, "Transparent");
+				renderQueue = TransparentQueue;
 			}
 			break;
 		case eBlendMode.Multiplyx2:
 			{
 				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.DstColor);
 				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.SrcColor);
-				material.SetOverrideTag("RenderType", "Transparent");
-				renderQueue = kTransparentQueue;
+				SetRenderQueue(material, "Transparent");
+				renderQueue = TransparentQueue;
 			}
 			break;
 		case eBlendMode.PreMultipliedAlpha:
 		case eBlendMode.StandardAlpha:
 		default:
 			{
+				bool zWrite = material.GetFloat("_ZWrite") > 0.0f;
 				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
 				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-				material.SetOverrideTag("RenderType", zWrite ? "TransparentCutout" : "Transparent");
-				renderQueue = zWrite ? kAlphaTestQueue : kTransparentQueue;
+				SetRenderQueue(material, zWrite ? "TransparentCutout" : "Transparent");
+				renderQueue = zWrite ? AlphaTestQueue : TransparentQueue;
 			}
 			break;
 		}
@@ -459,16 +535,16 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 
 			switch (_lightMode) {
 			case eLightMode.VertexLit:
-				if (material.shader.name != kShaderVertexLit)
-					_materialEditor.SetShader(Shader.Find(kShaderVertexLit), false);
+				if (material.shader.name != ShaderVertexLit)
+					_materialEditor.SetShader(Shader.Find(ShaderVertexLit), false);
 				break;
 			case eLightMode.PixelLit:
-				if (material.shader.name != kShaderPixelLit)
-					_materialEditor.SetShader(Shader.Find(kShaderPixelLit), false);
+				if (material.shader.name != ShaderPixelLit)
+					_materialEditor.SetShader(Shader.Find(ShaderPixelLit), false);
 				break;
 			case eLightMode.Unlit:
-				if (material.shader.name != kShaderUnlit)
-					_materialEditor.SetShader(Shader.Find(kShaderUnlit), false);
+				if (material.shader.name != ShaderUnlit)
+					_materialEditor.SetShader(Shader.Find(ShaderUnlit), false);
 				break;
 			}
 
@@ -476,13 +552,5 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 		}
 	}
 
-	void BlendModePopup () {
-		eBlendMode mode = (eBlendMode)_blendMode.floatValue;
-		EditorGUI.BeginChangeCheck();
-		mode = (eBlendMode)EditorGUILayout.Popup("Blend Mode", (int)mode, Enum.GetNames(typeof(eBlendMode)));
-		if (EditorGUI.EndChangeCheck()) {
-			_materialEditor.RegisterPropertyChangeUndo("Blend Mode");
-			_blendMode.floatValue = (float)mode;
-		}
-	}
+
 }

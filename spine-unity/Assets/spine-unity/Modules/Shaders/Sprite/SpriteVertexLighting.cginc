@@ -9,8 +9,8 @@
 // Defines
 //
 
-//Define to use fake spherical harmonics for ambient lighting
-#define TRI_COLOR_AMBIENT
+//Define to use spot lights (more expensive)
+#define SPOT_LIGHTS
 
 //Have to process lighting per pixel if using normal maps or a diffuse ramp or rim lighting
 #if defined(_NORMALMAP) || defined(_DIFFUSE_RAMP) || defined(_RIM_LIGHTING)
@@ -126,7 +126,7 @@ struct VertexLightInfo
 	fixed3 lightColor;
 	
 #if defined(_DIFFUSE_RAMP)	
-	float attenuation;
+	float attenuationSqrt;
 #endif // _DIFFUSE_RAMP
 };
 
@@ -135,24 +135,29 @@ inline VertexLightInfo getVertexLightAttenuatedInfo(int index, float3 viewPos)
 	VertexLightInfo lightInfo;
 	
 	//For directional lights _WorldSpaceLightPos0.w is set to zero
-	lightInfo.lightDirection = unity_LightPosition[index].xyz - (viewPos.xyz * unity_LightPosition[index].w);
+	lightInfo.lightDirection = unity_LightPosition[index].xyz - viewPos.xyz * unity_LightPosition[index].w;
 	float lengthSq = dot(lightInfo.lightDirection, lightInfo.lightDirection);
+	
+	// don't produce NaNs if some vertex position overlaps with the light
+	lengthSq = max(lengthSq, 0.000001);
+		
 	lightInfo.lightDirection *= rsqrt(lengthSq);
 	
-	float attenuation = 1.0 / (1.0 + lengthSq * unity_LightAtten[index].z);
+	float attenuation = 1.0 / (1.0 + lengthSq * unity_LightAtten[index].z);	
 	
+#if defined(SPOT_LIGHTS)
 	//Spot light attenuation - for non-spot lights unity_LightAtten.x is set to -1 and y is set to 1
-	if (-1 != unity_LightAtten[index].x || 1 != unity_LightAtten[index].y)
-	{	
-		float rho = dotClamped(lightInfo.lightDirection, unity_SpotDirection[index].xyz);
+	{
+		float rho = max (0, dot(lightInfo.lightDirection, unity_SpotDirection[index].xyz));
 		float spotAtt = (rho - unity_LightAtten[index].x) * unity_LightAtten[index].y;
 		attenuation *= saturate(spotAtt);
 	}
-
+#endif // SPOT_LIGHTS
+	
 	//If using a diffuse ramp texture then need to pass through the lights attenuation, otherwise premultiply the light color with it
 #if defined(_DIFFUSE_RAMP)	
 	lightInfo.lightColor = unity_LightColor[index].rgb;
-	lightInfo.attenuation = sqrt(attenuation);
+	lightInfo.attenuationSqrt = sqrt(attenuation);
 #else
 	lightInfo.lightColor = unity_LightColor[index].rgb * attenuation;
 #endif // _DIFFUSE_RAMP
@@ -162,13 +167,13 @@ inline VertexLightInfo getVertexLightAttenuatedInfo(int index, float3 viewPos)
 
 fixed3 calculateAmbientLight(half3 normalWorld)
 {
-#if defined(TRI_COLOR_AMBIENT)	
+#if defined(_SPHERICAL_HARMONICS)	
 
 	//Magic constants used to tweak ambient to approximate pixel shader spherical harmonics 
-	fixed3 worldUp = fixed3(0,1,0);
-	float skyGroundDotMul = 2.5;
-	float minEquatorMix = 0.5;
-	float equatorColorBlur = 0.33;
+	static const fixed3 worldUp = fixed3(0,1,0);
+	static const float skyGroundDotMul = 2.5;
+	static const float minEquatorMix = 0.5;
+	static const float equatorColorBlur = 0.33;
 	
 	float upDot = dot(normalWorld, worldUp);
 	
@@ -191,13 +196,12 @@ fixed3 calculateAmbientLight(half3 normalWorld)
 	//Mix the two colors together based on how bright the equator light is
 	return lerp(skyGroundColor, equatorColor, saturate(equatorBright + minEquatorMix)) * 0.75;
 
-#else 
+#else // !_SPHERICAL_HARMONICS
 
 	//Flat ambient is just the sky color
 	return unity_AmbientSky.rgb * 0.75;
 	
-#endif // TRI_COLOR_AMBIENT	
-
+#endif // !_SPHERICAL_HARMONICS	
 }
 
 ////////////////////////////////////////
@@ -208,18 +212,18 @@ fixed3 calculateAmbientLight(half3 normalWorld)
 
 inline fixed3 calculateLightDiffuse(fixed3 lightColor, half3 normal, half3 lightDirection, float attenuation)
 {
-	float angleDot = dotClamped(normal, lightDirection);
+	float angleDot = max(0, dot(normal, lightDirection));
 	fixed3 diffuse = calculateRampedDiffuse(lightColor, attenuation, angleDot);
-	return diffuse * 0.75;
+	return diffuse;
 }
 
 #else
 
 inline fixed3 calculateLightDiffuse(fixed3 attenuatedLightColor, half3 normal, half3 lightDirection)
 {
-	float angleDot = dotClamped(normal, lightDirection);
+	float angleDot = max(0, dot(normal, lightDirection));
 	fixed3 diffuse = attenuatedLightColor * angleDot;
-	return diffuse * 0.75;
+	return diffuse;
 }
 
 #endif // _NORMALMAP
@@ -273,7 +277,7 @@ inline VertexLightInfo getVertexLightAttenuatedInfoWorldSpace(int index, float3 
 
 	#define PACK_VERTEX_LIGHT_DIFFUSE(index, output, lightInfo) \
 	{ \
-		output.LIGHT_DIFFUSE_ATTEN_##index = lightInfo.attenuation; \
+		output.LIGHT_DIFFUSE_ATTEN_##index = lightInfo.attenuationSqrt; \
 	}
 	
 	#define ADD_VERTEX_LIGHT_DIFFUSE(index, diffuse, input, vertexLightColor, normalDirection, vertexLightDir) \
@@ -314,10 +318,8 @@ inline VertexLightInfo getVertexLightAttenuatedInfoWorldSpace(int index, float3 
 inline fixed3 calculateLightDiffuse(int index, float3 viewPos, half3 viewNormal)
 {
 	VertexLightInfo lightInfo = getVertexLightAttenuatedInfo(index, viewPos);
-	float angleDot = dotClamped(viewNormal, lightInfo.lightDirection);
-	
-	fixed3 diffuse =  lightInfo.lightColor * angleDot;
-	return diffuse;
+	float diff = max (0, dot (viewNormal, lightInfo.lightDirection));
+	return lightInfo.lightColor * diff;
 }
 
 #endif // !PER_PIXEL_LIGHTING
@@ -368,7 +370,7 @@ VertexOutput vert(VertexInput input)
 	diffuse += calculateLightDiffuse(2, viewPos, viewNormal);
 	diffuse += calculateLightDiffuse(3, viewPos, viewNormal);
 	
-	output.FullLighting = saturate(ambient + diffuse);
+	output.FullLighting = ambient + diffuse;
 	
 #endif // !PER_PIXEL_LIGHTING
 	
@@ -408,7 +410,7 @@ fixed4 frag(VertexOutput input) : SV_Target
 	ADD_VERTEX_LIGHT(2, input, normalWorld, diffuse)
 	ADD_VERTEX_LIGHT(3, input, normalWorld, diffuse)
 	
-	fixed3 lighting = saturate(ambient + diffuse);
+	fixed3 lighting = ambient + diffuse;
 	
 	APPLY_EMISSION(lighting, input.texcoord.xy)
 

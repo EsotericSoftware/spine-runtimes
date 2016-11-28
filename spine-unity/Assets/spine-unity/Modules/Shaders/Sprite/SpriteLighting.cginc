@@ -1,5 +1,3 @@
-// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
-
 #ifndef SPRITE_LIGHTING_INCLUDED
 #define SPRITE_LIGHTING_INCLUDED
 
