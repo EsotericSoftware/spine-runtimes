@@ -130,7 +130,7 @@ public class TwoColorPolygonBatch {
 		mesh.setVertices(vertices, 0, vertexIndex);
 		mesh.setIndices(triangles, 0, triangleIndex);
 		Gdx.gl.glEnable(GL20.GL_BLEND);
-		Gdx.gl.glBlendFunc(blendSrcFunc, blendDstFunc);
+		if (blendSrcFunc != -1) Gdx.gl.glBlendFunc(blendSrcFunc, blendDstFunc);
 		mesh.render(shader, GL20.GL_TRIANGLES, 0, triangleIndex);
 
 		vertexIndex = 0;
