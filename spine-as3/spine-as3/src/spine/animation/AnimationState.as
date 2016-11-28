@@ -89,7 +89,7 @@ public class AnimationState {
 					next.delay = 0;
 					next.trackTime = nextTime + delta * next.timeScale;
 					current.trackTime += currentDelta;
-					setCurrent(i, next);
+					setCurrent(i, next, true);
 					while (next.mixingFrom != null) {
 						next.mixTime += currentDelta;
 						next = next.mixingFrom;
@@ -355,12 +355,12 @@ public class AnimationState {
 	}
 	
 	
-	private function setCurrent (index:int, current:TrackEntry):void {
+	private function setCurrent (index:int, current:TrackEntry, interrupt:Boolean):void {
 		var from:TrackEntry = expandToIndex(index);
 		tracks[index] = current;
 
 		if (from != null) {
-			queue.interrupt(from);
+			if (interrupt) queue.interrupt(from);
 			current.mixingFrom = from;
 			current.mixTime = 0;
 
@@ -381,6 +381,7 @@ public class AnimationState {
 	
 	public function setAnimation (trackIndex:int, animation:Animation, loop:Boolean):TrackEntry {
 		if (animation == null) throw new ArgumentError("animation cannot be null.");
+		var interrupt:Boolean = true;
 		var current:TrackEntry = expandToIndex(trackIndex);
 		if (current != null) {
 			if (current.nextTrackLast == -1) {
@@ -390,11 +391,12 @@ public class AnimationState {
 				queue.end(current);
 				disposeNext(current);
 				current = current.mixingFrom;
+				interrupt = false;
 			} else
 				disposeNext(current);
 		}
 		var entry:TrackEntry = trackEntry(trackIndex, animation, loop, current);
-		setCurrent(trackIndex, entry);
+		setCurrent(trackIndex, entry, interrupt);
 		queue.drain();
 		return entry;
 	}
@@ -417,7 +419,7 @@ public class AnimationState {
 		var entry:TrackEntry = trackEntry(trackIndex, animation, loop, last);
 
 		if (last == null) {
-			setCurrent(trackIndex, entry);
+			setCurrent(trackIndex, entry, true);
 			queue.drain();
 		} else {
 			last.next = entry;
