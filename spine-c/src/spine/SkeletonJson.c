@@ -685,6 +685,12 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 					data->blendMode = SP_BLEND_MODE_SCREEN;
 			}
 
+			item = Json_getItem(slotMap, "additive");
+			if (item && item->type == Json_True)
+			{
+				data->blendMode = SP_BLEND_MODE_ADDITIVE;
+			}
+
 			skeletonData->slots[i] = data;
 		}
 	}
