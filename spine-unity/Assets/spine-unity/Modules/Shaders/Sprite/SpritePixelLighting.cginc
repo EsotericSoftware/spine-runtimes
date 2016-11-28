@@ -9,9 +9,6 @@
 // Defines
 //
 
-//Define to use spherical harmonics for ambient lighting
-#define TRI_COLOR_AMBIENT
-
 ////////////////////////////////////////
 // Vertex output struct
 //
@@ -94,7 +91,7 @@ fixed3 calculateVertexLighting(float3 posWorld, float3 normalWorld)
 
 fixed3 calculateAmbientLight(half3 normalWorld)
 {
-#if defined(TRI_COLOR_AMBIENT)
+#if defined(_SPHERICAL_HARMONICS)
 	fixed3 ambient = ShadeSH9(half4(normalWorld, 1.0)) * 0.75f;
 #else 
 	fixed3 ambient = unity_AmbientSky.rgb * 0.75;
