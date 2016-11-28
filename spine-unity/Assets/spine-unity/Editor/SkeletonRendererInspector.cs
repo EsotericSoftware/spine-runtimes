@@ -296,7 +296,7 @@ namespace Spine.Unity.Editor {
 				//	EditorGUILayout.Space();
 				//	bool addSkeletonUtility = GUILayout.Button(buttonContent, GUILayout.Height(30));
 				//	foreach (var t in targets) {
-				//		var component = t as SkeletonAnimation;
+				//		var component = t as Component;
 				//		if (addSkeletonUtility && component.GetComponent<SkeletonUtility>() == null)
 				//			component.gameObject.AddComponent<SkeletonUtility>();
 				//	}
