@@ -46,7 +46,7 @@ void _spAnimationState_updateMixingFrom (spAnimationState* self, spTrackEntry* e
 float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* entry, spSkeleton* skeleton);
 void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* timeline, spSkeleton* skeleton, float time, float alpha, int /*boolean*/ setupPose, float* timelinesRotation, int i, int /*boolean*/ firstFrame);
 void _spAnimationState_queueEvents (spAnimationState* self, spTrackEntry* entry, float animationTime);
-void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEntry* current);
+void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEntry* current, int /*boolean*/ interrupt);
 spTrackEntry* _spAnimationState_expandToIndex (spAnimationState* self, int index);
 spTrackEntry* _spAnimationState_trackEntry (spAnimationState* self, int trackIndex, spAnimation* animation, int /*boolean*/ loop, spTrackEntry* last);
 void _spAnimationState_disposeNext (spAnimationState* self, spTrackEntry* entry);
@@ -175,7 +175,6 @@ void _spEventQueue_drain (_spEventQueue* self) {
 }
 
 void _spAnimationState_disposeTrackEntry (spTrackEntry* entry) {
-	if (entry->mixingFrom) _spAnimationState_disposeTrackEntry(entry->mixingFrom);
 	FREE(entry->timelinesFirst);
 	FREE(entry->timelinesRotation);
 	FREE(entry);
@@ -184,6 +183,12 @@ void _spAnimationState_disposeTrackEntry (spTrackEntry* entry) {
 void _spAnimationState_disposeTrackEntries (spAnimationState* state, spTrackEntry* entry) {
 	while (entry) {
 		spTrackEntry* next = entry->next;
+		spTrackEntry* from = entry->mixingFrom;
+		while (from) {
+			spTrackEntry* nextFrom = from->mixingFrom;
+			_spAnimationState_disposeTrackEntry(from);
+			from = nextFrom;
+		}
 		_spAnimationState_disposeTrackEntry(entry);
 		entry = next;
 	}
@@ -255,7 +260,7 @@ void spAnimationState_update (spAnimationState* self, float delta) {
 				next->delay = 0;
 				next->trackTime = nextTime + delta * next->timeScale;
 				current->trackTime += currentDelta;
-				_spAnimationState_setCurrent(self, i, next);
+				_spAnimationState_setCurrent(self, i, next, 1);
 				while (next->mixingFrom) {
 					next->mixTime += currentDelta;
 					next = next->mixingFrom;
@@ -566,13 +571,13 @@ void spAnimationState_clearTrack (spAnimationState* self, int trackIndex) {
 	_spEventQueue_drain(internal->queue);
 }
 
-void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEntry* current) {
+void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEntry* current, int /*boolean*/ interrupt) {
 	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
 	spTrackEntry* from = _spAnimationState_expandToIndex(self, index);
 	self->tracks[index] = current;
 
 	if (from) {
-		_spEventQueue_interrupt(internal->queue, from);
+		if (interrupt) _spEventQueue_interrupt(internal->queue, from);
 		current->mixingFrom = from;
 		current->mixTime = 0;
 
@@ -593,6 +598,7 @@ spTrackEntry* spAnimationState_setAnimationByName (spAnimationState* self, int t
 spTrackEntry* spAnimationState_setAnimation (spAnimationState* self, int trackIndex, spAnimation* animation, int/*bool*/loop) {
 	spTrackEntry* entry;
 	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
+	int interrupt = 1;
 	spTrackEntry* current = _spAnimationState_expandToIndex(self, trackIndex);
 	if (current) {
 		if (current->nextTrackLast == -1) {
@@ -602,11 +608,12 @@ spTrackEntry* spAnimationState_setAnimation (spAnimationState* self, int trackIn
 			_spEventQueue_end(internal->queue, current);
 			_spAnimationState_disposeNext(self, current);
 			current = current->mixingFrom;
+			interrupt = 0;
 		} else
 			_spAnimationState_disposeNext(self, current);
 	}
 	entry = _spAnimationState_trackEntry(self, trackIndex, animation, loop, current);
-	_spAnimationState_setCurrent(self, trackIndex, entry);
+	_spAnimationState_setCurrent(self, trackIndex, entry, interrupt);
 	_spEventQueue_drain(internal->queue);
 	return entry;
 }
@@ -632,7 +639,7 @@ spTrackEntry* spAnimationState_addAnimation (spAnimationState* self, int trackIn
 	entry = _spAnimationState_trackEntry(self, trackIndex, animation, loop, last);
 
 	if (!last) {
-		_spAnimationState_setCurrent(self, trackIndex, entry);
+		_spAnimationState_setCurrent(self, trackIndex, entry, 1);
 		_spEventQueue_drain(internal->queue);
 	} else {
 		last->next = entry;

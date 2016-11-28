@@ -59,7 +59,7 @@ public class AnimationState {
 	boolean animationsChanged;
 	private float timeScale = 1;
 
-	final Pool<TrackEntry> trackEntryPool = new Pool() {
+	Pool<TrackEntry> trackEntryPool = new Pool() {
 		protected Object newObject () {
 			return new TrackEntry();
 		}
@@ -239,6 +239,9 @@ public class AnimationState {
 
 	private void applyRotateTimeline (Timeline timeline, Skeleton skeleton, float time, float alpha, boolean setupPose,
 		float[] timelinesRotation, int i, boolean firstFrame) {
+
+		if (firstFrame) timelinesRotation[i] = 0;
+
 		if (alpha == 1) {
 			timeline.apply(skeleton, 0, time, null, 1, setupPose, false);
 			return;
@@ -272,13 +275,9 @@ public class AnimationState {
 		// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
 		float r1 = setupPose ? bone.data.rotation : bone.rotation;
 		float total, diff = r2 - r1;
-		if (diff == 0) {
-			if (firstFrame) {
-				timelinesRotation[i] = 0;
-				total = 0;
-			} else
-				total = timelinesRotation[i];
-		} else {
+		if (diff == 0)
+			total = timelinesRotation[i];
+		else {
 			diff -= (16384 - (int)(16384.499999999996 - diff / 360)) * 360;
 			float lastTotal, lastDiff;
 			if (firstFrame) {
@@ -382,6 +381,8 @@ public class AnimationState {
 			if (interrupt) queue.interrupt(from);
 			current.mixingFrom = from;
 			current.mixTime = 0;
+
+			from.timelinesRotation.clear(); // Reset rotation for mixing out, in case entry was mixed in.
 
 			// If not completely mixed in, set mixAlpha so mixing out happens from current mix to zero.
 			if (from.mixingFrom != null) current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);

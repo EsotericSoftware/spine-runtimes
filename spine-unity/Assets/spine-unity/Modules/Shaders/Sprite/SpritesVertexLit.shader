@@ -27,8 +27,7 @@ Shader "Spine/Sprite/Vertex Lit"
 		
 		_BlendTex ("Blend Texture", 2D) = "white" {}
 		_BlendAmount ("Blend", Range(0,1)) = 0.0
-		
-		[HideInInspector] _BlendMode ("__mode", Float) = 0.0
+
 		[HideInInspector] _SrcBlend ("__src", Float) = 1.0
 		[HideInInspector] _DstBlend ("__dst", Float) = 0.0
 		[HideInInspector] _RenderQueue ("__queue", Float) = 0.0
@@ -37,7 +36,7 @@ Shader "Spine/Sprite/Vertex Lit"
 	
 	SubShader
 	{
-		Tags { "Queue"="Transparent" "RenderType"="Transparent" }
+		Tags { "Queue"="Transparent" "RenderType"="Sprite" }
 		LOD 150
 		
 		Pass
@@ -62,6 +61,7 @@ Shader "Spine/Sprite/Vertex Lit"
 				#pragma shader_feature _COLOR_ADJUST
 				#pragma shader_feature _RIM_LIGHTING
 				#pragma shader_feature _TEXTURE_BLEND
+				#pragma shader_feature _SPHERICAL_HARMONICS
 				#pragma shader_feature _FOG
 				
                 #pragma fragmentoption ARB_precision_hint_fastest

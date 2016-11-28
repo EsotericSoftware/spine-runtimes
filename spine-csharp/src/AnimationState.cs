@@ -95,7 +95,7 @@ namespace Spine {
 						next.delay = 0;
 						next.trackTime = nextTime + (delta * next.timeScale);
 						current.trackTime += currentDelta;
-						SetCurrent(i, next);
+						SetCurrent(i, next, true);
 						while (next.mixingFrom != null) {
 							next.mixTime += currentDelta;
 							next = next.mixingFrom;
@@ -136,7 +136,7 @@ namespace Spine {
 			from.trackTime += delta * from.timeScale;
 			entry.mixTime += delta * entry.timeScale;
 		}
-			
+
 
 		/// <summary>
 		/// Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so the 
@@ -242,6 +242,9 @@ namespace Spine {
 
 		static private void ApplyRotateTimeline (RotateTimeline rotateTimeline, Skeleton skeleton, float time, float alpha, bool setupPose,
 			float[] timelinesRotation, int i, bool firstFrame) {
+
+			if (firstFrame) timelinesRotation[i] = 0;
+
 			if (alpha == 1) {
 				rotateTimeline.Apply(skeleton, 0, time, null, 1, setupPose, false);
 				return;
@@ -275,11 +278,7 @@ namespace Spine {
 			float r1 = setupPose ? bone.data.rotation : bone.rotation;
 			float total, diff = r2 - r1;
 			if (diff == 0) {
-				if (firstFrame) {
-					timelinesRotation[i] = 0;
-					total = 0;
-				} else
-					total = timelinesRotation[i];
+				total = timelinesRotation[i];
 			} else {
 				diff -= (16384 - (int)(16384.499999999996 - diff / 360)) * 360;
 				float lastTotal, lastDiff;
@@ -378,12 +377,12 @@ namespace Spine {
 			queue.Drain();
 		}
 
-		private void SetCurrent (int index, TrackEntry current) {
+		private void SetCurrent (int index, TrackEntry current, bool interrupt) {
 			TrackEntry from = ExpandToIndex(index);
 			tracks.Items[index] = current;
 
 			if (from != null) {
-				queue.Interrupt(from);
+				if (interrupt) queue.Interrupt(from);
 				current.mixingFrom = from;
 				current.mixTime = 0;
 
@@ -413,6 +412,7 @@ namespace Spine {
 		/// after <see cref="AnimationState.Dispose"/>.</returns>
 		public TrackEntry SetAnimation (int trackIndex, Animation animation, bool loop) {
 			if (animation == null) throw new ArgumentNullException("animation", "animation cannot be null.");
+			bool interrupt = true;
 			TrackEntry current = ExpandToIndex(trackIndex);
 			if (current != null) {
 				if (current.nextTrackLast == -1) {
@@ -422,12 +422,13 @@ namespace Spine {
 					queue.End(current);
 					DisposeNext(current);
 					current = current.mixingFrom;
+					interrupt = false;
 				} else {
 					DisposeNext(current);
 				}
 			}
 			TrackEntry entry = NewTrackEntry(trackIndex, animation, loop, current);
-			SetCurrent(trackIndex, entry);
+			SetCurrent(trackIndex, entry, interrupt);
 			queue.Drain();
 			return entry;
 		}
@@ -460,7 +461,7 @@ namespace Spine {
 			TrackEntry entry = NewTrackEntry(trackIndex, animation, loop, last);
 
 			if (last == null) {
-				SetCurrent(trackIndex, entry);
+				SetCurrent(trackIndex, entry, true);
 				queue.Drain();
 			} else {
 				last.next = entry;
@@ -503,7 +504,7 @@ namespace Spine {
 			entry.trackEnd = mixDuration;
 			return entry;
 		}
-			
+
 		/// <summary>
 		/// Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix duration.</summary>
 		public void SetEmptyAnimations (float mixDuration) {

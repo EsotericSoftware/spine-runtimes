@@ -93,14 +93,13 @@ namespace Spine {
 		#if WINDOWS_PHONE
 			using (var input = new BufferedStream(Microsoft.Xna.Framework.TitleContainer.OpenStream(path))) {
 		#else
-			using (var input = new BufferedStream(new FileStream(path, FileMode.Open))) {
-		#endif // WINDOWS_PHONE
+			using (var input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+		#endif
 				SkeletonData skeletonData = ReadSkeletonData(input);
 				skeletonData.name = Path.GetFileNameWithoutExtension(path);
 				return skeletonData;
 			}
 		}
-
 		#endif // WINDOWS_STOREAPP
 
 		public static readonly TransformMode[] TransformModeValues = {

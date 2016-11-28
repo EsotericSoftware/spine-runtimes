@@ -74,7 +74,7 @@ module spine {
 						next.delay = 0;
 						next.trackTime = nextTime + delta * next.timeScale;
 						current.trackTime += currentDelta;
-						this.setCurrent(i, next);
+						this.setCurrent(i, next, true);
 						while (next.mixingFrom != null) {
 							next.mixTime += currentDelta;
 							next = next.mixingFrom;
@@ -338,12 +338,12 @@ module spine {
 			this.queue.drain();
 		}
 
-		setCurrent (index: number, current: TrackEntry) {
+		setCurrent (index: number, current: TrackEntry, interrupt: boolean) {
 			let from = this.expandToIndex(index);
 			this.tracks[index] = current;
 
 			if (from != null) {
-				this.queue.interrupt(from);
+				if (interrupt) this.queue.interrupt(from);
 				current.mixingFrom = from;
 				current.mixTime = 0;
 
@@ -362,6 +362,7 @@ module spine {
 
 		setAnimationWith (trackIndex: number, animation: Animation, loop: boolean) {
 			if (animation == null) throw new Error("animation cannot be null.");
+			let interrupt = true;
 			let current = this.expandToIndex(trackIndex);
 			if (current != null) {
 				if (current.nextTrackLast == -1) {
@@ -371,11 +372,12 @@ module spine {
 					this.queue.end(current);
 					this.disposeNext(current);
 					current = current.mixingFrom;
+					interrupt = false;
 				} else
 					this.disposeNext(current);
 			}
 			let entry = this.trackEntry(trackIndex, animation, loop, current);
-			this.setCurrent(trackIndex, entry);
+			this.setCurrent(trackIndex, entry, interrupt);
 			this.queue.drain();
 			return entry;
 		}
@@ -398,7 +400,7 @@ module spine {
 			let entry = this.trackEntry(trackIndex, animation, loop, last);
 
 			if (last == null) {
-				this.setCurrent(trackIndex, entry);
+				this.setCurrent(trackIndex, entry, true);
 				this.queue.drain();
 			} else {
 				last.next = entry;

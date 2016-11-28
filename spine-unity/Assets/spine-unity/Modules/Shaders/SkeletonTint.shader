@@ -1,6 +1,13 @@
+// Spine/Skeleton Tint
+// - Two color tint
+// - unlit
+// - Premultiplied alpha blending
+// - No depth, no backface culling, no fog.
+
 Shader "Spine/Skeleton Tint" {
 	Properties {
 		_Color ("Tint Color", Color) = (1,1,1,1)
+		_Black ("Black Point", Color) = (0,0,0,0)
 		_MainTex ("MainTex", 2D) = "black" {}
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
 	}
@@ -23,6 +30,7 @@ Shader "Spine/Skeleton Tint" {
 			#include "UnityCG.cginc"
 			uniform sampler2D _MainTex; uniform float4 _MainTex_ST;
 			uniform float4 _Color;
+			uniform float4 _Black;
 
 			struct VertexInput {
 				float4 vertex : POSITION;
@@ -45,7 +53,8 @@ Shader "Spine/Skeleton Tint" {
 			}
 
 			float4 frag (VertexOutput i) : COLOR {
-				return (tex2D(_MainTex, i.uv) * i.vertexColor);
+				float4 texColor = tex2D(_MainTex, i.uv);
+				return (texColor * i.vertexColor) + float4(((1-texColor.rgb) * texColor.a * _Black.rgb), 0);
 			}
 			ENDCG
 		}

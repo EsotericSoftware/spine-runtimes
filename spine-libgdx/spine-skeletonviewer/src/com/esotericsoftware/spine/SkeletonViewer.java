@@ -702,7 +702,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 		}
 
 		void render () {
-			if (state.getCurrent(ui.trackButtons.getCheckedIndex()) == null) {
+			if (state != null && state.getCurrent(ui.trackButtons.getCheckedIndex()) == null) {
 				ui.animationList.getSelection().setProgrammaticChangeEvents(false);
 				ui.animationList.setSelected(null);
 				ui.animationList.getSelection().setProgrammaticChangeEvents(true);
