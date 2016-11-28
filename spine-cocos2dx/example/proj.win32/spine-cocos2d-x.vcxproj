@@ -72,7 +72,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(EngineRoot)external;$(EngineRoot)cocos\audio\include;$(EngineRoot)external\chipmunk\include\chipmunk;$(EngineRoot)extensions;..\Classes;..;%(AdditionalIncludeDirectories);$(_COCOS_HEADER_WIN32_BEGIN);$(_COCOS_HEADER_WIN32_END);$(SolutionDir)..\..\..\spine-c\include;$(SolutionDir)..\..\src;$(IncludePath)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(EngineRoot)external;$(EngineRoot)cocos\audio\include;$(EngineRoot)external\chipmunk\include\chipmunk;$(EngineRoot)extensions;..\Classes;..;%(AdditionalIncludeDirectories);$(_COCOS_HEADER_WIN32_BEGIN);$(_COCOS_HEADER_WIN32_END);$(SolutionDir)..\..\..\spine-c\spine-c\include;$(SolutionDir)..\..\src;$(IncludePath)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USE_MATH_DEFINES;GL_GLEXT_PROTOTYPES;CC_ENABLE_CHIPMUNK_INTEGRATION=1;COCOS2D_DEBUG=1;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -145,37 +145,38 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\spine-c\src\spine\Animation.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\AnimationState.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\AnimationStateData.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\Atlas.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\AtlasAttachmentLoader.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\Attachment.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\AttachmentLoader.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\Bone.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\BoneData.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\BoundingBoxAttachment.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\Event.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\EventData.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\extension.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\IkConstraint.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\IkConstraintData.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\Json.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\MeshAttachment.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\PathAttachment.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\PathConstraint.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\PathConstraintData.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\RegionAttachment.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\Skeleton.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\SkeletonBounds.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\SkeletonData.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\SkeletonJson.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\Skin.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\Slot.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\SlotData.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\TransformConstraint.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\TransformConstraintData.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\VertexAttachment.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Animation.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\AnimationState.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\AnimationStateData.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Atlas.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\AtlasAttachmentLoader.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Attachment.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\AttachmentLoader.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Bone.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\BoneData.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\BoundingBoxAttachment.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Event.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\EventData.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\extension.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\IkConstraint.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\IkConstraintData.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Json.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\MeshAttachment.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\PathAttachment.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\PathConstraint.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\PathConstraintData.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\RegionAttachment.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Skeleton.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\SkeletonBinary.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\SkeletonBounds.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\SkeletonData.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\SkeletonJson.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Skin.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Slot.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\SlotData.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\TransformConstraint.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\TransformConstraintData.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\VertexAttachment.c" />
     <ClCompile Include="..\..\src\spine\AttachmentVertices.cpp" />
     <ClCompile Include="..\..\src\spine\Cocos2dAttachmentLoader.cpp" />
     <ClCompile Include="..\..\src\spine\SkeletonAnimation.cpp" />
@@ -192,38 +193,8 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\spine-c\include\spine\Animation.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\AnimationState.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\AnimationStateData.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\Atlas.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\AtlasAttachmentLoader.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\Attachment.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\AttachmentLoader.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\Bone.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\BoneData.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\BoundingBoxAttachment.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\Event.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\EventData.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\extension.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\IkConstraint.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\IkConstraintData.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\MeshAttachment.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\PathAttachment.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\PathConstraint.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\PathConstraintData.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\RegionAttachment.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\Skeleton.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\SkeletonBounds.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\SkeletonData.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\SkeletonJson.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\Skin.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\Slot.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\SlotData.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\spine.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\TransformConstraint.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\TransformConstraintData.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\VertexAttachment.h" />
-    <ClInclude Include="..\..\..\spine-c\src\spine\Json.h" />
+    <ClInclude Include="..\..\..\spine-c\spine-c\src\spine\Json.h" />
+    <ClInclude Include="..\..\..\spine-c\spine-c\src\spine\kvec.h" />
     <ClInclude Include="..\..\src\spine\AttachmentVertices.h" />
     <ClInclude Include="..\..\src\spine\Cocos2dAttachmentLoader.h" />
     <ClInclude Include="..\..\src\spine\SkeletonAnimation.h" />
