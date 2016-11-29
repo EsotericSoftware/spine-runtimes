@@ -48,6 +48,7 @@ void callback (AnimationState* state, EventType type, TrackEntry* entry, Event* 
 		break;
 	case ANIMATION_INTERRUPT:
 		printf("%d interrupt: %s\n", entry->trackIndex, animationName);
+		break;
 	case ANIMATION_END:
 		printf("%d end: %s\n", entry->trackIndex, animationName);
 		break;
@@ -56,6 +57,7 @@ void callback (AnimationState* state, EventType type, TrackEntry* entry, Event* 
 		break;
 	case ANIMATION_DISPOSE:
 		printf("%d dispose: %s\n", entry->trackIndex, animationName);
+		break;
 	case ANIMATION_EVENT:
 		printf("%d event: %s, %s: %d, %f, %s\n", entry->trackIndex, animationName, event->data->name, event->intValue, event->floatValue,
 				event->stringValue);

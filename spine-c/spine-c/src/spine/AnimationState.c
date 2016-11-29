@@ -433,6 +433,8 @@ void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* 
 	float total, diff;
 	int /*boolean*/ current, dir;
 
+	if (firstFrame) timelinesRotation[i] = 0;
+
 	if (alpha == 1) {
 		spTimeline_apply(timeline, skeleton, 0, time, 0, 0, 1, setupPose, 0);
 		return;
@@ -468,11 +470,7 @@ void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* 
 	r1 = setupPose ? bone->data->rotation : bone->rotation;
 	diff = r2 - r1;
 	if (diff == 0) {
-		if (firstFrame) {
-			timelinesRotation[i] = 0;
-			total = 0;
-		} else
-			total = timelinesRotation[i];
+		total = timelinesRotation[i];
 	} else {
 		float lastTotal, lastDiff;
 		diff -= (16384 - (int)(16384.499999999996 - diff / 360)) * 360;
@@ -580,6 +578,8 @@ void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEnt
 		if (interrupt) _spEventQueue_interrupt(internal->queue, from);
 		current->mixingFrom = from;
 		current->mixTime = 0;
+
+		from->timelinesRotationCount = 0;
 
 		/* If not completely mixed in, set mixAlpha so mixing out happens from current mix to zero. */
 		if (from->mixingFrom) current->mixAlpha *= MIN(from->mixTime / from->mixDuration, 1);
