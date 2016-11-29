@@ -104,3 +104,7 @@ spine-turbulenz/spine-js/spine.js
 spine-threejs/spine-js/spine.js
 
 spine-ts/.vscode/*
+
+spine-ue4/Binaries
+spine-ue4/Intermediate
+spine-ue4/SpineUE4.xcworkspace
