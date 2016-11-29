@@ -226,6 +226,9 @@ public class AnimationState {
 	
 	private function applyRotateTimeline (timeline:Timeline, skeleton:Skeleton, time:Number, alpha:Number, setupPose:Boolean,
 		timelinesRotation:Vector.<Number>, i:int, firstFrame:Boolean):void {
+			
+		if (firstFrame) timelinesRotation[i] = 0;
+			
 		if (alpha == 1) {
 			timeline.apply(skeleton, 0, time, null, 1, setupPose, false);
 			return;
@@ -260,11 +263,7 @@ public class AnimationState {
 		var r1:Number = setupPose ? bone.data.rotation : bone.rotation;
 		var total:Number, diff:Number = r2 - r1;
 		if (diff == 0) {
-			if (firstFrame) {
-				timelinesRotation[i] = 0;
-				total = 0;
-			} else
-				total = timelinesRotation[i];
+			total = timelinesRotation[i];
 		} else {
 			diff -= (16384 - int((16384.499999999996 - diff / 360))) * 360;
 			var lastTotal:Number, lastDiff:Number;
