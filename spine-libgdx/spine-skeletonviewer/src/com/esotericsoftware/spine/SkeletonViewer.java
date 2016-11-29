@@ -218,15 +218,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 		setAnimation();
 
 		// ui.animationList.clearListeners();
-		// state.addListener(new AnimationState.AnimationStateAdapter() {
-		// public void complete (TrackEntry entry) {
-		// System.out.println("complete " + entry + ", " + entry.hashCode());
-		// System.out.println("complete " + entry + ", " + entry.hashCode());
-		// state.setAnimation(0, Math.random() > 0.5? "walk" : "jump", false);
-		// state.update(0);
-		// state.apply(skeleton);
-		// }
-		// });
 		// state.setAnimation(0, "walk", true);
 	}
 
