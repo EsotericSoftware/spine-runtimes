@@ -1100,6 +1100,8 @@ var spine;
 			return mix;
 		};
 		AnimationState.prototype.applyRotateTimeline = function (timeline, skeleton, time, alpha, setupPose, timelinesRotation, i, firstFrame) {
+			if (firstFrame)
+				timelinesRotation[i] = 0;
 			if (alpha == 1) {
 				timeline.apply(skeleton, 0, time, null, 1, setupPose, false);
 				return;
@@ -1128,12 +1130,7 @@ var spine;
 			var r1 = setupPose ? bone.data.rotation : bone.rotation;
 			var total = 0, diff = r2 - r1;
 			if (diff == 0) {
-				if (firstFrame) {
-					timelinesRotation[i] = 0;
-					total = 0;
-				}
-				else
-					total = timelinesRotation[i];
+				total = timelinesRotation[i];
 			}
 			else {
 				diff -= (16384 - ((16384.499999999996 - diff / 360) | 0)) * 360;
@@ -1223,6 +1220,7 @@ var spine;
 					this.queue.interrupt(from);
 				current.mixingFrom = from;
 				current.mixTime = 0;
+				from.timelinesRotation.length = 0;
 				if (from.mixingFrom != null)
 					current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
 			}
