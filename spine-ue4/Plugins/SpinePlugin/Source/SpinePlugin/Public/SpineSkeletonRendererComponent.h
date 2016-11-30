@@ -18,10 +18,24 @@ public:
 	
 	virtual void BeginPlay () override;
 		
-	virtual void TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;	
+	virtual void TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
+	UMaterialInterface* DefaultMaterial;
+
+	UMaterialInterface* GetDefaultMaterial() const { return DefaultMaterial; }
+
+	UMaterialInterface* GetAlternateMaterial() const { return nullptr; }
+	
+	UMaterialInterface* GetMaterial(int32 MaterialIndex) const;
+
+	int32 GetNumMaterials() const;
+
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
+	float depthOffset = 0.1f;
 protected:
 	void UpdateMesh (spSkeleton* skeleton);
 
-	bool updated;
+	UPROPERTY()
+	TArray<UMaterialInstanceDynamic*> atlasMaterials;
 };

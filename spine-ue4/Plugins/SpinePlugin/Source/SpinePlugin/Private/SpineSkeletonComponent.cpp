@@ -59,7 +59,7 @@ void USpineSkeletonComponent::DisposeState() {
 	}
 }
 
-void USpineSkeletonComponent::BeginDestroy() {
+void USpineSkeletonComponent::FinishDestroy() {
 	DisposeState();
-	Super::BeginDestroy();
+	Super::FinishDestroy();
 }

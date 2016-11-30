@@ -10,7 +10,10 @@ USpineSkeletonRendererComponent::USpineSkeletonRendererComponent(const FObjectIn
 	bWantsBeginPlay = true;
 	PrimaryComponentTick.bCanEverTick = true;
 	bTickInEditor = true;
-	bAutoActivate = true;	
+	bAutoActivate = true;
+
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MaskedMaterialRef(TEXT("/Paper2D/MaskedUnlitSpriteMaterial"));
+	DefaultMaterial = MaskedMaterialRef.Object;
 }
 
 // Called when the game starts
@@ -41,12 +44,14 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* skeleton) {
 	TArray<FVector2D> uvs;
 	TArray<FColor> colors;		
 
-	int worldVerticesLength = 1000;
-	float* worldVertices = (float*)malloc((2 + 2 + 5) * worldVerticesLength);
+	TArray<float> worldVertices;
+	worldVertices.SetNumUninitialized(2 * 1024);
 	int idx = 0;
 	int meshSection = 0;
 
 	ClearAllMeshSections();
+
+	float depthOffset = 0;
 
 	for (int i = 0; i < skeleton->slotsCount; ++i) {
 		spSlot* slot = skeleton->drawOrder[i];
@@ -55,7 +60,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* skeleton) {
 		
 		if (attachment->type == SP_ATTACHMENT_REGION) {
 			spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;			
-			spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, worldVertices);
+			spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, worldVertices.GetData());
 
 			uint8 r = static_cast<uint8>(skeleton->r * slot->r * 255);
 			uint8 g = static_cast<uint8>(skeleton->g * slot->g * 255);
@@ -63,19 +68,19 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* skeleton) {
 			uint8 a = static_cast<uint8>(skeleton->a * slot->a * 255);
 			
 			colors.Add(FColor(r, g, b, a));
-			vertices.Add(FVector(worldVertices[0], 0, worldVertices[1]));
+			vertices.Add(FVector(worldVertices[0], depthOffset, worldVertices[1]));
 			uvs.Add(FVector2D(regionAttachment->uvs[0], regionAttachment->uvs[1]));
 
 			colors.Add(FColor(r, g, b, a));
-			vertices.Add(FVector(worldVertices[2], 0, worldVertices[3]));
+			vertices.Add(FVector(worldVertices[2], depthOffset, worldVertices[3]));
 			uvs.Add(FVector2D(regionAttachment->uvs[2], regionAttachment->uvs[3]));
 
 			colors.Add(FColor(r, g, b, a));
-			vertices.Add(FVector(worldVertices[4], 0, worldVertices[5]));
+			vertices.Add(FVector(worldVertices[4], depthOffset, worldVertices[5]));
 			uvs.Add(FVector2D(regionAttachment->uvs[4], regionAttachment->uvs[5]));
 
 			colors.Add(FColor(r, g, b, a));
-			vertices.Add(FVector(worldVertices[6], 0, worldVertices[7]));
+			vertices.Add(FVector(worldVertices[6], depthOffset, worldVertices[7]));
 			uvs.Add(FVector2D(regionAttachment->uvs[6], regionAttachment->uvs[7]));
 
 			indices.Add(idx + 0);
@@ -84,35 +89,41 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* skeleton) {
 			indices.Add(idx + 0);
 			indices.Add(idx + 2);
 			indices.Add(idx + 3);
-			idx += 4;			
-		}
-		/*else if (attachment->type == ATTACHMENT_MESH) {
-			MeshAttachment* mesh = (MeshAttachment*)attachment;
-			if (mesh->super.worldVerticesLength > SPINE_MESH_VERTEX_COUNT_MAX) continue;
-			texture = (Texture*)((AtlasRegion*)mesh->rendererObject)->page->rendererObject;
-			MeshAttachment_computeWorldVertices(mesh, slot, worldVertices);
-
-			Uint8 r = static_cast<Uint8>(skeleton->r * slot->r * 255);
-			Uint8 g = static_cast<Uint8>(skeleton->g * slot->g * 255);
-			Uint8 b = static_cast<Uint8>(skeleton->b * slot->b * 255);
-			Uint8 a = static_cast<Uint8>(skeleton->a * slot->a * 255);
-			vertex.color.r = r;
-			vertex.color.g = g;
-			vertex.color.b = b;
-			vertex.color.a = a;
-
-			Vector2u size = texture->getSize();
-			for (int i = 0; i < mesh->trianglesCount; ++i) {
-				int index = mesh->triangles[i] << 1;
-				vertex.position.x = worldVertices[index];
-				vertex.position.y = worldVertices[index + 1];
-				vertex.texCoords.x = mesh->uvs[index] * size.x;
-				vertex.texCoords.y = mesh->uvs[index + 1] * size.y;
-				vertexArray->append(vertex);
+			idx += 4;
+			depthOffset -= this->depthOffset;
+		} else if (attachment->type == SP_ATTACHMENT_MESH) {
+			spMeshAttachment* mesh = (spMeshAttachment*)attachment;
+			if (mesh->super.worldVerticesLength> worldVertices.Num()) {
+				worldVertices.SetNum(mesh->super.worldVerticesLength);
 			}
-		}*/
+			spMeshAttachment_computeWorldVertices(mesh, slot, worldVertices.GetData());
+
+			uint8 r = static_cast<uint8>(skeleton->r * slot->r * 255);
+			uint8 g = static_cast<uint8>(skeleton->g * slot->g * 255);
+			uint8 b = static_cast<uint8>(skeleton->b * slot->b * 255);
+			uint8 a = static_cast<uint8>(skeleton->a * slot->a * 255);
+			
+			for (int i = 0; i < mesh->super.worldVerticesLength; i += 2) {				
+				colors.Add(FColor(r, g, b, a));
+				vertices.Add(FVector(worldVertices[i], depthOffset, worldVertices[i + 1]));
+				uvs.Add(FVector2D(mesh->uvs[i], mesh->uvs[i + 1]));				
+			}
+
+			for (int i = 0; i < mesh->trianglesCount; i++) {
+				indices.Add(idx + mesh->triangles[i]);
+			}
+			idx += mesh->super.worldVerticesLength >> 1;
+			depthOffset -= this->depthOffset;
+		}
 	}
 
-	CreateMeshSection(0, vertices, indices, TArray<FVector>(), uvs, colors, TArray<FProcMeshTangent>(), false);
-	free(worldVertices);
+	CreateMeshSection(0, vertices, indices, TArray<FVector>(), uvs, colors, TArray<FProcMeshTangent>(), false);	
+}
+
+UMaterialInterface* USpineSkeletonRendererComponent::GetMaterial(int32 MaterialIndex) const {
+	return MaterialIndex == 0 ? GetDefaultMaterial() : nullptr;		
+}
+
+int32 USpineSkeletonRendererComponent::GetNumMaterials() const {
+	return 1;
 }

@@ -28,11 +28,11 @@ public:
 		
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;	
 
-	virtual void BeginDestroy () override;	
+	virtual void FinishDestroy () override;	
 
 protected:
 	void DisposeState();	
 
 	USpineAtlasAsset* lastAtlas = nullptr;
-	USpineSkeletonDataAsset* lastData = nullptr;
+	USpineSkeletonDataAsset* lastData = nullptr;	
 };
