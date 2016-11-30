@@ -85,8 +85,7 @@ UTexture2D* resolveTexture (USpineAtlasAsset* asset, const FString& pageFileName
     
     TArray<FString> fileNames;
     fileNames.Add(pageFileName);
-    
-    //@TODO: Avoid the first compression, since we're going to recompress
+        
     TArray<UObject*> importedAsset = AssetToolsModule.Get().ImportAssets(fileNames, targetSubPath);
     UTexture2D* texture = (importedAsset.Num() > 0) ? Cast<UTexture2D>(importedAsset[0]) : nullptr;
     

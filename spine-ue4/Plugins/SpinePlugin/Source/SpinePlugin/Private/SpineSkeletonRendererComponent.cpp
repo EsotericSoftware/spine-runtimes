@@ -31,11 +31,50 @@ void USpineSkeletonRendererComponent::TickComponent( float DeltaTime, ELevelTick
 	AActor* owner = GetOwner();
 	if (owner) {
 		USpineSkeletonComponent* skeleton = Cast<USpineSkeletonComponent>(owner->GetComponentByClass(skeletonClass));
-		if (skeleton && skeleton->skeleton) {
+		if (skeleton && !skeleton->IsBeingDestroyed() && skeleton->skeleton) {
+			if (atlasMaterials.Num() != skeleton->atlas->atlasPages.Num()) {
+				atlasMaterials.SetNum(0);
+				pageToMaterial.Empty();
+				spAtlasPage* currPage = skeleton->atlas->GetAtlas(false)->pages;
+				for (int i = 0; i < skeleton->atlas->atlasPages.Num(); i++) {
+					UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(DefaultMaterial, owner);
+					material->SetTextureParameterValue(FName(TEXT("SpriteTexture")), skeleton->atlas->atlasPages[i]);
+					atlasMaterials.Add(material);
+					pageToMaterial.Add(currPage, material);
+					currPage = currPage->next;
+				}
+			}
+			else {
+				pageToMaterial.Empty();
+				spAtlasPage* currPage = skeleton->atlas->GetAtlas(false)->pages;
+				for (int i = 0; i < skeleton->atlas->atlasPages.Num(); i++) {
+					UMaterialInstanceDynamic* current = atlasMaterials[i];
+					UTexture2D* texture = skeleton->atlas->atlasPages[i];
+					UTexture* oldTexture = nullptr;					
+					if(!current->GetTextureParameterValue(FName(TEXT("SpriteTexture")), oldTexture) || oldTexture != texture) {
+						UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(DefaultMaterial, owner);
+						material->SetTextureParameterValue("SpriteTexture", texture);
+						atlasMaterials[i] = material;
+					}
+					pageToMaterial.Add(currPage, atlasMaterials[i]);
+					currPage = currPage->next;
+				}
+			}			
 			spSkeleton_updateWorldTransform(skeleton->skeleton);			
 			UpdateMesh(skeleton->skeleton);			
 		}
 	}		
+}
+
+void USpineSkeletonRendererComponent::Flush(int &idx, TArray<FVector> &vertices, TArray<int32> &indices, TArray<FVector2D> &uvs, TArray<FColor> &colors, UMaterialInstanceDynamic* material) {
+	if (vertices.Num() == 0) return;
+	CreateMeshSection(idx, vertices, indices, TArray<FVector>(), uvs, colors, TArray<FProcMeshTangent>(), false);
+	SetMaterial(idx, material);
+	vertices.SetNum(0);
+	indices.SetNum(0);
+	uvs.SetNum(0);
+	colors.SetNum(0);
+	idx++;
 }
 
 void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* skeleton) {	
@@ -48,6 +87,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* skeleton) {
 	worldVertices.SetNumUninitialized(2 * 1024);
 	int idx = 0;
 	int meshSection = 0;
+	UMaterialInstanceDynamic* lastMaterial = nullptr;
 
 	ClearAllMeshSections();
 
@@ -59,7 +99,15 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* skeleton) {
 		if (!attachment) continue;						
 		
 		if (attachment->type == SP_ATTACHMENT_REGION) {
-			spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;			
+			spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
+			spAtlasRegion* region = (spAtlasRegion*)regionAttachment->rendererObject;
+			UMaterialInstanceDynamic* material = pageToMaterial[region->page];
+
+			if (lastMaterial != material) {
+				Flush(meshSection, vertices, indices, uvs, colors, lastMaterial);
+				lastMaterial = material;
+			}
+
 			spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, worldVertices.GetData());
 
 			uint8 r = static_cast<uint8>(skeleton->r * slot->r * 255);
@@ -91,8 +139,18 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* skeleton) {
 			indices.Add(idx + 3);
 			idx += 4;
 			depthOffset -= this->depthOffset;
+
+			SetMaterial(meshSection, material);
 		} else if (attachment->type == SP_ATTACHMENT_MESH) {
 			spMeshAttachment* mesh = (spMeshAttachment*)attachment;
+			spAtlasRegion* region = (spAtlasRegion*)mesh->rendererObject;
+			UMaterialInstanceDynamic* material = pageToMaterial[region->page];
+
+			if (lastMaterial != material) {
+				Flush(meshSection, vertices, indices, uvs, colors, lastMaterial);
+				lastMaterial = material;
+			}
+
 			if (mesh->super.worldVerticesLength> worldVertices.Num()) {
 				worldVertices.SetNum(mesh->super.worldVerticesLength);
 			}
@@ -114,16 +172,9 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* skeleton) {
 			}
 			idx += mesh->super.worldVerticesLength >> 1;
 			depthOffset -= this->depthOffset;
+			SetMaterial(meshSection, material);
 		}
 	}
-
-	CreateMeshSection(0, vertices, indices, TArray<FVector>(), uvs, colors, TArray<FProcMeshTangent>(), false);	
-}
-
-UMaterialInterface* USpineSkeletonRendererComponent::GetMaterial(int32 MaterialIndex) const {
-	return MaterialIndex == 0 ? GetDefaultMaterial() : nullptr;		
-}
-
-int32 USpineSkeletonRendererComponent::GetNumMaterials() const {
-	return 1;
+	
+	Flush(meshSection, vertices, indices, uvs, colors, lastMaterial);
 }

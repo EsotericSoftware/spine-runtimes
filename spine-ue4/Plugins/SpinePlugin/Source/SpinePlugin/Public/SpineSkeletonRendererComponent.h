@@ -21,21 +21,15 @@ public:
 	virtual void TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
-	UMaterialInterface* DefaultMaterial;
-
-	UMaterialInterface* GetDefaultMaterial() const { return DefaultMaterial; }
-
-	UMaterialInterface* GetAlternateMaterial() const { return nullptr; }
-	
-	UMaterialInterface* GetMaterial(int32 MaterialIndex) const;
-
-	int32 GetNumMaterials() const;
+	UMaterialInterface* DefaultMaterial;	
 
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	float depthOffset = 0.1f;
 protected:
 	void UpdateMesh (spSkeleton* skeleton);
 
-	UPROPERTY()
+	void Flush(int &idx, TArray<FVector> &vertices, TArray<int32> &indices, TArray<FVector2D> &uvs, TArray<FColor> &colors, UMaterialInstanceDynamic* material);
+	
 	TArray<UMaterialInstanceDynamic*> atlasMaterials;
+	TMap<spAtlasPage*, UMaterialInstanceDynamic*> pageToMaterial;
 };
