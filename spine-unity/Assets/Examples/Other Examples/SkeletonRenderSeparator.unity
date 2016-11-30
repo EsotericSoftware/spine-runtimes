@@ -233,7 +233,7 @@ MonoBehaviour:
   skeletonDataAsset: {fileID: 11400000, guid: 44691b56ed7d1f04da0cbc2a52a91b8d, type: 2}
   initialSkinName: default
   separatorSlotNames:
-  - front_foot
+  - --B
   zSpacing: 0
   renderMeshes: 1
   immutableTriangles: 0
@@ -402,7 +402,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 565117361}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.3629907, y: 3.7230203, z: 0}
+  m_LocalPosition: {x: -1.3626752, y: 3.7231483, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
@@ -2989,7 +2989,7 @@ MonoBehaviour:
   skeletonDataAsset: {fileID: 11400000, guid: 44691b56ed7d1f04da0cbc2a52a91b8d, type: 2}
   initialSkinName: default
   separatorSlotNames:
-  - front_upper_arm
+  - --A
   zSpacing: 0
   renderMeshes: 1
   immutableTriangles: 0

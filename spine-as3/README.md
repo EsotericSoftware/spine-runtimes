@@ -25,7 +25,7 @@ spine-as3 does not yet support loading the binary format.
 The Spine AS3 example works on Windows, Linux and Mac OS X. This guide assumes you are using [FDT Free](http://fdt.powerflasher.com/) as your development environment.
 
 1. Download [FDT free](http://fdt.powerflasher.com/buy-download/) for your operating system.
-3. Download and install Adobe Flash Player 22 with debugging support](https://www.adobe.com/support/flashplayer/debug_downloads.html#fp15)
+3. Download and install [Adobe Flash Player 23 with debugging support](https://www.adobe.com/support/flashplayer/debug_downloads.html#fp15)
 2. Download the latest [Flex SDK](http://www.adobe.com/devnet/flex/flex-sdk-download.html). We assume it will be installed to some folder on your disk called `flex_sdk`.
 3. Download the latest [Adobe AIR SDK](http://www.adobe.com/devnet/air/air-sdk-download.html)
 4. Extract the AIR SDK contents, and copy them to your `flex_sdk` folder. This will replace the Adobe AIR version shipped with Flex.

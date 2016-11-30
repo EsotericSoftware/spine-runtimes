@@ -267,6 +267,7 @@ namespace Spine.Unity {
 			bool isCustomSlotMaterialsPopulated = customSlotMaterials.Count > 0;
 			#endif
 
+			bool hasSeparators = separatorSlots.Count > 0;
 			int vertexCount = 0;
 			int submeshVertexCount = 0;
 			int submeshTriangleCount = 0, submeshFirstVertex = 0, submeshStartSlotIndex = 0;
@@ -281,8 +282,9 @@ namespace Spine.Unity {
 				workingFlipsItems[i] = flip;
 				#endif
 
-				object rendererObject; // An AtlasRegion in plain Spine-Unity. Spine-TK2D hooks into TK2D's system. eventual source of Material object.
+				object rendererObject = null; // An AtlasRegion in plain Spine-Unity. Spine-TK2D hooks into TK2D's system. eventual source of Material object.
 				int attachmentVertexCount, attachmentTriangleCount;
+				bool noRender = false;
 
 				var regionAttachment = attachment as RegionAttachment;
 				if (regionAttachment != null) {
@@ -290,56 +292,85 @@ namespace Spine.Unity {
 					attachmentVertexCount = 4;
 					attachmentTriangleCount = 6;
 				} else {
-					if (!renderMeshes)
-						continue;
-					var meshAttachment = attachment as MeshAttachment;
-					if (meshAttachment != null) {
-						rendererObject = meshAttachment.RendererObject;
-						attachmentVertexCount = meshAttachment.worldVerticesLength >> 1;
-						attachmentTriangleCount = meshAttachment.triangles.Length;
+					if (!renderMeshes) {
+						noRender = true;
+						attachmentVertexCount = 0;
+						attachmentTriangleCount = 0;
+						//continue;
 					} else {
-						continue;
+						var meshAttachment = attachment as MeshAttachment;
+						if (meshAttachment != null) {
+							rendererObject = meshAttachment.RendererObject;
+							attachmentVertexCount = meshAttachment.worldVerticesLength >> 1;
+							attachmentTriangleCount = meshAttachment.triangles.Length;
+						} else {
+							noRender = true;
+							attachmentVertexCount = 0;
+							attachmentTriangleCount = 0;
+							//continue;
+						}
 					}
 				}
-
-				#if !SPINE_TK2D
-				Material material; //= (Material)((AtlasRegion)rendererObject).page.rendererObject; // For no customSlotMaterials
-				if (isCustomSlotMaterialsPopulated) {
-					if (!customSlotMaterials.TryGetValue(slot, out material)) {
-						material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
-					}
-				} else {
-					material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
-				}
-				#else
-				Material material = (rendererObject.GetType() == typeof(Material)) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
-				#endif
 
 				// Create a new SubmeshInstruction when material changes. (or when forced to separate by a submeshSeparator)
-				bool forceSeparate = (separatorSlots.Count > 0 && separatorSlots.Contains(slot));
-				if (vertexCount > 0 && (lastMaterial.GetInstanceID() != material.GetInstanceID() || forceSeparate)) {
-					workingSubmeshInstructions.Add(
-						new Spine.Unity.MeshGeneration.SubmeshInstruction {
-							skeleton = this.skeleton,
-							material = lastMaterial,
-							startSlot = submeshStartSlotIndex,
-							endSlot = i,
-							triangleCount = submeshTriangleCount,
-							firstVertexIndex = submeshFirstVertex,
-							vertexCount = submeshVertexCount,
-							forceSeparate = forceSeparate
-						}
-					);
-					submeshTriangleCount = 0;
-					submeshVertexCount = 0;
-					submeshFirstVertex = vertexCount;
-					submeshStartSlotIndex = i;
+				// Slot with a separator/new material will become the starting slot of the next new instruction.
+				bool forceSeparate = (hasSeparators && separatorSlots.Contains(slot));
+				if (noRender) {
+					if (forceSeparate && vertexCount > 0 && this.generateMeshOverride != null) {
+						workingSubmeshInstructions.Add(
+							new Spine.Unity.MeshGeneration.SubmeshInstruction {
+								skeleton = this.skeleton,
+								material = lastMaterial,
+								startSlot = submeshStartSlotIndex,
+								endSlot = i,
+								triangleCount = submeshTriangleCount,
+								firstVertexIndex = submeshFirstVertex,
+								vertexCount = submeshVertexCount,
+								forceSeparate = forceSeparate
+							}
+						);
+						submeshTriangleCount = 0;
+						submeshVertexCount = 0;
+						submeshFirstVertex = vertexCount;
+						submeshStartSlotIndex = i;
+					}
+				} else {
+					#if !SPINE_TK2D
+					Material material;
+					if (isCustomSlotMaterialsPopulated) {
+						if (!customSlotMaterials.TryGetValue(slot, out material))
+							material = (Material)((AtlasRegion)rendererObject).page.rendererObject;				
+					} else {
+						material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
+					}
+					#else
+					Material material = (rendererObject.GetType() == typeof(Material)) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
+					#endif
+
+					if (vertexCount > 0 && (forceSeparate || lastMaterial.GetInstanceID() != material.GetInstanceID())) {
+						workingSubmeshInstructions.Add(
+							new Spine.Unity.MeshGeneration.SubmeshInstruction {
+								skeleton = this.skeleton,
+								material = lastMaterial,
+								startSlot = submeshStartSlotIndex,
+								endSlot = i,
+								triangleCount = submeshTriangleCount,
+								firstVertexIndex = submeshFirstVertex,
+								vertexCount = submeshVertexCount,
+								forceSeparate = forceSeparate
+							}
+						);
+						submeshTriangleCount = 0;
+						submeshVertexCount = 0;
+						submeshFirstVertex = vertexCount;
+						submeshStartSlotIndex = i;
+					}
+					// Update state for the next iteration.
+					lastMaterial = material;
+					submeshTriangleCount += attachmentTriangleCount;
+					vertexCount += attachmentVertexCount;
+					submeshVertexCount += attachmentVertexCount;
 				}
-				// Update state for the next iteration.
-				lastMaterial = material;
-				submeshTriangleCount += attachmentTriangleCount;
-				vertexCount += attachmentVertexCount;
-				submeshVertexCount += attachmentVertexCount;
 			}
 
 			if (submeshVertexCount != 0) {

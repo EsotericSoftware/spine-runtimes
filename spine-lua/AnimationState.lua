@@ -382,6 +382,8 @@ function AnimationState:applyMixingFrom (entry, skeleton)
 end
 
 function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, setupPose, timelinesRotation, i, firstFrame)
+	if firstFrame then timelinesRotation[i] = 0 end
+	
   if alpha == 1 then
     timeline:apply(skeleton, 0, time, nil, 1, setupPose, false)
     return
@@ -418,12 +420,7 @@ function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, se
   local total = 0
   local diff = r2 - r1
   if diff == 0 then
-    if firstFrame then
-      timelinesRotation[i] = 0
-      total = 0
-    else
-      total = timelinesRotation[i]
-    end
+    total = timelinesRotation[i]
   else
     diff = diff - (16384 - math_floor(16384.499999999996 - diff / 360)) * 360
     local lastTotal = 0
@@ -540,6 +537,8 @@ function AnimationState:setCurrent (index, current, interrupt)
     if interrupt then queue:interrupt(from) end
     current.mixingFrom = from
     current.mixTime = 0
+		
+		from.timelinesRotation = {};
 
     -- If not completely mixed in, set mixAlpha so mixing out happens from current mix to zero.
     if from.mixingFrom then current.mixAlpha = current.mixAlpha * math_min(from.mixTime / from.mixDuration, 1) end
