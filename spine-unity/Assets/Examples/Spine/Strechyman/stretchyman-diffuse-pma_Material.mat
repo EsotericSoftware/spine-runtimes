@@ -12,7 +12,7 @@ Material:
   m_LightmapFlags: 5
   m_CustomRenderQueue: 3000
   stringTagMap:
-    RenderType: Transparent
+    RenderType: Sprite
   m_SavedProperties:
     serializedVersion: 2
     m_TexEnvs:
