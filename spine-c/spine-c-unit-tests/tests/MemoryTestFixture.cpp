@@ -179,4 +179,44 @@ void MemoryTestFixture::reproduceIssue_777()
 	DisposeAll(skeleton, state, stateData, skeletonData, atlas);
 }
 
+spSkeleton* skeleton = nullptr;
+static void  spineAnimStateHandler(spAnimationState* state, int type, spTrackEntry* entry, spEvent* event)
+{
+	if (type == SP_ANIMATION_COMPLETE)
+	{
+		spAnimationState_setAnimationByName(state, 0, "walk", false);
+		spAnimationState_update(state, 0);
+		spAnimationState_apply(state, skeleton);
+	}
+}
+
+void MemoryTestFixture::reproduceIssue_Loop()
+{
+	spAtlas* atlas = nullptr;
+	spSkeletonData* skeletonData = nullptr;
+	spAnimationStateData* stateData = nullptr;
+	spAnimationState* state = nullptr;
+
+	//////////////////////////////////////////////////////////////////////////
+	// Initialize Animations
+	LoadSpineboyExample(atlas, skeletonData, stateData, skeleton, state);
+
+	///////////////////////////////////////////////////////////////////////////
+
+	if (state)
+		state->listener = (spAnimationStateListener)&spineAnimStateHandler;
+
+	spAnimationState_setAnimationByName(state, 0, "walk", false);
+
+	// run normal update
+	for (int i = 0; i < 50; ++i) {
+		const float timeSlice = 1.0f / 60.0f;
+		spSkeleton_update(skeleton, timeSlice);
+		spAnimationState_update(state, timeSlice);
+		spAnimationState_apply(state, skeleton);
+	}
+
+	DisposeAll(skeleton, state, stateData, skeletonData, atlas);
+}
+
 
