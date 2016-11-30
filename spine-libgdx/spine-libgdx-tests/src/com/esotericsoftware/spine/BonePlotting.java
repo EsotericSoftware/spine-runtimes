@@ -36,6 +36,7 @@ import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
+import com.esotericsoftware.spine.attachments.PointAttachment;
 
 public class BonePlotting {
 	static public void main (String[] args) throws Exception {
@@ -54,6 +55,10 @@ public class BonePlotting {
 			}
 
 			public PathAttachment newPathAttachment (Skin skin, String name) {
+				return null;
+			}
+
+			public PointAttachment newPointAttachment (Skin skin, String name) {
 				return null;
 			}
 		});

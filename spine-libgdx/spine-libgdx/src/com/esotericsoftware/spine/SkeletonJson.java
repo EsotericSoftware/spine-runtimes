@@ -67,6 +67,7 @@ import com.esotericsoftware.spine.attachments.AttachmentType;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
+import com.esotericsoftware.spine.attachments.PointAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
 
@@ -390,6 +391,17 @@ public class SkeletonJson {
 			String color = map.getString("color", null);
 			if (color != null) path.getColor().set(Color.valueOf(color));
 			return path;
+		}
+		case point: {
+			PointAttachment point = attachmentLoader.newPointAttachment(skin, name);
+			if (point == null) return null;
+			point.setX(map.getFloat("x", 0) * scale);
+			point.setY(map.getFloat("y", 0) * scale);
+			point.setRotation(map.getFloat("rotation", 0));
+
+			String color = map.getString("color", null);
+			if (color != null) point.getColor().set(Color.valueOf(color));
+			return point;
 		}
 		}
 		return null;

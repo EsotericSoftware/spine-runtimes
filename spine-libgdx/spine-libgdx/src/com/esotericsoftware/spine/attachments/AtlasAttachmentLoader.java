@@ -71,4 +71,8 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 	public PathAttachment newPathAttachment (Skin skin, String name) {
 		return new PathAttachment(name);
 	}
+
+	public PointAttachment newPointAttachment (Skin skin, String name) {
+		return new PointAttachment(name);
+	}
 }

@@ -70,6 +70,7 @@ import com.esotericsoftware.spine.attachments.AttachmentType;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
+import com.esotericsoftware.spine.attachments.PointAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
 
@@ -467,6 +468,20 @@ public class SkeletonBinary {
 			path.setLengths(lengths);
 			if (nonessential) Color.rgba8888ToColor(path.getColor(), color);
 			return path;
+		}
+		case point: {
+			float rotation = input.readFloat();
+			float x = input.readFloat();
+			float y = input.readFloat();
+			int color = nonessential ? input.readInt() : 0;
+
+			PointAttachment point = attachmentLoader.newPointAttachment(skin, name);
+			if (point == null) return null;
+			point.setX(x * scale);
+			point.setY(y * scale);
+			point.setRotation(rotation);
+			if (nonessential) Color.rgba8888ToColor(point.getColor(), color);
+			return point;
 		}
 		}
 		return null;

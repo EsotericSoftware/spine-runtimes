@@ -35,7 +35,6 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.esotericsoftware.spine.Bone;
-import com.esotericsoftware.spine.Slot;
 
 /** An attachment that displays a textured quadrilateral.
  * <p>
@@ -150,9 +149,8 @@ public class RegionAttachment extends Attachment {
 	 * @param worldVertices The output world vertices. Must have a length >= <code>offset</code> + 8.
 	 * @param offset The <code>worldVertices</code> index to begin writing values.
 	 * @param stride The number of <code>worldVertices</code> entries between the value pairs written. */
-	public void computeWorldVertices (Slot slot, float[] worldVertices, int offset, int stride) {
+	public void computeWorldVertices (Bone bone, float[] worldVertices, int offset, int stride) {
 		float[] vertexOffset = this.offset;
-		Bone bone = slot.getBone();
 		float x = bone.getWorldX(), y = bone.getWorldY();
 		float a = bone.getA(), b = bone.getB(), c = bone.getC(), d = bone.getD();
 		float offsetX, offsetY;

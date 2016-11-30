@@ -43,6 +43,7 @@ import com.esotericsoftware.spine.attachments.AttachmentLoader;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
+import com.esotericsoftware.spine.attachments.PointAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 
 public class AnimationStateTests {
@@ -60,6 +61,10 @@ public class AnimationStateTests {
 		}
 
 		public PathAttachment newPathAttachment (Skin skin, String name) {
+			return null;
+		}
+
+		public PointAttachment newPointAttachment (Skin skin, String name) {
 			return null;
 		}
 	});

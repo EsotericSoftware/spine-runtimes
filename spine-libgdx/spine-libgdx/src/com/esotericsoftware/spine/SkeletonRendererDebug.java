@@ -35,12 +35,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
+import com.esotericsoftware.spine.attachments.PointAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 
 public class SkeletonRendererDebug {
@@ -51,13 +53,14 @@ public class SkeletonRendererDebug {
 	static private final Color aabbColor = new Color(0, 1, 0, 0.5f);
 
 	private final ShapeRenderer shapes;
-	private boolean drawBones = true, drawRegionAttachments = true, drawBoundingBoxes = true;
+	private boolean drawBones = true, drawRegionAttachments = true, drawBoundingBoxes = true, drawPoints = true;
 	private boolean drawMeshHull = true, drawMeshTriangles = true, drawPaths = true;
 	private final SkeletonBounds bounds = new SkeletonBounds();
 	private final FloatArray vertices = new FloatArray(32);
 	private float scale = 1;
 	private float boneWidth = 2;
 	private boolean premultipliedAlpha;
+	private final Vector2 temp1 = new Vector2(), temp2 = new Vector2();
 
 	public SkeletonRendererDebug () {
 		shapes = new ShapeRenderer();
@@ -73,10 +76,12 @@ public class SkeletonRendererDebug {
 		Gdx.gl.glBlendFunc(srcFunc, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
 		ShapeRenderer shapes = this.shapes;
-
 		Array<Bone> bones = skeleton.getBones();
+		Array<Slot> slots = skeleton.getSlots();
+
+		shapes.begin(ShapeType.Filled);
+
 		if (drawBones) {
-			shapes.begin(ShapeType.Filled);
 			for (int i = 0, n = bones.size; i < n; i++) {
 				Bone bone = bones.get(i);
 				if (bone.parent == null) continue;
@@ -91,22 +96,35 @@ public class SkeletonRendererDebug {
 				float y = length * bone.c + bone.worldY;
 				shapes.rectLine(bone.worldX, bone.worldY, x, y, width * scale);
 			}
-			shapes.end();
 			shapes.begin(ShapeType.Line);
 			shapes.x(skeleton.getX(), skeleton.getY(), 4 * scale);
-		} else
-			shapes.begin(ShapeType.Line);
+		}
+
+		if (drawPoints) {
+			shapes.setColor(boneOriginColor);
+			for (int i = 0, n = slots.size; i < n; i++) {
+				Slot slot = slots.get(i);
+				Attachment attachment = slot.attachment;
+				if (!(attachment instanceof PointAttachment)) continue;
+				PointAttachment point = (PointAttachment)attachment;
+				point.computeWorldPosition(slot.getBone(), temp1);
+				temp2.set(8, 0).rotate(point.computeWorldRotation(slot.getBone()));
+				shapes.rectLine(temp1, temp2, boneWidth / 2 * scale);
+			}
+		}
+
+		shapes.end();
+		shapes.begin(ShapeType.Line);
 
 		if (drawRegionAttachments) {
 			shapes.setColor(attachmentLineColor);
-			Array<Slot> slots = skeleton.getSlots();
 			for (int i = 0, n = slots.size; i < n; i++) {
 				Slot slot = slots.get(i);
 				Attachment attachment = slot.attachment;
 				if (attachment instanceof RegionAttachment) {
 					RegionAttachment region = (RegionAttachment)attachment;
 					float[] vertices = this.vertices.items;
-					region.computeWorldVertices(slot, vertices, 0, 2);
+					region.computeWorldVertices(slot.getBone(), vertices, 0, 2);
 					shapes.line(vertices[0], vertices[1], vertices[2], vertices[3]);
 					shapes.line(vertices[2], vertices[3], vertices[4], vertices[5]);
 					shapes.line(vertices[4], vertices[5], vertices[6], vertices[7]);
@@ -116,7 +134,6 @@ public class SkeletonRendererDebug {
 		}
 
 		if (drawMeshHull || drawMeshTriangles) {
-			Array<Slot> slots = skeleton.getSlots();
 			for (int i = 0, n = slots.size; i < n; i++) {
 				Slot slot = slots.get(i);
 				Attachment attachment = slot.attachment;
@@ -164,7 +181,6 @@ public class SkeletonRendererDebug {
 		}
 
 		if (drawPaths) {
-			Array<Slot> slots = skeleton.getSlots();
 			for (int i = 0, n = slots.size; i < n; i++) {
 				Slot slot = slots.get(i);
 				Attachment attachment = slot.attachment;
@@ -208,8 +224,19 @@ public class SkeletonRendererDebug {
 			shapes.setColor(boneOriginColor);
 			for (int i = 0, n = bones.size; i < n; i++) {
 				Bone bone = bones.get(i);
-				shapes.setColor(Color.GREEN);
 				shapes.circle(bone.worldX, bone.worldY, 3 * scale, 8);
+			}
+		}
+
+		if (drawPoints) {
+			shapes.setColor(boneOriginColor);
+			for (int i = 0, n = slots.size; i < n; i++) {
+				Slot slot = slots.get(i);
+				Attachment attachment = slot.attachment;
+				if (!(attachment instanceof PointAttachment)) continue;
+				PointAttachment point = (PointAttachment)attachment;
+				point.computeWorldPosition(slot.getBone(), temp1);
+				shapes.circle(temp1.x, temp1.y, 3 * scale, 8);
 			}
 		}
 
@@ -247,6 +274,10 @@ public class SkeletonRendererDebug {
 
 	public void setPaths (boolean paths) {
 		this.drawPaths = paths;
+	}
+
+	public void setPoints (boolean points) {
+		this.drawPoints = points;
 	}
 
 	public void setPremultipliedAlpha (boolean premultipliedAlpha) {
