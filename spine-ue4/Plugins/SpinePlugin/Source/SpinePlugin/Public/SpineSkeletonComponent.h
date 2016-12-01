@@ -31,7 +31,26 @@ public:
 	virtual void TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	virtual void FinishDestroy () override;
-
+	
+	// Blueprint functions
+	UFUNCTION(BlueprintCallable, Category="Components|Spine")
+	void SetAnimation (int trackIndex, FString animationName, bool loop);
+	
+	UFUNCTION(BlueprintCallable, Category="Components|Spine")
+	void AddAnimation (int trackIndex, FString animationName, bool loop, float delay);
+	
+	UFUNCTION(BlueprintCallable, Category="Components|Spine")
+	void SetEmptyAnimation (int trackIndex, float mixDuration);
+	
+	UFUNCTION(BlueprintCallable, Category="Components|Spine")
+	void AddEmptyAnimation (int trackIndex, float mixDuration, float delay);
+	
+	UFUNCTION(BlueprintCallable, Category="Components|Spine")
+	void ClearTracks ();
+	
+	UFUNCTION(BlueprintCallable, Category="Components|Spine")
+	void ClearTrack (int trackIndex);
+	
 protected:
 	void DisposeState();
 

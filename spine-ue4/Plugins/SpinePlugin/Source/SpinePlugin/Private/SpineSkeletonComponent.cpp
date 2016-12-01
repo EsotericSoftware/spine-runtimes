@@ -59,4 +59,40 @@ void USpineSkeletonComponent::FinishDestroy () {
 	Super::FinishDestroy();
 }
 
+void USpineSkeletonComponent::SetAnimation (int trackIndex, FString animationName, bool loop) {
+	if (state) {
+		spAnimationState_setAnimationByName(state, trackIndex, TCHAR_TO_UTF8(*animationName), loop ? 1 : 0);
+	}
+}
+
+void USpineSkeletonComponent::AddAnimation (int trackIndex, FString animationName, bool loop, float delay) {
+	if (state) {
+		spAnimationState_addAnimationByName(state, trackIndex, TCHAR_TO_UTF8(*animationName), loop ? 1 : 0, delay);
+	}
+}
+
+void USpineSkeletonComponent::SetEmptyAnimation (int trackIndex, float mixDuration) {
+	if (state) {
+		spAnimationState_setEmptyAnimation(state, trackIndex, mixDuration);
+	}
+}
+
+void USpineSkeletonComponent::AddEmptyAnimation (int trackIndex, float mixDuration, float delay) {
+	if (state) {
+		spAnimationState_addAnimationByName(state, trackIndex, mixDuration, delay);
+	}
+}
+
+void USpineSkeletonComponent::ClearTracks () {
+	if (state) {
+		spAnimationState_clearTracks(state);
+	}
+}
+
+void USpineSkeletonComponent::ClearTrack (int trackIndex) {
+	if (state) {
+		spAnimationState_clearTrack(state, trackIndex);
+	}
+}
+
 #undef LOCTEXT_NAMESPACE

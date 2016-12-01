@@ -40,8 +40,7 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 					pageToMaterial.Add(currPage, material);
 					currPage = currPage->next;
 				}
-			}
-			else {
+			} else {
 				pageToMaterial.Empty();
 				spAtlasPage* currPage = skeleton->Atlas->GetAtlas(false)->pages;
 				for (int i = 0; i < skeleton->Atlas->atlasPages.Num(); i++) {
