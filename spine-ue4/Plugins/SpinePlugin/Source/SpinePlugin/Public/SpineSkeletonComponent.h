@@ -3,12 +3,23 @@
 #pragma once
 
 #include "Components/ActorComponent.h"
+#include "spine/spine.h"
 #include "SpineSkeletonComponent.generated.h"
 
+USTRUCT(BlueprintType)
+struct SPINEPLUGIN_API FTrackEntry {
+	GENERATED_BODY ();
+	
+	FTrackEntry (): entry(0) { }
+	
+	FTrackEntry (spTrackEntry* entry) { this->entry = entry; }
+	
+	spTrackEntry* entry;
+};
+
 class USpineAtlasAsset;
-UCLASS( ClassGroup=(Spine), meta=(BlueprintSpawnableComponent) )
-class SPINEPLUGIN_API USpineSkeletonComponent : public UActorComponent
-{
+UCLASS(ClassGroup=(Spine), meta=(BlueprintSpawnableComponent))
+class SPINEPLUGIN_API USpineSkeletonComponent: public UActorComponent {
 	GENERATED_BODY()
 
 public:
@@ -34,16 +45,16 @@ public:
 	
 	// Blueprint functions
 	UFUNCTION(BlueprintCallable, Category="Components|Spine")
-	void SetAnimation (int trackIndex, FString animationName, bool loop);
+	FTrackEntry SetAnimation (int trackIndex, FString animationName, bool loop);
 	
 	UFUNCTION(BlueprintCallable, Category="Components|Spine")
-	void AddAnimation (int trackIndex, FString animationName, bool loop, float delay);
+	FTrackEntry AddAnimation (int trackIndex, FString animationName, bool loop, float delay);
 	
 	UFUNCTION(BlueprintCallable, Category="Components|Spine")
-	void SetEmptyAnimation (int trackIndex, float mixDuration);
+	FTrackEntry SetEmptyAnimation (int trackIndex, float mixDuration);
 	
 	UFUNCTION(BlueprintCallable, Category="Components|Spine")
-	void AddEmptyAnimation (int trackIndex, float mixDuration, float delay);
+	FTrackEntry AddEmptyAnimation (int trackIndex, float mixDuration, float delay);
 	
 	UFUNCTION(BlueprintCallable, Category="Components|Spine")
 	void ClearTracks ();
@@ -51,8 +62,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Components|Spine")
 	void ClearTrack (int trackIndex);
 	
+	UFUNCTION(BlueprintImplentableEvent, category = "Components|Spine")
+	void AnimationEvent(int trackIndex, );
+	
 protected:
-	void DisposeState();
+	void CheckState ();
+	void DisposeState ();
 
 	spAnimationStateData* stateData;
 	spAnimationState* state;
