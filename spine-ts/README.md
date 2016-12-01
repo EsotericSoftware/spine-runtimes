@@ -75,8 +75,8 @@ setup a development environment, follow these steps.
   * **WebGL**: `tsc -w -p tsconfig.webgl.json`, builds `core/src` and `webgl/src`, outputs `build/spine-webgl.js|d.ts|js.map`
   * **Canvas**: `tsc -w -p tsconfig.canvas.json`, builds `core/src` and `canvas/src`, outputs `build/spine-canvas.js|d.ts|js.map`
   * **THREE.JS**: `tsc -w -p tsconfig.threejs.json`, builds `core/src` and `threejs/src`, outputs `build/spine-threejs.js|d.ts|js.map`
-  * **Widget**: `tsc -w -p tsconfig.widget.json`, builds `core/src` and `widget/src`, outputs `build/spine-widget.js|d.ts|js.map` 
-6. Open the `spine-ts` folder in Visual Studio Code. VS Code will use the `tsconfig.json` file all source files from core and all 
+  * **Widget**: `tsc -w -p tsconfig.widget.json`, builds `core/src` and `widget/src`, outputs `build/spine-widget.js|d.ts|js.map`
+6. Open the `spine-ts` folder in Visual Studio Code. VS Code will use the `tsconfig.json` file all source files from core and all
 backends for your development pleasure. The actual JavaScript output is still created by the command line TypeScript compiler process from the previous step.
 
 Each backend contains an `example/` folder with an `index.html` file that demonstrates the respective backend. For development, we
@@ -90,7 +90,7 @@ python -m SimpleHTTPServer
 Then navigate to `http://localhost:8000/webgl/example`, `http://localhost:8000/canvas/example`, `http://localhost:8000/threejs/example` or `http://localhost:8000/widget/example`
 
 ### Using the Widget
-To easily display Spine animations on your website, you can use the spine-ts Widget backend. 
+To easily display Spine animations on your website, you can use the spine-ts Widget backend.
 
 1. Export your Spine animation with a texture atlas and put the resulting `.json`, `.atlas` and `.png` files on your server.
 2. Copy the `build/spine-widget.js` file to your server and include it on your website `<script src="spine-widget.js"></script>`, adjusting the src to match the location of the file on your server.
@@ -114,7 +114,7 @@ To specify the configuration of a Spine Widget via HTML, you can use these HTML 
   * `data-fit-to-canvas`: optional, whether to fit the animation to the canvas size or not. Defaults to `true` if omitted, in which case `data-scale`, `data-x` and `data-y` are irrelevant. This setting calculates the setup pose bounding box using the specified skin to center and scale the animation on the canvas.
   * `data-background-color`: optional, the background color to use. Defaults to `#000000` if omitted.
   * `data-premultiplied-alpha`: optional, whether the atlas pages use premultiplied alpha or not. Defaults to `false` if omitted.
-  * `data-debug`: optional, whether to show debug information such as bones, attachments, etc. Defaults to `false` if omitted. 
+  * `data-debug`: optional, whether to show debug information such as bones, attachments, etc. Defaults to `false` if omitted.
 
 You can specify these as attribuets on the HTML element like this:
 
@@ -139,12 +139,12 @@ Then create a new `spine.SpineWidget`, providing a [`SpineWidgetConfiguration`](
 ```JavaScript
 new spine.SpineWidget("my-widget", {
 	json: "assets/spineboy.json",
-	atlas: "assets/spineboy.atlas",		
-	animation: "run",	
+	atlas: "assets/spineboy.atlas",
+	animation: "run",
 	backgroundColor: "#000000",
 	success: function (widget) {
 		var animIndex = 0;
-		widget.canvas.onclick = function () {				
+		widget.canvas.onclick = function () {
 			animIndex++;
 			let animations = widget.skeleton.data.animations;
 			if (animIndex >= animations.length) animIndex = 0;
@@ -160,6 +160,7 @@ The configuration object has the following fields:
   * `atlas`: required, path to the `.atlas` file, absolute or relative, e.g. "assets/animation.atlas"
   * `animation`: required, the name of the animation to play back
   * `imagesPath`: optional, the location of images on the server to load atlas pages from. If omitted, atlas `.png` page files are loaded relative to the `.atlas` file.
+  * `atlasPages`: optional, the list of atlas page images, e.g. `atlasPages: ["assets/page1.png", "assets/page2.png"]` when using code, or `data-atlas-pages="assets/page1.png,assets/page2.png"` on case of HTML instantiation. Use this if you have a multi-page atlas. If ommited, only one atlas page image is loaded based on the atlas file name, replacing `.atlas` with `.png`.
   * `skin`: optional, the name of the skin to use. Defaults to `default` if omitted.
   * `loop`: optional, whether to loop the animation or not. Defaults to `true` if omitted.
   * `scale`: optional, the scaling factor to apply when loading the `.json` file. Defaults to `1` if omitted. Irrelevant if `data-fit-to-canavs` is `true`.
