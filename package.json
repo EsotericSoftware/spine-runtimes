@@ -1,0 +1,29 @@
+{
+  "name": "spine-runtimes",
+  "version": "3.5.35",
+  "description": "2D skeletal animation runtimes for Spine.",
+  "main": "spine-ts/build/spine-all.js",
+  "directories": {
+    "example": "examples"
+  },
+  "files": [
+    "spine-ts"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:EsotericSoftware/spine-runtimes.git"
+  },
+  "keywords": [
+    "spine",
+    "runtimes",
+    "2d",
+    "skeletal",
+    "animation"
+  ],
+  "author": "Esoteric Software",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/EsotericSoftware/spine-runtimes/issues"
+  },
+  "homepage": "https://github.com/EsotericSoftware/spine-runtimes#readme"
+}
