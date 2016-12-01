@@ -87,9 +87,9 @@ public class PointAttachment extends Attachment {
 	}
 
 	public float computeWorldRotation (Bone bone) {
-		float x = cos(rotation), y = sin(rotation);
-		x = x * bone.getA() + y * bone.getB() + bone.getWorldX();
-		y = x * bone.getC() + y * bone.getD() + bone.getWorldY();
-		return (float)Math.atan2(y, x);
+		float cos = cosDeg(rotation), sin = sinDeg(rotation);
+		float x = cos * bone.getA() + sin * bone.getB();
+		float y = cos * bone.getC() + sin * bone.getD();
+		return (float)Math.atan2(y, x) * radDeg;
 	}
 }
