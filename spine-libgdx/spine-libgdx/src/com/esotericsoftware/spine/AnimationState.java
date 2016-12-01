@@ -385,7 +385,7 @@ public class AnimationState {
 			from.timelinesRotation.clear(); // Reset rotation for mixing out, in case entry was mixed in.
 
 			// If not completely mixed in, set mixAlpha so mixing out happens from current mix to zero.
-			if (from.mixingFrom != null) current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
+			if (from.mixingFrom != null && from.mixDuration > 0) current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
 		}
 
 		queue.start(current);
