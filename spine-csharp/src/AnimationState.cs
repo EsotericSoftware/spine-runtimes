@@ -215,7 +215,7 @@ namespace Spine {
 			float alpha = from.alpha * entry.mixAlpha * (1 - mix);
 
 			bool firstFrame = entry.timelinesRotation.Count == 0;
-			if (firstFrame) entry.timelinesRotation.Capacity = timelineCount << 1;
+			if (firstFrame) entry.timelinesRotation.EnsureCapacity(timelines.Count << 1);
 			var timelinesRotation = entry.timelinesRotation.Items;
 
 			for (int i = 0; i < timelineCount; i++) {
@@ -389,7 +389,7 @@ namespace Spine {
 				from.timelinesRotation.Clear();
 
 				// If not completely mixed in, set mixAlpha so mixing out happens from current mix to zero.
-				if (from.mixingFrom != null) from.mixAlpha *= Math.Min(from.mixTime / from.mixDuration, 1);
+				if (from.mixingFrom != null && from.mixDuration > 0) current.mixAlpha *= Math.Min(from.mixTime / from.mixDuration, 1);
 			}
 
 			queue.Start(current);
