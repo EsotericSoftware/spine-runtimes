@@ -28,14 +28,14 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 	AActor* owner = GetOwner();
 	if (owner) {
 		USpineSkeletonComponent* skeleton = Cast<USpineSkeletonComponent>(owner->GetComponentByClass(skeletonClass));
-		if (skeleton && !skeleton->IsBeingDestroyed() && skeleton->skeleton) {
-			if (atlasMaterials.Num() != skeleton->atlas->atlasPages.Num()) {
+		if (skeleton && !skeleton->IsBeingDestroyed() && skeleton->GetSkeleton()) {
+			if (atlasMaterials.Num() != skeleton->Atlas->atlasPages.Num()) {
 				atlasMaterials.SetNum(0);
 				pageToMaterial.Empty();
-				spAtlasPage* currPage = skeleton->atlas->GetAtlas(false)->pages;
-				for (int i = 0; i < skeleton->atlas->atlasPages.Num(); i++) {
+				spAtlasPage* currPage = skeleton->Atlas->GetAtlas(false)->pages;
+				for (int i = 0; i < skeleton->Atlas->atlasPages.Num(); i++) {
 					UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(DefaultMaterial, owner);
-					material->SetTextureParameterValue(TextureParameterName, skeleton->atlas->atlasPages[i]);
+					material->SetTextureParameterValue(TextureParameterName, skeleton->Atlas->atlasPages[i]);
 					atlasMaterials.Add(material);
 					pageToMaterial.Add(currPage, material);
 					currPage = currPage->next;
@@ -43,10 +43,10 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 			}
 			else {
 				pageToMaterial.Empty();
-				spAtlasPage* currPage = skeleton->atlas->GetAtlas(false)->pages;
-				for (int i = 0; i < skeleton->atlas->atlasPages.Num(); i++) {
+				spAtlasPage* currPage = skeleton->Atlas->GetAtlas(false)->pages;
+				for (int i = 0; i < skeleton->Atlas->atlasPages.Num(); i++) {
 					UMaterialInstanceDynamic* current = atlasMaterials[i];
-					UTexture2D* texture = skeleton->atlas->atlasPages[i];
+					UTexture2D* texture = skeleton->Atlas->atlasPages[i];
 					UTexture* oldTexture = nullptr;
 					if(!current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
 						UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(DefaultMaterial, owner);
@@ -57,8 +57,7 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 					currPage = currPage->next;
 				}
 			}
-			spSkeleton_updateWorldTransform(skeleton->skeleton);
-			UpdateMesh(skeleton->skeleton);
+			UpdateMesh(skeleton->GetSkeleton());
 		}
 	}
 }
@@ -135,7 +134,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 			indices.Add(idx + 2);
 			indices.Add(idx + 3);
 			idx += 4;
-			depthOffset -= this->depthOffset;
+			depthOffset += this->DepthOffset;
 
 			SetMaterial(meshSection, material);
 		} else if (attachment->type == SP_ATTACHMENT_MESH) {
@@ -158,17 +157,17 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 			uint8 b = static_cast<uint8>(Skeleton->b * slot->b * 255);
 			uint8 a = static_cast<uint8>(Skeleton->a * slot->a * 255);
 			
-			for (int i = 0; i < mesh->super.worldVerticesLength; i += 2) {				
+			for (int j = 0; j < mesh->super.worldVerticesLength; j += 2) {
 				colors.Add(FColor(r, g, b, a));
-				vertices.Add(FVector(worldVertices[i], depthOffset, worldVertices[i + 1]));
-				uvs.Add(FVector2D(mesh->uvs[i], mesh->uvs[i + 1]));				
+				vertices.Add(FVector(worldVertices[j], depthOffset, worldVertices[j + 1]));
+				uvs.Add(FVector2D(mesh->uvs[j], mesh->uvs[j + 1]));
 			}
 
-			for (int i = 0; i < mesh->trianglesCount; i++) {
-				indices.Add(idx + mesh->triangles[i]);
+			for (int j = 0; j < mesh->trianglesCount; j++) {
+				indices.Add(idx + mesh->triangles[j]);
 			}
 			idx += mesh->super.worldVerticesLength >> 1;
-			depthOffset -= this->depthOffset;
+			depthOffset += this->DepthOffset;
 			SetMaterial(meshSection, material);
 		}
 	}

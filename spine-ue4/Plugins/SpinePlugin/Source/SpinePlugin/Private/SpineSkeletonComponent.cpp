@@ -16,18 +16,18 @@ void USpineSkeletonComponent::BeginPlay() {
 void USpineSkeletonComponent::TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
-	if (lastAtlas != atlas || lastData != skeletonData) {
+	if (lastAtlas != Atlas || lastData != SkeletonData) {
 		DisposeState();
 
-		if (atlas && skeletonData) {
-			spSkeletonData* data = skeletonData->GetSkeletonData(atlas->GetAtlas(false), false);
+		if (Atlas && SkeletonData) {
+			spSkeletonData* data = SkeletonData->GetSkeletonData(Atlas->GetAtlas(false), false);
 			skeleton = spSkeleton_create(data);
 			stateData = spAnimationStateData_create(data);
 			state = spAnimationState_create(stateData);
 		}
 
-		lastAtlas = atlas;
-		lastData = skeletonData;
+		lastAtlas = Atlas;
+		lastData = SkeletonData;
 	}
 
 	if (state) {
