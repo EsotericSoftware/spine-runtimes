@@ -6,41 +6,41 @@
 
 UCLASS(ClassGroup=(Spine))
 class SPINEPLUGIN_API USpineAtlasAsset: public UObject {
-    GENERATED_BODY()
-    
+	GENERATED_BODY()
+	
 public:
-    spAtlas* GetAtlas (bool ForceReload = false);
-    
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
-    TArray<UTexture2D*> atlasPages;
-    
-    FString GetRawData () const;
-    
-    FName GetAtlasFileName () const;
-    
-    virtual void BeginDestroy () override;
-    
+	spAtlas* GetAtlas (bool ForceReload = false);
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
+	TArray<UTexture2D*> atlasPages;
+	
+	FString GetRawData () const;
+	
+	FName GetAtlasFileName () const;
+	
+	virtual void BeginDestroy () override;
+	
 protected:
-    spAtlas* atlas = nullptr;
-    
-    UPROPERTY()
-    FString rawData;
-    
-    UPROPERTY()
-    FName atlasFileName;
-    
+	spAtlas* atlas = nullptr;
+	
+	UPROPERTY()
+	FString rawData;
+	
+	UPROPERTY()
+	FName atlasFileName;
+	
 #if WITH_EDITORONLY_DATA
 
 public:
-    void SetRawData (const FString &RawData);
-    void SetAtlasFileName (const FName &AtlasFileName);
-    
+	void SetRawData (const FString &RawData);
+	void SetAtlasFileName (const FName &AtlasFileName);
+	
 protected:
-    UPROPERTY(VisibleAnywhere, Instanced, Category=ImportSettings)
-    class UAssetImportData* importData;
-    
-    virtual void PostInitProperties ( ) override;
-    virtual void GetAssetRegistryTags(TArray<FAssetRegistryTag>& OutTags) const override;
-    virtual void Serialize (FArchive& Ar) override;
+	UPROPERTY(VisibleAnywhere, Instanced, Category=ImportSettings)
+	class UAssetImportData* importData;
+	
+	virtual void PostInitProperties ( ) override;
+	virtual void GetAssetRegistryTags(TArray<FAssetRegistryTag>& OutTags) const override;
+	virtual void Serialize (FArchive& Ar) override;
 #endif
 };

@@ -12,18 +12,18 @@ class SPINEPLUGIN_API USpineSkeletonComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
-    USpineAtlasAsset* Atlas;
-    
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
-    USpineSkeletonDataAsset* SkeletonData;
-    
-    spAnimationStateData* GetAnimationStateData () { return stateData; };
-    
-    spAnimationState* GetAnimationState () { return state; };
-    
-    spSkeleton* GetSkeleton () { return skeleton; };
-    	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
+	USpineAtlasAsset* Atlas;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
+	USpineSkeletonDataAsset* SkeletonData;
+	
+	spAnimationStateData* GetAnimationStateData () { return stateData; };
+	
+	spAnimationState* GetAnimationState () { return state; };
+	
+	spSkeleton* GetSkeleton () { return skeleton; };
+		
 	USpineSkeletonComponent ();
 	
 	virtual void BeginPlay () override;
@@ -35,9 +35,9 @@ public:
 protected:
 	void DisposeState();
 
-    spAnimationStateData* stateData;
-    spAnimationState* state;
-    spSkeleton* skeleton;
+	spAnimationStateData* stateData;
+	spAnimationState* state;
+	spSkeleton* skeleton;
 	USpineAtlasAsset* lastAtlas = nullptr;
 	USpineSkeletonDataAsset* lastData = nullptr;	
 };

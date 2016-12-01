@@ -4,7 +4,7 @@
 
 USpineSkeletonComponent::USpineSkeletonComponent () {
 	bWantsBeginPlay = true;
-    PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = true;
 	bTickInEditor = true;
 	bAutoActivate = true;
 }
@@ -33,7 +33,7 @@ void USpineSkeletonComponent::TickComponent (float DeltaTime, ELevelTick TickTyp
 	if (state) {
 		spAnimationState_update(state, DeltaTime);
 		spAnimationState_apply(state, skeleton);
-        spSkeleton_updateWorldTransform(skeleton);
+		spSkeleton_updateWorldTransform(skeleton);
 	}
 }
 

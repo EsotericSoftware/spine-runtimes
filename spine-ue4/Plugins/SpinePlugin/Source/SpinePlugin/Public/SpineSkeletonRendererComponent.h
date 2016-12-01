@@ -12,7 +12,7 @@ UCLASS(ClassGroup=(Spine), meta=(BlueprintSpawnableComponent))
 class SPINEPLUGIN_API USpineSkeletonRendererComponent: public UProceduralMeshComponent {
 	GENERATED_BODY()
 
-public:	
+public: 
 	USpineSkeletonRendererComponent (const FObjectInitializer& ObjectInitializer);
 	
 	virtual void BeginPlay () override;
@@ -24,10 +24,10 @@ public:
 
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	float DepthOffset = 0.1f;
-    
-    UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
-    FName TextureParameterName;
-    
+	
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
+	FName TextureParameterName;
+	
 protected:
 	void UpdateMesh (spSkeleton* Skeleton);
 
