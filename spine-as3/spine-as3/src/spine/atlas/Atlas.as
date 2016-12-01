@@ -126,7 +126,7 @@ public class Atlas {
 					region.splits = new Vector.<int>(parseInt(tuple[0]), parseInt(tuple[1]), parseInt(tuple[2]), parseInt(tuple[3]));
 
 					if (reader.readTuple(tuple) == 4) { // pad is optional, but only present with splits
-						region.pads = Vector.<int>(parseInt(tuple[0]), parseInt(tuple[1]), parseInt(tuple[2]), parseInt(tuple[3]));
+						region.pads = new Vector.<int>(parseInt(tuple[0]), parseInt(tuple[1]), parseInt(tuple[2]), parseInt(tuple[3]));
 
 						reader.readTuple(tuple);
 					}
