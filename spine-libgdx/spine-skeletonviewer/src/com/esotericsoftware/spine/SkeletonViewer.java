@@ -216,6 +216,9 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		if (ui.skinList.getSelected() != null) skeleton.setSkin(ui.skinList.getSelected());
 		setAnimation();
+
+		// ui.animationList.clearListeners();
+		// state.setAnimation(0, "walk", true);
 	}
 
 	void setAnimation () {

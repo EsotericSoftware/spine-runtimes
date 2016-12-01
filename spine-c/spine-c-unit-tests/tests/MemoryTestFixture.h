@@ -17,6 +17,7 @@ public:
 		// Comment out here to disable individual test cases 
 		TEST_CASE(reproduceIssue_776);
 		TEST_CASE(reproduceIssue_777);
+		TEST_CASE(reproduceIssue_Loop);
 
 		initialize();
 	}
@@ -29,6 +30,7 @@ public:
 public:
 	void reproduceIssue_776();
 	void reproduceIssue_777();
+	void reproduceIssue_Loop(); // http://esotericsoftware.com/forum/spine-c-3-5-animation-jerking-7451
 
 	//////////////////////////////////////////////////////////////////////////
 	// test fixture setup

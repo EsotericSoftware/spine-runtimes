@@ -55,7 +55,7 @@ namespace Spine.Unity.Modules {
 
 		MeshRenderer mainMeshRenderer;
 		public bool copyPropertyBlock = false;
-		[Tooltip("Copies MeshRenderer flags into ")]
+		[Tooltip("Copies MeshRenderer flags into each parts renderer")]
 		public bool copyMeshRendererFlags = false;
 		public List<Spine.Unity.Modules.SkeletonPartsRenderer> partsRenderers = new List<SkeletonPartsRenderer>();
 
@@ -125,7 +125,7 @@ namespace Spine.Unity.Modules {
 			int rendererCount = partsRenderers.Count;
 			if (rendererCount <= 0) return;
 
-			int rendererIndex = 0;
+
 
 			if (copyPropertyBlock)
 				mainMeshRenderer.GetPropertyBlock(copiedBlock);
@@ -134,11 +134,13 @@ namespace Spine.Unity.Modules {
 			var submeshInstructionsItems = submeshInstructions.Items;
 			int lastSubmeshInstruction = submeshInstructions.Count - 1;
 
-			var currentRenderer = partsRenderers[rendererIndex];
+
 			bool addNormals = skeletonRenderer.calculateNormals;
 			bool addTangents = skeletonRenderer.calculateTangents;
 			bool pmaVertexColors = skeletonRenderer.pmaVertexColors;
-				
+
+			int rendererIndex = 0;
+			var currentRenderer = partsRenderers[rendererIndex];
 			for (int si = 0, start = 0; si <= lastSubmeshInstruction; si++) {
 				if (submeshInstructionsItems[si].forceSeparate || si == lastSubmeshInstruction) {
 					// Apply properties
