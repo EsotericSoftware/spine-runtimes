@@ -4,6 +4,8 @@
 #include <string>
 #include <stdlib.h>
 
+#define LOCTEXT_NAMESPACE "Spine"
+
 FString USpineAtlasAsset::GetRawData () const {
     return rawData;
 }
@@ -21,12 +23,12 @@ FName USpineAtlasAsset::GetAtlasFileName () const {
 
 #if WITH_EDITORONLY_DATA
 
-void USpineAtlasAsset::SetRawData (const FString &_rawData) {
-    this->rawData = _rawData;
+void USpineAtlasAsset::SetRawData (const FString &RawData) {
+	this->rawData = RawData;
 }
 
-void USpineAtlasAsset::SetAtlasFileName (const FName &_atlasFileName) {
-    importData->UpdateFilenameOnly(_atlasFileName.ToString());
+void USpineAtlasAsset::SetAtlasFileName (const FName &AtlasFileName) {
+    importData->UpdateFilenameOnly(AtlasFileName.ToString());
     TArray<FString> files;
     importData->ExtractFilenames(files);
     if (files.Num() > 0) atlasFileName = FName(*files[0]);
@@ -59,8 +61,8 @@ void USpineAtlasAsset::BeginDestroy () {
     Super::BeginDestroy();
 }
 
-spAtlas* USpineAtlasAsset::GetAtlas (bool forceReload) {
-    if (!atlas || forceReload) {
+spAtlas* USpineAtlasAsset::GetAtlas (bool ForceReload) {
+    if (!atlas || ForceReload) {
         if (atlas) {
             spAtlas_dispose(atlas);
             atlas = nullptr;
@@ -74,9 +76,11 @@ spAtlas* USpineAtlasAsset::GetAtlas (bool forceReload) {
             if (atlasPages.Num() > 0 && atlasPages.Num() > i)
                 page->rendererObject = atlasPages[i++];
             page = page->next;
-        }        
+        }
     }
     return this->atlas;
 }
 
 #endif
+
+#undef LOCTEXT_NAMESPACE

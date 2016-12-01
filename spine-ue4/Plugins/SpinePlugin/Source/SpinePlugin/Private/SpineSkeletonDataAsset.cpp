@@ -4,6 +4,8 @@
 #include <string>
 #include <stdlib.h>
 
+#define LOCTEXT_NAMESPACE "Spine"
+
 FName USpineSkeletonDataAsset::GetSkeletonDataFileName () const {
 #if WITH_EDITORONLY_DATA
     TArray<FString> files;
@@ -21,8 +23,8 @@ TArray<uint8>& USpineSkeletonDataAsset::GetRawData () {
 
 #if WITH_EDITORONLY_DATA
 
-void USpineSkeletonDataAsset::SetSkeletonDataFileName (const FName &_skeletonDataFileName) {
-    importData->UpdateFilenameOnly(_skeletonDataFileName.ToString());
+void USpineSkeletonDataAsset::SetSkeletonDataFileName (const FName &SkeletonDataFileName) {
+    importData->UpdateFilenameOnly(SkeletonDataFileName.ToString());
     TArray<FString> files;
     importData->ExtractFilenames(files);
     if (files.Num() > 0) this->skeletonDataFileName = FName(*files[0]);
@@ -55,25 +57,27 @@ void USpineSkeletonDataAsset::BeginDestroy () {
     Super::BeginDestroy();
 }
 
-spSkeletonData* USpineSkeletonDataAsset::GetSkeletonData (spAtlas* atlas, bool forceReload) {
-    if (!skeletonData || forceReload) {
+spSkeletonData* USpineSkeletonDataAsset::GetSkeletonData (spAtlas* Atlas, bool ForceReload) {
+    if (!skeletonData || ForceReload) {
         if (skeletonData) {
             spSkeletonData_dispose(skeletonData);
             skeletonData = nullptr;
         }
         int dataLen = rawData.Num();
         if (skeletonDataFileName.GetPlainNameString().Contains(TEXT(".json"))) {
-            spSkeletonJson* json = spSkeletonJson_create(atlas);
+            spSkeletonJson* json = spSkeletonJson_create(Atlas);
             this->skeletonData = spSkeletonJson_readSkeletonData(json, (const char*)rawData.GetData());
             spSkeletonJson_dispose(json);
         } else {
-            spSkeletonBinary* binary = spSkeletonBinary_create(atlas);
+            spSkeletonBinary* binary = spSkeletonBinary_create(Atlas);
             this->skeletonData = spSkeletonBinary_readSkeletonData(binary, (const unsigned char*)rawData.GetData(), (int)rawData.Num());
             spSkeletonBinary_dispose(binary);
         }
-        lastAtlas = atlas;
+        lastAtlas = Atlas;
     }
     return this->skeletonData;
 }
 
 #endif
+
+#undef LOCTEXT_NAMESPACE

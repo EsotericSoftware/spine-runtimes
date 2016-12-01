@@ -8,9 +8,8 @@
 #include "SpineSkeletonRendererComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Spine), meta=(BlueprintSpawnableComponent) )
-class SPINEPLUGIN_API USpineSkeletonRendererComponent : public UProceduralMeshComponent
-{
+UCLASS(ClassGroup=(Spine), meta=(BlueprintSpawnableComponent))
+class SPINEPLUGIN_API USpineSkeletonRendererComponent: public UProceduralMeshComponent {
 	GENERATED_BODY()
 
 public:	
@@ -24,11 +23,15 @@ public:
 	UMaterialInterface* DefaultMaterial;	
 
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
-	float depthOffset = 0.1f;
+	float DepthOffset = 0.1f;
+    
+    UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
+    FName TextureParameterName;
+    
 protected:
-	void UpdateMesh (spSkeleton* skeleton);
+	void UpdateMesh (spSkeleton* Skeleton);
 
-	void Flush(int &idx, TArray<FVector> &vertices, TArray<int32> &indices, TArray<FVector2D> &uvs, TArray<FColor> &colors, UMaterialInstanceDynamic* material);
+	void Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, UMaterialInstanceDynamic* Material);
 	
 	TArray<UMaterialInstanceDynamic*> atlasMaterials;
 	TMap<spAtlasPage*, UMaterialInstanceDynamic*> pageToMaterial;

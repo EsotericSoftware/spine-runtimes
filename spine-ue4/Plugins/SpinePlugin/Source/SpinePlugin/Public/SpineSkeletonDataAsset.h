@@ -4,12 +4,12 @@
 #include "spine/spine.h"
 #include "SpineSkeletonDataAsset.generated.h"
 
-UCLASS( ClassGroup=(Spine) )
-class SPINEPLUGIN_API USpineSkeletonDataAsset : public UObject {
+UCLASS(ClassGroup=(Spine))
+class SPINEPLUGIN_API USpineSkeletonDataAsset: public UObject {
     GENERATED_BODY()
     
 public:
-    spSkeletonData* GetSkeletonData(spAtlas* atlas, bool forceReload = false);
+    spSkeletonData* GetSkeletonData(spAtlas* Atlas, bool ForceReload = false);
     
     FName GetSkeletonDataFileName () const;
     TArray<uint8>& GetRawData ();

@@ -1,41 +1,24 @@
-// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
-
 #include "SpinePluginPrivatePCH.h"
-#include "spine/spine.h"
 
 
 class FSpinePlugin : public SpinePlugin {
-	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 };
 
 IMPLEMENT_MODULE( FSpinePlugin, SpinePlugin )
 
+void FSpinePlugin::StartupModule() { }
 
 
-void FSpinePlugin::StartupModule() {
-	// This code will execute after your module is loaded into memory (but after global variables are initialized, of course.)
-    printf("This is a test");
-}
+void FSpinePlugin::ShutdownModule() { }
 
-
-void FSpinePlugin::ShutdownModule() {
-	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
-	// we call this function before unloading the module.
-}
-
+// These are not used in the Spine UE4 plugin, see SpineAtlasAsset on how atlas page textures
+// are loaded, See SpineSkeletonRendererComponent on how these textures are used for rendering.
 extern "C" {
-    void _spAtlasPage_createTexture (spAtlasPage* self, const char* path) {
-        
-    }
-    void _spAtlasPage_disposeTexture (spAtlasPage* self) {
-        
-    }
-    
-    char* _spUtil_readFile (const char* path, int* length) {
-        return 0;
-    }
+    void _spAtlasPage_createTexture (spAtlasPage* self, const char* path) { }
+    void _spAtlasPage_disposeTexture (spAtlasPage* self) { }
+    char* _spUtil_readFile (const char* path, int* length) { return 0; }
 }
 
 

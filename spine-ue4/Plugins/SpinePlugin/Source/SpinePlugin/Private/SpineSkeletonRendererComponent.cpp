@@ -3,10 +3,9 @@
 #include "spine/spine.h"
 #include <stdlib.h>
 
-USpineSkeletonRendererComponent::USpineSkeletonRendererComponent(const FObjectInitializer& ObjectInitializer)
-{
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.	
+#define LOCTEXT_NAMESPACE "Spine"
+
+USpineSkeletonRendererComponent::USpineSkeletonRendererComponent (const FObjectInitializer& ObjectInitializer) {
 	bWantsBeginPlay = true;
 	PrimaryComponentTick.bCanEverTick = true;
 	bTickInEditor = true;
@@ -14,18 +13,16 @@ USpineSkeletonRendererComponent::USpineSkeletonRendererComponent(const FObjectIn
 
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MaskedMaterialRef(TEXT("/Paper2D/MaskedUnlitSpriteMaterial"));
 	DefaultMaterial = MaskedMaterialRef.Object;
+	
+	TextureParameterName = FName(TEXT("SpriteTexture"));
 }
 
-// Called when the game starts
-void USpineSkeletonRendererComponent::BeginPlay()
-{
+void USpineSkeletonRendererComponent::BeginPlay () {
 	Super::BeginPlay();
 }
 
-// Called every frame
-void USpineSkeletonRendererComponent::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
-{
-	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
+void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	UClass* skeletonClass = USpineSkeletonComponent::StaticClass();
 	AActor* owner = GetOwner();
@@ -38,7 +35,7 @@ void USpineSkeletonRendererComponent::TickComponent( float DeltaTime, ELevelTick
 				spAtlasPage* currPage = skeleton->atlas->GetAtlas(false)->pages;
 				for (int i = 0; i < skeleton->atlas->atlasPages.Num(); i++) {
 					UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(DefaultMaterial, owner);
-					material->SetTextureParameterValue(FName(TEXT("SpriteTexture")), skeleton->atlas->atlasPages[i]);
+					material->SetTextureParameterValue(TextureParameterName, skeleton->atlas->atlasPages[i]);
 					atlasMaterials.Add(material);
 					pageToMaterial.Add(currPage, material);
 					currPage = currPage->next;
@@ -50,34 +47,34 @@ void USpineSkeletonRendererComponent::TickComponent( float DeltaTime, ELevelTick
 				for (int i = 0; i < skeleton->atlas->atlasPages.Num(); i++) {
 					UMaterialInstanceDynamic* current = atlasMaterials[i];
 					UTexture2D* texture = skeleton->atlas->atlasPages[i];
-					UTexture* oldTexture = nullptr;					
-					if(!current->GetTextureParameterValue(FName(TEXT("SpriteTexture")), oldTexture) || oldTexture != texture) {
+					UTexture* oldTexture = nullptr;
+					if(!current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
 						UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(DefaultMaterial, owner);
-						material->SetTextureParameterValue("SpriteTexture", texture);
+						material->SetTextureParameterValue(TextureParameterName, texture);
 						atlasMaterials[i] = material;
 					}
 					pageToMaterial.Add(currPage, atlasMaterials[i]);
 					currPage = currPage->next;
 				}
-			}			
-			spSkeleton_updateWorldTransform(skeleton->skeleton);			
-			UpdateMesh(skeleton->skeleton);			
+			}
+			spSkeleton_updateWorldTransform(skeleton->skeleton);
+			UpdateMesh(skeleton->skeleton);
 		}
-	}		
+	}
 }
 
-void USpineSkeletonRendererComponent::Flush(int &idx, TArray<FVector> &vertices, TArray<int32> &indices, TArray<FVector2D> &uvs, TArray<FColor> &colors, UMaterialInstanceDynamic* material) {
-	if (vertices.Num() == 0) return;
-	CreateMeshSection(idx, vertices, indices, TArray<FVector>(), uvs, colors, TArray<FProcMeshTangent>(), false);
-	SetMaterial(idx, material);
-	vertices.SetNum(0);
-	indices.SetNum(0);
-	uvs.SetNum(0);
-	colors.SetNum(0);
-	idx++;
+void USpineSkeletonRendererComponent::Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, UMaterialInstanceDynamic* Material) {
+	if (Vertices.Num() == 0) return;
+	CreateMeshSection(Idx, Vertices, Indices, TArray<FVector>(), Uvs, Colors, TArray<FProcMeshTangent>(), false);
+	SetMaterial(Idx, Material);
+	Vertices.SetNum(0);
+	Indices.SetNum(0);
+	Uvs.SetNum(0);
+	Colors.SetNum(0);
+	Idx++;
 }
 
-void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* skeleton) {	
+void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 	TArray<FVector> vertices;
 	TArray<int32> indices;
 	TArray<FVector2D> uvs;
@@ -93,8 +90,8 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* skeleton) {
 
 	float depthOffset = 0;
 
-	for (int i = 0; i < skeleton->slotsCount; ++i) {
-		spSlot* slot = skeleton->drawOrder[i];
+	for (int i = 0; i < Skeleton->slotsCount; ++i) {
+		spSlot* slot = Skeleton->drawOrder[i];
 		spAttachment* attachment = slot->attachment;
 		if (!attachment) continue;						
 		
@@ -110,10 +107,10 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* skeleton) {
 
 			spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, worldVertices.GetData());
 
-			uint8 r = static_cast<uint8>(skeleton->r * slot->r * 255);
-			uint8 g = static_cast<uint8>(skeleton->g * slot->g * 255);
-			uint8 b = static_cast<uint8>(skeleton->b * slot->b * 255);
-			uint8 a = static_cast<uint8>(skeleton->a * slot->a * 255);
+			uint8 r = static_cast<uint8>(Skeleton->r * slot->r * 255);
+			uint8 g = static_cast<uint8>(Skeleton->g * slot->g * 255);
+			uint8 b = static_cast<uint8>(Skeleton->b * slot->b * 255);
+			uint8 a = static_cast<uint8>(Skeleton->a * slot->a * 255);
 			
 			colors.Add(FColor(r, g, b, a));
 			vertices.Add(FVector(worldVertices[0], depthOffset, worldVertices[1]));
@@ -156,10 +153,10 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* skeleton) {
 			}
 			spMeshAttachment_computeWorldVertices(mesh, slot, worldVertices.GetData());
 
-			uint8 r = static_cast<uint8>(skeleton->r * slot->r * 255);
-			uint8 g = static_cast<uint8>(skeleton->g * slot->g * 255);
-			uint8 b = static_cast<uint8>(skeleton->b * slot->b * 255);
-			uint8 a = static_cast<uint8>(skeleton->a * slot->a * 255);
+			uint8 r = static_cast<uint8>(Skeleton->r * slot->r * 255);
+			uint8 g = static_cast<uint8>(Skeleton->g * slot->g * 255);
+			uint8 b = static_cast<uint8>(Skeleton->b * slot->b * 255);
+			uint8 a = static_cast<uint8>(Skeleton->a * slot->a * 255);
 			
 			for (int i = 0; i < mesh->super.worldVerticesLength; i += 2) {				
 				colors.Add(FColor(r, g, b, a));
@@ -178,3 +175,5 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* skeleton) {
 	
 	Flush(meshSection, vertices, indices, uvs, colors, lastMaterial);
 }
+
+#undef LOCTEXT_NAMESPACE

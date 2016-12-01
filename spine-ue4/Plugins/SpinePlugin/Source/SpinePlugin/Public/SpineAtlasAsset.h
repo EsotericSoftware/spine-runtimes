@@ -4,17 +4,18 @@
 #include "spine/spine.h"
 #include "SpineAtlasAsset.generated.h"
 
-UCLASS( ClassGroup=(Spine) )
-class SPINEPLUGIN_API USpineAtlasAsset : public UObject {
+UCLASS(ClassGroup=(Spine))
+class SPINEPLUGIN_API USpineAtlasAsset: public UObject {
     GENERATED_BODY()
     
 public:
-    spAtlas* GetAtlas (bool forceReload = false);
+    spAtlas* GetAtlas (bool ForceReload = false);
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
     TArray<UTexture2D*> atlasPages;
     
     FString GetRawData () const;
+    
     FName GetAtlasFileName () const;
     
     virtual void BeginDestroy () override;
@@ -31,8 +32,8 @@ protected:
 #if WITH_EDITORONLY_DATA
 
 public:
-    void SetRawData (const FString &rawData);
-    void SetAtlasFileName (const FName &atlasFileName);
+    void SetRawData (const FString &RawData);
+    void SetAtlasFileName (const FName &AtlasFileName);
     
 protected:
     UPROPERTY(VisibleAnywhere, Instanced, Category=ImportSettings)
