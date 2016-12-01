@@ -539,7 +539,7 @@ public class AnimationState {
 		entry.trackTime = 0;
 		entry.trackLast = -1;
 		entry.nextTrackLast = -1;
-		entry.trackEnd = loop ? Integer.MAX_VALUE : entry.animationEnd;
+		entry.trackEnd = Float.MAX_VALUE;
 		entry.timeScale = 1;
 
 		entry.alpha = 1;
@@ -752,10 +752,10 @@ public class AnimationState {
 			this.trackTime = trackTime;
 		}
 
-		/** The track time in seconds when this animation will be removed from the track. Defaults to the animation
-		 * {@link Animation#duration} for non-looping animations and the highest float possible for looping animations. If the track
-		 * end time is reached, no other animations are queued for playback, and mixing from any previous animations is complete,
-		 * then the properties keyed by the animation are set to the setup pose and the track is cleared.
+		/** The track time in seconds when this animation will be removed from the track. Defaults to the highest possible float
+		 * value, meaning the animation will be applied until a new animation is set or the track is cleared. If the track end time
+		 * is reached, no other animations are queued for playback, and mixing from any previous animations is complete, then the
+		 * properties keyed by the animation are set to the setup pose and the track is cleared.
 		 * <p>
 		 * It may be desired to use {@link AnimationState#addEmptyAnimation(int, float, float)} to mix the properties back to the
 		 * setup pose over time, rather than have it happen instantly. */
