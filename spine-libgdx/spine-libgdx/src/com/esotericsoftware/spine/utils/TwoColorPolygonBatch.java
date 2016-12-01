@@ -190,11 +190,11 @@ public class TwoColorPolygonBatch {
 	private ShaderProgram createDefaultShader () {
 		String vertexShader = "attribute vec4 a_position;\n" //
 			+ "attribute vec4 a_light;\n" //
-			+ "attribute vec4 a_dark;\n" //
+			+ "attribute vec3 a_dark;\n" //
 			+ "attribute vec2 a_texCoord0;\n" //
 			+ "uniform mat4 u_projTrans;\n" //
 			+ "varying vec4 v_light;\n" //
-			+ "varying vec4 v_dark;\n" //
+			+ "varying vec3 v_dark;\n" //
 			+ "varying vec2 v_texCoords;\n" //
 			+ "\n" //
 			+ "void main()\n" //
@@ -212,14 +212,14 @@ public class TwoColorPolygonBatch {
 			+ "#define LOWP \n" //
 			+ "#endif\n" //
 			+ "varying LOWP vec4 v_light;\n" //
-			+ "varying LOWP vec4 v_dark;\n" //
+			+ "varying LOWP vec3 v_dark;\n" //
 			+ "varying vec2 v_texCoords;\n" //
 			+ "uniform sampler2D u_texture;\n" //
 			+ "void main()\n"//
 			+ "{\n" //
 			+ "  vec4 texColor = texture2D(u_texture, v_texCoords);\n" //
 			+ "  gl_FragColor.a = texColor.a * v_light.a;\n" //
-			+ "  gl_FragColor.rgb = (1 - texColor.rgb) * v_dark * gl_FragColor.a + texColor.rgb * v_light.rgb;\n" //
+			+ "  gl_FragColor.rgb = (1.0 - texColor.rgb) * v_dark * gl_FragColor.a + texColor.rgb * v_light.rgb;\n" //
 			+ "}";
 
 		ShaderProgram shader = new ShaderProgram(vertexShader, fragmentShader);
