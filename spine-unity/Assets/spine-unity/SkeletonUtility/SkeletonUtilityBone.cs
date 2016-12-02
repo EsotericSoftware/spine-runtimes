@@ -121,7 +121,7 @@ namespace Spine.Unity {
 					cachedTransform.localPosition = new Vector3(bone.x, bone.y, 0);
 				
 				if (rotation) {
-					if (!bone.data.transformMode.InheritsRotation()) {
+					if (bone.data.transformMode.InheritsRotation()) {
 						cachedTransform.localRotation = Quaternion.Euler(0, 0, bone.AppliedRotation);
 					} else {
 						Vector3 euler = skeletonTransform.rotation.eulerAngles;
