@@ -129,7 +129,7 @@ public class AnimationStateTests {
 			expect(0, "end", 1, 1.1f), //
 			expect(0, "dispose", 1, 1.1f) //
 		);
-		state.setAnimation(0, "events0", false);
+		state.setAnimation(0, "events0", false).setTrackEnd(1);
 		run(0.1f, 1000, null);
 
 		setup("1/60 time step, dispose queued", // 2
@@ -155,7 +155,7 @@ public class AnimationStateTests {
 		state.addAnimation(0, "events1", false, 0);
 		state.addAnimation(0, "events0", false, 0);
 		state.addAnimation(0, "events1", false, 0);
-		state.setAnimation(0, "events0", false);
+		state.setAnimation(0, "events0", false).setTrackEnd(1);
 		run(1 / 60f, 1000, null);
 
 		setup("30 time step", // 3
@@ -167,7 +167,7 @@ public class AnimationStateTests {
 			expect(0, "end", 30, 60), //
 			expect(0, "dispose", 30, 60) //
 		);
-		state.setAnimation(0, "events0", false);
+		state.setAnimation(0, "events0", false).setTrackEnd(1);
 		run(30, 1000, null);
 
 		setup("1 time step", // 4
@@ -179,7 +179,7 @@ public class AnimationStateTests {
 			expect(0, "end", 1, 2), //
 			expect(0, "dispose", 1, 2) //
 		);
-		state.setAnimation(0, "events0", false);
+		state.setAnimation(0, "events0", false).setTrackEnd(1);
 		run(1, 1.01f, null);
 
 		setup("interrupt", // 5
@@ -215,7 +215,7 @@ public class AnimationStateTests {
 		);
 		state.setAnimation(0, "events0", false);
 		state.addAnimation(0, "events1", false, 0);
-		state.addAnimation(0, "events0", false, 0);
+		state.addAnimation(0, "events0", false, 0).setTrackEnd(1);
 		run(0.1f, 4f, null);
 
 		setup("interrupt with delay", // 6
@@ -237,7 +237,7 @@ public class AnimationStateTests {
 			expect(1, "dispose", 1, 1.6f) //
 		);
 		state.setAnimation(0, "events0", false);
-		state.addAnimation(0, "events1", false, 0.5f);
+		state.addAnimation(0, "events1", false, 0.5f).setTrackEnd(1);
 		run(0.1f, 1000, null);
 
 		setup("interrupt with delay and mix time", // 7
@@ -263,7 +263,7 @@ public class AnimationStateTests {
 		);
 		stateData.setMix("events0", "events1", 0.7f);
 		state.setAnimation(0, "events0", true);
-		state.addAnimation(0, "events1", false, 0.9f);
+		state.addAnimation(0, "events1", false, 0.9f).setTrackEnd(1);
 		run(0.1f, 1000, null);
 
 		setup("animation 0 events do not fire during mix", // 8
@@ -286,7 +286,7 @@ public class AnimationStateTests {
 		);
 		stateData.setDefaultMix(0.7f);
 		state.setAnimation(0, "events0", false);
-		state.addAnimation(0, "events1", false, 0.4f);
+		state.addAnimation(0, "events1", false, 0.4f).setTrackEnd(1);
 		run(0.1f, 1000, null);
 
 		setup("event threshold, some animation 0 events fire during mix", // 9
@@ -312,7 +312,7 @@ public class AnimationStateTests {
 		);
 		stateData.setMix("events0", "events1", 0.7f);
 		state.setAnimation(0, "events0", false).setEventThreshold(0.5f);
-		state.addAnimation(0, "events1", false, 0.4f);
+		state.addAnimation(0, "events1", false, 0.4f).setTrackEnd(1);
 		run(0.1f, 1000, null);
 
 		setup("event threshold, all animation 0 events fire during mix", // 10
@@ -339,7 +339,9 @@ public class AnimationStateTests {
 			expect(1, "dispose", 1, 1.9f) //
 		);
 		state.setAnimation(0, "events0", true).setEventThreshold(1);
-		state.addAnimation(0, "events1", false, 0.8f).setMixDuration(0.7f);
+		entry = state.addAnimation(0, "events1", false, 0.8f);
+		entry.setMixDuration(0.7f);
+		entry.setTrackEnd(1);
 		run(0.1f, 1000, null);
 
 		setup("looping", // 11
@@ -388,7 +390,7 @@ public class AnimationStateTests {
 			expect(1, "dispose", 1, 3.1f) //
 		);
 		state.setAnimation(0, "events0", false);
-		state.addAnimation(0, "events1", false, 2);
+		state.addAnimation(0, "events1", false, 2).setTrackEnd(1);
 		run(0.1f, 4f, null);
 
 		setup("interrupt animation after first loop complete", // 13
@@ -419,7 +421,7 @@ public class AnimationStateTests {
 		state.setAnimation(0, "events0", true);
 		run(0.1f, 6, new TestListener() {
 			public void frame (float time) {
-				if (MathUtils.isEqual(time, 1.4f)) state.addAnimation(0, "events1", false, 0);
+				if (MathUtils.isEqual(time, 1.4f)) state.addAnimation(0, "events1", false, 0).setTrackEnd(1);
 			}
 		});
 
@@ -432,7 +434,7 @@ public class AnimationStateTests {
 			expect(0, "end", 1, 1.1f), //
 			expect(0, "dispose", 1, 1.1f) //
 		);
-		state.addAnimation(0, "events0", false, 0);
+		state.addAnimation(0, "events0", false, 0).setTrackEnd(1);
 		run(0.1f, 1.9f, null);
 
 		setup("end time beyond non-looping animation duration", // 15
@@ -490,6 +492,7 @@ public class AnimationStateTests {
 		entry.setAnimationStart(0.2f);
 		entry.setAnimationLast(0.2f);
 		entry.setAnimationEnd(0.8f);
+		entry.setTrackEnd(1);
 		run(0.1f, 1.8f, null);
 
 		setup("mix out looping with animation start and end", // 19
@@ -519,7 +522,9 @@ public class AnimationStateTests {
 		entry.setAnimationLast(0.2f);
 		entry.setAnimationEnd(0.8f);
 		entry.setEventThreshold(1);
-		state.addAnimation(0, "events1", false, 0.7f).setMixDuration(0.7f);
+		entry = state.addAnimation(0, "events1", false, 0.7f);
+		entry.setMixDuration(0.7f);
+		entry.setTrackEnd(1);
 		run(0.1f, 20, null);
 
 		setup("setAnimation with track entry mix", // 20
@@ -547,7 +552,11 @@ public class AnimationStateTests {
 		state.setAnimation(0, "events0", true);
 		run(0.1f, 1000, new TestListener() {
 			public void frame (float time) {
-				if (MathUtils.isEqual(time, 1f)) state.setAnimation(0, "events1", false).setMixDuration(0.7f);
+				if (MathUtils.isEqual(time, 1f)) {
+					TrackEntry entry = state.setAnimation(0, "events1", false);
+					entry.setMixDuration(0.7f);
+					entry.setTrackEnd(1);
+				}
 			}
 		});
 
@@ -588,7 +597,7 @@ public class AnimationStateTests {
 			public void frame (float time) {
 				if (MathUtils.isEqual(time, 0.8f)) {
 					state.setAnimation(0, "events0", false); // First should be ignored.
-					state.setAnimation(0, "events2", false);
+					state.setAnimation(0, "events2", false).setTrackEnd(1);
 				}
 			}
 		});
@@ -650,7 +659,7 @@ public class AnimationStateTests {
 				}
 				if (MathUtils.isEqual(time, 0.4f)) {
 					state.setAnimation(0, "events1", false); // First should be ignored.
-					state.setAnimation(0, "events0", false);
+					state.setAnimation(0, "events0", false).setTrackEnd(1);
 				}
 			}
 		});
@@ -664,7 +673,7 @@ public class AnimationStateTests {
 			expect(0, "end", 1, 6.1f), //
 			expect(0, "dispose", 1, 6.1f) //
 		);
-		state.addAnimation(0, "events0", false, 5);
+		state.addAnimation(0, "events0", false, 5).setTrackEnd(1);
 		run(0.1f, 10, null);
 
 		setup("setAnimation during AnimationStateListener"); // 24
@@ -695,7 +704,7 @@ public class AnimationStateTests {
 		});
 		state.addAnimation(0, "events0", false, 0);
 		state.addAnimation(0, "events1", false, 0);
-		state.setAnimation(1, "events1", false);
+		state.setAnimation(1, "events1", false).setTrackEnd(1);
 		run(0.1f, 10, null);
 
 		setup("clearTrack", // 25
@@ -705,7 +714,7 @@ public class AnimationStateTests {
 			expect(0, "end", 0.7f, 0.7f), //
 			expect(0, "dispose", 0.7f, 0.7f) //
 		);
-		state.addAnimation(0, "events0", false, 0);
+		state.addAnimation(0, "events0", false, 0).setTrackEnd(1);
 		run(0.1f, 10, new TestListener() {
 			public void frame (float time) {
 				if (MathUtils.isEqual(time, 0.7f)) state.clearTrack(0);
@@ -727,7 +736,7 @@ public class AnimationStateTests {
 			expect(-1, "end", 0.2f, 1), //
 			expect(-1, "dispose", 0.2f, 1) //
 		);
-		state.addAnimation(0, "events0", false, 0);
+		state.addAnimation(0, "events0", false, 0).setTrackEnd(1);
 		run(0.1f, 10, new TestListener() {
 			public void frame (float time) {
 				if (MathUtils.isEqual(time, 0.7f)) state.setEmptyAnimation(0, 0);
@@ -763,7 +772,7 @@ public class AnimationStateTests {
 		});
 		state.addAnimation(0, "events0", false, 0);
 		state.addAnimation(0, "events1", false, 0);
-		state.setAnimation(1, "events1", false);
+		state.setAnimation(1, "events1", false).setTrackEnd(1);
 		run(0.1f, 10, null);
 		if (counter.get() != 15082016) {
 			log("TEST 26 FAILED! " + counter);
