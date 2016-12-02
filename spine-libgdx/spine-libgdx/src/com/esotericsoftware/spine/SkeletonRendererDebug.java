@@ -96,7 +96,6 @@ public class SkeletonRendererDebug {
 				float y = length * bone.c + bone.worldY;
 				shapes.rectLine(bone.worldX, bone.worldY, x, y, width * scale);
 			}
-			shapes.begin(ShapeType.Line);
 			shapes.x(skeleton.getX(), skeleton.getY(), 4 * scale);
 		}
 
@@ -156,7 +155,7 @@ public class SkeletonRendererDebug {
 				if (drawMeshHull && hullLength > 0) {
 					shapes.setColor(attachmentLineColor);
 					float lastX = vertices[hullLength - 2], lastY = vertices[hullLength - 1];
-					for (int ii = 0, nn = hullLength; ii < nn; ii += 5) {
+					for (int ii = 0, nn = hullLength; ii < nn; ii += 2) {
 						float x = vertices[ii], y = vertices[ii + 1];
 						shapes.line(x, y, lastX, lastY);
 						lastX = x;
