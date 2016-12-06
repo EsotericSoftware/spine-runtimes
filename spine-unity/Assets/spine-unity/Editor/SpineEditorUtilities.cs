@@ -1079,7 +1079,7 @@ namespace Spine.Unity.Editor {
 					AssetDatabase.CreateAsset(skeletonDataAsset, filePath);
 					AssetDatabase.SaveAssets();
 				} else {
-					skeletonDataAsset.Reset();
+					skeletonDataAsset.Clear();
 					skeletonDataAsset.GetSkeletonData(true);
 				}
 
@@ -1312,16 +1312,16 @@ namespace Spine.Unity.Editor {
 			anim.skeletonDataAsset = skeletonDataAsset;
 
 			// Detect "Lit" shader and automatically enable calculateNormals.
-			bool requiresNormals = false;
-			foreach (AtlasAsset atlasAsset in anim.skeletonDataAsset.atlasAssets) {
-				foreach (Material m in atlasAsset.materials) {
-					if (m.shader.name.Contains("Lit")) {
-						requiresNormals = true;
-						break;
-					}
-				}
-			}
-			anim.calculateNormals = requiresNormals;
+//			bool requiresNormals = false;
+//			foreach (AtlasAsset atlasAsset in anim.skeletonDataAsset.atlasAssets) {
+//				foreach (Material m in atlasAsset.materials) {
+//					if (m.shader.name.Contains("Lit")) {
+//						requiresNormals = true;
+//						break;
+//					}
+//				}
+//			}
+//			anim.calculateNormals = requiresNormals;
 
 			SkeletonData data = skeletonDataAsset.GetSkeletonData(true);
 			if (data == null) {
@@ -1352,8 +1352,9 @@ namespace Spine.Unity.Editor {
 
 		static void EnableTK2D () {
 			bool added = false;
-			foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
-				if (group == BuildTargetGroup.Unknown)
+			foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {				
+				int gi = (int)group;
+				if (gi == 15 || gi == 16 || group == BuildTargetGroup.Unknown)
 					continue;
 
 				string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
@@ -1379,6 +1380,10 @@ namespace Spine.Unity.Editor {
 		static void DisableTK2D () {
 			bool removed = false;
 			foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
+				int gi = (int)group;
+				if (gi == 15 || gi == 16 || group == BuildTargetGroup.Unknown)
+					continue;
+				
 				string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
 				if (defines.Contains(SPINE_TK2D_DEFINE)) {
 					removed = true;
