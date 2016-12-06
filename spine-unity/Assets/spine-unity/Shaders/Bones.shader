@@ -18,7 +18,7 @@ Category {
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-			#pragma multi_compile_particles
+//			#pragma multi_compile_particles
 			
 			#include "UnityCG.cginc"
 
@@ -35,21 +35,20 @@ Category {
 				float4 vertex : SV_POSITION;
 				fixed4 color : COLOR;
 				float2 texcoord : TEXCOORD0;
-				#ifdef SOFTPARTICLES_ON
-				float4 projPos : TEXCOORD1;
-				#endif
+//				#ifdef SOFTPARTICLES_ON
+//				float4 projPos : TEXCOORD1;
+//				#endif
 			};
 			
 			float4 _MainTex_ST;
 
-			v2f vert (appdata_t v)
-			{
+			v2f vert (appdata_t v) {
 				v2f o;
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
-				#ifdef SOFTPARTICLES_ON
-				o.projPos = ComputeScreenPos (o.vertex);
-				COMPUTE_EYEDEPTH(o.projPos.z);
-				#endif
+//				#ifdef SOFTPARTICLES_ON
+//				o.projPos = ComputeScreenPos (o.vertex);
+//				COMPUTE_EYEDEPTH(o.projPos.z);
+//				#endif
 				o.color = v.color;
 				o.texcoord = TRANSFORM_TEX(v.texcoord,_MainTex);
 				return o;
@@ -57,9 +56,8 @@ Category {
 
 			sampler2D_float _CameraDepthTexture;
 			
-			fixed4 frag (v2f i) : SV_Target
-			{				
-				return 2.0f * i.color * _Color * tex2D(_MainTex, i.texcoord);
+			fixed4 frag (v2f i) : SV_Target {				
+				return i.color * _Color * tex2D(_MainTex, i.texcoord);
 			}
 			ENDCG 
 		}

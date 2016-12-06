@@ -118,6 +118,12 @@ namespace Spine.Unity {
 			return new Vector2(bone.worldX, bone.worldY);
 		}
 
+		public static Vector2 GetSkeletonSpacePosition (this Bone bone, Vector2 boneLocal) {
+			Vector2 o;
+			bone.LocalToWorld(boneLocal.x, boneLocal.y, out o.x, out o.y);
+			return o;
+		}
+
 		public static Vector3 GetWorldPosition (this Bone bone, UnityEngine.Transform parentTransform) {		
 			return parentTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY));
 		}
@@ -142,15 +148,23 @@ namespace Spine.Unity {
 
 		#region Attachments
 		public static Material GetMaterial (this Attachment a) {
+			object rendererObject = null;
 			var regionAttachment = a as RegionAttachment;
 			if (regionAttachment != null)
-				return (Material)((AtlasRegion)regionAttachment.RendererObject).page.rendererObject;
+				rendererObject = regionAttachment.RendererObject;
 
 			var meshAttachment = a as MeshAttachment;
 			if (meshAttachment != null)
-				return (Material)((AtlasRegion)meshAttachment.RendererObject).page.rendererObject;			
+				rendererObject = meshAttachment.RendererObject;
 
-			return null;
+			if (rendererObject == null)
+				return null;
+			
+			#if SPINE_TK2D
+			return (rendererObject.GetType() == typeof(Material)) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
+			#else
+			return (Material)((AtlasRegion)rendererObject).page.rendererObject;
+			#endif
 		}
 
 		/// <summary>Fills a Vector2 buffer with local vertices.</summary>
