@@ -7,16 +7,21 @@
 #include "spine/spine.h"
 #include "SpineSkeletonAnimationComponent.generated.h"
 
-USTRUCT(BlueprintType)
-struct SPINEPLUGIN_API FTrackEntry {
-	GENERATED_BODY ();
+UCLASS(ClassGroup=(Spine), meta=(BlueprintSpawnableComponent), BlueprintType)
+class SPINEPLUGIN_API UTrackEntry: public UObject {
+	GENERATED_BODY ()
+
+public:
 	
-	FTrackEntry (): entry(0) { }
+	UTrackEntry () { }
 	
-	FTrackEntry (spTrackEntry* entry) { this->entry = entry; }
+	spTrackEntry* entry = nullptr;
 	
-	spTrackEntry* entry;
+	UFUNCTION(BlueprintCallable, Category="Components|Spine")
+	int GetTrackIndex() { return entry ? entry->trackIndex : 0; }
 };
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpineAnimationStartEvent, UTrackEntry*, entry);
 
 class USpineAtlasAsset;
 UCLASS(ClassGroup=(Spine), meta=(BlueprintSpawnableComponent))
@@ -38,16 +43,16 @@ public:
 	
 	// Blueprint functions
 	UFUNCTION(BlueprintCallable, Category="Components|Spine")
-	FTrackEntry SetAnimation (int trackIndex, FString animationName, bool loop);
+	UTrackEntry* SetAnimation (int trackIndex, FString animationName, bool loop);
 	
 	UFUNCTION(BlueprintCallable, Category="Components|Spine")
-	FTrackEntry AddAnimation (int trackIndex, FString animationName, bool loop, float delay);
+	UTrackEntry* AddAnimation (int trackIndex, FString animationName, bool loop, float delay);
 	
 	UFUNCTION(BlueprintCallable, Category="Components|Spine")
-	FTrackEntry SetEmptyAnimation (int trackIndex, float mixDuration);
+	UTrackEntry* SetEmptyAnimation (int trackIndex, float mixDuration);
 	
 	UFUNCTION(BlueprintCallable, Category="Components|Spine")
-	FTrackEntry AddEmptyAnimation (int trackIndex, float mixDuration, float delay);
+	UTrackEntry* AddEmptyAnimation (int trackIndex, float mixDuration, float delay);
 	
 	UFUNCTION(BlueprintCallable, Category="Components|Spine")
 	void ClearTracks ();
@@ -55,8 +60,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Components|Spine")
 	void ClearTrack (int trackIndex);
 	
-	// UFUNCTION(BlueprintImplentableEvent, category = "Components|Spine")
-	// void AnimationEvent(int trackIndex, );
+	UPROPERTY(BlueprintAssignable, Category = "Components|Spine")
+	FSpineAnimationStartEvent AnimationStartEvent;
 	
 protected:
 	virtual void CheckState () override;

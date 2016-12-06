@@ -3,7 +3,9 @@
 #define LOCTEXT_NAMESPACE "Spine"
 
 void callback(spAnimationState* state, spEventType type, spTrackEntry* entry, spEvent* event) {
-	USpineSkeletonAnimationComponent* component = (USpineSkeletonAnimationComponent*)entry->rendererObject;
+	USpineSkeletonAnimationComponent* component = (USpineSkeletonAnimationComponent*)state->rendererObject;
+	
+	component->SpineAnimationStartEvent.Broadcast(231);
 }
 
 USpineSkeletonAnimationComponent::USpineSkeletonAnimationComponent () {
@@ -38,6 +40,8 @@ void USpineSkeletonAnimationComponent::CheckState () {
 			skeleton = spSkeleton_create(data);
 			stateData = spAnimationStateData_create(data);
 			state = spAnimationState_create(stateData);
+			state->rendererObject = (void*)this;
+			state->listener = callback;
 		}
 		
 		lastAtlas = Atlas;
@@ -67,37 +71,45 @@ void USpineSkeletonAnimationComponent::FinishDestroy () {
 	Super::FinishDestroy();
 }
 
-FTrackEntry USpineSkeletonAnimationComponent::SetAnimation (int trackIndex, FString animationName, bool loop) {
+UTrackEntry USpineSkeletonAnimationComponent::SetAnimation (int trackIndex, FString animationName, bool loop) {
 	CheckState();
 	if (state && spSkeletonData_findAnimation(skeleton->data, TCHAR_TO_UTF8(*animationName))) {
 		spTrackEntry* entry = spAnimationState_setAnimationByName(state, trackIndex, TCHAR_TO_UTF8(*animationName), loop ? 1 : 0);
-		return FTrackEntry(entry);
-	} else return FTrackEntry();
+		UTrackEntry* uEnty = NewObject<UTrackEntry>();
+		uEntry->entry = entry;
+		return uEntry;
+	} else return NewObject<UTrackEntry>();
 	
 }
 
-FTrackEntry USpineSkeletonAnimationComponent::AddAnimation (int trackIndex, FString animationName, bool loop, float delay) {
+UTrackEntry USpineSkeletonAnimationComponent::AddAnimation (int trackIndex, FString animationName, bool loop, float delay) {
 	CheckState();
 	if (state && spSkeletonData_findAnimation(skeleton->data, TCHAR_TO_UTF8(*animationName))) {
 		spTrackEntry* entry = spAnimationState_addAnimationByName(state, trackIndex, TCHAR_TO_UTF8(*animationName), loop ? 1 : 0, delay);		
-		return FTrackEntry(entry);
-	} else return FTrackEntry();
+		UTrackEntry* uEnty = NewObject<UTrackEntry>();
+		uEntry->entry = entry;
+		return uEntry;
+	} else return NewObject<UTrackEntry>();
 }
 
-FTrackEntry USpineSkeletonAnimationComponent::SetEmptyAnimation (int trackIndex, float mixDuration) {
+UTrackEntry USpineSkeletonAnimationComponent::SetEmptyAnimation (int trackIndex, float mixDuration) {
 	CheckState();
 	if (state) {
 		spTrackEntry* entry = spAnimationState_setEmptyAnimation(state, trackIndex, mixDuration);
-		return FTrackEntry(entry);
-	} else return FTrackEntry();
+		UTrackEntry* uEnty = NewObject<UTrackEntry>();
+		uEntry->entry = entry;
+		return uEntry;
+	} else return NewObject<UTrackEntry>();
 }
 
-FTrackEntry USpineSkeletonAnimationComponent::AddEmptyAnimation (int trackIndex, float mixDuration, float delay) {
+UTrackEntry USpineSkeletonAnimationComponent::AddEmptyAnimation (int trackIndex, float mixDuration, float delay) {
 	CheckState();
 	if (state) {
 		spTrackEntry* entry = spAnimationState_addEmptyAnimation(state, trackIndex, mixDuration, delay);
-		return FTrackEntry(entry);
-	} else return FTrackEntry();
+		UTrackEntry* uEnty = NewObject<UTrackEntry>();
+		uEntry->entry = entry;
+		return uEntry;
+	} else return NewObject<UTrackEntry>();
 }
 
 void USpineSkeletonAnimationComponent::ClearTracks () {
