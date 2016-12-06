@@ -23,11 +23,12 @@ void USpineSkeletonRendererComponent::BeginPlay () {
 
 void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	UClass* skeletonClass = USpineSkeletonComponent::StaticClass();
+	
 	AActor* owner = GetOwner();
 	if (owner) {
+		UClass* skeletonClass = USpineSkeletonComponent::StaticClass();
 		USpineSkeletonComponent* skeleton = Cast<USpineSkeletonComponent>(owner->GetComponentByClass(skeletonClass));
+		
 		if (skeleton && !skeleton->IsBeingDestroyed() && skeleton->GetSkeleton()) {
 			if (atlasMaterials.Num() != skeleton->Atlas->atlasPages.Num()) {
 				atlasMaterials.SetNum(0);
@@ -57,6 +58,8 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 				}
 			}
 			UpdateMesh(skeleton->GetSkeleton());
+		} else {
+			ClearAllMeshSections();
 		}
 	}
 }

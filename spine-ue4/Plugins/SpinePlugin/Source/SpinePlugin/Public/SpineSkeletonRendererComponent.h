@@ -4,7 +4,7 @@
 
 #include "Components/ActorComponent.h"
 #include "ProceduralMeshComponent.h"
-#include "SpineSkeletonComponent.h"
+#include "SpineSkeletonAnimationComponent.h"
 #include "SpineSkeletonRendererComponent.generated.h"
 
 
