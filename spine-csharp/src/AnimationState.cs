@@ -30,11 +30,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Spine {
 	public class AnimationState {
-		private static Animation EmptyAnimation = new Animation("<empty>", new ExposedList<Timeline>(), 0);
+		static readonly Animation EmptyAnimation = new Animation("<empty>", new ExposedList<Timeline>(), 0);
 
 		private AnimationStateData data;
 		private readonly ExposedList<TrackEntry> tracks = new ExposedList<TrackEntry>();
@@ -43,6 +42,8 @@ namespace Spine {
 		private readonly EventQueue queue;
 		private bool animationsChanged;
 		private float timeScale = 1;
+
+		Pool<TrackEntry> trackEntryPool = new Pool<TrackEntry>();
 
 		public AnimationStateData Data { get { return data; } }
 		/// <summary>A list of tracks that have animations, which may contain nulls.</summary>
@@ -58,7 +59,7 @@ namespace Spine {
 		public AnimationState (AnimationStateData data) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
 			this.data = data;
-			this.queue = new EventQueue(this, HandleAnimationsChanged);
+			this.queue = new EventQueue(this, HandleAnimationsChanged, trackEntryPool);
 		}
 
 		void HandleAnimationsChanged () {
@@ -215,7 +216,7 @@ namespace Spine {
 			float alpha = from.alpha * entry.mixAlpha * (1 - mix);
 
 			bool firstFrame = entry.timelinesRotation.Count == 0;
-			if (firstFrame) entry.timelinesRotation.Capacity = timelineCount << 1;
+			if (firstFrame) entry.timelinesRotation.EnsureCapacity(timelines.Count << 1);
 			var timelinesRotation = entry.timelinesRotation.Items;
 
 			for (int i = 0; i < timelineCount; i++) {
@@ -389,7 +390,7 @@ namespace Spine {
 				from.timelinesRotation.Clear();
 
 				// If not completely mixed in, set mixAlpha so mixing out happens from current mix to zero.
-				if (from.mixingFrom != null) from.mixAlpha *= Math.Min(from.mixTime / from.mixDuration, 1);
+				if (from.mixingFrom != null && from.mixDuration > 0) current.mixAlpha *= Math.Min(from.mixTime / from.mixDuration, 1);
 			}
 
 			queue.Start(current);
@@ -526,32 +527,32 @@ namespace Spine {
 
 		/// <param name="last">May be null.</param>
 		private TrackEntry NewTrackEntry (int trackIndex, Animation animation, bool loop, TrackEntry last) {
-			return new TrackEntry {
-				trackIndex = trackIndex,
-				animation = animation,
-				loop = loop,
+			TrackEntry entry = trackEntryPool.Obtain(); // Pooling
+			entry.trackIndex = trackIndex;
+			entry.animation = animation;
+			entry.loop = loop;
 
-				eventThreshold = 0,
-				attachmentThreshold = 0,
-				drawOrderThreshold = 0,
+			entry.eventThreshold = 0;
+			entry.attachmentThreshold = 0;
+			entry.drawOrderThreshold = 0;
 
-				animationStart = 0,
-				animationEnd = animation.duration,
-				animationLast = -1,
-				nextAnimationLast = -1,
+			entry.animationStart = 0;
+			entry.animationEnd = animation.Duration;
+			entry.animationLast = -1;
+			entry.nextAnimationLast = -1;
 
-				delay = 0,
-				trackTime = 0,
-				trackLast = -1,
-				nextTrackLast = -1,
-				trackEnd = loop ? int.MaxValue : animation.duration,
-				timeScale = 1,
+			entry.delay = 0;
+			entry.trackTime = 0;
+			entry.trackLast = -1;
+			entry.nextTrackLast = -1;
+			entry.trackEnd = float.MaxValue; // loop ? float.MaxValue : animation.Duration;
+			entry.timeScale = 1;
 
-				alpha = 1,
-				mixAlpha = 1,
-				mixTime = 0,
-				mixDuration = (last == null) ? 0 : data.GetMix(last.animation, animation),
-			};
+			entry.alpha = 1;
+			entry.mixAlpha = 1;
+			entry.mixTime = 0;
+			entry.mixDuration = (last == null) ? 0 : data.GetMix(last.animation, animation);
+			return entry;
 		}
 
 		private void DisposeNext (TrackEntry entry) {
@@ -627,7 +628,7 @@ namespace Spine {
 		}
 
 		override public String ToString () {
-			var buffer = new StringBuilder();
+			var buffer = new System.Text.StringBuilder();
 			for (int i = 0, n = tracks.Count; i < n; i++) {
 				TrackEntry entry = tracks.Items[i];
 				if (entry == null) continue;
@@ -646,7 +647,7 @@ namespace Spine {
 	}
 
 	/// <summary>State for the playback of an animation.</summary>
-	public class TrackEntry {
+	public class TrackEntry : Pool<TrackEntry>.IPoolable {
 		internal Animation animation;
 
 		internal TrackEntry next, mixingFrom;
@@ -657,8 +658,24 @@ namespace Spine {
 		internal float animationStart, animationEnd, animationLast, nextAnimationLast;
 		internal float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale = 1f;
 		internal float alpha, mixTime, mixDuration, mixAlpha;
-		internal readonly ExposedList<bool> timelinesFirst = new ExposedList<bool>(), timelinesLast = new ExposedList<bool>();
+		internal readonly ExposedList<bool> timelinesFirst = new ExposedList<bool>();
 		internal readonly ExposedList<float> timelinesRotation = new ExposedList<float>();
+
+		// IPoolable.Reset()
+		public void Reset () { 
+			next = null;
+			mixingFrom = null;
+			animation = null;
+			timelinesFirst.Clear();
+			timelinesRotation.Clear();
+
+			Start = null;
+			Interrupt = null;
+			End = null;
+			Dispose = null;
+			Complete = null;
+			Event = null;
+		}
 
 		/// <summary>The index of the track where this entry is either current or queued.</summary>
 		public int TrackIndex { get { return trackIndex; } }
@@ -824,11 +841,13 @@ namespace Spine {
 		public bool drainDisabled;
 
 		private readonly AnimationState state;
+		private readonly Pool<TrackEntry> trackEntryPool;
 		public event Action AnimationsChanged;
 
-		public EventQueue (AnimationState state, Action HandleAnimationsChanged) {
+		public EventQueue (AnimationState state, Action HandleAnimationsChanged, Pool<TrackEntry> trackEntryPool) {
 			this.state = state;
 			this.AnimationsChanged += HandleAnimationsChanged;
+			this.trackEntryPool = trackEntryPool;
 		}
 
 		struct EventQueueEntry {
@@ -901,6 +920,7 @@ namespace Spine {
 				case EventType.Dispose:
 					trackEntry.OnDispose();
 					state.OnDispose(trackEntry);
+					trackEntryPool.Free(trackEntry); // Pooling
 					break;
 				case EventType.Complete:
 					trackEntry.OnComplete();
@@ -921,4 +941,57 @@ namespace Spine {
 			eventQueueEntries.Clear();
 		}
 	}
+
+	public class Pool<T> where T : class, new() {
+		public readonly int max;
+		readonly Stack<T> freeObjects;
+
+		public int Count { get { return freeObjects.Count; } }
+		public int Peak { get; private set; }
+
+		public Pool (int initialCapacity = 16, int max = int.MaxValue) {
+			freeObjects = new Stack<T>(initialCapacity);
+			this.max = max;
+		}
+
+		public T Obtain () {
+			return freeObjects.Count == 0 ? new T() : freeObjects.Pop();
+		}
+
+		public void Free (T obj) {
+			if (obj == null) throw new ArgumentNullException("obj", "obj cannot be null");
+			if (freeObjects.Count < max) {
+				freeObjects.Push(obj);
+				Peak = Math.Max(Peak, freeObjects.Count);
+			}
+			Reset(obj);
+		}
+
+//		protected void FreeAll (List<T> objects) {
+//			if (objects == null) throw new ArgumentNullException("objects", "objects cannot be null.");
+//			var freeObjects = this.freeObjects;
+//			int max = this.max;
+//			for (int i = 0; i < objects.Count; i++) {
+//				T obj = objects[i];
+//				if (obj == null) continue;
+//				if (freeObjects.Count < max) freeObjects.Push(obj);
+//				Reset(obj);
+//			}
+//			Peak = Math.Max(Peak, freeObjects.Count);
+//		}
+
+		public void Clear () {
+			freeObjects.Clear();
+		}
+
+		protected void Reset (T obj) {
+			var poolable = obj as IPoolable;
+			if (poolable != null) poolable.Reset();
+		}
+
+		public interface IPoolable {
+			void Reset ();
+		}
+	}
+
 }

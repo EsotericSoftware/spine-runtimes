@@ -582,7 +582,7 @@ void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEnt
 		from->timelinesRotationCount = 0;
 
 		/* If not completely mixed in, set mixAlpha so mixing out happens from current mix to zero. */
-		if (from->mixingFrom) current->mixAlpha *= MIN(from->mixTime / from->mixDuration, 1);
+		if (from->mixingFrom && from->mixDuration > 0) current->mixAlpha *= MIN(from->mixTime / from->mixDuration, 1);
 	}
 
 	_spEventQueue_start(internal->queue, current);
@@ -715,7 +715,7 @@ spTrackEntry* _spAnimationState_trackEntry (spAnimationState* self, int trackInd
 	entry->trackTime = 0;
 	entry->trackLast = -1;
 	entry->nextTrackLast = -1;
-	entry->trackEnd = loop ? (float)INT_MAX : entry->animationEnd;
+	entry->trackEnd = (float)INT_MAX;
 	entry->timeScale = 1;
 
 	entry->alpha = 1;

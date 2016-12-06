@@ -541,7 +541,7 @@ function AnimationState:setCurrent (index, current, interrupt)
 		from.timelinesRotation = {};
 
     -- If not completely mixed in, set mixAlpha so mixing out happens from current mix to zero.
-    if from.mixingFrom then current.mixAlpha = current.mixAlpha * math_min(from.mixTime / from.mixDuration, 1) end
+    if from.mixingFrom and from.mixDuration > 0 then current.mixAlpha = current.mixAlpha * math_min(from.mixTime / from.mixDuration, 1) end
   end
 
   queue:start(current)
@@ -665,11 +665,7 @@ function AnimationState:trackEntry (trackIndex, animation, loop, last)
   entry.trackTime = 0
   entry.trackLast = -1
   entry.nextTrackLast = -1
-  if loop then
-    entry.trackEnd = 999999999
-  else
-    entry.trackEnd = entry.animationEnd
-  end
+  entry.trackEnd = 999999999  
   entry.timeScale = 1
 
   entry.alpha = 1
