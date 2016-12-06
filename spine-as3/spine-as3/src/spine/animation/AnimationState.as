@@ -366,7 +366,7 @@ public class AnimationState {
 			from.timelinesRotation.length = 0;
 
 			// If not completely mixed in, set mixAlpha so mixing out happens from current mix to zero.
-			if (from.mixingFrom != null) current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
+			if (from.mixingFrom != null && from.mixDuration > 0) current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
 		}
 
 		queue.start(current);
@@ -485,7 +485,7 @@ public class AnimationState {
 		entry.trackTime = 0;
 		entry.trackLast = -1;
 		entry.nextTrackLast = -1;
-		entry.trackEnd = loop ? int.MAX_VALUE : entry.animationEnd;
+		entry.trackEnd = int.MAX_VALUE;
 		entry.timeScale = 1;
 
 		entry.alpha = 1;

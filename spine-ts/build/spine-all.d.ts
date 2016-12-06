@@ -1543,6 +1543,7 @@ declare module spine {
 		atlas: string;
 		animation: string;
 		imagesPath: string;
+		atlasPages: string[];
 		skin: string;
 		loop: boolean;
 		scale: number;

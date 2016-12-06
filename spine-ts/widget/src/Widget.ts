@@ -80,7 +80,13 @@ module spine {
 			let assets = this.assetManager = new spine.webgl.AssetManager(gl);
 			assets.loadText(config.atlas);
 			assets.loadText(config.json);
-			assets.loadTexture(config.atlas.replace(".atlas", ".png"));
+			if (config.atlasPages == null) {
+				assets.loadTexture(config.atlas.replace(".atlas", ".png"));
+			} else {
+				for (let i = 0; i < config.atlasPages.length; i++) {
+					assets.loadTexture(config.atlasPages[i]);
+				}
+			}
 			requestAnimationFrame(() => { this.load(); });
 		}
 
@@ -264,6 +270,7 @@ module spine {
 			config.json = widget.getAttribute("data-json");
 			config.animation = widget.getAttribute("data-animation");
 			if (widget.getAttribute("data-images-path")) config.imagesPath = widget.getAttribute("data-images-path");
+			if (widget.getAttribute("data-atlas-pages")) config.atlasPages = widget.getAttribute("data-atlas-pages").split(",");
 			if (widget.getAttribute("data-skin")) config.skin = widget.getAttribute("data-skin");
 			if (widget.getAttribute("data-loop")) config.loop = widget.getAttribute("data-loop") === "true";
 			if (widget.getAttribute("data-scale")) config.scale = parseFloat(widget.getAttribute("data-scale"));
@@ -303,6 +310,7 @@ module spine {
 		atlas: string;
 		animation: string;
 		imagesPath: string;
+		atlasPages: string[];
 		skin = "default";
 		loop = true;
 		scale = 1.0;

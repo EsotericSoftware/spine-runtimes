@@ -110,12 +110,13 @@ namespace Spine.Unity {
 		public Transform boneRoot;
 
 		void Update () {
-			if (boneRoot != null && skeletonRenderer.skeleton != null) {
+			var skeleton = skeletonRenderer.skeleton;
+			if (boneRoot != null && skeleton != null) {
 				Vector3 flipScale = Vector3.one;
-				if (skeletonRenderer.skeleton.FlipX)
+				if (skeleton.FlipX)
 					flipScale.x = -1;
 
-				if (skeletonRenderer.skeleton.FlipY)
+				if (skeleton.FlipY)
 					flipScale.y = -1;
 
 				boneRoot.localScale = flipScale;

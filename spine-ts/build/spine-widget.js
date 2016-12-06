@@ -1221,7 +1221,7 @@ var spine;
 				current.mixingFrom = from;
 				current.mixTime = 0;
 				from.timelinesRotation.length = 0;
-				if (from.mixingFrom != null)
+				if (from.mixingFrom != null && from.mixDuration > 0)
 					current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
 			}
 			this.queue.start(current);
@@ -1333,7 +1333,7 @@ var spine;
 			entry.trackTime = 0;
 			entry.trackLast = -1;
 			entry.nextTrackLast = -1;
-			entry.trackEnd = loop ? Number.MAX_VALUE : entry.animationEnd;
+			entry.trackEnd = Number.MAX_VALUE;
 			entry.timeScale = 1;
 			entry.alpha = 1;
 			entry.mixAlpha = 1;
@@ -7478,7 +7478,14 @@ var spine;
 			var assets = this.assetManager = new spine.webgl.AssetManager(gl);
 			assets.loadText(config.atlas);
 			assets.loadText(config.json);
-			assets.loadTexture(config.atlas.replace(".atlas", ".png"));
+			if (config.atlasPages == null) {
+				assets.loadTexture(config.atlas.replace(".atlas", ".png"));
+			}
+			else {
+				for (var i = 0; i < config.atlasPages.length; i++) {
+					assets.loadTexture(config.atlasPages[i]);
+				}
+			}
 			requestAnimationFrame(function () { _this.load(); });
 		}
 		SpineWidget.prototype.validateConfig = function (config) {
@@ -7661,6 +7668,8 @@ var spine;
 			config.animation = widget.getAttribute("data-animation");
 			if (widget.getAttribute("data-images-path"))
 				config.imagesPath = widget.getAttribute("data-images-path");
+			if (widget.getAttribute("data-atlas-pages"))
+				config.atlasPages = widget.getAttribute("data-atlas-pages").split(",");
 			if (widget.getAttribute("data-skin"))
 				config.skin = widget.getAttribute("data-skin");
 			if (widget.getAttribute("data-loop"))

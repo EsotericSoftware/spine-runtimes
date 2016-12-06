@@ -69,9 +69,8 @@ namespace Spine.Unity.Examples {
 				SetXPosition(endX);
 				separator.enabled = true; // Enable Separator when hit
 				var poleTrack = state.SetAnimation(0, pole, false);
-				float duration = poleTrack.TrackEnd;
-				poleTrack.TrackEnd = float.PositiveInfinity;
-				yield return new WaitForSeconds(duration + 1f);
+				yield return new WaitForSpineAnimationComplete(poleTrack);
+				yield return new WaitForSeconds(1f);
 			}
 		}
 
