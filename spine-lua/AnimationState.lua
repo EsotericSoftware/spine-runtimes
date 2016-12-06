@@ -327,6 +327,7 @@ function AnimationState:apply (skeleton)
 				end
 			end
 			self:queueEvents(current, animationTime)
+			self.events = {};
 			current.nextAnimationLast = animationTime
 			current.nextTrackLast = current.trackTime
 		end
@@ -374,7 +375,8 @@ function AnimationState:applyMixingFrom (entry, skeleton)
 		end
 	end
 
-	self:queueEvents(from, animationTime)
+	if (entry.mixDuration > 0) then 	self:queueEvents(from, animationTime) end
+	self.events = {};
 	from.nextAnimationLast = animationTime
 	from.nextTrackLast = from.trackTime
 
@@ -488,7 +490,6 @@ function AnimationState:queueEvents (entry, animationTime)
     end
     i = i + 1
   end
-	self.events = {}
 end
 
 function AnimationState:clearTracks ()
