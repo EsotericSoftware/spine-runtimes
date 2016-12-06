@@ -186,6 +186,7 @@ namespace Spine {
 					}
 				}
 				QueueEvents(current, animationTime);
+				events.Clear(false);
 				current.nextAnimationLast = animationTime;
 				current.nextTrackLast = current.trackTime;
 			}
@@ -234,7 +235,8 @@ namespace Spine {
 				}
 			}
 
-			QueueEvents(from, animationTime);
+			if (entry.mixDuration > 0 ) QueueEvents(from, animationTime);
+			events.Clear(false);
 			from.nextAnimationLast = animationTime;
 			from.nextTrackLast = from.trackTime;
 
@@ -333,8 +335,7 @@ namespace Spine {
 				Event e = eventsItems[i];
 				if (e.time < animationStart) continue; // Discard events outside animation start/end.
 				queue.Event(entry, eventsItems[i]);
-			}
-			events.Clear(false);
+			}			
 		}
 
 		/// <summary>
