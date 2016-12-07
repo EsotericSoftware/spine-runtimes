@@ -2,10 +2,15 @@
 
 #define LOCTEXT_NAMESPACE "Spine"
 
+void UTrackEntry::SetTrackEntry(spTrackEntry* entry) {
+	this->entry = entry;
+	entry->rendererObject = (void*)this;
+}
+
 void callback(spAnimationState* state, spEventType type, spTrackEntry* entry, spEvent* event) {
 	USpineSkeletonAnimationComponent* component = (USpineSkeletonAnimationComponent*)state->rendererObject;
 	
-	if (type == SP_ANIMATION_START) {		
+	if (type == SP_ANIMATION_COMPLETE) {	
 		if (entry->rendererObject) {			
 			UTrackEntry* uEntry = (UTrackEntry*)entry->rendererObject;
 			component->AnimationStartEvent.Broadcast(uEntry);

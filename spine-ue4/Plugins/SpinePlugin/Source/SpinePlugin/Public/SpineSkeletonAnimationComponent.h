@@ -19,10 +19,7 @@ public:
 	
 	spTrackEntry* entry = nullptr;
 
-	void SetTrackEntry(spTrackEntry* entry) {
-		this->entry = entry;
-		entry->rendererObject = (void*)this;
-	}
+	void SetTrackEntry(spTrackEntry* entry);
 	
 	UFUNCTION(BlueprintCallable, Category="Components|Spine")
 	int GetTrackIndex() { return entry ? entry->trackIndex : 0; }	
