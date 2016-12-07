@@ -46,9 +46,9 @@ namespace Spine.Unity.Editor {
 		SkeletonUtility skeletonUtility;
 		Skeleton skeleton;
 		SkeletonRenderer skeletonRenderer;
+		Skin activeSkin;
 
 		bool isPrefab;
-		//Transform transform;
 
 		Dictionary<Slot, List<Attachment>> attachmentTable = new Dictionary<Slot, List<Attachment>>();
 
@@ -61,8 +61,7 @@ namespace Spine.Unity.Editor {
 		void OnEnable () {
 			skeletonUtility = (SkeletonUtility)target;
 			skeletonRenderer = skeletonUtility.GetComponent<SkeletonRenderer>();
-			skeleton = skeletonRenderer.skeleton;
-			//transform = skeletonRenderer.transform;
+			skeleton = skeletonRenderer.Skeleton;
 
 			if (skeleton == null) {
 				skeletonRenderer.Initialize(false);
@@ -78,6 +77,9 @@ namespace Spine.Unity.Editor {
 			
 		public override void OnInspectorGUI () {
 			bool requireRepaint = false;
+			if (skeletonRenderer.skeleton != skeleton || activeSkin != skeleton.Skin) {
+				UpdateAttachments();
+			}
 
 			if (isPrefab) {
 				GUILayout.Label(new GUIContent("Cannot edit Prefabs", Icons.warning));
@@ -160,13 +162,20 @@ namespace Spine.Unity.Editor {
 		}
 
 		void UpdateAttachments () {
-			attachmentTable = new Dictionary<Slot, List<Attachment>>();
-			Skin skin = skeleton.Skin ?? skeletonRenderer.skeletonDataAsset.GetSkeletonData(true).DefaultSkin;
+			skeleton = skeletonRenderer.skeleton;
+			Skin defaultSkin = skeleton.Data.DefaultSkin;
+			Skin skin = skeleton.Skin ?? defaultSkin;
+			bool notDefaultSkin = skin != defaultSkin;
+
+			attachmentTable.Clear();
 			for (int i = skeleton.Slots.Count - 1; i >= 0; i--) {
 				var attachments = new List<Attachment>();
-				skin.FindAttachmentsForSlot(i, attachments);
 				attachmentTable.Add(skeleton.Slots.Items[i], attachments);
+				skin.FindAttachmentsForSlot(i, attachments); // Add skin attachments.
+				if (notDefaultSkin) defaultSkin.FindAttachmentsForSlot(i, attachments); // Add default skin attachments.
 			}
+
+			activeSkin = skeleton.Skin;
 		}
 
 //		void SpawnHierarchyButton (string label, string tooltip, SkeletonUtilityBone.Mode mode, bool pos, bool rot, bool sca, params GUILayoutOption[] options) {
