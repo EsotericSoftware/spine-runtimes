@@ -39,6 +39,7 @@ namespace Spine.Unity {
 
 		public enum MixMode { AlwaysMix, MixNext, SpineStyle }
 		public MixMode[] layerMixModes = new MixMode[0];
+		public bool autoReset = false;
 
 		#region Bone Callbacks (ISkeletonAnimation)
 		protected event UpdateBonesDelegate _UpdateLocal;
@@ -87,6 +88,39 @@ namespace Spine.Unity {
 				System.Array.Resize<MixMode>(ref layerMixModes, animator.layerCount);
 			
 			//skeleton.Update(Time.deltaTime); // Doesn't actually do anything, currently. (Spine 3.5).
+
+			// Clear Previous
+			if (autoReset)
+			{
+				for (int layer = 0, n = animator.layerCount; layer < n; layer++) {
+					float layerWeight = animator.GetLayerWeight(layer);
+					if (layerWeight <= 0) continue;
+
+					AnimatorStateInfo nextStateInfo = animator.GetNextAnimatorStateInfo(layer);
+
+					#if UNITY_5
+					bool hasNext = nextStateInfo.fullPathHash != 0;
+					AnimatorClipInfo[] clipInfo = animator.GetCurrentAnimatorClipInfo(layer);
+					AnimatorClipInfo[] nextClipInfo = animator.GetNextAnimatorClipInfo(layer);
+					#else
+					bool hasNext = nextStateInfo.nameHash != 0;
+					var clipInfo = animator.GetCurrentAnimationClipState(i);
+					var nextClipInfo = animator.GetNextAnimationClipState(i);
+					#endif
+
+					for (int c = 0; c < clipInfo.Length; c++) {
+						var info = clipInfo[c];	float weight = info.weight * layerWeight; if (weight == 0) continue;
+						animationTable[NameHashCode(info.clip)].SetKeyedItemsToSetupPose(skeleton);
+					}
+					if (hasNext) {
+						for (int c = 0; c < nextClipInfo.Length; c++) {
+							var info = nextClipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
+							animationTable[NameHashCode(info.clip)].SetKeyedItemsToSetupPose(skeleton);
+						}
+					}
+				}
+			}
+
 
 			// Apply
 			for (int layer = 0, n = animator.layerCount; layer < n; layer++) {
