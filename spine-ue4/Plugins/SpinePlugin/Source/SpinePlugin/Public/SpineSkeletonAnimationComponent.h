@@ -7,6 +7,8 @@
 #include "spine/spine.h"
 #include "SpineSkeletonAnimationComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpineAnimationStartEvent, UTrackEntry*, entry);
+
 UCLASS(ClassGroup=(Spine), meta=(BlueprintSpawnableComponent), BlueprintType)
 class SPINEPLUGIN_API UTrackEntry: public UObject {
 	GENERATED_BODY ()
@@ -16,12 +18,18 @@ public:
 	UTrackEntry () { }
 	
 	spTrackEntry* entry = nullptr;
+
+	void SetTrackEntry(spTrackEntry* entry) {
+		this->entry = entry;
+		entry->rendererObject = (void*)this;
+	}
 	
 	UFUNCTION(BlueprintCallable, Category="Components|Spine")
-	int GetTrackIndex() { return entry ? entry->trackIndex : 0; }
-};
+	int GetTrackIndex() { return entry ? entry->trackIndex : 0; }	
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpineAnimationStartEvent, UTrackEntry*, entry);
+	UPROPERTY(BlueprintAssignable, Category = "Components|Spine")
+	FSpineAnimationStartEvent AnimationStartEvent;
+};
 
 class USpineAtlasAsset;
 UCLASS(ClassGroup=(Spine), meta=(BlueprintSpawnableComponent))
