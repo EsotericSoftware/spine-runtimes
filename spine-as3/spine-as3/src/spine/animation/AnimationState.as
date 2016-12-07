@@ -172,6 +172,7 @@ public class AnimationState {
 				}
 			}
 			queueEvents(current, animationTime);
+			events.length = 0;
 			current.nextAnimationLast = animationTime;
 			current.nextTrackLast = current.trackTime;
 		}
@@ -217,7 +218,8 @@ public class AnimationState {
 			}
 		}
 
-		queueEvents(from, animationTime);
+		if (entry.mixDuration > 0) queueEvents(from, animationTime);
+		events.length = 0;
 		from.nextAnimationLast = animationTime;
 		from.nextTrackLast = from.trackTime;
 
@@ -317,8 +319,7 @@ public class AnimationState {
 			event = events[i];
 			if (event.time < animationStart) continue; // Discard events outside animation start/end.
 			queue.event(entry, events[i]);
-		}
-		events.length = 0;
+		}		
 	}
 	
 	public function clearTracks ():void {

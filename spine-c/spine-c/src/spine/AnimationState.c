@@ -351,6 +351,7 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 			}
 		}
 		_spAnimationState_queueEvents(self, current, animationTime);
+		internal->eventsCount = 0;
 		current->nextAnimationLast = animationTime;
 		current->nextTrackLast = current->trackTime;
 	}
@@ -414,7 +415,8 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* e
 		}
 	}
 
-	_spAnimationState_queueEvents(self, from, animationTime);
+	if (entry->mixDuration > 0) _spAnimationState_queueEvents(self, from, animationTime);
+	internal->eventsCount = 0;
 	from->nextAnimationLast = animationTime;
 	from->nextTrackLast = from->trackTime;
 
@@ -528,7 +530,6 @@ void _spAnimationState_queueEvents (spAnimationState* self, spTrackEntry* entry,
 		if (event->time < animationStart) continue; /* Discard events outside animation start/end. */
 		_spEventQueue_event(internal->queue, entry, event);
 	}
-	internal->eventsCount = 0;
 }
 
 void spAnimationState_clearTracks (spAnimationState* self) {

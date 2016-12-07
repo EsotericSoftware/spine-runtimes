@@ -185,6 +185,7 @@ public class AnimationState {
 				}
 			}
 			queueEvents(current, animationTime);
+			events.clear();
 			current.nextAnimationLast = animationTime;
 			current.nextTrackLast = current.trackTime;
 		}
@@ -230,7 +231,8 @@ public class AnimationState {
 			}
 		}
 
-		queueEvents(from, animationTime);
+		if (entry.mixDuration > 0) queueEvents(from, animationTime);
+		this.events.clear();
 		from.nextAnimationLast = animationTime;
 		from.nextTrackLast = from.trackTime;
 
@@ -330,7 +332,6 @@ public class AnimationState {
 			if (event.time < animationStart) continue; // Discard events outside animation start/end.
 			queue.event(entry, events.get(i));
 		}
-		events.clear();
 	}
 
 	/** Removes all animations from all tracks, leaving skeletons in their previous pose.

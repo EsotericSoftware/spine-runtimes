@@ -34,7 +34,7 @@ using UnityEngine;
 namespace Spine.Unity.Editor {	
 	[CustomEditor(typeof(BoneFollower))]
 	public class BoneFollowerInspector : UnityEditor.Editor {
-		SerializedProperty boneName, skeletonRenderer, followZPosition, followBoneRotation, followSkeletonFlip;
+		SerializedProperty boneName, skeletonRenderer, followZPosition, followBoneRotation, followLocalScale, followSkeletonFlip;
 		BoneFollower targetBoneFollower;
 		bool needsReset;
 
@@ -43,6 +43,7 @@ namespace Spine.Unity.Editor {
 			boneName = serializedObject.FindProperty("boneName");
 			followBoneRotation = serializedObject.FindProperty("followBoneRotation");
 			followZPosition = serializedObject.FindProperty("followZPosition");
+			followLocalScale = serializedObject.FindProperty("followLocalScale");
 			followSkeletonFlip = serializedObject.FindProperty("followSkeletonFlip");
 
 			targetBoneFollower = (BoneFollower)target;
@@ -87,6 +88,7 @@ namespace Spine.Unity.Editor {
 				}
 				EditorGUILayout.PropertyField(followBoneRotation);
 				EditorGUILayout.PropertyField(followZPosition);
+				EditorGUILayout.PropertyField(followLocalScale);
 				EditorGUILayout.PropertyField(followSkeletonFlip);
 			} else {
 				var boneFollowerSkeletonRenderer = targetBoneFollower.skeletonRenderer;
