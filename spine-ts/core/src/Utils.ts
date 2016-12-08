@@ -218,7 +218,7 @@ module spine {
 			this.instantiator = instantiator;
 		}
 
-		obtain ():T {
+		obtain (): T {
 			return this.items.length > 0 ? this.items.pop() : this.instantiator();
 		}
 
