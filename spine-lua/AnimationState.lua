@@ -743,7 +743,7 @@ function AnimationState:setTimelinesFirst (entry)
   end
 end
 
-function AnimationState:checkTimlinesFirst (entry)
+function AnimationState:checkTimelinesFirst (entry)
   if entry.mixingFrom then self:checkTimelinesFirst(entry.mixingFrom) end
   self:checkTimelinesUsage(entry, entry.timelinesFirst)
 end
