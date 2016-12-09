@@ -9,14 +9,37 @@ void UTrackEntry::SetTrackEntry(spTrackEntry* entry) {
 
 void callback(spAnimationState* state, spEventType type, spTrackEntry* entry, spEvent* event) {
 	USpineSkeletonAnimationComponent* component = (USpineSkeletonAnimationComponent*)state->rendererObject;
-	
-	if (type == SP_ANIMATION_COMPLETE) {	
-		if (entry->rendererObject) {			
-			UTrackEntry* uEntry = (UTrackEntry*)entry->rendererObject;
-			component->AnimationStartEvent.Broadcast(uEntry);
-			uEntry->AnimationStartEvent.Broadcast(uEntry);
+		
+	if (entry->rendererObject) {			
+		UTrackEntry* uEntry = (UTrackEntry*)entry->rendererObject;
+		if (type == SP_ANIMATION_START) {
+			component->AnimationStart.Broadcast(uEntry);
+			uEntry->AnimationStart.Broadcast(uEntry);
 		}
-	}
+		else if (type == SP_ANIMATION_INTERRUPT) {
+			component->AnimationInterrupt.Broadcast(uEntry);
+			uEntry->AnimationInterrupt.Broadcast(uEntry);
+		} else if (type == SP_ANIMATION_EVENT) {
+			FSpineEvent evt;
+			evt.SetEvent(event);
+			component->AnimationEvent.Broadcast(uEntry, evt);
+			uEntry->AnimationEvent.Broadcast(uEntry, evt);
+		}
+		else if (type == SP_ANIMATION_COMPLETE) {
+			component->AnimationComplete.Broadcast(uEntry);
+			uEntry->AnimationComplete.Broadcast(uEntry);
+		}
+		else if (type == SP_ANIMATION_END) {
+			component->AnimationEnd.Broadcast(uEntry);
+			uEntry->AnimationEnd.Broadcast(uEntry);
+		}
+		else if (type == SP_ANIMATION_DISPOSE) {
+			component->AnimationDispose.Broadcast(uEntry);
+			uEntry->AnimationDispose.Broadcast(uEntry);
+			uEntry->SetTrackEntry(nullptr);
+			component->GCTrackEntry(uEntry);
+		}
+	}	
 }
 
 USpineSkeletonAnimationComponent::USpineSkeletonAnimationComponent () {
@@ -28,6 +51,7 @@ USpineSkeletonAnimationComponent::USpineSkeletonAnimationComponent () {
 
 void USpineSkeletonAnimationComponent::BeginPlay() {
 	Super::BeginPlay();
+	trackEntries.Empty();
 }
 
 void USpineSkeletonAnimationComponent::TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
@@ -53,6 +77,7 @@ void USpineSkeletonAnimationComponent::CheckState () {
 			state = spAnimationState_create(stateData);
 			state->rendererObject = (void*)this;
 			state->listener = callback;
+			trackEntries.Empty();
 		}
 		
 		lastAtlas = Atlas;
@@ -75,6 +100,8 @@ void USpineSkeletonAnimationComponent::DisposeState () {
 		spSkeleton_dispose(skeleton);
 		skeleton = nullptr;
 	}
+
+	trackEntries.Empty();
 }
 
 void USpineSkeletonAnimationComponent::FinishDestroy () {
@@ -88,6 +115,7 @@ UTrackEntry* USpineSkeletonAnimationComponent::SetAnimation (int trackIndex, FSt
 		spTrackEntry* entry = spAnimationState_setAnimationByName(state, trackIndex, TCHAR_TO_UTF8(*animationName), loop ? 1 : 0);
 		UTrackEntry* uEntry = NewObject<UTrackEntry>();
 		uEntry->SetTrackEntry(entry);
+		trackEntries.Add(uEntry);
 		return uEntry;
 	} else return NewObject<UTrackEntry>();
 	
@@ -99,6 +127,7 @@ UTrackEntry* USpineSkeletonAnimationComponent::AddAnimation (int trackIndex, FSt
 		spTrackEntry* entry = spAnimationState_addAnimationByName(state, trackIndex, TCHAR_TO_UTF8(*animationName), loop ? 1 : 0, delay);		
 		UTrackEntry* uEntry = NewObject<UTrackEntry>();
 		uEntry->SetTrackEntry(entry);
+		trackEntries.Add(uEntry);
 		return uEntry;
 	} else return NewObject<UTrackEntry>();
 }
@@ -109,6 +138,7 @@ UTrackEntry* USpineSkeletonAnimationComponent::SetEmptyAnimation (int trackIndex
 		spTrackEntry* entry = spAnimationState_setEmptyAnimation(state, trackIndex, mixDuration);
 		UTrackEntry* uEntry = NewObject<UTrackEntry>();
 		uEntry->SetTrackEntry(entry);
+		trackEntries.Add(uEntry);
 		return uEntry;
 	} else return NewObject<UTrackEntry>();
 }
@@ -119,6 +149,7 @@ UTrackEntry* USpineSkeletonAnimationComponent::AddEmptyAnimation (int trackIndex
 		spTrackEntry* entry = spAnimationState_addEmptyAnimation(state, trackIndex, mixDuration, delay);
 		UTrackEntry* uEntry = NewObject<UTrackEntry>();
 		uEntry->SetTrackEntry(entry);
+		trackEntries.Add(uEntry);
 		return uEntry;
 	} else return NewObject<UTrackEntry>();
 }
