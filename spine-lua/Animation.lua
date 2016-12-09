@@ -554,7 +554,7 @@ function Animation.ColorTimeline.new (frameCount)
 			slot.color:set(r, g, b, a)
 		else
 			local color = slot.color
-			if setupPose then color.setFrom(slot.data.color) end
+			if setupPose then color:setFrom(slot.data.color) end
 			color:add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha)
 		end
 	end

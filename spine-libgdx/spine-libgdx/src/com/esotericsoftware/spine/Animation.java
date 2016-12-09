@@ -690,7 +690,7 @@ public class Animation {
 			if (time >= frames[frames.length - 1]) // Time is after last frame.
 				frameIndex = frames.length - 1;
 			else
-				frameIndex = binarySearch(frames, time, 1) - 1;
+				frameIndex = binarySearch(frames, time) - 1;
 
 			String attachmentName = attachmentNames[frameIndex];
 			slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slotIndex, attachmentName));

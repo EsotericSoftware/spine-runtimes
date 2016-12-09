@@ -138,4 +138,14 @@ function utils.signum (value)
   end
 end
 
+-- Implements Java float modulo
+function utils.mod(a, b)
+  if b < 0 then b = -b end
+  if a < 0 then
+    return -(-a % b)
+  else
+    return a % b
+  end
+end
+
 return utils
