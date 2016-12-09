@@ -4,7 +4,7 @@
 
 void UTrackEntry::SetTrackEntry(spTrackEntry* entry) {
 	this->entry = entry;
-	entry->rendererObject = (void*)this;
+	if (entry) entry->rendererObject = (void*)this;
 }
 
 void callback(spAnimationState* state, spEventType type, spTrackEntry* entry, spEvent* event) {
@@ -73,7 +73,7 @@ void USpineSkeletonAnimationComponent::CheckState () {
 		if (Atlas && SkeletonData) {
 			spSkeletonData* data = SkeletonData->GetSkeletonData(Atlas->GetAtlas(false), false);
 			skeleton = spSkeleton_create(data);
-			stateData = spAnimationStateData_create(data);
+			spAnimationStateData* stateData = SkeletonData->GetAnimationStateData(Atlas->GetAtlas(false));
 			state = spAnimationState_create(stateData);
 			state->rendererObject = (void*)this;
 			state->listener = callback;
@@ -85,12 +85,7 @@ void USpineSkeletonAnimationComponent::CheckState () {
 	}
 }
 
-void USpineSkeletonAnimationComponent::DisposeState () {
-	if (stateData) {
-		spAnimationStateData_dispose(stateData);
-		stateData = nullptr;
-	}
-
+void USpineSkeletonAnimationComponent::DisposeState () {	
 	if (state) {
 		spAnimationState_dispose(state);
 		state = nullptr;

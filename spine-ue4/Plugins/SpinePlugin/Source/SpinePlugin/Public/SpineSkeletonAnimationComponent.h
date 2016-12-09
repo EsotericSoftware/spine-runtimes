@@ -177,8 +177,6 @@ class SPINEPLUGIN_API USpineSkeletonAnimationComponent: public USpineSkeletonCom
 	GENERATED_BODY()
 
 public:
-	spAnimationStateData* GetAnimationStateData () { return stateData; };
-	
 	spAnimationState* GetAnimationState () { return state; };
 		
 	USpineSkeletonAnimationComponent ();
@@ -232,8 +230,7 @@ public:
 protected:
 	virtual void CheckState () override;
 	virtual void DisposeState () override;
-
-	spAnimationStateData* stateData;
+	
 	spAnimationState* state;
 
 	// keep track of track entries so they won't get GCed while
