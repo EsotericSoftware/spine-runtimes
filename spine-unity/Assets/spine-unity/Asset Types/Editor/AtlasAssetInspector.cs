@@ -288,21 +288,11 @@ namespace Spine.Unity.Editor {
 			var sprites = new List<SpriteMetaData>(spriteSheet);
 
 			var regions = AtlasAssetInspector.GetRegions(atlas);
-			int textureHeight = texture.height;
 			char[] FilenameDelimiter = {'.'};
 			int updatedCount = 0;
 			int addedCount = 0;
 
 			foreach (var r in regions) {
-				int width, height;
-				if (r.rotate) {
-					width = r.height;
-					height = r.width;
-				} else {
-					width = r.width;
-					height = r.height;
-				}
-
 				string pageName = r.page.name.Split(FilenameDelimiter, StringSplitOptions.RemoveEmptyEntries)[0];
 				string textureName = texture.name;
 				bool pageMatch = string.Equals(pageName, textureName, StringComparison.Ordinal);
@@ -320,23 +310,34 @@ namespace Spine.Unity.Editor {
 				) : -1;
 				bool spriteNameMatchExists = spriteIndex >= 0;
 
-				int x = r.x;
-				int y = r.page.height - height - r.y;
-				if (spriteNameMatchExists) {
-					var s = sprites[spriteIndex];
-					s.rect = new Rect(x, y, width, height);
-					sprites[spriteIndex] = s;
-					updatedCount++;
-				} else {
-					if (pageMatch) {
+				if (pageMatch) {
+					Rect spriteRect = new Rect();
+
+					if (r.rotate) {
+						spriteRect.width = r.height;
+						spriteRect.height = r.width;
+					} else {
+						spriteRect.width = r.width;
+						spriteRect.height = r.height;
+					}
+					spriteRect.x = r.x;
+					spriteRect.y = r.page.height - spriteRect.height - r.y;
+
+					if (spriteNameMatchExists) {
+						var s = sprites[spriteIndex];
+						s.rect = spriteRect;
+						sprites[spriteIndex] = s;
+						updatedCount++;
+					} else {
 						sprites.Add(new SpriteMetaData {
 							name = r.name,
 							pivot = new Vector2(0.5f, 0.5f),
-							rect = new Rect(x, y, width, height)
+							rect = spriteRect
 						});
 						addedCount++;
 					}
 				}
+
 			}
 
 			t.spritesheet = sprites.ToArray();
