@@ -303,18 +303,26 @@ namespace Spine.Unity.Editor {
 					height = r.height;
 				}
 
-				int x = r.x;
-				int y = textureHeight - height - r.y;
-
 				string pageName = r.page.name.Split(FilenameDelimiter, StringSplitOptions.RemoveEmptyEntries)[0];
 				string textureName = texture.name;
-				bool pageMatch = string.Equals(pageName, textureName,StringComparison.Ordinal);
+				bool pageMatch = string.Equals(pageName, textureName, StringComparison.Ordinal);
+
+//				if (pageMatch) {
+//					int pw = r.page.width;
+//					int ph = r.page.height;
+//					bool mismatchSize = pw != texture.width || pw > t.maxTextureSize || ph != texture.height || ph > t.maxTextureSize;
+//					if (mismatchSize)
+//						Debug.LogWarningFormat("Size mismatch found.\nExpected atlas size is {0}x{1}. Texture Import Max Size of texture '{2}'({4}x{5}) is currently set to {3}.", pw, ph, texture.name, t.maxTextureSize, texture.width, texture.height);
+//				}
+
 				int spriteIndex = pageMatch ? sprites.FindIndex(
 					(s) => string.Equals(s.name, r.name, StringComparison.Ordinal)
 				) : -1;
-				bool matchFound = spriteIndex >= 0;
+				bool spriteNameMatchExists = spriteIndex >= 0;
 
-				if (matchFound) {
+				int x = r.x;
+				int y = r.page.height - height - r.y;
+				if (spriteNameMatchExists) {
 					var s = sprites[spriteIndex];
 					s.rect = new Rect(x, y, width, height);
 					sprites[spriteIndex] = s;
