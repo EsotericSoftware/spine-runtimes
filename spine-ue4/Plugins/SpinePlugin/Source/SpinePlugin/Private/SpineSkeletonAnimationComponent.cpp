@@ -62,7 +62,9 @@ void USpineSkeletonAnimationComponent::TickComponent (float DeltaTime, ELevelTic
 	if (state) {
 		spAnimationState_update(state, DeltaTime);
 		spAnimationState_apply(state, skeleton);
+		BeforeUpdateWorldTransform.Broadcast(this);
 		spSkeleton_updateWorldTransform(skeleton);
+		AfterUpdateWorldTransform.Broadcast(this);
 	}
 }
 
@@ -146,6 +148,21 @@ UTrackEntry* USpineSkeletonAnimationComponent::AddEmptyAnimation (int trackIndex
 		uEntry->SetTrackEntry(entry);
 		trackEntries.Add(uEntry);
 		return uEntry;
+	} else return NewObject<UTrackEntry>();
+}
+
+UTrackEntry* USpineSkeletonAnimationComponent::GetCurrent (int trackIndex) {
+	CheckState();
+	if (state) {
+		spTrackEntry* entry = spAnimationState_getCurrent(state, trackIndex);
+		if (entry->rendererObject) {
+			return (UTrackEntry*)entry->rendererObject;
+		} else {
+			UTrackEntry* uEntry = NewObject<UTrackEntry>();
+			uEntry->SetTrackEntry(entry);
+			trackEntries.Add(uEntry);
+			return uEntry;
+		}
 	} else return NewObject<UTrackEntry>();
 }
 
