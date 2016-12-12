@@ -42,7 +42,7 @@ public class Main extends Sprite {
 		var example:Class;
 		example = SpineboyExample;
 		// example = GoblinsExample;
-		// example = RaptorExample;
+		example = RaptorExample;
 		// example = TankExample;
 		// example = VineExample;
 		// example = StretchymanExample;
