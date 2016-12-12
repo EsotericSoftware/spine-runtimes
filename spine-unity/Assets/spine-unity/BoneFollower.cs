@@ -55,7 +55,7 @@ namespace Spine.Unity {
 		public bool followBoneRotation = true;
 
 		[Tooltip("Follows the skeleton's flip state by controlling this Transform's local scale.")]
-		public bool followSkeletonFlip = false;
+		public bool followSkeletonFlip = true;
 
 		[Tooltip("Follows the target bone's local scale. BoneFollower cannot inherit world/skewed scale because of UnityEngine.Transform property limitations.")]
 		public bool followLocalScale = false;
