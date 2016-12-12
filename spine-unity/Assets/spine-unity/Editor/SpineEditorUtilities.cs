@@ -531,7 +531,7 @@ namespace Spine.Unity.Editor {
 			bool abortSkeletonImport = false;
 			foreach (string sp in skeletonPaths) {
 				if (!reimport && CheckForValidSkeletonData(sp)) {
-					ClearExistingSkeletonData(sp);
+					ReloadSkeletonData(sp);
 					continue;
 				}
 
@@ -596,7 +596,7 @@ namespace Spine.Unity.Editor {
 			// Any post processing of images
 		}
 
-		static void ClearExistingSkeletonData (string skeletonJSONPath) {
+		static void ReloadSkeletonData (string skeletonJSONPath) {
 			string dir = Path.GetDirectoryName(skeletonJSONPath);
 			TextAsset textAsset = (TextAsset)AssetDatabase.LoadAssetAtPath(skeletonJSONPath, typeof(TextAsset));
 			DirectoryInfo dirInfo = new DirectoryInfo(dir);
@@ -611,6 +611,7 @@ namespace Spine.Unity.Editor {
 						if (Selection.activeObject == skeletonDataAsset)
 							Selection.activeObject = null;
 
+						Debug.LogFormat("Changes to '{0}' detected. Clearing SkeletonDataAsset: {1}", skeletonJSONPath, localPath);
 						skeletonDataAsset.Clear();
 
 						string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(skeletonDataAsset));
@@ -643,9 +644,8 @@ namespace Spine.Unity.Editor {
 						// if (currentHash == null || lastHash != currentHash)
 						// Do any upkeep on synchronized assets
 
-						if (currentHash != null) {
+						if (currentHash != null)
 							EditorPrefs.SetString(guid + "_hash", currentHash);
-						}
 					}
 				}
 			}
@@ -1399,17 +1399,18 @@ namespace Spine.Unity.Editor {
 		public static Color TransformContraintColor { get { return new Color(170/255f, 226/255f, 35/255f); } }
 		public static Color IkColor { get { return new Color(228/255f,90/255f,43/255f); } }
 
+		static Vector3[] _boneMeshVerts = {
+			new Vector3(0, 0, 0),
+			new Vector3(0.1f, 0.1f, 0),
+			new Vector3(1, 0, 0),
+			new Vector3(0.1f, -0.1f, 0)
+		};
 		static Mesh _boneMesh;
 		public static Mesh BoneMesh {
 			get {
 				if (_boneMesh == null) {
 					_boneMesh = new Mesh {
-						vertices = new [] {
-							new Vector3(0, 0, 0),
-							new Vector3(0.1f, 0.1f, 0),
-							new Vector3(1, 0, 0),
-							new Vector3(0.1f, -0.1f, 0)
-						},
+						vertices = _boneMeshVerts,
 						uv = new Vector2[4],
 						triangles = new [] { 0, 1, 2, 2, 3, 0 }
 					};
@@ -1503,6 +1504,34 @@ namespace Spine.Unity.Editor {
 			foreach (Bone b in skeleton.Bones) {
 				DrawBone(transform, b, boneScale);
 				boneScale = 1f;
+			}
+		}
+
+		static Vector3[] _boneWireBuffer = new Vector3[5];
+		static Vector3[] GetBoneWireBuffer (Matrix4x4 m) {
+			for (int i = 0, n = _boneMeshVerts.Length; i < n; i++)
+				_boneWireBuffer[i] = m.MultiplyPoint(_boneMeshVerts[i]);
+
+			_boneWireBuffer[4] = _boneWireBuffer[0]; // closed polygon.
+			return _boneWireBuffer;
+		}
+		public static void DrawBoneWireframe (Transform transform, Bone b, Color color) {
+			Handles.color = color;
+			var pos = new Vector3(b.WorldX, b.WorldY, 0);
+			float length = b.Data.Length;
+
+			if (length > 0) {
+				Quaternion rot = Quaternion.Euler(0, 0, b.WorldRotationX);
+				Vector3 scale = Vector3.one * length * b.WorldScaleX;
+				const float my = 1.5f;
+				scale.y *= (SpineHandles.handleScale + 1f) * 0.5f;
+				scale.y = Mathf.Clamp(scale.x, -my, my);
+				Handles.DrawPolyLine(GetBoneWireBuffer(transform.localToWorldMatrix * Matrix4x4.TRS(pos, rot, scale)));
+				var wp = transform.TransformPoint(pos);
+				DrawBoneCircle(wp, color, transform.forward);
+			} else {
+				var wp = transform.TransformPoint(pos);
+				DrawBoneCircle(wp, color, transform.forward);
 			}
 		}
 
