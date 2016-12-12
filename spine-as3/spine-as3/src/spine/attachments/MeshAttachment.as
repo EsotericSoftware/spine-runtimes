@@ -83,7 +83,7 @@ public dynamic class MeshAttachment extends VertexAttachment {
 		}
 	}
 
-	public function applyFFD (sourceAttachment:Attachment) : Boolean {
+	override public function applyDeform (sourceAttachment:Attachment) : Boolean {
 		return this == sourceAttachment || (inheritDeform && _parentMesh == sourceAttachment);
 	}
 
