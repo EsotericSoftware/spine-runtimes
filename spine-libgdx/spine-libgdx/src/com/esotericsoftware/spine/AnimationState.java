@@ -910,7 +910,10 @@ public class AnimationState {
 		 * {@link AnimationStateData#getMix(Animation, Animation)} based on the animation before this animation (if any).
 		 * <p>
 		 * The <code>mixDuration</code> must be set for a new track entry before {@link AnimationState#update(float)} is next
-		 * called. */
+		 * called.
+		 * <p>
+		 * When using {@link AnimationState#addAnimation(int, Animation, boolean, float)} with a <code>delay</code> <= 0, note the
+		 * {@link #getDelay()} is set using the mix duration from the {@link AnimationStateData}. */
 		public float getMixDuration () {
 			return mixDuration;
 		}
