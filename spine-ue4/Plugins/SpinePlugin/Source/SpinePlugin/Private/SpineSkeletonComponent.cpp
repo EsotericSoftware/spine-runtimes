@@ -24,18 +24,19 @@ bool USpineSkeletonComponent::setAttachment (const FString& slotName, const FStr
 FTransform USpineSkeletonComponent::GetBoneWorldTransform (const FString& BoneName) {
 	CheckState();
 	if (skeleton) {
-		spBone* bone = spSkeleton_findBone(skeleton, TCHAR_TO_UTF8(*BoneName));
-		if (!bone->appliedValid) this->InternalTick(0);
+		spBone* bone = spSkeleton_findBone(skeleton, TCHAR_TO_UTF8(*BoneName));		
 		if (!bone) return FTransform();
+		if (!bone->appliedValid) this->InternalTick(0);		
 
 		// Need to fetch the renderer component to get world transform of actor plus
-		// offset by renderer component and its parent component(s).
-		// FIXME add overloaded method that takes a base world transform?
+		// offset by renderer component and its parent component(s). If no renderer
+		// component is found, this components owner's transform is used as a fallback
 		FTransform baseTransform;
 		AActor* owner = GetOwner();
 		if (owner) {
 			USpineSkeletonRendererComponent* rendererComponent = static_cast<USpineSkeletonRendererComponent*>(owner->GetComponentByClass(USpineSkeletonRendererComponent::StaticClass()));
 			if (rendererComponent) baseTransform = rendererComponent->GetComponentTransform();
+			else baseTransform = owner->GetActorTransform();
 		}
 
 		FVector position(bone->worldX, 0, bone->worldY);
@@ -53,8 +54,36 @@ FTransform USpineSkeletonComponent::GetBoneWorldTransform (const FString& BoneNa
 	return FTransform();
 }
 
-FTransform USpineSkeletonComponent::GetBoneLocalTransform (const FString& BoneName) {
-	return FTransform();
+void USpineSkeletonComponent::SetBoneWorldPosition (const FString& BoneName, const FVector& position) {
+	CheckState();
+	if (skeleton) {
+		spBone* bone = spSkeleton_findBone(skeleton, TCHAR_TO_UTF8(*BoneName));		
+
+		// Need to fetch the renderer component to get world transform of actor plus
+		// offset by renderer component and its parent component(s). If no renderer
+		// component is found, this components owner's transform is used as a fallback
+		FTransform baseTransform;
+		AActor* owner = GetOwner();
+		if (owner) {
+			USpineSkeletonRendererComponent* rendererComponent = static_cast<USpineSkeletonRendererComponent*>(owner->GetComponentByClass(USpineSkeletonRendererComponent::StaticClass()));
+			if (rendererComponent) baseTransform = rendererComponent->GetComponentTransform();
+			else baseTransform = owner->GetActorTransform();
+		}
+
+		baseTransform = baseTransform.Inverse();
+		baseTransform.TransformVector(position);
+		float localX = 0, localY = 0;
+		spBone_worldToLocal(bone, position.X, position.Z, &localX, &localY);
+		bone->x = localX;
+		bone->y = localY;
+	}
+}
+
+void USpineSkeletonComponent::UpdateWorldTransform() {
+	CheckState();
+	if (skeleton) {
+		spSkeleton_updateWorldTransform(skeleton);
+	}
 }
 
 void USpineSkeletonComponent::SetToSetupPose () {
@@ -70,6 +99,28 @@ void USpineSkeletonComponent::SetBonesToSetupPose () {
 void USpineSkeletonComponent::SetSlotsToSetupPose () {
 	CheckState();
 	if (skeleton) spSkeleton_setSlotsToSetupPose(skeleton);
+}
+
+void USpineSkeletonComponent::SetFlipX (bool flipX) {
+	CheckState();
+	if (skeleton) skeleton->flipX = flipX ? 1 : 0;
+}
+
+bool USpineSkeletonComponent::GetFlipX() {
+	CheckState();
+	if (skeleton) return skeleton->flipX != 0;
+	return false;
+}
+
+void USpineSkeletonComponent::SetFlipY(bool flipY) {
+	CheckState();
+	if (skeleton) skeleton->flipY = flipY ? 1 : 0;
+}
+
+bool USpineSkeletonComponent::GetFlipY() {
+	CheckState();
+	if (skeleton) return skeleton->flipY != 0;
+	return false;
 }
 
 void USpineSkeletonComponent::BeginPlay() {

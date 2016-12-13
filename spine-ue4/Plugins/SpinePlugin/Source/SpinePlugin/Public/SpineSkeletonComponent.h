@@ -35,16 +35,31 @@ public:
 	FTransform GetBoneWorldTransform (const FString& BoneName);
 	
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
-	FTransform GetBoneLocalTransform (const FString& BoneName);
+	void SetBoneWorldPosition (const FString& BoneName, const FVector& position);
 	
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
 	void SetToSetupPose ();
 	
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
 	void SetBonesToSetupPose ();
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	void UpdateWorldTransform ();
 	
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
 	void SetSlotsToSetupPose ();
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	void SetFlipX(bool flipX);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	bool GetFlipX();
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	void SetFlipY(bool flipY);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	bool GetFlipY();
 	
 	UPROPERTY(BlueprintAssignable, Category = "Components|Spine")
 	FSpineBeforeUpdateWorldTransformDelegate BeforeUpdateWorldTransform;
