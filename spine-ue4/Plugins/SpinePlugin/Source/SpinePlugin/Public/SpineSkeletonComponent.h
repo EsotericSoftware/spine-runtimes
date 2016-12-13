@@ -77,7 +77,7 @@ public:
 	
 protected:
 	virtual void CheckState ();
-	virtual void InternalTick(float DeltaTime);
+	virtual void InternalTick(float DeltaTime, bool CallDelegates = true);
 	virtual void DisposeState ();
 
 	spSkeleton* skeleton;

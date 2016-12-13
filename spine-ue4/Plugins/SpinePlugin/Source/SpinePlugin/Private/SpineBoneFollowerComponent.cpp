@@ -11,7 +11,6 @@ void USpineBoneFollowerComponent::BeginPlay () {
 	Super::BeginPlay();
 }
 
-
 void USpineBoneFollowerComponent::TickComponent ( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 

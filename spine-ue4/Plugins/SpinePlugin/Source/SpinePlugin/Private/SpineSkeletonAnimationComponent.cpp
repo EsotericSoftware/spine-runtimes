@@ -60,15 +60,15 @@ void USpineSkeletonAnimationComponent::TickComponent(float DeltaTime, ELevelTick
 	InternalTick(DeltaTime);
 }
 
-void USpineSkeletonAnimationComponent::InternalTick(float DeltaTime) {
+void USpineSkeletonAnimationComponent::InternalTick(float DeltaTime, bool CallDelegates) {
 	CheckState();
 
 	if (state) {
 		spAnimationState_update(state, DeltaTime);
 		spAnimationState_apply(state, skeleton);
-		BeforeUpdateWorldTransform.Broadcast(this);
+		if (CallDelegates) BeforeUpdateWorldTransform.Broadcast(this);
 		spSkeleton_updateWorldTransform(skeleton);
-		AfterUpdateWorldTransform.Broadcast(this);
+		if (CallDelegates) AfterUpdateWorldTransform.Broadcast(this);
 	}
 }
 

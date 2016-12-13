@@ -238,7 +238,7 @@ public:
 	void GCTrackEntry(UTrackEntry* entry) { trackEntries.Remove(entry); }
 protected:
 	virtual void CheckState () override;
-	virtual void InternalTick(float DeltaTime) override;
+	virtual void InternalTick(float DeltaTime, bool CallDelegates = true) override;
 	virtual void DisposeState () override;
 	
 	spAnimationState* state;

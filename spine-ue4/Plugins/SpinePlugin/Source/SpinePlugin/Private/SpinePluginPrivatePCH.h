@@ -10,3 +10,4 @@
 #include "SpineSkeletonAnimationComponent.h"
 #include "SpineSkeletonRendererComponent.h"
 #include "SpineBoneFollowerComponent.h"
+#include "SpineBoneDriverComponent.h"

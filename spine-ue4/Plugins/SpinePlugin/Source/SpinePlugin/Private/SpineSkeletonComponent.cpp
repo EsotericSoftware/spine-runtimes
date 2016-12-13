@@ -26,7 +26,7 @@ FTransform USpineSkeletonComponent::GetBoneWorldTransform (const FString& BoneNa
 	if (skeleton) {
 		spBone* bone = spSkeleton_findBone(skeleton, TCHAR_TO_UTF8(*BoneName));		
 		if (!bone) return FTransform();
-		if (!bone->appliedValid) this->InternalTick(0);		
+		if (!bone->appliedValid) this->InternalTick(0, false);		
 
 		// Need to fetch the renderer component to get world transform of actor plus
 		// offset by renderer component and its parent component(s). If no renderer
@@ -57,7 +57,9 @@ FTransform USpineSkeletonComponent::GetBoneWorldTransform (const FString& BoneNa
 void USpineSkeletonComponent::SetBoneWorldPosition (const FString& BoneName, const FVector& position) {
 	CheckState();
 	if (skeleton) {
-		spBone* bone = spSkeleton_findBone(skeleton, TCHAR_TO_UTF8(*BoneName));		
+		spBone* bone = spSkeleton_findBone(skeleton, TCHAR_TO_UTF8(*BoneName));
+		if (!bone) return;
+		if (!bone->appliedValid) this->InternalTick(0, false);
 
 		// Need to fetch the renderer component to get world transform of actor plus
 		// offset by renderer component and its parent component(s). If no renderer
@@ -71,9 +73,9 @@ void USpineSkeletonComponent::SetBoneWorldPosition (const FString& BoneName, con
 		}
 
 		baseTransform = baseTransform.Inverse();
-		baseTransform.TransformVector(position);
+		FVector localPosition = baseTransform.TransformVector(position);
 		float localX = 0, localY = 0;
-		spBone_worldToLocal(bone, position.X, position.Z, &localX, &localY);
+		spBone_worldToLocal(bone, localPosition.X, localPosition.Z, &localX, &localY);
 		bone->x = localX;
 		bone->y = localY;
 	}
@@ -132,13 +134,13 @@ void USpineSkeletonComponent::TickComponent (float DeltaTime, ELevelTick TickTyp
 	InternalTick(DeltaTime);
 }
 
-void USpineSkeletonComponent::InternalTick(float DeltaTime) {
+void USpineSkeletonComponent::InternalTick(float DeltaTime, bool CallDelegates) {
 	CheckState();
 
 	if (skeleton) {
-		BeforeUpdateWorldTransform.Broadcast(this);
+		if (CallDelegates) BeforeUpdateWorldTransform.Broadcast(this);
 		spSkeleton_updateWorldTransform(skeleton);
-		AfterUpdateWorldTransform.Broadcast(this);
+		if (CallDelegates) AfterUpdateWorldTransform.Broadcast(this);
 	}
 }
 
