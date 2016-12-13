@@ -55,17 +55,9 @@ void USpineSkeletonAnimationComponent::BeginPlay() {
 }
 
 void USpineSkeletonAnimationComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	Super::Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	CheckState();
-
-	if (state) {
-		spAnimationState_update(state, DeltaTime);
-		spAnimationState_apply(state, skeleton);
-		BeforeUpdateWorldTransform.Broadcast(this);
-		spSkeleton_updateWorldTransform(skeleton);
-		AfterUpdateWorldTransform.Broadcast(this);
-	}
+	InternalTick(DeltaTime);
 }
 
 void USpineSkeletonAnimationComponent::InternalTick(float DeltaTime) {
