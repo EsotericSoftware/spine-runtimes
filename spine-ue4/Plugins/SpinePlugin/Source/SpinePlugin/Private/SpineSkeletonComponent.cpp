@@ -17,11 +17,39 @@ bool USpineSkeletonComponent::SetSkin(const FString& skinName) {
 
 bool USpineSkeletonComponent::setAttachment (const FString& slotName, const FString& attachmentName) {
 	CheckState();
-	if (skeleton) return spSkeleton_setAttachment(skeleton, TCHAR_TO_UTF8(*slotName), TCHAR_TO_UTF8(*attachmentName));
+	if (skeleton) return spSkeleton_setAttachment(skeleton, TCHAR_TO_UTF8(*slotName), TCHAR_TO_UTF8(*attachmentName)) != 0;
 	return false;
 }
 
 FTransform USpineSkeletonComponent::GetBoneWorldTransform (const FString& BoneName) {
+	CheckState();
+	if (skeleton) {
+		spBone* bone = spSkeleton_findBone(skeleton, TCHAR_TO_UTF8(*BoneName));
+		if (!bone->appliedValid) this->InternalTick(0);
+		if (!bone) return FTransform();
+
+		// Need to fetch the renderer component to get world transform of actor plus
+		// offset by renderer component and its parent component(s).
+		// FIXME add overloaded method that takes a base world transform?
+		FTransform baseTransform;
+		AActor* owner = GetOwner();
+		if (owner) {
+			USpineSkeletonRendererComponent* rendererComponent = static_cast<USpineSkeletonRendererComponent*>(owner->GetComponentByClass(USpineSkeletonRendererComponent::StaticClass()));
+			if (rendererComponent) baseTransform = rendererComponent->GetComponentTransform();
+		}
+
+		FVector position(bone->worldX, 0, bone->worldY);
+		FMatrix localTransform;
+		localTransform.SetIdentity();
+		localTransform.SetAxis(2, FVector(bone->a, 0, bone->c));
+		localTransform.SetAxis(0, FVector(bone->b, 0, bone->d));
+		localTransform.SetOrigin(FVector(bone->worldX, 0, bone->worldY));				
+		localTransform = localTransform * baseTransform.ToMatrixWithScale();
+
+		FTransform result;
+		result.SetFromMatrix(localTransform);		
+		return result;
+	}
 	return FTransform();
 }
 
@@ -50,7 +78,10 @@ void USpineSkeletonComponent::BeginPlay() {
 
 void USpineSkeletonComponent::TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
+	InternalTick(DeltaTime);
+}
+
+void USpineSkeletonComponent::InternalTick(float DeltaTime) {
 	CheckState();
 
 	if (skeleton) {

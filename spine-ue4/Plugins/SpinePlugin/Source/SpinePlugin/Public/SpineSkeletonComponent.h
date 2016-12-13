@@ -56,12 +56,13 @@ public:
 	
 	virtual void BeginPlay () override;
 		
-	virtual void TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;	
 
 	virtual void FinishDestroy () override;
 	
 protected:
 	virtual void CheckState ();
+	virtual void InternalTick(float DeltaTime);
 	virtual void DisposeState ();
 
 	spSkeleton* skeleton;

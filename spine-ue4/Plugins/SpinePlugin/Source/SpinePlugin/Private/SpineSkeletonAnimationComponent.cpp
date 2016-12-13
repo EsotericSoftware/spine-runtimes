@@ -54,9 +54,21 @@ void USpineSkeletonAnimationComponent::BeginPlay() {
 	trackEntries.Empty();
 }
 
-void USpineSkeletonAnimationComponent::TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
+void USpineSkeletonAnimationComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
+
+	CheckState();
+
+	if (state) {
+		spAnimationState_update(state, DeltaTime);
+		spAnimationState_apply(state, skeleton);
+		BeforeUpdateWorldTransform.Broadcast(this);
+		spSkeleton_updateWorldTransform(skeleton);
+		AfterUpdateWorldTransform.Broadcast(this);
+	}
+}
+
+void USpineSkeletonAnimationComponent::InternalTick(float DeltaTime) {
 	CheckState();
 
 	if (state) {
@@ -104,6 +116,17 @@ void USpineSkeletonAnimationComponent::DisposeState () {
 void USpineSkeletonAnimationComponent::FinishDestroy () {
 	DisposeState();
 	Super::FinishDestroy();
+}
+
+void USpineSkeletonAnimationComponent::SetTimeScale(float timeScale) {
+	CheckState();
+	if (state) state->timeScale = timeScale;	
+}
+
+float USpineSkeletonAnimationComponent::GetTimeScale() {
+	CheckState();
+	if (state) return state->timeScale;
+	return 1;
 }
 
 UTrackEntry* USpineSkeletonAnimationComponent::SetAnimation (int trackIndex, FString animationName, bool loop) {

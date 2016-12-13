@@ -188,6 +188,12 @@ public:
 	virtual void FinishDestroy () override;
 	
 	// Blueprint functions
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	void SetTimeScale(float timeScale);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	float GetTimeScale();
+
 	UFUNCTION(BlueprintCallable, Category="Components|Spine")
 	UTrackEntry* SetAnimation (int trackIndex, FString animationName, bool loop);
 	
@@ -232,6 +238,7 @@ public:
 	void GCTrackEntry(UTrackEntry* entry) { trackEntries.Remove(entry); }
 protected:
 	virtual void CheckState () override;
+	virtual void InternalTick(float DeltaTime) override;
 	virtual void DisposeState () override;
 	
 	spAnimationState* state;
