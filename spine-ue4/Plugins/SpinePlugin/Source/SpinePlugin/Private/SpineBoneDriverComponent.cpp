@@ -13,7 +13,7 @@ void USpineBoneDriverComponent::BeginPlay () {
 
 void USpineBoneDriverComponent::BeforeUpdateWorldTransform(USpineSkeletonComponent* skeleton) {	
 	AActor* owner = GetOwner();
-	if (owner) {		
+	if (owner && skeleton == lastBoundComponent) {		
 		skeleton->SetBoneWorldPosition(BoneName, owner->GetActorLocation() );
 	}
 }
@@ -25,7 +25,8 @@ void USpineBoneDriverComponent::TickComponent (float DeltaTime, ELevelTick TickT
 		USpineSkeletonComponent* skeleton = static_cast<USpineSkeletonComponent*>(Target->GetComponentByClass(USpineSkeletonComponent::StaticClass()));
 		if (skeleton != lastBoundComponent) {
 			// if (lastBoundComponent) lastBoundComponent->BeforeUpdateWorldTransform.RemoveAll(this);
-			skeleton->BeforeUpdateWorldTransform.AddDynamic(this, &USpineBoneDriverComponent::BeforeUpdateWorldTransform);
+			if (!skeleton->BeforeUpdateWorldTransform.GetAllObjects().Contains(this))
+				skeleton->BeforeUpdateWorldTransform.AddDynamic(this, &USpineBoneDriverComponent::BeforeUpdateWorldTransform);
 			lastBoundComponent = skeleton;
 		}		
 	}

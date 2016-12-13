@@ -73,9 +73,13 @@ void USpineSkeletonComponent::SetBoneWorldPosition (const FString& BoneName, con
 		}
 
 		baseTransform = baseTransform.Inverse();
-		FVector localPosition = baseTransform.TransformVector(position);
+		FVector localPosition = baseTransform.TransformPosition(position);
 		float localX = 0, localY = 0;
-		spBone_worldToLocal(bone, localPosition.X, localPosition.Z, &localX, &localY);
+		if (bone->parent) {
+			spBone_worldToLocal(bone->parent, localPosition.X, localPosition.Z, &localX, &localY);
+		} else {
+			spBone_worldToLocal(bone, localPosition.X, localPosition.Z, &localX, &localY);
+		}
 		bone->x = localX;
 		bone->y = localY;
 	}
