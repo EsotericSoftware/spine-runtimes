@@ -90,26 +90,6 @@ inline half3 calculateNormalFromBumpMap(float2 texUV, half3 tangentWorld, half3 
 
 #endif // _NORMALMAP
 
-#if defined(_DIFFUSE_RAMP)
-
-////////////////////////////////////////
-// Diffuse ramp functions
-//
-
-uniform sampler2D _DiffuseRamp;
-
-inline fixed3 calculateDiffuseRamp(float ramp)
-{
-	return tex2D(_DiffuseRamp, float2(ramp, ramp)).rgb;
-}
-
-inline fixed3 calculateRampedDiffuse(fixed3 lightColor, float attenuation, float angleDot)
-{
-	float ramp = clamp(((angleDot * 0.5) + 0.5) * attenuation, 0.0, 1.0);
-	return lightColor * calculateDiffuseRamp(ramp);
-}
-#endif // _DIFFUSE_RAMP
-
 ////////////////////////////////////////
 // Blending functions
 //
