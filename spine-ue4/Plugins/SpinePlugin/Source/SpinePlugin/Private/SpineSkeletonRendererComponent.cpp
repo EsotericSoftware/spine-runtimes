@@ -167,10 +167,10 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 			UMaterialInstanceDynamic* material = nullptr;
 			
 			switch(slot->data->blendMode) {
-				case SP_BLEND_MODE_NORMAL:
+				/*case SP_BLEND_MODE_NORMAL:
 					material = pageToNormalBlendMaterial[region->page];
 					break;
-				/*case SP_BLEND_MODE_ADDITIVE:
+				case SP_BLEND_MODE_ADDITIVE:
 					material = pageToAdditiveBlendMaterial[region->page];
 					break;
 				case SP_BLEND_MODE_MULTIPLY:
@@ -183,10 +183,10 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 					material = pageToNormalBlendMaterial[region->page];
 			}
 
-			if (lastMaterial != material) {
+			// if (lastMaterial != material) {
 				Flush(meshSection, vertices, indices, uvs, colors, lastMaterial);
 				lastMaterial = material;
-			}
+			// }
 
 			spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, worldVertices.GetData());
 
