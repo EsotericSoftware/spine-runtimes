@@ -233,7 +233,6 @@ namespace Spine.Unity.Editor {
 				menu.AddItem(new GUIContent(bones.Items[i].Data.Name), bones.Items[i].Data.Name == current, callback, bones.Items[i]);
 
 			menu.ShowAsContext();
-
 		}
 
 		void TargetBoneSelected (object obj) {

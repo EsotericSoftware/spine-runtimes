@@ -16,7 +16,7 @@ Shader "Spine/Sprite/Unlit"
 		
 		_BlendTex ("Blend Texture", 2D) = "white" {}
 		_BlendAmount ("Blend", Range(0,1)) = 0.0
-
+		
 		[HideInInspector] _SrcBlend ("__src", Float) = 1.0
 		[HideInInspector] _DstBlend ("__dst", Float) = 0.0
 		[HideInInspector] _RenderQueue ("__queue", Float) = 0.0
@@ -25,7 +25,7 @@ Shader "Spine/Sprite/Unlit"
 	
 	SubShader
 	{
-		Tags { "Queue"="Transparent" "RenderType"="Sprite" }
+		Tags { "Queue"="Transparent" "RenderType"="Sprite" "AlphaDepth"="False" }
 		LOD 100
 		
 		Pass

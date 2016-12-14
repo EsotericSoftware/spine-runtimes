@@ -224,7 +224,7 @@ namespace Spine.Unity {
 				var utilityBones = this.utilityBones;
 				for (int i = 0, n = utilityBones.Count; i < n; i++) {
 					var b = utilityBones[i];
-					if (b.bone == null) return;
+					if (b.bone == null) continue;
 					hasTransformBones |= (b.mode == SkeletonUtilityBone.Mode.Override);
 					hasUtilityConstraints |= constraintTargets.Contains(b.bone);
 				}

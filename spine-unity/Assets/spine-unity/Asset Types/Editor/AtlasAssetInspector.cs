@@ -288,47 +288,56 @@ namespace Spine.Unity.Editor {
 			var sprites = new List<SpriteMetaData>(spriteSheet);
 
 			var regions = AtlasAssetInspector.GetRegions(atlas);
-			int textureHeight = texture.height;
 			char[] FilenameDelimiter = {'.'};
 			int updatedCount = 0;
 			int addedCount = 0;
 
 			foreach (var r in regions) {
-				int width, height;
-				if (r.rotate) {
-					width = r.height;
-					height = r.width;
-				} else {
-					width = r.width;
-					height = r.height;
-				}
-
-				int x = r.x;
-				int y = textureHeight - height - r.y;
-
 				string pageName = r.page.name.Split(FilenameDelimiter, StringSplitOptions.RemoveEmptyEntries)[0];
 				string textureName = texture.name;
-				bool pageMatch = string.Equals(pageName, textureName,StringComparison.Ordinal);
+				bool pageMatch = string.Equals(pageName, textureName, StringComparison.Ordinal);
+
+//				if (pageMatch) {
+//					int pw = r.page.width;
+//					int ph = r.page.height;
+//					bool mismatchSize = pw != texture.width || pw > t.maxTextureSize || ph != texture.height || ph > t.maxTextureSize;
+//					if (mismatchSize)
+//						Debug.LogWarningFormat("Size mismatch found.\nExpected atlas size is {0}x{1}. Texture Import Max Size of texture '{2}'({4}x{5}) is currently set to {3}.", pw, ph, texture.name, t.maxTextureSize, texture.width, texture.height);
+//				}
+
 				int spriteIndex = pageMatch ? sprites.FindIndex(
 					(s) => string.Equals(s.name, r.name, StringComparison.Ordinal)
 				) : -1;
-				bool matchFound = spriteIndex >= 0;
+				bool spriteNameMatchExists = spriteIndex >= 0;
 
-				if (matchFound) {
-					var s = sprites[spriteIndex];
-					s.rect = new Rect(x, y, width, height);
-					sprites[spriteIndex] = s;
-					updatedCount++;
-				} else {
-					if (pageMatch) {
+				if (pageMatch) {
+					Rect spriteRect = new Rect();
+
+					if (r.rotate) {
+						spriteRect.width = r.height;
+						spriteRect.height = r.width;
+					} else {
+						spriteRect.width = r.width;
+						spriteRect.height = r.height;
+					}
+					spriteRect.x = r.x;
+					spriteRect.y = r.page.height - spriteRect.height - r.y;
+
+					if (spriteNameMatchExists) {
+						var s = sprites[spriteIndex];
+						s.rect = spriteRect;
+						sprites[spriteIndex] = s;
+						updatedCount++;
+					} else {
 						sprites.Add(new SpriteMetaData {
 							name = r.name,
 							pivot = new Vector2(0.5f, 0.5f),
-							rect = new Rect(x, y, width, height)
+							rect = spriteRect
 						});
 						addedCount++;
 					}
 				}
+
 			}
 
 			t.spritesheet = sprites.ToArray();

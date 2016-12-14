@@ -175,11 +175,12 @@ namespace Spine.Unity.Editor {
 		#region Menus
 		[MenuItem("CONTEXT/SkeletonRenderer/Add BoundingBoxFollower GameObject")]
 		static void AddBoundingBoxFollowerChild (MenuCommand command) {
-			AddBoundingBoxFollowerChild((SkeletonRenderer)command.context);
+			var go = AddBoundingBoxFollowerChild((SkeletonRenderer)command.context);
+			Undo.RegisterCreatedObjectUndo(go, "Add BoundingBoxFollower");
 		}
 		#endregion
 
-		static void AddBoundingBoxFollowerChild (SkeletonRenderer sr, BoundingBoxFollower original = null) {
+		static GameObject AddBoundingBoxFollowerChild (SkeletonRenderer sr, BoundingBoxFollower original = null) {
 			var go = new GameObject("BoundingBoxFollower");
 			go.transform.SetParent(sr.transform, false);
 			var newFollower = go.AddComponent<BoundingBoxFollower>();
@@ -196,6 +197,7 @@ namespace Spine.Unity.Editor {
 
 			Selection.activeGameObject = go;
 			EditorGUIUtility.PingObject(go);
+			return go;
 		}
 
 	}

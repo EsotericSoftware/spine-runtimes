@@ -582,6 +582,7 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 	kv_trim(spTimeline*, timelines);
 
 	animation = spAnimation_create(name, 0);
+	FREE(animation->timelines);
 	animation->duration = duration;
 	animation->timelinesCount = kv_size(timelines);
 	animation->timelines = kv_array(timelines);

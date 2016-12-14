@@ -55,7 +55,6 @@ namespace Spine.Unity.Editor {
 		GUIContent SpawnHierarchyButtonLabel = new GUIContent("Spawn Hierarchy", Icons.skeleton);
 		GUIContent SlotsRootLabel = new GUIContent("Slots", Icons.slotRoot);
 		static AnimBool showSlots = new AnimBool(false);
-		static bool showPaths = true;
 		static bool debugSkeleton = false;
 
 		void OnEnable () {
@@ -102,10 +101,6 @@ namespace Spine.Unity.Editor {
 				debugSkeleton = EditorGUILayout.Foldout(debugSkeleton, "Debug Skeleton");
 
 				if (debugSkeleton) {
-					EditorGUI.BeginChangeCheck();
-					showPaths = EditorGUILayout.Toggle("Show Paths", showPaths);
-					requireRepaint |= EditorGUI.EndChangeCheck();
-
 					EditorGUI.BeginChangeCheck();
 					skeleton.FlipX = EditorGUILayout.ToggleLeft("skeleton.FlipX", skeleton.FlipX);
 					skeleton.FlipY = EditorGUILayout.ToggleLeft("skeleton.FlipY", skeleton.FlipY);

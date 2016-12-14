@@ -45,11 +45,37 @@ namespace Spine.Unity.Modules {
 		[SpineSlot] public string slot;
 		#endregion
 
+		#if UNITY_EDITOR
+		void OnValidate () {
+			var skeletonComponent = GetComponent<ISkeletonComponent>();
+			var skeletonRenderer = skeletonComponent as SkeletonRenderer;
+			bool apma;
+
+			if (skeletonRenderer != null) {
+				apma = skeletonRenderer.pmaVertexColors;
+			} else {
+				var skeletonGraphic = skeletonComponent as SkeletonGraphic;
+				apma = skeletonGraphic != null && skeletonGraphic.SpineMeshGenerator.PremultiplyVertexColors;
+			}
+
+			if (apma) {
+				try {
+					sprite.texture.GetPixel(0, 0);
+				} catch (UnityException e) {
+					Debug.LogFormat("Texture of {0} ({1}) is not read/write enabled. SpriteAttacher requires this in order to work with a SkeletonRenderer that renders premultiplied alpha. Please check the texture settings.", sprite.name, sprite.texture.name);
+					UnityEditor.EditorGUIUtility.PingObject(sprite.texture);
+					throw e;
+				}
+			}
+		}
+		#endif
+
 		RegionAttachment attachment;
 		bool applyPMA;
 
-		Dictionary<Texture, AtlasPage> atlasPageCache = new Dictionary<Texture, AtlasPage>();
-		AtlasPage GetPageFor (Texture texture, Shader shader) {
+		static Dictionary<Texture, AtlasPage> atlasPageCache;
+		static AtlasPage GetPageFor (Texture texture, Shader shader) {
+			if (atlasPageCache == null) atlasPageCache = new Dictionary<Texture, AtlasPage>();
 			AtlasPage atlasPage;
 			atlasPageCache.TryGetValue(texture, out atlasPage);
 			if (atlasPage == null) {
@@ -76,7 +102,7 @@ namespace Spine.Unity.Modules {
 			}
 
 			Shader attachmentShader = applyPMA ? Shader.Find(DefaultPMAShader) : Shader.Find(DefaultStraightAlphaShader);
-			attachment = applyPMA ? sprite.ToRegionAttachmentPMAClone(attachmentShader) : sprite.ToRegionAttachment(GetPageFor(sprite.texture, attachmentShader));
+			attachment = applyPMA ? sprite.ToRegionAttachmentPMAClone(attachmentShader) : sprite.ToRegionAttachment(SpriteAttacher.GetPageFor(sprite.texture, attachmentShader));
 			skeletonComponent.Skeleton.FindSlot(slot).Attachment = attachment;
 		}
 	}

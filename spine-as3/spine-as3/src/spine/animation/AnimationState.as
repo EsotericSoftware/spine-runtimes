@@ -219,7 +219,7 @@ public class AnimationState {
 		}
 
 		if (entry.mixDuration > 0) queueEvents(from, animationTime);
-		events.length = 0;
+		this.events.length = 0;
 		from.nextAnimationLast = animationTime;
 		from.nextTrackLast = from.trackTime;
 

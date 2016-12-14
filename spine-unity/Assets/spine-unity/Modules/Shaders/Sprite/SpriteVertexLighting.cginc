@@ -126,7 +126,7 @@ struct VertexLightInfo
 	fixed3 lightColor;
 	
 #if defined(_DIFFUSE_RAMP)	
-	float attenuationSqrt;
+	float attenuation;
 #endif // _DIFFUSE_RAMP
 };
 
@@ -134,7 +134,7 @@ inline VertexLightInfo getVertexLightAttenuatedInfo(int index, float3 viewPos)
 {
 	VertexLightInfo lightInfo;
 	
-	//For directional lights _WorldSpaceLightPos0.w is set to zero
+	//For directional lights unity_LightPosition.w is set to zero
 	lightInfo.lightDirection = unity_LightPosition[index].xyz - viewPos.xyz * unity_LightPosition[index].w;
 	float lengthSq = dot(lightInfo.lightDirection, lightInfo.lightDirection);
 	
@@ -157,7 +157,7 @@ inline VertexLightInfo getVertexLightAttenuatedInfo(int index, float3 viewPos)
 	//If using a diffuse ramp texture then need to pass through the lights attenuation, otherwise premultiply the light color with it
 #if defined(_DIFFUSE_RAMP)	
 	lightInfo.lightColor = unity_LightColor[index].rgb;
-	lightInfo.attenuationSqrt = sqrt(attenuation);
+	lightInfo.attenuation = attenuation;
 #else
 	lightInfo.lightColor = unity_LightColor[index].rgb * attenuation;
 #endif // _DIFFUSE_RAMP
@@ -205,25 +205,23 @@ fixed3 calculateAmbientLight(half3 normalWorld)
 }
 
 ////////////////////////////////////////
-// Light Packing Functions (this stuff gets messy!)
+// Light Packing Functions
 //
 
 #if defined(_DIFFUSE_RAMP)
 
-inline fixed3 calculateLightDiffuse(fixed3 lightColor, half3 normal, half3 lightDirection, float attenuation)
+inline fixed3 calculateLightDiffuse(fixed3 lightColor, half3 viewNormal, half3 lightViewDir, float attenuation)
 {
-	float angleDot = max(0, dot(normal, lightDirection));
-	fixed3 diffuse = calculateRampedDiffuse(lightColor, attenuation, angleDot);
-	return diffuse;
+	float angleDot = max(0, dot(viewNormal, lightViewDir));
+	return calculateRampedDiffuse(lightColor, attenuation, angleDot);
 }
 
 #else
 
-inline fixed3 calculateLightDiffuse(fixed3 attenuatedLightColor, half3 normal, half3 lightDirection)
+inline fixed3 calculateLightDiffuse(fixed3 attenuatedLightColor, half3 viewNormal, half3 lightViewDir)
 {
-	float angleDot = max(0, dot(normal, lightDirection));
-	fixed3 diffuse = attenuatedLightColor * angleDot;
-	return diffuse;
+	float angleDot = max(0, dot(viewNormal, lightViewDir));
+	return attenuatedLightColor * angleDot;
 }
 
 #endif // _NORMALMAP
@@ -231,16 +229,6 @@ inline fixed3 calculateLightDiffuse(fixed3 attenuatedLightColor, half3 normal, h
 
 #if defined(PER_PIXEL_LIGHTING)
 
-inline VertexLightInfo getVertexLightAttenuatedInfoWorldSpace(int index, float3 viewPos)
-{
-	VertexLightInfo lightInfo = getVertexLightAttenuatedInfo(index, viewPos);
-	
-	//Convert light direction from view space to world space
-	lightInfo.lightDirection = normalize(mul((float3x3)UNITY_MATRIX_V, lightInfo.lightDirection));
-	
-	return lightInfo;
-}
-	
 #define VERTEX_LIGHT_0_DIR VertexLightInfo0.xyz
 #define VERTEX_LIGHT_0_R VertexLightInfo4.x
 #define VERTEX_LIGHT_0_G VertexLightInfo4.y
@@ -277,24 +265,24 @@ inline VertexLightInfo getVertexLightAttenuatedInfoWorldSpace(int index, float3 
 
 	#define PACK_VERTEX_LIGHT_DIFFUSE(index, output, lightInfo) \
 	{ \
-		output.LIGHT_DIFFUSE_ATTEN_##index = lightInfo.attenuationSqrt; \
+		output.LIGHT_DIFFUSE_ATTEN_##index = lightInfo.attenuation; \
 	}
 	
-	#define ADD_VERTEX_LIGHT_DIFFUSE(index, diffuse, input, vertexLightColor, normalDirection, vertexLightDir) \
+	#define ADD_VERTEX_LIGHT_DIFFUSE(index, diffuse, input, lightColor, viewNormal, lightViewDir) \
 	{ \
-		diffuse += calculateLightDiffuse(vertexLightColor, normalDirection, vertexLightDir, input.LIGHT_DIFFUSE_ATTEN_##index); \
+		diffuse += calculateLightDiffuse(lightColor, viewNormal, lightViewDir, input.LIGHT_DIFFUSE_ATTEN_##index); \
 	}
 #else
 	#define PACK_VERTEX_LIGHT_DIFFUSE(index, output, lightInfo)
-	#define ADD_VERTEX_LIGHT_DIFFUSE(index, diffuse, input, vertexLightColor, normalDirection, vertexLightDir) \
+	#define ADD_VERTEX_LIGHT_DIFFUSE(index, diffuse, input, lightColor, viewNormal, lightViewDir) \
 	{ \
-		diffuse += calculateLightDiffuse(vertexLightColor, normalDirection, vertexLightDir); \
+		diffuse += calculateLightDiffuse(lightColor, viewNormal, lightViewDir); \
 	}
 #endif
 
 #define PACK_VERTEX_LIGHT(index, output, viewPos) \
 	{ \
-		VertexLightInfo lightInfo = getVertexLightAttenuatedInfoWorldSpace(index, viewPos); \
+		VertexLightInfo lightInfo = getVertexLightAttenuatedInfo(index, viewPos); \
 		output.VERTEX_LIGHT_##index##_DIR = lightInfo.lightDirection; \
 		output.VERTEX_LIGHT_##index##_R = lightInfo.lightColor.r; \
 		output.VERTEX_LIGHT_##index##_G = lightInfo.lightColor.g; \
@@ -302,11 +290,11 @@ inline VertexLightInfo getVertexLightAttenuatedInfoWorldSpace(int index, float3 
 		PACK_VERTEX_LIGHT_DIFFUSE(index, output, lightInfo); \
 	}
 
-#define ADD_VERTEX_LIGHT(index, input, normalDirection, diffuse) \
+#define ADD_VERTEX_LIGHT(index, input, viewNormal, diffuse) \
 	{ \
-		half3 vertexLightDir = input.VERTEX_LIGHT_##index##_DIR; \
-		fixed3 vertexLightColor = fixed3(input.VERTEX_LIGHT_##index##_R, input.VERTEX_LIGHT_##index##_G, input.VERTEX_LIGHT_##index##_B); \
-		ADD_VERTEX_LIGHT_DIFFUSE(index, diffuse, input, vertexLightColor, normalDirection, vertexLightDir) \
+		half3 lightViewDir = input.VERTEX_LIGHT_##index##_DIR; \
+		fixed3 lightColor = fixed3(input.VERTEX_LIGHT_##index##_R, input.VERTEX_LIGHT_##index##_G, input.VERTEX_LIGHT_##index##_B); \
+		ADD_VERTEX_LIGHT_DIFFUSE(index, diffuse, input, lightColor, viewNormal, lightViewDir) \
 	}
 
 #else //!PER_PIXEL_LIGHTING
@@ -318,8 +306,8 @@ inline VertexLightInfo getVertexLightAttenuatedInfoWorldSpace(int index, float3 
 inline fixed3 calculateLightDiffuse(int index, float3 viewPos, half3 viewNormal)
 {
 	VertexLightInfo lightInfo = getVertexLightAttenuatedInfo(index, viewPos);
-	float diff = max (0, dot (viewNormal, lightInfo.lightDirection));
-	return lightInfo.lightColor * diff;
+	float angleDot = max(0, dot(viewNormal, lightInfo.lightDirection));
+	return lightInfo.lightColor * angleDot;
 }
 
 #endif // !PER_PIXEL_LIGHTING
@@ -405,10 +393,11 @@ fixed4 frag(VertexOutput input) : SV_Target
 	fixed3 diffuse = fixed3(0,0,0);
 	
 	//Add each vertex light to diffuse
-	ADD_VERTEX_LIGHT(0, input, normalWorld, diffuse)
-	ADD_VERTEX_LIGHT(1, input, normalWorld, diffuse)
-	ADD_VERTEX_LIGHT(2, input, normalWorld, diffuse)
-	ADD_VERTEX_LIGHT(3, input, normalWorld, diffuse)
+	half3 normalView = normalize(mul((float3x3)UNITY_MATRIX_V, normalWorld));
+	ADD_VERTEX_LIGHT(0, input, normalView, diffuse)
+	ADD_VERTEX_LIGHT(1, input, normalView, diffuse)
+	ADD_VERTEX_LIGHT(2, input, normalView, diffuse)
+	ADD_VERTEX_LIGHT(3, input, normalView, diffuse)
 	
 	fixed3 lighting = ambient + diffuse;
 	
