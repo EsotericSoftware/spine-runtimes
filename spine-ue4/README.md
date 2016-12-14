@@ -7,14 +7,20 @@ This Spine Runtime may only be used for personal or internal use, typically to e
 
 The Spine Runtimes are developed with the intent to be used with data exported from Spine. By purchasing Spine, `Section 2` of the [Spine Software License](https://esotericsoftware.com/files/license.txt) grants the right to create and distribute derivative works of the Spine Runtimes.
 
+## 3rd Party Licenses
+
+spine-ue4 includes a copy of [UE4 Runtime Mesh Component](https://github.com/Koderz/UE4RuntimeMeshComponent) by Chris Conway (Koderz), licensed under the [MIT license](https://github.com/Koderz/UE4RuntimeMeshComponent/blob/master/LICENSE).
+
 ## Spine version
 
 spine-ue4 works with data exported from Spine 3.4.02.
 
 spine-ue4 supports all Spine features.
 
+spine-ue4 does not support multiply and screen blending. spine-ue4 does not support pre-multiplied alpha atlases.
+
 ## Usage
-1. Create a new Unreal Engine project. See the [Unreal Engine documentation](https://docs.unrealengine.com/latest/INT/) or have a look at the example in this repository.
+1. Create a new Unreal Engine code project. You don't need to write C++, but the code project is needed for the plugin to compile. See the [Unreal Engine documentation](https://docs.unrealengine.com/latest/INT/) or have a look at the example in this repository.
 2. Download the Spine Runtimes source using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip)
 3. Copy the `Plugins` folder from this directory to your new project's root directory.
 4. Copy the `spine-c` folder from this repositories root directory to your project's `Plugins/SpinePlugin/Sources/SpinePlugin/Public/` directory.
