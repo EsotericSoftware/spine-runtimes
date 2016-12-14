@@ -157,6 +157,7 @@ public class Skeleton {
 	public void updateCache () {
 		Array<Updatable> updateCache = this.updateCache;
 		updateCache.clear();
+		updateCacheReset.clear();
 
 		Array<Bone> bones = this.bones;
 		for (int i = 0, n = bones.size; i < n; i++)
