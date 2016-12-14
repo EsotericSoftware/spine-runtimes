@@ -3,13 +3,13 @@
 #pragma once
 
 #include "Components/ActorComponent.h"
-#include "ProceduralMeshComponent.h"
+#include "RuntimeMeshComponent.h"
 #include "SpineSkeletonAnimationComponent.h"
 #include "SpineSkeletonRendererComponent.generated.h"
 
 
 UCLASS(ClassGroup=(Spine), meta=(BlueprintSpawnableComponent))
-class SPINEPLUGIN_API USpineSkeletonRendererComponent: public UProceduralMeshComponent {
+class SPINEPLUGIN_API USpineSkeletonRendererComponent: public URuntimeMeshComponent {
 	GENERATED_BODY()
 
 public: 

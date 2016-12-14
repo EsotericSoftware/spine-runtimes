@@ -5,7 +5,8 @@
 
 #define LOCTEXT_NAMESPACE "Spine"
 
-USpineSkeletonRendererComponent::USpineSkeletonRendererComponent (const FObjectInitializer& ObjectInitializer) {
+USpineSkeletonRendererComponent::USpineSkeletonRendererComponent (const FObjectInitializer& ObjectInitializer) 
+: URuntimeMeshComponent(ObjectInitializer) {
 	bWantsBeginPlay = true;
 	PrimaryComponentTick.bCanEverTick = true;
 	bTickInEditor = true;
@@ -130,8 +131,8 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 
 void USpineSkeletonRendererComponent::Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, UMaterialInstanceDynamic* Material) {
 	if (Vertices.Num() == 0) return;
-	CreateMeshSection(Idx, Vertices, Indices, TArray<FVector>(), Uvs, Colors, TArray<FProcMeshTangent>(), false);
 	SetMaterial(Idx, Material);
+	CreateMeshSection(Idx, Vertices, Indices, TArray<FVector>(), Uvs, Colors, TArray<FRuntimeMeshTangent>(), false);
 	Vertices.SetNum(0);
 	Indices.SetNum(0);
 	Uvs.SetNum(0);
@@ -167,7 +168,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 			UMaterialInstanceDynamic* material = nullptr;
 			
 			switch(slot->data->blendMode) {
-				/*case SP_BLEND_MODE_NORMAL:
+				case SP_BLEND_MODE_NORMAL:
 					material = pageToNormalBlendMaterial[region->page];
 					break;
 				case SP_BLEND_MODE_ADDITIVE:
@@ -178,15 +179,16 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 					break;
 				case SP_BLEND_MODE_SCREEN:
 				material = pageToScreenBlendMaterial[region->page];
-					break;*/
+					break;
 				default:
 					material = pageToNormalBlendMaterial[region->page];
 			}
 
-			// if (lastMaterial != material) {
-				Flush(meshSection, vertices, indices, uvs, colors, lastMaterial);
+			if (lastMaterial != material) {
+				Flush(meshSection, vertices, indices, uvs, colors, lastMaterial);				
 				lastMaterial = material;
-			// }
+				idx = 0;
+			}
 
 			spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, worldVertices.GetData());
 
@@ -227,6 +229,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 			if (lastMaterial != material) {
 				Flush(meshSection, vertices, indices, uvs, colors, lastMaterial);
 				lastMaterial = material;
+				idx = 0;
 			}
 
 			if (mesh->super.worldVerticesLength> worldVertices.Num()) {
