@@ -20,7 +20,16 @@ public:
 	virtual void TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
-	UMaterialInterface* DefaultMaterial;	
+	UMaterialInterface* NormalBlendMaterial;
+	
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
+	UMaterialInterface* AdditiveBlendMaterial;
+	
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
+	UMaterialInterface* MultiplyBlendMaterial;
+	
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
+	UMaterialInterface* ScreenBlendMaterial;
 
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	float DepthOffset = 0.1f;
@@ -33,6 +42,15 @@ protected:
 
 	void Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, UMaterialInstanceDynamic* Material);
 	
-	TArray<UMaterialInstanceDynamic*> atlasMaterials;
-	TMap<spAtlasPage*, UMaterialInstanceDynamic*> pageToMaterial;
+	TArray<UMaterialInstanceDynamic*> atlasNormalBlendMaterials;
+	TMap<spAtlasPage*, UMaterialInstanceDynamic*> pageToNormalBlendMaterial;
+	
+	TArray<UMaterialInstanceDynamic*> atlasAdditiveBlendMaterials;
+	TMap<spAtlasPage*, UMaterialInstanceDynamic*> pageToAdditiveBlendMaterial;
+	
+	TArray<UMaterialInstanceDynamic*> atlasMultiplyBlendMaterials;
+	TMap<spAtlasPage*, UMaterialInstanceDynamic*> pageToMultiplyBlendMaterial;
+	
+	TArray<UMaterialInstanceDynamic*> atlasScreenBlendMaterials;
+	TMap<spAtlasPage*, UMaterialInstanceDynamic*> pageToScreenBlendMaterial;
 };
