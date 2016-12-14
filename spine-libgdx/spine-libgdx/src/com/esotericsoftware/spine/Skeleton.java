@@ -231,15 +231,15 @@ public class Skeleton {
 
 		Array<Bone> constrained = constraint.bones;
 		int boneCount = constrained.size;
-		for (int ii = 0; ii < boneCount; ii++)
-			sortBone(constrained.get(ii));
+		for (int i = 0; i < boneCount; i++)
+			sortBone(constrained.get(i));
 
 		updateCache.add(constraint);
 
-		for (int ii = 0; ii < boneCount; ii++)
-			sortReset(constrained.get(ii).children);
-		for (int ii = 0; ii < boneCount; ii++)
-			constrained.get(ii).sorted = true;
+		for (int i = 0; i < boneCount; i++)
+			sortReset(constrained.get(i).children);
+		for (int i = 0; i < boneCount; i++)
+			constrained.get(i).sorted = true;
 	}
 
 	private void sortTransformConstraint (TransformConstraint constraint) {
@@ -247,15 +247,23 @@ public class Skeleton {
 
 		Array<Bone> constrained = constraint.bones;
 		int boneCount = constrained.size;
-		for (int ii = 0; ii < boneCount; ii++)
-			sortBone(constrained.get(ii));
+		if (constraint.data.local) {
+			for (int i = 0; i < boneCount; i++) {
+				Bone child = constrained.peek();
+				sortBone(child.parent);
+				if (!updateCache.contains(child, true)) updateCacheReset.add(child);
+			}
+		} else {
+			for (int i = 0; i < boneCount; i++)
+				sortBone(constrained.get(i));
+		}
 
 		updateCache.add(constraint);
 
-		for (int ii = 0; ii < boneCount; ii++)
-			sortReset(constrained.get(ii).children);
-		for (int ii = 0; ii < boneCount; ii++)
-			constrained.get(ii).sorted = true;
+		for (int i = 0; i < boneCount; i++)
+			sortReset(constrained.get(i).children);
+		for (int i = 0; i < boneCount; i++)
+			constrained.get(i).sorted = true;
 	}
 
 	private void sortPathConstraintAttachment (Skin skin, int slotIndex, Bone slotBone) {
