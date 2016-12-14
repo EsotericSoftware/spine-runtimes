@@ -1051,6 +1051,7 @@ var spine;
 					}
 				}
 				this.queueEvents(current, animationTime);
+				events.length = 0;
 				current.nextAnimationLast = animationTime;
 				current.nextTrackLast = current.trackTime;
 			}
@@ -1094,7 +1095,9 @@ var spine;
 					timeline.apply(skeleton, animationLast, animationTime, events, alpha, setupPose, true);
 				}
 			}
-			this.queueEvents(from, animationTime);
+			if (entry.mixDuration > 0)
+				this.queueEvents(from, animationTime);
+			this.events.length = 0;
 			from.nextAnimationLast = animationTime;
 			from.nextTrackLast = from.trackTime;
 			return mix;
@@ -1182,7 +1185,6 @@ var spine;
 					continue;
 				this.queue.event(entry, events[i]);
 			}
-			this.events.length = 0;
 		};
 		AnimationState.prototype.clearTracks = function () {
 			this.queue.drainDisabled = true;

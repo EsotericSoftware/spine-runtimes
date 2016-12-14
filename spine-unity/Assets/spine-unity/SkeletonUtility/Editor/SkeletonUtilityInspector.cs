@@ -46,7 +46,8 @@ namespace Spine.Unity.Editor {
 		SkeletonUtility skeletonUtility;
 		Skeleton skeleton;
 		SkeletonRenderer skeletonRenderer;
-		Transform transform;
+		Skin activeSkin;
+
 		bool isPrefab;
 
 		Dictionary<Slot, List<Attachment>> attachmentTable = new Dictionary<Slot, List<Attachment>>();
@@ -54,14 +55,12 @@ namespace Spine.Unity.Editor {
 		GUIContent SpawnHierarchyButtonLabel = new GUIContent("Spawn Hierarchy", Icons.skeleton);
 		GUIContent SlotsRootLabel = new GUIContent("Slots", Icons.slotRoot);
 		static AnimBool showSlots = new AnimBool(false);
-		static bool showPaths = true;
 		static bool debugSkeleton = false;
 
 		void OnEnable () {
 			skeletonUtility = (SkeletonUtility)target;
 			skeletonRenderer = skeletonUtility.GetComponent<SkeletonRenderer>();
-			skeleton = skeletonRenderer.skeleton;
-			transform = skeletonRenderer.transform;
+			skeleton = skeletonRenderer.Skeleton;
 
 			if (skeleton == null) {
 				skeletonRenderer.Initialize(false);
@@ -74,33 +73,12 @@ namespace Spine.Unity.Editor {
 			UpdateAttachments();
 			isPrefab |= PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab;
 		}
-
-		void OnSceneGUI () {
-			if (skeleton == null) {
-				OnEnable();
-				return;
-			}
-
-			var m = transform.localToWorldMatrix;
-			foreach (Bone b in skeleton.Bones) {
-				Vector3 pos = new Vector3(b.WorldX, b.WorldY, 0);
-				Quaternion rot = Quaternion.Euler(0, 0, b.WorldRotationX - 90f);
-				Vector3 scale = Vector3.one * b.Data.Length * b.WorldScaleX;
-				const float mx = 2f;
-				scale.x = Mathf.Clamp(scale.x, -mx, mx);
-				SpineEditorUtilities.DrawBone(m * Matrix4x4.TRS(pos, rot, scale));
-			}
-
-			if (showPaths) {
-				foreach (Slot s in skeleton.DrawOrder) {
-					var p = s.Attachment as PathAttachment;
-					if (p != null) SpineEditorUtilities.DrawPath(s, p, transform);
-				}
-			}
-		}
-
+			
 		public override void OnInspectorGUI () {
 			bool requireRepaint = false;
+			if (skeletonRenderer.skeleton != skeleton || activeSkin != skeleton.Skin) {
+				UpdateAttachments();
+			}
 
 			if (isPrefab) {
 				GUILayout.Label(new GUIContent("Cannot edit Prefabs", Icons.warning));
@@ -123,10 +101,6 @@ namespace Spine.Unity.Editor {
 				debugSkeleton = EditorGUILayout.Foldout(debugSkeleton, "Debug Skeleton");
 
 				if (debugSkeleton) {
-					EditorGUI.BeginChangeCheck();
-					showPaths = EditorGUILayout.Toggle("Show Paths", showPaths);
-					requireRepaint |= EditorGUI.EndChangeCheck();
-
 					EditorGUI.BeginChangeCheck();
 					skeleton.FlipX = EditorGUILayout.ToggleLeft("skeleton.FlipX", skeleton.FlipX);
 					skeleton.FlipY = EditorGUILayout.ToggleLeft("skeleton.FlipY", skeleton.FlipY);
@@ -183,13 +157,20 @@ namespace Spine.Unity.Editor {
 		}
 
 		void UpdateAttachments () {
-			attachmentTable = new Dictionary<Slot, List<Attachment>>();
-			Skin skin = skeleton.Skin ?? skeletonRenderer.skeletonDataAsset.GetSkeletonData(true).DefaultSkin;
+			skeleton = skeletonRenderer.skeleton;
+			Skin defaultSkin = skeleton.Data.DefaultSkin;
+			Skin skin = skeleton.Skin ?? defaultSkin;
+			bool notDefaultSkin = skin != defaultSkin;
+
+			attachmentTable.Clear();
 			for (int i = skeleton.Slots.Count - 1; i >= 0; i--) {
 				var attachments = new List<Attachment>();
-				skin.FindAttachmentsForSlot(i, attachments);
 				attachmentTable.Add(skeleton.Slots.Items[i], attachments);
+				skin.FindAttachmentsForSlot(i, attachments); // Add skin attachments.
+				if (notDefaultSkin) defaultSkin.FindAttachmentsForSlot(i, attachments); // Add default skin attachments.
 			}
+
+			activeSkin = skeleton.Skin;
 		}
 
 //		void SpawnHierarchyButton (string label, string tooltip, SkeletonUtilityBone.Mode mode, bool pos, bool rot, bool sca, params GUILayoutOption[] options) {

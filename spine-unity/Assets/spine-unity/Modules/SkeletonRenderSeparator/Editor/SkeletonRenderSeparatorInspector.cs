@@ -266,7 +266,9 @@ namespace Spine.Unity.Modules {
 		[MenuItem ("CONTEXT/SkeletonRenderer/Add Skeleton Render Separator")]
 		static void AddRenderSeparatorComponent (MenuCommand cmd) {
 			var skeletonRenderer = cmd.context as SkeletonRenderer;
-			skeletonRenderer.gameObject.AddComponent<SkeletonRenderSeparator>();
+			var newComponent = skeletonRenderer.gameObject.AddComponent<SkeletonRenderSeparator>();
+
+			Undo.RegisterCreatedObjectUndo(newComponent, "Add SkeletonRenderSeparator");
 		}
 
 		// Validate

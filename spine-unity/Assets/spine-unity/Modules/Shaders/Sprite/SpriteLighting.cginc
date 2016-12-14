@@ -39,11 +39,9 @@ inline half3 calculateSpriteWorldNormal(VertexInput vertex)
 	//Rotate fixed normal by inverse camera matrix to convert the fixed normal into world space
 	float3x3 invView = transpose((float3x3)UNITY_MATRIX_VP);
 	float3 normal = _FixedNormal.xyz;
-	
 #if UNITY_REVERSED_Z
 	normal.z = -normal.z;
 #endif
-
 	return normalize(mul(invView, normal));
 #endif // !MESH_NORMALS
 }
@@ -83,6 +81,36 @@ inline half3 calculateSpriteWorldBinormal(half3 normalWorld, half3 tangentWorld,
 }
 
 #endif // _NORMALMAP
+
+#if defined(_DIFFUSE_RAMP)
+
+
+////////////////////////////////////////
+// Diffuse ramp functions
+//
+
+//Disable for softer, more traditional diffuse ramping
+#define HARD_DIFFUSE_RAMP
+
+uniform sampler2D _DiffuseRamp;
+
+inline fixed3 calculateDiffuseRamp(float ramp)
+{
+	return tex2D(_DiffuseRamp, float2(ramp, ramp)).rgb;
+}
+
+inline fixed3 calculateRampedDiffuse(fixed3 lightColor, float attenuation, float angleDot)
+{
+	float d = angleDot * 0.5 + 0.5;
+#if defined(HARD_DIFFUSE_RAMP)
+	half3 ramp = calculateDiffuseRamp(d * attenuation * 2);
+	return lightColor * ramp;
+#else
+	half3 ramp = calculateDiffuseRamp(d);
+	return lightColor * ramp * (attenuation * 2);
+#endif
+}
+#endif // _DIFFUSE_RAMP
 
 ////////////////////////////////////////
 // Rim Lighting functions

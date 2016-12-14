@@ -38,6 +38,7 @@ local math_abs = math.abs
 local math_signum = utils.signum
 local math_floor = math.floor
 local math_ceil = math.ceil
+local math_mod = utils.mod
 
 local function zlen(array)
 	return #array + 1
@@ -327,6 +328,7 @@ function AnimationState:apply (skeleton)
 				end
 			end
 			self:queueEvents(current, animationTime)
+			self.events = {};
 			current.nextAnimationLast = animationTime
 			current.nextTrackLast = current.trackTime
 		end
@@ -374,7 +376,8 @@ function AnimationState:applyMixingFrom (entry, skeleton)
 		end
 	end
 
-	self:queueEvents(from, animationTime)
+	if (entry.mixDuration > 0) then 	self:queueEvents(from, animationTime) end
+	self.events = {};
 	from.nextAnimationLast = animationTime
 	from.nextTrackLast = from.trackTime
 
@@ -440,7 +443,7 @@ function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, se
       if math_abs(lastTotal) > 180 then lastTotal = lastTotal + 360 * math_signum(lastTotal) end
       dir = current
     end
-    total = diff + lastTotal - math_ceil(lastTotal / 360 - 0.5) * 360 -- FIXME used to be %360, store loops as part of lastTotal.
+    total = diff + lastTotal - math_mod(lastTotal, 360) -- FIXME used to be %360, store loops as part of lastTotal.
     if dir ~= current then total = total + 360 * math_signum(lastTotal) end
     timelinesRotation[i] = total
   end
@@ -488,7 +491,6 @@ function AnimationState:queueEvents (entry, animationTime)
     end
     i = i + 1
   end
-	self.events = {}
 end
 
 function AnimationState:clearTracks ()
@@ -741,7 +743,7 @@ function AnimationState:setTimelinesFirst (entry)
   end
 end
 
-function AnimationState:checkTimlinesFirst (entry)
+function AnimationState:checkTimelinesFirst (entry)
   if entry.mixingFrom then self:checkTimelinesFirst(entry.mixingFrom) end
   self:checkTimelinesUsage(entry, entry.timelinesFirst)
 end
