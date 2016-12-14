@@ -534,11 +534,20 @@ namespace Spine.Unity {
 				bool mustUpdateRendererMaterials = mustUpdateMeshStructure ||
 					(lastPushedMaterials.Length != submeshCount);
 
+				// Assumption at this point: (lastPushedMaterials.Count == workingSubmeshInstructions.Count == thisSubmeshMaterials.Count == submeshCount)
+
+				// Case: mesh structure or submesh count did not change but materials changed.
 				if (!mustUpdateRendererMaterials) {
 					var workingSubmeshInstructionsItems = workingSubmeshInstructions.Items;
-					for (int i = 0, n = lastPushedMaterials.Length; i < n; i++) {
-						if (lastPushedMaterials[i].GetInstanceID() != workingSubmeshInstructionsItems[i].material.GetInstanceID()) {   // Bounds check is implied above.
+					for (int i = 0; i < submeshCount; i++) {
+						if (lastPushedMaterials[i].GetInstanceID() != workingSubmeshInstructionsItems[i].material.GetInstanceID()) {   // Bounds check is implied by submeshCount above.
 							mustUpdateRendererMaterials = true;
+							{
+								var thisSubmeshMaterials = this.submeshMaterials.Items;
+								if (mustUpdateRendererMaterials)
+									for (int j = 0; j < submeshCount; j++)
+										thisSubmeshMaterials[j] = workingSubmeshInstructionsItems[j].material;
+							}
 							break;
 						}
 					}
