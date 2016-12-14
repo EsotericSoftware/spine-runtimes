@@ -163,7 +163,25 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 		if (attachment->type == SP_ATTACHMENT_REGION) {
 			spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
 			spAtlasRegion* region = (spAtlasRegion*)regionAttachment->rendererObject;
-			UMaterialInstanceDynamic* material = pageToNormalBlendMaterial[region->page];
+			
+			UMaterialInstanceDynamic* material = nullptr;
+			
+			switch(slot->data->blendMode) {
+				case SP_BLEND_MODE_NORMAL:
+					material = pageToNormalBlendMaterial[region->page];
+					break;
+				/*case SP_BLEND_MODE_ADDITIVE:
+					material = pageToAdditiveBlendMaterial[region->page];
+					break;
+				case SP_BLEND_MODE_MULTIPLY:
+					material = pageToMultiplyBlendMaterial[region->page];
+					break;
+				case SP_BLEND_MODE_SCREEN:
+				material = pageToScreenBlendMaterial[region->page];
+					break;*/
+				default:
+					material = pageToNormalBlendMaterial[region->page];
+			}
 
 			if (lastMaterial != material) {
 				Flush(meshSection, vertices, indices, uvs, colors, lastMaterial);
@@ -201,8 +219,6 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 			indices.Add(idx + 3);
 			idx += 4;
 			depthOffset += this->DepthOffset;
-
-			SetMaterial(meshSection, material);
 		} else if (attachment->type == SP_ATTACHMENT_MESH) {
 			spMeshAttachment* mesh = (spMeshAttachment*)attachment;
 			spAtlasRegion* region = (spAtlasRegion*)mesh->rendererObject;
