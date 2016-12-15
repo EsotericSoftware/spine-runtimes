@@ -7,10 +7,6 @@ This Spine Runtime may only be used for personal or internal use, typically to e
 
 The Spine Runtimes are developed with the intent to be used with data exported from Spine. By purchasing Spine, `Section 2` of the [Spine Software License](https://esotericsoftware.com/files/license.txt) grants the right to create and distribute derivative works of the Spine Runtimes.
 
-## 3rd Party Licenses
-
-spine-ue4 includes a copy of [UE4 Runtime Mesh Component](https://github.com/Koderz/UE4RuntimeMeshComponent) by Chris Conway (Koderz), licensed under the [MIT license](https://github.com/Koderz/UE4RuntimeMeshComponent/blob/master/LICENSE).
-
 ## Spine version
 
 spine-ue4 works with data exported from Spine 3.4.02.

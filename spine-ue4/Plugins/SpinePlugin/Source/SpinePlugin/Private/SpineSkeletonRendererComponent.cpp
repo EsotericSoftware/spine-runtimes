@@ -6,7 +6,7 @@
 #define LOCTEXT_NAMESPACE "Spine"
 
 USpineSkeletonRendererComponent::USpineSkeletonRendererComponent (const FObjectInitializer& ObjectInitializer) 
-: URuntimeMeshComponent(ObjectInitializer) {
+: UProceduralMeshComponent(ObjectInitializer) {
 	bWantsBeginPlay = true;
 	PrimaryComponentTick.bCanEverTick = true;
 	bTickInEditor = true;
@@ -132,7 +132,7 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 void USpineSkeletonRendererComponent::Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, UMaterialInstanceDynamic* Material) {
 	if (Vertices.Num() == 0) return;
 	SetMaterial(Idx, Material);
-	CreateMeshSection(Idx, Vertices, Indices, TArray<FVector>(), Uvs, Colors, TArray<FRuntimeMeshTangent>(), false);
+	CreateMeshSection(Idx, Vertices, Indices, TArray<FVector>(), Uvs, Colors, TArray<FProcMeshTangent>(), false);
 	Vertices.SetNum(0);
 	Indices.SetNum(0);
 	Uvs.SetNum(0);
