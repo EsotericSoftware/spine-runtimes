@@ -37,6 +37,10 @@ namespace Spine.Unity.Modules {
 	
 	[RequireComponent(typeof(SkeletonRenderer))]
 	public class SkeletonGhost : MonoBehaviour {
+		// Internal Settings
+		const HideFlags GhostHideFlags = HideFlags.HideInHierarchy;
+		const string GhostingShaderName = "Spine/Special/SkeletonGhost";
+
 		public bool ghostingEnabled = true;
 		public float spawnRate = 0.05f;
 		public Color32 color = new Color32(0xFF, 0xFF, 0xFF, 0x00); // default for additive.
@@ -60,12 +64,11 @@ namespace Spine.Unity.Modules {
 		MeshRenderer meshRenderer;
 		MeshFilter meshFilter;
 
-
-		Dictionary<Material, Material> materialTable = new Dictionary<Material, Material>();
+		readonly Dictionary<Material, Material> materialTable = new Dictionary<Material, Material>();
 
 		void Start () {
 			if (ghostShader == null)
-				ghostShader = Shader.Find("Spine/Special/SkeletonGhost");
+				ghostShader = Shader.Find(GhostingShaderName);
 
 			skeletonRenderer = GetComponent<SkeletonRenderer>();
 			meshFilter = GetComponent<MeshFilter>();
@@ -76,12 +79,11 @@ namespace Spine.Unity.Modules {
 				GameObject go = new GameObject(gameObject.name + " Ghost", typeof(SkeletonGhostRenderer));
 				pool[i] = go.GetComponent<SkeletonGhostRenderer>();
 				go.SetActive(false);
-				go.hideFlags = HideFlags.HideInHierarchy;
+				go.hideFlags = GhostHideFlags;
 			}
 
-			if (skeletonRenderer is SkeletonAnimation)
-				((SkeletonAnimation)skeletonRenderer).state.Event += OnEvent;
-
+			var skeletonAnimation = skeletonRenderer as Spine.Unity.IAnimationStateComponent;
+			if (skeletonAnimation != null) skeletonAnimation.AnimationState.Event += OnEvent;
 		}
 
 		//SkeletonAnimation
@@ -91,13 +93,13 @@ namespace Spine.Unity.Modules {
 		 *	String Value:	Pass RGBA hex color values in to set the color property.  IE:   "A0FF8BFF"
 		 */
 		void OnEvent (Spine.TrackEntry trackEntry, Spine.Event e) {
-			if (e.Data.Name == "Ghosting") {
+			if (e.Data.Name.Equals("Ghosting", System.StringComparison.Ordinal)) {
 				ghostingEnabled = e.Int > 0;
 				if (e.Float > 0)
 					spawnRate = e.Float;
-				if (e.String != null) {
+				
+				if (!string.IsNullOrEmpty(e.stringValue))
 					this.color = HexToColor(e.String);
-				}
 			}
 		}
 
@@ -153,15 +155,12 @@ namespace Spine.Unity.Modules {
 		}
 
 		void OnDestroy () {
-			for (int i = 0; i < maximumGhosts; i++) {
-				if (pool[i] != null)
-					pool[i].Cleanup();
-			}
+			for (int i = 0; i < maximumGhosts; i++)
+				if (pool[i] != null) pool[i].Cleanup();
 
 			foreach (var mat in materialTable.Values)
 				Destroy(mat);
 		}
-
 
 		//based on UnifyWiki  http://wiki.unity3d.com/index.php?title=HexConverter
 		static Color32 HexToColor (string hex) {
