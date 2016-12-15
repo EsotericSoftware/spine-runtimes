@@ -10,7 +10,7 @@
 	"DocsURL" : "",
 	"MarketplaceURL" : "",
 	"SupportURL" : "",
-	"EnabledByDefault" : false,
+	"EnabledByDefault" : true,
 	"CanContainContent" : true,
 	"IsBetaVersion" : false,
 	"Installed" : false,
@@ -19,7 +19,7 @@
 		{
 			"Name" : "SpinePlugin",
 			"Type" : "Runtime",
-			"LoadingPhase" : "PreDefault"
+			"LoadingPhase" : "PreDefault"			
 		},
 		{
 			"Name" : "SpineEditorPlugin",
