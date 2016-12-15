@@ -118,7 +118,7 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 					UTexture* oldTexture = nullptr;
 					
 					UMaterialInstanceDynamic* current = atlasNormalBlendMaterials[i];
-					if(!current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
+					if(!current || !current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
 						UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(NormalBlendMaterial, owner);
 						material->SetTextureParameterValue(TextureParameterName, texture);
 						atlasNormalBlendMaterials[i] = material;
@@ -126,7 +126,7 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 					pageToNormalBlendMaterial.Add(currPage, atlasNormalBlendMaterials[i]);
 					
 					current = atlasAdditiveBlendMaterials[i];
-					if(!current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
+					if(!current || !current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
 						UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(AdditiveBlendMaterial, owner);
 						material->SetTextureParameterValue(TextureParameterName, texture);
 						atlasAdditiveBlendMaterials[i] = material;
@@ -134,7 +134,7 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 					pageToAdditiveBlendMaterial.Add(currPage, atlasAdditiveBlendMaterials[i]);
 					
 					current = atlasMultiplyBlendMaterials[i];
-					if(!current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
+					if(!current || !current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
 						UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(MultiplyBlendMaterial, owner);
 						material->SetTextureParameterValue(TextureParameterName, texture);
 						atlasMultiplyBlendMaterials[i] = material;
@@ -142,7 +142,7 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 					pageToMultiplyBlendMaterial.Add(currPage, atlasMultiplyBlendMaterials[i]);
 					
 					current = atlasScreenBlendMaterials[i];
-					if(!current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
+					if(!current || !current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
 						UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(ScreenBlendMaterial, owner);
 						material->SetTextureParameterValue(TextureParameterName, texture);
 						atlasScreenBlendMaterials[i] = material;
