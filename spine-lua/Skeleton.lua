@@ -110,6 +110,7 @@ end
 function Skeleton:updateCache ()
 	local updateCache = {}
 	self._updateCache = updateCache
+	self.updateCacheReset = {}
 
 	local bones = self.bones
 	for i, bone in ipairs(bones) do
