@@ -79,9 +79,27 @@ namespace Spine.Unity.Editor {
 		GUIStyle activePlayButtonStyle, idlePlayButtonStyle;
 		readonly GUIContent DefaultMixLabel = new GUIContent("Default Mix Duration", "Sets 'SkeletonDataAsset.defaultMix' in the asset and 'AnimationState.data.defaultMix' at runtime load time.");
 
-
 		void OnEnable () {
 			SpineEditorUtilities.ConfirmInitialization();
+			m_skeletonDataAsset = (SkeletonDataAsset)target;
+
+			// Clear empty atlas array items.
+			{
+				bool hasNulls = false;
+				foreach (var a in m_skeletonDataAsset.atlasAssets) {
+					if (a == null) {
+						hasNulls = true;
+						break;
+					}
+				}
+				if (hasNulls) {
+					var trimmedAtlasAssets = new List<AtlasAsset>();
+					foreach (var a in m_skeletonDataAsset.atlasAssets) {
+						if (a != null) trimmedAtlasAssets.Add(a);
+					}
+					m_skeletonDataAsset.atlasAssets = trimmedAtlasAssets.ToArray();
+				}
+			}
 
 			atlasAssets = serializedObject.FindProperty("atlasAssets");
 			skeletonJSON = serializedObject.FindProperty("skeletonJSON");
@@ -106,7 +124,6 @@ namespace Spine.Unity.Editor {
 			isBakingExpanded = EditorPrefs.GetBool(ShowBakingPrefsKey, false);
 			#endif
 
-			m_skeletonDataAsset = (SkeletonDataAsset)target;
 			m_skeletonDataAssetGUID = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(m_skeletonDataAsset));
 			EditorApplication.update += EditorUpdate;
 			m_skeletonData = m_skeletonDataAsset.GetSkeletonData(false);
@@ -125,7 +142,6 @@ namespace Spine.Unity.Editor {
 
 		override public void OnInspectorGUI () {
 			{ 
-				
 				// Lazy initialization because accessing EditorStyles values in OnEnable during a recompile causes UnityEditor to throw null exceptions. (Unity 5.3.5)
 				idlePlayButtonStyle = idlePlayButtonStyle ?? new GUIStyle(EditorStyles.miniButton);
 				if (activePlayButtonStyle == null) {
@@ -207,7 +223,6 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.Space();
 				DrawSlotList();
 				EditorGUILayout.Space();
-
 				DrawUnityTools();
 			} else {
 				#if !SPINE_TK2D
@@ -483,10 +498,6 @@ namespace Spine.Unity.Editor {
 							icon = Icons.warning;
 						//JOHN: left todo: Icon for paths. Generic icon for unidentified attachments.
 
-						// MITCH: left todo:  Waterboard Nate
-						//if (name != attachment.Name)
-						//icon = SpineEditorUtilities.Icons.skinPlaceholder;
-
 						bool initialState = slot.Attachment == attachment;
 
 						bool toggled = EditorGUILayout.ToggleLeft(new GUIContent(attachmentName, icon), slot.Attachment == attachment);
@@ -606,11 +617,12 @@ namespace Spine.Unity.Editor {
 			if (this.m_previewUtility == null) {
 				this.m_lastTime = Time.realtimeSinceStartup;
 				this.m_previewUtility = new PreviewRenderUtility(true);
-				this.m_previewUtility.m_Camera.orthographic = true;
-				this.m_previewUtility.m_Camera.orthographicSize = 1;
-				this.m_previewUtility.m_Camera.cullingMask = -2147483648;
-				this.m_previewUtility.m_Camera.nearClipPlane = 0.01f;
-				this.m_previewUtility.m_Camera.farClipPlane = 1000f;
+				var c = this.m_previewUtility.m_Camera;
+				c.orthographic = true;
+				c.orthographicSize = 1;
+				c.cullingMask = -2147483648;
+				c.nearClipPlane = 0.01f;
+				c.farClipPlane = 1000f;
 				this.CreatePreviewInstances();
 			}
 		}
