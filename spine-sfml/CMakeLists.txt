@@ -3,8 +3,8 @@
 #
 set(DEPS_DIR "${CMAKE_CURRENT_LIST_DIR}/dependencies/")
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(SFML_URL "http://www.sfml-dev.org/files/SFML-2.3.2-osx-clang-universal.tar.gz")
-    set(SFML_DIR ${DEPS_DIR}/SFML-2.3.2-osx-clang-universal)
+    set(SFML_URL "http://www.sfml-dev.org/files/SFML-2.4.1-osx-clang.tar.gz")
+    set(SFML_DIR ${DEPS_DIR}/SFML-2.4.1-osx-clang)
 	if (NOT EXISTS "${SFML_DIR}")
 		message("Downloading SFML for Mac OS X")
 		file(DOWNLOAD "${SFML_URL}" "${DEPS_DIR}/sfml.tar.gz")
