@@ -13,7 +13,7 @@ SpineEventMonitor::SpineEventMonitor(spAnimationState* _pAnimationState /*= null
 
 SpineEventMonitor::~SpineEventMonitor()
 {
-	pAnimState = nullptr;
+	pAnimState = 0;
 }
 
 void SpineEventMonitor::RegisterListener(spAnimationState * _pAnimationState)
@@ -28,7 +28,7 @@ void SpineEventMonitor::RegisterListener(spAnimationState * _pAnimationState)
 bool SpineEventMonitor::isAnimationPlaying()
 {
 	if (pAnimState) 
-		return spAnimationState_getCurrent(pAnimState, 0) != nullptr;
+		return spAnimationState_getCurrent(pAnimState, 0) != 0;
 	return false;
 }
 
@@ -42,7 +42,7 @@ void SpineEventMonitor::spineAnimStateHandler(spAnimationState * state, int type
 
 void SpineEventMonitor::OnSpineAnimationStateEvent(spAnimationState * state, int type, spTrackEntry * trackEntry, spEvent * event)
 {
-	const char* eventName = nullptr;
+	const char* eventName = 0;
 	if (state == pAnimState) { // only monitor ours
 		switch(type)
 		{
@@ -135,7 +135,7 @@ inline bool InterruptMonitor::InterruptEvent::matches(spAnimationState * state, 
 	if (mEventType == type) {
 
 		// Looking for specific TrackEntry by pointer
-		if (mTrackEntry != nullptr) {
+		if (mTrackEntry != 0) {
 			return mTrackEntry == trackEntry;
 		}
 

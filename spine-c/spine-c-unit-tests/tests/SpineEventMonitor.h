@@ -25,7 +25,7 @@ typedef struct spEvent spEvent;
 class SpineEventMonitor
 {
 public:
-	SpineEventMonitor(spAnimationState* _pAnimationState = nullptr);
+	SpineEventMonitor(spAnimationState* _pAnimationState = 0);
 	virtual ~SpineEventMonitor();
 
 	void RegisterListener(spAnimationState* _pAnimationState);
@@ -58,7 +58,7 @@ private:
 	{
 		InterruptEvent() {
 			mEventType = -1; // invalid
-			mTrackEntry = nullptr;
+			mTrackEntry = 0;
 		}
 
 		bool matches(spAnimationState* state, int type, spTrackEntry* trackEntry, spEvent* event);
@@ -72,7 +72,7 @@ private:
 
 
 public:
-	InterruptMonitor(spAnimationState* _pAnimationState = nullptr);
+	InterruptMonitor(spAnimationState* _pAnimationState = 0);
 	~InterruptMonitor() {}
 
 	virtual bool isAnimationPlaying() override;

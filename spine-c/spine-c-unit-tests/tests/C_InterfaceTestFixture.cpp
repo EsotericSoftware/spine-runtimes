@@ -27,10 +27,10 @@ void C_InterfaceTestFixture::tearDown()
 
 static spSkeletonData* readSkeletonJsonData(const char* filename, spAtlas* atlas) {
 	spSkeletonJson* json = spSkeletonJson_create(atlas);
-	ASSERT(json != nullptr);
+	ASSERT(json != 0);
 
 	spSkeletonData* skeletonData = spSkeletonJson_readSkeletonDataFile(json, filename);
-	ASSERT(skeletonData != nullptr);
+	ASSERT(skeletonData != 0);
 
 	spSkeletonJson_dispose(json);
 	return skeletonData;
@@ -54,22 +54,22 @@ static void testRunner(const char* jsonName, const char* atlasName)
 	///////////////////////////////////////////////////////////////////////////
 	// Global Animation Information
 	spAtlas* atlas = spAtlas_createFromFile(atlasName, 0);
-	ASSERT(atlas != nullptr);
+	ASSERT(atlas != 0);
 
 	spSkeletonData* skeletonData = readSkeletonJsonData(jsonName, atlas);
-	ASSERT(skeletonData != nullptr);
+	ASSERT(skeletonData != 0);
 
 	spAnimationStateData* stateData = spAnimationStateData_create(skeletonData);
-	ASSERT(stateData != nullptr);
+	ASSERT(stateData != 0);
 	stateData->defaultMix = 0.2f; // force mixing
 
 	///////////////////////////////////////////////////////////////////////////
 	// Animation Instance 
 	spSkeleton* skeleton = spSkeleton_create(skeletonData);
-	ASSERT(skeleton != nullptr);
+	ASSERT(skeleton != 0);
 
 	spAnimationState* state = spAnimationState_create(stateData);
-	ASSERT(state != nullptr);
+	ASSERT(state != 0);
 
 
 	///////////////////////////////////////////////////////////////////////////
