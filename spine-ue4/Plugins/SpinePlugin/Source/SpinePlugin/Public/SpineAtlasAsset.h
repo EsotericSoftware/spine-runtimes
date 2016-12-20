@@ -41,7 +41,7 @@ class SPINEPLUGIN_API USpineAtlasAsset: public UObject {
 public:
 	spAtlas* GetAtlas (bool ForceReload = false);
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<UTexture2D*> atlasPages;
 	
 	FString GetRawData () const;
