@@ -45,7 +45,7 @@ bool USpineSkeletonComponent::SetSkin(const FString& skinName) {
 	else return false;
 }
 
-bool USpineSkeletonComponent::setAttachment (const FString& slotName, const FString& attachmentName) {
+bool USpineSkeletonComponent::SetAttachment (const FString& slotName, const FString& attachmentName) {
 	CheckState();
 	if (skeleton) return spSkeleton_setAttachment(skeleton, TCHAR_TO_UTF8(*slotName), TCHAR_TO_UTF8(*attachmentName)) != 0;
 	return false;

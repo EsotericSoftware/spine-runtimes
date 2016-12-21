@@ -84,115 +84,115 @@ public:
 	void SetTrackEntry (spTrackEntry* entry);
 	spTrackEntry* GetTrackEntry();
 	
-	UFUNCTION(BlueprintCallable, Category="Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	int GetTrackIndex () { return entry ? entry->trackIndex : 0; }
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	bool GetLoop () { return entry ? entry->loop != 0 : false; }
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetLoop (bool loop) { if (entry) entry->loop = loop ? 1 : 0; }
 	
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	float GetEventThreshold () { return entry ? entry->eventThreshold : 0; }
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetEventThreshold(float eventThreshold) { if (entry) entry->eventThreshold = eventThreshold; }
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	float GetAttachmentThreshold() { return entry ? entry->attachmentThreshold : 0; }
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetAttachmentThreshold(float attachmentThreshold) { if (entry) entry->attachmentThreshold = attachmentThreshold; }
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	float GetDrawOrderThreshold() { return entry ? entry->drawOrderThreshold : 0; }
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetDrawOrderThreshold(float drawOrderThreshold) { if (entry) entry->drawOrderThreshold = drawOrderThreshold; }
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	float GetAnimationStart() { return entry ? entry->animationStart : 0; }
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetAnimationStart(float animationStart) { if (entry) entry->animationStart = animationStart; }
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	float GetAnimationEnd() { return entry ? entry->animationEnd : 0; }
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetAnimationEnd(float animationEnd) { if (entry) entry->animationEnd = animationEnd; }
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	float GetAnimationLast() { return entry ? entry->animationLast : 0; }
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetAnimationLast(float animationLast) { if (entry) entry->animationLast = animationLast; }
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	float GetNextAnimationLast() { return entry ? entry->nextAnimationLast : 0; }
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetNextAnimationLast(float nextAnimationLast) { if (entry) entry->nextAnimationLast = nextAnimationLast; }
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	float GetDelay() { return entry ? entry->delay : 0; }
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetDelay(float delay) { if (entry) entry->delay = delay; }
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	float GetTrackTime() { return entry ? entry->trackTime : 0; }
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetTrackTime(float trackTime) { if (entry) entry->trackTime = trackTime; }
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	float GetTrackLast() { return entry ? entry->trackLast : 0; }
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetTrackLast(float trackLast) { if (entry) entry->trackLast = trackLast; }
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	float GetNextTrackLast() { return entry ? entry->nextTrackLast : 0; }
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetNextTrackLast(float nextTrackLast) { if (entry) entry->nextTrackLast = nextTrackLast; }
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	float GetTrackEnd() { return entry ? entry->trackEnd : 0; }
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetTrackEnd(float trackEnd) { if (entry) entry->trackEnd = trackEnd; }
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	float GetTimeScale() { return entry ? entry->timeScale : 0; }
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetTimeScale(float timeScale) { if (entry) entry->timeScale = timeScale; }
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	float GetAlpha() { return entry ? entry->alpha : 0; }
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetAlpha(float alpha) { if (entry) entry->alpha = alpha; }
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	float GetMixTime() { return entry ? entry->mixTime : 0; }
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetMixTime(float mixTime) { if (entry) entry->mixTime = mixTime; }
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	float GetMixDuration() { return entry ? entry->mixDuration : 0; }
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetMixDuration(float mixDuration) { if (entry) entry->mixDuration = mixDuration; }
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	float GetMixAlpha() { return entry ? entry->mixAlpha : 0; }
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetMixAlpha(float mixAlpha) { if (entry) entry->mixAlpha = mixAlpha; }	
 
-	UPROPERTY(BlueprintAssignable, Category = "Components|Spine")
+	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|TrackEntry")
 	FSpineAnimationStartDelegate AnimationStart;
 
-	UPROPERTY(BlueprintAssignable, Category = "Components|Spine")
+	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|TrackEntry")
 	FSpineAnimationInterruptDelegate AnimationInterrupt;
 
-	UPROPERTY(BlueprintAssignable, Category = "Components|Spine")
+	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|TrackEntry")
 	FSpineAnimationEventDelegate AnimationEvent;
 
-	UPROPERTY(BlueprintAssignable, Category = "Components|Spine")
+	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|TrackEntry")
 	FSpineAnimationCompleteDelegate AnimationComplete;
 
-	UPROPERTY(BlueprintAssignable, Category = "Components|Spine")
+	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|TrackEntry")
 	FSpineAnimationEndDelegate AnimationEnd;
 
-	UPROPERTY(BlueprintAssignable, Category = "Components|Spine")
+	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|TrackEntry")
 	FSpineAnimationDisposeDelegate AnimationDispose;
 
 protected:
@@ -216,49 +216,49 @@ public:
 	virtual void FinishDestroy () override;
 	
 	// Blueprint functions
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|Animation")
 	void SetTimeScale(float timeScale);
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|Animation")
 	float GetTimeScale();
 
-	UFUNCTION(BlueprintCallable, Category="Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|Animation")
 	UTrackEntry* SetAnimation (int trackIndex, FString animationName, bool loop);
 	
-	UFUNCTION(BlueprintCallable, Category="Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|Animation")
 	UTrackEntry* AddAnimation (int trackIndex, FString animationName, bool loop, float delay);
 	
-	UFUNCTION(BlueprintCallable, Category="Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|Animation")
 	UTrackEntry* SetEmptyAnimation (int trackIndex, float mixDuration);
 	
-	UFUNCTION(BlueprintCallable, Category="Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|Animation")
 	UTrackEntry* AddEmptyAnimation (int trackIndex, float mixDuration, float delay);
 	
-	UFUNCTION(BlueprintCallable, Category="Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|Animation")
 	UTrackEntry* GetCurrent (int trackIndex);
 	
-	UFUNCTION(BlueprintCallable, Category="Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|Animation")
 	void ClearTracks ();
 	
-	UFUNCTION(BlueprintCallable, Category="Components|Spine")
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|Animation")
 	void ClearTrack (int trackIndex);
 	
-	UPROPERTY(BlueprintAssignable, Category = "Components|Spine")
+	UPROPERTY(BlueprintAssignable, Category="Components|Spine|Animation")
 	FSpineAnimationStartDelegate AnimationStart;
 
-	UPROPERTY(BlueprintAssignable, Category = "Components|Spine")
+	UPROPERTY(BlueprintAssignable, Category="Components|Spine|Animation")
 	FSpineAnimationInterruptDelegate AnimationInterrupt;
 
-	UPROPERTY(BlueprintAssignable, Category = "Components|Spine")
+	UPROPERTY(BlueprintAssignable, Category="Components|Spine|Animation")
 	FSpineAnimationEventDelegate AnimationEvent;
 
-	UPROPERTY(BlueprintAssignable, Category = "Components|Spine")
+	UPROPERTY(BlueprintAssignable, Category="Components|Spine|Animation")
 	FSpineAnimationCompleteDelegate AnimationComplete;
 
-	UPROPERTY(BlueprintAssignable, Category = "Components|Spine")
+	UPROPERTY(BlueprintAssignable, Category="Components|Spine|Animation")
 	FSpineAnimationEndDelegate AnimationEnd;
 
-	UPROPERTY(BlueprintAssignable, Category = "Components|Spine")
+	UPROPERTY(BlueprintAssignable, Category="Components|Spine|Animation")
 	FSpineAnimationDisposeDelegate AnimationDispose;
 	
 	// used in C event callback. Needs to be public as we can't call

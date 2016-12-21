@@ -53,46 +53,46 @@ public:
 	
 	spSkeleton* GetSkeleton () { return skeleton; };
 	
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	bool SetSkin (const FString& SkinName);
 	
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
-	bool setAttachment (const FString& slotName, const FString& attachmentName);
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	bool SetAttachment (const FString& slotName, const FString& attachmentName);
 	
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	FTransform GetBoneWorldTransform (const FString& BoneName);
 	
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	void SetBoneWorldPosition (const FString& BoneName, const FVector& position);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	void UpdateWorldTransform();
 	
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	void SetToSetupPose ();
 	
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	void SetBonesToSetupPose ();
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
-	void UpdateWorldTransform ();
-	
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
-	void SetSlotsToSetupPose ();
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	void SetSlotsToSetupPose();
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	void SetFlipX(bool flipX);
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	bool GetFlipX();
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	void SetFlipY(bool flipY);
 
-	UFUNCTION(BlueprintCallable, Category = "Components|Spine")
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	bool GetFlipY();
 	
-	UPROPERTY(BlueprintAssignable, Category = "Components|Spine")
+	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|Skeleton")
 	FSpineBeforeUpdateWorldTransformDelegate BeforeUpdateWorldTransform;
 	
-	UPROPERTY(BlueprintAssignable, Category = "Components|Spine")
+	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|Skeleton")
 	FSpineAfterUpdateWorldTransformDelegate AfterUpdateWorldTransform;
 		
 	USpineSkeletonComponent ();
