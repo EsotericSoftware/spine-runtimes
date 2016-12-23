@@ -482,24 +482,8 @@ namespace Spine.Unity.Editor {
 					for (int a = 0; a < slotAttachments.Count; a++) {
 						Attachment attachment = slotAttachments[a];
 						string attachmentName = slotAttachmentNames[a];
-
-						Texture2D icon = null;
-						var type = attachment.GetType();
-
-						if (type == typeof(RegionAttachment))
-							icon = Icons.image;
-						else if (type == typeof(MeshAttachment))
-							icon = Icons.mesh;
-						else if (type == typeof(BoundingBoxAttachment))
-							icon = Icons.boundingBox;
-						else if (type == typeof(PathAttachment))
-							icon = Icons.boundingBox;
-						else
-							icon = Icons.warning;
-						//JOHN: left todo: Icon for paths. Generic icon for unidentified attachments.
-
+						Texture2D icon = Icons.GetAttachmentIcon(attachment);
 						bool initialState = slot.Attachment == attachment;
-
 						bool toggled = EditorGUILayout.ToggleLeft(new GUIContent(attachmentName, icon), slot.Attachment == attachment);
 
 						if (!defaultSkinAttachmentNames.Contains(attachmentName)) {
@@ -526,7 +510,7 @@ namespace Spine.Unity.Editor {
 			if (skeletonJSON.objectReferenceValue == null) {
 				warnings.Add("Missing Skeleton JSON");
 			} else {
-				if (SpineEditorUtilities.IsValidSpineData((TextAsset)skeletonJSON.objectReferenceValue) == false) {
+				if (SpineEditorUtilities.IsSpineData((TextAsset)skeletonJSON.objectReferenceValue) == false) {
 					warnings.Add("Skeleton data file is not a valid JSON or binary file.");
 				} else {
 					#if !SPINE_TK2D

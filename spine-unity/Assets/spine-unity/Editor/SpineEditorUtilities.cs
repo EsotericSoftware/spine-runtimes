@@ -62,6 +62,7 @@ namespace Spine.Unity.Editor {
 			public static Texture2D boundingBox;
 			public static Texture2D mesh;
 			public static Texture2D weights;
+			public static Texture2D path;
 			public static Texture2D skin;
 			public static Texture2D skinsRoot;
 			public static Texture2D animation;
@@ -100,9 +101,24 @@ namespace Spine.Unity.Editor {
 				skeletonUtility = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-skeletonUtility.png");
 				hingeChain = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-hingeChain.png");
 				subMeshRenderer = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-subMeshRenderer.png");
+				path = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-path.png");
 
 				unityIcon = EditorGUIUtility.FindTexture("SceneAsset Icon");
 				controllerIcon = EditorGUIUtility.FindTexture("AnimatorController Icon");
+			}
+
+			public static Texture2D GetAttachmentIcon (Attachment attachment) {
+				if (attachment is RegionAttachment)
+					return Icons.image;
+				// Analysis disable once CanBeReplacedWithTryCastAndCheckForNull
+				else if (attachment is MeshAttachment)
+					return ((MeshAttachment)attachment).IsWeighted() ? Icons.weights : Icons.mesh;
+				else if (attachment is BoundingBoxAttachment)
+					return Icons.boundingBox;
+				else if (attachment is PathAttachment)
+					return Icons.path;
+				else
+					return Icons.warning;
 			}
 		}
 
@@ -551,12 +567,12 @@ namespace Spine.Unity.Editor {
 					imagePaths.Add(str);
 					break;
 				case ".json":
-					if (IsValidSpineData((TextAsset)AssetDatabase.LoadAssetAtPath(str, typeof(TextAsset))))
+					if (IsSpineData((TextAsset)AssetDatabase.LoadAssetAtPath(str, typeof(TextAsset))))
 						skeletonPaths.Add(str);
 					break;
 				case ".bytes":
 					if (str.ToLower().EndsWith(".skel.bytes", System.StringComparison.Ordinal)) {
-						if (IsValidSpineData((TextAsset)AssetDatabase.LoadAssetAtPath(str, typeof(TextAsset))))
+						if (IsSpineData((TextAsset)AssetDatabase.LoadAssetAtPath(str, typeof(TextAsset))))
 							skeletonPaths.Add(str);
 					}
 					break;
@@ -602,7 +618,7 @@ namespace Spine.Unity.Editor {
 
 						switch (result) {
 						case -1:
-							Debug.Log("Select Atlas");
+							//Debug.Log("Select Atlas");
 							AtlasAsset selectedAtlas = GetAtlasDialog(Path.GetDirectoryName(sp));
 							if (selectedAtlas != null) {
 								localAtlases.Clear();
@@ -1167,37 +1183,52 @@ namespace Spine.Unity.Editor {
 			return false;
 		}
 
-		public static bool IsValidSpineData (TextAsset asset) {
-			if (asset.name.Contains(".skel")) return true;
+		public static bool IsSpineData (TextAsset asset) {
+			bool isSpineData = false;
+			string rawVersion = null;
 
-			object obj = null;
-			obj = Json.Deserialize(new StringReader(asset.text));
+			if (asset.name.Contains(".skel")) {
+				try {
+					rawVersion = SkeletonBinary.GetVersionString(new MemoryStream(asset.bytes));
+					//Debug.Log(rawVersion);
+				} catch (System.Exception e) {
+					Debug.LogErrorFormat("Failed to read '{0}'. It is likely not a binary Spine SkeletonData file.\n{1}", asset.name, e);
+					return false;
+				}
+			} else {
+				var obj = Json.Deserialize(new StringReader(asset.text));
+				if (obj == null) {
+					Debug.LogErrorFormat("'{0}' is not valid JSON.", asset.name);
+					return false;
+				}
 
-			if (obj == null) {
-				Debug.LogError("Is not valid JSON.");
-				return false;
+				var root = obj as Dictionary<string, object>;
+				if (root == null) {
+					Debug.LogError("Parser returned an incorrect type.");
+					return false;
+				}
+
+				isSpineData = root.ContainsKey("skeleton");
+				if (isSpineData) {
+					var skeletonInfo = (Dictionary<string, object>)root["skeleton"];
+					object jv;
+					skeletonInfo.TryGetValue("spine", out jv);
+					rawVersion = jv as string;
+				}
 			}
-
-			var root = obj as Dictionary<string, object>;
-			if (root == null) {
-				Debug.LogError("Parser returned an incorrect type.");
-				return false;
-			}
-
-			bool isSpineJson = root.ContainsKey("skeleton");
 
 			// Version warning
-			if (isSpineJson) {
-				var skeletonInfo = (Dictionary<string, object>)root["skeleton"];
-				object jv;
-				skeletonInfo.TryGetValue("spine", out jv);
-				string jsonVersion = jv as string;
-				if (!string.IsNullOrEmpty(jsonVersion)) {
-					string[] jsonVersionSplit = jsonVersion.Split('.');
+			{
+				string runtimeVersion = compatibleVersions[0][0] + "." + compatibleVersions[0][1];
+
+				if (string.IsNullOrEmpty(rawVersion)) {
+					Debug.LogWarningFormat("Skeleton '{0}' has no version information. It may be incompatible with your runtime version: spine-unity v{1}", asset.name, runtimeVersion);
+				} else {
+					string[] versionSplit = rawVersion.Split('.');
 					bool match = false;
 					foreach (var version in compatibleVersions) {
-						bool primaryMatch = version[0] == int.Parse(jsonVersionSplit[0]);
-						bool secondaryMatch = version[1] == int.Parse(jsonVersionSplit[1]);
+						bool primaryMatch = version[0] == int.Parse(versionSplit[0]);
+						bool secondaryMatch = version[1] == int.Parse(versionSplit[1]);
 
 						// if (isFixVersionRequired) secondaryMatch &= version[2] <= int.Parse(jsonVersionSplit[2]);
 
@@ -1207,16 +1238,12 @@ namespace Spine.Unity.Editor {
 						}
 					}
 
-					if (!match) {
-						string runtimeVersion = compatibleVersions[0][0] + "." + compatibleVersions[0][1];
-						Debug.LogWarning(string.Format("Skeleton '{0}' (exported with Spine {1}) may be incompatible with your runtime version: spine-unity v{2}", asset.name, jsonVersion, runtimeVersion));
-					}
-				} else {
-					isSpineJson = false;
+					if (!match)
+						Debug.LogWarningFormat("Skeleton '{0}' (exported with Spine {1}) may be incompatible with your runtime version: spine-unity v{2}", asset.name, rawVersion, runtimeVersion);
 				}
 			}
-				
-			return isSpineJson;
+
+			return isSpineData;
 		}
 		#endregion
 
@@ -1433,6 +1460,25 @@ namespace Spine.Unity.Editor {
 
 		public static string GetPathSafeRegionName (AtlasRegion region) {
 			return region.name.Replace("/", "_");
+		}
+
+		internal static int ReadVarint (Stream input, bool optimizePositive) {
+			int b = input.ReadByte();
+			int result = b & 0x7F;
+			if ((b & 0x80) != 0) {
+				b = input.ReadByte();
+				result |= (b & 0x7F) << 7;
+				if ((b & 0x80) != 0) {
+					b = input.ReadByte();
+					result |= (b & 0x7F) << 14;
+					if ((b & 0x80) != 0) {
+						b = input.ReadByte();
+						result |= (b & 0x7F) << 21;
+						if ((b & 0x80) != 0) result |= (input.ReadByte() & 0x7F) << 28;
+					}
+				}
+			}
+			return optimizePositive ? result : ((result >> 1) ^ -(result & 1));
 		}
 	}
 

@@ -130,7 +130,7 @@ namespace Spine.Unity.Editor {
 								foreach (var attachment in pair.Value) {
 									GUI.contentColor = slot.Attachment == attachment ? Color.white : Color.grey;
 									EditorGUI.indentLevel = baseIndent + 2;
-									var icon = (attachment is MeshAttachment) ? Icons.mesh : Icons.image;
+									var icon = Icons.GetAttachmentIcon(attachment);
 									bool isAttached = (attachment == slot.Attachment);
 									bool swap = EditorGUILayout.ToggleLeft(new GUIContent(attachment.Name, icon), attachment == slot.Attachment);
 									if (isAttached != swap) {

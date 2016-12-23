@@ -194,7 +194,6 @@ namespace Spine.Unity {
 		}
 
 		public void RegisterConstraint (SkeletonUtilityConstraint constraint) {
-
 			if (utilityConstraints.Contains(constraint))
 				return;
 			else {

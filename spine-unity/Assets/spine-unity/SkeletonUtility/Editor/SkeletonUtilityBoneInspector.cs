@@ -36,6 +36,8 @@ using System.Collections.Generic;
 using Spine;
 
 namespace Spine.Unity.Editor {
+	using Icons = SpineEditorUtilities.Icons;
+
 	[CustomEditor(typeof(SkeletonUtilityBone)), CanEditMultipleObjects]
 	public class SkeletonUtilityBoneInspector : UnityEditor.Editor {
 		SerializedProperty mode, boneName, zPosition, position, rotation, scale, overrideAlpha, parentReference;
@@ -162,11 +164,11 @@ namespace Spine.Unity.Editor {
 			using (new GUILayout.HorizontalScope()) {
 				EditorGUILayout.Space();
 				using (new EditorGUI.DisabledGroupScope(multiObject || !utilityBone.valid || utilityBone.bone == null || utilityBone.bone.Children.Count == 0)) {
-					if (GUILayout.Button(new GUIContent("Add Child", SpineEditorUtilities.Icons.bone), GUILayout.MinWidth(120), GUILayout.Height(24)))
+					if (GUILayout.Button(new GUIContent("Add Child", Icons.bone), GUILayout.MinWidth(120), GUILayout.Height(24)))
 						BoneSelectorContextMenu("", utilityBone.bone.Children, "<Recursively>", SpawnChildBoneSelected);
 				}
 				using (new EditorGUI.DisabledGroupScope(multiObject || !utilityBone.valid || utilityBone.bone == null || containsOverrides)) {
-					if (GUILayout.Button(new GUIContent("Add Override", SpineEditorUtilities.Icons.poseBones), GUILayout.MinWidth(120), GUILayout.Height(24)))
+					if (GUILayout.Button(new GUIContent("Add Override", Icons.poseBones), GUILayout.MinWidth(120), GUILayout.Height(24)))
 						SpawnOverride();
 				}
 				EditorGUILayout.Space();
@@ -175,14 +177,14 @@ namespace Spine.Unity.Editor {
 			using (new GUILayout.HorizontalScope()) {
 				EditorGUILayout.Space();
 				using (new EditorGUI.DisabledGroupScope(multiObject || !utilityBone.valid || !canCreateHingeChain)) {
-					if (GUILayout.Button(new GUIContent("Create Hinge Chain", SpineEditorUtilities.Icons.hingeChain), GUILayout.Width(150), GUILayout.Height(24)))
+					if (GUILayout.Button(new GUIContent("Create Hinge Chain", Icons.hingeChain), GUILayout.Width(150), GUILayout.Height(24)))
 						CreateHingeChain();
 				}
 				EditorGUILayout.Space();
 			}
 
 			using (new EditorGUI.DisabledGroupScope(multiObject || boundingBoxTable.Count == 0)) {
-				EditorGUILayout.LabelField(new GUIContent("Bounding Boxes", SpineEditorUtilities.Icons.boundingBox), EditorStyles.boldLabel);
+				EditorGUILayout.LabelField(new GUIContent("Bounding Boxes", Icons.boundingBox), EditorStyles.boldLabel);
 
 				foreach (var entry in boundingBoxTable){
 					Slot slot = entry.Key;
