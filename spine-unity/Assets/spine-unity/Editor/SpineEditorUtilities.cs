@@ -1461,25 +1461,6 @@ namespace Spine.Unity.Editor {
 		public static string GetPathSafeRegionName (AtlasRegion region) {
 			return region.name.Replace("/", "_");
 		}
-
-		internal static int ReadVarint (Stream input, bool optimizePositive) {
-			int b = input.ReadByte();
-			int result = b & 0x7F;
-			if ((b & 0x80) != 0) {
-				b = input.ReadByte();
-				result |= (b & 0x7F) << 7;
-				if ((b & 0x80) != 0) {
-					b = input.ReadByte();
-					result |= (b & 0x7F) << 14;
-					if ((b & 0x80) != 0) {
-						b = input.ReadByte();
-						result |= (b & 0x7F) << 21;
-						if ((b & 0x80) != 0) result |= (input.ReadByte() & 0x7F) << 28;
-					}
-				}
-			}
-			return optimizePositive ? result : ((result >> 1) ^ -(result & 1));
-		}
 	}
 
 	public static class SpineHandles {
