@@ -380,29 +380,6 @@ public class Bone implements Updatable {
 		return (float)Math.sqrt(b * b + d * d);
 	}
 
-	public float worldToLocalRotationX () {
-		Bone parent = this.parent;
-		if (parent == null) return arotation;
-		return atan2(parent.a * c - parent.c * a, parent.d * a - parent.b * c) * radDeg;
-	}
-
-	public float worldToLocalRotationY () {
-		Bone parent = this.parent;
-		if (parent == null) return arotation;
-		return atan2(parent.a * d - parent.c * b, parent.d * b - parent.b * d) * radDeg;
-	}
-
-	/** Rotates the world transform the specified amount. {@link #updateWorldTransform()} will need to be called on any child
-	 * bones, recursively. */
-	public void rotateWorld (float degrees) {
-		float cos = cosDeg(degrees), sin = sinDeg(degrees);
-		a = cos * a - sin * c;
-		b = cos * b - sin * d;
-		c = sin * a + cos * c;
-		d = sin * b + cos * d;
-		appliedValid = false;
-	}
-
 	/** Computes the individual applied transform values from the world transform. This can be useful to perform processing using
 	 * the applied transform after the world transform has been modified directly (eg, by a constraint).
 	 * <p>
@@ -478,6 +455,29 @@ public class Bone implements Updatable {
 		local.x = x * a + y * b + worldX;
 		local.y = x * c + y * d + worldY;
 		return local;
+	}
+
+	/** Transforms a world rotation to a local rotation. */
+	public float worldToLocalRotation (float worldRotation) {
+		float sin = sinDeg(worldRotation), cos = cosDeg(worldRotation);
+		return atan2(a * sin - c * cos, d * cos - b * sin) * radDeg;
+	}
+
+	/** Transforms a local rotation to a world rotation. */
+	public float localToWorldRotation (float localRotation) {
+		float sin = sinDeg(localRotation), cos = cosDeg(localRotation);
+		return atan2(cos * c + sin * d, cos * a + sin * b) * radDeg;
+	}
+
+	/** Rotates the world transform the specified amount. {@link #updateWorldTransform()} will need to be called on any child
+	 * bones, recursively. */
+	public void rotateWorld (float degrees) {
+		float cos = cosDeg(degrees), sin = sinDeg(degrees);
+		a = cos * a - sin * c;
+		b = cos * b - sin * d;
+		c = sin * a + cos * c;
+		d = sin * b + cos * d;
+		appliedValid = false;
 	}
 
 	public String toString () {
