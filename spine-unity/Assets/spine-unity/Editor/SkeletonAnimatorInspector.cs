@@ -37,17 +37,19 @@ namespace Spine.Unity.Editor {
 	[CanEditMultipleObjects]
 	public class SkeletonAnimatorInspector : SkeletonRendererInspector {
 		protected SerializedProperty layerMixModes;
+		protected SerializedProperty autoReset;
+
 		protected override void OnEnable () {
 			base.OnEnable();
+			autoReset = serializedObject.FindProperty("autoReset");
 			layerMixModes = serializedObject.FindProperty("layerMixModes");
 		}
 
 		protected override void DrawInspectorGUI (bool multi) {
 			base.DrawInspectorGUI(multi);
+			EditorGUILayout.PropertyField(autoReset);
 			EditorGUILayout.PropertyField(layerMixModes, true);
-
 			if (!TargetIsValid) return;
-
 			if (!isInspectingPrefab)
 				DrawSkeletonUtilityButton(multi);
 		}
