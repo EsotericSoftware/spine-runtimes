@@ -101,7 +101,7 @@ namespace Spine.Unity {
 				previousAnimations.Clear();
 
 				for (int layer = 0, n = animator.layerCount; layer < n; layer++) {
-					float layerWeight = animator.GetLayerWeight(layer);
+					float layerWeight = (layer == 0) ? 1 : animator.GetLayerWeight(layer);
 					if (layerWeight <= 0) continue;
 
 					AnimatorStateInfo nextStateInfo = animator.GetNextAnimatorStateInfo(layer);
