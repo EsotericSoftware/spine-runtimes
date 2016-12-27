@@ -86,7 +86,6 @@ public class TransformConstraint implements Constraint {
 				applyRelativeLocal();
 			else
 				applyAbsoluteLocal();
-
 		} else {
 			if (data.relative)
 				applyRelativeWorld();
@@ -131,11 +130,11 @@ public class TransformConstraint implements Constraint {
 
 			if (scaleMix > 0) {
 				float s = (float)Math.sqrt(bone.a * bone.a + bone.c * bone.c);
-				if (s > 0.00001f) s = (s + ((float)Math.sqrt(ta * ta + tc * tc) - s + data.offsetScaleX) * scaleMix) / s;
+				if (s != 0) s = (s + ((float)Math.sqrt(ta * ta + tc * tc) - s + data.offsetScaleX) * scaleMix) / s;
 				bone.a *= s;
 				bone.c *= s;
 				s = (float)Math.sqrt(bone.b * bone.b + bone.d * bone.d);
-				if (s > 0.00001f) s = (s + ((float)Math.sqrt(tb * tb + td * td) - s + data.offsetScaleY) * scaleMix) / s;
+				if (s != 0) s = (s + ((float)Math.sqrt(tb * tb + td * td) - s + data.offsetScaleY) * scaleMix) / s;
 				bone.b *= s;
 				bone.d *= s;
 				modified = true;
@@ -244,8 +243,8 @@ public class TransformConstraint implements Constraint {
 
 			float scaleX = bone.ascaleX, scaleY = bone.ascaleY;
 			if (scaleMix > 0) {
-				if (scaleX > 0.00001f) scaleX = (scaleX + (target.ascaleX - scaleX + data.offsetScaleX) * scaleMix) / scaleX;
-				if (scaleY > 0.00001f) scaleY = (scaleY + (target.ascaleY - scaleY + data.offsetScaleY) * scaleMix) / scaleY;
+				if (scaleX != 0) scaleX = (scaleX + (target.ascaleX - scaleX + data.offsetScaleX) * scaleMix) / scaleX;
+				if (scaleY != 0) scaleY = (scaleY + (target.ascaleY - scaleY + data.offsetScaleY) * scaleMix) / scaleY;
 			}
 
 			float shearY = bone.ashearY;
@@ -279,8 +278,8 @@ public class TransformConstraint implements Constraint {
 
 			float scaleX = bone.ascaleX, scaleY = bone.ascaleY;
 			if (scaleMix > 0) {
-				if (scaleX > 0.00001f) scaleX *= ((target.ascaleX - 1 + data.offsetScaleX) * scaleMix) + 1;
-				if (scaleY > 0.00001f) scaleY *= ((target.ascaleY - 1 + data.offsetScaleY) * scaleMix) + 1;
+				scaleX *= ((target.ascaleX - 1 + data.offsetScaleX) * scaleMix) + 1;
+				scaleY *= ((target.ascaleY - 1 + data.offsetScaleY) * scaleMix) + 1;
 			}
 
 			float shearY = bone.ashearY;
