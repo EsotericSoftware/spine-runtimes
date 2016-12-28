@@ -14,8 +14,6 @@ spine-cocos2dx works with data exported from Spine 3.5.xx.
 
 spine-cocos2dx supports all Spine features.
 
-spine-cocos2dx does not yet support loading the binary format.
-
 ## Setup
 
 The setup for cocos2d-x differs from most other Spine Runtimes because the cocos2d-x distribution includes a copy of the Spine Runtime files. This is not ideal because these files may be old and fail to work with the latest Spine editor. Also it means if cocos2d-x is updated, you may get newer Spine Runtime files which can break your application if you are not using the latest Spine editor. For these reasons, we have requested cocos2d-x to cease distributing the Spine Runtime files, but they  continue to do so. The following instructions allow you to use the official Spine cocos2d-x runtime with your cocos2d-x project.
