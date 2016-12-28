@@ -261,6 +261,7 @@ public class MeshAttachment extends VertexAttachment {
 			regionUVs = parentMesh.regionUVs;
 			triangles = parentMesh.triangles;
 			hullLength = parentMesh.hullLength;
+			worldVerticesLength = parentMesh.worldVerticesLength;
 			edges = parentMesh.edges;
 			width = parentMesh.width;
 			height = parentMesh.height;
