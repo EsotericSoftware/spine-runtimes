@@ -161,14 +161,14 @@ namespace Spine.Unity {
 		}
 
 		void OnDisable () {
-			if (clearStateOnDisable)
+			if (clearStateOnDisable && valid)
 				ClearState();
 		}
 
 		protected virtual void ClearState () {
 			meshFilter.sharedMesh = null;
 			currentInstructions.Clear();
-			skeleton.SetToSetupPose();
+			if (skeleton != null) skeleton.SetToSetupPose();
 		}
 
 		public virtual void Initialize (bool overwrite) {

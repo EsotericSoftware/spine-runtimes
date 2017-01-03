@@ -129,7 +129,7 @@ namespace Spine.Unity {
 
 		protected override void ClearState () {
 			base.ClearState();
-			state.ClearTracks();
+			if (state != null) state.ClearTracks();
 		}
 
 		public override void Initialize (bool overwrite) {
