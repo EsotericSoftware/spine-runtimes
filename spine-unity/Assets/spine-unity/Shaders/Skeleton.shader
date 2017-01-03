@@ -1,7 +1,7 @@
 Shader "Spine/Skeleton" {
 	Properties {
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
-		_MainTex ("Texture to blend", 2D) = "black" {}
+		[NoScaleOffset] _MainTex ("Texture to blend", 2D) = "black" {}
 	}
 	// 2 texture stage GPUs
 	SubShader {
