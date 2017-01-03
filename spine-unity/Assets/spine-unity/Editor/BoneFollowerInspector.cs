@@ -32,44 +32,11 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Spine.Unity.Editor {	
-	[CustomEditor(typeof(BoneFollower))]
+	[CustomEditor(typeof(BoneFollower)), CanEditMultipleObjects]
 	public class BoneFollowerInspector : UnityEditor.Editor {
 		SerializedProperty boneName, skeletonRenderer, followZPosition, followBoneRotation, followLocalScale, followSkeletonFlip;
 		BoneFollower targetBoneFollower;
 		bool needsReset;
-
-		void OnEnable () {
-			skeletonRenderer = serializedObject.FindProperty("skeletonRenderer");
-			boneName = serializedObject.FindProperty("boneName");
-			followBoneRotation = serializedObject.FindProperty("followBoneRotation");
-			followZPosition = serializedObject.FindProperty("followZPosition");
-			followLocalScale = serializedObject.FindProperty("followLocalScale");
-			followSkeletonFlip = serializedObject.FindProperty("followSkeletonFlip");
-
-			targetBoneFollower = (BoneFollower)target;
-			if (targetBoneFollower.SkeletonRenderer != null)
-				targetBoneFollower.SkeletonRenderer.Initialize(false);
-		}
-
-		public void OnSceneGUI () {
-			if (targetBoneFollower == null) return;
-			var skeletonRendererComponent = targetBoneFollower.skeletonRenderer;
-			if (skeletonRendererComponent == null) return;
-
-			var transform = skeletonRendererComponent.transform;
-			var skeleton = skeletonRendererComponent.skeleton;
-
-			if (string.IsNullOrEmpty(targetBoneFollower.boneName)) {
-				SpineHandles.DrawBones(transform, skeleton);
-				SpineHandles.DrawBoneNames(transform, skeleton);
-				Handles.Label(targetBoneFollower.transform.position, "No bone selected", EditorStyles.helpBox);
-			} else {
-				var targetBone = targetBoneFollower.bone;
-				if (targetBone == null) return;
-				SpineHandles.DrawBoneWireframe(transform, targetBone, SpineHandles.TransformContraintColor);
-				Handles.Label(targetBone.GetWorldPosition(transform), targetBone.Data.Name, SpineHandles.BoneNameStyle);
-			}
-		}
 
 		#region Context Menu Item
 		[MenuItem ("CONTEXT/SkeletonRenderer/Add BoneFollower GameObject")]
@@ -96,7 +63,57 @@ namespace Spine.Unity.Editor {
 		}
 		#endregion
 
+		void OnEnable () {
+			skeletonRenderer = serializedObject.FindProperty("skeletonRenderer");
+			boneName = serializedObject.FindProperty("boneName");
+			followBoneRotation = serializedObject.FindProperty("followBoneRotation");
+			followZPosition = serializedObject.FindProperty("followZPosition");
+			followLocalScale = serializedObject.FindProperty("followLocalScale");
+			followSkeletonFlip = serializedObject.FindProperty("followSkeletonFlip");
+
+			targetBoneFollower = (BoneFollower)target;
+			if (targetBoneFollower.SkeletonRenderer != null)
+				targetBoneFollower.SkeletonRenderer.Initialize(false);
+		}
+
+		public void OnSceneGUI () {
+			var tbf = target as BoneFollower;
+			var skeletonRendererComponent = tbf.skeletonRenderer;
+			if (skeletonRendererComponent == null) return;
+
+			var transform = skeletonRendererComponent.transform;
+			var skeleton = skeletonRendererComponent.skeleton;
+
+			if (string.IsNullOrEmpty(tbf.boneName)) {
+				SpineHandles.DrawBones(transform, skeleton);
+				SpineHandles.DrawBoneNames(transform, skeleton);
+				Handles.Label(tbf.transform.position, "No bone selected", EditorStyles.helpBox);
+			} else {
+				var targetBone = tbf.bone;
+				if (targetBone == null) return;
+				SpineHandles.DrawBoneWireframe(transform, targetBone, SpineHandles.TransformContraintColor);
+				Handles.Label(targetBone.GetWorldPosition(transform), targetBone.Data.Name, SpineHandles.BoneNameStyle);
+			}
+		}
+
 		override public void OnInspectorGUI () {
+			if (serializedObject.isEditingMultipleObjects) {
+				if (needsReset) {
+					needsReset = false;
+					foreach (var o in targets) {
+						var bf = (BoneFollower)o;
+						bf.Initialize();
+						bf.LateUpdate();
+					}
+					SceneView.RepaintAll();
+				}
+
+				EditorGUI.BeginChangeCheck();
+				DrawDefaultInspector();
+				needsReset |= EditorGUI.EndChangeCheck();
+				return;
+			}
+
 			if (needsReset) {
 				targetBoneFollower.Initialize();
 				targetBoneFollower.LateUpdate();
@@ -144,7 +161,7 @@ namespace Spine.Unity.Editor {
 
 					if (boneFollowerSkeletonRenderer.skeletonDataAsset == null)
 						EditorGUILayout.HelpBox("Assigned SkeletonRenderer does not have SkeletonData assigned to it.", MessageType.Warning);
-					
+
 					if (!boneFollowerSkeletonRenderer.valid)
 						EditorGUILayout.HelpBox("Assigned SkeletonRenderer is invalid. Check target SkeletonRenderer, its SkeletonDataAsset or the console for other errors.", MessageType.Warning);
 				}

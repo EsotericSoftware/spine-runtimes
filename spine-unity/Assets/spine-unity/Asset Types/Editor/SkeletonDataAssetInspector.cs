@@ -43,7 +43,7 @@ namespace Spine.Unity.Editor {
 	using Event = UnityEngine.Event;
 	using Icons = SpineEditorUtilities.Icons;
 
-	[CustomEditor(typeof(SkeletonDataAsset))]
+	[CustomEditor(typeof(SkeletonDataAsset)), CanEditMultipleObjects]
 	public class SkeletonDataAssetInspector : UnityEditor.Editor {
 		static bool showAnimationStateData = true;
 		static bool showAnimationList = true;
@@ -141,6 +141,34 @@ namespace Spine.Unity.Editor {
 		}
 
 		override public void OnInspectorGUI () {
+			if (serializedObject.isEditingMultipleObjects) {
+				using (new SpineInspectorUtility.BoxScope()) {
+					EditorGUILayout.LabelField("SkeletonData", EditorStyles.boldLabel);
+					EditorGUILayout.PropertyField(skeletonJSON, new GUIContent(skeletonJSON.displayName, Icons.spine));
+					EditorGUILayout.PropertyField(scale);
+				}
+
+				using (new SpineInspectorUtility.BoxScope()) {
+					EditorGUILayout.LabelField("Atlas", EditorStyles.boldLabel);
+					#if !SPINE_TK2D
+					EditorGUILayout.PropertyField(atlasAssets, true);
+					#else
+					using (new EditorGUI.DisabledGroupScope(spriteCollection.objectReferenceValue != null)) {
+						EditorGUILayout.PropertyField(atlasAssets, true);
+					}
+					EditorGUILayout.LabelField("spine-tk2d", EditorStyles.boldLabel);
+					EditorGUILayout.PropertyField(spriteCollection, true);
+					#endif
+				}
+
+				using (new SpineInspectorUtility.BoxScope()) {
+					EditorGUILayout.LabelField("Mix Settings", EditorStyles.boldLabel);
+					SpineInspectorUtility.PropertyFieldWideLabel(defaultMix, DefaultMixLabel, 160);
+					EditorGUILayout.Space();
+				}
+				return;
+			}
+
 			{ 
 				// Lazy initialization because accessing EditorStyles values in OnEnable during a recompile causes UnityEditor to throw null exceptions. (Unity 5.3.5)
 				idlePlayButtonStyle = idlePlayButtonStyle ?? new GUIStyle(EditorStyles.miniButton);
@@ -645,8 +673,11 @@ namespace Spine.Unity.Editor {
 			m_initialized = false;
 		}
 
-		public override bool HasPreviewGUI () {
-			// MITCH: left todo: validate json data
+		public override bool HasPreviewGUI () {			
+			if (serializedObject.isEditingMultipleObjects) {
+				// JOHN: Implement multi-preview.
+				return false;
+			}
 
 			for (int i = 0; i < atlasAssets.arraySize; i++) {
 				var prop = atlasAssets.GetArrayElementAtIndex(i);
