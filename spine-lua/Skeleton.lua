@@ -512,10 +512,10 @@ function Skeleton:update (delta)
 end
 
 function Skeleton:setColor (r, g, b, a)
-	self.r = r
-	self.g = g
-	self.b = b
-	self.a = a
+	self.color.r = r
+	self.color.g = g
+	self.color.b = b
+	self.color.a = a
 end
 
 return Skeleton
