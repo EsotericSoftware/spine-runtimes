@@ -1191,6 +1191,7 @@ namespace Spine.Unity.Editor {
 				try {
 					rawVersion = SkeletonBinary.GetVersionString(new MemoryStream(asset.bytes));
 					//Debug.Log(rawVersion);
+					isSpineData = !(string.IsNullOrEmpty(rawVersion));
 				} catch (System.Exception e) {
 					Debug.LogErrorFormat("Failed to read '{0}'. It is likely not a binary Spine SkeletonData file.\n{1}", asset.name, e);
 					return false;
