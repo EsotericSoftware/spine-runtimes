@@ -114,10 +114,12 @@ namespace Spine.Unity {
 			return new Vector2(bone.x, bone.y);
 		}
 
+		/// <summary>Gets the position of the bone in Skeleton-space.</summary>
 		public static Vector2 GetSkeletonSpacePosition (this Bone bone) {
 			return new Vector2(bone.worldX, bone.worldY);
 		}
 
+		/// <summary>Gets a local offset from the bone and converts it into Skeleton-space.</summary>
 		public static Vector2 GetSkeletonSpacePosition (this Bone bone, Vector2 boneLocal) {
 			Vector2 o;
 			bone.LocalToWorld(boneLocal.x, boneLocal.y, out o.x, out o.y);
@@ -136,6 +138,7 @@ namespace Spine.Unity {
 			};
 		}
 
+		/// <summary>Outputs a 2x2 Transformation Matrix that can convert a skeleton-space position to a bone-local position.</summary>
 		public static void GetWorldToLocalMatrix (this Bone bone, out float ia, out float ib, out float ic, out float id) {
 			float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
 			float invDet = 1 / (a * d - b * c);
@@ -143,6 +146,13 @@ namespace Spine.Unity {
 			ib = invDet * -b;
 			ic = invDet * -c;
 			id = invDet * a;
+		}
+
+		/// <summary>UnityEngine.Vector2 override of Bone.WorldToLocal. This converts a skeleton-space position into a bone local position.</summary>
+		public static Vector2 WorldToLocal (this Bone bone, Vector2 worldPosition) {
+			Vector2 o;
+			bone.WorldToLocal(worldPosition.x, worldPosition.y, out o.x, out o.y);
+			return o;
 		}
 		#endregion
 

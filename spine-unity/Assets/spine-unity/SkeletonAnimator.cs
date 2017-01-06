@@ -39,7 +39,9 @@ namespace Spine.Unity {
 
 		public enum MixMode { AlwaysMix, MixNext, SpineStyle }
 		public MixMode[] layerMixModes = new MixMode[0];
+
 		public bool autoReset = false;
+		List<Animation> previousAnimations = new List<Animation>();
 
 		#region Bone Callbacks (ISkeletonAnimation)
 		protected event UpdateBonesDelegate _UpdateLocal;
@@ -90,53 +92,50 @@ namespace Spine.Unity {
 			//skeleton.Update(Time.deltaTime); // Doesn't actually do anything, currently. (Spine 3.5).
 
 			// Clear Previous
-			if (autoReset)
-			{
+			if (autoReset) {
+				var previousAnimations = this.previousAnimations;
+				for (int i = 0, n = previousAnimations.Count; i < n; i++)
+					previousAnimations[i].SetKeyedItemsToSetupPose(skeleton);
+
+				previousAnimations.Clear();
 				for (int layer = 0, n = animator.layerCount; layer < n; layer++) {
-					float layerWeight = animator.GetLayerWeight(layer);
+					float layerWeight = (layer == 0) ? 1 : animator.GetLayerWeight(layer); // Animator.GetLayerWeight always returns 0 on the first layer. Should be interpreted as 1.
 					if (layerWeight <= 0) continue;
 
 					AnimatorStateInfo nextStateInfo = animator.GetNextAnimatorStateInfo(layer);
 
-					#if UNITY_5
 					bool hasNext = nextStateInfo.fullPathHash != 0;
 					AnimatorClipInfo[] clipInfo = animator.GetCurrentAnimatorClipInfo(layer);
 					AnimatorClipInfo[] nextClipInfo = animator.GetNextAnimatorClipInfo(layer);
-					#else
-					bool hasNext = nextStateInfo.nameHash != 0;
-					var clipInfo = animator.GetCurrentAnimationClipState(i);
-					var nextClipInfo = animator.GetNextAnimationClipState(i);
-					#endif
 
 					for (int c = 0; c < clipInfo.Length; c++) {
-						var info = clipInfo[c];	float weight = info.weight * layerWeight; if (weight == 0) continue;
-						animationTable[NameHashCode(info.clip)].SetKeyedItemsToSetupPose(skeleton);
+						var info = clipInfo[c];
+						float weight = info.weight * layerWeight; if (weight == 0) continue;
+						previousAnimations.Add(animationTable[NameHashCode(info.clip)]);
 					}
 					if (hasNext) {
 						for (int c = 0; c < nextClipInfo.Length; c++) {
-							var info = nextClipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-							animationTable[NameHashCode(info.clip)].SetKeyedItemsToSetupPose(skeleton);
+							var info = nextClipInfo[c];
+							float weight = info.weight * layerWeight; if (weight == 0) continue;
+							previousAnimations.Add(animationTable[NameHashCode(info.clip)]);
 						}
 					}
 				}
 			}
 
-
 			// Apply
 			for (int layer = 0, n = animator.layerCount; layer < n; layer++) {
-				float layerWeight = (layer == 0) ? 1 : animator.GetLayerWeight(layer);
+				float layerWeight = (layer == 0) ? 1 : animator.GetLayerWeight(layer); // Animator.GetLayerWeight always returns 0 on the first layer. Should be interpreted as 1.
 				AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(layer);
 				AnimatorStateInfo nextStateInfo = animator.GetNextAnimatorStateInfo(layer);
 
-				#if UNITY_5
 				bool hasNext = nextStateInfo.fullPathHash != 0;
 				AnimatorClipInfo[] clipInfo = animator.GetCurrentAnimatorClipInfo(layer);
 				AnimatorClipInfo[] nextClipInfo = animator.GetNextAnimatorClipInfo(layer);
-				#else
-				bool hasNext = nextStateInfo.nameHash != 0;
-				var clipInfo = animator.GetCurrentAnimationClipState(i);
-				var nextClipInfo = animator.GetNextAnimationClipState(i);
-				#endif
+//				UNITY 4
+//				bool hasNext = nextStateInfo.nameHash != 0;
+//				var clipInfo = animator.GetCurrentAnimationClipState(i);
+//				var nextClipInfo = animator.GetNextAnimationClipState(i);
 
 				MixMode mode = layerMixModes[layer];
 				if (mode == MixMode.AlwaysMix) {

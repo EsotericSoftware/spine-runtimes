@@ -41,6 +41,8 @@ namespace Spine.Unity {
 		public Material[] materials;
 		protected Atlas atlas;
 
+		public bool IsLoaded { get { return this.atlas != null; } }
+
 		#region Runtime Instantiation
 		/// <summary>
 		/// Creates a runtime AtlasAsset</summary>
@@ -122,8 +124,7 @@ namespace Spine.Unity {
 				return null;
 			}
 
-			if (atlas != null)
-				return atlas;
+			if (atlas != null) return atlas;
 
 			try {
 				atlas = new Atlas(new StringReader(atlasFile.text), "", new MaterialsTextureLoader(this));
@@ -201,7 +202,7 @@ namespace Spine.Unity {
 			this.atlasAsset = atlasAsset;
 		}
 
-		public void Load (AtlasPage page, String path) {
+		public void Load (AtlasPage page, string path) {
 			String name = Path.GetFileNameWithoutExtension(path);
 			Material material = null;
 			foreach (Material other in atlasAsset.materials) {
@@ -227,7 +228,6 @@ namespace Spine.Unity {
 			}
 		}
 
-		public void Unload (object texture) {
-		}
+		public void Unload (object texture) { }
 	}
 }

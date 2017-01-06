@@ -11,6 +11,7 @@
 
 #include <ctime>
 #include "KString.h"
+#include <stdio.h>
 
 #include "spine/extension.h"
 #include "spine/spine.h"
@@ -63,7 +64,7 @@ int main(int argc, char* argv[])
 extern "C" { // probably unnecessary 
 
 	void _spAtlasPage_createTexture(spAtlasPage* self, const char* path) {
-		self->rendererObject = nullptr;
+		self->rendererObject = 0;
 		self->width = 2048;
 		self->height = 2048;
 	}

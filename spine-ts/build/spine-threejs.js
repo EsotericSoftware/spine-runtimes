@@ -1187,11 +1187,12 @@ var spine;
 			}
 		};
 		AnimationState.prototype.clearTracks = function () {
+			var oldDrainDisabled = this.queue.drainDisabled;
 			this.queue.drainDisabled = true;
 			for (var i = 0, n = this.tracks.length; i < n; i++)
 				this.clearTrack(i);
 			this.tracks.length = 0;
-			this.queue.drainDisabled = false;
+			this.queue.drainDisabled = oldDrainDisabled;
 			this.queue.drain();
 		};
 		AnimationState.prototype.clearTrack = function (trackIndex) {
@@ -1303,13 +1304,14 @@ var spine;
 			return entry;
 		};
 		AnimationState.prototype.setEmptyAnimations = function (mixDuration) {
+			var oldDrainDisabled = this.queue.drainDisabled;
 			this.queue.drainDisabled = true;
 			for (var i = 0, n = this.tracks.length; i < n; i++) {
 				var current = this.tracks[i];
 				if (current != null)
 					this.setEmptyAnimation(current.trackIndex, mixDuration);
 			}
-			this.queue.drainDisabled = false;
+			this.queue.drainDisabled = oldDrainDisabled;
 			this.queue.drain();
 		};
 		AnimationState.prototype.expandToIndex = function (index) {
@@ -1989,6 +1991,7 @@ var spine;
 				this.regionUVs = parentMesh.regionUVs;
 				this.triangles = parentMesh.triangles;
 				this.hullLength = parentMesh.hullLength;
+				this.worldVerticesLength = parentMesh.worldVerticesLength;
 			}
 		};
 		return MeshAttachment;
@@ -3311,6 +3314,7 @@ var spine;
 		Skeleton.prototype.updateCache = function () {
 			var updateCache = this._updateCache;
 			updateCache.length = 0;
+			this.updateCacheReset.length = 0;
 			var bones = this.bones;
 			for (var i = 0, n = bones.length; i < n; i++)
 				bones[i].sorted = false;

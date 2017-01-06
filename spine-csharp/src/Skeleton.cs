@@ -118,6 +118,7 @@ namespace Spine {
 		public void UpdateCache () {
 			ExposedList<IUpdatable> updateCache = this.updateCache;
 			updateCache.Clear();
+			this.updateCacheReset.Clear();
 
 			ExposedList<Bone> bones = this.bones;
 			for (int i = 0, n = bones.Count; i < n; i++)

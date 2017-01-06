@@ -85,6 +85,9 @@ namespace Spine.Unity {
 			skeletonRenderer.OnRebuild -= HandleRebuildRenderer;
 			skeletonRenderer.OnRebuild += HandleRebuildRenderer;
 
+			if (!string.IsNullOrEmpty(boneName))
+				bone = skeletonRenderer.skeleton.FindBone(boneName);
+
 			#if UNITY_EDITOR
 			if (Application.isEditor)
 				LateUpdate();

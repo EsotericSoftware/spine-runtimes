@@ -323,11 +323,12 @@ public class AnimationState {
 	}
 	
 	public function clearTracks ():void {
+		var oldTrainDisabled:Boolean = queue.drainDisabled;
 		queue.drainDisabled = true;
 		for (var i:int = 0, n:int = tracks.length; i < n; i++)
 			clearTrack(i);
 		tracks.length = 0;
-		queue.drainDisabled = false;
+		queue.drainDisabled = oldTrainDisabled;
 		queue.drain();
 	}
 	
@@ -452,12 +453,13 @@ public class AnimationState {
 	}
 	
 	public function setEmptyAnimations (mixDuration:Number):void {
+		var oldDrainDisabled:Boolean = queue.drainDisabled;
 		queue.drainDisabled = true;
 		for (var i:int = 0, n:int = tracks.length; i < n; i++) {
 			var current:TrackEntry = tracks[i];
 			if (current != null) setEmptyAnimation(current.trackIndex, mixDuration);
 		}
-		queue.drainDisabled = false;
+		queue.drainDisabled = oldDrainDisabled;
 		queue.drain();
 	}
 	

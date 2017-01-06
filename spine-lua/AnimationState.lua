@@ -496,12 +496,13 @@ end
 function AnimationState:clearTracks ()
   local queue = self.queue
   local tracks = self.tracks
+	local oldDrainDisabled = queue.drainDisabled
   queue.drainDisabled = true;
   for i,track in pairs(tracks) do
     self:clearTrack(i)
   end
   tracks = {}
-  queue.drainDisabled = false;
+  queue.drainDisabled = oldDrainDisabled
   queue:drain();
 end
 
@@ -635,11 +636,12 @@ end
 
 function AnimationState:setEmptyAnimations (mixDuration)
   local queue = self.queue
+	local oldDrainDisabled = queue.drainDisabled
   queue.drainDisabled = true
   for i,current in pairs(self.tracks) do
     if current then self:setEmptyAnimation(current.trackIndex, mixDuration) end
   end
-  queue.drainDisabled = false
+  queue.drainDisabled = oldDrainDisabled
   queue:drain()
 end
 

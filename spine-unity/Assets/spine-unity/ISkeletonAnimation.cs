@@ -29,7 +29,7 @@
  *****************************************************************************/
 
 namespace Spine.Unity {
-	public delegate void UpdateBonesDelegate (ISkeletonAnimation animatedSkeletonComponent);
+	public delegate void UpdateBonesDelegate (ISkeletonAnimation animated);
 
 	/// <summary>A Spine-Unity Component that animates a Skeleton but not necessarily with a Spine.AnimationState.</summary>
 	public interface ISkeletonAnimation {

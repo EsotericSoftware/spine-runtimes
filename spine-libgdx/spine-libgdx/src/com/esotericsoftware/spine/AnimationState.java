@@ -339,11 +339,12 @@ public class AnimationState {
 	 * It may be desired to use {@link AnimationState#setEmptyAnimations(float)} to mix the skeletons back to the setup pose,
 	 * rather than leaving them in their previous pose. */
 	public void clearTracks () {
+		boolean oldDrainDisabled = queue.drainDisabled;
 		queue.drainDisabled = true;
 		for (int i = 0, n = tracks.size; i < n; i++)
 			clearTrack(i);
 		tracks.clear();
-		queue.drainDisabled = false;
+		queue.drainDisabled = oldDrainDisabled;
 		queue.drain();
 	}
 
@@ -504,12 +505,13 @@ public class AnimationState {
 	/** Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix
 	 * duration. */
 	public void setEmptyAnimations (float mixDuration) {
+		boolean oldDrainDisabled = queue.drainDisabled;
 		queue.drainDisabled = true;
 		for (int i = 0, n = tracks.size; i < n; i++) {
 			TrackEntry current = tracks.get(i);
 			if (current != null) setEmptyAnimation(current.trackIndex, mixDuration);
 		}
-		queue.drainDisabled = false;
+		queue.drainDisabled = oldDrainDisabled;
 		queue.drain();
 	}
 
