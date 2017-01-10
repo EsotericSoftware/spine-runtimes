@@ -70,7 +70,7 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 		UClass* skeletonClass = USpineSkeletonComponent::StaticClass();
 		USpineSkeletonComponent* skeleton = Cast<USpineSkeletonComponent>(owner->GetComponentByClass(skeletonClass));
 		
-		if (skeleton && !skeleton->IsBeingDestroyed() && skeleton->GetSkeleton()) {
+		if (skeleton && !skeleton->IsBeingDestroyed() && skeleton->GetSkeleton() && skeleton->Atlas) {
 			if (atlasNormalBlendMaterials.Num() != skeleton->Atlas->atlasPages.Num()) {
 				atlasNormalBlendMaterials.SetNum(0);
 				pageToNormalBlendMaterial.Empty();
@@ -197,20 +197,28 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 			
 			UMaterialInstanceDynamic* material = nullptr;
 			
+			// if the user switches the atlas data while not having switched
+			// to the correct skeleton data yet, we won't find any regions.
+			// ignore regions for which we can't find a material
 			switch(slot->data->blendMode) {
 				case SP_BLEND_MODE_NORMAL:
+					if (!pageToNormalBlendMaterial.Contains(region->page)) continue;
 					material = pageToNormalBlendMaterial[region->page];
 					break;
 				case SP_BLEND_MODE_ADDITIVE:
+					if (!pageToAdditiveBlendMaterial.Contains(region->page)) continue;
 					material = pageToAdditiveBlendMaterial[region->page];
 					break;
 				case SP_BLEND_MODE_MULTIPLY:
+					if (!pageToMultiplyBlendMaterial.Contains(region->page)) continue;
 					material = pageToMultiplyBlendMaterial[region->page];
 					break;
 				case SP_BLEND_MODE_SCREEN:
-				material = pageToScreenBlendMaterial[region->page];
+					if (!pageToScreenBlendMaterial.Contains(region->page)) continue;
+					material = pageToScreenBlendMaterial[region->page];
 					break;
 				default:
+					if (!pageToNormalBlendMaterial.Contains(region->page)) continue;
 					material = pageToNormalBlendMaterial[region->page];
 			}
 
@@ -254,7 +262,32 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 		} else if (attachment->type == SP_ATTACHMENT_MESH) {
 			spMeshAttachment* mesh = (spMeshAttachment*)attachment;
 			spAtlasRegion* region = (spAtlasRegion*)mesh->rendererObject;
-			UMaterialInstanceDynamic* material = pageToNormalBlendMaterial[region->page];
+			UMaterialInstanceDynamic* material = nullptr;
+			
+			// if the user switches the atlas data while not having switched
+			// to the correct skeleton data yet, we won't find any regions.
+			// ignore regions for which we can't find a material
+			switch(slot->data->blendMode) {
+				case SP_BLEND_MODE_NORMAL:
+					if (!pageToNormalBlendMaterial.Contains(region->page)) continue;
+					material = pageToNormalBlendMaterial[region->page];
+					break;
+				case SP_BLEND_MODE_ADDITIVE:
+					if (!pageToAdditiveBlendMaterial.Contains(region->page)) continue;
+					material = pageToAdditiveBlendMaterial[region->page];
+					break;
+				case SP_BLEND_MODE_MULTIPLY:
+					if (!pageToMultiplyBlendMaterial.Contains(region->page)) continue;
+					material = pageToMultiplyBlendMaterial[region->page];
+					break;
+				case SP_BLEND_MODE_SCREEN:
+					if (!pageToScreenBlendMaterial.Contains(region->page)) continue;
+					material = pageToScreenBlendMaterial[region->page];
+					break;
+				default:
+					if (!pageToNormalBlendMaterial.Contains(region->page)) continue;
+					material = pageToNormalBlendMaterial[region->page];
+			}
 
 			if (lastMaterial != material) {
 				Flush(meshSection, vertices, indices, uvs, colors, lastMaterial);
