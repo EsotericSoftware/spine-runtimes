@@ -142,7 +142,7 @@ void _spEventQueue_drain (_spEventQueue* self) {
 	if (self->drainDisabled) return;
 	self->drainDisabled = 1;
 	for (i = 0; i < self->objectsCount; i += 2) {
-		spEventType type = self->objects[i].type;
+		spEventType type = (spEventType)self->objects[i].type;
 		spTrackEntry* entry = self->objects[i+1].entry;
 		spEvent* event;
 		switch (type) {
