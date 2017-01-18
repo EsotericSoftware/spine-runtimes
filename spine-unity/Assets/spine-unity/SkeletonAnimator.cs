@@ -83,7 +83,7 @@ namespace Spine.Unity {
 				animationTable.Add(a.Name.GetHashCode(), a);
 		}
 
-		void Update () {
+		public void Update () {
 			if (!valid) return;
 
 			if (layerMixModes.Length < animator.layerCount)
