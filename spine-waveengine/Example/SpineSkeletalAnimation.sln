@@ -1,0 +1,36 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpineSkeletalAnimation", "SpineSkeletalAnimation\SpineSkeletalAnimation\SpineSkeletalAnimation.csproj", "{A9BBF3B9-0C5E-47C6-8518-6CA3965C3BC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpineSkeletalAnimationProject", "SpineSkeletalAnimation\SpineSkeletalAnimationProject\SpineSkeletalAnimationProject.csproj", "{9152A612-848F-4F1F-9ADD-1B607ECA8668}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs2013.plainconcepts.com/tfs/wave
+		SccProjectUniqueName0 = SpineSkeletalAnimation\\SpineSkeletalAnimationProject\\SpineSkeletalAnimationProject.csproj
+		SccProjectName0 = SpineSkeletalAnimation/SpineSkeletalAnimationProject
+		SccLocalPath0 = SpineSkeletalAnimation\\SpineSkeletalAnimationProject
+		SccProjectUniqueName1 = SpineSkeletalAnimation\\SpineSkeletalAnimation\\SpineSkeletalAnimation.csproj
+		SccProjectName1 = SpineSkeletalAnimation/SpineSkeletalAnimation
+		SccLocalPath1 = SpineSkeletalAnimation\\SpineSkeletalAnimation
+		SccLocalPath2 = .
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A9BBF3B9-0C5E-47C6-8518-6CA3965C3BC1}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{A9BBF3B9-0C5E-47C6-8518-6CA3965C3BC1}.Debug|Any CPU.Build.0 = Debug|x86
+		{A9BBF3B9-0C5E-47C6-8518-6CA3965C3BC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9BBF3B9-0C5E-47C6-8518-6CA3965C3BC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9152A612-848F-4F1F-9ADD-1B607ECA8668}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{9152A612-848F-4F1F-9ADD-1B607ECA8668}.Debug|Any CPU.Build.0 = Debug|x86
+		{9152A612-848F-4F1F-9ADD-1B607ECA8668}.Release|Any CPU.ActiveCfg = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
