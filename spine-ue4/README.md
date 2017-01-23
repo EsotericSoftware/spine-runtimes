@@ -16,6 +16,8 @@ spine-ue4 supports all Spine features.
 spine-ue4 does not support multiply and screen blending. spine-ue4 does not support pre-multiplied alpha atlases.
 
 ## Usage
+### [Please see the spine-ue4 guide for full documentation](http://esotericsoftware.com/spine-ue4)
+
 1. Create a new Unreal Engine code project. You don't need to write C++, but the code project is needed for the plugin to compile. See the [Unreal Engine documentation](https://docs.unrealengine.com/latest/INT/) or have a look at the example in this repository.
 2. Download the Spine Runtimes source using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip)
 3. Copy the `Plugins` folder from this directory to your new project's root directory.
@@ -26,6 +28,7 @@ See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documen
 
 ## Example
 The Spine UE4 example works on all platforms supported by Unreal Engine.
+### [Please see the spine-ue4 guide for full documentation](http://esotericsoftware.com/spine-ue4)
 
 1. Copy the `spine-c` folder from this repositories root directory to your `Plugins/SpinePlugin/Sources/SpinePlugin/Public/` directory.
 2. Open the SpineUE4.uproject file with Unreal Editor
