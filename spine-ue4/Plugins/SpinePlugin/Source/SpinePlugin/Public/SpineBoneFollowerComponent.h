@@ -41,7 +41,7 @@ class SPINEPLUGIN_API USpineBoneFollowerComponent : public UActorComponent {
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AActor* Target = 0;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString BoneName;
 
