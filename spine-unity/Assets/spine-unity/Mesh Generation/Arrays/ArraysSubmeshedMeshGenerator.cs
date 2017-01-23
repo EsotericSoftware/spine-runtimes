@@ -41,6 +41,7 @@ namespace Spine.Unity.MeshGeneration {
 		public List<Slot> Separators { get { return this.separators; } }
 
 		#region Settings
+		// ArraysMeshGenerator.PremultiplyAlpha
 		public float ZSpacing { get; set; }
 		#endregion
 
