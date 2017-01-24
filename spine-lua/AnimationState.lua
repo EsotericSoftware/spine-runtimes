@@ -561,6 +561,7 @@ function AnimationState:setAnimation (trackIndex, animation, loop)
   local interrupt = true;
   local current = self:expandToIndex(trackIndex)
   local queue = self.queue
+  local tracks = self.tracks
   if current then
     if current.nextTrackLast == -1 then
       -- Don't mix from an entry that was never applied.
