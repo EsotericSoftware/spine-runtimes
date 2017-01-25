@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>CF859511-51DA-41AB-85A2-72A6C6C85D6F</string>
+	<key>IDESourceControlProjectName</key>
+	<string>HelloCpp</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>F80609B6-5269-41C8-8793-033CB41F8AB3</key>
+		<string>https://github.com/equinox2k/spine-runtimes.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>spine-cocos2dx-v3/example/proj.ios_mac/HelloCpp.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>5ADAE35F-3C17-45E7-9C39-898CD8030D55</key>
+		<string>../../../../cocos2dx/cocos/scripting/auto-generated</string>
+		<key>F80609B6-5269-41C8-8793-033CB41F8AB3</key>
+		<string>../../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/equinox2k/spine-runtimes.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>F80609B6-5269-41C8-8793-033CB41F8AB3</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>5ADAE35F-3C17-45E7-9C39-898CD8030D55</string>
+			<key>IDESourceControlWCCName</key>
+			<string>auto-generated</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>F80609B6-5269-41C8-8793-033CB41F8AB3</string>
+			<key>IDESourceControlWCCName</key>
+			<string>spine-runtimes</string>
+		</dict>
+	</array>
+</dict>
+</plist>
