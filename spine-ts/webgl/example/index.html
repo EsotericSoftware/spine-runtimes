@@ -119,7 +119,7 @@ function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 	animationStateData = new spine.AnimationStateData(skeleton.data);
 	var animationState = new spine.AnimationState(animationStateData);
 	if (name == "spineboy") {
-		animationStateData.setMix("walk", "jump", 0.4)		
+		animationStateData.setMix("walk", "jump", 0.4)
 		animationStateData.setMix("jump", "run", 0.4);
 		animationState.setAnimation(0, "walk", true);
 		var jumpEntry = animationState.addAnimation(0, "jump", false, 3);
@@ -157,7 +157,7 @@ function calculateBounds(skeleton) {
 	skeleton.updateWorldTransform();
 	var offset = new spine.Vector2();
 	var size = new spine.Vector2();
-	skeleton.getBounds(offset, size);
+	skeleton.getBounds(offset, size, []);
 	return { offset: offset, size: size };
 }
 

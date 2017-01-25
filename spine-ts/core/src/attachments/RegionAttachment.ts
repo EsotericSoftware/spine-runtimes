@@ -83,36 +83,12 @@ module spine {
 		region: TextureRegion;
 
 		offset = Utils.newFloatArray(8);
-		vertices = Utils.newFloatArray(8 * 4);
+		uvs = Utils.newFloatArray(8);
 
 		tempColor = new Color(1, 1, 1, 1);
 
 		constructor (name:string) {
 			super(name);
-		}
-
-		setRegion (region: TextureRegion) : void {
-			let vertices = this.vertices;
-			if (region.rotate) {
-				vertices[RegionAttachment.U2] = region.u;
-				vertices[RegionAttachment.V2] = region.v2;
-				vertices[RegionAttachment.U3] = region.u;
-				vertices[RegionAttachment.V3] = region.v;
-				vertices[RegionAttachment.U4] = region.u2;
-				vertices[RegionAttachment.V4] = region.v;
-				vertices[RegionAttachment.U1] = region.u2;
-				vertices[RegionAttachment.V1] = region.v2;
-			} else {
-				vertices[RegionAttachment.U1] = region.u;
-				vertices[RegionAttachment.V1] = region.v2;
-				vertices[RegionAttachment.U2] = region.u;
-				vertices[RegionAttachment.V2] = region.v;
-				vertices[RegionAttachment.U3] = region.u2;
-				vertices[RegionAttachment.V3] = region.v;
-				vertices[RegionAttachment.U4] = region.u2;
-				vertices[RegionAttachment.V4] = region.v2;
-			}
-			this.region = region;
 		}
 
 		updateOffset () : void {
@@ -144,63 +120,58 @@ module spine {
 			offset[RegionAttachment.OY4] = localYCos + localX2Sin;
 		}
 
-		updateWorldVertices (slot: Slot, premultipliedAlpha: boolean) {
-			let skeleton = slot.bone.skeleton;
-			let skeletonColor = skeleton.color;
-			let slotColor = slot.color;
-			let regionColor = this.color;
-			let alpha = skeletonColor.a * slotColor.a * regionColor.a;
-			let multiplier = premultipliedAlpha ? alpha : 1;
-			let color = this.tempColor;
-			color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
-				skeletonColor.g * slotColor.g * regionColor.g * multiplier,
-				skeletonColor.b * slotColor.b * regionColor.b * multiplier,
-				alpha);
+		setRegion (region: TextureRegion) : void {
+			this.region = region;
+			let uvs = this.uvs;
+			if (region.rotate) {
+				uvs[2] = region.u;
+				uvs[3] = region.v2;
+				uvs[4] = region.u;
+				uvs[5] = region.v;
+				uvs[6] = region.u2;
+				uvs[7] = region.v;
+				uvs[0] = region.u2;
+				uvs[1] = region.v2;
+			} else {
+				uvs[0] = region.u;
+				uvs[1] = region.v2;
+				uvs[2] = region.u;
+				uvs[3] = region.v;
+				uvs[4] = region.u2;
+				uvs[5] = region.v;
+				uvs[6] = region.u2;
+				uvs[7] = region.v2;
+			}
+		}
 
-			let vertices = this.vertices;
-			let offset = this.offset;
-			let bone = slot.bone;
+		computeWorldVertices (bone: Bone, worldVertices: ArrayLike<number>, offset: number, stride: number) {
+			let vertexOffset = this.offset;
 			let x = bone.worldX, y = bone.worldY;
 			let a = bone.a, b = bone.b, c = bone.c, d = bone.d;
 			let offsetX = 0, offsetY = 0;
 
-			offsetX = offset[RegionAttachment.OX1];
-			offsetY = offset[RegionAttachment.OY1];
-			vertices[RegionAttachment.X1] = offsetX * a + offsetY * b + x; // br
-			vertices[RegionAttachment.Y1] = offsetX * c + offsetY * d + y;
-			vertices[RegionAttachment.C1R] = color.r;
-			vertices[RegionAttachment.C1G] = color.g;
-			vertices[RegionAttachment.C1B] = color.b;
-			vertices[RegionAttachment.C1A] = color.a;
+			offsetX = vertexOffset[RegionAttachment.OX1];
+			offsetY = vertexOffset[RegionAttachment.OY1];
+			worldVertices[offset] = offsetX * a + offsetY * b + x; // br
+			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+			offset += stride;
 
-			offsetX = offset[RegionAttachment.OX2];
-			offsetY = offset[RegionAttachment.OY2];
-			vertices[RegionAttachment.X2] = offsetX * a + offsetY * b + x; // bl
-			vertices[RegionAttachment.Y2] = offsetX * c + offsetY * d + y;
-			vertices[RegionAttachment.C2R] = color.r;
-			vertices[RegionAttachment.C2G] = color.g;
-			vertices[RegionAttachment.C2B] = color.b;
-			vertices[RegionAttachment.C2A] = color.a;
+			offsetX = vertexOffset[RegionAttachment.OX2];
+			offsetY = vertexOffset[RegionAttachment.OY2];
+			worldVertices[offset] = offsetX * a + offsetY * b + x; // bl
+			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+			offset += stride;
 
-			offsetX = offset[RegionAttachment.OX3];
-			offsetY = offset[RegionAttachment.OY3];
-			vertices[RegionAttachment.X3] = offsetX * a + offsetY * b + x; // ul
-			vertices[RegionAttachment.Y3] = offsetX * c + offsetY * d + y;
-			vertices[RegionAttachment.C3R] = color.r;
-			vertices[RegionAttachment.C3G] = color.g;
-			vertices[RegionAttachment.C3B] = color.b;
-			vertices[RegionAttachment.C3A] = color.a;
+			offsetX = vertexOffset[RegionAttachment.OX3];
+			offsetY = vertexOffset[RegionAttachment.OY3];
+			worldVertices[offset] = offsetX * a + offsetY * b + x; // ul
+			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+			offset += stride;
 
-			offsetX = offset[RegionAttachment.OX4];
-			offsetY = offset[RegionAttachment.OY4];
-			vertices[RegionAttachment.X4] = offsetX * a + offsetY * b + x; // ur
-			vertices[RegionAttachment.Y4] = offsetX * c + offsetY * d + y;
-			vertices[RegionAttachment.C4R] = color.r;
-			vertices[RegionAttachment.C4G] = color.g;
-			vertices[RegionAttachment.C4B] = color.b;
-			vertices[RegionAttachment.C4A] = color.a;
-
-			return vertices;
+			offsetX = vertexOffset[RegionAttachment.OX4];
+			offsetY = vertexOffset[RegionAttachment.OY4];
+			worldVertices[offset] = offsetX * a + offsetY * b + x; // ur
+			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 		}
 	}
 }

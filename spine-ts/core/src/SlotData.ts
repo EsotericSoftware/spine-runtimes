@@ -34,6 +34,7 @@ module spine {
 		name: string;
 		boneData: BoneData;
 		color = new Color(1, 1, 1, 1);
+		darkColor: Color;
 		attachmentName: string;
 		blendMode: BlendMode;
 

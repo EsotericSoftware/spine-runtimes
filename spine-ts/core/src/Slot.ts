@@ -33,6 +33,7 @@ module spine {
 		data: SlotData;
 		bone: Bone;
 		color: Color;
+		darkColor: Color;
 		private attachment: Attachment;
 		private attachmentTime: number;
 		attachmentVertices = new Array<number>();
@@ -43,6 +44,7 @@ module spine {
 			this.data = data;
 			this.bone = bone;
 			this.color = new Color();
+			this.darkColor = data.darkColor == null ? null : new Color();
 			this.setToSetupPose();
 		}
 
@@ -71,6 +73,7 @@ module spine {
 
 		setToSetupPose () {
 			this.color.setFromColor(this.data.color);
+			if (this.darkColor != null) this.darkColor.setFromColor(this.data.darkColor);
 			if (this.data.attachmentName == null)
 				this.attachment = null;
 			else {

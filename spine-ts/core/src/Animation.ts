@@ -87,7 +87,8 @@ module spine {
 		attachment, color, deform,
 		event, drawOrder,
 		ikConstraint, transformConstraint,
-		pathConstraintPosition, pathConstraintSpacing, pathConstraintMix
+		pathConstraintPosition, pathConstraintSpacing, pathConstraintMix,
+		twoColor
 	}
 
 	export abstract class CurveTimeline implements Timeline {
@@ -475,6 +476,90 @@ module spine {
 				g += (frames[frame + ColorTimeline.G] - g) * percent;
 				b += (frames[frame + ColorTimeline.B] - b) * percent;
 				a += (frames[frame + ColorTimeline.A] - a) * percent;
+			}
+			if (alpha == 1)
+				slot.color.set(r, g, b, a);
+			else {
+				let color = slot.color;
+				if (setupPose) color.setFromColor(slot.data.color);
+				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
+			}
+		}
+	}
+
+	export class TwoColorTimeline extends CurveTimeline {
+		static ENTRIES = 8;
+		static PREV_TIME = -8; static PREV_R = -7; static PREV_G = -6; static PREV_B = -5; static PREV_A = -4;
+		static PREV_R2 = -3; static PREV_G2 = -2; static PREV_B2 = -1;
+		static R = 1; static G = 2; static B = 3; static A = 4; static R2 = 5; static G2 = 6; static B2 = 7;
+
+		slotIndex: number;
+		frames: ArrayLike<number>; // time, r, g, b, a, r2, g2, b2, ...
+
+		constructor (frameCount: number) {
+			super(frameCount);
+			this.frames = Utils.newFloatArray(frameCount * TwoColorTimeline.ENTRIES);
+		}
+
+		getPropertyId () {
+			return (TimelineType.color << 24) + this.slotIndex;
+		}
+
+		/** Sets the time and value of the specified keyframe. */
+		setFrame (frameIndex: number, time: number, r: number, g: number, b: number, a: number, r2: number, g2: number, b2: number) {
+			frameIndex *= TwoColorTimeline.ENTRIES;
+			this.frames[frameIndex] = time;
+			this.frames[frameIndex + TwoColorTimeline.R] = r;
+			this.frames[frameIndex + TwoColorTimeline.G] = g;
+			this.frames[frameIndex + TwoColorTimeline.B] = b;
+			this.frames[frameIndex + TwoColorTimeline.A] = a;
+			this.frames[frameIndex + TwoColorTimeline.R2] = r2;
+			this.frames[frameIndex + TwoColorTimeline.G2] = g2;
+			this.frames[frameIndex + TwoColorTimeline.B2] = b2;
+		}
+
+		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean) {
+			let slot = skeleton.slots[this.slotIndex];
+			let frames = this.frames;
+			if (time < frames[0]) {
+				if (setupPose) {
+					slot.color.setFromColor(slot.data.color);
+					slot.darkColor.setFromColor(slot.data.darkColor);
+				}
+				return;
+			}
+
+			let r = 0, g = 0, b = 0, a = 0, r2 = 0, g2 = 0, b2 = 0;
+			if (time >= frames[frames.length - TwoColorTimeline.ENTRIES]) { // Time is after last frame.
+				let i = frames.length;
+				r = frames[i + TwoColorTimeline.PREV_R];
+				g = frames[i + TwoColorTimeline.PREV_G];
+				b = frames[i + TwoColorTimeline.PREV_B];
+				a = frames[i + TwoColorTimeline.PREV_A];
+				r2 = frames[i + TwoColorTimeline.PREV_R2];
+				g2 = frames[i + TwoColorTimeline.PREV_G2];
+				b2 = frames[i + TwoColorTimeline.PREV_B2];
+			} else {
+				// Interpolate between the previous frame and the current frame.
+				let frame = Animation.binarySearch(frames, time, TwoColorTimeline.ENTRIES);
+				r = frames[frame + TwoColorTimeline.PREV_R];
+				g = frames[frame + TwoColorTimeline.PREV_G];
+				b = frames[frame + TwoColorTimeline.PREV_B];
+				a = frames[frame + TwoColorTimeline.PREV_A];
+				r2 = frames[frame + TwoColorTimeline.PREV_R2];
+				g2 = frames[frame + TwoColorTimeline.PREV_G2];
+				b2 = frames[frame + TwoColorTimeline.PREV_B2];
+				let frameTime = frames[frame];
+				let percent = this.getCurvePercent(frame / TwoColorTimeline.ENTRIES - 1,
+					1 - (time - frameTime) / (frames[frame + TwoColorTimeline.PREV_TIME] - frameTime));
+
+				r += (frames[frame + TwoColorTimeline.R] - r) * percent;
+				g += (frames[frame + TwoColorTimeline.G] - g) * percent;
+				b += (frames[frame + TwoColorTimeline.B] - b) * percent;
+				a += (frames[frame + TwoColorTimeline.A] - a) * percent;
+				r2 += (frames[frame + TwoColorTimeline.R2] - r2) * percent;
+				g2 += (frames[frame + TwoColorTimeline.G2] - g2) * percent;
+				b2 += (frames[frame + TwoColorTimeline.B2] - b2) * percent;
 			}
 			if (alpha == 1)
 				slot.color.set(r, g, b, a);

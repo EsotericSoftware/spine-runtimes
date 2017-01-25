@@ -93,6 +93,9 @@ module spine {
 					let color: string = this.getValue(slotMap, "color", null);
 					if (color != null) data.color.setFromString(color);
 
+					let dark: string = this.getValue(slotMap, "dark", null);
+					if (dark != null) data.darkColor.setFromString(color);
+
 					data.attachmentName = this.getValue(slotMap, "attachment", null);
 					data.blendMode = SkeletonJson.blendModeFromString(this.getValue(slotMap, "blend", "normal"));
 					skeletonData.slots.push(data);
@@ -323,6 +326,17 @@ module spine {
 					if (color != null) path.color.setFromString(color);
 					return path;
 				}
+				case "point": {
+					let point = this.attachmentLoader.newPointAttachment(skin, name);
+					if (point == null) return null;
+					point.x = this.getValue(map, "x", 0) * scale;
+					point.y = this.getValue(map, "y", 0) * scale;
+					point.rotation = this.getValue(map, "rotation", 0);
+
+					let color = this.getValue(map, "color", null);
+					if (color != null) point.color.setFromString(color);
+					return point;
+				}
 			}
 			return null;
 		}
@@ -368,7 +382,18 @@ module spine {
 					if (slotIndex == -1) throw new Error("Slot not found: " + slotName);
 					for (let timelineName in slotMap) {
 						let timelineMap = slotMap[timelineName];
-						if (timelineName == "color") {
+						if (timelineName = "attachment") {
+							let timeline = new AttachmentTimeline(timelineMap.length);
+							timeline.slotIndex = slotIndex;
+
+							let frameIndex = 0;
+							for (let i = 0; i < timelineMap.length; i++) {
+								let valueMap = timelineMap[i];
+								timeline.setFrame(frameIndex++, valueMap.time, valueMap.name);
+							}
+							timelines.push(timeline);
+							duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
+						} else if (timelineName == "color") {
 							let timeline = new ColorTimeline(timelineMap.length);
 							timeline.slotIndex = slotIndex;
 
@@ -384,17 +409,24 @@ module spine {
 							timelines.push(timeline);
 							duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * ColorTimeline.ENTRIES]);
 
-						} else if (timelineName = "attachment") {
-							let timeline = new AttachmentTimeline(timelineMap.length);
+						} else if (timelineName == "twoColor") {
+							let timeline = new TwoColorTimeline(timelineMap.length);
 							timeline.slotIndex = slotIndex;
 
 							let frameIndex = 0;
 							for (let i = 0; i < timelineMap.length; i++) {
 								let valueMap = timelineMap[i];
-								timeline.setFrame(frameIndex++, valueMap.time, valueMap.name);
+								let light = new Color();
+								let dark = new Color();
+								light.setFromString(valueMap.color);
+								dark.setFromString(valueMap.dark);
+								timeline.setFrame(frameIndex, valueMap.time, light.r, light.g, light.b, light.a, dark.r, dark.g, dark.b);
+								this.readCurve(valueMap, timeline, frameIndex);
+								frameIndex++;
 							}
 							timelines.push(timeline);
-							duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
+							duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * TwoColorTimeline.ENTRIES]);
+
 						} else
 							throw new Error("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
 					}
@@ -707,7 +739,7 @@ module spine {
 		}
 
 		static transformModeFromString(str: string) {
-			str = str.toLowerCase();			
+			str = str.toLowerCase();
 			if (str == "normal") return TransformMode.Normal;
 			if (str == "onlytranslation") return TransformMode.OnlyTranslation;
 			if (str == "norotationorreflection") return TransformMode.NoRotationOrReflection;

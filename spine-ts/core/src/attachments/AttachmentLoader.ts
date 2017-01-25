@@ -41,5 +41,8 @@ module spine {
 
 		/** @return May be null to not load an attachment */
 		newPathAttachment(skin: Skin, name: string): PathAttachment;
+
+		/** @return May be null to not load an attachment */
+		newPointAttachment(skin: Skin, name: string): PointAttachment;
 	}
 }

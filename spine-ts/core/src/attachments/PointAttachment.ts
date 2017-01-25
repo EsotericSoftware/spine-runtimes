@@ -29,45 +29,25 @@
  *****************************************************************************/
 
 module spine {
-	export class AtlasAttachmentLoader implements AttachmentLoader {
-		atlas: TextureAtlas;
+	export class PointAttachment extends VertexAttachment {
+		x: number; y: number; rotation: number;
+		color = new Color(0.38, 0.94, 0, 1);
 
-		constructor (atlas: TextureAtlas) {
-			this.atlas = atlas;
+		constructor (name: string) {
+			super(name);
 		}
 
-		/** @return May be null to not load an attachment. */
-		newRegionAttachment (skin: Skin, name: string, path: string): RegionAttachment {
-			let region = this.atlas.findRegion(path);
-			if (region == null) throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
-			region.renderObject = region;
-			let attachment = new RegionAttachment(name);
-			attachment.setRegion(region);
-			return attachment;
+		computeWorldPosition (bone: Bone, point: Vector2) {
+			point.x = this.x * bone.a + this.y * bone.b + bone.worldX;
+			point.y = this.x * bone.c + this.y * bone.d + bone.worldY;
+			return point;
 		}
 
-		/** @return May be null to not load an attachment. */
-		newMeshAttachment (skin: Skin, name: string, path: string) : MeshAttachment {
-			let region = this.atlas.findRegion(path);
-			if (region == null) throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
-			region.renderObject = region;
-			let attachment = new MeshAttachment(name);
-			attachment.region = region;
-			return attachment;
-		}
-
-		/** @return May be null to not load an attachment. */
-		newBoundingBoxAttachment (skin: Skin, name: string) : BoundingBoxAttachment {
-			return new BoundingBoxAttachment(name);
-		}
-
-		/** @return May be null to not load an attachment */
-		newPathAttachment (skin: Skin, name: string): PathAttachment {
-			return new PathAttachment(name);
-		}
-
-		newPointAttachment(skin: Skin, name: string): PointAttachment {
-			return new PointAttachment(name);
+		computeWorldRotation (bone: Bone) {
+			let cos = MathUtils.cosDeg(this.rotation), sin = MathUtils.sinDeg(this.rotation);
+			let x = cos * bone.a + sin * bone.b;
+			let y = cos * bone.c + sin * bone.d;
+			return Math.atan2(y, x) * MathUtils.radDeg;
 		}
 	}
 }
