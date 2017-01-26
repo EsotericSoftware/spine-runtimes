@@ -561,12 +561,18 @@ module spine {
 				g2 += (frames[frame + TwoColorTimeline.G2] - g2) * percent;
 				b2 += (frames[frame + TwoColorTimeline.B2] - b2) * percent;
 			}
-			if (alpha == 1)
+			if (alpha == 1) {
 				slot.color.set(r, g, b, a);
-			else {
-				let color = slot.color;
-				if (setupPose) color.setFromColor(slot.data.color);
-				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
+				slot.darkColor.set(r2, g2, b2, 1);
+			} else {
+				let light = slot.color;
+				let dark = slot.darkColor;
+				if (setupPose) {
+					light.setFromColor(slot.data.color);
+					dark.setFromColor(slot.data.darkColor);
+				}
+				light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
+				dark.add((r2 - dark.r) * alpha, (g2 - dark.g) * alpha, (b2 - dark.b) * alpha, 0);
 			}
 		}
 	}

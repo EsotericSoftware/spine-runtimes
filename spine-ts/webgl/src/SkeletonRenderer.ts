@@ -94,33 +94,33 @@ module spine.webgl {
 
 			let uvs = region.uvs;
 
-			vertices[RegionAttachment.U1] = uvs[0];
-			vertices[RegionAttachment.V1] = uvs[1];
 			vertices[RegionAttachment.C1R] = color.r;
 			vertices[RegionAttachment.C1G] = color.g;
 			vertices[RegionAttachment.C1B] = color.b;
 			vertices[RegionAttachment.C1A] = color.a;
+			vertices[RegionAttachment.U1] = uvs[0];
+			vertices[RegionAttachment.V1] = uvs[1];
 
-			vertices[RegionAttachment.U2] = uvs[2];
-			vertices[RegionAttachment.V2] = uvs[3];
 			vertices[RegionAttachment.C2R] = color.r;
 			vertices[RegionAttachment.C2G] = color.g;
 			vertices[RegionAttachment.C2B] = color.b;
 			vertices[RegionAttachment.C2A] = color.a;
+			vertices[RegionAttachment.U2] = uvs[2];
+			vertices[RegionAttachment.V2] = uvs[3];
 
-			vertices[RegionAttachment.U3] = uvs[4];
-			vertices[RegionAttachment.V3] = uvs[5];
 			vertices[RegionAttachment.C3R] = color.r;
 			vertices[RegionAttachment.C3G] = color.g;
 			vertices[RegionAttachment.C3B] = color.b;
 			vertices[RegionAttachment.C3A] = color.a;
+			vertices[RegionAttachment.U3] = uvs[4];
+			vertices[RegionAttachment.V3] = uvs[5];
 
-			vertices[RegionAttachment.U4] = uvs[6];
-			vertices[RegionAttachment.V4] = uvs[7];
 			vertices[RegionAttachment.C4R] = color.r;
 			vertices[RegionAttachment.C4G] = color.g;
 			vertices[RegionAttachment.C4B] = color.b;
 			vertices[RegionAttachment.C4A] = color.a;
+			vertices[RegionAttachment.U4] = uvs[6];
+			vertices[RegionAttachment.V4] = uvs[7];
 
 			return vertices;
 		}
@@ -144,12 +144,12 @@ module spine.webgl {
 
 			let uvs = mesh.uvs;
 			for (let i = 0, n = numVertices, u = 0, v = 2; i < n; i++) {
-				vertices[v++] = uvs[u++];
-				vertices[v++] = uvs[u++];
 				vertices[v++] = color.r;
 				vertices[v++] = color.g;
 				vertices[v++] = color.b;
 				vertices[v++] = color.a;
+				vertices[v++] = uvs[u++];
+				vertices[v++] = uvs[u++];
 				v += 2;
 			}
 

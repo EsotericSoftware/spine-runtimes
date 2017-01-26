@@ -66,7 +66,7 @@ module spine {
 			} else {
 				for (let i = 0, n = uvs.length; i < n; i += 2) {
 					uvs[i] = u + regionUVs[i] * width;
-					uvs[i] = v + regionUVs[i + 1] * height;
+					uvs[i + 1] = v + regionUVs[i + 1] * height;
 				}
 			}
 		}

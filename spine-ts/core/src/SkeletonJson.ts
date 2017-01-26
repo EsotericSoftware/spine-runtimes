@@ -382,7 +382,7 @@ module spine {
 					if (slotIndex == -1) throw new Error("Slot not found: " + slotName);
 					for (let timelineName in slotMap) {
 						let timelineMap = slotMap[timelineName];
-						if (timelineName = "attachment") {
+						if (timelineName == "attachment") {
 							let timeline = new AttachmentTimeline(timelineMap.length);
 							timeline.slotIndex = slotIndex;
 

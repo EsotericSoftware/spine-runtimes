@@ -499,13 +499,19 @@ var spine;
                 g2 += (frames[frame + TwoColorTimeline.G2] - g2) * percent;
                 b2 += (frames[frame + TwoColorTimeline.B2] - b2) * percent;
             }
-            if (alpha == 1)
+            if (alpha == 1) {
                 slot.color.set(r, g, b, a);
+                slot.darkColor.set(r2, g2, b2, 1);
+            }
             else {
-                var color = slot.color;
-                if (setupPose)
-                    color.setFromColor(slot.data.color);
-                color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
+                var light = slot.color;
+                var dark = slot.darkColor;
+                if (setupPose) {
+                    light.setFromColor(slot.data.color);
+                    dark.setFromColor(slot.data.darkColor);
+                }
+                light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
+                dark.add((r2 - dark.r) * alpha, (g2 - dark.g) * alpha, (b2 - dark.b) * alpha, 0);
             }
         };
         TwoColorTimeline.ENTRIES = 8;
@@ -1991,7 +1997,7 @@ var spine;
             else {
                 for (var i = 0, n = uvs.length; i < n; i += 2) {
                     uvs[i] = u + regionUVs[i] * width;
-                    uvs[i] = v + regionUVs[i + 1] * height;
+                    uvs[i + 1] = v + regionUVs[i + 1] * height;
                 }
             }
         };
@@ -4321,7 +4327,7 @@ var spine;
                         throw new Error("Slot not found: " + slotName);
                     for (var timelineName in slotMap) {
                         var timelineMap = slotMap[timelineName];
-                        if (timelineName = "attachment") {
+                        if (timelineName == "attachment") {
                             var timeline = new spine.AttachmentTimeline(timelineMap.length);
                             timeline.slotIndex = slotIndex;
                             var frameIndex = 0;
@@ -7545,30 +7551,30 @@ var spine;
                 var vertices = spine.Utils.newFloatArray(4 * SkeletonRenderer.VERTEX_SIZE);
                 region.computeWorldVertices(slot.bone, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
                 var uvs = region.uvs;
-                vertices[spine.RegionAttachment.U1] = uvs[0];
-                vertices[spine.RegionAttachment.V1] = uvs[1];
                 vertices[spine.RegionAttachment.C1R] = color.r;
                 vertices[spine.RegionAttachment.C1G] = color.g;
                 vertices[spine.RegionAttachment.C1B] = color.b;
                 vertices[spine.RegionAttachment.C1A] = color.a;
-                vertices[spine.RegionAttachment.U2] = uvs[2];
-                vertices[spine.RegionAttachment.V2] = uvs[3];
+                vertices[spine.RegionAttachment.U1] = uvs[0];
+                vertices[spine.RegionAttachment.V1] = uvs[1];
                 vertices[spine.RegionAttachment.C2R] = color.r;
                 vertices[spine.RegionAttachment.C2G] = color.g;
                 vertices[spine.RegionAttachment.C2B] = color.b;
                 vertices[spine.RegionAttachment.C2A] = color.a;
-                vertices[spine.RegionAttachment.U3] = uvs[4];
-                vertices[spine.RegionAttachment.V3] = uvs[5];
+                vertices[spine.RegionAttachment.U2] = uvs[2];
+                vertices[spine.RegionAttachment.V2] = uvs[3];
                 vertices[spine.RegionAttachment.C3R] = color.r;
                 vertices[spine.RegionAttachment.C3G] = color.g;
                 vertices[spine.RegionAttachment.C3B] = color.b;
                 vertices[spine.RegionAttachment.C3A] = color.a;
-                vertices[spine.RegionAttachment.U4] = uvs[6];
-                vertices[spine.RegionAttachment.V4] = uvs[7];
+                vertices[spine.RegionAttachment.U3] = uvs[4];
+                vertices[spine.RegionAttachment.V3] = uvs[5];
                 vertices[spine.RegionAttachment.C4R] = color.r;
                 vertices[spine.RegionAttachment.C4G] = color.g;
                 vertices[spine.RegionAttachment.C4B] = color.b;
                 vertices[spine.RegionAttachment.C4A] = color.a;
+                vertices[spine.RegionAttachment.U4] = uvs[6];
+                vertices[spine.RegionAttachment.V4] = uvs[7];
                 return vertices;
             };
             SkeletonRenderer.prototype.computeMeshVertices = function (slot, mesh, pma) {
@@ -7585,12 +7591,12 @@ var spine;
                 mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
                 var uvs = mesh.uvs;
                 for (var i = 0, n = numVertices, u = 0, v = 2; i < n; i++) {
-                    vertices[v++] = uvs[u++];
-                    vertices[v++] = uvs[u++];
                     vertices[v++] = color.r;
                     vertices[v++] = color.g;
                     vertices[v++] = color.b;
                     vertices[v++] = color.a;
+                    vertices[v++] = uvs[u++];
+                    vertices[v++] = uvs[u++];
                     v += 2;
                 }
                 return vertices;
