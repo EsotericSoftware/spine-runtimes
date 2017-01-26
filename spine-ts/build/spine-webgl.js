@@ -446,7 +446,7 @@ var spine;
             this.frames = spine.Utils.newFloatArray(frameCount * TwoColorTimeline.ENTRIES);
         }
         TwoColorTimeline.prototype.getPropertyId = function () {
-            return (TimelineType.color << 24) + this.slotIndex;
+            return (TimelineType.twoColor << 24) + this.slotIndex;
         };
         TwoColorTimeline.prototype.setFrame = function (frameIndex, time, r, g, b, a, r2, g2, b2) {
             frameIndex *= TwoColorTimeline.ENTRIES;

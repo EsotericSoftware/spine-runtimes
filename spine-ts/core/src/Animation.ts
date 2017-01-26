@@ -502,7 +502,7 @@ module spine {
 		}
 
 		getPropertyId () {
-			return (TimelineType.color << 24) + this.slotIndex;
+			return (TimelineType.twoColor << 24) + this.slotIndex;
 		}
 
 		/** Sets the time and value of the specified keyframe. */
