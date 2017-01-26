@@ -46,11 +46,11 @@ function init () {
 	mvp.ortho2d(0, 0, canvas.width - 1, canvas.height - 1);
 	skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
 	debugRenderer = new spine.webgl.SkeletonDebugRenderer(gl);
-	debugRenderer.drawRegionAttachments = false;
-	debugRenderer.drawBoundingBoxes = false;
-	debugRenderer.drawMeshHull = false;
-	debugRenderer.drawMeshTriangles = false;
-	debugRenderer.drawPaths = false;
+	debugRenderer.drawRegionAttachments = true;
+	debugRenderer.drawBoundingBoxes = true;
+	debugRenderer.drawMeshHull = true;
+	debugRenderer.drawMeshTriangles = true;
+	debugRenderer.drawPaths = true;
 	debugShader = spine.webgl.Shader.newColored(gl);
 	shapes = new spine.webgl.ShapeRenderer(gl);
 	assetManager = new spine.webgl.AssetManager(gl);

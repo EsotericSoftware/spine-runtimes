@@ -50,6 +50,7 @@ module spine.webgl {
 		private gl: WebGLRenderingContext;
 		private bounds = new SkeletonBounds();
 		private temp = new Array<number>();
+		private vertices = Utils.newFloatArray(SkeletonRenderer.VERTEX_SIZE * 1024);
 		private static LIGHT_GRAY = new Color(192 / 255, 192 / 255, 192 / 255, 1);
 		private static GREEN = new Color(0, 1, 0, 1);
 
@@ -86,11 +87,12 @@ module spine.webgl {
 					let attachment = slot.getAttachment();
 					if (attachment instanceof RegionAttachment) {
 						let regionAttachment = <RegionAttachment>attachment;
-						let vertices = regionAttachment.updateWorldVertices(slot, false);
-						shapes.line(vertices[RegionAttachment.X1], vertices[RegionAttachment.Y1], vertices[RegionAttachment.X2], vertices[RegionAttachment.Y2]);
-						shapes.line(vertices[RegionAttachment.X2], vertices[RegionAttachment.Y2], vertices[RegionAttachment.X3], vertices[RegionAttachment.Y3]);
-						shapes.line(vertices[RegionAttachment.X3], vertices[RegionAttachment.Y3], vertices[RegionAttachment.X4], vertices[RegionAttachment.Y4]);
-						shapes.line(vertices[RegionAttachment.X4], vertices[RegionAttachment.Y4], vertices[RegionAttachment.X1], vertices[RegionAttachment.Y1]);
+						let vertices = this.vertices;
+						regionAttachment.computeWorldVertices(slot.bone, vertices, 0, 2);
+						shapes.line(vertices[0], vertices[1], vertices[2], vertices[3]);
+						shapes.line(vertices[2], vertices[3], vertices[4], vertices[5]);
+						shapes.line(vertices[4], vertices[5], vertices[6], vertices[7]);
+						shapes.line(vertices[6], vertices[7], vertices[0], vertices[1]);
 					}
 				}
 			}
@@ -102,14 +104,14 @@ module spine.webgl {
 					let attachment = slot.getAttachment();
 					if (!(attachment instanceof MeshAttachment)) continue;
 					let mesh = <MeshAttachment>attachment;
-					mesh.updateWorldVertices(slot, false);
-					let vertices = mesh.worldVertices;
+					let vertices = this.vertices;
+					mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, 2);
 					let triangles = mesh.triangles;
 					let hullLength = mesh.hullLength;
 					if (this.drawMeshTriangles) {
 						shapes.setColor(this.triangleLineColor);
 						for (let ii = 0, nn = triangles.length; ii < nn; ii += 3) {
-							let v1 = triangles[ii] * 8, v2 = triangles[ii + 1] * 8, v3 = triangles[ii + 2] * 8;
+							let v1 = triangles[ii] * 2, v2 = triangles[ii + 1] * 2, v3 = triangles[ii + 2] * 2;
 							shapes.triangle(false, vertices[v1], vertices[v1 + 1], //
 								vertices[v2], vertices[v2 + 1], //
 								vertices[v3], vertices[v3 + 1] //
@@ -118,9 +120,9 @@ module spine.webgl {
 					}
 					if (this.drawMeshHull && hullLength > 0) {
 						shapes.setColor(this.attachmentLineColor);
-						hullLength = (hullLength >> 1) * 8;
-						let lastX = vertices[hullLength - 8], lastY = vertices[hullLength - 7];
-						for (let ii = 0, nn = hullLength; ii < nn; ii += 8) {
+						hullLength = (hullLength >> 1) * 2;
+						let lastX = vertices[hullLength - 2], lastY = vertices[hullLength - 1];
+						for (let ii = 0, nn = hullLength; ii < nn; ii += 2) {
 							let x = vertices[ii], y = vertices[ii + 1];
 							shapes.line(x, y, lastX, lastY);
 							lastX = x;
@@ -153,7 +155,7 @@ module spine.webgl {
 					let path = <PathAttachment>attachment;
 					let nn = path.worldVerticesLength;
 					let world = this.temp = Utils.setArraySize(this.temp, nn, 0);
-					path.computeWorldVertices(slot, world);
+					path.computeWorldVertices(slot, 0, nn, world, 0, 2);
 					let color = this.pathColor;
 					let x1 = world[2], y1 = world[3], x2 = 0, y2 = 0;
 					if (path.closed) {

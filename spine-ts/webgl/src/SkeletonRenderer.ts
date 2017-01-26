@@ -36,6 +36,7 @@ module spine.webgl {
 		premultipliedAlpha = false;
 		private gl: WebGLRenderingContext;
 		private tempColor = new Color();
+		private vertices = Utils.newFloatArray(SkeletonRenderer.VERTEX_SIZE * 1024);
 
 		constructor (gl: WebGLRenderingContext) {
 			this.gl = gl;
@@ -89,9 +90,9 @@ module spine.webgl {
 					  skeletonColor.b * slotColor.b * regionColor.b * multiplier,
 					  alpha);
 
-			let vertices = Utils.newFloatArray(4 * SkeletonRenderer.VERTEX_SIZE);
-			region.computeWorldVertices(slot.bone, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
+			region.computeWorldVertices(slot.bone, this.vertices, 0, SkeletonRenderer.VERTEX_SIZE);
 
+			let vertices = this.vertices;
 			let uvs = region.uvs;
 
 			vertices[RegionAttachment.C1R] = color.r;
@@ -139,7 +140,10 @@ module spine.webgl {
 					  alpha);
 
 			let numVertices = mesh.worldVerticesLength / 2;
-			let vertices = Utils.newFloatArray(numVertices * SkeletonRenderer.VERTEX_SIZE);
+			if (this.vertices.length < mesh.worldVerticesLength) {
+				this.vertices = Utils.newFloatArray(mesh.worldVerticesLength);
+			}
+			let vertices = this.vertices;
 			mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
 
 			let uvs = mesh.uvs;

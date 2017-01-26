@@ -1508,6 +1508,7 @@ declare module spine.webgl {
         private gl;
         private bounds;
         private temp;
+        private vertices;
         private static LIGHT_GRAY;
         private static GREEN;
         constructor(gl: WebGLRenderingContext);
@@ -1522,6 +1523,7 @@ declare module spine.webgl {
         premultipliedAlpha: boolean;
         private gl;
         private tempColor;
+        private vertices;
         constructor(gl: WebGLRenderingContext);
         draw(batcher: PolygonBatcher, skeleton: Skeleton): void;
         computeRegionVertices(slot: Slot, region: RegionAttachment, pma: boolean): ArrayLike<number>;

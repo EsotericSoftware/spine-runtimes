@@ -793,7 +793,7 @@ var spine;
             this.frames = spine.Utils.newFloatArray(frameCount * TwoColorTimeline.ENTRIES);
         }
         TwoColorTimeline.prototype.getPropertyId = function () {
-            return (TimelineType.color << 24) + this.slotIndex;
+            return (TimelineType.twoColor << 24) + this.slotIndex;
         };
         TwoColorTimeline.prototype.setFrame = function (frameIndex, time, r, g, b, a, r2, g2, b2) {
             frameIndex *= TwoColorTimeline.ENTRIES;
@@ -7773,6 +7773,7 @@ var spine;
                 this.boneWidth = 2;
                 this.bounds = new spine.SkeletonBounds();
                 this.temp = new Array();
+                this.vertices = spine.Utils.newFloatArray(webgl.SkeletonRenderer.VERTEX_SIZE * 1024);
                 this.gl = gl;
             }
             SkeletonDebugRenderer.prototype.draw = function (shapes, skeleton, ignoredBones) {
@@ -7806,11 +7807,12 @@ var spine;
                         var attachment = slot.getAttachment();
                         if (attachment instanceof spine.RegionAttachment) {
                             var regionAttachment = attachment;
-                            var vertices = regionAttachment.updateWorldVertices(slot, false);
-                            shapes.line(vertices[spine.RegionAttachment.X1], vertices[spine.RegionAttachment.Y1], vertices[spine.RegionAttachment.X2], vertices[spine.RegionAttachment.Y2]);
-                            shapes.line(vertices[spine.RegionAttachment.X2], vertices[spine.RegionAttachment.Y2], vertices[spine.RegionAttachment.X3], vertices[spine.RegionAttachment.Y3]);
-                            shapes.line(vertices[spine.RegionAttachment.X3], vertices[spine.RegionAttachment.Y3], vertices[spine.RegionAttachment.X4], vertices[spine.RegionAttachment.Y4]);
-                            shapes.line(vertices[spine.RegionAttachment.X4], vertices[spine.RegionAttachment.Y4], vertices[spine.RegionAttachment.X1], vertices[spine.RegionAttachment.Y1]);
+                            var vertices = this.vertices;
+                            regionAttachment.computeWorldVertices(slot.bone, vertices, 0, 2);
+                            shapes.line(vertices[0], vertices[1], vertices[2], vertices[3]);
+                            shapes.line(vertices[2], vertices[3], vertices[4], vertices[5]);
+                            shapes.line(vertices[4], vertices[5], vertices[6], vertices[7]);
+                            shapes.line(vertices[6], vertices[7], vertices[0], vertices[1]);
                         }
                     }
                 }
@@ -7822,22 +7824,22 @@ var spine;
                         if (!(attachment instanceof spine.MeshAttachment))
                             continue;
                         var mesh = attachment;
-                        mesh.updateWorldVertices(slot, false);
-                        var vertices = mesh.worldVertices;
+                        var vertices = this.vertices;
+                        mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, 2);
                         var triangles = mesh.triangles;
                         var hullLength = mesh.hullLength;
                         if (this.drawMeshTriangles) {
                             shapes.setColor(this.triangleLineColor);
                             for (var ii = 0, nn = triangles.length; ii < nn; ii += 3) {
-                                var v1 = triangles[ii] * 8, v2 = triangles[ii + 1] * 8, v3 = triangles[ii + 2] * 8;
+                                var v1 = triangles[ii] * 2, v2 = triangles[ii + 1] * 2, v3 = triangles[ii + 2] * 2;
                                 shapes.triangle(false, vertices[v1], vertices[v1 + 1], vertices[v2], vertices[v2 + 1], vertices[v3], vertices[v3 + 1]);
                             }
                         }
                         if (this.drawMeshHull && hullLength > 0) {
                             shapes.setColor(this.attachmentLineColor);
-                            hullLength = (hullLength >> 1) * 8;
-                            var lastX = vertices[hullLength - 8], lastY = vertices[hullLength - 7];
-                            for (var ii = 0, nn = hullLength; ii < nn; ii += 8) {
+                            hullLength = (hullLength >> 1) * 2;
+                            var lastX = vertices[hullLength - 2], lastY = vertices[hullLength - 1];
+                            for (var ii = 0, nn = hullLength; ii < nn; ii += 2) {
                                 var x = vertices[ii], y = vertices[ii + 1];
                                 shapes.line(x, y, lastX, lastY);
                                 lastX = x;
@@ -7869,7 +7871,7 @@ var spine;
                         var path = attachment;
                         var nn = path.worldVerticesLength;
                         var world = this.temp = spine.Utils.setArraySize(this.temp, nn, 0);
-                        path.computeWorldVertices(slot, world);
+                        path.computeWorldVertices(slot, 0, nn, world, 0, 2);
                         var color = this.pathColor;
                         var x1 = world[2], y1 = world[3], x2 = 0, y2 = 0;
                         if (path.closed) {
@@ -7924,6 +7926,7 @@ var spine;
             function SkeletonRenderer(gl) {
                 this.premultipliedAlpha = false;
                 this.tempColor = new spine.Color();
+                this.vertices = spine.Utils.newFloatArray(SkeletonRenderer.VERTEX_SIZE * 1024);
                 this.gl = gl;
             }
             SkeletonRenderer.prototype.draw = function (batcher, skeleton) {
@@ -7969,8 +7972,8 @@ var spine;
                 var multiplier = pma ? alpha : 1;
                 var color = this.tempColor;
                 color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier, skeletonColor.g * slotColor.g * regionColor.g * multiplier, skeletonColor.b * slotColor.b * regionColor.b * multiplier, alpha);
-                var vertices = spine.Utils.newFloatArray(4 * SkeletonRenderer.VERTEX_SIZE);
-                region.computeWorldVertices(slot.bone, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
+                region.computeWorldVertices(slot.bone, this.vertices, 0, SkeletonRenderer.VERTEX_SIZE);
+                var vertices = this.vertices;
                 var uvs = region.uvs;
                 vertices[spine.RegionAttachment.C1R] = color.r;
                 vertices[spine.RegionAttachment.C1G] = color.g;
@@ -8008,7 +8011,10 @@ var spine;
                 var color = this.tempColor;
                 color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier, skeletonColor.g * slotColor.g * regionColor.g * multiplier, skeletonColor.b * slotColor.b * regionColor.b * multiplier, alpha);
                 var numVertices = mesh.worldVerticesLength / 2;
-                var vertices = spine.Utils.newFloatArray(numVertices * SkeletonRenderer.VERTEX_SIZE);
+                if (this.vertices.length < mesh.worldVerticesLength) {
+                    this.vertices = spine.Utils.newFloatArray(mesh.worldVerticesLength);
+                }
+                var vertices = this.vertices;
                 mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
                 var uvs = mesh.uvs;
                 for (var i = 0, n = numVertices, u = 0, v = 2; i < n; i++) {
