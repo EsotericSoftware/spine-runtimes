@@ -29,7 +29,7 @@ function init () {
 	// enable the triangle renderer, supports meshes, but may produce artifacts in some browsers
 	skeletonRenderer.triangleRendering = false;
 
-	assetManager = new spine.canvas.AssetManager();	
+	assetManager = new spine.canvas.AssetManager();
 
 	assetManager.loadText("assets/spineboy.json");
 	assetManager.loadText("assets/spineboy.atlas");
@@ -43,7 +43,7 @@ function load () {
 		var data = loadSkeleton("spineboy", "walk", "default");
 		skeleton = data.skeleton;
 		state = data.state;
-		bounds = data.bounds;	
+		bounds = data.bounds;
 		requestAnimationFrame(render);
 	} else {
 		requestAnimationFrame(load);
@@ -56,7 +56,7 @@ function loadSkeleton (name, initialAnimation, skin) {
 	// Load the texture atlas using name.atlas and name.png from the AssetManager.
 	// The function passed to TextureAtlas is used to resolve relative paths.
 	atlas = new spine.TextureAtlas(assetManager.get("assets/" + name + ".atlas"), function(path) {
-		return assetManager.get("assets/" + path);				
+		return assetManager.get("assets/" + path);
 	});
 
 	// Create a AtlasAttachmentLoader, which is specific to the WebGL backend.
@@ -64,12 +64,12 @@ function loadSkeleton (name, initialAnimation, skin) {
 
 	// Create a SkeletonJson instance for parsing the .json file.
 	var skeletonJson = new spine.SkeletonJson(atlasLoader);
-	
-	// Set the scale to apply during parsing, parse the file, and create a new skeleton.	
+
+	// Set the scale to apply during parsing, parse the file, and create a new skeleton.
 	var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/" + name + ".json"));
 	var skeleton = new spine.Skeleton(skeletonData);
-	skeleton.flipY = true;		
-	var bounds = calculateBounds(skeleton);	
+	skeleton.flipY = true;
+	var bounds = calculateBounds(skeleton);
 	skeleton.setSkinByName(skin);
 
 	// Create an AnimationState, and set the initial animation in looping mode.
@@ -100,7 +100,7 @@ function calculateBounds(skeleton) {
 	skeleton.updateWorldTransform();
 	var offset = new spine.Vector2();
 	var size = new spine.Vector2();
-	skeleton.getBounds(offset, size);	
+	skeleton.getBounds(offset, size, []);
 	return { offset: offset, size: size };
 }
 
@@ -108,7 +108,7 @@ function render () {
 	var now = Date.now() / 1000;
 	var delta = now - lastFrameTime;
 	lastFrameTime = now;
-	
+
 	resize();
 
 	context.save();
@@ -119,15 +119,15 @@ function render () {
 
 	state.update(delta);
 	state.apply(skeleton);
-	skeleton.updateWorldTransform();		 			
-	skeletonRenderer.draw(skeleton);	
+	skeleton.updateWorldTransform();
+	skeletonRenderer.draw(skeleton);
 
 	requestAnimationFrame(render);
 }
 
 function resize () {
 	var w = canvas.clientWidth;
-	var h = canvas.clientHeight;	
+	var h = canvas.clientHeight;
 	if (canvas.width != w || canvas.height != h) {
 		canvas.width = w;
 		canvas.height = h;
@@ -142,10 +142,10 @@ function resize () {
 	if (scale < 1) scale = 1;
 	var width = canvas.width * scale;
 	var height = canvas.height * scale;
-	
+
 	context.resetTransform();
 	context.scale(1 / scale, 1 / scale);
-	context.translate(-centerX, -centerY);	
+	context.translate(-centerX, -centerY);
 	context.translate(width / 2, height / 2);
 }
 

@@ -31,11 +31,14 @@
 module spine.canvas {
 	export class SkeletonRenderer {
 		static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
+		static VERTEX_SIZE = 2 + 2 + 4;
 
 		private ctx: CanvasRenderingContext2D;
 
 		public triangleRendering = false;
 		public debugRendering = false;
+		private vertices = Utils.newFloatArray(8 * 1024);
+		private tempColor = new Color();
 
 		constructor (context: CanvasRenderingContext2D) {
 			this.ctx = context;
@@ -57,10 +60,10 @@ module spine.canvas {
 				let attachment = slot.getAttachment();
 				let region: TextureAtlasRegion = null;
 				let image: HTMLImageElement = null;
-				let vertices: ArrayLike<number> = null;
+				let vertices: ArrayLike<number> = this.vertices;
 				if (attachment instanceof RegionAttachment) {
 					let regionAttachment = <RegionAttachment>attachment;
-					vertices = regionAttachment.updateWorldVertices(slot, false);
+					vertices = this.computeRegionVertices(slot, regionAttachment, false);
 					region = <TextureAtlasRegion>regionAttachment.region;
 					image = (<CanvasTexture>(region).texture).getImage();
 
@@ -94,7 +97,7 @@ module spine.canvas {
 		private drawTriangles (skeleton: Skeleton) {
 			let blendMode: BlendMode = null;
 
-			let vertices: ArrayLike<number> = null;
+			let vertices: ArrayLike<number> = this.vertices;
 			let triangles: Array<number> = null;
 			let drawOrder = skeleton.drawOrder;
 
@@ -105,14 +108,14 @@ module spine.canvas {
 				let region: TextureAtlasRegion = null;
 				if (attachment instanceof RegionAttachment) {
 					let regionAttachment = <RegionAttachment>attachment;
-					vertices = regionAttachment.updateWorldVertices(slot, false);
+					vertices = this.computeRegionVertices(slot, regionAttachment, false);
 					triangles = SkeletonRenderer.QUAD_TRIANGLES;
 					region = <TextureAtlasRegion>regionAttachment.region;
 					texture = (<CanvasTexture>region.texture).getImage();
 
 				} else if (attachment instanceof MeshAttachment) {
 					let mesh = <MeshAttachment>attachment;
-					vertices = mesh.updateWorldVertices(slot, false);
+					vertices = this.computeMeshVertices(slot, mesh, false);
 					triangles = mesh.triangles;
 					texture = (<TextureAtlasRegion>mesh.region.renderObject).texture.getImage();
 				} else continue;
@@ -195,6 +198,89 @@ module spine.canvas {
 			ctx.clip();
 			ctx.drawImage(img, 0, 0);
 			ctx.restore();
+		}
+
+		private computeRegionVertices(slot: Slot, region: RegionAttachment, pma: boolean) {
+			let skeleton = slot.bone.skeleton;
+			let skeletonColor = skeleton.color;
+			let slotColor = slot.color;
+			let regionColor = region.color;
+			let alpha = skeletonColor.a * slotColor.a * regionColor.a;
+			let multiplier = pma ? alpha : 1;
+			let color = this.tempColor;
+			color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
+					  skeletonColor.g * slotColor.g * regionColor.g * multiplier,
+					  skeletonColor.b * slotColor.b * regionColor.b * multiplier,
+					  alpha);
+
+			region.computeWorldVertices(slot.bone, this.vertices, 0, SkeletonRenderer.VERTEX_SIZE);
+
+			let vertices = this.vertices;
+			let uvs = region.uvs;
+
+			vertices[RegionAttachment.C1R] = color.r;
+			vertices[RegionAttachment.C1G] = color.g;
+			vertices[RegionAttachment.C1B] = color.b;
+			vertices[RegionAttachment.C1A] = color.a;
+			vertices[RegionAttachment.U1] = uvs[0];
+			vertices[RegionAttachment.V1] = uvs[1];
+
+			vertices[RegionAttachment.C2R] = color.r;
+			vertices[RegionAttachment.C2G] = color.g;
+			vertices[RegionAttachment.C2B] = color.b;
+			vertices[RegionAttachment.C2A] = color.a;
+			vertices[RegionAttachment.U2] = uvs[2];
+			vertices[RegionAttachment.V2] = uvs[3];
+
+			vertices[RegionAttachment.C3R] = color.r;
+			vertices[RegionAttachment.C3G] = color.g;
+			vertices[RegionAttachment.C3B] = color.b;
+			vertices[RegionAttachment.C3A] = color.a;
+			vertices[RegionAttachment.U3] = uvs[4];
+			vertices[RegionAttachment.V3] = uvs[5];
+
+			vertices[RegionAttachment.C4R] = color.r;
+			vertices[RegionAttachment.C4G] = color.g;
+			vertices[RegionAttachment.C4B] = color.b;
+			vertices[RegionAttachment.C4A] = color.a;
+			vertices[RegionAttachment.U4] = uvs[6];
+			vertices[RegionAttachment.V4] = uvs[7];
+
+			return vertices;
+		}
+
+		private computeMeshVertices(slot: Slot, mesh: MeshAttachment, pma: boolean) {
+			let skeleton = slot.bone.skeleton;
+			let skeletonColor = skeleton.color;
+			let slotColor = slot.color;
+			let regionColor = mesh.color;
+			let alpha = skeletonColor.a * slotColor.a * regionColor.a;
+			let multiplier = pma ? alpha : 1;
+			let color = this.tempColor;
+			color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
+					  skeletonColor.g * slotColor.g * regionColor.g * multiplier,
+					  skeletonColor.b * slotColor.b * regionColor.b * multiplier,
+					  alpha);
+
+			let numVertices = mesh.worldVerticesLength / 2;
+			if (this.vertices.length < mesh.worldVerticesLength) {
+				this.vertices = Utils.newFloatArray(mesh.worldVerticesLength);
+			}
+			let vertices = this.vertices;
+			mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
+
+			let uvs = mesh.uvs;
+			for (let i = 0, n = numVertices, u = 0, v = 2; i < n; i++) {
+				vertices[v++] = color.r;
+				vertices[v++] = color.g;
+				vertices[v++] = color.b;
+				vertices[v++] = color.a;
+				vertices[v++] = uvs[u++];
+				vertices[v++] = uvs[u++];
+				v += 2;
+			}
+
+			return vertices;
 		}
 	}
 }

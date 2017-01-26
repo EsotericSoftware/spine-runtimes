@@ -27,6 +27,7 @@ declare module spine {
 		pathConstraintPosition = 11,
 		pathConstraintSpacing = 12,
 		pathConstraintMix = 13,
+		twoColor = 14,
 	}
 	abstract class CurveTimeline implements Timeline {
 		static LINEAR: number;
@@ -96,6 +97,30 @@ declare module spine {
 		constructor(frameCount: number);
 		getPropertyId(): number;
 		setFrame(frameIndex: number, time: number, r: number, g: number, b: number, a: number): void;
+		apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
+	}
+	class TwoColorTimeline extends CurveTimeline {
+		static ENTRIES: number;
+		static PREV_TIME: number;
+		static PREV_R: number;
+		static PREV_G: number;
+		static PREV_B: number;
+		static PREV_A: number;
+		static PREV_R2: number;
+		static PREV_G2: number;
+		static PREV_B2: number;
+		static R: number;
+		static G: number;
+		static B: number;
+		static A: number;
+		static R2: number;
+		static G2: number;
+		static B2: number;
+		slotIndex: number;
+		frames: ArrayLike<number>;
+		constructor(frameCount: number);
+		getPropertyId(): number;
+		setFrame(frameIndex: number, time: number, r: number, g: number, b: number, a: number, r2: number, g2: number, b2: number): void;
 		apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, setupPose: boolean, mixingOut: boolean): void;
 	}
 	class AttachmentTimeline implements Timeline {
@@ -354,6 +379,7 @@ declare module spine {
 		newMeshAttachment(skin: Skin, name: string, path: string): MeshAttachment;
 		newBoundingBoxAttachment(skin: Skin, name: string): BoundingBoxAttachment;
 		newPathAttachment(skin: Skin, name: string): PathAttachment;
+		newPointAttachment(skin: Skin, name: string): PointAttachment;
 	}
 }
 declare module spine {
@@ -366,8 +392,7 @@ declare module spine {
 		vertices: ArrayLike<number>;
 		worldVerticesLength: number;
 		constructor(name: string);
-		computeWorldVertices(slot: Slot, worldVertices: ArrayLike<number>): void;
-		computeWorldVerticesWith(slot: Slot, start: number, count: number, worldVertices: ArrayLike<number>, offset: number): void;
+		computeWorldVertices(slot: Slot, start: number, count: number, worldVertices: ArrayLike<number>, offset: number, stride: number): void;
 		applyDeform(sourceAttachment: VertexAttachment): boolean;
 	}
 }
@@ -377,6 +402,7 @@ declare module spine {
 		newMeshAttachment(skin: Skin, name: string, path: string): MeshAttachment;
 		newBoundingBoxAttachment(skin: Skin, name: string): BoundingBoxAttachment;
 		newPathAttachment(skin: Skin, name: string): PathAttachment;
+		newPointAttachment(skin: Skin, name: string): PointAttachment;
 	}
 }
 declare module spine {
@@ -386,6 +412,7 @@ declare module spine {
 		Mesh = 2,
 		LinkedMesh = 3,
 		Path = 4,
+		Point = 5,
 	}
 }
 declare module spine {
@@ -399,7 +426,7 @@ declare module spine {
 		region: TextureRegion;
 		path: string;
 		regionUVs: ArrayLike<number>;
-		worldVertices: ArrayLike<number>;
+		uvs: ArrayLike<number>;
 		triangles: Array<number>;
 		color: Color;
 		hullLength: number;
@@ -408,7 +435,6 @@ declare module spine {
 		tempColor: Color;
 		constructor(name: string);
 		updateUVs(): void;
-		updateWorldVertices(slot: Slot, premultipliedAlpha: boolean): ArrayLike<number>;
 		applyDeform(sourceAttachment: VertexAttachment): boolean;
 		getParentMesh(): MeshAttachment;
 		setParentMesh(parentMesh: MeshAttachment): void;
@@ -421,6 +447,17 @@ declare module spine {
 		constantSpeed: boolean;
 		color: Color;
 		constructor(name: string);
+	}
+}
+declare module spine {
+	class PointAttachment extends VertexAttachment {
+		x: number;
+		y: number;
+		rotation: number;
+		color: Color;
+		constructor(name: string);
+		computeWorldPosition(bone: Bone, point: Vector2): Vector2;
+		computeWorldRotation(bone: Bone): number;
 	}
 }
 declare module spine {
@@ -477,12 +514,12 @@ declare module spine {
 		rendererObject: any;
 		region: TextureRegion;
 		offset: ArrayLike<number>;
-		vertices: ArrayLike<number>;
+		uvs: ArrayLike<number>;
 		tempColor: Color;
 		constructor(name: string);
-		setRegion(region: TextureRegion): void;
 		updateOffset(): void;
-		updateWorldVertices(slot: Slot, premultipliedAlpha: boolean): ArrayLike<number>;
+		setRegion(region: TextureRegion): void;
+		computeWorldVertices(bone: Bone, worldVertices: ArrayLike<number>, offset: number, stride: number): void;
 	}
 }
 declare module spine {
@@ -530,12 +567,12 @@ declare module spine {
 		getWorldRotationY(): number;
 		getWorldScaleX(): number;
 		getWorldScaleY(): number;
-		worldToLocalRotationX(): number;
-		worldToLocalRotationY(): number;
-		rotateWorld(degrees: number): void;
 		updateAppliedTransform(): void;
 		worldToLocal(world: Vector2): Vector2;
 		localToWorld(local: Vector2): Vector2;
+		worldToLocalRotation(worldRotation: number): number;
+		localToWorldRotation(localRotation: number): number;
+		rotateWorld(degrees: number): void;
 	}
 }
 declare module spine {
@@ -735,7 +772,7 @@ declare module spine {
 		findIkConstraint(constraintName: string): IkConstraint;
 		findTransformConstraint(constraintName: string): TransformConstraint;
 		findPathConstraint(constraintName: string): PathConstraint;
-		getBounds(offset: Vector2, size: Vector2): void;
+		getBounds(offset: Vector2, size: Vector2, temp: Array<number>): void;
 		update(delta: number): void;
 	}
 }
@@ -827,6 +864,7 @@ declare module spine {
 		data: SlotData;
 		bone: Bone;
 		color: Color;
+		darkColor: Color;
 		private attachment;
 		private attachmentTime;
 		attachmentVertices: number[];
@@ -844,6 +882,7 @@ declare module spine {
 		name: string;
 		boneData: BoneData;
 		color: Color;
+		darkColor: Color;
 		attachmentName: string;
 		blendMode: BlendMode;
 		constructor(index: number, name: string, boneData: BoneData);
@@ -931,6 +970,10 @@ declare module spine {
 		constructor(data: TransformConstraintData, skeleton: Skeleton);
 		apply(): void;
 		update(): void;
+		applyAbsoluteWorld(): void;
+		applyRelativeWorld(): void;
+		applyAbsoluteLocal(): void;
+		applyRelativeLocal(): void;
 		getOrder(): number;
 	}
 }
@@ -950,6 +993,8 @@ declare module spine {
 		offsetScaleX: number;
 		offsetScaleY: number;
 		offsetShearY: number;
+		relative: boolean;
+		local: boolean;
 		constructor(name: string);
 	}
 }

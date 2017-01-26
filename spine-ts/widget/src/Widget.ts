@@ -143,7 +143,7 @@ module spine {
 				skeleton.setSkinByName(config.skin);
 				skeleton.setToSetupPose();
 				skeleton.updateWorldTransform();
-				skeleton.getBounds(bounds.offset, bounds.size);
+				skeleton.getBounds(bounds.offset, bounds.size, []);
 				if (!config.fitToCanvas) {
 					skeleton.x = config.x;
 					skeleton.y = config.y;

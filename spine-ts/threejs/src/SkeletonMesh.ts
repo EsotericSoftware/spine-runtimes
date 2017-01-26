@@ -38,6 +38,10 @@ module spine.threejs {
 		private batcher: MeshBatcher;
 
 		static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
+		static VERTEX_SIZE = 2 + 2 + 4;
+
+		private vertices = Utils.newFloatArray(1024);
+		private tempColor = new Color();
 
 		constructor (skeletonData: SkeletonData) {
 			super();
@@ -85,13 +89,13 @@ module spine.threejs {
 				let texture: ThreeJsTexture = null;
 				if (attachment instanceof RegionAttachment) {
 					let region = <RegionAttachment>attachment;
-					vertices = region.updateWorldVertices(slot, false);
+					vertices = this.computeRegionVertices(slot, region, false);
 					triangles = SkeletonMesh.QUAD_TRIANGLES;
 					texture = <ThreeJsTexture>(<TextureAtlasRegion>region.region.renderObject).texture;
 
 				} else if (attachment instanceof MeshAttachment) {
 					let mesh = <MeshAttachment>attachment;
-					vertices = mesh.updateWorldVertices(slot, false);
+					vertices = this.computeMeshVertices(slot, mesh, false);
 					triangles = mesh.triangles;
 					texture = <ThreeJsTexture>(<TextureAtlasRegion>mesh.region.renderObject).texture;
 				} else continue;
@@ -117,35 +121,87 @@ module spine.threejs {
 			batcher.end();
 		}
 
-		static createMesh(map: THREE.Texture) {
-			let geo = new THREE.BufferGeometry();
-			let vertices = new Float32Array(1024);
-			vertices.set([
-				-200, -200, 1, 0, 0, 1, 0, 0,
-				200, -200, 0, 1, 0, 1, 1, 0,
-				200, 200, 0, 0, 1, 1, 1, 1,
-				-200, 200, 1, 1, 0, 0.1, 0, 1
-			], 0);
-			let vb = new THREE.InterleavedBuffer(vertices, 8);
-			var positions = new THREE.InterleavedBufferAttribute(vb, 2, 0, false);
-			geo.addAttribute("position", positions);
-			var colors = new THREE.InterleavedBufferAttribute(vb, 4, 2, false);
-			geo.addAttribute("color", colors);
-			var uvs = new THREE.InterleavedBufferAttribute(vb, 2, 6, false);
-			geo.addAttribute("uv", colors);
+		private computeRegionVertices(slot: Slot, region: RegionAttachment, pma: boolean) {
+			let skeleton = slot.bone.skeleton;
+			let skeletonColor = skeleton.color;
+			let slotColor = slot.color;
+			let regionColor = region.color;
+			let alpha = skeletonColor.a * slotColor.a * regionColor.a;
+			let multiplier = pma ? alpha : 1;
+			let color = this.tempColor;
+			color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
+					  skeletonColor.g * slotColor.g * regionColor.g * multiplier,
+					  skeletonColor.b * slotColor.b * regionColor.b * multiplier,
+					  alpha);
 
-			var indices = new Uint16Array(1024);
-			indices.set([0, 1, 2, 2, 3, 0], 0);
-			geo.setIndex(new THREE.BufferAttribute(indices, 1));
-			geo.drawRange.start = 0;
-			geo.drawRange.count = 6;
+			region.computeWorldVertices(slot.bone, this.vertices, 0, SkeletonMesh.VERTEX_SIZE);
 
-			let mat = new THREE.MeshBasicMaterial();
-			mat.vertexColors = THREE.VertexColors;
-			mat.transparent = true;
-			mat.map = map;
-			let mesh = new THREE.Mesh(geo, mat);
-			return mesh; 
+			let vertices = this.vertices;
+			let uvs = region.uvs;
+
+			vertices[RegionAttachment.C1R] = color.r;
+			vertices[RegionAttachment.C1G] = color.g;
+			vertices[RegionAttachment.C1B] = color.b;
+			vertices[RegionAttachment.C1A] = color.a;
+			vertices[RegionAttachment.U1] = uvs[0];
+			vertices[RegionAttachment.V1] = uvs[1];
+
+			vertices[RegionAttachment.C2R] = color.r;
+			vertices[RegionAttachment.C2G] = color.g;
+			vertices[RegionAttachment.C2B] = color.b;
+			vertices[RegionAttachment.C2A] = color.a;
+			vertices[RegionAttachment.U2] = uvs[2];
+			vertices[RegionAttachment.V2] = uvs[3];
+
+			vertices[RegionAttachment.C3R] = color.r;
+			vertices[RegionAttachment.C3G] = color.g;
+			vertices[RegionAttachment.C3B] = color.b;
+			vertices[RegionAttachment.C3A] = color.a;
+			vertices[RegionAttachment.U3] = uvs[4];
+			vertices[RegionAttachment.V3] = uvs[5];
+
+			vertices[RegionAttachment.C4R] = color.r;
+			vertices[RegionAttachment.C4G] = color.g;
+			vertices[RegionAttachment.C4B] = color.b;
+			vertices[RegionAttachment.C4A] = color.a;
+			vertices[RegionAttachment.U4] = uvs[6];
+			vertices[RegionAttachment.V4] = uvs[7];
+
+			return vertices;
+		}
+
+		private computeMeshVertices(slot: Slot, mesh: MeshAttachment, pma: boolean) {
+			let skeleton = slot.bone.skeleton;
+			let skeletonColor = skeleton.color;
+			let slotColor = slot.color;
+			let regionColor = mesh.color;
+			let alpha = skeletonColor.a * slotColor.a * regionColor.a;
+			let multiplier = pma ? alpha : 1;
+			let color = this.tempColor;
+			color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
+					  skeletonColor.g * slotColor.g * regionColor.g * multiplier,
+					  skeletonColor.b * slotColor.b * regionColor.b * multiplier,
+					  alpha);
+
+			let numVertices = mesh.worldVerticesLength / 2;
+			if (this.vertices.length < mesh.worldVerticesLength) {
+				this.vertices = Utils.newFloatArray(mesh.worldVerticesLength);
+			}
+			let vertices = this.vertices;
+			mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, SkeletonMesh.VERTEX_SIZE);
+
+			let uvs = mesh.uvs;
+			for (let i = 0, n = numVertices, u = 0, v = 2; i < n; i++) {
+				vertices[v++] = color.r;
+				vertices[v++] = color.g;
+				vertices[v++] = color.b;
+				vertices[v++] = color.a;
+				vertices[v++] = uvs[u++];
+				vertices[v++] = uvs[u++];
+				v += 2;
+			}
+
+			return vertices;
 		}
 	}
 }
