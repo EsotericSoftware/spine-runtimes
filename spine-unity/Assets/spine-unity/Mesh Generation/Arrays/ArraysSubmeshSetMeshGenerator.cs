@@ -42,7 +42,14 @@ namespace Spine.Unity.MeshGeneration {
 		readonly ExposedList<SubmeshTriangleBuffer> submeshBuffers = new ExposedList<SubmeshTriangleBuffer>();
 		Material[] sharedMaterials = new Material[0];
 
-		public MeshAndMaterials GenerateMesh (ExposedList<SubmeshInstruction> instructions, int startSubmesh, int endSubmesh) {
+		/// <summary>
+		/// Generates a mesh based on a subset of instructions.
+		/// </summary>
+		/// <returns>A UnityEngine.Mesh.</returns>
+		/// <param name="instructions">A list of SubmeshInstructions.</param>
+		/// <param name="startSubmesh">The index of the starting submesh.</param>
+		/// <param name="endSubmesh">The exclusive upper bound of the last submesh to be included.</param>
+		public MeshAndMaterials GenerateMesh (ExposedList<SubmeshInstruction> instructions, int startSubmesh, int endSubmesh, float scale = 1f) {
 			// STEP 0: Prepare instructions.
 			var paramItems = instructions.Items;
 			currentInstructions.Clear(false);
@@ -120,6 +127,15 @@ namespace Spine.Unity.MeshGeneration {
 			if (structureDoesntMatch) {
 				mesh.Clear();
 				this.sharedMaterials = currentInstructions.GetUpdatedMaterialArray(this.sharedMaterials);
+			}
+
+			if (scale != 1f) {
+				for (int i = 0; i < vertexCount; i++) {
+					meshVertices[i].x *= scale;
+					meshVertices[i].y *= scale;
+					//meshVertices[i].z *= scale;
+				}
+					
 			}
 
 			// STEP 3: Assign the buffers into the Mesh.

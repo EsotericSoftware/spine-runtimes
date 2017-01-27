@@ -30,9 +30,6 @@
 
 // Contributed by: Mitch Thompson
 
-using System;
-using System.IO;
-using System.Collections.Generic;
 using UnityEngine;
 using Spine;
 

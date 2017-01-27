@@ -41,7 +41,7 @@ using Spine;
 namespace Spine.Unity.Editor {
 	using Event = UnityEngine.Event;
 
-	[CustomEditor(typeof(AtlasAsset))]
+	[CustomEditor(typeof(AtlasAsset)), CanEditMultipleObjects]
 	public class AtlasAssetInspector : UnityEditor.Editor {
 		SerializedProperty atlasFile, materials;
 		AtlasAsset atlasAsset;
@@ -103,6 +103,11 @@ namespace Spine.Unity.Editor {
 		#endif
 
 		override public void OnInspectorGUI () {
+			if (serializedObject.isEditingMultipleObjects) {
+				DrawDefaultInspector();
+				return;
+			}
+
 			serializedObject.Update();
 			atlasAsset = atlasAsset ?? (AtlasAsset)target;
 			EditorGUI.BeginChangeCheck();
@@ -113,7 +118,6 @@ namespace Spine.Unity.Editor {
 				atlasAsset.Clear();
 				atlasAsset.GetAtlas();
 			}
-				
 
 			if (materials.arraySize == 0) {
 				EditorGUILayout.LabelField(new GUIContent("Error:  Missing materials", SpineEditorUtilities.Icons.warning));

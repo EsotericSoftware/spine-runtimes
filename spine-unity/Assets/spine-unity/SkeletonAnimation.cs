@@ -129,7 +129,7 @@ namespace Spine.Unity {
 
 		protected override void ClearState () {
 			base.ClearState();
-			state.ClearTracks();
+			if (state != null) state.ClearTracks();
 		}
 
 		public override void Initialize (bool overwrite) {
@@ -163,11 +163,11 @@ namespace Spine.Unity {
 			#endif
 		}
 
-		public virtual void Update () {
+		public void Update () {
 			Update(Time.deltaTime);
 		}
 
-		public virtual void Update (float deltaTime) {
+		public void Update (float deltaTime) {
 			if (!valid)
 				return;
 

@@ -307,11 +307,12 @@ module spine {
 		}
 
 		clearTracks () {
+			let oldDrainDisabled = this.queue.drainDisabled;
 			this.queue.drainDisabled = true;
 			for (let i = 0, n = this.tracks.length; i < n; i++)
 				this.clearTrack(i);
 			this.tracks.length = 0;
-			this.queue.drainDisabled = false;
+			this.queue.drainDisabled = oldDrainDisabled;
 			this.queue.drain();
 		}
 
@@ -435,12 +436,13 @@ module spine {
 		}
 
 		setEmptyAnimations (mixDuration: number) {
+			let oldDrainDisabled = this.queue.drainDisabled;
 			this.queue.drainDisabled = true;
 			for (let i = 0, n = this.tracks.length; i < n; i++) {
 				let current = this.tracks[i];
 				if (current != null) this.setEmptyAnimation(current.trackIndex, mixDuration);
 			}
-			this.queue.drainDisabled = false;
+			this.queue.drainDisabled = oldDrainDisabled;
 			this.queue.drain();
 		}
 

@@ -50,6 +50,8 @@ namespace Spine.Unity {
 		public float defaultMix;
 		public RuntimeAnimatorController controller;
 
+		public bool IsLoaded { get { return this.skeletonData != null; } }
+
 		void Reset () {
 			Clear();
 		}
@@ -109,75 +111,88 @@ namespace Spine.Unity {
 			}
 			#else
 			if (atlasAssets.Length == 0 && spriteCollection == null) {
-				Reset();
+				Clear();
 				return null;
 			}
 			#endif
-
-			Atlas[] atlasArr = new Atlas[atlasAssets.Length];
-			for (int i = 0; i < atlasAssets.Length; i++) {
-				if (atlasAssets[i] == null) {
-					Clear();
-					return null;
-				}
-				atlasArr[i] = atlasAssets[i].GetAtlas();
-				if (atlasArr[i] == null) {
-					Clear();
-					return null;
-				}
-			}
-
 			if (skeletonData != null)
 				return skeletonData;
 
 			AttachmentLoader attachmentLoader;
 			float skeletonDataScale;
+			Atlas[] atlasArray = this.GetAtlasArray();
 
 			#if !SPINE_TK2D
-			attachmentLoader = new AtlasAttachmentLoader(atlasArr);
+			attachmentLoader = new AtlasAttachmentLoader(atlasArray);
 			skeletonDataScale = scale;
 			#else
 			if (spriteCollection != null) {
 				attachmentLoader = new Spine.Unity.TK2D.SpriteCollectionAttachmentLoader(spriteCollection);
 				skeletonDataScale = (1.0f / (spriteCollection.invOrthoSize * spriteCollection.halfTargetHeight) * scale);
 			} else {
-				if (atlasArr.Length == 0) {
+				if (atlasArray.Length == 0) {
 					Reset();
 					if (!quiet) Debug.LogError("Atlas not set for SkeletonData asset: " + name, this);
 					return null;
 				}
-				attachmentLoader = new AtlasAttachmentLoader(atlasArr);
+				attachmentLoader = new AtlasAttachmentLoader(atlasArray);
 				skeletonDataScale = scale;
 			}
 			#endif
 
+			bool isBinary = skeletonJSON.name.ToLower().Contains(".skel");
+			SkeletonData loadedSkeletonData;
+
 			try {
-				//var stopwatch = new System.Diagnostics.Stopwatch();
-				if (skeletonJSON.name.ToLower().Contains(".skel")) {
-					var input = new MemoryStream(skeletonJSON.bytes);
-					var binary = new SkeletonBinary(attachmentLoader);
-					binary.Scale = skeletonDataScale;
-					//stopwatch.Start();
-					skeletonData = binary.ReadSkeletonData(input);
-				} else {
-					var input = new StringReader(skeletonJSON.text);
-					var json = new SkeletonJson(attachmentLoader);
-					json.Scale = skeletonDataScale;
-					//stopwatch.Start();
-					skeletonData = json.ReadSkeletonData(input);
-				}
-				//stopwatch.Stop();
-				//Debug.Log(stopwatch.Elapsed);
+				if (isBinary)
+					loadedSkeletonData = SkeletonDataAsset.ReadSkeletonData(skeletonJSON.bytes, attachmentLoader, skeletonDataScale);
+				else
+					loadedSkeletonData = SkeletonDataAsset.ReadSkeletonData(skeletonJSON.text, attachmentLoader, skeletonDataScale);
+
 			} catch (Exception ex) {
 				if (!quiet)
 					Debug.LogError("Error reading skeleton JSON file for SkeletonData asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
 				return null;
+
 			}
 
-			stateData = new AnimationStateData(skeletonData);
-			FillStateData();
+			this.InitializeWithData(loadedSkeletonData);
 
 			return skeletonData;
+		}
+
+		internal void InitializeWithData (SkeletonData sd) {
+			this.skeletonData = sd;
+			this.stateData = new AnimationStateData(skeletonData);
+			FillStateData();
+		}
+
+		internal Atlas[] GetAtlasArray () {
+			var returnList = new System.Collections.Generic.List<Atlas>(atlasAssets.Length);
+			for (int i = 0; i < atlasAssets.Length; i++) {
+				var aa = atlasAssets[i];
+				if (aa == null) continue;
+				var a = aa.GetAtlas();
+				if (a == null) continue;
+				returnList.Add(a);
+			}
+			return returnList.ToArray();
+		}
+
+		internal static SkeletonData ReadSkeletonData (byte[] bytes, AttachmentLoader attachmentLoader, float scale) {
+			var input = new MemoryStream(bytes);
+			var binary = new SkeletonBinary(attachmentLoader) {
+				Scale = scale
+			};
+			return binary.ReadSkeletonData(input);
+		}
+
+		internal static SkeletonData ReadSkeletonData (string text, AttachmentLoader attachmentLoader, float scale) {
+			var input = new StringReader(text);
+			var json = new SkeletonJson(attachmentLoader) {
+				Scale = scale
+			};
+			return json.ReadSkeletonData(input);
 		}
 
 		public void FillStateData () {

@@ -96,6 +96,7 @@ public class Skeleton {
 	public function updateCache () : void {
 		var updateCache:Vector.<Updatable> = this._updateCache;
 		updateCache.length = 0;
+		this._updateCacheReset.length = 0;
 
 		var bones:Vector.<Bone> = this.bones;
 		var i:Number = 0;

@@ -110,6 +110,30 @@ namespace Spine {
 			TransformMode.NoScaleOrReflection
 		};
 
+		/// <summary>Returns the version string of binary skeleton data.</summary>
+		public static string GetVersionString (Stream input) {
+			if (input == null) throw new ArgumentNullException("input");
+
+			try {
+				// Hash.
+				int byteCount = ReadVarint(input, true);
+				if (byteCount > 1) input.Position += byteCount - 1;
+
+				// Version.
+				byteCount = ReadVarint(input, true);
+				if (byteCount > 1) {
+					byteCount--;
+					var buffer = new byte[byteCount];
+					ReadFully(input, buffer, 0, byteCount);
+					return System.Text.Encoding.UTF8.GetString(buffer, 0, byteCount);
+				}
+
+				throw new ArgumentException("Stream does not contain a valid binary Skeleton Data.", "input");
+			} catch (Exception e) {
+				throw new ArgumentException("Stream does not contain a valid binary Skeleton Data.\n" + e, "input");
+			}
+		}
+
 		public SkeletonData ReadSkeletonData (Stream input) {
 			if (input == null) throw new ArgumentNullException("input");
 			float scale = Scale;
