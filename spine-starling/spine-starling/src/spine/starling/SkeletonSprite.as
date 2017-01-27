@@ -69,13 +69,11 @@ public class SkeletonSprite extends DisplayObject {
 	}
 
 	override public function render (painter:Painter) : void {
-		alpha *= this.alpha * skeleton.a;
+		alpha *= this.alpha * skeleton.color.a;
 		var originalBlendMode:String = painter.state.blendMode;
-		var r:Number = skeleton.r * 255;
-		var g:Number = skeleton.g * 255;
-		var b:Number = skeleton.b * 255;
-		var x:Number = skeleton.x;
-		var y:Number = skeleton.y;
+		var r:Number = skeleton.color.r * 255;
+		var g:Number = skeleton.color.g * 255;
+		var b:Number = skeleton.color.b * 255;
 		var drawOrder:Vector.<Slot> = skeleton.drawOrder;
 		var worldVertices:Vector.<Number> = _tempVertices;
 		var ii:int, iii:int;
@@ -89,13 +87,12 @@ public class SkeletonSprite extends DisplayObject {
 			var slot:Slot = drawOrder[i];
 			if (slot.attachment is RegionAttachment) {
 				var region:RegionAttachment = slot.attachment as RegionAttachment;
-				region.computeWorldVertices(x, y, slot.bone, worldVertices);
-				// FIXME pre-multiplied alpha?
-				a = slot.a * region.a;
+				region.computeWorldVertices(slot.bone, worldVertices, 0, 2);				
+				a = slot.color.a * region.color.a;
 				rgb = Color.rgb(
-					r * slot.r * region.r,
-					g * slot.g * region.g,
-					b * slot.b * region.b);
+					r * slot.color.r * region.color.r,
+					g * slot.color.g * region.color.g,
+					b * slot.color.b * region.color.b);
 
 				var image:Image = region.rendererObject as Image;
 				if (image == null) {
@@ -132,7 +129,7 @@ public class SkeletonSprite extends DisplayObject {
 				verticesLength = meshAttachment.worldVerticesLength;
 				verticesCount = verticesLength >> 1;
 				if (worldVertices.length < verticesLength) worldVertices.length = verticesLength;
-				meshAttachment.computeWorldVertices(slot, worldVertices);
+				meshAttachment.computeWorldVertices(slot, 0, meshAttachment.worldVerticesLength, worldVertices, 0, 2);
 				mesh = meshAttachment.rendererObject as SkeletonMesh;
 				if (mesh == null) {
 					if (meshAttachment.rendererObject is Image)
@@ -153,11 +150,11 @@ public class SkeletonSprite extends DisplayObject {
 				}
 
 				// FIXME pre-multiplied alpha?
-				a = slot.a * meshAttachment.a;
+				a = slot.color.a * meshAttachment.color.a;
 				rgb = Color.rgb(
-					r * slot.r * meshAttachment.r,
-					g * slot.g * meshAttachment.g,
-					b * slot.b * meshAttachment.b);
+					r * slot.color.r * meshAttachment.color.r,
+					g * slot.color.g * meshAttachment.color.g,
+					b * slot.color.b * meshAttachment.color.b);
 
 				vertexData = mesh.getVertexData();
 				uvs = meshAttachment.uvs;
@@ -191,12 +188,12 @@ public class SkeletonSprite extends DisplayObject {
 			if (attachment is RegionAttachment) {
 				var region:RegionAttachment = RegionAttachment(slot.attachment);
 				verticesLength = 8;
-				region.computeWorldVertices(0, 0, slot.bone, worldVertices);
+				region.computeWorldVertices(slot.bone, worldVertices, 0, 2);
 			} else if (attachment is MeshAttachment) {
 				var mesh:MeshAttachment = MeshAttachment(attachment);
 				verticesLength = mesh.worldVerticesLength;
 				if (worldVertices.length < verticesLength) worldVertices.length = verticesLength;
-				mesh.computeWorldVertices(slot, worldVertices);
+				mesh.computeWorldVertices(slot, 0, verticesLength, worldVertices, 0, 2);
 			} else
 				continue;
 			for (var ii:int = 0; ii < verticesLength; ii += 2) {

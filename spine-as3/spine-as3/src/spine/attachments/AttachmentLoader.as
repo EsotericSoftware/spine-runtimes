@@ -43,6 +43,9 @@ public interface AttachmentLoader {
 	
 	/** @return May be null to not load an attachment */
 	function newPathAttachment(skin:Skin, name:String): PathAttachment;
+	
+	/** @return May be null to not load an attachment */
+	function newPointAttachment(skin:Skin, name:String): PointAttachment;
 }
 
 }

@@ -28,42 +28,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine {
+package spine.attachments {
+import spine.Color;
+import spine.MathUtils;
+import spine.Bone;
 
-public class TransformConstraintData {
-	internal var _name:String;
-	public var order:Number;
-	internal var _bones:Vector.<BoneData> = new Vector.<BoneData>();
-	public var target:BoneData;
-	public var rotateMix:Number;
-	public var translateMix:Number;
-	public var scaleMix:Number;
-	public var shearMix:Number;
-	public var offsetRotation:Number;
-	public var offsetX:Number;
-	public var offsetY:Number;
-	public var offsetScaleX:Number;
-	public var offsetScaleY:Number;
-	public var offsetShearY:Number;
-	public var relative:Boolean = false;
-	public var local:Boolean = false;
-
-	public function TransformConstraintData (name:String) {
-		if (name == null) throw new ArgumentError("name cannot be null.");
-		_name = name;
+public dynamic class PointAttachment extends VertexAttachment {
+	public var x: Number, y: Number, rotation: Number;
+	public var color:Color = new Color(0.38, 0.94, 0, 1);
+	
+	public function PointAttachment (name:String) {
+		super(name);
 	}
 	
-	public function get bones () : Vector.<BoneData> {;
-		return _bones;
+	public function computeWorldPosition (bone: Bone, point: Vector.<Number>): Vector.<Number> {
+		point[0] = this.x * bone.a + this.y * bone.b + bone.worldX;
+		point[1] = this.x * bone.c + this.y * bone.d + bone.worldY;
+		return point;
 	}
 
-	public function get name () : String {
-		return _name;
-	}
-
-	public function toString () : String {
-		return _name;
-	}
+	public function computeWorldRotation (bone: Bone): Number {
+		var cos:Number = MathUtils.cosDeg(this.rotation), sin: Number = MathUtils.sinDeg(this.rotation);
+		var x:Number = cos * bone.a + sin * bone.b;
+		var y:Number = cos * bone.c + sin * bone.d;
+		return Math.atan2(y, x) * MathUtils.radDeg;
+	}	
 }
-
 }

@@ -489,8 +489,8 @@ module spine {
 					mesh.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
 				}
 				if (vertices != null) {
-					for (let i = 0, nn = vertices.length; i < nn; i += 8) {
-						let x = vertices[i], y = vertices[i + 1];
+					for (let ii = 0, nn = vertices.length; ii < nn; ii += 8) {
+						let x = vertices[ii], y = vertices[ii + 1];
 						minX = Math.min(minX, x);
 						minY = Math.min(minY, y);
 						maxX = Math.max(maxX, x);

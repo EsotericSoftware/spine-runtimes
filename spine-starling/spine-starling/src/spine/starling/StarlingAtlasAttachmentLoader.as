@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 package spine.starling {
+	import spine.attachments.PointAttachment;
 import spine.attachments.PathAttachment;
 import starling.display.Image;
 import spine.Bone;
@@ -122,6 +123,10 @@ public class StarlingAtlasAttachmentLoader implements AttachmentLoader {
 
 	public function newPathAttachment (skin:Skin, name:String) : PathAttachment {
 		return new PathAttachment(name);
+	}
+	
+	public function newPointAttachment (skin:Skin, name:String) : PointAttachment {
+		return new PointAttachment(name);
 	}
 }
 

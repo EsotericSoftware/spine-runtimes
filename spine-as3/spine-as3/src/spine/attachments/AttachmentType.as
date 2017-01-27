@@ -37,6 +37,7 @@ public class AttachmentType {
 	public static const mesh:AttachmentType = new AttachmentType(3, "mesh");	
 	public static const linkedmesh:AttachmentType = new AttachmentType(3, "linkedmesh");
 	public static const path:AttachmentType = new AttachmentType(4, "path");
+	public static const point:AttachmentType = new AttachmentType(5, "point");
 
 	public var ordinal:int;
 	public var name:String;

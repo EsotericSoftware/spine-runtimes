@@ -125,10 +125,10 @@ public class SkeletonSprite extends Sprite {
 			wrapper.blendMode = blendModes[slot.data.blendMode.ordinal];
 
 			var colorTransform:ColorTransform = wrapper.transform.colorTransform;
-			colorTransform.redMultiplier = skeleton.r * slot.r * regionAttachment.r;
-			colorTransform.greenMultiplier = skeleton.g * slot.g * regionAttachment.g;
-			colorTransform.blueMultiplier = skeleton.b * slot.b * regionAttachment.b;
-			colorTransform.alphaMultiplier = skeleton.a * slot.a * regionAttachment.a;
+			colorTransform.redMultiplier = skeleton.color.r * slot.color.r * regionAttachment.color.r;
+			colorTransform.greenMultiplier = skeleton.color.g * slot.color.g * regionAttachment.color.g;
+			colorTransform.blueMultiplier = skeleton.color.b * slot.color.b * regionAttachment.color.b;
+			colorTransform.alphaMultiplier = skeleton.color.a * slot.color.a * regionAttachment.color.a;
 			wrapper.transform.colorTransform = colorTransform;
 
 			var bone:Bone = slot.bone;

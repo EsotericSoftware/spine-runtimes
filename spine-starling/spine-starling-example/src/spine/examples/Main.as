@@ -40,12 +40,12 @@ public class Main extends Sprite {
 
 	public function Main () {
 		var example:Class;
-		example = SpineboyExample;
+		// example = SpineboyExample;
 		// example = GoblinsExample;
-		example = RaptorExample;
+		// example = RaptorExample;
 		// example = TankExample;
 		// example = VineExample;
-		// example = StretchymanExample;
+		example = StretchymanExample;
 
 		_starling = new Starling(example, stage);
 		_starling.enableErrorChecking = true;

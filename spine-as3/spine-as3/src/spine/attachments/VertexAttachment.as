@@ -42,17 +42,13 @@ public dynamic class VertexAttachment extends Attachment {
 		super(name);
 	}
 
-	public function computeWorldVertices (slot:Slot, worldVertices:Vector.<Number>): void {
-		computeWorldVertices2(slot, 0, worldVerticesLength, worldVertices, 0);
-	}
-
 	/** Transforms local vertices to world coordinates.
 	 * @param start The index of the first local vertex value to transform. Each vertex has 2 values, x and y.
 	 * @param count The number of world vertex values to output. Must be <= {@link #getWorldVerticesLength()} - start.
 	 * @param worldVertices The output world vertices. Must have a length >= offset + count.
 	 * @param offset The worldVertices index to begin writing values. */
-	public function computeWorldVertices2 (slot:Slot, start:int, count:int, worldVertices:Vector.<Number>, offset:int): void {
-		count += offset;
+	public function computeWorldVertices (slot:Slot, start:int, count:int, worldVertices:Vector.<Number>, offset:int, stride:int): void {
+		count = offset + (count >> 1) * stride;
 		var skeleton:Skeleton = slot.skeleton;		
 		var deformArray:Vector.<Number> = slot.attachmentVertices;
 		var vertices:Vector.<Number> = this.vertices;
@@ -70,7 +66,7 @@ public dynamic class VertexAttachment extends Attachment {
 			var x:Number = bone.worldX;
 			var y:Number = bone.worldY;
 			var a:Number = bone.a, bb:Number = bone.b, c:Number = bone.c, d:Number = bone.d;
-			for (v = start, w = offset; w < count; v += 2, w += 2) {
+			for (v = start, w = offset; w < count; v += 2, w += stride) {
 				vx = vertices[v], vy = vertices[v + 1];
 				worldVertices[w] = vx * a + vy * bb + x;
 				worldVertices[w + 1] = vx * c + vy * d + y;
@@ -85,7 +81,7 @@ public dynamic class VertexAttachment extends Attachment {
 		}
 		var skeletonBones:Vector.<Bone> = skeleton.bones;
 		if (deformArray.length == 0) {
-			for (w = offset, b = skip * 3; w < count; w += 2) {
+			for (w = offset, b = skip * 3; w < count; w += stride) {
 				wx = 0, wy = 0;
 				n = bones[v++];
 				n += v;
@@ -100,7 +96,7 @@ public dynamic class VertexAttachment extends Attachment {
 			}
 		} else {
 			deform = deformArray;
-			for (w = offset, b = skip * 3, f = skip << 1; w < count; w += 2) {
+			for (w = offset, b = skip * 3, f = skip << 1; w < count; w += stride) {
 				wx = 0; wy = 0;
 				n = bones[v++];
 				n += v;

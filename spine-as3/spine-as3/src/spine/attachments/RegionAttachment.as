@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 package spine.attachments {
+import spine.Color;
 import spine.Bone;
 
 public dynamic class RegionAttachment extends Attachment {
@@ -48,10 +49,7 @@ public dynamic class RegionAttachment extends Attachment {
 	public var rotation:Number;
 	public var width:Number;
 	public var height:Number;
-	public var r:Number = 1;
-	public var g:Number = 1;
-	public var b:Number = 1;
-	public var a:Number = 1;
+	public var color:Color = new Color(1, 1, 1, 1);
 
 	public var path:String;
 	public var rendererObject:Object;
@@ -69,28 +67,6 @@ public dynamic class RegionAttachment extends Attachment {
 		super(name);
 		offset.length = 8;
 		uvs.length = 8;
-	}
-
-	public function setUVs (u:Number, v:Number, u2:Number, v2:Number, rotate:Boolean) : void {
-		if (rotate) {
-			uvs[X2] = u;
-			uvs[Y2] = v2;
-			uvs[X3] = u;
-			uvs[Y3] = v;
-			uvs[X4] = u2;
-			uvs[Y4] = v;
-			uvs[X1] = u2;
-			uvs[Y1] = v2;
-		} else {
-			uvs[X1] = u;
-			uvs[Y1] = v2;
-			uvs[X2] = u;
-			uvs[Y2] = v;
-			uvs[X3] = u2;
-			uvs[Y3] = v;
-			uvs[X4] = u2;
-			uvs[Y4] = v2;
-		}
 	}
 
 	public function updateOffset () : void {
@@ -120,30 +96,58 @@ public dynamic class RegionAttachment extends Attachment {
 		offset[X4] = localX2Cos - localYSin;
 		offset[Y4] = localYCos + localX2Sin;
 	}
+	
+	public function setUVs (u:Number, v:Number, u2:Number, v2:Number, rotate:Boolean) : void {
+		var uvs:Vector.<Number> = this.uvs; 
+		if (rotate) {
+			uvs[X2] = u;
+			uvs[Y2] = v2;
+			uvs[X3] = u;
+			uvs[Y3] = v;
+			uvs[X4] = u2;
+			uvs[Y4] = v;
+			uvs[X1] = u2;
+			uvs[Y1] = v2;
+		} else {
+			uvs[X1] = u;
+			uvs[Y1] = v2;
+			uvs[X2] = u;
+			uvs[Y2] = v;
+			uvs[X3] = u2;
+			uvs[Y3] = v;
+			uvs[X4] = u2;
+			uvs[Y4] = v2;
+		}
+	}
 
-	public function computeWorldVertices (x:Number, y:Number, bone:Bone, worldVertices:Vector.<Number>) : void {
-		x += bone.worldX;
-		y += bone.worldY;
-		var m00:Number = bone.a;
-		var m01:Number = bone.b;
-		var m10:Number = bone.c;
-		var m11:Number = bone.d;
-		var x1:Number = offset[X1];
-		var y1:Number = offset[Y1];
-		var x2:Number = offset[X2];
-		var y2:Number = offset[Y2];
-		var x3:Number = offset[X3];
-		var y3:Number = offset[Y3];
-		var x4:Number = offset[X4];
-		var y4:Number = offset[Y4];
-		worldVertices[X1] = x1 * m00 + y1 * m01 + x;
-		worldVertices[Y1] = x1 * m10 + y1 * m11 + y;
-		worldVertices[X2] = x2 * m00 + y2 * m01 + x;
-		worldVertices[Y2] = x2 * m10 + y2 * m11 + y;
-		worldVertices[X3] = x3 * m00 + y3 * m01 + x;
-		worldVertices[Y3] = x3 * m10 + y3 * m11 + y;
-		worldVertices[X4] = x4 * m00 + y4 * m01 + x;
-		worldVertices[Y4] = x4 * m10 + y4 * m11 + y;
+	public function computeWorldVertices (bone:Bone, worldVertices:Vector.<Number>, offset:int, stride:int) : void {
+		var vertexOffset:Vector.<Number> = this.offset;
+		var x:Number = bone.worldX, y:Number = bone.worldY;
+		var a:Number = bone.a, b:Number = bone.b, c:Number = bone.c, d:Number = bone.d;
+		var offsetX:Number = 0, offsetY:Number = 0;
+
+		offsetX = vertexOffset[X1];
+		offsetY = vertexOffset[Y1];
+		worldVertices[offset] = offsetX * a + offsetY * b + x; // br
+		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+		offset += stride;
+
+		offsetX = vertexOffset[X2];
+		offsetY = vertexOffset[Y2];
+		worldVertices[offset] = offsetX * a + offsetY * b + x; // bl
+		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+		offset += stride;
+
+		offsetX = vertexOffset[X3];
+		offsetY = vertexOffset[Y3];
+		worldVertices[offset] = offsetX * a + offsetY * b + x; // ul
+		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+		offset += stride;
+
+		offsetX = vertexOffset[X4];
+		offsetY = vertexOffset[Y4];
+		worldVertices[offset] = offsetX * a + offsetY * b + x; // ur
+		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 	}
 }
 

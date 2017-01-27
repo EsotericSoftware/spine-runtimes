@@ -53,12 +53,12 @@ public class Bone implements Updatable {
 	public var ashearY:Number;
 	public var appliedValid:Boolean;	
 
-	internal var _a:Number;
-	internal var _b:Number;
-	internal var _c:Number;
-	internal var _d:Number;
-	internal var _worldX:Number;
-	internal var _worldY:Number;
+	public var a:Number;
+	public var b:Number;
+	public var c:Number;
+	public var d:Number;
+	public var worldX:Number;
+	public var worldY:Number;
 	
 	internal var _sorted:Boolean;
 
@@ -115,38 +115,38 @@ public class Bone implements Updatable {
 				lc = -lc;
 				ld = -ld;
 			}
-			_a = la;
-			_b = lb;
-			_c = lc;
-			_d = ld;
-			_worldX = x + skeleton.x;
-			_worldY = y + skeleton.y;	
+			this.a = la;
+			this.b = lb;
+			this.c = lc;
+			this.d = ld;
+			worldX = x + skeleton.x;
+			worldY = y + skeleton.y;	
 			return;
 		}
 
-		var pa:Number = parent._a, pb:Number = parent._b, pc:Number = parent._c, pd:Number = parent._d;
-		_worldX = pa * x + pb * y + parent._worldX;
-		_worldY = pc * x + pd * y + parent._worldY;		
+		var pa:Number = parent.a, pb:Number = parent.b, pc:Number = parent.c, pd:Number = parent.d;
+		worldX = pa * x + pb * y + parent.worldX;
+		worldY = pc * x + pd * y + parent.worldY;		
 
-		switch (_data.transformMode) {
+		switch (this.data.transformMode) {
 		case TransformMode.normal: {
 			rotationY = rotation + 90 + shearY;
 			la = MathUtils.cosDeg(rotation + shearX) * scaleX;
 			lb = MathUtils.cosDeg(rotationY) * scaleY;
 			lc = MathUtils.sinDeg(rotation + shearX) * scaleX;
 			ld = MathUtils.sinDeg(rotationY) * scaleY;
-			_a = pa * la + pb * lc;
-			_b = pa * lb + pb * ld;
-			_c = pc * la + pd * lc;
-			_d = pc * lb + pd * ld;
+			this.a = pa * la + pb * lc;
+			this.b = pa * lb + pb * ld;
+			this.c = pc * la + pd * lc;
+			this.d = pc * lb + pd * ld;
 			return;
 		}
 		case TransformMode.onlyTranslation: {
 			rotationY = rotation + 90 + shearY;
-			_a = MathUtils.cosDeg(rotation + shearX) * scaleX;
-			_b = MathUtils.cosDeg(rotationY) * scaleY;
-			_c = MathUtils.sinDeg(rotation + shearX) * scaleX;
-			_d = MathUtils.sinDeg(rotationY) * scaleY;
+			this.a = MathUtils.cosDeg(rotation + shearX) * scaleX;
+			this.b = MathUtils.cosDeg(rotationY) * scaleY;
+			this.c = MathUtils.sinDeg(rotation + shearX) * scaleX;
+			this.d = MathUtils.sinDeg(rotationY) * scaleY;
 			break;
 		}
 		case TransformMode.noRotationOrReflection: {
@@ -168,10 +168,10 @@ public class Bone implements Updatable {
 			lb = MathUtils.cosDeg(ry) * scaleY;
 			lc = MathUtils.sinDeg(rx) * scaleX;
 			ld = MathUtils.sinDeg(ry) * scaleY;
-			_a = pa * la - pb * lc;
-			_b = pa * lb - pb * ld;
-			_c = pc * la + pd * lc;
-			_d = pc * lb + pd * ld;
+			this.a = pa * la - pb * lc;
+			this.b = pa * lb - pb * ld;
+			this.c = pc * la + pd * lc;
+			this.d = pc * lb + pd * ld;
 			break;
 		}
 		case TransformMode.noScale:
@@ -192,35 +192,35 @@ public class Bone implements Updatable {
 			lb = MathUtils.cosDeg(90 + shearY) * scaleY;
 			lc = MathUtils.sinDeg(shearX) * scaleX;
 			ld = MathUtils.sinDeg(90 + shearY) * scaleY;
-			_a = za * la + zb * lc;
-			_b = za * lb + zb * ld;
-			_c = zc * la + zd * lc;
-			_d = zc * lb + zd * ld;
-			if (_data.transformMode != TransformMode.noScaleOrReflection ? pa * pd - pb * pc < 0 : skeleton.flipX != skeleton.flipY) {
-				_b = -_b;
-				_d = -_d;
+			this.a = za * la + zb * lc;
+			this.b = za * lb + zb * ld;
+			this.c = zc * la + zd * lc;
+			this.d = zc * lb + zd * ld;
+			if (this.data.transformMode != TransformMode.noScaleOrReflection ? pa * pd - pb * pc < 0 : skeleton.flipX != skeleton.flipY) {
+				this.b = -this.b;
+				this.d = -this.d;
 			}
 			return;
 		}
 		}
 		if (_skeleton.flipX) {
-			_a = -_a;
-			_b = -_b;
+			this.a = -this.a;
+			this.b = -this.b;
 		}
 		if (_skeleton.flipY != yDown) {
-			_c = -_c;
-			_d = -_d;
+			this.c = -this.c;
+			this.d = -this.d;
 		}
 	}
 
 	public function setToSetupPose () : void {
-		x = _data.x;
-		y = _data.y;
-		rotation = _data.rotation;
-		scaleX = _data.scaleX;
-		scaleY = _data.scaleY;
-		shearX = _data.shearX;
-		shearY = _data.shearY;
+		x = this.data.x;
+		y = this.data.y;
+		rotation = this.data.rotation;
+		scaleX = this.data.scaleX;
+		scaleY = this.data.scaleY;
+		shearX = this.data.shearX;
+		shearY = this.data.shearY;
 	}
 
 	public function get data () : BoneData {
@@ -237,70 +237,22 @@ public class Bone implements Updatable {
 	
 	public function get children () : Vector.<Bone> {;
 		return _children;
-	}
-
-	public function get a () : Number {
-		return _a;
-	}
-
-	public function get b () : Number {
-		return _b;
-	}
-
-	public function get c () : Number {
-		return _c;
-	}
-
-	public function get d () : Number {
-		return _d;
-	}
-
-	public function get worldX () : Number {
-		return _worldX;
-	}
-
-	public function get worldY () : Number {
-		return _worldY;
-	}
+	}	
 
 	public function get worldRotationX () : Number {
-		return Math.atan2(_c, _a) * MathUtils.radDeg;
+		return Math.atan2(this.c, this.a) * MathUtils.radDeg;
 	}
 
 	public function get worldRotationY () : Number {
-		return Math.atan2(_d, _b) * MathUtils.radDeg;
+		return Math.atan2(this.d, this.b) * MathUtils.radDeg;
 	}
 
 	public function get worldScaleX () : Number {
-		return Math.sqrt(_a * _a + _c * _c);
+		return Math.sqrt(this.a * this.a + this.c * this.c);
 	}
 
 	public function get worldScaleY () : Number {
-		return Math.sqrt(_b * _b + _d * _d);
-	}
-	
-	public function worldToLocalRotationX () : Number {
-		var parent:Bone = _parent;
-		if (parent == null) return arotation;
-		var pa:Number = parent.a, pb:Number = parent.b, pc:Number = parent.c, pd:Number = parent.d, a:Number = this.a, c:Number = this.c;
-		return Math.atan2(pa * c - pc * a, pd * a - pb * c) * MathUtils.radDeg;
-	}
-
-	public function worldToLocalRotationY () : Number {
-		var parent:Bone = _parent;
-		if (parent == null) return arotation;
-		var pa:Number = parent.a, pb:Number = parent.b, pc:Number = parent.c, pd:Number = parent.d, b:Number = this.b, d:Number = this.d;
-		return Math.atan2(pa * d - pc * b, pd * b - pb * d) * MathUtils.radDeg;
-	}
-
-	public function rotateWorld (degrees:Number) : void {
-		var a:Number = this.a, b:Number = this.b, c:Number = this.c, d:Number = this.d;
-		var cos:Number = MathUtils.cosDeg(degrees), sin:Number = MathUtils.sinDeg(degrees);
-		this._a = cos * a - sin * c;
-		this._b = cos * b - sin * d;
-		this._c = sin * a + cos * c;
-		this._d = sin * b + cos * d;
-		this.appliedValid = false;
+		return Math.sqrt(this.b * this.b + this.d * this.d);
 	}
 
 	/** Computes the individual applied transform values from the world transform. This can be useful to perform processing using
@@ -349,21 +301,41 @@ public class Bone implements Updatable {
 	}
 
 	public function worldToLocal (world:Vector.<Number>) : void {
-		var a:Number = _a, b:Number = _b, c:Number = _c, d:Number = _d;
+		var a:Number = this.a, b:Number = this.b, c:Number = this.c, d:Number = this.d;
 		var invDet:Number = 1 / (a * d - b * c);
-		var x:Number = world[0] - _worldX, y:Number = world[1] - _worldY;				
+		var x:Number = world[0] - this.worldX, y:Number = world[1] - this.worldY;
 		world[0] = (x * d * invDet - y * b * invDet);
 		world[1] = (y * a * invDet - x * c * invDet);
 	}
 
 	public function localToWorld (local:Vector.<Number>) : void {
 		var localX:Number = local[0], localY:Number = local[1];
-		local[0] = localX * _a + localY * _b + _worldX;
-		local[1] = localX * _c + localY * _d + _worldY;
+		local[0] = localX * this.a + localY * this.b + this.worldX;
+		local[1] = localX * this.c + localY * this.d + this.worldY;
+	}
+	
+	public function worldToLocalRotation (worldRotation:Number) : Number {
+		var sin:Number = MathUtils.sinDeg(worldRotation), cos:Number = MathUtils.cosDeg(worldRotation);
+		return Math.atan2(this.a * sin - this.c * cos, this.d * cos - this.b * sin) * MathUtils.radDeg;
+	}
+
+	public function localToWorldRotation (localRotation:Number) : Number {
+		var sin:Number = MathUtils.sinDeg(localRotation), cos:Number = MathUtils.cosDeg(localRotation);
+		return Math.atan2(cos * this.c + sin * this.d, cos * this.a + sin * this.b) * MathUtils.radDeg;
+	}
+
+	public function rotateWorld (degrees:Number) : void {
+		var a:Number = this.a, b:Number = this.b, c:Number = this.c, d:Number = this.d;
+		var cos:Number = MathUtils.cosDeg(degrees), sin:Number = MathUtils.sinDeg(degrees);
+		this.a = cos * a - sin * c;
+		this.b = cos * b - sin * d;
+		this.c = sin * a + cos * c;
+		this.d = sin * b + cos * d;
+		this.appliedValid = false;
 	}
 
 	public function toString () : String {
-		return _data._name;
+		return this.data._name;
 	}
 }
 

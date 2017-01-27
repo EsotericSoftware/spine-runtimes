@@ -51,6 +51,7 @@ public class TimelineType {
 	public static const pathConstraintPosition:TimelineType = new TimelineType(11);
 	public static const pathConstraintSpacing:TimelineType = new TimelineType(12);
 	public static const pathConstraintMix:TimelineType = new TimelineType(13);
+	public static const twoColor:TimelineType = new TimelineType(14);
 }
 
 }

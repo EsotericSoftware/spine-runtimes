@@ -31,6 +31,8 @@
 package spine {
 
 public class MathUtils {
+	static public var PI:Number = Math.PI;
+	static public var PI2:Number = Math.PI * 2;
 	static public var radDeg:Number = 180 / Math.PI;
 	static public var degRad:Number = Math.PI / 180;
 	
