@@ -43,6 +43,7 @@ namespace Spine {
 
 		public int HullLength { get { return hulllength; } set { hulllength = value; } }
 		public float[] RegionUVs { get { return regionUVs; } set { regionUVs = value; } }
+		/// <summary>The UV pair for each vertex, normalized within the entire texture. <seealso cref="MeshAttachment.UpdateUVs"/></summary>
 		public float[] UVs { get { return uvs; } set { uvs = value; } }
 		public int[] Triangles { get { return triangles; } set { triangles = value; } }
 

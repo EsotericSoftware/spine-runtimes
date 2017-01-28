@@ -805,6 +805,11 @@ namespace Spine {
 		/// <see cref="AnimationStateData"/> based on the animation before this animation (if any).
 		/// 
 		/// The mix duration must be set before <see cref="AnimationState.Update(float)"/> is next called.
+		/// <para>
+		/// When using <seealso cref="AnimationState.AddAnimation(int, Animation, bool, float)"/> with a 
+		/// <code>delay</code> <seealso cref="Delay"/> is set using the mix duration from the <see cref=" AnimationStateData"/>
+		/// </para>
+		/// 
 		/// </summary>
 		public float MixDuration { get { return mixDuration; } set { mixDuration = value; } }
 

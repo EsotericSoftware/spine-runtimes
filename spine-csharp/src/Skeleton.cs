@@ -194,15 +194,15 @@ namespace Spine {
 
 			var constrained = constraint.bones;
 			int boneCount = constrained.Count;
-			for (int ii = 0; ii < boneCount; ii++)
-				SortBone(constrained.Items[ii]);
+			for (int i = 0; i < boneCount; i++)
+				SortBone(constrained.Items[i]);
 
 			updateCache.Add(constraint);
 
-			for (int ii = 0; ii < boneCount; ii++)
-				SortReset(constrained.Items[ii].children);
-			for (int ii = 0; ii < boneCount; ii++)
-				constrained.Items[ii].sorted = true;
+			for (int i = 0; i < boneCount; i++)
+				SortReset(constrained.Items[i].children);
+			for (int i = 0; i < boneCount; i++)
+				constrained.Items[i].sorted = true;
 		}
 
 		private void SortTransformConstraint (TransformConstraint constraint) {
@@ -210,15 +210,25 @@ namespace Spine {
 
 			var constrained = constraint.bones;
 			int boneCount = constrained.Count;
-			for (int ii = 0; ii < boneCount; ii++)
-				SortBone(constrained.Items[ii]);
+//			for (int ii = 0; ii < boneCount; ii++)
+//				SortBone(constrained.Items[ii]);
+			if (constraint.data.local) {
+				for (int i = 0; i < boneCount; i++) {
+					Bone child = constrained.Items[constrained.Count - 1];
+					SortBone(child.parent);
+					if (!updateCache.Contains(child)) updateCacheReset.Add(child);
+				}
+			} else {
+				for (int i = 0; i < boneCount; i++)
+					SortBone(constrained.Items[i]);
+			}
 
 			updateCache.Add(constraint);
 
-			for (int ii = 0; ii < boneCount; ii++)
-				SortReset(constrained.Items[ii].children);
-			for (int ii = 0; ii < boneCount; ii++)
-				constrained.Items[ii].sorted = true;
+			for (int i = 0; i < boneCount; i++)
+				SortReset(constrained.Items[i].children);
+			for (int i = 0; i < boneCount; i++)
+				constrained.Items[i].sorted = true;
 		}
 
 		private void SortPathConstraintAttachment (Skin skin, int slotIndex, Bone slotBone) {
@@ -474,6 +484,54 @@ namespace Spine {
 
 		public void Update (float delta) {
 			time += delta;
+		}
+
+		/// <summary>Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.</summary>
+		/// <param name="x">The horizontal distance between the skeleton origin and the left side of the AABB.</param>
+		/// <param name="y">The vertical distance between the skeleton origin and the bottom side of the AABB.</param>
+		/// <param name="width">The width of the AABB</param>
+		/// <param name="height">The height of the AABB.</param>
+		/// <param name="vertexBuffer">Reference to hold a float[]. May be a null reference. This method will assign it a new float[] with the appropriate size as needed.</param>
+		public void GetBounds (out float x, out float y, out float width, out float height, ref float[] vertexBuffer) {
+			float[] temp = vertexBuffer;
+			temp = temp ?? new float[8];
+			var drawOrder = this.drawOrder;
+			float minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
+			for (int i = 0, n = drawOrder.Count; i < n; i++) {
+				Slot slot = drawOrder.Items[i];
+				int verticesLength = 0;
+				float[] vertices = null;
+				Attachment attachment = slot.attachment;
+				var regionAttachment = attachment as RegionAttachment;
+				if (regionAttachment != null) {
+					verticesLength = 8;
+					if (temp.Length < 8) temp = new float[8];
+					regionAttachment.ComputeWorldVertices(slot.bone, temp);
+				} else {
+					var meshAttachment = attachment as MeshAttachment;
+					if (meshAttachment != null) {
+						MeshAttachment mesh = meshAttachment;
+						verticesLength = mesh.WorldVerticesLength;
+						if (temp.Length < verticesLength) temp = new float[verticesLength];
+						mesh.ComputeWorldVertices(slot, 0, verticesLength, temp, 0);
+					}
+				}
+
+				if (vertices != null) {
+					for (int ii = 0; ii < verticesLength; ii += 2) {
+						float vx = vertices[ii], vy = vertices[ii + 1];
+						minX = Math.Min(minX, vx);
+						minY = Math.Min(minY, vy);
+						maxX = Math.Max(maxX, vx);
+						maxY = Math.Max(maxY, vy);
+					}
+				}
+			}
+			x = minX;
+			y = minY;
+			width = maxX - minX;
+			height = maxY - minY;
+			vertexBuffer = temp;
 		}
 	}
 }

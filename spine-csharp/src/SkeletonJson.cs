@@ -146,6 +146,14 @@ namespace Spine {
 						data.b = ToColor(color, 2);
 						data.a = ToColor(color, 3);
 					}
+
+					if (slotMap.ContainsKey("dark")) {
+						var color2 = (String)slotMap["dark"];
+						data.r2 = ToColor(color2, 0);
+						data.g2 = ToColor(color2, 1);
+						data.b2 = ToColor(color2, 2);
+						data.hasSecondColor = true;
+					}
 						
 					data.attachmentName = GetString(slotMap, "attachment", null);
 					if (slotMap.ContainsKey("blend"))
@@ -394,6 +402,17 @@ namespace Spine {
 					pathAttachment.lengths = GetFloatArray(map, "lengths", scale);
 					return pathAttachment;
 				}
+			case AttachmentType.Point: {
+					PointAttachment point = attachmentLoader.NewPointAttachment(skin, name);
+					if (point == null) return null;
+					point.x = GetFloat(map, "x", 0) * scale;
+					point.y = GetFloat(map, "y", 0) * scale;
+					point.rotation = GetFloat(map, "rotation", 0);
+
+					//string color = GetString(map, "color", null);
+					//if (color != null) point.color = color;
+					return point;
+				}
 			}
 			return null;
 		}
@@ -441,7 +460,19 @@ namespace Spine {
 					foreach (KeyValuePair<String, Object> timelineEntry in timelineMap) {
 						var values = (List<Object>)timelineEntry.Value;
 						var timelineName = (String)timelineEntry.Key;
-						if (timelineName == "color") {
+						if (timelineName == "attachment") {
+							var timeline = new AttachmentTimeline(values.Count);
+							timeline.slotIndex = slotIndex;
+
+							int frameIndex = 0;
+							foreach (Dictionary<String, Object> valueMap in values) {
+								float time = (float)valueMap["time"];
+								timeline.SetFrame(frameIndex++, time, (String)valueMap["name"]);
+							}
+							timelines.Add(timeline);
+							duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1]);
+
+						} else if (timelineName == "color") {
 							var timeline = new ColorTimeline(values.Count);
 							timeline.slotIndex = slotIndex;
 
@@ -456,17 +487,22 @@ namespace Spine {
 							timelines.Add(timeline);
 							duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * ColorTimeline.ENTRIES]);
 
-						} else if (timelineName == "attachment") {
-							var timeline = new AttachmentTimeline(values.Count);
+						} else if (timelineName == "twoColor") {
+							var timeline = new TwoColorTimeline(values.Count);
 							timeline.slotIndex = slotIndex;
 
 							int frameIndex = 0;
 							foreach (Dictionary<String, Object> valueMap in values) {
 								float time = (float)valueMap["time"];
-								timeline.SetFrame(frameIndex++, time, (String)valueMap["name"]);
+								String c = (String)valueMap["light"];
+								String c2 = (String)valueMap["dark"];
+								timeline.SetFrame(frameIndex, time, ToColor(c, 0), ToColor(c, 1), ToColor(c, 2), ToColor(c, 3),
+									ToColor(c2, 0), ToColor(c2, 1), ToColor(c2, 2));
+								ReadCurve(valueMap, timeline, frameIndex);
+								frameIndex++;
 							}
 							timelines.Add(timeline);
-							duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1]);
+							duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * ColorTimeline.ENTRIES]);
 
 						} else
 							throw new Exception("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");

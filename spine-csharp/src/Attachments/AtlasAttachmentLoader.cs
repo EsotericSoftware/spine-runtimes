@@ -39,7 +39,7 @@ namespace Spine {
 			this.atlasArray = atlasArray;
 		}
 
-		public RegionAttachment NewRegionAttachment (Skin skin, String name, String path) {
+		public RegionAttachment NewRegionAttachment (Skin skin, string name, string path) {
 			AtlasRegion region = FindRegion(path);
 			if (region == null) throw new Exception("Region not found in atlas: " + path + " (region attachment: " + name + ")");
 			RegionAttachment attachment = new RegionAttachment(name);
@@ -54,7 +54,7 @@ namespace Spine {
 			return attachment;
 		}
 
-		public MeshAttachment NewMeshAttachment (Skin skin, String name, String path) {
+		public MeshAttachment NewMeshAttachment (Skin skin, string name, string path) {
 			AtlasRegion region = FindRegion(path);
 			if (region == null) throw new Exception("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
 			MeshAttachment attachment = new MeshAttachment(name);
@@ -73,12 +73,16 @@ namespace Spine {
 			return attachment;
 		}			
 
-		public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, String name) {
+		public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string name) {
 			return new BoundingBoxAttachment(name);
 		}
 
-		public PathAttachment NewPathAttachment (Skin skin, String name) {
-			return new PathAttachment (name);
+		public PathAttachment NewPathAttachment (Skin skin, string name) {
+			return new PathAttachment(name);
+		}
+
+		public PointAttachment NewPointAttachment (Skin skin, string name) {
+			return new PointAttachment(name);
 		}
 
 		public AtlasRegion FindRegion (string name) {
