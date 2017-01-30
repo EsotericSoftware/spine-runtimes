@@ -179,10 +179,10 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	SkeletonBatch* batch = SkeletonBatch::getInstance();
 
 	Color3B nodeColor = getColor();
-	_skeleton->r = nodeColor.r / (float)255;
-	_skeleton->g = nodeColor.g / (float)255;
-	_skeleton->b = nodeColor.b / (float)255;
-	_skeleton->a = getDisplayedOpacity() / (float)255;
+	_skeleton->color.r = nodeColor.r / (float)255;
+	_skeleton->color.g = nodeColor.g / (float)255;
+	_skeleton->color.b = nodeColor.b / (float)255;
+	_skeleton->color.a = getDisplayedOpacity() / (float)255;
     
     Color4F color;
 	AttachmentVertices* attachmentVertices = nullptr;
@@ -193,33 +193,33 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		switch (slot->attachment->type) {
 		case SP_ATTACHMENT_REGION: {
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
+			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices, 0, 2);
 			attachmentVertices = getAttachmentVertices(attachment);
-            color.r = attachment->r;
-			color.g = attachment->g;
-			color.b = attachment->b;
-			color.a = attachment->a;
+            color.r = attachment->color.r;
+			color.g = attachment->color.g;
+			color.b = attachment->color.b;
+			color.a = attachment->color.a;
 			break;
 		}
 		case SP_ATTACHMENT_MESH: {
 			spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
-			spMeshAttachment_computeWorldVertices(attachment, slot, _worldVertices);
+			spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, attachment->super.worldVerticesLength, _worldVertices, 0, 2);
 			attachmentVertices = getAttachmentVertices(attachment);
-            color.r = attachment->r;
-            color.g = attachment->g;
-            color.b = attachment->b;
-            color.a = attachment->a;
+            color.r = attachment->color.r;
+            color.g = attachment->color.g;
+            color.b = attachment->color.b;
+            color.a = attachment->color.a;
 			break;
 		}
 		default:
 			continue;
 		}
 
-		color.a *= _skeleton->a * slot->a * 255;
+		color.a *= _skeleton->color.a * slot->color.a * 255;
 		float multiplier = _premultipliedAlpha ? color.a : 255;
-		color.r *= _skeleton->r * slot->r * multiplier;
-		color.g *= _skeleton->g * slot->g * multiplier;
-		color.b *= _skeleton->b * slot->b * multiplier;
+		color.r *= _skeleton->color.r * slot->color.r * multiplier;
+		color.g *= _skeleton->color.g * slot->color.g * multiplier;
+		color.b *= _skeleton->color.b * slot->color.b * multiplier;
         
         
         
@@ -279,7 +279,7 @@ void SkeletonRenderer::drawDebug (Renderer* renderer, const Mat4 &transform, uin
             spSlot* slot = _skeleton->drawOrder[i];
             if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
             spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-            spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
+            spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices, 0, 2);
             points[0] = Vec2(_worldVertices[0], _worldVertices[1]);
             points[1] = Vec2(_worldVertices[2], _worldVertices[3]);
             points[2] = Vec2(_worldVertices[4], _worldVertices[5]);
@@ -326,11 +326,11 @@ Rect SkeletonRenderer::getBoundingBox () const {
 		int verticesCount;
 		if (slot->attachment->type == SP_ATTACHMENT_REGION) {
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
+			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices, 0, 2);
 			verticesCount = 8;
 		} else if (slot->attachment->type == SP_ATTACHMENT_MESH) {
 			spMeshAttachment* mesh = (spMeshAttachment*)slot->attachment;
-			spMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
+			spVertexAttachment_computeWorldVertices(SUPER(mesh), slot, 0, mesh->super.worldVerticesLength, _worldVertices, 0, 2);
 			verticesCount = mesh->super.worldVerticesLength;
 		} else
 			continue;
