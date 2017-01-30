@@ -2014,6 +2014,7 @@ var spine;
 			if (parentMesh != null) {
 				this.bones = parentMesh.bones;
 				this.vertices = parentMesh.vertices;
+				this.worldVerticesLength = parentMesh.worldVerticesLength;
 				this.regionUVs = parentMesh.regionUVs;
 				this.triangles = parentMesh.triangles;
 				this.hullLength = parentMesh.hullLength;
@@ -3689,8 +3690,8 @@ var spine;
 					mesh.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
 				}
 				if (vertices != null) {
-					for (var i_1 = 0, nn = vertices.length; i_1 < nn; i_1 += 8) {
-						var x = vertices[i_1], y = vertices[i_1 + 1];
+					for (var ii = 0, nn = vertices.length; ii < nn; ii += 8) {
+						var x = vertices[ii], y = vertices[ii + 1];
 						minX = Math.min(minX, x);
 						minY = Math.min(minY, y);
 						maxX = Math.max(maxX, x);
@@ -5780,8 +5781,8 @@ var spine;
 						break;
 					}
 					var listeners = _this.listeners;
-					for (var i_2 = 0; i_2 < listeners.length; i_2++) {
-						listeners[i_2].down(_this.currTouch.x, _this.currTouch.y);
+					for (var i_1 = 0; i_1 < listeners.length; i_1++) {
+						listeners[i_1].down(_this.currTouch.x, _this.currTouch.y);
 					}
 					console.log("Start " + _this.currTouch.x + ", " + _this.currTouch.y);
 					_this.lastX = _this.currTouch.x;
@@ -5790,6 +5791,29 @@ var spine;
 					ev.preventDefault();
 				}, false);
 				element.addEventListener("touchend", function (ev) {
+					var touches = ev.changedTouches;
+					for (var i = 0; i < touches.length; i++) {
+						var touch = touches[i];
+						if (_this.currTouch.identifier === touch.identifier) {
+							var rect = element.getBoundingClientRect();
+							var x = _this.currTouch.x = touch.clientX - rect.left;
+							var y = _this.currTouch.y = touch.clientY - rect.top;
+							_this.touchesPool.free(_this.currTouch);
+							var listeners = _this.listeners;
+							for (var i_2 = 0; i_2 < listeners.length; i_2++) {
+								listeners[i_2].up(x, y);
+							}
+							console.log("End " + x + ", " + y);
+							_this.lastX = x;
+							_this.lastY = y;
+							_this.buttonDown = false;
+							_this.currTouch = null;
+							break;
+						}
+					}
+					ev.preventDefault();
+				}, false);
+				element.addEventListener("touchcancel", function (ev) {
 					var touches = ev.changedTouches;
 					for (var i = 0; i < touches.length; i++) {
 						var touch = touches[i];
@@ -5812,29 +5836,6 @@ var spine;
 					}
 					ev.preventDefault();
 				}, false);
-				element.addEventListener("touchcancel", function (ev) {
-					var touches = ev.changedTouches;
-					for (var i = 0; i < touches.length; i++) {
-						var touch = touches[i];
-						if (_this.currTouch.identifier === touch.identifier) {
-							var rect = element.getBoundingClientRect();
-							var x = _this.currTouch.x = touch.clientX - rect.left;
-							var y = _this.currTouch.y = touch.clientY - rect.top;
-							_this.touchesPool.free(_this.currTouch);
-							var listeners = _this.listeners;
-							for (var i_4 = 0; i_4 < listeners.length; i_4++) {
-								listeners[i_4].up(x, y);
-							}
-							console.log("End " + x + ", " + y);
-							_this.lastX = x;
-							_this.lastY = y;
-							_this.buttonDown = false;
-							_this.currTouch = null;
-							break;
-						}
-					}
-					ev.preventDefault();
-				}, false);
 				element.addEventListener("touchmove", function (ev) {
 					if (_this.currTouch == null)
 						return;
@@ -5846,8 +5847,8 @@ var spine;
 							var x = touch.clientX - rect.left;
 							var y = touch.clientY - rect.top;
 							var listeners = _this.listeners;
-							for (var i_5 = 0; i_5 < listeners.length; i_5++) {
-								listeners[i_5].dragged(x, y);
+							for (var i_4 = 0; i_4 < listeners.length; i_4++) {
+								listeners[i_4].dragged(x, y);
 							}
 							console.log("Drag " + x + ", " + y);
 							_this.lastX = _this.currTouch.x = x;

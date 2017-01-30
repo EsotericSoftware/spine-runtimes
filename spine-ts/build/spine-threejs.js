@@ -2014,6 +2014,7 @@ var spine;
 			if (parentMesh != null) {
 				this.bones = parentMesh.bones;
 				this.vertices = parentMesh.vertices;
+				this.worldVerticesLength = parentMesh.worldVerticesLength;
 				this.regionUVs = parentMesh.regionUVs;
 				this.triangles = parentMesh.triangles;
 				this.hullLength = parentMesh.hullLength;
@@ -3689,8 +3690,8 @@ var spine;
 					mesh.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
 				}
 				if (vertices != null) {
-					for (var i_1 = 0, nn = vertices.length; i_1 < nn; i_1 += 8) {
-						var x = vertices[i_1], y = vertices[i_1 + 1];
+					for (var ii = 0, nn = vertices.length; ii < nn; ii += 8) {
+						var x = vertices[ii], y = vertices[ii + 1];
 						minX = Math.min(minX, x);
 						minY = Math.min(minY, y);
 						maxX = Math.max(maxX, x);

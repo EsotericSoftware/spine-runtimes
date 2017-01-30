@@ -85,6 +85,7 @@ module spine {
 			if (parentMesh != null) {
 				this.bones = parentMesh.bones;
 				this.vertices = parentMesh.vertices;
+				this.worldVerticesLength = parentMesh.worldVerticesLength;
 				this.regionUVs = parentMesh.regionUVs;
 				this.triangles = parentMesh.triangles;
 				this.hullLength = parentMesh.hullLength;
