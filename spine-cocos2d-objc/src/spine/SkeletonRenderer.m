@@ -148,10 +148,10 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 
 -(void)draw:(CCRenderer *)renderer transform:(const GLKMatrix4 *)transform {
 	CCColor* nodeColor = self.color;
-	_skeleton->r = nodeColor.red;
-	_skeleton->g = nodeColor.green;
-	_skeleton->b = nodeColor.blue;
-	_skeleton->a = self.displayedOpacity;
+	_skeleton->color.r = nodeColor.red;
+	_skeleton->color.g = nodeColor.green;
+	_skeleton->color.b = nodeColor.blue;
+	_skeleton->color.a = self.displayedOpacity;
 
 	int blendMode = -1;
 	const float* uvs = 0;
@@ -166,30 +166,30 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		switch (slot->attachment->type) {
 		case SP_ATTACHMENT_REGION: {
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
+			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices, 0, 2);
 			texture = [self getTextureForRegion:attachment];
 			uvs = attachment->uvs;
 			verticesCount = 8;
 			triangles = quadTriangles;
 			trianglesCount = 6;
-			r = attachment->r;
-			g = attachment->g;
-			b = attachment->b;
-			a = attachment->a;
+			r = attachment->color.r;
+			g = attachment->color.g;
+			b = attachment->color.b;
+			a = attachment->color.a;
 			break;
 		}
 		case SP_ATTACHMENT_MESH: {
 			spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
-			spMeshAttachment_computeWorldVertices(attachment, slot, _worldVertices);
+			spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, attachment->super.worldVerticesLength, _worldVertices, 0, 2);
 			texture = [self getTextureForMesh:attachment];
 			uvs = attachment->uvs;
 			verticesCount = attachment->super.worldVerticesLength;
 			triangles = attachment->triangles;
 			trianglesCount = attachment->trianglesCount;
-			r = attachment->r;
-			g = attachment->g;
-			b = attachment->b;
-			a = attachment->a;
+			r = attachment->color.r;
+			g = attachment->color.g;
+			b = attachment->color.b;
+			a = attachment->color.a;
 			break;
 		}
 		default: ;
@@ -212,15 +212,15 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 				}
 			}
 			if (_premultipliedAlpha) {
-				a *= _skeleton->a * slot->a;
-				r *= _skeleton->r * slot->r * a;
-				g *= _skeleton->g * slot->g * a;
-				b *= _skeleton->b * slot->b * a;
+				a *= _skeleton->color.a * slot->color.a;
+				r *= _skeleton->color.r * slot->color.r * a;
+				g *= _skeleton->color.g * slot->color.g * a;
+				b *= _skeleton->color.b * slot->color.b * a;
 			} else {
-				a *= _skeleton->a * slot->a;
-				r *= _skeleton->r * slot->r;
-				g *= _skeleton->g * slot->g;
-				b *= _skeleton->b * slot->b;
+				a *= _skeleton->color.a * slot->color.a;
+				r *= _skeleton->color.r * slot->color.r;
+				g *= _skeleton->color.g * slot->color.g;
+				b *= _skeleton->color.b * slot->color.b;
 			}
 			self.texture = texture;
 			CGSize size = texture.contentSize;
@@ -249,7 +249,7 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 			spSlot* slot = _skeleton->drawOrder[i];
 			if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
+			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices, 0, 2);
 			points[0] = ccp(_worldVertices[0], _worldVertices[1]);
 			points[1] = ccp(_worldVertices[2], _worldVertices[3]);
 			points[2] = ccp(_worldVertices[4], _worldVertices[5]);
@@ -292,11 +292,12 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		int verticesCount;
 		if (slot->attachment->type == SP_ATTACHMENT_REGION) {
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
+			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices, 0, 2);
 			verticesCount = 8;
 		} else if (slot->attachment->type == SP_ATTACHMENT_MESH) {
 			spMeshAttachment* mesh = (spMeshAttachment*)slot->attachment;
-			spMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
+			spVertexAttachment_computeWorldVertices(SUPER(mesh), slot, 0, mesh->super.worldVerticesLength, _worldVertices, 0, 2);
+
 			verticesCount = mesh->super.worldVerticesLength;
 		} else
 			continue;
