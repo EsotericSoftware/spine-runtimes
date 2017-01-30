@@ -75,6 +75,16 @@ namespace Spine.Unity {
 
 		public static PolygonCollider2D AddBoundingBoxAsComponent (BoundingBoxAttachment box, Slot slot, GameObject gameObject, bool isTrigger = true) {
 			if (box == null) return null;
+
+			if (slot.bone != slot.Skeleton.RootBone) {
+				var rb = gameObject.GetComponent<Rigidbody2D>();
+				if (rb == null) {
+					rb = gameObject.AddComponent<Rigidbody2D>();
+					rb.isKinematic = true;
+					rb.gravityScale = 0;
+				}
+			}
+
 			var collider = gameObject.AddComponent<PolygonCollider2D>();
 			collider.isTrigger = isTrigger;
 			SetColliderPointsLocal(collider, slot, box);
