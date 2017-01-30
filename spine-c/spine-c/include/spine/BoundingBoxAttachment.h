@@ -45,12 +45,10 @@ typedef struct spBoundingBoxAttachment {
 } spBoundingBoxAttachment;
 
 spBoundingBoxAttachment* spBoundingBoxAttachment_create (const char* name);
-void spBoundingBoxAttachment_computeWorldVertices (spBoundingBoxAttachment* self, spSlot* slot, float* worldVertices);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spBoundingBoxAttachment BoundingBoxAttachment;
 #define BoundingBoxAttachment_create(...) spBoundingBoxAttachment_create(__VA_ARGS__)
-#define BoundingBoxAttachment_computeWorldVertices(...) spBoundingBoxAttachment_computeWorldVertices(__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

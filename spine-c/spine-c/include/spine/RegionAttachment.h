@@ -47,7 +47,7 @@ typedef struct spRegionAttachment {
 	spAttachment super;
 	const char* path;
 	float x, y, scaleX, scaleY, rotation, width, height;
-	float r, g, b, a;
+	spColor color;
 
 	void* rendererObject;
 	int regionOffsetX, regionOffsetY; /* Pixels stripped from the bottom left, unrotated. */
@@ -61,7 +61,7 @@ typedef struct spRegionAttachment {
 spRegionAttachment* spRegionAttachment_create (const char* name);
 void spRegionAttachment_setUVs (spRegionAttachment* self, float u, float v, float u2, float v2, int/*bool*/rotate);
 void spRegionAttachment_updateOffset (spRegionAttachment* self);
-void spRegionAttachment_computeWorldVertices (spRegionAttachment* self, spBone* bone, float* vertices);
+void spRegionAttachment_computeWorldVertices (spRegionAttachment* self, spBone* bone, float* vertices, int offset, int stride);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spVertexIndex VertexIndex;

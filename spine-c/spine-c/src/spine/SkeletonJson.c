@@ -34,7 +34,6 @@
 #include "Json.h"
 #include <spine/extension.h>
 #include <spine/AtlasAttachmentLoader.h>
-#include <spine/Animation.h>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #define strdup _strdup
@@ -188,7 +187,19 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 		}
 
 		for (timelineMap = slotMap->child; timelineMap; timelineMap = timelineMap->next) {
-			if (strcmp(timelineMap->name, "color") == 0) {
+			if (strcmp(timelineMap->name, "attachment") == 0) {
+				spAttachmentTimeline *timeline = spAttachmentTimeline_create(timelineMap->size);
+				timeline->slotIndex = slotIndex;
+
+				for (valueMap = timelineMap->child, frameIndex = 0; valueMap; valueMap = valueMap->next, ++frameIndex) {
+					Json* name = Json_getItem(valueMap, "name");
+					spAttachmentTimeline_setFrame(timeline, frameIndex, Json_getFloat(valueMap, "time", 0),
+												  name->type == Json_NULL ? 0 : name->valueString);
+				}
+				animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
+				animation->duration = MAX(animation->duration, timeline->frames[timelineMap->size - 1]);
+
+			} else if (strcmp(timelineMap->name, "color") == 0) {
 				spColorTimeline *timeline = spColorTimeline_create(timelineMap->size);
 				timeline->slotIndex = slotIndex;
 
@@ -201,17 +212,19 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 				animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
 				animation->duration = MAX(animation->duration, timeline->frames[(timelineMap->size - 1) * COLOR_ENTRIES]);
 
-			} else if (strcmp(timelineMap->name, "attachment") == 0) {
-				spAttachmentTimeline *timeline = spAttachmentTimeline_create(timelineMap->size);
+			} else if (strcmp(timelineMap->name, "twoColor") == 0) {
+				spTwoColorTimeline *timeline = spTwoColorTimeline_create(timelineMap->size);
 				timeline->slotIndex = slotIndex;
 
 				for (valueMap = timelineMap->child, frameIndex = 0; valueMap; valueMap = valueMap->next, ++frameIndex) {
-					Json* name = Json_getItem(valueMap, "name");
-					spAttachmentTimeline_setFrame(timeline, frameIndex, Json_getFloat(valueMap, "time", 0),
-							name->type == Json_NULL ? 0 : name->valueString);
+					const char* s = Json_getString(valueMap, "color", 0);
+					const char* ds = Json_getString(valueMap, "color", 0);
+					spTwoColorTimeline_setFrame(timeline, frameIndex, Json_getFloat(valueMap, "time", 0), toColor(s, 0), toColor(s, 1), toColor(s, 2),
+											 toColor(s, 3), toColor(ds, 0), toColor(ds, 1), toColor(ds, 2));
+					readCurve(valueMap, SUPER(timeline), frameIndex);
 				}
 				animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
-				animation->duration = MAX(animation->duration, timeline->frames[timelineMap->size - 1]);
+				animation->duration = MAX(animation->duration, timeline->frames[(timelineMap->size - 1) * TWOCOLOR_ENTRIES]);
 
 			} else {
 				spAnimation_dispose(animation);
@@ -652,6 +665,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 		for (slotMap = slots->child, i = 0; slotMap; slotMap = slotMap->next, ++i) {
 			spSlotData* data;
 			const char* color;
+			const char* dark;
 			Json *item;
 
 			const char* boneName = Json_getString(slotMap, "bone", 0);
@@ -666,10 +680,21 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 
 			color = Json_getString(slotMap, "color", 0);
 			if (color) {
-				data->r = toColor(color, 0);
-				data->g = toColor(color, 1);
-				data->b = toColor(color, 2);
-				data->a = toColor(color, 3);
+				spColor_setFromFloats(&data->color,
+									  toColor(color, 0),
+									  toColor(color, 1),
+									  toColor(color, 2),
+									  toColor(color, 3));
+			}
+
+			dark = Json_getString(slotMap, "dark", 0);
+			if (dark) {
+				data->darkColor = spColor_create();
+				spColor_setFromFloats(data->darkColor,
+									  toColor(dark, 0),
+									  toColor(dark, 1),
+									  toColor(dark, 2),
+									  toColor(dark, 3));
 			}
 
 			item = Json_getItem(slotMap, "attachment");
@@ -902,10 +927,11 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 
 						color = Json_getString(attachmentMap, "color", 0);
 						if (color) {
-							region->r = toColor(color, 0);
-							region->g = toColor(color, 1);
-							region->b = toColor(color, 2);
-							region->a = toColor(color, 3);
+							spColor_setFromFloats(&region->color,
+												  toColor(color, 0),
+												  toColor(color, 1),
+												  toColor(color, 2),
+												  toColor(color, 3));
 						}
 
 						spRegionAttachment_updateOffset(region);
@@ -921,10 +947,11 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 
 						color = Json_getString(attachmentMap, "color", 0);
 						if (color) {
-							mesh->r = toColor(color, 0);
-							mesh->g = toColor(color, 1);
-							mesh->b = toColor(color, 2);
-							mesh->a = toColor(color, 3);
+							spColor_setFromFloats(&mesh->color,
+												  toColor(color, 0),
+												  toColor(color, 1),
+												  toColor(color, 2),
+												  toColor(color, 3));
 						}
 
 						mesh->width = Json_getFloat(attachmentMap, "width", 32) * self->scale;
@@ -989,6 +1016,22 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						curves = Json_getItem(attachmentMap, "lengths");
 						for (curves = curves->child, ii = 0; curves; curves = curves->next, ++ii) {
 							path->lengths[ii] = curves->valueFloat * self->scale;
+						}
+						break;
+					}
+					case SP_ATTACHMENT_POINT: {
+						spPointAttachment* point = SUB_CAST(spPointAttachment, attachment);
+						point->x = Json_getFloat(attachmentMap, "x", 0) * self->scale;
+						point->y = Json_getFloat(attachmentMap, "y", 0) * self->scale;
+						point->rotation = Json_getFloat(attachmentMap, "rotation", 0);
+
+						color = Json_getString(attachmentMap, "color", 0);
+						if (color) {
+							spColor_setFromFloats(&point->color,
+												  toColor(color, 0),
+												  toColor(color, 1),
+												  toColor(color, 2),
+												  toColor(color, 3));
 						}
 						break;
 					}

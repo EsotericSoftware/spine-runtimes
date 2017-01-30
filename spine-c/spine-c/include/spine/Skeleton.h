@@ -63,7 +63,7 @@ typedef struct spSkeleton {
 	spPathConstraint** pathConstraints;
 
 	spSkin* const skin;
-	float r, g, b, a;
+	spColor color;
 	float time;
 	int/*bool*/flipX, flipY;
 	float x, y;
@@ -85,7 +85,7 @@ typedef struct spSkeleton {
 		transformConstraints(0),
 
 		skin(0),
-		r(0), g(0), b(0), a(0),
+		color(),
 		time(0),
 		flipX(0),
 		flipY(0),
