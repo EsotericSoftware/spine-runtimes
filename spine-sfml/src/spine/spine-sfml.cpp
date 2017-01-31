@@ -122,12 +122,12 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		if (attachment->type == ATTACHMENT_REGION) {
 			RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
 			texture = (Texture*)((AtlasRegion*)regionAttachment->rendererObject)->page->rendererObject;
-			RegionAttachment_computeWorldVertices(regionAttachment, slot->bone, worldVertices);
+			spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, worldVertices, 0, 2);
 
-			Uint8 r = static_cast<Uint8>(skeleton->r * slot->r * 255);
-			Uint8 g = static_cast<Uint8>(skeleton->g * slot->g * 255);
-			Uint8 b = static_cast<Uint8>(skeleton->b * slot->b * 255);
-			Uint8 a = static_cast<Uint8>(skeleton->a * slot->a * 255);
+			Uint8 r = static_cast<Uint8>(skeleton->color.r * slot->color.r * 255);
+			Uint8 g = static_cast<Uint8>(skeleton->color.g * slot->color.g * 255);
+			Uint8 b = static_cast<Uint8>(skeleton->color.b * slot->color.b * 255);
+			Uint8 a = static_cast<Uint8>(skeleton->color.a * slot->color.a * 255);
 
 			Vector2u size = texture->getSize();
 			vertices[0].color.r = r;
@@ -177,12 +177,12 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 			MeshAttachment* mesh = (MeshAttachment*)attachment;
 			if (mesh->super.worldVerticesLength > SPINE_MESH_VERTEX_COUNT_MAX) continue;
 			texture = (Texture*)((AtlasRegion*)mesh->rendererObject)->page->rendererObject;
-			MeshAttachment_computeWorldVertices(mesh, slot, worldVertices);
+			spVertexAttachment_computeWorldVertices(SUPER(mesh), slot, 0, mesh->super.worldVerticesLength, worldVertices, 0, 2);
 
-			Uint8 r = static_cast<Uint8>(skeleton->r * slot->r * 255);
-			Uint8 g = static_cast<Uint8>(skeleton->g * slot->g * 255);
-			Uint8 b = static_cast<Uint8>(skeleton->b * slot->b * 255);
-			Uint8 a = static_cast<Uint8>(skeleton->a * slot->a * 255);
+			Uint8 r = static_cast<Uint8>(skeleton->color.r * slot->color.r * 255);
+			Uint8 g = static_cast<Uint8>(skeleton->color.g * slot->color.g * 255);
+			Uint8 b = static_cast<Uint8>(skeleton->color.b * slot->color.b * 255);
+			Uint8 a = static_cast<Uint8>(skeleton->color.a * slot->color.a * 255);
 			vertex.color.r = r;
 			vertex.color.g = g;
 			vertex.color.b = b;

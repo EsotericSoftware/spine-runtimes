@@ -80,10 +80,10 @@ module spine {
 				if (scale) lengths = Utils.setArraySize(this.lengths, boneCount);
 				for (let i = 0, n = spacesCount - 1; i < n;) {
 					let bone = bones[i];
-					let length = bone.data.length, x = length * bone.a, y = length * bone.c;
-					length = Math.sqrt(x * x + y * y);
+					let setupLength = bone.data.length, x = setupLength * bone.a, y = setupLength * bone.c;
+					let length = Math.sqrt(x * x + y * y);
 					if (scale) lengths[i] = length;
-					spaces[++i] = lengthSpacing ? Math.max(0, length + spacing) : spacing;
+					spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
 				}
 			} else {
 				for (let i = 1; i < spacesCount; i++)
@@ -180,14 +180,14 @@ module spine {
 					} else if (p < 0) {
 						if (prevCurve != PathConstraint.BEFORE) {
 							prevCurve = PathConstraint.BEFORE;
-							path.computeWorldVerticesWith(target, 2, 4, world, 0);
+							path.computeWorldVertices(target, 2, 4, world, 0, 2);
 						}
 						this.addBeforePosition(p, world, 0, out, o);
 						continue;
 					} else if (p > pathLength) {
 						if (prevCurve != PathConstraint.AFTER) {
 							prevCurve = PathConstraint.AFTER;
-							path.computeWorldVerticesWith(target, verticesLength - 6, 4, world, 0);
+							path.computeWorldVertices(target, verticesLength - 6, 4, world, 0, 2);
 						}
 						this.addAfterPosition(p - pathLength, world, 0, out, o);
 						continue;
@@ -208,10 +208,10 @@ module spine {
 					if (curve != prevCurve) {
 						prevCurve = curve;
 						if (closed && curve == curveCount) {
-							path.computeWorldVerticesWith(target, verticesLength - 4, 4, world, 0);
-							path.computeWorldVerticesWith(target, 0, 4, world, 4);
+							path.computeWorldVertices(target, verticesLength - 4, 4, world, 0, 2);
+							path.computeWorldVertices(target, 0, 4, world, 4, 2);
 						} else
-							path.computeWorldVerticesWith(target, curve * 6 + 2, 8, world, 0);
+							path.computeWorldVertices(target, curve * 6 + 2, 8, world, 0, 2);
 					}
 					this.addCurvePosition(p, world[0], world[1], world[2], world[3], world[4], world[5], world[6], world[7], out, o,
 						tangents || (i > 0 && space == 0));
@@ -223,15 +223,15 @@ module spine {
 			if (closed) {
 				verticesLength += 2;
 				world = Utils.setArraySize(this.world, verticesLength);
-				path.computeWorldVerticesWith(target, 2, verticesLength - 4, world, 0);
-				path.computeWorldVerticesWith(target, 0, 2, world, verticesLength - 4);
+				path.computeWorldVertices(target, 2, verticesLength - 4, world, 0, 2);
+				path.computeWorldVertices(target, 0, 2, world, verticesLength - 4, 2);
 				world[verticesLength - 2] = world[0];
 				world[verticesLength - 1] = world[1];
 			} else {
 				curveCount--;
 				verticesLength -= 4;
 				world = Utils.setArraySize(this.world, verticesLength);
-				path.computeWorldVerticesWith(target, 2, verticesLength, world, 0);
+				path.computeWorldVertices(target, 2, verticesLength, world, 0, 2);
 			}
 
 			// Curve lengths.

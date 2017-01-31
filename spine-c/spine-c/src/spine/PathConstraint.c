@@ -74,7 +74,7 @@ void spPathConstraint_dispose (spPathConstraint* self) {
 
 void spPathConstraint_apply (spPathConstraint* self) {
 	int i, p, n;
-	float length, x, y, dx, dy, s;
+	float length, setupLength, x, y, dx, dy, s;
 	float* spaces, *lengths, *positions;
 	float spacing;
 	float boneX, boneY, offsetRotation;
@@ -114,10 +114,10 @@ void spPathConstraint_apply (spPathConstraint* self) {
 		}
 		for (i = 0, n = spacesCount - 1; i < n;) {
 			spBone* bone = bones[i];
-			length = bone->data->length, x = length * bone->a, y = length * bone->c;
+			setupLength = bone->data->length, x = setupLength * bone->a, y = setupLength * bone->c;
 			length = SQRT(x * x + y * y);
 			if (scale) lengths[i] = length;
-			spaces[++i] = lengthSpacing ? MAX(0, length + spacing) : spacing;
+			spaces[++i] =  (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
 		}
 	} else {
 		for (i = 1; i < spacesCount; i++) {
@@ -256,14 +256,14 @@ float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAtta
 			} else if (p < 0) {
 				if (prevCurve != PATHCONSTRAINT_BEFORE) {
 					prevCurve = PATHCONSTRAINT_BEFORE;
-					spPathAttachment_computeWorldVertices1(path, target, 2, 4, world, 0);
+					spVertexAttachment_computeWorldVertices(SUPER(path), target, 2, 4, world, 0, 2);
 				}
 				_addBeforePosition(p, world, 0, out, o);
 				continue;
 			} else if (p > pathLength) {
 				if (prevCurve != PATHCONSTRAINT_AFTER) {
 					prevCurve = PATHCONSTRAINT_AFTER;
-					spPathAttachment_computeWorldVertices1(path, target, verticesLength - 6, 4, world, 0);
+					spVertexAttachment_computeWorldVertices(SUPER(path), target, verticesLength - 6, 4, world, 0, 2);
 				}
 				_addAfterPosition(p - pathLength, world, 0, out, o);
 				continue;
@@ -284,10 +284,10 @@ float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAtta
 			if (curve != prevCurve) {
 				prevCurve = curve;
 				if (closed && curve == curveCount) {
-					spPathAttachment_computeWorldVertices1(path, target, verticesLength - 4, 4, world, 0);
-					spPathAttachment_computeWorldVertices1(path, target, 0, 4, world, 4);
+					spVertexAttachment_computeWorldVertices(SUPER(path), target, verticesLength - 4, 4, world, 0, 2);
+					spVertexAttachment_computeWorldVertices(SUPER(path), target, 0, 4, world, 4, 2);
 				} else
-					spPathAttachment_computeWorldVertices1(path, target, curve * 6 + 2, 8, world, 0);
+					spVertexAttachment_computeWorldVertices(SUPER(path), target, curve * 6 + 2, 8, world, 0, 2);
 			}
 			_addCurvePosition(p, world[0], world[1], world[2], world[3], world[4], world[5], world[6], world[7], out, o,
 				tangents || (i > 0 && space == 0));
@@ -304,8 +304,8 @@ float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAtta
 			self->worldCount = verticesLength;
 		}
 		world = self->world;
-		spPathAttachment_computeWorldVertices1(path, target, 2, verticesLength - 4, world, 0);
-		spPathAttachment_computeWorldVertices1(path, target, 0, 2, world, verticesLength - 4);
+		spVertexAttachment_computeWorldVertices(SUPER(path), target, 2, verticesLength - 4, world, 0, 2);
+		spVertexAttachment_computeWorldVertices(SUPER(path), target, 0, 2, world, verticesLength - 4, 2);
 		world[verticesLength - 2] = world[0];
 		world[verticesLength - 1] = world[1];
 	} else {
@@ -317,7 +317,7 @@ float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAtta
 			self->worldCount = verticesLength;
 		}
 		world = self->world;
-		spPathAttachment_computeWorldVertices1(path, target, 2, verticesLength, world, 0);
+		spVertexAttachment_computeWorldVertices(SUPER(path), target, 2, verticesLength, world, 0, 2);
 	}
 
 	/* Curve lengths. */

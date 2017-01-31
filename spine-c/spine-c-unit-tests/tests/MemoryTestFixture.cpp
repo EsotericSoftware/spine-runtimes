@@ -40,10 +40,10 @@ void MemoryTestFixture::tearDown()
 // Helper methods
 static spSkeletonData* readSkeletonJsonData(const char* filename, spAtlas* atlas) {
 	spSkeletonJson* json = spSkeletonJson_create(atlas);
-	ASSERT(json != nullptr);
+	ASSERT(json != 0);
 
 	spSkeletonData* skeletonData = spSkeletonJson_readSkeletonDataFile(json, filename);
-	ASSERT(skeletonData != nullptr);
+	ASSERT(skeletonData != 0);
 
 	spSkeletonJson_dispose(json);
 	return skeletonData;
@@ -54,22 +54,22 @@ static void LoadSpineboyExample(spAtlas* &atlas, spSkeletonData* &skeletonData, 
 	///////////////////////////////////////////////////////////////////////////
 	// Global Animation Information
 	atlas = spAtlas_createFromFile(SPINEBOY_ATLAS, 0);
-	ASSERT(atlas != nullptr);
+	ASSERT(atlas != 0);
 
 	skeletonData = readSkeletonJsonData(SPINEBOY_JSON, atlas);
-	ASSERT(skeletonData != nullptr);
+	ASSERT(skeletonData != 0);
 
 	stateData = spAnimationStateData_create(skeletonData);
-	ASSERT(stateData != nullptr);
+	ASSERT(stateData != 0);
 	stateData->defaultMix = 0.4f; // force mixing
 
 	///////////////////////////////////////////////////////////////////////////
 	// Animation Instance 
 	skeleton = spSkeleton_create(skeletonData);
-	ASSERT(skeleton != nullptr);
+	ASSERT(skeleton != 0);
 
 	state = spAnimationState_create(stateData);
-	ASSERT(state != nullptr);
+	ASSERT(state != 0);
 }
 
 static void DisposeAll(spSkeleton* skeleton, spAnimationState* state, spAnimationStateData* stateData, spSkeletonData* skeletonData, spAtlas* atlas)
@@ -92,11 +92,11 @@ static void DisposeAll(spSkeleton* skeleton, spAnimationState* state, spAnimatio
 // https://github.com/EsotericSoftware/spine-runtimes/issues/776
 void MemoryTestFixture::reproduceIssue_776()
 {
-	spAtlas* atlas = nullptr;
-	spSkeletonData* skeletonData = nullptr;
-	spAnimationStateData* stateData = nullptr;
-	spSkeleton* skeleton = nullptr;
-	spAnimationState* state = nullptr;
+	spAtlas* atlas = 0;
+	spSkeletonData* skeletonData = 0;
+	spAnimationStateData* stateData = 0;
+	spSkeleton* skeleton = 0;
+	spAnimationState* state = 0;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Initialize Animations
@@ -134,11 +134,11 @@ void MemoryTestFixture::reproduceIssue_776()
 
 void MemoryTestFixture::reproduceIssue_777()
 {
-	spAtlas* atlas = nullptr;
-	spSkeletonData* skeletonData = nullptr;
-	spAnimationStateData* stateData = nullptr;
-	spSkeleton* skeleton = nullptr;
-	spAnimationState* state = nullptr;
+	spAtlas* atlas = 0;
+	spSkeletonData* skeletonData = 0;
+	spAnimationStateData* stateData = 0;
+	spSkeleton* skeleton = 0;
+	spAnimationState* state = 0;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Initialize Animations
@@ -179,7 +179,7 @@ void MemoryTestFixture::reproduceIssue_777()
 	DisposeAll(skeleton, state, stateData, skeletonData, atlas);
 }
 
-spSkeleton* skeleton = nullptr;
+spSkeleton* skeleton = 0;
 static void  spineAnimStateHandler(spAnimationState* state, int type, spTrackEntry* entry, spEvent* event)
 {
 	if (type == SP_ANIMATION_COMPLETE)
@@ -192,10 +192,10 @@ static void  spineAnimStateHandler(spAnimationState* state, int type, spTrackEnt
 
 void MemoryTestFixture::reproduceIssue_Loop()
 {
-	spAtlas* atlas = nullptr;
-	spSkeletonData* skeletonData = nullptr;
-	spAnimationStateData* stateData = nullptr;
-	spAnimationState* state = nullptr;
+	spAtlas* atlas = 0;
+	spSkeletonData* skeletonData = 0;
+	spAnimationStateData* stateData = 0;
+	spAnimationState* state = 0;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Initialize Animations

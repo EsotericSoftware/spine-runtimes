@@ -90,7 +90,8 @@ typedef enum {
 	SP_TIMELINE_TRANSFORMCONSTRAINT,
 	SP_TIMELINE_PATHCONSTRAINTPOSITION,
 	SP_TIMELINE_PATHCONSTRAINTSPACING,
-	SP_TIMELINE_PATHCONSTRAINTMIX
+	SP_TIMELINE_PATHCONSTRAINTMIX,
+	SP_TIMELINE_TWOCOLOR
 } spTimelineType;
 
 struct spTimeline {
@@ -262,6 +263,36 @@ void spColorTimeline_setFrame (spColorTimeline* self, int frameIndex, float time
 typedef spColorTimeline ColorTimeline;
 #define ColorTimeline_create(...) spColorTimeline_create(__VA_ARGS__)
 #define ColorTimeline_setFrame(...) spColorTimeline_setFrame(__VA_ARGS__)
+#endif
+
+/**/
+
+static const int TWOCOLOR_ENTRIES = 8;
+
+typedef struct spTwoColorTimeline {
+	spCurveTimeline super;
+	int const framesCount;
+	float* const frames; /* time, r, g, b, a, ... */
+	int slotIndex;
+
+#ifdef __cplusplus
+	spTwoColorTimeline() :
+		super(),
+		framesCount(0),
+		frames(0),
+		slotIndex(0) {
+	}
+#endif
+} spTwoColorTimeline;
+
+spTwoColorTimeline* spTwoColorTimeline_create (int framesCount);
+
+void spTwoColorTimeline_setFrame (spTwoColorTimeline* self, int frameIndex, float time, float r, float g, float b, float a, float r2, float g2, float b2);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spTwoColorTimeline TwoColorTimeline;
+#define TwoColorTimeline_create(...) spTwoColorTimeline_create(__VA_ARGS__)
+#define TwoColorTimeline_setFrame(...) spTwoColorTimeline_setFrame(__VA_ARGS__)
 #endif
 
 /**/

@@ -217,30 +217,6 @@ module spine {
 			return Math.sqrt(this.b * this.b + this.d * this.d);
 		}
 
-		worldToLocalRotationX () {
-			let parent = this.parent;
-			if (parent == null) return this.arotation;
-			let pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, a = this.a, c = this.c;
-			return Math.atan2(pa * c - pc * a, pd * a - pb * c) * MathUtils.radDeg;
-		}
-
-		worldToLocalRotationY () {
-			let parent = this.parent;
-			if (parent == null) return this.arotation;
-			let pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, b = this.b, d = this.d;
-			return Math.atan2(pa * d - pc * b, pd * b - pb * d) * MathUtils.radDeg;
-		}
-
-		rotateWorld (degrees: number) {
-			let a = this.a, b = this.b, c = this.c, d = this.d;
-			let cos = MathUtils.cosDeg(degrees), sin = MathUtils.sinDeg(degrees);
-			this.a = cos * a - sin * c;
-			this.b = cos * b - sin * d;
-			this.c = sin * a + cos * c;
-			this.d = sin * b + cos * d;
-			this.appliedValid = false;
-		}
-
 		/** Computes the individual applied transform values from the world transform. This can be useful to perform processing using
 	 	 * the applied transform after the world transform has been modified directly (eg, by a constraint).
 	 	 * <p>
@@ -300,6 +276,26 @@ module spine {
 			local.x = x * this.a + y * this.b + this.worldX;
 			local.y = x * this.c + y * this.d + this.worldY;
 			return local;
+		}
+
+		worldToLocalRotation (worldRotation: number) {
+			let sin = MathUtils.sinDeg(worldRotation), cos = MathUtils.cosDeg(worldRotation);
+			return Math.atan2(this.a * sin - this.c * cos, this.d * cos - this.b * sin) * MathUtils.radDeg;
+		}
+
+		localToWorldRotation (localRotation: number) {
+			let sin = MathUtils.sinDeg(localRotation), cos = MathUtils.cosDeg(localRotation);
+			return Math.atan2(cos * this.c + sin * this.d, cos * this.a + sin * this.b) * MathUtils.radDeg;
+		}
+
+		rotateWorld (degrees: number) {
+			let a = this.a, b = this.b, c = this.c, d = this.d;
+			let cos = MathUtils.cosDeg(degrees), sin = MathUtils.sinDeg(degrees);
+			this.a = cos * a - sin * c;
+			this.b = cos * b - sin * d;
+			this.c = sin * a + cos * c;
+			this.d = sin * b + cos * d;
+			this.appliedValid = false;
 		}
 	}
 }

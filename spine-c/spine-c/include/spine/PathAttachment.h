@@ -48,8 +48,6 @@ typedef struct spPathAttachment {
 } spPathAttachment;
 
 spPathAttachment* spPathAttachment_create (const char* name);
-void spPathAttachment_computeWorldVertices (spPathAttachment* self, spSlot* slot, float* worldVertices);
-void spPathAttachment_computeWorldVertices1 (spPathAttachment* self, spSlot* slot, int start, int count, float* worldVertices, int offset);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spPathAttachment PathAttachment;

@@ -32,6 +32,7 @@
 #define SPINE_SLOTDATA_H_
 
 #include <spine/BoneData.h>
+#include <spine/Color.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,7 +47,8 @@ typedef struct spSlotData {
 	const char* const name;
 	const spBoneData* const boneData;
 	const char* attachmentName;
-	float r, g, b, a;
+	spColor color;
+	spColor* darkColor;
 	spBlendMode blendMode;
 
 #ifdef __cplusplus
@@ -55,7 +57,8 @@ typedef struct spSlotData {
 		name(0),
 		boneData(0),
 		attachmentName(0),
-		r(0), g(0), b(0), a(0),
+		color(),
+		darkColor(0),
 		blendMode(SP_BLEND_MODE_NORMAL) {
 	}
 #endif

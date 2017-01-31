@@ -135,6 +135,7 @@
 #include <spine/MeshAttachment.h>
 #include <spine/BoundingBoxAttachment.h>
 #include <spine/PathAttachment.h>
+#include <spine/PointAttachment.h>
 #include <spine/AnimationState.h>
 
 #ifdef __cplusplus

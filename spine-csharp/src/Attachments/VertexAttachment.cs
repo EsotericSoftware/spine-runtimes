@@ -55,7 +55,8 @@ namespace Spine {
 		/// <param name="count">The number of world vertex values to output. Must be less than or equal to <see cref="WorldVerticesLength"/> - start.</param>
 		/// <param name="worldVertices">The output world vertices. Must have a length greater than or equal to <paramref name="offset"/> + <paramref name="count"/>.</param>
 		/// <param name="offset">The <paramref name="worldVertices"/> index to begin writing values.</param>
-		public void ComputeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset) {
+		/// <param name="stride">The number of <paramref name="worldVertices"/> entries between the value pairs written.</param>
+		public void ComputeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset, int stride = 2) {
 			count += offset;
 			Skeleton skeleton = slot.Skeleton;
 			var deformArray = slot.attachmentVertices;
@@ -66,7 +67,7 @@ namespace Spine {
 				Bone bone = slot.bone;
 				float x = bone.worldX, y = bone.worldY;
 				float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-				for (int vv = start, w = offset; w < count; vv += 2, w += 2) {
+				for (int vv = start, w = offset; w < count; vv += 2, w += stride) {
 					float vx = vertices[vv], vy = vertices[vv + 1];
 					worldVertices[w] = vx * a + vy * b + x;
 					worldVertices[w + 1] = vx * c + vy * d + y;
@@ -81,7 +82,7 @@ namespace Spine {
 			}
 			Bone[] skeletonBones = skeleton.Bones.Items;
 			if (deformArray.Count == 0) {
-				for (int w = offset, b = skip * 3; w < count; w += 2) {
+				for (int w = offset, b = skip * 3; w < count; w += stride) {
 					float wx = 0, wy = 0;
 					int n = bones[v++];
 					n += v;
@@ -96,7 +97,7 @@ namespace Spine {
 				}
 			} else {
 				float[] deform = deformArray.Items;
-				for (int w = offset, b = skip * 3, f = skip << 1; w < count; w += 2) {
+				for (int w = offset, b = skip * 3, f = skip << 1; w < count; w += stride) {
 					float wx = 0, wy = 0;
 					int n = bones[v++];
 					n += v;

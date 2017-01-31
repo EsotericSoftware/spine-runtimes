@@ -34,10 +34,8 @@ public class SlotData {
 	internal var _index:int;
 	internal var _name:String;
 	internal var _boneData:BoneData;
-	public var r:Number = 1;
-	public var g:Number = 1;
-	public var b:Number = 1;
-	public var a:Number = 1;
+	public var color: Color = new Color(1, 1, 1, 1);
+	public var darkColor: Color;	
 	public var attachmentName:String;
 	public var blendMode:BlendMode;
 

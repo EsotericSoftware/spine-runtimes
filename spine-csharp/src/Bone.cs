@@ -31,6 +31,14 @@
 using System;
 
 namespace Spine {
+	/// <summary>
+	/// Stores a bone's current pose.
+	/// <para>
+	/// A bone has a local transform which is used to compute its world transform. A bone also has an applied transform, which is a
+	/// local transform that can be applied to compute the world transform. The local transform and applied transform may differ if a
+	/// constraint or application code modifies the world transform after it was computed from the local transform.
+	/// </para>
+	/// </summary>
 	public class Bone : IUpdatable {
 		static public bool yDown;
 
@@ -55,6 +63,7 @@ namespace Spine {
 		public Skeleton Skeleton { get { return skeleton; } }
 		public Bone Parent { get { return parent; } }
 		public ExposedList<Bone> Children { get { return children; } }
+		/// <summary>The local X translation.</summary>
 		public float X { get { return x; } set { x = value; } }
 		public float Y { get { return y; } set { y = value; } }
 		public float Rotation { get { return rotation; } set { rotation = value; } }
@@ -240,34 +249,6 @@ namespace Spine {
 			shearY = data.shearY;
 		}
 
-		public float WorldToLocalRotationX {
-			get {
-				Bone parent = this.parent;
-				if (parent == null) return arotation;
-				float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, a = this.a, c = this.c;
-				return MathUtils.Atan2(pa * c - pc * a, pd * a - pb * c) * MathUtils.RadDeg;
-			}
-		}
-
-		public float WorldToLocalRotationY {
-			get {
-				Bone parent = this.parent;
-				if (parent == null) return arotation;
-				float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, b = this.b, d = this.d;
-				return MathUtils.Atan2(pa * d - pc * b, pd * b - pb * d) * MathUtils.RadDeg;
-			}
-		}
-
-		public void RotateWorld (float degrees) {
-			float a = this.a, b = this.b, c = this.c, d = this.d;
-			float cos = MathUtils.CosDeg(degrees), sin = MathUtils.SinDeg(degrees);
-			this.a = cos * a - sin * c;
-			this.b = cos * b - sin * d;
-			this.c = sin * a + cos * c;
-			this.d = sin * b + cos * d;
-			appliedValid = false;
-		}
-
 		/// <summary>
 		/// Computes the individual applied transform values from the world transform. This can be useful to perform processing using
 		/// the applied transform after the world transform has been modified directly (eg, by a constraint)..
@@ -326,6 +307,44 @@ namespace Spine {
 		public void LocalToWorld (float localX, float localY, out float worldX, out float worldY) {
 			worldX = localX * a + localY * b + this.worldX;
 			worldY = localX * c + localY * d + this.worldY;
+		}
+
+		public float WorldToLocalRotationX {
+			get {
+				Bone parent = this.parent;
+				if (parent == null) return arotation;
+				float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, a = this.a, c = this.c;
+				return MathUtils.Atan2(pa * c - pc * a, pd * a - pb * c) * MathUtils.RadDeg;
+			}
+		}
+
+		public float WorldToLocalRotationY {
+			get {
+				Bone parent = this.parent;
+				if (parent == null) return arotation;
+				float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, b = this.b, d = this.d;
+				return MathUtils.Atan2(pa * d - pc * b, pd * b - pb * d) * MathUtils.RadDeg;
+			}
+		}
+
+		public float WorldToLocalRotation (float worldRotation) {
+			float sin = MathUtils.SinDeg(worldRotation), cos = MathUtils.CosDeg(worldRotation);
+			return MathUtils.Atan2(a * sin - c * cos, d * cos - b * sin) * MathUtils.RadDeg;
+		}
+
+		public float LocalToWorldRotation (float localRotation) {
+			float sin = MathUtils.SinDeg(localRotation), cos = MathUtils.CosDeg(localRotation);
+			return MathUtils.Atan2(cos * c + sin * d, cos * a + sin * b) * MathUtils.RadDeg;
+		}
+
+		public void RotateWorld (float degrees) {
+			float a = this.a, b = this.b, c = this.c, d = this.d;
+			float cos = MathUtils.CosDeg(degrees), sin = MathUtils.SinDeg(degrees);
+			this.a = cos * a - sin * c;
+			this.b = cos * b - sin * d;
+			this.c = sin * a + cos * c;
+			this.d = sin * b + cos * d;
+			appliedValid = false;
 		}
 
 		override public String ToString () {

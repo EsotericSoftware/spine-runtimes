@@ -66,10 +66,7 @@ public class ColorTimeline extends CurveTimeline {
 		
 		if (time < frames[0]) {
 			if (setupPose) {
-				slot.r = slot.data.r;
-				slot.g = slot.data.g;
-				slot.b = slot.data.b;
-				slot.a = slot.data.a;	
+				slot.color.setFromColor(slot.data.color);				
 			}
 			return;
 		}
@@ -98,21 +95,15 @@ public class ColorTimeline extends CurveTimeline {
 			a += (frames[frame + A] - a) * percent;
 		}		
 		if (alpha == 1) {
-			slot.r = r;
-			slot.g = g;
-			slot.b = b;
-			slot.a = a;
+			slot.color.setFrom(r, g, b, a);
 		} else {			
 			if (setupPose) {
-				slot.r = slot.data.r;
-				slot.g = slot.data.g;
-				slot.b = slot.data.b;
-				slot.a = slot.data.a;				 
+				slot.color.setFromColor(slot.data.color);			 
 			}
-			slot.r += (r - slot.r) * alpha;
-			slot.g += (g - slot.g) * alpha;
-			slot.b += (b - slot.b) * alpha;
-			slot.a += (a - slot.a) * alpha;			
+			slot.color.r += (r - slot.color.r) * alpha;
+			slot.color.g += (g - slot.color.g) * alpha;
+			slot.color.b += (b - slot.color.b) * alpha;
+			slot.color.a += (a - slot.color.a) * alpha;			
 		}
 	}
 }

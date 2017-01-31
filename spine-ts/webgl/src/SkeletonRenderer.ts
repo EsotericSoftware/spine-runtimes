@@ -30,10 +30,13 @@
 
 module spine.webgl {
 	export class SkeletonRenderer {
+		static VERTEX_SIZE = 2 + 2 + 4;
 		static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 
 		premultipliedAlpha = false;
 		private gl: WebGLRenderingContext;
+		private tempColor = new Color();
+		private vertices = Utils.newFloatArray(SkeletonRenderer.VERTEX_SIZE * 1024);
 
 		constructor (gl: WebGLRenderingContext) {
 			this.gl = gl;
@@ -52,13 +55,13 @@ module spine.webgl {
 				let texture: GLTexture = null;
 				if (attachment instanceof RegionAttachment) {
 					let region = <RegionAttachment>attachment;
-					vertices = region.updateWorldVertices(slot, premultipliedAlpha);
+					vertices = this.computeRegionVertices(slot, region, premultipliedAlpha);
 					triangles = SkeletonRenderer.QUAD_TRIANGLES;
 					texture = <GLTexture>(<TextureAtlasRegion>region.region.renderObject).texture;
 
 				} else if (attachment instanceof MeshAttachment) {
 					let mesh = <MeshAttachment>attachment;
-					vertices = mesh.updateWorldVertices(slot, premultipliedAlpha);
+					vertices = this.computeMeshVertices(slot, mesh, premultipliedAlpha);
 					triangles = mesh.triangles;
 					texture = <GLTexture>(<TextureAtlasRegion>mesh.region.renderObject).texture;
 				} else continue;
@@ -72,6 +75,89 @@ module spine.webgl {
 					batcher.draw(texture, vertices, triangles);
 				}
 			}
+		}
+
+		computeRegionVertices(slot: Slot, region: RegionAttachment, pma: boolean) {
+			let skeleton = slot.bone.skeleton;
+			let skeletonColor = skeleton.color;
+			let slotColor = slot.color;
+			let regionColor = region.color;
+			let alpha = skeletonColor.a * slotColor.a * regionColor.a;
+			let multiplier = pma ? alpha : 1;
+			let color = this.tempColor;
+			color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
+					  skeletonColor.g * slotColor.g * regionColor.g * multiplier,
+					  skeletonColor.b * slotColor.b * regionColor.b * multiplier,
+					  alpha);
+
+			region.computeWorldVertices(slot.bone, this.vertices, 0, SkeletonRenderer.VERTEX_SIZE);
+
+			let vertices = this.vertices;
+			let uvs = region.uvs;
+
+			vertices[RegionAttachment.C1R] = color.r;
+			vertices[RegionAttachment.C1G] = color.g;
+			vertices[RegionAttachment.C1B] = color.b;
+			vertices[RegionAttachment.C1A] = color.a;
+			vertices[RegionAttachment.U1] = uvs[0];
+			vertices[RegionAttachment.V1] = uvs[1];
+
+			vertices[RegionAttachment.C2R] = color.r;
+			vertices[RegionAttachment.C2G] = color.g;
+			vertices[RegionAttachment.C2B] = color.b;
+			vertices[RegionAttachment.C2A] = color.a;
+			vertices[RegionAttachment.U2] = uvs[2];
+			vertices[RegionAttachment.V2] = uvs[3];
+
+			vertices[RegionAttachment.C3R] = color.r;
+			vertices[RegionAttachment.C3G] = color.g;
+			vertices[RegionAttachment.C3B] = color.b;
+			vertices[RegionAttachment.C3A] = color.a;
+			vertices[RegionAttachment.U3] = uvs[4];
+			vertices[RegionAttachment.V3] = uvs[5];
+
+			vertices[RegionAttachment.C4R] = color.r;
+			vertices[RegionAttachment.C4G] = color.g;
+			vertices[RegionAttachment.C4B] = color.b;
+			vertices[RegionAttachment.C4A] = color.a;
+			vertices[RegionAttachment.U4] = uvs[6];
+			vertices[RegionAttachment.V4] = uvs[7];
+
+			return vertices;
+		}
+
+		computeMeshVertices(slot: Slot, mesh: MeshAttachment, pma: boolean) {
+			let skeleton = slot.bone.skeleton;
+			let skeletonColor = skeleton.color;
+			let slotColor = slot.color;
+			let regionColor = mesh.color;
+			let alpha = skeletonColor.a * slotColor.a * regionColor.a;
+			let multiplier = pma ? alpha : 1;
+			let color = this.tempColor;
+			color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
+					  skeletonColor.g * slotColor.g * regionColor.g * multiplier,
+					  skeletonColor.b * slotColor.b * regionColor.b * multiplier,
+					  alpha);
+
+			let numVertices = mesh.worldVerticesLength / 2;
+			if (this.vertices.length < mesh.worldVerticesLength) {
+				this.vertices = Utils.newFloatArray(mesh.worldVerticesLength);
+			}
+			let vertices = this.vertices;
+			mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
+
+			let uvs = mesh.uvs;
+			for (let i = 0, n = numVertices, u = 0, v = 2; i < n; i++) {
+				vertices[v++] = color.r;
+				vertices[v++] = color.g;
+				vertices[v++] = color.b;
+				vertices[v++] = color.a;
+				vertices[v++] = uvs[u++];
+				vertices[v++] = uvs[u++];
+				v += 2;
+			}
+
+			return vertices;
 		}
 	}
 }

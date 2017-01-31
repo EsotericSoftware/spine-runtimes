@@ -29,16 +29,13 @@
  *****************************************************************************/
 
 package spine.attachments {
+import spine.Color;
 
-public dynamic class MeshAttachment extends VertexAttachment {
-	public var worldVertices:Vector.<Number>;
+public dynamic class MeshAttachment extends VertexAttachment {	
 	public var uvs:Vector.<Number>;
 	public var regionUVs:Vector.<Number>;
 	public var triangles:Vector.<uint>;	
-	public var r:Number = 1;
-	public var g:Number = 1;
-	public var b:Number = 1;
-	public var a:Number = 1;
+	public var color:Color = new Color(1, 1, 1, 1);
 	public var hullLength:int;
 	private var _parentMesh:MeshAttachment;
 	public var inheritDeform:Boolean;

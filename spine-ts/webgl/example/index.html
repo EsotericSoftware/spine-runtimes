@@ -29,7 +29,7 @@ var skeletonRenderer;
 var debugRenderer;
 var shapes;
 var skeletons = {};
-var activeSkeleton = "raptor";
+var activeSkeleton = "vine";
 
 function init () {
 	// Setup canvas and WebGL context. We pass alpha: false to canvas.getContext() so we don't use premultiplied alpha when
@@ -46,11 +46,11 @@ function init () {
 	mvp.ortho2d(0, 0, canvas.width - 1, canvas.height - 1);
 	skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
 	debugRenderer = new spine.webgl.SkeletonDebugRenderer(gl);
-	debugRenderer.drawRegionAttachments = false;
-	debugRenderer.drawBoundingBoxes = false;
-	debugRenderer.drawMeshHull = false;
-	debugRenderer.drawMeshTriangles = false;
-	debugRenderer.drawPaths = false;
+	debugRenderer.drawRegionAttachments = true;
+	debugRenderer.drawBoundingBoxes = true;
+	debugRenderer.drawMeshHull = true;
+	debugRenderer.drawMeshTriangles = true;
+	debugRenderer.drawPaths = true;
 	debugShader = spine.webgl.Shader.newColored(gl);
 	shapes = new spine.webgl.ShapeRenderer(gl);
 	assetManager = new spine.webgl.AssetManager(gl);
@@ -119,7 +119,7 @@ function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 	animationStateData = new spine.AnimationStateData(skeleton.data);
 	var animationState = new spine.AnimationState(animationStateData);
 	if (name == "spineboy") {
-		animationStateData.setMix("walk", "jump", 0.4)		
+		animationStateData.setMix("walk", "jump", 0.4)
 		animationStateData.setMix("jump", "run", 0.4);
 		animationState.setAnimation(0, "walk", true);
 		var jumpEntry = animationState.addAnimation(0, "jump", false, 3);
@@ -157,7 +157,7 @@ function calculateBounds(skeleton) {
 	skeleton.updateWorldTransform();
 	var offset = new spine.Vector2();
 	var size = new spine.Vector2();
-	skeleton.getBounds(offset, size);
+	skeleton.getBounds(offset, size, []);
 	return { offset: offset, size: size };
 }
 

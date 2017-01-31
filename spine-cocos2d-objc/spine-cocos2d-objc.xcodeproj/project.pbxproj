@@ -73,6 +73,8 @@
 		76F5BDA71D2BDE1C005917E5 /* tank.png in Resources */ = {isa = PBXBuildFile; fileRef = 76F5BDA11D2BDE1C005917E5 /* tank.png */; };
 		76F5BDAA1D2BDE67005917E5 /* RaptorExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 76F5BDA91D2BDE67005917E5 /* RaptorExample.m */; };
 		76F5BDAD1D2BDFA2005917E5 /* TankExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 76F5BDAC1D2BDFA2005917E5 /* TankExample.m */; };
+		76FAC1961E3FA15E001CCC8C /* Color.c in Sources */ = {isa = PBXBuildFile; fileRef = 76FAC1941E3FA15E001CCC8C /* Color.c */; };
+		76FAC1971E3FA15E001CCC8C /* PointAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 76FAC1951E3FA15E001CCC8C /* PointAttachment.c */; };
 		83F1A0EF1986955A001F6B44 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83F1A0EE1986955A001F6B44 /* GLKit.framework */; };
 		9A5D2499170A94DA0030D4DD /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5D2498170A94DA0030D4DD /* QuartzCore.framework */; };
 		9A5D249B170A94DA0030D4DD /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5D249A170A94DA0030D4DD /* OpenGLES.framework */; };
@@ -201,6 +203,8 @@
 		76F5BDA91D2BDE67005917E5 /* RaptorExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RaptorExample.m; path = example/RaptorExample.m; sourceTree = "<group>"; };
 		76F5BDAB1D2BDFA2005917E5 /* TankExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TankExample.h; path = example/TankExample.h; sourceTree = "<group>"; };
 		76F5BDAC1D2BDFA2005917E5 /* TankExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TankExample.m; path = example/TankExample.m; sourceTree = "<group>"; };
+		76FAC1941E3FA15E001CCC8C /* Color.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Color.c; path = "../spine-c/spine-c/src/spine/Color.c"; sourceTree = "<group>"; };
+		76FAC1951E3FA15E001CCC8C /* PointAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = PointAttachment.c; path = "../spine-c/spine-c/src/spine/PointAttachment.c"; sourceTree = "<group>"; };
 		83F1A0EE1986955A001F6B44 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		9A5D2495170A94DA0030D4DD /* SpineExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpineExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A5D2498170A94DA0030D4DD /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -273,6 +277,8 @@
 		43C32822170B0BC2004A9460 /* spine-c */ = {
 			isa = PBXGroup;
 			children = (
+				76FAC1941E3FA15E001CCC8C /* Color.c */,
+				76FAC1951E3FA15E001CCC8C /* PointAttachment.c */,
 				76F28CF41DEC810200CDE54D /* Animation.c */,
 				76F28CF51DEC810300CDE54D /* AnimationState.c */,
 				76F28CF61DEC810300CDE54D /* AnimationStateData.c */,
@@ -558,8 +564,10 @@
 				76F28D311DEC810300CDE54D /* Slot.c in Sources */,
 				43C32A06170B0F93004A9460 /* main.m in Sources */,
 				76F28D351DEC810300CDE54D /* VertexAttachment.c in Sources */,
+				76FAC1961E3FA15E001CCC8C /* Color.c in Sources */,
 				76F28D331DEC810300CDE54D /* TransformConstraint.c in Sources */,
 				43C32A09170B10FF004A9460 /* AppDelegate.m in Sources */,
+				76FAC1971E3FA15E001CCC8C /* PointAttachment.c in Sources */,
 				43F7FF881927F94800CA4038 /* SkeletonAnimation.m in Sources */,
 				76F28D271DEC810300CDE54D /* PathAttachment.c in Sources */,
 				76F28D2B1DEC810300CDE54D /* Skeleton.c in Sources */,

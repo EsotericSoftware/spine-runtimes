@@ -35,6 +35,8 @@ namespace Spine {
 		internal SlotData data;
 		internal Bone bone;
 		internal float r, g, b, a;
+		internal float r2, g2, b2;
+		internal bool hasSecondColor;
 		internal Attachment attachment;
 		internal float attachmentTime;
 		internal ExposedList<float> attachmentVertices = new ExposedList<float>();
@@ -46,6 +48,11 @@ namespace Spine {
 		public float G { get { return g; } set { g = value; } }
 		public float B { get { return b; } set { b = value; } }
 		public float A { get { return a; } set { a = value; } }
+
+		public float R2 { get { return r2; } set { r2 = value; } }
+		public float G2 { get { return g2; } set { g2 = value; } }
+		public float B2 { get { return b2; } set { b2 = value; } }
+		public bool HasSecondColor { get { return hasSecondColor; } set { hasSecondColor = value; } }
 
 		/// <summary>May be null.</summary>
 		public Attachment Attachment {

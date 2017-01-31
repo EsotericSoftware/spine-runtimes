@@ -47,17 +47,13 @@ module spine {
 			super(name);
 		}
 
-		computeWorldVertices (slot: Slot, worldVertices: ArrayLike<number>) {
-			this.computeWorldVerticesWith(slot, 0, this.worldVerticesLength, worldVertices, 0);
-		}
-
 		/** Transforms local vertices to world coordinates.
 		 * @param start The index of the first local vertex value to transform. Each vertex has 2 values, x and y.
 		 * @param count The number of world vertex values to output. Must be <= {@link #getWorldVerticesLength()} - start.
 		 * @param worldVertices The output world vertices. Must have a length >= offset + count.
 		 * @param offset The worldVertices index to begin writing values. */
-		computeWorldVerticesWith (slot: Slot, start: number, count: number, worldVertices: ArrayLike<number>, offset: number) {
-			count += offset;
+		computeWorldVertices (slot: Slot, start: number, count: number, worldVertices: ArrayLike<number>, offset: number, stride: number) {
+			count = offset + (count >> 1) * stride;
 			let skeleton = slot.bone.skeleton;
 			let deformArray = slot.attachmentVertices;
 			let vertices = this.vertices;
@@ -68,7 +64,7 @@ module spine {
 				let x = bone.worldX;
 				let y = bone.worldY;
 				let a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-				for (let v = start, w = offset; w < count; v += 2, w += 2) {
+				for (let v = start, w = offset; w < count; v += 2, w += stride) {
 					let vx = vertices[v], vy = vertices[v + 1];
 					worldVertices[w] = vx * a + vy * b + x;
 					worldVertices[w + 1] = vx * c + vy * d + y;
@@ -83,7 +79,7 @@ module spine {
 			}
 			let skeletonBones = skeleton.bones;
 			if (deformArray.length == 0) {
-				for (let w = offset, b = skip * 3; w < count; w += 2) {
+				for (let w = offset, b = skip * 3; w < count; w += stride) {
 					let wx = 0, wy = 0;
 					let n = bones[v++];
 					n += v;
@@ -98,7 +94,7 @@ module spine {
 				}
 			} else {
 				let deform = deformArray;
-				for (let w = offset, b = skip * 3, f = skip << 1; w < count; w += 2) {
+				for (let w = offset, b = skip * 3, f = skip << 1; w < count; w += stride) {
 					let wx = 0, wy = 0;
 					let n = bones[v++];
 					n += v;

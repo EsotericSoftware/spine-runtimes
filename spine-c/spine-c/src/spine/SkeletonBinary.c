@@ -686,7 +686,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 			region->scaleY = readFloat(input);
 			region->width = readFloat(input) * self->scale;
 			region->height = readFloat(input) * self->scale;
-			readColor(input, &region->r, &region->g, &region->b, &region->a);
+			readColor(input, &region->color.r, &region->color.g, &region->color.b, &region->color.a);
 			spRegionAttachment_updateOffset(region);
 			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 			if (freeName) FREE(name);
@@ -711,7 +711,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 			attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path);
 			mesh = SUB_CAST(spMeshAttachment, attachment);
 			mesh->path = path;
-			readColor(input, &mesh->r, &mesh->g, &mesh->b, &mesh->a);
+			readColor(input, &mesh->color.r, &mesh->color.g, &mesh->color.b, &mesh->color.a);
 			vertexCount = readVarint(input, 1);
 			mesh->regionUVs = _readFloatArray(input, vertexCount << 1, 1);
 			mesh->triangles = (unsigned short*)_readShortArray(input, &mesh->trianglesCount);
@@ -741,7 +741,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 			attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path);
 			mesh = SUB_CAST(spMeshAttachment, attachment);
 			mesh->path = path;
-			readColor(input, &mesh->r, &mesh->g, &mesh->b, &mesh->a);
+			readColor(input, &mesh->color.r, &mesh->color.g, &mesh->color.b, &mesh->color.a);
 			skinName = readString(input);
 			parent = readString(input);
 			mesh->inheritDeform = readBoolean(input);
@@ -769,6 +769,18 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 			}
 			if (nonessential) readInt(input); /* Skip color. */
 			if (freeName) FREE(name);
+			return attachment;
+		}
+		case SP_ATTACHMENT_POINT: {
+			spAttachment* attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
+			spPointAttachment* point = SUB_CAST(spPointAttachment, attachment);
+			point->rotation = readFloat(input);
+			point->x = readFloat(input) * self->scale;
+			point->y = readFloat(input) * self->scale;
+
+			if (nonessential) {
+				readColor(input, &point->color.r, &point->color.g, &point->color.b, &point->color.a);
+			}
 			return attachment;
 		}
 	}
@@ -884,12 +896,21 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 	skeletonData->slotsCount = readVarint(input, 1);
 	skeletonData->slots = MALLOC(spSlotData*, skeletonData->slotsCount);
 	for (i = 0; i < skeletonData->slotsCount; ++i) {
+		int r, g, b, a;
 		const char* slotName = readString(input);
 		spBoneData* boneData = skeletonData->bones[readVarint(input, 1)];
 		/* TODO Avoid copying of slotName */
 		spSlotData* slotData = spSlotData_create(i, slotName, boneData);
 		FREE(slotName);
-		readColor(input, &slotData->r, &slotData->g, &slotData->b, &slotData->a);
+		readColor(input, &slotData->color.r, &slotData->color.g, &slotData->color.b, &slotData->color.a);
+		r = readByte(input);
+		g = readByte(input);
+		b = readByte(input);
+		a = readByte(input);
+		if (!(r == 0xff && g == 0xff && b == 0xff && a == 0xff)) {
+			slotData->darkColor = spColor_create();
+			spColor_setFromFloats(slotData->darkColor, r / 255.0f, g / 255.0f, b / 255.0f, 1);
+		}
 		slotData->attachmentName = readString(input);
 		slotData->blendMode = (spBlendMode)readVarint(input, 1);
 		skeletonData->slots[i] = slotData;

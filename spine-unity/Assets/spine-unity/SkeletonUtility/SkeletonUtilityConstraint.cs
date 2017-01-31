@@ -28,8 +28,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+// Contributed by: Mitch Thompson
+
 using UnityEngine;
-using System.Collections;
 
 namespace Spine.Unity {
 	[RequireComponent(typeof(SkeletonUtilityBone)), ExecuteInEditMode]

@@ -61,11 +61,11 @@ module spine {
 						polygon = Utils.newFloatArray(boundingBox.worldVerticesLength);
 					}
 					polygons.push(polygon);
-					boundingBox.computeWorldVertices(slot, polygon);
+					boundingBox.computeWorldVertices(slot, 0, boundingBox.worldVerticesLength, polygon, 0, 2);
 				}
 			}
 
-			if (updateAabb) { 
+			if (updateAabb) {
 				this.aabbCompute();
 			} else {
 				this.minX = Number.POSITIVE_INFINITY;

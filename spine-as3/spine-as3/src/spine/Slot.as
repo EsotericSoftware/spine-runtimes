@@ -34,10 +34,8 @@ import spine.attachments.Attachment;
 public class Slot {
 	internal var _data:SlotData;
 	internal var _bone:Bone;
-	public var r:Number;
-	public var g:Number;
-	public var b:Number;
-	public var a:Number;
+	public var color:Color;
+	public var darkColor:Color;
 	internal var _attachment:Attachment;
 	private var _attachmentTime:Number;
 	public var attachmentVertices:Vector.<Number> = new Vector.<Number>();
@@ -47,6 +45,8 @@ public class Slot {
 		if (bone == null) throw new ArgumentError("bone cannot be null.");
 		_data = data;
 		_bone = bone;
+		this.color = new Color(1, 1, 1, 1);
+		this.darkColor = data.darkColor == null ? null : new Color(1, 1, 1, 1);
 		setToSetupPose();
 	}
 
@@ -86,10 +86,8 @@ public class Slot {
 	}
 
 	public function setToSetupPose () : void {		
-		r = _data.r;
-		g = _data.g;
-		b = _data.b;
-		a = _data.a;
+		color.setFromColor(data.color);
+		if (darkColor != null) darkColor.setFromColor(this.data.darkColor);
 		if (_data.attachmentName == null)
 			attachment = null;
 		else {

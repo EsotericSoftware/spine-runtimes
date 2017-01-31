@@ -38,8 +38,6 @@ Download the latest Spine-Unity unitypackage from the download page: http://esot
 
 In the `Assets/Examples/Scenes` folder you will find many example scenes that demonstrate various spine-unity features.
 
-> Note: If you are still using Spine 2.1.xx, you'll need to use the older 2.1.xx compatible runtime. You can find it here: [spine-unity-v2.unitypackage](http://esotericsoftware.com/files/runtimes/unity/spine-unity-v2.unitypackage)
-
 ## Manual installation
 
 You can also choose to setup and run from the Git files:

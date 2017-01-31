@@ -154,6 +154,10 @@
 		76F5BD551D2BD7D3005917E5 /* TankExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76F5BD531D2BD7D3005917E5 /* TankExample.cpp */; };
 		76F5BD561D2BD7EF005917E5 /* TankExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76F5BD531D2BD7D3005917E5 /* TankExample.cpp */; };
 		76F5BD571D2BD7EF005917E5 /* TankExample.h in Sources */ = {isa = PBXBuildFile; fileRef = 76F5BD541D2BD7D3005917E5 /* TankExample.h */; };
+		76FAC18C1E3F97D2001CCC8C /* Color.c in Sources */ = {isa = PBXBuildFile; fileRef = 76FAC18A1E3F97D2001CCC8C /* Color.c */; };
+		76FAC18D1E3F97D2001CCC8C /* PointAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 76FAC18B1E3F97D2001CCC8C /* PointAttachment.c */; };
+		76FAC18F1E3F98A0001CCC8C /* Color.c in Sources */ = {isa = PBXBuildFile; fileRef = 76FAC18A1E3F97D2001CCC8C /* Color.c */; };
+		76FAC1901E3F98A0001CCC8C /* PointAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 76FAC18B1E3F97D2001CCC8C /* PointAttachment.c */; };
 		8262943E1AAF051F00CB7CF7 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8262943D1AAF051F00CB7CF7 /* Security.framework */; };
 		BF171245129291EC00B8313A /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF170DB012928DE900B8313A /* OpenGLES.framework */; };
 		BF1712471292920000B8313A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BF170DB412928DE900B8313A /* libz.dylib */; };
@@ -309,6 +313,8 @@
 		76F28CB01DEC7EBB00CDE54D /* VertexAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VertexAttachment.c; path = "../../../spine-c/spine-c/src/spine/VertexAttachment.c"; sourceTree = "<group>"; };
 		76F5BD531D2BD7D3005917E5 /* TankExample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TankExample.cpp; sourceTree = "<group>"; };
 		76F5BD541D2BD7D3005917E5 /* TankExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TankExample.h; sourceTree = "<group>"; };
+		76FAC18A1E3F97D2001CCC8C /* Color.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Color.c; path = "../../../spine-c/spine-c/src/spine/Color.c"; sourceTree = "<group>"; };
+		76FAC18B1E3F97D2001CCC8C /* PointAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = PointAttachment.c; path = "../../../spine-c/spine-c/src/spine/PointAttachment.c"; sourceTree = "<group>"; };
 		8262943D1AAF051F00CB7CF7 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		BF170DB012928DE900B8313A /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		BF170DB412928DE900B8313A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
@@ -524,6 +530,8 @@
 		76AAA3B21D180F7300C54FCB /* spine */ = {
 			isa = PBXGroup;
 			children = (
+				76FAC18A1E3F97D2001CCC8C /* Color.c */,
+				76FAC18B1E3F97D2001CCC8C /* PointAttachment.c */,
 				76F28C8F1DEC7EBA00CDE54D /* Animation.c */,
 				76F28C901DEC7EBA00CDE54D /* AnimationState.c */,
 				76F28C911DEC7EBA00CDE54D /* AnimationStateData.c */,
@@ -742,6 +750,7 @@
 				76AAA3C31D180F7C00C54FCB /* RaptorExample.cpp in Sources */,
 				76F28CB51DEC7EBB00CDE54D /* AtlasAttachmentLoader.c in Sources */,
 				76AAA3C01D180F7C00C54FCB /* AppDelegate.cpp in Sources */,
+				76FAC18D1E3F97D2001CCC8C /* PointAttachment.c in Sources */,
 				76F28CC31DEC7EBB00CDE54D /* PathConstraint.c in Sources */,
 				76AAA3C41D180F7C00C54FCB /* SimpleCommand.cpp in Sources */,
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
@@ -769,6 +778,7 @@
 				76F28CBF1DEC7EBB00CDE54D /* IkConstraintData.c in Sources */,
 				76F28CC61DEC7EBB00CDE54D /* Skeleton.c in Sources */,
 				76AAA4101D18106000C54FCB /* SkeletonRenderer.cpp in Sources */,
+				76FAC18C1E3F97D2001CCC8C /* Color.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -776,6 +786,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				76FAC18F1E3F98A0001CCC8C /* Color.c in Sources */,
+				76FAC1901E3F98A0001CCC8C /* PointAttachment.c in Sources */,
 				76F28CD11DEC7FFA00CDE54D /* Animation.c in Sources */,
 				76F28CD21DEC7FFA00CDE54D /* AnimationState.c in Sources */,
 				76F28CD31DEC7FFA00CDE54D /* AnimationStateData.c in Sources */,

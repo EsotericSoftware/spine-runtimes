@@ -638,7 +638,7 @@ public class Animation {
 		}
 
 		public int getPropertyId () {
-			return (TimelineType.color.ordinal() << 24) + slotIndex;
+			return (TimelineType.twoColor.ordinal() << 24) + slotIndex;
 		}
 
 		public void setSlotIndex (int index) {

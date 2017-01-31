@@ -45,6 +45,8 @@ typedef struct spTransformConstraintData {
 	spBoneData* target;
 	float rotateMix, translateMix, scaleMix, shearMix;
 	float offsetRotation, offsetX, offsetY, offsetScaleX, offsetScaleY, offsetShearY;
+	int /*boolean*/ relative;
+	int /*boolean*/ local;
 
 #ifdef __cplusplus
 	spTransformConstraintData() :
@@ -61,7 +63,9 @@ typedef struct spTransformConstraintData {
 		offsetY(0),
 		offsetScaleX(0),
 		offsetScaleY(0),
-		offsetShearY(0) {
+		offsetShearY(0),
+		relative(0),
+		local(0) {
 	}
 #endif
 } spTransformConstraintData;

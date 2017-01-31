@@ -343,12 +343,13 @@ namespace Spine {
 		/// It may be desired to use <see cref="AnimationState.SetEmptyAnimations(float)"/> to mix the skeletons back to the setup pose, 
 		/// rather than leaving them in their previous pose.</summary>
 		public void ClearTracks () {
+			bool oldDrainDisabled = queue.drainDisabled;
 			queue.drainDisabled = true;
 			for (int i = 0, n = tracks.Count; i < n; i++) {
 				ClearTrack(i);
 			}
 			tracks.Clear();
-			queue.drainDisabled = false;
+			queue.drainDisabled = oldDrainDisabled;
 			queue.Drain();
 		}
 
@@ -510,12 +511,13 @@ namespace Spine {
 		/// <summary>
 		/// Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix duration.</summary>
 		public void SetEmptyAnimations (float mixDuration) {
+			bool oldDrainDisabled = queue.drainDisabled;
 			queue.drainDisabled = true;
 			for (int i = 0, n = tracks.Count; i < n; i++) {
 				TrackEntry current = tracks.Items[i];
 				if (current != null) SetEmptyAnimation(i, mixDuration);
 			}
-			queue.drainDisabled = false;
+			queue.drainDisabled = oldDrainDisabled;
 			queue.Drain();
 		}
 
@@ -803,6 +805,11 @@ namespace Spine {
 		/// <see cref="AnimationStateData"/> based on the animation before this animation (if any).
 		/// 
 		/// The mix duration must be set before <see cref="AnimationState.Update(float)"/> is next called.
+		/// <para>
+		/// When using <seealso cref="AnimationState.AddAnimation(int, Animation, bool, float)"/> with a 
+		/// <code>delay</code> <seealso cref="Delay"/> is set using the mix duration from the <see cref=" AnimationStateData"/>
+		/// </para>
+		/// 
 		/// </summary>
 		public float MixDuration { get { return mixDuration; } set { mixDuration = value; } }
 

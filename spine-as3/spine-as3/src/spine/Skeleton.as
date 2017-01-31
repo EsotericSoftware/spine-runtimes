@@ -29,6 +29,8 @@
  *****************************************************************************/
 
 package spine {
+import spine.attachments.MeshAttachment;
+import spine.attachments.RegionAttachment;
 import flash.utils.Dictionary;
 import spine.attachments.PathAttachment;
 import spine.attachments.Attachment;
@@ -44,7 +46,7 @@ public class Skeleton {
 	private var _updateCache:Vector.<Updatable> = new Vector.<Updatable>();
 	private var _updateCacheReset:Vector.<Bone> = new Vector.<Bone>();
 	private var _skin:Skin;
-	public var r:Number = 1, g:Number = 1, b:Number = 1, a:Number = 1;
+	public var color:Color = new Color(1, 1, 1, 1);
 	public var time:Number = 0;
 	public var flipX:Boolean, flipY:Boolean;
 	public var x:Number = 0, y:Number = 0;
@@ -96,6 +98,7 @@ public class Skeleton {
 	public function updateCache () : void {
 		var updateCache:Vector.<Updatable> = this._updateCache;
 		updateCache.length = 0;
+		this._updateCacheReset.length = 0;
 
 		var bones:Vector.<Bone> = this.bones;
 		var i:Number = 0;
@@ -166,25 +169,25 @@ public class Skeleton {
 		if (skin != null) sortPathConstraintAttachment(skin, slotIndex, slotBone);
 		if (data.defaultSkin != null && data.defaultSkin != skin)
 			sortPathConstraintAttachment(data.defaultSkin, slotIndex, slotBone);
-		var ii:Number = 0;
-		var nn:Number = 0;		
-		for (ii = 0, nn = data.skins.length; ii < nn; ii++)
-			sortPathConstraintAttachment(data.skins[ii], slotIndex, slotBone);
+		var i:Number = 0;
+		var n:Number = 0;		
+		for (i = 0, n = data.skins.length; i < n; i++)
+			sortPathConstraintAttachment(data.skins[i], slotIndex, slotBone);
 
 		var attachment:Attachment = slot.attachment;
 		if (attachment is PathAttachment) sortPathConstraintAttachment2(attachment, slotBone);
 
 		var constrained:Vector.<Bone> = constraint.bones;
 		var boneCount:Number = constrained.length;
-		for (ii = 0; ii < boneCount; ii++)
-			sortBone(constrained[ii]);
+		for (i = 0; i < boneCount; i++)
+			sortBone(constrained[i]);
 
 		_updateCache.push(constraint);
 
-		for (ii = 0; ii < boneCount; ii++)
-			sortReset(constrained[ii].children);
-		for (ii = 0; ii < boneCount; ii++)
-			constrained[ii]._sorted = true;
+		for (i = 0; i < boneCount; i++)
+			sortReset(constrained[i].children);
+		for (i = 0; i < boneCount; i++)
+			constrained[i]._sorted = true;
 	}
 
 	private function sortTransformConstraint (constraint:TransformConstraint): void {
@@ -192,16 +195,24 @@ public class Skeleton {
 
 		var constrained:Vector.<Bone> = constraint.bones;
 		var boneCount:Number = constrained.length;
-		var ii:Number = 0;
-		for (ii = 0; ii < boneCount; ii++)
-			sortBone(constrained[ii]);
+		var i:Number = 0;
+		if (constraint.data.local) {
+			for (i = 0; i < boneCount; i++) {
+				var child:Bone = constrained[constrained.length - 1];
+				sortBone(child.parent);
+				if (!(_updateCache.indexOf(child) > -1)) _updateCacheReset.push(child);
+			}
+		} else {
+			for (i = 0; i < boneCount; i++)
+				sortBone(constrained[i]);
+		}
 
 		_updateCache.push(constraint);
 
-		for (ii = 0; ii < boneCount; ii++)
-			sortReset(constrained[ii].children);
-		for (ii = 0; ii < boneCount; ii++)
-			constrained[ii]._sorted = true;
+		for (i = 0; i < boneCount; i++)
+			sortReset(constrained[i].children);
+		for (i = 0; i < boneCount; i++)
+			constrained[i]._sorted = true;
 	}
 	
 	private function sortPathConstraintAttachment (skin:Skin, slotIndex:int, slotBone:Bone) : void {
@@ -463,6 +474,44 @@ public class Skeleton {
 	public function toString () : String {
 		return _data.name != null ? _data.name : super.toString();
 	}
+	
+	public function getBounds (offset: Vector.<Number>, size: Vector.<Number>, temp: Vector.<Number>) : void {
+			if (offset == null) throw new ArgumentError("offset cannot be null.");
+			if (size == null) throw new ArgumentError("size cannot be null.");
+			var drawOrder:Vector.<Slot> = this.drawOrder;
+			var minX:Number = Number.POSITIVE_INFINITY, minY:Number = Number.POSITIVE_INFINITY, maxX:Number = Number.NEGATIVE_INFINITY, maxY:Number = Number.NEGATIVE_INFINITY;
+			for (var i:int = 0, n:int = drawOrder.length; i < n; i++) {
+				var slot:Slot = drawOrder[i];
+				var verticesLength:int = 0;
+				var vertices: Vector.<Number> = null;
+				var attachment:Attachment = slot.attachment;
+				if (attachment is RegionAttachment) {
+					verticesLength = 8;
+					temp.length = verticesLength;
+					vertices = temp;
+					(attachment as RegionAttachment).computeWorldVertices(slot.bone, vertices, 0, 2);
+				} else if (attachment is MeshAttachment) {
+					var mesh:MeshAttachment = attachment as MeshAttachment;
+					verticesLength = mesh.worldVerticesLength;
+					temp.length = verticesLength;
+					vertices = temp;
+					mesh.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
+				}
+				if (vertices != null) {
+					for (var ii:int = 0, nn:int = vertices.length; ii < nn; ii += 8) {
+						var x:Number = vertices[ii], y:Number = vertices[ii + 1];
+						minX = Math.min(minX, x);
+						minY = Math.min(minY, y);
+						maxX = Math.max(maxX, x);
+						maxY = Math.max(maxY, y);
+					}
+				}
+			}
+			offset[0] = minX;
+			offset[1] = minY;
+			size[0] = maxX - minX;
+			size[1] = maxY - minY;
+		}
 }
 
 }

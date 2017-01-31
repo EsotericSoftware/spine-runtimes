@@ -98,6 +98,7 @@ module spine {
 		updateCache () {
 			let updateCache = this._updateCache;
 			updateCache.length = 0;
+			this.updateCacheReset.length = 0;
 
 			let bones = this.bones;
 			for (let i = 0, n = bones.length; i < n; i++)
@@ -165,23 +166,23 @@ module spine {
 			if (this.skin != null) this.sortPathConstraintAttachment(this.skin, slotIndex, slotBone);
 			if (this.data.defaultSkin != null && this.data.defaultSkin != this.skin)
 				this.sortPathConstraintAttachment(this.data.defaultSkin, slotIndex, slotBone);
-			for (let ii = 0, nn = this.data.skins.length; ii < nn; ii++)
-				this.sortPathConstraintAttachment(this.data.skins[ii], slotIndex, slotBone);
+			for (let i = 0, n = this.data.skins.length; i < n; i++)
+				this.sortPathConstraintAttachment(this.data.skins[i], slotIndex, slotBone);
 
 			let attachment = slot.getAttachment();
 			if (attachment instanceof PathAttachment) this.sortPathConstraintAttachmentWith(attachment, slotBone);
 
 			let constrained = constraint.bones;
 			let boneCount = constrained.length;
-			for (let ii = 0; ii < boneCount; ii++)
-				this.sortBone(constrained[ii]);
+			for (let i = 0; i < boneCount; i++)
+				this.sortBone(constrained[i]);
 
 			this._updateCache.push(constraint);
 
-			for (let ii = 0; ii < boneCount; ii++)
-				this.sortReset(constrained[ii].children);
-			for (let ii = 0; ii < boneCount; ii++)
-				constrained[ii].sorted = true;
+			for (let i = 0; i < boneCount; i++)
+				this.sortReset(constrained[i].children);
+			for (let i = 0; i < boneCount; i++)
+				constrained[i].sorted = true;
 		}
 
 		sortTransformConstraint (constraint: TransformConstraint) {
@@ -189,8 +190,17 @@ module spine {
 
 			let constrained = constraint.bones;
 			let boneCount = constrained.length;
-			for (let ii = 0; ii < boneCount; ii++)
-				this.sortBone(constrained[ii]);
+			if (constraint.data.local) {
+				for (let i = 0; i < boneCount; i++) {
+					let child = constrained[constrained.length - 1];
+					this.sortBone(child.parent);
+					if (!(this._updateCache.indexOf(child) > -1)) this.updateCacheReset.push(child);
+				}
+			} else {
+				for (let i = 0; i < boneCount; i++) {
+					this.sortBone(constrained[i]);
+				}
+			}
 
 			this._updateCache.push(constraint);
 
@@ -456,20 +466,28 @@ module spine {
 
 		/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
 		 * @param offset The distance from the skeleton origin to the bottom left corner of the AABB.
-		 * @param size The width and height of the AABB. */
-		getBounds (offset: Vector2, size: Vector2) {
+		 * @param size The width and height of the AABB.
+		 * @param temp Working memory */
+		getBounds (offset: Vector2, size: Vector2, temp: Array<number>) {
 			if (offset == null) throw new Error("offset cannot be null.");
 			if (size == null) throw new Error("size cannot be null.");
 			let drawOrder = this.drawOrder;
 			let minX = Number.POSITIVE_INFINITY, minY = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				let slot = drawOrder[i];
+				let verticesLength = 0;
 				let vertices: ArrayLike<number> = null;
 				let attachment = slot.getAttachment();
-				if (attachment instanceof RegionAttachment)
-					vertices = (<RegionAttachment>attachment).updateWorldVertices(slot, false);
-				else if (attachment instanceof MeshAttachment) //
-					vertices = (<MeshAttachment>attachment).updateWorldVertices(slot, true);
+				if (attachment instanceof RegionAttachment) {
+					verticesLength = 8;
+					vertices = Utils.setArraySize(temp, verticesLength, 0);
+					(<RegionAttachment>attachment).computeWorldVertices(slot.bone, vertices, 0, 2);
+				} else if (attachment instanceof MeshAttachment) {
+					let mesh = (<MeshAttachment>attachment);
+					verticesLength = mesh.worldVerticesLength;
+					vertices = Utils.setArraySize(temp, verticesLength, 0);
+					mesh.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
+				}
 				if (vertices != null) {
 					for (let ii = 0, nn = vertices.length; ii < nn; ii += 8) {
 						let x = vertices[ii], y = vertices[ii + 1];

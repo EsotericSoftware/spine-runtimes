@@ -89,6 +89,10 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 	public function newPathAttachment(skin:Skin, name:String) : PathAttachment {
 		return new PathAttachment(name);
 	}
+	
+	public function newPointAttachment(skin:Skin, name:String) : PointAttachment {
+		return new PointAttachment(name);
+	}
 
 	static public function nextPOT (value:int) : int {
 		value--;

@@ -50,6 +50,7 @@ namespace Spine {
 
 		public const int SLOT_ATTACHMENT = 0;
 		public const int SLOT_COLOR = 1;
+		public const int SLOT_TWO_COLOR = 2;
 
 		public const int PATH_POSITION = 0;
 		public const int PATH_SPACING = 1;
@@ -110,6 +111,30 @@ namespace Spine {
 			TransformMode.NoScaleOrReflection
 		};
 
+		/// <summary>Returns the version string of binary skeleton data.</summary>
+		public static string GetVersionString (Stream input) {
+			if (input == null) throw new ArgumentNullException("input");
+
+			try {
+				// Hash.
+				int byteCount = ReadVarint(input, true);
+				if (byteCount > 1) input.Position += byteCount - 1;
+
+				// Version.
+				byteCount = ReadVarint(input, true);
+				if (byteCount > 1) {
+					byteCount--;
+					var buffer = new byte[byteCount];
+					ReadFully(input, buffer, 0, byteCount);
+					return System.Text.Encoding.UTF8.GetString(buffer, 0, byteCount);
+				}
+
+				throw new ArgumentException("Stream does not contain a valid binary Skeleton Data.", "input");
+			} catch (Exception e) {
+				throw new ArgumentException("Stream does not contain a valid binary Skeleton Data.\n" + e, "input");
+			}
+		}
+
 		public SkeletonData ReadSkeletonData (Stream input) {
 			if (input == null) throw new ArgumentNullException("input");
 			float scale = Scale;
@@ -158,6 +183,15 @@ namespace Spine {
 				slotData.g = ((color & 0x00ff0000) >> 16) / 255f;
 				slotData.b = ((color & 0x0000ff00) >> 8) / 255f;
 				slotData.a = ((color & 0x000000ff)) / 255f;
+
+				int darkColor = ReadInt(input);
+				if (darkColor != -1) {
+					slotData.hasSecondColor = true;
+					slotData.r2 = ((darkColor & 0xff000000) >> 24) / 255f;
+					slotData.g2 = ((darkColor & 0x00ff0000) >> 16) / 255f;
+					slotData.b2 = ((darkColor & 0x0000ff00) >> 8) / 255f;
+				}
+
 				slotData.attachmentName = ReadString(input);
 				slotData.blendMode = (BlendMode)ReadVarint(input, true);
 				skeletonData.slots.Add(slotData);
@@ -401,7 +435,7 @@ namespace Spine {
 					float[] lengths = new float[vertexCount / 3];
 					for (int i = 0, n = lengths.Length; i < n; i++)
 						lengths[i] = ReadFloat(input) * scale;
-					if (nonessential) ReadInt(input); //int color = nonessential ? ReadInt(input) : 0; // Avoid unused local warning.
+					if (nonessential) ReadInt(input); //int color = nonessential ? ReadInt(input) : 0;
 
 					PathAttachment path = attachmentLoader.NewPathAttachment(skin, name);
 					if (path == null) return null;
@@ -412,7 +446,21 @@ namespace Spine {
 					path.bones = vertices.bones;
 					path.lengths = lengths;
 					return path;                    
-				}			
+				}
+			case AttachmentType.Point: {
+					float rotation = ReadFloat(input);
+					float x = ReadFloat(input);
+					float y = ReadFloat(input);
+					if (nonessential) ReadInt(input); //int color = nonessential ? ReadInt(input) : 0;
+
+					PointAttachment point = attachmentLoader.NewPointAttachment(skin, name);
+					if (point == null) return null;
+					point.x = x * scale;
+					point.y = y * scale;
+					point.rotation = rotation;
+					//if (nonessential) point.color = color;
+					return point;
+				}
 			}
 			return null;
 		}
@@ -475,6 +523,15 @@ namespace Spine {
 					int timelineType = input.ReadByte();
 					int frameCount = ReadVarint(input, true);
 					switch (timelineType) {
+					case SLOT_ATTACHMENT: {
+							AttachmentTimeline timeline = new AttachmentTimeline(frameCount);
+							timeline.slotIndex = slotIndex;
+							for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+								timeline.SetFrame(frameIndex, ReadFloat(input), ReadString(input));
+							timelines.Add(timeline);
+							duration = Math.Max(duration, timeline.frames[frameCount - 1]);
+							break;
+						}
 					case SLOT_COLOR: {
 							ColorTimeline timeline = new ColorTimeline(frameCount);
 							timeline.slotIndex = slotIndex;
@@ -492,13 +549,26 @@ namespace Spine {
 							duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * ColorTimeline.ENTRIES]);
 							break;
 						}
-					case SLOT_ATTACHMENT: {
-							AttachmentTimeline timeline = new AttachmentTimeline(frameCount);
+					case SLOT_TWO_COLOR: {
+							TwoColorTimeline timeline = new TwoColorTimeline(frameCount);
 							timeline.slotIndex = slotIndex;
-							for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
-								timeline.SetFrame(frameIndex, ReadFloat(input), ReadString(input));
+							for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
+								float time = ReadFloat(input);
+								int color = ReadInt(input);
+								float r = ((color & 0xff000000) >> 24) / 255f;
+								float g = ((color & 0x00ff0000) >> 16) / 255f;
+								float b = ((color & 0x0000ff00) >> 8) / 255f;
+								float a = ((color & 0x000000ff)) / 255f;
+								int color2 = ReadInt(input);
+								float r2 = ((color2 & 0xff000000) >> 24) / 255f;
+								float g2 = ((color2 & 0x00ff0000) >> 16) / 255f;
+								float b2 = ((color2 & 0x0000ff00) >> 8) / 255f;
+
+								timeline.SetFrame(frameIndex, time, r, g, b, a, r2, g2, b2);
+								if (frameIndex < frameCount - 1) ReadCurve(input, frameIndex, timeline);
+							}
 							timelines.Add(timeline);
-							duration = Math.Max(duration, timeline.frames[frameCount - 1]);
+							duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * TwoColorTimeline.ENTRIES]);
 							break;
 						}
 					}

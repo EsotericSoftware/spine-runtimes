@@ -33,15 +33,17 @@ using System;
 namespace Spine {
 	public interface AttachmentLoader {
 		/// <return>May be null to not load any attachment.</return>
-		RegionAttachment NewRegionAttachment (Skin skin, String name, String path);
+		RegionAttachment NewRegionAttachment (Skin skin, String name, string path);
 
 		/// <return>May be null to not load any attachment.</return>
-		MeshAttachment NewMeshAttachment (Skin skin, String name, String path);
+		MeshAttachment NewMeshAttachment (Skin skin, String name, string path);
 
 		/// <return>May be null to not load any attachment.</return>
-		BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, String name);
+		BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string name);
 
 		/// <returns>May be null to not load any attachment</returns>
-		PathAttachment NewPathAttachment (Skin skin, String name);
+		PathAttachment NewPathAttachment (Skin skin, string name);
+
+		PointAttachment NewPointAttachment (Skin skin, string name);
 	}
 }

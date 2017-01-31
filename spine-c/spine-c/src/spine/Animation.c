@@ -528,10 +528,7 @@ void _spColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 
 	if (time < self->frames[0]) {
 		if (setupPose) {
-			slot->r = slot->data->r;
-			slot->g = slot->data->g;
-			slot->b = slot->data->b;
-			slot->a = slot->data->a;
+			spColor_setFromColor(&slot->color, &slot->data->color);
 		}
 		return;
 	}
@@ -561,21 +558,12 @@ void _spColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 		a += (self->frames[frame + COLOR_A] - a) * percent;
 	}
 	if (alpha == 1) {
-		slot->r = r;
-		slot->g = g;
-		slot->b = b;
-		slot->a = a;
+		spColor_setFromFloats(&slot->color, r, g, b, a);
 	} else {
 		if (setupPose) {
-			slot->r = slot->data->r;
-			slot->g = slot->data->g;
-			slot->b = slot->data->b;
-			slot->a = slot->data->a;
+			spColor_setFromColor(&slot->color, &slot->data->color);
 		}
-		slot->r += (r - slot->r) * alpha;
-		slot->g += (g - slot->g) * alpha;
-		slot->b += (b - slot->b) * alpha;
-		slot->a += (a - slot->a) * alpha;
+		spColor_addFloats(&slot->color, (r - slot->color.r) * alpha, (g - slot->color.g) * alpha, (b - slot->color.b) * alpha, (a - slot->color.a) * alpha);
 	}
 
 	UNUSED(lastTime);
@@ -598,6 +586,103 @@ void spColorTimeline_setFrame (spColorTimeline* self, int frameIndex, float time
 	self->frames[frameIndex + COLOR_G] = g;
 	self->frames[frameIndex + COLOR_B] = b;
 	self->frames[frameIndex + COLOR_A] = a;
+}
+
+/**/
+
+static const int TWOCOLOR_PREV_TIME = -8, TWOCOLOR_PREV_R = -7, TWOCOLOR_PREV_G = -6, TWOCOLOR_PREV_B = -5, TWOCOLOR_PREV_A = -4;
+static const int TWOCOLOR_PREV_R2 = -3, TWOCOLOR_PREV_G2 = -2, TWOCOLOR_PREV_B2 = -1;
+static const int TWOCOLOR_R = 1, TWOCOLOR_G = 2, TWOCOLOR_B = 3, TWOCOLOR_A = 4, TWOCOLOR_R2 = 5, TWOCOLOR_G2 = 6, TWOCOLOR_B2 = 7;
+
+void _spTwoColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
+							 int* eventsCount, float alpha, int setupPose, int mixingOut) {
+	spSlot *slot;
+	int frame;
+	float percent, frameTime;
+	float r, g, b, a, r2, g2, b2;
+	spColor* light;
+	spColor* dark;
+	spColorTimeline* self = (spColorTimeline*)timeline;
+	slot = skeleton->slots[self->slotIndex];
+
+	if (time < self->frames[0]) {
+		if (setupPose) {
+			spColor_setFromColor(&slot->color, &slot->data->color);
+			spColor_setFromColor(slot->darkColor, slot->data->darkColor);
+		}
+		return;
+	}
+
+	if (time >= self->frames[self->framesCount - TWOCOLOR_ENTRIES]) { /* Time is after last frame */
+		int i = self->framesCount;
+		r = self->frames[i + TWOCOLOR_PREV_R];
+		g = self->frames[i + TWOCOLOR_PREV_G];
+		b = self->frames[i + TWOCOLOR_PREV_B];
+		a = self->frames[i + TWOCOLOR_PREV_A];
+		r2 = self->frames[i + TWOCOLOR_PREV_R2];
+		g2 = self->frames[i + TWOCOLOR_PREV_G2];
+		b2 = self->frames[i + TWOCOLOR_PREV_B2];
+	} else {
+		/* Interpolate between the previous frame and the current frame. */
+		frame = binarySearch(self->frames, self->framesCount, time, TWOCOLOR_ENTRIES);
+
+		r = self->frames[frame + TWOCOLOR_PREV_R];
+		g = self->frames[frame + TWOCOLOR_PREV_G];
+		b = self->frames[frame + TWOCOLOR_PREV_B];
+		a = self->frames[frame + TWOCOLOR_PREV_A];
+		r2 = self->frames[frame + TWOCOLOR_PREV_R2];
+		g2 = self->frames[frame + TWOCOLOR_PREV_G2];
+		b2 = self->frames[frame + TWOCOLOR_PREV_B2];
+
+		frameTime = self->frames[frame];
+		percent = spCurveTimeline_getCurvePercent(SUPER(self), frame / TWOCOLOR_ENTRIES - 1,
+												  1 - (time - frameTime) / (self->frames[frame + TWOCOLOR_PREV_TIME] - frameTime));
+
+		r += (self->frames[frame + TWOCOLOR_R] - r) * percent;
+		g += (self->frames[frame + TWOCOLOR_G] - g) * percent;
+		b += (self->frames[frame + TWOCOLOR_B] - b) * percent;
+		a += (self->frames[frame + TWOCOLOR_A] - a) * percent;
+		r2 += (self->frames[frame + TWOCOLOR_R2] - r2) * percent;
+		g2 += (self->frames[frame + TWOCOLOR_G2] - g2) * percent;
+		b2 += (self->frames[frame + TWOCOLOR_B2] - b2) * percent;
+	}
+	if (alpha == 1) {
+		spColor_setFromFloats(&slot->color, r, g, b, a);
+		spColor_setFromFloats(slot->darkColor, r2, g2, b2, 1);
+	} else {
+		light = &slot->color;
+		dark = slot->darkColor;
+		if (setupPose) {
+			spColor_setFromColor(light, &slot->data->color);
+			spColor_setFromColor(dark, slot->data->darkColor);
+		}
+		spColor_addFloats(light, (r - light->r) * alpha, (g - light->g) * alpha, (b - light->b) * alpha, (a - light->a) * alpha);
+		spColor_addFloats(dark, (r2 - dark->r) * alpha, (g2 - dark->g) * alpha, (b2 - dark->b) * alpha, 0);
+	}
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
+}
+
+int _spTwoColorTimeline_getPropertyId (const spTimeline* timeline) {
+	return (SP_TIMELINE_TWOCOLOR << 24) + SUB_CAST(spTwoColorTimeline, timeline)->slotIndex;
+}
+
+spTwoColorTimeline* spTwoColorTimeline_create (int framesCount) {
+	return (spTwoColorTimeline*)_spBaseTimeline_create(framesCount, SP_TIMELINE_TWOCOLOR, TWOCOLOR_ENTRIES, _spTwoColorTimeline_apply, _spTwoColorTimeline_getPropertyId);
+}
+
+void spTwoColorTimeline_setFrame (spTwoColorTimeline* self, int frameIndex, float time, float r, float g, float b, float a, float r2, float g2, float b2) {
+	frameIndex *= TWOCOLOR_ENTRIES;
+	self->frames[frameIndex] = time;
+	self->frames[frameIndex + TWOCOLOR_R] = r;
+	self->frames[frameIndex + TWOCOLOR_G] = g;
+	self->frames[frameIndex + TWOCOLOR_B] = b;
+	self->frames[frameIndex + TWOCOLOR_A] = a;
+	self->frames[frameIndex + TWOCOLOR_R2] = r2;
+	self->frames[frameIndex + TWOCOLOR_G2] = g2;
+	self->frames[frameIndex + TWOCOLOR_B2] = b2;
 }
 
 /**/

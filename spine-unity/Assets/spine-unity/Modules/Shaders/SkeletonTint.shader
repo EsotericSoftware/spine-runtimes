@@ -8,7 +8,7 @@ Shader "Spine/Skeleton Tint" {
 	Properties {
 		_Color ("Tint Color", Color) = (1,1,1,1)
 		_Black ("Black Point", Color) = (0,0,0,0)
-		_MainTex ("MainTex", 2D) = "black" {}
+		[NoScaleOffset] _MainTex ("MainTex", 2D) = "black" {}
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
 	}
 

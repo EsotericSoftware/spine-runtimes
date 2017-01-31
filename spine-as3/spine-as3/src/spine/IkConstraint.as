@@ -57,10 +57,10 @@ public class IkConstraint implements Constraint {
 	public function update () : void {
 		switch (bones.length) {
 		case 1:
-			apply1(bones[0], target._worldX, target._worldY, mix);
+			apply1(bones[0], target.worldX, target.worldY, mix);
 			break;
 		case 2:
-			apply2(bones[0], bones[1], target._worldX, target._worldY, bendDirection, mix);
+			apply2(bones[0], bones[1], target.worldX, target.worldY, bendDirection, mix);
 			break;
 		}
 	}

@@ -224,6 +224,7 @@ function MeshAttachment:setParentMesh (parentMesh)
 		self.regionUVs = parentMesh.regionUVs
 		self.triangles = parentMesh.triangles
 		self.hullLength = parentMesh.hullLength
+    self.worldVerticesLength = parentMesh.worldVerticesLength
 	end
 end
 

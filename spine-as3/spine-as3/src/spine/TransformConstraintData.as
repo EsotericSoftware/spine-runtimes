@@ -45,6 +45,8 @@ public class TransformConstraintData {
 	public var offsetScaleX:Number;
 	public var offsetScaleY:Number;
 	public var offsetShearY:Number;
+	public var relative:Boolean = false;
+	public var local:Boolean = false;
 
 	public function TransformConstraintData (name:String) {
 		if (name == null) throw new ArgumentError("name cannot be null.");

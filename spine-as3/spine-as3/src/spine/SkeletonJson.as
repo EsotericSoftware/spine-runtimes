@@ -29,6 +29,8 @@
  *****************************************************************************/
 
 package spine {
+	import spine.animation.TwoColorTimeline;
+	import spine.attachments.PointAttachment;
 import spine.animation.PathConstraintMixTimeline;
 import spine.animation.PathConstraintSpacingTimeline;
 import spine.animation.PathConstraintPositionTimeline;
@@ -126,10 +128,12 @@ public class SkeletonJson {
 
 			var color:String = slotMap["color"];
 			if (color) {
-				slotData.r = toColor(color, 0);
-				slotData.g = toColor(color, 1);
-				slotData.b = toColor(color, 2);
-				slotData.a = toColor(color, 3);
+				slotData.color.setFrom(toColor(color, 0), toColor(color, 1), toColor(color, 2), toColor(color, 3));
+			}
+			
+			var dark:String = slotMap["dark"];
+			if (dark) {
+				slotData.darkColor.setFrom(toColor(dark, 0), toColor(dark, 1), toColor(dark, 2), toColor(dark, 3));
 			}
 
 			slotData.attachmentName = slotMap["attachment"];
@@ -288,10 +292,7 @@ public class SkeletonJson {
 				region.height = Number(map["height"] || 0) * scale;
 				color = map["color"];
 				if (color) {
-					region.r = toColor(color, 0);
-					region.g = toColor(color, 1);
-					region.b = toColor(color, 2);
-					region.a = toColor(color, 3);
+					region.color.setFrom(toColor(color, 0), toColor(color, 1), toColor(color, 2), toColor(color, 3));					
 				}
 				region.updateOffset();
 				return region;
@@ -303,10 +304,7 @@ public class SkeletonJson {
 
 				color = map["color"];
 				if (color) {
-					mesh.r = toColor(color, 0);
-					mesh.g = toColor(color, 1);
-					mesh.b = toColor(color, 2);
-					mesh.a = toColor(color, 3);
+					mesh.color.setFrom(toColor(color, 0), toColor(color, 1), toColor(color, 2), toColor(color, 3));
 				}
 
 				mesh.width = Number(map["width"] || 0) * scale;
@@ -347,6 +345,18 @@ public class SkeletonJson {
 				}
 				path.lengths = lengths;				
 				return path;
+			case AttachmentType.point:
+				var point:PointAttachment = attachmentLoader.newPointAttachment(skin, name);
+				if (!point) return null;
+				point.x = map.hasOwnProperty("x") ? Number(map["x"]) * scale : 0;
+				point.y = map.hasOwnProperty("y") ? Number(map["y"]) * scale : 0;
+				point.rotation = map.hasOwnProperty("rotation") ? Number(map["rotation"]) : 0;
+				
+				color = map["color"];
+				if (color) {
+					point.color.setFrom(toColor(color, 0), toColor(color, 1), toColor(color, 2), toColor(color, 3)); 					
+				}
+				return point;
 		}
 
 		return null;
@@ -400,7 +410,16 @@ public class SkeletonJson {
 
 			for (timelineName in slotMap) {
 				values = slotMap[timelineName];
-				if (timelineName == "color") {
+				if (timelineName == "attachment") {
+					var attachmentTimeline:AttachmentTimeline = new AttachmentTimeline(values.length);
+					attachmentTimeline.slotIndex = slotIndex;
+
+					frameIndex = 0;
+					for each (valueMap in values)
+						attachmentTimeline.setFrame(frameIndex++, valueMap["time"], valueMap["name"]);
+					timelines[timelines.length] = attachmentTimeline;
+					duration = Math.max(duration, attachmentTimeline.frames[attachmentTimeline.frameCount - 1]);
+				} else if (timelineName == "color") {
 					var colorTimeline:ColorTimeline = new ColorTimeline(values.length);
 					colorTimeline.slotIndex = slotIndex;
 
@@ -417,15 +436,24 @@ public class SkeletonJson {
 					}
 					timelines[timelines.length] = colorTimeline;
 					duration = Math.max(duration, colorTimeline.frames[(colorTimeline.frameCount - 1) * ColorTimeline.ENTRIES]);
-				} else if (timelineName == "attachment") {
-					var attachmentTimeline:AttachmentTimeline = new AttachmentTimeline(values.length);
-					attachmentTimeline.slotIndex = slotIndex;
+				} else if (timelineName == "twoColor") {
+					var twoColorTimeline:TwoColorTimeline = new TwoColorTimeline(values.length);
+					twoColorTimeline.slotIndex = slotIndex;
 
 					frameIndex = 0;
-					for each (valueMap in values)
-						attachmentTimeline.setFrame(frameIndex++, valueMap["time"], valueMap["name"]);
-					timelines[timelines.length] = attachmentTimeline;
-					duration = Math.max(duration, attachmentTimeline.frames[attachmentTimeline.frameCount - 1]);
+					for each (valueMap in values) {
+						color = valueMap["color"];
+						var darkColor:String = valueMap["dark"];
+						var light:Color = new Color(0, 0, 0, 0);
+						var dark:Color = new Color(0, 0, 0, 0);						
+						light.setFrom(toColor(color, 0), toColor(color, 1), toColor(color, 2), toColor(color, 3));
+						dark.setFrom(toColor(darkColor, 0), toColor(darkColor, 1), toColor(darkColor, 2), toColor(darkColor, 3));						
+						twoColorTimeline.setFrame(frameIndex, valueMap["time"], light.r, light.g, light.b, light.a, dark.r, dark.g, dark.b);
+						readCurve(valueMap, twoColorTimeline, frameIndex);
+						frameIndex++;
+					}
+					timelines[timelines.length] = twoColorTimeline;
+					duration = Math.max(duration, twoColorTimeline.frames[(twoColorTimeline.frameCount - 1) * TwoColorTimeline.ENTRIES]);
 				} else
 					throw new Error("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
 			}

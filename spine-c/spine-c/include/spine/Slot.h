@@ -42,7 +42,8 @@ extern "C" {
 typedef struct spSlot {
 	spSlotData* const data;
 	spBone* const bone;
-	float r, g, b, a;
+	spColor color;
+	spColor* darkColor;
 	spAttachment* const attachment;
 
 	int attachmentVerticesCapacity;
@@ -53,7 +54,8 @@ typedef struct spSlot {
 	spSlot() :
 		data(0),
 		bone(0),
-		r(0), g(0), b(0), a(0),
+		color(),
+		darkColor(0),
 		attachment(0),
 		attachmentVerticesCapacity(0),
 		attachmentVerticesCount(0),

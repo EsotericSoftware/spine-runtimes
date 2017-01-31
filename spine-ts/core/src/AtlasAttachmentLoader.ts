@@ -65,5 +65,9 @@ module spine {
 		newPathAttachment (skin: Skin, name: string): PathAttachment {
 			return new PathAttachment(name);
 		}
+
+		newPointAttachment(skin: Skin, name: string): PointAttachment {
+			return new PointAttachment(name);
+		}
 	}
 }

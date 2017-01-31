@@ -38,6 +38,7 @@ namespace Spine {
 		internal BoneData target;
 		internal float rotateMix, translateMix, scaleMix, shearMix;
 		internal float offsetRotation, offsetX, offsetY, offsetScaleX, offsetScaleY, offsetShearY;
+		internal bool relative, local;
 
 		public String Name { get { return name; } }
 		public int Order { get { return order; } set { order = value; } }
@@ -54,6 +55,9 @@ namespace Spine {
 		public float OffsetScaleX { get { return offsetScaleX; } set { offsetScaleX = value; } }
 		public float OffsetScaleY { get { return offsetScaleY; } set { offsetScaleY = value; } }
 		public float OffsetShearY { get { return offsetShearY; } set { offsetShearY = value; } }
+
+		public bool Relative { get { return relative; } set { relative = value; } }
+		public bool Local { get { return local; } set { local = value; } }
 
 		public TransformConstraintData (String name) {
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");

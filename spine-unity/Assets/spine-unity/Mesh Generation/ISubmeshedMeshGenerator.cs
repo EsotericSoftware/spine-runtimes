@@ -44,6 +44,7 @@ namespace Spine.Unity.MeshGeneration {
 		List<Slot> Separators { get; }
 
 		float ZSpacing { get; set; }
+		bool PremultiplyVertexColors { get; set; }
 		bool AddNormals { get; set; }
 		bool AddTangents { get; set; }
 	}
@@ -55,7 +56,7 @@ namespace Spine.Unity.MeshGeneration {
 	// Step 3: Call GenerateMesh. You'll get a Mesh and Materials.
 	// Step 4: Put the Mesh in MeshFilter. Put the Materials in MeshRenderer.sharedMaterials.
 	public interface ISubmeshSetMeshGenerator {
-		MeshAndMaterials GenerateMesh (ExposedList<SubmeshInstruction> instructions, int startSubmesh, int endSubmesh);
+		MeshAndMaterials GenerateMesh (ExposedList<SubmeshInstruction> instructions, int startSubmesh, int endSubmesh, float scale = 1f);
 
 		float ZSpacing { get; set; }
 		bool PremultiplyVertexColors { get; set; }

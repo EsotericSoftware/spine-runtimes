@@ -89,10 +89,10 @@ public class PathConstraint implements Constraint {
 			}
 			for (var i:int = 0, n:int = spacesCount - 1; i < n;) {
 				var bone:Bone = bones[i];
-				var length:Number = bone.data.length, x:Number = length * bone.a, y:Number = length * bone.c;
-				length = Math.sqrt(x * x + y * y);
+				var setupLength:Number = bone.data.length, x:Number = setupLength * bone.a, y:Number = setupLength * bone.c;
+				var length:Number = Math.sqrt(x * x + y * y);
 				if (scale) lengths[i] = length;
-				spaces[++i] = lengthSpacing ? Math.max(0, length + spacing) : spacing;
+				spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
 			}
 		} else {
 			for (i = 1; i < spacesCount; i++)
@@ -113,15 +113,15 @@ public class PathConstraint implements Constraint {
 		var p:Number;
 		for (i = 0, p = 3; i < boneCount; i++, p += 3) {
 			bone = bones[i];
-			bone._worldX += (boneX - bone.worldX) * translateMix;
-			bone._worldY += (boneY - bone.worldY) * translateMix;
+			bone.worldX += (boneX - bone.worldX) * translateMix;
+			bone.worldY += (boneY - bone.worldY) * translateMix;
 			x = positions[p]; y = positions[p + 1]; var dx:Number = x - boneX, dy:Number = y - boneY;
 			if (scale) {
 				length = lengths[i];
 				if (length != 0) {
 					var s:Number = (Math.sqrt(dx * dx + dy * dy) / length - 1) * rotateMix + 1;
-					bone._a *= s;
-					bone._c *= s;
+					bone.a *= s;
+					bone.c *= s;
 				}
 			}
 			boneX = x;
@@ -151,10 +151,10 @@ public class PathConstraint implements Constraint {
 				r *= rotateMix;
 				cos = Math.cos(r);
 				sin = Math.sin(r);
-				bone._a = cos * a - sin * c;
-				bone._b = cos * b - sin * d;
-				bone._c = sin * a + cos * c;
-				bone._d = sin * b + cos * d;
+				bone.a = cos * a - sin * c;
+				bone.b = cos * b - sin * d;
+				bone.c = sin * a + cos * c;
+				bone.d = sin * b + cos * d;
 			}
 			bone.appliedValid = false;
 		}
@@ -194,14 +194,14 @@ public class PathConstraint implements Constraint {
 				} else if (p < 0) {
 					if (prevCurve != BEFORE) {
 						prevCurve = BEFORE;
-						path.computeWorldVertices2(target, 2, 4, world, 0);
+						path.computeWorldVertices(target, 2, 4, world, 0, 2);
 					}
 					addBeforePosition(p, world, 0, out, o);
 					continue;
 				} else if (p > pathLength) {
 					if (prevCurve != AFTER) {
 						prevCurve = AFTER;
-						path.computeWorldVertices2(target, verticesLength - 6, 4, world, 0);
+						path.computeWorldVertices(target, verticesLength - 6, 4, world, 0, 2);
 					}
 					addAfterPosition(p - pathLength, world, 0, out, o);
 					continue;
@@ -222,10 +222,10 @@ public class PathConstraint implements Constraint {
 				if (curve != prevCurve) {
 					prevCurve = curve;
 					if (closed && curve == curveCount) {
-						path.computeWorldVertices2(target, verticesLength - 4, 4, world, 0);
-						path.computeWorldVertices2(target, 0, 4, world, 4);
+						path.computeWorldVertices(target, verticesLength - 4, 4, world, 0, 2);
+						path.computeWorldVertices(target, 0, 4, world, 4, 2);
 					} else
-						path.computeWorldVertices2(target, curve * 6 + 2, 8, world, 0);
+						path.computeWorldVertices(target, curve * 6 + 2, 8, world, 0, 2);
 				}
 				addCurvePosition(p, world[0], world[1], world[2], world[3], world[4], world[5], world[6], world[7], out, o,
 					tangents || (i > 0 && space == 0));
@@ -238,8 +238,8 @@ public class PathConstraint implements Constraint {
 			verticesLength += 2;
 			this._world.length = verticesLength;
 			world = this._world;
-			path.computeWorldVertices2(target, 2, verticesLength - 4, world, 0);
-			path.computeWorldVertices2(target, 0, 2, world, verticesLength - 4);
+			path.computeWorldVertices(target, 2, verticesLength - 4, world, 0, 2);
+			path.computeWorldVertices(target, 0, 2, world, verticesLength - 4, 2);
 			world[verticesLength - 2] = world[0];
 			world[verticesLength - 1] = world[1];
 		} else {
@@ -247,7 +247,7 @@ public class PathConstraint implements Constraint {
 			verticesLength -= 4;
 			this._world.length = verticesLength;
 			world = this._world;
-			path.computeWorldVertices2(target, 2, verticesLength, world, 0);
+			path.computeWorldVertices(target, 2, verticesLength, world, 0, 2);
 		}
 
 		// Curve lengths.
