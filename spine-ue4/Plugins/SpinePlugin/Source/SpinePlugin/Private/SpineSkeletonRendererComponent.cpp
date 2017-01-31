@@ -228,12 +228,12 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 				idx = 0;
 			}
 
-			spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, worldVertices.GetData());
+			spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, worldVertices.GetData(), 0, 2);
 
-			uint8 r = static_cast<uint8>(Skeleton->r * slot->r * 255);
-			uint8 g = static_cast<uint8>(Skeleton->g * slot->g * 255);
-			uint8 b = static_cast<uint8>(Skeleton->b * slot->b * 255);
-			uint8 a = static_cast<uint8>(Skeleton->a * slot->a * 255);
+			uint8 r = static_cast<uint8>(Skeleton->color.r * slot->color.r * 255);
+			uint8 g = static_cast<uint8>(Skeleton->color.g * slot->color.g * 255);
+			uint8 b = static_cast<uint8>(Skeleton->color.b * slot->color.b * 255);
+			uint8 a = static_cast<uint8>(Skeleton->color.a * slot->color.a * 255);
 			
 			colors.Add(FColor(r, g, b, a));
 			vertices.Add(FVector(worldVertices[0], depthOffset, worldVertices[1]));
@@ -298,12 +298,13 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 			if (mesh->super.worldVerticesLength> worldVertices.Num()) {
 				worldVertices.SetNum(mesh->super.worldVerticesLength);
 			}
-			spMeshAttachment_computeWorldVertices(mesh, slot, worldVertices.GetData());
+			
+			spVertexAttachment_computeWorldVertices(&mesh->super, slot, 0, mesh->super.worldVerticesLength, worldVertices.GetData(), 0, 2);
 
-			uint8 r = static_cast<uint8>(Skeleton->r * slot->r * 255);
-			uint8 g = static_cast<uint8>(Skeleton->g * slot->g * 255);
-			uint8 b = static_cast<uint8>(Skeleton->b * slot->b * 255);
-			uint8 a = static_cast<uint8>(Skeleton->a * slot->a * 255);
+			uint8 r = static_cast<uint8>(Skeleton->color.r * slot->color.r * 255);
+			uint8 g = static_cast<uint8>(Skeleton->color.g * slot->color.g * 255);
+			uint8 b = static_cast<uint8>(Skeleton->color.b * slot->color.b * 255);
+			uint8 a = static_cast<uint8>(Skeleton->color.a * slot->color.a * 255);
 			
 			for (int j = 0; j < mesh->super.worldVerticesLength; j += 2) {
 				colors.Add(FColor(r, g, b, a));
