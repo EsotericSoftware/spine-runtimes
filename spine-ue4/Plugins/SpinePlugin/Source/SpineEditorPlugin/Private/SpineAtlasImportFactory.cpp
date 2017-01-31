@@ -34,6 +34,7 @@
 #include "AssetRegistryModule.h"
 #include "AssetToolsModule.h"
 #include "PackageTools.h"
+#include "Developer/AssetTools/Public/IAssetTools.h"
 #include "Developer/DesktopPlatform/Public/IDesktopPlatform.h"
 #include "Developer/DesktopPlatform/Public/DesktopPlatformModule.h"
 #include "spine/spine.h"
