@@ -80,11 +80,11 @@ namespace Spine.Unity.Examples {
 			} else {
 				if (Input.GetKey(rightKey)) {
 					skeletonAnimation.AnimationName = moveAnimation;
-					skeletonAnimation.skeleton.FlipX = false;
+					skeletonAnimation.Skeleton.FlipX = false;
 					transform.Translate(moveSpeed * Time.deltaTime, 0, 0);
 				} else if(Input.GetKey(leftKey)) {
 					skeletonAnimation.AnimationName = moveAnimation;
-					skeletonAnimation.skeleton.FlipX = true;
+					skeletonAnimation.Skeleton.FlipX = true;
 					transform.Translate(-moveSpeed * Time.deltaTime, 0, 0);
 				} else {
 					skeletonAnimation.AnimationName = idleAnimation;
@@ -95,9 +95,9 @@ namespace Spine.Unity.Examples {
 		IEnumerator Blink() {
 			while (true) {
 				yield return new WaitForSeconds(Random.Range(0.25f, 3f));
-				skeletonAnimation.skeleton.SetAttachment(eyesSlot, blinkAttachment);
+				skeletonAnimation.Skeleton.SetAttachment(eyesSlot, blinkAttachment);
 				yield return new WaitForSeconds(blinkDuration);
-				skeletonAnimation.skeleton.SetAttachment(eyesSlot, eyesOpenAttachment);
+				skeletonAnimation.Skeleton.SetAttachment(eyesSlot, eyesOpenAttachment);
 			}
 		}
 	}
