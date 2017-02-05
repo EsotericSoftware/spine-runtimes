@@ -32,6 +32,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
@@ -82,6 +83,9 @@
     <Compile Include="src\PathConstraintData.cs" />
     <Compile Include="src\Skeleton.cs" />
     <Compile Include="src\SkeletonBinary.cs" />
+    <Compile Include="src\SkeletonBinaryArrayReaderStream.cs" />
+    <Compile Include="src\SkeletonBinaryBufferedStream.cs" />
+    <Compile Include="src\SkeletonBinaryStream.cs" />
     <Compile Include="src\SkeletonBounds.cs" />
     <Compile Include="src\SkeletonData.cs" />
     <Compile Include="src\SkeletonJson.cs" />
