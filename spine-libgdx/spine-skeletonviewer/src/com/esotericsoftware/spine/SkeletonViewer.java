@@ -661,14 +661,24 @@ public class SkeletonViewer extends ApplicationAdapter {
 				button.addListener(trackButtonListener);
 
 			Gdx.input.setInputProcessor(new InputMultiplexer(stage, new InputAdapter() {
+				float offsetX;
+				float offsetY;
+				
 				public boolean touchDown (int screenX, int screenY, int pointer, int button) {
-					touchDragged(screenX, screenY, pointer);
+					offsetX = screenX;
+					offsetY = Gdx.graphics.getHeight() - screenY;					
 					return false;
 				}
 
 				public boolean touchDragged (int screenX, int screenY, int pointer) {
-					skeletonX = screenX;
-					skeletonY = Gdx.graphics.getHeight() - screenY;
+					float deltaX = screenX - offsetX;
+					float deltaY = Gdx.graphics.getHeight() - screenY - offsetY;
+					
+					skeletonX += deltaX;
+					skeletonY += deltaY;
+					
+					offsetX = screenX;
+					offsetY = Gdx.graphics.getHeight() - screenY;
 					return false;
 				}
 
