@@ -160,25 +160,25 @@ namespace Spine.Unity {
 		}
 
 		void DisposeColliders () {
-			#if UNITY_EDITOR
 			var colliders = GetComponents<PolygonCollider2D>();
 			if (colliders.Length == 0) return;
 
-			if (Application.isPlaying) {
-				foreach (var c in colliders) {
-					if (c != null)
-						Destroy(c);
+			if (Application.isEditor) {
+				if (Application.isPlaying) {
+					foreach (var c in colliders) {
+						if (c != null)
+							Destroy(c);
+					}
+				} else {
+					foreach (var c in colliders)
+						if (c != null) 
+							DestroyImmediate(c);
 				}
 			} else {
-				foreach (var c in colliders)
-					if (c != null) 
-						DestroyImmediate(c);
+				foreach (PolygonCollider2D c in colliders)
+					if (c != null)
+						Destroy(c);
 			}
-			#else
-			foreach (PolygonCollider2D c in colliderTable.Values)
-				if (c != null)
-					Destroy(c);
-			#endif
 
 			slot = null;
 			currentAttachment = null;
