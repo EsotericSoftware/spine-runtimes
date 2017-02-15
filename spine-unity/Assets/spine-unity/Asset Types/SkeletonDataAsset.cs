@@ -89,14 +89,6 @@ namespace Spine.Unity {
 		}
 
 		public SkeletonData GetSkeletonData (bool quiet) {
-			if (atlasAssets == null) {
-				atlasAssets = new AtlasAsset[0];
-				if (!quiet)
-					Debug.LogError("Atlas not set for SkeletonData asset: " + name, this);
-				Clear();
-				return null;
-			}
-
 			if (skeletonJSON == null) {
 				if (!quiet)
 					Debug.LogError("Skeleton JSON file not set for SkeletonData asset: " + name, this);
@@ -104,17 +96,26 @@ namespace Spine.Unity {
 				return null;
 			}
 
-			#if !SPINE_TK2D
-			if (atlasAssets.Length == 0) {
-				Clear();
-				return null;
-			}
-			#else
-			if (atlasAssets.Length == 0 && spriteCollection == null) {
-				Clear();
-				return null;
-			}
-			#endif
+			// Support attachmentless/skinless SkeletonData.
+//			if (atlasAssets == null) {
+//				atlasAssets = new AtlasAsset[0];
+//				if (!quiet)
+//					Debug.LogError("Atlas not set for SkeletonData asset: " + name, this);
+//				Clear();
+//				return null;
+//			}
+//			#if !SPINE_TK2D
+//			if (atlasAssets.Length == 0) {
+//				Clear();
+//				return null;
+//			}
+//			#else
+//			if (atlasAssets.Length == 0 && spriteCollection == null) {
+//				Clear();
+//				return null;
+//			}
+//			#endif
+
 			if (skeletonData != null)
 				return skeletonData;
 

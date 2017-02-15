@@ -214,8 +214,9 @@ namespace Spine.Unity.Editor {
 						if (skinNameString == initialSkinName.stringValue)
 							skinIndex = i;
 					}
-					skinIndex = EditorGUILayout.Popup("Initial Skin", skinIndex, skins);			
-					initialSkinName.stringValue = skins[skinIndex];
+					skinIndex = EditorGUILayout.Popup("Initial Skin", skinIndex, skins);
+					if (skins.Length > 0) // Support attachmentless/skinless SkeletonData.
+						initialSkinName.stringValue = skins[skinIndex];
 				}
 			}
 
