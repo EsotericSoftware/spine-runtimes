@@ -51,9 +51,11 @@ public class SkeletonRenderer<T extends Batch> {
 				RegionAttachment regionAttachment = (RegionAttachment)attachment;
 				float[] vertices = regionAttachment.updateWorldVertices(slot, premultipliedAlpha);
 				BlendMode blendMode = slot.data.getBlendMode();
+				int src = batch.getBlendSrcFunc();
+        			int dst = batch.getBlendDstFunc();
 				batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
 				batch.draw(regionAttachment.getRegion().getTexture(), vertices, 0, 20);
-
+				batch.setBlendFunction(src, dst);
 			} else if (attachment instanceof MeshAttachment) {
 				throw new RuntimeException("SkeletonMeshRenderer is required to render meshes.");
 
