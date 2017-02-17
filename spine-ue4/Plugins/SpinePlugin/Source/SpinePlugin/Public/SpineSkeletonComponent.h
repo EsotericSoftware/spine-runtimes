@@ -31,6 +31,7 @@
 #pragma once
 
 #include "Components/ActorComponent.h"
+#include "SpineSkeletonDataAsset.h"
 #include "spine/spine.h"
 #include "SpineSkeletonComponent.generated.h"
 
