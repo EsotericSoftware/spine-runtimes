@@ -64,6 +64,7 @@ struct spTrackEntry {
 	float* timelinesRotation;
 	int timelinesRotationCount;
 	void* rendererObject;
+	void* userData;
 
 #ifdef __cplusplus
 	spTrackEntry() :

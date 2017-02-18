@@ -76,7 +76,7 @@ namespace Spine.Unity.Examples {
 			// Case 1: Create an attachment from an atlas.
 			RegionAttachment newHand = handSource.GetAtlas().FindRegion(handRegion).ToRegionAttachment("new hand");
 			newHand.SetPositionOffset(newHandOffset);
-			newHand.rotation = newHandRotation;
+			newHand.Rotation = newHandRotation;
 			newHand.UpdateOffset();
 			int handSlotIndex = skeleton.FindSlotIndex(handSlot);
 			handTexture = newHand.GetRegion().ToTexture();

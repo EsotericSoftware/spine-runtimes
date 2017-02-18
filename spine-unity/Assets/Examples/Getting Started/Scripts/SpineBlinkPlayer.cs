@@ -44,7 +44,7 @@ namespace Spine.Unity.Examples {
 		IEnumerator Start () {
 			var skeletonAnimation = GetComponent<SkeletonAnimation>(); if (skeletonAnimation == null) yield break;
 			while (true) {
-				skeletonAnimation.state.SetAnimation(SpineBlinkPlayer.BlinkTrack, blinkAnimation, false);
+				skeletonAnimation.AnimationState.SetAnimation(SpineBlinkPlayer.BlinkTrack, blinkAnimation, false);
 				yield return new WaitForSeconds(Random.Range(minimumDelay, maximumDelay));
 			}
 		}

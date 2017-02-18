@@ -32,38 +32,47 @@ using System;
 using System.Collections.Generic;
 
 namespace Spine {
-	/// <summary>Stores attachments by slot index and attachment name.</summary>
+	/// <summary>Stores attachments by slot index and attachment name.
+	/// <para>See SkeletonData <see cref="Spine.SkeletonData.DefaultSkin"/>, Skeleton <see cref="Spine.Skeleton.Skin"/>, and 
+	/// <a href="http://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide.</para>
+	/// </summary>
 	public class Skin {
 		internal String name;
 		private Dictionary<AttachmentKeyTuple, Attachment> attachments =
 			new Dictionary<AttachmentKeyTuple, Attachment>(AttachmentKeyTupleComparer.Instance);
 
-		public String Name { get { return name; } }
+		public string Name { get { return name; } }
 		public Dictionary<AttachmentKeyTuple, Attachment> Attachments { get { return attachments; } }
 
-		public Skin (String name) {
+		public Skin (string name) {
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
 			this.name = name;
 		}
 
-		public void AddAttachment (int slotIndex, String name, Attachment attachment) {
+		public void AddAttachment (int slotIndex, string name, Attachment attachment) {
 			if (attachment == null) throw new ArgumentNullException("attachment", "attachment cannot be null.");
 			attachments[new AttachmentKeyTuple(slotIndex, name)] = attachment;
 		}
 
 		/// <returns>May be null.</returns>
-		public Attachment GetAttachment (int slotIndex, String name) {
+		public Attachment GetAttachment (int slotIndex, string name) {
 			Attachment attachment;
 			attachments.TryGetValue(new AttachmentKeyTuple(slotIndex, name), out attachment);
 			return attachment;
 		}
 
-		public void FindNamesForSlot (int slotIndex, List<String> names) {
+		/// <summary>Finds the skin keys for a given slot. The results are added to the passed List(names).</summary>
+		/// <param name="slotIndex">The target slotIndex. To find the slot index, use <see cref="Spine.Skeleton.FindSlotIndex"/> or <see cref="Spine.SkeletonData.FindSlotIndex"/>
+		/// <param name="names">Found skin key names will be added to this list.</param>
+		public void FindNamesForSlot (int slotIndex, List<string> names) {
 			if (names == null) throw new ArgumentNullException("names", "names cannot be null.");
 			foreach (AttachmentKeyTuple key in attachments.Keys)
 				if (key.slotIndex == slotIndex) names.Add(key.name);
 		}
 
+		/// <summary>Finds the attachments for a given slot. The results are added to the passed List(Attachment).</summary>
+		/// <param name="slotIndex">The target slotIndex. To find the slot index, use <see cref="Spine.Skeleton.FindSlotIndex"/> or <see cref="Spine.SkeletonData.FindSlotIndex"/>
+		/// <param name="attachments">Found Attachments will be added to this list.</param>
 		public void FindAttachmentsForSlot (int slotIndex, List<Attachment> attachments) {
 			if (attachments == null) throw new ArgumentNullException("attachments", "attachments cannot be null.");
 			foreach (KeyValuePair<AttachmentKeyTuple, Attachment> entry in this.attachments)
