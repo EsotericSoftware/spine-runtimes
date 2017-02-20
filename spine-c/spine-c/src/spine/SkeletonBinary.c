@@ -950,6 +950,8 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		for (ii = 0; ii < data->bonesCount; ++ii)
 			data->bones[ii] = skeletonData->bones[readVarint(input, 1)];
 		data->target = skeletonData->bones[readVarint(input, 1)];
+		data->local = readBoolean(input);
+		data->relative = readBoolean(input);
 		data->offsetRotation = readFloat(input);
 		data->offsetX = readFloat(input) * self->scale;
 		data->offsetY = readFloat(input) * self->scale;
