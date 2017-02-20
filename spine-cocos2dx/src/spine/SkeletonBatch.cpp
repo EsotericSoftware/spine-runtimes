@@ -35,83 +35,109 @@
 USING_NS_CC;
 #define EVENT_AFTER_DRAW_RESET_POSITION "director_after_draw"
 using std::max;
+#define INITIAL_SIZE (10000)
 
 namespace spine {
 
-    static SkeletonBatch* instance = nullptr;
+static SkeletonBatch* instance = nullptr;
 
-    SkeletonBatch* SkeletonBatch::getInstance () {
-        if (!instance) instance = new SkeletonBatch();
-        return instance;
-    }
+SkeletonBatch* SkeletonBatch::getInstance () {
+	if (!instance) instance = new SkeletonBatch();
+	return instance;
+}
 
-    void SkeletonBatch::destroyInstance () {
-        if (instance) {
-            delete instance;
-            instance = nullptr;
-        }
-    }
+void SkeletonBatch::destroyInstance () {
+	if (instance) {
+		delete instance;
+		instance = nullptr;
+	}
+}
 
-    SkeletonBatch::SkeletonBatch ()
-    {
-        _firstCommand = new Command();
-        _command = _firstCommand;
+SkeletonBatch::SkeletonBatch () {
+	for (unsigned int i = 0; i < INITIAL_SIZE; i++) {
+		_commandsPool.push_back(new TrianglesCommand());
+	}
+	
+	reset ();
+		
+	// callback after drawing is finished so we can clear out the batch state
+	// for the next frame
+	Director::getInstance()->getEventDispatcher()->addCustomEventListener(EVENT_AFTER_DRAW_RESET_POSITION, [this](EventCustom* eventCustom){
+		this->update(0);
+	});;
+}
 
-        Director::getInstance()->getEventDispatcher()->addCustomEventListener(EVENT_AFTER_DRAW_RESET_POSITION, [this](EventCustom* eventCustom){
-            this->update(0);
-        });;
-    }
+SkeletonBatch::~SkeletonBatch () {
+	Director::getInstance()->getEventDispatcher()->removeCustomEventListeners(EVENT_AFTER_DRAW_RESET_POSITION);
 
-    SkeletonBatch::~SkeletonBatch () {
-        Director::getInstance()->getEventDispatcher()->removeCustomEventListeners(EVENT_AFTER_DRAW_RESET_POSITION);
+	for (unsigned int i = 0; i < _commandsPool.size(); i++) {
+		delete _commandsPool[i];
+		_commandsPool[i] = nullptr;
+	}
+}
 
-        Command* command = _firstCommand;
-        while (command) {
-            Command* next = command->next;
-            delete command;
-            command = next;
-        }
-    }
+void SkeletonBatch::update (float delta) {
+	reset();
+}
+	
+cocos2d::V3F_C4B_T2F* SkeletonBatch::allocateVertices(uint32_t numVertices) {
+	if (_vertices.size() - _numVertices < numVertices) {
+		cocos2d::V3F_C4B_T2F* oldData = _vertices.data();
+		_vertices.resize((_vertices.size() + numVertices) * 2 + 1);
+		cocos2d::V3F_C4B_T2F* newData = _vertices.data();
+		for (uint32_t i = 0; i < this->_nextFreeCommand; i++) {
+			TrianglesCommand* command = _commandsPool[i];
+			cocos2d::TrianglesCommand::Triangles& triangles = (cocos2d::TrianglesCommand::Triangles&)command->getTriangles();
+			triangles.verts = newData + (triangles.verts - oldData);
+		}
+	}
+	
+	cocos2d::V3F_C4B_T2F* vertices = _vertices.data() + _numVertices;
+	_numVertices += numVertices;
+	return vertices;
+}
+	
+const cocos2d::TrianglesCommand::Triangles& SkeletonBatch::addCommand(cocos2d::Renderer* renderer, float globalOrder, GLuint textureID, cocos2d::GLProgramState* glProgramState, cocos2d::BlendFunc blendType, const cocos2d::TrianglesCommand::Triangles& triangles, const cocos2d::Mat4& mv, uint32_t flags) {
+	TrianglesCommand* command = nextFreeCommand();
+	command->init(globalOrder, textureID, glProgramState, blendType, triangles, mv, flags);
+	renderer->addCommand(command);
+	return command->getTriangles();
+}
 
-    void SkeletonBatch::update (float delta) {
-        _command = _firstCommand;
-    }
+void SkeletonBatch::reset() {
+	_nextFreeCommand = 0;
+	_numVertices = 0;
+}
 
-    void SkeletonBatch::addCommand (cocos2d::Renderer* renderer, float globalZOrder, GLuint textureID, GLProgramState* glProgramState,
-                                    BlendFunc blendFunc, const TrianglesCommand::Triangles& triangles, const Mat4& transform, uint32_t transformFlags
-                                    ) {
-        if (_command->triangles->verts) {
-            free(_command->triangles->verts);
-            _command->triangles->verts = NULL;
-        }
-        
-        _command->triangles->verts = (V3F_C4B_T2F *)malloc(sizeof(V3F_C4B_T2F) * triangles.vertCount);
-        memcpy(_command->triangles->verts, triangles.verts, sizeof(V3F_C4B_T2F) * triangles.vertCount);
-        
-        _command->triangles->vertCount = triangles.vertCount;
-        _command->triangles->indexCount = triangles.indexCount;
-        _command->triangles->indices = triangles.indices;
-        
-        _command->trianglesCommand->init(globalZOrder, textureID, glProgramState, blendFunc, *_command->triangles, transform);
-        renderer->addCommand(_command->trianglesCommand);
-        
-        if (!_command->next) _command->next = new Command();
-        _command = _command->next;
-    }
+cocos2d::TrianglesCommand* SkeletonBatch::nextFreeCommand() {
+	if (_commandsPool.size() <= _nextFreeCommand) {
+		unsigned int newSize = _commandsPool.size() * 2 + 1;
+		for (int i = _commandsPool.size();  i < newSize; i++) {
+			_commandsPool.push_back(new TrianglesCommand());
+		}
+	}
+	return _commandsPool[_nextFreeCommand++];
+}
 
-    SkeletonBatch::Command::Command () :
-    next(nullptr)
-    {
-        trianglesCommand = new TrianglesCommand();
-        triangles = new TrianglesCommand::Triangles();
-    }
-
-    SkeletonBatch::Command::~Command () {
-        if (triangles->verts) {
-            free(triangles->verts);
-        }
-        delete triangles;
-        delete trianglesCommand;
-    }
-
+//void SkeletonBatch::addCommand (cocos2d::Renderer* renderer, float globalZOrder, GLuint textureID, GLProgramState* glProgramState,
+//								BlendFunc blendFunc, const TrianglesCommand::Triangles& triangles, const Mat4& transform, uint32_t transformFlags
+//								) {
+//	if (_command->triangles->verts) {
+//		free(_command->triangles->verts);
+//		_command->triangles->verts = NULL;
+//	}
+//	
+//	_command->triangles->verts = (V3F_C4B_T2F *)malloc(sizeof(V3F_C4B_T2F) * triangles.vertCount);
+//	memcpy(_command->triangles->verts, triangles.verts, sizeof(V3F_C4B_T2F) * triangles.vertCount);
+//	
+//	_command->triangles->vertCount = triangles.vertCount;
+//	_command->triangles->indexCount = triangles.indexCount;
+//	_command->triangles->indices = triangles.indices;
+//	
+//	_command->trianglesCommand->init(globalZOrder, textureID, glProgramState, blendFunc, *_command->triangles, transform);
+//	renderer->addCommand(_command->trianglesCommand);
+//	
+//	if (!_command->next) _command->next = new Command();
+//	_command = _command->next;
+//}
 }

@@ -189,12 +189,19 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	for (int i = 0, n = _skeleton->slotsCount; i < n; ++i) {
 		spSlot* slot = _skeleton->drawOrder[i];
 		if (!slot->attachment) continue;
-
+		
+		cocos2d::TrianglesCommand::Triangles triangles;
+		
 		switch (slot->attachment->type) {
 		case SP_ATTACHMENT_REGION: {
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices, 0, 2);
 			attachmentVertices = getAttachmentVertices(attachment);
+			triangles.indices = attachmentVertices->_triangles->indices;
+			triangles.indexCount = attachmentVertices->_triangles->indexCount;
+			triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
+			triangles.vertCount = attachmentVertices->_triangles->vertCount;
+			memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
+			spRegionAttachment_computeWorldVertices(attachment, slot->bone, (float*)triangles.verts, 0, 6);
             color.r = attachment->color.r;
 			color.g = attachment->color.g;
 			color.b = attachment->color.b;
@@ -203,8 +210,13 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		}
 		case SP_ATTACHMENT_MESH: {
 			spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
-			spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, attachment->super.worldVerticesLength, _worldVertices, 0, 2);
 			attachmentVertices = getAttachmentVertices(attachment);
+			triangles.indices = attachmentVertices->_triangles->indices;
+			triangles.indexCount = attachmentVertices->_triangles->indexCount;
+			triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
+			triangles.vertCount = attachmentVertices->_triangles->vertCount;
+			memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
+			spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, triangles.vertCount, (float*)triangles.verts, 0, 6);
             color.r = attachment->color.r;
             color.g = attachment->color.g;
             color.b = attachment->color.b;
@@ -220,40 +232,35 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		color.r *= _skeleton->color.r * slot->color.r * multiplier;
 		color.g *= _skeleton->color.g * slot->color.g * multiplier;
 		color.b *= _skeleton->color.b * slot->color.b * multiplier;
+		
+		BlendFunc blendFunc;
+		switch (slot->data->blendMode) {
+			case SP_BLEND_MODE_ADDITIVE:
+				blendFunc.src = _premultipliedAlpha ? GL_ONE : GL_SRC_ALPHA;
+				blendFunc.dst = GL_ONE;
+				break;
+			case SP_BLEND_MODE_MULTIPLY:
+				blendFunc.src = GL_DST_COLOR;
+				blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
+				break;
+			case SP_BLEND_MODE_SCREEN:
+				blendFunc.src = GL_ONE;
+				blendFunc.dst = GL_ONE_MINUS_SRC_COLOR;
+				break;
+			default:
+				blendFunc.src = _premultipliedAlpha ? GL_ONE : GL_SRC_ALPHA;
+				blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
+		}
+		
+		const cocos2d::TrianglesCommand::Triangles& batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture->getName(), _glProgramState, blendFunc, triangles, transform, transformFlags);
         
-        
-        
-		for (int v = 0, w = 0, vn = attachmentVertices->_triangles->vertCount; v < vn; ++v, w += 2) {
-			V3F_C4B_T2F* vertex = attachmentVertices->_triangles->verts + v;
-			vertex->vertices.x = _worldVertices[w];
-			vertex->vertices.y = _worldVertices[w + 1];
+		for (int v = 0, vn = batchedTriangles.vertCount; v < vn; ++v) {
+			V3F_C4B_T2F* vertex = batchedTriangles.verts + v;
             vertex->colors.r = (GLubyte)color.r;
             vertex->colors.g = (GLubyte)color.g;
             vertex->colors.b = (GLubyte)color.b;
             vertex->colors.a = (GLubyte)color.a;
 		}
-
-		BlendFunc blendFunc;
-		switch (slot->data->blendMode) {
-		case SP_BLEND_MODE_ADDITIVE:
-			blendFunc.src = _premultipliedAlpha ? GL_ONE : GL_SRC_ALPHA;
-			blendFunc.dst = GL_ONE;
-			break;
-		case SP_BLEND_MODE_MULTIPLY:
-			blendFunc.src = GL_DST_COLOR;
-			blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
-			break;
-		case SP_BLEND_MODE_SCREEN:
-			blendFunc.src = GL_ONE;
-			blendFunc.dst = GL_ONE_MINUS_SRC_COLOR;
-			break;
-		default:
-			blendFunc.src = _premultipliedAlpha ? GL_ONE : GL_SRC_ALPHA;
-			blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
-		}
-
-		batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture->getName(), _glProgramState, blendFunc,
-			*attachmentVertices->_triangles, transform, transformFlags);
 	}
 
 	if (_debugSlots || _debugBones) {
