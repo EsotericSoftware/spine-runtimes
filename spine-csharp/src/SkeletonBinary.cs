@@ -216,6 +216,8 @@ namespace Spine {
 				for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
 				    data.bones.Add(skeletonData.bones.Items[ReadVarint(input, true)]);
 				data.target = skeletonData.bones.Items[ReadVarint(input, true)];
+				data.local = ReadBoolean(input);
+				data.relative = ReadBoolean(input);
 				data.offsetRotation = ReadFloat(input);
 				data.offsetX = ReadFloat(input) * scale;
 				data.offsetY = ReadFloat(input) * scale;
