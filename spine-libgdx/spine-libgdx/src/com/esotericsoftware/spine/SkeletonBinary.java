@@ -237,6 +237,8 @@ public class SkeletonBinary {
 				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++)
 					data.bones.add(skeletonData.bones.get(input.readInt(true)));
 				data.target = skeletonData.bones.get(input.readInt(true));
+				data.local = input.readBoolean();
+				data.relative = input.readBoolean();
 				data.offsetRotation = input.readFloat();
 				data.offsetX = input.readFloat() * scale;
 				data.offsetY = input.readFloat() * scale;
