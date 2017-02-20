@@ -216,7 +216,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 			triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
 			triangles.vertCount = attachmentVertices->_triangles->vertCount;
 			memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
-			spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, triangles.vertCount, (float*)triangles.verts, 0, 6);
+			spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, triangles.vertCount * sizeof(cocos2d::V3F_C4B_T2F) / 4, (float*)triangles.verts, 0, 6);
             color.r = attachment->color.r;
             color.g = attachment->color.g;
             color.b = attachment->color.b;

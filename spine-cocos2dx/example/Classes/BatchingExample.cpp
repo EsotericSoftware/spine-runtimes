@@ -53,7 +53,7 @@ bool BatchingExample::init () {
 
 	// Load the skeleton data.
 	spSkeletonJson* json = spSkeletonJson_createWithLoader(_attachmentLoader);
-	json->scale = 0.6f; // Resizes skeleton data to 60% of the size it was in Spine.
+	json->scale = 0.1f; // Resizes skeleton data to 60% of the size it was in Spine.
 	_skeletonData = spSkeletonJson_readSkeletonDataFile(json, "spineboy.json");
 	CCASSERT(_skeletonData, json->error ? json->error : "Error reading skeleton data file.");
 	spSkeletonJson_dispose(json);
@@ -65,7 +65,7 @@ bool BatchingExample::init () {
 
 	int xMin = _contentSize.width * 0.10f, xMax = _contentSize.width * 0.90f;
 	int yMin = 0, yMax = _contentSize.height * 0.7f;
-	for (int i = 0; i < 5000; i++) {
+	for (int i = 0; i < 500; i++) {
 		// Each skeleton node shares the same atlas, skeleton data, and mix times.
 		SkeletonAnimation* skeletonNode = SkeletonAnimation::createWithData(_skeletonData, false);
 		skeletonNode->setAnimationStateData(_stateData);
