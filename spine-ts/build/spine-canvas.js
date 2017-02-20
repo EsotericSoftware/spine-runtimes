@@ -4420,6 +4420,8 @@ var spine;
 					data.target = skeletonData.findBone(targetName);
 					if (data.target == null)
 						throw new Error("Transform constraint target bone not found: " + targetName);
+					data.local = this.getValue(constraintMap, "local", false);
+					data.relative = this.getValue(constraintMap, "relative", false);
 					data.offsetRotation = this.getValue(constraintMap, "rotation", 0);
 					data.offsetX = this.getValue(constraintMap, "x", 0) * scale;
 					data.offsetY = this.getValue(constraintMap, "y", 0) * scale;

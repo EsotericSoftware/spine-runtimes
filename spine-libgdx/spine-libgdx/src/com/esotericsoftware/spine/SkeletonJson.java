@@ -205,6 +205,9 @@ public class SkeletonJson {
 			data.target = skeletonData.findBone(targetName);
 			if (data.target == null) throw new SerializationException("Transform constraint target bone not found: " + targetName);
 
+			data.local = constraintMap.getBoolean("local", false);
+			data.relative = constraintMap.getBoolean("relative", false);
+			
 			data.offsetRotation = constraintMap.getFloat("rotation", 0);
 			data.offsetX = constraintMap.getFloat("x", 0) * scale;
 			data.offsetY = constraintMap.getFloat("y", 0) * scale;

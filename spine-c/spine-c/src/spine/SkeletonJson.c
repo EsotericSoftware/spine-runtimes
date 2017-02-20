@@ -785,6 +785,8 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 				return 0;
 			}
 
+			data->local = Json_getInt(constraintMap, "local", 0);
+			data->relative = Json_getInt(constraintMap, "relative", 0);
 			data->offsetRotation = Json_getFloat(constraintMap, "rotation", 0);
 			data->offsetX = Json_getFloat(constraintMap, "x", 0) * self->scale;
 			data->offsetY = Json_getFloat(constraintMap, "y", 0) * self->scale;

@@ -175,6 +175,9 @@ public class SkeletonJson {
 			transformConstraintData.target = skeletonData.findBone(constraintMap["target"]);
 			if (!transformConstraintData.target) throw new Error("Target bone not found: " + constraintMap["target"]);
 			
+			transformConstraintData.local = constraintMap.hasOwnProperty("local") ? Boolean(constraintMap["local"]) : false;
+			transformConstraintData.relative = constraintMap.hasOwnProperty("relative") ? Boolean(constraintMap["relative"]) : false;
+			
 			transformConstraintData.offsetRotation = Number(constraintMap["rotation"] || 0);
 			transformConstraintData.offsetX = Number(constraintMap["x"] || 0) * scale;
 			transformConstraintData.offsetY = Number(constraintMap["y"] || 0) * scale;

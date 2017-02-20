@@ -203,6 +203,9 @@ namespace Spine {
 					data.target = skeletonData.FindBone(targetName);
 					if (data.target == null) throw new Exception("Target bone not found: " + targetName);
 
+					data.local = GetBoolean(constraintMap, "local", false);
+					data.relative = GetBoolean(constraintMap, "relative", false);
+
 					data.offsetRotation = GetFloat(constraintMap, "rotation", 0);
 					data.offsetX = GetFloat(constraintMap, "x", 0) * scale;
 					data.offsetY = GetFloat(constraintMap, "y", 0) * scale;
