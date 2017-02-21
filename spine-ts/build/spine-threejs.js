@@ -4299,12 +4299,13 @@ var spine;
 			var scale = this.scale;
 			attachment.worldVerticesLength = verticesLength;
 			var vertices = map.vertices;
+			var scaledVertices = spine.Utils.toFloatArray(vertices);
 			if (verticesLength == vertices.length) {
 				if (scale != 1) {
 					for (var i = 0, n = vertices.length; i < n; i++)
-						vertices[i] *= scale;
+						scaledVertices[i] *= scale;
 				}
-				attachment.vertices = spine.Utils.toFloatArray(vertices);
+				attachment.vertices = scaledVertices;
 				return;
 			}
 			var weights = new Array();
