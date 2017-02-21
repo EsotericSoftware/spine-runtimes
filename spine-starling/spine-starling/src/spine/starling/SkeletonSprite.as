@@ -167,6 +167,7 @@ public class SkeletonSprite extends DisplayObject {
 					mesh.setTexCoords(ii, uvs[iii], uvs[iii+1]);
 				}
 				vertexData.numVertices = verticesCount;
+				painter.state.blendMode = blendModes[slot.data.blendMode.ordinal];
 				// FIXME set smoothing/filter
 				painter.batchMesh(mesh);
 			}
