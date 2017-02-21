@@ -331,12 +331,13 @@ module spine {
 			let scale = this.scale;
 			attachment.worldVerticesLength = verticesLength;
 			let vertices: Array<number> = map.vertices;
+			let scaledVertices = new Array<number>();
 			if (verticesLength == vertices.length) {
 				if (scale != 1) {
 					for (let i = 0, n = vertices.length; i < n; i++)
-						vertices[i] *= scale;
+						scaledVertices.push(vertices[i] * scale);
 				}
-				attachment.vertices = Utils.toFloatArray(vertices);
+				attachment.vertices = Utils.toFloatArray(scaledVertices);
 				return;
 			}
 			let weights = new Array<number>();
