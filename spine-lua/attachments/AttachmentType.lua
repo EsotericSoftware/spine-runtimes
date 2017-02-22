@@ -33,6 +33,7 @@ local AttachmentType = {
 	boundingbox = 1,
 	mesh = 2,
 	linkedmesh = 3,
-	path = 4
+	path = 4,
+	point = 5
 }
 return AttachmentType

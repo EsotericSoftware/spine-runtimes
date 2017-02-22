@@ -28,60 +28,41 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-local setmetatable = setmetatable
-
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
-local RegionAttachment = require "spine-lua.attachments.RegionAttachment"
-local BoundingBoxAttachment = require "spine-lua.attachments.BoundingBoxAttachment"
-local MeshAttachment = require "spine-lua.attachments.MeshAttachment"
-local PathAttachment = require "spine-lua.attachments.PathAttachment"
-local PointAttachment = require "spine-lua.attachments.PointAttachment"
-local TextureAtlas = require "spine-lua.TextureAtlas"
+local VertexAttachment = require "spine-lua.attachments.VertexAttachment"
+local Color = require "spine-lua.Color"
 
-local AtlasAttachmentLoader = {}
-AtlasAttachmentLoader.__index = AtlasAttachmentLoader
+local math_cos = math.cos
+local math_sin = math.sin
 
-function AtlasAttachmentLoader.new (atlas)
-	local self = {
-		atlas = atlas
-	}
-	setmetatable(self, AtlasAttachmentLoader)
+local PointAttachment = {}
+PointAttachment.__index = PointAttachment
+setmetatable(PointAttachment, { __index = VertexAttachment })
+
+function PointAttachment.new (name)
+	if not name then error("name cannot be nil", 2) end
+
+	local self = VertexAttachment.new(name, AttachmentType.point)
+	self.x = 0
+	self.y = 0
+	self.rotation = 0
+	self.color = Color.newWith(0.38, 0.94, 0, 1)
+	setmetatable(self, BoundingBoxAttachment)
 	return self
 end
 
-function AtlasAttachmentLoader:newRegionAttachment (skin, name, path)
-	local region = self.atlas:findRegion(path)
-	if not region then error("Region not found in atlas: " .. path .. " (region attachment: " .. name .. ")") end
-	region.renderObject = region
-	local attachment = RegionAttachment.new(name)
-	attachment:setRegion(region)
-	attachment.region = region
-	return attachment
+function PointAttachment:computeWorldPosition(bone, point)
+	point.x = self.x * bone.a + self.y * bone.b + bone.worldX
+	point.y = self.x * bone.c + self.y * bone.d + bone.worldY
+	return point
 end
 
-function AtlasAttachmentLoader:newMeshAttachment (skin, name, path)
-	local region = self.atlas:findRegion(path)
-	if not region then error("Region not found in atlas: " .. path .. " (mesh attachment: " .. name .. ")") end
-	region.renderObject = region
-	local attachment = MeshAttachment.new(name)
-	attachment.region = region
-	return attachment
+function PointAttachment:computeWorldRotation(bone)
+	local cos = math_cos(math_rad(self.rotation))
+	local sin = math_sin(math_rad(self.rotation))
+	local x = cos * bone.a + sin * bone.b
+	local y = cos * bone.c + sin * bone.d
+	return math_deg(math_atan2(y, x))
 end
 
-function AtlasAttachmentLoader:newSkinningMeshAttachment (skin, name, path)
-	return SkinningMeshAttachment.new(name)
-end
-
-function AtlasAttachmentLoader:newBoundingBoxAttachment (skin, name)
-	return BoundingBoxAttachment.new(name)
-end
-
-function AtlasAttachmentLoader:newPathAttachment(skin, name)
-	return PathAttachment.new(name)
-end
-
-function AtlasAttachmentLoader:newPointAttachment(skin, name)
-	return PointAttachment.new(name)
-end
-
-return AtlasAttachmentLoader
+return PointAttachment

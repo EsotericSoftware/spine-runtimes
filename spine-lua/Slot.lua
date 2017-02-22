@@ -43,12 +43,15 @@ function Slot.new (data, bone)
 		data = data,
 		bone = bone,
 		color = Color.newWith(1, 1, 1, 1),
+		darkColor = nil,
 		attachment = nil,
 		attachmentTime = 0,
 		attachmentVertices = {},
 		attachmentVerticesCount = 0
-	}
+	}	
 	setmetatable(self, Slot)
+	
+	if data.darkColor then self.darkColor = Color.newWith(1, 1, 1, 1) end
 
 	self:setToSetupPose()
 
@@ -74,6 +77,7 @@ function Slot:setToSetupPose ()
 	local data = self.data
 
 	self.color:setFrom(data.color)
+	if self.darkColor then self.darkColor:setFrom(data.darkColor) end
 
 	local attachment = nil
 	if data.attachmentName then

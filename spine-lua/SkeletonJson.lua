@@ -131,6 +131,15 @@ function SkeletonJson.new (attachmentLoader)
 					               tonumber(color:sub(7, 8), 16) / 255)
 				end
 
+				local dark = slotMap["dark"]
+				if dark then
+					data.darkColor = Color.newWith(1, 1, 1, 1)
+					data.darkColor:set(tonumber(dark:sub(1, 2), 16) / 255,
+					               tonumber(dark:sub(3, 4), 16) / 255,
+					               tonumber(dark:sub(5, 6), 16) / 255,
+					               tonumber(dark:sub(7, 8), 16) / 255)
+				end
+
 				data.attachmentName = getValue(slotMap, "attachment", nil)
 				data.blendMode = BlendMode[getValue(slotMap, "blend", "normal")]
 
@@ -380,6 +389,23 @@ function SkeletonJson.new (attachmentLoader)
 				               tonumber(color:sub(7, 8), 16) / 255)
 			end
 			return path;
+		
+		elseif type == AttachmentType.point then
+			local point = self.attachmentLoader:newPointAttachment(skin, name)
+			if not point then return nil end
+			point.x = getValue(map, "x", 0) * scale
+			point.y = getValue(map, "y", 0) * scale
+			point.rotation = getValue(map, "rotation", 0)
+			
+			local color = map.color
+			if color then
+				path.color:set(tonumber(color:sub(1, 2), 16) / 255,
+				               tonumber(color:sub(3, 4), 16) / 255,
+				               tonumber(color:sub(5, 6), 16) / 255,
+				               tonumber(color:sub(7, 8), 16) / 255)
+			end
+			return point
+		
 		end
 
 		error("Unknown attachment type: " .. type .. " (" .. name .. ")")

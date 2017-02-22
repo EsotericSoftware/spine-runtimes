@@ -43,6 +43,7 @@ spine.RegionAttachment = require "spine-lua.attachments.RegionAttachment"
 spine.MeshAttachment = require "spine-lua.attachments.MeshAttachment"
 spine.VertexAttachment = require "spine-lua.attachments.VertexAttachment"
 spine.PathAttachment = require "spine-lua.attachments.PathAttachment"
+spine.PointAttachment = require "spine-lua.attachments.PointAttachment"
 spine.Skeleton = require "spine-lua.Skeleton"
 spine.Bone = require "spine-lua.Bone"
 spine.Slot = require "spine-lua.Slot"
@@ -86,6 +87,7 @@ spine.Skeleton.new = function(skeletonData, group)
 	self.drawingGroup = nil
 	self.premultipliedAlpha = false
 	self.batches = 0
+	self.tempColor = spine.Color.newWith(1, 1, 1, 1)
 	return self
 end
 
@@ -108,6 +110,8 @@ local function toCoronaBlendMode(blendMode)
 	end
 end
 
+local worldVertices = spine.utils.newNumberArray(10000 * 8)
+
 function spine.Skeleton:updateWorldTransform()
 	spine.Skeleton.updateWorldTransform_super(self)
 	local premultipliedAlpha = self.premultipliedAlpha
@@ -125,7 +129,7 @@ function spine.Skeleton:updateWorldTransform()
 	local groupVertices = {}
 	local groupIndices = {}
 	local groupUvs = {}
-	local color = nil
+	local color = self.tempColor
 	local lastColor = nil
 	local texture = nil
 	local lastTexture = nil
@@ -134,19 +138,20 @@ function spine.Skeleton:updateWorldTransform()
 	for i,slot in ipairs(drawOrder) do
 		local attachment = slot.attachment
 		local vertices = nil
+		local numVertices = 0
 		local indices = nil
 		if attachment then
 			if attachment.type == spine.AttachmentType.region then
-				vertices = attachment:updateWorldVertices(slot, premultipliedAlpha)
+				numVertices = 4
+				vertices = self:computeRegionVertices(slot, attachment, premultipliedAlpha, color)
 				indices = QUAD_TRIANGLES
-				texture = attachment.region.renderObject.texture
-				color = { vertices[5], vertices[6], vertices[7], vertices[8]}
+				texture = attachment.region.renderObject.texture				
 				blendMode = toCoronaBlendMode(slot.data.blendMode)
 			elseif attachment.type == spine.AttachmentType.mesh then
-				vertices = attachment:updateWorldVertices(slot, premultipliedAlpha)
+				numVertices = attachment.worldVerticesLength / 2
+				vertices = self:computeMeshVertices(slot, attachment, premultipliedAlpha, color)
 				indices = attachment.triangles
 				texture = attachment.region.renderObject.texture
-				color = { vertices[5], vertices[6], vertices[7], vertices[8] }
 				blendMode = toCoronaBlendMode(slot.data.blendMode)
 			end
 
@@ -165,7 +170,7 @@ function spine.Skeleton:updateWorldTransform()
 					groupIndices = {}
 				end
 
-				self:batch(vertices, indices, groupVertices, groupUvs, groupIndices)
+				self:batch(vertices, numVertices, indices, groupVertices, groupUvs, groupIndices)
 			end
 		end
 	end
@@ -175,22 +180,87 @@ function spine.Skeleton:updateWorldTransform()
 	end
 end
 
+function spine.Skeleton:computeRegionVertices(slot, region, pma, color)
+	local skeleton = slot.bone.skeleton
+	local skeletonColor = skeleton.color
+	local slotColor = slot.color
+	local regionColor = region.color
+	local alpha = skeletonColor.a * slotColor.a * regionColor.a
+	local multiplier = alpha
+	if pma then multiplier = 1 end
+	color:set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
+				skeletonColor.g * slotColor.g * regionColor.g * multiplier,
+				skeletonColor.b * slotColor.b * regionColor.b * multiplier,
+				alpha)
+
+	local vertices = worldVertices
+	region:computeWorldVertices(slot.bone, vertices, 0, 4)
+
+	local uvs = region.uvs
+
+	vertices[3] = uvs[1]
+	vertices[4] = uvs[2]
+
+	vertices[7] = uvs[3]
+	vertices[8] = uvs[4]
+
+	vertices[11] = uvs[5]
+	vertices[12] = uvs[6]
+
+	vertices[15] = uvs[7]
+	vertices[16] = uvs[8]
+
+	return vertices
+end
+
+function spine.Skeleton:computeMeshVertices(slot, mesh, pma, color)
+	local skeleton = slot.bone.skeleton
+	local skeletonColor = skeleton.color
+	local slotColor = slot.color
+	local meshColor = mesh.color
+	local alpha = skeletonColor.a * slotColor.a * meshColor.a
+	local multiplier = alpha
+	if pma then multiplier = 1 end
+	color:set(skeletonColor.r * slotColor.r * meshColor.r * multiplier,
+				skeletonColor.g * slotColor.g * meshColor.g * multiplier,
+				skeletonColor.b * slotColor.b * meshColor.b * multiplier,
+				alpha)
+			
+	local numVertices = mesh.worldVerticesLength / 2
+	local vertices = worldVertices
+	mesh:computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, 4)
+	
+	local uvs = mesh.uvs
+	local i = 1
+	local n = numVertices + 1
+	local u = 1
+	local v = 3
+	while i < n do
+		vertices[v] = uvs[u]
+		vertices[v + 1] = uvs[u + 1]
+		i = i + 1
+		u = u + 2
+		v = v + 4
+	end
+	return vertices
+end
+
 function spine.Skeleton:flush(groupVertices, groupUvs, groupIndices, texture, color, blendMode, drawingGroup)
-	mesh = display.newMesh(drawingGroup, 0, 0, {
+	local mesh = display.newMesh(drawingGroup, 0, 0, {
 			mode = "indexed",
 			vertices = groupVertices,
 			uvs = groupUvs,
 			indices = groupIndices
 	})
 	mesh.fill = texture
-	mesh:setFillColor(color[1], color[2], color[3])
-	mesh.alpha = color[4]
+	mesh:setFillColor(color.r, color.g, color.b)
+	mesh.alpha = color.a
 	mesh.blendMode = blendMode
 	mesh:translate(mesh.path:getVertexOffset())
 	self.batches = self.batches + 1
 end
 
-function spine.Skeleton:batch(vertices, indices, groupVertices, groupUvs, groupIndices)
+function spine.Skeleton:batch(vertices, numVertices, indices, groupVertices, groupUvs, groupIndices)
 	local numIndices = #indices
 	local i = 1
 	local indexStart = #groupIndices + 1
@@ -204,16 +274,15 @@ function spine.Skeleton:batch(vertices, indices, groupVertices, groupUvs, groupI
 	end
 
 	i = 1
-	local numVertices = #vertices
 	local vertexStart = #groupVertices + 1
-	local vertexEnd = vertexStart + numVertices / 4
+	local vertexEnd = vertexStart + numVertices * 2
 	while vertexStart < vertexEnd do
 		groupVertices[vertexStart] = vertices[i]
 		groupVertices[vertexStart+1] = vertices[i+1]
 		groupUvs[vertexStart] = vertices[i+2]
 		groupUvs[vertexStart+1] = vertices[i+3]
 		vertexStart = vertexStart + 2
-		i = i + 8
+		i = i + 4
 	end
 end
 

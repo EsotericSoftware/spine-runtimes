@@ -68,7 +68,7 @@ function SkeletonBounds:update (skeleton, updateAabb)
 			local polygon = {}
 			table_insert(polygons, polygon)
 
-			boundingBox:computeWorldVertices(slot, polygon)
+			boundingBox:computeWorldVertices(slot, 0, boundingBox.worldVerticesLength, polygon, 0, 2)
 		end
 	end
 

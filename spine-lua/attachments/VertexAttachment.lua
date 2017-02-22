@@ -50,12 +50,8 @@ function VertexAttachment.new (name, attachmentType)
 	return self
 end
 
-function VertexAttachment:computeWorldVertices (slot, worldVertices)
-	self:computeWorldVerticesWith(slot, 0, self.worldVerticesLength, worldVertices, 0)
-end
-
-function VertexAttachment:computeWorldVerticesWith (slot, start, count, worldVertices, offset)
-	count = count + offset
+function VertexAttachment:computeWorldVertices (slot, start, count, worldVertices, offset, stride)
+	count = offset + (count / 2) * stride
 	local skeleton = slot.bone.skeleton
 	local deformArray = slot.attachmentVertices
 	local vertices = self.vertices
@@ -77,7 +73,7 @@ function VertexAttachment:computeWorldVerticesWith (slot, start, count, worldVer
 			worldVertices[w + 1] = vx * a + vy * b + x
 			worldVertices[w + 2] = vx * c + vy * d + y
 			v = v + 2
-			w = w + 2
+			w = w + stride
 		end
 		return
 	end
@@ -112,7 +108,7 @@ function VertexAttachment:computeWorldVerticesWith (slot, start, count, worldVer
 			end
 			worldVertices[w + 1] = wx
 			worldVertices[w + 2] = wy
-			w = w + 2
+			w = w + stride
 		end
 	else
 		local deform = deformArray
@@ -139,7 +135,7 @@ function VertexAttachment:computeWorldVerticesWith (slot, start, count, worldVer
 			end
 			worldVertices[w + 1] = wx
 			worldVertices[w + 2] = wy
-			w = w + 2
+			w = w + stride
 		end
 	end
 end

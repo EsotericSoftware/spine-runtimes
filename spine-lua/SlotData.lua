@@ -46,6 +46,7 @@ function SlotData.new (index, name, boneData)
 		name = name,
 		boneData = boneData,
 		color = Color.newWith(1, 1, 1, 1),
+		darkColor = nil,
 		attachmentName = nil,
 		blendMode = BlendMode.normal
 	}

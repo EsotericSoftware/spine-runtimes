@@ -117,13 +117,13 @@ function PathConstraint:update ()
 		local n = spacesCount - 1
 		while i < n do
 			local bone = bones[i + 1];
-			local length = bone.data.length
-			local x = length * bone.a
-			local y = length * bone.c
-			length = math_sqrt(x * x + y * y)
+			local setupLength = bone.data.length
+			local x = setupLength * bone.a
+			local y = setupLength * bone.c
+			local length = math_sqrt(x * x + y * y)
 			if scale then lengths[i + 1] = length end
 			i = i + 1
-			if lengthSpacing then spaces[i + 1] = math_max(0, length + spacing) else spaces[i + 1] = spacing end
+			if lengthSpacing then spaces[i + 1] = (setupLength + spacing) * length / setupLength else spaces[i + 1] = spacing * length / setupLength end
 		end
 	else
 		local i = 1
@@ -254,14 +254,14 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 			elseif p < 0 then
 				if prevCurve ~= PathConstraint.BEFORE then
 					prevCurve = PathConstraint.BEFORE
-					path:computeWorldVerticesWith(target, 2, 4, world, 0)
+					path:computeWorldVertices(target, 2, 4, world, 0, 2)
 				end
 				self:addBeforePosition(p, world, 0, out, o)
 				skip = true
 			elseif p > pathLength then
 				if prevCurve ~= PathConstraint.AFTER then
 					prevCurve = PathConstraint.AFTER
-					path:computeWorldVerticesWith(target, verticesLength - 6, 4, world, 0)
+					path:computeWorldVertices(target, verticesLength - 6, 4, world, 0, 2)
 				end
 				self:addAfterPosition(p - pathLength, world, 0, out, o)
 				skip = true
@@ -285,10 +285,10 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 				if curve ~= prevCurve then
 					prevCurve = curve
 					if closed and curve == curveCount then
-						path:computeWorldVerticesWith(target, verticesLength - 4, 4, world, 0)
-						path:computeWorldVerticesWith(target, 0, 4, world, 4)
+						path:computeWorldVertices(target, verticesLength - 4, 4, world, 0, 2)
+						path:computeWorldVertices(target, 0, 4, world, 4, 2)
 					else
-						path:computeWorldVerticesWith(target, curve * 6 + 2, 8, world, 0)
+						path:computeWorldVertices(target, curve * 6 + 2, 8, world, 0, 2)
 					end
 				end
 				self:addCurvePosition(p, world[1], world[2], world[3], world[4], world[5], world[6], world[7], world[8], out, o, tangents or (i > 0 and space == 0))
@@ -304,15 +304,15 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 	if closed then
 		verticesLength = verticesLength + 2
 		world = utils.setArraySize(self.world, verticesLength)
-		path:computeWorldVerticesWith(target, 2, verticesLength - 4, world, 0)
-		path:computeWorldVerticesWith(target, 0, 2, world, verticesLength - 4)
+		path:computeWorldVertices(target, 2, verticesLength - 4, world, 0, 2)
+		path:computeWorldVertices(target, 0, 2, world, verticesLength - 4, 2)
 		world[verticesLength - 2 + 1] = world[0 + 1]
 		world[verticesLength - 1 + 1] = world[1 + 1]
 	else
 		curveCount = curveCount - 1
 		verticesLength = verticesLength - 4;
 		world = utils.setArraySize(self.world, verticesLength)
-		path:computeWorldVerticesWith(target, 2, verticesLength, world, 0)
+		path:computeWorldVertices(target, 2, verticesLength, world, 0, 2)
 	end
 
 	-- Curve lengths.

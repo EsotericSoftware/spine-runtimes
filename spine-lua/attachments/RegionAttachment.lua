@@ -86,6 +86,51 @@ local C4A = 32
 local RegionAttachment = {}
 RegionAttachment.__index = RegionAttachment
 setmetatable(RegionAttachment, { __index = Attachment })
+ 
+RegionAttachment.OX1 = 1
+RegionAttachment.OY1 = 2
+RegionAttachment.OX2 = 3
+RegionAttachment.OY2 = 4
+RegionAttachment.OX3 = 5
+RegionAttachment.OY3 = 6
+RegionAttachment.OX4 = 7
+RegionAttachment.OY4 = 8
+
+RegionAttachment.X1 = 1
+RegionAttachment.Y1 = 2
+RegionAttachment.U1 = 3
+RegionAttachment.V1 = 4
+RegionAttachment.C1R = 5
+RegionAttachment.C1G = 6
+RegionAttachment.C1B = 7
+RegionAttachment.C1A = 8
+
+RegionAttachment.X2 = 9
+RegionAttachment.Y2 = 10
+RegionAttachment.U2 = 11
+RegionAttachment.V2 = 12
+RegionAttachment.C2R = 13
+RegionAttachment.C2G = 14
+RegionAttachment.C2B = 15
+RegionAttachment.C2A = 16
+
+RegionAttachment.X3 = 17
+RegionAttachment.Y3 = 18
+RegionAttachment.U3 = 19
+RegionAttachment.V3 = 20
+RegionAttachment.C3R = 21
+RegionAttachment.C3G = 22
+RegionAttachment.C3B = 23
+RegionAttachment.C3A = 24
+
+RegionAttachment.X4 = 25
+RegionAttachment.Y4 = 26
+RegionAttachment.U4 = 27
+RegionAttachment.V4 = 28
+RegionAttachment.C4R = 29
+RegionAttachment.C4G = 30
+RegionAttachment.C4B = 31
+RegionAttachment.C4A = 32
 
 function RegionAttachment.new (name)
 	if not name then error("name cannot be nil", 2) end
@@ -103,34 +148,11 @@ function RegionAttachment.new (name)
 	self.rendererObject = nil
 	self.region = nil
 	self.offset = Utils.newNumberArray(8)
-	self.vertices = Utils.newNumberArray(8 * 4)
+	self.uvs = Utils.newNumberArray(8)
 	self.tempColor = Color.newWith(1, 1, 1, 1)
 	setmetatable(self, RegionAttachment)
 
 	return self
-end
-
-function RegionAttachment:setRegion (region)
-	local vertices = self.vertices
-	if region.rotate then
-		vertices[U2] = region.u
-		vertices[V2] = region.v2
-		vertices[U3] = region.u
-		vertices[V3] = region.v
-		vertices[U4] = region.u2
-		vertices[V4] = region.v
-		vertices[U1] = region.u2
-		vertices[V1] = region.v2
-	else
-		vertices[U1] = region.u
-		vertices[V1] = region.v2
-		vertices[U2] = region.u
-		vertices[V2] = region.v
-		vertices[U3] = region.u2
-		vertices[V3] = region.v
-		vertices[U4] = region.u2
-		vertices[V4] = region.v2
-	end
 end
 
 function RegionAttachment:updateOffset ()
@@ -162,23 +184,32 @@ function RegionAttachment:updateOffset ()
 	offset[OY4] = localYCos + localX2Sin
 end
 
-function RegionAttachment:updateWorldVertices (slot, premultipliedAlpha)
-	local skeleton = slot.bone.skeleton
-	local skeletonColor = skeleton.color
-	local slotColor = slot.color
-	local regionColor = self.color
-	local alpha = skeletonColor.a * slotColor.a * regionColor.a
-	local multiplier = alpha
-	if premultipliedAlpha then multiplier = 1 end
-	local color = self.tempColor
-	color:set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
-		skeletonColor.g * slotColor.g * regionColor.g * multiplier,
-		skeletonColor.b * slotColor.b * regionColor.b * multiplier,
-		alpha)
+function RegionAttachment:setRegion (region)
+	local uvs = self.uvs
+	if region.rotate then
+		uvs[3] = region.u
+		uvs[4] = region.v2
+		uvs[5] = region.u
+		uvs[6] = region.v
+		uvs[7] = region.u2
+		uvs[8] = region.v
+		uvs[1] = region.u2
+		uvs[2] = region.v2
+	else
+		uvs[1] = region.u
+		uvs[2] = region.v2
+		uvs[3] = region.u
+		uvs[4] = region.v
+		uvs[5] = region.u2
+		uvs[6] = region.v
+		uvs[7] = region.u2
+		uvs[8] = region.v2
+	end
+end
 
-	local vertices = self.vertices
-	local offset = self.offset
-	local bone = slot.bone
+function RegionAttachment:computeWorldVertices (bone, worldVertices, offset, stride)
+	offset = offset + 1
+	local vertexOffset = self.offset
 	local x = bone.worldX
 	local y = bone.worldY
 	local a = bone.a
@@ -188,43 +219,28 @@ function RegionAttachment:updateWorldVertices (slot, premultipliedAlpha)
 	local offsetX = 0
 	local offsetY = 0
 
-	offsetX = offset[OX1]
-	offsetY = offset[OY1]
-	vertices[X1] = offsetX * a + offsetY * b + x -- br
-	vertices[Y1] = offsetX * c + offsetY * d + y
-	vertices[C1R] = color.r
-	vertices[C1G] = color.g
-	vertices[C1B] = color.b
-	vertices[C1A] = color.a
+	offsetX = vertexOffset[OX1]
+	offsetY = vertexOffset[OY1]
+	worldVertices[offset] = offsetX * a + offsetY * b + x -- br
+	worldVertices[offset + 1] = offsetX * c + offsetY * d + y
+	offset = offset + stride
 
-	offsetX = offset[OX2]
-	offsetY = offset[OY2]
-	vertices[X2] = offsetX * a + offsetY * b + x -- bl
-	vertices[Y2] = offsetX * c + offsetY * d + y
-	vertices[C2R] = color.r
-	vertices[C2G] = color.g
-	vertices[C2B] = color.b
-	vertices[C2A] = color.a
+	offsetX = vertexOffset[OX2]
+	offsetY = vertexOffset[OY2]
+	worldVertices[offset] = offsetX * a + offsetY * b + x -- bl
+	worldVertices[offset + 1] = offsetX * c + offsetY * d + y
+	offset = offset + stride
 
-	offsetX = offset[OX3]
-	offsetY = offset[OY3]
-	vertices[X3] = offsetX * a + offsetY * b + x -- ul
-	vertices[Y3] = offsetX * c + offsetY * d + y
-	vertices[C3R] = color.r
-	vertices[C3G] = color.g
-	vertices[C3B] = color.b
-	vertices[C3A] = color.a
+	offsetX = vertexOffset[OX3]
+	offsetY = vertexOffset[OY3]
+	worldVertices[offset] = offsetX * a + offsetY * b + x -- ul
+	worldVertices[offset + 1] = offsetX * c + offsetY * d + y
+	offset = offset + stride
 
-	offsetX = offset[OX4]
-	offsetY = offset[OY4]
-	vertices[X4] = offsetX * a + offsetY * b + x -- ur
-	vertices[Y4] = offsetX * c + offsetY * d + y
-	vertices[C4R] = color.r
-	vertices[C4G] = color.g
-	vertices[C4B] = color.b
-	vertices[C4A] = color.a
-
-	return vertices
+	offsetX = vertexOffset[OX4]
+	offsetY = vertexOffset[OY4]
+	worldVertices[offset] = offsetX * a + offsetY * b + x -- ur
+	worldVertices[offset + 1] = offsetX * c + offsetY * d + y
 end
 
 return RegionAttachment

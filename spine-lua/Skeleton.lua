@@ -206,7 +206,7 @@ function Skeleton:sortPathConstraint(constraint)
 	if self.data.defaultSkin and not (self.data.defaultSkin == skin) then
 		self:sortPathConstraintAttachment(self.data.defaultSkin, slotIndex, slotBone)
 	end
-	for ii,skin in ipairs(self.data.skins) do
+	for i,skin in ipairs(self.data.skins) do
 		self:sortPathConstraintAttachment(skin, slotIndex, slotBone)
 	end
 	
@@ -214,7 +214,7 @@ function Skeleton:sortPathConstraint(constraint)
 	if attachment.type == AttachmentType.path then self:sortPathConstraintAttachmentWith(attachment, slotBone) end
 	
 	local constrained = constraint.bones
-	for ii,bone in ipairs(constrained) do
+	for i,bone in ipairs(constrained) do
 		self:sortBone(bone)
 	end
 	
@@ -232,9 +232,24 @@ end
 function Skeleton:sortTransformConstraint(constraint)
 	self:sortBone(constraint.target)
 	
-	local constrained = constraint.bones
-	for ii,bone in ipairs(constrained) do
-		self:sortBone(bone)
+	local constrained = constraint.bones	
+	if constraint.data.local_ then
+		for i,bone in ipairs(constrained) do
+			local child = constrained[#constrained]
+			local contains = false
+			sortBone(child.parent)
+			for i,updatable in ipairs(self._updateCache) do
+				if updatable == child then
+					contains = true
+					break
+				end
+			end
+			if not contains then table_insert(self.updateCacheReset, child) end
+		end
+	else
+		for i,bone in ipairs(constrained) do
+			self:sortBone(bone)
+		end
 	end
 	
 	table_insert(self._updateCache, constraint)
@@ -482,12 +497,16 @@ function Skeleton:getBounds(offset, size)
 			local maxX = -99999999
 			local maxY = -99999999
 			for i, slot in ipairs(drawOrder) do
-				local vertices = nil
+				local vertices = {}
 				local attachment = slot.attachment
-				if attachment and (attachment.type == AttachmentType.region or attachment.type == AttachmentType.mesh) then
-					vertices = attachment:updateWorldVertices(slot, false);
+				if attachment then
+					if attachment.type == AttachmentType.region then
+						attachment:computeWorldVertices(slot.bone, vertices, 0, 2)
+					elseif attachment.type == AttachmentType.mesh then
+						attachment:computeWorldVertices(slot, 0, attachment.worldVerticesLength, vertices, 0, 2)
+					end
 				end
-				if vertices then
+				if #vertices > 0 then
 					local nn = #vertices
 					local ii = 1
 					while ii <= nn do
@@ -497,7 +516,7 @@ function Skeleton:getBounds(offset, size)
 						minY = math_min(minY, y)
 						maxX = math_max(maxX, x)
 						maxY = math_max(maxY, y)
-						ii = ii + 8
+						ii = ii + 2
 					end
 				end
 			end

@@ -75,12 +75,21 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 	return { skeleton = skeleton, state = animationState }
 end
 
+table.insert(skeletons, loadSkeleton("test.atlas", "test.json", 240, 300, 0.4, "animation"))
 table.insert(skeletons, loadSkeleton("spineboy.atlas", "spineboy.json", 240, 300, 0.4, "walk"))
 table.insert(skeletons, loadSkeleton("raptor.atlas", "raptor.json", 200, 300, 0.25, "walk"))
 table.insert(skeletons, loadSkeleton("goblins.atlas", "goblins-mesh.json", 240, 300, 0.8, "walk", "goblin"))
 table.insert(skeletons, loadSkeleton("stretchyman.atlas", "stretchyman.json", 40, 300, 0.5, "sneak"))
 table.insert(skeletons, loadSkeleton("tank.atlas", "tank.json", 400, 300, 0.2, "drive"))
 table.insert(skeletons, loadSkeleton("vine.atlas", "vine.json", 240, 300, 0.3, "animation"))
+
+local bounds = spine.SkeletonBounds.new()
+skeletons[1].skeleton:updateWorldTransform()
+bounds:update(skeletons[1].skeleton, true)
+
+local offset = {}
+local size = {}
+skeletons[1].skeleton:getBounds(offset, size)
 
 display.setDefault("background", 0.2, 0.2, 0.2, 1)
 

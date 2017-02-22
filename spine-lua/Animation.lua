@@ -118,7 +118,8 @@ Animation.TimelineType = {
 	attachment = 4, color = 5, deform = 6,
 	event = 7, drawOrder = 8,
 	ikConstraint = 9, transformConstraint = 10,
-	pathConstraintPosition = 11, pathConstraintSpacing = 12, pathConstraintMix = 13
+	pathConstraintPosition = 11, pathConstraintSpacing = 12, pathConstraintMix = 13,
+	twoColor = 14
 }
 local TimelineType = Animation.TimelineType
 local SHL_24 = 16777216
@@ -556,6 +557,108 @@ function Animation.ColorTimeline.new (frameCount)
 			local color = slot.color
 			if setupPose then color:setFrom(slot.data.color) end
 			color:add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha)
+		end
+	end
+
+	return self
+end
+
+Animation.TwoColorTimeline = {}
+Animation.TwoColorTimeline.ENTRIES = 8
+function Animation.TwoColorTimeline.new (frameCount)
+	local ENTRIES = Animation.TwoColorTimeline.ENTRIES
+	local PREV_TIME = -8
+	local PREV_R = -7
+	local PREV_G = -6
+	local PREV_B = -5
+	local PREV_A = -4
+	local PREV_R2 = -3
+	local PREV_G2 = -2
+	local PREV_B2 = -1
+	local R = 1
+	local G = 2
+	local B = 3
+	local A = 4
+	local R2 = 5
+	local G2 = 6
+	local B2 = 7
+
+	local self = Animation.CurveTimeline.new(frameCount)
+	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
+	self.slotIndex = -1
+	self.type = TimelineType.twoColor
+	
+	function self:getPropertyId ()
+		return TimelineType.twoColor * SHL_24 + self.slotIndex
+	end
+
+	function self:setFrame (frameIndex, time, r, g, b, a, r2, g2, b2)
+		frameIndex = frameIndex * ENTRIES
+		self.frames[frameIndex] = time
+		self.frames[frameIndex + R] = r
+		self.frames[frameIndex + G] = g
+		self.frames[frameIndex + B] = b
+		self.frames[frameIndex + A] = a
+		self.frames[frameIndex + R2] = r2
+		self.frames[frameIndex + G2] = g2
+		self.frames[frameIndex + B2] = b2
+	end
+
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha, setupPose, mixingOut)
+		local frames = self.frames
+		local slot = skeleton.slots[self.slotIndex]
+		if time < frames[0] then 
+			if setupPose then
+				slot.color:setFrom(slot.data.color)
+				slot.darkColor:setFrom(slot.data.darkColor)
+			end
+			return
+		end
+
+		local r, g, b, a, r2, g2, b2
+		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
+			local i = zlen(frames)
+			r = frames[i + PREV_R]
+			g = frames[i + PREV_G]
+			b = frames[i + PREV_B]
+			a = frames[i + PREV_A]
+			r2 = frames[i + PREV_R2]
+			g2 = frames[i + PREV_G2]
+			b2 = frames[i + PREV_B2]
+		else
+			-- Interpolate between the last frame and the current frame.
+			local frame = binarySearch(frames, time, ENTRIES)
+			r = frames[frame + PREV_R]
+			g = frames[frame + PREV_G]
+			b = frames[frame + PREV_B]
+			a = frames[frame + PREV_A]
+			r2 = frames[frame + PREV_R2]
+			g2 = frames[frame + PREV_G2]
+			b2 = frames[frame + PREV_B2]
+			local frameTime = frames[frame]
+			local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1,
+					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
+
+			r = r + (frames[frame + R] - r) * percent
+			g = g + (frames[frame + G] - g) * percent
+			b = b + (frames[frame + B] - b) * percent
+			a = a + (frames[frame + A] - a) * percent
+			r2 = r2 + (frames[frame + R2] - r2) * percent
+			g2 = g2 + (frames[frame + G2] - g2) * percent
+			b2 = b2 + (frames[frame + B2] - b2) * percent
+		end
+		if alpha == 1 then
+			slot.color:set(r, g, b, a)
+			slot.darkColor:set(r2, g2, b2, 1)
+		else
+			local light = slot.color
+			local dark = slot.darkColor
+			if setupPose then 
+				light:setFrom(slot.data.color)
+				dark:setFrom(slot.data.darkColor)
+			end
+			light:add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha)
+			dark:add((r2 - dark.r) * alpha, (g2 - dark.g) * alpha, (b2 - dark.b) * alpha, 0)
 		end
 	end
 
