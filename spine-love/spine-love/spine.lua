@@ -45,6 +45,7 @@ spine.RegionAttachment = require "spine-lua.attachments.RegionAttachment"
 spine.MeshAttachment = require "spine-lua.attachments.MeshAttachment"
 spine.VertexAttachment = require "spine-lua.attachments.VertexAttachment"
 spine.PathAttachment = require "spine-lua.attachments.PathAttachment"
+spine.PointAttachment = require "spine-lua.attachments.PointAttachment"
 spine.Skeleton = require "spine-lua.Skeleton"
 spine.Bone = require "spine-lua.Bone"
 spine.Slot = require "spine-lua.Slot"
@@ -113,8 +114,7 @@ function PolygonBatcher:begin ()
 	self.drawCalls = 0
 end
 
-function PolygonBatcher:draw (texture, vertices, indices)
-	local numVertices = #vertices / 8
+function PolygonBatcher:draw (texture, vertices, numVertices, indices)
 	local numIndices = #indices
 	local mesh = self.mesh
 
@@ -192,6 +192,9 @@ function SkeletonRenderer.new ()
 	return self
 end
 
+local worldVertices = spine.utils.newNumberArray(10000 * 8)
+local tmpColor = spine.Color.newWith(0, 0, 0, 0)
+
 function SkeletonRenderer:draw (skeleton)
 	local batcher = self.batcher
 	local premultipliedAlpha = self.premultipliedAlpha
@@ -207,13 +210,16 @@ function SkeletonRenderer:draw (skeleton)
 		local vertices = nil
 		local indics = nil
 		local texture = nil
+		local color = tmpColor
 		if attachment then
 			if attachment.type == spine.AttachmentType.region then
-				vertices = attachment:updateWorldVertices(slot, premultipliedAlpha)
+				numVertices = 4
+				vertices = self:computeRegionVertices(slot, attachment, premultipliedAlpha, color)
 				indices = SkeletonRenderer.QUAD_TRIANGLES
 				texture = attachment.region.renderObject.texture
 			elseif attachment.type == spine.AttachmentType.mesh then
-				vertices = attachment:updateWorldVertices(slot, premultipliedAlpha)
+				numVertices = attachment.worldVerticesLength / 2
+				vertices = self:computeMeshVertices(slot, attachment, premultipliedAlpha, color)
 				indices = attachment.triangles
 				texture = attachment.region.renderObject.texture
 			end
@@ -234,13 +240,98 @@ function SkeletonRenderer:draw (skeleton)
 					batcher:stop()
 					batcher:begin()
 				end
-				batcher:draw(texture, vertices, indices)
+				batcher:draw(texture, vertices, numVertices, indices)
 			end
 		end
 	end
 
 	batcher:stop()
 	love.graphics.setBlendMode(lastLoveBlendMode)
+end
+
+function SkeletonRenderer:computeRegionVertices(slot, region, pma, color)
+	local skeleton = slot.bone.skeleton
+	local skeletonColor = skeleton.color
+	local slotColor = slot.color
+	local regionColor = region.color
+	local alpha = skeletonColor.a * slotColor.a * regionColor.a
+	local multiplier = alpha
+	if pma then multiplier = 1 end
+	color:set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
+				skeletonColor.g * slotColor.g * regionColor.g * multiplier,
+				skeletonColor.b * slotColor.b * regionColor.b * multiplier,
+				alpha)
+
+	local vertices = worldVertices
+	region:computeWorldVertices(slot.bone, vertices, 0, 8)
+
+	local uvs = region.uvs
+
+	vertices[3] = uvs[1]
+	vertices[4] = uvs[2]
+	vertices[5] = color.r
+	vertices[6] = color.g
+	vertices[7] = color.b
+	vertices[8] = color.a
+
+	vertices[11] = uvs[3]
+	vertices[12] = uvs[4]
+	vertices[13] = color.r
+	vertices[14] = color.g
+	vertices[15] = color.b
+	vertices[16] = color.a
+
+	vertices[19] = uvs[5]
+	vertices[20] = uvs[6]
+	vertices[21] = color.r
+	vertices[22] = color.g
+	vertices[23] = color.b
+	vertices[24] = color.a
+
+	vertices[27] = uvs[7]
+	vertices[28] = uvs[8]
+	vertices[29] = color.r
+	vertices[30] = color.g
+	vertices[31] = color.b
+	vertices[32] = color.a
+
+	return vertices
+end
+
+function SkeletonRenderer:computeMeshVertices(slot, mesh, pma, color)
+	local skeleton = slot.bone.skeleton
+	local skeletonColor = skeleton.color
+	local slotColor = slot.color
+	local meshColor = mesh.color
+	local alpha = skeletonColor.a * slotColor.a * meshColor.a
+	local multiplier = alpha
+	if pma then multiplier = 1 end
+	color:set(skeletonColor.r * slotColor.r * meshColor.r * multiplier,
+				skeletonColor.g * slotColor.g * meshColor.g * multiplier,
+				skeletonColor.b * slotColor.b * meshColor.b * multiplier,
+				alpha)
+			
+	local numVertices = mesh.worldVerticesLength / 2
+	local vertices = worldVertices
+	mesh:computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, 8)
+	
+	local uvs = mesh.uvs
+	local i = 1
+	local n = numVertices + 1
+	local u = 1
+	local v = 3
+	while i < n do
+		vertices[v] = uvs[u]
+		vertices[v + 1] = uvs[u + 1]
+		vertices[v + 2] = color.r
+		vertices[v + 3] = color.g
+		vertices[v + 4] = color.b
+		vertices[v + 5] = color.a
+		i = i + 1
+		u = u + 2
+		v = v + 8
+	end
+	return vertices
 end
 
 spine.PolygonBatcher = PolygonBatcher
