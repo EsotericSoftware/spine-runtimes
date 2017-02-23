@@ -96,7 +96,7 @@ namespace Spine.Unity.MeshGeneration {
 
 				// Apply scale to vertices
 				meshBoundsMax.x *= scale; meshBoundsMax.y *= scale;
-				meshBoundsMin.x *= scale; meshBoundsMax.y *= scale;
+				meshBoundsMin.x *= scale; meshBoundsMin.y *= scale;
 				var vertices = this.meshVertices;
 				for (int i = 0; i < totalVertexCount; i++) {
 					Vector3 p = vertices[i];
