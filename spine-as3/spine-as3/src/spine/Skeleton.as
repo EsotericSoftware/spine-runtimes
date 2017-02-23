@@ -198,7 +198,7 @@ public class Skeleton {
 		var i:Number = 0;
 		if (constraint.data.local) {
 			for (i = 0; i < boneCount; i++) {
-				var child:Bone = constrained[constrained.length - 1];
+				var child:Bone = constrained[i];
 				sortBone(child.parent);
 				if (!(_updateCache.indexOf(child) > -1)) _updateCacheReset.push(child);
 			}

@@ -3724,7 +3724,7 @@ var spine;
 			var boneCount = constrained.length;
 			if (constraint.data.local) {
 				for (var i = 0; i < boneCount; i++) {
-					var child = constrained[constrained.length - 1];
+					var child = constrained[i];
 					this.sortBone(child.parent);
 					if (!(this._updateCache.indexOf(child) > -1))
 						this.updateCacheReset.push(child);

@@ -210,11 +210,9 @@ namespace Spine {
 
 			var constrained = constraint.bones;
 			int boneCount = constrained.Count;
-//			for (int ii = 0; ii < boneCount; ii++)
-//				SortBone(constrained.Items[ii]);
 			if (constraint.data.local) {
 				for (int i = 0; i < boneCount; i++) {
-					Bone child = constrained.Items[constrained.Count - 1];
+					Bone child = constrained.Items[i];
 					SortBone(child.parent);
 					if (!updateCache.Contains(child)) updateCacheReset.Add(child);
 				}

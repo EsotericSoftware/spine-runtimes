@@ -192,7 +192,7 @@ module spine {
 			let boneCount = constrained.length;
 			if (constraint.data.local) {
 				for (let i = 0; i < boneCount; i++) {
-					let child = constrained[constrained.length - 1];
+					let child = constrained[i];
 					this.sortBone(child.parent);
 					if (!(this._updateCache.indexOf(child) > -1)) this.updateCacheReset.push(child);
 				}

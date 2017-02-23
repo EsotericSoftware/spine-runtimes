@@ -295,7 +295,7 @@ static void _sortTransformConstraint(_spSkeleton* const internal, spTransformCon
 	boneCount = constraint->bonesCount;
 	if (constraint->data->local) {
 		for (i = 0; i < boneCount; i++) {
-			child = constrained[boneCount - 1];
+			child = constrained[i];
 			_sortBone(internal, child);
 			contains = 0;
 			for (i = 0; i < internal->updateCacheCount; i++) {

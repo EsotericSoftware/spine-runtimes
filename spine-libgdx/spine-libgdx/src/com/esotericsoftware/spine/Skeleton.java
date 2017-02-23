@@ -250,7 +250,7 @@ public class Skeleton {
 		int boneCount = constrained.size;
 		if (constraint.data.local) {
 			for (int i = 0; i < boneCount; i++) {
-				Bone child = constrained.peek();
+				Bone child = constrained.get(i);
 				sortBone(child.parent);
 				if (!updateCache.contains(child, true)) updateCacheReset.add(child);
 			}
