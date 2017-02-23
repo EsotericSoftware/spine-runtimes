@@ -57,7 +57,7 @@ namespace Spine.Unity.Examples {
 		void Start () {
 			if (skeletonAnimation == null) return;
 			model.ShootEvent += PlayShoot;
-			skeletonAnimation.state.Event += HandleEvent;
+			skeletonAnimation.AnimationState.Event += HandleEvent;
 		}
 
 		void HandleEvent (Spine.TrackEntry trackEntry, Spine.Event e) {
@@ -104,7 +104,7 @@ namespace Spine.Unity.Examples {
 				}
 			}
 
-			skeletonAnimation.state.SetAnimation(0, nextAnimation, true);
+			skeletonAnimation.AnimationState.SetAnimation(0, nextAnimation, true);
 		}
 
 		void PlayFootstepSound () {
@@ -114,7 +114,7 @@ namespace Spine.Unity.Examples {
 
 		[ContextMenu("Check Tracks")]
 		void CheckTracks () {
-			var state = skeletonAnimation.state;
+			var state = skeletonAnimation.AnimationState;
 			Debug.Log(state.GetCurrent(0));
 			Debug.Log(state.GetCurrent(1));
 		}
@@ -122,7 +122,7 @@ namespace Spine.Unity.Examples {
 		#region Transient Actions
 		public void PlayShoot () {
 			// Play the shoot animation on track 1.
-			skeletonAnimation.state.SetAnimation(1, shoot, false);
+			skeletonAnimation.AnimationState.SetAnimation(1, shoot, false);
 			//skeletonAnimation.state.AddEmptyAnimation(1, 0.1f, 0f);
 			gunSource.pitch = GetRandomPitch(gunsoundPitchOffset);
 			gunSource.Play();
@@ -131,7 +131,7 @@ namespace Spine.Unity.Examples {
 		}
 
 		public void Turn (bool facingLeft) {
-			skeletonAnimation.skeleton.FlipX = facingLeft;
+			skeletonAnimation.Skeleton.FlipX = facingLeft;
 			// Maybe play a transient turning animation too, then call ChangeStableAnimation.
 		}
 		#endregion

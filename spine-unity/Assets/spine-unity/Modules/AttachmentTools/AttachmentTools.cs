@@ -341,7 +341,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			return Sprite.Create(ar.GetMainTexture(), ar.GetUnityRect(), new Vector2(0.5f, 0.5f), pixelsPerUnit);
 		}
 
-		internal static Texture2D ToTexture (this AtlasRegion ar, bool applyImmediately = true) {
+		public static Texture2D ToTexture (this AtlasRegion ar, bool applyImmediately = true) {
 			Texture2D sourceTexture = ar.GetMainTexture();
 			Rect r = ar.GetUnityRect(sourceTexture.height);
 			Texture2D output = new Texture2D((int)r.width, (int)r.height);
