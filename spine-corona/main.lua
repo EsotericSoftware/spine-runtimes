@@ -75,7 +75,7 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 	return { skeleton = skeleton, state = animationState }
 end
 
-table.insert(skeletons, loadSkeleton("test.atlas", "test.json", 240, 300, 0.4, "animation"))
+-- table.insert(skeletons, loadSkeleton("test.atlas", "test.json", 240, 300, 0.4, "animation"))
 table.insert(skeletons, loadSkeleton("spineboy.atlas", "spineboy.json", 240, 300, 0.4, "walk"))
 table.insert(skeletons, loadSkeleton("raptor.atlas", "raptor.json", 200, 300, 0.25, "walk"))
 table.insert(skeletons, loadSkeleton("goblins.atlas", "goblins-mesh.json", 240, 300, 0.8, "walk", "goblin"))

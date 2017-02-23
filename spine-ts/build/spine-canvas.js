@@ -4610,8 +4610,8 @@ var spine;
 			var scale = this.scale;
 			attachment.worldVerticesLength = verticesLength;
 			var vertices = map.vertices;
-			var scaledVertices = spine.Utils.toFloatArray(vertices);
 			if (verticesLength == vertices.length) {
+				var scaledVertices = spine.Utils.toFloatArray(vertices);
 				if (scale != 1) {
 					for (var i = 0, n = vertices.length; i < n; i++)
 						scaledVertices[i] *= scale;

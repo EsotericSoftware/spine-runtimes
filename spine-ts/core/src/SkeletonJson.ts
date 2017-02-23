@@ -347,8 +347,8 @@ module spine {
 			let scale = this.scale;
 			attachment.worldVerticesLength = verticesLength;
 			let vertices: Array<number> = map.vertices;
-			let scaledVertices = Utils.toFloatArray(vertices);
 			if (verticesLength == vertices.length) {
+				let scaledVertices = Utils.toFloatArray(vertices);
 				if (scale != 1) {
 					for (let i = 0, n = vertices.length; i < n; i++)
 						scaledVertices[i] *= scale;
