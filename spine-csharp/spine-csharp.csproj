@@ -64,6 +64,7 @@
     <Compile Include="src\Attachments\BoundingBoxAttachment.cs" />
     <Compile Include="src\Attachments\MeshAttachment.cs" />
     <Compile Include="src\Attachments\PathAttachment.cs" />
+    <Compile Include="src\Attachments\PointAttachment.cs" />
     <Compile Include="src\Attachments\RegionAttachment.cs" />
     <Compile Include="src\Attachments\VertexAttachment.cs" />
     <Compile Include="src\BlendMode.cs" />

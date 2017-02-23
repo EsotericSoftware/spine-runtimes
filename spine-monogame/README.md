@@ -17,6 +17,11 @@ spine-monogame supports all Spine features.
 ## Setup
 
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
-1. Open the Windows 8 Store or Xamarin Studio project files in `spine-monogame`.
+1. Copy the contents of the `spine-csharp/src` and `spine-xna/src` directories into your project.
 
-Alternatively, the contents of the `spine-csharp/src` and `spine-xna/src` directories can be copied into your project.
+## Example
+
+1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
+1. Open the `spine-monogame-example.sln` Solution in either Visual Studio 2015 or Xamarin Studio
+1. Right click the `spine-monogame-example` project in the solution explorer and select `Properties`
+1. Select `Debug` and set the working directory to point to `spine-runtimes/spine-xna/example`
