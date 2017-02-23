@@ -43,7 +43,7 @@ namespace Spine.Unity.Examples {
 		
 		public void Start () {
 			skeletonAnimation = GetComponent<SkeletonAnimation>();
-			headBone = skeletonAnimation.skeleton.FindBone("head");
+			headBone = skeletonAnimation.Skeleton.FindBone("head");
 			skeletonAnimation.UpdateLocal += UpdateLocal;
 		}
 
@@ -53,16 +53,16 @@ namespace Spine.Unity.Examples {
 		}
 		
 		public void OnMouseDown () {
-			skeletonAnimation.skeleton.SetSkin(girlSkin ? "goblin" : "goblingirl");
-			skeletonAnimation.skeleton.SetSlotsToSetupPose();
+			skeletonAnimation.Skeleton.SetSkin(girlSkin ? "goblin" : "goblingirl");
+			skeletonAnimation.Skeleton.SetSlotsToSetupPose();
 			
 			girlSkin = !girlSkin;
 			
 			if (girlSkin) {
-				skeletonAnimation.skeleton.SetAttachment("right hand item", null);
-				skeletonAnimation.skeleton.SetAttachment("left hand item", "spear");
+				skeletonAnimation.Skeleton.SetAttachment("right hand item", null);
+				skeletonAnimation.Skeleton.SetAttachment("left hand item", "spear");
 			} else
-				skeletonAnimation.skeleton.SetAttachment("left hand item", "dagger");
+				skeletonAnimation.Skeleton.SetAttachment("left hand item", "dagger");
 		}
 	}
 }

@@ -47,13 +47,13 @@ namespace Spine.Unity.Examples {
 				healthText.text = currentHealth + "/" + maxHealth;
 
 				if (currentHealth > 0) {
-					spineboy.state.SetAnimation(0, "hit", false);
-					spineboy.state.AddAnimation(0, "idle", true, 0);
+					spineboy.AnimationState.SetAnimation(0, "hit", false);
+					spineboy.AnimationState.AddAnimation(0, "idle", true, 0);
 					gauge.fillPercent = (float)currentHealth/(float)maxHealth;
 				} else {
 					if (currentHealth >= 0) {
 						gauge.fillPercent = 0;
-						spineboy.state.SetAnimation(0, "death", false).TrackEnd = float.PositiveInfinity;
+						spineboy.AnimationState.SetAnimation(0, "death", false).TrackEnd = float.PositiveInfinity;
 					}
 				}
 			}

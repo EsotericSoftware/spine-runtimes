@@ -1,7 +1,7 @@
 # spine-ue4
 The spine-ue4 runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Unreal Engine 4.15+](https://www.unrealengine.com/). spine-ue4 is based on [spine-c](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-c).
 
-# WARNING This plugin will only work with Unreal Engine 4.15 and later versions as these include a [fix](https://github.com/EpicGames/UnrealEngine/pull/3015) for compiling plain `.c` files in Visual Studio.
+### WARNING This plugin will only work with Unreal Engine 4.15 and later when this [fix](https://github.com/EpicGames/UnrealEngine/pull/3185) for compiling plain `.c` files is applied.
 
 ## Licensing
 

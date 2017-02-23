@@ -93,7 +93,7 @@ namespace Spine.Unity.Examples {
 
 		void Start () {
 			// Register a callback for Spine Events (in this case, Footstep)
-			skeletonAnimation.state.Event += HandleEvent;
+			skeletonAnimation.AnimationState.Event += HandleEvent;
 		}
 
 		void HandleEvent (Spine.TrackEntry trackEntry, Spine.Event e) {
