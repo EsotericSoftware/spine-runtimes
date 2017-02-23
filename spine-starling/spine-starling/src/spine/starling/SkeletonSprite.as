@@ -69,7 +69,7 @@ public class SkeletonSprite extends DisplayObject {
 	}
 
 	override public function render (painter:Painter) : void {
-		alpha *= this.alpha * skeleton.a;
+		painter.state.alpha *= skeleton.a;
 		var originalBlendMode:String = painter.state.blendMode;
 		var r:Number = skeleton.r * 255;
 		var g:Number = skeleton.g * 255;
