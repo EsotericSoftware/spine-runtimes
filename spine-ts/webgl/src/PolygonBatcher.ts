@@ -41,10 +41,13 @@ module spine.webgl {
 		private srcBlend: number = WebGLRenderingContext.SRC_ALPHA;
 		private dstBlend: number = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
 
-		constructor (gl: WebGLRenderingContext, maxVertices: number = 10920) {
+		constructor (gl: WebGLRenderingContext, twoColorTint: boolean = true, maxVertices: number = 10920) {
 			if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
 			this.gl = gl;
-			this.mesh = new Mesh(gl, [new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute()], maxVertices, maxVertices * 3);
+			let attributes = twoColorTint ?
+					[new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute(), new Color2Attribute()] :
+					[new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute()];
+			this.mesh = new Mesh(gl, attributes, maxVertices, maxVertices * 3);
 		}
 
 		begin (shader: Shader) {

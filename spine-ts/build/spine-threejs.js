@@ -4065,8 +4065,10 @@ var spine;
 					if (color != null)
 						data.color.setFromString(color);
 					var dark = this.getValue(slotMap, "dark", null);
-					if (dark != null)
-						data.darkColor.setFromString(color);
+					if (dark != null) {
+						data.darkColor = new spine.Color(1, 1, 1, 1);
+						data.darkColor.setFromString(dark);
+					}
 					data.attachmentName = this.getValue(slotMap, "attachment", null);
 					data.blendMode = SkeletonJson.blendModeFromString(this.getValue(slotMap, "blend", "normal"));
 					skeletonData.slots.push(data);
@@ -4369,7 +4371,7 @@ var spine;
 								var valueMap = timelineMap[i];
 								var light = new spine.Color();
 								var dark = new spine.Color();
-								light.setFromString(valueMap.color);
+								light.setFromString(valueMap.light);
 								dark.setFromString(valueMap.dark);
 								timeline.setFrame(frameIndex, valueMap.time, light.r, light.g, light.b, light.a, dark.r, dark.g, dark.b);
 								this.readCurve(valueMap, timeline, frameIndex);
@@ -5573,6 +5575,45 @@ var spine;
 		return TimeKeeper;
 	}());
 	spine.TimeKeeper = TimeKeeper;
+	var WindowedMean = (function () {
+		function WindowedMean(windowSize) {
+			if (windowSize === void 0) { windowSize = 32; }
+			this.addedValues = 0;
+			this.lastValue = 0;
+			this.mean = 0;
+			this.dirty = true;
+			this.values = new Array(windowSize);
+		}
+		WindowedMean.prototype.hasEnoughData = function () {
+			return this.addedValues >= this.values.length;
+		};
+		WindowedMean.prototype.addValue = function (value) {
+			if (this.addedValues < this.values.length)
+				this.addedValues++;
+			this.values[this.lastValue++] = value;
+			if (this.lastValue > this.values.length - 1)
+				this.lastValue = 0;
+			this.dirty = true;
+		};
+		WindowedMean.prototype.getMean = function () {
+			if (this.hasEnoughData()) {
+				if (this.dirty) {
+					var mean = 0;
+					for (var i = 0; i < this.values.length; i++) {
+						mean += this.values[i];
+					}
+					this.mean = mean / this.values.length;
+					this.dirty = false;
+				}
+				return this.mean;
+			}
+			else {
+				return 0;
+			}
+		};
+		return WindowedMean;
+	}());
+	spine.WindowedMean = WindowedMean;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {

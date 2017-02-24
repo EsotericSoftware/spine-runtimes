@@ -4376,8 +4376,10 @@ var spine;
 					if (color != null)
 						data.color.setFromString(color);
 					var dark = this.getValue(slotMap, "dark", null);
-					if (dark != null)
-						data.darkColor.setFromString(color);
+					if (dark != null) {
+						data.darkColor = new spine.Color(1, 1, 1, 1);
+						data.darkColor.setFromString(dark);
+					}
 					data.attachmentName = this.getValue(slotMap, "attachment", null);
 					data.blendMode = SkeletonJson.blendModeFromString(this.getValue(slotMap, "blend", "normal"));
 					skeletonData.slots.push(data);
@@ -4680,7 +4682,7 @@ var spine;
 								var valueMap = timelineMap[i];
 								var light = new spine.Color();
 								var dark = new spine.Color();
-								light.setFromString(valueMap.color);
+								light.setFromString(valueMap.light);
 								dark.setFromString(valueMap.dark);
 								timeline.setFrame(frameIndex, valueMap.time, light.r, light.g, light.b, light.a, dark.r, dark.g, dark.b);
 								this.readCurve(valueMap, timeline, frameIndex);
@@ -5818,6 +5820,45 @@ var spine;
 		return TimeKeeper;
 	}());
 	spine.TimeKeeper = TimeKeeper;
+	var WindowedMean = (function () {
+		function WindowedMean(windowSize) {
+			if (windowSize === void 0) { windowSize = 32; }
+			this.addedValues = 0;
+			this.lastValue = 0;
+			this.mean = 0;
+			this.dirty = true;
+			this.values = new Array(windowSize);
+		}
+		WindowedMean.prototype.hasEnoughData = function () {
+			return this.addedValues >= this.values.length;
+		};
+		WindowedMean.prototype.addValue = function (value) {
+			if (this.addedValues < this.values.length)
+				this.addedValues++;
+			this.values[this.lastValue++] = value;
+			if (this.lastValue > this.values.length - 1)
+				this.lastValue = 0;
+			this.dirty = true;
+		};
+		WindowedMean.prototype.getMean = function () {
+			if (this.hasEnoughData()) {
+				if (this.dirty) {
+					var mean = 0;
+					for (var i = 0; i < this.values.length; i++) {
+						mean += this.values[i];
+					}
+					this.mean = mean / this.values.length;
+					this.dirty = false;
+				}
+				return this.mean;
+			}
+			else {
+				return 0;
+			}
+		};
+		return WindowedMean;
+	}());
+	spine.WindowedMean = WindowedMean;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
@@ -6848,6 +6889,14 @@ var spine;
 			};
 			Mesh.prototype.getIndices = function () { return this.indices; };
 			;
+			Mesh.prototype.getVertexSizeInFloats = function () {
+				var size = 0;
+				for (var i = 0; i < this.attributes.length; i++) {
+					var attribute = this.attributes[i];
+					size += attribute.numElements;
+				}
+				return size;
+			};
 			Mesh.prototype.setVertices = function (vertices) {
 				this.dirtyVertices = true;
 				if (vertices.length > this.vertices.length)
@@ -6908,7 +6957,7 @@ var spine;
 						this.verticesBuffer = gl.createBuffer();
 					}
 					gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesBuffer);
-					gl.bufferData(gl.ARRAY_BUFFER, this.vertices.subarray(0, this.verticesLength), gl.STATIC_DRAW);
+					gl.bufferData(gl.ARRAY_BUFFER, this.vertices.subarray(0, this.verticesLength), gl.DYNAMIC_DRAW);
 					this.dirtyVertices = false;
 				}
 				if (this.dirtyIndices) {
@@ -6916,7 +6965,7 @@ var spine;
 						this.indicesBuffer = gl.createBuffer();
 					}
 					gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
-					gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices.subarray(0, this.indicesLength), gl.STATIC_DRAW);
+					gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices.subarray(0, this.indicesLength), gl.DYNAMIC_DRAW);
 					this.dirtyIndices = false;
 				}
 			};
@@ -6970,6 +7019,14 @@ var spine;
 			return ColorAttribute;
 		}(VertexAttribute));
 		webgl.ColorAttribute = ColorAttribute;
+		var Color2Attribute = (function (_super) {
+			__extends(Color2Attribute, _super);
+			function Color2Attribute() {
+				_super.call(this, webgl.Shader.COLOR2, VertexAttributeType.Float, 4);
+			}
+			return Color2Attribute;
+		}(VertexAttribute));
+		webgl.Color2Attribute = Color2Attribute;
 		(function (VertexAttributeType) {
 			VertexAttributeType[VertexAttributeType["Float"] = 0] = "Float";
 		})(webgl.VertexAttributeType || (webgl.VertexAttributeType = {}));
@@ -6981,7 +7038,8 @@ var spine;
 	var webgl;
 	(function (webgl) {
 		var PolygonBatcher = (function () {
-			function PolygonBatcher(gl, maxVertices) {
+			function PolygonBatcher(gl, twoColorTint, maxVertices) {
+				if (twoColorTint === void 0) { twoColorTint = true; }
 				if (maxVertices === void 0) { maxVertices = 10920; }
 				this.isDrawing = false;
 				this.shader = null;
@@ -6993,7 +7051,10 @@ var spine;
 				if (maxVertices > 10920)
 					throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
 				this.gl = gl;
-				this.mesh = new webgl.Mesh(gl, [new webgl.Position2Attribute(), new webgl.ColorAttribute(), new webgl.TexCoordAttribute()], maxVertices, maxVertices * 3);
+				var attributes = twoColorTint ?
+					[new webgl.Position2Attribute(), new webgl.ColorAttribute(), new webgl.TexCoordAttribute(), new webgl.Color2Attribute()] :
+					[new webgl.Position2Attribute(), new webgl.ColorAttribute(), new webgl.TexCoordAttribute()];
+				this.mesh = new webgl.Mesh(gl, attributes, maxVertices, maxVertices * 3);
 			}
 			PolygonBatcher.prototype.begin = function (shader) {
 				var gl = this.gl;
@@ -7071,7 +7132,8 @@ var spine;
 	var webgl;
 	(function (webgl) {
 		var SceneRenderer = (function () {
-			function SceneRenderer(canvas, gl) {
+			function SceneRenderer(canvas, gl, twoColorTint) {
+				if (twoColorTint === void 0) { twoColorTint = true; }
 				this.activeRenderer = null;
 				this.QUAD = [
 					0, 0, 1, 1, 1, 1, 0, 0,
@@ -7084,11 +7146,11 @@ var spine;
 				this.canvas = canvas;
 				this.gl = gl;
 				this.camera = new webgl.OrthoCamera(canvas.width, canvas.height);
-				this.batcherShader = webgl.Shader.newColoredTextured(gl);
-				this.batcher = new webgl.PolygonBatcher(gl);
+				this.batcherShader = twoColorTint ? webgl.Shader.newTwoColorTextured(gl) : webgl.Shader.newColoredTextured(gl);
+				this.batcher = new webgl.PolygonBatcher(gl, twoColorTint);
 				this.shapesShader = webgl.Shader.newColored(gl);
 				this.shapes = new webgl.ShapeRenderer(gl);
-				this.skeletonRenderer = new webgl.SkeletonRenderer(gl);
+				this.skeletonRenderer = new webgl.SkeletonRenderer(gl, twoColorTint);
 				this.skeletonDebugRenderer = new webgl.SkeletonDebugRenderer(gl);
 			}
 			SceneRenderer.prototype.begin = function () {
@@ -7526,6 +7588,11 @@ var spine;
 				var fs = "\n\t\t\t\t#ifdef GL_ES\n\t\t\t\t\t#define LOWP lowp\n\t\t\t\t\tprecision mediump float;\n\t\t\t\t#else\n\t\t\t\t\t#define LOWP\n\t\t\t\t#endif\n\t\t\t\tvarying LOWP vec4 v_color;\n\t\t\t\tvarying vec2 v_texCoords;\n\t\t\t\tuniform sampler2D u_texture;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tgl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n\t\t\t\t}\n\t\t\t";
 				return new Shader(gl, vs, fs);
 			};
+			Shader.newTwoColorTextured = function (gl) {
+				var vs = "\n\t\t\t\tattribute vec4 " + Shader.POSITION + ";\n\t\t\t\tattribute vec4 " + Shader.COLOR + ";\n\t\t\t\tattribute vec4 " + Shader.COLOR2 + ";\n\t\t\t\tattribute vec2 " + Shader.TEXCOORDS + ";\n\t\t\t\tuniform mat4 " + Shader.MVP_MATRIX + ";\n\t\t\t\tvarying vec4 v_light;\n\t\t\t\tvarying vec4 v_dark;\n\t\t\t\tvarying vec2 v_texCoords;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tv_light = " + Shader.COLOR + ";\n\t\t\t\t\tv_dark = " + Shader.COLOR2 + ";\n\t\t\t\t\tv_texCoords = " + Shader.TEXCOORDS + ";\n\t\t\t\t\tgl_Position = " + Shader.MVP_MATRIX + " * " + Shader.POSITION + ";\n\t\t\t\t}\n\t\t\t";
+				var fs = "\n\t\t\t\t#ifdef GL_ES\n\t\t\t\t\t#define LOWP lowp\n\t\t\t\t\tprecision mediump float;\n\t\t\t\t#else\n\t\t\t\t\t#define LOWP\n\t\t\t\t#endif\n\t\t\t\tvarying LOWP vec4 v_light;\n\t\t\t\tvarying LOWP vec4 v_dark;\n\t\t\t\tvarying vec2 v_texCoords;\n\t\t\t\tuniform sampler2D u_texture;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tvec4 texColor = texture2D(u_texture, v_texCoords);\n\t\t\t\t\tfloat alpha = texColor.a * v_light.a;\n\t\t\t\t\tgl_FragColor.a = alpha;\n\t\t\t\t\tgl_FragColor.rgb = (1.0 - texColor.rgb) * v_dark.rgb * alpha + texColor.rgb * v_light.rgb;\n\t\t\t\t}\n\t\t\t";
+				return new Shader(gl, vs, fs);
+			};
 			Shader.newColored = function (gl) {
 				var vs = "\n\t\t\t\tattribute vec4 " + Shader.POSITION + ";\n\t\t\t\tattribute vec4 " + Shader.COLOR + ";\n\t\t\t\tuniform mat4 " + Shader.MVP_MATRIX + ";\n\t\t\t\tvarying vec4 v_color;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tv_color = " + Shader.COLOR + ";\n\t\t\t\t\tgl_Position = " + Shader.MVP_MATRIX + " * " + Shader.POSITION + ";\n\t\t\t\t}\n\t\t\t";
 				var fs = "\n\t\t\t\t#ifdef GL_ES\n\t\t\t\t\t#define LOWP lowp\n\t\t\t\t\tprecision mediump float;\n\t\t\t\t#else\n\t\t\t\t\t#define LOWP\n\t\t\t\t#endif\n\t\t\t\tvarying LOWP vec4 v_color;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tgl_FragColor = v_color;\n\t\t\t\t}\n\t\t\t";
@@ -7534,6 +7601,7 @@ var spine;
 			Shader.MVP_MATRIX = "u_projTrans";
 			Shader.POSITION = "a_position";
 			Shader.COLOR = "a_color";
+			Shader.COLOR2 = "a_color2";
 			Shader.TEXCOORDS = "a_texCoords";
 			Shader.SAMPLER = "u_texture";
 			return Shader;
@@ -7889,7 +7957,7 @@ var spine;
 				this.boneWidth = 2;
 				this.bounds = new spine.SkeletonBounds();
 				this.temp = new Array();
-				this.vertices = spine.Utils.newFloatArray(webgl.SkeletonRenderer.VERTEX_SIZE * 1024);
+				this.vertices = spine.Utils.newFloatArray(2 * 1024);
 				this.gl = gl;
 			}
 			SkeletonDebugRenderer.prototype.draw = function (shapes, skeleton, ignoredBones) {
@@ -8038,12 +8106,28 @@ var spine;
 (function (spine) {
 	var webgl;
 	(function (webgl) {
+		var Renderable = (function () {
+			function Renderable(vertices, numFloats) {
+				this.vertices = vertices;
+				this.numFloats = numFloats;
+			}
+			return Renderable;
+		}());
+		;
 		var SkeletonRenderer = (function () {
-			function SkeletonRenderer(gl) {
+			function SkeletonRenderer(gl, twoColorTint) {
+				if (twoColorTint === void 0) { twoColorTint = true; }
 				this.premultipliedAlpha = false;
 				this.tempColor = new spine.Color();
-				this.vertices = spine.Utils.newFloatArray(SkeletonRenderer.VERTEX_SIZE * 1024);
+				this.tempColor2 = new spine.Color();
+				this.vertexSize = 2 + 2 + 4;
+				this.twoColorTint = false;
+				this.renderable = new Renderable(null, 0);
 				this.gl = gl;
+				this.twoColorTint = twoColorTint;
+				if (twoColorTint)
+					this.vertexSize += 4;
+				this.vertices = spine.Utils.newFloatArray(this.vertexSize * 1024);
 			}
 			SkeletonRenderer.prototype.draw = function (batcher, skeleton) {
 				var premultipliedAlpha = this.premultipliedAlpha;
@@ -8057,13 +8141,13 @@ var spine;
 					var texture = null;
 					if (attachment instanceof spine.RegionAttachment) {
 						var region = attachment;
-						vertices = this.computeRegionVertices(slot, region, premultipliedAlpha);
+						vertices = this.computeRegionVertices(slot, region, premultipliedAlpha, this.twoColorTint);
 						triangles = SkeletonRenderer.QUAD_TRIANGLES;
 						texture = region.region.renderObject.texture;
 					}
 					else if (attachment instanceof spine.MeshAttachment) {
 						var mesh = attachment;
-						vertices = this.computeMeshVertices(slot, mesh, premultipliedAlpha);
+						vertices = this.computeMeshVertices(slot, mesh, premultipliedAlpha, this.twoColorTint);
 						triangles = mesh.triangles;
 						texture = mesh.region.renderObject.texture;
 					}
@@ -8075,11 +8159,13 @@ var spine;
 							blendMode = slotBlendMode;
 							batcher.setBlendMode(webgl.getSourceGLBlendMode(this.gl, blendMode, premultipliedAlpha), webgl.getDestGLBlendMode(this.gl, blendMode));
 						}
-						batcher.draw(texture, vertices, triangles);
+						var view = vertices.vertices.subarray(0, vertices.numFloats);
+						batcher.draw(texture, view, triangles);
 					}
 				}
 			};
-			SkeletonRenderer.prototype.computeRegionVertices = function (slot, region, pma) {
+			SkeletonRenderer.prototype.computeRegionVertices = function (slot, region, pma, twoColorTint) {
+				if (twoColorTint === void 0) { twoColorTint = false; }
 				var skeleton = slot.bone.skeleton;
 				var skeletonColor = skeleton.color;
 				var slotColor = slot.color;
@@ -8088,36 +8174,72 @@ var spine;
 				var multiplier = pma ? alpha : 1;
 				var color = this.tempColor;
 				color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier, skeletonColor.g * slotColor.g * regionColor.g * multiplier, skeletonColor.b * slotColor.b * regionColor.b * multiplier, alpha);
-				region.computeWorldVertices(slot.bone, this.vertices, 0, SkeletonRenderer.VERTEX_SIZE);
+				var dark = this.tempColor2;
+				if (slot.darkColor == null)
+					dark.set(0, 0, 0, 1);
+				else
+					dark.setFromColor(slot.darkColor);
+				region.computeWorldVertices(slot.bone, this.vertices, 0, this.vertexSize);
 				var vertices = this.vertices;
 				var uvs = region.uvs;
-				vertices[spine.RegionAttachment.C1R] = color.r;
-				vertices[spine.RegionAttachment.C1G] = color.g;
-				vertices[spine.RegionAttachment.C1B] = color.b;
-				vertices[spine.RegionAttachment.C1A] = color.a;
-				vertices[spine.RegionAttachment.U1] = uvs[0];
-				vertices[spine.RegionAttachment.V1] = uvs[1];
-				vertices[spine.RegionAttachment.C2R] = color.r;
-				vertices[spine.RegionAttachment.C2G] = color.g;
-				vertices[spine.RegionAttachment.C2B] = color.b;
-				vertices[spine.RegionAttachment.C2A] = color.a;
-				vertices[spine.RegionAttachment.U2] = uvs[2];
-				vertices[spine.RegionAttachment.V2] = uvs[3];
-				vertices[spine.RegionAttachment.C3R] = color.r;
-				vertices[spine.RegionAttachment.C3G] = color.g;
-				vertices[spine.RegionAttachment.C3B] = color.b;
-				vertices[spine.RegionAttachment.C3A] = color.a;
-				vertices[spine.RegionAttachment.U3] = uvs[4];
-				vertices[spine.RegionAttachment.V3] = uvs[5];
-				vertices[spine.RegionAttachment.C4R] = color.r;
-				vertices[spine.RegionAttachment.C4G] = color.g;
-				vertices[spine.RegionAttachment.C4B] = color.b;
-				vertices[spine.RegionAttachment.C4A] = color.a;
-				vertices[spine.RegionAttachment.U4] = uvs[6];
-				vertices[spine.RegionAttachment.V4] = uvs[7];
-				return vertices;
+				var i = 2;
+				vertices[i++] = color.r;
+				vertices[i++] = color.g;
+				vertices[i++] = color.b;
+				vertices[i++] = color.a;
+				vertices[i++] = uvs[0];
+				vertices[i++] = uvs[1];
+				if (twoColorTint) {
+					vertices[i++] = dark.r;
+					vertices[i++] = dark.g;
+					vertices[i++] = dark.b;
+					vertices[i++] = 1;
+				}
+				i += 2;
+				vertices[i++] = color.r;
+				vertices[i++] = color.g;
+				vertices[i++] = color.b;
+				vertices[i++] = color.a;
+				vertices[i++] = uvs[2];
+				vertices[i++] = uvs[3];
+				if (twoColorTint) {
+					vertices[i++] = dark.r;
+					vertices[i++] = dark.g;
+					vertices[i++] = dark.b;
+					vertices[i++] = 1;
+				}
+				i += 2;
+				vertices[i++] = color.r;
+				vertices[i++] = color.g;
+				vertices[i++] = color.b;
+				vertices[i++] = color.a;
+				vertices[i++] = uvs[4];
+				vertices[i++] = uvs[5];
+				if (twoColorTint) {
+					vertices[i++] = dark.r;
+					vertices[i++] = dark.g;
+					vertices[i++] = dark.b;
+					vertices[i++] = 1;
+				}
+				i += 2;
+				vertices[i++] = color.r;
+				vertices[i++] = color.g;
+				vertices[i++] = color.b;
+				vertices[i++] = color.a;
+				vertices[i++] = uvs[6];
+				vertices[i++] = uvs[7];
+				if (twoColorTint) {
+					vertices[i++] = dark.r;
+					vertices[i++] = dark.g;
+					vertices[i++] = dark.b;
+					vertices[i++] = 1;
+				}
+				this.renderable.vertices = vertices;
+				this.renderable.numFloats = 4 * (twoColorTint ? 12 : 8);
+				return this.renderable;
 			};
-			SkeletonRenderer.prototype.computeMeshVertices = function (slot, mesh, pma) {
+			SkeletonRenderer.prototype.computeMeshVertices = function (slot, mesh, pma, twoColorTint) {
+				if (twoColorTint === void 0) { twoColorTint = false; }
 				var skeleton = slot.bone.skeleton;
 				var skeletonColor = skeleton.color;
 				var slotColor = slot.color;
@@ -8126,25 +8248,48 @@ var spine;
 				var multiplier = pma ? alpha : 1;
 				var color = this.tempColor;
 				color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier, skeletonColor.g * slotColor.g * regionColor.g * multiplier, skeletonColor.b * slotColor.b * regionColor.b * multiplier, alpha);
+				var dark = this.tempColor2;
+				if (slot.darkColor == null)
+					dark.set(0, 0, 0, 1);
+				else
+					dark.setFromColor(slot.darkColor);
 				var numVertices = mesh.worldVerticesLength / 2;
 				if (this.vertices.length < mesh.worldVerticesLength) {
 					this.vertices = spine.Utils.newFloatArray(mesh.worldVerticesLength);
 				}
 				var vertices = this.vertices;
-				mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
+				mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, this.vertexSize);
 				var uvs = mesh.uvs;
-				for (var i = 0, n = numVertices, u = 0, v = 2; i < n; i++) {
-					vertices[v++] = color.r;
-					vertices[v++] = color.g;
-					vertices[v++] = color.b;
-					vertices[v++] = color.a;
-					vertices[v++] = uvs[u++];
-					vertices[v++] = uvs[u++];
-					v += 2;
+				if (!twoColorTint) {
+					for (var i = 0, n = numVertices, u = 0, v = 2; i < n; i++) {
+						vertices[v++] = color.r;
+						vertices[v++] = color.g;
+						vertices[v++] = color.b;
+						vertices[v++] = color.a;
+						vertices[v++] = uvs[u++];
+						vertices[v++] = uvs[u++];
+						v += 2;
+					}
 				}
-				return vertices;
+				else {
+					for (var i = 0, n = numVertices, u = 0, v = 2; i < n; i++) {
+						vertices[v++] = color.r;
+						vertices[v++] = color.g;
+						vertices[v++] = color.b;
+						vertices[v++] = color.a;
+						vertices[v++] = uvs[u++];
+						vertices[v++] = uvs[u++];
+						vertices[v++] = dark.r;
+						vertices[v++] = dark.g;
+						vertices[v++] = dark.b;
+						vertices[v++] = 1;
+						v += 2;
+					}
+				}
+				this.renderable.vertices = vertices;
+				this.renderable.numFloats = numVertices * (twoColorTint ? 12 : 8);
+				return this.renderable;
 			};
-			SkeletonRenderer.VERTEX_SIZE = 2 + 2 + 4;
 			SkeletonRenderer.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 			return SkeletonRenderer;
 		}());

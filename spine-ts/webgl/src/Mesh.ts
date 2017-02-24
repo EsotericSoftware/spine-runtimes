@@ -59,6 +59,15 @@ module spine.webgl {
 		}
 		getIndices (): Uint16Array { return this.indices };
 
+		getVertexSizeInFloats (): number {
+			let size = 0;
+			for (var i = 0; i < this.attributes.length; i++) {
+				let attribute = this.attributes[i];
+				size += attribute.numElements;
+			}
+			return size;
+		}
+
 		constructor (gl: WebGLRenderingContext, private attributes: VertexAttribute[], maxVertices: number, maxIndices: number) {
 			this.gl = gl;
 			this.elementsPerVertex = 0;
@@ -128,7 +137,7 @@ module spine.webgl {
 					this.verticesBuffer = gl.createBuffer();
 				}
 				gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesBuffer);
-				gl.bufferData(gl.ARRAY_BUFFER, this.vertices.subarray(0, this.verticesLength), gl.STATIC_DRAW);
+				gl.bufferData(gl.ARRAY_BUFFER, this.vertices.subarray(0, this.verticesLength), gl.DYNAMIC_DRAW);
 				this.dirtyVertices = false;
 			}
 
@@ -137,7 +146,7 @@ module spine.webgl {
 					this.indicesBuffer = gl.createBuffer();
 				}
 				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
-				gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices.subarray(0, this.indicesLength), gl.STATIC_DRAW);
+				gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices.subarray(0, this.indicesLength), gl.DYNAMIC_DRAW);
 				this.dirtyIndices = false;
 			}
 		}
@@ -174,6 +183,12 @@ module spine.webgl {
 	export class ColorAttribute extends VertexAttribute {
 		constructor () {
 			super(Shader.COLOR, VertexAttributeType.Float, 4);
+		}
+	}
+
+	export class Color2Attribute extends VertexAttribute {
+		constructor () {
+			super(Shader.COLOR2, VertexAttributeType.Float, 4);
 		}
 	}
 

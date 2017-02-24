@@ -33,6 +33,7 @@ module spine.webgl {
 		public static MVP_MATRIX = "u_projTrans";
 		public static POSITION = "a_position";
 		public static COLOR = "a_color";
+		public static COLOR2 = "a_color2";
 		public static TEXCOORDS = "a_texCoords";
 		public static SAMPLER = "u_texture";
 
@@ -200,6 +201,48 @@ module spine.webgl {
 
 				void main () {
 					gl_FragColor = v_color * texture2D(u_texture, v_texCoords);
+				}
+			`;
+
+			return new Shader(gl, vs, fs);
+		}
+
+		public static newTwoColorTextured (gl: WebGLRenderingContext): Shader {
+			let vs = `
+				attribute vec4 ${Shader.POSITION};
+				attribute vec4 ${Shader.COLOR};
+				attribute vec4 ${Shader.COLOR2};
+				attribute vec2 ${Shader.TEXCOORDS};
+				uniform mat4 ${Shader.MVP_MATRIX};
+				varying vec4 v_light;
+				varying vec4 v_dark;
+				varying vec2 v_texCoords;
+
+				void main () {
+					v_light = ${Shader.COLOR};
+					v_dark = ${Shader.COLOR2};
+					v_texCoords = ${Shader.TEXCOORDS};
+					gl_Position = ${Shader.MVP_MATRIX} * ${Shader.POSITION};
+				}
+			`;
+
+			let fs = `
+				#ifdef GL_ES
+					#define LOWP lowp
+					precision mediump float;
+				#else
+					#define LOWP
+				#endif
+				varying LOWP vec4 v_light;
+				varying LOWP vec4 v_dark;
+				varying vec2 v_texCoords;
+				uniform sampler2D u_texture;
+
+				void main () {
+					vec4 texColor = texture2D(u_texture, v_texCoords);
+					float alpha = texColor.a * v_light.a;
+					gl_FragColor.a = alpha;
+					gl_FragColor.rgb = (1.0 - texColor.rgb) * v_dark.rgb * alpha + texColor.rgb * v_light.rgb;
 				}
 			`;
 

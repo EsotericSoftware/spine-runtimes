@@ -94,7 +94,10 @@ module spine {
 					if (color != null) data.color.setFromString(color);
 
 					let dark: string = this.getValue(slotMap, "dark", null);
-					if (dark != null) data.darkColor.setFromString(color);
+					if (dark != null) {
+						data.darkColor = new Color(1, 1, 1, 1);
+						data.darkColor.setFromString(dark);
+					}
 
 					data.attachmentName = this.getValue(slotMap, "attachment", null);
 					data.blendMode = SkeletonJson.blendModeFromString(this.getValue(slotMap, "blend", "normal"));
@@ -421,7 +424,7 @@ module spine {
 								let valueMap = timelineMap[i];
 								let light = new Color();
 								let dark = new Color();
-								light.setFromString(valueMap.color);
+								light.setFromString(valueMap.light);
 								dark.setFromString(valueMap.dark);
 								timeline.setFrame(frameIndex, valueMap.time, light.r, light.g, light.b, light.a, dark.r, dark.g, dark.b);
 								this.readCurve(valueMap, timeline, frameIndex);

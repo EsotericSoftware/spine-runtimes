@@ -50,7 +50,7 @@ module spine.webgl {
 		private gl: WebGLRenderingContext;
 		private bounds = new SkeletonBounds();
 		private temp = new Array<number>();
-		private vertices = Utils.newFloatArray(SkeletonRenderer.VERTEX_SIZE * 1024);
+		private vertices = Utils.newFloatArray(2 * 1024);
 		private static LIGHT_GRAY = new Color(192 / 255, 192 / 255, 192 / 255, 1);
 		private static GREEN = new Color(0, 1, 0, 1);
 

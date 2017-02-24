@@ -1,0 +1,66 @@
+{
+"skeleton": { "hash": "F1HM8+VG3WR6tPJTA5IpJM8nDs4", "spine": "3.6.05-beta", "width": 300.48, "height": 300.48 },
+"bones": [
+	{ "name": "root", "rotation": -0.09 },
+	{ "name": "singleColorTint", "parent": "root", "x": -400 },
+	{ "name": "twoColorTint", "parent": "root", "x": 800 },
+	{ "name": "twoColorTint (blackOnly)", "parent": "root" },
+	{ "name": "twoColorTint (colorOnly)", "parent": "root", "x": 400 }
+],
+"slots": [
+	{ "name": "squareWithBorder", "bone": "singleColorTint", "attachment": "squareWithBorder" },
+	{ "name": "squareWithBorder2", "bone": "twoColorTint (blackOnly)", "dark": "000000", "attachment": "squareWithBorder" },
+	{ "name": "squareWithBorder4", "bone": "twoColorTint (colorOnly)", "dark": "000000", "attachment": "squareWithBorder" },
+	{ "name": "squareWithBorder3", "bone": "twoColorTint", "dark": "000000", "attachment": "squareWithBorder" }
+],
+"skins": {
+	"default": {
+		"squareWithBorder": {
+			"squareWithBorder": { "width": 300, "height": 300 }
+		},
+		"squareWithBorder2": {
+			"squareWithBorder": { "width": 300, "height": 300 }
+		},
+		"squareWithBorder3": {
+			"squareWithBorder": { "width": 300, "height": 300 }
+		},
+		"squareWithBorder4": {
+			"squareWithBorder": { "width": 300, "height": 300 }
+		}
+	}
+},
+"animations": {
+	"animation": {
+		"slots": {
+			"squareWithBorder": {
+				"color": [
+					{ "time": 0, "color": "fffffffe" },
+					{ "time": 1, "color": "9e17b3fe" },
+					{ "time": 2, "color": "fffffffe" }
+				]
+			},
+			"squareWithBorder2": {
+				"twoColor": [
+					{ "time": 0, "light": "fffffffe", "dark": "000000" },
+					{ "time": 1, "light": "fffffffe", "dark": "ff0000" },
+					{ "time": 2, "light": "fffffffe", "dark": "000000" }
+				]
+			},
+			"squareWithBorder3": {
+				"twoColor": [
+					{ "time": 0, "light": "fffffffe", "dark": "000000" },
+					{ "time": 1, "light": "80ff00fe", "dark": "001cff" },
+					{ "time": 2, "light": "fffffffe", "dark": "000000" }
+				]
+			},
+			"squareWithBorder4": {
+				"twoColor": [
+					{ "time": 0, "light": "fffffffe", "dark": "000000" },
+					{ "time": 1, "light": "ffd300fe", "dark": "000000" },
+					{ "time": 2, "light": "fffffffe", "dark": "000000" }
+				]
+			}
+		}
+	}
+}
+}

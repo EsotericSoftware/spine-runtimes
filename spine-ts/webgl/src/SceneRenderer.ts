@@ -49,15 +49,15 @@ module spine.webgl {
 		private QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 		private WHITE = new Color(1, 1, 1, 1);
 
-		constructor (canvas: HTMLCanvasElement, gl: WebGLRenderingContext) {
+		constructor (canvas: HTMLCanvasElement, gl: WebGLRenderingContext, twoColorTint: boolean = true) {
 			this.canvas = canvas;
 			this.gl = gl;
 			this.camera = new OrthoCamera(canvas.width, canvas.height);
-			this.batcherShader = Shader.newColoredTextured(gl);
-			this.batcher = new PolygonBatcher(gl);
+			this.batcherShader = twoColorTint ? Shader.newTwoColorTextured(gl) : Shader.newColoredTextured(gl);
+			this.batcher = new PolygonBatcher(gl, twoColorTint);
 			this.shapesShader = Shader.newColored(gl);
-			this.shapes = new ShapeRenderer(gl); 
-			this.skeletonRenderer = new SkeletonRenderer(gl);
+			this.shapes = new ShapeRenderer(gl);
+			this.skeletonRenderer = new SkeletonRenderer(gl, twoColorTint);
 			this.skeletonDebugRenderer = new SkeletonDebugRenderer(gl);
 		}
 

@@ -296,4 +296,44 @@ module spine {
 		length: number;
 		[n: number]: T;
 	}
+
+	export class WindowedMean {
+		values: Array<number>;
+		addedValues = 0;
+		lastValue = 0;
+		mean = 0;
+		dirty = true;
+
+		constructor (windowSize: number = 32) {
+			this.values = new Array<number>(windowSize);
+		}
+
+		hasEnoughData () {
+			return this.addedValues >= this.values.length;
+		}
+
+		addValue (value: number) {
+			if (this.addedValues < this.values.length)
+				this.addedValues++;
+			this.values[this.lastValue++] = value;
+			if (this.lastValue > this.values.length - 1) this.lastValue = 0;
+			this.dirty = true;
+		}
+
+		getMean () {
+			if (this.hasEnoughData()) {
+				if (this.dirty) {
+					let mean = 0;
+					for (let i = 0; i < this.values.length; i++) {
+						mean += this.values[i];
+					}
+					this.mean = mean / this.values.length;
+					this.dirty = false;
+				}
+				return this.mean;
+			} else {
+				return 0;
+			}
+		}
+	}
 }

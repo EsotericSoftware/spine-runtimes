@@ -29,24 +29,35 @@
  *****************************************************************************/
 
 module spine.webgl {
+	class Renderable {
+		constructor(public vertices: ArrayLike<number>, public numFloats: number) {}
+	};
+
 	export class SkeletonRenderer {
-		static VERTEX_SIZE = 2 + 2 + 4;
 		static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 
 		premultipliedAlpha = false;
 		private gl: WebGLRenderingContext;
 		private tempColor = new Color();
-		private vertices = Utils.newFloatArray(SkeletonRenderer.VERTEX_SIZE * 1024);
+		private tempColor2 = new Color();
+		private vertices:ArrayLike<number>;
+		private vertexSize = 2 + 2 + 4;
+		private twoColorTint = false;
+		private renderable: Renderable = new Renderable(null, 0);
 
-		constructor (gl: WebGLRenderingContext) {
+		constructor (gl: WebGLRenderingContext, twoColorTint: boolean = true) {
 			this.gl = gl;
+			this.twoColorTint = twoColorTint;
+			if (twoColorTint)
+				this.vertexSize += 4;
+			this.vertices = Utils.newFloatArray(this.vertexSize * 1024);
 		}
 
 		draw (batcher: PolygonBatcher, skeleton: Skeleton) {
 			let premultipliedAlpha = this.premultipliedAlpha;
 			let blendMode: BlendMode = null;
 
-			let vertices: ArrayLike<number> = null;
+			let vertices: Renderable = null;
 			let triangles: Array<number> = null;
 			let drawOrder = skeleton.drawOrder;
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
@@ -55,13 +66,13 @@ module spine.webgl {
 				let texture: GLTexture = null;
 				if (attachment instanceof RegionAttachment) {
 					let region = <RegionAttachment>attachment;
-					vertices = this.computeRegionVertices(slot, region, premultipliedAlpha);
+					vertices = this.computeRegionVertices(slot, region, premultipliedAlpha, this.twoColorTint);
 					triangles = SkeletonRenderer.QUAD_TRIANGLES;
 					texture = <GLTexture>(<TextureAtlasRegion>region.region.renderObject).texture;
 
 				} else if (attachment instanceof MeshAttachment) {
 					let mesh = <MeshAttachment>attachment;
-					vertices = this.computeMeshVertices(slot, mesh, premultipliedAlpha);
+					vertices = this.computeMeshVertices(slot, mesh, premultipliedAlpha, this.twoColorTint);
 					triangles = mesh.triangles;
 					texture = <GLTexture>(<TextureAtlasRegion>mesh.region.renderObject).texture;
 				} else continue;
@@ -72,12 +83,14 @@ module spine.webgl {
 						blendMode = slotBlendMode;
 						batcher.setBlendMode(getSourceGLBlendMode(this.gl, blendMode, premultipliedAlpha), getDestGLBlendMode(this.gl, blendMode));
 					}
-					batcher.draw(texture, vertices, triangles);
+
+					let view = (vertices.vertices as Float32Array).subarray(0, vertices.numFloats);
+					batcher.draw(texture, view, triangles);
 				}
 			}
 		}
 
-		computeRegionVertices(slot: Slot, region: RegionAttachment, pma: boolean) {
+		private computeRegionVertices(slot: Slot, region: RegionAttachment, pma: boolean, twoColorTint: boolean = false) {
 			let skeleton = slot.bone.skeleton;
 			let skeletonColor = skeleton.color;
 			let slotColor = slot.color;
@@ -89,44 +102,77 @@ module spine.webgl {
 					  skeletonColor.g * slotColor.g * regionColor.g * multiplier,
 					  skeletonColor.b * slotColor.b * regionColor.b * multiplier,
 					  alpha);
+			let dark = this.tempColor2;
+			if (slot.darkColor == null) dark.set(0, 0, 0, 1);
+			else dark.setFromColor(slot.darkColor);
 
-			region.computeWorldVertices(slot.bone, this.vertices, 0, SkeletonRenderer.VERTEX_SIZE);
+			region.computeWorldVertices(slot.bone, this.vertices, 0, this.vertexSize);
 
 			let vertices = this.vertices;
 			let uvs = region.uvs;
 
-			vertices[RegionAttachment.C1R] = color.r;
-			vertices[RegionAttachment.C1G] = color.g;
-			vertices[RegionAttachment.C1B] = color.b;
-			vertices[RegionAttachment.C1A] = color.a;
-			vertices[RegionAttachment.U1] = uvs[0];
-			vertices[RegionAttachment.V1] = uvs[1];
+			let i = 2;
+			vertices[i++] = color.r;
+			vertices[i++] = color.g;
+			vertices[i++] = color.b;
+			vertices[i++] = color.a;
+			vertices[i++] = uvs[0];
+			vertices[i++] = uvs[1];
+			if (twoColorTint) {
+				vertices[i++] = dark.r;
+				vertices[i++] = dark.g;
+				vertices[i++] = dark.b;
+				vertices[i++] = 1;
+			}
+			i+=2;
 
-			vertices[RegionAttachment.C2R] = color.r;
-			vertices[RegionAttachment.C2G] = color.g;
-			vertices[RegionAttachment.C2B] = color.b;
-			vertices[RegionAttachment.C2A] = color.a;
-			vertices[RegionAttachment.U2] = uvs[2];
-			vertices[RegionAttachment.V2] = uvs[3];
+			vertices[i++] = color.r;
+			vertices[i++] = color.g;
+			vertices[i++] = color.b;
+			vertices[i++] = color.a;
+			vertices[i++] = uvs[2];
+			vertices[i++] = uvs[3];
+			if (twoColorTint) {
+				vertices[i++] = dark.r;
+				vertices[i++] = dark.g;
+				vertices[i++] = dark.b;
+				vertices[i++] = 1;
+			}
+			i+=2;
 
-			vertices[RegionAttachment.C3R] = color.r;
-			vertices[RegionAttachment.C3G] = color.g;
-			vertices[RegionAttachment.C3B] = color.b;
-			vertices[RegionAttachment.C3A] = color.a;
-			vertices[RegionAttachment.U3] = uvs[4];
-			vertices[RegionAttachment.V3] = uvs[5];
+			vertices[i++] = color.r;
+			vertices[i++] = color.g;
+			vertices[i++] = color.b;
+			vertices[i++] = color.a;
+			vertices[i++] = uvs[4];
+			vertices[i++] = uvs[5];
+			if (twoColorTint) {
+				vertices[i++] = dark.r;
+				vertices[i++] = dark.g;
+				vertices[i++] = dark.b;
+				vertices[i++] = 1;
+			}
+			i+=2;
 
-			vertices[RegionAttachment.C4R] = color.r;
-			vertices[RegionAttachment.C4G] = color.g;
-			vertices[RegionAttachment.C4B] = color.b;
-			vertices[RegionAttachment.C4A] = color.a;
-			vertices[RegionAttachment.U4] = uvs[6];
-			vertices[RegionAttachment.V4] = uvs[7];
+			vertices[i++] = color.r;
+			vertices[i++] = color.g;
+			vertices[i++] = color.b;
+			vertices[i++] = color.a;
+			vertices[i++] = uvs[6];
+			vertices[i++] = uvs[7];
+			if (twoColorTint) {
+				vertices[i++] = dark.r;
+				vertices[i++] = dark.g;
+				vertices[i++] = dark.b;
+				vertices[i++] = 1;
+			}
 
-			return vertices;
+			this.renderable.vertices = vertices;
+			this.renderable.numFloats = 4 * (twoColorTint ? 12 :  8);
+			return this.renderable;
 		}
 
-		computeMeshVertices(slot: Slot, mesh: MeshAttachment, pma: boolean) {
+		private computeMeshVertices(slot: Slot, mesh: MeshAttachment, pma: boolean, twoColorTint: boolean = false) {
 			let skeleton = slot.bone.skeleton;
 			let skeletonColor = skeleton.color;
 			let slotColor = slot.color;
@@ -138,26 +184,47 @@ module spine.webgl {
 					  skeletonColor.g * slotColor.g * regionColor.g * multiplier,
 					  skeletonColor.b * slotColor.b * regionColor.b * multiplier,
 					  alpha);
+			let dark = this.tempColor2;
+			if (slot.darkColor == null) dark.set(0, 0, 0, 1);
+			else dark.setFromColor(slot.darkColor);
 
 			let numVertices = mesh.worldVerticesLength / 2;
 			if (this.vertices.length < mesh.worldVerticesLength) {
 				this.vertices = Utils.newFloatArray(mesh.worldVerticesLength);
 			}
 			let vertices = this.vertices;
-			mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
+			mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, this.vertexSize);
 
 			let uvs = mesh.uvs;
-			for (let i = 0, n = numVertices, u = 0, v = 2; i < n; i++) {
-				vertices[v++] = color.r;
-				vertices[v++] = color.g;
-				vertices[v++] = color.b;
-				vertices[v++] = color.a;
-				vertices[v++] = uvs[u++];
-				vertices[v++] = uvs[u++];
-				v += 2;
+			if (!twoColorTint) {
+				for (let i = 0, n = numVertices, u = 0, v = 2; i < n; i++) {
+					vertices[v++] = color.r;
+					vertices[v++] = color.g;
+					vertices[v++] = color.b;
+					vertices[v++] = color.a;
+					vertices[v++] = uvs[u++];
+					vertices[v++] = uvs[u++];
+					v += 2;
+				}
+			} else {
+				for (let i = 0, n = numVertices, u = 0, v = 2; i < n; i++) {
+					vertices[v++] = color.r;
+					vertices[v++] = color.g;
+					vertices[v++] = color.b;
+					vertices[v++] = color.a;
+					vertices[v++] = uvs[u++];
+					vertices[v++] = uvs[u++];
+					vertices[v++] = dark.r;
+					vertices[v++] = dark.g;
+					vertices[v++] = dark.b;
+					vertices[v++] = 1;
+					v += 2;
+				}
 			}
 
-			return vertices;
+			this.renderable.vertices = vertices;
+			this.renderable.numFloats = numVertices * (twoColorTint ? 12 :  8);
+			return this.renderable;
 		}
 	}
 }

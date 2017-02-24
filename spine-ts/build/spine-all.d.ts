@@ -1122,6 +1122,17 @@ declare module spine {
 		length: number;
 		[n: number]: T;
 	}
+	class WindowedMean {
+		values: Array<number>;
+		addedValues: number;
+		lastValue: number;
+		mean: number;
+		dirty: boolean;
+		constructor(windowSize?: number);
+		hasEnoughData(): boolean;
+		addValue(value: number): void;
+		getMean(): number;
+	}
 }
 declare module spine.threejs {
 	class AssetManager extends spine.AssetManager {
@@ -1322,6 +1333,7 @@ declare module spine.webgl {
 		numIndices(): number;
 		setIndicesLength(length: number): void;
 		getIndices(): Uint16Array;
+		getVertexSizeInFloats(): number;
 		constructor(gl: WebGLRenderingContext, attributes: VertexAttribute[], maxVertices: number, maxIndices: number);
 		setVertices(vertices: Array<number>): void;
 		setIndices(indices: Array<number>): void;
@@ -1350,6 +1362,9 @@ declare module spine.webgl {
 	class ColorAttribute extends VertexAttribute {
 		constructor();
 	}
+	class Color2Attribute extends VertexAttribute {
+		constructor();
+	}
 	enum VertexAttributeType {
 		Float = 0,
 	}
@@ -1366,7 +1381,7 @@ declare module spine.webgl {
 		private indicesLength;
 		private srcBlend;
 		private dstBlend;
-		constructor(gl: WebGLRenderingContext, maxVertices?: number);
+		constructor(gl: WebGLRenderingContext, twoColorTint?: boolean, maxVertices?: number);
 		begin(shader: Shader): void;
 		setBlendMode(srcBlend: number, dstBlend: number): void;
 		draw(texture: GLTexture, vertices: ArrayLike<number>, indices: Array<number>): void;
@@ -1391,7 +1406,7 @@ declare module spine.webgl {
 		private QUAD;
 		private QUAD_TRIANGLES;
 		private WHITE;
-		constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext);
+		constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext, twoColorTint?: boolean);
 		begin(): void;
 		drawSkeleton(skeleton: Skeleton, premultipliedAlpha?: boolean): void;
 		drawSkeletonDebug(skeleton: Skeleton, premultipliedAlpha?: boolean, ignoredBones?: Array<string>): void;
@@ -1424,6 +1439,7 @@ declare module spine.webgl {
 		static MVP_MATRIX: string;
 		static POSITION: string;
 		static COLOR: string;
+		static COLOR2: string;
 		static TEXCOORDS: string;
 		static SAMPLER: string;
 		private gl;
@@ -1454,6 +1470,7 @@ declare module spine.webgl {
 		getAttributeLocation(attribute: string): number;
 		dispose(): void;
 		static newColoredTextured(gl: WebGLRenderingContext): Shader;
+		static newTwoColorTextured(gl: WebGLRenderingContext): Shader;
 		static newColored(gl: WebGLRenderingContext): Shader;
 	}
 }
@@ -1527,16 +1544,19 @@ declare module spine.webgl {
 }
 declare module spine.webgl {
 	class SkeletonRenderer {
-		static VERTEX_SIZE: number;
 		static QUAD_TRIANGLES: number[];
 		premultipliedAlpha: boolean;
 		private gl;
 		private tempColor;
+		private tempColor2;
 		private vertices;
-		constructor(gl: WebGLRenderingContext);
+		private vertexSize;
+		private twoColorTint;
+		private renderable;
+		constructor(gl: WebGLRenderingContext, twoColorTint?: boolean);
 		draw(batcher: PolygonBatcher, skeleton: Skeleton): void;
-		computeRegionVertices(slot: Slot, region: RegionAttachment, pma: boolean): ArrayLike<number>;
-		computeMeshVertices(slot: Slot, mesh: MeshAttachment, pma: boolean): ArrayLike<number>;
+		private computeRegionVertices(slot, region, pma, twoColorTint?);
+		private computeMeshVertices(slot, mesh, pma, twoColorTint?);
 	}
 }
 declare module spine.webgl {

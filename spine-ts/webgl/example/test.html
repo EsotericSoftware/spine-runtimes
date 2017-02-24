@@ -7,13 +7,17 @@
 	canvas { position: absolute; width: 100% ;height: 100%; }
 </style>
 <body>
+<div id="label" style="position: absolute; top: 0; left: 0; color: #fff; z-index: 10"></div>
 <canvas id="canvas"></canvas>
 </body>
 <script>
 
 var canvas, gl, renderer, input, assetManager;
-var skeleton, bounds, state;
+var skeletons = [];
 var timeKeeper;
+var label = document.getElementById("label");
+var updateMean = new spine.WindowedMean();
+var renderMean = new spine.WindowedMean();
 
 function init() {
 	canvas = document.getElementById("canvas");
@@ -24,9 +28,9 @@ function init() {
 	assetManager = new spine.webgl.AssetManager(gl, "assets/");
 	var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
 	input = new spine.webgl.Input(canvas);
-	assetManager.loadTexture("raptor.png");
-	assetManager.loadText("raptor.atlas");
-	assetManager.loadText("raptor.json");
+	assetManager.loadTexture("spineboy.png");
+	assetManager.loadText("spineboy.atlas");
+	assetManager.loadText("spineboy.json");
 	timeKeeper = new spine.TimeKeeper();
 	requestAnimationFrame(load);
 }
@@ -34,21 +38,25 @@ function init() {
 function load() {
 	timeKeeper.update();
 	if (assetManager.isLoadingComplete()) {
-		var atlas = new spine.TextureAtlas(assetManager.get("raptor.atlas"), function(path) {
+		var atlas = new spine.TextureAtlas(assetManager.get("spineboy.atlas"), function(path) {
 			return assetManager.get(path);
 		});
 		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
-		skeletonJson.scale = 0.5;
-		var skeletonData = skeletonJson.readSkeletonData(JSON.parse(assetManager.get("raptor.json")));
-		skeleton = new spine.Skeleton(skeletonData);
-		var stateData = new spine.AnimationStateData(skeleton.data);
-		state = new spine.AnimationState(stateData);
-		stateData.setMix("walk", "Jump", 0.5);
-		state.setAnimation(0, "walk", false);
-		state.addAnimation(0, "Jump", false, 0);
-		state.apply(skeleton);
-		skeleton.updateWorldTransform();
+		skeletonJson.scale = 0.01;
+		var skeletonData = skeletonJson.readSkeletonData(JSON.parse(assetManager.get("spineboy.json")));
+
+		for (var i = 0; i < 1000; i++) {
+			skeleton = new spine.Skeleton(skeletonData);
+			var stateData = new spine.AnimationStateData(skeleton.data);
+			state = new spine.AnimationState(stateData);
+			state.setAnimation(0, "walk", true);
+			state.apply(skeleton);
+			skeleton.x = Math.random() * 200 - Math.random() * 200;
+			skeleton.y = Math.random() * 200 - Math.random() * 200;
+			skeleton.updateWorldTransform();
+			skeletons.push({ skeleton: skeleton, state: state });
+		}
 
 		requestAnimationFrame(render);
 	} else {
@@ -57,23 +65,36 @@ function load() {
 }
 
 function render() {
+	var start = Date.now()
 	timeKeeper.update();
 	var delta = timeKeeper.delta;
 	delta = 0.016;
 
-	state.update(delta);
-	state.apply(skeleton);
-	skeleton.updateWorldTransform();
+	for (var i = 0; i < skeletons.length; i++) {
+		var state = skeletons[i].state;
+		var skeleton = skeletons[i].skeleton;
+		state.update(delta);
+		state.apply(skeleton);
+		skeleton.updateWorldTransform();
+	}
+	updateMean.addValue(Date.now() - start);
+	start = Date.now();
 
 	gl.clearColor(0, 0, 0, 1);
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
 	renderer.resize(spine.webgl.ResizeMode.Fit);
 	renderer.begin();
-	renderer.drawSkeleton(skeleton);
+	for (var i = 0; i < skeletons.length; i++) {
+		var skeleton = skeletons[i].skeleton;
+		renderer.drawSkeleton(skeleton);
+	}
 	renderer.end();
 
 	requestAnimationFrame(render)
+	renderMean.addValue(Date.now() - start);
+	label.innerHTML = ("Update time: " + Number(updateMean.getMean()).toFixed(2) + " ms\n" +
+					   "Render time: " + Number(renderMean.getMean()).toFixed(2) + " ms\n");
 }
 
 init();
