@@ -53,7 +53,7 @@ module spine.webgl {
 			this.canvas = canvas;
 			this.gl = gl;
 			this.camera = new OrthoCamera(canvas.width, canvas.height);
-			this.batcherShader = twoColorTint ? Shader.newTwoColorTextured(gl) : Shader.newColoredTextured(gl);
+			this.batcherShader = twoColorTint ? Shader.newTwoColoredTextured(gl) : Shader.newColoredTextured(gl);
 			this.batcher = new PolygonBatcher(gl, twoColorTint);
 			this.shapesShader = Shader.newColored(gl);
 			this.shapes = new ShapeRenderer(gl);

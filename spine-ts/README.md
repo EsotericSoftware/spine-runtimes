@@ -18,9 +18,13 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-ts works with data exported from Spine 3.5.xx.
+spine-ts works with data exported from Spine 3.6.xx
 
-spine-ts WebGL & Widget backends supports all Spine features. The spine-ts Canvas backend does not support color tinting, mesh attachments or shearing. Mesh attachments are supported by setting `spine.canvas.SkeletonRenderer.useTriangleRendering` to true. Note that this method is slow and may lead to artifacts on some browsers. The spine-ts THREE.JS backend does not support color tinting and blend modes. The THREE.JS backend provides `SkeletonMesh.zOffset` to avoid z-fighting. Adjust to your near/far plane settings.
+spine-ts WebGL & Widget backends supports all Spine features. 
+
+The spine-ts Canvas backend does not support color tinting, mesh attachments or shearing. Mesh attachments are supported by setting `spine.canvas.SkeletonRenderer.useTriangleRendering` to true. Note that this method is slow and may lead to artifacts on some browsers. 
+
+The spine-ts THREE.JS backend does not support color tinting and blend modes. The THREE.JS backend provides `SkeletonMesh.zOffset` to avoid z-fighting. Adjust to your near/far plane settings.
 
 spine-ts does not yet support loading the binary format.
 
@@ -88,6 +92,24 @@ python -m SimpleHTTPServer
 ```
 
 Then navigate to `http://localhost:8000/webgl/example`, `http://localhost:8000/canvas/example`, `http://localhost:8000/threejs/example` or `http://localhost:8000/widget/example`
+
+### Spine-ts WebGL backend
+By default, the spine-ts WebGL backend supports two-color tinting. This has a neglible effect on performance, as more per vertex data has to be submitted to the GPU, and the fragment shader has to do a few more arithmetic operations.
+
+You can disable two-color tinting like this:
+
+```javascript
+// If you use SceneRenderer, disable two-color tinting via the last constructor argument
+var sceneRenderer = new spine.SceneRenderer(canvas, gl, false);
+
+// If you use SkeletonRenderer and PolygonBatcher directly, 
+// disable two-color tinting in the respective constructor
+// and use the shader returned by Shader.newColoredTextured()
+// instead of Shader.newTwoColoredTextured()
+var batcher = new spine.PolygonBatcher(gl, false);
+var skeletonRenderer = new spine.SkeletonRenderer(gl, false);
+var shader = Shader.newColoredTextured();
+```
 
 ### Using the Widget
 To easily display Spine animations on your website, you can use the spine-ts Widget backend.

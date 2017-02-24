@@ -1470,7 +1470,7 @@ declare module spine.webgl {
 		getAttributeLocation(attribute: string): number;
 		dispose(): void;
 		static newColoredTextured(gl: WebGLRenderingContext): Shader;
-		static newTwoColorTextured(gl: WebGLRenderingContext): Shader;
+		static newTwoColoredTextured(gl: WebGLRenderingContext): Shader;
 		static newColored(gl: WebGLRenderingContext): Shader;
 	}
 }

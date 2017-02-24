@@ -6617,7 +6617,7 @@ var spine;
 				this.canvas = canvas;
 				this.gl = gl;
 				this.camera = new webgl.OrthoCamera(canvas.width, canvas.height);
-				this.batcherShader = twoColorTint ? webgl.Shader.newTwoColorTextured(gl) : webgl.Shader.newColoredTextured(gl);
+				this.batcherShader = twoColorTint ? webgl.Shader.newTwoColoredTextured(gl) : webgl.Shader.newColoredTextured(gl);
 				this.batcher = new webgl.PolygonBatcher(gl, twoColorTint);
 				this.shapesShader = webgl.Shader.newColored(gl);
 				this.shapes = new webgl.ShapeRenderer(gl);
@@ -7059,7 +7059,7 @@ var spine;
 				var fs = "\n\t\t\t\t#ifdef GL_ES\n\t\t\t\t\t#define LOWP lowp\n\t\t\t\t\tprecision mediump float;\n\t\t\t\t#else\n\t\t\t\t\t#define LOWP\n\t\t\t\t#endif\n\t\t\t\tvarying LOWP vec4 v_color;\n\t\t\t\tvarying vec2 v_texCoords;\n\t\t\t\tuniform sampler2D u_texture;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tgl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n\t\t\t\t}\n\t\t\t";
 				return new Shader(gl, vs, fs);
 			};
-			Shader.newTwoColorTextured = function (gl) {
+			Shader.newTwoColoredTextured = function (gl) {
 				var vs = "\n\t\t\t\tattribute vec4 " + Shader.POSITION + ";\n\t\t\t\tattribute vec4 " + Shader.COLOR + ";\n\t\t\t\tattribute vec4 " + Shader.COLOR2 + ";\n\t\t\t\tattribute vec2 " + Shader.TEXCOORDS + ";\n\t\t\t\tuniform mat4 " + Shader.MVP_MATRIX + ";\n\t\t\t\tvarying vec4 v_light;\n\t\t\t\tvarying vec4 v_dark;\n\t\t\t\tvarying vec2 v_texCoords;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tv_light = " + Shader.COLOR + ";\n\t\t\t\t\tv_dark = " + Shader.COLOR2 + ";\n\t\t\t\t\tv_texCoords = " + Shader.TEXCOORDS + ";\n\t\t\t\t\tgl_Position = " + Shader.MVP_MATRIX + " * " + Shader.POSITION + ";\n\t\t\t\t}\n\t\t\t";
 				var fs = "\n\t\t\t\t#ifdef GL_ES\n\t\t\t\t\t#define LOWP lowp\n\t\t\t\t\tprecision mediump float;\n\t\t\t\t#else\n\t\t\t\t\t#define LOWP\n\t\t\t\t#endif\n\t\t\t\tvarying LOWP vec4 v_light;\n\t\t\t\tvarying LOWP vec4 v_dark;\n\t\t\t\tvarying vec2 v_texCoords;\n\t\t\t\tuniform sampler2D u_texture;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tvec4 texColor = texture2D(u_texture, v_texCoords);\n\t\t\t\t\tfloat alpha = texColor.a * v_light.a;\n\t\t\t\t\tgl_FragColor.a = alpha;\n\t\t\t\t\tgl_FragColor.rgb = (1.0 - texColor.rgb) * v_dark.rgb * alpha + texColor.rgb * v_light.rgb;\n\t\t\t\t}\n\t\t\t";
 				return new Shader(gl, vs, fs);

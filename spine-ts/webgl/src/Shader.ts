@@ -207,7 +207,7 @@ module spine.webgl {
 			return new Shader(gl, vs, fs);
 		}
 
-		public static newTwoColorTextured (gl: WebGLRenderingContext): Shader {
+		public static newTwoColoredTextured (gl: WebGLRenderingContext): Shader {
 			let vs = `
 				attribute vec4 ${Shader.POSITION};
 				attribute vec4 ${Shader.COLOR};
