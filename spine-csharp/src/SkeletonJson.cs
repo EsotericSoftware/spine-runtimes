@@ -480,9 +480,9 @@ namespace Spine {
 							timeline.slotIndex = slotIndex;
 
 							int frameIndex = 0;
-							foreach (Dictionary<String, Object> valueMap in values) {
+							foreach (Dictionary<string, Object> valueMap in values) {
 								float time = (float)valueMap["time"];
-								String c = (String)valueMap["color"];
+								string c = (string)valueMap["color"];
 								timeline.SetFrame(frameIndex, time, ToColor(c, 0), ToColor(c, 1), ToColor(c, 2), ToColor(c, 3));
 								ReadCurve(valueMap, timeline, frameIndex);
 								frameIndex++;
@@ -495,17 +495,17 @@ namespace Spine {
 							timeline.slotIndex = slotIndex;
 
 							int frameIndex = 0;
-							foreach (Dictionary<String, Object> valueMap in values) {
+							foreach (Dictionary<string, Object> valueMap in values) {
 								float time = (float)valueMap["time"];
-								String c = (String)valueMap["light"];
-								String c2 = (String)valueMap["dark"];
-								timeline.SetFrame(frameIndex, time, ToColor(c, 0), ToColor(c, 1), ToColor(c, 2), ToColor(c, 3),
-									ToColor(c2, 0), ToColor(c2, 1), ToColor(c2, 2));
+								string light = (string)valueMap["light"];
+								string dark = (string)valueMap["dark"];
+								timeline.SetFrame(frameIndex, time, ToColor(light, 0), ToColor(light, 1), ToColor(light, 2), ToColor(light, 3),
+									ToColor(dark, 0), ToColor(dark, 1), ToColor(dark, 2));
 								ReadCurve(valueMap, timeline, frameIndex);
 								frameIndex++;
 							}
 							timelines.Add(timeline);
-							duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * ColorTimeline.ENTRIES]);
+							duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * TwoColorTimeline.ENTRIES]);
 
 						} else
 							throw new Exception("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");

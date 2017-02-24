@@ -37,7 +37,7 @@ namespace Spine {
 	/// <a href="http://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide.</para>
 	/// </summary>
 	public class Skin {
-		internal String name;
+		internal string name;
 		private Dictionary<AttachmentKeyTuple, Attachment> attachments =
 			new Dictionary<AttachmentKeyTuple, Attachment>(AttachmentKeyTupleComparer.Instance);
 
@@ -49,11 +49,13 @@ namespace Spine {
 			this.name = name;
 		}
 
+		/// <summary>Adds an attachment to the skin for the specified slot index and name.</summary>
 		public void AddAttachment (int slotIndex, string name, Attachment attachment) {
 			if (attachment == null) throw new ArgumentNullException("attachment", "attachment cannot be null.");
 			attachments[new AttachmentKeyTuple(slotIndex, name)] = attachment;
 		}
 
+		/// <summary>Returns the attachment for the specified slot index and name, or null.</summary>
 		/// <returns>May be null.</returns>
 		public Attachment GetAttachment (int slotIndex, string name) {
 			Attachment attachment;
@@ -79,7 +81,7 @@ namespace Spine {
 				if (entry.Key.slotIndex == slotIndex) attachments.Add(entry.Value);
 		}
 
-		override public String ToString () {
+		override public string ToString () {
 			return name;
 		}
 
