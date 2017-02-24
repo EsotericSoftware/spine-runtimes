@@ -579,7 +579,7 @@ public class Bone implements Updatable {
 		return atan2(cos * c + sin * d, cos * a + sin * b) * radDeg;
 	}
 
-	/** Rotates the world transform the specified amount and sets {@link #isAppliedValid()} to false.
+	/** Rotates the world transform the specified amount and sets {@link #appliedValid()} to false.
 	 * {@link #updateWorldTransform()} will need to be called on any child bones, recursively, and any constraints reapplied. */
 	public void rotateWorld (float degrees) {
 		float cos = cosDeg(degrees), sin = sinDeg(degrees);
