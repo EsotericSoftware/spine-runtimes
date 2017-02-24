@@ -67,7 +67,7 @@ namespace Spine {
 			this.boneData = boneData;
 		}
 
-		override public String ToString () {
+		override public string ToString () {
 			return name;
 		}
 	}

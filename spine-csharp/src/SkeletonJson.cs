@@ -157,9 +157,9 @@ namespace Spine {
 						
 					data.attachmentName = GetString(slotMap, "attachment", null);
 					if (slotMap.ContainsKey("blend"))
-						data.blendMode = (BlendMode)Enum.Parse(typeof(BlendMode), (String)slotMap["blend"], false);
+						data.blendMode = (BlendMode)Enum.Parse(typeof(BlendMode), (String)slotMap["blend"], true);
 					else
-						data.blendMode = BlendMode.normal;
+						data.blendMode = BlendMode.Normal;
 					skeletonData.slots.Add(data);
 				}
 			}

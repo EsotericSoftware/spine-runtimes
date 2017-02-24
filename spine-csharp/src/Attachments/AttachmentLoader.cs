@@ -28,15 +28,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using System;
-
 namespace Spine {
 	public interface AttachmentLoader {
 		/// <return>May be null to not load any attachment.</return>
-		RegionAttachment NewRegionAttachment (Skin skin, String name, string path);
+		RegionAttachment NewRegionAttachment (Skin skin, string name, string path);
 
 		/// <return>May be null to not load any attachment.</return>
-		MeshAttachment NewMeshAttachment (Skin skin, String name, string path);
+		MeshAttachment NewMeshAttachment (Skin skin, string name, string path);
 
 		/// <return>May be null to not load any attachment.</return>
 		BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string name);

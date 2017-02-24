@@ -31,20 +31,22 @@
 using System;
 
 namespace Spine {
+	/// <summary>Stores the setup pose values for an Event.</summary>
 	public class EventData {
-		internal String name;
+		internal string name;
 
-		public String Name { get { return name; } }
+		/// <summary>The name of the event, which is unique within the skeleton.</summary>
+		public string Name { get { return name; } }
 		public int Int { get; set; }
 		public float Float { get; set; }
-		public String String { get; set; }
+		public string String { get; set; }
 
-		public EventData (String name) {
+		public EventData (string name) {
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
 			this.name = name;
 		}
 
-		override public String ToString () {
+		override public string ToString () {
 			return Name;
 		}
 	}

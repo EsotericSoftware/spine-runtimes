@@ -29,7 +29,6 @@
  *****************************************************************************/
 
 using System;
-using System.Collections.Generic;
 
 namespace Spine {
 	/// <summary>>An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's vertices.</summary> 
@@ -57,7 +56,7 @@ namespace Spine {
 		/// <param name="offset">The <paramref name="worldVertices"/> index to begin writing values.</param>
 		/// <param name="stride">The number of <paramref name="worldVertices"/> entries between the value pairs written.</param>
 		public void ComputeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset, int stride = 2) {
-			count += offset;
+			count = offset + (count >> 1) * stride;
 			Skeleton skeleton = slot.Skeleton;
 			var deformArray = slot.attachmentVertices;
 			float[] vertices = this.vertices;
@@ -80,7 +79,7 @@ namespace Spine {
 				v += n + 1;
 				skip += n;
 			}
-			Bone[] skeletonBones = skeleton.Bones.Items;
+			var skeletonBones = skeleton.bones.Items;
 			if (deformArray.Count == 0) {
 				for (int w = offset, b = skip * 3; w < count; w += stride) {
 					float wx = 0, wy = 0;

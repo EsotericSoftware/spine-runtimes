@@ -58,11 +58,12 @@ namespace Spine {
 			target = skeleton.FindBone(data.target.name);
 		}
 
-		public void Update () {
-			Apply();
+		/// <summary>Applies the constraint to the constrained bones.</summary>
+		public void Apply () {
+			Update();
 		}
 
-		public void Apply () {
+		public void Update () {
 			Bone target = this.target;
 			ExposedList<Bone> bones = this.bones;
 			switch (bones.Count) {
@@ -75,7 +76,7 @@ namespace Spine {
 			}
 		}
 
-		override public String ToString () {
+		override public string ToString () {
 			return data.name;
 		}
 

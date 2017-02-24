@@ -116,10 +116,12 @@ namespace Spine {
 
 				if (scaleMix > 0) {
 					float s = (float)Math.Sqrt(bone.a * bone.a + bone.c * bone.c);
+					//float ts = (float)Math.sqrt(ta * ta + tc * tc);
 					if (s > 0.00001f) s = (s + ((float)Math.Sqrt(ta * ta + tc * tc) - s + data.offsetScaleX) * scaleMix) / s;
 					bone.a *= s;
 					bone.c *= s;
 					s = (float)Math.Sqrt(bone.b * bone.b + bone.d * bone.d);
+					//ts = (float)Math.Sqrt(tb * tb + td * td);
 					if (s > 0.00001f) s = (s + ((float)Math.Sqrt(tb * tb + td * td) - s + data.offsetScaleY) * scaleMix) / s;
 					bone.b *= s;
 					bone.d *= s;
@@ -209,9 +211,9 @@ namespace Spine {
 			float rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
 			Bone target = this.target;
 			if (!target.appliedValid) target.UpdateAppliedTransform();
-			var bones = this.bones;
-			for (int i = 0, n = bones.Count; i < n; i++) {
-				Bone bone = bones.Items[i];
+			var bonesItems = this.bones.Items;
+			for (int i = 0, n = this.bones.Count; i < n; i++) {
+				Bone bone = bonesItems[i];
 				if (!bone.appliedValid) bone.UpdateAppliedTransform();
 
 				float rotation = bone.arotation;
@@ -248,9 +250,9 @@ namespace Spine {
 			float rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
 			Bone target = this.target;
 			if (!target.appliedValid) target.UpdateAppliedTransform();
-			var bones = this.bones;
-			for (int i = 0, n = bones.Count; i < n; i++) {
-				Bone bone = bones.Items[i];
+			var bonesItems = this.bones.Items;
+			for (int i = 0, n = this.bones.Count; i < n; i++) {
+				Bone bone = bonesItems[i];
 				if (!bone.appliedValid) bone.UpdateAppliedTransform();
 
 				float rotation = bone.arotation;
@@ -275,7 +277,7 @@ namespace Spine {
 			}
 		}
 
-		override public String ToString () {
+		override public string ToString () {
 			return data.name;
 		}
 	}

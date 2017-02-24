@@ -31,6 +31,11 @@
 using System;
 
 namespace Spine {
+
+	/// <summary>
+	/// Collects each BoundingBoxAttachment that is visible and computes the world vertices for its polygon.
+	/// The polygon vertices are provided along with convenience methods for doing hit detection.
+	/// </summary>
 	public class SkeletonBounds {
 		private ExposedList<Polygon> polygonPool = new ExposedList<Polygon>();
 		private float minX, minY, maxX, maxY;
@@ -49,6 +54,14 @@ namespace Spine {
 			Polygons = new ExposedList<Polygon>();
 		}
 
+		/// <summary>
+		/// Clears any previous polygons, finds all visible bounding box attachments,
+		/// and computes the world vertices for each bounding box's polygon.</summary>
+		/// <param name="skeleton">The skeleton.</param>
+		/// <param name="updateAabb">
+		/// If true, the axis aligned bounding box containing all the polygons is computed.
+		/// If false, the SkeletonBounds AABB methods will always return true.
+		/// </param>
 		public void Update (Skeleton skeleton, bool updateAabb) {
 			ExposedList<BoundingBoxAttachment> boundingBoxes = BoundingBoxes;
 			ExposedList<Polygon> polygons = Polygons;
@@ -75,7 +88,7 @@ namespace Spine {
 					polygon = new Polygon();
 				polygons.Add(polygon);
 
-				int count = boundingBox.Vertices.Length;
+				int count = boundingBox.worldVerticesLength;
 				polygon.Count = count;
 				if (polygon.Vertices.Length < count) polygon.Vertices = new float[count];
 				boundingBox.ComputeWorldVertices(slot, polygon.Vertices);

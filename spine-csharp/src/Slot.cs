@@ -93,7 +93,7 @@ namespace Spine {
 			}
 		}
 
-		override public String ToString () {
+		override public string ToString () {
 			return data.name;
 		}
 	}

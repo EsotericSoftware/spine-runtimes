@@ -34,11 +34,11 @@ namespace Spine {
 	/// <summary>Attachment that displays a texture region using a mesh.</summary>
 	public class MeshAttachment : VertexAttachment {
 		internal float regionOffsetX, regionOffsetY, regionWidth, regionHeight, regionOriginalWidth, regionOriginalHeight;
+		private MeshAttachment parentMesh;
 		internal float[] uvs, regionUVs;
 		internal int[] triangles;
 		internal float r = 1, g = 1, b = 1, a = 1;
 		internal int hulllength;
-		internal MeshAttachment parentMesh;
 		internal bool inheritDeform;
 
 		public int HullLength { get { return hulllength; } set { hulllength = value; } }

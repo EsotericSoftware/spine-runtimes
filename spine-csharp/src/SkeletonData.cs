@@ -31,10 +31,12 @@
 using System;
 
 namespace Spine {
+	
+	/// <summary>Stores the setup pose and all of the stateless data for a skeleton.</summary>
 	public class SkeletonData {
 		internal string name;
-		internal ExposedList<BoneData> bones = new ExposedList<BoneData>();
-		internal ExposedList<SlotData> slots = new ExposedList<SlotData>();
+		internal ExposedList<BoneData> bones = new ExposedList<BoneData>(); // Ordered parents first
+		internal ExposedList<SlotData> slots = new ExposedList<SlotData>(); // Setup pose draw order.
 		internal ExposedList<Skin> skins = new ExposedList<Skin>();
 		internal Skin defaultSkin;
 		internal ExposedList<EventData> events = new ExposedList<EventData>();
@@ -49,12 +51,23 @@ namespace Spine {
 		internal float fps;
 		internal string imagesPath;
 
-		public String Name { get { return name; } set { name = value; } }
-		public ExposedList<BoneData> Bones { get { return bones; } } // Ordered parents first.
-		public ExposedList<SlotData> Slots { get { return slots; } } // Setup pose draw order.
+		public string Name { get { return name; } set { name = value; } }
+
+		/// <summary>The skeleton's bones, sorted parent first. The root bone is always the first bone.</summary>
+		public ExposedList<BoneData> Bones { get { return bones; } }
+
+		public ExposedList<SlotData> Slots { get { return slots; } }
+
+		/// <summary>All skins, including the default skin.</summary>
 		public ExposedList<Skin> Skins { get { return skins; } set { skins = value; } }
-		/// <summary>May be null.</summary>
+
+		/// <summary>
+		/// The skeleton's default skin.
+		/// By default this skin contains all attachments that were not in a skin in Spine.
+		/// </summary>
+		/// <return>May be null.</return>
 		public Skin DefaultSkin { get { return defaultSkin; } set { defaultSkin = value; } }
+
 		public ExposedList<EventData> Events { get { return events; } set { events = value; } }
 		public ExposedList<Animation> Animations { get { return animations; } set { animations = value; } }
 		public ExposedList<IkConstraintData> IkConstraints { get { return ikConstraints; } set { ikConstraints = value; } }
@@ -67,34 +80,42 @@ namespace Spine {
 		public string Version { get { return version; } set { version = value; } }
 		public string Hash { get { return hash; } set { hash = value; } }
 		public string ImagesPath { get { return imagesPath; } set { imagesPath = value; } }
+
+		/// <summary>
+		/// The dopesheet FPS in Spine. Available only when nonessential data was exported.</summary>
 		public float Fps { get { return fps; } set { fps = value; } }
 
 		// --- Bones.
 
+		/// <summary>
+		/// Finds a bone by comparing each bone's name.
+		/// It is more efficient to cache the results of this method than to call it multiple times.</summary>
 		/// <returns>May be null.</returns>
-		public BoneData FindBone (String boneName) {
+		public BoneData FindBone (string boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName", "boneName cannot be null.");
-			ExposedList<BoneData> bones = this.bones;
+			var bones = this.bones;
+			var bonesItems = bones.Items;
 			for (int i = 0, n = bones.Count; i < n; i++) {
-				BoneData bone = bones.Items[i];
+				BoneData bone = bonesItems[i];
 				if (bone.name == boneName) return bone;
 			}
 			return null;
 		}
 
 		/// <returns>-1 if the bone was not found.</returns>
-		public int FindBoneIndex (String boneName) {
+		public int FindBoneIndex (string boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName", "boneName cannot be null.");
-			ExposedList<BoneData> bones = this.bones;
+			var bones = this.bones;
+			var bonesItems = bones.Items;
 			for (int i = 0, n = bones.Count; i < n; i++)
-				if (bones.Items[i].name == boneName) return i;
+				if (bonesItems[i].name == boneName) return i;
 			return -1;
 		}
 
 		// --- Slots.
 
 		/// <returns>May be null.</returns>
-		public SlotData FindSlot (String slotName) {
+		public SlotData FindSlot (string slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
 			ExposedList<SlotData> slots = this.slots;
 			for (int i = 0, n = slots.Count; i < n; i++) {
@@ -105,7 +126,7 @@ namespace Spine {
 		}
 
 		/// <returns>-1 if the slot was not found.</returns>
-		public int FindSlotIndex (String slotName) {
+		public int FindSlotIndex (string slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
 			ExposedList<SlotData> slots = this.slots;
 			for (int i = 0, n = slots.Count; i < n; i++)
@@ -116,7 +137,7 @@ namespace Spine {
 		// --- Skins.
 
 		/// <returns>May be null.</returns>
-		public Skin FindSkin (String skinName) {
+		public Skin FindSkin (string skinName) {
 			if (skinName == null) throw new ArgumentNullException("skinName", "skinName cannot be null.");
 			foreach (Skin skin in skins)
 				if (skin.name == skinName) return skin;
@@ -126,7 +147,7 @@ namespace Spine {
 		// --- Events.
 
 		/// <returns>May be null.</returns>
-		public EventData FindEvent (String eventDataName) {
+		public EventData FindEvent (string eventDataName) {
 			if (eventDataName == null) throw new ArgumentNullException("eventDataName", "eventDataName cannot be null.");
 			foreach (EventData eventData in events)
 				if (eventData.name == eventDataName) return eventData;
@@ -136,7 +157,7 @@ namespace Spine {
 		// --- Animations.
 
 		/// <returns>May be null.</returns>
-		public Animation FindAnimation (String animationName) {
+		public Animation FindAnimation (string animationName) {
 			if (animationName == null) throw new ArgumentNullException("animationName", "animationName cannot be null.");
 			ExposedList<Animation> animations = this.animations;
 			for (int i = 0, n = animations.Count; i < n; i++) {
@@ -149,7 +170,7 @@ namespace Spine {
 		// --- IK constraints.
 
 		/// <returns>May be null.</returns>
-		public IkConstraintData FindIkConstraint (String constraintName) {
+		public IkConstraintData FindIkConstraint (string constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
 			ExposedList<IkConstraintData> ikConstraints = this.ikConstraints;
 			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
@@ -162,7 +183,7 @@ namespace Spine {
 		// --- Transform constraints.
 
 		/// <returns>May be null.</returns>
-		public TransformConstraintData FindTransformConstraint (String constraintName) {
+		public TransformConstraintData FindTransformConstraint (string constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
 			ExposedList<TransformConstraintData> transformConstraints = this.transformConstraints;
 			for (int i = 0, n = transformConstraints.Count; i < n; i++) {
@@ -175,7 +196,7 @@ namespace Spine {
 		// --- Path constraints.
 
 		/// <returns>May be null.</returns>
-		public PathConstraintData FindPathConstraint (String constraintName) {
+		public PathConstraintData FindPathConstraint (string constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
 			ExposedList<PathConstraintData> pathConstraints = this.pathConstraints;
 			for (int i = 0, n = pathConstraints.Count; i < n; i++) {
@@ -186,7 +207,7 @@ namespace Spine {
 		}
 
 		/// <returns>-1 if the path constraint was not found.</returns>
-		public int FindPathConstraintIndex (String pathConstraintName) {
+		public int FindPathConstraintIndex (string pathConstraintName) {
 			if (pathConstraintName == null) throw new ArgumentNullException("pathConstraintName", "pathConstraintName cannot be null.");
 			ExposedList<PathConstraintData> pathConstraints = this.pathConstraints;
 			for (int i = 0, n = pathConstraints.Count; i < n; i++)
@@ -196,7 +217,7 @@ namespace Spine {
 
 		// ---
 
-		override public String ToString () {
+		override public string ToString () {
 			return name ?? base.ToString();
 		}
 	}
