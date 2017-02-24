@@ -65,19 +65,49 @@ namespace Spine {
 		public ExposedList<Bone> Children { get { return children; } }
 		/// <summary>The local X translation.</summary>
 		public float X { get { return x; } set { x = value; } }
+		/// <summary>The local Y translation.</summary>
 		public float Y { get { return y; } set { y = value; } }
+		/// <summary>The local rotation.</summary>
 		public float Rotation { get { return rotation; } set { rotation = value; } }
+
+		/// <summary>The local scaleX.</summary>
+		public float ScaleX { get { return scaleX; } set { scaleX = value; } }
+
+		/// <summary>The local scaleY.</summary>
+		public float ScaleY { get { return scaleY; } set { scaleY = value; } }
+
+		/// <summary>The local shearX.</summary>
+		public float ShearX { get { return shearX; } set { shearX = value; } }
+
+		/// <summary>The local shearY.</summary>
+		public float ShearY { get { return shearY; } set { shearY = value; } }
+
 		/// <summary>The rotation, as calculated by any constraints.</summary>
 		public float AppliedRotation { get { return arotation; } set { arotation = value; } }
-		public float ScaleX { get { return scaleX; } set { scaleX = value; } }
-		public float ScaleY { get { return scaleY; } set { scaleY = value; } }
-		public float ShearX { get { return shearX; } set { shearX = value; } }
-		public float ShearY { get { return shearY; } set { shearY = value; } }
+
+		/// <summary>The applied local x translation.</summary>
+		public float AX { get { return ax; } set { ax = value; } }
+
+		/// <summary>The applied local y translation.</summary>
+		public float AY { get { return ay; } set { ay = value; } }
+
+		/// <summary>The applied local scaleX.</summary>
+		public float AScaleX { get { return ascaleX; } set { ascaleX = value; } }
+
+		/// <summary>The applied local scaleY.</summary>
+		public float AScaleY { get { return ascaleY; } set { ascaleY = value; } }
+
+		/// <summary>The applied local shearX.</summary>
+		public float AShearX { get { return ashearX; } set { ashearX = value; } }
+
+		/// <summary>The applied local shearY.</summary>
+		public float AShearY { get { return ashearY; } set { ashearY = value; } }
 
 		public float A { get { return a; } }
 		public float B { get { return b; } }
 		public float C { get { return c; } }
 		public float D { get { return d; } }
+
 		public float WorldX { get { return worldX; } }
 		public float WorldY { get { return worldY; } }
 		public float WorldRotationX { get { return MathUtils.Atan2(c, a) * MathUtils.RadDeg; } }
@@ -337,6 +367,10 @@ namespace Spine {
 			return MathUtils.Atan2(cos * c + sin * d, cos * a + sin * b) * MathUtils.RadDeg;
 		}
 
+		/// <summary>
+		/// Rotates the world transform the specified amount and sets isAppliedValid to false.
+		/// </summary>
+		/// <param name="degrees">Degrees.</param>
 		public void RotateWorld (float degrees) {
 			float a = this.a, b = this.b, c = this.c, d = this.d;
 			float cos = MathUtils.CosDeg(degrees), sin = MathUtils.SinDeg(degrees);
@@ -347,7 +381,7 @@ namespace Spine {
 			appliedValid = false;
 		}
 
-		override public String ToString () {
+		override public string ToString () {
 			return data.name;
 		}
 	}

@@ -339,7 +339,7 @@ namespace Spine {
 		}
 
 		/// <returns>May be null.</returns>
-		public Bone FindBone (String boneName) {
+		public Bone FindBone (string boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName", "boneName cannot be null.");
 			var bones = this.bones;
 			var bonesItems = bones.Items;
@@ -351,7 +351,7 @@ namespace Spine {
 		}
 
 		/// <returns>-1 if the bone was not found.</returns>
-		public int FindBoneIndex (String boneName) {
+		public int FindBoneIndex (string boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName", "boneName cannot be null.");
 			var bones = this.bones;
 			var bonesItems = bones.Items;
@@ -361,7 +361,7 @@ namespace Spine {
 		}
 
 		/// <returns>May be null.</returns>
-		public Slot FindSlot (String slotName) {
+		public Slot FindSlot (string slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
 			var slots = this.slots;
 			var slotsItems = slots.Items;
@@ -373,7 +373,7 @@ namespace Spine {
 		}
 
 		/// <returns>-1 if the bone was not found.</returns>
-		public int FindSlotIndex (String slotName) {
+		public int FindSlotIndex (string slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
 			var slots = this.slots;
 			var slotsItems = slots.Items;
@@ -383,7 +383,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets a skin by name (see SetSkin).</summary>
-		public void SetSkin (String skinName) {
+		public void SetSkin (string skinName) {
 			Skin skin = data.FindSkin(skinName);
 			if (skin == null) throw new ArgumentException("Skin not found: " + skinName, "skinName");
 			SetSkin(skin);
@@ -401,7 +401,7 @@ namespace Spine {
 					ExposedList<Slot> slots = this.slots;
 					for (int i = 0, n = slots.Count; i < n; i++) {
 						Slot slot = slots.Items[i];
-						String name = slot.data.attachmentName;
+						string name = slot.data.attachmentName;
 						if (name != null) {
 							Attachment attachment = newSkin.GetAttachment(i, name);
 							if (attachment != null) slot.Attachment = attachment;
@@ -413,12 +413,12 @@ namespace Spine {
 		}
 
 		/// <returns>May be null.</returns>
-		public Attachment GetAttachment (String slotName, String attachmentName) {
+		public Attachment GetAttachment (string slotName, string attachmentName) {
 			return GetAttachment(data.FindSlotIndex(slotName), attachmentName);
 		}
 
 		/// <returns>May be null.</returns>
-		public Attachment GetAttachment (int slotIndex, String attachmentName) {
+		public Attachment GetAttachment (int slotIndex, string attachmentName) {
 			if (attachmentName == null) throw new ArgumentNullException("attachmentName", "attachmentName cannot be null.");
 			if (skin != null) {
 				Attachment attachment = skin.GetAttachment(slotIndex, attachmentName);
@@ -429,7 +429,7 @@ namespace Spine {
 		}
 
 		/// <param name="attachmentName">May be null.</param>
-		public void SetAttachment (String slotName, String attachmentName) {
+		public void SetAttachment (string slotName, string attachmentName) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
 			ExposedList<Slot> slots = this.slots;
 			for (int i = 0, n = slots.Count; i < n; i++) {
@@ -448,7 +448,7 @@ namespace Spine {
 		}
 			
 		/// <returns>May be null.</returns>
-		public IkConstraint FindIkConstraint (String constraintName) {
+		public IkConstraint FindIkConstraint (string constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
 			ExposedList<IkConstraint> ikConstraints = this.ikConstraints;
 			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
@@ -459,7 +459,7 @@ namespace Spine {
 		}
 
 		/// <returns>May be null.</returns>
-		public TransformConstraint FindTransformConstraint (String constraintName) {
+		public TransformConstraint FindTransformConstraint (string constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
 			ExposedList<TransformConstraint> transformConstraints = this.transformConstraints;
 			for (int i = 0, n = transformConstraints.Count; i < n; i++) {
@@ -470,7 +470,7 @@ namespace Spine {
 		}
 
 		/// <returns>May be null.</returns>
-		public PathConstraint FindPathConstraint (String constraintName) {
+		public PathConstraint FindPathConstraint (string constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
 			ExposedList<PathConstraint> pathConstraints = this.pathConstraints;
 			for (int i = 0, n = pathConstraints.Count; i < n; i++) {
@@ -493,10 +493,10 @@ namespace Spine {
 		public void GetBounds (out float x, out float y, out float width, out float height, ref float[] vertexBuffer) {
 			float[] temp = vertexBuffer;
 			temp = temp ?? new float[8];
-			var drawOrder = this.drawOrder;
+			var drawOrderItems = this.drawOrder.Items;
 			float minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
-			for (int i = 0, n = drawOrder.Count; i < n; i++) {
-				Slot slot = drawOrder.Items[i];
+			for (int i = 0, n = this.drawOrder.Count; i < n; i++) {
+				Slot slot = drawOrderItems[i];
 				int verticesLength = 0;
 				float[] vertices = null;
 				Attachment attachment = slot.attachment;
@@ -504,7 +504,7 @@ namespace Spine {
 				if (regionAttachment != null) {
 					verticesLength = 8;
 					if (temp.Length < 8) temp = new float[8];
-					regionAttachment.ComputeWorldVertices(slot.bone, temp);
+					regionAttachment.ComputeWorldVertices(slot.bone, temp, 0);
 				} else {
 					var meshAttachment = attachment as MeshAttachment;
 					if (meshAttachment != null) {

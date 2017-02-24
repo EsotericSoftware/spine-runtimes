@@ -565,13 +565,13 @@ namespace Spine {
 			}
 		}
 
+		override public int PropertyId {
+			get { return ((int)TimelineType.TwoColor << 24) + slotIndex; }
+		}
+
 		public TwoColorTimeline (int frameCount) :
 			base(frameCount) {
 			frames = new float[frameCount * ENTRIES];
-		}
-
-		override public int PropertyId {
-			get { return ((int)TimelineType.TwoColor << 24) + slotIndex; }
 		}
 
 		/// <summary>Sets the time and value of the specified keyframe.</summary>
