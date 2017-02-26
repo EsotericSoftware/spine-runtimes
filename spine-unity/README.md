@@ -14,7 +14,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-unity works with data exported from Spine 3.5.xx.
+spine-unity works with data exported from Spine 3.6.xx.
 
 spine-unity supports all Spine features.
 
