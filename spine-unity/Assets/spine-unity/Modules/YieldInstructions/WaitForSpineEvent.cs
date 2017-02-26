@@ -28,10 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#if (UNITY_5_0 || UNITY_5_1 || UNITY_5_2 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7)
-#define PREUNITY_5_3
-#endif
-
 using UnityEngine;
 using System.Collections;
 using Spine;
@@ -51,10 +47,6 @@ namespace Spine.Unity {
 
 		#region Constructors
 		void Subscribe (Spine.AnimationState state, Spine.EventData eventDataReference, bool unsubscribe) {
-			#if PREUNITY_5_3
-			Debug.LogWarning("Unity 5.3 or later is required for Spine Unity custom yield instructions to function correctly.");
-			#endif
-
 			if (state == null) {
 				Debug.LogWarning("AnimationState argument was null. Coroutine will continue immediately.");
 				m_WasFired = true;
@@ -74,10 +66,6 @@ namespace Spine.Unity {
 		}
 
 		void SubscribeByName (Spine.AnimationState state, string eventName, bool unsubscribe) {
-			#if PREUNITY_5_3
-			Debug.LogWarning("Unity 5.3 or later is required for Spine Unity custom yield instructions to function correctly.");
-			#endif
-
 			if (state == null) {
 				Debug.LogWarning("AnimationState argument was null. Coroutine will continue immediately.");
 				m_WasFired = true;
@@ -168,7 +156,5 @@ namespace Spine.Unity {
 		void IEnumerator.Reset () { m_WasFired = false; }
 		object IEnumerator.Current { get { return null; } }
 		#endregion
-
-
 	}
 }
