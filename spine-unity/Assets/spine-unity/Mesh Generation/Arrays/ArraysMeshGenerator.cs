@@ -130,12 +130,12 @@ namespace Spine.Unity.MeshGeneration {
 
 				var regionAttachment = attachment as RegionAttachment;
 				if (regionAttachment != null) {
-					regionAttachment.ComputeWorldVertices(slot.bone, tempVerts);
+					regionAttachment.ComputeWorldVertices(slot.bone, tempVerts, 0);
 
-					float x1 = tempVerts[RegionAttachment.X1], y1 = tempVerts[RegionAttachment.Y1];
-					float x2 = tempVerts[RegionAttachment.X2], y2 = tempVerts[RegionAttachment.Y2];
-					float x3 = tempVerts[RegionAttachment.X3], y3 = tempVerts[RegionAttachment.Y3];
-					float x4 = tempVerts[RegionAttachment.X4], y4 = tempVerts[RegionAttachment.Y4];
+					float x1 = tempVerts[RegionAttachment.BLX], y1 = tempVerts[RegionAttachment.BLY];
+					float x2 = tempVerts[RegionAttachment.ULX], y2 = tempVerts[RegionAttachment.ULY];
+					float x3 = tempVerts[RegionAttachment.URX], y3 = tempVerts[RegionAttachment.URY];
+					float x4 = tempVerts[RegionAttachment.BRX], y4 = tempVerts[RegionAttachment.BRY];
 					verts[vi].x = x1; verts[vi].y = y1; verts[vi].z = z;
 					verts[vi + 1].x = x4; verts[vi + 1].y = y4; verts[vi + 1].z = z;
 					verts[vi + 2].x = x2; verts[vi + 2].y = y2; verts[vi + 2].z = z;
@@ -146,7 +146,7 @@ namespace Spine.Unity.MeshGeneration {
 						color.r = (byte)(r * slot.r * regionAttachment.r * color.a);
 						color.g = (byte)(g * slot.g * regionAttachment.g * color.a);
 						color.b = (byte)(b * slot.b * regionAttachment.b * color.a);
-						if (slot.data.blendMode == BlendMode.additive) color.a = 0;
+						if (slot.data.blendMode == BlendMode.Additive) color.a = 0;
 					} else {
 						color.a = (byte)(a * slot.a * regionAttachment.a);
 						color.r = (byte)(r * slot.r * regionAttachment.r * 255);
@@ -157,10 +157,10 @@ namespace Spine.Unity.MeshGeneration {
 					colors[vi] = color; colors[vi + 1] = color; colors[vi + 2] = color; colors[vi + 3] = color;
 
 					float[] regionUVs = regionAttachment.uvs;
-					uvs[vi].x = regionUVs[RegionAttachment.X1]; uvs[vi].y = regionUVs[RegionAttachment.Y1];
-					uvs[vi + 1].x = regionUVs[RegionAttachment.X4]; uvs[vi + 1].y = regionUVs[RegionAttachment.Y4];
-					uvs[vi + 2].x = regionUVs[RegionAttachment.X2]; uvs[vi + 2].y = regionUVs[RegionAttachment.Y2];
-					uvs[vi + 3].x = regionUVs[RegionAttachment.X3]; uvs[vi + 3].y = regionUVs[RegionAttachment.Y3];
+					uvs[vi].x = regionUVs[RegionAttachment.BLX]; uvs[vi].y = regionUVs[RegionAttachment.BLY];
+					uvs[vi + 1].x = regionUVs[RegionAttachment.BRX]; uvs[vi + 1].y = regionUVs[RegionAttachment.BRY];
+					uvs[vi + 2].x = regionUVs[RegionAttachment.ULX]; uvs[vi + 2].y = regionUVs[RegionAttachment.ULY];
+					uvs[vi + 3].x = regionUVs[RegionAttachment.URX]; uvs[vi + 3].y = regionUVs[RegionAttachment.URY];
 
 					if (x1 < bmin.x) bmin.x = x1; // Potential first attachment bounds initialization. Initial min should not block initial max. Same for Y below.
 					if (x1 > bmax.x) bmax.x = x1;
@@ -193,7 +193,7 @@ namespace Spine.Unity.MeshGeneration {
 							color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
 							color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
 							color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
-							if (slot.data.blendMode == BlendMode.additive) color.a = 0;
+							if (slot.data.blendMode == BlendMode.Additive) color.a = 0;
 						} else {
 							color.a = (byte)(a * slot.a * meshAttachment.a);
 							color.r = (byte)(r * slot.r * meshAttachment.r * 255);

@@ -543,7 +543,7 @@ namespace Spine.Unity.Editor {
 
 			Vector2[] uvs = ExtractUV(attachment.UVs);
 			float[] floatVerts = new float[8];
-			attachment.ComputeWorldVertices(bone, floatVerts);
+			attachment.ComputeWorldVertices(bone, floatVerts, 0);
 			Vector3[] verts = ExtractVerts(floatVerts);
 
 			//unrotate verts now that they're centered
