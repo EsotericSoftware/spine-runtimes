@@ -39,6 +39,8 @@ namespace Spine.Unity.MeshGeneration {
 		public bool AddNormals { get { return addNormals; } set { addNormals = value; } }
 		protected bool addTangents;
 		public bool AddTangents { get { return addTangents; } set { addTangents = value; } }
+		protected bool addBlackTint;
+		public bool AddBlackTint { get { return addBlackTint; } set { addBlackTint = value; } }
 		#endregion
 
 		protected float[] attachmentVertexBuffer = new float[8];
@@ -51,6 +53,8 @@ namespace Spine.Unity.MeshGeneration {
 		#endif
 		protected Vector4[] meshTangents;
 		protected Vector2[] tempTanBuffer;
+
+		protected Vector2[] uv2, uv3; // Black tint
 
 		public void TryAddNormalsTo (Mesh mesh, int targetVertexCount) {
 			#if SPINE_OPTIONAL_NORMALS
@@ -88,6 +92,19 @@ namespace Spine.Unity.MeshGeneration {
 			return verticesWasResized;
 		}
 
+		public static bool EnsureSize (int targetVertexCount, ref Vector2[] buffer) {
+			Vector2[] buff = buffer;
+			bool verticesWasResized = (buffer == null || targetVertexCount > buffer.Length);
+			if (verticesWasResized) {
+				buffer = new Vector2[targetVertexCount];
+			} else {
+				Vector3 zero = Vector3.zero;
+				for (int i = targetVertexCount, n = buff.Length; i < n; i++)
+					buff[i] = zero;
+			}
+			return verticesWasResized;
+		}
+
 		public static bool EnsureTriangleBuffersSize (ExposedList<SubmeshTriangleBuffer> submeshBuffers, int targetSubmeshCount, SubmeshInstruction[] instructionItems) {
 			bool submeshBuffersWasResized = submeshBuffers.Count < targetSubmeshCount;
 			if (submeshBuffersWasResized) {
@@ -96,6 +113,40 @@ namespace Spine.Unity.MeshGeneration {
 					submeshBuffers.Add(new SubmeshTriangleBuffer(instructionItems[i].triangleCount));
 			}
 			return submeshBuffersWasResized;
+		}
+
+		public static void FillBlackUVs (Skeleton skeleton, int startSlot, int endSlot, Vector2[] uv2, Vector2[] uv3, int vertexIndex, bool renderMeshes = true) {
+			var skeletonDrawOrderItems = skeleton.DrawOrder.Items;
+			Vector2 rg, b2;
+			int vi = vertexIndex;
+			b2.y = 1f;
+
+			// drawOrder[endSlot] is excluded
+			for (int slotIndex = startSlot; slotIndex < endSlot; slotIndex++) {
+				var slot = skeletonDrawOrderItems[slotIndex];
+				var attachment = slot.attachment;
+
+				rg.x = slot.r2; //r
+				rg.y = slot.g2; //g
+				b2.x = slot.b2; //b
+
+				var regionAttachment = attachment as RegionAttachment;
+				if (regionAttachment != null) {
+					uv2[vi] = rg; uv2[vi + 1] = rg; uv2[vi + 2] = rg; uv2[vi + 3] = rg;
+					uv3[vi] = b2; uv3[vi + 1] = b2; uv3[vi + 2] = b2; uv3[vi + 3] = b2;
+					vi += 4;
+				} else if (renderMeshes) {
+					var meshAttachment = attachment as MeshAttachment;
+					if (meshAttachment != null) {
+						int meshVertexCount = meshAttachment.worldVerticesLength;
+						for (int iii = 0; iii < meshVertexCount; iii += 2) {
+							uv2[vi] = rg;
+							uv3[vi] = b2;
+							vi++;
+						}
+					}
+				}
+			}
 		}
 
 		/// <summary>Fills Unity vertex data buffers with verts from the Spine Skeleton.</summary>

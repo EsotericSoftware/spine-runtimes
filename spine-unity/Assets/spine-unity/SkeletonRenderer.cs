@@ -65,6 +65,7 @@ namespace Spine.Unity {
 		public bool renderMeshes = true, immutableTriangles;
 		public bool pmaVertexColors = true;
 		public bool clearStateOnDisable = false;
+		public bool tintBlack = false;
 
 		#if SPINE_OPTIONAL_NORMALS
 		public bool calculateNormals;
@@ -131,6 +132,10 @@ namespace Spine.Unity {
 		Vector3[] vertices;
 		Color32[] colors;
 		Vector2[] uvs;
+
+		Vector2[] uv2;
+		Vector2[] uv3;
+
 		#if SPINE_OPTIONAL_NORMALS
 		Vector3[] normals;
 		#endif
@@ -423,6 +428,10 @@ namespace Spine.Unity {
 			// STEP 2. Update vertex buffer based on verts from the attachments.  ============================================================
 			// Uses values that were also stored in workingInstruction.
 			bool vertexCountIncreased = ArraysMeshGenerator.EnsureSize(vertexCount, ref this.vertices, ref this.uvs, ref this.colors);
+			if (tintBlack) {
+				ArraysMeshGenerator.EnsureSize(vertexCount, ref this.uv2);
+				ArraysMeshGenerator.EnsureSize(vertexCount, ref this.uv3);
+			}
 			#if SPINE_OPTIONAL_NORMALS
 			if (vertexCountIncreased && calculateNormals) {
 				Vector3[] localNormals = this.normals = new Vector3[vertexCount];
@@ -452,7 +461,12 @@ namespace Spine.Unity {
 				}
 			}
 			int vertexIndex = 0;
+
+			if (tintBlack)
+				ArraysMeshGenerator.FillBlackUVs(skeleton, 0, drawOrderCount, this.uv2, this.uv3, vertexIndex, renderMeshes); // This needs to be called before FillVerts so we have the correct vertexIndex argument.
+
 			ArraysMeshGenerator.FillVerts(skeleton, 0, drawOrderCount, this.zSpacing, pmaVertexColors, this.vertices, this.uvs, this.colors, ref vertexIndex, ref tempVertices, ref meshBoundsMin, ref meshBoundsMax, renderMeshes);
+
 
 
 			// Step 3. Move the mesh data into a UnityEngine.Mesh ============================================================
@@ -462,6 +476,11 @@ namespace Spine.Unity {
 			currentMesh.colors32 = colors;
 			currentMesh.uv = uvs;
 			currentMesh.bounds = ArraysMeshGenerator.ToBounds(meshBoundsMin, meshBoundsMax);
+
+			if (tintBlack) {
+				currentMesh.uv2 = this.uv2;
+				currentMesh.uv3 = this.uv3;
+			}
 
 			var currentSmartMeshInstructionUsed = currentSmartMesh.instructionUsed;
 			#if SPINE_OPTIONAL_NORMALS

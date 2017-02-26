@@ -50,6 +50,7 @@ namespace Spine.Unity {
 		public float timeScale = 1f;
 		public bool freeze;
 		public bool unscaledTime;
+		//public bool tintBlack = false;
 
 		#if UNITY_EDITOR
 		protected override void OnValidate () {
@@ -180,6 +181,7 @@ namespace Spine.Unity {
 
 			this.skeleton = new Skeleton(skeletonData);
 			this.spineMeshGenerator = new Spine.Unity.MeshGeneration.ArraysSimpleMeshGenerator(); // You can switch this out with any other implementer of Spine.Unity.MeshGeneration.ISimpleMeshGenerator
+			//this.spineMeshGenerator.AddBlackTint = this.tintBlack;
 			this.spineMeshGenerator.PremultiplyVertexColors = true;
 
 			// Set the initial Skin and Animation

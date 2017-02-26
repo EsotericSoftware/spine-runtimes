@@ -44,8 +44,8 @@ namespace Spine.Unity.Editor {
 	public class SkeletonGraphicInspector : UnityEditor.Editor {
 		SerializedProperty material_, color_;
 		SerializedProperty skeletonDataAsset_, initialSkinName_;
-		SerializedProperty startingAnimation_, startingLoop_, timeScale_, freeze_, unscaledTime_;
 	#if !PREUNITY_5_2
+		SerializedProperty startingAnimation_, startingLoop_, timeScale_, freeze_, unscaledTime_, tintBlack_;
 		SerializedProperty raycastTarget_;
 
 		SkeletonGraphic thisSkeletonGraphic;
@@ -62,6 +62,7 @@ namespace Spine.Unity.Editor {
 			// SkeletonRenderer
 			skeletonDataAsset_ = so.FindProperty("skeletonDataAsset");
 			initialSkinName_ = so.FindProperty("initialSkinName");
+			//tintBlack_ = so.FindProperty("tintBlack");
 
 			// SkeletonAnimation
 			startingAnimation_ = so.FindProperty("startingAnimation");
@@ -87,6 +88,7 @@ namespace Spine.Unity.Editor {
 
 			EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(initialSkinName_);
+			//EditorGUILayout.PropertyField(tintBlack_);
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("Animation", EditorStyles.boldLabel);
 			EditorGUILayout.PropertyField(startingAnimation_);
