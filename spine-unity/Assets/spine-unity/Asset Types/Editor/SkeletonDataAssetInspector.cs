@@ -574,8 +574,8 @@ namespace Spine.Unity.Editor {
 					#else
 					if (spriteCollection.objectReferenceValue == null)
 						warnings.Add("SkeletonDataAsset requires tk2DSpriteCollectionData.");
-					else
-						warnings.Add("Your sprite collection may have missing images.");
+//					else
+//						warnings.Add("Your sprite collection may have missing images.");
 					#endif
 				}
 			}
