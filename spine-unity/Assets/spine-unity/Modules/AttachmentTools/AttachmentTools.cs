@@ -341,6 +341,8 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			return Sprite.Create(ar.GetMainTexture(), ar.GetUnityRect(), new Vector2(0.5f, 0.5f), pixelsPerUnit);
 		}
 
+		/// <summary>Creates a new Texture2D object based on an AtlasRegion.
+		/// If applyImmediately is true, Texture2D.Apply is called immediately after the Texture2D is filled with data.</summary>
 		public static Texture2D ToTexture (this AtlasRegion ar, bool applyImmediately = true) {
 			Texture2D sourceTexture = ar.GetMainTexture();
 			Rect r = ar.GetUnityRect(sourceTexture.height);
