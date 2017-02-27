@@ -28,6 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#define SPINE_OPTIONAL_MATERIALOVERRIDE
+
 // Contributed by: Lost Polygon
 
 using System;
@@ -40,8 +42,8 @@ namespace Spine.Unity.Modules {
 
 		#region Inspector
 		public SkeletonRenderer skeletonRenderer;
-		[SerializeField] List<SlotMaterialOverride> customSlotMaterials = new List<SlotMaterialOverride>();
-		[SerializeField] List<AtlasMaterialOverride> customMaterialOverrides = new List<AtlasMaterialOverride>();
+		[SerializeField] protected List<SlotMaterialOverride> customSlotMaterials = new List<SlotMaterialOverride>();
+		[SerializeField] protected List<AtlasMaterialOverride> customMaterialOverrides = new List<AtlasMaterialOverride>();
 
 		#if UNITY_EDITOR
 		void Reset () {
@@ -115,6 +117,7 @@ namespace Spine.Unity.Modules {
 				return;
 			}
 
+			#if SPINE_OPTIONAL_MATERIALOVERRIDE
 			for (int i = 0; i < customMaterialOverrides.Count; i++) {
 				AtlasMaterialOverride atlasMaterialOverride = customMaterialOverrides[i];
 				if (atlasMaterialOverride.overrideDisabled)
@@ -122,6 +125,7 @@ namespace Spine.Unity.Modules {
 
 				skeletonRenderer.CustomMaterialOverride[atlasMaterialOverride.originalMaterial] = atlasMaterialOverride.replacementMaterial;
 			}
+			#endif
 		}
 
 		void RemoveCustomMaterialOverrides () {
@@ -130,18 +134,21 @@ namespace Spine.Unity.Modules {
 				return;
 			}
 
+			#if SPINE_OPTIONAL_MATERIALOVERRIDE
 			for (int i = 0; i < customMaterialOverrides.Count; i++) {
 				AtlasMaterialOverride atlasMaterialOverride = customMaterialOverrides[i];
 				Material currentMaterial;
+
 				if (!skeletonRenderer.CustomMaterialOverride.TryGetValue(atlasMaterialOverride.originalMaterial, out currentMaterial))
 					continue;
-
+				
 				// Do not revert the material if it was changed by something else
 				if (currentMaterial != atlasMaterialOverride.replacementMaterial)
 					continue;
 
 				skeletonRenderer.CustomMaterialOverride.Remove(atlasMaterialOverride.originalMaterial);
 			}
+			#endif
 		}
 			
 		// OnEnable applies the overrides at runtime, and when the editor loads.

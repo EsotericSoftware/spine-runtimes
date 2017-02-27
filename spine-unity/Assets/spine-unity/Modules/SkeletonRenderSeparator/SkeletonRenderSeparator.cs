@@ -28,6 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#define SPINE_OPTIONAL_RENDEROVERRIDE
+
 using UnityEngine;
 using System.Collections.Generic;
 using Spine.Unity;
@@ -45,8 +47,10 @@ namespace Spine.Unity.Modules {
 		public SkeletonRenderer SkeletonRenderer {
 			get { return skeletonRenderer; }
 			set {
+				#if SPINE_OPTIONAL_RENDEROVERRIDE
 				if (skeletonRenderer != null)
 					skeletonRenderer.GenerateMeshOverride -= HandleRender;
+				#endif
 				
 				skeletonRenderer = value;
 				this.enabled = false; // Disable if nulled.
@@ -72,8 +76,11 @@ namespace Spine.Unity.Modules {
 			if (copiedBlock == null) copiedBlock = new MaterialPropertyBlock();	
 			mainMeshRenderer = skeletonRenderer.GetComponent<MeshRenderer>();
 
+			#if SPINE_OPTIONAL_RENDEROVERRIDE
 			skeletonRenderer.GenerateMeshOverride -= HandleRender;
 			skeletonRenderer.GenerateMeshOverride += HandleRender;
+			#endif
+
 
 			#if UNITY_5_4_OR_NEWER
 			if (copyMeshRendererFlags) {
@@ -109,7 +116,9 @@ namespace Spine.Unity.Modules {
 
 		void OnDisable () {
 			if (skeletonRenderer == null) return;
+			#if SPINE_OPTIONAL_RENDEROVERRIDE
 			skeletonRenderer.GenerateMeshOverride -= HandleRender;
+			#endif
 
 			#if UNITY_EDITOR
 			skeletonRenderer.LateUpdate();
@@ -134,9 +143,14 @@ namespace Spine.Unity.Modules {
 			var submeshInstructionsItems = submeshInstructions.Items;
 			int lastSubmeshInstruction = submeshInstructions.Count - 1;
 
-
+			#if SPINE_OPTIONAL_NORMALS
 			bool addNormals = skeletonRenderer.calculateNormals;
+			#endif
+
+			#if SPINE_OPTIONAL_SOLVETANGENTS
 			bool addTangents = skeletonRenderer.calculateTangents;
+			#endif
+
 			bool pmaVertexColors = skeletonRenderer.pmaVertexColors;
 
 			int rendererIndex = 0;
@@ -145,8 +159,12 @@ namespace Spine.Unity.Modules {
 				if (submeshInstructionsItems[si].forceSeparate || si == lastSubmeshInstruction) {
 					// Apply properties
 					var meshGenerator = currentRenderer.MeshGenerator;
+					#if SPINE_OPTIONAL_NORMALS
 					meshGenerator.AddNormals = addNormals;
+					#endif
+					#if SPINE_OPTIONAL_SOLVETANGENTS
 					meshGenerator.AddTangents = addTangents;
+					#endif
 					meshGenerator.PremultiplyVertexColors = pmaVertexColors;
 					if (copyPropertyBlock)
 						currentRenderer.SetPropertyBlock(copiedBlock);

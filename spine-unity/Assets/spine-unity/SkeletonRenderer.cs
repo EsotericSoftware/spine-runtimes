@@ -316,7 +316,11 @@ namespace Spine.Unity {
 				// Slot with a separator/new material will become the starting slot of the next new instruction.
 				bool forceSeparate = (hasSeparators && separatorSlots.Contains(slot));
 				if (noRender) {
-					if (forceSeparate && vertexCount > 0 && this.generateMeshOverride != null) {
+					if (forceSeparate && vertexCount > 0
+						#if SPINE_OPTIONAL_RENDEROVERRIDE
+						&& this.generateMeshOverride != null
+						#endif
+					) {
 						workingSubmeshInstructions.Add(
 							new Spine.Unity.MeshGeneration.SubmeshInstruction {
 								skeleton = this.skeleton,
@@ -422,14 +426,16 @@ namespace Spine.Unity {
 
 			// STEP 2. Update vertex buffer based on verts from the attachments.  ============================================================
 			// Uses values that were also stored in workingInstruction.
-			bool vertexCountIncreased = ArraysMeshGenerator.EnsureSize(vertexCount, ref this.vertices, ref this.uvs, ref this.colors);
 			#if SPINE_OPTIONAL_NORMALS
+			bool vertexCountIncreased = ArraysMeshGenerator.EnsureSize(vertexCount, ref this.vertices, ref this.uvs, ref this.colors);
 			if (vertexCountIncreased && calculateNormals) {
 				Vector3[] localNormals = this.normals = new Vector3[vertexCount];
 				Vector3 normal = new Vector3(0, 0, -1);
 				for (int i = 0; i < vertexCount; i++)
 					localNormals[i] = normal;
 			}
+			#else
+			ArraysMeshGenerator.EnsureSize(vertexCount, ref this.vertices, ref this.uvs, ref this.colors);
 			#endif
 
 			Vector3 meshBoundsMin;
