@@ -223,7 +223,7 @@ namespace Spine {
 				a = -a;
 				b = -b;
 			}
-			if (skeleton.flipY) {
+			if (skeleton.flipY != Bone.yDown) {
 				c = -c;
 				d = -d;
 			}
