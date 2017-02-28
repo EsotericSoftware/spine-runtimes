@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-cocos2dx works with data exported from Spine 3.5.xx.
+spine-cocos2dx works with data exported from Spine 3.6.xx.
 
 spine-cocos2dx supports all Spine features.
 
@@ -69,6 +69,7 @@ The Spine cocos2d-x example works on Windows and Mac OS X.
 ## Notes
 
 - Images are premultiplied by cocos2d-x, so the Spine atlas images should *not* use premultiplied alpha.
+- Two color tinting needs to be enabled on a per-skeleton basis. Call `SkeletonRenderer::setTwoColorTine(true)` or `SkeletonAnimation::setTwoColorTint(true)` after you created the skeleton instance. Note that two color tinting requires a custom shader and vertex format. Skeletons rendered with two color tinting can therefore not be batched with single color tinted skeletons or other 2D cocos2d-x elements like sprites. However, two-color tinted skeletons will be batched if possible when rendered after one another.
 
 ## Examples
 
