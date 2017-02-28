@@ -93,7 +93,7 @@ static float toColor (const char* value, int index) {
 	char *error;
 	int color;
 
-	if (strlen(value) != 8) return -1;
+	if (strlen(value) / 2 < index) return -1;
 	value += index * 2;
 
 	digits[0] = *value;
@@ -217,8 +217,8 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 				timeline->slotIndex = slotIndex;
 
 				for (valueMap = timelineMap->child, frameIndex = 0; valueMap; valueMap = valueMap->next, ++frameIndex) {
-					const char* s = Json_getString(valueMap, "color", 0);
-					const char* ds = Json_getString(valueMap, "color", 0);
+					const char* s = Json_getString(valueMap, "light", 0);
+					const char* ds = Json_getString(valueMap, "dark", 0);
 					spTwoColorTimeline_setFrame(timeline, frameIndex, Json_getFloat(valueMap, "time", 0), toColor(s, 0), toColor(s, 1), toColor(s, 2),
 											 toColor(s, 3), toColor(ds, 0), toColor(ds, 1), toColor(ds, 2));
 					readCurve(valueMap, SUPER(timeline), frameIndex);
