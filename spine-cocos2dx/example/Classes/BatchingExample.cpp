@@ -74,7 +74,7 @@ bool BatchingExample::init () {
 		skeletonNode->addAnimation(0, "jump", true, RandomHelper::random_int(0, 300) / 100.0f);
 		skeletonNode->addAnimation(0, "run", true);
 		
-		skeletonNode->setTwoColorTint(true);
+		// skeletonNode->setTwoColorTint(true);
 
 		skeletonNode->setPosition(Vec2(
 			RandomHelper::random_int(xMin, xMax),
