@@ -69,6 +69,10 @@ namespace Spine.Unity.MeshGeneration {
 			// STEP 1: Ensure correct buffer sizes.
 			bool vertBufferResized = ArraysMeshGenerator.EnsureSize(vertexCount, ref this.meshVertices, ref this.meshUVs, ref this.meshColors32); 
 			bool submeshBuffersResized = ArraysMeshGenerator.EnsureTriangleBuffersSize(submeshBuffers, submeshCount, currentInstructionsItems);
+			if (addBlackTint) {
+				ArraysMeshGenerator.EnsureSize(vertexCount, ref this.uv2);
+				ArraysMeshGenerator.EnsureSize(vertexCount, ref this.uv3);
+			}
 
 			// STEP 2: Update buffers based on Skeleton.
 
@@ -109,6 +113,7 @@ namespace Spine.Unity.MeshGeneration {
 					var ca = skeletonDrawOrderItems[i].attachment;
 					if (ca != null) workingAttachments.Add(ca); // Includes BoundingBoxes. This is ok.
 				}
+				if (addBlackTint) ArraysMeshGenerator.FillBlackUVs(skeleton, startSlot, endSlot, this.uv2, this.uv3, vertexIndex);
 				ArraysMeshGenerator.FillVerts(skeleton, startSlot, endSlot, zSpacing, this.PremultiplyVertexColors, this.meshVertices, this.meshUVs, this.meshColors32, ref vertexIndex, ref this.attachmentVertexBuffer, ref meshBoundsMin, ref meshBoundsMax);
 			}
 
@@ -135,13 +140,15 @@ namespace Spine.Unity.MeshGeneration {
 					meshVertices[i].y *= scale;
 					//meshVertices[i].z *= scale;
 				}
-					
 			}
 
 			// STEP 3: Assign the buffers into the Mesh.
 			smartMesh.Set(this.meshVertices, this.meshUVs, this.meshColors32, workingAttachments, currentInstructions);
 			mesh.bounds = ArraysMeshGenerator.ToBounds(meshBoundsMin, meshBoundsMax);
-
+			if (addBlackTint) {
+				mesh.uv2 = this.uv2;
+				mesh.uv3 = this.uv3;
+			}
 
 			if (structureDoesntMatch) {
 				// Push new triangles if doesn't match.

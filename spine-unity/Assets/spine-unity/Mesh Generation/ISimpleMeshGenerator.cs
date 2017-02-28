@@ -43,5 +43,6 @@ namespace Spine.Unity.MeshGeneration {
 
 		bool AddNormals { get; set; }
 		bool AddTangents { get; set; }
+		bool AddBlackTint { get; set; }
 	}
 }

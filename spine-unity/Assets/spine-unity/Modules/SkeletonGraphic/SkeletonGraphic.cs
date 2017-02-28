@@ -28,40 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.3
- * 
- * Copyright (c) 2013-2015, Esoteric Software
- * All rights reserved.
- * 
- * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to use, install, execute and perform the Spine
- * Runtimes Software (the "Software") and derivative works solely for personal
- * or internal use. Without the written permission of Esoteric Software (see
- * Section 2 of the Spine Software License Agreement), you may not (a) modify,
- * translate, adapt or otherwise create derivative works, improvements of the
- * Software or develop new applications using the Software or (b) remove,
- * delete, alter or obscure any trademarks or any copyright, trademark, patent
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- * 
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
-#if (UNITY_5_0 || UNITY_5_1 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7)
-#define PREUNITY_5_2
-#endif
-
 using UnityEngine;
 using UnityEngine.UI;
 using Spine;
@@ -84,12 +50,12 @@ namespace Spine.Unity {
 		public float timeScale = 1f;
 		public bool freeze;
 		public bool unscaledTime;
+		//public bool tintBlack = false;
 
 		#if UNITY_EDITOR
 		protected override void OnValidate () {
 			// This handles Scene View preview.
 			base.OnValidate ();
-			#if !PREUNITY_5_2
 			if (this.IsValid) {
 				if (skeletonDataAsset == null) {
 					Clear();
@@ -109,11 +75,7 @@ namespace Spine.Unity {
 			} else {
 				if (skeletonDataAsset != null)
 					Initialize(true);
-			}
-			#else
-			Debug.LogWarning("SkeletonGraphic requres Unity 5.2 or higher.\nUnityEngine.UI 5.1 and below does not accept meshes and can't be used to render Spine skeletons. You may delete the SkeletonGraphic folder under `Modules` if you want to exclude it from your project." );
-			#endif
-				
+			}				
 		}
 
 		protected override void Reset () {
@@ -124,7 +86,6 @@ namespace Spine.Unity {
 		#endif
 		#endregion
 
-		#if !PREUNITY_5_2
 		#region Internals
 		// This is used by the UI system to determine what to put in the MaterialPropertyBlock.
 		public override Texture mainTexture {
@@ -220,6 +181,7 @@ namespace Spine.Unity {
 
 			this.skeleton = new Skeleton(skeletonData);
 			this.spineMeshGenerator = new Spine.Unity.MeshGeneration.ArraysSimpleMeshGenerator(); // You can switch this out with any other implementer of Spine.Unity.MeshGeneration.ISimpleMeshGenerator
+			//this.spineMeshGenerator.AddBlackTint = this.tintBlack;
 			this.spineMeshGenerator.PremultiplyVertexColors = true;
 
 			// Set the initial Skin and Animation
@@ -241,11 +203,5 @@ namespace Spine.Unity {
 			}
 		}
 		#endregion
-		#else
-		public Skeleton Skeleton { get { return null; } }
-		public AnimationState AnimationState { get { return null; } }
-		public event UpdateBonesDelegate UpdateLocal, UpdateWorld, UpdateComplete;
-		public void LateUpdate () { }
-		#endif
 	}
 }

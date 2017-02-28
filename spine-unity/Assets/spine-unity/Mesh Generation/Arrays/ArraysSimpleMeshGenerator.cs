@@ -74,6 +74,11 @@ namespace Spine.Unity.MeshGeneration {
 
 			// STEP 2 : Ensure buffers are the correct size
 			ArraysMeshGenerator.EnsureSize(totalVertexCount, ref this.meshVertices, ref this.meshUVs, ref this.meshColors32);
+			if (addBlackTint) {
+				ArraysMeshGenerator.EnsureSize(totalVertexCount, ref this.uv2);
+				ArraysMeshGenerator.EnsureSize(totalVertexCount, ref this.uv3);
+			}
+
 			this.triangles = this.triangles ?? new int[totalTriangleCount];
 				
 			// STEP 3 : Update vertex buffer
@@ -92,6 +97,7 @@ namespace Spine.Unity.MeshGeneration {
 				meshBoundsMax.z = zFauxHalfThickness * scale;
 
 				int vertexIndex = 0;
+				if (addBlackTint) ArraysMeshGenerator.FillBlackUVs(skeleton, 0, drawOrderCount, this.uv2, this.uv3, vertexIndex);
 				ArraysMeshGenerator.FillVerts(skeleton, 0, drawOrderCount, this.ZSpacing, this.PremultiplyVertexColors, this.meshVertices, this.meshUVs, this.meshColors32, ref vertexIndex, ref this.attachmentVertexBuffer, ref meshBoundsMin, ref meshBoundsMax);
 
 				// Apply scale to vertices
@@ -116,6 +122,11 @@ namespace Spine.Unity.MeshGeneration {
 			mesh.uv = meshUVs;
 			mesh.bounds = ArraysMeshGenerator.ToBounds(meshBoundsMin, meshBoundsMax);
 			mesh.triangles = triangles;
+			if (addBlackTint) {
+				mesh.uv2 = this.uv2;
+				mesh.uv3 = this.uv3;
+			}
+
 			TryAddNormalsTo(mesh, totalVertexCount);
 
 			if (addTangents) { 

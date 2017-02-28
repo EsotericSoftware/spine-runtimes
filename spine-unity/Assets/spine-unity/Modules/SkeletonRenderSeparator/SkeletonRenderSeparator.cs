@@ -125,8 +125,6 @@ namespace Spine.Unity.Modules {
 			int rendererCount = partsRenderers.Count;
 			if (rendererCount <= 0) return;
 
-
-
 			if (copyPropertyBlock)
 				mainMeshRenderer.GetPropertyBlock(copiedBlock);
 

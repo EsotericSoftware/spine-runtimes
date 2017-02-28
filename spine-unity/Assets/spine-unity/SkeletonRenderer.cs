@@ -33,8 +33,6 @@
 #define SPINE_OPTIONAL_NORMALS
 #define SPINE_OPTIONAL_SOLVETANGENTS
 
-//#define SPINE_OPTIONAL_FRONTFACING
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -65,15 +63,13 @@ namespace Spine.Unity {
 		public bool renderMeshes = true, immutableTriangles;
 		public bool pmaVertexColors = true;
 		public bool clearStateOnDisable = false;
+		public bool tintBlack = false;
 
 		#if SPINE_OPTIONAL_NORMALS
 		public bool calculateNormals;
 		#endif
 		#if SPINE_OPTIONAL_SOLVETANGENTS
 		public bool calculateTangents;
-		#endif
-		#if SPINE_OPTIONAL_FRONTFACING
-		public bool frontFacing;
 		#endif
 
 		public bool logErrors = false;
@@ -131,6 +127,10 @@ namespace Spine.Unity {
 		Vector3[] vertices;
 		Color32[] colors;
 		Vector2[] uvs;
+
+		Vector2[] uv2;
+		Vector2[] uv3;
+
 		#if SPINE_OPTIONAL_NORMALS
 		Vector3[] normals;
 		#endif
@@ -252,14 +252,6 @@ namespace Spine.Unity {
 			workingAttachments.Count = drawOrderCount;
 			var workingAttachmentsItems = workingInstruction.attachments.Items;
 
-			#if SPINE_OPTIONAL_FRONTFACING
-			var workingFlips = workingInstruction.attachmentFlips;
-			workingFlips.Clear(false);
-			workingFlips.GrowIfNeeded(drawOrderCount);
-			workingFlips.Count = drawOrderCount;
-			var workingFlipsItems = workingFlips.Items;
-			#endif
-
 			var workingSubmeshInstructions = workingInstruction.submeshInstructions;	// Items array should not be cached. There is dynamic writing to this list.
 			workingSubmeshInstructions.Clear(false);
 
@@ -276,11 +268,6 @@ namespace Spine.Unity {
 				Slot slot = drawOrderItems[i];
 				Attachment attachment = slot.attachment;
 				workingAttachmentsItems[i] = attachment;
-
-				#if SPINE_OPTIONAL_FRONTFACING
-				bool flip = frontFacing && (slot.bone.WorldSignX != slot.bone.WorldSignY);
-				workingFlipsItems[i] = flip;
-				#endif
 
 				object rendererObject = null; // An AtlasRegion in plain Spine-Unity. Spine-TK2D hooks into TK2D's system. eventual source of Material object.
 				int attachmentVertexCount, attachmentTriangleCount;
@@ -390,9 +377,6 @@ namespace Spine.Unity {
 
 			workingInstruction.vertexCount = vertexCount;
 			workingInstruction.immutableTriangles = this.immutableTriangles;
-			#if SPINE_OPTIONAL_FRONTFACING
-			workingInstruction.frontFacing = this.frontFacing;
-			#endif
 
 
 			// STEP 1.9. Post-process workingInstructions. ============================================================
@@ -423,6 +407,10 @@ namespace Spine.Unity {
 			// STEP 2. Update vertex buffer based on verts from the attachments.  ============================================================
 			// Uses values that were also stored in workingInstruction.
 			bool vertexCountIncreased = ArraysMeshGenerator.EnsureSize(vertexCount, ref this.vertices, ref this.uvs, ref this.colors);
+			if (tintBlack) {
+				ArraysMeshGenerator.EnsureSize(vertexCount, ref this.uv2);
+				ArraysMeshGenerator.EnsureSize(vertexCount, ref this.uv3);
+			}
 			#if SPINE_OPTIONAL_NORMALS
 			if (vertexCountIncreased && calculateNormals) {
 				Vector3[] localNormals = this.normals = new Vector3[vertexCount];
@@ -452,7 +440,12 @@ namespace Spine.Unity {
 				}
 			}
 			int vertexIndex = 0;
+
+			if (tintBlack)
+				ArraysMeshGenerator.FillBlackUVs(skeleton, 0, drawOrderCount, this.uv2, this.uv3, vertexIndex, renderMeshes); // This needs to be called before FillVerts so we have the correct vertexIndex argument.
+
 			ArraysMeshGenerator.FillVerts(skeleton, 0, drawOrderCount, this.zSpacing, pmaVertexColors, this.vertices, this.uvs, this.colors, ref vertexIndex, ref tempVertices, ref meshBoundsMin, ref meshBoundsMax, renderMeshes);
+
 
 
 			// Step 3. Move the mesh data into a UnityEngine.Mesh ============================================================
@@ -462,6 +455,11 @@ namespace Spine.Unity {
 			currentMesh.colors32 = colors;
 			currentMesh.uv = uvs;
 			currentMesh.bounds = ArraysMeshGenerator.ToBounds(meshBoundsMin, meshBoundsMax);
+
+			if (tintBlack) {
+				currentMesh.uv2 = this.uv2;
+				currentMesh.uv3 = this.uv3;
+			}
 
 			var currentSmartMeshInstructionUsed = currentSmartMesh.instructionUsed;
 			#if SPINE_OPTIONAL_NORMALS
@@ -490,8 +488,7 @@ namespace Spine.Unity {
 					var submeshInstruction = workingSubmeshInstructions.Items[i];
 
 					if (mutableTriangles || i >= oldSubmeshCount) {
-	
-						#if !SPINE_OPTIONAL_FRONTFACING
+
 						var currentSubmesh = submeshes.Items[i];
 						int instructionTriangleCount = submeshInstruction.triangleCount;
 						if (renderMeshes) {
@@ -500,9 +497,6 @@ namespace Spine.Unity {
 						} else {
 							ArraysMeshGenerator.FillTrianglesQuads(ref currentSubmesh.triangles, ref currentSubmesh.triangleCount, ref currentSubmesh.firstVertex, submeshInstruction.firstVertexIndex, instructionTriangleCount, (i == last));
 						}
-						#else
-						SetSubmesh(i, submeshInstruction, currentInstructions.attachmentFlips, i == last);
-						#endif
 
 					}
 
@@ -594,19 +588,6 @@ namespace Spine.Unity {
 					return true;
 			}
 
-			#if SPINE_OPTIONAL_FRONTFACING
-			if (a.frontFacing != b.frontFacing) { 	// if settings changed
-				return true;
-			} else if (a.frontFacing) { 			// if settings matched, only need to check one.
-				var flipsA = a.attachmentFlips.Items;
-				var flipsB = b.attachmentFlips.Items;
-				for (int i = 0; i < attachmentCountB; i++) {
-					if (flipsA[i] != flipsB[i])
-						return true;
-				}
-			}
-			#endif
-
 			// Submesh count changed
 			int submeshCountA = a.submeshInstructions.Count;
 			int submeshCountB = b.submeshInstructions.Count;
@@ -633,106 +614,6 @@ namespace Spine.Unity {
 			return false;
 		}
 
-		#if SPINE_OPTIONAL_FRONTFACING
-		void SetSubmesh (int submeshIndex, Spine.Unity.MeshGeneration.SubmeshInstruction submeshInstructions, ExposedList<bool> flipStates, bool isLastSubmesh) {
-			var currentSubmesh = submeshes.Items[submeshIndex];
-			int[] triangles = currentSubmesh.triangles;
-
-			int triangleCount = submeshInstructions.triangleCount;
-			int firstVertex = submeshInstructions.firstVertexIndex;
-
-			int trianglesCapacity = triangles.Length;
-			if (isLastSubmesh && trianglesCapacity > triangleCount) {
-				// Last submesh may have more triangles than required, so zero triangles to the end.
-				for (int i = triangleCount; i < trianglesCapacity; i++)
-					triangles[i] = 0;
-
-				currentSubmesh.triangleCount = triangleCount;
-
-			} else if (trianglesCapacity != triangleCount) {
-				// Reallocate triangles when not the exact size needed.
-				currentSubmesh.triangles = triangles = new int[triangleCount];
-				currentSubmesh.triangleCount = 0;
-			}
-				
-			if (!this.renderMeshes && !this.frontFacing) {
-				// Use stored triangles if possible.
-				if (currentSubmesh.firstVertex != firstVertex || currentSubmesh.triangleCount < triangleCount) { //|| currentSubmesh.triangleCount == 0
-					currentSubmesh.triangleCount = triangleCount;
-					currentSubmesh.firstVertex = firstVertex;
-
-					for (int i = 0; i < triangleCount; i += 6, firstVertex += 4) {
-						triangles[i] = firstVertex;
-						triangles[i + 1] = firstVertex + 2;
-						triangles[i + 2] = firstVertex + 1;
-						triangles[i + 3] = firstVertex + 2;
-						triangles[i + 4] = firstVertex + 3;
-						triangles[i + 5] = firstVertex + 1;
-					}
-				}
-				return;
-			}
-				
-			var flipStatesItems = flipStates.Items;
-
-			// Iterate through all slots and store their triangles. 
-			var drawOrderItems = skeleton.DrawOrder.Items;
-			int triangleIndex = 0; // Modified by loop
-			for (int i = submeshInstructions.startSlot, n = submeshInstructions.endSlot; i < n; i++) {			
-				Attachment attachment = drawOrderItems[i].attachment;
-				bool flip = frontFacing && flipStatesItems[i];
-
-				// Add RegionAttachment triangles
-				if (attachment is RegionAttachment) {
-					if (!flip) {
-						triangles[triangleIndex] = firstVertex;
-						triangles[triangleIndex + 1] = firstVertex + 2;
-						triangles[triangleIndex + 2] = firstVertex + 1;
-						triangles[triangleIndex + 3] = firstVertex + 2;
-						triangles[triangleIndex + 4] = firstVertex + 3;
-						triangles[triangleIndex + 5] = firstVertex + 1;
-					} else {
-						triangles[triangleIndex] = firstVertex + 1;
-						triangles[triangleIndex + 1] = firstVertex + 2;
-						triangles[triangleIndex + 2] = firstVertex;
-						triangles[triangleIndex + 3] = firstVertex + 1;
-						triangles[triangleIndex + 4] = firstVertex + 3;
-						triangles[triangleIndex + 5] = firstVertex + 2;
-					}
-
-					triangleIndex += 6;
-					firstVertex += 4;
-					continue;
-				}
-
-				// Add (Weighted)MeshAttachment triangles
-				int[] attachmentTriangles;
-				int attachmentVertexCount;
-				var meshAttachment = attachment as MeshAttachment;
-				if (meshAttachment != null) {
-					attachmentVertexCount = meshAttachment.worldVerticesLength >> 1; // length/2
-					attachmentTriangles = meshAttachment.triangles;
-				} else {
-					continue;
-				}
-
-				if (flip) {
-					for (int ii = 0, nn = attachmentTriangles.Length; ii < nn; ii += 3, triangleIndex += 3) {
-						triangles[triangleIndex + 2] = firstVertex + attachmentTriangles[ii];
-						triangles[triangleIndex + 1] = firstVertex + attachmentTriangles[ii + 1];
-						triangles[triangleIndex] = firstVertex + attachmentTriangles[ii + 2];
-					}
-				} else {
-					for (int ii = 0, nn = attachmentTriangles.Length; ii < nn; ii++, triangleIndex++) {
-						triangles[triangleIndex] = firstVertex + attachmentTriangles[ii];
-					}
-				}
-
-				firstVertex += attachmentVertexCount;
-			}
-		}
-		#endif
-
 		///<summary>This is a Mesh that also stores the instructions SkeletonRenderer generated for it.</summary>
 		public class SmartMesh {
 			public Mesh mesh = Spine.Unity.SpineMesh.NewMesh();
@@ -744,18 +625,9 @@ namespace Spine.Unity {
 				public readonly ExposedList<Attachment> attachments = new ExposedList<Attachment>();
 				public readonly ExposedList<Spine.Unity.MeshGeneration.SubmeshInstruction> submeshInstructions = new ExposedList<Spine.Unity.MeshGeneration.SubmeshInstruction>();
 
-				#if SPINE_OPTIONAL_FRONTFACING
-				public bool frontFacing;
-				public readonly ExposedList<bool> attachmentFlips = new ExposedList<bool>();
-				#endif
-
 				public void Clear () {
 					this.attachments.Clear(false);
 					this.submeshInstructions.Clear(false);
-
-					#if SPINE_OPTIONAL_FRONTFACING
-					this.attachmentFlips.Clear(false);
-					#endif
 				}
 
 				public void Set (Instruction other) {
@@ -766,15 +638,6 @@ namespace Spine.Unity {
 					this.attachments.GrowIfNeeded(other.attachments.Capacity);
 					this.attachments.Count = other.attachments.Count;
 					other.attachments.CopyTo(this.attachments.Items);
-
-					#if SPINE_OPTIONAL_FRONTFACING
-					this.frontFacing = other.frontFacing;
-					this.attachmentFlips.Clear(false);
-					this.attachmentFlips.GrowIfNeeded(other.attachmentFlips.Capacity);
-					this.attachmentFlips.Count = other.attachmentFlips.Count;
-					if (this.frontFacing)
-						other.attachmentFlips.CopyTo(this.attachmentFlips.Items);
-					#endif
 
 					this.submeshInstructions.Clear(false);
 					this.submeshInstructions.GrowIfNeeded(other.submeshInstructions.Capacity);

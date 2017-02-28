@@ -39,6 +39,8 @@ namespace Spine.Unity.MeshGeneration {
 		public bool AddNormals { get { return addNormals; } set { addNormals = value; } }
 		protected bool addTangents;
 		public bool AddTangents { get { return addTangents; } set { addTangents = value; } }
+		protected bool addBlackTint;
+		public bool AddBlackTint { get { return addBlackTint; } set { addBlackTint = value; } }
 		#endregion
 
 		protected float[] attachmentVertexBuffer = new float[8];
@@ -51,6 +53,8 @@ namespace Spine.Unity.MeshGeneration {
 		#endif
 		protected Vector4[] meshTangents;
 		protected Vector2[] tempTanBuffer;
+
+		protected Vector2[] uv2, uv3; // Black tint
 
 		public void TryAddNormalsTo (Mesh mesh, int targetVertexCount) {
 			#if SPINE_OPTIONAL_NORMALS
@@ -88,6 +92,19 @@ namespace Spine.Unity.MeshGeneration {
 			return verticesWasResized;
 		}
 
+		public static bool EnsureSize (int targetVertexCount, ref Vector2[] buffer) {
+			Vector2[] buff = buffer;
+			bool verticesWasResized = (buffer == null || targetVertexCount > buffer.Length);
+			if (verticesWasResized) {
+				buffer = new Vector2[targetVertexCount];
+			} else {
+				Vector3 zero = Vector3.zero;
+				for (int i = targetVertexCount, n = buff.Length; i < n; i++)
+					buff[i] = zero;
+			}
+			return verticesWasResized;
+		}
+
 		public static bool EnsureTriangleBuffersSize (ExposedList<SubmeshTriangleBuffer> submeshBuffers, int targetSubmeshCount, SubmeshInstruction[] instructionItems) {
 			bool submeshBuffersWasResized = submeshBuffers.Count < targetSubmeshCount;
 			if (submeshBuffersWasResized) {
@@ -96,6 +113,40 @@ namespace Spine.Unity.MeshGeneration {
 					submeshBuffers.Add(new SubmeshTriangleBuffer(instructionItems[i].triangleCount));
 			}
 			return submeshBuffersWasResized;
+		}
+
+		public static void FillBlackUVs (Skeleton skeleton, int startSlot, int endSlot, Vector2[] uv2, Vector2[] uv3, int vertexIndex, bool renderMeshes = true) {
+			var skeletonDrawOrderItems = skeleton.DrawOrder.Items;
+			Vector2 rg, b2;
+			int vi = vertexIndex;
+			b2.y = 1f;
+
+			// drawOrder[endSlot] is excluded
+			for (int slotIndex = startSlot; slotIndex < endSlot; slotIndex++) {
+				var slot = skeletonDrawOrderItems[slotIndex];
+				var attachment = slot.attachment;
+
+				rg.x = slot.r2; //r
+				rg.y = slot.g2; //g
+				b2.x = slot.b2; //b
+
+				var regionAttachment = attachment as RegionAttachment;
+				if (regionAttachment != null) {
+					uv2[vi] = rg; uv2[vi + 1] = rg; uv2[vi + 2] = rg; uv2[vi + 3] = rg;
+					uv3[vi] = b2; uv3[vi + 1] = b2; uv3[vi + 2] = b2; uv3[vi + 3] = b2;
+					vi += 4;
+				} else if (renderMeshes) {
+					var meshAttachment = attachment as MeshAttachment;
+					if (meshAttachment != null) {
+						int meshVertexCount = meshAttachment.worldVerticesLength;
+						for (int iii = 0; iii < meshVertexCount; iii += 2) {
+							uv2[vi] = rg;
+							uv3[vi] = b2;
+							vi++;
+						}
+					}
+				}
+			}
 		}
 
 		/// <summary>Fills Unity vertex data buffers with verts from the Spine Skeleton.</summary>
@@ -130,12 +181,12 @@ namespace Spine.Unity.MeshGeneration {
 
 				var regionAttachment = attachment as RegionAttachment;
 				if (regionAttachment != null) {
-					regionAttachment.ComputeWorldVertices(slot.bone, tempVerts);
+					regionAttachment.ComputeWorldVertices(slot.bone, tempVerts, 0);
 
-					float x1 = tempVerts[RegionAttachment.X1], y1 = tempVerts[RegionAttachment.Y1];
-					float x2 = tempVerts[RegionAttachment.X2], y2 = tempVerts[RegionAttachment.Y2];
-					float x3 = tempVerts[RegionAttachment.X3], y3 = tempVerts[RegionAttachment.Y3];
-					float x4 = tempVerts[RegionAttachment.X4], y4 = tempVerts[RegionAttachment.Y4];
+					float x1 = tempVerts[RegionAttachment.BLX], y1 = tempVerts[RegionAttachment.BLY];
+					float x2 = tempVerts[RegionAttachment.ULX], y2 = tempVerts[RegionAttachment.ULY];
+					float x3 = tempVerts[RegionAttachment.URX], y3 = tempVerts[RegionAttachment.URY];
+					float x4 = tempVerts[RegionAttachment.BRX], y4 = tempVerts[RegionAttachment.BRY];
 					verts[vi].x = x1; verts[vi].y = y1; verts[vi].z = z;
 					verts[vi + 1].x = x4; verts[vi + 1].y = y4; verts[vi + 1].z = z;
 					verts[vi + 2].x = x2; verts[vi + 2].y = y2; verts[vi + 2].z = z;
@@ -146,7 +197,7 @@ namespace Spine.Unity.MeshGeneration {
 						color.r = (byte)(r * slot.r * regionAttachment.r * color.a);
 						color.g = (byte)(g * slot.g * regionAttachment.g * color.a);
 						color.b = (byte)(b * slot.b * regionAttachment.b * color.a);
-						if (slot.data.blendMode == BlendMode.additive) color.a = 0;
+						if (slot.data.blendMode == BlendMode.Additive) color.a = 0;
 					} else {
 						color.a = (byte)(a * slot.a * regionAttachment.a);
 						color.r = (byte)(r * slot.r * regionAttachment.r * 255);
@@ -157,10 +208,10 @@ namespace Spine.Unity.MeshGeneration {
 					colors[vi] = color; colors[vi + 1] = color; colors[vi + 2] = color; colors[vi + 3] = color;
 
 					float[] regionUVs = regionAttachment.uvs;
-					uvs[vi].x = regionUVs[RegionAttachment.X1]; uvs[vi].y = regionUVs[RegionAttachment.Y1];
-					uvs[vi + 1].x = regionUVs[RegionAttachment.X4]; uvs[vi + 1].y = regionUVs[RegionAttachment.Y4];
-					uvs[vi + 2].x = regionUVs[RegionAttachment.X2]; uvs[vi + 2].y = regionUVs[RegionAttachment.Y2];
-					uvs[vi + 3].x = regionUVs[RegionAttachment.X3]; uvs[vi + 3].y = regionUVs[RegionAttachment.Y3];
+					uvs[vi].x = regionUVs[RegionAttachment.BLX]; uvs[vi].y = regionUVs[RegionAttachment.BLY];
+					uvs[vi + 1].x = regionUVs[RegionAttachment.BRX]; uvs[vi + 1].y = regionUVs[RegionAttachment.BRY];
+					uvs[vi + 2].x = regionUVs[RegionAttachment.ULX]; uvs[vi + 2].y = regionUVs[RegionAttachment.ULY];
+					uvs[vi + 3].x = regionUVs[RegionAttachment.URX]; uvs[vi + 3].y = regionUVs[RegionAttachment.URY];
 
 					if (x1 < bmin.x) bmin.x = x1; // Potential first attachment bounds initialization. Initial min should not block initial max. Same for Y below.
 					if (x1 > bmax.x) bmax.x = x1;
@@ -193,7 +244,7 @@ namespace Spine.Unity.MeshGeneration {
 							color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
 							color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
 							color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
-							if (slot.data.blendMode == BlendMode.additive) color.a = 0;
+							if (slot.data.blendMode == BlendMode.Additive) color.a = 0;
 						} else {
 							color.a = (byte)(a * slot.a * meshAttachment.a);
 							color.r = (byte)(r * slot.r * meshAttachment.r * 255);

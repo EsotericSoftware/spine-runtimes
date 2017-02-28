@@ -914,6 +914,10 @@ namespace Spine.Unity.Editor {
 			public PathAttachment NewPathAttachment (Skin skin, string name) {
 				return new PathAttachment(name);
 			}
+
+			public PointAttachment NewPointAttachment (Skin skin, string name) {
+				return new PointAttachment(name);
+			}
 		}
 		#endregion
 
@@ -1165,7 +1169,7 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Checking Methods
-		static int[][] compatibleVersions = { new[] {3, 5, 0} };
+		static int[][] compatibleVersions = { new[] {3, 6, 0} };
 		//static bool isFixVersionRequired = false;
 
 		static bool CheckForValidSkeletonData (string skeletonJSONPath) {

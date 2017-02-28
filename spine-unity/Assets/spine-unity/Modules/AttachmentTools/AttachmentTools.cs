@@ -341,6 +341,8 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			return Sprite.Create(ar.GetMainTexture(), ar.GetUnityRect(), new Vector2(0.5f, 0.5f), pixelsPerUnit);
 		}
 
+		/// <summary>Creates a new Texture2D object based on an AtlasRegion.
+		/// If applyImmediately is true, Texture2D.Apply is called immediately after the Texture2D is filled with data.</summary>
 		public static Texture2D ToTexture (this AtlasRegion ar, bool applyImmediately = true) {
 			Texture2D sourceTexture = ar.GetMainTexture();
 			Rect r = ar.GetUnityRect(sourceTexture.height);
@@ -657,9 +659,9 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			};
 
 			// Linked mesh
-			if (o.parentMesh != null) {
+			if (o.ParentMesh != null) {
 				// bones, vertices, worldVerticesLength, regionUVs, triangles, HullLength, Edges, Width, Height
-				ma.ParentMesh = o.parentMesh;
+				ma.ParentMesh = o.ParentMesh;
 			} else {
 				CloneVertexAttachment(o, ma); // bones, vertices, worldVerticesLength
 				ma.regionUVs = o.regionUVs.Clone() as float[];
@@ -704,8 +706,8 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			if (region == null) throw new System.ArgumentNullException("region");
 
 			// If parentMesh is a linked mesh, create a link to its parent. Preserves Deform animations.
-			if (o.parentMesh != null)
-				o = o.parentMesh;
+			if (o.ParentMesh != null)
+				o = o.ParentMesh;
 
 			// 1. NewMeshAttachment (AtlasAttachmentLoader.cs)
 			var mesh = new MeshAttachment(newLinkedMeshName);

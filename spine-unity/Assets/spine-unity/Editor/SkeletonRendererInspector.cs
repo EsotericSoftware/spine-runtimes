@@ -43,12 +43,12 @@ namespace Spine.Unity.Editor {
 		protected static bool advancedFoldout;
 		protected static bool showBoneNames, showPaths, showShapes, showConstraints = true;
 
-		protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, separatorSlotNames, frontFacing, zSpacing, pmaVertexColors, clearStateOnDisable;
+		protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, separatorSlotNames, frontFacing, zSpacing, pmaVertexColors, clearStateOnDisable, tintBlack;
 		protected SpineInspectorUtility.SerializedSortingProperties sortingProperties;
 		protected bool isInspectingPrefab;
 
 		protected GUIContent SkeletonDataAssetLabel, SkeletonUtilityButtonContent;
-		protected GUIContent PMAVertexColorsLabel, ClearStateOnDisableLabel, ZSpacingLabel, MeshesLabel, ImmubleTrianglesLabel;
+		protected GUIContent PMAVertexColorsLabel, ClearStateOnDisableLabel, ZSpacingLabel, MeshesLabel, ImmubleTrianglesLabel, TintBlackLabel;
 		protected GUIContent NormalsLabel, TangentsLabel;
 		const string ReloadButtonLabel = "Reload";
 
@@ -83,6 +83,7 @@ namespace Spine.Unity.Editor {
 			ZSpacingLabel = new GUIContent("Z Spacing", "A value other than 0 adds a space between each rendered attachment to prevent Z Fighting when using shaders that read or write to the depth buffer. Large values may cause unwanted parallax and spaces depending on camera setup.");
 			NormalsLabel = new GUIContent("Add Normals", "Use this if your shader requires vertex normals. A more efficient solution for 2D setups is to modify the shader to assume a single normal value for the whole mesh.");
 			TangentsLabel = new GUIContent("Solve Tangents", "Calculates the tangents per frame. Use this if you are using lit shaders (usually with normal maps) that require vertex tangents.");
+			TintBlackLabel = new GUIContent("Tint Black", "Adds black tint vertex data to the mesh as UV2 and UV3. Black tinting requires that the shader interpret UV2 and UV3 as black tint colors for this effect to work. You may also use the default [Spine/Skeleton Tint Black] shader.\n\nIf you only need to tint the whole skeleton and not individual parts, the [Spine/Skeleton Tint] shader is recommended for better efficiency and changing/animating the _Black material property via MaterialPropertyBlock.");
 
 			var so = this.serializedObject;
 			skeletonDataAsset = so.FindProperty("skeletonDataAsset");
@@ -93,6 +94,7 @@ namespace Spine.Unity.Editor {
 			immutableTriangles = so.FindProperty("immutableTriangles");
 			pmaVertexColors = so.FindProperty("pmaVertexColors");
 			clearStateOnDisable = so.FindProperty("clearStateOnDisable");
+			tintBlack = so.FindProperty("tintBlack");
 
 			separatorSlotNames = so.FindProperty("separatorSlotNames");
 			separatorSlotNames.isExpanded = true;
@@ -237,6 +239,7 @@ namespace Spine.Unity.Editor {
 							// Optimization options
 							EditorGUILayout.PropertyField(meshes, MeshesLabel);
 							EditorGUILayout.PropertyField(immutableTriangles, ImmubleTrianglesLabel);
+							EditorGUILayout.PropertyField(tintBlack, TintBlackLabel);
 							EditorGUILayout.PropertyField(clearStateOnDisable, ClearStateOnDisableLabel);
 							EditorGUILayout.Space();
 						}
