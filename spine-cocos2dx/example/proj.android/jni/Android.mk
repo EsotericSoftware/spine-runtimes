@@ -23,6 +23,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../../src/spine/Cocos2dAttachmentLoader.cpp \
                    ../../../src/spine/SkeletonAnimation.cpp \
                    ../../../src/spine/SkeletonBatch.cpp \
+                   ../../../src/spine/SkeletonTwoColorBatch.cpp \
                    ../../../src/spine/SkeletonRenderer.cpp \
                    ../../../src/spine/spine-cocos2dx.cpp \
                    ../../../../spine-c/spine-c/src/spine/Animation.c \
@@ -35,6 +36,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../../../spine-c/spine-c/src/spine/Bone.c \
 				   ../../../../spine-c/spine-c/src/spine/BoneData.c \
 				   ../../../../spine-c/spine-c/src/spine/BoundingBoxAttachment.c \
+				   ../../../../spine-c/spine-c/src/spine/Color.c \
 				   ../../../../spine-c/spine-c/src/spine/Event.c \
 				   ../../../../spine-c/spine-c/src/spine/EventData.c \
 				   ../../../../spine-c/spine-c/src/spine/IkConstraint.c \
@@ -42,6 +44,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../../../spine-c/spine-c/src/spine/Json.c \
 				   ../../../../spine-c/spine-c/src/spine/MeshAttachment.c \
 				   ../../../../spine-c/spine-c/src/spine/PathAttachment.c \
+				   ../../../../spine-c/spine-c/src/spine/PointAttachment.c \
 				   ../../../../spine-c/spine-c/src/spine/PathConstraint.c \
 				   ../../../../spine-c/spine-c/src/spine/PathConstraintData.c \
 				   ../../../../spine-c/spine-c/src/spine/RegionAttachment.c \
