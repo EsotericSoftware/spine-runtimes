@@ -65,7 +65,7 @@ bool BatchingExample::init () {
 
 	int xMin = _contentSize.width * 0.10f, xMax = _contentSize.width * 0.90f;
 	int yMin = 0, yMax = _contentSize.height * 0.7f;
-	for (int i = 0; i < 500; i++) {
+	for (int i = 0; i < 100; i++) {
 		// Each skeleton node shares the same atlas, skeleton data, and mix times.
 		SkeletonAnimation* skeletonNode = SkeletonAnimation::createWithData(_skeletonData, false);
 		skeletonNode->setAnimationStateData(_stateData);
@@ -73,6 +73,8 @@ bool BatchingExample::init () {
 		skeletonNode->setAnimation(0, "walk", true);
 		skeletonNode->addAnimation(0, "jump", true, RandomHelper::random_int(0, 300) / 100.0f);
 		skeletonNode->addAnimation(0, "run", true);
+		
+		skeletonNode->setTwoColorTint(true);
 
 		skeletonNode->setPosition(Vec2(
 			RandomHelper::random_int(xMin, xMax),

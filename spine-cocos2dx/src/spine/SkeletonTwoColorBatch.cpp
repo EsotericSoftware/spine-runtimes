@@ -43,13 +43,7 @@ using std::max;
 
 namespace spine {
 
-TwoColorTrianglesCommand::TwoColorTrianglesCommand()
-:_materialID(0)
-,_textureID(0)
-,_glProgramState(nullptr)
-,_glProgram(nullptr)
-,_blendType(BlendFunc::DISABLE)
-,_alphaTextureID(0) {
+TwoColorTrianglesCommand::TwoColorTrianglesCommand() :_materialID(0), _textureID(0), _glProgramState(nullptr), _glProgram(nullptr), _blendType(BlendFunc::DISABLE), _alphaTextureID(0) {
 	_type = RenderCommand::Type::CUSTOM_COMMAND;
 	func = [this]() { draw(); };
 }
@@ -83,8 +77,7 @@ void TwoColorTrianglesCommand::init(float globalOrder, GLuint textureID, GLProgr
 TwoColorTrianglesCommand::~TwoColorTrianglesCommand() {
 }
 
-void TwoColorTrianglesCommand::generateMaterialID()
-{
+void TwoColorTrianglesCommand::generateMaterialID() {
 	// do not batch if using custom uniforms (since we cannot batch) it
 	if(_glProgramState->getUniformCount() > 0) {
 		_materialID = Renderer::MATERIAL_ID_DO_NOT_BATCH;
@@ -97,8 +90,7 @@ void TwoColorTrianglesCommand::generateMaterialID()
 	}
 }
 
-void TwoColorTrianglesCommand::useMaterial() const
-{
+void TwoColorTrianglesCommand::useMaterial() const {
 	//Set texture
 	GL::bindTexture2D(_textureID);
 	
@@ -212,8 +204,7 @@ SkeletonTwoColorBatch::~SkeletonTwoColorBatch () {
 	delete _indexBuffer;
 }
 
-void SkeletonTwoColorBatch::update (float delta) {
-	printf("Num batches: %i\n", _numBatches);
+void SkeletonTwoColorBatch::update (float delta) {	
 	reset();
 }
 
