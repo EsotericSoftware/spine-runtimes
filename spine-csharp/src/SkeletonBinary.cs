@@ -184,12 +184,12 @@ namespace Spine {
 				slotData.b = ((color & 0x0000ff00) >> 8) / 255f;
 				slotData.a = ((color & 0x000000ff)) / 255f;
 
-				int darkColor = ReadInt(input);
+				int darkColor = ReadInt(input); // 0x00rrggbb
 				if (darkColor != -1) {
 					slotData.hasSecondColor = true;
-					slotData.r2 = ((darkColor & 0xff000000) >> 24) / 255f;
-					slotData.g2 = ((darkColor & 0x00ff0000) >> 16) / 255f;
-					slotData.b2 = ((darkColor & 0x0000ff00) >> 8) / 255f;
+					slotData.r2 = ((darkColor & 0x00ff0000) >> 16) / 255f;
+					slotData.g2 = ((darkColor & 0x0000ff00) >> 8) / 255f;
+					slotData.b2 = ((darkColor & 0x000000ff)) / 255f;
 				}
 
 				slotData.attachmentName = ReadString(input);
@@ -561,10 +561,10 @@ namespace Spine {
 								float g = ((color & 0x00ff0000) >> 16) / 255f;
 								float b = ((color & 0x0000ff00) >> 8) / 255f;
 								float a = ((color & 0x000000ff)) / 255f;
-								int color2 = ReadInt(input);
-								float r2 = ((color2 & 0xff000000) >> 24) / 255f;
-								float g2 = ((color2 & 0x00ff0000) >> 16) / 255f;
-								float b2 = ((color2 & 0x0000ff00) >> 8) / 255f;
+								int color2 = ReadInt(input); // 0x00rrggbb
+								float r2 = ((color2 & 0x00ff0000) >> 16) / 255f;
+								float g2 = ((color2 & 0x0000ff00) >> 8) / 255f;
+								float b2 = ((color2 & 0x000000ff)) / 255f;
 
 								timeline.SetFrame(frameIndex, time, r, g, b, a, r2, g2, b2);
 								if (frameIndex < frameCount - 1) ReadCurve(input, frameIndex, timeline);
