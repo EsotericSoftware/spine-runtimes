@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "+wD3CxYNDCLBTldmA/MNGhrRDHE", "spine": "3.5.03-beta", "width": 0, "height": 0, "fps": 1, "images": "" },
+"skeleton": { "hash": "zBR2x5RGJoCPEHpszlOxG4dsqEw", "spine": "3.6.07-beta", "width": 868, "height": 322, "fps": 1, "images": "" },
 "bones": [
 	{ "name": "root" },
 	{ "name": "L_Eye", "parent": "root", "x": -223.17, "y": 2.99 },

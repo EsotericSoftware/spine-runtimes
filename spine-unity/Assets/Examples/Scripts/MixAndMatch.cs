@@ -106,6 +106,8 @@ namespace Spine.Unity.Examples {
 			skeleton.SetSkin(newSkin);
 			skeleton.SetToSetupPose();
 			skeleton.SetAttachment(weaponSlot, daggerName);
+
+			Resources.UnloadUnusedAssets();
 		}
 
 	}
