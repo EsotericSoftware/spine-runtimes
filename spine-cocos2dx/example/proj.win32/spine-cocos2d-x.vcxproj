@@ -155,6 +155,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Bone.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\BoneData.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\BoundingBoxAttachment.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Color.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Event.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\EventData.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\extension.c" />
@@ -165,6 +166,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\PathAttachment.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\PathConstraint.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\PathConstraintData.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\PointAttachment.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\RegionAttachment.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Skeleton.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\SkeletonBinary.c" />
@@ -182,6 +184,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\..\src\spine\SkeletonAnimation.cpp" />
     <ClCompile Include="..\..\src\spine\SkeletonBatch.cpp" />
     <ClCompile Include="..\..\src\spine\SkeletonRenderer.cpp" />
+    <ClCompile Include="..\..\src\spine\SkeletonTwoColorBatch.cpp" />
     <ClCompile Include="..\..\src\spine\spine-cocos2dx.cpp" />
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
     <ClCompile Include="..\Classes\BatchingExample.cpp" />

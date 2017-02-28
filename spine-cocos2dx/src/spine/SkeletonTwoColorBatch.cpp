@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 #include <spine/SkeletonTwoColorBatch.h>
-#include "external/xxhash/xxhash.h"
 #include <spine/extension.h>
 #include <algorithm>
 
@@ -84,9 +83,8 @@ void TwoColorTrianglesCommand::generateMaterialID() {
 		setSkipBatching(true);
 	}
 	else {
-		int glProgram = (int)_glProgram->getProgram();
-		int intArray[4] = { glProgram, (int)_textureID, (int)_blendType.src, (int)_blendType.dst};
-		_materialID = XXH32((const void*)intArray, sizeof(intArray), 0);
+		int glProgram = (int)_glProgram->getProgram();		
+		_materialID = glProgram + (int)_textureID + (int)_blendType.src + (int)_blendType.dst;
 	}
 }
 

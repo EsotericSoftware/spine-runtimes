@@ -156,6 +156,15 @@
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\VertexAttachment.c">
       <Filter>spine</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Color.c">
+      <Filter>spine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\PointAttachment.c">
+      <Filter>spine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\SkeletonTwoColorBatch.cpp">
+      <Filter>spine-cocos2dx</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
