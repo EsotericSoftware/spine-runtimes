@@ -306,6 +306,9 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			var texturesToPack = new List<Texture2D>();
 			foreach (var kvp in skinAttachments) {
 				var newAttachment = kvp.Value.GetClone(true);
+				if (newAttachment == null) {
+					return;	
+				}
 				if (IsRenderable(newAttachment)) {
 					texturesToPack.Add(newAttachment.GetAtlasRegion().ToTexture());
 					repackedAttachments.Add(newAttachment);
