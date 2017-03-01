@@ -803,7 +803,7 @@ namespace Spine {
 
 		static float ToColor(String hexString, int colorIndex) {
 			if (hexString.Length != 8)
-				throw new ArgumentException("Color hexidecimal length must be 8, recieved: " + hexString, "hexString");
+				throw new ArgumentException("Color hexidecimal length must be 8, received: " + hexString, "hexString");
 			return Convert.ToInt32(hexString.Substring(colorIndex * 2, 2), 16) / (float)255;
 		}
 	}
