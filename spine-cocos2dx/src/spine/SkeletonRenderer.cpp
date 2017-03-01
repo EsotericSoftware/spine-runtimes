@@ -67,7 +67,6 @@ void SkeletonRenderer::initialize () {
 	setOpacityModifyRGB(true);
 
 	setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
-	setTwoColorTint(true);
 }
 
 void SkeletonRenderer::setSkeletonData (spSkeletonData *skeletonData, bool ownsSkeletonData) {
@@ -332,7 +331,42 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		}
 	}
 	
-	if (lastTwoColorTrianglesCommand) lastTwoColorTrianglesCommand->setForceFlush(true);
+	if (lastTwoColorTrianglesCommand) {
+		Node* parent = this->getParent();
+		
+		// We need to decide if we can postpone flushing the current
+		// batch. We can postpone if the next sibling node is a
+		// two color tinted skeleton with the same global-z.
+		// The parent->getChildrenCount() > 100 check is a hack
+		// as checking for a sibling is an O(n) operation, and if
+		// all children of this nodes parent are skeletons, we
+		// are in O(n2) territory.
+		if (!parent || parent->getChildrenCount() > 100 || getChildrenCount() != 0) {
+			lastTwoColorTrianglesCommand->setForceFlush(true);
+		} else {
+			Vector<Node*>& children = parent->getChildren();
+			Node* sibling = nullptr;
+			for (ssize_t i = 0; i < children.size(); i++) {
+				if (children.at(i) == this) {
+					if (i < children.size() - 1) {
+						sibling = children.at(i+1);
+						break;
+					}
+				}
+			}
+			if (!sibling) {
+				lastTwoColorTrianglesCommand->setForceFlush(true);
+			} else {
+				SkeletonRenderer* siblingSkeleton = dynamic_cast<SkeletonRenderer*>(sibling);
+				if (!siblingSkeleton || // flush is next sibling isn't a SkeletonRenderer
+					!siblingSkeleton->isTwoColorTint() || // flush if next sibling isn't two color tinted
+					!siblingSkeleton->isVisible() || // flush if next sibling is two color tinted but not visible
+					(siblingSkeleton->getGlobalZOrder() != this->getGlobalZOrder())) { // flush if next sibling is two color tinted but z-order differs
+					lastTwoColorTrianglesCommand->setForceFlush(true);
+				}
+			}
+		}
+	}
 
 	if (_debugSlots || _debugBones) {
         drawDebug(renderer, transform, transformFlags);

@@ -226,7 +226,7 @@ V3F_C4B_C4B_T2F* SkeletonTwoColorBatch::allocateVertices(uint32_t numVertices) {
 TwoColorTrianglesCommand* SkeletonTwoColorBatch::addCommand(cocos2d::Renderer* renderer, float globalOrder, GLuint textureID, cocos2d::GLProgramState* glProgramState, cocos2d::BlendFunc blendType, const TwoColorTriangles& triangles, const cocos2d::Mat4& mv, uint32_t flags) {
 	TwoColorTrianglesCommand* command = nextFreeCommand();
 	command->init(globalOrder, textureID, glProgramState, blendType, triangles, mv, flags);
-	renderer->addCommand(command);
+	renderer->addCommand(command);	
 	return command;
 }
 	
