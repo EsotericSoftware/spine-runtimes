@@ -688,7 +688,7 @@ public class SkeletonJson {
 	}
 
 	static private function toColor (hexString:String, colorIndex:int) : Number {
-		if (hexString.length != 8) throw new ArgumentError("Color hexidecimal length must be 8, recieved: " + hexString);
+		if (hexString.length != 8) throw new ArgumentError("Color hexidecimal length must be 8, received: " + hexString);
 		return parseInt(hexString.substring(colorIndex * 2, colorIndex * 2 + 2), 16) / 255;
 	}
 
