@@ -67,17 +67,15 @@ module spine.canvas {
 				let bone = slot.bone;
 				let w = region.width;
 				let h = region.height;
-				let offsetX = attachment.offset[0];
-				let offsetY = attachment.offset[1];
 				ctx.save();
 				ctx.transform(bone.a, bone.c, bone.b, bone.d, bone.worldX, bone.worldY);
-				ctx.translate(offsetX, offsetY);
+				ctx.translate(attachment.offset[0], attachment.offset[1]);
 				ctx.rotate(attachment.rotation * Math.PI / 180);
 				ctx.scale(attachment.scaleX, attachment.scaleY);
-				ctx.translate(region.width / 2, region.height / 2);
+				ctx.translate(w / 2, h / 2);
 				ctx.scale(1, -1);
-				ctx.translate(-region.width / 2, -region.height / 2);
-				ctx.drawImage(image, region.x, region.y, region.width, region.height, 0, 0, w, h);
+				ctx.translate(-w / 2, -h / 2);
+				ctx.drawImage(image, region.x, region.y, w, h, 0, 0, w, h);
 				if (this.debugRendering) ctx.strokeRect(0, 0, w, h);
 				ctx.restore();
 			}
