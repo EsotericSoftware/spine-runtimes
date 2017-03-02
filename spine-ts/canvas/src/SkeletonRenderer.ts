@@ -37,6 +37,8 @@ module spine.canvas {
 		public triangleRendering = false;
 		public debugRendering = false;
 
+		private tempColor = new Color(0, 0, 0, 1);
+
 		constructor (context: CanvasRenderingContext2D) {
 			this.ctx = context;
 		}
@@ -52,16 +54,29 @@ module spine.canvas {
 
 			if (this.debugRendering) ctx.strokeStyle = "green";
 
+			ctx.save();
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				let slot = drawOrder[i];
 				let attachment = slot.getAttachment();
+				let regionAttachment: RegionAttachment = null;
 				let region: TextureAtlasRegion = null;
 				let image: HTMLImageElement = null;
 				if (attachment instanceof RegionAttachment) {
-					let regionAttachment = <RegionAttachment>attachment;
+					regionAttachment = <RegionAttachment>attachment;
 					region = <TextureAtlasRegion>regionAttachment.region;
 					image = (<CanvasTexture>region.texture).getImage();
 				} else continue;
+
+				let skeleton = slot.bone.skeleton;
+				let skeletonColor = skeleton.color;
+				let slotColor = slot.color;
+				let regionColor = regionAttachment.color;
+				let alpha = skeletonColor.a * slotColor.a * regionColor.a;
+				let color = this.tempColor;
+				color.set(skeletonColor.r * slotColor.r * regionColor.r,
+					skeletonColor.g * slotColor.g * regionColor.g,
+					skeletonColor.b * slotColor.b * regionColor.b,
+					alpha);
 
 				let att = <RegionAttachment>attachment;
 				let bone = slot.bone;
@@ -76,9 +91,18 @@ module spine.canvas {
 				ctx.scale(1, -1);
 				ctx.translate(-w / 2, -h / 2);
 				ctx.drawImage(image, region.x, region.y, w, h, 0, 0, w, h);
+				if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
+					ctx.globalAlpha = color.a;
+					// experimental tinting via compositing, doesn't work
+					// ctx.globalCompositeOperation = "source-atop";
+					// ctx.fillStyle = "rgba(" + (color.r * 255 | 0) + ", " + (color.g * 255 | 0)  + ", " + (color.b * 255 | 0) + ", " + color.a + ")";
+					// ctx.fillRect(0, 0, w, h);
+				}
 				if (this.debugRendering) ctx.strokeRect(0, 0, w, h);
 				ctx.restore();
 			}
+
+			ctx.restore();
 		}
 
 		private drawTriangles (skeleton: Skeleton) {

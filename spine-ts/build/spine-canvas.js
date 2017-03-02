@@ -213,6 +213,7 @@ var spine;
             function SkeletonRenderer(context) {
                 this.triangleRendering = false;
                 this.debugRendering = false;
+                this.tempColor = new spine.Color(0, 0, 0, 1);
                 this.ctx = context;
             }
             SkeletonRenderer.prototype.draw = function (skeleton) {
@@ -226,18 +227,27 @@ var spine;
                 var drawOrder = skeleton.drawOrder;
                 if (this.debugRendering)
                     ctx.strokeStyle = "green";
+                ctx.save();
                 for (var i = 0, n = drawOrder.length; i < n; i++) {
                     var slot = drawOrder[i];
                     var attachment = slot.getAttachment();
+                    var regionAttachment = null;
                     var region = null;
                     var image = null;
                     if (attachment instanceof spine.RegionAttachment) {
-                        var regionAttachment = attachment;
+                        regionAttachment = attachment;
                         region = regionAttachment.region;
                         image = region.texture.getImage();
                     }
                     else
                         continue;
+                    var skeleton_1 = slot.bone.skeleton;
+                    var skeletonColor = skeleton_1.color;
+                    var slotColor = slot.color;
+                    var regionColor = regionAttachment.color;
+                    var alpha = skeletonColor.a * slotColor.a * regionColor.a;
+                    var color = this.tempColor;
+                    color.set(skeletonColor.r * slotColor.r * regionColor.r, skeletonColor.g * slotColor.g * regionColor.g, skeletonColor.b * slotColor.b * regionColor.b, alpha);
                     var att = attachment;
                     var bone = slot.bone;
                     var w = region.width;
@@ -251,10 +261,14 @@ var spine;
                     ctx.scale(1, -1);
                     ctx.translate(-w / 2, -h / 2);
                     ctx.drawImage(image, region.x, region.y, w, h, 0, 0, w, h);
+                    if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
+                        ctx.globalAlpha = color.a;
+                    }
                     if (this.debugRendering)
                         ctx.strokeRect(0, 0, w, h);
                     ctx.restore();
                 }
+                ctx.restore();
             };
             SkeletonRenderer.prototype.drawTriangles = function (skeleton) {
                 var blendMode = null;

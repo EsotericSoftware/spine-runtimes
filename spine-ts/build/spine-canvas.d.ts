@@ -79,6 +79,7 @@ declare module spine.canvas {
         private ctx;
         triangleRendering: boolean;
         debugRendering: boolean;
+        private tempColor;
         constructor(context: CanvasRenderingContext2D);
         draw(skeleton: Skeleton): void;
         private drawImages(skeleton);
