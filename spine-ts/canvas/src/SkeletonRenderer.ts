@@ -55,43 +55,56 @@ module spine.canvas {
 
 			if (this.debugRendering) ctx.strokeStyle = "green";
 
+			ctx.save();
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				let slot = drawOrder[i];
 				let attachment = slot.getAttachment();
+				let regionAttachment: RegionAttachment = null;
 				let region: TextureAtlasRegion = null;
 				let image: HTMLImageElement = null;
-				let vertices: ArrayLike<number> = this.vertices;
-				if (attachment instanceof RegionAttachment) {
-					let regionAttachment = <RegionAttachment>attachment;
-					vertices = this.computeRegionVertices(slot, regionAttachment, false);
-					region = <TextureAtlasRegion>regionAttachment.region;
-					image = (<CanvasTexture>(region).texture).getImage();
 
+				if (attachment instanceof RegionAttachment) {
+					regionAttachment = <RegionAttachment>attachment;
+					region = <TextureAtlasRegion>regionAttachment.region;
+					image = (<CanvasTexture>region.texture).getImage();
 				} else continue;
+
+				let skeleton = slot.bone.skeleton;
+				let skeletonColor = skeleton.color;
+				let slotColor = slot.color;
+				let regionColor = regionAttachment.color;
+				let alpha = skeletonColor.a * slotColor.a * regionColor.a;
+				let color = this.tempColor;
+				color.set(skeletonColor.r * slotColor.r * regionColor.r,
+					skeletonColor.g * slotColor.g * regionColor.g,
+					skeletonColor.b * slotColor.b * regionColor.b,
+					alpha);
 
 				let att = <RegionAttachment>attachment;
 				let bone = slot.bone;
-				let x = vertices[0];
-				let y = vertices[1];
-				let rotation = (bone.getWorldRotationX() - att.rotation) * Math.PI / 180;
-				let xx = vertices[24] - vertices[0];
-				let xy = vertices[25] - vertices[1];
-				let yx = vertices[8] - vertices[0];
-				let yy = vertices[9] - vertices[1];
-				let w = Math.sqrt(xx * xx + xy * xy), h = -Math.sqrt(yx * yx + yy * yy);
-				ctx.translate(x, y);
-				ctx.rotate(rotation);
-				if (region.rotate) {
-					ctx.rotate(Math.PI / 2);
-					ctx.drawImage(image, region.x, region.y, region.height, region.width, 0, 0, h, -w);
-					ctx.rotate(-Math.PI / 2);
-				} else {
-					ctx.drawImage(image, region.x, region.y, region.width, region.height, 0, 0, w, h);
+				let w = region.width;
+				let h = region.height;
+				ctx.save();
+				ctx.transform(bone.a, bone.c, bone.b, bone.d, bone.worldX, bone.worldY);
+				ctx.translate(attachment.offset[0], attachment.offset[1]);
+				ctx.rotate(attachment.rotation * Math.PI / 180);
+				ctx.scale(attachment.scaleX, attachment.scaleY);
+				ctx.translate(w / 2, h / 2);
+				ctx.scale(1, -1);
+				ctx.translate(-w / 2, -h / 2);
+				if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
+					ctx.globalAlpha = color.a;
+					// experimental tinting via compositing, doesn't work
+					// ctx.globalCompositeOperation = "source-atop";
+					// ctx.fillStyle = "rgba(" + (color.r * 255 | 0) + ", " + (color.g * 255 | 0)  + ", " + (color.b * 255 | 0) + ", " + color.a + ")";
+					// ctx.fillRect(0, 0, w, h);
 				}
+				ctx.drawImage(image, region.x, region.y, w, h, 0, 0, w, h);
 				if (this.debugRendering) ctx.strokeRect(0, 0, w, h);
-				ctx.rotate(-rotation);
-				ctx.translate(-x, -y);
+				ctx.restore();
 			}
+
+			ctx.restore();
 		}
 
 		private drawTriangles (skeleton: Skeleton) {

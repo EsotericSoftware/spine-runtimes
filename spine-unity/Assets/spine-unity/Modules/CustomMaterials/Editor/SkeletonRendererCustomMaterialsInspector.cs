@@ -28,6 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#define SPINE_OPTIONAL_MATERIALOVERRIDE
+
 // Contributed by: Lost Polygon
 
 using System;
@@ -136,7 +138,9 @@ namespace Spine.Unity.Editor {
 
 			if (SpineInspectorUtility.LargeCenteredButton(new GUIContent("Clear and Reapply Changes", "Removes all non-serialized overrides in the SkeletonRenderer and reapplies the overrides on this component."))) {
 				if (skeletonRenderer != null) {
+					#if SPINE_OPTIONAL_MATERIALOVERRIDE
 					skeletonRenderer.CustomMaterialOverride.Clear();
+					#endif
 					skeletonRenderer.CustomSlotMaterials.Clear();
 					RemoveCustomMaterials();
 					SetCustomMaterials();
