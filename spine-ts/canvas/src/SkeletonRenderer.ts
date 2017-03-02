@@ -60,7 +60,7 @@ module spine.canvas {
 				if (attachment instanceof RegionAttachment) {
 					let regionAttachment = <RegionAttachment>attachment;
 					region = <TextureAtlasRegion>regionAttachment.region;
-					image = (<CanvasTexture>(region).texture).getImage();
+					image = (<CanvasTexture>region.texture).getImage();
 				} else continue;
 
 				let att = <RegionAttachment>attachment;
