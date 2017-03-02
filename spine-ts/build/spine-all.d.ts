@@ -79,6 +79,7 @@ declare module spine.canvas {
 		private ctx;
 		triangleRendering: boolean;
 		debugRendering: boolean;
+		private tempColor;
 		constructor(context: CanvasRenderingContext2D);
 		draw(skeleton: Skeleton): void;
 		private drawImages(skeleton);
@@ -1540,7 +1541,9 @@ declare module spine {
 	}
 	class SpineWidgetConfig {
 		json: string;
+		jsonContent: any;
 		atlas: string;
+		atlasContent: string;
 		animation: string;
 		imagesPath: string;
 		atlasPages: string[];

@@ -213,6 +213,7 @@ var spine;
 			function SkeletonRenderer(context) {
 				this.triangleRendering = false;
 				this.debugRendering = false;
+				this.tempColor = new spine.Color(0, 0, 0, 1);
 				this.ctx = context;
 			}
 			SkeletonRenderer.prototype.draw = function (skeleton) {
@@ -226,37 +227,48 @@ var spine;
 				var drawOrder = skeleton.drawOrder;
 				if (this.debugRendering)
 					ctx.strokeStyle = "green";
+				ctx.save();
 				for (var i = 0, n = drawOrder.length; i < n; i++) {
 					var slot = drawOrder[i];
 					var attachment = slot.getAttachment();
+					var regionAttachment = null;
 					var region = null;
 					var image = null;
 					if (attachment instanceof spine.RegionAttachment) {
-						var regionAttachment = attachment;
+						regionAttachment = attachment;
 						region = regionAttachment.region;
-						image = (region).texture.getImage();
+						image = region.texture.getImage();
 					}
 					else
 						continue;
+					var skeleton_1 = slot.bone.skeleton;
+					var skeletonColor = skeleton_1.color;
+					var slotColor = slot.color;
+					var regionColor = regionAttachment.color;
+					var alpha = skeletonColor.a * slotColor.a * regionColor.a;
+					var color = this.tempColor;
+					color.set(skeletonColor.r * slotColor.r * regionColor.r, skeletonColor.g * slotColor.g * regionColor.g, skeletonColor.b * slotColor.b * regionColor.b, alpha);
 					var att = attachment;
 					var bone = slot.bone;
 					var w = region.width;
 					var h = region.height;
-					var offsetX = attachment.offset[0];
-					var offsetY = attachment.offset[1];
 					ctx.save();
 					ctx.transform(bone.a, bone.c, bone.b, bone.d, bone.worldX, bone.worldY);
-					ctx.translate(offsetX, offsetY);
+					ctx.translate(attachment.offset[0], attachment.offset[1]);
 					ctx.rotate(attachment.rotation * Math.PI / 180);
 					ctx.scale(attachment.scaleX, attachment.scaleY);
-					ctx.translate(region.width / 2, region.height / 2);
+					ctx.translate(w / 2, h / 2);
 					ctx.scale(1, -1);
-					ctx.translate(-region.width / 2, -region.height / 2);
-					ctx.drawImage(image, region.x, region.y, region.width, region.height, 0, 0, w, h);
+					ctx.translate(-w / 2, -h / 2);
+					if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
+						ctx.globalAlpha = color.a;
+					}
+					ctx.drawImage(image, region.x, region.y, w, h, 0, 0, w, h);
 					if (this.debugRendering)
 						ctx.strokeRect(0, 0, w, h);
 					ctx.restore();
 				}
+				ctx.restore();
 			};
 			SkeletonRenderer.prototype.drawTriangles = function (skeleton) {
 				var blendMode = null;
@@ -7895,8 +7907,10 @@ var spine;
 			this.debugRenderer = new spine.webgl.SkeletonDebugRenderer(gl);
 			this.shapes = new spine.webgl.ShapeRenderer(gl);
 			var assets = this.assetManager = new spine.webgl.AssetManager(gl);
-			assets.loadText(config.atlas);
-			assets.loadText(config.json);
+			if (!config.atlasContent)
+				assets.loadText(config.atlas);
+			if (!config.jsonContent)
+				assets.loadText(config.json);
 			if (config.atlasPages == null) {
 				assets.loadTexture(config.atlas.replace(".atlas", ".png"));
 			}
@@ -7908,10 +7922,10 @@ var spine;
 			requestAnimationFrame(function () { _this.load(); });
 		}
 		SpineWidget.prototype.validateConfig = function (config) {
-			if (!config.atlas)
-				throw new Error("Please specify config.atlas");
-			if (!config.json)
-				throw new Error("Please specify config.json");
+			if (!config.atlas && !config.atlasContent)
+				throw new Error("Please specify config.atlas or config.atlasContent");
+			if (!config.json && !config.jsonContent)
+				throw new Error("Please specify config.json or config.jsonContent");
 			if (!config.animation)
 				throw new Error("Please specify config.animationName");
 			if (!config.scale)
@@ -7958,14 +7972,16 @@ var spine;
 					else
 						throw new Error("Failed to load assets: " + JSON.stringify(assetManager.getErrors()));
 				}
-				var atlas = new spine.TextureAtlas(this.assetManager.get(this.config.atlas), function (path) {
+				var atlasContent = config.atlasContent === undefined ? this.assetManager.get(this.config.atlas) : config.atlasContent;
+				var atlas = new spine.TextureAtlas(atlasContent, function (path) {
 					var texture = assetManager.get(imagesPath + path);
 					return texture;
 				});
 				var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 				var skeletonJson = new spine.SkeletonJson(atlasLoader);
 				skeletonJson.scale = config.scale;
-				var skeletonData = skeletonJson.readSkeletonData(assetManager.get(config.json));
+				var jsonContent = config.jsonContent === undefined ? assetManager.get(config.json) : config.jsonContent;
+				var skeletonData = skeletonJson.readSkeletonData(jsonContent);
 				var skeleton = this.skeleton = new spine.Skeleton(skeletonData);
 				var bounds = this.bounds;
 				skeleton.setSkinByName(config.skin);

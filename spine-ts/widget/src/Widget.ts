@@ -78,8 +78,8 @@ module spine {
 			this.shapes = new spine.webgl.ShapeRenderer(gl);
 
 			let assets = this.assetManager = new spine.webgl.AssetManager(gl);
-			assets.loadText(config.atlas);
-			assets.loadText(config.json);
+			if (!config.atlasContent) assets.loadText(config.atlas);
+			if (!config.jsonContent) assets.loadText(config.json);
 			if (config.atlasPages == null) {
 				assets.loadTexture(config.atlas.replace(".atlas", ".png"));
 			} else {
@@ -91,8 +91,8 @@ module spine {
 		}
 
 		private validateConfig (config: SpineWidgetConfig) {
-			if (!config.atlas) throw new Error("Please specify config.atlas");
-			if (!config.json) throw new Error("Please specify config.json");
+			if (!config.atlas && !config.atlasContent) throw new Error("Please specify config.atlas or config.atlasContent");
+			if (!config.json && !config.jsonContent) throw new Error("Please specify config.json or config.jsonContent");
 			if (!config.animation) throw new Error("Please specify config.animationName");
 
 			if (!config.scale) config.scale = 1.0;
@@ -127,7 +127,8 @@ module spine {
 					else throw new Error("Failed to load assets: " + JSON.stringify(assetManager.getErrors()));
 				}
 
-				let atlas = new spine.TextureAtlas(this.assetManager.get(this.config.atlas) as string, (path: string) => {
+				let atlasContent = config.atlasContent === undefined ? this.assetManager.get(this.config.atlas) as string : config.atlasContent;
+				let atlas = new spine.TextureAtlas(atlasContent, (path: string) => {
 					let texture = assetManager.get(imagesPath + path) as spine.webgl.GLTexture;
 					return texture;
 				});
@@ -137,7 +138,8 @@ module spine {
 
 				// Set the scale to apply during parsing, parse the file, and create a new skeleton.
 				skeletonJson.scale = config.scale;
-				var skeletonData = skeletonJson.readSkeletonData(assetManager.get(config.json) as string);
+				let jsonContent = config.jsonContent === undefined ? assetManager.get(config.json) as string : config.jsonContent;
+				var skeletonData = skeletonJson.readSkeletonData(jsonContent);
 				var skeleton = this.skeleton = new spine.Skeleton(skeletonData);
 				var bounds = this.bounds;
 				skeleton.setSkinByName(config.skin);
@@ -307,7 +309,9 @@ module spine {
 
 	export class SpineWidgetConfig {
 		json: string;
+		jsonContent: any;
 		atlas: string;
+		atlasContent: string;
 		animation: string;
 		imagesPath: string;
 		atlasPages: string[];
