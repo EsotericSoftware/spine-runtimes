@@ -231,10 +231,8 @@ var spine;
 					var attachment = slot.getAttachment();
 					var region = null;
 					var image = null;
-					var vertices = null;
 					if (attachment instanceof spine.RegionAttachment) {
 						var regionAttachment = attachment;
-						vertices = regionAttachment.updateWorldVertices(slot, false);
 						region = regionAttachment.region;
 						image = (region).texture.getImage();
 					}
@@ -242,28 +240,22 @@ var spine;
 						continue;
 					var att = attachment;
 					var bone = slot.bone;
-					var x = vertices[0];
-					var y = vertices[1];
-					var rotation = (bone.getWorldRotationX() - att.rotation) * Math.PI / 180;
-					var xx = vertices[24] - vertices[0];
-					var xy = vertices[25] - vertices[1];
-					var yx = vertices[8] - vertices[0];
-					var yy = vertices[9] - vertices[1];
-					var w = Math.sqrt(xx * xx + xy * xy), h = -Math.sqrt(yx * yx + yy * yy);
-					ctx.translate(x, y);
-					ctx.rotate(rotation);
-					if (region.rotate) {
-						ctx.rotate(Math.PI / 2);
-						ctx.drawImage(image, region.x, region.y, region.height, region.width, 0, 0, h, -w);
-						ctx.rotate(-Math.PI / 2);
-					}
-					else {
-						ctx.drawImage(image, region.x, region.y, region.width, region.height, 0, 0, w, h);
-					}
+					var w = region.width;
+					var h = region.height;
+					var offsetX = attachment.offset[0];
+					var offsetY = attachment.offset[1];
+					ctx.save();
+					ctx.transform(bone.a, bone.c, bone.b, bone.d, bone.worldX, bone.worldY);
+					ctx.translate(offsetX, offsetY);
+					ctx.rotate(attachment.rotation * Math.PI / 180);
+					ctx.scale(attachment.scaleX, attachment.scaleY);
+					ctx.translate(region.width / 2, region.height / 2);
+					ctx.scale(1, -1);
+					ctx.translate(-region.width / 2, -region.height / 2);
+					ctx.drawImage(image, region.x, region.y, region.width, region.height, 0, 0, w, h);
 					if (this.debugRendering)
 						ctx.strokeRect(0, 0, w, h);
-					ctx.rotate(-rotation);
-					ctx.translate(-x, -y);
+					ctx.restore();
 				}
 			};
 			SkeletonRenderer.prototype.drawTriangles = function (skeleton) {

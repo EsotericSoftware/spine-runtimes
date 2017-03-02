@@ -20,7 +20,11 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 spine-ts works with data exported from Spine 3.5.xx.
 
-spine-ts WebGL & Widget backends supports all Spine features. The spine-ts Canvas backend does not support color tinting, mesh attachments or shearing. Mesh attachments are supported by setting `spine.canvas.SkeletonRenderer.useTriangleRendering` to true. Note that this method is slow and may lead to artifacts on some browsers. The spine-ts THREE.JS backend does not support color tinting and blend modes. The THREE.JS backend provides `SkeletonMesh.zOffset` to avoid z-fighting. Adjust to your near/far plane settings.
+spine-ts WebGL & Widget backends supports all Spine features. 
+
+spine-ts Canvas does not support color tinting and mesh attachments. Experimental support for mesh attachments can be enabled by setting `spine.canvas.SkeletonRenderer.useTriangleRendering` to true. Note that this method is slow and may lead to artifacts on some browsers. 
+
+spine-ts THREE.JS does not support color tinting and blend modes. The THREE.JS backend provides `SkeletonMesh.zOffset` to avoid z-fighting. Adjust to your near/far plane settings.
 
 spine-ts does not yet support loading the binary format.
 
