@@ -90,7 +90,6 @@ module spine.canvas {
 				ctx.translate(w / 2, h / 2);
 				ctx.scale(1, -1);
 				ctx.translate(-w / 2, -h / 2);
-				ctx.drawImage(image, region.x, region.y, w, h, 0, 0, w, h);
 				if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
 					ctx.globalAlpha = color.a;
 					// experimental tinting via compositing, doesn't work
@@ -98,6 +97,7 @@ module spine.canvas {
 					// ctx.fillStyle = "rgba(" + (color.r * 255 | 0) + ", " + (color.g * 255 | 0)  + ", " + (color.b * 255 | 0) + ", " + color.a + ")";
 					// ctx.fillRect(0, 0, w, h);
 				}
+				ctx.drawImage(image, region.x, region.y, w, h, 0, 0, w, h);
 				if (this.debugRendering) ctx.strokeRect(0, 0, w, h);
 				ctx.restore();
 			}

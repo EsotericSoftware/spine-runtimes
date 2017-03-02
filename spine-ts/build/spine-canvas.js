@@ -260,10 +260,10 @@ var spine;
                     ctx.translate(w / 2, h / 2);
                     ctx.scale(1, -1);
                     ctx.translate(-w / 2, -h / 2);
-                    ctx.drawImage(image, region.x, region.y, w, h, 0, 0, w, h);
                     if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
                         ctx.globalAlpha = color.a;
                     }
+                    ctx.drawImage(image, region.x, region.y, w, h, 0, 0, w, h);
                     if (this.debugRendering)
                         ctx.strokeRect(0, 0, w, h);
                     ctx.restore();
