@@ -1541,7 +1541,9 @@ declare module spine {
 	}
 	class SpineWidgetConfig {
 		json: string;
+		jsonContent: any;
 		atlas: string;
+		atlasContent: string;
 		animation: string;
 		imagesPath: string;
 		atlasPages: string[];

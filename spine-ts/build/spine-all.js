@@ -8448,8 +8448,10 @@ var spine;
 			this.debugRenderer = new spine.webgl.SkeletonDebugRenderer(gl);
 			this.shapes = new spine.webgl.ShapeRenderer(gl);
 			var assets = this.assetManager = new spine.webgl.AssetManager(gl);
-			assets.loadText(config.atlas);
-			assets.loadText(config.json);
+			if (!config.atlasContent)
+				assets.loadText(config.atlas);
+			if (!config.jsonContent)
+				assets.loadText(config.json);
 			if (config.atlasPages == null) {
 				assets.loadTexture(config.atlas.replace(".atlas", ".png"));
 			}
@@ -8461,10 +8463,10 @@ var spine;
 			requestAnimationFrame(function () { _this.load(); });
 		}
 		SpineWidget.prototype.validateConfig = function (config) {
-			if (!config.atlas)
-				throw new Error("Please specify config.atlas");
-			if (!config.json)
-				throw new Error("Please specify config.json");
+			if (!config.atlas && !config.atlasContent)
+				throw new Error("Please specify config.atlas or config.atlasContent");
+			if (!config.json && !config.jsonContent)
+				throw new Error("Please specify config.json or config.jsonContent");
 			if (!config.animation)
 				throw new Error("Please specify config.animationName");
 			if (!config.scale)
@@ -8511,14 +8513,16 @@ var spine;
 					else
 						throw new Error("Failed to load assets: " + JSON.stringify(assetManager.getErrors()));
 				}
-				var atlas = new spine.TextureAtlas(this.assetManager.get(this.config.atlas), function (path) {
+				var atlasContent = config.atlasContent === undefined ? this.assetManager.get(this.config.atlas) : config.atlasContent;
+				var atlas = new spine.TextureAtlas(atlasContent, function (path) {
 					var texture = assetManager.get(imagesPath + path);
 					return texture;
 				});
 				var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 				var skeletonJson = new spine.SkeletonJson(atlasLoader);
 				skeletonJson.scale = config.scale;
-				var skeletonData = skeletonJson.readSkeletonData(assetManager.get(config.json));
+				var jsonContent = config.jsonContent === undefined ? assetManager.get(config.json) : config.jsonContent;
+				var skeletonData = skeletonJson.readSkeletonData(jsonContent);
 				var skeleton = this.skeleton = new spine.Skeleton(skeletonData);
 				var bounds = this.bounds;
 				skeleton.setSkinByName(config.skin);
