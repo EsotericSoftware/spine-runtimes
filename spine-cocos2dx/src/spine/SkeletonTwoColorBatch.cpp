@@ -107,28 +107,28 @@ void TwoColorTrianglesCommand::draw() {
 }
 
 const char* TWO_COLOR_TINT_VERTEX_SHADER = STRINGIFY(
-	attribute vec4 a_position;
-	attribute vec4 a_color;
-	attribute vec4 a_color2;
-	attribute vec2 a_texCoords;
+attribute vec4 a_position;
+attribute vec4 a_color;
+attribute vec4 a_color2;
+attribute vec2 a_texCoords;
 
-	\n#ifdef GL_ES\n
-	varying lowp vec4 v_light;
-	varying lowp vec4 v_dark;
-	varying mediump vec2 v_texCoord;
-	\n#else\n
-	varying vec4 v_light;
-	varying vec4 v_dark;
-	varying vec2 v_texCoord;
+\n#ifdef GL_ES\n
+varying lowp vec4 v_light;
+varying lowp vec4 v_dark;
+varying mediump vec2 v_texCoord;
+\n#else\n
+varying vec4 v_light;
+varying vec4 v_dark;
+varying vec2 v_texCoord;
 
-	\n#endif\n
+\n#endif\n
 
-	void main() {
-		v_light = a_color;
-		v_dark = a_color2;
-		v_texCoord = a_texCoords;
-		gl_Position = CC_PMatrix * a_position;
-	}
+void main() {
+	v_light = a_color;
+	v_dark = a_color2;
+	v_texCoord = a_texCoords;
+	gl_Position = CC_PMatrix * a_position;
+}
 );
 
 const char* TWO_COLOR_TINT_FRAGMENT_SHADER = STRINGIFY(

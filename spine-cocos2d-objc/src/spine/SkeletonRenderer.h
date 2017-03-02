@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 #import <spine/spine.h>
+#import "TwoColorBatcher.h"
 #import "cocos2d.h"
 
 /** Draws a skeleton. */
@@ -45,6 +46,7 @@
 	spAtlas* _atlas;
 	float* _worldVertices;
 	CCBlendMode* screenMode;
+	spTwoColorBatcher* batcher;
 }
 
 + (id) skeletonWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
