@@ -410,7 +410,6 @@ namespace Spine.Unity {
 
 			// STEP 2. Update vertex buffer based on verts from the attachments.  ============================================================
 			// Uses values that were also stored in workingInstruction.
-			bool vertexCountIncreased = ArraysMeshGenerator.EnsureSize(vertexCount, ref this.vertices, ref this.uvs, ref this.colors);
 			if (tintBlack) {
 				ArraysMeshGenerator.EnsureSize(vertexCount, ref this.uv2);
 				ArraysMeshGenerator.EnsureSize(vertexCount, ref this.uv3);
