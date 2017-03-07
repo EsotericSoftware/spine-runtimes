@@ -15,7 +15,7 @@
     * Fixed renderer to work with 3.6 changes
   * **[corona]**
     * Fixed renderer to work with 3.6 changes. Sadly, two color tinting is not supported, as Corona doesn't let us change the vertex format needed and its doesn't allow to modify shaders in the way needed for two color tinting
-* [c]
+* **[c]**
   * **Breaking changes**
     * `spVertexAttachment_computeWorldVertices` and `spRegionAttachment_computeWorldVerticeS` now take new parameters to make it possible to directly output the calculated vertex positions to a vertex buffer. Removes the need for additional copies in the backends' respective renderers.
     * Removed `spBoundingBoxAttachment_computeWorldVertices`, superseded by `spVertexAttachment_computeWorldVertices`.
@@ -42,7 +42,7 @@
   	* Fixed renderer to work with 3.6 changes. Sadly, two color tinting does not work, as the vertex format in SFML is fixed.
   * **[ue4]**
     * Fixed renderer to work with 3.6 changes
-* [as3]
+* **[as3]**
   * **Breaking changes**
     * Removed `Bone.worldToLocalRotationX` and `Bone.worldToLocalRotationY`. Replaced by `Bone.worldToLocalRotation` (rotation given relative to x-axis, counter-clockwise, in degrees).
     * Made `Bone` fields `_a`, `_b`, `_c`, `_d`, `_worldX` and `_worldY` public, removed underscore prefix.
@@ -58,7 +58,7 @@
     * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.    
   * **[starling]**
     * Fixed renderer to work with 3.6 changes.
-* [ts]
+* **[ts]**
   * **Breaking changes**
   * `Skeleton.getBounds` takes a scratch array as input so it doesn't have to allocate a new array on each invocation itself. Reduces GC activity.
   * Removed `Bone.worldToLocalRotationX` and `Bone.worldToLocalRotationY`. Replaced by `Bone.worldToLocalRotation` (rotation given relative to x-axis, counter-clockwise, in degrees).
