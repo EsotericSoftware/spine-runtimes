@@ -1476,6 +1476,7 @@ declare module spine {
 		animation: string;
 		imagesPath: string;
 		atlasPages: string[];
+		atlasPagesContent: string[];
 		skin: string;
 		loop: boolean;
 		scale: number;

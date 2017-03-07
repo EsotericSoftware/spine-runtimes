@@ -77,11 +77,24 @@ module spine {
 			this.debugRenderer = new spine.webgl.SkeletonDebugRenderer(gl);
 			this.shapes = new spine.webgl.ShapeRenderer(gl);
 
-			let assets = this.assetManager = new spine.webgl.AssetManager(gl);
-			if (!config.atlasContent) assets.loadText(config.atlas);
-			if (!config.jsonContent) assets.loadText(config.json);
+			let assets = this.assetManager = new spine.webgl.AssetManager(gl, config.imagesPath ? config.imagesPath : "");
+			if (!config.atlasContent) {
+				assets.loadText(config.atlas);
+			}
+			if (!config.jsonContent) {
+				assets.loadText(config.json);
+			}
 			if (config.atlasPages == null) {
-				assets.loadTexture(config.atlas.replace(".atlas", ".png"));
+				if (config.atlas) {
+					var atlasPage = config.atlas.replace(".atlas", ".png");
+					if (atlasPage.lastIndexOf(config.imagesPath) == 0) {
+						atlasPage = atlasPage.substr(config.imagesPath.length);
+					}
+					assets.loadTexture(atlasPage);
+				} else {
+					let firstLine = config.atlasContent.trim().split("\n")[0];
+					assets.loadTexture(firstLine);
+				}
 			} else {
 				for (let i = 0; i < config.atlasPages.length; i++) {
 					assets.loadTexture(config.atlasPages[i]);
@@ -103,12 +116,22 @@ module spine {
 			if (config.fitToCanvas === undefined) config.fitToCanvas = true;
 			if (!config.backgroundColor) config.backgroundColor = "#555555";
 			if (!config.imagesPath) {
-				let index = config.atlas.lastIndexOf("/");
-				if (index != -1) {
-					config.imagesPath = config.atlas.substr(0, index) + "/";
+				if (config.atlas) {
+					let index = config.atlas.lastIndexOf("/");
+					if (index != -1) {
+						config.imagesPath = config.atlas.substr(0, index) + "/";
+					} else {
+						config.imagesPath = "";
+					}
 				} else {
 					config.imagesPath = "";
 				}
+			}
+			if (config.json && config.json.lastIndexOf(config.imagesPath) == 0) {
+				config.json = config.json.substr(config.imagesPath.length);
+			}
+			if (config.atlas && config.atlas.lastIndexOf(config.imagesPath) == 0) {
+				config.atlas = config.atlas.substr(config.imagesPath.length);
 			}
 			if (!config.premultipliedAlpha === undefined) config.premultipliedAlpha = false;
 			if (!config.debug === undefined) config.debug = false;
@@ -129,7 +152,7 @@ module spine {
 
 				let atlasContent = config.atlasContent === undefined ? this.assetManager.get(this.config.atlas) as string : config.atlasContent;
 				let atlas = new spine.TextureAtlas(atlasContent, (path: string) => {
-					let texture = assetManager.get(imagesPath + path) as spine.webgl.GLTexture;
+					let texture = assetManager.get(path) as spine.webgl.GLTexture;
 					return texture;
 				});
 
@@ -315,6 +338,7 @@ module spine {
 		animation: string;
 		imagesPath: string;
 		atlasPages: string[];
+		atlasPagesContent: string[];
 		skin = "default";
 		loop = true;
 		scale = 1.0;
