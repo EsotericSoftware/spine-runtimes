@@ -7591,7 +7591,7 @@ var spine;
 					skeleton.y = config.y;
 				}
 				var animationState = this.state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
-				animationState.setAnimation(0, config.animation, true);
+				animationState.setAnimation(0, config.animation, config.loop);
 				if (config.success)
 					config.success(this);
 				this.loaded = true;
