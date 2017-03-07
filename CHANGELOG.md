@@ -1,18 +1,19 @@
 # 3.6
-* [lua]
-  * API addition: added `Bone:localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).
-  * API change: removed `Bone:worldToLocalRotationX` and `Bone:worldToLocalRotationY`. Replaced by `Bone:worldToLocalRotation` (rotation given relative to x-axis, counter-clockwise, in degrees).
-  * API addition: added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.
-  * API change: `VertexAttachment:computeWorldVertices` now takes offsets and stride to allow compositing vertices directly in a vertex buffer to be send to the GPU. The compositing is now performed in the backends' respective renderers. This also affects the subclasses `MeshAttachment`, `BoundingBoxAttachment` and `PathAttachment`.
-  * API change: removed `RegionAttachment:updateWorldVertices`, added `RegionAttachment:computeWorldVertices`, which takes offsets and stride to allow compositing vertices directly in a vertex buffer to be send to the GPU. The compositing is now performed in the backends' respective renderers.
-  * API addition: `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
-  * API change: removed `MeshAttachment.worldVertices` field. Computation is now performed in each backends' respective renderer. The `uv` coordinates are now stored in `MeshAttachment.uvs`.
-  * API change: removed `RegionAttachment.vertices` field. Computation is now performed in each backends respective renderer. The `uv` coordinates for each vertex are now stored in the `RegionAttachment.uvs` field.
-  * API addition: added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
-  * API addition: `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
-  * [love]
+* **[lua]**
+  * **Breaking changes**
+    * Removed `Bone:worldToLocalRotationX` and `Bone:worldToLocalRotationY`. Replaced by `Bone:worldToLocalRotation` (rotation given relative to x-axis, counter-clockwise, in degrees).
+    * `VertexAttachment:computeWorldVertices` now takes offsets and stride to allow compositing vertices directly in a vertex buffer to be send to the GPU. The compositing is now performed in the backends' respective renderers. This also affects the subclasses `MeshAttachment`, `BoundingBoxAttachment` and `PathAttachment`.
+    * Removed `RegionAttachment:updateWorldVertices`, added `RegionAttachment:computeWorldVertices`, which takes offsets and stride to allow compositing vertices directly in a vertex buffer to be send to the GPU. The compositing is now performed in the backends' respective renderers.
+    * Removed `MeshAttachment.worldVertices` field. Computation is now performed in each backends' respective renderer. The `uv` coordinates are now stored in `MeshAttachment.uvs`.
+    * Removed `RegionAttachment.vertices` field. Computation is now performed in each backends respective renderer. The `uv` coordinates for each vertex are now stored in the `RegionAttachment.uvs` field.
+  * **Additions**
+    * Added `Bone:localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).
+    * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.
+    * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.  
+    * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`  
+  * **[love]**
     * Fixed renderer to work with 3.6 changes
-  * [corona]
+  * **[corona]**
     * Fixed renderer to work with 3.6 changes. Sadly, two color tinting is not supported, as Corona doesn't let us change the vertex format needed and its doesn't allow to modify shaders in the way needed for two color tinting
 * [c]
   * API addition: added support for local and relative transform constraint calculation, including additional fields in `spTransformConstraintData`.
