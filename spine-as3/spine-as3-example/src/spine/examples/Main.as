@@ -27,70 +27,65 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 package spine.examples {
+	import flash.display.Sprite;
 
-import flash.display.Sprite;
+	import spine.*;
+	import spine.animation.AnimationStateData;
+	import spine.atlas.Atlas;
+	import spine.attachments.AtlasAttachmentLoader;
+	import spine.flash.FlashTextureLoader;
+	import spine.flash.SkeletonAnimation;
 
-import spine.*;
-import spine.animation.AnimationStateData;
-import spine.atlas.Atlas;
-import spine.attachments.AtlasAttachmentLoader;
-import spine.flash.FlashTextureLoader;
-import spine.flash.SkeletonAnimation;
+	[SWF(width = "800", height = "600", frameRate = "60", backgroundColor = "#dddddd")]
+	public class Main extends Sprite {
+		[Embed(source = "/spineboy.atlas", mimeType = "application/octet-stream")]
+		static public const SpineboyAtlas : Class;
 
-[SWF(width = "800", height = "600", frameRate = "60", backgroundColor = "#dddddd")]
-public class Main extends Sprite {
-	[Embed(source = "/spineboy.atlas", mimeType = "application/octet-stream")]
-	static public const SpineboyAtlas:Class;
+		[Embed(source = "/spineboy.png")]
+		static public const SpineboyAtlasTexture : Class;
 
-	[Embed(source = "/spineboy.png")]
-	static public const SpineboyAtlasTexture:Class;
+		[Embed(source = "/spineboy.json", mimeType = "application/octet-stream")]
+		static public const SpineboyJson : Class;
+		private var skeleton : SkeletonAnimation;
 
-	[Embed(source = "/spineboy.json", mimeType = "application/octet-stream")]
-	static public const SpineboyJson:Class;
+		public function Main() {
+			var atlas : Atlas = new Atlas(new SpineboyAtlas(), new FlashTextureLoader(new SpineboyAtlasTexture()));
+			var json : SkeletonJson = new SkeletonJson(new AtlasAttachmentLoader(atlas));
+			json.scale = 0.6;
+			var skeletonData : SkeletonData = json.readSkeletonData(new SpineboyJson());
 
-	private var skeleton:SkeletonAnimation;
+			var stateData : AnimationStateData = new AnimationStateData(skeletonData);
+			stateData.setMixByName("walk", "jump", 0.2);
+			stateData.setMixByName("jump", "run", 0.4);
+			stateData.setMixByName("jump", "jump", 0.2);
 
-	public function Main () {
-		var atlas:Atlas = new Atlas(new SpineboyAtlas(), new FlashTextureLoader(new SpineboyAtlasTexture()));
-		var json:SkeletonJson = new SkeletonJson(new AtlasAttachmentLoader(atlas));
-		json.scale = 0.6;
-		var skeletonData:SkeletonData = json.readSkeletonData(new SpineboyJson());
+			skeleton = new SkeletonAnimation(skeletonData, stateData);
+			skeleton.x = 400;
+			skeleton.y = 560;
 
-		var stateData:AnimationStateData = new AnimationStateData(skeletonData);
-		stateData.setMixByName("walk", "jump", 0.2);
-		stateData.setMixByName("jump", "run", 0.4);
-		stateData.setMixByName("jump", "jump", 0.2);
+			skeleton.state.onStart.add(function(trackIndex : int) : void {
+				trace(trackIndex + " fuu start: " + skeleton.state.getCurrent(trackIndex));
+			});
+			skeleton.state.onEnd.add(function(trackIndex : int) : void {
+				trace(trackIndex + " end: " + skeleton.state.getCurrent(trackIndex));
+			});
+			skeleton.state.onComplete.add(function(trackIndex : int, count : int) : void {
+				trace(trackIndex + " complete: " + skeleton.state.getCurrent(trackIndex) + ", " + count);
+			});
+			skeleton.state.onEvent.add(function(trackIndex : int, event : Event) : void {
+				trace(trackIndex + " event: " + skeleton.state.getCurrent(trackIndex) + ", " + event.data.name + ": " + event.intValue + ", " + event.floatValue + ", " + event.stringValue);
+			});
 
-		skeleton = new SkeletonAnimation(skeletonData, stateData);
-		skeleton.x = 400;
-		skeleton.y = 560;
-		
-		skeleton.state.onStart.add(function (trackIndex:int) : void {
-			trace(trackIndex + " fuu start: " + skeleton.state.getCurrent(trackIndex));
-		});
-		skeleton.state.onEnd.add(function (trackIndex:int) : void {
-			trace(trackIndex + " end: " + skeleton.state.getCurrent(trackIndex));
-		});
-		skeleton.state.onComplete.add(function (trackIndex:int, count:int) : void {
-			trace(trackIndex + " complete: " + skeleton.state.getCurrent(trackIndex) + ", " + count);
-		});
-		skeleton.state.onEvent.add(function (trackIndex:int, event:Event) : void {
-			trace(trackIndex + " event: " + skeleton.state.getCurrent(trackIndex) + ", "
-				+ event.data.name + ": " + event.intValue + ", " + event.floatValue + ", " + event.stringValue);
-		});
-		
-		if (false) {
-			skeleton.state.setAnimationByName(0, "test", true);
-		} else {
-			skeleton.state.setAnimationByName(0, "walk", true);
-			skeleton.state.addAnimationByName(0, "jump", false, 3);
-			skeleton.state.addAnimationByName(0, "run", true, 0);
+			if (false) {
+				skeleton.state.setAnimationByName(0, "test", true);
+			} else {
+				skeleton.state.setAnimationByName(0, "walk", true);
+				skeleton.state.addAnimationByName(0, "jump", false, 3);
+				skeleton.state.addAnimationByName(0, "run", true, 0);
+			}
+
+			addChild(skeleton);
 		}
-
-		addChild(skeleton);
 	}
-}
-
 }

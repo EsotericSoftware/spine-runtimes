@@ -30,44 +30,44 @@
 
 package spine.starling {
 	import starling.rendering.Program;
-import flash.display3D.Context3D;
-import starling.rendering.VertexDataFormat;
-import starling.rendering.MeshEffect;
 
-public class TwoColorEffect extends MeshEffect {
-	public  static const VERTEX_FORMAT:VertexDataFormat = TwoColorMeshStyle.VERTEX_FORMAT;
-	
-	override protected function createProgram():Program {
-		var vertexShader:String = [
-		"m44 op, va0, vc0", // 4x4 matrix transform to output clip-space
-		"mov v0, va1     ", // pass texture coordinates to fragment program
-		"mul v1, va2, vc4", // multiply alpha (vc4) with color (va2), pass to fp
-		"mov v2, va3     "  // pass offset to fp
-		].join("\n");
- 
-		var fragmentShader:String = [
-		    tex("ft0", "v0", 0, texture) +  // get color from texture
-		"mul ft0, ft0, v1",             // multiply color with texel color
-		"mov ft1, v2",                  // copy complete offset to ft1
-		"mul ft1.xyz, v2.xyz, ft0.www", // multiply offset.rgb with alpha (pma!)
-		"add oc, ft0, ft1"              // add offset, copy to output
-		].join("\n");
- 		
-		return Program.fromSource(vertexShader, fragmentShader);
-    }
-	
-	override public function get vertexFormat():VertexDataFormat {
-		return VERTEX_FORMAT;
+	import flash.display3D.Context3D;
+
+	import starling.rendering.VertexDataFormat;
+	import starling.rendering.MeshEffect;
+
+	public class TwoColorEffect extends MeshEffect {
+		public  static const VERTEX_FORMAT : VertexDataFormat = TwoColorMeshStyle.VERTEX_FORMAT;
+
+		override protected function createProgram() : Program {
+			var vertexShader : String = ["m44 op, va0, vc0", // 4x4 matrix transform to output clip-space 
+			"mov v0, va1     ", // pass texture coordinates to fragment program 
+			"mul v1, va2, vc4", // multiply alpha (vc4) with color (va2), pass to fp 
+			"mov v2, va3     "  // pass offset to fp
+			].join("\n");
+
+			var fragmentShader : String = [tex("ft0", "v0", 0, texture) +  // get color from texture 
+			"mul ft0, ft0, v1",             // multiply color with texel color 
+			"mov ft1, v2",                  // copy complete offset to ft1 
+			"mul ft1.xyz, v2.xyz, ft0.www", // multiply offset.rgb with alpha (pma!) 
+			"add oc, ft0, ft1"              // add offset, copy to output
+			].join("\n");
+
+			return Program.fromSource(vertexShader, fragmentShader);
+		}
+
+		override public function get vertexFormat() : VertexDataFormat {
+			return VERTEX_FORMAT;
+		}
+
+		override protected function beforeDraw(context : Context3D) : void {
+			super.beforeDraw(context);
+			vertexFormat.setVertexBufferAt(3, vertexBuffer, "color2");
+		}
+
+		override protected function afterDraw(context : Context3D) : void {
+			context.setVertexBufferAt(3, null);
+			super.afterDraw(context);
+		}
 	}
- 
-	override protected function beforeDraw(context:Context3D):void {
-		super.beforeDraw(context);
-		vertexFormat.setVertexBufferAt(3, vertexBuffer, "color2");
-	}
- 
-	override protected function afterDraw(context:Context3D):void {
-		context.setVertexBufferAt(3, null);
-		super.afterDraw(context);
-	}
-}
 }

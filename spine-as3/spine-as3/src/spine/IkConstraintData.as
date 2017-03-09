@@ -29,27 +29,25 @@
  *****************************************************************************/
 
 package spine {
+	public class IkConstraintData {
+		internal var _name : String;
+		public var order : Number;
+		public var bones : Vector.<BoneData> = new Vector.<BoneData>();
+		public var target : BoneData;
+		public var bendDirection : int = 1;
+		public var mix : Number = 1;
 
-public class IkConstraintData {
-	internal var _name:String;
-	public var order:Number;
-	public var bones:Vector.<BoneData> = new Vector.<BoneData>();
-	public var target:BoneData;
-	public var bendDirection:int = 1;
-	public var mix:Number = 1;
+		public function IkConstraintData(name : String) {
+			if (name == null) throw new ArgumentError("name cannot be null.");
+			_name = name;
+		}
 
-	public function IkConstraintData (name:String) {
-		if (name == null) throw new ArgumentError("name cannot be null.");
-		_name = name;
+		public function get name() : String {
+			return _name;
+		}
+
+		public function toString() : String {
+			return _name;
+		}
 	}
-
-	public function get name () : String {
-		return _name;
-	}
-
-	public function toString () : String {
-		return _name;
-	}
-}
-
 }

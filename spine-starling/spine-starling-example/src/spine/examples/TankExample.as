@@ -29,44 +29,43 @@
  *****************************************************************************/
 
 package spine.examples {
-import spine.atlas.Atlas;
-import spine.*;
-import spine.attachments.AtlasAttachmentLoader;
-import spine.attachments.AttachmentLoader;
-import spine.starling.SkeletonAnimation;
-import spine.starling.StarlingTextureLoader;
+	import spine.atlas.Atlas;
+	import spine.*;
+	import spine.attachments.AtlasAttachmentLoader;
+	import spine.attachments.AttachmentLoader;
+	import spine.starling.SkeletonAnimation;
+	import spine.starling.StarlingTextureLoader;
 
-import starling.core.Starling;
-import starling.display.Sprite;
+	import starling.core.Starling;
+	import starling.display.Sprite;
 
-public class TankExample extends Sprite {
-	[Embed(source = "/tank.json", mimeType = "application/octet-stream")]
-	static public const TankJson:Class;
-	
-	[Embed(source = "/tank.atlas", mimeType = "application/octet-stream")]
-	static public const TankAtlas:Class;
-	
-	[Embed(source = "/tank.png")]
-	static public const TankAtlasTexture:Class;
-	
-	private var skeleton:SkeletonAnimation;	
+	public class TankExample extends Sprite {
+		[Embed(source = "/tank.json", mimeType = "application/octet-stream")]
+		static public const TankJson : Class;
 
-	public function TankExample () {
-		var attachmentLoader:AttachmentLoader;
-		var spineAtlas:Atlas = new Atlas(new TankAtlas(), new StarlingTextureLoader(new TankAtlasTexture()));
-		attachmentLoader = new AtlasAttachmentLoader(spineAtlas);
+		[Embed(source = "/tank.atlas", mimeType = "application/octet-stream")]
+		static public const TankAtlas : Class;
 
-		var json:SkeletonJson = new SkeletonJson(attachmentLoader);
-		json.scale = 0.5;
-		var skeletonData:SkeletonData = json.readSkeletonData(new TankJson());
+		[Embed(source = "/tank.png")]
+		static public const TankAtlasTexture : Class;
+		private var skeleton : SkeletonAnimation;
 
-		skeleton = new SkeletonAnimation(skeletonData);
-		skeleton.x = 400;
-		skeleton.y = 560;
-		skeleton.state.setAnimationByName(0, "drive", true);
+		public function TankExample() {
+			var attachmentLoader : AttachmentLoader;
+			var spineAtlas : Atlas = new Atlas(new TankAtlas(), new StarlingTextureLoader(new TankAtlasTexture()));
+			attachmentLoader = new AtlasAttachmentLoader(spineAtlas);
 
-		addChild(skeleton);
-		Starling.juggler.add(skeleton);	
-	}	
-}
+			var json : SkeletonJson = new SkeletonJson(attachmentLoader);
+			json.scale = 0.5;
+			var skeletonData : SkeletonData = json.readSkeletonData(new TankJson());
+
+			skeleton = new SkeletonAnimation(skeletonData);
+			skeleton.x = 400;
+			skeleton.y = 560;
+			skeleton.state.setAnimationByName(0, "drive", true);
+
+			addChild(skeleton);
+			Starling.juggler.add(skeleton);
+		}
+	}
 }

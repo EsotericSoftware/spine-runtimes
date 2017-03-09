@@ -29,29 +29,28 @@
  *****************************************************************************/
 
 package spine.starling {
-import spine.SkeletonData;
-import spine.animation.AnimationState;
-import spine.animation.AnimationStateData;
+	import spine.SkeletonData;
+	import spine.animation.AnimationState;
+	import spine.animation.AnimationStateData;
 
-import starling.animation.IAnimatable;
+	import starling.animation.IAnimatable;
 
-public class SkeletonAnimation extends SkeletonSprite implements IAnimatable {
-	public var state:AnimationState;
-	public var timeScale:Number = 1;
+	public class SkeletonAnimation extends SkeletonSprite implements IAnimatable {
+		public var state : AnimationState;
+		public var timeScale : Number = 1;
 
-	public function SkeletonAnimation (skeletonData:SkeletonData, stateData:AnimationStateData = null) {
-		super(skeletonData);
-		state = new AnimationState(stateData ? stateData : new AnimationStateData(skeletonData));
+		public function SkeletonAnimation(skeletonData : SkeletonData, stateData : AnimationStateData = null) {
+			super(skeletonData);
+			state = new AnimationState(stateData ? stateData : new AnimationStateData(skeletonData));
+		}
+
+		public function advanceTime(time : Number) : void {
+			time *= timeScale;
+			skeleton.update(time);
+			state.update(time);
+			state.apply(skeleton);
+			skeleton.updateWorldTransform();
+			this.setRequiresRedraw();
+		}
 	}
-
-	public function advanceTime (time:Number) : void {
-		time *= timeScale;
-		skeleton.update(time);
-		state.update(time);
-		state.apply(skeleton);
-		skeleton.updateWorldTransform();
-		this.setRequiresRedraw();
-	}
-}
-
 }

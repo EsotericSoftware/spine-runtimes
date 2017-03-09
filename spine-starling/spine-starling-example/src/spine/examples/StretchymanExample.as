@@ -29,70 +29,68 @@
  *****************************************************************************/
 
 package spine.examples {
-import spine.*;
-import spine.animation.AnimationStateData;
-import spine.animation.TrackEntry;
-import spine.atlas.Atlas;
-import spine.attachments.AtlasAttachmentLoader;
-import spine.attachments.AttachmentLoader;
-import spine.starling.SkeletonAnimation;
-import spine.starling.StarlingTextureLoader;
+	import spine.*;
+	import spine.animation.AnimationStateData;
+	import spine.animation.TrackEntry;
+	import spine.atlas.Atlas;
+	import spine.attachments.AtlasAttachmentLoader;
+	import spine.attachments.AttachmentLoader;
+	import spine.starling.SkeletonAnimation;
+	import spine.starling.StarlingTextureLoader;
 
-import starling.core.Starling;
-import starling.display.Sprite;
+	import starling.core.Starling;
+	import starling.display.Sprite;
 
-public class StretchymanExample extends Sprite {
-	[Embed(source = "/stretchyman.json", mimeType = "application/octet-stream")]
-	static public const StretchymanJson:Class;
+	public class StretchymanExample extends Sprite {
+		[Embed(source = "/stretchyman.json", mimeType = "application/octet-stream")]
+		static public const StretchymanJson : Class;
 
-	[Embed(source = "/stretchyman.atlas", mimeType = "application/octet-stream")]
-	static public const StretchymanAtlas:Class;
+		[Embed(source = "/stretchyman.atlas", mimeType = "application/octet-stream")]
+		static public const StretchymanAtlas : Class;
 
-	[Embed(source = "/stretchyman.png")]
-	static public const StretchymanAtlasTexture:Class;
+		[Embed(source = "/stretchyman.png")]
+		static public const StretchymanAtlasTexture : Class;
+		private var skeleton : SkeletonAnimation;
 
-	private var skeleton:SkeletonAnimation;
+		public function StretchymanExample() {
+			var spineAtlas : Atlas = new Atlas(new StretchymanAtlas(), new StarlingTextureLoader(new StretchymanAtlasTexture()));
+			var attachmentLoader : AttachmentLoader = new AtlasAttachmentLoader(spineAtlas);
+			var json : SkeletonJson = new SkeletonJson(attachmentLoader);
+			json.scale = 0.4;
+			var skeletonData : SkeletonData = json.readSkeletonData(new StretchymanJson());
 
-	public function StretchymanExample () {
-		var spineAtlas:Atlas = new Atlas(new StretchymanAtlas(), new StarlingTextureLoader(new StretchymanAtlasTexture()));
-		var attachmentLoader:AttachmentLoader = new AtlasAttachmentLoader(spineAtlas);
-		var json:SkeletonJson = new SkeletonJson(attachmentLoader);
-		json.scale = 0.4;
-		var skeletonData:SkeletonData = json.readSkeletonData(new StretchymanJson());
+			var stateData : AnimationStateData = new AnimationStateData(skeletonData);
 
-		var stateData:AnimationStateData = new AnimationStateData(skeletonData);
+			skeleton = new SkeletonAnimation(skeletonData, stateData);
+			skeleton.x = 100;
+			skeleton.y = 560;
 
-		skeleton = new SkeletonAnimation(skeletonData, stateData);
-		skeleton.x = 100;
-		skeleton.y = 560;
-		
-		skeleton.state.timeScale = 0.1;
-		
-		skeleton.state.onStart.add(function (entry:TrackEntry) : void {
-			trace(entry.trackIndex + " start: " + entry.animation.name);
-		});
-		skeleton.state.onInterrupt.add(function (entry:TrackEntry) : void {
-			trace(entry.trackIndex + " interrupt: " + entry.animation.name);
-		});
-		skeleton.state.onEnd.add(function (entry:TrackEntry) : void {
-			trace(entry.trackIndex + " end: " + entry.animation.name);
-		});
-		skeleton.state.onComplete.add(function (entry:TrackEntry) : void {
-			trace(entry.trackIndex + " complete: " + entry.animation.name);
-		});
-		skeleton.state.onDispose.add(function (entry:TrackEntry) : void {
-			trace(entry.trackIndex + " dispose: " + entry.animation.name);
-		});
-		skeleton.state.onEvent.add(function (entry:TrackEntry, event:Event) : void {
-			trace(entry.trackIndex + " event: " + entry.animation.name + ", "
-				+ event.data.name + ": " + event.intValue + ", " + event.floatValue + ", " + event.stringValue);
-		});
+			skeleton.state.timeScale = 0.1;
 
-		skeleton.skeleton.setToSetupPose();
-		skeleton.state.setAnimationByName(0, "sneak", true);
+			skeleton.state.onStart.add(function(entry : TrackEntry) : void {
+				trace(entry.trackIndex + " start: " + entry.animation.name);
+			});
+			skeleton.state.onInterrupt.add(function(entry : TrackEntry) : void {
+				trace(entry.trackIndex + " interrupt: " + entry.animation.name);
+			});
+			skeleton.state.onEnd.add(function(entry : TrackEntry) : void {
+				trace(entry.trackIndex + " end: " + entry.animation.name);
+			});
+			skeleton.state.onComplete.add(function(entry : TrackEntry) : void {
+				trace(entry.trackIndex + " complete: " + entry.animation.name);
+			});
+			skeleton.state.onDispose.add(function(entry : TrackEntry) : void {
+				trace(entry.trackIndex + " dispose: " + entry.animation.name);
+			});
+			skeleton.state.onEvent.add(function(entry : TrackEntry, event : Event) : void {
+				trace(entry.trackIndex + " event: " + entry.animation.name + ", " + event.data.name + ": " + event.intValue + ", " + event.floatValue + ", " + event.stringValue);
+			});
 
-		addChild(skeleton);
-		Starling.juggler.add(skeleton);		
+			skeleton.skeleton.setToSetupPose();
+			skeleton.state.setAnimationByName(0, "sneak", true);
+
+			addChild(skeleton);
+			Starling.juggler.add(skeleton);
+		}
 	}
-}
 }

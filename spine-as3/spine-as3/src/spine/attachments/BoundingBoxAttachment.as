@@ -29,10 +29,9 @@
  *****************************************************************************/
 
 package spine.attachments {
-
-public dynamic class BoundingBoxAttachment extends VertexAttachment {	
-	public function BoundingBoxAttachment (name:String) {
-		super(name);
-	}		
-}
+	public dynamic class BoundingBoxAttachment extends VertexAttachment {
+		public function BoundingBoxAttachment(name : String) {
+			super(name);
+		}
+	}
 }

@@ -29,83 +29,80 @@
  *****************************************************************************/
 
 package spine.animation {
-import spine.Event;
-import spine.Skeleton;
-import spine.Slot;
+	import spine.Event;
+	import spine.Skeleton;
+	import spine.Slot;
 
-public class ColorTimeline extends CurveTimeline {
-	static public const ENTRIES:int = 5;
-	static internal const PREV_TIME:int = -5, PREV_R:int = -4, PREV_G:int = -3, PREV_B:int = -2, PREV_A:int = -1;
-	static internal const R:int = 1, G:int = 2, B:int = 3, A:int = 4;
+	public class ColorTimeline extends CurveTimeline {
+		static public const ENTRIES : int = 5;
+		static internal const PREV_TIME : int = -5, PREV_R : int = -4, PREV_G : int = -3, PREV_B : int = -2, PREV_A : int = -1;
+		static internal const R : int = 1, G : int = 2, B : int = 3, A : int = 4;
+		public var slotIndex : int;
+		public var frames : Vector.<Number>; // time, r, g, b, a, ...
 
-	public var slotIndex:int;
-	public var frames:Vector.<Number>; // time, r, g, b, a, ...
-
-	public function ColorTimeline (frameCount:int) {
-		super(frameCount);
-		frames = new Vector.<Number>(frameCount * 5, true);
-	}
-	
-	override public function getPropertyId () : int {
-		return (TimelineType.color.ordinal << 24) + slotIndex;
-	}
-
-	/** Sets the time and value of the specified keyframe. */
-	public function setFrame (frameIndex:int, time:Number, r:Number, g:Number, b:Number, a:Number) : void {
-		frameIndex *= ENTRIES;
-		frames[frameIndex] = time;
-		frames[int(frameIndex + R)] = r;
-		frames[int(frameIndex + G)] = g;
-		frames[int(frameIndex + B)] = b;
-		frames[int(frameIndex + A)] = a;
-	}
-
-	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
-		var frames:Vector.<Number> = this.frames;
-		var slot:Slot = skeleton.slots[slotIndex];
-		
-		if (time < frames[0]) {
-			if (setupPose) {
-				slot.color.setFromColor(slot.data.color);				
-			}
-			return;
+		public function ColorTimeline(frameCount : int) {
+			super(frameCount);
+			frames = new Vector.<Number>(frameCount * 5, true);
 		}
 
-		var r:Number, g:Number, b:Number, a:Number;
-		if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
-			var i:int = frames.length;
-			r = frames[i + PREV_R];
-			g = frames[i + PREV_G];
-			b = frames[i + PREV_B];
-			a = frames[i + PREV_A];
-		} else {
-			// Interpolate between the previous frame and the current frame.
-			var frame:int = Animation.binarySearch(frames, time, ENTRIES);
-			r = frames[frame + PREV_R];
-			g = frames[frame + PREV_G];
-			b = frames[frame + PREV_B];
-			a = frames[frame + PREV_A];
-			var frameTime:Number = frames[frame];
-			var percent:Number = getCurvePercent(frame / ENTRIES - 1,
-				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+		override public function getPropertyId() : int {
+			return (TimelineType.color.ordinal << 24) + slotIndex;
+		}
 
-			r += (frames[frame + R] - r) * percent;
-			g += (frames[frame + G] - g) * percent;
-			b += (frames[frame + B] - b) * percent;
-			a += (frames[frame + A] - a) * percent;
-		}		
-		if (alpha == 1) {
-			slot.color.setFrom(r, g, b, a);
-		} else {			
-			if (setupPose) {
-				slot.color.setFromColor(slot.data.color);			 
+		/** Sets the time and value of the specified keyframe. */
+		public function setFrame(frameIndex : int, time : Number, r : Number, g : Number, b : Number, a : Number) : void {
+			frameIndex *= ENTRIES;
+			frames[frameIndex] = time;
+			frames[int(frameIndex + R)] = r;
+			frames[int(frameIndex + G)] = g;
+			frames[int(frameIndex + B)] = b;
+			frames[int(frameIndex + A)] = a;
+		}
+
+		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, setupPose : Boolean, mixingOut : Boolean) : void {
+			var frames : Vector.<Number> = this.frames;
+			var slot : Slot = skeleton.slots[slotIndex];
+
+			if (time < frames[0]) {
+				if (setupPose) {
+					slot.color.setFromColor(slot.data.color);
+				}
+				return;
 			}
-			slot.color.r += (r - slot.color.r) * alpha;
-			slot.color.g += (g - slot.color.g) * alpha;
-			slot.color.b += (b - slot.color.b) * alpha;
-			slot.color.a += (a - slot.color.a) * alpha;			
+
+			var r : Number, g : Number, b : Number, a : Number;
+			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
+				var i : int = frames.length;
+				r = frames[i + PREV_R];
+				g = frames[i + PREV_G];
+				b = frames[i + PREV_B];
+				a = frames[i + PREV_A];
+			} else {
+				// Interpolate between the previous frame and the current frame.
+				var frame : int = Animation.binarySearch(frames, time, ENTRIES);
+				r = frames[frame + PREV_R];
+				g = frames[frame + PREV_G];
+				b = frames[frame + PREV_B];
+				a = frames[frame + PREV_A];
+				var frameTime : Number = frames[frame];
+				var percent : Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+
+				r += (frames[frame + R] - r) * percent;
+				g += (frames[frame + G] - g) * percent;
+				b += (frames[frame + B] - b) * percent;
+				a += (frames[frame + A] - a) * percent;
+			}
+			if (alpha == 1) {
+				slot.color.setFrom(r, g, b, a);
+			} else {
+				if (setupPose) {
+					slot.color.setFromColor(slot.data.color);
+				}
+				slot.color.r += (r - slot.color.r) * alpha;
+				slot.color.g += (g - slot.color.g) * alpha;
+				slot.color.b += (b - slot.color.b) * alpha;
+				slot.color.a += (a - slot.color.a) * alpha;
+			}
 		}
 	}
-}
-
 }

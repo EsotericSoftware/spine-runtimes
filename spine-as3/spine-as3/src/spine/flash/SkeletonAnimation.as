@@ -29,24 +29,23 @@
  *****************************************************************************/
 
 package spine.flash {
-import spine.SkeletonData;
-import spine.animation.AnimationState;
-import spine.animation.AnimationStateData;
+	import spine.SkeletonData;
+	import spine.animation.AnimationState;
+	import spine.animation.AnimationStateData;
 
-public class SkeletonAnimation extends SkeletonSprite {
-	public var state:AnimationState;
+	public class SkeletonAnimation extends SkeletonSprite {
+		public var state : AnimationState;
 
-	public function SkeletonAnimation (skeletonData:SkeletonData, stateData:AnimationStateData = null) {
-		super(skeletonData);
-		state = new AnimationState(stateData ? stateData : new AnimationStateData(skeletonData));
+		public function SkeletonAnimation(skeletonData : SkeletonData, stateData : AnimationStateData = null) {
+			super(skeletonData);
+			state = new AnimationState(stateData ? stateData : new AnimationStateData(skeletonData));
+		}
+
+		override public function advanceTime(time : Number) : void {
+			state.update(time * timeScale);
+			state.apply(skeleton);
+			skeleton.updateWorldTransform();
+			super.advanceTime(time);
+		}
 	}
-
-	override public function advanceTime (time:Number) : void {
-		state.update(time * timeScale);
-		state.apply(skeleton);
-		skeleton.updateWorldTransform();
-		super.advanceTime(time);
-	}
-}
-
 }

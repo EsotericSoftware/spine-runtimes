@@ -29,79 +29,76 @@
  *****************************************************************************/
 
 package spine.attachments {
-import spine.Color;
+	import spine.Color;
 
-public dynamic class MeshAttachment extends VertexAttachment {	
-	public var uvs:Vector.<Number>;
-	public var regionUVs:Vector.<Number>;
-	public var triangles:Vector.<uint>;	
-	public var color:Color = new Color(1, 1, 1, 1);
-	public var hullLength:int;
-	private var _parentMesh:MeshAttachment;
-	public var inheritDeform:Boolean;
+	public dynamic class MeshAttachment extends VertexAttachment {
+		public var uvs : Vector.<Number>;
+		public var regionUVs : Vector.<Number>;
+		public var triangles : Vector.<uint>;
+		public var color : Color = new Color(1, 1, 1, 1);
+		public var hullLength : int;
+		private var _parentMesh : MeshAttachment;
+		public var inheritDeform : Boolean;
+		public var path : String;
+		public var rendererObject : Object;
+		public var regionU : Number;
+		public var regionV : Number;
+		public var regionU2 : Number;
+		public var regionV2 : Number;
+		public var regionRotate : Boolean;
+		public var regionOffsetX : Number; // Pixels stripped from the bottom left, unrotated.
+		public var regionOffsetY : Number;
+		public var regionWidth : Number; // Unrotated, stripped size.
+		public var regionHeight : Number;
+		public var regionOriginalWidth : Number; // Unrotated, unstripped size.
+		public var regionOriginalHeight : Number;
+		// Nonessential.
+		public var edges : Vector.<int>;
+		public var width : Number;
+		public var height : Number;
 
-	public var path:String;
-	public var rendererObject:Object;
-	public var regionU:Number;
-	public var regionV:Number;
-	public var regionU2:Number;
-	public var regionV2:Number;
-	public var regionRotate:Boolean;
-	public var regionOffsetX:Number; // Pixels stripped from the bottom left, unrotated.
-	public var regionOffsetY:Number;
-	public var regionWidth:Number; // Unrotated, stripped size.
-	public var regionHeight:Number;
-	public var regionOriginalWidth:Number; // Unrotated, unstripped size.
-	public var regionOriginalHeight:Number;
+		public function MeshAttachment(name : String) {
+			super(name);
+		}
 
-	// Nonessential.
-	public var edges:Vector.<int>;
-	public var width:Number;
-	public var height:Number;
-
-	public function MeshAttachment (name:String) {
-		super(name);
-	}
-
-	public function updateUVs () : void {
-		var width:Number = regionU2 - regionU, height:Number = regionV2 - regionV;
-		var i:int, n:int = regionUVs.length;
-		if (!uvs || uvs.length != n) uvs = new Vector.<Number>(n, true);
-		if (regionRotate) {
-			for (i = 0; i < n; i += 2) {
-				uvs[i] = regionU + regionUVs[int(i + 1)] * width;
-				uvs[int(i + 1)] = regionV + height - regionUVs[i] * height;
+		public function updateUVs() : void {
+			var width : Number = regionU2 - regionU, height : Number = regionV2 - regionV;
+			var i : int, n : int = regionUVs.length;
+			if (!uvs || uvs.length != n) uvs = new Vector.<Number>(n, true);
+			if (regionRotate) {
+				for (i = 0; i < n; i += 2) {
+					uvs[i] = regionU + regionUVs[int(i + 1)] * width;
+					uvs[int(i + 1)] = regionV + height - regionUVs[i] * height;
+				}
+			} else {
+				for (i = 0; i < n; i += 2) {
+					uvs[i] = regionU + regionUVs[i] * width;
+					uvs[int(i + 1)] = regionV + regionUVs[int(i + 1)] * height;
+				}
 			}
-		} else {
-			for (i = 0; i < n; i += 2) {
-				uvs[i] = regionU + regionUVs[i] * width;
-				uvs[int(i + 1)] = regionV + regionUVs[int(i + 1)] * height;
+		}
+
+		override public function applyDeform(sourceAttachment : VertexAttachment) : Boolean {
+			return this == sourceAttachment || (inheritDeform && _parentMesh == sourceAttachment);
+		}
+
+		public function get parentMesh() : MeshAttachment {
+			return _parentMesh;
+		}
+
+		public function set parentMesh(parentMesh : MeshAttachment) : void {
+			_parentMesh = parentMesh;
+			if (parentMesh != null) {
+				bones = parentMesh.bones;
+				vertices = parentMesh.vertices;
+				worldVerticesLength = parentMesh.worldVerticesLength;
+				regionUVs = parentMesh.regionUVs;
+				triangles = parentMesh.triangles;
+				hullLength = parentMesh.hullLength;
+				edges = parentMesh.edges;
+				width = parentMesh.width;
+				height = parentMesh.height;
 			}
 		}
 	}
-
-	override public function applyDeform (sourceAttachment:VertexAttachment) : Boolean {
-		return this == sourceAttachment || (inheritDeform && _parentMesh == sourceAttachment);
-	}
-
-	public function get parentMesh () : MeshAttachment {
-		return _parentMesh;
-	}
-
-	public function set parentMesh (parentMesh:MeshAttachment) : void {
-		_parentMesh = parentMesh;
-		if (parentMesh != null) {
-			bones = parentMesh.bones;
-			vertices = parentMesh.vertices;
-			worldVerticesLength = parentMesh.worldVerticesLength;
-			regionUVs = parentMesh.regionUVs;
-			triangles = parentMesh.triangles;
-			hullLength = parentMesh.hullLength;
-			edges = parentMesh.edges;
-			width = parentMesh.width;
-			height = parentMesh.height;
-		}
-	}
-}
-
 }

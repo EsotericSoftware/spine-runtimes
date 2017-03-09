@@ -29,46 +29,44 @@
  *****************************************************************************/
 
 package spine {
+	public class BoneData {
+		internal var _index : int;
+		internal var _name : String;
+		internal var _parent : BoneData;
+		public var length : Number;
+		public var x : Number;
+		public var y : Number;
+		public var rotation : Number;
+		public var scaleX : Number = 1;
+		public var scaleY : Number = 1;
+		public var shearX : Number;
+		public var shearY : Number;
+		public var transformMode : TransformMode = TransformMode.normal;
 
-public class BoneData {
-	internal var _index:int;
-	internal var _name:String;
-	internal var _parent:BoneData;
-	public var length:Number;
-	public var x:Number;
-	public var y:Number;
-	public var rotation:Number;
-	public var scaleX:Number = 1;
-	public var scaleY:Number = 1;
-	public var shearX:Number;
-	public var shearY:Number;	
-	public var transformMode:TransformMode = TransformMode.normal;
+		/** @param parent May be null. */
+		public function BoneData(index : int, name : String, parent : BoneData) {
+			if (index < 0) throw new ArgumentError("index must be >= 0");
+			if (name == null) throw new ArgumentError("name cannot be null.");
+			_index = index;
+			_name = name;
+			_parent = parent;
+		}
 
-	/** @param parent May be null. */
-	public function BoneData (index:int, name:String, parent:BoneData) {
-		if (index < 0) throw new ArgumentError("index must be >= 0");
-		if (name == null) throw new ArgumentError("name cannot be null.");
-		_index = index;
-		_name = name;
-		_parent = parent;
+		public function get index() : int {
+			return _index;
+		}
+
+		public function get name() : String {
+			return _name;
+		}
+
+		/** @return May be null. */
+		public function get parent() : BoneData {
+			return _parent;
+		}
+
+		public function toString() : String {
+			return _name;
+		}
 	}
-	
-	public function get index () : int {
-		return _index;
-	}
-
-	public function get name () : String {
-		return _name;
-	}
-
-	/** @return May be null. */
-	public function get parent () : BoneData {
-		return _parent;
-	}
-
-	public function toString () : String {
-		return _name;
-	}
-}
-
 }
