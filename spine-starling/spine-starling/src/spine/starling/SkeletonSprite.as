@@ -60,12 +60,16 @@ public class SkeletonSprite extends DisplayObject {
 
 	private var _skeleton:Skeleton;
 	public var batchable:Boolean = true;
-	private var _smoothing:String = "bilinear";
+	private var _smoothing:String = "bilinear";	
+	private static var _twoColorStyle:TwoColorMeshStyle;
 
 	public function SkeletonSprite (skeletonData:SkeletonData) {
 		Bone.yDown = true;
 		_skeleton = new Skeleton(skeletonData);
 		_skeleton.updateWorldTransform();
+		if (_twoColorStyle == null) {
+			_twoColorStyle = new TwoColorMeshStyle();
+		}
 	}
 
 	override public function render (painter:Painter) : void {
@@ -78,10 +82,11 @@ public class SkeletonSprite extends DisplayObject {
 		var worldVertices:Vector.<Number> = _tempVertices;
 		var ii:int, iii:int;
 		var rgb:uint, a:Number;
+		var dark:uint;
 		var mesh:SkeletonMesh;
 		var verticesLength:int, verticesCount:int, indicesLength:int;
 		var indexData:IndexData, indices:Vector.<uint>, vertexData:VertexData;
-		var uvs: Vector.<Number>;
+		var uvs: Vector.<Number>;		
 
 		for (var i:int = 0, n:int = drawOrder.length; i < n; ++i) {
 			var slot:Slot = drawOrder[i];
@@ -94,19 +99,23 @@ public class SkeletonSprite extends DisplayObject {
 					g * slot.color.g * region.color.g,
 					b * slot.color.b * region.color.b);
 
-				var image:Image = region.rendererObject as Image;
+				var image:Image = region.rendererObject as Image;				
 				if (image == null) {
-					var origImage:Image = Image(AtlasRegion(region.rendererObject).rendererObject);
+					var origImage:Image = Image(AtlasRegion(region.rendererObject).rendererObject);					
 					region.rendererObject = image = new Image(origImage.texture);
+					image.style = _twoColorStyle;
 					for (var j:int = 0; j < 4; j++) {
 						var p: Point = origImage.getTexCoords(j);
 						image.setTexCoords(j, p.x, p.y);
 					}
 				}
+								
+				if (slot.darkColor == null) dark = Color.rgb(0, 0, 0);
+				else dark = Color.rgb(slot.darkColor.r * 255, slot.darkColor.g * 255, slot.darkColor.b * 255);						
 
 				image.setVertexPosition(0, worldVertices[2], worldVertices[3]);
 				image.setVertexColor(0, rgb);
-				image.setVertexAlpha(0, a);
+				image.setVertexAlpha(0, a);				
 
 				image.setVertexPosition(1, worldVertices[4], worldVertices[5]);
 				image.setVertexColor(1, rgb);
@@ -135,7 +144,7 @@ public class SkeletonSprite extends DisplayObject {
 					if (meshAttachment.rendererObject is Image)
 						meshAttachment.rendererObject = mesh = new SkeletonMesh(Image(meshAttachment.rendererObject).texture);
 					if (meshAttachment.rendererObject is AtlasRegion)
-						meshAttachment.rendererObject = mesh = new SkeletonMesh(Image(AtlasRegion(meshAttachment.rendererObject).rendererObject).texture);
+						meshAttachment.rendererObject = mesh = new SkeletonMesh(Image(AtlasRegion(meshAttachment.rendererObject).rendererObject).texture);				
 				}
 
 				if (mesh.numIndices != meshAttachment.triangles.length) {
@@ -155,13 +164,19 @@ public class SkeletonSprite extends DisplayObject {
 					r * slot.color.r * meshAttachment.color.r,
 					g * slot.color.g * meshAttachment.color.g,
 					b * slot.color.b * meshAttachment.color.b);
+					
+				if (slot.darkColor == null) dark = Color.rgb(0, 0, 0);
+				else dark = Color.rgb(slot.darkColor.r * 255, slot.darkColor.g * 255, slot.darkColor.b * 255);
 
+				if (mesh.style.vertexFormat != _twoColorStyle.vertexFormat) 
+					mesh.style = _twoColorStyle;
 				vertexData = mesh.getVertexData();
-				uvs = meshAttachment.uvs;
-				vertexData.colorize("color", rgb, a);
+				uvs = meshAttachment.uvs;				
+				vertexData.colorize("color", rgb, a);						
+				vertexData.colorize("color2", dark);
 				for (ii = 0, iii = 0; ii < verticesCount; ii++, iii+=2) {
 					mesh.setVertexPosition(ii, worldVertices[iii], worldVertices[iii+1]);
-					mesh.setTexCoords(ii, uvs[iii], uvs[iii+1]);
+					mesh.setTexCoords(ii, uvs[iii], uvs[iii+1]);					
 				}
 				vertexData.numVertices = verticesCount;
 				painter.state.blendMode = blendModes[slot.data.blendMode.ordinal];
