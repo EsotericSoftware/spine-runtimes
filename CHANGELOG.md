@@ -1,22 +1,22 @@
 # 3.6
-## Lua
+
+## AS3
  * **Breaking changes**
-  * Removed `Bone:worldToLocalRotationX` and `Bone:worldToLocalRotationY`. Replaced by `Bone:worldToLocalRotation` (rotation given relative to x-axis, counter-clockwise, in degrees).
-  * `VertexAttachment:computeWorldVertices` now takes offsets and stride to allow compositing vertices directly in a vertex buffer to be send to the GPU. The compositing is now performed in the backends' respective renderers. This also affects the subclasses `MeshAttachment`, `BoundingBoxAttachment` and `PathAttachment`.
-  * Removed `RegionAttachment:updateWorldVertices`, added `RegionAttachment:computeWorldVertices`, which takes offsets and stride to allow compositing vertices directly in a vertex buffer to be send to the GPU. The compositing is now performed in the backends' respective renderers.
-  * Removed `MeshAttachment.worldVertices` field. Computation is now performed in each backends' respective renderer. The `uv` coordinates are now stored in `MeshAttachment.uvs`.
-  * Removed `RegionAttachment.vertices` field. Computation is now performed in each backends respective renderer. The `uv` coordinates for each vertex are now stored in the `RegionAttachment.uvs` field.
+  * Removed `Bone.worldToLocalRotationX` and `Bone.worldToLocalRotationY`. Replaced by `Bone.worldToLocalRotation` (rotation given relative to x-axis, counter-clockwise, in degrees).
+  * Made `Bone` fields `_a`, `_b`, `_c`, `_d`, `_worldX` and `_worldY` public, removed underscore prefix.
+  * Removed `VertexAttachment.computeWorldVertices` overload, changed `VertexAttachment.computeWorldVertices2` to `VertexAttachment.computeWorldVertices`, added `stride` parameter.
+  * Removed `RegionAttachment.vertices` field. The vertices array is provided to `RegionAttachment.computeWorldVertices` by the API user now.
+  * Removed `RegionAttachment.updateWorldVertices`, added `RegionAttachment.computeWorldVertices`. The new method now computes the x/y positions of the 4 vertices of the corner and places them in the provided `worldVertices` array, starting at `offset`, then moving by `stride` array elements when advancing to the next vertex. This allows to directly compose the vertex buffer and avoids a copy. The computation of the full vertices, including vertex colors and texture coordinates, is now done by the backend's respective renderer.
+  * Replaced `r`, `g`, `b`, `a` fields with instances of new `Color` class in `RegionAttachment`, `MeshAttachment`, `Skeleton`, `SkeletonData`, `Slot` and `SlotData`.
  * **Additions**
-  * Added `Bone:localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).
-  * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.
-  * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.  
+  * Added `Skeleton.getBounds` from reference implementation.
   * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
+  * Added `Bone.localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).    
+  * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.
+  * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
 
-### Love2D
-  * Fixed renderer to work with 3.6 changes
-
-### Corona
-  * Fixed renderer to work with 3.6 changes. Sadly, two color tinting is not supported, as Corona doesn't let us change the vertex format needed and its doesn't allow to modify shaders in the way needed for two color tinting
+### Starling
+ * Fixed renderer to work with 3.6 changes.
 
 ## C
  * **Breaking changes**
@@ -50,23 +50,28 @@
 ### Unreal Engine 4
  * Fixed renderer to work with 3.6 changes
 
-## AS3
- * **Breaking changes**
-  * Removed `Bone.worldToLocalRotationX` and `Bone.worldToLocalRotationY`. Replaced by `Bone.worldToLocalRotation` (rotation given relative to x-axis, counter-clockwise, in degrees).
-  * Made `Bone` fields `_a`, `_b`, `_c`, `_d`, `_worldX` and `_worldY` public, removed underscore prefix.
-  * Removed `VertexAttachment.computeWorldVertices` overload, changed `VertexAttachment.computeWorldVertices2` to `VertexAttachment.computeWorldVertices`, added `stride` parameter.
-  * Removed `RegionAttachment.vertices` field. The vertices array is provided to `RegionAttachment.computeWorldVertices` by the API user now.
-  * Removed `RegionAttachment.updateWorldVertices`, added `RegionAttachment.computeWorldVertices`. The new method now computes the x/y positions of the 4 vertices of the corner and places them in the provided `worldVertices` array, starting at `offset`, then moving by `stride` array elements when advancing to the next vertex. This allows to directly compose the vertex buffer and avoids a copy. The computation of the full vertices, including vertex colors and texture coordinates, is now done by the backend's respective renderer.
-  * Replaced `r`, `g`, `b`, `a` fields with instances of new `Color` class in `RegionAttachment`, `MeshAttachment`, `Skeleton`, `SkeletonData`, `Slot` and `SlotData`.
- * **Additions**
-  * Added `Skeleton.getBounds` from reference implementation.
-  * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
-  * Added `Bone.localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).    
-  * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.
-  * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
+## C#
 
-### Starling
- * Fixed renderer to work with 3.6 changes.
+### Unity
+
+## Lua
+ * **Breaking changes**
+  * Removed `Bone:worldToLocalRotationX` and `Bone:worldToLocalRotationY`. Replaced by `Bone:worldToLocalRotation` (rotation given relative to x-axis, counter-clockwise, in degrees).
+  * `VertexAttachment:computeWorldVertices` now takes offsets and stride to allow compositing vertices directly in a vertex buffer to be send to the GPU. The compositing is now performed in the backends' respective renderers. This also affects the subclasses `MeshAttachment`, `BoundingBoxAttachment` and `PathAttachment`.
+  * Removed `RegionAttachment:updateWorldVertices`, added `RegionAttachment:computeWorldVertices`, which takes offsets and stride to allow compositing vertices directly in a vertex buffer to be send to the GPU. The compositing is now performed in the backends' respective renderers.
+  * Removed `MeshAttachment.worldVertices` field. Computation is now performed in each backends' respective renderer. The `uv` coordinates are now stored in `MeshAttachment.uvs`.
+  * Removed `RegionAttachment.vertices` field. Computation is now performed in each backends respective renderer. The `uv` coordinates for each vertex are now stored in the `RegionAttachment.uvs` field.
+ * **Additions**
+  * Added `Bone:localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).
+  * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.
+  * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.  
+  * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
+
+### Love2D
+  * Fixed renderer to work with 3.6 changes
+
+### Corona
+  * Fixed renderer to work with 3.6 changes. Sadly, two color tinting is not supported, as Corona doesn't let us change the vertex format needed and its doesn't allow to modify shaders in the way needed for two color tinting
 
 ## Typescript/Javascript
  * **Breaking changes**
