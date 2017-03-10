@@ -51,7 +51,8 @@
 ### Unreal Engine 4
  * Fixed renderer to work with 3.6 changes
 
-## C\#
+C#
+----
  * **Breaking changes**
   *  `MeshAttachment.parentMesh` is now a private field to enforce using the `.ParentMesh` setter property in external code. The `MeshAttachment.ParentMesh` property is an appropriate replacement wherever `.parentMesh` was used.
 
