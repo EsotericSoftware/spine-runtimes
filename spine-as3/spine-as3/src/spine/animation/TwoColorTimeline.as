@@ -103,9 +103,9 @@ package spine.animation {
 				g += (frames[frame + G] - g) * percent;
 				b += (frames[frame + B] - b) * percent;
 				a += (frames[frame + A] - a) * percent;
-				r2 += (frames[frame + R2] - a) * percent;
-				g2 += (frames[frame + G2] - a) * percent;
-				b2 += (frames[frame + B2] - a) * percent;
+				r2 += (frames[frame + R2] - r2) * percent;
+				g2 += (frames[frame + G2] - g2) * percent;
+				b2 += (frames[frame + B2] - b2) * percent;
 			}
 			if (alpha == 1) {
 				slot.color.setFrom(r, g, b, a);

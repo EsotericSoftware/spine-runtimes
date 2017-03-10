@@ -27,31 +27,45 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
- 
+
 package spine.examples {
-	import flash.display.Sprite;
+	import spine.*;
+	import spine.atlas.Atlas;
+	import spine.attachments.AtlasAttachmentLoader;
+	import spine.attachments.AttachmentLoader;
+	import spine.starling.SkeletonAnimation;
+	import spine.starling.StarlingTextureLoader;
 
 	import starling.core.Starling;
+	import starling.display.Sprite;
 
-	[SWF(width = "800", height = "600", frameRate = "60", backgroundColor = "#dddddd")]
-	public class Main extends Sprite {
-		private var _starling : Starling;
+	public class TwoColorExample extends Sprite {
+		[Embed(source = "/TwoColorTest.json", mimeType = "application/octet-stream")]
+		static public const VineJson : Class;
 
-		public function Main() {
-			var example : Class;
-			example = SpineboyExample;
-			// example = GoblinsExample;
-			// example = RaptorExample;
-			// example = TankExample;
-			// example = VineExample;
-			// example = StretchymanExample;
-			example = TwoColorExample;
+		[Embed(source = "/TwoColorTest.atlas", mimeType = "application/octet-stream")]
+		static public const VineAtlas : Class;
 
-			_starling = new Starling(example, stage);
-			_starling.enableErrorChecking = true;
-			_starling.showStats = true;
-			_starling.skipUnchangedFrames = false;
-			_starling.start();			
+		[Embed(source = "/TwoColorTest.png")]
+		static public const VineAtlasTexture : Class;
+		private var skeleton : SkeletonAnimation;
+
+		public function TwoColorExample() {
+			var attachmentLoader : AttachmentLoader;
+			var spineAtlas : Atlas = new Atlas(new VineAtlas(), new StarlingTextureLoader(new VineAtlasTexture()));
+			attachmentLoader = new AtlasAttachmentLoader(spineAtlas);
+
+			var json : SkeletonJson = new SkeletonJson(attachmentLoader);
+			json.scale = 0.5;
+			var skeletonData : SkeletonData = json.readSkeletonData(new VineJson());
+
+			skeleton = new SkeletonAnimation(skeletonData);
+			skeleton.x = 300;
+			skeleton.y = 200;
+			skeleton.state.setAnimationByName(0, "animation", true);
+
+			addChild(skeleton);
+			Starling.juggler.add(skeleton);
 		}
 	}
 }

@@ -134,7 +134,7 @@ package spine {
 
 				var dark : String = slotMap["dark"];
 				if (dark) {
-					slotData.darkColor.setFrom(toColor(dark, 0), toColor(dark, 1), toColor(dark, 2), toColor(dark, 3));
+					slotData.darkColor = new Color(toColor(dark, 0), toColor(dark, 1), toColor(dark, 2), 0);					
 				}
 
 				slotData.attachmentName = slotMap["attachment"];
@@ -438,7 +438,7 @@ package spine {
 
 						frameIndex = 0;
 						for each (valueMap in values) {
-							color = valueMap["color"];
+							color = valueMap["light"];
 							var darkColor : String = valueMap["dark"];
 							var light : Color = new Color(0, 0, 0, 0);
 							var dark : Color = new Color(0, 0, 0, 0);
@@ -710,8 +710,8 @@ package spine {
 		}
 
 		static private function toColor(hexString : String, colorIndex : int) : Number {
-			if (hexString.length != 8) throw new ArgumentError("Color hexidecimal length must be 8, received: " + hexString);
-			return parseInt(hexString.substring(colorIndex * 2, colorIndex * 2 + 2), 16) / 255;
+			if (hexString.length != 8 && hexString.length != 6) throw new ArgumentError("Color hexidecimal length must be 6 or 8, received: " + hexString);
+			return parseInt(hexString.substring(colorIndex * 2, colorIndex * 2 + 2), 16) / 255;			
 		}
 
 		static private function getFloatArray(map : Object, name : String, scale : Number) : Vector.<Number> {

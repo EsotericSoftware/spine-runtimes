@@ -79,6 +79,7 @@ package spine.starling {
 			var drawOrder : Vector.<Slot> = skeleton.drawOrder;
 			var worldVertices : Vector.<Number> = _tempVertices;
 			var ii : int, iii : int;
+			var attachmentColor: spine.Color;
 			var rgb : uint, a : Number;
 			var dark : uint;
 			var mesh : SkeletonMesh;
@@ -90,59 +91,43 @@ package spine.starling {
 				var slot : Slot = drawOrder[i];
 				if (slot.attachment is RegionAttachment) {
 					var region : RegionAttachment = slot.attachment as RegionAttachment;
-					region.computeWorldVertices(slot.bone, worldVertices, 0, 2);
-					a = slot.color.a * region.color.a;
-					rgb = Color.rgb(r * slot.color.r * region.color.r, g * slot.color.g * region.color.g, b * slot.color.b * region.color.b);
+					verticesLength = 4 * 2;
+					verticesCount = verticesLength >> 1;
+					if (worldVertices.length < verticesLength) worldVertices.length = verticesLength;
+					region.computeWorldVertices(slot.bone, worldVertices, 0, 2);					
 
-					var image : Image = region.rendererObject as Image;
-					if (image == null) {
-						var origImage : Image = Image(AtlasRegion(region.rendererObject).rendererObject);
-						region.rendererObject = image = new Image(origImage.texture);
-						image.style = _twoColorStyle;
-						for (var j : int = 0; j < 4; j++) {
-							var p : Point = origImage.getTexCoords(j);
-							image.setTexCoords(j, p.x, p.y);
-						}
+					mesh = region.rendererObject as SkeletonMesh;
+					if (mesh == null) {
+						if (region.rendererObject is Image)
+							region.rendererObject = mesh = new SkeletonMesh(Image(region.rendererObject).texture);
+						if (region.rendererObject is AtlasRegion)
+							region.rendererObject = mesh = new SkeletonMesh(Image(AtlasRegion(region.rendererObject).rendererObject).texture);
+						
+						indexData = mesh.getIndexData();
+						indices = new <uint>[0, 1, 2, 2, 3, 0];
+						for (ii = 0; ii < indices.length; ii++)
+							indexData.setIndex(ii, indices[ii]);
+						indexData.numIndices = 6;
+						indexData.trim();
 					}
-
-					if (slot.darkColor == null) dark = Color.rgb(0, 0, 0);
-					else dark = Color.rgb(slot.darkColor.r * 255, slot.darkColor.g * 255, slot.darkColor.b * 255);
-
-					image.setVertexPosition(0, worldVertices[2], worldVertices[3]);
-					image.setVertexColor(0, rgb);
-					image.setVertexAlpha(0, a);
-
-					image.setVertexPosition(1, worldVertices[4], worldVertices[5]);
-					image.setVertexColor(1, rgb);
-					image.setVertexAlpha(1, a);
-
-					image.setVertexPosition(2, worldVertices[0], worldVertices[1]);
-					image.setVertexColor(2, rgb);
-					image.setVertexAlpha(2, a);
-
-					image.setVertexPosition(3, worldVertices[6], worldVertices[7]);
-					image.setVertexColor(3, rgb);
-					image.setVertexAlpha(3, a);
-
-					image.setRequiresRedraw();
-					painter.state.blendMode = blendModes[slot.data.blendMode.ordinal];
-					// FIXME set smoothing/filter
-					painter.batchMesh(image);
+					
+					attachmentColor = region.color;
+					uvs = region.uvs;													
 				} else if (slot.attachment is MeshAttachment) {
 					var meshAttachment : MeshAttachment = MeshAttachment(slot.attachment);
 					verticesLength = meshAttachment.worldVerticesLength;
 					verticesCount = verticesLength >> 1;
 					if (worldVertices.length < verticesLength) worldVertices.length = verticesLength;
 					meshAttachment.computeWorldVertices(slot, 0, meshAttachment.worldVerticesLength, worldVertices, 0, 2);
+					
 					mesh = meshAttachment.rendererObject as SkeletonMesh;
 					if (mesh == null) {
 						if (meshAttachment.rendererObject is Image)
 							meshAttachment.rendererObject = mesh = new SkeletonMesh(Image(meshAttachment.rendererObject).texture);
 						if (meshAttachment.rendererObject is AtlasRegion)
-							meshAttachment.rendererObject = mesh = new SkeletonMesh(Image(AtlasRegion(meshAttachment.rendererObject).rendererObject).texture);
-					}
-
-					if (mesh.numIndices != meshAttachment.triangles.length) {
+							meshAttachment.rendererObject = mesh = new SkeletonMesh(Image(AtlasRegion(meshAttachment.rendererObject).rendererObject).texture);						
+						mesh.setStyle(_twoColorStyle);
+						
 						indexData = mesh.getIndexData();
 						indices = meshAttachment.triangles;
 						indicesLength = meshAttachment.triangles.length;
@@ -151,39 +136,34 @@ package spine.starling {
 						}
 						indexData.numIndices = indicesLength;
 						indexData.trim();
-					}
-
-					// FIXME pre-multiplied alpha?
-					a = slot.color.a * meshAttachment.color.a;
-					rgb = Color.rgb(r * slot.color.r * meshAttachment.color.r, g * slot.color.g * meshAttachment.color.g, b * slot.color.b * meshAttachment.color.b);
-
-					if (slot.darkColor == null) dark = Color.rgb(0, 0, 0);
-					else dark = Color.rgb(slot.darkColor.r * 255, slot.darkColor.g * 255, slot.darkColor.b * 255);
-
-					if (mesh.style.vertexFormat != _twoColorStyle.vertexFormat)
-						mesh.style = _twoColorStyle;
-					vertexData = mesh.getVertexData();
-					uvs = meshAttachment.uvs;
-					vertexData.colorize("color", rgb, a);
-					vertexData.colorize("color2", dark);
-					for (ii = 0, iii = 0; ii < verticesCount; ii++, iii += 2) {
-						mesh.setVertexPosition(ii, worldVertices[iii], worldVertices[iii + 1]);
-						mesh.setTexCoords(ii, uvs[iii], uvs[iii + 1]);
-					}
-					vertexData.numVertices = verticesCount;
-					painter.state.blendMode = blendModes[slot.data.blendMode.ordinal];
-					// FIXME set smoothing/filter
-					painter.batchMesh(mesh);
+					}					
+										
+					attachmentColor = meshAttachment.color;
+					uvs = meshAttachment.uvs;					
 				}
+				
+				a = slot.color.a * attachmentColor.a;
+				rgb = Color.rgb(r * slot.color.r * attachmentColor.r, g * slot.color.g * attachmentColor.g, b * slot.color.b * attachmentColor.b);
+				if (slot.darkColor == null) dark = Color.rgb(0, 0, 0);
+				else dark = Color.rgb(slot.darkColor.r * 255, slot.darkColor.g * 255, slot.darkColor.b * 255);	
+
+				// Mesh doesn't retain the style, can't find the reason why
+				mesh.setStyle(_twoColorStyle);			
+				vertexData = mesh.getVertexData();					
+				vertexData.colorize("color", rgb, a);
+				vertexData.colorize("color2", dark);
+				for (ii = 0, iii = 0; ii < verticesCount; ii++, iii += 2) {
+					mesh.setVertexPosition(ii, worldVertices[iii], worldVertices[iii + 1]);
+					mesh.setTexCoords(ii, uvs[iii], uvs[iii + 1]);
+				}
+				vertexData.numVertices = verticesCount;
+				painter.state.blendMode = blendModes[slot.data.blendMode.ordinal];				
+				painter.batchMesh(mesh);
 			}
 			painter.state.blendMode = originalBlendMode;
 		}
 
 		override public function hitTest(localPoint : Point) : DisplayObject {
-			// FIXME what to do here?
-			// if (forTouch && (!visible || !touchable))
-			// return null;
-
 			var minX : Number = Number.MAX_VALUE, minY : Number = Number.MAX_VALUE;
 			var maxX : Number = -Number.MAX_VALUE, maxY : Number = -Number.MAX_VALUE;
 			var slots : Vector.<Slot> = skeleton.slots;

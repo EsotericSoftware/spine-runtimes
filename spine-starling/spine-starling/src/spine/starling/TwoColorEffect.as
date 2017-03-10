@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 package spine.starling {
+	import flash.display3D.Context3DProgramType;
 	import starling.rendering.Program;
 
 	import flash.display3D.Context3D;
@@ -40,20 +41,28 @@ package spine.starling {
 		public  static const VERTEX_FORMAT : VertexDataFormat = TwoColorMeshStyle.VERTEX_FORMAT;
 
 		override protected function createProgram() : Program {
-			var vertexShader : String = ["m44 op, va0, vc0", // 4x4 matrix transform to output clip-space 
+			// v0 -> tex coords
+			// v1 -> color plus alpha
+			// v2 -> dark color
+			var vertexShader : String = [
+			"m44 op, va0, vc0", // 4x4 matrix transform to output clip-space 
 			"mov v0, va1     ", // pass texture coordinates to fragment program 
 			"mul v1, va2, vc4", // multiply alpha (vc4) with color (va2), pass to fp 
-			"mov v2, va3     "  // pass offset to fp
+			"mov v2, va3     "  // pass dark color to fp
 			].join("\n");
 
-			var fragmentShader : String = [tex("ft0", "v0", 0, texture) +  // get color from texture 
-			"mul ft0, ft0, v1",             // multiply color with texel color 
-			"mov ft1, v2",                  // copy complete offset to ft1 
-			"mul ft1.xyz, v2.xyz, ft0.www", // multiply offset.rgb with alpha (pma!) 
-			"add oc, ft0, ft1"              // add offset, copy to output
+			var fragmentShader : String = [
+			tex("ft0", "v0", 0, texture),   	// ft0 = texture2d(texCoords)
+			"mul ft1, ft0, v1",					// ft1 = texColor * light
+			"sub ft2.xyz, fc0.xyz, ft0.xyz",	// ft2.xyz = (1 - texColor.rgb)
+			"mul ft2.xyz, ft2.xyz, v2.xyz",		// ft2.xyz = (1 - texColor.rgb) * dark.rgb
+			"mul ft2.xyz, ft2.xyz, ft1.www",	// ft2.xyz = (1 - texColor.rgb) * dark.rgb * alpha
+			"add ft2.xyz, ft2.xyz, ft1.xyz",	// ft2.xyz = (1 - texColor.rgb) * dark.rgb * alpha + texColor.rgb * light.rgb
+			"mov ft2.w, ft1.w",					// ft2.w = alpha
+			"mov oc, ft2"
 			].join("\n");
 
-			return Program.fromSource(vertexShader, fragmentShader);
+			return Program.fromSource(vertexShader, fragmentShader);			
 		}
 
 		override public function get vertexFormat() : VertexDataFormat {
@@ -63,6 +72,9 @@ package spine.starling {
 		override protected function beforeDraw(context : Context3D) : void {
 			super.beforeDraw(context);
 			vertexFormat.setVertexBufferAt(3, vertexBuffer, "color2");
+			
+			// fc0 -> (1, 1, 1, 1) 
+			context.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 1, 1, 1]));
 		}
 
 		override protected function afterDraw(context : Context3D) : void {
