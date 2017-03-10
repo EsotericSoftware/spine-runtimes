@@ -17,6 +17,7 @@
 
 ### Starling
  * Fixed renderer to work with 3.6 changes.
+ * Added support for two color tinting.
 
 ## C
  * **Breaking changes**
@@ -50,7 +51,7 @@
 ### Unreal Engine 4
  * Fixed renderer to work with 3.6 changes
 
-## C#
+## C\#
 
 ### Unity
 
