@@ -51,9 +51,21 @@
 ### Unreal Engine 4
  * Fixed renderer to work with 3.6 changes
 
-## C\# 
+## C\#
+ * **Breaking changes**
+  *  `MeshAttachment.parentMesh` is now a private field to enforce using the `.ParentMesh` setter property in external code. The `MeshAttachment.ParentMesh` property is an appropriate replacement wherever `.parentMesh` was used.
 
 ### Unity
+ * Fixed renderer to work with 3.6 changes.
+ * Two color tinting is currently supported via extra UV2 and UV3 mesh vertex streams. To use Two color tinting, you need to:
+  * switch on "Tint Black" under "Advanced...",
+  * use the new `Spine/Skeleton Tint Black` shader, or your own shader that treats the UV2 and UV3 streams similarly.
+ * `SkeletonAnimator` now has autoreset set to true by default. Old prefabs and scene values will have been serialized to whatever value it was previously. This change only applies to new instances of SkeletonAnimator.
+ * Old triangle-winding code has been removed from `SkeletonRenderer`. Please use shaders that have backface culling off.
+ * The code in the example scripts have been switched over to using properties instead of fields. This is in anticipation of both users who want to move the Spine folders to the Unity Plugins folder (compiled as a different assembly), and of Unity 2017's ability to manually define different assemblies.
+ * Warnings and conditionals checking for specific Unity 5.2-and-below incompatibility have been removed.
+ * `AtasRegionAttacher` and `SpriteAttacher` are now part of `Example Modules`, to reflect that they are meant to be used as sample code rather than production.
+ * In the unitypackage, the "spine-csharp" and "spine-unity" folders are now inside a "Spine" folder. This change will only affect fresh imports. Importing the unitypackage to update Spine-Unity in your project will update the appropriate files wherever you have moved them.
 
 ## Lua
  * **Breaking changes**
