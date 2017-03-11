@@ -1,125 +1,125 @@
 
 tank.png
-size: 1024,512
+size: 2048,1024
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 antenna
-  rotate: true
-  xy: 650, 346
-  size: 11, 152
-  orig: 11, 152
+  rotate: false
+  xy: 1411, 191
+  size: 22, 303
+  orig: 22, 303
   offset: 0, 0
   index: -1
 cannon
   rotate: false
-  xy: 2, 49
-  size: 466, 29
-  orig: 466, 29
+  xy: 2, 75
+  size: 931, 58
+  orig: 931, 58
   offset: 0, 0
   index: -1
 cannonConnector
-  rotate: true
-  xy: 843, 231
-  size: 56, 68
-  orig: 56, 68
+  rotate: false
+  xy: 1289, 359
+  size: 112, 135
+  orig: 112, 135
   offset: 0, 0
   index: -1
 guntower
   rotate: false
-  xy: 650, 359
-  size: 365, 145
-  orig: 365, 145
+  xy: 1295, 689
+  size: 730, 289
+  orig: 730, 289
   offset: 0, 0
   index: -1
 machinegun
   rotate: false
-  xy: 2, 18
-  size: 166, 29
-  orig: 166, 29
+  xy: 2, 16
+  size: 331, 57
+  orig: 331, 57
   offset: 0, 0
   index: -1
 machinegun-mount
-  rotate: true
-  xy: 647, 193
-  size: 36, 48
-  orig: 36, 48
+  rotate: false
+  xy: 1952, 591
+  size: 72, 96
+  orig: 72, 96
   offset: 0, 0
   index: -1
 rock
   rotate: false
-  xy: 470, 50
-  size: 126, 28
-  orig: 126, 28
+  xy: 935, 78
+  size: 252, 55
+  orig: 252, 55
   offset: 0, 0
   index: -1
 tankBottom
   rotate: false
-  xy: 2, 193
-  size: 643, 138
-  orig: 643, 138
+  xy: 2, 359
+  size: 1285, 276
+  orig: 1285, 276
   offset: 0, 0
   index: -1
 tankBottom-shadow
   rotate: false
-  xy: 2, 333
-  size: 646, 171
-  orig: 646, 171
+  xy: 2, 637
+  size: 1291, 341
+  orig: 1291, 341
   offset: 0, 0
   index: -1
 tankTop
   rotate: false
-  xy: 2, 80
-  size: 704, 111
-  orig: 704, 111
+  xy: 2, 135
+  size: 1407, 222
+  orig: 1407, 222
   offset: 0, 0
   index: -1
 tread
   rotate: false
-  xy: 647, 231
-  size: 48, 15
-  orig: 48, 15
+  xy: 1189, 103
+  size: 96, 30
+  orig: 96, 30
   offset: 0, 0
   index: -1
 tread-inside
   rotate: false
-  xy: 2, 2
-  size: 13, 14
-  orig: 13, 14
+  xy: 1676, 521
+  size: 25, 28
+  orig: 25, 28
   offset: 0, 0
   index: -1
 wheel-big
   rotate: false
-  xy: 650, 248
-  size: 96, 96
-  orig: 96, 96
+  xy: 1295, 496
+  size: 191, 191
+  orig: 191, 191
   offset: 0, 0
   index: -1
 wheel-big-overlay
   rotate: false
-  xy: 748, 251
-  size: 93, 93
-  orig: 93, 93
+  xy: 1488, 501
+  size: 186, 186
+  orig: 186, 186
   offset: 0, 0
   index: -1
 wheel-mid
   rotate: false
-  xy: 843, 289
-  size: 68, 68
-  orig: 68, 68
+  xy: 1676, 551
+  size: 136, 136
+  orig: 136, 136
   offset: 0, 0
   index: -1
 wheel-mid-overlay
   rotate: false
-  xy: 913, 289
-  size: 68, 68
-  orig: 68, 68
+  xy: 1814, 551
+  size: 136, 136
+  orig: 136, 136
   offset: 0, 0
   index: -1
 wheel-small
   rotate: false
-  xy: 913, 251
-  size: 36, 36
-  orig: 36, 36
+  xy: 335, 2
+  size: 71, 71
+  orig: 71, 71
   offset: 0, 0
   index: -1
