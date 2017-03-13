@@ -268,6 +268,7 @@ end
 
 local worldVertices = spine.utils.newNumberArray(10000 * 12)
 local tmpColor = spine.Color.newWith(0, 0, 0, 0)
+local tmpColor2 = spine.Color.newWith(0, 0, 0, 0)
 
 function SkeletonRenderer:draw (skeleton)
 	local batcher = self.batcher
@@ -323,8 +324,6 @@ function SkeletonRenderer:draw (skeleton)
 	love.graphics.setBlendMode(lastLoveBlendMode)
 end
 
-local tmpColor2 = spine.Color.new()
-
 function SkeletonRenderer:computeRegionVertices(slot, region, pma, color)
 	local skeleton = slot.bone.skeleton
 	local skeletonColor = skeleton.color
@@ -338,8 +337,9 @@ function SkeletonRenderer:computeRegionVertices(slot, region, pma, color)
 				skeletonColor.b * slotColor.b * regionColor.b * multiplier,
 				alpha)
 			
-	local dark = tmpColor
-	if slot.darkColor then dark = slot.darkColor end
+	local dark = tmpColor2
+	if slot.darkColor then dark = slot.darkColor
+	else dark:set(0, 0, 0, 0) end
 
 	local vertices = worldVertices
 	if not self.useTwoColorTint then
@@ -443,8 +443,9 @@ function SkeletonRenderer:computeMeshVertices(slot, mesh, pma, color)
 	local numVertices = mesh.worldVerticesLength / 2
 	local vertices = worldVertices
 	
-	local dark = tmpColor
-	if slot.darkColor then dark = slot.darkColor end
+	local dark = tmpColor2
+	if slot.darkColor then dark = slot.darkColor
+	else dark:set(0, 0, 0, 0) end
 	
 	if not self.useTwoColorTint then
 		mesh:computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, 8)

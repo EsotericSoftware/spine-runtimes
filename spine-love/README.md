@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-love works with data exported from Spine 3.5.xx.
+spine-love works with data exported from Spine 3.6.x.
 
 spine-love supports all Spine features except for blending modes other than normal.
 
@@ -23,6 +23,10 @@ spine-love does not yet support loading the binary format.
 1. Run the `main.lua` file using LÖVE.
 
 Alternatively, the `spine-lua` and `spine-love/spine-love` directories can be copied into your project. Note that the require statements use `spine-lua.Xxx`, so the spine-lua files must be in a `spine-lua` directory in your project.
+
+## Notes
+
+ * Two enable two color tinting, pass `true` to `SkeletonRenderer.new()`.
 
 ## Examples
 
