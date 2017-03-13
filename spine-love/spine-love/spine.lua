@@ -79,9 +79,53 @@ end
 local PolygonBatcher = {}
 PolygonBatcher.__index = PolygonBatcher
 
-function PolygonBatcher.new(vertexCount)
+function PolygonBatcher.new(vertexCount, useTwoColorTint)
+	if useTwoColorTint == nil then useTwoColorTint = false end
+	
+	local vertexFormat
+	local twoColorTintShader = nil
+	
+	if useTwoColorTint then
+		vertexFormat = {
+			{"VertexPosition", "float", 2}, -- The x,y position of each vertex.
+			{"VertexTexCoord", "float", 2}, -- The u,v texture coordinates of each vertex.
+			{"VertexColor", "byte", 4}, -- The r,g,b,a light color of each vertex.
+			{"VertexColor2", "byte", 4} -- The r,g,b,a dark color of each vertex.
+		}
+		local vertexcode = [[
+				attribute vec4 VertexColor2;
+				varying vec4 color2;
+		
+        vec4 position(mat4 transform_projection, vec4 vertex_position) {
+						color2 = VertexColor2;
+            return transform_projection * vertex_position;
+        }
+    ]]
+		
+		local pixelcode = [[
+				varying vec4 color2;
+		
+        vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
+            vec4 texColor = Texel(texture, texture_coords);
+						float alpha = texColor.a * color.a;
+						vec4 outputColor;
+						outputColor.a = alpha;
+						outputColor.rgb = (1.0 - texColor.rgb) * color2.rgb * alpha + texColor.rgb * color.rgb;
+						return outputColor;
+        }
+    ]]
+ 
+		twoColorTintShader = love.graphics.newShader(pixelcode, vertexcode)
+	else
+		vertexFormat = {
+			{"VertexPosition", "float", 2}, -- The x,y position of each vertex.
+			{"VertexTexCoord", "float", 2}, -- The u,v texture coordinates of each vertex.
+			{"VertexColor", "byte", 4} -- The r,g,b,a light color of each vertex.
+		}
+	end		
+	
 	local self = {
-		mesh = love.graphics.newMesh(vertexCount, "triangles", "dynamic"),
+		mesh = love.graphics.newMesh(vertexFormat, vertexCount, "triangles", "dynamic"),
 		maxVerticesLength = vertexCount,
 		maxIndicesLength = vertexCount * 3,
 		verticesLength = 0,
@@ -90,7 +134,9 @@ function PolygonBatcher.new(vertexCount)
 		isDrawing = false,
 		drawCalls = 0,
 		vertex = { 0, 0, 0, 0, 0, 0, 0, 0 },
-		indices = nil
+		indices = nil,
+		useTwoColorTint = useTwoColorTint,
+		twoColorTintShader = twoColorTintShader
 	}
 
 	local indices = {}
@@ -142,18 +188,38 @@ function PolygonBatcher:draw (texture, vertices, numVertices, indices)
 	local vertexStart = self.verticesLength + 1
 	local vertexEnd = vertexStart + numVertices
 	local vertex = self.vertex
-	while vertexStart < vertexEnd do
-		vertex[1] = vertices[i]
-		vertex[2] = vertices[i+1]
-		vertex[3] = vertices[i+2]
-		vertex[4] = vertices[i+3]
-		vertex[5] = vertices[i+4] * 255
-		vertex[6] = vertices[i+5] * 255
-		vertex[7] = vertices[i+6] * 255
-		vertex[8] = vertices[i+7] * 255
-		mesh:setVertex(vertexStart, vertex)
-		vertexStart = vertexStart + 1
-		i = i + 8
+	if not self.useTwoColorTint then
+		while vertexStart < vertexEnd do
+			vertex[1] = vertices[i]
+			vertex[2] = vertices[i+1]
+			vertex[3] = vertices[i+2]
+			vertex[4] = vertices[i+3]
+			vertex[5] = vertices[i+4] * 255
+			vertex[6] = vertices[i+5] * 255
+			vertex[7] = vertices[i+6] * 255
+			vertex[8] = vertices[i+7] * 255
+			mesh:setVertex(vertexStart, vertex)
+			vertexStart = vertexStart + 1
+			i = i + 8
+		end
+	else
+		while vertexStart < vertexEnd do
+			vertex[1] = vertices[i]
+			vertex[2] = vertices[i+1]
+			vertex[3] = vertices[i+2]
+			vertex[4] = vertices[i+3]
+			vertex[5] = vertices[i+4] * 255
+			vertex[6] = vertices[i+5] * 255
+			vertex[7] = vertices[i+6] * 255
+			vertex[8] = vertices[i+7] * 255
+			vertex[9] = vertices[i+8] * 255
+			vertex[10] = vertices[i+9] * 255
+			vertex[11] = vertices[i+10] * 255
+			vertex[12] = vertices[i+11] * 255
+			mesh:setVertex(vertexStart, vertex)
+			vertexStart = vertexStart + 1
+			i = i + 12
+		end
 	end
 	self.verticesLength = self.verticesLength + numVertices
 end
@@ -163,7 +229,13 @@ function PolygonBatcher:flush ()
 	local mesh = self.mesh
 	mesh:setVertexMap(self.indices)
 	mesh:setDrawRange(1, self.indicesLength)
-	love.graphics.draw(mesh, 0, 0)
+	if not self.useTwoColorTint then
+		love.graphics.draw(mesh, 0, 0)
+	else
+		love.graphics.setShader(self.twoColorTintShader)
+		love.graphics.draw(mesh, 0, 0)
+		love.graphics.setShader()
+	end
 
 	self.verticesLength = 0
 	self.indicesLength = 0
@@ -182,17 +254,19 @@ local SkeletonRenderer = {}
 SkeletonRenderer.__index = SkeletonRenderer
 SkeletonRenderer.QUAD_TRIANGLES = { 1, 2, 3, 3, 4, 1 }
 
-function SkeletonRenderer.new ()
+function SkeletonRenderer.new (useTwoColorTint)
+	if not useTwoColorTint then useTwoColorTint = false end
 	local self = {
-		batcher = PolygonBatcher.new(3 * 500),
-		premultipliedAlpha = false
+		batcher = PolygonBatcher.new(3 * 500, useTwoColorTint),
+		premultipliedAlpha = false,
+		useTwoColorTint = useTwoColorTint
 	}
 
 	setmetatable(self, SkeletonRenderer)
 	return self
 end
 
-local worldVertices = spine.utils.newNumberArray(10000 * 8)
+local worldVertices = spine.utils.newNumberArray(10000 * 12)
 local tmpColor = spine.Color.newWith(0, 0, 0, 0)
 
 function SkeletonRenderer:draw (skeleton)
@@ -249,6 +323,8 @@ function SkeletonRenderer:draw (skeleton)
 	love.graphics.setBlendMode(lastLoveBlendMode)
 end
 
+local tmpColor2 = spine.Color.new()
+
 function SkeletonRenderer:computeRegionVertices(slot, region, pma, color)
 	local skeleton = slot.bone.skeleton
 	local skeletonColor = skeleton.color
@@ -261,39 +337,92 @@ function SkeletonRenderer:computeRegionVertices(slot, region, pma, color)
 				skeletonColor.g * slotColor.g * regionColor.g * multiplier,
 				skeletonColor.b * slotColor.b * regionColor.b * multiplier,
 				alpha)
+			
+	local dark = tmpColor
+	if slot.darkColor then dark = slot.darkColor end
 
 	local vertices = worldVertices
-	region:computeWorldVertices(slot.bone, vertices, 0, 8)
+	if not self.useTwoColorTint then
+		region:computeWorldVertices(slot.bone, vertices, 0, 8)
+	else
+		region:computeWorldVertices(slot.bone, vertices, 0, 12)
+	end
 
 	local uvs = region.uvs
 
-	vertices[3] = uvs[1]
-	vertices[4] = uvs[2]
-	vertices[5] = color.r
-	vertices[6] = color.g
-	vertices[7] = color.b
-	vertices[8] = color.a
+	if not self.useTwoColorTint then
+		vertices[3] = uvs[1]
+		vertices[4] = uvs[2]
+		vertices[5] = color.r
+		vertices[6] = color.g
+		vertices[7] = color.b
+		vertices[8] = color.a
 
-	vertices[11] = uvs[3]
-	vertices[12] = uvs[4]
-	vertices[13] = color.r
-	vertices[14] = color.g
-	vertices[15] = color.b
-	vertices[16] = color.a
+		vertices[11] = uvs[3]
+		vertices[12] = uvs[4]
+		vertices[13] = color.r
+		vertices[14] = color.g
+		vertices[15] = color.b
+		vertices[16] = color.a
 
-	vertices[19] = uvs[5]
-	vertices[20] = uvs[6]
-	vertices[21] = color.r
-	vertices[22] = color.g
-	vertices[23] = color.b
-	vertices[24] = color.a
+		vertices[19] = uvs[5]
+		vertices[20] = uvs[6]
+		vertices[21] = color.r
+		vertices[22] = color.g
+		vertices[23] = color.b
+		vertices[24] = color.a
 
-	vertices[27] = uvs[7]
-	vertices[28] = uvs[8]
-	vertices[29] = color.r
-	vertices[30] = color.g
-	vertices[31] = color.b
-	vertices[32] = color.a
+		vertices[27] = uvs[7]
+		vertices[28] = uvs[8]
+		vertices[29] = color.r
+		vertices[30] = color.g
+		vertices[31] = color.b
+		vertices[32] = color.a
+	else
+		vertices[3] = uvs[1]
+		vertices[4] = uvs[2]
+		vertices[5] = color.r
+		vertices[6] = color.g
+		vertices[7] = color.b
+		vertices[8] = color.a
+		vertices[9] = dark.r
+		vertices[10] = dark.g
+		vertices[11] = dark.b
+		vertices[12] = 0
+
+		vertices[15] = uvs[3]
+		vertices[16] = uvs[4]
+		vertices[17] = color.r
+		vertices[18] = color.g
+		vertices[19] = color.b
+		vertices[20] = color.a
+		vertices[21] = dark.r
+		vertices[22] = dark.g
+		vertices[23] = dark.b
+		vertices[24] = 0
+
+		vertices[27] = uvs[5]
+		vertices[28] = uvs[6]
+		vertices[29] = color.r
+		vertices[30] = color.g
+		vertices[31] = color.b
+		vertices[32] = color.a
+		vertices[33] = dark.r
+		vertices[34] = dark.g
+		vertices[35] = dark.b
+		vertices[36] = 0
+
+		vertices[39] = uvs[7]
+		vertices[40] = uvs[8]
+		vertices[41] = color.r
+		vertices[42] = color.g
+		vertices[43] = color.b
+		vertices[44] = color.a
+		vertices[45] = dark.r
+		vertices[46] = dark.g
+		vertices[47] = dark.b
+		vertices[48] = 0
+	end
 
 	return vertices
 end
@@ -313,23 +442,49 @@ function SkeletonRenderer:computeMeshVertices(slot, mesh, pma, color)
 			
 	local numVertices = mesh.worldVerticesLength / 2
 	local vertices = worldVertices
-	mesh:computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, 8)
+	
+	local dark = tmpColor
+	if slot.darkColor then dark = slot.darkColor end
+	
+	if not self.useTwoColorTint then
+		mesh:computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, 8)
+	else
+		mesh:computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, 12)
+	end
 	
 	local uvs = mesh.uvs
 	local i = 1
 	local n = numVertices + 1
 	local u = 1
 	local v = 3
-	while i < n do
-		vertices[v] = uvs[u]
-		vertices[v + 1] = uvs[u + 1]
-		vertices[v + 2] = color.r
-		vertices[v + 3] = color.g
-		vertices[v + 4] = color.b
-		vertices[v + 5] = color.a
-		i = i + 1
-		u = u + 2
-		v = v + 8
+	if not self.useTwoColorTint then
+		while i < n do
+			vertices[v] = uvs[u]
+			vertices[v + 1] = uvs[u + 1]
+			vertices[v + 2] = color.r
+			vertices[v + 3] = color.g
+			vertices[v + 4] = color.b
+			vertices[v + 5] = color.a
+			i = i + 1
+			u = u + 2
+			v = v + 8
+		end
+	else
+		while i < n do
+			vertices[v] = uvs[u]
+			vertices[v + 1] = uvs[u + 1]
+			vertices[v + 2] = color.r
+			vertices[v + 3] = color.g
+			vertices[v + 4] = color.b
+			vertices[v + 5] = color.a
+			vertices[v + 6] = dark.r
+			vertices[v + 7] = dark.g
+			vertices[v + 8] = dark.b
+			vertices[v + 9] = 0
+			i = i + 1
+			u = u + 2
+			v = v + 12
+		end
 	end
 	return vertices
 end
