@@ -82,14 +82,14 @@ end
 
 function love.load(arg)
 	if arg[#arg] == "-debug" then require("mobdebug").start() end
-	--table.insert(skeletons, loadSkeleton("test", "test", "animation", nil, 0.5, 400, 300))
+	table.insert(skeletons, loadSkeleton("test", "test", "animation", nil, 0.5, 400, 300))
 	table.insert(skeletons, loadSkeleton("TwoColorTest", "TwoColorTest", "animation", nil, 0.3, 400, 300))
-	--[[table.insert(skeletons, loadSkeleton("spineboy", "spineboy", "walk", nil, 0.5, 400, 500))
+	table.insert(skeletons, loadSkeleton("spineboy", "spineboy", "walk", nil, 0.5, 400, 500))
 	table.insert(skeletons, loadSkeleton("raptor", "raptor", "walk", nil, 0.3, 400, 500))
 	table.insert(skeletons, loadSkeleton("goblins-mesh", "goblins", "walk", "goblin", 1, 400, 500))
 	table.insert(skeletons, loadSkeleton("tank", "tank", "drive", nil, 0.2, 600, 500))
 	table.insert(skeletons, loadSkeleton("vine", "vine", "animation", nil, 0.3, 400, 500))
-	table.insert(skeletons, loadSkeleton("stretchyman", "stretchyman", "sneak", nil, 0.3, 200, 500))]]
+	table.insert(skeletons, loadSkeleton("stretchyman", "stretchyman", "sneak", nil, 0.3, 200, 500))
 	skeletonRenderer = spine.SkeletonRenderer.new(true)
 end
 

@@ -83,6 +83,7 @@ C#
 
 ### Love2D
   * Fixed renderer to work with 3.6 changes
+  * Added support for two color tinting. Enable it via `SkeletonRenderer.new(true)`.
 
 ### Corona
   * Fixed renderer to work with 3.6 changes. Sadly, two color tinting is not supported, as Corona doesn't let us change the vertex format needed and its doesn't allow to modify shaders in the way needed for two color tinting
