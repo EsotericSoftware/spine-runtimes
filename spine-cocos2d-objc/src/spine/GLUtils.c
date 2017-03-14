@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "TwoColorBatcher.h"
+#include "GLUtils.h"
 
 #include <spine/extension.h>
 
@@ -52,6 +52,8 @@ attribute vec4 a_position;
 attribute vec4 a_color;
 attribute vec4 a_color2;
 attribute vec2 a_texCoords;
+													 
+uniform mat4 transform;
 
 \n#ifdef GL_ES\n
 varying lowp vec4 v_light;
@@ -68,7 +70,7 @@ void main() {
 	v_light = a_color;
 	v_dark = a_color2;
 	v_texCoord = a_texCoords;
-	gl_Position = CC_PMatrix * a_position;
+	gl_Position = transform * a_position;
 }
 );
 
@@ -76,18 +78,61 @@ const char* TWO_COLOR_TINT_FRAGMENT_SHADER = STRINGIFY(
 \n#ifdef GL_ES\n
 precision lowp float;
 \n#endif\n
+													   
+uniform sampler2D texture;
 
 varying vec4 v_light;
 varying vec4 v_dark;
 varying vec2 v_texCoord;
 
 void main() {
-   vec4 texColor = texture2D(CC_Texture0, v_texCoord);
+   vec4 texColor = texture2D(texture, v_texCoord);
    float alpha = texColor.a * v_light.a;
    gl_FragColor.a = alpha;
    gl_FragColor.rgb = (1.0 - texColor.rgb) * v_dark.rgb * alpha + texColor.rgb * v_light.rgb;	
 }
 );
+
+spMesh* spMesh_create(uint32_t numVertices, uint32_t numIndices) {
+	spMesh* mesh = MALLOC(spMesh, 1);
+	mesh->vertices = MALLOC(spVertex, numVertices);
+	mesh->indices = MALLOC(unsigned short, numIndices);
+	mesh->numVertices = numVertices;
+	mesh->numIndices = numIndices;
+	mesh->numAllocatedVertices = 0;
+	mesh->numAllocatedIndices = 0;
+	return mesh;
+}
+
+void spMesh_allocatePart(spMesh* mesh, spMeshPart* part, uint32_t numVertices, uint32_t numIndices, uint32_t textureHandle, uint32_t srcBlend, uint32_t dstBlend) {
+	if (mesh->numVertices < mesh->numAllocatedVertices + numVertices) {
+		mesh->numVertices = mesh->numAllocatedVertices + numVertices;
+		mesh->vertices = REALLOC(mesh->vertices, spVertex, mesh->numVertices);
+	}
+	if (mesh->numIndices < mesh->numAllocatedIndices + numIndices) {
+		mesh->numIndices = mesh->numAllocatedIndices + numIndices;
+		mesh->indices = REALLOC(mesh->indices, unsigned short, mesh->numIndices);
+	}
+	
+	part->mesh = mesh;
+	part->startVertex = mesh->numAllocatedVertices;
+	part->numIndices = numIndices;
+	part->startIndex = mesh->numAllocatedIndices;
+	part->numVertices = numVertices;
+	mesh->numAllocatedVertices += numVertices;
+	mesh->numAllocatedIndices += numIndices;
+}
+
+void spMesh_clearParts(spMesh* mesh) {
+	mesh->numAllocatedIndices = 0;
+	mesh->numAllocatedVertices = 0;
+}
+
+void spMesh_dispose(spMesh* mesh) {
+	FREE(mesh->vertices);
+	FREE(mesh->indices);
+	FREE(mesh);
+}
 
 GLuint compileShader(GLenum shaderType, const char* shaderSource) {
 	GLuint shader = glCreateShader(shaderType);
@@ -134,7 +179,14 @@ spShader* spShader_create(const char* vertexShaderSource, const char* fragmentSh
 	return shader;
 }
 
-spTwoColorBatcher* _spTwoColorBatcher_create() {
+void spShader_dispose(spShader* shader) {
+	glDeleteProgram(shader->program);
+	glDeleteShader(shader->vertexShader);
+	glDeleteShader(shader->fragmentShader);
+	FREE(shader);
+}
+
+spTwoColorBatcher* spTwoColorBatcher_create() {
 	spTwoColorBatcher* batcher = MALLOC(spTwoColorBatcher, 1);
 	
 	batcher->shader = spShader_create(TWO_COLOR_TINT_VERTEX_SHADER, TWO_COLOR_TINT_FRAGMENT_SHADER);
@@ -152,19 +204,16 @@ spTwoColorBatcher* _spTwoColorBatcher_create() {
 	return batcher;
 }
 
-void _spTwoColorBatcher_add(spTwoColorBatcher* batcher, spVertex* triangles, unsigned short* indices, uint32_t textureHandle, uint32_t srcBlend, uint32_t dstBlend) {
+void spTwoColorBatcher_add(spTwoColorBatcher* batcher, spMeshPart* mesh) {
 	
 }
 
-void _spTwoColorBatcher_flush(spTwoColorBatcher* batcher) {
+void spTwoColorBatcher_flush(spTwoColorBatcher* batcher) {
 	
 }
 
-void _spDisposeTwoColorBatcher(spTwoColorBatcher* batcher) {
-	glDeleteProgram(batcher->shader->program);
-	glDeleteShader(batcher->shader->vertexShader);
-	glDeleteShader(batcher->shader->fragmentShader);
-	FREE(batcher->shader);
+void spDisposeTwoColorBatcher(spTwoColorBatcher* batcher) {
+	spShader_dispose(batcher->shader);
 	glDeleteBuffers(1, &batcher->vertexBufferHandle);
 	FREE(batcher->verticesBuffer);
 	glDeleteBuffers(1, &batcher->indexBufferHandle);

@@ -28,8 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef TwoColorBatcher_h
-#define TwoColorBatcher_h
+#ifndef GLUtils_h
+#define GLUtils_h
 
 #include <stdint.h>
 
@@ -40,11 +40,39 @@ typedef struct spVertex {
 	float u, v;
 } spVertex;
 
+typedef struct spMesh {
+	spVertex* vertices;
+	uint32_t numVertices;
+	uint32_t numAllocatedVertices;
+	unsigned short* indices;
+	uint32_t numIndices;
+	uint32_t numAllocatedIndices;
+} spMesh;
+
+typedef struct spMeshPart {
+	spMesh* mesh;
+	uint32_t startVertex;
+	uint32_t numVertices;
+	uint32_t startIndex;
+	uint32_t numIndices;
+	uint32_t textureHandle;
+	uint32_t srcBlend;
+	uint32_t dstBlend;
+} spMeshPart;
+
+spMesh* spMesh_create(uint32_t numVertices, uint32_t numIndices);
+void spMesh_allocatePart(spMesh* mesh, spMeshPart* part, uint32_t numVertices, uint32_t numIndices, uint32_t textureHandle, uint32_t srcBlend, uint32_t dstBlend);
+void spMesh_clearParts(spMesh* mesh);
+void spMesh_dispose(spMesh* mesh);
+
 typedef struct spShader {
 	uint32_t program;
 	uint32_t vertexShader;
 	uint32_t fragmentShader;
 } spShader;
+
+spShader* spShader_create(const char* vertexShaderSource, const char* fragmentShaderSource);
+void spShader_dispose(spShader* shader);
 
 typedef struct spTwoColorBatcher {
 	spShader* shader;
@@ -63,9 +91,9 @@ typedef struct spTwoColorBatcher {
 	int32_t texCoordsAttributeLocation;
 } spTwoColorBatcher;
 
-spTwoColorBatcher* _spTwoColorBatcher_create();
-void _spTwoColorBatcher_add(spTwoColorBatcher* batcher, spVertex* triangles, unsigned short* indices, uint32_t textureHandle, uint32_t srcBlend, uint32_t dstBlend);
-void _spTwoColorBatcher_flush(spTwoColorBatcher* batcher);
-void _spDisposeTwoColorBatcher(spTwoColorBatcher* batcher);
+spTwoColorBatcher* spTwoColorBatcher_create();
+void spTwoColorBatcher_add(spTwoColorBatcher* batcher, spMeshPart* meshPart);
+void spTwoColorBatcher_flush(spTwoColorBatcher* batcher);
+void spDisposeTwoColorBatcher(spTwoColorBatcher* batcher);
 
-#endif /* TwoColorBatcher_h */
+#endif /* GLUtils_h */

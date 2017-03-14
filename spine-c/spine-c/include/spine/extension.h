@@ -64,6 +64,7 @@
 /* All allocation uses these. */
 #define MALLOC(TYPE,COUNT) ((TYPE*)_malloc(sizeof(TYPE) * (COUNT), __FILE__, __LINE__))
 #define CALLOC(TYPE,COUNT) ((TYPE*)_calloc(COUNT, sizeof(TYPE), __FILE__, __LINE__))
+#define REALLOC(PTR,TYPE,COUNT) ((TYPE*)_realloc(PTR, sizeof(TYPE) * (COUNT)))
 #define NEW(TYPE) CALLOC(TYPE,1)
 
 /* Gets the direct super class. Type safe. */
@@ -162,6 +163,7 @@ char* _spUtil_readFile (const char* path, int* length);
 
 void* _malloc (size_t size, const char* file, int line);
 void* _calloc (size_t num, size_t size, const char* file, int line);
+void* _realloc(void* ptr, size_t size);
 void _free (void* ptr);
 
 void _setMalloc (void* (*_malloc) (size_t size));
