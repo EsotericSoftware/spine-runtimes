@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 package spine.flash {
+	import flash.events.Event;
 	import spine.SkeletonData;
 	import spine.animation.AnimationState;
 	import spine.animation.AnimationStateData;
@@ -39,6 +40,12 @@ package spine.flash {
 		public function SkeletonAnimation(skeletonData : SkeletonData, stateData : AnimationStateData = null) {
 			super(skeletonData);
 			state = new AnimationState(stateData ? stateData : new AnimationStateData(skeletonData));
+		}
+		
+		override protected function onRemove(e:Event):void{
+			state.clearListeners();
+			state.clearListenerNotifications();
+			super.onRemove(e);
 		}
 
 		override public function advanceTime(time : Number) : void {

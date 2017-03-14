@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 package spine.examples {
+	import spine.animation.TrackEntry;
 	import flash.display.Sprite;
 
 	import spine.*;
@@ -65,17 +66,23 @@ package spine.examples {
 			skeleton.x = 400;
 			skeleton.y = 560;
 
-			skeleton.state.onStart.add(function(trackIndex : int) : void {
-				trace(trackIndex + " fuu start: " + skeleton.state.getCurrent(trackIndex));
+			skeleton.state.onStart.add(function(entry : TrackEntry) : void {
+				trace(entry.trackIndex + " start: " + entry.animation.name);
 			});
-			skeleton.state.onEnd.add(function(trackIndex : int) : void {
-				trace(trackIndex + " end: " + skeleton.state.getCurrent(trackIndex));
+			skeleton.state.onInterrupt.add(function(entry : TrackEntry) : void {
+				trace(entry.trackIndex + " interrupt: " + entry.animation.name);
 			});
-			skeleton.state.onComplete.add(function(trackIndex : int, count : int) : void {
-				trace(trackIndex + " complete: " + skeleton.state.getCurrent(trackIndex) + ", " + count);
+			skeleton.state.onEnd.add(function(entry : TrackEntry) : void {
+				trace(entry.trackIndex + " end: " + entry.animation.name);
 			});
-			skeleton.state.onEvent.add(function(trackIndex : int, event : Event) : void {
-				trace(trackIndex + " event: " + skeleton.state.getCurrent(trackIndex) + ", " + event.data.name + ": " + event.intValue + ", " + event.floatValue + ", " + event.stringValue);
+			skeleton.state.onComplete.add(function(entry : TrackEntry) : void {
+				trace(entry.trackIndex + " complete: " + entry.animation.name);
+			});
+			skeleton.state.onDispose.add(function(entry : TrackEntry) : void {
+				trace(entry.trackIndex + " dispose: " + entry.animation.name);
+			});
+			skeleton.state.onEvent.add(function(entry : TrackEntry, event : Event) : void {
+				trace(entry.trackIndex + " event: " + entry.animation.name + ", " + event.data.name + ": " + event.intValue + ", " + event.floatValue + ", " + event.stringValue);
 			});
 
 			if (false) {
