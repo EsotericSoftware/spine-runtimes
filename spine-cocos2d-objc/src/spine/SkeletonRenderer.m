@@ -185,6 +185,7 @@ static bool handlerQueued = false;
 	const unsigned short* triangles = 0;
 	int trianglesCount = 0;
 	float r = 0, g = 0, b = 0, a = 0;
+	float dr = 0, dg = 0, db = 0;
 	for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
 		spSlot* slot = _skeleton->drawOrder[i];
 		if (!slot->attachment) continue;
@@ -274,6 +275,14 @@ static bool handlerQueued = false;
 						CCRenderBufferSetTriangle(buffer, j, triangles[j * 3], triangles[j * 3 + 1], triangles[j * 3 + 2]);
 					}
 				} else {
+					if (slot->darkColor) {
+						dr = slot->darkColor->r;
+						dg = slot->darkColor->g;
+						db = slot->darkColor->b;
+					} else {
+						dr = dg = db = 0;
+					}
+					
 					spMeshPart meshPart;
 					spMesh_allocatePart(mesh, &meshPart, verticesCount / 2, trianglesCount, self.texture.name, srcBlend, dstBlend);
 					
@@ -288,8 +297,8 @@ static bool handlerQueued = false;
 						vertices->y = vertex.position.y;
 						vertices->z = vertex.position.z;
 						vertices->w = vertex.position.w;
-						vertices->color = ((int)(r * 255)) << 24 | ((int)(g * 255)) << 16 | ((int)(b * 255)) << 8 | ((int)(a * 255));
-						vertices->color2 = ((int)(r * 255)) << 24 | ((int)(g * 255)) << 16 | ((int)(b * 255)) << 8 | ((int)(a * 255));
+						vertices->color = ((unsigned short)(r * 255))| ((unsigned short)(g * 255)) << 8 | ((unsigned short)(b * 255)) <<16 | ((unsigned short)(a * 255)) << 24;
+						vertices->color2 = ((unsigned short)(dr * 255)) | ((unsigned short)(dg * 255)) << 8 | ((unsigned short)(db * 255)) << 16 | ((unsigned short)(255)) << 24;
 						vertices->u = uvs[i * 2];
 						vertices->v = 1 - uvs[i * 2 + 1];
 					}

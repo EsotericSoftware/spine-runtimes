@@ -30,6 +30,8 @@
 
 #include "GLUtils.h"
 
+#include <stddef.h>
+
 #include <spine/extension.h>
 
 #include <TargetConditionals.h>
@@ -203,6 +205,9 @@ spTwoColorBatcher* spTwoColorBatcher_create() {
 	batcher->indicesBuffer = MALLOC(unsigned short, MAX_INDICES);
 	batcher->numIndices = 0;
 	batcher->numVertices = 0;
+	batcher->lastTextureHandle = -1;
+	batcher->lastSrcBlend = -1;
+	batcher->lastDstBlend = -1;
 	return batcher;
 }
 
@@ -220,7 +225,7 @@ void spTwoColorBatcher_add(spTwoColorBatcher* batcher, spMeshPart mesh) {
 	
 	memcpy(vertices, &mesh.mesh->vertices[mesh.startVertex], mesh.numVertices * sizeof(spVertex));
 	unsigned short offset = (unsigned short)batcher->numVertices;
-	for (int i = batcher->numIndices, j = mesh.startIndex, n = batcher->numIndices + mesh.numIndices; i < n; i++, j++) {
+	for (int i = 0, j = mesh.startIndex, n = mesh.numIndices; i < n; i++, j++) {
 		indices[i] = mesh.mesh->indices[j] + offset;
 	}
 	
@@ -251,10 +256,10 @@ void spTwoColorBatcher_flush(spTwoColorBatcher* batcher) {
 	glEnableVertexAttribArray(batcher->color2AttributeLocation);
 	glEnableVertexAttribArray(batcher->texCoordsAttributeLocation);
 	
-	glVertexAttribPointer(batcher->positionAttributeLocation, 4, GL_FLOAT, GL_FALSE, sizeof(spVertex), (GLvoid*)0);
-	glVertexAttribPointer(batcher->colorAttributeLocation, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(spVertex), (GLvoid*)16);
-	glVertexAttribPointer(batcher->color2AttributeLocation, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(spVertex), (GLvoid*)20);
-	glVertexAttribPointer(batcher->texCoordsAttributeLocation, 2, GL_FLOAT, GL_FALSE, sizeof(spVertex), (GLvoid*)24);
+	glVertexAttribPointer(batcher->positionAttributeLocation, 4, GL_FLOAT, GL_FALSE, sizeof(spVertex), (GLvoid*)offsetof(spVertex, x));
+	glVertexAttribPointer(batcher->colorAttributeLocation, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(spVertex), (GLvoid*)offsetof(spVertex, color));
+	glVertexAttribPointer(batcher->color2AttributeLocation, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(spVertex), (GLvoid*)offsetof(spVertex, color2));
+	glVertexAttribPointer(batcher->texCoordsAttributeLocation, 2, GL_FLOAT, GL_FALSE, sizeof(spVertex), (GLvoid*)offsetof(spVertex, u));
 	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, batcher->indexBufferHandle);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * batcher->numIndices, batcher->indicesBuffer, GL_STATIC_DRAW);
