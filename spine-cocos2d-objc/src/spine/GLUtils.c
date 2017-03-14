@@ -52,8 +52,6 @@ attribute vec4 a_position;
 attribute vec4 a_color;
 attribute vec4 a_color2;
 attribute vec2 a_texCoords;
-													 
-uniform mat4 transform;
 
 \n#ifdef GL_ES\n
 varying lowp vec4 v_light;
@@ -63,14 +61,13 @@ varying mediump vec2 v_texCoord;
 varying vec4 v_light;
 varying vec4 v_dark;
 varying vec2 v_texCoord;
-
 \n#endif\n
 
 void main() {
 	v_light = a_color;
 	v_dark = a_color2;
 	v_texCoord = a_texCoords;
-	gl_Position = transform * a_position;
+	gl_Position = a_position;
 }
 );
 
@@ -89,7 +86,7 @@ void main() {
    vec4 texColor = texture2D(texture, v_texCoord);
    float alpha = texColor.a * v_light.a;
    gl_FragColor.a = alpha;
-   gl_FragColor.rgb = (1.0 - texColor.rgb) * v_dark.rgb * alpha + texColor.rgb * v_light.rgb;	
+   gl_FragColor.rgb = (1.0 - texColor.rgb) * v_dark.rgb * alpha + texColor.rgb * v_light.rgb;
 }
 );
 
@@ -119,6 +116,10 @@ void spMesh_allocatePart(spMesh* mesh, spMeshPart* part, uint32_t numVertices, u
 	part->numIndices = numIndices;
 	part->startIndex = mesh->numAllocatedIndices;
 	part->numVertices = numVertices;
+	part->textureHandle = textureHandle;
+	part->srcBlend = srcBlend;
+	part->dstBlend = dstBlend;
+	
 	mesh->numAllocatedVertices += numVertices;
 	mesh->numAllocatedIndices += numIndices;
 }
@@ -194,6 +195,7 @@ spTwoColorBatcher* spTwoColorBatcher_create() {
 	batcher->colorAttributeLocation = glGetAttribLocation(batcher->shader->program, "a_color");
 	batcher->color2AttributeLocation = glGetAttribLocation(batcher->shader->program, "a_color2");
 	batcher->texCoordsAttributeLocation = glGetAttribLocation(batcher->shader->program, "a_texCoords");
+	batcher->textureUniformLocation = glGetUniformLocation(batcher->shader->program, "texture");
 	
 	glGenBuffers(1, &batcher->vertexBufferHandle);
 	glGenBuffers(1, &batcher->indexBufferHandle);
@@ -204,12 +206,72 @@ spTwoColorBatcher* spTwoColorBatcher_create() {
 	return batcher;
 }
 
-void spTwoColorBatcher_add(spTwoColorBatcher* batcher, spMeshPart* mesh) {
+void spTwoColorBatcher_add(spTwoColorBatcher* batcher, spMeshPart mesh) {
+	if (batcher->numVertices + mesh.numVertices > MAX_VERTICES || batcher->numIndices + mesh.numIndices > MAX_INDICES) {
+		spTwoColorBatcher_flush(batcher);
+	}
 	
+	if (batcher->lastTextureHandle != mesh.textureHandle || batcher->lastSrcBlend != mesh.srcBlend || batcher->lastDstBlend != mesh.dstBlend) {
+		spTwoColorBatcher_flush(batcher);
+	}
+	
+	spVertex* vertices = &batcher->verticesBuffer[batcher->numVertices];
+	unsigned short* indices = &batcher->indicesBuffer[batcher->numIndices];
+	
+	memcpy(vertices, &mesh.mesh->vertices[mesh.startVertex], mesh.numVertices * sizeof(spVertex));
+	unsigned short offset = (unsigned short)batcher->numVertices;
+	for (int i = batcher->numIndices, j = mesh.startIndex, n = batcher->numIndices + mesh.numIndices; i < n; i++, j++) {
+		indices[i] = mesh.mesh->indices[j] + offset;
+	}
+	
+	batcher->numIndices += mesh.numIndices;
+	batcher->numVertices += mesh.numVertices;
+	batcher->lastSrcBlend = mesh.srcBlend;
+	batcher->lastDstBlend = mesh.dstBlend;
+	batcher->lastTextureHandle = mesh.textureHandle;
 }
 
 void spTwoColorBatcher_flush(spTwoColorBatcher* batcher) {
+	if (batcher->numVertices == 0 || batcher->numIndices == 0)
+		return;
 	
+	glUseProgram(batcher->shader->program);
+		
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, batcher->lastTextureHandle);
+	glUniform1i(batcher->textureUniformLocation, 0);
+	
+	glBlendFunc(batcher->lastSrcBlend, batcher->lastDstBlend);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, batcher->vertexBufferHandle);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(spVertex) * batcher->numVertices , batcher->verticesBuffer, GL_DYNAMIC_DRAW);
+	
+	glEnableVertexAttribArray(batcher->positionAttributeLocation);
+	glEnableVertexAttribArray(batcher->colorAttributeLocation);
+	glEnableVertexAttribArray(batcher->color2AttributeLocation);
+	glEnableVertexAttribArray(batcher->texCoordsAttributeLocation);
+	
+	glVertexAttribPointer(batcher->positionAttributeLocation, 4, GL_FLOAT, GL_FALSE, sizeof(spVertex), (GLvoid*)0);
+	glVertexAttribPointer(batcher->colorAttributeLocation, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(spVertex), (GLvoid*)16);
+	glVertexAttribPointer(batcher->color2AttributeLocation, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(spVertex), (GLvoid*)20);
+	glVertexAttribPointer(batcher->texCoordsAttributeLocation, 2, GL_FLOAT, GL_FALSE, sizeof(spVertex), (GLvoid*)24);
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, batcher->indexBufferHandle);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * batcher->numIndices, batcher->indicesBuffer, GL_STATIC_DRAW);
+	
+	glDrawElements(GL_TRIANGLES, (GLsizei)batcher->numIndices, GL_UNSIGNED_SHORT, 0);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	
+	glUseProgram(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	
+	batcher->numIndices = 0;
+	batcher->numVertices = 0;
+	batcher->lastSrcBlend = -1;
+	batcher->lastDstBlend = -1;
+	batcher->lastTextureHandle = -1;
 }
 
 void spDisposeTwoColorBatcher(spTwoColorBatcher* batcher) {

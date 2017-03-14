@@ -89,10 +89,15 @@ typedef struct spTwoColorBatcher {
 	int32_t colorAttributeLocation;
 	int32_t color2AttributeLocation;
 	int32_t texCoordsAttributeLocation;
+	int32_t textureUniformLocation;
+	
+	uint32_t lastTextureHandle;
+	uint32_t lastSrcBlend;
+	uint32_t lastDstBlend;
 } spTwoColorBatcher;
 
 spTwoColorBatcher* spTwoColorBatcher_create();
-void spTwoColorBatcher_add(spTwoColorBatcher* batcher, spMeshPart* meshPart);
+void spTwoColorBatcher_add(spTwoColorBatcher* batcher, spMeshPart meshPart);
 void spTwoColorBatcher_flush(spTwoColorBatcher* batcher);
 void spDisposeTwoColorBatcher(spTwoColorBatcher* batcher);
 

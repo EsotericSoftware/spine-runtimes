@@ -37,6 +37,7 @@
 static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 static spTwoColorBatcher* batcher = 0;
 static spMesh* mesh = 0;
+static bool handlerQueued = false;
 
 @interface SkeletonRenderer (Private)
 - (void) initialize:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
@@ -66,9 +67,6 @@ static spMesh* mesh = 0;
 	if (!batcher) {
 		batcher = spTwoColorBatcher_create();
 		mesh = spMesh_create(64000, 32000);
-		[[CCDirector sharedDirector] addFrameCompletionHandler: ^{
-			printf ("frame completed");
-		}];
 	}
 	
 	_ownsSkeletonData = ownsSkeletonData;
@@ -159,6 +157,20 @@ static spMesh* mesh = 0;
 }
 
 -(void)draw:(CCRenderer *)renderer transform:(const GLKMatrix4 *)transform {
+	// FIXME we need to clear the mesh parts at the end of the frame
+	// there's no general event mechanism to get notified on end frame
+	// that doesn't need to be re-added every frame. This is a poor man
+	// notification system that may break if the block is called on a
+	// separate thread.
+	if (!handlerQueued) {
+		[[CCDirector sharedDirector] addFrameCompletionHandler: ^{
+			printf("clearing mesh\n");
+			spMesh_clearParts(mesh);
+			handlerQueued = false;
+		}];
+		handlerQueued = true;
+	}
+	
 	CCColor* nodeColor = self.color;
 	_skeleton->color.r = nodeColor.red;
 	_skeleton->color.g = nodeColor.green;
@@ -265,13 +277,41 @@ static spMesh* mesh = 0;
 					spMeshPart meshPart;
 					spMesh_allocatePart(mesh, &meshPart, verticesCount / 2, trianglesCount, self.texture.name, srcBlend, dstBlend);
 					
+					spVertex* vertices = &meshPart.mesh->vertices[meshPart.startVertex];
+					unsigned short* indices = &meshPart.mesh->indices[meshPart.startIndex];
+					
+					for (int i = 0; i * 2 < verticesCount; i++, vertices++) {
+						CCVertex vertex;
+						vertex.position = GLKVector4Make(_worldVertices[i * 2], _worldVertices[i * 2 + 1], 0.0, 1.0);
+						vertex = CCVertexApplyTransform(vertex, transform);
+						vertices->x = vertex.position.x;
+						vertices->y = vertex.position.y;
+						vertices->z = vertex.position.z;
+						vertices->w = vertex.position.w;
+						vertices->color = ((int)(r * 255)) << 24 | ((int)(g * 255)) << 16 | ((int)(b * 255)) << 8 | ((int)(a * 255));
+						vertices->color2 = ((int)(r * 255)) << 24 | ((int)(g * 255)) << 16 | ((int)(b * 255)) << 8 | ((int)(a * 255));
+						vertices->u = uvs[i * 2];
+						vertices->v = 1 - uvs[i * 2 + 1];
+					}
+					
+					for (int j = 0; j < trianglesCount; j++, indices++) {
+						*indices = triangles[j];
+					}
+					
 					[renderer enqueueBlock:^{
-						
+						spTwoColorBatcher_add(batcher, meshPart);
 					} globalSortOrder:0 debugLabel: nil threadSafe: false];
 				}
 			}
 		}
 	}
+	
+	if (self.twoColorTint) {
+		[renderer enqueueBlock:^{
+			spTwoColorBatcher_flush(batcher);
+		} globalSortOrder:0 debugLabel: nil threadSafe: false];
+	}
+	
 	[_drawNode clear];
 	if (_debugSlots) {
 		// Slots.
