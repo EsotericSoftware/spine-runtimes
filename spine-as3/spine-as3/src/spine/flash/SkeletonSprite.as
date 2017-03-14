@@ -60,6 +60,7 @@ package spine.flash {
 			_skeleton = new Skeleton(skeletonData);
 			_skeleton.updateWorldTransform();
 
+			lastTime = getTimer();
 			addEventListener(Event.ADDED_TO_STAGE, onAdd);
       		addEventListener(Event.REMOVED_FROM_STAGE, onRemove);
 		}
@@ -67,7 +68,7 @@ package spine.flash {
 			removeEventListener(Event.ENTER_FRAME, enterFrame);
 		}
 		   
-		public function clearListeners() {
+		public function clearListeners() : void {
 			removeEventListener(Event.ADDED_TO_STAGE, onAdd);
 			removeEventListener(Event.REMOVED_FROM_STAGE, onRemove);
 		}
