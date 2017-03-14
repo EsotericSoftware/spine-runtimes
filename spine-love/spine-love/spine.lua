@@ -93,26 +93,26 @@ function PolygonBatcher.new(vertexCount, useTwoColorTint)
 			{"VertexColor2", "byte", 4} -- The r,g,b,a dark color of each vertex.
 		}
 		local vertexcode = [[
-				attribute vec4 VertexColor2;
-				varying vec4 color2;
-		
-        vec4 position(mat4 transform_projection, vec4 vertex_position) {
-						color2 = VertexColor2;
-            return transform_projection * vertex_position;
-        }
+			attribute vec4 VertexColor2;
+			varying vec4 color2;
+			
+			vec4 position(mat4 transform_projection, vec4 vertex_position) {
+				color2 = VertexColor2;
+				return transform_projection * vertex_position;
+			}
     ]]
 		
 		local pixelcode = [[
-				varying vec4 color2;
-		
-        vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
-            vec4 texColor = Texel(texture, texture_coords);
-						float alpha = texColor.a * color.a;
-						vec4 outputColor;
-						outputColor.a = alpha;
-						outputColor.rgb = (1.0 - texColor.rgb) * color2.rgb * alpha + texColor.rgb * color.rgb;
-						return outputColor;
-        }
+			varying vec4 color2;
+			
+			vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
+				vec4 texColor = Texel(texture, texture_coords);
+				float alpha = texColor.a * color.a;
+				vec4 outputColor;
+				outputColor.a = alpha;
+				outputColor.rgb = (1.0 - texColor.rgb) * color2.rgb * alpha + texColor.rgb * color.rgb;
+				return outputColor;
+			}
     ]]
  
 		twoColorTintShader = love.graphics.newShader(pixelcode, vertexcode)
