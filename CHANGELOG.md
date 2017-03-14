@@ -44,6 +44,7 @@
 
 ### Cocos2d-Objc
  * Fixed renderer to work with 3.6 changes
+ * Added support for two color tinting. Tinting is enabled/disabled per `SkeletonRenderer/SkeletonAnimation.twoColorTint = true`. Note that two color tinted skeletons do not batch with other nodes.
 
 ### SFML
  * Fixed renderer to work with 3.6 changes. Sadly, two color tinting does not work, as the vertex format in SFML is fixed.
