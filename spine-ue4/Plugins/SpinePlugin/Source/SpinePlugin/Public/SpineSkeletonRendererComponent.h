@@ -64,6 +64,9 @@ public:
 	
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	FName TextureParameterName;
+
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
+	FLinearColor Color = FLinearColor(1, 1, 1, 1);
 	
 protected:
 	void UpdateMesh (spSkeleton* Skeleton);
