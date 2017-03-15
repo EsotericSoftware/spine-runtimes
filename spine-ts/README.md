@@ -40,6 +40,18 @@ All `*.js` files are self-contained and include both the core and respective bac
 
 If you write your app with TypeScript, additionally copy the corresponding `build/spine-*.d.ts` file to your project.
 
+**Note:** If you are using the compiled `.js` files with ES6 or other module systems, you have to add
+
+```
+export { spine };
+```
+
+At the bottom of the `.js` file you are using. You can then import the module as usual, e.g.:
+
+```
+import { spine } from './spine-webgl.js';
+```
+
 ## Examples
 To run the examples, the image, atlas, and JSON files must be served by a webserver, they can't be loaded from your local disk. Spawn a light-weight web server in the root of spine-ts, then navigate to the `index.html` file for the example you want to view. E.g.:
 
