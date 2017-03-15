@@ -71,6 +71,8 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 		USpineSkeletonComponent* skeleton = Cast<USpineSkeletonComponent>(owner->GetComponentByClass(skeletonClass));
 		
 		if (skeleton && !skeleton->IsBeingDestroyed() && skeleton->GetSkeleton() && skeleton->Atlas) {
+			spColor_setFromFloats(&skeleton->GetSkeleton()->color, Color.R, Color.G, Color.B, Color.A);
+
 			if (atlasNormalBlendMaterials.Num() != skeleton->Atlas->atlasPages.Num()) {
 				atlasNormalBlendMaterials.SetNum(0);
 				pageToNormalBlendMaterial.Empty();
