@@ -51,6 +51,7 @@
 
 ### Unreal Engine 4
  * Fixed renderer to work with 3.6 changes
+ * Added new UPROPERTY to SpineSkeletonRendererComponent called `Color`. This allows to set the tint color of the skeleton in the editor, C++ and Blueprints. Under the hood, the `spSkeleton->color` will be set on every tick of the renderer component.
 
 C#
 ----
