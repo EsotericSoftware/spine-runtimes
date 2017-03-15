@@ -98,7 +98,7 @@ namespace Spine {
 				Attachment attachment = slot.Attachment;
 				if (attachment is RegionAttachment) {
 					RegionAttachment regionAttachment = (RegionAttachment)attachment;
-					BlendState blend = slot.Data.BlendMode == BlendMode.additive ? BlendState.Additive : defaultBlendState;
+					BlendState blend = slot.Data.BlendMode == BlendMode.Additive ? BlendState.Additive : defaultBlendState;
 					if (device.BlendState != blend) {
 						End();
 						device.BlendState = blend;
@@ -129,29 +129,29 @@ namespace Spine {
 					itemVertices[BR].Color = color;
 					itemVertices[TR].Color = color;
 
-					regionAttachment.ComputeWorldVertices(slot.Bone, vertices);
-					itemVertices[TL].Position.X = vertices[RegionAttachment.X1];
-					itemVertices[TL].Position.Y = vertices[RegionAttachment.Y1];
+					regionAttachment.ComputeWorldVertices(slot.Bone, vertices, 0, 2);
+					itemVertices[TL].Position.X = vertices[0];
+					itemVertices[TL].Position.Y = vertices[1];
 					itemVertices[TL].Position.Z = 0;
-					itemVertices[BL].Position.X = vertices[RegionAttachment.X2];
-					itemVertices[BL].Position.Y = vertices[RegionAttachment.Y2];
+					itemVertices[BL].Position.X = vertices[2];
+					itemVertices[BL].Position.Y = vertices[3];
 					itemVertices[BL].Position.Z = 0;
-					itemVertices[BR].Position.X = vertices[RegionAttachment.X3];
-					itemVertices[BR].Position.Y = vertices[RegionAttachment.Y3];
+					itemVertices[BR].Position.X = vertices[4];
+					itemVertices[BR].Position.Y = vertices[5];
 					itemVertices[BR].Position.Z = 0;
-					itemVertices[TR].Position.X = vertices[RegionAttachment.X4];
-					itemVertices[TR].Position.Y = vertices[RegionAttachment.Y4];
+					itemVertices[TR].Position.X = vertices[6];
+					itemVertices[TR].Position.Y = vertices[7];
 					itemVertices[TR].Position.Z = 0;
 
 					float[] uvs = regionAttachment.UVs;
-					itemVertices[TL].TextureCoordinate.X = uvs[RegionAttachment.X1];
-					itemVertices[TL].TextureCoordinate.Y = uvs[RegionAttachment.Y1];
-					itemVertices[BL].TextureCoordinate.X = uvs[RegionAttachment.X2];
-					itemVertices[BL].TextureCoordinate.Y = uvs[RegionAttachment.Y2];
-					itemVertices[BR].TextureCoordinate.X = uvs[RegionAttachment.X3];
-					itemVertices[BR].TextureCoordinate.Y = uvs[RegionAttachment.Y3];
-					itemVertices[TR].TextureCoordinate.X = uvs[RegionAttachment.X4];
-					itemVertices[TR].TextureCoordinate.Y = uvs[RegionAttachment.Y4];
+					itemVertices[TL].TextureCoordinate.X = uvs[0];
+					itemVertices[TL].TextureCoordinate.Y = uvs[1];
+					itemVertices[BL].TextureCoordinate.X = uvs[2];
+					itemVertices[BL].TextureCoordinate.Y = uvs[3];
+					itemVertices[BR].TextureCoordinate.X = uvs[4];
+					itemVertices[BR].TextureCoordinate.Y = uvs[5];
+					itemVertices[TR].TextureCoordinate.X = uvs[6];
+					itemVertices[TR].TextureCoordinate.Y = uvs[7];
 				} else if (attachment is MeshAttachment) {
 					MeshAttachment mesh = (MeshAttachment)attachment;
 					int vertexCount = mesh.WorldVerticesLength;
