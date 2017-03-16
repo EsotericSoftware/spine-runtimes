@@ -31,9 +31,13 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Spine.Unity.Editor {	
+namespace Spine.Unity.Editor {
+
+	using Editor = UnityEditor.Editor;
+	using Event = UnityEngine.Event;
+
 	[CustomEditor(typeof(BoneFollower)), CanEditMultipleObjects]
-	public class BoneFollowerInspector : UnityEditor.Editor {
+	public class BoneFollowerInspector : Editor {
 		SerializedProperty boneName, skeletonRenderer, followZPosition, followBoneRotation, followLocalScale, followSkeletonFlip;
 		BoneFollower targetBoneFollower;
 		bool needsReset;
@@ -121,7 +125,7 @@ namespace Spine.Unity.Editor {
 				return;
 			}
 
-			if (needsReset && UnityEngine.Event.current.type == EventType.Layout) {
+			if (needsReset && Event.current.type == EventType.Layout) {
 				targetBoneFollower.Initialize();
 				targetBoneFollower.LateUpdate();
 				needsReset = false;
@@ -171,7 +175,7 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
-			var current = UnityEngine.Event.current;
+			var current = Event.current;
 			bool wasUndo = (current.type == EventType.ValidateCommand && current.commandName == "UndoRedoPerformed");
 			if (wasUndo)
 				targetBoneFollower.Initialize();
