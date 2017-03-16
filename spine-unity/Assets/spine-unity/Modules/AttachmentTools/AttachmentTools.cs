@@ -306,10 +306,11 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			var newSkin = new Skin(newName);
 
 			var existingRegions = new Dictionary<AtlasRegion, int>();
-			var textureIndexes = new List<int>();
+			var regionIndexes = new List<int>();
 
 			var repackedAttachments = new List<Attachment>();
 			var texturesToPack = new List<Texture2D>();
+			var originalRegions = new List<AtlasRegion>();
 			int newRegionIndex = 0;
 			foreach (var kvp in skinAttachments) {
 				var newAttachment = kvp.Value.GetClone(true);
@@ -318,11 +319,12 @@ namespace Spine.Unity.Modules.AttachmentTools {
 					var region = newAttachment.GetAtlasRegion();
 					int existingIndex;
 					if (existingRegions.TryGetValue(region, out existingIndex)) {
-						textureIndexes.Add(existingIndex); // Store the region index for the eventual new attachment.
+						regionIndexes.Add(existingIndex); // Store the region index for the eventual new attachment.
 					} else {
+						originalRegions.Add(region);
 						texturesToPack.Add(region.ToTexture()); // Add the texture to the PackTextures argument
 						existingRegions.Add(region, newRegionIndex); // Add the region to the dictionary of known regions
-						textureIndexes.Add(newRegionIndex); // Store the region index for the eventual new attachment.
+						regionIndexes.Add(newRegionIndex); // Store the region index for the eventual new attachment.
 						newRegionIndex++;
 					}
 
@@ -343,12 +345,16 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			var page = newMaterial.ToSpineAtlasPage();
 			page.name = newName;
 
+			var repackedRegions = new List<AtlasRegion>();
+			for (int i = 0, n = originalRegions.Count; i < n; i++) {
+				var oldRegion = originalRegions[i];
+				var newRegion = UVRectToAtlasRegion(rects[i], oldRegion.name, page, oldRegion.offsetX, oldRegion.offsetY, oldRegion.rotate);
+				repackedRegions.Add(newRegion);
+			}
+
 			for (int i = 0, n = repackedAttachments.Count; i < n; i++) {
 				var a = repackedAttachments[i];
-				var r = rects[textureIndexes[i]];
-				var oldRegion = a.GetAtlasRegion();
-				var newRegion = UVRectToAtlasRegion(r, oldRegion.name, page, oldRegion.offsetX, oldRegion.offsetY, oldRegion.rotate);
-				a.SetRegion(newRegion);
+				a.SetRegion(repackedRegions[regionIndexes[i]]);
 			}
 
 			t = newTexture;
