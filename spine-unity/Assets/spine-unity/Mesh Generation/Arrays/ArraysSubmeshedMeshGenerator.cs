@@ -35,7 +35,7 @@ namespace Spine.Unity.MeshGeneration {
 	/// <summary>
 	/// Arrays submeshed mesh generator.
 	/// </summary>
-	public class ArraysSubmeshedMeshGenerator : ArraysMeshGenerator, ISubmeshedMeshGenerator {
+	public class ArraysSubmeshedMeshGenerator : ArraysMeshGenerator, ISubmeshedMeshGenerator, System.IDisposable {
 
 		readonly List<Slot> separators = new List<Slot>();
 		public List<Slot> Separators { get { return this.separators; } }
@@ -49,6 +49,11 @@ namespace Spine.Unity.MeshGeneration {
 		readonly SubmeshedMeshInstruction currentInstructions = new SubmeshedMeshInstruction();
 		readonly ExposedList<SubmeshTriangleBuffer> submeshBuffers = new ExposedList<SubmeshTriangleBuffer>();
 		Material[] sharedMaterials = new Material[0];
+
+		public void Dispose () {
+			doubleBufferedSmartMesh.GetNext().Dispose();
+			doubleBufferedSmartMesh.GetNext().Dispose();
+		}
 
 		public SubmeshedMeshInstruction GenerateInstruction (Skeleton skeleton) {
 			if (skeleton == null) throw new System.ArgumentNullException("skeleton");
@@ -232,10 +237,20 @@ namespace Spine.Unity.MeshGeneration {
 
 		#region Types
 		// A SmartMesh is a Mesh (with submeshes) that knows what attachments and instructions were used to generate it.
-		class SmartMesh {
+		class SmartMesh : System.IDisposable {
 			public readonly Mesh mesh = SpineMesh.NewMesh();
 			readonly ExposedList<Attachment> attachmentsUsed = new ExposedList<Attachment>();
 			readonly ExposedList<SubmeshInstruction> instructionsUsed = new ExposedList<SubmeshInstruction>();
+
+			public void Dispose () {
+				if (mesh != null) {
+					if (Application.isEditor && !Application.isPlaying) {
+						UnityEngine.Object.DestroyImmediate(mesh);
+					} else {
+						UnityEngine.Object.Destroy(mesh);
+					}
+				}
+			}
 
 			public void Set (Vector3[] verts, Vector2[] uvs, Color32[] colors, SubmeshedMeshInstruction instruction) {
 				mesh.vertices = verts;
