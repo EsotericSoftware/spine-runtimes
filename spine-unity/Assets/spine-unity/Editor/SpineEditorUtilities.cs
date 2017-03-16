@@ -1221,7 +1221,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			// Version warning
-			{
+			if (isSpineData) {
 				string runtimeVersion = compatibleVersions[0][0] + "." + compatibleVersions[0][1];
 
 				if (string.IsNullOrEmpty(rawVersion)) {
