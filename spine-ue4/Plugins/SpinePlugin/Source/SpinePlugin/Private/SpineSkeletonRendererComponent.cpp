@@ -176,10 +176,11 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 	TArray<FVector> vertices;
 	TArray<int32> indices;
 	TArray<FVector2D> uvs;
-	TArray<FColor> colors;		
+	TArray<FColor> colors;
+	TArray<FColor> darkColors;
 
-	TArray<float> worldVertices;
-	worldVertices.SetNumUninitialized(2 * 1024);
+	TArray<float> attachmentVertices;
+	attachmentVertices.SetNumUninitialized(2 * 1024);
 	int idx = 0;
 	int meshSection = 0;
 	UMaterialInstanceDynamic* lastMaterial = nullptr;
@@ -187,140 +188,94 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 	ClearAllMeshSections();
 
 	float depthOffset = 0;
+	unsigned short quadIndices[] = { 0, 1, 2, 0, 2, 3 };
 
 	for (int i = 0; i < Skeleton->slotsCount; ++i) {
+		unsigned short* attachmentIndices = nullptr;
+		int numVertices;
+		int numIndices;
+		spAtlasRegion* attachmentAtlasRegion = nullptr;
+		spColor attachmentColor;
+		spColor_setFromFloats(&attachmentColor, 1, 1, 1, 1);
+		float* attachmentUvs = nullptr;
+
 		spSlot* slot = Skeleton->drawOrder[i];
 		spAttachment* attachment = slot->attachment;
-		if (!attachment) continue;						
+		if (!attachment) continue;
+		if (attachment->type != SP_ATTACHMENT_REGION && attachment->type != SP_ATTACHMENT_MESH) continue;
 		
 		if (attachment->type == SP_ATTACHMENT_REGION) {
 			spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
-			spAtlasRegion* region = (spAtlasRegion*)regionAttachment->rendererObject;
-			
-			UMaterialInstanceDynamic* material = nullptr;
-			
-			// if the user switches the atlas data while not having switched
-			// to the correct skeleton data yet, we won't find any regions.
-			// ignore regions for which we can't find a material
-			switch(slot->data->blendMode) {
-				case SP_BLEND_MODE_NORMAL:
-					if (!pageToNormalBlendMaterial.Contains(region->page)) continue;
-					material = pageToNormalBlendMaterial[region->page];
-					break;
-				case SP_BLEND_MODE_ADDITIVE:
-					if (!pageToAdditiveBlendMaterial.Contains(region->page)) continue;
-					material = pageToAdditiveBlendMaterial[region->page];
-					break;
-				case SP_BLEND_MODE_MULTIPLY:
-					if (!pageToMultiplyBlendMaterial.Contains(region->page)) continue;
-					material = pageToMultiplyBlendMaterial[region->page];
-					break;
-				case SP_BLEND_MODE_SCREEN:
-					if (!pageToScreenBlendMaterial.Contains(region->page)) continue;
-					material = pageToScreenBlendMaterial[region->page];
-					break;
-				default:
-					if (!pageToNormalBlendMaterial.Contains(region->page)) continue;
-					material = pageToNormalBlendMaterial[region->page];
-			}
-
-			if (lastMaterial != material) {
-				Flush(meshSection, vertices, indices, uvs, colors, lastMaterial);				
-				lastMaterial = material;
-				idx = 0;
-			}
-
-			spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, worldVertices.GetData(), 0, 2);
-
-			uint8 r = static_cast<uint8>(Skeleton->color.r * slot->color.r * 255);
-			uint8 g = static_cast<uint8>(Skeleton->color.g * slot->color.g * 255);
-			uint8 b = static_cast<uint8>(Skeleton->color.b * slot->color.b * 255);
-			uint8 a = static_cast<uint8>(Skeleton->color.a * slot->color.a * 255);
-			
-			colors.Add(FColor(r, g, b, a));
-			vertices.Add(FVector(worldVertices[0], depthOffset, worldVertices[1]));
-			uvs.Add(FVector2D(regionAttachment->uvs[0], regionAttachment->uvs[1]));
-
-			colors.Add(FColor(r, g, b, a));
-			vertices.Add(FVector(worldVertices[2], depthOffset, worldVertices[3]));
-			uvs.Add(FVector2D(regionAttachment->uvs[2], regionAttachment->uvs[3]));
-
-			colors.Add(FColor(r, g, b, a));
-			vertices.Add(FVector(worldVertices[4], depthOffset, worldVertices[5]));
-			uvs.Add(FVector2D(regionAttachment->uvs[4], regionAttachment->uvs[5]));
-
-			colors.Add(FColor(r, g, b, a));
-			vertices.Add(FVector(worldVertices[6], depthOffset, worldVertices[7]));
-			uvs.Add(FVector2D(regionAttachment->uvs[6], regionAttachment->uvs[7]));
-
-			indices.Add(idx + 0);
-			indices.Add(idx + 1);
-			indices.Add(idx + 2);
-			indices.Add(idx + 0);
-			indices.Add(idx + 2);
-			indices.Add(idx + 3);
-			idx += 4;
-			depthOffset += this->DepthOffset;
-		} else if (attachment->type == SP_ATTACHMENT_MESH) {
+			spColor_setFromColor(&attachmentColor, &regionAttachment->color);
+			attachmentAtlasRegion = (spAtlasRegion*)regionAttachment->rendererObject;
+			spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, attachmentVertices.GetData(), 0, 2);
+			attachmentIndices = quadIndices;
+			attachmentUvs = regionAttachment->uvs;
+			numVertices = 4;
+			numIndices = 6;
+		} else /*mesh*/ {
 			spMeshAttachment* mesh = (spMeshAttachment*)attachment;
-			spAtlasRegion* region = (spAtlasRegion*)mesh->rendererObject;
-			UMaterialInstanceDynamic* material = nullptr;
-			
-			// if the user switches the atlas data while not having switched
-			// to the correct skeleton data yet, we won't find any regions.
-			// ignore regions for which we can't find a material
-			switch(slot->data->blendMode) {
-				case SP_BLEND_MODE_NORMAL:
-					if (!pageToNormalBlendMaterial.Contains(region->page)) continue;
-					material = pageToNormalBlendMaterial[region->page];
-					break;
-				case SP_BLEND_MODE_ADDITIVE:
-					if (!pageToAdditiveBlendMaterial.Contains(region->page)) continue;
-					material = pageToAdditiveBlendMaterial[region->page];
-					break;
-				case SP_BLEND_MODE_MULTIPLY:
-					if (!pageToMultiplyBlendMaterial.Contains(region->page)) continue;
-					material = pageToMultiplyBlendMaterial[region->page];
-					break;
-				case SP_BLEND_MODE_SCREEN:
-					if (!pageToScreenBlendMaterial.Contains(region->page)) continue;
-					material = pageToScreenBlendMaterial[region->page];
-					break;
-				default:
-					if (!pageToNormalBlendMaterial.Contains(region->page)) continue;
-					material = pageToNormalBlendMaterial[region->page];
-			}
-
-			if (lastMaterial != material) {
-				Flush(meshSection, vertices, indices, uvs, colors, lastMaterial);
-				lastMaterial = material;
-				idx = 0;
-			}
-
-			if (mesh->super.worldVerticesLength> worldVertices.Num()) {
-				worldVertices.SetNum(mesh->super.worldVerticesLength);
-			}
-			
-			spVertexAttachment_computeWorldVertices(&mesh->super, slot, 0, mesh->super.worldVerticesLength, worldVertices.GetData(), 0, 2);
-
-			uint8 r = static_cast<uint8>(Skeleton->color.r * slot->color.r * 255);
-			uint8 g = static_cast<uint8>(Skeleton->color.g * slot->color.g * 255);
-			uint8 b = static_cast<uint8>(Skeleton->color.b * slot->color.b * 255);
-			uint8 a = static_cast<uint8>(Skeleton->color.a * slot->color.a * 255);
-			
-			for (int j = 0; j < mesh->super.worldVerticesLength; j += 2) {
-				colors.Add(FColor(r, g, b, a));
-				vertices.Add(FVector(worldVertices[j], depthOffset, worldVertices[j + 1]));
-				uvs.Add(FVector2D(mesh->uvs[j], mesh->uvs[j + 1]));
-			}
-
-			for (int j = 0; j < mesh->trianglesCount; j++) {
-				indices.Add(idx + mesh->triangles[j]);
-			}
-			idx += mesh->super.worldVerticesLength >> 1;
-			depthOffset += this->DepthOffset;
-			SetMaterial(meshSection, material);
+			spColor_setFromColor(&attachmentColor, &mesh->color);
+			attachmentAtlasRegion = (spAtlasRegion*)mesh->rendererObject;			
+			if (mesh->super.worldVerticesLength > attachmentVertices.Num()) attachmentVertices.SetNum(mesh->super.worldVerticesLength);
+			spVertexAttachment_computeWorldVertices(&mesh->super, slot, 0, mesh->super.worldVerticesLength, attachmentVertices.GetData(), 0, 2);
+			attachmentIndices = mesh->triangles;
+			attachmentUvs = mesh->uvs;
+			numVertices = mesh->super.worldVerticesLength >> 1;
+			numIndices = mesh->trianglesCount;
 		}
+
+		// if the user switches the atlas data while not having switched
+		// to the correct skeleton data yet, we won't find any regions.
+		// ignore regions for which we can't find a material
+		UMaterialInstanceDynamic* material = nullptr;
+		switch (slot->data->blendMode) {
+		case SP_BLEND_MODE_NORMAL:
+			if (!pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) continue;
+			material = pageToNormalBlendMaterial[attachmentAtlasRegion->page];
+			break;
+		case SP_BLEND_MODE_ADDITIVE:
+			if (!pageToAdditiveBlendMaterial.Contains(attachmentAtlasRegion->page)) continue;
+			material = pageToAdditiveBlendMaterial[attachmentAtlasRegion->page];
+			break;
+		case SP_BLEND_MODE_MULTIPLY:
+			if (!pageToMultiplyBlendMaterial.Contains(attachmentAtlasRegion->page)) continue;
+			material = pageToMultiplyBlendMaterial[attachmentAtlasRegion->page];
+			break;
+		case SP_BLEND_MODE_SCREEN:
+			if (!pageToScreenBlendMaterial.Contains(attachmentAtlasRegion->page)) continue;
+			material = pageToScreenBlendMaterial[attachmentAtlasRegion->page];
+			break;
+		default:
+			if (!pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) continue;
+			material = pageToNormalBlendMaterial[attachmentAtlasRegion->page];
+		}
+
+		if (lastMaterial != material) {
+			Flush(meshSection, vertices, indices, uvs, colors, lastMaterial);
+			lastMaterial = material;
+			idx = 0;
+		}
+
+		SetMaterial(meshSection, material);
+
+		uint8 r = static_cast<uint8>(Skeleton->color.r * slot->color.r * attachmentColor.r * 255);
+		uint8 g = static_cast<uint8>(Skeleton->color.g * slot->color.g * attachmentColor.g * 255);
+		uint8 b = static_cast<uint8>(Skeleton->color.b * slot->color.b * attachmentColor.b * 255);
+		uint8 a = static_cast<uint8>(Skeleton->color.a * slot->color.a * attachmentColor.a * 255);
+
+		for (int j = 0; j < numVertices << 1; j += 2) {
+			colors.Add(FColor(r, g, b, a));
+			vertices.Add(FVector(attachmentVertices[j], depthOffset, attachmentVertices[j + 1]));
+			uvs.Add(FVector2D(attachmentUvs[j], attachmentUvs[j + 1]));
+		}
+
+		for (int j = 0; j < numIndices; j++) {
+			indices.Add(idx + attachmentIndices[j]);
+		}
+
+		idx += numVertices;
+		depthOffset += this->DepthOffset;
 	}
 	
 	Flush(meshSection, vertices, indices, uvs, colors, lastMaterial);
