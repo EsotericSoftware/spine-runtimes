@@ -1,4 +1,4 @@
-﻿/******************************************************************************
+/******************************************************************************
  * Spine Runtimes Software License v2.5
  *
  * Copyright (c) 2013-2016, Esoteric Software
@@ -302,12 +302,27 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			var skinAttachments = o.Attachments;
 			var newSkin = new Skin(newName);
 
+			var existingRegions = new Dictionary<AtlasRegion, int>();
+			var textureIndexes = new List<int>();
+
 			var repackedAttachments = new List<Attachment>();
 			var texturesToPack = new List<Texture2D>();
+			int newRegionIndex = 0;
 			foreach (var kvp in skinAttachments) {
 				var newAttachment = kvp.Value.GetClone(true);
 				if (IsRenderable(newAttachment)) {
-					texturesToPack.Add(newAttachment.GetAtlasRegion().ToTexture());
+					
+					var region = newAttachment.GetAtlasRegion();
+					int existingIndex;
+					if (existingRegions.TryGetValue(region, out existingIndex)) {
+						textureIndexes.Add(existingIndex); // Store the region index for the eventual new attachment.
+					} else {
+						texturesToPack.Add(region.ToTexture()); // Add the texture to the PackTextures argument
+						existingRegions.Add(region, newRegionIndex); // Add the region to the dictionary of known regions
+						textureIndexes.Add(newRegionIndex); // Store the region index for the eventual new attachment.
+						newRegionIndex++;
+					}
+
 					repackedAttachments.Add(newAttachment);
 				}
 				var key = kvp.Key;
@@ -326,7 +341,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 			for (int i = 0, n = repackedAttachments.Count; i < n; i++) {
 				var a = repackedAttachments[i];
-				var r = rects[i];
+				var r = rects[textureIndexes[i]];
 				var oldRegion = a.GetAtlasRegion();
 				var newRegion = UVRectToAtlasRegion(r, oldRegion.name, page, oldRegion.offsetX, oldRegion.offsetY, oldRegion.rotate);
 				a.SetRegion(newRegion);
