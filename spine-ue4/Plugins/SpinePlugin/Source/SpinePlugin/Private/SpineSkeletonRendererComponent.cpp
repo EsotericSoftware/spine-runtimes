@@ -161,7 +161,7 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 	}
 }
 
-void USpineSkeletonRendererComponent::Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, UMaterialInstanceDynamic* Material) {
+void USpineSkeletonRendererComponent::Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FProcMeshTangent>& Colors2, UMaterialInstanceDynamic* Material) {
 	if (Vertices.Num() == 0) return;
 	SetMaterial(Idx, Material);
 	CreateMeshSection(Idx, Vertices, Indices, TArray<FVector>(), Uvs, Colors, TArray<FProcMeshTangent>(), false);
@@ -169,6 +169,7 @@ void USpineSkeletonRendererComponent::Flush (int &Idx, TArray<FVector> &Vertices
 	Indices.SetNum(0);
 	Uvs.SetNum(0);
 	Colors.SetNum(0);
+	Colors2.SetNum(0);
 	Idx++;
 }
 
@@ -177,7 +178,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 	TArray<int32> indices;
 	TArray<FVector2D> uvs;
 	TArray<FColor> colors;
-	TArray<FColor> darkColors;
+	TArray<FProcMeshTangent> darkColors;
 
 	TArray<float> attachmentVertices;
 	attachmentVertices.SetNumUninitialized(2 * 1024);
@@ -252,7 +253,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 		}
 
 		if (lastMaterial != material) {
-			Flush(meshSection, vertices, indices, uvs, colors, lastMaterial);
+			Flush(meshSection, vertices, indices, uvs, colors, darkColors, lastMaterial);
 			lastMaterial = material;
 			idx = 0;
 		}
@@ -264,8 +265,13 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 		uint8 b = static_cast<uint8>(Skeleton->color.b * slot->color.b * attachmentColor.b * 255);
 		uint8 a = static_cast<uint8>(Skeleton->color.a * slot->color.a * attachmentColor.a * 255);
 
+		float dr = slot->darkColor ? slot->darkColor->r : 0.0f;
+		float dg = slot->darkColor ? slot->darkColor->g : 0.0f;
+		float db = slot->darkColor ? slot->darkColor->b : 0.0f;
+
 		for (int j = 0; j < numVertices << 1; j += 2) {
 			colors.Add(FColor(r, g, b, a));
+			darkColors.Add(FProcMeshTangent(dr, dg, db));
 			vertices.Add(FVector(attachmentVertices[j], depthOffset, attachmentVertices[j + 1]));
 			uvs.Add(FVector2D(attachmentUvs[j], attachmentUvs[j + 1]));
 		}
@@ -278,7 +284,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 		depthOffset += this->DepthOffset;
 	}
 	
-	Flush(meshSection, vertices, indices, uvs, colors, lastMaterial);
+	Flush(meshSection, vertices, indices, uvs, colors,darkColors, lastMaterial);
 }
 
 #undef LOCTEXT_NAMESPACE
