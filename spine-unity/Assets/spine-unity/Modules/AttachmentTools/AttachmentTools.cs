@@ -306,10 +306,11 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			var newSkin = new Skin(newName);
 
 			var existingRegions = new Dictionary<AtlasRegion, int>();
-			var textureIndexes = new List<int>();
+			var regionIndexes = new List<int>();
 
 			var repackedAttachments = new List<Attachment>();
 			var texturesToPack = new List<Texture2D>();
+			var originalRegions = new List<AtlasRegion>();
 			int newRegionIndex = 0;
 			foreach (var kvp in skinAttachments) {
 				var newAttachment = kvp.Value.GetClone(true);
@@ -318,11 +319,12 @@ namespace Spine.Unity.Modules.AttachmentTools {
 					var region = newAttachment.GetAtlasRegion();
 					int existingIndex;
 					if (existingRegions.TryGetValue(region, out existingIndex)) {
-						textureIndexes.Add(existingIndex); // Store the region index for the eventual new attachment.
+						regionIndexes.Add(existingIndex); // Store the region index for the eventual new attachment.
 					} else {
+						originalRegions.Add(region);
 						texturesToPack.Add(region.ToTexture()); // Add the texture to the PackTextures argument
 						existingRegions.Add(region, newRegionIndex); // Add the region to the dictionary of known regions
-						textureIndexes.Add(newRegionIndex); // Store the region index for the eventual new attachment.
+						regionIndexes.Add(newRegionIndex); // Store the region index for the eventual new attachment.
 						newRegionIndex++;
 					}
 
@@ -343,12 +345,16 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			var page = newMaterial.ToSpineAtlasPage();
 			page.name = newName;
 
+			var repackedRegions = new List<AtlasRegion>();
+			for (int i = 0, n = originalRegions.Count; i < n; i++) {
+				var oldRegion = originalRegions[i];
+				var newRegion = UVRectToAtlasRegion(rects[i], oldRegion.name, page, oldRegion.offsetX, oldRegion.offsetY, oldRegion.rotate);
+				repackedRegions.Add(newRegion);
+			}
+
 			for (int i = 0, n = repackedAttachments.Count; i < n; i++) {
 				var a = repackedAttachments[i];
-				var r = rects[textureIndexes[i]];
-				var oldRegion = a.GetAtlasRegion();
-				var newRegion = UVRectToAtlasRegion(r, oldRegion.name, page, oldRegion.offsetX, oldRegion.offsetY, oldRegion.rotate);
-				a.SetRegion(newRegion);
+				a.SetRegion(repackedRegions[regionIndexes[i]]);
 			}
 
 			t = newTexture;
@@ -365,9 +371,11 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		public static Texture2D ToTexture (this AtlasRegion ar, bool applyImmediately = true, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
 			Texture2D sourceTexture = ar.GetMainTexture();
 			Rect r = ar.GetUnityRect(sourceTexture.height);
-			Texture2D output = new Texture2D((int)r.width, (int)r.height, textureFormat, mipmaps);
+			int width = (int)r.width;
+			int height = (int)r.height;
+			Texture2D output = new Texture2D(width, height, textureFormat, mipmaps);
 			output.name = ar.name;
-			Color[] pixelBuffer = sourceTexture.GetPixels((int)r.x, (int)r.y, (int)r.width, (int)r.height);
+			Color[] pixelBuffer = sourceTexture.GetPixels((int)r.x, (int)r.y, width, height);
 			output.SetPixels(pixelBuffer);
 
 			if (applyImmediately)
@@ -447,7 +455,17 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		static AtlasRegion UVRectToAtlasRegion (Rect uvRect, string name, AtlasPage page, float offsetX, float offsetY, bool rotate) {			
 			var tr  = UVRectToTextureRect(uvRect, page.width, page.height);
 			var rr = tr.SpineUnityFlipRect(page.height);
-			int w = (int)rr.width, h = (int)rr.height, x = (int)rr.x, y = (int)rr.y;
+
+			int x = (int)rr.x, y = (int)rr.y;
+			int w, h;
+			if (rotate) {
+				w = (int)rr.height;
+				h = (int)rr.width;
+			} else {
+				w = (int)rr.width;
+				h = (int)rr.height;
+			}
+
 			return new AtlasRegion {
 				page = page,
 				name = name,
