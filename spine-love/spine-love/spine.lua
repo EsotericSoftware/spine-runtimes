@@ -302,18 +302,19 @@ function SkeletonRenderer:draw (skeleton)
 			if texture then
 				local slotBlendMode = slot.data.blendMode
 				if lastBlendMode ~= slotBlendMode then
+          batcher:stop()
+					batcher:begin()
+          
 					if slotBlendMode == spine.BlendMode.normal then
-						love.graphics.setBlendMode("alpha")
+ 						love.graphics.setBlendMode("alpha")
 					elseif slotBlendMode == spine.BlendMode.additive then
-						love.graphics.setBlendMode("additive")
+ 						love.graphics.setBlendMode("add")
 					elseif slotBlendMode == spine.BlendMode.multiply then
 						love.graphics.setBlendMode("multiply")
 					elseif slotBlendMode == spine.BlendMode.screen then
 						love.graphics.setBlendMode("screen")
 					end
-					lastBlendMode = slotBlendMode
-					batcher:stop()
-					batcher:begin()
+					lastBlendMode = slotBlendMode					
 				end
 				batcher:draw(texture, vertices, numVertices, indices)
 			end
