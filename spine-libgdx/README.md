@@ -27,6 +27,61 @@ Alternatively, the contents of the `spine-libgdx/src` directory can be copied in
 * spine-libgdx depends on the gdx-backend-lwjgl project so the tests can easily be run on the desktop. If the tests are excluded, spine-libgdx only needs to depend on the gdx project.
 * spine-libgdx depends on the gdx-box2d extension project solely for the `Box2DExample` test.
 
+## Maven & Gradle
+The spine-libgdx runtime is released to Maven Central through SonaType. We also deploy snapshot builds on every commit to the master repository. You can find the Jenkins build [here](http://libgdx.badlogicgames.com:8080/job/spine-libgdx/).
+
+### Versions
+
+You can find the latest version for release builds [here](http://search.maven.org/#search%7Cga%7C1%7Cspine-libgdx).
+
+You can find the latest SNAPSHOT version in the project's [pom.xml](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/spine-libgdx/pom.xml#L13).
+
+If you want to use a different branch, e.g. `3.6-beta`, build the artifact locally:
+
+```
+cd spine-libgdx/spine-libgdx
+mvn install
+```
+
+
+### Maven
+To add the spine-libgdx runtime to your Maven project, add this dependency:
+
+```
+<depenency>
+	<groupId>com.esotericsoftware.spine</groupId>
+	<artifactId>spine-libgdx</artifactId>
+	<version>3.5.51.1</version>
+</depenency>
+```
+
+For SNAPSHOT versions, add the SonaType Snapshot repository to your `pom.xml`:
+
+```
+<repositories>
+	<repository>
+		<id>nightlies</id>
+		<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+	</repository>
+</repositories>
+```
+
+### Gradle
+To add the spine-libgdx runtime to your libGDX Gradle project, add the following dependencies in the `build.gradle` file at the root of your libGDX project.
+
+```
+project(":core") {
+    apply plugin: "java"
+
+    dependencies {
+        compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+
+        compile "com.esotericsoftware.spine:spine-libgdx:3.5.51.1"
+    }
+}
+```
+
 ## Examples
 
 * [HTML5 example](http://esotericsoftware.com/files/runtimes/spine-libgdx/raptor/)
