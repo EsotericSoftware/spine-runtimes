@@ -67,7 +67,7 @@ For SNAPSHOT versions, add the SonaType Snapshot repository to your `pom.xml`:
 ```
 
 ### Gradle
-To add the spine-libgdx runtime to your libGDX Gradle project, add the following dependencies in the `build.gradle` file at the root of your libGDX project.
+To add the spine-libgdx runtime to your libGDX Gradle project, add the following dependencies to the `core` project in the `build.gradle` file at the root of your libGDX project:
 
 ```
 project(":core") {
