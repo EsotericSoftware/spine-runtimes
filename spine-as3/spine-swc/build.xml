@@ -1,0 +1,41 @@
+<project name="spine" default="build">
+
+	<property environment="env" />
+	<fail unless="env.FLEX_HOME" message="FLEX_HOME needs to be defined as an environment variable or in the Ant build." />
+	<property name="FLEX_HOME" location="${env.FLEX_HOME}" />
+	
+	<property name="OUTPUT" location="bin/spine.swc"/>
+
+	<taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/ant/lib/flexTasks.jar"/>
+
+	<target name="build">
+
+		<mkdir dir="lib" />
+
+		<!-- compile SWC -->
+		<compc output="${OUTPUT}">
+			<!-- <load-config filename="${FLEX_HOME}/frameworks/air-config.xml" /> --> <!-- uncomment for AIR -->
+			<sp path-element="spine" />
+			<include-sources dir="spine" includes="*"  />
+		</compc>
+
+		<!-- generate documentation -->
+		<asdoc output="lib/tempDoc" lenient="true" failonerror="true" keep-xml="true" skip-xsl="true" fork="true">
+			<!-- <load-config filename="${FLEX_HOME}/frameworks/air-config.xml" /> --> <!-- uncomment for AIR -->
+			<sp path-element="spine"/>
+			<doc-sources path-element="spine" />
+		</asdoc>
+
+		<!-- inject documentation inside SWC -->
+		<zip destfile="${OUTPUT}" update="true">
+			<zipfileset dir="lib/tempDoc/tempdita" prefix="docs">
+				<include name="*.*"/>
+				<exclude name="ASDoc_Config.xml"/>
+				<exclude name="overviews.xml"/>
+			</zipfileset>
+		</zip>
+
+		<!-- cleanup -->
+		<delete dir="lib/tempDoc" />
+	</target>
+</project>
