@@ -90,18 +90,11 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>			
-				<executions>
-					<execution>
-						<id>default</id>
-						<goals>
-							<goal>perform</goal>
-						</goals>
-						<configuration>
-							<pomFileName>spine-libgdx/spine-libgdx/pom.xml</pomFileName>
-						</configuration>
-					</execution>
-				</executions>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5.3</version>			
+				<configuration>
+					<pomFileName>spine-libgdx/spine-libgdx/pom.xml</pomFileName>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
