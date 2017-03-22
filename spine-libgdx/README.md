@@ -43,6 +43,8 @@ cd spine-libgdx/spine-libgdx
 mvn install
 ```
 
+The version number is composed of the editor number at the time of release of the Maven artifact plus a patch number at the end. E.g. `3.5.51.3` means editor version `3.5.51`, and patch version `3` for the runtime. The editor version is updated everytime a new editor release is performed, the patch version is updated everytime a new fix or enhancement is released in the runtime.
+
 
 ### Maven
 To add the spine-libgdx runtime to your Maven project, add this dependency:
