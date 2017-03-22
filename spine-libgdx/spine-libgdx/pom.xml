@@ -10,7 +10,7 @@
 	<groupId>com.esotericsoftware.spine</groupId>
 	<artifactId>spine-libgdx</artifactId>
 	<packaging>jar</packaging>
-	<version>3.5.51.1</version>
+	<version>3.5.51.1-SNAPSHOT</version>
 
 	<name>spine-libgdx</name>
 	<description>Spine Runtime for libGDX</description>
@@ -36,7 +36,7 @@
 
 	<scm>
 		<connection>scm:git:https://github.com/EsotericSoftware/spine-runtimes.git</connection>
-		<developerConnection>scm:git:https://github.com/EsotericSoftware/spine-runtimes/.git</developerConnection>
+		<developerConnection>scm:git:https://github.com/EsotericSoftware/spine-runtimes.git</developerConnection>
 		<url>https://github.com/EsotericSoftware/spine-runtimes/</url>
 	</scm>
 
