@@ -30,7 +30,6 @@
 
 package com.esotericsoftware.spine;
 
-import static com.badlogic.gdx.math.MathUtils.*;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
@@ -39,6 +38,7 @@ import com.esotericsoftware.spine.PathConstraintData.RotateMode;
 import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
+import com.esotericsoftware.spine.utils.TrigUtils;
 
 /** Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the
  * constrained bones so they follow a {@link PathAttachment}.
@@ -131,7 +131,7 @@ public class PathConstraint implements Constraint {
 		else {
 			tip = false;
 			Bone p = target.bone;
-			offsetRotation *= p.a * p.d - p.b * p.c > 0 ? degRad : -degRad;
+			offsetRotation *= p.a * p.d - p.b * p.c > 0 ? TrigUtils.degRad : -TrigUtils.degRad;
 		}
 		for (int i = 0, p = 3; i < boneCount; i++, p += 3) {
 			Bone bone = (Bone)bones[i];
@@ -155,23 +155,23 @@ public class PathConstraint implements Constraint {
 				else if (spaces[i + 1] == 0)
 					r = positions[p + 2];
 				else
-					r = atan2(dy, dx);
-				r -= atan2(c, a);
+					r = (float)Math.atan2(dy, dx);
+				r -= (float)Math.atan2(c, a);
 				if (tip) {
-					cos = cos(r);
-					sin = sin(r);
+					cos = (float)Math.cos(r);
+					sin = (float)Math.sin(r);
 					float length = bone.data.length;
 					boneX += (length * (cos * a - sin * c) - dx) * rotateMix;
 					boneY += (length * (sin * a + cos * c) - dy) * rotateMix;
 				} else
 					r += offsetRotation;
-				if (r > PI)
-					r -= PI2;
-				else if (r < -PI) //
-					r += PI2;
+				if (r > TrigUtils.PI)
+					r -= TrigUtils.PI2;
+				else if (r < -TrigUtils.PI) //
+					r += TrigUtils.PI2;
 				r *= rotateMix;
-				cos = cos(r);
-				sin = sin(r);
+				cos = (float)Math.cos(r);
+				sin = (float)Math.sin(r);
 				bone.a = cos * a - sin * c;
 				bone.b = cos * b - sin * d;
 				bone.c = sin * a + cos * c;
@@ -399,16 +399,16 @@ public class PathConstraint implements Constraint {
 	}
 
 	private void addBeforePosition (float p, float[] temp, int i, float[] out, int o) {
-		float x1 = temp[i], y1 = temp[i + 1], dx = temp[i + 2] - x1, dy = temp[i + 3] - y1, r = atan2(dy, dx);
-		out[o] = x1 + p * cos(r);
-		out[o + 1] = y1 + p * sin(r);
+		float x1 = temp[i], y1 = temp[i + 1], dx = temp[i + 2] - x1, dy = temp[i + 3] - y1, r = (float)Math.atan2(dy, dx);
+		out[o] = x1 + p * (float)Math.cos(r);
+		out[o + 1] = y1 + p * (float)Math.sin(r);
 		out[o + 2] = r;
 	}
 
 	private void addAfterPosition (float p, float[] temp, int i, float[] out, int o) {
-		float x1 = temp[i + 2], y1 = temp[i + 3], dx = x1 - temp[i], dy = y1 - temp[i + 1], r = atan2(dy, dx);
-		out[o] = x1 + p * cos(r);
-		out[o + 1] = y1 + p * sin(r);
+		float x1 = temp[i + 2], y1 = temp[i + 3], dx = x1 - temp[i], dy = y1 - temp[i + 1], r = (float)Math.atan2(dy, dx);
+		out[o] = x1 + p * (float)Math.cos(r);
+		out[o + 1] = y1 + p * (float)Math.sin(r);
 		out[o + 2] = r;
 	}
 
@@ -420,7 +420,7 @@ public class PathConstraint implements Constraint {
 		float x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
 		out[o] = x;
 		out[o + 1] = y;
-		if (tangents) out[o + 2] = atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+		if (tangents) out[o + 2] = (float)Math.atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
 	}
 
 	public int getOrder () {
