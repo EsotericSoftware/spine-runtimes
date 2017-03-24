@@ -81,7 +81,7 @@ new spine.SpineWidget("spine-widget", {
 		var animIndex = 0;
 		widget.canvas.onclick = function () {
 			animIndex++;
-			let animations = widget.skeleton.data.animations;
+			var animations = widget.skeleton.data.animations;
 			if (animIndex >= animations.length) animIndex = 0;
 			widget.setAnimation(animations[animIndex].name);
 		}
