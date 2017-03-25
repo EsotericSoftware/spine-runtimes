@@ -623,7 +623,10 @@ public class SkeletonViewer extends ApplicationAdapter {
 			scaleResetButton.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
 					resetCameraPosition();
-					scaleSlider.setValue(1);
+					if (scaleSlider.getValue() == 1)
+						loadSkeleton(skeletonFile);
+					else
+						scaleSlider.setValue(1);
 				}
 			});
 
