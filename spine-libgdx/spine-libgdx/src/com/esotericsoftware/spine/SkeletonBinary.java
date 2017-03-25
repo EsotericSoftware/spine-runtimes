@@ -377,6 +377,7 @@ public class SkeletonBinary {
 			region.updateOffset();
 			return region;
 		}
+		// BOZO! - Binary clip export.
 		case boundingbox: {
 			int vertexCount = input.readInt(true);
 			Vertices vertices = readVertices(input, vertexCount);

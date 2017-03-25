@@ -30,14 +30,20 @@
 
 package com.esotericsoftware.spine;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer;
+import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.esotericsoftware.spine.attachments.Attachment;
+import com.esotericsoftware.spine.attachments.ClippingAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.SkeletonAttachment;
@@ -48,6 +54,10 @@ public class SkeletonRenderer {
 
 	private boolean premultipliedAlpha;
 	private final FloatArray vertices = new FloatArray(32);
+
+	private Slot clipEnd;
+	private final Matrix4 combinedMatrix = new Matrix4();
+	private ImmediateModeRenderer renderer; // BOZO! - Dispose.
 
 	public void draw (Batch batch, Skeleton skeleton) {
 		boolean premultipliedAlpha = this.premultipliedAlpha;
@@ -78,31 +88,44 @@ public class SkeletonRenderer {
 				batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
 				batch.draw(region.getRegion().getTexture(), vertices, 0, 20);
 
+			} else if (attachment instanceof ClippingAttachment) {
+				ClippingAttachment clip = (ClippingAttachment)attachment;
+				batch.end();
+				clipStart(batch.getProjectionMatrix(), batch.getTransformMatrix(), slot, clip);
+				batch.begin();
+				continue;
+
 			} else if (attachment instanceof MeshAttachment) {
 				throw new RuntimeException("SkeletonMeshRenderer is required to render meshes.");
 
 			} else if (attachment instanceof SkeletonAttachment) {
 				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
-				if (attachmentSkeleton == null) continue;
-				Bone bone = slot.getBone();
-				Bone rootBone = attachmentSkeleton.getRootBone();
-				float oldScaleX = rootBone.getScaleX();
-				float oldScaleY = rootBone.getScaleY();
-				float oldRotation = rootBone.getRotation();
-				attachmentSkeleton.setPosition(bone.getWorldX(), bone.getWorldY());
-				// rootBone.setScaleX(1 + bone.getWorldScaleX() - oldScaleX);
-				// rootBone.setScaleY(1 + bone.getWorldScaleY() - oldScaleY);
-				// Set shear.
-				rootBone.setRotation(oldRotation + bone.getWorldRotationX());
-				attachmentSkeleton.updateWorldTransform();
+				if (attachmentSkeleton != null) {
+					Bone bone = slot.getBone();
+					Bone rootBone = attachmentSkeleton.getRootBone();
+					float oldScaleX = rootBone.getScaleX();
+					float oldScaleY = rootBone.getScaleY();
+					float oldRotation = rootBone.getRotation();
+					attachmentSkeleton.setPosition(bone.getWorldX(), bone.getWorldY());
+					// rootBone.setScaleX(1 + bone.getWorldScaleX() - oldScaleX);
+					// rootBone.setScaleY(1 + bone.getWorldScaleY() - oldScaleY);
+					// Set shear.
+					rootBone.setRotation(oldRotation + bone.getWorldRotationX());
+					attachmentSkeleton.updateWorldTransform();
 
-				draw(batch, attachmentSkeleton);
+					draw(batch, attachmentSkeleton);
 
-				attachmentSkeleton.setX(0);
-				attachmentSkeleton.setY(0);
-				rootBone.setScaleX(oldScaleX);
-				rootBone.setScaleY(oldScaleY);
-				rootBone.setRotation(oldRotation);
+					attachmentSkeleton.setX(0);
+					attachmentSkeleton.setY(0);
+					rootBone.setScaleX(oldScaleX);
+					rootBone.setScaleY(oldScaleY);
+					rootBone.setRotation(oldRotation);
+				}
+			}
+
+			if (slot == clipEnd) {
+				batch.flush();
+				clipEnd();
 			}
 		}
 	}
@@ -142,28 +165,35 @@ public class SkeletonRenderer {
 				uvs = mesh.getUVs();
 				color = mesh.getColor();
 
+			} else if (attachment instanceof ClippingAttachment) {
+				ClippingAttachment clip = (ClippingAttachment)attachment;
+				batch.end();
+				clipStart(batch.getProjectionMatrix(), batch.getTransformMatrix(), slot, clip);
+				batch.begin();
+				continue;
+
 			} else if (attachment instanceof SkeletonAttachment) {
 				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
-				if (attachmentSkeleton == null) continue;
-				Bone bone = slot.getBone();
-				Bone rootBone = attachmentSkeleton.getRootBone();
-				float oldScaleX = rootBone.getScaleX();
-				float oldScaleY = rootBone.getScaleY();
-				float oldRotation = rootBone.getRotation();
-				attachmentSkeleton.setPosition(bone.getWorldX(), bone.getWorldY());
-				// rootBone.setScaleX(1 + bone.getWorldScaleX() - oldScaleX);
-				// rootBone.setScaleY(1 + bone.getWorldScaleY() - oldScaleY);
-				// Also set shear.
-				rootBone.setRotation(oldRotation + bone.getWorldRotationX());
-				attachmentSkeleton.updateWorldTransform();
+				if (attachmentSkeleton != null) {
+					Bone bone = slot.getBone();
+					Bone rootBone = attachmentSkeleton.getRootBone();
+					float oldScaleX = rootBone.getScaleX();
+					float oldScaleY = rootBone.getScaleY();
+					float oldRotation = rootBone.getRotation();
+					attachmentSkeleton.setPosition(bone.getWorldX(), bone.getWorldY());
+					// rootBone.setScaleX(1 + bone.getWorldScaleX() - oldScaleX);
+					// rootBone.setScaleY(1 + bone.getWorldScaleY() - oldScaleY);
+					// Also set shear.
+					rootBone.setRotation(oldRotation + bone.getWorldRotationX());
+					attachmentSkeleton.updateWorldTransform();
 
-				draw(batch, attachmentSkeleton);
+					draw(batch, attachmentSkeleton);
 
-				attachmentSkeleton.setPosition(0, 0);
-				rootBone.setScaleX(oldScaleX);
-				rootBone.setScaleY(oldScaleY);
-				rootBone.setRotation(oldRotation);
-				continue;
+					attachmentSkeleton.setPosition(0, 0);
+					rootBone.setScaleX(oldScaleX);
+					rootBone.setScaleY(oldScaleY);
+					rootBone.setRotation(oldRotation);
+				}
 			}
 
 			if (texture != null) {
@@ -185,6 +215,11 @@ public class SkeletonRenderer {
 					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
 				}
 				batch.draw(texture, vertices, 0, verticesLength, triangles, 0, triangles.length);
+			}
+
+			if (slot == clipEnd) {
+				batch.flush();
+				clipEnd();
 			}
 		}
 	}
@@ -224,28 +259,35 @@ public class SkeletonRenderer {
 				uvs = mesh.getUVs();
 				color = mesh.getColor();
 
+			} else if (attachment instanceof ClippingAttachment) {
+				ClippingAttachment clip = (ClippingAttachment)attachment;
+				batch.end();
+				clipStart(batch.getProjectionMatrix(), batch.getTransformMatrix(), slot, clip);
+				batch.begin();
+				continue;
+
 			} else if (attachment instanceof SkeletonAttachment) {
 				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
-				if (attachmentSkeleton == null) continue;
-				Bone bone = slot.getBone();
-				Bone rootBone = attachmentSkeleton.getRootBone();
-				float oldScaleX = rootBone.getScaleX();
-				float oldScaleY = rootBone.getScaleY();
-				float oldRotation = rootBone.getRotation();
-				attachmentSkeleton.setPosition(bone.getWorldX(), bone.getWorldY());
-				// rootBone.setScaleX(1 + bone.getWorldScaleX() - oldScaleX);
-				// rootBone.setScaleY(1 + bone.getWorldScaleY() - oldScaleY);
-				// Also set shear.
-				rootBone.setRotation(oldRotation + bone.getWorldRotationX());
-				attachmentSkeleton.updateWorldTransform();
+				if (attachmentSkeleton != null) {
+					Bone bone = slot.getBone();
+					Bone rootBone = attachmentSkeleton.getRootBone();
+					float oldScaleX = rootBone.getScaleX();
+					float oldScaleY = rootBone.getScaleY();
+					float oldRotation = rootBone.getRotation();
+					attachmentSkeleton.setPosition(bone.getWorldX(), bone.getWorldY());
+					// rootBone.setScaleX(1 + bone.getWorldScaleX() - oldScaleX);
+					// rootBone.setScaleY(1 + bone.getWorldScaleY() - oldScaleY);
+					// Also set shear.
+					rootBone.setRotation(oldRotation + bone.getWorldRotationX());
+					attachmentSkeleton.updateWorldTransform();
 
-				draw(batch, attachmentSkeleton);
+					draw(batch, attachmentSkeleton);
 
-				attachmentSkeleton.setPosition(0, 0);
-				rootBone.setScaleX(oldScaleX);
-				rootBone.setScaleY(oldScaleY);
-				rootBone.setRotation(oldRotation);
-				continue;
+					attachmentSkeleton.setPosition(0, 0);
+					rootBone.setScaleX(oldScaleX);
+					rootBone.setScaleY(oldScaleY);
+					rootBone.setRotation(oldRotation);
+				}
 			}
 
 			if (texture != null) {
@@ -275,7 +317,45 @@ public class SkeletonRenderer {
 				}
 				batch.draw(texture, vertices, 0, verticesLength, triangles, 0, triangles.length);
 			}
+
+			if (slot == clipEnd) {
+				batch.flush();
+				clipEnd();
+			}
 		}
+	}
+
+	private void clipStart (Matrix4 transformMatrix, Matrix4 projectionMatrix, Slot slot, ClippingAttachment clip) {
+		if (clipEnd != null) return;
+		clipEnd = clip.getEnd();
+
+		int n = clip.getWorldVerticesLength();
+		float[] vertices = this.vertices.setSize(n);
+		clip.computeWorldVertices(slot, 0, n, vertices, 0, 2);
+
+		Gdx.gl.glClearStencil(0);
+		Gdx.gl.glClear(GL20.GL_STENCIL_BUFFER_BIT);
+		Gdx.gl.glEnable(GL20.GL_STENCIL_TEST);
+		Gdx.gl.glStencilFunc(GL20.GL_NEVER, 0, 1);
+		Gdx.gl.glStencilOp(GL20.GL_INVERT, GL20.GL_INVERT, GL20.GL_INVERT);
+		Gdx.gl.glColorMask(false, false, false, false);
+
+		if (renderer == null || renderer.getMaxVertices() < n)
+			renderer = new ImmediateModeRenderer20(Math.max(100, n), false, false, 0);
+		renderer.begin(combinedMatrix.set(projectionMatrix).mul(transformMatrix), GL20.GL_TRIANGLE_FAN);
+		renderer.vertex(vertices[0], vertices[1], 0);
+		for (int i = 2; i < n; i += 2)
+			renderer.vertex(vertices[i], vertices[i + 1], 0);
+		renderer.end();
+
+		Gdx.gl.glColorMask(true, true, true, true);
+		Gdx.gl.glStencilFunc(clip.getInvert() ? GL20.GL_NOTEQUAL : GL20.GL_EQUAL, 1, 1);
+		Gdx.gl.glStencilOp(GL20.GL_KEEP, GL20.GL_KEEP, GL20.GL_KEEP);
+	}
+
+	private void clipEnd () {
+		clipEnd = null;
+		Gdx.gl.glDisable(GL20.GL_STENCIL_TEST);
 	}
 
 	public void setPremultipliedAlpha (boolean premultipliedAlpha) {

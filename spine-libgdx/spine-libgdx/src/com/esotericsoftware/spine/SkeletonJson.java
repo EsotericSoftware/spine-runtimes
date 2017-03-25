@@ -337,6 +337,7 @@ public class SkeletonJson {
 			region.updateOffset();
 			return region;
 		}
+		// BOZO! - JSON clip export.
 		case boundingbox: {
 			BoundingBoxAttachment box = attachmentLoader.newBoundingBoxAttachment(skin, name);
 			if (box == null) return null;

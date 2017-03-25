@@ -40,6 +40,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
+import com.esotericsoftware.spine.attachments.ClippingAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.PointAttachment;
@@ -51,10 +52,11 @@ public class SkeletonRendererDebug {
 	static private final Color attachmentLineColor = new Color(0, 0, 1, 0.5f);
 	static private final Color triangleLineColor = new Color(1, 0.64f, 0, 0.5f);
 	static private final Color aabbColor = new Color(0, 1, 0, 0.5f);
+	static private final Color clippingLineColor = Color.MAGENTA;
 
 	private final ShapeRenderer shapes;
 	private boolean drawBones = true, drawRegionAttachments = true, drawBoundingBoxes = true, drawPoints = true;
-	private boolean drawMeshHull = true, drawMeshTriangles = true, drawPaths = true;
+	private boolean drawMeshHull = true, drawMeshTriangles = true, drawPaths = true, drawClipping = true;
 	private final SkeletonBounds bounds = new SkeletonBounds();
 	private final FloatArray vertices = new FloatArray(32);
 	private float scale = 1;
@@ -176,6 +178,22 @@ public class SkeletonRendererDebug {
 				FloatArray polygon = polygons.get(i);
 				shapes.setColor(boxes.get(i).getColor());
 				shapes.polygon(polygon.items, 0, polygon.size);
+			}
+		}
+
+		if (drawClipping) {
+			for (int i = 0, n = slots.size; i < n; i++) {
+				Slot slot = slots.get(i);
+				Attachment attachment = slot.attachment;
+				if (!(attachment instanceof ClippingAttachment)) continue;
+				ClippingAttachment clip = (ClippingAttachment)attachment;
+				int nn = clip.getWorldVerticesLength();
+				float[] vertices = this.vertices.setSize(nn);
+				clip.computeWorldVertices(slot, 0, nn, vertices, 0, 2);
+				shapes.setColor(clippingLineColor);
+				for (int ii = 2; ii < nn; ii += 2)
+					shapes.line(vertices[ii - 2], vertices[ii - 1], vertices[ii], vertices[ii + 1]);
+				shapes.line(vertices[0], vertices[1], vertices[nn - 2], vertices[nn - 1]);
 			}
 		}
 

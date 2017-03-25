@@ -41,6 +41,7 @@ import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
 import com.esotericsoftware.spine.AnimationState.TrackEntry;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
+import com.esotericsoftware.spine.attachments.ClippingAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.PointAttachment;
@@ -57,6 +58,10 @@ public class AnimationStateTests {
 		}
 
 		public BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name) {
+			return null;
+		}
+
+		public ClippingAttachment newClippingAttachment (Skin skin, String name) {
 			return null;
 		}
 

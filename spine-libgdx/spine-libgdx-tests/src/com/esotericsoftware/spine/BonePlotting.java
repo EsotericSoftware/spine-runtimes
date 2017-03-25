@@ -33,6 +33,7 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.files.FileHandle;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
+import com.esotericsoftware.spine.attachments.ClippingAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
@@ -51,6 +52,10 @@ public class BonePlotting {
 			}
 
 			public BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name) {
+				return null;
+			}
+
+			public ClippingAttachment newClippingAttachment (Skin skin, String name) {
 				return null;
 			}
 
