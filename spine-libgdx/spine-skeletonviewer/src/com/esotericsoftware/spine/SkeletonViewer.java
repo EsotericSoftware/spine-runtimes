@@ -753,7 +753,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				public boolean scrolled (int amount) {
 					float zoom = zoomSlider.getValue(), zoomMin = zoomSlider.getMinValue(), zoomMax = zoomSlider.getMaxValue();
 					float speedAlpha = Math.min(1.2f, (zoom - zoomMin) / (zoomMax - zoomMin) * 3.5f);
-					zoom += linear.apply(0.02f, 0.2f, speedAlpha) * Math.signum(amount);
+					zoom -= linear.apply(0.02f, 0.2f, speedAlpha) * Math.signum(amount);
 					zoomSlider.setValue(MathUtils.clamp(zoom, zoomMin, zoomMax));
 					return false;
 				}
