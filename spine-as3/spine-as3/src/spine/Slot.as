@@ -29,76 +29,75 @@
  *****************************************************************************/
 
 package spine {
-import spine.attachments.Attachment;
+	import spine.attachments.Attachment;
 
-public class Slot {
-	internal var _data:SlotData;
-	internal var _bone:Bone;
-	public var color:Color;
-	public var darkColor:Color;
-	internal var _attachment:Attachment;
-	private var _attachmentTime:Number;
-	public var attachmentVertices:Vector.<Number> = new Vector.<Number>();
+	public class Slot {
+		internal var _data : SlotData;
+		internal var _bone : Bone;
+		public var color : Color;
+		public var darkColor : Color;
+		internal var _attachment : Attachment;
+		private var _attachmentTime : Number;
+		public var attachmentVertices : Vector.<Number> = new Vector.<Number>();
 
-	public function Slot (data:SlotData, bone:Bone) {
-		if (data == null) throw new ArgumentError("data cannot be null.");
-		if (bone == null) throw new ArgumentError("bone cannot be null.");
-		_data = data;
-		_bone = bone;
-		this.color = new Color(1, 1, 1, 1);
-		this.darkColor = data.darkColor == null ? null : new Color(1, 1, 1, 1);
-		setToSetupPose();
-	}
+		public function Slot(data : SlotData, bone : Bone) {
+			if (data == null) throw new ArgumentError("data cannot be null.");
+			if (bone == null) throw new ArgumentError("bone cannot be null.");
+			_data = data;
+			_bone = bone;
+			this.color = new Color(1, 1, 1, 1);
+			this.darkColor = data.darkColor == null ? null : new Color(1, 1, 1, 1);
+			setToSetupPose();
+		}
 
-	public function get data () : SlotData {
-		return _data;
-	}
-	
-	public function get bone () : Bone {
-		return _bone;
-	}
-	
-	public function get skeleton () : Skeleton {
-		return _bone._skeleton;
-	}
+		public function get data() : SlotData {
+			return _data;
+		}
 
-	/** @return May be null. */
-	public function get attachment () : Attachment {
-		return _attachment;
-	}
+		public function get bone() : Bone {
+			return _bone;
+		}
 
-	/** Sets the attachment and resets {@link #getAttachmentTime()}.
-	 * @param attachment May be null. */
-	public function set attachment (attachment:Attachment) : void {
-		if (_attachment == attachment) return;
-		_attachment = attachment;
-		_attachmentTime = _bone._skeleton.time;
-		attachmentVertices.length = 0;
-	}
+		public function get skeleton() : Skeleton {
+			return _bone._skeleton;
+		}
 
-	public function set attachmentTime (time:Number) : void {
-		_attachmentTime = _bone._skeleton.time - time;
-	}
+		/** @return May be null. */
+		public function get attachment() : Attachment {
+			return _attachment;
+		}
 
-	/** Returns the time since the attachment was set. */
-	public function get attachmentTime () : Number {
-		return _bone._skeleton.time - _attachmentTime;
-	}
+		/** Sets the attachment and resets {@link #getAttachmentTime()}.
+		 * @param attachment May be null. */
+		public function set attachment(attachment : Attachment) : void {
+			if (_attachment == attachment) return;
+			_attachment = attachment;
+			_attachmentTime = _bone._skeleton.time;
+			attachmentVertices.length = 0;
+		}
 
-	public function setToSetupPose () : void {		
-		color.setFromColor(data.color);
-		if (darkColor != null) darkColor.setFromColor(this.data.darkColor);
-		if (_data.attachmentName == null)
-			attachment = null;
-		else {
-			_attachment = null;
-			attachment = _bone._skeleton.getAttachmentForSlotIndex(data.index, data.attachmentName);
+		public function set attachmentTime(time : Number) : void {
+			_attachmentTime = _bone._skeleton.time - time;
+		}
+
+		/** Returns the time since the attachment was set. */
+		public function get attachmentTime() : Number {
+			return _bone._skeleton.time - _attachmentTime;
+		}
+
+		public function setToSetupPose() : void {
+			color.setFromColor(data.color);
+			if (darkColor != null) darkColor.setFromColor(this.data.darkColor);
+			if (_data.attachmentName == null)
+				attachment = null;
+			else {
+				_attachment = null;
+				attachment = _bone._skeleton.getAttachmentForSlotIndex(data.index, data.attachmentName);
+			}
+		}
+
+		public function toString() : String {
+			return _data.name;
 		}
 	}
-
-	public function toString () : String {
-		return _data.name;
-	}
-}
-
 }

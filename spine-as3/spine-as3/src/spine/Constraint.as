@@ -29,9 +29,7 @@
  *****************************************************************************/
 
 package spine {
-
-public interface Constraint extends Updatable {
-	function getOrder () : Number;
-}
-
+	public interface Constraint extends Updatable {
+		function getOrder() : Number;
+	}
 }

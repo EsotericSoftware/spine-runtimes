@@ -47,6 +47,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
@@ -88,13 +89,13 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 	UI ui;
 
+	OrthographicCamera camera;
 	TwoColorPolygonBatch batch;
 	SkeletonRenderer renderer;
 	SkeletonRendererDebug debugRenderer;
 	SkeletonData skeletonData;
 	Skeleton skeleton;
 	AnimationState state;
-	int skeletonX, skeletonY;
 	FileHandle skeletonFile;
 	long lastModified;
 	float lastModifiedCheck, reloadTimer;
@@ -112,10 +113,11 @@ public class SkeletonViewer extends ApplicationAdapter {
 		prefs = Gdx.app.getPreferences("spine-skeletonviewer");
 		ui = new UI();
 		batch = new TwoColorPolygonBatch(3100);
+		camera = new OrthographicCamera();
 		renderer = new SkeletonRenderer();
 		debugRenderer = new SkeletonRendererDebug();
-		skeletonX = (int)(ui.window.getWidth() + (Gdx.graphics.getWidth() - ui.window.getWidth()) / 2);
-		skeletonY = Gdx.graphics.getHeight() / 4;
+		camera.position.x = (int)(ui.window.getWidth() + (Gdx.graphics.getWidth() - ui.window.getWidth()) / 2);
+		camera.position.y = Gdx.graphics.getHeight() / 4;
 		ui.loadPrefs();
 
 		loadSkeleton(
@@ -161,11 +163,11 @@ public class SkeletonViewer extends ApplicationAdapter {
 			String extension = skeletonFile.extension();
 			if (extension.equalsIgnoreCase("json") || extension.equalsIgnoreCase("txt")) {
 				SkeletonJson json = new SkeletonJson(atlas);
-				json.setScale(ui.scaleSlider.getValue());
+				json.setScale(1);
 				skeletonData = json.readSkeletonData(skeletonFile);
 			} else {
 				SkeletonBinary binary = new SkeletonBinary(atlas);
-				binary.setScale(ui.scaleSlider.getValue());
+				binary.setScale(1);
 				skeletonData = binary.readSkeletonData(skeletonFile);
 				if (skeletonData.getBones().size == 0) throw new Exception("No bones in skeleton data.");
 			}
@@ -237,17 +239,21 @@ public class SkeletonViewer extends ApplicationAdapter {
 	}
 
 	public void render () {
+		Gdx.gl.glClearColor(0.3f, 0.3f, 0.3f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		float delta = Gdx.graphics.getDeltaTime();
+		camera.update();
+		batch.getProjectionMatrix().set(camera.combined);
+		debugRenderer.getShapeRenderer().setProjectionMatrix(camera.combined);
 
 		// Draw skeleton origin lines.
-		ShapeRenderer shapes = debugRenderer.getShapeRenderer();
+		ShapeRenderer shapes = debugRenderer.getShapeRenderer();		
 		if (state != null) {
 			shapes.setColor(Color.DARK_GRAY);
 			shapes.begin(ShapeType.Line);
-			shapes.line(skeleton.x, -99999, skeleton.x, 99999);
-			shapes.line(-99999, skeleton.y, 99999, skeleton.y);
+			shapes.line(0, -99999, 0, 99999);
+			shapes.line(-99999, 0, 99999, 0);
 			shapes.end();
 		}
 
@@ -272,19 +278,18 @@ public class SkeletonViewer extends ApplicationAdapter {
 			state.getData().setDefaultMix(ui.mixSlider.getValue());
 			renderer.setPremultipliedAlpha(ui.premultipliedCheckbox.isChecked());
 
-			skeleton.setFlip(ui.flipXCheckbox.isChecked(), ui.flipYCheckbox.isChecked());
-			skeleton.setPosition(skeletonX, skeletonY);
+			skeleton.setFlip(ui.flipXCheckbox.isChecked(), ui.flipYCheckbox.isChecked());			
 
 			delta = Math.min(delta, 0.032f) * ui.speedSlider.getValue();
 			skeleton.update(delta);
 			state.update(delta);
 			state.apply(skeleton);
 			skeleton.updateWorldTransform();
-
+			
 			batch.begin();
 			renderer.draw(batch, skeleton);
 			batch.end();
-
+			
 			debugRenderer.setBones(ui.debugBonesCheckbox.isChecked());
 			debugRenderer.setRegionAttachments(ui.debugRegionsCheckbox.isChecked());
 			debugRenderer.setBoundingBoxes(ui.debugBoundingBoxesCheckbox.isChecked());
@@ -318,6 +323,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 		if (state != null) {
 			TrackEntry entry = state.getCurrent(0);
 			if (entry != null) {
+				shapes.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+				shapes.updateMatrices();
 				shapes.begin(ShapeType.Line);
 
 				float percent = entry.getAnimationTime() / entry.getAnimationEnd();
@@ -346,8 +353,10 @@ public class SkeletonViewer extends ApplicationAdapter {
 	}
 
 	public void resize (int width, int height) {
-		batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
-		debugRenderer.getShapeRenderer().setProjectionMatrix(batch.getProjectionMatrix());
+		float x = camera.position.x;
+		float y = camera.position.y;
+		camera.setToOrtho(false);
+		camera.position.set(x, y, 0);
 		ui.stage.getViewport().update(width, height, true);
 		if (!ui.minimizeButton.isChecked()) ui.window.setHeight(height + 8);
 	}
@@ -585,7 +594,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 			scaleSlider.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
 					scaleLabel.setText(Float.toString((int)(scaleSlider.getValue() * 100) / 100f));
-					if (!scaleSlider.isDragging()) loadSkeleton(skeletonFile);
+					camera.zoom = 1 / scaleSlider.getValue();
+					// if (!scaleSlider.isDragging()) loadSkeleton(skeletonFile);
 				}
 			});
 
@@ -677,8 +687,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 					float deltaX = screenX - offsetX;
 					float deltaY = Gdx.graphics.getHeight() - screenY - offsetY;
 					
-					skeletonX += deltaX;
-					skeletonY += deltaY;
+					camera.position.x -= deltaX * camera.zoom;
+					camera.position.y -= deltaY * camera.zoom;
 					
 					offsetX = screenX;
 					offsetY = Gdx.graphics.getHeight() - screenY;
@@ -767,8 +777,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 			prefs.putFloat("speed", speedSlider.getValue());
 			prefs.putFloat("mix", mixSlider.getValue());
 			prefs.putFloat("scale", scaleSlider.getValue());
-			prefs.putInteger("x", skeletonX);
-			prefs.putInteger("y", skeletonY);
+			prefs.putFloat("x", camera.position.x);
+			prefs.putFloat("y", camera.position.y);
 			TrackEntry current = state.getCurrent(0);
 			if (current != null) {
 				String name = current.animation.name;
@@ -791,8 +801,9 @@ public class SkeletonViewer extends ApplicationAdapter {
 			speedSlider.setValue(prefs.getFloat("speed", 0.3f));
 			mixSlider.setValue(prefs.getFloat("mix", 0.3f));
 			scaleSlider.setValue(prefs.getFloat("scale", 1));
-			skeletonX = prefs.getInteger("x", 0);
-			skeletonY = prefs.getInteger("y", 0);
+			camera.zoom = 1 / prefs.getFloat("scale", 1);
+			camera.position.x = prefs.getFloat("x", 0);
+			camera.position.y = prefs.getFloat("y", 0);
 			animationList.setSelected(prefs.getString("animationName", null));
 			skinList.setSelected(prefs.getString("skinName", null));
 			prefsLoaded = true;

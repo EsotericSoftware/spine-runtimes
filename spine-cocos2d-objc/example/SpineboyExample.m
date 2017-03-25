@@ -36,6 +36,7 @@
 + (CCScene*) scene {
 	CCScene *scene = [CCScene node];
 	[scene addChild:[SpineboyExample node]];
+	[scene setColorRGBA: [CCColor colorWithRed:1 green:0 blue:0]];
 	return scene;
 }
 
@@ -43,11 +44,12 @@
 	self = [super init];
 	if (!self) return nil;
 
-	skeletonNode = [SkeletonAnimation skeletonWithFile:@"spineboy.json" atlasFile:@"spineboy.atlas" scale:0.6];
+	skeletonNode = [SkeletonAnimation skeletonWithFile:@"TwoColorTest.json" atlasFile:@"TwoColorTest.atlas" scale:0.2];
 	[skeletonNode setMixFrom:@"walk" to:@"jump" duration:0.2f];
 	[skeletonNode setMixFrom:@"jump" to:@"run" duration:0.2f];
 
     __weak SkeletonAnimation* node = skeletonNode;
+	skeletonNode.twoColorTint = true;
 	skeletonNode.startListener = ^(spTrackEntry* entry) {
 		const char* animationName = entry->animation->name;
 		NSLog(@"%d start: %s", entry->trackIndex, animationName);
@@ -68,18 +70,12 @@
 		NSLog(@"%d event: %s, %d, %f, %s", entry->trackIndex, event->data->name, event->intValue, event->floatValue, event->stringValue);
 	};
 
-	[skeletonNode setAnimationForTrack:0 name:@"walk" loop:YES];
-	spTrackEntry* jumpEntry = [skeletonNode addAnimationForTrack:0 name:@"jump" loop:NO afterDelay:3];
-	[skeletonNode addAnimationForTrack:0 name:@"run" loop:YES afterDelay:0];
-
-	[skeletonNode setListenerForEntry:jumpEntry onStart:^(spTrackEntry* entry) {
-		CCLOG(@"jumped!");
-	}];
+	[skeletonNode setAnimationForTrack:0 name:@"animation" loop:YES];
 
 	// [skeletonNode setAnimationForTrack:1 name:@"test" loop:YES];
 
 	CGSize windowSize = [[CCDirector sharedDirector] viewSize];
-	[skeletonNode setPosition:ccp(windowSize.width / 2, 20)];
+	[skeletonNode setPosition:ccp(windowSize.width / 2, windowSize.height / 2)];
 	[self addChild:skeletonNode];
 
 	self.userInteractionEnabled = YES;
@@ -90,12 +86,7 @@
 
 #if ( TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR )
 - (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event {
-	if (!skeletonNode.debugBones)
-		skeletonNode.debugBones = true;
-	else if (skeletonNode.timeScale == 1)
-		skeletonNode.timeScale = 0.3f;
-	else
-		[[CCDirector sharedDirector] replaceScene:[GoblinsExample scene]];
+	skeletonNode.twoColorTint = !skeletonNode.twoColorTint;
 }
 #endif
 

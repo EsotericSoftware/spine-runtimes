@@ -46,6 +46,8 @@
 		521A8E6519F0C34300D177D7 /* Default-736h@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 521A8E6319F0C34300D177D7 /* Default-736h@3x.png */; };
 		52B47A471A53D09C004E4C60 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52B47A461A53D09B004E4C60 /* Security.framework */; };
 		7602C5551D7DAA1300C7C674 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7602C5541D7DAA1300C7C674 /* CoreText.framework */; };
+		76A45BDE1E64396800745AA1 /* SkeletonTwoColorBatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76A45BDC1E64396800745AA1 /* SkeletonTwoColorBatch.cpp */; };
+		76A45BDF1E64396800745AA1 /* SkeletonTwoColorBatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76A45BDC1E64396800745AA1 /* SkeletonTwoColorBatch.cpp */; };
 		76AAA3C01D180F7C00C54FCB /* AppDelegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3B31D180F7C00C54FCB /* AppDelegate.cpp */; };
 		76AAA3C11D180F7C00C54FCB /* BatchingExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3B61D180F7C00C54FCB /* BatchingExample.cpp */; };
 		76AAA3C21D180F7C00C54FCB /* GoblinsExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3B81D180F7C00C54FCB /* GoblinsExample.cpp */; };
@@ -251,6 +253,8 @@
 		521A8E6319F0C34300D177D7 /* Default-736h@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-736h@3x.png"; sourceTree = "<group>"; };
 		52B47A461A53D09B004E4C60 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.1.sdk/System/Library/Frameworks/Security.framework; sourceTree = DEVELOPER_DIR; };
 		7602C5541D7DAA1300C7C674 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/CoreText.framework; sourceTree = DEVELOPER_DIR; };
+		76A45BDC1E64396800745AA1 /* SkeletonTwoColorBatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonTwoColorBatch.cpp; path = ../../src/spine/SkeletonTwoColorBatch.cpp; sourceTree = "<group>"; };
+		76A45BDD1E64396800745AA1 /* SkeletonTwoColorBatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonTwoColorBatch.h; path = ../../src/spine/SkeletonTwoColorBatch.h; sourceTree = "<group>"; };
 		76AAA3B31D180F7C00C54FCB /* AppDelegate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AppDelegate.cpp; sourceTree = "<group>"; };
 		76AAA3B41D180F7C00C54FCB /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		76AAA3B51D180F7C00C54FCB /* AppMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppMacros.h; sourceTree = "<group>"; };
@@ -573,6 +577,8 @@
 		76AAA3FF1D18102C00C54FCB /* spine-cocos2dx */ = {
 			isa = PBXGroup;
 			children = (
+				76A45BDC1E64396800745AA1 /* SkeletonTwoColorBatch.cpp */,
+				76A45BDD1E64396800745AA1 /* SkeletonTwoColorBatch.h */,
 				76AAA4001D18106000C54FCB /* AttachmentVertices.cpp */,
 				76AAA4011D18106000C54FCB /* AttachmentVertices.h */,
 				76AAA4021D18106000C54FCB /* Cocos2dAttachmentLoader.cpp */,
@@ -775,6 +781,7 @@
 				503AE10217EB989F00D1A890 /* RootViewController.mm in Sources */,
 				503AE10117EB989F00D1A890 /* main.m in Sources */,
 				76F28CCB1DEC7EBB00CDE54D /* Skin.c in Sources */,
+				76A45BDE1E64396800745AA1 /* SkeletonTwoColorBatch.cpp in Sources */,
 				76F28CBF1DEC7EBB00CDE54D /* IkConstraintData.c in Sources */,
 				76F28CC61DEC7EBB00CDE54D /* Skeleton.c in Sources */,
 				76AAA4101D18106000C54FCB /* SkeletonRenderer.cpp in Sources */,
@@ -840,6 +847,7 @@
 				76AAA4121D18119F00C54FCB /* AttachmentVertices.cpp in Sources */,
 				76AAA4131D18119F00C54FCB /* AttachmentVertices.h in Sources */,
 				76AAA4141D18119F00C54FCB /* Cocos2dAttachmentLoader.cpp in Sources */,
+				76A45BDF1E64396800745AA1 /* SkeletonTwoColorBatch.cpp in Sources */,
 				76AAA4151D18119F00C54FCB /* Cocos2dAttachmentLoader.h in Sources */,
 				76AAA4161D18119F00C54FCB /* SkeletonAnimation.cpp in Sources */,
 				76AAA4171D18119F00C54FCB /* SkeletonAnimation.h in Sources */,

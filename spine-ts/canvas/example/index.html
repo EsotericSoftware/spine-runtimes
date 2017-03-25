@@ -17,6 +17,9 @@ var assetManager;
 var skeleton, state, bounds;
 var skeletonRenderer;
 
+var skelName = "spineboy";
+var animName = "test";
+
 function init () {
 	canvas = document.getElementById("canvas");
 	canvas.width = window.innerWidth;
@@ -31,16 +34,16 @@ function init () {
 
 	assetManager = new spine.canvas.AssetManager();
 
-	assetManager.loadText("assets/spineboy.json");
-	assetManager.loadText("assets/spineboy.atlas");
-	assetManager.loadTexture("assets/spineboy.png");
+	assetManager.loadText("assets/" + skelName + ".json");
+	assetManager.loadText("assets/" + skelName + ".atlas");
+	assetManager.loadTexture("assets/" + skelName + ".png");
 
 	requestAnimationFrame(load);
 }
 
 function load () {
 	if (assetManager.isLoadingComplete()) {
-		var data = loadSkeleton("spineboy", "walk", "default");
+		var data = loadSkeleton(skelName, animName, "default");
 		skeleton = data.skeleton;
 		state = data.state;
 		bounds = data.bounds;
@@ -121,6 +124,14 @@ function render () {
 	state.apply(skeleton);
 	skeleton.updateWorldTransform();
 	skeletonRenderer.draw(skeleton);
+
+	context.strokeStyle = "green";
+	context.beginPath();
+	context.moveTo(-1000, 0);
+	context.lineTo(1000, 0);
+	context.moveTo(0, -1000);
+	context.lineTo(0, 1000);
+	context.stroke();
 
 	requestAnimationFrame(render);
 }

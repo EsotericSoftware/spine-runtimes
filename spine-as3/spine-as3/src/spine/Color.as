@@ -30,25 +30,24 @@
 
 package spine {
 	public class Color {
-		public static var WHITE:Color = new Color(1, 1, 1, 1);
-		public static var RED:Color = new Color(1, 0, 0, 1);
-		public static var GREEN:Color = new Color(0, 1, 0, 1);
-		public static var BLUE:Color = new Color(0, 0, 1, 1);
-		public static var MAGENTA:Color = new Color(1, 0, 1, 1);
+		public static var WHITE : Color = new Color(1, 1, 1, 1);
+		public static var RED : Color = new Color(1, 0, 0, 1);
+		public static var GREEN : Color = new Color(0, 1, 0, 1);
+		public static var BLUE : Color = new Color(0, 0, 1, 1);
+		public static var MAGENTA : Color = new Color(1, 0, 1, 1);
+		public var r : Number = 0;
+		public var g : Number = 0;
+		public var b : Number = 0;
+		public var a : Number = 0;
 
-		public var r:Number = 0;
-		public var g:Number = 0;
-		public var b:Number = 0;
-		public var a:Number = 0;
-
-		public function Color (r:Number, g:Number, b:Number, a:Number = 0) {
+		public function Color(r : Number, g : Number, b : Number, a : Number = 0) {
 			this.r = r;
 			this.g = g;
 			this.b = b;
 			this.a = a;
 		}
 
-		public function setFrom (r:Number, g:Number, b:Number, a:Number): Color {
+		public function setFrom(r : Number, g : Number, b : Number, a : Number) : Color {
 			this.r = r;
 			this.g = g;
 			this.b = b;
@@ -57,7 +56,7 @@ package spine {
 			return this;
 		}
 
-		public function setFromColor (c:Color): Color{
+		public function setFromColor(c : Color) : Color {
 			this.r = c.r;
 			this.g = c.g;
 			this.b = c.b;
@@ -65,7 +64,7 @@ package spine {
 			return this;
 		}
 
-		public function setFromString (hex:String): Color {
+		public function setFromString(hex : String) : Color {
 			hex = hex.charAt(0) == '#' ? hex.substr(1) : hex;
 			this.r = parseInt(hex.substr(0, 2), 16) / 255.0;
 			this.g = parseInt(hex.substr(2, 2), 16) / 255.0;
@@ -74,7 +73,7 @@ package spine {
 			return this;
 		}
 
-		public function add (r:Number, g:Number, b:Number, a:Number): Color {
+		public function add(r : Number, g : Number, b : Number, a : Number) : Color {
 			this.r += r;
 			this.g += g;
 			this.b += b;
@@ -83,7 +82,7 @@ package spine {
 			return this;
 		}
 
-		public function clamp (): Color {
+		public function clamp() : Color {
 			if (this.r < 0) this.r = 0;
 			else if (this.r > 1) this.r = 1;
 

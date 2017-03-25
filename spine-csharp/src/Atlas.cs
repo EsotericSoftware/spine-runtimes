@@ -40,7 +40,7 @@ using Windows.Storage;
 
 namespace Spine {
 	public class Atlas {
-		List<AtlasPage> pages = new List<AtlasPage>();
+		readonly List<AtlasPage> pages = new List<AtlasPage>();
 		List<AtlasRegion> regions = new List<AtlasRegion>();
 		TextureLoader textureLoader;
 
@@ -58,12 +58,12 @@ namespace Spine {
 			}
 		}
 
-		public Atlas(String path, TextureLoader textureLoader) {
+		public Atlas(string path, TextureLoader textureLoader) {
 			this.ReadFile(path, textureLoader).Wait();
 		}
 		#else
 
-		public Atlas (String path, TextureLoader textureLoader) {
+		public Atlas (string path, TextureLoader textureLoader) {
 
 			#if WINDOWS_PHONE
 			Stream stream = Microsoft.Xna.Framework.TitleContainer.OpenStream(path);
@@ -84,7 +84,7 @@ namespace Spine {
 
 		#endif // !(UNITY)
 
-		public Atlas (TextReader reader, String dir, TextureLoader textureLoader) {
+		public Atlas (TextReader reader, string dir, TextureLoader textureLoader) {
 			Load(reader, dir, textureLoader);
 		}
 
@@ -94,14 +94,14 @@ namespace Spine {
 			this.textureLoader = null;
 		}
 
-		private void Load (TextReader reader, String imagesDir, TextureLoader textureLoader) {
+		private void Load (TextReader reader, string imagesDir, TextureLoader textureLoader) {
 			if (textureLoader == null) throw new ArgumentNullException("textureLoader cannot be null.");
 			this.textureLoader = textureLoader;
 
-			String[] tuple = new String[4];
+			string[] tuple = new string[4];
 			AtlasPage page = null;
 			while (true) {
-				String line = reader.ReadLine();
+				string line = reader.ReadLine();
 				if (line == null) break;
 				if (line.Trim().Length == 0)
 					page = null;
@@ -120,7 +120,7 @@ namespace Spine {
 					page.minFilter = (TextureFilter)Enum.Parse(typeof(TextureFilter), tuple[0], false);
 					page.magFilter = (TextureFilter)Enum.Parse(typeof(TextureFilter), tuple[1], false);
 
-					String direction = ReadValue(reader);
+					string direction = ReadValue(reader);
 					page.uWrap = TextureWrap.ClampToEdge;
 					page.vWrap = TextureWrap.ClampToEdge;
 					if (direction == "x")
@@ -189,16 +189,16 @@ namespace Spine {
 			}
 		}
 
-		static String ReadValue (TextReader reader) {
-			String line = reader.ReadLine();
+		static string ReadValue (TextReader reader) {
+			string line = reader.ReadLine();
 			int colon = line.IndexOf(':');
 			if (colon == -1) throw new Exception("Invalid line: " + line);
 			return line.Substring(colon + 1).Trim();
 		}
 
 		/// <summary>Returns the number of tuple values read (1, 2 or 4).</summary>
-		static int ReadTuple (TextReader reader, String[] tuple) {
-			String line = reader.ReadLine();
+		static int ReadTuple (TextReader reader, string[] tuple) {
+			string line = reader.ReadLine();
 			int colon = line.IndexOf(':');
 			if (colon == -1) throw new Exception("Invalid line: " + line);
 			int i = 0, lastMatch = colon + 1;
@@ -223,7 +223,7 @@ namespace Spine {
 		/// <summary>Returns the first region found with the specified name. This method uses string comparison to find the region, so the result
 		/// should be cached rather than calling this method multiple times.</summary>
 		/// <returns>The region, or null.</returns>
-		public AtlasRegion FindRegion (String name) {
+		public AtlasRegion FindRegion (string name) {
 			for (int i = 0, n = regions.Count; i < n; i++)
 				if (regions[i].name == name) return regions[i];
 			return null;
@@ -263,7 +263,7 @@ namespace Spine {
 	}
 
 	public class AtlasPage {
-		public String name;
+		public string name;
 		public Format format;
 		public TextureFilter minFilter;
 		public TextureFilter magFilter;
@@ -275,7 +275,7 @@ namespace Spine {
 
 	public class AtlasRegion {
 		public AtlasPage page;
-		public String name;
+		public string name;
 		public int x, y, width, height;
 		public float u, v, u2, v2;
 		public float offsetX, offsetY;
@@ -287,7 +287,7 @@ namespace Spine {
 	}
 
 	public interface TextureLoader {
-		void Load (AtlasPage page, String path);
+		void Load (AtlasPage page, string path);
 		void Unload (Object texture);
 	}
 }

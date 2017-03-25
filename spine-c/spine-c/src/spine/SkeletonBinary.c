@@ -187,6 +187,7 @@ static void readColor (_dataInput* input, float *r, float *g, float *b, float *a
 
 #define SLOT_ATTACHMENT 0
 #define SLOT_COLOR 1
+#define SLOT_TWO_COLOR 2
 
 #define PATH_POSITION 0
 #define PATH_SPACING 1
@@ -261,6 +262,20 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 			unsigned char timelineType = readByte(input);
 			int frameCount = readVarint(input, 1);
 			switch (timelineType) {
+				case SLOT_ATTACHMENT: {
+					spAttachmentTimeline* timeline = spAttachmentTimeline_create(frameCount);
+					timeline->slotIndex = slotIndex;
+					for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
+						float time = readFloat(input);
+						const char* attachmentName = readString(input);
+						/* TODO Avoid copying of attachmentName inside */
+						spAttachmentTimeline_setFrame(timeline, frameIndex, time, attachmentName);
+						FREE(attachmentName);
+					}
+					kv_push(spTimeline*, timelines, SUPER(timeline));
+					duration = MAX(duration, timeline->frames[frameCount - 1]);
+					break;
+				}
 				case SLOT_COLOR: {
 					spColorTimeline* timeline = spColorTimeline_create(frameCount);
 					timeline->slotIndex = slotIndex;
@@ -275,18 +290,20 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 					duration = MAX(duration, timeline->frames[(frameCount - 1) * COLOR_ENTRIES]);
 					break;
 				}
-				case SLOT_ATTACHMENT: {
-					spAttachmentTimeline* timeline = spAttachmentTimeline_create(frameCount);
+				case SLOT_TWO_COLOR: {
+					spTwoColorTimeline* timeline = spTwoColorTimeline_create(frameCount);
 					timeline->slotIndex = slotIndex;
 					for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
 						float time = readFloat(input);
-						const char* attachmentName = readString(input);
-						/* TODO Avoid copying of attachmentName inside */
-						spAttachmentTimeline_setFrame(timeline, frameIndex, time, attachmentName);
-						FREE(attachmentName);
+						float r, g, b, a;
+						float r2, g2, b2, a2;
+						readColor(input, &r, &g, &b, &a);
+						readColor(input, &a2, &r2, &g2, &b2);
+						spTwoColorTimeline_setFrame(timeline, frameIndex, time, r, g, b, a, r2, g2, b2);
+						if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
 					}
-					kv_push(spTimeline*, timelines, SUPER(timeline));
-					duration = MAX(duration, timeline->frames[frameCount - 1]);
+					kv_push(spTimeline*, timelines, SUPER(SUPER(timeline)));
+					duration = MAX(duration, timeline->frames[(frameCount - 1) * TWOCOLOR_ENTRIES]);
 					break;
 				}
 				default: {

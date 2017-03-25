@@ -29,40 +29,38 @@
  *****************************************************************************/
 
 package spine {
+	public class SlotData {
+		internal var _index : int;
+		internal var _name : String;
+		internal var _boneData : BoneData;
+		public var color : Color = new Color(1, 1, 1, 1);
+		public var darkColor : Color;
+		public var attachmentName : String;
+		public var blendMode : BlendMode;
 
-public class SlotData {
-	internal var _index:int;
-	internal var _name:String;
-	internal var _boneData:BoneData;
-	public var color: Color = new Color(1, 1, 1, 1);
-	public var darkColor: Color;	
-	public var attachmentName:String;
-	public var blendMode:BlendMode;
+		public function SlotData(index : int, name : String, boneData : BoneData) {
+			if (index < 0) throw new ArgumentError("index must be >= 0.");
+			if (name == null) throw new ArgumentError("name cannot be null.");
+			if (boneData == null) throw new ArgumentError("boneData cannot be null.");
+			_index = index;
+			_name = name;
+			_boneData = boneData;
+		}
 
-	public function SlotData (index:int, name:String, boneData:BoneData) {
-		if (index < 0) throw new ArgumentError("index must be >= 0.");
-		if (name == null) throw new ArgumentError("name cannot be null.");
-		if (boneData == null) throw new ArgumentError("boneData cannot be null.");
-		_index = index;
-		_name = name;
-		_boneData = boneData;
+		public function get index() : int {
+			return _index;
+		}
+
+		public function get name() : String {
+			return _name;
+		}
+
+		public function get boneData() : BoneData {
+			return _boneData;
+		}
+
+		public function toString() : String {
+			return _name;
+		}
 	}
-	
-	public function get index () : int {
-		return _index;
-	}
-
-	public function get name () : String {
-		return _name;
-	}
-
-	public function get boneData () : BoneData {
-		return _boneData;
-	}
-
-	public function toString () : String {
-		return _name;
-	}
-}
-
 }

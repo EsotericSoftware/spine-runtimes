@@ -29,72 +29,70 @@
  *****************************************************************************/
 
 package spine.animation {
-import spine.MathUtils;
-import spine.Bone;
-import spine.Event;
-import spine.Skeleton;
+	import spine.MathUtils;
+	import spine.Bone;
+	import spine.Event;
+	import spine.Skeleton;
 
-public class ScaleTimeline extends TranslateTimeline {
-	public function ScaleTimeline (frameCount:int) {
-		super(frameCount);
-	}
-	
-	override public function getPropertyId () : int {
-		return (TimelineType.scale.ordinal << 24) + boneIndex;
-	}
+	public class ScaleTimeline extends TranslateTimeline {
+		public function ScaleTimeline(frameCount : int) {
+			super(frameCount);
+		}
 
-	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
-		var frames:Vector.<Number> = this.frames;
-		var bone:Bone = skeleton.bones[boneIndex];
-		
-		if (time < frames[0]) {
-			if (setupPose) {
-				bone.scaleX = bone.data.scaleX;
-				bone.scaleY = bone.data.scaleY;	
+		override public function getPropertyId() : int {
+			return (TimelineType.scale.ordinal << 24) + boneIndex;
+		}
+
+		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, setupPose : Boolean, mixingOut : Boolean) : void {
+			var frames : Vector.<Number> = this.frames;
+			var bone : Bone = skeleton.bones[boneIndex];
+
+			if (time < frames[0]) {
+				if (setupPose) {
+					bone.scaleX = bone.data.scaleX;
+					bone.scaleY = bone.data.scaleY;
+				}
+				return;
 			}
-			return;
-		}
 
-		var x:Number, y:Number;
-		if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
-			x = frames[frames.length + PREV_X] * bone.data.scaleX;
-			y = frames[frames.length + PREV_Y] * bone.data.scaleY;
-		} else {
-			// Interpolate between the previous frame and the current frame.
-			var frame:int = Animation.binarySearch(frames, time, ENTRIES);
-			x = frames[frame + PREV_X];
-			y = frames[frame + PREV_Y];
-			var frameTime:Number = frames[frame];
-			var percent:Number = getCurvePercent(frame / ENTRIES - 1,
-				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-			x = (x + (frames[frame + X] - x) * percent) * bone.data.scaleX;
-			y = (y + (frames[frame + Y] - y) * percent) * bone.data.scaleY;
-		}
-		if (alpha == 1) {
-			bone.scaleX = x;
-			bone.scaleY = y;
-		} else {
-			var bx:Number, by:Number;
-			if (setupPose) {
-				bx = bone.data.scaleX;
-				by = bone.data.scaleY;
+			var x : Number, y : Number;
+			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
+				x = frames[frames.length + PREV_X] * bone.data.scaleX;
+				y = frames[frames.length + PREV_Y] * bone.data.scaleY;
 			} else {
-				bx = bone.scaleX;
-				by = bone.scaleY;
+				// Interpolate between the previous frame and the current frame.
+				var frame : int = Animation.binarySearch(frames, time, ENTRIES);
+				x = frames[frame + PREV_X];
+				y = frames[frame + PREV_Y];
+				var frameTime : Number = frames[frame];
+				var percent : Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+
+				x = (x + (frames[frame + X] - x) * percent) * bone.data.scaleX;
+				y = (y + (frames[frame + Y] - y) * percent) * bone.data.scaleY;
 			}
-			// Mixing out uses sign of setup or current pose, else use sign of key.
-			if (mixingOut) {
-				x = Math.abs(x) * MathUtils.signum(bx);
-				y = Math.abs(y) * MathUtils.signum(by);
+			if (alpha == 1) {
+				bone.scaleX = x;
+				bone.scaleY = y;
 			} else {
-				bx = Math.abs(bx) * MathUtils.signum(x);
-				by = Math.abs(by) * MathUtils.signum(y);
+				var bx : Number, by : Number;
+				if (setupPose) {
+					bx = bone.data.scaleX;
+					by = bone.data.scaleY;
+				} else {
+					bx = bone.scaleX;
+					by = bone.scaleY;
+				}
+				// Mixing out uses sign of setup or current pose, else use sign of key.
+				if (mixingOut) {
+					x = Math.abs(x) * MathUtils.signum(bx);
+					y = Math.abs(y) * MathUtils.signum(by);
+				} else {
+					bx = Math.abs(bx) * MathUtils.signum(x);
+					by = Math.abs(by) * MathUtils.signum(y);
+				}
+				bone.scaleX = bx + (x - bx) * alpha;
+				bone.scaleY = by + (y - by) * alpha;
 			}
-			bone.scaleX = bx + (x - bx) * alpha;
-			bone.scaleY = by + (y - by) * alpha;
 		}
 	}
-}
-
 }

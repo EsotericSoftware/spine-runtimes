@@ -31,9 +31,13 @@
 #import <spine/SkeletonRenderer.h>
 #import <spine/spine-cocos2d-objc.h>
 #import <spine/extension.h>
+#import <spine/GLUtils.h>
 #import "CCDrawNode.h"
 
 static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
+static spTwoColorBatcher* batcher = 0;
+static spMesh* mesh = 0;
+static bool handlerQueued = false;
 
 @interface SkeletonRenderer (Private)
 - (void) initialize:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
@@ -43,6 +47,7 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 
 @synthesize skeleton = _skeleton;
 @synthesize rootBone = _rootBone;
+@synthesize twoColorTint = _twoColorTint;
 @synthesize debugSlots = _debugSlots;
 @synthesize debugBones = _debugBones;
 
@@ -59,6 +64,11 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 }
 
 - (void) initialize:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
+	if (!batcher) {
+		batcher = spTwoColorBatcher_create();
+		mesh = spMesh_create(64000, 32000);
+	}
+	
 	_ownsSkeletonData = ownsSkeletonData;
 
 	_worldVertices = MALLOC(float, 1000); // Max number of vertices per mesh.
@@ -147,6 +157,20 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 }
 
 -(void)draw:(CCRenderer *)renderer transform:(const GLKMatrix4 *)transform {
+	// FIXME we need to clear the mesh parts at the end of the frame
+	// there's no general event mechanism to get notified on end frame
+	// that doesn't need to be re-added every frame. This is a poor man
+	// notification system that may break if the block is called on a
+	// separate thread.
+	if (!handlerQueued) {
+		[[CCDirector sharedDirector] addFrameCompletionHandler: ^{
+			printf("clearing mesh\n");
+			spMesh_clearParts(mesh);
+			handlerQueued = false;
+		}];
+		handlerQueued = true;
+	}
+	
 	CCColor* nodeColor = self.color;
 	_skeleton->color.r = nodeColor.red;
 	_skeleton->color.g = nodeColor.green;
@@ -154,11 +178,14 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	_skeleton->color.a = self.displayedOpacity;
 
 	int blendMode = -1;
+	uint32_t srcBlend = GL_SRC_ALPHA;
+	uint32_t dstBlend = GL_ONE_MINUS_SRC_ALPHA;
 	const float* uvs = 0;
 	int verticesCount = 0;
 	const unsigned short* triangles = 0;
 	int trianglesCount = 0;
 	float r = 0, g = 0, b = 0, a = 0;
+	float dr = 0, dg = 0, db = 0;
 	for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
 		spSlot* slot = _skeleton->drawOrder[i];
 		if (!slot->attachment) continue;
@@ -200,15 +227,23 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 				switch (slot->data->blendMode) {
 				case SP_BLEND_MODE_ADDITIVE:
 					[self setBlendMode:[CCBlendMode addMode]];
+					srcBlend = !_premultipliedAlpha ? GL_SRC_ALPHA : GL_ONE;
+					dstBlend = GL_ONE;
 					break;
 				case SP_BLEND_MODE_MULTIPLY:
 					[self setBlendMode:[CCBlendMode multiplyMode]];
+					srcBlend = GL_DST_COLOR;
+					dstBlend = GL_ONE_MINUS_SRC_ALPHA;
 					break;
 				case SP_BLEND_MODE_SCREEN:
 					[self setBlendMode:screenMode];
+					srcBlend = GL_ONE;
+					dstBlend = GL_ONE_MINUS_SRC_COLOR;
 					break;
 				default:
 					[self setBlendMode:_premultipliedAlpha ? [CCBlendMode premultipliedAlphaMode] : [CCBlendMode alphaMode]];
+					srcBlend = !_premultipliedAlpha ? GL_SRC_ALPHA : GL_ONE;
+					dstBlend = GL_ONE_MINUS_SRC_ALPHA;
 				}
 			}
 			if (_premultipliedAlpha) {
@@ -227,20 +262,65 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 			GLKVector2 center = GLKVector2Make(size.width / 2.0, size.height / 2.0);
 			GLKVector2 extents = GLKVector2Make(size.width / 2.0, size.height / 2.0);
 			if (_skipVisibilityCheck || CCRenderCheckVisbility(transform, center, extents)) {
-				CCRenderBuffer buffer = [renderer enqueueTriangles:(trianglesCount / 3) andVertexes:verticesCount withState:self.renderState globalSortOrder:0];
-				for (int i = 0; i * 2 < verticesCount; ++i) {
-					CCVertex vertex;
-					vertex.position = GLKVector4Make(_worldVertices[i * 2], _worldVertices[i * 2 + 1], 0.0, 1.0);
-					vertex.color = GLKVector4Make(r, g, b, a);
-					vertex.texCoord1 = GLKVector2Make(uvs[i * 2], 1 - uvs[i * 2 + 1]);
-					CCRenderBufferSetVertex(buffer, i, CCVertexApplyTransform(vertex, transform));
-				}
-				for (int j = 0; j * 3 < trianglesCount; ++j) {
-					CCRenderBufferSetTriangle(buffer, j, triangles[j * 3], triangles[j * 3 + 1], triangles[j * 3 + 2]);
+				if (!self.twoColorTint) {
+					CCRenderBuffer buffer = [renderer enqueueTriangles:(trianglesCount / 3) andVertexes:verticesCount withState:self.renderState globalSortOrder:0];
+					for (int i = 0; i * 2 < verticesCount; ++i) {
+						CCVertex vertex;
+						vertex.position = GLKVector4Make(_worldVertices[i * 2], _worldVertices[i * 2 + 1], 0.0, 1.0);
+						vertex.color = GLKVector4Make(r, g, b, a);
+						vertex.texCoord1 = GLKVector2Make(uvs[i * 2], 1 - uvs[i * 2 + 1]);
+						CCRenderBufferSetVertex(buffer, i, CCVertexApplyTransform(vertex, transform));
+					}
+					for (int j = 0; j * 3 < trianglesCount; ++j) {
+						CCRenderBufferSetTriangle(buffer, j, triangles[j * 3], triangles[j * 3 + 1], triangles[j * 3 + 2]);
+					}
+				} else {
+					if (slot->darkColor) {
+						dr = slot->darkColor->r;
+						dg = slot->darkColor->g;
+						db = slot->darkColor->b;
+					} else {
+						dr = dg = db = 0;
+					}
+					
+					spMeshPart meshPart;
+					spMesh_allocatePart(mesh, &meshPart, verticesCount / 2, trianglesCount, self.texture.name, srcBlend, dstBlend);
+					
+					spVertex* vertices = &meshPart.mesh->vertices[meshPart.startVertex];
+					unsigned short* indices = &meshPart.mesh->indices[meshPart.startIndex];
+					
+					for (int i = 0; i * 2 < verticesCount; i++, vertices++) {
+						CCVertex vertex;
+						vertex.position = GLKVector4Make(_worldVertices[i * 2], _worldVertices[i * 2 + 1], 0.0, 1.0);
+						vertex = CCVertexApplyTransform(vertex, transform);
+						vertices->x = vertex.position.x;
+						vertices->y = vertex.position.y;
+						vertices->z = vertex.position.z;
+						vertices->w = vertex.position.w;
+						vertices->color = ((unsigned short)(r * 255))| ((unsigned short)(g * 255)) << 8 | ((unsigned short)(b * 255)) <<16 | ((unsigned short)(a * 255)) << 24;
+						vertices->color2 = ((unsigned short)(dr * 255)) | ((unsigned short)(dg * 255)) << 8 | ((unsigned short)(db * 255)) << 16 | ((unsigned short)(255)) << 24;
+						vertices->u = uvs[i * 2];
+						vertices->v = 1 - uvs[i * 2 + 1];
+					}
+					
+					for (int j = 0; j < trianglesCount; j++, indices++) {
+						*indices = triangles[j];
+					}
+					
+					[renderer enqueueBlock:^{
+						spTwoColorBatcher_add(batcher, meshPart);
+					} globalSortOrder:0 debugLabel: nil threadSafe: false];
 				}
 			}
 		}
 	}
+	
+	if (self.twoColorTint) {
+		[renderer enqueueBlock:^{
+			spTwoColorBatcher_flush(batcher);
+		} globalSortOrder:0 debugLabel: nil threadSafe: false];
+	}
+	
 	[_drawNode clear];
 	if (_debugSlots) {
 		// Slots.

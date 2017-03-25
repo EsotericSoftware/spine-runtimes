@@ -29,55 +29,53 @@
  *****************************************************************************/
 
 package spine.animation {
-import spine.Event;
-import spine.Skeleton;
-import spine.Bone;
+	import spine.Event;
+	import spine.Skeleton;
+	import spine.Bone;
 
-public class ShearTimeline extends TranslateTimeline {
-	public function ShearTimeline (frameCount:int) {
-		super(frameCount);
-	}
-	
-	override public function getPropertyId () : int {
-		return (TimelineType.shear.ordinal << 24) + boneIndex;
-	}
+	public class ShearTimeline extends TranslateTimeline {
+		public function ShearTimeline(frameCount : int) {
+			super(frameCount);
+		}
 
-	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {
-		var frames:Vector.<Number> = this.frames;		
-		var bone:Bone = skeleton.bones[boneIndex];
-		
-		if (time < frames[0]) {
-			if (setupPose) {
-				bone.shearX = bone.data.shearX;
-				bone.shearY = bone.data.shearY;
+		override public function getPropertyId() : int {
+			return (TimelineType.shear.ordinal << 24) + boneIndex;
+		}
+
+		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, setupPose : Boolean, mixingOut : Boolean) : void {
+			var frames : Vector.<Number> = this.frames;
+			var bone : Bone = skeleton.bones[boneIndex];
+
+			if (time < frames[0]) {
+				if (setupPose) {
+					bone.shearX = bone.data.shearX;
+					bone.shearY = bone.data.shearY;
+				}
+				return;
 			}
-			return;
-		}
 
-		var x:Number, y:Number;
-		if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
-			x = frames[frames.length + PREV_X];
-			y = frames[frames.length + PREV_Y];
-		} else {
-			// Interpolate between the previous frame and the current frame.
-			var frame:int = Animation.binarySearch(frames, time, ENTRIES);
-			x = frames[frame + PREV_X];
-			y = frames[frame + PREV_Y];
-			var frameTime:Number = frames[frame];
-			var percent:Number = getCurvePercent(frame / ENTRIES - 1,
-				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+			var x : Number, y : Number;
+			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
+				x = frames[frames.length + PREV_X];
+				y = frames[frames.length + PREV_Y];
+			} else {
+				// Interpolate between the previous frame and the current frame.
+				var frame : int = Animation.binarySearch(frames, time, ENTRIES);
+				x = frames[frame + PREV_X];
+				y = frames[frame + PREV_Y];
+				var frameTime : Number = frames[frame];
+				var percent : Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-			x = x + (frames[frame + X] - x) * percent;
-			y = y + (frames[frame + Y] - y) * percent;
-		}
-		if (setupPose) {
-			bone.shearX = bone.data.shearX + x * alpha;
-			bone.shearY = bone.data.shearY + y * alpha;
-		} else {
-			bone.shearX += (bone.data.shearX + x - bone.shearX) * alpha;
-			bone.shearY += (bone.data.shearY + y - bone.shearY) * alpha;
+				x = x + (frames[frame + X] - x) * percent;
+				y = y + (frames[frame + Y] - y) * percent;
+			}
+			if (setupPose) {
+				bone.shearX = bone.data.shearX + x * alpha;
+				bone.shearY = bone.data.shearY + y * alpha;
+			} else {
+				bone.shearX += (bone.data.shearX + x - bone.shearX) * alpha;
+				bone.shearY += (bone.data.shearY + y - bone.shearY) * alpha;
+			}
 		}
 	}
-}
-
 }

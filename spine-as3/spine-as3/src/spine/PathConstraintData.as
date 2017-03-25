@@ -29,34 +29,32 @@
  *****************************************************************************/
 
 package spine {
+	public dynamic class PathConstraintData {
+		internal var _name : String;
+		public var order : Number;
+		internal var _bones : Vector.<BoneData> = new Vector.<BoneData>();
+		public var target : SlotData;
+		public var positionMode : PositionMode;
+		public var spacingMode : SpacingMode;
+		public var rotateMode : RotateMode;
+		public var offsetRotation : Number;
+		public var position : Number, spacing : Number, rotateMix : Number, translateMix : Number;
 
-public dynamic class PathConstraintData {
-	internal var _name:String;
-	public var order:Number;
-	internal var _bones:Vector.<BoneData> = new Vector.<BoneData>();
-	public var target:SlotData;
-	public var positionMode:PositionMode;
-	public var spacingMode:SpacingMode;
-	public var rotateMode:RotateMode;
-	public var offsetRotation:Number;
-	public var position:Number, spacing:Number, rotateMix:Number, translateMix:Number;
+		public function PathConstraintData(name : String) {
+			if (name == null) throw new ArgumentError("name cannot be null.");
+			_name = name;
+		}
 
-	public function PathConstraintData (name:String) {
-		if (name == null) throw new ArgumentError("name cannot be null.");
-		_name = name;
+		public function get bones() : Vector.<BoneData> {
+			return _bones;
+		}
+
+		public function get name() : String {
+			return _name;
+		}
+
+		public function toString() : String {
+			return name;
+		}
 	}
-
-	public function get bones () : Vector.<BoneData> {
-		return _bones;
-	}
-	
-	public function get name () : String {
-		return _name;
-	}
-
-	public function toString () : String {
-		return name;
-	}
-}
-
 }

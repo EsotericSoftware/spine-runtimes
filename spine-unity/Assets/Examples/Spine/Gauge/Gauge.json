@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "l6rgF0e8V0iyd44P62tS+NdEpPk", "spine": "3.5.03-beta", "width": 0, "height": 0, "fps": 1, "images": "./images/" },
+"skeleton": { "hash": "rc2mxcPRae3DQs+8yUQlM2SkaRg", "spine": "3.6.07-beta", "width": 250, "height": 60, "fps": 1, "images": "./images/" },
 "bones": [
 	{ "name": "root" },
 	{ "name": "Bar", "parent": "root", "x": -112.29 }

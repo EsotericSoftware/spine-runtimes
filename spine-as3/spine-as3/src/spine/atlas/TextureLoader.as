@@ -29,11 +29,11 @@
  *****************************************************************************/
 
 package spine.atlas {
+	public interface TextureLoader {
+		function loadPage(page : AtlasPage, path : String) : void;
 
-public interface TextureLoader {
-	function loadPage (page:AtlasPage, path:String) : void;
-	function loadRegion (region:AtlasRegion) : void;
-	function unloadPage (page:AtlasPage) : void;
-}
+		function loadRegion(region : AtlasRegion) : void;
 
+		function unloadPage(page : AtlasPage) : void;
+	}
 }

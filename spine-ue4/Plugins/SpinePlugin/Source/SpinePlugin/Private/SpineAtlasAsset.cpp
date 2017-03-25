@@ -83,6 +83,8 @@ void USpineAtlasAsset::Serialize (FArchive& Ar) {
 		importData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
 }
 
+#endif
+
 void USpineAtlasAsset::BeginDestroy () {
 	if (atlas) {
 		spAtlas_dispose(atlas);
@@ -110,7 +112,5 @@ spAtlas* USpineAtlasAsset::GetAtlas (bool ForceReload) {
 	}
 	return this->atlas;
 }
-
-#endif
 
 #undef LOCTEXT_NAMESPACE

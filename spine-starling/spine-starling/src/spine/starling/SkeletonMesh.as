@@ -29,26 +29,24 @@
  *****************************************************************************/
 
 package spine.starling {
-import starling.textures.Texture;
-import starling.styles.MeshStyle;
-import starling.rendering.IndexData;
-import starling.rendering.VertexData;
-import starling.display.Mesh;
+	import starling.textures.Texture;
+	import starling.styles.MeshStyle;
+	import starling.rendering.IndexData;
+	import starling.rendering.VertexData;
+	import starling.display.Mesh;
 
-public class SkeletonMesh extends Mesh {
+	public class SkeletonMesh extends Mesh {
+		public function SkeletonMesh(texture : Texture, vertexData : VertexData = null, indexData : IndexData = null, style : MeshStyle = null) {
+			super(vertexData == null ? new VertexData() : vertexData, indexData == null ? new IndexData() : indexData, style);
+			this.texture = texture;
+		}
 
-	public function SkeletonMesh(texture:Texture, vertexData:VertexData = null, indexData:IndexData = null, style:MeshStyle=null) {
-		super(vertexData == null? new VertexData(): vertexData, indexData == null? new IndexData(): indexData, style);
-		this.texture = texture;
+		public function getVertexData() : VertexData {
+			return this.vertexData;
+		}
+
+		public function getIndexData() : IndexData {
+			return this.indexData;
+		}
 	}
-
-	public function getVertexData(): VertexData {
-		return this.vertexData;
-	}
-
-	public function getIndexData(): IndexData {
-		return this.indexData;
-	}
-}
-
 }

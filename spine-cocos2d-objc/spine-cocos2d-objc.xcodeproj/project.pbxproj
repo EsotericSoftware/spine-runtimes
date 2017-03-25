@@ -33,6 +33,7 @@
 		652107961895250000B1FF07 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652107951895250000B1FF07 /* CoreText.framework */; };
 		765A2EF61D7D7A08003FB779 /* goblins.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 765A2EF41D7D7A08003FB779 /* goblins.atlas */; };
 		765A2EF71D7D7A08003FB779 /* goblins.png in Resources */ = {isa = PBXBuildFile; fileRef = 765A2EF51D7D7A08003FB779 /* goblins.png */; };
+		76BF7E071E66ED9C00485998 /* GLUtils.c in Sources */ = {isa = PBXBuildFile; fileRef = 76BF7E051E66ED9C00485998 /* GLUtils.c */; };
 		76F28D161DEC810300CDE54D /* Animation.c in Sources */ = {isa = PBXBuildFile; fileRef = 76F28CF41DEC810200CDE54D /* Animation.c */; };
 		76F28D171DEC810300CDE54D /* AnimationState.c in Sources */ = {isa = PBXBuildFile; fileRef = 76F28CF51DEC810300CDE54D /* AnimationState.c */; };
 		76F28D181DEC810300CDE54D /* AnimationStateData.c in Sources */ = {isa = PBXBuildFile; fileRef = 76F28CF61DEC810300CDE54D /* AnimationStateData.c */; };
@@ -159,6 +160,8 @@
 		652107951895250000B1FF07 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		765A2EF41D7D7A08003FB779 /* goblins.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = goblins.atlas; path = Resources/goblins.atlas; sourceTree = "<group>"; };
 		765A2EF51D7D7A08003FB779 /* goblins.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = goblins.png; path = Resources/goblins.png; sourceTree = "<group>"; };
+		76BF7E051E66ED9C00485998 /* GLUtils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GLUtils.c; path = src/spine/GLUtils.c; sourceTree = "<group>"; };
+		76BF7E061E66ED9C00485998 /* GLUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GLUtils.h; path = src/spine/GLUtils.h; sourceTree = "<group>"; };
 		76F28CF41DEC810200CDE54D /* Animation.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Animation.c; path = "../spine-c/spine-c/src/spine/Animation.c"; sourceTree = "<group>"; };
 		76F28CF51DEC810300CDE54D /* AnimationState.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = AnimationState.c; path = "../spine-c/spine-c/src/spine/AnimationState.c"; sourceTree = "<group>"; };
 		76F28CF61DEC810300CDE54D /* AnimationStateData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = AnimationStateData.c; path = "../spine-c/spine-c/src/spine/AnimationStateData.c"; sourceTree = "<group>"; };
@@ -326,6 +329,8 @@
 				43F7FF861927F94800CA4038 /* SkeletonRenderer.m */,
 				43C3282E170B0C19004A9460 /* spine-cocos2d-objc.h */,
 				43C3282D170B0C19004A9460 /* spine-cocos2d-objc.m */,
+				76BF7E051E66ED9C00485998 /* GLUtils.c */,
+				76BF7E061E66ED9C00485998 /* GLUtils.h */,
 			);
 			name = "spine-cocos2d-objc";
 			sourceTree = "<group>";
@@ -557,6 +562,7 @@
 				76F28D171DEC810300CDE54D /* AnimationState.c in Sources */,
 				76F28D221DEC810300CDE54D /* extension.c in Sources */,
 				76F28D231DEC810300CDE54D /* IkConstraint.c in Sources */,
+				76BF7E071E66ED9C00485998 /* GLUtils.c in Sources */,
 				43C3282F170B0C19004A9460 /* spine-cocos2d-objc.m in Sources */,
 				76F28D1F1DEC810300CDE54D /* BoundingBoxAttachment.c in Sources */,
 				76F28D281DEC810300CDE54D /* PathConstraint.c in Sources */,
@@ -673,6 +679,7 @@
 				);
 				INFOPLIST_FILE = "Resources-ios/Info.plist";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-lsqlite3",
@@ -700,6 +707,7 @@
 				);
 				INFOPLIST_FILE = "Resources-ios/Info.plist";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-lsqlite3",

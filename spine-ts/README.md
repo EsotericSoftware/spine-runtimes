@@ -22,9 +22,9 @@ spine-ts works with data exported from Spine 3.6.xx
 
 spine-ts WebGL & Widget backends supports all Spine features. 
 
-The spine-ts Canvas backend does not support color tinting, mesh attachments or shearing. Mesh attachments are supported by setting `spine.canvas.SkeletonRenderer.useTriangleRendering` to true. Note that this method is slow and may lead to artifacts on some browsers. 
+spine-ts Canvas does not support color tinting and mesh attachments. Only the alpha channel from tint colors is applied. Experimental support for mesh attachments can be enabled by setting `spine.canvas.SkeletonRenderer.useTriangleRendering` to true. Note that this method is slow and may lead to artifacts on some browsers. 
 
-The spine-ts THREE.JS backend does not support color tinting and blend modes. The THREE.JS backend provides `SkeletonMesh.zOffset` to avoid z-fighting. Adjust to your near/far plane settings.
+spine-ts THREE.JS does not support color tinting and blend modes. The THREE.JS backend provides `SkeletonMesh.zOffset` to avoid z-fighting. Adjust to your near/far plane settings.
 
 spine-ts does not yet support loading the binary format.
 
@@ -39,6 +39,18 @@ spine-ts does not yet support loading the binary format.
 All `*.js` files are self-contained and include both the core and respective backend classes.
 
 If you write your app with TypeScript, additionally copy the corresponding `build/spine-*.d.ts` file to your project.
+
+**Note:** If you are using the compiled `.js` files with ES6 or other module systems, you have to add
+
+```
+export { spine };
+```
+
+At the bottom of the `.js` file you are using. You can then import the module as usual, e.g.:
+
+```
+import { spine } from './spine-webgl.js';
+```
 
 ## Examples
 To run the examples, the image, atlas, and JSON files must be served by a webserver, they can't be loaded from your local disk. Spawn a light-weight web server in the root of spine-ts, then navigate to the `index.html` file for the example you want to view. E.g.:
@@ -179,7 +191,9 @@ new spine.SpineWidget("my-widget", {
 The configuration object has the following fields:
 
   * `json`: required, path to the `.json` file, absolute or relative, e.g. "assets/animation.json"
+  * `jsonContent`: optional, string or JSON object holding the content of a skeleton `.json` file. Overrides `json` if given.
   * `atlas`: required, path to the `.atlas` file, absolute or relative, e.g. "assets/animation.atlas"
+  * `atlasContent`: optional, string holding the content of a file. Overrides `atlasContent` if given.
   * `animation`: required, the name of the animation to play back
   * `imagesPath`: optional, the location of images on the server to load atlas pages from. If omitted, atlas `.png` page files are loaded relative to the `.atlas` file.
   * `atlasPages`: optional, the list of atlas page images, e.g. `atlasPages: ["assets/page1.png", "assets/page2.png"]` when using code, or `data-atlas-pages="assets/page1.png,assets/page2.png"` on case of HTML instantiation. Use this if you have a multi-page atlas. If ommited, only one atlas page image is loaded based on the atlas file name, replacing `.atlas` with `.png`.

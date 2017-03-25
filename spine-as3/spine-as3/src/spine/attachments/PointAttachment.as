@@ -29,29 +29,29 @@
  *****************************************************************************/
 
 package spine.attachments {
-import spine.Color;
-import spine.MathUtils;
-import spine.Bone;
+	import spine.Color;
+	import spine.MathUtils;
+	import spine.Bone;
 
-public dynamic class PointAttachment extends VertexAttachment {
-	public var x: Number, y: Number, rotation: Number;
-	public var color:Color = new Color(0.38, 0.94, 0, 1);
-	
-	public function PointAttachment (name:String) {
-		super(name);
-	}
-	
-	public function computeWorldPosition (bone: Bone, point: Vector.<Number>): Vector.<Number> {
-		point[0] = this.x * bone.a + this.y * bone.b + bone.worldX;
-		point[1] = this.x * bone.c + this.y * bone.d + bone.worldY;
-		return point;
-	}
+	public dynamic class PointAttachment extends VertexAttachment {
+		public var x : Number, y : Number, rotation : Number;
+		public var color : Color = new Color(0.38, 0.94, 0, 1);
 
-	public function computeWorldRotation (bone: Bone): Number {
-		var cos:Number = MathUtils.cosDeg(this.rotation), sin: Number = MathUtils.sinDeg(this.rotation);
-		var x:Number = cos * bone.a + sin * bone.b;
-		var y:Number = cos * bone.c + sin * bone.d;
-		return Math.atan2(y, x) * MathUtils.radDeg;
-	}	
-}
+		public function PointAttachment(name : String) {
+			super(name);
+		}
+
+		public function computeWorldPosition(bone : Bone, point : Vector.<Number>) : Vector.<Number> {
+			point[0] = this.x * bone.a + this.y * bone.b + bone.worldX;
+			point[1] = this.x * bone.c + this.y * bone.d + bone.worldY;
+			return point;
+		}
+
+		public function computeWorldRotation(bone : Bone) : Number {
+			var cos : Number = MathUtils.cosDeg(this.rotation), sin : Number = MathUtils.sinDeg(this.rotation);
+			var x : Number = cos * bone.a + sin * bone.b;
+			var y : Number = cos * bone.c + sin * bone.d;
+			return Math.atan2(y, x) * MathUtils.radDeg;
+		}
+	}
 }

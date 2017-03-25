@@ -149,9 +149,9 @@ namespace Spine {
 
 					if (slotMap.ContainsKey("dark")) {
 						var color2 = (String)slotMap["dark"];
-						data.r2 = ToColor(color2, 0);
-						data.g2 = ToColor(color2, 1);
-						data.b2 = ToColor(color2, 2);
+						data.r2 = ToColor(color2, 0, 6); // expectedLength = 6. ie. "RRGGBB"
+						data.g2 = ToColor(color2, 1, 6);
+						data.b2 = ToColor(color2, 2, 6);
 						data.hasSecondColor = true;
 					}
 						
@@ -500,7 +500,7 @@ namespace Spine {
 								string light = (string)valueMap["light"];
 								string dark = (string)valueMap["dark"];
 								timeline.SetFrame(frameIndex, time, ToColor(light, 0), ToColor(light, 1), ToColor(light, 2), ToColor(light, 3),
-									ToColor(dark, 0), ToColor(dark, 1), ToColor(dark, 2));
+									ToColor(dark, 0, 6), ToColor(dark, 1, 6), ToColor(dark, 2, 6));
 								ReadCurve(valueMap, timeline, frameIndex);
 								frameIndex++;
 							}
@@ -840,9 +840,9 @@ namespace Spine {
 			return (String)map[name];
 		}
 
-		static float ToColor(String hexString, int colorIndex) {
-			if (hexString.Length != 8)
-				throw new ArgumentException("Color hexidecimal length must be 8, recieved: " + hexString, "hexString");
+		static float ToColor(String hexString, int colorIndex, int expectedLength = 8) {
+			if (hexString.Length != expectedLength)
+				throw new ArgumentException("Color hexidecimal length must be " + expectedLength + ", recieved: " + hexString, "hexString");
 			return Convert.ToInt32(hexString.Substring(colorIndex * 2, 2), 16) / (float)255;
 		}
 	}

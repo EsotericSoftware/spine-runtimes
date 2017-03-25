@@ -29,70 +29,67 @@
  *****************************************************************************/
 
 package spine.animation {
-import spine.Event;
-import spine.Skeleton;
-import spine.PathConstraint;
+	import spine.Event;
+	import spine.Skeleton;
+	import spine.PathConstraint;
 
-public class PathConstraintMixTimeline extends CurveTimeline {
-	static public const ENTRIES:int = 3;
-	static internal const PREV_TIME:int = -3, PREV_ROTATE:int = -2, PREV_TRANSLATE:int = -1;
-	static internal const ROTATE:int = 1, TRANSLATE:int = 2;
+	public class PathConstraintMixTimeline extends CurveTimeline {
+		static public const ENTRIES : int = 3;
+		static internal const PREV_TIME : int = -3, PREV_ROTATE : int = -2, PREV_TRANSLATE : int = -1;
+		static internal const ROTATE : int = 1, TRANSLATE : int = 2;
+		public var pathConstraintIndex : int;
+		public var frames : Vector.<Number>; // time, rotate mix, translate mix, ...
 
-	public var pathConstraintIndex:int;
+		public function PathConstraintMixTimeline(frameCount : int) {
+			super(frameCount);
+			frames = new Vector.<Number>(frameCount * ENTRIES, true);
+		}
 
-	public var frames:Vector.<Number>; // time, rotate mix, translate mix, ...
+		override public function getPropertyId() : int {
+			return (TimelineType.pathConstraintMix.ordinal << 24) + pathConstraintIndex;
+		}
 
-	public function PathConstraintMixTimeline (frameCount:int) {
-		super(frameCount);
-		frames = new Vector.<Number>(frameCount * ENTRIES, true);
-	}
-	
-	override public function getPropertyId () : int {
-		return (TimelineType.pathConstraintMix.ordinal << 24) + pathConstraintIndex;
-	}
+		/** Sets the time and mixes of the specified keyframe. */
+		public function setFrame(frameIndex : int, time : Number, rotateMix : Number, translateMix : Number) : void {
+			frameIndex *= ENTRIES;
+			frames[frameIndex] = time;
+			frames[frameIndex + ROTATE] = rotateMix;
+			frames[frameIndex + TRANSLATE] = translateMix;
+		}
 
-	/** Sets the time and mixes of the specified keyframe. */
-	public function setFrame (frameIndex:int, time:Number, rotateMix:Number, translateMix:Number) : void {
-		frameIndex *= ENTRIES;
-		frames[frameIndex] = time;
-		frames[frameIndex + ROTATE] = rotateMix;
-		frames[frameIndex + TRANSLATE] = translateMix;
-	}
-
-	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number, setupPose:Boolean, mixingOut:Boolean) : void {		
-		var constraint:PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
-		if (time < frames[0]) {
-			if (setupPose) {
-				constraint.rotateMix = constraint.data.rotateMix;
-				constraint.translateMix = constraint.data.translateMix;
+		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, setupPose : Boolean, mixingOut : Boolean) : void {
+			var constraint : PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
+			if (time < frames[0]) {
+				if (setupPose) {
+					constraint.rotateMix = constraint.data.rotateMix;
+					constraint.translateMix = constraint.data.translateMix;
+				}
+				return;
 			}
-			return;
-		}
 
-		var rotate:Number, translate:Number;
-		if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
-			rotate = frames[frames.length + PREV_ROTATE];
-			translate = frames[frames.length + PREV_TRANSLATE];
-		} else {
-			// Interpolate between the previous frame and the current frame.
-			var frame:int = Animation.binarySearch(frames, time, ENTRIES);
-			rotate = frames[frame + PREV_ROTATE];
-			translate = frames[frame + PREV_TRANSLATE];
-			var frameTime:Number = frames[frame];
-			var percent:Number = getCurvePercent(frame / ENTRIES - 1,
-				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+			var rotate : Number, translate : Number;
+			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
+				rotate = frames[frames.length + PREV_ROTATE];
+				translate = frames[frames.length + PREV_TRANSLATE];
+			} else {
+				// Interpolate between the previous frame and the current frame.
+				var frame : int = Animation.binarySearch(frames, time, ENTRIES);
+				rotate = frames[frame + PREV_ROTATE];
+				translate = frames[frame + PREV_TRANSLATE];
+				var frameTime : Number = frames[frame];
+				var percent : Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-			rotate += (frames[frame + ROTATE] - rotate) * percent;
-			translate += (frames[frame + TRANSLATE] - translate) * percent;
-		}
+				rotate += (frames[frame + ROTATE] - rotate) * percent;
+				translate += (frames[frame + TRANSLATE] - translate) * percent;
+			}
 
-		if (setupPose) {
-			constraint.rotateMix = constraint.data.rotateMix + (rotate - constraint.data.rotateMix) * alpha;
-			constraint.translateMix = constraint.data.translateMix + (translate - constraint.data.translateMix) * alpha;
-		} else {
-			constraint.rotateMix += (rotate - constraint.rotateMix) * alpha;
-			constraint.translateMix += (translate - constraint.translateMix) * alpha;
+			if (setupPose) {
+				constraint.rotateMix = constraint.data.rotateMix + (rotate - constraint.data.rotateMix) * alpha;
+				constraint.translateMix = constraint.data.translateMix + (translate - constraint.data.translateMix) * alpha;
+			} else {
+				constraint.rotateMix += (rotate - constraint.rotateMix) * alpha;
+				constraint.translateMix += (translate - constraint.translateMix) * alpha;
+			}
 		}
 	}
-}
 }

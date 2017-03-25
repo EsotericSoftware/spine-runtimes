@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-cocos2dx works with data exported from Spine 3.5.xx.
+spine-cocos2dx works with data exported from Spine 3.6.xx.
 
 spine-cocos2dx supports all Spine features.
 
@@ -36,6 +36,7 @@ The Spine cocos2d-x example works on Windows and Mac OS X.
 5. Click `Browse Source` and select the directory `spine-runtimes`
 6. Click `Browse Build` and select the `spine-runtimes/spine-cocos2dx/build` directory. You can create the `build` folder directly in the file dialog via `New Folder`.
 7. Click `Configure`. This will download the cocos2d-x dependency and wire it up with the example source code in `spine-runtimes/spine-cocos2dx/example`. The download is 400mb, so get yourself a cup of tea.
+7. Open the file `spine-cocos2dx\example\cocos2d\cocos\2d\cocos2dx.props` and remove the `libSpine.lib` entry from the `<AdditionalDependencies>` tag.
 8. Open the `spine-runtimes/spine-cocos2dx/example/proj.win32/spine-cocos2d-x.sln` file in Visual Studio 2015. Visual Studio may ask you to install the Windows XP/7 SDK, which you should install.
 9. Expand the cocos2d_libs sub project and delete the `editor-support/spine` group. This will remove the outdated Spine cocos2d-x runtime shipped by cocos2d-x from your build.
 9. Expand `References` of the cocos2d_libs sub project, and remove the entry for `libSpine`, which should be marked with an error.
@@ -68,7 +69,8 @@ The Spine cocos2d-x example works on Windows and Mac OS X.
 
 ## Notes
 
-- Images are premultiplied by cocos2d-x, so the Spine atlas images should *not* use premultiplied alpha.
+* Images are premultiplied by cocos2d-x, so the Spine atlas images should *not* use premultiplied alpha.
+* Two color tinting needs to be enabled on a per-skeleton basis. Call `SkeletonRenderer::setTwoColorTine(true)` or `SkeletonAnimation::setTwoColorTint(true)` after you created the skeleton instance. Note that two color tinting requires a custom shader and vertex format. Skeletons rendered with two color tinting can therefore not be batched with single color tinted skeletons or other 2D cocos2d-x elements like sprites. However, two-color tinted skeletons will be batched if possible when rendered after one another. Attaching a child to a two color tinted skeleton will also break the batch.
 
 ## Examples
 

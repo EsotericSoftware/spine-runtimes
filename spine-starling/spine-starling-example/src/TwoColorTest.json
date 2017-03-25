@@ -1,0 +1,150 @@
+{
+"skeleton": { "hash": "5Oji/z9A5lQ/crlH60repeTNBg8", "spine": "3.6.09-beta", "width": 1588, "height": 732, "images": "" },
+"bones": [
+	{ "name": "root" },
+	{ "name": "singleColorTint", "parent": "root", "x": -400 },
+	{ "name": "singleColorTint2", "parent": "root", "x": -400, "y": -383 },
+	{ "name": "twoColorTint", "parent": "root", "x": 800 },
+	{ "name": "twoColorTint2", "parent": "root", "x": 800, "y": -382 },
+	{ "name": "twoColorTint (blackOnly)", "parent": "root" },
+	{ "name": "twoColorTint (blackOnly)2", "parent": "root", "y": -391 },
+	{ "name": "twoColorTint (colorOnly)", "parent": "root", "x": 400 },
+	{ "name": "twoColorTint (colorOnly)2", "parent": "root", "x": 400, "y": -382 }
+],
+"slots": [
+	{ "name": "squareWithBorder", "bone": "singleColorTint", "attachment": "squareWithBorder" },
+	{ "name": "squareWithBorder7", "bone": "singleColorTint2", "attachment": "squareWithBorder" },
+	{ "name": "squareWithBorder2", "bone": "twoColorTint (blackOnly)", "dark": "000000", "attachment": "squareWithBorder" },
+	{ "name": "squareWithBorder8", "bone": "twoColorTint (blackOnly)2", "dark": "000000", "attachment": "squareWithBorder" },
+	{ "name": "squareWithBorder4", "bone": "twoColorTint (colorOnly)", "dark": "000000", "attachment": "squareWithBorder" },
+	{ "name": "squareWithBorder5", "bone": "twoColorTint (colorOnly)2", "dark": "000000", "attachment": "squareWithBorder" },
+	{ "name": "squareWithBorder3", "bone": "twoColorTint", "dark": "000000", "attachment": "squareWithBorder" },
+	{ "name": "squareWithBorder6", "bone": "twoColorTint2", "dark": "000000", "attachment": "squareWithBorder" }
+],
+"skins": {
+	"default": {
+		"squareWithBorder": {
+			"squareWithBorder": { "width": 300, "height": 300 }
+		},
+		"squareWithBorder2": {
+			"squareWithBorder": { "width": 300, "height": 300 }
+		},
+		"squareWithBorder3": {
+			"squareWithBorder": { "width": 300, "height": 300 }
+		},
+		"squareWithBorder4": {
+			"squareWithBorder": { "width": 300, "height": 300 }
+		},
+		"squareWithBorder5": {
+			"squareWithBorder": {
+				"type": "mesh",
+				"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
+				"triangles": [ 1, 2, 3, 1, 3, 0 ],
+				"vertices": [ 150, -150, -150, -150, -197, 99, 183, 155 ],
+				"hull": 4,
+				"edges": [ 0, 2, 2, 4, 4, 6, 0, 6 ],
+				"width": 300,
+				"height": 300
+			}
+		},
+		"squareWithBorder6": {
+			"squareWithBorder": {
+				"type": "mesh",
+				"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
+				"triangles": [ 1, 2, 3, 1, 3, 0 ],
+				"vertices": [ 238, -200, -191, -60, -150, 150, 119, 111 ],
+				"hull": 4,
+				"edges": [ 0, 2, 2, 4, 4, 6, 0, 6 ],
+				"width": 300,
+				"height": 300
+			}
+		},
+		"squareWithBorder7": {
+			"squareWithBorder": {
+				"type": "mesh",
+				"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
+				"triangles": [ 1, 2, 3, 1, 3, 0 ],
+				"vertices": [ 210, -132, -150, -150, -150, 150, 124, 119 ],
+				"hull": 4,
+				"edges": [ 0, 2, 2, 4, 4, 6, 0, 6 ],
+				"width": 300,
+				"height": 300
+			}
+		},
+		"squareWithBorder8": {
+			"squareWithBorder": {
+				"type": "mesh",
+				"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
+				"triangles": [ 1, 2, 3, 1, 3, 0 ],
+				"vertices": [ 150, -150, -150, -150, -97, 58, 86, 62 ],
+				"hull": 4,
+				"edges": [ 0, 2, 2, 4, 4, 6, 0, 6 ],
+				"width": 300,
+				"height": 300
+			}
+		}
+	}
+},
+"animations": {
+	"animation": {
+		"slots": {
+			"squareWithBorder": {
+				"color": [
+					{ "time": 0, "color": "fffffffe" },
+					{ "time": 1, "color": "9e17b3fe" },
+					{ "time": 2, "color": "fffffffe" }
+				]
+			},
+			"squareWithBorder2": {
+				"twoColor": [
+					{ "time": 0, "light": "fffffffe", "dark": "000000" },
+					{ "time": 1, "light": "fffffffe", "dark": "ff0000" },
+					{ "time": 2, "light": "fffffffe", "dark": "000000" }
+				]
+			},
+			"squareWithBorder3": {
+				"twoColor": [
+					{ "time": 0, "light": "fffffffe", "dark": "000000" },
+					{ "time": 1, "light": "80ff00fe", "dark": "001cff" },
+					{ "time": 2, "light": "fffffffe", "dark": "000000" }
+				]
+			},
+			"squareWithBorder4": {
+				"twoColor": [
+					{ "time": 0, "light": "fffffffe", "dark": "000000" },
+					{ "time": 1, "light": "ffd300fe", "dark": "000000" },
+					{ "time": 2, "light": "fffffffe", "dark": "000000" }
+				]
+			},
+			"squareWithBorder5": {
+				"twoColor": [
+					{ "time": 0, "light": "fffffffe", "dark": "000000" },
+					{ "time": 1, "light": "ffd300fe", "dark": "000000" },
+					{ "time": 2, "light": "fffffffe", "dark": "000000" }
+				]
+			},
+			"squareWithBorder6": {
+				"twoColor": [
+					{ "time": 0, "light": "fffffffe", "dark": "000000" },
+					{ "time": 1, "light": "80ff00fe", "dark": "001cff" },
+					{ "time": 2, "light": "fffffffe", "dark": "000000" }
+				]
+			},
+			"squareWithBorder7": {
+				"color": [
+					{ "time": 0, "color": "fffffffe" },
+					{ "time": 1, "color": "9e17b3fe" },
+					{ "time": 2, "color": "fffffffe" }
+				]
+			},
+			"squareWithBorder8": {
+				"twoColor": [
+					{ "time": 0, "light": "fffffffe", "dark": "000000" },
+					{ "time": 1, "light": "fffffffe", "dark": "ff0000" },
+					{ "time": 2, "light": "fffffffe", "dark": "000000" }
+				]
+			}
+		}
+	}
+}
+}

@@ -29,9 +29,7 @@
  *****************************************************************************/
 
 package spine {
-
-public interface Updatable {
-	function update () : void;
-}
-
+	public interface Updatable {
+		function update() : void;
+	}
 }

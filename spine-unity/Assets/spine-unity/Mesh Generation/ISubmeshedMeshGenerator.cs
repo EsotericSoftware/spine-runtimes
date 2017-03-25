@@ -47,6 +47,7 @@ namespace Spine.Unity.MeshGeneration {
 		bool PremultiplyVertexColors { get; set; }
 		bool AddNormals { get; set; }
 		bool AddTangents { get; set; }
+		bool AddBlackTint { get; set; }
 	}
 
 	// ISubmeshSetMeshGenerator
@@ -62,6 +63,7 @@ namespace Spine.Unity.MeshGeneration {
 		bool PremultiplyVertexColors { get; set; }
 		bool AddNormals { get; set; }
 		bool AddTangents { get; set; }
+		bool AddBlackTint { get; set; }
 	}
 
 	/// <summary>Primarily a collection of Submesh Instructions. This constitutes instructions for how to construct a mesh containing submeshes.</summary>

@@ -47,6 +47,7 @@ local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local BlendMode = require "spine-lua.BlendMode"
 local TransformMode = require "spine-lua.TransformMode"
 local utils = require "spine-lua.utils"
+local Color = require "spine-lua.Color"
 
 local SkeletonJson = {}
 function SkeletonJson.new (attachmentLoader)
@@ -137,7 +138,7 @@ function SkeletonJson.new (attachmentLoader)
 					data.darkColor:set(tonumber(dark:sub(1, 2), 16) / 255,
 					               tonumber(dark:sub(3, 4), 16) / 255,
 					               tonumber(dark:sub(5, 6), 16) / 255,
-					               tonumber(dark:sub(7, 8), 16) / 255)
+					               0)
 				end
 
 				data.attachmentName = getValue(slotMap, "attachment", nil)
@@ -480,7 +481,29 @@ function SkeletonJson.new (attachmentLoader)
 						end
 						table_insert(timelines, timeline)
 						duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.ColorTimeline.ENTRIES])
+					elseif timelineName == "twoColor" then
+						local timeline = Animation.TwoColorTimeline.new(#values)
+						timeline.slotIndex = slotIndex
 
+						local frameIndex = 0
+						for i,valueMap in ipairs(values) do
+							local light = valueMap["light"]
+							local dark = valueMap["dark"]
+							timeline:setFrame(
+								frameIndex, valueMap["time"],
+								tonumber(light:sub(1, 2), 16) / 255,
+								tonumber(light:sub(3, 4), 16) / 255,
+								tonumber(light:sub(5, 6), 16) / 255,
+								tonumber(light:sub(7, 8), 16) / 255,
+								tonumber(dark:sub(1, 2), 16) / 255,
+								tonumber(dark:sub(3, 4), 16) / 255,
+								tonumber(dark:sub(5, 6), 16) / 255
+							)
+							readCurve(valueMap, timeline, frameIndex)
+							frameIndex = frameIndex + 1
+						end
+						table_insert(timelines, timeline)
+						duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.TwoColorTimeline.ENTRIES])
 					elseif timelineName == "attachment" then
 						local timeline = Animation.AttachmentTimeline.new(#values)
 						timeline.slotIndex = slotIndex

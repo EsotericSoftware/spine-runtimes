@@ -79,6 +79,8 @@ void USpineSkeletonDataAsset::Serialize (FArchive& Ar) {
 		importData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
 }
 
+#endif
+
 void USpineSkeletonDataAsset::BeginDestroy () {
 	if (this->skeletonData) {
 		spSkeletonData_dispose(this->skeletonData);
@@ -149,7 +151,5 @@ float USpineSkeletonDataAsset::GetMix(const FString& from, const FString& to) {
 	}
 	return 0;
 }
-
-#endif
 
 #undef LOCTEXT_NAMESPACE

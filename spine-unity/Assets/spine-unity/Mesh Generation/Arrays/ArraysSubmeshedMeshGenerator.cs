@@ -41,7 +41,6 @@ namespace Spine.Unity.MeshGeneration {
 		public List<Slot> Separators { get { return this.separators; } }
 
 		#region Settings
-		// ArraysMeshGenerator.PremultiplyAlpha
 		public float ZSpacing { get; set; }
 		#endregion
 
@@ -160,6 +159,11 @@ namespace Spine.Unity.MeshGeneration {
 			bool vertBufferResized = ArraysMeshGenerator.EnsureSize(vertexCount, ref this.meshVertices, ref this.meshUVs, ref this.meshColors32);
 			Vector3[] vertices = this.meshVertices;
 
+			if (addBlackTint) {
+				ArraysMeshGenerator.EnsureSize(vertexCount, ref this.uv2);
+				ArraysMeshGenerator.EnsureSize(vertexCount, ref this.uv3);
+			}
+
 			// STEP 2: Update buffers based on Skeleton.
 			float zSpacing = this.ZSpacing;
 			Vector3 meshBoundsMin;
@@ -190,7 +194,9 @@ namespace Spine.Unity.MeshGeneration {
 				int start = submeshInstruction.startSlot;
 				int end = submeshInstruction.endSlot;
 				var skeleton = submeshInstruction.skeleton;
+				if (addBlackTint) ArraysMeshGenerator.FillBlackUVs(skeleton, start, end, this.uv2, this.uv3, vertexIndex);
 				ArraysMeshGenerator.FillVerts(skeleton, start, end, zSpacing, this.PremultiplyVertexColors, vertices, this.meshUVs, this.meshColors32, ref vertexIndex, ref this.attachmentVertexBuffer, ref meshBoundsMin, ref meshBoundsMax);
+
 				if (structureDoesntMatch) {
 					var currentBuffer = submeshBuffers.Items[submeshIndex];
 					bool isLastSubmesh = (submeshIndex == submeshCount - 1);
@@ -207,6 +213,10 @@ namespace Spine.Unity.MeshGeneration {
 
 			// STEP 3: Assign the buffers into the Mesh.
 			smartMesh.Set(this.meshVertices, this.meshUVs, this.meshColors32, meshInstructions);
+			if (addBlackTint) {
+				mesh.uv2 = this.uv2;
+				mesh.uv3 = this.uv3;
+			}
 			mesh.bounds = ArraysMeshGenerator.ToBounds(meshBoundsMin, meshBoundsMax);
 
 			if (structureDoesntMatch) {

@@ -228,45 +228,48 @@ var spine;
 				var drawOrder = skeleton.drawOrder;
 				if (this.debugRendering)
 					ctx.strokeStyle = "green";
+				ctx.save();
 				for (var i = 0, n = drawOrder.length; i < n; i++) {
 					var slot = drawOrder[i];
 					var attachment = slot.getAttachment();
+					var regionAttachment = null;
 					var region = null;
 					var image = null;
-					var vertices = this.vertices;
 					if (attachment instanceof spine.RegionAttachment) {
-						var regionAttachment = attachment;
-						vertices = this.computeRegionVertices(slot, regionAttachment, false);
+						regionAttachment = attachment;
 						region = regionAttachment.region;
-						image = (region).texture.getImage();
+						image = region.texture.getImage();
 					}
 					else
 						continue;
+					var skeleton_1 = slot.bone.skeleton;
+					var skeletonColor = skeleton_1.color;
+					var slotColor = slot.color;
+					var regionColor = regionAttachment.color;
+					var alpha = skeletonColor.a * slotColor.a * regionColor.a;
+					var color = this.tempColor;
+					color.set(skeletonColor.r * slotColor.r * regionColor.r, skeletonColor.g * slotColor.g * regionColor.g, skeletonColor.b * slotColor.b * regionColor.b, alpha);
 					var att = attachment;
 					var bone = slot.bone;
-					var x = vertices[0];
-					var y = vertices[1];
-					var rotation = (bone.getWorldRotationX() - att.rotation) * Math.PI / 180;
-					var xx = vertices[24] - vertices[0];
-					var xy = vertices[25] - vertices[1];
-					var yx = vertices[8] - vertices[0];
-					var yy = vertices[9] - vertices[1];
-					var w = Math.sqrt(xx * xx + xy * xy), h = -Math.sqrt(yx * yx + yy * yy);
-					ctx.translate(x, y);
-					ctx.rotate(rotation);
-					if (region.rotate) {
-						ctx.rotate(Math.PI / 2);
-						ctx.drawImage(image, region.x, region.y, region.height, region.width, 0, 0, h, -w);
-						ctx.rotate(-Math.PI / 2);
+					var w = region.width;
+					var h = region.height;
+					ctx.save();
+					ctx.transform(bone.a, bone.c, bone.b, bone.d, bone.worldX, bone.worldY);
+					ctx.translate(attachment.offset[0], attachment.offset[1]);
+					ctx.rotate(attachment.rotation * Math.PI / 180);
+					ctx.scale(attachment.scaleX, attachment.scaleY);
+					ctx.translate(w / 2, h / 2);
+					ctx.scale(1, -1);
+					ctx.translate(-w / 2, -h / 2);
+					if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
+						ctx.globalAlpha = color.a;
 					}
-					else {
-						ctx.drawImage(image, region.x, region.y, region.width, region.height, 0, 0, w, h);
-					}
+					ctx.drawImage(image, region.x, region.y, w, h, 0, 0, w, h);
 					if (this.debugRendering)
 						ctx.strokeRect(0, 0, w, h);
-					ctx.rotate(-rotation);
-					ctx.translate(-x, -y);
+					ctx.restore();
 				}
+				ctx.restore();
 			};
 			SkeletonRenderer.prototype.drawTriangles = function (skeleton) {
 				var blendMode = null;
@@ -8444,11 +8447,25 @@ var spine;
 			this.debugShader = spine.webgl.Shader.newColored(gl);
 			this.debugRenderer = new spine.webgl.SkeletonDebugRenderer(gl);
 			this.shapes = new spine.webgl.ShapeRenderer(gl);
-			var assets = this.assetManager = new spine.webgl.AssetManager(gl);
-			assets.loadText(config.atlas);
-			assets.loadText(config.json);
+			var assets = this.assetManager = new spine.webgl.AssetManager(gl, config.imagesPath ? config.imagesPath : "");
+			if (!config.atlasContent) {
+				assets.loadText(config.atlas);
+			}
+			if (!config.jsonContent) {
+				assets.loadText(config.json);
+			}
 			if (config.atlasPages == null) {
-				assets.loadTexture(config.atlas.replace(".atlas", ".png"));
+				if (config.atlas) {
+					var atlasPage = config.atlas.replace(".atlas", ".png");
+					if (atlasPage.lastIndexOf(config.imagesPath) == 0) {
+						atlasPage = atlasPage.substr(config.imagesPath.length);
+					}
+					assets.loadTexture(atlasPage);
+				}
+				else {
+					var firstLine = config.atlasContent.trim().split("\n")[0];
+					assets.loadTexture(firstLine);
+				}
 			}
 			else {
 				for (var i = 0; i < config.atlasPages.length; i++) {
@@ -8458,10 +8475,10 @@ var spine;
 			requestAnimationFrame(function () { _this.load(); });
 		}
 		SpineWidget.prototype.validateConfig = function (config) {
-			if (!config.atlas)
-				throw new Error("Please specify config.atlas");
-			if (!config.json)
-				throw new Error("Please specify config.json");
+			if (!config.atlas && !config.atlasContent)
+				throw new Error("Please specify config.atlas or config.atlasContent");
+			if (!config.json && !config.jsonContent)
+				throw new Error("Please specify config.json or config.jsonContent");
 			if (!config.animation)
 				throw new Error("Please specify config.animationName");
 			if (!config.scale)
@@ -8479,13 +8496,24 @@ var spine;
 			if (!config.backgroundColor)
 				config.backgroundColor = "#555555";
 			if (!config.imagesPath) {
-				var index = config.atlas.lastIndexOf("/");
-				if (index != -1) {
-					config.imagesPath = config.atlas.substr(0, index) + "/";
+				if (config.atlas) {
+					var index = config.atlas.lastIndexOf("/");
+					if (index != -1) {
+						config.imagesPath = config.atlas.substr(0, index) + "/";
+					}
+					else {
+						config.imagesPath = "";
+					}
 				}
 				else {
 					config.imagesPath = "";
 				}
+			}
+			if (config.json && config.json.lastIndexOf(config.imagesPath) == 0) {
+				config.json = config.json.substr(config.imagesPath.length);
+			}
+			if (config.atlas && config.atlas.lastIndexOf(config.imagesPath) == 0) {
+				config.atlas = config.atlas.substr(config.imagesPath.length);
 			}
 			if (!config.premultipliedAlpha === undefined)
 				config.premultipliedAlpha = false;
@@ -8508,14 +8536,16 @@ var spine;
 					else
 						throw new Error("Failed to load assets: " + JSON.stringify(assetManager.getErrors()));
 				}
-				var atlas = new spine.TextureAtlas(this.assetManager.get(this.config.atlas), function (path) {
-					var texture = assetManager.get(imagesPath + path);
+				var atlasContent = config.atlasContent === undefined ? this.assetManager.get(this.config.atlas) : config.atlasContent;
+				var atlas = new spine.TextureAtlas(atlasContent, function (path) {
+					var texture = assetManager.get(path);
 					return texture;
 				});
 				var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 				var skeletonJson = new spine.SkeletonJson(atlasLoader);
 				skeletonJson.scale = config.scale;
-				var skeletonData = skeletonJson.readSkeletonData(assetManager.get(config.json));
+				var jsonContent = config.jsonContent === undefined ? assetManager.get(config.json) : config.jsonContent;
+				var skeletonData = skeletonJson.readSkeletonData(jsonContent);
 				var skeleton = this.skeleton = new spine.Skeleton(skeletonData);
 				var bounds = this.bounds;
 				skeleton.setSkinByName(config.skin);
@@ -8527,7 +8557,7 @@ var spine;
 					skeleton.y = config.y;
 				}
 				var animationState = this.state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
-				animationState.setAnimation(0, config.animation, true);
+				animationState.setAnimation(0, config.animation, config.loop);
 				if (config.success)
 					config.success(this);
 				this.loaded = true;

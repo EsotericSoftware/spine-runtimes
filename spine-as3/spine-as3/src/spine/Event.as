@@ -29,27 +29,25 @@
  *****************************************************************************/
 
 package spine {
+	public class Event {
+		internal var _data : EventData;
+		public var time : Number;
+		public var intValue : int;
+		public var floatValue : Number;
+		public var stringValue : String;
 
-public class Event {
-	internal var _data:EventData;
-	public var time:Number;
-	public var intValue:int;
-	public var floatValue:Number;
-	public var stringValue:String;
+		public function Event(time : Number, data : EventData) {
+			if (data == null) throw new ArgumentError("data cannot be null.");
+			this.time = time;
+			_data = data;
+		}
 
-	public function Event (time:Number, data:EventData) {
-		if (data == null) throw new ArgumentError("data cannot be null.");
-		this.time = time;
-		_data = data;
+		public function get data() : EventData {
+			return _data;
+		}
+
+		public function toString() : String {
+			return _data._name;
+		}
 	}
-
-	public function get data () : EventData {
-		return _data;
-	}
-
-	public function toString () : String {
-		return _data._name;
-	}
-}
-
 }

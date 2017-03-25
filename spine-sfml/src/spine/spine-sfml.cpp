@@ -92,37 +92,42 @@ void SkeletonDrawable::update (float deltaTime) {
 
 void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 	vertexArray->clear();
+	states.texture = 0;
 
 	sf::Vertex vertices[4];
 	sf::Vertex vertex;
+	Texture* texture = 0;
 	for (int i = 0; i < skeleton->slotsCount; ++i) {
 		Slot* slot = skeleton->drawOrder[i];
 		Attachment* attachment = slot->attachment;
 		if (!attachment) continue;
 
-		sf::BlendMode blend;
-		switch (slot->data->blendMode) {
-		case BLEND_MODE_ADDITIVE:
-			blend = BlendAdd;
-			break;
-		case BLEND_MODE_MULTIPLY:
-			blend = BlendMultiply;
-			break;
-		case BLEND_MODE_SCREEN: // Unsupported, fall through.
-		default:
-			blend = BlendAlpha;
-		}
-		if (states.blendMode != blend) {
-			target.draw(*vertexArray, states);
-			vertexArray->clear();
-			states.blendMode = blend;
-		}
-
-		Texture* texture = 0;
 		if (attachment->type == ATTACHMENT_REGION) {
 			RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
 			texture = (Texture*)((AtlasRegion*)regionAttachment->rendererObject)->page->rendererObject;
 			spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, worldVertices, 0, 2);
+
+			sf::BlendMode blend;
+			switch (slot->data->blendMode) {
+				case BLEND_MODE_ADDITIVE:
+					blend = BlendAdd;
+					break;
+				case BLEND_MODE_MULTIPLY:
+					blend = BlendMultiply;
+					break;
+				case BLEND_MODE_SCREEN: // Unsupported, fall through.
+				default:
+					blend = BlendAlpha;
+			}
+
+			if (states.texture == 0) states.texture = texture;
+
+			if (states.blendMode != blend || states.texture != texture) {
+				target.draw(*vertexArray, states);
+				vertexArray->clear();
+				states.blendMode = blend;
+				states.texture = texture;
+			}
 
 			Uint8 r = static_cast<Uint8>(skeleton->color.r * slot->color.r * 255);
 			Uint8 g = static_cast<Uint8>(skeleton->color.g * slot->color.g * 255);
@@ -179,6 +184,28 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 			texture = (Texture*)((AtlasRegion*)mesh->rendererObject)->page->rendererObject;
 			spVertexAttachment_computeWorldVertices(SUPER(mesh), slot, 0, mesh->super.worldVerticesLength, worldVertices, 0, 2);
 
+			sf::BlendMode blend;
+			switch (slot->data->blendMode) {
+				case BLEND_MODE_ADDITIVE:
+					blend = BlendAdd;
+					break;
+				case BLEND_MODE_MULTIPLY:
+					blend = BlendMultiply;
+					break;
+				case BLEND_MODE_SCREEN: // Unsupported, fall through.
+				default:
+					blend = BlendAlpha;
+			}
+
+			if (states.texture == 0) states.texture = texture;
+
+			if (states.blendMode != blend || states.texture != texture) {
+				target.draw(*vertexArray, states);
+				vertexArray->clear();
+				states.blendMode = blend;
+				states.texture = texture;
+			}
+
 			Uint8 r = static_cast<Uint8>(skeleton->color.r * slot->color.r * 255);
 			Uint8 g = static_cast<Uint8>(skeleton->color.g * slot->color.g * 255);
 			Uint8 b = static_cast<Uint8>(skeleton->color.b * slot->color.b * 255);
@@ -199,12 +226,8 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 			}
 
 		}
-
-		if (texture) {
-			// SMFL doesn't handle batching for us, so we'll just force a single texture per skeleton.
-			states.texture = texture;
-		}
 	}
+
 	target.draw(*vertexArray, states);
 }
 

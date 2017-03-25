@@ -29,14 +29,12 @@
  *****************************************************************************/
 
 package spine.attachments {
+	public dynamic class PathAttachment extends VertexAttachment {
+		public var lengths : Vector.<Number>;
+		public var closed : Boolean, constantSpeed : Boolean;
 
-public dynamic class PathAttachment extends VertexAttachment {
-	public var lengths:Vector.<Number>;
-	public var closed:Boolean, constantSpeed:Boolean;
-
-	public function PathAttachment (name:String) {
-		super(name);
+		public function PathAttachment(name : String) {
+			super(name);
+		}
 	}
-}
-
 }

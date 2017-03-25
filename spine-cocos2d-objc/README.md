@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-cocos2d-objc works with data exported from Spine 3.5.xx.
+spine-cocos2d-objc works with data exported from Spine 3.6.x.
 
 spine-cocos2d-objc supports all Spine features.
 
@@ -28,6 +28,9 @@ See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documen
 ## Examples
 
 The Spine cocos2d-objc example works on iOS simulators and devices.
+
+## Notes
+* To enable two color tinting, set `SkeletonRenderer.twoColorTint = true`. Note that skeletons rendered with this feature will not batch with other skeletons.
 
 ### iOS
 1. Install [Xcode](https://developer.apple.com/xcode/)

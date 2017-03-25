@@ -9,13 +9,93 @@
 <div style="margin-bottom: 20px; width: 100%; height: 150px;" class="spine-widget" data-json="assets/raptor.json" data-atlas="assets/raptor.atlas" data-animation="Jump" data-fit-to-canvas="false" data-scale="0.1" data-x="200" data-y="10"></div>
 <!-- Or make things real small -->
 <div style="margin-bottom: 20px; width: 320px; height: 240px;" class="spine-widget" data-json="assets/raptor.json" data-atlas="assets/raptor.atlas" data-animation="walk" data-background-color="#cc0000"></div>
+<!-- You can also specify the .JSON and .atlas files inline to reduce the number of requests made to the server -->
+<div id="spine-widget-inline" style="margin-bottom: 20px; width: 640px; height: 480px;"></div>
 </center>
 </body>
+
+<script id="atlas" type="text/plain">
+spine-logo.png
+size: 128,64
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+logo
+  rotate: false
+  xy: 2, 2
+  size: 104, 32
+  orig: 104, 32
+  offset: 0, 0
+  index: -1
+</script>
+
+<script id="atlasPage" type="text/plain">
+data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAABACAYAAADS1n9/AAAFLElEQVR42u2bTWhVRxTH//myJtTmGT+SYEvTFGvTRBOTV8tLbXwL0e3bZCEiBtRuzUa6ElJX2QgKiqibiG4MfiSCiHaToohowQQEUShY/MCNNQUXLtSUs7gwDHPvzLx737svef8fDNHk3nnnnPnP3DNn7gMIIWTR0NKAlpPrcXKqB1Py80A7DvSvQH9DDRoYnSpgvBPjC3ks6O3DNnx4NYhXc1nM3dmMO5PdmDz4JQ4ur8VyRm0Jcbkbl00CCGsn1uMEo7aEuNSNSz4CmOnDDKNWBH19fQOjo6O/qU1+53p/Pp/fLq2jo6Mzqt9CoTDsY9fhr3HYRwAXunDBp/8wu8XOOHab0Pv0jXHJBn5qavqP+fn/FkxtZubPv2xGSgCD68WpoF+519Tns2f//Osa0NZlaH3zM964CmDXWuzyGfzApomJc5OB3bOzc38XGwsTEhPxOSzGEv9UhCCq1w0T5/UABIPqKoCRkZFfw5xVm6sIJOt/sgVPbIP/MIuHPrsD1W4ZBBe7JTaZTGal62ccO3b8tEssZBzKLgLVOJkB6jIoTkpAxGEfAaizXu6VPoJlVp8J8m/XYNbXoH54DYbPd+H805/w9P0Q3gcD/3Yr3p7ZgDOrGrDKd/lXbQmzW2LjMyHUma/2L/9X/dVXX19xxUZ1KuyD5fc2o9RAqjPKdJ9+rWswTTTXozlTj0yx95vslsE22a2KQAbTZXVV+5XPCrtWnTRx4hFLAHH60QMpDrmuPLZrS4lut4jWdUBty/XY2O/jwbXiry05TCUePg75BNK2YqgOxxVfkgKw2a3mRlEz2vfaJCejF/qyJs+9JAKZ5PIo5L5A7sYm3Li9Gbevb8T1iz/gohSI7vXj3sscXs5vxfz9AdyPkwO42K0+r202+w5oUpPRewto2gXoyUrSgdQdtgXzag+uumwBd7didyUIwPRosTWfeCQuAtO+15S1piWA6R5ML2YB+LZUagKy/JsKNyIOn0JQKQRw5BscsQ3+pzw+dTaisxIFoFf/olqxj+FEVwS9eGHLTEstAKkGvsjhRZQAxjowVurcpVgBLMqzAb0qlqTDIjKf7FtY9xnWnd2As68H8VotAF3biGs7WrCjHMmrqwDEH7Vf/Zxh0aA6HFWg0ANpc1itkMkjxteupjo0NdaiMeltYJK7ADWvSn1ZT0IAUU6YCkFRlUU1OLYiSTnrAEkKQC0EpVnsiizGSPDDZqsMlLpFjEoETVmvOG3qW88v4ma8ckaQXYFsYTUKlZIEmmodLkKXSVa2HUCwDMsgi3EiiODwIzgEcimRRm17pG+ZCcE5uL7flb/52l1Xg7p97dg38T0m7vbj7rtf8C7ICaQgJOcDlSAA/VGn1liCOAexlvgHk61sZwGuR7ZimO2ZrgdSBjzq/Nv2mIhiZwt2Ru0GfBLCUgvAtOLZWlkPg8L2/urKUGwhKOxFk6DAVKzNg80YjBLA9pVwrqKpuxGXEz61dO5TrZNro166kc+WvlNLFmWQ1WXJtxQZNZMkyMX2a6K2BrWzWcyaBv9KD67II6JSk2pTnFN/JSyNbDoubcvQduo7nHowgAe3enHr6Lc4OpTBEEh1CIBQAIQCIFUtgN7P0Ssvhz76EY/kq2GPt+Dx8xyeH/oKhzgiZUZ9vbxcZc+9bdhr2gnIN4k4IlVAVxO6Pm7DR10A+9uxn9GpEqQqKO8IyjeEb27CzT2t2MOoEEIIIYQQQgghhBBCCCGEEEIIIYQQQgghhBBCCCGEEEIIIYQQQpYG/wPiudlO23hTHQAAAABJRU5ErkJggg==
+</script>
+
+<script id="json" type="text/plain">
+{
+"skeleton": { "hash": "MYXtB/H4Z2fp6J+/XZiyN+f9Hfc", "spine": "3.5.49", "width": 104, "height": 32, "images": "" },
+"bones": [
+	{ "name": "root" }
+],
+"slots": [
+	{ "name": "spine-logo", "bone": "root", "attachment": "logo" }
+],
+"skins": {
+	"default": {
+		"spine-logo": {
+			"logo": { "width": 104, "height": 32 }
+		}
+	}
+},
+"animations": {
+	"animation": {
+		"bones": {
+			"root": {
+				"rotate": [
+					{ "time": 0, "angle": 0 },
+					{ "time": 0.8333, "angle": 39.96 },
+					{ "time": 1.6667, "angle": 0 }
+				],
+				"scale": [
+					{ "time": 0, "x": 1, "y": 1 },
+					{ "time": 0.8333, "x": 3, "y": 3 },
+					{ "time": 1.6667, "x": 1, "y": 1 }
+				]
+			}
+		}
+	}
+}
+}
+</script>
+
 <script>
 new spine.SpineWidget("spine-widget", {
 	json: "assets/spineboy.json",
 	atlas: "assets/spineboy.atlas",
 	animation: "run",
+	backgroundColor: "#00000000",
+	debug: true,
+	success: function (widget) {
+		var animIndex = 0;
+		widget.canvas.onclick = function () {
+			animIndex++;
+			var animations = widget.skeleton.data.animations;
+			if (animIndex >= animations.length) animIndex = 0;
+			widget.setAnimation(animations[animIndex].name);
+		}
+	}
+});
+
+json = document.getElementById("json").innerHTML;
+atlas = document.getElementById("atlas").innerHTML;
+
+new spine.SpineWidget("spine-widget-inline", {
+	jsonContent: json,
+	atlasContent: atlas,
+	imagesPath: "assets/",
+	animation: "animation",
 	backgroundColor: "#00000000",
 	debug: true,
 	success: function (widget) {
@@ -28,6 +108,7 @@ new spine.SpineWidget("spine-widget", {
 		}
 	}
 });
+
 </script>
 </body>
 </html>

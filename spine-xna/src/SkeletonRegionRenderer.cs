@@ -90,7 +90,7 @@ namespace Spine {
 				Slot slot = drawOrderItems[i];
 				RegionAttachment regionAttachment = slot.Attachment as RegionAttachment;
 				if (regionAttachment != null) {
-					BlendState blend = slot.Data.BlendMode == BlendMode.additive ? BlendState.Additive : defaultBlendState;
+					BlendState blend = slot.Data.BlendMode == BlendMode.Additive ? BlendState.Additive : defaultBlendState;
 					if (device.BlendState != blend) {
 						End();
 						device.BlendState = blend;
@@ -113,29 +113,29 @@ namespace Spine {
 					item.vertexTR.Color = color;
 
 					float[] vertices = this.vertices;
-					regionAttachment.ComputeWorldVertices(slot.Bone, vertices);
-					item.vertexTL.Position.X = vertices[RegionAttachment.X1];
-					item.vertexTL.Position.Y = vertices[RegionAttachment.Y1];
+					regionAttachment.ComputeWorldVertices(slot.Bone, vertices, 0, 2);
+					item.vertexTL.Position.X = vertices[0];
+					item.vertexTL.Position.Y = vertices[1];
 					item.vertexTL.Position.Z = 0;
-					item.vertexBL.Position.X = vertices[RegionAttachment.X2];
-					item.vertexBL.Position.Y = vertices[RegionAttachment.Y2];
+					item.vertexBL.Position.X = vertices[2];
+					item.vertexBL.Position.Y = vertices[3];
 					item.vertexBL.Position.Z = 0;
-					item.vertexBR.Position.X = vertices[RegionAttachment.X3];
-					item.vertexBR.Position.Y = vertices[RegionAttachment.Y3];
+					item.vertexBR.Position.X = vertices[4];
+					item.vertexBR.Position.Y = vertices[5];
 					item.vertexBR.Position.Z = 0;
-					item.vertexTR.Position.X = vertices[RegionAttachment.X4];
-					item.vertexTR.Position.Y = vertices[RegionAttachment.Y4];
+					item.vertexTR.Position.X = vertices[6];
+					item.vertexTR.Position.Y = vertices[7];
 					item.vertexTR.Position.Z = 0;
 
 					float[] uvs = regionAttachment.UVs;
-					item.vertexTL.TextureCoordinate.X = uvs[RegionAttachment.X1];
-					item.vertexTL.TextureCoordinate.Y = uvs[RegionAttachment.Y1];
-					item.vertexBL.TextureCoordinate.X = uvs[RegionAttachment.X2];
-					item.vertexBL.TextureCoordinate.Y = uvs[RegionAttachment.Y2];
-					item.vertexBR.TextureCoordinate.X = uvs[RegionAttachment.X3];
-					item.vertexBR.TextureCoordinate.Y = uvs[RegionAttachment.Y3];
-					item.vertexTR.TextureCoordinate.X = uvs[RegionAttachment.X4];
-					item.vertexTR.TextureCoordinate.Y = uvs[RegionAttachment.Y4];
+					item.vertexTL.TextureCoordinate.X = uvs[0];
+					item.vertexTL.TextureCoordinate.Y = uvs[1];
+					item.vertexBL.TextureCoordinate.X = uvs[2];
+					item.vertexBL.TextureCoordinate.Y = uvs[3];
+					item.vertexBR.TextureCoordinate.X = uvs[4];
+					item.vertexBR.TextureCoordinate.Y = uvs[5];
+					item.vertexTR.TextureCoordinate.X = uvs[6];
+					item.vertexTR.TextureCoordinate.Y = uvs[7];
 				}
 			}
 		}

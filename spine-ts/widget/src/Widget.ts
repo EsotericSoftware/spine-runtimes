@@ -77,11 +77,24 @@ module spine {
 			this.debugRenderer = new spine.webgl.SkeletonDebugRenderer(gl);
 			this.shapes = new spine.webgl.ShapeRenderer(gl);
 
-			let assets = this.assetManager = new spine.webgl.AssetManager(gl);
-			assets.loadText(config.atlas);
-			assets.loadText(config.json);
+			let assets = this.assetManager = new spine.webgl.AssetManager(gl, config.imagesPath ? config.imagesPath : "");
+			if (!config.atlasContent) {
+				assets.loadText(config.atlas);
+			}
+			if (!config.jsonContent) {
+				assets.loadText(config.json);
+			}
 			if (config.atlasPages == null) {
-				assets.loadTexture(config.atlas.replace(".atlas", ".png"));
+				if (config.atlas) {
+					var atlasPage = config.atlas.replace(".atlas", ".png");
+					if (atlasPage.lastIndexOf(config.imagesPath) == 0) {
+						atlasPage = atlasPage.substr(config.imagesPath.length);
+					}
+					assets.loadTexture(atlasPage);
+				} else {
+					let firstLine = config.atlasContent.trim().split("\n")[0];
+					assets.loadTexture(firstLine);
+				}
 			} else {
 				for (let i = 0; i < config.atlasPages.length; i++) {
 					assets.loadTexture(config.atlasPages[i]);
@@ -91,8 +104,8 @@ module spine {
 		}
 
 		private validateConfig (config: SpineWidgetConfig) {
-			if (!config.atlas) throw new Error("Please specify config.atlas");
-			if (!config.json) throw new Error("Please specify config.json");
+			if (!config.atlas && !config.atlasContent) throw new Error("Please specify config.atlas or config.atlasContent");
+			if (!config.json && !config.jsonContent) throw new Error("Please specify config.json or config.jsonContent");
 			if (!config.animation) throw new Error("Please specify config.animationName");
 
 			if (!config.scale) config.scale = 1.0;
@@ -103,12 +116,22 @@ module spine {
 			if (config.fitToCanvas === undefined) config.fitToCanvas = true;
 			if (!config.backgroundColor) config.backgroundColor = "#555555";
 			if (!config.imagesPath) {
-				let index = config.atlas.lastIndexOf("/");
-				if (index != -1) {
-					config.imagesPath = config.atlas.substr(0, index) + "/";
+				if (config.atlas) {
+					let index = config.atlas.lastIndexOf("/");
+					if (index != -1) {
+						config.imagesPath = config.atlas.substr(0, index) + "/";
+					} else {
+						config.imagesPath = "";
+					}
 				} else {
 					config.imagesPath = "";
 				}
+			}
+			if (config.json && config.json.lastIndexOf(config.imagesPath) == 0) {
+				config.json = config.json.substr(config.imagesPath.length);
+			}
+			if (config.atlas && config.atlas.lastIndexOf(config.imagesPath) == 0) {
+				config.atlas = config.atlas.substr(config.imagesPath.length);
 			}
 			if (!config.premultipliedAlpha === undefined) config.premultipliedAlpha = false;
 			if (!config.debug === undefined) config.debug = false;
@@ -127,8 +150,9 @@ module spine {
 					else throw new Error("Failed to load assets: " + JSON.stringify(assetManager.getErrors()));
 				}
 
-				let atlas = new spine.TextureAtlas(this.assetManager.get(this.config.atlas) as string, (path: string) => {
-					let texture = assetManager.get(imagesPath + path) as spine.webgl.GLTexture;
+				let atlasContent = config.atlasContent === undefined ? this.assetManager.get(this.config.atlas) as string : config.atlasContent;
+				let atlas = new spine.TextureAtlas(atlasContent, (path: string) => {
+					let texture = assetManager.get(path) as spine.webgl.GLTexture;
 					return texture;
 				});
 
@@ -137,7 +161,8 @@ module spine {
 
 				// Set the scale to apply during parsing, parse the file, and create a new skeleton.
 				skeletonJson.scale = config.scale;
-				var skeletonData = skeletonJson.readSkeletonData(assetManager.get(config.json) as string);
+				let jsonContent = config.jsonContent === undefined ? assetManager.get(config.json) as string : config.jsonContent;
+				var skeletonData = skeletonJson.readSkeletonData(jsonContent);
 				var skeleton = this.skeleton = new spine.Skeleton(skeletonData);
 				var bounds = this.bounds;
 				skeleton.setSkinByName(config.skin);
@@ -150,7 +175,7 @@ module spine {
 				}
 
 				var animationState = this.state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
-				animationState.setAnimation(0, config.animation, true);
+				animationState.setAnimation(0, config.animation, config.loop);
 				if (config.success) config.success(this);
 				this.loaded = true;
 				requestAnimationFrame(() => { this.render(); });
@@ -307,10 +332,13 @@ module spine {
 
 	export class SpineWidgetConfig {
 		json: string;
+		jsonContent: any;
 		atlas: string;
+		atlasContent: string;
 		animation: string;
 		imagesPath: string;
 		atlasPages: string[];
+		atlasPagesContent: string[];
 		skin = "default";
 		loop = true;
 		scale = 1.0;

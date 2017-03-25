@@ -46,6 +46,9 @@ void* _calloc (size_t num, size_t size, const char* file, int line) {
 	if (ptr) memset(ptr, 0, num * size);
 	return ptr;
 }
+void* _realloc(void* ptr, size_t size) {
+	return realloc(ptr, size);
+}
 void _free (void* ptr) {
 	freeFunc(ptr);
 }

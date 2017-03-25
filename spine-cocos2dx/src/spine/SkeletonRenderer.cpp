@@ -31,6 +31,7 @@
 #include <spine/SkeletonRenderer.h>
 #include <spine/extension.h>
 #include <spine/SkeletonBatch.h>
+#include <spine/SkeletonTwoColorBatch.h>
 #include <spine/AttachmentVertices.h>
 #include <spine/Cocos2dAttachmentLoader.h>
 #include <algorithm>
@@ -177,6 +178,8 @@ void SkeletonRenderer::update (float deltaTime) {
 
 void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t transformFlags) {
 	SkeletonBatch* batch = SkeletonBatch::getInstance();
+	SkeletonTwoColorBatch* twoColorBatch = SkeletonTwoColorBatch::getInstance();
+	bool isTwoColorTint = this->isTwoColorTint();
 
 	Color3B nodeColor = getColor();
 	_skeleton->color.r = nodeColor.r / (float)255;
@@ -185,42 +188,91 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	_skeleton->color.a = getDisplayedOpacity() / (float)255;
     
     Color4F color;
+	Color4F darkColor;
 	AttachmentVertices* attachmentVertices = nullptr;
+	TwoColorTrianglesCommand* lastTwoColorTrianglesCommand = nullptr;
 	for (int i = 0, n = _skeleton->slotsCount; i < n; ++i) {
 		spSlot* slot = _skeleton->drawOrder[i];
 		if (!slot->attachment) continue;
 		
 		cocos2d::TrianglesCommand::Triangles triangles;
+		TwoColorTriangles trianglesTwoColor;
 		
 		switch (slot->attachment->type) {
 		case SP_ATTACHMENT_REGION: {
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
 			attachmentVertices = getAttachmentVertices(attachment);
-			triangles.indices = attachmentVertices->_triangles->indices;
-			triangles.indexCount = attachmentVertices->_triangles->indexCount;
-			triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
-			triangles.vertCount = attachmentVertices->_triangles->vertCount;
-			memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
-			spRegionAttachment_computeWorldVertices(attachment, slot->bone, (float*)triangles.verts, 0, 6);
+			
+			if (!isTwoColorTint) {
+				triangles.indices = attachmentVertices->_triangles->indices;
+				triangles.indexCount = attachmentVertices->_triangles->indexCount;
+				triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
+				triangles.vertCount = attachmentVertices->_triangles->vertCount;
+				memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
+				spRegionAttachment_computeWorldVertices(attachment, slot->bone, (float*)triangles.verts, 0, 6);
+			} else {
+				trianglesTwoColor.indices = attachmentVertices->_triangles->indices;
+				trianglesTwoColor.indexCount = attachmentVertices->_triangles->indexCount;
+				trianglesTwoColor.verts = twoColorBatch->allocateVertices(attachmentVertices->_triangles->vertCount);
+				trianglesTwoColor.vertCount = attachmentVertices->_triangles->vertCount;
+				for (int i = 0; i < trianglesTwoColor.vertCount; i++) {
+					trianglesTwoColor.verts[i].texCoords = attachmentVertices->_triangles->verts[i].texCoords;
+				}
+				spRegionAttachment_computeWorldVertices(attachment, slot->bone, (float*)trianglesTwoColor.verts, 0, 7);
+			}
+			
             color.r = attachment->color.r;
 			color.g = attachment->color.g;
 			color.b = attachment->color.b;
 			color.a = attachment->color.a;
+			
+			if (slot->darkColor) {
+				darkColor.r = slot->darkColor->r * 255;
+				darkColor.g = slot->darkColor->g * 255;
+				darkColor.b = slot->darkColor->b * 255;
+			} else {
+				darkColor.r = 0;
+				darkColor.g = 0;
+				darkColor.b = 0;
+			}
 			break;
 		}
 		case SP_ATTACHMENT_MESH: {
 			spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
 			attachmentVertices = getAttachmentVertices(attachment);
-			triangles.indices = attachmentVertices->_triangles->indices;
-			triangles.indexCount = attachmentVertices->_triangles->indexCount;
-			triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
-			triangles.vertCount = attachmentVertices->_triangles->vertCount;
-			memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
-			spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, triangles.vertCount * sizeof(cocos2d::V3F_C4B_T2F) / 4, (float*)triangles.verts, 0, 6);
+			
+			if (!isTwoColorTint) {
+				triangles.indices = attachmentVertices->_triangles->indices;
+				triangles.indexCount = attachmentVertices->_triangles->indexCount;
+				triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
+				triangles.vertCount = attachmentVertices->_triangles->vertCount;
+				memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
+				spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, triangles.vertCount * sizeof(cocos2d::V3F_C4B_T2F) / 4, (float*)triangles.verts, 0, 6);
+			} else {
+				trianglesTwoColor.indices = attachmentVertices->_triangles->indices;
+				trianglesTwoColor.indexCount = attachmentVertices->_triangles->indexCount;
+				trianglesTwoColor.verts = twoColorBatch->allocateVertices(attachmentVertices->_triangles->vertCount);
+				trianglesTwoColor.vertCount = attachmentVertices->_triangles->vertCount;
+				for (int i = 0; i < trianglesTwoColor.vertCount; i++) {
+					trianglesTwoColor.verts[i].texCoords = attachmentVertices->_triangles->verts[i].texCoords;
+				}
+				spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, trianglesTwoColor.vertCount * sizeof(V3F_C4B_C4B_T2F) / 4, (float*)trianglesTwoColor.verts, 0, 7);
+			}
+			
             color.r = attachment->color.r;
             color.g = attachment->color.g;
             color.b = attachment->color.b;
-            color.a = attachment->color.a;
+			color.a = attachment->color.a;
+			
+			if (slot->darkColor) {
+				darkColor.r = slot->darkColor->r * 255;
+				darkColor.g = slot->darkColor->g * 255;
+				darkColor.b = slot->darkColor->b * 255;
+			} else {
+				darkColor.r = 0;
+				darkColor.g = 0;
+				darkColor.b = 0;
+			}
 			break;
 		}
 		default:
@@ -252,14 +304,67 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
 		}
 		
-		const cocos2d::TrianglesCommand::Triangles& batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture->getName(), _glProgramState, blendFunc, triangles, transform, transformFlags);
-        
-		for (int v = 0, vn = batchedTriangles.vertCount; v < vn; ++v) {
-			V3F_C4B_T2F* vertex = batchedTriangles.verts + v;
-            vertex->colors.r = (GLubyte)color.r;
-            vertex->colors.g = (GLubyte)color.g;
-            vertex->colors.b = (GLubyte)color.b;
-            vertex->colors.a = (GLubyte)color.a;
+		if (!isTwoColorTint) {
+			cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture->getName(), _glProgramState, blendFunc, triangles, transform, transformFlags);
+			
+			for (int v = 0, vn = batchedTriangles->getTriangles().vertCount; v < vn; ++v) {
+				V3F_C4B_T2F* vertex = batchedTriangles->getTriangles().verts + v;
+				vertex->colors.r = (GLubyte)color.r;
+				vertex->colors.g = (GLubyte)color.g;
+				vertex->colors.b = (GLubyte)color.b;
+				vertex->colors.a = (GLubyte)color.a;
+			}
+		} else {
+			TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture->getName(), _glProgramState, blendFunc, trianglesTwoColor, transform, transformFlags);
+			
+			for (int v = 0, vn = batchedTriangles->getTriangles().vertCount; v < vn; ++v) {
+				V3F_C4B_C4B_T2F* vertex = batchedTriangles->getTriangles().verts + v;
+				vertex->color.r = (GLubyte)color.r;
+				vertex->color.g = (GLubyte)color.g;
+				vertex->color.b = (GLubyte)color.b;
+				vertex->color.a = (GLubyte)color.a;
+				vertex->color2.r = (GLubyte)darkColor.r;
+				vertex->color2.g = (GLubyte)darkColor.g;
+				vertex->color2.b = (GLubyte)darkColor.b;
+				vertex->color2.a = 1;
+			}
+		}
+	}
+	
+	if (lastTwoColorTrianglesCommand) {
+		Node* parent = this->getParent();
+		
+		// We need to decide if we can postpone flushing the current
+		// batch. We can postpone if the next sibling node is a
+		// two color tinted skeleton with the same global-z.
+		// The parent->getChildrenCount() > 100 check is a hack
+		// as checking for a sibling is an O(n) operation, and if
+		// all children of this nodes parent are skeletons, we
+		// are in O(n2) territory.
+		if (!parent || parent->getChildrenCount() > 100 || getChildrenCount() != 0) {
+			lastTwoColorTrianglesCommand->setForceFlush(true);
+		} else {
+			Vector<Node*>& children = parent->getChildren();
+			Node* sibling = nullptr;
+			for (ssize_t i = 0; i < children.size(); i++) {
+				if (children.at(i) == this) {
+					if (i < children.size() - 1) {
+						sibling = children.at(i+1);
+						break;
+					}
+				}
+			}
+			if (!sibling) {
+				lastTwoColorTrianglesCommand->setForceFlush(true);
+			} else {
+				SkeletonRenderer* siblingSkeleton = dynamic_cast<SkeletonRenderer*>(sibling);
+				if (!siblingSkeleton || // flush is next sibling isn't a SkeletonRenderer
+					!siblingSkeleton->isTwoColorTint() || // flush if next sibling isn't two color tinted
+					!siblingSkeleton->isVisible() || // flush if next sibling is two color tinted but not visible
+					(siblingSkeleton->getGlobalZOrder() != this->getGlobalZOrder())) { // flush if next sibling is two color tinted but z-order differs
+					lastTwoColorTrianglesCommand->setForceFlush(true);
+				}
+			}
 		}
 	}
 
@@ -393,6 +498,17 @@ bool SkeletonRenderer::setAttachment (const std::string& slotName, const std::st
 }
 bool SkeletonRenderer::setAttachment (const std::string& slotName, const char* attachmentName) {
 	return spSkeleton_setAttachment(_skeleton, slotName.c_str(), attachmentName) ? true : false;
+}
+	
+void SkeletonRenderer::setTwoColorTint(bool enabled) {
+	if (enabled)
+		setGLProgramState(SkeletonTwoColorBatch::getInstance()->getTwoColorTintProgramState());
+	else
+		setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
+}
+
+bool SkeletonRenderer::isTwoColorTint() {
+	return getGLProgramState() == SkeletonTwoColorBatch::getInstance()->getTwoColorTintProgramState();
 }
 
 spSkeleton* SkeletonRenderer::getSkeleton () {
