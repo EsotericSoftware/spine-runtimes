@@ -526,8 +526,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 				table.add(speedResetButton);
 				root.add(table).fill().row();
 			}
-			root.add();
-			root.add(multipleMixingCheckbox).row();
 			root.add("Default mix:");
 			{
 				Table table = table();
@@ -535,6 +533,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 				table.add(mixSlider).fillX().expandX();
 				root.add(table).fill().row();
 			}
+			root.add();
+			root.add(multipleMixingCheckbox).row();
 
 			window.add(root).expand().fill();
 			window.pack();
