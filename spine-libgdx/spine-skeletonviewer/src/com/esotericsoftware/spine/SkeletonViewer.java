@@ -185,6 +185,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 		skeleton.updateWorldTransform();
 
 		state = new AnimationState(new AnimationStateData(skeletonData));
+		state.setMultipleMixing(ui.multipleMixingCheckbox.isChecked());
 		state.addListener(new AnimationStateAdapter() {
 			public void event (TrackEntry entry, Event event) {
 				ui.toast(event.getData().getName());
@@ -702,7 +703,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 			multipleMixingCheckbox.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
-					state.setMultipleMixing(multipleMixingCheckbox.isChecked());
+					if (state != null) state.setMultipleMixing(multipleMixingCheckbox.isChecked());
 				}
 			});
 
