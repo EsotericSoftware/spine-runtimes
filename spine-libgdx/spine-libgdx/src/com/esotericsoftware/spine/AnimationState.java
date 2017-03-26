@@ -703,13 +703,13 @@ public class AnimationState {
 		this.timeScale = timeScale;
 	}
 
-	/** When false, only two animations can be mixed at once. Interrupting a mix by setting a new animation will choose from the
-	 * two old animations the one that is closest to being fully mixed in and the other is discarded. Discarding an animation in
-	 * this way may cause keyed values to jump.
+	/** When false, only two animations can be mixed at once. Interrupting a mix by setting a new animation will discard one of the
+	 * two old animations, keeping the one closest to being fully mixed in. Discarding an animation in this way may cause keyed
+	 * values to jump.
 	 * <p>
-	 * When true, any number of animations may be mixed at once without causing keyed values to jump. Mixing is done by mixing out
-	 * one or more animations while mixing in the newest one. When animations key the same value, this may cause "dipping", where
-	 * the value moves toward the setup pose as the old animation mixes out, then back to the keyed value as the new animation
+	 * When true, any number of animations can be mixed at once without causing keyed values to jump. Mixing is done by mixing out
+	 * one or more old animations while mixing in the newest one. When animations key the same value, this may cause "dipping",
+	 * where the value moves toward the setup pose as the old animations mix out, then back to the keyed value as the new animation
 	 * mixes in.
 	 * <p>
 	 * Defaults to false. */
