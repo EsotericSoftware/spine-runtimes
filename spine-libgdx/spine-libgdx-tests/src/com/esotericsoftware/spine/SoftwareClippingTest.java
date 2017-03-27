@@ -174,18 +174,23 @@ public class SoftwareClippingTest extends ApplicationAdapter {
 	}
 
 	private void clip () {
-		boolean clipped = clipper.clip(triangle, 0, triangle.length, 5, clippingPolygon, clippedPolygon);
+		float x1 = triangle[0];
+		float y1 = triangle[1];
+		float x2 = triangle[5];
+		float y2 = triangle[6];
+		float x3 = triangle[10];
+		float y3 = triangle[11];
+		
+		// must duplicate first vertex at end of polygon
+		// so we can avoid module/branch in clipping code
+		clippingPolygon.add(clippingPolygon.get(0));
+		clippingPolygon.add(clippingPolygon.get(1));
+		
+		boolean clipped = clipper.clip(x1, y1, x2, y2, x3, y3, clippingPolygon, clippedPolygon);
 		System.out.println("Clipped: " + clipped);
 		if (clipped) {
 			clippedPolygonVertices.clear();
 			clippedPolygonIndices.clear();
-			
-			float x1 = triangle[0];
-			float y1 = triangle[1];
-			float x2 = triangle[5];
-			float y2 = triangle[6];
-			float x3 = triangle[10];
-			float y3 = triangle[11];
 			
 			float d0 = y2 - y3;
 			float d1 = x3 - x2;
@@ -222,6 +227,8 @@ public class SoftwareClippingTest extends ApplicationAdapter {
 		} else {
 			clippedPolygon.clear();
 		}
+		
+		clippingPolygon.setSize(clippingPolygon.size - 2);
 	}
 
 	public static void main (String[] args) {

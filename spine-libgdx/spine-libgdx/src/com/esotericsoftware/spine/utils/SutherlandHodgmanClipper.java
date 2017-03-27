@@ -1,67 +1,91 @@
 
 package com.esotericsoftware.spine.utils;
 
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.FloatArray;
 
 public class SutherlandHodgmanClipper {
 	Vector2 tmp = new Vector2();
 	final FloatArray scratch = new FloatArray();
-	
-	/**
-	 * Clips the input triangle against the convex clipping area. If the triangle lies entirely
-	 * within the clipping area, false is returned.
-	 */
-	public boolean clip (float[] triangle, int offset, int length, int stride, FloatArray clippingArea, FloatArray output) {
+
+	public boolean clip(float x1, float y1, float x2, float y2, float x3, float y3, FloatArray clippingArea,
+			FloatArray output) {
 		boolean isClockwise = clockwise(clippingArea);
-		
-		FloatArray originalOutput = output;
+		return clip(x1, y1, x2, y2, x3, y3, clippingArea, output, isClockwise);
+	}
+
+	/**
+	 * Clips the input triangle against the convex clipping area. If the
+	 * triangle lies entirely within the clipping area, false is returned. The
+	 * clipping area must duplicate the first vertex at the end of the vertices
+	 * list!
+	 */
+	public boolean clip(float x1, float y1, float x2, float y2, float x3, float y3, FloatArray clippingArea,
+			FloatArray output, boolean isClockwise) {
+		final FloatArray originalOutput = output;
 		boolean clipped = false;
 		
-		FloatArray input = scratch;
-		input.clear();
-		for (int i = offset; i < offset + length; i+= stride) {
-			input.add(triangle[i]);
-			input.add(triangle[i + 1]);
+		FloatArray input = null;
+		// avoid copy at the end
+		if ((clippingArea.size / 2) % 2 != 0) {
+			input = output;
+			output = scratch;
+		} else {
+			input = scratch;
 		}
+		 
+		input.clear();
+		input.add(x1);
+		input.add(y1);
+		input.add(x2);
+		input.add(y2);
+		input.add(x3);
+		input.add(y3);
+		input.add(x1);
+		input.add(y1);
 		output.clear();
-		
-		for (int i = 0; i < clippingArea.size; i += 2) {
-			float edgeX = clippingArea.items[i];
-			float edgeY = clippingArea.items[i + 1];
-			float edgeX2 = clippingArea.items[(i + 2) % clippingArea.size];
-			float edgeY2 = clippingArea.items[(i + 3) % clippingArea.size];
-			
+
+		final float[] clippingVertices = clippingArea.items;
+		final int clippingVerticesLength = clippingArea.size - 2;
+		for (int i = 0; i < clippingVerticesLength; i += 2) {
+			float edgeX = clippingVertices[i];
+			float edgeY = clippingVertices[i + 1];
+			float edgeX2 = clippingVertices[i + 2];
+			float edgeY2 = clippingVertices[i + 3];
+
 			if (!isClockwise) {
 				float tmp = edgeX;
 				edgeX = edgeX2;
 				edgeX2 = tmp;
-				
+
 				tmp = edgeY;
 				edgeY = edgeY2;
 				edgeY2 = tmp;
 			}
 
-			for (int j = 0; j < input.size; j += 2) {
-				float inputX = input.items[j % input.size];
-				float inputY = input.items[(j + 1) % input.size];
-				float inputX2 = input.items[(j + 2) % input.size];
-				float inputY2 = input.items[(j + 3) % input.size];
-				
-				int side = pointLineSide(edgeX2, edgeY2, edgeX, edgeY, inputX, inputY);
-				int side2 = pointLineSide(edgeX2, edgeY2, edgeX, edgeY, inputX2, inputY2);
-				
+			final float deltaX = edgeX - edgeX2;
+			final float deltaY = edgeY - edgeY2;
+
+			final float[] inputVertices = input.items;
+			final int inputVerticesLength = input.size - 2;
+
+			for (int j = 0; j < inputVerticesLength; j += 2) {
+				final float inputX = inputVertices[j];
+				final float inputY = inputVertices[j + 1];
+				final float inputX2 = inputVertices[j + 2];
+				final float inputY2 = inputVertices[j + 3];
+
+				final int side = pointLineSide(deltaX, deltaY, edgeX2, edgeY2, inputX, inputY);
+				final int side2 = pointLineSide(deltaX, deltaY, edgeX2, edgeY2, inputX2, inputY2);
+
 				// v1 inside, v2 inside
 				if (side >= 0 && side2 >= 0) {
 					output.add(inputX2);
 					output.add(inputY2);
-				} 
+				}
 				// v1 inside, v2 outside
 				else if (side >= 0 && side2 < 0) {
-					if (!Intersector.intersectLines(edgeX, edgeY, edgeX2, edgeY2, inputX, inputY, inputX2, inputY2, tmp)) {
-						throw new RuntimeException("Lines should intersect, but didn't");
-					}
+					intersectLines(edgeX, edgeY, edgeX2, edgeY2, inputX, inputY, inputX2, inputY2, tmp);
 					output.add(tmp.x);
 					output.add(tmp.y);
 					clipped = true;
@@ -73,9 +97,7 @@ public class SutherlandHodgmanClipper {
 				}
 				// v1 outside, v2 inside
 				else if (side < 0 && side2 >= 0) {
-					if (!Intersector.intersectLines(edgeX, edgeY, edgeX2, edgeY2, inputX, inputY, inputX2, inputY2, tmp)) {
-						throw new RuntimeException("Lines should intersect, but didn't");
-					}
+					intersectLines(edgeX, edgeY, edgeX2, edgeY2, inputX, inputY, inputX2, inputY2, tmp);
 					output.add(tmp.x);
 					output.add(tmp.y);
 					output.add(inputX2);
@@ -84,50 +106,57 @@ public class SutherlandHodgmanClipper {
 				}
 			}
 			
-			if (i < clippingArea.size - 2) {
+			output.add(output.items[0]);
+			output.add(output.items[1]);
+
+			if (i < clippingVerticesLength - 2) {
 				FloatArray tmp = output;
 				output = input;
 				output.clear();
 				input = tmp;
 			}
 		}
-		
+
 		if (originalOutput != output) {
 			originalOutput.clear();
 			originalOutput.addAll(output.items, 0, output.size);
 		}
 		
+		originalOutput.setSize(originalOutput.size - 2);
+
 		return clipped;
 	}
-	
-	private int pointLineSide(float lineX, float lineY, float lineX2, float lineY2, float pointX, float pointY) {
-		return (int)Math.signum((lineX2 - lineX) * (pointY - lineY) - (lineY2 - lineY) * (pointX - lineX));
-	}
-	
-	public static boolean intersectLines (float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
-		Vector2 intersection) {
-		float d = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
-		if (d == 0) return false;
 
-		if (intersection != null) {
-			float ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / d;
-			intersection.set(x1 + (x2 - x1) * ua, y1 + (y2 - y1) * ua);
-		}
-		return true;
+	private int pointLineSide(float deltaX, float deltaY, float lineX, float lineY, float pointX, float pointY) {
+		return (int) Math.signum(deltaX * (pointY - lineY) - deltaY * (pointX - lineX));
 	}
 
-	public static boolean clockwise (FloatArray poly) {
+	public static void intersectLines(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
+			Vector2 intersection) {
+		float c0 = y4 - y3;
+		float c1 = x2 - x1;
+		float c2 = x4 - x3;
+		float c3 = y2 - y1;
+		float d = c0 * c1 - c2 * c3;
+
+		float ua = (c2 * (y1 - y3) - c0 * (x1 - x3)) / d;
+		intersection.set(x1 + (x2 - x1) * ua, y1 + (y2 - y1) * ua);
+	}
+
+	public static boolean clockwise(FloatArray poly) {
 		return area(poly) < 0;
 	}
 
-	public static float area (FloatArray poly) {
+	public static float area(FloatArray poly) {
 		float area = 0;
 
-		for (int i = 0; i < poly.size; i += 2) {
-			float x = poly.items[i];
-			float y = poly.items[i + 1];
-			float x2 = poly.items[(i + 2) % poly.size];
-			float y2 = poly.items[(i + 3) % poly.size];
+		final float[] polyVertices = poly.items;
+		final int polySize = poly.size;
+		for (int i = 0; i < polySize; i += 2) {
+			float x = polyVertices[i];
+			float y = polyVertices[i + 1];
+			float x2 = polyVertices[(i + 2) % poly.size];
+			float y2 = polyVertices[(i + 3) % poly.size];
 
 			area += x * y2 - y * x2;
 		}

@@ -116,7 +116,8 @@ public class ClippingTest extends ApplicationAdapter {
 	}
 
 	public void render () {
-		state.update(Gdx.graphics.getDeltaTime() * 0.3f);
+		// state.update(Gdx.graphics.getDeltaTime() * 0.3f);
+		state.update(0);
 
 		Gdx.gl.glClearColor(0.3f, 0.3f, 0.3f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);

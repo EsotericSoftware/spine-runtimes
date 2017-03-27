@@ -62,7 +62,7 @@ public class SkeletonRenderer {
 	private ClippingAttachment clipAttachment;
 	private Slot clipEnd;
 	private FloatArray clippingArea = new FloatArray();
-	private float[] clipInput = new float[6];
+	private boolean clippingAreaClockwise;
 	private FloatArray clipOutput = new FloatArray(400);
 	private FloatArray clippedVertices = new FloatArray(400);	
 	private ShortArray clippedTriangles = new ShortArray(400);
@@ -100,9 +100,9 @@ public class SkeletonRenderer {
 
 			} else if (attachment instanceof ClippingAttachment) {
 				ClippingAttachment clip = (ClippingAttachment) attachment;
-				batch.end();
+				if (!softwareClipping) batch.end();
 				clipStart(batch.getProjectionMatrix(), batch.getTransformMatrix(), slot, clip);
-				batch.begin();
+				if (!softwareClipping) batch.begin();
 				continue;
 
 			} else if (attachment instanceof MeshAttachment) {
@@ -179,9 +179,9 @@ public class SkeletonRenderer {
 
 			} else if (attachment instanceof ClippingAttachment) {
 				ClippingAttachment clip = (ClippingAttachment) attachment;
-				batch.end();
+				if (!softwareClipping) batch.end();
 				clipStart(batch.getProjectionMatrix(), batch.getTransformMatrix(), slot, clip);
-				batch.begin();
+				if (!softwareClipping) batch.begin();
 				continue;
 
 			} else if (attachment instanceof SkeletonAttachment) {
@@ -284,9 +284,9 @@ public class SkeletonRenderer {
 
 			} else if (attachment instanceof ClippingAttachment) {
 				ClippingAttachment clip = (ClippingAttachment) attachment;
-				batch.end();
+				if (!softwareClipping) batch.end();
 				clipStart(batch.getProjectionMatrix(), batch.getTransformMatrix(), slot, clip);
-				batch.begin();
+				if (!softwareClipping) batch.begin();
 				continue;
 
 			} else if (attachment instanceof SkeletonAttachment) {
@@ -393,6 +393,9 @@ public class SkeletonRenderer {
 			int n = clip.getWorldVerticesLength();
 			float[] vertices = this.clippingArea.setSize(n);
 			clip.computeWorldVertices(slot, 0, n, vertices, 0, 2);
+			clippingAreaClockwise = SutherlandHodgmanClipper.clockwise(this.clippingArea);
+			clippingArea.add(clippingArea.items[0]);
+			clippingArea.add(clippingArea.items[1]);
 		}
 	}
 
@@ -402,7 +405,7 @@ public class SkeletonRenderer {
 		if (!softwareClipping) Gdx.gl.glDisable(GL20.GL_STENCIL_TEST);
 	}
 	
-	private void clipSoftware(float[] vertices, int offset, int verticesLength, short[] triangles, int triangleOffset, int trianglesLength, FloatArray clippedVertices, ShortArray clippedTriangles, float dark, float light, boolean twoColor) {
+	private void clipSoftware(final float[] vertices, final int offset, final int verticesLength, final short[] triangles, final int triangleOffset, final int trianglesLength, final FloatArray clippedVertices, final ShortArray clippedTriangles, final float dark, final float light, final boolean twoColor) {
 		int idx = 0;
 		clippedVertices.clear();
 		clippedTriangles.clear();
@@ -410,32 +413,25 @@ public class SkeletonRenderer {
 		final int uvOffset = twoColor ? 4 : 3;
 		for (int i = 0; i < trianglesLength; i += 3) {
 			int triOffset = triangles[i] * vertexSize;
-			clipInput[0] = vertices[triOffset];
-			clipInput[1] = vertices[triOffset + 1];
+			float x1 = vertices[triOffset];
+			float y1= vertices[triOffset + 1];
 			float u1 = vertices[triOffset + uvOffset];
 			float v1 = vertices[triOffset + uvOffset + 1];
 			
 			triOffset = triangles[i + 1] * vertexSize;
-			clipInput[2] = vertices[triOffset];
-			clipInput[3] = vertices[triOffset + 1];
+			float x2 = vertices[triOffset];
+			float y2 = vertices[triOffset + 1];
 			float u2 = vertices[triOffset + uvOffset];
 			float v2 = vertices[triOffset + uvOffset + 1];
 			
 			triOffset = triangles[i + 2] * vertexSize;
-			clipInput[4] = vertices[triOffset];
-			clipInput[5] = vertices[triOffset + 1];
+			float x3 = vertices[triOffset];
+			float y3 = vertices[triOffset + 1];
 			float u3 = vertices[triOffset + uvOffset];
 			float v3 = vertices[triOffset + uvOffset + 1];
 			
-			boolean clipped = clipper.clip(clipInput, 0, 6, 2, clippingArea, clipOutput);
+			boolean clipped = clipper.clip(x1, y1, x2, y2, x3, y3, clippingArea, clipOutput, clippingAreaClockwise);
 			if (clipped) {				
-				float x1 = clipInput[0];
-				float y1 = clipInput[1];
-				float x2 = clipInput[2];
-				float y2 = clipInput[3];
-				float x3 = clipInput[4];
-				float y3 = clipInput[5];
-				
 				float d0 = y2 - y3;
 				float d1 = x3 - x2;
 				float d2 = x1 - x3;
@@ -450,8 +446,10 @@ public class SkeletonRenderer {
 					float x = clipVertices[j];
 					float y = clipVertices[j + 1];
 						
-					float a = (d0 * (x - x3) + d1 * (y - y3)) * denom;
-					float b = (d4 * (x - x3) + d2 * (y - y3)) * denom;
+					float c0 = x - x3;
+					float c1 = y - y3;
+					float a = (d0 * c0 + d1 * c1) * denom;
+					float b = (d4 * c0 + d2 * c1) * denom;
 					float c = 1.0f - a - b;
 					
 					float u = u1 * a + u2 * b + u3 * c;
@@ -472,22 +470,22 @@ public class SkeletonRenderer {
 				
 				idx += clipOutput.size >> 1;
 			} else {
-				clippedVertices.add(clipInput[0]);
-				clippedVertices.add(clipInput[1]);
+				clippedVertices.add(x1);
+				clippedVertices.add(y1);
 				clippedVertices.add(light);
 				if (twoColor) clippedVertices.add(dark);
 				clippedVertices.add(u1);
 				clippedVertices.add(v1);
 				
-				clippedVertices.add(clipInput[2]);
-				clippedVertices.add(clipInput[3]);
+				clippedVertices.add(x2);
+				clippedVertices.add(y2);
 				clippedVertices.add(light);
 				if (twoColor) clippedVertices.add(dark);
 				clippedVertices.add(u2);
 				clippedVertices.add(v2);
 				
-				clippedVertices.add(clipInput[4]);
-				clippedVertices.add(clipInput[5]);
+				clippedVertices.add(x3);
+				clippedVertices.add(y3);
 				clippedVertices.add(light);
 				if (twoColor) clippedVertices.add(dark);
 				clippedVertices.add(u3);
