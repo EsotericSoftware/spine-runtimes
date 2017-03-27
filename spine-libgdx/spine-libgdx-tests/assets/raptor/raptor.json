@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "WOArBZLexLEX/Tow3AuM8ddszEE", "spine": "3.6.05-beta", "width": 1223.73, "height": 1055.62, "images": "./images/" },
+"skeleton": { "hash": "WOArBZLexLEX/Tow3AuM8ddszEE", "spine": "3.6.12-beta", "width": 1223.73, "height": 1055.62, "images": "./images/" },
 "bones": [
 	{ "name": "root" },
 	{ "name": "hip", "parent": "root", "rotation": 3.16, "x": -136.79, "y": 415.48, "color": "fbff00ff" },

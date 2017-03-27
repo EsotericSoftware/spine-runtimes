@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "B1t2zOgaLSulKMcmcm3oTMzI3qI", "spine": "3.6.05-beta", "width": 1914.53, "height": 964.05, "images": "./images/" },
+"skeleton": { "hash": "B1t2zOgaLSulKMcmcm3oTMzI3qI", "spine": "3.6.12-beta", "width": 1914.53, "height": 964.05, "images": "./images/" },
 "bones": [
 	{ "name": "root" },
 	{ "name": "tankRoot", "parent": "root", "y": 200 },
@@ -1875,9 +1875,9 @@
 		},
 		"ik": {
 			"cannonTarget": [
-				{ "time": 0, "mix": 0.809 },
-				{ "time": 4.7333, "mix": 0.809, "curve": "stepped" },
-				{ "time": 5.1667, "mix": 0.504, "curve": "stepped" },
+				{ "time": 0, "mix": 0.809, "curve": "stepped" },
+				{ "time": 4.7333, "mix": 0.809 },
+				{ "time": 5.1667, "mix": 0.504 },
 				{ "time": 5.6667 }
 			]
 		},

@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "ESgSG/7CxdxIbeuHK+6pb0TxzjM", "spine": "3.6.05-beta", "width": 318.71, "height": 333.7, "images": "./images/" },
+"skeleton": { "hash": "ESgSG/7CxdxIbeuHK+6pb0TxzjM", "spine": "3.6.12-beta", "width": 318.71, "height": 333.7, "images": "./images/" },
 "bones": [
 	{ "name": "root" },
 	{ "name": "Hip", "parent": "root", "y": 94.89 },

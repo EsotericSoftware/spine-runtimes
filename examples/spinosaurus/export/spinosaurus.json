@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "/FQ62MLXDzS93xb3LzhPr1aQxX8", "spine": "3.6.05-beta", "width": 1680, "height": 1782.28, "images": "./images/" },
+"skeleton": { "hash": "/FQ62MLXDzS93xb3LzhPr1aQxX8", "spine": "3.6.12-beta", "width": 1680, "height": 1782.28, "images": "./images/" },
 "bones": [
 	{ "name": "root", "y": -526.32 },
 	{ "name": "leaves", "parent": "root", "x": -0.17, "y": 1310.1 },
