@@ -30,7 +30,7 @@
 
 package com.esotericsoftware.spine;
 
-import static com.esotericsoftware.spine.utils.TrigUtils.*;
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
 import static com.badlogic.gdx.math.Matrix3.*;
 
 import com.badlogic.gdx.math.Matrix3;

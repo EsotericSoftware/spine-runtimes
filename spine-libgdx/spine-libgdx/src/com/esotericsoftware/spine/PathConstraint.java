@@ -38,7 +38,7 @@ import com.esotericsoftware.spine.PathConstraintData.RotateMode;
 import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
-import com.esotericsoftware.spine.utils.TrigUtils;
+import com.esotericsoftware.spine.utils.SpineUtils;
 
 /** Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the
  * constrained bones so they follow a {@link PathAttachment}.
@@ -131,7 +131,7 @@ public class PathConstraint implements Constraint {
 		else {
 			tip = false;
 			Bone p = target.bone;
-			offsetRotation *= p.a * p.d - p.b * p.c > 0 ? TrigUtils.degRad : -TrigUtils.degRad;
+			offsetRotation *= p.a * p.d - p.b * p.c > 0 ? SpineUtils.degRad : -SpineUtils.degRad;
 		}
 		for (int i = 0, p = 3; i < boneCount; i++, p += 3) {
 			Bone bone = (Bone)bones[i];
@@ -165,10 +165,10 @@ public class PathConstraint implements Constraint {
 					boneY += (length * (sin * a + cos * c) - dy) * rotateMix;
 				} else
 					r += offsetRotation;
-				if (r > TrigUtils.PI)
-					r -= TrigUtils.PI2;
-				else if (r < -TrigUtils.PI) //
-					r += TrigUtils.PI2;
+				if (r > SpineUtils.PI)
+					r -= SpineUtils.PI2;
+				else if (r < -SpineUtils.PI) //
+					r += SpineUtils.PI2;
 				r *= rotateMix;
 				cos = (float)Math.cos(r);
 				sin = (float)Math.sin(r);
