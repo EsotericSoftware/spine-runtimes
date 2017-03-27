@@ -68,33 +68,33 @@ public class ClippingTest extends ApplicationAdapter {
 		debugRenderer.setRegionAttachments(false);
 		font = new BitmapFont();
 
-		atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy-pma.atlas"));
+		atlas = new TextureAtlas(Gdx.files.internal("raptor/raptor-pma.atlas"));
 		SkeletonJson json = new SkeletonJson(atlas);
 		json.setScale(0.6f);
-		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy.json"));
+		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("raptor/raptor.json"));
 
 		skeleton = new Skeleton(skeletonData);
 		skeleton.setPosition(250, 20);
 
 		AnimationStateData stateData = new AnimationStateData(skeletonData);
-		stateData.setMix("run", "jump", 0.2f);
-		stateData.setMix("jump", "run", 0.2f);
+//		stateData.setMix("run", "jump", 0.2f);
+//		stateData.setMix("jump", "run", 0.2f);
 
 		state = new AnimationState(stateData);
 		state.setTimeScale(0.5f);
 
-		state.setAnimation(0, "run", true);
-		state.addAnimation(0, "jump", false, 2);
-		state.addAnimation(0, "run", true, 0);
+		state.setAnimation(0, "walk", true);
+		state.addAnimation(0, "Jump", false, 2);
+		state.addAnimation(0, "walk", true, 0);
 
 		// Create a clipping attachment, slot data, and slot.
 		ClippingAttachment clip = new ClippingAttachment("clip");
 		// Rectangle:
 		clip.setVertices(new float[] { //
-			-140, -50, //
-			120, -50, //
-			120, 50, //
 			-140, 50, //
+			250, 50, //
+			250, 350, //
+			-140, 350, //
 		});
 		// Self intersection:
 //		clip.setVertices(new float[] { //
@@ -104,7 +104,7 @@ public class ClippingTest extends ApplicationAdapter {
 //			-140, 50, //
 //		});
 		clip.setWorldVerticesLength(8);
-		clip.setEnd(skeleton.findSlot("muzzle"));
+		clip.setEnd(skeleton.findSlot("front_hand"));
 
 		SlotData clipSlotData = new SlotData(skeletonData.getSlots().size, "clip slot", skeletonData.getBones().first());
 		skeletonData.getSlots().add(clipSlotData);
@@ -112,7 +112,7 @@ public class ClippingTest extends ApplicationAdapter {
 		Slot clipSlot = new Slot(clipSlotData, skeleton.getRootBone());
 		clipSlot.setAttachment(clip);
 		skeleton.getSlots().add(clipSlot);
-		skeleton.getDrawOrder().insert(skeletonData.findSlot("neck").getIndex(), clipSlot);
+		skeleton.getDrawOrder().insert(skeletonData.findSlot("back_hand").getIndex(), clipSlot);
 	}
 
 	public void render () {
