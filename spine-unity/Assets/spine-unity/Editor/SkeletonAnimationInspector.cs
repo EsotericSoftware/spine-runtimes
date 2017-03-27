@@ -61,7 +61,11 @@ namespace Spine.Unity.Editor {
 				
 				EditorGUILayout.Space();
 				if (!sameData) {
+					#if UNITY_5_3_OR_NEWER
 					EditorGUILayout.DelayedTextField(animationName);
+					#else
+					animationName.stringValue = EditorGUILayout.TextField(animationName.displayName, animationName.stringValue);
+					#endif
 				} else {
 					EditorGUI.BeginChangeCheck();
 					EditorGUILayout.PropertyField(animationName);
