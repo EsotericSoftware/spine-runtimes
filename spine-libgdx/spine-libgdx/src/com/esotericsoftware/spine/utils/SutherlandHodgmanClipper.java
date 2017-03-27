@@ -43,19 +43,14 @@ public class SutherlandHodgmanClipper {
 				edgeY2 = tmp;
 			}
 
-			// System.out.println("-- Edge " + i / 2 + ": (" + edgeX + ", " + edgeY + ")-(" + edgeX2 + ", " + edgeY2 + ")");
-			
 			for (int j = 0; j < input.size; j += 2) {
 				float inputX = input.items[j % input.size];
 				float inputY = input.items[(j + 1) % input.size];
 				float inputX2 = input.items[(j + 2) % input.size];
 				float inputY2 = input.items[(j + 3) % input.size];
 				
-				// System.out.println("\tinput " + j / 2 + ": (" + inputX + ", " + inputY + ")-(" + inputX2 + ", " + inputY2 + ")");
-				
 				int side = pointLineSide(edgeX2, edgeY2, edgeX, edgeY, inputX, inputY);
 				int side2 = pointLineSide(edgeX2, edgeY2, edgeX, edgeY, inputX2, inputY2);
-				// System.out.println("\tv1: " + (side < 0 ? "outside" : "inside" ) + ", v2: " + (side2 < 0 ? "outside" : "inside"));				
 				
 				// v1 inside, v2 inside
 				if (side >= 0 && side2 >= 0) {

@@ -37,29 +37,36 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.WindowedMean;
 import com.esotericsoftware.spine.attachments.ClippingAttachment;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
 public class ClippingTest extends ApplicationAdapter {
 	OrthographicCamera camera;
-	TwoColorPolygonBatch batch;
+	PolygonSpriteBatch batch;
 	SkeletonRenderer renderer;
 	SkeletonRendererDebug debugRenderer;
+	BitmapFont font;
 
 	TextureAtlas atlas;
 	Skeleton skeleton;
 	AnimationState state;
+	
+	WindowedMean mean = new WindowedMean(30);	
 
 	public void create () {
 		camera = new OrthographicCamera();
-		batch = new TwoColorPolygonBatch(2048);
+		batch = new PolygonSpriteBatch(2048);
 		renderer = new SkeletonRenderer();
 		renderer.setPremultipliedAlpha(true);
 		renderer.setSoftwareClipping(true);
 		debugRenderer = new SkeletonRendererDebug();
 		debugRenderer.setBoundingBoxes(false);
 		debugRenderer.setRegionAttachments(false);
+		font = new BitmapFont();
 
 		atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy-pma.atlas"));
 		SkeletonJson json = new SkeletonJson(atlas);
@@ -122,7 +129,11 @@ public class ClippingTest extends ApplicationAdapter {
 		debugRenderer.getShapeRenderer().setProjectionMatrix(camera.combined);
 
 		batch.begin();
+		long start = System.nanoTime();
 		renderer.draw(batch, skeleton);
+		mean.addValue((System.nanoTime() - start) / 1000000.0f);
+		renderer.setPremultipliedAlpha(false);
+		font.draw(batch, "Time: " + mean.getMean() + "ms", 10, Gdx.graphics.getHeight() - font.getLineHeight());
 		batch.end();
 
 		debugRenderer.draw(skeleton);

@@ -444,9 +444,11 @@ public class SkeletonRenderer {
 				
 				float denom = 1 / (d0 * d2 + d1 * d3);
 				
-				for (int j = 0; j < clipOutput.size; j += 2) {				
-					float x = clipOutput.get(j);
-					float y = clipOutput.get(j + 1);
+				float[] clipVertices = clipOutput.items;
+				
+				for (int j = 0, n = clipOutput.size; j < n; j += 2) {				
+					float x = clipVertices[j];
+					float y = clipVertices[j + 1];
 						
 					float a = (d0 * (x - x3) + d1 * (y - y3)) * denom;
 					float b = (d4 * (x - x3) + d2 * (y - y3)) * denom;
@@ -462,7 +464,7 @@ public class SkeletonRenderer {
 					clippedVertices.add(v);
 				}
 				
-				for (int j = 1; j < (clipOutput.size >> 1) - 1; j++) {
+				for (int j = 1, n = (clipOutput.size >> 1) - 1; j < n; j++) {
 					clippedTriangles.add(idx);
 					clippedTriangles.add(idx + j);
 					clippedTriangles.add(idx + j + 1);
