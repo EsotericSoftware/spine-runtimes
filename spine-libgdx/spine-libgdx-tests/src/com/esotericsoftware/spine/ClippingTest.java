@@ -32,17 +32,18 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.esotericsoftware.spine.attachments.ClippingAttachment;
+import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
 public class ClippingTest extends ApplicationAdapter {
 	OrthographicCamera camera;
-	SpriteBatch batch;
+	TwoColorPolygonBatch batch;
 	SkeletonRenderer renderer;
 	SkeletonRendererDebug debugRenderer;
 
@@ -52,9 +53,10 @@ public class ClippingTest extends ApplicationAdapter {
 
 	public void create () {
 		camera = new OrthographicCamera();
-		batch = new SpriteBatch();
+		batch = new TwoColorPolygonBatch(2048);
 		renderer = new SkeletonRenderer();
 		renderer.setPremultipliedAlpha(true);
+		renderer.setSoftwareClipping(true);
 		debugRenderer = new SkeletonRendererDebug();
 		debugRenderer.setBoundingBoxes(false);
 		debugRenderer.setRegionAttachments(false);
@@ -81,19 +83,19 @@ public class ClippingTest extends ApplicationAdapter {
 		// Create a clipping attachment, slot data, and slot.
 		ClippingAttachment clip = new ClippingAttachment("clip");
 		// Rectangle:
-//		clip.setVertices(new float[] { //
-//			-140, -50, //
-//			120, -50, //
-//			120, 50, //
-//			-140, 50, //
-//		});
-		// Self intersection:
 		clip.setVertices(new float[] { //
 			-140, -50, //
-			120, 50, //
 			120, -50, //
+			120, 50, //
 			-140, 50, //
 		});
+		// Self intersection:
+//		clip.setVertices(new float[] { //
+//			-140, -50, //
+//			120, 50, //
+//			120, -50, //
+//			-140, 50, //
+//		});
 		clip.setWorldVerticesLength(8);
 		clip.setEnd(skeleton.findSlot("muzzle"));
 
@@ -109,6 +111,7 @@ public class ClippingTest extends ApplicationAdapter {
 	public void render () {
 		state.update(Gdx.graphics.getDeltaTime() * 0.3f);
 
+		Gdx.gl.glClearColor(0.3f, 0.3f, 0.3f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		state.apply(skeleton);
@@ -123,6 +126,11 @@ public class ClippingTest extends ApplicationAdapter {
 		batch.end();
 
 		debugRenderer.draw(skeleton);
+		
+		if (Gdx.input.isKeyJustPressed(Keys.S)) {
+			renderer.setSoftwareClipping(!renderer.getSoftwareClipping());
+			System.out.println("Software clipping: " + renderer.getSoftwareClipping());
+		}
 	}
 
 	public void resize (int width, int height) {

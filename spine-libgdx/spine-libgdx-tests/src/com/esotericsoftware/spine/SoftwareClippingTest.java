@@ -1,8 +1,6 @@
 
 package com.esotericsoftware.spine;
 
-import javax.management.BadBinaryOpValueExpException;
-
 import org.lwjgl.opengl.GL11;
 
 import com.badlogic.gdx.ApplicationAdapter;
