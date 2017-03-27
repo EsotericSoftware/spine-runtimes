@@ -1,6 +1,8 @@
 
 package com.esotericsoftware.spine;
 
+import javax.management.BadBinaryOpValueExpException;
+
 import org.lwjgl.opengl.GL11;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -11,29 +13,45 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.ShortArray;
 import com.esotericsoftware.spine.utils.SutherlandHodgmanClipper;
 
 public class SoftwareClippingTest extends ApplicationAdapter {
 	OrthographicCamera sceneCamera;
 	ShapeRenderer shapes;
+	PolygonSpriteBatch polyBatcher;
+	Texture image;
 
-	float[] triangle = {100, 100, 300, 100, 200, 300};
+	float[] triangleOutline = { 100, 100, 300, 100, 200, 300 };
+	float[] triangle = { 
+		100, 100, Color.WHITE.toFloatBits(), 0, 1, 
+		300, 100, Color.WHITE.toFloatBits(), 1, 1, 
+		200, 300, Color.WHITE.toFloatBits(), 0.5f, 0
+	};
+	short[] triangleIndices = { 0, 1, 2 };	
 	FloatArray clippingPolygon = new FloatArray();
 	FloatArray clippedPolygon = new FloatArray();
+	
+	FloatArray clippedPolygonVertices = new FloatArray();
+	ShortArray clippedPolygonIndices = new ShortArray();
 
 	boolean isCreatingClippingArea = false;
 	Vector3 tmp = new Vector3();
-	SutherlandHodgmanClipper clipper;
+	SutherlandHodgmanClipper clipper;	
 
 	@Override
 	public void create () {
 		sceneCamera = new OrthographicCamera();
 		shapes = new ShapeRenderer();
+		polyBatcher = new PolygonSpriteBatch();
 		clipper = new SutherlandHodgmanClipper();
+		image = new Texture("skin/skin.png");
 	}
 
 	@Override
@@ -73,11 +91,23 @@ public class SoftwareClippingTest extends ApplicationAdapter {
 	private void renderScene () {
 		sceneCamera.update();
 		shapes.setProjectionMatrix(sceneCamera.combined);
+		polyBatcher.setProjectionMatrix(sceneCamera.combined);
+		
+		polyBatcher.begin();
+		polyBatcher.disableBlending();
+		
+		if (clippedPolygon.size == 0) {
+			polyBatcher.draw(image, triangle, 0, 15, triangleIndices, 0, 3);
+		} else {
+			polyBatcher.draw(image, clippedPolygonVertices.items, 0, clippedPolygonVertices.size, clippedPolygonIndices.items, 0, clippedPolygonIndices.size);
+		}
+		polyBatcher.end();
+		
 		shapes.begin(ShapeType.Line);
 
 		// triangle
 		shapes.setColor(Color.GREEN);
-		shapes.polygon(triangle);
+		shapes.polygon(triangleOutline);
 
 		// clipped polygons
 		shapes.setColor(Color.RED);
@@ -146,10 +176,54 @@ public class SoftwareClippingTest extends ApplicationAdapter {
 	}
 
 	private void clip () {
-		FloatArray input = new FloatArray();
-		input.addAll(triangle, 0, triangle.length);
-		clippedPolygon.clear();
-		System.out.println("Clipped: " + (clipper.clip(input, clippingPolygon, clippedPolygon) != null));
+		boolean clipped = clipper.clip(triangle, 0, triangle.length, 5, clippingPolygon, clippedPolygon);
+		System.out.println("Clipped: " + clipped);
+		if (clipped) {
+			clippedPolygonVertices.clear();
+			clippedPolygonIndices.clear();
+			
+			float x1 = triangle[0];
+			float y1 = triangle[1];
+			float x2 = triangle[5];
+			float y2 = triangle[6];
+			float x3 = triangle[10];
+			float y3 = triangle[11];
+			
+			float d0 = y2 - y3;
+			float d1 = x3 - x2;
+			float d2 = x1 - x3;
+			float d3 = y1 - y3;
+			float d4 = y3 - y1;
+			
+			float denom = 1 / (d0 * d2 + d1 * d3);
+			
+			// triangulate by creating a triangle fan, duplicate vertices
+			float color = Color.WHITE.toFloatBits();
+			for (int i = 0; i < clippedPolygon.size; i+=2) {				
+				float x = clippedPolygon.get(i);
+				float y = clippedPolygon.get(i + 1);
+					
+				float a = (d0 * (x - x3) + d1 * (y - y3)) * denom;
+				float b = (d4 * (x - x3) + d2 * (y - y3)) * denom;
+				float c = 1.0f - a - b;
+				
+				float u = triangle[3] * a + triangle[8] * b + triangle[13] * c;
+				float v = triangle[4] * a + triangle[9] * b + triangle[14] * c;
+				clippedPolygonVertices.add(x);
+				clippedPolygonVertices.add(y);
+				clippedPolygonVertices.add(color);
+				clippedPolygonVertices.add(u);
+				clippedPolygonVertices.add(v);
+			}
+			
+			for (int i = 1; i < (clippedPolygon.size >> 1) - 1; i++) {
+				clippedPolygonIndices.add(0);
+				clippedPolygonIndices.add(i);
+				clippedPolygonIndices.add(i + 1);
+			}
+		} else {
+			clippedPolygon.clear();
+		}
 	}
 
 	public static void main (String[] args) {

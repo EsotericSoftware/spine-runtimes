@@ -7,12 +7,25 @@ import com.badlogic.gdx.utils.FloatArray;
 
 public class SutherlandHodgmanClipper {
 	Vector2 tmp = new Vector2();
+	final FloatArray scratch = new FloatArray();
 	
-	public FloatArray clip (FloatArray input, FloatArray clippingArea, FloatArray output) {
+	/**
+	 * Clips the input triangle against the convex clipping area. If the triangle lies entirely
+	 * within the clipping area, false is returned.
+	 */
+	public boolean clip (float[] triangle, int offset, int length, int stride, FloatArray clippingArea, FloatArray output) {
 		boolean isClockwise = clockwise(clippingArea);
 		
 		FloatArray originalOutput = output;
 		boolean clipped = false;
+		
+		FloatArray input = scratch;
+		input.clear();
+		for (int i = offset; i < offset + length; i+= stride) {
+			input.add(triangle[i]);
+			input.add(triangle[i + 1]);
+		}
+		output.clear();
 		
 		for (int i = 0; i < clippingArea.size; i += 2) {
 			float edgeX = clippingArea.items[i];
@@ -40,8 +53,8 @@ public class SutherlandHodgmanClipper {
 				
 				System.out.println("\tinput " + j / 2 + ": (" + inputX + ", " + inputY + ")-(" + inputX2 + ", " + inputY2 + ")");
 				
-				int side = Intersector.pointLineSide(edgeX2, edgeY2, edgeX, edgeY, inputX, inputY);
-				int side2 = Intersector.pointLineSide(edgeX2, edgeY2, edgeX, edgeY, inputX2, inputY2);
+				int side = pointLineSide(edgeX2, edgeY2, edgeX, edgeY, inputX, inputY);
+				int side2 = pointLineSide(edgeX2, edgeY2, edgeX, edgeY, inputX2, inputY2);
 				System.out.println("\tv1: " + (side < 0 ? "outside" : "inside" ) + ", v2: " + (side2 < 0 ? "outside" : "inside"));				
 				
 				// v1 inside, v2 inside
@@ -89,7 +102,7 @@ public class SutherlandHodgmanClipper {
 			originalOutput.addAll(output.items, 0, output.size);
 		}
 		
-		return clipped ? output : null;
+		return clipped;
 	}
 	
 	private int pointLineSide(float lineX, float lineY, float lineX2, float lineY2, float pointX, float pointY) {
