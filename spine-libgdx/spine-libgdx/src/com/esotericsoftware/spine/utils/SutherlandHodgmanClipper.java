@@ -1,30 +1,18 @@
 
 package com.esotericsoftware.spine.utils;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.FloatArray;
 
 public class SutherlandHodgmanClipper {
-	Vector2 tmp = new Vector2();
 	final FloatArray scratch = new FloatArray();
 
-	public boolean clip(float x1, float y1, float x2, float y2, float x3, float y3, FloatArray clippingArea,
-			FloatArray output) {
-		boolean isClockwise = clockwise(clippingArea);
-		return clip(x1, y1, x2, y2, x3, y3, clippingArea, output, isClockwise);
-	}
-
-	/**
-	 * Clips the input triangle against the convex clipping area. If the
-	 * triangle lies entirely within the clipping area, false is returned. The
-	 * clipping area must duplicate the first vertex at the end of the vertices
-	 * list!
-	 */
-	public boolean clip(float x1, float y1, float x2, float y2, float x3, float y3, FloatArray clippingArea,
-			FloatArray output, boolean isClockwise) {
+	/** Clips the input triangle against the convex clipping area. If the triangle lies entirely within the clipping area, false is
+	 * returned. The clipping area must duplicate the first vertex at the end of the vertices list! */
+	public boolean clip (float x1, float y1, float x2, float y2, float x3, float y3, FloatArray clippingArea, FloatArray output,
+		boolean isClockwise) {
 		final FloatArray originalOutput = output;
 		boolean clipped = false;
-		
+
 		FloatArray input = null;
 		// avoid copy at the end
 		if ((clippingArea.size / 2) % 2 != 0) {
@@ -33,7 +21,7 @@ public class SutherlandHodgmanClipper {
 		} else {
 			input = scratch;
 		}
-		 
+
 		input.clear();
 		input.add(x1);
 		input.add(y1);
@@ -75,37 +63,36 @@ public class SutherlandHodgmanClipper {
 				final float inputX2 = inputVertices[j + 2];
 				final float inputY2 = inputVertices[j + 3];
 
-				final int side = pointLineSide(deltaX, deltaY, edgeX2, edgeY2, inputX, inputY);
-				final int side2 = pointLineSide(deltaX, deltaY, edgeX2, edgeY2, inputX2, inputY2);
+				final int side = (int)Math.signum(deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2));
+				final int side2 = (int)Math.signum(deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2));
 
-				// v1 inside, v2 inside
-				if (side >= 0 && side2 >= 0) {
-					output.add(inputX2);
-					output.add(inputY2);
-				}
-				// v1 inside, v2 outside
-				else if (side >= 0 && side2 < 0) {
-					intersectLines(edgeX, edgeY, edgeX2, edgeY2, inputX, inputY, inputX2, inputY2, tmp);
-					output.add(tmp.x);
-					output.add(tmp.y);
-					clipped = true;
-				}
-				// v1 outside, v2 outside
-				else if (side < 0 && side2 < 0) {
-					// no output
-					clipped = true;
-				}
-				// v1 outside, v2 inside
-				else if (side < 0 && side2 >= 0) {
-					intersectLines(edgeX, edgeY, edgeX2, edgeY2, inputX, inputY, inputX2, inputY2, tmp);
-					output.add(tmp.x);
-					output.add(tmp.y);
-					output.add(inputX2);
-					output.add(inputY2);
-					clipped = true;
+				if (side >= 0) {
+					// v1 inside, v2 inside
+					if (side2 >= 0) {
+						output.add(inputX2);
+						output.add(inputY2);
+					}
+					// v1 inside, v2 outside
+					else {
+						intersectLines(edgeX, edgeY, edgeX2, edgeY2, inputX, inputY, inputX2, inputY2, output);
+						clipped = true;
+					}
+				} else {
+					// v1 outside, v2 outside
+					if (side2 < 0) {
+						// no output
+						clipped = true;
+					}
+					// v1 outside, v2 inside
+					else {
+						intersectLines(edgeX, edgeY, edgeX2, edgeY2, inputX, inputY, inputX2, inputY2, output);
+						output.add(inputX2);
+						output.add(inputY2);
+						clipped = true;
+					}
 				}
 			}
-			
+
 			output.add(output.items[0]);
 			output.add(output.items[1]);
 
@@ -121,18 +108,14 @@ public class SutherlandHodgmanClipper {
 			originalOutput.clear();
 			originalOutput.addAll(output.items, 0, output.size);
 		}
-		
+
 		originalOutput.setSize(originalOutput.size - 2);
 
 		return clipped;
 	}
 
-	private int pointLineSide(float deltaX, float deltaY, float lineX, float lineY, float pointX, float pointY) {
-		return (int) Math.signum(deltaX * (pointY - lineY) - deltaY * (pointX - lineX));
-	}
-
-	public static void intersectLines(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
-			Vector2 intersection) {
+	public static void intersectLines (float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
+		FloatArray output) {
 		float c0 = y4 - y3;
 		float c1 = x2 - x1;
 		float c2 = x4 - x3;
@@ -140,14 +123,15 @@ public class SutherlandHodgmanClipper {
 		float d = c0 * c1 - c2 * c3;
 
 		float ua = (c2 * (y1 - y3) - c0 * (x1 - x3)) / d;
-		intersection.set(x1 + (x2 - x1) * ua, y1 + (y2 - y1) * ua);
+		output.add(x1 + (x2 - x1) * ua);
+		output.add(y1 + (y2 - y1) * ua);
 	}
 
-	public static boolean clockwise(FloatArray poly) {
+	public static boolean clockwise (FloatArray poly) {
 		return area(poly) < 0;
 	}
 
-	public static float area(FloatArray poly) {
+	public static float area (FloatArray poly) {
 		float area = 0;
 
 		final float[] polyVertices = poly.items;
