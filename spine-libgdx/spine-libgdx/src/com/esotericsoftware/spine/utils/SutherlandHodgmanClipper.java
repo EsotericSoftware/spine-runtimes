@@ -63,8 +63,8 @@ public class SutherlandHodgmanClipper {
 				final float inputX2 = inputVertices[j + 2];
 				final float inputY2 = inputVertices[j + 3];
 
-				final int side = (int)Math.signum(deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2));
-				final int side2 = (int)Math.signum(deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2));
+				final int side = deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0 ? 1 : -1;
+				final int side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0 ? 1 : -1;
 
 				if (side >= 0) {
 					// v1 inside, v2 inside
