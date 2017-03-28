@@ -64,8 +64,16 @@ public class SutherlandHodgmanClipper {
 						output.add(inputY2);
 					}
 					// v1 inside, v2 outside
-					else {
-						intersectLines(edgeX, edgeY, edgeX2, edgeY2, inputX, inputY, inputX2, inputY2, output);
+					else {						
+						float c0 = inputY2 - inputY;
+						float c1 = edgeX2 - edgeX;
+						float c2 = inputX2 - inputX;
+						float c3 = edgeY2 - edgeY;
+						float d = c0 * c1 - c2 * c3;
+
+						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / d;
+						output.add(edgeX + (edgeX2 - edgeX) * ua);
+						output.add(edgeY + (edgeY2 - edgeY) * ua);
 						clipped = true;
 					}
 				} else {
@@ -77,7 +85,16 @@ public class SutherlandHodgmanClipper {
 					}
 					// v1 outside, v2 inside
 					else {
-						intersectLines(edgeX, edgeY, edgeX2, edgeY2, inputX, inputY, inputX2, inputY2, output);
+						float c0 = inputY2 - inputY;
+						float c1 = edgeX2 - edgeX;
+						float c2 = inputX2 - inputX;
+						float c3 = edgeY2 - edgeY;
+						float d = c0 * c1 - c2 * c3;
+
+						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / d;
+						output.add(edgeX + (edgeX2 - edgeX) * ua);
+						output.add(edgeY + (edgeY2 - edgeY) * ua);
+						
 						output.add(inputX2);
 						output.add(inputY2);
 						clipped = true;
@@ -110,19 +127,6 @@ public class SutherlandHodgmanClipper {
 		originalOutput.setSize(originalOutput.size - 2);
 
 		return clipped;
-	}
-
-	public static void intersectLines (float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
-		FloatArray output) {
-		float c0 = y4 - y3;
-		float c1 = x2 - x1;
-		float c2 = x4 - x3;
-		float c3 = y2 - y1;
-		float d = c0 * c1 - c2 * c3;
-
-		float ua = (c2 * (y1 - y3) - c0 * (x1 - x3)) / d;
-		output.add(x1 + (x2 - x1) * ua);
-		output.add(y1 + (y2 - y1) * ua);
 	}
 	
 	public static void makeClockwise (FloatArray poly) {
