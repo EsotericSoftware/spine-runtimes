@@ -45,6 +45,8 @@ public class SutherlandHodgmanClipper {
 
 			final float[] inputVertices = input.items;
 			final int inputVerticesLength = input.size - 2;
+			
+			int numOutside = 0; 
 
 			for (int j = 0; j < inputVerticesLength; j += 2) {
 				final float inputX = inputVertices[j];
@@ -71,6 +73,7 @@ public class SutherlandHodgmanClipper {
 					if (side2 < 0) {
 						// no output
 						clipped = true;
+						numOutside += 2;
 					}
 					// v1 outside, v2 inside
 					else {
@@ -80,6 +83,12 @@ public class SutherlandHodgmanClipper {
 						clipped = true;
 					}
 				}
+			}
+			
+			// early out if all edges were outside
+			if (numOutside == inputVerticesLength) {
+				originalOutput.clear();
+				return true;
 			}
 
 			output.add(output.items[0]);
