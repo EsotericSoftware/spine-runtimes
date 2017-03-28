@@ -183,11 +183,11 @@ public class SoftwareClippingTest extends ApplicationAdapter {
 		
 		// must duplicate first vertex at end of polygon
 		// so we can avoid module/branch in clipping code
+		SutherlandHodgmanClipper.makeClockwise(clippingPolygon);
 		clippingPolygon.add(clippingPolygon.get(0));
 		clippingPolygon.add(clippingPolygon.get(1));
 		
-		boolean isClockwise = SutherlandHodgmanClipper.clockwise(clippingPolygon);
-		boolean clipped = clipper.clip(x1, y1, x2, y2, x3, y3, clippingPolygon, clippedPolygon, isClockwise);
+		boolean clipped = clipper.clip(x1, y1, x2, y2, x3, y3, clippingPolygon, clippedPolygon);
 		System.out.println("Clipped: " + clipped);
 		if (clipped) {
 			clippedPolygonVertices.clear();

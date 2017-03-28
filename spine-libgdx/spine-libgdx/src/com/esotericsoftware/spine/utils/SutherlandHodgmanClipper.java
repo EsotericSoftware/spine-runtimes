@@ -8,8 +8,7 @@ public class SutherlandHodgmanClipper {
 
 	/** Clips the input triangle against the convex clipping area, which needs to be clockwise. If the triangle lies entirely within the clipping area, false is
 	 * returned. The clipping area must duplicate the first vertex at the end of the vertices list! */
-	public boolean clip (float x1, float y1, float x2, float y2, float x3, float y3, FloatArray clippingArea, FloatArray output,
-		boolean isClockwise) {
+	public boolean clip (float x1, float y1, float x2, float y2, float x3, float y3, FloatArray clippingArea, FloatArray output) {
 		final FloatArray originalOutput = output;
 		boolean clipped = false;
 

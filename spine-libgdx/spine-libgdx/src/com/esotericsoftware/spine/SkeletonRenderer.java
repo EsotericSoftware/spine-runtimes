@@ -152,15 +152,16 @@ public class SkeletonRenderer {
 		Texture texture = null;
 		Color color = null, skeletonColor = skeleton.color;
 		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
-		Array<Slot> drawOrder = skeleton.drawOrder;
+		Array<Slot> drawOrder = skeleton.drawOrder;		
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
+			final int vertexSize = (softwareClipping && clipAttachment != null) ? 2 : 5;
 			Slot slot = drawOrder.get(i);
-			Attachment attachment = slot.attachment;
+			Attachment attachment = slot.attachment;			
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment region = (RegionAttachment) attachment;
-				verticesLength = 20;
+				verticesLength = vertexSize << 2;
 				vertices = this.vertices.items;
-				region.computeWorldVertices(slot.getBone(), vertices, 0, 5);
+				region.computeWorldVertices(slot.getBone(), vertices, 0, vertexSize);
 				triangles = quadTriangles;
 				texture = region.getRegion().getTexture();
 				uvs = region.getUVs();
@@ -169,9 +170,9 @@ public class SkeletonRenderer {
 			} else if (attachment instanceof MeshAttachment) {
 				MeshAttachment mesh = (MeshAttachment) attachment;
 				int count = mesh.getWorldVerticesLength();
-				verticesLength = (count >> 1) * 5;
+				verticesLength = (count >> 1) * vertexSize;
 				vertices = this.vertices.setSize(verticesLength);
-				mesh.computeWorldVertices(slot, 0, count, vertices, 0, 5);
+				mesh.computeWorldVertices(slot, 0, count, vertices, 0, vertexSize);
 				triangles = mesh.getTriangles();
 				texture = mesh.getRegion().getTexture();
 				uvs = mesh.getUVs();
@@ -217,11 +218,6 @@ public class SkeletonRenderer {
 						| ((int) (b * slotColor.b * color.b * alpha) << 16) //
 						| ((int) (g * slotColor.g * color.g * alpha) << 8) //
 						| (int) (r * slotColor.r * color.r * alpha));
-				for (int v = 2, u = 0; v < verticesLength; v += 5, u += 2) {
-					vertices[v] = c;
-					vertices[v + 1] = uvs[u];
-					vertices[v + 2] = uvs[u + 1];
-				}
 
 				BlendMode slotBlendMode = slot.data.getBlendMode();
 				if (slotBlendMode != blendMode) {
@@ -230,12 +226,22 @@ public class SkeletonRenderer {
 				}
 				if (softwareClipping) {
 					if (clipAttachment != null) {
-						clipSoftware(vertices, 0, verticesLength, triangles, 0, triangles.length, clippedVertices, clippedTriangles, 0, c, false);
+						clipSoftware(vertices, 0, verticesLength, triangles, 0, triangles.length, uvs, 0, c, false, clippedVertices, clippedTriangles);
 						batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0, clippedTriangles.size);
 					} else {
+						for (int v = 2, u = 0; v < verticesLength; v += 5, u += 2) {
+							vertices[v] = c;
+							vertices[v + 1] = uvs[u];
+							vertices[v + 2] = uvs[u + 1];
+						}
 						batch.draw(texture, vertices, 0, verticesLength, triangles, 0, triangles.length);
 					}
 				} else {
+					for (int v = 2, u = 0; v < verticesLength; v += 5, u += 2) {
+						vertices[v] = c;
+						vertices[v + 1] = uvs[u];
+						vertices[v + 2] = uvs[u + 1];
+					}
 					batch.draw(texture, vertices, 0, verticesLength, triangles, 0, triangles.length);
 				}
 			}
@@ -257,15 +263,16 @@ public class SkeletonRenderer {
 		Texture texture = null;
 		Color color = null, skeletonColor = skeleton.color;
 		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
-		Array<Slot> drawOrder = skeleton.drawOrder;
+		Array<Slot> drawOrder = skeleton.drawOrder;		
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
+			final int vertexSize = (softwareClipping && clipAttachment != null) ? 2 : 6;
 			Slot slot = drawOrder.get(i);
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment region = (RegionAttachment) attachment;
-				verticesLength = 24;
+				verticesLength = vertexSize << 2;
 				vertices = this.vertices.items;
-				region.computeWorldVertices(slot.getBone(), vertices, 0, 6);
+				region.computeWorldVertices(slot.getBone(), vertices, 0, vertexSize);
 				triangles = quadTriangles;
 				texture = region.getRegion().getTexture();
 				uvs = region.getUVs();
@@ -274,9 +281,9 @@ public class SkeletonRenderer {
 			} else if (attachment instanceof MeshAttachment) {
 				MeshAttachment mesh = (MeshAttachment) attachment;
 				int count = mesh.getWorldVerticesLength();
-				verticesLength = count * 3;
+				verticesLength = count * (vertexSize >> 1);
 				vertices = this.vertices.setSize(verticesLength);
-				mesh.computeWorldVertices(slot, 0, count, vertices, 0, 6);
+				mesh.computeWorldVertices(slot, 0, count, vertices, 0, vertexSize);
 				triangles = mesh.getTriangles();
 				texture = mesh.getRegion().getTexture();
 				uvs = mesh.getUVs();
@@ -329,12 +336,6 @@ public class SkeletonRenderer {
 						((int) (b * darkColor.b * color.b * 255) << 16) //
 								| ((int) (g * darkColor.g * color.g * 255) << 8) //
 								| (int) (r * darkColor.r * color.r * 255));
-				for (int v = 2, u = 0; v < verticesLength; v += 6, u += 2) {
-					vertices[v] = light;
-					vertices[v + 1] = dark;
-					vertices[v + 2] = uvs[u];
-					vertices[v + 3] = uvs[u + 1];
-				}
 
 				BlendMode slotBlendMode = slot.data.getBlendMode();
 				if (slotBlendMode != blendMode) {
@@ -344,12 +345,24 @@ public class SkeletonRenderer {
 				
 				if (softwareClipping) {
 					if (clipAttachment != null) {
-						clipSoftware(vertices, 0, verticesLength, triangles, 0, triangles.length, clippedVertices, clippedTriangles, dark, light, true);
+						clipSoftware(vertices, 0, verticesLength, triangles, 0, triangles.length, uvs, dark, light, true, clippedVertices, clippedTriangles);
 						batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0, clippedTriangles.size);
 					} else {
+						for (int v = 2, u = 0; v < verticesLength; v += 6, u += 2) {
+							vertices[v] = light;
+							vertices[v + 1] = dark;
+							vertices[v + 2] = uvs[u];
+							vertices[v + 3] = uvs[u + 1];
+						}
 						batch.draw(texture, vertices, 0, verticesLength, triangles, 0, triangles.length);
 					}
 				} else {
+					for (int v = 2, u = 0; v < verticesLength; v += 6, u += 2) {
+						vertices[v] = light;
+						vertices[v + 1] = dark;
+						vertices[v + 2] = uvs[u];
+						vertices[v + 3] = uvs[u + 1];
+					}
 					batch.draw(texture, vertices, 0, verticesLength, triangles, 0, triangles.length);
 				}
 			}
@@ -408,33 +421,32 @@ public class SkeletonRenderer {
 		if (!softwareClipping) Gdx.gl.glDisable(GL20.GL_STENCIL_TEST);
 	}
 	
-	private void clipSoftware(final float[] vertices, final int offset, final int verticesLength, final short[] triangles, final int triangleOffset, final int trianglesLength, final FloatArray clippedVertices, final ShortArray clippedTriangles, final float dark, final float light, final boolean twoColor) {
-		int idx = 0;
+	private void clipSoftware(final float[] vertices, final int offset, final int verticesLength, final short[] triangles, final int triangleOffset, final int trianglesLength, final float uvs[], final float dark, final float light, final boolean twoColor, final FloatArray clippedVertices, final ShortArray clippedTriangles) {
+		short idx = 0;
 		clippedVertices.clear();
 		clippedTriangles.clear();
-		final int vertexSize = twoColor ? 6 : 5;
-		final int uvOffset = twoColor ? 4 : 3;
 		for (int i = 0; i < trianglesLength; i += 3) {
-			int triOffset = triangles[i] * vertexSize;
-			float x1 = vertices[triOffset];
-			float y1= vertices[triOffset + 1];
-			float u1 = vertices[triOffset + uvOffset];
-			float v1 = vertices[triOffset + uvOffset + 1];
+			int vertexOffset = triangles[i] << 1;
+			float x1 = vertices[vertexOffset];
+			float y1= vertices[vertexOffset + 1];
+			float u1 = uvs[vertexOffset];
+			float v1 = uvs[vertexOffset + 1];
 			
-			triOffset = triangles[i + 1] * vertexSize;
-			float x2 = vertices[triOffset];
-			float y2 = vertices[triOffset + 1];
-			float u2 = vertices[triOffset + uvOffset];
-			float v2 = vertices[triOffset + uvOffset + 1];
+			vertexOffset = triangles[i + 1] << 1;
+			float x2 = vertices[vertexOffset];
+			float y2 = vertices[vertexOffset + 1];
+			float u2 = uvs[vertexOffset];
+			float v2 = uvs[vertexOffset + 1];
 			
-			triOffset = triangles[i + 2] * vertexSize;
-			float x3 = vertices[triOffset];
-			float y3 = vertices[triOffset + 1];
-			float u3 = vertices[triOffset + uvOffset];
-			float v3 = vertices[triOffset + uvOffset + 1];
+			vertexOffset = triangles[i + 2] << 1;
+			float x3 = vertices[vertexOffset];
+			float y3 = vertices[vertexOffset + 1];
+			float u3 = uvs[vertexOffset];
+			float v3 = uvs[vertexOffset + 1];
 			
-			boolean clipped = clipper.clip(x1, y1, x2, y2, x3, y3, clippingArea, clipOutput, clippingAreaClockwise);
-			if (clipped) {				
+			boolean clipped = clipper.clip(x1, y1, x2, y2, x3, y3, clippingArea, clipOutput);
+			if (clipped) {
+				if (clipOutput.size == 0) continue;
 				float d0 = y2 - y3;
 				float d1 = x3 - x2;
 				float d2 = x1 - x3;
@@ -444,6 +456,9 @@ public class SkeletonRenderer {
 				float denom = 1 / (d0 * d2 + d1 * d3);
 				
 				float[] clipVertices = clipOutput.items;
+				int s = clippedVertices.size;
+				clippedVertices.setSize(s + (clipOutput.size >> 1) * (twoColor ? 6 : 5));
+				final float[] clippedVerticesArray = clippedVertices.items;
 				
 				for (int j = 0, n = clipOutput.size; j < n; j += 2) {				
 					float x = clipVertices[j];
@@ -457,46 +472,77 @@ public class SkeletonRenderer {
 					
 					float u = u1 * a + u2 * b + u3 * c;
 					float v = v1 * a + v2 * b + v3 * c;
-					clippedVertices.add(x);
-					clippedVertices.add(y);
-					clippedVertices.add(light);
-					if (twoColor) clippedVertices.add(dark);
-					clippedVertices.add(u);
-					clippedVertices.add(v);
+					clippedVerticesArray[s++] = x;
+					clippedVerticesArray[s++] = y;
+					clippedVerticesArray[s++] = light;
+					if (twoColor) clippedVerticesArray[s++] = dark;
+					clippedVerticesArray[s++] = u;
+					clippedVerticesArray[s++] = v;
 				}
 				
+				s = clippedTriangles.size;
+				clippedTriangles.setSize(s + 3 * ((clipOutput.size >> 1) - 2));
+				final short[] clippedTrianglesArray = clippedTriangles.items;
+				
 				for (int j = 1, n = (clipOutput.size >> 1) - 1; j < n; j++) {
-					clippedTriangles.add(idx);
-					clippedTriangles.add(idx + j);
-					clippedTriangles.add(idx + j + 1);
+					clippedTrianglesArray[s++] = idx;
+					clippedTrianglesArray[s++] = (short)(idx + j);
+					clippedTrianglesArray[s++] = (short)(idx + j + 1);
 				}
 				
 				idx += clipOutput.size >> 1;
 			} else {
-				clippedVertices.add(x1);
-				clippedVertices.add(y1);
-				clippedVertices.add(light);
-				if (twoColor) clippedVertices.add(dark);
-				clippedVertices.add(u1);
-				clippedVertices.add(v1);
+				int s = clippedVertices.size;
+				clippedVertices.setSize(s + 3 * (twoColor ? 6 : 5));
+				final float[] clippedVerticesArray = clippedVertices.items;
 				
-				clippedVertices.add(x2);
-				clippedVertices.add(y2);
-				clippedVertices.add(light);
-				if (twoColor) clippedVertices.add(dark);
-				clippedVertices.add(u2);
-				clippedVertices.add(v2);
+				if (!twoColor) { 
+					clippedVerticesArray[s] = x1;
+					clippedVerticesArray[s + 1] = y1;
+					clippedVerticesArray[s + 2] = light;
+					clippedVerticesArray[s + 3] = u1;
+					clippedVerticesArray[s + 4] = v1;
+					
+					clippedVerticesArray[s + 5] = x2;
+					clippedVerticesArray[s + 6] = y2;
+					clippedVerticesArray[s + 7] = light;
+					clippedVerticesArray[s + 8] = u2;
+					clippedVerticesArray[s + 9] = v2;
+					
+					clippedVerticesArray[s + 10] = x3;
+					clippedVerticesArray[s + 11] = y3;
+					clippedVerticesArray[s + 12] = light;
+					clippedVerticesArray[s + 13] = u3;
+					clippedVerticesArray[s + 14] = v3;
+				} else {
+					clippedVerticesArray[s] = x1;
+					clippedVerticesArray[s + 1] = y1;
+					clippedVerticesArray[s + 2] = light;
+					clippedVerticesArray[s + 3] = dark;
+					clippedVerticesArray[s + 4] = u1;
+					clippedVerticesArray[s + 5] = v1;
+					
+					clippedVerticesArray[s + 6] = x2;
+					clippedVerticesArray[s + 7] = y2;
+					clippedVerticesArray[s + 8] = light;
+					clippedVerticesArray[s + 9] = dark;
+					clippedVerticesArray[s + 10] = u2;
+					clippedVerticesArray[s + 11] = v2;
+					
+					clippedVerticesArray[s + 12] = x3;
+					clippedVerticesArray[s + 13] = y3;
+					clippedVerticesArray[s + 14] = light;
+					clippedVerticesArray[s + 15] = dark;
+					clippedVerticesArray[s + 16] = u3;
+					clippedVerticesArray[s + 17] = v3;
+				}
 				
-				clippedVertices.add(x3);
-				clippedVertices.add(y3);
-				clippedVertices.add(light);
-				if (twoColor) clippedVertices.add(dark);
-				clippedVertices.add(u3);
-				clippedVertices.add(v3);
-				
-				clippedTriangles.add(idx++);
-				clippedTriangles.add(idx++);
-				clippedTriangles.add(idx++);
+				s = clippedTriangles.size;
+				clippedTriangles.setSize(s + 3);
+				final short[] clippedTrianglesArray = clippedTriangles.items;
+				clippedTrianglesArray[s] = idx++;
+				clippedTrianglesArray[s + 1] = idx++;
+				clippedTrianglesArray[s + 2] = idx++;
 			}
 		}
 	}
