@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.FloatArray;
 public class SutherlandHodgmanClipper {
 	final FloatArray scratch = new FloatArray();
 
-	/** Clips the input triangle against the convex clipping area. If the triangle lies entirely within the clipping area, false is
+	/** Clips the input triangle against the convex clipping area, which needs to be clockwise. If the triangle lies entirely within the clipping area, false is
 	 * returned. The clipping area must duplicate the first vertex at the end of the vertices list! */
 	public boolean clip (float x1, float y1, float x2, float y2, float x3, float y3, FloatArray clippingArea, FloatArray output,
 		boolean isClockwise) {
@@ -40,16 +40,6 @@ public class SutherlandHodgmanClipper {
 			float edgeY = clippingVertices[i + 1];
 			float edgeX2 = clippingVertices[i + 2];
 			float edgeY2 = clippingVertices[i + 3];
-
-			if (!isClockwise) {
-				float tmp = edgeX;
-				edgeX = edgeX2;
-				edgeX2 = tmp;
-
-				tmp = edgeY;
-				edgeY = edgeY2;
-				edgeY2 = tmp;
-			}
 
 			final float deltaX = edgeX - edgeX2;
 			final float deltaY = edgeY - edgeY2;
@@ -125,6 +115,22 @@ public class SutherlandHodgmanClipper {
 		float ua = (c2 * (y1 - y3) - c0 * (x1 - x3)) / d;
 		output.add(x1 + (x2 - x1) * ua);
 		output.add(y1 + (y2 - y1) * ua);
+	}
+	
+	public static void makeClockwise (FloatArray poly) {
+		if (clockwise(poly)) return;
+		
+		int lastX = poly.size - 2;
+		final float[] polygon = poly.items;
+		for (int i = 0, n = poly.size / 2; i < n; i += 2) {
+			int other = lastX - i;
+			float x = polygon[i];
+			float y = polygon[i + 1];
+			polygon[i] = polygon[other];
+			polygon[i + 1] = polygon[other + 1];
+			polygon[other] = x;
+			polygon[other + 1] = y;
+		}
 	}
 
 	public static boolean clockwise (FloatArray poly) {
