@@ -35,10 +35,10 @@ public class SutherlandHodgmanClipper {
 		final float[] clippingVertices = clippingArea.items;
 		final int clippingVerticesLength = clippingArea.size - 2;
 		for (int i = 0; i < clippingVerticesLength; i += 2) {
-			float edgeX2 = clippingVertices[i];
-			float edgeY2 = clippingVertices[i + 1];
-			float edgeX = clippingVertices[i + 2];
-			float edgeY = clippingVertices[i + 3];
+			float edgeX = clippingVertices[i];
+			float edgeY = clippingVertices[i + 1];
+			float edgeX2 = clippingVertices[i + 2];
+			float edgeY2 = clippingVertices[i + 3];
 
 			final float deltaX = edgeX - edgeX2;
 			final float deltaY = edgeY - edgeY2;
@@ -129,8 +129,8 @@ public class SutherlandHodgmanClipper {
 		return clipped;
 	}
 	
-	public static void makeCounterClockwise (FloatArray poly) {
-		if (counterClockwise(poly)) return;
+	public static void makeClockwise (FloatArray poly) {
+		if (isClockwise(poly)) return;
 		
 		int lastX = poly.size - 2;
 		final float[] polygon = poly.items;
@@ -145,8 +145,8 @@ public class SutherlandHodgmanClipper {
 		}
 	}
 
-	public static boolean counterClockwise (FloatArray poly) {
-		return area(poly) > 0;
+	public static boolean isClockwise (FloatArray poly) {
+		return area(poly) < 0;
 	}
 
 	public static float area (FloatArray poly) {
