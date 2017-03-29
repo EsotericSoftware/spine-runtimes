@@ -137,7 +137,7 @@ public class SoftwareClippingTest extends ApplicationAdapter {
 		// edge normals
 		shapes.setColor(Color.YELLOW);		
 		if (clippingPolygon.size > 2) {
-			boolean clockwise = SutherlandHodgmanClipper.clockwise(clippingPolygon);
+			boolean clockwise = SutherlandHodgmanClipper.counterClockwise(clippingPolygon);
 			for (int i = 0; i < clippingPolygon.size; i += 2) {
 				float x = clippingPolygon.get(i);
 				float y = clippingPolygon.get(i + 1);
@@ -183,7 +183,7 @@ public class SoftwareClippingTest extends ApplicationAdapter {
 		
 		// must duplicate first vertex at end of polygon
 		// so we can avoid module/branch in clipping code
-		SutherlandHodgmanClipper.makeClockwise(clippingPolygon);
+		SutherlandHodgmanClipper.makeCounterClockwise(clippingPolygon);
 		clippingPolygon.add(clippingPolygon.get(0));
 		clippingPolygon.add(clippingPolygon.get(1));
 		
