@@ -42,7 +42,6 @@ import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.WindowedMean;
 import com.esotericsoftware.spine.attachments.ClippingAttachment;
-import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
 public class ClippingTest extends ApplicationAdapter {
 	OrthographicCamera camera;
