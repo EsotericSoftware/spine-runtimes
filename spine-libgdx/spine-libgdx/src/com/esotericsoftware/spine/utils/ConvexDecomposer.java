@@ -74,14 +74,22 @@ public class ConvexDecomposer {
 		polyIndices.add(idx3);
 		idx3 <<= 1;
 		System.out.println("Triangle: " + idx1 / 2 + ", " + idx2 / 2 + ", " + idx3 / 2);
-		poly.add(polygon.get(idx1));
-		poly.add(polygon.get(idx1 + 1));
-		poly.add(polygon.get(idx2));
-		poly.add(polygon.get(idx2 + 1));
-		poly.add(polygon.get(idx3));
-		poly.add(polygon.get(idx3 + 1));
-		int lastWinding = lastWinding(poly);
-		int fanBaseIndex = idx1 >> 1;
+		
+		float x1 = polygon.get(idx1);
+		float y1 = polygon.get(idx1 + 1);
+		float x2 = polygon.get(idx2);
+		float y2 = polygon.get(idx2 + 1);
+		float x3 = polygon.get(idx3);
+		float y3 = polygon.get(idx3 + 1);
+		
+		poly.add(x1);
+		poly.add(y1);
+		poly.add(x2);
+		poly.add(y2);
+		poly.add(x3);
+		poly.add(y3);
+		int lastWinding = winding(x1, y1, x2, y2, x3, y3);
+		int fanBaseIndex = idx1 >> 1;		
 
 		for (int i = 3, n = triangles.size; i < n; i += 3) {
 			idx1 = triangles.get(i);
@@ -89,31 +97,26 @@ public class ConvexDecomposer {
 			idx3 = triangles.get(i + 2);
 			System.out.println("Triangle: " + idx1 + ", " + idx2 + ", " + idx3);
 
-			float x1 = polygon.get(idx1 * 2);
-			float y1 = polygon.get(idx1 * 2 + 1);
-			float x2 = polygon.get(idx2 * 2);
-			float y2 = polygon.get(idx2 * 2 + 1);
-			float x3 = polygon.get(idx3 * 2);
-			float y3 = polygon.get(idx3 * 2 + 1);
+			x1 = polygon.get(idx1 * 2);
+			y1 = polygon.get(idx1 * 2 + 1);
+			x2 = polygon.get(idx2 * 2);
+			y2 = polygon.get(idx2 * 2 + 1);
+			x3 = polygon.get(idx3 * 2);
+			y3 = polygon.get(idx3 * 2 + 1);
 
 			// if the base of the last triangle
 			// is the same as this triangle's base
 			// check if they form a convex polygon (triangle fan)
 			boolean merged = false;
-			if (fanBaseIndex == idx1) {
-				poly.add(x3);
-				poly.add(y3);
-				poly.add(poly.get(0));
-				poly.add(poly.get(1));
-				poly.add(poly.get(2));
-				poly.add(poly.get(3));
-				float winding = lastWinding(poly);
-				if (winding == lastWinding) {
-					poly.size -= 4;
+			if (fanBaseIndex == idx1) {				
+				int o = poly.size - 4;				
+				int winding1 = winding(poly.get(o), poly.get(o + 1), poly.get(o + 2), poly.get(o + 3), x3, y3);
+				int winding2 = winding(x3, y3, poly.get(0), poly.get(1), poly.get(2), poly.get(3));
+				if (winding1 == lastWinding && winding2 == lastWinding) {
+					poly.add(x3);
+					poly.add(y3);
 					polyIndices.add(idx3);
 					merged = true;
-				} else {
-					poly.size -= 6;
 				}
 			}
 
@@ -133,7 +136,7 @@ public class ConvexDecomposer {
 				polyIndices.add(idx1);
 				polyIndices.add(idx2);
 				polyIndices.add(idx3);
-				lastWinding = lastWinding(poly);
+				lastWinding = winding(x1, y1, x2, y2, x3, y3);
 				fanBaseIndex = idx1;
 			}
 		}
@@ -150,16 +153,10 @@ public class ConvexDecomposer {
 		return polyResult;
 	}
 
-	private int lastWinding (FloatArray poly) {
-		float px = poly.get(poly.size - 5);
-		float py = poly.get(poly.size - 6);
-		float tx = poly.get(poly.size - 3);
-		float ty = poly.get(poly.size - 4);
-		float ux = poly.get(poly.size - 1);
-		float uy = poly.get(poly.size - 2);
-		float vx = tx - px;
-		float vy = ty - py;
-		return ux * vy - uy * vx + vx * py - px * vy >= 0 ? 1 : -1;
+	public static int winding (float v1x, float v1y, float v2x, float v2y, float v3x, float v3y) {
+		float vx = v2x - v1x;
+		float vy = v2y - v1y;
+		return v3x * vy - v3y * vx + vx * v1y - v1x * vy >= 0 ? 1 : -1;
 	}
 
 	/** @return {@link #CONCAVE}, {@link #TANGENTIAL} or {@link #CONVEX} */

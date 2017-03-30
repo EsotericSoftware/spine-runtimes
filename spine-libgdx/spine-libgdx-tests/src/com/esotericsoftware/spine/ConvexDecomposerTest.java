@@ -43,6 +43,11 @@ public class ConvexDecomposerTest extends ApplicationAdapter {
 		polyBatcher = new PolygonSpriteBatch();
 		image = new Texture("skin/skin.png");
 		font = new BitmapFont();
+		
+		// float[] v = { 87, 288, 217, 371, 456, 361, 539, 175, 304, 194, 392, 290, 193, 214, 123, 15, 14, 137 };
+		float[] v = { 336, 153, 207, 184, 364, 333, 529, 326, 584, 130, 438, 224 };
+		polygon.addAll(v);
+		triangulate();
 	}
 
 	@Override
@@ -70,11 +75,17 @@ public class ConvexDecomposerTest extends ApplicationAdapter {
 				isCreatingPolygon = true;
 			}
 
-			polygon.add(tmp.x);
-			polygon.add(tmp.y);
+			polygon.add((int)tmp.x);
+			polygon.add((int)tmp.y);
 
 			if (Gdx.input.isButtonPressed(Buttons.RIGHT)) {
 				isCreatingPolygon = false;
+				System.out.print("float[] v = { ");
+				for (int i = 0; i < polygon.size; i++) {
+					System.out.print(polygon.get(i));
+					if (i != polygon.size - 1) System.out.print(", ");
+				}
+				System.out.println("};");
 				triangulate();
 			}
 		}
@@ -133,7 +144,7 @@ public class ConvexDecomposerTest extends ApplicationAdapter {
 				float my = y + (y2 - y) / 2;
 				float nx = (y2 - y);
 				float ny = -(x2 - x);
-				if (clockwise) {
+				if (!clockwise) {
 					nx = -nx;
 					ny = -ny;
 				}
@@ -167,8 +178,9 @@ public class ConvexDecomposerTest extends ApplicationAdapter {
 		for (int i = 0; i < polygon.size; i+=2) {
 			float x = polygon.get(i);
 			float y = polygon.get(i + 1);
-			font.draw(polyBatcher, "" + (i >> 1), x, y);
+			font.draw(polyBatcher, "" + (i >> 1), x, y); // + ", " + x + ", " + y, x, y);
 		}
+		font.draw(polyBatcher, Gdx.input.getX() + ", " + (Gdx.graphics.getHeight() - Gdx.input.getY()), 0, 20);
 		polyBatcher.end();
 	}
 
