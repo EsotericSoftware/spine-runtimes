@@ -137,7 +137,7 @@ public class SoftwareClippingTest extends ApplicationAdapter {
 		// edge normals
 		shapes.setColor(Color.YELLOW);		
 		if (clippingPolygon.size > 2) {
-			boolean clockwise = SutherlandHodgmanClipper.clockwise(clippingPolygon);
+			boolean clockwise = SutherlandHodgmanClipper.isClockwise(clippingPolygon);
 			for (int i = 0; i < clippingPolygon.size; i += 2) {
 				float x = clippingPolygon.get(i);
 				float y = clippingPolygon.get(i + 1);

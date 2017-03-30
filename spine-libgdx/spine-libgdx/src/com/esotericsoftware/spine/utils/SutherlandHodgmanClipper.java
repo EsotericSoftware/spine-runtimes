@@ -130,7 +130,7 @@ public class SutherlandHodgmanClipper {
 	}
 	
 	public static void makeClockwise (FloatArray poly) {
-		if (clockwise(poly)) return;
+		if (isClockwise(poly)) return;
 		
 		int lastX = poly.size - 2;
 		final float[] polygon = poly.items;
@@ -145,7 +145,7 @@ public class SutherlandHodgmanClipper {
 		}
 	}
 
-	public static boolean clockwise (FloatArray poly) {
+	public static boolean isClockwise (FloatArray poly) {
 		return area(poly) < 0;
 	}
 

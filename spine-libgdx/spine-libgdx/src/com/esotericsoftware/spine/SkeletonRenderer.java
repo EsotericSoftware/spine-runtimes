@@ -406,7 +406,7 @@ public class SkeletonRenderer {
 			int n = clip.getWorldVerticesLength();
 			float[] vertices = this.clippingArea.setSize(n);
 			clip.computeWorldVertices(slot, 0, n, vertices, 0, 2);
-			clippingAreaClockwise = SutherlandHodgmanClipper.clockwise(this.clippingArea);
+			clippingAreaClockwise = SutherlandHodgmanClipper.isClockwise(this.clippingArea);
 			if (!clippingAreaClockwise) {
 				SutherlandHodgmanClipper.makeClockwise(clippingArea);
 			}
