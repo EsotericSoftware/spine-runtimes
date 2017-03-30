@@ -1,15 +1,63 @@
+/******************************************************************************
+ * Spine Runtimes Software License v2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 
 package com.esotericsoftware.spine.utils;
+
+import java.util.Iterator;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.ShortArray;
 
 public class ConvexDecomposer {
 	static private final int CONCAVE = -1;
-	static private final int TANGENTIAL = 0;
 	static private final int CONVEX = 1;
+
+	private Pool<FloatArray> polygonPool = new Pool<FloatArray>() {
+		@Override
+		protected FloatArray newObject () {
+			return new FloatArray(16);
+		}
+	};
+
+	private Pool<ShortArray> polygonIndicesPool = new Pool<ShortArray>() {
+		@Override
+		protected ShortArray newObject () {
+			return new ShortArray(16);
+		}
+	};
+
+	private Array<FloatArray> convexPolygons = new Array<FloatArray>();
+	private Array<ShortArray> convexPolygonsIndices = new Array<ShortArray>();
 
 	private final ShortArray indicesArray = new ShortArray();
 	private short[] indices;
@@ -36,17 +84,15 @@ public class ConvexDecomposer {
 		for (int i = 0, n = vertexCount; i < n; ++i)
 			vertexTypes.add(classifyVertex(i));
 
-		// A polygon with n vertices has a triangulation of n-2 triangles.
 		ShortArray triangles = this.triangles;
 		triangles.clear();
 		triangles.ensureCapacity(Math.max(0, vertexCount - 2) * 4);
 
+		// Triangulate
 		while (this.vertexCount > 3) {
 			int earTipIndex = findEarTip();
-			System.out.println("tip index: " + earTipIndex);
 			cutEarTip(earTipIndex);
 
-			// The type of the two vertices adjacent to the clipped vertex may have changed.
 			int previousIndex = previousIndex(earTipIndex);
 			int nextIndex = earTipIndex == vertexCount ? 0 : earTipIndex;
 			vertexTypes.set(previousIndex, classifyVertex(previousIndex));
@@ -59,57 +105,37 @@ public class ConvexDecomposer {
 			triangles.add(indicesArray.get(1));
 		}
 
-		Array<FloatArray> polyResult = new Array<FloatArray>();
-		Array<ShortArray> polyIndicesResult = new Array<ShortArray>();
+		polygonPool.freeAll(convexPolygons);
+		convexPolygons.clear();
+		polygonIndicesPool.freeAll(convexPolygonsIndices);
+		convexPolygonsIndices.clear();
 
-		ShortArray polyIndices = new ShortArray();
-		FloatArray poly = new FloatArray();
-		int idx1 = triangles.get(0);
-		polyIndices.add(idx1);
-		idx1 <<= 1;
-		int idx2 = triangles.get(1);
-		polyIndices.add(idx2);
-		idx2 <<= 1;
-		int idx3 = triangles.get(2);
-		polyIndices.add(idx3);
-		idx3 <<= 1;
-		System.out.println("Triangle: " + idx1 / 2 + ", " + idx2 / 2 + ", " + idx3 / 2);
-		
-		float x1 = polygon.get(idx1);
-		float y1 = polygon.get(idx1 + 1);
-		float x2 = polygon.get(idx2);
-		float y2 = polygon.get(idx2 + 1);
-		float x3 = polygon.get(idx3);
-		float y3 = polygon.get(idx3 + 1);
-		
-		poly.add(x1);
-		poly.add(y1);
-		poly.add(x2);
-		poly.add(y2);
-		poly.add(x3);
-		poly.add(y3);
-		int lastWinding = winding(x1, y1, x2, y2, x3, y3);
-		int fanBaseIndex = idx1 >> 1;		
+		ShortArray polyIndices = polygonIndicesPool.obtain();
+		polyIndices.clear();
+		FloatArray poly = polygonPool.obtain();
+		poly.clear();
+		int fanBaseIndex = -1;
+		int lastWinding = 0;
 
-		for (int i = 3, n = triangles.size; i < n; i += 3) {
-			idx1 = triangles.get(i);
-			idx2 = triangles.get(i + 1);
-			idx3 = triangles.get(i + 2);
-			System.out.println("Triangle: " + idx1 + ", " + idx2 + ", " + idx3);
+		// Merge subsequent triangles if they form a triangle fan
+		for (int i = 0, n = triangles.size; i < n; i += 3) {
+			int idx1 = triangles.get(i) << 1;
+			int idx2 = triangles.get(i + 1) << 1;
+			int idx3 = triangles.get(i + 2) << 1;
 
-			x1 = polygon.get(idx1 * 2);
-			y1 = polygon.get(idx1 * 2 + 1);
-			x2 = polygon.get(idx2 * 2);
-			y2 = polygon.get(idx2 * 2 + 1);
-			x3 = polygon.get(idx3 * 2);
-			y3 = polygon.get(idx3 * 2 + 1);
+			float x1 = polygon.get(idx1);
+			float y1 = polygon.get(idx1 + 1);
+			float x2 = polygon.get(idx2);
+			float y2 = polygon.get(idx2 + 1);
+			float x3 = polygon.get(idx3);
+			float y3 = polygon.get(idx3 + 1);
 
 			// if the base of the last triangle
 			// is the same as this triangle's base
 			// check if they form a convex polygon (triangle fan)
 			boolean merged = false;
-			if (fanBaseIndex == idx1) {				
-				int o = poly.size - 4;				
+			if (fanBaseIndex == idx1) {
+				int o = poly.size - 4;
 				int winding1 = winding(poly.get(o), poly.get(o + 1), poly.get(o + 2), poly.get(o + 3), x3, y3);
 				int winding2 = winding(x3, y3, poly.get(0), poly.get(1), poly.get(2), poly.get(3));
 				if (winding1 == lastWinding && winding2 == lastWinding) {
@@ -123,16 +149,20 @@ public class ConvexDecomposer {
 			// otherwise make this triangle
 			// the new base
 			if (!merged) {
-				polyResult.add(poly);
-				polyIndicesResult.add(polyIndices);
-				poly = new FloatArray();
+				if (poly.size > 0) {
+					convexPolygons.add(poly);
+					convexPolygonsIndices.add(polyIndices);
+				}
+				poly = polygonPool.obtain();
+				poly.clear();
 				poly.add(x1);
 				poly.add(y1);
 				poly.add(x2);
 				poly.add(y2);
 				poly.add(x3);
 				poly.add(y3);
-				polyIndices = new ShortArray();
+				polyIndices = polygonIndicesPool.obtain();
+				polyIndices.clear();
 				polyIndices.add(idx1);
 				polyIndices.add(idx2);
 				polyIndices.add(idx3);
@@ -142,24 +172,75 @@ public class ConvexDecomposer {
 		}
 
 		if (poly.size > 0) {
-			polyResult.add(poly);
-			polyIndicesResult.add(polyIndices);
+			convexPolygons.add(poly);
+			convexPolygonsIndices.add(polyIndices);
 		}
 
-		for (ShortArray pIndices : polyIndicesResult) {
-			System.out.println("Poly: " + pIndices.toString(","));
+		// go through the list of polygons and try
+		// to merge the remaining triangles with
+		// the found triangle fans
+		for (int i = 0, n = convexPolygons.size; i < n; i++) {
+			polyIndices = convexPolygonsIndices.get(i);
+			if (polyIndices.size == 0) continue;
+			int firstIndex = polyIndices.get(0);
+			int lastIndex = polyIndices.get(polyIndices.size - 1);
+
+			poly = convexPolygons.get(i);
+			int o = poly.size - 4;
+			float prevPrevX = poly.get(o);
+			float prevPrevY = poly.get(o + 1);
+			float prevX = poly.get(o + 2);
+			float prevY = poly.get(o + 3);
+			float firstX = poly.get(0);
+			float firstY = poly.get(1);
+			float secondX = poly.get(2);
+			float secondY = poly.get(3);
+			int winding = winding(prevPrevX, prevPrevY, prevX, prevY, firstX, firstY);
+
+			for (int j = 0; j < n; j++) {
+				if (j == i) continue;
+				ShortArray otherIndices = convexPolygonsIndices.get(j);
+				if (otherIndices.size != 3) continue;
+				int otherFirstIndex = otherIndices.get(0);
+				int otherSecondIndex = otherIndices.get(1);
+				int otherLastIndex = otherIndices.get(2);
+
+				FloatArray otherPoly = convexPolygons.get(j);
+				float x3 = otherPoly.get(otherPoly.size - 2);
+				float y3 = otherPoly.get(otherPoly.size - 1);
+
+				if (otherFirstIndex != firstIndex || otherSecondIndex != lastIndex) continue;
+				int winding1 = winding(prevPrevX, prevPrevY, prevX, prevY, x3, y3);
+				int winding2 = winding(x3, y3, firstX, firstY, secondX, secondY);
+				if (winding1 == winding && winding2 == winding) {
+					otherPoly.clear();
+					otherIndices.clear();
+					poly.add(x3);
+					poly.add(y3);
+					polyIndices.add(otherLastIndex);
+					prevPrevX = prevX;
+					prevPrevY = prevY;
+					prevX = x3;
+					prevY = y3;
+					j = 0;
+				}
+			}
 		}
 
-		return polyResult;
+		// Remove empty polygons that resulted from the
+		// merge step above
+		Iterator<FloatArray> polyIter = convexPolygons.iterator();
+		while (polyIter.hasNext()) {
+			poly = polyIter.next();
+			if (poly.size == 0) {
+				polyIter.remove();
+				polygonPool.free(poly);
+			}
+		}
+
+		return convexPolygons;
 	}
 
-	public static int winding (float v1x, float v1y, float v2x, float v2y, float v3x, float v3y) {
-		float vx = v2x - v1x;
-		float vy = v2y - v1y;
-		return v3x * vy - v3y * vx + vx * v1y - v1x * vy >= 0 ? 1 : -1;
-	}
-
-	/** @return {@link #CONCAVE}, {@link #TANGENTIAL} or {@link #CONVEX} */
 	private int classifyVertex (int index) {
 		short[] indices = this.indices;
 		int previous = indices[previousIndex(index)] * 2;
@@ -175,17 +256,10 @@ public class ConvexDecomposer {
 		for (int i = 0; i < vertexCount; i++)
 			if (isEarTip(i)) return i;
 
-		// Desperate mode: if no vertex is an ear tip, we are dealing with a degenerate polygon (e.g. nearly collinear).
-		// Note that the input was not necessarily degenerate, but we could have made it so by clipping some valid ears.
-
-		// Idea taken from Martin Held, "FIST: Fast industrial-strength triangulation of polygons", Algorithmica (1998),
-		// http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.115.291
-
-		// Return a convex or tangential vertex if one exists.
 		int[] vertexTypes = this.vertexTypes.items;
 		for (int i = 0; i < vertexCount; i++)
 			if (vertexTypes[i] != CONCAVE) return i;
-		return 0; // If all vertices are concave, just return the first one.
+		return 0;
 	}
 
 	private boolean isEarTip (int earTipIndex) {
@@ -203,18 +277,11 @@ public class ConvexDecomposer {
 		float p2x = vertices[p2], p2y = vertices[p2 + 1];
 		float p3x = vertices[p3], p3y = vertices[p3 + 1];
 
-		// Check if any point is inside the triangle formed by previous, current and next vertices.
-		// Only consider vertices that are not part of this triangle, or else we'll always find one inside.
 		for (int i = nextIndex(nextIndex); i != previousIndex; i = nextIndex(i)) {
-			// Concave vertices can obviously be inside the candidate ear, but so can tangential vertices
-			// if they coincide with one of the triangle's vertices.
 			if (vertexTypes[i] != CONVEX) {
 				int v = indices[i] * 2;
 				float vx = vertices[v];
 				float vy = vertices[v + 1];
-				// Because the polygon has clockwise winding order, the area sign will be positive if the point is strictly inside.
-				// It will be 0 on the edge, which we want to include as well.
-				// note: check the edge defined by p1->p3 first since this fails _far_ more then the other 2 checks.
 				if (computeSpannedAreaSign(p3x, p3y, p1x, p1y, vx, vy) >= 0) {
 					if (computeSpannedAreaSign(p1x, p1y, p2x, p2y, vx, vy) >= 0) {
 						if (computeSpannedAreaSign(p2x, p2y, p3x, p3y, vx, vy) >= 0) return false;
@@ -254,5 +321,11 @@ public class ConvexDecomposer {
 		area += p2x * (p1y - p3y);
 		area += p3x * (p2y - p1y);
 		return (int)Math.signum(area);
+	}
+
+	public static int winding (float v1x, float v1y, float v2x, float v2y, float v3x, float v3y) {
+		float vx = v2x - v1x;
+		float vy = v2y - v1y;
+		return v3x * vy - v3y * vx + vx * v1y - v1x * vy >= 0 ? 1 : -1;
 	}
 }

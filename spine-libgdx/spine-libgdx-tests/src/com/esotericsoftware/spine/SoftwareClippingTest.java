@@ -18,7 +18,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.ShortArray;
-import com.esotericsoftware.spine.utils.SutherlandHodgmanClipper;
+import com.esotericsoftware.spine.utils.Clipper;
 
 public class SoftwareClippingTest extends ApplicationAdapter {
 	OrthographicCamera sceneCamera;
@@ -41,14 +41,14 @@ public class SoftwareClippingTest extends ApplicationAdapter {
 
 	boolean isCreatingClippingArea = false;
 	Vector3 tmp = new Vector3();
-	SutherlandHodgmanClipper clipper;	
+	Clipper clipper;
 
 	@Override
 	public void create () {
 		sceneCamera = new OrthographicCamera();
 		shapes = new ShapeRenderer();
 		polyBatcher = new PolygonSpriteBatch();
-		clipper = new SutherlandHodgmanClipper();
+		clipper = new Clipper();
 		image = new Texture("skin/skin.png");
 	}
 
@@ -137,7 +137,7 @@ public class SoftwareClippingTest extends ApplicationAdapter {
 		// edge normals
 		shapes.setColor(Color.YELLOW);		
 		if (clippingPolygon.size > 2) {
-			boolean clockwise = SutherlandHodgmanClipper.isClockwise(clippingPolygon);
+			boolean clockwise = Clipper.isClockwise(clippingPolygon);
 			for (int i = 0; i < clippingPolygon.size; i += 2) {
 				float x = clippingPolygon.get(i);
 				float y = clippingPolygon.get(i + 1);
@@ -183,7 +183,7 @@ public class SoftwareClippingTest extends ApplicationAdapter {
 		
 		// must duplicate first vertex at end of polygon
 		// so we can avoid module/branch in clipping code
-		SutherlandHodgmanClipper.makeClockwise(clippingPolygon);
+		Clipper.makeClockwise(clippingPolygon);
 		clippingPolygon.add(clippingPolygon.get(0));
 		clippingPolygon.add(clippingPolygon.get(1));
 		
