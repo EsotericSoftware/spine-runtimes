@@ -171,7 +171,8 @@ public class ClippingTest extends ApplicationAdapter {
 
 	public static void main (String[] args) throws Exception {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.stencil = 8;
+		config.width = 800;
+		config.height = 600;
 		new LwjglApplication(new ClippingTest(), config);
 	}
 }

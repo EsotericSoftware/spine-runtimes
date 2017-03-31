@@ -28,14 +28,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package com.esotericsoftware.spine;
+package com.esotericsoftware.spine.utils;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.ShortArray;
+import com.esotericsoftware.spine.Slot;
 import com.esotericsoftware.spine.attachments.ClippingAttachment;
-import com.esotericsoftware.spine.utils.Clipper;
-import com.esotericsoftware.spine.utils.ConvexDecomposer;
 
 public class SkeletonClipping {
 	private final Clipper clipper = new Clipper();
