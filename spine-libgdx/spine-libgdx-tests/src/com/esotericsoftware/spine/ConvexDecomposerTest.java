@@ -47,7 +47,7 @@ public class ConvexDecomposerTest extends ApplicationAdapter {
 		image = new Texture("skin/skin.png");
 		font = new BitmapFont();
 
-		float[] v = {100, 100, 120, 100, 200, 100, 200, 400, 100, 400};
+		float[] v = new float[] { 94.0f, 84.0f, 45.0f, 165.0f, 218.0f, 292.0f, 476.0f, 227.0f, 480.0f, 125.0f, 325.0f, 191.0f, 333.0f, 77.0f, 302.0f, 30.0f, 175.0f, 140.0f };
 
 // float[] v = {87, 288, 217, 371, 456, 361, 539, 175, 304, 194, 392, 290, 193, 214, 123, 15, 14, 137};
 // float[] v = { 336, 153, 207, 184, 364, 333, 529, 326, 584, 130, 438, 224 };

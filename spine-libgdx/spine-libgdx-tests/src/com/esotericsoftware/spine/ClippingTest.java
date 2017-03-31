@@ -61,7 +61,6 @@ public class ClippingTest extends ApplicationAdapter {
 		batch = new PolygonSpriteBatch(2048);
 		renderer = new SkeletonRenderer();
 		renderer.setPremultipliedAlpha(true);
-		renderer.setSoftwareClipping(true);
 		debugRenderer = new SkeletonRendererDebug();
 		debugRenderer.setBoundingBoxes(false);
 		debugRenderer.setRegionAttachments(false);
@@ -90,13 +89,13 @@ public class ClippingTest extends ApplicationAdapter {
 		ClippingAttachment clip = new ClippingAttachment("clip");
 		// Rectangle:
 		clip.setVertices(
-//			new float[] { 87, 288, 217, 371, 456, 361, 539, 175, 304, 194, 392, 290, 193, 214, 123, 15, 14, 137 });	
-		new float[] { //
-			-140, 50, //
-			250, 50, //
-			250, 350, //
-			-140, 350, //
-		});
+			new float[] { 94.0f, 84.0f, 45.0f, 165.0f, 218.0f, 292.0f, 476.0f, 227.0f, 480.0f, 125.0f, 325.0f, 191.0f, 333.0f, 77.0f, 302.0f, 30.0f, 175.0f, 140.0f });	
+//		new float[] { //
+//			-140, 50, //
+//			250, 50, //
+//			250, 350, //
+//			-140, 350, //
+//		});
 		// Self intersection:
 //		clip.setVertices(new float[] { //
 //			-140, -50, //
@@ -104,7 +103,11 @@ public class ClippingTest extends ApplicationAdapter {
 //			120, -50, //
 //			-140, 50, //
 //		});
-		clip.setWorldVerticesLength(8);
+		for (int j = 0; j < clip.getVertices().length; j+=2) {
+			clip.getVertices()[j] = (clip.getVertices()[j] - 150f);
+			clip.getVertices()[j+1] = (clip.getVertices()[j+1] + 100);
+		}
+		clip.setWorldVerticesLength(clip.getVertices().length);
 		clip.setEndSlot(skeleton.findSlot("front_hand").data.index);
 
 		SlotData clipSlotData = new SlotData(skeletonData.getSlots().size, "clip slot", skeletonData.getBones().first());
@@ -139,11 +142,6 @@ public class ClippingTest extends ApplicationAdapter {
 		batch.end();
 
 		debugRenderer.draw(skeleton);
-		
-		if (Gdx.input.isKeyJustPressed(Keys.S)) {
-			renderer.setSoftwareClipping(!renderer.getSoftwareClipping());
-			System.out.println("Software clipping: " + renderer.getSoftwareClipping());
-		}
 	}
 
 	public void resize (int width, int height) {
