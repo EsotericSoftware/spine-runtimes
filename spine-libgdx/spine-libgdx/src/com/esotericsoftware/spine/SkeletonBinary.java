@@ -68,6 +68,7 @@ import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
 import com.esotericsoftware.spine.attachments.AttachmentType;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
+import com.esotericsoftware.spine.attachments.ClippingAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.PointAttachment;
@@ -377,7 +378,6 @@ public class SkeletonBinary {
 			region.updateOffset();
 			return region;
 		}
-		// BOZO! - Binary clip export.
 		case boundingbox: {
 			int vertexCount = input.readInt(true);
 			Vertices vertices = readVertices(input, vertexCount);
@@ -485,6 +485,21 @@ public class SkeletonBinary {
 			point.setRotation(rotation);
 			if (nonessential) Color.rgba8888ToColor(point.getColor(), color);
 			return point;
+		}
+		case clipping: {
+			int endSlotIndex = input.readInt(true);
+			int vertexCount = input.readInt(true);
+			Vertices vertices = readVertices(input, vertexCount);
+			int color = nonessential ? input.readInt() : 0;
+
+			ClippingAttachment clip = attachmentLoader.newClippingAttachment(skin, name);
+			if (clip == null) return null;
+			clip.setEndSlot(endSlotIndex);
+			clip.setWorldVerticesLength(vertexCount << 1);
+			clip.setVertices(vertices.vertices);
+			clip.setBones(vertices.bones);
+			if (nonessential) Color.rgba8888ToColor(clip.getColor(), color);
+			return clip;
 		}
 		}
 		return null;

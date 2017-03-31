@@ -31,37 +31,25 @@
 package com.esotericsoftware.spine.attachments;
 
 import com.badlogic.gdx.graphics.Color;
-import com.esotericsoftware.spine.Slot;
 
 /** An attachment with vertices that make up a polygon used for clipping the rendering of other attachments. */
 public class ClippingAttachment extends VertexAttachment {
-	Slot end;
-	boolean invert;
+	int endSlot;
 
 	// Nonessential.
-	final Color color = new Color(0.38f, 0.94f, 0, 1);
+	final Color color = new Color(0.2275f, 0.2275f, 0.8078f, 1); // ce3a3aff
 
 	public ClippingAttachment (String name) {
 		super(name);
 	}
 
 	/** Clipping is performed between the clipping polygon's slot and the end slot. */
-	public Slot getEnd () {
-		return end;
+	public int getEndSlot () {
+		return endSlot;
 	}
 
-	public void setEnd (Slot end) {
-		this.end = end;
-	}
-
-	/** If false, attachments outside the clipping polygon will be drawn. If true, attachments inside the clipping polygon will be
-	 * drawn. */
-	public boolean getInvert () {
-		return invert;
-	}
-
-	public void setInvert (boolean invert) {
-		this.invert = invert;
+	public void setEndSlot (int slotIndex) {
+		this.endSlot = slotIndex;
 	}
 
 	/** The color of the clipping polygon as it was in Spine. Available only when nonessential data was exported. Clipping polygons

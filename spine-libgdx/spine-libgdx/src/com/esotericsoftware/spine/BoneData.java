@@ -42,7 +42,7 @@ public class BoneData {
 	TransformMode transformMode = TransformMode.normal;
 
 	// Nonessential.
-	final Color color = new Color(0.61f, 0.61f, 0.61f, 1);
+	final Color color = new Color(0.61f, 0.61f, 0.61f, 1); // 9b9b9bff
 
 	/** @param parent May be null. */
 	public BoneData (int index, String name, BoneData parent) {

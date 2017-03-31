@@ -305,9 +305,11 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			var skinAttachments = o.Attachments;
 			var newSkin = new Skin(newName);
 
+			// Use these to detect and use shared regions.
 			var existingRegions = new Dictionary<AtlasRegion, int>();
 			var regionIndexes = new List<int>();
 
+			// Collect all textures from the attachments of the original skin.
 			var repackedAttachments = new List<Attachment>();
 			var texturesToPack = new List<Texture2D>();
 			var originalRegions = new List<AtlasRegion>();
@@ -334,11 +336,13 @@ namespace Spine.Unity.Modules.AttachmentTools {
 				newSkin.AddAttachment(key.slotIndex, key.name, newAttachment);
 			}
 
+			// Fill a new texture with the collected attachment textures.
 			var newTexture = new Texture2D(maxAtlasSize, maxAtlasSize, textureFormat, mipmaps);
 			newTexture.anisoLevel = texturesToPack[0].anisoLevel;
 			newTexture.name = newName;
 			var rects = newTexture.PackTextures(texturesToPack.ToArray(), padding, maxAtlasSize);
 
+			// Rehydrate the repacked textures as a Material, Spine atlas and Spine.AtlasAttachments
 			var newMaterial = new Material(shader);
 			newMaterial.name = newName;
 			newMaterial.mainTexture = newTexture;
@@ -352,10 +356,15 @@ namespace Spine.Unity.Modules.AttachmentTools {
 				repackedRegions.Add(newRegion);
 			}
 
+			// Map the cloned attachments to the repacked atlas.
 			for (int i = 0, n = repackedAttachments.Count; i < n; i++) {
 				var a = repackedAttachments[i];
 				a.SetRegion(repackedRegions[regionIndexes[i]]);
 			}
+
+			// Clean up
+			foreach (var ttp in texturesToPack)
+				UnityEngine.Object.Destroy(ttp);
 
 			t = newTexture;
 			m = newMaterial;
@@ -706,7 +715,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 				ma.hulllength = o.hulllength;
 
 				// Nonessential.
-				ma.Edges = o.Edges.Clone() as int[];
+				ma.Edges = (o.Edges == null) ? null : o.Edges.Clone() as int[]; // Allow absence of Edges array when nonessential data is not exported.
 				ma.Width = o.Width;
 				ma.Height = o.Height;
 			}

@@ -50,9 +50,8 @@ public class SkeletonRendererDebug {
 	static private final Color boneLineColor = Color.RED;
 	static private final Color boneOriginColor = Color.GREEN;
 	static private final Color attachmentLineColor = new Color(0, 0, 1, 0.5f);
-	static private final Color triangleLineColor = new Color(1, 0.64f, 0, 0.5f);
+	static private final Color triangleLineColor = new Color(1, 0.64f, 0, 0.5f); // ffa3007f
 	static private final Color aabbColor = new Color(0, 1, 0, 0.5f);
-	static private final Color clippingLineColor = Color.MAGENTA;
 
 	private final ShapeRenderer shapes;
 	private boolean drawBones = true, drawRegionAttachments = true, drawBoundingBoxes = true, drawPoints = true;
@@ -190,7 +189,7 @@ public class SkeletonRendererDebug {
 				int nn = clip.getWorldVerticesLength();
 				float[] vertices = this.vertices.setSize(nn);
 				clip.computeWorldVertices(slot, 0, nn, vertices, 0, 2);
-				shapes.setColor(clippingLineColor);
+				shapes.setColor(clip.getColor());
 				for (int ii = 2; ii < nn; ii += 2)
 					shapes.line(vertices[ii - 2], vertices[ii - 1], vertices[ii], vertices[ii + 1]);
 				shapes.line(vertices[0], vertices[1], vertices[nn - 2], vertices[nn - 1]);
@@ -295,6 +294,10 @@ public class SkeletonRendererDebug {
 
 	public void setPoints (boolean points) {
 		this.drawPoints = points;
+	}
+	
+	public void setClipping (boolean clipping) {
+		this.drawClipping = clipping;
 	}
 
 	public void setPremultipliedAlpha (boolean premultipliedAlpha) {

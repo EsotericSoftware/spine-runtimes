@@ -40,6 +40,7 @@ import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.ShortArray;
@@ -52,26 +53,25 @@ import com.esotericsoftware.spine.utils.Clipper;
 import com.esotericsoftware.spine.utils.ConvexDecomposer;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
-public class SkeletonRenderer {
-	static private final short[] quadTriangles = { 0, 1, 2, 2, 3, 0 };
+public class SkeletonRenderer implements Disposable {
+	static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
 
 	private boolean softwareClipping;
 	private boolean premultipliedAlpha;
 	private final FloatArray vertices = new FloatArray(32);
 	
 	private ClippingAttachment clipAttachment;
-	private Slot clipEnd;
 	private Clipper clipper = new Clipper();
 	private ConvexDecomposer decomposer = new ConvexDecomposer();
 	private FloatArray clippingPolygon = new FloatArray(400);
 	private Array<FloatArray> convexClippingPolygons;
 	private FloatArray clipOutput = new FloatArray(400);
-	private FloatArray clippedVertices = new FloatArray(400);	
+	private FloatArray clippedVertices = new FloatArray(400);
 	private ShortArray clippedTriangles = new ShortArray(400);
 	private final Matrix4 combinedMatrix = new Matrix4();
-	private ImmediateModeRenderer renderer; // BOZO! - Dispose.
+	private ImmediateModeRenderer renderer;
 
-	public void draw(Batch batch, Skeleton skeleton) {
+	public void draw (Batch batch, Skeleton skeleton) {
 		boolean premultipliedAlpha = this.premultipliedAlpha;
 		float[] vertices = this.vertices.items;
 		Color skeletonColor = skeleton.color;
@@ -81,14 +81,14 @@ public class SkeletonRenderer {
 			Slot slot = drawOrder.get(i);
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
-				RegionAttachment region = (RegionAttachment) attachment;
+				RegionAttachment region = (RegionAttachment)attachment;
 				region.computeWorldVertices(slot.getBone(), vertices, 0, 5);
 				Color color = region.getColor(), slotColor = slot.getColor();
 				float alpha = a * slotColor.a * color.a * 255;
-				float c = NumberUtils.intToFloatColor(((int) alpha << 24) //
-						| ((int) (b * slotColor.b * color.b * alpha) << 16) //
-						| ((int) (g * slotColor.g * color.g * alpha) << 8) //
-						| (int) (r * slotColor.r * color.r * alpha));
+				float c = NumberUtils.intToFloatColor(((int)alpha << 24) //
+					| ((int)(b * slotColor.b * color.b * alpha) << 16) //
+					| ((int)(g * slotColor.g * color.g * alpha) << 8) //
+					| (int)(r * slotColor.r * color.r * alpha));
 				float[] uvs = region.getUVs();
 				for (int u = 0, v = 2; u < 8; u += 2, v += 5) {
 					vertices[v] = c;
@@ -101,7 +101,7 @@ public class SkeletonRenderer {
 				batch.draw(region.getRegion().getTexture(), vertices, 0, 20);
 
 			} else if (attachment instanceof ClippingAttachment) {
-				ClippingAttachment clip = (ClippingAttachment) attachment;
+				ClippingAttachment clip = (ClippingAttachment)attachment;
 				if (!softwareClipping) batch.end();
 				clipStart(batch.getProjectionMatrix(), batch.getTransformMatrix(), slot, clip);
 				if (!softwareClipping) batch.begin();
@@ -111,7 +111,7 @@ public class SkeletonRenderer {
 				throw new RuntimeException("SkeletonMeshRenderer is required to render meshes.");
 
 			} else if (attachment instanceof SkeletonAttachment) {
-				Skeleton attachmentSkeleton = ((SkeletonAttachment) attachment).getSkeleton();
+				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
 				if (attachmentSkeleton != null) {
 					Bone bone = slot.getBone();
 					Bone rootBone = attachmentSkeleton.getRootBone();
@@ -137,7 +137,7 @@ public class SkeletonRenderer {
 				}
 			}
 
-			if (slot == clipEnd) {
+			if (clipAttachment != null && i == clipAttachment.getEndSlot()) {
 				batch.flush();
 				clipEnd();
 			}
@@ -145,7 +145,7 @@ public class SkeletonRenderer {
 	}
 
 	@SuppressWarnings("null")
-	public void draw(PolygonSpriteBatch batch, Skeleton skeleton) {
+	public void draw (PolygonSpriteBatch batch, Skeleton skeleton) {
 		boolean premultipliedAlpha = this.premultipliedAlpha;
 		BlendMode blendMode = null;
 		int verticesLength = 0;
@@ -154,13 +154,13 @@ public class SkeletonRenderer {
 		Texture texture = null;
 		Color color = null, skeletonColor = skeleton.color;
 		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
-		Array<Slot> drawOrder = skeleton.drawOrder;		
+		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			final int vertexSize = (softwareClipping && clipAttachment != null) ? 2 : 5;
 			Slot slot = drawOrder.get(i);
-			Attachment attachment = slot.attachment;			
+			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
-				RegionAttachment region = (RegionAttachment) attachment;
+				RegionAttachment region = (RegionAttachment)attachment;
 				verticesLength = vertexSize << 2;
 				vertices = this.vertices.items;
 				region.computeWorldVertices(slot.getBone(), vertices, 0, vertexSize);
@@ -170,7 +170,7 @@ public class SkeletonRenderer {
 				color = region.getColor();
 
 			} else if (attachment instanceof MeshAttachment) {
-				MeshAttachment mesh = (MeshAttachment) attachment;
+				MeshAttachment mesh = (MeshAttachment)attachment;
 				int count = mesh.getWorldVerticesLength();
 				verticesLength = (count >> 1) * vertexSize;
 				vertices = this.vertices.setSize(verticesLength);
@@ -181,14 +181,14 @@ public class SkeletonRenderer {
 				color = mesh.getColor();
 
 			} else if (attachment instanceof ClippingAttachment) {
-				ClippingAttachment clip = (ClippingAttachment) attachment;
+				ClippingAttachment clip = (ClippingAttachment)attachment;
 				if (!softwareClipping) batch.end();
 				clipStart(batch.getProjectionMatrix(), batch.getTransformMatrix(), slot, clip);
 				if (!softwareClipping) batch.begin();
 				continue;
 
 			} else if (attachment instanceof SkeletonAttachment) {
-				Skeleton attachmentSkeleton = ((SkeletonAttachment) attachment).getSkeleton();
+				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
 				if (attachmentSkeleton != null) {
 					Bone bone = slot.getBone();
 					Bone rootBone = attachmentSkeleton.getRootBone();
@@ -216,10 +216,10 @@ public class SkeletonRenderer {
 			if (texture != null) {
 				Color slotColor = slot.getColor();
 				float alpha = a * slotColor.a * color.a * 255;
-				float c = NumberUtils.intToFloatColor(((int) alpha << 24) //
-						| ((int) (b * slotColor.b * color.b * alpha) << 16) //
-						| ((int) (g * slotColor.g * color.g * alpha) << 8) //
-						| (int) (r * slotColor.r * color.r * alpha));
+				float c = NumberUtils.intToFloatColor(((int)alpha << 24) //
+					| ((int)(b * slotColor.b * color.b * alpha) << 16) //
+					| ((int)(g * slotColor.g * color.g * alpha) << 8) //
+					| (int)(r * slotColor.r * color.r * alpha));
 
 				BlendMode slotBlendMode = slot.data.getBlendMode();
 				if (slotBlendMode != blendMode) {
@@ -228,8 +228,10 @@ public class SkeletonRenderer {
 				}
 				if (softwareClipping) {
 					if (clipAttachment != null) {
-						clipSoftware(vertices, 0, verticesLength, triangles, 0, triangles.length, uvs, 0, c, false, clippedVertices, clippedTriangles);
-						batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0, clippedTriangles.size);
+						clipSoftware(vertices, 0, verticesLength, triangles, 0, triangles.length, uvs, 0, c, false, clippedVertices,
+							clippedTriangles);
+						batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,
+							clippedTriangles.size);
 					} else {
 						for (int v = 2, u = 0; v < verticesLength; v += 5, u += 2) {
 							vertices[v] = c;
@@ -248,7 +250,7 @@ public class SkeletonRenderer {
 				}
 			}
 
-			if (slot == clipEnd) {
+			if (clipAttachment != null && i == clipAttachment.getEndSlot()) {
 				if (!softwareClipping) batch.flush();
 				clipEnd();
 			}
@@ -256,7 +258,7 @@ public class SkeletonRenderer {
 	}
 
 	@SuppressWarnings("null")
-	public void draw(TwoColorPolygonBatch batch, Skeleton skeleton) {
+	public void draw (TwoColorPolygonBatch batch, Skeleton skeleton) {
 		boolean premultipliedAlpha = this.premultipliedAlpha;
 		BlendMode blendMode = null;
 		int verticesLength = 0;
@@ -265,13 +267,13 @@ public class SkeletonRenderer {
 		Texture texture = null;
 		Color color = null, skeletonColor = skeleton.color;
 		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
-		Array<Slot> drawOrder = skeleton.drawOrder;		
+		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			final int vertexSize = (softwareClipping && clipAttachment != null) ? 2 : 6;
 			Slot slot = drawOrder.get(i);
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
-				RegionAttachment region = (RegionAttachment) attachment;
+				RegionAttachment region = (RegionAttachment)attachment;
 				verticesLength = vertexSize << 2;
 				vertices = this.vertices.items;
 				region.computeWorldVertices(slot.getBone(), vertices, 0, vertexSize);
@@ -281,7 +283,7 @@ public class SkeletonRenderer {
 				color = region.getColor();
 
 			} else if (attachment instanceof MeshAttachment) {
-				MeshAttachment mesh = (MeshAttachment) attachment;
+				MeshAttachment mesh = (MeshAttachment)attachment;
 				int count = mesh.getWorldVerticesLength();
 				verticesLength = count * (vertexSize >> 1);
 				vertices = this.vertices.setSize(verticesLength);
@@ -292,14 +294,14 @@ public class SkeletonRenderer {
 				color = mesh.getColor();
 
 			} else if (attachment instanceof ClippingAttachment) {
-				ClippingAttachment clip = (ClippingAttachment) attachment;
+				ClippingAttachment clip = (ClippingAttachment)attachment;
 				if (!softwareClipping) batch.end();
 				clipStart(batch.getProjectionMatrix(), batch.getTransformMatrix(), slot, clip);
 				if (!softwareClipping) batch.begin();
 				continue;
 
 			} else if (attachment instanceof SkeletonAttachment) {
-				Skeleton attachmentSkeleton = ((SkeletonAttachment) attachment).getSkeleton();
+				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
 				if (attachmentSkeleton != null) {
 					Bone bone = slot.getBone();
 					Bone rootBone = attachmentSkeleton.getRootBone();
@@ -327,28 +329,29 @@ public class SkeletonRenderer {
 			if (texture != null) {
 				Color lightColor = slot.getColor();
 				float alpha = a * lightColor.a * color.a * 255;
-				float light = NumberUtils.intToFloatColor(((int) alpha << 24) //
-						| ((int) (b * lightColor.b * color.b * alpha) << 16) //
-						| ((int) (g * lightColor.g * color.g * alpha) << 8) //
-						| (int) (r * lightColor.r * color.r * alpha));
+				float light = NumberUtils.intToFloatColor(((int)alpha << 24) //
+					| ((int)(b * lightColor.b * color.b * alpha) << 16) //
+					| ((int)(g * lightColor.g * color.g * alpha) << 8) //
+					| (int)(r * lightColor.r * color.r * alpha));
 				Color darkColor = slot.getDarkColor();
-				if (darkColor == null)
-					darkColor = Color.BLACK;
+				if (darkColor == null) darkColor = Color.BLACK;
 				float dark = NumberUtils.intToFloatColor( //
-						((int) (b * darkColor.b * color.b * 255) << 16) //
-								| ((int) (g * darkColor.g * color.g * 255) << 8) //
-								| (int) (r * darkColor.r * color.r * 255));
+					((int)(b * darkColor.b * color.b * 255) << 16) //
+						| ((int)(g * darkColor.g * color.g * 255) << 8) //
+						| (int)(r * darkColor.r * color.r * 255));
 
 				BlendMode slotBlendMode = slot.data.getBlendMode();
 				if (slotBlendMode != blendMode) {
 					blendMode = slotBlendMode;
 					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
 				}
-				
+
 				if (softwareClipping) {
 					if (clipAttachment != null) {
-						clipSoftware(vertices, 0, verticesLength, triangles, 0, triangles.length, uvs, dark, light, true, clippedVertices, clippedTriangles);
-						batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0, clippedTriangles.size);
+						clipSoftware(vertices, 0, verticesLength, triangles, 0, triangles.length, uvs, dark, light, true,
+							clippedVertices, clippedTriangles);
+						batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,
+							clippedTriangles.size);
 					} else {
 						for (int v = 2, u = 0; v < verticesLength; v += 6, u += 2) {
 							vertices[v] = light;
@@ -369,17 +372,16 @@ public class SkeletonRenderer {
 				}
 			}
 
-			if (slot == clipEnd) {
+			if (clipAttachment != null && i == clipAttachment.getEndSlot()) {
 				if (!softwareClipping) batch.flush();
 				clipEnd();
 			}
 		}
 	}
 
-	private void clipStart(Matrix4 transformMatrix, Matrix4 projectionMatrix, Slot slot, ClippingAttachment clip) {
-		if (clipEnd != null) return;
+	private void clipStart (Matrix4 transformMatrix, Matrix4 projectionMatrix, Slot slot, ClippingAttachment clip) {
+		if (clipAttachment != null) return;
 		clipAttachment = clip;
-		clipEnd = clip.getEnd();
 
 		if (!softwareClipping) {
 			int n = clip.getWorldVerticesLength();
@@ -402,7 +404,7 @@ public class SkeletonRenderer {
 			renderer.end();
 
 			Gdx.gl.glColorMask(true, true, true, true);
-			Gdx.gl.glStencilFunc(clip.getInvert() ? GL20.GL_NOTEQUAL : GL20.GL_EQUAL, 1, 1);
+			Gdx.gl.glStencilFunc(false ? GL20.GL_NOTEQUAL : GL20.GL_EQUAL, 1, 1);
 			Gdx.gl.glStencilOp(GL20.GL_KEEP, GL20.GL_KEEP, GL20.GL_KEEP);
 		} else {
 			int n = clip.getWorldVerticesLength();
@@ -423,11 +425,12 @@ public class SkeletonRenderer {
 		clippingPolygon.clear();
 		convexClippingPolygons = null;
 		clipAttachment = null;
-		clipEnd = null;
 		if (!softwareClipping) Gdx.gl.glDisable(GL20.GL_STENCIL_TEST);
 	}
-	
-	private void clipSoftware(final float[] vertices, final int offset, final int verticesLength, final short[] triangles, final int triangleOffset, final int trianglesLength, final float uvs[], final float dark, final float light, final boolean twoColor, final FloatArray clippedVertices, final ShortArray clippedTriangles) {
+
+	private void clipSoftware (final float[] vertices, final int offset, final int verticesLength, final short[] triangles,
+		final int triangleOffset, final int trianglesLength, final float uvs[], final float dark, final float light,
+		final boolean twoColor, final FloatArray clippedVertices, final ShortArray clippedTriangles) {
 		short idx = 0;
 		clippedVertices.clear();
 		clippedTriangles.clear();
@@ -555,15 +558,19 @@ public class SkeletonRenderer {
 		}
 	}
 
-	public void setPremultipliedAlpha(boolean premultipliedAlpha) {
+	public void setPremultipliedAlpha (boolean premultipliedAlpha) {
 		this.premultipliedAlpha = premultipliedAlpha;
 	}
-	
+
+	public void dispose () {
+		renderer.dispose();
+	}
+
 	public boolean getSoftwareClipping () {
 		return softwareClipping;
 	}
 
-	public void setSoftwareClipping(boolean softwareClipping) {
+	public void setSoftwareClipping (boolean softwareClipping) {
 		this.softwareClipping = softwareClipping;
 	}
 }

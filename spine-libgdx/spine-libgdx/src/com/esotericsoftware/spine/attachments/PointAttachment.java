@@ -45,7 +45,7 @@ public class PointAttachment extends Attachment {
 	float x, y, rotation;
 
 	// Nonessential.
-	final Color color = new Color(0.38f, 0.94f, 0, 1);
+	final Color color = new Color(0.9451f, 0.9451f, 0, 1); // f1f100ff
 
 	public PointAttachment (String name) {
 		super(name);
