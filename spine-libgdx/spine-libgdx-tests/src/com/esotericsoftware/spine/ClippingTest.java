@@ -105,7 +105,7 @@ public class ClippingTest extends ApplicationAdapter {
 //			-140, 50, //
 //		});
 		clip.setWorldVerticesLength(8);
-		clip.setEnd(skeleton.findSlot("front_hand"));
+		clip.setEndSlot(skeleton.findSlot("front_hand").data.index);
 
 		SlotData clipSlotData = new SlotData(skeletonData.getSlots().size, "clip slot", skeletonData.getBones().first());
 		skeletonData.getSlots().add(clipSlotData);

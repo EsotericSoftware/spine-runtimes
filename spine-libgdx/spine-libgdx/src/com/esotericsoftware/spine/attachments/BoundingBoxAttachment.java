@@ -40,7 +40,7 @@ import com.esotericsoftware.spine.SkeletonBounds;
  * Guide. */
 public class BoundingBoxAttachment extends VertexAttachment {
 	// Nonessential.
-	final Color color = new Color(0.38f, 0.94f, 0, 1);
+	final Color color = new Color(0.38f, 0.94f, 0, 1); // 60f000ff
 
 	public BoundingBoxAttachment (String name) {
 		super(name);

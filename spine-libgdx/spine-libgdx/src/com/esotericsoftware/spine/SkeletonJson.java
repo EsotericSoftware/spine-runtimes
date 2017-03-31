@@ -65,6 +65,7 @@ import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
 import com.esotericsoftware.spine.attachments.AttachmentType;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
+import com.esotericsoftware.spine.attachments.ClippingAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.PointAttachment;
@@ -207,7 +208,7 @@ public class SkeletonJson {
 
 			data.local = constraintMap.getBoolean("local", false);
 			data.relative = constraintMap.getBoolean("relative", false);
-			
+
 			data.offsetRotation = constraintMap.getFloat("rotation", 0);
 			data.offsetX = constraintMap.getFloat("x", 0) * scale;
 			data.offsetY = constraintMap.getFloat("y", 0) * scale;
@@ -261,7 +262,7 @@ public class SkeletonJson {
 				if (slot == null) throw new SerializationException("Slot not found: " + slotEntry.name);
 				for (JsonValue entry = slotEntry.child; entry != null; entry = entry.next) {
 					try {
-						Attachment attachment = readAttachment(entry, skin, slot.index, entry.name);
+						Attachment attachment = readAttachment(entry, skin, slot.index, entry.name, skeletonData);
 						if (attachment != null) skin.addAttachment(slot.index, entry.name, attachment);
 					} catch (Exception ex) {
 						throw new SerializationException("Error reading attachment: " + entry.name + ", skin: " + skin, ex);
@@ -311,7 +312,7 @@ public class SkeletonJson {
 		return skeletonData;
 	}
 
-	private Attachment readAttachment (JsonValue map, Skin skin, int slotIndex, String name) {
+	private Attachment readAttachment (JsonValue map, Skin skin, int slotIndex, String name, SkeletonData skeletonData) {
 		float scale = this.scale;
 		name = map.getString("name", name);
 
@@ -337,7 +338,6 @@ public class SkeletonJson {
 			region.updateOffset();
 			return region;
 		}
-		// BOZO! - JSON clip export.
 		case boundingbox: {
 			BoundingBoxAttachment box = attachmentLoader.newBoundingBoxAttachment(skin, name);
 			if (box == null) return null;
@@ -406,6 +406,20 @@ public class SkeletonJson {
 			String color = map.getString("color", null);
 			if (color != null) point.getColor().set(Color.valueOf(color));
 			return point;
+		}
+		case clipping: {
+			ClippingAttachment clip = attachmentLoader.newClippingAttachment(skin, name);
+			if (clip == null) return null;
+
+			SlotData slot = skeletonData.findSlot(map.getString("end"));
+			if (slot == null) throw new SerializationException("Slot not found: " + map.getString("end"));
+			clip.setEndSlot(slot.index);
+
+			readVertices(map, clip, map.getInt("vertexCount") << 1);
+
+			String color = map.getString("color", null);
+			if (color != null) clip.getColor().set(Color.valueOf(color));
+			return clip;
 		}
 		}
 		return null;

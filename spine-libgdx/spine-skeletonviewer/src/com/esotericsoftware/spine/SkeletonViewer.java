@@ -299,6 +299,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			debugRenderer.setMeshTriangles(ui.debugMeshTrianglesCheckbox.isChecked());
 			debugRenderer.setPaths(ui.debugPathsCheckbox.isChecked());
 			debugRenderer.setPoints(ui.debugPointsCheckbox.isChecked());
+			debugRenderer.setClipping(ui.debugClippingCheckbox.isChecked());
 			debugRenderer.draw(skeleton);
 		}
 
@@ -396,6 +397,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 		CheckBox debugMeshTrianglesCheckbox = new CheckBox("Triangles", skin);
 		CheckBox debugPathsCheckbox = new CheckBox("Paths", skin);
 		CheckBox debugPointsCheckbox = new CheckBox("Points", skin);
+		CheckBox debugClippingCheckbox = new CheckBox("Clipping", skin);
 		Slider scaleSlider = new Slider(0.1f, 3, 0.01f, false, skin);
 		Slider zoomSlider = new Slider(0.01f, 10, 0.01f, false, skin);
 		Label scaleLabel = new Label("1.0", skin);
@@ -452,7 +454,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			window.setX(-3);
 			window.setY(-2);
 
-			window.getTitleLabel().setColor(new Color(0.76f, 1, 1, 1));
+			window.getTitleLabel().setColor(new Color(0xc1ffffff));
 			window.getTitleTable().add(openButton).space(3);
 			window.getTitleTable().add(minimizeButton).width(20);
 
@@ -486,7 +488,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			root.add("Debug:");
 			root.add(table(debugBonesCheckbox, debugRegionsCheckbox, debugBoundingBoxesCheckbox)).row();
 			root.add();
-			root.add(table(debugPathsCheckbox, debugPointsCheckbox)).row();
+			root.add(table(debugPathsCheckbox, debugPointsCheckbox, debugClippingCheckbox)).row();
 			root.add();
 			root.add(table(debugMeshHullCheckbox, debugMeshTrianglesCheckbox)).row();
 			root.add("Atlas alpha:");
@@ -784,6 +786,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			debugMeshTrianglesCheckbox.addListener(savePrefsListener);
 			debugPathsCheckbox.addListener(savePrefsListener);
 			debugPointsCheckbox.addListener(savePrefsListener);
+			debugClippingCheckbox.addListener(savePrefsListener);
 			premultipliedCheckbox.addListener(savePrefsListener);
 			loopCheckbox.addListener(savePrefsListener);
 			multipleMixingCheckbox.addListener(savePrefsListener);
@@ -848,6 +851,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			prefs.putBoolean("debugMeshTriangles", debugMeshTrianglesCheckbox.isChecked());
 			prefs.putBoolean("debugPaths", debugPathsCheckbox.isChecked());
 			prefs.putBoolean("debugPoints", debugPointsCheckbox.isChecked());
+			prefs.putBoolean("debugClipping", debugClippingCheckbox.isChecked());
 			prefs.putBoolean("premultiplied", premultipliedCheckbox.isChecked());
 			prefs.putBoolean("loop", loopCheckbox.isChecked());
 			prefs.putBoolean("multipleMixing", multipleMixingCheckbox.isChecked());
@@ -874,6 +878,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			debugMeshTrianglesCheckbox.setChecked(prefs.getBoolean("debugMeshTriangles", false));
 			debugPathsCheckbox.setChecked(prefs.getBoolean("debugPaths", true));
 			debugPointsCheckbox.setChecked(prefs.getBoolean("debugPoints", true));
+			debugClippingCheckbox.setChecked(prefs.getBoolean("debugClipping", true));
 			premultipliedCheckbox.setChecked(prefs.getBoolean("premultiplied", true));
 			loopCheckbox.setChecked(prefs.getBoolean("loop", false));
 			multipleMixingCheckbox.setChecked(prefs.getBoolean("multipleMixing", false));
