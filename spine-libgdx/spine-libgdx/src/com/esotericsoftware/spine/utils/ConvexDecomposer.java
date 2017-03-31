@@ -167,14 +167,10 @@ public class ConvexDecomposer {
 
 			polygon = convexPolygons.get(i);
 			int o = polygon.size - 4;
-			float prevPrevX = polygon.get(o);
-			float prevPrevY = polygon.get(o + 1);
-			float prevX = polygon.get(o + 2);
-			float prevY = polygon.get(o + 3);
-			float firstX = polygon.get(0);
-			float firstY = polygon.get(1);
-			float secondX = polygon.get(2);
-			float secondY = polygon.get(3);
+			float prevPrevX = polygon.get(o), prevPrevY = polygon.get(o + 1);
+			float prevX = polygon.get(o + 2), prevY = polygon.get(o + 3);
+			float firstX = polygon.get(0), firstY = polygon.get(1);
+			float secondX = polygon.get(2), secondY = polygon.get(3);
 			int winding = winding(prevPrevX, prevPrevY, prevX, prevY, firstX, firstY);
 
 			for (int ii = 0; ii < n; ii++) {
