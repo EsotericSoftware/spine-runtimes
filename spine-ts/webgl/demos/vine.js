@@ -5,7 +5,7 @@ var vineDemo = function(loadingComplete, bgColor) {
 	var COLOR_OUTER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.8);
 
 	var canvas, gl, renderer, input, assetManager;
-	var skeleton, state, bounds;		
+	var skeleton, state, bounds;
 	var timeKeeper, loadingScreen;
 	var target = null;
 	var hoverTargets = [null, null, null, null, null, null];
@@ -20,16 +20,16 @@ var vineDemo = function(loadingComplete, bgColor) {
 	function init () {
 		canvas = document.getElementById("vine-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
+		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });
 
-		renderer = new spine.webgl.SceneRenderer(canvas, gl);		
+		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		input = new spine.webgl.Input(canvas);
 		assetManager = spineDemos.assetManager;
 		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
 		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas2.png");
 		assetManager.loadText(DEMO_NAME, "atlas2.atlas");
-		assetManager.loadJson(DEMO_NAME, "demos.json");		
-		timeKeeper = new spine.TimeKeeper();		
+		assetManager.loadJson(DEMO_NAME, "demos.json");
+		timeKeeper = new spine.TimeKeeper();
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
 		requestAnimationFrame(load);
 	}
@@ -38,7 +38,7 @@ var vineDemo = function(loadingComplete, bgColor) {
 		timeKeeper.update();
 		if (assetManager.isLoadingComplete(DEMO_NAME)) {
 			var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas2.atlas"), function(path) {
-				return assetManager.get(DEMO_NAME, path);		
+				return assetManager.get(DEMO_NAME, path);
 			});
 			var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
@@ -48,7 +48,7 @@ var vineDemo = function(loadingComplete, bgColor) {
 			skeleton.updateWorldTransform();
 			var offset = new spine.Vector2();
 			bounds = new spine.Vector2();
-			skeleton.getBounds(offset, bounds);
+			skeleton.getBounds(offset, bounds, []);
 			state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 			state.setAnimation(0, "animation", true);
 			state.apply(skeleton);
@@ -65,14 +65,14 @@ var vineDemo = function(loadingComplete, bgColor) {
 
 			loadingComplete(canvas, render);
 		} else {
-			loadingScreen.draw(); 
+			loadingScreen.draw();
 			requestAnimationFrame(load);
 		}
 	}
 
 	function setupUI() {
 		playButton = $("#vine-playbutton");
-		var playButtonUpdate = function () {			
+		var playButtonUpdate = function () {
 			isPlaying = !isPlaying;
 			if (isPlaying)
 				playButton.addClass("pause").removeClass("play");
@@ -87,11 +87,11 @@ var vineDemo = function(loadingComplete, bgColor) {
 			if (isPlaying) playButton.click();
 			if (!isPlaying) {
 				var animationDuration = state.getCurrent(0).animation.duration;
-				time = animationDuration * percent;	
+				time = animationDuration * percent;
 				state.update(time - playTime);
 				state.apply(skeleton);
 				skeleton.updateWorldTransform();
-				playTime = time;		
+				playTime = time;
 			}
 		};
 
@@ -100,19 +100,19 @@ var vineDemo = function(loadingComplete, bgColor) {
 		var checkbox = $("#vine-drawbones");
 		checkbox.change(function() {
 			renderer.skeletonDebugRenderer.drawPaths = this.checked;
-			renderer.skeletonDebugRenderer.drawBones = this.checked;			
+			renderer.skeletonDebugRenderer.drawBones = this.checked;
 		});
 	}
 
 	function setupInput() {
 		input.addListener({
 			down: function(x, y) {
-				for (var i = 0; i < controlBones.length; i++) {	
-					var bone = skeleton.findBone(controlBones[i]);				
-					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);				
+				for (var i = 0; i < controlBones.length; i++) {
+					var bone = skeleton.findBone(controlBones[i]);
+					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
 					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
 						target = bone;
-					}				
+					}
 				}
 			},
 			up: function(x, y) {
@@ -132,15 +132,15 @@ var vineDemo = function(loadingComplete, bgColor) {
 				}
 			},
 			moved: function (x, y) {
-				for (var i = 0; i < controlBones.length; i++) {	
-					var bone = skeleton.findBone(controlBones[i]);				
-					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);				
+				for (var i = 0; i < controlBones.length; i++) {
+					var bone = skeleton.findBone(controlBones[i]);
+					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
 					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
 						hoverTargets[i] = bone;
 					} else {
 						hoverTargets[i] = null;
 					}
-				}				
+				}
 			}
 		});
 	}
@@ -151,14 +151,14 @@ var vineDemo = function(loadingComplete, bgColor) {
 
 		if (isPlaying) {
 			var animationDuration = state.getCurrent(0).animation.duration;
-			playTime += delta;			
+			playTime += delta;
 			while (playTime >= animationDuration) {
 				playTime -= animationDuration;
 			}
 			timeLine.set(playTime / animationDuration);
 
 			state.update(delta);
-			state.apply(skeleton);						
+			state.apply(skeleton);
 		}
 
 		skeleton.updateWorldTransform();
@@ -168,18 +168,18 @@ var vineDemo = function(loadingComplete, bgColor) {
 		renderer.resize(spine.webgl.ResizeMode.Fit);
 
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
-		gl.clear(gl.COLOR_BUFFER_BIT);			
+		gl.clear(gl.COLOR_BUFFER_BIT);
 
-		renderer.begin();				
+		renderer.begin();
 		renderer.drawSkeleton(skeleton, true);
 		renderer.drawSkeletonDebug(skeleton);
 		gl.lineWidth(2);
-		for (var i = 0; i < controlBones.length; i++) {		
+		for (var i = 0; i < controlBones.length; i++) {
 			var bone = skeleton.findBone(controlBones[i]);
 			var colorInner = hoverTargets[i] !== null ? spineDemos.HOVER_COLOR_INNER : spineDemos.NON_HOVER_COLOR_INNER;
 			var colorOuter = hoverTargets[i] !== null ? spineDemos.HOVER_COLOR_OUTER : spineDemos.NON_HOVER_COLOR_OUTER;
-			renderer.circle(true, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorInner);			
-			renderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);			
+			renderer.circle(true, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorInner);
+			renderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);
 		}
 		gl.lineWidth(1);
 		renderer.end();

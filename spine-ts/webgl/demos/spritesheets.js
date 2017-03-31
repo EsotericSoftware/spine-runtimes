@@ -50,7 +50,7 @@ var spritesheetsDemo = function(loadingComplete, bgColor) {
 			skeleton.updateWorldTransform();
 			offset = new spine.Vector2();
 			bounds = new spine.Vector2();
-			skeleton.getBounds(offset, bounds);
+			skeleton.getBounds(offset, bounds, []);
 			skeleton.x -= 60;
 
 			skeletonSeq = new spine.Skeleton(skeletonData);

@@ -1,5 +1,5 @@
 var transitionsDemo = function(loadingComplete, bgColor) {
-	var OUTLINE_COLOR = new spine.Color(0, 0.8, 0, 1);	
+	var OUTLINE_COLOR = new spine.Color(0, 0.8, 0, 1);
 
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, skeletonNoMix, state, stateNoMix, bounds;
@@ -17,43 +17,44 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 		timeSliderLabel = $("#transitions-timeslider-label")[0];
 		canvas = document.getElementById("transitions-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
+		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = spineDemos.assetManager;
 		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
-		
-		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas1.png");		
+
+		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas1.png");
 		assetManager.loadText(DEMO_NAME, "atlas1.atlas");
 		assetManager.loadJson(DEMO_NAME, "demos.json");
-				
+
 		input = new spine.webgl.Input(canvas);
-		timeKeeper = new spine.TimeKeeper();		
+		timeKeeper = new spine.TimeKeeper();
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
 
-		requestAnimationFrame(load);	
+		requestAnimationFrame(load);
 	}
 
 	function load () {
 		timeKeeper.update();
 		if (assetManager.isLoadingComplete(DEMO_NAME)) {
 			skeleton = loadSkeleton("spineboy");
-			skeletonNoMix = new spine.Skeleton(skeleton.data);					
+			skeletonNoMix = new spine.Skeleton(skeleton.data);
 			state = createState(0.25);
+			state.multipleMixing = true;
 			setAnimations(state, 0);
 			stateNoMix = createState(0);
 			setAnimations(stateNoMix, -0.25);
-			
+
 			state.apply(skeleton);
 			skeleton.updateWorldTransform();
 			bounds = { offset: new spine.Vector2(), size: new spine.Vector2() };
-			skeleton.getBounds(bounds.offset, bounds.size);
+			skeleton.getBounds(bounds.offset, bounds.size, []);
 			setupInput();
 			$("#transitions-overlay").removeClass("overlay-hide");
-			$("#transitions-overlay").addClass("overlay");	
-			loadingComplete(canvas, render);						
+			$("#transitions-overlay").addClass("overlay");
+			loadingComplete(canvas, render);
 		} else {
-			loadingScreen.draw();			
+			loadingScreen.draw();
 			requestAnimationFrame(load);
 		}
 	}
@@ -86,7 +87,7 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 		state.addAnimation(0, "run", true, mix);
 		state.addAnimation(0, "jump", true, 0.5);
 		state.addAnimation(0, "run", true, mix).listener = {
-			start: function (trackIndex) { 
+			start: function (trackIndex) {
 				setAnimations(state, mix);
 			}
 		};
@@ -94,7 +95,7 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 
 	function loadSkeleton(name) {
 		var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas1.atlas"), function(path) {
-			return assetManager.get(DEMO_NAME, path);		
+			return assetManager.get(DEMO_NAME, path);
 		});
 		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
@@ -111,7 +112,7 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 			var oldValue = timeSliderLabel.textContent;
 			var newValue = Math.round(timeSlider.get() * 100) + "%";
 			if (oldValue !== newValue) timeSliderLabel.textContent = newValue;
-		} 
+		}
 
 		var offset = bounds.offset;
 		var size = bounds.size;
@@ -123,7 +124,7 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 		renderer.resize(spine.webgl.ResizeMode.Fit);
 
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
-		gl.clear(gl.COLOR_BUFFER_BIT);		
+		gl.clear(gl.COLOR_BUFFER_BIT);
 
 		renderer.begin();
 		state.update(delta);

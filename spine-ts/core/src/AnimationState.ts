@@ -39,6 +39,7 @@ module spine {
 		queue = new EventQueue(this);
 		propertyIDs = new IntSet();
 		animationsChanged = false;
+		multipleMixing = false;
 		timeScale = 1;
 
 		trackEntryPool = new Pool<TrackEntry>(() => new TrackEntry());
@@ -183,7 +184,9 @@ module spine {
 			let timelineCount = from.animation.timelines.length;
 			let timelines = from.animation.timelines;
 			let timelinesFirst = from.timelinesFirst;
-			let alpha = from.alpha * entry.mixAlpha * (1 - mix);
+			let timelinesLast = this.multipleMixing ? null : from.timelinesLast;
+			let alphaBase = from.alpha * entry.mixAlpha;
+			let alphaMix = alphaBase * (1 - mix);
 
 			let firstFrame = from.timelinesRotation.length == 0;
 			if (firstFrame) Utils.setArraySize(from.timelinesRotation, timelineCount << 1, null);
@@ -192,6 +195,7 @@ module spine {
 			for (let i = 0; i < timelineCount; i++) {
 				let timeline = timelines[i];
 				let setupPose = timelinesFirst[i];
+				let alpha = timelinesLast != null && setupPose && !timelinesLast[i] ? alphaBase : alphaMix;
 				if (timeline instanceof RotateTimeline)
 					this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, setupPose, timelinesRotation, i << 1, firstFrame);
 				else {
@@ -348,10 +352,30 @@ module spine {
 				current.mixingFrom = from;
 				current.mixTime = 0;
 
-				from.timelinesRotation.length = 0;
+				let mixingFrom = from.mixingFrom;
+				if (mixingFrom != null && from.mixDuration > 0) {
+					// A mix was interrupted, mix from the closest animation.
+					if (!this.multipleMixing && from.mixTime / from.mixDuration < 0.5 && mixingFrom.animation != AnimationState.emptyAnimation) {
+						current.mixingFrom = mixingFrom;
+						mixingFrom.mixingFrom = from;
+						mixingFrom.mixTime = from.mixDuration - from.mixTime;
+						mixingFrom.mixDuration = from.mixDuration;
+						from.mixingFrom = null;
+						from = mixingFrom;
+					}
 
-				// If not completely mixed in, set mixAlpha so mixing out happens from current mix to zero.
-				if (from.mixingFrom != null && from.mixDuration > 0) current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
+					// The interrupted mix will mix out from its current percentage to zero.
+					current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
+
+					// End the other animation after it is applied one last time.
+					if (!this.multipleMixing) {
+						from.mixAlpha = 0;
+						from.mixTime = 0;
+						from.mixDuration = 0;
+					}
+				}
+
+				from.timelinesRotation.length = 0;
 			}
 
 			this.queue.start(current);
@@ -510,6 +534,33 @@ module spine {
 				let entry = this.tracks[i];
 				if (entry != null) this.checkTimelinesFirst(entry);
 			}
+
+			if (this.multipleMixing) return;
+
+			// Set timelinesLast for mixingFrom entries, from highest track to lowest that has mixingFrom.
+			propertyIDs.clear();
+			let lowestMixingFrom = n;
+			for (i = 0; i < n; i++) { // Find lowest track with a mixingFrom entry.
+				let entry = this.tracks[i];
+				if (entry == null || entry.mixingFrom == null) continue;
+				lowestMixingFrom = i;
+				break;
+			}
+			for (i = n - 1; i >= lowestMixingFrom; i--) { // Find first non-null entry.
+				let entry = this.tracks[i];
+				if (entry == null) continue;
+
+				// Store properties for non-mixingFrom entry but don't set timelinesLast, which is only used for mixingFrom entries.
+				let timelines = entry.animation.timelines;
+				for (let ii = 0, nn = entry.animation.timelines.length; ii < nn; ii++)
+					propertyIDs.add(timelines[ii].getPropertyId());
+
+				entry = entry.mixingFrom;
+				while (entry != null) {
+					this.checkTimelinesUsage(entry, entry.timelinesLast);
+					entry = entry.mixingFrom;
+				}
+			}
 		}
 
 		setTimelinesFirst (entry: TrackEntry) {
@@ -578,6 +629,7 @@ module spine {
 		delay: number; trackTime: number; trackLast: number; nextTrackLast: number; trackEnd: number; timeScale: number;
 		alpha: number; mixTime: number; mixDuration: number; mixAlpha: number;
 		timelinesFirst = new Array<boolean>();
+		timelinesLast = new Array<boolean>();
 		timelinesRotation = new Array<number>();
 
 		reset () {
@@ -586,6 +638,7 @@ module spine {
 			this.animation = null;
 			this.listener = null;
 			this.timelinesFirst.length = 0;
+			this.timelinesLast.length = 0;
 			this.timelinesRotation.length = 0;
 		}
 
