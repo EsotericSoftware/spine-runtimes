@@ -52,7 +52,6 @@ public class SkeletonRenderer implements Disposable {
 
 	private boolean premultipliedAlpha;
 	private final FloatArray vertices = new FloatArray(32);
-	
 	private ImmediateModeRenderer renderer;
 	private final SkeletonClipping clipper = new SkeletonClipping();
 
@@ -122,6 +121,7 @@ public class SkeletonRenderer implements Disposable {
 
 			if (clipper.isClipping() && clipper.getClippingAttachment().getEndSlot() == i) clipper.clipEnd();
 		}
+		if (clipper.isClipping()) clipper.clipEnd();
 	}
 
 	@SuppressWarnings("null")
@@ -223,6 +223,7 @@ public class SkeletonRenderer implements Disposable {
 
 			if (clipper.isClipping() && clipper.getClippingAttachment().getEndSlot() == i) clipper.clipEnd();
 		}
+		if (clipper.isClipping()) clipper.clipEnd();
 	}
 
 	@SuppressWarnings("null")
@@ -331,6 +332,7 @@ public class SkeletonRenderer implements Disposable {
 
 			if (clipper.isClipping() && clipper.getClippingAttachment().getEndSlot() == i) clipper.clipEnd();
 		}
+		if (clipper.isClipping()) clipper.clipEnd();
 	}
 
 	public void setPremultipliedAlpha (boolean premultipliedAlpha) {

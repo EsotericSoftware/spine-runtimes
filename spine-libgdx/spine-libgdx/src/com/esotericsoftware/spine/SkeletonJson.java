@@ -411,9 +411,12 @@ public class SkeletonJson {
 			ClippingAttachment clip = attachmentLoader.newClippingAttachment(skin, name);
 			if (clip == null) return null;
 
-			SlotData slot = skeletonData.findSlot(map.getString("end"));
-			if (slot == null) throw new SerializationException("Slot not found: " + map.getString("end"));
-			clip.setEndSlot(slot.index);
+			String end = map.getString("end", null);
+			if (end != null) {
+				SlotData slot = skeletonData.findSlot(end);
+				if (slot == null) throw new SerializationException("Slot not found: " + end);
+				clip.setEndSlot(slot.index);
+			}
 
 			readVertices(map, clip, map.getInt("vertexCount") << 1);
 
