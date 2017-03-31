@@ -69,6 +69,25 @@
  * `AtasRegionAttacher` and `SpriteAttacher` are now part of `Example Modules`, to reflect that they are meant to be used as sample code rather than production.
  * In the unitypackage, the "spine-csharp" and "spine-unity" folders are now inside a "Spine" folder. This change will only affect fresh imports. Importing the unitypackage to update Spine-Unity in your project will update the appropriate files wherever you have moved them.
 
+## Java
+ * **Breaking changes**
+  * `Skeleton.getBounds` takes a scratch array as input so it doesn't have to allocate a new array on each invocation itself. Reduces GC activity.
+  * Removed `Bone.worldToLocalRotationX` and `Bone.worldToLocalRotationY`. Replaced by `Bone.worldToLocalRotation` (rotation given relative to x-axis, counter-clockwise, in degrees).
+  * Added `stride` parameter to `VertexAttachment.computeWorldVertices`.
+  * Removed `RegionAttachment.vertices` field. The vertices array is provided to `RegionAttachment.computeWorldVertices` by the API user now.
+  * Removed `RegionAttachment.updateWorldVertices`, added `RegionAttachment.computeWorldVertices`. The new method now computes the x/y positions of the 4 vertices of the corner and places them in the provided `worldVertices` array, starting at `offset`, then moving by `stride` array elements when advancing to the next vertex. This allows to directly compose the vertex buffer and avoids a copy. The computation of the full vertices, including vertex colors and texture coordinates, is now done by the backend's respective renderer.
+ * **Additions**  
+  * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
+  * Added `Bone.localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).  
+  * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.  
+  * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
+  * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
+
+### libGDX
+ * Fixed renderer to work with 3.6 changes
+ * Added support for two color tinting. Use the new `TwoColorPolygonBatch` together with `SkeletonRenderer`
+ * Added support for clipping. See `SkeletonClipper`. Used automatically by `SkeletonRenderer`. Does not work when using a `SpriteBatch` with `SkeletonRenderer`. Use `PolygonSpriteBatch` or `TwoColorPolygonBatch` instead.
+
 ## Lua
  * **Breaking changes**
   * Removed `Bone:worldToLocalRotationX` and `Bone:worldToLocalRotationY`. Replaced by `Bone:worldToLocalRotation` (rotation given relative to x-axis, counter-clockwise, in degrees).
