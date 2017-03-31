@@ -34,7 +34,7 @@ import com.badlogic.gdx.graphics.Color;
 
 /** An attachment with vertices that make up a polygon used for clipping the rendering of other attachments. */
 public class ClippingAttachment extends VertexAttachment {
-	int endSlot;
+	int endSlot = -1;
 
 	// Nonessential.
 	final Color color = new Color(0.2275f, 0.2275f, 0.8078f, 1); // ce3a3aff
@@ -43,7 +43,8 @@ public class ClippingAttachment extends VertexAttachment {
 		super(name);
 	}
 
-	/** Clipping is performed between the clipping polygon's slot and the end slot. */
+	/** Clipping is performed between the clipping polygon's slot and the end slot. Returns -1 if clipping is done until the end of
+	 * the skeleton's rendering. */
 	public int getEndSlot () {
 		return endSlot;
 	}

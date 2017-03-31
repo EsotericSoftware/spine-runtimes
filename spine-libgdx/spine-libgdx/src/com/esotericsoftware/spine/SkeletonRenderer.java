@@ -56,10 +56,10 @@ import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 public class SkeletonRenderer implements Disposable {
 	static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
 
-	private boolean softwareClipping;
+	private boolean softwareClipping = true;
 	private boolean premultipliedAlpha;
 	private final FloatArray vertices = new FloatArray(32);
-	
+
 	private ClippingAttachment clipAttachment;
 	private Clipper clipper = new Clipper();
 	private ConvexDecomposer decomposer = new ConvexDecomposer();
@@ -141,6 +141,10 @@ public class SkeletonRenderer implements Disposable {
 				batch.flush();
 				clipEnd();
 			}
+		}
+		if (clipAttachment != null) {
+			if (!softwareClipping) batch.flush();
+			clipEnd();
 		}
 	}
 
@@ -254,6 +258,10 @@ public class SkeletonRenderer implements Disposable {
 				if (!softwareClipping) batch.flush();
 				clipEnd();
 			}
+		}
+		if (clipAttachment != null) {
+			if (!softwareClipping) batch.flush();
+			clipEnd();
 		}
 	}
 
@@ -377,6 +385,10 @@ public class SkeletonRenderer implements Disposable {
 				clipEnd();
 			}
 		}
+		if (clipAttachment != null) {
+			if (!softwareClipping) batch.flush();
+			clipEnd();
+		}
 	}
 
 	private void clipStart (Matrix4 transformMatrix, Matrix4 projectionMatrix, Slot slot, ClippingAttachment clip) {
@@ -411,7 +423,7 @@ public class SkeletonRenderer implements Disposable {
 			float[] vertices = this.clippingPolygon.setSize(n);
 			clip.computeWorldVertices(slot, 0, n, vertices, 0, 2);
 			convexClippingPolygons = decomposer.decompose(clippingPolygon);
-			for (FloatArray poly: convexClippingPolygons) {
+			for (FloatArray poly : convexClippingPolygons) {
 				Clipper.makeClockwise(poly);
 				poly.add(poly.items[0]);
 				poly.add(poly.items[1]);
@@ -419,7 +431,7 @@ public class SkeletonRenderer implements Disposable {
 		}
 	}
 
-	private void clipEnd() {
+	private void clipEnd () {
 		clippedVertices.clear();
 		clippedTriangles.clear();
 		clippingPolygon.clear();
@@ -434,26 +446,26 @@ public class SkeletonRenderer implements Disposable {
 		short idx = 0;
 		clippedVertices.clear();
 		clippedTriangles.clear();
-		for (FloatArray convexClippingPolygon: convexClippingPolygons) {
+		for (FloatArray convexClippingPolygon : convexClippingPolygons) {
 			for (int i = 0; i < trianglesLength; i += 3) {
 				int vertexOffset = triangles[i] << 1;
 				float x1 = vertices[vertexOffset];
-				float y1= vertices[vertexOffset + 1];
+				float y1 = vertices[vertexOffset + 1];
 				float u1 = uvs[vertexOffset];
 				float v1 = uvs[vertexOffset + 1];
-				
+
 				vertexOffset = triangles[i + 1] << 1;
 				float x2 = vertices[vertexOffset];
 				float y2 = vertices[vertexOffset + 1];
 				float u2 = uvs[vertexOffset];
 				float v2 = uvs[vertexOffset + 1];
-				
+
 				vertexOffset = triangles[i + 2] << 1;
 				float x3 = vertices[vertexOffset];
 				float y3 = vertices[vertexOffset + 1];
 				float u3 = uvs[vertexOffset];
 				float v3 = uvs[vertexOffset + 1];
-				
+
 				boolean clipped = clipper.clip(x1, y1, x2, y2, x3, y3, convexClippingPolygon, clipOutput);
 				if (clipped) {
 					if (clipOutput.size == 0) continue;
@@ -462,24 +474,24 @@ public class SkeletonRenderer implements Disposable {
 					float d2 = x1 - x3;
 					float d3 = y1 - y3;
 					float d4 = y3 - y1;
-					
+
 					float denom = 1 / (d0 * d2 + d1 * d3);
-					
+
 					float[] clipVertices = clipOutput.items;
 					int s = clippedVertices.size;
 					clippedVertices.setSize(s + (clipOutput.size >> 1) * (twoColor ? 6 : 5));
 					final float[] clippedVerticesArray = clippedVertices.items;
-					
-					for (int j = 0, n = clipOutput.size; j < n; j += 2) {				
+
+					for (int j = 0, n = clipOutput.size; j < n; j += 2) {
 						float x = clipVertices[j];
 						float y = clipVertices[j + 1];
-							
+
 						float c0 = x - x3;
 						float c1 = y - y3;
 						float a = (d0 * c0 + d1 * c1) * denom;
 						float b = (d4 * c0 + d2 * c1) * denom;
 						float c = 1.0f - a - b;
-						
+
 						float u = u1 * a + u2 * b + u3 * c;
 						float v = v1 * a + v2 * b + v3 * c;
 						clippedVerticesArray[s++] = x;
@@ -489,36 +501,36 @@ public class SkeletonRenderer implements Disposable {
 						clippedVerticesArray[s++] = u;
 						clippedVerticesArray[s++] = v;
 					}
-					
+
 					s = clippedTriangles.size;
 					clippedTriangles.setSize(s + 3 * ((clipOutput.size >> 1) - 2));
 					final short[] clippedTrianglesArray = clippedTriangles.items;
-					
+
 					for (int j = 1, n = (clipOutput.size >> 1) - 1; j < n; j++) {
 						clippedTrianglesArray[s++] = idx;
 						clippedTrianglesArray[s++] = (short)(idx + j);
 						clippedTrianglesArray[s++] = (short)(idx + j + 1);
 					}
-					
+
 					idx += clipOutput.size >> 1;
 				} else {
 					int s = clippedVertices.size;
 					clippedVertices.setSize(s + 3 * (twoColor ? 6 : 5));
 					final float[] clippedVerticesArray = clippedVertices.items;
-					
-					if (!twoColor) { 
+
+					if (!twoColor) {
 						clippedVerticesArray[s] = x1;
 						clippedVerticesArray[s + 1] = y1;
 						clippedVerticesArray[s + 2] = light;
 						clippedVerticesArray[s + 3] = u1;
 						clippedVerticesArray[s + 4] = v1;
-						
+
 						clippedVerticesArray[s + 5] = x2;
 						clippedVerticesArray[s + 6] = y2;
 						clippedVerticesArray[s + 7] = light;
 						clippedVerticesArray[s + 8] = u2;
 						clippedVerticesArray[s + 9] = v2;
-						
+
 						clippedVerticesArray[s + 10] = x3;
 						clippedVerticesArray[s + 11] = y3;
 						clippedVerticesArray[s + 12] = light;
@@ -531,14 +543,14 @@ public class SkeletonRenderer implements Disposable {
 						clippedVerticesArray[s + 3] = dark;
 						clippedVerticesArray[s + 4] = u1;
 						clippedVerticesArray[s + 5] = v1;
-						
+
 						clippedVerticesArray[s + 6] = x2;
 						clippedVerticesArray[s + 7] = y2;
 						clippedVerticesArray[s + 8] = light;
 						clippedVerticesArray[s + 9] = dark;
 						clippedVerticesArray[s + 10] = u2;
 						clippedVerticesArray[s + 11] = v2;
-						
+
 						clippedVerticesArray[s + 12] = x3;
 						clippedVerticesArray[s + 13] = y3;
 						clippedVerticesArray[s + 14] = light;
@@ -546,7 +558,7 @@ public class SkeletonRenderer implements Disposable {
 						clippedVerticesArray[s + 16] = u3;
 						clippedVerticesArray[s + 17] = v3;
 					}
-					
+
 					s = clippedTriangles.size;
 					clippedTriangles.setSize(s + 3);
 					final short[] clippedTrianglesArray = clippedTriangles.items;
