@@ -90,13 +90,13 @@ public class ClippingTest extends ApplicationAdapter {
 		ClippingAttachment clip = new ClippingAttachment("clip");
 		// Rectangle:
 		clip.setVertices(
-			new float[] { 87, 288, 217, 371, 456, 361, 539, 175, 304, 194, 392, 290, 193, 214, 123, 15, 14, 137 });	
-//		new float[] { //
-//			-140, 50, //
-//			250, 50, //
-//			250, 350, //
-//			-140, 350, //
-//		});
+//			new float[] { 87, 288, 217, 371, 456, 361, 539, 175, 304, 194, 392, 290, 193, 214, 123, 15, 14, 137 });	
+		new float[] { //
+			-140, 50, //
+			250, 50, //
+			250, 350, //
+			-140, 350, //
+		});
 		// Self intersection:
 //		clip.setVertices(new float[] { //
 //			-140, -50, //
