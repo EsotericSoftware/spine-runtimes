@@ -328,6 +328,7 @@ declare module spine {
 		queue: EventQueue;
 		propertyIDs: IntSet;
 		animationsChanged: boolean;
+		multipleMixing: boolean;
 		timeScale: number;
 		trackEntryPool: Pool<TrackEntry>;
 		constructor(data: AnimationStateData);
@@ -385,6 +386,7 @@ declare module spine {
 		mixDuration: number;
 		mixAlpha: number;
 		timelinesFirst: boolean[];
+		timelinesLast: boolean[];
 		timelinesRotation: number[];
 		reset(): void;
 		getAnimationTime(): number;
