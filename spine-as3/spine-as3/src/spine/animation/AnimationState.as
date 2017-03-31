@@ -27,7 +27,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 package spine.animation {
 	import spine.MathUtils;
 	import spine.Bone;
@@ -52,6 +51,7 @@ package spine.animation {
 		internal var queue : EventQueue;
 		internal var propertyIDs : Dictionary = new Dictionary();
 		internal var animationsChanged : Boolean;
+		public var multipleMixing : Boolean = false;
 		public var timeScale : Number = 1;
 		internal var trackEntryPool : Pool;
 
@@ -198,7 +198,9 @@ package spine.animation {
 			var timelineCount : int = from.animation.timelines.length;
 			var timelines : Vector.<Timeline> = from.animation.timelines;
 			var timelinesFirst : Vector.<Boolean> = from.timelinesFirst;
-			var alpha : Number = from.alpha * entry.mixAlpha * (1 - mix);
+			var timelinesLast : Vector.<Boolean> = multipleMixing ? null : from.timelinesLast;
+			var alphaBase : Number = from.alpha * entry.mixAlpha;
+			var alphaMix : Number = alphaBase * (1 - mix);
 
 			var firstFrame : Boolean = from.timelinesRotation.length == 0;
 			if (firstFrame) from.timelinesRotation.length = timelineCount << 1;
@@ -207,6 +209,7 @@ package spine.animation {
 			for (var i : int = 0; i < timelineCount; i++) {
 				var timeline : Timeline = timelines[i];
 				var setupPose : Boolean = timelinesFirst[i];
+				var alpha : Number = timelinesLast != null && setupPose && !timelinesLast[i] ? alphaBase : alphaMix;
 				if (timeline is RotateTimeline)
 					applyRotateTimeline(timeline, skeleton, animationTime, alpha, setupPose, timelinesRotation, i << 1, firstFrame);
 				else {
@@ -360,10 +363,30 @@ package spine.animation {
 				current.mixingFrom = from;
 				current.mixTime = 0;
 
-				from.timelinesRotation.length = 0;
+				var mixingFrom : TrackEntry = from.mixingFrom;
+				if (mixingFrom != null && from.mixDuration > 0) {
+					// A mix was interrupted, mix from the closest animation.
+					if (!multipleMixing && from.mixTime / from.mixDuration < 0.5 && mixingFrom.animation != AnimationState.emptyAnimation) {
+						current.mixingFrom = mixingFrom;
+						mixingFrom.mixingFrom = from;
+						mixingFrom.mixTime = from.mixDuration - from.mixTime;
+						mixingFrom.mixDuration = from.mixDuration;
+						from.mixingFrom = null;
+						from = mixingFrom;
+					}
+	
+					// The interrupted mix will mix out from its current percentage to zero.
+					current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
+	
+					// End the other animation after it is applied one last time.
+					if (!multipleMixing) {
+						from.mixAlpha = 0;
+						from.mixTime = 0;
+						from.mixDuration = 0;
+					}
+				}
 
-				// If not completely mixed in, set mixAlpha so mixing out happens from current mix to zero.
-				if (from.mixingFrom != null && from.mixDuration > 0) current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
+				from.timelinesRotation.length = 0;
 			}
 
 			queue.start(current);
@@ -523,6 +546,36 @@ package spine.animation {
 			for (; i < n; i++) { // Rest of entries.
 				entry = tracks[i];
 				if (entry != null) checkTimelinesFirst(entry);
+			}
+			
+			if (multipleMixing) return;
+
+			// Set timelinesLast for mixingFrom entries, from highest track to lowest that has mixingFrom.
+			for (var key2 : String in propertyIDs) {
+				delete propertyIDs[key2];
+			}
+			var lowestMixingFrom : int = n;
+			for (i = 0; i < n; i++) { // Find lowest track with a mixingFrom entry.
+				entry = tracks[i];
+				if (entry == null || entry.mixingFrom == null) continue;
+				lowestMixingFrom = i;
+				break;
+			}
+			for (i = n - 1; i >= lowestMixingFrom; i--) { // Find first non-null entry.
+				entry = tracks[i];
+				if (entry == null) continue;
+	
+				// Store properties for non-mixingFrom entry but don't set timelinesLast, which is only used for mixingFrom entries.
+				var timelines : Vector.<Timeline> = entry.animation.timelines;
+				for (var ii : int = 0, nn : int = entry.animation.timelines.length; ii < nn; ii++)
+					var id : String = timelines[ii].getPropertyId().toString();
+					propertyIDs[id] = id;
+	
+				entry = entry.mixingFrom;
+				while (entry != null) {
+					checkTimelinesUsage(entry, entry.timelinesLast);
+					entry = entry.mixingFrom;
+				}
 			}
 		}
 

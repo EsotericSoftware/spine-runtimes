@@ -45,7 +45,7 @@ package spine.examples {
 			// example = TankExample;
 			// example = VineExample;
 			// example = StretchymanExample;
-			example = TwoColorExample;
+			// example = TwoColorExample;
 
 			_starling = new Starling(example, stage);
 			_starling.enableErrorChecking = true;

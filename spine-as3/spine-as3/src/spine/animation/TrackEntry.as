@@ -47,6 +47,7 @@ package spine.animation {
 		public var delay : Number, trackTime : Number, trackLast : Number, nextTrackLast : Number, trackEnd : Number, timeScale : Number;
 		public var alpha : Number, mixTime : Number, mixDuration : Number, mixAlpha : Number;
 		public var timelinesFirst : Vector.<Boolean> = new Vector.<Boolean>();
+		public var timelinesLast : Vector.<Boolean> = new Vector.<Boolean>();
 		public var timelinesRotation : Vector.<Number> = new Vector.<Number>();
 
 		public function TrackEntry() {
@@ -72,6 +73,7 @@ package spine.animation {
 			onComplete.listeners.length = 0;
 			onEvent.listeners.length = 0;
 			timelinesFirst.length = 0;
+			timelinesLast.length = 0;
 			timelinesRotation.length = 0;
 		}
 
