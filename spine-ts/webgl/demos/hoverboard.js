@@ -50,7 +50,7 @@ var hoverboardDemo = function(loadingComplete, bgColor) {
 			skeleton.updateWorldTransform();
 			var offset = new spine.Vector2();
 			bounds = new spine.Vector2();
-			skeleton.getBounds(offset, bounds);
+			skeleton.getBounds(offset, bounds, []);
 			for (var i = 0; i < controlBones.length; i++) hoverTargets.push(null);
 
 			renderer.camera.position.x = offset.x + bounds.x / 2;
@@ -139,15 +139,8 @@ var hoverboardDemo = function(loadingComplete, bgColor) {
 
 		renderer.begin();
 		renderer.drawSkeleton(skeleton, true);
-		renderer.drawSkeletonDebug(skeleton, false, ["root"]);
-		gl.lineWidth(2);
-		for (var i = 0; i < controlBones.length; i++) {
-			var bone = skeleton.findBone(controlBones[i]);
-			var colorInner = hoverTargets[i] !== null ? spineDemos.HOVER_COLOR_INNER : spineDemos.NON_HOVER_COLOR_INNER;
-			var colorOuter = hoverTargets[i] !== null ? spineDemos.HOVER_COLOR_OUTER : spineDemos.NON_HOVER_COLOR_OUTER;
-			renderer.circle(true, bone.worldX, bone.worldY, 20, colorInner);
-			renderer.circle(false, bone.worldX, bone.worldY, 20, colorOuter);
-		}
+		// renderer.drawSkeletonDebug(skeleton, false, ["root"]);
+
 		renderer.end();
 		gl.lineWidth(1);
 

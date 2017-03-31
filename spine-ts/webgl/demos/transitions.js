@@ -40,6 +40,7 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 			skeleton = loadSkeleton("spineboy");
 			skeletonNoMix = new spine.Skeleton(skeleton.data);
 			state = createState(0.25);
+			state.multipleMixing = true;
 			setAnimations(state, 0);
 			stateNoMix = createState(0);
 			setAnimations(stateNoMix, -0.25);

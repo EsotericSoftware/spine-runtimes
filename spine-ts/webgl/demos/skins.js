@@ -47,7 +47,7 @@ var skinsDemo = function(loadingComplete, bgColor) {
 			skeleton.updateWorldTransform();
 			offset = new spine.Vector2();
 			bounds = new spine.Vector2();
-			skeleton.getBounds(offset, bounds);
+			skeleton.getBounds(offset, bounds, []);
 			setupUI();
 			setupInput();
 			loadingComplete(canvas, render);
