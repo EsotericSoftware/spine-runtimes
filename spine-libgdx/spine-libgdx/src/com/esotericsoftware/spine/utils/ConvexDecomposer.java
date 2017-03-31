@@ -33,70 +33,61 @@ package com.esotericsoftware.spine.utils;
 import java.util.Iterator;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.BooleanArray;
 import com.badlogic.gdx.utils.FloatArray;
-import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.ShortArray;
 
 public class ConvexDecomposer {
-	static private final int CONCAVE = -1;
-	static private final int CONVEX = 1;
-
-	private Pool<FloatArray> polygonPool = new Pool<FloatArray>() {
-		@Override
-		protected FloatArray newObject () {
-			return new FloatArray(16);
-		}
-	};
-
-	private Pool<ShortArray> polygonIndicesPool = new Pool<ShortArray>() {
-		@Override
-		protected ShortArray newObject () {
-			return new ShortArray(16);
-		}
-	};
-
-	private Array<FloatArray> convexPolygons = new Array<FloatArray>();
-	private Array<ShortArray> convexPolygonsIndices = new Array<ShortArray>();
+	private final Array<FloatArray> convexPolygons = new Array();
+	private final Array<ShortArray> convexPolygonsIndices = new Array();
 
 	private final ShortArray indicesArray = new ShortArray();
 	private short[] indices;
 	private float[] vertices;
 	private int vertexCount;
-	private final IntArray vertexTypes = new IntArray();
+	private final BooleanArray isConcaveArray = new BooleanArray();
 	private final ShortArray triangles = new ShortArray();
 
-	public Array<FloatArray> decompose (FloatArray polygon) {
-		this.vertices = polygon.items;
-		int vertexCount = this.vertexCount = polygon.size / 2;
+	private final Pool<FloatArray> polygonPool = new Pool<FloatArray>() {
+		protected FloatArray newObject () {
+			return new FloatArray(16);
+		}
+	};
+
+	private final Pool<ShortArray> polygonIndicesPool = new Pool<ShortArray>() {
+		protected ShortArray newObject () {
+			return new ShortArray(16);
+		}
+	};
+
+	public Array<FloatArray> decompose (FloatArray input) {
+		vertices = input.items;
+		int vertexCount = this.vertexCount = input.size / 2;
 
 		ShortArray indicesArray = this.indicesArray;
 		indicesArray.clear();
-		indicesArray.ensureCapacity(vertexCount);
-		indicesArray.size = vertexCount;
-		short[] indices = this.indices = indicesArray.items;
+		short[] indices = this.indices = indicesArray.setSize(vertexCount);
 		for (short i = 0; i < vertexCount; i++)
 			indices[i] = i;
 
-		IntArray vertexTypes = this.vertexTypes;
-		vertexTypes.clear();
-		vertexTypes.ensureCapacity(vertexCount);
+		boolean[] isConcave = isConcaveArray.setSize(vertexCount);
 		for (int i = 0, n = vertexCount; i < n; ++i)
-			vertexTypes.add(classifyVertex(i));
+			isConcave[i] = isConcave(i);
 
 		ShortArray triangles = this.triangles;
 		triangles.clear();
 		triangles.ensureCapacity(Math.max(0, vertexCount - 2) * 4);
 
-		// Triangulate
+		// Triangulate.
 		while (this.vertexCount > 3) {
 			int earTipIndex = findEarTip();
 			cutEarTip(earTipIndex);
 
 			int previousIndex = previousIndex(earTipIndex);
 			int nextIndex = earTipIndex == vertexCount ? 0 : earTipIndex;
-			vertexTypes.set(previousIndex, classifyVertex(previousIndex));
-			vertexTypes.set(nextIndex, classifyVertex(nextIndex));
+			isConcave[previousIndex] = isConcave(previousIndex);
+			isConcave[nextIndex] = isConcave(nextIndex);
 		}
 
 		if (this.vertexCount == 3) {
@@ -110,102 +101,91 @@ public class ConvexDecomposer {
 		polygonIndicesPool.freeAll(convexPolygonsIndices);
 		convexPolygonsIndices.clear();
 
-		ShortArray polyIndices = polygonIndicesPool.obtain();
-		polyIndices.clear();
-		FloatArray poly = polygonPool.obtain();
-		poly.clear();
-		int fanBaseIndex = -1;
-		int lastWinding = 0;
+		ShortArray polygonIndices = polygonIndicesPool.obtain();
+		polygonIndices.clear();
+		FloatArray polygon = polygonPool.obtain();
+		polygon.clear();
+		int fanBaseIndex = -1, lastWinding = 0;
 
-		// Merge subsequent triangles if they form a triangle fan
+		// Merge subsequent triangles if they form a triangle fan.
 		for (int i = 0, n = triangles.size; i < n; i += 3) {
-			int idx1 = triangles.get(i) << 1;
-			int idx2 = triangles.get(i + 1) << 1;
-			int idx3 = triangles.get(i + 2) << 1;
+			int t1 = triangles.get(i) << 1, t2 = triangles.get(i + 1) << 1, t3 = triangles.get(i + 2) << 1;
+			float x1 = input.get(t1), y1 = input.get(t1 + 1);
+			float x2 = input.get(t2), y2 = input.get(t2 + 1);
+			float x3 = input.get(t3), y3 = input.get(t3 + 1);
 
-			float x1 = polygon.get(idx1);
-			float y1 = polygon.get(idx1 + 1);
-			float x2 = polygon.get(idx2);
-			float y2 = polygon.get(idx2 + 1);
-			float x3 = polygon.get(idx3);
-			float y3 = polygon.get(idx3 + 1);
-
-			// if the base of the last triangle
-			// is the same as this triangle's base
-			// check if they form a convex polygon (triangle fan)
+			// If the base of the last triangle is the same as this triangle's base, check if they form a convex polygon (triangle
+			// fan).
 			boolean merged = false;
-			if (fanBaseIndex == idx1) {
-				int o = poly.size - 4;
-				int winding1 = winding(poly.get(o), poly.get(o + 1), poly.get(o + 2), poly.get(o + 3), x3, y3);
-				int winding2 = winding(x3, y3, poly.get(0), poly.get(1), poly.get(2), poly.get(3));
+			if (fanBaseIndex == t1) {
+				int o = polygon.size - 4;
+				int winding1 = winding(polygon.get(o), polygon.get(o + 1), polygon.get(o + 2), polygon.get(o + 3), x3, y3);
+				int winding2 = winding(x3, y3, polygon.get(0), polygon.get(1), polygon.get(2), polygon.get(3));
 				if (winding1 == lastWinding && winding2 == lastWinding) {
-					poly.add(x3);
-					poly.add(y3);
-					polyIndices.add(idx3);
+					polygon.add(x3);
+					polygon.add(y3);
+					polygonIndices.add(t3);
 					merged = true;
 				}
 			}
 
-			// otherwise make this triangle
-			// the new base
+			// Otherwise make this triangle the new base.
 			if (!merged) {
-				if (poly.size > 0) {
-					convexPolygons.add(poly);
-					convexPolygonsIndices.add(polyIndices);
+				if (polygon.size > 0) {
+					convexPolygons.add(polygon);
+					convexPolygonsIndices.add(polygonIndices);
 				}
-				poly = polygonPool.obtain();
-				poly.clear();
-				poly.add(x1);
-				poly.add(y1);
-				poly.add(x2);
-				poly.add(y2);
-				poly.add(x3);
-				poly.add(y3);
-				polyIndices = polygonIndicesPool.obtain();
-				polyIndices.clear();
-				polyIndices.add(idx1);
-				polyIndices.add(idx2);
-				polyIndices.add(idx3);
+				polygon = polygonPool.obtain();
+				polygon.clear();
+				polygon.add(x1);
+				polygon.add(y1);
+				polygon.add(x2);
+				polygon.add(y2);
+				polygon.add(x3);
+				polygon.add(y3);
+				polygonIndices = polygonIndicesPool.obtain();
+				polygonIndices.clear();
+				polygonIndices.add(t1);
+				polygonIndices.add(t2);
+				polygonIndices.add(t3);
 				lastWinding = winding(x1, y1, x2, y2, x3, y3);
-				fanBaseIndex = idx1;
+				fanBaseIndex = t1;
 			}
 		}
 
-		if (poly.size > 0) {
-			convexPolygons.add(poly);
-			convexPolygonsIndices.add(polyIndices);
+		if (polygon.size > 0) {
+			convexPolygons.add(polygon);
+			convexPolygonsIndices.add(polygonIndices);
 		}
 
-		// go through the list of polygons and try
-		// to merge the remaining triangles with
-		// the found triangle fans
+		// Go through the list of polygons and try to merge the remaining triangles with the found triangle fans.
 		for (int i = 0, n = convexPolygons.size; i < n; i++) {
-			polyIndices = convexPolygonsIndices.get(i);
-			if (polyIndices.size == 0) continue;
-			int firstIndex = polyIndices.get(0);
-			int lastIndex = polyIndices.get(polyIndices.size - 1);
+			polygonIndices = convexPolygonsIndices.get(i);
+			if (polygonIndices.size == 0) continue;
+			int firstIndex = polygonIndices.get(0);
+			int lastIndex = polygonIndices.get(polygonIndices.size - 1);
 
-			poly = convexPolygons.get(i);
-			int o = poly.size - 4;
-			float prevPrevX = poly.get(o);
-			float prevPrevY = poly.get(o + 1);
-			float prevX = poly.get(o + 2);
-			float prevY = poly.get(o + 3);
-			float firstX = poly.get(0);
-			float firstY = poly.get(1);
-			float secondX = poly.get(2);
-			float secondY = poly.get(3);
+			polygon = convexPolygons.get(i);
+			int o = polygon.size - 4;
+			float prevPrevX = polygon.get(o);
+			float prevPrevY = polygon.get(o + 1);
+			float prevX = polygon.get(o + 2);
+			float prevY = polygon.get(o + 3);
+			float firstX = polygon.get(0);
+			float firstY = polygon.get(1);
+			float secondX = polygon.get(2);
+			float secondY = polygon.get(3);
 			int winding = winding(prevPrevX, prevPrevY, prevX, prevY, firstX, firstY);
 
-			for (int j = 0; j < n; j++) {
-				if (j == i) continue;
-				ShortArray otherIndices = convexPolygonsIndices.get(j);
+			for (int ii = 0; ii < n; ii++) {
+				if (ii == i) continue;
+				ShortArray otherIndices = convexPolygonsIndices.get(ii);
 				if (otherIndices.size != 3) continue;
 				int otherFirstIndex = otherIndices.get(0);
 				int otherSecondIndex = otherIndices.get(1);
 				int otherLastIndex = otherIndices.get(2);
 
-				FloatArray otherPoly = convexPolygons.get(j);
+				FloatArray otherPoly = convexPolygons.get(ii);
 				float x3 = otherPoly.get(otherPoly.size - 2);
 				float y3 = otherPoly.get(otherPoly.size - 1);
 
@@ -215,40 +195,38 @@ public class ConvexDecomposer {
 				if (winding1 == winding && winding2 == winding) {
 					otherPoly.clear();
 					otherIndices.clear();
-					poly.add(x3);
-					poly.add(y3);
-					polyIndices.add(otherLastIndex);
+					polygon.add(x3);
+					polygon.add(y3);
+					polygonIndices.add(otherLastIndex);
 					prevPrevX = prevX;
 					prevPrevY = prevY;
 					prevX = x3;
 					prevY = y3;
-					j = 0;
+					ii = 0;
 				}
 			}
 		}
 
-		// Remove empty polygons that resulted from the
-		// merge step above
-		Iterator<FloatArray> polyIter = convexPolygons.iterator();
-		while (polyIter.hasNext()) {
-			poly = polyIter.next();
-			if (poly.size == 0) {
-				polyIter.remove();
-				polygonPool.free(poly);
+		// Remove empty polygons that resulted from the merge step above.
+		for (Iterator<FloatArray> iter = convexPolygons.iterator(); iter.hasNext();) {
+			polygon = iter.next();
+			if (polygon.size == 0) {
+				iter.remove();
+				polygonPool.free(polygon);
 			}
 		}
 
 		return convexPolygons;
 	}
 
-	private int classifyVertex (int index) {
+	private boolean isConcave (int index) {
 		short[] indices = this.indices;
 		int previous = indices[previousIndex(index)] * 2;
 		int current = indices[index] * 2;
 		int next = indices[nextIndex(index)] * 2;
 		float[] vertices = this.vertices;
-		return computeSpannedAreaSign(vertices[previous], vertices[previous + 1], vertices[current], vertices[current + 1],
-			vertices[next], vertices[next + 1]);
+		return !positiveArea(vertices[previous], vertices[previous + 1], vertices[current], vertices[current + 1], vertices[next],
+			vertices[next + 1]);
 	}
 
 	private int findEarTip () {
@@ -256,15 +234,15 @@ public class ConvexDecomposer {
 		for (int i = 0; i < vertexCount; i++)
 			if (isEarTip(i)) return i;
 
-		int[] vertexTypes = this.vertexTypes.items;
+		boolean[] isConcave = this.isConcaveArray.items;
 		for (int i = 0; i < vertexCount; i++)
-			if (vertexTypes[i] != CONCAVE) return i;
+			if (!isConcave[i]) return i;
 		return 0;
 	}
 
 	private boolean isEarTip (int earTipIndex) {
-		int[] vertexTypes = this.vertexTypes.items;
-		if (vertexTypes[earTipIndex] == CONCAVE) return false;
+		boolean[] isConcave = this.isConcaveArray.items;
+		if (isConcave[earTipIndex]) return false;
 
 		int previousIndex = previousIndex(earTipIndex);
 		int nextIndex = nextIndex(earTipIndex);
@@ -278,13 +256,12 @@ public class ConvexDecomposer {
 		float p3x = vertices[p3], p3y = vertices[p3 + 1];
 
 		for (int i = nextIndex(nextIndex); i != previousIndex; i = nextIndex(i)) {
-			if (vertexTypes[i] != CONVEX) {
+			if (isConcave[i]) {
 				int v = indices[i] * 2;
-				float vx = vertices[v];
-				float vy = vertices[v + 1];
-				if (computeSpannedAreaSign(p3x, p3y, p1x, p1y, vx, vy) >= 0) {
-					if (computeSpannedAreaSign(p1x, p1y, p2x, p2y, vx, vy) >= 0) {
-						if (computeSpannedAreaSign(p2x, p2y, p3x, p3y, vx, vy) >= 0) return false;
+				float vx = vertices[v], vy = vertices[v + 1];
+				if (positiveArea(p3x, p3y, p1x, p1y, vx, vy)) {
+					if (positiveArea(p1x, p1y, p2x, p2y, vx, vy)) {
+						if (positiveArea(p2x, p2y, p3x, p3y, vx, vy)) return false;
 					}
 				}
 			}
@@ -296,15 +273,12 @@ public class ConvexDecomposer {
 		short[] indices = this.indices;
 		ShortArray triangles = this.triangles;
 
-		short idx1 = indices[previousIndex(earTipIndex)];
-		short idx2 = indices[earTipIndex];
-		short idx3 = indices[nextIndex(earTipIndex)];
-		triangles.add(idx1);
-		triangles.add(idx2);
-		triangles.add(idx3);
+		triangles.add(indices[previousIndex(earTipIndex)]);
+		triangles.add(indices[earTipIndex]);
+		triangles.add(indices[nextIndex(earTipIndex)]);
 
 		indicesArray.removeIndex(earTipIndex);
-		vertexTypes.removeIndex(earTipIndex);
+		isConcaveArray.removeIndex(earTipIndex);
 		vertexCount--;
 	}
 
@@ -316,16 +290,12 @@ public class ConvexDecomposer {
 		return (index + 1) % vertexCount;
 	}
 
-	static private int computeSpannedAreaSign (float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {
-		float area = p1x * (p3y - p2y);
-		area += p2x * (p1y - p3y);
-		area += p3x * (p2y - p1y);
-		return (int)Math.signum(area);
+	static private boolean positiveArea (float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {
+		return p1x * (p3y - p2y) + p2x * (p1y - p3y) + p3x * (p2y - p1y) >= 0;
 	}
 
-	public static int winding (float v1x, float v1y, float v2x, float v2y, float v3x, float v3y) {
-		float vx = v2x - v1x;
-		float vy = v2y - v1y;
-		return v3x * vy - v3y * vx + vx * v1y - v1x * vy >= 0 ? 1 : -1;
+	static private int winding (float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {
+		float px = p2x - p1x, py = p2y - p1y;
+		return p3x * py - p3y * px + px * p1y - p1x * py >= 0 ? 1 : -1;
 	}
 }

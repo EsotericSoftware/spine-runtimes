@@ -33,22 +33,22 @@ package com.esotericsoftware.spine.utils;
 import com.badlogic.gdx.utils.FloatArray;
 
 public class Clipper {
-	final FloatArray scratch = new FloatArray();
+	private final FloatArray scratch = new FloatArray();
 
-	/** Clips the input triangle against the convex clipping area, which needs to be clockwise. If the triangle lies entirely within the clipping area, false is
-	 * returned. The clipping area must duplicate the first vertex at the end of the vertices list! */
+	/** Clips the input triangle against the convex clipping area, which needs to be clockwise. If the triangle lies entirely
+	 * within the clipping area, false is returned. The clipping area must duplicate the first vertex at the end of the vertices
+	 * list. */
 	public boolean clip (float x1, float y1, float x2, float y2, float x3, float y3, FloatArray clippingArea, FloatArray output) {
-		final FloatArray originalOutput = output;
+		FloatArray originalOutput = output;
 		boolean clipped = false;
 
+		// Avoid copy at the end.
 		FloatArray input = null;
-		// avoid copy at the end
-		if ((clippingArea.size / 2) % 2 != 0) {
+		if (clippingArea.size % 4 >= 2) {
 			input = output;
 			output = scratch;
-		} else {
+		} else
 			input = scratch;
-		}
 
 		input.clear();
 		input.add(x1);
@@ -61,77 +61,51 @@ public class Clipper {
 		input.add(y1);
 		output.clear();
 
-		final float[] clippingVertices = clippingArea.items;
-		final int clippingVerticesLength = clippingArea.size - 2;
+		float[] clippingVertices = clippingArea.items;
+		int clippingVerticesLength = clippingArea.size - 2;
 		for (int i = 0; i < clippingVerticesLength; i += 2) {
-			float edgeX = clippingVertices[i];
-			float edgeY = clippingVertices[i + 1];
-			float edgeX2 = clippingVertices[i + 2];
-			float edgeY2 = clippingVertices[i + 3];
+			float edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
+			float edgeX2 = clippingVertices[i + 2], edgeY2 = clippingVertices[i + 3];
+			float deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;
 
-			final float deltaX = edgeX - edgeX2;
-			final float deltaY = edgeY - edgeY2;
+			float[] inputVertices = input.items;
+			int inputVerticesLength = input.size - 2;
+			int numOutside = 0;
+			for (int ii = 0; ii < inputVerticesLength; ii += 2) {
+				float inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
+				float inputX2 = inputVertices[ii + 2], inputY2 = inputVertices[ii + 3];
 
-			final float[] inputVertices = input.items;
-			final int inputVerticesLength = input.size - 2;
-			
-			int numOutside = 0; 
-
-			for (int j = 0; j < inputVerticesLength; j += 2) {
-				final float inputX = inputVertices[j];
-				final float inputY = inputVertices[j + 1];
-				final float inputX2 = inputVertices[j + 2];
-				final float inputY2 = inputVertices[j + 3];
-
-				final int side = deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0 ? 1 : -1;
-				final int side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0 ? 1 : -1;
-
+				int side = deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0 ? 1 : -1;
+				int side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0 ? 1 : -1;
 				if (side >= 0) {
-					// v1 inside, v2 inside
-					if (side2 >= 0) {
+					if (side2 >= 0) { // v1 inside, v2 inside
 						output.add(inputX2);
 						output.add(inputY2);
-					}
-					// v1 inside, v2 outside
-					else {						
-						float c0 = inputY2 - inputY;
-						float c1 = edgeX2 - edgeX;
-						float c2 = inputX2 - inputX;
-						float c3 = edgeY2 - edgeY;
-						float d = c0 * c1 - c2 * c3;
-
+					} else { // v1 inside, v2 outside
+						float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
+						float d = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
 						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / d;
 						output.add(edgeX + (edgeX2 - edgeX) * ua);
 						output.add(edgeY + (edgeY2 - edgeY) * ua);
 						clipped = true;
 					}
 				} else {
-					// v1 outside, v2 outside
-					if (side2 < 0) {
-						// no output
-						clipped = true;
+					if (side2 < 0) // v1 outside, v2 outside: no output
 						numOutside += 2;
-					}
-					// v1 outside, v2 inside
-					else {
-						float c0 = inputY2 - inputY;
-						float c1 = edgeX2 - edgeX;
-						float c2 = inputX2 - inputX;
-						float c3 = edgeY2 - edgeY;
-						float d = c0 * c1 - c2 * c3;
-
+					else { // v1 outside, v2 inside
+						float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
+						float d = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
 						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / d;
 						output.add(edgeX + (edgeX2 - edgeX) * ua);
 						output.add(edgeY + (edgeY2 - edgeY) * ua);
-						
 						output.add(inputX2);
 						output.add(inputY2);
-						clipped = true;
 					}
+					clipped = true;
 				}
 			}
-			
-			// early out if all edges were outside
+
+			// Early out if all edges were outside.
 			if (numOutside == inputVerticesLength) {
 				originalOutput.clear();
 				return true;
@@ -141,57 +115,43 @@ public class Clipper {
 			output.add(output.items[1]);
 
 			if (i < clippingVerticesLength - 2) {
-				FloatArray tmp = output;
+				FloatArray temp = output;
 				output = input;
 				output.clear();
-				input = tmp;
+				input = temp;
 			}
 		}
 
 		if (originalOutput != output) {
 			originalOutput.clear();
-			originalOutput.addAll(output.items, 0, output.size);
-		}
-
-		originalOutput.setSize(originalOutput.size - 2);
+			originalOutput.addAll(output.items, 0, output.size - 2);
+		} else
+			originalOutput.setSize(originalOutput.size - 2);
 
 		return clipped;
 	}
-	
-	public static void makeClockwise (FloatArray poly) {
-		if (isClockwise(poly)) return;
-		
-		int lastX = poly.size - 2;
-		final float[] polygon = poly.items;
-		for (int i = 0, n = poly.size / 2; i < n; i += 2) {
+
+	static public void makeClockwise (FloatArray polygon) {
+		float[] vertices = polygon.items;
+		int verticeslength = polygon.size;
+
+		float area = 0, p1x, p1y, p2x, p2y;
+		for (int i = 0, n = verticeslength - 3; i < n; i += 2) {
+			p1x = vertices[i];
+			p1y = vertices[i + 1];
+			p2x = vertices[i + 2];
+			p2y = vertices[i + 3];
+			area += p1x * p2y - p2x * p1y;
+		}
+		if (area + vertices[verticeslength - 2] * vertices[1] - vertices[0] * vertices[verticeslength - 1] < 0) return;
+
+		for (int i = 0, lastX = verticeslength - 2, n = verticeslength / 2; i < n; i += 2) {
+			float x = vertices[i], y = vertices[i + 1];
 			int other = lastX - i;
-			float x = polygon[i];
-			float y = polygon[i + 1];
-			polygon[i] = polygon[other];
-			polygon[i + 1] = polygon[other + 1];
-			polygon[other] = x;
-			polygon[other + 1] = y;
+			vertices[i] = vertices[other];
+			vertices[i + 1] = vertices[other + 1];
+			vertices[other] = x;
+			vertices[other + 1] = y;
 		}
-	}
-
-	public static boolean isClockwise (FloatArray poly) {
-		return area(poly) < 0;
-	}
-
-	public static float area (FloatArray poly) {
-		float area = 0;
-
-		final float[] polyVertices = poly.items;
-		final int polySize = poly.size;
-		for (int i = 0; i < polySize; i += 2) {
-			float x = polyVertices[i];
-			float y = polyVertices[i + 1];
-			float x2 = polyVertices[(i + 2) % poly.size];
-			float y2 = polyVertices[(i + 3) % poly.size];
-
-			area += x * y2 - y * x2;
-		}
-
-		return area;
 	}
 }

@@ -85,8 +85,7 @@ public class SkeletonRenderer implements Disposable {
 				batch.draw(region.getRegion().getTexture(), vertices, 0, 20);
 
 			} else if (attachment instanceof ClippingAttachment) {
-				ClippingAttachment clip = (ClippingAttachment)attachment;
-				clipper.clipStart(slot, clip);
+				clipper.clipStart(slot, (ClippingAttachment)attachment);
 				continue;
 
 			} else if (attachment instanceof MeshAttachment) {
@@ -119,9 +118,9 @@ public class SkeletonRenderer implements Disposable {
 				}
 			}
 
-			if (clipper.isClipping() && clipper.getClippingAttachment().getEndSlot() == i) clipper.clipEnd();
+			clipper.clipEnd(i);
 		}
-		if (clipper.isClipping()) clipper.clipEnd();
+		clipper.clipEnd(-1);
 	}
 
 	@SuppressWarnings("null")
@@ -221,9 +220,9 @@ public class SkeletonRenderer implements Disposable {
 				}
 			}
 
-			if (clipper.isClipping() && clipper.getClippingAttachment().getEndSlot() == i) clipper.clipEnd();
+			clipper.clipEnd(i);
 		}
-		if (clipper.isClipping()) clipper.clipEnd();
+		clipper.clipEnd(-1);
 	}
 
 	@SuppressWarnings("null")
@@ -330,9 +329,9 @@ public class SkeletonRenderer implements Disposable {
 				}
 			}
 
-			if (clipper.isClipping() && clipper.getClippingAttachment().getEndSlot() == i) clipper.clipEnd();
+			clipper.clipEnd(i);
 		}
-		if (clipper.isClipping()) clipper.clipEnd();
+		clipper.clipEnd(-1);
 	}
 
 	public void setPremultipliedAlpha (boolean premultipliedAlpha) {
