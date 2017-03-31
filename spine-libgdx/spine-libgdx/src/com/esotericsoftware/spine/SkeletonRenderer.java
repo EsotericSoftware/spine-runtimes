@@ -48,7 +48,7 @@ import com.esotericsoftware.spine.attachments.ClippingAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.SkeletonAttachment;
-import com.esotericsoftware.spine.utils.SutherlandHodgmanClipper;
+import com.esotericsoftware.spine.utils.Clipper;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
 public class SkeletonRenderer {
@@ -58,7 +58,7 @@ public class SkeletonRenderer {
 	private boolean premultipliedAlpha;
 	private final FloatArray vertices = new FloatArray(32);
 
-	private SutherlandHodgmanClipper clipper = new SutherlandHodgmanClipper();
+	private Clipper clipper = new Clipper();
 	private ClippingAttachment clipAttachment;
 	private Slot clipEnd;
 	private FloatArray clippingArea = new FloatArray();
@@ -406,9 +406,9 @@ public class SkeletonRenderer {
 			int n = clip.getWorldVerticesLength();
 			float[] vertices = this.clippingArea.setSize(n);
 			clip.computeWorldVertices(slot, 0, n, vertices, 0, 2);
-			clippingAreaClockwise = SutherlandHodgmanClipper.isClockwise(this.clippingArea);
+			clippingAreaClockwise = Clipper.isClockwise(this.clippingArea);
 			if (!clippingAreaClockwise) {
-				SutherlandHodgmanClipper.makeClockwise(clippingArea);
+				Clipper.makeClockwise(clippingArea);
 			}
 			clippingArea.add(clippingArea.items[0]);
 			clippingArea.add(clippingArea.items[1]);

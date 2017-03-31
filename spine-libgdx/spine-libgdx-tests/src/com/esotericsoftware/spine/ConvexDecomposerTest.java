@@ -24,7 +24,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.esotericsoftware.spine.utils.ConvexDecomposer;
-import com.esotericsoftware.spine.utils.SutherlandHodgmanClipper;
+import com.esotericsoftware.spine.utils.Clipper;
 
 public class ConvexDecomposerTest extends ApplicationAdapter {
 	OrthographicCamera sceneCamera;
@@ -46,9 +46,11 @@ public class ConvexDecomposerTest extends ApplicationAdapter {
 		polyBatcher = new PolygonSpriteBatch();
 		image = new Texture("skin/skin.png");
 		font = new BitmapFont();
-		
-		// float[] v = { 87, 288, 217, 371, 456, 361, 539, 175, 304, 194, 392, 290, 193, 214, 123, 15, 14, 137 };
-		float[] v = { 336, 153, 207, 184, 364, 333, 529, 326, 584, 130, 438, 224 };
+
+		float[] v = {100, 100, 120, 100, 200, 100, 200, 400, 100, 400};
+
+// float[] v = {87, 288, 217, 371, 456, 361, 539, 175, 304, 194, 392, 290, 193, 214, 123, 15, 14, 137};
+// float[] v = { 336, 153, 207, 184, 364, 333, 529, 326, 584, 130, 438, 224 };
 		polygon.addAll(v);
 		triangulate();
 	}
@@ -92,7 +94,7 @@ public class ConvexDecomposerTest extends ApplicationAdapter {
 				triangulate();
 			}
 		}
-		
+
 		if (Gdx.input.isKeyJustPressed(Keys.R)) {
 			long start = System.nanoTime();
 			generateRandomPolygon();
@@ -103,43 +105,52 @@ public class ConvexDecomposerTest extends ApplicationAdapter {
 				if (i != polygon.size - 1) System.out.print(", ");
 			}
 			System.out.println("};");
-//			triangulate();
+			triangulate();
+		}
+
+		if (Gdx.input.isKeyJustPressed(Keys.T)) {
+			triangulate();
 		}
 	}
 
 	private void generateRandomPolygon () {
 		polygon.clear();
-		
-		int numVertices = 10; // MathUtils.random(3, 3);
+		convexPolygons.clear();
+
+		int numVertices = MathUtils.random(3, 30);
 		for (int i = 0; i < numVertices; i++) {
 			float x = (float)(50 + Math.random() * (Gdx.graphics.getWidth() - 50));
 			float y = (float)(50 + Math.random() * (Gdx.graphics.getHeight() - 50));
 
 			polygon.add(x);
 			polygon.add(y);
-			
+			System.out.println(polygon.toString(","));
 			if (selfIntersects(polygon)) {
 				polygon.size -= 2;
 				i--;
 			}
 		}
 	}
-	
-	private boolean selfIntersects(FloatArray polygon) {
+
+	private boolean selfIntersects (FloatArray polygon) {
 		Vector2 tmp = new Vector2();
-		for(int i = 0, n = polygon.size; i <= n; i+=4) {
+		if (polygon.size == 6) return false;
+		for (int i = 0, n = polygon.size; i <= n; i += 2) {
 			float x1 = polygon.get(i % n);
 			float y1 = polygon.get((i + 1) % n);
 			float x2 = polygon.get((i + 2) % n);
 			float y2 = polygon.get((i + 3) % n);
-			
-			for (int j = 0; j <= n; j+=4) {
-				if (j == i || j == i + 1) continue;
+
+			for (int j = 0; j <= n; j += 2) {
 				float x3 = polygon.get(j % n);
 				float y3 = polygon.get((j + 1) % n);
 				float x4 = polygon.get((j + 2) % n);
 				float y4 = polygon.get((j + 3) % n);
-				if (Intersector.intersectSegments(x1, y1, x2, y2, x3, y3, x4, y4, tmp)) return true;		
+				if (x1 == x3 && y1 == y3) continue;
+				if (x1 == x4 && y1 == y4) continue;
+				if (x2 == x3 && y2 == y3) continue;
+				if (x2 == x4 && y2 == y4) continue;
+				if (Intersector.intersectSegments(x1, y1, x2, y2, x3, y3, x4, y4, tmp)) return true;
 			}
 		}
 		return false;
@@ -154,7 +165,7 @@ public class ConvexDecomposerTest extends ApplicationAdapter {
 		polyBatcher.disableBlending();
 
 		polyBatcher.end();
-		
+
 		// polygon
 		shapes.setColor(Color.RED);
 		shapes.begin(ShapeType.Line);
@@ -185,32 +196,32 @@ public class ConvexDecomposerTest extends ApplicationAdapter {
 		}
 
 		// edge normals
-		shapes.setColor(Color.YELLOW);
-		if (polygon.size > 2) {
-			boolean clockwise = SutherlandHodgmanClipper.isClockwise(polygon);
-			for (int i = 0; i < polygon.size; i += 2) {
-				float x = polygon.get(i);
-				float y = polygon.get(i + 1);
-				float x2 = polygon.get((i + 2) % polygon.size);
-				float y2 = polygon.get((i + 3) % polygon.size);
+// shapes.setColor(Color.YELLOW);
+// if (polygon.size > 2) {
+// boolean clockwise = Clipper.isClockwise(polygon);
+// for (int i = 0; i < polygon.size; i += 2) {
+// float x = polygon.get(i);
+// float y = polygon.get(i + 1);
+// float x2 = polygon.get((i + 2) % polygon.size);
+// float y2 = polygon.get((i + 3) % polygon.size);
+//
+// float mx = x + (x2 - x) / 2;
+// float my = y + (y2 - y) / 2;
+// float nx = (y2 - y);
+// float ny = -(x2 - x);
+// if (!clockwise) {
+// nx = -nx;
+// ny = -ny;
+// }
+// float l = 1 / (float)Math.sqrt(nx * nx + ny * ny);
+// nx *= l * 20;
+// ny *= l * 20;
+//
+// shapes.line(mx, my, mx + nx, my + ny);
+// }
+// }
 
-				float mx = x + (x2 - x) / 2;
-				float my = y + (y2 - y) / 2;
-				float nx = (y2 - y);
-				float ny = -(x2 - x);
-				if (!clockwise) {
-					nx = -nx;
-					ny = -ny;
-				}
-				float l = 1 / (float)Math.sqrt(nx * nx + ny * ny);
-				nx *= l * 20;
-				ny *= l * 20;
-
-//				shapes.line(mx, my, mx + nx, my + ny);
-			}
-		}
-		
-		// decomposition		
+		// decomposition
 		if (convexPolygons != null) {
 			for (int i = 0, n = convexPolygons.size; i < n; i++) {
 				if (colors.size <= i) {
@@ -223,12 +234,12 @@ public class ConvexDecomposerTest extends ApplicationAdapter {
 
 		if (isCreatingPolygon) {
 			polygon.setSize(polygon.size - 2);
-		}	
+		}
 		shapes.end();
-		
+
 		polyBatcher.begin();
 		polyBatcher.enableBlending();
-		for (int i = 0; i < polygon.size; i+=2) {
+		for (int i = 0; i < polygon.size; i += 2) {
 			float x = polygon.get(i);
 			float y = polygon.get(i + 1);
 			font.draw(polyBatcher, "" + (i >> 1), x, y); // + ", " + x + ", " + y, x, y);
@@ -238,7 +249,7 @@ public class ConvexDecomposerTest extends ApplicationAdapter {
 	}
 
 	private void triangulate () {
-		SutherlandHodgmanClipper.makeClockwise(polygon);
+		Clipper.makeClockwise(polygon);
 		convexPolygons = decomposer.decompose(polygon);
 	}
 
