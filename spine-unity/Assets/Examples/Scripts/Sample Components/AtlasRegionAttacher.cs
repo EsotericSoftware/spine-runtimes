@@ -29,11 +29,13 @@
  *****************************************************************************/
 
 using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using Spine;
 using Spine.Unity.Modules.AttachmentTools;
 
 namespace Spine.Unity.Modules {
+	/// <summary>
+	/// Example code for a component that replaces the default attachment of a slot with an image from a Spine atlas.</summary>
 	public class AtlasRegionAttacher : MonoBehaviour {
 
 		[System.Serializable]
@@ -45,8 +47,9 @@ namespace Spine.Unity.Modules {
 			public string region;
 		}
 
-		public AtlasAsset atlasAsset;
-		public SlotRegionPair[] attachments;
+		[SerializeField] protected AtlasAsset atlasAsset;
+		[SerializeField] protected bool inheritProperties = true;
+		[SerializeField] protected List<SlotRegionPair> attachments = new List<SlotRegionPair>();
 
 		Atlas atlas;
 
@@ -58,14 +61,55 @@ namespace Spine.Unity.Modules {
 			atlas = atlasAsset.GetAtlas();
 			float scale = skeletonRenderer.skeletonDataAsset.scale;
 
-			var enumerator = attachments.GetEnumerator();
-			while (enumerator.MoveNext()) {
-				var entry = (SlotRegionPair)enumerator.Current;
-
-				var slot = skeletonRenderer.skeleton.FindSlot(entry.slot);
+			foreach (var entry in attachments) {
+				var slot = skeletonRenderer.Skeleton.FindSlot(entry.slot);
 				var region = atlas.FindRegion(entry.region);
-				slot.Attachment = region.ToRegionAttachment(entry.region, scale);
+				ReplaceAttachment(slot, region, scale, inheritProperties);
 			}
+		}
+
+		static void ReplaceAttachment (Slot slot, AtlasRegion region, float scale, bool inheritProperties) {
+			var originalAttachment = slot.Attachment;
+
+			// Altas was empty
+			if (region == null) {
+				slot.Attachment = null;
+				return;
+			}
+
+			// Original was MeshAttachment
+			if (inheritProperties) {
+				var originalMeshAttachment = originalAttachment as MeshAttachment;
+				if (originalMeshAttachment != null) {
+					var newMeshAttachment = originalMeshAttachment.GetLinkedClone(); // Attach the region as a linked mesh to the original mesh.
+					newMeshAttachment.SetRegion(region);
+					slot.Attachment = newMeshAttachment;
+					return;
+				}
+			}
+
+			// Original was RegionAttachment or empty
+			{
+				var originalRegionAttachment = originalAttachment as RegionAttachment;
+				var newRegionAttachment = region.ToRegionAttachment(region.name, scale);
+				if (originalRegionAttachment != null && inheritProperties) {
+					newRegionAttachment.X = originalRegionAttachment.X;
+					newRegionAttachment.Y = originalRegionAttachment.Y;
+					newRegionAttachment.Rotation = originalRegionAttachment.Rotation;
+					newRegionAttachment.ScaleX = originalRegionAttachment.ScaleX;
+					newRegionAttachment.ScaleY = originalRegionAttachment.ScaleY;
+					newRegionAttachment.UpdateOffset();
+
+					newRegionAttachment.R = originalRegionAttachment.R;
+					newRegionAttachment.G = originalRegionAttachment.G;
+					newRegionAttachment.B = originalRegionAttachment.B;
+					newRegionAttachment.A = originalRegionAttachment.A;
+				}
+
+				slot.Attachment = newRegionAttachment;
+				return;
+			}
+
 		}
 
 	}
