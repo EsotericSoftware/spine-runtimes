@@ -206,7 +206,7 @@ public class SkeletonRenderer implements Disposable {
 				}
 
 				if (clipper.isClipping()) {
-					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, 0, c, false);
+					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, c, 0, false);
 					FloatArray clippedVertices = clipper.getClippedVertices();
 					ShortArray clippedTriangles = clipper.getClippedTriangles();
 					batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,
@@ -314,7 +314,7 @@ public class SkeletonRenderer implements Disposable {
 				}
 
 				if (clipper.isClipping()) {
-					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, dark, light, true);
+					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, light, dark, true);
 					FloatArray clippedVertices = clipper.getClippedVertices();
 					ShortArray clippedTriangles = clipper.getClippedTriangles();
 					batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,

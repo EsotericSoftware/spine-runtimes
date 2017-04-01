@@ -76,7 +76,7 @@ public class SkeletonClipping {
 	}
 
 	public void clipTriangles (float[] vertices, int verticesLength, short[] triangles, int trianglesLength, float uvs[],
-		float dark, float light, boolean twoColor) {
+		float light, float dark, boolean twoColor) {
 
 		Clipper clipper = this.clipper;
 		FloatArray clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
