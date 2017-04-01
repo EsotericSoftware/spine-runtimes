@@ -75,7 +75,7 @@ public class SkeletonClipping {
 		return clipAttachment != null;
 	}
 
-	public void clipTriangles (float[] vertices, int verticesLength, short[] triangles, int trianglesLength, float uvs[],
+	public void clipTriangles (float[] vertices, int verticesLength, short[] triangles, int trianglesLength, float[] uvs,
 		float light, float dark, boolean twoColor) {
 
 		Clipper clipper = this.clipper;

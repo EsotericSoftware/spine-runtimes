@@ -53,7 +53,8 @@ public class VertexAttachment extends Attachment {
 	 * Runtimes Guide.
 	 * @param start The index of the first {@link #getVertices()} value to transform. Each vertex has 2 values, x and y.
 	 * @param count The number of world vertex values to output. Must be <= {@link #getWorldVerticesLength()} - <code>start</code>.
-	 * @param worldVertices The output world vertices. Must have a length >= <code>offset</code> + <code>count</code>.
+	 * @param worldVertices The output world vertices. Must have a length >= <code>offset</code> + <code>count</code> *
+	 *           <code>stride</code> / 2.
 	 * @param offset The <code>worldVertices</code> index to begin writing values.
 	 * @param stride The number of <code>worldVertices</code> entries between the value pairs written. */
 	public void computeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset, int stride) {
@@ -142,8 +143,8 @@ public class VertexAttachment extends Attachment {
 		this.vertices = vertices;
 	}
 
-	/** The maximum length required of the <code>worldVertices</code> passed to
-	 * {@link #computeWorldVertices(Slot, int, int, float[], int, int)}. */
+	/** The maximum number of world vertex values that can be output by
+	 * {@link #computeWorldVertices(Slot, int, int, float[], int, int)} using the <code>count</code> parameter. */
 	public int getWorldVerticesLength () {
 		return worldVerticesLength;
 	}

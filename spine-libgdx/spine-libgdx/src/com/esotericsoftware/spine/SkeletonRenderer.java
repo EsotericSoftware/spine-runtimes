@@ -53,8 +53,8 @@ public class SkeletonRenderer implements Disposable {
 
 	private boolean premultipliedAlpha;
 	private final FloatArray vertices = new FloatArray(32);
-	private ImmediateModeRenderer renderer;
 	private final SkeletonClipping clipper = new SkeletonClipping();
+	private ImmediateModeRenderer renderer;
 
 	public void draw (Batch batch, Skeleton skeleton) {
 		boolean premultipliedAlpha = this.premultipliedAlpha;
@@ -136,7 +136,7 @@ public class SkeletonRenderer implements Disposable {
 		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
 		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
-			final int vertexSize = clipper.isClipping() ? 2 : 5;
+			int vertexSize = clipper.isClipping() ? 2 : 5;
 			Slot slot = drawOrder.get(i);
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
@@ -238,8 +238,8 @@ public class SkeletonRenderer implements Disposable {
 		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
 		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
-			final int vertexSize = clipper.isClipping() ? 2 : 6;
 			Slot slot = drawOrder.get(i);
+			int vertexSize = clipper.isClipping() ? 2 : 6;
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment region = (RegionAttachment)attachment;
