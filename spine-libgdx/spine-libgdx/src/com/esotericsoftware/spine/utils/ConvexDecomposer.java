@@ -30,8 +30,6 @@
 
 package com.esotericsoftware.spine.utils;
 
-import java.util.Iterator;
-
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BooleanArray;
 import com.badlogic.gdx.utils.FloatArray;
@@ -43,79 +41,99 @@ public class ConvexDecomposer {
 	private final Array<ShortArray> convexPolygonsIndices = new Array();
 
 	private final ShortArray indicesArray = new ShortArray();
-	private short[] indices;
-	private float[] vertices;
-	private int vertexCount;
 	private final BooleanArray isConcaveArray = new BooleanArray();
 	private final ShortArray triangles = new ShortArray();
 
-	private final Pool<FloatArray> polygonPool = new Pool<FloatArray>() {
+	private final Pool<FloatArray> polygonPool = new Pool() {
 		protected FloatArray newObject () {
 			return new FloatArray(16);
 		}
 	};
 
-	private final Pool<ShortArray> polygonIndicesPool = new Pool<ShortArray>() {
+	private final Pool<ShortArray> polygonIndicesPool = new Pool() {
 		protected ShortArray newObject () {
 			return new ShortArray(16);
 		}
 	};
 
 	public Array<FloatArray> decompose (FloatArray input) {
-		vertices = input.items;
-		int vertexCount = this.vertexCount = input.size / 2;
+		float[] vertices = input.items;
+		int vertexCount = input.size >> 1;
 
 		ShortArray indicesArray = this.indicesArray;
 		indicesArray.clear();
-		short[] indices = this.indices = indicesArray.setSize(vertexCount);
+		short[] indices = indicesArray.setSize(vertexCount);
 		for (short i = 0; i < vertexCount; i++)
 			indices[i] = i;
 
+		BooleanArray isConcaveArray = this.isConcaveArray;
 		boolean[] isConcave = isConcaveArray.setSize(vertexCount);
 		for (int i = 0, n = vertexCount; i < n; ++i)
-			isConcave[i] = isConcave(i);
+			isConcave[i] = isConcave(i, vertexCount, vertices, indices);
 
 		ShortArray triangles = this.triangles;
 		triangles.clear();
-		triangles.ensureCapacity(Math.max(0, vertexCount - 2) * 4);
+		triangles.ensureCapacity(Math.max(0, vertexCount - 2) << 2);
 
 		// Triangulate.
-		while (this.vertexCount > 3) {
-			int earTipIndex = findEarTip();
-			cutEarTip(earTipIndex);
+		while (vertexCount > 3) {
+			// Find ear tip.
+			int i = 0;
+			while (true) {
+				if (!isConcave[i] && isEarTip(i, vertexCount, vertices, indices)) break;
+				i++;
+				if (i == vertexCount) {
+					do {
+						i--;
+						if (!isConcave[i]) break;
+					} while (i > 0);
+					break;
+				}
+			}
 
-			int previousIndex = previousIndex(earTipIndex);
-			int nextIndex = earTipIndex == vertexCount ? 0 : earTipIndex;
-			isConcave[previousIndex] = isConcave(previousIndex);
-			isConcave[nextIndex] = isConcave(nextIndex);
+			// Cut ear tip.
+			triangles.add(indices[previousIndex(i, vertexCount)]);
+			triangles.add(indices[i]);
+			triangles.add(indices[nextIndex(i, vertexCount)]);
+			indicesArray.removeIndex(i);
+			isConcaveArray.removeIndex(i);
+			vertexCount--;
+
+			int previousIndex = previousIndex(i, vertexCount);
+			int nextIndex = i == vertexCount ? 0 : i;
+			isConcave[previousIndex] = isConcave(previousIndex, vertexCount, vertices, indices);
+			isConcave[nextIndex] = isConcave(nextIndex, vertexCount, vertices, indices);
 		}
 
-		if (this.vertexCount == 3) {
+		if (vertexCount == 3) {
 			triangles.add(indicesArray.get(2));
 			triangles.add(indicesArray.get(0));
 			triangles.add(indicesArray.get(1));
 		}
 
+		Array<FloatArray> convexPolygons = this.convexPolygons;
 		polygonPool.freeAll(convexPolygons);
 		convexPolygons.clear();
+
+		Array<ShortArray> convexPolygonsIndices = this.convexPolygonsIndices;
 		polygonIndicesPool.freeAll(convexPolygonsIndices);
 		convexPolygonsIndices.clear();
 
 		ShortArray polygonIndices = polygonIndicesPool.obtain();
 		polygonIndices.clear();
+
 		FloatArray polygon = polygonPool.obtain();
 		polygon.clear();
-		int fanBaseIndex = -1, lastWinding = 0;
 
 		// Merge subsequent triangles if they form a triangle fan.
+		int fanBaseIndex = -1, lastWinding = 0;
 		for (int i = 0, n = triangles.size; i < n; i += 3) {
 			int t1 = triangles.get(i) << 1, t2 = triangles.get(i + 1) << 1, t3 = triangles.get(i + 2) << 1;
 			float x1 = input.get(t1), y1 = input.get(t1 + 1);
 			float x2 = input.get(t2), y2 = input.get(t2 + 1);
 			float x3 = input.get(t3), y3 = input.get(t3 + 1);
 
-			// If the base of the last triangle is the same as this triangle's base, check if they form a convex polygon (triangle
-			// fan).
+			// If the base of the last triangle is the same as this triangle, check if they form a convex polygon (triangle fan).
 			boolean merged = false;
 			if (fanBaseIndex == t1) {
 				int o = polygon.size - 4;
@@ -204,10 +222,10 @@ public class ConvexDecomposer {
 		}
 
 		// Remove empty polygons that resulted from the merge step above.
-		for (Iterator<FloatArray> iter = convexPolygons.iterator(); iter.hasNext();) {
-			polygon = iter.next();
+		for (int i = convexPolygons.size - 1; i >= 0; i--) {
+			polygon = convexPolygons.get(i);
 			if (polygon.size == 0) {
-				iter.remove();
+				convexPolygons.removeIndex(i);
 				polygonPool.free(polygon);
 			}
 		}
@@ -215,45 +233,20 @@ public class ConvexDecomposer {
 		return convexPolygons;
 	}
 
-	private boolean isConcave (int index) {
-		short[] indices = this.indices;
-		int previous = indices[previousIndex(index)] * 2;
-		int current = indices[index] * 2;
-		int next = indices[nextIndex(index)] * 2;
-		float[] vertices = this.vertices;
-		return !positiveArea(vertices[previous], vertices[previous + 1], vertices[current], vertices[current + 1], vertices[next],
-			vertices[next + 1]);
-	}
-
-	private int findEarTip () {
-		int vertexCount = this.vertexCount;
-		for (int i = 0; i < vertexCount; i++)
-			if (isEarTip(i)) return i;
-
-		boolean[] isConcave = this.isConcaveArray.items;
-		for (int i = 0; i < vertexCount; i++)
-			if (!isConcave[i]) return i;
-		return 0;
-	}
-
-	private boolean isEarTip (int earTipIndex) {
-		boolean[] isConcave = this.isConcaveArray.items;
-		if (isConcave[earTipIndex]) return false;
-
-		int previousIndex = previousIndex(earTipIndex);
-		int nextIndex = nextIndex(earTipIndex);
-		short[] indices = this.indices;
-		int p1 = indices[previousIndex] * 2;
-		int p2 = indices[earTipIndex] * 2;
-		int p3 = indices[nextIndex] * 2;
-		float[] vertices = this.vertices;
+	private boolean isEarTip (int earTipIndex, int vertexCount, float[] vertices, short[] indices) {
+		int previousIndex = previousIndex(earTipIndex, vertexCount);
+		int nextIndex = nextIndex(earTipIndex, vertexCount);
+		int p1 = indices[previousIndex] << 1;
+		int p2 = indices[earTipIndex] << 1;
+		int p3 = indices[nextIndex] << 1;
 		float p1x = vertices[p1], p1y = vertices[p1 + 1];
 		float p2x = vertices[p2], p2y = vertices[p2 + 1];
 		float p3x = vertices[p3], p3y = vertices[p3 + 1];
+		boolean[] isConcave = this.isConcaveArray.items;
 
-		for (int i = nextIndex(nextIndex); i != previousIndex; i = nextIndex(i)) {
+		for (int i = nextIndex(nextIndex, vertexCount); i != previousIndex; i = nextIndex(i, vertexCount)) {
 			if (isConcave[i]) {
-				int v = indices[i] * 2;
+				int v = indices[i] << 1;
 				float vx = vertices[v], vy = vertices[v + 1];
 				if (positiveArea(p3x, p3y, p1x, p1y, vx, vy)) {
 					if (positiveArea(p1x, p1y, p2x, p2y, vx, vy)) {
@@ -265,24 +258,19 @@ public class ConvexDecomposer {
 		return true;
 	}
 
-	private void cutEarTip (int earTipIndex) {
-		short[] indices = this.indices;
-		ShortArray triangles = this.triangles;
-
-		triangles.add(indices[previousIndex(earTipIndex)]);
-		triangles.add(indices[earTipIndex]);
-		triangles.add(indices[nextIndex(earTipIndex)]);
-
-		indicesArray.removeIndex(earTipIndex);
-		isConcaveArray.removeIndex(earTipIndex);
-		vertexCount--;
+	static private boolean isConcave (int index, int vertexCount, float[] vertices, short[] indices) {
+		int previous = indices[previousIndex(index, vertexCount)] << 1;
+		int current = indices[index] << 1;
+		int next = indices[nextIndex(index, vertexCount)] << 1;
+		return !positiveArea(vertices[previous], vertices[previous + 1], vertices[current], vertices[current + 1], vertices[next],
+			vertices[next + 1]);
 	}
 
-	private int previousIndex (int index) {
+	static private int previousIndex (int index, int vertexCount) {
 		return (index == 0 ? vertexCount : index) - 1;
 	}
 
-	private int nextIndex (int index) {
+	static private int nextIndex (int index, int vertexCount) {
 		return (index + 1) % vertexCount;
 	}
 

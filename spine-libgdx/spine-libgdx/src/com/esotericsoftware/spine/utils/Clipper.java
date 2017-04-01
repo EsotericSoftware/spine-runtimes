@@ -145,7 +145,7 @@ public class Clipper {
 		}
 		if (area + vertices[verticeslength - 2] * vertices[1] - vertices[0] * vertices[verticeslength - 1] < 0) return;
 
-		for (int i = 0, lastX = verticeslength - 2, n = verticeslength / 2; i < n; i += 2) {
+		for (int i = 0, lastX = verticeslength - 2, n = verticeslength >> 1; i < n; i += 2) {
 			float x = vertices[i], y = vertices[i + 1];
 			int other = lastX - i;
 			vertices[i] = vertices[other];
