@@ -54,6 +54,7 @@ public class SkeletonClipping {
 		int n = clip.getWorldVerticesLength();
 		float[] vertices = clippingPolygon.setSize(n);
 		clip.computeWorldVertices(slot, 0, n, vertices, 0, 2);
+		Clipper.makeClockwise(clippingPolygon);
 		convexClippingPolygons = decomposer.decompose(clippingPolygon);
 		for (FloatArray polygon : convexClippingPolygons) {
 			Clipper.makeClockwise(polygon);

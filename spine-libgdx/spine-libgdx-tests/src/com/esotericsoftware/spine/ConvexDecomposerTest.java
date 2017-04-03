@@ -190,23 +190,23 @@ public class ConvexDecomposerTest extends ApplicationAdapter {
 		}
 
 		// polygon while drawing
-		switch (polygon.size) {
-		case 0:
-			break;
-		case 2:
-			shapes.end();
-			shapes.begin(ShapeType.Point);
-			GL11.glPointSize(4);
-			shapes.point(polygon.get(0), polygon.get(1), 0);
-			shapes.end();
-			shapes.begin(ShapeType.Line);
-			break;
-		case 4:
-			shapes.line(polygon.get(0), polygon.get(1), polygon.get(2), polygon.get(3));
-			break;
-		default:
-			shapes.polygon(polygon.items, 0, polygon.size);
-		}
+//		switch (polygon.size) {
+//		case 0:
+//			break;
+//		case 2:
+//			shapes.end();
+//			shapes.begin(ShapeType.Point);
+//			GL11.glPointSize(4);
+//			shapes.point(polygon.get(0), polygon.get(1), 0);
+//			shapes.end();
+//			shapes.begin(ShapeType.Line);
+//			break;
+//		case 4:
+//			shapes.line(polygon.get(0), polygon.get(1), polygon.get(2), polygon.get(3));
+//			break;
+//		default:
+//			shapes.polygon(polygon.items, 0, polygon.size);
+//		}
 
 		// edge normals
 // shapes.setColor(Color.YELLOW);
@@ -242,6 +242,7 @@ public class ConvexDecomposerTest extends ApplicationAdapter {
 				}
 				shapes.setColor(colors.get(i));
 				shapes.polygon(convexPolygons.get(i).items, 0, convexPolygons.get(i).size);
+				if (i == 29) break;
 			}
 		}
 
