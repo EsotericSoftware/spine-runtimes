@@ -103,13 +103,15 @@ public class SkeletonClipping {
 
 				int s = clippedVertices.size;
 				if (clipper.clip(x1, y1, x2, y2, x3, y3, convexClippingPolygon, clipOutput)) {
-					if (clipOutput.size == 0) continue;
+					int outputLength = clipOutput.size;
+					if (outputLength == 0) continue;
 					float d0 = y2 - y3, d1 = x3 - x2, d2 = x1 - x3, d4 = y3 - y1;
 					float d = 1 / (d0 * d2 + d1 * (y1 - y3));
 
+					int vertexCount = outputLength >> 1;
 					float[] clipOutputItems = clipOutput.items;
-					float[] clippedVerticesItems = clippedVertices.setSize(s + (clipOutput.size >> 1) * vertexSize);
-					for (int ii = 0, nn = clipOutput.size; ii < nn; ii += 2) {
+					float[] clippedVerticesItems = clippedVertices.setSize(s + vertexCount * vertexSize);
+					for (int ii = 0; ii < outputLength; ii += 2) {
 						float x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
 						float c0 = x - x3, c1 = y - y3;
 						float a = (d0 * c0 + d1 * c1) * d;
@@ -133,14 +135,15 @@ public class SkeletonClipping {
 					}
 
 					s = clippedTriangles.size;
-					short[] clippedTrianglesItems = clippedTriangles.setSize(s + 3 * ((clipOutput.size >> 1) - 2));
-					for (int ii = 1, nn = (clipOutput.size >> 1) - 1; ii < nn; ii++) {
+					short[] clippedTrianglesItems = clippedTriangles.setSize(s + 3 * (vertexCount - 2));
+					vertexCount--;
+					for (int ii = 1; ii < vertexCount; ii++) {
 						clippedTrianglesItems[s] = index;
 						clippedTrianglesItems[s + 1] = (short)(index + ii);
 						clippedTrianglesItems[s + 2] = (short)(index + ii + 1);
 						s += 3;
 					}
-					index += clipOutput.size >> 1;
+					index += vertexCount + 1;
 
 				} else {
 					float[] clippedVerticesItems = clippedVertices.setSize(s + 3 * vertexSize);
