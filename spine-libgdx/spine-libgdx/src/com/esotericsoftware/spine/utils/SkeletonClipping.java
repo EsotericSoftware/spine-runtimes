@@ -87,8 +87,9 @@ public class SkeletonClipping {
 		short index = 0;
 		clippedVertices.clear();
 		clippedTriangles.clear();
-		for (FloatArray convexClippingPolygon : convexClippingPolygons) {
-			for (int i = 0; i < trianglesLength; i += 3) {
+		outer:
+		for (int i = 0; i < trianglesLength; i += 3) {
+			for (FloatArray convexClippingPolygon : convexClippingPolygons) {
 				int vertexOffset = triangles[i] << 1;
 				float x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
 				float u1 = uvs[vertexOffset], v1 = uvs[vertexOffset + 1];
@@ -190,6 +191,7 @@ public class SkeletonClipping {
 					clippedTrianglesItems[s] = index++;
 					clippedTrianglesItems[s + 1] = index++;
 					clippedTrianglesItems[s + 2] = index++;
+					continue outer;
 				}
 			}
 		}
