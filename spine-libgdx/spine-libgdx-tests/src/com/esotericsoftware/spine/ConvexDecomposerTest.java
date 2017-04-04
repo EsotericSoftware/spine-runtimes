@@ -1,8 +1,6 @@
 
 package com.esotericsoftware.spine;
 
-import org.lwjgl.opengl.GL11;
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
@@ -23,8 +21,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
-import com.esotericsoftware.spine.utils.ConvexDecomposer;
 import com.esotericsoftware.spine.utils.Clipper;
+import com.esotericsoftware.spine.utils.ConvexDecomposer;
 
 public class ConvexDecomposerTest extends ApplicationAdapter {
 	OrthographicCamera sceneCamera;
