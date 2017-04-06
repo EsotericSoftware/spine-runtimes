@@ -62,8 +62,8 @@ public class Clipper {
 		output.clear();
 
 		float[] clippingVertices = clippingArea.items;
-		int clippingVerticesLength = clippingArea.size - 2;
-		for (int i = 0; i < clippingVerticesLength; i += 2) {
+		int clippingVerticesLast = clippingArea.size - 4;
+		for (int i = 0;; i += 2) {
 			float edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
 			float edgeX2 = clippingVertices[i + 2], edgeY2 = clippingVertices[i + 3];
 			float deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;
@@ -73,36 +73,30 @@ public class Clipper {
 			for (int ii = 0; ii < inputVerticesLength; ii += 2) {
 				float inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
 				float inputX2 = inputVertices[ii + 2], inputY2 = inputVertices[ii + 3];
-
-				int side = deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0 ? 1 : -1;
-				int side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0 ? 1 : -1;
-				if (side >= 0) {
-					if (side2 >= 0) { // v1 inside, v2 inside
+				boolean side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0;
+				if (deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0) {
+					if (side2) { // v1 inside, v2 inside
 						output.add(inputX2);
 						output.add(inputY2);
-					} else { // v1 inside, v2 outside
-						float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-						float d = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
-						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / d;
-						output.add(edgeX + (edgeX2 - edgeX) * ua);
-						output.add(edgeY + (edgeY2 - edgeY) * ua);
-						clipped = true;
+						continue;
 					}
-				} else {
-					if (side2 >= 0) { // v1 outside, v2 inside
-						float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-						float d = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
-						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / d;
-						output.add(edgeX + (edgeX2 - edgeX) * ua);
-						output.add(edgeY + (edgeY2 - edgeY) * ua);
-						output.add(inputX2);
-						output.add(inputY2);
-					}
-					clipped = true;
+					// v1 inside, v2 outside
+					float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
+					float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
+					output.add(edgeX + (edgeX2 - edgeX) * ua);
+					output.add(edgeY + (edgeY2 - edgeY) * ua);
+				} else if (side2) { // v1 outside, v2 inside
+					float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
+					float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
+					output.add(edgeX + (edgeX2 - edgeX) * ua);
+					output.add(edgeY + (edgeY2 - edgeY) * ua);
+					output.add(inputX2);
+					output.add(inputY2);
 				}
+				clipped = true;
 			}
 
-			if (outputStart == output.size) { // All edges were outside.
+			if (outputStart == output.size) { // All edges outside.
 				originalOutput.clear();
 				return true;
 			}
@@ -110,12 +104,11 @@ public class Clipper {
 			output.add(output.items[0]);
 			output.add(output.items[1]);
 
-			if (i < clippingVerticesLength - 2) {
-				FloatArray temp = output;
-				output = input;
-				output.clear();
-				input = temp;
-			}
+			if (i == clippingVerticesLast) break;
+			FloatArray temp = output;
+			output = input;
+			output.clear();
+			input = temp;
 		}
 
 		if (originalOutput != output) {
@@ -131,7 +124,7 @@ public class Clipper {
 		float[] vertices = polygon.items;
 		int verticeslength = polygon.size;
 
-		float area = 0, p1x, p1y, p2x, p2y;
+		float area = vertices[verticeslength - 2] * vertices[1] - vertices[0] * vertices[verticeslength - 1], p1x, p1y, p2x, p2y;
 		for (int i = 0, n = verticeslength - 3; i < n; i += 2) {
 			p1x = vertices[i];
 			p1y = vertices[i + 1];
@@ -139,7 +132,7 @@ public class Clipper {
 			p2y = vertices[i + 3];
 			area += p1x * p2y - p2x * p1y;
 		}
-		if (area + vertices[verticeslength - 2] * vertices[1] - vertices[0] * vertices[verticeslength - 1] < 0) return;
+		if (area < 0) return;
 
 		for (int i = 0, lastX = verticeslength - 2, n = verticeslength >> 1; i < n; i += 2) {
 			float x = vertices[i], y = vertices[i + 1];

@@ -116,25 +116,21 @@ public class SkeletonClipping {
 					float[] clippedVerticesItems = clippedVertices.setSize(s + clipOutputCount * vertexSize);
 					for (int ii = 0; ii < clipOutputLength; ii += 2) {
 						float x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
-						float c0 = x - x3, c1 = y - y3;
-						float a = (d0 * c0 + d1 * c1) * d;
-						float b = (d4 * c0 + d2 * c1) * d;
-						float c = 1 - a - b;
-						float u = u1 * a + u2 * b + u3 * c;
-						float v = v1 * a + v2 * b + v3 * c;
 						clippedVerticesItems[s] = x;
 						clippedVerticesItems[s + 1] = y;
 						clippedVerticesItems[s + 2] = light;
 						if (twoColor) {
 							clippedVerticesItems[s + 3] = dark;
-							clippedVerticesItems[s + 4] = u;
-							clippedVerticesItems[s + 5] = v;
-							s += 6;
-						} else {
-							clippedVerticesItems[s + 3] = u;
-							clippedVerticesItems[s + 4] = v;
-							s += 5;
-						}
+							s += 4;
+						} else
+							s += 3;
+						float c0 = x - x3, c1 = y - y3;
+						float a = (d0 * c0 + d1 * c1) * d;
+						float b = (d4 * c0 + d2 * c1) * d;
+						float c = 1 - a - b;
+						clippedVerticesItems[s] = u1 * a + u2 * b + u3 * c;
+						clippedVerticesItems[s + 1] = v1 * a + v2 * b + v3 * c;
+						s += 2;
 					}
 
 					s = clippedTriangles.size;
@@ -190,9 +186,10 @@ public class SkeletonClipping {
 
 					s = clippedTriangles.size;
 					short[] clippedTrianglesItems = clippedTriangles.setSize(s + 3);
-					clippedTrianglesItems[s] = index++;
-					clippedTrianglesItems[s + 1] = index++;
-					clippedTrianglesItems[s + 2] = index++;
+					clippedTrianglesItems[s] = index;
+					clippedTrianglesItems[s + 1] = (short)(index + 1);
+					clippedTrianglesItems[s + 2] = (short)(index + 2);
+					index += 3;
 					continue outer;
 				}
 			}
