@@ -40,7 +40,26 @@ namespace Spine {
 		private readonly HashSet<int> propertyIDs = new HashSet<int>();
 		private readonly ExposedList<Event> events = new ExposedList<Event>();
 		private readonly EventQueue queue;
+
 		private bool animationsChanged;
+		private bool multipleMixing;
+		/// <summary>
+		/// <para>When false, only two animations can be mixed at once. Interrupting a mix by setting a new animation will choose from the 
+		/// two old animations the one that is closest to being fully mixed in and the other is discarded. Discarding an animation in 
+		/// this way may cause keyed values to jump.</para>
+		/// <para>When true, any number of animations may be mixed at once without causing keyed values to jump. Mixing is done by mixing out 
+		/// one or more animations while mixing in the newest one. When animations key the same value, this may cause "dipping", where 
+		/// the value moves toward the setup pose as the old animation mixes out, then back to the keyed value as the new animation 
+		/// mixes in.</para>
+		/// Defaults to false.</summary>
+		public bool MultipleMixing {
+			get { return multipleMixing; }
+			set {
+				multipleMixing = value;
+				animationsChanged = true;
+			}
+		}
+
 		private float timeScale = 1;
 
 		Pool<TrackEntry> trackEntryPool = new Pool<TrackEntry>();
@@ -214,7 +233,9 @@ namespace Spine {
 			int timelineCount = timelines.Count;
 			var timelinesFirst = from.timelinesFirst;
 			var timelinesFirstItems = timelinesFirst.Items;
-			float alpha = from.alpha * entry.mixAlpha * (1 - mix);
+			var timelinesLastItems = multipleMixing ? null : from.timelinesLast.Items;
+			float alphaBase = from.alpha * entry.mixAlpha;
+			float alphaMix = alphaBase * (1 - mix);
 
 			bool firstFrame = entry.timelinesRotation.Count == 0;
 			if (firstFrame) entry.timelinesRotation.EnsureCapacity(timelines.Count << 1);
@@ -223,6 +244,7 @@ namespace Spine {
 			for (int i = 0; i < timelineCount; i++) {
 				Timeline timeline = timelinesItems[i];
 				bool setupPose = timelinesFirstItems[i];
+				float alpha = timelinesLastItems != null && setupPose && !timelinesLastItems[i] ? alphaBase : alphaMix;
 				var rotateTimeline = timeline as RotateTimeline;
 				if (rotateTimeline != null) {
 					ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, alpha, setupPose, timelinesRotation, i << 1, firstFrame);
@@ -389,10 +411,31 @@ namespace Spine {
 				current.mixingFrom = from;
 				current.mixTime = 0;
 
-				from.timelinesRotation.Clear();
+				//from.timelinesRotation.Clear();
+				var mixingFrom = from.mixingFrom;
+				float mixProgress = from.mixTime / from.mixDuration;
+				if (mixingFrom != null && from.mixDuration > 0) {
+					// A mix was interrupted, mix from the closest animation.
+					if (!multipleMixing && mixProgress < 0.5f && mixingFrom.animation != AnimationState.EmptyAnimation) {
+						current.mixingFrom = mixingFrom;
+						mixingFrom.mixingFrom = from;
+						mixingFrom.mixTime = from.mixDuration - from.mixTime;
+						mixingFrom.mixDuration = from.mixDuration;
+						from.mixingFrom = null;
+						from = mixingFrom;
+					}
 
-				// If not completely mixed in, set mixAlpha so mixing out happens from current mix to zero.
-				if (from.mixingFrom != null && from.mixDuration > 0) current.mixAlpha *= Math.Min(from.mixTime / from.mixDuration, 1);
+					// The interrupted mix will mix out from its current percentage to zero.
+					if (multipleMixing) current.mixAlpha *= Math.Min(mixProgress, 1);
+
+					if (!multipleMixing) {
+						from.mixAlpha = 0;
+						from.mixTime = 0;
+						from.mixDuration = 0;
+					}
+				}
+
+				from.timelinesRotation.Clear(); // Reset rotation for mixing out, in case entry was mixed in.
 			}
 
 			queue.Start(current);
@@ -586,13 +629,41 @@ namespace Spine {
 				TrackEntry entry = tracks.Items[i];
 				if (entry != null) CheckTimelinesFirst(entry);
 			}
+
+			if (multipleMixing) return;
+
+			// Set timelinesLast for mixingFrom entries, from highest track to lowest that has mixingFrom.
+			propertyIDs.Clear();
+			int lowestMixingFrom = n;
+			for (i = 0; i < n; i++) { // Find lowest track with a mixingFrom entry.
+				TrackEntry entry = tracks.Items[i];
+				if (entry == null || entry.mixingFrom == null) continue;
+				lowestMixingFrom = i;
+				break;
+			}
+			for (i = n - 1; i >= lowestMixingFrom; i--) { // Find first non-null entry.
+				TrackEntry entry = tracks.Items[i];
+				if (entry == null) continue;
+
+				// Store properties for non-mixingFrom entry but don't set timelinesLast, which is only used for mixingFrom entries.
+				var timelines = entry.animation.timelines;
+				var timelinesItems = timelines.Items;
+				for (int ii = 0, nn = timelines.Count; ii < nn; ii++)
+					propertyIDs.Add(timelinesItems[ii].PropertyId);
+	
+				entry = entry.mixingFrom;
+				while (entry != null) {
+					CheckTimelinesUsage(entry, entry.timelinesLast);
+					entry = entry.mixingFrom;
+				}
+			}
 		}
 
 		/// <summary>From last to first mixingFrom entries, sets timelinesFirst to true on last, calls checkTimelineUsage on rest.</summary>
 		private void SetTimelinesFirst (TrackEntry entry) {
 			if (entry.mixingFrom != null) {
 				SetTimelinesFirst(entry.mixingFrom);
-				CheckTimelinesUsage(entry);
+				CheckTimelinesUsage(entry, entry.timelinesFirst);
 				return;
 			}
 			var propertyIDs = this.propertyIDs;
@@ -610,14 +681,14 @@ namespace Spine {
 		/// <summary>From last to first mixingFrom entries, calls checkTimelineUsage.</summary>
 		private void CheckTimelinesFirst (TrackEntry entry) {
 			if (entry.mixingFrom != null) CheckTimelinesFirst(entry.mixingFrom);
-			CheckTimelinesUsage(entry);
+			CheckTimelinesUsage(entry, entry.timelinesFirst);
 		}
 
-		private void CheckTimelinesUsage (TrackEntry entry) {
+		private void CheckTimelinesUsage (TrackEntry entry, ExposedList<bool> usageArray) {
 			var propertyIDs = this.propertyIDs;
 			var timelines = entry.animation.timelines;
 			int n = timelines.Count;
-			var usageArray = entry.timelinesFirst;
+			//var usageArray = entry.timelinesFirst;
 			usageArray.EnsureCapacity(n);
 			var usage = usageArray.Items;
 			var timelinesItems = timelines.Items;
@@ -662,6 +733,7 @@ namespace Spine {
 		internal float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale = 1f;
 		internal float alpha, mixTime, mixDuration, mixAlpha;
 		internal readonly ExposedList<bool> timelinesFirst = new ExposedList<bool>();
+		internal readonly ExposedList<bool> timelinesLast = new ExposedList<bool>();
 		internal readonly ExposedList<float> timelinesRotation = new ExposedList<float>();
 
 		// IPoolable.Reset()
@@ -670,6 +742,7 @@ namespace Spine {
 			mixingFrom = null;
 			animation = null;
 			timelinesFirst.Clear();
+			timelinesLast.Clear();
 			timelinesRotation.Clear();
 
 			Start = null;
