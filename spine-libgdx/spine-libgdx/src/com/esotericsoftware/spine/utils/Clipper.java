@@ -69,8 +69,7 @@ public class Clipper {
 			float deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;
 
 			float[] inputVertices = input.items;
-			int inputVerticesLength = input.size - 2;
-			int numOutside = 0;
+			int inputVerticesLength = input.size - 2, outputStart = output.size;
 			for (int ii = 0; ii < inputVerticesLength; ii += 2) {
 				float inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
 				float inputX2 = inputVertices[ii + 2], inputY2 = inputVertices[ii + 3];
@@ -90,9 +89,7 @@ public class Clipper {
 						clipped = true;
 					}
 				} else {
-					if (side2 < 0) // v1 outside, v2 outside: no output
-						numOutside += 2;
-					else { // v1 outside, v2 inside
+					if (side2 >= 0) { // v1 outside, v2 inside
 						float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
 						float d = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
 						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / d;
@@ -105,8 +102,7 @@ public class Clipper {
 				}
 			}
 
-			// Early out if all edges were outside.
-			if (numOutside == inputVerticesLength) {
+			if (outputStart == output.size) { // All edges were outside.
 				originalOutput.clear();
 				return true;
 			}
