@@ -398,7 +398,8 @@ public class AnimationState {
 				}
 
 				// The interrupted mix will mix out from its current percentage to zero.
-				current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
+				if (multipleMixing) current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
+				else current.mixAlpha = 1;
 
 				// End the other animation after it is applied one last time.
 				if (!multipleMixing) {
