@@ -169,6 +169,7 @@ function TrackEntry.new ()
 		delay = 0, trackTime = 0, trackLast = 0, nextTrackLast = 0, trackEnd = 0, timeScale = 0,
 		alpha = 0, mixTime = 0, mixDuration = 0, mixAlpha = 0,
 		timelinesFirst = {},
+		timelinesLast = {},
 		timelinesRotation = {}
 	}
 	setmetatable(self, TrackEntry)
@@ -202,7 +203,8 @@ function AnimationState.new (data)
 		queue = nil,
 		propertyIDs = {},
 		animationsChanged = false,
-		timeScale = 1
+		timeScale = 1,
+		mixingMultiple = false
 	}
 	self.queue = EventQueue.new(self)
 	setmetatable(self, AnimationState)
@@ -356,8 +358,11 @@ function AnimationState:applyMixingFrom (entry, skeleton)
 	local animationLast = from.animationLast
 	local animationTime = from:getAnimationTime()
 	local timelines = from.animation.timelines
-	local timelinesFirst = from.timelinesFirst;
-	local alpha = from.alpha * entry.mixAlpha * (1 - mix)
+	local timelinesFirst = from.timelinesFirst
+	local timelinesLast = nil
+	if (self.multipleMixing == false) then timelinesLast = from.timelinesLast end
+	local alphaBase = from.alpha * entry.mixAlpha
+	local alphaMix = alphaBase * (1 - mix)
 
 	local firstFrame = #from.timelinesRotation == 0
 	local timelinesRotation = from.timelinesRotation
@@ -365,6 +370,12 @@ function AnimationState:applyMixingFrom (entry, skeleton)
 	local skip = false
 	for i,timeline in ipairs(timelines) do
 		local setupPose = timelinesFirst[i]
+		local alpha = 1;
+		if (timelinesLast ~= nil and setupPose and not timlinesLast[i]) then
+			alpha = alphaBase
+		else
+			alpha = alphaMix
+		end
 		if timeline.type == Animation.TimelineType.rotate then
 			self:applyRotateTimeline(timeline, skeleton, animationTime, alpha, setupPose, timelinesRotation, i * 2, firstFrame) -- FIXME passing i * 2, correct indexing?
 		else
@@ -541,10 +552,27 @@ function AnimationState:setCurrent (index, current, interrupt)
     current.mixingFrom = from
     current.mixTime = 0
 		
-		from.timelinesRotation = {};
+		local mixingFrom = from.mixingFrom
+		if (mixingFrom ~= nil and from.mixDuration > 0) then
+			if (not self.multipleMixing and from.mixTime / from.mixDuration < 0.5 and mixingFrom.animation ~= EMPTY_ANIMATION) then
+				current.mixingFrom = mixingFrom
+				mixingFrom.mixingFrom = from
+				mixingFrom.mixTime = from.mixDuration - from.mixTime
+				mixingFrom.mixDuration = from.mixDuration
+				from.mixingFrom = nil
+				from = mixingFrom
+			end
 
-    -- If not completely mixed in, set mixAlpha so mixing out happens from current mix to zero.
-    if from.mixingFrom and from.mixDuration > 0 then current.mixAlpha = current.mixAlpha * math_min(from.mixTime / from.mixDuration, 1) end
+			current.mixAlpha = current.mixAlpha * math_min(from.mixTime / from.mixDuration, 1)
+
+			if (not self.multipleMixing) then
+				from.mixAlpha = 0;
+				from.mixTime = 0;
+				from.mixDuration = 0;
+			end
+		end
+		
+		from.timelinesRotation = {};
   end
 
   queue:start(current)
@@ -724,6 +752,42 @@ function AnimationState:_animationsChanged ()
     if entry then self:checkTimelinesFirst(entry) end
     i = i + 1
   end
+	
+	if (self.multipleMixing) then return end
+
+	self.propertyIDs = {}
+	local lowestMixingFrom = n
+	i = 0;
+	while i < n do
+		entry = self.tracks[i]
+		if not (entry == nil or entry.mixingFrom == nil) then
+			lowestMixingFrom = i
+			i = n + 1 -- break
+		end
+		i = i + 1
+	end
+	i = n - 1
+	while i >= lowestMixingFrom do
+		local entry = self.tracks[i]
+		if (entry) then
+			local propertyIDs = self.propertyIDs
+			local timelines = entry.animation.timelines
+			local ii = 1
+			local nn = #entry.animation.timelines;
+			while ii <= nn do
+				local id = "" .. timelines[ii]:getPropertyId()
+				propertyIDs[id] = id
+				ii = ii + 1
+			end
+
+			entry = entry.mixingFrom
+			while (entry) do
+				self:checkTimelinesUsage(entry, entry.timelinesLast)
+				entry = entry.mixingFrom;
+			end
+		end
+		i = i - 1
+	end
 end
 
 function AnimationState:setTimelinesFirst (entry)
