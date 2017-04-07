@@ -100,8 +100,11 @@ module spine.webgl {
 			let gl = this.gl;
 			if (this.dirtyVertices || this.dirtyIndices) this.update();
 			this.bind(shader);
-			if (this.indicesLength > 0) gl.drawElements(primitiveType, count, gl.UNSIGNED_SHORT, offset * 2);
-			else gl.drawArrays(primitiveType, offset, count);
+			if (this.indicesLength > 0) {
+				gl.drawElements(primitiveType, count, gl.UNSIGNED_SHORT, offset * 2);
+			} else {
+				gl.drawArrays(primitiveType, offset, count);
+			}
 			this.unbind(shader);
 		}
 

@@ -21,6 +21,10 @@ var hoverboardDemo = function(loadingComplete, bgColor) {
 		canvas = document.getElementById("hoverboard-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });
+		if (!gl) {
+			alert('WebGL is unavailable.');
+			return;
+		}
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = spineDemos.assetManager;

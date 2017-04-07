@@ -1320,6 +1320,7 @@ declare module spine.webgl {
 		canvas: HTMLCanvasElement;
 		camera: OrthoCamera;
 		batcher: PolygonBatcher;
+		private twoColorTint;
 		private batcherShader;
 		private shapes;
 		private shapesShader;

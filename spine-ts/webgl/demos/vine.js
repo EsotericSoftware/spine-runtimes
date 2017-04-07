@@ -21,6 +21,10 @@ var vineDemo = function(loadingComplete, bgColor) {
 		canvas = document.getElementById("vine-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });
+		if (!gl) {
+			alert('WebGL is unavailable.');
+			return;
+		}
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		input = new spine.webgl.Input(canvas);
