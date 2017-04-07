@@ -175,7 +175,7 @@ var stretchymanDemo = function(loadingComplete, bgColor) {
 		skeleton.updateWorldTransform();
 
 		renderer.camera.viewportWidth = bounds.x * 1.2;
-		renderer.camera.viewportHeight = bounds.y * 1.2;
+		renderer.camera.viewportHeight = bounds.y * 1.5;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
 
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);

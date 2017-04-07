@@ -146,6 +146,7 @@ var imageChangesDemo = function(loadingComplete, bgColor) {
 
 		var x = offset.x + size.x + 100, offsetY = offset.y;
 		if (activeSkeleton === "Alien") {
+			skeleton.x = -400;
 			renderer.camera.position.x = offset.x + size.x - 100;
 			renderer.camera.position.y = offset.y + size.y / 2 + 100;
 			offsetY += 125;
