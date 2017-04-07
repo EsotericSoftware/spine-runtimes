@@ -61,6 +61,8 @@ struct spTrackEntry {
 	float alpha, mixTime, mixDuration, mixAlpha;
 	int* /*boolean*/ timelinesFirst;
 	int timelinesFirstCount;
+	int* /*boolean*/ timelinesLast;
+	int timelinesLastCount;
 	float* timelinesRotation;
 	int timelinesRotationCount;
 	void* rendererObject;
@@ -79,6 +81,8 @@ struct spTrackEntry {
 		alpha(0), mixTime(0), mixDuration(0), mixAlpha(0),
 		timelinesFirst(0),
 		timelinesFirstCount(0),
+		timelinesLast(0),
+		timelinesLastCount(0),
 		timelinesRotation(0),
 		timelinesRotationCount(0) {
 	}
@@ -95,6 +99,8 @@ struct spAnimationState {
 
 	float timeScale;
 
+	int /*boolean*/ multipleMixing;
+
 	void* rendererObject;
 
 #ifdef __cplusplus
@@ -103,7 +109,9 @@ struct spAnimationState {
 		tracksCount(0),
 		tracks(0),
 		listener(0),
-		timeScale(0) {
+		timeScale(0),
+		multipleMixing(0),
+		rendererObject(0) {
 	}
 #endif
 };

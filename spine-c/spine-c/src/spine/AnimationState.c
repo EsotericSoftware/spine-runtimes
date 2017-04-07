@@ -57,7 +57,7 @@ void _spAnimationState_ensureCapacityPropertyIDs(spAnimationState* self, int cap
 int _spAnimationState_addPropertyID(spAnimationState* self, int id);
 void _spAnimationState_setTimelinesFirst (spAnimationState* self, spTrackEntry* entry);
 void _spAnimationState_checkTimelinesFirst (spAnimationState* self, spTrackEntry* entry);
-void _spAnimationState_checkTimelinesUsage (spAnimationState* self, spTrackEntry* entry);
+void _spAnimationState_checkTimelinesUsage (spAnimationState* self, spTrackEntry* entry, int /*boolean*/ useTimelinesFirst);
 
 _spEventQueue* _spEventQueue_create (_spAnimationState* state) {
 	_spEventQueue *self = CALLOC(_spEventQueue, 1);
@@ -176,6 +176,7 @@ void _spEventQueue_drain (_spEventQueue* self) {
 
 void _spAnimationState_disposeTrackEntry (spTrackEntry* entry) {
 	FREE(entry->timelinesFirst);
+	FREE(entry->timelinesLast);
 	FREE(entry->timelinesRotation);
 	FREE(entry);
 }
@@ -370,6 +371,9 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* e
 	int timelineCount;
 	spTimeline** timelines;
 	int* timelinesFirst;
+	int* timelinesLast;
+	float alphaBase;
+	float alphaMix;
 	float alpha;
 	int /*boolean*/ firstFrame;
 	float* timelinesRotation;
@@ -395,7 +399,9 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* e
 	timelineCount = from->animation->timelinesCount;
 	timelines = from->animation->timelines;
 	timelinesFirst = from->timelinesFirst;
-	alpha = from->alpha * entry->mixAlpha * (1 - mix);
+	timelinesLast = self->multipleMixing ? 0 : from->timelinesLast;
+	alphaBase = from->alpha * entry->mixAlpha;
+	alphaMix = alphaBase * (1 - mix);
 
 	firstFrame = from->timelinesRotationCount == 0;
 	if (firstFrame) _spAnimationState_resizeTimelinesRotation(from, timelineCount << 1);
@@ -404,6 +410,7 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* e
 	for (i = 0; i < timelineCount; i++) {
 		timeline = timelines[i];
 		setupPose = timelinesFirst[i];
+		alpha = timelinesLast != 0 && setupPose && !timelinesLast[i] ? alphaBase : alphaMix;
 		if (timeline->type == SP_TIMELINE_ROTATE)
 			_spAnimationState_applyRotateTimeline(self, timeline, skeleton, animationTime, alpha, setupPose, timelinesRotation, i << 1, firstFrame);
 		else {
@@ -574,6 +581,7 @@ void spAnimationState_clearTrack (spAnimationState* self, int trackIndex) {
 void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEntry* current, int /*boolean*/ interrupt) {
 	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
 	spTrackEntry* from = _spAnimationState_expandToIndex(self, index);
+	spTrackEntry* mixingFrom = 0;
 	self->tracks[index] = current;
 
 	if (from) {
@@ -581,10 +589,26 @@ void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEnt
 		current->mixingFrom = from;
 		current->mixTime = 0;
 
-		from->timelinesRotationCount = 0;
+		mixingFrom = from->mixingFrom;
+		if (mixingFrom != 0 && from->mixDuration > 0) {
+			if (self->multipleMixing && from->mixTime / from->mixDuration < 0.5 && mixingFrom->animation != SP_EMPTY_ANIMATION) {
+				current->mixingFrom = mixingFrom;
+				mixingFrom->mixingFrom = from;
+				mixingFrom->mixTime = from->mixDuration - from->mixTime;
+				mixingFrom->mixDuration = from->mixDuration;
+				from->mixingFrom = 0;
+				from = mixingFrom;
+			}
 
-		/* If not completely mixed in, set mixAlpha so mixing out happens from current mix to zero. */
-		if (from->mixingFrom && from->mixDuration > 0) current->mixAlpha *= MIN(from->mixTime / from->mixDuration, 1);
+			current->mixAlpha *= MIN(from->mixTime / from->mixDuration, 1);
+			if (!self->multipleMixing) {
+				from->mixAlpha = 0;
+				from->mixTime = 0;
+				from->mixDuration = 0;
+			}
+		}
+
+		from->timelinesRotationCount = 0;
 	}
 
 	_spEventQueue_start(internal->queue, current);
@@ -740,8 +764,9 @@ void _spAnimationState_disposeNext (spAnimationState* self, spTrackEntry* entry)
 
 void _spAnimationState_animationsChanged (spAnimationState* self) {
 	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
-	int i, n;
+	int i, n, ii, nn, lowestMixingFrom;
 	spTrackEntry* entry;
+	spTimeline** timelines;
 	internal->animationsChanged = 0;
 
 	i = 0; n = self->tracksCount;
@@ -757,6 +782,31 @@ void _spAnimationState_animationsChanged (spAnimationState* self) {
 	for (; i < n; i++) {
 		entry = self->tracks[i];
 		if (entry) _spAnimationState_checkTimelinesFirst(self, entry);
+	}
+
+	if (self->multipleMixing) return;
+
+	internal->propertyIDsCount = 0;
+	lowestMixingFrom = n;
+	for (i = 0; i < n; i++) {
+		entry = self->tracks[i];
+		if (entry == 0 || entry->mixingFrom == 0) continue;
+		lowestMixingFrom = i;
+		break;
+	}
+	for (i = n - 1; i >= lowestMixingFrom; i--) {
+		entry = self->tracks[i];
+		if (entry == 0) continue;
+
+		timelines = entry->animation->timelines;
+		for (ii = 0, nn = entry->animation->timelinesCount; ii < nn; ii++)
+			_spAnimationState_addPropertyID(self, spTimeline_getPropertyId(timelines[ii]));
+
+		entry = entry->mixingFrom;
+		while (entry != 0) {
+			_spAnimationState_checkTimelinesUsage(self, entry, 0);
+			entry = entry->mixingFrom;
+		}
 	}
 }
 
@@ -779,6 +829,17 @@ int* _spAnimationState_resizeTimelinesFirst(spTrackEntry* entry, int newSize) {
 	}
 
 	return entry->timelinesFirst;
+}
+
+int* _spAnimationState_resizeTimelinesLast(spTrackEntry* entry, int newSize) {
+	if (entry->timelinesLastCount != newSize) {
+		int* newTimelinesLast = CALLOC(int, newSize);
+		FREE(entry->timelinesLast);
+		entry->timelinesLast = newTimelinesLast;
+		entry->timelinesLastCount = newSize;
+	}
+
+	return entry->timelinesLast;
 }
 
 void _spAnimationState_ensureCapacityPropertyIDs(spAnimationState* self, int capacity) {
@@ -813,7 +874,7 @@ void _spAnimationState_setTimelinesFirst (spAnimationState* self, spTrackEntry* 
 
 	if (entry->mixingFrom) {
 		_spAnimationState_setTimelinesFirst(self, entry->mixingFrom);
-		_spAnimationState_checkTimelinesUsage(self, entry);
+		_spAnimationState_checkTimelinesUsage(self, entry, -1);
 		return;
 	}
 
@@ -828,16 +889,16 @@ void _spAnimationState_setTimelinesFirst (spAnimationState* self, spTrackEntry* 
 
 void _spAnimationState_checkTimelinesFirst (spAnimationState* self, spTrackEntry* entry) {
 	if (entry->mixingFrom) _spAnimationState_checkTimelinesFirst(self, entry->mixingFrom);
-	_spAnimationState_checkTimelinesUsage(self, entry);
+	_spAnimationState_checkTimelinesUsage(self, entry, -1);
 }
 
-void _spAnimationState_checkTimelinesUsage (spAnimationState* self, spTrackEntry* entry) {
+void _spAnimationState_checkTimelinesUsage (spAnimationState* self, spTrackEntry* entry, int /*boolean*/ useTimelinesFirst) {
 	int i, n;
 	int* usage;
 	spTimeline** timelines;
 	n = entry->animation->timelinesCount;
 	timelines = entry->animation->timelines;
-	usage = _spAnimationState_resizeTimelinesFirst(entry, n);
+	usage = useTimelinesFirst ? _spAnimationState_resizeTimelinesFirst(entry, n) : _spAnimationState_resizeTimelinesLast(entry, n);
 	for (i = 0; i < n; i++)
 		usage[i] = _spAnimationState_addPropertyID(self, spTimeline_getPropertyId(timelines[i]));
 }
