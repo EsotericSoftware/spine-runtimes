@@ -500,7 +500,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			root.add("Setup pose:");
 			root.add(table(bonesSetupPoseButton, slotsSetupPoseButton, setupPoseButton)).row();
 			root.add("Skin:");
-			root.add(skinScroll).expand().fill().row();
+			root.add(skinScroll).expand().fill().minHeight(64).row();
 
 			root.add(new Image(skin.newDrawable("white", new Color(0x4e4e4eff)))).height(1).fillX().colspan(2).pad(1, 0, 1, 0).row();
 
@@ -520,7 +520,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				root.add(table).fill().row();
 			}
 			root.add("Animation:");
-			root.add(animationScroll).expand().fill().row();
+			root.add(animationScroll).expand().fill().minHeight(64).row();
 			root.add("Speed:");
 			{
 				Table table = table();
