@@ -100,7 +100,7 @@ var imageChangesDemo = function(loadingComplete, bgColor) {
 		var anim = skeletonData.findAnimation(animation);
 		state.setAnimation(0, animation, true);
 		if (name === "alien") {
-			state.update(anim.duration / 2.5);
+			state.update(anim.duration / 1.4);
 		}
 		state.apply(skeleton);
 		skeleton.updateWorldTransform();
@@ -108,7 +108,7 @@ var imageChangesDemo = function(loadingComplete, bgColor) {
 		var size = new spine.Vector2();
 		skeleton.getBounds(offset, size, []);
 		if (name === "alien") {
-			state.update(-anim.duration / 2.5);
+			state.update(-anim.duration / 1.4);
 		}
 
 		var regions = [];
@@ -146,6 +146,7 @@ var imageChangesDemo = function(loadingComplete, bgColor) {
 
 		var x = offset.x + size.x + 100, offsetY = offset.y;
 		if (activeSkeleton === "Alien") {
+			skeleton.x = -400;
 			renderer.camera.position.x = offset.x + size.x - 100;
 			renderer.camera.position.y = offset.y + size.y / 2 + 100;
 			offsetY += 125;

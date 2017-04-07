@@ -143,8 +143,15 @@ var hoverboardDemo = function(loadingComplete, bgColor) {
 
 		renderer.begin();
 		renderer.drawSkeleton(skeleton, true);
-		// renderer.drawSkeletonDebug(skeleton, false, ["root"]);
-
+		renderer.drawSkeletonDebug(skeleton, false, ["root"]);
+		gl.lineWidth(2);
+		for (var i = 0; i < controlBones.length; i++) {
+			var bone = skeleton.findBone(controlBones[i]);
+			var colorInner = hoverTargets[i] !== null ? spineDemos.HOVER_COLOR_INNER : spineDemos.NON_HOVER_COLOR_INNER;
+			var colorOuter = hoverTargets[i] !== null ? spineDemos.HOVER_COLOR_OUTER : spineDemos.NON_HOVER_COLOR_OUTER;
+			renderer.circle(true, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorInner);
+			renderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);
+		}
 		renderer.end();
 		gl.lineWidth(1);
 

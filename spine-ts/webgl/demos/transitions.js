@@ -123,8 +123,8 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 
 		renderer.camera.position.x = offset.x + size.x - 50;
 		renderer.camera.position.y = offset.y + size.y / 2 - 40;
-		renderer.camera.viewportWidth = size.x * 2.4;
-		renderer.camera.viewportHeight = size.y * 1.2;
+		renderer.camera.viewportWidth = size.x * 2;
+		renderer.camera.viewportHeight = size.y * 2;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
 
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
@@ -134,13 +134,15 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 		state.update(delta);
 		state.apply(skeleton);
 		skeleton.updateWorldTransform();
-		skeleton.x = -10;
+		skeleton.x = -300;
+		skeleton.y = -100;
 		renderer.drawSkeleton(skeleton, true);
 
 		stateNoMix.update(delta);
 		stateNoMix.apply(skeletonNoMix);
 		skeletonNoMix.updateWorldTransform();
 		skeletonNoMix.x = size.x + 45;
+		skeletonNoMix.y = -100;
 		renderer.drawSkeleton(skeletonNoMix, true);
 		renderer.end();
 

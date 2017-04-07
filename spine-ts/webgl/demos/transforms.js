@@ -60,8 +60,8 @@ var transformsDemo = function(loadingComplete, bgColor) {
 			skeleton.updateWorldTransform();
 			rotateHandle = skeleton.findBone("rotate-handle");
 
-			renderer.camera.position.x = offset.x + bounds.x / 2;
-			renderer.camera.position.y = offset.y + bounds.y / 2;
+			renderer.camera.position.x = offset.x + bounds.x / 2 + 70;
+			renderer.camera.position.y = offset.y + bounds.y / 2 + 50;
 
 			renderer.skeletonDebugRenderer.drawRegionAttachments = false;
 			renderer.skeletonDebugRenderer.drawMeshHull = false;
@@ -161,10 +161,9 @@ var transformsDemo = function(loadingComplete, bgColor) {
 	function render () {
 		timeKeeper.update();
 		var delta = timeKeeper.delta;
-
 		skeleton.updateWorldTransform();
 
-		renderer.camera.viewportWidth = bounds.x * 1.2;
+		renderer.camera.viewportWidth = bounds.x * 1.6;
 		renderer.camera.viewportHeight = bounds.y * 1.2;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
 

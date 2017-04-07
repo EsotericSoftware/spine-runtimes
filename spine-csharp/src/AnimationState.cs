@@ -413,22 +413,22 @@ namespace Spine {
 
 				//from.timelinesRotation.Clear();
 				var mixingFrom = from.mixingFrom;
-				float mixProgress = from.mixTime / from.mixDuration;
+
 				if (mixingFrom != null && from.mixDuration > 0) {
-					// A mix was interrupted, mix from the closest animation.
-					if (!multipleMixing && mixProgress < 0.5f && mixingFrom.animation != AnimationState.EmptyAnimation) {
-						current.mixingFrom = mixingFrom;
-						mixingFrom.mixingFrom = from;
-						mixingFrom.mixTime = from.mixDuration - from.mixTime;
-						mixingFrom.mixDuration = from.mixDuration;
-						from.mixingFrom = null;
-						from = mixingFrom;
-					}
+					if (multipleMixing) {
+						// The interrupted mix will mix out from its current percentage to zero.
+						current.mixAlpha *= Math.Min(from.mixTime / from.mixDuration, 1);
+					} else {
+						// A mix was interrupted, mix from the closest animation.
+						if (from.mixTime / from.mixDuration < 0.5f && mixingFrom.animation != AnimationState.EmptyAnimation) {
+							current.mixingFrom = mixingFrom;
+							mixingFrom.mixingFrom = from;
+							mixingFrom.mixTime = from.mixDuration - from.mixTime;
+							mixingFrom.mixDuration = from.mixDuration;
+							from.mixingFrom = null;
+							from = mixingFrom;
+						}
 
-					// The interrupted mix will mix out from its current percentage to zero.
-					if (multipleMixing) current.mixAlpha *= Math.Min(mixProgress, 1);
-
-					if (!multipleMixing) {
 						from.mixAlpha = 0;
 						from.mixTime = 0;
 						from.mixDuration = 0;
@@ -650,7 +650,7 @@ namespace Spine {
 				var timelinesItems = timelines.Items;
 				for (int ii = 0, nn = timelines.Count; ii < nn; ii++)
 					propertyIDs.Add(timelinesItems[ii].PropertyId);
-	
+
 				entry = entry.mixingFrom;
 				while (entry != null) {
 					CheckTimelinesUsage(entry, entry.timelinesLast);
