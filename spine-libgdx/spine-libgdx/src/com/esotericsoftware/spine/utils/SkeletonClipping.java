@@ -37,12 +37,12 @@ import com.esotericsoftware.spine.Slot;
 import com.esotericsoftware.spine.attachments.ClippingAttachment;
 
 public class SkeletonClipping {
-	private final Clipper clipper = new Clipper();
 	private final ConvexDecomposer decomposer = new ConvexDecomposer();
 	private final FloatArray clippingPolygon = new FloatArray();
-	private final FloatArray clipOutput = new FloatArray(400);
-	private final FloatArray clippedVertices = new FloatArray(400);
-	private final ShortArray clippedTriangles = new ShortArray(400);
+	private final FloatArray clipOutput = new FloatArray(128);
+	private final FloatArray clippedVertices = new FloatArray(128);
+	private final ShortArray clippedTriangles = new ShortArray(128);
+	private final FloatArray scratch = new FloatArray();
 
 	private ClippingAttachment clipAttachment;
 	private Array<FloatArray> clippingPolygons;
@@ -54,10 +54,10 @@ public class SkeletonClipping {
 		int n = clip.getWorldVerticesLength();
 		float[] vertices = clippingPolygon.setSize(n);
 		clip.computeWorldVertices(slot, 0, n, vertices, 0, 2);
-		Clipper.makeClockwise(clippingPolygon);
+		makeClockwise(clippingPolygon);
 		clippingPolygons = decomposer.decompose(clippingPolygon);
 		for (FloatArray polygon : clippingPolygons) {
-			Clipper.makeClockwise(polygon);
+			makeClockwise(polygon);
 			polygon.add(polygon.items[0]);
 			polygon.add(polygon.items[1]);
 		}
@@ -79,7 +79,6 @@ public class SkeletonClipping {
 	public void clipTriangles (float[] vertices, int verticesLength, short[] triangles, int trianglesLength, float[] uvs,
 		float light, float dark, boolean twoColor) {
 
-		Clipper clipper = this.clipper;
 		FloatArray clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
 		ShortArray clippedTriangles = this.clippedTriangles;
 		Object[] polygons = clippingPolygons.items;
@@ -105,7 +104,7 @@ public class SkeletonClipping {
 
 			for (int p = 0; p < polygonsCount; p++) {
 				int s = clippedVertices.size;
-				if (clipper.clip(x1, y1, x2, y2, x3, y3, (FloatArray)polygons[p], clipOutput)) {
+				if (clip(x1, y1, x2, y2, x3, y3, (FloatArray)polygons[p], clipOutput)) {
 					int clipOutputLength = clipOutput.size;
 					if (clipOutputLength == 0) continue;
 					float d0 = y2 - y3, d1 = x3 - x2, d2 = x1 - x3, d4 = y3 - y1;
@@ -196,11 +195,119 @@ public class SkeletonClipping {
 		}
 	}
 
+	/** Clips the input triangle against the convex, clockwise clipping area. If the triangle lies entirely within the clipping
+	 * area, false is returned. The clipping area must duplicate the first vertex at the end of the vertices list. */
+	boolean clip (float x1, float y1, float x2, float y2, float x3, float y3, FloatArray clippingArea, FloatArray output) {
+		FloatArray originalOutput = output;
+		boolean clipped = false;
+
+		// Avoid copy at the end.
+		FloatArray input = null;
+		if (clippingArea.size % 4 >= 2) {
+			input = output;
+			output = scratch;
+		} else
+			input = scratch;
+
+		input.clear();
+		input.add(x1);
+		input.add(y1);
+		input.add(x2);
+		input.add(y2);
+		input.add(x3);
+		input.add(y3);
+		input.add(x1);
+		input.add(y1);
+		output.clear();
+
+		float[] clippingVertices = clippingArea.items;
+		int clippingVerticesLast = clippingArea.size - 4;
+		for (int i = 0;; i += 2) {
+			float edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
+			float edgeX2 = clippingVertices[i + 2], edgeY2 = clippingVertices[i + 3];
+			float deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;
+
+			float[] inputVertices = input.items;
+			int inputVerticesLength = input.size - 2, outputStart = output.size;
+			for (int ii = 0; ii < inputVerticesLength; ii += 2) {
+				float inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
+				float inputX2 = inputVertices[ii + 2], inputY2 = inputVertices[ii + 3];
+				boolean side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0;
+				if (deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0) {
+					if (side2) { // v1 inside, v2 inside
+						output.add(inputX2);
+						output.add(inputY2);
+						continue;
+					}
+					// v1 inside, v2 outside
+					float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
+					float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
+					output.add(edgeX + (edgeX2 - edgeX) * ua);
+					output.add(edgeY + (edgeY2 - edgeY) * ua);
+				} else if (side2) { // v1 outside, v2 inside
+					float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
+					float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
+					output.add(edgeX + (edgeX2 - edgeX) * ua);
+					output.add(edgeY + (edgeY2 - edgeY) * ua);
+					output.add(inputX2);
+					output.add(inputY2);
+				}
+				clipped = true;
+			}
+
+			if (outputStart == output.size) { // All edges outside.
+				originalOutput.clear();
+				return true;
+			}
+
+			output.add(output.items[0]);
+			output.add(output.items[1]);
+
+			if (i == clippingVerticesLast) break;
+			FloatArray temp = output;
+			output = input;
+			output.clear();
+			input = temp;
+		}
+
+		if (originalOutput != output) {
+			originalOutput.clear();
+			originalOutput.addAll(output.items, 0, output.size - 2);
+		} else
+			originalOutput.setSize(originalOutput.size - 2);
+
+		return clipped;
+	}
+
 	public FloatArray getClippedVertices () {
 		return clippedVertices;
 	}
 
 	public ShortArray getClippedTriangles () {
 		return clippedTriangles;
+	}
+
+	static void makeClockwise (FloatArray polygon) {
+		float[] vertices = polygon.items;
+		int verticeslength = polygon.size;
+
+		float area = vertices[verticeslength - 2] * vertices[1] - vertices[0] * vertices[verticeslength - 1], p1x, p1y, p2x, p2y;
+		for (int i = 0, n = verticeslength - 3; i < n; i += 2) {
+			p1x = vertices[i];
+			p1y = vertices[i + 1];
+			p2x = vertices[i + 2];
+			p2y = vertices[i + 3];
+			area += p1x * p2y - p2x * p1y;
+		}
+		if (area < 0) return;
+
+		for (int i = 0, lastX = verticeslength - 2, n = verticeslength >> 1; i < n; i += 2) {
+			float x = vertices[i], y = vertices[i + 1];
+			int other = lastX - i;
+			vertices[i] = vertices[other];
+			vertices[i + 1] = vertices[other + 1];
+			vertices[other] = x;
+			vertices[other + 1] = y;
+		}
 	}
 }
