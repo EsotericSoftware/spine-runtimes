@@ -387,21 +387,21 @@ public class AnimationState {
 
 			TrackEntry mixingFrom = from.mixingFrom;
 			if (mixingFrom != null && from.mixDuration > 0) {
-				// A mix was interrupted, mix from the closest animation.
-				if (!multipleMixing && from.mixTime / from.mixDuration < 0.5f && mixingFrom.animation != emptyAnimation) {
-					current.mixingFrom = mixingFrom;
-					mixingFrom.mixingFrom = from;
-					mixingFrom.mixTime = from.mixDuration - from.mixTime;
-					mixingFrom.mixDuration = from.mixDuration;
-					from.mixingFrom = null;
-					from = mixingFrom;
-				}
+				if (multipleMixing) {
+					// The interrupted mix will mix out from its current percentage to zero.
+					current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
+				} else {
+					// A mix was interrupted, mix from the closest animation.
+					if (from.mixTime / from.mixDuration < 0.5f && mixingFrom.animation != emptyAnimation) {
+						current.mixingFrom = mixingFrom;
+						mixingFrom.mixingFrom = from;
+						mixingFrom.mixTime = from.mixDuration - from.mixTime;
+						mixingFrom.mixDuration = from.mixDuration;
+						from.mixingFrom = null;
+						from = mixingFrom;
+					}
 
-				// The interrupted mix will mix out from its current percentage to zero.
-				current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
-
-				// End the other animation after it is applied one last time.
-				if (!multipleMixing) {
+					// End the other animation after it is applied one last time.
 					from.mixAlpha = 0;
 					from.mixTime = 0;
 					from.mixDuration = 0;
