@@ -69,7 +69,7 @@ module spine {
 			var webglConfig = { alpha: config.alpha };
 			let gl = this.gl = <WebGLRenderingContext> (canvas.getContext("webgl", webglConfig) || canvas.getContext("experimental-webgl", webglConfig));
 
-			this.shader = spine.webgl.Shader.newColoredTextured(gl);
+			this.shader = spine.webgl.Shader.newTwoColoredTextured(gl);
 			this.batcher = new spine.webgl.PolygonBatcher(gl);
 			this.mvp.ortho2d(0, 0, canvas.width - 1, canvas.height - 1);
 			this.skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);

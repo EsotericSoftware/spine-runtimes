@@ -154,7 +154,7 @@ function resize () {
 	var width = canvas.width * scale;
 	var height = canvas.height * scale;
 
-	context.resetTransform();
+	context.setTransform(1, 0, 0, 1, 0, 0);
 	context.scale(1 / scale, 1 / scale);
 	context.translate(-centerX, -centerY);
 	context.translate(width / 2, height / 2);

@@ -39,6 +39,10 @@ function init () {
 	canvas.height = window.innerHeight;
 	var config = { alpha: false };
 	gl = canvas.getContext("webgl", config) || canvas.getContext("experimental-webgl", config);
+	if (!gl) {
+		alert('WebGL is unavailable.');
+		return;
+	}
 
 	// Create a simple shader, mesh, model-view-projection matrix and SkeletonRenderer.
 	shader = spine.webgl.Shader.newTwoColoredTextured(gl);
