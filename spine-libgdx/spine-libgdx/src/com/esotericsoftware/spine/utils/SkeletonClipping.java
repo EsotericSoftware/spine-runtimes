@@ -64,7 +64,11 @@ public class SkeletonClipping {
 	}
 
 	public void clipEnd (int index) {
-		if (clipAttachment == null || clipAttachment.getEndSlot() != index) return;
+		if (clipAttachment != null && clipAttachment.getEndSlot() == index) clipEnd();
+	}
+
+	public void clipEnd () {
+		if (clipAttachment == null) return;
 		clipAttachment = null;
 		clippingPolygons = null;
 		clippedVertices.clear();

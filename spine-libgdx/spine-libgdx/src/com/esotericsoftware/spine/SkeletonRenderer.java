@@ -121,7 +121,7 @@ public class SkeletonRenderer implements Disposable {
 
 			clipper.clipEnd(i);
 		}
-		clipper.clipEnd(-1);
+		clipper.clipEnd();
 	}
 
 	@SuppressWarnings("null")
@@ -223,7 +223,7 @@ public class SkeletonRenderer implements Disposable {
 
 			clipper.clipEnd(i);
 		}
-		clipper.clipEnd(-1);
+		clipper.clipEnd();
 	}
 
 	@SuppressWarnings("null")
@@ -332,7 +332,7 @@ public class SkeletonRenderer implements Disposable {
 
 			clipper.clipEnd(i);
 		}
-		clipper.clipEnd(-1);
+		clipper.clipEnd();
 	}
 
 	public void setPremultipliedAlpha (boolean premultipliedAlpha) {
