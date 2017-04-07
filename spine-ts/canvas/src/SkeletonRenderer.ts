@@ -90,6 +90,12 @@ module spine.canvas {
 				ctx.rotate(attachment.rotation * Math.PI / 180);
 				ctx.scale(attachment.scaleX, attachment.scaleY);
 				ctx.translate(w / 2, h / 2);
+				if (attachment.region.rotate) {
+					let t = w;
+					w = h;
+					h = t;
+					ctx.rotate(-Math.PI / 2);
+				}
 				ctx.scale(1, -1);
 				ctx.translate(-w / 2, -h / 2);
 				if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
