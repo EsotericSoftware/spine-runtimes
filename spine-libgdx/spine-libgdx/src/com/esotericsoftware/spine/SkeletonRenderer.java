@@ -119,7 +119,7 @@ public class SkeletonRenderer implements Disposable {
 				}
 			}
 
-			clipper.clipEnd(i);
+			clipper.clipEnd(slot);
 		}
 		clipper.clipEnd();
 	}
@@ -131,13 +131,13 @@ public class SkeletonRenderer implements Disposable {
 		int verticesLength = 0;
 		float[] vertices = null, uvs = null;
 		short[] triangles = null;
-		Texture texture = null;
 		Color color = null, skeletonColor = skeleton.color;
 		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
 		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
-			int vertexSize = clipper.isClipping() ? 2 : 5;
 			Slot slot = drawOrder.get(i);
+			Texture texture = null;
+			int vertexSize = clipper.isClipping() ? 2 : 5;
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment region = (RegionAttachment)attachment;
@@ -221,7 +221,7 @@ public class SkeletonRenderer implements Disposable {
 				}
 			}
 
-			clipper.clipEnd(i);
+			clipper.clipEnd(slot);
 		}
 		clipper.clipEnd();
 	}
@@ -233,12 +233,12 @@ public class SkeletonRenderer implements Disposable {
 		int verticesLength = 0;
 		float[] vertices = null, uvs = null;
 		short[] triangles = null;
-		Texture texture = null;
 		Color color = null, skeletonColor = skeleton.color;
 		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
 		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
+			Texture texture = null;
 			int vertexSize = clipper.isClipping() ? 2 : 6;
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
@@ -254,7 +254,7 @@ public class SkeletonRenderer implements Disposable {
 			} else if (attachment instanceof MeshAttachment) {
 				MeshAttachment mesh = (MeshAttachment)attachment;
 				int count = mesh.getWorldVerticesLength();
-				verticesLength = count * (vertexSize >> 1);
+				verticesLength = (count >> 1) * vertexSize;
 				vertices = this.vertices.setSize(verticesLength);
 				mesh.computeWorldVertices(slot, 0, count, vertices, 0, vertexSize);
 				triangles = mesh.getTriangles();
@@ -330,7 +330,7 @@ public class SkeletonRenderer implements Disposable {
 				}
 			}
 
-			clipper.clipEnd(i);
+			clipper.clipEnd(slot);
 		}
 		clipper.clipEnd();
 	}

@@ -63,8 +63,8 @@ public class SkeletonClipping {
 		}
 	}
 
-	public void clipEnd (int index) {
-		if (clipAttachment != null && clipAttachment.getEndSlot() == index) clipEnd();
+	public void clipEnd (Slot slot) {
+		if (clipAttachment != null && clipAttachment.getEndSlot() == slot.getData()) clipEnd();
 	}
 
 	public void clipEnd () {

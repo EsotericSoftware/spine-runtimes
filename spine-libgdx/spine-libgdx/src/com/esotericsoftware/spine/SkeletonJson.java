@@ -414,8 +414,8 @@ public class SkeletonJson {
 			String end = map.getString("end", null);
 			if (end != null) {
 				SlotData slot = skeletonData.findSlot(end);
-				if (slot == null) throw new SerializationException("Slot not found: " + end);
-				clip.setEndSlot(slot.index);
+				if (slot == null) throw new SerializationException("Clipping end slot not found: " + end);
+				clip.setEndSlot(slot);
 			}
 
 			readVertices(map, clip, map.getInt("vertexCount") << 1);

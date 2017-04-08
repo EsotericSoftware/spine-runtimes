@@ -274,7 +274,7 @@ public class SkeletonBinary {
 			}
 
 			// Default skin.
-			Skin defaultSkin = readSkin(input, "default", nonessential);
+			Skin defaultSkin = readSkin(input, skeletonData, "default", nonessential);
 			if (defaultSkin != null) {
 				skeletonData.defaultSkin = defaultSkin;
 				skeletonData.skins.add(defaultSkin);
@@ -282,7 +282,7 @@ public class SkeletonBinary {
 
 			// Skins.
 			for (int i = 0, n = input.readInt(true); i < n; i++)
-				skeletonData.skins.add(readSkin(input, input.readString(), nonessential));
+				skeletonData.skins.add(readSkin(input, skeletonData, input.readString(), nonessential));
 
 			// Linked meshes.
 			for (int i = 0, n = linkedMeshes.size; i < n; i++) {
@@ -307,7 +307,7 @@ public class SkeletonBinary {
 
 			// Animations.
 			for (int i = 0, n = input.readInt(true); i < n; i++)
-				readAnimation(input.readString(), input, skeletonData);
+				readAnimation(input, input.readString(), skeletonData);
 
 		} catch (IOException ex) {
 			throw new SerializationException("Error reading skeleton file.", ex);
@@ -328,7 +328,7 @@ public class SkeletonBinary {
 	}
 
 	/** @return May be null. */
-	private Skin readSkin (DataInput input, String skinName, boolean nonessential) throws IOException {
+	private Skin readSkin (DataInput input, SkeletonData skeletonData, String skinName, boolean nonessential) throws IOException {
 		int slotCount = input.readInt(true);
 		if (slotCount == 0) return null;
 		Skin skin = new Skin(skinName);
@@ -336,15 +336,15 @@ public class SkeletonBinary {
 			int slotIndex = input.readInt(true);
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 				String name = input.readString();
-				Attachment attachment = readAttachment(input, skin, slotIndex, name, nonessential);
+				Attachment attachment = readAttachment(input, skeletonData, skin, slotIndex, name, nonessential);
 				if (attachment != null) skin.addAttachment(slotIndex, name, attachment);
 			}
 		}
 		return skin;
 	}
 
-	private Attachment readAttachment (DataInput input, Skin skin, int slotIndex, String attachmentName, boolean nonessential)
-		throws IOException {
+	private Attachment readAttachment (DataInput input, SkeletonData skeletonData, Skin skin, int slotIndex, String attachmentName,
+		boolean nonessential) throws IOException {
 		float scale = this.scale;
 
 		String name = input.readString();
@@ -494,7 +494,7 @@ public class SkeletonBinary {
 
 			ClippingAttachment clip = attachmentLoader.newClippingAttachment(skin, name);
 			if (clip == null) return null;
-			clip.setEndSlot(endSlotIndex);
+			clip.setEndSlot(skeletonData.slots.get(endSlotIndex));
 			clip.setWorldVerticesLength(vertexCount << 1);
 			clip.setVertices(vertices.vertices);
 			clip.setBones(vertices.bones);
@@ -549,7 +549,7 @@ public class SkeletonBinary {
 		return array;
 	}
 
-	private void readAnimation (String name, DataInput input, SkeletonData skeletonData) {
+	private void readAnimation (DataInput input, String name, SkeletonData skeletonData) {
 		Array<Timeline> timelines = new Array();
 		float scale = this.scale;
 		float duration = 0;
