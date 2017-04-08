@@ -1,0 +1,21 @@
+com.powerflasher.fdt.core.CompatiblePlayers=AIR_Debug_Launcher
+com.powerflasher.fdt.core.CompilerArguments=-static-link-runtime-shared-libraries\=true\n-target-player\={playerVersion}\n-library-path+\="{flexSDK}/frameworks/locale/en_US"\n-default-size\=550,400
+com.powerflasher.fdt.core.CompilerConstants=CONFIG\:\:AUTHOR\!"{user.name}"\nCONFIG\:\:DEBUG\!{debug}
+com.powerflasher.fdt.core.DefaultOutputFolder=bin
+com.powerflasher.fdt.core.DefaultPlayer=AIR_Debug_Launcher
+com.powerflasher.fdt.core.IncludeTestResources=false
+com.powerflasher.fdt.core.Language=AS3
+com.powerflasher.fdt.core.Manifests=
+com.powerflasher.fdt.core.PassClasspath=true
+com.powerflasher.fdt.core.PassDefines=true
+com.powerflasher.fdt.core.PassExterns=false
+com.powerflasher.fdt.core.PassMainclass=true
+com.powerflasher.fdt.core.PassManifests=true
+com.powerflasher.fdt.core.PassRsls=false
+com.powerflasher.fdt.core.PassSwcs=true
+com.powerflasher.fdt.core.PlatformType=AIR
+com.powerflasher.fdt.core.PlayerVersion=22.0
+com.powerflasher.fdt.core.ProjectTypeHint=Library AIR
+com.powerflasher.fdt.core.Runtime=AIR
+com.powerflasher.fdt.core.SdkName=Flex 4.6.0
+eclipse.preferences.version=1

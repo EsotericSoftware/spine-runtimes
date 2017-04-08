@@ -1,13 +1,14 @@
 Shader "Spine/Skeleton" {
 	Properties {
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
-		_MainTex ("Texture to blend", 2D) = "black" {}
+		[NoScaleOffset] _MainTex ("Texture to blend", 2D) = "black" {}
 	}
 	// 2 texture stage GPUs
 	SubShader {
 		Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
 		LOD 100
 
+		Fog { Mode Off }
 		Cull Off
 		ZWrite Off
 		Blend One OneMinusSrcAlpha
@@ -24,8 +25,7 @@ Shader "Spine/Skeleton" {
 			Name "Caster"
 			Tags { "LightMode"="ShadowCaster" }
 			Offset 1, 1
-			
-			Fog { Mode Off }
+
 			ZWrite On
 			ZTest LEqual
 			Cull Off

@@ -1,41 +1,34 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.3
- * 
- * Copyright (c) 2013-2015, Esoteric Software
+ * Spine Runtimes Software License v2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
- * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to use, install, execute and perform the Spine
- * Runtimes Software (the "Software") and derivative works solely for personal
- * or internal use. Without the written permission of Esoteric Software (see
- * Section 2 of the Spine Software License Agreement), you may not (a) modify,
- * translate, adapt or otherwise create derivative works, improvements of the
- * Software or develop new applications using the Software or (b) remove,
- * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
  * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #include <spine/spine-sfml.h>
-#include <spine/extension.h>
-#include <SFML/Graphics/Vertex.hpp>
-#include <SFML/Graphics/VertexArray.hpp>
-#include <SFML/Graphics/Texture.hpp>
-#include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/RenderStates.hpp>
 
 #ifndef SPINE_MESH_VERTEX_COUNT_MAX
 #define SPINE_MESH_VERTEX_COUNT_MAX 1000
@@ -46,7 +39,10 @@ using namespace sf;
 void _AtlasPage_createTexture (AtlasPage* self, const char* path){
 	Texture* texture = new Texture();
 	if (!texture->loadFromFile(path)) return;
-	texture->setSmooth(true);
+
+	if (self->magFilter == SP_ATLAS_LINEAR) texture->setSmooth(true);
+	if (self->uWrap == SP_ATLAS_REPEAT && self->vWrap == SP_ATLAS_REPEAT) texture->setRepeated(true);
+
 	self->rendererObject = texture;
 	Vector2u size = texture->getSize();
 	self->width = size.x;
@@ -66,9 +62,9 @@ char* _Util_readFile (const char* path, int* length){
 namespace spine {
 
 SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData, AnimationStateData* stateData) :
-				timeScale(1),
-				vertexArray(new VertexArray(Triangles, skeletonData->bonesCount * 4)),
-				worldVertices(0) {
+		timeScale(1),
+		vertexArray(new VertexArray(Triangles, skeletonData->bonesCount * 4)),
+		worldVertices(0) {
 	Bone_setYDown(true);
 	worldVertices = MALLOC(float, SPINE_MESH_VERTEX_COUNT_MAX);
 	skeleton = Skeleton_create(skeletonData);
@@ -82,7 +78,7 @@ SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData, AnimationStateDa
 SkeletonDrawable::~SkeletonDrawable () {
 	delete vertexArray;
 	FREE(worldVertices);
-    if (ownsAnimationStateData) AnimationStateData_dispose(state->data);
+	if (ownsAnimationStateData) AnimationStateData_dispose(state->data);
 	AnimationState_dispose(state);
 	Skeleton_dispose(skeleton);
 }
@@ -179,7 +175,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 
 		} else if (attachment->type == ATTACHMENT_MESH) {
 			MeshAttachment* mesh = (MeshAttachment*)attachment;
-			if (mesh->verticesCount > SPINE_MESH_VERTEX_COUNT_MAX) continue;
+			if (mesh->super.worldVerticesLength > SPINE_MESH_VERTEX_COUNT_MAX) continue;
 			texture = (Texture*)((AtlasRegion*)mesh->rendererObject)->page->rendererObject;
 			MeshAttachment_computeWorldVertices(mesh, slot, worldVertices);
 
@@ -202,30 +198,6 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 				vertexArray->append(vertex);
 			}
 
-		} else if (attachment->type == ATTACHMENT_SKINNED_MESH) {
-			SkinnedMeshAttachment* mesh = (SkinnedMeshAttachment*)attachment;
-			if (mesh->uvsCount > SPINE_MESH_VERTEX_COUNT_MAX) continue;
-			texture = (Texture*)((AtlasRegion*)mesh->rendererObject)->page->rendererObject;
-			SkinnedMeshAttachment_computeWorldVertices(mesh, slot, worldVertices);
-
-			Uint8 r = static_cast<Uint8>(skeleton->r * slot->r * 255);
-			Uint8 g = static_cast<Uint8>(skeleton->g * slot->g * 255);
-			Uint8 b = static_cast<Uint8>(skeleton->b * slot->b * 255);
-			Uint8 a = static_cast<Uint8>(skeleton->a * slot->a * 255);
-			vertex.color.r = r;
-			vertex.color.g = g;
-			vertex.color.b = b;
-			vertex.color.a = a;
-
-			Vector2u size = texture->getSize();
-			for (int i = 0; i < mesh->trianglesCount; ++i) {
-				int index = mesh->triangles[i] << 1;
-				vertex.position.x = worldVertices[index];
-				vertex.position.y = worldVertices[index + 1];
-				vertex.texCoords.x = mesh->uvs[index] * size.x;
-				vertex.texCoords.y = mesh->uvs[index + 1] * size.y;
-				vertexArray->append(vertex);
-			}
 		}
 
 		if (texture) {

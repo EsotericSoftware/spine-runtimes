@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="com.powerflasher.fdt.ui.CompcGroup">
+<booleanAttribute key="ADVANCED_TELEMTRY" value="false"/>
+<stringAttribute key="ARGUMENTS" value=" -target-player={playerVersion}"/>
+<listAttribute key="COMPILER_CONSTANTS"/>
+<stringAttribute key="COMPILER_TECHNOLOGY" value="Flex SDK"/>
+<booleanAttribute key="FORCE_FRESH_COMPILATION" value="false"/>
+<stringAttribute key="LAUNCHER_DEPENDENCIES" value="[Self]"/>
+<stringAttribute key="OUTPUT" value="../spine-starling-example/lib/spine-starling.swc"/>
+<booleanAttribute key="PASS_CP" value="true"/>
+<booleanAttribute key="PASS_DEFINES" value="true"/>
+<booleanAttribute key="PASS_EXTERNS" value="true"/>
+<booleanAttribute key="PASS_MANIFESTS" value="true"/>
+<booleanAttribute key="PASS_RSLS" value="false"/>
+<booleanAttribute key="PASS_SWCS" value="true"/>
+<stringAttribute key="PROJECT_NAME" value="spine-starling"/>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/spine-starling"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="4"/>
+</listAttribute>
+</launchConfiguration>

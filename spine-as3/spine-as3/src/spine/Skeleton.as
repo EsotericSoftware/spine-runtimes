@@ -1,35 +1,36 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.3
- * 
- * Copyright (c) 2013-2015, Esoteric Software
+ * Spine Runtimes Software License v2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
- * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to use, install, execute and perform the Spine
- * Runtimes Software (the "Software") and derivative works solely for personal
- * or internal use. Without the written permission of Esoteric Software (see
- * Section 2 of the Spine Software License Agreement), you may not (a) modify,
- * translate, adapt or otherwise create derivative works, improvements of the
- * Software or develop new applications using the Software or (b) remove,
- * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
  * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 package spine {
+import flash.utils.Dictionary;
+import spine.attachments.PathAttachment;
 import spine.attachments.Attachment;
 
 public class Skeleton {
@@ -38,7 +39,10 @@ public class Skeleton {
 	public var slots:Vector.<Slot>;
 	public var drawOrder:Vector.<Slot>;
 	public var ikConstraints:Vector.<IkConstraint>;
-	private var _boneCache:Vector.<Vector.<Bone>> = new Vector.<Vector.<Bone>>();
+	public var transformConstraints:Vector.<TransformConstraint>;
+	public var pathConstraints:Vector.<PathConstraint>;
+	private var _updateCache:Vector.<Updatable> = new Vector.<Updatable>();
+	private var _updateCacheReset:Vector.<Bone> = new Vector.<Bone>();
 	private var _skin:Skin;
 	public var r:Number = 1, g:Number = 1, b:Number = 1, a:Number = 1;
 	public var time:Number = 0;
@@ -52,85 +56,222 @@ public class Skeleton {
 
 		bones = new Vector.<Bone>();
 		for each (var boneData:BoneData in data.bones) {
-			var parent:Bone = boneData.parent == null ? null : bones[data.bones.indexOf(boneData.parent)];
-			bones[bones.length] = new Bone(boneData, this, parent);
+			var bone:Bone;
+			if (boneData.parent == null)
+				bone = new Bone(boneData, this, null);
+			else {
+				var parent:Bone = bones[boneData.parent.index];
+				bone = new Bone(boneData, this, parent);
+				parent.children.push(bone);
+			}
+			bones.push(bone);
 		}
 
 		slots = new Vector.<Slot>();
 		drawOrder = new Vector.<Slot>();
 		for each (var slotData:SlotData in data.slots) {
-			var bone:Bone = bones[data.bones.indexOf(slotData.boneData)];
+			bone = bones[slotData.boneData.index];
 			var slot:Slot = new Slot(slotData, bone);
-			slots[slots.length] = slot;
+			slots.push(slot);
 			drawOrder[drawOrder.length] = slot;
 		}
 		
-		ikConstraints = new Vector.<IkConstraint>()
+		ikConstraints = new Vector.<IkConstraint>();		
 		for each (var ikConstraintData:IkConstraintData in data.ikConstraints)
-			ikConstraints[ikConstraints.length] = new IkConstraint(ikConstraintData, this);
+			ikConstraints.push(new IkConstraint(ikConstraintData, this));
+		
+		transformConstraints = new Vector.<TransformConstraint>();
+		for each (var transformConstraintData:TransformConstraintData in data.transformConstraints)
+			transformConstraints.push(new TransformConstraint(transformConstraintData, this));
+
+		pathConstraints = new Vector.<PathConstraint>();
+		for each (var pathConstraintData:PathConstraintData in data.pathConstraints)
+			pathConstraints.push(new PathConstraint(pathConstraintData, this));
 
 		updateCache();
 	}
 
-	/** Caches information about bones and IK constraints. Must be called if bones or IK constraints are added or removed. */
+	/** Caches information about bones and constraints. Must be called if bones, constraints, or weighted path attachments are
+	 * added or removed. */
 	public function updateCache () : void {
-		var ikConstraintsCount:int = ikConstraints.length;
+		var updateCache:Vector.<Updatable> = this._updateCache;
+		updateCache.length = 0;
+		this._updateCacheReset.length = 0;
 
-		var arrayCount:int = ikConstraintsCount + 1;
-		if (_boneCache.length > arrayCount) _boneCache.splice(arrayCount, _boneCache.length - arrayCount);
-		for each (var cachedBones:Vector.<Bone> in _boneCache)
-			cachedBones.length = 0;
-		while (_boneCache.length < arrayCount)
-			_boneCache[_boneCache.length] = new Vector.<Bone>();
+		var bones:Vector.<Bone> = this.bones;
+		var i:Number = 0;
+		var n:Number = 0;
+		for (i = 0, n = bones.length; i < n; i++)
+			bones[i]._sorted = false;
 
-		var nonIkBones:Vector.<Bone> = _boneCache[0];
-
-		outer:
-		for each (var bone:Bone in bones) {
-			var current:Bone = bone;
-			do {
-				var ii:int = 0;
-				for each (var ikConstraint:IkConstraint in ikConstraints) {
-					var parent:Bone = ikConstraint.bones[0];
-					var child:Bone = ikConstraint.bones[int(ikConstraint.bones.length - 1)];
-					while (true) {
-						if (current == child) {
-							_boneCache[ii].push(bone);
-							_boneCache[int(ii + 1)].push(bone);
-							continue outer;
-						}
-						if (child == parent) break;
-						child = child.parent;
-					}
-					ii++;
+		// IK first, lowest hierarchy depth first.
+		var ikConstraints:Vector.<IkConstraint> = this.ikConstraints;
+		var transformConstraints:Vector.<TransformConstraint> = this.transformConstraints;
+		var pathConstraints:Vector.<PathConstraint> = this.pathConstraints;
+		var ikCount:Number = ikConstraints.length, transformCount:Number = transformConstraints.length, pathCount:Number = pathConstraints.length;
+		var constraintCount:Number = ikCount + transformCount + pathCount;
+		
+		outer:			
+		for (i = 0; i < constraintCount; i++) {
+			var ii:Number = 0;
+			for (ii = 0; ii < ikCount; ii++) {
+				var ikConstraint:IkConstraint = ikConstraints[ii];
+				if (ikConstraint.data.order == i) {
+					sortIkConstraint(ikConstraint);
+					continue outer;
 				}
-				current = current.parent;
-			} while (current != null);
-			nonIkBones[nonIkBones.length] = bone;
+			}
+			for (ii = 0; ii < transformCount; ii++) {
+				var transformConstraint:TransformConstraint = transformConstraints[ii];
+				if (transformConstraint.data.order == i) {
+					sortTransformConstraint(transformConstraint);
+					continue outer;
+				}
+			}
+			for (ii = 0; ii < pathCount; ii++) {
+				var pathConstraint:PathConstraint = pathConstraints[ii];
+				if (pathConstraint.data.order == i) {
+					sortPathConstraint(pathConstraint);
+					continue outer;
+				}
+			}
+		}
+		
+		for (i = 0, n = bones.length; i < n; i++)
+			sortBone(bones[i]);
+	}
+	
+	private function sortIkConstraint (constraint:IkConstraint): void {
+		var target:Bone = constraint.target;
+		sortBone(target);
+
+		var constrained:Vector.<Bone> = constraint.bones;
+		var parent:Bone = constrained[0];
+		sortBone(parent);
+
+		if (constrained.length > 1) {
+			var child:Bone = constrained[constrained.length - 1];
+			if (!(_updateCache.indexOf(child) > -1)) _updateCacheReset.push(child);
+		}
+
+		_updateCache.push(constraint);
+
+		sortReset(parent.children);
+		constrained[constrained.length - 1]._sorted = true;
+	}
+
+	private function sortPathConstraint (constraint:PathConstraint): void {
+		var slot:Slot = constraint.target;
+		var slotIndex:Number = slot.data.index;
+		var slotBone:Bone = slot.bone;
+		if (skin != null) sortPathConstraintAttachment(skin, slotIndex, slotBone);
+		if (data.defaultSkin != null && data.defaultSkin != skin)
+			sortPathConstraintAttachment(data.defaultSkin, slotIndex, slotBone);
+		var ii:Number = 0;
+		var nn:Number = 0;		
+		for (ii = 0, nn = data.skins.length; ii < nn; ii++)
+			sortPathConstraintAttachment(data.skins[ii], slotIndex, slotBone);
+
+		var attachment:Attachment = slot.attachment;
+		if (attachment is PathAttachment) sortPathConstraintAttachment2(attachment, slotBone);
+
+		var constrained:Vector.<Bone> = constraint.bones;
+		var boneCount:Number = constrained.length;
+		for (ii = 0; ii < boneCount; ii++)
+			sortBone(constrained[ii]);
+
+		_updateCache.push(constraint);
+
+		for (ii = 0; ii < boneCount; ii++)
+			sortReset(constrained[ii].children);
+		for (ii = 0; ii < boneCount; ii++)
+			constrained[ii]._sorted = true;
+	}
+
+	private function sortTransformConstraint (constraint:TransformConstraint): void {
+		sortBone(constraint.target);
+
+		var constrained:Vector.<Bone> = constraint.bones;
+		var boneCount:Number = constrained.length;
+		var ii:Number = 0;
+		for (ii = 0; ii < boneCount; ii++)
+			sortBone(constrained[ii]);
+
+		_updateCache.push(constraint);
+
+		for (ii = 0; ii < boneCount; ii++)
+			sortReset(constrained[ii].children);
+		for (ii = 0; ii < boneCount; ii++)
+			constrained[ii]._sorted = true;
+	}
+	
+	private function sortPathConstraintAttachment (skin:Skin, slotIndex:int, slotBone:Bone) : void {
+		var dict:Dictionary = skin.attachments[slotIndex];
+		if (!dict) return;
+		
+		for each (var value:Attachment in dict) {
+			sortPathConstraintAttachment2(value, slotBone);
 		}
 	}
 
-	/** Updates the world transform for each bone and applies IK constraints. */
+	private function sortPathConstraintAttachment2 (attachment:Attachment, slotBone:Bone) : void {
+		var pathAttachment:PathAttachment = attachment as PathAttachment;
+		if (!pathAttachment) return;
+		var pathBones:Vector.<int> = pathAttachment.bones;
+		if (pathBones == null)
+			sortBone(slotBone);
+		else {
+			var bones:Vector.<Bone> = this.bones;
+			var i:int = 0;
+			while (i < pathBones.length) {
+				var boneCount:int = pathBones[i++];
+				for (var n:int = i + boneCount; i < n; i++) {				
+					sortBone(bones[pathBones[i]]);
+				}
+			}
+		}
+	}
+
+	private function sortBone (bone:Bone) : void {
+		if (bone._sorted) return;
+		var parent:Bone = bone.parent;
+		if (parent != null) sortBone(parent);
+		bone._sorted = true;
+		_updateCache.push(bone);
+	}
+
+	private function sortReset (bones:Vector.<Bone>) : void {
+		for (var i:int = 0, n:int = bones.length; i < n; i++) {
+			var bone:Bone = bones[i];
+			if (bone._sorted) sortReset(bone.children);
+			bone._sorted = false;
+		}
+	}
+
+	/** Updates the world transform for each bone and applies constraints. */
 	public function updateWorldTransform () : void {
-		var bone:Bone;
-		for each (bone in bones)
-			bone.rotationIK = bone.rotation;
-		var i:int = 0, last:int = _boneCache.length - 1;
-		while (true) {
-			for each (bone in _boneCache[i])
-				bone.updateWorldTransform();
-			if (i == last) break;
-			ikConstraints[i].apply();
-			i++;
+		var updateCacheReset:Vector.<Bone> = this._updateCacheReset;
+		for each (var bone:Bone in updateCacheReset) {
+			bone.ax = bone.x;
+			bone.ay = bone.y;
+			bone.arotation = bone.rotation;
+			bone.ascaleX = bone.scaleX;
+			bone.ascaleY = bone.scaleY;
+			bone.ashearX = bone.shearX;
+			bone.ashearY = bone.shearY;
+			bone.appliedValid = true;
 		}
+		for each (var updatable:Updatable in _updateCache)
+			updatable.update();
 	}
 
-	/** Sets the bones and slots to their setup pose values. */
+	/** Sets the bones, constraints, and slots to their setup pose values. */
 	public function setToSetupPose () : void {
 		setBonesToSetupPose();
 		setSlotsToSetupPose();
 	}
 
+	/** Sets the bones and constraints to their setup pose values. */
 	public function setBonesToSetupPose () : void {
 		for each (var bone:Bone in bones)
 			bone.setToSetupPose();
@@ -139,11 +280,25 @@ public class Skeleton {
 			ikConstraint.bendDirection = ikConstraint._data.bendDirection;
 			ikConstraint.mix = ikConstraint._data.mix;
 		}
+
+		for each (var transformConstraint:TransformConstraint in transformConstraints) {
+			transformConstraint.rotateMix = transformConstraint._data.rotateMix;
+			transformConstraint.translateMix = transformConstraint._data.translateMix;
+			transformConstraint.scaleMix = transformConstraint._data.scaleMix;
+			transformConstraint.shearMix = transformConstraint._data.shearMix;
+		}
+		
+		for each (var pathConstraint:PathConstraint in pathConstraints) {
+			pathConstraint.position = pathConstraint._data.position;
+			pathConstraint.spacing = pathConstraint._data.spacing;
+			pathConstraint.rotateMix = pathConstraint._data.rotateMix;
+			pathConstraint.translateMix = pathConstraint._data.translateMix;
+		}
 	}
 
 	public function setSlotsToSetupPose () : void {
 		var i:int = 0;
-		for each (var slot:Slot in slots) { 
+		for each (var slot:Slot in slots) {
 			drawOrder[i++] = slot;
 			slot.setToSetupPose();
 		}
@@ -151,6 +306,10 @@ public class Skeleton {
 
 	public function get data () : SkeletonData {
 		return _data;
+	}
+	
+	public function get getUpdateCache () : Vector.<Updatable> {
+		return _updateCache;
 	}
 
 	public function get rootBone () : Bone {
@@ -215,8 +374,8 @@ public class Skeleton {
 		return _skin == null ? null : _skin._name;
 	}
 
-	/** Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default skin}. 
-	 * Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was 
+	/** Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default skin}.
+	 * Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was
 	 * no old skin, each slot's setup mode attachment is attached from the new skin.
 	 * @param newSkin May be null. */
 	public function set skin (newSkin:Skin) : void {
@@ -275,10 +434,26 @@ public class Skeleton {
 	}
 
 	/** @return May be null. */
-	public function findIkConstraint (ikConstraintName:String) : IkConstraint {
-		if (ikConstraintName == null) throw new ArgumentError("ikConstraintName cannot be null.");
+	public function findIkConstraint (constraintName:String) : IkConstraint {
+		if (constraintName == null) throw new ArgumentError("constraintName cannot be null.");
 		for each (var ikConstraint:IkConstraint in ikConstraints)
-			if (ikConstraint._data._name == ikConstraintName) return ikConstraint;
+			if (ikConstraint._data._name == constraintName) return ikConstraint;
+		return null;
+	}
+
+	/** @return May be null. */
+	public function findTransformConstraint (constraintName:String) : TransformConstraint {
+		if (constraintName == null) throw new ArgumentError("constraintName cannot be null.");
+		for each (var transformConstraint:TransformConstraint in transformConstraints)
+			if (transformConstraint._data._name == constraintName) return transformConstraint;
+		return null;
+	}
+	
+	/** @return May be null. */
+	public function findPathConstraint (constraintName:String) : PathConstraint {
+		if (constraintName == null) throw new ArgumentError("constraintName cannot be null.");
+		for each (var pathConstraint:PathConstraint in pathConstraints)
+			if (pathConstraint._data._name == constraintName) return pathConstraint;
 		return null;
 	}
 

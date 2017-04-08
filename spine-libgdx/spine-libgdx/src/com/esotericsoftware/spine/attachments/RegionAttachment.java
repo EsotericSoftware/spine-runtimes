@@ -1,39 +1,34 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.3
- * 
- * Copyright (c) 2013-2015, Esoteric Software
+ * Spine Runtimes Software License v2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
- * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to use, install, execute and perform the Spine
- * Runtimes Software (the "Software") and derivative works solely for personal
- * or internal use. Without the written permission of Esoteric Software (see
- * Section 2 of the Spine Software License Agreement), you may not (a) modify,
- * translate, adapt or otherwise create derivative works, improvements of the
- * Software or develop new applications using the Software or (b) remove,
- * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
  * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 package com.esotericsoftware.spine.attachments;
-
-import com.esotericsoftware.spine.Bone;
-import com.esotericsoftware.spine.Skeleton;
-import com.esotericsoftware.spine.Slot;
 
 import static com.badlogic.gdx.graphics.g2d.Batch.*;
 
@@ -42,8 +37,13 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.NumberUtils;
+import com.esotericsoftware.spine.Bone;
+import com.esotericsoftware.spine.Skeleton;
+import com.esotericsoftware.spine.Slot;
 
-/** Attachment that displays a texture region. */
+/** An attachment that displays a textured quadrilateral.
+ * <p>
+ * See <a href="http://esotericsoftware.com/spine-regions">Region attachments</a> in the Spine User Guide. */
 public class RegionAttachment extends Attachment {
 	static public final int BLX = 0;
 	static public final int BLY = 1;
@@ -65,6 +65,7 @@ public class RegionAttachment extends Attachment {
 		super(name);
 	}
 
+	/** Calculates the {@link #offset} using the region settings. Must be called after changing region settings. */
 	public void updateOffset () {
 		float width = getWidth();
 		float height = getHeight();
@@ -93,8 +94,8 @@ public class RegionAttachment extends Attachment {
 		localX2 *= scaleX;
 		localY2 *= scaleY;
 		float rotation = getRotation();
-		float cos = MathUtils.cosDeg(rotation);
-		float sin = MathUtils.sinDeg(rotation);
+		float cos = (float)Math.cos(MathUtils.degRad * rotation);
+		float sin = (float)Math.sin(MathUtils.degRad * rotation);
 		float x = getX();
 		float y = getY();
 		float localXCos = localX * cos + x;
@@ -146,15 +147,16 @@ public class RegionAttachment extends Attachment {
 		return region;
 	}
 
-	public void updateWorldVertices (Slot slot, boolean premultipliedAlpha) {
+	/** @return The updated world vertices. */
+	public float[] updateWorldVertices (Slot slot, boolean premultipliedAlpha) {
 		Skeleton skeleton = slot.getSkeleton();
 		Color skeletonColor = skeleton.getColor();
 		Color slotColor = slot.getColor();
 		Color regionColor = color;
-		float a = skeletonColor.a * slotColor.a * regionColor.a * 255;
-		float multiplier = premultipliedAlpha ? a : 255;
+		float alpha = skeletonColor.a * slotColor.a * regionColor.a * 255;
+		float multiplier = premultipliedAlpha ? alpha : 255;
 		float color = NumberUtils.intToFloatColor( //
-			((int)a << 24) //
+			((int)alpha << 24) //
 				| ((int)(skeletonColor.b * slotColor.b * regionColor.b * multiplier) << 16) //
 				| ((int)(skeletonColor.g * slotColor.g * regionColor.g * multiplier) << 8) //
 				| (int)(skeletonColor.r * slotColor.r * regionColor.r * multiplier));
@@ -162,43 +164,48 @@ public class RegionAttachment extends Attachment {
 		float[] vertices = this.vertices;
 		float[] offset = this.offset;
 		Bone bone = slot.getBone();
-		float x = skeleton.getX() + bone.getWorldX(), y = skeleton.getY() + bone.getWorldY();
-		float m00 = bone.getM00(), m01 = bone.getM01(), m10 = bone.getM10(), m11 = bone.getM11();
+		float x = bone.getWorldX(), y = bone.getWorldY();
+		float a = bone.getA(), b = bone.getB(), c = bone.getC(), d = bone.getD();
 		float offsetX, offsetY;
 
 		offsetX = offset[BRX];
 		offsetY = offset[BRY];
-		vertices[X1] = offsetX * m00 + offsetY * m01 + x; // br
-		vertices[Y1] = offsetX * m10 + offsetY * m11 + y;
+		vertices[X1] = offsetX * a + offsetY * b + x; // br
+		vertices[Y1] = offsetX * c + offsetY * d + y;
 		vertices[C1] = color;
 
 		offsetX = offset[BLX];
 		offsetY = offset[BLY];
-		vertices[X2] = offsetX * m00 + offsetY * m01 + x; // bl
-		vertices[Y2] = offsetX * m10 + offsetY * m11 + y;
+		vertices[X2] = offsetX * a + offsetY * b + x; // bl
+		vertices[Y2] = offsetX * c + offsetY * d + y;
 		vertices[C2] = color;
 
 		offsetX = offset[ULX];
 		offsetY = offset[ULY];
-		vertices[X3] = offsetX * m00 + offsetY * m01 + x; // ul
-		vertices[Y3] = offsetX * m10 + offsetY * m11 + y;
+		vertices[X3] = offsetX * a + offsetY * b + x; // ul
+		vertices[Y3] = offsetX * c + offsetY * d + y;
 		vertices[C3] = color;
 
 		offsetX = offset[URX];
 		offsetY = offset[URY];
-		vertices[X4] = offsetX * m00 + offsetY * m01 + x; // ur
-		vertices[Y4] = offsetX * m10 + offsetY * m11 + y;
+		vertices[X4] = offsetX * a + offsetY * b + x; // ur
+		vertices[Y4] = offsetX * c + offsetY * d + y;
 		vertices[C4] = color;
+		return vertices;
 	}
 
 	public float[] getWorldVertices () {
 		return vertices;
 	}
 
+	/** For each of the 4 vertices, a pair of <code>x,y</code> values that is the local position of the vertex.
+	 * <p>
+	 * See {@link #updateOffset()}. */
 	public float[] getOffset () {
 		return offset;
 	}
 
+	/** The local x translation. */
 	public float getX () {
 		return x;
 	}
@@ -207,6 +214,7 @@ public class RegionAttachment extends Attachment {
 		this.x = x;
 	}
 
+	/** The local y translation. */
 	public float getY () {
 		return y;
 	}
@@ -215,6 +223,7 @@ public class RegionAttachment extends Attachment {
 		this.y = y;
 	}
 
+	/** The local scaleX. */
 	public float getScaleX () {
 		return scaleX;
 	}
@@ -223,6 +232,7 @@ public class RegionAttachment extends Attachment {
 		this.scaleX = scaleX;
 	}
 
+	/** The local scaleY. */
 	public float getScaleY () {
 		return scaleY;
 	}
@@ -231,6 +241,7 @@ public class RegionAttachment extends Attachment {
 		this.scaleY = scaleY;
 	}
 
+	/** The local rotation. */
 	public float getRotation () {
 		return rotation;
 	}
@@ -239,6 +250,7 @@ public class RegionAttachment extends Attachment {
 		this.rotation = rotation;
 	}
 
+	/** The width of the region attachment in Spine. */
 	public float getWidth () {
 		return width;
 	}
@@ -247,6 +259,7 @@ public class RegionAttachment extends Attachment {
 		this.width = width;
 	}
 
+	/** The height of the region attachment in Spine. */
 	public float getHeight () {
 		return height;
 	}
@@ -255,10 +268,12 @@ public class RegionAttachment extends Attachment {
 		this.height = height;
 	}
 
+	/** The color to tint the region attachment. */
 	public Color getColor () {
 		return color;
 	}
 
+	/** The name of the texture region for this attachment. */
 	public String getPath () {
 		return path;
 	}

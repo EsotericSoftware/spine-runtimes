@@ -1,0 +1,75 @@
+body, html {
+	margin: 0;
+	height: 100%;
+	font-family: Tahoma;
+	font-size: 11pt;
+}
+body {
+	padding: 15px;
+}
+br {
+	display: block;
+	content: "";
+	margin-top: 15px;
+}
+.aspect {
+	margin-bottom: 15px;
+	max-width: 800px;
+	text-align: center;
+}
+.aspect div {
+	position: relative;
+	padding-bottom: 70.14%;
+}
+.aspect canvas {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	height: 100%;
+	border: 1px solid black;
+}
+.slider {
+	width: 100%;
+	max-width: 800px;
+	border-radius: 3px;
+	text-align: left;
+	transform: translateZ(0);
+	background: #222;
+}
+.slider, .slider.filled span {
+	height: 15px;
+	border: 1px solid #c5c5c5;
+}
+.slider div {	
+	position: absolute;
+	top: -2px;
+	width: 10px;
+	height: 17px;
+	background: white;
+	border: #000 1px solid;
+	border-radius: 2px;
+	z-index: 10;
+}
+.slider.filled {
+	border: 0;
+}
+.slider.filled div {	
+	top: -1px;
+	margin-left: 1px;
+}
+.slider.filled span {
+	display: block;
+	position: absolute;
+	background: #3ea9f5;
+	border-top-left-radius: 3px;
+	border-bottom-left-radius: 3px;
+	z-index: 5;
+}
+.slider.filled span:last-child {
+	background: #222;
+	border-top-right-radius: 3px;
+	border-bottom-right-radius: 3px;
+}

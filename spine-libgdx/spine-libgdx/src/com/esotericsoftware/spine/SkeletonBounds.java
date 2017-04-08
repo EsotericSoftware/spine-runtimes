@@ -1,43 +1,43 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.3
- * 
- * Copyright (c) 2013-2015, Esoteric Software
+ * Spine Runtimes Software License v2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
- * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to use, install, execute and perform the Spine
- * Runtimes Software (the "Software") and derivative works solely for personal
- * or internal use. Without the written permission of Esoteric Software (see
- * Section 2 of the Spine Software License Agreement), you may not (a) modify,
- * translate, adapt or otherwise create derivative works, improvements of the
- * Software or develop new applications using the Software or (b) remove,
- * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
  * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 package com.esotericsoftware.spine;
 
-import com.esotericsoftware.spine.attachments.Attachment;
-import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
-
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Pool;
+import com.esotericsoftware.spine.attachments.Attachment;
+import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 
+/** Collects each {@link BoundingBoxAttachment} that is visible and computes the world vertices for its polygon. The polygon
+ * vertices are provided along with convenience methods for doing hit detection. */
 public class SkeletonBounds {
 	private float minX, minY, maxX, maxY;
 	private Array<BoundingBoxAttachment> boundingBoxes = new Array();
@@ -48,7 +48,12 @@ public class SkeletonBounds {
 		}
 	};
 
+	/** Clears any previous polygons, finds all visible bounding box attachments, and computes the world vertices for each bounding
+	 * box's polygon.
+	 * @param updateAabb If true, the axis aligned bounding box containing all the polygons is computed. If false, the
+	 *           SkeletonBounds AABB methods will always return true. */
 	public void update (Skeleton skeleton, boolean updateAabb) {
+		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		Array<BoundingBoxAttachment> boundingBoxes = this.boundingBoxes;
 		Array<FloatArray> polygons = this.polygons;
 		Array<Slot> slots = skeleton.slots;
@@ -67,15 +72,18 @@ public class SkeletonBounds {
 
 				FloatArray polygon = polygonPool.obtain();
 				polygons.add(polygon);
-				int vertexCount = boundingBox.getVertices().length;
-				polygon.ensureCapacity(vertexCount);
-				polygon.size = vertexCount;
-
-				boundingBox.computeWorldVertices(slot.bone, polygon.items);
+				boundingBox.computeWorldVertices(slot, polygon.setSize(boundingBox.getWorldVerticesLength()));
 			}
 		}
 
-		if (updateAabb) aabbCompute();
+		if (updateAabb)
+			aabbCompute();
+		else {
+			minX = Integer.MIN_VALUE;
+			minY = Integer.MIN_VALUE;
+			maxX = Integer.MAX_VALUE;
+			maxY = Integer.MAX_VALUE;
+		}
 	}
 
 	private void aabbCompute () {
@@ -157,8 +165,9 @@ public class SkeletonBounds {
 		return inside;
 	}
 
-	/** Returns the first bounding box attachment that contains the line segment, or null. When doing many checks, it is usually
-	 * more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} returns true. */
+	/** Returns the first bounding box attachment that contains any part of the line segment, or null. When doing many checks, it
+	 * is usually more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} returns
+	 * true. */
 	public BoundingBoxAttachment intersectsSegment (float x1, float y1, float x2, float y2) {
 		Array<FloatArray> polygons = this.polygons;
 		for (int i = 0, n = polygons.size; i < n; i++)
@@ -166,7 +175,7 @@ public class SkeletonBounds {
 		return null;
 	}
 
-	/** Returns true if the polygon contains the line segment. */
+	/** Returns true if the polygon contains any part of the line segment. */
 	public boolean intersectsSegment (FloatArray polygon, float x1, float y1, float x2, float y2) {
 		float[] vertices = polygon.items;
 		int nn = polygon.size;
@@ -190,40 +199,49 @@ public class SkeletonBounds {
 		return false;
 	}
 
+	/** The left edge of the axis aligned bounding box. */
 	public float getMinX () {
 		return minX;
 	}
 
+	/** The bottom edge of the axis aligned bounding box. */
 	public float getMinY () {
 		return minY;
 	}
 
+	/** The right edge of the axis aligned bounding box. */
 	public float getMaxX () {
 		return maxX;
 	}
 
+	/** The top edge of the axis aligned bounding box. */
 	public float getMaxY () {
 		return maxY;
 	}
 
+	/** The width of the axis aligned bounding box. */
 	public float getWidth () {
 		return maxX - minX;
 	}
 
+	/** The height of the axis aligned bounding box. */
 	public float getHeight () {
 		return maxY - minY;
 	}
 
+	/** The visible bounding boxes. */
 	public Array<BoundingBoxAttachment> getBoundingBoxes () {
 		return boundingBoxes;
 	}
 
+	/** The world vertices for the bounding box polygons. */
 	public Array<FloatArray> getPolygons () {
 		return polygons;
 	}
 
 	/** Returns the polygon for the specified bounding box, or null. */
 	public FloatArray getPolygon (BoundingBoxAttachment boundingBox) {
+		if (boundingBox == null) throw new IllegalArgumentException("boundingBox cannot be null.");
 		int index = boundingBoxes.indexOf(boundingBox, true);
 		return index == -1 ? null : polygons.get(index);
 	}

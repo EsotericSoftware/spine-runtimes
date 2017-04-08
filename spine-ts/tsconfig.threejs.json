@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"module": "none",
+		"noImplicitAny": true,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"outFile": "build/spine-threejs.js",
+		"sourceMap": true,
+		"declaration": true
+	},
+	"include": [
+		"core/src/**/*",		
+		"threejs/src/**/*"
+	],
+	"exclude": [
+		"canvas",
+		"webgl",
+		"widget",
+		"build"	 
+	]
+}

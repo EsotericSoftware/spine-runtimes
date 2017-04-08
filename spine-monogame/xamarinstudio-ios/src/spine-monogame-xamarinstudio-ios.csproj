@@ -4,11 +4,13 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{08DC311B-1F38-4CBD-B7B6-B734984A8CB3}</ProjectGuid>
-    <ProjectTypeGuids>{6BC8ED88-2882-458C-8E55-DFD12B67127B};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <RootNamespace>spinecsharpxamarinios</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
     <AssemblyName>spine-monogame-xamarinstudio-ios</AssemblyName>
+    <TargetFrameworkIdentifier>Xamarin.iOS</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,20 +35,15 @@
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
-    <Reference Include="monotouch" />
+    <Reference Include="Xamarin.iOS" />
+    <Reference Include="MonoGame.Framework">
+      <HintPath>..\example\packages\MonoGame.Framework.iOS.3.5.0.1678\lib\XamariniOS\MonoGame.Framework.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="spine-csharp\" />
     <Folder Include="spine-xna\" />
     <Folder Include="spine-csharp\Attachments\" />
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets" />
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\MonoGame\MonoGame.Framework\MonoGame.Framework.iOS.csproj">
-      <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
-      <Name>MonoGame.Framework.iOS</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\..\spine-csharp\src\Attachments\AtlasAttachmentLoader.cs">
@@ -84,6 +81,9 @@
     </Compile>
     <Compile Include="..\..\..\spine-csharp\src\BoneData.cs">
       <Link>spine-csharp\BoneData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\ExposedList.cs">
+      <Link>spine-csharp\ExposedList.cs</Link>
     </Compile>
     <Compile Include="..\..\..\spine-csharp\src\Json.cs">
       <Link>spine-csharp\Json.cs</Link>
@@ -136,14 +136,36 @@
     <Compile Include="..\..\..\spine-csharp\src\Attachments\MeshAttachment.cs">
       <Link>spine-csharp\Attachments\MeshAttachment.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\spine-csharp\src\Attachments\SkinnedMeshAttachment.cs">
-      <Link>spine-csharp\Attachments\SkinnedMeshAttachment.cs</Link>
-    </Compile>
     <Compile Include="..\..\..\spine-csharp\src\IkConstraint.cs">
       <Link>spine-csharp\IkConstraint.cs</Link>
     </Compile>
     <Compile Include="..\..\..\spine-csharp\src\IkConstraintData.cs">
       <Link>spine-csharp\IkConstraintData.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\BlendMode.cs">
+      <Link>spine-csharp\BlendMode.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\SkeletonBinary.cs">
+      <Link>spine-csharp\SkeletonBinary.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\WeightedMeshAttachment.cs">
+      <Link>spine-csharp\Attachments\WeightedMeshAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\IUpdatable.cs">
+      <Link>spine-csharp\IUpdatable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\MathUtils.cs">
+      <Link>spine-csharp\MathUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\TransformConstraint.cs">
+      <Link>spine-csharp\TransformConstraint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\TransformConstraintData.cs">
+      <Link>spine-csharp\TransformConstraintData.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

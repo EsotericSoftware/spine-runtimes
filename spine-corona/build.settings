@@ -1,11 +1,11 @@
 settings = {
 	orientation = {
-		default = "portrait",
-		supported = { "portrait", }
+		default = "landscape",
+		supported = { "landscape", }
 	},	
 	iphone = {
 		plist = {
-			UIStatusBarHidden = false,
+			UIStatusBarHidden = true,
 			UIPrerenderedIcon = true, -- set to false for "shine" overlay
 		}
 	},

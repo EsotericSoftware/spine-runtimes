@@ -1,0 +1,6 @@
+SkeletonRenderSeparator
+=======================
+
+Dependencies:
+- SkeletonPartsRenderer uses the `ArraysMeshGenerator` class in `Spine.Unity.MeshGeneration`
+- It requires `SPINE_OPTIONAL_RENDEROVERRIDE` to be #defined in `SkeletonRenderer.cs`.

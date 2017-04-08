@@ -12,39 +12,45 @@ target
 *.user
 .DS_Store
 
+
+.idea/
+build/
+
 spine-c/Debug/*
 
 spine-cpp/Debug/*
 
 spine-sfml/Debug/*
 spine-sfml/SFML
+spine-sfml/dependencies
 
-spine-libgdx/spine-libgdx/bin/*
-spine-libgdx/spine-libgdx-tests/bin/*
-spine-libgdx/spine-skeletonviewer/bin/*
+spine-libgdx/spine-libgdx/bin
+spine-libgdx/spine-libgdx-tests/bin
+spine-libgdx/spine-skeletonviewer/bin
 
-spine-cocos2dx/2/cocos2dx/
-!spine-cocos2dx/2/cocos2dx/Place cocos2dx here.txt
-spine-cocos2dx/2/example/proj.win32/Debug
-spine-cocos2dx/3/cocos2dx/
-!spine-cocos2dx/3/cocos2dx/Place cocos2dx here.txt
-spine-cocos2dx/3/example/proj.win32/Debug
-xcuserdata
+spine-cocos2dx/dependencies
+spine-cocos2dx/example/cocos2dx.zip
+spine-cocos2dx/example/__MACOSX
+spine-cocos2dx/example/cocos2d
+spine-cocos2dx/example/proj.win32/spine-cocos2d-x.VC.opendb
+xcuserdata/
 
-spine-cocos2d-iphone/2/cocos2d/*
-!spine-cocos2d-iphone/2/cocos2d/Place cocos2d here.txt
-spine-cocos2d-iphone/3/cocos2d/*
-!spine-cocos2d-iphone/3/cocos2d/Place cocos2d here.txt
+spine-cocos2d-objc/cocos2d/*
+spine-cocos2d-objc/spine-cocos2d-iphone-objc.xcodeproj/project.xcworkspace/xcshareddata/
 
 spine-csharp/bin
 spine-csharp/obj
+spine-csharp/src/*.meta
 spine-csharp/src/*.cs.meta
+spine-csharp/src/Attachments/*.cs.meta
 
 spine-monogame/xamarinstudio-ios/src/bin
 spine-monogame/xamarinstudio-ios/src/obj
+spine-monogame/xamarinstudio-ios/src/packages
 
 spine-monogame/xamarinstudio-ios/example/bin
 spine-monogame/xamarinstudio-ios/example/obj
+spine-monogame/xamarinstudio-ios/example/packages
 
 spine-monogame/windows8-store/src/bin
 spine-monogame/windows8-store/src/obj
@@ -60,6 +66,8 @@ spine-xna/example/obj
 
 spine-unity/Assets/spine-csharp*
 !spine-unity/Assets/spine-csharp/Place spine-csharp src here.*
+spine-unity/spine-unity.CSharp.csproj
+spine-unity/spine-unity.CSharp.Editor.csproj
 spine-unity/ProjectSettings
 spine-unity/Temp
 spine-unity/Library
@@ -85,12 +93,23 @@ spine-love/spine-lua/
 spine-love/love/
 !spine-love/spine-lua/Place spine-lua here.txt
 
-spine-as3/spine-as3/bin
-spine-as3/spine-as3-example/bin-debug
-spine-as3/spine-as3-example/bin-release
+spine-as3/spine-as3-example/bin
+spine-as3/spine-as3-example/lib/.spine-as3.swc.stamp
 
-spine-starling/spine-starling/bin
-spine-starling/spine-starling-example/bin-debug
-spine-starling/spine-starling-example/bin-release
+spine-starling/spine-starling-example/bin
+spine-starling/spine-starling-example/lib/.spine-starling.swc.stamp
 
 spine-turbulenz/spine-js/spine.js
+
+spine-threejs/spine-js/spine.js
+
+spine-ts/.vscode/*
+
+spine-ue4/Binaries
+spine-ue4/Intermediate
+spine-ue4/Saved
+spine-ue4/SpineUE4.xcworkspace
+spine-ue4/Plugins/SpinePlugin/Source/SpinePlugin/Public/spine-c
+spine-ue4/Plugins/SpinePlugin/Binaries
+spine-ue4/SpineUE4.VC.opendb
+spine-ue4/SpineUE4.sln
