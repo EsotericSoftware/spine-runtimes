@@ -28,15 +28,18 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
+local AttachmentType = require "spine-lua.attachments.AttachmentType"
+local Attachment = require "spine-lua.attachments.Attachment"
+local Color = require "spine-lua.Color"
+local Utils = require "spine-lua.utils"
+
+local AttachmentType_region = AttachmentType.region
+
 local setmetatable = setmetatable
 local math_pi = math.pi
 local math_sin = math.sin
 local math_cos = math.cos
 
-local AttachmentType = require "spine-lua.attachments.AttachmentType"
-local Attachment = require "spine-lua.attachments.Attachment"
-local Color = require "spine-lua.Color"
-local Utils = require "spine-lua.utils"
 
 local OX1 = 1
 local OY1 = 2
@@ -85,12 +88,11 @@ local C4A = 32
 
 local RegionAttachment = {}
 RegionAttachment.__index = RegionAttachment
-setmetatable(RegionAttachment, { __index = Attachment })
 
 function RegionAttachment.new (name)
 	if not name then error("name cannot be nil", 2) end
 
-	local self = Attachment.new(name, AttachmentType.region)
+	local self = Attachment.new(name, AttachmentType_region)
 	self.x = 0
 	self.y = 0
 	self.scaleX = 1
@@ -105,8 +107,9 @@ function RegionAttachment.new (name)
 	self.offset = Utils.newNumberArray(8)
 	self.vertices = Utils.newNumberArray(8 * 4)
 	self.tempColor = Color.newWith(1, 1, 1, 1)
+	
 	setmetatable(self, RegionAttachment)
-
+	
 	return self
 end
 

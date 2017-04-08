@@ -32,29 +32,30 @@
 -- access adds 1 to the calculated index. We should switch the logic
 -- to 1-based indexing eventually.
 
-local setmetatable = setmetatable
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local PathConstraintData = require "spine-lua.PathConstraintData"
 local utils = require "spine-lua.utils"
+
+local AttachmentType_path = AttachmentType.path
+
+local setmetatable = setmetatable
 local math_pi = math.pi
-local math_pi2 = math.pi * 2
+local math_pi2 = math_pi * 2
 local math_atan2 = math.atan2
 local math_sqrt = math.sqrt
-local math_acos = math.acos
 local math_sin = math.sin
 local math_cos = math.cos
-local table_insert = table.insert
-local math_deg = math.deg
-local math_rad = math.rad
-local math_abs = math.abs
 local math_max = math.max
 
 local PathConstraint = {}
 PathConstraint.__index = PathConstraint
 
-PathConstraint.NONE = -1
-PathConstraint.BEFORE = -2
-PathConstraint.AFTER = -3
+local PathConstraint_NONE 	= -1
+local PathConstraint_BEFORE = -2
+local PathConstraint_AFTER 	= -3
+PathConstraint.NONE 	= PathConstraint_NONE
+PathConstraint.BEFORE 	= PathConstraint_BEFORE
+PathConstraint.AFTER 	= PathConstraint_AFTER
 
 function PathConstraint.new (data, skeleton)
 	if not data then error("data cannot be nil", 2) end
@@ -77,8 +78,11 @@ function PathConstraint.new (data, skeleton)
 	}
 	setmetatable(self, PathConstraint)
 
-	for i,boneData in ipairs(data.bones) do
-		table_insert(self.bones, skeleton:findBone(boneData.name))
+	local bones = self.bones
+	local data_bones = data.bones
+	for i=1, #data_bones do
+		local boneData = data_bones[i]
+		bones[#bones + 1] = skeleton:findBone(boneData.name)
 	end
 
 	return self
@@ -90,7 +94,7 @@ end
 
 function PathConstraint:update ()
 	local attachment = self.target.attachment
-	if not (attachment.type == AttachmentType.path) then return end
+	if not (attachment.type == AttachmentType_path) then return end
 
 	local rotateMix = self.rotateMix
 	local translateMix = self.translateMix
@@ -111,6 +115,7 @@ function PathConstraint:update ()
 	local spaces = utils.setArraySize(self.spaces, spacesCount)
 	local lengths = nil
 	local spacing = self.spacing
+	
 	if scale or lengthSpacing then
 		if scale then lengths = utils.setArraySize(self.lengths, boneCount) end
 		local i = 0
@@ -223,7 +228,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 	local closed = path.closed
 	local verticesLength = path.worldVerticesLength
 	local curveCount = verticesLength / 6
-	local prevCurve = PathConstraint.NONE
+	local prevCurve = PathConstraint_NONE
 
 	if not path.constantSpeed then
 		local lengths = path.lengths
@@ -252,15 +257,15 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 				if p < 0 then p = p + pathLength end
 				curve = 0
 			elseif p < 0 then
-				if prevCurve ~= PathConstraint.BEFORE then
-					prevCurve = PathConstraint.BEFORE
+				if prevCurve ~= PathConstraint_BEFORE then
+					prevCurve = PathConstraint_BEFORE
 					path:computeWorldVerticesWith(target, 2, 4, world, 0)
 				end
 				self:addBeforePosition(p, world, 0, out, o)
 				skip = true
 			elseif p > pathLength then
-				if prevCurve ~= PathConstraint.AFTER then
-					prevCurve = PathConstraint.AFTER
+				if prevCurve ~= PathConstraint_AFTER then
+					prevCurve = PathConstraint_AFTER
 					path:computeWorldVerticesWith(target, verticesLength - 6, 4, world, 0)
 				end
 				self:addAfterPosition(p - pathLength, world, 0, out, o)

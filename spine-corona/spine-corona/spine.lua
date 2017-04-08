@@ -29,65 +29,123 @@
 -------------------------------------------------------------------------------
 
 spine = {}
+local spine = spine
 
-spine.utils = require "spine-lua.utils"
-spine.SkeletonJson = require "spine-lua.SkeletonJson"
-spine.SkeletonData = require "spine-lua.SkeletonData"
-spine.BoneData = require "spine-lua.BoneData"
-spine.SlotData = require "spine-lua.SlotData"
-spine.IkConstraintData = require "spine-lua.IkConstraintData"
-spine.Skin = require "spine-lua.Skin"
-spine.Attachment = require "spine-lua.attachments.Attachment"
-spine.BoundingBoxAttachment = require "spine-lua.attachments.BoundingBoxAttachment"
-spine.RegionAttachment = require "spine-lua.attachments.RegionAttachment"
-spine.MeshAttachment = require "spine-lua.attachments.MeshAttachment"
-spine.VertexAttachment = require "spine-lua.attachments.VertexAttachment"
-spine.PathAttachment = require "spine-lua.attachments.PathAttachment"
-spine.Skeleton = require "spine-lua.Skeleton"
-spine.Bone = require "spine-lua.Bone"
-spine.Slot = require "spine-lua.Slot"
-spine.IkConstraint = require "spine-lua.IkConstraint"
-spine.AttachmentType = require "spine-lua.attachments.AttachmentType"
-spine.AttachmentLoader = require "spine-lua.AttachmentLoader"
-spine.Animation = require "spine-lua.Animation"
-spine.AnimationStateData = require "spine-lua.AnimationStateData"
-spine.AnimationState = require "spine-lua.AnimationState"
-spine.EventData = require "spine-lua.EventData"
-spine.Event = require "spine-lua.Event"
-spine.SkeletonBounds = require "spine-lua.SkeletonBounds"
-spine.BlendMode = require "spine-lua.BlendMode"
-spine.TextureAtlas = require "spine-lua.TextureAtlas"
-spine.TextureRegion = require "spine-lua.TextureRegion"
-spine.TextureAtlasRegion = require "spine-lua.TextureAtlasRegion"
-spine.AtlasAttachmentLoader = require "spine-lua.AtlasAttachmentLoader"
-spine.Color = require "spine-lua.Color"
+local spine_utils 					= require "spine-lua.utils"
+spine.utils 						= spine_utils
+local spine_SkeletonJson 			= require "spine-lua.SkeletonJson"
+spine.SkeletonJson 					= spine_SkeletonJson
+local spine_SkeletonData 			= require "spine-lua.SkeletonData"
+spine.SkeletonData 					= spine_SkeletonData
+local spine_BoneData 				= require "spine-lua.BoneData"
+spine.BoneData 						= spine_BoneData
+local spine_SlotData 				= require "spine-lua.SlotData"
+spine.SlotData 						= spine_SlotData
+local spine_IkConstraintData 		= require "spine-lua.IkConstraintData"
+spine.IkConstraintData 				= spine_IkConstraintData
+local spine_Skin 					= require "spine-lua.Skin"
+spine.Skin 							= spine_Skin
+local spine_Attachment 				= require "spine-lua.attachments.Attachment"
+spine.Attachment 					= spine_Attachment
+local spine_BoundingBoxAttachment 	= require "spine-lua.attachments.BoundingBoxAttachment"
+spine.BoundingBoxAttachment 		= spine_BoundingBoxAttachment
+local spine_RegionAttachment 		= require "spine-lua.attachments.RegionAttachment"
+spine.RegionAttachment 				= spine_RegionAttachment
+local spine_MeshAttachment 			= require "spine-lua.attachments.MeshAttachment"
+spine.MeshAttachment 				= spine_MeshAttachment
+local spine_VertexAttachment 		= require "spine-lua.attachments.VertexAttachment"
+spine.VertexAttachment 				= spine_VertexAttachment
+local spine_PathAttachment 			= require "spine-lua.attachments.PathAttachment"
+spine.PathAttachment 				= spine_PathAttachment
+local spine_Skeleton 				= require "spine-lua.Skeleton"
+spine.Skeleton 						= spine_Skeleton
+local spine_Bone 					= require "spine-lua.Bone"
+spine.Bone 							= spine_Bone
+local spine_Slot 					= require "spine-lua.Slot"
+spine.Slot 							= spine_Slot
+local spine_IkConstraint 			= require "spine-lua.IkConstraint"
+spine.IkConstraint 					= spine_IkConstraint
+local spine_AttachmentType 			= require "spine-lua.attachments.AttachmentType"
+spine.AttachmentType 				= spine_AttachmentType
+local spine_AttachmentLoader 		= require "spine-lua.AttachmentLoader"
+spine.AttachmentLoader 				= spine_AttachmentLoader
+local spine_Animation 				= require "spine-lua.Animation"
+spine.Animation 					= spine_Animation
+local spine_AnimationStateData 		= require "spine-lua.AnimationStateData"
+spine.AnimationStateData 			= spine_AnimationStateData
+local spine_AnimationState 			= require "spine-lua.AnimationState"
+spine.AnimationState 				= spine_AnimationState
+local spine_EventData 				= require "spine-lua.EventData"
+spine.EventData 					= spine_EventData
+local spine_Event 					= require "spine-lua.Event"
+spine.Event 						= spine_Event
+local spine_SkeletonBounds 			= require "spine-lua.SkeletonBounds"
+spine.SkeletonBounds 				= spine_SkeletonBounds
+local spine_BlendMode 				= require "spine-lua.BlendMode"
+spine.BlendMode 					= spine_BlendMode
+local spine_TextureAtlas 			= require "spine-lua.TextureAtlas"
+spine.TextureAtlas 					= spine_TextureAtlas
+local spine_TextureRegion 			= require "spine-lua.TextureRegion"
+spine.TextureRegion 				= spine_TextureRegion
+local spine_TextureAtlasRegion 		= require "spine-lua.TextureAtlasRegion"
+spine.TextureAtlasRegion 			= spine_TextureAtlasRegion
+local spine_AtlasAttachmentLoader 	= require "spine-lua.AtlasAttachmentLoader"
+spine.AtlasAttachmentLoader 		= spine_AtlasAttachmentLoader
+local spine_Color 					= require "spine-lua.Color"
+spine.Color 						= spine_Color
 
-spine.utils.readFile = function (fileName, base)
-	if not base then base = system.ResourceDirectory end
-	local path = system.pathForFile(fileName, base)
-	local file = io.open(path, "r")
+local spine_AttachmentType_region 		= spine_AttachmentType.region
+local spine_AttachmentType_mesh 		= spine_AttachmentType.mesh
+
+
+local json = require "json"
+
+--localizing functions
+local system_ResourceDirectory 	= system.ResourceDirectory
+local system_pathForFile 		= system.pathForFile
+local io_open 					= io.open
+local io_close 					= io.close
+local json_decode 				= json.decode
+local display_newGroup 			= display.newGroup
+local display_newMesh			= display.newMesh
+
+
+local coronaBlendModes = {
+	[0] = "normal",
+	[1] = "add",
+	[2] = "multiply",
+	[3] = "screen",
+}
+
+
+spine_utils.readFile = function (fileName, base)
+	if not base then base = system_ResourceDirectory end
+	local path = system_pathForFile(fileName, base)
+	local file = io_open(path, "r")
 	if not file then return nil end
 	local contents = file:read("*a")
-	io.close(file)
+	io_close(file)
 	return contents
 end
 
-local json = require "json"
-spine.utils.readJSON = function (text)
-	return json.decode(text)
+spine_utils.readJSON = function (text)
+	return json_decode(text)
 end
 
 local QUAD_TRIANGLES = { 1, 2, 3, 3, 4, 1 }
-spine.Skeleton.new_super = spine.Skeleton.new
-spine.Skeleton.updateWorldTransform_super = spine.Skeleton.updateWorldTransform
-spine.Skeleton.new = function(skeletonData, group)
-	self = spine.Skeleton.new_super(skeletonData)
-	self.group = group or display.newGroup()
+local spine_Skeleton_new_super = spine_Skeleton.new
+spine_Skeleton.new_super = spine_Skeleton_new_super
+spine_Skeleton.updateWorldTransform_super = spine_Skeleton.updateWorldTransform
+
+spine_Skeleton.new = function(skeletonData, group)
+	self = spine_Skeleton_new_super(skeletonData)
+	self.group = group or display_newGroup()
 	self.drawingGroup = nil
 	self.premultipliedAlpha = false
 	self.batches = 0
 	return self
 end
+
 
 local function colorEquals(color1, color2)
 	if not color1 and not color2 then return true end
@@ -96,58 +154,52 @@ local function colorEquals(color1, color2)
 	return color1[1] == color2[1] and color1[2] == color2[2] and color1[3] == color2[3] and color1[4] == color2[4]
 end
 
-local function toCoronaBlendMode(blendMode)
-	if blendMode == spine.BlendMode.normal then
-		return "normal"
-	elseif blendMode == spine.BlendMode.additive then
-		return "add"
-	elseif blendMode == spine.BlendMode.multiply then
-		return "multiply"
-	elseif blendMode == spine.BlendMode.screen then
-		return "screen"
-	end
-end
 
-function spine.Skeleton:updateWorldTransform()
-	spine.Skeleton.updateWorldTransform_super(self)
+function spine_Skeleton:updateWorldTransform()
+	spine_Skeleton.updateWorldTransform_super(self)
 	local premultipliedAlpha = self.premultipliedAlpha
 
 	self.batches = 0
 
 	-- Remove old drawing group, we will start anew
 	if self.drawingGroup then self.drawingGroup:removeSelf() end
-	local drawingGroup = display.newGroup()
+	local drawingGroup = display_newGroup()
 	self.drawingGroup = drawingGroup
 	self.group:insert(drawingGroup)
 
-	local drawOrder = self.drawOrder
-	local currentGroup = nil
+	local drawOrder 	= self.drawOrder
+	local currentGroup 	= nil
 	local groupVertices = {}
-	local groupIndices = {}
-	local groupUvs = {}
-	local color = nil
-	local lastColor = nil
-	local texture = nil
-	local lastTexture = nil
-	local blendMode = nil
+	local groupIndices 	= {}
+	local groupUvs 		= {}
+	local color 		= nil
+	local lastColor 	= nil
+	local texture 		= nil
+	local lastTexture 	= nil
+	local blendMode 	= nil
 	local lastBlendMode = nil
-	for i,slot in ipairs(drawOrder) do
-		local attachment = slot.attachment
-		local vertices = nil
-		local indices = nil
+
+	for i=1, #drawOrder do
+		local slot = drawOrder[i]
+		local attachment 	= slot.attachment
+		local vertices 		= nil
+		local indices 		= nil
+
 		if attachment then
-			if attachment.type == spine.AttachmentType.region then
-				vertices = attachment:updateWorldVertices(slot, premultipliedAlpha)
-				indices = QUAD_TRIANGLES
-				texture = attachment.region.renderObject.texture
-				color = { vertices[5], vertices[6], vertices[7], vertices[8]}
-				blendMode = toCoronaBlendMode(slot.data.blendMode)
-			elseif attachment.type == spine.AttachmentType.mesh then
-				vertices = attachment:updateWorldVertices(slot, premultipliedAlpha)
-				indices = attachment.triangles
-				texture = attachment.region.renderObject.texture
-				color = { vertices[5], vertices[6], vertices[7], vertices[8] }
-				blendMode = toCoronaBlendMode(slot.data.blendMode)
+			local attachment_type = attachment.type
+			if attachment_type == spine_AttachmentType_region then
+				vertices 	= attachment:updateWorldVertices(slot, premultipliedAlpha)
+				indices 	= QUAD_TRIANGLES
+				texture 	= attachment.region.renderObject.texture
+				color 		= { vertices[5], vertices[6], vertices[7], vertices[8]}
+				blendMode 	= coronaBlendModes[slot.data.blendMode]
+
+			elseif attachment_type == spine_AttachmentType_mesh then
+				vertices 	= attachment:updateWorldVertices(slot, premultipliedAlpha)
+				indices 	= attachment.triangles
+				texture 	= attachment.region.renderObject.texture
+				color 		= { vertices[5], vertices[6], vertices[7], vertices[8] }
+				blendMode 	= coronaBlendModes[slot.data.blendMode]
 			end
 
 			if texture and vertices and indices then
@@ -175,12 +227,12 @@ function spine.Skeleton:updateWorldTransform()
 	end
 end
 
-function spine.Skeleton:flush(groupVertices, groupUvs, groupIndices, texture, color, blendMode, drawingGroup)
-	mesh = display.newMesh(drawingGroup, 0, 0, {
-			mode = "indexed",
-			vertices = groupVertices,
-			uvs = groupUvs,
-			indices = groupIndices
+function spine_Skeleton:flush(groupVertices, groupUvs, groupIndices, texture, color, blendMode, drawingGroup)
+	mesh = display_newMesh(drawingGroup, 0, 0, {
+			mode 		= "indexed",
+			vertices 	= groupVertices,
+			uvs 		= groupUvs,
+			indices 	= groupIndices
 	})
 	mesh.fill = texture
 	mesh:setFillColor(color[1], color[2], color[3])
@@ -190,7 +242,7 @@ function spine.Skeleton:flush(groupVertices, groupUvs, groupIndices, texture, co
 	self.batches = self.batches + 1
 end
 
-function spine.Skeleton:batch(vertices, indices, groupVertices, groupUvs, groupIndices)
+function spine_Skeleton:batch(vertices, indices, groupVertices, groupUvs, groupIndices)
 	local numIndices = #indices
 	local i = 1
 	local indexStart = #groupIndices + 1

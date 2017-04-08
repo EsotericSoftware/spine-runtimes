@@ -28,6 +28,14 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
+local TransformMode = require "spine-lua.TransformMode"
+
+local TransformMode_normal = TransformMode.normal
+local TransformMode_onlyTranslation = TransformMode.onlyTranslation
+local TransformMode_noRotationOrReflection = TransformMode.noRotationOrReflection
+local TransformMode_noScale = TransformMode.noScale
+local TransformMode_noScaleOrReflection = TransformMode.noScaleOrReflection
+
 local setmetatable = setmetatable
 local math_rad = math.rad
 local math_deg = math.deg
@@ -37,8 +45,6 @@ local math_atan2 = math.atan2
 local math_sqrt = math.sqrt
 local math_abs = math.abs
 local math_pi = math.pi
-
-local TransformMode = require "spine-lua.TransformMode"
 
 function math.sign(x)
 	if x<0 then
@@ -133,7 +139,7 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 	self.worldY = pc * x + pd * y + parent.worldY
 
 	local transformMode = self.data.transformMode
-	if transformMode == TransformMode.normal then
+	if transformMode == TransformMode_normal then
 		local rotationY = rotation + 90 + shearY
 		local la = math_cos(math_rad(rotation + shearX)) * scaleX
 		local lb = math_cos(math_rad(rotationY)) * scaleY
@@ -144,13 +150,13 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		self.c = pc * la + pd * lc
 		self.d = pc * lb + pd * ld
 		return;
-	elseif transformMode == TransformMode.onlyTranslation then
+	elseif transformMode == TransformMode_onlyTranslation then
 		local rotationY = rotation + 90 + shearY
 		self.a = math_cos(math_rad(rotation + shearX)) * scaleX
 		self.b = math_cos(math_rad(rotationY)) * scaleY
 		self.c = math_sin(math_rad(rotation + shearX)) * scaleX
 		self.d = math_sin(math_rad(rotationY)) * scaleY
-	elseif transformMode == TransformMode.noRotationOrReflection then
+	elseif transformMode == TransformMode_noRotationOrReflection then
 		local s = pa * pa + pc * pc
 		local prx = 0
 		if s > 0.0001 then
@@ -173,7 +179,7 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		self.b = pa * lb - pb * ld
 		self.c = pc * la + pd * lc
 		self.d = pc * lb + pd * ld	
-	elseif transformMode == TransformMode.noScale or transformMode == TransformMode.noScaleOrReflection then
+	elseif transformMode == TransformMode_noScale or transformMode == TransformMode_noScaleOrReflection then
 		local cos = math_cos(math_rad(rotation))
 		local sin = math_sin(math_rad(rotation))
 		local za = pa * cos + pb * sin
@@ -195,7 +201,7 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		self.c = zc * la + zd * lc
 		self.d = zc * lb + zd * ld
 		local flip = self.skeleton.flipX ~= self.skeleton.flipY
-		if transformMode ~= TransformMode.noScaleOrReflection then flip = pa * pd - pb * pc < 0 end
+		if transformMode ~= TransformMode_noScaleOrReflection then flip = pa * pd - pb * pc < 0 end
 		if flip then
 			self.b = -self.b
 			self.d = -self.d

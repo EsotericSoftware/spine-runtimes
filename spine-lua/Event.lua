@@ -42,4 +42,5 @@ function Event.new (time, data)
 
 	return self
 end
+
 return Event

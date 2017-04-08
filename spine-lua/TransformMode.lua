@@ -35,4 +35,5 @@ local TransformMode = {
 	noScale = 3,
 	noScaleOrReflection = 4
 }
+
 return TransformMode

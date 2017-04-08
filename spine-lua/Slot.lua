@@ -28,9 +28,11 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-local setmetatable = setmetatable
-
 local Color = require "spine-lua.Color"
+
+local Color_newWith = Color.newWith
+
+local setmetatable = setmetatable
 
 local Slot = {}
 Slot.__index = Slot
@@ -42,7 +44,7 @@ function Slot.new (data, bone)
 	local self = {
 		data = data,
 		bone = bone,
-		color = Color.newWith(1, 1, 1, 1),
+		color = Color_newWith(1, 1, 1, 1),
 		attachment = nil,
 		attachmentTime = 0,
 		attachmentVertices = {},
@@ -76,8 +78,9 @@ function Slot:setToSetupPose ()
 	self.color:setFrom(data.color)
 
 	local attachment = nil
-	if data.attachmentName then
-		attachment = self.bone.skeleton:getAttachmentByIndex(data.index, data.attachmentName)
+	local attachmentName = data.attachmentName
+	if attachmentName then
+		attachment = self.bone.skeleton:getAttachmentByIndex(data.index, attachmentName)
 	end
 	self:setAttachment(attachment)
 end

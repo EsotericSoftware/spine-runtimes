@@ -43,4 +43,5 @@ function IkConstraintData.new (name)
 
 	return self
 end
+
 return IkConstraintData

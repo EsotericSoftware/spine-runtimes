@@ -32,16 +32,16 @@ local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local VertexAttachment = require "spine-lua.attachments.VertexAttachment"
 local Color = require "spine-lua.Color"
 
+local AttachmentType_boundingbox = AttachmentType.boundingbox
+
 local BoundingBoxAttachment = {}
-BoundingBoxAttachment.__index = BoundingBoxAttachment
-setmetatable(BoundingBoxAttachment, { __index = VertexAttachment })
 
 function BoundingBoxAttachment.new (name)
 	if not name then error("name cannot be nil", 2) end
 
-	local self = VertexAttachment.new(name, AttachmentType.boundingbox)
+	local self = VertexAttachment.new(name, AttachmentType_boundingbox)
 	self.color = Color.newWith(1, 1, 1, 1)
-	setmetatable(self, BoundingBoxAttachment)
+
 	return self
 end
 return BoundingBoxAttachment

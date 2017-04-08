@@ -28,6 +28,13 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
+local pairs = pairs
+local type = type
+local tostring = tostring
+local string_rep = string.rep
+local io_write = io.write
+
+
 local utils = {}
 
 utils.degRad = math.pi / 180
@@ -35,14 +42,14 @@ utils.degRad = math.pi / 180
 function tablePrint (tt, indent, done)
 	done = done or {}
 	for key, value in pairs(tt) do
-		local spaces = string.rep (" ", indent)
+		local spaces = string_rep (" ", indent)
 		if type(value) == "table" and not done [value] then
 			done [value] = true
 			print(spaces .. "{")
 			utils.print(value, indent + 2, done)
 			print(spaces .. "}")
 		else
-			io.write(spaces .. tostring(key) .. " = ")
+			io_write(spaces .. tostring(key) .. " = ")
 			utils.print(value, indent + 2, done)
 		end
 	end
@@ -53,7 +60,7 @@ function utils.print (value, indent, done)
 	if "nil" == type(value) then
 		print(tostring(nil))
 	elseif "table" == type(value) then
-		local spaces = string.rep (" ", indent)
+		local spaces = string_rep (" ", indent)
 		print(spaces .. "{")
 		tablePrint(value, indent + 2)
 		print(spaces .. "}")
@@ -129,23 +136,23 @@ function utils.clamp (value, min, max)
 end
 
 function utils.signum (value)
-  if value < 0 then
-    return -1
-  elseif value > 0 then
-    return 1
-  else
-    return 0
-  end
+	if value < 0 then
+		return -1
+	elseif value > 0 then
+		return 1
+	else
+		return 0
+	end
 end
 
 -- Implements Java float modulo
 function utils.mod(a, b)
-  if b < 0 then b = -b end
-  if a < 0 then
-    return -(-a % b)
-  else
-    return a % b
-  end
+	if b < 0 then b = -b end
+	if a < 0 then
+		return -(-a % b)
+	else
+		return a % b
+	end
 end
 
 return utils

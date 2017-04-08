@@ -31,11 +31,11 @@
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local utils = require "spine-lua.utils"
 
+local AttachmentType_boundingbox = AttachmentType.boundingbox
+
 local setmetatable = setmetatable
 local math_min = math.min
 local math_max = math.max
-local ipairs = ipairs
-local table_insert = table.insert
 
 local SkeletonBounds = {}
 SkeletonBounds.__index = SkeletonBounds
@@ -59,14 +59,15 @@ function SkeletonBounds:update (skeleton, updateAabb)
 	self.polygons = polygons
 	local slots = skeleton.slots
 
-	for i,slot in ipairs(skeleton.slots) do
+	for i=1, #slots do
+		local slots = slots[i]
 		local attachment = slot.attachment
-		if attachment and attachment.type == AttachmentType.boundingbox then
+		if attachment and attachment.type == AttachmentType_boundingbox then
 			local boundingBox = attachment
-			table_insert(boundingBoxes, boundingBox)
+			boundingBoxes[#boundingBoxes + 1] = boundingBox
 
 			local polygon = {}
-			table_insert(polygons, polygon)
+			polygons[#polygons + 1] = polygon
 
 			boundingBox:computeWorldVertices(slot, polygon)
 		end
@@ -85,7 +86,9 @@ end
 function SkeletonBounds:aabbCompute ()
 	local minX, minY, maxX, maxY = 9999999, 9999999, -9999999, -9999999
 	local polygons = self.polygons
-	for i,vertices in ipairs(polygons) do
+
+	for i=1, #polygons do
+		local vertices = polygons[i]
 		local count = #vertices
 		for ii = 1, count, 2 do
 			local x = vertices[ii]
@@ -128,15 +131,17 @@ function SkeletonBounds:aabbIntersectsSkeleton (bounds)
 end
 
 function SkeletonBounds:containsPoint (x, y)
-	for i,polygon in ipairs(self.polygons) do
-		if self:polygonContainsPoint(polygon, x, y) then return self.boundingBoxes[i] end
+	local polygons = self.polygons
+	for i=1, #polygons do
+		if self:polygonContainsPoint(polygons[i], x, y) then return self.boundingBoxes[i] end
 	end
 	return nil
 end
 
 function SkeletonBounds:intersectsSegment (x1, y1, x2, y2)
-	for i,polygon in ipairs(self.polygons) do
-		if self:polygonIntersectsSegment(polygon, x1, y1, x2, y2) then return self.boundingBoxes[i] end
+	local polygons = self.polygons
+	for i=1, #polygons do
+		if self:polygonIntersectsSegment(polygons[i], x1, y1, x2, y2) then return self.boundingBoxes[i] end
 	end
 	return nil
 end

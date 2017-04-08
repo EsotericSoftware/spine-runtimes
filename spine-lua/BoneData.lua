@@ -28,8 +28,10 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-local setmetatable = setmetatable
 local TransformMode = require "spine-lua.TransformMode"
+local TransformMode_normal = TransformMode.normal
+
+local setmetatable = setmetatable
 
 local BoneData = {}
 function BoneData.new (index, name, parent)
@@ -39,7 +41,7 @@ function BoneData.new (index, name, parent)
 	local self = {
 		index = index,
 		name = name,
-		transformMode = TransformMode.normal,
+		transformMode = TransformMode_normal,
 		parent = parent,
 		length = 0,
 		x = 0, y = 0,
