@@ -28,14 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 package spine.animation {
-	import spine.MathUtils;
 	import spine.Bone;
-	import spine.Pool;
-
-	import flash.utils.Dictionary;
-
 	import spine.Event;
+	import spine.MathUtils;
+	import spine.Pool;
 	import spine.Skeleton;
+	import flash.utils.Dictionary;
 
 	public class AnimationState {
 		internal static var emptyAnimation : Animation = new Animation("<empty>", new Vector.<Timeline>(), 0);
@@ -365,24 +363,22 @@ package spine.animation {
 
 				var mixingFrom : TrackEntry = from.mixingFrom;
 				if (mixingFrom != null && from.mixDuration > 0) {
-					// A mix was interrupted, mix from the closest animation.
-					if (!multipleMixing && from.mixTime / from.mixDuration < 0.5 && mixingFrom.animation != AnimationState.emptyAnimation) {
-						current.mixingFrom = mixingFrom;
-						mixingFrom.mixingFrom = from;
-						mixingFrom.mixTime = from.mixDuration - from.mixTime;
-						mixingFrom.mixDuration = from.mixDuration;
-						from.mixingFrom = null;
-						from = mixingFrom;
-					}
-	
-					// The interrupted mix will mix out from its current percentage to zero.
-					current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
-	
-					// End the other animation after it is applied one last time.
-					if (!multipleMixing) {
+					if (multipleMixing) {
+						current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
+					} else {
+						// A mix was interrupted, mix from the closest animation.
+						if (from.mixTime / from.mixDuration < 0.5 && mixingFrom.animation != AnimationState.emptyAnimation) {
+							current.mixingFrom = mixingFrom;
+							mixingFrom.mixingFrom = from;
+							mixingFrom.mixTime = from.mixDuration - from.mixTime;
+							mixingFrom.mixDuration = from.mixDuration;
+							from.mixingFrom = null;
+							from = mixingFrom;
+						}
+						
 						from.mixAlpha = 0;
 						from.mixTime = 0;
-						from.mixDuration = 0;
+						from.mixDuration = 0;					
 					}
 				}
 
@@ -551,9 +547,7 @@ package spine.animation {
 			if (multipleMixing) return;
 
 			// Set timelinesLast for mixingFrom entries, from highest track to lowest that has mixingFrom.
-			for (var key2 : String in propertyIDs) {
-				delete propertyIDs[key2];
-			}
+			propertyIDs = this.propertyIDs = new Dictionary();
 			var lowestMixingFrom : int = n;
 			for (i = 0; i < n; i++) { // Find lowest track with a mixingFrom entry.
 				entry = tracks[i];
@@ -567,9 +561,8 @@ package spine.animation {
 	
 				// Store properties for non-mixingFrom entry but don't set timelinesLast, which is only used for mixingFrom entries.
 				var timelines : Vector.<Timeline> = entry.animation.timelines;
-				for (var ii : int = 0, nn : int = entry.animation.timelines.length; ii < nn; ii++)
-					var id : String = timelines[ii].getPropertyId().toString();
-					propertyIDs[id] = id;
+				for (var ii : int = 0, nn : int = entry.animation.timelines.length; ii < nn; ii++)					
+					propertyIDs[timelines[ii].getPropertyId().toString()] = true;				
 	
 				entry = entry.mixingFrom;
 				while (entry != null) {
@@ -590,9 +583,8 @@ package spine.animation {
 			var n : int = timelines.length;
 			var usage : Vector.<Boolean> = entry.timelinesFirst;
 			usage.length = n;
-			for (var i : int = 0; i < n; i++) {
-				var id : String = timelines[i].getPropertyId().toString();
-				propertyIDs[id] = id;
+			for (var i : int = 0; i < n; i++) {				
+				propertyIDs[timelines[i].getPropertyId().toString()] = true;
 				usage[i] = true;
 			}
 		}
@@ -611,7 +603,7 @@ package spine.animation {
 			for (var i : int = 0; i < n; i++) {
 				var id : String = timelines[i].getPropertyId().toString();
 				usage[i] = !propertyIDs.hasOwnProperty(id);
-				propertyIDs[id] = id;
+				propertyIDs[id] = true;
 			}
 		}
 
