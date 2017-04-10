@@ -144,7 +144,7 @@ package spine.animation {
 				var mix : Number = current.alpha;
 				if (current.mixingFrom != null)
 					mix *= applyMixingFrom(current, skeleton);
-				else if (current.trackTime >= current.trackEnd)
+				else if (current.trackTime >= current.trackEnd && current.next == null)
 					mix = 0;
 
 				// Apply current entry.
