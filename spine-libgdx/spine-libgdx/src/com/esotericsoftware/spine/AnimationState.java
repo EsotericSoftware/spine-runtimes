@@ -108,14 +108,12 @@ public class AnimationState {
 					}
 					continue;
 				}
-			} else {
+			} else if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
 				// Clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom.
-				if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
-					tracks.set(i, null);
-					queue.end(current);
-					disposeNext(current);
-					continue;
-				}
+				tracks.set(i, null);
+				queue.end(current);
+				disposeNext(current);
+				continue;
 			}
 			updateMixingFrom(current, delta);
 
@@ -159,7 +157,7 @@ public class AnimationState {
 			float mix = current.alpha;
 			if (current.mixingFrom != null)
 				mix *= applyMixingFrom(current, skeleton);
-			else if (current.trackTime >= current.trackEnd) //
+			else if (current.trackTime >= current.trackEnd && current.next == null) //
 				mix = 0; // Set to setup pose the last time the entry will be applied.
 
 			// Apply current entry.
