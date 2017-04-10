@@ -327,7 +327,7 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 		mix = current->alpha;
 		if (current->mixingFrom)
             mix *= _spAnimationState_applyMixingFrom(self, current, skeleton);
-        else if (current->trackTime >= current->trackEnd)
+        else if (current->trackTime >= current->trackEnd && current->next == 0)
             mix = 0;
 
 		/* Apply current entry. */

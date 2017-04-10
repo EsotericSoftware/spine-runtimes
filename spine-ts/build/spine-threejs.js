@@ -1080,13 +1080,11 @@ var spine;
 						continue;
 					}
 				}
-				else {
-					if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
-						tracks[i] = null;
-						this.queue.end(current);
-						this.disposeNext(current);
-						continue;
-					}
+				else if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
+					tracks[i] = null;
+					this.queue.end(current);
+					this.disposeNext(current);
+					continue;
 				}
 				this.updateMixingFrom(current, delta);
 				current.trackTime += currentDelta;
@@ -1122,7 +1120,7 @@ var spine;
 				var mix = current.alpha;
 				if (current.mixingFrom != null)
 					mix *= this.applyMixingFrom(current, skeleton);
-				else if (current.trackTime >= current.trackEnd)
+				else if (current.trackTime >= current.trackEnd && current.next == null)
 					mix = 0;
 				var animationLast = current.animationLast, animationTime = current.getAnimationTime();
 				var timelineCount = current.animation.timelines.length;
