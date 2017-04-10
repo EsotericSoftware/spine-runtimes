@@ -303,10 +303,10 @@ function AnimationState:apply (skeleton)
 			-- Apply mixing from entries first.
 			local mix = current.alpha
 			if current.mixingFrom then 
-        mix = mix * self:applyMixingFrom(current, skeleton)
-      elseif current.trackTime >= current.trackEnd then
-        mix = 0
-      end
+              mix = mix * self:applyMixingFrom(current, skeleton)
+            elseif current.trackTime >= current.trackEnd and current.next == nil then
+              mix = 0
+            end
 
 			-- Apply current entry.
 			local animationLast = current.animationLast
