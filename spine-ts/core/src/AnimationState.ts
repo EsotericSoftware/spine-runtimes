@@ -82,14 +82,11 @@ module spine {
 						}
 						continue;
 					}
-				} else {
-					// Clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom.
-					if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
-						tracks[i] = null;
-						this.queue.end(current);
-						this.disposeNext(current);
-						continue;
-					}
+				} else if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
+					tracks[i] = null;
+					this.queue.end(current);
+					this.disposeNext(current);
+					continue;
 				}
 				this.updateMixingFrom(current, delta);
 
@@ -132,7 +129,7 @@ module spine {
 				let mix = current.alpha;
 				if (current.mixingFrom != null)
 					mix *= this.applyMixingFrom(current, skeleton);
-				else if (current.trackTime >= current.trackEnd)
+				else if (current.trackTime >= current.trackEnd && current.next == null)
 					mix = 0;
 
 				// Apply current entry.
