@@ -105,7 +105,7 @@ module spine {
 
 			this.updateMixingFrom(from, delta);
 
-			if (entry.mixTime >= entry.mixDuration && from.mixingFrom != null && entry.mixTime > 0) {
+			if (entry.mixTime >= entry.mixDuration && from.mixingFrom == null && entry.mixTime > 0) {
 				entry.mixingFrom = null;
 				this.queue.end(from);
 				return;
@@ -354,21 +354,21 @@ module spine {
 
 				let mixingFrom = from.mixingFrom;
 				if (mixingFrom != null && from.mixDuration > 0) {
-					// A mix was interrupted, mix from the closest animation.
-					if (!this.multipleMixing && from.mixTime / from.mixDuration < 0.5 && mixingFrom.animation != AnimationState.emptyAnimation) {
-						current.mixingFrom = mixingFrom;
-						mixingFrom.mixingFrom = from;
-						mixingFrom.mixTime = from.mixDuration - from.mixTime;
-						mixingFrom.mixDuration = from.mixDuration;
-						from.mixingFrom = null;
-						from = mixingFrom;
-					}
+					if (this.multipleMixing) {
+						// The interrupted mix will mix out from its current percentage to zero.
+						current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
+					} else {
+						// A mix was interrupted, mix from the closest animation.
+						if (from.mixTime / from.mixDuration < 0.5 && mixingFrom.animation != AnimationState.emptyAnimation) {
+							current.mixingFrom = mixingFrom;
+							mixingFrom.mixingFrom = from;
+							mixingFrom.mixTime = from.mixDuration - from.mixTime;
+							mixingFrom.mixDuration = from.mixDuration;
+							from.mixingFrom = null;
+							from = mixingFrom;
+						}
 
-					// The interrupted mix will mix out from its current percentage to zero.
-					current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
-
-					// End the other animation after it is applied one last time.
-					if (!this.multipleMixing) {
+						// End the other animation after it is applied one last time.
 						from.mixAlpha = 0;
 						from.mixTime = 0;
 						from.mixDuration = 0;
