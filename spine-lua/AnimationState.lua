@@ -371,7 +371,7 @@ function AnimationState:applyMixingFrom (entry, skeleton)
 	for i,timeline in ipairs(timelines) do
 		local setupPose = timelinesFirst[i]
 		local alpha = 1;
-		if (timelinesLast ~= nil and setupPose and not timlinesLast[i]) then
+		if (timelinesLast ~= nil and setupPose and not timelinesLast[i]) then
 			alpha = alphaBase
 		else
 			alpha = alphaMix
@@ -396,7 +396,10 @@ function AnimationState:applyMixingFrom (entry, skeleton)
 end
 
 function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, setupPose, timelinesRotation, i, firstFrame)
-	if firstFrame then timelinesRotation[i] = 0 end
+	if firstFrame then 
+		timelinesRotation[i] = 0
+		timelinesRotation[i+1] = 0
+	end
 	
   if alpha == 1 then
     timeline:apply(skeleton, 0, time, nil, 1, setupPose, false)
@@ -554,18 +557,18 @@ function AnimationState:setCurrent (index, current, interrupt)
 		
 		local mixingFrom = from.mixingFrom
 		if (mixingFrom ~= nil and from.mixDuration > 0) then
-			if (not self.multipleMixing and from.mixTime / from.mixDuration < 0.5 and mixingFrom.animation ~= EMPTY_ANIMATION) then
-				current.mixingFrom = mixingFrom
-				mixingFrom.mixingFrom = from
-				mixingFrom.mixTime = from.mixDuration - from.mixTime
-				mixingFrom.mixDuration = from.mixDuration
-				from.mixingFrom = nil
-				from = mixingFrom
-			end
+			if (self.multipleMixing) then
+				current.mixAlpha = current.mixAlpha * math_min(from.mixTime / from.mixDuration, 1)
+			else
+				if (from.mixTime / from.mixDuration < 0.5 and mixingFrom.animation ~= EMPTY_ANIMATION) then
+					current.mixingFrom = mixingFrom
+					mixingFrom.mixingFrom = from
+					mixingFrom.mixTime = from.mixDuration - from.mixTime
+					mixingFrom.mixDuration = from.mixDuration
+					from.mixingFrom = nil
+					from = mixingFrom
+				end
 
-			current.mixAlpha = current.mixAlpha * math_min(from.mixTime / from.mixDuration, 1)
-
-			if (not self.multipleMixing) then
 				from.mixAlpha = 0;
 				from.mixTime = 0;
 				from.mixDuration = 0;

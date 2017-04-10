@@ -1522,7 +1522,7 @@ var spine;
 			if (from == null)
 				return;
 			this.updateMixingFrom(from, delta);
-			if (entry.mixTime >= entry.mixDuration && from.mixingFrom != null && entry.mixTime > 0) {
+			if (entry.mixTime >= entry.mixDuration && from.mixingFrom == null && entry.mixTime > 0) {
 				entry.mixingFrom = null;
 				this.queue.end(from);
 				return;
@@ -1748,16 +1748,18 @@ var spine;
 				current.mixTime = 0;
 				var mixingFrom = from.mixingFrom;
 				if (mixingFrom != null && from.mixDuration > 0) {
-					if (!this.multipleMixing && from.mixTime / from.mixDuration < 0.5 && mixingFrom.animation != AnimationState.emptyAnimation) {
-						current.mixingFrom = mixingFrom;
-						mixingFrom.mixingFrom = from;
-						mixingFrom.mixTime = from.mixDuration - from.mixTime;
-						mixingFrom.mixDuration = from.mixDuration;
-						from.mixingFrom = null;
-						from = mixingFrom;
+					if (this.multipleMixing) {
+						current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
 					}
-					current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
-					if (!this.multipleMixing) {
+					else {
+						if (from.mixTime / from.mixDuration < 0.5 && mixingFrom.animation != AnimationState.emptyAnimation) {
+							current.mixingFrom = mixingFrom;
+							mixingFrom.mixingFrom = from;
+							mixingFrom.mixTime = from.mixDuration - from.mixTime;
+							mixingFrom.mixDuration = from.mixDuration;
+							from.mixingFrom = null;
+							from = mixingFrom;
+						}
 						from.mixAlpha = 0;
 						from.mixTime = 0;
 						from.mixDuration = 0;

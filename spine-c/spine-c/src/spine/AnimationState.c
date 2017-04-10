@@ -591,17 +591,18 @@ void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEnt
 
 		mixingFrom = from->mixingFrom;
 		if (mixingFrom != 0 && from->mixDuration > 0) {
-			if (self->multipleMixing && from->mixTime / from->mixDuration < 0.5 && mixingFrom->animation != SP_EMPTY_ANIMATION) {
-				current->mixingFrom = mixingFrom;
-				mixingFrom->mixingFrom = from;
-				mixingFrom->mixTime = from->mixDuration - from->mixTime;
-				mixingFrom->mixDuration = from->mixDuration;
-				from->mixingFrom = 0;
-				from = mixingFrom;
-			}
-
-			current->mixAlpha *= MIN(from->mixTime / from->mixDuration, 1);
-			if (!self->multipleMixing) {
+			if (self->multipleMixing) {
+				current->mixAlpha *= MIN(from->mixTime / from->mixDuration, 1);
+			} else {
+				if (from->mixTime / from->mixDuration < 0.5 && mixingFrom->animation != SP_EMPTY_ANIMATION) {
+					current->mixingFrom = mixingFrom;
+					mixingFrom->mixingFrom = from;
+					mixingFrom->mixTime = from->mixDuration - from->mixTime;
+					mixingFrom->mixDuration = from->mixDuration;
+					from->mixingFrom = 0;
+					from = mixingFrom;
+				}
+				
 				from->mixAlpha = 0;
 				from->mixTime = 0;
 				from->mixDuration = 0;

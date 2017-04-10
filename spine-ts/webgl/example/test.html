@@ -12,6 +12,10 @@
 </body>
 <script>
 
+var FILE = "spineboy ikfeet";
+var NUM_SKELETONS = 1;
+var SCALE = 0.6;
+
 var canvas, gl, renderer, input, assetManager;
 var skeletons = [];
 var timeKeeper;
@@ -28,9 +32,11 @@ function init() {
 	assetManager = new spine.webgl.AssetManager(gl, "assets/");
 	var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
 	input = new spine.webgl.Input(canvas);
-	assetManager.loadTexture("spineboy.png");
-	assetManager.loadText("spineboy.atlas");
-	assetManager.loadText("spineboy.json");
+
+	assetManager.loadTexture(FILE + ".png");
+	assetManager.loadText(FILE + ".atlas");
+	assetManager.loadText(FILE + ".json");
+
 	timeKeeper = new spine.TimeKeeper();
 	requestAnimationFrame(load);
 }
@@ -38,19 +44,31 @@ function init() {
 function load() {
 	timeKeeper.update();
 	if (assetManager.isLoadingComplete()) {
-		var atlas = new spine.TextureAtlas(assetManager.get("spineboy.atlas"), function(path) {
+		var atlas = new spine.TextureAtlas(assetManager.get(FILE + ".atlas"), function(path) {
 			return assetManager.get(path);
 		});
 		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
-		skeletonJson.scale = 0.01;
-		var skeletonData = skeletonJson.readSkeletonData(JSON.parse(assetManager.get("spineboy.json")));
+		skeletonJson.scale = SCALE;
+		var skeletonData = skeletonJson.readSkeletonData(JSON.parse(assetManager.get(FILE + ".json")));
 
-		for (var i = 0; i < 1000; i++) {
+		for (var i = 0; i < NUM_SKELETONS; i++) {
 			skeleton = new spine.Skeleton(skeletonData);
 			var stateData = new spine.AnimationStateData(skeleton.data);
 			state = new spine.AnimationState(stateData);
-			state.setAnimation(0, "walk", true);
+
+			var mixDuration = 0.8;
+			var stableDuration = 2;
+			stateData.defaultMix = mixDuration;
+
+			state.multipleMixing = false;
+			state.setAnimation(0, "idle", true);
+			state.addAnimation(0, "run", true, stableDuration);
+			state.addAnimation(0, "idle", true, mixDuration * 0.35);
+			state.addAnimation(0, "run", true, stableDuration);
+			state.addAnimation(0, "idle", true, mixDuration * 0.75);
+			state.addAnimation(0, "run", true, stableDuration);
+			state.addAnimation(0, "idle", true, mixDuration * 2);
 			state.apply(skeleton);
 			skeleton.x = Math.random() * 200 - Math.random() * 200;
 			skeleton.y = Math.random() * 200 - Math.random() * 200;
