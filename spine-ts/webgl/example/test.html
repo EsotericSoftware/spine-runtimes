@@ -12,7 +12,7 @@
 </body>
 <script>
 
-var FILE = "spineboy";
+var FILE = "coin";
 var NUM_SKELETONS = 1;
 var SCALE = 0.6;
 
@@ -62,7 +62,7 @@ function load() {
 			stateData.defaultMix = mixDuration;
 
 			state.multipleMixing = false;
-			state.setAnimation(0, "idle", true);
+			state.setAnimation(0, "animation", true);
 			state.apply(skeleton);
 			skeleton.x = Math.random() * 200 - Math.random() * 200;
 			skeleton.y = Math.random() * 200 - Math.random() * 200;

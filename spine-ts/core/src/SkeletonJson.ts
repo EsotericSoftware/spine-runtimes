@@ -209,7 +209,7 @@ module spine {
 						if (slotIndex == -1) throw new Error("Slot not found: " + slotName);
 						let slotMap = skinMap[slotName];
 						for (let entryName in slotMap) {
-							let attachment = this.readAttachment(slotMap[entryName], skin, slotIndex, entryName);
+							let attachment = this.readAttachment(slotMap[entryName], skin, slotIndex, entryName, skeletonData);
 							if (attachment != null) skin.addAttachment(slotIndex, entryName, attachment);
 						}
 					}
@@ -253,7 +253,7 @@ module spine {
 			return skeletonData;
 		}
 
-		readAttachment (map: any, skin: Skin, slotIndex: number, name: string): Attachment {
+		readAttachment (map: any, skin: Skin, slotIndex: number, name: string, skeletonData: SkeletonData): Attachment {
 			let scale = this.scale;
 			name = this.getValue(map, "name", name);
 
@@ -341,6 +341,24 @@ module spine {
 					let color = this.getValue(map, "color", null);
 					if (color != null) point.color.setFromString(color);
 					return point;
+				}
+				case "clipping": {
+					let clip = this.attachmentLoader.newClippingAttachment(skin, name);
+					if (clip == null) return null;
+
+					let end = this.getValue(map, "end", null);
+					if (end != null) {
+						let slot = skeletonData.findSlot(end);
+						if (slot == null) throw new Error("Clipping end slot not found: " + end);
+						clip.endSlot = slot;
+					}
+
+					let vertexCount = map.vertexCount;
+					this.readVertices(map, clip, vertexCount << 1);
+
+					let color: string = this.getValue(map, "color", null);
+					if (color != null) clip.color.setFromString(color);
+					return clip;
 				}
 			}
 			return null;

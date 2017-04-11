@@ -29,49 +29,14 @@
  *****************************************************************************/
 
 module spine {
-	export class AtlasAttachmentLoader implements AttachmentLoader {
-		atlas: TextureAtlas;
+	export class ClippingAttachment extends VertexAttachment {
+		endSlot: SlotData;
 
-		constructor (atlas: TextureAtlas) {
-			this.atlas = atlas;
-		}
+		// Nonessential.
+		color = new spine.Color(0.2275, 0.2275, 0.8078, 1); // ce3a3aff
 
-		/** @return May be null to not load an attachment. */
-		newRegionAttachment (skin: Skin, name: string, path: string): RegionAttachment {
-			let region = this.atlas.findRegion(path);
-			if (region == null) throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
-			region.renderObject = region;
-			let attachment = new RegionAttachment(name);
-			attachment.setRegion(region);
-			return attachment;
-		}
-
-		/** @return May be null to not load an attachment. */
-		newMeshAttachment (skin: Skin, name: string, path: string) : MeshAttachment {
-			let region = this.atlas.findRegion(path);
-			if (region == null) throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
-			region.renderObject = region;
-			let attachment = new MeshAttachment(name);
-			attachment.region = region;
-			return attachment;
-		}
-
-		/** @return May be null to not load an attachment. */
-		newBoundingBoxAttachment (skin: Skin, name: string) : BoundingBoxAttachment {
-			return new BoundingBoxAttachment(name);
-		}
-
-		/** @return May be null to not load an attachment */
-		newPathAttachment (skin: Skin, name: string): PathAttachment {
-			return new PathAttachment(name);
-		}
-
-		newPointAttachment(skin: Skin, name: string): PointAttachment {
-			return new PointAttachment(name);
-		}
-
-		newClippingAttachment(skin: Skin, name: string): ClippingAttachment {
-			return new ClippingAttachment(name);
+		constructor (name: string) {
+			super(name);
 		}
 	}
 }
