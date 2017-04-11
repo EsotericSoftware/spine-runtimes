@@ -11,6 +11,7 @@ echo "Spine exe: $SPINE_EXE"
 
 echo "Cleaning..."
 rm -rf ../alien/export/*
+rm -rf ../coin/export/*
 rm -rf ../dragon/export/*
 rm -rf ../goblins/export/*
 rm -rf ../hero/export/*
@@ -32,6 +33,11 @@ echo "Exporting..."
 -i ../alien/alien.spine -o ../alien/export -e binary.json \
 -i ../alien/images -o ../alien/export -n alien -p atlas-0.5.json \
 -i ../alien/images -o ../alien/export -n alien-pma -p atlas-0.5-pma.json \
+\
+-i ../coin/coin-pro.spine -o ../coin/export -e json.json \
+-i ../coin/coin-pro.spine -o ../coin/export -e binary.json \
+-i ../coin/images -o ../coin/export -n coin -p atlas-0.5.json \
+-i ../coin/images -o ../coin/export -n coin-pma -p atlas-0.5-pma.json \
 \
 -i ../dragon/dragon.spine -o ../dragon/export -e json.json \
 -i ../dragon/dragon.spine -o ../dragon/export -e binary.json \
@@ -93,11 +99,6 @@ echo "Exporting..."
 -i ../tank/tank.spine -o ../tank/export -e binary.json \
 -i ../tank/images -o ../tank/export -n tank -p atlas-0.5.json \
 -i ../tank/images -o ../tank/export -n tank-pma -p atlas-0.5-pma.json \
-\
--i ../test/test.spine -o ../test/export -e json.json \
--i ../test/test.spine -o ../test/export -e binary.json \
--i ../test/images -o ../test/export -n test -p atlas-0.5.json \
--i ../test/images -o ../test/export -n test-pma -p atlas-0.5-pma.json \
 \
 -i ../vine/vine.spine -o ../vine/export -e json.json \
 -i ../vine/vine.spine -o ../vine/export -e binary.json \

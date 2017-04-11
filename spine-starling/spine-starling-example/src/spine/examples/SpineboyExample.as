@@ -29,6 +29,8 @@
  *****************************************************************************/
  
 package spine.examples {
+	import starling.display.DisplayObjectContainer;
+	import flash.display.DisplayObject;
 	import spine.animation.TrackEntry;
 	import spine.animation.AnimationStateData;
 	import spine.*;
@@ -53,7 +55,7 @@ package spine.examples {
 
 		[Embed(source = "/spineboy.png")]
 		static public const SpineboyAtlasTexture : Class;
-		private var skeleton : SkeletonAnimation;
+		private var skeleton : SkeletonAnimation;		
 
 		public function SpineboyExample() {
 			var spineAtlas : Atlas = new Atlas(new SpineboyAtlas(), new StarlingTextureLoader(new SpineboyAtlasTexture()));
@@ -104,8 +106,9 @@ package spine.examples {
 		private function onClick(event : TouchEvent) : void {
 			var touch : Touch = event.getTouch(this);
 			if (touch && touch.phase == TouchPhase.BEGAN) {
-				skeleton.state.setAnimationByName(0, "jump", false);
-				skeleton.state.addAnimationByName(0, "run", true, 0);
+				var parent: DisplayObjectContainer = this.parent;
+				this.removeFromParent(true);			
+				parent.addChild(new GoblinsExample());				
 			}
 		}
 	}

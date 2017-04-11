@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "B1t2zOgaLSulKMcmcm3oTMzI3qI", "spine": "3.6.12-beta", "width": 1914.53, "height": 964.05, "images": "./images/" },
+"skeleton": { "hash": "B1t2zOgaLSulKMcmcm3oTMzI3qI", "spine": "3.6.14-beta", "width": 1914.53, "height": 964.05, "images": "./images/" },
 "bones": [
 	{ "name": "root" },
 	{ "name": "tankRoot", "parent": "root", "y": 200 },

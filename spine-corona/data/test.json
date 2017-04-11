@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "64h+ct/Nr1wkBrgZHtYbbfXpBlI", "spine": "3.6.12-beta", "width": 1333.78, "height": 1112.91, "images": "./images/" },
+"skeleton": { "hash": "64h+ct/Nr1wkBrgZHtYbbfXpBlI", "spine": "3.6.14-beta", "width": 1333.78, "height": 1112.91, "images": "./images/" },
 "bones": [
 	{ "name": "root", "x": 28.68, "y": -105.71 },
 	{ "name": "attachment", "parent": "root", "x": -267.71, "y": -366.62 },

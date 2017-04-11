@@ -140,6 +140,8 @@ package spine.starling {
 										
 					attachmentColor = meshAttachment.color;
 					uvs = meshAttachment.uvs;					
+				} else {
+					continue;
 				}
 				
 				a = slot.color.a * attachmentColor.a;

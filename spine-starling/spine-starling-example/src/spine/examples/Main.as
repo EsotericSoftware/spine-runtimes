@@ -38,20 +38,11 @@ package spine.examples {
 		private var _starling : Starling;
 
 		public function Main() {
-			var example : Class;
-			example = SpineboyExample;
-			// example = GoblinsExample;
-			// example = RaptorExample;
-			// example = TankExample;
-			// example = VineExample;
-			// example = StretchymanExample;
-			// example = TwoColorExample;
-
-			_starling = new Starling(example, stage);
+			_starling = new Starling(SpineboyExample, stage);
 			_starling.enableErrorChecking = true;
 			_starling.showStats = true;
 			_starling.skipUnchangedFrames = false;
-			_starling.start();			
+			_starling.start();	
 		}
 	}
 }

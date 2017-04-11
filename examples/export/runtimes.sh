@@ -94,10 +94,6 @@ cp -f ../stretchyman/export/stretchyman.json ../../spine-corona/data
 cp -f ../stretchyman/export/stretchyman.atlas ../../spine-corona/data
 cp -f ../stretchyman/export/stretchyman.png ../../spine-corona/data
 
-cp -f ../test/export/test.json ../../spine-corona/data
-cp -f ../test/export/test.atlas ../../spine-corona/data
-cp -f ../test/export/test.png ../../spine-corona/data
-
 echo "spine-love"
 rm -f ../../spine-love/data/*
 cp -f ../goblins/export/goblins-mesh.json ../../spine-love/data
@@ -123,10 +119,6 @@ cp -f ../vine/export/vine.png ../../spine-love/data
 cp -f ../stretchyman/export/stretchyman.json ../../spine-love/data
 cp -f ../stretchyman/export/stretchyman.atlas ../../spine-love/data
 cp -f ../stretchyman/export/stretchyman.png ../../spine-love/data
-
-cp -f ../test/export/test.json ../../spine-love/data
-cp -f ../test/export/test.atlas ../../spine-love/data
-cp -f ../test/export/test.png ../../spine-love/data
 
 echo "spine-sfml"
 rm -f ../../spine-sfml/data/*
@@ -189,6 +181,10 @@ cp -f ../stretchyman/export/stretchyman.png ../../spine-starling/spine-starling-
 
 echo "spine-ts"
 rm -f ../../spine-ts/webgl/example/assets/*
+cp -f ../coin/export/coin.json ../../spine-ts-webgl/examples/assets/
+cp -f ../coin/export/coin.atlas ../../spine-ts-webgl/examples/assets/
+cp -f ../coin/export/coin.png ../../spine-ts-webgl/examples/assets/
+
 cp -f ../goblins/export/goblins-mesh.json ../../spine-ts/webgl/example/assets/
 cp -f ../goblins/export/goblins.atlas ../../spine-ts/webgl/example/assets/goblins-mesh.atlas
 cp -f ../goblins/export/goblins.png ../../spine-ts/webgl/example/assets/goblins.png

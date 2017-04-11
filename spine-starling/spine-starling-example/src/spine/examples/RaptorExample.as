@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 package spine.examples {
+	import starling.display.DisplayObjectContainer;
 	import spine.atlas.Atlas;
 	import spine.*;
 	import spine.attachments.AtlasAttachmentLoader;
@@ -53,6 +54,7 @@ package spine.examples {
 		static public const RaptorAtlasTexture : Class;
 		private var skeleton : SkeletonAnimation;
 		private var gunGrabbed : Boolean;
+		private var gunGrabCount : Number = 0;
 
 		public function RaptorExample() {
 			var attachmentLoader : AttachmentLoader;
@@ -77,11 +79,18 @@ package spine.examples {
 		private function onClick(event : TouchEvent) : void {
 			var touch : Touch = event.getTouch(this);
 			if (touch && touch.phase == TouchPhase.BEGAN) {
-				if (gunGrabbed)
-					skeleton.skeleton.setToSetupPose();
-				else
-					skeleton.state.setAnimationByName(1, "gungrab", false);
-				gunGrabbed = !gunGrabbed;
+				if (gunGrabCount < 2) {
+					if (gunGrabbed)
+						skeleton.skeleton.setToSetupPose();
+					else
+						skeleton.state.setAnimationByName(1, "gungrab", false);
+					gunGrabbed = !gunGrabbed;
+					gunGrabCount++;
+				} else {
+					var parent: DisplayObjectContainer = this.parent;
+					this.removeFromParent(true);	
+					parent.addChild(new TankExample());
+				}
 			}
 		}
 	}
