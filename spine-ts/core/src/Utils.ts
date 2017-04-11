@@ -196,6 +196,16 @@ module spine {
 			}
 		}
 
+		static newShortArray (size: number): ArrayLike<number> {
+			if (Utils.SUPPORTS_TYPED_ARRAYS) {
+				return new Int16Array(size)
+			} else {
+				 let array = new Array<number>(size);
+				 for (let i = 0; i < array.length; i++) array[i] = 0;
+				 return array;
+			}
+		}
+
 		static toFloatArray (array: Array<number>) {
 			return Utils.SUPPORTS_TYPED_ARRAYS ? new Float32Array(array) : array;
 		}
