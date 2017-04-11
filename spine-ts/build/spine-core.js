@@ -1824,6 +1824,30 @@ var spine;
 					error(path, "Couldn't load image " + path);
 			};
 		};
+		AssetManager.prototype.loadTextureData = function (path, data, success, error) {
+			var _this = this;
+			if (success === void 0) { success = null; }
+			if (error === void 0) { error = null; }
+			path = this.pathPrefix + path;
+			this.toLoad++;
+			var img = new Image();
+			img.src = data;
+			img.onload = function (ev) {
+				var texture = _this.textureLoader(img);
+				_this.assets[path] = texture;
+				_this.toLoad--;
+				_this.loaded++;
+				if (success)
+					success(path, img);
+			};
+			img.onerror = function (ev) {
+				_this.errors[path] = "Couldn't load image " + path;
+				_this.toLoad--;
+				_this.loaded++;
+				if (error)
+					error(path, "Couldn't load image " + path);
+			};
+		};
 		AssetManager.prototype.get = function (path) {
 			path = this.pathPrefix + path;
 			return this.assets[path];

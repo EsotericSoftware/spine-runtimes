@@ -9,6 +9,7 @@ declare module spine {
 		constructor(textureLoader: (image: HTMLImageElement) => any, pathPrefix?: string);
 		loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, error: string) => void): void;
 		loadTexture(path: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
+		loadTextureData(path: string, data: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
 		get(path: string): any;
 		remove(path: string): void;
 		removeAll(): void;
