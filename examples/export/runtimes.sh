@@ -181,9 +181,9 @@ cp -f ../stretchyman/export/stretchyman.png ../../spine-starling/spine-starling-
 
 echo "spine-ts"
 rm -f ../../spine-ts/webgl/example/assets/*
-cp -f ../coin/export/coin.json ../../spine-ts-webgl/examples/assets/
-cp -f ../coin/export/coin.atlas ../../spine-ts-webgl/examples/assets/
-cp -f ../coin/export/coin.png ../../spine-ts-webgl/examples/assets/
+cp -f ../coin/export/coin.json ../../spine-ts/webgl/example/assets/
+cp -f ../coin/export/coin.atlas ../../spine-ts/webgl/example/assets/
+cp -f ../coin/export/coin.png ../../spine-ts/webgl/example/assets/
 
 cp -f ../goblins/export/goblins-mesh.json ../../spine-ts/webgl/example/assets/
 cp -f ../goblins/export/goblins.atlas ../../spine-ts/webgl/example/assets/goblins-mesh.atlas
