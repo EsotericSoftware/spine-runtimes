@@ -35,8 +35,7 @@
 
 + (CCScene*) scene {
 	CCScene *scene = [CCScene node];
-	[scene addChild:[SpineboyExample node]];
-	[scene setColorRGBA: [CCColor colorWithRed:1 green:0 blue:0]];
+	[scene addChild:[SpineboyExample node]];	
 	return scene;
 }
 
@@ -44,7 +43,7 @@
 	self = [super init];
 	if (!self) return nil;
 
-	skeletonNode = [SkeletonAnimation skeletonWithFile:@"TwoColorTest.json" atlasFile:@"TwoColorTest.atlas" scale:0.2];
+	skeletonNode = [SkeletonAnimation skeletonWithFile:@"spineboy.json" atlasFile:@"spineboy.atlas" scale:0.4];
 	[skeletonNode setMixFrom:@"walk" to:@"jump" duration:0.2f];
 	[skeletonNode setMixFrom:@"jump" to:@"run" duration:0.2f];
 
@@ -70,12 +69,14 @@
 		NSLog(@"%d event: %s, %d, %f, %s", entry->trackIndex, event->data->name, event->intValue, event->floatValue, event->stringValue);
 	};
 
-	[skeletonNode setAnimationForTrack:0 name:@"animation" loop:YES];
+	[skeletonNode setAnimationForTrack:0 name:@"walk" loop:YES];
+	[skeletonNode addAnimationForTrack:0 name:@"jump" loop:NO afterDelay:2];
+	[skeletonNode addAnimationForTrack:0 name:@"run" loop:YES afterDelay:0];
 
 	// [skeletonNode setAnimationForTrack:1 name:@"test" loop:YES];
 
 	CGSize windowSize = [[CCDirector sharedDirector] viewSize];
-	[skeletonNode setPosition:ccp(windowSize.width / 2, windowSize.height / 2)];
+	[skeletonNode setPosition:ccp(windowSize.width / 2, 20)];
 	[self addChild:skeletonNode];
 
 	self.userInteractionEnabled = YES;
@@ -86,7 +87,12 @@
 
 #if ( TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR )
 - (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event {
-	skeletonNode.twoColorTint = !skeletonNode.twoColorTint;
+	if (!skeletonNode.debugBones)
+		skeletonNode.debugBones = true;
+	else if (skeletonNode.timeScale == 1)
+		skeletonNode.timeScale = 0.3f;
+	else
+		[[CCDirector sharedDirector] replaceScene:[GoblinsExample scene]];
 }
 #endif
 
