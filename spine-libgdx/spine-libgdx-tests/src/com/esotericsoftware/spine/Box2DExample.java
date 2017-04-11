@@ -156,8 +156,8 @@ public class Box2DExample extends ApplicationAdapter {
 			if (!(slot.getAttachment() instanceof Box2dAttachment)) continue;
 			Box2dAttachment attachment = (Box2dAttachment)slot.getAttachment();
 			if (attachment.body == null) continue;
-			float x = skeleton.x + slot.getBone().getWorldX();
-			float y = skeleton.y + slot.getBone().getWorldY();
+			float x = slot.getBone().getWorldX();
+			float y = slot.getBone().getWorldY();
 			float rotation = slot.getBone().getWorldRotationX();
 			attachment.body.setTransform(x, y, rotation * MathUtils.degRad);
 		}
