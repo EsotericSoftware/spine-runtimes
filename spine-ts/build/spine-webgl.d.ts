@@ -827,6 +827,23 @@ declare module spine {
     }
 }
 declare module spine {
+    class SkeletonClipping {
+        private decomposer;
+        private clippingPolygon;
+        private clipOutput;
+        private clippedVertices;
+        private clippedTriangles;
+        private scratch;
+        private clipAttachment;
+        private clippingPolygons;
+        clipStart(slot: Slot, clip: ClippingAttachment): void;
+        clipEndWithSlot(slot: Slot): void;
+        clipEnd(): void;
+        isClipping(): boolean;
+        clipTriangles(vertices: ArrayLike<number>, verticesLength: number, triangles: ArrayLike<number>, trianglesLength: number, uvs: ArrayLike<number>, light: Color, dark: Color, twoColor: boolean): void;
+        clip(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, clippingArea: Array<number>, output: Array<number>): boolean;
+        static makeClockwise(polygon: ArrayLike<number>): void;
+    }
 }
 declare module spine {
     class SkeletonData {

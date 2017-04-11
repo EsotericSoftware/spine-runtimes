@@ -29,7 +29,7 @@
  *****************************************************************************/
 
 module spine {
-	/*export class SkeletonClipping {
+	export class SkeletonClipping {
 		private decomposer = new ConvexDecomposer();
 		private clippingPolygon = new Array<number>();
 		private clipOutput = new Array<number>();
@@ -40,151 +40,183 @@ module spine {
 		private clipAttachment: ClippingAttachment;
 		private clippingPolygons: Array<Array<number>>;
 
-		public void clipStart (Slot slot, ClippingAttachment clip) {
-			if (clipAttachment != null) return;
-			clipAttachment = clip;
+		clipStart (slot: Slot, clip: ClippingAttachment) {
+			if (this.clipAttachment != null) return;
+			this.clipAttachment = clip;
 
-			int n = clip.getWorldVerticesLength();
-			float[] vertices = clippingPolygon.setSize(n);
+			let n = clip.worldVerticesLength;
+			let vertices = spine.Utils.setArraySize(this.clippingPolygon, n);
 			clip.computeWorldVertices(slot, 0, n, vertices, 0, 2);
-			makeClockwise(clippingPolygon);
-			clippingPolygons = decomposer.decompose(clippingPolygon);
-			for (FloatArray polygon : clippingPolygons) {
-				makeClockwise(polygon);
-				polygon.add(polygon.items[0]);
-				polygon.add(polygon.items[1]);
+			let clippingPolygon = this.clippingPolygon;
+			SkeletonClipping.makeClockwise(clippingPolygon);
+			let clippingPolygons = this.clippingPolygons = this.decomposer.decompose(clippingPolygon);
+			for (let i = 0, n = clippingPolygons.length; i < n; i++) {
+				let polygon = clippingPolygons[i];
+				SkeletonClipping.makeClockwise(polygon);
+				polygon.push(polygon[0]);
+				polygon.push(polygon[1]);
 			}
 		}
 
-		public void clipEnd (Slot slot) {
-			if (clipAttachment != null && clipAttachment.getEndSlot() == slot.getData()) clipEnd();
+		clipEndWithSlot (slot: Slot) {
+			if (this.clipAttachment != null && this.clipAttachment.endSlot == slot.data) this.clipEnd();
 		}
 
-		public void clipEnd () {
-			if (clipAttachment == null) return;
-			clipAttachment = null;
-			clippingPolygons = null;
-			clippedVertices.clear();
-			clippedTriangles.clear();
-			clippingPolygon.clear();
+		clipEnd () {
+			if (this.clipAttachment == null) return;
+			this.clipAttachment = null;
+			this.clippingPolygons = null;
+			this.clippedVertices.length = 0;
+			this.clippedTriangles.length = 0;
+			this.clippingPolygon.length = 0;
 		}
 
-		public boolean isClipping () {
-			return clipAttachment != null;
+		isClipping (): boolean {
+			return this.clipAttachment != null;
 		}
 
-		public void clipTriangles (float[] vertices, int verticesLength, short[] triangles, int trianglesLength, float[] uvs,
-			float light, float dark, boolean twoColor) {
+		clipTriangles (vertices: ArrayLike<number>, verticesLength: number, triangles: ArrayLike<number>, trianglesLength: number, uvs: ArrayLike<number>,
+			light: Color, dark: Color, twoColor: boolean) {
 
-			FloatArray clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
-			ShortArray clippedTriangles = this.clippedTriangles;
-			Object[] polygons = clippingPolygons.items;
-			int polygonsCount = clippingPolygons.size;
-			int vertexSize = twoColor ? 6 : 5;
+			let clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
+			let clippedTriangles = this.clippedTriangles;
+			let polygons = this.clippingPolygons;
+			let polygonsCount = this.clippingPolygons.length;
+			let vertexSize = twoColor ? 6 : 5;
 
-			short index = 0;
-			clippedVertices.clear();
-			clippedTriangles.clear();
+			let index = 0;
+			clippedVertices.length = 0;
+			clippedTriangles.length = 0;
 			outer:
-			for (int i = 0; i < trianglesLength; i += 3) {
-				int vertexOffset = triangles[i] << 1;
-				float x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
-				float u1 = uvs[vertexOffset], v1 = uvs[vertexOffset + 1];
+			for (let i = 0; i < trianglesLength; i += 3) {
+				let vertexOffset = triangles[i] << 1;
+				let x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
+				let u1 = uvs[vertexOffset], v1 = uvs[vertexOffset + 1];
 
 				vertexOffset = triangles[i + 1] << 1;
-				float x2 = vertices[vertexOffset], y2 = vertices[vertexOffset + 1];
-				float u2 = uvs[vertexOffset], v2 = uvs[vertexOffset + 1];
+				let x2 = vertices[vertexOffset], y2 = vertices[vertexOffset + 1];
+				let u2 = uvs[vertexOffset], v2 = uvs[vertexOffset + 1];
 
 				vertexOffset = triangles[i + 2] << 1;
-				float x3 = vertices[vertexOffset], y3 = vertices[vertexOffset + 1];
-				float u3 = uvs[vertexOffset], v3 = uvs[vertexOffset + 1];
+				let x3 = vertices[vertexOffset], y3 = vertices[vertexOffset + 1];
+				let u3 = uvs[vertexOffset], v3 = uvs[vertexOffset + 1];
 
-				for (int p = 0; p < polygonsCount; p++) {
-					int s = clippedVertices.size;
-					if (clip(x1, y1, x2, y2, x3, y3, (FloatArray)polygons[p], clipOutput)) {
-						int clipOutputLength = clipOutput.size;
+				for (let p = 0; p < polygonsCount; p++) {
+					let s = clippedVertices.length;
+					if (this.clip(x1, y1, x2, y2, x3, y3, polygons[p], clipOutput)) {
+						let clipOutputLength = clipOutput.length;
 						if (clipOutputLength == 0) continue;
-						float d0 = y2 - y3, d1 = x3 - x2, d2 = x1 - x3, d4 = y3 - y1;
-						float d = 1 / (d0 * d2 + d1 * (y1 - y3));
+						let d0 = y2 - y3, d1 = x3 - x2, d2 = x1 - x3, d4 = y3 - y1;
+						let d = 1 / (d0 * d2 + d1 * (y1 - y3));
 
-						int clipOutputCount = clipOutputLength >> 1;
-						float[] clipOutputItems = clipOutput.items;
-						float[] clippedVerticesItems = clippedVertices.setSize(s + clipOutputCount * vertexSize);
-						for (int ii = 0; ii < clipOutputLength; ii += 2) {
-							float x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
+						let clipOutputCount = clipOutputLength >> 1;
+						let clipOutputItems = this.clipOutput;
+						let clippedVerticesItems = spine.Utils.setArraySize(clippedVertices, s + clipOutputCount * vertexSize);
+						for (let ii = 0; ii < clipOutputLength; ii += 2) {
+							let x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
 							clippedVerticesItems[s] = x;
 							clippedVerticesItems[s + 1] = y;
-							clippedVerticesItems[s + 2] = light;
+							clippedVerticesItems[s + 2] = light.r;
+							clippedVerticesItems[s + 3] = light.g;
+							clippedVerticesItems[s + 4] = light.b;
+							clippedVerticesItems[s + 5] = light.a;
 							if (twoColor) {
-								clippedVerticesItems[s + 3] = dark;
-								s += 4;
+								clippedVerticesItems[s + 6] = dark.r;
+								clippedVerticesItems[s + 7] = dark.g;
+								clippedVerticesItems[s + 8] = dark.b;
+								clippedVerticesItems[s + 9] = dark.a;
+								s += 10;
 							} else
-								s += 3;
-							float c0 = x - x3, c1 = y - y3;
-							float a = (d0 * c0 + d1 * c1) * d;
-							float b = (d4 * c0 + d2 * c1) * d;
-							float c = 1 - a - b;
+								s += 6;
+							let c0 = x - x3, c1 = y - y3;
+							let a = (d0 * c0 + d1 * c1) * d;
+							let b = (d4 * c0 + d2 * c1) * d;
+							let c = 1 - a - b;
 							clippedVerticesItems[s] = u1 * a + u2 * b + u3 * c;
 							clippedVerticesItems[s + 1] = v1 * a + v2 * b + v3 * c;
 							s += 2;
 						}
 
-						s = clippedTriangles.size;
-						short[] clippedTrianglesItems = clippedTriangles.setSize(s + 3 * (clipOutputCount - 2));
+						s = clippedTriangles.length;
+						let clippedTrianglesItems = spine.Utils.setArraySize(clippedTriangles, s + 3 * (clipOutputCount - 2));
 						clipOutputCount--;
-						for (int ii = 1; ii < clipOutputCount; ii++) {
+						for (let ii = 1; ii < clipOutputCount; ii++) {
 							clippedTrianglesItems[s] = index;
-							clippedTrianglesItems[s + 1] = (short)(index + ii);
-							clippedTrianglesItems[s + 2] = (short)(index + ii + 1);
+							clippedTrianglesItems[s + 1] = (index + ii);
+							clippedTrianglesItems[s + 2] = (index + ii + 1);
 							s += 3;
 						}
 						index += clipOutputCount + 1;
 
 					} else {
-						float[] clippedVerticesItems = clippedVertices.setSize(s + 3 * vertexSize);
+						let clippedVerticesItems = spine.Utils.setArraySize(clippedVertices, s + 3 * vertexSize);
 						clippedVerticesItems[s] = x1;
 						clippedVerticesItems[s + 1] = y1;
-						clippedVerticesItems[s + 2] = light;
+						clippedVerticesItems[s + 2] = light.r;
+						clippedVerticesItems[s + 3] = light.g;
+						clippedVerticesItems[s + 4] = light.b;
+						clippedVerticesItems[s + 5] = light.a;
 						if (!twoColor) {
-							clippedVerticesItems[s + 3] = u1;
-							clippedVerticesItems[s + 4] = v1;
+							clippedVerticesItems[s + 6] = u1;
+							clippedVerticesItems[s + 7] = v1;
 
-							clippedVerticesItems[s + 5] = x2;
-							clippedVerticesItems[s + 6] = y2;
-							clippedVerticesItems[s + 7] = light;
-							clippedVerticesItems[s + 8] = u2;
-							clippedVerticesItems[s + 9] = v2;
+							clippedVerticesItems[s + 8] = x2;
+							clippedVerticesItems[s + 9] = y2;
+							clippedVerticesItems[s + 10] = light.r;
+							clippedVerticesItems[s + 11] = light.g;
+							clippedVerticesItems[s + 12] = light.b;
+							clippedVerticesItems[s + 13] = light.a;
+							clippedVerticesItems[s + 14] = u2;
+							clippedVerticesItems[s + 15] = v2;
 
-							clippedVerticesItems[s + 10] = x3;
-							clippedVerticesItems[s + 11] = y3;
-							clippedVerticesItems[s + 12] = light;
-							clippedVerticesItems[s + 13] = u3;
-							clippedVerticesItems[s + 14] = v3;
+							clippedVerticesItems[s + 16] = x3;
+							clippedVerticesItems[s + 17] = y3;
+							clippedVerticesItems[s + 18] = light.r;
+							clippedVerticesItems[s + 19] = light.g;
+							clippedVerticesItems[s + 20] = light.b;
+							clippedVerticesItems[s + 21] = light.a;
+							clippedVerticesItems[s + 22] = u3;
+							clippedVerticesItems[s + 23] = v3;
 						} else {
-							clippedVerticesItems[s + 3] = dark;
-							clippedVerticesItems[s + 4] = u1;
-							clippedVerticesItems[s + 5] = v1;
+							clippedVerticesItems[s + 6] = dark.r;
+							clippedVerticesItems[s + 7] = dark.g;
+							clippedVerticesItems[s + 8] = dark.b;
+							clippedVerticesItems[s + 9] = dark.a;
+							clippedVerticesItems[s + 10] = u1;
+							clippedVerticesItems[s + 11] = v1;
 
-							clippedVerticesItems[s + 6] = x2;
-							clippedVerticesItems[s + 7] = y2;
-							clippedVerticesItems[s + 8] = light;
-							clippedVerticesItems[s + 9] = dark;
-							clippedVerticesItems[s + 10] = u2;
-							clippedVerticesItems[s + 11] = v2;
+							clippedVerticesItems[s + 12] = x2;
+							clippedVerticesItems[s + 13] = y2;
+							clippedVerticesItems[s + 14] = light.r;
+							clippedVerticesItems[s + 15] = light.g;
+							clippedVerticesItems[s + 16] = light.b;
+							clippedVerticesItems[s + 17] = light.a;
+							clippedVerticesItems[s + 18] = dark.r;
+							clippedVerticesItems[s + 19] = dark.g;
+							clippedVerticesItems[s + 20] = dark.b;
+							clippedVerticesItems[s + 21] = dark.a;
+							clippedVerticesItems[s + 22] = u2;
+							clippedVerticesItems[s + 23] = v2;
 
-							clippedVerticesItems[s + 12] = x3;
-							clippedVerticesItems[s + 13] = y3;
-							clippedVerticesItems[s + 14] = light;
-							clippedVerticesItems[s + 15] = dark;
-							clippedVerticesItems[s + 16] = u3;
-							clippedVerticesItems[s + 17] = v3;
+							clippedVerticesItems[s + 24] = x3;
+							clippedVerticesItems[s + 25] = y3;
+							clippedVerticesItems[s + 26] = light.r;
+							clippedVerticesItems[s + 27] = light.g;
+							clippedVerticesItems[s + 28] = light.b;
+							clippedVerticesItems[s + 29] = light.a;
+							clippedVerticesItems[s + 30] = dark.r;
+							clippedVerticesItems[s + 31] = dark.g;
+							clippedVerticesItems[s + 32] = dark.b;
+							clippedVerticesItems[s + 33] = dark.a;
+							clippedVerticesItems[s + 34] = u3;
+							clippedVerticesItems[s + 35] = v3;
 						}
 
-						s = clippedTriangles.size;
-						short[] clippedTrianglesItems = clippedTriangles.setSize(s + 3);
+						s = clippedTriangles.length;
+						let clippedTrianglesItems = spine.Utils.setArraySize(clippedTriangles, s + 3);
 						clippedTrianglesItems[s] = index;
-						clippedTrianglesItems[s + 1] = (short)(index + 1);
-						clippedTrianglesItems[s + 2] = (short)(index + 2);
+						clippedTrianglesItems[s + 1] = (index + 1);
+						clippedTrianglesItems[s + 2] = (index + 2);
 						index += 3;
 						continue outer;
 					}
@@ -194,102 +226,95 @@ module spine {
 
 		/** Clips the input triangle against the convex, clockwise clipping area. If the triangle lies entirely within the clipping
 		 * area, false is returned. The clipping area must duplicate the first vertex at the end of the vertices list. */
-		/*boolean clip (float x1, float y1, float x2, float y2, float x3, float y3, FloatArray clippingArea, FloatArray output) {
-			FloatArray originalOutput = output;
-			boolean clipped = false;
+		clip (x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, clippingArea: Array<number>, output: Array<number>) {
+			let originalOutput = output;
+			let clipped = false;
 
 			// Avoid copy at the end.
-			FloatArray input = null;
-			if (clippingArea.size % 4 >= 2) {
+			let input: Array<number> = null;
+			if (clippingArea.length % 4 >= 2) {
 				input = output;
-				output = scratch;
+				output = this.scratch;
 			} else
-				input = scratch;
+				input = this.scratch;
 
-			input.clear();
-			input.add(x1);
-			input.add(y1);
-			input.add(x2);
-			input.add(y2);
-			input.add(x3);
-			input.add(y3);
-			input.add(x1);
-			input.add(y1);
-			output.clear();
+			input.length = 0;
+			input.push(x1);
+			input.push(y1);
+			input.push(x2);
+			input.push(y2);
+			input.push(x3);
+			input.push(y3);
+			input.push(x1);
+			input.push(y1);
+			output.length = 0;
 
-			float[] clippingVertices = clippingArea.items;
-			int clippingVerticesLast = clippingArea.size - 4;
-			for (int i = 0;; i += 2) {
-				float edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
-				float edgeX2 = clippingVertices[i + 2], edgeY2 = clippingVertices[i + 3];
-				float deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;
+			let clippingVertices = clippingArea;
+			let clippingVerticesLast = clippingArea.length - 4;
+			for (let i = 0;; i += 2) {
+				let edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
+				let edgeX2 = clippingVertices[i + 2], edgeY2 = clippingVertices[i + 3];
+				let deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;
 
-				float[] inputVertices = input.items;
-				int inputVerticesLength = input.size - 2, outputStart = output.size;
-				for (int ii = 0; ii < inputVerticesLength; ii += 2) {
-					float inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
-					float inputX2 = inputVertices[ii + 2], inputY2 = inputVertices[ii + 3];
-					boolean side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0;
+				let inputVertices = input;
+				let inputVerticesLength = input.length - 2, outputStart = output.length;
+				for (let ii = 0; ii < inputVerticesLength; ii += 2) {
+					let inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
+					let inputX2 = inputVertices[ii + 2], inputY2 = inputVertices[ii + 3];
+					let side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0;
 					if (deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0) {
 						if (side2) { // v1 inside, v2 inside
-							output.add(inputX2);
-							output.add(inputY2);
+							output.push(inputX2);
+							output.push(inputY2);
 							continue;
 						}
 						// v1 inside, v2 outside
-						float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
-						output.add(edgeX + (edgeX2 - edgeX) * ua);
-						output.add(edgeY + (edgeY2 - edgeY) * ua);
+						let c0 = inputY2 - inputY, c2 = inputX2 - inputX;
+						let ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
+						output.push(edgeX + (edgeX2 - edgeX) * ua);
+						output.push(edgeY + (edgeY2 - edgeY) * ua);
 					} else if (side2) { // v1 outside, v2 inside
-						float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
-						output.add(edgeX + (edgeX2 - edgeX) * ua);
-						output.add(edgeY + (edgeY2 - edgeY) * ua);
-						output.add(inputX2);
-						output.add(inputY2);
+						let c0 = inputY2 - inputY, c2 = inputX2 - inputX;
+						let ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
+						output.push(edgeX + (edgeX2 - edgeX) * ua);
+						output.push(edgeY + (edgeY2 - edgeY) * ua);
+						output.push(inputX2);
+						output.push(inputY2);
 					}
 					clipped = true;
 				}
 
-				if (outputStart == output.size) { // All edges outside.
-					originalOutput.clear();
+				if (outputStart == output.length) { // All edges outside.
+					originalOutput.length = 0;
 					return true;
 				}
 
-				output.add(output.items[0]);
-				output.add(output.items[1]);
+				output.push(output[0]);
+				output.push(output[1]);
 
 				if (i == clippingVerticesLast) break;
-				FloatArray temp = output;
+				let temp = output;
 				output = input;
-				output.clear();
+				output.length = 0;
 				input = temp;
 			}
 
 			if (originalOutput != output) {
-				originalOutput.clear();
-				originalOutput.addAll(output.items, 0, output.size - 2);
+				originalOutput.length = 0;
+				for (let i = 0, n = output.length - 2; i < n; i++)
+					originalOutput[i] = output[i];
 			} else
-				originalOutput.setSize(originalOutput.size - 2);
+				originalOutput.length = originalOutput.length - 2;
 
 			return clipped;
 		}
 
-		public FloatArray getClippedVertices () {
-			return clippedVertices;
-		}
+		public static makeClockwise (polygon: ArrayLike<number>) {
+			let vertices = polygon;
+			let verticeslength = polygon.length;
 
-		public ShortArray getClippedTriangles () {
-			return clippedTriangles;
-		}
-
-		static void makeClockwise (FloatArray polygon) {
-			float[] vertices = polygon.items;
-			int verticeslength = polygon.size;
-
-			float area = vertices[verticeslength - 2] * vertices[1] - vertices[0] * vertices[verticeslength - 1], p1x, p1y, p2x, p2y;
-			for (int i = 0, n = verticeslength - 3; i < n; i += 2) {
+			let area = vertices[verticeslength - 2] * vertices[1] - vertices[0] * vertices[verticeslength - 1], p1x = 0, p1y = 0, p2x = 0, p2y = 0;
+			for (let i = 0, n = verticeslength - 3; i < n; i += 2) {
 				p1x = vertices[i];
 				p1y = vertices[i + 1];
 				p2x = vertices[i + 2];
@@ -298,14 +323,14 @@ module spine {
 			}
 			if (area < 0) return;
 
-			for (int i = 0, lastX = verticeslength - 2, n = verticeslength >> 1; i < n; i += 2) {
-				float x = vertices[i], y = vertices[i + 1];
-				int other = lastX - i;
+			for (let i = 0, lastX = verticeslength - 2, n = verticeslength >> 1; i < n; i += 2) {
+				let x = vertices[i], y = vertices[i + 1];
+				let other = lastX - i;
 				vertices[i] = vertices[other];
 				vertices[i + 1] = vertices[other + 1];
 				vertices[other] = x;
 				vertices[other + 1] = y;
 			}
 		}
-}*/
+	}
 }
