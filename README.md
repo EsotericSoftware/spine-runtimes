@@ -19,3 +19,8 @@ Review our backlog of bugs, enhancements, and tasks in the [spine-runtimes](http
 ## Versioning
 
 The code provided here is continuously under development. Generally the latest Git `master` source works with the data exported from the latest version of Spine. The Spine version can be [frozen](http://esotericsoftware.com/spine-settings#Version) at a specific Spine version that matches the Spine Runtimes source being used. Occaisionally the Spine Runtimes are [tagged](https://github.com/EsotericSoftware/spine-runtimes/releases) to work with a specific Spine version.
+
+## Contributing
+Before we can merge your contributions, we will need a signed [contributor license agreement (CLA)](http://esotericsoftware.com/files/cla.txt) from you. You can send a copy of the CLA to contact@esotericsoftware.com.
+
+If possible, base your contributions on the current development branch, which is `$version-beta`, e.g. `3.6-beta`. Makre sure to follow the formatting you find in the respective runtime code you contribute to.
