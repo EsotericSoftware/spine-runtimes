@@ -137,4 +137,4 @@
 
 ### Widget backend
  * Fixed renderer to work for 3.6 changes. Supports two color tinting (see webgl backend changes for details).
- * Added fields `atlasContent` and `jsonContent` to `WidgetConfiguration` allowing you to directly pass the contents of the `.atlas` and `.json` file without having to do a request. See `README.md` and the example for details.
+ * Added fields `atlasContent`, `atlasPagesContent`, and `jsonContent` to `WidgetConfiguration` allowing you to directly pass the contents of the `.atlas`, atlas page `.png` files, and the `.json` file without having to do a request. See `README.md` and the example for details.

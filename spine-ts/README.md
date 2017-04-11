@@ -193,10 +193,11 @@ The configuration object has the following fields:
   * `json`: required, path to the `.json` file, absolute or relative, e.g. "assets/animation.json"
   * `jsonContent`: optional, string or JSON object holding the content of a skeleton `.json` file. Overrides `json` if given.
   * `atlas`: required, path to the `.atlas` file, absolute or relative, e.g. "assets/animation.atlas"
-  * `atlasContent`: optional, string holding the content of a file. Overrides `atlasContent` if given.
+  * `atlasContent`: optional, string holding the content of an .atlas file. Overrides `atlas` if given.
   * `animation`: required, the name of the animation to play back
   * `imagesPath`: optional, the location of images on the server to load atlas pages from. If omitted, atlas `.png` page files are loaded relative to the `.atlas` file.
   * `atlasPages`: optional, the list of atlas page images, e.g. `atlasPages: ["assets/page1.png", "assets/page2.png"]` when using code, or `data-atlas-pages="assets/page1.png,assets/page2.png"` on case of HTML instantiation. Use this if you have a multi-page atlas. If ommited, only one atlas page image is loaded based on the atlas file name, replacing `.atlas` with `.png`.
+  * `atlasPagesContent`: optional, the list of atlas page images as data URIs. If given, `atlasPages` must also be given.
   * `skin`: optional, the name of the skin to use. Defaults to `default` if omitted.
   * `loop`: optional, whether to loop the animation or not. Defaults to `true` if omitted.
   * `scale`: optional, the scaling factor to apply when loading the `.json` file. Defaults to `1` if omitted. Irrelevant if `data-fit-to-canavs` is `true`.
