@@ -90,6 +90,29 @@ module spine {
 			}
 		}
 
+		loadTextureData(path: string, data: string,
+			success: (path: string, image: HTMLImageElement) => void = null,
+			error: (path: string, error: string) => void = null
+		) {
+			path = this.pathPrefix + path;
+			this.toLoad++;
+			let img = new Image();
+			img.src = data;
+			img.onload = (ev) => {
+				let texture = this.textureLoader(img);
+				this.assets[path] = texture;
+				this.toLoad--;
+				this.loaded++;
+				if (success) success(path, img);
+			}
+			img.onerror = (ev) => {
+				this.errors[path] = `Couldn't load image ${path}`;
+				this.toLoad--;
+				this.loaded++;
+				if (error) error(path, `Couldn't load image ${path}`);
+			}
+		}
+
 		get (path: string) {
 			path = this.pathPrefix + path;
 			return this.assets[path];

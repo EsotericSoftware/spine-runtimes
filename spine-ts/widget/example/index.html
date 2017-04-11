@@ -104,11 +104,13 @@ new spine.SpineWidget("spine-widget", {
 
 json = document.getElementById("json").innerHTML;
 atlas = document.getElementById("atlas").innerHTML;
+atlasPageContent = document.getElementById("atlasPage").innerHTML;
 
 new spine.SpineWidget("spine-widget-inline", {
 	jsonContent: json,
 	atlasContent: atlas,
-	imagesPath: "assets/",
+	atlasPages: ["spine-logo.png"],
+	atlasPagesContent: [atlasPageContent],
 	animation: "animation",
 	backgroundColor: "#00000000",
 	debug: true,

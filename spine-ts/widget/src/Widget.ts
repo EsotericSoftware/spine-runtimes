@@ -97,7 +97,11 @@ module spine {
 				}
 			} else {
 				for (let i = 0; i < config.atlasPages.length; i++) {
-					assets.loadTexture(config.atlasPages[i]);
+					if (config.atlasPagesContent && config.atlasPagesContent[i]) {
+						assets.loadTextureData(config.atlasPages[i], config.atlasPagesContent[0]);
+					} else {
+						assets.loadTexture(config.atlasPages[i]);
+					}
 				}
 			}
 			requestAnimationFrame(() => { this.load(); });

@@ -12,7 +12,7 @@
 </body>
 <script>
 
-var FILE = "spineboy ikfeet";
+var FILE = "spineboy";
 var NUM_SKELETONS = 1;
 var SCALE = 0.6;
 
@@ -63,12 +63,6 @@ function load() {
 
 			state.multipleMixing = false;
 			state.setAnimation(0, "idle", true);
-			state.addAnimation(0, "run", true, stableDuration);
-			state.addAnimation(0, "idle", true, mixDuration * 0.35);
-			state.addAnimation(0, "run", true, stableDuration);
-			state.addAnimation(0, "idle", true, mixDuration * 0.75);
-			state.addAnimation(0, "run", true, stableDuration);
-			state.addAnimation(0, "idle", true, mixDuration * 2);
 			state.apply(skeleton);
 			skeleton.x = Math.random() * 200 - Math.random() * 200;
 			skeleton.y = Math.random() * 200 - Math.random() * 200;
