@@ -33,8 +33,8 @@ module spine {
 		private decomposer = new ConvexDecomposer();
 		private clippingPolygon = new Array<number>();
 		private clipOutput = new Array<number>();
-		private clippedVertices = new Array<number>();
-		private clippedTriangles = new Array<number>();
+		clippedVertices = new Array<number>();
+		clippedTriangles = new Array<number>();
 		private scratch = new Array<number>();
 
 		private clipAttachment: ClippingAttachment;
@@ -82,7 +82,7 @@ module spine {
 			let clippedTriangles = this.clippedTriangles;
 			let polygons = this.clippingPolygons;
 			let polygonsCount = this.clippingPolygons.length;
-			let vertexSize = twoColor ? 6 : 5;
+			let vertexSize = twoColor ? 12 : 8;
 
 			let index = 0;
 			clippedVertices.length = 0;
@@ -120,21 +120,19 @@ module spine {
 							clippedVerticesItems[s + 3] = light.g;
 							clippedVerticesItems[s + 4] = light.b;
 							clippedVerticesItems[s + 5] = light.a;
-							if (twoColor) {
-								clippedVerticesItems[s + 6] = dark.r;
-								clippedVerticesItems[s + 7] = dark.g;
-								clippedVerticesItems[s + 8] = dark.b;
-								clippedVerticesItems[s + 9] = dark.a;
-								s += 10;
-							} else
-								s += 6;
 							let c0 = x - x3, c1 = y - y3;
 							let a = (d0 * c0 + d1 * c1) * d;
 							let b = (d4 * c0 + d2 * c1) * d;
 							let c = 1 - a - b;
-							clippedVerticesItems[s] = u1 * a + u2 * b + u3 * c;
-							clippedVerticesItems[s + 1] = v1 * a + v2 * b + v3 * c;
-							s += 2;
+							clippedVerticesItems[s + 6] = u1 * a + u2 * b + u3 * c;
+							clippedVerticesItems[s + 7] = v1 * a + v2 * b + v3 * c;
+							if (twoColor) {
+								clippedVerticesItems[s + 8] = dark.r;
+								clippedVerticesItems[s + 8] = dark.g;
+								clippedVerticesItems[s + 10] = dark.b;
+								clippedVerticesItems[s + 11] = dark.a;
+							}
+							s += vertexSize;
 						}
 
 						s = clippedTriangles.length;
@@ -178,12 +176,12 @@ module spine {
 							clippedVerticesItems[s + 22] = u3;
 							clippedVerticesItems[s + 23] = v3;
 						} else {
-							clippedVerticesItems[s + 6] = dark.r;
-							clippedVerticesItems[s + 7] = dark.g;
-							clippedVerticesItems[s + 8] = dark.b;
-							clippedVerticesItems[s + 9] = dark.a;
-							clippedVerticesItems[s + 10] = u1;
-							clippedVerticesItems[s + 11] = v1;
+							clippedVerticesItems[s + 6] = u1;
+							clippedVerticesItems[s + 7] = v1;
+							clippedVerticesItems[s + 8] = dark.r;
+							clippedVerticesItems[s + 9] = dark.g;
+							clippedVerticesItems[s + 10] = dark.b;
+							clippedVerticesItems[s + 11] = dark.a;
 
 							clippedVerticesItems[s + 12] = x2;
 							clippedVerticesItems[s + 13] = y2;
@@ -191,12 +189,12 @@ module spine {
 							clippedVerticesItems[s + 15] = light.g;
 							clippedVerticesItems[s + 16] = light.b;
 							clippedVerticesItems[s + 17] = light.a;
-							clippedVerticesItems[s + 18] = dark.r;
-							clippedVerticesItems[s + 19] = dark.g;
-							clippedVerticesItems[s + 20] = dark.b;
-							clippedVerticesItems[s + 21] = dark.a;
-							clippedVerticesItems[s + 22] = u2;
-							clippedVerticesItems[s + 23] = v2;
+							clippedVerticesItems[s + 18] = u2;
+							clippedVerticesItems[s + 19] = v2;
+							clippedVerticesItems[s + 20] = dark.r;
+							clippedVerticesItems[s + 21] = dark.g;
+							clippedVerticesItems[s + 22] = dark.b;
+							clippedVerticesItems[s + 23] = dark.a;
 
 							clippedVerticesItems[s + 24] = x3;
 							clippedVerticesItems[s + 25] = y3;
@@ -204,12 +202,12 @@ module spine {
 							clippedVerticesItems[s + 27] = light.g;
 							clippedVerticesItems[s + 28] = light.b;
 							clippedVerticesItems[s + 29] = light.a;
-							clippedVerticesItems[s + 30] = dark.r;
-							clippedVerticesItems[s + 31] = dark.g;
-							clippedVerticesItems[s + 32] = dark.b;
-							clippedVerticesItems[s + 33] = dark.a;
-							clippedVerticesItems[s + 34] = u3;
-							clippedVerticesItems[s + 35] = v3;
+							clippedVerticesItems[s + 30] = u3;
+							clippedVerticesItems[s + 31] = v3;
+							clippedVerticesItems[s + 32] = dark.r;
+							clippedVerticesItems[s + 33] = dark.g;
+							clippedVerticesItems[s + 34] = dark.b;
+							clippedVerticesItems[s + 35] = dark.a;
 						}
 
 						s = clippedTriangles.length;

@@ -383,6 +383,7 @@ declare module spine {
 		newBoundingBoxAttachment(skin: Skin, name: string): BoundingBoxAttachment;
 		newPathAttachment(skin: Skin, name: string): PathAttachment;
 		newPointAttachment(skin: Skin, name: string): PointAttachment;
+		newClippingAttachment(skin: Skin, name: string): ClippingAttachment;
 	}
 }
 declare module spine {
@@ -406,6 +407,7 @@ declare module spine {
 		newBoundingBoxAttachment(skin: Skin, name: string): BoundingBoxAttachment;
 		newPathAttachment(skin: Skin, name: string): PathAttachment;
 		newPointAttachment(skin: Skin, name: string): PointAttachment;
+		newClippingAttachment(skin: Skin, name: string): ClippingAttachment;
 	}
 }
 declare module spine {
@@ -420,6 +422,13 @@ declare module spine {
 }
 declare module spine {
 	class BoundingBoxAttachment extends VertexAttachment {
+		color: Color;
+		constructor(name: string);
+	}
+}
+declare module spine {
+	class ClippingAttachment extends VertexAttachment {
+		endSlot: SlotData;
 		color: Color;
 		constructor(name: string);
 	}
@@ -605,6 +614,21 @@ declare module spine {
 declare module spine {
 	interface Constraint extends Updatable {
 		getOrder(): number;
+	}
+}
+declare module spine {
+	class ConvexDecomposer {
+		private convexPolygons;
+		private convexPolygonsIndices;
+		private indicesArray;
+		private isConcaveArray;
+		private triangles;
+		private polygonPool;
+		private polygonIndicesPool;
+		decompose(input: ArrayLike<number>): Array<Array<number>>;
+		private static isConcave(index, vertexCount, vertices, indices);
+		private static positiveArea(p1x, p1y, p2x, p2y, p3x, p3y);
+		private static winding(p1x, p1y, p2x, p2y, p3x, p3y);
 	}
 }
 declare module spine {
@@ -803,6 +827,25 @@ declare module spine {
 	}
 }
 declare module spine {
+	class SkeletonClipping {
+		private decomposer;
+		private clippingPolygon;
+		private clipOutput;
+		clippedVertices: number[];
+		clippedTriangles: number[];
+		private scratch;
+		private clipAttachment;
+		private clippingPolygons;
+		clipStart(slot: Slot, clip: ClippingAttachment): void;
+		clipEndWithSlot(slot: Slot): void;
+		clipEnd(): void;
+		isClipping(): boolean;
+		clipTriangles(vertices: ArrayLike<number>, verticesLength: number, triangles: ArrayLike<number>, trianglesLength: number, uvs: ArrayLike<number>, light: Color, dark: Color, twoColor: boolean): void;
+		clip(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, clippingArea: Array<number>, output: Array<number>): boolean;
+		static makeClockwise(polygon: ArrayLike<number>): void;
+	}
+}
+declare module spine {
 	class SkeletonData {
 		name: string;
 		bones: BoneData[];
@@ -840,7 +883,7 @@ declare module spine {
 		private linkedMeshes;
 		constructor(attachmentLoader: AttachmentLoader);
 		readSkeletonData(json: string | any): SkeletonData;
-		readAttachment(map: any, skin: Skin, slotIndex: number, name: string): Attachment;
+		readAttachment(map: any, skin: Skin, slotIndex: number, name: string, skeletonData: SkeletonData): Attachment;
 		readVertices(map: any, attachment: VertexAttachment, verticesLength: number): void;
 		readAnimation(map: any, name: string, skeletonData: SkeletonData): void;
 		readCurve(map: any, timeline: CurveTimeline, frameIndex: number): void;
@@ -1058,6 +1101,7 @@ declare module spine {
 		static ensureArrayCapacity<T>(array: Array<T>, size: number, value?: any): Array<T>;
 		static newArray<T>(size: number, defaultValue: T): Array<T>;
 		static newFloatArray(size: number): ArrayLike<number>;
+		static newShortArray(size: number): ArrayLike<number>;
 		static toFloatArray(array: Array<number>): number[] | Float32Array;
 	}
 	class DebugUtils {

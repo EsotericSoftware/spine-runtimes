@@ -120,12 +120,14 @@
   * Added `Bone.localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).  
   * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.  
   * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
+  * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
 
 ### WebGL backend
  * Fixed renderer to work with 3.6 changes.
  * Added support for two color tinting.
  * Improved performance by using `DYNAMIC_DRAW` for vertex buffer objects and fixing bug that copied to much data to the GPU each frame in `PolygonBatcher`/`Mesh`.
  * Added two color tinting support, enabled by default. You can disable it via the constructors of `SceneRenderer`, `SkeletonRenderer`and `PolygonBatcher`. Note that you will need to use a shader created via `Shader.newTwoColoredTexturedShader` shader with `SkeletonRenderer` and `PolygonBatcher` if two color tinting is enabled.
+ * Added clipping support
 
 ### Canvas backend
  * Fixed renderer to work for 3.6 changes. Sadly, we can't support two color tinting via the Canvas API.
@@ -136,5 +138,5 @@
  * Fixed renderer to work with 3.6 changes. Two color tinting is not supported.
 
 ### Widget backend
- * Fixed renderer to work for 3.6 changes. Supports two color tinting (see webgl backend changes for details).
+ * Fixed renderer to work for 3.6 changes. Supports two color tinting & clipping (see webgl backend changes for details).
  * Added fields `atlasContent`, `atlasPagesContent`, and `jsonContent` to `WidgetConfiguration` allowing you to directly pass the contents of the `.atlas`, atlas page `.png` files, and the `.json` file without having to do a request. See `README.md` and the example for details.

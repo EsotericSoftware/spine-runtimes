@@ -13,8 +13,9 @@
 <script>
 
 var FILE = "coin";
+var ANIMATION = "rotate";
 var NUM_SKELETONS = 1;
-var SCALE = 0.6;
+var SCALE = 0.5;
 
 var canvas, gl, renderer, input, assetManager;
 var skeletons = [];
@@ -29,6 +30,12 @@ function init() {
 	gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });
 
 	renderer = new spine.webgl.SceneRenderer(canvas, gl);
+	renderer.skeletonDebugRenderer.drawBones = false;
+	renderer.skeletonDebugRenderer.drawMeshTriangles = false;
+	renderer.skeletonDebugRenderer.drawMeshHull = false;
+	renderer.skeletonDebugRenderer.drawRegionAttachments = false;
+	renderer.skeletonDebugRenderer.drawBoundingBoxes = false;
+
 	assetManager = new spine.webgl.AssetManager(gl, "assets/");
 	var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
 	input = new spine.webgl.Input(canvas);
@@ -62,10 +69,9 @@ function load() {
 			stateData.defaultMix = mixDuration;
 
 			state.multipleMixing = false;
-			state.setAnimation(0, "rotate", true);
-			state.apply(skeleton);
-			skeleton.x = Math.random() * 200 - Math.random() * 200;
-			skeleton.y = Math.random() * 200 - Math.random() * 200;
+			state.setAnimation(0, "walk", true);
+			skeleton.x = 0;
+			skeleton.y = 0;
 			skeleton.updateWorldTransform();
 			skeletons.push({ skeleton: skeleton, state: state });
 		}
@@ -92,7 +98,7 @@ function render() {
 	updateMean.addValue(Date.now() - start);
 	start = Date.now();
 
-	gl.clearColor(0, 0, 0, 1);
+	gl.clearColor(0.2, 0.2, 0.2, 1);
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
 	renderer.resize(spine.webgl.ResizeMode.Fit);
@@ -100,6 +106,7 @@ function render() {
 	for (var i = 0; i < skeletons.length; i++) {
 		var skeleton = skeletons[i].skeleton;
 		renderer.drawSkeleton(skeleton);
+		renderer.drawSkeletonDebug(skeleton);
 	}
 	renderer.end();
 
