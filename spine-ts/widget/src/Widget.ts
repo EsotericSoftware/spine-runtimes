@@ -60,10 +60,14 @@ module spine {
 
 			this.validateConfig(config);
 
-			let canvas = this.canvas = document.createElement("canvas");
+			let existingCanvas = <HTMLCanvasElement> element.children[0];
+			let canvas = this.canvas = existingCanvas || document.createElement("canvas");
 			canvas.style.width = "100%";
 			canvas.style.height = "100%";
-			(<HTMLElement> element).appendChild(canvas);
+			// only create a new canvas when one doesn't already exist
+			if (!existingCanvas) {
+				(<HTMLElement>element).appendChild(canvas);
+			}
 			canvas.width = (<HTMLElement>element).clientWidth;
 			canvas.height = (<HTMLElement>element).clientHeight;
 			var webglConfig = { alpha: config.alpha };
