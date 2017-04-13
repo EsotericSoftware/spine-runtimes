@@ -239,10 +239,12 @@ module spine {
 
 		private resize () {
 			let canvas = this.canvas;
-			let w = canvas.clientWidth;
-			let h = canvas.clientHeight;
 			let bounds = this.bounds;
-			if (canvas.width != w || canvas.height != h) {
+			let w = bounds.size.x;
+			let h = bounds.size.y;
+			// set canvas drawingBuffer equal to skeleton bounds (enables retina quality graphics)
+			// Math.floor is for matching how browsers round canvas size
+			if (canvas.width != Math.floor(w) || canvas.height != Math.floor(h)) {
 				canvas.width = w;
 				canvas.height = h;
 			}
