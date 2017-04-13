@@ -63,12 +63,12 @@ module spine.threejs {
 			this.indicesLength = 0;
 		}
 
-		batch (vertices: ArrayLike<number>, indices: ArrayLike<number>, z: number = 0) {
+		batch (vertices: ArrayLike<number>, verticesLength: number, indices: ArrayLike<number>, indicesLength: number, z: number = 0) {
 			let indexStart = this.verticesLength / MeshBatcher.VERTEX_SIZE;
 			let vertexBuffer = this.vertices;
 			let i = this.verticesLength;
 			let j = 0;
-			for (;j < vertices.length;) {
+			for (;j < verticesLength;) {
 				vertexBuffer[i++] = vertices[j++];
 				vertexBuffer[i++] = vertices[j++];
 				vertexBuffer[i++] = z;
@@ -82,9 +82,9 @@ module spine.threejs {
 			this.verticesLength = i;
 
 			let indicesArray = this.indices;
-			for (i = this.indicesLength, j = 0; j < indices.length; i++, j++)
+			for (i = this.indicesLength, j = 0; j < indicesLength; i++, j++)
 				indicesArray[i] = indices[j] + indexStart;
-			this.indicesLength += indices.length;
+			this.indicesLength += indicesLength;
 		}
 
 		end () {

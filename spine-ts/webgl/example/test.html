@@ -12,8 +12,8 @@
 </body>
 <script>
 
-var FILE = "coin";
-var ANIMATION = "rotate";
+var FILE = "raptor";
+var ANIMATION = "walk";
 var NUM_SKELETONS = 1;
 var SCALE = 0.5;
 
@@ -69,7 +69,7 @@ function load() {
 			stateData.defaultMix = mixDuration;
 
 			state.multipleMixing = false;
-			state.setAnimation(0, "walk", true);
+			state.setAnimation(0, ANIMATION, true);
 			skeleton.x = 0;
 			skeleton.y = 0;
 			skeleton.updateWorldTransform();

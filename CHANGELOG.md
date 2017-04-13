@@ -121,6 +121,7 @@
   * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.  
   * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
   * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
+  * Added `SkeletonClipper` and `ConvexDecomposer`, used to implement software clipping of attachments.
 
 ### WebGL backend
  * Fixed renderer to work with 3.6 changes.
@@ -136,6 +137,7 @@
 
 ### Three.js backend
  * Fixed renderer to work with 3.6 changes. Two color tinting is not supported.
+ * Added clipping support
 
 ### Widget backend
  * Fixed renderer to work for 3.6 changes. Supports two color tinting & clipping (see webgl backend changes for details).

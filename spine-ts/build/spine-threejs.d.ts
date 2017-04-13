@@ -1166,7 +1166,7 @@ declare module spine.threejs {
 		private indicesLength;
 		constructor(mesh: THREE.Mesh, maxVertices?: number);
 		begin(): void;
-		batch(vertices: ArrayLike<number>, indices: ArrayLike<number>, z?: number): void;
+		batch(vertices: ArrayLike<number>, verticesLength: number, indices: ArrayLike<number>, indicesLength: number, z?: number): void;
 		end(): void;
 	}
 }
@@ -1176,6 +1176,7 @@ declare module spine.threejs {
 		state: AnimationState;
 		zOffset: number;
 		private batcher;
+		private clipper;
 		static QUAD_TRIANGLES: number[];
 		static VERTEX_SIZE: number;
 		private vertices;
@@ -1183,8 +1184,6 @@ declare module spine.threejs {
 		constructor(skeletonData: SkeletonData);
 		update(deltaTime: number): void;
 		private updateGeometry();
-		private computeRegionVertices(slot, region, pma);
-		private computeMeshVertices(slot, mesh, pma);
 	}
 }
 declare module spine.threejs {
