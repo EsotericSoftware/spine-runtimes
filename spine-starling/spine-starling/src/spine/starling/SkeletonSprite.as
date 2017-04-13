@@ -27,8 +27,39 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
+/******************************************************************************
+ * Spine Runtimes Software License v2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 
 package spine.starling {
+	import spine.attachments.ClippingAttachment;
+	import spine.SkeletonClipping;
 	import spine.Bone;
 	import spine.Skeleton;
 	import spine.SkeletonData;
@@ -60,6 +91,8 @@ package spine.starling {
 		public var batchable : Boolean = true;
 		private var _smoothing : String = "bilinear";
 		private static var _twoColorStyle : TwoColorMeshStyle;
+		private static var clipper: SkeletonClipping = new SkeletonClipping();
+		private static var QUAD_INDICES : Vector.<uint> = new <uint>[0, 1, 2, 2, 3, 0];
 
 		public function SkeletonSprite(skeletonData : SkeletonData) {
 			Bone.yDown = true;
@@ -71,13 +104,13 @@ package spine.starling {
 		}
 
 		override public function render(painter : Painter) : void {
+			var clipper: SkeletonClipping = SkeletonSprite.clipper;
 			painter.state.alpha *= skeleton.color.a;
 			var originalBlendMode : String = painter.state.blendMode;
 			var r : Number = skeleton.color.r * 255;
 			var g : Number = skeleton.color.g * 255;
 			var b : Number = skeleton.color.b * 255;
-			var drawOrder : Vector.<Slot> = skeleton.drawOrder;
-			var worldVertices : Vector.<Number> = _tempVertices;
+			var drawOrder : Vector.<Slot> = skeleton.drawOrder;			
 			var ii : int, iii : int;
 			var attachmentColor: spine.Color;
 			var rgb : uint, a : Number;
@@ -88,6 +121,7 @@ package spine.starling {
 			var uvs : Vector.<Number>;
 
 			for (var i : int = 0, n : int = drawOrder.length; i < n; ++i) {
+				var worldVertices : Vector.<Number> = _tempVertices;
 				var slot : Slot = drawOrder[i];
 				if (slot.attachment is RegionAttachment) {
 					var region : RegionAttachment = slot.attachment as RegionAttachment;
@@ -97,20 +131,20 @@ package spine.starling {
 					region.computeWorldVertices(slot.bone, worldVertices, 0, 2);					
 
 					mesh = region.rendererObject as SkeletonMesh;
+					indices = QUAD_INDICES;					
 					if (mesh == null) {
 						if (region.rendererObject is Image)
 							region.rendererObject = mesh = new SkeletonMesh(Image(region.rendererObject).texture);
 						if (region.rendererObject is AtlasRegion)
-							region.rendererObject = mesh = new SkeletonMesh(Image(AtlasRegion(region.rendererObject).rendererObject).texture);
-						
+							region.rendererObject = mesh = new SkeletonMesh(Image(AtlasRegion(region.rendererObject).rendererObject).texture);						
+												
 						indexData = mesh.getIndexData();
-						indices = new <uint>[0, 1, 2, 2, 3, 0];
 						for (ii = 0; ii < indices.length; ii++)
 							indexData.setIndex(ii, indices[ii]);
-						indexData.numIndices = 6;
+						indexData.numIndices = indices.length;
 						indexData.trim();
 					}
-					
+					indexData = mesh.getIndexData();
 					attachmentColor = region.color;
 					uvs = region.uvs;													
 				} else if (slot.attachment is MeshAttachment) {
@@ -121,6 +155,7 @@ package spine.starling {
 					meshAttachment.computeWorldVertices(slot, 0, meshAttachment.worldVerticesLength, worldVertices, 0, 2);
 					
 					mesh = meshAttachment.rendererObject as SkeletonMesh;
+					indices = meshAttachment.triangles;					
 					if (mesh == null) {
 						if (meshAttachment.rendererObject is Image)
 							meshAttachment.rendererObject = mesh = new SkeletonMesh(Image(meshAttachment.rendererObject).texture);
@@ -129,17 +164,20 @@ package spine.starling {
 						mesh.setStyle(_twoColorStyle);
 						
 						indexData = mesh.getIndexData();
-						indices = meshAttachment.triangles;
 						indicesLength = meshAttachment.triangles.length;
 						for (ii = 0; ii < indicesLength; ii++) {
 							indexData.setIndex(ii, indices[ii]);
 						}
 						indexData.numIndices = indicesLength;
 						indexData.trim();
-					}					
-										
+					}
+					indexData = mesh.getIndexData();				
 					attachmentColor = meshAttachment.color;
 					uvs = meshAttachment.uvs;					
+				} else if (slot.attachment is ClippingAttachment) {
+					var clip : ClippingAttachment = ClippingAttachment(slot.attachment);
+					clipper.clipStart(slot, clip);
+					continue;
 				} else {
 					continue;
 				}
@@ -148,6 +186,22 @@ package spine.starling {
 				rgb = Color.rgb(r * slot.color.r * attachmentColor.r, g * slot.color.g * attachmentColor.g, b * slot.color.b * attachmentColor.b);
 				if (slot.darkColor == null) dark = Color.rgb(0, 0, 0);
 				else dark = Color.rgb(slot.darkColor.r * 255, slot.darkColor.g * 255, slot.darkColor.b * 255);	
+
+				if (clipper.isClipping()) {
+					clipper.clipTriangles(worldVertices, indices, indices.length, uvs);
+					
+					verticesCount = clipper.clippedVertices.length >> 1;
+					worldVertices = clipper.clippedVertices;
+					uvs = clipper.clippedUvs;					
+					
+					indices = clipper.clippedTriangles;
+					indicesLength = indices.length;
+					for (ii = 0; ii < indicesLength; ii++) {
+						indexData.setIndex(ii, indices[ii]);
+					}
+					indexData.numIndices = indicesLength;
+					indexData.trim();
+				}
 
 				// Mesh doesn't retain the style, can't find the reason why
 				mesh.setStyle(_twoColorStyle);			
@@ -161,8 +215,11 @@ package spine.starling {
 				vertexData.numVertices = verticesCount;
 				painter.state.blendMode = blendModes[slot.data.blendMode.ordinal];				
 				painter.batchMesh(mesh);
+				
+				clipper.clipEndWithSlot(slot);
 			}
 			painter.state.blendMode = originalBlendMode;
+			clipper.clipEnd();
 		}
 
 		override public function hitTest(localPoint : Point) : DisplayObject {

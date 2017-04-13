@@ -65,13 +65,16 @@ package spine.examples {
 			json.scale = 0.5;
 			var skeletonData : SkeletonData = json.readSkeletonData(new RaptorJson());
 
+			this.x = 400;
+			this.y = 560;
+
 			skeleton = new SkeletonAnimation(skeletonData);
-			skeleton.x = 400;
-			skeleton.y = 560;
+//			skeleton.x = 400;
+//			skeleton.y = 560;
 			skeleton.state.setAnimationByName(0, "walk", true);
 
 			addChild(skeleton);
-			Starling.juggler.add(skeleton);
+			// Starling.juggler.add(skeleton);
 
 			addEventListener(TouchEvent.TOUCH, onClick);
 		}

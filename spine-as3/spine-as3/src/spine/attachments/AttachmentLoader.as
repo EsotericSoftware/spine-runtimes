@@ -46,5 +46,8 @@ package spine.attachments {
 
 		/** @return May be null to not load an attachment */
 		function newPointAttachment(skin : Skin, name : String) : PointAttachment;
+		
+		/** @return May be null to not load an attachment */
+		function newClippingAttachment(skin : Skin, name : String) : ClippingAttachment;
 	}
 }

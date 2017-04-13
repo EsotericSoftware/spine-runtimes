@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "WOArBZLexLEX/Tow3AuM8ddszEE", "spine": "3.6.14-beta", "width": 1223.73, "height": 1055.62, "images": "./images/" },
+"skeleton": { "hash": "T+jP778edtEIrEMb7QvVNAgiHUo", "spine": "3.6.14-beta", "width": 1223.73, "height": 1056.91, "images": "./images/" },
 "bones": [
 	{ "name": "root" },
 	{ "name": "hip", "parent": "root", "rotation": 3.16, "x": -136.79, "y": 415.48, "color": "fbff00ff" },
@@ -199,6 +199,7 @@
 	{ "name": "tongue3", "parent": "tongue2", "length": 43.65, "rotation": 12.86, "x": 44.27, "y": -0.21, "color": "fff200ff" }
 ],
 "slots": [
+	{ "name": "clip", "bone": "root", "attachment": "clip" },
 	{ "name": "back_hand", "bone": "back_hand", "attachment": "back_hand" },
 	{ "name": "back_arm", "bone": "back_arm", "attachment": "back_arm" },
 	{ "name": "back_bracer", "bone": "back_bracer", "attachment": "back_bracer" },
@@ -309,6 +310,15 @@
 		},
 		"back_thigh": {
 			"back_thigh": { "x": 37.85, "y": -4.37, "rotation": 19.25, "width": 78, "height": 47 }
+		},
+		"clip": {
+			"clip": {
+				"type": "clipping",
+				"end": "clip",
+				"vertexCount": 25,
+				"vertices": [ -31.42, 352.85, -182.02, 382.27, -214.91, 562.3, -8.92, 647.12, 183.22, 555.37, 254.19, 375.35, 261.12, 153.78, 3.2, 13.57, -270.3, -36.63, -408.78, 48.19, -349.93, 280.14, -228.76, 133.01, -59.12, 94.93, 107.06, 160.71, 202.26, 349.38, 122.64, 487.86, -41.81, 557.1, -142.21, 489.6, -57.39, 422.09, 49.94, 432.47, 133.02, 370.16, 94.94, 271.49, 43.01, 186.67, -138.74, 174.55, -230.49, 273.22 ],
+				"color": "ce3a3aff"
+			}
 		},
 		"eyes_open": {
 			"eyes_open": { "x": 93.24, "y": -25.45, "rotation": -70.58, "width": 93, "height": 89 }

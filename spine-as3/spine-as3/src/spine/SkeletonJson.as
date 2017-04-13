@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 package spine {
+	import spine.attachments.ClippingAttachment;
 	import spine.animation.TwoColorTimeline;
 	import spine.attachments.PointAttachment;
 	import spine.animation.PathConstraintMixTimeline;
@@ -231,7 +232,7 @@ package spine {
 					var slotIndex : int = skeletonData.findSlotIndex(slotName);
 					var slotEntry : Object = skinMap[slotName];
 					for (var attachmentName : String in slotEntry) {
-						var attachment : Attachment = readAttachment(slotEntry[attachmentName], skin, slotIndex, attachmentName);
+						var attachment : Attachment = readAttachment(slotEntry[attachmentName], skin, slotIndex, attachmentName, skeletonData);
 						if (attachment != null)
 							skin.addAttachment(slotIndex, attachmentName, attachment);
 					}
@@ -274,7 +275,7 @@ package spine {
 			return skeletonData;
 		}
 
-		private function readAttachment(map : Object, skin : Skin, slotIndex : int, name : String) : Attachment {
+		private function readAttachment(map : Object, skin : Skin, slotIndex : int, name : String, skeletonData: SkeletonData) : Attachment {
 			name = map["name"] || name;
 
 			var typeName : String = map["type"] || "region";
@@ -353,6 +354,23 @@ package spine {
 						point.color.setFrom(toColor(color, 0), toColor(color, 1), toColor(color, 2), toColor(color, 3));
 					}
 					return point;
+				case AttachmentType.clipping:
+					var clip : ClippingAttachment = attachmentLoader.newClippingAttachment(skin, name);
+					if (!clip) return null;
+					var end : String = map["end"];
+					if (end != null) {
+						var slot : SlotData = skeletonData.findSlot(end);
+						if (slot == null) throw new Error("Clipping end slot not found: " + end);
+						clip.endSlot = slot;
+					}
+					
+					vertexCount = int(map["vertexCount"]);
+					readVertices(map, clip, vertexCount << 1);					
+					color = map["color"];
+					if (color) {
+						clip.color.setFrom(toColor(color, 0), toColor(color, 1), toColor(color, 2), toColor(color, 3));
+					}
+					return clip;
 			}
 
 			return null;

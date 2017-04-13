@@ -33,14 +33,14 @@ package spine.attachments {
 	import spine.Bone;
 
 	public dynamic class RegionAttachment extends Attachment {
-		public const X1 : int = 0;
-		public const Y1 : int = 1;
-		public const X2 : int = 2;
-		public const Y2 : int = 3;
-		public const X3 : int = 4;
-		public const Y3 : int = 5;
-		public const X4 : int = 6;
-		public const Y4 : int = 7;
+		public const BLX : int = 0;
+		public const BLY : int = 1;
+		public const ULX : int = 2;
+		public const ULY : int = 3;
+		public const URX : int = 4;
+		public const URY : int = 5;
+		public const BRX : int = 6;
+		public const BRY : int = 7;
 		public var x : Number;
 		public var y : Number;
 		public var scaleX : Number = 1;
@@ -57,7 +57,7 @@ package spine.attachments {
 		public var regionHeight : Number;
 		public var regionOriginalWidth : Number; // Unrotated, unstripped size.
 		public var regionOriginalHeight : Number;
-		public var offset : Vector.<Number> = new Vector.<Number>();
+		private var offset : Vector.<Number> = new Vector.<Number>();
 		public var uvs : Vector.<Number> = new Vector.<Number>();
 
 		public function RegionAttachment(name : String) {
@@ -84,36 +84,36 @@ package spine.attachments {
 			var localX2Sin : Number = localX2 * sin;
 			var localY2Cos : Number = localY2 * cos + y;
 			var localY2Sin : Number = localY2 * sin;
-			offset[X1] = localXCos - localYSin;
-			offset[Y1] = localYCos + localXSin;
-			offset[X2] = localXCos - localY2Sin;
-			offset[Y2] = localY2Cos + localXSin;
-			offset[X3] = localX2Cos - localY2Sin;
-			offset[Y3] = localY2Cos + localX2Sin;
-			offset[X4] = localX2Cos - localYSin;
-			offset[Y4] = localYCos + localX2Sin;
+			offset[BLX] = localXCos - localYSin;
+			offset[BLY] = localYCos + localXSin;
+			offset[ULX] = localXCos - localY2Sin;
+			offset[ULY] = localY2Cos + localXSin;
+			offset[URX] = localX2Cos - localY2Sin;
+			offset[URY] = localY2Cos + localX2Sin;
+			offset[BRX] = localX2Cos - localYSin;
+			offset[BRY] = localYCos + localX2Sin;
 		}
 
 		public function setUVs(u : Number, v : Number, u2 : Number, v2 : Number, rotate : Boolean) : void {
 			var uvs : Vector.<Number> = this.uvs;
 			if (rotate) {
-				uvs[X2] = u;
-				uvs[Y2] = v2;
-				uvs[X3] = u;
-				uvs[Y3] = v;
-				uvs[X4] = u2;
-				uvs[Y4] = v;
-				uvs[X1] = u2;
-				uvs[Y1] = v2;
+				uvs[4] = u;
+				uvs[5] = v2;
+				uvs[6] = u;
+				uvs[7] = v;
+				uvs[0] = u2;
+				uvs[1] = v;
+				uvs[2] = u2;
+				uvs[3] = v2;
 			} else {
-				uvs[X1] = u;
-				uvs[Y1] = v2;
-				uvs[X2] = u;
-				uvs[Y2] = v;
-				uvs[X3] = u2;
-				uvs[Y3] = v;
-				uvs[X4] = u2;
-				uvs[Y4] = v2;
+				uvs[2] = u;
+				uvs[3] = v2;
+				uvs[4] = u;
+				uvs[5] = v;
+				uvs[6] = u2;
+				uvs[7] = v;
+				uvs[0] = u2;
+				uvs[1] = v2;
 			}
 		}
 
@@ -123,26 +123,26 @@ package spine.attachments {
 			var a : Number = bone.a, b : Number = bone.b, c : Number = bone.c, d : Number = bone.d;
 			var offsetX : Number = 0, offsetY : Number = 0;
 
-			offsetX = vertexOffset[X1];
-			offsetY = vertexOffset[Y1];
+			offsetX = vertexOffset[BRX];
+			offsetY = vertexOffset[BRY];
 			worldVertices[offset] = offsetX * a + offsetY * b + x; // br
 			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 			offset += stride;
-
-			offsetX = vertexOffset[X2];
-			offsetY = vertexOffset[Y2];
+		
+			offsetX = vertexOffset[BLX];
+			offsetY = vertexOffset[BLY];
 			worldVertices[offset] = offsetX * a + offsetY * b + x; // bl
 			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 			offset += stride;
-
-			offsetX = vertexOffset[X3];
-			offsetY = vertexOffset[Y3];
+		
+			offsetX = vertexOffset[ULX];
+			offsetY = vertexOffset[ULY];
 			worldVertices[offset] = offsetX * a + offsetY * b + x; // ul
 			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 			offset += stride;
-
-			offsetX = vertexOffset[X4];
-			offsetY = vertexOffset[Y4];
+		
+			offsetX = vertexOffset[URX];
+			offsetY = vertexOffset[URY];
 			worldVertices[offset] = offsetX * a + offsetY * b + x; // ur
 			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 		}

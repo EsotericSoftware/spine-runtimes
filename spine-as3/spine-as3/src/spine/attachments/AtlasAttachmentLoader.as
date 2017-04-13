@@ -93,6 +93,10 @@ package spine.attachments {
 		public function newPointAttachment(skin : Skin, name : String) : PointAttachment {
 			return new PointAttachment(name);
 		}
+		
+		public function newClippingAttachment(skin : Skin, name : String) : ClippingAttachment {
+			return new ClippingAttachment(name);
+		}
 
 		static public function nextPOT(value : int) : int {
 			value--;
