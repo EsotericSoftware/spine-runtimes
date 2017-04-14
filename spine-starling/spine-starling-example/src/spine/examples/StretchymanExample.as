@@ -104,7 +104,7 @@ package spine.examples {
 			if (touch && touch.phase == TouchPhase.BEGAN) {
 				var parent: DisplayObjectContainer = this.parent;
 				this.removeFromParent(true);			
-				parent.addChild(new SpineboyExample());				
+				parent.addChild(new CoinExample());				
 			}
 		}
 	}

@@ -43,6 +43,9 @@ package spine {
 		private var clipAttachment: ClippingAttachment;
 		private var clippingPolygons: Vector.<Vector.<Number>>;
 
+		public function SkeletonClipping () {
+		}
+
 		public function clipStart (slot: Slot, clip: ClippingAttachment) : void {
 			if (this.clipAttachment != null) return;
 			this.clipAttachment = clip;

@@ -154,6 +154,10 @@ cp -f ../stretchyman/export/stretchyman.png ../../spine-sfml/data/
 
 echo "spine-starling"
 # DO NOT DELETE EVERYTHING IN SOURCE, ESPECIALLY goblins-mesh-starling.png/.xml
+cp -f ../coin/export/coin.json ../../spine-starling/spine-starling-example/src/
+cp -f ../coin/export/coin.atlas ../../spine-starling/spine-starling-example/src/
+cp -f ../coin/export/coin.png ../../spine-starling/spine-starling-example/src/
+
 cp -f ../goblins/export/goblins-mesh.json ../../spine-starling/spine-starling-example/src/
 cp -f ../goblins/export/goblins.atlas ../../spine-starling/spine-starling-example/src/
 cp -f ../goblins/export/goblins.png ../../spine-starling/spine-starling-example/src/

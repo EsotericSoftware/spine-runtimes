@@ -40,6 +40,9 @@ package spine {
 		private var polygonIndicesPool : Pool = new Pool(function() : Vector.<int> {
 			return new Vector.<int>();
 		});
+		
+		public function ConvexDecomposer () {			
+		}
 
 		public function decompose(input : Vector.<Number>) : Vector.<Vector.<Number>> {
 			var vertices : Vector.<Number> = input;
