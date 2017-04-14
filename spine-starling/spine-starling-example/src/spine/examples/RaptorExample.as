@@ -70,9 +70,13 @@ package spine.examples {
 
 			skeleton = new SkeletonAnimation(skeletonData);
 			skeleton.state.setAnimationByName(0, "walk", true);
+			skeleton.state.update(0);
+			skeleton.state.apply(skeleton.skeleton);
+			skeleton.skeleton.updateWorldTransform();
+			this.setRequiresRedraw();
 
 			addChild(skeleton);
-			Starling.juggler.add(skeleton);
+//			Starling.juggler.add(skeleton);
 
 			addEventListener(TouchEvent.TOUCH, onClick);
 		}
@@ -80,10 +84,10 @@ package spine.examples {
 		private function onClick(event : TouchEvent) : void {
 			var touch : Touch = event.getTouch(this);
 			if (touch && touch.phase == TouchPhase.BEGAN) {
-//				skeleton.state.update(gunGrabCount++ % 2 == 1 ? 0 : 0.1);
-//				skeleton.state.apply(skeleton.skeleton);
-//				skeleton.skeleton.updateWorldTransform();
-//				this.setRequiresRedraw();
+				skeleton.state.update(gunGrabCount++ % 2 == 1 ? 0 : 0.1);
+				skeleton.state.apply(skeleton.skeleton);
+				skeleton.skeleton.updateWorldTransform();
+				this.setRequiresRedraw();
 //				if (gunGrabCount < 2) {
 //					if (gunGrabbed)
 //						skeleton.skeleton.setToSetupPose();
@@ -92,9 +96,9 @@ package spine.examples {
 //					gunGrabbed = !gunGrabbed;
 //					gunGrabCount++;
 //				} else {
-					var parent: DisplayObjectContainer = this.parent;
-					this.removeFromParent(true);	
-					parent.addChild(new TankExample());
+//					var parent: DisplayObjectContainer = this.parent;
+//					this.removeFromParent(true);	
+//					parent.addChild(new TankExample());
 //				}
 			}
 		}
