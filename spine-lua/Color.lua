@@ -28,8 +28,11 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-local setmetatable = setmetatable
 local utils = require "spine-lua.utils"
+
+local utils_clamp = utils.clamp
+
+local setmetatable = setmetatable
 
 local Color = {}
 Color.__index = Color
@@ -75,10 +78,10 @@ function Color:add(r, g, b, a)
 end
 
 function Color:clamp()
-	self.r = utils.clamp(self.r, 0, 1)
-	self.g = utils.clamp(self.g, 0, 1)
-	self.b = utils.clamp(self.b, 0, 1)
-	self.a = utils.clamp(self.a, 0, 1)
+	self.r = utils_clamp(self.r, 0, 1)
+	self.g = utils_clamp(self.g, 0, 1)
+	self.b = utils_clamp(self.b, 0, 1)
+	self.a = utils_clamp(self.a, 0, 1)
 end
 
 return Color

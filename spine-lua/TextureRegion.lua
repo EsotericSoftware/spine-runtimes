@@ -28,13 +28,9 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-local setmetatable = setmetatable
-
 local TextureRegion = {}
-TextureRegion.__index = TextureRegion
 
 function TextureRegion.new ()
-
 	local self = {
 		renderObject = nil,
 		u = 0, v = 0,
@@ -44,7 +40,6 @@ function TextureRegion.new ()
 		offsetX = 0, offsetY = 0,
 		originalWidth = 0, originalHeight = 0
 	}
-	setmetatable(self, TextureRegion)
 
 	return self
 end

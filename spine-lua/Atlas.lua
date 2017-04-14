@@ -28,27 +28,35 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
+local utils = spine.utils
+
+local tonumber = tonumber
+local string_match = string.match
+local string_gmatch = string.gmatch
+
+
+local function parseIntTuple4( l )
+	local a,b,c,d = string_match( l , " ? ?%a+: ([+-]?%d+), ?([+-]?%d+), ?([+-]?%d+), ?([+-]?%d+)" )
+	local a,b,c,d = tonumber( a ), tonumber( b ), tonumber( c ), tonumber( d )
+	return a and b and c and d and {a, b, c ,d}
+end
+
+local function parseIntTuple2( l )
+	local a,b = string_match( l , " ? ?%a+: ([+-]?%d+), ?([+-]?%d+)" )
+	local a,b = tonumber( a ), tonumber( b )
+	return a and b and {a, b}
+end
+
+
 local Atlas = {}
 
 function Atlas.parse(atlasPath, atlasBase)
-	local function parseIntTuple4( l )
-		local a,b,c,d = string.match( l , " ? ?%a+: ([+-]?%d+), ?([+-]?%d+), ?([+-]?%d+), ?([+-]?%d+)" )
-		local a,b,c,d = tonumber( a ), tonumber( b ), tonumber( c ), tonumber( d )
-		return a and b and c and d and {a, b, c ,d}
-	end
-
-	local function parseIntTuple2( l )
-		local a,b = string.match( l , " ? ?%a+: ([+-]?%d+), ?([+-]?%d+)" )
-		local a,b = tonumber( a ), tonumber( b )
-		return a and b and {a, b}
-	end
-
 	if not atlasPath then
 		error("Error: " .. atlasPath .. ".atlas" .. " doesn't exist!")
 		return nil
 	end
 
-	local atlasLines = spine.utils.readFile( atlasPath, atlasBase )
+	local atlasLines = utils.readFile( atlasPath, atlasBase )
 	if not atlasLines then
 		error("Error: " .. atlasPath .. ".atlas" .. " unable to read!")
 		return nil
@@ -56,8 +64,7 @@ function Atlas.parse(atlasPath, atlasBase)
 
 	local pages = {}
 
-
-	local it = string.gmatch(atlasLines, "(.-)\r?\n") -- iterate over lines
+	local it = string_gmatch(atlasLines, "(.-)\r?\n") -- iterate over lines
 	for l in it do
 		if #l == 0 then
 			l = it()
@@ -68,18 +75,18 @@ function Atlas.parse(atlasPath, atlasBase)
 				if page.size then
 					l = it()
 				end
-				page.format = string.match( l, "%a+: (.+)" )
-				page.filter = {string.match( it(), "%a+: (.+),(.+)" )}
-				page.wrap = string.match( it(), "%a+: (.+)" )
+				page.format = string_match( l, "%a+: (.+)" )
+				page.filter = {string_match( it(), "%a+: (.+),(.+)" )}
+				page.wrap = string_match( it(), "%a+: (.+)" )
 				page.regions = {}
-				table.insert( pages, page )
+				pages[#pages + 1] = page
 			else
 				break
 			end
 		else
 			local region = {name = l}
 
-			region.rotate = string.match( it(), "%a+: (.+)" ) == "true"
+			region.rotate = string_match( it(), "%a+: (.+)" ) == "true"
 			region.xy = parseIntTuple2( it() )
 			region.size = parseIntTuple2( it() )
 			l = it()
@@ -93,9 +100,10 @@ function Atlas.parse(atlasPath, atlasBase)
 			end
 			region.orig = parseIntTuple2( l )
 			region.offset = parseIntTuple2( it() )
-			region.index = tonumber( string.match( it() , "%a+: ([+-]?%d+)" ) )
+			region.index = tonumber( string_match( it() , "%a+: ([+-]?%d+)" ) )
 
-			table.insert( pages[#pages].regions, region )
+			local pageRegion = pages[#pages].regions
+			pageRegion[#pageRegion + 1] = region
 		end
 	end
 

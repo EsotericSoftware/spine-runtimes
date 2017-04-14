@@ -28,14 +28,17 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-local setmetatable = setmetatable
-
-local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local RegionAttachment = require "spine-lua.attachments.RegionAttachment"
 local BoundingBoxAttachment = require "spine-lua.attachments.BoundingBoxAttachment"
 local MeshAttachment = require "spine-lua.attachments.MeshAttachment"
 local PathAttachment = require "spine-lua.attachments.PathAttachment"
-local TextureAtlas = require "spine-lua.TextureAtlas"
+
+local RegionAttachment_new = RegionAttachment.new
+local MeshAttachment_new = MeshAttachment.new
+local BoundingBoxAttachment_new = BoundingBoxAttachment.new
+local PathAttachment_new = PathAttachment.new
+
+local setmetatable = setmetatable
 
 local AtlasAttachmentLoader = {}
 AtlasAttachmentLoader.__index = AtlasAttachmentLoader
@@ -52,7 +55,7 @@ function AtlasAttachmentLoader:newRegionAttachment (skin, name, path)
 	local region = self.atlas:findRegion(path)
 	if not region then error("Region not found in atlas: " .. path .. " (region attachment: " .. name .. ")") end
 	region.renderObject = region
-	local attachment = RegionAttachment.new(name)
+	local attachment = RegionAttachment_new(name)
 	attachment:setRegion(region)
 	attachment.region = region
 	return attachment
@@ -62,7 +65,7 @@ function AtlasAttachmentLoader:newMeshAttachment (skin, name, path)
 	local region = self.atlas:findRegion(path)
 	if not region then error("Region not found in atlas: " .. path .. " (mesh attachment: " .. name .. ")") end
 	region.renderObject = region
-	local attachment = MeshAttachment.new(name)
+	local attachment = MeshAttachment_new(name)
 	attachment.region = region
 	return attachment
 end
@@ -72,11 +75,11 @@ function AtlasAttachmentLoader:newSkinningMeshAttachment (skin, name, path)
 end
 
 function AtlasAttachmentLoader:newBoundingBoxAttachment (skin, name)
-	return BoundingBoxAttachment.new(name)
+	return BoundingBoxAttachment_new(name)
 end
 
 function AtlasAttachmentLoader:newPathAttachment(skin, name)
-	return PathAttachment.new(name)
+	return PathAttachment_new(name)
 end
 
 return AtlasAttachmentLoader

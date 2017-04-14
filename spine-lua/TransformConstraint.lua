@@ -28,19 +28,16 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-local setmetatable = setmetatable
+
 local utils = require "spine-lua.utils"
+
 local math_pi = math.pi
 local math_pi2 = math.pi * 2
 local math_atan2 = math.atan2
 local math_sqrt = math.sqrt
-local math_acos = math.acos
 local math_sin = math.sin
 local math_cos = math.cos
-local table_insert = table.insert
-local math_deg = math.deg
-local math_rad = math.rad
-local math_abs = math.abs
+local setmetatable = setmetatable
 
 local TransformConstraint = {}
 TransformConstraint.__index = TransformConstraint
@@ -58,8 +55,10 @@ function TransformConstraint.new (data, skeleton)
 	}
 	setmetatable(self, TransformConstraint)
 
-	for i,bone in ipairs(data.bones) do
-		table_insert(self.bones, skeleton:findBone(bone.name))
+	local bones = self.bones
+	local data_bones = data.bones
+	for i=1, #data_bones do
+		bones[#bones + 1] = skeleton:findBone(data_bones[i].name)
 	end
 	self.target = skeleton:findBone(data.target.name)
 
@@ -85,7 +84,9 @@ function TransformConstraint:update ()
 	local offsetRotation = self.data.offsetRotation * degRadReflect
 	local offsetShearY = self.data.offsetShearY * degRadReflect
 	local bones = self.bones
-	for i, bone in ipairs(bones) do
+
+	for i=1, #bones do
+		local bone = bones[i]
 		local modified = false
 		if rotateMix ~= 0 then
 			local a = bone.a

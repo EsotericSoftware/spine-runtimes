@@ -28,11 +28,14 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-local setmetatable = setmetatable
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local VertexAttachment = require "spine-lua.attachments.VertexAttachment"
 local utils = require "spine-lua.utils"
 local Color = require "spine-lua.Color"
+
+local AttachmentType_mesh = AttachmentType.mesh
+
+local setmetatable = setmetatable
 
 local MeshAttachment = {}
 MeshAttachment.__index = MeshAttachment
@@ -41,7 +44,7 @@ setmetatable(MeshAttachment, { __index = VertexAttachment })
 function MeshAttachment.new (name)
 	if not name then error("name cannot be nil", 2) end
 
-	local self = VertexAttachment.new(name, AttachmentType.mesh)
+	local self = VertexAttachment.new(name, AttachmentType_mesh)
 	self.region = nil
 	self.path = nil
 	self.regionUVs = nil
@@ -52,14 +55,16 @@ function MeshAttachment.new (name)
 	self.parentMesh = nil
 	self.inheritDeform = false
 	self.tempColor = Color.newWith(1, 1, 1, 1)
+
 	setmetatable(self, MeshAttachment)
+
 	return self
 end
 
 function MeshAttachment:updateUVs ()
 	local regionUVs = self.regionUVs
 	local verticesLength = #regionUVs
-	local worldVerticesLength = (verticesLength / 2) * 8
+	local worldVerticesLength = verticesLength * 4
 	if not self.worldVertices or #self.worldVertices ~= worldVerticesLength then
 		self.worldVertices = utils.newNumberArray(worldVerticesLength)
 	end
@@ -74,17 +79,17 @@ function MeshAttachment:updateUVs ()
 		width = 1
 		height = 1
 	else
-		u = self.region.u;
-		v = self.region.v;
-		width = self.region.u2 - u;
-		height = self.region.v2 - v;
+		u = self.region.u
+		v = self.region.v
+		width = self.region.u2 - u
+		height = self.region.v2 - v
 	end
 	if self.region and self.region.rotate then
 		local i = 0
 		local w = 2
 		while i < verticesLength do
-			self.worldVertices[w + 1] = u + regionUVs[i + 2] * width;
-			self.worldVertices[w + 2] = v + height - regionUVs[i + 1] * height;
+			self.worldVertices[w + 1] = u + regionUVs[i + 2] * width
+			self.worldVertices[w + 2] = v + height - regionUVs[i + 1] * height
 			i = i + 2
 			w = w + 8
 		end
@@ -92,8 +97,8 @@ function MeshAttachment:updateUVs ()
 		local i = 0
 		local w = 2
 		while i < verticesLength do
-			self.worldVertices[w + 1] = u + regionUVs[i + 1] * width;
-			self.worldVertices[w + 2] = v + regionUVs[i + 2] * height;
+			self.worldVertices[w + 1] = u + regionUVs[i + 1] * width
+			self.worldVertices[w + 2] = v + regionUVs[i + 2] * height
 			i = i + 2
 			w = w + 8
 		end

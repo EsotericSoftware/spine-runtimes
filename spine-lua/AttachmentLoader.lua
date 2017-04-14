@@ -28,36 +28,40 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local RegionAttachment = require "spine-lua.attachments.RegionAttachment"
 local BoundingBoxAttachment = require "spine-lua.attachments.BoundingBoxAttachment"
 local MeshAttachment = require "spine-lua.attachments.MeshAttachment"
 local PathAttachment = require "spine-lua.attachments.PathAttachment"
 
+local setmetatable = setmetatable
+
 local AttachmentLoader = {}
+AttachmentLoader.__index = AttachmentLoader
+
 function AttachmentLoader.new ()
-	local self = {}
-
-	function self:newRegionAttachment (skin, name, path)
-		return RegionAttachment.new(name)
-	end
-
-	function self:newMeshAttachment (skin, name, path)
-		return MeshAttachment.new(name)
-	end
-
-	function self:newSkinningMeshAttachment (skin, name, path)
-		return SkinningMeshAttachment.new(name)
-	end
-
-	function self:newBoundingBoxAttachment (skin, name)
-		return BoundingBoxAttachment.new(name)
-	end
-
-	function self:newPathAttachment(skin, name)
-		return PathAttachment.new(name)
-	end
+	local self = setmetatable({}, AttachmentLoader)
 
 	return self
 end
+
+function AttachmentLoader:newRegionAttachment (skin, name, path)
+	return RegionAttachment.new(name)
+end
+
+function AttachmentLoader:newMeshAttachment (skin, name, path)
+	return MeshAttachment.new(name)
+end
+
+function AttachmentLoader:newSkinningMeshAttachment (skin, name, path)
+	return SkinningMeshAttachment.new(name)
+end
+
+function AttachmentLoader:newBoundingBoxAttachment (skin, name)
+	return BoundingBoxAttachment.new(name)
+end
+
+function AttachmentLoader:newPathAttachment(skin, name)
+	return PathAttachment.new(name)
+end
+
 return AttachmentLoader

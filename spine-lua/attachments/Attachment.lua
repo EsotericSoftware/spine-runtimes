@@ -28,12 +28,11 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-local setmetatable = setmetatable
-
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
 
+local setmetatable = setmetatable
+
 local Attachment = {}
-Attachment.__index = Attachment
 
 function Attachment.new (name, attachmentType)
 	if not name then error("name cannot be nil.", 2) end
@@ -43,7 +42,7 @@ function Attachment.new (name, attachmentType)
 		name = name,
 		type = attachmentType
 	}
-	setmetatable(self, Attachment)
+	
 	return self
 end
 

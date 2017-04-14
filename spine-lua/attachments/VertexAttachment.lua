@@ -32,14 +32,12 @@
 -- access adds 1 to the calculated index. We should switch the logic
 -- to 1-based indexing eventually.
 
-local setmetatable = setmetatable
-
-local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local Attachment = require "spine-lua.attachments.Attachment"
+
+local setmetatable = setmetatable
 
 local VertexAttachment = {}
 VertexAttachment.__index = VertexAttachment
-setmetatable(VertexAttachment, { __index = Attachment })
 
 function VertexAttachment.new (name, attachmentType)
 	local self = Attachment.new(name, attachmentType)
@@ -47,6 +45,7 @@ function VertexAttachment.new (name, attachmentType)
 	self.vertices = nil
 	self.worldVerticesLength = 0
 	setmetatable(self, VertexAttachment)
+
 	return self
 end
 

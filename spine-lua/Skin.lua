@@ -29,7 +29,6 @@
 -------------------------------------------------------------------------------
 
 local setmetatable = setmetatable
-local table_insert = table.insert
 
 local Skin = {}
 Skin.__index = Skin
@@ -84,14 +83,14 @@ end
 function Skin:findNamesForSlot (slotIndex)
 	local names = {}
 	for k,v in self.attachments do
-		if v[1] == slotIndex then table_insert(names, v[2]) end
+		if v[1] == slotIndex then names[#names + 1] = v[2] end
 	end
 end
 
 function Skin:findAttachmentsForSlot (slotIndex)
 	local attachments = {}
 	for k,v in self.attachments do
-		if v[1] == slotIndex then table_insert(attachments, v[3]) end
+		if v[1] == slotIndex then attachments[#attachments + 1] = v[3] end
 	end
 end
 

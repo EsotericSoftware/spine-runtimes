@@ -41,4 +41,5 @@ function EventData.new (name)
 
 	return self
 end
+
 return EventData

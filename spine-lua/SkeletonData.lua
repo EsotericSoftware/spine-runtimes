@@ -85,7 +85,9 @@ end
 
 function SkeletonData:findSkin (skinName)
 	if not skinName then error("skinName cannot be nil.", 2) end
-	for i,skin in ipairs(self.skins) do
+	local skins = self.skins
+	for i=1, #skins do
+		local skin = skins[i]
 		if skin.name == skinName then return skin end
 	end
 	return nil
@@ -93,7 +95,9 @@ end
 
 function SkeletonData:findEvent (eventName)
 	if not eventName then error("eventName cannot be nil.", 2) end
-	for i,event in ipairs(self.events) do
+	local events = self.events
+	for i=1, #events do
+		local event = events[i]
 		if event.name == eventName then return event end
 	end
 	return nil
@@ -101,7 +105,9 @@ end
 
 function SkeletonData:findAnimation (animationName)
 	if not animationName then error("animationName cannot be nil.", 2) end
-	for i,animation in ipairs(self.animations) do
+	local animations = self.animations
+	for i=1, #animations do
+		local animation = animations[i]
 		if animation.name == animationName then return animation end
 	end
 	return nil
@@ -109,7 +115,9 @@ end
 
 function SkeletonData:findIkConstraint (constraintName)
 	if not constraintName then error("constraintName cannot be nil.", 2) end
-	for i,constraint in ipairs(self.ikConstraints) do
+	local ikConstraints = self.ikConstraints
+	for i=1, #ikConstraints do
+		local constraint = ikConstraints[i]
 		if constraint.name == constraintName then return constraint end
 	end
 	return nil
@@ -117,7 +125,9 @@ end
 
 function SkeletonData:findTransformConstraint (constraintName)
 	if not constraintName then error("constraintName cannot be nil.", 2) end
-	for i,constraint in ipairs(self.transformConstraints) do
+	local transformConstraints = self.transformConstraints
+	for i=1, #transformConstraints do
+		local constraint = transformConstraints[i]
 		if constraint.name == constraintName then return constraint end
 	end
 	return nil
@@ -125,7 +135,9 @@ end
 
 function SkeletonData:findPathConstraint (constraintName)
 	if not constraintName then error("constraintName cannot be nil.", 2) end
-	for i,constraint in ipairs(self.pathConstraints) do
+	local pathConstraints = self.pathConstraints
+	for i=1, #pathConstraints do
+		local constraint = pathConstraints[i]
 		if constraint.name == constraintName then return constraint end
 	end
 	return nil
@@ -133,7 +145,9 @@ end
 
 function SkeletonData:findPathConstraintIndex (constraintName)
 	if not constraintName then error("constraintName cannot be nil.", 2) end
-	for i,constraint in ipairs(self.pathConstraints) do
+	local pathConstraints = self.pathConstraints
+	for i=1, #pathConstraints do
+		local constraint = pathConstraints[i]
 		if constraint.name == constraintName then return i end
 	end
 	return -1

@@ -35,9 +35,7 @@ local math_sqrt = math.sqrt
 local math_acos = math.acos
 local math_sin = math.sin
 local math_cos = math.cos
-local table_insert = table.insert
 local math_deg = math.deg
-local math_rad = math.rad
 local math_abs = math.abs
 
 local IkConstraint = {}
@@ -58,7 +56,7 @@ function IkConstraint.new (data, skeleton)
 
 	local self_bones = self.bones
 	for i,boneData in ipairs(data.bones) do
-		table_insert(self_bones, skeleton:findBone(boneData.name))
+		self_bones[#self_bones + 1] = skeleton:findBone(boneData.name)
 	end
 	self.target = skeleton:findBone(data.target.name)
 

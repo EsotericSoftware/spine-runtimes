@@ -29,14 +29,19 @@
 -------------------------------------------------------------------------------
 
 local AttachmentType = require "spine-lua.AttachmentType"
+local AttachmentType_mesh = AttachmentType.mesh
+
+local setmetatable = setmetatable
 
 local MeshAttachment = {}
+MeshAttachment.__index = MeshAttachment
+
 function MeshAttachment.new (name)
 	if not name then error("name cannot be nil", 2) end
 
 	local self = {
 		name = name,
-		type = AttachmentType.mesh,
+		type = AttachmentType_mesh,
 		vertices = nil,
 		uvs = nil,
 		regionUVs = nil,
@@ -53,42 +58,50 @@ function MeshAttachment.new (name)
 		width = 0, height = 0
 	}
 
-	function self:updateUVs ()
-		local width, height = self.regionU2 - self.regionU, self.regionV2 - self.regionV
-		local n = #self.regionUVs
-		if not self.uvs or #self.uvs ~= n then
-			self.uvs = {}
-		end
-		if self.regionRotate then
-			for i = 1, n, 2 do
-				self.uvs[i] = self.regionU + self.regionUVs[i + 1] * width
-				self.uvs[i + 1] = self.regionV + height - self.regionUVs[i] * height
-			end
-		else
-			for i = 1, n, 2 do
-				self.uvs[i] = self.regionU + self.regionUVs[i] * width
-				self.uvs[i + 1] = self.regionV + self.regionUVs[i + 1] * height
-			end
-		end
-	end
-
-	function self:computeWorldVertices (x, y, slot, worldVertices)
-		local bone = slot.bone
-x,y=slot.bone.skeleton.x,slot.bone.skeleton.y
-		x = x + bone.worldX
-		y = y + bone.worldY
-		local m00, m01, m10, m11 = bone.m00, bone.m01, bone.m10, bone.m11
-		local vertices = self.vertices
-		local verticesCount = #vertices
-		if slot.attachmentVertices and #slot.attachmentVertices == verticesCount then vertices = slot.attachmentVertices end
-		for i = 1, verticesCount, 2 do
-			local vx = vertices[i]
-			local vy = vertices[i + 1]
-			worldVertices[i] = vx * m00 + vy * m01 + x
-			worldVertices[i + 1] = vx * m10 + vy * m11 + y
-		end
-	end
+	setmetatable(self, MeshAttachment)
 
 	return self
 end
+
+function MeshAttachment:updateUVs ()
+	local self_regionU = self.regionU
+	local self_regionV = self.regionV
+	local self_regionUVs = self.regionUVs
+	local width, height = self.regionU2 - self_regionU, self.regionV2 - self_regionV
+	local n = #self_regionUVs
+
+	if not self.uvs or #self.uvs ~= n then
+		self.uvs = {}
+	end
+
+	if self.regionRotate then
+		for i = 1, n, 2 do
+			self.uvs[i] = self_regionU + self_regionUVs[i + 1] * width
+			self.uvs[i + 1] = self_regionV + height - self_regionUVs[i] * height
+		end
+	else
+		for i = 1, n, 2 do
+			self.uvs[i] = self_regionU + self_regionUVs[i] * width
+			self.uvs[i + 1] = self_regionV + self_regionUVs[i + 1] * height
+		end
+	end
+end
+
+function MeshAttachment:computeWorldVertices (x, y, slot, worldVertices)
+	local bone = slot.bone
+	x, y = slot.bone.skeleton.x,slot.bone.skeleton.y
+	x = x + bone.worldX
+	y = y + bone.worldY
+	local m00, m01, m10, m11 = bone.m00, bone.m01, bone.m10, bone.m11
+	local vertices = self.vertices
+	local verticesCount = #vertices
+	if slot.attachmentVertices and #slot.attachmentVertices == verticesCount then vertices = slot.attachmentVertices end
+	for i = 1, verticesCount, 2 do
+		local vx = vertices[i]
+		local vy = vertices[i + 1]
+		worldVertices[i] = vx * m00 + vy * m01 + x
+		worldVertices[i + 1] = vx * m10 + vy * m11 + y
+	end
+end
+
 return MeshAttachment

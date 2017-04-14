@@ -28,13 +28,9 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-local setmetatable = setmetatable
-
 local TextureRegion = require "spine-lua.TextureRegion"
 
 local TextureAtlasRegion = {}
-TextureAtlasRegion.__index = TextureAtlasRegion
-setmetatable(TextureAtlasRegion, { __index = TextureRegion })
 
 function TextureAtlasRegion.new ()
 	local self = TextureRegion.new()
@@ -45,7 +41,6 @@ function TextureAtlasRegion.new ()
 	self.index = 0
 	self.rotate = false
 	self.texture = nil
-	setmetatable(self, TextureAtlasRegion)
 
 	return self
 end

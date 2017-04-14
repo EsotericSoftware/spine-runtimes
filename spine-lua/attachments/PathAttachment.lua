@@ -32,17 +32,17 @@ local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local VertexAttachment = require "spine-lua.attachments.VertexAttachment"
 local Color = require "spine-lua.Color"
 
+local AttachmentType_path = AttachmentType.path
+
 local PathAttachment = {}
-PathAttachment.__index = PathAttachment
-setmetatable(PathAttachment, { __index = VertexAttachment })
 
 function PathAttachment.new (name)
 	if not name then error("name cannot be nil", 2) end
 
-	local self = VertexAttachment.new(name, AttachmentType.path)
+	local self = VertexAttachment.new(name, AttachmentType_path)
 	self.lengths = nil
 	self.color = Color.newWith(1, 1, 1, 1)
-	setmetatable(self, PathAttachment)
+	
 	return self
 end
 return PathAttachment

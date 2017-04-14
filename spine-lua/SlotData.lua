@@ -31,10 +31,10 @@
 local BlendMode = require "spine-lua.BlendMode"
 local Color = require "spine-lua.Color"
 
-local setmetatable = setmetatable
+local BlendMode_normal = BlendMode.normal
+local Color_newWith = Color.newWith
 
 local SlotData = {}
-SlotData.__index = SlotData
 
 function SlotData.new (index, name, boneData)
 	if index < 0 then error("index must be >= 0", 2) end
@@ -45,11 +45,10 @@ function SlotData.new (index, name, boneData)
 		index = index,
 		name = name,
 		boneData = boneData,
-		color = Color.newWith(1, 1, 1, 1),
+		color = Color_newWith(1, 1, 1, 1),
 		attachmentName = nil,
-		blendMode = BlendMode.normal
+		blendMode = BlendMode_normal
 	}
-	setmetatable(self, SlotData)
 
 	return self
 end
