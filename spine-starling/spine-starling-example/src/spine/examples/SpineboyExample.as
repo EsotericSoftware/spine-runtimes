@@ -29,11 +29,9 @@
  *****************************************************************************/
  
 package spine.examples {
-	import starling.display.DisplayObjectContainer;
-	import flash.display.DisplayObject;
-	import spine.animation.TrackEntry;
-	import spine.animation.AnimationStateData;
 	import spine.*;
+	import spine.animation.AnimationStateData;
+	import spine.animation.TrackEntry;
 	import spine.atlas.Atlas;
 	import spine.attachments.AtlasAttachmentLoader;
 	import spine.attachments.AttachmentLoader;
@@ -41,6 +39,7 @@ package spine.examples {
 	import spine.starling.StarlingTextureLoader;
 
 	import starling.core.Starling;
+	import starling.display.DisplayObjectContainer;
 	import starling.display.Sprite;
 	import starling.events.Touch;
 	import starling.events.TouchEvent;
