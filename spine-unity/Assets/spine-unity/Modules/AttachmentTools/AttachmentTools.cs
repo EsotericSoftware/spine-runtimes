@@ -669,7 +669,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		public static BoundingBoxAttachment GetClone (this BoundingBoxAttachment o) {
 			var ba = new BoundingBoxAttachment(o.Name);
 			CloneVertexAttachment(o, ba);
-			return o;
+			return ba;
 		}
 
 		public static MeshAttachment GetLinkedClone (this MeshAttachment o, bool inheritDeform = true) {
@@ -720,7 +720,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 				ma.Height = o.Height;
 			}
 
-			return o;
+			return ma;
 		}
 
 		public static PathAttachment GetClone (this PathAttachment o) {
