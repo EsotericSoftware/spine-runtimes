@@ -50,31 +50,28 @@ Shader "Spine/SkeletonGraphic (Premultiply Alpha)"
 			#pragma vertex vert
 			#pragma fragment frag
 			#include "UnityCG.cginc"
-			
-			struct appdata_t
-			{
+			fixed4 _Color;
+
+			struct VertexInput {
 				float4 vertex   : POSITION;
 				float4 color    : COLOR;
 				float2 texcoord : TEXCOORD0;
 			};
 
-			struct v2f
-			{
+			struct VertexOutput {
 				float4 vertex   : SV_POSITION;
 				fixed4 color    : COLOR;
 				half2 texcoord  : TEXCOORD0;
 			};
 			
-			fixed4 _Color;
 
-			v2f vert(appdata_t IN)
-			{
-				v2f OUT;
-				OUT.vertex = mul(UNITY_MATRIX_MVP, IN.vertex);
+			VertexOutput vert (VertexInput IN) {
+				VertexOutput OUT;
+				OUT.vertex = UnityObjectToClipPos(IN.vertex);
 				OUT.texcoord = IN.texcoord;
 
 				#ifdef UNITY_HALF_TEXEL_OFFSET
-				OUT.vertex.xy += (_ScreenParams.zw-1.0)*float2(-1,1);
+				OUT.vertex.xy += (_ScreenParams.zw-1.0) * float2(-1,1);
 				#endif
 
 				OUT.color = IN.color * _Color;
@@ -83,7 +80,7 @@ Shader "Spine/SkeletonGraphic (Premultiply Alpha)"
 
 			sampler2D _MainTex;
 
-			fixed4 frag(v2f IN) : SV_Target
+			fixed4 frag (VertexOutput IN) : SV_Target
 			{
 				half4 color = tex2D(_MainTex, IN.texcoord) * IN.color;
 				//clip(color.a - 0.01);
