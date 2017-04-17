@@ -1282,6 +1282,40 @@ namespace Spine.Unity.Editor {
 //			return true;
 //		}
 
+		public static void IngestAdvancedRenderSettings (SkeletonRenderer skeletonRenderer) {
+			const string PMAShaderQuery = "Spine/Skeleton";
+			const string TintBlackShaderQuery = "Tint Black";
+
+			if (skeletonRenderer == null) return;
+			var skeletonDataAsset = skeletonRenderer.skeletonDataAsset;
+			if (skeletonDataAsset == null) return;
+
+			bool pmaVertexColors = false;
+			bool tintBlack = false;
+			foreach (AtlasAsset atlasAsset in skeletonDataAsset.atlasAssets) {
+				if (!pmaVertexColors) {
+					foreach (Material m in atlasAsset.materials) {
+						if (m.shader.name.Contains(PMAShaderQuery)) {
+							pmaVertexColors = true;
+							break;
+						}
+					}
+				}
+
+				if (!tintBlack) {
+					foreach (Material m in atlasAsset.materials) {
+						if (m.shader.name.Contains(PMAShaderQuery)) {
+							tintBlack = true;
+							break;
+						}
+					}
+				}
+			}
+
+			skeletonRenderer.pmaVertexColors = pmaVertexColors;
+			skeletonRenderer.tintBlack = tintBlack;
+		}
+
 		public static SkeletonAnimation InstantiateSkeletonAnimation (SkeletonDataAsset skeletonDataAsset, string skinName, bool destroyInvalid = true) {
 			var skeletonData = skeletonDataAsset.GetSkeletonData(true);
 			var skin = skeletonData != null ? skeletonData.FindSkin(skinName) : null;
@@ -1308,19 +1342,7 @@ namespace Spine.Unity.Editor {
 			GameObject go = new GameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(SkeletonAnimation));
 			SkeletonAnimation newSkeletonAnimation = go.GetComponent<SkeletonAnimation>();
 			newSkeletonAnimation.skeletonDataAsset = skeletonDataAsset;
-
-//			{
-//				bool requiresNormals = false;
-//				foreach (AtlasAsset atlasAsset in skeletonDataAsset.atlasAssets) {
-//					foreach (Material m in atlasAsset.materials) {
-//						if (m.shader.name.Contains("Lit")) {
-//							requiresNormals = true;
-//							break;
-//						}
-//					}
-//				}
-//				newSkeletonAnimation.calculateNormals = requiresNormals;
-//			}
+			IngestAdvancedRenderSettings(newSkeletonAnimation);
 
 			try {
 				newSkeletonAnimation.Initialize(false);
@@ -1374,18 +1396,7 @@ namespace Spine.Unity.Editor {
 
 			SkeletonAnimator anim = go.GetComponent<SkeletonAnimator>();
 			anim.skeletonDataAsset = skeletonDataAsset;
-
-			// Detect "Lit" shader and automatically enable calculateNormals.
-//			bool requiresNormals = false;
-//			foreach (AtlasAsset atlasAsset in anim.skeletonDataAsset.atlasAssets) {
-//				foreach (Material m in atlasAsset.materials) {
-//					if (m.shader.name.Contains("Lit")) {
-//						requiresNormals = true;
-//						break;
-//					}
-//				}
-//			}
-//			anim.calculateNormals = requiresNormals;
+			IngestAdvancedRenderSettings(anim);
 
 			SkeletonData data = skeletonDataAsset.GetSkeletonData(true);
 			if (data == null) {
