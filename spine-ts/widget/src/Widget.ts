@@ -60,10 +60,14 @@ module spine {
 
 			this.validateConfig(config);
 
-			let canvas = this.canvas = document.createElement("canvas");
+			let existingCanvas = <HTMLCanvasElement> element.children[0];
+			let canvas = this.canvas = existingCanvas || document.createElement("canvas");
 			canvas.style.width = "100%";
 			canvas.style.height = "100%";
-			(<HTMLElement> element).appendChild(canvas);
+			// only create a new canvas when one doesn't already exist
+			if (!existingCanvas) {
+				(<HTMLElement>element).appendChild(canvas);
+			}
 			canvas.width = (<HTMLElement>element).clientWidth;
 			canvas.height = (<HTMLElement>element).clientHeight;
 			var webglConfig = { alpha: config.alpha };
@@ -235,10 +239,12 @@ module spine {
 
 		private resize () {
 			let canvas = this.canvas;
-			let w = canvas.clientWidth;
-			let h = canvas.clientHeight;
 			let bounds = this.bounds;
-			if (canvas.width != w || canvas.height != h) {
+			let w = bounds.size.x;
+			let h = bounds.size.y;
+			// set canvas drawingBuffer equal to skeleton bounds (enables retina quality graphics)
+			// Math.floor is for matching how browsers round canvas size
+			if (canvas.width != Math.floor(w) || canvas.height != Math.floor(h)) {
 				canvas.width = w;
 				canvas.height = h;
 			}
