@@ -9065,10 +9065,13 @@ var spine;
 			if (element == null)
 				throw new Error("Element " + elementId + " does not exist");
 			this.validateConfig(config);
-			var canvas = this.canvas = document.createElement("canvas");
+			var existingCanvas = element.children[0];
+			var canvas = this.canvas = existingCanvas || document.createElement("canvas");
 			canvas.style.width = "100%";
 			canvas.style.height = "100%";
-			element.appendChild(canvas);
+			if (!existingCanvas) {
+				element.appendChild(canvas);
+			}
 			canvas.width = element.clientWidth;
 			canvas.height = element.clientHeight;
 			var webglConfig = { alpha: config.alpha };
@@ -9253,25 +9256,26 @@ var spine;
 			var w = canvas.clientWidth;
 			var h = canvas.clientHeight;
 			var bounds = this.bounds;
-			if (canvas.width != w || canvas.height != h) {
-				canvas.width = w;
-				canvas.height = h;
+			var devicePixelRatio = window.devicePixelRatio || 1;
+			if (canvas.width != Math.floor(w * devicePixelRatio) || canvas.height != Math.floor(h * devicePixelRatio)) {
+				canvas.width = Math.floor(w * devicePixelRatio);
+				canvas.height = Math.floor(h * devicePixelRatio);
 			}
 			if (this.config.fitToCanvas) {
 				var centerX = bounds.offset.x + bounds.size.x / 2;
 				var centerY = bounds.offset.y + bounds.size.y / 2;
-				var scaleX = bounds.size.x / canvas.width;
-				var scaleY = bounds.size.y / canvas.height;
+				var scaleX = bounds.size.x / w;
+				var scaleY = bounds.size.y / h;
 				var scale = Math.max(scaleX, scaleY) * 1.2;
 				if (scale < 1)
 					scale = 1;
-				var width = canvas.width * scale;
-				var height = canvas.height * scale;
+				var width = w * scale;
+				var height = h * scale;
 				this.skeleton.x = this.skeleton.y = 0;
 				this.mvp.ortho2d(centerX - width / 2, centerY - height / 2, width, height);
 			}
 			else {
-				this.mvp.ortho2d(0, 0, canvas.width - 1, canvas.height - 1);
+				this.mvp.ortho2d(0, 0, w - 1, h - 1);
 			}
 			this.gl.viewport(0, 0, canvas.width, canvas.height);
 		};
