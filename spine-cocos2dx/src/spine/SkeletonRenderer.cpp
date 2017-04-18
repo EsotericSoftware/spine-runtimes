@@ -305,7 +305,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		}
 		
 		if (!isTwoColorTint) {
-			cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture->getName(), _glProgramState, blendFunc, triangles, transform, transformFlags);
+			cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, _glProgramState, blendFunc, triangles, transform, transformFlags);
 			
 			for (int v = 0, vn = batchedTriangles->getTriangles().vertCount; v < vn; ++v) {
 				V3F_C4B_T2F* vertex = batchedTriangles->getTriangles().verts + v;
