@@ -17,7 +17,7 @@ var ANIMATION = "walk";
 var NUM_SKELETONS = 1;
 var SCALE = 0.5;
 
-var canvas, gl, renderer, input, assetManager;
+var canvas, context, gl, renderer, input, assetManager;
 var skeletons = [];
 var timeKeeper;
 var label = document.getElementById("label");
@@ -27,16 +27,17 @@ var renderMean = new spine.WindowedMean();
 function init() {
 	canvas = document.getElementById("canvas");
 	canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-	gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });
+	context = new spine.webgl.ManagedWebGLRenderingContext(canvas);
+	gl = context.gl;
 
-	renderer = new spine.webgl.SceneRenderer(canvas, gl);
+	renderer = new spine.webgl.SceneRenderer(canvas, context);
 	renderer.skeletonDebugRenderer.drawBones = false;
 	renderer.skeletonDebugRenderer.drawMeshTriangles = false;
 	renderer.skeletonDebugRenderer.drawMeshHull = false;
 	renderer.skeletonDebugRenderer.drawRegionAttachments = false;
 	renderer.skeletonDebugRenderer.drawBoundingBoxes = false;
 
-	assetManager = new spine.webgl.AssetManager(gl, "assets/");
+	assetManager = new spine.webgl.AssetManager(context, "assets/");
 	var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
 	input = new spine.webgl.Input(canvas);
 

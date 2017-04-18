@@ -29,22 +29,60 @@
  *****************************************************************************/
 
 module spine.webgl {
-	export function getSourceGLBlendMode (gl: WebGLRenderingContext, blendMode: BlendMode, premultipliedAlpha: boolean = false) {
+	export class ManagedWebGLRenderingContext {
+		public canvas: HTMLCanvasElement;
+		public gl: WebGLRenderingContext;
+		private restorables = new Array<Restorable>();
+
+		constructor(canvasOrContext: HTMLCanvasElement | WebGLRenderingContext, contextConfig: any = { alpha: "true" }) {
+			if (canvasOrContext instanceof HTMLCanvasElement) {
+				let canvas = canvasOrContext;
+				this.gl = <WebGLRenderingContext> (canvas.getContext("webgl", contextConfig) || canvas.getContext("experimental-webgl", contextConfig));
+				this.canvas = canvas;
+				canvas.addEventListener("webglcontextlost", (e: any) => {
+					let event = <WebGLContextEvent>e;
+					if (e) {
+						e.preventDefault();
+					}
+				});
+
+				canvas.addEventListener("webglcontextrestored", (e: any) => {
+					for (let i = 0, n = this.restorables.length; i < n; i++) {
+						this.restorables[i].restore();
+					}
+				});
+			} else {
+				this.gl = canvasOrContext;
+				this.canvas = this.gl.canvas;
+			}
+		}
+
+		addRestorable(restorable: Restorable) {
+			this.restorables.push(restorable);
+		}
+
+		removeRestorable(restorable: Restorable) {
+			let index = this.restorables.indexOf(restorable);
+			if (index > -1) this.restorables.splice(index, 1);
+		}
+	}
+
+	export function getSourceGLBlendMode (blendMode: BlendMode, premultipliedAlpha: boolean = false) {
 		switch(blendMode) {
-			case BlendMode.Normal: return premultipliedAlpha? gl.ONE : gl.SRC_ALPHA;
-			case BlendMode.Additive: return premultipliedAlpha? gl.ONE : gl.SRC_ALPHA;
-			case BlendMode.Multiply: return gl.DST_COLOR;
-			case BlendMode.Screen: return gl.ONE;
+			case BlendMode.Normal: return premultipliedAlpha? WebGLRenderingContext.ONE : WebGLRenderingContext.SRC_ALPHA;
+			case BlendMode.Additive: return premultipliedAlpha? WebGLRenderingContext.ONE : WebGLRenderingContext.SRC_ALPHA;
+			case BlendMode.Multiply: return WebGLRenderingContext.DST_COLOR;
+			case BlendMode.Screen: return WebGLRenderingContext.ONE;
 			default: throw new Error("Unknown blend mode: " + blendMode);
 		}
 	}
 
-	export function getDestGLBlendMode (gl: WebGLRenderingContext, blendMode: BlendMode) {
+	export function getDestGLBlendMode (blendMode: BlendMode) {
 		switch(blendMode) {
-			case BlendMode.Normal: return gl.ONE_MINUS_SRC_ALPHA;
-			case BlendMode.Additive: return gl.ONE;
-			case BlendMode.Multiply: return gl.ONE_MINUS_SRC_ALPHA;
-			case BlendMode.Screen: return gl.ONE_MINUS_SRC_ALPHA;
+			case BlendMode.Normal: return WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
+			case BlendMode.Additive: return WebGLRenderingContext.ONE;
+			case BlendMode.Multiply: return WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
+			case BlendMode.Screen: return WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
 			default: throw new Error("Unknown blend mode: " + blendMode);
 		}
 	}

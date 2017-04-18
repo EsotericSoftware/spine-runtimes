@@ -32,7 +32,7 @@ module spine {
 	export class SpineWidget {
 		skeleton: Skeleton;
 		state: AnimationState;
-		gl: WebGLRenderingContext;
+		context: spine.webgl.ManagedWebGLRenderingContext;
 		canvas: HTMLCanvasElement;
 		debugRenderer: spine.webgl.SkeletonDebugRenderer;
 
@@ -70,17 +70,17 @@ module spine {
 			canvas.width = (<HTMLElement>element).clientWidth;
 			canvas.height = (<HTMLElement>element).clientHeight;
 			var webglConfig = { alpha: config.alpha };
-			let gl = this.gl = <WebGLRenderingContext> (canvas.getContext("webgl", webglConfig) || canvas.getContext("experimental-webgl", webglConfig));
+			this.context = new spine.webgl.ManagedWebGLRenderingContext(canvas, webglConfig);
 
-			this.shader = spine.webgl.Shader.newTwoColoredTextured(gl);
-			this.batcher = new spine.webgl.PolygonBatcher(gl);
+			this.shader = spine.webgl.Shader.newTwoColoredTextured(this.context);
+			this.batcher = new spine.webgl.PolygonBatcher(this.context);
 			this.mvp.ortho2d(0, 0, canvas.width - 1, canvas.height - 1);
-			this.skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
-			this.debugShader = spine.webgl.Shader.newColored(gl);
-			this.debugRenderer = new spine.webgl.SkeletonDebugRenderer(gl);
-			this.shapes = new spine.webgl.ShapeRenderer(gl);
+			this.skeletonRenderer = new spine.webgl.SkeletonRenderer(this.context);
+			this.debugShader = spine.webgl.Shader.newColored(this.context);
+			this.debugRenderer = new spine.webgl.SkeletonDebugRenderer(this.context);
+			this.shapes = new spine.webgl.ShapeRenderer(this.context);
 
-			let assets = this.assetManager = new spine.webgl.AssetManager(gl, config.imagesPath ? config.imagesPath : "");
+			let assets = this.assetManager = new spine.webgl.AssetManager(this.context, config.imagesPath ? config.imagesPath : "");
 			if (!config.atlasContent) {
 				assets.loadText(config.atlas);
 			}
@@ -196,7 +196,7 @@ module spine {
 			if (delta > 0.1) delta = 0;
 			this.lastFrameTime = now;
 
-			let gl = this.gl;
+			let gl = this.context.gl;
 			let color = this.backgroundColor;
 			this.resize();
 			gl.clearColor(color.r, color.g, color.b, color.a);
@@ -267,7 +267,7 @@ module spine {
 				this.mvp.ortho2d(0, 0, w - 1, h - 1);
 			}
 
-			this.gl.viewport(0, 0, canvas.width, canvas.height);
+			this.context.gl.viewport(0, 0, canvas.width, canvas.height);
 		}
 
 		pause () {

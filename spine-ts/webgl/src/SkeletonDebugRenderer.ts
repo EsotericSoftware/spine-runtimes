@@ -49,21 +49,21 @@ module spine.webgl {
 		scale = 1;
 		boneWidth = 2;
 
-		private gl: WebGLRenderingContext;
+		private context: ManagedWebGLRenderingContext;
 		private bounds = new SkeletonBounds();
 		private temp = new Array<number>();
 		private vertices = Utils.newFloatArray(2 * 1024);
 		private static LIGHT_GRAY = new Color(192 / 255, 192 / 255, 192 / 255, 1);
 		private static GREEN = new Color(0, 1, 0, 1);
 
-		constructor (gl: WebGLRenderingContext) {
-			this.gl = gl;
+		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext) {
+			this.context = context instanceof ManagedWebGLRenderingContext? context : new ManagedWebGLRenderingContext(context);
 		}
 
 		draw (shapes: ShapeRenderer, skeleton: Skeleton, ignoredBones: Array<string> = null) {
 			let skeletonX = skeleton.x;
 			let skeletonY = skeleton.y;
-			let gl = this.gl;
+			let gl = this.context.gl;
 			let srcFunc = this.premultipliedAlpha ? gl.ONE : gl.SRC_ALPHA;
 			shapes.setBlendMode(srcFunc, gl.ONE_MINUS_SRC_ALPHA);
 

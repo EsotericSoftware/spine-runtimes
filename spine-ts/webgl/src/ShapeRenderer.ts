@@ -30,7 +30,7 @@
 
 module spine.webgl {
 	export class ShapeRenderer implements Disposable {
-		private gl: WebGLRenderingContext;
+		private context: ManagedWebGLRenderingContext;
 		private isDrawing = false;
 		private mesh: Mesh;
 		private shapeType = ShapeType.Filled;
@@ -41,10 +41,10 @@ module spine.webgl {
 		private srcBlend: number = WebGLRenderingContext.SRC_ALPHA;
 		private dstBlend: number = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
 
-		constructor (gl: WebGLRenderingContext, maxVertices: number = 10920) {
+		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, maxVertices: number = 10920) {
 			if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
-			this.gl = gl;
-			this.mesh = new Mesh(gl, [new Position2Attribute(), new ColorAttribute()], maxVertices, 0);
+			this.context = context instanceof ManagedWebGLRenderingContext? context : new ManagedWebGLRenderingContext(context);
+			this.mesh = new Mesh(context, [new Position2Attribute(), new ColorAttribute()], maxVertices, 0);
 		}
 
 		begin (shader: Shader) {
@@ -53,13 +53,13 @@ module spine.webgl {
 			this.vertexIndex = 0;
 			this.isDrawing = true;
 
-			let gl = this.gl;
+			let gl = this.context.gl;
 			gl.enable(gl.BLEND);
 			gl.blendFunc(this.srcBlend, this.dstBlend);
 		}
 
 		setBlendMode (srcBlend: number, dstBlend: number) {
-			let gl = this.gl;
+			let gl = this.context.gl;
 			this.srcBlend = srcBlend;
 			this.dstBlend = dstBlend;
 			if (this.isDrawing) {
@@ -308,7 +308,7 @@ module spine.webgl {
 		end () {
 			if (!this.isDrawing) throw new Error("ShapeRenderer.begin() has not been called");
 			this.flush();
-			this.gl.disable(this.gl.BLEND);
+			this.context.gl.disable(this.context.gl.BLEND);
 			this.isDrawing = false;
 		}
 

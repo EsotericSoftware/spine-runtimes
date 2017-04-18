@@ -59,6 +59,10 @@ module spine {
 		dispose (): void;
 	}
 
+	export interface Restorable {
+		restore (): void;
+	}
+
 	export class Color {
 		public static WHITE = new Color(1, 1, 1, 1);
 		public static RED = new Color(1, 0, 0, 1);

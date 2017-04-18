@@ -37,7 +37,6 @@ module spine.webgl {
 		static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 
 		premultipliedAlpha = false;
-		private gl: WebGLRenderingContext;
 		private tempColor = new Color();
 		private tempColor2 = new Color();
 		private vertices:ArrayLike<number>;
@@ -46,8 +45,7 @@ module spine.webgl {
 		private renderable: Renderable = new Renderable(null, 0, 0);
 		private clipper: SkeletonClipping = new SkeletonClipping();
 
-		constructor (gl: WebGLRenderingContext, twoColorTint: boolean = true) {
-			this.gl = gl;
+		constructor (context: ManagedWebGLRenderingContext, twoColorTint: boolean = true) {
 			this.twoColorTint = twoColorTint;
 			if (twoColorTint)
 				this.vertexSize += 4;
@@ -120,7 +118,7 @@ module spine.webgl {
 					let slotBlendMode = slot.data.blendMode;
 					if (slotBlendMode != blendMode) {
 						blendMode = slotBlendMode;
-						batcher.setBlendMode(getSourceGLBlendMode(this.gl, blendMode, premultipliedAlpha), getDestGLBlendMode(this.gl, blendMode));
+						batcher.setBlendMode(getSourceGLBlendMode(blendMode, premultipliedAlpha), getDestGLBlendMode(blendMode));
 					}
 
 					if (clipper.isClipping()) {
