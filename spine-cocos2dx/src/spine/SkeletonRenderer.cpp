@@ -75,21 +75,21 @@ void SkeletonRenderer::setSkeletonData (spSkeletonData *skeletonData, bool ownsS
 }
 
 SkeletonRenderer::SkeletonRenderer ()
-	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _timeScale(1) {
+	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _timeScale(1) {
 }
 
 SkeletonRenderer::SkeletonRenderer (spSkeletonData *skeletonData, bool ownsSkeletonData)
-	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _timeScale(1) {
+	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _timeScale(1) {
 	initWithData(skeletonData, ownsSkeletonData);
 }
 
 SkeletonRenderer::SkeletonRenderer (const std::string& skeletonDataFile, spAtlas* atlas, float scale)
-	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _timeScale(1) {
+	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _timeScale(1) {
 	initWithJsonFile(skeletonDataFile, atlas, scale);
 }
 
 SkeletonRenderer::SkeletonRenderer (const std::string& skeletonDataFile, const std::string& atlasFile, float scale)
-	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _timeScale(1) {
+	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _timeScale(1) {
 	initWithJsonFile(skeletonDataFile, atlasFile, scale);
 }
 
@@ -368,7 +368,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		}
 	}
 
-	if (_debugSlots || _debugBones) {
+	if (_debugSlots || _debugBones || _debugMeshes) {
         drawDebug(renderer, transform, transformFlags);
 	}
 }
@@ -416,6 +416,26 @@ void SkeletonRenderer::drawDebug (Renderer* renderer, const Mat4 &transform, uin
             if (i == 0) color = Color4F::GREEN;
         }
     }
+	
+	if (_debugMeshes) {
+		// Meshes.
+		glLineWidth(1);
+		for (int i = 0, n = _skeleton->slotsCount; i < n; ++i) {
+			spSlot* slot = _skeleton->drawOrder[i];
+			if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_MESH) continue;
+			spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;			
+			spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, attachment->super.worldVerticesLength, _worldVertices, 0, 2);
+			for (int ii = 0; ii < attachment->trianglesCount;) {
+				Vec2 v1(_worldVertices + (attachment->triangles[ii++] * 2));
+				Vec2 v2(_worldVertices + (attachment->triangles[ii++] * 2));
+				Vec2 v3(_worldVertices + (attachment->triangles[ii++] * 2));
+				drawNode->drawLine(v1, v2, Color4F::YELLOW);
+				drawNode->drawLine(v2, v3, Color4F::YELLOW);
+				drawNode->drawLine(v3, v1, Color4F::YELLOW);
+			}
+		}
+		
+	}
     
     drawNode->draw(renderer, transform, transformFlags);
     director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
@@ -534,6 +554,13 @@ void SkeletonRenderer::setDebugBonesEnabled (bool enabled) {
 }
 bool SkeletonRenderer::getDebugBonesEnabled () const {
 	return _debugBones;
+}
+	
+void SkeletonRenderer::setDebugMeshesEnabled (bool enabled) {
+	_debugMeshes = enabled;
+}
+bool SkeletonRenderer::getDebugMeshesEnabled () const {
+	return _debugMeshes;
 }
 
 void SkeletonRenderer::onEnter () {
