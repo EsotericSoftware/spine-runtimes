@@ -3975,7 +3975,7 @@ var spine;
 					mesh.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
 				}
 				if (vertices != null) {
-					for (var ii = 0, nn = vertices.length; ii < nn; ii += 8) {
+					for (var ii = 0, nn = vertices.length; ii < nn; ii += 2) {
 						var x = vertices[ii], y = vertices[ii + 1];
 						minX = Math.min(minX, x);
 						minY = Math.min(minY, y);
