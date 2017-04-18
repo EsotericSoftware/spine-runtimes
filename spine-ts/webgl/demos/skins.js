@@ -208,7 +208,6 @@ var skinsDemo = function(loadingComplete, bgColor) {
 
 		state.update(delta);
 		state.apply(skeleton);
-		skeleton.y = -150;
 		skeleton.updateWorldTransform();
 
 		renderer.begin();
