@@ -43,5 +43,7 @@ namespace Spine {
 		PathAttachment NewPathAttachment (Skin skin, string name);
 
 		PointAttachment NewPointAttachment (Skin skin, string name);
+
+		ClippingAttachment NewClippingAttachment (Skin skin, string name);
 	}
 }

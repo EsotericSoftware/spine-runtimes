@@ -62,6 +62,7 @@
     <Compile Include="src\Attachments\AttachmentLoader.cs" />
     <Compile Include="src\Attachments\AttachmentType.cs" />
     <Compile Include="src\Attachments\BoundingBoxAttachment.cs" />
+    <Compile Include="src\Attachments\ClippingAttachment.cs" />
     <Compile Include="src\Attachments\MeshAttachment.cs" />
     <Compile Include="src\Attachments\PathAttachment.cs" />
     <Compile Include="src\Attachments\PointAttachment.cs" />

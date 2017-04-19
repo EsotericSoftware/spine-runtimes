@@ -261,7 +261,7 @@ namespace Spine {
 						int slotIndex = skeletonData.FindSlotIndex(slotEntry.Key);
 						foreach (KeyValuePair<String, Object> entry in ((Dictionary<String, Object>)slotEntry.Value)) {
 							try {
-								Attachment attachment = ReadAttachment((Dictionary<String, Object>)entry.Value, skin, slotIndex, entry.Key);
+								Attachment attachment = ReadAttachment((Dictionary<String, Object>)entry.Value, skin, slotIndex, entry.Key, skeletonData);
 								if (attachment != null) skin.AddAttachment(slotIndex, entry.Key, attachment);
 							} catch (Exception e) {
 								throw new Exception("Error reading attachment: " + entry.Key + ", skin: " + skin, e);
@@ -317,7 +317,7 @@ namespace Spine {
 			return skeletonData;
 		}
 
-		private Attachment ReadAttachment (Dictionary<String, Object> map, Skin skin, int slotIndex, String name) {
+		private Attachment ReadAttachment (Dictionary<String, Object> map, Skin skin, int slotIndex, String name, SkeletonData skeletonData) {
 			var scale = this.Scale;
 			name = GetString(map, "name", name);
 
@@ -415,6 +415,16 @@ namespace Spine {
 					//string color = GetString(map, "color", null);
 					//if (color != null) point.color = color;
 					return point;
+				}
+			case AttachmentType.Clipping: {
+					ClippingAttachment clip = attachmentLoader.NewClippingAttachment(skin, name);
+					if (clip == null) return null;
+
+					SlotData slot = skeletonData.FindSlot(GetString(map, "end", null));
+					if (slot == null) throw new Exception("Clipping end slot not found: " + GetString(map, "end", null));
+					clip.endSlot = slot;
+					ReadVertices(map, clip, GetInt(map, "vertexCount", 0) << 1);
+					return clip;
 				}
 			}
 			return null;
