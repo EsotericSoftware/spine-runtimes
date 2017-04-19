@@ -234,6 +234,10 @@ cp -f ../spineboy/export/spineboy.png ../../spine-ts/widget/example/assets/
 
 echo "spine-xna"
 rm -f ../../spine-xna/example/data/*
+cp -f ../coin/export/coin.json ../../spine-xna/example/data/
+cp -f ../coin/export/coin.atlas ../../spine-xna/example/data/
+cp -f ../coin/export/coin.png ../../spine-xna/example/data/
+
 cp -f ../goblins/export/goblins-mesh.json ../../spine-xna/example/data/
 cp -f ../goblins/export/goblins-mesh.skel ../../spine-xna/example/data/
 cp -f ../goblins/export/goblins.atlas ../../spine-xna/example/data/goblins-mesh.atlas

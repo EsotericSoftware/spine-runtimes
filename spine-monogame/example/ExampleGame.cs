@@ -48,11 +48,7 @@ namespace Spine {
 		AnimationState state;
 		SkeletonBounds bounds = new SkeletonBounds();
 
-#if WINDOWS_STOREAPP
-		private string assetsFolder = @"Assets\";
-#else
 		private string assetsFolder = "data/";
-#endif
 
 		public Example () {
 			IsMouseVisible = true;
@@ -139,16 +135,10 @@ namespace Spine {
 			headSlot = skeleton.FindSlot("head");
 		}
 
-		protected override void UnloadContent () {
-			// TODO: Unload any non ContentManager content here
+		protected override void UnloadContent () {			
 		}
 
-		protected override void Update (GameTime gameTime) {
-			// TODO: Add your update logic here
-#if (!WINDOWS_STOREAPP || WINDOWS_PHONE81) && !IOS	
-			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-					this.Exit();
-#endif
+		protected override void Update (GameTime gameTime) {			
 			base.Update(gameTime);
 		}
 
@@ -180,27 +170,19 @@ namespace Spine {
 		}
 
 		public void Start (TrackEntry entry) {
-#if !WINDOWS_STOREAPP
 			Console.WriteLine(entry + ": start");
-#endif
 		}
 
 		public void End (TrackEntry entry) {
-#if !WINDOWS_STOREAPP	
 			Console.WriteLine(entry + ": end");
-#endif
 		}
 
 		public void Complete (TrackEntry entry) {
-#if !WINDOWS_STOREAPP	
 			Console.WriteLine(entry + ": complete ");
-#endif
 		}
 
 		public void Event (TrackEntry entry, Event e) {
-#if !WINDOWS_STOREAPP	
 			Console.WriteLine(entry + ": event " + e);
-#endif
 		}
 	}
 }
