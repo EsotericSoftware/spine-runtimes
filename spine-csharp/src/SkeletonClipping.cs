@@ -37,6 +37,7 @@ namespace Spine {
 		private readonly ExposedList<float> clipOutput = new ExposedList<float>(128);
 		private readonly ExposedList<float> clippedVertices = new ExposedList<float>(128);
 		private readonly ExposedList<short> clippedTriangles = new ExposedList<short>(128);
+		private readonly ExposedList<float> clippedUVs = new ExposedList<float>(128);
 		private readonly ExposedList<float> scratch = new ExposedList<float>();
 
 		private ClippingAttachment clipAttachment;
@@ -44,6 +45,7 @@ namespace Spine {
 
 		public ExposedList<float> ClippedVertices { get { return clippedVertices; } }
 		public ExposedList<short> ClippedTriangles { get { return clippedTriangles; } }
+		public ExposedList<float> ClippedUVs { get { return clippedUVs; } }
 
 		public void ClipStart(Slot slot, ClippingAttachment clip) {
 			if (clipAttachment != null) return;
@@ -78,17 +80,16 @@ namespace Spine {
 			return clipAttachment != null;
 		}
 
-		public void ClipTriangles(float[] vertices, int verticesLength, short[] triangles, int trianglesLength, float[] uvs,
-			float light, float dark, bool twoColor) {
+		public void ClipTriangles(float[] vertices, int verticesLength, short[] triangles, int trianglesLength, float[] uvs) {
 
 			ExposedList<float> clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
 			var clippedTriangles = this.clippedTriangles;
 			var polygons = clippingPolygons.Items;
-			int polygonsCount = clippingPolygons.Count;
-			int vertexSize = twoColor ? 6 : 5;
+			int polygonsCount = clippingPolygons.Count;			
 
 			short index = 0;
 			clippedVertices.Clear();
+			clippedUVs.Clear();
 			clippedTriangles.Clear();
 			outer:
 			for (int i = 0; i < trianglesLength; i += 3) {
@@ -114,24 +115,18 @@ namespace Spine {
 
 						int clipOutputCount = clipOutputLength >> 1;
 						float[] clipOutputItems = clipOutput.Items;
-						float[] clippedVerticesItems = clippedVertices.Resize(s + clipOutputCount * vertexSize).Items;
+						float[] clippedVerticesItems = clippedVertices.Resize(s + clipOutputCount * 2).Items;
+						float[] clippedUVsItems = clippedUVs.Resize(s + clipOutputCount * 2).Items;
 						for (int ii = 0; ii < clipOutputLength; ii += 2) {
 							float x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
 							clippedVerticesItems[s] = x;
-							clippedVerticesItems[s + 1] = y;
-							clippedVerticesItems[s + 2] = light;
-							if (twoColor) {
-								clippedVerticesItems[s + 3] = dark;
-								s += 4;
-							}
-							else
-								s += 3;
+							clippedVerticesItems[s + 1] = y;							
 							float c0 = x - x3, c1 = y - y3;
 							float a = (d0 * c0 + d1 * c1) * d;
 							float b = (d4 * c0 + d2 * c1) * d;
 							float c = 1 - a - b;
-							clippedVerticesItems[s] = u1 * a + u2 * b + u3 * c;
-							clippedVerticesItems[s + 1] = v1 * a + v2 * b + v3 * c;
+							clippedUVsItems[s] = u1 * a + u2 * b + u3 * c;
+							clippedUVsItems[s + 1] = v1 * a + v2 * b + v3 * c;
 							s += 2;
 						}
 
@@ -148,45 +143,21 @@ namespace Spine {
 
 					}
 					else {
-						float[] clippedVerticesItems = clippedVertices.Resize(s + 3 * vertexSize).Items;
+						float[] clippedVerticesItems = clippedVertices.Resize(s + 3 * 2).Items;
+						float[] clippedUVsItems = clippedUVs.Resize(s + 3 * 2).Items;
 						clippedVerticesItems[s] = x1;
 						clippedVerticesItems[s + 1] = y1;
-						clippedVerticesItems[s + 2] = light;
-						if (!twoColor) {
-							clippedVerticesItems[s + 3] = u1;
-							clippedVerticesItems[s + 4] = v1;
+						clippedVerticesItems[s + 2] = x2;
+						clippedVerticesItems[s + 3] = y2;
+						clippedVerticesItems[s + 4] = x3;
+						clippedVerticesItems[s + 5] = y3;
 
-							clippedVerticesItems[s + 5] = x2;
-							clippedVerticesItems[s + 6] = y2;
-							clippedVerticesItems[s + 7] = light;
-							clippedVerticesItems[s + 8] = u2;
-							clippedVerticesItems[s + 9] = v2;
-
-							clippedVerticesItems[s + 10] = x3;
-							clippedVerticesItems[s + 11] = y3;
-							clippedVerticesItems[s + 12] = light;
-							clippedVerticesItems[s + 13] = u3;
-							clippedVerticesItems[s + 14] = v3;
-						}
-						else {
-							clippedVerticesItems[s + 3] = dark;
-							clippedVerticesItems[s + 4] = u1;
-							clippedVerticesItems[s + 5] = v1;
-
-							clippedVerticesItems[s + 6] = x2;
-							clippedVerticesItems[s + 7] = y2;
-							clippedVerticesItems[s + 8] = light;
-							clippedVerticesItems[s + 9] = dark;
-							clippedVerticesItems[s + 10] = u2;
-							clippedVerticesItems[s + 11] = v2;
-
-							clippedVerticesItems[s + 12] = x3;
-							clippedVerticesItems[s + 13] = y3;
-							clippedVerticesItems[s + 14] = light;
-							clippedVerticesItems[s + 15] = dark;
-							clippedVerticesItems[s + 16] = u3;
-							clippedVerticesItems[s + 17] = v3;
-						}
+						clippedUVsItems[s] = u1;
+						clippedUVsItems[s + 1] = v1;
+						clippedUVsItems[s + 2] = u2;
+						clippedUVsItems[s + 3] = v2;
+						clippedUVsItems[s + 4] = u3;
+						clippedUVsItems[s + 5] = v3;					
 
 						s = clippedTriangles.Count;
 						short[] clippedTrianglesItems = clippedTriangles.Resize(s + 3).Items;
