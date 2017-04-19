@@ -71,6 +71,7 @@
     <Compile Include="src\BlendMode.cs" />
     <Compile Include="src\Bone.cs" />
     <Compile Include="src\BoneData.cs" />
+    <Compile Include="src\ConvexDecomposer.cs" />
     <Compile Include="src\Event.cs" />
     <Compile Include="src\EventData.cs" />
     <Compile Include="src\ExposedList.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="src\Skeleton.cs" />
     <Compile Include="src\SkeletonBinary.cs" />
     <Compile Include="src\SkeletonBounds.cs" />
+    <Compile Include="src\SkeletonClipping.cs" />
     <Compile Include="src\SkeletonData.cs" />
     <Compile Include="src\SkeletonJson.cs" />
     <Compile Include="src\Skin.cs" />
