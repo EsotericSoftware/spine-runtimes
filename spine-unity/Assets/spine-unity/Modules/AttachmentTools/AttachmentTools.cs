@@ -203,6 +203,65 @@ namespace Spine.Unity.Modules.AttachmentTools {
 	public static class SpriteAtlasRegionExtensions {
 		internal const TextureFormat SpineTextureFormat = TextureFormat.RGBA32;
 		internal const bool UseMipMaps = false;
+		internal const float DefaultScale = 0.01f;
+
+		public static AtlasRegion ToAtlasRegion (this Texture2D t, Shader shader, float scale = DefaultScale) {
+			var material = new Material(shader);
+
+			material.mainTexture = t;
+			var page = material.ToSpineAtlasPage();
+
+			float width = t.width;
+			float height = t.height;
+
+			var region = new AtlasRegion();
+			region.name = t.name;
+			region.index = -1;
+			region.rotate = false;
+
+			// World space units
+			Vector2 boundsMin = Vector2.zero, boundsMax = new Vector2(width, height) * scale;
+
+			// Texture space/pixel units
+			region.width = (int)width;
+			region.originalWidth = (int)width;
+			region.height = (int)height;
+			region.originalHeight = (int)height;
+			region.offsetX = width * (0.5f - InverseLerp(boundsMin.x, boundsMax.x, 0));
+			region.offsetY = height * (0.5f - InverseLerp(boundsMin.y, boundsMax.y, 0));
+
+			// Use the full area of the texture.
+			region.u = 0;
+			region.v = 1;
+			region.u2 = 1;
+			region.v2 = 0;
+			region.x = 0;
+			region.y = 0;
+
+			region.page = page;
+
+			return region;
+		}
+
+		/// <summary>
+		/// Creates a Spine.AtlasRegion that uses a premultiplied alpha duplicate of the Sprite's texture data.</summary>
+		public static AtlasRegion ToAtlasRegionPMAClone (this Texture2D t, Shader shader, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
+			var material = new Material(shader);
+			var newTexture = t.GetClone(false, textureFormat, mipmaps);
+			newTexture.ApplyPMA(true);
+
+			newTexture.name = t.name + "-pma-";
+			material.name = t.name + shader.name;
+
+			material.mainTexture = newTexture;
+			var page = material.ToSpineAtlasPage();
+
+			var region = newTexture.ToAtlasRegion(shader);
+			region.page = page;
+
+			return region;
+		}
+
 
 		/// <summary>
 		/// Creates a new Spine.AtlasPage from a UnityEngine.Material. If the material has a preassigned texture, the page width and height will be set.</summary>
@@ -398,6 +457,17 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			var r = s.textureRect;
 			var spritePixels = spriteTexture.GetPixels((int)r.x, (int)r.y, (int)r.width, (int)r.height);
 			var newTexture = new Texture2D((int)r.width, (int)r.height, textureFormat, mipmaps);
+			newTexture.SetPixels(spritePixels);
+
+			if (applyImmediately)
+				newTexture.Apply();
+
+			return newTexture;
+		}
+
+		static Texture2D GetClone (this Texture2D t, bool applyImmediately = true, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
+			var spritePixels = t.GetPixels(0, 0, (int)t.width, (int)t.height);
+			var newTexture = new Texture2D((int)t.width, (int)t.height, textureFormat, mipmaps);
 			newTexture.SetPixels(spritePixels);
 
 			if (applyImmediately)
