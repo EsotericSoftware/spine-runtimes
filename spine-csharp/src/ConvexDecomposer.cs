@@ -33,14 +33,14 @@ using System;
 namespace Spine {
 	internal class ConvexDecomposer {
 		private readonly ExposedList<ExposedList<float>> convexPolygons = new ExposedList<ExposedList<float>>();
-		private readonly ExposedList<ExposedList<short>> convexPolygonsIndices = new ExposedList<ExposedList<short>>();
+		private readonly ExposedList<ExposedList<int>> convexPolygonsIndices = new ExposedList<ExposedList<int>>();
 
-		private readonly ExposedList<short> indicesArray = new ExposedList<short>();
+		private readonly ExposedList<int> indicesArray = new ExposedList<int>();
 		private readonly ExposedList<bool> isConcaveArray = new ExposedList<bool>();
-		private readonly ExposedList<short> triangles = new ExposedList<short>();
+		private readonly ExposedList<int> triangles = new ExposedList<int>();
 
 		private readonly Pool<ExposedList<float>> polygonPool = new Pool<ExposedList<float>>();
-		private readonly Pool<ExposedList<short>> polygonIndicesPool = new Pool<ExposedList<short>>();
+		private readonly Pool<ExposedList<int>> polygonIndicesPool = new Pool<ExposedList<int>>();
 
 		public ExposedList<ExposedList<float>> Decompose(ExposedList<float> input) {
 			var vertices = input.Items;
@@ -48,8 +48,8 @@ namespace Spine {
 
 			var indicesArray = this.indicesArray;
 			indicesArray.Clear();
-			short[] indices = indicesArray.Resize(vertexCount).Items;
-			for (short i = 0; i < vertexCount; i++)
+			int[] indices = indicesArray.Resize(vertexCount).Items;
+			for (int i = 0; i < vertexCount; i++)
 				indices[i] = i;
 
 			var isConcaveArray = this.isConcaveArray;
@@ -137,7 +137,7 @@ namespace Spine {
 
 			// Merge subsequent triangles if they form a triangle fan.
 			int fanBaseIndex = -1, lastWinding = 0;
-			short[] trianglesItems = triangles.Items;
+			int[] trianglesItems = triangles.Items;
 			for (int i = 0, n = triangles.Count; i < n; i += 3) {
 				int t1 = trianglesItems[i] << 1, t2 = trianglesItems[i + 1] << 1, t3 = trianglesItems[i + 2] << 1;
 				float x1 = vertices[t1], y1 = vertices[t1 + 1];
@@ -154,7 +154,7 @@ namespace Spine {
 					if (winding1 == lastWinding && winding2 == lastWinding) {
 						polygon.Add(x3);
 						polygon.Add(y3);
-						polygonIndices.Add((short)t3);
+						polygonIndices.Add(t3);
 						merged = true;
 					}
 				}
@@ -175,9 +175,9 @@ namespace Spine {
 					polygon.Add(y3);
 					polygonIndices = polygonIndicesPool.Obtain();
 					polygonIndices.Clear();
-					polygonIndices.Add((short)t1);
-					polygonIndices.Add((short)t2);
-					polygonIndices.Add((short)t3);
+					polygonIndices.Add(t1);
+					polygonIndices.Add(t2);
+					polygonIndices.Add(t3);
 					lastWinding = Winding(x1, y1, x2, y2, x3, y3);
 					fanBaseIndex = t1;
 				}
@@ -223,7 +223,7 @@ namespace Spine {
 						otherIndices.Clear();
 						polygon.Add(x3);
 						polygon.Add(y3);
-						polygonIndices.Add((short)otherLastIndex);
+						polygonIndices.Add(otherLastIndex);
 						prevPrevX = prevX;
 						prevPrevY = prevY;
 						prevX = x3;
@@ -245,7 +245,7 @@ namespace Spine {
 			return convexPolygons;
 		}
 
-		static private bool IsConcave(int index, int vertexCount, float[] vertices, short[] indices) {
+		static private bool IsConcave(int index, int vertexCount, float[] vertices, int[] indices) {
 			int previous = indices[(vertexCount + index - 1) % vertexCount] << 1;
 			int current = indices[index] << 1;
 			int next = indices[(index + 1) % vertexCount] << 1;

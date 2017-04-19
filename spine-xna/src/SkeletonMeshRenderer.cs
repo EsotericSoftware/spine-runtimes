@@ -42,6 +42,7 @@ namespace Spine {
 		private const int BL = 2;
 		private const int BR = 3;
 
+		SkeletonClipping clipper = new SkeletonClipping();	
 		GraphicsDevice device;
 		MeshBatcher batcher;
 		RasterizerState rasterizerState;
@@ -131,6 +132,8 @@ namespace Spine {
 					uvs = mesh.UVs;
 				}
 				else if (attachment is ClippingAttachment) {
+					ClippingAttachment clip = (ClippingAttachment)attachment;
+					clipper.ClipStart(slot, clip);
 					continue;
 				}
 				else {
@@ -159,6 +162,19 @@ namespace Spine {
 							skeletonB * slot.B * attachmentColorB, a);
 				}
 
+				// clip
+				if (clipper.IsClipping()) {
+					clipper.ClipTriangles(vertices, verticesCount << 1, indices, indicesCount, uvs);
+					vertices = clipper.ClippedVertices.Items;
+					verticesCount = clipper.ClippedVertices.Count;
+					indices = clipper.ClippedTriangles.Items;
+					indicesCount = clipper.ClippedTriangles.Count;
+					uvs = clipper.ClippedUVs.Items;
+				}
+
+				if (verticesCount == 0 || indicesCount == 0)
+					continue;
+
 				// submit to batch
 				MeshItem item = batcher.NextItem(verticesCount, indicesCount);
 				item.texture = texture;
@@ -172,7 +188,10 @@ namespace Spine {
 					itemVertices[ii].TextureCoordinate.X = uvs[v];
 					itemVertices[ii].TextureCoordinate.Y = uvs[v + 1];
 				}
+
+				clipper.ClipEnd(slot);
 			}
+			clipper.ClipEnd();
 		}
 	}
 }

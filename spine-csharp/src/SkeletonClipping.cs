@@ -36,7 +36,7 @@ namespace Spine {
 		private readonly ExposedList<float> clippingPolygon = new ExposedList<float>();
 		private readonly ExposedList<float> clipOutput = new ExposedList<float>(128);
 		private readonly ExposedList<float> clippedVertices = new ExposedList<float>(128);
-		private readonly ExposedList<short> clippedTriangles = new ExposedList<short>(128);
+		private readonly ExposedList<int> clippedTriangles = new ExposedList<int>(128);
 		private readonly ExposedList<float> clippedUVs = new ExposedList<float>(128);
 		private readonly ExposedList<float> scratch = new ExposedList<float>();
 
@@ -44,7 +44,7 @@ namespace Spine {
 		private ExposedList<ExposedList<float>> clippingPolygons;
 
 		public ExposedList<float> ClippedVertices { get { return clippedVertices; } }
-		public ExposedList<short> ClippedTriangles { get { return clippedTriangles; } }
+		public ExposedList<int> ClippedTriangles { get { return clippedTriangles; } }
 		public ExposedList<float> ClippedUVs { get { return clippedUVs; } }
 
 		public void ClipStart(Slot slot, ClippingAttachment clip) {
@@ -80,14 +80,14 @@ namespace Spine {
 			return clipAttachment != null;
 		}
 
-		public void ClipTriangles(float[] vertices, int verticesLength, short[] triangles, int trianglesLength, float[] uvs) {
+		public void ClipTriangles(float[] vertices, int verticesLength, int[] triangles, int trianglesLength, float[] uvs) {
 
 			ExposedList<float> clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
 			var clippedTriangles = this.clippedTriangles;
 			var polygons = clippingPolygons.Items;
 			int polygonsCount = clippingPolygons.Count;			
 
-			short index = 0;
+			int index = 0;
 			clippedVertices.Clear();
 			clippedUVs.Clear();
 			clippedTriangles.Clear();
@@ -131,15 +131,15 @@ namespace Spine {
 						}
 
 						s = clippedTriangles.Count;
-						short[] clippedTrianglesItems = clippedTriangles.Resize(s + 3 * (clipOutputCount - 2)).Items;
+						int[] clippedTrianglesItems = clippedTriangles.Resize(s + 3 * (clipOutputCount - 2)).Items;
 						clipOutputCount--;
 						for (int ii = 1; ii < clipOutputCount; ii++) {
 							clippedTrianglesItems[s] = index;
-							clippedTrianglesItems[s + 1] = (short)(index + ii);
-							clippedTrianglesItems[s + 2] = (short)(index + ii + 1);
+							clippedTrianglesItems[s + 1] = index + ii;
+							clippedTrianglesItems[s + 2] = index + ii + 1;
 							s += 3;
 						}
-						index += (short)(clipOutputCount + 1);
+						index += clipOutputCount + 1;
 
 					}
 					else {
@@ -160,10 +160,10 @@ namespace Spine {
 						clippedUVsItems[s + 5] = v3;					
 
 						s = clippedTriangles.Count;
-						short[] clippedTrianglesItems = clippedTriangles.Resize(s + 3).Items;
+						int[] clippedTrianglesItems = clippedTriangles.Resize(s + 3).Items;
 						clippedTrianglesItems[s] = index;
-						clippedTrianglesItems[s + 1] = (short)(index + 1);
-						clippedTrianglesItems[s + 2] = (short)(index + 2);
+						clippedTrianglesItems[s + 1] = index + 1;
+						clippedTrianglesItems[s + 2] = index + 2;
 						index += 3;
 						goto outer;
 					}
