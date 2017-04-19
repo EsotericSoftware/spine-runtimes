@@ -78,7 +78,7 @@ namespace Spine {
 			// String name = "raptor";
 			// String name = "tank";
 			String name = "coin";
-			bool binaryData = true;
+			bool binaryData = false;
 
 			Atlas atlas = new Atlas(assetsFolder + name + ".atlas", new XnaTextureLoader(GraphicsDevice));
 
