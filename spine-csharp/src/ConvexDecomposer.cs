@@ -42,9 +42,9 @@ namespace Spine {
 		private readonly Pool<ExposedList<float>> polygonPool = new Pool<ExposedList<float>>();
 		private readonly Pool<ExposedList<short>> polygonIndicesPool = new Pool<ExposedList<short>>();
 
-		public ExposedList<ExposedList<float>> Decompose(float[] input) {
-			var vertices = input;
-			int vertexCount = input.Length >> 1;
+		public ExposedList<ExposedList<float>> Decompose(ExposedList<float> input) {
+			var vertices = input.Items;
+			int vertexCount = input.Count >> 1;
 
 			var indicesArray = this.indicesArray;
 			indicesArray.Clear();
