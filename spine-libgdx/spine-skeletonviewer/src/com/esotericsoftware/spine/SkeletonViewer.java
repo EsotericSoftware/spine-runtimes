@@ -35,6 +35,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
 import java.awt.FileDialog;
 import java.awt.Frame;
+import java.awt.Toolkit;
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
 
@@ -88,6 +89,7 @@ import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 public class SkeletonViewer extends ApplicationAdapter {
 	static final float checkModifiedInterval = 0.250f;
 	static final float reloadDelay = 1;
+	static float uiScale = 1;
 
 	UI ui;
 
@@ -331,12 +333,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 				shapes.begin(ShapeType.Line);
 
 				float percent = entry.getAnimationTime() / entry.getAnimationEnd();
-				float x = ui.window.getRight() + (Gdx.graphics.getWidth() - ui.window.getRight()) * percent;
+				float x = ui.window.getRight() * uiScale + (Gdx.graphics.getWidth() - ui.window.getRight() * uiScale) * percent;
 				shapes.setColor(Color.CYAN);
 				shapes.line(x, 0, x, 12);
 
 				percent = entry.getMixDuration() == 0 ? 1 : Math.min(1, entry.getMixTime() / entry.getMixDuration());
-				x = ui.window.getRight() + (Gdx.graphics.getWidth() - ui.window.getRight()) * percent;
+				x = ui.window.getRight() * uiScale + (Gdx.graphics.getWidth() - ui.window.getRight() * uiScale) * percent;
 				shapes.setColor(Color.RED);
 				shapes.line(x, 0, x, 12);
 
@@ -356,7 +358,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 	}
 
 	void resetCameraPosition () {
-		camera.position.x = -ui.window.getWidth() / 2;
+		camera.position.x = -ui.window.getWidth() / 2 * uiScale;
 		camera.position.y = Gdx.graphics.getHeight() / 4;
 	}
 
@@ -364,8 +366,9 @@ public class SkeletonViewer extends ApplicationAdapter {
 		float x = camera.position.x, y = camera.position.y;
 		camera.setToOrtho(false);
 		camera.position.set(x, y, 0);
+		((ScreenViewport)ui.stage.getViewport()).setUnitsPerPixel(1 / uiScale);
 		ui.stage.getViewport().update(width, height, true);
-		if (!ui.minimizeButton.isChecked()) ui.window.setHeight(height + 8);
+		if (!ui.minimizeButton.isChecked()) ui.window.setHeight(height / uiScale + 8);
 	}
 
 	class UI {
@@ -614,7 +617,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 						minimizeButton.setText("+");
 					} else {
 						window.getCells().get(0).setActor(root);
-						ui.window.setHeight(Gdx.graphics.getHeight() + 8);
+						ui.window.setHeight(Gdx.graphics.getHeight() / uiScale + 8);
 						minimizeButton.setText("-");
 					}
 				}
@@ -898,10 +901,19 @@ public class SkeletonViewer extends ApplicationAdapter {
 	}
 
 	static public void main (String[] args) throws Exception {
+		String os = System.getProperty("os.name");
+		float dpiScale = 1;
+		if (os.contains("Windows")) dpiScale = Toolkit.getDefaultToolkit().getScreenResolution() / 96f;
+		if (os.contains("OS X")) {
+			Object object = Toolkit.getDefaultToolkit().getDesktopProperty("apple.awt.contentScaleFactor");
+			if (object instanceof Float && ((Float)object).intValue() == 2) dpiScale = 2;
+		}
+		if (dpiScale >= 2.5f) uiScale = 2;
+
 		LwjglApplicationConfiguration.disableAudio = true;
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.width = 800;
-		config.height = 600;
+		config.width = (int)(800 * uiScale);
+		config.height = (int)(600 * uiScale);
 		config.title = "Skeleton Viewer";
 		config.allowSoftwareMode = true;
 		new LwjglApplication(new SkeletonViewer(), config);
