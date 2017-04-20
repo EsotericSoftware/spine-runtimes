@@ -864,11 +864,13 @@ public class SkeletonViewer extends ApplicationAdapter {
 			prefs.putFloat("zoom", zoomSlider.getValue());
 			prefs.putFloat("x", camera.position.x);
 			prefs.putFloat("y", camera.position.y);
-			TrackEntry current = state.getCurrent(0);
-			if (current != null) {
-				String name = current.animation.name;
-				if (name.equals("<empty>")) name = current.next == null ? "" : current.next.animation.name;
-				prefs.putString("animationName", name);
+			if (state != null) {
+				TrackEntry current = state.getCurrent(0);
+				if (current != null) {
+					String name = current.animation.name;
+					if (name.equals("<empty>")) name = current.next == null ? "" : current.next.animation.name;
+					prefs.putString("animationName", name);
+				}
 			}
 			if (skinList.getSelected() != null) prefs.putString("skinName", skinList.getSelected());
 			prefs.flush();
@@ -908,7 +910,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			Object object = Toolkit.getDefaultToolkit().getDesktopProperty("apple.awt.contentScaleFactor");
 			if (object instanceof Float && ((Float)object).intValue() == 2) dpiScale = 2;
 		}
-		if (dpiScale >= 2.5f) uiScale = 2;
+		if (dpiScale >= 2.0f) uiScale = 2;
 
 		LwjglApplicationConfiguration.disableAudio = true;
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
