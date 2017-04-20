@@ -62,6 +62,7 @@
     <Compile Include="src\Attachments\AttachmentLoader.cs" />
     <Compile Include="src\Attachments\AttachmentType.cs" />
     <Compile Include="src\Attachments\BoundingBoxAttachment.cs" />
+    <Compile Include="src\Attachments\ClippingAttachment.cs" />
     <Compile Include="src\Attachments\MeshAttachment.cs" />
     <Compile Include="src\Attachments\PathAttachment.cs" />
     <Compile Include="src\Attachments\PointAttachment.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="src\BlendMode.cs" />
     <Compile Include="src\Bone.cs" />
     <Compile Include="src\BoneData.cs" />
+    <Compile Include="src\ConvexDecomposer.cs" />
     <Compile Include="src\Event.cs" />
     <Compile Include="src\EventData.cs" />
     <Compile Include="src\ExposedList.cs" />
@@ -84,6 +86,7 @@
     <Compile Include="src\Skeleton.cs" />
     <Compile Include="src\SkeletonBinary.cs" />
     <Compile Include="src\SkeletonBounds.cs" />
+    <Compile Include="src\SkeletonClipping.cs" />
     <Compile Include="src\SkeletonData.cs" />
     <Compile Include="src\SkeletonJson.cs" />
     <Compile Include="src\Skin.cs" />

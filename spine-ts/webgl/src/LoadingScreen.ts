@@ -32,7 +32,7 @@ module spine.webgl {
 	export class LoadingScreen {
 		static FADE_SECONDS = 1;
 
-		private static loaded = 0; 
+		private static loaded = 0;
 		private static spinnerImg: HTMLImageElement = null;
 		private static logoImg: HTMLImageElement = null;
 
@@ -84,7 +84,7 @@ module spine.webgl {
 
 			let renderer = this.renderer;
 			let canvas = renderer.canvas;
-			let gl = renderer.gl;
+			let gl = renderer.context.gl;
 
 			let oldX = renderer.camera.position.x, oldY = renderer.camera.position.y;
 			renderer.camera.position.set(canvas.width / 2, canvas.height / 2, 0);
@@ -114,8 +114,8 @@ module spine.webgl {
 
 			if (LoadingScreen.loaded != 2) return;
 			if (this.logo === null) {
-				this.logo = new GLTexture(renderer.gl, LoadingScreen.logoImg);
-				this.spinner = new GLTexture(renderer.gl, LoadingScreen.spinnerImg);
+				this.logo = new GLTexture(renderer.context, LoadingScreen.logoImg);
+				this.spinner = new GLTexture(renderer.context, LoadingScreen.spinnerImg);
 			}
 			this.logo.update(false);
 			this.spinner.update(false);

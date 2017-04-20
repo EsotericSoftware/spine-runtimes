@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 package spine.examples {
+	import starling.display.DisplayObjectContainer;
 	import spine.atlas.Atlas;
 	import spine.*;
 	import spine.attachments.AtlasAttachmentLoader;
@@ -53,6 +54,7 @@ package spine.examples {
 		static public const RaptorAtlasTexture : Class;
 		private var skeleton : SkeletonAnimation;
 		private var gunGrabbed : Boolean;
+		private var gunGrabCount : Number = 0;
 
 		public function RaptorExample() {
 			var attachmentLoader : AttachmentLoader;
@@ -63,13 +65,18 @@ package spine.examples {
 			json.scale = 0.5;
 			var skeletonData : SkeletonData = json.readSkeletonData(new RaptorJson());
 
+			this.x = 400;
+			this.y = 560;
+
 			skeleton = new SkeletonAnimation(skeletonData);
-			skeleton.x = 400;
-			skeleton.y = 560;
 			skeleton.state.setAnimationByName(0, "walk", true);
+			skeleton.state.update(0);
+			skeleton.state.apply(skeleton.skeleton);
+			skeleton.skeleton.updateWorldTransform();
+			this.setRequiresRedraw();
 
 			addChild(skeleton);
-			Starling.juggler.add(skeleton);
+//			Starling.juggler.add(skeleton);
 
 			addEventListener(TouchEvent.TOUCH, onClick);
 		}
@@ -77,11 +84,22 @@ package spine.examples {
 		private function onClick(event : TouchEvent) : void {
 			var touch : Touch = event.getTouch(this);
 			if (touch && touch.phase == TouchPhase.BEGAN) {
-				if (gunGrabbed)
-					skeleton.skeleton.setToSetupPose();
-				else
-					skeleton.state.setAnimationByName(1, "gungrab", false);
-				gunGrabbed = !gunGrabbed;
+				skeleton.state.update(gunGrabCount++ % 2 == 1 ? 0 : 0.1);
+				skeleton.state.apply(skeleton.skeleton);
+				skeleton.skeleton.updateWorldTransform();
+				this.setRequiresRedraw();
+//				if (gunGrabCount < 2) {
+//					if (gunGrabbed)
+//						skeleton.skeleton.setToSetupPose();
+//					else
+//						skeleton.state.setAnimationByName(1, "gungrab", false);
+//					gunGrabbed = !gunGrabbed;
+//					gunGrabCount++;
+//				} else {
+//					var parent: DisplayObjectContainer = this.parent;
+//					this.removeFromParent(true);	
+//					parent.addChild(new TankExample());
+//				}
 			}
 		}
 	}

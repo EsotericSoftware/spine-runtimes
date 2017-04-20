@@ -1,8 +1,13 @@
-var __extends = (this && this.__extends) || function (d, b) {
-	for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	function __() { this.constructor = d; }
-	d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+	var extendStatics = Object.setPrototypeOf ||
+		({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+		function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	return function (d, b) {
+		extendStatics(d, b);
+		function __() { this.constructor = d; }
+		d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+})();
 var spine;
 (function (spine) {
 	var Animation = (function () {
@@ -53,6 +58,7 @@ var spine;
 		return Animation;
 	}());
 	spine.Animation = Animation;
+	var TimelineType;
 	(function (TimelineType) {
 		TimelineType[TimelineType["rotate"] = 0] = "rotate";
 		TimelineType[TimelineType["translate"] = 1] = "translate";
@@ -69,8 +75,7 @@ var spine;
 		TimelineType[TimelineType["pathConstraintSpacing"] = 12] = "pathConstraintSpacing";
 		TimelineType[TimelineType["pathConstraintMix"] = 13] = "pathConstraintMix";
 		TimelineType[TimelineType["twoColor"] = 14] = "twoColor";
-	})(spine.TimelineType || (spine.TimelineType = {}));
-	var TimelineType = spine.TimelineType;
+	})(TimelineType = spine.TimelineType || (spine.TimelineType = {}));
 	var CurveTimeline = (function () {
 		function CurveTimeline(frameCount) {
 			if (frameCount <= 0)
@@ -146,18 +151,19 @@ var spine;
 			var y = curves[i - 1];
 			return y + (1 - y) * (percent - x) / (1 - x);
 		};
-		CurveTimeline.LINEAR = 0;
-		CurveTimeline.STEPPED = 1;
-		CurveTimeline.BEZIER = 2;
-		CurveTimeline.BEZIER_SIZE = 10 * 2 - 1;
 		return CurveTimeline;
 	}());
+	CurveTimeline.LINEAR = 0;
+	CurveTimeline.STEPPED = 1;
+	CurveTimeline.BEZIER = 2;
+	CurveTimeline.BEZIER_SIZE = 10 * 2 - 1;
 	spine.CurveTimeline = CurveTimeline;
 	var RotateTimeline = (function (_super) {
 		__extends(RotateTimeline, _super);
 		function RotateTimeline(frameCount) {
-			_super.call(this, frameCount);
-			this.frames = spine.Utils.newFloatArray(frameCount << 1);
+			var _this = _super.call(this, frameCount) || this;
+			_this.frames = spine.Utils.newFloatArray(frameCount << 1);
+			return _this;
 		}
 		RotateTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.rotate << 24) + this.boneIndex;
@@ -202,18 +208,19 @@ var spine;
 				bone.rotation += r * alpha;
 			}
 		};
-		RotateTimeline.ENTRIES = 2;
-		RotateTimeline.PREV_TIME = -2;
-		RotateTimeline.PREV_ROTATION = -1;
-		RotateTimeline.ROTATION = 1;
 		return RotateTimeline;
 	}(CurveTimeline));
+	RotateTimeline.ENTRIES = 2;
+	RotateTimeline.PREV_TIME = -2;
+	RotateTimeline.PREV_ROTATION = -1;
+	RotateTimeline.ROTATION = 1;
 	spine.RotateTimeline = RotateTimeline;
 	var TranslateTimeline = (function (_super) {
 		__extends(TranslateTimeline, _super);
 		function TranslateTimeline(frameCount) {
-			_super.call(this, frameCount);
-			this.frames = spine.Utils.newFloatArray(frameCount * TranslateTimeline.ENTRIES);
+			var _this = _super.call(this, frameCount) || this;
+			_this.frames = spine.Utils.newFloatArray(frameCount * TranslateTimeline.ENTRIES);
+			return _this;
 		}
 		TranslateTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.translate << 24) + this.boneIndex;
@@ -257,19 +264,19 @@ var spine;
 				bone.y += (bone.data.y + y - bone.y) * alpha;
 			}
 		};
-		TranslateTimeline.ENTRIES = 3;
-		TranslateTimeline.PREV_TIME = -3;
-		TranslateTimeline.PREV_X = -2;
-		TranslateTimeline.PREV_Y = -1;
-		TranslateTimeline.X = 1;
-		TranslateTimeline.Y = 2;
 		return TranslateTimeline;
 	}(CurveTimeline));
+	TranslateTimeline.ENTRIES = 3;
+	TranslateTimeline.PREV_TIME = -3;
+	TranslateTimeline.PREV_X = -2;
+	TranslateTimeline.PREV_Y = -1;
+	TranslateTimeline.X = 1;
+	TranslateTimeline.Y = 2;
 	spine.TranslateTimeline = TranslateTimeline;
 	var ScaleTimeline = (function (_super) {
 		__extends(ScaleTimeline, _super);
 		function ScaleTimeline(frameCount) {
-			_super.call(this, frameCount);
+			return _super.call(this, frameCount) || this;
 		}
 		ScaleTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.scale << 24) + this.boneIndex;
@@ -330,7 +337,7 @@ var spine;
 	var ShearTimeline = (function (_super) {
 		__extends(ShearTimeline, _super);
 		function ShearTimeline(frameCount) {
-			_super.call(this, frameCount);
+			return _super.call(this, frameCount) || this;
 		}
 		ShearTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.shear << 24) + this.boneIndex;
@@ -374,8 +381,9 @@ var spine;
 	var ColorTimeline = (function (_super) {
 		__extends(ColorTimeline, _super);
 		function ColorTimeline(frameCount) {
-			_super.call(this, frameCount);
-			this.frames = spine.Utils.newFloatArray(frameCount * ColorTimeline.ENTRIES);
+			var _this = _super.call(this, frameCount) || this;
+			_this.frames = spine.Utils.newFloatArray(frameCount * ColorTimeline.ENTRIES);
+			return _this;
 		}
 		ColorTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.color << 24) + this.slotIndex;
@@ -426,24 +434,25 @@ var spine;
 				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 			}
 		};
-		ColorTimeline.ENTRIES = 5;
-		ColorTimeline.PREV_TIME = -5;
-		ColorTimeline.PREV_R = -4;
-		ColorTimeline.PREV_G = -3;
-		ColorTimeline.PREV_B = -2;
-		ColorTimeline.PREV_A = -1;
-		ColorTimeline.R = 1;
-		ColorTimeline.G = 2;
-		ColorTimeline.B = 3;
-		ColorTimeline.A = 4;
 		return ColorTimeline;
 	}(CurveTimeline));
+	ColorTimeline.ENTRIES = 5;
+	ColorTimeline.PREV_TIME = -5;
+	ColorTimeline.PREV_R = -4;
+	ColorTimeline.PREV_G = -3;
+	ColorTimeline.PREV_B = -2;
+	ColorTimeline.PREV_A = -1;
+	ColorTimeline.R = 1;
+	ColorTimeline.G = 2;
+	ColorTimeline.B = 3;
+	ColorTimeline.A = 4;
 	spine.ColorTimeline = ColorTimeline;
 	var TwoColorTimeline = (function (_super) {
 		__extends(TwoColorTimeline, _super);
 		function TwoColorTimeline(frameCount) {
-			_super.call(this, frameCount);
-			this.frames = spine.Utils.newFloatArray(frameCount * TwoColorTimeline.ENTRIES);
+			var _this = _super.call(this, frameCount) || this;
+			_this.frames = spine.Utils.newFloatArray(frameCount * TwoColorTimeline.ENTRIES);
+			return _this;
 		}
 		TwoColorTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.twoColor << 24) + this.slotIndex;
@@ -514,24 +523,24 @@ var spine;
 				dark.add((r2 - dark.r) * alpha, (g2 - dark.g) * alpha, (b2 - dark.b) * alpha, 0);
 			}
 		};
-		TwoColorTimeline.ENTRIES = 8;
-		TwoColorTimeline.PREV_TIME = -8;
-		TwoColorTimeline.PREV_R = -7;
-		TwoColorTimeline.PREV_G = -6;
-		TwoColorTimeline.PREV_B = -5;
-		TwoColorTimeline.PREV_A = -4;
-		TwoColorTimeline.PREV_R2 = -3;
-		TwoColorTimeline.PREV_G2 = -2;
-		TwoColorTimeline.PREV_B2 = -1;
-		TwoColorTimeline.R = 1;
-		TwoColorTimeline.G = 2;
-		TwoColorTimeline.B = 3;
-		TwoColorTimeline.A = 4;
-		TwoColorTimeline.R2 = 5;
-		TwoColorTimeline.G2 = 6;
-		TwoColorTimeline.B2 = 7;
 		return TwoColorTimeline;
 	}(CurveTimeline));
+	TwoColorTimeline.ENTRIES = 8;
+	TwoColorTimeline.PREV_TIME = -8;
+	TwoColorTimeline.PREV_R = -7;
+	TwoColorTimeline.PREV_G = -6;
+	TwoColorTimeline.PREV_B = -5;
+	TwoColorTimeline.PREV_A = -4;
+	TwoColorTimeline.PREV_R2 = -3;
+	TwoColorTimeline.PREV_G2 = -2;
+	TwoColorTimeline.PREV_B2 = -1;
+	TwoColorTimeline.R = 1;
+	TwoColorTimeline.G = 2;
+	TwoColorTimeline.B = 3;
+	TwoColorTimeline.A = 4;
+	TwoColorTimeline.R2 = 5;
+	TwoColorTimeline.G2 = 6;
+	TwoColorTimeline.B2 = 7;
 	spine.TwoColorTimeline = TwoColorTimeline;
 	var AttachmentTimeline = (function () {
 		function AttachmentTimeline(frameCount) {
@@ -578,9 +587,10 @@ var spine;
 	var DeformTimeline = (function (_super) {
 		__extends(DeformTimeline, _super);
 		function DeformTimeline(frameCount) {
-			_super.call(this, frameCount);
-			this.frames = spine.Utils.newFloatArray(frameCount);
-			this.frameVertices = new Array(frameCount);
+			var _this = _super.call(this, frameCount) || this;
+			_this.frames = spine.Utils.newFloatArray(frameCount);
+			_this.frameVertices = new Array(frameCount);
+			return _this;
 		}
 		DeformTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.deform << 24) + this.slotIndex;
@@ -761,8 +771,9 @@ var spine;
 	var IkConstraintTimeline = (function (_super) {
 		__extends(IkConstraintTimeline, _super);
 		function IkConstraintTimeline(frameCount) {
-			_super.call(this, frameCount);
-			this.frames = spine.Utils.newFloatArray(frameCount * IkConstraintTimeline.ENTRIES);
+			var _this = _super.call(this, frameCount) || this;
+			_this.frames = spine.Utils.newFloatArray(frameCount * IkConstraintTimeline.ENTRIES);
+			return _this;
 		}
 		IkConstraintTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.ikConstraint << 24) + this.ikConstraintIndex;
@@ -810,20 +821,21 @@ var spine;
 					constraint.bendDirection = frames[frame + IkConstraintTimeline.PREV_BEND_DIRECTION];
 			}
 		};
-		IkConstraintTimeline.ENTRIES = 3;
-		IkConstraintTimeline.PREV_TIME = -3;
-		IkConstraintTimeline.PREV_MIX = -2;
-		IkConstraintTimeline.PREV_BEND_DIRECTION = -1;
-		IkConstraintTimeline.MIX = 1;
-		IkConstraintTimeline.BEND_DIRECTION = 2;
 		return IkConstraintTimeline;
 	}(CurveTimeline));
+	IkConstraintTimeline.ENTRIES = 3;
+	IkConstraintTimeline.PREV_TIME = -3;
+	IkConstraintTimeline.PREV_MIX = -2;
+	IkConstraintTimeline.PREV_BEND_DIRECTION = -1;
+	IkConstraintTimeline.MIX = 1;
+	IkConstraintTimeline.BEND_DIRECTION = 2;
 	spine.IkConstraintTimeline = IkConstraintTimeline;
 	var TransformConstraintTimeline = (function (_super) {
 		__extends(TransformConstraintTimeline, _super);
 		function TransformConstraintTimeline(frameCount) {
-			_super.call(this, frameCount);
-			this.frames = spine.Utils.newFloatArray(frameCount * TransformConstraintTimeline.ENTRIES);
+			var _this = _super.call(this, frameCount) || this;
+			_this.frames = spine.Utils.newFloatArray(frameCount * TransformConstraintTimeline.ENTRIES);
+			return _this;
 		}
 		TransformConstraintTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.transformConstraint << 24) + this.transformConstraintIndex;
@@ -884,24 +896,25 @@ var spine;
 				constraint.shearMix += (shear - constraint.shearMix) * alpha;
 			}
 		};
-		TransformConstraintTimeline.ENTRIES = 5;
-		TransformConstraintTimeline.PREV_TIME = -5;
-		TransformConstraintTimeline.PREV_ROTATE = -4;
-		TransformConstraintTimeline.PREV_TRANSLATE = -3;
-		TransformConstraintTimeline.PREV_SCALE = -2;
-		TransformConstraintTimeline.PREV_SHEAR = -1;
-		TransformConstraintTimeline.ROTATE = 1;
-		TransformConstraintTimeline.TRANSLATE = 2;
-		TransformConstraintTimeline.SCALE = 3;
-		TransformConstraintTimeline.SHEAR = 4;
 		return TransformConstraintTimeline;
 	}(CurveTimeline));
+	TransformConstraintTimeline.ENTRIES = 5;
+	TransformConstraintTimeline.PREV_TIME = -5;
+	TransformConstraintTimeline.PREV_ROTATE = -4;
+	TransformConstraintTimeline.PREV_TRANSLATE = -3;
+	TransformConstraintTimeline.PREV_SCALE = -2;
+	TransformConstraintTimeline.PREV_SHEAR = -1;
+	TransformConstraintTimeline.ROTATE = 1;
+	TransformConstraintTimeline.TRANSLATE = 2;
+	TransformConstraintTimeline.SCALE = 3;
+	TransformConstraintTimeline.SHEAR = 4;
 	spine.TransformConstraintTimeline = TransformConstraintTimeline;
 	var PathConstraintPositionTimeline = (function (_super) {
 		__extends(PathConstraintPositionTimeline, _super);
 		function PathConstraintPositionTimeline(frameCount) {
-			_super.call(this, frameCount);
-			this.frames = spine.Utils.newFloatArray(frameCount * PathConstraintPositionTimeline.ENTRIES);
+			var _this = _super.call(this, frameCount) || this;
+			_this.frames = spine.Utils.newFloatArray(frameCount * PathConstraintPositionTimeline.ENTRIES);
+			return _this;
 		}
 		PathConstraintPositionTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.pathConstraintPosition << 24) + this.pathConstraintIndex;
@@ -934,17 +947,17 @@ var spine;
 			else
 				constraint.position += (position - constraint.position) * alpha;
 		};
-		PathConstraintPositionTimeline.ENTRIES = 2;
-		PathConstraintPositionTimeline.PREV_TIME = -2;
-		PathConstraintPositionTimeline.PREV_VALUE = -1;
-		PathConstraintPositionTimeline.VALUE = 1;
 		return PathConstraintPositionTimeline;
 	}(CurveTimeline));
+	PathConstraintPositionTimeline.ENTRIES = 2;
+	PathConstraintPositionTimeline.PREV_TIME = -2;
+	PathConstraintPositionTimeline.PREV_VALUE = -1;
+	PathConstraintPositionTimeline.VALUE = 1;
 	spine.PathConstraintPositionTimeline = PathConstraintPositionTimeline;
 	var PathConstraintSpacingTimeline = (function (_super) {
 		__extends(PathConstraintSpacingTimeline, _super);
 		function PathConstraintSpacingTimeline(frameCount) {
-			_super.call(this, frameCount);
+			return _super.call(this, frameCount) || this;
 		}
 		PathConstraintSpacingTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.pathConstraintSpacing << 24) + this.pathConstraintIndex;
@@ -978,8 +991,9 @@ var spine;
 	var PathConstraintMixTimeline = (function (_super) {
 		__extends(PathConstraintMixTimeline, _super);
 		function PathConstraintMixTimeline(frameCount) {
-			_super.call(this, frameCount);
-			this.frames = spine.Utils.newFloatArray(frameCount * PathConstraintMixTimeline.ENTRIES);
+			var _this = _super.call(this, frameCount) || this;
+			_this.frames = spine.Utils.newFloatArray(frameCount * PathConstraintMixTimeline.ENTRIES);
+			return _this;
 		}
 		PathConstraintMixTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.pathConstraintMix << 24) + this.pathConstraintIndex;
@@ -1023,14 +1037,14 @@ var spine;
 				constraint.translateMix += (translate - constraint.translateMix) * alpha;
 			}
 		};
-		PathConstraintMixTimeline.ENTRIES = 3;
-		PathConstraintMixTimeline.PREV_TIME = -3;
-		PathConstraintMixTimeline.PREV_ROTATE = -2;
-		PathConstraintMixTimeline.PREV_TRANSLATE = -1;
-		PathConstraintMixTimeline.ROTATE = 1;
-		PathConstraintMixTimeline.TRANSLATE = 2;
 		return PathConstraintMixTimeline;
 	}(CurveTimeline));
+	PathConstraintMixTimeline.ENTRIES = 3;
+	PathConstraintMixTimeline.PREV_TIME = -3;
+	PathConstraintMixTimeline.PREV_ROTATE = -2;
+	PathConstraintMixTimeline.PREV_TRANSLATE = -1;
+	PathConstraintMixTimeline.ROTATE = 1;
+	PathConstraintMixTimeline.TRANSLATE = 2;
 	spine.PathConstraintMixTimeline = PathConstraintMixTimeline;
 })(spine || (spine = {}));
 var spine;
@@ -1559,9 +1573,9 @@ var spine;
 		AnimationState.prototype.clearListenerNotifications = function () {
 			this.queue.clear();
 		};
-		AnimationState.emptyAnimation = new spine.Animation("<empty>", [], 0);
 		return AnimationState;
 	}());
+	AnimationState.emptyAnimation = new spine.Animation("<empty>", [], 0);
 	spine.AnimationState = AnimationState;
 	var TrackEntry = (function () {
 		function TrackEntry() {
@@ -1697,6 +1711,7 @@ var spine;
 		return EventQueue;
 	}());
 	spine.EventQueue = EventQueue;
+	var EventType;
 	(function (EventType) {
 		EventType[EventType["start"] = 0] = "start";
 		EventType[EventType["interrupt"] = 1] = "interrupt";
@@ -1704,8 +1719,7 @@ var spine;
 		EventType[EventType["dispose"] = 3] = "dispose";
 		EventType[EventType["complete"] = 4] = "complete";
 		EventType[EventType["event"] = 5] = "event";
-	})(spine.EventType || (spine.EventType = {}));
-	var EventType = spine.EventType;
+	})(EventType = spine.EventType || (spine.EventType = {}));
 	var AnimationStateAdapter2 = (function () {
 		function AnimationStateAdapter2() {
 		}
@@ -1824,6 +1838,30 @@ var spine;
 					error(path, "Couldn't load image " + path);
 			};
 		};
+		AssetManager.prototype.loadTextureData = function (path, data, success, error) {
+			var _this = this;
+			if (success === void 0) { success = null; }
+			if (error === void 0) { error = null; }
+			path = this.pathPrefix + path;
+			this.toLoad++;
+			var img = new Image();
+			img.src = data;
+			img.onload = function (ev) {
+				var texture = _this.textureLoader(img);
+				_this.assets[path] = texture;
+				_this.toLoad--;
+				_this.loaded++;
+				if (success)
+					success(path, img);
+			};
+			img.onerror = function (ev) {
+				_this.errors[path] = "Couldn't load image " + path;
+				_this.toLoad--;
+				_this.loaded++;
+				if (error)
+					error(path, "Couldn't load image " + path);
+			};
+		};
 		AssetManager.prototype.get = function (path) {
 			path = this.pathPrefix + path;
 			return this.assets[path];
@@ -1898,363 +1936,22 @@ var spine;
 		AtlasAttachmentLoader.prototype.newPointAttachment = function (skin, name) {
 			return new spine.PointAttachment(name);
 		};
+		AtlasAttachmentLoader.prototype.newClippingAttachment = function (skin, name) {
+			return new spine.ClippingAttachment(name);
+		};
 		return AtlasAttachmentLoader;
 	}());
 	spine.AtlasAttachmentLoader = AtlasAttachmentLoader;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
-	var Attachment = (function () {
-		function Attachment(name) {
-			if (name == null)
-				throw new Error("name cannot be null.");
-			this.name = name;
-		}
-		return Attachment;
-	}());
-	spine.Attachment = Attachment;
-	var VertexAttachment = (function (_super) {
-		__extends(VertexAttachment, _super);
-		function VertexAttachment(name) {
-			_super.call(this, name);
-			this.worldVerticesLength = 0;
-		}
-		VertexAttachment.prototype.computeWorldVertices = function (slot, start, count, worldVertices, offset, stride) {
-			count = offset + (count >> 1) * stride;
-			var skeleton = slot.bone.skeleton;
-			var deformArray = slot.attachmentVertices;
-			var vertices = this.vertices;
-			var bones = this.bones;
-			if (bones == null) {
-				if (deformArray.length > 0)
-					vertices = deformArray;
-				var bone = slot.bone;
-				var x = bone.worldX;
-				var y = bone.worldY;
-				var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-				for (var v_1 = start, w = offset; w < count; v_1 += 2, w += stride) {
-					var vx = vertices[v_1], vy = vertices[v_1 + 1];
-					worldVertices[w] = vx * a + vy * b + x;
-					worldVertices[w + 1] = vx * c + vy * d + y;
-				}
-				return;
-			}
-			var v = 0, skip = 0;
-			for (var i = 0; i < start; i += 2) {
-				var n = bones[v];
-				v += n + 1;
-				skip += n;
-			}
-			var skeletonBones = skeleton.bones;
-			if (deformArray.length == 0) {
-				for (var w = offset, b = skip * 3; w < count; w += stride) {
-					var wx = 0, wy = 0;
-					var n = bones[v++];
-					n += v;
-					for (; v < n; v++, b += 3) {
-						var bone = skeletonBones[bones[v]];
-						var vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
-						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
-						wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
-					}
-					worldVertices[w] = wx;
-					worldVertices[w + 1] = wy;
-				}
-			}
-			else {
-				var deform = deformArray;
-				for (var w = offset, b = skip * 3, f = skip << 1; w < count; w += stride) {
-					var wx = 0, wy = 0;
-					var n = bones[v++];
-					n += v;
-					for (; v < n; v++, b += 3, f += 2) {
-						var bone = skeletonBones[bones[v]];
-						var vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
-						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
-						wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
-					}
-					worldVertices[w] = wx;
-					worldVertices[w + 1] = wy;
-				}
-			}
-		};
-		VertexAttachment.prototype.applyDeform = function (sourceAttachment) {
-			return this == sourceAttachment;
-		};
-		return VertexAttachment;
-	}(Attachment));
-	spine.VertexAttachment = VertexAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	(function (AttachmentType) {
-		AttachmentType[AttachmentType["Region"] = 0] = "Region";
-		AttachmentType[AttachmentType["BoundingBox"] = 1] = "BoundingBox";
-		AttachmentType[AttachmentType["Mesh"] = 2] = "Mesh";
-		AttachmentType[AttachmentType["LinkedMesh"] = 3] = "LinkedMesh";
-		AttachmentType[AttachmentType["Path"] = 4] = "Path";
-		AttachmentType[AttachmentType["Point"] = 5] = "Point";
-	})(spine.AttachmentType || (spine.AttachmentType = {}));
-	var AttachmentType = spine.AttachmentType;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var BoundingBoxAttachment = (function (_super) {
-		__extends(BoundingBoxAttachment, _super);
-		function BoundingBoxAttachment(name) {
-			_super.call(this, name);
-			this.color = new spine.Color(1, 1, 1, 1);
-		}
-		return BoundingBoxAttachment;
-	}(spine.VertexAttachment));
-	spine.BoundingBoxAttachment = BoundingBoxAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var MeshAttachment = (function (_super) {
-		__extends(MeshAttachment, _super);
-		function MeshAttachment(name) {
-			_super.call(this, name);
-			this.color = new spine.Color(1, 1, 1, 1);
-			this.inheritDeform = false;
-			this.tempColor = new spine.Color(0, 0, 0, 0);
-		}
-		MeshAttachment.prototype.updateUVs = function () {
-			var u = 0, v = 0, width = 0, height = 0;
-			if (this.region == null) {
-				u = v = 0;
-				width = height = 1;
-			}
-			else {
-				u = this.region.u;
-				v = this.region.v;
-				width = this.region.u2 - u;
-				height = this.region.v2 - v;
-			}
-			var regionUVs = this.regionUVs;
-			if (this.uvs == null || this.uvs.length != regionUVs.length)
-				this.uvs = spine.Utils.newFloatArray(regionUVs.length);
-			var uvs = this.uvs;
-			if (this.region.rotate) {
-				for (var i = 0, n = uvs.length; i < n; i += 2) {
-					uvs[i] = u + regionUVs[i + 1] * width;
-					uvs[i + 1] = v + height - regionUVs[i] * height;
-				}
-			}
-			else {
-				for (var i = 0, n = uvs.length; i < n; i += 2) {
-					uvs[i] = u + regionUVs[i] * width;
-					uvs[i + 1] = v + regionUVs[i + 1] * height;
-				}
-			}
-		};
-		MeshAttachment.prototype.applyDeform = function (sourceAttachment) {
-			return this == sourceAttachment || (this.inheritDeform && this.parentMesh == sourceAttachment);
-		};
-		MeshAttachment.prototype.getParentMesh = function () {
-			return this.parentMesh;
-		};
-		MeshAttachment.prototype.setParentMesh = function (parentMesh) {
-			this.parentMesh = parentMesh;
-			if (parentMesh != null) {
-				this.bones = parentMesh.bones;
-				this.vertices = parentMesh.vertices;
-				this.worldVerticesLength = parentMesh.worldVerticesLength;
-				this.regionUVs = parentMesh.regionUVs;
-				this.triangles = parentMesh.triangles;
-				this.hullLength = parentMesh.hullLength;
-				this.worldVerticesLength = parentMesh.worldVerticesLength;
-			}
-		};
-		return MeshAttachment;
-	}(spine.VertexAttachment));
-	spine.MeshAttachment = MeshAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var PathAttachment = (function (_super) {
-		__extends(PathAttachment, _super);
-		function PathAttachment(name) {
-			_super.call(this, name);
-			this.closed = false;
-			this.constantSpeed = false;
-			this.color = new spine.Color(1, 1, 1, 1);
-		}
-		return PathAttachment;
-	}(spine.VertexAttachment));
-	spine.PathAttachment = PathAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var PointAttachment = (function (_super) {
-		__extends(PointAttachment, _super);
-		function PointAttachment(name) {
-			_super.call(this, name);
-			this.color = new spine.Color(0.38, 0.94, 0, 1);
-		}
-		PointAttachment.prototype.computeWorldPosition = function (bone, point) {
-			point.x = this.x * bone.a + this.y * bone.b + bone.worldX;
-			point.y = this.x * bone.c + this.y * bone.d + bone.worldY;
-			return point;
-		};
-		PointAttachment.prototype.computeWorldRotation = function (bone) {
-			var cos = spine.MathUtils.cosDeg(this.rotation), sin = spine.MathUtils.sinDeg(this.rotation);
-			var x = cos * bone.a + sin * bone.b;
-			var y = cos * bone.c + sin * bone.d;
-			return Math.atan2(y, x) * spine.MathUtils.radDeg;
-		};
-		return PointAttachment;
-	}(spine.VertexAttachment));
-	spine.PointAttachment = PointAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var RegionAttachment = (function (_super) {
-		__extends(RegionAttachment, _super);
-		function RegionAttachment(name) {
-			_super.call(this, name);
-			this.x = 0;
-			this.y = 0;
-			this.scaleX = 1;
-			this.scaleY = 1;
-			this.rotation = 0;
-			this.width = 0;
-			this.height = 0;
-			this.color = new spine.Color(1, 1, 1, 1);
-			this.offset = spine.Utils.newFloatArray(8);
-			this.uvs = spine.Utils.newFloatArray(8);
-			this.tempColor = new spine.Color(1, 1, 1, 1);
-		}
-		RegionAttachment.prototype.updateOffset = function () {
-			var regionScaleX = this.width / this.region.originalWidth * this.scaleX;
-			var regionScaleY = this.height / this.region.originalHeight * this.scaleY;
-			var localX = -this.width / 2 * this.scaleX + this.region.offsetX * regionScaleX;
-			var localY = -this.height / 2 * this.scaleY + this.region.offsetY * regionScaleY;
-			var localX2 = localX + this.region.width * regionScaleX;
-			var localY2 = localY + this.region.height * regionScaleY;
-			var radians = this.rotation * Math.PI / 180;
-			var cos = Math.cos(radians);
-			var sin = Math.sin(radians);
-			var localXCos = localX * cos + this.x;
-			var localXSin = localX * sin;
-			var localYCos = localY * cos + this.y;
-			var localYSin = localY * sin;
-			var localX2Cos = localX2 * cos + this.x;
-			var localX2Sin = localX2 * sin;
-			var localY2Cos = localY2 * cos + this.y;
-			var localY2Sin = localY2 * sin;
-			var offset = this.offset;
-			offset[RegionAttachment.OX1] = localXCos - localYSin;
-			offset[RegionAttachment.OY1] = localYCos + localXSin;
-			offset[RegionAttachment.OX2] = localXCos - localY2Sin;
-			offset[RegionAttachment.OY2] = localY2Cos + localXSin;
-			offset[RegionAttachment.OX3] = localX2Cos - localY2Sin;
-			offset[RegionAttachment.OY3] = localY2Cos + localX2Sin;
-			offset[RegionAttachment.OX4] = localX2Cos - localYSin;
-			offset[RegionAttachment.OY4] = localYCos + localX2Sin;
-		};
-		RegionAttachment.prototype.setRegion = function (region) {
-			this.region = region;
-			var uvs = this.uvs;
-			if (region.rotate) {
-				uvs[2] = region.u;
-				uvs[3] = region.v2;
-				uvs[4] = region.u;
-				uvs[5] = region.v;
-				uvs[6] = region.u2;
-				uvs[7] = region.v;
-				uvs[0] = region.u2;
-				uvs[1] = region.v2;
-			}
-			else {
-				uvs[0] = region.u;
-				uvs[1] = region.v2;
-				uvs[2] = region.u;
-				uvs[3] = region.v;
-				uvs[4] = region.u2;
-				uvs[5] = region.v;
-				uvs[6] = region.u2;
-				uvs[7] = region.v2;
-			}
-		};
-		RegionAttachment.prototype.computeWorldVertices = function (bone, worldVertices, offset, stride) {
-			var vertexOffset = this.offset;
-			var x = bone.worldX, y = bone.worldY;
-			var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-			var offsetX = 0, offsetY = 0;
-			offsetX = vertexOffset[RegionAttachment.OX1];
-			offsetY = vertexOffset[RegionAttachment.OY1];
-			worldVertices[offset] = offsetX * a + offsetY * b + x;
-			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
-			offset += stride;
-			offsetX = vertexOffset[RegionAttachment.OX2];
-			offsetY = vertexOffset[RegionAttachment.OY2];
-			worldVertices[offset] = offsetX * a + offsetY * b + x;
-			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
-			offset += stride;
-			offsetX = vertexOffset[RegionAttachment.OX3];
-			offsetY = vertexOffset[RegionAttachment.OY3];
-			worldVertices[offset] = offsetX * a + offsetY * b + x;
-			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
-			offset += stride;
-			offsetX = vertexOffset[RegionAttachment.OX4];
-			offsetY = vertexOffset[RegionAttachment.OY4];
-			worldVertices[offset] = offsetX * a + offsetY * b + x;
-			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
-		};
-		RegionAttachment.OX1 = 0;
-		RegionAttachment.OY1 = 1;
-		RegionAttachment.OX2 = 2;
-		RegionAttachment.OY2 = 3;
-		RegionAttachment.OX3 = 4;
-		RegionAttachment.OY3 = 5;
-		RegionAttachment.OX4 = 6;
-		RegionAttachment.OY4 = 7;
-		RegionAttachment.X1 = 0;
-		RegionAttachment.Y1 = 1;
-		RegionAttachment.C1R = 2;
-		RegionAttachment.C1G = 3;
-		RegionAttachment.C1B = 4;
-		RegionAttachment.C1A = 5;
-		RegionAttachment.U1 = 6;
-		RegionAttachment.V1 = 7;
-		RegionAttachment.X2 = 8;
-		RegionAttachment.Y2 = 9;
-		RegionAttachment.C2R = 10;
-		RegionAttachment.C2G = 11;
-		RegionAttachment.C2B = 12;
-		RegionAttachment.C2A = 13;
-		RegionAttachment.U2 = 14;
-		RegionAttachment.V2 = 15;
-		RegionAttachment.X3 = 16;
-		RegionAttachment.Y3 = 17;
-		RegionAttachment.C3R = 18;
-		RegionAttachment.C3G = 19;
-		RegionAttachment.C3B = 20;
-		RegionAttachment.C3A = 21;
-		RegionAttachment.U3 = 22;
-		RegionAttachment.V3 = 23;
-		RegionAttachment.X4 = 24;
-		RegionAttachment.Y4 = 25;
-		RegionAttachment.C4R = 26;
-		RegionAttachment.C4G = 27;
-		RegionAttachment.C4B = 28;
-		RegionAttachment.C4A = 29;
-		RegionAttachment.U4 = 30;
-		RegionAttachment.V4 = 31;
-		return RegionAttachment;
-	}(spine.Attachment));
-	spine.RegionAttachment = RegionAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
+	var BlendMode;
 	(function (BlendMode) {
 		BlendMode[BlendMode["Normal"] = 0] = "Normal";
 		BlendMode[BlendMode["Additive"] = 1] = "Additive";
 		BlendMode[BlendMode["Multiply"] = 2] = "Multiply";
 		BlendMode[BlendMode["Screen"] = 3] = "Screen";
-	})(spine.BlendMode || (spine.BlendMode = {}));
-	var BlendMode = spine.BlendMode;
+	})(BlendMode = spine.BlendMode || (spine.BlendMode = {}));
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
@@ -2543,14 +2240,215 @@ var spine;
 		return BoneData;
 	}());
 	spine.BoneData = BoneData;
+	var TransformMode;
 	(function (TransformMode) {
 		TransformMode[TransformMode["Normal"] = 0] = "Normal";
 		TransformMode[TransformMode["OnlyTranslation"] = 1] = "OnlyTranslation";
 		TransformMode[TransformMode["NoRotationOrReflection"] = 2] = "NoRotationOrReflection";
 		TransformMode[TransformMode["NoScale"] = 3] = "NoScale";
 		TransformMode[TransformMode["NoScaleOrReflection"] = 4] = "NoScaleOrReflection";
-	})(spine.TransformMode || (spine.TransformMode = {}));
-	var TransformMode = spine.TransformMode;
+	})(TransformMode = spine.TransformMode || (spine.TransformMode = {}));
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var ConvexDecomposer = (function () {
+		function ConvexDecomposer() {
+			this.convexPolygons = new Array();
+			this.convexPolygonsIndices = new Array();
+			this.indicesArray = new Array();
+			this.isConcaveArray = new Array();
+			this.triangles = new Array();
+			this.polygonPool = new spine.Pool(function () {
+				return new Array();
+			});
+			this.polygonIndicesPool = new spine.Pool(function () {
+				return new Array();
+			});
+		}
+		ConvexDecomposer.prototype.decompose = function (input) {
+			var vertices = input;
+			var vertexCount = input.length >> 1;
+			var indices = this.indicesArray;
+			indices.length = 0;
+			for (var i = 0; i < vertexCount; i++)
+				indices[i] = i;
+			var isConcave = this.isConcaveArray;
+			isConcave.length = 0;
+			for (var i = 0, n = vertexCount; i < n; ++i)
+				isConcave[i] = ConvexDecomposer.isConcave(i, vertexCount, vertices, indices);
+			var triangles = this.triangles;
+			triangles.length = 0;
+			while (vertexCount > 3) {
+				var previous = vertexCount - 1, i = 0, next = 1;
+				while (true) {
+					outer: if (!isConcave[i]) {
+						var p1 = indices[previous] << 1, p2 = indices[i] << 1, p3 = indices[next] << 1;
+						var p1x = vertices[p1], p1y = vertices[p1 + 1];
+						var p2x = vertices[p2], p2y = vertices[p2 + 1];
+						var p3x = vertices[p3], p3y = vertices[p3 + 1];
+						for (var ii = (next + 1) % vertexCount; ii != previous; ii = (ii + 1) % vertexCount) {
+							if (!isConcave[ii])
+								continue;
+							var v = indices[ii] << 1;
+							var vx = vertices[v], vy = vertices[v + 1];
+							if (ConvexDecomposer.positiveArea(p3x, p3y, p1x, p1y, vx, vy)) {
+								if (ConvexDecomposer.positiveArea(p1x, p1y, p2x, p2y, vx, vy)) {
+									if (ConvexDecomposer.positiveArea(p2x, p2y, p3x, p3y, vx, vy))
+										break outer;
+								}
+							}
+						}
+						break;
+					}
+					if (next == 0) {
+						do {
+							if (!isConcave[i])
+								break;
+							i--;
+						} while (i > 0);
+						break;
+					}
+					previous = i;
+					i = next;
+					next = (next + 1) % vertexCount;
+				}
+				triangles.push(indices[(vertexCount + i - 1) % vertexCount]);
+				triangles.push(indices[i]);
+				triangles.push(indices[(i + 1) % vertexCount]);
+				indices.splice(i, 1);
+				isConcave.splice(i, 1);
+				vertexCount--;
+				var previousIndex = (vertexCount + i - 1) % vertexCount;
+				var nextIndex = i == vertexCount ? 0 : i;
+				isConcave[previousIndex] = ConvexDecomposer.isConcave(previousIndex, vertexCount, vertices, indices);
+				isConcave[nextIndex] = ConvexDecomposer.isConcave(nextIndex, vertexCount, vertices, indices);
+			}
+			if (vertexCount == 3) {
+				triangles.push(indices[2]);
+				triangles.push(indices[0]);
+				triangles.push(indices[1]);
+			}
+			var convexPolygons = this.convexPolygons;
+			this.polygonPool.freeAll(convexPolygons);
+			convexPolygons.length = 0;
+			var convexPolygonsIndices = this.convexPolygonsIndices;
+			this.polygonIndicesPool.freeAll(convexPolygonsIndices);
+			convexPolygonsIndices.length = 0;
+			var polygonIndices = this.polygonIndicesPool.obtain();
+			polygonIndices.length = 0;
+			var polygon = this.polygonPool.obtain();
+			polygon.length = 0;
+			var fanBaseIndex = -1, lastWinding = 0;
+			for (var i = 0, n = triangles.length; i < n; i += 3) {
+				var t1 = triangles[i] << 1, t2 = triangles[i + 1] << 1, t3 = triangles[i + 2] << 1;
+				var x1 = vertices[t1], y1 = vertices[t1 + 1];
+				var x2 = vertices[t2], y2 = vertices[t2 + 1];
+				var x3 = vertices[t3], y3 = vertices[t3 + 1];
+				var merged = false;
+				if (fanBaseIndex == t1) {
+					var o = polygon.length - 4;
+					var winding1 = ConvexDecomposer.winding(polygon[o], polygon[o + 1], polygon[o + 2], polygon[o + 3], x3, y3);
+					var winding2 = ConvexDecomposer.winding(x3, y3, polygon[0], polygon[1], polygon[2], polygon[3]);
+					if (winding1 == lastWinding && winding2 == lastWinding) {
+						polygon.push(x3);
+						polygon.push(y3);
+						polygonIndices.push(t3);
+						merged = true;
+					}
+				}
+				if (!merged) {
+					if (polygon.length > 0) {
+						convexPolygons.push(polygon);
+						convexPolygonsIndices.push(polygonIndices);
+					}
+					polygon = this.polygonPool.obtain();
+					polygon.length = 0;
+					polygon.push(x1);
+					polygon.push(y1);
+					polygon.push(x2);
+					polygon.push(y2);
+					polygon.push(x3);
+					polygon.push(y3);
+					polygonIndices = this.polygonIndicesPool.obtain();
+					polygonIndices.length = 0;
+					polygonIndices.push(t1);
+					polygonIndices.push(t2);
+					polygonIndices.push(t3);
+					lastWinding = ConvexDecomposer.winding(x1, y1, x2, y2, x3, y3);
+					fanBaseIndex = t1;
+				}
+			}
+			if (polygon.length > 0) {
+				convexPolygons.push(polygon);
+				convexPolygonsIndices.push(polygonIndices);
+			}
+			for (var i = 0, n = convexPolygons.length; i < n; i++) {
+				polygonIndices = convexPolygonsIndices[i];
+				if (polygonIndices.length == 0)
+					continue;
+				var firstIndex = polygonIndices[0];
+				var lastIndex = polygonIndices[polygonIndices.length - 1];
+				polygon = convexPolygons[i];
+				var o = polygon.length - 4;
+				var prevPrevX = polygon[o], prevPrevY = polygon[o + 1];
+				var prevX = polygon[o + 2], prevY = polygon[o + 3];
+				var firstX = polygon[0], firstY = polygon[1];
+				var secondX = polygon[2], secondY = polygon[3];
+				var winding = ConvexDecomposer.winding(prevPrevX, prevPrevY, prevX, prevY, firstX, firstY);
+				for (var ii = 0; ii < n; ii++) {
+					if (ii == i)
+						continue;
+					var otherIndices = convexPolygonsIndices[ii];
+					if (otherIndices.length != 3)
+						continue;
+					var otherFirstIndex = otherIndices[0];
+					var otherSecondIndex = otherIndices[1];
+					var otherLastIndex = otherIndices[2];
+					var otherPoly = convexPolygons[ii];
+					var x3 = otherPoly[otherPoly.length - 2], y3 = otherPoly[otherPoly.length - 1];
+					if (otherFirstIndex != firstIndex || otherSecondIndex != lastIndex)
+						continue;
+					var winding1 = ConvexDecomposer.winding(prevPrevX, prevPrevY, prevX, prevY, x3, y3);
+					var winding2 = ConvexDecomposer.winding(x3, y3, firstX, firstY, secondX, secondY);
+					if (winding1 == winding && winding2 == winding) {
+						otherPoly.length = 0;
+						otherIndices.length = 0;
+						polygon.push(x3);
+						polygon.push(y3);
+						polygonIndices.push(otherLastIndex);
+						prevPrevX = prevX;
+						prevPrevY = prevY;
+						prevX = x3;
+						prevY = y3;
+						ii = 0;
+					}
+				}
+			}
+			for (var i = convexPolygons.length - 1; i >= 0; i--) {
+				polygon = convexPolygons[i];
+				if (polygon.length == 0) {
+					convexPolygons.splice(i, 1);
+					this.polygonPool.free(polygon);
+				}
+			}
+			return convexPolygons;
+		};
+		ConvexDecomposer.isConcave = function (index, vertexCount, vertices, indices) {
+			var previous = indices[(vertexCount + index - 1) % vertexCount] << 1;
+			var current = indices[index] << 1;
+			var next = indices[(index + 1) % vertexCount] << 1;
+			return !this.positiveArea(vertices[previous], vertices[previous + 1], vertices[current], vertices[current + 1], vertices[next], vertices[next + 1]);
+		};
+		ConvexDecomposer.positiveArea = function (p1x, p1y, p2x, p2y, p3x, p3y) {
+			return p1x * (p3y - p2y) + p2x * (p1y - p3y) + p3x * (p2y - p1y) >= 0;
+		};
+		ConvexDecomposer.winding = function (p1x, p1y, p2x, p2y, p3x, p3y) {
+			var px = p2x - p1x, py = p2y - p1y;
+			return p3x * py - p3y * px + px * p1y - p1x * py >= 0 ? 1 : -1;
+		};
+		return ConvexDecomposer;
+	}());
+	spine.ConvexDecomposer = ConvexDecomposer;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
@@ -3148,11 +3046,11 @@ var spine;
 		PathConstraint.prototype.getOrder = function () {
 			return this.data.order;
 		};
-		PathConstraint.NONE = -1;
-		PathConstraint.BEFORE = -2;
-		PathConstraint.AFTER = -3;
 		return PathConstraint;
 	}());
+	PathConstraint.NONE = -1;
+	PathConstraint.BEFORE = -2;
+	PathConstraint.AFTER = -3;
 	spine.PathConstraint = PathConstraint;
 })(spine || (spine = {}));
 var spine;
@@ -3166,23 +3064,23 @@ var spine;
 		return PathConstraintData;
 	}());
 	spine.PathConstraintData = PathConstraintData;
+	var PositionMode;
 	(function (PositionMode) {
 		PositionMode[PositionMode["Fixed"] = 0] = "Fixed";
 		PositionMode[PositionMode["Percent"] = 1] = "Percent";
-	})(spine.PositionMode || (spine.PositionMode = {}));
-	var PositionMode = spine.PositionMode;
+	})(PositionMode = spine.PositionMode || (spine.PositionMode = {}));
+	var SpacingMode;
 	(function (SpacingMode) {
 		SpacingMode[SpacingMode["Length"] = 0] = "Length";
 		SpacingMode[SpacingMode["Fixed"] = 1] = "Fixed";
 		SpacingMode[SpacingMode["Percent"] = 2] = "Percent";
-	})(spine.SpacingMode || (spine.SpacingMode = {}));
-	var SpacingMode = spine.SpacingMode;
+	})(SpacingMode = spine.SpacingMode || (spine.SpacingMode = {}));
+	var RotateMode;
 	(function (RotateMode) {
 		RotateMode[RotateMode["Tangent"] = 0] = "Tangent";
 		RotateMode[RotateMode["Chain"] = 1] = "Chain";
 		RotateMode[RotateMode["ChainScale"] = 2] = "ChainScale";
-	})(spine.RotateMode || (spine.RotateMode = {}));
-	var RotateMode = spine.RotateMode;
+	})(RotateMode = spine.RotateMode || (spine.RotateMode = {}));
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
@@ -3735,7 +3633,7 @@ var spine;
 					mesh.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
 				}
 				if (vertices != null) {
-					for (var ii = 0, nn = vertices.length; ii < nn; ii += 8) {
+					for (var ii = 0, nn = vertices.length; ii < nn; ii += 2) {
 						var x = vertices[ii], y = vertices[ii + 1];
 						minX = Math.min(minX, x);
 						minY = Math.min(minY, y);
@@ -3919,6 +3817,285 @@ var spine;
 		return SkeletonBounds;
 	}());
 	spine.SkeletonBounds = SkeletonBounds;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var SkeletonClipping = (function () {
+		function SkeletonClipping() {
+			this.decomposer = new spine.ConvexDecomposer();
+			this.clippingPolygon = new Array();
+			this.clipOutput = new Array();
+			this.clippedVertices = new Array();
+			this.clippedTriangles = new Array();
+			this.scratch = new Array();
+		}
+		SkeletonClipping.prototype.clipStart = function (slot, clip) {
+			if (this.clipAttachment != null)
+				return;
+			this.clipAttachment = clip;
+			var n = clip.worldVerticesLength;
+			var vertices = spine.Utils.setArraySize(this.clippingPolygon, n);
+			clip.computeWorldVertices(slot, 0, n, vertices, 0, 2);
+			var clippingPolygon = this.clippingPolygon;
+			SkeletonClipping.makeClockwise(clippingPolygon);
+			var clippingPolygons = this.clippingPolygons = this.decomposer.decompose(clippingPolygon);
+			for (var i = 0, n_1 = clippingPolygons.length; i < n_1; i++) {
+				var polygon = clippingPolygons[i];
+				SkeletonClipping.makeClockwise(polygon);
+				polygon.push(polygon[0]);
+				polygon.push(polygon[1]);
+			}
+		};
+		SkeletonClipping.prototype.clipEndWithSlot = function (slot) {
+			if (this.clipAttachment != null && this.clipAttachment.endSlot == slot.data)
+				this.clipEnd();
+		};
+		SkeletonClipping.prototype.clipEnd = function () {
+			if (this.clipAttachment == null)
+				return;
+			this.clipAttachment = null;
+			this.clippingPolygons = null;
+			this.clippedVertices.length = 0;
+			this.clippedTriangles.length = 0;
+			this.clippingPolygon.length = 0;
+		};
+		SkeletonClipping.prototype.isClipping = function () {
+			return this.clipAttachment != null;
+		};
+		SkeletonClipping.prototype.clipTriangles = function (vertices, verticesLength, triangles, trianglesLength, uvs, light, dark, twoColor) {
+			var clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
+			var clippedTriangles = this.clippedTriangles;
+			var polygons = this.clippingPolygons;
+			var polygonsCount = this.clippingPolygons.length;
+			var vertexSize = twoColor ? 12 : 8;
+			var index = 0;
+			clippedVertices.length = 0;
+			clippedTriangles.length = 0;
+			outer: for (var i = 0; i < trianglesLength; i += 3) {
+				var vertexOffset = triangles[i] << 1;
+				var x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
+				var u1 = uvs[vertexOffset], v1 = uvs[vertexOffset + 1];
+				vertexOffset = triangles[i + 1] << 1;
+				var x2 = vertices[vertexOffset], y2 = vertices[vertexOffset + 1];
+				var u2 = uvs[vertexOffset], v2 = uvs[vertexOffset + 1];
+				vertexOffset = triangles[i + 2] << 1;
+				var x3 = vertices[vertexOffset], y3 = vertices[vertexOffset + 1];
+				var u3 = uvs[vertexOffset], v3 = uvs[vertexOffset + 1];
+				for (var p = 0; p < polygonsCount; p++) {
+					var s = clippedVertices.length;
+					if (this.clip(x1, y1, x2, y2, x3, y3, polygons[p], clipOutput)) {
+						var clipOutputLength = clipOutput.length;
+						if (clipOutputLength == 0)
+							continue;
+						var d0 = y2 - y3, d1 = x3 - x2, d2 = x1 - x3, d4 = y3 - y1;
+						var d = 1 / (d0 * d2 + d1 * (y1 - y3));
+						var clipOutputCount = clipOutputLength >> 1;
+						var clipOutputItems = this.clipOutput;
+						var clippedVerticesItems = spine.Utils.setArraySize(clippedVertices, s + clipOutputCount * vertexSize);
+						for (var ii = 0; ii < clipOutputLength; ii += 2) {
+							var x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
+							clippedVerticesItems[s] = x;
+							clippedVerticesItems[s + 1] = y;
+							clippedVerticesItems[s + 2] = light.r;
+							clippedVerticesItems[s + 3] = light.g;
+							clippedVerticesItems[s + 4] = light.b;
+							clippedVerticesItems[s + 5] = light.a;
+							var c0 = x - x3, c1 = y - y3;
+							var a = (d0 * c0 + d1 * c1) * d;
+							var b = (d4 * c0 + d2 * c1) * d;
+							var c = 1 - a - b;
+							clippedVerticesItems[s + 6] = u1 * a + u2 * b + u3 * c;
+							clippedVerticesItems[s + 7] = v1 * a + v2 * b + v3 * c;
+							if (twoColor) {
+								clippedVerticesItems[s + 8] = dark.r;
+								clippedVerticesItems[s + 8] = dark.g;
+								clippedVerticesItems[s + 10] = dark.b;
+								clippedVerticesItems[s + 11] = dark.a;
+							}
+							s += vertexSize;
+						}
+						s = clippedTriangles.length;
+						var clippedTrianglesItems = spine.Utils.setArraySize(clippedTriangles, s + 3 * (clipOutputCount - 2));
+						clipOutputCount--;
+						for (var ii = 1; ii < clipOutputCount; ii++) {
+							clippedTrianglesItems[s] = index;
+							clippedTrianglesItems[s + 1] = (index + ii);
+							clippedTrianglesItems[s + 2] = (index + ii + 1);
+							s += 3;
+						}
+						index += clipOutputCount + 1;
+					}
+					else {
+						var clippedVerticesItems = spine.Utils.setArraySize(clippedVertices, s + 3 * vertexSize);
+						clippedVerticesItems[s] = x1;
+						clippedVerticesItems[s + 1] = y1;
+						clippedVerticesItems[s + 2] = light.r;
+						clippedVerticesItems[s + 3] = light.g;
+						clippedVerticesItems[s + 4] = light.b;
+						clippedVerticesItems[s + 5] = light.a;
+						if (!twoColor) {
+							clippedVerticesItems[s + 6] = u1;
+							clippedVerticesItems[s + 7] = v1;
+							clippedVerticesItems[s + 8] = x2;
+							clippedVerticesItems[s + 9] = y2;
+							clippedVerticesItems[s + 10] = light.r;
+							clippedVerticesItems[s + 11] = light.g;
+							clippedVerticesItems[s + 12] = light.b;
+							clippedVerticesItems[s + 13] = light.a;
+							clippedVerticesItems[s + 14] = u2;
+							clippedVerticesItems[s + 15] = v2;
+							clippedVerticesItems[s + 16] = x3;
+							clippedVerticesItems[s + 17] = y3;
+							clippedVerticesItems[s + 18] = light.r;
+							clippedVerticesItems[s + 19] = light.g;
+							clippedVerticesItems[s + 20] = light.b;
+							clippedVerticesItems[s + 21] = light.a;
+							clippedVerticesItems[s + 22] = u3;
+							clippedVerticesItems[s + 23] = v3;
+						}
+						else {
+							clippedVerticesItems[s + 6] = u1;
+							clippedVerticesItems[s + 7] = v1;
+							clippedVerticesItems[s + 8] = dark.r;
+							clippedVerticesItems[s + 9] = dark.g;
+							clippedVerticesItems[s + 10] = dark.b;
+							clippedVerticesItems[s + 11] = dark.a;
+							clippedVerticesItems[s + 12] = x2;
+							clippedVerticesItems[s + 13] = y2;
+							clippedVerticesItems[s + 14] = light.r;
+							clippedVerticesItems[s + 15] = light.g;
+							clippedVerticesItems[s + 16] = light.b;
+							clippedVerticesItems[s + 17] = light.a;
+							clippedVerticesItems[s + 18] = u2;
+							clippedVerticesItems[s + 19] = v2;
+							clippedVerticesItems[s + 20] = dark.r;
+							clippedVerticesItems[s + 21] = dark.g;
+							clippedVerticesItems[s + 22] = dark.b;
+							clippedVerticesItems[s + 23] = dark.a;
+							clippedVerticesItems[s + 24] = x3;
+							clippedVerticesItems[s + 25] = y3;
+							clippedVerticesItems[s + 26] = light.r;
+							clippedVerticesItems[s + 27] = light.g;
+							clippedVerticesItems[s + 28] = light.b;
+							clippedVerticesItems[s + 29] = light.a;
+							clippedVerticesItems[s + 30] = u3;
+							clippedVerticesItems[s + 31] = v3;
+							clippedVerticesItems[s + 32] = dark.r;
+							clippedVerticesItems[s + 33] = dark.g;
+							clippedVerticesItems[s + 34] = dark.b;
+							clippedVerticesItems[s + 35] = dark.a;
+						}
+						s = clippedTriangles.length;
+						var clippedTrianglesItems = spine.Utils.setArraySize(clippedTriangles, s + 3);
+						clippedTrianglesItems[s] = index;
+						clippedTrianglesItems[s + 1] = (index + 1);
+						clippedTrianglesItems[s + 2] = (index + 2);
+						index += 3;
+						continue outer;
+					}
+				}
+			}
+		};
+		SkeletonClipping.prototype.clip = function (x1, y1, x2, y2, x3, y3, clippingArea, output) {
+			var originalOutput = output;
+			var clipped = false;
+			var input = null;
+			if (clippingArea.length % 4 >= 2) {
+				input = output;
+				output = this.scratch;
+			}
+			else
+				input = this.scratch;
+			input.length = 0;
+			input.push(x1);
+			input.push(y1);
+			input.push(x2);
+			input.push(y2);
+			input.push(x3);
+			input.push(y3);
+			input.push(x1);
+			input.push(y1);
+			output.length = 0;
+			var clippingVertices = clippingArea;
+			var clippingVerticesLast = clippingArea.length - 4;
+			for (var i = 0;; i += 2) {
+				var edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
+				var edgeX2 = clippingVertices[i + 2], edgeY2 = clippingVertices[i + 3];
+				var deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;
+				var inputVertices = input;
+				var inputVerticesLength = input.length - 2, outputStart = output.length;
+				for (var ii = 0; ii < inputVerticesLength; ii += 2) {
+					var inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
+					var inputX2 = inputVertices[ii + 2], inputY2 = inputVertices[ii + 3];
+					var side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0;
+					if (deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0) {
+						if (side2) {
+							output.push(inputX2);
+							output.push(inputY2);
+							continue;
+						}
+						var c0 = inputY2 - inputY, c2 = inputX2 - inputX;
+						var ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
+						output.push(edgeX + (edgeX2 - edgeX) * ua);
+						output.push(edgeY + (edgeY2 - edgeY) * ua);
+					}
+					else if (side2) {
+						var c0 = inputY2 - inputY, c2 = inputX2 - inputX;
+						var ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
+						output.push(edgeX + (edgeX2 - edgeX) * ua);
+						output.push(edgeY + (edgeY2 - edgeY) * ua);
+						output.push(inputX2);
+						output.push(inputY2);
+					}
+					clipped = true;
+				}
+				if (outputStart == output.length) {
+					originalOutput.length = 0;
+					return true;
+				}
+				output.push(output[0]);
+				output.push(output[1]);
+				if (i == clippingVerticesLast)
+					break;
+				var temp = output;
+				output = input;
+				output.length = 0;
+				input = temp;
+			}
+			if (originalOutput != output) {
+				originalOutput.length = 0;
+				for (var i = 0, n = output.length - 2; i < n; i++)
+					originalOutput[i] = output[i];
+			}
+			else
+				originalOutput.length = originalOutput.length - 2;
+			return clipped;
+		};
+		SkeletonClipping.makeClockwise = function (polygon) {
+			var vertices = polygon;
+			var verticeslength = polygon.length;
+			var area = vertices[verticeslength - 2] * vertices[1] - vertices[0] * vertices[verticeslength - 1], p1x = 0, p1y = 0, p2x = 0, p2y = 0;
+			for (var i = 0, n = verticeslength - 3; i < n; i += 2) {
+				p1x = vertices[i];
+				p1y = vertices[i + 1];
+				p2x = vertices[i + 2];
+				p2y = vertices[i + 3];
+				area += p1x * p2y - p2x * p1y;
+			}
+			if (area < 0)
+				return;
+			for (var i = 0, lastX = verticeslength - 2, n = verticeslength >> 1; i < n; i += 2) {
+				var x = vertices[i], y = vertices[i + 1];
+				var other = lastX - i;
+				vertices[i] = vertices[other];
+				vertices[i + 1] = vertices[other + 1];
+				vertices[other] = x;
+				vertices[other + 1] = y;
+			}
+		};
+		return SkeletonClipping;
+	}());
+	spine.SkeletonClipping = SkeletonClipping;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
@@ -4212,7 +4389,7 @@ var spine;
 							throw new Error("Slot not found: " + slotName);
 						var slotMap = skinMap[slotName];
 						for (var entryName in slotMap) {
-							var attachment = this.readAttachment(slotMap[entryName], skin, slotIndex, entryName);
+							var attachment = this.readAttachment(slotMap[entryName], skin, slotIndex, entryName, skeletonData);
 							if (attachment != null)
 								skin.addAttachment(slotIndex, entryName, attachment);
 						}
@@ -4252,7 +4429,7 @@ var spine;
 			}
 			return skeletonData;
 		};
-		SkeletonJson.prototype.readAttachment = function (map, skin, slotIndex, name) {
+		SkeletonJson.prototype.readAttachment = function (map, skin, slotIndex, name, skeletonData) {
 			var scale = this.scale;
 			name = this.getValue(map, "name", name);
 			var type = this.getValue(map, "type", "region");
@@ -4338,6 +4515,24 @@ var spine;
 					if (color != null)
 						point.color.setFromString(color);
 					return point;
+				}
+				case "clipping": {
+					var clip = this.attachmentLoader.newClippingAttachment(skin, name);
+					if (clip == null)
+						return null;
+					var end = this.getValue(map, "end", null);
+					if (end != null) {
+						var slot = skeletonData.findSlot(end);
+						if (slot == null)
+							throw new Error("Clipping end slot not found: " + end);
+						clip.endSlot = slot;
+					}
+					var vertexCount = map.vertexCount;
+					this.readVertices(map, clip, vertexCount << 1);
+					var color = this.getValue(map, "color", null);
+					if (color != null)
+						clip.color.setFromString(color);
+					return clip;
 				}
 			}
 			return null;
@@ -4895,6 +5090,7 @@ var spine;
 		return Texture;
 	}());
 	spine.Texture = Texture;
+	var TextureFilter;
 	(function (TextureFilter) {
 		TextureFilter[TextureFilter["Nearest"] = 9728] = "Nearest";
 		TextureFilter[TextureFilter["Linear"] = 9729] = "Linear";
@@ -4903,14 +5099,13 @@ var spine;
 		TextureFilter[TextureFilter["MipMapLinearNearest"] = 9985] = "MipMapLinearNearest";
 		TextureFilter[TextureFilter["MipMapNearestLinear"] = 9986] = "MipMapNearestLinear";
 		TextureFilter[TextureFilter["MipMapLinearLinear"] = 9987] = "MipMapLinearLinear";
-	})(spine.TextureFilter || (spine.TextureFilter = {}));
-	var TextureFilter = spine.TextureFilter;
+	})(TextureFilter = spine.TextureFilter || (spine.TextureFilter = {}));
+	var TextureWrap;
 	(function (TextureWrap) {
 		TextureWrap[TextureWrap["MirroredRepeat"] = 33648] = "MirroredRepeat";
 		TextureWrap[TextureWrap["ClampToEdge"] = 33071] = "ClampToEdge";
 		TextureWrap[TextureWrap["Repeat"] = 10497] = "Repeat";
-	})(spine.TextureWrap || (spine.TextureWrap = {}));
-	var TextureWrap = spine.TextureWrap;
+	})(TextureWrap = spine.TextureWrap || (spine.TextureWrap = {}));
 	var TextureRegion = (function () {
 		function TextureRegion() {
 			this.u = 0;
@@ -5078,7 +5273,7 @@ var spine;
 	var TextureAtlasRegion = (function (_super) {
 		__extends(TextureAtlasRegion, _super);
 		function TextureAtlasRegion() {
-			_super.apply(this, arguments);
+			return _super !== null && _super.apply(this, arguments) || this;
 		}
 		return TextureAtlasRegion;
 	}(spine.TextureRegion));
@@ -5433,13 +5628,13 @@ var spine;
 				this.a = 1;
 			return this;
 		};
-		Color.WHITE = new Color(1, 1, 1, 1);
-		Color.RED = new Color(1, 0, 0, 1);
-		Color.GREEN = new Color(0, 1, 0, 1);
-		Color.BLUE = new Color(0, 0, 1, 1);
-		Color.MAGENTA = new Color(1, 0, 1, 1);
 		return Color;
 	}());
+	Color.WHITE = new Color(1, 1, 1, 1);
+	Color.RED = new Color(1, 0, 0, 1);
+	Color.GREEN = new Color(0, 1, 0, 1);
+	Color.BLUE = new Color(0, 0, 1, 1);
+	Color.MAGENTA = new Color(1, 0, 1, 1);
 	spine.Color = Color;
 	var MathUtils = (function () {
 		function MathUtils() {
@@ -5467,14 +5662,14 @@ var spine;
 			var y = Math.pow(Math.abs(x), 1 / 3);
 			return x < 0 ? -y : y;
 		};
-		MathUtils.PI = 3.1415927;
-		MathUtils.PI2 = MathUtils.PI * 2;
-		MathUtils.radiansToDegrees = 180 / MathUtils.PI;
-		MathUtils.radDeg = MathUtils.radiansToDegrees;
-		MathUtils.degreesToRadians = MathUtils.PI / 180;
-		MathUtils.degRad = MathUtils.degreesToRadians;
 		return MathUtils;
 	}());
+	MathUtils.PI = 3.1415927;
+	MathUtils.PI2 = MathUtils.PI * 2;
+	MathUtils.radiansToDegrees = 180 / MathUtils.PI;
+	MathUtils.radDeg = MathUtils.radiansToDegrees;
+	MathUtils.degreesToRadians = MathUtils.PI / 180;
+	MathUtils.degRad = MathUtils.degreesToRadians;
 	spine.MathUtils = MathUtils;
 	var Utils = (function () {
 		function Utils() {
@@ -5519,12 +5714,23 @@ var spine;
 				return array;
 			}
 		};
+		Utils.newShortArray = function (size) {
+			if (Utils.SUPPORTS_TYPED_ARRAYS) {
+				return new Int16Array(size);
+			}
+			else {
+				var array = new Array(size);
+				for (var i = 0; i < array.length; i++)
+					array[i] = 0;
+				return array;
+			}
+		};
 		Utils.toFloatArray = function (array) {
 			return Utils.SUPPORTS_TYPED_ARRAYS ? new Float32Array(array) : array;
 		};
-		Utils.SUPPORTS_TYPED_ARRAYS = typeof (Float32Array) !== "undefined";
 		return Utils;
 	}());
+	Utils.SUPPORTS_TYPED_ARRAYS = typeof (Float32Array) !== "undefined";
 	spine.Utils = Utils;
 	var DebugUtils = (function () {
 		function DebugUtils() {
@@ -5662,15 +5868,378 @@ var spine;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
+	var Attachment = (function () {
+		function Attachment(name) {
+			if (name == null)
+				throw new Error("name cannot be null.");
+			this.name = name;
+		}
+		return Attachment;
+	}());
+	spine.Attachment = Attachment;
+	var VertexAttachment = (function (_super) {
+		__extends(VertexAttachment, _super);
+		function VertexAttachment(name) {
+			var _this = _super.call(this, name) || this;
+			_this.worldVerticesLength = 0;
+			return _this;
+		}
+		VertexAttachment.prototype.computeWorldVertices = function (slot, start, count, worldVertices, offset, stride) {
+			count = offset + (count >> 1) * stride;
+			var skeleton = slot.bone.skeleton;
+			var deformArray = slot.attachmentVertices;
+			var vertices = this.vertices;
+			var bones = this.bones;
+			if (bones == null) {
+				if (deformArray.length > 0)
+					vertices = deformArray;
+				var bone = slot.bone;
+				var x = bone.worldX;
+				var y = bone.worldY;
+				var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
+				for (var v_1 = start, w = offset; w < count; v_1 += 2, w += stride) {
+					var vx = vertices[v_1], vy = vertices[v_1 + 1];
+					worldVertices[w] = vx * a + vy * b + x;
+					worldVertices[w + 1] = vx * c + vy * d + y;
+				}
+				return;
+			}
+			var v = 0, skip = 0;
+			for (var i = 0; i < start; i += 2) {
+				var n = bones[v];
+				v += n + 1;
+				skip += n;
+			}
+			var skeletonBones = skeleton.bones;
+			if (deformArray.length == 0) {
+				for (var w = offset, b = skip * 3; w < count; w += stride) {
+					var wx = 0, wy = 0;
+					var n = bones[v++];
+					n += v;
+					for (; v < n; v++, b += 3) {
+						var bone = skeletonBones[bones[v]];
+						var vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
+						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
+						wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
+					}
+					worldVertices[w] = wx;
+					worldVertices[w + 1] = wy;
+				}
+			}
+			else {
+				var deform = deformArray;
+				for (var w = offset, b = skip * 3, f = skip << 1; w < count; w += stride) {
+					var wx = 0, wy = 0;
+					var n = bones[v++];
+					n += v;
+					for (; v < n; v++, b += 3, f += 2) {
+						var bone = skeletonBones[bones[v]];
+						var vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
+						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
+						wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
+					}
+					worldVertices[w] = wx;
+					worldVertices[w + 1] = wy;
+				}
+			}
+		};
+		VertexAttachment.prototype.applyDeform = function (sourceAttachment) {
+			return this == sourceAttachment;
+		};
+		return VertexAttachment;
+	}(Attachment));
+	spine.VertexAttachment = VertexAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var AttachmentType;
+	(function (AttachmentType) {
+		AttachmentType[AttachmentType["Region"] = 0] = "Region";
+		AttachmentType[AttachmentType["BoundingBox"] = 1] = "BoundingBox";
+		AttachmentType[AttachmentType["Mesh"] = 2] = "Mesh";
+		AttachmentType[AttachmentType["LinkedMesh"] = 3] = "LinkedMesh";
+		AttachmentType[AttachmentType["Path"] = 4] = "Path";
+		AttachmentType[AttachmentType["Point"] = 5] = "Point";
+	})(AttachmentType = spine.AttachmentType || (spine.AttachmentType = {}));
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var BoundingBoxAttachment = (function (_super) {
+		__extends(BoundingBoxAttachment, _super);
+		function BoundingBoxAttachment(name) {
+			var _this = _super.call(this, name) || this;
+			_this.color = new spine.Color(1, 1, 1, 1);
+			return _this;
+		}
+		return BoundingBoxAttachment;
+	}(spine.VertexAttachment));
+	spine.BoundingBoxAttachment = BoundingBoxAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var ClippingAttachment = (function (_super) {
+		__extends(ClippingAttachment, _super);
+		function ClippingAttachment(name) {
+			var _this = _super.call(this, name) || this;
+			_this.color = new spine.Color(0.2275, 0.2275, 0.8078, 1);
+			return _this;
+		}
+		return ClippingAttachment;
+	}(spine.VertexAttachment));
+	spine.ClippingAttachment = ClippingAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var MeshAttachment = (function (_super) {
+		__extends(MeshAttachment, _super);
+		function MeshAttachment(name) {
+			var _this = _super.call(this, name) || this;
+			_this.color = new spine.Color(1, 1, 1, 1);
+			_this.inheritDeform = false;
+			_this.tempColor = new spine.Color(0, 0, 0, 0);
+			return _this;
+		}
+		MeshAttachment.prototype.updateUVs = function () {
+			var u = 0, v = 0, width = 0, height = 0;
+			if (this.region == null) {
+				u = v = 0;
+				width = height = 1;
+			}
+			else {
+				u = this.region.u;
+				v = this.region.v;
+				width = this.region.u2 - u;
+				height = this.region.v2 - v;
+			}
+			var regionUVs = this.regionUVs;
+			if (this.uvs == null || this.uvs.length != regionUVs.length)
+				this.uvs = spine.Utils.newFloatArray(regionUVs.length);
+			var uvs = this.uvs;
+			if (this.region.rotate) {
+				for (var i = 0, n = uvs.length; i < n; i += 2) {
+					uvs[i] = u + regionUVs[i + 1] * width;
+					uvs[i + 1] = v + height - regionUVs[i] * height;
+				}
+			}
+			else {
+				for (var i = 0, n = uvs.length; i < n; i += 2) {
+					uvs[i] = u + regionUVs[i] * width;
+					uvs[i + 1] = v + regionUVs[i + 1] * height;
+				}
+			}
+		};
+		MeshAttachment.prototype.applyDeform = function (sourceAttachment) {
+			return this == sourceAttachment || (this.inheritDeform && this.parentMesh == sourceAttachment);
+		};
+		MeshAttachment.prototype.getParentMesh = function () {
+			return this.parentMesh;
+		};
+		MeshAttachment.prototype.setParentMesh = function (parentMesh) {
+			this.parentMesh = parentMesh;
+			if (parentMesh != null) {
+				this.bones = parentMesh.bones;
+				this.vertices = parentMesh.vertices;
+				this.worldVerticesLength = parentMesh.worldVerticesLength;
+				this.regionUVs = parentMesh.regionUVs;
+				this.triangles = parentMesh.triangles;
+				this.hullLength = parentMesh.hullLength;
+				this.worldVerticesLength = parentMesh.worldVerticesLength;
+			}
+		};
+		return MeshAttachment;
+	}(spine.VertexAttachment));
+	spine.MeshAttachment = MeshAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var PathAttachment = (function (_super) {
+		__extends(PathAttachment, _super);
+		function PathAttachment(name) {
+			var _this = _super.call(this, name) || this;
+			_this.closed = false;
+			_this.constantSpeed = false;
+			_this.color = new spine.Color(1, 1, 1, 1);
+			return _this;
+		}
+		return PathAttachment;
+	}(spine.VertexAttachment));
+	spine.PathAttachment = PathAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var PointAttachment = (function (_super) {
+		__extends(PointAttachment, _super);
+		function PointAttachment(name) {
+			var _this = _super.call(this, name) || this;
+			_this.color = new spine.Color(0.38, 0.94, 0, 1);
+			return _this;
+		}
+		PointAttachment.prototype.computeWorldPosition = function (bone, point) {
+			point.x = this.x * bone.a + this.y * bone.b + bone.worldX;
+			point.y = this.x * bone.c + this.y * bone.d + bone.worldY;
+			return point;
+		};
+		PointAttachment.prototype.computeWorldRotation = function (bone) {
+			var cos = spine.MathUtils.cosDeg(this.rotation), sin = spine.MathUtils.sinDeg(this.rotation);
+			var x = cos * bone.a + sin * bone.b;
+			var y = cos * bone.c + sin * bone.d;
+			return Math.atan2(y, x) * spine.MathUtils.radDeg;
+		};
+		return PointAttachment;
+	}(spine.VertexAttachment));
+	spine.PointAttachment = PointAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var RegionAttachment = (function (_super) {
+		__extends(RegionAttachment, _super);
+		function RegionAttachment(name) {
+			var _this = _super.call(this, name) || this;
+			_this.x = 0;
+			_this.y = 0;
+			_this.scaleX = 1;
+			_this.scaleY = 1;
+			_this.rotation = 0;
+			_this.width = 0;
+			_this.height = 0;
+			_this.color = new spine.Color(1, 1, 1, 1);
+			_this.offset = spine.Utils.newFloatArray(8);
+			_this.uvs = spine.Utils.newFloatArray(8);
+			_this.tempColor = new spine.Color(1, 1, 1, 1);
+			return _this;
+		}
+		RegionAttachment.prototype.updateOffset = function () {
+			var regionScaleX = this.width / this.region.originalWidth * this.scaleX;
+			var regionScaleY = this.height / this.region.originalHeight * this.scaleY;
+			var localX = -this.width / 2 * this.scaleX + this.region.offsetX * regionScaleX;
+			var localY = -this.height / 2 * this.scaleY + this.region.offsetY * regionScaleY;
+			var localX2 = localX + this.region.width * regionScaleX;
+			var localY2 = localY + this.region.height * regionScaleY;
+			var radians = this.rotation * Math.PI / 180;
+			var cos = Math.cos(radians);
+			var sin = Math.sin(radians);
+			var localXCos = localX * cos + this.x;
+			var localXSin = localX * sin;
+			var localYCos = localY * cos + this.y;
+			var localYSin = localY * sin;
+			var localX2Cos = localX2 * cos + this.x;
+			var localX2Sin = localX2 * sin;
+			var localY2Cos = localY2 * cos + this.y;
+			var localY2Sin = localY2 * sin;
+			var offset = this.offset;
+			offset[RegionAttachment.OX1] = localXCos - localYSin;
+			offset[RegionAttachment.OY1] = localYCos + localXSin;
+			offset[RegionAttachment.OX2] = localXCos - localY2Sin;
+			offset[RegionAttachment.OY2] = localY2Cos + localXSin;
+			offset[RegionAttachment.OX3] = localX2Cos - localY2Sin;
+			offset[RegionAttachment.OY3] = localY2Cos + localX2Sin;
+			offset[RegionAttachment.OX4] = localX2Cos - localYSin;
+			offset[RegionAttachment.OY4] = localYCos + localX2Sin;
+		};
+		RegionAttachment.prototype.setRegion = function (region) {
+			this.region = region;
+			var uvs = this.uvs;
+			if (region.rotate) {
+				uvs[2] = region.u;
+				uvs[3] = region.v2;
+				uvs[4] = region.u;
+				uvs[5] = region.v;
+				uvs[6] = region.u2;
+				uvs[7] = region.v;
+				uvs[0] = region.u2;
+				uvs[1] = region.v2;
+			}
+			else {
+				uvs[0] = region.u;
+				uvs[1] = region.v2;
+				uvs[2] = region.u;
+				uvs[3] = region.v;
+				uvs[4] = region.u2;
+				uvs[5] = region.v;
+				uvs[6] = region.u2;
+				uvs[7] = region.v2;
+			}
+		};
+		RegionAttachment.prototype.computeWorldVertices = function (bone, worldVertices, offset, stride) {
+			var vertexOffset = this.offset;
+			var x = bone.worldX, y = bone.worldY;
+			var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
+			var offsetX = 0, offsetY = 0;
+			offsetX = vertexOffset[RegionAttachment.OX1];
+			offsetY = vertexOffset[RegionAttachment.OY1];
+			worldVertices[offset] = offsetX * a + offsetY * b + x;
+			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+			offset += stride;
+			offsetX = vertexOffset[RegionAttachment.OX2];
+			offsetY = vertexOffset[RegionAttachment.OY2];
+			worldVertices[offset] = offsetX * a + offsetY * b + x;
+			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+			offset += stride;
+			offsetX = vertexOffset[RegionAttachment.OX3];
+			offsetY = vertexOffset[RegionAttachment.OY3];
+			worldVertices[offset] = offsetX * a + offsetY * b + x;
+			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+			offset += stride;
+			offsetX = vertexOffset[RegionAttachment.OX4];
+			offsetY = vertexOffset[RegionAttachment.OY4];
+			worldVertices[offset] = offsetX * a + offsetY * b + x;
+			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+		};
+		return RegionAttachment;
+	}(spine.Attachment));
+	RegionAttachment.OX1 = 0;
+	RegionAttachment.OY1 = 1;
+	RegionAttachment.OX2 = 2;
+	RegionAttachment.OY2 = 3;
+	RegionAttachment.OX3 = 4;
+	RegionAttachment.OY3 = 5;
+	RegionAttachment.OX4 = 6;
+	RegionAttachment.OY4 = 7;
+	RegionAttachment.X1 = 0;
+	RegionAttachment.Y1 = 1;
+	RegionAttachment.C1R = 2;
+	RegionAttachment.C1G = 3;
+	RegionAttachment.C1B = 4;
+	RegionAttachment.C1A = 5;
+	RegionAttachment.U1 = 6;
+	RegionAttachment.V1 = 7;
+	RegionAttachment.X2 = 8;
+	RegionAttachment.Y2 = 9;
+	RegionAttachment.C2R = 10;
+	RegionAttachment.C2G = 11;
+	RegionAttachment.C2B = 12;
+	RegionAttachment.C2A = 13;
+	RegionAttachment.U2 = 14;
+	RegionAttachment.V2 = 15;
+	RegionAttachment.X3 = 16;
+	RegionAttachment.Y3 = 17;
+	RegionAttachment.C3R = 18;
+	RegionAttachment.C3G = 19;
+	RegionAttachment.C3B = 20;
+	RegionAttachment.C3A = 21;
+	RegionAttachment.U3 = 22;
+	RegionAttachment.V3 = 23;
+	RegionAttachment.X4 = 24;
+	RegionAttachment.Y4 = 25;
+	RegionAttachment.C4R = 26;
+	RegionAttachment.C4G = 27;
+	RegionAttachment.C4B = 28;
+	RegionAttachment.C4A = 29;
+	RegionAttachment.U4 = 30;
+	RegionAttachment.V4 = 31;
+	spine.RegionAttachment = RegionAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
 	var threejs;
 	(function (threejs) {
 		var AssetManager = (function (_super) {
 			__extends(AssetManager, _super);
 			function AssetManager(pathPrefix) {
 				if (pathPrefix === void 0) { pathPrefix = ""; }
-				_super.call(this, function (image) {
+				return _super.call(this, function (image) {
 					return new threejs.ThreeJsTexture(image);
-				}, pathPrefix);
+				}, pathPrefix) || this;
 			}
 			return AssetManager;
 		}(spine.AssetManager));
@@ -5707,13 +6276,13 @@ var spine;
 				this.verticesLength = 0;
 				this.indicesLength = 0;
 			};
-			MeshBatcher.prototype.batch = function (vertices, indices, z) {
+			MeshBatcher.prototype.batch = function (vertices, verticesLength, indices, indicesLength, z) {
 				if (z === void 0) { z = 0; }
 				var indexStart = this.verticesLength / MeshBatcher.VERTEX_SIZE;
 				var vertexBuffer = this.vertices;
 				var i = this.verticesLength;
 				var j = 0;
-				for (; j < vertices.length;) {
+				for (; j < verticesLength;) {
 					vertexBuffer[i++] = vertices[j++];
 					vertexBuffer[i++] = vertices[j++];
 					vertexBuffer[i++] = z;
@@ -5726,9 +6295,9 @@ var spine;
 				}
 				this.verticesLength = i;
 				var indicesArray = this.indices;
-				for (i = this.indicesLength, j = 0; j < indices.length; i++, j++)
+				for (i = this.indicesLength, j = 0; j < indicesLength; i++, j++)
 					indicesArray[i] = indices[j] + indexStart;
-				this.indicesLength += indices.length;
+				this.indicesLength += indicesLength;
 			};
 			MeshBatcher.prototype.end = function () {
 				this.vertexBuffer.needsUpdate = true;
@@ -5741,9 +6310,9 @@ var spine;
 				geo.drawRange.start = 0;
 				geo.drawRange.count = this.indicesLength;
 			};
-			MeshBatcher.VERTEX_SIZE = 9;
 			return MeshBatcher;
 		}());
+		MeshBatcher.VERTEX_SIZE = 9;
 		threejs.MeshBatcher = MeshBatcher;
 	})(threejs = spine.threejs || (spine.threejs = {}));
 })(spine || (spine = {}));
@@ -5754,18 +6323,20 @@ var spine;
 		var SkeletonMesh = (function (_super) {
 			__extends(SkeletonMesh, _super);
 			function SkeletonMesh(skeletonData) {
-				_super.call(this);
-				this.zOffset = 0.1;
-				this.vertices = spine.Utils.newFloatArray(1024);
-				this.tempColor = new spine.Color();
-				this.skeleton = new spine.Skeleton(skeletonData);
+				var _this = _super.call(this) || this;
+				_this.zOffset = 0.1;
+				_this.clipper = new spine.SkeletonClipping();
+				_this.vertices = spine.Utils.newFloatArray(1024);
+				_this.tempColor = new spine.Color();
+				_this.skeleton = new spine.Skeleton(skeletonData);
 				var animData = new spine.AnimationStateData(skeletonData);
-				this.state = new spine.AnimationState(animData);
-				var material = this.material = new THREE.MeshBasicMaterial();
+				_this.state = new spine.AnimationState(animData);
+				var material = _this.material = new THREE.MeshBasicMaterial();
 				material.side = THREE.DoubleSide;
 				material.transparent = true;
 				material.alphaTest = 0.5;
-				this.batcher = new threejs.MeshBatcher(this);
+				_this.batcher = new threejs.MeshBatcher(_this);
+				return _this;
 			}
 			SkeletonMesh.prototype.update = function (deltaTime) {
 				var state = this.state;
@@ -5781,28 +6352,49 @@ var spine;
 				var verticesLength = 0;
 				var indicesLength = 0;
 				var blendMode = null;
-				var vertices = null;
+				var clipper = this.clipper;
+				var vertices = this.vertices;
 				var triangles = null;
+				var uvs = null;
 				var drawOrder = this.skeleton.drawOrder;
 				var batcher = this.batcher;
 				batcher.begin();
 				var z = 0;
 				var zOffset = this.zOffset;
 				for (var i = 0, n = drawOrder.length; i < n; i++) {
+					var vertexSize = clipper.isClipping() ? 2 : SkeletonMesh.VERTEX_SIZE;
 					var slot = drawOrder[i];
 					var attachment = slot.getAttachment();
+					var attachmentColor = null;
 					var texture = null;
+					var numFloats = 0;
 					if (attachment instanceof spine.RegionAttachment) {
 						var region = attachment;
-						vertices = this.computeRegionVertices(slot, region, false);
+						attachmentColor = region.color;
+						vertices = this.vertices;
+						numFloats = vertexSize * 4;
+						region.computeWorldVertices(slot.bone, vertices, 0, vertexSize);
 						triangles = SkeletonMesh.QUAD_TRIANGLES;
+						uvs = region.uvs;
 						texture = region.region.renderObject.texture;
 					}
 					else if (attachment instanceof spine.MeshAttachment) {
 						var mesh = attachment;
-						vertices = this.computeMeshVertices(slot, mesh, false);
+						attachmentColor = mesh.color;
+						vertices = this.vertices;
+						numFloats = (mesh.worldVerticesLength >> 1) * vertexSize;
+						if (numFloats > vertices.length) {
+							vertices = this.vertices = spine.Utils.newFloatArray(numFloats);
+						}
+						mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, vertexSize);
 						triangles = mesh.triangles;
+						uvs = mesh.uvs;
 						texture = mesh.region.renderObject.texture;
+					}
+					else if (attachment instanceof spine.ClippingAttachment) {
+						var clip = (attachment);
+						clipper.clipStart(slot, clip);
+						continue;
 					}
 					else
 						continue;
@@ -5812,81 +6404,39 @@ var spine;
 							mat.map = texture.texture;
 							mat.needsUpdate = true;
 						}
-						this.batcher.batch(vertices, triangles, z);
+						var skeleton = slot.bone.skeleton;
+						var skeletonColor = skeleton.color;
+						var slotColor = slot.color;
+						var alpha = skeletonColor.a * slotColor.a * attachmentColor.a;
+						var color = this.tempColor;
+						color.set(skeletonColor.r * slotColor.r * attachmentColor.r, skeletonColor.g * slotColor.g * attachmentColor.g, skeletonColor.b * slotColor.b * attachmentColor.b, alpha);
+						if (clipper.isClipping()) {
+							clipper.clipTriangles(vertices, numFloats, triangles, triangles.length, uvs, color, null, false);
+							var clippedVertices = clipper.clippedVertices;
+							var clippedTriangles = clipper.clippedTriangles;
+							batcher.batch(clippedVertices, clippedVertices.length, clippedTriangles, clippedTriangles.length, z);
+						}
+						else {
+							var verts = vertices;
+							for (var v = 2, u = 0, n_2 = numFloats; v < n_2; v += vertexSize, u += 2) {
+								verts[v] = color.r;
+								verts[v + 1] = color.g;
+								verts[v + 2] = color.b;
+								verts[v + 3] = color.a;
+								verts[v + 4] = uvs[u];
+								verts[v + 5] = uvs[u + 1];
+							}
+							batcher.batch(vertices, numFloats, triangles, triangles.length, z);
+						}
 						z += zOffset;
 					}
 				}
 				batcher.end();
 			};
-			SkeletonMesh.prototype.computeRegionVertices = function (slot, region, pma) {
-				var skeleton = slot.bone.skeleton;
-				var skeletonColor = skeleton.color;
-				var slotColor = slot.color;
-				var regionColor = region.color;
-				var alpha = skeletonColor.a * slotColor.a * regionColor.a;
-				var multiplier = pma ? alpha : 1;
-				var color = this.tempColor;
-				color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier, skeletonColor.g * slotColor.g * regionColor.g * multiplier, skeletonColor.b * slotColor.b * regionColor.b * multiplier, alpha);
-				region.computeWorldVertices(slot.bone, this.vertices, 0, SkeletonMesh.VERTEX_SIZE);
-				var vertices = this.vertices;
-				var uvs = region.uvs;
-				vertices[spine.RegionAttachment.C1R] = color.r;
-				vertices[spine.RegionAttachment.C1G] = color.g;
-				vertices[spine.RegionAttachment.C1B] = color.b;
-				vertices[spine.RegionAttachment.C1A] = color.a;
-				vertices[spine.RegionAttachment.U1] = uvs[0];
-				vertices[spine.RegionAttachment.V1] = uvs[1];
-				vertices[spine.RegionAttachment.C2R] = color.r;
-				vertices[spine.RegionAttachment.C2G] = color.g;
-				vertices[spine.RegionAttachment.C2B] = color.b;
-				vertices[spine.RegionAttachment.C2A] = color.a;
-				vertices[spine.RegionAttachment.U2] = uvs[2];
-				vertices[spine.RegionAttachment.V2] = uvs[3];
-				vertices[spine.RegionAttachment.C3R] = color.r;
-				vertices[spine.RegionAttachment.C3G] = color.g;
-				vertices[spine.RegionAttachment.C3B] = color.b;
-				vertices[spine.RegionAttachment.C3A] = color.a;
-				vertices[spine.RegionAttachment.U3] = uvs[4];
-				vertices[spine.RegionAttachment.V3] = uvs[5];
-				vertices[spine.RegionAttachment.C4R] = color.r;
-				vertices[spine.RegionAttachment.C4G] = color.g;
-				vertices[spine.RegionAttachment.C4B] = color.b;
-				vertices[spine.RegionAttachment.C4A] = color.a;
-				vertices[spine.RegionAttachment.U4] = uvs[6];
-				vertices[spine.RegionAttachment.V4] = uvs[7];
-				return vertices;
-			};
-			SkeletonMesh.prototype.computeMeshVertices = function (slot, mesh, pma) {
-				var skeleton = slot.bone.skeleton;
-				var skeletonColor = skeleton.color;
-				var slotColor = slot.color;
-				var regionColor = mesh.color;
-				var alpha = skeletonColor.a * slotColor.a * regionColor.a;
-				var multiplier = pma ? alpha : 1;
-				var color = this.tempColor;
-				color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier, skeletonColor.g * slotColor.g * regionColor.g * multiplier, skeletonColor.b * slotColor.b * regionColor.b * multiplier, alpha);
-				var numVertices = mesh.worldVerticesLength / 2;
-				if (this.vertices.length < mesh.worldVerticesLength) {
-					this.vertices = spine.Utils.newFloatArray(mesh.worldVerticesLength);
-				}
-				var vertices = this.vertices;
-				mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, SkeletonMesh.VERTEX_SIZE);
-				var uvs = mesh.uvs;
-				for (var i = 0, n = numVertices, u = 0, v = 2; i < n; i++) {
-					vertices[v++] = color.r;
-					vertices[v++] = color.g;
-					vertices[v++] = color.b;
-					vertices[v++] = color.a;
-					vertices[v++] = uvs[u++];
-					vertices[v++] = uvs[u++];
-					v += 2;
-				}
-				return vertices;
-			};
-			SkeletonMesh.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
-			SkeletonMesh.VERTEX_SIZE = 2 + 2 + 4;
 			return SkeletonMesh;
 		}(THREE.Mesh));
+		SkeletonMesh.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
+		SkeletonMesh.VERTEX_SIZE = 2 + 2 + 4;
 		threejs.SkeletonMesh = SkeletonMesh;
 	})(threejs = spine.threejs || (spine.threejs = {}));
 })(spine || (spine = {}));
@@ -5897,10 +6447,11 @@ var spine;
 		var ThreeJsTexture = (function (_super) {
 			__extends(ThreeJsTexture, _super);
 			function ThreeJsTexture(image) {
-				_super.call(this, image);
-				this.texture = new THREE.Texture(image);
-				this.texture.flipY = false;
-				this.texture.needsUpdate = true;
+				var _this = _super.call(this, image) || this;
+				_this.texture = new THREE.Texture(image);
+				_this.texture.flipY = false;
+				_this.texture.needsUpdate = true;
+				return _this;
 			}
 			ThreeJsTexture.prototype.setFilters = function (minFilter, magFilter) {
 				this.texture.minFilter = ThreeJsTexture.toThreeJsTextureFilter(minFilter);

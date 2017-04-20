@@ -29,9 +29,9 @@
  *****************************************************************************/
  
 package spine.examples {
-	import spine.animation.TrackEntry;
-	import spine.animation.AnimationStateData;
 	import spine.*;
+	import spine.animation.AnimationStateData;
+	import spine.animation.TrackEntry;
 	import spine.atlas.Atlas;
 	import spine.attachments.AtlasAttachmentLoader;
 	import spine.attachments.AttachmentLoader;
@@ -39,6 +39,7 @@ package spine.examples {
 	import spine.starling.StarlingTextureLoader;
 
 	import starling.core.Starling;
+	import starling.display.DisplayObjectContainer;
 	import starling.display.Sprite;
 	import starling.events.Touch;
 	import starling.events.TouchEvent;
@@ -53,7 +54,7 @@ package spine.examples {
 
 		[Embed(source = "/spineboy.png")]
 		static public const SpineboyAtlasTexture : Class;
-		private var skeleton : SkeletonAnimation;
+		private var skeleton : SkeletonAnimation;		
 
 		public function SpineboyExample() {
 			var spineAtlas : Atlas = new Atlas(new SpineboyAtlas(), new StarlingTextureLoader(new SpineboyAtlasTexture()));
@@ -104,8 +105,9 @@ package spine.examples {
 		private function onClick(event : TouchEvent) : void {
 			var touch : Touch = event.getTouch(this);
 			if (touch && touch.phase == TouchPhase.BEGAN) {
-				skeleton.state.setAnimationByName(0, "jump", false);
-				skeleton.state.addAnimationByName(0, "run", true, 0);
+				var parent: DisplayObjectContainer = this.parent;
+				this.removeFromParent(true);			
+				parent.addChild(new GoblinsExample());				
 			}
 		}
 	}

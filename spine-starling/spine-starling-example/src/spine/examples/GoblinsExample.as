@@ -29,6 +29,7 @@
  *****************************************************************************/
  
 package spine.examples {
+	import starling.display.DisplayObjectContainer;
 	import spine.*;
 	import spine.atlas.Atlas;
 	import spine.attachments.AtlasAttachmentLoader;
@@ -61,6 +62,8 @@ package spine.examples {
 		[Embed(source = "/goblins-mesh-starling.png")]
 		static public const GoblinsStarlingAtlasTexture : Class;
 		private var skeleton : SkeletonAnimation;
+		
+		private var skinChangeCount: Number = 0;
 
 		public function GoblinsExample() {
 			var useStarlingAtlas : Boolean = false;
@@ -95,8 +98,15 @@ package spine.examples {
 		private function onClick(event : TouchEvent) : void {
 			var touch : Touch = event.getTouch(this);
 			if (touch && touch.phase == TouchPhase.BEGAN) {
-				skeleton.skeleton.skinName = skeleton.skeleton.skin.name == "goblin" ? "goblingirl" : "goblin";
-				skeleton.skeleton.setSlotsToSetupPose();
+				if (skinChangeCount < 2) {
+					skeleton.skeleton.skinName = skeleton.skeleton.skin.name == "goblin" ? "goblingirl" : "goblin";
+					skeleton.skeleton.setSlotsToSetupPose();
+					skinChangeCount++;
+				} else {					
+					var parent: DisplayObjectContainer = this.parent;
+					this.removeFromParent(true);			
+					parent.addChild(new RaptorExample());	
+				}
 			}
 		}
 	}

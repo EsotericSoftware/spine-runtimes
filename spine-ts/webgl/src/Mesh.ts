@@ -29,8 +29,8 @@
  *****************************************************************************/
 
 module spine.webgl {
-	export class Mesh implements Disposable {
-		private gl: WebGLRenderingContext;
+	export class Mesh implements Disposable, Restorable {
+		private context: ManagedWebGLRenderingContext;
 		private vertices:Float32Array;
 		private verticesBuffer: WebGLBuffer;
 		private verticesLength = 0;
@@ -68,14 +68,15 @@ module spine.webgl {
 			return size;
 		}
 
-		constructor (gl: WebGLRenderingContext, private attributes: VertexAttribute[], maxVertices: number, maxIndices: number) {
-			this.gl = gl;
+		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, private attributes: VertexAttribute[], maxVertices: number, maxIndices: number) {
+			this.context = context instanceof ManagedWebGLRenderingContext? context : new ManagedWebGLRenderingContext(context);
 			this.elementsPerVertex = 0;
 			for (let i = 0; i < attributes.length; i++) {
 				this.elementsPerVertex += attributes[i].numElements;
 			}
 			this.vertices = new Float32Array(maxVertices * this.elementsPerVertex);
 			this.indices = new Uint16Array(maxIndices);
+			this.context.addRestorable(this);
 		}
 
 		setVertices (vertices: Array<number>) {
@@ -97,7 +98,7 @@ module spine.webgl {
 		}
 
 		drawWithOffset (shader: Shader, primitiveType: number, offset: number, count: number) {
-			let gl = this.gl;
+			let gl = this.context.gl;
 			if (this.dirtyVertices || this.dirtyIndices) this.update();
 			this.bind(shader);
 			if (this.indicesLength > 0) {
@@ -109,7 +110,7 @@ module spine.webgl {
 		}
 
 		bind (shader: Shader) {
-			let gl = this.gl;
+			let gl = this.context.gl;
 			gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesBuffer);
 			let offset = 0;
 			for (let i = 0; i < this.attributes.length; i++) {
@@ -123,7 +124,7 @@ module spine.webgl {
 		}
 
 		unbind (shader: Shader) {
-			let gl = this.gl;
+			let gl = this.context.gl;
 			for (let i = 0; i < this.attributes.length; i++) {
 				let attrib = this.attributes[i];
 				let location = shader.getAttributeLocation(attrib.name);
@@ -134,7 +135,7 @@ module spine.webgl {
 		}
 
 		private update () {
-			let gl = this.gl;
+			let gl = this.context.gl;
 			if (this.dirtyVertices) {
 				if (!this.verticesBuffer) {
 					this.verticesBuffer = gl.createBuffer();
@@ -154,8 +155,15 @@ module spine.webgl {
 			}
 		}
 
+		restore () {
+			this.verticesBuffer = null;
+			this.indicesBuffer = null;
+			this.update();
+		}
+
 		dispose () {
-			let gl = this.gl;
+			this.context.removeRestorable(this);
+			let gl = this.context.gl;
 			gl.deleteBuffer(this.verticesBuffer);
 			gl.deleteBuffer(this.indicesBuffer);
 		}

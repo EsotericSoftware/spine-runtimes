@@ -69,5 +69,9 @@ module spine {
 		newPointAttachment(skin: Skin, name: string): PointAttachment {
 			return new PointAttachment(name);
 		}
+
+		newClippingAttachment(skin: Skin, name: string): ClippingAttachment {
+			return new ClippingAttachment(name);
+		}
 	}
 }

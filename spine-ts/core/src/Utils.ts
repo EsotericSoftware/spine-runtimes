@@ -59,6 +59,10 @@ module spine {
 		dispose (): void;
 	}
 
+	export interface Restorable {
+		restore (): void;
+	}
+
 	export class Color {
 		public static WHITE = new Color(1, 1, 1, 1);
 		public static RED = new Color(1, 0, 0, 1);
@@ -189,6 +193,16 @@ module spine {
 		static newFloatArray (size: number): ArrayLike<number> {
 			if (Utils.SUPPORTS_TYPED_ARRAYS) {
 				return new Float32Array(size)
+			} else {
+				 let array = new Array<number>(size);
+				 for (let i = 0; i < array.length; i++) array[i] = 0;
+				 return array;
+			}
+		}
+
+		static newShortArray (size: number): ArrayLike<number> {
+			if (Utils.SUPPORTS_TYPED_ARRAYS) {
+				return new Int16Array(size)
 			} else {
 				 let array = new Array<number>(size);
 				 for (let i = 0; i < array.length; i++) array[i] = 0;

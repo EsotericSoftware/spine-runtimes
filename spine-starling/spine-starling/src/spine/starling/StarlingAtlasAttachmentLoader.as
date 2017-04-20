@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 package spine.starling {
+	import spine.attachments.ClippingAttachment;
 	import spine.attachments.PointAttachment;
 	import spine.attachments.PathAttachment;
 
@@ -128,6 +129,10 @@ package spine.starling {
 
 		public function newPointAttachment(skin : Skin, name : String) : PointAttachment {
 			return new PointAttachment(name);
+		}
+		
+		public function newClippingAttachment(skin : Skin, name : String) : ClippingAttachment {
+			return new ClippingAttachment(name);
 		}
 	}
 }

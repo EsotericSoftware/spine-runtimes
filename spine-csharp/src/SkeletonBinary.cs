@@ -252,7 +252,7 @@ namespace Spine {
 			}
 
 			// Default skin.
-			Skin defaultSkin = ReadSkin(input, "default", nonessential);
+			Skin defaultSkin = ReadSkin(input, skeletonData, "default", nonessential);
 			if (defaultSkin != null) {
 				skeletonData.defaultSkin = defaultSkin;
 				skeletonData.skins.Add(defaultSkin);
@@ -260,7 +260,7 @@ namespace Spine {
 
 			// Skins.
 			for (int i = 0, n = ReadVarint(input, true); i < n; i++)
-				skeletonData.skins.Add(ReadSkin(input, ReadString(input), nonessential));
+				skeletonData.skins.Add(ReadSkin(input, skeletonData, ReadString(input), nonessential));
 
 			// Linked meshes.
 			for (int i = 0, n = linkedMeshes.Count; i < n; i++) {
@@ -299,7 +299,7 @@ namespace Spine {
 
 
 		/// <returns>May be null.</returns>
-		private Skin ReadSkin (Stream input, String skinName, bool nonessential) {
+		private Skin ReadSkin (Stream input, SkeletonData skeletonData, String skinName, bool nonessential) {
 			int slotCount = ReadVarint(input, true);
 			if (slotCount == 0) return null;
 			Skin skin = new Skin(skinName);
@@ -307,14 +307,14 @@ namespace Spine {
 				int slotIndex = ReadVarint(input, true);
 				for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++) {
 					String name = ReadString(input);
-					Attachment attachment = ReadAttachment(input, skin, slotIndex, name, nonessential);
+					Attachment attachment = ReadAttachment(input, skeletonData, skin, slotIndex, name, nonessential);
 					if (attachment != null) skin.AddAttachment(slotIndex, name, attachment);
 				}
 			}
 			return skin;
 		}
 
-		private Attachment ReadAttachment (Stream input, Skin skin, int slotIndex, String attachmentName, bool nonessential) {
+		private Attachment ReadAttachment (Stream input, SkeletonData skeletonData, Skin skin, int slotIndex, String attachmentName, bool nonessential) {
 			float scale = Scale;
 
 			String name = ReadString(input);
@@ -462,6 +462,20 @@ namespace Spine {
 					point.rotation = rotation;
 					//if (nonessential) point.color = color;
 					return point;
+				}
+			case AttachmentType.Clipping: {
+					int endSlotIndex = ReadVarint(input, true);
+					int vertexCount = ReadVarint(input, true);
+					Vertices vertices = ReadVertices(input, vertexCount);
+					if (nonessential) ReadInt(input);
+
+					ClippingAttachment clip = attachmentLoader.NewClippingAttachment(skin, name);
+					if (clip == null) return null;
+					clip.EndSlot = skeletonData.slots.Items[endSlotIndex];
+					clip.worldVerticesLength = vertexCount << 1;
+					clip.vertices = vertices.vertices;
+					clip.bones = vertices.bones;
+					return clip;
 				}
 			}
 			return null;

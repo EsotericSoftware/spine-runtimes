@@ -30,7 +30,7 @@
 
 module spine.webgl {
 	export class SceneRenderer implements Disposable {
-		gl: WebGLRenderingContext;
+		context: ManagedWebGLRenderingContext;
 		canvas: HTMLCanvasElement;
 		camera: OrthoCamera;
 		batcher: PolygonBatcher;
@@ -50,17 +50,17 @@ module spine.webgl {
 		private QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 		private WHITE = new Color(1, 1, 1, 1);
 
-		constructor (canvas: HTMLCanvasElement, gl: WebGLRenderingContext, twoColorTint: boolean = true) {
+		constructor (canvas: HTMLCanvasElement, context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint: boolean = true) {
 			this.canvas = canvas;
-			this.gl = gl;
+			this.context = context instanceof ManagedWebGLRenderingContext? context : new ManagedWebGLRenderingContext(context);
 			this.twoColorTint = twoColorTint;
 			this.camera = new OrthoCamera(canvas.width, canvas.height);
-			this.batcherShader = twoColorTint ? Shader.newTwoColoredTextured(gl) : Shader.newColoredTextured(gl);
-			this.batcher = new PolygonBatcher(gl, twoColorTint);
-			this.shapesShader = Shader.newColored(gl);
-			this.shapes = new ShapeRenderer(gl);
-			this.skeletonRenderer = new SkeletonRenderer(gl, twoColorTint);
-			this.skeletonDebugRenderer = new SkeletonDebugRenderer(gl);
+			this.batcherShader = twoColorTint ? Shader.newTwoColoredTextured(this.context) : Shader.newColoredTextured(this.context);
+			this.batcher = new PolygonBatcher(this.context, twoColorTint);
+			this.shapesShader = Shader.newColored(this.context);
+			this.shapes = new ShapeRenderer(this.context);
+			this.skeletonRenderer = new SkeletonRenderer(this.context, twoColorTint);
+			this.skeletonDebugRenderer = new SkeletonDebugRenderer(this.context);
 		}
 
 		begin () {
@@ -393,7 +393,7 @@ module spine.webgl {
 				canvas.width = w;
 				canvas.height = h;
 			}
-			this.gl.viewport(0, 0, canvas.width, canvas.height);
+			this.context.gl.viewport(0, 0, canvas.width, canvas.height);
 
 			if (resizeMode === ResizeMode.Stretch) {
 				// nothing to do, we simply apply the viewport size of the camera

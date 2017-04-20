@@ -41,6 +41,7 @@
  * Optimized rendering by removing all per-frame allocation in `SkeletonRenderer`, resulting in 15% performance increase for large numbers of skeletons being rendered per frame.
  * Added support for two color tinting. Tinting is enabled/disabled per `SkeletonRenderer`/`SkeletonAnimation` instance. Use `SkeletonRenderer::setTwoColorTint()`. Note that two color tinting requires the use of a non-standard shader and vertex format. This means that skeletons rendered with two color tinting will break batching. However, skeletons with two color tinting enabled and rendered after each other will be batched.
  * Updated example to use Cocos2d-x 3.14.1.
+ * Added mesh debug rendering. Enable/Disable via `SkeletonRenderer::setDebugMeshesEnabled()`.
 
 ### Cocos2d-Objc
  * Fixed renderer to work with 3.6 changes
@@ -120,12 +121,23 @@
   * Added `Bone.localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).  
   * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.  
   * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
+  * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
+  * Added `SkeletonClipper` and `ConvexDecomposer`, used to implement software clipping of attachments.
 
 ### WebGL backend
+ * Fixed WebGL context loss
+   * Added `Restorable` interface, implemented by any WebGL resource that needs restoration after a context loss. All WebGL resource classes (`Shader`, `Mesh`, `GLTexture`) implement this interface.
+   * Added `ManagedWebGLRenderingContext`. Handles setup of a `WebGLRenderingContext` given a canvas element and restoration of WebGL resources (`Shader`, `Mesh`, `GLTexture`) on WebGL context loss. WebGL resources register themselves with the `ManagedWebGLRenderingContext`. If the context is informed of a context loss and restoration, the registered WebGL resources' `restore()` method is called. The `restore()` method implementation on each resource type will recreate the GPU side objects.
+   * All classes that previously took a `WebGLRenderingContext` in the constructor now also allow a `ManagedWebGLRenderingContext`. This ensures existing applications do not break.
+   * To use automatic context restauration:
+    1. Create or fetch a canvas element from the DOM
+    2. Instantiate a `ManagedWebGLRenderingContext`, passing the canvas to the constructor. This will setup a `WebGLRenderingContext` internally and manage context loss/restoration.
+    3. Pass the `ManagedWebGLRenderingContext` to the constructors of classes that you previously passed a `WebGLRenderingContext` to (`AssetManager`, `GLTexture`, `Mesh`, `Shader`, `PolygonBatcher`, `SceneRenderer`, `ShapeRenderer`, `SkeletonRenderer`, `SkeletonDebugRenderer`).
  * Fixed renderer to work with 3.6 changes.
  * Added support for two color tinting.
  * Improved performance by using `DYNAMIC_DRAW` for vertex buffer objects and fixing bug that copied to much data to the GPU each frame in `PolygonBatcher`/`Mesh`.
  * Added two color tinting support, enabled by default. You can disable it via the constructors of `SceneRenderer`, `SkeletonRenderer`and `PolygonBatcher`. Note that you will need to use a shader created via `Shader.newTwoColoredTexturedShader` shader with `SkeletonRenderer` and `PolygonBatcher` if two color tinting is enabled.
+ * Added clipping support
 
 ### Canvas backend
  * Fixed renderer to work for 3.6 changes. Sadly, we can't support two color tinting via the Canvas API.
@@ -134,7 +146,9 @@
 
 ### Three.js backend
  * Fixed renderer to work with 3.6 changes. Two color tinting is not supported.
+ * Added clipping support
 
 ### Widget backend
- * Fixed renderer to work for 3.6 changes. Supports two color tinting (see webgl backend changes for details).
- * Added fields `atlasContent` and `jsonContent` to `WidgetConfiguration` allowing you to directly pass the contents of the `.atlas` and `.json` file without having to do a request. See `README.md` and the example for details.
+ * Fixed WebGL context loss (see WebGL backend changes). Enabled automatically.
+ * Fixed renderer to work for 3.6 changes. Supports two color tinting & clipping (see WebGL backend changes for details).
+ * Added fields `atlasContent`, `atlasPagesContent`, and `jsonContent` to `WidgetConfiguration` allowing you to directly pass the contents of the `.atlas`, atlas page `.png` files, and the `.json` file without having to do a request. See `README.md` and the example for details.

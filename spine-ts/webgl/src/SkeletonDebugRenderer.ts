@@ -35,6 +35,7 @@ module spine.webgl {
 		attachmentLineColor = new Color(0, 0, 1, 0.5);
 		triangleLineColor = new Color(1, 0.64, 0, 0.5);
 		pathColor = new Color().setFromString("FF7F00");
+		clipColor = new Color(0.8, 0, 0, 2);
 		aabbColor = new Color(0, 1, 0, 0.5);
 		drawBones = true;
 		drawRegionAttachments = true;
@@ -43,25 +44,26 @@ module spine.webgl {
 		drawMeshTriangles = true;
 		drawPaths = true;
 		drawSkeletonXY = false;
+		drawClipping = true;
 		premultipliedAlpha = false;
 		scale = 1;
 		boneWidth = 2;
 
-		private gl: WebGLRenderingContext;
+		private context: ManagedWebGLRenderingContext;
 		private bounds = new SkeletonBounds();
 		private temp = new Array<number>();
 		private vertices = Utils.newFloatArray(2 * 1024);
 		private static LIGHT_GRAY = new Color(192 / 255, 192 / 255, 192 / 255, 1);
 		private static GREEN = new Color(0, 1, 0, 1);
 
-		constructor (gl: WebGLRenderingContext) {
-			this.gl = gl;
+		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext) {
+			this.context = context instanceof ManagedWebGLRenderingContext? context : new ManagedWebGLRenderingContext(context);
 		}
 
 		draw (shapes: ShapeRenderer, skeleton: Skeleton, ignoredBones: Array<string> = null) {
 			let skeletonX = skeleton.x;
 			let skeletonY = skeleton.y;
-			let gl = this.gl;
+			let gl = this.context.gl;
 			let srcFunc = this.premultipliedAlpha ? gl.ONE : gl.SRC_ALPHA;
 			shapes.setBlendMode(srcFunc, gl.ONE_MINUS_SRC_ALPHA);
 
@@ -190,6 +192,27 @@ module spine.webgl {
 					let bone = bones[i];
 					if (ignoredBones && ignoredBones.indexOf(bone.data.name) > -1) continue;
 					shapes.circle(true, skeletonX + bone.worldX, skeletonY + bone.worldY, 3 * this.scale, SkeletonDebugRenderer.GREEN, 8);
+				}
+			}
+
+			if (this.drawClipping) {
+				let slots = skeleton.slots;
+				shapes.setColor(this.clipColor)
+				for (let i = 0, n = slots.length; i < n; i++) {
+					let slot = slots[i];
+					let attachment = slot.getAttachment();
+					if (!(attachment instanceof ClippingAttachment)) continue;
+					let clip = <ClippingAttachment>attachment;
+					let nn = clip.worldVerticesLength;
+					let world = this.temp = Utils.setArraySize(this.temp, nn, 0);
+					clip.computeWorldVertices(slot, 0, nn, world, 0, 2);
+					for (let i = 0, n = world.length; i < n; i+=2) {
+						let x = world[i];
+						let y = world[i + 1];
+						let x2 = world[(i + 2) % world.length];
+						let y2 = world[(i + 3) % world.length];
+						shapes.line(x, y, x2, y2);
+					}
 				}
 			}
 		}

@@ -44,5 +44,8 @@ module spine {
 
 		/** @return May be null to not load an attachment */
 		newPointAttachment(skin: Skin, name: string): PointAttachment;
+
+		/** @return May be null to not load an attachment */
+		newClippingAttachment(skin: Skin, name: string): ClippingAttachment;
 	}
 }

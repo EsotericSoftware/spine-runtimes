@@ -163,8 +163,7 @@ static bool handlerQueued = false;
 	// notification system that may break if the block is called on a
 	// separate thread.
 	if (!handlerQueued) {
-		[[CCDirector sharedDirector] addFrameCompletionHandler: ^{
-			printf("clearing mesh\n");
+		[[CCDirector sharedDirector] addFrameCompletionHandler: ^{			
 			spMesh_clearParts(mesh);
 			handlerQueued = false;
 		}];

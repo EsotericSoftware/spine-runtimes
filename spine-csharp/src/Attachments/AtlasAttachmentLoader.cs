@@ -90,6 +90,10 @@ namespace Spine {
 			return new PointAttachment(name);
 		}
 
+		public ClippingAttachment NewClippingAttachment(Skin skin, string name) {
+			return new ClippingAttachment(name);
+		}
+
 		public AtlasRegion FindRegion (string name) {
 			AtlasRegion region;
 

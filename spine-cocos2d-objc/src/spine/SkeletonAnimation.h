@@ -68,7 +68,7 @@ typedef void(^spEventListener)(spTrackEntry* entry, spEvent* event);
 - (void) setMixFrom:(NSString*)fromAnimation to:(NSString*)toAnimation duration:(float)duration;
 
 - (spTrackEntry*) setAnimationForTrack:(int)trackIndex name:(NSString*)name loop:(bool)loop;
-- (spTrackEntry*) addAnimationForTrack:(int)trackIndex name:(NSString*)name loop:(bool)loop afterDelay:(int)delay;
+- (spTrackEntry*) addAnimationForTrack:(int)trackIndex name:(NSString*)name loop:(bool)loop afterDelay:(float)delay;
 - (spTrackEntry*) getCurrentForTrack:(int)trackIndex;
 - (void) clearTracks;
 - (void) clearTrack:(int)trackIndex;

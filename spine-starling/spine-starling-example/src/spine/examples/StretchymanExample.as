@@ -29,6 +29,10 @@
  *****************************************************************************/
 
 package spine.examples {
+	import starling.display.DisplayObjectContainer;
+	import starling.events.TouchPhase;
+	import starling.events.Touch;
+	import starling.events.TouchEvent;
 	import spine.*;
 	import spine.animation.AnimationStateData;
 	import spine.animation.TrackEntry;
@@ -91,6 +95,17 @@ package spine.examples {
 
 			addChild(skeleton);
 			Starling.juggler.add(skeleton);
+			
+			addEventListener(TouchEvent.TOUCH, onClick);
+		}
+
+		private function onClick(event : TouchEvent) : void {
+			var touch : Touch = event.getTouch(this);
+			if (touch && touch.phase == TouchPhase.BEGAN) {
+				var parent: DisplayObjectContainer = this.parent;
+				this.removeFromParent(true);			
+				parent.addChild(new CoinExample());				
+			}
 		}
 	}
 }

@@ -97,9 +97,9 @@ cocos2d::V3F_C4B_T2F* SkeletonBatch::allocateVertices(uint32_t numVertices) {
 	return vertices;
 }
 	
-cocos2d::TrianglesCommand* SkeletonBatch::addCommand(cocos2d::Renderer* renderer, float globalOrder, GLuint textureID, cocos2d::GLProgramState* glProgramState, cocos2d::BlendFunc blendType, const cocos2d::TrianglesCommand::Triangles& triangles, const cocos2d::Mat4& mv, uint32_t flags) {
+cocos2d::TrianglesCommand* SkeletonBatch::addCommand(cocos2d::Renderer* renderer, float globalOrder, cocos2d::Texture2D* texture, cocos2d::GLProgramState* glProgramState, cocos2d::BlendFunc blendType, const cocos2d::TrianglesCommand::Triangles& triangles, const cocos2d::Mat4& mv, uint32_t flags) {
 	TrianglesCommand* command = nextFreeCommand();
-	command->init(globalOrder, textureID, glProgramState, blendType, triangles, mv, flags);
+	command->init(globalOrder, texture, glProgramState, blendType, triangles, mv, flags);
 	renderer->addCommand(command);
 	return command;
 }
@@ -118,26 +118,4 @@ cocos2d::TrianglesCommand* SkeletonBatch::nextFreeCommand() {
 	}
 	return _commandsPool[_nextFreeCommand++];
 }
-
-//void SkeletonBatch::addCommand (cocos2d::Renderer* renderer, float globalZOrder, GLuint textureID, GLProgramState* glProgramState,
-//								BlendFunc blendFunc, const TrianglesCommand::Triangles& triangles, const Mat4& transform, uint32_t transformFlags
-//								) {
-//	if (_command->triangles->verts) {
-//		free(_command->triangles->verts);
-//		_command->triangles->verts = NULL;
-//	}
-//	
-//	_command->triangles->verts = (V3F_C4B_T2F *)malloc(sizeof(V3F_C4B_T2F) * triangles.vertCount);
-//	memcpy(_command->triangles->verts, triangles.verts, sizeof(V3F_C4B_T2F) * triangles.vertCount);
-//	
-//	_command->triangles->vertCount = triangles.vertCount;
-//	_command->triangles->indexCount = triangles.indexCount;
-//	_command->triangles->indices = triangles.indices;
-//	
-//	_command->trianglesCommand->init(globalZOrder, textureID, glProgramState, blendFunc, *_command->triangles, transform);
-//	renderer->addCommand(_command->trianglesCommand);
-//	
-//	if (!_command->next) _command->next = new Command();
-//	_command = _command->next;
-//}
 }

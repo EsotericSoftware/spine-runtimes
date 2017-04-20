@@ -42,11 +42,12 @@ namespace Spine {
 		private const int BL = 2;
 		private const int BR = 3;
 
+		SkeletonClipping clipper = new SkeletonClipping();	
 		GraphicsDevice device;
 		MeshBatcher batcher;
 		RasterizerState rasterizerState;
 		float[] vertices = new float[8];
-		int[] quadTriangles = { 0, 1, 2, 1, 3, 2 };
+		int[] quadTriangles = { 0, 1, 2, 2, 3, 0 };
 		BlendState defaultBlendState;
 
 		BasicEffect effect;
@@ -88,109 +89,109 @@ namespace Spine {
 			}
 		}
 
-		public void Draw (Skeleton skeleton) {
-			float[] vertices = this.vertices;
+		public void Draw(Skeleton skeleton) {
 			var drawOrder = skeleton.DrawOrder;
 			var drawOrderItems = skeleton.DrawOrder.Items;
 			float skeletonR = skeleton.R, skeletonG = skeleton.G, skeletonB = skeleton.B, skeletonA = skeleton.A;
+			Color color = new Color();
+
 			for (int i = 0, n = drawOrder.Count; i < n; i++) {
 				Slot slot = drawOrderItems[i];
 				Attachment attachment = slot.Attachment;
+
+				float attachmentColorR, attachmentColorG, attachmentColorB, attachmentColorA;
+				Texture2D texture = null;
+				int verticesCount = 0;
+				float[] vertices = this.vertices;
+				int indicesCount = 0;
+				int[] indices = null;
+				float[] uvs = null;
+
 				if (attachment is RegionAttachment) {
 					RegionAttachment regionAttachment = (RegionAttachment)attachment;
-					BlendState blend = slot.Data.BlendMode == BlendMode.Additive ? BlendState.Additive : defaultBlendState;
-					if (device.BlendState != blend) {
-						End();
-						device.BlendState = blend;
-					}
-
-					MeshItem item = batcher.NextItem(4, 6);
-					item.triangles = quadTriangles;
-					VertexPositionColorTexture[] itemVertices = item.vertices;
-
+					attachmentColorR = regionAttachment.R; attachmentColorG = regionAttachment.G; attachmentColorB = regionAttachment.B; attachmentColorA = regionAttachment.A;
 					AtlasRegion region = (AtlasRegion)regionAttachment.RendererObject;
-					item.texture = (Texture2D)region.page.rendererObject;
-
-					Color color;
-					float a = skeletonA * slot.A * regionAttachment.A;
-					if (premultipliedAlpha) {
-						color = new Color(
-								skeletonR * slot.R * regionAttachment.R * a,
-								skeletonG * slot.G * regionAttachment.G * a,
-								skeletonB * slot.B * regionAttachment.B * a, a);
-					} else {
-						color = new Color(
-								skeletonR * slot.R * regionAttachment.R,
-								skeletonG * slot.G * regionAttachment.G,
-								skeletonB * slot.B * regionAttachment.B, a);
-					}
-					itemVertices[TL].Color = color;
-					itemVertices[BL].Color = color;
-					itemVertices[BR].Color = color;
-					itemVertices[TR].Color = color;
-
+					texture = (Texture2D)region.page.rendererObject;
+					verticesCount = 4;
 					regionAttachment.ComputeWorldVertices(slot.Bone, vertices, 0, 2);
-					itemVertices[TL].Position.X = vertices[0];
-					itemVertices[TL].Position.Y = vertices[1];
-					itemVertices[TL].Position.Z = 0;
-					itemVertices[BL].Position.X = vertices[2];
-					itemVertices[BL].Position.Y = vertices[3];
-					itemVertices[BL].Position.Z = 0;
-					itemVertices[BR].Position.X = vertices[4];
-					itemVertices[BR].Position.Y = vertices[5];
-					itemVertices[BR].Position.Z = 0;
-					itemVertices[TR].Position.X = vertices[6];
-					itemVertices[TR].Position.Y = vertices[7];
-					itemVertices[TR].Position.Z = 0;
-
-					float[] uvs = regionAttachment.UVs;
-					itemVertices[TL].TextureCoordinate.X = uvs[0];
-					itemVertices[TL].TextureCoordinate.Y = uvs[1];
-					itemVertices[BL].TextureCoordinate.X = uvs[2];
-					itemVertices[BL].TextureCoordinate.Y = uvs[3];
-					itemVertices[BR].TextureCoordinate.X = uvs[4];
-					itemVertices[BR].TextureCoordinate.Y = uvs[5];
-					itemVertices[TR].TextureCoordinate.X = uvs[6];
-					itemVertices[TR].TextureCoordinate.Y = uvs[7];
-				} else if (attachment is MeshAttachment) {
+					indicesCount = 6;
+					indices = quadTriangles;
+					uvs = regionAttachment.UVs;
+				}
+				else if (attachment is MeshAttachment) {
 					MeshAttachment mesh = (MeshAttachment)attachment;
+					attachmentColorR = mesh.R; attachmentColorG = mesh.G; attachmentColorB = mesh.B; attachmentColorA = mesh.A;
+					AtlasRegion region = (AtlasRegion)mesh.RendererObject;
+					texture = (Texture2D)region.page.rendererObject;
 					int vertexCount = mesh.WorldVerticesLength;
 					if (vertices.Length < vertexCount) vertices = new float[vertexCount];
+					verticesCount = vertexCount >> 1;
 					mesh.ComputeWorldVertices(slot, vertices);
-
-					int[] triangles = mesh.Triangles;
-					MeshItem item = batcher.NextItem(vertexCount, triangles.Length);
-					item.triangles = triangles;
-
-					AtlasRegion region = (AtlasRegion)mesh.RendererObject;
-					item.texture = (Texture2D)region.page.rendererObject;
-
-					Color color;
-					float a = skeletonA * slot.A * mesh.A;
-					if (premultipliedAlpha) {
-						color = new Color(
-								skeletonR * slot.R * mesh.R * a,
-								skeletonG * slot.G * mesh.G * a,
-								skeletonB * slot.B * mesh.B * a, a);
-					} else {
-						color = new Color(
-								skeletonR * slot.R * mesh.R,
-								skeletonG * slot.G * mesh.G,
-								skeletonB * slot.B * mesh.B, a);
-					}
-
-					float[] uvs = mesh.UVs;
-					VertexPositionColorTexture[] itemVertices = item.vertices;
-					for (int ii = 0, v = 0; v < vertexCount; ii++, v += 2) {
-						itemVertices[ii].Color = color;
-						itemVertices[ii].Position.X = vertices[v];
-						itemVertices[ii].Position.Y = vertices[v + 1];
-						itemVertices[ii].Position.Z = 0;
-						itemVertices[ii].TextureCoordinate.X = uvs[v];
-						itemVertices[ii].TextureCoordinate.Y = uvs[v + 1];
-					}
+					indicesCount = mesh.Triangles.Length;
+					indices = mesh.Triangles;
+					uvs = mesh.UVs;
 				}
+				else if (attachment is ClippingAttachment) {
+					ClippingAttachment clip = (ClippingAttachment)attachment;
+					clipper.ClipStart(slot, clip);
+					continue;
+				}
+				else {
+					continue;
+				}
+
+				// set blend state
+				BlendState blend = slot.Data.BlendMode == BlendMode.Additive ? BlendState.Additive : defaultBlendState;
+				if (device.BlendState != blend) {
+					End();
+					device.BlendState = blend;
+				}
+
+				// calculate color
+				float a = skeletonA * slot.A * attachmentColorA;
+				if (premultipliedAlpha) {
+					color = new Color(
+							skeletonR * slot.R * attachmentColorR * a,
+							skeletonG * slot.G * attachmentColorG * a,
+							skeletonB * slot.B * attachmentColorB * a, a);
+				}
+				else {
+					color = new Color(
+							skeletonR * slot.R * attachmentColorR,
+							skeletonG * slot.G * attachmentColorG,
+							skeletonB * slot.B * attachmentColorB, a);
+				}
+
+				// clip
+				if (clipper.IsClipping()) {
+					clipper.ClipTriangles(vertices, verticesCount << 1, indices, indicesCount, uvs);
+					vertices = clipper.ClippedVertices.Items;
+					verticesCount = clipper.ClippedVertices.Count;
+					indices = clipper.ClippedTriangles.Items;
+					indicesCount = clipper.ClippedTriangles.Count;
+					uvs = clipper.ClippedUVs.Items;
+				}
+
+				if (verticesCount == 0 || indicesCount == 0)
+					continue;
+
+				// submit to batch
+				MeshItem item = batcher.NextItem(verticesCount, indicesCount);
+				item.texture = texture;
+				item.triangles = indices;
+				VertexPositionColorTexture[] itemVertices = item.vertices;
+				for (int ii = 0, v = 0, nn = verticesCount << 1; v < nn; ii++, v += 2) {
+					itemVertices[ii].Color = color;
+					itemVertices[ii].Position.X = vertices[v];
+					itemVertices[ii].Position.Y = vertices[v + 1];
+					itemVertices[ii].Position.Z = 0;
+					itemVertices[ii].TextureCoordinate.X = uvs[v];
+					itemVertices[ii].TextureCoordinate.Y = uvs[v + 1];
+				}
+
+				clipper.ClipEnd(slot);
 			}
+			clipper.ClipEnd();
 		}
 	}
 }

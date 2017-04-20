@@ -60,8 +60,8 @@ var transformsDemo = function(loadingComplete, bgColor) {
 			skeleton.updateWorldTransform();
 			rotateHandle = skeleton.findBone("rotate-handle");
 
-			renderer.camera.position.x = offset.x + bounds.x / 2 + 70;
-			renderer.camera.position.y = offset.y + bounds.y / 2 + 50;
+			renderer.camera.position.x = offset.x + bounds.x / 2;
+			renderer.camera.position.y = offset.y + bounds.y / 2;
 
 			renderer.skeletonDebugRenderer.drawRegionAttachments = false;
 			renderer.skeletonDebugRenderer.drawMeshHull = false;

@@ -86,10 +86,7 @@ namespace Spine.Unity.Editor {
 
 			string dataPath = AssetDatabase.GetAssetPath(skeletonDataAsset);
 			string controllerPath = dataPath.Replace("_SkeletonData", "_Controller").Replace(".asset", ".controller");
-
-		#if UNITY_5
 			UnityEditor.Animations.AnimatorController controller;
-
 			if (skeletonDataAsset.controller != null) {
 				controller = (UnityEditor.Animations.AnimatorController)skeletonDataAsset.controller;
 				controllerPath = AssetDatabase.GetAssetPath(controller);
@@ -105,24 +102,6 @@ namespace Spine.Unity.Editor {
 				}
 
 			}
-		#else
-		UnityEditorInternal.AnimatorController controller;
-
-		if (skeletonDataAsset.controller != null) {
-			controller = (UnityEditorInternal.AnimatorController)skeletonDataAsset.controller;
-			controllerPath = AssetDatabase.GetAssetPath(controller);
-		} else {
-			if (File.Exists(controllerPath)) {
-				if (EditorUtility.DisplayDialog("Controller Overwrite Warning", "Unknown Controller already exists at: " + controllerPath, "Update", "Overwrite")) {
-					controller = (UnityEditorInternal.AnimatorController)AssetDatabase.LoadAssetAtPath(controllerPath, typeof(RuntimeAnimatorController));
-				} else {
-					controller = (UnityEditorInternal.AnimatorController)UnityEditorInternal.AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
-				}
-			} else {
-				controller = (UnityEditorInternal.AnimatorController)UnityEditorInternal.AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
-			}
-		}
-		#endif
 
 			skeletonDataAsset.controller = controller;
 			EditorUtility.SetDirty(skeletonDataAsset);
@@ -218,32 +197,19 @@ namespace Spine.Unity.Editor {
 
 			var skeletonData = skeletonDataAsset.GetSkeletonData(true);
 			bool hasAnimations = bakeAnimations && skeletonData.Animations.Count > 0;
-			#if UNITY_5
 			UnityEditor.Animations.AnimatorController controller = null;
-			#else
-			UnityEditorInternal.AnimatorController controller = null;
-			#endif
 			if (hasAnimations) {
 				string controllerPath = outputPath + "/" + skeletonDataAsset.skeletonJSON.name + " Controller.controller";
 				bool newAnimContainer = false;
 
 				var runtimeController = AssetDatabase.LoadAssetAtPath(controllerPath, typeof(RuntimeAnimatorController));
 
-				#if UNITY_5
 				if (runtimeController != null) {
 					controller = (UnityEditor.Animations.AnimatorController)runtimeController;
 				} else {
 					controller = UnityEditor.Animations.AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
 					newAnimContainer = true;
 				}
-				#else
-				if (runtimeController != null) {
-				controller = (UnityEditorInternal.AnimatorController)runtimeController;
-				} else {
-				controller = UnityEditorInternal.AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
-				newAnimContainer = true;
-				}
-				#endif
 
 				var existingClipTable = new Dictionary<string, AnimationClip>();
 				var unusedClipNames = new List<string>();
@@ -288,12 +254,7 @@ namespace Spine.Unity.Editor {
 						unusedClipNames.Remove(clip.name);
 					} else {
 						AssetDatabase.AddObjectToAsset(clip, controller);
-						#if UNITY_5
 						controller.AddMotion(clip);
-						#else
-						UnityEditorInternal.AnimatorController.AddAnimationClipToController(controller, clip);
-						#endif
-
 					}
 				}
 
@@ -782,12 +743,6 @@ namespace Spine.Unity.Editor {
 				clip.ClearCurves();
 				AnimationUtility.SetAnimationEvents(clip, new AnimationEvent[0]);
 			}
-
-			#if UNITY_5
-
-			#else
-			AnimationUtility.SetAnimationType(clip, ModelImporterAnimationType.Generic);
-			#endif
 
 			clip.name = name;
 
@@ -1477,14 +1432,7 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		static void SetAnimationSettings (AnimationClip clip, AnimationClipSettings settings) {
-			#if UNITY_5
 			AnimationUtility.SetAnimationClipSettings(clip, settings);
-			#else
-			MethodInfo methodInfo = typeof(AnimationUtility).GetMethod("SetAnimationClipSettings", BindingFlags.Static | BindingFlags.NonPublic);
-			methodInfo.Invoke(null, new object[] { clip, settings });
-
-			EditorUtility.SetDirty(clip);
-			#endif
 		}
 
 

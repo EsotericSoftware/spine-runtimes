@@ -30,7 +30,7 @@
 
 module spine.webgl {
 	export class PolygonBatcher implements Disposable {
-		private gl: WebGLRenderingContext;
+		private context: ManagedWebGLRenderingContext;
 		private drawCalls: number;
 		private isDrawing = false;
 		private mesh: Mesh;
@@ -41,17 +41,17 @@ module spine.webgl {
 		private srcBlend: number = WebGLRenderingContext.SRC_ALPHA;
 		private dstBlend: number = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
 
-		constructor (gl: WebGLRenderingContext, twoColorTint: boolean = true, maxVertices: number = 10920) {
+		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint: boolean = true, maxVertices: number = 10920) {
 			if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
-			this.gl = gl;
+			this.context = context instanceof ManagedWebGLRenderingContext? context : new ManagedWebGLRenderingContext(context);
 			let attributes = twoColorTint ?
 					[new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute(), new Color2Attribute()] :
 					[new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute()];
-			this.mesh = new Mesh(gl, attributes, maxVertices, maxVertices * 3);
+			this.mesh = new Mesh(context, attributes, maxVertices, maxVertices * 3);
 		}
 
 		begin (shader: Shader) {
-			let gl = this.gl;
+			let gl = this.context.gl;
 			if (this.isDrawing) throw new Error("PolygonBatch is already drawing. Call PolygonBatch.end() before calling PolygonBatch.begin()");
 			this.drawCalls = 0;
 			this.shader = shader;
@@ -63,7 +63,7 @@ module spine.webgl {
 		}
 
 		setBlendMode (srcBlend: number, dstBlend: number) {
-			let gl = this.gl;
+			let gl = this.context.gl;
 			this.srcBlend = srcBlend;
 			this.dstBlend = dstBlend;
 			if (this.isDrawing) {
@@ -95,7 +95,7 @@ module spine.webgl {
 		}
 
 		private flush () {
-			let gl = this.gl;
+			let gl = this.context.gl;
 			if (this.verticesLength == 0) return;
 
 			this.mesh.draw(this.shader, gl.TRIANGLES);
@@ -108,7 +108,7 @@ module spine.webgl {
 		}
 
 		end () {
-			let gl = this.gl;
+			let gl = this.context.gl;
 			if (!this.isDrawing) throw new Error("PolygonBatch is not drawing. Call PolygonBatch.begin() before calling PolygonBatch.end()");
 			if (this.verticesLength > 0 || this.indicesLength > 0) this.flush();
 			this.shader = null;
