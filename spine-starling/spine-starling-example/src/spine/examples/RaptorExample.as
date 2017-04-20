@@ -44,7 +44,7 @@ package spine.examples {
 	import starling.events.TouchPhase;
 
 	public class RaptorExample extends Sprite {
-		[Embed(source = "/raptor.json", mimeType = "application/octet-stream")]
+		[Embed(source = "/raptor-clipped.json", mimeType = "application/octet-stream")]
 		static public const RaptorJson : Class;
 
 		[Embed(source = "/raptor.atlas", mimeType = "application/octet-stream")]
