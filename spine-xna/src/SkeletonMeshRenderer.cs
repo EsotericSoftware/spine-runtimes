@@ -143,8 +143,8 @@ namespace Spine {
 				// set blend state
 				BlendState blend = slot.Data.BlendMode == BlendMode.Additive ? BlendState.Additive : defaultBlendState;
 				if (device.BlendState != blend) {
-					End();
-					device.BlendState = blend;
+					//End();
+					//device.BlendState = blend;
 				}
 
 				// calculate color
@@ -166,7 +166,7 @@ namespace Spine {
 				if (clipper.IsClipping()) {
 					clipper.ClipTriangles(vertices, verticesCount << 1, indices, indicesCount, uvs);
 					vertices = clipper.ClippedVertices.Items;
-					verticesCount = clipper.ClippedVertices.Count;
+					verticesCount = clipper.ClippedVertices.Count >> 1;
 					indices = clipper.ClippedTriangles.Items;
 					indicesCount = clipper.ClippedTriangles.Count;
 					uvs = clipper.ClippedUVs.Items;
@@ -178,7 +178,9 @@ namespace Spine {
 				// submit to batch
 				MeshItem item = batcher.NextItem(verticesCount, indicesCount);
 				item.texture = texture;
-				item.triangles = indices;
+				for (int ii = 0, nn = indicesCount; ii < nn; ii++) {
+					item.triangles[ii] = indices[ii];
+				}
 				VertexPositionColorTexture[] itemVertices = item.vertices;
 				for (int ii = 0, v = 0, nn = verticesCount << 1; v < nn; ii++, v += 2) {
 					itemVertices[ii].Color = color;

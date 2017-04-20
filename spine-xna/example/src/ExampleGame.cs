@@ -71,13 +71,13 @@ namespace Spine {
 
 		protected override void LoadContent () {
 			skeletonRenderer = new SkeletonMeshRenderer(GraphicsDevice);
-			skeletonRenderer.PremultipliedAlpha = true;
+			skeletonRenderer.PremultipliedAlpha = false;
 
-			// String name = "spineboy";
+			String name = "spineboy";
 			// String name = "goblins-mesh";
 			// String name = "raptor";
 			// String name = "tank";
-			String name = "coin";
+			// String name = "coin";
 			bool binaryData = false;
 
 			Atlas atlas = new Atlas(assetsFolder + name + ".atlas", new XnaTextureLoader(GraphicsDevice));
