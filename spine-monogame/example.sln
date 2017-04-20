@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spine-monogame-example", "example\spine-monogame-example.csproj", "{0A7474EC-4DF9-40E7-B920-D1D1601F20A7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spine-csharp", "..\spine-csharp\spine-csharp.csproj", "{94144E22-2431-4A8F-AC04-DEC22F7EDD8F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,14 @@ Global
 		{0A7474EC-4DF9-40E7-B920-D1D1601F20A7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0A7474EC-4DF9-40E7-B920-D1D1601F20A7}.Release|x86.ActiveCfg = Release|Any CPU
 		{0A7474EC-4DF9-40E7-B920-D1D1601F20A7}.Release|x86.Build.0 = Release|Any CPU
+		{94144E22-2431-4A8F-AC04-DEC22F7EDD8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94144E22-2431-4A8F-AC04-DEC22F7EDD8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94144E22-2431-4A8F-AC04-DEC22F7EDD8F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{94144E22-2431-4A8F-AC04-DEC22F7EDD8F}.Debug|x86.Build.0 = Debug|Any CPU
+		{94144E22-2431-4A8F-AC04-DEC22F7EDD8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94144E22-2431-4A8F-AC04-DEC22F7EDD8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94144E22-2431-4A8F-AC04-DEC22F7EDD8F}.Release|x86.ActiveCfg = Release|Any CPU
+		{94144E22-2431-4A8F-AC04-DEC22F7EDD8F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
