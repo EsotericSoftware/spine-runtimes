@@ -899,6 +899,8 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						type = SP_ATTACHMENT_BOUNDING_BOX;
 					else if (strcmp(typeString, "path") == 0)
 						type = SP_ATTACHMENT_PATH;
+					else if	(strcmp(typeString, "clipping") == 0)
+						type = SP_ATTACHMENT_CLIPPING;
 					else {
 						spSkeletonData_dispose(skeletonData);
 						_spSkeletonJson_setError(self, root, "Unknown attachment type: ", typeString);
@@ -1035,6 +1037,20 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 												  toColor(color, 2),
 												  toColor(color, 3));
 						}
+						break;
+					}
+					case SP_ATTACHMENT_CLIPPING: {
+						spClippingAttachment* clip = SUB_CAST(spClippingAttachment, attachment);
+						int vertexCount = 0;
+						const char* end = Json_getString(attachmentMap, "end", 0);
+						if (end) {
+							spSlotData* slot = spSkeletonData_findSlot(skeletonData, end);
+							clip->endSlot = slot;
+						}
+						vertexCount = Json_getInt(attachmentMap, "vertexCount", 0) << 1;
+						_readVertices(self, attachmentMap, SUPER(clip), vertexCount);
+						clip->super.verticesCount = vertexCount;
+						spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 						break;
 					}
 					}

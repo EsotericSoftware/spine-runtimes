@@ -122,6 +122,11 @@ cp -f ../stretchyman/export/stretchyman.png ../../spine-love/data
 
 echo "spine-sfml"
 rm -f ../../spine-sfml/data/*
+cp -f ../coin/export/coin.json ../../spine-sfml/data/
+cp -f ../coin/export/coin.skel ../../spine-sfml/data/
+cp -f ../coin/export/coin.atlas ../../spine-sfml/data/
+cp -f ../coin/export/coin.png ../../spine-sfml/data/
+
 cp -f ../goblins/export/goblins-mesh.json ../../spine-sfml/data/
 cp -f ../goblins/export/goblins-mesh.skel ../../spine-sfml/data/
 cp -f ../goblins/export/goblins.atlas ../../spine-sfml/data/

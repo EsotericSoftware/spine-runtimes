@@ -674,7 +674,7 @@ static void _readVertices(spSkeletonBinary* self, _dataInput* input, spVertexAtt
 }
 
 spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput* input,
-		spSkin* skin, int slotIndex, const char* attachmentName, int/*bool*/ nonessential) {
+		spSkin* skin, int slotIndex, const char* attachmentName, spSkeletonData* skeletonData, int/*bool*/ nonessential) {
 	int i;
 	spAttachmentType type;
 	const char* name = readString(input);
@@ -692,8 +692,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 			spAttachment* attachment;
 			spRegionAttachment* region;
 			if (!path) MALLOC_STR(path, name);
-			attachment = spAttachmentLoader_createAttachment(
-					self->attachmentLoader, skin, type, name, path);
+			attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path);
 			region = SUB_CAST(spRegionAttachment, attachment);
 			region->path = path;
 			region->rotation = readFloat(input);
@@ -711,8 +710,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 		}
 		case SP_ATTACHMENT_BOUNDING_BOX: {
 			int vertexCount = readVarint(input, 1);
-			spAttachment* attachment = spAttachmentLoader_createAttachment(
-					self->attachmentLoader, skin, type, name, 0);
+			spAttachment* attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
 			_readVertices(self, input, SUB_CAST(spVertexAttachment, attachment), vertexCount);
 			if (nonessential) readInt(input); /* Skip color. */
 			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
@@ -771,8 +769,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 			return attachment;
 		}
 		case SP_ATTACHMENT_PATH: {
-			spAttachment* attachment = spAttachmentLoader_createAttachment(
-					self->attachmentLoader, skin, type, name, 0);
+			spAttachment* attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
 			spPathAttachment* path = SUB_CAST(spPathAttachment, attachment);
 			int vertexCount = 0;
 			path->closed = readBoolean(input);
@@ -800,6 +797,18 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 			}
 			return attachment;
 		}
+		case SP_ATTACHMENT_CLIPPING: {
+			int endSlotIndex = readVarint(input, 1);
+			int vertexCount = readVarint(input, 1);
+			spAttachment* attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
+			spClippingAttachment* clip = SUB_CAST(spClippingAttachment, attachment);
+			_readVertices(self, input, SUB_CAST(spVertexAttachment, attachment), vertexCount);
+			if (nonessential) readInt(input); /* Skip color. */
+			clip->endSlot = skeletonData->slots[endSlotIndex];
+			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+			if (freeName) FREE(name);
+			return attachment;
+		}
 	}
 
 	if (freeName) FREE(name);
@@ -807,7 +816,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 }
 
 spSkin* spSkeletonBinary_readSkin(spSkeletonBinary* self, _dataInput* input,
-		const char* skinName, int/*bool*/ nonessential) {
+		const char* skinName, spSkeletonData* skeletonData, int/*bool*/ nonessential) {
 	spSkin* skin;
 	int slotCount = readVarint(input, 1);
 	int i, ii, nn;
@@ -818,7 +827,7 @@ spSkin* spSkeletonBinary_readSkin(spSkeletonBinary* self, _dataInput* input,
 		int slotIndex = readVarint(input, 1);
 		for (ii = 0, nn = readVarint(input, 1); ii < nn; ++ii) {
 			const char* name = readString(input);
-			spAttachment* attachment = spSkeletonBinary_readAttachment(self, input, skin, slotIndex, name, nonessential);
+			spAttachment* attachment = spSkeletonBinary_readAttachment(self, input, skin, slotIndex, name, skeletonData, nonessential);
 			if (attachment) spSkin_addAttachment(skin, slotIndex, name, attachment);
 			FREE(name);
 		}
@@ -1010,7 +1019,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 	}
 
 	/* Default skin. */
-	skeletonData->defaultSkin = spSkeletonBinary_readSkin(self, input, "default", nonessential);
+	skeletonData->defaultSkin = spSkeletonBinary_readSkin(self, input, "default", skeletonData, nonessential);
 	skeletonData->skinsCount = readVarint(input, 1);
 
 	if (skeletonData->defaultSkin)
@@ -1025,7 +1034,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 	for (i = skeletonData->defaultSkin ? 1 : 0; i < skeletonData->skinsCount; ++i) {
 		const char* skinName = readString(input);
 		/* TODO Avoid copying of skinName */
-		skeletonData->skins[i] = spSkeletonBinary_readSkin(self, input, skinName, nonessential);
+		skeletonData->skins[i] = spSkeletonBinary_readSkin(self, input, skinName, skeletonData, nonessential);
 		FREE(skinName);
 	}
 

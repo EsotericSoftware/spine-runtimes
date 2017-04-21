@@ -28,33 +28,32 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SPINE_SPINE_H_
-#define SPINE_SPINE_H_
+#ifndef SPINE_CLIPPINGATTACHMENT_H_
+#define SPINE_CLIPPINGATTACHMENT_H_
 
-#include <spine/Animation.h>
-#include <spine/AnimationState.h>
-#include <spine/AnimationStateData.h>
-#include <spine/Atlas.h>
-#include <spine/AtlasAttachmentLoader.h>
 #include <spine/Attachment.h>
-#include <spine/AttachmentLoader.h>
-#include <spine/Bone.h>
-#include <spine/BoneData.h>
-#include <spine/RegionAttachment.h>
 #include <spine/VertexAttachment.h>
-#include <spine/MeshAttachment.h>
-#include <spine/BoundingBoxAttachment.h>
-#include <spine/ClippingAttachment.h>
-#include <spine/PointAttachment.h>
-#include <spine/Skeleton.h>
-#include <spine/SkeletonBounds.h>
-#include <spine/SkeletonData.h>
-#include <spine/SkeletonBinary.h>
-#include <spine/SkeletonJson.h>
-#include <spine/Skin.h>
+#include <spine/Atlas.h>
 #include <spine/Slot.h>
-#include <spine/SlotData.h>
-#include <spine/Event.h>
-#include <spine/EventData.h>
 
-#endif /* SPINE_SPINE_H_ */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct spClippingAttachment {
+	spVertexAttachment super;
+	spSlotData* endSlot;
+} spClippingAttachment;
+
+spClippingAttachment* spClippingAttachment_create (const char* name);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spClippingAttachment ClippingAttachment;
+#define ClippingAttachment_create(...) spClippingAttachment_create(__VA_ARGS__)
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* SPINE_CLIPPINGATTACHMENT_H_ */

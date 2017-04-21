@@ -325,6 +325,36 @@ void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
 	}
 }
 
+void coin (SkeletonData* skeletonData, Atlas* atlas) {
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+
+	Skeleton* skeleton = drawable->skeleton;
+	skeleton->x = 320;
+	skeleton->y = 590;
+	Skeleton_updateWorldTransform(skeleton);
+
+	AnimationState_setAnimationByName(drawable->state, 0, "rotate", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - vine");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable->update(delta);
+
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+}
+
 /**
  * Used for debugging purposes during runtime development
  */
@@ -354,11 +384,12 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 
 int main () {
 	testcase(test, "data/tank.json", "data/tank.skel", "data/tank.atlas", 1.0f);
-	testcase(vine, "data/vine.json", "data/vine.skel", "data/vine.atlas", 0.5f);
+	testcase(coin, "data/coin.json", "data/coin.skel", "data/coin.atlas", 0.5f);
+	/*testcase(vine, "data/vine.json", "data/vine.skel", "data/vine.atlas", 0.5f);
 	testcase(tank, "data/tank.json", "data/tank.skel", "data/tank.atlas", 0.2f);
 	testcase(raptor, "data/raptor.json", "data/raptor.skel", "data/raptor.atlas", 0.5f);
 	testcase(spineboy, "data/spineboy.json", "data/spineboy.skel", "data/spineboy.atlas", 0.6f);
 	testcase(goblins, "data/goblins-mesh.json", "data/goblins-mesh.skel", "data/goblins.atlas", 1.4f);
-	testcase(stretchyman, "data/stretchyman.json", "data/stretchyman.skel", "data/stretchyman.atlas", 0.6f);
+	testcase(stretchyman, "data/stretchyman.json", "data/stretchyman.skel", "data/stretchyman.atlas", 0.6f);*/
 	return 0;
 }

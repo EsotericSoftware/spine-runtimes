@@ -198,7 +198,7 @@ static void _addAfterPosition (float p, float* temp, int i, float* out, int o) {
 	out[o + 2] = r;
 }
 
-// Need to pass 0 as an argument, so VC++ doesn't error with C2124
+/* Need to pass 0 as an argument, so VC++ doesn't error with C2124 */
 static int _isNan(float value, float zero) {
 	float _nan =  (float)0.0 / zero;
 	return 0 == memcmp((void*)&value, (void*)&_nan, sizeof(value));
