@@ -37,7 +37,7 @@ import com.esotericsoftware.spine.Slot;
 import com.esotericsoftware.spine.attachments.ClippingAttachment;
 
 public class SkeletonClipping {
-	private final ConvexDecomposer decomposer = new ConvexDecomposer();
+	private final Triangulator triangulator = new Triangulator();
 	private final FloatArray clippingPolygon = new FloatArray();
 	private final FloatArray clipOutput = new FloatArray(128);
 	private final FloatArray clippedVertices = new FloatArray(128);
@@ -55,7 +55,7 @@ public class SkeletonClipping {
 		float[] vertices = clippingPolygon.setSize(n);
 		clip.computeWorldVertices(slot, 0, n, vertices, 0, 2);
 		makeClockwise(clippingPolygon);
-		clippingPolygons = decomposer.decompose(clippingPolygon);
+		clippingPolygons = triangulator.decompose(clippingPolygon, triangulator.triangulate(clippingPolygon));
 		for (FloatArray polygon : clippingPolygons) {
 			makeClockwise(polygon);
 			polygon.add(polygon.items[0]);

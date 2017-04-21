@@ -36,7 +36,7 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.ShortArray;
 
-class ConvexDecomposer {
+class Triangulator {
 	private final Array<FloatArray> convexPolygons = new Array();
 	private final Array<ShortArray> convexPolygonsIndices = new Array();
 
@@ -56,9 +56,9 @@ class ConvexDecomposer {
 		}
 	};
 
-	public Array<FloatArray> decompose (FloatArray input) {
-		float[] vertices = input.items;
-		int vertexCount = input.size >> 1;
+	public ShortArray triangulate (FloatArray verticesArray) {
+		float[] vertices = verticesArray.items;
+		int vertexCount = verticesArray.size >> 1;
 
 		ShortArray indicesArray = this.indicesArray;
 		indicesArray.clear();
@@ -130,6 +130,12 @@ class ConvexDecomposer {
 			triangles.add(indices[0]);
 			triangles.add(indices[1]);
 		}
+
+		return triangles;
+	}
+
+	public Array<FloatArray> decompose (FloatArray verticesArray, ShortArray triangles) {
+		float[] vertices = verticesArray.items;
 
 		Array<FloatArray> convexPolygons = this.convexPolygons;
 		polygonPool.freeAll(convexPolygons);
