@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 package spine {
-	public class ConvexDecomposer {
+	public class Triangulator {
 		private var convexPolygons : Vector.<Vector.<Number>> = new Vector.<Vector.<Number>>();
 		private var convexPolygonsIndices : Vector.<Vector.<int>> = new Vector.<Vector.<int>>();
 		private var indicesArray : Vector.<int> = new Vector.<int>();
@@ -41,12 +41,12 @@ package spine {
 			return new Vector.<int>();
 		});
 		
-		public function ConvexDecomposer () {			
+		public function Triangulator () {			
 		}
-
-		public function decompose(input : Vector.<Number>) : Vector.<Vector.<Number>> {
-			var vertices : Vector.<Number> = input;
-			var vertexCount : int = input.length >> 1;
+		
+		public function triangulate(verticesArray : Vector.<Number>) : Vector.<int> {
+			var vertices : Vector.<Number> = verticesArray;
+			var vertexCount : int = verticesArray.length >> 1;
 			var i : int, n : int;
 
 			var indices : Vector.<int> = this.indicesArray;
@@ -118,8 +118,14 @@ package spine {
 				triangles.push(indices[0]);
 				triangles.push(indices[1]);
 			}
+			
+			return triangles;
+		}
 
+		public function decompose(verticesArray : Vector.<Number>, triangles : Vector.<int>) : Vector.<Vector.<Number>> {
+			var vertices : Vector.<Number> = verticesArray;
 			var convexPolygons : Vector.<Vector.<Number>> = this.convexPolygons;
+			var i : int, n : int;
 			for (i = 0, n = convexPolygons.length; i < n; i++) {
 				this.polygonPool.free(convexPolygons[i]);
 			}
@@ -154,8 +160,8 @@ package spine {
 				var merged : Boolean = false;
 				if (fanBaseIndex == t1) {
 					o = polygon.length - 4;
-					winding1 = ConvexDecomposer.winding(polygon[o], polygon[o + 1], polygon[o + 2], polygon[o + 3], x3, y3);
-					winding2 = ConvexDecomposer.winding(x3, y3, polygon[0], polygon[1], polygon[2], polygon[3]);
+					winding1 = Triangulator.winding(polygon[o], polygon[o + 1], polygon[o + 2], polygon[o + 3], x3, y3);
+					winding2 = Triangulator.winding(x3, y3, polygon[0], polygon[1], polygon[2], polygon[3]);
 					if (winding1 == lastWinding && winding2 == lastWinding) {
 						polygon.push(x3);
 						polygon.push(y3);
@@ -183,7 +189,7 @@ package spine {
 					polygonIndices.push(t1);
 					polygonIndices.push(t2);
 					polygonIndices.push(t3);
-					lastWinding = ConvexDecomposer.winding(x1, y1, x2, y2, x3, y3);
+					lastWinding = Triangulator.winding(x1, y1, x2, y2, x3, y3);
 					fanBaseIndex = t1;
 				}
 			}
@@ -206,9 +212,9 @@ package spine {
 				var prevX : Number = polygon[o + 2], prevY : Number = polygon[o + 3];
 				var firstX : Number = polygon[0], firstY : Number = polygon[1];
 				var secondX : Number = polygon[2], secondY : Number = polygon[3];
-				var currWinding : int = ConvexDecomposer.winding(prevPrevX, prevPrevY, prevX, prevY, firstX, firstY);
+				var currWinding : int = Triangulator.winding(prevPrevX, prevPrevY, prevX, prevY, firstX, firstY);
 
-				for (ii = 0; ii < n; ii++) {
+				for (var ii : int = 0; ii < n; ii++) {
 					if (ii == i) continue;
 					var otherIndices : Vector.<int>= convexPolygonsIndices[ii];
 					if (otherIndices.length != 3) continue;
@@ -221,8 +227,8 @@ package spine {
 					y3 = otherPoly[otherPoly.length - 1];
 
 					if (otherFirstIndex != firstIndex || otherSecondIndex != lastIndex) continue;
-					winding1 = ConvexDecomposer.winding(prevPrevX, prevPrevY, prevX, prevY, x3, y3);
-					winding2 = ConvexDecomposer.winding(x3, y3, firstX, firstY, secondX, secondY);
+					winding1 = Triangulator.winding(prevPrevX, prevPrevY, prevX, prevY, x3, y3);
+					winding2 = Triangulator.winding(x3, y3, firstX, firstY, secondX, secondY);
 					if (winding1 == currWinding && winding2 == currWinding) {
 						otherPoly.length = 0;
 						otherIndices.length = 0;

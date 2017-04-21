@@ -32,7 +32,7 @@ package spine {
 	import spine.attachments.ClippingAttachment;
 	
 	public class SkeletonClipping {
-		private var decomposer : ConvexDecomposer = new ConvexDecomposer();
+		private var triangulator : Triangulator = new Triangulator();
 		private var clippingPolygon : Vector.<Number> = new Vector.<Number>();
 		private var clipOutput : Vector.<Number> = new Vector.<Number>();
 		public var clippedVertices : Vector.<Number> = new Vector.<Number>();
@@ -46,8 +46,8 @@ package spine {
 		public function SkeletonClipping () {
 		}
 
-		public function clipStart (slot: Slot, clip: ClippingAttachment) : void {
-			if (this.clipAttachment != null) return;
+		public function clipStart (slot: Slot, clip: ClippingAttachment) : int {
+			if (this.clipAttachment != null) return 0;
 			this.clipAttachment = clip;
 
 			var i : int, n : int = clip.worldVerticesLength;			
@@ -56,13 +56,15 @@ package spine {
 			clip.computeWorldVertices(slot, 0, n, vertices, 0, 2);
 			var clippingPolygon : Vector.<Number> = this.clippingPolygon;
 			SkeletonClipping.makeClockwise(clippingPolygon);
-			var clippingPolygons : Vector.<Vector.<Number>> = this.clippingPolygons = this.decomposer.decompose(clippingPolygon);
+			var clippingPolygons : Vector.<Vector.<Number>> = this.clippingPolygons = this.triangulator.decompose(clippingPolygon, triangulator.triangulate(clippingPolygon));
 			for (i = 0, n = clippingPolygons.length; i < n; i++) {
 				var polygon : Vector.<Number> = clippingPolygons[i];
 				SkeletonClipping.makeClockwise(polygon);
 				polygon.push(polygon[0]);
 				polygon.push(polygon[1]);
 			}
+			
+			return clippingPolygons.length;
 		}
 
 		public function clipEndWithSlot (slot: Slot) : void {

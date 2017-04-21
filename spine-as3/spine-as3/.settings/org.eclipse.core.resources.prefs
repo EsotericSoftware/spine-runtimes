@@ -1,7 +1,7 @@
 eclipse.preferences.version=1
-encoding//src/spine/ConvexDecomposer.as=UTF-8
 encoding//src/spine/SkeletonClipping.as=UTF-8
 encoding//src/spine/SkeletonJson.as=UTF-8
+encoding//src/spine/Triangulator.as=UTF-8
 encoding//src/spine/animation/TwoColorTimeline.as=UTF-8
 encoding//src/spine/attachments/ClippingAttachment.as=UTF-8
 encoding//src/spine/attachments/PointAttachment.as=UTF-8
