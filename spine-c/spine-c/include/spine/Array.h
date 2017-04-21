@@ -69,7 +69,7 @@ extern "C" {
 			self->capacity = MAX(8, (int)(self->size * 1.75f)); \
 			self->items = REALLOC(self->items, itemType, self->capacity); \
 		} \
-    } \
+	} \
 	void name##_ensureCapacity(name* self, int newCapacity) { \
 		if (self->capacity >= newCapacity) return; \
 		self->capacity = newCapacity; \
@@ -81,12 +81,12 @@ extern "C" {
             self->items = REALLOC(self->items, itemType, self->capacity); \
 		} \
 		self->items[self->size++] = value; \
-    } \
+	} \
 	void name##_removeAt(name* self, int index) { \
 		self->size--; \
 		memmove(self->items + index, self->items + index + 1, sizeof(itemType) * (self->size - index)); \
 		self->items[self->size] = 0; \
-    } \
+	} \
 	int name##_contains(name* self, itemType value) { \
 		itemType* items = self->items; \
 		int i, n; \
