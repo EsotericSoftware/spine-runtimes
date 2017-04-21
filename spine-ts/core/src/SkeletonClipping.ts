@@ -30,7 +30,7 @@
 
 module spine {
 	export class SkeletonClipping {
-		private decomposer = new ConvexDecomposer();
+		private triangulator = new Triangulator();
 		private clippingPolygon = new Array<number>();
 		private clipOutput = new Array<number>();
 		clippedVertices = new Array<number>();
@@ -40,8 +40,8 @@ module spine {
 		private clipAttachment: ClippingAttachment;
 		private clippingPolygons: Array<Array<number>>;
 
-		clipStart (slot: Slot, clip: ClippingAttachment) {
-			if (this.clipAttachment != null) return;
+		clipStart (slot: Slot, clip: ClippingAttachment): number {
+			if (this.clipAttachment != null) return 0;
 			this.clipAttachment = clip;
 
 			let n = clip.worldVerticesLength;
@@ -49,13 +49,15 @@ module spine {
 			clip.computeWorldVertices(slot, 0, n, vertices, 0, 2);
 			let clippingPolygon = this.clippingPolygon;
 			SkeletonClipping.makeClockwise(clippingPolygon);
-			let clippingPolygons = this.clippingPolygons = this.decomposer.decompose(clippingPolygon);
+			let clippingPolygons = this.clippingPolygons = this.triangulator.decompose(clippingPolygon, this.triangulator.triangulate(clippingPolygon));
 			for (let i = 0, n = clippingPolygons.length; i < n; i++) {
 				let polygon = clippingPolygons[i];
 				SkeletonClipping.makeClockwise(polygon);
 				polygon.push(polygon[0]);
 				polygon.push(polygon[1]);
 			}
+
+			return clippingPolygons.length;
 		}
 
 		clipEndWithSlot (slot: Slot) {

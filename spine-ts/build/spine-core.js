@@ -2251,207 +2251,6 @@ var spine;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
-	var ConvexDecomposer = (function () {
-		function ConvexDecomposer() {
-			this.convexPolygons = new Array();
-			this.convexPolygonsIndices = new Array();
-			this.indicesArray = new Array();
-			this.isConcaveArray = new Array();
-			this.triangles = new Array();
-			this.polygonPool = new spine.Pool(function () {
-				return new Array();
-			});
-			this.polygonIndicesPool = new spine.Pool(function () {
-				return new Array();
-			});
-		}
-		ConvexDecomposer.prototype.decompose = function (input) {
-			var vertices = input;
-			var vertexCount = input.length >> 1;
-			var indices = this.indicesArray;
-			indices.length = 0;
-			for (var i = 0; i < vertexCount; i++)
-				indices[i] = i;
-			var isConcave = this.isConcaveArray;
-			isConcave.length = 0;
-			for (var i = 0, n = vertexCount; i < n; ++i)
-				isConcave[i] = ConvexDecomposer.isConcave(i, vertexCount, vertices, indices);
-			var triangles = this.triangles;
-			triangles.length = 0;
-			while (vertexCount > 3) {
-				var previous = vertexCount - 1, i = 0, next = 1;
-				while (true) {
-					outer: if (!isConcave[i]) {
-						var p1 = indices[previous] << 1, p2 = indices[i] << 1, p3 = indices[next] << 1;
-						var p1x = vertices[p1], p1y = vertices[p1 + 1];
-						var p2x = vertices[p2], p2y = vertices[p2 + 1];
-						var p3x = vertices[p3], p3y = vertices[p3 + 1];
-						for (var ii = (next + 1) % vertexCount; ii != previous; ii = (ii + 1) % vertexCount) {
-							if (!isConcave[ii])
-								continue;
-							var v = indices[ii] << 1;
-							var vx = vertices[v], vy = vertices[v + 1];
-							if (ConvexDecomposer.positiveArea(p3x, p3y, p1x, p1y, vx, vy)) {
-								if (ConvexDecomposer.positiveArea(p1x, p1y, p2x, p2y, vx, vy)) {
-									if (ConvexDecomposer.positiveArea(p2x, p2y, p3x, p3y, vx, vy))
-										break outer;
-								}
-							}
-						}
-						break;
-					}
-					if (next == 0) {
-						do {
-							if (!isConcave[i])
-								break;
-							i--;
-						} while (i > 0);
-						break;
-					}
-					previous = i;
-					i = next;
-					next = (next + 1) % vertexCount;
-				}
-				triangles.push(indices[(vertexCount + i - 1) % vertexCount]);
-				triangles.push(indices[i]);
-				triangles.push(indices[(i + 1) % vertexCount]);
-				indices.splice(i, 1);
-				isConcave.splice(i, 1);
-				vertexCount--;
-				var previousIndex = (vertexCount + i - 1) % vertexCount;
-				var nextIndex = i == vertexCount ? 0 : i;
-				isConcave[previousIndex] = ConvexDecomposer.isConcave(previousIndex, vertexCount, vertices, indices);
-				isConcave[nextIndex] = ConvexDecomposer.isConcave(nextIndex, vertexCount, vertices, indices);
-			}
-			if (vertexCount == 3) {
-				triangles.push(indices[2]);
-				triangles.push(indices[0]);
-				triangles.push(indices[1]);
-			}
-			var convexPolygons = this.convexPolygons;
-			this.polygonPool.freeAll(convexPolygons);
-			convexPolygons.length = 0;
-			var convexPolygonsIndices = this.convexPolygonsIndices;
-			this.polygonIndicesPool.freeAll(convexPolygonsIndices);
-			convexPolygonsIndices.length = 0;
-			var polygonIndices = this.polygonIndicesPool.obtain();
-			polygonIndices.length = 0;
-			var polygon = this.polygonPool.obtain();
-			polygon.length = 0;
-			var fanBaseIndex = -1, lastWinding = 0;
-			for (var i = 0, n = triangles.length; i < n; i += 3) {
-				var t1 = triangles[i] << 1, t2 = triangles[i + 1] << 1, t3 = triangles[i + 2] << 1;
-				var x1 = vertices[t1], y1 = vertices[t1 + 1];
-				var x2 = vertices[t2], y2 = vertices[t2 + 1];
-				var x3 = vertices[t3], y3 = vertices[t3 + 1];
-				var merged = false;
-				if (fanBaseIndex == t1) {
-					var o = polygon.length - 4;
-					var winding1 = ConvexDecomposer.winding(polygon[o], polygon[o + 1], polygon[o + 2], polygon[o + 3], x3, y3);
-					var winding2 = ConvexDecomposer.winding(x3, y3, polygon[0], polygon[1], polygon[2], polygon[3]);
-					if (winding1 == lastWinding && winding2 == lastWinding) {
-						polygon.push(x3);
-						polygon.push(y3);
-						polygonIndices.push(t3);
-						merged = true;
-					}
-				}
-				if (!merged) {
-					if (polygon.length > 0) {
-						convexPolygons.push(polygon);
-						convexPolygonsIndices.push(polygonIndices);
-					}
-					polygon = this.polygonPool.obtain();
-					polygon.length = 0;
-					polygon.push(x1);
-					polygon.push(y1);
-					polygon.push(x2);
-					polygon.push(y2);
-					polygon.push(x3);
-					polygon.push(y3);
-					polygonIndices = this.polygonIndicesPool.obtain();
-					polygonIndices.length = 0;
-					polygonIndices.push(t1);
-					polygonIndices.push(t2);
-					polygonIndices.push(t3);
-					lastWinding = ConvexDecomposer.winding(x1, y1, x2, y2, x3, y3);
-					fanBaseIndex = t1;
-				}
-			}
-			if (polygon.length > 0) {
-				convexPolygons.push(polygon);
-				convexPolygonsIndices.push(polygonIndices);
-			}
-			for (var i = 0, n = convexPolygons.length; i < n; i++) {
-				polygonIndices = convexPolygonsIndices[i];
-				if (polygonIndices.length == 0)
-					continue;
-				var firstIndex = polygonIndices[0];
-				var lastIndex = polygonIndices[polygonIndices.length - 1];
-				polygon = convexPolygons[i];
-				var o = polygon.length - 4;
-				var prevPrevX = polygon[o], prevPrevY = polygon[o + 1];
-				var prevX = polygon[o + 2], prevY = polygon[o + 3];
-				var firstX = polygon[0], firstY = polygon[1];
-				var secondX = polygon[2], secondY = polygon[3];
-				var winding = ConvexDecomposer.winding(prevPrevX, prevPrevY, prevX, prevY, firstX, firstY);
-				for (var ii = 0; ii < n; ii++) {
-					if (ii == i)
-						continue;
-					var otherIndices = convexPolygonsIndices[ii];
-					if (otherIndices.length != 3)
-						continue;
-					var otherFirstIndex = otherIndices[0];
-					var otherSecondIndex = otherIndices[1];
-					var otherLastIndex = otherIndices[2];
-					var otherPoly = convexPolygons[ii];
-					var x3 = otherPoly[otherPoly.length - 2], y3 = otherPoly[otherPoly.length - 1];
-					if (otherFirstIndex != firstIndex || otherSecondIndex != lastIndex)
-						continue;
-					var winding1 = ConvexDecomposer.winding(prevPrevX, prevPrevY, prevX, prevY, x3, y3);
-					var winding2 = ConvexDecomposer.winding(x3, y3, firstX, firstY, secondX, secondY);
-					if (winding1 == winding && winding2 == winding) {
-						otherPoly.length = 0;
-						otherIndices.length = 0;
-						polygon.push(x3);
-						polygon.push(y3);
-						polygonIndices.push(otherLastIndex);
-						prevPrevX = prevX;
-						prevPrevY = prevY;
-						prevX = x3;
-						prevY = y3;
-						ii = 0;
-					}
-				}
-			}
-			for (var i = convexPolygons.length - 1; i >= 0; i--) {
-				polygon = convexPolygons[i];
-				if (polygon.length == 0) {
-					convexPolygons.splice(i, 1);
-					this.polygonPool.free(polygon);
-				}
-			}
-			return convexPolygons;
-		};
-		ConvexDecomposer.isConcave = function (index, vertexCount, vertices, indices) {
-			var previous = indices[(vertexCount + index - 1) % vertexCount] << 1;
-			var current = indices[index] << 1;
-			var next = indices[(index + 1) % vertexCount] << 1;
-			return !this.positiveArea(vertices[previous], vertices[previous + 1], vertices[current], vertices[current + 1], vertices[next], vertices[next + 1]);
-		};
-		ConvexDecomposer.positiveArea = function (p1x, p1y, p2x, p2y, p3x, p3y) {
-			return p1x * (p3y - p2y) + p2x * (p1y - p3y) + p3x * (p2y - p1y) >= 0;
-		};
-		ConvexDecomposer.winding = function (p1x, p1y, p2x, p2y, p3x, p3y) {
-			var px = p2x - p1x, py = p2y - p1y;
-			return p3x * py - p3y * px + px * p1y - p1x * py >= 0 ? 1 : -1;
-		};
-		return ConvexDecomposer;
-	}());
-	spine.ConvexDecomposer = ConvexDecomposer;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
 	var Event = (function () {
 		function Event(time, data) {
 			if (data == null)
@@ -3822,7 +3621,7 @@ var spine;
 (function (spine) {
 	var SkeletonClipping = (function () {
 		function SkeletonClipping() {
-			this.decomposer = new spine.ConvexDecomposer();
+			this.triangulator = new spine.Triangulator();
 			this.clippingPolygon = new Array();
 			this.clipOutput = new Array();
 			this.clippedVertices = new Array();
@@ -3831,20 +3630,21 @@ var spine;
 		}
 		SkeletonClipping.prototype.clipStart = function (slot, clip) {
 			if (this.clipAttachment != null)
-				return;
+				return 0;
 			this.clipAttachment = clip;
 			var n = clip.worldVerticesLength;
 			var vertices = spine.Utils.setArraySize(this.clippingPolygon, n);
 			clip.computeWorldVertices(slot, 0, n, vertices, 0, 2);
 			var clippingPolygon = this.clippingPolygon;
 			SkeletonClipping.makeClockwise(clippingPolygon);
-			var clippingPolygons = this.clippingPolygons = this.decomposer.decompose(clippingPolygon);
+			var clippingPolygons = this.clippingPolygons = this.triangulator.decompose(clippingPolygon, this.triangulator.triangulate(clippingPolygon));
 			for (var i = 0, n_1 = clippingPolygons.length; i < n_1; i++) {
 				var polygon = clippingPolygons[i];
 				SkeletonClipping.makeClockwise(polygon);
 				polygon.push(polygon[0]);
 				polygon.push(polygon[1]);
 			}
+			return clippingPolygons.length;
 		};
 		SkeletonClipping.prototype.clipEndWithSlot = function (slot) {
 			if (this.clipAttachment != null && this.clipAttachment.endSlot == slot.data)
@@ -5543,6 +5343,211 @@ var spine;
 		return TransformConstraintData;
 	}());
 	spine.TransformConstraintData = TransformConstraintData;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var Triangulator = (function () {
+		function Triangulator() {
+			this.convexPolygons = new Array();
+			this.convexPolygonsIndices = new Array();
+			this.indicesArray = new Array();
+			this.isConcaveArray = new Array();
+			this.triangles = new Array();
+			this.polygonPool = new spine.Pool(function () {
+				return new Array();
+			});
+			this.polygonIndicesPool = new spine.Pool(function () {
+				return new Array();
+			});
+		}
+		Triangulator.prototype.triangulate = function (verticesArray) {
+			var vertices = verticesArray;
+			var vertexCount = verticesArray.length >> 1;
+			var indices = this.indicesArray;
+			indices.length = 0;
+			for (var i = 0; i < vertexCount; i++)
+				indices[i] = i;
+			var isConcave = this.isConcaveArray;
+			isConcave.length = 0;
+			for (var i = 0, n = vertexCount; i < n; ++i)
+				isConcave[i] = Triangulator.isConcave(i, vertexCount, vertices, indices);
+			var triangles = this.triangles;
+			triangles.length = 0;
+			while (vertexCount > 3) {
+				var previous = vertexCount - 1, i = 0, next = 1;
+				while (true) {
+					outer: if (!isConcave[i]) {
+						var p1 = indices[previous] << 1, p2 = indices[i] << 1, p3 = indices[next] << 1;
+						var p1x = vertices[p1], p1y = vertices[p1 + 1];
+						var p2x = vertices[p2], p2y = vertices[p2 + 1];
+						var p3x = vertices[p3], p3y = vertices[p3 + 1];
+						for (var ii = (next + 1) % vertexCount; ii != previous; ii = (ii + 1) % vertexCount) {
+							if (!isConcave[ii])
+								continue;
+							var v = indices[ii] << 1;
+							var vx = vertices[v], vy = vertices[v + 1];
+							if (Triangulator.positiveArea(p3x, p3y, p1x, p1y, vx, vy)) {
+								if (Triangulator.positiveArea(p1x, p1y, p2x, p2y, vx, vy)) {
+									if (Triangulator.positiveArea(p2x, p2y, p3x, p3y, vx, vy))
+										break outer;
+								}
+							}
+						}
+						break;
+					}
+					if (next == 0) {
+						do {
+							if (!isConcave[i])
+								break;
+							i--;
+						} while (i > 0);
+						break;
+					}
+					previous = i;
+					i = next;
+					next = (next + 1) % vertexCount;
+				}
+				triangles.push(indices[(vertexCount + i - 1) % vertexCount]);
+				triangles.push(indices[i]);
+				triangles.push(indices[(i + 1) % vertexCount]);
+				indices.splice(i, 1);
+				isConcave.splice(i, 1);
+				vertexCount--;
+				var previousIndex = (vertexCount + i - 1) % vertexCount;
+				var nextIndex = i == vertexCount ? 0 : i;
+				isConcave[previousIndex] = Triangulator.isConcave(previousIndex, vertexCount, vertices, indices);
+				isConcave[nextIndex] = Triangulator.isConcave(nextIndex, vertexCount, vertices, indices);
+			}
+			if (vertexCount == 3) {
+				triangles.push(indices[2]);
+				triangles.push(indices[0]);
+				triangles.push(indices[1]);
+			}
+			return triangles;
+		};
+		Triangulator.prototype.decompose = function (verticesArray, triangles) {
+			var vertices = verticesArray;
+			var convexPolygons = this.convexPolygons;
+			this.polygonPool.freeAll(convexPolygons);
+			convexPolygons.length = 0;
+			var convexPolygonsIndices = this.convexPolygonsIndices;
+			this.polygonIndicesPool.freeAll(convexPolygonsIndices);
+			convexPolygonsIndices.length = 0;
+			var polygonIndices = this.polygonIndicesPool.obtain();
+			polygonIndices.length = 0;
+			var polygon = this.polygonPool.obtain();
+			polygon.length = 0;
+			var fanBaseIndex = -1, lastWinding = 0;
+			for (var i = 0, n = triangles.length; i < n; i += 3) {
+				var t1 = triangles[i] << 1, t2 = triangles[i + 1] << 1, t3 = triangles[i + 2] << 1;
+				var x1 = vertices[t1], y1 = vertices[t1 + 1];
+				var x2 = vertices[t2], y2 = vertices[t2 + 1];
+				var x3 = vertices[t3], y3 = vertices[t3 + 1];
+				var merged = false;
+				if (fanBaseIndex == t1) {
+					var o = polygon.length - 4;
+					var winding1 = Triangulator.winding(polygon[o], polygon[o + 1], polygon[o + 2], polygon[o + 3], x3, y3);
+					var winding2 = Triangulator.winding(x3, y3, polygon[0], polygon[1], polygon[2], polygon[3]);
+					if (winding1 == lastWinding && winding2 == lastWinding) {
+						polygon.push(x3);
+						polygon.push(y3);
+						polygonIndices.push(t3);
+						merged = true;
+					}
+				}
+				if (!merged) {
+					if (polygon.length > 0) {
+						convexPolygons.push(polygon);
+						convexPolygonsIndices.push(polygonIndices);
+					}
+					polygon = this.polygonPool.obtain();
+					polygon.length = 0;
+					polygon.push(x1);
+					polygon.push(y1);
+					polygon.push(x2);
+					polygon.push(y2);
+					polygon.push(x3);
+					polygon.push(y3);
+					polygonIndices = this.polygonIndicesPool.obtain();
+					polygonIndices.length = 0;
+					polygonIndices.push(t1);
+					polygonIndices.push(t2);
+					polygonIndices.push(t3);
+					lastWinding = Triangulator.winding(x1, y1, x2, y2, x3, y3);
+					fanBaseIndex = t1;
+				}
+			}
+			if (polygon.length > 0) {
+				convexPolygons.push(polygon);
+				convexPolygonsIndices.push(polygonIndices);
+			}
+			for (var i = 0, n = convexPolygons.length; i < n; i++) {
+				polygonIndices = convexPolygonsIndices[i];
+				if (polygonIndices.length == 0)
+					continue;
+				var firstIndex = polygonIndices[0];
+				var lastIndex = polygonIndices[polygonIndices.length - 1];
+				polygon = convexPolygons[i];
+				var o = polygon.length - 4;
+				var prevPrevX = polygon[o], prevPrevY = polygon[o + 1];
+				var prevX = polygon[o + 2], prevY = polygon[o + 3];
+				var firstX = polygon[0], firstY = polygon[1];
+				var secondX = polygon[2], secondY = polygon[3];
+				var winding = Triangulator.winding(prevPrevX, prevPrevY, prevX, prevY, firstX, firstY);
+				for (var ii = 0; ii < n; ii++) {
+					if (ii == i)
+						continue;
+					var otherIndices = convexPolygonsIndices[ii];
+					if (otherIndices.length != 3)
+						continue;
+					var otherFirstIndex = otherIndices[0];
+					var otherSecondIndex = otherIndices[1];
+					var otherLastIndex = otherIndices[2];
+					var otherPoly = convexPolygons[ii];
+					var x3 = otherPoly[otherPoly.length - 2], y3 = otherPoly[otherPoly.length - 1];
+					if (otherFirstIndex != firstIndex || otherSecondIndex != lastIndex)
+						continue;
+					var winding1 = Triangulator.winding(prevPrevX, prevPrevY, prevX, prevY, x3, y3);
+					var winding2 = Triangulator.winding(x3, y3, firstX, firstY, secondX, secondY);
+					if (winding1 == winding && winding2 == winding) {
+						otherPoly.length = 0;
+						otherIndices.length = 0;
+						polygon.push(x3);
+						polygon.push(y3);
+						polygonIndices.push(otherLastIndex);
+						prevPrevX = prevX;
+						prevPrevY = prevY;
+						prevX = x3;
+						prevY = y3;
+						ii = 0;
+					}
+				}
+			}
+			for (var i = convexPolygons.length - 1; i >= 0; i--) {
+				polygon = convexPolygons[i];
+				if (polygon.length == 0) {
+					convexPolygons.splice(i, 1);
+					this.polygonPool.free(polygon);
+				}
+			}
+			return convexPolygons;
+		};
+		Triangulator.isConcave = function (index, vertexCount, vertices, indices) {
+			var previous = indices[(vertexCount + index - 1) % vertexCount] << 1;
+			var current = indices[index] << 1;
+			var next = indices[(index + 1) % vertexCount] << 1;
+			return !this.positiveArea(vertices[previous], vertices[previous + 1], vertices[current], vertices[current + 1], vertices[next], vertices[next + 1]);
+		};
+		Triangulator.positiveArea = function (p1x, p1y, p2x, p2y, p3x, p3y) {
+			return p1x * (p3y - p2y) + p2x * (p1y - p3y) + p3x * (p2y - p1y) >= 0;
+		};
+		Triangulator.winding = function (p1x, p1y, p2x, p2y, p3x, p3y) {
+			var px = p2x - p1x, py = p2y - p1y;
+			return p3x * py - p3y * px + px * p1y - p1x * py >= 0 ? 1 : -1;
+		};
+		return Triangulator;
+	}());
+	spine.Triangulator = Triangulator;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {

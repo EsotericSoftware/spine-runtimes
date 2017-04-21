@@ -469,21 +469,6 @@ declare module spine {
 	}
 }
 declare module spine {
-	class ConvexDecomposer {
-		private convexPolygons;
-		private convexPolygonsIndices;
-		private indicesArray;
-		private isConcaveArray;
-		private triangles;
-		private polygonPool;
-		private polygonIndicesPool;
-		decompose(input: ArrayLike<number>): Array<Array<number>>;
-		private static isConcave(index, vertexCount, vertices, indices);
-		private static positiveArea(p1x, p1y, p2x, p2y, p3x, p3y);
-		private static winding(p1x, p1y, p2x, p2y, p3x, p3y);
-	}
-}
-declare module spine {
 	class Event {
 		data: EventData;
 		intValue: number;
@@ -680,7 +665,7 @@ declare module spine {
 }
 declare module spine {
 	class SkeletonClipping {
-		private decomposer;
+		private triangulator;
 		private clippingPolygon;
 		private clipOutput;
 		clippedVertices: number[];
@@ -688,7 +673,7 @@ declare module spine {
 		private scratch;
 		private clipAttachment;
 		private clippingPolygons;
-		clipStart(slot: Slot, clip: ClippingAttachment): void;
+		clipStart(slot: Slot, clip: ClippingAttachment): number;
 		clipEndWithSlot(slot: Slot): void;
 		clipEnd(): void;
 		isClipping(): boolean;
@@ -894,6 +879,22 @@ declare module spine {
 		relative: boolean;
 		local: boolean;
 		constructor(name: string);
+	}
+}
+declare module spine {
+	class Triangulator {
+		private convexPolygons;
+		private convexPolygonsIndices;
+		private indicesArray;
+		private isConcaveArray;
+		private triangles;
+		private polygonPool;
+		private polygonIndicesPool;
+		triangulate(verticesArray: ArrayLike<number>): Array<number>;
+		decompose(verticesArray: Array<number>, triangles: Array<number>): Array<Array<number>>;
+		private static isConcave(index, vertexCount, vertices, indices);
+		private static positiveArea(p1x, p1y, p2x, p2y, p3x, p3y);
+		private static winding(p1x, p1y, p2x, p2y, p3x, p3y);
 	}
 }
 declare module spine {

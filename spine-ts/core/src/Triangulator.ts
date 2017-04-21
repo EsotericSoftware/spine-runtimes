@@ -29,7 +29,7 @@
  *****************************************************************************/
 
 module spine {
-	export class ConvexDecomposer {
+	export class Triangulator {
 		private convexPolygons = new Array<Array<number>>();
 		private convexPolygonsIndices = new Array<Array<number>>();
 
@@ -45,9 +45,9 @@ module spine {
 			return new Array<number>();
 		});
 
-		public decompose (input: ArrayLike<number>): Array<Array<number>> {
-			let vertices = input;
-			let vertexCount = input.length >> 1;
+		public triangulate (verticesArray: ArrayLike<number>): Array<number> {
+			let vertices = verticesArray;
+			let vertexCount = verticesArray.length >> 1;
 
 			let indices = this.indicesArray;
 			indices.length = 0;
@@ -57,7 +57,7 @@ module spine {
 			let isConcave = this.isConcaveArray;
 			isConcave.length = 0;
 			for (let i = 0, n = vertexCount; i < n; ++i)
-				isConcave[i] = ConvexDecomposer.isConcave(i, vertexCount, vertices, indices);
+				isConcave[i] = Triangulator.isConcave(i, vertexCount, vertices, indices);
 
 			let triangles = this.triangles;
 			triangles.length = 0;
@@ -76,9 +76,9 @@ module spine {
 							if (!isConcave[ii]) continue;
 							let v = indices[ii] << 1;
 							let vx = vertices[v], vy = vertices[v + 1];
-							if (ConvexDecomposer.positiveArea(p3x, p3y, p1x, p1y, vx, vy)) {
-								if (ConvexDecomposer.positiveArea(p1x, p1y, p2x, p2y, vx, vy)) {
-									if (ConvexDecomposer.positiveArea(p2x, p2y, p3x, p3y, vx, vy)) break outer;
+							if (Triangulator.positiveArea(p3x, p3y, p1x, p1y, vx, vy)) {
+								if (Triangulator.positiveArea(p1x, p1y, p2x, p2y, vx, vy)) {
+									if (Triangulator.positiveArea(p2x, p2y, p3x, p3y, vx, vy)) break outer;
 								}
 							}
 						}
@@ -108,8 +108,8 @@ module spine {
 
 				let previousIndex = (vertexCount + i - 1) % vertexCount;
 				let nextIndex = i == vertexCount ? 0 : i;
-				isConcave[previousIndex] = ConvexDecomposer.isConcave(previousIndex, vertexCount, vertices, indices);
-				isConcave[nextIndex] = ConvexDecomposer.isConcave(nextIndex, vertexCount, vertices, indices);
+				isConcave[previousIndex] = Triangulator.isConcave(previousIndex, vertexCount, vertices, indices);
+				isConcave[nextIndex] = Triangulator.isConcave(nextIndex, vertexCount, vertices, indices);
 			}
 
 			if (vertexCount == 3) {
@@ -118,6 +118,11 @@ module spine {
 				triangles.push(indices[1]);
 			}
 
+			return triangles;
+		}
+
+		decompose (verticesArray: Array<number>, triangles: Array<number>) : Array<Array<number>> {
+			let vertices = verticesArray;
 			let convexPolygons = this.convexPolygons;
 			this.polygonPool.freeAll(convexPolygons);
 			convexPolygons.length = 0;
@@ -144,8 +149,8 @@ module spine {
 				let merged = false;
 				if (fanBaseIndex == t1) {
 					let o = polygon.length - 4;
-					let winding1 = ConvexDecomposer.winding(polygon[o], polygon[o + 1], polygon[o + 2], polygon[o + 3], x3, y3);
-					let winding2 = ConvexDecomposer.winding(x3, y3, polygon[0], polygon[1], polygon[2], polygon[3]);
+					let winding1 = Triangulator.winding(polygon[o], polygon[o + 1], polygon[o + 2], polygon[o + 3], x3, y3);
+					let winding2 = Triangulator.winding(x3, y3, polygon[0], polygon[1], polygon[2], polygon[3]);
 					if (winding1 == lastWinding && winding2 == lastWinding) {
 						polygon.push(x3);
 						polygon.push(y3);
@@ -173,7 +178,7 @@ module spine {
 					polygonIndices.push(t1);
 					polygonIndices.push(t2);
 					polygonIndices.push(t3);
-					lastWinding = ConvexDecomposer.winding(x1, y1, x2, y2, x3, y3);
+					lastWinding = Triangulator.winding(x1, y1, x2, y2, x3, y3);
 					fanBaseIndex = t1;
 				}
 			}
@@ -196,7 +201,7 @@ module spine {
 				let prevX = polygon[o + 2], prevY = polygon[o + 3];
 				let firstX = polygon[0], firstY = polygon[1];
 				let secondX = polygon[2], secondY = polygon[3];
-				let winding = ConvexDecomposer.winding(prevPrevX, prevPrevY, prevX, prevY, firstX, firstY);
+				let winding = Triangulator.winding(prevPrevX, prevPrevY, prevX, prevY, firstX, firstY);
 
 				for (let ii = 0; ii < n; ii++) {
 					if (ii == i) continue;
@@ -210,8 +215,8 @@ module spine {
 					let x3 = otherPoly[otherPoly.length - 2], y3 = otherPoly[otherPoly.length - 1];
 
 					if (otherFirstIndex != firstIndex || otherSecondIndex != lastIndex) continue;
-					let winding1 = ConvexDecomposer.winding(prevPrevX, prevPrevY, prevX, prevY, x3, y3);
-					let winding2 = ConvexDecomposer.winding(x3, y3, firstX, firstY, secondX, secondY);
+					let winding1 = Triangulator.winding(prevPrevX, prevPrevY, prevX, prevY, x3, y3);
+					let winding2 = Triangulator.winding(x3, y3, firstX, firstY, secondX, secondY);
 					if (winding1 == winding && winding2 == winding) {
 						otherPoly.length = 0;
 						otherIndices.length = 0;
