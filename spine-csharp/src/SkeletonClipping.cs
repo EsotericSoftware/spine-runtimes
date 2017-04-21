@@ -32,7 +32,7 @@ using System;
 
 namespace Spine {
 	public class SkeletonClipping {
-		private readonly ConvexDecomposer decomposer = new ConvexDecomposer();
+		private readonly Triangulator triangulator = new Triangulator();
 		private readonly ExposedList<float> clippingPolygon = new ExposedList<float>();
 		private readonly ExposedList<float> clipOutput = new ExposedList<float>(128);
 		private readonly ExposedList<float> clippedVertices = new ExposedList<float>(128);
@@ -47,20 +47,21 @@ namespace Spine {
 		public ExposedList<int> ClippedTriangles { get { return clippedTriangles; } }
 		public ExposedList<float> ClippedUVs { get { return clippedUVs; } }
 
-		public void ClipStart(Slot slot, ClippingAttachment clip) {
-			if (clipAttachment != null) return;
+		public int ClipStart(Slot slot, ClippingAttachment clip) {
+			if (clipAttachment != null) return 0;
 			clipAttachment = clip;
 
 			int n = clip.worldVerticesLength;
 			float[] vertices = clippingPolygon.Resize(n).Items;
 			clip.ComputeWorldVertices(slot, 0, n, vertices, 0, 2);
 			MakeClockwise(clippingPolygon);
-			clippingPolygons = decomposer.Decompose(clippingPolygon);
+			clippingPolygons = triangulator.Decompose(clippingPolygon, triangulator.Triangulate(clippingPolygon));
 			foreach (var polygon in clippingPolygons) {
 				MakeClockwise(polygon);
 				polygon.Add(polygon.Items[0]);
 				polygon.Add(polygon.Items[1]);
 			}
+			return clippingPolygons.Count;
 		}
 
 		public void ClipEnd(Slot slot) {

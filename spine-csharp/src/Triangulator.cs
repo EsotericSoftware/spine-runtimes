@@ -31,7 +31,7 @@
 using System;
 
 namespace Spine {
-	internal class ConvexDecomposer {
+	internal class Triangulator {
 		private readonly ExposedList<ExposedList<float>> convexPolygons = new ExposedList<ExposedList<float>>();
 		private readonly ExposedList<ExposedList<int>> convexPolygonsIndices = new ExposedList<ExposedList<int>>();
 
@@ -42,9 +42,9 @@ namespace Spine {
 		private readonly Pool<ExposedList<float>> polygonPool = new Pool<ExposedList<float>>();
 		private readonly Pool<ExposedList<int>> polygonIndicesPool = new Pool<ExposedList<int>>();
 
-		public ExposedList<ExposedList<float>> Decompose(ExposedList<float> input) {
-			var vertices = input.Items;
-			int vertexCount = input.Count >> 1;
+		public ExposedList<int> Triangulate(ExposedList<float> verticesArray) {
+			var vertices = verticesArray.Items;
+			int vertexCount = verticesArray.Count >> 1;
 
 			var indicesArray = this.indicesArray;
 			indicesArray.Clear();
@@ -117,6 +117,11 @@ namespace Spine {
 				triangles.Add(indices[1]);
 			}
 
+			return triangles;
+		}
+
+		public ExposedList<ExposedList<float>> Decompose(ExposedList<float> verticesArray, ExposedList<int> triangles) {
+			var vertices = verticesArray.Items;
 			var convexPolygons = this.convexPolygons;
 			for (int i = 0, n = convexPolygons.Count; i < n; i++) {
 				polygonPool.Free(convexPolygons.Items[i]);
