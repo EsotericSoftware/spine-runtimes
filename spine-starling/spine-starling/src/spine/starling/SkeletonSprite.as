@@ -61,17 +61,13 @@ package spine.starling {
 		private var _skeleton : Skeleton;
 		public var batchable : Boolean = true;
 		private var _smoothing : String = "bilinear";
-		private static var _twoColorStyle : TwoColorMeshStyle;
 		private static var clipper: SkeletonClipping = new SkeletonClipping();
 		private static var QUAD_INDICES : Vector.<uint> = new <uint>[0, 1, 2, 2, 3, 0];
 
 		public function SkeletonSprite(skeletonData : SkeletonData) {
 			Bone.yDown = true;
 			_skeleton = new Skeleton(skeletonData);
-			_skeleton.updateWorldTransform();
-			if (_twoColorStyle == null) {
-				_twoColorStyle = new TwoColorMeshStyle();
-			}
+			_skeleton.updateWorldTransform();			
 		}
 
 		override public function render(painter : Painter) : void {
@@ -108,7 +104,7 @@ package spine.starling {
 							region.rendererObject = mesh = new SkeletonMesh(Image(region.rendererObject).texture);
 						if (region.rendererObject is AtlasRegion)
 							region.rendererObject = mesh = new SkeletonMesh(Image(AtlasRegion(region.rendererObject).rendererObject).texture);						
-												
+						mesh.setStyle(new TwoColorMeshStyle());					
 						indexData = mesh.getIndexData();
 						for (ii = 0; ii < indices.length; ii++)
 							indexData.setIndex(ii, indices[ii]);
@@ -132,7 +128,7 @@ package spine.starling {
 							meshAttachment.rendererObject = mesh = new SkeletonMesh(Image(meshAttachment.rendererObject).texture);
 						if (meshAttachment.rendererObject is AtlasRegion)
 							meshAttachment.rendererObject = mesh = new SkeletonMesh(Image(AtlasRegion(meshAttachment.rendererObject).rendererObject).texture);						
-						mesh.setStyle(_twoColorStyle);
+						mesh.setStyle(new TwoColorMeshStyle());
 						
 						indexData = mesh.getIndexData();
 						indicesLength = meshAttachment.triangles.length;
@@ -174,16 +170,14 @@ package spine.starling {
 					indexData.trim();
 				}
 
-				// Mesh doesn't retain the style, can't find the reason why
-				mesh.setStyle(_twoColorStyle);			
-				vertexData = mesh.getVertexData();					
+				vertexData = mesh.getVertexData();
+				vertexData.numVertices = verticesCount;				
 				vertexData.colorize("color", rgb, a);
 				vertexData.colorize("color2", dark);
 				for (ii = 0, iii = 0; ii < verticesCount; ii++, iii += 2) {
 					mesh.setVertexPosition(ii, worldVertices[iii], worldVertices[iii + 1]);
 					mesh.setTexCoords(ii, uvs[iii], uvs[iii + 1]);
-				}
-				vertexData.numVertices = verticesCount;
+				}				
 				painter.state.blendMode = blendModes[slot.data.blendMode.ordinal];				
 				painter.batchMesh(mesh);
 				

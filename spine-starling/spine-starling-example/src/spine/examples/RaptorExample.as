@@ -76,30 +76,26 @@ package spine.examples {
 			this.setRequiresRedraw();
 
 			addChild(skeleton);
-//			Starling.juggler.add(skeleton);
+			Starling.juggler.add(skeleton);
 
 			addEventListener(TouchEvent.TOUCH, onClick);
 		}
 
 		private function onClick(event : TouchEvent) : void {
 			var touch : Touch = event.getTouch(this);
-			if (touch && touch.phase == TouchPhase.BEGAN) {
-				skeleton.state.update(gunGrabCount++ % 2 == 1 ? 0 : 0.1);
-				skeleton.state.apply(skeleton.skeleton);
-				skeleton.skeleton.updateWorldTransform();
-				this.setRequiresRedraw();
-//				if (gunGrabCount < 2) {
-//					if (gunGrabbed)
-//						skeleton.skeleton.setToSetupPose();
-//					else
-//						skeleton.state.setAnimationByName(1, "gungrab", false);
-//					gunGrabbed = !gunGrabbed;
-//					gunGrabCount++;
-//				} else {
-//					var parent: DisplayObjectContainer = this.parent;
-//					this.removeFromParent(true);	
-//					parent.addChild(new TankExample());
-//				}
+			if (touch && touch.phase == TouchPhase.BEGAN) {				
+				if (gunGrabCount < 2) {
+					if (gunGrabbed)
+						skeleton.skeleton.setToSetupPose();
+					else
+						skeleton.state.setAnimationByName(1, "gungrab", false);
+					gunGrabbed = !gunGrabbed;
+					gunGrabCount++;
+				} else {
+					var parent: DisplayObjectContainer = this.parent;
+					this.removeFromParent(true);	
+					parent.addChild(new TankExample());
+				}
 			}
 		}
 	}
