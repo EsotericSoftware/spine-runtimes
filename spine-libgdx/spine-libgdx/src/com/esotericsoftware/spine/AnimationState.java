@@ -218,7 +218,7 @@ public class AnimationState {
 		for (int i = 0; i < timelineCount; i++) {
 			Timeline timeline = (Timeline)timelines[i];
 			boolean setupPose = timelinesFirst[i];
-			float alpha = timelinesLast != null && setupPose && !timelinesLast[i] ? alphaBase : alphaMix;
+			float alpha = timelinesLast != null && !timelinesLast[i] ? alphaBase : alphaMix;
 			if (timeline instanceof RotateTimeline)
 				applyRotateTimeline(timeline, skeleton, animationTime, alpha, setupPose, timelinesRotation, i << 1, firstFrame);
 			else {
