@@ -31,51 +31,29 @@
 #ifndef SPINE_TRIANGULATOR_H
 #define SPINE_TRIANGULATOR_H
 
+#include <spine/Array.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct spTransformConstraintData {
-	const char* const name;
-	int order;
-	int bonesCount;
-	spBoneData** const bones;
-	spBoneData* target;
-	float rotateMix, translateMix, scaleMix, shearMix;
-	float offsetRotation, offsetX, offsetY, offsetScaleX, offsetScaleY, offsetShearY;
-	int /*boolean*/ relative;
-	int /*boolean*/ local;
+typedef struct spTriangulator {
+	spArrayFloatArray* convexPolygons;
+	spArrayShortArray* convexPolygonsIndices;
 
-#ifdef __cplusplus
-	spTransformConstraintData() :
-		name(0),
-		bonesCount(0),
-		bones(0),
-		target(0),
-		rotateMix(0),
-		translateMix(0),
-		scaleMix(0),
-		shearMix(0),
-		offsetRotation(0),
-		offsetX(0),
-		offsetY(0),
-		offsetScaleX(0),
-		offsetScaleY(0),
-		offsetShearY(0),
-		relative(0),
-		local(0) {
-	}
-#endif
-} spTransformConstraintData;
+	spShortArray* indicesArray;
+	spIntArray* isConcaveArray;
+	spShortArray* triangles;
 
-spTransformConstraintData* spTransformConstraintData_create (const char* name);
-void spTransformConstraintData_dispose (spTransformConstraintData* self);
+	spArrayFloatArray* polygonPool;
+	spArrayShortArray* polygonIndicesPool;
+} spTriangulator;
 
-#ifdef SPINE_SHORT_NAMES
-typedef spTransformConstraintData TransformConstraintData;
-#define TransformConstraintData_create(...) spTransformConstraintData_create(__VA_ARGS__)
-#define TransformConstraintData_dispose(...) spTransformConstraintData_dispose(__VA_ARGS__)
-#endif
+spTriangulator* spTriangulator_create();
+spShortArray* spTriangulator_triangulate(spTriangulator* self, spFloatArray* verticesArray);
+spArrayFloatArray* spTriangulator_decompose(spTriangulator* self, spFloatArray* verticesArray, spShortArray* triangles);
+void spTriangulator_dispose(spTriangulator* self);
+
 
 #ifdef __cplusplus
 }

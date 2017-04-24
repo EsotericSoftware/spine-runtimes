@@ -40,7 +40,7 @@ extern "C" {
 	name* name##_create(int initialCapacity); \
 	void name##_dispose(name* self); \
 	void name##_clear(name* self); \
-	void name##_setSize(name* self, int newSize); \
+	name* name##_setSize(name* self, int newSize); \
 	void name##_ensureCapacity(name* self, int newCapacity); \
 	void name##_add(name* self, itemType value); \
 	void name##_removeAt(name* self, int index); \
@@ -50,7 +50,7 @@ extern "C" {
 
 #define _SP_ARRAY_IMPLEMENT_TYPE(name, itemType) \
 	name* name##_create(int initialCapacity) { \
-		name* array = MALLOC(name, 1); \
+		name* array = CALLOC(name, 1); \
 		array->size = 0; \
 		array->capacity = initialCapacity; \
 		array->items = CALLOC(itemType, initialCapacity); \
@@ -63,12 +63,13 @@ extern "C" {
 	void name##_clear(name* self) { \
 		self->size = 0; \
 	} \
-	void name##_setSize(name* self, int newSize) { \
+	name* name##_setSize(name* self, int newSize) { \
 		self->size = newSize; \
 		if (self->capacity < newSize) { \
 			self->capacity = MAX(8, (int)(self->size * 1.75f)); \
 			self->items = REALLOC(self->items, itemType, self->capacity); \
 		} \
+		return self; \
 	} \
 	void name##_ensureCapacity(name* self, int newCapacity) { \
 		if (self->capacity >= newCapacity) return; \
@@ -81,6 +82,12 @@ extern "C" {
             self->items = REALLOC(self->items, itemType, self->capacity); \
 		} \
 		self->items[self->size++] = value; \
+	} \
+	void name##_addAll(name* self, name* other) { \
+		int i = 0; \
+		for (; i < other->size; i++) { \
+			name##_add(self, other->items[i]); \
+		} \
 	} \
 	void name##_removeAt(name* self, int index) { \
 		self->size--; \
@@ -107,6 +114,9 @@ extern "C" {
 _SP_ARRAY_DECLARE_TYPE(spFloatArray, float)
 _SP_ARRAY_DECLARE_TYPE(spIntArray, int)
 _SP_ARRAY_DECLARE_TYPE(spShortArray, short)
+_SP_ARRAY_DECLARE_TYPE(spArrayFloatArray, spFloatArray*)
+_SP_ARRAY_DECLARE_TYPE(spArrayShortArray, spShortArray*)
+
 
 #ifdef __cplusplus
 }

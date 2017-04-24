@@ -219,4 +219,41 @@ void MemoryTestFixture::reproduceIssue_Loop()
 	DisposeAll(skeleton, state, stateData, skeletonData, atlas);
 }
 
+void MemoryTestFixture::triangulator() {
+	spTriangulator* triangulator = spTriangulator_create();
+	spFloatArray* polygon = spFloatArray_create(16);
+	spFloatArray_add(polygon, 0);
+	spFloatArray_add(polygon, 0);
+	spFloatArray_add(polygon, 100);
+	spFloatArray_add(polygon, 0);
+	spFloatArray_add(polygon, 100);
+	spFloatArray_add(polygon, 100);
+	spFloatArray_add(polygon, 0);
+	spFloatArray_add(polygon, 100);
+
+	spShortArray* triangles = spTriangulator_triangulate(triangulator, polygon);
+	ASSERT(triangles->size == 6);
+	ASSERT(triangles->items[0] == 3);
+	ASSERT(triangles->items[1] == 0);
+	ASSERT(triangles->items[2] == 1);
+	ASSERT(triangles->items[3] == 3);
+	ASSERT(triangles->items[4] == 1);
+	ASSERT(triangles->items[5] == 2);
+
+	spArrayFloatArray* polys = spTriangulator_decompose(triangulator, polygon, triangles);
+	ASSERT(polys->size == 1);
+	ASSERT(polys->items[0]->size == 8);
+	ASSERT(polys->items[0]->items[0] == 0);
+	ASSERT(polys->items[0]->items[1] == 100);
+	ASSERT(polys->items[0]->items[2] == 0);
+	ASSERT(polys->items[0]->items[3] == 0);
+	ASSERT(polys->items[0]->items[4] == 100);
+	ASSERT(polys->items[0]->items[5] == 0);
+	ASSERT(polys->items[0]->items[6] == 100);
+	ASSERT(polys->items[0]->items[7] == 100);
+
+	spFloatArray_dispose(polygon);
+	spTriangulator_dispose(triangulator);
+}
+
 

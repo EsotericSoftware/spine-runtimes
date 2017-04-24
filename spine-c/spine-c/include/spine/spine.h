@@ -54,6 +54,7 @@
 #include <spine/Skin.h>
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
+#include <spine/Triangulator.h>
 #include <spine/Event.h>
 #include <spine/EventData.h>
 

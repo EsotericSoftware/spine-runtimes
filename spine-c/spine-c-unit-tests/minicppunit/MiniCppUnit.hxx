@@ -201,7 +201,7 @@ public:
 				<< errmsgTag_expected() << " " << expected << " "
 				<< errmsgTag_butWas() << " " << result << "\n";
 
-			TestsListener::theInstance().errorsLog() << anError;
+			// TestsListener::theInstance().errorsLog() << anError;
 
 			TestsListener::theInstance().testHasFailed(anError.str().c_str(), file, linia);
 		}
