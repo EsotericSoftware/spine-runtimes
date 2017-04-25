@@ -807,7 +807,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		static void CloneVertexAttachment (VertexAttachment src, VertexAttachment dest) {
 			dest.worldVerticesLength = src.worldVerticesLength;
 			if (src.bones != null)
-				dest.bones = src.vertices.Clone() as int[];
+				dest.bones = src.bones.Clone() as int[];
 
 			if (src.vertices != null)
 				dest.vertices = src.vertices.Clone() as float[];
