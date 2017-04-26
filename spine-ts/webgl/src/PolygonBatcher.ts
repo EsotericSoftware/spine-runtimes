@@ -38,8 +38,8 @@ module spine.webgl {
 		private lastTexture: GLTexture = null;
 		private verticesLength = 0;
 		private indicesLength = 0;
-		private srcBlend: number = WebGLRenderingContext.SRC_ALPHA;
-		private dstBlend: number = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
+		private srcBlend: number;
+		private dstBlend: number;
 
 		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint: boolean = true, maxVertices: number = 10920) {
 			if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
@@ -48,6 +48,8 @@ module spine.webgl {
 					[new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute(), new Color2Attribute()] :
 					[new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute()];
 			this.mesh = new Mesh(context, attributes, maxVertices, maxVertices * 3);
+			this.srcBlend = this.context.gl.SRC_ALPHA;
+			this.dstBlend = this.context.gl.ONE_MINUS_SRC_ALPHA;
 		}
 
 		begin (shader: Shader) {
@@ -76,7 +78,6 @@ module spine.webgl {
 			if (texture != this.lastTexture) {
 				this.flush();
 				this.lastTexture = texture;
-				texture.bind();
 			} else if (this.verticesLength + vertices.length > this.mesh.getVertices().length ||
 					this.indicesLength + indices.length > this.mesh.getIndices().length) {
 				this.flush();
@@ -98,6 +99,7 @@ module spine.webgl {
 			let gl = this.context.gl;
 			if (this.verticesLength == 0) return;
 
+			this.lastTexture.bind();
 			this.mesh.draw(this.shader, gl.TRIANGLES);
 
 			this.verticesLength = 0;

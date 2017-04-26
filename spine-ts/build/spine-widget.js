@@ -1821,7 +1821,6 @@ var spine;
 			this.toLoad++;
 			var img = new Image();
 			img.crossOrigin = "anonymous";
-			img.src = path;
 			img.onload = function (ev) {
 				var texture = _this.textureLoader(img);
 				_this.assets[path] = texture;
@@ -1837,6 +1836,7 @@ var spine;
 				if (error)
 					error(path, "Couldn't load image " + path);
 			};
+			img.src = path;
 		};
 		AssetManager.prototype.loadTextureData = function (path, data, success, error) {
 			var _this = this;
@@ -1845,7 +1845,6 @@ var spine;
 			path = this.pathPrefix + path;
 			this.toLoad++;
 			var img = new Image();
-			img.src = data;
 			img.onload = function (ev) {
 				var texture = _this.textureLoader(img);
 				_this.assets[path] = texture;
@@ -1861,6 +1860,7 @@ var spine;
 				if (error)
 					error(path, "Couldn't load image " + path);
 			};
+			img.src = data;
 		};
 		AssetManager.prototype.get = function (path) {
 			path = this.pathPrefix + path;
@@ -6637,7 +6637,7 @@ var spine;
 				var logoHeight = this.logo.getImage().height;
 				var spinnerWidth = this.spinner.getImage().width;
 				var spinnerHeight = this.spinner.getImage().height;
-				renderer.batcher.setBlendMode(WebGLRenderingContext.SRC_ALPHA, WebGLRenderingContext.ONE_MINUS_SRC_ALPHA);
+				renderer.batcher.setBlendMode(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 				renderer.begin();
 				renderer.drawTexture(this.logo, (canvas.width - logoWidth) / 2, (canvas.height - logoHeight) / 2, logoWidth, logoHeight, this.tempColor);
 				renderer.drawTextureRotated(this.spinner, (canvas.width - spinnerWidth) / 2, (canvas.height - spinnerHeight) / 2, spinnerWidth, spinnerHeight, spinnerWidth / 2, spinnerHeight / 2, this.angle, this.tempColor);
@@ -7157,8 +7157,6 @@ var spine;
 				this.lastTexture = null;
 				this.verticesLength = 0;
 				this.indicesLength = 0;
-				this.srcBlend = WebGLRenderingContext.SRC_ALPHA;
-				this.dstBlend = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
 				if (maxVertices > 10920)
 					throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
 				this.context = context instanceof webgl.ManagedWebGLRenderingContext ? context : new webgl.ManagedWebGLRenderingContext(context);
@@ -7166,6 +7164,8 @@ var spine;
 					[new webgl.Position2Attribute(), new webgl.ColorAttribute(), new webgl.TexCoordAttribute(), new webgl.Color2Attribute()] :
 					[new webgl.Position2Attribute(), new webgl.ColorAttribute(), new webgl.TexCoordAttribute()];
 				this.mesh = new webgl.Mesh(context, attributes, maxVertices, maxVertices * 3);
+				this.srcBlend = this.context.gl.SRC_ALPHA;
+				this.dstBlend = this.context.gl.ONE_MINUS_SRC_ALPHA;
 			}
 			PolygonBatcher.prototype.begin = function (shader) {
 				var gl = this.context.gl;
@@ -7191,7 +7191,6 @@ var spine;
 				if (texture != this.lastTexture) {
 					this.flush();
 					this.lastTexture = texture;
-					texture.bind();
 				}
 				else if (this.verticesLength + vertices.length > this.mesh.getVertices().length ||
 					this.indicesLength + indices.length > this.mesh.getIndices().length) {
@@ -7211,6 +7210,7 @@ var spine;
 				var gl = this.context.gl;
 				if (this.verticesLength == 0)
 					return;
+				this.lastTexture.bind();
 				this.mesh.draw(this.shader, gl.TRIANGLES);
 				this.verticesLength = 0;
 				this.indicesLength = 0;
@@ -7618,6 +7618,7 @@ var spine;
 				if (renderer instanceof webgl.PolygonBatcher) {
 					this.batcherShader.bind();
 					this.batcherShader.setUniform4x4f(webgl.Shader.MVP_MATRIX, this.camera.projectionView.values);
+					this.batcherShader.setUniformi("u_texture", 0);
 					this.batcher.begin(this.batcherShader);
 					this.activeRenderer = this.batcher;
 				}
@@ -7816,12 +7817,12 @@ var spine;
 				this.color = new spine.Color(1, 1, 1, 1);
 				this.vertexIndex = 0;
 				this.tmp = new spine.Vector2();
-				this.srcBlend = WebGLRenderingContext.SRC_ALPHA;
-				this.dstBlend = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
 				if (maxVertices > 10920)
 					throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
 				this.context = context instanceof webgl.ManagedWebGLRenderingContext ? context : new webgl.ManagedWebGLRenderingContext(context);
 				this.mesh = new webgl.Mesh(context, [new webgl.Position2Attribute(), new webgl.ColorAttribute()], maxVertices, 0);
+				this.srcBlend = this.context.gl.SRC_ALPHA;
+				this.dstBlend = this.context.gl.ONE_MINUS_SRC_ALPHA;
 			}
 			ShapeRenderer.prototype.begin = function (shader) {
 				if (this.isDrawing)
@@ -8122,9 +8123,9 @@ var spine;
 		webgl.ShapeRenderer = ShapeRenderer;
 		var ShapeType;
 		(function (ShapeType) {
-			ShapeType[ShapeType["Point"] = WebGLRenderingContext.POINTS] = "Point";
-			ShapeType[ShapeType["Line"] = WebGLRenderingContext.LINES] = "Line";
-			ShapeType[ShapeType["Filled"] = WebGLRenderingContext.TRIANGLES] = "Filled";
+			ShapeType[ShapeType["Point"] = 0] = "Point";
+			ShapeType[ShapeType["Line"] = 1] = "Line";
+			ShapeType[ShapeType["Filled"] = 4] = "Filled";
 		})(ShapeType = webgl.ShapeType || (webgl.ShapeType = {}));
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
@@ -8417,7 +8418,7 @@ var spine;
 						var slotBlendMode = slot.data.blendMode;
 						if (slotBlendMode != blendMode) {
 							blendMode = slotBlendMode;
-							batcher.setBlendMode(webgl.getSourceGLBlendMode(blendMode, premultipliedAlpha), webgl.getDestGLBlendMode(blendMode));
+							batcher.setBlendMode(webgl.WebGLBlendModeConverter.getSourceGLBlendMode(blendMode, premultipliedAlpha), webgl.WebGLBlendModeConverter.getDestGLBlendMode(blendMode));
 						}
 						if (clipper.isClipping()) {
 							clipper.clipTriangles(renderable.vertices, renderable.numFloats, triangles, triangles.length, uvs, finalColor, darkColor, twoColorTint);
@@ -8591,27 +8592,40 @@ var spine;
 			return ManagedWebGLRenderingContext;
 		}());
 		webgl.ManagedWebGLRenderingContext = ManagedWebGLRenderingContext;
-		function getSourceGLBlendMode(blendMode, premultipliedAlpha) {
-			if (premultipliedAlpha === void 0) { premultipliedAlpha = false; }
-			switch (blendMode) {
-				case spine.BlendMode.Normal: return premultipliedAlpha ? WebGLRenderingContext.ONE : WebGLRenderingContext.SRC_ALPHA;
-				case spine.BlendMode.Additive: return premultipliedAlpha ? WebGLRenderingContext.ONE : WebGLRenderingContext.SRC_ALPHA;
-				case spine.BlendMode.Multiply: return WebGLRenderingContext.DST_COLOR;
-				case spine.BlendMode.Screen: return WebGLRenderingContext.ONE;
-				default: throw new Error("Unknown blend mode: " + blendMode);
+		var WebGLBlendModeConverter = (function () {
+			function WebGLBlendModeConverter() {
 			}
-		}
-		webgl.getSourceGLBlendMode = getSourceGLBlendMode;
-		function getDestGLBlendMode(blendMode) {
-			switch (blendMode) {
-				case spine.BlendMode.Normal: return WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
-				case spine.BlendMode.Additive: return WebGLRenderingContext.ONE;
-				case spine.BlendMode.Multiply: return WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
-				case spine.BlendMode.Screen: return WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
-				default: throw new Error("Unknown blend mode: " + blendMode);
-			}
-		}
-		webgl.getDestGLBlendMode = getDestGLBlendMode;
+			WebGLBlendModeConverter.getDestGLBlendMode = function (blendMode) {
+				switch (blendMode) {
+					case spine.BlendMode.Normal: return WebGLBlendModeConverter.ONE_MINUS_SRC_ALPHA;
+					case spine.BlendMode.Additive: return WebGLBlendModeConverter.ONE;
+					case spine.BlendMode.Multiply: return WebGLBlendModeConverter.ONE_MINUS_SRC_ALPHA;
+					case spine.BlendMode.Screen: return WebGLBlendModeConverter.ONE_MINUS_SRC_ALPHA;
+					default: throw new Error("Unknown blend mode: " + blendMode);
+				}
+			};
+			WebGLBlendModeConverter.getSourceGLBlendMode = function (blendMode, premultipliedAlpha) {
+				if (premultipliedAlpha === void 0) { premultipliedAlpha = false; }
+				switch (blendMode) {
+					case spine.BlendMode.Normal: return premultipliedAlpha ? WebGLBlendModeConverter.ONE : WebGLBlendModeConverter.SRC_ALPHA;
+					case spine.BlendMode.Additive: return premultipliedAlpha ? WebGLBlendModeConverter.ONE : WebGLBlendModeConverter.SRC_ALPHA;
+					case spine.BlendMode.Multiply: return WebGLBlendModeConverter.DST_COLOR;
+					case spine.BlendMode.Screen: return WebGLBlendModeConverter.ONE;
+					default: throw new Error("Unknown blend mode: " + blendMode);
+				}
+			};
+			return WebGLBlendModeConverter;
+		}());
+		WebGLBlendModeConverter.ZERO = 0;
+		WebGLBlendModeConverter.ONE = 1;
+		WebGLBlendModeConverter.SRC_COLOR = 0x0300;
+		WebGLBlendModeConverter.ONE_MINUS_SRC_COLOR = 0x0301;
+		WebGLBlendModeConverter.SRC_ALPHA = 0x0302;
+		WebGLBlendModeConverter.ONE_MINUS_SRC_ALPHA = 0x0303;
+		WebGLBlendModeConverter.DST_ALPHA = 0x0304;
+		WebGLBlendModeConverter.ONE_MINUS_DST_ALPHA = 0x0305;
+		WebGLBlendModeConverter.DST_COLOR = 0x0306;
+		webgl.WebGLBlendModeConverter = WebGLBlendModeConverter;
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
 var spine;

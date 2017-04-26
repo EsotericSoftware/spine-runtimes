@@ -417,6 +417,7 @@ module spine.webgl {
 			if (renderer instanceof PolygonBatcher) {
 				this.batcherShader.bind();
 				this.batcherShader.setUniform4x4f(Shader.MVP_MATRIX, this.camera.projectionView.values);
+				this.batcherShader.setUniformi("u_texture", 0);
 				this.batcher.begin(this.batcherShader);
 				this.activeRenderer = this.batcher;
 			} else if (renderer instanceof ShapeRenderer) {

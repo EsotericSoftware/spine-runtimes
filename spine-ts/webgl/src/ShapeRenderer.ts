@@ -38,13 +38,15 @@ module spine.webgl {
 		private shader: Shader;
 		private vertexIndex = 0;
 		private tmp = new Vector2();
-		private srcBlend: number = WebGLRenderingContext.SRC_ALPHA;
-		private dstBlend: number = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
+		private srcBlend: number;
+		private dstBlend: number;
 
 		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, maxVertices: number = 10920) {
 			if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
 			this.context = context instanceof ManagedWebGLRenderingContext? context : new ManagedWebGLRenderingContext(context);
 			this.mesh = new Mesh(context, [new Position2Attribute(), new ColorAttribute()], maxVertices, 0);
+			this.srcBlend = this.context.gl.SRC_ALPHA;
+			this.dstBlend = this.context.gl.ONE_MINUS_SRC_ALPHA;
 		}
 
 		begin (shader: Shader) {
@@ -336,8 +338,8 @@ module spine.webgl {
 	}
 
 	export enum ShapeType {
-		Point = WebGLRenderingContext.POINTS,
-		Line = WebGLRenderingContext.LINES,
-		Filled = WebGLRenderingContext.TRIANGLES
+		Point = 0x0000,
+		Line = 0x0001,
+		Filled = 0x0004
 	}
 }

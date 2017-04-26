@@ -1821,7 +1821,6 @@ var spine;
 			this.toLoad++;
 			var img = new Image();
 			img.crossOrigin = "anonymous";
-			img.src = path;
 			img.onload = function (ev) {
 				var texture = _this.textureLoader(img);
 				_this.assets[path] = texture;
@@ -1837,6 +1836,7 @@ var spine;
 				if (error)
 					error(path, "Couldn't load image " + path);
 			};
+			img.src = path;
 		};
 		AssetManager.prototype.loadTextureData = function (path, data, success, error) {
 			var _this = this;
@@ -1845,7 +1845,6 @@ var spine;
 			path = this.pathPrefix + path;
 			this.toLoad++;
 			var img = new Image();
-			img.src = data;
 			img.onload = function (ev) {
 				var texture = _this.textureLoader(img);
 				_this.assets[path] = texture;
@@ -1861,6 +1860,7 @@ var spine;
 				if (error)
 					error(path, "Couldn't load image " + path);
 			};
+			img.src = data;
 		};
 		AssetManager.prototype.get = function (path) {
 			path = this.pathPrefix + path;

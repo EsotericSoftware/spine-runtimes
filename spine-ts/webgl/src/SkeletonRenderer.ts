@@ -118,7 +118,7 @@ module spine.webgl {
 					let slotBlendMode = slot.data.blendMode;
 					if (slotBlendMode != blendMode) {
 						blendMode = slotBlendMode;
-						batcher.setBlendMode(getSourceGLBlendMode(blendMode, premultipliedAlpha), getDestGLBlendMode(blendMode));
+						batcher.setBlendMode(WebGLBlendModeConverter.getSourceGLBlendMode(blendMode, premultipliedAlpha), WebGLBlendModeConverter.getDestGLBlendMode(blendMode));
 					}
 
 					if (clipper.isClipping()) {

@@ -1485,9 +1485,9 @@ declare module spine.webgl {
 		dispose(): void;
 	}
 	enum ShapeType {
-		Point,
-		Line,
-		Filled,
+		Point = 0,
+		Line = 1,
+		Filled = 4,
 	}
 }
 declare module spine.webgl {
@@ -1565,6 +1565,17 @@ declare module spine.webgl {
 		addRestorable(restorable: Restorable): void;
 		removeRestorable(restorable: Restorable): void;
 	}
-	function getSourceGLBlendMode(blendMode: BlendMode, premultipliedAlpha?: boolean): number;
-	function getDestGLBlendMode(blendMode: BlendMode): number;
+	class WebGLBlendModeConverter {
+		static ZERO: number;
+		static ONE: number;
+		static SRC_COLOR: number;
+		static ONE_MINUS_SRC_COLOR: number;
+		static SRC_ALPHA: number;
+		static ONE_MINUS_SRC_ALPHA: number;
+		static DST_ALPHA: number;
+		static ONE_MINUS_DST_ALPHA: number;
+		static DST_COLOR: number;
+		static getDestGLBlendMode(blendMode: BlendMode): number;
+		static getSourceGLBlendMode(blendMode: BlendMode, premultipliedAlpha?: boolean): number;
+	}
 }

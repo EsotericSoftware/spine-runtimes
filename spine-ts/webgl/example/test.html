@@ -8,7 +8,7 @@
 </style>
 <body>
 <div id="label" style="position: absolute; top: 0; left: 0; color: #fff; z-index: 10"></div>
-<canvas id="canvas"></canvas>
+<canvas id="canvas" style="background: red;"></canvas>
 </body>
 <script>
 
@@ -27,7 +27,7 @@ var renderMean = new spine.WindowedMean();
 function init() {
 	canvas = document.getElementById("canvas");
 	canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-	context = new spine.webgl.ManagedWebGLRenderingContext(canvas);
+	context = new spine.webgl.ManagedWebGLRenderingContext(canvas, { alpha: false });
 	gl = context.gl;
 
 	renderer = new spine.webgl.SceneRenderer(canvas, context);
@@ -43,7 +43,7 @@ function init() {
 
 	assetManager.loadTexture(FILE + ".png");
 	assetManager.loadText(FILE + ".atlas");
-	assetManager.loadText("raptor-clipped.json");
+	assetManager.loadText("raptor.json");
 
 	timeKeeper = new spine.TimeKeeper();
 	requestAnimationFrame(load);
@@ -58,7 +58,7 @@ function load() {
 		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
 		skeletonJson.scale = SCALE;
-		var skeletonData = skeletonJson.readSkeletonData(JSON.parse(assetManager.get("raptor-clipped.json")));
+		var skeletonData = skeletonJson.readSkeletonData(JSON.parse(assetManager.get("raptor.json")));
 
 		for (var i = 0; i < NUM_SKELETONS; i++) {
 			skeleton = new spine.Skeleton(skeletonData);
@@ -106,7 +106,7 @@ function render() {
 	renderer.begin();
 	for (var i = 0; i < skeletons.length; i++) {
 		var skeleton = skeletons[i].skeleton;
-		renderer.drawSkeleton(skeleton);
+		renderer.drawSkeleton(skeleton, false);
 		renderer.drawSkeletonDebug(skeleton);
 	}
 	renderer.end();

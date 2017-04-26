@@ -74,7 +74,6 @@ module spine {
 			this.toLoad++;
 			let img = new Image();
 			img.crossOrigin = "anonymous";
-			img.src = path;
 			img.onload = (ev) => {
 				let texture = this.textureLoader(img);
 				this.assets[path] = texture;
@@ -88,6 +87,7 @@ module spine {
 				this.loaded++;
 				if (error) error(path, `Couldn't load image ${path}`);
 			}
+			img.src = path;
 		}
 
 		loadTextureData(path: string, data: string,
@@ -97,7 +97,6 @@ module spine {
 			path = this.pathPrefix + path;
 			this.toLoad++;
 			let img = new Image();
-			img.src = data;
 			img.onload = (ev) => {
 				let texture = this.textureLoader(img);
 				this.assets[path] = texture;
@@ -111,6 +110,7 @@ module spine {
 				this.loaded++;
 				if (error) error(path, `Couldn't load image ${path}`);
 			}
+			img.src = data;
 		}
 
 		get (path: string) {
