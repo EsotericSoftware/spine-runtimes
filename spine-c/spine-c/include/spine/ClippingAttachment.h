@@ -45,6 +45,7 @@ typedef struct spClippingAttachment {
 	spSlotData* endSlot;
 } spClippingAttachment;
 
+void _spClippingAttachment_dispose(spAttachment* self);
 spClippingAttachment* spClippingAttachment_create (const char* name);
 
 #ifdef SPINE_SHORT_NAMES

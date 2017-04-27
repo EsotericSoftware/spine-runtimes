@@ -33,7 +33,12 @@ package com.esotericsoftware.spine.utils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.ShortArray;
+import com.esotericsoftware.spine.Bone;
+import com.esotericsoftware.spine.BoneData;
+import com.esotericsoftware.spine.Skeleton;
+import com.esotericsoftware.spine.SkeletonData;
 import com.esotericsoftware.spine.Slot;
+import com.esotericsoftware.spine.SlotData;
 import com.esotericsoftware.spine.attachments.ClippingAttachment;
 
 public class SkeletonClipping {

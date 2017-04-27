@@ -19,6 +19,7 @@ public:
 		TEST_CASE(reproduceIssue_777);
 		TEST_CASE(reproduceIssue_Loop);
 		TEST_CASE(triangulator);
+		TEST_CASE(skeletonClipper);
 
 		initialize();
 	}
@@ -33,6 +34,7 @@ public:
 	void reproduceIssue_777();
 	void reproduceIssue_Loop(); // http://esotericsoftware.com/forum/spine-c-3-5-animation-jerking-7451
 	void triangulator();
+	void skeletonClipper();
 
 	//////////////////////////////////////////////////////////////////////////
 	// test fixture setup

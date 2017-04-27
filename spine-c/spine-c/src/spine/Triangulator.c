@@ -231,11 +231,9 @@ spArrayFloatArray* spTriangulator_decompose(spTriangulator* self, spFloatArray* 
 	spArrayShortArray_clear(convexPolygonsIndices);
 
 	polygonIndices = _obtainPolygonIndices(self);
-	printf("Obtained indices 0x%x\n", polygonIndices);
 	spShortArray_clear(polygonIndices);
 
 	polygon = _obtainPolygon(self);
-	printf("Obtained polygon 0x%x\n", polygon);
 	spFloatArray_clear(polygon);
 
 	fanBaseIndex = -1; lastWinding = 0;
@@ -264,9 +262,11 @@ spArrayFloatArray* spTriangulator_decompose(spTriangulator* self, spFloatArray* 
 			if (polygon->size > 0) {
 				spArrayFloatArray_add(convexPolygons, polygon);
 				spArrayShortArray_add(convexPolygonsIndices, polygonIndices);
+			} else {
+				_freePolygon(self, polygon);
+				_freePolygonIndices(self, polygonIndices);
 			}
 			polygon = _obtainPolygon(self);
-			printf("Obtained polygon #2 0x%x\n", polygon);
 			spFloatArray_clear(polygon);
 			spFloatArray_add(polygon, x1);
 			spFloatArray_add(polygon, y1);
@@ -275,7 +275,6 @@ spArrayFloatArray* spTriangulator_decompose(spTriangulator* self, spFloatArray* 
 			spFloatArray_add(polygon, x3);
 			spFloatArray_add(polygon, y3);
 			polygonIndices = _obtainPolygonIndices(self);
-			printf("Obtained indices #2 0x%x\n", polygonIndices);
 			spShortArray_clear(polygonIndices);
 			spShortArray_add(polygonIndices, t1);
 			spShortArray_add(polygonIndices, t2);
@@ -352,6 +351,9 @@ spArrayFloatArray* spTriangulator_decompose(spTriangulator* self, spFloatArray* 
 		if (polygon->size == 0) {
 			spArrayFloatArray_removeAt(convexPolygons, i);
 			_freePolygon(self, polygon);
+			polygonIndices = convexPolygonsIndices->items[i];
+			spArrayShortArray_removeAt(convexPolygonsIndices, i);
+			_freePolygonIndices(self, polygonIndices);
 		}
 	}
 

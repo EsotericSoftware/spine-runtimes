@@ -43,6 +43,8 @@ extern "C" {
 	name* name##_setSize(name* self, int newSize); \
 	void name##_ensureCapacity(name* self, int newCapacity); \
 	void name##_add(name* self, itemType value); \
+	void name##_addAll(name* self, name* other); \
+	void name##_addAllValues(name* self, itemType* values, int offset, int count); \
 	void name##_removeAt(name* self, int index); \
 	int name##_contains(name* self, itemType value); \
 	itemType name##_pop(name* self); \
@@ -87,6 +89,12 @@ extern "C" {
 		int i = 0; \
 		for (; i < other->size; i++) { \
 			name##_add(self, other->items[i]); \
+		} \
+	} \
+	void name##_addAllValues(name* self, itemType* values, int offset, int count) { \
+		int i = offset, n = offset + count; \
+		for (; i < n; i++) { \
+			name##_add(self, values[i]); \
 		} \
 	} \
 	void name##_removeAt(name* self, int index) { \
