@@ -308,7 +308,7 @@ static bool handlerQueued = false;
 						spVertex* verts = &meshPart.mesh->vertices[meshPart.startVertex];
 						unsigned short* indices = &meshPart.mesh->indices[meshPart.startIndex];
 						
-						for (int i = 0; i * 2 < verticesCount; i++, vertices++) {
+						for (int i = 0; i * 2 < verticesCount; i++, verts++) {
 							CCVertex vertex;
 							vertex.position = GLKVector4Make(vertices[i * 2], vertices[i * 2 + 1], 0.0, 1.0);
 							vertex = CCVertexApplyTransform(vertex, transform);
