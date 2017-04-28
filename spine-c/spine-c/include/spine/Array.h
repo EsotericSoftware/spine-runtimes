@@ -122,6 +122,7 @@ extern "C" {
 _SP_ARRAY_DECLARE_TYPE(spFloatArray, float)
 _SP_ARRAY_DECLARE_TYPE(spIntArray, int)
 _SP_ARRAY_DECLARE_TYPE(spShortArray, short)
+_SP_ARRAY_DECLARE_TYPE(spUnsignedShortArray, unsigned short)
 _SP_ARRAY_DECLARE_TYPE(spArrayFloatArray, spFloatArray*)
 _SP_ARRAY_DECLARE_TYPE(spArrayShortArray, spShortArray*)
 

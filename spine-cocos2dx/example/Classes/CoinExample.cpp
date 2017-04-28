@@ -28,25 +28,25 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "TankExample.h"
 #include "CoinExample.h"
+#include "BatchingExample.h"
 
 USING_NS_CC;
 using namespace spine;
 
-Scene* TankExample::scene () {
+Scene* CoinExample::scene () {
 	Scene *scene = Scene::create();
-	scene->addChild(TankExample::create());
+	scene->addChild(CoinExample::create());
 	return scene;
 }
 
-bool TankExample::init () {
+bool CoinExample::init () {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
-	skeletonNode = SkeletonAnimation::createWithJsonFile("tank.json", "tank.atlas", 0.5f);
-	skeletonNode->setAnimation(0, "drive", true);
+	skeletonNode = SkeletonAnimation::createWithJsonFile("coin.json", "coin.atlas", 0.5f);
+	skeletonNode->setAnimation(0, "rotate", true);
 
-	skeletonNode->setPosition(Vec2(_contentSize.width / 2 + 400, 20));
+	skeletonNode->setPosition(Vec2(_contentSize.width / 2, 150));
 	addChild(skeletonNode);
 
 	scheduleUpdate();
@@ -58,7 +58,7 @@ bool TankExample::init () {
 		else if (skeletonNode->getTimeScale() == 1)
 			skeletonNode->setTimeScale(0.3f);
 		else
-			Director::getInstance()->replaceScene(CoinExample::scene());
+			Director::getInstance()->replaceScene(BatchingExample::scene());
 		return true;
 	};
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);

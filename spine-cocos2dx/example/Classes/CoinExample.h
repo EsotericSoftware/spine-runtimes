@@ -28,40 +28,22 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "TankExample.h"
-#include "CoinExample.h"
+#ifndef _COINEXAMPLE_H_
+#define _COINEXAMPLE_H_
 
-USING_NS_CC;
-using namespace spine;
+#include "cocos2d.h"
+#include <spine/spine-cocos2dx.h>
 
-Scene* TankExample::scene () {
-	Scene *scene = Scene::create();
-	scene->addChild(TankExample::create());
-	return scene;
-}
+class CoinExample : public cocos2d::LayerColor {
+public:
+	static cocos2d::Scene* scene ();
 
-bool TankExample::init () {
-	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
+	CREATE_FUNC(CoinExample);
 
-	skeletonNode = SkeletonAnimation::createWithJsonFile("tank.json", "tank.atlas", 0.5f);
-	skeletonNode->setAnimation(0, "drive", true);
+	virtual bool init ();
 
-	skeletonNode->setPosition(Vec2(_contentSize.width / 2 + 400, 20));
-	addChild(skeletonNode);
+private:
+	spine::SkeletonAnimation* skeletonNode;
+};
 
-	scheduleUpdate();
-	
-	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
-	listener->onTouchBegan = [this] (Touch* touch, Event* event) -> bool {
-		if (!skeletonNode->getDebugBonesEnabled())
-			skeletonNode->setDebugBonesEnabled(true);
-		else if (skeletonNode->getTimeScale() == 1)
-			skeletonNode->setTimeScale(0.3f);
-		else
-			Director::getInstance()->replaceScene(CoinExample::scene());
-		return true;
-	};
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-
-	return true;
-}
+#endif // _COINXAMPLE_H_

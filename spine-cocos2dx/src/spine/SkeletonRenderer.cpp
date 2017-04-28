@@ -62,6 +62,8 @@ SkeletonRenderer* SkeletonRenderer::createWithFile (const std::string& skeletonD
 
 void SkeletonRenderer::initialize () {
 	_worldVertices = new float[1000]; // Max number of vertices per mesh.
+	
+	_clipper = spSkeletonClipping_create();
 
 	_blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
 	setOpacityModifyRGB(true);
@@ -99,6 +101,7 @@ SkeletonRenderer::~SkeletonRenderer () {
 	if (_atlas) spAtlas_dispose(_atlas);
 	if (_attachmentLoader) spAttachmentLoader_dispose(_attachmentLoader);
 	delete [] _worldVertices;
+	spSkeletonClipping_dispose(_clipper);
 }
 
 void SkeletonRenderer::initWithData (spSkeletonData* skeletonData, bool ownsSkeletonData) {
@@ -275,6 +278,10 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 			}
 			break;
 		}
+		case SP_ATTACHMENT_CLIPPING: {
+			spClippingAttachment* clip = (spClippingAttachment*)slot->attachment;
+			spSkeletonClipping_clipStart(_clipper, slot, clip);
+		}
 		default:
 			continue;
 		}
@@ -329,7 +336,9 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				vertex->color2.a = 1;
 			}
 		}
+		spSkeletonClipping_clipEnd(_clipper, slot);
 	}
+	spSkeletonClipping_clipEnd2(_clipper);
 	
 	if (lastTwoColorTrianglesCommand) {
 		Node* parent = this->getParent();

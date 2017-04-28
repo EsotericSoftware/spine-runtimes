@@ -39,7 +39,7 @@ spSkeletonClipping* spSkeletonClipping_create() {
 	clipping->clipOutput = spFloatArray_create(128);
 	clipping->clippedVertices = spFloatArray_create(128);
 	clipping->clippedUVs = spFloatArray_create(128);
-	clipping->clippedTriangles = spShortArray_create(128);
+	clipping->clippedTriangles = spUnsignedShortArray_create(128);
 	clipping->scratch = spFloatArray_create(128);
 
 	return clipping;
@@ -51,7 +51,7 @@ void spSkeletonClipping_dispose(spSkeletonClipping* self) {
 	spFloatArray_dispose(self->clipOutput);
 	spFloatArray_dispose(self->clippedVertices);
 	spFloatArray_dispose(self->clippedUVs);
-	spShortArray_dispose(self->clippedTriangles);
+	spUnsignedShortArray_dispose(self->clippedTriangles);
 	spFloatArray_dispose(self->scratch);
 	FREE(self);
 }
@@ -111,7 +111,7 @@ void spSkeletonClipping_clipEnd2(spSkeletonClipping* self) {
 	self->clippingPolygons = 0;
 	spFloatArray_clear(self->clippedVertices);
 	spFloatArray_clear(self->clippedUVs);
-	spShortArray_clear(self->clippedTriangles);
+	spUnsignedShortArray_clear(self->clippedTriangles);
 	spFloatArray_clear(self->clippingPolygon);
 }
 
@@ -206,12 +206,12 @@ int /*boolean*/ _clip(spSkeletonClipping* self, float x1, float y1, float x2, fl
 	return clipped;
 }
 
-void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices, int verticesLength, short* triangles, int trianglesLength, float* uvs) {
+void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices, int verticesLength, unsigned short* triangles, int trianglesLength, float* uvs) {
 	int i;
 	spFloatArray* clipOutput = self->clipOutput;
 	spFloatArray* clippedVertices = self->clippedVertices;
 	spFloatArray* clippedUVs = self->clippedUVs;
-	spShortArray* clippedTriangles = self->clippedTriangles;
+	spUnsignedShortArray* clippedTriangles = self->clippedTriangles;
 	spFloatArray** polygons = self->clippingPolygons->items;
 	int polygonsCount = self->clippingPolygons->size;
 	int vertexSize = 2;
@@ -219,7 +219,7 @@ void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices,
 	short index = 0;
 	spFloatArray_clear(clippedVertices);
 	spFloatArray_clear(clippedUVs);
-	spShortArray_clear(clippedTriangles);
+	spUnsignedShortArray_clear(clippedTriangles);
 	outer:
 	for (i = 0; i < trianglesLength; i += 3) {
 		int p;
@@ -241,7 +241,7 @@ void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices,
 			if (_clip(self, x1, y1, x2, y2, x3, y3, polygons[p], clipOutput)) {
 				int ii;
 				float d0, d1, d2, d4, d;
-				short* clippedTrianglesItems;
+				unsigned short* clippedTrianglesItems;
 				int clipOutputCount;
 				float* clipOutputItems;
 				float* clippedVerticesItems;
@@ -271,18 +271,18 @@ void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices,
 				}
 
 				s = clippedTriangles->size;
-				clippedTrianglesItems = spShortArray_setSize(clippedTriangles, s + 3 * (clipOutputCount - 2))->items;
+				clippedTrianglesItems = spUnsignedShortArray_setSize(clippedTriangles, s + 3 * (clipOutputCount - 2))->items;
 				clipOutputCount--;
 				for (ii = 1; ii < clipOutputCount; ii++) {
 					clippedTrianglesItems[s] = index;
-					clippedTrianglesItems[s + 1] = (short)(index + ii);
-					clippedTrianglesItems[s + 2] = (short)(index + ii + 1);
+					clippedTrianglesItems[s + 1] = (unsigned short)(index + ii);
+					clippedTrianglesItems[s + 2] = (unsigned short)(index + ii + 1);
 					s += 3;
 				}
 				index += clipOutputCount + 1;
 
 			} else {
-				short* clippedTrianglesItems;
+				unsigned short* clippedTrianglesItems;
 				float* clippedVerticesItems = spFloatArray_setSize(clippedVertices, s + 3 * vertexSize)->items;
 				float* clippedUVsItems = spFloatArray_setSize(clippedUVs, s + 3 * vertexSize)->items;
 				clippedVerticesItems[s] = x1;
@@ -300,10 +300,10 @@ void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices,
 				clippedUVsItems[s + 5] = v3;
 
 				s = clippedTriangles->size;
-				clippedTrianglesItems = spShortArray_setSize(clippedTriangles, s + 3)->items;
+				clippedTrianglesItems = spUnsignedShortArray_setSize(clippedTriangles, s + 3)->items;
 				clippedTrianglesItems[s] = index;
-				clippedTrianglesItems[s + 1] = (short)(index + 1);
-				clippedTrianglesItems[s + 2] = (short)(index + 2);
+				clippedTrianglesItems[s + 1] = (unsigned short)(index + 1);
+				clippedTrianglesItems[s + 2] = (unsigned short)(index + 2);
 				index += 3;
 				goto outer;
 			}

@@ -87,6 +87,16 @@
 		76AAA4471D1811B000C54FCB /* SpineboyExample.h in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3BF1D180F7C00C54FCB /* SpineboyExample.h */; };
 		76AAA4571D18132D00C54FCB /* common in Resources */ = {isa = PBXBuildFile; fileRef = 76AAA4521D18132D00C54FCB /* common */; };
 		76AAA4581D18132D00C54FCB /* common in Resources */ = {isa = PBXBuildFile; fileRef = 76AAA4521D18132D00C54FCB /* common */; };
+		76D520DA1EB3611300572471 /* ClippingAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 76D520D71EB3611300572471 /* ClippingAttachment.c */; };
+		76D520DB1EB3611300572471 /* SkeletonClipping.c in Sources */ = {isa = PBXBuildFile; fileRef = 76D520D81EB3611300572471 /* SkeletonClipping.c */; };
+		76D520DC1EB3611300572471 /* Triangulator.c in Sources */ = {isa = PBXBuildFile; fileRef = 76D520D91EB3611300572471 /* Triangulator.c */; };
+		76D520DE1EB3619800572471 /* ClippingAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 76D520D71EB3611300572471 /* ClippingAttachment.c */; };
+		76D520DF1EB3619800572471 /* SkeletonClipping.c in Sources */ = {isa = PBXBuildFile; fileRef = 76D520D81EB3611300572471 /* SkeletonClipping.c */; };
+		76D520E01EB3619800572471 /* Triangulator.c in Sources */ = {isa = PBXBuildFile; fileRef = 76D520D91EB3611300572471 /* Triangulator.c */; };
+		76D520E21EB3625700572471 /* Array.c in Sources */ = {isa = PBXBuildFile; fileRef = 76D520E11EB3625700572471 /* Array.c */; };
+		76D520E31EB3625B00572471 /* Array.c in Sources */ = {isa = PBXBuildFile; fileRef = 76D520E11EB3625700572471 /* Array.c */; };
+		76D520E61EB362DD00572471 /* CoinExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D520E41EB362DD00572471 /* CoinExample.cpp */; };
+		76D520E71EB3634600572471 /* CoinExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D520E41EB362DD00572471 /* CoinExample.cpp */; };
 		76F28CB11DEC7EBB00CDE54D /* Animation.c in Sources */ = {isa = PBXBuildFile; fileRef = 76F28C8F1DEC7EBA00CDE54D /* Animation.c */; };
 		76F28CB21DEC7EBB00CDE54D /* AnimationState.c in Sources */ = {isa = PBXBuildFile; fileRef = 76F28C901DEC7EBA00CDE54D /* AnimationState.c */; };
 		76F28CB31DEC7EBB00CDE54D /* AnimationStateData.c in Sources */ = {isa = PBXBuildFile; fileRef = 76F28C911DEC7EBA00CDE54D /* AnimationStateData.c */; };
@@ -281,6 +291,12 @@
 		76AAA40A1D18106000C54FCB /* spine-cocos2dx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "spine-cocos2dx.cpp"; path = "../../src/spine/spine-cocos2dx.cpp"; sourceTree = "<group>"; };
 		76AAA40B1D18106000C54FCB /* spine-cocos2dx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "spine-cocos2dx.h"; path = "../../src/spine/spine-cocos2dx.h"; sourceTree = "<group>"; };
 		76AAA4521D18132D00C54FCB /* common */ = {isa = PBXFileReference; lastKnownFileType = folder; path = common; sourceTree = "<group>"; };
+		76D520D71EB3611300572471 /* ClippingAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ClippingAttachment.c; path = "../../../spine-c/spine-c/src/spine/ClippingAttachment.c"; sourceTree = "<group>"; };
+		76D520D81EB3611300572471 /* SkeletonClipping.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SkeletonClipping.c; path = "../../../spine-c/spine-c/src/spine/SkeletonClipping.c"; sourceTree = "<group>"; };
+		76D520D91EB3611300572471 /* Triangulator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Triangulator.c; path = "../../../spine-c/spine-c/src/spine/Triangulator.c"; sourceTree = "<group>"; };
+		76D520E11EB3625700572471 /* Array.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Array.c; path = "../../../spine-c/spine-c/src/spine/Array.c"; sourceTree = "<group>"; };
+		76D520E41EB362DD00572471 /* CoinExample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CoinExample.cpp; sourceTree = "<group>"; };
+		76D520E51EB362DD00572471 /* CoinExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoinExample.h; sourceTree = "<group>"; };
 		76F28C8F1DEC7EBA00CDE54D /* Animation.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Animation.c; path = "../../../spine-c/spine-c/src/spine/Animation.c"; sourceTree = "<group>"; };
 		76F28C901DEC7EBA00CDE54D /* AnimationState.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = AnimationState.c; path = "../../../spine-c/spine-c/src/spine/AnimationState.c"; sourceTree = "<group>"; };
 		76F28C911DEC7EBA00CDE54D /* AnimationStateData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = AnimationStateData.c; path = "../../../spine-c/spine-c/src/spine/AnimationStateData.c"; sourceTree = "<group>"; };
@@ -464,6 +480,8 @@
 		46880B8319C43A87006E1F66 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				76D520E41EB362DD00572471 /* CoinExample.cpp */,
+				76D520E51EB362DD00572471 /* CoinExample.h */,
 				76F5BD531D2BD7D3005917E5 /* TankExample.cpp */,
 				76F5BD541D2BD7D3005917E5 /* TankExample.h */,
 				76AAA3B31D180F7C00C54FCB /* AppDelegate.cpp */,
@@ -534,6 +552,10 @@
 		76AAA3B21D180F7300C54FCB /* spine */ = {
 			isa = PBXGroup;
 			children = (
+				76D520E11EB3625700572471 /* Array.c */,
+				76D520D71EB3611300572471 /* ClippingAttachment.c */,
+				76D520D81EB3611300572471 /* SkeletonClipping.c */,
+				76D520D91EB3611300572471 /* Triangulator.c */,
 				76FAC18A1E3F97D2001CCC8C /* Color.c */,
 				76FAC18B1E3F97D2001CCC8C /* PointAttachment.c */,
 				76F28C8F1DEC7EBA00CDE54D /* Animation.c */,
@@ -742,6 +764,7 @@
 				76F5BD551D2BD7D3005917E5 /* TankExample.cpp in Sources */,
 				76F28CCC1DEC7EBB00CDE54D /* Slot.c in Sources */,
 				76F28CB31DEC7EBB00CDE54D /* AnimationStateData.c in Sources */,
+				76D520E21EB3625700572471 /* Array.c in Sources */,
 				76F28CBE1DEC7EBB00CDE54D /* IkConstraint.c in Sources */,
 				76AAA3C51D180F7C00C54FCB /* SpineboyExample.cpp in Sources */,
 				76AAA3C11D180F7C00C54FCB /* BatchingExample.cpp in Sources */,
@@ -775,17 +798,21 @@
 				76F28CB91DEC7EBB00CDE54D /* BoneData.c in Sources */,
 				76AAA3C21D180F7C00C54FCB /* GoblinsExample.cpp in Sources */,
 				76F28CC91DEC7EBB00CDE54D /* SkeletonData.c in Sources */,
+				76D520DA1EB3611300572471 /* ClippingAttachment.c in Sources */,
 				76F28CC41DEC7EBB00CDE54D /* PathConstraintData.c in Sources */,
 				76F28CB81DEC7EBB00CDE54D /* Bone.c in Sources */,
 				76F28CB61DEC7EBB00CDE54D /* Attachment.c in Sources */,
 				503AE10217EB989F00D1A890 /* RootViewController.mm in Sources */,
 				503AE10117EB989F00D1A890 /* main.m in Sources */,
+				76D520DB1EB3611300572471 /* SkeletonClipping.c in Sources */,
 				76F28CCB1DEC7EBB00CDE54D /* Skin.c in Sources */,
 				76A45BDE1E64396800745AA1 /* SkeletonTwoColorBatch.cpp in Sources */,
 				76F28CBF1DEC7EBB00CDE54D /* IkConstraintData.c in Sources */,
 				76F28CC61DEC7EBB00CDE54D /* Skeleton.c in Sources */,
 				76AAA4101D18106000C54FCB /* SkeletonRenderer.cpp in Sources */,
+				76D520E61EB362DD00572471 /* CoinExample.cpp in Sources */,
 				76FAC18C1E3F97D2001CCC8C /* Color.c in Sources */,
+				76D520DC1EB3611300572471 /* Triangulator.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -793,6 +820,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				76D520E71EB3634600572471 /* CoinExample.cpp in Sources */,
+				76D520E31EB3625B00572471 /* Array.c in Sources */,
+				76D520DE1EB3619800572471 /* ClippingAttachment.c in Sources */,
+				76D520DF1EB3619800572471 /* SkeletonClipping.c in Sources */,
+				76D520E01EB3619800572471 /* Triangulator.c in Sources */,
 				76FAC18F1E3F98A0001CCC8C /* Color.c in Sources */,
 				76FAC1901E3F98A0001CCC8C /* PointAttachment.c in Sources */,
 				76F28CD11DEC7FFA00CDE54D /* Animation.c in Sources */,

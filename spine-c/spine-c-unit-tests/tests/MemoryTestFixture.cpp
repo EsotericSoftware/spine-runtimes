@@ -300,10 +300,10 @@ void MemoryTestFixture::skeletonClipper() {
 	spFloatArray_add(uvs, 0);
 	spFloatArray_add(uvs, 0.5f);
 	spFloatArray_add(uvs, 1);
-	spShortArray* indices = spShortArray_create(16);
-	spShortArray_add(indices, 0);
-	spShortArray_add(indices, 1);
-	spShortArray_add(indices, 2);
+	spUnsignedShortArray* indices = spUnsignedShortArray_create(16);
+	spUnsignedShortArray_add(indices, 0);
+	spUnsignedShortArray_add(indices, 1);
+	spUnsignedShortArray_add(indices, 2);
 
 	spSkeletonClipping_clipTriangles(clipping, vertices->items, vertices->size, indices->items, indices->size, uvs->items);
 
@@ -327,7 +327,7 @@ void MemoryTestFixture::skeletonClipper() {
 
 	spFloatArray_dispose(vertices);
 	spFloatArray_dispose(uvs);
-	spShortArray_dispose(indices);
+	spUnsignedShortArray_dispose(indices);
 
 	spSlotData_dispose(slotData);
 	spSlot_dispose(slot);

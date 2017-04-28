@@ -58,6 +58,7 @@ public:
 private:
 	bool ownsAnimationStateData;
 	float* worldVertices;
+	spSkeletonClipping* clipper;
 };
 
 } /* namespace spine */

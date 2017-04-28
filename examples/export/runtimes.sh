@@ -34,6 +34,11 @@ cp -f ../spineboy/export/spineboy.png ../../spine-as3/spine-as3-example/src/
 
 echo "spine-cocos2d-objc"
 rm -f ../../spine-cocos2d-objc/Resources/*
+
+cp -f ../coin/export/coin.json ../../spine-cocos2d-objc/Resources/
+cp -f ../coin/export/coin.atlas ../../spine-cocos2d-objc/Resources/
+cp -f ../coin/export/coin.png ../../spine-cocos2d-objc/Resources/
+
 cp -f ../goblins/export/goblins-mesh.json ../../spine-cocos2d-objc/Resources/
 cp -f ../goblins/export/goblins.atlas ../../spine-cocos2d-objc/Resources/
 cp -f ../goblins/export/goblins.png ../../spine-cocos2d-objc/Resources/
@@ -52,6 +57,11 @@ cp -f ../tank/export/tank.png ../../spine-cocos2d-objc/Resources/
 
 echo "spine-cocos2dx"
 rm -f ../../spine-cocos2dx/example/Resources/common/*
+
+cp -f ../coin/export/coin.json ../../spine-cocos2dx/example/Resources/common/
+cp -f ../coin/export/coin.atlas ../../spine-cocos2dx/example/Resources/common/
+cp -f ../coin/export/coin.png ../../spine-cocos2dx/example/Resources/common/
+
 cp -f ../goblins/export/goblins-mesh.json ../../spine-cocos2dx/example/Resources/common/
 cp -f ../goblins/export/goblins.atlas ../../spine-cocos2dx/example/Resources/common/
 cp -f ../goblins/export/goblins.png ../../spine-cocos2dx/example/Resources/common/

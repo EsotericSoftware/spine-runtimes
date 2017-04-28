@@ -139,6 +139,7 @@ protected:
 	bool _debugSlots;
 	bool _debugBones;
 	bool _debugMeshes;
+	spSkeletonClipping* _clipper;
 };
 
 }

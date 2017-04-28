@@ -385,11 +385,11 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 int main () {
 	testcase(test, "data/tank.json", "data/tank.skel", "data/tank.atlas", 1.0f);
 	testcase(coin, "data/coin.json", "data/coin.skel", "data/coin.atlas", 0.5f);
-	/*testcase(vine, "data/vine.json", "data/vine.skel", "data/vine.atlas", 0.5f);
+	testcase(vine, "data/vine.json", "data/vine.skel", "data/vine.atlas", 0.5f);
 	testcase(tank, "data/tank.json", "data/tank.skel", "data/tank.atlas", 0.2f);
 	testcase(raptor, "data/raptor.json", "data/raptor.skel", "data/raptor.atlas", 0.5f);
 	testcase(spineboy, "data/spineboy.json", "data/spineboy.skel", "data/spineboy.atlas", 0.6f);
 	testcase(goblins, "data/goblins-mesh.json", "data/goblins-mesh.skel", "data/goblins.atlas", 1.4f);
-	testcase(stretchyman, "data/stretchyman.json", "data/stretchyman.skel", "data/stretchyman.atlas", 0.6f);*/
+	testcase(stretchyman, "data/stretchyman.json", "data/stretchyman.skel", "data/stretchyman.atlas", 0.6f);
 	return 0;
 }
