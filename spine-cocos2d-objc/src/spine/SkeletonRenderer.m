@@ -34,7 +34,7 @@
 #import <spine/GLUtils.h>
 #import "CCDrawNode.h"
 
-static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
+static unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 static spTwoColorBatcher* batcher = 0;
 static spMesh* mesh = 0;
 static bool handlerQueued = false;
@@ -89,6 +89,8 @@ static bool handlerQueued = false;
 		CCBlendFuncSrcColor: @(GL_ONE),
 		CCBlendFuncDstColor: @(GL_ONE_MINUS_SRC_COLOR)}
 	];
+	
+	_clipper = spSkeletonClipping_create();
 }
 
 - (id) initWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
@@ -153,6 +155,7 @@ static bool handlerQueued = false;
 	if (_atlas) spAtlas_dispose(_atlas);
 	spSkeleton_dispose(_skeleton);
 	FREE(_worldVertices);
+	spSkeletonClipping_dispose(_clipper);
 	[super dealloc];
 }
 
@@ -179,9 +182,10 @@ static bool handlerQueued = false;
 	int blendMode = -1;
 	uint32_t srcBlend = GL_SRC_ALPHA;
 	uint32_t dstBlend = GL_ONE_MINUS_SRC_ALPHA;
-	const float* uvs = 0;
+	float* uvs = 0;
+	float* vertices = _worldVertices;
 	int verticesCount = 0;
-	const unsigned short* triangles = 0;
+	unsigned short* triangles = 0;
 	int trianglesCount = 0;
 	float r = 0, g = 0, b = 0, a = 0;
 	float dr = 0, dg = 0, db = 0;
@@ -192,7 +196,7 @@ static bool handlerQueued = false;
 		switch (slot->attachment->type) {
 		case SP_ATTACHMENT_REGION: {
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices, 0, 2);
+			spRegionAttachment_computeWorldVertices(attachment, slot->bone, vertices, 0, 2);
 			texture = [self getTextureForRegion:attachment];
 			uvs = attachment->uvs;
 			verticesCount = 8;
@@ -206,7 +210,7 @@ static bool handlerQueued = false;
 		}
 		case SP_ATTACHMENT_MESH: {
 			spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
-			spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, attachment->super.worldVerticesLength, _worldVertices, 0, 2);
+			spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, attachment->super.worldVerticesLength, vertices, 0, 2);
 			texture = [self getTextureForMesh:attachment];
 			uvs = attachment->uvs;
 			verticesCount = attachment->super.worldVerticesLength;
@@ -218,8 +222,13 @@ static bool handlerQueued = false;
 			a = attachment->color.a;
 			break;
 		}
+		case SP_ATTACHMENT_CLIPPING: {
+			spClippingAttachment* clip = (spClippingAttachment*)slot->attachment;
+			spSkeletonClipping_clipStart(_clipper, slot, clip);
+		}
 		default: ;
 		}
+		
 		if (texture) {
 			if (slot->data->blendMode != blendMode) {
 				blendMode = slot->data->blendMode;
@@ -261,58 +270,72 @@ static bool handlerQueued = false;
 			GLKVector2 center = GLKVector2Make(size.width / 2.0, size.height / 2.0);
 			GLKVector2 extents = GLKVector2Make(size.width / 2.0, size.height / 2.0);
 			if (_skipVisibilityCheck || CCRenderCheckVisbility(transform, center, extents)) {
-				if (!self.twoColorTint) {
-					CCRenderBuffer buffer = [renderer enqueueTriangles:(trianglesCount / 3) andVertexes:verticesCount withState:self.renderState globalSortOrder:0];
-					for (int i = 0; i * 2 < verticesCount; ++i) {
-						CCVertex vertex;
-						vertex.position = GLKVector4Make(_worldVertices[i * 2], _worldVertices[i * 2 + 1], 0.0, 1.0);
-						vertex.color = GLKVector4Make(r, g, b, a);
-						vertex.texCoord1 = GLKVector2Make(uvs[i * 2], 1 - uvs[i * 2 + 1]);
-						CCRenderBufferSetVertex(buffer, i, CCVertexApplyTransform(vertex, transform));
-					}
-					for (int j = 0; j * 3 < trianglesCount; ++j) {
-						CCRenderBufferSetTriangle(buffer, j, triangles[j * 3], triangles[j * 3 + 1], triangles[j * 3 + 2]);
-					}
-				} else {
-					if (slot->darkColor) {
-						dr = slot->darkColor->r;
-						dg = slot->darkColor->g;
-						db = slot->darkColor->b;
+				
+				if (spSkeletonClipping_isClipping(_clipper)) {
+					spSkeletonClipping_clipTriangles(_clipper, vertices, verticesCount, triangles, trianglesCount, uvs);
+					vertices = _clipper->clippedVertices->items;
+					verticesCount = _clipper->clippedVertices->size;
+					uvs = _clipper->clippedUVs->items;
+					triangles = _clipper->clippedTriangles->items;
+					trianglesCount = _clipper->clippedTriangles->size;
+				}
+				
+				if (trianglesCount > 0) {
+					if (!self.twoColorTint) {
+						CCRenderBuffer buffer = [renderer enqueueTriangles:(trianglesCount / 3) andVertexes:verticesCount withState:self.renderState globalSortOrder:0];
+						for (int i = 0; i * 2 < verticesCount; ++i) {
+							CCVertex vertex;
+							vertex.position = GLKVector4Make(vertices[i * 2], vertices[i * 2 + 1], 0.0, 1.0);
+							vertex.color = GLKVector4Make(r, g, b, a);
+							vertex.texCoord1 = GLKVector2Make(uvs[i * 2], 1 - uvs[i * 2 + 1]);
+							CCRenderBufferSetVertex(buffer, i, CCVertexApplyTransform(vertex, transform));
+						}
+						for (int j = 0; j * 3 < trianglesCount; ++j) {
+							CCRenderBufferSetTriangle(buffer, j, triangles[j * 3], triangles[j * 3 + 1], triangles[j * 3 + 2]);
+						}
 					} else {
-						dr = dg = db = 0;
+						if (slot->darkColor) {
+							dr = slot->darkColor->r;
+							dg = slot->darkColor->g;
+							db = slot->darkColor->b;
+						} else {
+							dr = dg = db = 0;
+						}
+						
+						spMeshPart meshPart;
+						spMesh_allocatePart(mesh, &meshPart, verticesCount / 2, trianglesCount, self.texture.name, srcBlend, dstBlend);
+						
+						spVertex* verts = &meshPart.mesh->vertices[meshPart.startVertex];
+						unsigned short* indices = &meshPart.mesh->indices[meshPart.startIndex];
+						
+						for (int i = 0; i * 2 < verticesCount; i++, vertices++) {
+							CCVertex vertex;
+							vertex.position = GLKVector4Make(vertices[i * 2], vertices[i * 2 + 1], 0.0, 1.0);
+							vertex = CCVertexApplyTransform(vertex, transform);
+							verts->x = vertex.position.x;
+							verts->y = vertex.position.y;
+							verts->z = vertex.position.z;
+							verts->w = vertex.position.w;
+							verts->color = ((unsigned short)(r * 255))| ((unsigned short)(g * 255)) << 8 | ((unsigned short)(b * 255)) <<16 | ((unsigned short)(a * 255)) << 24;
+							verts->color2 = ((unsigned short)(dr * 255)) | ((unsigned short)(dg * 255)) << 8 | ((unsigned short)(db * 255)) << 16 | ((unsigned short)(255)) << 24;
+							verts->u = uvs[i * 2];
+							verts->v = 1 - uvs[i * 2 + 1];
+						}
+						
+						for (int j = 0; j < trianglesCount; j++, indices++) {
+							*indices = triangles[j];
+						}
+						
+						[renderer enqueueBlock:^{
+							spTwoColorBatcher_add(batcher, meshPart);
+						} globalSortOrder:0 debugLabel: nil threadSafe: false];
 					}
-					
-					spMeshPart meshPart;
-					spMesh_allocatePart(mesh, &meshPart, verticesCount / 2, trianglesCount, self.texture.name, srcBlend, dstBlend);
-					
-					spVertex* vertices = &meshPart.mesh->vertices[meshPart.startVertex];
-					unsigned short* indices = &meshPart.mesh->indices[meshPart.startIndex];
-					
-					for (int i = 0; i * 2 < verticesCount; i++, vertices++) {
-						CCVertex vertex;
-						vertex.position = GLKVector4Make(_worldVertices[i * 2], _worldVertices[i * 2 + 1], 0.0, 1.0);
-						vertex = CCVertexApplyTransform(vertex, transform);
-						vertices->x = vertex.position.x;
-						vertices->y = vertex.position.y;
-						vertices->z = vertex.position.z;
-						vertices->w = vertex.position.w;
-						vertices->color = ((unsigned short)(r * 255))| ((unsigned short)(g * 255)) << 8 | ((unsigned short)(b * 255)) <<16 | ((unsigned short)(a * 255)) << 24;
-						vertices->color2 = ((unsigned short)(dr * 255)) | ((unsigned short)(dg * 255)) << 8 | ((unsigned short)(db * 255)) << 16 | ((unsigned short)(255)) << 24;
-						vertices->u = uvs[i * 2];
-						vertices->v = 1 - uvs[i * 2 + 1];
-					}
-					
-					for (int j = 0; j < trianglesCount; j++, indices++) {
-						*indices = triangles[j];
-					}
-					
-					[renderer enqueueBlock:^{
-						spTwoColorBatcher_add(batcher, meshPart);
-					} globalSortOrder:0 debugLabel: nil threadSafe: false];
 				}
 			}
 		}
+		spSkeletonClipping_clipEnd(_clipper, slot);
 	}
+	spSkeletonClipping_clipEnd2(_clipper);
 	
 	if (self.twoColorTint) {
 		[renderer enqueueBlock:^{

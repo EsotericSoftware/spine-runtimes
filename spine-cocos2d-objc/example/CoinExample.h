@@ -28,43 +28,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#import "TankExample.h"
-#import "CoinExample.h"
+#import "cocos2d.h"
+#import <spine/spine-cocos2d-objc.h>
 
-@implementation TankExample
-
-+ (CCScene*) scene {
-    CCScene *scene = [CCScene node];
-    [scene addChild:[TankExample node]];
-    return scene;
+@interface CoinExample : CCNode {
+	SkeletonAnimation* skeletonNode;
 }
 
--(id) init {
-    self = [super init];
-    if (!self) return nil;
-    
-    skeletonNode = [SkeletonAnimation skeletonWithFile:@"tank.json" atlasFile:@"tank.atlas" scale:0.2f];
-    [skeletonNode setAnimationForTrack:0 name:@"drive" loop:YES];
-    
-    CGSize windowSize = [[CCDirector sharedDirector] viewSize];
-    [skeletonNode setPosition:ccp(windowSize.width / 2, 20)];
-    [self addChild:skeletonNode];
-    
-    self.userInteractionEnabled = YES;
-    self.contentSize = windowSize;
-    
-    return self;
-}
-
-#if ( TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR )
-- (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event {
-    if (!skeletonNode.debugBones)
-        skeletonNode.debugBones = true;
-    else if (skeletonNode.timeScale == 1)
-        skeletonNode.timeScale = 0.3f;
-    else
-        [[CCDirector sharedDirector] replaceScene:[CoinExample scene]];
-}
-#endif
++ (CCScene*) scene;
 
 @end

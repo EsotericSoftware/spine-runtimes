@@ -34,6 +34,14 @@
 		765A2EF61D7D7A08003FB779 /* goblins.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 765A2EF41D7D7A08003FB779 /* goblins.atlas */; };
 		765A2EF71D7D7A08003FB779 /* goblins.png in Resources */ = {isa = PBXBuildFile; fileRef = 765A2EF51D7D7A08003FB779 /* goblins.png */; };
 		76BF7E071E66ED9C00485998 /* GLUtils.c in Sources */ = {isa = PBXBuildFile; fileRef = 76BF7E051E66ED9C00485998 /* GLUtils.c */; };
+		76EE4E461EB36DE6000254F4 /* Array.c in Sources */ = {isa = PBXBuildFile; fileRef = 76EE4E421EB36DE6000254F4 /* Array.c */; };
+		76EE4E471EB36DE6000254F4 /* ClippingAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 76EE4E431EB36DE6000254F4 /* ClippingAttachment.c */; };
+		76EE4E481EB36DE6000254F4 /* SkeletonClipping.c in Sources */ = {isa = PBXBuildFile; fileRef = 76EE4E441EB36DE6000254F4 /* SkeletonClipping.c */; };
+		76EE4E491EB36DE6000254F4 /* Triangulator.c in Sources */ = {isa = PBXBuildFile; fileRef = 76EE4E451EB36DE6000254F4 /* Triangulator.c */; };
+		76EE4E511EB36E53000254F4 /* coin.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 76EE4E4E1EB36E53000254F4 /* coin.atlas */; };
+		76EE4E521EB36E53000254F4 /* coin.json in Resources */ = {isa = PBXBuildFile; fileRef = 76EE4E4F1EB36E53000254F4 /* coin.json */; };
+		76EE4E531EB36E53000254F4 /* coin.png in Resources */ = {isa = PBXBuildFile; fileRef = 76EE4E501EB36E53000254F4 /* coin.png */; };
+		76EE4E561EB36E94000254F4 /* CoinExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 76EE4E551EB36E94000254F4 /* CoinExample.m */; };
 		76F28D161DEC810300CDE54D /* Animation.c in Sources */ = {isa = PBXBuildFile; fileRef = 76F28CF41DEC810200CDE54D /* Animation.c */; };
 		76F28D171DEC810300CDE54D /* AnimationState.c in Sources */ = {isa = PBXBuildFile; fileRef = 76F28CF51DEC810300CDE54D /* AnimationState.c */; };
 		76F28D181DEC810300CDE54D /* AnimationStateData.c in Sources */ = {isa = PBXBuildFile; fileRef = 76F28CF61DEC810300CDE54D /* AnimationStateData.c */; };
@@ -162,6 +170,15 @@
 		765A2EF51D7D7A08003FB779 /* goblins.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = goblins.png; path = Resources/goblins.png; sourceTree = "<group>"; };
 		76BF7E051E66ED9C00485998 /* GLUtils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GLUtils.c; path = src/spine/GLUtils.c; sourceTree = "<group>"; };
 		76BF7E061E66ED9C00485998 /* GLUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GLUtils.h; path = src/spine/GLUtils.h; sourceTree = "<group>"; };
+		76EE4E421EB36DE6000254F4 /* Array.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Array.c; path = "../spine-c/spine-c/src/spine/Array.c"; sourceTree = "<group>"; };
+		76EE4E431EB36DE6000254F4 /* ClippingAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ClippingAttachment.c; path = "../spine-c/spine-c/src/spine/ClippingAttachment.c"; sourceTree = "<group>"; };
+		76EE4E441EB36DE6000254F4 /* SkeletonClipping.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SkeletonClipping.c; path = "../spine-c/spine-c/src/spine/SkeletonClipping.c"; sourceTree = "<group>"; };
+		76EE4E451EB36DE6000254F4 /* Triangulator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Triangulator.c; path = "../spine-c/spine-c/src/spine/Triangulator.c"; sourceTree = "<group>"; };
+		76EE4E4E1EB36E53000254F4 /* coin.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = coin.atlas; path = Resources/coin.atlas; sourceTree = "<group>"; };
+		76EE4E4F1EB36E53000254F4 /* coin.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = coin.json; path = Resources/coin.json; sourceTree = "<group>"; };
+		76EE4E501EB36E53000254F4 /* coin.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = coin.png; path = Resources/coin.png; sourceTree = "<group>"; };
+		76EE4E541EB36E94000254F4 /* CoinExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoinExample.h; path = example/CoinExample.h; sourceTree = "<group>"; };
+		76EE4E551EB36E94000254F4 /* CoinExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CoinExample.m; path = example/CoinExample.m; sourceTree = "<group>"; };
 		76F28CF41DEC810200CDE54D /* Animation.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Animation.c; path = "../spine-c/spine-c/src/spine/Animation.c"; sourceTree = "<group>"; };
 		76F28CF51DEC810300CDE54D /* AnimationState.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = AnimationState.c; path = "../spine-c/spine-c/src/spine/AnimationState.c"; sourceTree = "<group>"; };
 		76F28CF61DEC810300CDE54D /* AnimationStateData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = AnimationStateData.c; path = "../spine-c/spine-c/src/spine/AnimationStateData.c"; sourceTree = "<group>"; };
@@ -269,6 +286,8 @@
 				76F5BDA91D2BDE67005917E5 /* RaptorExample.m */,
 				76F5BDAB1D2BDFA2005917E5 /* TankExample.h */,
 				76F5BDAC1D2BDFA2005917E5 /* TankExample.m */,
+				76EE4E541EB36E94000254F4 /* CoinExample.h */,
+				76EE4E551EB36E94000254F4 /* CoinExample.m */,
 				43C32A07170B10FF004A9460 /* AppDelegate.h */,
 				43C32A08170B10FF004A9460 /* AppDelegate.m */,
 				43C32A05170B0F93004A9460 /* main.m */,
@@ -280,6 +299,10 @@
 		43C32822170B0BC2004A9460 /* spine-c */ = {
 			isa = PBXGroup;
 			children = (
+				76EE4E421EB36DE6000254F4 /* Array.c */,
+				76EE4E431EB36DE6000254F4 /* ClippingAttachment.c */,
+				76EE4E441EB36DE6000254F4 /* SkeletonClipping.c */,
+				76EE4E451EB36DE6000254F4 /* Triangulator.c */,
 				76FAC1941E3FA15E001CCC8C /* Color.c */,
 				76FAC1951E3FA15E001CCC8C /* PointAttachment.c */,
 				76F28CF41DEC810200CDE54D /* Animation.c */,
@@ -338,6 +361,9 @@
 		43C32867170B0C7F004A9460 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				76EE4E4E1EB36E53000254F4 /* coin.atlas */,
+				76EE4E4F1EB36E53000254F4 /* coin.json */,
+				76EE4E501EB36E53000254F4 /* coin.png */,
 				765A2EF41D7D7A08003FB779 /* goblins.atlas */,
 				765A2EF51D7D7A08003FB779 /* goblins.png */,
 				76F5BD9C1D2BDE1C005917E5 /* raptor.atlas */,
@@ -515,14 +541,17 @@
 				43C3286E170B0DA6004A9460 /* spineboy.atlas in Resources */,
 				43C3286F170B0DA6004A9460 /* spineboy.png in Resources */,
 				43C3287D170B0DBE004A9460 /* Default-568h@2x.png in Resources */,
+				76EE4E521EB36E53000254F4 /* coin.json in Resources */,
 				43C3287E170B0DBE004A9460 /* Default-Landscape~ipad.png in Resources */,
 				43C3287F170B0DBE004A9460 /* Default.png in Resources */,
 				76F5BDA31D2BDE1C005917E5 /* raptor.json in Resources */,
+				76EE4E531EB36E53000254F4 /* coin.png in Resources */,
 				43C32880170B0DBE004A9460 /* Default@2x.png in Resources */,
 				765A2EF71D7D7A08003FB779 /* goblins.png in Resources */,
 				43C32881170B0DBE004A9460 /* Icon-72.png in Resources */,
 				76F5BDA41D2BDE1C005917E5 /* raptor.png in Resources */,
 				43C32882170B0DBE004A9460 /* Icon-Small-50.png in Resources */,
+				76EE4E511EB36E53000254F4 /* coin.atlas in Resources */,
 				76F5BDA21D2BDE1C005917E5 /* raptor.atlas in Resources */,
 				43C32883170B0DBE004A9460 /* Icon-Small.png in Resources */,
 				43C32884170B0DBE004A9460 /* Icon-Small@2x.png in Resources */,
@@ -553,16 +582,20 @@
 				76F5BDAA1D2BDE67005917E5 /* RaptorExample.m in Sources */,
 				76F28D301DEC810300CDE54D /* Skin.c in Sources */,
 				76F28D251DEC810300CDE54D /* Json.c in Sources */,
+				76EE4E491EB36DE6000254F4 /* Triangulator.c in Sources */,
 				76F28D1C1DEC810300CDE54D /* AttachmentLoader.c in Sources */,
+				76EE4E461EB36DE6000254F4 /* Array.c in Sources */,
 				76F28D241DEC810300CDE54D /* IkConstraintData.c in Sources */,
 				76F28D1E1DEC810300CDE54D /* BoneData.c in Sources */,
 				76F28D2A1DEC810300CDE54D /* RegionAttachment.c in Sources */,
+				76EE4E471EB36DE6000254F4 /* ClippingAttachment.c in Sources */,
 				76F28D2C1DEC810300CDE54D /* SkeletonBinary.c in Sources */,
 				76F5BDAD1D2BDFA2005917E5 /* TankExample.m in Sources */,
 				76F28D171DEC810300CDE54D /* AnimationState.c in Sources */,
 				76F28D221DEC810300CDE54D /* extension.c in Sources */,
 				76F28D231DEC810300CDE54D /* IkConstraint.c in Sources */,
 				76BF7E071E66ED9C00485998 /* GLUtils.c in Sources */,
+				76EE4E481EB36DE6000254F4 /* SkeletonClipping.c in Sources */,
 				43C3282F170B0C19004A9460 /* spine-cocos2d-objc.m in Sources */,
 				76F28D1F1DEC810300CDE54D /* BoundingBoxAttachment.c in Sources */,
 				76F28D281DEC810300CDE54D /* PathConstraint.c in Sources */,
@@ -580,6 +613,7 @@
 				76F28D1B1DEC810300CDE54D /* Attachment.c in Sources */,
 				76F28D261DEC810300CDE54D /* MeshAttachment.c in Sources */,
 				76F28D1A1DEC810300CDE54D /* AtlasAttachmentLoader.c in Sources */,
+				76EE4E561EB36E94000254F4 /* CoinExample.m in Sources */,
 				76F28D211DEC810300CDE54D /* EventData.c in Sources */,
 				76F28D181DEC810300CDE54D /* AnimationStateData.c in Sources */,
 				43F7FF891927F94800CA4038 /* SkeletonRenderer.m in Sources */,

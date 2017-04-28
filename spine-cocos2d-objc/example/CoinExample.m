@@ -28,42 +28,46 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#import "TankExample.h"
 #import "CoinExample.h"
+#import "SpineBoyExample.h"
 
-@implementation TankExample
+@implementation CoinExample
 
 + (CCScene*) scene {
-    CCScene *scene = [CCScene node];
-    [scene addChild:[TankExample node]];
-    return scene;
+	CCScene *scene = [CCScene node];
+	[scene addChild:[CoinExample node]];
+	return scene;
 }
 
 -(id) init {
-    self = [super init];
-    if (!self) return nil;
-    
-    skeletonNode = [SkeletonAnimation skeletonWithFile:@"tank.json" atlasFile:@"tank.atlas" scale:0.2f];
-    [skeletonNode setAnimationForTrack:0 name:@"drive" loop:YES];
-    
-    CGSize windowSize = [[CCDirector sharedDirector] viewSize];
-    [skeletonNode setPosition:ccp(windowSize.width / 2, 20)];
-    [self addChild:skeletonNode];
-    
-    self.userInteractionEnabled = YES;
+	self = [super init];
+	if (!self) return nil;
+
+	skeletonNode = [SkeletonAnimation skeletonWithFile:@"coin.json" atlasFile:@"coin.atlas" scale:0.5];
+
+    __weak SkeletonAnimation* node = skeletonNode;
+	skeletonNode.twoColorTint = false;
+	
+	[skeletonNode setAnimationForTrack:0 name:@"rotate" loop:YES];
+
+	CGSize windowSize = [[CCDirector sharedDirector] viewSize];
+	[skeletonNode setPosition:ccp(windowSize.width / 2, windowSize.height / 2 - 100)];
+	[self addChild:skeletonNode];
+
+	self.userInteractionEnabled = YES;
     self.contentSize = windowSize;
-    
-    return self;
+
+	return self;
 }
 
 #if ( TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR )
 - (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event {
-    if (!skeletonNode.debugBones)
-        skeletonNode.debugBones = true;
-    else if (skeletonNode.timeScale == 1)
-        skeletonNode.timeScale = 0.3f;
-    else
-        [[CCDirector sharedDirector] replaceScene:[CoinExample scene]];
+	if (!skeletonNode.debugBones)
+		skeletonNode.debugBones = true;
+	else if (skeletonNode.timeScale == 1)
+		skeletonNode.timeScale = 0.3f;
+	else
+		[[CCDirector sharedDirector] replaceScene:[SpineboyExample scene]];
 }
 #endif
 

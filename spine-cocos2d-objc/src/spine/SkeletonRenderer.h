@@ -46,6 +46,7 @@
 	spAtlas* _atlas;
 	float* _worldVertices;
 	CCBlendMode* screenMode;
+	spSkeletonClipping* _clipper;
 }
 
 + (id) skeletonWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
