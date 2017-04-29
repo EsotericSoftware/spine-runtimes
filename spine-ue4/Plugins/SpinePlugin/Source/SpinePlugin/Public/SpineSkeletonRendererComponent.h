@@ -67,6 +67,8 @@ public:
 
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	FLinearColor Color = FLinearColor(1, 1, 1, 1);
+
+	virtual void FinishDestroy() override;
 	
 protected:
 	void UpdateMesh (spSkeleton* Skeleton);
@@ -89,4 +91,7 @@ protected:
 	UPROPERTY()
 	TArray<UMaterialInstanceDynamic*> atlasScreenBlendMaterials;
 	TMap<spAtlasPage*, UMaterialInstanceDynamic*> pageToScreenBlendMaterial;
+
+	spFloatArray* worldVertices;
+	spSkeletonClipping* clipper;
 };

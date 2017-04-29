@@ -54,8 +54,16 @@ USpineSkeletonRendererComponent::USpineSkeletonRendererComponent (const FObjectI
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> ScreenMaterialRef(TEXT("/SpinePlugin/SpineUnlitScreenMaterial"));
 	ScreenBlendMaterial = ScreenMaterialRef.Object;
 	
-	
 	TextureParameterName = FName(TEXT("SpriteTexture"));
+
+	worldVertices = spFloatArray_create(1024 * 2);
+	clipper = spSkeletonClipping_create();
+}
+
+void USpineSkeletonRendererComponent::FinishDestroy() {
+	if (clipper) spSkeletonClipping_dispose(clipper);
+	if (worldVertices) spFloatArray_dispose(worldVertices);
+	Super::FinishDestroy();
 }
 
 void USpineSkeletonRendererComponent::BeginPlay () {
@@ -179,9 +187,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 	TArray<FVector2D> uvs;
 	TArray<FColor> colors;
 	TArray<FProcMeshTangent> darkColors;
-
-	TArray<float> attachmentVertices;
-	attachmentVertices.SetNumUninitialized(2 * 1024);
+	
 	int idx = 0;
 	int meshSection = 0;
 	UMaterialInstanceDynamic* lastMaterial = nullptr;
@@ -192,6 +198,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 	unsigned short quadIndices[] = { 0, 1, 2, 0, 2, 3 };
 
 	for (int i = 0; i < Skeleton->slotsCount; ++i) {
+		float* attachmentVertices = worldVertices->items;
 		unsigned short* attachmentIndices = nullptr;
 		int numVertices;
 		int numIndices;
@@ -203,27 +210,31 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 		spSlot* slot = Skeleton->drawOrder[i];
 		spAttachment* attachment = slot->attachment;
 		if (!attachment) continue;
-		if (attachment->type != SP_ATTACHMENT_REGION && attachment->type != SP_ATTACHMENT_MESH) continue;
+		if (attachment->type != SP_ATTACHMENT_REGION && attachment->type != SP_ATTACHMENT_MESH && attachment->type != SP_ATTACHMENT_CLIPPING) continue;
 		
 		if (attachment->type == SP_ATTACHMENT_REGION) {
 			spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
 			spColor_setFromColor(&attachmentColor, &regionAttachment->color);
 			attachmentAtlasRegion = (spAtlasRegion*)regionAttachment->rendererObject;
-			spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, attachmentVertices.GetData(), 0, 2);
+			spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, attachmentVertices, 0, 2);
 			attachmentIndices = quadIndices;
 			attachmentUvs = regionAttachment->uvs;
 			numVertices = 4;
 			numIndices = 6;
-		} else /*mesh*/ {
+		} else if (attachment->type == SP_ATTACHMENT_MESH) {
 			spMeshAttachment* mesh = (spMeshAttachment*)attachment;
 			spColor_setFromColor(&attachmentColor, &mesh->color);
 			attachmentAtlasRegion = (spAtlasRegion*)mesh->rendererObject;			
-			if (mesh->super.worldVerticesLength > attachmentVertices.Num()) attachmentVertices.SetNum(mesh->super.worldVerticesLength);
-			spVertexAttachment_computeWorldVertices(&mesh->super, slot, 0, mesh->super.worldVerticesLength, attachmentVertices.GetData(), 0, 2);
+			if (mesh->super.worldVerticesLength > worldVertices->size) spFloatArray_setSize(worldVertices, mesh->super.worldVerticesLength);
+			spVertexAttachment_computeWorldVertices(&mesh->super, slot, 0, mesh->super.worldVerticesLength, attachmentVertices, 0, 2);
 			attachmentIndices = mesh->triangles;
 			attachmentUvs = mesh->uvs;
 			numVertices = mesh->super.worldVerticesLength >> 1;
 			numIndices = mesh->trianglesCount;
+		} else /* clipping */ {
+			spClippingAttachment* clip = (spClippingAttachment*)slot->attachment;
+			spSkeletonClipping_clipStart(clipper, slot, clip);
+			continue;
 		}
 
 		// if the user switches the atlas data while not having switched
@@ -250,6 +261,16 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 		default:
 			if (!pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) continue;
 			material = pageToNormalBlendMaterial[attachmentAtlasRegion->page];
+		}
+
+		if (spSkeletonClipping_isClipping(clipper)) {
+			spSkeletonClipping_clipTriangles(clipper, attachmentVertices, numVertices << 1, attachmentIndices, numIndices, attachmentUvs);
+			attachmentVertices = clipper->clippedVertices->items;
+			numVertices = clipper->clippedVertices->size >> 1;
+			attachmentIndices = clipper->clippedTriangles->items;
+			numIndices = clipper->clippedTriangles->size;
+			attachmentUvs = clipper->clippedUVs->items;
+			if (clipper->clippedTriangles->size == 0) continue;
 		}
 
 		if (lastMaterial != material) {
@@ -282,9 +303,12 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 
 		idx += numVertices;
 		depthOffset += this->DepthOffset;
+
+		spSkeletonClipping_clipEnd(clipper, slot);			
 	}
 	
 	Flush(meshSection, vertices, indices, uvs, colors,darkColors, lastMaterial);
+	spSkeletonClipping_clipEnd2(clipper);
 }
 
 #undef LOCTEXT_NAMESPACE
