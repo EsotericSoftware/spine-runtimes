@@ -57,7 +57,7 @@ int spSkeletonClipping_clipStart(spSkeletonClipping* self, spSlot* slot, spClipp
 void spSkeletonClipping_clipEnd(spSkeletonClipping* self, spSlot* slot);
 void spSkeletonClipping_clipEnd2(spSkeletonClipping* self);
 int /*boolean*/ spSkeletonClipping_isClipping(spSkeletonClipping* self);
-void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices, int verticesLength, unsigned short* triangles, int trianglesLength, float* uvs);
+void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices, int verticesLength, unsigned short* triangles, int trianglesLength, float* uvs, int stride);
 void spSkeletonClipping_dispose(spSkeletonClipping* self);
 
 #ifdef __cplusplus

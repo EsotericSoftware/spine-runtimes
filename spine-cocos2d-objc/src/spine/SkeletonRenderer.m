@@ -272,7 +272,7 @@ static bool handlerQueued = false;
 			if (_skipVisibilityCheck || CCRenderCheckVisbility(transform, center, extents)) {
 				
 				if (spSkeletonClipping_isClipping(_clipper)) {
-					spSkeletonClipping_clipTriangles(_clipper, vertices, verticesCount, triangles, trianglesCount, uvs);
+					spSkeletonClipping_clipTriangles(_clipper, vertices, verticesCount, triangles, trianglesCount, uvs, 2);
 					vertices = _clipper->clippedVertices->items;
 					verticesCount = _clipper->clippedVertices->size;
 					uvs = _clipper->clippedUVs->items;

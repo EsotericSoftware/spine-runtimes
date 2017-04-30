@@ -27,6 +27,7 @@
   * Removed `sp_MeshAttachment_computeWorldVertices`, superseded by `spVertexAttachment_computeWorldVertices`.
   * Removed `spBone_worldToLocalRotationX` and `spBone_worldToLocalRotationY`. Replaced by `spBone_worldToLocalRotation` (rotation given relative to x-axis, counter-clockwise, in degrees).
   * Replaced `r`, `g`, `b`, `a` fields with instances of new `spColor` struct in `spRegionAttachment`, `spMeshAttachment`, `spSkeleton`, `spSkeletonData`, `spSlot` and `spSlotData`.
+  * Removed `spVertexIndex`from public API.
  * **Additions**
   * Added support for local and relative transform constraint calculation, including additional fields in `spTransformConstraintData`.  
   * Added `spPointAttachment`, additional method `spAtlasAttachmentLoadeR_newPointAttachment`.
@@ -42,10 +43,12 @@
  * Added support for two color tinting. Tinting is enabled/disabled per `SkeletonRenderer`/`SkeletonAnimation` instance. Use `SkeletonRenderer::setTwoColorTint()`. Note that two color tinting requires the use of a non-standard shader and vertex format. This means that skeletons rendered with two color tinting will break batching. However, skeletons with two color tinting enabled and rendered after each other will be batched.
  * Updated example to use Cocos2d-x 3.14.1.
  * Added mesh debug rendering. Enable/Disable via `SkeletonRenderer::setDebugMeshesEnabled()`.
+ * Added support for clipping.
 
 ### Cocos2d-Objc
  * Fixed renderer to work with 3.6 changes
  * Added support for two color tinting. Tinting is enabled/disabled per `SkeletonRenderer/SkeletonAnimation.twoColorTint = true`. Note that two color tinted skeletons do not batch with other nodes.
+ * Added support for clipping.
 
 ### SFML
  * Fixed renderer to work with 3.6 changes. Sadly, two color tinting does not work, as the vertex format in SFML is fixed.
@@ -53,6 +56,7 @@
 ### Unreal Engine 4
  * Fixed renderer to work with 3.6 changes
  * Added new UPROPERTY to SpineSkeletonRendererComponent called `Color`. This allows to set the tint color of the skeleton in the editor, C++ and Blueprints. Under the hood, the `spSkeleton->color` will be set on every tick of the renderer component.
+ * Added support for clipping.
 
 ## C#
  * **Breaking changes**

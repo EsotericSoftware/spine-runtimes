@@ -43,10 +43,10 @@ Scene* CoinExample::scene () {
 bool CoinExample::init () {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
-	skeletonNode = SkeletonAnimation::createWithJsonFile("coin.json", "coin.atlas", 0.5f);
-	skeletonNode->setAnimation(0, "rotate", true);
+	skeletonNode = SkeletonAnimation::createWithJsonFile("coin.json", "coin.atlas", 1);
+	skeletonNode->setAnimation(0, "rotate", true);	
 
-	skeletonNode->setPosition(Vec2(_contentSize.width / 2, 150));
+	skeletonNode->setPosition(Vec2(_contentSize.width / 2, 100));
 	addChild(skeletonNode);
 
 	scheduleUpdate();

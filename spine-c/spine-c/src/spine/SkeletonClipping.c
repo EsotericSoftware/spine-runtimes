@@ -206,7 +206,7 @@ int /*boolean*/ _clip(spSkeletonClipping* self, float x1, float y1, float x2, fl
 	return clipped;
 }
 
-void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices, int verticesLength, unsigned short* triangles, int trianglesLength, float* uvs) {
+void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices, int verticesLength, unsigned short* triangles, int trianglesLength, float* uvs, int stride) {
 	int i;
 	spFloatArray* clipOutput = self->clipOutput;
 	spFloatArray* clippedVertices = self->clippedVertices;
@@ -214,7 +214,6 @@ void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices,
 	spUnsignedShortArray* clippedTriangles = self->clippedTriangles;
 	spFloatArray** polygons = self->clippingPolygons->items;
 	int polygonsCount = self->clippingPolygons->size;
-	int vertexSize = 2;
 
 	short index = 0;
 	spFloatArray_clear(clippedVertices);
@@ -223,16 +222,16 @@ void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices,
 	outer:
 	for (i = 0; i < trianglesLength; i += 3) {
 		int p;
-		int vertexOffset = triangles[i] << 1;
+		int vertexOffset = triangles[i] * stride;
 		float x2, y2, u2, v2, x3, y3, u3, v3;
 		float x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
 		float u1 = uvs[vertexOffset], v1 = uvs[vertexOffset + 1];
 
-		vertexOffset = triangles[i + 1] << 1;
+		vertexOffset = triangles[i + 1] * stride;
 		x2 = vertices[vertexOffset]; y2 = vertices[vertexOffset + 1];
 		u2 = uvs[vertexOffset]; v2 = uvs[vertexOffset + 1];
 
-		vertexOffset = triangles[i + 2] << 1;
+		vertexOffset = triangles[i + 2] * stride;
 		x3 = vertices[vertexOffset]; y3 = vertices[vertexOffset + 1];
 		u3 = uvs[vertexOffset]; v3 = uvs[vertexOffset + 1];
 
@@ -254,8 +253,8 @@ void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices,
 
 				clipOutputCount = clipOutputLength >> 1;
 				clipOutputItems = clipOutput->items;
-				clippedVerticesItems = spFloatArray_setSize(clippedVertices, s + clipOutputCount * vertexSize)->items;
-				clippedUVsItems = spFloatArray_setSize(clippedUVs, s + clipOutputCount * vertexSize)->items;
+				clippedVerticesItems = spFloatArray_setSize(clippedVertices, s + (clipOutputCount << 1))->items;
+				clippedUVsItems = spFloatArray_setSize(clippedUVs, s + (clipOutputCount << 1))->items;
 				for (ii = 0; ii < clipOutputLength; ii += 2) {
 					float c0, c1, a, b, c;
 					float x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
@@ -283,8 +282,8 @@ void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices,
 
 			} else {
 				unsigned short* clippedTrianglesItems;
-				float* clippedVerticesItems = spFloatArray_setSize(clippedVertices, s + 3 * vertexSize)->items;
-				float* clippedUVsItems = spFloatArray_setSize(clippedUVs, s + 3 * vertexSize)->items;
+				float* clippedVerticesItems = spFloatArray_setSize(clippedVertices, s + (3 << 1))->items;
+				float* clippedUVsItems = spFloatArray_setSize(clippedUVs, s + (3 << 1))->items;
 				clippedVerticesItems[s] = x1;
 				clippedVerticesItems[s + 1] = y1;
 				clippedVerticesItems[s + 2] = x2;

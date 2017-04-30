@@ -264,7 +264,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 		}
 
 		if (spSkeletonClipping_isClipping(clipper)) {
-			spSkeletonClipping_clipTriangles(clipper, attachmentVertices, numVertices << 1, attachmentIndices, numIndices, attachmentUvs);
+			spSkeletonClipping_clipTriangles(clipper, attachmentVertices, numVertices << 1, attachmentIndices, numIndices, attachmentUvs, 2);
 			attachmentVertices = clipper->clippedVertices->items;
 			numVertices = clipper->clippedVertices->size >> 1;
 			attachmentIndices = clipper->clippedTriangles->items;

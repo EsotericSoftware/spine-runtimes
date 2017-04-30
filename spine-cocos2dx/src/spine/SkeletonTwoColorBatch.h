@@ -108,6 +108,10 @@ namespace spine {
         void update (float delta);
 
 		V3F_C4B_C4B_T2F* allocateVertices(uint32_t numVertices);
+		void deallocateVertices(uint32_t numVertices);
+		
+		unsigned short* allocateIndices(uint32_t numIndices);
+		void deallocateIndices(uint32_t numIndices);
 
 		TwoColorTrianglesCommand* addCommand(cocos2d::Renderer* renderer, float globalOrder, GLuint textureID, cocos2d::GLProgramState* glProgramState, cocos2d::BlendFunc blendType, const TwoColorTriangles& triangles, const cocos2d::Mat4& mv, uint32_t flags);
 
@@ -134,6 +138,9 @@ namespace spine {
 		// pool of vertices
 		std::vector<V3F_C4B_C4B_T2F> _vertices;
 		uint32_t _numVertices;
+		
+		// pool of indices
+		spUnsignedShortArray* _indices;
 		
 		// two color tint shader and state
 		cocos2d::GLProgram* _twoColorTintShader;

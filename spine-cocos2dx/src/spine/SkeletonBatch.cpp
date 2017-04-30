@@ -58,6 +58,8 @@ SkeletonBatch::SkeletonBatch () {
 		_commandsPool.push_back(new TrianglesCommand());
 	}
 	
+	_indices = spUnsignedShortArray_create(8);
+	
 	reset ();
 		
 	// callback after drawing is finished so we can clear out the batch state
@@ -70,6 +72,8 @@ SkeletonBatch::SkeletonBatch () {
 SkeletonBatch::~SkeletonBatch () {
 	Director::getInstance()->getEventDispatcher()->removeCustomEventListeners(EVENT_AFTER_DRAW_RESET_POSITION);
 
+	spUnsignedShortArray_dispose(_indices);
+	
 	for (unsigned int i = 0; i < _commandsPool.size(); i++) {
 		delete _commandsPool[i];
 		_commandsPool[i] = nullptr;
@@ -97,6 +101,36 @@ cocos2d::V3F_C4B_T2F* SkeletonBatch::allocateVertices(uint32_t numVertices) {
 	return vertices;
 }
 	
+void SkeletonBatch::deallocateVertices(uint32_t numVertices) {
+	_numVertices -= numVertices;
+}
+
+	
+unsigned short* SkeletonBatch::allocateIndices(uint32_t numIndices) {	
+	if (_indices->capacity - _indices->size < numIndices) {
+		unsigned short* oldData = _indices->items;
+		int oldSize = _indices->size;
+		spUnsignedShortArray_ensureCapacity(_indices, _indices->size + numIndices);
+		unsigned short* newData = _indices->items;
+		for (uint32_t i = 0; i < this->_nextFreeCommand; i++) {
+			TrianglesCommand* command = _commandsPool[i];
+			cocos2d::TrianglesCommand::Triangles& triangles = (cocos2d::TrianglesCommand::Triangles&)command->getTriangles();
+			if (triangles.indices >= oldData && triangles.indices < oldData + oldSize) {
+				triangles.indices = newData + (triangles.indices - oldData);
+			}
+		}
+	}
+	
+	unsigned short* indices = _indices->items + _indices->size;
+	_indices->size += numIndices;
+	return indices;
+}
+
+void SkeletonBatch::deallocateIndices(uint32_t numIndices) {
+	_indices->size -= numIndices;
+}
+
+	
 cocos2d::TrianglesCommand* SkeletonBatch::addCommand(cocos2d::Renderer* renderer, float globalOrder, cocos2d::Texture2D* texture, cocos2d::GLProgramState* glProgramState, cocos2d::BlendFunc blendType, const cocos2d::TrianglesCommand::Triangles& triangles, const cocos2d::Mat4& mv, uint32_t flags) {
 	TrianglesCommand* command = nextFreeCommand();
 	command->init(globalOrder, texture, glProgramState, blendType, triangles, mv, flags);
@@ -107,6 +141,7 @@ cocos2d::TrianglesCommand* SkeletonBatch::addCommand(cocos2d::Renderer* renderer
 void SkeletonBatch::reset() {
 	_nextFreeCommand = 0;
 	_numVertices = 0;
+	_indices->size = 0;
 }
 
 cocos2d::TrianglesCommand* SkeletonBatch::nextFreeCommand() {

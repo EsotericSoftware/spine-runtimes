@@ -31,6 +31,10 @@
 #include <spine/RegionAttachment.h>
 #include <spine/extension.h>
 
+typedef enum {
+	BLX = 0, BLY, ULX, ULY, URX, URY, BRX, BRY
+} spVertexIndex;
+
 void _spRegionAttachment_dispose (spAttachment* attachment) {
 	spRegionAttachment* self = SUB_CAST(spRegionAttachment, attachment);
 	_spAttachment_deinit(attachment);
@@ -49,23 +53,23 @@ spRegionAttachment* spRegionAttachment_create (const char* name) {
 
 void spRegionAttachment_setUVs (spRegionAttachment* self, float u, float v, float u2, float v2, int/*bool*/rotate) {
 	if (rotate) {
-		self->uvs[SP_VERTEX_X2] = u;
-		self->uvs[SP_VERTEX_Y2] = v2;
-		self->uvs[SP_VERTEX_X3] = u;
-		self->uvs[SP_VERTEX_Y3] = v;
-		self->uvs[SP_VERTEX_X4] = u2;
-		self->uvs[SP_VERTEX_Y4] = v;
-		self->uvs[SP_VERTEX_X1] = u2;
-		self->uvs[SP_VERTEX_Y1] = v2;
+		self->uvs[URX] = u;
+		self->uvs[URY] = v2;
+		self->uvs[BRX] = u;
+		self->uvs[BRY] = v;
+		self->uvs[BLX] = u2;
+		self->uvs[BLY] = v;
+		self->uvs[ULX] = u2;
+		self->uvs[ULY] = v2;
 	} else {
-		self->uvs[SP_VERTEX_X1] = u;
-		self->uvs[SP_VERTEX_Y1] = v2;
-		self->uvs[SP_VERTEX_X2] = u;
-		self->uvs[SP_VERTEX_Y2] = v;
-		self->uvs[SP_VERTEX_X3] = u2;
-		self->uvs[SP_VERTEX_Y3] = v;
-		self->uvs[SP_VERTEX_X4] = u2;
-		self->uvs[SP_VERTEX_Y4] = v2;
+		self->uvs[ULX] = u;
+		self->uvs[ULY] = v2;
+		self->uvs[URX] = u;
+		self->uvs[URY] = v;
+		self->uvs[BRX] = u2;
+		self->uvs[BRY] = v;
+		self->uvs[BLX] = u2;
+		self->uvs[BLY] = v2;
 	}
 }
 
@@ -86,32 +90,41 @@ void spRegionAttachment_updateOffset (spRegionAttachment* self) {
 	float localX2Sin = localX2 * sine;
 	float localY2Cos = localY2 * cosine + self->y;
 	float localY2Sin = localY2 * sine;
-	self->offset[SP_VERTEX_X1] = localXCos - localYSin;
-	self->offset[SP_VERTEX_Y1] = localYCos + localXSin;
-	self->offset[SP_VERTEX_X2] = localXCos - localY2Sin;
-	self->offset[SP_VERTEX_Y2] = localY2Cos + localXSin;
-	self->offset[SP_VERTEX_X3] = localX2Cos - localY2Sin;
-	self->offset[SP_VERTEX_Y3] = localY2Cos + localX2Sin;
-	self->offset[SP_VERTEX_X4] = localX2Cos - localYSin;
-	self->offset[SP_VERTEX_Y4] = localYCos + localX2Sin;
+	self->offset[BLX] = localXCos - localYSin;
+	self->offset[BLY] = localYCos + localXSin;
+	self->offset[ULX] = localXCos - localY2Sin;
+	self->offset[ULY] = localY2Cos + localXSin;
+	self->offset[URX] = localX2Cos - localY2Sin;
+	self->offset[URY] = localY2Cos + localX2Sin;
+	self->offset[BRX] = localX2Cos - localYSin;
+	self->offset[BRY] = localYCos + localX2Sin;
 }
 
 void spRegionAttachment_computeWorldVertices (spRegionAttachment* self, spBone* bone, float* vertices, int offset, int stride) {
 	const float* offsets = self->offset;
 	float x = bone->worldX, y = bone->worldY;
+	float offsetX, offsetY;
 
-	vertices[offset] = offsets[SP_VERTEX_X1] * bone->a + offsets[SP_VERTEX_Y1] * bone->b + x; /* br */
-	vertices[offset + 1] = offsets[SP_VERTEX_X1] * bone->c + offsets[SP_VERTEX_Y1] * bone->d + y;
+	offsetX = offsets[BRX];
+	offsetY = offsets[BRY];
+	vertices[offset] = offsetX * bone->a + offsetY * bone->b + x; /* br */
+	vertices[offset + 1] = offsetX * bone->c + offsetY * bone->d + y;
 	offset += stride;
 
-	vertices[offset] = offsets[SP_VERTEX_X2] * bone->a + offsets[SP_VERTEX_Y2] * bone->b + x; /* bl */
-	vertices[offset + 1] = offsets[SP_VERTEX_X2] * bone->c + offsets[SP_VERTEX_Y2] * bone->d + y;
+	offsetX = offsets[BLX];
+	offsetY = offsets[BLY];
+	vertices[offset] = offsetX * bone->a + offsetY * bone->b + x; /* bl */
+	vertices[offset + 1] = offsetX * bone->c + offsetY * bone->d + y;
 	offset += stride;
 
-	vertices[offset] = offsets[SP_VERTEX_X3] * bone->a + offsets[SP_VERTEX_Y3] * bone->b + x; /* ul */
-	vertices[offset + 1] = offsets[SP_VERTEX_X3] * bone->c + offsets[SP_VERTEX_Y3] * bone->d + y;
+	offsetX = offsets[ULX];
+	offsetY = offsets[ULY];
+	vertices[offset] = offsetX * bone->a + offsetY * bone->b + x; /* ul */
+	vertices[offset + 1] = offsetX * bone->c + offsetY * bone->d + y;
 	offset += stride;
 
-	vertices[offset] = offsets[SP_VERTEX_X4] * bone->a + offsets[SP_VERTEX_Y4] * bone->b + x; /* ur */
-	vertices[offset + 1] = offsets[SP_VERTEX_X4] * bone->c + offsets[SP_VERTEX_Y4] * bone->d + y;
+	offsetX = offsets[URX];
+	offsetY = offsets[URY];
+	vertices[offset] = offsetX * bone->a + offsetY * bone->b + x; /* ur */
+	vertices[offset + 1] = offsetX * bone->c + offsetY * bone->d + y;
 }

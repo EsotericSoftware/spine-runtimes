@@ -46,6 +46,9 @@ namespace spine {
         void update (float delta);
 		
 		cocos2d::V3F_C4B_T2F* allocateVertices(uint32_t numVertices);
+		void deallocateVertices(uint32_t numVertices);
+		unsigned short* allocateIndices(uint32_t numIndices);
+		void deallocateIndices(uint32_t numVertices);
 		cocos2d::TrianglesCommand* addCommand(cocos2d::Renderer* renderer, float globalOrder, cocos2d::Texture2D* texture, cocos2d::GLProgramState* glProgramState, cocos2d::BlendFunc blendType, const cocos2d::TrianglesCommand::Triangles& triangles, const cocos2d::Mat4& mv, uint32_t flags);
         
     protected:
@@ -63,6 +66,9 @@ namespace spine {
 		// pool of vertices
 		std::vector<cocos2d::V3F_C4B_T2F> _vertices;
 		uint32_t _numVertices;
+		
+		// pool of indices
+		spUnsignedShortArray* _indices;
     };
 	
 }

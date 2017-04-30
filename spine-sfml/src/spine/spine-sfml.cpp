@@ -169,7 +169,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		}
 
 		if (spSkeletonClipping_isClipping(clipper)) {
-			spSkeletonClipping_clipTriangles(clipper, vertices, verticesCount << 1, indices, indicesCount, uvs);
+			spSkeletonClipping_clipTriangles(clipper, vertices, verticesCount << 1, indices, indicesCount, uvs, 2);
 			vertices = clipper->clippedVertices->items;
 			verticesCount = clipper->clippedVertices->size >> 1;
 			uvs = clipper->clippedUVs->items;

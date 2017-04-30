@@ -229,15 +229,6 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 			color.b = attachment->color.b;
 			color.a = attachment->color.a;
 			
-			if (slot->darkColor) {
-				darkColor.r = slot->darkColor->r * 255;
-				darkColor.g = slot->darkColor->g * 255;
-				darkColor.b = slot->darkColor->b * 255;
-			} else {
-				darkColor.r = 0;
-				darkColor.g = 0;
-				darkColor.b = 0;
-			}
 			break;
 		}
 		case SP_ATTACHMENT_MESH: {
@@ -262,20 +253,11 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, trianglesTwoColor.vertCount * sizeof(V3F_C4B_C4B_T2F) / 4, (float*)trianglesTwoColor.verts, 0, 7);
 			}
 			
-            color.r = attachment->color.r;
-            color.g = attachment->color.g;
-            color.b = attachment->color.b;
+			color.r = attachment->color.r;
+			color.g = attachment->color.g;
+			color.b = attachment->color.b;
 			color.a = attachment->color.a;
 			
-			if (slot->darkColor) {
-				darkColor.r = slot->darkColor->r * 255;
-				darkColor.g = slot->darkColor->g * 255;
-				darkColor.b = slot->darkColor->b * 255;
-			} else {
-				darkColor.r = 0;
-				darkColor.g = 0;
-				darkColor.b = 0;
-			}
 			break;
 		}
 		case SP_ATTACHMENT_CLIPPING: {
@@ -285,7 +267,17 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		default:
 			continue;
 		}
-
+		
+		if (slot->darkColor) {
+			darkColor.r = slot->darkColor->r * 255;
+			darkColor.g = slot->darkColor->g * 255;
+			darkColor.b = slot->darkColor->b * 255;
+		} else {
+			darkColor.r = 0;
+			darkColor.g = 0;
+			darkColor.b = 0;
+		}
+		
 		color.a *= _skeleton->color.a * slot->color.a * 255;
 		float multiplier = _premultipliedAlpha ? color.a : 255;
 		color.r *= _skeleton->color.r * slot->color.r * multiplier;
@@ -312,28 +304,92 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		}
 		
 		if (!isTwoColorTint) {
-			cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, _glProgramState, blendFunc, triangles, transform, transformFlags);
-			
-			for (int v = 0, vn = batchedTriangles->getTriangles().vertCount; v < vn; ++v) {
-				V3F_C4B_T2F* vertex = batchedTriangles->getTriangles().verts + v;
-				vertex->colors.r = (GLubyte)color.r;
-				vertex->colors.g = (GLubyte)color.g;
-				vertex->colors.b = (GLubyte)color.b;
-				vertex->colors.a = (GLubyte)color.a;
+			if (spSkeletonClipping_isClipping(_clipper)) {
+				spSkeletonClipping_clipTriangles(_clipper, (float*)&triangles.verts[0].vertices, triangles.vertCount * sizeof(cocos2d::V3F_C4B_T2F) / 4, triangles.indices, triangles.indexCount, (float*)&triangles.verts[0].texCoords, 6);
+				batch->deallocateVertices(triangles.vertCount);
+				
+				if (_clipper->clippedTriangles->size == 0)
+					continue;
+				
+				triangles.vertCount = _clipper->clippedVertices->size >> 1;
+				triangles.verts = batch->allocateVertices(triangles.vertCount);
+				triangles.indexCount = _clipper->clippedTriangles->size;
+				triangles.indices = batch->allocateIndices(triangles.indexCount);
+				memcpy(triangles.indices, _clipper->clippedTriangles->items, sizeof(unsigned short) * _clipper->clippedTriangles->size);
+				
+				cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, _glProgramState, blendFunc, triangles, transform, transformFlags);
+				
+				float* verts = _clipper->clippedVertices->items;
+				float* uvs = _clipper->clippedUVs->items;
+				for (int v = 0, vn = batchedTriangles->getTriangles().vertCount, vv = 0; v < vn; ++v, vv+=2) {
+					V3F_C4B_T2F* vertex = batchedTriangles->getTriangles().verts + v;
+					vertex->vertices.x = verts[vv];
+					vertex->vertices.y = verts[vv + 1];
+					vertex->texCoords.u = uvs[vv];
+					vertex->texCoords.v = uvs[vv + 1];
+					vertex->colors.r = (GLubyte)color.r;
+					vertex->colors.g = (GLubyte)color.g;
+					vertex->colors.b = (GLubyte)color.b;
+					vertex->colors.a = (GLubyte)color.a;
+				}
+			} else {
+				cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, _glProgramState, blendFunc, triangles, transform, transformFlags);
+				
+				for (int v = 0, vn = batchedTriangles->getTriangles().vertCount; v < vn; ++v) {
+					V3F_C4B_T2F* vertex = batchedTriangles->getTriangles().verts + v;
+					vertex->colors.r = (GLubyte)color.r;
+					vertex->colors.g = (GLubyte)color.g;
+					vertex->colors.b = (GLubyte)color.b;
+					vertex->colors.a = (GLubyte)color.a;
+				}
 			}
 		} else {
-			TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture->getName(), _glProgramState, blendFunc, trianglesTwoColor, transform, transformFlags);
-			
-			for (int v = 0, vn = batchedTriangles->getTriangles().vertCount; v < vn; ++v) {
-				V3F_C4B_C4B_T2F* vertex = batchedTriangles->getTriangles().verts + v;
-				vertex->color.r = (GLubyte)color.r;
-				vertex->color.g = (GLubyte)color.g;
-				vertex->color.b = (GLubyte)color.b;
-				vertex->color.a = (GLubyte)color.a;
-				vertex->color2.r = (GLubyte)darkColor.r;
-				vertex->color2.g = (GLubyte)darkColor.g;
-				vertex->color2.b = (GLubyte)darkColor.b;
-				vertex->color2.a = 1;
+			if (spSkeletonClipping_isClipping(_clipper)) {
+				spSkeletonClipping_clipTriangles(_clipper, (float*)&trianglesTwoColor.verts[0].position, trianglesTwoColor.vertCount * sizeof(V3F_C4B_C4B_T2F) / 4, trianglesTwoColor.indices, trianglesTwoColor.indexCount, (float*)&trianglesTwoColor.verts[0].texCoords, 7);
+				twoColorBatch->deallocateVertices(trianglesTwoColor.vertCount);
+				
+				if (_clipper->clippedTriangles->size == 0)
+					continue;
+				
+				trianglesTwoColor.vertCount = _clipper->clippedVertices->size >> 1;
+				trianglesTwoColor.verts = twoColorBatch->allocateVertices(trianglesTwoColor.vertCount);
+				trianglesTwoColor.indexCount = _clipper->clippedTriangles->size;
+				trianglesTwoColor.indices = twoColorBatch->allocateIndices(trianglesTwoColor.indexCount);
+				memcpy(trianglesTwoColor.indices, _clipper->clippedTriangles->items, sizeof(unsigned short) * _clipper->clippedTriangles->size);
+				
+				TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture->getName(), _glProgramState, blendFunc, trianglesTwoColor, transform, transformFlags);
+				
+				float* verts = _clipper->clippedVertices->items;
+				float* uvs = _clipper->clippedUVs->items;
+				for (int v = 0, vn = batchedTriangles->getTriangles().vertCount, vv = 0; v < vn; ++v, vv += 2) {
+					V3F_C4B_C4B_T2F* vertex = batchedTriangles->getTriangles().verts + v;
+					vertex->position.x = verts[vv];
+					vertex->position.y = verts[vv + 1];
+					vertex->texCoords.u = uvs[vv];
+					vertex->texCoords.v = uvs[vv + 1];
+					vertex->color.r = (GLubyte)color.r;
+					vertex->color.g = (GLubyte)color.g;
+					vertex->color.b = (GLubyte)color.b;
+					vertex->color.a = (GLubyte)color.a;
+					vertex->color2.r = (GLubyte)darkColor.r;
+					vertex->color2.g = (GLubyte)darkColor.g;
+					vertex->color2.b = (GLubyte)darkColor.b;
+					vertex->color2.a = 1;
+				}
+			} else {
+				TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture->getName(), _glProgramState, blendFunc, trianglesTwoColor, transform, transformFlags);
+				
+				for (int v = 0, vn = batchedTriangles->getTriangles().vertCount; v < vn; ++v) {
+					V3F_C4B_C4B_T2F* vertex = batchedTriangles->getTriangles().verts + v;
+					vertex->color.r = (GLubyte)color.r;
+					vertex->color.g = (GLubyte)color.g;
+					vertex->color.b = (GLubyte)color.b;
+					vertex->color.a = (GLubyte)color.a;
+					vertex->color2.r = (GLubyte)darkColor.r;
+					vertex->color2.g = (GLubyte)darkColor.g;
+					vertex->color2.b = (GLubyte)darkColor.b;
+					vertex->color2.a = 1;
+				}
 			}
 		}
 		spSkeletonClipping_clipEnd(_clipper, slot);

@@ -35,6 +35,7 @@
 
 #include "RaptorExample.h"
 #include "BatchingExample.h"
+#include "CoinExample.h"
 #include "AppMacros.h"
 
 USING_NS_CC;

@@ -46,7 +46,7 @@ bool RaptorExample::init () {
 	skeletonNode = SkeletonAnimation::createWithJsonFile("raptor.json", "raptor.atlas", 0.5f);
 	skeletonNode->setAnimation(0, "walk", true);
 	skeletonNode->setAnimation(1, "empty", false);
-	skeletonNode->addAnimation(1, "gungrab", false, 2);
+	skeletonNode->addAnimation(1, "gungrab", false, 2);	
 
 	skeletonNode->setPosition(Vec2(_contentSize.width / 2, 20));
 	addChild(skeletonNode);
