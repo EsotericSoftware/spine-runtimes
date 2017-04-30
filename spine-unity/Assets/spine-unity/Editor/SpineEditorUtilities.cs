@@ -919,6 +919,10 @@ namespace Spine.Unity.Editor {
 			public PointAttachment NewPointAttachment (Skin skin, string name) {
 				return new PointAttachment(name);
 			}
+
+			public ClippingAttachment NewClippingAttachment (Skin skin, string name) {
+				return new ClippingAttachment(name);
+			}
 		}
 		#endregion
 

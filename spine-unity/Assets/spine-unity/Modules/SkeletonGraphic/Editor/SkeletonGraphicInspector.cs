@@ -41,6 +41,7 @@ namespace Spine.Unity.Editor {
 		SerializedProperty material_, color_;
 		SerializedProperty skeletonDataAsset_, initialSkinName_;
 		SerializedProperty startingAnimation_, startingLoop_, timeScale_, freeze_, unscaledTime_, tintBlack_;
+		SerializedProperty meshGeneratorSettings_;
 		SerializedProperty raycastTarget_;
 
 		SkeletonGraphic thisSkeletonGraphic;
@@ -65,6 +66,8 @@ namespace Spine.Unity.Editor {
 			timeScale_ = so.FindProperty("timeScale");
 			unscaledTime_ = so.FindProperty("unscaledTime");
 			freeze_ = so.FindProperty("freeze");
+
+			meshGeneratorSettings_ = so.FindProperty("meshGenerator").FindPropertyRelative("settings");
 		}
 
 		public override void OnInspectorGUI () {
@@ -80,10 +83,12 @@ namespace Spine.Unity.Editor {
 				serializedObject.Update();
 				return;
 			}
+			using (new SpineInspectorUtility.BoxScope()) {
+				EditorGUILayout.PropertyField(meshGeneratorSettings_, new GUIContent("Advanced..."), includeChildren: true);
+			}
 
 			EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(initialSkinName_);
-			//EditorGUILayout.PropertyField(tintBlack_);
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("Animation", EditorStyles.boldLabel);
 			EditorGUILayout.PropertyField(startingAnimation_);
@@ -106,7 +111,7 @@ namespace Spine.Unity.Editor {
 		[MenuItem("CONTEXT/SkeletonGraphic/Match RectTransform with Mesh Bounds")]
 		static void MatchRectTransformWithBounds (MenuCommand command) {
 			var skeletonGraphic = (SkeletonGraphic)command.context;
-			var mesh = skeletonGraphic.SpineMeshGenerator.LastGeneratedMesh;
+			var mesh = skeletonGraphic.GetComponent<MeshFilter>().sharedMesh;
 
 			mesh.RecalculateBounds();
 			var bounds = mesh.bounds;

@@ -29,15 +29,14 @@
  *****************************************************************************/
 
 using UnityEngine;
-using Spine.Unity.MeshGeneration;
 
 namespace Spine.Unity.Modules {
 	[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
 	public class SkeletonPartsRenderer : MonoBehaviour {
 
 		#region Properties
-		ISubmeshSetMeshGenerator meshGenerator;
-		public ISubmeshSetMeshGenerator MeshGenerator {
+		MeshGenerator meshGenerator;
+		public MeshGenerator MeshGenerator {
 			get {
 				LazyIntialize();
 				return meshGenerator;
@@ -61,11 +60,21 @@ namespace Spine.Unity.Modules {
 		}
 		#endregion
 
+		MeshRendererBuffers buffers;
+		SkeletonRendererInstruction currentInstructions = new SkeletonRendererInstruction();
+
+
 		void LazyIntialize () {
-			if (meshGenerator != null) return;
-			meshGenerator = new ArraysSubmeshSetMeshGenerator();
-			meshFilter = GetComponent<MeshFilter>();
-			meshRenderer = GetComponent<MeshRenderer>();
+			if (buffers == null) {
+				buffers = new MeshRendererBuffers();
+				buffers.Initialize();
+
+				if (meshGenerator != null) return;
+				meshGenerator = new MeshGenerator();
+				meshFilter = GetComponent<MeshFilter>();
+				meshRenderer = GetComponent<MeshRenderer>();
+				currentInstructions.Clear();
+			}
 		}
 
 		public void ClearMesh () {
@@ -75,9 +84,31 @@ namespace Spine.Unity.Modules {
 
 		public void RenderParts (ExposedList<SubmeshInstruction> instructions, int startSubmesh, int endSubmesh) {
 			LazyIntialize();
-			MeshAndMaterials m = meshGenerator.GenerateMesh(instructions, startSubmesh, endSubmesh);
-			meshFilter.sharedMesh = m.mesh;
-			meshRenderer.sharedMaterials = m.materials;
+
+			// STEP 1: Create instruction
+			currentInstructions.SetWithSubset(instructions, startSubmesh, endSubmesh);
+
+			// STEP 2: Generate mesh buffers.
+			var currentInstructionsSubmeshesItems = currentInstructions.submeshInstructions.Items;
+			meshGenerator.BeginNewMesh();
+			for (int i = 0; i < currentInstructions.submeshInstructions.Count; i++)
+				meshGenerator.AddSubmesh(currentInstructionsSubmeshesItems[i]);
+
+			buffers.UpdateSharedMaterials(currentInstructions.submeshInstructions);
+
+			// STEP 3: modify mesh.
+			var smartMesh = buffers.GetNextMesh();
+			var mesh = smartMesh.mesh;
+			meshGenerator.FillVertexData(mesh);
+			if (SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, smartMesh.instructionUsed)) {
+				meshGenerator.FillTriangles(mesh);
+				meshRenderer.sharedMaterials = buffers.GetUpdatedShaderdMaterialsArray();
+			} else if (buffers.MaterialsChangedInLastUpdate()) {
+				meshRenderer.sharedMaterials = buffers.GetUpdatedShaderdMaterialsArray();
+			}
+
+			meshFilter.sharedMesh = mesh;
+			smartMesh.instructionUsed.Set(currentInstructions);
 		}
 
 		public void SetPropertyBlock (MaterialPropertyBlock block) {

@@ -150,9 +150,10 @@ namespace Spine.Unity {
 		protected Spine.AnimationState state;
 		public Spine.AnimationState AnimationState { get { return state; } }
 
-		// This is any object that can give you a mesh when you give it a skeleton to render.
-		protected Spine.Unity.MeshGeneration.ISimpleMeshGenerator spineMeshGenerator;
-		public Spine.Unity.MeshGeneration.ISimpleMeshGenerator SpineMeshGenerator { get { return this.spineMeshGenerator; } }
+		[SerializeField] protected Spine.Unity.MeshGenerator meshGenerator = new MeshGenerator();
+		public Spine.Unity.MeshGenerator MeshGenerator { get { return this.meshGenerator; } }
+		DoubleBuffered<Spine.Unity.MeshRendererBuffers.SmartMesh> meshBuffers;
+		SkeletonRendererInstruction currentInstructions = new SkeletonRendererInstruction();
 
 		public event UpdateBonesDelegate UpdateLocal;
 		public event UpdateBonesDelegate UpdateWorld;
@@ -180,9 +181,7 @@ namespace Spine.Unity {
 			}
 
 			this.skeleton = new Skeleton(skeletonData);
-			this.spineMeshGenerator = new Spine.Unity.MeshGeneration.ArraysSimpleMeshGenerator(); // You can switch this out with any other implementer of Spine.Unity.MeshGeneration.ISimpleMeshGenerator
-			//this.spineMeshGenerator.AddBlackTint = this.tintBlack;
-			this.spineMeshGenerator.PremultiplyVertexColors = true;
+			meshBuffers = new DoubleBuffered<MeshRendererBuffers.SmartMesh>();
 
 			// Set the initial Skin and Animation
 			if (!string.IsNullOrEmpty(initialSkinName))
@@ -193,14 +192,28 @@ namespace Spine.Unity {
 		}
 
 		public void UpdateMesh () {
-			if (this.IsValid) {
-				skeleton.SetColor(this.color);
-				if (canvas != null)
-					spineMeshGenerator.Scale = canvas.referencePixelsPerUnit; //JOHN: left a todo: move this to a listener to of the canvas?
+			if (!this.IsValid) return;
 
-				canvasRenderer.SetMesh(spineMeshGenerator.GenerateMesh(skeleton));
-				//this.UpdateMaterial(); // TODO: This allocates memory.
-			}
+			skeleton.SetColor(this.color);
+
+			var currentInstructions = this.currentInstructions;
+			MeshGenerator.GenerateSingleSubmeshInstruction(currentInstructions, skeleton, true, this.material);
+			meshGenerator.BeginNewMesh();
+			meshGenerator.AddSubmesh(currentInstructions.submeshInstructions.Items[0]);
+			if (canvas != null)
+				meshGenerator.ScaleVertexData(canvas.referencePixelsPerUnit);
+
+			var smartMesh = meshBuffers.GetNext();
+			var mesh = smartMesh.mesh;
+
+			meshGenerator.FillVertexData(mesh);
+			if (SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, smartMesh.instructionUsed))
+				meshGenerator.FillTrianglesSingle(mesh);
+			
+			canvasRenderer.SetMesh(mesh);
+			smartMesh.instructionUsed.Set(currentInstructions);
+
+			//this.UpdateMaterial(); // TODO: This allocates memory.
 		}
 		#endregion
 	}

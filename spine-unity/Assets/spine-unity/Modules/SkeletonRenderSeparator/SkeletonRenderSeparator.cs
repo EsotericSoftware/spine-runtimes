@@ -130,26 +130,27 @@ namespace Spine.Unity.Modules {
 
 		MaterialPropertyBlock copiedBlock;
 
-		void HandleRender (SkeletonRenderer.SmartMesh.Instruction instruction) {
+		void HandleRender (SkeletonRendererInstruction instruction) {
 			int rendererCount = partsRenderers.Count;
 			if (rendererCount <= 0) return;
 
 			if (copyPropertyBlock)
 				mainMeshRenderer.GetPropertyBlock(copiedBlock);
 
+			var settings = new MeshGenerator.Settings {
+				addNormals = skeletonRenderer.addNormals,
+				calculateTangents = skeletonRenderer.calculateTangents,
+				immutableTriangles = false, // parts cannot do immutable triangles.
+				pmaVertexColors = skeletonRenderer.pmaVertexColors,
+				renderMeshes = skeletonRenderer.renderMeshes,
+				tintBlack = skeletonRenderer.tintBlack,
+				useClipping = true,
+				zSpacing = skeletonRenderer.zSpacing
+			};
+
 			var submeshInstructions = instruction.submeshInstructions;
 			var submeshInstructionsItems = submeshInstructions.Items;
 			int lastSubmeshInstruction = submeshInstructions.Count - 1;
-
-			#if SPINE_OPTIONAL_NORMALS
-			bool addNormals = skeletonRenderer.calculateNormals;
-			#endif
-
-			#if SPINE_OPTIONAL_SOLVETANGENTS
-			bool addTangents = skeletonRenderer.calculateTangents;
-			#endif
-
-			bool pmaVertexColors = skeletonRenderer.pmaVertexColors;
 
 			int rendererIndex = 0;
 			var currentRenderer = partsRenderers[rendererIndex];
@@ -157,13 +158,8 @@ namespace Spine.Unity.Modules {
 				if (submeshInstructionsItems[si].forceSeparate || si == lastSubmeshInstruction) {
 					// Apply properties
 					var meshGenerator = currentRenderer.MeshGenerator;
-					#if SPINE_OPTIONAL_NORMALS
-					meshGenerator.AddNormals = addNormals;
-					#endif
-					#if SPINE_OPTIONAL_SOLVETANGENTS
-					meshGenerator.AddTangents = addTangents;
-					#endif
-					meshGenerator.PremultiplyVertexColors = pmaVertexColors;
+					meshGenerator.settings = settings;
+
 					if (copyPropertyBlock)
 						currentRenderer.SetPropertyBlock(copiedBlock);
 
