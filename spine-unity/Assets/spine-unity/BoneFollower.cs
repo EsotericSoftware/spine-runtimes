@@ -67,6 +67,7 @@ namespace Spine.Unity {
 		[NonSerialized] public bool valid;
 		[NonSerialized] public Bone bone;
 		Transform skeletonTransform;
+		bool skeletonTransformIsParent;
 
 		public void Awake () {
 			if (initializeOnAwake) Initialize();
@@ -84,6 +85,7 @@ namespace Spine.Unity {
 			skeletonTransform = skeletonRenderer.transform;
 			skeletonRenderer.OnRebuild -= HandleRebuildRenderer;
 			skeletonRenderer.OnRebuild += HandleRebuildRenderer;
+			skeletonTransformIsParent = Transform.ReferenceEquals(skeletonTransform, transform.parent);
 
 			if (!string.IsNullOrEmpty(boneName))
 				bone = skeletonRenderer.skeleton.FindBone(boneName);
@@ -105,6 +107,11 @@ namespace Spine.Unity {
 				return;
 			}
 
+			#if UNITY_EDITOR
+			if (!Application.isPlaying)
+				skeletonTransformIsParent = Transform.ReferenceEquals(skeletonTransform, transform.parent);
+			#endif
+
 			if (bone == null) {
 				if (string.IsNullOrEmpty(boneName)) return;
 				bone = skeletonRenderer.skeleton.FindBone(boneName);
@@ -115,23 +122,32 @@ namespace Spine.Unity {
 			}
 
 			Transform thisTransform = this.transform;
-			if (thisTransform.parent == skeletonTransform) {
+			if (skeletonTransformIsParent) {
 				// Recommended setup: Use local transform properties if Spine GameObject is the immediate parent
 				thisTransform.localPosition = new Vector3(bone.worldX, bone.worldY, followZPosition ? 0f : thisTransform.localPosition.z);
-				if (followBoneRotation) thisTransform.localRotation = Quaternion.Euler(0f, 0f, bone.WorldRotationX);
+				if (followBoneRotation) {
+					var halfRotation = Mathf.Atan2(bone.c, bone.a) * 0.5f;
+					thisTransform.localRotation = new Quaternion(0, 0, Mathf.Sin(halfRotation), Mathf.Cos(halfRotation)); //thisTransform.localRotation = Quaternion.Euler(0f, 0f, bone.WorldRotationX);
+				}
 			} else {
 				// For special cases: Use transform world properties if transform relationship is complicated
 				Vector3 targetWorldPosition = skeletonTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY, 0f));
 				if (!followZPosition) targetWorldPosition.z = thisTransform.position.z;
-				thisTransform.position = targetWorldPosition;
 
 				if (followBoneRotation) {
 					Vector3 worldRotation = skeletonTransform.rotation.eulerAngles;
+					#if UNITY_5_6_OR_NEWER
+					thisTransform.SetPositionAndRotation(targetWorldPosition, Quaternion.Euler(worldRotation.x, worldRotation.y, skeletonTransform.rotation.eulerAngles.z + bone.WorldRotationX));
+					#else
+					thisTransform.position = targetWorldPosition;
 					thisTransform.rotation = Quaternion.Euler(worldRotation.x, worldRotation.y, skeletonTransform.rotation.eulerAngles.z + bone.WorldRotationX);
+					#endif
+				} else {
+					thisTransform.position = targetWorldPosition;
 				}
 			}
-				
-			Vector3 localScale = followLocalScale ? new Vector3(bone.scaleX, bone.scaleY, 1f) : Vector3.one;
+
+			Vector3 localScale = followLocalScale ? new Vector3(bone.scaleX, bone.scaleY, 1f) : new Vector3(1f, 1f, 1f);
 			if (followSkeletonFlip) localScale.y *= bone.skeleton.flipX ^ bone.skeleton.flipY ? -1f : 1f;
 			thisTransform.localScale = localScale;
 		}
