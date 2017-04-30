@@ -42,7 +42,7 @@ namespace Spine {
 		private readonly Pool<ExposedList<float>> polygonPool = new Pool<ExposedList<float>>();
 		private readonly Pool<ExposedList<int>> polygonIndicesPool = new Pool<ExposedList<int>>();
 
-		public ExposedList<int> Triangulate(ExposedList<float> verticesArray) {
+		public ExposedList<int> Triangulate (ExposedList<float> verticesArray) {
 			var vertices = verticesArray.Items;
 			int vertexCount = verticesArray.Count >> 1;
 
@@ -120,7 +120,7 @@ namespace Spine {
 			return triangles;
 		}
 
-		public ExposedList<ExposedList<float>> Decompose(ExposedList<float> verticesArray, ExposedList<int> triangles) {
+		public ExposedList<ExposedList<float>> Decompose (ExposedList<float> verticesArray, ExposedList<int> triangles) {
 			var vertices = verticesArray.Items;
 			var convexPolygons = this.convexPolygons;
 			for (int i = 0, n = convexPolygons.Count; i < n; i++) {
@@ -250,7 +250,7 @@ namespace Spine {
 			return convexPolygons;
 		}
 
-		static private bool IsConcave(int index, int vertexCount, float[] vertices, int[] indices) {
+		static private bool IsConcave (int index, int vertexCount, float[] vertices, int[] indices) {
 			int previous = indices[(vertexCount + index - 1) % vertexCount] << 1;
 			int current = indices[index] << 1;
 			int next = indices[(index + 1) % vertexCount] << 1;
@@ -258,11 +258,11 @@ namespace Spine {
 				vertices[next + 1]);
 		}
 
-		static private bool PositiveArea(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {
+		static private bool PositiveArea (float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {
 			return p1x * (p3y - p2y) + p2x * (p1y - p3y) + p3x * (p2y - p1y) >= 0;
 		}
 
-		static private int Winding(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {
+		static private int Winding (float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {
 			float px = p2x - p1x, py = p2y - p1y;
 			return p3x * py - p3y * px + px * p1y - p1x * py >= 0 ? 1 : -1;
 		}

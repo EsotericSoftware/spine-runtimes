@@ -32,22 +32,24 @@ using System;
 
 namespace Spine {
 	public class SkeletonClipping {
-		private readonly Triangulator triangulator = new Triangulator();
-		private readonly ExposedList<float> clippingPolygon = new ExposedList<float>();
-		private readonly ExposedList<float> clipOutput = new ExposedList<float>(128);
-		private readonly ExposedList<float> clippedVertices = new ExposedList<float>(128);
-		private readonly ExposedList<int> clippedTriangles = new ExposedList<int>(128);
-		private readonly ExposedList<float> clippedUVs = new ExposedList<float>(128);
-		private readonly ExposedList<float> scratch = new ExposedList<float>();
+		internal readonly Triangulator triangulator = new Triangulator();
+		internal readonly ExposedList<float> clippingPolygon = new ExposedList<float>();
+		internal readonly ExposedList<float> clipOutput = new ExposedList<float>(128);
+		internal readonly ExposedList<float> clippedVertices = new ExposedList<float>(128);
+		internal readonly ExposedList<int> clippedTriangles = new ExposedList<int>(128);
+		internal readonly ExposedList<float> clippedUVs = new ExposedList<float>(128);
+		internal readonly ExposedList<float> scratch = new ExposedList<float>();
 
-		private ClippingAttachment clipAttachment;
-		private ExposedList<ExposedList<float>> clippingPolygons;
+		internal ClippingAttachment clipAttachment;
+		internal ExposedList<ExposedList<float>> clippingPolygons;
 
 		public ExposedList<float> ClippedVertices { get { return clippedVertices; } }
 		public ExposedList<int> ClippedTriangles { get { return clippedTriangles; } }
 		public ExposedList<float> ClippedUVs { get { return clippedUVs; } }
 
-		public int ClipStart(Slot slot, ClippingAttachment clip) {
+		public bool IsClipping () { return clipAttachment != null; }
+
+		public int ClipStart (Slot slot, ClippingAttachment clip) {
 			if (clipAttachment != null) return 0;
 			clipAttachment = clip;
 
@@ -64,11 +66,11 @@ namespace Spine {
 			return clippingPolygons.Count;
 		}
 
-		public void ClipEnd(Slot slot) {
+		public void ClipEnd (Slot slot) {
 			if (clipAttachment != null && clipAttachment.endSlot == slot.data) ClipEnd();
 		}
 
-		public void ClipEnd() {
+		public void ClipEnd () {
 			if (clipAttachment == null) return;
 			clipAttachment = null;
 			clippingPolygons = null;
@@ -76,13 +78,8 @@ namespace Spine {
 			clippedTriangles.Clear();
 			clippingPolygon.Clear();
 		}
-
-		public bool IsClipping() {
-			return clipAttachment != null;
-		}
-
-		public void ClipTriangles(float[] vertices, int verticesLength, int[] triangles, int trianglesLength, float[] uvs) {
-
+			
+		public void ClipTriangles (float[] vertices, int verticesLength, int[] triangles, int trianglesLength, float[] uvs) {
 			ExposedList<float> clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
 			var clippedTriangles = this.clippedTriangles;
 			var polygons = clippingPolygons.Items;
@@ -174,7 +171,7 @@ namespace Spine {
 
 		/** Clips the input triangle against the convex, clockwise clipping area. If the triangle lies entirely within the clipping
 		 * area, false is returned. The clipping area must duplicate the first vertex at the end of the vertices list. */
-		internal bool Clip(float x1, float y1, float x2, float y2, float x3, float y3, ExposedList<float> clippingArea, ExposedList<float> output) {
+		internal bool Clip (float x1, float y1, float x2, float y2, float x3, float y3, ExposedList<float> clippingArea, ExposedList<float> output) {
 			var originalOutput = output;
 			var clipped = false;
 
@@ -261,7 +258,7 @@ namespace Spine {
 			return clipped;
 		}
 
-		static void MakeClockwise(ExposedList<float> polygon) {
+		static void MakeClockwise (ExposedList<float> polygon) {
 			float[] vertices = polygon.Items;
 			int verticeslength = polygon.Count;
 
