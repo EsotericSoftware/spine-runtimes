@@ -89,7 +89,7 @@ namespace Spine {
 			clippedVertices.Clear();
 			clippedUVs.Clear();
 			clippedTriangles.Clear();
-			outer:
+			//outer: // libgdx
 			for (int i = 0; i < trianglesLength; i += 3) {
 				int vertexOffset = triangles[i] << 1;
 				float x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
@@ -138,7 +138,6 @@ namespace Spine {
 							s += 3;
 						}
 						index += clipOutputCount + 1;
-
 					}
 					else {
 						float[] clippedVerticesItems = clippedVertices.Resize(s + 3 * 2).Items;
@@ -163,10 +162,11 @@ namespace Spine {
 						clippedTrianglesItems[s + 1] = index + 1;
 						clippedTrianglesItems[s + 2] = index + 2;
 						index += 3;
-						goto outer;
+						break; //continue outer;
 					}
 				}
 			}
+
 		}
 
 		/** Clips the input triangle against the convex, clockwise clipping area. If the triangle lies entirely within the clipping
