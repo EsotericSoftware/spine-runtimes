@@ -30,7 +30,7 @@
 
 #pragma warning disable 0219
 
-// Contributed by: Mitch Thompson
+// Original contribution by: Mitch Thompson
 
 #define SPINE_SKELETONANIMATOR
 using UnityEngine;
@@ -713,7 +713,8 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Match SkeletonData with Atlases
-		static readonly AttachmentType[] NonAtlasTypes = { AttachmentType.Boundingbox, AttachmentType.Path };
+		//static readonly AttachmentType[] NonAtlasTypes = { AttachmentType.Boundingbox, AttachmentType.Path };
+		static readonly AttachmentType[] AtlasTypes = { AttachmentType.Region, AttachmentType.Linkedmesh, AttachmentType.Mesh };
 
 		static List<AtlasAsset> MultiAtlasDialog (List<string> requiredPaths, string initialDirectory, string filename = "") {
 			List<AtlasAsset> atlasAssets = new List<AtlasAsset>();
@@ -850,8 +851,8 @@ namespace Spine.Unity.Editor {
 								Debug.LogWarning(string.Format("Unidentified Attachment type: \"{0}\". Skeleton may have been exported from an incompatible Spine version.", typeString));
 								throw e;
 							}
-
-							if (NonAtlasTypes.Contains(attachmentType))
+								
+							if (!AtlasTypes.Contains(attachmentType))
 								continue;
 						}
 
@@ -1304,7 +1305,7 @@ namespace Spine.Unity.Editor {
 
 				if (!tintBlack) {
 					foreach (Material m in atlasAsset.materials) {
-						if (m.shader.name.Contains(PMAShaderQuery)) {
+						if (m.shader.name.Contains(TintBlackShaderQuery)) {
 							tintBlack = true;
 							break;
 						}

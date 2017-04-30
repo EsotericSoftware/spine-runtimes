@@ -237,8 +237,8 @@ namespace Spine.Unity.Editor {
 
 						using (new SpineInspectorUtility.LabelWidthScope()) {
 							// Optimization options
-							EditorGUILayout.PropertyField(meshes, MeshesLabel);
-							EditorGUILayout.PropertyField(immutableTriangles, ImmubleTrianglesLabel);
+							if (meshes != null) EditorGUILayout.PropertyField(meshes, MeshesLabel);
+							if (immutableTriangles != null) EditorGUILayout.PropertyField(immutableTriangles, ImmubleTrianglesLabel);
 							EditorGUILayout.PropertyField(tintBlack, TintBlackLabel);
 							EditorGUILayout.PropertyField(clearStateOnDisable, ClearStateOnDisableLabel);
 							EditorGUILayout.Space();
@@ -255,7 +255,7 @@ namespace Spine.Unity.Editor {
 
 						using (new SpineInspectorUtility.LabelWidthScope()) {
 							EditorGUILayout.LabelField("Vertex Data", EditorStyles.boldLabel);
-							EditorGUILayout.PropertyField(pmaVertexColors, PMAVertexColorsLabel);
+							if (pmaVertexColors != null) EditorGUILayout.PropertyField(pmaVertexColors, PMAVertexColorsLabel);
 
 							// Optional fields. May be disabled in SkeletonRenderer.
 							if (normals != null) EditorGUILayout.PropertyField(normals, NormalsLabel);
