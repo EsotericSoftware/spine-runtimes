@@ -46,8 +46,7 @@ function Slot.new (data, bone)
 		darkColor = nil,
 		attachment = nil,
 		attachmentTime = 0,
-		attachmentVertices = {},
-		attachmentVerticesCount = 0
+		attachmentVertices = {}
 	}	
 	setmetatable(self, Slot)
 	
@@ -62,7 +61,7 @@ function Slot:setAttachment (attachment)
 	if self.attachment == attachment then return end
 	self.attachment = attachment
 	self.attachmentTime = self.bone.skeleton.time
-	self.attachmentVerticesCount = 0
+	self.attachmentVertices = {};
 end
 
 function Slot:setAttachmentTime (time)
