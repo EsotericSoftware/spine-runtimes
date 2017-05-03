@@ -242,7 +242,7 @@ function SkeletonJson.new (attachmentLoader)
 				for slotName,slotMap in pairs(skinMap) do
 					local slotIndex = skeletonData.slotNameIndices[slotName]
 					for attachmentName,attachmentMap in pairs(slotMap) do
-						local attachment = readAttachment(attachmentMap, skin, slotIndex, attachmentName)
+						local attachment = readAttachment(attachmentMap, skin, slotIndex, attachmentName, skeletonData)
 						if attachment then
 							skin:addAttachment(slotIndex, attachmentName, attachment)
 						end
@@ -286,7 +286,7 @@ function SkeletonJson.new (attachmentLoader)
 		return skeletonData
 	end
 
-	readAttachment = function (map, skin, slotIndex, name)
+	readAttachment = function (map, skin, slotIndex, name, skeletonData)
 		local scale = self.scale
 		name = getValue(map, "name", name)
 
@@ -407,6 +407,26 @@ function SkeletonJson.new (attachmentLoader)
 			end
 			return point
 		
+		elseif type == AttachmentType.clipping then
+			local clip = attachmentLoader:newClippingAttachment(skin, name)
+			if not clip then return nil end
+			
+			local _end = getValue(map, "end", nil)
+			if _end then
+				local slot = skeletonData:findSlot(_end)
+				if not slot then error("Clipping end slot not found: " + _end) end
+				clip.endSlot = slot
+			end
+			
+			readVertices(map, clip, map.vertexCount * 2)
+			local color = map.color
+			if color then
+				clip.color:set(tonumber(color:sub(1, 2), 16) / 255,
+				              tonumber(color:sub(3, 4), 16) / 255,
+				              tonumber(color:sub(5, 6), 16) / 255,
+				              tonumber(color:sub(7, 8), 16) / 255)
+			end
+			return clip
 		end
 
 		error("Unknown attachment type: " .. type .. " (" .. name .. ")")

@@ -80,6 +80,10 @@ cp -f ../tank/export/tank.png ../../spine-cocos2dx/example/Resources/common/
 
 echo "spine-corona"
 rm -f ../../spine-corona/data/*
+cp -f ../coin/export/coin.json ../../spine-corona/data
+cp -f ../coin/export/coin.atlas ../../spine-corona/data
+cp -f ../coin/export/coin.png ../../spine-corona/data
+
 cp -f ../goblins/export/goblins-mesh.json ../../spine-corona/data
 cp -f ../goblins/export/goblins.atlas ../../spine-corona/data
 cp -f ../goblins/export/goblins.png ../../spine-corona/data

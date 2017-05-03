@@ -44,6 +44,7 @@ spine.MeshAttachment = require "spine-lua.attachments.MeshAttachment"
 spine.VertexAttachment = require "spine-lua.attachments.VertexAttachment"
 spine.PathAttachment = require "spine-lua.attachments.PathAttachment"
 spine.PointAttachment = require "spine-lua.attachments.PointAttachment"
+spine.ClippingAttachment = require "spine-lua.attachments.ClippingAttachment"
 spine.Skeleton = require "spine-lua.Skeleton"
 spine.Bone = require "spine-lua.Bone"
 spine.Slot = require "spine-lua.Slot"
@@ -63,6 +64,7 @@ spine.TextureAtlasRegion = require "spine-lua.TextureAtlasRegion"
 spine.AtlasAttachmentLoader = require "spine-lua.AtlasAttachmentLoader"
 spine.Color = require "spine-lua.Color"
 spine.Triangulator = require "spine-lua.Triangulator"
+spine.SkeletonClipping = require "spine-lua.SkeletonClipping"
 
 spine.utils.readFile = function (fileName, base)
 	if not base then base = system.ResourceDirectory end
@@ -89,6 +91,7 @@ spine.Skeleton.new = function(skeletonData, group)
 	self.premultipliedAlpha = false
 	self.batches = 0
 	self.tempColor = spine.Color.newWith(1, 1, 1, 1)
+	self.tempColor2 = spine.Color.newWith(-1, 1, 1, 1)
 	return self
 end
 
@@ -131,7 +134,8 @@ function spine.Skeleton:updateWorldTransform()
 	local groupIndices = {}
 	local groupUvs = {}
 	local color = self.tempColor
-	local lastColor = nil
+	local lastColor = self.tempColor2
+	lastColor.r = -1
 	local texture = nil
 	local lastTexture = nil
 	local blendMode = nil
@@ -158,7 +162,7 @@ function spine.Skeleton:updateWorldTransform()
 
 			if texture and vertices and indices then
 				if not lastTexture then lastTexture = texture end
-				if not lastColor then lastColor = color end
+				if lastColor.r == -1 then lastColor:setFrom(color) end
 				if not lastBlendMode then lastBlendMode = blendMode end
 
 				if (texture ~= lastTexture or not colorEquals(color, lastColor) or blendMode ~= lastBlendMode) then

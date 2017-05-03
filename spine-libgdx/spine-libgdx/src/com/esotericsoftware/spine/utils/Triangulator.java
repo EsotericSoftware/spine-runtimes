@@ -285,6 +285,7 @@ class Triangulator {
 		ShortArray triangles = triangulator.triangulate(polygon);		
 		System.out.println(triangles);
 		for (short i: triangles.items) System.out.print((i + 1) + ", ");
+		System.out.println();
 		
 		Array<FloatArray> polys = triangulator.decompose(polygon,  triangles);
 		System.out.println(polys);

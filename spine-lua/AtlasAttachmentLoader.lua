@@ -36,6 +36,7 @@ local BoundingBoxAttachment = require "spine-lua.attachments.BoundingBoxAttachme
 local MeshAttachment = require "spine-lua.attachments.MeshAttachment"
 local PathAttachment = require "spine-lua.attachments.PathAttachment"
 local PointAttachment = require "spine-lua.attachments.PointAttachment"
+local ClippingAttachment = require "spine-lua.attachments.ClippingAttachment"
 local TextureAtlas = require "spine-lua.TextureAtlas"
 
 local AtlasAttachmentLoader = {}
@@ -82,6 +83,10 @@ end
 
 function AtlasAttachmentLoader:newPointAttachment(skin, name)
 	return PointAttachment.new(name)
+end
+
+function AtlasAttachmentLoader:newClippingAttachment(skin, name)
+	return ClippingAttachment.new(name)
 end
 
 return AtlasAttachmentLoader
