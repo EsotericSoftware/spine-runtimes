@@ -168,6 +168,150 @@ function Triangulator:triangulate (verticesArray)
 	return triangles
 end
 
+function Triangulator:decompose(verticesArray, triangles)
+	local vertices = verticesArray
+
+	self.convexPolygons = {}
+	local convexPolygons = self.convexPolygons;
+
+	self.convexPolygonsIndices = {}
+	local convexPolygonsIndices = self.convexPolygonsIndices;
+
+	local polygonIndices = {}
+	local polygon = {}
+
+	-- Merge subsequent triangles if they form a triangle fan.
+	local fanBaseIndex = -1
+	local lastWinding = 0
+	local trianglesItems = triangles
+	local i = 1
+	local n = #triangles
+	while i <= n do
+		local t1 = (trianglesItems[i] - 1) * 2 + 1
+		local t2 = (trianglesItems[i + 1] - 1) * 2 + 1
+		local t3 = (trianglesItems[i + 2] - 1) * 2 + 1
+		local x1 = vertices[t1]
+		local y1 = vertices[t1 + 1]
+		local x2 = vertices[t2]
+		local y2 = vertices[t2 + 1]
+		local x3 = vertices[t3]
+		local y3 = vertices[t3 + 1]
+
+		-- If the base of the last triangle is the same as this triangle, check if they form a convex polygon (triangle fan).
+		local merged = false;
+		if fanBaseIndex == t1 then
+			local o = #polygon - 4 + 1;
+			local p = polygon;
+			local winding1 = self:winding(p[o], p[o + 1], p[o + 2], p[o + 3], x3, y3);
+			local winding2 = self:winding(x3, y3, p[1], p[2], p[3], p[4]);
+			if winding1 == lastWinding and winding2 == lastWinding then
+				table_insert(polygon, x3)
+				table_insert(polygon, y3)
+				table_insert(polygonIndices, t3)
+				merged = true
+			end
+		end
+
+		-- Otherwise make this triangle the new base.
+		if not merged then
+			if #polygon > 0 then
+				table_insert(convexPolygons, polygon)
+				table_insert(convexPolygonsIndices, polygonIndices)
+			end
+			polygon = {}
+			table_insert(polygon, x1)
+			table_insert(polygon, y1)
+			table_insert(polygon, x2)
+			table_insert(polygon, y2)
+			table_insert(polygon, x3)
+			table_insert(polygon, y3)
+			polygonIndices = {}
+			table_insert(polygonIndices, t1)
+			table_insert(polygonIndices, t2);
+			table_insert(polygonIndices, t3);
+			lastWinding = self:winding(x1, y1, x2, y2, x3, y3)
+			fanBaseIndex = t1
+		end
+		i = i + 3
+	end
+
+	if #polygon > 0 then
+		table_insert(convexPolygons, polygon)
+		table_insert(convexPolygonsIndices, polygonIndices)
+	end
+
+	-- Go through the list of polygons and try to merge the remaining triangles with the found triangle fans.
+	i = 1
+	n = #convexPolygons
+	while i <= n do
+		polygonIndices = convexPolygonsIndices[i]
+		if (#polygonIndices > 0) then
+			local firstIndex = polygonIndices[1]
+			local lastIndex = polygonIndices[#polygonIndices]
+
+			polygon = convexPolygons[i]
+			local o = #polygon - 4 + 1
+			local p = polygon
+			local prevPrevX = p[o]
+			local prevPrevY = p[o + 1]
+			local prevX = p[o + 2]
+			local prevY = p[o + 3]
+			local firstX = p[1]
+			local firstY = p[2]
+			local secondX = p[3]
+			local secondY = p[4]
+			local winding = self:winding(prevPrevX, prevPrevY, prevX, prevY, firstX, firstY)
+
+			local ii = 1
+			while ii <= n do
+				if ii ~= i then
+					local otherIndices = convexPolygonsIndices[ii]
+					if (#otherIndices == 3) then
+						local otherFirstIndex = otherIndices[1];
+						local otherSecondIndex = otherIndices[2];
+						local otherLastIndex = otherIndices[3];
+
+						local otherPoly = convexPolygons[ii];
+						local x3 = otherPoly[#otherPoly - 2 + 1]
+						local y3 = otherPoly[#otherPoly - 1 + 1]
+
+						if not (otherFirstIndex ~= firstIndex or otherSecondIndex ~= lastIndex) then
+							local winding1 = self:winding(prevPrevX, prevPrevY, prevX, prevY, x3, y3)
+							local winding2 = self:winding(x3, y3, firstX, firstY, secondX, secondY)
+							if winding1 == winding and winding2 == winding then
+								convexPolygons[ii] = {}
+								convexPolygonsIndices[ii] = {}
+								table_insert(polygon, x3)
+								table_insert(polygon, y3)
+								table_insert(polygonIndices, otherLastIndex)
+								prevPrevX = prevX
+								prevPrevY = prevY
+								prevX = x3
+								prevY = y3
+								ii = 1
+							end
+						end
+					end
+				end
+				ii = ii + 1
+			end
+		end
+		i = i + 1
+	end
+
+	-- Remove empty polygons that resulted from the merge step above.
+	i = #convexPolygons
+	while i >= 1 do
+		polygon = convexPolygons[i]
+		if #polygon == 0 then
+			table_remove(convexPolygons, i)
+		end
+		i = i - 1
+	end
+
+	return convexPolygons;	
+end
+
 function Triangulator:isConcave(index, vertexCount, vertices, indices)
 	local previous = indices[(vertexCount + index - 1) % vertexCount] * 2 + 1;
 	local current = indices[index] * 2 + 1;

@@ -87,6 +87,7 @@ local triangulator = spine.Triangulator.new()
 local polygon = { 411, 219, 199, 230, 161, 362, 534, 407, 346, 305, 596, 265 }
 local indices = triangulator:triangulate(polygon)
 print(indices)
+print(triangulator:decompose(polygon, indices))
 
 local bounds = spine.SkeletonBounds.new()
 skeletons[1].skeleton:updateWorldTransform()
