@@ -277,4 +277,16 @@ class Triangulator {
 		float px = p2x - p1x, py = p2y - p1y;
 		return p3x * py - p3y * px + px * p1y - p1x * py >= 0 ? 1 : -1;
 	}
+	
+	public static void main (String[] args) {
+		Triangulator triangulator = new Triangulator();
+		FloatArray polygon = new FloatArray();
+		polygon.addAll(411, 219, 199, 230, 161, 362, 534, 407, 346, 305, 596, 265);
+		ShortArray triangles = triangulator.triangulate(polygon);		
+		System.out.println(triangles);
+		for (short i: triangles.items) System.out.print((i + 1) + ", ");
+		
+		Array<FloatArray> polys = triangulator.decompose(polygon,  triangles);
+		System.out.println(polys);
+	}
 }

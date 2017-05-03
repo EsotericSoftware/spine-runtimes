@@ -83,6 +83,11 @@ table.insert(skeletons, loadSkeleton("stretchyman.atlas", "stretchyman.json", 40
 table.insert(skeletons, loadSkeleton("tank.atlas", "tank.json", 400, 300, 0.2, "drive"))
 table.insert(skeletons, loadSkeleton("vine.atlas", "vine.json", 240, 300, 0.3, "animation"))
 
+local triangulator = spine.Triangulator.new()
+local polygon = { 411, 219, 199, 230, 161, 362, 534, 407, 346, 305, 596, 265 }
+local indices = triangulator:triangulate(polygon)
+print(indices)
+
 local bounds = spine.SkeletonBounds.new()
 skeletons[1].skeleton:updateWorldTransform()
 bounds:update(skeletons[1].skeleton, true)

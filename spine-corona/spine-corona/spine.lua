@@ -62,6 +62,7 @@ spine.TextureRegion = require "spine-lua.TextureRegion"
 spine.TextureAtlasRegion = require "spine-lua.TextureAtlasRegion"
 spine.AtlasAttachmentLoader = require "spine-lua.AtlasAttachmentLoader"
 spine.Color = require "spine-lua.Color"
+spine.Triangulator = require "spine-lua.Triangulator"
 
 spine.utils.readFile = function (fileName, base)
 	if not base then base = system.ResourceDirectory end
