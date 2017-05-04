@@ -289,5 +289,9 @@ class Triangulator {
 		
 		Array<FloatArray> polys = triangulator.decompose(polygon,  triangles);
 		System.out.println(polys);
+		
+		FloatArray poly2 = new FloatArray(new float[] {0, 0, 100, 0, 100, 100, 0, 100 });
+		SkeletonClipping.makeClockwise(poly2);
+		System.out.println(poly2);
 	}
 }

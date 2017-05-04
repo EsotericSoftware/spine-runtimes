@@ -108,7 +108,12 @@ function utils.setArraySize (array, size)
 			i = i + 1
 		end
 	else
-		array[size + 1] = nil -- dirty trick to appease # without realloc
+		local originalSize = #array
+		local i = originalSize
+		while i > size do
+			array[i] = nil -- dirty trick to appease # without realloc
+			i = i - 1
+		end
 	end
 	return array
 end

@@ -77,18 +77,24 @@ end
 
 -- table.insert(skeletons, loadSkeleton("test.atlas", "test.json", 240, 300, 0.4, "animation"))
 table.insert(skeletons, loadSkeleton("coin.atlas", "coin.json", 240, 300, 0.4, "rotate"))
---[[table.insert(skeletons, loadSkeleton("spineboy.atlas", "spineboy.json", 240, 300, 0.4, "walk"))
+table.insert(skeletons, loadSkeleton("spineboy.atlas", "spineboy.json", 240, 300, 0.4, "walk"))
 table.insert(skeletons, loadSkeleton("raptor.atlas", "raptor.json", 200, 300, 0.25, "walk"))
 table.insert(skeletons, loadSkeleton("goblins.atlas", "goblins-mesh.json", 240, 300, 0.8, "walk", "goblin"))
 table.insert(skeletons, loadSkeleton("stretchyman.atlas", "stretchyman.json", 40, 300, 0.5, "sneak"))
 table.insert(skeletons, loadSkeleton("tank.atlas", "tank.json", 400, 300, 0.2, "drive"))
-table.insert(skeletons, loadSkeleton("vine.atlas", "vine.json", 240, 300, 0.3, "animation"))]]--
+table.insert(skeletons, loadSkeleton("vine.atlas", "vine.json", 240, 300, 0.3, "animation"))
 
 local triangulator = spine.Triangulator.new()
 local polygon = { 411, 219, 199, 230, 161, 362, 534, 407, 346, 305, 596, 265 }
 local indices = triangulator:triangulate(polygon)
 print(indices)
 print(triangulator:decompose(polygon, indices))
+
+local skeletonClipping = spine.SkeletonClipping.new()
+local polygon2 = {0, 0, 100, 0, 100, 100, 0, 100 }
+skeletonClipping:makeClockwise(polygon2)
+print(polygon2)
+
 
 local bounds = spine.SkeletonBounds.new()
 skeletons[1].skeleton:updateWorldTransform()
@@ -110,7 +116,7 @@ Runtime:addEventListener("enterFrame", function (event)
 	state = skeletons[activeSkeleton].state
 
 	state:update(delta)
-	-- state:apply(skeleton)
+	state:apply(skeleton)
 	skeleton:updateWorldTransform()
 
 	-- uncomment if you want to know how many batches a skeleton renders to
@@ -120,7 +126,7 @@ end)
 Runtime:addEventListener("key", function(event)
 	if activeSkeleton == 2 and event.phase == "down" then
 		state = skeletons[activeSkeleton].state
-		state:setAnimationByName(0, "Jump", false)
+		state:setAnimationByName(0, "jump", false)
 		state:addAnimationByName(0, "walk", true, 0)
 	end
 	return false

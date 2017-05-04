@@ -187,6 +187,15 @@ end
 function RegionAttachment:setRegion (region)
 	local uvs = self.uvs
 	if region.rotate then
+		uvs[5] = region.u
+		uvs[6] = region.v2
+		uvs[7] = region.u
+		uvs[8] = region.v
+		uvs[1] = region.u2
+		uvs[2] = region.v
+		uvs[3] = region.u2
+		uvs[4] = region.v2
+	else
 		uvs[3] = region.u
 		uvs[4] = region.v2
 		uvs[5] = region.u
@@ -195,15 +204,6 @@ function RegionAttachment:setRegion (region)
 		uvs[8] = region.v
 		uvs[1] = region.u2
 		uvs[2] = region.v2
-	else
-		uvs[1] = region.u
-		uvs[2] = region.v2
-		uvs[3] = region.u
-		uvs[4] = region.v
-		uvs[5] = region.u2
-		uvs[6] = region.v
-		uvs[7] = region.u2
-		uvs[8] = region.v2
 	end
 end
 
@@ -219,26 +219,26 @@ function RegionAttachment:computeWorldVertices (bone, worldVertices, offset, str
 	local offsetX = 0
 	local offsetY = 0
 
-	offsetX = vertexOffset[OX1]
-	offsetY = vertexOffset[OY1]
+	offsetX = vertexOffset[7]
+	offsetY = vertexOffset[8]
 	worldVertices[offset] = offsetX * a + offsetY * b + x -- br
 	worldVertices[offset + 1] = offsetX * c + offsetY * d + y
 	offset = offset + stride
 
-	offsetX = vertexOffset[OX2]
-	offsetY = vertexOffset[OY2]
+	offsetX = vertexOffset[1]
+	offsetY = vertexOffset[2]
 	worldVertices[offset] = offsetX * a + offsetY * b + x -- bl
 	worldVertices[offset + 1] = offsetX * c + offsetY * d + y
 	offset = offset + stride
 
-	offsetX = vertexOffset[OX3]
-	offsetY = vertexOffset[OY3]
+	offsetX = vertexOffset[3]
+	offsetY = vertexOffset[4]
 	worldVertices[offset] = offsetX * a + offsetY * b + x -- ul
 	worldVertices[offset + 1] = offsetX * c + offsetY * d + y
 	offset = offset + stride
 
-	offsetX = vertexOffset[OX4]
-	offsetY = vertexOffset[OY4]
+	offsetX = vertexOffset[5]
+	offsetY = vertexOffset[6]
 	worldVertices[offset] = offsetX * a + offsetY * b + x -- ur
 	worldVertices[offset + 1] = offsetX * c + offsetY * d + y
 end
