@@ -180,6 +180,9 @@ class Triangulator {
 				if (polygon.size > 0) {
 					convexPolygons.add(polygon);
 					convexPolygonsIndices.add(polygonIndices);
+				} else {
+					polygonPool.free(polygon);
+					polygonIndicesPool.free(polygonIndices);					
 				}
 				polygon = polygonPool.obtain();
 				polygon.clear();
@@ -255,6 +258,8 @@ class Triangulator {
 			if (polygon.size == 0) {
 				convexPolygons.removeIndex(i);
 				polygonPool.free(polygon);
+				polygonIndices = convexPolygonsIndices.removeIndex(i);			
+				polygonIndicesPool.free(polygonIndices);
 			}
 		}
 
@@ -276,22 +281,5 @@ class Triangulator {
 	static private int winding (float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {
 		float px = p2x - p1x, py = p2y - p1y;
 		return p3x * py - p3y * px + px * p1y - p1x * py >= 0 ? 1 : -1;
-	}
-	
-	public static void main (String[] args) {
-		Triangulator triangulator = new Triangulator();
-		FloatArray polygon = new FloatArray();
-		polygon.addAll(411, 219, 199, 230, 161, 362, 534, 407, 346, 305, 596, 265);
-		ShortArray triangles = triangulator.triangulate(polygon);		
-		System.out.println(triangles);
-		for (short i: triangles.items) System.out.print((i + 1) + ", ");
-		System.out.println();
-		
-		Array<FloatArray> polys = triangulator.decompose(polygon,  triangles);
-		System.out.println(polys);
-		
-		FloatArray poly2 = new FloatArray(new float[] {0, 0, 100, 0, 100, 100, 0, 100 });
-		SkeletonClipping.makeClockwise(poly2);
-		System.out.println(poly2);
 	}
 }
