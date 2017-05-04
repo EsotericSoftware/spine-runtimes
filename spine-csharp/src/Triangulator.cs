@@ -169,7 +169,10 @@ namespace Spine {
 					if (polygon.Count > 0) {
 						convexPolygons.Add(polygon);
 						convexPolygonsIndices.Add(polygonIndices);
-					}
+					} else {
+						polygonPool.Free(polygon);
+						polygonIndicesPool.Free(polygonIndices);
+					} 
 					polygon = polygonPool.Obtain();
 					polygon.Clear();
 					polygon.Add(x1);
@@ -244,6 +247,9 @@ namespace Spine {
 				if (polygon.Count == 0) {
 					convexPolygons.RemoveAt(i);
 					polygonPool.Free(polygon);
+					polygonIndices = convexPolygonsIndices.Items[i];
+					convexPolygonsIndices.RemoveAt(i);
+					polygonIndicesPool.Free(polygonIndices);
 				}
 			}
 
