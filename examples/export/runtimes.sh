@@ -110,6 +110,10 @@ cp -f ../stretchyman/export/stretchyman.png ../../spine-corona/data
 
 echo "spine-love"
 rm -f ../../spine-love/data/*
+cp -f ../coin/export/coin.json ../../spine-love/data
+cp -f ../coin/export/coin.atlas ../../spine-love/data
+cp -f ../coin/export/coin.png ../../spine-love/data
+
 cp -f ../goblins/export/goblins-mesh.json ../../spine-love/data
 cp -f ../goblins/export/goblins.atlas ../../spine-love/data
 cp -f ../goblins/export/goblins.png ../../spine-love/data

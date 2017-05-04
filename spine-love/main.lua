@@ -88,6 +88,7 @@ end
 
 function love.load(arg)
 	if arg[#arg] == "-debug" then require("mobdebug").start() end
+	table.insert(skeletons, loadSkeleton("coin", "coin", "rotate", nil, 0.5, 400, 500))
 	table.insert(skeletons, loadSkeleton("spineboy", "spineboy", "walk", nil, 0.5, 400, 500))
 	table.insert(skeletons, loadSkeleton("raptor", "raptor", "walk", nil, 0.3, 400, 500))
 	table.insert(skeletons, loadSkeleton("goblins-mesh", "goblins", "walk", "goblin", 1, 400, 500))

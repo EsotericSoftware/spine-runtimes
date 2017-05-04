@@ -46,6 +46,7 @@ spine.MeshAttachment = require "spine-lua.attachments.MeshAttachment"
 spine.VertexAttachment = require "spine-lua.attachments.VertexAttachment"
 spine.PathAttachment = require "spine-lua.attachments.PathAttachment"
 spine.PointAttachment = require "spine-lua.attachments.PointAttachment"
+spine.PointAttachment = require "spine-lua.attachments.ClippingAttachment"
 spine.Skeleton = require "spine-lua.Skeleton"
 spine.Bone = require "spine-lua.Bone"
 spine.Slot = require "spine-lua.Slot"
@@ -64,6 +65,8 @@ spine.TextureRegion = require "spine-lua.TextureRegion"
 spine.TextureAtlasRegion = require "spine-lua.TextureAtlasRegion"
 spine.AtlasAttachmentLoader = require "spine-lua.AtlasAttachmentLoader"
 spine.Color = require "spine-lua.Color"
+spine.Triangulator = require "spine-lua.Triangulator"
+spine.SkeletonClipping = require "spine-lua.SkeletonClipping"
 
 spine.utils.readFile = function (fileName, base)
 	local path = fileName
@@ -160,7 +163,7 @@ function PolygonBatcher:begin ()
 	self.drawCalls = 0
 end
 
-function PolygonBatcher:draw (texture, vertices, numVertices, indices)
+function PolygonBatcher:draw (texture, vertices, uvs, numVertices, indices, color, darkColor)
 	local numIndices = #indices
 	local mesh = self.mesh
 
@@ -182,44 +185,36 @@ function PolygonBatcher:draw (texture, vertices, numVertices, indices)
 		indexStart = indexStart + 1
 		i = i + 1
 	end
-	self.indicesLength = self.indicesLength + numIndices
+	self.indicesLength = self.indicesLength + numIndices	
 
-	i = 1
 	local vertexStart = self.verticesLength + 1
 	local vertexEnd = vertexStart + numVertices
 	local vertex = self.vertex
 	if not self.useTwoColorTint then
-		while vertexStart < vertexEnd do
-			vertex[1] = vertices[i]
-			vertex[2] = vertices[i+1]
-			vertex[3] = vertices[i+2]
-			vertex[4] = vertices[i+3]
-			vertex[5] = vertices[i+4] * 255
-			vertex[6] = vertices[i+5] * 255
-			vertex[7] = vertices[i+6] * 255
-			vertex[8] = vertices[i+7] * 255
-			mesh:setVertex(vertexStart, vertex)
-			vertexStart = vertexStart + 1
-			i = i + 8
-		end
+		vertex[5] = color.r * 255
+		vertex[6] = color.g * 255
+		vertex[7] = color.b * 255
+		vertex[8] = color.a * 255
 	else
-		while vertexStart < vertexEnd do
-			vertex[1] = vertices[i]
-			vertex[2] = vertices[i+1]
-			vertex[3] = vertices[i+2]
-			vertex[4] = vertices[i+3]
-			vertex[5] = vertices[i+4] * 255
-			vertex[6] = vertices[i+5] * 255
-			vertex[7] = vertices[i+6] * 255
-			vertex[8] = vertices[i+7] * 255
-			vertex[9] = vertices[i+8] * 255
-			vertex[10] = vertices[i+9] * 255
-			vertex[11] = vertices[i+10] * 255
-			vertex[12] = vertices[i+11] * 255
-			mesh:setVertex(vertexStart, vertex)
-			vertexStart = vertexStart + 1
-			i = i + 12
-		end
+		vertex[5] = color.r * 255
+		vertex[6] = color.g * 255
+		vertex[7] = color.b * 255
+		vertex[8] = color.a * 255
+		vertex[9] = darkColor.r * 255
+		vertex[10] = darkColor.g * 255
+		vertex[11] = darkColor.b * 255
+		vertex[12] = darkColor.a * 255
+	end
+	
+	local v = 1
+	while vertexStart < vertexEnd do
+		vertex[1] = vertices[v]
+		vertex[2] = vertices[v + 1]
+		vertex[3] = uvs[v]
+		vertex[4] = uvs[v + 1]
+		mesh:setVertex(vertexStart, vertex)
+		vertexStart = vertexStart + 1
+		v = v + 2
 	end
 	self.verticesLength = self.verticesLength + numVertices
 end
@@ -259,7 +254,8 @@ function SkeletonRenderer.new (useTwoColorTint)
 	local self = {
 		batcher = PolygonBatcher.new(3 * 500, useTwoColorTint),
 		premultipliedAlpha = false,
-		useTwoColorTint = useTwoColorTint
+		useTwoColorTint = useTwoColorTint,
+		clipper = spine.SkeletonClipping.new()
 	}
 
 	setmetatable(self, SkeletonRenderer)
@@ -282,24 +278,29 @@ function SkeletonRenderer:draw (skeleton)
 	local drawOrder = skeleton.drawOrder
 	for i, slot in ipairs(drawOrder) do
 		local attachment = slot.attachment
-		local vertices = nil
-		local indics = nil
+		local vertices = worldVertices
+		local uvs = nil
+		local indices = nil
 		local texture = nil
 		local color = tmpColor
 		if attachment then
 			if attachment.type == spine.AttachmentType.region then
 				numVertices = 4
-				vertices = self:computeRegionVertices(slot, attachment, premultipliedAlpha, color)
+				attachment:computeWorldVertices(slot.bone, vertices, 0, 2)
+				uvs = attachment.uvs
 				indices = SkeletonRenderer.QUAD_TRIANGLES
 				texture = attachment.region.renderObject.texture
 			elseif attachment.type == spine.AttachmentType.mesh then
 				numVertices = attachment.worldVerticesLength / 2
-				vertices = self:computeMeshVertices(slot, attachment, premultipliedAlpha, color)
+				attachment:computeWorldVertices(slot, 0, attachment.worldVerticesLength, vertices, 0, 2)
+				uvs = attachment.uvs
 				indices = attachment.triangles
 				texture = attachment.region.renderObject.texture
+			elseif attachment.type == spine.AttachmentType.clipping then
+				self.clipper:clipStart(slot, attachment)
 			end
 
-			if texture then
+			if texture then								
 				local slotBlendMode = slot.data.blendMode
 				if lastBlendMode ~= slotBlendMode then
           batcher:stop()
@@ -316,179 +317,41 @@ function SkeletonRenderer:draw (skeleton)
 					end
 					lastBlendMode = slotBlendMode					
 				end
-				batcher:draw(texture, vertices, numVertices, indices)
+				
+				local skeleton = slot.bone.skeleton
+				local skeletonColor = skeleton.color
+				local slotColor = slot.color
+				local attachmentColor = attachment.color
+				local alpha = skeletonColor.a * slotColor.a * attachmentColor.a
+				local multiplier = alpha
+				if premultipliedAlpha then multiplier = 1 end
+				color:set(skeletonColor.r * slotColor.r * attachmentColor.r * multiplier,
+							skeletonColor.g * slotColor.g * attachmentColor.g * multiplier,
+							skeletonColor.b * slotColor.b * attachmentColor.b * multiplier,
+							alpha)
+						
+				local dark = tmpColor2
+				if slot.darkColor then dark = slot.darkColor
+				else dark:set(0, 0, 0, 0) end
+				
+				if self.clipper:isClipping() then
+					self.clipper:clipTriangles(vertices, attachment.uvs, indices, #indices)
+					vertices = self.clipper.clippedVertices
+					numVertices = #vertices / 2
+					uvs = self.clipper.clippedUVs
+					indices = self.clipper.clippedTriangles
+				end
+				
+				batcher:draw(texture, vertices, uvs, numVertices, indices, color, dark)
 			end
+			
+			self.clipper:clipEnd(slot)
 		end
 	end
 
 	batcher:stop()
 	love.graphics.setBlendMode(lastLoveBlendMode)
-end
-
-function SkeletonRenderer:computeRegionVertices(slot, region, pma, color)
-	local skeleton = slot.bone.skeleton
-	local skeletonColor = skeleton.color
-	local slotColor = slot.color
-	local regionColor = region.color
-	local alpha = skeletonColor.a * slotColor.a * regionColor.a
-	local multiplier = alpha
-	if pma then multiplier = 1 end
-	color:set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
-				skeletonColor.g * slotColor.g * regionColor.g * multiplier,
-				skeletonColor.b * slotColor.b * regionColor.b * multiplier,
-				alpha)
-			
-	local dark = tmpColor2
-	if slot.darkColor then dark = slot.darkColor
-	else dark:set(0, 0, 0, 0) end
-
-	local vertices = worldVertices
-	if not self.useTwoColorTint then
-		region:computeWorldVertices(slot.bone, vertices, 0, 8)
-	else
-		region:computeWorldVertices(slot.bone, vertices, 0, 12)
-	end
-
-	local uvs = region.uvs
-
-	if not self.useTwoColorTint then
-		vertices[3] = uvs[1]
-		vertices[4] = uvs[2]
-		vertices[5] = color.r
-		vertices[6] = color.g
-		vertices[7] = color.b
-		vertices[8] = color.a
-
-		vertices[11] = uvs[3]
-		vertices[12] = uvs[4]
-		vertices[13] = color.r
-		vertices[14] = color.g
-		vertices[15] = color.b
-		vertices[16] = color.a
-
-		vertices[19] = uvs[5]
-		vertices[20] = uvs[6]
-		vertices[21] = color.r
-		vertices[22] = color.g
-		vertices[23] = color.b
-		vertices[24] = color.a
-
-		vertices[27] = uvs[7]
-		vertices[28] = uvs[8]
-		vertices[29] = color.r
-		vertices[30] = color.g
-		vertices[31] = color.b
-		vertices[32] = color.a
-	else
-		vertices[3] = uvs[1]
-		vertices[4] = uvs[2]
-		vertices[5] = color.r
-		vertices[6] = color.g
-		vertices[7] = color.b
-		vertices[8] = color.a
-		vertices[9] = dark.r
-		vertices[10] = dark.g
-		vertices[11] = dark.b
-		vertices[12] = 0
-
-		vertices[15] = uvs[3]
-		vertices[16] = uvs[4]
-		vertices[17] = color.r
-		vertices[18] = color.g
-		vertices[19] = color.b
-		vertices[20] = color.a
-		vertices[21] = dark.r
-		vertices[22] = dark.g
-		vertices[23] = dark.b
-		vertices[24] = 0
-
-		vertices[27] = uvs[5]
-		vertices[28] = uvs[6]
-		vertices[29] = color.r
-		vertices[30] = color.g
-		vertices[31] = color.b
-		vertices[32] = color.a
-		vertices[33] = dark.r
-		vertices[34] = dark.g
-		vertices[35] = dark.b
-		vertices[36] = 0
-
-		vertices[39] = uvs[7]
-		vertices[40] = uvs[8]
-		vertices[41] = color.r
-		vertices[42] = color.g
-		vertices[43] = color.b
-		vertices[44] = color.a
-		vertices[45] = dark.r
-		vertices[46] = dark.g
-		vertices[47] = dark.b
-		vertices[48] = 0
-	end
-
-	return vertices
-end
-
-function SkeletonRenderer:computeMeshVertices(slot, mesh, pma, color)
-	local skeleton = slot.bone.skeleton
-	local skeletonColor = skeleton.color
-	local slotColor = slot.color
-	local meshColor = mesh.color
-	local alpha = skeletonColor.a * slotColor.a * meshColor.a
-	local multiplier = alpha
-	if pma then multiplier = 1 end
-	color:set(skeletonColor.r * slotColor.r * meshColor.r * multiplier,
-				skeletonColor.g * slotColor.g * meshColor.g * multiplier,
-				skeletonColor.b * slotColor.b * meshColor.b * multiplier,
-				alpha)
-			
-	local numVertices = mesh.worldVerticesLength / 2
-	local vertices = worldVertices
-	
-	local dark = tmpColor2
-	if slot.darkColor then dark = slot.darkColor
-	else dark:set(0, 0, 0, 0) end
-	
-	if not self.useTwoColorTint then
-		mesh:computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, 8)
-	else
-		mesh:computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, 12)
-	end
-	
-	local uvs = mesh.uvs
-	local i = 1
-	local n = numVertices + 1
-	local u = 1
-	local v = 3
-	if not self.useTwoColorTint then
-		while i < n do
-			vertices[v] = uvs[u]
-			vertices[v + 1] = uvs[u + 1]
-			vertices[v + 2] = color.r
-			vertices[v + 3] = color.g
-			vertices[v + 4] = color.b
-			vertices[v + 5] = color.a
-			i = i + 1
-			u = u + 2
-			v = v + 8
-		end
-	else
-		while i < n do
-			vertices[v] = uvs[u]
-			vertices[v + 1] = uvs[u + 1]
-			vertices[v + 2] = color.r
-			vertices[v + 3] = color.g
-			vertices[v + 4] = color.b
-			vertices[v + 5] = color.a
-			vertices[v + 6] = dark.r
-			vertices[v + 7] = dark.g
-			vertices[v + 8] = dark.b
-			vertices[v + 9] = 0
-			i = i + 1
-			u = u + 2
-			v = v + 12
-		end
-	end
-	return vertices
+	self.clipper:clipEnd2()
 end
 
 spine.PolygonBatcher = PolygonBatcher
