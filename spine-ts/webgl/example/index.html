@@ -79,6 +79,9 @@ function init () {
 	assetManager.loadText("assets/stretchyman.json");
 	assetManager.loadText("assets/stretchyman.atlas");
 	assetManager.loadTexture("assets/stretchyman.png");
+	assetManager.loadText("assets/coin.json");
+	assetManager.loadText("assets/coin.atlas");
+	assetManager.loadTexture("assets/coin.png");
 	requestAnimationFrame(load);
 }
 
@@ -91,6 +94,7 @@ function load () {
 		skeletons["goblins"] = loadSkeleton("goblins-mesh", "walk", false, "goblin");
 		skeletons["vine"] = loadSkeleton("vine", "animation", false);
 		skeletons["stretchyman"] = loadSkeleton("stretchyman", "sneak", false);
+		skeletons["coin"] = loadSkeleton("coin", "rotate", false);
 		setupUI();
 		requestAnimationFrame(render);
 	} else {

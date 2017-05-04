@@ -5460,6 +5460,10 @@ var spine;
 						convexPolygons.push(polygon);
 						convexPolygonsIndices.push(polygonIndices);
 					}
+					else {
+						this.polygonPool.free(polygon);
+						this.polygonIndicesPool.free(polygonIndices);
+					}
 					polygon = this.polygonPool.obtain();
 					polygon.length = 0;
 					polygon.push(x1);
@@ -5528,6 +5532,9 @@ var spine;
 				if (polygon.length == 0) {
 					convexPolygons.splice(i, 1);
 					this.polygonPool.free(polygon);
+					polygonIndices = convexPolygonsIndices[i];
+					convexPolygonsIndices.splice(i, 1);
+					this.polygonIndicesPool.free(polygonIndices);
 				}
 			}
 			return convexPolygons;
