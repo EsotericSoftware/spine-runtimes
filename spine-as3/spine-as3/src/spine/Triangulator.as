@@ -175,6 +175,9 @@ package spine {
 					if (polygon.length > 0) {
 						convexPolygons.push(polygon);
 						convexPolygonsIndices.push(polygonIndices);
+					} else {
+						polygonPool.free(polygon);
+						polygonIndicesPool.free(polygonIndices);
 					}
 					polygon = Vector.<Number>(this.polygonPool.obtain());
 					polygon.length = 0;
@@ -250,6 +253,9 @@ package spine {
 				if (polygon.length == 0) {
 					convexPolygons.splice(i, 1);
 					this.polygonPool.free(polygon);
+					polygonIndices = convexPolygonsIndices[i];
+					convexPolygonsIndices.splice(i, 1);
+					this.polygonIndicesPool.free(polygonIndices);
 				}
 			}
 
