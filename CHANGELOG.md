@@ -14,10 +14,12 @@
   * Added `Bone.localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).    
   * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.
   * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
+  * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
 
 ### Starling
  * Fixed renderer to work with 3.6 changes.
  * Added support for two color tinting.
+ * Added support for clipping.
 
 ## C
  * **Breaking changes**
@@ -36,6 +38,9 @@
    * Added two color tinting support, including `spTwoColorTimeline` and additional fields on `spSlot` and `spSlotData`.
   * Added `userData` field to `spTrackEntry`, so users can expose data in `spAnimationState` callbacks.
   * Modified kvec.h used by SkeletonBinary.c to use Spine's MALLOC/FREE macros. That way there's only one place to inject custom allocators ([extension.h](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-c/spine-c/include/spine/extension.h)) [commit](https://github.com/EsotericSoftware/spine-runtimes/commit/c2cfbc6cb8709daa082726222d558188d75a004f)
+  * Added macros to define typed dynamic arrays, see `Array.h/.c`
+  * Added `spClippingAttachment` and respective enum.
+  * Added `spSkeletonClipper` and `spTriangulator`, used to implement software clipping of attachments.
 
 ### Cocos2d-X
  * Fixed renderer to work with 3.6 changes
@@ -52,6 +57,7 @@
 
 ### SFML
  * Fixed renderer to work with 3.6 changes. Sadly, two color tinting does not work, as the vertex format in SFML is fixed.
+ * Added support for clipping.
 
 ### Unreal Engine 4
  * Fixed renderer to work with 3.6 changes
@@ -87,6 +93,7 @@
   * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.  
   * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
   * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
+  * Added `SkeletonClipper` and `Triangulator`, used to implement software clipping of attachments.
 
 ### libGDX
  * Fixed renderer to work with 3.6 changes
@@ -105,13 +112,17 @@
   * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.
   * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.  
   * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
+  * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
+  * Added `SkeletonClipper` and `Triangulator`, used to implement software clipping of attachments.
 
 ### Love2D
   * Fixed renderer to work with 3.6 changes
   * Added support for two color tinting. Enable it via `SkeletonRenderer.new(true)`.
+  * Added clipping support.
 
 ### Corona
   * Fixed renderer to work with 3.6 changes. Sadly, two color tinting is not supported, as Corona doesn't let us change the vertex format needed and its doesn't allow to modify shaders in the way needed for two color tinting
+  * Added clipping support.
 
 ## Typescript/Javascript
  * **Breaking changes**
@@ -126,7 +137,7 @@
   * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.  
   * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
   * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
-  * Added `SkeletonClipper` and `ConvexDecomposer`, used to implement software clipping of attachments.
+  * Added `SkeletonClipper` and `Triangulator`, used to implement software clipping of attachments.
 
 ### WebGL backend
  * Fixed WebGL context loss
