@@ -49,6 +49,7 @@ module spine {
 		private backgroundColor = new Color();
 		private loaded = false;
 		private bounds = { offset: new Vector2(), size: new Vector2() };
+		
 
 		constructor (element: HTMLElement | string, config: SpineWidgetConfig) {
 			if (!element) throw new Error("Please provide a DOM element, e.g. document.getElementById('myelement')");
@@ -183,8 +184,8 @@ module spine {
 
 				var animationState = this.state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 				animationState.setAnimation(0, config.animation, config.loop);
-				if (config.success) config.success(this);
 				this.loaded = true;
+				if (config.success) config.success(this);				
 				requestAnimationFrame(() => { this.render(); });
 			} else
 				requestAnimationFrame(() => { this.load(); });
@@ -283,12 +284,12 @@ module spine {
 			return !this.paused;
 		}
 
-		setAnimation (animationName: string) {
+		setAnimation (animationName: string, animationStateListener: AnimationStateListener2 = null) {
 			if (!this.loaded) throw new Error("Widget isn't loaded yet");
 			this.skeleton.setToSetupPose();
-			this.state.setAnimation(0, animationName, this.config.loop);
+			let entry = this.state.setAnimation(0, animationName, this.config.loop);
+			entry.listener = animationStateListener
 		}
-
 
 		static loadWidgets() {
 			let widgets = document.getElementsByClassName("spine-widget");
