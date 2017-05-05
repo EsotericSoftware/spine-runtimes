@@ -142,7 +142,7 @@ namespace Spine.Unity.Modules {
 				calculateTangents = skeletonRenderer.calculateTangents,
 				immutableTriangles = false, // parts cannot do immutable triangles.
 				pmaVertexColors = skeletonRenderer.pmaVertexColors,
-				renderMeshes = skeletonRenderer.renderMeshes,
+				//renderMeshes = skeletonRenderer.renderMeshes,
 				tintBlack = skeletonRenderer.tintBlack,
 				useClipping = true,
 				zSpacing = skeletonRenderer.zSpacing

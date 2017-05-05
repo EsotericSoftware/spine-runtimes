@@ -53,11 +53,13 @@ namespace Spine.Unity {
 		[System.NonSerialized] public readonly List<Slot> separatorSlots = new List<Slot>();
 
 		[Range(-0.1f, 0f)] public float zSpacing;
-		public bool renderMeshes = true;
+		//public bool renderMeshes = true;
+		public bool useClipping = true;
 		public bool immutableTriangles = false;
 		public bool pmaVertexColors = true;
 		public bool clearStateOnDisable = false;
 		public bool tintBlack = false;
+		public bool singleSubmesh = false;
 
 		[UnityEngine.Serialization.FormerlySerializedAs("calculateNormals")]
 		public bool addNormals;
@@ -110,7 +112,7 @@ namespace Spine.Unity {
 		}
 			
 		[System.NonSerialized] readonly SkeletonRendererInstruction currentInstructions = new SkeletonRendererInstruction();
-		[System.NonSerialized] readonly MeshGenerator meshGenerator = new MeshGenerator();
+		readonly MeshGenerator meshGenerator = new MeshGenerator();
 		[System.NonSerialized] readonly MeshRendererBuffers rendererBuffers = new MeshRendererBuffers();
 
 		#region Runtime Instantiation
@@ -163,20 +165,18 @@ namespace Spine.Unity {
 
 				currentInstructions.Clear();
 				rendererBuffers.Clear();
-				meshGenerator.BeginNewMesh();
+				meshGenerator.Begin();
 				skeleton = null;
 				valid = false;
 			}
 
 			if (!skeletonDataAsset) {
-				if (logErrors)
-					Debug.LogError("Missing SkeletonData asset.", this);
-
+				if (logErrors) Debug.LogError("Missing SkeletonData asset.", this);
 				return;
 			}
+
 			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
-			if (skeletonData == null)
-				return;
+			if (skeletonData == null) return;
 			valid = true;
 
 			meshFilter = GetComponent<MeshFilter>();
@@ -184,7 +184,7 @@ namespace Spine.Unity {
 			rendererBuffers.Initialize();
 
 			skeleton = new Skeleton(skeletonData);
-			if (!string.IsNullOrEmpty(initialSkinName) && initialSkinName != "default")
+			if (!string.IsNullOrEmpty(initialSkinName) && !string.Equals(initialSkinName, "default", System.StringComparison.Ordinal))
 				skeleton.SetSkin(initialSkinName);
 
 			separatorSlots.Clear();
@@ -207,61 +207,87 @@ namespace Spine.Unity {
 			const bool doMeshOverride = false;
 			if (!meshRenderer.enabled) return;
 			#endif
-
 			var currentInstructions = this.currentInstructions;
-
-			// STEP 1. Determine a SmartMesh.Instruction. Split up instructions into submeshes. ============================================================
-			MeshGenerator.GenerateSkeletonRendererInstruction(currentInstructions, skeleton, customSlotMaterials, separatorSlots, doMeshOverride, this.immutableTriangles, this.renderMeshes);
-
-
-			// STEP 1.9. Post-process workingInstructions. ============================================================
-			#if SPINE_OPTIONAL_MATERIALOVERRIDE
-			if (customMaterialOverride.Count > 0) // isCustomMaterialOverridePopulated 
-				MeshGenerator.TryReplaceMaterials(currentInstructions.submeshInstructions, customMaterialOverride);
-			#endif
-
-			#if SPINE_OPTIONAL_RENDEROVERRIDE
-			if (doMeshOverride) {
-				this.generateMeshOverride(currentInstructions);
-				if (disableRenderingOnOverride) return;
-			}
-			#endif
-
-
-			// STEP 2. Update vertex buffer based on verts from the attachments.  ============================================================
-			meshGenerator.BeginNewMesh();
-			meshGenerator.settings = new MeshGenerator.Settings {
-				pmaVertexColors = this.pmaVertexColors,
-				zSpacing = this.zSpacing,
-				useClipping = true,
-				tintBlack = this.tintBlack,
-				calculateTangents = this.calculateTangents,
-				renderMeshes = this.renderMeshes,
-				addNormals = this.addNormals
-			};
-
 			var workingSubmeshInstructions = currentInstructions.submeshInstructions;
-			foreach (var submeshInstruction in workingSubmeshInstructions) {
-				meshGenerator.AddSubmesh(submeshInstruction);
-			}
-				
+			var currentSmartMesh = rendererBuffers.GetNextMesh(); // Double-buffer for performance.
 
-			// Step 3. Move the mesh data into a UnityEngine.Mesh ============================================================
-			var currentSmartMesh = rendererBuffers.GetNextMesh();	// Double-buffer for performance.
+			bool updateTriangles;
+
+			if (this.singleSubmesh) {
+				// STEP 1. Determine a SmartMesh.Instruction. Split up instructions into submeshes. =============================================
+				MeshGenerator.GenerateSingleSubmeshInstruction(currentInstructions, skeleton, skeletonDataAsset.atlasAssets[0].materials[0]);
+
+				// STEP 1.9. Post-process workingInstructions. ==================================================================================
+				#if SPINE_OPTIONAL_MATERIALOVERRIDE
+				if (customMaterialOverride.Count > 0) // isCustomMaterialOverridePopulated 
+					MeshGenerator.TryReplaceMaterials(workingSubmeshInstructions, customMaterialOverride);
+				#endif
+
+				// STEP 2. Update vertex buffer based on verts from the attachments.  ===========================================================
+				meshGenerator.settings = new MeshGenerator.Settings {
+					pmaVertexColors = this.pmaVertexColors,
+					zSpacing = this.zSpacing,
+					useClipping = this.useClipping,
+					tintBlack = this.tintBlack,
+					calculateTangents = this.calculateTangents,
+					addNormals = this.addNormals
+				};
+				meshGenerator.Begin();
+				updateTriangles = SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, currentSmartMesh.instructionUsed);
+				if (currentInstructions.hasActiveClipping) {
+					meshGenerator.AddSubmesh(workingSubmeshInstructions.Items[0], updateTriangles);
+				} else {
+					meshGenerator.BuildMeshWithArrays(currentInstructions, updateTriangles);
+				}
+
+			} else {
+				// STEP 1. Determine a SmartMesh.Instruction. Split up instructions into submeshes. =============================================
+				MeshGenerator.GenerateSkeletonRendererInstruction(currentInstructions, skeleton, customSlotMaterials, separatorSlots, doMeshOverride, this.immutableTriangles);
+
+				// STEP 1.9. Post-process workingInstructions. ==================================================================================
+				#if SPINE_OPTIONAL_MATERIALOVERRIDE
+				if (customMaterialOverride.Count > 0) // isCustomMaterialOverridePopulated 
+					MeshGenerator.TryReplaceMaterials(workingSubmeshInstructions, customMaterialOverride);
+				#endif
+
+				#if SPINE_OPTIONAL_RENDEROVERRIDE
+				if (doMeshOverride) {
+					this.generateMeshOverride(currentInstructions);
+					if (disableRenderingOnOverride) return;
+				}
+				#endif
+
+				updateTriangles = SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, currentSmartMesh.instructionUsed);
+
+				// STEP 2. Update vertex buffer based on verts from the attachments.  ===========================================================
+				meshGenerator.settings = new MeshGenerator.Settings {
+					pmaVertexColors = this.pmaVertexColors,
+					zSpacing = this.zSpacing,
+					useClipping = this.useClipping,
+					tintBlack = this.tintBlack,
+					calculateTangents = this.calculateTangents,
+					addNormals = this.addNormals
+				};
+				meshGenerator.Begin();
+				if (currentInstructions.hasActiveClipping)
+					meshGenerator.BuildMesh(currentInstructions, updateTriangles);
+				else
+					meshGenerator.BuildMeshWithArrays(currentInstructions, updateTriangles);
+			}
+
+			// STEP 3. Move the mesh data into a UnityEngine.Mesh ===========================================================================
 			var currentMesh = currentSmartMesh.mesh;
 			meshGenerator.FillVertexData(currentMesh);
-
 			rendererBuffers.UpdateSharedMaterials(workingSubmeshInstructions);
-
-			// Check if the triangles should also be updated.
-			if (SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, currentSmartMesh.instructionUsed)) { // This thorough structure check is cheaper than updating triangles every frame.
+			if (updateTriangles) { // Check if the triangles should also be updated.
 				meshGenerator.FillTriangles(currentMesh);
 				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedShaderdMaterialsArray();
 			} else if (rendererBuffers.MaterialsChangedInLastUpdate()) {
 				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedShaderdMaterialsArray();
 			}
 
-			// Step 4. The UnityEngine.Mesh is ready. Set it as the MeshFilter's mesh. Store the instructions used for that mesh. ============================================================
+
+			// STEP 4. The UnityEngine.Mesh is ready. Set it as the MeshFilter's mesh. Store the instructions used for that mesh. ===========
 			meshFilter.sharedMesh = currentMesh;
 			currentSmartMesh.instructionUsed.Set(currentInstructions);
 		}

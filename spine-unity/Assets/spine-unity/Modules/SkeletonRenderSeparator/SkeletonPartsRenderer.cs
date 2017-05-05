@@ -86,21 +86,26 @@ namespace Spine.Unity.Modules {
 			LazyIntialize();
 
 			// STEP 1: Create instruction
+			var smartMesh = buffers.GetNextMesh();
 			currentInstructions.SetWithSubset(instructions, startSubmesh, endSubmesh);
+			bool updateTriangles = SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, smartMesh.instructionUsed);
 
 			// STEP 2: Generate mesh buffers.
 			var currentInstructionsSubmeshesItems = currentInstructions.submeshInstructions.Items;
-			meshGenerator.BeginNewMesh();
-			for (int i = 0; i < currentInstructions.submeshInstructions.Count; i++)
-				meshGenerator.AddSubmesh(currentInstructionsSubmeshesItems[i]);
+			meshGenerator.Begin();
+			if (currentInstructions.hasActiveClipping) {
+				for (int i = 0; i < currentInstructions.submeshInstructions.Count; i++)
+					meshGenerator.AddSubmesh(currentInstructionsSubmeshesItems[i], updateTriangles);
+			} else {
+				meshGenerator.BuildMeshWithArrays(currentInstructions, updateTriangles);
+			}
 
 			buffers.UpdateSharedMaterials(currentInstructions.submeshInstructions);
 
 			// STEP 3: modify mesh.
-			var smartMesh = buffers.GetNextMesh();
 			var mesh = smartMesh.mesh;
 			meshGenerator.FillVertexData(mesh);
-			if (SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, smartMesh.instructionUsed)) {
+			if (updateTriangles) {
 				meshGenerator.FillTriangles(mesh);
 				meshRenderer.sharedMaterials = buffers.GetUpdatedShaderdMaterialsArray();
 			} else if (buffers.MaterialsChangedInLastUpdate()) {

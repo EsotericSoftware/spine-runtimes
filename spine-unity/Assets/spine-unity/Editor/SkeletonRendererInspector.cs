@@ -43,12 +43,14 @@ namespace Spine.Unity.Editor {
 		protected static bool advancedFoldout;
 		protected static bool showBoneNames, showPaths, showShapes, showConstraints = true;
 
-		protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, separatorSlotNames, frontFacing, zSpacing, pmaVertexColors, clearStateOnDisable, tintBlack;
+		protected SerializedProperty skeletonDataAsset, initialSkinName;
+		protected SerializedProperty singleSubmesh, separatorSlotNames, clearStateOnDisable, immutableTriangles;
+		protected SerializedProperty normals, tangents, meshes, zSpacing, pmaVertexColors, tintBlack; // MeshGenerator settings
 		protected SpineInspectorUtility.SerializedSortingProperties sortingProperties;
 		protected bool isInspectingPrefab;
 
 		protected GUIContent SkeletonDataAssetLabel, SkeletonUtilityButtonContent;
-		protected GUIContent PMAVertexColorsLabel, ClearStateOnDisableLabel, ZSpacingLabel, MeshesLabel, ImmubleTrianglesLabel, TintBlackLabel;
+		protected GUIContent PMAVertexColorsLabel, ClearStateOnDisableLabel, ZSpacingLabel, MeshesLabel, ImmubleTrianglesLabel, TintBlackLabel, SingleSubmeshLabel;
 		protected GUIContent NormalsLabel, TangentsLabel;
 		const string ReloadButtonLabel = "Reload";
 
@@ -84,6 +86,7 @@ namespace Spine.Unity.Editor {
 			NormalsLabel = new GUIContent("Add Normals", "Use this if your shader requires vertex normals. A more efficient solution for 2D setups is to modify the shader to assume a single normal value for the whole mesh.");
 			TangentsLabel = new GUIContent("Solve Tangents", "Calculates the tangents per frame. Use this if you are using lit shaders (usually with normal maps) that require vertex tangents.");
 			TintBlackLabel = new GUIContent("Tint Black", "Adds black tint vertex data to the mesh as UV2 and UV3. Black tinting requires that the shader interpret UV2 and UV3 as black tint colors for this effect to work. You may also use the default [Spine/Skeleton Tint Black] shader.\n\nIf you only need to tint the whole skeleton and not individual parts, the [Spine/Skeleton Tint] shader is recommended for better efficiency and changing/animating the _Black material property via MaterialPropertyBlock.");
+			SingleSubmeshLabel = new GUIContent("Use Single Submesh", "Simplifies submesh determination by assuming you are only using one Material and need only one submesh. This is will disable render separation and custom slot materials.");
 
 			var so = this.serializedObject;
 			skeletonDataAsset = so.FindProperty("skeletonDataAsset");
@@ -95,11 +98,12 @@ namespace Spine.Unity.Editor {
 			pmaVertexColors = so.FindProperty("pmaVertexColors");
 			clearStateOnDisable = so.FindProperty("clearStateOnDisable");
 			tintBlack = so.FindProperty("tintBlack");
+			singleSubmesh = so.FindProperty("singleSubmesh");
 
 			separatorSlotNames = so.FindProperty("separatorSlotNames");
 			separatorSlotNames.isExpanded = true;
 
-			frontFacing = so.FindProperty("frontFacing");
+			//frontFacing = so.FindProperty("frontFacing");
 			zSpacing = so.FindProperty("zSpacing");
 
 			SerializedObject rso = SpineInspectorUtility.GetRenderersSerializedObject(serializedObject);
@@ -237,6 +241,7 @@ namespace Spine.Unity.Editor {
 
 						using (new SpineInspectorUtility.LabelWidthScope()) {
 							// Optimization options
+							if (singleSubmesh != null) EditorGUILayout.PropertyField(singleSubmesh, SingleSubmeshLabel);
 							if (meshes != null) EditorGUILayout.PropertyField(meshes, MeshesLabel);
 							if (immutableTriangles != null) EditorGUILayout.PropertyField(immutableTriangles, ImmubleTrianglesLabel);
 							EditorGUILayout.PropertyField(tintBlack, TintBlackLabel);
@@ -260,7 +265,7 @@ namespace Spine.Unity.Editor {
 							// Optional fields. May be disabled in SkeletonRenderer.
 							if (normals != null) EditorGUILayout.PropertyField(normals, NormalsLabel);
 							if (tangents != null) EditorGUILayout.PropertyField(tangents, TangentsLabel);
-							if (frontFacing != null) EditorGUILayout.PropertyField(frontFacing);
+							//if (frontFacing != null) EditorGUILayout.PropertyField(frontFacing);
 
 							EditorGUILayout.Space();
 

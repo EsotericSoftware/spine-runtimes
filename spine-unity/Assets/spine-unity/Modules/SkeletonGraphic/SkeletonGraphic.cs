@@ -195,20 +195,24 @@ namespace Spine.Unity {
 			if (!this.IsValid) return;
 
 			skeleton.SetColor(this.color);
-
-			var currentInstructions = this.currentInstructions;
-			MeshGenerator.GenerateSingleSubmeshInstruction(currentInstructions, skeleton, true, this.material);
-			meshGenerator.BeginNewMesh();
-			meshGenerator.AddSubmesh(currentInstructions.submeshInstructions.Items[0]);
-			if (canvas != null)
-				meshGenerator.ScaleVertexData(canvas.referencePixelsPerUnit);
-
 			var smartMesh = meshBuffers.GetNext();
-			var mesh = smartMesh.mesh;
+			var currentInstructions = this.currentInstructions;
 
+			MeshGenerator.GenerateSingleSubmeshInstruction(currentInstructions, skeleton, this.material);
+			bool updateTriangles = SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, smartMesh.instructionUsed);
+
+			meshGenerator.Begin();
+			if (currentInstructions.hasActiveClipping) {
+				meshGenerator.AddSubmesh(currentInstructions.submeshInstructions.Items[0], updateTriangles);
+			} else {
+				meshGenerator.BuildMeshWithArrays(currentInstructions, updateTriangles);
+			}
+
+			if (canvas != null) meshGenerator.ScaleVertexData(canvas.referencePixelsPerUnit);
+
+			var mesh = smartMesh.mesh;
 			meshGenerator.FillVertexData(mesh);
-			if (SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, smartMesh.instructionUsed))
-				meshGenerator.FillTrianglesSingle(mesh);
+			if (updateTriangles) meshGenerator.FillTrianglesSingle(mesh);
 			
 			canvasRenderer.SetMesh(mesh);
 			smartMesh.instructionUsed.Set(currentInstructions);
