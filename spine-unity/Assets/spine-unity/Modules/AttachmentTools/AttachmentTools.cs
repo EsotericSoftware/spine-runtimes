@@ -129,12 +129,16 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 		/// <summary>
 		/// Creates a Spine.AtlasRegion that uses a premultiplied alpha duplicate texture of the Sprite's texture data. Returns a RegionAttachment that uses it. Use this if you plan to use a premultiply alpha shader such as "Spine/Skeleton"</summary>
-		public static RegionAttachment ToRegionAttachmentPMAClone (this Sprite sprite, Shader shader, TextureFormat textureFormat = SpriteAtlasRegionExtensions.SpineTextureFormat, bool mipmaps = SpriteAtlasRegionExtensions.UseMipMaps) {
+		public static RegionAttachment ToRegionAttachmentPMAClone (this Sprite sprite, Shader shader, TextureFormat textureFormat = SpriteAtlasRegionExtensions.SpineTextureFormat, bool mipmaps = SpriteAtlasRegionExtensions.UseMipMaps, Material materialPropertySource = null) {
 			if (sprite == null) throw new System.ArgumentNullException("sprite");
 			if (shader == null) throw new System.ArgumentNullException("shader");
-			var region = sprite.ToAtlasRegionPMAClone(shader, textureFormat, mipmaps);
+			var region = sprite.ToAtlasRegionPMAClone(shader, textureFormat, mipmaps, materialPropertySource);
 			var unitsPerPixel = 1f / sprite.pixelsPerUnit;
 			return region.ToRegionAttachment(sprite.name, unitsPerPixel);
+		}
+
+		public static RegionAttachment ToRegionAttachmentPMAClone (this Sprite sprite, Material materialPropertySource, TextureFormat textureFormat = SpriteAtlasRegionExtensions.SpineTextureFormat, bool mipmaps = SpriteAtlasRegionExtensions.UseMipMaps) {
+			return sprite.ToRegionAttachmentPMAClone(materialPropertySource.shader, textureFormat, mipmaps, materialPropertySource);
 		}
 
 		/// <summary>
@@ -205,8 +209,16 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		internal const bool UseMipMaps = false;
 		internal const float DefaultScale = 0.01f;
 
-		public static AtlasRegion ToAtlasRegion (this Texture2D t, Shader shader, float scale = DefaultScale) {
+		public static AtlasRegion ToAtlasRegion (this Texture2D t, Material materialPropertySource, float scale = DefaultScale) {
+			return t.ToAtlasRegion(materialPropertySource.shader, scale, materialPropertySource);
+		}
+
+		public static AtlasRegion ToAtlasRegion (this Texture2D t, Shader shader, float scale = DefaultScale, Material materialPropertySource = null) {
 			var material = new Material(shader);
+			if (materialPropertySource != null) {
+				material.CopyPropertiesFromMaterial(materialPropertySource);
+				material.shaderKeywords = materialPropertySource.shaderKeywords;
+			}
 
 			material.mainTexture = t;
 			var page = material.ToSpineAtlasPage();
@@ -245,8 +257,18 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 		/// <summary>
 		/// Creates a Spine.AtlasRegion that uses a premultiplied alpha duplicate of the Sprite's texture data.</summary>
-		public static AtlasRegion ToAtlasRegionPMAClone (this Texture2D t, Shader shader, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
+		public static AtlasRegion ToAtlasRegionPMAClone (this Texture2D t, Material materialPropertySource, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
+			return t.ToAtlasRegionPMAClone(materialPropertySource.shader, textureFormat, mipmaps, materialPropertySource);
+		}
+
+		/// <summary>
+		/// Creates a Spine.AtlasRegion that uses a premultiplied alpha duplicate of the Sprite's texture data.</summary>
+		public static AtlasRegion ToAtlasRegionPMAClone (this Texture2D t, Shader shader, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps, Material materialPropertySource = null) {
 			var material = new Material(shader);
+			if (materialPropertySource != null) {
+				material.CopyPropertiesFromMaterial(materialPropertySource);
+				material.shaderKeywords = materialPropertySource.shaderKeywords;
+			}
 			var newTexture = t.GetClone(false, textureFormat, mipmaps);
 			newTexture.ApplyPMA(true);
 
@@ -261,7 +283,6 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 			return region;
 		}
-
 
 		/// <summary>
 		/// Creates a new Spine.AtlasPage from a UnityEngine.Material. If the material has a preassigned texture, the page width and height will be set.</summary>
@@ -299,8 +320,13 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 		/// <summary>
 		/// Creates a Spine.AtlasRegion that uses a premultiplied alpha duplicate of the Sprite's texture data.</summary>
-		public static AtlasRegion ToAtlasRegionPMAClone (this Sprite s, Shader shader, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
+		public static AtlasRegion ToAtlasRegionPMAClone (this Sprite s, Shader shader, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps, Material materialPropertySource = null) {
 			var material = new Material(shader);
+			if (materialPropertySource != null) {
+				material.CopyPropertiesFromMaterial(materialPropertySource);
+				material.shaderKeywords = materialPropertySource.shaderKeywords;
+			}
+
 			var tex = s.ToTexture(false, textureFormat, mipmaps);
 			tex.ApplyPMA(true);
 
@@ -316,7 +342,11 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			return region;
 		}
 
-		static AtlasRegion ToAtlasRegion (this Sprite s, bool isolatedTexture = false) {
+		public static AtlasRegion ToAtlasRegionPMAClone (this Sprite s, Material materialPropertySource, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
+			return s.ToAtlasRegionPMAClone(materialPropertySource.shader, textureFormat, mipmaps, materialPropertySource);
+		}
+
+		internal static AtlasRegion ToAtlasRegion (this Sprite s, bool isolatedTexture = false) {
 			var region = new AtlasRegion();
 			region.name = s.name;
 			region.index = -1;
@@ -360,7 +390,14 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		/// <summary>
 		/// Creates and populates a duplicate skin with cloned attachments that are backed by a new packed texture atlas comprised of all the regions from the original skin.</summary>
 		/// <remarks>No Spine.Atlas object is created so there is no way to find AtlasRegions except through the Attachments using them.</remarks>
-		public static Skin GetRepackedSkin (this Skin o, string newName, Shader shader, out Material m, out Texture2D t, int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
+		public static Skin GetRepackedSkin (this Skin o, string newName, Material materialPropertySource, out Material m, out Texture2D t, int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
+			return GetRepackedSkin(o, newName, materialPropertySource.shader, out m, out t, maxAtlasSize, padding, textureFormat, mipmaps, materialPropertySource);
+		}
+
+		/// <summary>
+		/// Creates and populates a duplicate skin with cloned attachments that are backed by a new packed texture atlas comprised of all the regions from the original skin.</summary>
+		/// <remarks>No Spine.Atlas object is created so there is no way to find AtlasRegions except through the Attachments using them.</remarks>
+		public static Skin GetRepackedSkin (this Skin o, string newName, Shader shader, out Material m, out Texture2D t, int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps, Material materialPropertySource = null) {
 			var skinAttachments = o.Attachments;
 			var newSkin = new Skin(newName);
 
@@ -376,7 +413,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			foreach (var kvp in skinAttachments) {
 				var newAttachment = kvp.Value.GetClone(true);
 				if (IsRenderable(newAttachment)) {
-					
+
 					var region = newAttachment.GetAtlasRegion();
 					int existingIndex;
 					if (existingRegions.TryGetValue(region, out existingIndex)) {
@@ -403,6 +440,11 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 			// Rehydrate the repacked textures as a Material, Spine atlas and Spine.AtlasAttachments
 			var newMaterial = new Material(shader);
+			if (materialPropertySource != null) {
+				newMaterial.CopyPropertiesFromMaterial(materialPropertySource);
+				newMaterial.shaderKeywords = materialPropertySource.shaderKeywords;
+			}
+
 			newMaterial.name = newName;
 			newMaterial.mainTexture = newTexture;
 			var page = newMaterial.ToSpineAtlasPage();
@@ -606,7 +648,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		}
 		#endregion
 
-		private static float InverseLerp (float a, float b, float value) {
+		static float InverseLerp (float a, float b, float value) {
 			return (value - a) / (b - a);
 		}
 	}
@@ -848,8 +890,20 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		/// <summary>
 		/// Returns a new linked mesh linked to this MeshAttachment. It will be mapped to an AtlasRegion generated from a Sprite. The AtlasRegion will be mapped to a new Material based on the shader.
 		/// For better caching and batching, use GetLinkedMesh(string, AtlasRegion, bool)</summary>
-		public static MeshAttachment GetLinkedMesh (this MeshAttachment o, Sprite sprite, Shader shader, bool inheritDeform = true) {
-			return o.GetLinkedMesh(sprite.name, sprite.ToAtlasRegion(new Material(shader)), inheritDeform);
+		public static MeshAttachment GetLinkedMesh (this MeshAttachment o, Sprite sprite, Shader shader, bool inheritDeform = true, Material materialPropertySource = null) {
+			var m = new Material(shader);
+			if (materialPropertySource != null) {
+				m.CopyPropertiesFromMaterial(materialPropertySource);
+				m.shaderKeywords = materialPropertySource.shaderKeywords;
+			}
+			return o.GetLinkedMesh(sprite.name, sprite.ToAtlasRegion(), inheritDeform);
+		}
+
+		/// <summary>
+		/// Returns a new linked mesh linked to this MeshAttachment. It will be mapped to an AtlasRegion generated from a Sprite. The AtlasRegion will be mapped to a new Material based on the shader.
+		/// For better caching and batching, use GetLinkedMesh(string, AtlasRegion, bool)</summary>
+		public static MeshAttachment GetLinkedMesh (this MeshAttachment o, Sprite sprite, Material materialPropertySource, bool inheritDeform = true) {
+			return o.GetLinkedMesh(sprite, materialPropertySource.shader, inheritDeform, materialPropertySource);
 		}
 		#endregion
 	}
