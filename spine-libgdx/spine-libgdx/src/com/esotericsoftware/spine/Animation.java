@@ -245,14 +245,8 @@ public class Animation {
 			for (int start = i, n = i + BEZIER_SIZE - 1; i < n; i += 2) {
 				x = curves[i];
 				if (x >= percent) {
-					float prevX, prevY;
-					if (i == start) {
-						prevX = 0;
-						prevY = 0;
-					} else {
-						prevX = curves[i - 2];
-						prevY = curves[i - 1];
-					}
+					if (i == start) return curves[i + 1] * percent / x; // First point is 0,0.
+					float prevX = curves[i - 2], prevY = curves[i - 1];
 					return prevY + (curves[i + 1] - prevY) * (percent - prevX) / (x - prevX);
 				}
 			}
