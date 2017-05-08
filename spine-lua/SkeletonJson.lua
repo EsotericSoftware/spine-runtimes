@@ -256,7 +256,7 @@ function SkeletonJson.new (attachmentLoader)
 		-- Linked meshes
 		for i, linkedMesh in ipairs(self.linkedMeshes) do
 			local skin = skeletonData.defaultSkin
-			if linkedMesh.skin then skin = skeletonData.findSkin(linkedMesh.skin) end
+			if linkedMesh.skin then skin = skeletonData:findSkin(linkedMesh.skin) end
 			if not skin then error("Skin not found: " .. linkedMesh.skin) end
 			local parent = skin:getAttachment(linkedMesh.slotIndex, linkedMesh.parent)
 			if not parent then error("Parent mesh not found: " + linkedMesh.parent) end
