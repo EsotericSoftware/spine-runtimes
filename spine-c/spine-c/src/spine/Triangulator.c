@@ -155,7 +155,6 @@ spShortArray* spTriangulator_triangulate(spTriangulator* self, spFloatArray* ver
 		int previous = vertexCount - 1, i = 0, next = 1;
 		int previousIndex, nextIndex;
 		while (1) {
-			outer:
 			if (!isConcave[i]) {
 				int p1 = indices[previous] << 1, p2 = indices[i] << 1, p3 = indices[next] << 1;
 				float p1x = vertices[p1], p1y = vertices[p1 + 1];
@@ -175,6 +174,7 @@ spShortArray* spTriangulator_triangulate(spTriangulator* self, spFloatArray* ver
 				}
 				break;
 			}
+			outer:
 
 			if (next == 0) {
 				do {

@@ -43,7 +43,7 @@ function init() {
 
 	assetManager.loadTexture(FILE + ".png");
 	assetManager.loadText(FILE + ".atlas");
-	assetManager.loadText("raptor.json");
+	assetManager.loadText(FILE + ".json");
 
 	timeKeeper = new spine.TimeKeeper();
 	requestAnimationFrame(load);
@@ -58,7 +58,7 @@ function load() {
 		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
 		skeletonJson.scale = SCALE;
-		var skeletonData = skeletonJson.readSkeletonData(JSON.parse(assetManager.get("raptor.json")));
+		var skeletonData = skeletonJson.readSkeletonData(JSON.parse(assetManager.get(FILE + ".json")));
 
 		for (var i = 0; i < NUM_SKELETONS; i++) {
 			skeleton = new spine.Skeleton(skeletonData);

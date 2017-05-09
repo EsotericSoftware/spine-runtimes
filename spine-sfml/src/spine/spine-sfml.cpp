@@ -135,6 +135,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		} else if (attachment->type == SP_ATTACHMENT_CLIPPING) {
 			spClippingAttachment* clip = (spClippingAttachment*)slot->attachment;
 			spSkeletonClipping_clipStart(clipper, slot, clip);
+			continue;
 		} else continue;
 
 		Uint8 r = static_cast<Uint8>(skeleton->color.r * slot->color.r * attachmentColor->r * 255);
