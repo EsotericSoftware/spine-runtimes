@@ -5,9 +5,14 @@ Shader "Spine/Sprite/Unlit"
 		_MainTex ("Main Texture", 2D) = "white" {}
 		_Color ("Color", Color) = (1,1,1,1)
 		
+		[MaterialToggle] PixelSnap ("Pixel snap", Float) = 0
+		[PerRendererData] _AlphaTex ("External Alpha", 2D) = "white" {}
+		[PerRendererData] _EnableExternalAlpha ("Enable External Alpha", Float) = 0
+		
 		_ZWrite ("Depth Write", Float) = 0.0
 		_Cutoff ("Depth alpha cutoff", Range(0,1)) = 0.0
 		_ShadowAlphaCutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
+		_CustomRenderQueue ("Custom Render Queue", Float) = 0.0
 		
 		_OverlayColor ("Overlay Color", Color) = (0,0,0,0)
 		_Hue("Hue", Range(-0.5,0.5)) = 0.0
@@ -25,7 +30,7 @@ Shader "Spine/Sprite/Unlit"
 	
 	SubShader
 	{
-		Tags { "Queue"="Transparent" "RenderType"="Sprite" "AlphaDepth"="False" }
+		Tags { "Queue"="Transparent" "RenderType"="Sprite" "AlphaDepth"="False" "CanUseSpriteAtlas"="True" "IgnoreProjector"="True" }
 		LOD 100
 		
 		Pass
@@ -38,7 +43,7 @@ Shader "Spine/Sprite/Unlit"
 			Lighting Off
 			
 			CGPROGRAM			
-				#pragma shader_feature _ _ALPHAPREMULTIPLY_ON _ADDITIVEBLEND _ADDITIVEBLEND_SOFT _MULTIPLYBLEND _MULTIPLYBLEND_X2
+				#pragma shader_feature _ _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON _ADDITIVEBLEND _ADDITIVEBLEND_SOFT _MULTIPLYBLEND _MULTIPLYBLEND_X2
 				#pragma shader_feature _ALPHA_CLIP
 				#pragma shader_feature _TEXTURE_BLEND
 				#pragma shader_feature _COLOR_ADJUST
@@ -46,11 +51,13 @@ Shader "Spine/Sprite/Unlit"
 				
 				#pragma fragmentoption ARB_precision_hint_fastest
 				#pragma multi_compile_fog
+				#pragma multi_compile _ PIXELSNAP_ON
+				#pragma multi_compile _ ETC1_EXTERNAL_ALPHA
 				
 				#pragma vertex vert
 				#pragma fragment frag
 				
-				#include "SpriteUnlit.cginc"
+				#include "CGIncludes/SpriteUnlit.cginc"
 			ENDCG
 		}
 		Pass
@@ -66,13 +73,15 @@ Shader "Spine/Sprite/Unlit"
 			Lighting Off
 			
 			CGPROGRAM		
-				#pragma multi_compile_shadowcaster
 				#pragma fragmentoption ARB_precision_hint_fastest
+				#pragma multi_compile_shadowcaster
+				#pragma multi_compile _ PIXELSNAP_ON
+				#pragma multi_compile _ ETC1_EXTERNAL_ALPHA
 				
 				#pragma vertex vert
 				#pragma fragment frag
 				
-				#include "SpriteShadows.cginc"
+				#include "CGIncludes/SpriteShadows.cginc"
 			ENDCG
 		}
 	}

@@ -123,7 +123,7 @@ namespace Spine.Unity.Examples {
 		public void PlayShoot () {
 			// Play the shoot animation on track 1.
 			skeletonAnimation.AnimationState.SetAnimation(1, shoot, false);
-			//skeletonAnimation.state.AddEmptyAnimation(1, 0.1f, 0f);
+			skeletonAnimation.AnimationState.AddEmptyAnimation(1, .3f, .3f);
 			gunSource.pitch = GetRandomPitch(gunsoundPitchOffset);
 			gunSource.Play();
 			gunParticles.randomSeed = (uint)Random.Range(0, 100);

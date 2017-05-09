@@ -48,6 +48,7 @@ function Slot.new (data, bone)
 		attachmentTime = 0,
 		attachmentVertices = {}
 	}	
+
 	setmetatable(self, Slot)
 	
 	if data.darkColor then self.darkColor = Color.newWith(1, 1, 1, 1) end
@@ -61,7 +62,7 @@ function Slot:setAttachment (attachment)
 	if self.attachment == attachment then return end
 	self.attachment = attachment
 	self.attachmentTime = self.bone.skeleton.time
-	self.attachmentVertices = {};
+	self.attachmentVertices = {}
 end
 
 function Slot:setAttachmentTime (time)

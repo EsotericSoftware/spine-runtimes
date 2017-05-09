@@ -305,7 +305,7 @@ void MemoryTestFixture::skeletonClipper() {
 	spUnsignedShortArray_add(indices, 1);
 	spUnsignedShortArray_add(indices, 2);
 
-	spSkeletonClipping_clipTriangles(clipping, vertices->items, vertices->size, indices->items, indices->size, uvs->items);
+	spSkeletonClipping_clipTriangles(clipping, vertices->items, vertices->size, indices->items, indices->size, uvs->items, 2);
 
 	float expectedVertices[8] = { 83.333328, 50.000000, 76.666664, 70.000000, 23.333334, 70.000000, 16.666672, 50.000000 };
 	ASSERT(clipping->clippedVertices->size == 8);

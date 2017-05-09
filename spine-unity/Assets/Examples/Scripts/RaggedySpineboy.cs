@@ -49,7 +49,7 @@ namespace Spine.Unity.Examples {
 
 		void AddRigidbody () {
 			var rb = gameObject.AddComponent<Rigidbody2D>();
-			#if UNITY_5_1 || UNITY_5_2 || UNITY_5_3 || UNITY_5_4 || UNITY_5_5
+			#if UNITY_5_1 || UNITY_5_2 || UNITY_5_3_OR_NEWER
 	        rb.freezeRotation = true;
 			#else
 			rb.fixedAngle = true;

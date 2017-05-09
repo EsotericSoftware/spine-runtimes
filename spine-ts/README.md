@@ -58,12 +58,12 @@ To run the examples, the image, atlas, and JSON files must be served by a webser
 ```
 cd spine-ts
 python -m SimpleHTTPServer
-````
+```
 
 Then open `http://localhost:8000/webgl/example`, `http://localhost:8000/canvas/example`, `https://localhost:8000/threejs/example` or `http://localhost:8000/widget/example` in your browser.
 
 ## WebGL Demos
-The spine-ts WebGL demos load their image, atlas, and JSON files from our webserver and so can be run directly, without needing a webserver. View the demos [all on one page](http://esotericsoftware.com/spine-demos/) or use the [standalone demos]() which are easy for you to explore and edit. The standalone demos can also be viewed here:
+The spine-ts WebGL demos load their image, atlas, and JSON files from our webserver and so can be run directly, without needing a webserver. The demos can be viewed [all on one page](http://esotericsoftware.com/spine-demos/) or in individual, standalone pages which are easy for you to explore and edit. See the [standalone demos source code](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-ts/webgl/demos) and view the pages here:
 
 - [Spine vs sprite sheets](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/spritesheets.html)
 - [Image changes](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/imagechanges.html)

@@ -42,7 +42,6 @@ namespace Spine.Unity.Examples {
 		[SpineSlot] public string handSlot;
 		public Vector2 newHandOffset;
 		public float newHandRotation;
-		public Texture2D handTexture;
 
 		[Header("From Sprite")]
 		public Sprite dagger;
@@ -79,7 +78,6 @@ namespace Spine.Unity.Examples {
 			newHand.Rotation = newHandRotation;
 			newHand.UpdateOffset();
 			int handSlotIndex = skeleton.FindSlotIndex(handSlot);
-			handTexture = newHand.GetRegion().ToTexture();
 			newSkin.AddAttachment(handSlotIndex, handAttachmentName, newHand);
 
 			// Case 2: Create an attachment from a Unity Sprite (Sprite texture needs to be Read/Write Enabled in the inspector.

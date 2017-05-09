@@ -9,7 +9,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-ue4 works with data exported from the latest Spine 3-5.xx.
+spine-ue4 works with data exported from the latest Spine version.
 
 spine-ue4 supports all Spine features.
 

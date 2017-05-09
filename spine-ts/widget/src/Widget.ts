@@ -49,7 +49,7 @@ module spine {
 		private backgroundColor = new Color();
 		private loaded = false;
 		private bounds = { offset: new Vector2(), size: new Vector2() };
-		
+
 
 		constructor (element: HTMLElement | string, config: SpineWidgetConfig) {
 			if (!element) throw new Error("Please provide a DOM element, e.g. document.getElementById('myelement')");
@@ -185,7 +185,7 @@ module spine {
 				var animationState = this.state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 				animationState.setAnimation(0, config.animation, config.loop);
 				this.loaded = true;
-				if (config.success) config.success(this);				
+				if (config.success) config.success(this);
 				requestAnimationFrame(() => { this.render(); });
 			} else
 				requestAnimationFrame(() => { this.load(); });
@@ -246,6 +246,7 @@ module spine {
 			let w = canvas.clientWidth;
 			let h = canvas.clientHeight;
 			let bounds = this.bounds;
+
 			var devicePixelRatio = window.devicePixelRatio || 1;
 			if (canvas.width != Math.floor(w * devicePixelRatio) || canvas.height != Math.floor(h * devicePixelRatio)) {
 				canvas.width = Math.floor(w * devicePixelRatio);
