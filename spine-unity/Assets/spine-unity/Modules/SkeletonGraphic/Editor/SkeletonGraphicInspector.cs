@@ -194,11 +194,8 @@ namespace Spine.Unity.Editor {
 				data = skeletonDataAsset.GetSkeletonData(true);
 			}
 
-			if (skin == null)
-				skin = data.DefaultSkin;
-
-			if (skin == null)
-				skin = data.Skins.Items[0];
+			skin = skin ?? data.DefaultSkin ?? data.Skins.Items[0];
+			graphic.MeshGenerator.settings.zSpacing = SpineEditorUtilities.defaultZSpacing;
 
 			graphic.Initialize(false);
 			graphic.Skeleton.SetSkin(skin);

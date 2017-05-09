@@ -153,6 +153,10 @@ namespace Spine.Unity.Editor {
 		const string DEFAULT_SHADER_KEY = "SPINE_DEFAULT_SHADER";
 		public static string defaultShader = DEFAULT_DEFAULT_SHADER;
 
+		const float DEFAULT_DEFAULT_ZSPACING = 0f;
+		const string DEFAULT_ZSPACING_KEY = "SPINE_DEFAULT_ZSPACING";
+		public static float defaultZSpacing = DEFAULT_DEFAULT_ZSPACING;
+
 		const bool DEFAULT_SHOW_HIERARCHY_ICONS = true;
 		const string SHOW_HIERARCHY_ICONS_KEY = "SPINE_SHOW_HIERARCHY_ICONS";
 		public static bool showHierarchyIcons = DEFAULT_SHOW_HIERARCHY_ICONS;
@@ -165,15 +169,18 @@ namespace Spine.Unity.Editor {
 			Initialize();
 		}
 
+		static void LoadPreferences () {
+			defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, DEFAULT_DEFAULT_MIX);
+			defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, DEFAULT_DEFAULT_SCALE);
+			defaultZSpacing = EditorPrefs.GetFloat(DEFAULT_ZSPACING_KEY, DEFAULT_DEFAULT_ZSPACING);
+			defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, DEFAULT_DEFAULT_SHADER);	
+			showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, DEFAULT_SHOW_HIERARCHY_ICONS);
+			SpineHandles.handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, DEFAULT_SCENE_ICONS_SCALE);
+			preferencesLoaded = true;
+		}
+
 		static void Initialize () {
-			{
-				defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, DEFAULT_DEFAULT_MIX);
-				defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, DEFAULT_DEFAULT_SCALE);
-				defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, DEFAULT_DEFAULT_SHADER);	
-				showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, DEFAULT_SHOW_HIERARCHY_ICONS);
-				SpineHandles.handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, DEFAULT_SCENE_ICONS_SCALE);
-				preferencesLoaded = true;
-			}
+			LoadPreferences();
 
 			DirectoryInfo rootDir = new DirectoryInfo(Application.dataPath);
 			FileInfo[] files = rootDir.GetFiles("SpineEditorUtilities.cs", SearchOption.AllDirectories);
@@ -214,14 +221,8 @@ namespace Spine.Unity.Editor {
 
 		[PreferenceItem("Spine")]
 		static void PreferencesGUI () {
-			if (!preferencesLoaded) {
-				defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, DEFAULT_DEFAULT_MIX);
-				defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, DEFAULT_DEFAULT_SCALE);
-				defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, DEFAULT_DEFAULT_SHADER);
-				showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, DEFAULT_SHOW_HIERARCHY_ICONS);
-				SpineHandles.handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, DEFAULT_SCENE_ICONS_SCALE);
-				preferencesLoaded = true;
-			}
+			if (!preferencesLoaded)
+				LoadPreferences();
 
 			EditorGUI.BeginChangeCheck();
 			showHierarchyIcons = EditorGUILayout.Toggle(new GUIContent("Show Hierarchy Icons", "Show relevant icons on GameObjects with Spine Components on them. Disable this if you have large, complex scenes."), showHierarchyIcons);
@@ -244,18 +245,22 @@ namespace Spine.Unity.Editor {
 			if (EditorGUI.EndChangeCheck())
 				EditorPrefs.SetFloat(DEFAULT_SCALE_KEY, defaultScale);
 
-
 			EditorGUI.BeginChangeCheck();
-			#if UNITY_5_3_OR_NEWER
-			defaultShader = EditorGUILayout.DelayedTextField(new GUIContent("Default shader", "Default shader for materials auto-generated on import."), defaultShader); 
-			#else
-			defaultShader = EditorGUILayout.TextField(new GUIContent("Default shader", "Default shader for materials auto-generated on import."), defaultShader); 
-			#endif
+			var shader = (EditorGUILayout.ObjectField("Default Shader", Shader.Find(defaultShader), typeof(Shader), false) as Shader);
+			defaultShader = shader != null ? shader.name : DEFAULT_DEFAULT_SHADER;
 			if (EditorGUI.EndChangeCheck())
 				EditorPrefs.SetString(DEFAULT_SHADER_KEY, defaultShader);
+			EditorGUILayout.Space();
+
+			EditorGUILayout.LabelField("Editor Instantiation", EditorStyles.boldLabel);
+			EditorGUI.BeginChangeCheck();
+			defaultZSpacing = EditorGUILayout.Slider("Default Slot Z-Spacing", defaultZSpacing, -0.1f, 0f);
+			if (EditorGUI.EndChangeCheck())
+				EditorPrefs.SetFloat(DEFAULT_ZSPACING_KEY, defaultZSpacing);
+			
 
 			EditorGUILayout.Space();
-			EditorGUILayout.LabelField("Editor", EditorStyles.boldLabel);
+			EditorGUILayout.LabelField("Handles and Gizmos", EditorStyles.boldLabel);
 			EditorGUI.BeginChangeCheck();
 			SpineHandles.handleScale = EditorGUILayout.Slider("Editor Bone Scale", SpineHandles.handleScale, 0.01f, 2f);
 			SpineHandles.handleScale = Mathf.Max(0.01f, SpineHandles.handleScale);
@@ -268,7 +273,7 @@ namespace Spine.Unity.Editor {
 			GUILayout.Space(20);
 			EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);
 			using (new GUILayout.HorizontalScope()) {
-				EditorGUILayout.PrefixLabel("TK2D");
+				EditorGUILayout.PrefixLabel("Define TK2D");
 				if (GUILayout.Button("Enable", GUILayout.Width(64)))
 					EnableTK2D();
 				if (GUILayout.Button("Disable", GUILayout.Width(64)))
@@ -1359,12 +1364,15 @@ namespace Spine.Unity.Editor {
 				throw e;
 			}
 
+			// Set Defaults
 			bool noSkins = data.DefaultSkin == null && (data.Skins == null || data.Skins.Count == 0); // Support attachmentless/skinless SkeletonData.
 			skin = skin ?? data.DefaultSkin ?? (noSkins ? null : data.Skins.Items[0]);
 			if (skin != null) {
 				newSkeletonAnimation.initialSkinName = skin.Name;
 				newSkeletonAnimation.skeleton.SetSkin(skin);
 			}
+
+			newSkeletonAnimation.zSpacing = defaultZSpacing;
 
 			newSkeletonAnimation.skeleton.Update(0);
 			newSkeletonAnimation.state.Update(0);
@@ -1412,7 +1420,9 @@ namespace Spine.Unity.Editor {
 				data = skeletonDataAsset.GetSkeletonData(true);
 			}
 
+			// Set defaults
 			skin = skin ?? data.DefaultSkin ?? data.Skins.Items[0];
+			anim.zSpacing = defaultZSpacing;
 
 			anim.Initialize(false);
 			anim.skeleton.SetSkin(skin);
