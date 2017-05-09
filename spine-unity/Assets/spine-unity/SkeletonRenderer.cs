@@ -46,6 +46,7 @@ namespace Spine.Unity {
 		public SkeletonDataAsset skeletonDataAsset;
 		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } } // ISkeletonComponent
 		public string initialSkinName;
+		public bool initialFlipX, initialFlipY;
 
 		#region Advanced
 		// Submesh Separation
@@ -186,6 +187,9 @@ namespace Spine.Unity {
 			skeleton = new Skeleton(skeletonData);
 			if (!string.IsNullOrEmpty(initialSkinName) && !string.Equals(initialSkinName, "default", System.StringComparison.Ordinal))
 				skeleton.SetSkin(initialSkinName);
+
+			skeleton.flipX = initialFlipX;
+			skeleton.flipY = initialFlipY;
 
 			separatorSlots.Clear();
 			for (int i = 0; i < separatorSlotNames.Length; i++)

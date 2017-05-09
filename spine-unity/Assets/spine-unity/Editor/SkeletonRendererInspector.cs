@@ -44,6 +44,7 @@ namespace Spine.Unity.Editor {
 		protected static bool showBoneNames, showPaths, showShapes, showConstraints = true;
 
 		protected SerializedProperty skeletonDataAsset, initialSkinName;
+		protected SerializedProperty initialFlipX, initialFlipY;
 		protected SerializedProperty singleSubmesh, separatorSlotNames, clearStateOnDisable, immutableTriangles;
 		protected SerializedProperty normals, tangents, meshes, zSpacing, pmaVertexColors, tintBlack; // MeshGenerator settings
 		protected SpineInspectorUtility.SerializedSortingProperties sortingProperties;
@@ -91,6 +92,8 @@ namespace Spine.Unity.Editor {
 			var so = this.serializedObject;
 			skeletonDataAsset = so.FindProperty("skeletonDataAsset");
 			initialSkinName = so.FindProperty("initialSkinName");
+			initialFlipX = so.FindProperty("initialFlipX");
+			initialFlipY = so.FindProperty("initialFlipY");
 			normals = so.FindProperty("calculateNormals");
 			tangents = so.FindProperty("calculateTangents");
 			meshes = so.FindProperty("renderMeshes");
@@ -172,7 +175,8 @@ namespace Spine.Unity.Editor {
 				}
 					
 				if (valid)
-					EditorGUILayout.PropertyField(initialSkinName);
+					EditorGUILayout.PropertyField(initialSkinName);					
+
 			} else {
 				var component = (SkeletonRenderer)target;
 
@@ -238,6 +242,13 @@ namespace Spine.Unity.Editor {
 				EditorGUI.BeginChangeCheck();
 				if (advancedFoldout = EditorGUILayout.Foldout(advancedFoldout, "Advanced")) {
 					using (new SpineInspectorUtility.IndentScope()) {
+						using (new EditorGUILayout.HorizontalScope()) {
+							initialFlipX.boolValue = EditorGUILayout.ToggleLeft(initialFlipX.displayName, initialFlipX.boolValue, GUILayout.Width(120f));
+							initialFlipY.boolValue = EditorGUILayout.ToggleLeft(initialFlipY.displayName, initialFlipY.boolValue, GUILayout.Width(120f));
+							EditorGUILayout.Space();
+						}
+
+						EditorGUILayout.Space();
 
 						using (new SpineInspectorUtility.LabelWidthScope()) {
 							// Optimization options
