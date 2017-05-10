@@ -134,10 +134,19 @@ namespace Spine.Unity {
 				Vector3 targetWorldPosition = skeletonTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY, 0f));
 				if (!followZPosition) targetWorldPosition.z = thisTransform.position.z;
 
+				float boneWorldRotation = bone.WorldRotationX;
+
+				Transform transformParent = thisTransform.parent;
+				if (transformParent != null) {
+					Matrix4x4 m = transformParent.localToWorldMatrix;
+					if (m.m00 * m.m11 - m.m01 * m.m10 < 0) // Determinant2D is negative
+						boneWorldRotation = -boneWorldRotation;
+				}
+
 				if (followBoneRotation) {
 					Vector3 worldRotation = skeletonTransform.rotation.eulerAngles;
 					#if UNITY_5_6_OR_NEWER
-					thisTransform.SetPositionAndRotation(targetWorldPosition, Quaternion.Euler(worldRotation.x, worldRotation.y, skeletonTransform.rotation.eulerAngles.z + bone.WorldRotationX));
+					thisTransform.SetPositionAndRotation(targetWorldPosition, Quaternion.Euler(worldRotation.x, worldRotation.y, skeletonTransform.rotation.eulerAngles.z + boneWorldRotation));
 					#else
 					thisTransform.position = targetWorldPosition;
 					thisTransform.rotation = Quaternion.Euler(worldRotation.x, worldRotation.y, skeletonTransform.rotation.eulerAngles.z + bone.WorldRotationX);
