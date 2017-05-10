@@ -1,0 +1,58 @@
+<html>
+<script src="../../build/spine-widget.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<body>
+<center>
+<!-- You can programmatically initialize a widget -->
+<button id="reload">Reload</button>
+</center>
+</body>
+
+<script>
+
+var numWidgets = 0;
+var spineWidgets = []
+
+function reload() {
+    // tear down old widgets if any
+    for (var i = 0; i < spineWidgets.length; i++) {
+        spineWidgets[i].pause();
+        var widgetDiv = document.getElementById("spine-widget-" + spineWidgets[i].id);
+        if (widgetDiv) widgetDiv.parentNode.removeChild(widgetDiv)
+    }
+
+    spineWidgets = []
+
+    for (var i = 0; i < 5; i++) {
+        var widgetDiv = document.createElement("div");
+        widgetDiv.id = "spine-widget-" + numWidgets;
+        widgetDiv.style = "margin-bottom: 20px; width: 640px; height: 480px;"
+        document.body.appendChild(widgetDiv)
+
+        spineWidget = new spine.SpineWidget("spine-widget-" + numWidgets, {
+            json: "assets/spineboy.json",
+            atlas: "assets/spineboy.atlas",
+            animation: "run",
+            backgroundColor: "#00000000",
+            debug: true,
+            success: function (widget) {
+                var animIndex = 0;
+                widget.canvas.onclick = function () {
+                    animIndex++;
+                    var animations = widget.skeleton.data.animations;
+                    if (animIndex >= animations.length) animIndex = 0;
+                    widget.setAnimation(animations[animIndex].name);
+                }
+            }
+        });
+        spineWidget.id = numWidgets++;
+        spineWidgets.push(spineWidget);
+    }
+}
+
+var reloadButton = document.getElementById("reload");
+reloadButton.onclick = reload;
+
+</script>
+</body>
+</html>

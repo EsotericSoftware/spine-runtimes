@@ -20,6 +20,7 @@
  * Fixed renderer to work with 3.6 changes.
  * Added support for two color tinting.
  * Added support for clipping.
+ * Added support for rotated regions in texture atlas loaded via StarlingAtlasAttachmentLoader.
 
 ## C
  * **Breaking changes**
