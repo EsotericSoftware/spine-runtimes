@@ -104,12 +104,18 @@ namespace Spine.Unity.Modules {
 
 			// STEP 3: modify mesh.
 			var mesh = smartMesh.mesh;
-			meshGenerator.FillVertexData(mesh);
-			if (updateTriangles) {
-				meshGenerator.FillTriangles(mesh);
-				meshRenderer.sharedMaterials = buffers.GetUpdatedShaderdMaterialsArray();
-			} else if (buffers.MaterialsChangedInLastUpdate()) {
-				meshRenderer.sharedMaterials = buffers.GetUpdatedShaderdMaterialsArray();
+
+			if (meshGenerator.VertexCount <= 0) { // Clear an empty mesh
+				updateTriangles = false;
+				mesh.Clear();
+			} else {
+				meshGenerator.FillVertexData(mesh);
+				if (updateTriangles) {
+					meshGenerator.FillTriangles(mesh);
+					meshRenderer.sharedMaterials = buffers.GetUpdatedShaderdMaterialsArray();
+				} else if (buffers.MaterialsChangedInLastUpdate()) {
+					meshRenderer.sharedMaterials = buffers.GetUpdatedShaderdMaterialsArray();
+				}
 			}
 
 			meshFilter.sharedMesh = mesh;

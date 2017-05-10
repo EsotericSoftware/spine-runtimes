@@ -38,7 +38,6 @@ using System.Collections.Generic;
 
 namespace Spine.Unity {
 	public static class SpineMesh {
-
 		internal const HideFlags MeshHideflags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
 
 		/// <summary>Factory method for creating a new mesh for use in Spine components. This can be called in field initializers.</summary>
@@ -131,6 +130,8 @@ namespace Spine.Unity {
 		[NonSerialized] ExposedList<Vector2> uv2;
 		[NonSerialized] ExposedList<Vector2> uv3;
 		#endregion
+
+		public int VertexCount { get { return vertexBuffer.Count; } }
 
 		#region Step 1 : Generate Instructions
 		public static void GenerateSingleSubmeshInstruction (SkeletonRendererInstruction instructionOutput, Skeleton skeleton, Material material) {
@@ -295,7 +296,7 @@ namespace Spine.Unity {
 				}
 
 				if (noRender) {
-					if (current.forceSeparate && current.rawVertexCount > 0 && generateMeshOverride) {
+					if (current.forceSeparate && generateMeshOverride && current.rawVertexCount > 0) {
 						{ // Add
 							current.endSlot = i;
 							current.preActiveClippingSlotSource = lastPreActiveClipping;
@@ -305,6 +306,7 @@ namespace Spine.Unity {
 
 							submeshIndex++;
 						}
+
 						current.startSlot = i;
 						lastPreActiveClipping = clippingAttachmentSource;
 						#if SPINE_TRIANGLECHECK
@@ -327,7 +329,7 @@ namespace Spine.Unity {
 					Material material = (rendererObject.GetType() == typeof(Material)) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
 					#endif
 
-					if (current.rawVertexCount > 0 && (current.forceSeparate || !System.Object.ReferenceEquals(current.material, material))) { // Material changed. Add the previous submesh.
+					if (current.forceSeparate || (current.rawVertexCount > 0 && !System.Object.ReferenceEquals(current.material, material))) { // Material changed. Add the previous submesh.
 						{ // Add
 							current.endSlot = i;
 							current.preActiveClippingSlotSource = lastPreActiveClipping;
