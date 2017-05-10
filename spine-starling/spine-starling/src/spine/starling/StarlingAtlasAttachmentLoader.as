@@ -58,10 +58,11 @@ package spine.starling {
 		}
 
 		public function newRegionAttachment(skin : Skin, name : String, path : String) : RegionAttachment {
-			var texture : Texture = atlas.getTexture(path);
+			var texture : Texture = atlas.getTexture(path);			
 			if (texture == null)
 				throw new Error("Region not found in Starling atlas: " + path + " (region attachment: " + name + ")");
 			var attachment : RegionAttachment = new RegionAttachment(name);
+			var rotated : Boolean = atlas.getRotation(path);			
 			attachment.rendererObject = new Image(Texture.fromTexture(texture)); // Discard frame.
 			var frame : Rectangle = texture.frame;
 			attachment.regionOffsetX = frame ? -frame.x : 0;
@@ -70,20 +71,42 @@ package spine.starling {
 			attachment.regionHeight = texture.height;
 			attachment.regionOriginalWidth = frame ? frame.width : texture.width;
 			attachment.regionOriginalHeight = frame ? frame.height : texture.height;
+			if (rotated) {
+				var tmp : Number = attachment.regionOriginalWidth;
+				attachment.regionOriginalWidth = attachment.regionOriginalHeight;
+				attachment.regionOriginalHeight = tmp;
+				tmp = attachment.regionWidth;
+				attachment.regionWidth = attachment.regionHeight;
+				attachment.regionHeight = tmp;
+			}
 			var subTexture : SubTexture = texture as SubTexture;
 			if (subTexture) {
 				var root : Texture = subTexture.root;
-				var rectRegion : Rectangle = atlas.getRegion(path);
-				attachment["regionU"] = rectRegion.x / root.width;
-				attachment["regionV"] = rectRegion.y / root.height;
-				attachment["regionU2"] = (rectRegion.x + subTexture.width) / root.width;
-				attachment["regionV2"] = (rectRegion.y + subTexture.height) / root.height;
+				var rectRegion : Rectangle = atlas.getRegion(path);				
+				if (!rotated) {
+					attachment["regionU"] = rectRegion.x / root.width;
+					attachment["regionV"] = rectRegion.y / root.height;
+					attachment["regionU2"] = (rectRegion.x + subTexture.width) / root.width;
+					attachment["regionV2"] = (rectRegion.y + subTexture.height) / root.height;
+				} else {
+					attachment["regionU2"] = rectRegion.x / root.width;
+					attachment["regionV2"] = rectRegion.y / root.height;
+					attachment["regionU"] = (rectRegion.x + subTexture.width) / root.width;
+					attachment["regionV"] = (rectRegion.y + subTexture.height) / root.height;
+				}
 				attachment.setUVs(attachment["regionU"], attachment["regionV"], attachment["regionU2"], attachment["regionV2"], atlas.getRotation(path));
 			} else {
-				attachment["regionU"] = 0;
-				attachment["regionV"] = 1;
-				attachment["regionU2"] = 1;
-				attachment["regionV2"] = 0;
+				if (!rotated) {
+					attachment["regionU"] = 0;
+					attachment["regionV"] = 1;
+					attachment["regionU2"] = 1;
+					attachment["regionV2"] = 0;
+				} else {
+					attachment["regionU2"] = 0;
+					attachment["regionV2"] = 1;
+					attachment["regionU"] = 1;
+					attachment["regionV"] = 0;
+				}
 			}
 			return attachment;
 		}
@@ -92,22 +115,38 @@ package spine.starling {
 			var texture : Texture = atlas.getTexture(path);
 			if (texture == null)
 				throw new Error("Region not found in Starling atlas: " + path + " (mesh attachment: " + name + ")");
+			var rotated : Boolean = atlas.getRotation(path);
 			var attachment : MeshAttachment = new MeshAttachment(name);
+			attachment.regionRotate = rotated;
 			attachment.rendererObject = new Image(Texture.fromTexture(texture)); // Discard frame.
 			var subTexture : SubTexture = texture as SubTexture;
 			if (subTexture) {
 				var root : Texture = subTexture.root;
 				var rectRegion : Rectangle = atlas.getRegion(path);
-				attachment.regionU = rectRegion.x / root.width;
-				attachment.regionV = rectRegion.y / root.height;
-				attachment.regionU2 = (rectRegion.x + subTexture.width) / root.width;
-				attachment.regionV2 = (rectRegion.y + subTexture.height) / root.height;
+				if (!rotated) {
+					attachment.regionU = rectRegion.x / root.width;
+					attachment.regionV = rectRegion.y / root.height;
+					attachment.regionU2 = (rectRegion.x + subTexture.width) / root.width;
+					attachment.regionV2 = (rectRegion.y + subTexture.height) / root.height;
+				} else {
+					attachment.regionU2 = rectRegion.x / root.width;
+					attachment.regionV2 = rectRegion.y / root.height;
+					attachment.regionU = (rectRegion.x + subTexture.height) / root.width;
+					attachment.regionV = (rectRegion.y + subTexture.width) / root.height;
+				}
 				attachment.rendererObject = new Image(root);
 			} else {
-				attachment.regionU = 0;
-				attachment.regionV = 1;
-				attachment.regionU2 = 1;
-				attachment.regionV2 = 0;
+				if (!rotated) {
+					attachment.regionU = 0;
+					attachment.regionV = 1;
+					attachment.regionU2 = 1;
+					attachment.regionV2 = 0;
+				} else {
+					attachment.regionU2 = 0;
+					attachment.regionV2 = 1;
+					attachment.regionU = 1;
+					attachment.regionV = 0;
+				}
 			}
 			var frame : Rectangle = texture.frame;
 			attachment.regionOffsetX = frame ? -frame.x : 0;
@@ -116,6 +155,14 @@ package spine.starling {
 			attachment.regionHeight = texture.height;
 			attachment.regionOriginalWidth = frame ? frame.width : texture.width;
 			attachment.regionOriginalHeight = frame ? frame.height : texture.height;
+			if (rotated) {
+				var tmp : Number = attachment.regionOriginalWidth;
+				attachment.regionOriginalWidth = attachment.regionOriginalHeight;
+				attachment.regionOriginalHeight = tmp;
+				tmp = attachment.regionWidth;
+				attachment.regionWidth = attachment.regionHeight;
+				attachment.regionHeight = tmp;
+			}
 			return attachment;
 		}
 

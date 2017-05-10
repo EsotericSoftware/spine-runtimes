@@ -65,7 +65,7 @@ package spine.examples {
 			var skeletonData : SkeletonData = json.readSkeletonData(new CoinJson());
 
 			this.x = 400;
-			this.y = 400;
+			this.y = 600;
 
 			skeleton = new SkeletonAnimation(skeletonData);
 			skeleton.state.setAnimationByName(0, "rotate", true);
