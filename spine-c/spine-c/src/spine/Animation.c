@@ -343,12 +343,11 @@ void _spTranslateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleto
 		y += (frames[frame + TRANSLATE_Y] - y) * percent;
 	}
 	if (setupPose) {
-		bone->x = bone->data->x + x * alpha;
-		bone->y = bone->data->y + y * alpha;
-	} else {
-		bone->x += (bone->data->x + x - bone->x) * alpha;
-		bone->y += (bone->data->y + y - bone->y) * alpha;
+		bone->x = bone->data->x;
+		bone->y = bone->data->y;
 	}
+	bone->x += x * alpha;
+	bone->y += y * alpha;
 
 	UNUSED(lastTime);
 	UNUSED(firedEvents);
