@@ -55,7 +55,7 @@ namespace Spine.Unity.Modules {
 				apma = skeletonRenderer.pmaVertexColors;
 			} else {
 				var skeletonGraphic = skeletonComponent as SkeletonGraphic;
-				apma = skeletonGraphic != null && skeletonGraphic.SpineMeshGenerator.PremultiplyVertexColors;
+				apma = skeletonGraphic != null && skeletonGraphic.MeshGenerator.settings.pmaVertexColors;
 			}
 
 			if (apma) {
@@ -98,7 +98,7 @@ namespace Spine.Unity.Modules {
 			else {
 				var skeletonGraphic = skeletonComponent as SkeletonGraphic;
 				if (skeletonGraphic != null)
-					this.applyPMA = skeletonGraphic.SpineMeshGenerator.PremultiplyVertexColors;
+					this.applyPMA = skeletonGraphic.MeshGenerator.settings.pmaVertexColors;
 			}
 
 			Shader attachmentShader = applyPMA ? Shader.Find(DefaultPMAShader) : Shader.Find(DefaultStraightAlphaShader);

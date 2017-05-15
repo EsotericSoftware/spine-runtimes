@@ -53,11 +53,16 @@ namespace Spine.Unity.Modules {
 
 		Atlas atlas;
 
+		void Start () {
+			
+		}
+
 		void Awake () {
 			GetComponent<SkeletonRenderer>().OnRebuild += Apply;
 		}
 
 		void Apply (SkeletonRenderer skeletonRenderer) {
+			if (!this.enabled) return;
 			atlas = atlasAsset.GetAtlas();
 			float scale = skeletonRenderer.skeletonDataAsset.scale;
 

@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "1KXIZu1/h7BGTa7Da5eI5aSb31A", "spine": "3.6.07-beta", "width": 0, "height": 0, "images": "" },
+"skeleton": { "hash": "drEwFNfBdyfvLHexBMVTOs/c4jc", "spine": "3.6.18-beta", "width": 519.94, "height": 542.37, "images": "" },
 "bones": [
 	{ "name": "root" },
 	{ "name": "arrowOrigin", "parent": "root", "x": 173, "y": 292 },
@@ -117,7 +117,8 @@
 		"name": "translateHandleTarget",
 		"order": 0,
 		"bones": [ "arrowOrigin" ],
-		"target": "handL"
+		"target": "handL",
+		"rotateMix": 0
 	}
 ],
 "skins": {

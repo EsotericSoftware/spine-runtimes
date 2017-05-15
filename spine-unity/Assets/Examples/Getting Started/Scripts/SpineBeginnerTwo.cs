@@ -90,6 +90,14 @@ namespace Spine.Unity.Examples {
 
 			}
 		}
+
+		void Track_Complete (TrackEntry trackEntry) { Debug.Log("Complete " + trackEntry.Animation.Name); }
+
+		void Track_End (TrackEntry trackEntry) { Debug.Log("End " + trackEntry.Animation.Name); }
+
+		void HandleStart (TrackEntry trackEntry) { Debug.Log("Start " + trackEntry.Animation.Name); }
+
+
 	}
 
 }

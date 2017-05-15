@@ -122,11 +122,14 @@ namespace Spine.Unity.Examples {
 		#region Transient Actions
 		public void PlayShoot () {
 			// Play the shoot animation on track 1.
-			skeletonAnimation.AnimationState.SetAnimation(1, shoot, false);
-			skeletonAnimation.AnimationState.AddEmptyAnimation(1, .3f, .3f);
+			var track = skeletonAnimation.AnimationState.SetAnimation(1, shoot, false);
+			track.AttachmentThreshold = 1f;
+			track.MixDuration = 0f;
+			var empty = skeletonAnimation.state.AddEmptyAnimation(1, 0.5f, 0.1f);
+			empty.AttachmentThreshold = 1f;
 			gunSource.pitch = GetRandomPitch(gunsoundPitchOffset);
 			gunSource.Play();
-			gunParticles.randomSeed = (uint)Random.Range(0, 100);
+			//gunParticles.randomSeed = (uint)Random.Range(0, 100);
 			gunParticles.Play();
 		}
 

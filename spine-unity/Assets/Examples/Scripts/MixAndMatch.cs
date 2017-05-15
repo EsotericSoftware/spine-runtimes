@@ -35,35 +35,32 @@ namespace Spine.Unity.Examples {
 	public class MixAndMatch : MonoBehaviour {
 
 		#region Inspector
-		[Header("From AtlasAsset")]
-		public AtlasAsset handSource;
-		[SpineAtlasRegion("handSource")] public string handRegion = "hand";
-		[SpineAttachment] public string handAttachmentName;
-		[SpineSlot] public string handSlot;
-		public Vector2 newHandOffset;
-		public float newHandRotation;
+		[Header("Visor")]
+		public Sprite visorSprite;
+		[SpineSlot] public string visorSlot;
+		[SpineAttachment(slotField:"visorSlot")] public string visorKey = "goggles";
 
-		[Header("From Sprite")]
-		public Sprite dagger;
-		public string daggerName = "dagger";
-		[SpineSlot] public string weaponSlot;
-
-		[Header("MeshAttachment.SetRegion")]
-		public bool applyHeadRegion = false;
-		public AtlasAsset headSource;
-		[SpineAtlasRegion("headSource")] public string headRegion;
-		[SpineSlot] public string headSlot;
-		[SpineAttachment] public string headAttachmentName;
+		[Header("Gun")]
+		public Sprite gunSprite;
+		[SpineSlot] public string gunSlot;
+		[SpineAttachment(slotField:"gunSlot")] public string gunKey = "gun";
 
 		[Header("Runtime Repack")]
 		public bool repack = true;
-		public Shader repackedShader;
+		public Material sourceMaterial;
 
 		[Header("Do not assign")]
 		public Texture2D runtimeAtlas;
 		public Material runtimeMaterial;
-
 		#endregion
+
+		void OnValidate () {
+			if (sourceMaterial == null) {
+				var skeletonAnimation = GetComponent<SkeletonAnimation>();
+				if (skeletonAnimation != null)
+					sourceMaterial = skeletonAnimation.SkeletonDataAsset.atlasAssets[0].materials[0];
+			}
+		}
 
 		void Start () {
 			var skeletonAnimation = GetComponent<SkeletonAnimation>();
@@ -72,38 +69,44 @@ namespace Spine.Unity.Examples {
 			// All attachment changes will be applied to the skin. We use a clone so other instances will not be affected.
 			var newSkin = skeleton.UnshareSkin(true, false, skeletonAnimation.AnimationState);
 
-			// Case 1: Create an attachment from an atlas.
-			RegionAttachment newHand = handSource.GetAtlas().FindRegion(handRegion).ToRegionAttachment("new hand");
-			newHand.SetPositionOffset(newHandOffset);
-			newHand.Rotation = newHandRotation;
-			newHand.UpdateOffset();
-			int handSlotIndex = skeleton.FindSlotIndex(handSlot);
-			newSkin.AddAttachment(handSlotIndex, handAttachmentName, newHand);
+			// NOTE: sprite textures need to be full rect.
+			var originalSkin = skeleton.Data.DefaultSkin;
 
-			// Case 2: Create an attachment from a Unity Sprite (Sprite texture needs to be Read/Write Enabled in the inspector.
-			RegionAttachment newWeapon = dagger.ToRegionAttachmentPMAClone(Shader.Find("Spine/Skeleton"));
-			newWeapon.SetScale(1.5f, 1.5f);
-			newWeapon.UpdateOffset();
-			int weaponSlotIndex = skeleton.FindSlotIndex(weaponSlot);
-			newSkin.AddAttachment(weaponSlotIndex, daggerName, newWeapon);
+			int visorSlotIndex = skeleton.FindSlotIndex(visorSlot);
+			RegionAttachment originalVisor = originalSkin.GetAttachment(visorSlotIndex, visorKey) as RegionAttachment;
+			RegionAttachment newVisor = visorSprite.ToRegionAttachmentPMAClone(sourceMaterial);
+			newVisor.X = originalVisor.X;
+			newVisor.Y = originalVisor.Y;
+			newVisor.Rotation = originalVisor.Rotation;
+			newSkin.AddAttachment(visorSlotIndex, visorKey, newVisor);
+
+
+			int gunSlotIndex = skeleton.FindSlotIndex(gunSlot);
+			RegionAttachment originalGun = originalSkin.GetAttachment(gunSlotIndex, gunKey) as RegionAttachment;
+			RegionAttachment newGun = gunSprite.ToRegionAttachmentPMAClone(sourceMaterial);
+			newGun.x = originalGun.x;
+			newGun.y = originalGun.y;
+			newGun.Rotation = originalGun.Rotation;
+			newSkin.AddAttachment(gunSlotIndex, gunKey, newGun);
 
 			// Case 3: Change an existing attachment's backing region.
-			if (applyHeadRegion) {
-				AtlasRegion spineBoyHead = headSource.GetAtlas().FindRegion(headRegion);
-				int headSlotIndex = skeleton.FindSlotIndex(headSlot);
-				var newHead = newSkin.GetAttachment(headSlotIndex, headAttachmentName).GetClone(true);
-				newHead.SetRegion(spineBoyHead);
-				newSkin.AddAttachment(headSlotIndex, headAttachmentName, newHead);
-			}
+//			if (applyHeadRegion) {
+//				AtlasRegion spineBoyHead = headSource.GetAtlas().FindRegion(headRegion);
+//				int headSlotIndex = skeleton.FindSlotIndex(headSlot);
+//				var newHead = newSkin.GetAttachment(headSlotIndex, headAttachmentName).GetClone(true);
+//				newHead.SetRegion(spineBoyHead);
+//				newSkin.AddAttachment(headSlotIndex, headAttachmentName, newHead);
+//			}
 
 			// Case 4: Repacking a mixed-and-matched skin to minimize draw calls.
 			// Repacking requires that you set all source textures/sprites/atlases to be Read/Write enabled in the inspector.
-			if (repack)
-				newSkin = newSkin.GetRepackedSkin("repacked", repackedShader, out runtimeMaterial, out runtimeAtlas);
+			if (repack) {
+				newSkin = newSkin.GetRepackedSkin("repacked", sourceMaterial, out runtimeMaterial, out runtimeAtlas);
+			}
 			
 			skeleton.SetSkin(newSkin);
-			skeleton.SetToSetupPose();
-			skeleton.SetAttachment(weaponSlot, daggerName);
+			skeleton.SetSlotsToSetupPose();
+			skeletonAnimation.Update(0);
 
 			Resources.UnloadUnusedAssets();
 		}
