@@ -41,7 +41,6 @@ namespace Spine.Unity.Editor {
 	[CanEditMultipleObjects]
 	public class SkeletonRendererInspector : UnityEditor.Editor {
 		protected static bool advancedFoldout;
-		protected static bool showBoneNames, showPaths, showShapes, showConstraints = true;
 
 		protected SerializedProperty skeletonDataAsset, initialSkinName;
 		protected SerializedProperty initialFlipX, initialFlipY;
@@ -106,7 +105,6 @@ namespace Spine.Unity.Editor {
 			separatorSlotNames = so.FindProperty("separatorSlotNames");
 			separatorSlotNames.isExpanded = true;
 
-			//frontFacing = so.FindProperty("frontFacing");
 			zSpacing = so.FindProperty("zSpacing");
 
 			SerializedObject rso = SpineInspectorUtility.GetRenderersSerializedObject(serializedObject);
@@ -276,15 +274,6 @@ namespace Spine.Unity.Editor {
 							// Optional fields. May be disabled in SkeletonRenderer.
 							if (normals != null) EditorGUILayout.PropertyField(normals, NormalsLabel);
 							if (tangents != null) EditorGUILayout.PropertyField(tangents, TangentsLabel);
-							//if (frontFacing != null) EditorGUILayout.PropertyField(frontFacing);
-
-							EditorGUILayout.Space();
-
-							EditorGUILayout.LabelField("Editor Preview", EditorStyles.boldLabel);
-							showBoneNames = EditorGUILayout.Toggle("Show Bone Names", showBoneNames);
-							showPaths = EditorGUILayout.Toggle("Show Paths", showPaths);
-							showShapes = EditorGUILayout.Toggle("Show Shapes", showShapes);
-							showConstraints = EditorGUILayout.Toggle("Show Constraints", showConstraints);
 						}
 
 						EditorGUILayout.Space();
@@ -332,11 +321,7 @@ namespace Spine.Unity.Editor {
 
 			if (skeleton == null) return;
 
-			if (showPaths) SpineHandles.DrawPaths(transform, skeleton);
 			SpineHandles.DrawBones(transform, skeleton);
-			if (showConstraints) SpineHandles.DrawConstraints(transform, skeleton);
-			if (showBoneNames) SpineHandles.DrawBoneNames(transform, skeleton);
-			if (showShapes) SpineHandles.DrawBoundingBoxes(transform, skeleton);
 		}
 
 		public void DrawSkeletonUtilityButton (bool multi) {
@@ -353,7 +338,7 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.Space();
 				var component = (Component)target;
 				if (component.GetComponent<SkeletonUtility>() == null) {						
-					if (SpineInspectorUtility.LargeCenteredButton(SkeletonUtilityButtonContent))
+					if (SpineInspectorUtility.CenteredButton(SkeletonUtilityButtonContent, 21))
 						component.gameObject.AddComponent<SkeletonUtility>();
 				}
 			}

@@ -46,16 +46,9 @@ namespace Spine.Unity.Editor {
 		SkeletonUtility skeletonUtility;
 		Skeleton skeleton;
 		SkeletonRenderer skeletonRenderer;
-		Skin activeSkin;
-
 		bool isPrefab;
 
-		Dictionary<Slot, List<Attachment>> attachmentTable = new Dictionary<Slot, List<Attachment>>();
-
 		GUIContent SpawnHierarchyButtonLabel = new GUIContent("Spawn Hierarchy", Icons.skeleton);
-		GUIContent SlotsRootLabel = new GUIContent("Slots", Icons.slotRoot);
-		static AnimBool showSlots = new AnimBool(false);
-		static bool debugSkeleton = false;
 
 		void OnEnable () {
 			skeletonUtility = (SkeletonUtility)target;
@@ -70,16 +63,10 @@ namespace Spine.Unity.Editor {
 
 			if (!skeletonRenderer.valid) return;
 
-			UpdateAttachments();
 			isPrefab |= PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab;
 		}
 			
 		public override void OnInspectorGUI () {
-			bool requireRepaint = false;
-			if (skeletonRenderer.skeleton != skeleton || activeSkin != skeleton.Skin) {
-				UpdateAttachments();
-			}
-
 			if (isPrefab) {
 				GUILayout.Label(new GUIContent("Cannot edit Prefabs", Icons.warning));
 				return;
@@ -96,100 +83,7 @@ namespace Spine.Unity.Editor {
 				if (SpineInspectorUtility.LargeCenteredButton(SpawnHierarchyButtonLabel))
 					SpawnHierarchyContextMenu();
 			}
-
-			using (new SpineInspectorUtility.BoxScope()) {
-				debugSkeleton = EditorGUILayout.Foldout(debugSkeleton, "Debug Skeleton");
-
-				if (debugSkeleton) {
-					EditorGUI.BeginChangeCheck();
-					skeleton.FlipX = EditorGUILayout.ToggleLeft("skeleton.FlipX", skeleton.FlipX);
-					skeleton.FlipY = EditorGUILayout.ToggleLeft("skeleton.FlipY", skeleton.FlipY);
-					requireRepaint |= EditorGUI.EndChangeCheck();
-
-//					foreach (var t in skeleton.IkConstraints)
-//						EditorGUILayout.LabelField(t.Data.Name + " " + t.Mix + " " + t.Target.Data.Name);
-
-					showSlots.target = EditorGUILayout.Foldout(showSlots.target, SlotsRootLabel);
-					if (showSlots.faded > 0) {
-						using (new EditorGUILayout.FadeGroupScope(showSlots.faded)) {
-							int baseIndent = EditorGUI.indentLevel;
-							foreach (KeyValuePair<Slot, List<Attachment>> pair in attachmentTable) {
-								Slot slot = pair.Key;
-
-								using (new EditorGUILayout.HorizontalScope()) {
-									EditorGUI.indentLevel = baseIndent + 1;
-									EditorGUILayout.LabelField(new GUIContent(slot.Data.Name, Icons.slot), GUILayout.ExpandWidth(false));
-									EditorGUI.BeginChangeCheck();
-									Color c = EditorGUILayout.ColorField(new Color(slot.R, slot.G, slot.B, slot.A), GUILayout.Width(60));
-									if (EditorGUI.EndChangeCheck()) {
-										slot.SetColor(c);
-										requireRepaint = true;
-									}
-								}
-
-								foreach (var attachment in pair.Value) {
-									GUI.contentColor = slot.Attachment == attachment ? Color.white : Color.grey;
-									EditorGUI.indentLevel = baseIndent + 2;
-									var icon = Icons.GetAttachmentIcon(attachment);
-									bool isAttached = (attachment == slot.Attachment);
-									bool swap = EditorGUILayout.ToggleLeft(new GUIContent(attachment.Name, icon), attachment == slot.Attachment);
-									if (isAttached != swap) {
-										slot.Attachment = isAttached ? null : attachment;
-										requireRepaint = true;
-									}
-									GUI.contentColor = Color.white;
-								}
-							}
-						}
-					}
-
-
-				}
-
-				if (showSlots.isAnimating)
-					Repaint();
-			}
-
-			if (requireRepaint) {
-				skeletonRenderer.LateUpdate();
-				SceneView.RepaintAll();
-			}
 		}
-
-		void UpdateAttachments () {
-			skeleton = skeletonRenderer.skeleton;
-			Skin defaultSkin = skeleton.Data.DefaultSkin;
-			Skin skin = skeleton.Skin ?? defaultSkin;
-			bool notDefaultSkin = skin != defaultSkin;
-
-			attachmentTable.Clear();
-			for (int i = skeleton.Slots.Count - 1; i >= 0; i--) {
-				var attachments = new List<Attachment>();
-				attachmentTable.Add(skeleton.Slots.Items[i], attachments);
-				skin.FindAttachmentsForSlot(i, attachments); // Add skin attachments.
-				if (notDefaultSkin) defaultSkin.FindAttachmentsForSlot(i, attachments); // Add default skin attachments.
-			}
-
-			activeSkin = skeleton.Skin;
-		}
-
-//		void SpawnHierarchyButton (string label, string tooltip, SkeletonUtilityBone.Mode mode, bool pos, bool rot, bool sca, params GUILayoutOption[] options) {
-//			GUIContent content = new GUIContent(label, tooltip);
-//			if (GUILayout.Button(content, options)) {
-//				if (skeletonUtility.skeletonRenderer == null)
-//					skeletonUtility.skeletonRenderer = skeletonUtility.GetComponent<SkeletonRenderer>();
-//
-//				if (skeletonUtility.boneRoot != null) {
-//					return;
-//				}
-//
-//				skeletonUtility.SpawnHierarchy(mode, pos, rot, sca);
-//
-//				SkeletonUtilityBone[] boneComps = skeletonUtility.GetComponentsInChildren<SkeletonUtilityBone>();
-//				foreach (SkeletonUtilityBone b in boneComps) 
-//					AttachIcon(b);
-//			}
-//		}
 
 		void SpawnHierarchyContextMenu () {
 			GenericMenu menu = new GenericMenu();
