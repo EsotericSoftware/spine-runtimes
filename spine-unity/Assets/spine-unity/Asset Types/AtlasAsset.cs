@@ -57,7 +57,7 @@ namespace Spine.Unity {
 
 			return atlasAsset;
 		}
-			
+
 		/// <summary>
 		/// Creates a runtime AtlasAsset. Only providing the textures is slower because it has to search for atlas page matches. <seealso cref="Spine.Unity.AtlasAsset.CreateRuntimeInstance(TextAsset, Material[], bool)"/></summary>
 		public static AtlasAsset CreateRuntimeInstance (TextAsset atlasText, Texture2D[] textures, Shader shader, bool initialize) {
@@ -94,11 +94,24 @@ namespace Spine.Unity {
 					materials[i] = mat;
 				else
 					throw new ArgumentException("Could not find matching atlas page in the texture array.");
-
 			}
 
 			// Create AtlasAsset normally
 			return CreateRuntimeInstance(atlasText, materials, initialize);
+		}
+
+		/// <summary>
+		/// Creates a runtime AtlasAsset. Only providing the textures is slower because it has to search for atlas page matches. <seealso cref="Spine.Unity.AtlasAsset.CreateRuntimeInstance(TextAsset, Material[], bool)"/></summary>
+		public static AtlasAsset CreateRuntimeInstance (TextAsset atlasText, Texture2D[] textures, Material materialPropertySource, bool initialize) {
+			var shader = materialPropertySource.shader;
+			var oa = CreateRuntimeInstance(atlasText, textures, shader, initialize);
+
+			foreach (var m in oa.materials) {
+				m.CopyPropertiesFromMaterial(materialPropertySource);
+				m.shaderKeywords = materialPropertySource.shaderKeywords;
+			}
+
+			return oa;
 		}
 		#endregion
 

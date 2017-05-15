@@ -71,6 +71,36 @@ namespace Spine.Unity.Modules {
 		#endif
 		#endregion
 
+		#region Runtime Instantiation
+		public static SkeletonRenderSeparator AddToSkeletonRenderer (SkeletonRenderer skeletonRenderer, int sortingLayerID = 0, int extraPartsRenderers = 0, int sortingOrderIncrement = DefaultSortingOrderIncrement, int baseSortingOrder = 0, bool addMinimumPartsRenderers = true) {
+			if (skeletonRenderer == null) {
+				Debug.Log("Tried to add SkeletonRenderSeparator to a null SkeletonRenderer reference.");
+				return null;
+			}
+
+			var srs = skeletonRenderer.gameObject.AddComponent<SkeletonRenderSeparator>();
+			srs.skeletonRenderer = skeletonRenderer;
+
+			skeletonRenderer.Initialize(false);
+			int count = extraPartsRenderers;
+			if (addMinimumPartsRenderers)
+				count = extraPartsRenderers + skeletonRenderer.separatorSlots.Count + 1;
+
+			var skeletonRendererTransform = skeletonRenderer.transform;
+			var componentRenderers = srs.partsRenderers;
+
+			for (int i = 0; i < count; i++) {
+				var smr = SkeletonPartsRenderer.NewPartsRendererGameObject(skeletonRendererTransform, i.ToString());
+				var mr = smr.MeshRenderer;
+				mr.sortingLayerID = sortingLayerID;
+				mr.sortingOrder = baseSortingOrder + (i * sortingOrderIncrement);
+				componentRenderers.Add(smr);
+			}
+
+			return srs;
+		}
+		#endregion
+
 		void OnEnable () {
 			if (skeletonRenderer == null) return;
 			if (copiedBlock == null) copiedBlock = new MaterialPropertyBlock();	

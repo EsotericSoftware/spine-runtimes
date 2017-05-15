@@ -86,6 +86,23 @@ namespace Spine.Unity {
 		#endif
 		#endregion
 
+		#region Runtime Instantiation
+		public static SkeletonGraphic NewSkeletonGraphicGameObject (SkeletonDataAsset skeletonDataAsset, Transform parent) {
+			SkeletonGraphic sg = SkeletonGraphic.AddSkeletonGraphicComponent(new GameObject("New Spine GameObject"), skeletonDataAsset);
+			if (parent != null) sg.transform.SetParent(parent, false);
+			return sg;
+		}
+
+		public static SkeletonGraphic AddSkeletonGraphicComponent (GameObject gameObject, SkeletonDataAsset skeletonDataAsset) {
+			var c = gameObject.AddComponent<SkeletonGraphic>();
+			if (skeletonDataAsset != null) {
+				c.skeletonDataAsset = skeletonDataAsset;
+				c.Initialize(false);
+			}
+			return c;
+		}
+		#endregion
+
 		#region Internals
 		// This is used by the UI system to determine what to put in the MaterialPropertyBlock.
 		public override Texture mainTexture {
