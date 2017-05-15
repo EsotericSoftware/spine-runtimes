@@ -36,11 +36,13 @@ using UnityEngine;
 
 namespace Spine.Unity.Editor {
 	using Event = UnityEngine.Event;
+	using Icons = SpineEditorUtilities.Icons;
 
 	[CustomEditor(typeof(SkeletonRenderer))]
 	[CanEditMultipleObjects]
 	public class SkeletonRendererInspector : UnityEditor.Editor {
 		protected static bool advancedFoldout;
+		internal static bool showBoneNames, showPaths, showShapes, showConstraints = true;
 
 		protected SerializedProperty skeletonDataAsset, initialSkinName;
 		protected SerializedProperty initialFlipX, initialFlipY;
@@ -76,8 +78,8 @@ namespace Spine.Unity.Editor {
 			SpineEditorUtilities.ConfirmInitialization();
 
 			// Labels
-			SkeletonDataAssetLabel = new GUIContent("SkeletonData Asset", SpineEditorUtilities.Icons.spine);
-			SkeletonUtilityButtonContent = new GUIContent("Add Skeleton Utility", SpineEditorUtilities.Icons.skeletonUtility);
+			SkeletonDataAssetLabel = new GUIContent("SkeletonData Asset", Icons.spine);
+			SkeletonUtilityButtonContent = new GUIContent("Add Skeleton Utility", Icons.skeletonUtility);
 			MeshesLabel = new GUIContent("Render MeshAttachments", "Disable to optimize rendering for skeletons that don't use Mesh Attachments");
 			ImmubleTrianglesLabel = new GUIContent("Immutable Triangles", "Enable to optimize rendering for skeletons that never change attachment visbility");
 			PMAVertexColorsLabel = new GUIContent("PMA Vertex Colors", "Use this if you are using the default Spine/Skeleton shader or any premultiply-alpha shader.");
@@ -93,7 +95,7 @@ namespace Spine.Unity.Editor {
 			initialSkinName = so.FindProperty("initialSkinName");
 			initialFlipX = so.FindProperty("initialFlipX");
 			initialFlipY = so.FindProperty("initialFlipY");
-			normals = so.FindProperty("calculateNormals");
+			normals = so.FindProperty("addNormals");
 			tangents = so.FindProperty("calculateTangents");
 			meshes = so.FindProperty("renderMeshes");
 			immutableTriangles = so.FindProperty("immutableTriangles");
@@ -238,7 +240,20 @@ namespace Spine.Unity.Editor {
 			// More Render Options...
 			using (new SpineInspectorUtility.BoxScope()) {
 				EditorGUI.BeginChangeCheck();
-				if (advancedFoldout = EditorGUILayout.Foldout(advancedFoldout, "Advanced")) {
+
+				EditorGUILayout.BeginHorizontal(GUILayout.Height(EditorGUIUtility.singleLineHeight + 5));
+				advancedFoldout = EditorGUILayout.Foldout(advancedFoldout, "Advanced");
+				if (advancedFoldout) {
+					EditorGUILayout.Space();
+					if (GUILayout.Button("Debug", EditorStyles.miniButton, GUILayout.Width(65f)))
+						SkeletonDebugWindow.Init();
+				} else {
+					EditorGUILayout.Space();
+				}
+				EditorGUILayout.EndHorizontal();
+
+				if (advancedFoldout) {
+					
 					using (new SpineInspectorUtility.IndentScope()) {
 						using (new EditorGUILayout.HorizontalScope()) {
 							initialFlipX.boolValue = EditorGUILayout.ToggleLeft(initialFlipX.displayName, initialFlipX.boolValue, GUILayout.Width(120f));
@@ -247,7 +262,7 @@ namespace Spine.Unity.Editor {
 						}
 
 						EditorGUILayout.Space();
-
+						EditorGUILayout.LabelField("Renderer Settings", EditorStyles.boldLabel);
 						using (new SpineInspectorUtility.LabelWidthScope()) {
 							// Optimization options
 							if (singleSubmesh != null) EditorGUILayout.PropertyField(singleSubmesh, SingleSubmeshLabel);
@@ -277,8 +292,30 @@ namespace Spine.Unity.Editor {
 						}
 
 						EditorGUILayout.Space();
+
+						if (TargetIsValid && !isInspectingPrefab) {
+							if (multi) {
+								// Support multi-edit SkeletonUtility button.
+								//	EditorGUILayout.Space();
+								//	bool addSkeletonUtility = GUILayout.Button(buttonContent, GUILayout.Height(30));
+								//	foreach (var t in targets) {
+								//		var component = t as Component;
+								//		if (addSkeletonUtility && component.GetComponent<SkeletonUtility>() == null)
+								//			component.gameObject.AddComponent<SkeletonUtility>();
+								//	}
+							} else {
+								var component = (Component)target;
+								if (component.GetComponent<SkeletonUtility>() == null) {						
+									if (SpineInspectorUtility.CenteredButton(SkeletonUtilityButtonContent, 21, true, 200f))
+										component.gameObject.AddComponent<SkeletonUtility>();
+								}
+							}
+						}
+
+						EditorGUILayout.Space();
 					}
 				}
+
 				if (EditorGUI.EndChangeCheck())
 					SceneView.RepaintAll();
 			}
@@ -308,6 +345,13 @@ namespace Spine.Unity.Editor {
 				const string SeparatorsDescription = "Stored names of slots where the Skeleton's render will be split into different batches. This is used by separate components that split the render into different MeshRenderers or GameObjects.";
 				if (separatorSlotNames.isExpanded) {
 					EditorGUILayout.PropertyField(separatorSlotNames, new GUIContent(separatorSlotNames.displayName + terminalSlotWarning, SeparatorsDescription), true);
+					GUILayout.BeginHorizontal();
+					GUILayout.FlexibleSpace();
+					if (GUILayout.Button("+", GUILayout.MaxWidth(28f), GUILayout.MaxHeight(15f))) {
+						separatorSlotNames.arraySize++;
+					}
+					GUILayout.EndHorizontal();
+
 					EditorGUILayout.Space();
 				} else
 					EditorGUILayout.PropertyField(separatorSlotNames, new GUIContent(separatorSlotNames.displayName + string.Format("{0} [{1}]", terminalSlotWarning, separatorSlotNames.arraySize), SeparatorsDescription), true);
@@ -318,30 +362,13 @@ namespace Spine.Unity.Editor {
 			var skeletonRenderer = (SkeletonRenderer)target;
 			var skeleton = skeletonRenderer.skeleton;
 			var transform = skeletonRenderer.transform;
-
 			if (skeleton == null) return;
 
+			if (showPaths) SpineHandles.DrawPaths(transform, skeleton);
 			SpineHandles.DrawBones(transform, skeleton);
-		}
-
-		public void DrawSkeletonUtilityButton (bool multi) {
-			if (multi) {
-				// Support multi-edit SkeletonUtility button.
-				//	EditorGUILayout.Space();
-				//	bool addSkeletonUtility = GUILayout.Button(buttonContent, GUILayout.Height(30));
-				//	foreach (var t in targets) {
-				//		var component = t as Component;
-				//		if (addSkeletonUtility && component.GetComponent<SkeletonUtility>() == null)
-				//			component.gameObject.AddComponent<SkeletonUtility>();
-				//	}
-			} else {
-				EditorGUILayout.Space();
-				var component = (Component)target;
-				if (component.GetComponent<SkeletonUtility>() == null) {						
-					if (SpineInspectorUtility.CenteredButton(SkeletonUtilityButtonContent, 21))
-						component.gameObject.AddComponent<SkeletonUtility>();
-				}
-			}
+			if (showConstraints) SpineHandles.DrawConstraints(transform, skeleton);
+			if (showBoneNames) SpineHandles.DrawBoneNames(transform, skeleton);
+			if (showShapes) SpineHandles.DrawBoundingBoxes(transform, skeleton);
 		}
 
 		override public void OnInspectorGUI () {

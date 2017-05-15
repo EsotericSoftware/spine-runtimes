@@ -79,9 +79,18 @@ namespace Spine.Unity.Editor {
 
 			skeletonUtility.boneRoot = (Transform)EditorGUILayout.ObjectField("Bone Root", skeletonUtility.boneRoot, typeof(Transform), true);
 
-			using (new EditorGUI.DisabledGroupScope(skeletonUtility.boneRoot != null)) {
+			bool hasRootBone = skeletonUtility.boneRoot != null;
+			using (new EditorGUI.DisabledGroupScope(hasRootBone)) {
 				if (SpineInspectorUtility.LargeCenteredButton(SpawnHierarchyButtonLabel))
 					SpawnHierarchyContextMenu();
+			}
+
+			if (hasRootBone) {
+				if (SpineInspectorUtility.CenteredButton(new GUIContent("Remove Hierarchy"))) {
+					Undo.RegisterCompleteObjectUndo(skeletonUtility, "Remove Hierarchy");
+					Undo.DestroyObjectImmediate(skeletonUtility.boneRoot.gameObject);
+					skeletonUtility.boneRoot = null;
+				}
 			}
 		}
 

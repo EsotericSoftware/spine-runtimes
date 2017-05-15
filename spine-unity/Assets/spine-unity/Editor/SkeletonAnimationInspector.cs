@@ -95,8 +95,6 @@ namespace Spine.Unity.Editor {
 					SceneView.RepaintAll();
 					requireRepaint = false;
 				}
-
-				DrawSkeletonUtilityButton(multi);
 			}
 		}
 

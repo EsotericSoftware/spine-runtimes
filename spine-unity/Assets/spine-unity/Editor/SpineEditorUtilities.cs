@@ -70,6 +70,10 @@ namespace Spine.Unity.Editor {
 			public static Texture2D spine;
 			public static Texture2D userEvent;
 			public static Texture2D constraintNib;
+			public static Texture2D constraintRoot;
+			public static Texture2D constraintTransform;
+			public static Texture2D constraintPath;
+			public static Texture2D constraintIK;
 			public static Texture2D warning;
 			public static Texture2D skeletonUtility;
 			public static Texture2D hingeChain;
@@ -97,6 +101,12 @@ namespace Spine.Unity.Editor {
 				spine = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-spine.png");
 				userEvent = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-event.png");
 				constraintNib = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-constraintNib.png");
+
+				constraintRoot = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-constraints.png");
+				constraintTransform = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-constraintTransform.png");
+				constraintPath = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-constraintPath.png");
+				constraintIK = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-constraintIK.png");
+
 				warning = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-warning.png");
 				skeletonUtility = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-skeletonUtility.png");
 				hingeChain = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-hingeChain.png");

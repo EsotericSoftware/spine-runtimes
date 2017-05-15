@@ -140,12 +140,12 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		public static bool LargeCenteredButton (string label, bool sideSpace = true) {
+		public static bool LargeCenteredButton (string label, bool sideSpace = true, float maxWidth = CenterButtonMaxWidth) {
 			if (sideSpace) {
 				bool clicked;
 				using (new EditorGUILayout.HorizontalScope()) {
 					EditorGUILayout.Space();
-					clicked = GUILayout.Button(label, SpineButtonStyle, GUILayout.MaxWidth(CenterButtonMaxWidth), GUILayout.Height(CenterButtonHeight));
+					clicked = GUILayout.Button(label, SpineButtonStyle, GUILayout.MaxWidth(maxWidth), GUILayout.Height(CenterButtonHeight));
 					EditorGUILayout.Space();
 				}
 				EditorGUILayout.Space();
@@ -155,12 +155,12 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		public static bool LargeCenteredButton (GUIContent content, bool sideSpace = true) {
+		public static bool LargeCenteredButton (GUIContent content, bool sideSpace = true, float maxWidth = CenterButtonMaxWidth) {
 			if (sideSpace) {
 				bool clicked;
 				using (new EditorGUILayout.HorizontalScope()) {
 					EditorGUILayout.Space();
-					clicked = GUILayout.Button(content, SpineButtonStyle, GUILayout.MaxWidth(CenterButtonMaxWidth), GUILayout.Height(CenterButtonHeight));
+					clicked = GUILayout.Button(content, SpineButtonStyle, GUILayout.MaxWidth(maxWidth), GUILayout.Height(CenterButtonHeight));
 					EditorGUILayout.Space();
 				}
 				EditorGUILayout.Space();
@@ -170,18 +170,18 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		public static bool CenteredButton (GUIContent content, float height = 20f, bool sideSpace = true) {
+		public static bool CenteredButton (GUIContent content, float height = 20f, bool sideSpace = true, float maxWidth = CenterButtonMaxWidth) {
 			if (sideSpace) {
 				bool clicked;
 				using (new EditorGUILayout.HorizontalScope()) {
 					EditorGUILayout.Space();
-					clicked = GUILayout.Button(content, GUILayout.MaxWidth(CenterButtonMaxWidth), GUILayout.Height(height));
+					clicked = GUILayout.Button(content, GUILayout.MaxWidth(maxWidth), GUILayout.Height(height));
 					EditorGUILayout.Space();
 				}
 				EditorGUILayout.Space();
 				return clicked;
 			} else {
-				return GUILayout.Button(content, GUILayout.MaxWidth(CenterButtonMaxWidth), GUILayout.Height(height));
+				return GUILayout.Button(content, GUILayout.MaxWidth(maxWidth), GUILayout.Height(height));
 			}
 		}
 		#endregion

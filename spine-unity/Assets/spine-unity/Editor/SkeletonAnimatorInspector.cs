@@ -49,9 +49,6 @@ namespace Spine.Unity.Editor {
 			base.DrawInspectorGUI(multi);
 			EditorGUILayout.PropertyField(autoReset);
 			EditorGUILayout.PropertyField(layerMixModes, true);
-			if (!TargetIsValid) return;
-			if (!isInspectingPrefab)
-				DrawSkeletonUtilityButton(multi);
 		}
 	}
 }
