@@ -5,7 +5,7 @@
 Shader "Spine/Special/SkeletonGhost" {
     Properties {
 		_Color ("Main Color", Color) = (1,1,1,1)
-		_MainTex ("Base (RGB) Alpha (A)", 2D) = "white" {}
+		[NoScaleOffset] _MainTex ("Base (RGB) Alpha (A)", 2D) = "white" {}
 		_TextureFade ("Texture Fade Out", Range(0,1)) = 0
     }
     SubShader {

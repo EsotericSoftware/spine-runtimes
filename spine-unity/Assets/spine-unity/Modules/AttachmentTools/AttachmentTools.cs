@@ -413,6 +413,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			foreach (var kvp in skinAttachments) {
 				var newAttachment = kvp.Value.GetClone(true);
 				if (IsRenderable(newAttachment)) {
+
 					var region = newAttachment.GetAtlasRegion();
 					int existingIndex;
 					if (existingRegions.TryGetValue(region, out existingIndex)) {
@@ -498,7 +499,6 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			var r = s.textureRect;
 			var spritePixels = spriteTexture.GetPixels((int)r.x, (int)r.y, (int)r.width, (int)r.height);
 			var newTexture = new Texture2D((int)r.width, (int)r.height, textureFormat, mipmaps);
-
 			newTexture.SetPixels(spritePixels);
 
 			if (applyImmediately)
