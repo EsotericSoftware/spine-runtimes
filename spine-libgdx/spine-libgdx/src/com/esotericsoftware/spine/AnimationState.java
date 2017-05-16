@@ -33,8 +33,8 @@ package com.esotericsoftware.spine;
 import static com.esotericsoftware.spine.Animation.RotateTimeline.*;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.BooleanArray;
 import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
@@ -49,6 +49,7 @@ import com.esotericsoftware.spine.Animation.Timeline;
  * See <a href='http://esotericsoftware.com/spine-applying-animations/'>Applying Animations</a> in the Spine Runtimes Guide. */
 public class AnimationState {
 	static private final Animation emptyAnimation = new Animation("<empty>", new Array(0), 0);
+	static private final int SUBSEQUENT = 0, FIRST = 1, DIP = 2;
 
 	private AnimationStateData data;
 	final Array<TrackEntry> tracks = new Array();
@@ -56,7 +57,7 @@ public class AnimationState {
 	final Array<AnimationStateListener> listeners = new Array();
 	private final EventQueue queue = new EventQueue();
 	private final IntSet propertyIDs = new IntSet();
-	boolean animationsChanged, multipleMixing;
+	boolean animationsChanged;
 	private float timeScale = 1;
 
 	Pool<TrackEntry> trackEntryPool = new Pool() {
@@ -93,7 +94,7 @@ public class AnimationState {
 				current.delay = 0;
 			}
 
-			TrackEntry next = current.next;
+			TrackEntry from = current.mixingFrom, next = current.next;
 			if (next != null) {
 				// When the next entry's delay is passed, change to the next entry, preserving leftover time.
 				float nextTime = current.trackLast - next.delay;
@@ -108,14 +109,21 @@ public class AnimationState {
 					}
 					continue;
 				}
-			} else if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
+			} else if (current.trackLast >= current.trackEnd && from == null) {
 				// Clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom.
 				tracks.set(i, null);
 				queue.end(current);
 				disposeNext(current);
 				continue;
 			}
-			updateMixingFrom(current, delta);
+			if (from != null && updateMixingFrom(current, delta)) {
+				// End mixing from entries once all have completed.
+				do {
+					queue.end(from);
+					from = from.mixingFrom;
+				} while (from != null);
+				current.mixingFrom = null;
+			}
 
 			current.trackTime += currentDelta;
 		}
@@ -123,22 +131,19 @@ public class AnimationState {
 		queue.drain();
 	}
 
-	private void updateMixingFrom (TrackEntry entry, float delta) {
+	/** Returns true when all mixing from entries are complete. */
+	private boolean updateMixingFrom (TrackEntry entry, float delta) {
 		TrackEntry from = entry.mixingFrom;
-		if (from == null) return;
+		if (from == null) return true;
 
-		updateMixingFrom(from, delta);
-
-		if (entry.mixTime >= entry.mixDuration && from.mixingFrom == null && entry.mixTime > 0) {
-			entry.mixingFrom = null;
-			queue.end(from);
-			return;
-		}
+		boolean finished = updateMixingFrom(from, delta);
+		if (entry.mixTime >= entry.mixDuration && entry.mixTime > 0) return finished;
 
 		from.animationLast = from.nextAnimationLast;
 		from.trackLast = from.nextTrackLast;
 		from.trackTime += delta * from.timeScale;
 		entry.mixTime += delta * entry.timeScale;
+		return false;
 	}
 
 	/** Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so the
@@ -156,7 +161,7 @@ public class AnimationState {
 			// Apply mixing from entries first.
 			float mix = current.alpha;
 			if (current.mixingFrom != null)
-				mix *= applyMixingFrom(current, skeleton);
+				mix *= applyMixingFrom(current, skeleton, 0);
 			else if (current.trackTime >= current.trackEnd && current.next == null) //
 				mix = 0; // Set to setup pose the last time the entry will be applied.
 
@@ -172,14 +177,14 @@ public class AnimationState {
 				if (firstFrame) current.timelinesRotation.setSize(timelineCount << 1);
 				float[] timelinesRotation = current.timelinesRotation.items;
 
-				boolean[] timelinesFirst = current.timelinesFirst.items;
+				int[] timelineData = current.timelineData.items;
 				for (int ii = 0; ii < timelineCount; ii++) {
 					Timeline timeline = (Timeline)timelines[ii];
 					if (timeline instanceof RotateTimeline) {
-						applyRotateTimeline(timeline, skeleton, animationTime, mix, timelinesFirst[ii], timelinesRotation, ii << 1,
+						applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineData[ii] > 0, timelinesRotation, ii << 1,
 							firstFrame);
 					} else
-						timeline.apply(skeleton, animationLast, animationTime, events, mix, timelinesFirst[ii], false);
+						timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineData[ii] > 0, false);
 				}
 			}
 			queueEvents(current, animationTime);
@@ -191,25 +196,25 @@ public class AnimationState {
 		queue.drain();
 	}
 
-	private float applyMixingFrom (TrackEntry entry, Skeleton skeleton) {
-		TrackEntry from = entry.mixingFrom;
-		if (from.mixingFrom != null) applyMixingFrom(from, skeleton);
-
+	private float applyMixingFrom (TrackEntry to, Skeleton skeleton, float parentMix) {
 		float mix;
-		if (entry.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
+		if (to.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
 			mix = 1;
 		else {
-			mix = entry.mixTime / entry.mixDuration;
+			mix = to.mixTime / to.mixDuration;
 			if (mix > 1) mix = 1;
 		}
+
+		TrackEntry from = to.mixingFrom;
+		if (from.mixingFrom != null) applyMixingFrom(from, skeleton, mix);
 
 		Array<Event> events = mix < from.eventThreshold ? this.events : null;
 		boolean attachments = mix < from.attachmentThreshold, drawOrder = mix < from.drawOrderThreshold;
 		float animationLast = from.animationLast, animationTime = from.getAnimationTime();
 		int timelineCount = from.animation.timelines.size;
 		Object[] timelines = from.animation.timelines.items;
-		boolean[] timelinesFirst = from.timelinesFirst.items, timelinesLast = multipleMixing ? null : from.timelinesLast.items;
-		float alphaBase = from.alpha * entry.mixAlpha, alphaMix = alphaBase * (1 - mix);
+		int[] timelineData = from.timelineData.items;
+		float alphaMix = from.alpha * to.mixAlpha * (1 - mix), alphaDip = from.alpha * to.mixAlpha * (1 - parentMix);
 
 		boolean firstFrame = from.timelinesRotation.size == 0;
 		if (firstFrame) from.timelinesRotation.setSize(timelineCount << 1);
@@ -217,20 +222,21 @@ public class AnimationState {
 
 		for (int i = 0; i < timelineCount; i++) {
 			Timeline timeline = (Timeline)timelines[i];
-			boolean setupPose = timelinesFirst[i];
-			float alpha = timelinesLast != null && setupPose && !timelinesLast[i] ? alphaBase : alphaMix;
+			int data = timelineData[i];
+			boolean first = data > 0;
+			float alpha = data == DIP ? alphaDip : alphaMix;
 			if (timeline instanceof RotateTimeline)
-				applyRotateTimeline(timeline, skeleton, animationTime, alpha, setupPose, timelinesRotation, i << 1, firstFrame);
+				applyRotateTimeline(timeline, skeleton, animationTime, alpha, first, timelinesRotation, i << 1, firstFrame);
 			else {
-				if (!setupPose) {
+				if (!first) {
 					if (!attachments && timeline instanceof AttachmentTimeline) continue;
 					if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
 				}
-				timeline.apply(skeleton, animationLast, animationTime, events, alpha, setupPose, true);
+				timeline.apply(skeleton, animationLast, animationTime, events, alpha, first, true);
 			}
 		}
 
-		if (entry.mixDuration > 0) queueEvents(from, animationTime);
+		if (to.mixDuration > 0) queueEvents(from, animationTime);
 		this.events.clear();
 		from.nextAnimationLast = animationTime;
 		from.nextTrackLast = from.trackTime;
@@ -382,29 +388,7 @@ public class AnimationState {
 			if (interrupt) queue.interrupt(from);
 			current.mixingFrom = from;
 			current.mixTime = 0;
-
-			TrackEntry mixingFrom = from.mixingFrom;
-			if (mixingFrom != null && from.mixDuration > 0) {
-				if (multipleMixing) {
-					// The interrupted mix will mix out from its current percentage to zero.
-					current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
-				} else {
-					// A mix was interrupted, mix from the closest animation.
-					if (from.mixTime / from.mixDuration < 0.5f && mixingFrom.animation != emptyAnimation) {
-						current.mixingFrom = mixingFrom;
-						mixingFrom.mixingFrom = from;
-						mixingFrom.mixTime = from.mixDuration - from.mixTime;
-						mixingFrom.mixDuration = from.mixDuration;
-						from.mixingFrom = null;
-						from = mixingFrom;
-					}
-
-					// End the other animation after it is applied one last time.
-					from.mixAlpha = 0;
-					from.mixTime = 0;
-					from.mixDuration = 0;
-				}
-			}
+			current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1); // Store interrupted mix percentage.
 
 			from.timelinesRotation.clear(); // Reset rotation for mixing out, in case entry was mixed in.
 		}
@@ -583,81 +567,17 @@ public class AnimationState {
 	private void animationsChanged () {
 		animationsChanged = false;
 
+		// Set timelinesData for all entries, from lowest track to highest.
 		IntSet propertyIDs = this.propertyIDs;
-
-		// Set timelinesFirst for all entries, from lowest track to highest.
-		int i = 0, n = tracks.size;
 		propertyIDs.clear();
-		for (; i < n; i++) { // Find first non-null entry.
+		TrackEntry lastEntry = null;
+		for (int i = 0, n = tracks.size; i < n; i++) {
 			TrackEntry entry = tracks.get(i);
-			if (entry == null) continue;
-			setTimelinesFirst(entry);
-			i++;
-			break;
-		}
-		for (; i < n; i++) { // Rest of entries.
-			TrackEntry entry = tracks.get(i);
-			if (entry != null) checkTimelinesFirst(entry);
-		}
-
-		if (multipleMixing) return;
-
-		// Set timelinesLast for mixingFrom entries, from highest track to lowest that has mixingFrom.
-		propertyIDs.clear();
-		int lowestMixingFrom = n;
-		for (i = 0; i < n; i++) { // Find lowest track with a mixingFrom entry.
-			TrackEntry entry = tracks.get(i);
-			if (entry == null || entry.mixingFrom == null) continue;
-			lowestMixingFrom = i;
-			break;
-		}
-		for (i = n - 1; i >= lowestMixingFrom; i--) { // Find first non-null entry.
-			TrackEntry entry = tracks.get(i);
-			if (entry == null) continue;
-
-			// Store properties for non-mixingFrom entry but don't set timelinesLast, which is only used for mixingFrom entries.
-			Object[] timelines = entry.animation.timelines.items;
-			for (int ii = 0, nn = entry.animation.timelines.size; ii < nn; ii++)
-				propertyIDs.add(((Timeline)timelines[ii]).getPropertyId());
-
-			entry = entry.mixingFrom;
-			while (entry != null) {
-				checkTimelinesUsage(entry, entry.timelinesLast);
-				entry = entry.mixingFrom;
+			if (entry != null) {
+				entry.setTimelineData(lastEntry, propertyIDs);
+				lastEntry = entry;
 			}
 		}
-	}
-
-	/** From last to first mixingFrom entries, sets timelinesFirst to true on last, calls checkTimelineUsage on rest. */
-	private void setTimelinesFirst (TrackEntry entry) {
-		if (entry.mixingFrom != null) {
-			setTimelinesFirst(entry.mixingFrom);
-			checkTimelinesUsage(entry, entry.timelinesFirst);
-			return;
-		}
-		IntSet propertyIDs = this.propertyIDs;
-		int n = entry.animation.timelines.size;
-		Object[] timelines = entry.animation.timelines.items;
-		boolean[] usage = entry.timelinesFirst.setSize(n);
-		for (int i = 0; i < n; i++) {
-			propertyIDs.add(((Timeline)timelines[i]).getPropertyId());
-			usage[i] = true;
-		}
-	}
-
-	/** From last to first mixingFrom entries, calls checkTimelineUsage. */
-	private void checkTimelinesFirst (TrackEntry entry) {
-		if (entry.mixingFrom != null) checkTimelinesFirst(entry.mixingFrom);
-		checkTimelinesUsage(entry, entry.timelinesFirst);
-	}
-
-	private void checkTimelinesUsage (TrackEntry entry, BooleanArray usageArray) {
-		IntSet propertyIDs = this.propertyIDs;
-		int n = entry.animation.timelines.size;
-		Object[] timelines = entry.animation.timelines.items;
-		boolean[] usage = usageArray.setSize(n);
-		for (int i = 0; i < n; i++)
-			usage[i] = propertyIDs.add(((Timeline)timelines[i]).getPropertyId());
 	}
 
 	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing. */
@@ -701,25 +621,6 @@ public class AnimationState {
 		this.timeScale = timeScale;
 	}
 
-	/** When false, only two animations can be mixed at once. Interrupting a mix by setting a new animation will discard one of the
-	 * two old animations, keeping the one closest to being fully mixed in. Discarding an animation in this way may cause keyed
-	 * values to jump.
-	 * <p>
-	 * When true, any number of animations can be mixed at once without causing keyed values to jump. Mixing is done by mixing out
-	 * one or more old animations while mixing in the newest one. When animations key the same value, this may cause "dipping",
-	 * where the value moves toward the setup pose as the old animations mix out, then back to the keyed value as the new animation
-	 * mixes in.
-	 * <p>
-	 * Defaults to false. */
-	public boolean getMultipleMixing () {
-		return multipleMixing;
-	}
-
-	public void setMultipleMixing (boolean multipleMixing) {
-		this.multipleMixing = multipleMixing;
-		animationsChanged = true;
-	}
-
 	/** The AnimationStateData to look up mix durations. */
 	public AnimationStateData getData () {
 		return data;
@@ -760,7 +661,7 @@ public class AnimationState {
 		float animationStart, animationEnd, animationLast, nextAnimationLast;
 		float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
 		float alpha, mixTime, mixDuration, mixAlpha;
-		final BooleanArray timelinesFirst = new BooleanArray(), timelinesLast = new BooleanArray();
+		final IntArray timelineData = new IntArray();
 		final FloatArray timelinesRotation = new FloatArray();
 
 		public void reset () {
@@ -768,9 +669,31 @@ public class AnimationState {
 			mixingFrom = null;
 			animation = null;
 			listener = null;
-			timelinesFirst.clear();
-			timelinesLast.clear();
+			timelineData.clear();
 			timelinesRotation.clear();
+		}
+
+		TrackEntry setTimelineData (TrackEntry parent, IntSet propertyIDs) {
+			TrackEntry lastEntry = mixingFrom != null ? mixingFrom.setTimelineData(this, propertyIDs) : this;
+			int n = animation.timelines.size;
+			Object[] timelines = animation.timelines.items;
+			int[] timelineData = this.timelineData.setSize(n << 1);
+			for (int i = 0; i < n; i++) {
+				int id = ((Timeline)timelines[i]).getPropertyId();
+				boolean first = propertyIDs.add(id);
+				if (first && parent != null && parent.hasTimeline(id))
+					timelineData[i] = DIP;
+				else
+					timelineData[i] = first ? FIRST : SUBSEQUENT;
+			}
+			return lastEntry;
+		}
+
+		private boolean hasTimeline (int id) {
+			Object[] timelines = animation.timelines.items;
+			for (int i = 0, n = animation.timelines.size; i < n; i++)
+				if (((Timeline)timelines[i]).getPropertyId() == id) return true;
+			return false;
 		}
 
 		/** The index of the track where this track entry is either current or queued.
@@ -994,7 +917,7 @@ public class AnimationState {
 		}
 
 		/** The track entry for the previous animation when mixing from the previous animation to this animation, or null if no
-		 * mixing is currently occuring. If mixing from multiple animations, <code>mixingFrom</code> makes up a linked list. */
+		 * mixing is currently occuring. When mixing from multiple animations, <code>mixingFrom</code> makes up a linked list. */
 		public TrackEntry getMixingFrom () {
 			return mixingFrom;
 		}

@@ -187,7 +187,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 		skeleton.updateWorldTransform();
 
 		state = new AnimationState(new AnimationStateData(skeletonData));
-		state.setMultipleMixing(ui.multipleMixingCheckbox.isChecked());
 		state.addListener(new AnimationStateAdapter() {
 			public void event (TrackEntry entry, Event event) {
 				ui.toast(event.getData().getName());
@@ -384,7 +383,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 		List<String> skinList = new List(skin);
 		ScrollPane skinScroll = new ScrollPane(skinList, skin, "bg");
 		CheckBox loopCheckbox = new CheckBox("Loop", skin);
-		CheckBox multipleMixingCheckbox = new CheckBox("Multiple mixing", skin);
 		CheckBox premultipliedCheckbox = new CheckBox("Premultiplied", skin);
 		Slider mixSlider = new Slider(0, 4, 0.01f, false, skin);
 		Label mixLabel = new Label("0.3", skin);
@@ -539,8 +537,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 				table.add(mixSlider).fillX().expandX();
 				root.add(table).fill().row();
 			}
-			root.add();
-			root.add(multipleMixingCheckbox).row();
 
 			window.add(root).expand().fill();
 			window.pack();
@@ -706,12 +702,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 				}
 			});
 
-			multipleMixingCheckbox.addListener(new ChangeListener() {
-				public void changed (ChangeEvent event, Actor actor) {
-					if (state != null) state.setMultipleMixing(multipleMixingCheckbox.isChecked());
-				}
-			});
-
 			skinList.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
 					if (skeleton != null) {
@@ -792,7 +782,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 			debugClippingCheckbox.addListener(savePrefsListener);
 			premultipliedCheckbox.addListener(savePrefsListener);
 			loopCheckbox.addListener(savePrefsListener);
-			multipleMixingCheckbox.addListener(savePrefsListener);
 			speedSlider.addListener(savePrefsListener);
 			speedResetButton.addListener(savePrefsListener);
 			mixSlider.addListener(savePrefsListener);
@@ -857,7 +846,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 			prefs.putBoolean("debugClipping", debugClippingCheckbox.isChecked());
 			prefs.putBoolean("premultiplied", premultipliedCheckbox.isChecked());
 			prefs.putBoolean("loop", loopCheckbox.isChecked());
-			prefs.putBoolean("multipleMixing", multipleMixingCheckbox.isChecked());
 			prefs.putFloat("speed", speedSlider.getValue());
 			prefs.putFloat("mix", mixSlider.getValue());
 			prefs.putFloat("scale", scaleSlider.getValue());
@@ -886,7 +874,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 			debugClippingCheckbox.setChecked(prefs.getBoolean("debugClipping", true));
 			premultipliedCheckbox.setChecked(prefs.getBoolean("premultiplied", true));
 			loopCheckbox.setChecked(prefs.getBoolean("loop", false));
-			multipleMixingCheckbox.setChecked(prefs.getBoolean("multipleMixing", false));
 			speedSlider.setValue(prefs.getFloat("speed", 0.3f));
 			mixSlider.setValue(prefs.getFloat("mix", 0.3f));
 
