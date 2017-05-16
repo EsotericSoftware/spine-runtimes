@@ -95,7 +95,7 @@ public class AnimationState {
 				current.delay = 0;
 			}
 
-			TrackEntry from = current.mixingFrom, next = current.next;
+			TrackEntry next = current.next;
 			if (next != null) {
 				// When the next entry's delay is passed, change to the next entry, preserving leftover time.
 				float nextTime = current.trackLast - next.delay;
@@ -110,20 +110,21 @@ public class AnimationState {
 					}
 					continue;
 				}
-			} else if (current.trackLast >= current.trackEnd && from == null) {
+			} else if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
 				// Clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom.
 				tracks.set(i, null);
 				queue.end(current);
 				disposeNext(current);
 				continue;
 			}
-			if (from != null && updateMixingFrom(current, delta)) {
+			if (current.mixingFrom != null && updateMixingFrom(current, delta, 2)) {
 				// End mixing from entries once all have completed.
-				do {
+				TrackEntry from = current.mixingFrom;
+				current.mixingFrom = null;
+				while (from != null) {
 					queue.end(from);
 					from = from.mixingFrom;
-				} while (from != null);
-				current.mixingFrom = null;
+				}
 			}
 
 			current.trackTime += currentDelta;
@@ -133,12 +134,18 @@ public class AnimationState {
 	}
 
 	/** Returns true when all mixing from entries are complete. */
-	private boolean updateMixingFrom (TrackEntry entry, float delta) {
+	private boolean updateMixingFrom (TrackEntry entry, float delta, int animationCount) {
 		TrackEntry from = entry.mixingFrom;
 		if (from == null) return true;
 
-		boolean finished = updateMixingFrom(from, delta);
-		if (entry.mixTime >= entry.mixDuration && entry.mixTime > 0) return finished;
+		boolean finished = updateMixingFrom(from, delta, animationCount + 1);
+		if (entry.mixTime >= entry.mixDuration && entry.mixTime > 0) {
+			if (animationCount > 6 && from.mixingFrom == null) { // Limit the mixing from linked list.
+				entry.mixingFrom = null;
+				queue.end(from);
+			}
+			return finished;
+		}
 
 		from.animationLast = from.nextAnimationLast;
 		from.trackLast = from.nextTrackLast;
