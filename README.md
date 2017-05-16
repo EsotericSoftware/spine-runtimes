@@ -26,4 +26,4 @@ It is highly suggested to [freeze](http://esotericsoftware.com/spine-settings#Ve
 
 In order to merge your contributions, we need a signed [contributor license agreement (CLA)](http://esotericsoftware.com/files/cla.txt) from you. You can send a copy of the CLA to contact@esotericsoftware.com.
 
-If possible, base your contributions on the current development branch, eg `X.X-beta`. Please be sure to follow the formatting you find in the respective runtime code to which you are contributing.
+When possible, it is best to base your contributions on the current beta branch (`X.X-beta`). Please be sure to follow the style and formatting you find in the respective runtime code to which you are contributing.
