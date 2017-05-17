@@ -237,7 +237,7 @@ package spine.animation {
 					first = true;
 					alpha = alphaDip;
 					var dipMix : TrackEntry = timelineDipMix[i];
-					if (dipMix != null && dipMix.mixDuration > 0) alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
+					if (dipMix != null) alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
 					break;
 				}
 				if (timeline is RotateTimeline)

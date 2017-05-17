@@ -106,7 +106,7 @@ package spine.animation {
 					for (var ii : int = mixingToLast; ii >= 0; ii--) {
 						var entry : TrackEntry = mixingTo[ii];
 						if (!entry.hasTimeline(intId)) {
-							timelineDipMix[i] = entry;
+							if (entry.mixDuration > 0) timelineDipMix[i] = entry;
 							continue outer;
 						}
 					}
