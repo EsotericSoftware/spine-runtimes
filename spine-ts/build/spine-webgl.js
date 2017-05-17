@@ -1215,7 +1215,7 @@ var spine;
 						first = true;
 						alpha = alphaDip;
 						var dipMix = timelineDipMix[i];
-						if (dipMix != null)
+						if (dipMix != null && dipMix.mixDuration > 0)
 							alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
 						break;
 				}
