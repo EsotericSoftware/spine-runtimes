@@ -414,7 +414,11 @@ public class AnimationState {
 			if (interrupt) queue.interrupt(from);
 			current.mixingFrom = from;
 			current.mixTime = 0;
-			current.interruptAlpha *= Math.min(1, from.mixTime / from.mixDuration); // Store interrupted mix percentage.
+
+			// Store the interrupted mix percentage.
+			if (from.mixingFrom != null && from.mixDuration > 0)
+				current.interruptAlpha *= Math.min(1, from.mixTime / from.mixDuration);
+
 			from.timelinesRotation.clear(); // Reset rotation for mixing out, in case entry was mixed in.
 		}
 
