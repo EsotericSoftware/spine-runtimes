@@ -167,16 +167,14 @@ namespace Spine.Unity.Editor {
 
 				bool hasCollider2D = targetBoneFollower.GetComponent<Collider2D>() != null || targetBoneFollower.GetComponent<BoundingBoxFollower>() != null;
 				bool hasCollider3D = !hasCollider2D && targetBoneFollower.GetComponent<Collider>();
-				if (hasCollider2D || hasCollider3D) {
-					if (targetBoneFollower.GetComponent<Rigidbody2D>() == null) {
-						using (new SpineInspectorUtility.BoxScope()) {
-							EditorGUILayout.HelpBox("Collider detected. Unity recommends adding a Rigidbody to the parent Transforms of any colliders that are intended to be dynamically repositioned and rotated.", MessageType.Warning);
-							string rbLabel = hasCollider2D ? "Add Rigidbody2D" : "Add Rigidbody";
-							var rbType = hasCollider2D ? typeof(Rigidbody2D) : typeof(Rigidbody);
-							var rbContent = new GUIContent(rbLabel, "Add a rigidbody to this GameObject to be the Box2D parent of the attached collider.");
-							rbContent.image = EditorGUIUtility.ObjectContent(null, rbType).image;
-							if (SpineInspectorUtility.CenteredButton(rbContent)) targetBoneFollower.gameObject.AddComponent(rbType);
-						}
+				bool missingRigidBody = (hasCollider2D && targetBoneFollower.GetComponent<Rigidbody2D>() == null) || (hasCollider3D && targetBoneFollower.GetComponent<Rigidbody>() == null);
+				if (missingRigidBody) {
+					using (new SpineInspectorUtility.BoxScope()) {
+						EditorGUILayout.HelpBox("Collider detected. Unity recommends adding a Rigidbody to the parent Transforms of any colliders that are intended to be dynamically repositioned and rotated.", MessageType.Warning);
+						var rbType = hasCollider2D ? typeof(Rigidbody2D) : typeof(Rigidbody);
+						string rbLabel = string.Format("Add {0}", rbType.Name);
+						var rbContent = SpineInspectorUtility.TempContent(rbLabel, SpineInspectorUtility.UnityIcon(rbType), "Add a rigidbody to this GameObject to be the Box2D parent of the attached collider.");
+						if (SpineInspectorUtility.CenteredButton(rbContent)) targetBoneFollower.gameObject.AddComponent(rbType);
 					}
 				}
 			} else {

@@ -48,23 +48,35 @@ namespace Spine.Unity.Editor {
 			get { return "\u2014"; }
 		}
 
+		static GUIContent tempContent;
+		internal static GUIContent TempContent (string text, Texture2D image = null, string tooltip = null) {
+			if (tempContent == null) tempContent = new GUIContent();
+			tempContent.text = text;
+			tempContent.image = image;
+			tempContent.tooltip = tooltip;
+			return tempContent;
+		}
+
 		public static void PropertyFieldWideLabel (SerializedProperty property, GUIContent label = null, float minimumLabelWidth = 150) {
 			EditorGUIUtility.labelWidth = minimumLabelWidth;
-			EditorGUILayout.PropertyField(property, label ?? new GUIContent(property.displayName, property.tooltip));
+			EditorGUILayout.PropertyField(property, label ?? TempContent(property.displayName, null, property.tooltip));
 			EditorGUIUtility.labelWidth = 0; // Resets to default
 		}
 
 		public static void PropertyFieldFitLabel (SerializedProperty property, GUIContent label = null, float extraSpace = 5f) {
-			label = label ?? new GUIContent(property.displayName, property.tooltip);
-			float width = GUI.skin.label.CalcSize(new GUIContent(label.text)).x + extraSpace;
+			label = label ?? TempContent(property.displayName, null, property.tooltip);
+			float width = GUI.skin.label.CalcSize(TempContent(label.text)).x + extraSpace;
 			if (label.image != null)
 				width += EditorGUIUtility.singleLineHeight;
 			PropertyFieldWideLabel(property, label, width);
-
 		}
 
 		public static bool UndoRedoPerformed (UnityEngine.Event current) {
 			return current.type == EventType.ValidateCommand && current.commandName == "UndoRedoPerformed";
+		}
+
+		public static Texture2D UnityIcon (System.Type type) {
+			return EditorGUIUtility.ObjectContent(null, type).image as Texture2D;
 		}
 
 		#region Layout Scopes

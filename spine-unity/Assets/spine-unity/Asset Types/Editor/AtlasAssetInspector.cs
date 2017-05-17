@@ -120,7 +120,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			if (materials.arraySize == 0) {
-				EditorGUILayout.LabelField(new GUIContent("Error:  Missing materials", SpineEditorUtilities.Icons.warning));
+				EditorGUILayout.HelpBox("Missing materials", MessageType.Error);
 				return;
 			}
 
@@ -128,7 +128,7 @@ namespace Spine.Unity.Editor {
 				SerializedProperty prop = materials.GetArrayElementAtIndex(i);
 				Material mat = (Material)prop.objectReferenceValue;
 				if (mat == null) {
-					EditorGUILayout.LabelField(new GUIContent("Error:  Materials cannot be null", SpineEditorUtilities.Icons.warning));
+					EditorGUILayout.HelpBox("Materials cannot be null.", MessageType.Error);
 					return;
 				}
 			}

@@ -88,6 +88,7 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.PropertyField(timeScale, TimeScaleLabel);
 				var component = (SkeletonAnimation)target;
 				component.timeScale = Mathf.Max(component.timeScale, 0);
+				EditorGUILayout.Space();
 			}
 
 			if (!isInspectingPrefab) {

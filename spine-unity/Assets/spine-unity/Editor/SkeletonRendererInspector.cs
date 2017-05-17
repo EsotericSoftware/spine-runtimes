@@ -42,7 +42,6 @@ namespace Spine.Unity.Editor {
 	[CanEditMultipleObjects]
 	public class SkeletonRendererInspector : UnityEditor.Editor {
 		protected static bool advancedFoldout;
-		internal static bool showBoneNames, showPaths, showShapes, showConstraints = true;
 
 		protected SerializedProperty skeletonDataAsset, initialSkinName;
 		protected SerializedProperty initialFlipX, initialFlipY;
@@ -131,6 +130,9 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
+		GUIContent[] skins;
+		ExposedList<Skin> loadedSkinList;
+
 		protected virtual void DrawInspectorGUI (bool multi) {
 			bool valid = TargetIsValid;
 			var reloadWidth = GUILayout.Width(GUI.skin.label.CalcSize(new GUIContent(ReloadButtonLabel)).x + 20);
@@ -216,17 +218,27 @@ namespace Spine.Unity.Editor {
 
 				// Initial skin name.
 				if (component.valid) {
-					string[] skins = new string[component.skeleton.Data.Skins.Count];
+					var skeletonDataSkins = component.skeleton.Data.Skins;
+					int skinCount = skeletonDataSkins.Count;
+					if (loadedSkinList != skeletonDataSkins) {
+						skins = new GUIContent[skinCount];
+						loadedSkinList = skeletonDataSkins;
+						for (int i = 0; i < skins.Length; i++) {
+							string skinNameString = skeletonDataSkins.Items[i].Name;
+							skins[i] = new GUIContent(skinNameString, Icons.skin);
+						}
+					}
+					
 					int skinIndex = 0;
 					for (int i = 0; i < skins.Length; i++) {
-						string skinNameString = component.skeleton.Data.Skins.Items[i].Name;
-						skins[i] = skinNameString;
+						string skinNameString = skeletonDataSkins.Items[i].Name;
 						if (skinNameString == initialSkinName.stringValue)
 							skinIndex = i;
 					}
-					skinIndex = EditorGUILayout.Popup("Initial Skin", skinIndex, skins);
+
+					skinIndex = EditorGUILayout.Popup(SpineInspectorUtility.TempContent("Initial Skin"), skinIndex, skins);
 					if (skins.Length > 0) // Support attachmentless/skinless SkeletonData.
-						initialSkinName.stringValue = skins[skinIndex];
+						initialSkinName.stringValue = skins[skinIndex].text;
 				}
 			}
 
@@ -268,7 +280,6 @@ namespace Spine.Unity.Editor {
 							if (singleSubmesh != null) EditorGUILayout.PropertyField(singleSubmesh, SingleSubmeshLabel);
 							if (meshes != null) EditorGUILayout.PropertyField(meshes, MeshesLabel);
 							if (immutableTriangles != null) EditorGUILayout.PropertyField(immutableTriangles, ImmubleTrianglesLabel);
-							EditorGUILayout.PropertyField(tintBlack, TintBlackLabel);
 							EditorGUILayout.PropertyField(clearStateOnDisable, ClearStateOnDisableLabel);
 							EditorGUILayout.Space();
 						}
@@ -283,8 +294,10 @@ namespace Spine.Unity.Editor {
 						EditorGUILayout.Space();
 
 						using (new SpineInspectorUtility.LabelWidthScope()) {
-							EditorGUILayout.LabelField("Vertex Data", EditorStyles.boldLabel);
+							//EditorGUILayout.LabelField("Vertex Data", EditorStyles.boldLabel);
+							EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Vertex Data", EditorGUIUtility.ObjectContent(null, typeof(MeshFilter)).image as Texture2D), EditorStyles.boldLabel);
 							if (pmaVertexColors != null) EditorGUILayout.PropertyField(pmaVertexColors, PMAVertexColorsLabel);
+							EditorGUILayout.PropertyField(tintBlack, TintBlackLabel);
 
 							// Optional fields. May be disabled in SkeletonRenderer.
 							if (normals != null) EditorGUILayout.PropertyField(normals, NormalsLabel);
@@ -344,7 +357,7 @@ namespace Spine.Unity.Editor {
 			using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
 				const string SeparatorsDescription = "Stored names of slots where the Skeleton's render will be split into different batches. This is used by separate components that split the render into different MeshRenderers or GameObjects.";
 				if (separatorSlotNames.isExpanded) {
-					EditorGUILayout.PropertyField(separatorSlotNames, new GUIContent(separatorSlotNames.displayName + terminalSlotWarning, SeparatorsDescription), true);
+					EditorGUILayout.PropertyField(separatorSlotNames, SpineInspectorUtility.TempContent(separatorSlotNames.displayName + terminalSlotWarning, Icons.slotRoot, SeparatorsDescription), true);
 					GUILayout.BeginHorizontal();
 					GUILayout.FlexibleSpace();
 					if (GUILayout.Button("+", GUILayout.MaxWidth(28f), GUILayout.MaxHeight(15f))) {
@@ -364,11 +377,7 @@ namespace Spine.Unity.Editor {
 			var transform = skeletonRenderer.transform;
 			if (skeleton == null) return;
 
-			if (showPaths) SpineHandles.DrawPaths(transform, skeleton);
 			SpineHandles.DrawBones(transform, skeleton);
-			if (showConstraints) SpineHandles.DrawConstraints(transform, skeleton);
-			if (showBoneNames) SpineHandles.DrawBoneNames(transform, skeleton);
-			if (showShapes) SpineHandles.DrawBoundingBoxes(transform, skeleton);
 		}
 
 		override public void OnInspectorGUI () {

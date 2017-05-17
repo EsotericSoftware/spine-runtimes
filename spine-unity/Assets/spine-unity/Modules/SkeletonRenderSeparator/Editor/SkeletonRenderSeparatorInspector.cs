@@ -85,6 +85,8 @@ namespace Spine.Unity.Modules {
 				bool checkBox = EditorGUILayout.Toggle("Enable Separator", componentEnabled);
 				if (checkBox != componentEnabled)
 					component.enabled = checkBox;
+				if (component.SkeletonRenderer.disableRenderingOnOverride && !component.enabled)
+					EditorGUILayout.HelpBox("By default, SkeletonRenderer's MeshRenderer is disabled while the SkeletonRenderSeparator takes over rendering. It is re-enabled when SkeletonRenderSeparator is disabled.", MessageType.Info);
 
 				EditorGUILayout.PropertyField(copyPropertyBlock_);
 				EditorGUILayout.PropertyField(copyMeshRendererFlags_);

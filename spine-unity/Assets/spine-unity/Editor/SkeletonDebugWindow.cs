@@ -42,6 +42,7 @@ namespace Spine.Unity.Editor {
 	public class SkeletonDebugWindow : EditorWindow {
 
 		const bool IsUtilityWindow = true;
+		internal static bool showBoneNames, showPaths = true, showShapes = true, showConstraints = true;
 
 		[MenuItem("CONTEXT/SkeletonRenderer/Open Skeleton Debug Window", false, 5000)]
 		public static void Init () {
@@ -79,7 +80,28 @@ namespace Spine.Unity.Editor {
 
 		readonly Dictionary<Slot, List<Attachment>> attachmentTable = new Dictionary<Slot, List<Attachment>>();
 
+		static bool staticLostValues = true;
+
+		void OnSceneGUI (SceneView sceneView) {
+			if (skeleton == null || skeletonRenderer == null || !skeletonRenderer.valid || isPrefab)
+				return;
+
+			var transform = skeletonRenderer.transform;
+			if (showPaths) SpineHandles.DrawPaths(transform, skeleton);
+			if (showConstraints) SpineHandles.DrawConstraints(transform, skeleton);
+			if (showBoneNames) SpineHandles.DrawBoneNames(transform, skeleton);
+			if (showShapes) SpineHandles.DrawBoundingBoxes(transform, skeleton);
+
+			if (bone != null) {
+				SpineHandles.DrawBone(skeletonRenderer.transform, bone, 1.5f, Color.cyan);
+				Handles.Label(bone.GetWorldPosition(skeletonRenderer.transform) + (Vector3.down * 0.15f), bone.Data.Name, SpineHandles.BoneNameStyle);
+			}			
+		}
+
 		void OnSelectionChange () {
+			SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
+			SceneView.onSceneGUIDelegate += this.OnSceneGUI;
+
 			bool noSkeletonRenderer = false;
 
 			var selectedObject = Selection.activeGameObject;
@@ -90,6 +112,11 @@ namespace Spine.Unity.Editor {
 				if (selectedSkeletonRenderer == null) {
 					noSkeletonRenderer = true;
 				} else if (skeletonRenderer != selectedSkeletonRenderer) {
+					
+					bone = null;
+					if (skeletonRenderer != null && skeletonRenderer.SkeletonDataAsset != selectedSkeletonRenderer.SkeletonDataAsset)
+						boneName = null;
+
 					skeletonRenderer = selectedSkeletonRenderer;
 					skeletonRenderer.Initialize(false);
 					skeletonRenderer.LateUpdate();
@@ -99,19 +126,43 @@ namespace Spine.Unity.Editor {
 				}
 			} 
 
-			if (noSkeletonRenderer) {
-				skeletonRenderer = null;
-				skeleton = null;
-				attachmentTable.Clear();
-				isPrefab = false;
-				boneName = string.Empty;
-				bone = null;
-			}				
-
+			if (noSkeletonRenderer) Clear();
 			Repaint();
 		}
 
+		void Clear () {
+			skeletonRenderer = null;
+			skeleton = null;
+			attachmentTable.Clear();
+			isPrefab = false;
+			boneName = string.Empty;
+			bone = null;
+			SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
+		}
+
+		void OnDestroy () {
+			Clear();
+		}
+
+		static void FalseDropDown (string label, string stringValue, Texture2D icon = null, bool disabledGroup = false) {
+			if (disabledGroup) EditorGUI.BeginDisabledGroup(true);
+			var pos = EditorGUILayout.GetControlRect(true);
+			pos = EditorGUI.PrefixLabel(pos, SpineInspectorUtility.TempContent(label));
+			GUI.Button(pos, SpineInspectorUtility.TempContent(stringValue, icon), EditorStyles.popup);
+			if (disabledGroup) EditorGUI.EndDisabledGroup();
+		}
+
+		// Window GUI
 		void OnGUI () {
+			bool requireRepaint = false;
+
+			if (staticLostValues) {
+				Clear();
+				OnSelectionChange();
+				staticLostValues = false;
+				requireRepaint = true;
+			}
+
 			if (SlotsRootLabel == null) {
 				SlotsRootLabel = new GUIContent("Slots", Icons.slotRoot);
 				SkeletonRootLabel = new GUIContent("Skeleton", Icons.skeleton);
@@ -121,21 +172,24 @@ namespace Spine.Unity.Editor {
 				BoldFoldoutStyle.fixedWidth = 0;
 			}
 
-			bool requireRepaint = false;
+
 			EditorGUILayout.Space();
 			EditorGUI.BeginDisabledGroup(true);
-			EditorGUILayout.ObjectField("Debug Selection", skeletonRenderer, typeof(SkeletonRenderer), true);
+			EditorGUILayout.ObjectField(SpineInspectorUtility.TempContent("Debug Selection", Icons.spine), skeletonRenderer,  typeof(SkeletonRenderer), true);
 			EditorGUI.EndDisabledGroup();
 
-			if (skeleton == null || skeletonRenderer == null || !skeletonRenderer.valid) return;
+			if (skeleton == null || skeletonRenderer == null) {
+				EditorGUILayout.HelpBox("No SkeletonRenderer Spine GameObject selected.", MessageType.Info);
+				return;
+			}
 
 			if (isPrefab) {
-				GUILayout.Label(new GUIContent("Cannot edit Prefabs", Icons.warning));
+				EditorGUILayout.HelpBox("SkeletonDebug only debugs Spine GameObjects in the scene.", MessageType.Warning);
 				return;
 			}
 
 			if (!skeletonRenderer.valid) {
-				GUILayout.Label(new GUIContent("Spine Component invalid. Check Skeleton Data Asset.", Icons.warning));
+				EditorGUILayout.HelpBox("Spine Component is invalid. Check SkeletonData Asset.", MessageType.Error);
 				return;	
 			}
 
@@ -145,7 +199,7 @@ namespace Spine.Unity.Editor {
 			scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
 
 			using (new SpineInspectorUtility.BoxScope(false)) {
-				if (SpineInspectorUtility.CenteredButton(new GUIContent("Skeleton.SetToSetupPose()"))) {
+				if (SpineInspectorUtility.CenteredButton(SpineInspectorUtility.TempContent("Skeleton.SetToSetupPose()"))) {
 					skeleton.SetToSetupPose();
 					requireRepaint = true;
 				}
@@ -153,10 +207,10 @@ namespace Spine.Unity.Editor {
 				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.LabelField("Scene View", EditorStyles.boldLabel);
 				using (new SpineInspectorUtility.LabelWidthScope()) {
-					SkeletonRendererInspector.showBoneNames = EditorGUILayout.Toggle("Show Bone Names", SkeletonRendererInspector.showBoneNames);
-					SkeletonRendererInspector.showPaths = EditorGUILayout.Toggle("Show Paths", SkeletonRendererInspector.showPaths);
-					SkeletonRendererInspector.showShapes = EditorGUILayout.Toggle("Show Shapes", SkeletonRendererInspector.showShapes);
-					SkeletonRendererInspector.showConstraints = EditorGUILayout.Toggle("Show Constraints", SkeletonRendererInspector.showConstraints);
+					showBoneNames = EditorGUILayout.Toggle("Show Bone Names", showBoneNames);
+					showPaths = EditorGUILayout.Toggle("Show Paths", showPaths);
+					showShapes = EditorGUILayout.Toggle("Show Shapes", showShapes);
+					showConstraints = EditorGUILayout.Toggle("Show Constraints", showConstraints);
 				}
 				requireRepaint |= EditorGUI.EndChangeCheck();
 
@@ -167,6 +221,10 @@ namespace Spine.Unity.Editor {
 					using (new SpineInspectorUtility.IndentScope()) {
 						using (new EditorGUILayout.FadeGroupScope(showSkeleton.faded)) {
 							EditorGUI.BeginChangeCheck();
+
+							EditorGUI.BeginDisabledGroup(true);
+							FalseDropDown(".Skin", skeleton.Skin != null ? skeletonRenderer.Skeleton.Skin.Name : "<None>", Icons.skin);
+							EditorGUI.EndDisabledGroup();
 
 							// Flip
 							EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(160f));
@@ -184,12 +242,13 @@ namespace Spine.Unity.Editor {
 				}
 
 				// Bone
-				showInspectBoneTree.target = EditorGUILayout.Foldout(showInspectBoneTree.target, new GUIContent("Bone", Icons.bone), BoldFoldoutStyle);
+				showInspectBoneTree.target = EditorGUILayout.Foldout(showInspectBoneTree.target, SpineInspectorUtility.TempContent("Bone", Icons.bone), BoldFoldoutStyle);
 				if (showInspectBoneTree.faded > 0) {
 					using (new SpineInspectorUtility.IndentScope()) {
 						using (new EditorGUILayout.FadeGroupScope(showInspectBoneTree.faded)) {
+							showBoneNames = EditorGUILayout.Toggle("Show Bone Names", showBoneNames);
 							if (bpo == null) bpo = new SerializedObject(this).FindProperty("boneName");
-							EditorGUILayout.PropertyField(bpo);
+							EditorGUILayout.PropertyField(bpo, SpineInspectorUtility.TempContent("Bone"));
 							if (!string.IsNullOrEmpty(bpo.stringValue)) {
 								if (bone == null || bone.Data.Name != bpo.stringValue) {
 									bone = skeleton.FindBone(bpo.stringValue);
@@ -197,18 +256,48 @@ namespace Spine.Unity.Editor {
 
 								if (bone != null) {
 									using (new EditorGUI.DisabledGroupScope(true)) {
-										var boneParent = bone.Parent;
-										if (boneParent != null) EditorGUILayout.TextField("parent", boneParent.Data.Name);
+										var wm = EditorGUIUtility.wideMode;
+										EditorGUIUtility.wideMode = true;
+										EditorGUILayout.Slider("Local Rotation", ViewRound(bone.Rotation), -180f, 180f);
+										EditorGUILayout.Vector2Field("Local Position", RoundVector2(bone.X, bone.Y));
+										EditorGUILayout.Vector2Field("Local Scale", RoundVector2(bone.ScaleX, bone.ScaleY));
+										EditorGUILayout.Vector2Field("Local Shear", RoundVector2(bone.ShearX, bone.ShearY));
+
 										EditorGUILayout.Space();
 
-										EditorGUILayout.Slider("Local Rotation", bone.Rotation, -180f, 180f);
-										EditorGUILayout.Vector2Field("Local Position", new Vector2(bone.X, bone.Y));
-										EditorGUILayout.Vector2Field("Local Scale", new Vector2(bone.ScaleX, bone.ScaleY));
-										EditorGUILayout.Vector2Field("Local Shear", new Vector2(bone.ShearX, bone.ShearY));
-//										EditorGUILayout.Space();
-//										EditorGUILayout.LabelField("LocalToWorld Matrix");
-//										EditorGUILayout.Vector2Field("AB", new Vector2(bone.A, bone.B));
-//										EditorGUILayout.Vector2Field("CD", new Vector2(bone.C, bone.D));
+										var boneParent = bone.Parent;
+										if (boneParent != null) FalseDropDown("Parent", boneParent.Data.Name, Icons.bone);
+
+										const string RoundFormat = "0.##";
+										var lw = EditorGUIUtility.labelWidth;
+										var fw = EditorGUIUtility.fieldWidth;
+										EditorGUIUtility.labelWidth *= 0.25f;
+										EditorGUIUtility.fieldWidth *= 0.5f;
+										EditorGUILayout.LabelField("LocalToWorld");
+
+										EditorGUILayout.BeginHorizontal();
+										EditorGUILayout.Space();
+										EditorGUILayout.TextField(".A", bone.A.ToString(RoundFormat));
+										EditorGUILayout.TextField(".B", bone.B.ToString(RoundFormat));
+										EditorGUILayout.EndHorizontal();
+										EditorGUILayout.BeginHorizontal();
+										EditorGUILayout.Space();
+										EditorGUILayout.TextField(".C", bone.C.ToString(RoundFormat));
+										EditorGUILayout.TextField(".D", bone.D.ToString(RoundFormat));
+										EditorGUILayout.EndHorizontal();
+
+										EditorGUIUtility.labelWidth = lw * 0.5f;
+										EditorGUILayout.BeginHorizontal();
+										EditorGUILayout.Space();
+										EditorGUILayout.Space();
+										EditorGUILayout.TextField(".WorldX", bone.WorldX.ToString(RoundFormat));
+										EditorGUILayout.TextField(".WorldY", bone.WorldY.ToString(RoundFormat));
+										EditorGUILayout.EndHorizontal();
+
+										EditorGUIUtility.labelWidth = lw;
+										EditorGUIUtility.fieldWidth = fw;
+										EditorGUIUtility.wideMode = wm;
+
 									}
 								}
 								requireRepaint = true;
@@ -224,7 +313,7 @@ namespace Spine.Unity.Editor {
 				showSlotsTree.target = EditorGUILayout.Foldout(showSlotsTree.target, SlotsRootLabel, BoldFoldoutStyle);
 				if (showSlotsTree.faded > 0) {
 					using (new EditorGUILayout.FadeGroupScope(showSlotsTree.faded)) {
-						if (SpineInspectorUtility.CenteredButton(new GUIContent("Skeleton.SetSlotsToSetupPose()"))) {
+						if (SpineInspectorUtility.CenteredButton(SpineInspectorUtility.TempContent("Skeleton.SetSlotsToSetupPose()"))) {
 							skeleton.SetSlotsToSetupPose();
 							requireRepaint = true;
 						}
@@ -235,7 +324,7 @@ namespace Spine.Unity.Editor {
 
 							using (new EditorGUILayout.HorizontalScope()) {
 								EditorGUI.indentLevel = baseIndent + 1;
-								EditorGUILayout.LabelField(new GUIContent(slot.Data.Name, Icons.slot), GUILayout.ExpandWidth(false));
+								EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(slot.Data.Name, Icons.slot), GUILayout.ExpandWidth(false));
 								EditorGUI.BeginChangeCheck();
 								Color c = EditorGUILayout.ColorField(new Color(slot.R, slot.G, slot.B, slot.A), GUILayout.Width(60));
 								if (EditorGUI.EndChangeCheck()) {
@@ -249,7 +338,7 @@ namespace Spine.Unity.Editor {
 								EditorGUI.indentLevel = baseIndent + 2;
 								var icon = Icons.GetAttachmentIcon(attachment);
 								bool isAttached = (attachment == slot.Attachment);
-								bool swap = EditorGUILayout.ToggleLeft(new GUIContent(attachment.Name, icon), attachment == slot.Attachment);
+								bool swap = EditorGUILayout.ToggleLeft(SpineInspectorUtility.TempContent(attachment.Name, icon), attachment == slot.Attachment);
 								if (isAttached != swap) {
 									slot.Attachment = isAttached ? null : attachment;
 									requireRepaint = true;
@@ -263,18 +352,24 @@ namespace Spine.Unity.Editor {
 
 				// Constraints
 				const string NoneText = "<none>";
-				showConstraintsTree.target = EditorGUILayout.Foldout(showConstraintsTree.target, new GUIContent("Constraints", Icons.constraintRoot), BoldFoldoutStyle);
+				showConstraintsTree.target = EditorGUILayout.Foldout(showConstraintsTree.target, SpineInspectorUtility.TempContent("Constraints", Icons.constraintRoot), BoldFoldoutStyle);
 				if (showConstraintsTree.faded > 0) {
 					using (new SpineInspectorUtility.IndentScope()) {
 						using (new EditorGUILayout.FadeGroupScope(showConstraintsTree.faded)) {
 							const float MixMin = 0f;
 							const float MixMax = 1f;
+							EditorGUI.BeginChangeCheck();
+							showConstraints = EditorGUILayout.Toggle("Show Constraints", showConstraints);
+							requireRepaint |= EditorGUI.EndChangeCheck();
 
-							EditorGUILayout.LabelField(new GUIContent(string.Format("IK Constraints ({0})", skeleton.IkConstraints.Count), Icons.constraintIK), EditorStyles.boldLabel);
+							EditorGUILayout.Space();
+
+							EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(string.Format("IK Constraints ({0})", skeleton.IkConstraints.Count), Icons.constraintIK), EditorStyles.boldLabel);
 							using (new SpineInspectorUtility.IndentScope()) {
 								if (skeleton.IkConstraints.Count > 0) {
 									foreach (var c in skeleton.IkConstraints) {
-										EditorGUILayout.LabelField(new GUIContent(c.Data.Name, Icons.constraintIK));
+										EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(c.Data.Name, Icons.constraintIK));
+										FalseDropDown("Goal", c.Data.Target.Name, Icons.bone, true);
 
 										EditorGUI.BeginChangeCheck();
 										c.Mix = EditorGUILayout.Slider("Mix", c.Mix, MixMin, MixMax);
@@ -289,11 +384,14 @@ namespace Spine.Unity.Editor {
 								}
 							}
 
-							EditorGUILayout.LabelField(new GUIContent(string.Format("Transform Constraints ({0})", skeleton.TransformConstraints.Count), Icons.constraintTransform), EditorStyles.boldLabel);
+							EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(string.Format("Transform Constraints ({0})", skeleton.TransformConstraints.Count), Icons.constraintTransform), EditorStyles.boldLabel);
 							using (new SpineInspectorUtility.IndentScope()) {
 								if (skeleton.TransformConstraints.Count > 0) {
 									foreach (var c in skeleton.TransformConstraints) {
-										EditorGUILayout.LabelField(new GUIContent(c.Data.Name, Icons.constraintTransform));
+										EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(c.Data.Name, Icons.constraintTransform));
+										EditorGUI.BeginDisabledGroup(true);
+										FalseDropDown("Goal", c.Data.Target.Name, Icons.bone);
+										EditorGUI.EndDisabledGroup();
 
 										EditorGUI.BeginChangeCheck();
 										c.TranslateMix = EditorGUILayout.Slider("TranslateMix", c.TranslateMix, MixMin, MixMax);
@@ -309,14 +407,24 @@ namespace Spine.Unity.Editor {
 								}
 							}
 
-							EditorGUILayout.LabelField(new GUIContent(string.Format("Path Constraints ({0})", skeleton.PathConstraints.Count), Icons.constraintPath), EditorStyles.boldLabel);
+							EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(string.Format("Path Constraints ({0})", skeleton.PathConstraints.Count), Icons.constraintPath), EditorStyles.boldLabel);
+
+							EditorGUI.BeginChangeCheck();
+							showPaths = EditorGUILayout.Toggle("Show Paths", showPaths);
+							requireRepaint |= EditorGUI.EndChangeCheck();
+
 							using (new SpineInspectorUtility.IndentScope()) {
 								if (skeleton.PathConstraints.Count > 0) {
 									foreach (var c in skeleton.PathConstraints) {
-										EditorGUILayout.LabelField(new GUIContent(c.Data.Name, Icons.constraintPath));
+										EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(c.Data.Name, Icons.constraintPath));
+										EditorGUI.BeginDisabledGroup(true);
+										FalseDropDown("Path Slot", c.Data.Target.Name, Icons.slot);
+										var activeAttachment = c.Target.Attachment;
+										FalseDropDown("Active Path", activeAttachment != null ? activeAttachment.Name : "<None>", activeAttachment is PathAttachment ? Icons.path : null);
 										EditorGUILayout.LabelField("PositionMode." + c.Data.PositionMode);
 										EditorGUILayout.LabelField("SpacingMode." + c.Data.SpacingMode);
 										EditorGUILayout.LabelField("RotateMode." + c.Data.RotateMode);
+										EditorGUI.EndDisabledGroup();
 
 										EditorGUI.BeginChangeCheck();
 										c.RotateMix = EditorGUILayout.Slider("RotateMix", c.RotateMix, MixMin, MixMax);
@@ -336,26 +444,28 @@ namespace Spine.Unity.Editor {
 					}
 				}
 
-				showDrawOrderTree.target = EditorGUILayout.Foldout(showDrawOrderTree.target, new GUIContent("Draw Order and Separators", Icons.slotRoot), BoldFoldoutStyle);
+				showDrawOrderTree.target = EditorGUILayout.Foldout(showDrawOrderTree.target, SpineInspectorUtility.TempContent("Draw Order and Separators", Icons.slotRoot), BoldFoldoutStyle);
 				if (showDrawOrderTree.faded > 0) {
 					using (new SpineInspectorUtility.IndentScope()) {
 						using (new EditorGUILayout.FadeGroupScope(showDrawOrderTree.faded)) {
 
+							const string SeparatorString = "------------- v SEPARATOR v -------------";
+
 							if (Application.isPlaying) {
 								foreach (var slot in skeleton.DrawOrder) {
-									if (skeletonRenderer.separatorSlots.Contains(slot))	EditorGUILayout.LabelField("------");
-									EditorGUILayout.LabelField(new GUIContent(slot.Data.Name, Icons.slot), GUILayout.ExpandWidth(false));
+									if (skeletonRenderer.separatorSlots.Contains(slot))	EditorGUILayout.LabelField(SeparatorString);
+									EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(slot.Data.Name, Icons.slot), GUILayout.ExpandWidth(false));
 								}
 							} else {
 								foreach (var slot in skeleton.DrawOrder) {
 									var slotNames = skeletonRenderer.separatorSlotNames;
 									for (int i = 0, n = slotNames.Length; i < n; i++) {
 										if (string.Equals(slotNames[i], slot.Data.Name, System.StringComparison.Ordinal)) {
-											EditorGUILayout.LabelField("------");
+											EditorGUILayout.LabelField(SeparatorString);
 											break;
 										}
 									}
-									EditorGUILayout.LabelField(new GUIContent(slot.Data.Name, Icons.slot), GUILayout.ExpandWidth(false));
+									EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(slot.Data.Name, Icons.slot), GUILayout.ExpandWidth(false));
 								}
 							}
 								
@@ -363,13 +473,13 @@ namespace Spine.Unity.Editor {
 					}
 				}
 
-				showEventDataTree.target = EditorGUILayout.Foldout(showEventDataTree.target, new GUIContent("Events", Icons.userEvent), BoldFoldoutStyle);
+				showEventDataTree.target = EditorGUILayout.Foldout(showEventDataTree.target, SpineInspectorUtility.TempContent("Events", Icons.userEvent), BoldFoldoutStyle);
 				if (showEventDataTree.faded > 0) {
 					using (new SpineInspectorUtility.IndentScope()) {
 						using (new EditorGUILayout.FadeGroupScope(showEventDataTree.faded)) {
 							if (skeleton.Data.Events.Count > 0) {
 								foreach (var e in skeleton.Data.Events) {
-									EditorGUILayout.LabelField(new GUIContent(e.Name, Icons.userEvent));
+									EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(e.Name, Icons.userEvent));
 								}
 							} else {
 								EditorGUILayout.LabelField(NoneText);
@@ -377,6 +487,8 @@ namespace Spine.Unity.Editor {
 						}
 					}
 				}
+
+				// TODO: Data counts. bones, slots, constraints, skins, etc...
 
 				if (IsAnimating(showSlotsTree, showSkeleton, showConstraintsTree, showDrawOrderTree, showEventDataTree, showInspectBoneTree))
 					Repaint();
@@ -389,6 +501,18 @@ namespace Spine.Unity.Editor {
 			}
 
 			EditorGUILayout.EndScrollView();
+		}
+
+		static float ViewRound (float x) {
+			const float Factor = 100f;
+			const float Divisor = 1f/Factor;
+			return Mathf.Round(x * Factor) * Divisor;
+		}
+
+		static Vector2 RoundVector2 (float x, float y) {
+			const float Factor = 100f;
+			const float Divisor = 1f/Factor;
+			return new Vector2(Mathf.Round(x * Factor) * Divisor, Mathf.Round(y * Factor) * Divisor);
 		}
 
 		static bool IsAnimating (params AnimBool[] animBools) {

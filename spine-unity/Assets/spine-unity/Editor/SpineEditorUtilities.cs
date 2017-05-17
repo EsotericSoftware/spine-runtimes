@@ -59,6 +59,7 @@ namespace Spine.Unity.Editor {
 			public static Texture2D slotRoot;
 			public static Texture2D skinPlaceholder;
 			public static Texture2D image;
+			public static Texture2D genericAttachment;
 			public static Texture2D boundingBox;
 			public static Texture2D mesh;
 			public static Texture2D weights;
@@ -90,11 +91,13 @@ namespace Spine.Unity.Editor {
 				slot = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-slot.png");
 				slotRoot = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-slotRoot.png");
 				skinPlaceholder = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-skinPlaceholder.png");
+
+				genericAttachment = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-attachment.png");
 				image = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-image.png");
 				boundingBox = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-boundingBox.png");
 				mesh = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-mesh.png");
 				weights = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-weights.png");
-				skin = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-skinPlaceholder.png");
+				skin = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-skin.png");
 				skinsRoot = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-skinsRoot.png");
 				animation = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-animation.png");
 				animationRoot = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-animationRoot.png");
@@ -1559,14 +1562,24 @@ namespace Spine.Unity.Editor {
 		}
 
 		static Material _boneMaterial;
-		public static Material BoneMaterial {
+		static Material BoneMaterial {
 			get {
 				if (_boneMaterial == null) {
 					_boneMaterial = new Material(Shader.Find("Hidden/Spine/Bones"));
 					_boneMaterial.SetColor("_Color", SpineHandles.BoneColor);
 				}
+
 				return _boneMaterial;
 			}
+		}
+		public static Material GetBoneMaterial () {
+			BoneMaterial.SetColor("_Color", SpineHandles.BoneColor);
+			return BoneMaterial;
+		}
+
+		public static Material GetBoneMaterial (Color color) {
+			BoneMaterial.SetColor("_Color", color);
+			return BoneMaterial;
 		}
 
 		static Material _ikMaterial;
@@ -1661,11 +1674,28 @@ namespace Spine.Unity.Editor {
 				const float my = 1.5f;
 				scale.y *= (SpineHandles.handleScale + 1f) * 0.5f;
 				scale.y = Mathf.Clamp(scale.x, -my, my);
-				SpineHandles.BoneMaterial.SetPass(0);
+				SpineHandles.GetBoneMaterial().SetPass(0);
 				Graphics.DrawMeshNow(SpineHandles.BoneMesh, transform.localToWorldMatrix * Matrix4x4.TRS(pos, rot, scale));
 			} else {
 				var wp = transform.TransformPoint(pos);
 				DrawBoneCircle(wp, SpineHandles.BoneColor, transform.forward, boneScale);
+			}
+		}
+
+		public static void DrawBone (Transform transform, Bone b, float boneScale, Color color) {
+			var pos = new Vector3(b.WorldX, b.WorldY, 0);
+			float length = b.Data.Length;
+			if (length > 0) {
+				Quaternion rot = Quaternion.Euler(0, 0, b.WorldRotationX);
+				Vector3 scale = Vector3.one * length * b.WorldScaleX;
+				const float my = 1.5f;
+				scale.y *= (SpineHandles.handleScale + 1f) * 0.5f;
+				scale.y = Mathf.Clamp(scale.x, -my, my);
+				SpineHandles.GetBoneMaterial(color).SetPass(0);
+				Graphics.DrawMeshNow(SpineHandles.BoneMesh, transform.localToWorldMatrix * Matrix4x4.TRS(pos, rot, scale));
+			} else {
+				var wp = transform.TransformPoint(pos);
+				DrawBoneCircle(wp, color, transform.forward, boneScale);
 			}
 		}
 

@@ -58,9 +58,9 @@ namespace Spine.Unity.Modules {
 		}
 
 		MeshRenderer mainMeshRenderer;
-		public bool copyPropertyBlock = false;
+		public bool copyPropertyBlock = true;
 		[Tooltip("Copies MeshRenderer flags into each parts renderer")]
-		public bool copyMeshRendererFlags = false;
+		public bool copyMeshRendererFlags = true;
 		public List<Spine.Unity.Modules.SkeletonPartsRenderer> partsRenderers = new List<SkeletonPartsRenderer>();
 
 		#if UNITY_EDITOR
@@ -117,6 +117,13 @@ namespace Spine.Unity.Modules {
 				var lightProbeUsage = mainMeshRenderer.lightProbeUsage;
 				bool receiveShadows = mainMeshRenderer.receiveShadows;
 
+				#if UNITY_5_5_OR_NEWER
+				var reflectionProbeUsage = mainMeshRenderer.reflectionProbeUsage;
+				var shadowCastingMode = mainMeshRenderer.shadowCastingMode;
+				var motionVectorGenerationMode = mainMeshRenderer.motionVectorGenerationMode;
+				var probeAnchor = mainMeshRenderer.probeAnchor;
+				#endif
+
 				for (int i = 0; i < partsRenderers.Count; i++) {
 					var currentRenderer = partsRenderers[i];
 					if (currentRenderer == null) continue; // skip null items.
@@ -124,6 +131,13 @@ namespace Spine.Unity.Modules {
 					var mr = currentRenderer.MeshRenderer;
 					mr.lightProbeUsage = lightProbeUsage;
 					mr.receiveShadows = receiveShadows;
+
+					#if UNITY_5_5_OR_NEWER
+					mr.reflectionProbeUsage = reflectionProbeUsage;
+					mr.shadowCastingMode = shadowCastingMode;
+					mr.motionVectorGenerationMode = motionVectorGenerationMode;
+					mr.probeAnchor = probeAnchor;
+					#endif
 				}
 			}
 			#else

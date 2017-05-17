@@ -43,6 +43,13 @@ namespace Spine.Unity.Modules {
 
 		public override void OnInspectorGUI () {
 			SpineInspectorUtility.SortingPropertyFields(sortingProperties, true);
+			EditorGUILayout.Space();
+			if (SpineInspectorUtility.LargeCenteredButton(new GUIContent("Select SkeletonRenderer", SpineEditorUtilities.Icons.spine))) {
+				var thisSkeletonPartsRenderer = target as SkeletonPartsRenderer;
+				var srs = thisSkeletonPartsRenderer.GetComponentInParent<SkeletonRenderSeparator>();
+				if (srs != null && srs.partsRenderers.Contains(thisSkeletonPartsRenderer) && srs.SkeletonRenderer != null)
+					Selection.activeGameObject = srs.SkeletonRenderer.gameObject;
+			}
 		}
 	}
 

@@ -84,7 +84,7 @@ namespace Spine.Unity.Editor {
 				return;
 			}
 			using (new SpineInspectorUtility.BoxScope()) {
-				EditorGUILayout.PropertyField(meshGeneratorSettings_, new GUIContent("Advanced..."), includeChildren: true);
+				EditorGUILayout.PropertyField(meshGeneratorSettings_, SpineInspectorUtility.TempContent("Advanced..."), includeChildren: true);
 			}
 
 			EditorGUILayout.Space();
@@ -94,7 +94,7 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.PropertyField(startingAnimation_);
 			EditorGUILayout.PropertyField(startingLoop_);
 			EditorGUILayout.PropertyField(timeScale_);
-			EditorGUILayout.PropertyField(unscaledTime_, new GUIContent(unscaledTime_.displayName, "If checked, this will use Time.unscaledDeltaTime to make this update independent of game Time.timeScale. Instance SkeletonGraphic.timeScale will still be applied."));
+			EditorGUILayout.PropertyField(unscaledTime_, SpineInspectorUtility.TempContent(unscaledTime_.displayName, tooltip: "If checked, this will use Time.unscaledDeltaTime to make this update independent of game Time.timeScale. Instance SkeletonGraphic.timeScale will still be applied."));
 			EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(freeze_);
 			EditorGUILayout.Space();
