@@ -139,7 +139,9 @@ public class AnimationState {
 		if (from == null) return true;
 
 		boolean finished = updateMixingFrom(from, delta, animationCount + 1);
-		if (entry.mixTime >= entry.mixDuration && entry.mixTime > 0) {
+
+		// Require mixTime > 0 to ensure the mixing from entry was applied at least once.
+		if (entry.mixTime > 0 && (entry.mixTime >= entry.mixDuration || entry.timeScale == 0)) {
 			if (animationCount > 6 && from.mixingFrom == null) { // Limit the mixing from linked list.
 				entry.mixingFrom = null;
 				queue.end(from);
@@ -855,6 +857,8 @@ public class AnimationState {
 
 		/** Multiplier for the delta time when the animation state is updated, causing time for this animation to pass slower or
 		 * faster. Defaults to 1.
+		 * <p>
+		 * If <code>timeScale</code> is 0, any {@link #getMixDuration()} will be ignored.
 		 * <p>
 		 * See AnimationState {@link AnimationState#getTimeScale()} for affecting all animations. */
 		public float getTimeScale () {
