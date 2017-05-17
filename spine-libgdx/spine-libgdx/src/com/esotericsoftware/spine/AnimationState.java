@@ -226,18 +226,16 @@ public class AnimationState {
 		Object[] timelines = from.animation.timelines.items;
 		int[] timelineData = from.timelineData.items;
 		Object[] timelineDipMix = from.timelineDipMix.items;
-		float alphaDip = from.alpha * to.mixAlpha, alphaMix = alphaDip * (1 - mix);
 
 		boolean firstFrame = from.timelinesRotation.size == 0;
 		if (firstFrame) from.timelinesRotation.setSize(timelineCount << 1);
 		float[] timelinesRotation = from.timelinesRotation.items;
 
+		boolean first;
+		float alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix), alpha;
 		for (int i = 0; i < timelineCount; i++) {
 			Timeline timeline = (Timeline)timelines[i];
-			int data = timelineData[i];
-			boolean first;
-			float alpha;
-			switch (data) {
+			switch (timelineData[i]) {
 			case SUBSEQUENT:
 				first = false;
 				alpha = alphaMix;
@@ -416,7 +414,7 @@ public class AnimationState {
 			if (interrupt) queue.interrupt(from);
 			current.mixingFrom = from;
 			current.mixTime = 0;
-			current.mixAlpha *= Math.min(1, from.mixTime / from.mixDuration); // Store interrupted mix percentage.
+			current.interruptAlpha *= Math.min(1, from.mixTime / from.mixDuration); // Store interrupted mix percentage.
 			from.timelinesRotation.clear(); // Reset rotation for mixing out, in case entry was mixed in.
 		}
 
@@ -576,7 +574,7 @@ public class AnimationState {
 		entry.timeScale = 1;
 
 		entry.alpha = 1;
-		entry.mixAlpha = 1;
+		entry.interruptAlpha = 1;
 		entry.mixTime = 0;
 		entry.mixDuration = last == null ? 0 : data.getMix(last.animation, animation);
 		return entry;
@@ -688,7 +686,7 @@ public class AnimationState {
 		float eventThreshold, attachmentThreshold, drawOrderThreshold;
 		float animationStart, animationEnd, animationLast, nextAnimationLast;
 		float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
-		float alpha, mixTime, mixDuration, mixAlpha;
+		float alpha, mixTime, mixDuration, interruptAlpha;
 		final IntArray timelineData = new IntArray();
 		final Array<TrackEntry> timelineDipMix = new Array();
 		final FloatArray timelinesRotation = new FloatArray();
@@ -941,8 +939,7 @@ public class AnimationState {
 		}
 
 		/** Seconds from 0 to the {@link #getMixDuration()} when mixing from the previous animation to this animation. May be
-		 * slightly more than <code>mixDuration</code> when the mix is complete. The mix time can be set manually rather than use
-		 * the value from AnimationStateData {@link AnimationStateData#getMix(Animation, Animation)}. */
+		 * slightly more than <code>mixDuration</code> when the mix is complete. */
 		public float getMixTime () {
 			return mixTime;
 		}
@@ -954,8 +951,9 @@ public class AnimationState {
 		/** Seconds for mixing from the previous animation to this animation. Defaults to the value provided by AnimationStateData
 		 * {@link AnimationStateData#getMix(Animation, Animation)} based on the animation before this animation (if any).
 		 * <p>
-		 * The <code>mixDuration</code> must be set for a new track entry before {@link AnimationState#update(float)} is next
-		 * called.
+		 * The <code>mixDuration</code> can be set manually rather than use the value from
+		 * {@link AnimationStateData#getMix(Animation, Animation)}. In that case, the <code>mixDuration</code> must be set for a new
+		 * track entry before {@link AnimationState#update(float)} is next called.
 		 * <p>
 		 * When using {@link AnimationState#addAnimation(int, Animation, boolean, float)} with a <code>delay</code> <= 0, note the
 		 * {@link #getDelay()} is set using the mix duration from the {@link AnimationStateData}. */
