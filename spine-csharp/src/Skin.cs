@@ -49,7 +49,7 @@ namespace Spine {
 			this.name = name;
 		}
 
-		/// <summary>Adds an attachment to the skin for the specified slot index and name.</summary>
+		/// <summary>Adds an attachment to the skin for the specified slot index and name. If the name already exists for the slot, the previous value is replaced.</summary>
 		public void AddAttachment (int slotIndex, string name, Attachment attachment) {
 			if (attachment == null) throw new ArgumentNullException("attachment", "attachment cannot be null.");
 			attachments[new AttachmentKeyTuple(slotIndex, name)] = attachment;
