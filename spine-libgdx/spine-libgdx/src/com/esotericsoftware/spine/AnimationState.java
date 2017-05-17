@@ -248,7 +248,7 @@ public class AnimationState {
 				first = true;
 				alpha = alphaDip;
 				TrackEntry dipMix = (TrackEntry)timelineDipMix[i];
-				if (dipMix != null) alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
+				if (dipMix != null && dipMix.mixDuration > 0) alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
 				break;
 			}
 			if (timeline instanceof RotateTimeline)
