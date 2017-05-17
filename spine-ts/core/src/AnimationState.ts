@@ -31,6 +31,9 @@
 module spine {
 	export class AnimationState {
 		static emptyAnimation = new Animation("<empty>", [], 0);
+		static SUBSEQUENT = 0;
+		static FIRST = 1;
+		static DIP = 2;
 
 		data: AnimationStateData;
 		tracks = new Array<TrackEntry>();
@@ -38,8 +41,8 @@ module spine {
 		listeners = new Array<AnimationStateListener2>();
 		queue = new EventQueue(this);
 		propertyIDs = new IntSet();
+		mixingTo = new Array<TrackEntry>();
 		animationsChanged = false;
-		multipleMixing = false;
 		timeScale = 1;
 
 		trackEntryPool = new Pool<TrackEntry>(() => new TrackEntry());
@@ -88,7 +91,15 @@ module spine {
 					this.disposeNext(current);
 					continue;
 				}
-				this.updateMixingFrom(current, delta);
+				if (current.mixingFrom != null && this.updateMixingFrom(current, delta, 2)) {
+					// End mixing from entries once all have completed.
+					let from = current.mixingFrom;
+					current.mixingFrom = null;
+					while (from != null) {
+						this.queue.end(from);
+						from = from.mixingFrom;
+					}
+				}
 
 				current.trackTime += currentDelta;
 			}
@@ -96,22 +107,26 @@ module spine {
 			this.queue.drain();
 		}
 
-		updateMixingFrom (entry: TrackEntry, delta: number) {
+		updateMixingFrom (entry: TrackEntry, delta: number, animationCount: number): boolean {
 			let from = entry.mixingFrom;
-			if (from == null) return;
+			if (from == null) return true;
 
-			this.updateMixingFrom(from, delta);
+			let finished = this.updateMixingFrom(from, delta, animationCount + 1);
 
-			if (entry.mixTime >= entry.mixDuration && from.mixingFrom == null && entry.mixTime > 0) {
-				entry.mixingFrom = null;
-				this.queue.end(from);
-				return;
+			// Require mixTime > 0 to ensure the mixing from entry was applied at least once.
+			if (entry.mixTime > 0 && (entry.mixTime >= entry.mixDuration || entry.timeScale == 0)) {
+				if (animationCount > 6 && from.mixingFrom == null) { // Limit the mixing from linked list.
+					entry.mixingFrom = null;
+					this.queue.end(from);
+				}
+				return finished;
 			}
 
 			from.animationLast = from.nextAnimationLast;
 			from.trackLast = from.nextTrackLast;
 			from.trackTime += delta * from.timeScale;
-			entry.mixTime += delta * from.timeScale;
+			entry.mixTime += delta * entry.timeScale;
+			return false;
 		}
 
 		apply (skeleton: Skeleton) {
@@ -140,18 +155,19 @@ module spine {
 					for (let ii = 0; ii < timelineCount; ii++)
 						timelines[ii].apply(skeleton, animationLast, animationTime, events, 1, true, false);
 				} else {
+					let timelineData = current.timelineData;
+
 					let firstFrame = current.timelinesRotation.length == 0;
 					if (firstFrame) Utils.setArraySize(current.timelinesRotation, timelineCount << 1, null);
 					let timelinesRotation = current.timelinesRotation;
 
-					let timelinesFirst = current.timelinesFirst;
 					for (let ii = 0; ii < timelineCount; ii++) {
 						let timeline = timelines[ii];
 						if (timeline instanceof RotateTimeline) {
-							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, timelinesFirst[ii], timelinesRotation, ii << 1,
+							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineData[ii] > 0, timelinesRotation, ii << 1,
 								firstFrame);
 						} else
-							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelinesFirst[ii], false);
+							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineData[ii] > 0, false);
 					}
 				}
 				this.queueEvents(current, animationTime);
@@ -163,15 +179,15 @@ module spine {
 			this.queue.drain();
 		}
 
-		applyMixingFrom (entry: TrackEntry, skeleton: Skeleton) {
-			let from = entry.mixingFrom;
+		applyMixingFrom (to: TrackEntry, skeleton: Skeleton) {
+			let from = to.mixingFrom;
 			if (from.mixingFrom != null) this.applyMixingFrom(from, skeleton);
 
 			let mix = 0;
-			if (entry.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
+			if (to.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
 				mix = 1;
 			else {
-				mix = entry.mixTime / entry.mixDuration;
+				mix = to.mixTime / to.mixDuration;
 				if (mix > 1) mix = 1;
 			}
 
@@ -180,31 +196,45 @@ module spine {
 			let animationLast = from.animationLast, animationTime = from.getAnimationTime();
 			let timelineCount = from.animation.timelines.length;
 			let timelines = from.animation.timelines;
-			let timelinesFirst = from.timelinesFirst;
-			let timelinesLast = this.multipleMixing ? null : from.timelinesLast;
-			let alphaBase = from.alpha * entry.mixAlpha;
-			let alphaMix = alphaBase * (1 - mix);
+			let timelineData = from.timelineData;
+			let timelineDipMix = from.timelineDipMix;
 
 			let firstFrame = from.timelinesRotation.length == 0;
 			if (firstFrame) Utils.setArraySize(from.timelinesRotation, timelineCount << 1, null);
 			let timelinesRotation = from.timelinesRotation;
 
-			for (let i = 0; i < timelineCount; i++) {
+			let first = false;
+			let alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix), alpha;
+			for (var i = 0; i < timelineCount; i++) {
 				let timeline = timelines[i];
-				let setupPose = timelinesFirst[i];
-				let alpha = timelinesLast != null && setupPose && !timelinesLast[i] ? alphaBase : alphaMix;
+				switch (timelineData[i]) {
+				case AnimationState.SUBSEQUENT:
+					first = false;
+					alpha = alphaMix;
+					break;
+				case AnimationState.FIRST:
+					first = true;
+					alpha = alphaMix;
+					break;
+				default:
+					first = true;
+					alpha = alphaDip;
+					let dipMix = timelineDipMix[i];
+					if (dipMix != null) alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
+					break;
+				}
 				if (timeline instanceof RotateTimeline)
-					this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, setupPose, timelinesRotation, i << 1, firstFrame);
+					this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, first, timelinesRotation, i << 1, firstFrame);
 				else {
-					if (!setupPose) {
+					if (!first) {
 						if (!attachments && timeline instanceof AttachmentTimeline) continue;
 						if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
 					}
-					timeline.apply(skeleton, animationLast, animationTime, events, alpha, setupPose, true);
+					timeline.apply(skeleton, animationLast, animationTime, events, alpha, first, true);
 				}
 			}
 
-			if (entry.mixDuration > 0) this.queueEvents(from, animationTime);
+			if (to.mixDuration > 0) this.queueEvents(from, animationTime);
 			this.events.length = 0;
 			from.nextAnimationLast = animationTime;
 			from.nextTrackLast = from.trackTime;
@@ -349,30 +379,11 @@ module spine {
 				current.mixingFrom = from;
 				current.mixTime = 0;
 
-				let mixingFrom = from.mixingFrom;
-				if (mixingFrom != null && from.mixDuration > 0) {
-					if (this.multipleMixing) {
-						// The interrupted mix will mix out from its current percentage to zero.
-						current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
-					} else {
-						// A mix was interrupted, mix from the closest animation.
-						if (from.mixTime / from.mixDuration < 0.5 && mixingFrom.animation != AnimationState.emptyAnimation) {
-							current.mixingFrom = mixingFrom;
-							mixingFrom.mixingFrom = from;
-							mixingFrom.mixTime = from.mixDuration - from.mixTime;
-							mixingFrom.mixDuration = from.mixDuration;
-							from.mixingFrom = null;
-							from = mixingFrom;
-						}
+				// Store the interrupted mix percentage.
+				if (from.mixingFrom != null && from.mixDuration > 0)
+					current.interruptAlpha *= Math.min(1, from.mixTime / from.mixDuration);
 
-						// End the other animation after it is applied one last time.
-						from.mixAlpha = 0;
-						from.mixTime = 0;
-						from.mixDuration = 0;
-					}
-				}
-
-				from.timelinesRotation.length = 0;
+				from.timelinesRotation.length = 0; // Reset rotation for mixing out, in case entry was mixed in.
 			}
 
 			this.queue.start(current);
@@ -497,7 +508,7 @@ module spine {
 			entry.timeScale = 1;
 
 			entry.alpha = 1;
-			entry.mixAlpha = 1;
+			entry.interruptAlpha = 1;
 			entry.mixTime = 0;
 			entry.mixDuration = last == null ? 0 : this.data.getMix(last.animation, animation);
 			return entry;
@@ -516,78 +527,17 @@ module spine {
 			this.animationsChanged = false;
 
 			let propertyIDs = this.propertyIDs;
-
-			// Compute timelinesFirst from lowest to highest track entries.
-			let i = 0, n = this.tracks.length;
 			propertyIDs.clear();
-			for (; i < n; i++) { // Find first non-null entry.
-				let entry = this.tracks[i];
-				if (entry == null) continue;
-				this.setTimelinesFirst(entry);
-				i++;
-				break;
-			}
-			for (; i < n; i++) { // Rest of entries.
-				let entry = this.tracks[i];
-				if (entry != null) this.checkTimelinesFirst(entry);
-			}
+			let mixingTo = this.mixingTo;
 
-			if (this.multipleMixing) return;
-
-			// Set timelinesLast for mixingFrom entries, from highest track to lowest that has mixingFrom.
-			propertyIDs.clear();
-			let lowestMixingFrom = n;
-			for (i = 0; i < n; i++) { // Find lowest track with a mixingFrom entry.
+			let lastEntry: TrackEntry = null;
+			for (var i = 0, n = this.tracks.length; i < n; i++) {
 				let entry = this.tracks[i];
-				if (entry == null || entry.mixingFrom == null) continue;
-				lowestMixingFrom = i;
-				break;
-			}
-			for (i = n - 1; i >= lowestMixingFrom; i--) { // Find first non-null entry.
-				let entry = this.tracks[i];
-				if (entry == null) continue;
-
-				// Store properties for non-mixingFrom entry but don't set timelinesLast, which is only used for mixingFrom entries.
-				let timelines = entry.animation.timelines;
-				for (let ii = 0, nn = entry.animation.timelines.length; ii < nn; ii++)
-					propertyIDs.add(timelines[ii].getPropertyId());
-
-				entry = entry.mixingFrom;
-				while (entry != null) {
-					this.checkTimelinesUsage(entry, entry.timelinesLast);
-					entry = entry.mixingFrom;
+				if (entry != null) {
+					entry.setTimelineData(lastEntry, mixingTo, propertyIDs);
+					lastEntry = entry;
 				}
 			}
-		}
-
-		setTimelinesFirst (entry: TrackEntry) {
-			if (entry.mixingFrom != null) {
-				this.setTimelinesFirst(entry.mixingFrom);
-				this.checkTimelinesUsage(entry, entry.timelinesFirst);
-				return;
-			}
-			let propertyIDs = this.propertyIDs;
-			let timelines = entry.animation.timelines;
-			let n = timelines.length;
-			let usage = Utils.setArraySize(entry.timelinesFirst, n, false);
-			for (let i = 0; i < n; i++) {
-				propertyIDs.add(timelines[i].getPropertyId());
-				usage[i] = true;
-			}
-		}
-
-		checkTimelinesFirst (entry: TrackEntry) {
-			if (entry.mixingFrom != null) this.checkTimelinesFirst(entry.mixingFrom);
-			this.checkTimelinesUsage(entry, entry.timelinesFirst);
-		}
-
-		checkTimelinesUsage (entry: TrackEntry, usageArray: Array<boolean>) {
-			let propertyIDs = this.propertyIDs;
-			let timelines = entry.animation.timelines;
-			let n = timelines.length;
-			let usage = Utils.setArraySize(usageArray, n);
-			for (let i = 0; i < n; i++)
-				usage[i] = propertyIDs.add(timelines[i].getPropertyId());
 		}
 
 		getCurrent (trackIndex: number) {
@@ -624,9 +574,9 @@ module spine {
 		eventThreshold: number; attachmentThreshold: number; drawOrderThreshold: number;
 		animationStart: number; animationEnd: number; animationLast: number; nextAnimationLast: number;
 		delay: number; trackTime: number; trackLast: number; nextTrackLast: number; trackEnd: number; timeScale: number;
-		alpha: number; mixTime: number; mixDuration: number; mixAlpha: number;
-		timelinesFirst = new Array<boolean>();
-		timelinesLast = new Array<boolean>();
+		alpha: number; mixTime: number; mixDuration: number; interruptAlpha: number;
+		timelineData = new Array<number>();
+		timelineDipMix = new Array<TrackEntry>();
 		timelinesRotation = new Array<number>();
 
 		reset () {
@@ -634,9 +584,50 @@ module spine {
 			this.mixingFrom = null;
 			this.animation = null;
 			this.listener = null;
-			this.timelinesFirst.length = 0;
-			this.timelinesLast.length = 0;
+			this.timelineData.length = 0;
+			this.timelineDipMix.length = 0;
 			this.timelinesRotation.length = 0;
+		}
+
+		setTimelineData (to: TrackEntry, mixingToArray: Array<TrackEntry>, propertyIDs: IntSet) : TrackEntry {
+			if (to != null) mixingToArray.push(to);
+			let lastEntry = this.mixingFrom != null ? this.mixingFrom.setTimelineData(this, mixingToArray, propertyIDs) : this;
+			if (to != null) mixingToArray.pop();
+
+			let mixingTo = mixingToArray;
+			let mixingToLast = mixingToArray.length - 1;
+			let timelines = this.animation.timelines;
+			let timelinesCount = this.animation.timelines.length;
+			let timelineData = Utils.setArraySize(this.timelineData, timelinesCount);
+			let timelineDipMix = Utils.setArraySize(this.timelineDipMix, timelinesCount);
+
+			outer:
+			for (var i = 0; i < timelinesCount; i++) {
+				let id = timelines[i].getPropertyId();
+				if (!propertyIDs.add(id))
+					timelineData[i] = AnimationState.SUBSEQUENT;
+				else if (to == null || !to.hasTimeline(id))
+					timelineData[i] = AnimationState.FIRST;
+				else {
+					timelineData[i] = AnimationState.DIP;
+					for (var ii = mixingToLast; ii >= 0; ii--) {
+						let entry = mixingTo[ii];
+						if (!entry.hasTimeline(id)) {
+							timelineDipMix[i] = entry;
+							continue outer;
+						}
+					}
+					timelineDipMix[i] = null;
+				}
+			}
+			return lastEntry;
+		}
+
+		hasTimeline (id: number) : boolean {
+			let timelines = this.animation.timelines;
+			for (var i = 0, n = timelines.length; i < n; i++)
+				if (timelines[i].getPropertyId() == id) return true;
+			return false;
 		}
 
 		getAnimationTime () {

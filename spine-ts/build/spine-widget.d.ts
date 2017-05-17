@@ -228,21 +228,24 @@ declare module spine {
 declare module spine {
 	class AnimationState {
 		static emptyAnimation: Animation;
+		static SUBSEQUENT: number;
+		static FIRST: number;
+		static DIP: number;
 		data: AnimationStateData;
 		tracks: TrackEntry[];
 		events: Event[];
 		listeners: AnimationStateListener2[];
 		queue: EventQueue;
 		propertyIDs: IntSet;
+		mixingTo: TrackEntry[];
 		animationsChanged: boolean;
-		multipleMixing: boolean;
 		timeScale: number;
 		trackEntryPool: Pool<TrackEntry>;
 		constructor(data: AnimationStateData);
 		update(delta: number): void;
-		updateMixingFrom(entry: TrackEntry, delta: number): void;
+		updateMixingFrom(entry: TrackEntry, delta: number, animationCount: number): boolean;
 		apply(skeleton: Skeleton): void;
-		applyMixingFrom(entry: TrackEntry, skeleton: Skeleton): number;
+		applyMixingFrom(to: TrackEntry, skeleton: Skeleton): number;
 		applyRotateTimeline(timeline: Timeline, skeleton: Skeleton, time: number, alpha: number, setupPose: boolean, timelinesRotation: Array<number>, i: number, firstFrame: boolean): void;
 		queueEvents(entry: TrackEntry, animationTime: number): void;
 		clearTracks(): void;
@@ -259,9 +262,6 @@ declare module spine {
 		trackEntry(trackIndex: number, animation: Animation, loop: boolean, last: TrackEntry): TrackEntry;
 		disposeNext(entry: TrackEntry): void;
 		_animationsChanged(): void;
-		setTimelinesFirst(entry: TrackEntry): void;
-		checkTimelinesFirst(entry: TrackEntry): void;
-		checkTimelinesUsage(entry: TrackEntry, usageArray: Array<boolean>): void;
 		getCurrent(trackIndex: number): TrackEntry;
 		addListener(listener: AnimationStateListener2): void;
 		removeListener(listener: AnimationStateListener2): void;
@@ -291,11 +291,13 @@ declare module spine {
 		alpha: number;
 		mixTime: number;
 		mixDuration: number;
-		mixAlpha: number;
-		timelinesFirst: boolean[];
-		timelinesLast: boolean[];
+		interruptAlpha: number;
+		timelineData: number[];
+		timelineDipMix: TrackEntry[];
 		timelinesRotation: number[];
 		reset(): void;
+		setTimelineData(to: TrackEntry, mixingToArray: Array<TrackEntry>, propertyIDs: IntSet): TrackEntry;
+		hasTimeline(id: number): boolean;
 		getAnimationTime(): number;
 		setAnimationLast(animationLast: number): void;
 		isComplete(): boolean;

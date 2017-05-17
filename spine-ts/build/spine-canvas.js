@@ -1056,8 +1056,8 @@ var spine;
 			this.listeners = new Array();
 			this.queue = new EventQueue(this);
 			this.propertyIDs = new spine.IntSet();
+			this.mixingTo = new Array();
 			this.animationsChanged = false;
-			this.multipleMixing = false;
 			this.timeScale = 1;
 			this.trackEntryPool = new spine.Pool(function () { return new TrackEntry(); });
 			this.data = data;
@@ -1100,25 +1100,35 @@ var spine;
 					this.disposeNext(current);
 					continue;
 				}
-				this.updateMixingFrom(current, delta);
+				if (current.mixingFrom != null && this.updateMixingFrom(current, delta, 2)) {
+					var from = current.mixingFrom;
+					current.mixingFrom = null;
+					while (from != null) {
+						this.queue.end(from);
+						from = from.mixingFrom;
+					}
+				}
 				current.trackTime += currentDelta;
 			}
 			this.queue.drain();
 		};
-		AnimationState.prototype.updateMixingFrom = function (entry, delta) {
+		AnimationState.prototype.updateMixingFrom = function (entry, delta, animationCount) {
 			var from = entry.mixingFrom;
 			if (from == null)
-				return;
-			this.updateMixingFrom(from, delta);
-			if (entry.mixTime >= entry.mixDuration && from.mixingFrom == null && entry.mixTime > 0) {
-				entry.mixingFrom = null;
-				this.queue.end(from);
-				return;
+				return true;
+			var finished = this.updateMixingFrom(from, delta, animationCount + 1);
+			if (entry.mixTime > 0 && (entry.mixTime >= entry.mixDuration || entry.timeScale == 0)) {
+				if (animationCount > 6 && from.mixingFrom == null) {
+					entry.mixingFrom = null;
+					this.queue.end(from);
+				}
+				return finished;
 			}
 			from.animationLast = from.nextAnimationLast;
 			from.trackLast = from.nextTrackLast;
 			from.trackTime += delta * from.timeScale;
-			entry.mixTime += delta * from.timeScale;
+			entry.mixTime += delta * entry.timeScale;
+			return false;
 		};
 		AnimationState.prototype.apply = function (skeleton) {
 			if (skeleton == null)
@@ -1144,18 +1154,18 @@ var spine;
 						timelines[ii].apply(skeleton, animationLast, animationTime, events, 1, true, false);
 				}
 				else {
+					var timelineData = current.timelineData;
 					var firstFrame = current.timelinesRotation.length == 0;
 					if (firstFrame)
 						spine.Utils.setArraySize(current.timelinesRotation, timelineCount << 1, null);
 					var timelinesRotation = current.timelinesRotation;
-					var timelinesFirst = current.timelinesFirst;
 					for (var ii = 0; ii < timelineCount; ii++) {
 						var timeline = timelines[ii];
 						if (timeline instanceof spine.RotateTimeline) {
-							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, timelinesFirst[ii], timelinesRotation, ii << 1, firstFrame);
+							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineData[ii] > 0, timelinesRotation, ii << 1, firstFrame);
 						}
 						else
-							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelinesFirst[ii], false);
+							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineData[ii] > 0, false);
 					}
 				}
 				this.queueEvents(current, animationTime);
@@ -1165,15 +1175,15 @@ var spine;
 			}
 			this.queue.drain();
 		};
-		AnimationState.prototype.applyMixingFrom = function (entry, skeleton) {
-			var from = entry.mixingFrom;
+		AnimationState.prototype.applyMixingFrom = function (to, skeleton) {
+			var from = to.mixingFrom;
 			if (from.mixingFrom != null)
 				this.applyMixingFrom(from, skeleton);
 			var mix = 0;
-			if (entry.mixDuration == 0)
+			if (to.mixDuration == 0)
 				mix = 1;
 			else {
-				mix = entry.mixTime / entry.mixDuration;
+				mix = to.mixTime / to.mixDuration;
 				if (mix > 1)
 					mix = 1;
 			}
@@ -1182,31 +1192,46 @@ var spine;
 			var animationLast = from.animationLast, animationTime = from.getAnimationTime();
 			var timelineCount = from.animation.timelines.length;
 			var timelines = from.animation.timelines;
-			var timelinesFirst = from.timelinesFirst;
-			var timelinesLast = this.multipleMixing ? null : from.timelinesLast;
-			var alphaBase = from.alpha * entry.mixAlpha;
-			var alphaMix = alphaBase * (1 - mix);
+			var timelineData = from.timelineData;
+			var timelineDipMix = from.timelineDipMix;
 			var firstFrame = from.timelinesRotation.length == 0;
 			if (firstFrame)
 				spine.Utils.setArraySize(from.timelinesRotation, timelineCount << 1, null);
 			var timelinesRotation = from.timelinesRotation;
+			var first = false;
+			var alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix), alpha;
 			for (var i = 0; i < timelineCount; i++) {
 				var timeline = timelines[i];
-				var setupPose = timelinesFirst[i];
-				var alpha = timelinesLast != null && setupPose && !timelinesLast[i] ? alphaBase : alphaMix;
+				switch (timelineData[i]) {
+					case AnimationState.SUBSEQUENT:
+						first = false;
+						alpha = alphaMix;
+						break;
+					case AnimationState.FIRST:
+						first = true;
+						alpha = alphaMix;
+						break;
+					default:
+						first = true;
+						alpha = alphaDip;
+						var dipMix = timelineDipMix[i];
+						if (dipMix != null)
+							alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
+						break;
+				}
 				if (timeline instanceof spine.RotateTimeline)
-					this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, setupPose, timelinesRotation, i << 1, firstFrame);
+					this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, first, timelinesRotation, i << 1, firstFrame);
 				else {
-					if (!setupPose) {
+					if (!first) {
 						if (!attachments && timeline instanceof spine.AttachmentTimeline)
 							continue;
 						if (!drawOrder && timeline instanceof spine.DrawOrderTimeline)
 							continue;
 					}
-					timeline.apply(skeleton, animationLast, animationTime, events, alpha, setupPose, true);
+					timeline.apply(skeleton, animationLast, animationTime, events, alpha, first, true);
 				}
 			}
-			if (entry.mixDuration > 0)
+			if (to.mixDuration > 0)
 				this.queueEvents(from, animationTime);
 			this.events.length = 0;
 			from.nextAnimationLast = animationTime;
@@ -1334,25 +1359,8 @@ var spine;
 					this.queue.interrupt(from);
 				current.mixingFrom = from;
 				current.mixTime = 0;
-				var mixingFrom = from.mixingFrom;
-				if (mixingFrom != null && from.mixDuration > 0) {
-					if (this.multipleMixing) {
-						current.mixAlpha *= Math.min(from.mixTime / from.mixDuration, 1);
-					}
-					else {
-						if (from.mixTime / from.mixDuration < 0.5 && mixingFrom.animation != AnimationState.emptyAnimation) {
-							current.mixingFrom = mixingFrom;
-							mixingFrom.mixingFrom = from;
-							mixingFrom.mixTime = from.mixDuration - from.mixTime;
-							mixingFrom.mixDuration = from.mixDuration;
-							from.mixingFrom = null;
-							from = mixingFrom;
-						}
-						from.mixAlpha = 0;
-						from.mixTime = 0;
-						from.mixDuration = 0;
-					}
-				}
+				if (from.mixingFrom != null && from.mixDuration > 0)
+					current.interruptAlpha *= Math.min(1, from.mixTime / from.mixDuration);
 				from.timelinesRotation.length = 0;
 			}
 			this.queue.start(current);
@@ -1468,7 +1476,7 @@ var spine;
 			entry.trackEnd = Number.MAX_VALUE;
 			entry.timeScale = 1;
 			entry.alpha = 1;
-			entry.mixAlpha = 1;
+			entry.interruptAlpha = 1;
 			entry.mixTime = 0;
 			entry.mixDuration = last == null ? 0 : this.data.getMix(last.animation, animation);
 			return entry;
@@ -1484,73 +1492,16 @@ var spine;
 		AnimationState.prototype._animationsChanged = function () {
 			this.animationsChanged = false;
 			var propertyIDs = this.propertyIDs;
-			var i = 0, n = this.tracks.length;
 			propertyIDs.clear();
-			for (; i < n; i++) {
+			var mixingTo = this.mixingTo;
+			var lastEntry = null;
+			for (var i = 0, n = this.tracks.length; i < n; i++) {
 				var entry = this.tracks[i];
-				if (entry == null)
-					continue;
-				this.setTimelinesFirst(entry);
-				i++;
-				break;
-			}
-			for (; i < n; i++) {
-				var entry = this.tracks[i];
-				if (entry != null)
-					this.checkTimelinesFirst(entry);
-			}
-			if (this.multipleMixing)
-				return;
-			propertyIDs.clear();
-			var lowestMixingFrom = n;
-			for (i = 0; i < n; i++) {
-				var entry = this.tracks[i];
-				if (entry == null || entry.mixingFrom == null)
-					continue;
-				lowestMixingFrom = i;
-				break;
-			}
-			for (i = n - 1; i >= lowestMixingFrom; i--) {
-				var entry = this.tracks[i];
-				if (entry == null)
-					continue;
-				var timelines = entry.animation.timelines;
-				for (var ii = 0, nn = entry.animation.timelines.length; ii < nn; ii++)
-					propertyIDs.add(timelines[ii].getPropertyId());
-				entry = entry.mixingFrom;
-				while (entry != null) {
-					this.checkTimelinesUsage(entry, entry.timelinesLast);
-					entry = entry.mixingFrom;
+				if (entry != null) {
+					entry.setTimelineData(lastEntry, mixingTo, propertyIDs);
+					lastEntry = entry;
 				}
 			}
-		};
-		AnimationState.prototype.setTimelinesFirst = function (entry) {
-			if (entry.mixingFrom != null) {
-				this.setTimelinesFirst(entry.mixingFrom);
-				this.checkTimelinesUsage(entry, entry.timelinesFirst);
-				return;
-			}
-			var propertyIDs = this.propertyIDs;
-			var timelines = entry.animation.timelines;
-			var n = timelines.length;
-			var usage = spine.Utils.setArraySize(entry.timelinesFirst, n, false);
-			for (var i = 0; i < n; i++) {
-				propertyIDs.add(timelines[i].getPropertyId());
-				usage[i] = true;
-			}
-		};
-		AnimationState.prototype.checkTimelinesFirst = function (entry) {
-			if (entry.mixingFrom != null)
-				this.checkTimelinesFirst(entry.mixingFrom);
-			this.checkTimelinesUsage(entry, entry.timelinesFirst);
-		};
-		AnimationState.prototype.checkTimelinesUsage = function (entry, usageArray) {
-			var propertyIDs = this.propertyIDs;
-			var timelines = entry.animation.timelines;
-			var n = timelines.length;
-			var usage = spine.Utils.setArraySize(usageArray, n);
-			for (var i = 0; i < n; i++)
-				usage[i] = propertyIDs.add(timelines[i].getPropertyId());
 		};
 		AnimationState.prototype.getCurrent = function (trackIndex) {
 			if (trackIndex >= this.tracks.length)
@@ -1576,11 +1527,14 @@ var spine;
 		return AnimationState;
 	}());
 	AnimationState.emptyAnimation = new spine.Animation("<empty>", [], 0);
+	AnimationState.SUBSEQUENT = 0;
+	AnimationState.FIRST = 1;
+	AnimationState.DIP = 2;
 	spine.AnimationState = AnimationState;
 	var TrackEntry = (function () {
 		function TrackEntry() {
-			this.timelinesFirst = new Array();
-			this.timelinesLast = new Array();
+			this.timelineData = new Array();
+			this.timelineDipMix = new Array();
 			this.timelinesRotation = new Array();
 		}
 		TrackEntry.prototype.reset = function () {
@@ -1588,9 +1542,48 @@ var spine;
 			this.mixingFrom = null;
 			this.animation = null;
 			this.listener = null;
-			this.timelinesFirst.length = 0;
-			this.timelinesLast.length = 0;
+			this.timelineData.length = 0;
+			this.timelineDipMix.length = 0;
 			this.timelinesRotation.length = 0;
+		};
+		TrackEntry.prototype.setTimelineData = function (to, mixingToArray, propertyIDs) {
+			if (to != null)
+				mixingToArray.push(to);
+			var lastEntry = this.mixingFrom != null ? this.mixingFrom.setTimelineData(this, mixingToArray, propertyIDs) : this;
+			if (to != null)
+				mixingToArray.pop();
+			var mixingTo = mixingToArray;
+			var mixingToLast = mixingToArray.length - 1;
+			var timelines = this.animation.timelines;
+			var timelinesCount = this.animation.timelines.length;
+			var timelineData = spine.Utils.setArraySize(this.timelineData, timelinesCount);
+			var timelineDipMix = spine.Utils.setArraySize(this.timelineDipMix, timelinesCount);
+			outer: for (var i = 0; i < timelinesCount; i++) {
+				var id = timelines[i].getPropertyId();
+				if (!propertyIDs.add(id))
+					timelineData[i] = AnimationState.SUBSEQUENT;
+				else if (to == null || !to.hasTimeline(id))
+					timelineData[i] = AnimationState.FIRST;
+				else {
+					timelineData[i] = AnimationState.DIP;
+					for (var ii = mixingToLast; ii >= 0; ii--) {
+						var entry = mixingTo[ii];
+						if (!entry.hasTimeline(id)) {
+							timelineDipMix[i] = entry;
+							continue outer;
+						}
+					}
+					timelineDipMix[i] = null;
+				}
+			}
+			return lastEntry;
+		};
+		TrackEntry.prototype.hasTimeline = function (id) {
+			var timelines = this.animation.timelines;
+			for (var i = 0, n = timelines.length; i < n; i++)
+				if (timelines[i].getPropertyId() == id)
+					return true;
+			return false;
 		};
 		TrackEntry.prototype.getAnimationTime = function () {
 			if (this.loop) {
