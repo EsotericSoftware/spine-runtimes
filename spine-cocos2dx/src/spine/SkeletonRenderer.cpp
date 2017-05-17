@@ -184,12 +184,12 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	SkeletonTwoColorBatch* twoColorBatch = SkeletonTwoColorBatch::getInstance();
 	bool isTwoColorTint = this->isTwoColorTint();
 
-	Color3B nodeColor = getColor();
-	_skeleton->color.r = nodeColor.r / (float)255;
-	_skeleton->color.g = nodeColor.g / (float)255;
-	_skeleton->color.b = nodeColor.b / (float)255;
-	_skeleton->color.a = getDisplayedOpacity() / (float)255;
-    
+	Color4F nodeColor;
+	nodeColor.r = getDisplayedColor().r / (float)255;
+	nodeColor.g = getDisplayedColor().g / (float)255;
+	nodeColor.b = getDisplayedColor().b / (float)255;
+	nodeColor.a = getDisplayedOpacity() / (float)255;
+	
     Color4F color;
 	Color4F darkColor;
 	AttachmentVertices* attachmentVertices = nullptr;
@@ -278,11 +278,11 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 			darkColor.b = 0;
 		}
 		
-		color.a *= _skeleton->color.a * slot->color.a * 255;
+		color.a *= nodeColor.a * _skeleton->color.a * slot->color.a * 255;
 		float multiplier = _premultipliedAlpha ? color.a : 255;
-		color.r *= _skeleton->color.r * slot->color.r * multiplier;
-		color.g *= _skeleton->color.g * slot->color.g * multiplier;
-		color.b *= _skeleton->color.b * slot->color.b * multiplier;
+		color.r *= nodeColor.r * _skeleton->color.r * slot->color.r * multiplier;
+		color.g *= nodeColor.g * _skeleton->color.g * slot->color.g * multiplier;
+		color.b *= nodeColor.b * _skeleton->color.b * slot->color.b * multiplier;
 		
 		BlendFunc blendFunc;
 		switch (slot->data->blendMode) {

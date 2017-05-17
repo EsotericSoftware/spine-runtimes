@@ -50,6 +50,7 @@
  * Updated example to use Cocos2d-x 3.14.1.
  * Added mesh debug rendering. Enable/Disable via `SkeletonRenderer::setDebugMeshesEnabled()`.
  * Added support for clipping.
+ * SkeletonRenderer now combines the displayed color of the Node (cascaded from all parents) with the skeleton color for tinting.
 
 ### Cocos2d-Objc
  * Fixed renderer to work with 3.6 changes
