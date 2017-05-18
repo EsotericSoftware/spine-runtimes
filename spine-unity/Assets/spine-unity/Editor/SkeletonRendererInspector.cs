@@ -86,7 +86,7 @@ namespace Spine.Unity.Editor {
 			ZSpacingLabel = new GUIContent("Z Spacing", "A value other than 0 adds a space between each rendered attachment to prevent Z Fighting when using shaders that read or write to the depth buffer. Large values may cause unwanted parallax and spaces depending on camera setup.");
 			NormalsLabel = new GUIContent("Add Normals", "Use this if your shader requires vertex normals. A more efficient solution for 2D setups is to modify the shader to assume a single normal value for the whole mesh.");
 			TangentsLabel = new GUIContent("Solve Tangents", "Calculates the tangents per frame. Use this if you are using lit shaders (usually with normal maps) that require vertex tangents.");
-			TintBlackLabel = new GUIContent("Tint Black", "Adds black tint vertex data to the mesh as UV2 and UV3. Black tinting requires that the shader interpret UV2 and UV3 as black tint colors for this effect to work. You may also use the default [Spine/Skeleton Tint Black] shader.\n\nIf you only need to tint the whole skeleton and not individual parts, the [Spine/Skeleton Tint] shader is recommended for better efficiency and changing/animating the _Black material property via MaterialPropertyBlock.");
+			TintBlackLabel = new GUIContent("Tint Black (!)", "Adds black tint vertex data to the mesh as UV2 and UV3. Black tinting requires that the shader interpret UV2 and UV3 as black tint colors for this effect to work. You may also use the default [Spine/Skeleton Tint Black] shader.\n\nIf you only need to tint the whole skeleton and not individual parts, the [Spine/Skeleton Tint] shader is recommended for better efficiency and changing/animating the _Black material property via MaterialPropertyBlock.");
 			SingleSubmeshLabel = new GUIContent("Use Single Submesh", "Simplifies submesh determination by assuming you are only using one Material and need only one submesh. This is will disable render separation and custom slot materials.");
 
 			var so = this.serializedObject;
@@ -294,8 +294,7 @@ namespace Spine.Unity.Editor {
 						EditorGUILayout.Space();
 
 						using (new SpineInspectorUtility.LabelWidthScope()) {
-							//EditorGUILayout.LabelField("Vertex Data", EditorStyles.boldLabel);
-							EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Vertex Data", EditorGUIUtility.ObjectContent(null, typeof(MeshFilter)).image as Texture2D), EditorStyles.boldLabel);
+							EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Vertex Data", SpineInspectorUtility.UnityIcon(typeof(MeshFilter))), EditorStyles.boldLabel);
 							if (pmaVertexColors != null) EditorGUILayout.PropertyField(pmaVertexColors, PMAVertexColorsLabel);
 							EditorGUILayout.PropertyField(tintBlack, TintBlackLabel);
 

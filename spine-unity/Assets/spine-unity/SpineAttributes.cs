@@ -40,6 +40,7 @@ namespace Spine.Unity {
 	public abstract class SpineAttributeBase : PropertyAttribute {
 		public string dataField = "";
 		public string startsWith = "";
+		public bool includeNone = true;
 	}
 
 	public class SpineSlot : SpineAttributeBase {
@@ -54,10 +55,11 @@ namespace Spine.Unity {
 		/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
 		/// </param>
 		/// <param name="containsBoundingBoxes">Disables popup results that don't contain bounding box attachments when true.</param>
-		public SpineSlot(string startsWith = "", string dataField = "", bool containsBoundingBoxes = false) {
+		public SpineSlot(string startsWith = "", string dataField = "", bool containsBoundingBoxes = false, bool includeNone = true) {
 			this.startsWith = startsWith;
 			this.dataField = dataField;
 			this.containsBoundingBoxes = containsBoundingBoxes;
+			this.includeNone = includeNone;
 		}
 	}
 
@@ -70,9 +72,10 @@ namespace Spine.Unity {
 		/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives).
 		/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
 		/// </param>
-		public SpineEvent(string startsWith = "", string dataField = "") {
+		public SpineEvent(string startsWith = "", string dataField = "", bool includeNone = true) {
 			this.startsWith = startsWith;
 			this.dataField = dataField;
+			this.includeNone = includeNone;
 		}
 	}
 
@@ -85,9 +88,10 @@ namespace Spine.Unity {
 		/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives)
 		/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
 		/// </param>
-		public SpineSkin(string startsWith = "", string dataField = "") {
+		public SpineSkin(string startsWith = "", string dataField = "", bool includeNone = true) {
 			this.startsWith = startsWith;
 			this.dataField = dataField;
+			this.includeNone = includeNone;
 		}
 	}
 	public class SpineAnimation : SpineAttributeBase {
@@ -99,9 +103,10 @@ namespace Spine.Unity {
 		/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives)
 		/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
 		/// </param>
-		public SpineAnimation(string startsWith = "", string dataField = "") {
+		public SpineAnimation(string startsWith = "", string dataField = "", bool includeNone = true) {
 			this.startsWith = startsWith;
 			this.dataField = dataField;
+			this.includeNone = includeNone;
 		}
 	}
 
@@ -122,12 +127,13 @@ namespace Spine.Unity {
 		/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives)
 		/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
 		/// </param>
-		public SpineAttachment (bool currentSkinOnly = true, bool returnAttachmentPath = false, bool placeholdersOnly = false, string slotField = "", string dataField = "") {
+		public SpineAttachment (bool currentSkinOnly = true, bool returnAttachmentPath = false, bool placeholdersOnly = false, string slotField = "", string dataField = "", bool includeNone = true) {
 			this.currentSkinOnly = currentSkinOnly;
 			this.returnAttachmentPath = returnAttachmentPath;
 			this.placeholdersOnly = placeholdersOnly;
 			this.slotField = slotField;
 			this.dataField = dataField;		
+			this.includeNone = includeNone;
 		}
 
 		public static SpineAttachment.Hierarchy GetHierarchy (string fullPath) {
@@ -183,9 +189,10 @@ namespace Spine.Unity {
 		/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives)
 		/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
 		/// </param>
-		public SpineBone(string startsWith = "", string dataField = "") {
+		public SpineBone(string startsWith = "", string dataField = "", bool includeNone = true) {
 			this.startsWith = startsWith;
 			this.dataField = dataField;
+			this.includeNone = includeNone;
 		}
 
 		public static Spine.Bone GetBone(string boneName, SkeletonRenderer renderer) {

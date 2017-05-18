@@ -173,12 +173,12 @@ namespace Spine.Unity.Editor {
 			using (new SpineInspectorUtility.BoxScope()) {
 				using (new EditorGUILayout.HorizontalScope()) {
 					EditorGUILayout.LabelField("SkeletonData", EditorStyles.boldLabel);
-//					if (m_skeletonData != null) {
-//						var sd = m_skeletonData;
-//						string m = string.Format("{8} - {0} {1}\nBones: {2}\tConstraints: {5} IK + {6} Path + {7} Transform\nSlots: {3}\t\tSkins: {4}\n",
-//							sd.Version, string.IsNullOrEmpty(sd.Version) ? "" : "export", sd.Bones.Count, sd.Slots.Count, sd.Skins.Count, sd.IkConstraints.Count, sd.PathConstraints.Count, sd.TransformConstraints.Count, skeletonJSON.objectReferenceValue.name);						
-//						EditorGUILayout.LabelField(new GUIContent("SkeletonData"), new GUIContent("+", m), EditorStyles.boldLabel);
-//					}
+					if (m_skeletonData != null) {
+						var sd = m_skeletonData;
+						string m = string.Format("{8} - {0} {1}\nBones: {2}\nConstraints: \n {5} IK \n {6} Path \n {7} Transform\n\nSlots: {3}\nSkins: {4}\n\nAnimations: {9}",
+							sd.Version, string.IsNullOrEmpty(sd.Version) ? "" : "export          ", sd.Bones.Count, sd.Slots.Count, sd.Skins.Count, sd.IkConstraints.Count, sd.PathConstraints.Count, sd.TransformConstraints.Count, skeletonJSON.objectReferenceValue.name, sd.Animations.Count);
+						EditorGUILayout.LabelField(GUIContent.none, new GUIContent(Icons.info, m), GUILayout.Width(30f));
+					}
 				}
 
 				EditorGUILayout.PropertyField(skeletonJSON, SpineInspectorUtility.TempContent(skeletonJSON.displayName, Icons.spine));
@@ -223,8 +223,8 @@ namespace Spine.Unity.Editor {
 			if (m_skeletonData != null) {
 				GUILayout.Space(20f);
 
-				using (new SpineInspectorUtility.BoxScope()) {
-					EditorGUILayout.LabelField("Mix Settings", EditorStyles.boldLabel);
+				using (new SpineInspectorUtility.BoxScope(false)) {
+					EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Mix Settings", Icons.animationRoot), EditorStyles.boldLabel);
 					DrawAnimationStateInfo();
 					EditorGUILayout.Space();
 				}
@@ -259,10 +259,10 @@ namespace Spine.Unity.Editor {
 		void DrawUnityTools () {
 			#if SPINE_SKELETON_ANIMATOR
 			using (new SpineInspectorUtility.BoxScope()) {
-				isMecanimExpanded = EditorGUILayout.Foldout(isMecanimExpanded, SpineInspectorUtility.TempContent("SkeletonAnimator", Icons.unityIcon));
+				isMecanimExpanded = EditorGUILayout.Foldout(isMecanimExpanded, SpineInspectorUtility.TempContent("SkeletonAnimator", SpineInspectorUtility.UnityIcon(typeof(SceneAsset))));
 				if (isMecanimExpanded) {
 					EditorGUI.indentLevel++;
-					EditorGUILayout.PropertyField(controller, SpineInspectorUtility.TempContent("Controller", Icons.controllerIcon));		
+					EditorGUILayout.PropertyField(controller, SpineInspectorUtility.TempContent("Controller", SpineInspectorUtility.UnityIcon(typeof(Animator))));		
 					if (controller.objectReferenceValue == null) {
 
 						// Generate Mecanim Controller Button
@@ -368,26 +368,28 @@ namespace Spine.Unity.Editor {
 		}
 
 		void DrawAnimationStateInfo () {
-			showAnimationStateData = EditorGUILayout.Foldout(showAnimationStateData, "Animation State Data");
+			using (new SpineInspectorUtility.IndentScope())
+				showAnimationStateData = EditorGUILayout.Foldout(showAnimationStateData, "Animation State Data");
+
 			if (!showAnimationStateData)
 				return;
 
 			EditorGUI.BeginChangeCheck();
-			SpineInspectorUtility.PropertyFieldWideLabel(defaultMix, DefaultMixLabel, 160);
+			using (new SpineInspectorUtility.IndentScope())
+				SpineInspectorUtility.PropertyFieldWideLabel(defaultMix, DefaultMixLabel, 160);
 
-			var animations = new string[m_skeletonData.Animations.Count];
-			for (int i = 0; i < animations.Length; i++)
-				animations[i] = m_skeletonData.Animations.Items[i].Name;
 
+			// Do not use EditorGUIUtility.indentLevel. It will add spaces on every field.
 			for (int i = 0; i < fromAnimation.arraySize; i++) {
 				SerializedProperty from = fromAnimation.GetArrayElementAtIndex(i);
 				SerializedProperty to = toAnimation.GetArrayElementAtIndex(i);
 				SerializedProperty durationProp = duration.GetArrayElementAtIndex(i);
 				using (new EditorGUILayout.HorizontalScope()) {
-					from.stringValue = animations[EditorGUILayout.Popup(Math.Max(Array.IndexOf(animations, from.stringValue), 0), animations)];
-					to.stringValue = animations[EditorGUILayout.Popup(Math.Max(Array.IndexOf(animations, to.stringValue), 0), animations)];
-					durationProp.floatValue = EditorGUILayout.FloatField(durationProp.floatValue);
-					if (GUILayout.Button("Delete")) {
+					GUILayout.Space(16f);
+					EditorGUILayout.PropertyField(from, GUIContent.none);
+					EditorGUILayout.PropertyField(to, GUIContent.none);
+					durationProp.floatValue = EditorGUILayout.FloatField(durationProp.floatValue, GUILayout.MinWidth(25f), GUILayout.MaxWidth(60f));
+					if (GUILayout.Button("Delete", EditorStyles.miniButton)) {
 						duration.DeleteArrayElementAtIndex(i);
 						toAnimation.DeleteArrayElementAtIndex(i);
 						fromAnimation.DeleteArrayElementAtIndex(i);
