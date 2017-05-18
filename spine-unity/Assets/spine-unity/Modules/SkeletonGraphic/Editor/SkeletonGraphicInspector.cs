@@ -68,6 +68,7 @@ namespace Spine.Unity.Editor {
 			freeze_ = so.FindProperty("freeze");
 
 			meshGeneratorSettings_ = so.FindProperty("meshGenerator").FindPropertyRelative("settings");
+			meshGeneratorSettings_.isExpanded = SkeletonRendererInspector.advancedFoldout;
 		}
 
 		public override void OnInspectorGUI () {
@@ -85,6 +86,7 @@ namespace Spine.Unity.Editor {
 			}
 			using (new SpineInspectorUtility.BoxScope()) {
 				EditorGUILayout.PropertyField(meshGeneratorSettings_, SpineInspectorUtility.TempContent("Advanced..."), includeChildren: true);
+				SkeletonRendererInspector.advancedFoldout = meshGeneratorSettings_.isExpanded;
 			}
 
 			EditorGUILayout.Space();

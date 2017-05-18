@@ -41,7 +41,7 @@ namespace Spine.Unity.Editor {
 	[CustomEditor(typeof(SkeletonRenderer))]
 	[CanEditMultipleObjects]
 	public class SkeletonRendererInspector : UnityEditor.Editor {
-		protected static bool advancedFoldout;
+		public static bool advancedFoldout;
 
 		protected SerializedProperty skeletonDataAsset, initialSkinName;
 		protected SerializedProperty initialFlipX, initialFlipY;
@@ -278,7 +278,7 @@ namespace Spine.Unity.Editor {
 						using (new SpineInspectorUtility.LabelWidthScope()) {
 							// Optimization options
 							if (singleSubmesh != null) EditorGUILayout.PropertyField(singleSubmesh, SingleSubmeshLabel);
-							if (meshes != null) EditorGUILayout.PropertyField(meshes, MeshesLabel);
+							//if (meshes != null) EditorGUILayout.PropertyField(meshes, MeshesLabel);
 							if (immutableTriangles != null) EditorGUILayout.PropertyField(immutableTriangles, ImmubleTrianglesLabel);
 							EditorGUILayout.PropertyField(clearStateOnDisable, ClearStateOnDisableLabel);
 							EditorGUILayout.Space();

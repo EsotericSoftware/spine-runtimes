@@ -50,7 +50,6 @@ namespace Spine.Unity {
 		public float timeScale = 1f;
 		public bool freeze;
 		public bool unscaledTime;
-		//public bool tintBlack = false;
 
 		#if UNITY_EDITOR
 		protected override void OnValidate () {
@@ -204,8 +203,24 @@ namespace Spine.Unity {
 			if (!string.IsNullOrEmpty(initialSkinName))
 				skeleton.SetSkin(initialSkinName);
 
-			if (!string.IsNullOrEmpty(startingAnimation))
+			#if UNITY_EDITOR
+			if (!string.IsNullOrEmpty(startingAnimation)) {
+				if (Application.isPlaying) {
+					state.SetAnimation(0, startingAnimation, startingLoop);
+				} else {
+					// Assume SkeletonAnimation is valid for skeletonData and skeleton. Checked above.
+					var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(startingAnimation);
+					if (animationObject != null)
+						animationObject.Apply(skeleton, 0f, 0f, false, null, 1f, true, false);
+				}
+				Update(0);
+			}
+			#else
+			if (!string.IsNullOrEmpty(startingAnimation)) {
 				state.SetAnimation(0, startingAnimation, startingLoop);
+				Update(0);
+			}
+			#endif
 		}
 
 		public void UpdateMesh () {
