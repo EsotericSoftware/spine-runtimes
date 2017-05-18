@@ -116,7 +116,6 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData, stateData);
 	drawable->timeScale = 1;
-	drawable->state->multipleMixing = -1;
 
 	Skeleton* skeleton = drawable->skeleton;
 	skeleton->flipX = false;
