@@ -142,9 +142,13 @@ public class AnimationState {
 
 		// Require mixTime > 0 to ensure the mixing from entry was applied at least once.
 		if (entry.mixTime > 0 && (entry.mixTime >= entry.mixDuration || entry.timeScale == 0)) {
-			if (animationCount > 6 && from.mixingFrom == null) { // Limit the mixing from linked list.
-				entry.mixingFrom = null;
-				queue.end(from);
+			if (animationCount > 5 && from.mixingFrom == null) {
+				// Limit linked list by speeding up and removing old entries.
+				entry.interruptAlpha = Math.max(0, entry.interruptAlpha - delta * 0.66f);
+				if (entry.interruptAlpha <= 0) {
+					entry.mixingFrom = null;
+					queue.end(from);
+				}
 			}
 			return finished;
 		}
