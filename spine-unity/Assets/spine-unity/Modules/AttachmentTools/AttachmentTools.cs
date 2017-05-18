@@ -654,6 +654,8 @@ namespace Spine.Unity.Modules.AttachmentTools {
 	}
 
 	public static class SkinExtensions {
+
+		#region Skeleton Skin Extensions
 		/// <summary>
 		/// Convenience method for duplicating a skeleton's current active skin so changes to it will not affect other skeleton instances. .</summary>
 		public static Skin UnshareSkin (this Skeleton skeleton, bool includeDefaultSkin, bool unshareAttachments, AnimationState state = null) {
@@ -684,6 +686,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 			return newSkin;
 		}
+		#endregion
 
 		/// <summary>
 		/// Gets a shallow copy of the skin. The cloned skin's attachments are shared with the original skin.</summary>
@@ -695,6 +698,36 @@ namespace Spine.Unity.Modules.AttachmentTools {
 				newSkinAttachments[a.Key] = a.Value;
 
 			return newSkin;
+		}
+
+		/// <summary>Adds an attachment to the skin for the specified slot index and name. If the name already exists for the slot, the previous value is replaced.</summary>
+		public static void SetAttachment (this Skin skin, string slotName, string keyName, Attachment attachment, Skeleton skeleton) {
+			int slotIndex = skeleton.FindSlotIndex(slotName);
+			if (skeleton == null) throw new System.ArgumentNullException("skeleton", "skeleton cannot be null.");
+			if (slotIndex == -1) throw new System.ArgumentException(string.Format("Slot '{0}' does not exist in skeleton.", slotName), "slotName");
+			skin.AddAttachment(slotIndex, keyName, attachment);
+		}
+
+		/// <summary>Adds an attachment to the skin for the specified slot index and name. If the name already exists for the slot, the previous value is replaced.</summary>
+		public static void SetAttachment (this Skin skin, int slotIndex, string keyName, Attachment attachment) {
+			skin.AddAttachment(slotIndex, keyName, attachment);
+		}
+
+		/// <summary>Removes the attachment. Returns true if the element is successfully found and removed; otherwise, false.</summary>
+		public static bool RemoveAttachment (this Skin skin, string slotName, string keyName, Skeleton skeleton) {
+			int slotIndex = skeleton.FindSlotIndex(slotName);
+			if (skeleton == null) throw new System.ArgumentNullException("skeleton", "skeleton cannot be null.");
+			if (slotIndex == -1) throw new System.ArgumentException(string.Format("Slot '{0}' does not exist in skeleton.", slotName), "slotName");
+			return skin.RemoveAttachment(slotIndex, keyName);
+		}
+
+		/// <summary>Removes the attachment. Returns true if the element is successfully found and removed; otherwise, false.</summary>
+		public static bool RemoveAttachment (this Skin skin, int slotIndex, string keyName) {
+			return skin.Attachments.Remove(new Skin.AttachmentKeyTuple(slotIndex, keyName));
+		}
+
+		public static void Append (this Skin destination, Skin source, bool overwrite, bool cloneAttachments, bool cloneMeshesAsLinked = true) {
+			source.CopyTo(destination, overwrite, cloneAttachments, cloneMeshesAsLinked);
 		}
 
 		public static void CopyTo (this Skin source, Skin destination, bool overwrite, bool cloneAttachments, bool cloneMeshesAsLinked = true) {
