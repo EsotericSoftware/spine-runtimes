@@ -25,6 +25,7 @@ void RegisterMemoryLeakDetector()
 	_setDebugMalloc(_kanjimalloc);
 	#endif
 	_setMalloc(_kanjimalloc);
+	_setRealloc(_kanjirealloc);
 	_setFree(_kanjifree);
 }
 
