@@ -37,11 +37,11 @@ namespace Spine {
 		internal float duration;
 		internal String name;
 
-		public String Name { get { return name; } }
+		public string Name { get { return name; } }
 		public ExposedList<Timeline> Timelines { get { return timelines; } set { timelines = value; } }
 		public float Duration { get { return duration; } set { duration = value; } }
 
-		public Animation (String name, ExposedList<Timeline> timelines, float duration) {
+		public Animation (string name, ExposedList<Timeline> timelines, float duration) {
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
 			if (timelines == null) throw new ArgumentNullException("timelines", "timelines cannot be null.");
 			this.name = name;

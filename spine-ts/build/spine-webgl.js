@@ -1215,7 +1215,7 @@ var spine;
 						first = true;
 						alpha = alphaDip;
 						var dipMix = timelineDipMix[i];
-						if (dipMix != null && dipMix.mixDuration > 0)
+						if (dipMix != null)
 							alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
 						break;
 				}
@@ -1569,7 +1569,8 @@ var spine;
 					for (var ii = mixingToLast; ii >= 0; ii--) {
 						var entry = mixingTo[ii];
 						if (!entry.hasTimeline(id)) {
-							timelineDipMix[i] = entry;
+							if (entry.mixDuration > 0)
+								timelineDipMix[i] = entry;
 							continue outer;
 						}
 					}

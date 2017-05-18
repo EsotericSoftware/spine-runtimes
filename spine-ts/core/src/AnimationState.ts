@@ -220,7 +220,7 @@ module spine {
 					first = true;
 					alpha = alphaDip;
 					let dipMix = timelineDipMix[i];
-					if (dipMix != null && dipMix.mixDuration > 0) alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
+					if (dipMix != null) alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
 					break;
 				}
 				if (timeline instanceof RotateTimeline)
@@ -613,7 +613,7 @@ module spine {
 					for (var ii = mixingToLast; ii >= 0; ii--) {
 						let entry = mixingTo[ii];
 						if (!entry.hasTimeline(id)) {
-							timelineDipMix[i] = entry;
+							if (entry.mixDuration > 0) timelineDipMix[i] = entry;
 							continue outer;
 						}
 					}
