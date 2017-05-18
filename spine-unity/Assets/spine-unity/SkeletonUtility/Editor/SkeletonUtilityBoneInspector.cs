@@ -222,6 +222,8 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
+			BoneFollowerInspector.RecommendRigidbodyButton(utilityBone);
+
 			serializedObject.ApplyModifiedProperties();
 		}
 

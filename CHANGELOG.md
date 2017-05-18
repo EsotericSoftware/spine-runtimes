@@ -77,10 +77,12 @@
      * use the new `Spine/Skeleton Tint Black` shader, or your own shader that treats the UV2 and UV3 streams similarly.
    * **Clipping** is now supported. The SkeletonRenderers switches to slightly slower mesh generation code when clipping so limit your use of `ClippingAttachment`s when using on large numbers of skeletons.
  * **Icons have been added to SpineAttributeDrawers**. This should make your default inspectors easier to understand at a glance.
+ * **[SpineAttribute(includeNone:false)]** SpineAttributes now have an includeNone optional parameter to specify if you want a none ("") value to be an option in the dropdown menu. Default is `includeNone:true`.
  * **SkeletonDebugWindow**. Debugging tools have been moved from the SkeletonRenderer and SkeletonUtility component inspectors into its own utility window. You can access "Skeleton Debug" under the `Advanced...` foldout in the SkeletonRenderer inspector, or in SkeletonRenderer's right-click/context menu.
  * **AttachmentTools source material**. `AttachmentTools` methods can now accept a `sourceMaterial` argument to copy material properties from.
  * The code in the example scripts have been switched over to using properties instead of fields. This is in anticipation of both users who want to move the Spine folders to the Unity Plugins folder (compiled as a different assembly), and of Unity 2017's ability to manually define different assemblies.
- * Warnings and conditionals checking for specific Unity 5.2-and-below incompatibility have been removed.
+ * **AttachmentTools Skin Extensions**. Using AttachmentTools, you can now add entries by slot name by also providing a skeleton argument. Also `Append(Skin)` and `RemoveAttachment` have been added.
+ * **BoneFollower and SkeletonUtilityBone Add RigidBody Button**. The BoneFollower component inspector will now offer to add a `Rigidbody` or `Rigidbody2D` if it detects a collider of the appropriate type. Having a rigidbody on a moving transform with a collider fits better with the Unity physics systems and prevents excess calculations. It will not detect colliders on child objects so you have to add Rigidbody components manually accordingly.
  * `AtasRegionAttacher` and `SpriteAttacher` are now part of `Example Modules`, to reflect that they are meant to be used as sample code rather than production.
  * In the unitypackage, the "spine-csharp" and "spine-unity" folders are now inside a "Spine" folder. This change will only affect fresh imports. Importing the unitypackage to update Spine-Unity in your project will update the appropriate files wherever you have moved them.
  * ** Breaking changes **
@@ -90,7 +92,8 @@
      * Old triangle-winding code has been removed from `SkeletonRenderer`. Please use shaders that have backface culling off.
      * Render settings in `SkeletonGraphic` can now be accessed under `SkeletonGraphic.MeshGenerator.settings`. This is visible in the SkeletonGraphic inspector as `Advanced...`
      * We will continue to bundle the unitypackage with the empty .cs files of deprecated classes until Spine 3.7 to ensure the upgrade process does not break.
-  * `SkeletonAnimator` now has autoreset set to true by default. Old prefabs and scene values will have been serialized to whatever value it was previously. This change only applies to new instances of SkeletonAnimator. 
+  * `SkeletonAnimator` now has autoreset set to true by default. Old prefabs and scene values will have been serialized to whatever value it was previously. This change only applies to new instances of SkeletonAnimator.
+  * Warnings and conditionals checking for specific Unity 5.2-and-below incompatibility have been removed. 
 
 ## Java
  * **Breaking changes**
