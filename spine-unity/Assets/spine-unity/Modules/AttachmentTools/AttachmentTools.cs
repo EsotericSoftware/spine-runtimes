@@ -726,6 +726,10 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			return skin.Attachments.Remove(new Skin.AttachmentKeyTuple(slotIndex, keyName));
 		}
 
+		public static void Clear (this Skin skin) {
+			skin.Attachments.Clear();
+		}
+
 		public static void Append (this Skin destination, Skin source, bool overwrite, bool cloneAttachments, bool cloneMeshesAsLinked = true) {
 			source.CopyTo(destination, overwrite, cloneAttachments, cloneMeshesAsLinked);
 		}
