@@ -114,6 +114,7 @@ namespace Spine.Unity {
 		public bool returnAttachmentPath = false;
 		public bool currentSkinOnly = false;
 		public bool placeholdersOnly = false;
+		public string skinField = "";
 		public string slotField = "";
 
 		/// <summary>
@@ -127,12 +128,13 @@ namespace Spine.Unity {
 		/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives)
 		/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
 		/// </param>
-		public SpineAttachment (bool currentSkinOnly = true, bool returnAttachmentPath = false, bool placeholdersOnly = false, string slotField = "", string dataField = "", bool includeNone = true) {
+		public SpineAttachment (bool currentSkinOnly = true, bool returnAttachmentPath = false, bool placeholdersOnly = false, string slotField = "", string dataField = "", string skinField = "", bool includeNone = true) {
 			this.currentSkinOnly = currentSkinOnly;
 			this.returnAttachmentPath = returnAttachmentPath;
 			this.placeholdersOnly = placeholdersOnly;
 			this.slotField = slotField;
-			this.dataField = dataField;		
+			this.dataField = dataField;
+			this.skinField = skinField;
 			this.includeNone = includeNone;
 		}
 

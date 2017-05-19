@@ -254,8 +254,15 @@ namespace Spine.Unity.Editor {
 			ISkeletonComponent skeletonComponent = GetTargetSkeletonComponent(property);
 			var validSkins = new List<Skin>();
 
+
+
 			if (skeletonComponent != null && targetAttribute.currentSkinOnly) {
-				var currentSkin = skeletonComponent.Skeleton.Skin;
+				Skin currentSkin = null;
+
+				var skinProperty = property.FindPropertyRelative(targetAttribute.skinField);
+				if (skinProperty != null) currentSkin = skeletonComponent.Skeleton.Data.FindSkin(skinProperty.stringValue);
+
+				currentSkin = currentSkin ?? skeletonComponent.Skeleton.Skin;
 				if (currentSkin != null)
 					validSkins.Add(currentSkin);
 				else
