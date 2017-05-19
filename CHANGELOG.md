@@ -89,15 +89,15 @@
    * **Examples now use properties**. The code in the example scripts have been switched over to using properties instead of fields to encourage their use for consistency. This is in anticipation of both users who want to move the Spine folders to the Unity Plugins folder (compiled as a different assembly), and of Unity 2017's ability to manually define different assemblies for shorter compilation times. 
    * **Sample Components**. `AtasRegionAttacher` and `SpriteAttacher` are now part of `Sample Components`, to reflect that they are meant to be used as sample code rather than production. A few other sample components have also been added.
  * **Spine folder**. In the unitypackage, the "spine-csharp" and "spine-unity" folders are now inside a "Spine" folder. This change will only affect fresh imports. Importing the unitypackage to update Spine-Unity in your existing project will update the appropriate files however you chose to arrange them, as long as the meta files are intact.
- * ** Breaking changes **
+ * **Breaking changes**
    * The Sprite shaders module was updated to the latest version from the [source](https://github.com/traggett/UnitySpriteShaders/commits/master). Some changes were made to the underlying keyword structure. You may need to review the settings of your lit materials. Particularly, your Fixed Normals settings.
    * The old MeshGenerator classes, interfaces and code in `Spine.Unity.MeshGeneration` are now deprecated. All mesh-generating components now share the class `Spine.Unity.MeshGenerator` defined in `SpineMesh.cs`. MeshGenerator is a serializable class.
      * The `SkeletonRenderer.renderMeshes` optimization is currently non-functional.
      * Old triangle-winding code has been removed from `SkeletonRenderer`. Please use shaders that have backface culling off.
      * Render settings in `SkeletonGraphic` can now be accessed under `SkeletonGraphic.MeshGenerator.settings`. This is visible in the SkeletonGraphic inspector as `Advanced...`
      * We will continue to bundle the unitypackage with the empty .cs files of deprecated classes until Spine 3.7 to ensure the upgrade process does not break.
-  * `SkeletonAnimator` now has autoreset set to true by default. Old prefabs and scene values will have been serialized to whatever value it was previously. This change only applies to new instances of SkeletonAnimator.
-  * Warnings and conditionals checking for specific Unity 5.2-and-below incompatibility have been removed. 
+   * `SkeletonAnimator` now has autoreset set to true by default. Old prefabs and scene values will have been serialized to whatever value it was previously. This change only applies to new instances of SkeletonAnimator.
+   * Warnings and conditionals checking for specific Unity 5.2-and-below incompatibility have been removed. 
 
 ## Java
  * **Breaking changes**
