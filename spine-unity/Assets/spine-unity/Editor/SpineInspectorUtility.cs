@@ -79,6 +79,20 @@ namespace Spine.Unity.Editor {
 			return EditorGUIUtility.ObjectContent(null, type).image as Texture2D;
 		}
 
+		#region SerializedProperty Helpers
+		public static SerializedProperty FindBaseOrSiblingProperty (this SerializedProperty property, string propertyName) {
+			if (string.IsNullOrEmpty(propertyName)) return null;
+			SerializedProperty relativeProperty = property.serializedObject.FindProperty(propertyName); // baseProperty
+			if (relativeProperty == null) { // If no baseProperty, find sibling property.
+				int nameLength = property.name.Length;
+				string propertyPath = property.propertyPath;
+				propertyPath = propertyPath.Remove(propertyPath.Length - nameLength, nameLength) + propertyName;
+				relativeProperty = property.serializedObject.FindProperty(propertyPath);
+			}
+			return relativeProperty;
+		}
+		#endregion
+
 		#region Layout Scopes
 		static GUIStyle grayMiniLabel;
 		public static GUIStyle GrayMiniLabel {

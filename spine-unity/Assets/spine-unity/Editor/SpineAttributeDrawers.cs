@@ -74,7 +74,7 @@ namespace Spine.Unity.Editor {
 				return;
 			}
 
-			var dataField = property.serializedObject.FindProperty(TargetAttribute.dataField);
+			var dataField = property.FindBaseOrSiblingProperty(TargetAttribute.dataField);
 			if (dataField != null) {
 				if (dataField.objectReferenceValue is SkeletonDataAsset) {
 					skeletonDataAsset = (SkeletonDataAsset)dataField.objectReferenceValue;
@@ -108,7 +108,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		public ISkeletonComponent GetTargetSkeletonComponent (SerializedProperty property) {
-			var dataField = property.serializedObject.FindProperty(TargetAttribute.dataField);
+			var dataField = property.FindBaseOrSiblingProperty(TargetAttribute.dataField);
 
 			if (dataField != null) {
 				var skeletonComponent = dataField.objectReferenceValue as ISkeletonComponent;
@@ -282,10 +282,9 @@ namespace Spine.Unity.Editor {
 				menu.AddSeparator("");
 			}
 
-
 			Skin defaultSkin = data.Skins.Items[0];
+			var slotProperty = property.FindBaseOrSiblingProperty(TargetAttribute.slotField);
 
-			SerializedProperty slotProperty = property.serializedObject.FindProperty(targetAttribute.slotField);
 			string slotMatch = "";
 			if (slotProperty != null) {
 				if (slotProperty.propertyType == SerializedPropertyType.String)
@@ -369,7 +368,7 @@ namespace Spine.Unity.Editor {
 			if (string.IsNullOrEmpty(atlasAssetFieldName))
 				atlasAssetFieldName = "atlasAsset";
 
-			atlasProp = property.serializedObject.FindProperty(atlasAssetFieldName);
+			atlasProp = property.FindBaseOrSiblingProperty(atlasAssetFieldName);
 
 			if (atlasProp == null) {
 				EditorGUI.LabelField(position, "ERROR:", "Must have AtlasAsset variable!");
