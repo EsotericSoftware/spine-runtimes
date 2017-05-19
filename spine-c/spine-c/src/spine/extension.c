@@ -32,6 +32,7 @@
 #include <stdio.h>
 
 static void* (*mallocFunc) (size_t size) = malloc;
+static void* (*reallocFunc) (void* ptr, size_t size) = realloc;
 static void* (*debugMallocFunc) (size_t size, const char* file, int line) = NULL;
 static void (*freeFunc) (void* ptr) = free;
 
@@ -47,7 +48,7 @@ void* _calloc (size_t num, size_t size, const char* file, int line) {
 	return ptr;
 }
 void* _realloc(void* ptr, size_t size) {
-	return realloc(ptr, size);
+	return reallocFunc(ptr, size);
 }
 void _free (void* ptr) {
 	freeFunc(ptr);
@@ -60,6 +61,11 @@ void _setDebugMalloc(void* (*malloc) (size_t size, const char* file, int line)) 
 void _setMalloc (void* (*malloc) (size_t size)) {
 	mallocFunc = malloc;
 }
+
+void _setRealloc (void* (*realloc) (void* ptr, size_t size)) {
+	reallocFunc = realloc;
+}
+
 void _setFree (void (*free) (void* ptr)) {
 	freeFunc = free;
 }

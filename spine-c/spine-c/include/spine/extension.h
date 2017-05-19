@@ -169,6 +169,7 @@ void _free (void* ptr);
 
 void _setMalloc (void* (*_malloc) (size_t size));
 void _setDebugMalloc (void* (*_malloc) (size_t size, const char* file, int line));
+void _setRealloc(void* (*_realloc) (void* ptr, size_t size));
 void _setFree (void (*_free) (void* ptr));
 
 char* _readFile (const char* path, int* length);
