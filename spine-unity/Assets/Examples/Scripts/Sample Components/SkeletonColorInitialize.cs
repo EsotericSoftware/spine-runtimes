@@ -17,19 +17,19 @@ namespace Spine.Unity.Examples {
 			public Color color = Color.white;
 		}
 
+		#if UNITY_EDITOR
 		void OnValidate () {
 			var skeletonComponent = GetComponent<ISkeletonComponent>();
 			if (skeletonComponent != null) {
 				skeletonComponent.Skeleton.SetSlotsToSetupPose();
-
 				var animationStateComponent = GetComponent<IAnimationStateComponent>();
 				if (animationStateComponent != null && animationStateComponent.AnimationState != null) {
 					animationStateComponent.AnimationState.Apply(skeletonComponent.Skeleton);
 				}
 			}
-
 			ApplySettings();
 		}
+		#endif
 
 		void Start () {
 			ApplySettings();
@@ -41,8 +41,11 @@ namespace Spine.Unity.Examples {
 				var skeleton = skeletonComponent.Skeleton;
 				skeleton.SetColor(skeletonColor);
 
-				foreach (var s in slotSettings)
-					skeleton.FindSlot(s.slot).SetColor(s.color);
+				foreach (var s in slotSettings) {
+					var slot = skeleton.FindSlot(s.slot);
+					if (slot != null) slot.SetColor(s.color);
+				}
+					
 			}
 		}
 

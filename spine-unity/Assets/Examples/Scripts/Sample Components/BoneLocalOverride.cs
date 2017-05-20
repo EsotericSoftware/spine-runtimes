@@ -2,9 +2,8 @@
 using Spine;
 using Spine.Unity;
 
-namespace Spine.Unity.Modules {	
+namespace Spine.Unity.Examples {	
 	public class BoneLocalOverride : MonoBehaviour {
-		
 		[SpineBone]
 		public string boneName;
 
@@ -15,11 +14,22 @@ namespace Spine.Unity.Modules {
 		public bool overridePosition = true;
 		public Vector2 localPosition;
 
+		[Space]
 		public bool overrideRotation = true;
 		[Range(0, 360)] public float rotation = 0;
 
 		ISkeletonAnimation spineComponent;
 		Bone bone;
+
+		#if UNITY_EDITOR
+		void OnValidate () {
+			if (Application.isPlaying) return;
+			spineComponent = spineComponent ?? GetComponent<ISkeletonAnimation>();
+			if (spineComponent == null) return;
+			if (bone != null) bone.SetToSetupPose();
+			OverrideLocal(spineComponent);
+		}
+		#endif
 
 		void Awake () {
 			spineComponent = GetComponent<ISkeletonAnimation>();

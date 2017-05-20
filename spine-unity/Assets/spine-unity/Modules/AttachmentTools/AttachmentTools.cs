@@ -164,6 +164,12 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			attachment.scaleY = 1;
 			attachment.rotation = 0;
 
+			attachment.r = 1;
+			attachment.g = 1;
+			attachment.b = 1;
+			attachment.a = 1;
+
+
 			// pass OriginalWidth and OriginalHeight because UpdateOffset uses it in its calculation.
 			attachment.width = attachment.regionOriginalWidth * scale;
 			attachment.height = attachment.regionOriginalHeight * scale;
@@ -708,6 +714,14 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			skin.AddAttachment(slotIndex, keyName, attachment);
 		}
 
+		/// <summary>Gets an attachment from the skin for the specified slot index and name.</summary>
+		public static Attachment GetAttachment (this Skin skin, string slotName, string keyName, Skeleton skeleton) {
+			int slotIndex = skeleton.FindSlotIndex(slotName);
+			if (skeleton == null) throw new System.ArgumentNullException("skeleton", "skeleton cannot be null.");
+			if (slotIndex == -1) throw new System.ArgumentException(string.Format("Slot '{0}' does not exist in skeleton.", slotName), "slotName");
+			return skin.GetAttachment(slotIndex, keyName);
+		}
+
 		/// <summary>Adds an attachment to the skin for the specified slot index and name. If the name already exists for the slot, the previous value is replaced.</summary>
 		public static void SetAttachment (this Skin skin, int slotIndex, string keyName, Attachment attachment) {
 			skin.AddAttachment(slotIndex, keyName, attachment);
@@ -730,8 +744,8 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			skin.Attachments.Clear();
 		}
 
-		public static void Append (this Skin destination, Skin source, bool overwrite, bool cloneAttachments, bool cloneMeshesAsLinked = true) {
-			source.CopyTo(destination, overwrite, cloneAttachments, cloneMeshesAsLinked);
+		public static void Append (this Skin destination, Skin source) {
+			source.CopyTo(destination, true, false);
 		}
 
 		public static void CopyTo (this Skin source, Skin destination, bool overwrite, bool cloneAttachments, bool cloneMeshesAsLinked = true) {
@@ -941,6 +955,53 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		/// For better caching and batching, use GetLinkedMesh(string, AtlasRegion, bool)</summary>
 		public static MeshAttachment GetLinkedMesh (this MeshAttachment o, Sprite sprite, Material materialPropertySource, bool inheritDeform = true) {
 			return o.GetLinkedMesh(sprite, materialPropertySource.shader, inheritDeform, materialPropertySource);
+		}
+		#endregion
+
+		#region RemappedClone Convenience Methods
+		/// <summary>
+		/// Gets a clone of the attachment remapped with a sprite image.</summary>
+		/// <returns>The remapped clone.</returns>
+		/// <param name="o">The original attachment.</param>
+		/// <param name="sprite">The sprite whose texture to use.</param>
+		/// <param name="sourceMaterial">The source material used to copy the shader and material properties from.</param>
+		/// <param name="premultiplyAlpha">If <c>true</c>, a premultiply alpha clone of the original texture will be created.</param>
+		/// <param name="cloneMeshAsLinked">If <c>true</c> MeshAttachments will be cloned as linked meshes and will inherit animation from the original attachment.</param>
+		/// <param name="useOriginalRegionSize">If <c>true</c> the size of the original attachment will be followed, instead of using the Sprite size.</param>
+		public static Attachment GetRemappedClone (this Attachment o, Sprite sprite, Material sourceMaterial, bool premultiplyAlpha = true, bool cloneMeshAsLinked = true, bool useOriginalRegionSize = false) {
+			var atlasRegion = premultiplyAlpha ? sprite.ToAtlasRegionPMAClone(sourceMaterial) : sprite.ToAtlasRegion(false);
+			return o.GetRemappedClone(atlasRegion, cloneMeshAsLinked, useOriginalRegionSize, 1f/sprite.pixelsPerUnit);
+		}
+
+		/// <summary>
+		/// Gets a clone of the attachment remapped with an atlasRegion image.</summary>
+		/// <returns>The remapped clone.</returns>
+		/// <param name="o">The original attachment.</param>
+		/// <param name="atlasRegion">Atlas region.</param>
+		/// <param name="cloneMeshAsLinked">If <c>true</c> MeshAttachments will be cloned as linked meshes and will inherit animation from the original attachment.</param>
+		/// <param name="useOriginalRegionSize">If <c>true</c> the size of the original attachment will be followed, instead of using the Sprite size.</param>
+		/// <param name="scale">Unity units per pixel scale used to scale the atlas region size when not using the original region size.</param>
+		public static Attachment GetRemappedClone (this Attachment o, AtlasRegion atlasRegion, bool cloneMeshAsLinked = true, bool useOriginalRegionSize = false, float scale = 0.01f) {
+			var regionAttachment = o as RegionAttachment;
+			if (regionAttachment != null) {
+				RegionAttachment newAttachment = regionAttachment.GetClone();
+				newAttachment.SetRegion(atlasRegion, false);
+				if (!useOriginalRegionSize) {
+					newAttachment.width = atlasRegion.width * scale;
+					newAttachment.height = atlasRegion.height * scale;
+				}
+				newAttachment.UpdateOffset();
+				return newAttachment;
+			} else {
+				var meshAttachment = o as MeshAttachment;
+				if (meshAttachment != null) {
+					MeshAttachment newAttachment = cloneMeshAsLinked ? meshAttachment.GetLinkedClone(cloneMeshAsLinked) : meshAttachment.GetClone();
+					newAttachment.SetRegion(atlasRegion);
+					return newAttachment;
+				}
+			}
+
+			return o.GetClone(true); // Non-renderable Attachments will return as normal cloned attachments.
 		}
 		#endregion
 	}
