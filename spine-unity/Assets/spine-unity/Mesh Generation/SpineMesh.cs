@@ -667,7 +667,6 @@ namespace Spine.Unity {
 							Array.Resize(ref uv2.Items, totalVertexCount);
 							Array.Resize(ref uv3.Items, totalVertexCount);
 						}
-						Debug.Log(totalVertexCount);
 						uv2.Count = uv3.Count = totalVertexCount;
 					}
 
@@ -684,7 +683,6 @@ namespace Spine.Unity {
 
 						var regionAttachment = attachment as RegionAttachment;
 						if (regionAttachment != null) {
-							Debug.Log(vi);
 							uv2i[vi] = rg; uv2i[vi + 1] = rg; uv2i[vi + 2] = rg; uv2i[vi + 3] = rg;
 							uv3i[vi] = b2; uv3i[vi + 1] = b2; uv3i[vi + 2] = b2; uv3i[vi + 3] = b2;
 							vi += 4;
