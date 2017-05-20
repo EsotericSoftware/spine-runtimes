@@ -305,7 +305,7 @@ namespace Spine.Unity.Editor {
 					prefix = skinPrefix;
 
 				for (int i = 0; i < data.Slots.Count; i++) {
-					if (slotMatch.Length > 0 && !(data.Slots.Items[i].Name.ToLower().Contains(slotMatch)))
+					if (slotMatch.Length > 0 && !(data.Slots.Items[i].Name.Equals(slotMatch, StringComparison.OrdinalIgnoreCase)))
 						continue;
 
 					attachmentNames.Clear();

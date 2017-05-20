@@ -42,36 +42,35 @@ using System.Reflection;
 using System.IO;
 using Spine;
 
-
-/// <summary>
-/// [SUPPORTS]
-/// Linear, Constant, and Bezier Curves* 
-/// Inverse Kinematics*
-/// Inherit Rotation
-/// Translate Timeline
-/// Rotate Timeline
-/// Scale Timeline**
-/// Event Timeline***
-/// Attachment Timeline
-/// 
-/// RegionAttachment
-/// MeshAttachment
-/// SkinnedMeshAttachment
-/// 
-/// [LIMITATIONS]
-/// *Inverse Kinematics & Bezier Curves are baked into the animation at 60fps and are not realtime. Use bakeIncrement constant to adjust key density if desired.
-/// **Non-uniform Scale Keys  (ie:  if ScaleX and ScaleY are not equal to eachother, it will not be accurate to Spine source)
-/// ***Events may only fire 1 type of data per event in Unity safely so priority to String data if present in Spine key, otherwise a Float is sent whether the Spine key was Int or Float with priority given to Int.
-/// 
-/// [DOES NOT SUPPORT]
-/// FlipX or FlipY (Maybe one day)
-/// FFD (Unity does not provide access to BlendShapes with code)
-/// Color Keys (Maybe one day when Unity supports full FBX standard and provides access with code)
-/// InheritScale (Never.  Unity and Spine do scaling very differently)
-/// Draw Order Keyframes
-/// </summary>
-/// 
 namespace Spine.Unity.Editor {
+
+	/// <summary>
+	/// [SUPPORTS]
+	/// Linear, Constant, and Bezier Curves* 
+	/// Inverse Kinematics*
+	/// Inherit Rotation
+	/// Translate Timeline
+	/// Rotate Timeline
+	/// Scale Timeline**
+	/// Event Timeline***
+	/// Attachment Timeline
+	/// 
+	/// RegionAttachment
+	/// MeshAttachment
+	/// SkinnedMeshAttachment
+	/// 
+	/// [LIMITATIONS]
+	/// *Inverse Kinematics & Bezier Curves are baked into the animation at 60fps and are not realtime. Use bakeIncrement constant to adjust key density if desired.
+	/// **Non-uniform Scale Keys  (ie:  if ScaleX and ScaleY are not equal to eachother, it will not be accurate to Spine source)
+	/// ***Events may only fire 1 type of data per event in Unity safely so priority to String data if present in Spine key, otherwise a Float is sent whether the Spine key was Int or Float with priority given to Int.
+	/// 
+	/// [DOES NOT SUPPORT]
+	/// FlipX or FlipY (Maybe one day)
+	/// FFD (Unity does not provide access to BlendShapes with code)
+	/// Color Keys (Maybe one day when Unity supports full FBX standard and provides access with code)
+	/// InheritScale (Never.  Unity and Spine do scaling very differently)
+	/// Draw Order Keyframes
+	/// </summary>
 	public static class SkeletonBaker {
 
 		#region SkeletonAnimator's Mecanim Clips
