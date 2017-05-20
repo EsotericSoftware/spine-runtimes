@@ -88,7 +88,7 @@ namespace Spine.Unity {
 
 			if (layerMixModes.Length < animator.layerCount)
 				System.Array.Resize<MixMode>(ref layerMixModes, animator.layerCount);
-			
+
 			//skeleton.Update(Time.deltaTime); // Doesn't actually do anything, currently. (Spine 3.5).
 
 			// Clear Previous
@@ -132,10 +132,10 @@ namespace Spine.Unity {
 				bool hasNext = nextStateInfo.fullPathHash != 0;
 				AnimatorClipInfo[] clipInfo = animator.GetCurrentAnimatorClipInfo(layer);
 				AnimatorClipInfo[] nextClipInfo = animator.GetNextAnimatorClipInfo(layer);
-//				UNITY 4
-//				bool hasNext = nextStateInfo.nameHash != 0;
-//				var clipInfo = animator.GetCurrentAnimationClipState(i);
-//				var nextClipInfo = animator.GetNextAnimationClipState(i);
+				//UNITY 4
+				//bool hasNext = nextStateInfo.nameHash != 0;
+				//var clipInfo = animator.GetCurrentAnimationClipState(i);
+				//var nextClipInfo = animator.GetNextAnimationClipState(i);
 
 				MixMode mode = layerMixModes[layer];
 				if (mode == MixMode.AlwaysMix) {
@@ -201,19 +201,17 @@ namespace Spine.Unity {
 		}
 
 		static float AnimationTime (float normalizedTime, float clipLength, bool loop, bool reversed) {
-			if(reversed){
-				normalizedTime = (1-normalizedTime+(int)normalizedTime) + (int)normalizedTime;
-			}
+			if (reversed)
+				normalizedTime = (1-normalizedTime + (int)normalizedTime) + (int)normalizedTime;
 			float time = normalizedTime * clipLength;
 			if (loop) return time;
 			const float EndSnapEpsilon = 1f/30f; // Workaround for end-duration keys not being applied.
 			return (clipLength - time < EndSnapEpsilon) ? clipLength : time; // return a time snapped to clipLength;
 		}
 
-		static float AnimationTime(float normalizedTime, float clipLength, bool reversed) {
-			if(reversed){
-				normalizedTime = (1-normalizedTime+(int)normalizedTime) + (int)normalizedTime;
-			}
+		static float AnimationTime (float normalizedTime, float clipLength, bool reversed) {
+			if (reversed)
+				normalizedTime = (1-normalizedTime + (int)normalizedTime) + (int)normalizedTime;
 
 			return normalizedTime * clipLength;
 		}
