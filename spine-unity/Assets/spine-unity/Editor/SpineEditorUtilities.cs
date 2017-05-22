@@ -82,7 +82,7 @@ namespace Spine.Unity.Editor {
 
 			public static Texture2D info;
 
-//			public static Texture2D unityIcon;
+			public static Texture2D unity;
 //			public static Texture2D controllerIcon;
 
 			public static void Initialize () {
@@ -120,7 +120,7 @@ namespace Spine.Unity.Editor {
 				path = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-path.png");
 
 				info = EditorGUIUtility.FindTexture("console.infoicon.sml");
-//				unityIcon = EditorGUIUtility.FindTexture("SceneAsset Icon");
+				unity = EditorGUIUtility.FindTexture("SceneAsset Icon");
 //				controllerIcon = EditorGUIUtility.FindTexture("AnimatorController Icon");
 			}
 

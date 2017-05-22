@@ -67,6 +67,18 @@ namespace Spine.Unity {
 						Debug.LogError("Unity UI does not support multiple textures per Renderer. Your skeleton will not be rendered correctly. Recommend using SkeletonAnimation instead. This requires the use of a Screen space camera canvas.");
 				} else {
 					if (freeze) return;
+
+					if (!string.IsNullOrEmpty(initialSkinName)) {
+						var skin = skeleton.data.FindSkin(initialSkinName);
+						if (skin != null) {
+							if (skin == skeleton.data.defaultSkin)
+								skeleton.SetSkin((Skin)null);
+							else
+								skeleton.SetSkin(skin);
+						}
+							
+					}
+
 					skeleton.SetToSetupPose();
 					if (!string.IsNullOrEmpty(startingAnimation))
 						skeleton.PoseWithAnimation(startingAnimation, 0f, false);
@@ -170,6 +182,10 @@ namespace Spine.Unity {
 		public Spine.Unity.MeshGenerator MeshGenerator { get { return this.meshGenerator; } }
 		DoubleBuffered<Spine.Unity.MeshRendererBuffers.SmartMesh> meshBuffers;
 		SkeletonRendererInstruction currentInstructions = new SkeletonRendererInstruction();
+
+		public Mesh GetLastMesh () {
+			return meshBuffers.GetCurrent().mesh;
+		}
 
 		public event UpdateBonesDelegate UpdateLocal;
 		public event UpdateBonesDelegate UpdateWorld;

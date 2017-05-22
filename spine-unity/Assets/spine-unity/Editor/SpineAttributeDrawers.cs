@@ -245,6 +245,64 @@ namespace Spine.Unity.Editor {
 
 	}
 
+	[CustomPropertyDrawer(typeof(SpineIkConstraint))]
+	public class SpineIkConstraintDrawer : SpineTreeItemDrawerBase<SpineIkConstraint> {
+
+		protected override Texture2D Icon {	get { return SpineEditorUtilities.Icons.constraintIK; } }
+
+		protected override void PopulateMenu (GenericMenu menu, SerializedProperty property, SpineIkConstraint targetAttribute, SkeletonData data) {
+			var constraints = skeletonDataAsset.GetSkeletonData(false).IkConstraints;
+
+			if (TargetAttribute.includeNone)
+				menu.AddItem(new GUIContent(NoneString), string.IsNullOrEmpty(property.stringValue), HandleSelect, new SpineDrawerValuePair(string.Empty, property));
+
+			for (int i = 0; i < constraints.Count; i++) {
+				string name = constraints.Items[i].Name;
+				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal))
+					menu.AddItem(new GUIContent(name), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
+			}
+		}
+
+	}
+
+	[CustomPropertyDrawer(typeof(SpineTransformConstraint))]
+	public class SpineTransformConstraintDrawer : SpineTreeItemDrawerBase<SpineTransformConstraint> {
+
+		protected override Texture2D Icon {	get { return SpineEditorUtilities.Icons.constraintTransform; } }
+
+		protected override void PopulateMenu (GenericMenu menu, SerializedProperty property, SpineTransformConstraint targetAttribute, SkeletonData data) {
+			var constraints = skeletonDataAsset.GetSkeletonData(false).TransformConstraints;
+
+			if (TargetAttribute.includeNone)
+				menu.AddItem(new GUIContent(NoneString), string.IsNullOrEmpty(property.stringValue), HandleSelect, new SpineDrawerValuePair(string.Empty, property));
+
+			for (int i = 0; i < constraints.Count; i++) {
+				string name = constraints.Items[i].Name;
+				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal))
+					menu.AddItem(new GUIContent(name), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
+			}
+		}
+	}
+
+	[CustomPropertyDrawer(typeof(SpinePathConstraint))]
+	public class SpinePathConstraintDrawer : SpineTreeItemDrawerBase<SpinePathConstraint> {
+
+		protected override Texture2D Icon {	get { return SpineEditorUtilities.Icons.constraintPath; } }
+
+		protected override void PopulateMenu (GenericMenu menu, SerializedProperty property, SpinePathConstraint targetAttribute, SkeletonData data) {
+			var constraints = skeletonDataAsset.GetSkeletonData(false).PathConstraints;
+
+			if (TargetAttribute.includeNone)
+				menu.AddItem(new GUIContent(NoneString), string.IsNullOrEmpty(property.stringValue), HandleSelect, new SpineDrawerValuePair(string.Empty, property));
+
+			for (int i = 0; i < constraints.Count; i++) {
+				string name = constraints.Items[i].Name;
+				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal))
+					menu.AddItem(new GUIContent(name), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
+			}
+		}
+	}
+
 	[CustomPropertyDrawer(typeof(SpineAttachment))]
 	public class SpineAttachmentDrawer : SpineTreeItemDrawerBase<SpineAttachment> {
 

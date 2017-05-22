@@ -259,10 +259,10 @@ namespace Spine.Unity.Editor {
 		void DrawUnityTools () {
 			#if SPINE_SKELETON_ANIMATOR
 			using (new SpineInspectorUtility.BoxScope()) {
-				isMecanimExpanded = EditorGUILayout.Foldout(isMecanimExpanded, SpineInspectorUtility.TempContent("SkeletonAnimator", SpineInspectorUtility.UnityIcon(typeof(SceneAsset))));
+				isMecanimExpanded = EditorGUILayout.Foldout(isMecanimExpanded, SpineInspectorUtility.TempContent("SkeletonAnimator", SpineInspectorUtility.UnityIcon<SceneAsset>()));
 				if (isMecanimExpanded) {
 					EditorGUI.indentLevel++;
-					EditorGUILayout.PropertyField(controller, SpineInspectorUtility.TempContent("Controller", SpineInspectorUtility.UnityIcon(typeof(Animator))));		
+					EditorGUILayout.PropertyField(controller, SpineInspectorUtility.TempContent("Controller", SpineInspectorUtility.UnityIcon<Animator>()));		
 					if (controller.objectReferenceValue == null) {
 
 						// Generate Mecanim Controller Button

@@ -75,13 +75,14 @@
    * **Two color tinting** is currently supported via extra UV2 and UV3 mesh vertex streams. To use Two color tinting, you need to:
      * switch on "Tint Black" under "Advanced...",
      * use the new `Spine/Skeleton Tint Black` shader, or your own shader that treats the UV2 and UV3 streams similarly.
-   * **Clipping** is now supported. The SkeletonRenderers switches to slightly slower mesh generation code when clipping so limit your use of `ClippingAttachment`s when using on large numbers of skeletons.
+   * **Clipping** is now supported. The SkeletonAnimation switches to slightly slower mesh generation code when clipping so limit your use of `ClippingAttachment`s when using on large numbers of skeletons.
  * **[SpineAttribute] Improvements** 
    * **Icons have been added to SpineAttributeDrawers**. This should make your default inspectors easier to understand at a glance.
+   * **Added Constraint Attributes** You can now use `[SpineIkConstraint]` `[SpineTransformConstraint]` `[SpinePathConstraint]`
    * **SpineAttribute dataField** parameter can also now detect sibling fields within arrays and serializable structs/classes.
    * **[SpineAttribute(includeNone:false)]** SpineAttributes now have an `includeNone` optional parameter to specify if you want to include or exclude a none ("") value option in the dropdown menu. Default is `includeNone:true`.
    * **[SpineAttachment(skinField:"mySkin")]** The SpineAttachment attribute now has a skinField optional parameter to limit the dropdown items to attachments in a specific skin instead of the just default skin or all the skins in SkeletonData.
- * **SkeletonDebugWindow**. Debugging tools have been moved from the SkeletonRenderer and SkeletonUtility component inspectors into its own utility window. You can access "Skeleton Debug" under the `Advanced...` foldout in the SkeletonRenderer inspector, or in SkeletonRenderer's right-click/context menu.
+ * **SkeletonDebugWindow**. Debugging tools have been moved from the SkeletonAnimation and SkeletonUtility component inspectors into its own utility window. You can access "Skeleton Debug" under the `Advanced...` foldout in the SkeletonAnimation inspector, or in SkeletonAnimation's right-click/context menu.
    * **Skeleton Baking Window** The old Skeleton Baking feature is also now accessible through the SkeletonDataAsset's right-click/context menu.
  * **AttachmentTools source material**. `AttachmentTools` methods can now accept a `sourceMaterial` argument to copy material properties from.
  * **AttachmentTools Skin Extensions**. Using AttachmentTools, you can now add entries by slot name by also providing a skeleton argument. Also `Append(Skin)`, `RemoveAttachment` and `Clear` have been added.

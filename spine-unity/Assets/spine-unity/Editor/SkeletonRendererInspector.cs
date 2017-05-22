@@ -294,7 +294,7 @@ namespace Spine.Unity.Editor {
 						EditorGUILayout.Space();
 
 						using (new SpineInspectorUtility.LabelWidthScope()) {
-							EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Vertex Data", SpineInspectorUtility.UnityIcon(typeof(MeshFilter))), EditorStyles.boldLabel);
+							EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Vertex Data", SpineInspectorUtility.UnityIcon<MeshFilter>()), EditorStyles.boldLabel);
 							if (pmaVertexColors != null) EditorGUILayout.PropertyField(pmaVertexColors, PMAVertexColorsLabel);
 							EditorGUILayout.PropertyField(tintBlack, TintBlackLabel);
 
