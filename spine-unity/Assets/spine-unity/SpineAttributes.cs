@@ -50,11 +50,12 @@ namespace Spine.Unity {
 		/// Smart popup menu for Spine Slots
 		/// </summary>
 		/// <param name="startsWith">Filters popup results to elements that begin with supplied string.</param>
+		/// <param name="containsBoundingBoxes">Disables popup results that don't contain bounding box attachments when true.</param>
+		/// <param name = "includeNone">If true, the dropdown list will include a "none" option which stored as an empty string.</param>
 		/// <param name="dataField">If specified, a locally scoped field with the name supplied by in dataField will be used to fill the popup results.
 		/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives).
 		/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
 		/// </param>
-		/// <param name="containsBoundingBoxes">Disables popup results that don't contain bounding box attachments when true.</param>
 		public SpineSlot(string startsWith = "", string dataField = "", bool containsBoundingBoxes = false, bool includeNone = true) {
 			this.startsWith = startsWith;
 			this.dataField = dataField;
@@ -68,6 +69,7 @@ namespace Spine.Unity {
 		/// Smart popup menu for Spine Events (Spine.EventData)
 		/// </summary>
 		/// <param name="startsWith">Filters popup results to elements that begin with supplied string.</param>
+		/// <param name = "includeNone">If true, the dropdown list will include a "none" option which stored as an empty string.</param>
 		/// <param name="dataField">If specified, a locally scoped field with the name supplied by in dataField will be used to fill the popup results.
 		/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives).
 		/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
@@ -79,11 +81,63 @@ namespace Spine.Unity {
 		}
 	}
 
+	public class SpineIkConstraint : SpineAttributeBase {
+		/// <summary>
+		/// Smart popup menu for Spine IK Constraints (Spine.IkConstraint)
+		/// </summary>
+		/// <param name="startsWith">Filters popup results to elements that begin with supplied string.</param>
+		/// <param name = "includeNone">If true, the dropdown list will include a "none" option which stored as an empty string.</param>
+		/// <param name="dataField">If specified, a locally scoped field with the name supplied by in dataField will be used to fill the popup results.
+		/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives).
+		/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
+		/// </param>
+		public SpineIkConstraint(string startsWith = "", string dataField = "", bool includeNone = true) {
+			this.startsWith = startsWith;
+			this.dataField = dataField;
+			this.includeNone = includeNone;
+		}
+	}
+
+	public class SpinePathConstraint : SpineAttributeBase {
+		/// <summary>
+		/// Smart popup menu for Spine Events (Spine.PathConstraint)
+		/// </summary>
+		/// <param name="startsWith">Filters popup results to elements that begin with supplied string.</param>
+		/// <param name = "includeNone">If true, the dropdown list will include a "none" option which stored as an empty string.</param>
+		/// <param name="dataField">If specified, a locally scoped field with the name supplied by in dataField will be used to fill the popup results.
+		/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives).
+		/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
+		/// </param>
+		public SpinePathConstraint(string startsWith = "", string dataField = "", bool includeNone = true) {
+			this.startsWith = startsWith;
+			this.dataField = dataField;
+			this.includeNone = includeNone;
+		}
+	}
+
+	public class SpineTransformConstraint : SpineAttributeBase {
+		/// <summary>
+		/// Smart popup menu for Spine Transform Constraints (Spine.TransformConstraint)
+		/// </summary>
+		/// <param name="startsWith">Filters popup results to elements that begin with supplied string.</param>
+		/// <param name = "includeNone">If true, the dropdown list will include a "none" option which stored as an empty string.</param>
+		/// <param name="dataField">If specified, a locally scoped field with the name supplied by in dataField will be used to fill the popup results.
+		/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives).
+		/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
+		/// </param>
+		public SpineTransformConstraint(string startsWith = "", string dataField = "", bool includeNone = true) {
+			this.startsWith = startsWith;
+			this.dataField = dataField;
+			this.includeNone = includeNone;
+		}
+	}
+
 	public class SpineSkin : SpineAttributeBase {
 		/// <summary>
 		/// Smart popup menu for Spine Skins
 		/// </summary>
 		/// <param name="startsWith">Filters popup results to elements that begin with supplied string.</param>
+		/// <param name = "includeNone">If true, the dropdown list will include a "none" option which stored as an empty string.</param>
 		/// <param name="dataField">If specified, a locally scoped field with the name supplied by in dataField will be used to fill the popup results.
 		/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives)
 		/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
@@ -100,6 +154,7 @@ namespace Spine.Unity {
 		/// </summary>
 		/// <param name="startsWith">Filters popup results to elements that begin with supplied string.</param>
 		/// <param name="dataField">If specified, a locally scoped field with the name supplied by in dataField will be used to fill the popup results.
+		/// <param name="includeNone">If true, the dropdown list will include a "none" option which stored as an empty string.</param>
 		/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives)
 		/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
 		/// </param>
@@ -124,6 +179,8 @@ namespace Spine.Unity {
 		/// <param name="returnAttachmentPath">Returns a fully qualified path for an Attachment in the format "Skin/Slot/AttachmentName". This path format is only used by the SpineAttachment helper methods like SpineAttachment.GetAttachment and .GetHierarchy. Do not use full path anywhere else in Spine's system.</param>
 		/// <param name="placeholdersOnly">Filters popup results to exclude attachments that are not children of Skin Placeholders</param>
 		/// <param name="slotField">If specified, a locally scoped field with the name supplied by in slotField will be used to limit the popup results to children of a named slot</param>
+		/// <param name="skinField">If specified, a locally scoped field with the name supplied by in skinField will be used to limit the popup results to entries of the named skin</param>
+		/// <param name="includeNone">If true, the dropdown list will include a "none" option which stored as an empty string.</param>
 		/// <param name="dataField">If specified, a locally scoped field with the name supplied by in dataField will be used to fill the popup results.
 		/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives)
 		/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
@@ -184,6 +241,7 @@ namespace Spine.Unity {
 		/// Smart popup menu for Spine Bones
 		/// </summary>
 		/// <param name="startsWith">Filters popup results to elements that begin with supplied string.</param>
+		/// /// <param name="includeNone">If true, the dropdown list will include a "none" option which stored as an empty string.</param>
 		/// <param name="dataField">If specified, a locally scoped field with the name supplied by in dataField will be used to fill the popup results.
 		/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives)
 		/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.

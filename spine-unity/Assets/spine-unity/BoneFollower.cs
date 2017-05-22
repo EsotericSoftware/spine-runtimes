@@ -125,10 +125,7 @@ namespace Spine.Unity {
 			if (skeletonTransformIsParent) {
 				// Recommended setup: Use local transform properties if Spine GameObject is the immediate parent
 				thisTransform.localPosition = new Vector3(bone.worldX, bone.worldY, followZPosition ? 0f : thisTransform.localPosition.z);
-				if (followBoneRotation) {
-					var halfRotation = Mathf.Atan2(bone.c, bone.a) * 0.5f;
-					thisTransform.localRotation = new Quaternion(0, 0, Mathf.Sin(halfRotation), Mathf.Cos(halfRotation)); //thisTransform.localRotation = Quaternion.Euler(0f, 0f, bone.WorldRotationX);
-				}
+				if (followBoneRotation) thisTransform.localRotation = bone.GetQuaternion();
 			} else {
 				// For special cases: Use transform world properties if transform relationship is complicated
 				Vector3 targetWorldPosition = skeletonTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY, 0f));
