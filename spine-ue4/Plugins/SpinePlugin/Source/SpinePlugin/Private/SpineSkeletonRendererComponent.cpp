@@ -171,8 +171,17 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 
 void USpineSkeletonRendererComponent::Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector>& Colors2, UMaterialInstanceDynamic* Material) {
 	if (Vertices.Num() == 0) return;
-	SetMaterial(Idx, Material);	
-	CreateMeshSection(Idx, Vertices, Indices, TArray<FVector>(), Uvs, Colors, TArray<FRuntimeMeshTangent>(), false);
+	SetMaterial(Idx, Material);
+	TArray<FVector2D> darkRG;
+	TArray<FVector2D> darkB;
+
+	for (int32 i = 0; i < Colors2.Num(); i++) {
+		FVector darkColor = Colors2[i];
+		darkRG.Add(FVector2D(darkColor.X, darkColor.Y));
+		darkB.Add(FVector2D(darkColor.Z, 0));
+	}
+
+	CreateMeshSection(Idx, Vertices, Indices, TArray<FVector>(), Uvs, darkRG, Colors, TArray<FRuntimeMeshTangent>(), false);
 	Vertices.SetNum(0);
 	Indices.SetNum(0);
 	Uvs.SetNum(0);
@@ -288,7 +297,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 
 		float dr = slot->darkColor ? slot->darkColor->r : 0.0f;
 		float dg = slot->darkColor ? slot->darkColor->g : 0.0f;
-		float db = slot->darkColor ? slot->darkColor->b : 0.0f;
+		float db = slot->darkColor ? slot->darkColor->b : 0.0f;		
 
 		for (int j = 0; j < numVertices << 1; j += 2) {
 			colors.Add(FColor(r, g, b, a));

@@ -31,7 +31,6 @@
 #pragma once
 
 #include "Components/ActorComponent.h"
-#include "ProceduralMeshComponent.h"
 #include "RuntimeMeshComponent.h"
 #include "SpineSkeletonAnimationComponent.h"
 #include "SpineSkeletonRendererComponent.generated.h"
