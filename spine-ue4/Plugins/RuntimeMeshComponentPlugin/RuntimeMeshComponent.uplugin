@@ -1,0 +1,29 @@
+{
+  "FileVersion": 3,
+  "Version": 2,
+  "VersionName": "2.0",
+  "FriendlyName": "Runtime Mesh Component",
+  "Description": "A renderable component with utilities for creating and modifying mesh geometry procedurally at runtime.",
+  "Category": "Rendering",
+	"CreatedBy" : "Chris Conway (Koderz)",
+	"CreatedByURL" : "https://forums.unrealengine.com/member.php?141752-Koderz",
+  "DocsURL": "https://github.com/Koderz/UE4RuntimeMeshComponent/wiki",
+  "MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/ad0b45a6a31e462aba7cf7c790a9c125",
+  "SupportURL": "https://github.com/Koderz/UE4RuntimeMeshComponent/issues",
+  "EnabledByDefault": true,
+  "CanContainContent": false,
+  "IsBetaVersion": false,
+  "Installed": false,
+  "Modules": [
+    {
+      "Name": "RuntimeMeshComponent",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    },
+		{
+			"Name" : "RuntimeMeshComponentEditor",
+			"Type" : "Editor",
+			"LoadingPhase" : "Default"
+		}
+  ]
+}

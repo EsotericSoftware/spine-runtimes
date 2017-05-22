@@ -36,7 +36,7 @@
 #define LOCTEXT_NAMESPACE "Spine"
 
 USpineSkeletonRendererComponent::USpineSkeletonRendererComponent (const FObjectInitializer& ObjectInitializer) 
-: UProceduralMeshComponent(ObjectInitializer) {
+: URuntimeMeshComponent(ObjectInitializer) {
 	bWantsBeginPlay = true;
 	PrimaryComponentTick.bCanEverTick = true;
 	bTickInEditor = true;
@@ -169,10 +169,10 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 	}
 }
 
-void USpineSkeletonRendererComponent::Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FProcMeshTangent>& Colors2, UMaterialInstanceDynamic* Material) {
+void USpineSkeletonRendererComponent::Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector>& Colors2, UMaterialInstanceDynamic* Material) {
 	if (Vertices.Num() == 0) return;
-	SetMaterial(Idx, Material);
-	CreateMeshSection(Idx, Vertices, Indices, TArray<FVector>(), Uvs, Colors, TArray<FProcMeshTangent>(), false);
+	SetMaterial(Idx, Material);	
+	CreateMeshSection(Idx, Vertices, Indices, TArray<FVector>(), Uvs, Colors, TArray<FRuntimeMeshTangent>(), false);
 	Vertices.SetNum(0);
 	Indices.SetNum(0);
 	Uvs.SetNum(0);
@@ -186,7 +186,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 	TArray<int32> indices;
 	TArray<FVector2D> uvs;
 	TArray<FColor> colors;
-	TArray<FProcMeshTangent> darkColors;
+	TArray<FVector> darkColors;
 	
 	int idx = 0;
 	int meshSection = 0;
@@ -292,7 +292,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 
 		for (int j = 0; j < numVertices << 1; j += 2) {
 			colors.Add(FColor(r, g, b, a));
-			darkColors.Add(FProcMeshTangent(dr, dg, db));
+			darkColors.Add(FVector(dr, dg, db));
 			vertices.Add(FVector(attachmentVertices[j], depthOffset, attachmentVertices[j + 1]));
 			uvs.Add(FVector2D(attachmentUvs[j], attachmentUvs[j + 1]));
 		}
@@ -307,7 +307,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 		spSkeletonClipping_clipEnd(clipper, slot);			
 	}
 	
-	Flush(meshSection, vertices, indices, uvs, colors,darkColors, lastMaterial);
+	Flush(meshSection, vertices, indices, uvs, colors, darkColors, lastMaterial);
 	spSkeletonClipping_clipEnd2(clipper);
 }
 

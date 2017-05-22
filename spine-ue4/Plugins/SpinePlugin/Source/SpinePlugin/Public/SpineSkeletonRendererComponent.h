@@ -32,12 +32,13 @@
 
 #include "Components/ActorComponent.h"
 #include "ProceduralMeshComponent.h"
+#include "RuntimeMeshComponent.h"
 #include "SpineSkeletonAnimationComponent.h"
 #include "SpineSkeletonRendererComponent.generated.h"
 
 
 UCLASS(ClassGroup=(Spine), meta=(BlueprintSpawnableComponent))
-class SPINEPLUGIN_API USpineSkeletonRendererComponent: public UProceduralMeshComponent {
+class SPINEPLUGIN_API USpineSkeletonRendererComponent: public URuntimeMeshComponent {
 	GENERATED_BODY()
 
 public: 
@@ -73,7 +74,7 @@ public:
 protected:
 	void UpdateMesh (spSkeleton* Skeleton);
 
-	void Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FProcMeshTangent> &Colors2, UMaterialInstanceDynamic* Material);
+	void Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector> &Colors2, UMaterialInstanceDynamic* Material);
 	
 	// Need to hold on to the dynamic instances, or the GC will kill us while updating them
 	UPROPERTY()
