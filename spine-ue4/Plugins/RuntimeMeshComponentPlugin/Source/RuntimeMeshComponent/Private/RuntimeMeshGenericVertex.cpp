@@ -7,6 +7,7 @@
 // Finish all the built in vertex types.
 DEFINE_RUNTIME_MESH_VERTEX(FRuntimeMeshVertexSimple);
 DEFINE_RUNTIME_MESH_VERTEX(FRuntimeMeshVertexDualUV);
+DEFINE_RUNTIME_MESH_VERTEX(FRuntimeMeshVertexTripleUV);
 DEFINE_RUNTIME_MESH_VERTEX(FRuntimeMeshVertexNoPosition);
 DEFINE_RUNTIME_MESH_VERTEX(FRuntimeMeshVertexNoPositionDualUV);
 DEFINE_RUNTIME_MESH_VERTEX(FRuntimeMeshVertexHiPrecisionNormals);
@@ -21,7 +22,8 @@ const FRuntimeMeshVertexTypeInfo* FRuntimeMeshComponentVerticesBuilder::GetVerte
 {
 	if (HasUVComponent(1))
 	{
-		return &FRuntimeMeshVertexDualUV::TypeInfo;
+		if (HasUVComponent(2)) return &FRuntimeMeshVertexTripleUV::TypeInfo;
+		else return &FRuntimeMeshVertexDualUV::TypeInfo;
 	}
 	else
 	{

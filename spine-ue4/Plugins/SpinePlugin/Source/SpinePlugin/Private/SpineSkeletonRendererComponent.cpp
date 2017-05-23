@@ -169,19 +169,19 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 	}
 }
 
+
 void USpineSkeletonRendererComponent::Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector>& Colors2, UMaterialInstanceDynamic* Material) {
 	if (Vertices.Num() == 0) return;
 	SetMaterial(Idx, Material);
-	TArray<FVector2D> darkRG;
-	TArray<FVector2D> darkB;
 
-	for (int32 i = 0; i < Colors2.Num(); i++) {
-		FVector darkColor = Colors2[i];
-		darkRG.Add(FVector2D(darkColor.X, darkColor.Y));
-		darkB.Add(FVector2D(darkColor.Z, 0));
+	TArray<FRuntimeMeshVertexTripleUV> verts;
+	for (int32 i = 0; i < Vertices.Num(); i++) {
+		verts.Add(FRuntimeMeshVertexTripleUV(Vertices[i], FVector(), FVector(), Colors[i], Uvs[i], FVector2D(Colors2[i].X, Colors2[i].Y), FVector2D(Colors2[i].Z, 0)));
 	}
 
-	CreateMeshSection(Idx, Vertices, Indices, TArray<FVector>(), Uvs, darkRG, Colors, TArray<FRuntimeMeshTangent>(), false);
+	CreateMeshSection(Idx, verts, Indices);
+
+	// CreateMeshSection(Idx, Vertices, Indices, TArray<FVector>(), Uvs, darkRG, Colors, TArray<FRuntimeMeshTangent>(), false);
 	Vertices.SetNum(0);
 	Indices.SetNum(0);
 	Uvs.SetNum(0);
