@@ -706,7 +706,7 @@ namespace Spine {
 					for (int ii = mixingToLast; ii >= 0; ii--) {
 						var entry = mixingTo[ii];
 						if (!entry.HasTimeline(id)) {
-							timelineDipMixItems[i] = entry;
+							if (entry.mixDuration > 0) timelineDipMixItems[i] = entry;
 							goto outer; // continue outer;
 						}
 					}
