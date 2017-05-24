@@ -46,7 +46,7 @@ package spine.animation {
 		public var eventThreshold : Number, attachmentThreshold : Number, drawOrderThreshold : Number;
 		public var animationStart : Number, animationEnd : Number, animationLast : Number, nextAnimationLast : Number;
 		public var delay : Number, trackTime : Number, trackLast : Number, nextTrackLast : Number, trackEnd : Number, timeScale : Number;
-		public var alpha : Number, mixTime : Number, mixDuration : Number, interruptAlpha : Number;
+		public var alpha : Number, mixTime : Number, mixDuration : Number, interruptAlpha : Number, totalAlpha : Number;
 		public var timelineData : Vector.<int> = new Vector.<int>();
 		public var timelineDipMix : Vector.<TrackEntry> = new Vector.<TrackEntry>();
 		public var timelinesRotation : Vector.<Number> = new Vector.<Number>();
@@ -89,6 +89,7 @@ package spine.animation {
 			var timelinesCount : int = animation.timelines.length;
 			var timelineData : Vector.<int> = this.timelineData;
 			timelineData.length = timelinesCount;
+			this.timelineDipMix.length = 0;
 			var timelineDipMix : Vector.<TrackEntry> = this.timelineDipMix;
 			timelineDipMix.length = timelinesCount;
 
@@ -101,16 +102,19 @@ package spine.animation {
 					timelineData[i] = AnimationState.SUBSEQUENT;
 				} else if (to == null || !to.hasTimeline(intId))
 					timelineData[i] = AnimationState.FIRST;
-				else {
-					timelineData[i] = AnimationState.DIP;
+				else {					
 					for (var ii : int = mixingToLast; ii >= 0; ii--) {
 						var entry : TrackEntry = mixingTo[ii];
 						if (!entry.hasTimeline(intId)) {
-							if (entry.mixDuration > 0) timelineDipMix[i] = entry;
-							continue outer;
-						}
+							if (entry.mixDuration > 0) {
+								timelineData[i] = AnimationState.DIP_MIX;							
+								timelineDipMix[i] = entry;
+								continue outer;
+							}
+							break;
+						}						
 					}
-					timelineDipMix[i] = null;
+					timelineData[i] = AnimationState.DIP;
 				}
 			}
 			return lastEntry;
