@@ -258,7 +258,7 @@ namespace Spine {
 			updateCache.Add(bone);
 		}
 
-		private void SortReset (ExposedList<Bone> bones) {
+		private static void SortReset (ExposedList<Bone> bones) {
 			var bonesItems = bones.Items;
 			for (int i = 0, n = bones.Count; i < n; i++) {
 				Bone bone = bonesItems[i];
@@ -309,21 +309,21 @@ namespace Spine {
 			var transformConstraintsItems = this.transformConstraints.Items;
 			for (int i = 0, n = transformConstraints.Count; i < n; i++) {
 				TransformConstraint constraint = transformConstraintsItems[i];
-				TransformConstraintData data = constraint.data;
-				constraint.rotateMix = data.rotateMix;
-				constraint.translateMix = data.translateMix;
-				constraint.scaleMix = data.scaleMix;
-				constraint.shearMix = data.shearMix;
+				TransformConstraintData constraintData = constraint.data;
+				constraint.rotateMix = constraintData.rotateMix;
+				constraint.translateMix = constraintData.translateMix;
+				constraint.scaleMix = constraintData.scaleMix;
+				constraint.shearMix = constraintData.shearMix;
 			}
 
 			var pathConstraintItems = this.pathConstraints.Items;
 			for (int i = 0, n = pathConstraints.Count; i < n; i++) {
 				PathConstraint constraint = pathConstraintItems[i];
-				PathConstraintData data = constraint.data;
-				constraint.position = data.position;
-				constraint.spacing = data.spacing;
-				constraint.rotateMix = data.rotateMix;
-				constraint.translateMix = data.translateMix;
+				PathConstraintData constraintData = constraint.data;
+				constraint.position = constraintData.position;
+				constraint.spacing = constraintData.spacing;
+				constraint.rotateMix = constraintData.rotateMix;
+				constraint.translateMix = constraintData.translateMix;
 			}
 		}
 
@@ -384,9 +384,9 @@ namespace Spine {
 
 		/// <summary>Sets a skin by name (see SetSkin).</summary>
 		public void SetSkin (string skinName) {
-			Skin skin = data.FindSkin(skinName);
-			if (skin == null) throw new ArgumentException("Skin not found: " + skinName, "skinName");
-			SetSkin(skin);
+			Skin foundSkin = data.FindSkin(skinName);
+			if (foundSkin == null) throw new ArgumentException("Skin not found: " + skinName, "skinName");
+			SetSkin(foundSkin);
 		}
 
 		/// <summary>Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default 
@@ -424,8 +424,7 @@ namespace Spine {
 				Attachment attachment = skin.GetAttachment(slotIndex, attachmentName);
 				if (attachment != null) return attachment;
 			}
-			if (data.defaultSkin != null) return data.defaultSkin.GetAttachment(slotIndex, attachmentName);
-			return null;
+			return data.defaultSkin != null ? data.defaultSkin.GetAttachment(slotIndex, attachmentName) : null;
 		}
 
 		/// <param name="attachmentName">May be null.</param>
