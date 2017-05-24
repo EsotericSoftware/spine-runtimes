@@ -171,21 +171,24 @@ module spine {
 				}
 				let minAngle = spine.MathUtils.PI, minX = l1 - a, minDist = minX * minX, minY = 0;
 				let maxAngle = 0, maxX = l1 + a, maxDist = maxX * maxX, maxY = 0;
-				let angle = Math.acos(-a * l1 / (aa - bb));
-				x = a * Math.cos(angle) + l1;
-				y = b * Math.sin(angle);
-				d = x * x + y * y;
-				if (d < minDist) {
-					minAngle = angle;
-					minDist = d;
-					minX = x;
-					minY = y;
-				}
-				if (d > maxDist) {
-					maxAngle = angle;
-					maxDist = d;
-					maxX = x;
-					maxY = y;
+				c = -a * l1 / (aa - bb);
+				if (c >= -1 && c <= 1) {
+					c = Math.acos(c);
+					x = a * Math.cos(c) + l1;
+					y = b * Math.sin(c);
+					d = x * x + y * y;
+					if (d < minDist) {
+						minAngle = c;
+						minDist = d;
+						minX = x;
+						minY = y;
+					}
+					if (d > maxDist) {
+						maxAngle = c;
+						maxDist = d;
+						maxX = x;
+						maxY = y;
+					}
 				}
 				if (dd <= (minDist + maxDist) / 2) {
 					a1 = ta - Math.atan2(minY * bendDir, minX);
