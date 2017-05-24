@@ -35,6 +35,25 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
 namespace Spine {
+	public struct VertexPositionColorTextureColor : IVertexType {
+		public Vector3 Position;
+		public Color Color;
+		public Vector2 TextureCoordinate;
+		public Color Color2;
+
+		public readonly static VertexDeclaration VertexDeclaration = new VertexDeclaration
+		(
+			new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+			new VertexElement(12, VertexElementFormat.Color, VertexElementUsage.Color, 0),
+			new VertexElement(16, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
+			new VertexElement(24, VertexElementFormat.Color, VertexElementUsage.Color, 1)
+		);
+
+		VertexDeclaration IVertexType.VertexDeclaration {
+			get { return VertexDeclaration; }
+		}
+	}
+
 	// #region License
 	// /*
 	// Microsoft Public License (Ms-PL)
@@ -80,7 +99,7 @@ namespace Spine {
 	public class MeshBatcher {
 		private readonly List<MeshItem> items;
 		private readonly Queue<MeshItem> freeItems;
-		private VertexPositionColorTexture[] vertexArray = { };
+		private VertexPositionColorTextureColor[] vertexArray = { };
 		private short[] triangles = { };
 
 		public MeshBatcher () {
@@ -92,7 +111,7 @@ namespace Spine {
 		/// <summary>Returns a pooled MeshItem.</summary>
 		public MeshItem NextItem (int vertexCount, int triangleCount) {
 			MeshItem item = freeItems.Count > 0 ? freeItems.Dequeue() : new MeshItem();
-			if (item.vertices.Length < vertexCount) item.vertices = new VertexPositionColorTexture[vertexCount];
+			if (item.vertices.Length < vertexCount) item.vertices = new VertexPositionColorTextureColor[vertexCount];
 			if (item.triangles.Length < triangleCount) item.triangles = new int[triangleCount];
 			item.vertexCount = vertexCount;
 			item.triangleCount = triangleCount;
@@ -101,7 +120,7 @@ namespace Spine {
 		}
 
 		private void EnsureCapacity (int vertexCount, int triangleCount) {
-			if (vertexArray.Length < vertexCount) vertexArray = new VertexPositionColorTexture[vertexCount];
+			if (vertexArray.Length < vertexCount) vertexArray = new VertexPositionColorTextureColor[vertexCount];
 			if (triangles.Length < triangleCount) triangles = new short[triangleCount];
 		}
 
@@ -154,14 +173,14 @@ namespace Spine {
 				PrimitiveType.TriangleList,
 				vertexArray, 0, vertexCount,
 				triangles, 0, triangleCount / 3,
-				VertexPositionColorTexture.VertexDeclaration);
+				VertexPositionColorTextureColor.VertexDeclaration);
 		}
 	}
 
 	public class MeshItem {
 		public Texture2D texture;
 		public int vertexCount, triangleCount;
-		public VertexPositionColorTexture[] vertices = { };
+		public VertexPositionColorTextureColor[] vertices = { };
 		public int[] triangles = { };
 	}
 }

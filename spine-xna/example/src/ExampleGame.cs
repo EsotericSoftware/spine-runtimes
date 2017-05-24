@@ -42,7 +42,7 @@ using Spine;
 namespace Spine {
 	public class Example : Microsoft.Xna.Framework.Game {
 		GraphicsDeviceManager graphics;
-		SkeletonMeshRenderer skeletonRenderer;
+		SkeletonRenderer skeletonRenderer;
 		Skeleton skeleton;
 		Slot headSlot;
 		AnimationState state;
@@ -70,23 +70,30 @@ namespace Spine {
 		}
 
 		protected override void LoadContent () {
-			skeletonRenderer = new SkeletonMeshRenderer(GraphicsDevice);
-			skeletonRenderer.PremultipliedAlpha = false;
+			var spineEffect = Content.Load<Effect>("spine-xna-example-content\\SpineEffect");
+			spineEffect.Parameters["World"].SetValue(Matrix.Identity);
+			spineEffect.Parameters["View"].SetValue(Matrix.CreateLookAt(new Vector3(0.0f, 0.0f, 1.0f), Vector3.Zero, Vector3.Up));			
 
-			String name = "spineboy";
+			skeletonRenderer = new SkeletonRenderer(GraphicsDevice);
+			skeletonRenderer.PremultipliedAlpha = false;
+			skeletonRenderer.Effect = spineEffect;
+
+			// String name = "spineboy";
 			// String name = "goblins-mesh";
 			// String name = "raptor";
 			// String name = "tank";
 			// String name = "coin";
+			String name = "TwoColorTest";
 			bool binaryData = false;
 
-			Atlas atlas = new Atlas(assetsFolder + name + ".atlas", new XnaTextureLoader(GraphicsDevice));
+			Atlas atlas = new Atlas(assetsFolder + name + ".atlas", new XnaTextureLoader(GraphicsDevice));			
 
 			float scale = 1;
 			if (name == "spineboy") scale = 0.6f;
 			if (name == "raptor") scale = 0.5f;
 			if (name == "tank") scale = 0.3f;
-			if (name == "coin") scale = 1;	
+			if (name == "coin") scale = 1;
+			if (name == "TwoColorTest") scale = 0.5f;
 
 			SkeletonData skeletonData;
 			if (binaryData) {
@@ -129,12 +136,16 @@ namespace Spine {
 			}
 			else if (name == "tank") {
 				state.SetAnimation(0, "drive", true);
-			} else {
+			}
+			else if (name == "TwoColorTest") {
+				state.SetAnimation(0, "animation", true);
+			}
+			else {
 				state.SetAnimation(0, "walk", true);
 			}
 
 			skeleton.X = 400 + (name == "tank" ? 300: 0);
-			skeleton.Y = 580;
+			skeleton.Y = 580 + (name == "TwoColorTest" ? -400 : 0);
 			skeleton.UpdateWorldTransform();
 
 			headSlot = skeleton.FindSlot("head");
@@ -159,6 +170,11 @@ namespace Spine {
 			state.Update(gameTime.ElapsedGameTime.Milliseconds / 1000f);
 			state.Apply(skeleton);			
 			skeleton.UpdateWorldTransform();
+			if (skeletonRenderer.Effect is BasicEffect) {
+				((BasicEffect)skeletonRenderer.Effect).Projection = Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 0, 1, 0);
+			} else {
+				skeletonRenderer.Effect.Parameters["Projection"].SetValue(Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 0, 1, 0));
+			}			
 			skeletonRenderer.Begin();
 			skeletonRenderer.Draw(skeleton);
 			skeletonRenderer.End();
