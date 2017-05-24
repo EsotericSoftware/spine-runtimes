@@ -184,12 +184,13 @@ namespace Spine.Unity {
 			meshRenderer = GetComponent<MeshRenderer>();
 			rendererBuffers.Initialize();
 
-			skeleton = new Skeleton(skeletonData);
+			skeleton = new Skeleton(skeletonData) {
+				flipX = initialFlipX,
+				flipY = initialFlipY
+			};
+
 			if (!string.IsNullOrEmpty(initialSkinName) && !string.Equals(initialSkinName, "default", System.StringComparison.Ordinal))
 				skeleton.SetSkin(initialSkinName);
-
-			skeleton.flipX = initialFlipX;
-			skeleton.flipY = initialFlipY;
 
 			separatorSlots.Clear();
 			for (int i = 0; i < separatorSlotNames.Length; i++)
