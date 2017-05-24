@@ -2407,22 +2407,8 @@ var spine;
 						break outer;
 					}
 				}
-				var minAngle = 0, minDist = Number.MAX_VALUE, minX = 0, minY = 0;
-				var maxAngle = 0, maxDist = 0, maxX = 0, maxY = 0;
-				x = l1 + a;
-				d = x * x;
-				if (d > maxDist) {
-					maxAngle = 0;
-					maxDist = d;
-					maxX = x;
-				}
-				x = l1 - a;
-				d = x * x;
-				if (d < minDist) {
-					minAngle = spine.MathUtils.PI;
-					minDist = d;
-					minX = x;
-				}
+				var minAngle = spine.MathUtils.PI, minX = l1 - a, minDist = minX * minX, minY = 0;
+				var maxAngle = 0, maxX = l1 + a, maxDist = maxX * maxX, maxY = 0;
 				var angle = Math.acos(-a * l1 / (aa - bb));
 				x = a * Math.cos(angle) + l1;
 				y = b * Math.sin(angle);
