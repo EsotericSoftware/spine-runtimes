@@ -45,14 +45,8 @@
     <Compile Include="..\..\spine-xna\src\MeshBatcher.cs">
       <Link>spine-xna\MeshBatcher.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-xna\src\RegionBatcher.cs">
-      <Link>spine-xna\RegionBatcher.cs</Link>
-    </Compile>
-    <Compile Include="..\..\spine-xna\src\SkeletonMeshRenderer.cs">
-      <Link>spine-xna\SkeletonMeshRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\spine-xna\src\SkeletonRegionRenderer.cs">
-      <Link>spine-xna\SkeletonRegionRenderer.cs</Link>
+    <Compile Include="..\..\spine-xna\src\SkeletonRenderer.cs">
+      <Link>spine-xna\SkeletonRenderer.cs</Link>
     </Compile>
     <Compile Include="..\..\spine-xna\src\Util.cs">
       <Link>spine-xna\Util.cs</Link>
@@ -76,7 +70,9 @@
     <EmbeddedResource Include="Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <MonoGameContentReference Include="Content\Content.mgcb" />
+    <MonoGameContentReference Include="Content\Content.mgcb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </MonoGameContentReference>
     <None Include="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\DesktopGL\x86\SDL2.dll">
       <Link>x86\SDL2.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

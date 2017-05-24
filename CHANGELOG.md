@@ -106,16 +106,11 @@
    * `SkeletonAnimator` now has autoreset set to true by default. Old prefabs and scene values will have been serialized to whatever value it was previously. This change only applies to new instances of SkeletonAnimator.
    * Warnings and conditionals checking for specific Unity 5.2-and-below incompatibility have been removed.
 
-## XNA
+## XNA/MonoGame
  * Added support for clipping
  * Removed `RegionBatcher` and `SkeletonRegionRenderer`, renamed `SkeletonMeshRenderer` to `SkeletonRenderer`
  * Added support for two color tint. For it to work, you need to add the `SpineEffect.fx` file to your content project, then load it via `var effect = Content.Load<Effect>("SpineEffect");`, and set it on the `SkeletonRenderer`. See the example project for code.
  * Added support for any `Effect` to be used by `SkeletonRenderer`
-
- ## MonoGame
- * Added support for clipping
- * Removed `RegionBatcher` and `SkeletonRegionRenderer`, renamed `SkeletonMeshRenderer` to `SkeletonRenderer`
- *
 
 ## Java
  * **Breaking changes**

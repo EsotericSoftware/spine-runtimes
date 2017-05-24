@@ -47,11 +47,14 @@ spine-csharp/src/Attachments/*.cs.meta
 
 spine-monogame/example/bin
 spine-monogame/example/obj
+spine-monogame/example/Content/bin/
+spine-monogame/example/Content/obj/
 
 spine-xna/bin
 spine-xna/obj
 spine-xna/example/bin
 spine-xna/example/obj
+spine-xna/example-content/obj/
 
 spine-unity/Assets/spine-csharp*
 !spine-unity/Assets/spine-csharp/Place spine-csharp src here.*

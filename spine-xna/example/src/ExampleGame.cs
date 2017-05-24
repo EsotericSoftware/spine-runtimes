@@ -70,6 +70,7 @@ namespace Spine {
 		}
 
 		protected override void LoadContent () {
+			// Two color tint effect, comment line 80 to disable
 			var spineEffect = Content.Load<Effect>("spine-xna-example-content\\SpineEffect");
 			spineEffect.Parameters["World"].SetValue(Matrix.Identity);
 			spineEffect.Parameters["View"].SetValue(Matrix.CreateLookAt(new Vector3(0.0f, 0.0f, 1.0f), Vector3.Zero, Vector3.Up));			

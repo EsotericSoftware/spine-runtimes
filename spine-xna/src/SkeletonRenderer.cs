@@ -78,9 +78,7 @@ namespace Spine {
 			defaultBlendState = premultipliedAlpha ? BlendState.AlphaBlend : BlendState.NonPremultiplied;
 
 			device.RasterizerState = rasterizerState;
-			device.BlendState = defaultBlendState;
-
-			if (effect is BasicEffect) ((BasicEffect)effect).Projection = Matrix.CreateOrthographicOffCenter(0, device.Viewport.Width, device.Viewport.Height, 0, 1, 0);
+			device.BlendState = defaultBlendState;			
 		}
 
 		public void End () {
