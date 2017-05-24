@@ -35,6 +35,7 @@
 #define SUBSEQUENT 0
 #define FIRST 1
 #define DIP 2
+#define DIP_MIX 3
 
 _SP_ARRAY_IMPLEMENT_TYPE(spTrackEntryArray, spTrackEntry*)
 
@@ -48,7 +49,7 @@ void spAnimationState_disposeStatics () {
    the same function order in C as we have method order in Java */
 void _spAnimationState_disposeTrackEntry (spTrackEntry* entry);
 void _spAnimationState_disposeTrackEntries (spAnimationState* state, spTrackEntry* entry);
-int /*boolean*/ _spAnimationState_updateMixingFrom (spAnimationState* self, spTrackEntry* entry, float delta, int animationCount);
+int /*boolean*/ _spAnimationState_updateMixingFrom (spAnimationState* self, spTrackEntry* entry, float delta);
 float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* entry, spSkeleton* skeleton);
 void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* timeline, spSkeleton* skeleton, float time, float alpha, int /*boolean*/ setupPose, float* timelinesRotation, int i, int /*boolean*/ firstFrame);
 void _spAnimationState_queueEvents (spAnimationState* self, spTrackEntry* entry, float animationTime);
@@ -285,7 +286,7 @@ void spAnimationState_update (spAnimationState* self, float delta) {
 				continue;
 			}
 		}
-		if (current->mixingFrom != 0 && _spAnimationState_updateMixingFrom(self, current, delta, 2)) {
+		if (current->mixingFrom != 0 && _spAnimationState_updateMixingFrom(self, current, delta)) {
 			/* End mixing from entries once all have completed. */
 			spTrackEntry* from = current->mixingFrom;
 			current->mixingFrom = 0;
@@ -301,23 +302,20 @@ void spAnimationState_update (spAnimationState* self, float delta) {
 	_spEventQueue_drain(internal->queue);
 }
 
-int /*boolean*/ _spAnimationState_updateMixingFrom (spAnimationState* self, spTrackEntry* entry, float delta, int animationCount) {
-	spTrackEntry* from = entry->mixingFrom;
+int /*boolean*/ _spAnimationState_updateMixingFrom (spAnimationState* self, spTrackEntry* to, float delta) {
+	spTrackEntry* from = to->mixingFrom;
 	int finished;
 	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
 	if (!from) return -1;
 
-	finished = _spAnimationState_updateMixingFrom(self, from, delta, animationCount + 1);
+	finished = _spAnimationState_updateMixingFrom(self, from, delta);
 
 	/* Require mixTime > 0 to ensure the mixing from entry was applied at least once. */
-	if (entry->mixTime > 0 && (entry->mixTime >= entry->mixDuration || entry->timeScale == 0)) {
-		if (animationCount > 5 && from->mixingFrom == 0) {
-			/* Limit linked list by speeding up and removing old entries. */
-			entry->interruptAlpha = MAX(0, entry->interruptAlpha - delta * 0.66f);
-			if (entry->interruptAlpha <= 0) {
-				entry->mixingFrom = 0;
-				_spEventQueue_end(internal->queue, from);
-			}
+	if (to->mixTime > 0 && (to->mixTime >= to->mixDuration || to->timeScale == 0)) {
+		if (from->totalAlpha == 0) {
+			to->mixingFrom = from->mixingFrom;
+			to->interruptAlpha = from->interruptAlpha;
+			_spEventQueue_end(internal->queue, from);
 		}
 		return finished;
 	}
@@ -325,7 +323,7 @@ int /*boolean*/ _spAnimationState_updateMixingFrom (spAnimationState* self, spTr
 	from->animationLast = from->nextAnimationLast;
 	from->trackLast = from->nextTrackLast;
 	from->trackTime += delta * from->timeScale;
-	entry->mixTime += delta * entry->timeScale;
+	to->mixTime += delta * to->timeScale;
 	return 0;
 }
 
@@ -371,9 +369,9 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 			for (ii = 0; ii < timelineCount; ii++) {
 				timeline = timelines[ii];
 				if (timeline->type == SP_TIMELINE_ROTATE)
-					_spAnimationState_applyRotateTimeline(self, timeline, skeleton, animationTime, mix, timelineData->items[ii] > 0, timelinesRotation, ii << 1, firstFrame);
+					_spAnimationState_applyRotateTimeline(self, timeline, skeleton, animationTime, mix, timelineData->items[ii] >= FIRST, timelinesRotation, ii << 1, firstFrame);
 				else
-					spTimeline_apply(timeline, skeleton, animationLast, animationTime, internal->events, &internal->eventsCount, mix, timelineData->items[ii] > 0, 0);
+					spTimeline_apply(timeline, skeleton, animationLast, animationTime, internal->events, &internal->eventsCount, mix, timelineData->items[ii] >= FIRST, 0);
 			}
 		}
 		_spAnimationState_queueEvents(self, current, animationTime);
@@ -432,6 +430,7 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* t
 
 	first = 0;
 	alphaDip = from->alpha * to->interruptAlpha; alphaMix = alphaDip * (1 - mix);
+	from->totalAlpha = 0;
 	for (i = 0; i < timelineCount; i++) {
 		spTimeline* timeline = timelines[i];
 		switch (timelineData->items[i]) {
@@ -443,13 +442,18 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* t
 				first = 1;
 				alpha = alphaMix;
 				break;
+			case DIP:
+				first = 1;
+				alpha = alphaDip;
+				break;
 			default:
 				first = 1;
 				alpha = alphaDip;
 				dipMix = timelineDipMix->items[i];
-				if (dipMix != 0) alpha *= MAX(0, 1 - dipMix->mixTime / dipMix->mixDuration);
+				alpha *= MAX(0, 1 - dipMix->mixTime / dipMix->mixDuration);
 				break;
 		}
+		from->totalAlpha += alpha;
 		if (timeline->type == SP_TIMELINE_ROTATE)
 			_spAnimationState_applyRotateTimeline(self, timeline, skeleton, animationTime, alpha, first, timelinesRotation, i << 1, firstFrame);
 		else {
@@ -892,6 +896,7 @@ spTrackEntry* _spTrackEntry_setTimelineData(spTrackEntry* self, spTrackEntry* to
 	timelines = self->animation->timelines;
 	timelinesCount = self->animation->timelinesCount;
 	timelineData = spIntArray_setSize(self->timelineData, timelinesCount)->items;
+	spTrackEntryArray_clear(self->timelineDipMix);
 	timelineDipMix = spTrackEntryArray_setSize(self->timelineDipMix, timelinesCount)->items;
 
 	outer:
@@ -902,16 +907,19 @@ spTrackEntry* _spTrackEntry_setTimelineData(spTrackEntry* self, spTrackEntry* to
 		else if (to == 0 || !_spTrackEntry_hasTimeline(to, id))
 			timelineData[i] = FIRST;
 		else {
-			timelineData[i] = DIP;
 			for (ii = mixingToLast; ii >= 0; ii--) {
 				spTrackEntry* entry = mixingTo[ii];
 				if (!_spTrackEntry_hasTimeline(entry, id)) {
-					if (entry->mixDuration > 0) timelineDipMix[i] = entry;
-					i++;
-					goto outer;
+					if (entry->mixDuration > 0) {
+						timelineData[i] = DIP_MIX;
+						timelineDipMix[i] = entry;
+						i++;
+						goto outer;
+					}
 				}
+				break;
 			}
-			timelineDipMix[i] = 0;
+			timelineData[i] = DIP;
 		}
 	}
 	return lastEntry;
