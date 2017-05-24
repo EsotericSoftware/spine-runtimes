@@ -446,7 +446,7 @@ namespace Spine.Unity {
 					clipper.ClipStart(slot, slot.attachment as ClippingAttachment);
 				}	
 			}
-				
+
 			for (int slotIndex = instruction.startSlot; slotIndex < instruction.endSlot; slotIndex++) {
 				var slot = drawOrderItems[slotIndex];
 				var attachment = slot.attachment;
@@ -507,7 +507,7 @@ namespace Spine.Unity {
 					color.b = (byte)(skeletonB * slot.b * c.b * 255);
 				}
 
-				if (useClipping && clipper.IsClipping()) {					
+				if (useClipping && clipper.IsClipping()) {
 					clipper.ClipTriangles(workingVerts, attachmentVertexCount << 1, attachmentTriangleIndices, attachmentIndexCount, uvs);
 					workingVerts = clipper.clippedVertices.Items;
 					attachmentVertexCount = clipper.clippedVertices.Count >> 1;

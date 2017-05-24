@@ -31,7 +31,6 @@
 // Contributed by: Mitch Thompson
 
 #define SPINE_SKELETON_ANIMATOR
-//#define SPINE_BAKING
 
 using System;
 using System.Collections.Generic;
@@ -49,14 +48,6 @@ namespace Spine.Unity.Editor {
 		static bool showAnimationList = true;
 		static bool showSlotList = false;
 		static bool showAttachments = false;
-
-		#if SPINE_BAKING
-		static bool isBakingExpanded = false;
-		static bool bakeAnimations = true;
-		static bool bakeIK = true;
-		static SendMessageOptions bakeEventOptions = SendMessageOptions.DontRequireReceiver;
-		const string ShowBakingPrefsKey = "SkeletonDataAssetInspector_showUnity";
-		#endif
 
 		SerializedProperty atlasAssets, skeletonJSON, scale, fromAnimation, toAnimation, duration, defaultMix;
 		#if SPINE_TK2D
@@ -102,13 +93,17 @@ namespace Spine.Unity.Editor {
 			atlasAssets.isExpanded = true;
 			#endif
 
-			#if SPINE_BAKING
-			isBakingExpanded = EditorPrefs.GetBool(ShowBakingPrefsKey, false);
-			#endif
-
 			m_skeletonDataAssetGUID = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(m_skeletonDataAsset));
+
+			EditorApplication.update -= EditorUpdate;
 			EditorApplication.update += EditorUpdate;
+
 			RepopulateWarnings();
+			if (m_skeletonDataAsset.skeletonJSON == null) {
+				m_skeletonData = null;
+				return;	
+			}
+
 			m_skeletonData = warnings.Count == 0 ? m_skeletonDataAsset.GetSkeletonData(false) : null;
 		}
 
@@ -220,6 +215,7 @@ namespace Spine.Unity.Editor {
 			// Some code depends on the existence of m_skeletonAnimation instance.
 			// If m_skeletonAnimation is lazy-instantiated elsewhere, this can cause contents to change between Layout and Repaint events, causing GUILayout control count errors.
 			InitPreview();
+
 			if (m_skeletonData != null) {
 				GUILayout.Space(20f);
 

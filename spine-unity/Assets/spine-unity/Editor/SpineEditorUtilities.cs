@@ -1169,14 +1169,12 @@ namespace Spine.Unity.Editor {
 			if (spineJson != null && atlasAssets != null) {
 				SkeletonDataAsset skeletonDataAsset = (SkeletonDataAsset)AssetDatabase.LoadAssetAtPath(filePath, typeof(SkeletonDataAsset));
 				if (skeletonDataAsset == null) {
-					skeletonDataAsset = SkeletonDataAsset.CreateInstance<SkeletonDataAsset>();
-					skeletonDataAsset.atlasAssets = atlasAssets;
-					skeletonDataAsset.skeletonJSON = spineJson;
-					skeletonDataAsset.fromAnimation = new string[0];
-					skeletonDataAsset.toAnimation = new string[0];
-					skeletonDataAsset.duration = new float[0];
-					skeletonDataAsset.defaultMix = defaultMix;
-					skeletonDataAsset.scale = defaultScale;
+					skeletonDataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>(); {
+						skeletonDataAsset.atlasAssets = atlasAssets;
+						skeletonDataAsset.skeletonJSON = spineJson;
+						skeletonDataAsset.defaultMix = defaultMix;
+						skeletonDataAsset.scale = defaultScale;
+					}
 
 					AssetDatabase.CreateAsset(skeletonDataAsset, filePath);
 					AssetDatabase.SaveAssets();

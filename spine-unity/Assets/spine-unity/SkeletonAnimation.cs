@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using System;
 using UnityEngine;
 
 namespace Spine.Unity {
