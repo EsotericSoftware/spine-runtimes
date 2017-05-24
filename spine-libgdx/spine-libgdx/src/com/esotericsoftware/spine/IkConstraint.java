@@ -233,21 +233,24 @@ public class IkConstraint implements Constraint {
 			}
 			float minAngle = PI, minX = l1 - a, minDist = minX * minX, minY = 0;
 			float maxAngle = 0, maxX = l1 + a, maxDist = maxX * maxX, maxY = 0;
-			float angle = (float)Math.acos(-a * l1 / (aa - bb));
-			x = a * cos(angle) + l1;
-			y = b * sin(angle);
-			d = x * x + y * y;
-			if (d < minDist) {
-				minAngle = angle;
-				minDist = d;
-				minX = x;
-				minY = y;
-			}
-			if (d > maxDist) {
-				maxAngle = angle;
-				maxDist = d;
-				maxX = x;
-				maxY = y;
+			c = -a * l1 / (aa - bb);
+			if (c >= -1 && c <= 1) {
+				c = (float)Math.acos(c);
+				x = a * cos(c) + l1;
+				y = b * sin(c);
+				d = x * x + y * y;
+				if (d < minDist) {
+					minAngle = c;
+					minDist = d;
+					minX = x;
+					minY = y;
+				}
+				if (d > maxDist) {
+					maxAngle = c;
+					maxDist = d;
+					maxX = x;
+					maxY = y;
+				}
 			}
 			if (dd <= (minDist + maxDist) / 2) {
 				a1 = ta - atan2(minY * bendDir, minX);
