@@ -6,9 +6,9 @@ namespace UnrealBuildTool.Rules
 	{
 		public SpineEditorPlugin(TargetInfo Target)
 		{
-			PublicIncludePaths.AddRange(new string[] { "SpineEditorPlugin/Public" });
+			PublicIncludePaths.AddRange(new string[] { "SpineEditorPlugin/Public", "SpinePlugin/Public/spine-c/include" });
             
-            PrivateIncludePaths.AddRange(new string[] { "SpineEditorPlugin/Private" });
+            PrivateIncludePaths.AddRange(new string[] { "SpineEditorPlugin/Private", "SpinePlugin/Public/spine-c/include" });
             
             PublicDependencyModuleNames.AddRange(new string[] {
                 "Core",
