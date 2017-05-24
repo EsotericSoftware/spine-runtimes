@@ -39,6 +39,7 @@ package spine.animation {
 		public static var SUBSEQUENT : int = 0;
 		public static var FIRST : int = 1;
 		public static var DIP : int = 2;
+		public static var DIP_MIX : int = 3;
 		internal static var emptyAnimation : Animation = new Animation("<empty>", new Vector.<Timeline>(), 0);
 		public var data : AnimationStateData;
 		public var tracks : Vector.<TrackEntry> = new Vector.<TrackEntry>();
@@ -107,7 +108,7 @@ package spine.animation {
 						continue;
 					}
 				}
-				if (current.mixingFrom != null && updateMixingFrom(current, delta, 2)) {
+				if (current.mixingFrom != null && updateMixingFrom(current, delta)) {
 					// End mixing from entries once all have completed.
 					var from : TrackEntry = current.mixingFrom;
 					current.mixingFrom = null;
@@ -123,21 +124,18 @@ package spine.animation {
 			queue.drain();
 		}
 
-		private function updateMixingFrom(entry : TrackEntry, delta : Number, animationCount : int) : Boolean {
-			var from : TrackEntry = entry.mixingFrom;
+		private function updateMixingFrom(to : TrackEntry, delta : Number) : Boolean {
+			var from : TrackEntry = to.mixingFrom;
 			if (from == null) return true;
 
-			var finished : Boolean = updateMixingFrom(from, delta, animationCount + 1);
+			var finished : Boolean = updateMixingFrom(from, delta);
 
 			// Require mixTime > 0 to ensure the mixing from entry was applied at least once.
-			if (entry.mixTime > 0 && (entry.mixTime >= entry.mixDuration || entry.timeScale == 0)) {
-				if (animationCount > 5 && from.mixingFrom == null) {
-					// Limit linked list by speeding up and removing old entries.
-					entry.interruptAlpha = Math.max(0, entry.interruptAlpha - delta * 0.66);
-					if (entry.interruptAlpha <= 0) {
-						entry.mixingFrom = null;
-						queue.end(from);
-					}
+			if (to.mixTime > 0 && (to.mixTime >= to.mixDuration || to.timeScale == 0)) {
+				if (from.totalAlpha == 0) {
+					to.mixingFrom = from.mixingFrom;
+					to.interruptAlpha = from.interruptAlpha;
+					queue.end(from);					
 				}
 				return finished;
 			}
@@ -145,7 +143,7 @@ package spine.animation {
 			from.animationLast = from.nextAnimationLast;
 			from.trackLast = from.nextTrackLast;
 			from.trackTime += delta * from.timeScale;
-			entry.mixTime += delta * entry.timeScale;
+			to.mixTime += delta * to.timeScale;
 			return false;
 		}
 
@@ -184,9 +182,9 @@ package spine.animation {
 					for (ii = 0; ii < timelineCount; ii++) {
 						var timeline : Timeline = timelines[ii];
 						if (timeline is RotateTimeline) {
-							applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineData[ii] > 0, timelinesRotation, ii << 1, firstFrame);
+							applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineData[ii] >= FIRST, timelinesRotation, ii << 1, firstFrame);
 						} else
-							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineData[ii] > 0, false);
+							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineData[ii] >= FIRST, false);
 					}
 				}
 				queueEvents(current, animationTime);
@@ -226,6 +224,7 @@ package spine.animation {
 			var alphaDip : Number = from.alpha * to.interruptAlpha;
 			var alphaMix : Number = alphaDip * (1 - mix);
 			var alpha : Number = 0;
+			from.totalAlpha = 0;
 			for (var i : int = 0; i < timelineCount; i++) {
 				var timeline : Timeline = timelines[i];
 				switch (timelineData[i]) {
@@ -237,13 +236,18 @@ package spine.animation {
 					first = true;
 					alpha = alphaMix;
 					break;
+				case DIP:
+					first = true;
+					alpha = alphaDip;
+					break;
 				default:
 					first = true;
 					alpha = alphaDip;
 					var dipMix : TrackEntry = timelineDipMix[i];
-					if (dipMix != null) alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
+					alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
 					break;
 				}
+				from.totalAlpha += alpha;
 				if (timeline is RotateTimeline)
 					applyRotateTimeline(timeline, skeleton, animationTime, alpha, first, timelinesRotation, i << 1, firstFrame);
 				else {

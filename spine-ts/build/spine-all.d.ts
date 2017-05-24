@@ -231,6 +231,7 @@ declare module spine {
 		static SUBSEQUENT: number;
 		static FIRST: number;
 		static DIP: number;
+		static DIP_MIX: number;
 		data: AnimationStateData;
 		tracks: TrackEntry[];
 		events: Event[];
@@ -243,7 +244,7 @@ declare module spine {
 		trackEntryPool: Pool<TrackEntry>;
 		constructor(data: AnimationStateData);
 		update(delta: number): void;
-		updateMixingFrom(entry: TrackEntry, delta: number, animationCount: number): boolean;
+		updateMixingFrom(to: TrackEntry, delta: number): boolean;
 		apply(skeleton: Skeleton): void;
 		applyMixingFrom(to: TrackEntry, skeleton: Skeleton): number;
 		applyRotateTimeline(timeline: Timeline, skeleton: Skeleton, time: number, alpha: number, setupPose: boolean, timelinesRotation: Array<number>, i: number, firstFrame: boolean): void;
@@ -292,6 +293,7 @@ declare module spine {
 		mixTime: number;
 		mixDuration: number;
 		interruptAlpha: number;
+		totalAlpha: number;
 		timelineData: number[];
 		timelineDipMix: TrackEntry[];
 		timelinesRotation: number[];

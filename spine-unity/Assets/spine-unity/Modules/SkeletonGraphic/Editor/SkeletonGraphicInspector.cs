@@ -38,11 +38,12 @@ namespace Spine.Unity.Editor {
 	[CustomEditor(typeof(SkeletonGraphic))]
 	[CanEditMultipleObjects]
 	public class SkeletonGraphicInspector : UnityEditor.Editor {
-		SerializedProperty material_, color_;
-		SerializedProperty skeletonDataAsset_, initialSkinName_;
-		SerializedProperty startingAnimation_, startingLoop_, timeScale_, freeze_, unscaledTime_, tintBlack_;
-		SerializedProperty meshGeneratorSettings_;
-		SerializedProperty raycastTarget_;
+		SerializedProperty material, color;
+		SerializedProperty skeletonDataAsset, initialSkinName;
+		SerializedProperty startingAnimation, startingLoop, timeScale, freeze, unscaledTime, tintBlack;
+		SerializedProperty initialFlipX, initialFlipY;
+		SerializedProperty meshGeneratorSettings;
+		SerializedProperty raycastTarget;
 
 		SkeletonGraphic thisSkeletonGraphic;
 
@@ -51,32 +52,34 @@ namespace Spine.Unity.Editor {
 			thisSkeletonGraphic = target as SkeletonGraphic;
 
 			// MaskableGraphic
-			material_ = so.FindProperty("m_Material");
-			color_ = so.FindProperty("m_Color");
-			raycastTarget_ = so.FindProperty("m_RaycastTarget");
+			material = so.FindProperty("m_Material");
+			color = so.FindProperty("m_Color");
+			raycastTarget = so.FindProperty("m_RaycastTarget");
 
 			// SkeletonRenderer
-			skeletonDataAsset_ = so.FindProperty("skeletonDataAsset");
-			initialSkinName_ = so.FindProperty("initialSkinName");
-			//tintBlack_ = so.FindProperty("tintBlack");
+			skeletonDataAsset = so.FindProperty("skeletonDataAsset");
+			initialSkinName = so.FindProperty("initialSkinName");
+
+			initialFlipX = so.FindProperty("initialFlipX");
+			initialFlipY = so.FindProperty("initialFlipY");
 
 			// SkeletonAnimation
-			startingAnimation_ = so.FindProperty("startingAnimation");
-			startingLoop_ = so.FindProperty("startingLoop");
-			timeScale_ = so.FindProperty("timeScale");
-			unscaledTime_ = so.FindProperty("unscaledTime");
-			freeze_ = so.FindProperty("freeze");
+			startingAnimation = so.FindProperty("startingAnimation");
+			startingLoop = so.FindProperty("startingLoop");
+			timeScale = so.FindProperty("timeScale");
+			unscaledTime = so.FindProperty("unscaledTime");
+			freeze = so.FindProperty("freeze");
 
-			meshGeneratorSettings_ = so.FindProperty("meshGenerator").FindPropertyRelative("settings");
-			meshGeneratorSettings_.isExpanded = SkeletonRendererInspector.advancedFoldout;
+			meshGeneratorSettings = so.FindProperty("meshGenerator").FindPropertyRelative("settings");
+			meshGeneratorSettings.isExpanded = SkeletonRendererInspector.advancedFoldout;
 		}
 
 		public override void OnInspectorGUI () {
 			EditorGUI.BeginChangeCheck();
 
-			EditorGUILayout.PropertyField(skeletonDataAsset_);
-			EditorGUILayout.PropertyField(material_);
-			EditorGUILayout.PropertyField(color_);
+			EditorGUILayout.PropertyField(skeletonDataAsset);
+			EditorGUILayout.PropertyField(material);
+			EditorGUILayout.PropertyField(color);
 
 			if (thisSkeletonGraphic.skeletonDataAsset == null) {
 				EditorGUILayout.HelpBox("You need to assign a SkeletonDataAsset first.", MessageType.Info);
@@ -85,23 +88,33 @@ namespace Spine.Unity.Editor {
 				return;
 			}
 			using (new SpineInspectorUtility.BoxScope()) {
-				EditorGUILayout.PropertyField(meshGeneratorSettings_, SpineInspectorUtility.TempContent("Advanced..."), includeChildren: true);
-				SkeletonRendererInspector.advancedFoldout = meshGeneratorSettings_.isExpanded;
+				EditorGUILayout.PropertyField(meshGeneratorSettings, SpineInspectorUtility.TempContent("Advanced..."), includeChildren: true);
+				SkeletonRendererInspector.advancedFoldout = meshGeneratorSettings.isExpanded;
 			}
 
 			EditorGUILayout.Space();
-			EditorGUILayout.PropertyField(initialSkinName_);
+			EditorGUILayout.PropertyField(initialSkinName);
+			{
+				var rect = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, EditorGUIUtility.singleLineHeight);
+				EditorGUI.PrefixLabel(rect, SpineInspectorUtility.TempContent("Initial Flip"));
+				rect.x += EditorGUIUtility.labelWidth;
+				rect.width = 30f;
+				initialFlipX.boolValue = EditorGUI.ToggleLeft(rect, SpineInspectorUtility.TempContent("X", tooltip:"initialFlipX"), initialFlipX.boolValue);
+				rect.x += 35f;
+				initialFlipY.boolValue = EditorGUI.ToggleLeft(rect, SpineInspectorUtility.TempContent("Y", tooltip:"initialFlipY"), initialFlipY.boolValue);
+			}
+
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("Animation", EditorStyles.boldLabel);
-			EditorGUILayout.PropertyField(startingAnimation_);
-			EditorGUILayout.PropertyField(startingLoop_);
-			EditorGUILayout.PropertyField(timeScale_);
-			EditorGUILayout.PropertyField(unscaledTime_, SpineInspectorUtility.TempContent(unscaledTime_.displayName, tooltip: "If checked, this will use Time.unscaledDeltaTime to make this update independent of game Time.timeScale. Instance SkeletonGraphic.timeScale will still be applied."));
+			EditorGUILayout.PropertyField(startingAnimation);
+			EditorGUILayout.PropertyField(startingLoop);
+			EditorGUILayout.PropertyField(timeScale);
+			EditorGUILayout.PropertyField(unscaledTime, SpineInspectorUtility.TempContent(unscaledTime.displayName, tooltip: "If checked, this will use Time.unscaledDeltaTime to make this update independent of game Time.timeScale. Instance SkeletonGraphic.timeScale will still be applied."));
 			EditorGUILayout.Space();
-			EditorGUILayout.PropertyField(freeze_);
+			EditorGUILayout.PropertyField(freeze);
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("UI", EditorStyles.boldLabel);
-			EditorGUILayout.PropertyField(raycastTarget_);
+			EditorGUILayout.PropertyField(raycastTarget);
 
 			bool wasChanged = EditorGUI.EndChangeCheck();
 

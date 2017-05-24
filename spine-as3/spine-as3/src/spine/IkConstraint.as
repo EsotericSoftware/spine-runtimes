@@ -174,22 +174,8 @@ package spine {
 						break outer;
 					}
 				}
-				var minAngle : Number = 0, minDist : Number = Number.MAX_VALUE, minX : Number = 0, minY : Number = 0;
-				var maxAngle : Number = 0, maxDist : Number = 0, maxX : Number = 0, maxY : Number = 0;
-				x = l1 + a;
-				d = x * x;
-				if (d > maxDist) {
-					maxAngle = 0;
-					maxDist = d;
-					maxX = x;
-				}
-				x = l1 - a;
-				d = x * x;
-				if (d < minDist) {
-					minAngle = Math.PI;
-					minDist = d;
-					minX = x;
-				}
+				var minAngle : Number = Math.PI, minX : Number = l1 - a, minDist : Number = minX * minX, minY : Number = 0;
+				var maxAngle : Number = 0, maxX : Number = l1 + a, maxDist : Number = maxX * maxX, maxY : Number = 0;
 				var angle : Number = Math.acos(-a * l1 / (aa - bb));
 				x = a * Math.cos(angle) + l1;
 				y = b * Math.sin(angle);

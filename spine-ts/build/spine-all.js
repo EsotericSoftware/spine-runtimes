@@ -1100,7 +1100,7 @@ var spine;
 					this.disposeNext(current);
 					continue;
 				}
-				if (current.mixingFrom != null && this.updateMixingFrom(current, delta, 2)) {
+				if (current.mixingFrom != null && this.updateMixingFrom(current, delta)) {
 					var from = current.mixingFrom;
 					current.mixingFrom = null;
 					while (from != null) {
@@ -1112,25 +1112,23 @@ var spine;
 			}
 			this.queue.drain();
 		};
-		AnimationState.prototype.updateMixingFrom = function (entry, delta, animationCount) {
-			var from = entry.mixingFrom;
+		AnimationState.prototype.updateMixingFrom = function (to, delta) {
+			var from = to.mixingFrom;
 			if (from == null)
 				return true;
-			var finished = this.updateMixingFrom(from, delta, animationCount + 1);
-			if (entry.mixTime > 0 && (entry.mixTime >= entry.mixDuration || entry.timeScale == 0)) {
-				if (animationCount > 5 && from.mixingFrom == null) {
-					entry.interruptAlpha = Math.max(0, entry.interruptAlpha - delta * 0.66);
-					if (entry.interruptAlpha <= 0) {
-						entry.mixingFrom = null;
-						this.queue.end(from);
-					}
+			var finished = this.updateMixingFrom(from, delta);
+			if (to.mixTime > 0 && (to.mixTime >= to.mixDuration || to.timeScale == 0)) {
+				if (from.totalAlpha == 0) {
+					to.mixingFrom = from.mixingFrom;
+					to.interruptAlpha = from.interruptAlpha;
+					this.queue.end(from);
 				}
 				return finished;
 			}
 			from.animationLast = from.nextAnimationLast;
 			from.trackLast = from.nextTrackLast;
 			from.trackTime += delta * from.timeScale;
-			entry.mixTime += delta * entry.timeScale;
+			to.mixTime += delta * to.timeScale;
 			return false;
 		};
 		AnimationState.prototype.apply = function (skeleton) {
@@ -1165,10 +1163,10 @@ var spine;
 					for (var ii = 0; ii < timelineCount; ii++) {
 						var timeline = timelines[ii];
 						if (timeline instanceof spine.RotateTimeline) {
-							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineData[ii] > 0, timelinesRotation, ii << 1, firstFrame);
+							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineData[ii] >= AnimationState.FIRST, timelinesRotation, ii << 1, firstFrame);
 						}
 						else
-							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineData[ii] > 0, false);
+							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineData[ii] >= AnimationState.FIRST, false);
 					}
 				}
 				this.queueEvents(current, animationTime);
@@ -1203,6 +1201,7 @@ var spine;
 			var timelinesRotation = from.timelinesRotation;
 			var first = false;
 			var alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix), alpha;
+			from.totalAlpha = 0;
 			for (var i = 0; i < timelineCount; i++) {
 				var timeline = timelines[i];
 				switch (timelineData[i]) {
@@ -1214,14 +1213,18 @@ var spine;
 						first = true;
 						alpha = alphaMix;
 						break;
+					case AnimationState.DIP:
+						first = true;
+						alpha = alphaDip;
+						break;
 					default:
 						first = true;
 						alpha = alphaDip;
 						var dipMix = timelineDipMix[i];
-						if (dipMix != null)
-							alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
+						alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
 						break;
 				}
+				from.totalAlpha += alpha;
 				if (timeline instanceof spine.RotateTimeline)
 					this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, first, timelinesRotation, i << 1, firstFrame);
 				else {
@@ -1533,6 +1536,7 @@ var spine;
 	AnimationState.SUBSEQUENT = 0;
 	AnimationState.FIRST = 1;
 	AnimationState.DIP = 2;
+	AnimationState.DIP_MIX = 3;
 	spine.AnimationState = AnimationState;
 	var TrackEntry = (function () {
 		function TrackEntry() {
@@ -1560,6 +1564,7 @@ var spine;
 			var timelines = this.animation.timelines;
 			var timelinesCount = this.animation.timelines.length;
 			var timelineData = spine.Utils.setArraySize(this.timelineData, timelinesCount);
+			this.timelineDipMix.length = 0;
 			var timelineDipMix = spine.Utils.setArraySize(this.timelineDipMix, timelinesCount);
 			outer: for (var i = 0; i < timelinesCount; i++) {
 				var id = timelines[i].getPropertyId();
@@ -1568,16 +1573,17 @@ var spine;
 				else if (to == null || !to.hasTimeline(id))
 					timelineData[i] = AnimationState.FIRST;
 				else {
-					timelineData[i] = AnimationState.DIP;
 					for (var ii = mixingToLast; ii >= 0; ii--) {
 						var entry = mixingTo[ii];
 						if (!entry.hasTimeline(id)) {
-							if (entry.mixDuration > 0)
+							if (entry.mixDuration > 0) {
+								timelineData[i] = AnimationState.DIP_MIX;
 								timelineDipMix[i] = entry;
-							continue outer;
+								continue outer;
+							}
 						}
 					}
-					timelineDipMix[i] = null;
+					timelineData[i] = AnimationState.DIP;
 				}
 			}
 			return lastEntry;
@@ -2407,22 +2413,8 @@ var spine;
 						break outer;
 					}
 				}
-				var minAngle = 0, minDist = Number.MAX_VALUE, minX = 0, minY = 0;
-				var maxAngle = 0, maxDist = 0, maxX = 0, maxY = 0;
-				x = l1 + a;
-				d = x * x;
-				if (d > maxDist) {
-					maxAngle = 0;
-					maxDist = d;
-					maxX = x;
-				}
-				x = l1 - a;
-				d = x * x;
-				if (d < minDist) {
-					minAngle = spine.MathUtils.PI;
-					minDist = d;
-					minX = x;
-				}
+				var minAngle = spine.MathUtils.PI, minX = l1 - a, minDist = minX * minX, minY = 0;
+				var maxAngle = 0, maxX = l1 + a, maxDist = maxX * maxX, maxY = 0;
 				var angle = Math.acos(-a * l1 / (aa - bb));
 				x = a * Math.cos(angle) + l1;
 				y = b * Math.sin(angle);

@@ -208,28 +208,14 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
 			end
 		end
 		if not skip then
-			local minAngle = 0
-			local minDist = 9999999999
-			local minX = 0
-			local minY = 0
+			local minAngle = math_pi
+			local minX = l1 - a
+			local minDist = minX * minX
+			local minY = 0;
 			local maxAngle = 0
-			local maxDist = 0
-			local maxX = 0
-			local maxY = 0
-			x = l1 + a
-			d = x * x
-			if d > maxDist then
-				maxAngle = 0
-				maxDist = d
-				maxX = x
-			end
-			x = l1 - a
-			d = x * x
-			if d < minDist then
-				minAngle = math_pi
-				minDist = d
-				minX = x
-			end
+			local maxX = l1 + a
+			local maxDist = maxX * maxX
+			local maxY = 0			
 			local angle = math_acos(-a * l1 / (aa - bb))
 			x = a * math_cos(angle) + l1
 			y = b * math_sin(angle)

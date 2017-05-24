@@ -150,8 +150,8 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 		float aa = a * a, bb = b * b, ll = l1 * l1, dd = tx * tx + ty * ty, ta = ATAN2(ty, tx);
 		float c0 = bb * ll + aa * dd - aa * bb, c1 = -2 * bb * l1, c2 = bb - aa;
 		float d = c1 * c1 - 4 * c2 * c0;
-		float minAngle = 0, minDist = FLT_MAX, minX = 0, minY = 0;
-		float maxAngle = 0, maxDist = 0, maxX = 0, maxY = 0;
+		float minAngle = PI, minX = l1 - a, minDist = minX * minX, minY = 0;
+		float maxAngle = 0, maxX = l1 + a, maxDist = maxX * maxX, maxY = 0;
 		float x = l1 + a, dist = x * x, angle, y;
 		if (d >= 0) {
 			float q = SQRT(d), r0, r1;
@@ -165,18 +165,6 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 				a2 = ATAN2(y / psy, (r - l1) / psx);
 				goto outer;
 			}
-		}
-		if (dist > maxDist) {
-			maxAngle = 0;
-			maxDist = dist;
-			maxX = x;
-		}
-		x = l1 - a;
-		dist = x * x;
-		if (dist < minDist) {
-			minAngle = PI;
-			minDist = dist;
-			minX = x;
 		}
 		angle = ACOS(-a * l1 / (aa - bb));
 		x = a * COS(angle) + l1;

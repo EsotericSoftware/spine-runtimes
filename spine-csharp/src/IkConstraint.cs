@@ -176,25 +176,11 @@ namespace Spine {
 						y = (float)Math.Sqrt(dd - r * r) * bendDir;
 						a1 = ta - (float)Math.Atan2(y, r);
 						a2 = (float)Math.Atan2(y / psy, (r - l1) / psx);
-						goto outer;
+						goto outer; // break outer;
 					}
 				}
-				float minAngle = 0, minDist = float.MaxValue, minX = 0, minY = 0;
-				float maxAngle = 0, maxDist = 0, maxX = 0, maxY = 0;
-				x = l1 + a;
-				d = x * x;
-				if (d > maxDist) {
-					maxAngle = 0;
-					maxDist = d;
-					maxX = x;
-				}
-				x = l1 - a;
-				d = x * x;
-				if (d < minDist) {
-					minAngle = (float)Math.PI;
-					minDist = d;
-					minX = x;
-				}
+				float minAngle = MathUtils.PI, minX = l1 - a, minDist = minX * minX, minY = 0;
+				float maxAngle = 0, maxX = l1 + a, maxDist = maxX * maxX, maxY = 0;
 				float angle = (float)Math.Acos(-a * l1 / (aa - bb));
 				x = a * (float)Math.Cos(angle) + l1;
 				y = b * (float)Math.Sin(angle);

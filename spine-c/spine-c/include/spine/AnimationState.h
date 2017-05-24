@@ -61,7 +61,7 @@ struct spTrackEntry {
 	float eventThreshold, attachmentThreshold, drawOrderThreshold;
 	float animationStart, animationEnd, animationLast, nextAnimationLast;
 	float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
-	float alpha, mixTime, mixDuration, interruptAlpha;
+	float alpha, mixTime, mixDuration, interruptAlpha, totalAlpha;
 	spIntArray* timelineData;
 	spTrackEntryArray* timelineDipMix;
 	float* timelinesRotation;
@@ -79,7 +79,7 @@ struct spTrackEntry {
 		eventThreshold(0), attachmentThreshold(0), drawOrderThreshold(0),
 		animationStart(0), animationEnd(0), animationLast(0), nextAnimationLast(0),
 		delay(0), trackTime(0), trackLast(0), nextTrackLast(0), trackEnd(0), timeScale(0),
-		alpha(0), mixTime(0), mixDuration(0), interruptAlpha(0),
+		alpha(0), mixTime(0), mixDuration(0), interruptAlpha(0), totalAlpha(0),
 		timelineData(0),
 		timelineDipMix(0),
 		timelinesRotation(0),

@@ -43,6 +43,7 @@ namespace Spine.Unity {
 
 		[SpineSkin(dataField:"skeletonDataAsset")]
 		public string initialSkinName = "default";
+		public bool initialFlipX, initialFlipY;
 
 		[SpineAnimation(dataField:"skeletonDataAsset")]
 		public string startingAnimation;
@@ -77,6 +78,11 @@ namespace Spine.Unity {
 								skeleton.SetSkin(skin);
 						}
 							
+					}
+
+					if (!Application.isPlaying) {
+						skeleton.flipX = this.initialFlipX;
+						skeleton.flipY = this.initialFlipY;
 					}
 
 					skeleton.SetToSetupPose();
@@ -212,7 +218,11 @@ namespace Spine.Unity {
 				return;
 			}
 
-			this.skeleton = new Skeleton(skeletonData);
+			this.skeleton = new Skeleton(skeletonData) {
+				flipX = this.initialFlipX,
+				flipY = this.initialFlipY
+			};
+
 			meshBuffers = new DoubleBuffered<MeshRendererBuffers.SmartMesh>();
 
 			// Set the initial Skin and Animation

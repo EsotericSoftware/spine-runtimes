@@ -34,6 +34,7 @@ module spine {
 		static SUBSEQUENT = 0;
 		static FIRST = 1;
 		static DIP = 2;
+		static DIP_MIX = 3;
 
 		data: AnimationStateData;
 		tracks = new Array<TrackEntry>();
@@ -91,7 +92,7 @@ module spine {
 					this.disposeNext(current);
 					continue;
 				}
-				if (current.mixingFrom != null && this.updateMixingFrom(current, delta, 2)) {
+				if (current.mixingFrom != null && this.updateMixingFrom(current, delta)) {
 					// End mixing from entries once all have completed.
 					let from = current.mixingFrom;
 					current.mixingFrom = null;
@@ -107,21 +108,18 @@ module spine {
 			this.queue.drain();
 		}
 
-		updateMixingFrom (entry: TrackEntry, delta: number, animationCount: number): boolean {
-			let from = entry.mixingFrom;
+		updateMixingFrom (to: TrackEntry, delta: number): boolean {
+			let from = to.mixingFrom;
 			if (from == null) return true;
 
-			let finished = this.updateMixingFrom(from, delta, animationCount + 1);
+			let finished = this.updateMixingFrom(from, delta);
 
 			// Require mixTime > 0 to ensure the mixing from entry was applied at least once.
-			if (entry.mixTime > 0 && (entry.mixTime >= entry.mixDuration || entry.timeScale == 0)) {
-				if (animationCount > 5 && from.mixingFrom == null) {
-					// Limit linked list by speeding up and removing old entries.
-					entry.interruptAlpha = Math.max(0, entry.interruptAlpha - delta * 0.66);
-					if (entry.interruptAlpha <= 0) {
-						entry.mixingFrom = null;
-						this.queue.end(from);
-					}
+			if (to.mixTime > 0 && (to.mixTime >= to.mixDuration || to.timeScale == 0)) {
+				if (from.totalAlpha == 0) {
+					to.mixingFrom = from.mixingFrom;
+					to.interruptAlpha = from.interruptAlpha;
+					this.queue.end(from);
 				}
 				return finished;
 			}
@@ -129,7 +127,7 @@ module spine {
 			from.animationLast = from.nextAnimationLast;
 			from.trackLast = from.nextTrackLast;
 			from.trackTime += delta * from.timeScale;
-			entry.mixTime += delta * entry.timeScale;
+			to.mixTime += delta * to.timeScale;
 			return false;
 		}
 
@@ -168,10 +166,10 @@ module spine {
 					for (let ii = 0; ii < timelineCount; ii++) {
 						let timeline = timelines[ii];
 						if (timeline instanceof RotateTimeline) {
-							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineData[ii] > 0, timelinesRotation, ii << 1,
+							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineData[ii] >= AnimationState.FIRST, timelinesRotation, ii << 1,
 								firstFrame);
 						} else
-							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineData[ii] > 0, false);
+							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineData[ii] >= AnimationState.FIRST, false);
 					}
 				}
 				this.queueEvents(current, animationTime);
@@ -209,6 +207,7 @@ module spine {
 
 			let first = false;
 			let alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix), alpha;
+			from.totalAlpha = 0;
 			for (var i = 0; i < timelineCount; i++) {
 				let timeline = timelines[i];
 				switch (timelineData[i]) {
@@ -220,13 +219,18 @@ module spine {
 					first = true;
 					alpha = alphaMix;
 					break;
+				case AnimationState.DIP:
+					first = true;
+					alpha = alphaDip;
+					break;
 				default:
 					first = true;
 					alpha = alphaDip;
 					let dipMix = timelineDipMix[i];
-					if (dipMix != null) alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
+					alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
 					break;
 				}
+				from.totalAlpha += alpha;
 				if (timeline instanceof RotateTimeline)
 					this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, first, timelinesRotation, i << 1, firstFrame);
 				else {
@@ -578,7 +582,7 @@ module spine {
 		eventThreshold: number; attachmentThreshold: number; drawOrderThreshold: number;
 		animationStart: number; animationEnd: number; animationLast: number; nextAnimationLast: number;
 		delay: number; trackTime: number; trackLast: number; nextTrackLast: number; trackEnd: number; timeScale: number;
-		alpha: number; mixTime: number; mixDuration: number; interruptAlpha: number;
+		alpha: number; mixTime: number; mixDuration: number; interruptAlpha: number; totalAlpha: number;
 		timelineData = new Array<number>();
 		timelineDipMix = new Array<TrackEntry>();
 		timelinesRotation = new Array<number>();
@@ -603,6 +607,7 @@ module spine {
 			let timelines = this.animation.timelines;
 			let timelinesCount = this.animation.timelines.length;
 			let timelineData = Utils.setArraySize(this.timelineData, timelinesCount);
+			this.timelineDipMix.length = 0;
 			let timelineDipMix = Utils.setArraySize(this.timelineDipMix, timelinesCount);
 
 			outer:
@@ -613,15 +618,17 @@ module spine {
 				else if (to == null || !to.hasTimeline(id))
 					timelineData[i] = AnimationState.FIRST;
 				else {
-					timelineData[i] = AnimationState.DIP;
 					for (var ii = mixingToLast; ii >= 0; ii--) {
 						let entry = mixingTo[ii];
 						if (!entry.hasTimeline(id)) {
-							if (entry.mixDuration > 0) timelineDipMix[i] = entry;
-							continue outer;
+							if (entry.mixDuration > 0) {
+								timelineData[i] = AnimationState.DIP_MIX;
+								timelineDipMix[i] = entry;
+								continue outer;
+							}
 						}
 					}
-					timelineDipMix[i] = null;
+					timelineData[i] = AnimationState.DIP;
 				}
 			}
 			return lastEntry;
