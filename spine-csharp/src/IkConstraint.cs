@@ -93,7 +93,7 @@ namespace Spine {
 			if (rotationIK > 180)
 				rotationIK -= 360;
 			else if (rotationIK < -180) rotationIK += 360;
-			bone.UpdateWorldTransform(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, bone.ascaleX, bone.ascaleY, bone.ashearX, 
+			bone.UpdateWorldTransform(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, bone.ascaleX, bone.ascaleY, bone.ashearX,
 				bone.ashearY);
 		}
 
@@ -181,21 +181,24 @@ namespace Spine {
 				}
 				float minAngle = MathUtils.PI, minX = l1 - a, minDist = minX * minX, minY = 0;
 				float maxAngle = 0, maxX = l1 + a, maxDist = maxX * maxX, maxY = 0;
-				float angle = (float)Math.Acos(-a * l1 / (aa - bb));
-				x = a * (float)Math.Cos(angle) + l1;
-				y = b * (float)Math.Sin(angle);
-				d = x * x + y * y;
-				if (d < minDist) {
-					minAngle = angle;
-					minDist = d;
-					minX = x;
-					minY = y;
-				}
-				if (d > maxDist) {
-					maxAngle = angle;
-					maxDist = d;
-					maxX = x;
-					maxY = y;
+				c = -a * l1 / (aa - bb);
+				if (c >= -1 && c <= 1) {
+					float angle = (float)Math.Acos(c);
+					x = a * (float)Math.Cos(c) + l1;
+					y = b * (float)Math.Sin(c);
+					d = x * x + y * y;
+					if (d < minDist) {
+						minAngle = c;
+						minDist = d;
+						minX = x;
+						minY = y;
+					}
+					if (d > maxDist) {
+						maxAngle = c;
+						maxDist = d;
+						maxX = x;
+						maxY = y;
+					}
 				}
 				if (dd <= (minDist + maxDist) / 2) {
 					a1 = ta - (float)Math.Atan2(minY * bendDir, minX);
