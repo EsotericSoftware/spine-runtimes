@@ -49,7 +49,7 @@ import com.esotericsoftware.spine.Animation.Timeline;
  * See <a href='http://esotericsoftware.com/spine-applying-animations/'>Applying Animations</a> in the Spine Runtimes Guide. */
 public class AnimationState {
 	static private final Animation emptyAnimation = new Animation("<empty>", new Array(0), 0);
-	static private final int SUBSEQUENT = 0, FIRST = 1, DIP = 2;
+	static private final int SUBSEQUENT = 0, FIRST = 1, DIP = 2, DIP_MIX = 3;
 
 	private AnimationStateData data;
 	final Array<TrackEntry> tracks = new Array();
@@ -117,7 +117,7 @@ public class AnimationState {
 				disposeNext(current);
 				continue;
 			}
-			if (current.mixingFrom != null && updateMixingFrom(current, delta, 2)) {
+			if (current.mixingFrom != null && updateMixingFrom(current, delta)) {
 				// End mixing from entries once all have completed.
 				TrackEntry from = current.mixingFrom;
 				current.mixingFrom = null;
@@ -134,21 +134,18 @@ public class AnimationState {
 	}
 
 	/** Returns true when all mixing from entries are complete. */
-	private boolean updateMixingFrom (TrackEntry entry, float delta, int animationCount) {
-		TrackEntry from = entry.mixingFrom;
+	private boolean updateMixingFrom (TrackEntry to, float delta) {
+		TrackEntry from = to.mixingFrom;
 		if (from == null) return true;
 
-		boolean finished = updateMixingFrom(from, delta, animationCount + 1);
+		boolean finished = updateMixingFrom(from, delta);
 
 		// Require mixTime > 0 to ensure the mixing from entry was applied at least once.
-		if (entry.mixTime > 0 && (entry.mixTime >= entry.mixDuration || entry.timeScale == 0)) {
-			if (animationCount > 5 && from.mixingFrom == null) {
-				// Limit linked list by speeding up and removing old entries.
-				entry.interruptAlpha = Math.max(0, entry.interruptAlpha - delta * 0.66f);
-				if (entry.interruptAlpha <= 0) {
-					entry.mixingFrom = null;
-					queue.end(from);
-				}
+		if (to.mixTime > 0 && (to.mixTime >= to.mixDuration || to.timeScale == 0)) {
+			if (from.totalAlpha == 0) {
+				to.mixingFrom = from.mixingFrom;
+				to.interruptAlpha = from.interruptAlpha;
+				queue.end(from);
 			}
 			return finished;
 		}
@@ -156,7 +153,7 @@ public class AnimationState {
 		from.animationLast = from.nextAnimationLast;
 		from.trackLast = from.nextTrackLast;
 		from.trackTime += delta * from.timeScale;
-		entry.mixTime += delta * entry.timeScale;
+		to.mixTime += delta * to.timeScale;
 		return false;
 	}
 
@@ -196,10 +193,10 @@ public class AnimationState {
 				for (int ii = 0; ii < timelineCount; ii++) {
 					Timeline timeline = (Timeline)timelines[ii];
 					if (timeline instanceof RotateTimeline) {
-						applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineData[ii] > 0, timelinesRotation, ii << 1,
-							firstFrame);
+						applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineData[ii] >= FIRST, timelinesRotation,
+							ii << 1, firstFrame);
 					} else
-						timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineData[ii] > 0, false);
+						timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineData[ii] >= FIRST, false);
 				}
 			}
 			queueEvents(current, animationTime);
@@ -237,6 +234,7 @@ public class AnimationState {
 
 		boolean first;
 		float alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix), alpha;
+		from.totalAlpha = 0;
 		for (int i = 0; i < timelineCount; i++) {
 			Timeline timeline = (Timeline)timelines[i];
 			switch (timelineData[i]) {
@@ -248,13 +246,18 @@ public class AnimationState {
 				first = true;
 				alpha = alphaMix;
 				break;
+			case DIP:
+				first = true;
+				alpha = alphaDip;
+				break;
 			default:
 				first = true;
 				alpha = alphaDip;
 				TrackEntry dipMix = (TrackEntry)timelineDipMix[i];
-				if (dipMix != null) alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
+				alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
 				break;
 			}
+			from.totalAlpha += alpha;
 			if (timeline instanceof RotateTimeline)
 				applyRotateTimeline(timeline, skeleton, animationTime, alpha, first, timelinesRotation, i << 1, firstFrame);
 			else {
@@ -694,7 +697,7 @@ public class AnimationState {
 		float eventThreshold, attachmentThreshold, drawOrderThreshold;
 		float animationStart, animationEnd, animationLast, nextAnimationLast;
 		float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
-		float alpha, mixTime, mixDuration, interruptAlpha;
+		float alpha, mixTime, mixDuration, interruptAlpha, totalAlpha;
 		final IntArray timelineData = new IntArray();
 		final Array<TrackEntry> timelineDipMix = new Array();
 		final FloatArray timelinesRotation = new FloatArray();
@@ -720,8 +723,8 @@ public class AnimationState {
 			Object[] timelines = animation.timelines.items;
 			int timelinesCount = animation.timelines.size;
 			int[] timelineData = this.timelineData.setSize(timelinesCount);
+			timelineDipMix.clear();
 			Object[] timelineDipMix = this.timelineDipMix.setSize(timelinesCount);
-
 			outer:
 			for (int i = 0; i < timelinesCount; i++) {
 				int id = ((Timeline)timelines[i]).getPropertyId();
@@ -730,15 +733,18 @@ public class AnimationState {
 				else if (to == null || !to.hasTimeline(id))
 					timelineData[i] = FIRST;
 				else {
-					timelineData[i] = DIP;
 					for (int ii = mixingToLast; ii >= 0; ii--) {
 						TrackEntry entry = (TrackEntry)mixingTo[ii];
 						if (!entry.hasTimeline(id)) {
-							if (entry.mixDuration > 0) timelineDipMix[i] = entry;
-							continue outer;
+							if (entry.mixDuration > 0) {
+								timelineData[i] = DIP_MIX;
+								timelineDipMix[i] = entry;
+								continue outer;
+							}
+							break;
 						}
 					}
-					timelineDipMix[i] = null;
+					timelineData[i] = DIP;
 				}
 			}
 			return lastEntry;
