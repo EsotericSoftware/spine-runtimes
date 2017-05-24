@@ -34,7 +34,7 @@ using System.Collections.Generic;
 namespace Spine {
 	public class AnimationState {
 		static readonly Animation EmptyAnimation = new Animation("<empty>", new ExposedList<Timeline>(), 0);
-		internal const int SUBSEQUENT = 0, FIRST = 1, DIP = 2;
+		internal const int SUBSEQUENT = 0, FIRST = 1, DIP = 2, DIP_MIX = 3;
 
 		private AnimationStateData data;
 		private readonly ExposedList<TrackEntry> tracks = new ExposedList<TrackEntry>();
@@ -115,7 +115,7 @@ namespace Spine {
 					DisposeNext(current);
 					continue;
 				}
-				if (current.mixingFrom != null && UpdateMixingFrom(current, delta, 2)) {
+				if (current.mixingFrom != null && UpdateMixingFrom(current, delta)) {
 					// End mixing from entries once all have completed.
 					var from = current.mixingFrom;
 					current.mixingFrom = null;
@@ -132,21 +132,18 @@ namespace Spine {
 		}
 
 		/// <summary>Returns true when all mixing from entries are complete.</summary>
-		private bool UpdateMixingFrom (TrackEntry entry, float delta, int animationCount) {
-			TrackEntry from = entry.mixingFrom;
+		private bool UpdateMixingFrom (TrackEntry to, float delta) {
+			TrackEntry from = to.mixingFrom;
 			if (from == null) return true;
 
-			bool finished = UpdateMixingFrom(from, delta, animationCount + 1);
+			bool finished = UpdateMixingFrom(from, delta);
 
 			// Require mixTime > 0 to ensure the mixing from entry was applied at least once.
-			if (entry.mixTime > 0 && (entry.mixTime >= entry.mixDuration || entry.timeScale == 0)) {
-				if (animationCount > 5 && from.mixingFrom == null) {
-					// Limit linked list by speeding up and removing old entries.
-					entry.interruptAlpha = Math.Max(0, entry.interruptAlpha - delta * 0.66f);
-					if (entry.interruptAlpha <= 0) {
-						entry.mixingFrom = null;
-						queue.End(from);
-					}
+			if (to.mixTime > 0 && (to.mixTime >= to.mixDuration || to.timeScale == 0)) {	
+				if (from.totalAlpha == 0) {
+					to.mixingFrom = from.mixingFrom;
+					to.interruptAlpha = from.interruptAlpha;
+					queue.End(from);
 				}
 				return finished;
 			}
@@ -154,7 +151,7 @@ namespace Spine {
 			from.animationLast = from.nextAnimationLast;
 			from.trackLast = from.nextTrackLast;
 			from.trackTime += delta * from.timeScale;
-			entry.mixTime += delta * entry.timeScale;
+			to.mixTime += delta * to.timeScale;
 			return false;
 		}
 
@@ -199,10 +196,10 @@ namespace Spine {
 						Timeline timeline = timelinesItems[ii];
 						var rotateTimeline = timeline as RotateTimeline;
 						if (rotateTimeline != null) {
-							ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, mix, timelineData[ii] > 0, timelinesRotation, ii << 1,
-								firstFrame);
+							ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, mix, timelineData[ii] >= FIRST, timelinesRotation,
+								ii << 1, firstFrame);
 						} else {
-							timeline.Apply(skeleton, animationLast, animationTime, events, mix, timelineData[ii] > 0, false);
+							timeline.Apply(skeleton, animationLast, animationTime, events, mix, timelineData[ii] > FIRST, false);
 						}
 					}
 				}
@@ -242,6 +239,7 @@ namespace Spine {
 
 			bool first;
 			float alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix), alpha;
+			from.totalAlpha = 0;
 			for (int i = 0; i < timelineCount; i++) {
 				Timeline timeline = timelinesItems[i];
 				switch (timelineData[i]) {
@@ -253,14 +251,18 @@ namespace Spine {
 					first = true;
 					alpha = alphaMix;
 					break;
+				case DIP:
+					first = true;
+					alpha = alphaDip;
+					break;
 				default:
 					first = true;
 					alpha = alphaDip;
 					var dipMix = timelineDipMix[i];
-					if (dipMix != null) alpha *= Math.Max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
+					alpha *= Math.Max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
 					break;
 				}
-
+				from.totalAlpha += alpha;
 				var rotateTimeline = timeline as RotateTimeline;
 				if (rotateTimeline != null) {
 					ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, alpha, first, timelinesRotation, i << 1, firstFrame);
@@ -659,7 +661,7 @@ namespace Spine {
 		internal float eventThreshold, attachmentThreshold, drawOrderThreshold;
 		internal float animationStart, animationEnd, animationLast, nextAnimationLast;
 		internal float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale = 1f;
-		internal float alpha, mixTime, mixDuration, interruptAlpha;
+		internal float alpha, mixTime, mixDuration, interruptAlpha, totalAlpha;
 		internal readonly ExposedList<int> timelineData = new ExposedList<int>();
 		internal readonly ExposedList<TrackEntry> timelineDipMix = new ExposedList<TrackEntry>();
 		internal readonly ExposedList<float> timelinesRotation = new ExposedList<float>();
@@ -691,8 +693,9 @@ namespace Spine {
 			int mixingToLast = mixingToArray.Count - 1;
 			var timelines = animation.timelines.Items;
 			int timelinesCount = animation.timelines.Count;
-			var timelineDataItems = this.timelineData.Resize(timelinesCount).Items; // timelineData.setSize(timelinesCount);
-			var timelineDipMixItems = this.timelineDipMix.Resize(timelinesCount).Items; //timelineDipMix.setSize(timelinesCount);
+			var timelineDataItems = timelineData.Resize(timelinesCount).Items; // timelineData.setSize(timelinesCount);
+			timelineDipMix.Clear();
+			var timelineDipMixItems = timelineDipMix.Resize(timelinesCount).Items; //timelineDipMix.setSize(timelinesCount);
 
 			// outer:
 			for (int i = 0; i < timelinesCount; i++) {
@@ -702,15 +705,17 @@ namespace Spine {
 				} else if (to == null || !to.HasTimeline(id)) {
 					timelineDataItems[i] = AnimationState.FIRST;
 				} else {
-					timelineDataItems[i] = AnimationState.DIP;
 					for (int ii = mixingToLast; ii >= 0; ii--) {
 						var entry = mixingTo[ii];
 						if (!entry.HasTimeline(id)) {
-							if (entry.mixDuration > 0) timelineDipMixItems[i] = entry;
-							goto outer; // continue outer;
+							if (entry.mixDuration > 0) {
+								timelineData[i] = AnimationState.DIP_MIX;
+								timelineDipMix[i] = entry;
+								goto outer; // continue outer;
+							}
 						}
 					}
-					timelineDipMixItems[i] = null;
+					timelineData[i] = AnimationState.DIP;
 				}
 				outer: {}
 			}
