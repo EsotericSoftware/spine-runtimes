@@ -79,8 +79,11 @@ namespace Spine.Unity.Editor {
 			public static Texture2D skeletonUtility;
 			public static Texture2D hingeChain;
 			public static Texture2D subMeshRenderer;
-			public static Texture2D unityIcon;
-			public static Texture2D controllerIcon;
+
+			public static Texture2D info;
+
+			public static Texture2D unity;
+//			public static Texture2D controllerIcon;
 
 			public static void Initialize () {
 				skeleton = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-skeleton.png");
@@ -116,8 +119,9 @@ namespace Spine.Unity.Editor {
 				subMeshRenderer = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-subMeshRenderer.png");
 				path = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-path.png");
 
-				unityIcon = EditorGUIUtility.FindTexture("SceneAsset Icon");
-				controllerIcon = EditorGUIUtility.FindTexture("AnimatorController Icon");
+				info = EditorGUIUtility.FindTexture("console.infoicon.sml");
+				unity = EditorGUIUtility.FindTexture("SceneAsset Icon");
+//				controllerIcon = EditorGUIUtility.FindTexture("AnimatorController Icon");
 			}
 
 			public static Texture2D GetAttachmentIcon (Attachment attachment) {

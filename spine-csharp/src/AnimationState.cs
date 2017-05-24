@@ -140,9 +140,13 @@ namespace Spine {
 
 			// Require mixTime > 0 to ensure the mixing from entry was applied at least once.
 			if (entry.mixTime > 0 && (entry.mixTime >= entry.mixDuration || entry.timeScale == 0)) {
-				if (animationCount > 6 && from.mixingFrom == null) { // Limit the mixing from linked list.
-					entry.mixingFrom = null;
-					queue.End(from);
+				if (animationCount > 5 && from.mixingFrom == null) {
+					// Limit linked list by speeding up and removing old entries.
+					entry.interruptAlpha = Math.Max(0, entry.interruptAlpha - delta * 0.66f);
+					if (entry.interruptAlpha <= 0) {
+						entry.mixingFrom = null;
+						queue.End(from);
+					}
 				}
 				return finished;
 			}
@@ -702,7 +706,7 @@ namespace Spine {
 					for (int ii = mixingToLast; ii >= 0; ii--) {
 						var entry = mixingTo[ii];
 						if (!entry.HasTimeline(id)) {
-							timelineDipMixItems[i] = entry;
+							if (entry.mixDuration > 0) timelineDipMixItems[i] = entry;
 							goto outer; // continue outer;
 						}
 					}

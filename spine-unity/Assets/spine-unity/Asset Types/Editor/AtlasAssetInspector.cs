@@ -52,7 +52,7 @@ namespace Spine.Unity.Editor {
 				if (spriteSlicesLabel == null) {
 					spriteSlicesLabel = new GUIContent(
 						"Apply Regions as Texture Sprite Slices",
-						SpineEditorUtilities.Icons.unityIcon,
+						SpineEditorUtilities.Icons.unity,
 						"Adds Sprite slices to atlas texture(s). " +
 						"Updates existing slices if ones with matching names exist. \n\n" +
 						"If your atlas was exported with Premultiply Alpha, " +

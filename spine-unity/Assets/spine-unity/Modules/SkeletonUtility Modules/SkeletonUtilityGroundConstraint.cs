@@ -29,7 +29,6 @@
  *****************************************************************************/
 
 using UnityEngine;
-using System.Collections;
 
 namespace Spine.Unity.Modules {
 	[RequireComponent(typeof(SkeletonUtilityBone)), ExecuteInEditMode]
@@ -37,7 +36,7 @@ namespace Spine.Unity.Modules {
 
 		[Tooltip("LayerMask for what objects to raycast against")]
 		public LayerMask groundMask;
-		[Tooltip("The 2D")]
+		[Tooltip("Use 2D")]
 		public bool use2D = false;
 		[Tooltip("Uses SphereCast for 3D mode and CircleCast for 2D mode")]
 		public bool useRadius = false;
@@ -62,10 +61,6 @@ namespace Spine.Unity.Modules {
 			lastHitY = transform.position.y;
 		}
 
-		protected override void OnDisable () {
-			base.OnDisable();
-		}
-
 		public override void DoUpdate () {
 			rayOrigin = transform.position + new Vector3(castOffset, castDistance, 0);
 
@@ -73,17 +68,15 @@ namespace Spine.Unity.Modules {
 			if (use2D) {
 				RaycastHit2D hit;
 
-				if (useRadius) {
+				if (useRadius)
 					hit = Physics2D.CircleCast(rayOrigin, castRadius, rayDir, castDistance + groundOffset, groundMask);
-				} else {
+				else
 					hit = Physics2D.Raycast(rayOrigin, rayDir, castDistance + groundOffset, groundMask);
-				}
 
 				if (hit.collider != null) {
 					hitY = hit.point.y + groundOffset;
-					if (Application.isPlaying) {
+					if (Application.isPlaying)
 						hitY = Mathf.MoveTowards(lastHitY, hitY, adjustSpeed * Time.deltaTime);
-					}
 				} else {
 					if (Application.isPlaying)
 						hitY = Mathf.MoveTowards(lastHitY, transform.position.y, adjustSpeed * Time.deltaTime);
@@ -92,17 +85,16 @@ namespace Spine.Unity.Modules {
 				RaycastHit hit;
 				bool validHit = false;
 
-				if (useRadius) {
+				if (useRadius)
 					validHit = Physics.SphereCast(rayOrigin, castRadius, rayDir, out hit, castDistance + groundOffset, groundMask);
-				} else {
+				else
 					validHit = Physics.Raycast(rayOrigin, rayDir, out hit, castDistance + groundOffset, groundMask);
-				}
 
 				if (validHit) {
 					hitY = hit.point.y + groundOffset;
-					if (Application.isPlaying) {
+					if (Application.isPlaying)
 						hitY = Mathf.MoveTowards(lastHitY, hitY, adjustSpeed * Time.deltaTime);
-					}
+
 				} else {
 					if (Application.isPlaying)
 						hitY = Mathf.MoveTowards(lastHitY, transform.position.y, adjustSpeed * Time.deltaTime);

@@ -173,9 +173,9 @@ public:
 	void SetMixDuration(float mixDuration) { if (entry) entry->mixDuration = mixDuration; }
 
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	float GetMixAlpha() { return entry ? entry->mixAlpha : 0; }
+	float GetInterruptAlpha() { return entry ? entry->interruptAlpha : 0; }
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetMixAlpha(float mixAlpha) { if (entry) entry->mixAlpha = mixAlpha; }	
+	void SetInterruptAlpha(float interruptAlpha) { if (entry) entry->interruptAlpha = interruptAlpha; }
 
 	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|TrackEntry")
 	FSpineAnimationStartDelegate AnimationStart;

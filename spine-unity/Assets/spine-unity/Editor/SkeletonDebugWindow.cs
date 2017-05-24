@@ -60,6 +60,7 @@ namespace Spine.Unity.Editor {
 		static AnimBool showConstraintsTree = new AnimBool(false);
 		static AnimBool showDrawOrderTree = new AnimBool(false);
 		static AnimBool showEventDataTree = new AnimBool(false);
+		static AnimBool showDataTree = new AnimBool(false);
 		static AnimBool showInspectBoneTree = new AnimBool(false);
 
 		Vector2 scrollPos;
@@ -488,9 +489,25 @@ namespace Spine.Unity.Editor {
 					}
 				}
 
-				// TODO: Data counts. bones, slots, constraints, skins, etc...
+				showDataTree.target = EditorGUILayout.Foldout(showDataTree.target, SpineInspectorUtility.TempContent("Data Counts", Icons.spine), BoldFoldoutStyle);
+				if (showDataTree.faded > 0) {
+					using (new SpineInspectorUtility.IndentScope()) {
+						using (new EditorGUILayout.FadeGroupScope(showDataTree.faded)) {
+							using (new SpineInspectorUtility.LabelWidthScope()) {
+								var skeletonData = skeleton.Data;
+								EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Bones", Icons.bone, "Skeleton.Data.Bones"), new GUIContent(skeletonData.Bones.Count.ToString()));
+								EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Slots", Icons.slotRoot, "Skeleton.Data.Slots"), new GUIContent(skeletonData.Slots.Count.ToString()));
+								EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Skins", Icons.skinsRoot, "Skeleton.Data.Skins"), new GUIContent(skeletonData.Skins.Count.ToString()));
+								EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Events", Icons.userEvent, "Skeleton.Data.Events"), new GUIContent(skeletonData.Events.Count.ToString()));
+								EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("IK Constraints", Icons.constraintIK, "Skeleton.Data.IkConstraints"), new GUIContent(skeletonData.IkConstraints.Count.ToString()));
+								EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Transform Constraints", Icons.constraintTransform, "Skeleton.Data.TransformConstraints"), new GUIContent(skeletonData.TransformConstraints.Count.ToString()));
+								EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Path Constraints", Icons.constraintPath, "Skeleton.Data.PathConstraints"), new GUIContent(skeletonData.PathConstraints.Count.ToString()));
+							}
+						}
+					}
+				}
 
-				if (IsAnimating(showSlotsTree, showSkeleton, showConstraintsTree, showDrawOrderTree, showEventDataTree, showInspectBoneTree))
+				if (IsAnimating(showSlotsTree, showSkeleton, showConstraintsTree, showDrawOrderTree, showEventDataTree, showInspectBoneTree, showDataTree))
 					Repaint();
 			}
 

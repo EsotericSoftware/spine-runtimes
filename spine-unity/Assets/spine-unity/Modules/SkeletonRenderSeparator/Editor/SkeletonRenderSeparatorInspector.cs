@@ -31,6 +31,8 @@
 using UnityEngine;
 using UnityEditor;
 
+using System.Collections.Generic;
+
 using Spine.Unity;
 using Spine.Unity.Editor;
 
@@ -76,7 +78,6 @@ namespace Spine.Unity.Modules {
 		}
 
 		public override void OnInspectorGUI () {
-			//JOHN: left todo: Add Undo support
 			var componentRenderers = component.partsRenderers;
 			int totalParts;
 
@@ -169,6 +170,7 @@ namespace Spine.Unity.Modules {
 							currentRenderers++;
 					}
 					int extraRenderersNeeded = totalParts - currentRenderers;
+
 					if (component.enabled && component.SkeletonRenderer != null && extraRenderersNeeded > 0) {
 						EditorGUILayout.HelpBox(string.Format("Insufficient parts renderers. Some parts will not be rendered."), MessageType.Warning);
 						string addMissingLabel = string.Format("Add the missing renderer{1} ({0}) ", extraRenderersNeeded, SpineInspectorUtility.PluralThenS(extraRenderersNeeded));
@@ -186,10 +188,11 @@ namespace Spine.Unity.Modules {
 						if (componentRenderers.Count > 0) {
 							if (GUILayout.Button("Clear Parts Renderers")) {
 								// Do you really want to destroy all?
-								if (EditorUtility.DisplayDialog("Destroy Renderers", "Do you really want to destroy all the Parts Renderer GameObjects in the list? (Undo will not work.)", "Destroy", "Cancel")) {						
+								Undo.RegisterCompleteObjectUndo(component, "Clear Parts Renderers");
+								if (EditorUtility.DisplayDialog("Destroy Renderers", "Do you really want to destroy all the Parts Renderer GameObjects in the list?", "Destroy", "Cancel")) {						
 									foreach (var r in componentRenderers) {
 										if (r != null)
-											DestroyImmediate(r.gameObject, allowDestroyingAssets: false);
+											Undo.DestroyObjectImmediate(r.gameObject);
 									}
 									componentRenderers.Clear();
 									// Do you also want to destroy orphans? (You monster.)
@@ -223,11 +226,12 @@ namespace Spine.Unity.Modules {
 				if (userClearEntries) componentRenderers.RemoveAll(x => x == null);
 			}
 
+			Undo.RegisterCompleteObjectUndo(component, "Add Parts Renderers");
 			for (int i = 0; i < count; i++) {
 				int index = componentRenderers.Count;
 				var smr = SkeletonPartsRenderer.NewPartsRendererGameObject(component.transform, index.ToString());
+				Undo.RegisterCreatedObjectUndo(smr.gameObject, "New Parts Renderer GameObject.");
 				componentRenderers.Add(smr);
-				EditorGUIUtility.PingObject(smr);
 
 				// increment renderer sorting order.
 				if (index == 0) continue;
@@ -258,7 +262,7 @@ namespace Spine.Unity.Modules {
 			if (orphans.Count > 0) {
 				if (EditorUtility.DisplayDialog("Destroy Submesh Renderers", "Unassigned renderers were found. Do you want to delete them? (These may belong to another Render Separator in the same hierarchy. If you don't have another Render Separator component in the children of this GameObject, it's likely safe to delete. Warning: This operation cannot be undone.)", "Delete", "Cancel")) {
 					foreach (var o in orphans) {
-						DestroyImmediate(o.gameObject, allowDestroyingAssets: false);
+						Undo.DestroyObjectImmediate(o.gameObject);
 					}
 				}
 			}

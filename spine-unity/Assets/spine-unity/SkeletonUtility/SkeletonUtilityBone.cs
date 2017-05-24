@@ -166,7 +166,6 @@ namespace Spine.Unity {
 						bone.y = Mathf.Lerp(bone.y, pos.y, overrideAlpha);
 					}
 
-					// MITCH
 					if (rotation) {
 						float angle = Mathf.LerpAngle(bone.Rotation, Quaternion.LookRotation(Vector3.forward, parentReference.InverseTransformDirection(cachedTransform.up)).eulerAngles.z, overrideAlpha);
 						bone.Rotation = angle;

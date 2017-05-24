@@ -34,6 +34,10 @@ namespace Spine.Unity {
 		readonly T b = new T();
 		bool usingA;
 
+		public T GetCurrent () {
+			return usingA ? a : b;
+		}
+
 		public T GetNext () {
 			usingA = !usingA;
 			return usingA ? a : b;

@@ -29,55 +29,55 @@
  *****************************************************************************/
 
 using UnityEngine;
+using System.Collections.Generic;
 using Spine;
-using Spine.Unity;
+using Spine.Unity.Modules.AttachmentTools;
 
 namespace Spine.Unity.Modules {
-	public class CustomSkin : MonoBehaviour {
+	/// <summary>
+	/// Example code for a component that replaces the default attachment of a slot with an image from a Spine atlas.</summary>
+	public class AtlasRegionAttacher : MonoBehaviour {
 
 		[System.Serializable]
-		public class SkinPair {
-			/// <summary>SpineAttachment attachment path to help find the attachment.</summary>
-			/// <remarks>This use of SpineAttachment generates an attachment path string that can only be used by SpineAttachment.GetAttachment.</remarks>
-			[SpineAttachment(currentSkinOnly: false, returnAttachmentPath: true, dataField: "skinSource")]
-			[UnityEngine.Serialization.FormerlySerializedAs("sourceAttachment")]
-			public string sourceAttachmentPath;
-
-			[SpineSlot]
-			public string targetSlot;
-
-			/// <summary>The name of the skin placeholder/skin dictionary entry this attachment should be associated with.</summary>
-			/// <remarks>This name is used by the skin dictionary, used in the method Skin.AddAttachment as well as setting a slot attachment</remarks>
-			[SpineAttachment(currentSkinOnly: true, placeholdersOnly: true)]
-			public string targetAttachment;
+		public class SlotRegionPair {
+			[SpineSlot] public string slot;
+			[SpineAtlasRegion] public string region;
 		}
 
-		#region Inspector
-		public SkeletonDataAsset skinSource;
+		[SerializeField] protected AtlasAsset atlasAsset;
+		[SerializeField] protected bool inheritProperties = true;
+		[SerializeField] protected List<SlotRegionPair> attachments = new List<SlotRegionPair>();
 
-		[UnityEngine.Serialization.FormerlySerializedAs("skinning")]
-		public SkinPair[] skinItems;
+		Atlas atlas;
 
-		public Skin customSkin;
-		#endregion
+		void Awake () {
+			var skeletonRenderer = GetComponent<SkeletonRenderer>();
+			skeletonRenderer.OnRebuild += Apply;
+			if (skeletonRenderer.valid) Apply(skeletonRenderer);
+		}
 
-		SkeletonRenderer skeletonRenderer;
+		void Start () { } // Allow checkbox in inspector
 
-		void Start () {
-			skeletonRenderer = GetComponent<SkeletonRenderer>();
-			Skeleton skeleton = skeletonRenderer.skeleton;
+		void Apply (SkeletonRenderer skeletonRenderer) {
+			if (!this.enabled) return;
 
-			customSkin = new Skin("CustomSkin");
+			atlas = atlasAsset.GetAtlas();
+			float scale = skeletonRenderer.skeletonDataAsset.scale;
 
-			foreach (var pair in skinItems) {
-				var attachment = SpineAttachment.GetAttachment(pair.sourceAttachmentPath, skinSource);
-				customSkin.AddAttachment(skeleton.FindSlotIndex(pair.targetSlot), pair.targetAttachment, attachment);
+			foreach (var entry in attachments) {
+				Slot slot = skeletonRenderer.Skeleton.FindSlot(entry.slot);
+				Attachment originalAttachment = slot.Attachment;
+				AtlasRegion region = atlas.FindRegion(entry.region);
+
+				if (region == null) {
+					slot.Attachment = null;
+				} else if (inheritProperties && originalAttachment != null) {
+					slot.Attachment = originalAttachment.GetRemappedClone(region, true, true, scale);
+				} else {
+					var newRegionAttachment = region.ToRegionAttachment(region.name, scale);
+					slot.Attachment = newRegionAttachment;
+				}
 			}
-
-			// The custom skin does not need to be added to the skeleton data for it to work.
-			// But it's useful for your script to keep a reference to it.
-			skeleton.SetSkin(customSkin);
 		}
 	}
-
 }

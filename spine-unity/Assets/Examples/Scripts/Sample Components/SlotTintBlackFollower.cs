@@ -1,14 +1,13 @@
 ﻿using UnityEngine;
 using Spine.Unity;
 
-namespace Spine.Unity.Modules {
+namespace Spine.Unity.Examples {
 
 	/// <summary>
 	/// Add this component to a Spine GameObject to apply a specific slot's Colors as MaterialProperties.
 	/// This allows you to apply the two color tint to the whole skeleton and not require the overhead of an extra vertex stream on the mesh.
 	/// </summary>
 	public class SlotTintBlackFollower : MonoBehaviour {
-
 		#region Inspector
 		/// <summary>
 		/// Serialized name of the slot loaded at runtime. Change the slot field instead of this if you want to change the followed slot at runtime.</summary>

@@ -126,7 +126,6 @@ _SP_ARRAY_DECLARE_TYPE(spUnsignedShortArray, unsigned short)
 _SP_ARRAY_DECLARE_TYPE(spArrayFloatArray, spFloatArray*)
 _SP_ARRAY_DECLARE_TYPE(spArrayShortArray, spShortArray*)
 
-
 #ifdef __cplusplus
 }
 #endif

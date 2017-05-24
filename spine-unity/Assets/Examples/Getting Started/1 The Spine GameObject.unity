@@ -120,7 +120,6 @@ GameObject:
   - component: {fileID: 139638500}
   - component: {fileID: 139638499}
   - component: {fileID: 139638503}
-  - component: {fileID: 139638504}
   m_Layer: 0
   m_Name: Spine GameObject (SpineUnityGirl)
   m_TagString: Untagged
@@ -224,17 +223,6 @@ MonoBehaviour:
   blinkAnimation: blink
   minimumDelay: 0.15
   maximumDelay: 3
---- !u!114 &139638504
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 139638498}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b337e07bc016684dabf04793dd00ea3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &199409354
 GameObject:
   m_ObjectHideFlags: 0

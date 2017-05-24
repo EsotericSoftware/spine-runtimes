@@ -200,7 +200,7 @@ namespace Spine.Unity.Editor {
 								string buttonLabel = box.IsWeighted() ? box.Name + " (!)" : box.Name;
 								if (GUILayout.Button(buttonLabel, GUILayout.Width(200))) {
 									utilityBone.bone.Skeleton.UpdateWorldTransform();
-									var bbTransform = utilityBone.transform.FindChild("[BoundingBox]" + box.Name);
+									var bbTransform = utilityBone.transform.Find("[BoundingBox]" + box.Name); // Use FindChild in older versions of Unity.
 									if (bbTransform != null) {
 										var originalCollider = bbTransform.GetComponent<PolygonCollider2D>();
 										if (originalCollider != null)
@@ -221,6 +221,8 @@ namespace Spine.Unity.Editor {
 					EditorGUI.indentLevel--;
 				}
 			}
+
+			BoneFollowerInspector.RecommendRigidbodyButton(utilityBone);
 
 			serializedObject.ApplyModifiedProperties();
 		}

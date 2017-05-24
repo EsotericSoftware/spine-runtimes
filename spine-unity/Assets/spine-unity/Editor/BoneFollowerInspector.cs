@@ -165,18 +165,7 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.PropertyField(followLocalScale);
 				EditorGUILayout.PropertyField(followSkeletonFlip);
 
-				bool hasCollider2D = targetBoneFollower.GetComponent<Collider2D>() != null || targetBoneFollower.GetComponent<BoundingBoxFollower>() != null;
-				bool hasCollider3D = !hasCollider2D && targetBoneFollower.GetComponent<Collider>();
-				bool missingRigidBody = (hasCollider2D && targetBoneFollower.GetComponent<Rigidbody2D>() == null) || (hasCollider3D && targetBoneFollower.GetComponent<Rigidbody>() == null);
-				if (missingRigidBody) {
-					using (new SpineInspectorUtility.BoxScope()) {
-						EditorGUILayout.HelpBox("Collider detected. Unity recommends adding a Rigidbody to the parent Transforms of any colliders that are intended to be dynamically repositioned and rotated.", MessageType.Warning);
-						var rbType = hasCollider2D ? typeof(Rigidbody2D) : typeof(Rigidbody);
-						string rbLabel = string.Format("Add {0}", rbType.Name);
-						var rbContent = SpineInspectorUtility.TempContent(rbLabel, SpineInspectorUtility.UnityIcon(rbType), "Add a rigidbody to this GameObject to be the Box2D parent of the attached collider.");
-						if (SpineInspectorUtility.CenteredButton(rbContent)) targetBoneFollower.gameObject.AddComponent(rbType);
-					}
-				}
+				BoneFollowerInspector.RecommendRigidbodyButton(targetBoneFollower);
 			} else {
 				var boneFollowerSkeletonRenderer = targetBoneFollower.skeletonRenderer;
 				if (boneFollowerSkeletonRenderer == null) {
@@ -198,6 +187,21 @@ namespace Spine.Unity.Editor {
 				targetBoneFollower.Initialize();
 
 			serializedObject.ApplyModifiedProperties();
+		}
+
+		internal static void RecommendRigidbodyButton (Component component) {
+			bool hasCollider2D = component.GetComponent<Collider2D>() != null || component.GetComponent<BoundingBoxFollower>() != null;
+			bool hasCollider3D = !hasCollider2D && component.GetComponent<Collider>();
+			bool missingRigidBody = (hasCollider2D && component.GetComponent<Rigidbody2D>() == null) || (hasCollider3D && component.GetComponent<Rigidbody>() == null);
+			if (missingRigidBody) {
+				using (new SpineInspectorUtility.BoxScope()) {
+					EditorGUILayout.HelpBox("Collider detected. Unity recommends adding a Rigidbody to the parent Transforms of any colliders that are intended to be dynamically repositioned and rotated.", MessageType.Warning);
+					var rbType = hasCollider2D ? typeof(Rigidbody2D) : typeof(Rigidbody);
+					string rbLabel = string.Format("Add {0}", rbType.Name);
+					var rbContent = SpineInspectorUtility.TempContent(rbLabel, SpineInspectorUtility.UnityIcon(rbType), "Add a rigidbody to this GameObject to be the Physics body parent of the attached collider.");
+					if (SpineInspectorUtility.CenteredButton(rbContent)) component.gameObject.AddComponent(rbType);
+				}
+			}
 		}
 	}
 

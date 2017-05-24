@@ -44,7 +44,9 @@ namespace Spine.Unity {
 		public float scale = 0.01f;
 		#endif
 		public TextAsset skeletonJSON;
+		[SpineAnimation(includeNone: false)]
 		public string[] fromAnimation = new string[0];
+		[SpineAnimation(includeNone: false)]
 		public string[] toAnimation = new string[0];
 		public float[] duration = new float[0];
 		public float defaultMix;

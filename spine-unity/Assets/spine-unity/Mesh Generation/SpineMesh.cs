@@ -653,6 +653,53 @@ namespace Spine.Unity {
 				int startSlot = submesh.startSlot;
 				lastSlotIndex = endSlot;
 
+				if (settings.tintBlack) {
+					Vector2 rg, b2;
+					int vi = vertexIndex;
+					b2.y = 1f;
+
+					{ 
+						if (uv2 == null) {
+							uv2 = new ExposedList<Vector2>();
+							uv3 = new ExposedList<Vector2>();
+						}
+						if (totalVertexCount > uv2.Items.Length) { // Manual ExposedList.Resize()
+							Array.Resize(ref uv2.Items, totalVertexCount);
+							Array.Resize(ref uv3.Items, totalVertexCount);
+						}
+						uv2.Count = uv3.Count = totalVertexCount;
+					}
+
+					var uv2i = uv2.Items;
+					var uv3i = uv3.Items;
+
+					for (int slotIndex = startSlot; slotIndex < endSlot; slotIndex++) {
+						var slot = skeletonDrawOrderItems[slotIndex];
+						var attachment = slot.attachment;
+
+						rg.x = slot.r2; //r
+						rg.y = slot.g2; //g
+						b2.x = slot.b2; //b
+
+						var regionAttachment = attachment as RegionAttachment;
+						if (regionAttachment != null) {
+							uv2i[vi] = rg; uv2i[vi + 1] = rg; uv2i[vi + 2] = rg; uv2i[vi + 3] = rg;
+							uv3i[vi] = b2; uv3i[vi + 1] = b2; uv3i[vi + 2] = b2; uv3i[vi + 3] = b2;
+							vi += 4;
+						} else { //} if (settings.renderMeshes) {
+							var meshAttachment = attachment as MeshAttachment;
+							if (meshAttachment != null) {
+								int meshVertexCount = meshAttachment.worldVerticesLength;
+								for (int iii = 0; iii < meshVertexCount; iii += 2) {
+									uv2i[vi] = rg;
+									uv3i[vi] = b2;
+									vi++;
+								}
+							}
+						}
+					}
+				}
+
 				for (int slotIndex = startSlot; slotIndex < endSlot; slotIndex++) {
 					var slot = skeletonDrawOrderItems[slotIndex];
 					var attachment = slot.attachment;
@@ -757,53 +804,6 @@ namespace Spine.Unity {
 								else if (y > bmax.y) bmax.y = y;
 
 								vertexIndex++;
-							}
-						}
-					}
-				}
-
-				if (settings.tintBlack) {
-					Vector2 rg, b2;
-					int vi = vertexIndex;
-					b2.y = 1f;
-
-					{ 
-						if (uv2 == null) {
-							uv2 = new ExposedList<Vector2>();
-							uv3 = new ExposedList<Vector2>();
-						}
-						if (totalVertexCount > uv2.Items.Length) { // Manual ExposedList.Resize()
-							Array.Resize(ref uv2.Items, totalVertexCount);
-							Array.Resize(ref uv3.Items, totalVertexCount);
-						}
-						uv2.Count = uv3.Count = totalVertexCount;
-					}
-
-					var uv2i = uv2.Items;
-					var uv3i = uv3.Items;
-
-					for (int slotIndex = startSlot; slotIndex < endSlot; slotIndex++) {
-						var slot = skeletonDrawOrderItems[slotIndex];
-						var attachment = slot.attachment;
-
-						rg.x = slot.r2; //r
-						rg.y = slot.g2; //g
-						b2.x = slot.b2; //b
-
-						var regionAttachment = attachment as RegionAttachment;
-						if (regionAttachment != null) {
-							uv2i[vi] = rg; uv2i[vi + 1] = rg; uv2i[vi + 2] = rg; uv2i[vi + 3] = rg;
-							uv3i[vi] = b2; uv3i[vi + 1] = b2; uv3i[vi + 2] = b2; uv3i[vi + 3] = b2;
-							vi += 4;
-						} else { //} if (settings.renderMeshes) {
-							var meshAttachment = attachment as MeshAttachment;
-							if (meshAttachment != null) {
-								int meshVertexCount = meshAttachment.worldVerticesLength;
-								for (int iii = 0; iii < meshVertexCount; iii += 2) {
-									uv2i[vi] = rg;
-									uv3i[vi] = b2;
-									vi++;
-								}
 							}
 						}
 					}

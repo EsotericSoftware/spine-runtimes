@@ -651,7 +651,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   groundMask:
     serializedVersion: 2
-    m_Bits: 1024
+    m_Bits: 1025
   use2D: 0
   useRadius: 1
   castRadius: 0.22
@@ -1833,7 +1833,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   groundMask:
     serializedVersion: 2
-    m_Bits: 1024
+    m_Bits: 1025
   use2D: 0
   useRadius: 1
   castRadius: 0.22

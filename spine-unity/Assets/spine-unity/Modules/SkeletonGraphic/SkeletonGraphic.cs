@@ -50,7 +50,6 @@ namespace Spine.Unity {
 		public float timeScale = 1f;
 		public bool freeze;
 		public bool unscaledTime;
-		//public bool tintBlack = false;
 
 		#if UNITY_EDITOR
 		protected override void OnValidate () {
@@ -68,6 +67,18 @@ namespace Spine.Unity {
 						Debug.LogError("Unity UI does not support multiple textures per Renderer. Your skeleton will not be rendered correctly. Recommend using SkeletonAnimation instead. This requires the use of a Screen space camera canvas.");
 				} else {
 					if (freeze) return;
+
+					if (!string.IsNullOrEmpty(initialSkinName)) {
+						var skin = skeleton.data.FindSkin(initialSkinName);
+						if (skin != null) {
+							if (skin == skeleton.data.defaultSkin)
+								skeleton.SetSkin((Skin)null);
+							else
+								skeleton.SetSkin(skin);
+						}
+							
+					}
+
 					skeleton.SetToSetupPose();
 					if (!string.IsNullOrEmpty(startingAnimation))
 						skeleton.PoseWithAnimation(startingAnimation, 0f, false);
@@ -172,6 +183,10 @@ namespace Spine.Unity {
 		DoubleBuffered<Spine.Unity.MeshRendererBuffers.SmartMesh> meshBuffers;
 		SkeletonRendererInstruction currentInstructions = new SkeletonRendererInstruction();
 
+		public Mesh GetLastMesh () {
+			return meshBuffers.GetCurrent().mesh;
+		}
+
 		public event UpdateBonesDelegate UpdateLocal;
 		public event UpdateBonesDelegate UpdateWorld;
 		public event UpdateBonesDelegate UpdateComplete;
@@ -204,8 +219,24 @@ namespace Spine.Unity {
 			if (!string.IsNullOrEmpty(initialSkinName))
 				skeleton.SetSkin(initialSkinName);
 
-			if (!string.IsNullOrEmpty(startingAnimation))
+			#if UNITY_EDITOR
+			if (!string.IsNullOrEmpty(startingAnimation)) {
+				if (Application.isPlaying) {
+					state.SetAnimation(0, startingAnimation, startingLoop);
+				} else {
+					// Assume SkeletonAnimation is valid for skeletonData and skeleton. Checked above.
+					var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(startingAnimation);
+					if (animationObject != null)
+						animationObject.Apply(skeleton, 0f, 0f, false, null, 1f, true, false);
+				}
+				Update(0);
+			}
+			#else
+			if (!string.IsNullOrEmpty(startingAnimation)) {
 				state.SetAnimation(0, startingAnimation, startingLoop);
+				Update(0);
+			}
+			#endif
 		}
 
 		public void UpdateMesh () {
