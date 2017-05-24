@@ -52,7 +52,7 @@ namespace Spine {
 		public float R2 { get { return r2; } set { r2 = value; } }
 		public float G2 { get { return g2; } set { g2 = value; } }
 		public float B2 { get { return b2; } set { b2 = value; } }
-		public bool HasSecondColor { get { return hasSecondColor; } set { hasSecondColor = value; } }
+		public bool HasSecondColor { get { return data.hasSecondColor; } set { data.hasSecondColor = value; } }
 
 		/// <summary>May be null.</summary>
 		public Attachment Attachment {
