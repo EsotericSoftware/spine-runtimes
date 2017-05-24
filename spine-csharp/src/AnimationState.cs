@@ -709,13 +709,13 @@ namespace Spine {
 						var entry = mixingTo[ii];
 						if (!entry.HasTimeline(id)) {
 							if (entry.mixDuration > 0) {
-								timelineData[i] = AnimationState.DIP_MIX;
-								timelineDipMix[i] = entry;
+								timelineDataItems[i] = AnimationState.DIP_MIX;
+								timelineDipMixItems[i] = entry;
 								goto outer; // continue outer;
 							}
 						}
 					}
-					timelineData[i] = AnimationState.DIP;
+					timelineDataItems[i] = AnimationState.DIP;
 				}
 				outer: {}
 			}
