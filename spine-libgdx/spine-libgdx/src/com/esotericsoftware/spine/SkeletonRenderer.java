@@ -35,6 +35,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.FloatArray;
@@ -55,8 +56,13 @@ public class SkeletonRenderer implements Disposable {
 	private final FloatArray vertices = new FloatArray(32);
 	private final SkeletonClipping clipper = new SkeletonClipping();
 	private ImmediateModeRenderer renderer;
+	private VertexEffect vertexEffect;
+	private final Vector2 temp = new Vector2();
 
 	public void draw (Batch batch, Skeleton skeleton) {
+		VertexEffect vertexEffect = this.vertexEffect;
+		if (vertexEffect != null) vertexEffect.begin(skeleton);
+
 		boolean premultipliedAlpha = this.premultipliedAlpha;
 		float[] vertices = this.vertices.items;
 		Color skeletonColor = skeleton.color;
@@ -80,6 +86,8 @@ public class SkeletonRenderer implements Disposable {
 					vertices[v + 1] = uvs[u];
 					vertices[v + 2] = uvs[u + 1];
 				}
+
+				if (vertexEffect != null) applyVertexEffect(vertices, 20, 5);
 
 				BlendMode blendMode = slot.data.getBlendMode();
 				batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
@@ -122,10 +130,15 @@ public class SkeletonRenderer implements Disposable {
 			clipper.clipEnd(slot);
 		}
 		clipper.clipEnd();
+		if (vertexEffect != null) vertexEffect.end();
 	}
 
 	@SuppressWarnings("null")
 	public void draw (PolygonSpriteBatch batch, Skeleton skeleton) {
+		Vector2 temp = this.temp;
+		VertexEffect vertexEffect = this.vertexEffect;
+		if (vertexEffect != null) vertexEffect.begin(skeleton);
+
 		boolean premultipliedAlpha = this.premultipliedAlpha;
 		BlendMode blendMode = null;
 		int verticesLength = 0;
@@ -209,13 +222,27 @@ public class SkeletonRenderer implements Disposable {
 					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, c, 0, false);
 					FloatArray clippedVertices = clipper.getClippedVertices();
 					ShortArray clippedTriangles = clipper.getClippedTriangles();
+					if (vertexEffect != null) applyVertexEffect(clippedVertices.items, clippedVertices.size, 5);
 					batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,
 						clippedTriangles.size);
 				} else {
-					for (int v = 2, u = 0; v < verticesLength; v += 5, u += 2) {
-						vertices[v] = c;
-						vertices[v + 1] = uvs[u];
-						vertices[v + 2] = uvs[u + 1];
+					if (vertexEffect != null) {
+						for (int v = 0, u = 0; v < verticesLength; v += 5, u += 2) {
+							temp.x = vertices[v];
+							temp.y = vertices[v + 1];
+							vertexEffect.transform(temp);
+							vertices[v] = temp.x;
+							vertices[v + 1] = temp.y;
+							vertices[v + 2] = c;
+							vertices[v + 3] = uvs[u];
+							vertices[v + 4] = uvs[u + 1];
+						}
+					} else {
+						for (int v = 2, u = 0; v < verticesLength; v += 5, u += 2) {
+							vertices[v] = c;
+							vertices[v + 1] = uvs[u];
+							vertices[v + 2] = uvs[u + 1];
+						}
 					}
 					batch.draw(texture, vertices, 0, verticesLength, triangles, 0, triangles.length);
 				}
@@ -224,10 +251,15 @@ public class SkeletonRenderer implements Disposable {
 			clipper.clipEnd(slot);
 		}
 		clipper.clipEnd();
+		if (vertexEffect != null) vertexEffect.end();
 	}
 
 	@SuppressWarnings("null")
 	public void draw (TwoColorPolygonBatch batch, Skeleton skeleton) {
+		Vector2 temp = this.temp;
+		VertexEffect vertexEffect = this.vertexEffect;
+		if (vertexEffect != null) vertexEffect.begin(skeleton);
+
 		boolean premultipliedAlpha = this.premultipliedAlpha;
 		BlendMode blendMode = null;
 		int verticesLength = 0;
@@ -317,14 +349,29 @@ public class SkeletonRenderer implements Disposable {
 					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, light, dark, true);
 					FloatArray clippedVertices = clipper.getClippedVertices();
 					ShortArray clippedTriangles = clipper.getClippedTriangles();
+					if (vertexEffect != null) applyVertexEffect(clippedVertices.items, clippedVertices.size, 6);
 					batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,
 						clippedTriangles.size);
 				} else {
-					for (int v = 2, u = 0; v < verticesLength; v += 6, u += 2) {
-						vertices[v] = light;
-						vertices[v + 1] = dark;
-						vertices[v + 2] = uvs[u];
-						vertices[v + 3] = uvs[u + 1];
+					if (vertexEffect != null) {
+						for (int v = 0, u = 0; v < verticesLength; v += 6, u += 2) {
+							temp.x = vertices[v];
+							temp.y = vertices[v + 1];
+							vertexEffect.transform(temp);
+							vertices[v] = temp.x;
+							vertices[v + 1] = temp.y;
+							vertices[v + 2] = light;
+							vertices[v + 3] = dark;
+							vertices[v + 4] = uvs[u];
+							vertices[v + 5] = uvs[u + 1];
+						}
+					} else {
+						for (int v = 2, u = 0; v < verticesLength; v += 6, u += 2) {
+							vertices[v] = light;
+							vertices[v + 1] = dark;
+							vertices[v + 2] = uvs[u];
+							vertices[v + 3] = uvs[u + 1];
+						}
 					}
 					batch.draw(texture, vertices, 0, verticesLength, triangles, 0, triangles.length);
 				}
@@ -333,13 +380,46 @@ public class SkeletonRenderer implements Disposable {
 			clipper.clipEnd(slot);
 		}
 		clipper.clipEnd();
+		if (vertexEffect != null) vertexEffect.end();
+	}
+
+	private void applyVertexEffect (float[] vertices, int verticesLength, int stride) {
+		VertexEffect vertexEffect = this.vertexEffect;
+		Vector2 temp = this.temp;
+		for (int v = 0; v < verticesLength; v += stride) {
+			temp.x = vertices[v];
+			temp.y = vertices[v + 1];
+			vertexEffect.transform(temp);
+			vertices[v] = temp.x;
+			vertices[v + 1] = temp.y;
+		}
+	}
+
+	public boolean getPremultipliedAlpha () {
+		return premultipliedAlpha;
 	}
 
 	public void setPremultipliedAlpha (boolean premultipliedAlpha) {
 		this.premultipliedAlpha = premultipliedAlpha;
 	}
 
+	public VertexEffect getVertexEffect () {
+		return vertexEffect;
+	}
+
+	public void setVertexEffect (VertexEffect vertexEffect) {
+		this.vertexEffect = vertexEffect;
+	}
+
 	public void dispose () {
 		renderer.dispose();
+	}
+
+	static public interface VertexEffect {
+		public void begin (Skeleton skeleton);
+
+		public void transform (Vector2 vertex);
+
+		public void end ();
 	}
 }
