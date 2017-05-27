@@ -17,6 +17,26 @@ public class SwirlEffect implements VertexEffect {
 		this.radius = radius;
 	}
 
+	public void begin (Skeleton skeleton) {
+		worldX = skeleton.getX() + centerX;
+		worldY = skeleton.getY() + centerY;
+	}
+
+	public void transform (Vector2 vertex) {
+		float x = vertex.x - worldX;
+		float y = vertex.y - worldY;
+		float dist = (float)Math.sqrt(x * x + y * y);
+		if (dist < radius) {
+			float theta = interpolation.apply(0, angle, (radius - dist) / radius);
+			float cos = SpineUtils.cos(theta), sin = SpineUtils.sin(theta);
+			vertex.x = cos * x - sin * y + worldX;
+			vertex.y = sin * x + cos * y + worldY;
+		}
+	}
+
+	public void end () {
+	}
+
 	public void setRadius (float radius) {
 		this.radius = radius;
 	}
@@ -38,23 +58,11 @@ public class SwirlEffect implements VertexEffect {
 		this.angle = degrees * MathUtils.degRad;
 	}
 
-	public void begin (Skeleton skeleton) {
-		worldX = skeleton.getX() + centerX;
-		worldY = skeleton.getY() + centerY;
+	public Interpolation getInterpolation () {
+		return interpolation;
 	}
 
-	public void transform (Vector2 vertex) {
-		float x = vertex.x - worldX;
-		float y = vertex.y - worldY;
-		float dist = (float)Math.sqrt(x * x + y * y);
-		if (dist < radius) {
-			float theta = interpolation.apply(0, angle, (radius - dist) / radius);
-			float cos = SpineUtils.cos(theta), sin = SpineUtils.sin(theta);
-			vertex.x = cos * x - sin * y + worldX;
-			vertex.y = sin * x + cos * y + worldY;
-		}
-	}
-
-	public void end () {
+	public void setInterpolation (Interpolation interpolation) {
+		this.interpolation = interpolation;
 	}
 }

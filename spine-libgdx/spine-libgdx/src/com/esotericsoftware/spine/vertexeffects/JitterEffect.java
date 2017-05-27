@@ -14,6 +14,17 @@ public class JitterEffect implements VertexEffect {
 		this.y = y;
 	}
 
+	public void begin (Skeleton skeleton) {
+	}
+
+	public void transform (Vector2 vertex) {
+		vertex.x += MathUtils.randomTriangular(-x, y);
+		vertex.y += MathUtils.randomTriangular(-x, y);
+	}
+
+	public void end () {
+	}
+
 	public void setJitter (float x, float y) {
 		this.x = x;
 		this.y = y;
@@ -25,16 +36,5 @@ public class JitterEffect implements VertexEffect {
 
 	public void setJitterY (float y) {
 		this.y = y;
-	}
-
-	public void begin (Skeleton skeleton) {
-	}
-
-	public void transform (Vector2 vertex) {
-		vertex.x += MathUtils.randomTriangular(-x, y);
-		vertex.y += MathUtils.randomTriangular(-x, y);
-	}
-
-	public void end () {
 	}
 }
