@@ -236,8 +236,8 @@ void spAnimationState_dispose (spAnimationState* self) {
 	_spEventQueue_free(internal->queue);
 	FREE(internal->events);
 	FREE(internal->propertyIDs);
-    FREE(internal);
 	spTrackEntryArray_dispose(self->mixingTo);
+    FREE(internal);
 }
 
 void spAnimationState_update (spAnimationState* self, float delta) {
