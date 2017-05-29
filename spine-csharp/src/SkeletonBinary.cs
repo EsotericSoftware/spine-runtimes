@@ -32,6 +32,8 @@
 #define IS_UNITY
 #endif
 
+#define USE_NEW_STREAM
+
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -42,6 +44,12 @@ using Windows.Storage;
 #endif
 
 namespace Spine {
+
+#if USE_NEW_STREAM
+using NewStream = Spine.SkeletonBinaryStream;
+#else
+using NewStream = System.IO.Stream;
+#endif
 	public class SkeletonBinary {
 		public const int BONE_ROTATE = 0;
 		public const int BONE_TRANSLATE = 1;
@@ -134,7 +142,20 @@ namespace Spine {
 			}
 		}
 
+#if USE_NEW_STREAM
 		public SkeletonData ReadSkeletonData (Stream input) {
+			return ReadSkeletonData(new SkeletonBinaryBufferedStream(input));
+		}
+#endif
+		public SkeletonData ReadSkeletonData (byte[] bytes) {
+#if USE_NEW_STREAM
+			return ReadSkeletonData(new SkeletonBinaryArrayReaderStream(bytes));
+#else
+			return ReadSkeletonData(new MemoryStream(bytes));
+#endif
+		}
+
+		public SkeletonData ReadSkeletonData (NewStream input) {
 			if (input == null) throw new ArgumentNullException("input");
 			float scale = Scale;
 
@@ -287,7 +308,7 @@ namespace Spine {
 
 
 		/// <returns>May be null.</returns>
-		private Skin ReadSkin (Stream input, String skinName, bool nonessential) {
+		private Skin ReadSkin (NewStream input, String skinName, bool nonessential) {
 			int slotCount = ReadVarint(input, true);
 			if (slotCount == 0) return null;
 			Skin skin = new Skin(skinName);
@@ -302,7 +323,7 @@ namespace Spine {
 			return skin;
 		}
 
-		private Attachment ReadAttachment (Stream input, Skin skin, int slotIndex, String attachmentName, bool nonessential) {
+		private Attachment ReadAttachment (NewStream input, Skin skin, int slotIndex, String attachmentName, bool nonessential) {
 			float scale = Scale;
 
 			String name = ReadString(input);
@@ -441,7 +462,7 @@ namespace Spine {
 			return null;
 		}
 
-		private Vertices ReadVertices (Stream input, int vertexCount) {
+		private Vertices ReadVertices (NewStream input, int vertexCount) {
 			float scale = Scale;
 			int verticesLength = vertexCount << 1;
 			Vertices vertices = new Vertices();
@@ -467,7 +488,7 @@ namespace Spine {
 			return vertices;
 		}
 
-		private float[] ReadFloatArray (Stream input, int n, float scale) {
+		private float[] ReadFloatArray (NewStream input, int n, float scale) {
 			float[] array = new float[n];
 			if (scale == 1) {
 				for (int i = 0; i < n; i++)
@@ -479,7 +500,7 @@ namespace Spine {
 			return array;
 		}
 
-		private int[] ReadShortArray (Stream input) {
+		private int[] ReadShortArray (NewStream input) {
 			int n = ReadVarint(input, true);
 			int[] array = new int[n];
 			for (int i = 0; i < n; i++) 
@@ -487,7 +508,7 @@ namespace Spine {
 			return array;
 		}
 
-		private void ReadAnimation (String name, Stream input, SkeletonData skeletonData) {
+		private void ReadAnimation (String name, NewStream input, SkeletonData skeletonData) {
 			var timelines = new ExposedList<Timeline>();
 			float scale = Scale;
 			float duration = 0;
@@ -747,7 +768,7 @@ namespace Spine {
 			skeletonData.animations.Add(new Animation(name, timelines, duration));
 		}
 
-		private void ReadCurve (Stream input, int frameIndex, CurveTimeline timeline) {
+		private void ReadCurve (NewStream input, int frameIndex, CurveTimeline timeline) {
 			switch (input.ReadByte()) {
 			case CURVE_STEPPED:
 				timeline.SetStepped(frameIndex);
@@ -756,6 +777,11 @@ namespace Spine {
 				timeline.SetCurve(frameIndex, ReadFloat(input), ReadFloat(input), ReadFloat(input), ReadFloat(input));
 				break;
 			}
+		}
+
+		private static sbyte ReadSByte(SkeletonBinaryStream input)
+		{
+			return input.ReadSByte();
 		}
 
 		private static sbyte ReadSByte (Stream input) {
@@ -768,6 +794,11 @@ namespace Spine {
 			return input.ReadByte() != 0;
 		}
 
+		private static bool ReadBoolean(SkeletonBinaryStream input)
+		{
+			return input.ReadBoolean();
+		}
+
 		private float ReadFloat (Stream input) {
 			buffer[3] = (byte)input.ReadByte();
 			buffer[2] = (byte)input.ReadByte();
@@ -776,8 +807,18 @@ namespace Spine {
 			return BitConverter.ToSingle(buffer, 0);
 		}
 
+		private float ReadFloat(SkeletonBinaryStream input)
+		{
+			return input.ReadFloat();
+		}
+
 		private static int ReadInt (Stream input) {
 			return (input.ReadByte() << 24) + (input.ReadByte() << 16) + (input.ReadByte() << 8) + input.ReadByte();
+		}
+
+		private static int ReadInt(SkeletonBinaryStream input)
+		{
+			return input.ReadInt();
 		}
 
 		private static int ReadVarint (Stream input, bool optimizePositive) {
@@ -799,6 +840,11 @@ namespace Spine {
 			return optimizePositive ? result : ((result >> 1) ^ -(result & 1));
 		}
 
+		private static int ReadVarint(SkeletonBinaryStream input, bool optimizePositive)
+		{
+			return input.ReadVarint(optimizePositive);
+		}
+
 		private string ReadString (Stream input) {
 			int byteCount = ReadVarint(input, true);
 			switch (byteCount) {
@@ -812,6 +858,11 @@ namespace Spine {
 			if (buffer.Length < byteCount) buffer = new byte[byteCount];
 			ReadFully(input, buffer, 0, byteCount);
 			return System.Text.Encoding.UTF8.GetString(buffer, 0, byteCount);
+		}
+
+		private string ReadString(SkeletonBinaryStream input)
+		{
+			return input.ReadString();
 		}
 
 		private static void ReadFully (Stream input, byte[] buffer, int offset, int length) {

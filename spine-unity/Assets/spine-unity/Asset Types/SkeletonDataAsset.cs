@@ -181,11 +181,10 @@ namespace Spine.Unity {
 		}
 
 		internal static SkeletonData ReadSkeletonData (byte[] bytes, AttachmentLoader attachmentLoader, float scale) {
-			var input = new MemoryStream(bytes);
 			var binary = new SkeletonBinary(attachmentLoader) {
 				Scale = scale
 			};
-			return binary.ReadSkeletonData(input);
+			return binary.ReadSkeletonData(bytes);
 		}
 
 		internal static SkeletonData ReadSkeletonData (string text, AttachmentLoader attachmentLoader, float scale) {
