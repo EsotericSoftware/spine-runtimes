@@ -158,16 +158,18 @@ public class AnimationState {
 	}
 
 	/** Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so the
-	 * animation state can be applied to multiple skeletons to pose them identically. */
-	public void apply (Skeleton skeleton) {
+	 * animation state can be applied to multiple skeletons to pose them identically.
+	 * @return True if any animations were applied. */
+	public boolean apply (Skeleton skeleton) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		if (animationsChanged) animationsChanged();
 
 		Array<Event> events = this.events;
-
+		boolean applied = false;
 		for (int i = 0, n = tracks.size; i < n; i++) {
 			TrackEntry current = tracks.get(i);
 			if (current == null || current.delay > 0) continue;
+			applied = true;
 
 			// Apply mixing from entries first.
 			float mix = current.alpha;
@@ -206,6 +208,7 @@ public class AnimationState {
 		}
 
 		queue.drain();
+		return applied;
 	}
 
 	private float applyMixingFrom (TrackEntry to, Skeleton skeleton) {
