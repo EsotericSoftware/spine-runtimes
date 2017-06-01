@@ -97,6 +97,7 @@
  * **Spine folder**. In the unitypackage, the "spine-csharp" and "spine-unity" folders are now inside a "Spine" folder. This change will only affect fresh imports. Importing the unitypackage to update Spine-Unity in your existing project will update the appropriate files however you chose to arrange them, as long as the meta files are intact.
  * **Breaking changes**
    * The Sprite shaders module was updated to the latest version from the [source](https://github.com/traggett/UnitySpriteShaders/commits/master). Some changes were made to the underlying keyword structure. You may need to review the settings of your lit materials. Particularly, your Fixed Normals settings.
+   * The `Spine/Skeleton Lit` shader was switched over to non-fixed-function code. It now no longer requires mesh normals and has fixed normals at the shader level. 
    * The old MeshGenerator classes, interfaces and code in `Spine.Unity.MeshGeneration` are now deprecated. All mesh-generating components now share the class `Spine.Unity.MeshGenerator` defined in `SpineMesh.cs`. MeshGenerator is a serializable class.
      * The `SkeletonRenderer.renderMeshes` optimization is currently non-functional.
      * Old triangle-winding code has been removed from `SkeletonRenderer`. Please use shaders that have backface culling off.

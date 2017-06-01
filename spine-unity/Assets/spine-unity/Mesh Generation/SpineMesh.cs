@@ -107,12 +107,12 @@ namespace Spine.Unity {
 			}
 		}
 
-		const float BoundsMinDefault = float.MaxValue;
-		const float BoundsMaxDefault = float.MinValue;
+		const float BoundsMinDefault = float.PositiveInfinity;
+		const float BoundsMaxDefault = float.NegativeInfinity;
 
-		[NonSerialized] readonly ExposedList<Vector3> vertexBuffer = new ExposedList<Vector3>();
-		[NonSerialized] readonly ExposedList<Vector2> uvBuffer = new ExposedList<Vector2>();
-		[NonSerialized] readonly ExposedList<Color32> colorBuffer = new ExposedList<Color32>();
+		[NonSerialized] readonly ExposedList<Vector3> vertexBuffer = new ExposedList<Vector3>(4);
+		[NonSerialized] readonly ExposedList<Vector2> uvBuffer = new ExposedList<Vector2>(4);
+		[NonSerialized] readonly ExposedList<Color32> colorBuffer = new ExposedList<Color32>(4);
 		[NonSerialized] readonly ExposedList<ExposedList<int>> submeshes = new ExposedList<ExposedList<int>> { new ExposedList<int>(6) }; // start with 1 submesh.
 
 		[NonSerialized] Vector2 meshBoundsMin, meshBoundsMax;
@@ -940,7 +940,7 @@ namespace Spine.Unity {
 				mesh.uv = ubi;
 				mesh.colors32 = cbi;
 
-				if (meshBoundsMin.x == BoundsMinDefault) {
+				if (float.IsInfinity(meshBoundsMin.x)) { // meshBoundsMin.x == BoundsMinDefault // == doesn't work on float Infinity constants.
 					mesh.bounds = new Bounds();
 				} else {
 					//mesh.bounds = ArraysMeshGenerator.ToBounds(meshBoundsMin, meshBoundsMax);

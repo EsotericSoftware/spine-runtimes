@@ -589,7 +589,8 @@ namespace Spine.Unity.Editor {
 					imagePaths.Add(str);
 					break;
 				case ".json":
-					if (IsSpineData((TextAsset)AssetDatabase.LoadAssetAtPath(str, typeof(TextAsset))))
+					var jsonAsset = (TextAsset)AssetDatabase.LoadAssetAtPath(str, typeof(TextAsset));
+					if (jsonAsset != null && IsSpineData(jsonAsset))
 						skeletonPaths.Add(str);
 					break;
 				case ".bytes":
@@ -1215,6 +1216,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static bool IsSpineData (TextAsset asset) {
+			if (asset == null) return false;
+
 			bool isSpineData = false;
 			string rawVersion = null;
 
