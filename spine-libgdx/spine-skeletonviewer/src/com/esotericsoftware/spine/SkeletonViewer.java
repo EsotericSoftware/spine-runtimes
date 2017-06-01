@@ -739,6 +739,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 					alphaSlider.setDisabled(track == 0);
 					alphaSlider.setValue(current == null ? 1 : current.alpha);
+
+					if (current != null) loopCheckbox.setChecked(current.getLoop());
 				}
 			};
 			for (TextButton button : trackButtons.getButtons())
