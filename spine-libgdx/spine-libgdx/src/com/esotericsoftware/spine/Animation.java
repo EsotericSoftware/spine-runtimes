@@ -869,7 +869,7 @@ public class Animation {
 
 			float[][] frameVertices = this.frameVertices;
 			int vertexCount = frameVertices[0].length;
-			if (verticesArray.size != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
+			if (verticesArray.size != vertexCount && !setupPose) alpha = 1; // Don't mix from uninitialized slot vertices.
 			float[] vertices = verticesArray.setSize(vertexCount);
 
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.
@@ -908,6 +908,7 @@ public class Animation {
 
 			if (alpha == 1) {
 				// Vertex positions or deform offsets, no alpha.
+				System.out.println(1);
 				for (int i = 0; i < vertexCount; i++) {
 					float prev = prevVertices[i];
 					vertices[i] = prev + (nextVertices[i] - prev) * percent;
@@ -916,6 +917,7 @@ public class Animation {
 				VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
 				if (vertexAttachment.getBones() == null) {
 					// Unweighted vertex positions, with alpha.
+					System.out.println(2);
 					float[] setupVertices = vertexAttachment.getVertices();
 					for (int i = 0; i < vertexCount; i++) {
 						float prev = prevVertices[i], setup = setupVertices[i];
@@ -923,6 +925,7 @@ public class Animation {
 					}
 				} else {
 					// Weighted deform offsets, with alpha.
+					System.out.println(3);
 					for (int i = 0; i < vertexCount; i++) {
 						float prev = prevVertices[i];
 						vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
@@ -930,6 +933,7 @@ public class Animation {
 				}
 			} else {
 				// Vertex positions or deform offsets, with alpha.
+				System.out.println(4);
 				for (int i = 0; i < vertexCount; i++) {
 					float prev = prevVertices[i];
 					vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
