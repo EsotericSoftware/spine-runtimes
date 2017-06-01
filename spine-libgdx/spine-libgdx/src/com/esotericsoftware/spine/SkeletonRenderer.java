@@ -34,10 +34,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.ShortArray;
@@ -49,13 +47,12 @@ import com.esotericsoftware.spine.attachments.SkeletonAttachment;
 import com.esotericsoftware.spine.utils.SkeletonClipping;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
-public class SkeletonRenderer implements Disposable {
+public class SkeletonRenderer {
 	static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
 
 	private boolean premultipliedAlpha;
 	private final FloatArray vertices = new FloatArray(32);
 	private final SkeletonClipping clipper = new SkeletonClipping();
-	private ImmediateModeRenderer renderer;
 	private VertexEffect vertexEffect;
 	private final Vector2 temp = new Vector2();
 
@@ -409,10 +406,6 @@ public class SkeletonRenderer implements Disposable {
 
 	public void setVertexEffect (VertexEffect vertexEffect) {
 		this.vertexEffect = vertexEffect;
-	}
-
-	public void dispose () {
-		renderer.dispose();
 	}
 
 	static public interface VertexEffect {
