@@ -64,6 +64,9 @@ public:
 
 	void setDebugBonesEnabled(bool enabled);
 	bool getDebugBonesEnabled() const;
+	
+	void setDebugMeshesEnabled(bool enabled);
+	bool getDebugMeshesEnabled() const;
 
 	// --- Convenience methods for common Skeleton_* functions.
 	void updateWorldTransform ();
@@ -130,6 +133,7 @@ protected:
 	float _timeScale;
 	bool _debugSlots;
 	bool _debugBones;
+	bool _debugMeshes;
 };
 
 }
