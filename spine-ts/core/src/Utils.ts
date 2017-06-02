@@ -42,7 +42,7 @@ module spine {
 			return !contains;
 		}
 
-		contains (value: number) {
+		contains (value: number): boolean {
 			return this.array[value | 0] != undefined;
 		}
 
@@ -69,7 +69,7 @@ module spine {
 		constructor (public r: number = 0, public g: number = 0, public b: number = 0, public a: number = 0) {
 		}
 
-		set (r: number, g: number, b: number, a: number) {
+		set (r: number, g: number, b: number, a: number): Color {
 			this.r = r;
 			this.g = g;
 			this.b = b;
@@ -78,7 +78,7 @@ module spine {
 			return this;
 		}
 
-		setFromColor (c: Color) {
+		setFromColor (c: Color): Color  {
 			this.r = c.r;
 			this.g = c.g;
 			this.b = c.b;
@@ -86,7 +86,7 @@ module spine {
 			return this;
 		}
 
-		setFromString (hex: string) {
+		setFromString (hex: string): Color  {
 			hex = hex.charAt(0) == '#' ? hex.substr(1) : hex;
 			this.r = parseInt(hex.substr(0, 2), 16) / 255.0;
 			this.g = parseInt(hex.substr(2, 2), 16) / 255.0;
@@ -95,7 +95,7 @@ module spine {
 			return this;
 		}
 
-		add (r: number, g: number, b: number, a: number) {
+		add (r: number, g: number, b: number, a: number): Color  {
 			this.r += r;
 			this.g += g;
 			this.b += b;
@@ -104,7 +104,7 @@ module spine {
 			return this;
 		}
 
-		clamp () {
+		clamp (): Color  {
 			if (this.r < 0) this.r = 0;
 			else if (this.r > 1) this.r = 1;
 
@@ -128,17 +128,17 @@ module spine {
 		static degreesToRadians = MathUtils.PI / 180;
 		static degRad = MathUtils.degreesToRadians;
 
-		static clamp (value: number, min: number, max: number) {
+		static clamp (value: number, min: number, max: number): number {
 			if (value < min) return min;
 			if (value > max) return max;
 			return value;
 		}
 
-		static cosDeg (degrees: number) {
+		static cosDeg (degrees: number): number {
 			return Math.cos(degrees * MathUtils.degRad);
 		}
 
-		static sinDeg (degrees: number) {
+		static sinDeg (degrees: number): number {
 			return Math.sin(degrees * MathUtils.degRad);
 		}
 
@@ -146,11 +146,11 @@ module spine {
 			return value > 0 ? 1 : value < 0 ? -1 : 0;
 		}
 
-		static toInt (x: number) {
+		static toInt (x: number): number {
 			return x > 0 ? Math.floor(x) : Math.ceil(x);
 		}
 
-		static cbrt (x: number) {
+		static cbrt (x: number): number {
 			var y = Math.pow(Math.abs(x), 1/3);
 			return x < 0 ? -y : y;
 		}
@@ -196,7 +196,7 @@ module spine {
 			}
 		}
 
-		static toFloatArray (array: Array<number>) {
+		static toFloatArray (array: Array<number>): ArrayLike<number> {
 			return Utils.SUPPORTS_TYPED_ARRAYS ? new Float32Array(array) : array;
 		}
 	}
@@ -218,7 +218,7 @@ module spine {
 			this.instantiator = instantiator;
 		}
 
-		obtain () {
+		obtain (): T {
 			return this.items.length > 0 ? this.items.pop() : this.instantiator();
 		}
 
@@ -249,13 +249,13 @@ module spine {
 			return this;
 		}
 
-		length () {
+		length (): number {
 			let x = this.x;
 			let y = this.y;
 			return Math.sqrt(x * x + y * y);
 		}
 
-		normalize () {
+		normalize (): Vector2 {
 			let len = this.length();
 			if (len != 0) {
 				this.x /= len;
