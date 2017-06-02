@@ -90,11 +90,14 @@ public class SkeletonMeshRenderer extends SkeletonRenderer<PolygonSpriteBatch> {
 
 			if (texture != null) {
 				BlendMode slotBlendMode = slot.data.getBlendMode();
+				int src = batch.getBlendSrcFunc();
+			        int dst = batch.getBlendDstFunc();
 				if (slotBlendMode != blendMode) {
 					blendMode = slotBlendMode;
 					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
 				}
 				batch.draw(texture, vertices, 0, vertices.length, triangles, 0, triangles.length);
+				batch.setBlendFunction(src, dst);
 			}
 		}
 	}
