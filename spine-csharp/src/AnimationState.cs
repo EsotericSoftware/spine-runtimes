@@ -159,16 +159,18 @@ namespace Spine {
 		/// <summary>
 		/// Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so the 
 		/// animation state can be applied to multiple skeletons to pose them identically.</summary>
-		public void Apply (Skeleton skeleton) {
+		public bool Apply (Skeleton skeleton) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 			if (animationsChanged) AnimationsChanged();
 
 			var events = this.events;
 
+			bool applied = false;
 			var tracksItems = tracks.Items;
 			for (int i = 0, m = tracks.Count; i < m; i++) {
 				TrackEntry current = tracksItems[i];
 				if (current == null || current.delay > 0) continue;
+				applied = true;
 
 				// Apply mixing from entries first.
 				float mix = current.alpha;
@@ -210,6 +212,7 @@ namespace Spine {
 			}
 
 			queue.Drain();
+			return applied;
 		}
 
 		private float ApplyMixingFrom (TrackEntry to, Skeleton skeleton) {
