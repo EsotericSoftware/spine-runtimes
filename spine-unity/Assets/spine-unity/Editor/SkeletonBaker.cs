@@ -135,7 +135,7 @@ namespace Spine.Unity.Editor {
 					//generate new dummy clip
 					AnimationClip newClip = new AnimationClip();
 					newClip.name = name;
-					#if !(UNITY_5)
+					#if !(UNITY_5_3_OR_NEWER)
 					AnimationUtility.SetAnimationType(newClip, ModelImporterAnimationType.Generic);
 					#endif
 					AssetDatabase.AddObjectToAsset(newClip, controller);
