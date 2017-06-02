@@ -14,6 +14,7 @@
 var canvas, gl, renderer, input, assetManager;
 var skeleton, bounds, state;
 var timeKeeper;
+var skelJsonObj;
 
 function init() {
 	canvas = document.getElementById("canvas");
@@ -24,9 +25,9 @@ function init() {
 	assetManager = new spine.webgl.AssetManager(gl, "assets/");
 	var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
 	input = new spine.webgl.Input(canvas);
-	assetManager.loadTexture("raptor.png");
-	assetManager.loadText("raptor.atlas");
-	assetManager.loadText("raptor.json");
+	assetManager.loadTexture("goblins.png");
+	assetManager.loadText("goblins-mesh.atlas");
+	assetManager.loadText("goblins-mesh.json");
 	timeKeeper = new spine.TimeKeeper();
 	requestAnimationFrame(load);
 }
@@ -34,26 +35,51 @@ function init() {
 function load() {
 	timeKeeper.update();
 	if (assetManager.isLoadingComplete()) {
-		var atlas = new spine.TextureAtlas(assetManager.get("raptor.atlas"), function(path) {
-			return assetManager.get(path);
-		});
-		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
-		var skeletonJson = new spine.SkeletonJson(atlasLoader);
-		skeletonJson.scale = 0.5;
-		var skeletonData = skeletonJson.readSkeletonData(JSON.parse(assetManager.get("raptor.json")));
-		skeleton = new spine.Skeleton(skeletonData);
-		var stateData = new spine.AnimationStateData(skeleton.data);
-		state = new spine.AnimationState(stateData);
-		stateData.setMix("walk", "Jump", 0.5);
-		state.setAnimation(0, "walk", false);
-		state.addAnimation(0, "Jump", false, 0);
-		state.apply(skeleton);
-		skeleton.updateWorldTransform();
+		skelJsonObj = JSON.parse(assetManager.get("goblins-mesh.json"));
+		loadSkeleton();
 
 		requestAnimationFrame(render);
 	} else {
 		requestAnimationFrame(load);
 	}
+}
+
+function loadSkeleton() {
+	var atlas = new spine.TextureAtlas(assetManager.get("goblins-mesh.atlas"), function(path) {
+		return assetManager.get(path);
+	});
+	var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+	var skeletonJson = new spine.SkeletonJson(atlasLoader);
+	skeletonJson.scale = 1.5;
+	var skeletonData = skeletonJson.readSkeletonData(skelJsonObj);
+	skeleton = new spine.Skeleton(skeletonData);
+	skeleton.setSkinByName('goblin');
+	var stateData = new spine.AnimationStateData(skeleton.data);
+	state = new spine.AnimationState(stateData);
+	state.setAnimation(0, "walk", false);
+	state.addListener({
+		start: function(track) {
+			console.log("Animation on track " + track.trackIndex + " started");
+		},
+		interrupt: function(track) {
+			console.log("Animation on track " + track.trackIndex + " interrupted");
+		},
+		end: function(track) {
+			console.log("Animation on track " + track.trackIndex + " ended");
+		},
+		disposed: function(track) {
+			console.log("Animation on track " + track.trackIndex + " disposed");
+		},
+		complete: function(track) {
+			console.log("Animation on track " + track.trackIndex + " completed");
+			loadSkeleton();
+		},
+		event: function(track, event) {
+			console.log("Event on track " + track.trackIndex + ": " + JSON.stringify(event));
+		}
+	})
+	state.apply(skeleton);
+	skeleton.updateWorldTransform();
 }
 
 function render() {
