@@ -412,6 +412,9 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			int newRegionIndex = 0;
 			foreach (var kvp in skinAttachments) {
 				var newAttachment = kvp.Value.GetClone(true);
+				if (newAttachment == null) {
+					return;	
+				}
 				if (IsRenderable(newAttachment)) {
 
 					var region = newAttachment.GetAtlasRegion();
