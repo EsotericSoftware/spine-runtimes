@@ -64,6 +64,9 @@ namespace Spine.Unity.Modules {
 
 				var slot = skeletonRenderer.skeleton.FindSlot(entry.slot);
 				var region = atlas.FindRegion(entry.region);
+				if (region == null) {
+					return;
+				}
 				slot.Attachment = region.ToRegionAttachment(entry.region, scale);
 			}
 		}
