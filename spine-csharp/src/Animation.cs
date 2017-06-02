@@ -773,7 +773,7 @@ namespace Spine {
 			float[][] frameVertices = this.frameVertices;
 			int vertexCount = frameVertices[0].Length;
 
-			if (verticesArray.Count != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
+			if (verticesArray.Count != vertexCount && !setupPose) alpha = 1; // Don't mix from uninitialized slot vertices.
 			// verticesArray.SetSize(vertexCount) // Ensure size and preemptively set count.
 			if (verticesArray.Capacity < vertexCount) verticesArray.Capacity = vertexCount;
 			verticesArray.Count = vertexCount;
