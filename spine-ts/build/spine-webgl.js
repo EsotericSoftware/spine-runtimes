@@ -4634,7 +4634,7 @@ var spine;
 					this.readVertices(map, path, vertexCount << 1);
 					var lengths = spine.Utils.newArray(vertexCount / 3, 0);
 					for (var i = 0; i < map.lengths.length; i++)
-						lengths[i++] = map.lengths[i] * scale;
+						lengths[i] = map.lengths[i] * scale;
 					path.lengths = lengths;
 					var color = this.getValue(map, "color", null);
 					if (color != null)
