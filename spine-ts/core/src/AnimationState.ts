@@ -131,16 +131,18 @@ module spine {
 			return false;
 		}
 
-		apply (skeleton: Skeleton) {
+		apply (skeleton: Skeleton) : boolean {
 			if (skeleton == null) throw new Error("skeleton cannot be null.");
 			if (this.animationsChanged) this._animationsChanged();
 
 			let events = this.events;
 			let tracks = this.tracks;
+			let applied = false;
 
 			for (let i = 0, n = tracks.length; i < n; i++) {
 				let current = tracks[i];
 				if (current == null || current.delay > 0) continue;
+				applied = true;
 
 				// Apply mixing from entries first.
 				let mix = current.alpha;
@@ -179,6 +181,7 @@ module spine {
 			}
 
 			this.queue.drain();
+			return applied;
 		}
 
 		applyMixingFrom (to: TrackEntry, skeleton: Skeleton) {
@@ -206,7 +209,7 @@ module spine {
 			let timelinesRotation = from.timelinesRotation;
 
 			let first = false;
-			let alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix), alpha;
+			let alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix), alpha = 0;
 			from.totalAlpha = 0;
 			for (var i = 0; i < timelineCount; i++) {
 				let timeline = timelines[i];

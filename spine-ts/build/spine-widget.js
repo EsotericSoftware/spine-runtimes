@@ -1,13 +1,8 @@
-var __extends = (this && this.__extends) || (function () {
-	var extendStatics = Object.setPrototypeOf ||
-		({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-		function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-	return function (d, b) {
-		extendStatics(d, b);
-		function __() { this.constructor = d; }
-		d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-})();
+var __extends = (this && this.__extends) || function (d, b) {
+	for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	function __() { this.constructor = d; }
+	d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var spine;
 (function (spine) {
 	var Animation = (function () {
@@ -58,7 +53,6 @@ var spine;
 		return Animation;
 	}());
 	spine.Animation = Animation;
-	var TimelineType;
 	(function (TimelineType) {
 		TimelineType[TimelineType["rotate"] = 0] = "rotate";
 		TimelineType[TimelineType["translate"] = 1] = "translate";
@@ -75,7 +69,8 @@ var spine;
 		TimelineType[TimelineType["pathConstraintSpacing"] = 12] = "pathConstraintSpacing";
 		TimelineType[TimelineType["pathConstraintMix"] = 13] = "pathConstraintMix";
 		TimelineType[TimelineType["twoColor"] = 14] = "twoColor";
-	})(TimelineType = spine.TimelineType || (spine.TimelineType = {}));
+	})(spine.TimelineType || (spine.TimelineType = {}));
+	var TimelineType = spine.TimelineType;
 	var CurveTimeline = (function () {
 		function CurveTimeline(frameCount) {
 			if (frameCount <= 0)
@@ -151,19 +146,18 @@ var spine;
 			var y = curves[i - 1];
 			return y + (1 - y) * (percent - x) / (1 - x);
 		};
+		CurveTimeline.LINEAR = 0;
+		CurveTimeline.STEPPED = 1;
+		CurveTimeline.BEZIER = 2;
+		CurveTimeline.BEZIER_SIZE = 10 * 2 - 1;
 		return CurveTimeline;
 	}());
-	CurveTimeline.LINEAR = 0;
-	CurveTimeline.STEPPED = 1;
-	CurveTimeline.BEZIER = 2;
-	CurveTimeline.BEZIER_SIZE = 10 * 2 - 1;
 	spine.CurveTimeline = CurveTimeline;
 	var RotateTimeline = (function (_super) {
 		__extends(RotateTimeline, _super);
 		function RotateTimeline(frameCount) {
-			var _this = _super.call(this, frameCount) || this;
-			_this.frames = spine.Utils.newFloatArray(frameCount << 1);
-			return _this;
+			_super.call(this, frameCount);
+			this.frames = spine.Utils.newFloatArray(frameCount << 1);
 		}
 		RotateTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.rotate << 24) + this.boneIndex;
@@ -208,19 +202,18 @@ var spine;
 				bone.rotation += r * alpha;
 			}
 		};
+		RotateTimeline.ENTRIES = 2;
+		RotateTimeline.PREV_TIME = -2;
+		RotateTimeline.PREV_ROTATION = -1;
+		RotateTimeline.ROTATION = 1;
 		return RotateTimeline;
 	}(CurveTimeline));
-	RotateTimeline.ENTRIES = 2;
-	RotateTimeline.PREV_TIME = -2;
-	RotateTimeline.PREV_ROTATION = -1;
-	RotateTimeline.ROTATION = 1;
 	spine.RotateTimeline = RotateTimeline;
 	var TranslateTimeline = (function (_super) {
 		__extends(TranslateTimeline, _super);
 		function TranslateTimeline(frameCount) {
-			var _this = _super.call(this, frameCount) || this;
-			_this.frames = spine.Utils.newFloatArray(frameCount * TranslateTimeline.ENTRIES);
-			return _this;
+			_super.call(this, frameCount);
+			this.frames = spine.Utils.newFloatArray(frameCount * TranslateTimeline.ENTRIES);
 		}
 		TranslateTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.translate << 24) + this.boneIndex;
@@ -264,19 +257,19 @@ var spine;
 				bone.y += (bone.data.y + y - bone.y) * alpha;
 			}
 		};
+		TranslateTimeline.ENTRIES = 3;
+		TranslateTimeline.PREV_TIME = -3;
+		TranslateTimeline.PREV_X = -2;
+		TranslateTimeline.PREV_Y = -1;
+		TranslateTimeline.X = 1;
+		TranslateTimeline.Y = 2;
 		return TranslateTimeline;
 	}(CurveTimeline));
-	TranslateTimeline.ENTRIES = 3;
-	TranslateTimeline.PREV_TIME = -3;
-	TranslateTimeline.PREV_X = -2;
-	TranslateTimeline.PREV_Y = -1;
-	TranslateTimeline.X = 1;
-	TranslateTimeline.Y = 2;
 	spine.TranslateTimeline = TranslateTimeline;
 	var ScaleTimeline = (function (_super) {
 		__extends(ScaleTimeline, _super);
 		function ScaleTimeline(frameCount) {
-			return _super.call(this, frameCount) || this;
+			_super.call(this, frameCount);
 		}
 		ScaleTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.scale << 24) + this.boneIndex;
@@ -337,7 +330,7 @@ var spine;
 	var ShearTimeline = (function (_super) {
 		__extends(ShearTimeline, _super);
 		function ShearTimeline(frameCount) {
-			return _super.call(this, frameCount) || this;
+			_super.call(this, frameCount);
 		}
 		ShearTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.shear << 24) + this.boneIndex;
@@ -381,9 +374,8 @@ var spine;
 	var ColorTimeline = (function (_super) {
 		__extends(ColorTimeline, _super);
 		function ColorTimeline(frameCount) {
-			var _this = _super.call(this, frameCount) || this;
-			_this.frames = spine.Utils.newFloatArray(frameCount * ColorTimeline.ENTRIES);
-			return _this;
+			_super.call(this, frameCount);
+			this.frames = spine.Utils.newFloatArray(frameCount * ColorTimeline.ENTRIES);
 		}
 		ColorTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.color << 24) + this.slotIndex;
@@ -434,25 +426,24 @@ var spine;
 				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 			}
 		};
+		ColorTimeline.ENTRIES = 5;
+		ColorTimeline.PREV_TIME = -5;
+		ColorTimeline.PREV_R = -4;
+		ColorTimeline.PREV_G = -3;
+		ColorTimeline.PREV_B = -2;
+		ColorTimeline.PREV_A = -1;
+		ColorTimeline.R = 1;
+		ColorTimeline.G = 2;
+		ColorTimeline.B = 3;
+		ColorTimeline.A = 4;
 		return ColorTimeline;
 	}(CurveTimeline));
-	ColorTimeline.ENTRIES = 5;
-	ColorTimeline.PREV_TIME = -5;
-	ColorTimeline.PREV_R = -4;
-	ColorTimeline.PREV_G = -3;
-	ColorTimeline.PREV_B = -2;
-	ColorTimeline.PREV_A = -1;
-	ColorTimeline.R = 1;
-	ColorTimeline.G = 2;
-	ColorTimeline.B = 3;
-	ColorTimeline.A = 4;
 	spine.ColorTimeline = ColorTimeline;
 	var TwoColorTimeline = (function (_super) {
 		__extends(TwoColorTimeline, _super);
 		function TwoColorTimeline(frameCount) {
-			var _this = _super.call(this, frameCount) || this;
-			_this.frames = spine.Utils.newFloatArray(frameCount * TwoColorTimeline.ENTRIES);
-			return _this;
+			_super.call(this, frameCount);
+			this.frames = spine.Utils.newFloatArray(frameCount * TwoColorTimeline.ENTRIES);
 		}
 		TwoColorTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.twoColor << 24) + this.slotIndex;
@@ -523,24 +514,24 @@ var spine;
 				dark.add((r2 - dark.r) * alpha, (g2 - dark.g) * alpha, (b2 - dark.b) * alpha, 0);
 			}
 		};
+		TwoColorTimeline.ENTRIES = 8;
+		TwoColorTimeline.PREV_TIME = -8;
+		TwoColorTimeline.PREV_R = -7;
+		TwoColorTimeline.PREV_G = -6;
+		TwoColorTimeline.PREV_B = -5;
+		TwoColorTimeline.PREV_A = -4;
+		TwoColorTimeline.PREV_R2 = -3;
+		TwoColorTimeline.PREV_G2 = -2;
+		TwoColorTimeline.PREV_B2 = -1;
+		TwoColorTimeline.R = 1;
+		TwoColorTimeline.G = 2;
+		TwoColorTimeline.B = 3;
+		TwoColorTimeline.A = 4;
+		TwoColorTimeline.R2 = 5;
+		TwoColorTimeline.G2 = 6;
+		TwoColorTimeline.B2 = 7;
 		return TwoColorTimeline;
 	}(CurveTimeline));
-	TwoColorTimeline.ENTRIES = 8;
-	TwoColorTimeline.PREV_TIME = -8;
-	TwoColorTimeline.PREV_R = -7;
-	TwoColorTimeline.PREV_G = -6;
-	TwoColorTimeline.PREV_B = -5;
-	TwoColorTimeline.PREV_A = -4;
-	TwoColorTimeline.PREV_R2 = -3;
-	TwoColorTimeline.PREV_G2 = -2;
-	TwoColorTimeline.PREV_B2 = -1;
-	TwoColorTimeline.R = 1;
-	TwoColorTimeline.G = 2;
-	TwoColorTimeline.B = 3;
-	TwoColorTimeline.A = 4;
-	TwoColorTimeline.R2 = 5;
-	TwoColorTimeline.G2 = 6;
-	TwoColorTimeline.B2 = 7;
 	spine.TwoColorTimeline = TwoColorTimeline;
 	var AttachmentTimeline = (function () {
 		function AttachmentTimeline(frameCount) {
@@ -587,10 +578,9 @@ var spine;
 	var DeformTimeline = (function (_super) {
 		__extends(DeformTimeline, _super);
 		function DeformTimeline(frameCount) {
-			var _this = _super.call(this, frameCount) || this;
-			_this.frames = spine.Utils.newFloatArray(frameCount);
-			_this.frameVertices = new Array(frameCount);
-			return _this;
+			_super.call(this, frameCount);
+			this.frames = spine.Utils.newFloatArray(frameCount);
+			this.frameVertices = new Array(frameCount);
 		}
 		DeformTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.deform << 24) + this.slotIndex;
@@ -771,9 +761,8 @@ var spine;
 	var IkConstraintTimeline = (function (_super) {
 		__extends(IkConstraintTimeline, _super);
 		function IkConstraintTimeline(frameCount) {
-			var _this = _super.call(this, frameCount) || this;
-			_this.frames = spine.Utils.newFloatArray(frameCount * IkConstraintTimeline.ENTRIES);
-			return _this;
+			_super.call(this, frameCount);
+			this.frames = spine.Utils.newFloatArray(frameCount * IkConstraintTimeline.ENTRIES);
 		}
 		IkConstraintTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.ikConstraint << 24) + this.ikConstraintIndex;
@@ -821,21 +810,20 @@ var spine;
 					constraint.bendDirection = frames[frame + IkConstraintTimeline.PREV_BEND_DIRECTION];
 			}
 		};
+		IkConstraintTimeline.ENTRIES = 3;
+		IkConstraintTimeline.PREV_TIME = -3;
+		IkConstraintTimeline.PREV_MIX = -2;
+		IkConstraintTimeline.PREV_BEND_DIRECTION = -1;
+		IkConstraintTimeline.MIX = 1;
+		IkConstraintTimeline.BEND_DIRECTION = 2;
 		return IkConstraintTimeline;
 	}(CurveTimeline));
-	IkConstraintTimeline.ENTRIES = 3;
-	IkConstraintTimeline.PREV_TIME = -3;
-	IkConstraintTimeline.PREV_MIX = -2;
-	IkConstraintTimeline.PREV_BEND_DIRECTION = -1;
-	IkConstraintTimeline.MIX = 1;
-	IkConstraintTimeline.BEND_DIRECTION = 2;
 	spine.IkConstraintTimeline = IkConstraintTimeline;
 	var TransformConstraintTimeline = (function (_super) {
 		__extends(TransformConstraintTimeline, _super);
 		function TransformConstraintTimeline(frameCount) {
-			var _this = _super.call(this, frameCount) || this;
-			_this.frames = spine.Utils.newFloatArray(frameCount * TransformConstraintTimeline.ENTRIES);
-			return _this;
+			_super.call(this, frameCount);
+			this.frames = spine.Utils.newFloatArray(frameCount * TransformConstraintTimeline.ENTRIES);
 		}
 		TransformConstraintTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.transformConstraint << 24) + this.transformConstraintIndex;
@@ -896,25 +884,24 @@ var spine;
 				constraint.shearMix += (shear - constraint.shearMix) * alpha;
 			}
 		};
+		TransformConstraintTimeline.ENTRIES = 5;
+		TransformConstraintTimeline.PREV_TIME = -5;
+		TransformConstraintTimeline.PREV_ROTATE = -4;
+		TransformConstraintTimeline.PREV_TRANSLATE = -3;
+		TransformConstraintTimeline.PREV_SCALE = -2;
+		TransformConstraintTimeline.PREV_SHEAR = -1;
+		TransformConstraintTimeline.ROTATE = 1;
+		TransformConstraintTimeline.TRANSLATE = 2;
+		TransformConstraintTimeline.SCALE = 3;
+		TransformConstraintTimeline.SHEAR = 4;
 		return TransformConstraintTimeline;
 	}(CurveTimeline));
-	TransformConstraintTimeline.ENTRIES = 5;
-	TransformConstraintTimeline.PREV_TIME = -5;
-	TransformConstraintTimeline.PREV_ROTATE = -4;
-	TransformConstraintTimeline.PREV_TRANSLATE = -3;
-	TransformConstraintTimeline.PREV_SCALE = -2;
-	TransformConstraintTimeline.PREV_SHEAR = -1;
-	TransformConstraintTimeline.ROTATE = 1;
-	TransformConstraintTimeline.TRANSLATE = 2;
-	TransformConstraintTimeline.SCALE = 3;
-	TransformConstraintTimeline.SHEAR = 4;
 	spine.TransformConstraintTimeline = TransformConstraintTimeline;
 	var PathConstraintPositionTimeline = (function (_super) {
 		__extends(PathConstraintPositionTimeline, _super);
 		function PathConstraintPositionTimeline(frameCount) {
-			var _this = _super.call(this, frameCount) || this;
-			_this.frames = spine.Utils.newFloatArray(frameCount * PathConstraintPositionTimeline.ENTRIES);
-			return _this;
+			_super.call(this, frameCount);
+			this.frames = spine.Utils.newFloatArray(frameCount * PathConstraintPositionTimeline.ENTRIES);
 		}
 		PathConstraintPositionTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.pathConstraintPosition << 24) + this.pathConstraintIndex;
@@ -947,17 +934,17 @@ var spine;
 			else
 				constraint.position += (position - constraint.position) * alpha;
 		};
+		PathConstraintPositionTimeline.ENTRIES = 2;
+		PathConstraintPositionTimeline.PREV_TIME = -2;
+		PathConstraintPositionTimeline.PREV_VALUE = -1;
+		PathConstraintPositionTimeline.VALUE = 1;
 		return PathConstraintPositionTimeline;
 	}(CurveTimeline));
-	PathConstraintPositionTimeline.ENTRIES = 2;
-	PathConstraintPositionTimeline.PREV_TIME = -2;
-	PathConstraintPositionTimeline.PREV_VALUE = -1;
-	PathConstraintPositionTimeline.VALUE = 1;
 	spine.PathConstraintPositionTimeline = PathConstraintPositionTimeline;
 	var PathConstraintSpacingTimeline = (function (_super) {
 		__extends(PathConstraintSpacingTimeline, _super);
 		function PathConstraintSpacingTimeline(frameCount) {
-			return _super.call(this, frameCount) || this;
+			_super.call(this, frameCount);
 		}
 		PathConstraintSpacingTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.pathConstraintSpacing << 24) + this.pathConstraintIndex;
@@ -991,9 +978,8 @@ var spine;
 	var PathConstraintMixTimeline = (function (_super) {
 		__extends(PathConstraintMixTimeline, _super);
 		function PathConstraintMixTimeline(frameCount) {
-			var _this = _super.call(this, frameCount) || this;
-			_this.frames = spine.Utils.newFloatArray(frameCount * PathConstraintMixTimeline.ENTRIES);
-			return _this;
+			_super.call(this, frameCount);
+			this.frames = spine.Utils.newFloatArray(frameCount * PathConstraintMixTimeline.ENTRIES);
 		}
 		PathConstraintMixTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.pathConstraintMix << 24) + this.pathConstraintIndex;
@@ -1037,14 +1023,14 @@ var spine;
 				constraint.translateMix += (translate - constraint.translateMix) * alpha;
 			}
 		};
+		PathConstraintMixTimeline.ENTRIES = 3;
+		PathConstraintMixTimeline.PREV_TIME = -3;
+		PathConstraintMixTimeline.PREV_ROTATE = -2;
+		PathConstraintMixTimeline.PREV_TRANSLATE = -1;
+		PathConstraintMixTimeline.ROTATE = 1;
+		PathConstraintMixTimeline.TRANSLATE = 2;
 		return PathConstraintMixTimeline;
 	}(CurveTimeline));
-	PathConstraintMixTimeline.ENTRIES = 3;
-	PathConstraintMixTimeline.PREV_TIME = -3;
-	PathConstraintMixTimeline.PREV_ROTATE = -2;
-	PathConstraintMixTimeline.PREV_TRANSLATE = -1;
-	PathConstraintMixTimeline.ROTATE = 1;
-	PathConstraintMixTimeline.TRANSLATE = 2;
 	spine.PathConstraintMixTimeline = PathConstraintMixTimeline;
 })(spine || (spine = {}));
 var spine;
@@ -1138,10 +1124,12 @@ var spine;
 				this._animationsChanged();
 			var events = this.events;
 			var tracks = this.tracks;
+			var applied = false;
 			for (var i = 0, n = tracks.length; i < n; i++) {
 				var current = tracks[i];
 				if (current == null || current.delay > 0)
 					continue;
+				applied = true;
 				var mix = current.alpha;
 				if (current.mixingFrom != null)
 					mix *= this.applyMixingFrom(current, skeleton);
@@ -1175,6 +1163,7 @@ var spine;
 				current.nextTrackLast = current.trackTime;
 			}
 			this.queue.drain();
+			return applied;
 		};
 		AnimationState.prototype.applyMixingFrom = function (to, skeleton) {
 			var from = to.mixingFrom;
@@ -1200,7 +1189,7 @@ var spine;
 				spine.Utils.setArraySize(from.timelinesRotation, timelineCount << 1, null);
 			var timelinesRotation = from.timelinesRotation;
 			var first = false;
-			var alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix), alpha;
+			var alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix), alpha = 0;
 			from.totalAlpha = 0;
 			for (var i = 0; i < timelineCount; i++) {
 				var timeline = timelines[i];
@@ -1530,13 +1519,13 @@ var spine;
 		AnimationState.prototype.clearListenerNotifications = function () {
 			this.queue.clear();
 		};
+		AnimationState.emptyAnimation = new spine.Animation("<empty>", [], 0);
+		AnimationState.SUBSEQUENT = 0;
+		AnimationState.FIRST = 1;
+		AnimationState.DIP = 2;
+		AnimationState.DIP_MIX = 3;
 		return AnimationState;
 	}());
-	AnimationState.emptyAnimation = new spine.Animation("<empty>", [], 0);
-	AnimationState.SUBSEQUENT = 0;
-	AnimationState.FIRST = 1;
-	AnimationState.DIP = 2;
-	AnimationState.DIP_MIX = 3;
 	spine.AnimationState = AnimationState;
 	var TrackEntry = (function () {
 		function TrackEntry() {
@@ -1714,7 +1703,6 @@ var spine;
 		return EventQueue;
 	}());
 	spine.EventQueue = EventQueue;
-	var EventType;
 	(function (EventType) {
 		EventType[EventType["start"] = 0] = "start";
 		EventType[EventType["interrupt"] = 1] = "interrupt";
@@ -1722,7 +1710,8 @@ var spine;
 		EventType[EventType["dispose"] = 3] = "dispose";
 		EventType[EventType["complete"] = 4] = "complete";
 		EventType[EventType["event"] = 5] = "event";
-	})(EventType = spine.EventType || (spine.EventType = {}));
+	})(spine.EventType || (spine.EventType = {}));
+	var EventType = spine.EventType;
 	var AnimationStateAdapter2 = (function () {
 		function AnimationStateAdapter2() {
 		}
@@ -1948,13 +1937,369 @@ var spine;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
-	var BlendMode;
+	var Attachment = (function () {
+		function Attachment(name) {
+			if (name == null)
+				throw new Error("name cannot be null.");
+			this.name = name;
+		}
+		return Attachment;
+	}());
+	spine.Attachment = Attachment;
+	var VertexAttachment = (function (_super) {
+		__extends(VertexAttachment, _super);
+		function VertexAttachment(name) {
+			_super.call(this, name);
+			this.worldVerticesLength = 0;
+		}
+		VertexAttachment.prototype.computeWorldVertices = function (slot, start, count, worldVertices, offset, stride) {
+			count = offset + (count >> 1) * stride;
+			var skeleton = slot.bone.skeleton;
+			var deformArray = slot.attachmentVertices;
+			var vertices = this.vertices;
+			var bones = this.bones;
+			if (bones == null) {
+				if (deformArray.length > 0)
+					vertices = deformArray;
+				var bone = slot.bone;
+				var x = bone.worldX;
+				var y = bone.worldY;
+				var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
+				for (var v_1 = start, w = offset; w < count; v_1 += 2, w += stride) {
+					var vx = vertices[v_1], vy = vertices[v_1 + 1];
+					worldVertices[w] = vx * a + vy * b + x;
+					worldVertices[w + 1] = vx * c + vy * d + y;
+				}
+				return;
+			}
+			var v = 0, skip = 0;
+			for (var i = 0; i < start; i += 2) {
+				var n = bones[v];
+				v += n + 1;
+				skip += n;
+			}
+			var skeletonBones = skeleton.bones;
+			if (deformArray.length == 0) {
+				for (var w = offset, b = skip * 3; w < count; w += stride) {
+					var wx = 0, wy = 0;
+					var n = bones[v++];
+					n += v;
+					for (; v < n; v++, b += 3) {
+						var bone = skeletonBones[bones[v]];
+						var vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
+						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
+						wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
+					}
+					worldVertices[w] = wx;
+					worldVertices[w + 1] = wy;
+				}
+			}
+			else {
+				var deform = deformArray;
+				for (var w = offset, b = skip * 3, f = skip << 1; w < count; w += stride) {
+					var wx = 0, wy = 0;
+					var n = bones[v++];
+					n += v;
+					for (; v < n; v++, b += 3, f += 2) {
+						var bone = skeletonBones[bones[v]];
+						var vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
+						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
+						wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
+					}
+					worldVertices[w] = wx;
+					worldVertices[w + 1] = wy;
+				}
+			}
+		};
+		VertexAttachment.prototype.applyDeform = function (sourceAttachment) {
+			return this == sourceAttachment;
+		};
+		return VertexAttachment;
+	}(Attachment));
+	spine.VertexAttachment = VertexAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	(function (AttachmentType) {
+		AttachmentType[AttachmentType["Region"] = 0] = "Region";
+		AttachmentType[AttachmentType["BoundingBox"] = 1] = "BoundingBox";
+		AttachmentType[AttachmentType["Mesh"] = 2] = "Mesh";
+		AttachmentType[AttachmentType["LinkedMesh"] = 3] = "LinkedMesh";
+		AttachmentType[AttachmentType["Path"] = 4] = "Path";
+		AttachmentType[AttachmentType["Point"] = 5] = "Point";
+	})(spine.AttachmentType || (spine.AttachmentType = {}));
+	var AttachmentType = spine.AttachmentType;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var BoundingBoxAttachment = (function (_super) {
+		__extends(BoundingBoxAttachment, _super);
+		function BoundingBoxAttachment(name) {
+			_super.call(this, name);
+			this.color = new spine.Color(1, 1, 1, 1);
+		}
+		return BoundingBoxAttachment;
+	}(spine.VertexAttachment));
+	spine.BoundingBoxAttachment = BoundingBoxAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var ClippingAttachment = (function (_super) {
+		__extends(ClippingAttachment, _super);
+		function ClippingAttachment(name) {
+			_super.call(this, name);
+			this.color = new spine.Color(0.2275, 0.2275, 0.8078, 1);
+		}
+		return ClippingAttachment;
+	}(spine.VertexAttachment));
+	spine.ClippingAttachment = ClippingAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var MeshAttachment = (function (_super) {
+		__extends(MeshAttachment, _super);
+		function MeshAttachment(name) {
+			_super.call(this, name);
+			this.color = new spine.Color(1, 1, 1, 1);
+			this.inheritDeform = false;
+			this.tempColor = new spine.Color(0, 0, 0, 0);
+		}
+		MeshAttachment.prototype.updateUVs = function () {
+			var u = 0, v = 0, width = 0, height = 0;
+			if (this.region == null) {
+				u = v = 0;
+				width = height = 1;
+			}
+			else {
+				u = this.region.u;
+				v = this.region.v;
+				width = this.region.u2 - u;
+				height = this.region.v2 - v;
+			}
+			var regionUVs = this.regionUVs;
+			if (this.uvs == null || this.uvs.length != regionUVs.length)
+				this.uvs = spine.Utils.newFloatArray(regionUVs.length);
+			var uvs = this.uvs;
+			if (this.region.rotate) {
+				for (var i = 0, n = uvs.length; i < n; i += 2) {
+					uvs[i] = u + regionUVs[i + 1] * width;
+					uvs[i + 1] = v + height - regionUVs[i] * height;
+				}
+			}
+			else {
+				for (var i = 0, n = uvs.length; i < n; i += 2) {
+					uvs[i] = u + regionUVs[i] * width;
+					uvs[i + 1] = v + regionUVs[i + 1] * height;
+				}
+			}
+		};
+		MeshAttachment.prototype.applyDeform = function (sourceAttachment) {
+			return this == sourceAttachment || (this.inheritDeform && this.parentMesh == sourceAttachment);
+		};
+		MeshAttachment.prototype.getParentMesh = function () {
+			return this.parentMesh;
+		};
+		MeshAttachment.prototype.setParentMesh = function (parentMesh) {
+			this.parentMesh = parentMesh;
+			if (parentMesh != null) {
+				this.bones = parentMesh.bones;
+				this.vertices = parentMesh.vertices;
+				this.worldVerticesLength = parentMesh.worldVerticesLength;
+				this.regionUVs = parentMesh.regionUVs;
+				this.triangles = parentMesh.triangles;
+				this.hullLength = parentMesh.hullLength;
+				this.worldVerticesLength = parentMesh.worldVerticesLength;
+			}
+		};
+		return MeshAttachment;
+	}(spine.VertexAttachment));
+	spine.MeshAttachment = MeshAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var PathAttachment = (function (_super) {
+		__extends(PathAttachment, _super);
+		function PathAttachment(name) {
+			_super.call(this, name);
+			this.closed = false;
+			this.constantSpeed = false;
+			this.color = new spine.Color(1, 1, 1, 1);
+		}
+		return PathAttachment;
+	}(spine.VertexAttachment));
+	spine.PathAttachment = PathAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var PointAttachment = (function (_super) {
+		__extends(PointAttachment, _super);
+		function PointAttachment(name) {
+			_super.call(this, name);
+			this.color = new spine.Color(0.38, 0.94, 0, 1);
+		}
+		PointAttachment.prototype.computeWorldPosition = function (bone, point) {
+			point.x = this.x * bone.a + this.y * bone.b + bone.worldX;
+			point.y = this.x * bone.c + this.y * bone.d + bone.worldY;
+			return point;
+		};
+		PointAttachment.prototype.computeWorldRotation = function (bone) {
+			var cos = spine.MathUtils.cosDeg(this.rotation), sin = spine.MathUtils.sinDeg(this.rotation);
+			var x = cos * bone.a + sin * bone.b;
+			var y = cos * bone.c + sin * bone.d;
+			return Math.atan2(y, x) * spine.MathUtils.radDeg;
+		};
+		return PointAttachment;
+	}(spine.VertexAttachment));
+	spine.PointAttachment = PointAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var RegionAttachment = (function (_super) {
+		__extends(RegionAttachment, _super);
+		function RegionAttachment(name) {
+			_super.call(this, name);
+			this.x = 0;
+			this.y = 0;
+			this.scaleX = 1;
+			this.scaleY = 1;
+			this.rotation = 0;
+			this.width = 0;
+			this.height = 0;
+			this.color = new spine.Color(1, 1, 1, 1);
+			this.offset = spine.Utils.newFloatArray(8);
+			this.uvs = spine.Utils.newFloatArray(8);
+			this.tempColor = new spine.Color(1, 1, 1, 1);
+		}
+		RegionAttachment.prototype.updateOffset = function () {
+			var regionScaleX = this.width / this.region.originalWidth * this.scaleX;
+			var regionScaleY = this.height / this.region.originalHeight * this.scaleY;
+			var localX = -this.width / 2 * this.scaleX + this.region.offsetX * regionScaleX;
+			var localY = -this.height / 2 * this.scaleY + this.region.offsetY * regionScaleY;
+			var localX2 = localX + this.region.width * regionScaleX;
+			var localY2 = localY + this.region.height * regionScaleY;
+			var radians = this.rotation * Math.PI / 180;
+			var cos = Math.cos(radians);
+			var sin = Math.sin(radians);
+			var localXCos = localX * cos + this.x;
+			var localXSin = localX * sin;
+			var localYCos = localY * cos + this.y;
+			var localYSin = localY * sin;
+			var localX2Cos = localX2 * cos + this.x;
+			var localX2Sin = localX2 * sin;
+			var localY2Cos = localY2 * cos + this.y;
+			var localY2Sin = localY2 * sin;
+			var offset = this.offset;
+			offset[RegionAttachment.OX1] = localXCos - localYSin;
+			offset[RegionAttachment.OY1] = localYCos + localXSin;
+			offset[RegionAttachment.OX2] = localXCos - localY2Sin;
+			offset[RegionAttachment.OY2] = localY2Cos + localXSin;
+			offset[RegionAttachment.OX3] = localX2Cos - localY2Sin;
+			offset[RegionAttachment.OY3] = localY2Cos + localX2Sin;
+			offset[RegionAttachment.OX4] = localX2Cos - localYSin;
+			offset[RegionAttachment.OY4] = localYCos + localX2Sin;
+		};
+		RegionAttachment.prototype.setRegion = function (region) {
+			this.region = region;
+			var uvs = this.uvs;
+			if (region.rotate) {
+				uvs[2] = region.u;
+				uvs[3] = region.v2;
+				uvs[4] = region.u;
+				uvs[5] = region.v;
+				uvs[6] = region.u2;
+				uvs[7] = region.v;
+				uvs[0] = region.u2;
+				uvs[1] = region.v2;
+			}
+			else {
+				uvs[0] = region.u;
+				uvs[1] = region.v2;
+				uvs[2] = region.u;
+				uvs[3] = region.v;
+				uvs[4] = region.u2;
+				uvs[5] = region.v;
+				uvs[6] = region.u2;
+				uvs[7] = region.v2;
+			}
+		};
+		RegionAttachment.prototype.computeWorldVertices = function (bone, worldVertices, offset, stride) {
+			var vertexOffset = this.offset;
+			var x = bone.worldX, y = bone.worldY;
+			var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
+			var offsetX = 0, offsetY = 0;
+			offsetX = vertexOffset[RegionAttachment.OX1];
+			offsetY = vertexOffset[RegionAttachment.OY1];
+			worldVertices[offset] = offsetX * a + offsetY * b + x;
+			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+			offset += stride;
+			offsetX = vertexOffset[RegionAttachment.OX2];
+			offsetY = vertexOffset[RegionAttachment.OY2];
+			worldVertices[offset] = offsetX * a + offsetY * b + x;
+			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+			offset += stride;
+			offsetX = vertexOffset[RegionAttachment.OX3];
+			offsetY = vertexOffset[RegionAttachment.OY3];
+			worldVertices[offset] = offsetX * a + offsetY * b + x;
+			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+			offset += stride;
+			offsetX = vertexOffset[RegionAttachment.OX4];
+			offsetY = vertexOffset[RegionAttachment.OY4];
+			worldVertices[offset] = offsetX * a + offsetY * b + x;
+			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+		};
+		RegionAttachment.OX1 = 0;
+		RegionAttachment.OY1 = 1;
+		RegionAttachment.OX2 = 2;
+		RegionAttachment.OY2 = 3;
+		RegionAttachment.OX3 = 4;
+		RegionAttachment.OY3 = 5;
+		RegionAttachment.OX4 = 6;
+		RegionAttachment.OY4 = 7;
+		RegionAttachment.X1 = 0;
+		RegionAttachment.Y1 = 1;
+		RegionAttachment.C1R = 2;
+		RegionAttachment.C1G = 3;
+		RegionAttachment.C1B = 4;
+		RegionAttachment.C1A = 5;
+		RegionAttachment.U1 = 6;
+		RegionAttachment.V1 = 7;
+		RegionAttachment.X2 = 8;
+		RegionAttachment.Y2 = 9;
+		RegionAttachment.C2R = 10;
+		RegionAttachment.C2G = 11;
+		RegionAttachment.C2B = 12;
+		RegionAttachment.C2A = 13;
+		RegionAttachment.U2 = 14;
+		RegionAttachment.V2 = 15;
+		RegionAttachment.X3 = 16;
+		RegionAttachment.Y3 = 17;
+		RegionAttachment.C3R = 18;
+		RegionAttachment.C3G = 19;
+		RegionAttachment.C3B = 20;
+		RegionAttachment.C3A = 21;
+		RegionAttachment.U3 = 22;
+		RegionAttachment.V3 = 23;
+		RegionAttachment.X4 = 24;
+		RegionAttachment.Y4 = 25;
+		RegionAttachment.C4R = 26;
+		RegionAttachment.C4G = 27;
+		RegionAttachment.C4B = 28;
+		RegionAttachment.C4A = 29;
+		RegionAttachment.U4 = 30;
+		RegionAttachment.V4 = 31;
+		return RegionAttachment;
+	}(spine.Attachment));
+	spine.RegionAttachment = RegionAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
 	(function (BlendMode) {
 		BlendMode[BlendMode["Normal"] = 0] = "Normal";
 		BlendMode[BlendMode["Additive"] = 1] = "Additive";
 		BlendMode[BlendMode["Multiply"] = 2] = "Multiply";
 		BlendMode[BlendMode["Screen"] = 3] = "Screen";
-	})(BlendMode = spine.BlendMode || (spine.BlendMode = {}));
+	})(spine.BlendMode || (spine.BlendMode = {}));
+	var BlendMode = spine.BlendMode;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
@@ -2243,14 +2588,14 @@ var spine;
 		return BoneData;
 	}());
 	spine.BoneData = BoneData;
-	var TransformMode;
 	(function (TransformMode) {
 		TransformMode[TransformMode["Normal"] = 0] = "Normal";
 		TransformMode[TransformMode["OnlyTranslation"] = 1] = "OnlyTranslation";
 		TransformMode[TransformMode["NoRotationOrReflection"] = 2] = "NoRotationOrReflection";
 		TransformMode[TransformMode["NoScale"] = 3] = "NoScale";
 		TransformMode[TransformMode["NoScaleOrReflection"] = 4] = "NoScaleOrReflection";
-	})(TransformMode = spine.TransformMode || (spine.TransformMode = {}));
+	})(spine.TransformMode || (spine.TransformMode = {}));
+	var TransformMode = spine.TransformMode;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
@@ -2415,21 +2760,24 @@ var spine;
 				}
 				var minAngle = spine.MathUtils.PI, minX = l1 - a, minDist = minX * minX, minY = 0;
 				var maxAngle = 0, maxX = l1 + a, maxDist = maxX * maxX, maxY = 0;
-				var angle = Math.acos(-a * l1 / (aa - bb));
-				x = a * Math.cos(angle) + l1;
-				y = b * Math.sin(angle);
-				d = x * x + y * y;
-				if (d < minDist) {
-					minAngle = angle;
-					minDist = d;
-					minX = x;
-					minY = y;
-				}
-				if (d > maxDist) {
-					maxAngle = angle;
-					maxDist = d;
-					maxX = x;
-					maxY = y;
+				c = -a * l1 / (aa - bb);
+				if (c >= -1 && c <= 1) {
+					c = Math.acos(c);
+					x = a * Math.cos(c) + l1;
+					y = b * Math.sin(c);
+					d = x * x + y * y;
+					if (d < minDist) {
+						minAngle = c;
+						minDist = d;
+						minX = x;
+						minY = y;
+					}
+					if (d > maxDist) {
+						maxAngle = c;
+						maxDist = d;
+						maxX = x;
+						maxY = y;
+					}
 				}
 				if (dd <= (minDist + maxDist) / 2) {
 					a1 = ta - Math.atan2(minY * bendDir, minX);
@@ -2834,11 +3182,11 @@ var spine;
 		PathConstraint.prototype.getOrder = function () {
 			return this.data.order;
 		};
+		PathConstraint.NONE = -1;
+		PathConstraint.BEFORE = -2;
+		PathConstraint.AFTER = -3;
 		return PathConstraint;
 	}());
-	PathConstraint.NONE = -1;
-	PathConstraint.BEFORE = -2;
-	PathConstraint.AFTER = -3;
 	spine.PathConstraint = PathConstraint;
 })(spine || (spine = {}));
 var spine;
@@ -2852,23 +3200,23 @@ var spine;
 		return PathConstraintData;
 	}());
 	spine.PathConstraintData = PathConstraintData;
-	var PositionMode;
 	(function (PositionMode) {
 		PositionMode[PositionMode["Fixed"] = 0] = "Fixed";
 		PositionMode[PositionMode["Percent"] = 1] = "Percent";
-	})(PositionMode = spine.PositionMode || (spine.PositionMode = {}));
-	var SpacingMode;
+	})(spine.PositionMode || (spine.PositionMode = {}));
+	var PositionMode = spine.PositionMode;
 	(function (SpacingMode) {
 		SpacingMode[SpacingMode["Length"] = 0] = "Length";
 		SpacingMode[SpacingMode["Fixed"] = 1] = "Fixed";
 		SpacingMode[SpacingMode["Percent"] = 2] = "Percent";
-	})(SpacingMode = spine.SpacingMode || (spine.SpacingMode = {}));
-	var RotateMode;
+	})(spine.SpacingMode || (spine.SpacingMode = {}));
+	var SpacingMode = spine.SpacingMode;
 	(function (RotateMode) {
 		RotateMode[RotateMode["Tangent"] = 0] = "Tangent";
 		RotateMode[RotateMode["Chain"] = 1] = "Chain";
 		RotateMode[RotateMode["ChainScale"] = 2] = "ChainScale";
-	})(RotateMode = spine.RotateMode || (spine.RotateMode = {}));
+	})(spine.RotateMode || (spine.RotateMode = {}));
+	var RotateMode = spine.RotateMode;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
@@ -4879,7 +5227,6 @@ var spine;
 		return Texture;
 	}());
 	spine.Texture = Texture;
-	var TextureFilter;
 	(function (TextureFilter) {
 		TextureFilter[TextureFilter["Nearest"] = 9728] = "Nearest";
 		TextureFilter[TextureFilter["Linear"] = 9729] = "Linear";
@@ -4888,13 +5235,14 @@ var spine;
 		TextureFilter[TextureFilter["MipMapLinearNearest"] = 9985] = "MipMapLinearNearest";
 		TextureFilter[TextureFilter["MipMapNearestLinear"] = 9986] = "MipMapNearestLinear";
 		TextureFilter[TextureFilter["MipMapLinearLinear"] = 9987] = "MipMapLinearLinear";
-	})(TextureFilter = spine.TextureFilter || (spine.TextureFilter = {}));
-	var TextureWrap;
+	})(spine.TextureFilter || (spine.TextureFilter = {}));
+	var TextureFilter = spine.TextureFilter;
 	(function (TextureWrap) {
 		TextureWrap[TextureWrap["MirroredRepeat"] = 33648] = "MirroredRepeat";
 		TextureWrap[TextureWrap["ClampToEdge"] = 33071] = "ClampToEdge";
 		TextureWrap[TextureWrap["Repeat"] = 10497] = "Repeat";
-	})(TextureWrap = spine.TextureWrap || (spine.TextureWrap = {}));
+	})(spine.TextureWrap || (spine.TextureWrap = {}));
+	var TextureWrap = spine.TextureWrap;
 	var TextureRegion = (function () {
 		function TextureRegion() {
 			this.u = 0;
@@ -5062,7 +5410,7 @@ var spine;
 	var TextureAtlasRegion = (function (_super) {
 		__extends(TextureAtlasRegion, _super);
 		function TextureAtlasRegion() {
-			return _super !== null && _super.apply(this, arguments) || this;
+			_super.apply(this, arguments);
 		}
 		return TextureAtlasRegion;
 	}(spine.TextureRegion));
@@ -5629,13 +5977,13 @@ var spine;
 				this.a = 1;
 			return this;
 		};
+		Color.WHITE = new Color(1, 1, 1, 1);
+		Color.RED = new Color(1, 0, 0, 1);
+		Color.GREEN = new Color(0, 1, 0, 1);
+		Color.BLUE = new Color(0, 0, 1, 1);
+		Color.MAGENTA = new Color(1, 0, 1, 1);
 		return Color;
 	}());
-	Color.WHITE = new Color(1, 1, 1, 1);
-	Color.RED = new Color(1, 0, 0, 1);
-	Color.GREEN = new Color(0, 1, 0, 1);
-	Color.BLUE = new Color(0, 0, 1, 1);
-	Color.MAGENTA = new Color(1, 0, 1, 1);
 	spine.Color = Color;
 	var MathUtils = (function () {
 		function MathUtils() {
@@ -5663,14 +6011,14 @@ var spine;
 			var y = Math.pow(Math.abs(x), 1 / 3);
 			return x < 0 ? -y : y;
 		};
+		MathUtils.PI = 3.1415927;
+		MathUtils.PI2 = MathUtils.PI * 2;
+		MathUtils.radiansToDegrees = 180 / MathUtils.PI;
+		MathUtils.radDeg = MathUtils.radiansToDegrees;
+		MathUtils.degreesToRadians = MathUtils.PI / 180;
+		MathUtils.degRad = MathUtils.degreesToRadians;
 		return MathUtils;
 	}());
-	MathUtils.PI = 3.1415927;
-	MathUtils.PI2 = MathUtils.PI * 2;
-	MathUtils.radiansToDegrees = 180 / MathUtils.PI;
-	MathUtils.radDeg = MathUtils.radiansToDegrees;
-	MathUtils.degreesToRadians = MathUtils.PI / 180;
-	MathUtils.degRad = MathUtils.degreesToRadians;
 	spine.MathUtils = MathUtils;
 	var Utils = (function () {
 		function Utils() {
@@ -5729,9 +6077,9 @@ var spine;
 		Utils.toFloatArray = function (array) {
 			return Utils.SUPPORTS_TYPED_ARRAYS ? new Float32Array(array) : array;
 		};
+		Utils.SUPPORTS_TYPED_ARRAYS = typeof (Float32Array) !== "undefined";
 		return Utils;
 	}());
-	Utils.SUPPORTS_TYPED_ARRAYS = typeof (Float32Array) !== "undefined";
 	spine.Utils = Utils;
 	var DebugUtils = (function () {
 		function DebugUtils() {
@@ -5869,378 +6217,15 @@ var spine;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
-	var Attachment = (function () {
-		function Attachment(name) {
-			if (name == null)
-				throw new Error("name cannot be null.");
-			this.name = name;
-		}
-		return Attachment;
-	}());
-	spine.Attachment = Attachment;
-	var VertexAttachment = (function (_super) {
-		__extends(VertexAttachment, _super);
-		function VertexAttachment(name) {
-			var _this = _super.call(this, name) || this;
-			_this.worldVerticesLength = 0;
-			return _this;
-		}
-		VertexAttachment.prototype.computeWorldVertices = function (slot, start, count, worldVertices, offset, stride) {
-			count = offset + (count >> 1) * stride;
-			var skeleton = slot.bone.skeleton;
-			var deformArray = slot.attachmentVertices;
-			var vertices = this.vertices;
-			var bones = this.bones;
-			if (bones == null) {
-				if (deformArray.length > 0)
-					vertices = deformArray;
-				var bone = slot.bone;
-				var x = bone.worldX;
-				var y = bone.worldY;
-				var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-				for (var v_1 = start, w = offset; w < count; v_1 += 2, w += stride) {
-					var vx = vertices[v_1], vy = vertices[v_1 + 1];
-					worldVertices[w] = vx * a + vy * b + x;
-					worldVertices[w + 1] = vx * c + vy * d + y;
-				}
-				return;
-			}
-			var v = 0, skip = 0;
-			for (var i = 0; i < start; i += 2) {
-				var n = bones[v];
-				v += n + 1;
-				skip += n;
-			}
-			var skeletonBones = skeleton.bones;
-			if (deformArray.length == 0) {
-				for (var w = offset, b = skip * 3; w < count; w += stride) {
-					var wx = 0, wy = 0;
-					var n = bones[v++];
-					n += v;
-					for (; v < n; v++, b += 3) {
-						var bone = skeletonBones[bones[v]];
-						var vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
-						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
-						wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
-					}
-					worldVertices[w] = wx;
-					worldVertices[w + 1] = wy;
-				}
-			}
-			else {
-				var deform = deformArray;
-				for (var w = offset, b = skip * 3, f = skip << 1; w < count; w += stride) {
-					var wx = 0, wy = 0;
-					var n = bones[v++];
-					n += v;
-					for (; v < n; v++, b += 3, f += 2) {
-						var bone = skeletonBones[bones[v]];
-						var vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
-						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
-						wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
-					}
-					worldVertices[w] = wx;
-					worldVertices[w + 1] = wy;
-				}
-			}
-		};
-		VertexAttachment.prototype.applyDeform = function (sourceAttachment) {
-			return this == sourceAttachment;
-		};
-		return VertexAttachment;
-	}(Attachment));
-	spine.VertexAttachment = VertexAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var AttachmentType;
-	(function (AttachmentType) {
-		AttachmentType[AttachmentType["Region"] = 0] = "Region";
-		AttachmentType[AttachmentType["BoundingBox"] = 1] = "BoundingBox";
-		AttachmentType[AttachmentType["Mesh"] = 2] = "Mesh";
-		AttachmentType[AttachmentType["LinkedMesh"] = 3] = "LinkedMesh";
-		AttachmentType[AttachmentType["Path"] = 4] = "Path";
-		AttachmentType[AttachmentType["Point"] = 5] = "Point";
-	})(AttachmentType = spine.AttachmentType || (spine.AttachmentType = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var BoundingBoxAttachment = (function (_super) {
-		__extends(BoundingBoxAttachment, _super);
-		function BoundingBoxAttachment(name) {
-			var _this = _super.call(this, name) || this;
-			_this.color = new spine.Color(1, 1, 1, 1);
-			return _this;
-		}
-		return BoundingBoxAttachment;
-	}(spine.VertexAttachment));
-	spine.BoundingBoxAttachment = BoundingBoxAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var ClippingAttachment = (function (_super) {
-		__extends(ClippingAttachment, _super);
-		function ClippingAttachment(name) {
-			var _this = _super.call(this, name) || this;
-			_this.color = new spine.Color(0.2275, 0.2275, 0.8078, 1);
-			return _this;
-		}
-		return ClippingAttachment;
-	}(spine.VertexAttachment));
-	spine.ClippingAttachment = ClippingAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var MeshAttachment = (function (_super) {
-		__extends(MeshAttachment, _super);
-		function MeshAttachment(name) {
-			var _this = _super.call(this, name) || this;
-			_this.color = new spine.Color(1, 1, 1, 1);
-			_this.inheritDeform = false;
-			_this.tempColor = new spine.Color(0, 0, 0, 0);
-			return _this;
-		}
-		MeshAttachment.prototype.updateUVs = function () {
-			var u = 0, v = 0, width = 0, height = 0;
-			if (this.region == null) {
-				u = v = 0;
-				width = height = 1;
-			}
-			else {
-				u = this.region.u;
-				v = this.region.v;
-				width = this.region.u2 - u;
-				height = this.region.v2 - v;
-			}
-			var regionUVs = this.regionUVs;
-			if (this.uvs == null || this.uvs.length != regionUVs.length)
-				this.uvs = spine.Utils.newFloatArray(regionUVs.length);
-			var uvs = this.uvs;
-			if (this.region.rotate) {
-				for (var i = 0, n = uvs.length; i < n; i += 2) {
-					uvs[i] = u + regionUVs[i + 1] * width;
-					uvs[i + 1] = v + height - regionUVs[i] * height;
-				}
-			}
-			else {
-				for (var i = 0, n = uvs.length; i < n; i += 2) {
-					uvs[i] = u + regionUVs[i] * width;
-					uvs[i + 1] = v + regionUVs[i + 1] * height;
-				}
-			}
-		};
-		MeshAttachment.prototype.applyDeform = function (sourceAttachment) {
-			return this == sourceAttachment || (this.inheritDeform && this.parentMesh == sourceAttachment);
-		};
-		MeshAttachment.prototype.getParentMesh = function () {
-			return this.parentMesh;
-		};
-		MeshAttachment.prototype.setParentMesh = function (parentMesh) {
-			this.parentMesh = parentMesh;
-			if (parentMesh != null) {
-				this.bones = parentMesh.bones;
-				this.vertices = parentMesh.vertices;
-				this.worldVerticesLength = parentMesh.worldVerticesLength;
-				this.regionUVs = parentMesh.regionUVs;
-				this.triangles = parentMesh.triangles;
-				this.hullLength = parentMesh.hullLength;
-				this.worldVerticesLength = parentMesh.worldVerticesLength;
-			}
-		};
-		return MeshAttachment;
-	}(spine.VertexAttachment));
-	spine.MeshAttachment = MeshAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var PathAttachment = (function (_super) {
-		__extends(PathAttachment, _super);
-		function PathAttachment(name) {
-			var _this = _super.call(this, name) || this;
-			_this.closed = false;
-			_this.constantSpeed = false;
-			_this.color = new spine.Color(1, 1, 1, 1);
-			return _this;
-		}
-		return PathAttachment;
-	}(spine.VertexAttachment));
-	spine.PathAttachment = PathAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var PointAttachment = (function (_super) {
-		__extends(PointAttachment, _super);
-		function PointAttachment(name) {
-			var _this = _super.call(this, name) || this;
-			_this.color = new spine.Color(0.38, 0.94, 0, 1);
-			return _this;
-		}
-		PointAttachment.prototype.computeWorldPosition = function (bone, point) {
-			point.x = this.x * bone.a + this.y * bone.b + bone.worldX;
-			point.y = this.x * bone.c + this.y * bone.d + bone.worldY;
-			return point;
-		};
-		PointAttachment.prototype.computeWorldRotation = function (bone) {
-			var cos = spine.MathUtils.cosDeg(this.rotation), sin = spine.MathUtils.sinDeg(this.rotation);
-			var x = cos * bone.a + sin * bone.b;
-			var y = cos * bone.c + sin * bone.d;
-			return Math.atan2(y, x) * spine.MathUtils.radDeg;
-		};
-		return PointAttachment;
-	}(spine.VertexAttachment));
-	spine.PointAttachment = PointAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var RegionAttachment = (function (_super) {
-		__extends(RegionAttachment, _super);
-		function RegionAttachment(name) {
-			var _this = _super.call(this, name) || this;
-			_this.x = 0;
-			_this.y = 0;
-			_this.scaleX = 1;
-			_this.scaleY = 1;
-			_this.rotation = 0;
-			_this.width = 0;
-			_this.height = 0;
-			_this.color = new spine.Color(1, 1, 1, 1);
-			_this.offset = spine.Utils.newFloatArray(8);
-			_this.uvs = spine.Utils.newFloatArray(8);
-			_this.tempColor = new spine.Color(1, 1, 1, 1);
-			return _this;
-		}
-		RegionAttachment.prototype.updateOffset = function () {
-			var regionScaleX = this.width / this.region.originalWidth * this.scaleX;
-			var regionScaleY = this.height / this.region.originalHeight * this.scaleY;
-			var localX = -this.width / 2 * this.scaleX + this.region.offsetX * regionScaleX;
-			var localY = -this.height / 2 * this.scaleY + this.region.offsetY * regionScaleY;
-			var localX2 = localX + this.region.width * regionScaleX;
-			var localY2 = localY + this.region.height * regionScaleY;
-			var radians = this.rotation * Math.PI / 180;
-			var cos = Math.cos(radians);
-			var sin = Math.sin(radians);
-			var localXCos = localX * cos + this.x;
-			var localXSin = localX * sin;
-			var localYCos = localY * cos + this.y;
-			var localYSin = localY * sin;
-			var localX2Cos = localX2 * cos + this.x;
-			var localX2Sin = localX2 * sin;
-			var localY2Cos = localY2 * cos + this.y;
-			var localY2Sin = localY2 * sin;
-			var offset = this.offset;
-			offset[RegionAttachment.OX1] = localXCos - localYSin;
-			offset[RegionAttachment.OY1] = localYCos + localXSin;
-			offset[RegionAttachment.OX2] = localXCos - localY2Sin;
-			offset[RegionAttachment.OY2] = localY2Cos + localXSin;
-			offset[RegionAttachment.OX3] = localX2Cos - localY2Sin;
-			offset[RegionAttachment.OY3] = localY2Cos + localX2Sin;
-			offset[RegionAttachment.OX4] = localX2Cos - localYSin;
-			offset[RegionAttachment.OY4] = localYCos + localX2Sin;
-		};
-		RegionAttachment.prototype.setRegion = function (region) {
-			this.region = region;
-			var uvs = this.uvs;
-			if (region.rotate) {
-				uvs[2] = region.u;
-				uvs[3] = region.v2;
-				uvs[4] = region.u;
-				uvs[5] = region.v;
-				uvs[6] = region.u2;
-				uvs[7] = region.v;
-				uvs[0] = region.u2;
-				uvs[1] = region.v2;
-			}
-			else {
-				uvs[0] = region.u;
-				uvs[1] = region.v2;
-				uvs[2] = region.u;
-				uvs[3] = region.v;
-				uvs[4] = region.u2;
-				uvs[5] = region.v;
-				uvs[6] = region.u2;
-				uvs[7] = region.v2;
-			}
-		};
-		RegionAttachment.prototype.computeWorldVertices = function (bone, worldVertices, offset, stride) {
-			var vertexOffset = this.offset;
-			var x = bone.worldX, y = bone.worldY;
-			var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-			var offsetX = 0, offsetY = 0;
-			offsetX = vertexOffset[RegionAttachment.OX1];
-			offsetY = vertexOffset[RegionAttachment.OY1];
-			worldVertices[offset] = offsetX * a + offsetY * b + x;
-			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
-			offset += stride;
-			offsetX = vertexOffset[RegionAttachment.OX2];
-			offsetY = vertexOffset[RegionAttachment.OY2];
-			worldVertices[offset] = offsetX * a + offsetY * b + x;
-			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
-			offset += stride;
-			offsetX = vertexOffset[RegionAttachment.OX3];
-			offsetY = vertexOffset[RegionAttachment.OY3];
-			worldVertices[offset] = offsetX * a + offsetY * b + x;
-			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
-			offset += stride;
-			offsetX = vertexOffset[RegionAttachment.OX4];
-			offsetY = vertexOffset[RegionAttachment.OY4];
-			worldVertices[offset] = offsetX * a + offsetY * b + x;
-			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
-		};
-		return RegionAttachment;
-	}(spine.Attachment));
-	RegionAttachment.OX1 = 0;
-	RegionAttachment.OY1 = 1;
-	RegionAttachment.OX2 = 2;
-	RegionAttachment.OY2 = 3;
-	RegionAttachment.OX3 = 4;
-	RegionAttachment.OY3 = 5;
-	RegionAttachment.OX4 = 6;
-	RegionAttachment.OY4 = 7;
-	RegionAttachment.X1 = 0;
-	RegionAttachment.Y1 = 1;
-	RegionAttachment.C1R = 2;
-	RegionAttachment.C1G = 3;
-	RegionAttachment.C1B = 4;
-	RegionAttachment.C1A = 5;
-	RegionAttachment.U1 = 6;
-	RegionAttachment.V1 = 7;
-	RegionAttachment.X2 = 8;
-	RegionAttachment.Y2 = 9;
-	RegionAttachment.C2R = 10;
-	RegionAttachment.C2G = 11;
-	RegionAttachment.C2B = 12;
-	RegionAttachment.C2A = 13;
-	RegionAttachment.U2 = 14;
-	RegionAttachment.V2 = 15;
-	RegionAttachment.X3 = 16;
-	RegionAttachment.Y3 = 17;
-	RegionAttachment.C3R = 18;
-	RegionAttachment.C3G = 19;
-	RegionAttachment.C3B = 20;
-	RegionAttachment.C3A = 21;
-	RegionAttachment.U3 = 22;
-	RegionAttachment.V3 = 23;
-	RegionAttachment.X4 = 24;
-	RegionAttachment.Y4 = 25;
-	RegionAttachment.C4R = 26;
-	RegionAttachment.C4G = 27;
-	RegionAttachment.C4B = 28;
-	RegionAttachment.C4A = 29;
-	RegionAttachment.U4 = 30;
-	RegionAttachment.V4 = 31;
-	spine.RegionAttachment = RegionAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
 	var webgl;
 	(function (webgl) {
 		var AssetManager = (function (_super) {
 			__extends(AssetManager, _super);
 			function AssetManager(context, pathPrefix) {
 				if (pathPrefix === void 0) { pathPrefix = ""; }
-				return _super.call(this, function (image) {
+				_super.call(this, function (image) {
 					return new spine.webgl.GLTexture(context, image);
-				}, pathPrefix) || this;
+				}, pathPrefix);
 			}
 			return AssetManager;
 		}(spine.AssetManager));
@@ -6309,15 +6294,14 @@ var spine;
 			__extends(GLTexture, _super);
 			function GLTexture(context, image, useMipMaps) {
 				if (useMipMaps === void 0) { useMipMaps = false; }
-				var _this = _super.call(this, image) || this;
-				_this.texture = null;
-				_this.boundUnit = 0;
-				_this.useMipMaps = false;
-				_this.context = context instanceof webgl.ManagedWebGLRenderingContext ? context : new webgl.ManagedWebGLRenderingContext(context);
-				_this.useMipMaps = useMipMaps;
-				_this.restore();
-				_this.context.addRestorable(_this);
-				return _this;
+				_super.call(this, image);
+				this.texture = null;
+				this.boundUnit = 0;
+				this.useMipMaps = false;
+				this.context = context instanceof webgl.ManagedWebGLRenderingContext ? context : new webgl.ManagedWebGLRenderingContext(context);
+				this.useMipMaps = useMipMaps;
+				this.restore();
+				this.context.addRestorable(this);
 			}
 			GLTexture.prototype.setFilters = function (minFilter, magFilter) {
 				var gl = this.context.gl;
@@ -6640,14 +6624,14 @@ var spine;
 				renderer.end();
 				renderer.camera.position.set(oldX, oldY, 0);
 			};
+			LoadingScreen.FADE_SECONDS = 1;
+			LoadingScreen.loaded = 0;
+			LoadingScreen.spinnerImg = null;
+			LoadingScreen.logoImg = null;
+			LoadingScreen.SPINNER_DATA = "data:image/png;base64,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";
+			LoadingScreen.SPINE_LOGO_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFIAAAAZCAYAAACis3k0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAtNJREFUaN7tmT2I1EAUxwN+oWgRT0HFKo0WCkJ6ObmAWFwZbCxsXGysLNJaiCyIoDaSwk4ETzvhmnBaCRbBWoQ01ho4PwotjP8cE337mMy8TLK757mBH3fLTWbe/PbN53neNniqZW8FvAVvQAqugwvgDDgO9niLRyTyJagM/ACPF6bsIl9ZRDac/Cc6tLn5xQdRQ496QlKPLxD5QCDxO9jtGM8QfYoIgUlgCipGCRJL5VvlyOdCU09iEXkCfLSIfCrs7Fab6nOsiafu06iDwES9w/uU1QnDC+ekkVS9vEaDsgVeB0d+z1VDtOGxRaYPboP3Gokb4GgXkZp4chZPJKgvZ3U0XkriK/TIt9YUDllFgTAjGwoaoHqfBhMI58yD4BQ4V6/aHYdfxToftvw9F2SiVroawU2/Cv5C4Thv0KB9S5nxlOd4STxjwUjzSdYlgrYijw2BsEfgsaFcM09lhiys94xXQQwugcvgJrgFLjrEE7WUiTuWCQzt/ZXN7FfqGwuGClyVy2xZAFmfDQvNtwFFSspMDGsD+UTWqu1KoVmVooFEJgKRXw0if85RpISEzwsjzeqWzkjkC4PIJ3MUmQgITAHlQwTFhnZhELkEntfZRwR+AvfAgXmJHOqU02XligWT8ppg67NXbdCXeq7afUQ6L8C2DalEZNt2YyQ94Qy8/ekjMpBMbfyl5iTjG7YAI8cNecROAb4kJmTjaXAF3AGvwQewOiuRxEtlSaT4j2h2lMsUueQEoMlIKpTvAmKhxPMtC876jEX6rE8l8TNx/KVbn6xlWU9NWcSDUsO4NGWpQOTZFpHPOooMXcswmW2XFk3ixb2v0Nq+XVKP00QNaffBLyWwBI/AkTlfMYZDXMf12kc6yjwEjoFdO/5me5oi/6tnyhlZX6OtgmX1c2Uh0k3khmbB2b9TRfpd/jfTUeRDJvHdYg5wE7kPXAN3wQ1weDvH+xufEgpi5qIl3QAAAABJRU5ErkJggg==";
 			return LoadingScreen;
 		}());
-		LoadingScreen.FADE_SECONDS = 1;
-		LoadingScreen.loaded = 0;
-		LoadingScreen.spinnerImg = null;
-		LoadingScreen.logoImg = null;
-		LoadingScreen.SPINNER_DATA = "data:image/png;base64,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";
-		LoadingScreen.SPINE_LOGO_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFIAAAAZCAYAAACis3k0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAtNJREFUaN7tmT2I1EAUxwN+oWgRT0HFKo0WCkJ6ObmAWFwZbCxsXGysLNJaiCyIoDaSwk4ETzvhmnBaCRbBWoQ01ho4PwotjP8cE337mMy8TLK757mBH3fLTWbe/PbN53neNniqZW8FvAVvQAqugwvgDDgO9niLRyTyJagM/ACPF6bsIl9ZRDac/Cc6tLn5xQdRQ496QlKPLxD5QCDxO9jtGM8QfYoIgUlgCipGCRJL5VvlyOdCU09iEXkCfLSIfCrs7Fab6nOsiafu06iDwES9w/uU1QnDC+ekkVS9vEaDsgVeB0d+z1VDtOGxRaYPboP3Gokb4GgXkZp4chZPJKgvZ3U0XkriK/TIt9YUDllFgTAjGwoaoHqfBhMI58yD4BQ4V6/aHYdfxToftvw9F2SiVroawU2/Cv5C4Thv0KB9S5nxlOd4STxjwUjzSdYlgrYijw2BsEfgsaFcM09lhiys94xXQQwugcvgJrgFLjrEE7WUiTuWCQzt/ZXN7FfqGwuGClyVy2xZAFmfDQvNtwFFSspMDGsD+UTWqu1KoVmVooFEJgKRXw0if85RpISEzwsjzeqWzkjkC4PIJ3MUmQgITAHlQwTFhnZhELkEntfZRwR+AvfAgXmJHOqU02XligWT8ppg67NXbdCXeq7afUQ6L8C2DalEZNt2YyQ94Qy8/ekjMpBMbfyl5iTjG7YAI8cNecROAb4kJmTjaXAF3AGvwQewOiuRxEtlSaT4j2h2lMsUueQEoMlIKpTvAmKhxPMtC876jEX6rE8l8TNx/KVbn6xlWU9NWcSDUsO4NGWpQOTZFpHPOooMXcswmW2XFk3ixb2v0Nq+XVKP00QNaffBLyWwBI/AkTlfMYZDXMf12kc6yjwEjoFdO/5me5oi/6tnyhlZX6OtgmX1c2Uh0k3khmbB2b9TRfpd/jfTUeRDJvHdYg5wE7kPXAN3wQ1weDvH+xufEgpi5qIl3QAAAABJRU5ErkJggg==";
 		webgl.LoadingScreen = LoadingScreen;
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
@@ -6942,12 +6926,12 @@ var spine;
 				if (Matrix4.zAxis === null)
 					Matrix4.zAxis = new webgl.Vector3();
 			};
+			Matrix4.xAxis = null;
+			Matrix4.yAxis = null;
+			Matrix4.zAxis = null;
+			Matrix4.tmpMatrix = new Matrix4();
 			return Matrix4;
 		}());
-		Matrix4.xAxis = null;
-		Matrix4.yAxis = null;
-		Matrix4.zAxis = null;
-		Matrix4.tmpMatrix = new Matrix4();
 		webgl.Matrix4 = Matrix4;
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
@@ -7096,7 +7080,7 @@ var spine;
 		var Position2Attribute = (function (_super) {
 			__extends(Position2Attribute, _super);
 			function Position2Attribute() {
-				return _super.call(this, webgl.Shader.POSITION, VertexAttributeType.Float, 2) || this;
+				_super.call(this, webgl.Shader.POSITION, VertexAttributeType.Float, 2);
 			}
 			return Position2Attribute;
 		}(VertexAttribute));
@@ -7104,7 +7088,7 @@ var spine;
 		var Position3Attribute = (function (_super) {
 			__extends(Position3Attribute, _super);
 			function Position3Attribute() {
-				return _super.call(this, webgl.Shader.POSITION, VertexAttributeType.Float, 3) || this;
+				_super.call(this, webgl.Shader.POSITION, VertexAttributeType.Float, 3);
 			}
 			return Position3Attribute;
 		}(VertexAttribute));
@@ -7113,7 +7097,7 @@ var spine;
 			__extends(TexCoordAttribute, _super);
 			function TexCoordAttribute(unit) {
 				if (unit === void 0) { unit = 0; }
-				return _super.call(this, webgl.Shader.TEXCOORDS + (unit == 0 ? "" : unit), VertexAttributeType.Float, 2) || this;
+				_super.call(this, webgl.Shader.TEXCOORDS + (unit == 0 ? "" : unit), VertexAttributeType.Float, 2);
 			}
 			return TexCoordAttribute;
 		}(VertexAttribute));
@@ -7121,7 +7105,7 @@ var spine;
 		var ColorAttribute = (function (_super) {
 			__extends(ColorAttribute, _super);
 			function ColorAttribute() {
-				return _super.call(this, webgl.Shader.COLOR, VertexAttributeType.Float, 4) || this;
+				_super.call(this, webgl.Shader.COLOR, VertexAttributeType.Float, 4);
 			}
 			return ColorAttribute;
 		}(VertexAttribute));
@@ -7129,15 +7113,15 @@ var spine;
 		var Color2Attribute = (function (_super) {
 			__extends(Color2Attribute, _super);
 			function Color2Attribute() {
-				return _super.call(this, webgl.Shader.COLOR2, VertexAttributeType.Float, 4) || this;
+				_super.call(this, webgl.Shader.COLOR2, VertexAttributeType.Float, 4);
 			}
 			return Color2Attribute;
 		}(VertexAttribute));
 		webgl.Color2Attribute = Color2Attribute;
-		var VertexAttributeType;
 		(function (VertexAttributeType) {
 			VertexAttributeType[VertexAttributeType["Float"] = 0] = "Float";
-		})(VertexAttributeType = webgl.VertexAttributeType || (webgl.VertexAttributeType = {}));
+		})(webgl.VertexAttributeType || (webgl.VertexAttributeType = {}));
+		var VertexAttributeType = webgl.VertexAttributeType;
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
 var spine;
@@ -7638,12 +7622,12 @@ var spine;
 			return SceneRenderer;
 		}());
 		webgl.SceneRenderer = SceneRenderer;
-		var ResizeMode;
 		(function (ResizeMode) {
 			ResizeMode[ResizeMode["Stretch"] = 0] = "Stretch";
 			ResizeMode[ResizeMode["Expand"] = 1] = "Expand";
 			ResizeMode[ResizeMode["Fit"] = 2] = "Fit";
-		})(ResizeMode = webgl.ResizeMode || (webgl.ResizeMode = {}));
+		})(webgl.ResizeMode || (webgl.ResizeMode = {}));
+		var ResizeMode = webgl.ResizeMode;
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
 var spine;
@@ -7790,14 +7774,14 @@ var spine;
 				var fs = "\n\t\t\t\t#ifdef GL_ES\n\t\t\t\t\t#define LOWP lowp\n\t\t\t\t\tprecision mediump float;\n\t\t\t\t#else\n\t\t\t\t\t#define LOWP\n\t\t\t\t#endif\n\t\t\t\tvarying LOWP vec4 v_color;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tgl_FragColor = v_color;\n\t\t\t\t}\n\t\t\t";
 				return new Shader(context, vs, fs);
 			};
+			Shader.MVP_MATRIX = "u_projTrans";
+			Shader.POSITION = "a_position";
+			Shader.COLOR = "a_color";
+			Shader.COLOR2 = "a_color2";
+			Shader.TEXCOORDS = "a_texCoords";
+			Shader.SAMPLER = "u_texture";
 			return Shader;
 		}());
-		Shader.MVP_MATRIX = "u_projTrans";
-		Shader.POSITION = "a_position";
-		Shader.COLOR = "a_color";
-		Shader.COLOR2 = "a_color2";
-		Shader.TEXCOORDS = "a_texCoords";
-		Shader.SAMPLER = "u_texture";
 		webgl.Shader = Shader;
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
@@ -8117,12 +8101,12 @@ var spine;
 			return ShapeRenderer;
 		}());
 		webgl.ShapeRenderer = ShapeRenderer;
-		var ShapeType;
 		(function (ShapeType) {
 			ShapeType[ShapeType["Point"] = 0] = "Point";
 			ShapeType[ShapeType["Line"] = 1] = "Line";
 			ShapeType[ShapeType["Filled"] = 4] = "Filled";
-		})(ShapeType = webgl.ShapeType || (webgl.ShapeType = {}));
+		})(webgl.ShapeType || (webgl.ShapeType = {}));
+		var ShapeType = webgl.ShapeType;
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
 var spine;
@@ -8310,10 +8294,10 @@ var spine;
 			};
 			SkeletonDebugRenderer.prototype.dispose = function () {
 			};
+			SkeletonDebugRenderer.LIGHT_GRAY = new spine.Color(192 / 255, 192 / 255, 192 / 255, 1);
+			SkeletonDebugRenderer.GREEN = new spine.Color(0, 1, 0, 1);
 			return SkeletonDebugRenderer;
 		}());
-		SkeletonDebugRenderer.LIGHT_GRAY = new spine.Color(192 / 255, 192 / 255, 192 / 255, 1);
-		SkeletonDebugRenderer.GREEN = new spine.Color(0, 1, 0, 1);
 		webgl.SkeletonDebugRenderer = SkeletonDebugRenderer;
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
@@ -8456,9 +8440,9 @@ var spine;
 				}
 				clipper.clipEnd();
 			};
+			SkeletonRenderer.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 			return SkeletonRenderer;
 		}());
-		SkeletonRenderer.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 		webgl.SkeletonRenderer = SkeletonRenderer;
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
@@ -8553,8 +8537,8 @@ var spine;
 	(function (webgl) {
 		var ManagedWebGLRenderingContext = (function () {
 			function ManagedWebGLRenderingContext(canvasOrContext, contextConfig) {
-				if (contextConfig === void 0) { contextConfig = { alpha: "true" }; }
 				var _this = this;
+				if (contextConfig === void 0) { contextConfig = { alpha: "true" }; }
 				this.restorables = new Array();
 				if (canvasOrContext instanceof HTMLCanvasElement) {
 					var canvas = canvasOrContext;
@@ -8610,17 +8594,17 @@ var spine;
 					default: throw new Error("Unknown blend mode: " + blendMode);
 				}
 			};
+			WebGLBlendModeConverter.ZERO = 0;
+			WebGLBlendModeConverter.ONE = 1;
+			WebGLBlendModeConverter.SRC_COLOR = 0x0300;
+			WebGLBlendModeConverter.ONE_MINUS_SRC_COLOR = 0x0301;
+			WebGLBlendModeConverter.SRC_ALPHA = 0x0302;
+			WebGLBlendModeConverter.ONE_MINUS_SRC_ALPHA = 0x0303;
+			WebGLBlendModeConverter.DST_ALPHA = 0x0304;
+			WebGLBlendModeConverter.ONE_MINUS_DST_ALPHA = 0x0305;
+			WebGLBlendModeConverter.DST_COLOR = 0x0306;
 			return WebGLBlendModeConverter;
 		}());
-		WebGLBlendModeConverter.ZERO = 0;
-		WebGLBlendModeConverter.ONE = 1;
-		WebGLBlendModeConverter.SRC_COLOR = 0x0300;
-		WebGLBlendModeConverter.ONE_MINUS_SRC_COLOR = 0x0301;
-		WebGLBlendModeConverter.SRC_ALPHA = 0x0302;
-		WebGLBlendModeConverter.ONE_MINUS_SRC_ALPHA = 0x0303;
-		WebGLBlendModeConverter.DST_ALPHA = 0x0304;
-		WebGLBlendModeConverter.ONE_MINUS_DST_ALPHA = 0x0305;
-		WebGLBlendModeConverter.DST_COLOR = 0x0306;
 		webgl.WebGLBlendModeConverter = WebGLBlendModeConverter;
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
@@ -8934,9 +8918,9 @@ var spine;
 				window.attachEvent("onload", SpineWidget.ready);
 			}
 		};
+		SpineWidget.pageLoaded = false;
 		return SpineWidget;
 	}());
-	SpineWidget.pageLoaded = false;
 	spine.SpineWidget = SpineWidget;
 	var SpineWidgetConfig = (function () {
 		function SpineWidgetConfig() {

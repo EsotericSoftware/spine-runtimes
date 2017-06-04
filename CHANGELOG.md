@@ -42,6 +42,7 @@
   * Added macros to define typed dynamic arrays, see `Array.h/.c`
   * Added `spClippingAttachment` and respective enum.
   * Added `spSkeletonClipper` and `spTriangulator`, used to implement software clipping of attachments.
+  * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
 
 ### Cocos2d-X
  * Fixed renderer to work with 3.6 changes
@@ -71,6 +72,8 @@
 ## C#
  * **Breaking changes**
    *  `MeshAttachment.parentMesh` is now a private field to enforce using the `.ParentMesh` setter property in external code. The `MeshAttachment.ParentMesh` property is an appropriate replacement wherever `.parentMesh` was used.
+ * **Additions**
+   * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
 
 ### Unity
  * Refactored renderer to work with new 3.6 features.
@@ -127,6 +130,7 @@
   * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
   * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
   * Added `SkeletonClipper` and `Triangulator`, used to implement software clipping of attachments.
+  * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
 
 ### libGDX
  * Fixed renderer to work with 3.6 changes
@@ -147,6 +151,7 @@
   * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
   * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
   * Added `SkeletonClipper` and `Triangulator`, used to implement software clipping of attachments.
+  * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
 
 ### Love2D
   * Fixed renderer to work with 3.6 changes
@@ -171,6 +176,7 @@
   * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
   * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
   * Added `SkeletonClipper` and `Triangulator`, used to implement software clipping of attachments.
+  * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
 
 ### WebGL backend
  * Fixed WebGL context loss
