@@ -120,7 +120,7 @@ spAnimationState* spAnimationState_create (spAnimationStateData* data);
 void spAnimationState_dispose (spAnimationState* self);
 
 void spAnimationState_update (spAnimationState* self, float delta);
-void spAnimationState_apply (spAnimationState* self, struct spSkeleton* skeleton);
+int /**bool**/ spAnimationState_apply (spAnimationState* self, struct spSkeleton* skeleton);
 
 void spAnimationState_clearTracks (spAnimationState* self);
 void spAnimationState_clearTrack (spAnimationState* self, int trackIndex);
