@@ -603,7 +603,7 @@ var spine;
 			}
 			var frameVertices = this.frameVertices;
 			var vertexCount = frameVertices[0].length;
-			if (verticesArray.length != vertexCount)
+			if (verticesArray.length != vertexCount && !setupPose)
 				alpha = 1;
 			var vertices = spine.Utils.setArraySize(verticesArray, vertexCount);
 			if (time >= frames[frames.length - 1]) {
