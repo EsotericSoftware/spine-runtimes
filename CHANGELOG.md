@@ -15,6 +15,7 @@
   * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.
   * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
   * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
+  * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
 
 ### Starling
  * Fixed renderer to work with 3.6 changes.
