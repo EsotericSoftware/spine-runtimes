@@ -366,9 +366,11 @@ function AnimationState:apply (skeleton)
 	local events = self.events
 	local tracks = self.tracks
 	local queue = self.queue
+  local applied = false
 
 	for i,current in pairs(tracks) do
 		if not (current == nil or current.delay > 0) then
+      applied = true
 			-- Apply mixing from entries first.
 			local mix = current.alpha
 			if current.mixingFrom then 
@@ -407,6 +409,7 @@ function AnimationState:apply (skeleton)
 	end
 
 	queue:drain()
+  return applied
 end
 
 function AnimationState:applyMixingFrom (to, skeleton)
