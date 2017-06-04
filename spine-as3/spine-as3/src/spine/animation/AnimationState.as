@@ -147,15 +147,17 @@ package spine.animation {
 			return false;
 		}
 
-		public function apply(skeleton : Skeleton) : void {
+		public function apply(skeleton : Skeleton) : Boolean {
 			if (skeleton == null) throw new ArgumentError("skeleton cannot be null.");
 			if (animationsChanged) _animationsChanged();
 
 			var events : Vector.<Event> = this.events;
+			var applied : Boolean = false;
 
 			for (var i : int = 0, n : int = tracks.length; i < n; i++) {
 				var current : TrackEntry = tracks[i];
 				if (current == null || current.delay > 0) continue;
+				applied = true;
 
 				// Apply mixing from entries first.
 				var mix : Number = current.alpha;
@@ -194,6 +196,7 @@ package spine.animation {
 			}
 
 			queue.drain();
+			return applied;
 		}
 
 		private function applyMixingFrom(to : TrackEntry, skeleton : Skeleton) : Number {
