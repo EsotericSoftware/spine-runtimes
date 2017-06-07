@@ -1675,11 +1675,19 @@ namespace Spine.Unity.Editor {
 
 			const float endCapSize = 0.05f;
 			Vector3 firstPoint = m.MultiplyPoint(new Vector3(pv[2], pv[3]));
-			Handles.DotCap(0, firstPoint, Quaternion.identity, endCapSize * HandleUtility.GetHandleSize(firstPoint));
-			//			if (!p.Closed) Handles.DotCap(0, m.MultiplyPoint(new Vector3(pv[n - 4], pv[n - 3])), q, endCapSize);
+			SpineHandles.DrawDot(firstPoint, endCapSize);
+			//if (!p.Closed) SpineHandles.DrawDot(m.MultiplyPoint(new Vector3(pv[n - 4], pv[n - 3])), endCapSize);
 			if (includeName) Handles.Label(firstPoint + new Vector3(0,0.1f), p.Name, PathNameStyle);
 
 			Handles.color = ocolor;
+		}
+
+		public static void DrawDot (Vector3 position, float size) {
+			#if UNITY_5_6_OR_NEWER
+			Handles.DotHandleCap(0, position, Quaternion.identity, size * HandleUtility.GetHandleSize(position), EventType.Ignore);
+			#else
+			Handles.DotCap(0, position, Quaternion.identity, size * HandleUtility.GetHandleSize(position));
+			#endif
 		}
 
 		public static void DrawBoundingBoxes (Transform transform, Skeleton skeleton) {
