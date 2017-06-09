@@ -46,8 +46,8 @@ namespace Spine {
 			: base(name) {
 		}
 
-		public void ComputeWorldPosition (Bone bone, float x, float y, out float ox, out float oy) {
-			bone.LocalToWorld(x, y, out ox, out oy);
+		public void ComputeWorldPosition (Bone bone, out float ox, out float oy) {
+			bone.LocalToWorld(this.x, this.y, out ox, out oy);
 		}
 
 		public float ComputeWorldRotation (Bone bone) {
