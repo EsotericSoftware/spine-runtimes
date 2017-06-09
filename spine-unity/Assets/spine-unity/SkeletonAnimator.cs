@@ -90,6 +90,7 @@ namespace Spine.Unity {
 				System.Array.Resize<MixMode>(ref layerMixModes, animator.layerCount);
 
 			//skeleton.Update(Time.deltaTime); // Doesn't actually do anything, currently. (Spine 3.5).
+			Spine.Animation spineAnimation;
 
 			// Clear Previous
 			if (autoReset) {
@@ -111,13 +112,15 @@ namespace Spine.Unity {
 					for (int c = 0; c < clipInfo.Length; c++) {
 						var info = clipInfo[c];
 						float weight = info.weight * layerWeight; if (weight == 0) continue;
-						previousAnimations.Add(animationTable[NameHashCode(info.clip)]);
+						animationTable.TryGetValue(NameHashCode(info.clip), out spineAnimation);
+						if (spineAnimation != null) previousAnimations.Add(spineAnimation);
 					}
 					if (hasNext) {
 						for (int c = 0; c < nextClipInfo.Length; c++) {
 							var info = nextClipInfo[c];
 							float weight = info.weight * layerWeight; if (weight == 0) continue;
-							previousAnimations.Add(animationTable[NameHashCode(info.clip)]);
+							animationTable.TryGetValue(NameHashCode(info.clip), out spineAnimation);
+							if (spineAnimation != null) previousAnimations.Add(spineAnimation);
 						}
 					}
 				}
@@ -142,12 +145,14 @@ namespace Spine.Unity {
 					// Always use Mix instead of Applying the first non-zero weighted clip.
 					for (int c = 0; c < clipInfo.Length; c++) {
 						var info = clipInfo[c];	float weight = info.weight * layerWeight; if (weight == 0) continue;
-						animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed <0), stateInfo.loop, null, weight, false, false);
+						animationTable.TryGetValue(NameHashCode(info.clip), out spineAnimation);
+						if (spineAnimation != null) spineAnimation.Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed <0), stateInfo.loop, null, weight, false, false);
 					}
 					if (hasNext) {
 						for (int c = 0; c < nextClipInfo.Length; c++) {
 							var info = nextClipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-							animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime , info.clip.length,nextStateInfo.speed < 0), nextStateInfo.loop, null, weight, false, false);
+							animationTable.TryGetValue(NameHashCode(info.clip), out spineAnimation);
+							if (spineAnimation != null) spineAnimation.Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime , info.clip.length, nextStateInfo.speed < 0), nextStateInfo.loop, null, weight, false, false);
 						}
 					}
 				} else { // case MixNext || SpineStyle
@@ -155,13 +160,15 @@ namespace Spine.Unity {
 					int c = 0;
 					for (; c < clipInfo.Length; c++) {
 						var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-						animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed <0), stateInfo.loop, null, 1f, false, false);
+						animationTable.TryGetValue(NameHashCode(info.clip), out spineAnimation);
+						if (spineAnimation != null) spineAnimation.Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed <0), stateInfo.loop, null, 1f, false, false);
 						break;
 					}
 					// Mix the rest
 					for (; c < clipInfo.Length; c++) {
 						var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-						animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed <0), stateInfo.loop, null, weight, false, false);
+						animationTable.TryGetValue(NameHashCode(info.clip), out spineAnimation);
+						if (spineAnimation != null) spineAnimation.Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed <0), stateInfo.loop, null, weight, false, false);
 					}
 
 					c = 0;
@@ -170,14 +177,16 @@ namespace Spine.Unity {
 						if (mode == MixMode.SpineStyle) {
 							for (; c < nextClipInfo.Length; c++) {
 								var info = nextClipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-								animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime , info.clip.length,nextStateInfo.speed < 0), nextStateInfo.loop, null, 1f, false, false);
+								animationTable.TryGetValue(NameHashCode(info.clip), out spineAnimation);
+								if (spineAnimation != null) spineAnimation.Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime , info.clip.length,nextStateInfo.speed < 0), nextStateInfo.loop, null, 1f, false, false);
 								break;
 							}
 						}
 						// Mix the rest
 						for (; c < nextClipInfo.Length; c++) {
 							var info = nextClipInfo[c];	float weight = info.weight * layerWeight; if (weight == 0) continue;
-							animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime , info.clip.length,nextStateInfo.speed < 0), nextStateInfo.loop, null, weight, false, false);
+							animationTable.TryGetValue(NameHashCode(info.clip), out spineAnimation);
+							if (spineAnimation != null) spineAnimation.Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime , info.clip.length,nextStateInfo.speed < 0), nextStateInfo.loop, null, weight, false, false);
 						}
 					}
 				}
