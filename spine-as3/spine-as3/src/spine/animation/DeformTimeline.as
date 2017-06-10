@@ -72,7 +72,7 @@ package spine.animation {
 			var frameVertices : Vector.<Vector.<Number>> = this.frameVertices;
 			var vertexCount : int = frameVertices[0].length;
 
-			if (verticesArray.length != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
+			if (verticesArray.length != vertexCount && !setupPose) alpha = 1; // Don't mix from uninitialized slot vertices.
 			verticesArray.length = vertexCount;
 			var vertices : Vector.<Number> = verticesArray;
 

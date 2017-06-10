@@ -327,7 +327,7 @@ int /*boolean*/ _spAnimationState_updateMixingFrom (spAnimationState* self, spTr
 	return 0;
 }
 
-void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
+int spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
 	spTrackEntry* current;
 	int i, ii, n;
@@ -337,6 +337,7 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 	int /*boolean*/ firstFrame;
 	float* timelinesRotation;
 	spTimeline* timeline;
+	int applied = 0;
 
 	if (internal->animationsChanged) _spAnimationState_animationsChanged(self);
 
@@ -344,6 +345,7 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 		float mix;
 		current = self->tracks[i];
 		if (!current || current->delay > 0) continue;
+		applied = -1;
 
 		/* Apply mixing from entries first. */
 		mix = current->alpha;
@@ -381,6 +383,7 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 	}
 
 	_spEventQueue_drain(internal->queue);
+	return applied;
 }
 
 float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* to, spSkeleton* skeleton) {

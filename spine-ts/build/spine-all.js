@@ -1,13 +1,456 @@
-var __extends = (this && this.__extends) || (function () {
-	var extendStatics = Object.setPrototypeOf ||
-		({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-		function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-	return function (d, b) {
-		extendStatics(d, b);
-		function __() { this.constructor = d; }
-		d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-})();
+var spine;
+(function (spine) {
+	var AssetManager = (function () {
+		function AssetManager(textureLoader, pathPrefix) {
+			if (pathPrefix === void 0) { pathPrefix = ""; }
+			this.assets = {};
+			this.errors = {};
+			this.toLoad = 0;
+			this.loaded = 0;
+			this.textureLoader = textureLoader;
+			this.pathPrefix = pathPrefix;
+		}
+		AssetManager.prototype.loadText = function (path, success, error) {
+			var _this = this;
+			if (success === void 0) { success = null; }
+			if (error === void 0) { error = null; }
+			path = this.pathPrefix + path;
+			this.toLoad++;
+			var request = new XMLHttpRequest();
+			request.onreadystatechange = function () {
+				if (request.readyState == XMLHttpRequest.DONE) {
+					if (request.status >= 200 && request.status < 300) {
+						_this.assets[path] = request.responseText;
+						if (success)
+							success(path, request.responseText);
+					}
+					else {
+						_this.errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
+						if (error)
+							error(path, "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText);
+					}
+					_this.toLoad--;
+					_this.loaded++;
+				}
+			};
+			request.open("GET", path, true);
+			request.send();
+		};
+		AssetManager.prototype.loadTexture = function (path, success, error) {
+			var _this = this;
+			if (success === void 0) { success = null; }
+			if (error === void 0) { error = null; }
+			path = this.pathPrefix + path;
+			this.toLoad++;
+			var img = new Image();
+			img.crossOrigin = "anonymous";
+			img.onload = function (ev) {
+				var texture = _this.textureLoader(img);
+				_this.assets[path] = texture;
+				_this.toLoad--;
+				_this.loaded++;
+				if (success)
+					success(path, img);
+			};
+			img.onerror = function (ev) {
+				_this.errors[path] = "Couldn't load image " + path;
+				_this.toLoad--;
+				_this.loaded++;
+				if (error)
+					error(path, "Couldn't load image " + path);
+			};
+			img.src = path;
+		};
+		AssetManager.prototype.loadTextureData = function (path, data, success, error) {
+			var _this = this;
+			if (success === void 0) { success = null; }
+			if (error === void 0) { error = null; }
+			path = this.pathPrefix + path;
+			this.toLoad++;
+			var img = new Image();
+			img.onload = function (ev) {
+				var texture = _this.textureLoader(img);
+				_this.assets[path] = texture;
+				_this.toLoad--;
+				_this.loaded++;
+				if (success)
+					success(path, img);
+			};
+			img.onerror = function (ev) {
+				_this.errors[path] = "Couldn't load image " + path;
+				_this.toLoad--;
+				_this.loaded++;
+				if (error)
+					error(path, "Couldn't load image " + path);
+			};
+			img.src = data;
+		};
+		AssetManager.prototype.get = function (path) {
+			path = this.pathPrefix + path;
+			return this.assets[path];
+		};
+		AssetManager.prototype.remove = function (path) {
+			path = this.pathPrefix + path;
+			var asset = this.assets[path];
+			if (asset.dispose)
+				asset.dispose();
+			this.assets[path] = null;
+		};
+		AssetManager.prototype.removeAll = function () {
+			for (var key in this.assets) {
+				var asset = this.assets[key];
+				if (asset.dispose)
+					asset.dispose();
+			}
+			this.assets = {};
+		};
+		AssetManager.prototype.isLoadingComplete = function () {
+			return this.toLoad == 0;
+		};
+		AssetManager.prototype.getToLoad = function () {
+			return this.toLoad;
+		};
+		AssetManager.prototype.getLoaded = function () {
+			return this.loaded;
+		};
+		AssetManager.prototype.dispose = function () {
+			this.removeAll();
+		};
+		AssetManager.prototype.hasErrors = function () {
+			return Object.keys(this.errors).length > 0;
+		};
+		AssetManager.prototype.getErrors = function () {
+			return this.errors;
+		};
+		return AssetManager;
+	}());
+	spine.AssetManager = AssetManager;
+})(spine || (spine = {}));
+var __extends = (this && this.__extends) || function (d, b) {
+	for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	function __() { this.constructor = d; }
+	d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var spine;
+(function (spine) {
+	var canvas;
+	(function (canvas) {
+		var AssetManager = (function (_super) {
+			__extends(AssetManager, _super);
+			function AssetManager(pathPrefix) {
+				if (pathPrefix === void 0) { pathPrefix = ""; }
+				_super.call(this, function (image) { return new spine.canvas.CanvasTexture(image); }, pathPrefix);
+			}
+			return AssetManager;
+		}(spine.AssetManager));
+		canvas.AssetManager = AssetManager;
+	})(canvas = spine.canvas || (spine.canvas = {}));
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var Texture = (function () {
+		function Texture(image) {
+			this._image = image;
+		}
+		Texture.prototype.getImage = function () {
+			return this._image;
+		};
+		Texture.filterFromString = function (text) {
+			switch (text.toLowerCase()) {
+				case "nearest": return TextureFilter.Nearest;
+				case "linear": return TextureFilter.Linear;
+				case "mipmap": return TextureFilter.MipMap;
+				case "mipmapnearestnearest": return TextureFilter.MipMapNearestNearest;
+				case "mipmaplinearnearest": return TextureFilter.MipMapLinearNearest;
+				case "mipmapnearestlinear": return TextureFilter.MipMapNearestLinear;
+				case "mipmaplinearlinear": return TextureFilter.MipMapLinearLinear;
+				default: throw new Error("Unknown texture filter " + text);
+			}
+		};
+		Texture.wrapFromString = function (text) {
+			switch (text.toLowerCase()) {
+				case "mirroredtepeat": return TextureWrap.MirroredRepeat;
+				case "clamptoedge": return TextureWrap.ClampToEdge;
+				case "repeat": return TextureWrap.Repeat;
+				default: throw new Error("Unknown texture wrap " + text);
+			}
+		};
+		return Texture;
+	}());
+	spine.Texture = Texture;
+	(function (TextureFilter) {
+		TextureFilter[TextureFilter["Nearest"] = 9728] = "Nearest";
+		TextureFilter[TextureFilter["Linear"] = 9729] = "Linear";
+		TextureFilter[TextureFilter["MipMap"] = 9987] = "MipMap";
+		TextureFilter[TextureFilter["MipMapNearestNearest"] = 9984] = "MipMapNearestNearest";
+		TextureFilter[TextureFilter["MipMapLinearNearest"] = 9985] = "MipMapLinearNearest";
+		TextureFilter[TextureFilter["MipMapNearestLinear"] = 9986] = "MipMapNearestLinear";
+		TextureFilter[TextureFilter["MipMapLinearLinear"] = 9987] = "MipMapLinearLinear";
+	})(spine.TextureFilter || (spine.TextureFilter = {}));
+	var TextureFilter = spine.TextureFilter;
+	(function (TextureWrap) {
+		TextureWrap[TextureWrap["MirroredRepeat"] = 33648] = "MirroredRepeat";
+		TextureWrap[TextureWrap["ClampToEdge"] = 33071] = "ClampToEdge";
+		TextureWrap[TextureWrap["Repeat"] = 10497] = "Repeat";
+	})(spine.TextureWrap || (spine.TextureWrap = {}));
+	var TextureWrap = spine.TextureWrap;
+	var TextureRegion = (function () {
+		function TextureRegion() {
+			this.u = 0;
+			this.v = 0;
+			this.u2 = 0;
+			this.v2 = 0;
+			this.width = 0;
+			this.height = 0;
+			this.rotate = false;
+			this.offsetX = 0;
+			this.offsetY = 0;
+			this.originalWidth = 0;
+			this.originalHeight = 0;
+		}
+		return TextureRegion;
+	}());
+	spine.TextureRegion = TextureRegion;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var canvas;
+	(function (canvas) {
+		var CanvasTexture = (function (_super) {
+			__extends(CanvasTexture, _super);
+			function CanvasTexture(image) {
+				_super.call(this, image);
+			}
+			CanvasTexture.prototype.setFilters = function (minFilter, magFilter) { };
+			CanvasTexture.prototype.setWraps = function (uWrap, vWrap) { };
+			CanvasTexture.prototype.dispose = function () { };
+			return CanvasTexture;
+		}(spine.Texture));
+		canvas.CanvasTexture = CanvasTexture;
+	})(canvas = spine.canvas || (spine.canvas = {}));
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var canvas;
+	(function (canvas) {
+		var SkeletonRenderer = (function () {
+			function SkeletonRenderer(context) {
+				this.triangleRendering = false;
+				this.debugRendering = false;
+				this.vertices = spine.Utils.newFloatArray(8 * 1024);
+				this.tempColor = new spine.Color();
+				this.ctx = context;
+			}
+			SkeletonRenderer.prototype.draw = function (skeleton) {
+				if (this.triangleRendering)
+					this.drawTriangles(skeleton);
+				else
+					this.drawImages(skeleton);
+			};
+			SkeletonRenderer.prototype.drawImages = function (skeleton) {
+				var ctx = this.ctx;
+				var drawOrder = skeleton.drawOrder;
+				if (this.debugRendering)
+					ctx.strokeStyle = "green";
+				ctx.save();
+				for (var i = 0, n = drawOrder.length; i < n; i++) {
+					var slot = drawOrder[i];
+					var attachment = slot.getAttachment();
+					var regionAttachment = null;
+					var region = null;
+					var image = null;
+					if (attachment instanceof spine.RegionAttachment) {
+						regionAttachment = attachment;
+						region = regionAttachment.region;
+						image = region.texture.getImage();
+					}
+					else
+						continue;
+					var skeleton_1 = slot.bone.skeleton;
+					var skeletonColor = skeleton_1.color;
+					var slotColor = slot.color;
+					var regionColor = regionAttachment.color;
+					var alpha = skeletonColor.a * slotColor.a * regionColor.a;
+					var color = this.tempColor;
+					color.set(skeletonColor.r * slotColor.r * regionColor.r, skeletonColor.g * slotColor.g * regionColor.g, skeletonColor.b * slotColor.b * regionColor.b, alpha);
+					var att = attachment;
+					var bone = slot.bone;
+					var w = region.width;
+					var h = region.height;
+					ctx.save();
+					ctx.transform(bone.a, bone.c, bone.b, bone.d, bone.worldX, bone.worldY);
+					ctx.translate(attachment.offset[0], attachment.offset[1]);
+					ctx.rotate(attachment.rotation * Math.PI / 180);
+					ctx.scale(attachment.scaleX, attachment.scaleY);
+					ctx.translate(w / 2, h / 2);
+					if (attachment.region.rotate) {
+						var t = w;
+						w = h;
+						h = t;
+						ctx.rotate(-Math.PI / 2);
+					}
+					ctx.scale(1, -1);
+					ctx.translate(-w / 2, -h / 2);
+					if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
+						ctx.globalAlpha = color.a;
+					}
+					ctx.drawImage(image, region.x, region.y, w, h, 0, 0, w, h);
+					if (this.debugRendering)
+						ctx.strokeRect(0, 0, w, h);
+					ctx.restore();
+				}
+				ctx.restore();
+			};
+			SkeletonRenderer.prototype.drawTriangles = function (skeleton) {
+				var blendMode = null;
+				var vertices = this.vertices;
+				var triangles = null;
+				var drawOrder = skeleton.drawOrder;
+				for (var i = 0, n = drawOrder.length; i < n; i++) {
+					var slot = drawOrder[i];
+					var attachment = slot.getAttachment();
+					var texture = null;
+					var region = null;
+					if (attachment instanceof spine.RegionAttachment) {
+						var regionAttachment = attachment;
+						vertices = this.computeRegionVertices(slot, regionAttachment, false);
+						triangles = SkeletonRenderer.QUAD_TRIANGLES;
+						region = regionAttachment.region;
+						texture = region.texture.getImage();
+					}
+					else if (attachment instanceof spine.MeshAttachment) {
+						var mesh = attachment;
+						vertices = this.computeMeshVertices(slot, mesh, false);
+						triangles = mesh.triangles;
+						texture = mesh.region.renderObject.texture.getImage();
+					}
+					else
+						continue;
+					if (texture != null) {
+						var slotBlendMode = slot.data.blendMode;
+						if (slotBlendMode != blendMode) {
+							blendMode = slotBlendMode;
+						}
+						var ctx = this.ctx;
+						for (var j = 0; j < triangles.length; j += 3) {
+							var t1 = triangles[j] * 8, t2 = triangles[j + 1] * 8, t3 = triangles[j + 2] * 8;
+							var x0 = vertices[t1], y0 = vertices[t1 + 1], u0 = vertices[t1 + 6], v0 = vertices[t1 + 7];
+							var x1 = vertices[t2], y1 = vertices[t2 + 1], u1 = vertices[t2 + 6], v1 = vertices[t2 + 7];
+							var x2 = vertices[t3], y2 = vertices[t3 + 1], u2 = vertices[t3 + 6], v2 = vertices[t3 + 7];
+							this.drawTriangle(texture, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
+							if (this.debugRendering) {
+								ctx.strokeStyle = "green";
+								ctx.beginPath();
+								ctx.moveTo(x0, y0);
+								ctx.lineTo(x1, y1);
+								ctx.lineTo(x2, y2);
+								ctx.lineTo(x0, y0);
+								ctx.stroke();
+							}
+						}
+					}
+				}
+			};
+			SkeletonRenderer.prototype.drawTriangle = function (img, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2) {
+				var ctx = this.ctx;
+				u0 *= img.width;
+				v0 *= img.height;
+				u1 *= img.width;
+				v1 *= img.height;
+				u2 *= img.width;
+				v2 *= img.height;
+				ctx.beginPath();
+				ctx.moveTo(x0, y0);
+				ctx.lineTo(x1, y1);
+				ctx.lineTo(x2, y2);
+				ctx.closePath();
+				x1 -= x0;
+				y1 -= y0;
+				x2 -= x0;
+				y2 -= y0;
+				u1 -= u0;
+				v1 -= v0;
+				u2 -= u0;
+				v2 -= v0;
+				var det = 1 / (u1 * v2 - u2 * v1), a = (v2 * x1 - v1 * x2) * det, b = (v2 * y1 - v1 * y2) * det, c = (u1 * x2 - u2 * x1) * det, d = (u1 * y2 - u2 * y1) * det, e = x0 - a * u0 - c * v0, f = y0 - b * u0 - d * v0;
+				ctx.save();
+				ctx.transform(a, b, c, d, e, f);
+				ctx.clip();
+				ctx.drawImage(img, 0, 0);
+				ctx.restore();
+			};
+			SkeletonRenderer.prototype.computeRegionVertices = function (slot, region, pma) {
+				var skeleton = slot.bone.skeleton;
+				var skeletonColor = skeleton.color;
+				var slotColor = slot.color;
+				var regionColor = region.color;
+				var alpha = skeletonColor.a * slotColor.a * regionColor.a;
+				var multiplier = pma ? alpha : 1;
+				var color = this.tempColor;
+				color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier, skeletonColor.g * slotColor.g * regionColor.g * multiplier, skeletonColor.b * slotColor.b * regionColor.b * multiplier, alpha);
+				region.computeWorldVertices(slot.bone, this.vertices, 0, SkeletonRenderer.VERTEX_SIZE);
+				var vertices = this.vertices;
+				var uvs = region.uvs;
+				vertices[spine.RegionAttachment.C1R] = color.r;
+				vertices[spine.RegionAttachment.C1G] = color.g;
+				vertices[spine.RegionAttachment.C1B] = color.b;
+				vertices[spine.RegionAttachment.C1A] = color.a;
+				vertices[spine.RegionAttachment.U1] = uvs[0];
+				vertices[spine.RegionAttachment.V1] = uvs[1];
+				vertices[spine.RegionAttachment.C2R] = color.r;
+				vertices[spine.RegionAttachment.C2G] = color.g;
+				vertices[spine.RegionAttachment.C2B] = color.b;
+				vertices[spine.RegionAttachment.C2A] = color.a;
+				vertices[spine.RegionAttachment.U2] = uvs[2];
+				vertices[spine.RegionAttachment.V2] = uvs[3];
+				vertices[spine.RegionAttachment.C3R] = color.r;
+				vertices[spine.RegionAttachment.C3G] = color.g;
+				vertices[spine.RegionAttachment.C3B] = color.b;
+				vertices[spine.RegionAttachment.C3A] = color.a;
+				vertices[spine.RegionAttachment.U3] = uvs[4];
+				vertices[spine.RegionAttachment.V3] = uvs[5];
+				vertices[spine.RegionAttachment.C4R] = color.r;
+				vertices[spine.RegionAttachment.C4G] = color.g;
+				vertices[spine.RegionAttachment.C4B] = color.b;
+				vertices[spine.RegionAttachment.C4A] = color.a;
+				vertices[spine.RegionAttachment.U4] = uvs[6];
+				vertices[spine.RegionAttachment.V4] = uvs[7];
+				return vertices;
+			};
+			SkeletonRenderer.prototype.computeMeshVertices = function (slot, mesh, pma) {
+				var skeleton = slot.bone.skeleton;
+				var skeletonColor = skeleton.color;
+				var slotColor = slot.color;
+				var regionColor = mesh.color;
+				var alpha = skeletonColor.a * slotColor.a * regionColor.a;
+				var multiplier = pma ? alpha : 1;
+				var color = this.tempColor;
+				color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier, skeletonColor.g * slotColor.g * regionColor.g * multiplier, skeletonColor.b * slotColor.b * regionColor.b * multiplier, alpha);
+				var numVertices = mesh.worldVerticesLength / 2;
+				if (this.vertices.length < mesh.worldVerticesLength) {
+					this.vertices = spine.Utils.newFloatArray(mesh.worldVerticesLength);
+				}
+				var vertices = this.vertices;
+				mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
+				var uvs = mesh.uvs;
+				for (var i = 0, n = numVertices, u = 0, v = 2; i < n; i++) {
+					vertices[v++] = color.r;
+					vertices[v++] = color.g;
+					vertices[v++] = color.b;
+					vertices[v++] = color.a;
+					vertices[v++] = uvs[u++];
+					vertices[v++] = uvs[u++];
+					v += 2;
+				}
+				return vertices;
+			};
+			SkeletonRenderer.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
+			SkeletonRenderer.VERTEX_SIZE = 2 + 2 + 4;
+			return SkeletonRenderer;
+		}());
+		canvas.SkeletonRenderer = SkeletonRenderer;
+	})(canvas = spine.canvas || (spine.canvas = {}));
+})(spine || (spine = {}));
 var spine;
 (function (spine) {
 	var Animation = (function () {
@@ -58,7 +501,6 @@ var spine;
 		return Animation;
 	}());
 	spine.Animation = Animation;
-	var TimelineType;
 	(function (TimelineType) {
 		TimelineType[TimelineType["rotate"] = 0] = "rotate";
 		TimelineType[TimelineType["translate"] = 1] = "translate";
@@ -75,7 +517,8 @@ var spine;
 		TimelineType[TimelineType["pathConstraintSpacing"] = 12] = "pathConstraintSpacing";
 		TimelineType[TimelineType["pathConstraintMix"] = 13] = "pathConstraintMix";
 		TimelineType[TimelineType["twoColor"] = 14] = "twoColor";
-	})(TimelineType = spine.TimelineType || (spine.TimelineType = {}));
+	})(spine.TimelineType || (spine.TimelineType = {}));
+	var TimelineType = spine.TimelineType;
 	var CurveTimeline = (function () {
 		function CurveTimeline(frameCount) {
 			if (frameCount <= 0)
@@ -151,19 +594,18 @@ var spine;
 			var y = curves[i - 1];
 			return y + (1 - y) * (percent - x) / (1 - x);
 		};
+		CurveTimeline.LINEAR = 0;
+		CurveTimeline.STEPPED = 1;
+		CurveTimeline.BEZIER = 2;
+		CurveTimeline.BEZIER_SIZE = 10 * 2 - 1;
 		return CurveTimeline;
 	}());
-	CurveTimeline.LINEAR = 0;
-	CurveTimeline.STEPPED = 1;
-	CurveTimeline.BEZIER = 2;
-	CurveTimeline.BEZIER_SIZE = 10 * 2 - 1;
 	spine.CurveTimeline = CurveTimeline;
 	var RotateTimeline = (function (_super) {
 		__extends(RotateTimeline, _super);
 		function RotateTimeline(frameCount) {
-			var _this = _super.call(this, frameCount) || this;
-			_this.frames = spine.Utils.newFloatArray(frameCount << 1);
-			return _this;
+			_super.call(this, frameCount);
+			this.frames = spine.Utils.newFloatArray(frameCount << 1);
 		}
 		RotateTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.rotate << 24) + this.boneIndex;
@@ -208,19 +650,18 @@ var spine;
 				bone.rotation += r * alpha;
 			}
 		};
+		RotateTimeline.ENTRIES = 2;
+		RotateTimeline.PREV_TIME = -2;
+		RotateTimeline.PREV_ROTATION = -1;
+		RotateTimeline.ROTATION = 1;
 		return RotateTimeline;
 	}(CurveTimeline));
-	RotateTimeline.ENTRIES = 2;
-	RotateTimeline.PREV_TIME = -2;
-	RotateTimeline.PREV_ROTATION = -1;
-	RotateTimeline.ROTATION = 1;
 	spine.RotateTimeline = RotateTimeline;
 	var TranslateTimeline = (function (_super) {
 		__extends(TranslateTimeline, _super);
 		function TranslateTimeline(frameCount) {
-			var _this = _super.call(this, frameCount) || this;
-			_this.frames = spine.Utils.newFloatArray(frameCount * TranslateTimeline.ENTRIES);
-			return _this;
+			_super.call(this, frameCount);
+			this.frames = spine.Utils.newFloatArray(frameCount * TranslateTimeline.ENTRIES);
 		}
 		TranslateTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.translate << 24) + this.boneIndex;
@@ -264,19 +705,19 @@ var spine;
 				bone.y += (bone.data.y + y - bone.y) * alpha;
 			}
 		};
+		TranslateTimeline.ENTRIES = 3;
+		TranslateTimeline.PREV_TIME = -3;
+		TranslateTimeline.PREV_X = -2;
+		TranslateTimeline.PREV_Y = -1;
+		TranslateTimeline.X = 1;
+		TranslateTimeline.Y = 2;
 		return TranslateTimeline;
 	}(CurveTimeline));
-	TranslateTimeline.ENTRIES = 3;
-	TranslateTimeline.PREV_TIME = -3;
-	TranslateTimeline.PREV_X = -2;
-	TranslateTimeline.PREV_Y = -1;
-	TranslateTimeline.X = 1;
-	TranslateTimeline.Y = 2;
 	spine.TranslateTimeline = TranslateTimeline;
 	var ScaleTimeline = (function (_super) {
 		__extends(ScaleTimeline, _super);
 		function ScaleTimeline(frameCount) {
-			return _super.call(this, frameCount) || this;
+			_super.call(this, frameCount);
 		}
 		ScaleTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.scale << 24) + this.boneIndex;
@@ -337,7 +778,7 @@ var spine;
 	var ShearTimeline = (function (_super) {
 		__extends(ShearTimeline, _super);
 		function ShearTimeline(frameCount) {
-			return _super.call(this, frameCount) || this;
+			_super.call(this, frameCount);
 		}
 		ShearTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.shear << 24) + this.boneIndex;
@@ -381,9 +822,8 @@ var spine;
 	var ColorTimeline = (function (_super) {
 		__extends(ColorTimeline, _super);
 		function ColorTimeline(frameCount) {
-			var _this = _super.call(this, frameCount) || this;
-			_this.frames = spine.Utils.newFloatArray(frameCount * ColorTimeline.ENTRIES);
-			return _this;
+			_super.call(this, frameCount);
+			this.frames = spine.Utils.newFloatArray(frameCount * ColorTimeline.ENTRIES);
 		}
 		ColorTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.color << 24) + this.slotIndex;
@@ -434,25 +874,24 @@ var spine;
 				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 			}
 		};
+		ColorTimeline.ENTRIES = 5;
+		ColorTimeline.PREV_TIME = -5;
+		ColorTimeline.PREV_R = -4;
+		ColorTimeline.PREV_G = -3;
+		ColorTimeline.PREV_B = -2;
+		ColorTimeline.PREV_A = -1;
+		ColorTimeline.R = 1;
+		ColorTimeline.G = 2;
+		ColorTimeline.B = 3;
+		ColorTimeline.A = 4;
 		return ColorTimeline;
 	}(CurveTimeline));
-	ColorTimeline.ENTRIES = 5;
-	ColorTimeline.PREV_TIME = -5;
-	ColorTimeline.PREV_R = -4;
-	ColorTimeline.PREV_G = -3;
-	ColorTimeline.PREV_B = -2;
-	ColorTimeline.PREV_A = -1;
-	ColorTimeline.R = 1;
-	ColorTimeline.G = 2;
-	ColorTimeline.B = 3;
-	ColorTimeline.A = 4;
 	spine.ColorTimeline = ColorTimeline;
 	var TwoColorTimeline = (function (_super) {
 		__extends(TwoColorTimeline, _super);
 		function TwoColorTimeline(frameCount) {
-			var _this = _super.call(this, frameCount) || this;
-			_this.frames = spine.Utils.newFloatArray(frameCount * TwoColorTimeline.ENTRIES);
-			return _this;
+			_super.call(this, frameCount);
+			this.frames = spine.Utils.newFloatArray(frameCount * TwoColorTimeline.ENTRIES);
 		}
 		TwoColorTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.twoColor << 24) + this.slotIndex;
@@ -523,24 +962,24 @@ var spine;
 				dark.add((r2 - dark.r) * alpha, (g2 - dark.g) * alpha, (b2 - dark.b) * alpha, 0);
 			}
 		};
+		TwoColorTimeline.ENTRIES = 8;
+		TwoColorTimeline.PREV_TIME = -8;
+		TwoColorTimeline.PREV_R = -7;
+		TwoColorTimeline.PREV_G = -6;
+		TwoColorTimeline.PREV_B = -5;
+		TwoColorTimeline.PREV_A = -4;
+		TwoColorTimeline.PREV_R2 = -3;
+		TwoColorTimeline.PREV_G2 = -2;
+		TwoColorTimeline.PREV_B2 = -1;
+		TwoColorTimeline.R = 1;
+		TwoColorTimeline.G = 2;
+		TwoColorTimeline.B = 3;
+		TwoColorTimeline.A = 4;
+		TwoColorTimeline.R2 = 5;
+		TwoColorTimeline.G2 = 6;
+		TwoColorTimeline.B2 = 7;
 		return TwoColorTimeline;
 	}(CurveTimeline));
-	TwoColorTimeline.ENTRIES = 8;
-	TwoColorTimeline.PREV_TIME = -8;
-	TwoColorTimeline.PREV_R = -7;
-	TwoColorTimeline.PREV_G = -6;
-	TwoColorTimeline.PREV_B = -5;
-	TwoColorTimeline.PREV_A = -4;
-	TwoColorTimeline.PREV_R2 = -3;
-	TwoColorTimeline.PREV_G2 = -2;
-	TwoColorTimeline.PREV_B2 = -1;
-	TwoColorTimeline.R = 1;
-	TwoColorTimeline.G = 2;
-	TwoColorTimeline.B = 3;
-	TwoColorTimeline.A = 4;
-	TwoColorTimeline.R2 = 5;
-	TwoColorTimeline.G2 = 6;
-	TwoColorTimeline.B2 = 7;
 	spine.TwoColorTimeline = TwoColorTimeline;
 	var AttachmentTimeline = (function () {
 		function AttachmentTimeline(frameCount) {
@@ -587,10 +1026,9 @@ var spine;
 	var DeformTimeline = (function (_super) {
 		__extends(DeformTimeline, _super);
 		function DeformTimeline(frameCount) {
-			var _this = _super.call(this, frameCount) || this;
-			_this.frames = spine.Utils.newFloatArray(frameCount);
-			_this.frameVertices = new Array(frameCount);
-			return _this;
+			_super.call(this, frameCount);
+			this.frames = spine.Utils.newFloatArray(frameCount);
+			this.frameVertices = new Array(frameCount);
 		}
 		DeformTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.deform << 24) + this.slotIndex;
@@ -613,7 +1051,7 @@ var spine;
 			}
 			var frameVertices = this.frameVertices;
 			var vertexCount = frameVertices[0].length;
-			if (verticesArray.length != vertexCount)
+			if (verticesArray.length != vertexCount && !setupPose)
 				alpha = 1;
 			var vertices = spine.Utils.setArraySize(verticesArray, vertexCount);
 			if (time >= frames[frames.length - 1]) {
@@ -771,9 +1209,8 @@ var spine;
 	var IkConstraintTimeline = (function (_super) {
 		__extends(IkConstraintTimeline, _super);
 		function IkConstraintTimeline(frameCount) {
-			var _this = _super.call(this, frameCount) || this;
-			_this.frames = spine.Utils.newFloatArray(frameCount * IkConstraintTimeline.ENTRIES);
-			return _this;
+			_super.call(this, frameCount);
+			this.frames = spine.Utils.newFloatArray(frameCount * IkConstraintTimeline.ENTRIES);
 		}
 		IkConstraintTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.ikConstraint << 24) + this.ikConstraintIndex;
@@ -821,21 +1258,20 @@ var spine;
 					constraint.bendDirection = frames[frame + IkConstraintTimeline.PREV_BEND_DIRECTION];
 			}
 		};
+		IkConstraintTimeline.ENTRIES = 3;
+		IkConstraintTimeline.PREV_TIME = -3;
+		IkConstraintTimeline.PREV_MIX = -2;
+		IkConstraintTimeline.PREV_BEND_DIRECTION = -1;
+		IkConstraintTimeline.MIX = 1;
+		IkConstraintTimeline.BEND_DIRECTION = 2;
 		return IkConstraintTimeline;
 	}(CurveTimeline));
-	IkConstraintTimeline.ENTRIES = 3;
-	IkConstraintTimeline.PREV_TIME = -3;
-	IkConstraintTimeline.PREV_MIX = -2;
-	IkConstraintTimeline.PREV_BEND_DIRECTION = -1;
-	IkConstraintTimeline.MIX = 1;
-	IkConstraintTimeline.BEND_DIRECTION = 2;
 	spine.IkConstraintTimeline = IkConstraintTimeline;
 	var TransformConstraintTimeline = (function (_super) {
 		__extends(TransformConstraintTimeline, _super);
 		function TransformConstraintTimeline(frameCount) {
-			var _this = _super.call(this, frameCount) || this;
-			_this.frames = spine.Utils.newFloatArray(frameCount * TransformConstraintTimeline.ENTRIES);
-			return _this;
+			_super.call(this, frameCount);
+			this.frames = spine.Utils.newFloatArray(frameCount * TransformConstraintTimeline.ENTRIES);
 		}
 		TransformConstraintTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.transformConstraint << 24) + this.transformConstraintIndex;
@@ -896,25 +1332,24 @@ var spine;
 				constraint.shearMix += (shear - constraint.shearMix) * alpha;
 			}
 		};
+		TransformConstraintTimeline.ENTRIES = 5;
+		TransformConstraintTimeline.PREV_TIME = -5;
+		TransformConstraintTimeline.PREV_ROTATE = -4;
+		TransformConstraintTimeline.PREV_TRANSLATE = -3;
+		TransformConstraintTimeline.PREV_SCALE = -2;
+		TransformConstraintTimeline.PREV_SHEAR = -1;
+		TransformConstraintTimeline.ROTATE = 1;
+		TransformConstraintTimeline.TRANSLATE = 2;
+		TransformConstraintTimeline.SCALE = 3;
+		TransformConstraintTimeline.SHEAR = 4;
 		return TransformConstraintTimeline;
 	}(CurveTimeline));
-	TransformConstraintTimeline.ENTRIES = 5;
-	TransformConstraintTimeline.PREV_TIME = -5;
-	TransformConstraintTimeline.PREV_ROTATE = -4;
-	TransformConstraintTimeline.PREV_TRANSLATE = -3;
-	TransformConstraintTimeline.PREV_SCALE = -2;
-	TransformConstraintTimeline.PREV_SHEAR = -1;
-	TransformConstraintTimeline.ROTATE = 1;
-	TransformConstraintTimeline.TRANSLATE = 2;
-	TransformConstraintTimeline.SCALE = 3;
-	TransformConstraintTimeline.SHEAR = 4;
 	spine.TransformConstraintTimeline = TransformConstraintTimeline;
 	var PathConstraintPositionTimeline = (function (_super) {
 		__extends(PathConstraintPositionTimeline, _super);
 		function PathConstraintPositionTimeline(frameCount) {
-			var _this = _super.call(this, frameCount) || this;
-			_this.frames = spine.Utils.newFloatArray(frameCount * PathConstraintPositionTimeline.ENTRIES);
-			return _this;
+			_super.call(this, frameCount);
+			this.frames = spine.Utils.newFloatArray(frameCount * PathConstraintPositionTimeline.ENTRIES);
 		}
 		PathConstraintPositionTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.pathConstraintPosition << 24) + this.pathConstraintIndex;
@@ -947,17 +1382,17 @@ var spine;
 			else
 				constraint.position += (position - constraint.position) * alpha;
 		};
+		PathConstraintPositionTimeline.ENTRIES = 2;
+		PathConstraintPositionTimeline.PREV_TIME = -2;
+		PathConstraintPositionTimeline.PREV_VALUE = -1;
+		PathConstraintPositionTimeline.VALUE = 1;
 		return PathConstraintPositionTimeline;
 	}(CurveTimeline));
-	PathConstraintPositionTimeline.ENTRIES = 2;
-	PathConstraintPositionTimeline.PREV_TIME = -2;
-	PathConstraintPositionTimeline.PREV_VALUE = -1;
-	PathConstraintPositionTimeline.VALUE = 1;
 	spine.PathConstraintPositionTimeline = PathConstraintPositionTimeline;
 	var PathConstraintSpacingTimeline = (function (_super) {
 		__extends(PathConstraintSpacingTimeline, _super);
 		function PathConstraintSpacingTimeline(frameCount) {
-			return _super.call(this, frameCount) || this;
+			_super.call(this, frameCount);
 		}
 		PathConstraintSpacingTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.pathConstraintSpacing << 24) + this.pathConstraintIndex;
@@ -991,9 +1426,8 @@ var spine;
 	var PathConstraintMixTimeline = (function (_super) {
 		__extends(PathConstraintMixTimeline, _super);
 		function PathConstraintMixTimeline(frameCount) {
-			var _this = _super.call(this, frameCount) || this;
-			_this.frames = spine.Utils.newFloatArray(frameCount * PathConstraintMixTimeline.ENTRIES);
-			return _this;
+			_super.call(this, frameCount);
+			this.frames = spine.Utils.newFloatArray(frameCount * PathConstraintMixTimeline.ENTRIES);
 		}
 		PathConstraintMixTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.pathConstraintMix << 24) + this.pathConstraintIndex;
@@ -1037,14 +1471,14 @@ var spine;
 				constraint.translateMix += (translate - constraint.translateMix) * alpha;
 			}
 		};
+		PathConstraintMixTimeline.ENTRIES = 3;
+		PathConstraintMixTimeline.PREV_TIME = -3;
+		PathConstraintMixTimeline.PREV_ROTATE = -2;
+		PathConstraintMixTimeline.PREV_TRANSLATE = -1;
+		PathConstraintMixTimeline.ROTATE = 1;
+		PathConstraintMixTimeline.TRANSLATE = 2;
 		return PathConstraintMixTimeline;
 	}(CurveTimeline));
-	PathConstraintMixTimeline.ENTRIES = 3;
-	PathConstraintMixTimeline.PREV_TIME = -3;
-	PathConstraintMixTimeline.PREV_ROTATE = -2;
-	PathConstraintMixTimeline.PREV_TRANSLATE = -1;
-	PathConstraintMixTimeline.ROTATE = 1;
-	PathConstraintMixTimeline.TRANSLATE = 2;
 	spine.PathConstraintMixTimeline = PathConstraintMixTimeline;
 })(spine || (spine = {}));
 var spine;
@@ -1138,10 +1572,12 @@ var spine;
 				this._animationsChanged();
 			var events = this.events;
 			var tracks = this.tracks;
+			var applied = false;
 			for (var i = 0, n = tracks.length; i < n; i++) {
 				var current = tracks[i];
 				if (current == null || current.delay > 0)
 					continue;
+				applied = true;
 				var mix = current.alpha;
 				if (current.mixingFrom != null)
 					mix *= this.applyMixingFrom(current, skeleton);
@@ -1175,6 +1611,7 @@ var spine;
 				current.nextTrackLast = current.trackTime;
 			}
 			this.queue.drain();
+			return applied;
 		};
 		AnimationState.prototype.applyMixingFrom = function (to, skeleton) {
 			var from = to.mixingFrom;
@@ -1200,7 +1637,7 @@ var spine;
 				spine.Utils.setArraySize(from.timelinesRotation, timelineCount << 1, null);
 			var timelinesRotation = from.timelinesRotation;
 			var first = false;
-			var alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix), alpha;
+			var alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix), alpha = 0;
 			from.totalAlpha = 0;
 			for (var i = 0; i < timelineCount; i++) {
 				var timeline = timelines[i];
@@ -1530,13 +1967,13 @@ var spine;
 		AnimationState.prototype.clearListenerNotifications = function () {
 			this.queue.clear();
 		};
+		AnimationState.emptyAnimation = new spine.Animation("<empty>", [], 0);
+		AnimationState.SUBSEQUENT = 0;
+		AnimationState.FIRST = 1;
+		AnimationState.DIP = 2;
+		AnimationState.DIP_MIX = 3;
 		return AnimationState;
 	}());
-	AnimationState.emptyAnimation = new spine.Animation("<empty>", [], 0);
-	AnimationState.SUBSEQUENT = 0;
-	AnimationState.FIRST = 1;
-	AnimationState.DIP = 2;
-	AnimationState.DIP_MIX = 3;
 	spine.AnimationState = AnimationState;
 	var TrackEntry = (function () {
 		function TrackEntry() {
@@ -1714,7 +2151,6 @@ var spine;
 		return EventQueue;
 	}());
 	spine.EventQueue = EventQueue;
-	var EventType;
 	(function (EventType) {
 		EventType[EventType["start"] = 0] = "start";
 		EventType[EventType["interrupt"] = 1] = "interrupt";
@@ -1722,7 +2158,8 @@ var spine;
 		EventType[EventType["dispose"] = 3] = "dispose";
 		EventType[EventType["complete"] = 4] = "complete";
 		EventType[EventType["event"] = 5] = "event";
-	})(EventType = spine.EventType || (spine.EventType = {}));
+	})(spine.EventType || (spine.EventType = {}));
+	var EventType = spine.EventType;
 	var AnimationStateAdapter2 = (function () {
 		function AnimationStateAdapter2() {
 		}
@@ -1780,134 +2217,6 @@ var spine;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
-	var AssetManager = (function () {
-		function AssetManager(textureLoader, pathPrefix) {
-			if (pathPrefix === void 0) { pathPrefix = ""; }
-			this.assets = {};
-			this.errors = {};
-			this.toLoad = 0;
-			this.loaded = 0;
-			this.textureLoader = textureLoader;
-			this.pathPrefix = pathPrefix;
-		}
-		AssetManager.prototype.loadText = function (path, success, error) {
-			var _this = this;
-			if (success === void 0) { success = null; }
-			if (error === void 0) { error = null; }
-			path = this.pathPrefix + path;
-			this.toLoad++;
-			var request = new XMLHttpRequest();
-			request.onreadystatechange = function () {
-				if (request.readyState == XMLHttpRequest.DONE) {
-					if (request.status >= 200 && request.status < 300) {
-						_this.assets[path] = request.responseText;
-						if (success)
-							success(path, request.responseText);
-					}
-					else {
-						_this.errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
-						if (error)
-							error(path, "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText);
-					}
-					_this.toLoad--;
-					_this.loaded++;
-				}
-			};
-			request.open("GET", path, true);
-			request.send();
-		};
-		AssetManager.prototype.loadTexture = function (path, success, error) {
-			var _this = this;
-			if (success === void 0) { success = null; }
-			if (error === void 0) { error = null; }
-			path = this.pathPrefix + path;
-			this.toLoad++;
-			var img = new Image();
-			img.crossOrigin = "anonymous";
-			img.onload = function (ev) {
-				var texture = _this.textureLoader(img);
-				_this.assets[path] = texture;
-				_this.toLoad--;
-				_this.loaded++;
-				if (success)
-					success(path, img);
-			};
-			img.onerror = function (ev) {
-				_this.errors[path] = "Couldn't load image " + path;
-				_this.toLoad--;
-				_this.loaded++;
-				if (error)
-					error(path, "Couldn't load image " + path);
-			};
-			img.src = path;
-		};
-		AssetManager.prototype.loadTextureData = function (path, data, success, error) {
-			var _this = this;
-			if (success === void 0) { success = null; }
-			if (error === void 0) { error = null; }
-			path = this.pathPrefix + path;
-			this.toLoad++;
-			var img = new Image();
-			img.onload = function (ev) {
-				var texture = _this.textureLoader(img);
-				_this.assets[path] = texture;
-				_this.toLoad--;
-				_this.loaded++;
-				if (success)
-					success(path, img);
-			};
-			img.onerror = function (ev) {
-				_this.errors[path] = "Couldn't load image " + path;
-				_this.toLoad--;
-				_this.loaded++;
-				if (error)
-					error(path, "Couldn't load image " + path);
-			};
-			img.src = data;
-		};
-		AssetManager.prototype.get = function (path) {
-			path = this.pathPrefix + path;
-			return this.assets[path];
-		};
-		AssetManager.prototype.remove = function (path) {
-			path = this.pathPrefix + path;
-			var asset = this.assets[path];
-			if (asset.dispose)
-				asset.dispose();
-			this.assets[path] = null;
-		};
-		AssetManager.prototype.removeAll = function () {
-			for (var key in this.assets) {
-				var asset = this.assets[key];
-				if (asset.dispose)
-					asset.dispose();
-			}
-			this.assets = {};
-		};
-		AssetManager.prototype.isLoadingComplete = function () {
-			return this.toLoad == 0;
-		};
-		AssetManager.prototype.getToLoad = function () {
-			return this.toLoad;
-		};
-		AssetManager.prototype.getLoaded = function () {
-			return this.loaded;
-		};
-		AssetManager.prototype.dispose = function () {
-			this.removeAll();
-		};
-		AssetManager.prototype.hasErrors = function () {
-			return Object.keys(this.errors).length > 0;
-		};
-		AssetManager.prototype.getErrors = function () {
-			return this.errors;
-		};
-		return AssetManager;
-	}());
-	spine.AssetManager = AssetManager;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
 	var AtlasAttachmentLoader = (function () {
 		function AtlasAttachmentLoader(atlas) {
 			this.atlas = atlas;
@@ -1948,13 +2257,369 @@ var spine;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
-	var BlendMode;
+	var Attachment = (function () {
+		function Attachment(name) {
+			if (name == null)
+				throw new Error("name cannot be null.");
+			this.name = name;
+		}
+		return Attachment;
+	}());
+	spine.Attachment = Attachment;
+	var VertexAttachment = (function (_super) {
+		__extends(VertexAttachment, _super);
+		function VertexAttachment(name) {
+			_super.call(this, name);
+			this.worldVerticesLength = 0;
+		}
+		VertexAttachment.prototype.computeWorldVertices = function (slot, start, count, worldVertices, offset, stride) {
+			count = offset + (count >> 1) * stride;
+			var skeleton = slot.bone.skeleton;
+			var deformArray = slot.attachmentVertices;
+			var vertices = this.vertices;
+			var bones = this.bones;
+			if (bones == null) {
+				if (deformArray.length > 0)
+					vertices = deformArray;
+				var bone = slot.bone;
+				var x = bone.worldX;
+				var y = bone.worldY;
+				var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
+				for (var v_1 = start, w = offset; w < count; v_1 += 2, w += stride) {
+					var vx = vertices[v_1], vy = vertices[v_1 + 1];
+					worldVertices[w] = vx * a + vy * b + x;
+					worldVertices[w + 1] = vx * c + vy * d + y;
+				}
+				return;
+			}
+			var v = 0, skip = 0;
+			for (var i = 0; i < start; i += 2) {
+				var n = bones[v];
+				v += n + 1;
+				skip += n;
+			}
+			var skeletonBones = skeleton.bones;
+			if (deformArray.length == 0) {
+				for (var w = offset, b = skip * 3; w < count; w += stride) {
+					var wx = 0, wy = 0;
+					var n = bones[v++];
+					n += v;
+					for (; v < n; v++, b += 3) {
+						var bone = skeletonBones[bones[v]];
+						var vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
+						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
+						wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
+					}
+					worldVertices[w] = wx;
+					worldVertices[w + 1] = wy;
+				}
+			}
+			else {
+				var deform = deformArray;
+				for (var w = offset, b = skip * 3, f = skip << 1; w < count; w += stride) {
+					var wx = 0, wy = 0;
+					var n = bones[v++];
+					n += v;
+					for (; v < n; v++, b += 3, f += 2) {
+						var bone = skeletonBones[bones[v]];
+						var vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
+						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
+						wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
+					}
+					worldVertices[w] = wx;
+					worldVertices[w + 1] = wy;
+				}
+			}
+		};
+		VertexAttachment.prototype.applyDeform = function (sourceAttachment) {
+			return this == sourceAttachment;
+		};
+		return VertexAttachment;
+	}(Attachment));
+	spine.VertexAttachment = VertexAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	(function (AttachmentType) {
+		AttachmentType[AttachmentType["Region"] = 0] = "Region";
+		AttachmentType[AttachmentType["BoundingBox"] = 1] = "BoundingBox";
+		AttachmentType[AttachmentType["Mesh"] = 2] = "Mesh";
+		AttachmentType[AttachmentType["LinkedMesh"] = 3] = "LinkedMesh";
+		AttachmentType[AttachmentType["Path"] = 4] = "Path";
+		AttachmentType[AttachmentType["Point"] = 5] = "Point";
+	})(spine.AttachmentType || (spine.AttachmentType = {}));
+	var AttachmentType = spine.AttachmentType;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var BoundingBoxAttachment = (function (_super) {
+		__extends(BoundingBoxAttachment, _super);
+		function BoundingBoxAttachment(name) {
+			_super.call(this, name);
+			this.color = new spine.Color(1, 1, 1, 1);
+		}
+		return BoundingBoxAttachment;
+	}(spine.VertexAttachment));
+	spine.BoundingBoxAttachment = BoundingBoxAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var ClippingAttachment = (function (_super) {
+		__extends(ClippingAttachment, _super);
+		function ClippingAttachment(name) {
+			_super.call(this, name);
+			this.color = new spine.Color(0.2275, 0.2275, 0.8078, 1);
+		}
+		return ClippingAttachment;
+	}(spine.VertexAttachment));
+	spine.ClippingAttachment = ClippingAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var MeshAttachment = (function (_super) {
+		__extends(MeshAttachment, _super);
+		function MeshAttachment(name) {
+			_super.call(this, name);
+			this.color = new spine.Color(1, 1, 1, 1);
+			this.inheritDeform = false;
+			this.tempColor = new spine.Color(0, 0, 0, 0);
+		}
+		MeshAttachment.prototype.updateUVs = function () {
+			var u = 0, v = 0, width = 0, height = 0;
+			if (this.region == null) {
+				u = v = 0;
+				width = height = 1;
+			}
+			else {
+				u = this.region.u;
+				v = this.region.v;
+				width = this.region.u2 - u;
+				height = this.region.v2 - v;
+			}
+			var regionUVs = this.regionUVs;
+			if (this.uvs == null || this.uvs.length != regionUVs.length)
+				this.uvs = spine.Utils.newFloatArray(regionUVs.length);
+			var uvs = this.uvs;
+			if (this.region.rotate) {
+				for (var i = 0, n = uvs.length; i < n; i += 2) {
+					uvs[i] = u + regionUVs[i + 1] * width;
+					uvs[i + 1] = v + height - regionUVs[i] * height;
+				}
+			}
+			else {
+				for (var i = 0, n = uvs.length; i < n; i += 2) {
+					uvs[i] = u + regionUVs[i] * width;
+					uvs[i + 1] = v + regionUVs[i + 1] * height;
+				}
+			}
+		};
+		MeshAttachment.prototype.applyDeform = function (sourceAttachment) {
+			return this == sourceAttachment || (this.inheritDeform && this.parentMesh == sourceAttachment);
+		};
+		MeshAttachment.prototype.getParentMesh = function () {
+			return this.parentMesh;
+		};
+		MeshAttachment.prototype.setParentMesh = function (parentMesh) {
+			this.parentMesh = parentMesh;
+			if (parentMesh != null) {
+				this.bones = parentMesh.bones;
+				this.vertices = parentMesh.vertices;
+				this.worldVerticesLength = parentMesh.worldVerticesLength;
+				this.regionUVs = parentMesh.regionUVs;
+				this.triangles = parentMesh.triangles;
+				this.hullLength = parentMesh.hullLength;
+				this.worldVerticesLength = parentMesh.worldVerticesLength;
+			}
+		};
+		return MeshAttachment;
+	}(spine.VertexAttachment));
+	spine.MeshAttachment = MeshAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var PathAttachment = (function (_super) {
+		__extends(PathAttachment, _super);
+		function PathAttachment(name) {
+			_super.call(this, name);
+			this.closed = false;
+			this.constantSpeed = false;
+			this.color = new spine.Color(1, 1, 1, 1);
+		}
+		return PathAttachment;
+	}(spine.VertexAttachment));
+	spine.PathAttachment = PathAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var PointAttachment = (function (_super) {
+		__extends(PointAttachment, _super);
+		function PointAttachment(name) {
+			_super.call(this, name);
+			this.color = new spine.Color(0.38, 0.94, 0, 1);
+		}
+		PointAttachment.prototype.computeWorldPosition = function (bone, point) {
+			point.x = this.x * bone.a + this.y * bone.b + bone.worldX;
+			point.y = this.x * bone.c + this.y * bone.d + bone.worldY;
+			return point;
+		};
+		PointAttachment.prototype.computeWorldRotation = function (bone) {
+			var cos = spine.MathUtils.cosDeg(this.rotation), sin = spine.MathUtils.sinDeg(this.rotation);
+			var x = cos * bone.a + sin * bone.b;
+			var y = cos * bone.c + sin * bone.d;
+			return Math.atan2(y, x) * spine.MathUtils.radDeg;
+		};
+		return PointAttachment;
+	}(spine.VertexAttachment));
+	spine.PointAttachment = PointAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var RegionAttachment = (function (_super) {
+		__extends(RegionAttachment, _super);
+		function RegionAttachment(name) {
+			_super.call(this, name);
+			this.x = 0;
+			this.y = 0;
+			this.scaleX = 1;
+			this.scaleY = 1;
+			this.rotation = 0;
+			this.width = 0;
+			this.height = 0;
+			this.color = new spine.Color(1, 1, 1, 1);
+			this.offset = spine.Utils.newFloatArray(8);
+			this.uvs = spine.Utils.newFloatArray(8);
+			this.tempColor = new spine.Color(1, 1, 1, 1);
+		}
+		RegionAttachment.prototype.updateOffset = function () {
+			var regionScaleX = this.width / this.region.originalWidth * this.scaleX;
+			var regionScaleY = this.height / this.region.originalHeight * this.scaleY;
+			var localX = -this.width / 2 * this.scaleX + this.region.offsetX * regionScaleX;
+			var localY = -this.height / 2 * this.scaleY + this.region.offsetY * regionScaleY;
+			var localX2 = localX + this.region.width * regionScaleX;
+			var localY2 = localY + this.region.height * regionScaleY;
+			var radians = this.rotation * Math.PI / 180;
+			var cos = Math.cos(radians);
+			var sin = Math.sin(radians);
+			var localXCos = localX * cos + this.x;
+			var localXSin = localX * sin;
+			var localYCos = localY * cos + this.y;
+			var localYSin = localY * sin;
+			var localX2Cos = localX2 * cos + this.x;
+			var localX2Sin = localX2 * sin;
+			var localY2Cos = localY2 * cos + this.y;
+			var localY2Sin = localY2 * sin;
+			var offset = this.offset;
+			offset[RegionAttachment.OX1] = localXCos - localYSin;
+			offset[RegionAttachment.OY1] = localYCos + localXSin;
+			offset[RegionAttachment.OX2] = localXCos - localY2Sin;
+			offset[RegionAttachment.OY2] = localY2Cos + localXSin;
+			offset[RegionAttachment.OX3] = localX2Cos - localY2Sin;
+			offset[RegionAttachment.OY3] = localY2Cos + localX2Sin;
+			offset[RegionAttachment.OX4] = localX2Cos - localYSin;
+			offset[RegionAttachment.OY4] = localYCos + localX2Sin;
+		};
+		RegionAttachment.prototype.setRegion = function (region) {
+			this.region = region;
+			var uvs = this.uvs;
+			if (region.rotate) {
+				uvs[2] = region.u;
+				uvs[3] = region.v2;
+				uvs[4] = region.u;
+				uvs[5] = region.v;
+				uvs[6] = region.u2;
+				uvs[7] = region.v;
+				uvs[0] = region.u2;
+				uvs[1] = region.v2;
+			}
+			else {
+				uvs[0] = region.u;
+				uvs[1] = region.v2;
+				uvs[2] = region.u;
+				uvs[3] = region.v;
+				uvs[4] = region.u2;
+				uvs[5] = region.v;
+				uvs[6] = region.u2;
+				uvs[7] = region.v2;
+			}
+		};
+		RegionAttachment.prototype.computeWorldVertices = function (bone, worldVertices, offset, stride) {
+			var vertexOffset = this.offset;
+			var x = bone.worldX, y = bone.worldY;
+			var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
+			var offsetX = 0, offsetY = 0;
+			offsetX = vertexOffset[RegionAttachment.OX1];
+			offsetY = vertexOffset[RegionAttachment.OY1];
+			worldVertices[offset] = offsetX * a + offsetY * b + x;
+			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+			offset += stride;
+			offsetX = vertexOffset[RegionAttachment.OX2];
+			offsetY = vertexOffset[RegionAttachment.OY2];
+			worldVertices[offset] = offsetX * a + offsetY * b + x;
+			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+			offset += stride;
+			offsetX = vertexOffset[RegionAttachment.OX3];
+			offsetY = vertexOffset[RegionAttachment.OY3];
+			worldVertices[offset] = offsetX * a + offsetY * b + x;
+			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+			offset += stride;
+			offsetX = vertexOffset[RegionAttachment.OX4];
+			offsetY = vertexOffset[RegionAttachment.OY4];
+			worldVertices[offset] = offsetX * a + offsetY * b + x;
+			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+		};
+		RegionAttachment.OX1 = 0;
+		RegionAttachment.OY1 = 1;
+		RegionAttachment.OX2 = 2;
+		RegionAttachment.OY2 = 3;
+		RegionAttachment.OX3 = 4;
+		RegionAttachment.OY3 = 5;
+		RegionAttachment.OX4 = 6;
+		RegionAttachment.OY4 = 7;
+		RegionAttachment.X1 = 0;
+		RegionAttachment.Y1 = 1;
+		RegionAttachment.C1R = 2;
+		RegionAttachment.C1G = 3;
+		RegionAttachment.C1B = 4;
+		RegionAttachment.C1A = 5;
+		RegionAttachment.U1 = 6;
+		RegionAttachment.V1 = 7;
+		RegionAttachment.X2 = 8;
+		RegionAttachment.Y2 = 9;
+		RegionAttachment.C2R = 10;
+		RegionAttachment.C2G = 11;
+		RegionAttachment.C2B = 12;
+		RegionAttachment.C2A = 13;
+		RegionAttachment.U2 = 14;
+		RegionAttachment.V2 = 15;
+		RegionAttachment.X3 = 16;
+		RegionAttachment.Y3 = 17;
+		RegionAttachment.C3R = 18;
+		RegionAttachment.C3G = 19;
+		RegionAttachment.C3B = 20;
+		RegionAttachment.C3A = 21;
+		RegionAttachment.U3 = 22;
+		RegionAttachment.V3 = 23;
+		RegionAttachment.X4 = 24;
+		RegionAttachment.Y4 = 25;
+		RegionAttachment.C4R = 26;
+		RegionAttachment.C4G = 27;
+		RegionAttachment.C4B = 28;
+		RegionAttachment.C4A = 29;
+		RegionAttachment.U4 = 30;
+		RegionAttachment.V4 = 31;
+		return RegionAttachment;
+	}(spine.Attachment));
+	spine.RegionAttachment = RegionAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
 	(function (BlendMode) {
 		BlendMode[BlendMode["Normal"] = 0] = "Normal";
 		BlendMode[BlendMode["Additive"] = 1] = "Additive";
 		BlendMode[BlendMode["Multiply"] = 2] = "Multiply";
 		BlendMode[BlendMode["Screen"] = 3] = "Screen";
-	})(BlendMode = spine.BlendMode || (spine.BlendMode = {}));
+	})(spine.BlendMode || (spine.BlendMode = {}));
+	var BlendMode = spine.BlendMode;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
@@ -2243,14 +2908,14 @@ var spine;
 		return BoneData;
 	}());
 	spine.BoneData = BoneData;
-	var TransformMode;
 	(function (TransformMode) {
 		TransformMode[TransformMode["Normal"] = 0] = "Normal";
 		TransformMode[TransformMode["OnlyTranslation"] = 1] = "OnlyTranslation";
 		TransformMode[TransformMode["NoRotationOrReflection"] = 2] = "NoRotationOrReflection";
 		TransformMode[TransformMode["NoScale"] = 3] = "NoScale";
 		TransformMode[TransformMode["NoScaleOrReflection"] = 4] = "NoScaleOrReflection";
-	})(TransformMode = spine.TransformMode || (spine.TransformMode = {}));
+	})(spine.TransformMode || (spine.TransformMode = {}));
+	var TransformMode = spine.TransformMode;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
@@ -2415,21 +3080,24 @@ var spine;
 				}
 				var minAngle = spine.MathUtils.PI, minX = l1 - a, minDist = minX * minX, minY = 0;
 				var maxAngle = 0, maxX = l1 + a, maxDist = maxX * maxX, maxY = 0;
-				var angle = Math.acos(-a * l1 / (aa - bb));
-				x = a * Math.cos(angle) + l1;
-				y = b * Math.sin(angle);
-				d = x * x + y * y;
-				if (d < minDist) {
-					minAngle = angle;
-					minDist = d;
-					minX = x;
-					minY = y;
-				}
-				if (d > maxDist) {
-					maxAngle = angle;
-					maxDist = d;
-					maxX = x;
-					maxY = y;
+				c = -a * l1 / (aa - bb);
+				if (c >= -1 && c <= 1) {
+					c = Math.acos(c);
+					x = a * Math.cos(c) + l1;
+					y = b * Math.sin(c);
+					d = x * x + y * y;
+					if (d < minDist) {
+						minAngle = c;
+						minDist = d;
+						minX = x;
+						minY = y;
+					}
+					if (d > maxDist) {
+						maxAngle = c;
+						maxDist = d;
+						maxX = x;
+						maxY = y;
+					}
 				}
 				if (dd <= (minDist + maxDist) / 2) {
 					a1 = ta - Math.atan2(minY * bendDir, minX);
@@ -2834,11 +3502,11 @@ var spine;
 		PathConstraint.prototype.getOrder = function () {
 			return this.data.order;
 		};
+		PathConstraint.NONE = -1;
+		PathConstraint.BEFORE = -2;
+		PathConstraint.AFTER = -3;
 		return PathConstraint;
 	}());
-	PathConstraint.NONE = -1;
-	PathConstraint.BEFORE = -2;
-	PathConstraint.AFTER = -3;
 	spine.PathConstraint = PathConstraint;
 })(spine || (spine = {}));
 var spine;
@@ -2852,23 +3520,23 @@ var spine;
 		return PathConstraintData;
 	}());
 	spine.PathConstraintData = PathConstraintData;
-	var PositionMode;
 	(function (PositionMode) {
 		PositionMode[PositionMode["Fixed"] = 0] = "Fixed";
 		PositionMode[PositionMode["Percent"] = 1] = "Percent";
-	})(PositionMode = spine.PositionMode || (spine.PositionMode = {}));
-	var SpacingMode;
+	})(spine.PositionMode || (spine.PositionMode = {}));
+	var PositionMode = spine.PositionMode;
 	(function (SpacingMode) {
 		SpacingMode[SpacingMode["Length"] = 0] = "Length";
 		SpacingMode[SpacingMode["Fixed"] = 1] = "Fixed";
 		SpacingMode[SpacingMode["Percent"] = 2] = "Percent";
-	})(SpacingMode = spine.SpacingMode || (spine.SpacingMode = {}));
-	var RotateMode;
+	})(spine.SpacingMode || (spine.SpacingMode = {}));
+	var SpacingMode = spine.SpacingMode;
 	(function (RotateMode) {
 		RotateMode[RotateMode["Tangent"] = 0] = "Tangent";
 		RotateMode[RotateMode["Chain"] = 1] = "Chain";
 		RotateMode[RotateMode["ChainScale"] = 2] = "ChainScale";
-	})(RotateMode = spine.RotateMode || (spine.RotateMode = {}));
+	})(spine.RotateMode || (spine.RotateMode = {}));
+	var RotateMode = spine.RotateMode;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
@@ -4286,7 +4954,7 @@ var spine;
 					this.readVertices(map, path, vertexCount << 1);
 					var lengths = spine.Utils.newArray(vertexCount / 3, 0);
 					for (var i = 0; i < map.lengths.length; i++)
-						lengths[i++] = map.lengths[i] * scale;
+						lengths[i] = map.lengths[i] * scale;
 					path.lengths = lengths;
 					var color = this.getValue(map, "color", null);
 					if (color != null)
@@ -4849,72 +5517,6 @@ var spine;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
-	var Texture = (function () {
-		function Texture(image) {
-			this._image = image;
-		}
-		Texture.prototype.getImage = function () {
-			return this._image;
-		};
-		Texture.filterFromString = function (text) {
-			switch (text.toLowerCase()) {
-				case "nearest": return TextureFilter.Nearest;
-				case "linear": return TextureFilter.Linear;
-				case "mipmap": return TextureFilter.MipMap;
-				case "mipmapnearestnearest": return TextureFilter.MipMapNearestNearest;
-				case "mipmaplinearnearest": return TextureFilter.MipMapLinearNearest;
-				case "mipmapnearestlinear": return TextureFilter.MipMapNearestLinear;
-				case "mipmaplinearlinear": return TextureFilter.MipMapLinearLinear;
-				default: throw new Error("Unknown texture filter " + text);
-			}
-		};
-		Texture.wrapFromString = function (text) {
-			switch (text.toLowerCase()) {
-				case "mirroredtepeat": return TextureWrap.MirroredRepeat;
-				case "clamptoedge": return TextureWrap.ClampToEdge;
-				case "repeat": return TextureWrap.Repeat;
-				default: throw new Error("Unknown texture wrap " + text);
-			}
-		};
-		return Texture;
-	}());
-	spine.Texture = Texture;
-	var TextureFilter;
-	(function (TextureFilter) {
-		TextureFilter[TextureFilter["Nearest"] = 9728] = "Nearest";
-		TextureFilter[TextureFilter["Linear"] = 9729] = "Linear";
-		TextureFilter[TextureFilter["MipMap"] = 9987] = "MipMap";
-		TextureFilter[TextureFilter["MipMapNearestNearest"] = 9984] = "MipMapNearestNearest";
-		TextureFilter[TextureFilter["MipMapLinearNearest"] = 9985] = "MipMapLinearNearest";
-		TextureFilter[TextureFilter["MipMapNearestLinear"] = 9986] = "MipMapNearestLinear";
-		TextureFilter[TextureFilter["MipMapLinearLinear"] = 9987] = "MipMapLinearLinear";
-	})(TextureFilter = spine.TextureFilter || (spine.TextureFilter = {}));
-	var TextureWrap;
-	(function (TextureWrap) {
-		TextureWrap[TextureWrap["MirroredRepeat"] = 33648] = "MirroredRepeat";
-		TextureWrap[TextureWrap["ClampToEdge"] = 33071] = "ClampToEdge";
-		TextureWrap[TextureWrap["Repeat"] = 10497] = "Repeat";
-	})(TextureWrap = spine.TextureWrap || (spine.TextureWrap = {}));
-	var TextureRegion = (function () {
-		function TextureRegion() {
-			this.u = 0;
-			this.v = 0;
-			this.u2 = 0;
-			this.v2 = 0;
-			this.width = 0;
-			this.height = 0;
-			this.rotate = false;
-			this.offsetX = 0;
-			this.offsetY = 0;
-			this.originalWidth = 0;
-			this.originalHeight = 0;
-		}
-		return TextureRegion;
-	}());
-	spine.TextureRegion = TextureRegion;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
 	var TextureAtlas = (function () {
 		function TextureAtlas(atlasText, textureLoader) {
 			this.pages = new Array();
@@ -5062,7 +5664,7 @@ var spine;
 	var TextureAtlasRegion = (function (_super) {
 		__extends(TextureAtlasRegion, _super);
 		function TextureAtlasRegion() {
-			return _super !== null && _super.apply(this, arguments) || this;
+			_super.apply(this, arguments);
 		}
 		return TextureAtlasRegion;
 	}(spine.TextureRegion));
@@ -5629,13 +6231,13 @@ var spine;
 				this.a = 1;
 			return this;
 		};
+		Color.WHITE = new Color(1, 1, 1, 1);
+		Color.RED = new Color(1, 0, 0, 1);
+		Color.GREEN = new Color(0, 1, 0, 1);
+		Color.BLUE = new Color(0, 0, 1, 1);
+		Color.MAGENTA = new Color(1, 0, 1, 1);
 		return Color;
 	}());
-	Color.WHITE = new Color(1, 1, 1, 1);
-	Color.RED = new Color(1, 0, 0, 1);
-	Color.GREEN = new Color(0, 1, 0, 1);
-	Color.BLUE = new Color(0, 0, 1, 1);
-	Color.MAGENTA = new Color(1, 0, 1, 1);
 	spine.Color = Color;
 	var MathUtils = (function () {
 		function MathUtils() {
@@ -5663,14 +6265,14 @@ var spine;
 			var y = Math.pow(Math.abs(x), 1 / 3);
 			return x < 0 ? -y : y;
 		};
+		MathUtils.PI = 3.1415927;
+		MathUtils.PI2 = MathUtils.PI * 2;
+		MathUtils.radiansToDegrees = 180 / MathUtils.PI;
+		MathUtils.radDeg = MathUtils.radiansToDegrees;
+		MathUtils.degreesToRadians = MathUtils.PI / 180;
+		MathUtils.degRad = MathUtils.degreesToRadians;
 		return MathUtils;
 	}());
-	MathUtils.PI = 3.1415927;
-	MathUtils.PI2 = MathUtils.PI * 2;
-	MathUtils.radiansToDegrees = 180 / MathUtils.PI;
-	MathUtils.radDeg = MathUtils.radiansToDegrees;
-	MathUtils.degreesToRadians = MathUtils.PI / 180;
-	MathUtils.degRad = MathUtils.degreesToRadians;
 	spine.MathUtils = MathUtils;
 	var Utils = (function () {
 		function Utils() {
@@ -5729,9 +6331,9 @@ var spine;
 		Utils.toFloatArray = function (array) {
 			return Utils.SUPPORTS_TYPED_ARRAYS ? new Float32Array(array) : array;
 		};
+		Utils.SUPPORTS_TYPED_ARRAYS = typeof (Float32Array) !== "undefined";
 		return Utils;
 	}());
-	Utils.SUPPORTS_TYPED_ARRAYS = typeof (Float32Array) !== "undefined";
 	spine.Utils = Utils;
 	var DebugUtils = (function () {
 		function DebugUtils() {
@@ -5869,620 +6471,267 @@ var spine;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
-	var Attachment = (function () {
-		function Attachment(name) {
-			if (name == null)
-				throw new Error("name cannot be null.");
-			this.name = name;
-		}
-		return Attachment;
-	}());
-	spine.Attachment = Attachment;
-	var VertexAttachment = (function (_super) {
-		__extends(VertexAttachment, _super);
-		function VertexAttachment(name) {
-			var _this = _super.call(this, name) || this;
-			_this.worldVerticesLength = 0;
-			return _this;
-		}
-		VertexAttachment.prototype.computeWorldVertices = function (slot, start, count, worldVertices, offset, stride) {
-			count = offset + (count >> 1) * stride;
-			var skeleton = slot.bone.skeleton;
-			var deformArray = slot.attachmentVertices;
-			var vertices = this.vertices;
-			var bones = this.bones;
-			if (bones == null) {
-				if (deformArray.length > 0)
-					vertices = deformArray;
-				var bone = slot.bone;
-				var x = bone.worldX;
-				var y = bone.worldY;
-				var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-				for (var v_1 = start, w = offset; w < count; v_1 += 2, w += stride) {
-					var vx = vertices[v_1], vy = vertices[v_1 + 1];
-					worldVertices[w] = vx * a + vy * b + x;
-					worldVertices[w + 1] = vx * c + vy * d + y;
-				}
-				return;
-			}
-			var v = 0, skip = 0;
-			for (var i = 0; i < start; i += 2) {
-				var n = bones[v];
-				v += n + 1;
-				skip += n;
-			}
-			var skeletonBones = skeleton.bones;
-			if (deformArray.length == 0) {
-				for (var w = offset, b = skip * 3; w < count; w += stride) {
-					var wx = 0, wy = 0;
-					var n = bones[v++];
-					n += v;
-					for (; v < n; v++, b += 3) {
-						var bone = skeletonBones[bones[v]];
-						var vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
-						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
-						wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
-					}
-					worldVertices[w] = wx;
-					worldVertices[w + 1] = wy;
-				}
-			}
-			else {
-				var deform = deformArray;
-				for (var w = offset, b = skip * 3, f = skip << 1; w < count; w += stride) {
-					var wx = 0, wy = 0;
-					var n = bones[v++];
-					n += v;
-					for (; v < n; v++, b += 3, f += 2) {
-						var bone = skeletonBones[bones[v]];
-						var vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
-						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
-						wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
-					}
-					worldVertices[w] = wx;
-					worldVertices[w + 1] = wy;
-				}
-			}
-		};
-		VertexAttachment.prototype.applyDeform = function (sourceAttachment) {
-			return this == sourceAttachment;
-		};
-		return VertexAttachment;
-	}(Attachment));
-	spine.VertexAttachment = VertexAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var AttachmentType;
-	(function (AttachmentType) {
-		AttachmentType[AttachmentType["Region"] = 0] = "Region";
-		AttachmentType[AttachmentType["BoundingBox"] = 1] = "BoundingBox";
-		AttachmentType[AttachmentType["Mesh"] = 2] = "Mesh";
-		AttachmentType[AttachmentType["LinkedMesh"] = 3] = "LinkedMesh";
-		AttachmentType[AttachmentType["Path"] = 4] = "Path";
-		AttachmentType[AttachmentType["Point"] = 5] = "Point";
-	})(AttachmentType = spine.AttachmentType || (spine.AttachmentType = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var BoundingBoxAttachment = (function (_super) {
-		__extends(BoundingBoxAttachment, _super);
-		function BoundingBoxAttachment(name) {
-			var _this = _super.call(this, name) || this;
-			_this.color = new spine.Color(1, 1, 1, 1);
-			return _this;
-		}
-		return BoundingBoxAttachment;
-	}(spine.VertexAttachment));
-	spine.BoundingBoxAttachment = BoundingBoxAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var ClippingAttachment = (function (_super) {
-		__extends(ClippingAttachment, _super);
-		function ClippingAttachment(name) {
-			var _this = _super.call(this, name) || this;
-			_this.color = new spine.Color(0.2275, 0.2275, 0.8078, 1);
-			return _this;
-		}
-		return ClippingAttachment;
-	}(spine.VertexAttachment));
-	spine.ClippingAttachment = ClippingAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var MeshAttachment = (function (_super) {
-		__extends(MeshAttachment, _super);
-		function MeshAttachment(name) {
-			var _this = _super.call(this, name) || this;
-			_this.color = new spine.Color(1, 1, 1, 1);
-			_this.inheritDeform = false;
-			_this.tempColor = new spine.Color(0, 0, 0, 0);
-			return _this;
-		}
-		MeshAttachment.prototype.updateUVs = function () {
-			var u = 0, v = 0, width = 0, height = 0;
-			if (this.region == null) {
-				u = v = 0;
-				width = height = 1;
-			}
-			else {
-				u = this.region.u;
-				v = this.region.v;
-				width = this.region.u2 - u;
-				height = this.region.v2 - v;
-			}
-			var regionUVs = this.regionUVs;
-			if (this.uvs == null || this.uvs.length != regionUVs.length)
-				this.uvs = spine.Utils.newFloatArray(regionUVs.length);
-			var uvs = this.uvs;
-			if (this.region.rotate) {
-				for (var i = 0, n = uvs.length; i < n; i += 2) {
-					uvs[i] = u + regionUVs[i + 1] * width;
-					uvs[i + 1] = v + height - regionUVs[i] * height;
-				}
-			}
-			else {
-				for (var i = 0, n = uvs.length; i < n; i += 2) {
-					uvs[i] = u + regionUVs[i] * width;
-					uvs[i + 1] = v + regionUVs[i + 1] * height;
-				}
-			}
-		};
-		MeshAttachment.prototype.applyDeform = function (sourceAttachment) {
-			return this == sourceAttachment || (this.inheritDeform && this.parentMesh == sourceAttachment);
-		};
-		MeshAttachment.prototype.getParentMesh = function () {
-			return this.parentMesh;
-		};
-		MeshAttachment.prototype.setParentMesh = function (parentMesh) {
-			this.parentMesh = parentMesh;
-			if (parentMesh != null) {
-				this.bones = parentMesh.bones;
-				this.vertices = parentMesh.vertices;
-				this.worldVerticesLength = parentMesh.worldVerticesLength;
-				this.regionUVs = parentMesh.regionUVs;
-				this.triangles = parentMesh.triangles;
-				this.hullLength = parentMesh.hullLength;
-				this.worldVerticesLength = parentMesh.worldVerticesLength;
-			}
-		};
-		return MeshAttachment;
-	}(spine.VertexAttachment));
-	spine.MeshAttachment = MeshAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var PathAttachment = (function (_super) {
-		__extends(PathAttachment, _super);
-		function PathAttachment(name) {
-			var _this = _super.call(this, name) || this;
-			_this.closed = false;
-			_this.constantSpeed = false;
-			_this.color = new spine.Color(1, 1, 1, 1);
-			return _this;
-		}
-		return PathAttachment;
-	}(spine.VertexAttachment));
-	spine.PathAttachment = PathAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var PointAttachment = (function (_super) {
-		__extends(PointAttachment, _super);
-		function PointAttachment(name) {
-			var _this = _super.call(this, name) || this;
-			_this.color = new spine.Color(0.38, 0.94, 0, 1);
-			return _this;
-		}
-		PointAttachment.prototype.computeWorldPosition = function (bone, point) {
-			point.x = this.x * bone.a + this.y * bone.b + bone.worldX;
-			point.y = this.x * bone.c + this.y * bone.d + bone.worldY;
-			return point;
-		};
-		PointAttachment.prototype.computeWorldRotation = function (bone) {
-			var cos = spine.MathUtils.cosDeg(this.rotation), sin = spine.MathUtils.sinDeg(this.rotation);
-			var x = cos * bone.a + sin * bone.b;
-			var y = cos * bone.c + sin * bone.d;
-			return Math.atan2(y, x) * spine.MathUtils.radDeg;
-		};
-		return PointAttachment;
-	}(spine.VertexAttachment));
-	spine.PointAttachment = PointAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var RegionAttachment = (function (_super) {
-		__extends(RegionAttachment, _super);
-		function RegionAttachment(name) {
-			var _this = _super.call(this, name) || this;
-			_this.x = 0;
-			_this.y = 0;
-			_this.scaleX = 1;
-			_this.scaleY = 1;
-			_this.rotation = 0;
-			_this.width = 0;
-			_this.height = 0;
-			_this.color = new spine.Color(1, 1, 1, 1);
-			_this.offset = spine.Utils.newFloatArray(8);
-			_this.uvs = spine.Utils.newFloatArray(8);
-			_this.tempColor = new spine.Color(1, 1, 1, 1);
-			return _this;
-		}
-		RegionAttachment.prototype.updateOffset = function () {
-			var regionScaleX = this.width / this.region.originalWidth * this.scaleX;
-			var regionScaleY = this.height / this.region.originalHeight * this.scaleY;
-			var localX = -this.width / 2 * this.scaleX + this.region.offsetX * regionScaleX;
-			var localY = -this.height / 2 * this.scaleY + this.region.offsetY * regionScaleY;
-			var localX2 = localX + this.region.width * regionScaleX;
-			var localY2 = localY + this.region.height * regionScaleY;
-			var radians = this.rotation * Math.PI / 180;
-			var cos = Math.cos(radians);
-			var sin = Math.sin(radians);
-			var localXCos = localX * cos + this.x;
-			var localXSin = localX * sin;
-			var localYCos = localY * cos + this.y;
-			var localYSin = localY * sin;
-			var localX2Cos = localX2 * cos + this.x;
-			var localX2Sin = localX2 * sin;
-			var localY2Cos = localY2 * cos + this.y;
-			var localY2Sin = localY2 * sin;
-			var offset = this.offset;
-			offset[RegionAttachment.OX1] = localXCos - localYSin;
-			offset[RegionAttachment.OY1] = localYCos + localXSin;
-			offset[RegionAttachment.OX2] = localXCos - localY2Sin;
-			offset[RegionAttachment.OY2] = localY2Cos + localXSin;
-			offset[RegionAttachment.OX3] = localX2Cos - localY2Sin;
-			offset[RegionAttachment.OY3] = localY2Cos + localX2Sin;
-			offset[RegionAttachment.OX4] = localX2Cos - localYSin;
-			offset[RegionAttachment.OY4] = localYCos + localX2Sin;
-		};
-		RegionAttachment.prototype.setRegion = function (region) {
-			this.region = region;
-			var uvs = this.uvs;
-			if (region.rotate) {
-				uvs[2] = region.u;
-				uvs[3] = region.v2;
-				uvs[4] = region.u;
-				uvs[5] = region.v;
-				uvs[6] = region.u2;
-				uvs[7] = region.v;
-				uvs[0] = region.u2;
-				uvs[1] = region.v2;
-			}
-			else {
-				uvs[0] = region.u;
-				uvs[1] = region.v2;
-				uvs[2] = region.u;
-				uvs[3] = region.v;
-				uvs[4] = region.u2;
-				uvs[5] = region.v;
-				uvs[6] = region.u2;
-				uvs[7] = region.v2;
-			}
-		};
-		RegionAttachment.prototype.computeWorldVertices = function (bone, worldVertices, offset, stride) {
-			var vertexOffset = this.offset;
-			var x = bone.worldX, y = bone.worldY;
-			var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-			var offsetX = 0, offsetY = 0;
-			offsetX = vertexOffset[RegionAttachment.OX1];
-			offsetY = vertexOffset[RegionAttachment.OY1];
-			worldVertices[offset] = offsetX * a + offsetY * b + x;
-			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
-			offset += stride;
-			offsetX = vertexOffset[RegionAttachment.OX2];
-			offsetY = vertexOffset[RegionAttachment.OY2];
-			worldVertices[offset] = offsetX * a + offsetY * b + x;
-			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
-			offset += stride;
-			offsetX = vertexOffset[RegionAttachment.OX3];
-			offsetY = vertexOffset[RegionAttachment.OY3];
-			worldVertices[offset] = offsetX * a + offsetY * b + x;
-			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
-			offset += stride;
-			offsetX = vertexOffset[RegionAttachment.OX4];
-			offsetY = vertexOffset[RegionAttachment.OY4];
-			worldVertices[offset] = offsetX * a + offsetY * b + x;
-			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
-		};
-		return RegionAttachment;
-	}(spine.Attachment));
-	RegionAttachment.OX1 = 0;
-	RegionAttachment.OY1 = 1;
-	RegionAttachment.OX2 = 2;
-	RegionAttachment.OY2 = 3;
-	RegionAttachment.OX3 = 4;
-	RegionAttachment.OY3 = 5;
-	RegionAttachment.OX4 = 6;
-	RegionAttachment.OY4 = 7;
-	RegionAttachment.X1 = 0;
-	RegionAttachment.Y1 = 1;
-	RegionAttachment.C1R = 2;
-	RegionAttachment.C1G = 3;
-	RegionAttachment.C1B = 4;
-	RegionAttachment.C1A = 5;
-	RegionAttachment.U1 = 6;
-	RegionAttachment.V1 = 7;
-	RegionAttachment.X2 = 8;
-	RegionAttachment.Y2 = 9;
-	RegionAttachment.C2R = 10;
-	RegionAttachment.C2G = 11;
-	RegionAttachment.C2B = 12;
-	RegionAttachment.C2A = 13;
-	RegionAttachment.U2 = 14;
-	RegionAttachment.V2 = 15;
-	RegionAttachment.X3 = 16;
-	RegionAttachment.Y3 = 17;
-	RegionAttachment.C3R = 18;
-	RegionAttachment.C3G = 19;
-	RegionAttachment.C3B = 20;
-	RegionAttachment.C3A = 21;
-	RegionAttachment.U3 = 22;
-	RegionAttachment.V3 = 23;
-	RegionAttachment.X4 = 24;
-	RegionAttachment.Y4 = 25;
-	RegionAttachment.C4R = 26;
-	RegionAttachment.C4G = 27;
-	RegionAttachment.C4B = 28;
-	RegionAttachment.C4A = 29;
-	RegionAttachment.U4 = 30;
-	RegionAttachment.V4 = 31;
-	spine.RegionAttachment = RegionAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var canvas;
-	(function (canvas) {
+	var threejs;
+	(function (threejs) {
 		var AssetManager = (function (_super) {
 			__extends(AssetManager, _super);
 			function AssetManager(pathPrefix) {
 				if (pathPrefix === void 0) { pathPrefix = ""; }
-				return _super.call(this, function (image) { return new spine.canvas.CanvasTexture(image); }, pathPrefix) || this;
+				_super.call(this, function (image) {
+					return new threejs.ThreeJsTexture(image);
+				}, pathPrefix);
 			}
 			return AssetManager;
 		}(spine.AssetManager));
-		canvas.AssetManager = AssetManager;
-	})(canvas = spine.canvas || (spine.canvas = {}));
+		threejs.AssetManager = AssetManager;
+	})(threejs = spine.threejs || (spine.threejs = {}));
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
-	var canvas;
-	(function (canvas) {
-		var CanvasTexture = (function (_super) {
-			__extends(CanvasTexture, _super);
-			function CanvasTexture(image) {
-				return _super.call(this, image) || this;
+	var threejs;
+	(function (threejs) {
+		var MeshBatcher = (function () {
+			function MeshBatcher(mesh, maxVertices) {
+				if (maxVertices === void 0) { maxVertices = 10920; }
+				this.verticesLength = 0;
+				this.indicesLength = 0;
+				if (maxVertices > 10920)
+					throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
+				var vertices = this.vertices = new Float32Array(maxVertices * MeshBatcher.VERTEX_SIZE);
+				var indices = this.indices = new Uint16Array(maxVertices * 3);
+				this.mesh = mesh;
+				var geo = new THREE.BufferGeometry();
+				var vertexBuffer = this.vertexBuffer = new THREE.InterleavedBuffer(vertices, MeshBatcher.VERTEX_SIZE);
+				vertexBuffer.dynamic = true;
+				geo.addAttribute("position", new THREE.InterleavedBufferAttribute(vertexBuffer, 3, 0, false));
+				geo.addAttribute("color", new THREE.InterleavedBufferAttribute(vertexBuffer, 4, 3, false));
+				geo.addAttribute("uv", new THREE.InterleavedBufferAttribute(vertexBuffer, 2, 7, false));
+				geo.setIndex(new THREE.BufferAttribute(indices, 1));
+				geo.getIndex().dynamic = true;
+				geo.drawRange.start = 0;
+				geo.drawRange.count = 0;
+				mesh.geometry = geo;
 			}
-			CanvasTexture.prototype.setFilters = function (minFilter, magFilter) { };
-			CanvasTexture.prototype.setWraps = function (uWrap, vWrap) { };
-			CanvasTexture.prototype.dispose = function () { };
-			return CanvasTexture;
-		}(spine.Texture));
-		canvas.CanvasTexture = CanvasTexture;
-	})(canvas = spine.canvas || (spine.canvas = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var canvas;
-	(function (canvas) {
-		var SkeletonRenderer = (function () {
-			function SkeletonRenderer(context) {
-				this.triangleRendering = false;
-				this.debugRendering = false;
-				this.vertices = spine.Utils.newFloatArray(8 * 1024);
-				this.tempColor = new spine.Color();
-				this.ctx = context;
-			}
-			SkeletonRenderer.prototype.draw = function (skeleton) {
-				if (this.triangleRendering)
-					this.drawTriangles(skeleton);
-				else
-					this.drawImages(skeleton);
+			MeshBatcher.prototype.begin = function () {
+				this.verticesLength = 0;
+				this.indicesLength = 0;
 			};
-			SkeletonRenderer.prototype.drawImages = function (skeleton) {
-				var ctx = this.ctx;
-				var drawOrder = skeleton.drawOrder;
-				if (this.debugRendering)
-					ctx.strokeStyle = "green";
-				ctx.save();
-				for (var i = 0, n = drawOrder.length; i < n; i++) {
-					var slot = drawOrder[i];
-					var attachment = slot.getAttachment();
-					var regionAttachment = null;
-					var region = null;
-					var image = null;
-					if (attachment instanceof spine.RegionAttachment) {
-						regionAttachment = attachment;
-						region = regionAttachment.region;
-						image = region.texture.getImage();
-					}
-					else
-						continue;
-					var skeleton_1 = slot.bone.skeleton;
-					var skeletonColor = skeleton_1.color;
-					var slotColor = slot.color;
-					var regionColor = regionAttachment.color;
-					var alpha = skeletonColor.a * slotColor.a * regionColor.a;
-					var color = this.tempColor;
-					color.set(skeletonColor.r * slotColor.r * regionColor.r, skeletonColor.g * slotColor.g * regionColor.g, skeletonColor.b * slotColor.b * regionColor.b, alpha);
-					var att = attachment;
-					var bone = slot.bone;
-					var w = region.width;
-					var h = region.height;
-					ctx.save();
-					ctx.transform(bone.a, bone.c, bone.b, bone.d, bone.worldX, bone.worldY);
-					ctx.translate(attachment.offset[0], attachment.offset[1]);
-					ctx.rotate(attachment.rotation * Math.PI / 180);
-					ctx.scale(attachment.scaleX, attachment.scaleY);
-					ctx.translate(w / 2, h / 2);
-					if (attachment.region.rotate) {
-						var t = w;
-						w = h;
-						h = t;
-						ctx.rotate(-Math.PI / 2);
-					}
-					ctx.scale(1, -1);
-					ctx.translate(-w / 2, -h / 2);
-					if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
-						ctx.globalAlpha = color.a;
-					}
-					ctx.drawImage(image, region.x, region.y, w, h, 0, 0, w, h);
-					if (this.debugRendering)
-						ctx.strokeRect(0, 0, w, h);
-					ctx.restore();
+			MeshBatcher.prototype.batch = function (vertices, verticesLength, indices, indicesLength, z) {
+				if (z === void 0) { z = 0; }
+				var indexStart = this.verticesLength / MeshBatcher.VERTEX_SIZE;
+				var vertexBuffer = this.vertices;
+				var i = this.verticesLength;
+				var j = 0;
+				for (; j < verticesLength;) {
+					vertexBuffer[i++] = vertices[j++];
+					vertexBuffer[i++] = vertices[j++];
+					vertexBuffer[i++] = z;
+					vertexBuffer[i++] = vertices[j++];
+					vertexBuffer[i++] = vertices[j++];
+					vertexBuffer[i++] = vertices[j++];
+					vertexBuffer[i++] = vertices[j++];
+					vertexBuffer[i++] = vertices[j++];
+					vertexBuffer[i++] = vertices[j++];
 				}
-				ctx.restore();
+				this.verticesLength = i;
+				var indicesArray = this.indices;
+				for (i = this.indicesLength, j = 0; j < indicesLength; i++, j++)
+					indicesArray[i] = indices[j] + indexStart;
+				this.indicesLength += indicesLength;
 			};
-			SkeletonRenderer.prototype.drawTriangles = function (skeleton) {
+			MeshBatcher.prototype.end = function () {
+				this.vertexBuffer.needsUpdate = true;
+				this.vertexBuffer.updateRange.offset = 0;
+				this.vertexBuffer.updateRange.count = this.verticesLength;
+				var geo = this.mesh.geometry;
+				geo.getIndex().needsUpdate = true;
+				geo.getIndex().updateRange.offset = 0;
+				geo.getIndex().updateRange.count = this.indicesLength;
+				geo.drawRange.start = 0;
+				geo.drawRange.count = this.indicesLength;
+			};
+			MeshBatcher.VERTEX_SIZE = 9;
+			return MeshBatcher;
+		}());
+		threejs.MeshBatcher = MeshBatcher;
+	})(threejs = spine.threejs || (spine.threejs = {}));
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var threejs;
+	(function (threejs) {
+		var SkeletonMesh = (function (_super) {
+			__extends(SkeletonMesh, _super);
+			function SkeletonMesh(skeletonData) {
+				_super.call(this);
+				this.zOffset = 0.1;
+				this.clipper = new spine.SkeletonClipping();
+				this.vertices = spine.Utils.newFloatArray(1024);
+				this.tempColor = new spine.Color();
+				this.skeleton = new spine.Skeleton(skeletonData);
+				var animData = new spine.AnimationStateData(skeletonData);
+				this.state = new spine.AnimationState(animData);
+				var material = this.material = new THREE.MeshBasicMaterial();
+				material.side = THREE.DoubleSide;
+				material.transparent = true;
+				material.alphaTest = 0.5;
+				this.batcher = new threejs.MeshBatcher(this);
+			}
+			SkeletonMesh.prototype.update = function (deltaTime) {
+				var state = this.state;
+				var skeleton = this.skeleton;
+				state.update(deltaTime);
+				state.apply(skeleton);
+				skeleton.updateWorldTransform();
+				this.updateGeometry();
+			};
+			SkeletonMesh.prototype.updateGeometry = function () {
+				var geometry = this.geometry;
+				var numVertices = 0;
+				var verticesLength = 0;
+				var indicesLength = 0;
 				var blendMode = null;
+				var clipper = this.clipper;
 				var vertices = this.vertices;
 				var triangles = null;
-				var drawOrder = skeleton.drawOrder;
+				var uvs = null;
+				var drawOrder = this.skeleton.drawOrder;
+				var batcher = this.batcher;
+				batcher.begin();
+				var z = 0;
+				var zOffset = this.zOffset;
 				for (var i = 0, n = drawOrder.length; i < n; i++) {
+					var vertexSize = clipper.isClipping() ? 2 : SkeletonMesh.VERTEX_SIZE;
 					var slot = drawOrder[i];
 					var attachment = slot.getAttachment();
+					var attachmentColor = null;
 					var texture = null;
-					var region = null;
+					var numFloats = 0;
 					if (attachment instanceof spine.RegionAttachment) {
-						var regionAttachment = attachment;
-						vertices = this.computeRegionVertices(slot, regionAttachment, false);
-						triangles = SkeletonRenderer.QUAD_TRIANGLES;
-						region = regionAttachment.region;
-						texture = region.texture.getImage();
+						var region = attachment;
+						attachmentColor = region.color;
+						vertices = this.vertices;
+						numFloats = vertexSize * 4;
+						region.computeWorldVertices(slot.bone, vertices, 0, vertexSize);
+						triangles = SkeletonMesh.QUAD_TRIANGLES;
+						uvs = region.uvs;
+						texture = region.region.renderObject.texture;
 					}
 					else if (attachment instanceof spine.MeshAttachment) {
 						var mesh = attachment;
-						vertices = this.computeMeshVertices(slot, mesh, false);
+						attachmentColor = mesh.color;
+						vertices = this.vertices;
+						numFloats = (mesh.worldVerticesLength >> 1) * vertexSize;
+						if (numFloats > vertices.length) {
+							vertices = this.vertices = spine.Utils.newFloatArray(numFloats);
+						}
+						mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, vertexSize);
 						triangles = mesh.triangles;
-						texture = mesh.region.renderObject.texture.getImage();
+						uvs = mesh.uvs;
+						texture = mesh.region.renderObject.texture;
+					}
+					else if (attachment instanceof spine.ClippingAttachment) {
+						var clip = (attachment);
+						clipper.clipStart(slot, clip);
+						continue;
 					}
 					else
 						continue;
 					if (texture != null) {
-						var slotBlendMode = slot.data.blendMode;
-						if (slotBlendMode != blendMode) {
-							blendMode = slotBlendMode;
+						if (!this.material.map) {
+							var mat = this.material;
+							mat.map = texture.texture;
+							mat.needsUpdate = true;
 						}
-						var ctx = this.ctx;
-						for (var j = 0; j < triangles.length; j += 3) {
-							var t1 = triangles[j] * 8, t2 = triangles[j + 1] * 8, t3 = triangles[j + 2] * 8;
-							var x0 = vertices[t1], y0 = vertices[t1 + 1], u0 = vertices[t1 + 6], v0 = vertices[t1 + 7];
-							var x1 = vertices[t2], y1 = vertices[t2 + 1], u1 = vertices[t2 + 6], v1 = vertices[t2 + 7];
-							var x2 = vertices[t3], y2 = vertices[t3 + 1], u2 = vertices[t3 + 6], v2 = vertices[t3 + 7];
-							this.drawTriangle(texture, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
-							if (this.debugRendering) {
-								ctx.strokeStyle = "green";
-								ctx.beginPath();
-								ctx.moveTo(x0, y0);
-								ctx.lineTo(x1, y1);
-								ctx.lineTo(x2, y2);
-								ctx.lineTo(x0, y0);
-								ctx.stroke();
+						var skeleton = slot.bone.skeleton;
+						var skeletonColor = skeleton.color;
+						var slotColor = slot.color;
+						var alpha = skeletonColor.a * slotColor.a * attachmentColor.a;
+						var color = this.tempColor;
+						color.set(skeletonColor.r * slotColor.r * attachmentColor.r, skeletonColor.g * slotColor.g * attachmentColor.g, skeletonColor.b * slotColor.b * attachmentColor.b, alpha);
+						if (clipper.isClipping()) {
+							clipper.clipTriangles(vertices, numFloats, triangles, triangles.length, uvs, color, null, false);
+							var clippedVertices = clipper.clippedVertices;
+							var clippedTriangles = clipper.clippedTriangles;
+							batcher.batch(clippedVertices, clippedVertices.length, clippedTriangles, clippedTriangles.length, z);
+						}
+						else {
+							var verts = vertices;
+							for (var v = 2, u = 0, n_2 = numFloats; v < n_2; v += vertexSize, u += 2) {
+								verts[v] = color.r;
+								verts[v + 1] = color.g;
+								verts[v + 2] = color.b;
+								verts[v + 3] = color.a;
+								verts[v + 4] = uvs[u];
+								verts[v + 5] = uvs[u + 1];
 							}
+							batcher.batch(vertices, numFloats, triangles, triangles.length, z);
 						}
+						z += zOffset;
 					}
 				}
+				batcher.end();
 			};
-			SkeletonRenderer.prototype.drawTriangle = function (img, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2) {
-				var ctx = this.ctx;
-				u0 *= img.width;
-				v0 *= img.height;
-				u1 *= img.width;
-				v1 *= img.height;
-				u2 *= img.width;
-				v2 *= img.height;
-				ctx.beginPath();
-				ctx.moveTo(x0, y0);
-				ctx.lineTo(x1, y1);
-				ctx.lineTo(x2, y2);
-				ctx.closePath();
-				x1 -= x0;
-				y1 -= y0;
-				x2 -= x0;
-				y2 -= y0;
-				u1 -= u0;
-				v1 -= v0;
-				u2 -= u0;
-				v2 -= v0;
-				var det = 1 / (u1 * v2 - u2 * v1), a = (v2 * x1 - v1 * x2) * det, b = (v2 * y1 - v1 * y2) * det, c = (u1 * x2 - u2 * x1) * det, d = (u1 * y2 - u2 * y1) * det, e = x0 - a * u0 - c * v0, f = y0 - b * u0 - d * v0;
-				ctx.save();
-				ctx.transform(a, b, c, d, e, f);
-				ctx.clip();
-				ctx.drawImage(img, 0, 0);
-				ctx.restore();
+			SkeletonMesh.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
+			SkeletonMesh.VERTEX_SIZE = 2 + 2 + 4;
+			return SkeletonMesh;
+		}(THREE.Mesh));
+		threejs.SkeletonMesh = SkeletonMesh;
+	})(threejs = spine.threejs || (spine.threejs = {}));
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var threejs;
+	(function (threejs) {
+		var ThreeJsTexture = (function (_super) {
+			__extends(ThreeJsTexture, _super);
+			function ThreeJsTexture(image) {
+				_super.call(this, image);
+				this.texture = new THREE.Texture(image);
+				this.texture.flipY = false;
+				this.texture.needsUpdate = true;
+			}
+			ThreeJsTexture.prototype.setFilters = function (minFilter, magFilter) {
+				this.texture.minFilter = ThreeJsTexture.toThreeJsTextureFilter(minFilter);
+				this.texture.magFilter = ThreeJsTexture.toThreeJsTextureFilter(magFilter);
 			};
-			SkeletonRenderer.prototype.computeRegionVertices = function (slot, region, pma) {
-				var skeleton = slot.bone.skeleton;
-				var skeletonColor = skeleton.color;
-				var slotColor = slot.color;
-				var regionColor = region.color;
-				var alpha = skeletonColor.a * slotColor.a * regionColor.a;
-				var multiplier = pma ? alpha : 1;
-				var color = this.tempColor;
-				color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier, skeletonColor.g * slotColor.g * regionColor.g * multiplier, skeletonColor.b * slotColor.b * regionColor.b * multiplier, alpha);
-				region.computeWorldVertices(slot.bone, this.vertices, 0, SkeletonRenderer.VERTEX_SIZE);
-				var vertices = this.vertices;
-				var uvs = region.uvs;
-				vertices[spine.RegionAttachment.C1R] = color.r;
-				vertices[spine.RegionAttachment.C1G] = color.g;
-				vertices[spine.RegionAttachment.C1B] = color.b;
-				vertices[spine.RegionAttachment.C1A] = color.a;
-				vertices[spine.RegionAttachment.U1] = uvs[0];
-				vertices[spine.RegionAttachment.V1] = uvs[1];
-				vertices[spine.RegionAttachment.C2R] = color.r;
-				vertices[spine.RegionAttachment.C2G] = color.g;
-				vertices[spine.RegionAttachment.C2B] = color.b;
-				vertices[spine.RegionAttachment.C2A] = color.a;
-				vertices[spine.RegionAttachment.U2] = uvs[2];
-				vertices[spine.RegionAttachment.V2] = uvs[3];
-				vertices[spine.RegionAttachment.C3R] = color.r;
-				vertices[spine.RegionAttachment.C3G] = color.g;
-				vertices[spine.RegionAttachment.C3B] = color.b;
-				vertices[spine.RegionAttachment.C3A] = color.a;
-				vertices[spine.RegionAttachment.U3] = uvs[4];
-				vertices[spine.RegionAttachment.V3] = uvs[5];
-				vertices[spine.RegionAttachment.C4R] = color.r;
-				vertices[spine.RegionAttachment.C4G] = color.g;
-				vertices[spine.RegionAttachment.C4B] = color.b;
-				vertices[spine.RegionAttachment.C4A] = color.a;
-				vertices[spine.RegionAttachment.U4] = uvs[6];
-				vertices[spine.RegionAttachment.V4] = uvs[7];
-				return vertices;
+			ThreeJsTexture.prototype.setWraps = function (uWrap, vWrap) {
+				this.texture.wrapS = ThreeJsTexture.toThreeJsTextureWrap(uWrap);
+				this.texture.wrapT = ThreeJsTexture.toThreeJsTextureWrap(vWrap);
 			};
-			SkeletonRenderer.prototype.computeMeshVertices = function (slot, mesh, pma) {
-				var skeleton = slot.bone.skeleton;
-				var skeletonColor = skeleton.color;
-				var slotColor = slot.color;
-				var regionColor = mesh.color;
-				var alpha = skeletonColor.a * slotColor.a * regionColor.a;
-				var multiplier = pma ? alpha : 1;
-				var color = this.tempColor;
-				color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier, skeletonColor.g * slotColor.g * regionColor.g * multiplier, skeletonColor.b * slotColor.b * regionColor.b * multiplier, alpha);
-				var numVertices = mesh.worldVerticesLength / 2;
-				if (this.vertices.length < mesh.worldVerticesLength) {
-					this.vertices = spine.Utils.newFloatArray(mesh.worldVerticesLength);
-				}
-				var vertices = this.vertices;
-				mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
-				var uvs = mesh.uvs;
-				for (var i = 0, n = numVertices, u = 0, v = 2; i < n; i++) {
-					vertices[v++] = color.r;
-					vertices[v++] = color.g;
-					vertices[v++] = color.b;
-					vertices[v++] = color.a;
-					vertices[v++] = uvs[u++];
-					vertices[v++] = uvs[u++];
-					v += 2;
-				}
-				return vertices;
+			ThreeJsTexture.prototype.dispose = function () {
+				this.texture.dispose();
 			};
-			return SkeletonRenderer;
-		}());
-		SkeletonRenderer.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
-		SkeletonRenderer.VERTEX_SIZE = 2 + 2 + 4;
-		canvas.SkeletonRenderer = SkeletonRenderer;
-	})(canvas = spine.canvas || (spine.canvas = {}));
+			ThreeJsTexture.toThreeJsTextureFilter = function (filter) {
+				if (filter === spine.TextureFilter.Linear)
+					return THREE.LinearFilter;
+				else if (filter === spine.TextureFilter.MipMap)
+					return THREE.LinearMipMapLinearFilter;
+				else if (filter === spine.TextureFilter.MipMapLinearNearest)
+					return THREE.LinearMipMapNearestFilter;
+				else if (filter === spine.TextureFilter.MipMapNearestLinear)
+					return THREE.NearestMipMapLinearFilter;
+				else if (filter === spine.TextureFilter.MipMapNearestNearest)
+					return THREE.NearestMipMapNearestFilter;
+				else if (filter === spine.TextureFilter.Nearest)
+					return THREE.NearestFilter;
+				else
+					throw new Error("Unknown texture filter: " + filter);
+			};
+			ThreeJsTexture.toThreeJsTextureWrap = function (wrap) {
+				if (wrap === spine.TextureWrap.ClampToEdge)
+					return THREE.ClampToEdgeWrapping;
+				else if (wrap === spine.TextureWrap.MirroredRepeat)
+					return THREE.MirroredRepeatWrapping;
+				else if (wrap === spine.TextureWrap.Repeat)
+					return THREE.RepeatWrapping;
+				else
+					throw new Error("Unknown texture wrap: " + wrap);
+			};
+			return ThreeJsTexture;
+		}(spine.Texture));
+		threejs.ThreeJsTexture = ThreeJsTexture;
+	})(threejs = spine.threejs || (spine.threejs = {}));
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
@@ -6492,9 +6741,9 @@ var spine;
 			__extends(AssetManager, _super);
 			function AssetManager(context, pathPrefix) {
 				if (pathPrefix === void 0) { pathPrefix = ""; }
-				return _super.call(this, function (image) {
+				_super.call(this, function (image) {
 					return new spine.webgl.GLTexture(context, image);
-				}, pathPrefix) || this;
+				}, pathPrefix);
 			}
 			return AssetManager;
 		}(spine.AssetManager));
@@ -6563,15 +6812,14 @@ var spine;
 			__extends(GLTexture, _super);
 			function GLTexture(context, image, useMipMaps) {
 				if (useMipMaps === void 0) { useMipMaps = false; }
-				var _this = _super.call(this, image) || this;
-				_this.texture = null;
-				_this.boundUnit = 0;
-				_this.useMipMaps = false;
-				_this.context = context instanceof webgl.ManagedWebGLRenderingContext ? context : new webgl.ManagedWebGLRenderingContext(context);
-				_this.useMipMaps = useMipMaps;
-				_this.restore();
-				_this.context.addRestorable(_this);
-				return _this;
+				_super.call(this, image);
+				this.texture = null;
+				this.boundUnit = 0;
+				this.useMipMaps = false;
+				this.context = context instanceof webgl.ManagedWebGLRenderingContext ? context : new webgl.ManagedWebGLRenderingContext(context);
+				this.useMipMaps = useMipMaps;
+				this.restore();
+				this.context.addRestorable(this);
 			}
 			GLTexture.prototype.setFilters = function (minFilter, magFilter) {
 				var gl = this.context.gl;
@@ -6894,14 +7142,14 @@ var spine;
 				renderer.end();
 				renderer.camera.position.set(oldX, oldY, 0);
 			};
+			LoadingScreen.FADE_SECONDS = 1;
+			LoadingScreen.loaded = 0;
+			LoadingScreen.spinnerImg = null;
+			LoadingScreen.logoImg = null;
+			LoadingScreen.SPINNER_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAAChCAMAAAB3TUS6AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAYNQTFRFAAAA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AAkTDRyAAAAIB0Uk5TAAABAgMEBQYHCAkKCwwODxAREhMUFRYXGBkaHB0eICEiIyQlJicoKSorLC0uLzAxMjM0Nzg5Ojs8PT4/QEFDRUlKS0xNTk9QUlRWWFlbXF1eYWJjZmhscHF0d3h5e3x+f4CIiYuMj5GSlJWXm56io6arr7rAxcjO0dXe6Onr8fmb5sOOAAADuElEQVQYGe3B+3vTVBwH4M/3nCRt13br2Lozhug2q25gYQubcxqVKYoMCYoKjEsUdSpeiBc0Kl7yp9t2za39pely7PF5zvuiQKc+/e2f8K+f9g2oyQ77Ag4VGX+HketQ0XYYe0JQ0CdhogwF+WFiBgr6JkxUoKCDMMGgoP0w9gdUtB3GfoCKVsPYAVQ0H8YuQUWVMHYGKuJhrAklPQkjJpT0bdj3O9S0FfZ9ADXxP8MjVSiqFfa8B2VVV8+df14QtB4iwn+BpuZEgyM38WMQHDYhnbkgukrIh5ygZ48glyn6KshlL+jbhVRcxCzk0ApiC5CI5kVsgTAy9jiI/WxBGmqIFBMjqwYphwRZaiLNwsjqQdoVSFISGRwjM4OMFUjBRcYCYWT0XZD2SwUS0LzIKCGH2SDja0LxKiJjCrm0gowVFI6aIs1CTouPg5QvUTgSKXMMuVUeBSmEopFITBPGwO8HCYbCTYtImTAWejuI3CMUjmZFT5NjbM/9GvQcMkhADdFRIxxD7aug4wGDFGSVTcLx0MzutQ2CpmmapmmapmmapmmapmmaphWBmGFV6rNNcaLC0GUuv3LROftUo8wJk0a10207sVED6IIf+9673LIwQeW2PaCEJX/A+xYmhTbtQUu46g96SJgQZg9Zwxf+EAMTwuwhm3jkD7EwIdweBn+YhQlh9pA2HvpDTEwIs4es4GN/CMekNOxBJ9D2B10nTAyfW7fT1hjYgZ/xYIUwUcycaiwuv2h3tOcZADr7ud/12c0ru2cWSwQ1UAcixIgImqZpmqZpmqZpmqZpmqZp2v8HMSIcF186t8oghbnlOJt1wnHwl7yOGxwSlHacrjWG8dVuej03OApn7jhHtiyMiZa9yD6haLYTebWOsbDXvQRHwchJWSTkV/rQS+EoWttJaTHkJe56KXcJRZt20jY48nnBy9hE4WjLSbvAkIfwMm5zFG/KyWgRRke3vYwGZDjpZHCMruJltCAFrTtpVYxu1ktzCHKwbSdlGqOreynXGGQpOylljI5uebFbBuSZc2IbhBxmvcj9GiSiZ52+HQO5nPb6TkIqajs9L5eQk7jnddxZgGT0jNOxYSI36+Kdj9oG5OPV6QpB6yJuGAYnqIrecLveYlDUKffIOtREl90+BiWV3cgMlNR0I09DSS030oaSttzILpT0phu5BBWRmyAoiLkJgoIMN8GgoJKb4FBQzU0YUFDdTRhQUNVNcCjIdBMEBdE7buQ8lFRz+97lUFN5fe+qu//aMkeB/gU2ae9y2HgbngAAAABJRU5ErkJggg==";
+			LoadingScreen.SPINE_LOGO_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFIAAAAZCAYAAACis3k0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAtNJREFUaN7tmT2I1EAUxwN+oWgRT0HFKo0WCkJ6ObmAWFwZbCxsXGysLNJaiCyIoDaSwk4ETzvhmnBaCRbBWoQ01ho4PwotjP8cE337mMy8TLK757mBH3fLTWbe/PbN53neNniqZW8FvAVvQAqugwvgDDgO9niLRyTyJagM/ACPF6bsIl9ZRDac/Cc6tLn5xQdRQ496QlKPLxD5QCDxO9jtGM8QfYoIgUlgCipGCRJL5VvlyOdCU09iEXkCfLSIfCrs7Fab6nOsiafu06iDwES9w/uU1QnDC+ekkVS9vEaDsgVeB0d+z1VDtOGxRaYPboP3Gokb4GgXkZp4chZPJKgvZ3U0XkriK/TIt9YUDllFgTAjGwoaoHqfBhMI58yD4BQ4V6/aHYdfxToftvw9F2SiVroawU2/Cv5C4Thv0KB9S5nxlOd4STxjwUjzSdYlgrYijw2BsEfgsaFcM09lhiys94xXQQwugcvgJrgFLjrEE7WUiTuWCQzt/ZXN7FfqGwuGClyVy2xZAFmfDQvNtwFFSspMDGsD+UTWqu1KoVmVooFEJgKRXw0if85RpISEzwsjzeqWzkjkC4PIJ3MUmQgITAHlQwTFhnZhELkEntfZRwR+AvfAgXmJHOqU02XligWT8ppg67NXbdCXeq7afUQ6L8C2DalEZNt2YyQ94Qy8/ekjMpBMbfyl5iTjG7YAI8cNecROAb4kJmTjaXAF3AGvwQewOiuRxEtlSaT4j2h2lMsUueQEoMlIKpTvAmKhxPMtC876jEX6rE8l8TNx/KVbn6xlWU9NWcSDUsO4NGWpQOTZFpHPOooMXcswmW2XFk3ixb2v0Nq+XVKP00QNaffBLyWwBI/AkTlfMYZDXMf12kc6yjwEjoFdO/5me5oi/6tnyhlZX6OtgmX1c2Uh0k3khmbB2b9TRfpd/jfTUeRDJvHdYg5wE7kPXAN3wQ1weDvH+xufEgpi5qIl3QAAAABJRU5ErkJggg==";
 			return LoadingScreen;
 		}());
-		LoadingScreen.FADE_SECONDS = 1;
-		LoadingScreen.loaded = 0;
-		LoadingScreen.spinnerImg = null;
-		LoadingScreen.logoImg = null;
-		LoadingScreen.SPINNER_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAAChCAMAAAB3TUS6AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAYNQTFRFAAAA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AA/0AAkTDRyAAAAIB0Uk5TAAABAgMEBQYHCAkKCwwODxAREhMUFRYXGBkaHB0eICEiIyQlJicoKSorLC0uLzAxMjM0Nzg5Ojs8PT4/QEFDRUlKS0xNTk9QUlRWWFlbXF1eYWJjZmhscHF0d3h5e3x+f4CIiYuMj5GSlJWXm56io6arr7rAxcjO0dXe6Onr8fmb5sOOAAADuElEQVQYGe3B+3vTVBwH4M/3nCRt13br2Lozhug2q25gYQubcxqVKYoMCYoKjEsUdSpeiBc0Kl7yp9t2za39pely7PF5zvuiQKc+/e2f8K+f9g2oyQ77Ag4VGX+HketQ0XYYe0JQ0CdhogwF+WFiBgr6JkxUoKCDMMGgoP0w9gdUtB3GfoCKVsPYAVQ0H8YuQUWVMHYGKuJhrAklPQkjJpT0bdj3O9S0FfZ9ADXxP8MjVSiqFfa8B2VVV8+df14QtB4iwn+BpuZEgyM38WMQHDYhnbkgukrIh5ygZ48glyn6KshlL+jbhVRcxCzk0ApiC5CI5kVsgTAy9jiI/WxBGmqIFBMjqwYphwRZaiLNwsjqQdoVSFISGRwjM4OMFUjBRcYCYWT0XZD2SwUS0LzIKCGH2SDja0LxKiJjCrm0gowVFI6aIs1CTouPg5QvUTgSKXMMuVUeBSmEopFITBPGwO8HCYbCTYtImTAWejuI3CMUjmZFT5NjbM/9GvQcMkhADdFRIxxD7aug4wGDFGSVTcLx0MzutQ2CpmmapmmapmmapmmapmmaphWBmGFV6rNNcaLC0GUuv3LROftUo8wJk0a10207sVED6IIf+9673LIwQeW2PaCEJX/A+xYmhTbtQUu46g96SJgQZg9Zwxf+EAMTwuwhm3jkD7EwIdweBn+YhQlh9pA2HvpDTEwIs4es4GN/CMekNOxBJ9D2B10nTAyfW7fT1hjYgZ/xYIUwUcycaiwuv2h3tOcZADr7ud/12c0ru2cWSwQ1UAcixIgImqZpmqZpmqZpmqZpmqZp2v8HMSIcF186t8oghbnlOJt1wnHwl7yOGxwSlHacrjWG8dVuej03OApn7jhHtiyMiZa9yD6haLYTebWOsbDXvQRHwchJWSTkV/rQS+EoWttJaTHkJe56KXcJRZt20jY48nnBy9hE4WjLSbvAkIfwMm5zFG/KyWgRRke3vYwGZDjpZHCMruJltCAFrTtpVYxu1ktzCHKwbSdlGqOreynXGGQpOylljI5uebFbBuSZc2IbhBxmvcj9GiSiZ52+HQO5nPb6TkIqajs9L5eQk7jnddxZgGT0jNOxYSI36+Kdj9oG5OPV6QpB6yJuGAYnqIrecLveYlDUKffIOtREl90+BiWV3cgMlNR0I09DSS030oaSttzILpT0phu5BBWRmyAoiLkJgoIMN8GgoJKb4FBQzU0YUFDdTRhQUNVNcCjIdBMEBdE7buQ8lFRz+97lUFN5fe+qu//aMkeB/gU2ae9y2HgbngAAAABJRU5ErkJggg==";
-		LoadingScreen.SPINE_LOGO_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFIAAAAZCAYAAACis3k0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAtNJREFUaN7tmT2I1EAUxwN+oWgRT0HFKo0WCkJ6ObmAWFwZbCxsXGysLNJaiCyIoDaSwk4ETzvhmnBaCRbBWoQ01ho4PwotjP8cE337mMy8TLK757mBH3fLTWbe/PbN53neNniqZW8FvAVvQAqugwvgDDgO9niLRyTyJagM/ACPF6bsIl9ZRDac/Cc6tLn5xQdRQ496QlKPLxD5QCDxO9jtGM8QfYoIgUlgCipGCRJL5VvlyOdCU09iEXkCfLSIfCrs7Fab6nOsiafu06iDwES9w/uU1QnDC+ekkVS9vEaDsgVeB0d+z1VDtOGxRaYPboP3Gokb4GgXkZp4chZPJKgvZ3U0XkriK/TIt9YUDllFgTAjGwoaoHqfBhMI58yD4BQ4V6/aHYdfxToftvw9F2SiVroawU2/Cv5C4Thv0KB9S5nxlOd4STxjwUjzSdYlgrYijw2BsEfgsaFcM09lhiys94xXQQwugcvgJrgFLjrEE7WUiTuWCQzt/ZXN7FfqGwuGClyVy2xZAFmfDQvNtwFFSspMDGsD+UTWqu1KoVmVooFEJgKRXw0if85RpISEzwsjzeqWzkjkC4PIJ3MUmQgITAHlQwTFhnZhELkEntfZRwR+AvfAgXmJHOqU02XligWT8ppg67NXbdCXeq7afUQ6L8C2DalEZNt2YyQ94Qy8/ekjMpBMbfyl5iTjG7YAI8cNecROAb4kJmTjaXAF3AGvwQewOiuRxEtlSaT4j2h2lMsUueQEoMlIKpTvAmKhxPMtC876jEX6rE8l8TNx/KVbn6xlWU9NWcSDUsO4NGWpQOTZFpHPOooMXcswmW2XFk3ixb2v0Nq+XVKP00QNaffBLyWwBI/AkTlfMYZDXMf12kc6yjwEjoFdO/5me5oi/6tnyhlZX6OtgmX1c2Uh0k3khmbB2b9TRfpd/jfTUeRDJvHdYg5wE7kPXAN3wQ1weDvH+xufEgpi5qIl3QAAAABJRU5ErkJggg==";
 		webgl.LoadingScreen = LoadingScreen;
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
@@ -7196,12 +7444,12 @@ var spine;
 				if (Matrix4.zAxis === null)
 					Matrix4.zAxis = new webgl.Vector3();
 			};
+			Matrix4.xAxis = null;
+			Matrix4.yAxis = null;
+			Matrix4.zAxis = null;
+			Matrix4.tmpMatrix = new Matrix4();
 			return Matrix4;
 		}());
-		Matrix4.xAxis = null;
-		Matrix4.yAxis = null;
-		Matrix4.zAxis = null;
-		Matrix4.tmpMatrix = new Matrix4();
 		webgl.Matrix4 = Matrix4;
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
@@ -7350,7 +7598,7 @@ var spine;
 		var Position2Attribute = (function (_super) {
 			__extends(Position2Attribute, _super);
 			function Position2Attribute() {
-				return _super.call(this, webgl.Shader.POSITION, VertexAttributeType.Float, 2) || this;
+				_super.call(this, webgl.Shader.POSITION, VertexAttributeType.Float, 2);
 			}
 			return Position2Attribute;
 		}(VertexAttribute));
@@ -7358,7 +7606,7 @@ var spine;
 		var Position3Attribute = (function (_super) {
 			__extends(Position3Attribute, _super);
 			function Position3Attribute() {
-				return _super.call(this, webgl.Shader.POSITION, VertexAttributeType.Float, 3) || this;
+				_super.call(this, webgl.Shader.POSITION, VertexAttributeType.Float, 3);
 			}
 			return Position3Attribute;
 		}(VertexAttribute));
@@ -7367,7 +7615,7 @@ var spine;
 			__extends(TexCoordAttribute, _super);
 			function TexCoordAttribute(unit) {
 				if (unit === void 0) { unit = 0; }
-				return _super.call(this, webgl.Shader.TEXCOORDS + (unit == 0 ? "" : unit), VertexAttributeType.Float, 2) || this;
+				_super.call(this, webgl.Shader.TEXCOORDS + (unit == 0 ? "" : unit), VertexAttributeType.Float, 2);
 			}
 			return TexCoordAttribute;
 		}(VertexAttribute));
@@ -7375,7 +7623,7 @@ var spine;
 		var ColorAttribute = (function (_super) {
 			__extends(ColorAttribute, _super);
 			function ColorAttribute() {
-				return _super.call(this, webgl.Shader.COLOR, VertexAttributeType.Float, 4) || this;
+				_super.call(this, webgl.Shader.COLOR, VertexAttributeType.Float, 4);
 			}
 			return ColorAttribute;
 		}(VertexAttribute));
@@ -7383,15 +7631,15 @@ var spine;
 		var Color2Attribute = (function (_super) {
 			__extends(Color2Attribute, _super);
 			function Color2Attribute() {
-				return _super.call(this, webgl.Shader.COLOR2, VertexAttributeType.Float, 4) || this;
+				_super.call(this, webgl.Shader.COLOR2, VertexAttributeType.Float, 4);
 			}
 			return Color2Attribute;
 		}(VertexAttribute));
 		webgl.Color2Attribute = Color2Attribute;
-		var VertexAttributeType;
 		(function (VertexAttributeType) {
 			VertexAttributeType[VertexAttributeType["Float"] = 0] = "Float";
-		})(VertexAttributeType = webgl.VertexAttributeType || (webgl.VertexAttributeType = {}));
+		})(webgl.VertexAttributeType || (webgl.VertexAttributeType = {}));
+		var VertexAttributeType = webgl.VertexAttributeType;
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
 var spine;
@@ -7892,12 +8140,12 @@ var spine;
 			return SceneRenderer;
 		}());
 		webgl.SceneRenderer = SceneRenderer;
-		var ResizeMode;
 		(function (ResizeMode) {
 			ResizeMode[ResizeMode["Stretch"] = 0] = "Stretch";
 			ResizeMode[ResizeMode["Expand"] = 1] = "Expand";
 			ResizeMode[ResizeMode["Fit"] = 2] = "Fit";
-		})(ResizeMode = webgl.ResizeMode || (webgl.ResizeMode = {}));
+		})(webgl.ResizeMode || (webgl.ResizeMode = {}));
+		var ResizeMode = webgl.ResizeMode;
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
 var spine;
@@ -8044,14 +8292,14 @@ var spine;
 				var fs = "\n\t\t\t\t#ifdef GL_ES\n\t\t\t\t\t#define LOWP lowp\n\t\t\t\t\tprecision mediump float;\n\t\t\t\t#else\n\t\t\t\t\t#define LOWP\n\t\t\t\t#endif\n\t\t\t\tvarying LOWP vec4 v_color;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tgl_FragColor = v_color;\n\t\t\t\t}\n\t\t\t";
 				return new Shader(context, vs, fs);
 			};
+			Shader.MVP_MATRIX = "u_projTrans";
+			Shader.POSITION = "a_position";
+			Shader.COLOR = "a_color";
+			Shader.COLOR2 = "a_color2";
+			Shader.TEXCOORDS = "a_texCoords";
+			Shader.SAMPLER = "u_texture";
 			return Shader;
 		}());
-		Shader.MVP_MATRIX = "u_projTrans";
-		Shader.POSITION = "a_position";
-		Shader.COLOR = "a_color";
-		Shader.COLOR2 = "a_color2";
-		Shader.TEXCOORDS = "a_texCoords";
-		Shader.SAMPLER = "u_texture";
 		webgl.Shader = Shader;
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
@@ -8371,12 +8619,12 @@ var spine;
 			return ShapeRenderer;
 		}());
 		webgl.ShapeRenderer = ShapeRenderer;
-		var ShapeType;
 		(function (ShapeType) {
 			ShapeType[ShapeType["Point"] = 0] = "Point";
 			ShapeType[ShapeType["Line"] = 1] = "Line";
 			ShapeType[ShapeType["Filled"] = 4] = "Filled";
-		})(ShapeType = webgl.ShapeType || (webgl.ShapeType = {}));
+		})(webgl.ShapeType || (webgl.ShapeType = {}));
+		var ShapeType = webgl.ShapeType;
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
 var spine;
@@ -8552,7 +8800,7 @@ var spine;
 						var nn = clip.worldVerticesLength;
 						var world = this.temp = spine.Utils.setArraySize(this.temp, nn, 0);
 						clip.computeWorldVertices(slot, 0, nn, world, 0, 2);
-						for (var i_5 = 0, n_2 = world.length; i_5 < n_2; i_5 += 2) {
+						for (var i_5 = 0, n_3 = world.length; i_5 < n_3; i_5 += 2) {
 							var x = world[i_5];
 							var y = world[i_5 + 1];
 							var x2 = world[(i_5 + 2) % world.length];
@@ -8564,10 +8812,10 @@ var spine;
 			};
 			SkeletonDebugRenderer.prototype.dispose = function () {
 			};
+			SkeletonDebugRenderer.LIGHT_GRAY = new spine.Color(192 / 255, 192 / 255, 192 / 255, 1);
+			SkeletonDebugRenderer.GREEN = new spine.Color(0, 1, 0, 1);
 			return SkeletonDebugRenderer;
 		}());
-		SkeletonDebugRenderer.LIGHT_GRAY = new spine.Color(192 / 255, 192 / 255, 192 / 255, 1);
-		SkeletonDebugRenderer.GREEN = new spine.Color(0, 1, 0, 1);
 		webgl.SkeletonDebugRenderer = SkeletonDebugRenderer;
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
@@ -8679,7 +8927,7 @@ var spine;
 						else {
 							var verts = renderable.vertices;
 							if (!twoColorTint) {
-								for (var v = 2, u = 0, n_3 = renderable.numFloats; v < n_3; v += vertexSize, u += 2) {
+								for (var v = 2, u = 0, n_4 = renderable.numFloats; v < n_4; v += vertexSize, u += 2) {
 									verts[v] = finalColor.r;
 									verts[v + 1] = finalColor.g;
 									verts[v + 2] = finalColor.b;
@@ -8689,7 +8937,7 @@ var spine;
 								}
 							}
 							else {
-								for (var v = 2, u = 0, n_4 = renderable.numFloats; v < n_4; v += vertexSize, u += 2) {
+								for (var v = 2, u = 0, n_5 = renderable.numFloats; v < n_5; v += vertexSize, u += 2) {
 									verts[v] = finalColor.r;
 									verts[v + 1] = finalColor.g;
 									verts[v + 2] = finalColor.b;
@@ -8710,9 +8958,9 @@ var spine;
 				}
 				clipper.clipEnd();
 			};
+			SkeletonRenderer.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 			return SkeletonRenderer;
 		}());
-		SkeletonRenderer.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 		webgl.SkeletonRenderer = SkeletonRenderer;
 	})(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
@@ -8807,8 +9055,8 @@ var spine;
 	(function (webgl) {
 		var ManagedWebGLRenderingContext = (function () {
 			function ManagedWebGLRenderingContext(canvasOrContext, contextConfig) {
-				if (contextConfig === void 0) { contextConfig = { alpha: "true" }; }
 				var _this = this;
+				if (contextConfig === void 0) { contextConfig = { alpha: "true" }; }
 				this.restorables = new Array();
 				if (canvasOrContext instanceof HTMLCanvasElement) {
 					var canvas_1 = canvasOrContext;
@@ -8864,285 +9112,19 @@ var spine;
 					default: throw new Error("Unknown blend mode: " + blendMode);
 				}
 			};
+			WebGLBlendModeConverter.ZERO = 0;
+			WebGLBlendModeConverter.ONE = 1;
+			WebGLBlendModeConverter.SRC_COLOR = 0x0300;
+			WebGLBlendModeConverter.ONE_MINUS_SRC_COLOR = 0x0301;
+			WebGLBlendModeConverter.SRC_ALPHA = 0x0302;
+			WebGLBlendModeConverter.ONE_MINUS_SRC_ALPHA = 0x0303;
+			WebGLBlendModeConverter.DST_ALPHA = 0x0304;
+			WebGLBlendModeConverter.ONE_MINUS_DST_ALPHA = 0x0305;
+			WebGLBlendModeConverter.DST_COLOR = 0x0306;
 			return WebGLBlendModeConverter;
 		}());
-		WebGLBlendModeConverter.ZERO = 0;
-		WebGLBlendModeConverter.ONE = 1;
-		WebGLBlendModeConverter.SRC_COLOR = 0x0300;
-		WebGLBlendModeConverter.ONE_MINUS_SRC_COLOR = 0x0301;
-		WebGLBlendModeConverter.SRC_ALPHA = 0x0302;
-		WebGLBlendModeConverter.ONE_MINUS_SRC_ALPHA = 0x0303;
-		WebGLBlendModeConverter.DST_ALPHA = 0x0304;
-		WebGLBlendModeConverter.ONE_MINUS_DST_ALPHA = 0x0305;
-		WebGLBlendModeConverter.DST_COLOR = 0x0306;
 		webgl.WebGLBlendModeConverter = WebGLBlendModeConverter;
 	})(webgl = spine.webgl || (spine.webgl = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var threejs;
-	(function (threejs) {
-		var AssetManager = (function (_super) {
-			__extends(AssetManager, _super);
-			function AssetManager(pathPrefix) {
-				if (pathPrefix === void 0) { pathPrefix = ""; }
-				return _super.call(this, function (image) {
-					return new threejs.ThreeJsTexture(image);
-				}, pathPrefix) || this;
-			}
-			return AssetManager;
-		}(spine.AssetManager));
-		threejs.AssetManager = AssetManager;
-	})(threejs = spine.threejs || (spine.threejs = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var threejs;
-	(function (threejs) {
-		var MeshBatcher = (function () {
-			function MeshBatcher(mesh, maxVertices) {
-				if (maxVertices === void 0) { maxVertices = 10920; }
-				this.verticesLength = 0;
-				this.indicesLength = 0;
-				if (maxVertices > 10920)
-					throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
-				var vertices = this.vertices = new Float32Array(maxVertices * MeshBatcher.VERTEX_SIZE);
-				var indices = this.indices = new Uint16Array(maxVertices * 3);
-				this.mesh = mesh;
-				var geo = new THREE.BufferGeometry();
-				var vertexBuffer = this.vertexBuffer = new THREE.InterleavedBuffer(vertices, MeshBatcher.VERTEX_SIZE);
-				vertexBuffer.dynamic = true;
-				geo.addAttribute("position", new THREE.InterleavedBufferAttribute(vertexBuffer, 3, 0, false));
-				geo.addAttribute("color", new THREE.InterleavedBufferAttribute(vertexBuffer, 4, 3, false));
-				geo.addAttribute("uv", new THREE.InterleavedBufferAttribute(vertexBuffer, 2, 7, false));
-				geo.setIndex(new THREE.BufferAttribute(indices, 1));
-				geo.getIndex().dynamic = true;
-				geo.drawRange.start = 0;
-				geo.drawRange.count = 0;
-				mesh.geometry = geo;
-			}
-			MeshBatcher.prototype.begin = function () {
-				this.verticesLength = 0;
-				this.indicesLength = 0;
-			};
-			MeshBatcher.prototype.batch = function (vertices, verticesLength, indices, indicesLength, z) {
-				if (z === void 0) { z = 0; }
-				var indexStart = this.verticesLength / MeshBatcher.VERTEX_SIZE;
-				var vertexBuffer = this.vertices;
-				var i = this.verticesLength;
-				var j = 0;
-				for (; j < verticesLength;) {
-					vertexBuffer[i++] = vertices[j++];
-					vertexBuffer[i++] = vertices[j++];
-					vertexBuffer[i++] = z;
-					vertexBuffer[i++] = vertices[j++];
-					vertexBuffer[i++] = vertices[j++];
-					vertexBuffer[i++] = vertices[j++];
-					vertexBuffer[i++] = vertices[j++];
-					vertexBuffer[i++] = vertices[j++];
-					vertexBuffer[i++] = vertices[j++];
-				}
-				this.verticesLength = i;
-				var indicesArray = this.indices;
-				for (i = this.indicesLength, j = 0; j < indicesLength; i++, j++)
-					indicesArray[i] = indices[j] + indexStart;
-				this.indicesLength += indicesLength;
-			};
-			MeshBatcher.prototype.end = function () {
-				this.vertexBuffer.needsUpdate = true;
-				this.vertexBuffer.updateRange.offset = 0;
-				this.vertexBuffer.updateRange.count = this.verticesLength;
-				var geo = this.mesh.geometry;
-				geo.getIndex().needsUpdate = true;
-				geo.getIndex().updateRange.offset = 0;
-				geo.getIndex().updateRange.count = this.indicesLength;
-				geo.drawRange.start = 0;
-				geo.drawRange.count = this.indicesLength;
-			};
-			return MeshBatcher;
-		}());
-		MeshBatcher.VERTEX_SIZE = 9;
-		threejs.MeshBatcher = MeshBatcher;
-	})(threejs = spine.threejs || (spine.threejs = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var threejs;
-	(function (threejs) {
-		var SkeletonMesh = (function (_super) {
-			__extends(SkeletonMesh, _super);
-			function SkeletonMesh(skeletonData) {
-				var _this = _super.call(this) || this;
-				_this.zOffset = 0.1;
-				_this.clipper = new spine.SkeletonClipping();
-				_this.vertices = spine.Utils.newFloatArray(1024);
-				_this.tempColor = new spine.Color();
-				_this.skeleton = new spine.Skeleton(skeletonData);
-				var animData = new spine.AnimationStateData(skeletonData);
-				_this.state = new spine.AnimationState(animData);
-				var material = _this.material = new THREE.MeshBasicMaterial();
-				material.side = THREE.DoubleSide;
-				material.transparent = true;
-				material.alphaTest = 0.5;
-				_this.batcher = new threejs.MeshBatcher(_this);
-				return _this;
-			}
-			SkeletonMesh.prototype.update = function (deltaTime) {
-				var state = this.state;
-				var skeleton = this.skeleton;
-				state.update(deltaTime);
-				state.apply(skeleton);
-				skeleton.updateWorldTransform();
-				this.updateGeometry();
-			};
-			SkeletonMesh.prototype.updateGeometry = function () {
-				var geometry = this.geometry;
-				var numVertices = 0;
-				var verticesLength = 0;
-				var indicesLength = 0;
-				var blendMode = null;
-				var clipper = this.clipper;
-				var vertices = this.vertices;
-				var triangles = null;
-				var uvs = null;
-				var drawOrder = this.skeleton.drawOrder;
-				var batcher = this.batcher;
-				batcher.begin();
-				var z = 0;
-				var zOffset = this.zOffset;
-				for (var i = 0, n = drawOrder.length; i < n; i++) {
-					var vertexSize = clipper.isClipping() ? 2 : SkeletonMesh.VERTEX_SIZE;
-					var slot = drawOrder[i];
-					var attachment = slot.getAttachment();
-					var attachmentColor = null;
-					var texture = null;
-					var numFloats = 0;
-					if (attachment instanceof spine.RegionAttachment) {
-						var region = attachment;
-						attachmentColor = region.color;
-						vertices = this.vertices;
-						numFloats = vertexSize * 4;
-						region.computeWorldVertices(slot.bone, vertices, 0, vertexSize);
-						triangles = SkeletonMesh.QUAD_TRIANGLES;
-						uvs = region.uvs;
-						texture = region.region.renderObject.texture;
-					}
-					else if (attachment instanceof spine.MeshAttachment) {
-						var mesh = attachment;
-						attachmentColor = mesh.color;
-						vertices = this.vertices;
-						numFloats = (mesh.worldVerticesLength >> 1) * vertexSize;
-						if (numFloats > vertices.length) {
-							vertices = this.vertices = spine.Utils.newFloatArray(numFloats);
-						}
-						mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, vertexSize);
-						triangles = mesh.triangles;
-						uvs = mesh.uvs;
-						texture = mesh.region.renderObject.texture;
-					}
-					else if (attachment instanceof spine.ClippingAttachment) {
-						var clip = (attachment);
-						clipper.clipStart(slot, clip);
-						continue;
-					}
-					else
-						continue;
-					if (texture != null) {
-						if (!this.material.map) {
-							var mat = this.material;
-							mat.map = texture.texture;
-							mat.needsUpdate = true;
-						}
-						var skeleton = slot.bone.skeleton;
-						var skeletonColor = skeleton.color;
-						var slotColor = slot.color;
-						var alpha = skeletonColor.a * slotColor.a * attachmentColor.a;
-						var color = this.tempColor;
-						color.set(skeletonColor.r * slotColor.r * attachmentColor.r, skeletonColor.g * slotColor.g * attachmentColor.g, skeletonColor.b * slotColor.b * attachmentColor.b, alpha);
-						if (clipper.isClipping()) {
-							clipper.clipTriangles(vertices, numFloats, triangles, triangles.length, uvs, color, null, false);
-							var clippedVertices = clipper.clippedVertices;
-							var clippedTriangles = clipper.clippedTriangles;
-							batcher.batch(clippedVertices, clippedVertices.length, clippedTriangles, clippedTriangles.length, z);
-						}
-						else {
-							var verts = vertices;
-							for (var v = 2, u = 0, n_5 = numFloats; v < n_5; v += vertexSize, u += 2) {
-								verts[v] = color.r;
-								verts[v + 1] = color.g;
-								verts[v + 2] = color.b;
-								verts[v + 3] = color.a;
-								verts[v + 4] = uvs[u];
-								verts[v + 5] = uvs[u + 1];
-							}
-							batcher.batch(vertices, numFloats, triangles, triangles.length, z);
-						}
-						z += zOffset;
-					}
-				}
-				batcher.end();
-			};
-			return SkeletonMesh;
-		}(THREE.Mesh));
-		SkeletonMesh.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
-		SkeletonMesh.VERTEX_SIZE = 2 + 2 + 4;
-		threejs.SkeletonMesh = SkeletonMesh;
-	})(threejs = spine.threejs || (spine.threejs = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-	var threejs;
-	(function (threejs) {
-		var ThreeJsTexture = (function (_super) {
-			__extends(ThreeJsTexture, _super);
-			function ThreeJsTexture(image) {
-				var _this = _super.call(this, image) || this;
-				_this.texture = new THREE.Texture(image);
-				_this.texture.flipY = false;
-				_this.texture.needsUpdate = true;
-				return _this;
-			}
-			ThreeJsTexture.prototype.setFilters = function (minFilter, magFilter) {
-				this.texture.minFilter = ThreeJsTexture.toThreeJsTextureFilter(minFilter);
-				this.texture.magFilter = ThreeJsTexture.toThreeJsTextureFilter(magFilter);
-			};
-			ThreeJsTexture.prototype.setWraps = function (uWrap, vWrap) {
-				this.texture.wrapS = ThreeJsTexture.toThreeJsTextureWrap(uWrap);
-				this.texture.wrapT = ThreeJsTexture.toThreeJsTextureWrap(vWrap);
-			};
-			ThreeJsTexture.prototype.dispose = function () {
-				this.texture.dispose();
-			};
-			ThreeJsTexture.toThreeJsTextureFilter = function (filter) {
-				if (filter === spine.TextureFilter.Linear)
-					return THREE.LinearFilter;
-				else if (filter === spine.TextureFilter.MipMap)
-					return THREE.LinearMipMapLinearFilter;
-				else if (filter === spine.TextureFilter.MipMapLinearNearest)
-					return THREE.LinearMipMapNearestFilter;
-				else if (filter === spine.TextureFilter.MipMapNearestLinear)
-					return THREE.NearestMipMapLinearFilter;
-				else if (filter === spine.TextureFilter.MipMapNearestNearest)
-					return THREE.NearestMipMapNearestFilter;
-				else if (filter === spine.TextureFilter.Nearest)
-					return THREE.NearestFilter;
-				else
-					throw new Error("Unknown texture filter: " + filter);
-			};
-			ThreeJsTexture.toThreeJsTextureWrap = function (wrap) {
-				if (wrap === spine.TextureWrap.ClampToEdge)
-					return THREE.ClampToEdgeWrapping;
-				else if (wrap === spine.TextureWrap.MirroredRepeat)
-					return THREE.MirroredRepeatWrapping;
-				else if (wrap === spine.TextureWrap.Repeat)
-					return THREE.RepeatWrapping;
-				else
-					throw new Error("Unknown texture wrap: " + wrap);
-			};
-			return ThreeJsTexture;
-		}(spine.Texture));
-		threejs.ThreeJsTexture = ThreeJsTexture;
-	})(threejs = spine.threejs || (spine.threejs = {}));
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
@@ -9454,9 +9436,9 @@ var spine;
 				window.attachEvent("onload", SpineWidget.ready);
 			}
 		};
+		SpineWidget.pageLoaded = false;
 		return SpineWidget;
 	}());
-	SpineWidget.pageLoaded = false;
 	spine.SpineWidget = SpineWidget;
 	var SpineWidgetConfig = (function () {
 		function SpineWidgetConfig() {

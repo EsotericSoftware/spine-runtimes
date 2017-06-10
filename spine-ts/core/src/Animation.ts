@@ -667,7 +667,7 @@ module spine {
 			let frameVertices = this.frameVertices;
 			let vertexCount = frameVertices[0].length;
 
-			if (verticesArray.length != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
+			if (verticesArray.length != vertexCount && !setupPose) alpha = 1; // Don't mix from uninitialized slot vertices.
 			let vertices: Array<number> = Utils.setArraySize(verticesArray, vertexCount);
 
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.

@@ -52,8 +52,8 @@ namespace Spine {
 		public float B { get { return b; } set { b = value; } }
 		public float A { get { return a; } set { a = value; } }
 
-		public String Path { get; set; }
-		public Object RendererObject { get; set; }
+		public string Path { get; set; }
+		public object RendererObject; //public Object RendererObject { get; set; }
 		public float RegionU { get; set; }
 		public float RegionV { get; set; }
 		public float RegionU2 { get; set; }

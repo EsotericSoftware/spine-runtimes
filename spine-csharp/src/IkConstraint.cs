@@ -183,7 +183,7 @@ namespace Spine {
 				float maxAngle = 0, maxX = l1 + a, maxDist = maxX * maxX, maxY = 0;
 				c = -a * l1 / (aa - bb);
 				if (c >= -1 && c <= 1) {
-					float angle = (float)Math.Acos(c);
+					c = (float)Math.Acos(c);
 					x = a * (float)Math.Cos(c) + l1;
 					y = b * (float)Math.Sin(c);
 					d = x * x + y * y;

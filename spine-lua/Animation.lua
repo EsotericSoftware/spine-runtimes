@@ -769,7 +769,7 @@ function Animation.DeformTimeline.new (frameCount)
 		local frameVertices = self.frameVertices
 		local vertexCount = #(frameVertices[0])
 
-		if (#verticesArray ~= vertexCount) then alpha = 1 end -- Don't mix from uninitialized slot vertices.
+		if (#verticesArray ~= vertexCount and not setupPose) then alpha = 1 end -- Don't mix from uninitialized slot vertices.
 		local vertices = utils.setArraySize(verticesArray, vertexCount)
 
 		if time >= frames[zlen(frames) - 1] then -- Time is after last frame.

@@ -324,7 +324,7 @@ module spine {
 
 					let lengths: Array<number> = Utils.newArray(vertexCount / 3, 0);
 					for (let i = 0; i < map.lengths.length; i++)
-						lengths[i++] = map.lengths[i] * scale;
+						lengths[i] = map.lengths[i] * scale;
 					path.lengths = lengths;
 
 					let color: string = this.getValue(map, "color", null);

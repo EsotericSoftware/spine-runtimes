@@ -806,7 +806,7 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 			slot->attachmentVerticesCapacity = vertexCount;
 		}
 	}
-	if (slot->attachmentVerticesCount != vertexCount) alpha = 1; /* Don't mix from uninitialized slot vertices. */
+	if (slot->attachmentVerticesCount != vertexCount && !setupPose) alpha = 1; /* Don't mix from uninitialized slot vertices. */
 	slot->attachmentVerticesCount = vertexCount;
 
 	frameVertices = self->frameVertices;

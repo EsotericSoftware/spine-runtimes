@@ -57,7 +57,7 @@ namespace Spine {
 		/// <param name="stride">The number of <paramref name="worldVertices"/> entries between the value pairs written.</param>
 		public void ComputeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset, int stride = 2) {
 			count = offset + (count >> 1) * stride;
-			Skeleton skeleton = slot.Skeleton;
+			Skeleton skeleton = slot.bone.skeleton;
 			var deformArray = slot.attachmentVertices;
 			float[] vertices = this.vertices;
 			int[] bones = this.bones;
