@@ -38,6 +38,9 @@ import com.esotericsoftware.spine.Slot;
 /** Base class for an attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
  * {@link Slot#getAttachmentVertices()}. */
 public class VertexAttachment extends Attachment {
+	static private int nextID;
+
+	private int id = nextID++ & 65535;
 	int[] bones;
 	float[] vertices;
 	int worldVerticesLength;
@@ -151,5 +154,10 @@ public class VertexAttachment extends Attachment {
 
 	public void setWorldVerticesLength (int worldVerticesLength) {
 		this.worldVerticesLength = worldVerticesLength;
+	}
+
+	/** Returns a unique ID for this attachment. */
+	public int getId () {
+		return id;
 	}
 }
