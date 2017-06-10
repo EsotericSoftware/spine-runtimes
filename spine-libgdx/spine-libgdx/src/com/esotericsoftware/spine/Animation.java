@@ -814,7 +814,7 @@ public class Animation {
 		}
 
 		public int getPropertyId () {
-			return (TimelineType.deform.ordinal() << 27) + ((slotIndex & 2047) << 16) + attachment.getId();
+			return (TimelineType.deform.ordinal() << 27) + attachment.getId() + slotIndex;
 		}
 
 		public void setSlotIndex (int index) {

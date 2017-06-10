@@ -40,7 +40,7 @@ import com.esotericsoftware.spine.Slot;
 public class VertexAttachment extends Attachment {
 	static private int nextID;
 
-	private int id = nextID++ & 65535;
+	private int id = (nextID++ & 65535) << 11;
 	int[] bones;
 	float[] vertices;
 	int worldVerticesLength;
