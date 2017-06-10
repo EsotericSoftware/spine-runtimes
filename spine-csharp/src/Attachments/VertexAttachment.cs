@@ -35,7 +35,7 @@ namespace Spine {
 	public class VertexAttachment : Attachment {
 		static int nextID = 0;
 
-		internal int id = (nextID++ & 65535) << 11;
+		internal readonly int id = (nextID++ & 65535) << 11;
 		internal int[] bones;
 		internal float[] vertices;
 		internal int worldVerticesLength;
