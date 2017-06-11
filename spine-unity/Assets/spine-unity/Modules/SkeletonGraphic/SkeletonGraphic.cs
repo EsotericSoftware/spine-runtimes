@@ -122,9 +122,11 @@ namespace Spine.Unity {
 
 		#region Internals
 		// This is used by the UI system to determine what to put in the MaterialPropertyBlock.
+		public Texture OverrideTexture { get; set; }
 		public override Texture mainTexture {
 			get { 
 				// Fail loudly when incorrectly set up.
+				if (OverrideTexture != null) return OverrideTexture;
 				return skeletonDataAsset == null ? null : skeletonDataAsset.atlasAssets[0].materials[0].mainTexture;
 			}
 		}
