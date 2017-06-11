@@ -199,6 +199,9 @@ namespace Spine.Unity {
 		public event UpdateBonesDelegate UpdateWorld;
 		public event UpdateBonesDelegate UpdateComplete;
 
+		/// <summary> Occurs after the vertex data populated every frame, before the vertices are pushed into the mesh.</summary>
+		public event Spine.Unity.MeshGeneratorDelegate OnPostProcessVertices;
+
 		public void Clear () {
 			skeleton = null;
 			canvasRenderer.Clear();
@@ -269,11 +272,12 @@ namespace Spine.Unity {
 			}
 
 			if (canvas != null) meshGenerator.ScaleVertexData(canvas.referencePixelsPerUnit);
+			if (OnPostProcessVertices != null) OnPostProcessVertices.Invoke(this.meshGenerator);
 
 			var mesh = smartMesh.mesh;
 			meshGenerator.FillVertexData(mesh);
 			if (updateTriangles) meshGenerator.FillTrianglesSingle(mesh);
-			
+
 			canvasRenderer.SetMesh(mesh);
 			smartMesh.instructionUsed.Set(currentInstructions);
 

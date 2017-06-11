@@ -41,7 +41,10 @@ namespace Spine.Unity {
 	public class SkeletonRenderer : MonoBehaviour, ISkeletonComponent {
 
 		public delegate void SkeletonRendererDelegate (SkeletonRenderer skeletonRenderer);
-		public SkeletonRendererDelegate OnRebuild;
+		public event SkeletonRendererDelegate OnRebuild;
+
+		/// <summary> Occurs after the vertex data is populated every frame, before the vertices are pushed into the mesh.</summary>
+		public event Spine.Unity.MeshGeneratorDelegate OnPostProcessVertices;
 
 		public SkeletonDataAsset skeletonDataAsset;
 		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } } // ISkeletonComponent
@@ -279,6 +282,8 @@ namespace Spine.Unity {
 				else
 					meshGenerator.BuildMeshWithArrays(currentInstructions, updateTriangles);
 			}
+
+			if (OnPostProcessVertices != null) OnPostProcessVertices.Invoke(this.meshGenerator);
 
 			// STEP 3. Move the mesh data into a UnityEngine.Mesh ===========================================================================
 			var currentMesh = currentSmartMesh.mesh;

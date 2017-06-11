@@ -73,6 +73,8 @@ namespace Spine.Unity {
 		public int SlotCount { get { return endSlot - startSlot; } }
 	}
 
+	public delegate void MeshGeneratorDelegate (MeshGenerator meshGenerator);
+
 	[System.Serializable]
 	public class MeshGenerator {
 		public Settings settings = Settings.Default;
@@ -114,6 +116,10 @@ namespace Spine.Unity {
 		[NonSerialized] readonly ExposedList<Vector2> uvBuffer = new ExposedList<Vector2>(4);
 		[NonSerialized] readonly ExposedList<Color32> colorBuffer = new ExposedList<Color32>(4);
 		[NonSerialized] readonly ExposedList<ExposedList<int>> submeshes = new ExposedList<ExposedList<int>> { new ExposedList<int>(6) }; // start with 1 submesh.
+
+		public Vector3[] VertexBuffer { get { return this.vertexBuffer.Items; } }
+		public Vector2[] UVBuffer { get { return this.uvBuffer.Items; } }
+		public Color32[] ColorBuffer { get { return this.colorBuffer.Items; } }
 
 		[NonSerialized] Vector2 meshBoundsMin, meshBoundsMax;
 		[NonSerialized] float meshBoundsThickness;
