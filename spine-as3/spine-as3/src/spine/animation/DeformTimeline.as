@@ -48,7 +48,7 @@ package spine.animation {
 		}
 
 		override public function getPropertyId() : int {
-			return (TimelineType.deform.ordinal << 24) + slotIndex;
+			return (TimelineType.deform.ordinal << 27) + attachment.id + slotIndex;
 		}
 
 		/** Sets the time and value of the specified keyframe. */
@@ -57,26 +57,34 @@ package spine.animation {
 			frameVertices[frameIndex] = vertices;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, setupPose : Boolean, mixingOut : Boolean) : void {
+		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
 			var slot : Slot = skeleton.slots[slotIndex];
 			var slotAttachment : Attachment = slot.attachment;
 			if (!(slotAttachment is VertexAttachment) || !(VertexAttachment(slotAttachment)).applyDeform(attachment)) return;
-
-			var frames : Vector.<Number> = this.frames;
+			
 			var verticesArray : Vector.<Number> = slot.attachmentVertices;
-			if (time < frames[0]) {
-				if (setupPose) verticesArray.length = 0;
-				return;
-			}
-
 			var frameVertices : Vector.<Vector.<Number>> = this.frameVertices;
 			var vertexCount : int = frameVertices[0].length;
-
-			if (verticesArray.length != vertexCount && !setupPose) alpha = 1; // Don't mix from uninitialized slot vertices.
+			if (verticesArray.length != vertexCount && pose != MixPose.setup) alpha = 1; // Don't mix from uninitialized slot vertices.
 			verticesArray.length = vertexCount;
 			var vertices : Vector.<Number> = verticesArray;
 
-			var i : int, n : int;
+			var frames : Vector.<Number> = this.frames;
+			var i : int;			
+			if (time < frames[0]) {
+				switch (pose) {
+				case MixPose.setup:
+					verticesArray.length = 0;
+					return;
+				case MixPose.current:
+					alpha = 1 - alpha;
+					for (i = 0; i < vertexCount; i++)
+						vertices[i] *= alpha;
+				}
+				return;
+			}						
+
+			var n : int;
 			var vertexAttachment : VertexAttachment;
 			var setupVertices : Vector.<Number>;
 			var setup : Number, prev : Number;
@@ -86,7 +94,7 @@ package spine.animation {
 					// Vertex positions or deform offsets, no alpha.
 					for (i = 0, n = vertexCount; i < n; i++)
 						vertices[i] = lastVertices[i];
-				} else if (setupPose) {
+				} else if (pose == MixPose.setup) {
 					vertexAttachment = VertexAttachment(slotAttachment);
 					if (vertexAttachment.bones == null) {
 						// Unweighted vertex positions, with alpha.
@@ -121,7 +129,7 @@ package spine.animation {
 					prev = prevVertices[i];
 					vertices[i] = prev + (nextVertices[i] - prev) * percent;
 				}
-			} else if (setupPose) {
+			} else if (pose == MixPose.setup) {
 				vertexAttachment = VertexAttachment(slotAttachment);
 				if (vertexAttachment.bones == null) {
 					// Unweighted vertex positions, with alpha.

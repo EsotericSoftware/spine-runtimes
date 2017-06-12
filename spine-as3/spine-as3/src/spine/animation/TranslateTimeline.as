@@ -57,14 +57,19 @@ package spine.animation {
 			frames[int(frameIndex + Y)] = y;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, setupPose : Boolean, mixingOut : Boolean) : void {
+		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
 			var frames : Vector.<Number> = this.frames;
 
 			var bone : Bone = skeleton.bones[boneIndex];
 			if (time < frames[0]) {
-				if (setupPose) {
+				switch (pose) {
+				case MixPose.setup:
 					bone.x = bone.data.x;
 					bone.y = bone.data.y;
+					return;
+				case MixPose.current:
+					bone.x += (bone.data.x - bone.x) * alpha;
+					bone.y += (bone.data.y - bone.y) * alpha;
 				}
 				return;
 			}
@@ -84,7 +89,7 @@ package spine.animation {
 				x += (frames[frame + X] - x) * percent;
 				y += (frames[frame + Y] - y) * percent;
 			}
-			if (setupPose) {
+			if (pose == MixPose.setup) {
 				bone.x = bone.data.x + x * alpha;
 				bone.y = bone.data.y + y * alpha;
 			} else {

@@ -56,10 +56,16 @@ package spine.animation {
 			frames[frameIndex + VALUE] = value;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, setupPose : Boolean, mixingOut : Boolean) : void {
+		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
 			var constraint : PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
 			if (time < frames[0]) {
-				if (setupPose) constraint.position = constraint.data.position;
+				switch (pose) {
+				case MixPose.setup:
+					constraint.position = constraint.data.position;
+					return;
+				case MixPose.current:
+					constraint.position += (constraint.data.position - constraint.position) * alpha;
+				}
 				return;
 			}
 
@@ -75,7 +81,7 @@ package spine.animation {
 
 				position += (frames[frame + VALUE] - position) * percent;
 			}
-			if (setupPose)
+			if (pose == MixPose.setup)
 				constraint.position = constraint.data.position + (position - constraint.data.position) * alpha;
 			else
 				constraint.position += (position - constraint.position) * alpha;

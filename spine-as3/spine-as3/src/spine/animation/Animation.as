@@ -50,7 +50,7 @@ package spine.animation {
 		}
 
 		/** Poses the skeleton at the specified time for this animation. */
-		public function apply(skeleton : Skeleton, lastTime : Number, time : Number, loop : Boolean, events : Vector.<Event>, alpha : Number, setupPose : Boolean, mixingOut : Boolean) : void {
+		public function apply(skeleton : Skeleton, lastTime : Number, time : Number, loop : Boolean, events : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
 			if (skeleton == null) throw new ArgumentError("skeleton cannot be null.");
 
 			if (loop && duration != 0) {
@@ -59,7 +59,7 @@ package spine.animation {
 			}
 
 			for (var i : int = 0, n : int = timelines.length; i < n; i++)
-				timelines[i].apply(skeleton, lastTime, time, events, alpha, setupPose, mixingOut);
+				timelines[i].apply(skeleton, lastTime, time, events, alpha, pose, direction);
 		}
 
 		public function get name() : String {

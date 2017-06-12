@@ -43,14 +43,19 @@ package spine.animation {
 			return (TimelineType.scale.ordinal << 24) + boneIndex;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, setupPose : Boolean, mixingOut : Boolean) : void {
+		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
 			var frames : Vector.<Number> = this.frames;
 			var bone : Bone = skeleton.bones[boneIndex];
 
 			if (time < frames[0]) {
-				if (setupPose) {
+				switch (pose) {
+				case MixPose.setup:
 					bone.scaleX = bone.data.scaleX;
 					bone.scaleY = bone.data.scaleY;
+					return;
+				case MixPose.current:
+					bone.scaleX += (bone.data.scaleX - bone.scaleX) * alpha;
+					bone.scaleY += (bone.data.scaleY - bone.scaleY) * alpha;
 				}
 				return;
 			}
@@ -75,7 +80,7 @@ package spine.animation {
 				bone.scaleY = y;
 			} else {
 				var bx : Number, by : Number;
-				if (setupPose) {
+				if (pose == MixPose.setup) {
 					bx = bone.data.scaleX;
 					by = bone.data.scaleY;
 				} else {
@@ -83,7 +88,7 @@ package spine.animation {
 					by = bone.scaleY;
 				}
 				// Mixing out uses sign of setup or current pose, else use sign of key.
-				if (mixingOut) {
+				if (direction == MixDirection.Out) {
 					x = Math.abs(x) * MathUtils.signum(bx);
 					y = Math.abs(y) * MathUtils.signum(by);
 				} else {

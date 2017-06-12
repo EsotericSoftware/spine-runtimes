@@ -64,14 +64,24 @@ package spine.animation {
 			this.frames[frameIndex + TwoColorTimeline.B2] = b2;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, setupPose : Boolean, mixingOut : Boolean) : void {
+		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
 			var frames : Vector.<Number> = this.frames;
 			var slot : Slot = skeleton.slots[slotIndex];
+			var light : Color, dark : Color;
 
 			if (time < frames[0]) {
-				if (setupPose) {
+				switch (pose) {
+				case MixPose.setup:
 					slot.color.setFromColor(slot.data.color);
 					slot.darkColor.setFromColor(slot.data.darkColor);
+					return;
+				case MixPose.current:
+					light = slot.color;
+					dark = slot.darkColor;
+					var setupLight : Color = slot.data.color, setupDark : Color = slot.data.darkColor;
+					light.add((setupLight.r - light.r) * alpha, (setupLight.g - light.g) * alpha, (setupLight.b - light.b) * alpha,
+						(setupLight.a - light.a) * alpha);
+					dark.add((setupDark.r - dark.r) * alpha, (setupDark.g - dark.g) * alpha, (setupDark.b - dark.b) * alpha, 0);
 				}
 				return;
 			}
@@ -111,9 +121,9 @@ package spine.animation {
 				slot.color.setFrom(r, g, b, a);
 				slot.darkColor.setFrom(r2, g2, b2, 1);
 			} else {
-				var light : Color = slot.color;
-				var dark : Color = slot.darkColor;
-				if (setupPose) {
+				light = slot.color;
+				dark = slot.darkColor;
+				if (pose == MixPose.setup) {
 					light.setFromColor(slot.data.color);
 					dark.setFromColor(slot.data.darkColor);
 				}

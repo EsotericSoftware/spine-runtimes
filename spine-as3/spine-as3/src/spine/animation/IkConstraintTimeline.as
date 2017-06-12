@@ -57,23 +57,28 @@ package spine.animation {
 			frames[int(frameIndex + BEND_DIRECTION)] = bendDirection;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, setupPose : Boolean, mixingOut : Boolean) : void {
+		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
 			var constraint : IkConstraint = skeleton.ikConstraints[ikConstraintIndex];
 			if (time < frames[0]) {
-				if (setupPose) {
+				switch (pose) {
+				case MixPose.setup:
 					constraint.mix = constraint.data.mix;
+					constraint.bendDirection = constraint.data.bendDirection;
+					return;
+				case MixPose.current:
+					constraint.mix += (constraint.data.mix - constraint.mix) * alpha;
 					constraint.bendDirection = constraint.data.bendDirection;
 				}
 				return;
 			}
 
 			if (time >= frames[int(frames.length - ENTRIES)]) { // Time is after last frame.
-				if (setupPose) {
+				if (pose == MixPose.setup) {
 					constraint.mix = constraint.data.mix + (frames[frames.length + PREV_MIX] - constraint.data.mix) * alpha;
-					constraint.bendDirection = mixingOut ? constraint.data.bendDirection : int(frames[frames.length + PREV_BEND_DIRECTION]);
+					constraint.bendDirection = direction == MixDirection.Out ? constraint.data.bendDirection : int(frames[frames.length + PREV_BEND_DIRECTION]);
 				} else {
 					constraint.mix += (frames[frames.length + PREV_MIX] - constraint.mix) * alpha;
-					if (!mixingOut) constraint.bendDirection = int(frames[frames.length + PREV_BEND_DIRECTION]);
+					if (direction == MixDirection.In) constraint.bendDirection = int(frames[frames.length + PREV_BEND_DIRECTION]);
 				}
 				return;
 			}
@@ -84,12 +89,12 @@ package spine.animation {
 			var frameTime : Number = frames[frame];
 			var percent : Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-			if (setupPose) {
+			if (pose == MixPose.setup) {
 				constraint.mix = constraint.data.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.data.mix) * alpha;
-				constraint.bendDirection = mixingOut ? constraint.data.bendDirection : int(frames[frame + PREV_BEND_DIRECTION]);
+				constraint.bendDirection = direction == MixDirection.Out ? constraint.data.bendDirection : int(frames[frame + PREV_BEND_DIRECTION]);
 			} else {
 				constraint.mix += (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
-				if (!mixingOut) constraint.bendDirection = int(frames[frame + PREV_BEND_DIRECTION]);
+				if (direction == MixDirection.In) constraint.bendDirection = int(frames[frame + PREV_BEND_DIRECTION]);
 			}
 		}
 	}

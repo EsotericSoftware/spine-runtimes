@@ -57,12 +57,17 @@ package spine.animation {
 			frames[frameIndex + TRANSLATE] = translateMix;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, setupPose : Boolean, mixingOut : Boolean) : void {
+		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
 			var constraint : PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
 			if (time < frames[0]) {
-				if (setupPose) {
+				switch (pose) {
+				case MixPose.setup:
 					constraint.rotateMix = constraint.data.rotateMix;
 					constraint.translateMix = constraint.data.translateMix;
+					return;
+				case MixPose.current:
+					constraint.rotateMix += (constraint.data.rotateMix - constraint.rotateMix) * alpha;
+					constraint.translateMix += (constraint.data.translateMix - constraint.translateMix) * alpha;
 				}
 				return;
 			}
@@ -83,7 +88,7 @@ package spine.animation {
 				translate += (frames[frame + TRANSLATE] - translate) * percent;
 			}
 
-			if (setupPose) {
+			if (pose == MixPose.setup) {
 				constraint.rotateMix = constraint.data.rotateMix + (rotate - constraint.data.rotateMix) * alpha;
 				constraint.translateMix = constraint.data.translateMix + (translate - constraint.data.translateMix) * alpha;
 			} else {

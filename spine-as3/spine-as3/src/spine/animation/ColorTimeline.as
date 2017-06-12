@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 package spine.animation {
+	import spine.Color;
 	import spine.Event;
 	import spine.Skeleton;
 	import spine.Slot;
@@ -59,13 +60,19 @@ package spine.animation {
 			frames[int(frameIndex + A)] = a;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, setupPose : Boolean, mixingOut : Boolean) : void {
+		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
 			var frames : Vector.<Number> = this.frames;
 			var slot : Slot = skeleton.slots[slotIndex];
 
 			if (time < frames[0]) {
-				if (setupPose) {
+				switch (pose) {
+				case MixPose.setup:
 					slot.color.setFromColor(slot.data.color);
+					return;
+				case MixPose.current:
+					var color : Color = slot.color, setup : Color = slot.data.color;
+					color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha,
+						(setup.a - color.a) * alpha);
 				}
 				return;
 			}
@@ -95,7 +102,7 @@ package spine.animation {
 			if (alpha == 1) {
 				slot.color.setFrom(r, g, b, a);
 			} else {
-				if (setupPose) {
+				if (pose == MixPose.setup) {
 					slot.color.setFromColor(slot.data.color);
 				}
 				slot.color.r += (r - slot.color.r) * alpha;

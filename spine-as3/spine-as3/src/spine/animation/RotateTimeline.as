@@ -56,18 +56,26 @@ package spine.animation {
 			frames[int(frameIndex + ROTATION)] = degrees;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, setupPose : Boolean, mixingOut : Boolean) : void {
+		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
 			var frames : Vector.<Number> = this.frames;
 
 			var bone : Bone = skeleton.bones[boneIndex];
 			var r : Number;
 			if (time < frames[0]) {
-				if (setupPose) bone.rotation = bone.data.rotation;
+				switch (pose) {
+				case MixPose.setup:
+					bone.rotation = bone.data.rotation;
+					return;
+				case MixPose.current:
+					r = bone.data.rotation - bone.rotation;
+					r -= (16384 - int((16384.499999999996 - r / 360))) * 360;
+					bone.rotation += r * alpha;
+				}
 				return;
 			}
 
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
-				if (setupPose)
+				if (pose == MixPose.setup)
 					bone.rotation = bone.data.rotation + frames[frames.length + PREV_ROTATION] * alpha;
 				else {
 					r = bone.data.rotation + frames[frames.length + PREV_ROTATION] - bone.rotation;
@@ -86,7 +94,7 @@ package spine.animation {
 			r = frames[frame + ROTATION] - prevRotation;
 			r -= (16384 - int((16384.499999999996 - r / 360))) * 360;
 			r = prevRotation + r * percent;
-			if (setupPose) {
+			if (pose == MixPose.setup) {
 				r -= (16384 - int((16384.499999999996 - r / 360))) * 360;
 				bone.rotation = bone.data.rotation + r * alpha;
 			} else {

@@ -60,18 +60,25 @@ package spine.animation {
 			frames[frameIndex + SHEAR] = shearMix;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, setupPose : Boolean, mixingOut : Boolean) : void {
+		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
 			var frames : Vector.<Number> = this.frames;
 
 			var constraint : TransformConstraint = skeleton.transformConstraints[transformConstraintIndex];
 			var data : TransformConstraintData;
 			if (time < frames[0]) {
-				if (setupPose) {
-					data = constraint.data;
-					constraint.rotateMix = constraint.data.rotateMix;
-					constraint.translateMix = constraint.data.translateMix;
-					constraint.scaleMix = constraint.data.scaleMix;
-					constraint.shearMix = constraint.data.shearMix;
+				data = constraint.data;
+				switch (pose) {
+				case MixPose.setup:
+					constraint.rotateMix = data.rotateMix;
+					constraint.translateMix = data.translateMix;
+					constraint.scaleMix = data.scaleMix;
+					constraint.shearMix = data.shearMix;
+					return;
+				case MixPose.current:
+					constraint.rotateMix += (data.rotateMix - constraint.rotateMix) * alpha;
+					constraint.translateMix += (data.translateMix - constraint.translateMix) * alpha;
+					constraint.scaleMix += (data.scaleMix - constraint.scaleMix) * alpha;
+					constraint.shearMix += (data.shearMix - constraint.shearMix) * alpha;
 				}
 				return;
 			}
@@ -98,7 +105,7 @@ package spine.animation {
 				scale += (frames[frame + SCALE] - scale) * percent;
 				shear += (frames[frame + SHEAR] - shear) * percent;
 			}
-			if (setupPose) {
+			if (pose == MixPose.setup) {
 				data = constraint.data;
 				constraint.rotateMix = data.rotateMix + (rotate - data.rotateMix) * alpha;
 				constraint.translateMix = data.translateMix + (translate - data.translateMix) * alpha;

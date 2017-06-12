@@ -34,9 +34,12 @@ package spine.attachments {
 	import spine.Slot;
 
 	public dynamic class VertexAttachment extends Attachment {
+		private static var nextID : int = 0;
+		
 		public var bones : Vector.<int>;
 		public var vertices : Vector.<Number>;
 		public var worldVerticesLength : int;
+		public var id : int = (nextID++ & 65535) << 11;
 
 		public function VertexAttachment(name : String) {
 			super(name);
