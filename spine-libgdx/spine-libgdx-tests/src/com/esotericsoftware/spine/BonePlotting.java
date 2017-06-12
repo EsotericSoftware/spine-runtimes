@@ -31,6 +31,8 @@
 package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.esotericsoftware.spine.Animation.MixDirection;
+import com.esotericsoftware.spine.Animation.MixPose;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.ClippingAttachment;
@@ -74,7 +76,7 @@ public class BonePlotting {
 		for (Animation animation : skeletonData.getAnimations()) {
 			float time = 0;
 			while (time < animation.getDuration()) {
-				animation.apply(skeleton, time, time, false, null, 1, false, false);
+				animation.apply(skeleton, time, time, false, null, 1, MixPose.current, MixDirection.in);
 				skeleton.updateWorldTransform();
 				System.out
 					.println(animation.getName() + "," + bone.getWorldX() + "," + bone.getWorldY() + "," + bone.getWorldRotationX());

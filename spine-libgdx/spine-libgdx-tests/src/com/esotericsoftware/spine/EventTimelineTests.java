@@ -31,7 +31,8 @@
 package com.esotericsoftware.spine;
 
 import com.esotericsoftware.spine.Animation.EventTimeline;
-
+import com.esotericsoftware.spine.Animation.MixDirection;
+import com.esotericsoftware.spine.Animation.MixPose;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
 
@@ -176,7 +177,7 @@ public class EventTimelineTests {
 
 			int beforeCount = firedEvents.size;
 			Array<Event> original = new Array(firedEvents);
-			timeline.apply(skeleton, lastTimeLooped, timeLooped, firedEvents, 1, false, false);
+			timeline.apply(skeleton, lastTimeLooped, timeLooped, firedEvents, 1, MixPose.current, MixDirection.in);
 
 			while (beforeCount < firedEvents.size) {
 				char fired = firedEvents.get(beforeCount).getData().getName().charAt(0);
@@ -185,7 +186,7 @@ public class EventTimelineTests {
 				} else {
 					if (firedEvents.size > eventsCount) {
 						if (print) System.out.println(lastTimeLooped + "->" + timeLooped + ": " + fired + " == ?");
-						timeline.apply(skeleton, lastTimeLooped, timeLooped, original, 1, false, false);
+						timeline.apply(skeleton, lastTimeLooped, timeLooped, original, 1, MixPose.current, MixDirection.in);
 						fail("Too many events fired.");
 					}
 				}
@@ -193,7 +194,7 @@ public class EventTimelineTests {
 					System.out.println(lastTimeLooped + "->" + timeLooped + ": " + fired + " == " + events[eventIndex]);
 				}
 				if (fired != events[eventIndex]) {
-					timeline.apply(skeleton, lastTimeLooped, timeLooped, original, 1, false, false);
+					timeline.apply(skeleton, lastTimeLooped, timeLooped, original, 1, MixPose.current, MixDirection.in);
 					fail("Wrong event fired.");
 				}
 				eventIndex++;
@@ -205,7 +206,7 @@ public class EventTimelineTests {
 			i++;
 		}
 		if (firedEvents.size < eventsCount) {
-			timeline.apply(skeleton, lastTimeLooped, timeLooped, firedEvents, 1, false, false);
+			timeline.apply(skeleton, lastTimeLooped, timeLooped, firedEvents, 1, MixPose.current, MixDirection.in);
 			if (print) System.out.println(firedEvents);
 			fail("Event not fired: " + events[eventIndex] + ", " + frames[eventIndex]);
 		}

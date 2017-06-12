@@ -37,6 +37,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
+import com.esotericsoftware.spine.Animation.MixDirection;
+import com.esotericsoftware.spine.Animation.MixPose;
 
 public class MixTest extends ApplicationAdapter {
 	SpriteBatch batch;
@@ -103,21 +105,23 @@ public class MixTest extends ApplicationAdapter {
 			skeleton.setX(-50);
 		} else if (time > beforeJump + jump) {
 			// just walk after jump
-			walkAnimation.apply(skeleton, time, time, true, events, 1, false, false);
+			walkAnimation.apply(skeleton, time, time, true, events, 1, MixPose.current, MixDirection.in);
 		} else if (time > blendOutStart) {
 			// blend out jump
-			walkAnimation.apply(skeleton, time, time, true, events, 1, false, false);
-			jumpAnimation.apply(skeleton, time - beforeJump, time - beforeJump, false, events, 1 - (time - blendOutStart) / blendOut, false, false);
+			walkAnimation.apply(skeleton, time, time, true, events, 1, MixPose.current, MixDirection.in);
+			jumpAnimation.apply(skeleton, time - beforeJump, time - beforeJump, false, events, 1 - (time - blendOutStart) / blendOut,
+				MixPose.current, MixDirection.in);
 		} else if (time > beforeJump + blendIn) {
 			// just jump
-			jumpAnimation.apply(skeleton, time - beforeJump, time - beforeJump, false, events, 1, false, false);
+			jumpAnimation.apply(skeleton, time - beforeJump, time - beforeJump, false, events, 1, MixPose.current, MixDirection.in);
 		} else if (time > beforeJump) {
 			// blend in jump
-			walkAnimation.apply(skeleton, time, time, true, events, 1, false, false);
-			jumpAnimation.apply(skeleton, time - beforeJump, time - beforeJump, false, events, (time - beforeJump) / blendIn, false, false);
+			walkAnimation.apply(skeleton, time, time, true, events, 1, MixPose.current, MixDirection.in);
+			jumpAnimation.apply(skeleton, time - beforeJump, time - beforeJump, false, events, (time - beforeJump) / blendIn,
+				MixPose.current, MixDirection.in);
 		} else {
 			// just walk before jump
-			walkAnimation.apply(skeleton, time, time, true, events, 1, false, false);
+			walkAnimation.apply(skeleton, time, time, true, events, 1, MixPose.current, MixDirection.in);
 		}
 
 		skeleton.updateWorldTransform();
