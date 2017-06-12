@@ -47,6 +47,7 @@ void _spMeshAttachment_dispose (spAttachment* attachment) {
 
 spMeshAttachment* spMeshAttachment_create (const char* name) {
 	spMeshAttachment* self = NEW(spMeshAttachment);
+	_spVertexAttachment_init(SUPER(self));
 	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
 	_spAttachment_init(SUPER(SUPER(self)), name, SP_ATTACHMENT_MESH, _spMeshAttachment_dispose);
 	return self;

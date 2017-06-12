@@ -49,6 +49,8 @@ struct spVertexAttachment {
 	float* vertices;
 
 	int worldVerticesLength;
+
+	int id;
 };
 
 void spVertexAttachment_computeWorldVertices (spVertexAttachment* self, spSlot* slot, int start, int count, float* worldVertices, int offset, int stride);

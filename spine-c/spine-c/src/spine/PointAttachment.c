@@ -41,6 +41,7 @@ void _spPointAttachment_dispose (spAttachment* attachment) {
 
 spPointAttachment* spPointAttachment_create (const char* name) {
 	spPointAttachment* self = NEW(spPointAttachment);
+	_spVertexAttachment_init(SUPER(self));
 	_spAttachment_init(SUPER(SUPER(self)), name, SP_ATTACHMENT_POINT, _spPointAttachment_dispose);
 	return self;
 }
