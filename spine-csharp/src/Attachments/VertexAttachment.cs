@@ -33,10 +33,15 @@ using System;
 namespace Spine {
 	/// <summary>>An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's vertices.</summary> 
 	public class VertexAttachment : Attachment {
+		static int nextID = 0;
+
+		internal readonly int id = (nextID++ & 65535) << 11;
 		internal int[] bones;
 		internal float[] vertices;
 		internal int worldVerticesLength;
 
+		/// <summary>Gets a unique ID for this attachment.</summary>
+		public int Id { get { return id; } }
 		public int[] Bones { get { return bones; } set { bones = value; } }
 		public float[] Vertices { get { return vertices; } set { vertices = value; } }
 		public int WorldVerticesLength { get { return worldVerticesLength; } set { worldVerticesLength = value; } }

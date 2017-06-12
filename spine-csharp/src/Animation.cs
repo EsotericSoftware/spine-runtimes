@@ -743,7 +743,7 @@ namespace Spine {
 		public VertexAttachment Attachment { get { return attachment; } set { attachment = value; } }
 
 		override public int PropertyId {
-			get { return ((int)TimelineType.Deform << 24) + slotIndex; }
+			get { return ((int)TimelineType.Deform << 24) + attachment.id + slotIndex; }
 		}
 
 		public DeformTimeline (int frameCount)
