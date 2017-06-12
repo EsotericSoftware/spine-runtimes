@@ -143,11 +143,12 @@ module spine {
 				let current = tracks[i];
 				if (current == null || current.delay > 0) continue;
 				applied = true;
+				let currentPose = i == 0 ? MixPose.current : MixPose.currentLayered;
 
 				// Apply mixing from entries first.
 				let mix = current.alpha;
 				if (current.mixingFrom != null)
-					mix *= this.applyMixingFrom(current, skeleton);
+					mix *= this.applyMixingFrom(current, skeleton, currentPose);
 				else if (current.trackTime >= current.trackEnd && current.next == null)
 					mix = 0;
 
@@ -157,7 +158,7 @@ module spine {
 				let timelines = current.animation.timelines;
 				if (mix == 1) {
 					for (let ii = 0; ii < timelineCount; ii++)
-						timelines[ii].apply(skeleton, animationLast, animationTime, events, 1, true, false);
+						timelines[ii].apply(skeleton, animationLast, animationTime, events, 1, MixPose.setup, MixDirection.in);
 				} else {
 					let timelineData = current.timelineData;
 
@@ -167,11 +168,11 @@ module spine {
 
 					for (let ii = 0; ii < timelineCount; ii++) {
 						let timeline = timelines[ii];
+						let pose = timelineData[ii] >= AnimationState.FIRST ? MixPose.setup : currentPose;
 						if (timeline instanceof RotateTimeline) {
-							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineData[ii] >= AnimationState.FIRST, timelinesRotation, ii << 1,
-								firstFrame);
+							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, pose, timelinesRotation, ii << 1, firstFrame);
 						} else
-							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineData[ii] >= AnimationState.FIRST, false);
+							timeline.apply(skeleton, animationLast, animationTime, events, mix, pose, MixDirection.in);
 					}
 				}
 				this.queueEvents(current, animationTime);
@@ -184,9 +185,9 @@ module spine {
 			return applied;
 		}
 
-		applyMixingFrom (to: TrackEntry, skeleton: Skeleton) {
+		applyMixingFrom (to: TrackEntry, skeleton: Skeleton, currentPose: MixPose) {
 			let from = to.mixingFrom;
-			if (from.mixingFrom != null) this.applyMixingFrom(from, skeleton);
+			if (from.mixingFrom != null) this.applyMixingFrom(from, skeleton, currentPose);
 
 			let mix = 0;
 			if (to.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
@@ -207,27 +208,29 @@ module spine {
 			let firstFrame = from.timelinesRotation.length == 0;
 			if (firstFrame) Utils.setArraySize(from.timelinesRotation, timelineCount << 1, null);
 			let timelinesRotation = from.timelinesRotation;
-
-			let first = false;
+			
+			let pose: MixPose;
 			let alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix), alpha = 0;
 			from.totalAlpha = 0;
 			for (var i = 0; i < timelineCount; i++) {
 				let timeline = timelines[i];
 				switch (timelineData[i]) {
 				case AnimationState.SUBSEQUENT:
-					first = false;
+					if (!attachments && timeline instanceof AttachmentTimeline) continue;
+					if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
+					pose = currentPose;
 					alpha = alphaMix;
 					break;
 				case AnimationState.FIRST:
-					first = true;
+					pose = MixPose.setup
 					alpha = alphaMix;
 					break;
 				case AnimationState.DIP:
-					first = true;
+					pose = MixPose.setup;
 					alpha = alphaDip;
 					break;
 				default:
-					first = true;
+					pose = MixPose.setup;
 					alpha = alphaDip;
 					let dipMix = timelineDipMix[i];
 					alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
@@ -235,13 +238,9 @@ module spine {
 				}
 				from.totalAlpha += alpha;
 				if (timeline instanceof RotateTimeline)
-					this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, first, timelinesRotation, i << 1, firstFrame);
-				else {
-					if (!first) {
-						if (!attachments && timeline instanceof AttachmentTimeline) continue;
-						if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
-					}
-					timeline.apply(skeleton, animationLast, animationTime, events, alpha, first, true);
+					this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, pose, timelinesRotation, i << 1, firstFrame);
+				else {					
+					timeline.apply(skeleton, animationLast, animationTime, events, alpha, pose, MixDirection.out);
 				}
 			}
 
@@ -253,13 +252,13 @@ module spine {
 			return mix;
 		}
 
-		applyRotateTimeline (timeline: Timeline, skeleton: Skeleton, time: number, alpha: number, setupPose: boolean,
+		applyRotateTimeline (timeline: Timeline, skeleton: Skeleton, time: number, alpha: number, pose: MixPose,
 			timelinesRotation: Array<number>, i: number, firstFrame: boolean) {
 
 			if (firstFrame) timelinesRotation[i] = 0;
 
 			if (alpha == 1) {
-				timeline.apply(skeleton, 0, time, null, 1, setupPose, false);
+				timeline.apply(skeleton, 0, time, null, 1, pose, MixDirection.in);
 				return;
 			}
 
@@ -267,7 +266,7 @@ module spine {
 			let frames = rotateTimeline.frames;
 			let bone = skeleton.bones[rotateTimeline.boneIndex];
 			if (time < frames[0]) {
-				if (setupPose) bone.rotation = bone.data.rotation;
+				if (pose == MixPose.setup) bone.rotation = bone.data.rotation;
 				return;
 			}
 
@@ -289,7 +288,7 @@ module spine {
 			}
 
 			// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
-			let r1 = setupPose ? bone.data.rotation : bone.rotation;
+			let r1 = pose == MixPose.setup ? bone.data.rotation : bone.rotation;
 			let total = 0, diff = r2 - r1;
 			if (diff == 0) {
 				total = timelinesRotation[i];

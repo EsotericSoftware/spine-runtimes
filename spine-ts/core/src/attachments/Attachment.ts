@@ -39,6 +39,9 @@ module spine {
 	}
 
 	export abstract class VertexAttachment extends Attachment {
+		private static nextID = 0;
+
+		id = (VertexAttachment.nextID++ & 65535) << 11;
 		bones: Array<number>;
 		vertices: ArrayLike<number>;
 		worldVerticesLength = 0;
