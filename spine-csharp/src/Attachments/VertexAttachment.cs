@@ -34,17 +34,9 @@ namespace Spine {
 	/// <summary>>An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's vertices.</summary> 
 	public class VertexAttachment : Attachment {
 		static int nextID = 0;
-		static Object nextIdLock = new Object();
-		static int GetNextID () {
-			int returnValue;
-			lock (nextIdLock) {
-				returnValue = nextID;
-				nextID++;
-			}
-			return returnValue;
-		}
+		static readonly Object nextIdLock = new Object();
 
-		internal readonly int id = (VertexAttachment.GetNextID() & 65535) << 11;
+		internal readonly int id;
 		internal int[] bones;
 		internal float[] vertices;
 		internal int worldVerticesLength;
@@ -55,8 +47,12 @@ namespace Spine {
 		public float[] Vertices { get { return vertices; } set { vertices = value; } }
 		public int WorldVerticesLength { get { return worldVerticesLength; } set { worldVerticesLength = value; } }
 
-		public VertexAttachment (String name)
+		public VertexAttachment (string name)
 			: base(name) {
+
+			lock (VertexAttachment.nextIdLock) {
+				id = (VertexAttachment.nextID++ & 65535) << 11;
+			}
 		}
 
 		public void ComputeWorldVertices (Slot slot, float[] worldVertices) {
