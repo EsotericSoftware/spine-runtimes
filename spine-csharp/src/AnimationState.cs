@@ -171,11 +171,12 @@ namespace Spine {
 				TrackEntry current = tracksItems[i];
 				if (current == null || current.delay > 0) continue;
 				applied = true;
+				MixPose currentPose = i == 0 ? MixPose.Current : MixPose.CurrentLayered;
 
 				// Apply mixing from entries first.
 				float mix = current.alpha;
 				if (current.mixingFrom != null)
-					mix *= ApplyMixingFrom(current, skeleton);
+					mix *= ApplyMixingFrom(current, skeleton, currentPose);
 				else if (current.trackTime >= current.trackEnd && current.next == null) //
 					mix = 0; // Set to setup pose the last time the entry will be applied.
 
@@ -186,7 +187,7 @@ namespace Spine {
 				var timelinesItems = timelines.Items;
 				if (mix == 1) {
 					for (int ii = 0; ii < timelineCount; ii++)
-						timelinesItems[ii].Apply(skeleton, animationLast, animationTime, events, 1, true, false);
+						timelinesItems[ii].Apply(skeleton, animationLast, animationTime, events, 1, MixPose.Setup, MixDirection.In);
 				} else {
 					var timelineData = current.timelineData.Items;
 
@@ -196,13 +197,12 @@ namespace Spine {
 
 					for (int ii = 0; ii < timelineCount; ii++) {
 						Timeline timeline = timelinesItems[ii];
+						MixPose pose = timelineData[ii] >= FIRST ? MixPose.Setup : currentPose;
 						var rotateTimeline = timeline as RotateTimeline;
-						if (rotateTimeline != null) {
-							ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, mix, timelineData[ii] >= FIRST, timelinesRotation,
-								ii << 1, firstFrame);
-						} else {
-							timeline.Apply(skeleton, animationLast, animationTime, events, mix, timelineData[ii] > FIRST, false);
-						}
+						if (rotateTimeline != null)
+							ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, mix, pose, timelinesRotation, ii << 1, firstFrame);
+						else
+							timeline.Apply(skeleton, animationLast, animationTime, events, mix, pose, MixDirection.In);
 					}
 				}
 				QueueEvents(current, animationTime);
@@ -215,9 +215,9 @@ namespace Spine {
 			return applied;
 		}
 
-		private float ApplyMixingFrom (TrackEntry to, Skeleton skeleton) {
+		private float ApplyMixingFrom (TrackEntry to, Skeleton skeleton, MixPose currentPose) {
 			TrackEntry from = to.mixingFrom;
-			if (from.mixingFrom != null) ApplyMixingFrom(from, skeleton);
+			if (from.mixingFrom != null) ApplyMixingFrom(from, skeleton, currentPose);
 
 			float mix;
 			if (to.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
@@ -240,26 +240,28 @@ namespace Spine {
 			if (firstFrame) from.timelinesRotation.Resize(timelines.Count << 1); // from.timelinesRotation.setSize
 			var timelinesRotation = from.timelinesRotation.Items;
 
-			bool first;
+			MixPose pose;
 			float alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix), alpha;
 			from.totalAlpha = 0;
 			for (int i = 0; i < timelineCount; i++) {
 				Timeline timeline = timelinesItems[i];
 				switch (timelineData[i]) {
 				case SUBSEQUENT:
-					first = false;
+					if (!attachments && timeline is AttachmentTimeline) continue;
+					if (!drawOrder && timeline is DrawOrderTimeline) continue;
+					pose = currentPose;
 					alpha = alphaMix;
 					break;
 				case FIRST:
-					first = true;
+					pose = MixPose.Setup;
 					alpha = alphaMix;
 					break;
 				case DIP:
-					first = true;
+					pose = MixPose.Setup;
 					alpha = alphaDip;
 					break;
 				default:
-					first = true;
+					pose = MixPose.Setup;
 					alpha = alphaDip;
 					var dipMix = timelineDipMix[i];
 					alpha *= Math.Max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
@@ -268,13 +270,9 @@ namespace Spine {
 				from.totalAlpha += alpha;
 				var rotateTimeline = timeline as RotateTimeline;
 				if (rotateTimeline != null) {
-					ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, alpha, first, timelinesRotation, i << 1, firstFrame);
+					ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, alpha, pose, timelinesRotation, i << 1, firstFrame);
 				} else {
-					if (!first) {
-						if (!attachments && timeline is AttachmentTimeline) continue;
-						if (!drawOrder && timeline is DrawOrderTimeline) continue;
-					}
-					timeline.Apply(skeleton, animationLast, animationTime, eventBuffer, alpha, first, true);
+					timeline.Apply(skeleton, animationLast, animationTime, eventBuffer, alpha, pose, MixDirection.Out);
 				}
 			}
 
@@ -286,20 +284,20 @@ namespace Spine {
 			return mix;
 		}
 
-		static private void ApplyRotateTimeline (RotateTimeline rotateTimeline, Skeleton skeleton, float time, float alpha, bool setupPose,
+		static private void ApplyRotateTimeline (RotateTimeline rotateTimeline, Skeleton skeleton, float time, float alpha, MixPose pose,
 			float[] timelinesRotation, int i, bool firstFrame) {
 
 			if (firstFrame) timelinesRotation[i] = 0;
 
 			if (alpha == 1) {
-				rotateTimeline.Apply(skeleton, 0, time, null, 1, setupPose, false);
+				rotateTimeline.Apply(skeleton, 0, time, null, 1, pose, MixDirection.In);
 				return;
 			}
 
 			Bone bone = skeleton.bones.Items[rotateTimeline.boneIndex];
 			float[] frames = rotateTimeline.frames;
 			if (time < frames[0]) {
-				if (setupPose) bone.rotation = bone.data.rotation;
+				if (pose == MixPose.Setup) bone.rotation = bone.data.rotation;
 				return;
 			}
 
@@ -321,7 +319,7 @@ namespace Spine {
 			}
 
 			// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
-			float r1 = setupPose ? bone.data.rotation : bone.rotation;
+			float r1 = pose == MixPose.Setup ? bone.data.rotation : bone.rotation;
 			float total, diff = r2 - r1;
 			if (diff == 0) {
 				total = timelinesRotation[i];
