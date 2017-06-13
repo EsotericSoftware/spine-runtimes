@@ -150,7 +150,7 @@ namespace Spine.Unity {
 					// Assume SkeletonAnimation is valid for skeletonData and skeleton. Checked above.
 					var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(_animationName);
 					if (animationObject != null)
-						animationObject.Apply(skeleton, 0f, 0f, false, null, 1f, true, false);
+						animationObject.PoseSkeleton(skeleton, 0f);
 				}
 				Update(0);
 			}
@@ -162,10 +162,11 @@ namespace Spine.Unity {
 			#endif
 		}
 
-		public void Update () {
+		void Update () {
 			Update(Time.deltaTime);
 		}
 
+		/// <summary>Progresses the AnimationState according to the given deltaTime, and applies it to the Skeleton. Use Time.deltaTime to update manually. Use deltaTime 0 to update without progressing the time.</summary>
 		public void Update (float deltaTime) {
 			if (!valid)
 				return;

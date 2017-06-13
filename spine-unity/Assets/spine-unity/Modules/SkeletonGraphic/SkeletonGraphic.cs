@@ -242,7 +242,7 @@ namespace Spine.Unity {
 					// Assume SkeletonAnimation is valid for skeletonData and skeleton. Checked above.
 					var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(startingAnimation);
 					if (animationObject != null)
-						animationObject.Apply(skeleton, 0f, 0f, false, null, 1f, true, false);
+						animationObject.PoseSkeleton(skeleton, 0);
 				}
 				Update(0);
 			}

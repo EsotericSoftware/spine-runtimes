@@ -931,7 +931,7 @@ namespace Spine.Unity.Editor {
 			Skeleton skeleton = bone.Skeleton;
 			bool inheritRotation = bone.Data.TransformMode.InheritsRotation();
 
-			animation.Apply(skeleton, 0, 0, true, null, 1f, true, false);
+			animation.PoseSkeleton(skeleton, 0);
 			skeleton.UpdateWorldTransform();
 			float duration = animation.Duration;
 
@@ -952,7 +952,6 @@ namespace Spine.Unity.Editor {
 			int steps = Mathf.CeilToInt(duration / bakeIncrement);
 
 			float currentTime = 0;
-			float lastTime = 0;
 			float angle = rotation;
 
 			for (int i = 1; i <= steps; i++) {
@@ -960,7 +959,7 @@ namespace Spine.Unity.Editor {
 				if (i == steps)
 					currentTime = duration;
 
-				animation.Apply(skeleton, lastTime, currentTime, true, null, 1f, true, false);
+				animation.PoseSkeleton(skeleton, currentTime, true);
 				skeleton.UpdateWorldTransform();
 
 				int pIndex = listIndex - 1;
@@ -969,11 +968,7 @@ namespace Spine.Unity.Editor {
 
 				pk = keys[pIndex];
 
-				if (inheritRotation)
-					rotation = bone.AppliedRotation;
-				else {
-					rotation = GetUninheritedRotation(bone);
-				}
+				rotation = inheritRotation ? bone.AppliedRotation : GetUninheritedRotation(bone);
 
 				angle += Mathf.DeltaAngle(angle, rotation);
 
@@ -988,7 +983,6 @@ namespace Spine.Unity.Editor {
 				keys[pIndex] = pk;
 
 				listIndex++;
-				lastTime = currentTime;
 			}
 
 			curve = EnsureCurveKeyCount(new AnimationCurve(keys.ToArray()));
@@ -1058,7 +1052,7 @@ namespace Spine.Unity.Editor {
 
 					currentTime = time;
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixPose.Setup, MixDirection.In);
 
 					lastTime = time;
 					listIndex++;
@@ -1085,7 +1079,7 @@ namespace Spine.Unity.Editor {
 
 					currentTime = time;
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixPose.Setup, MixDirection.In);
 
 					lastTime = time;
 					listIndex++;
@@ -1104,7 +1098,7 @@ namespace Spine.Unity.Editor {
 						if (i == steps)
 							currentTime = time;
 
-						timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
+						timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixPose.Setup, MixDirection.In);
 
 						px = xKeys[listIndex - 1];
 						py = yKeys[listIndex - 1];
@@ -1201,7 +1195,7 @@ namespace Spine.Unity.Editor {
 
 					currentTime = time;
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixPose.Setup, MixDirection.In);
 
 					lastTime = time;
 					listIndex++;
@@ -1228,7 +1222,7 @@ namespace Spine.Unity.Editor {
 
 					currentTime = time;
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixPose.Setup, MixDirection.In);
 
 					lastTime = time;
 					listIndex++;
@@ -1246,7 +1240,7 @@ namespace Spine.Unity.Editor {
 						if (i == steps)
 							currentTime = time;
 
-						timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
+						timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixPose.Setup, MixDirection.In);
 
 						px = xKeys[listIndex - 1];
 						py = yKeys[listIndex - 1];
@@ -1330,7 +1324,7 @@ namespace Spine.Unity.Editor {
 
 					currentTime = time;
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixPose.Setup, MixDirection.In);
 
 					lastTime = time;
 					listIndex++;
@@ -1355,7 +1349,7 @@ namespace Spine.Unity.Editor {
 
 					currentTime = time;
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixPose.Setup, MixDirection.In);
 
 					lastTime = time;
 					listIndex++;
@@ -1365,7 +1359,7 @@ namespace Spine.Unity.Editor {
 
 					float time = frames[f];
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixPose.Setup, MixDirection.In);
 					skeleton.UpdateWorldTransform();
 
 					rotation = frames[f + 1] + boneData.Rotation;
@@ -1379,7 +1373,7 @@ namespace Spine.Unity.Editor {
 						if (i == steps)
 							currentTime = time;
 
-						timeline.Apply(skeleton, lastTime, currentTime, null, 1, false, false);
+						timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixPose.Setup, MixDirection.In);
 						skeleton.UpdateWorldTransform();
 						pk = keys[listIndex - 1];
 
@@ -1407,7 +1401,7 @@ namespace Spine.Unity.Editor {
 			curve = EnsureCurveKeyCount(new AnimationCurve(keys.ToArray()));
 
 			string path = GetPath(boneData);
-			string propertyName = "localEulerAnglesBaked";
+			const string propertyName = "localEulerAnglesBaked";
 
 			EditorCurveBinding xBind = EditorCurveBinding.FloatCurve(path, typeof(Transform), propertyName + ".x");
 			AnimationUtility.SetEditorCurve(clip, xBind, new AnimationCurve());
