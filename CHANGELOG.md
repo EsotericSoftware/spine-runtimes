@@ -71,6 +71,7 @@
  * Added support for clipping.
  * Switched from built-in ProceduralMeshComponent to RuntimeMeshComponent by Koderz (https://github.com/Koderz/UE4RuntimeMeshComponent, MIT). Needed for more flexibility regarding vertex format, should not have an impact on existing code/assets. You need to copy the RuntimeMeshComponentPlugin from our repository in `spine-ue4\Plugins\` to your project as well!
  * Added support for two color tinting. All base materials, e.g. SpineUnlitNormalMaterial, now do proper two color tinting. No material parameters have changed.
+ * Updated to Unreal Engine 4.16.1. Note that 4.16 has a regression which will make it impossible to compile plain .c files!
 
 ## C#
  * **Breaking changes**
