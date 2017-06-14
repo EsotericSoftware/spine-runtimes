@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class SpineUE4Target : TargetRules
 {
-	public SpineUE4Target(ReadOnlyTargetRules Target) : base(Target)
+	public SpineUE4Target(TargetInfo Target)
 	{
 		Type = TargetType.Game;		
 	}
