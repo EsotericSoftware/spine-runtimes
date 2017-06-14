@@ -4,7 +4,7 @@ namespace UnrealBuildTool.Rules
 {
 	public class SpinePlugin : ModuleRules
 	{
-		public SpinePlugin(TargetInfo Target)
+		public SpinePlugin(ReadOnlyTargetRules Target) : base(Target)
 		{
 			PublicIncludePaths.AddRange(new string[] { "SpinePlugin/Public", "SpinePlugin/Public/spine-c/include" });
             PrivateIncludePaths.AddRange(new string[] { "SpinePlugin/Private", "SpinePlugin/Public/spine-c/include" });

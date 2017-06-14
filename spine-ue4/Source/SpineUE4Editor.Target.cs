@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class SpineUE4EditorTarget : TargetRules
 {
-	public SpineUE4EditorTarget(TargetInfo Target)
+	public SpineUE4EditorTarget(ReadOnlyTargetRules Target) : base(Target)
 	{
 		Type = TargetType.Editor;
 	}
