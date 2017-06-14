@@ -258,6 +258,7 @@ void _spAttachmentLoader_setUnknownTypeError (spAttachmentLoader* self, spAttach
 void _spAttachment_init (spAttachment* self, const char* name, spAttachmentType type,
 void (*dispose) (spAttachment* self));
 void _spAttachment_deinit (spAttachment* self);
+void _spVertexAttachment_init (spVertexAttachment* self);
 void _spVertexAttachment_deinit (spVertexAttachment* self);
 
 #ifdef SPINE_SHORT_NAMES
@@ -271,7 +272,7 @@ void _spVertexAttachment_deinit (spVertexAttachment* self);
 void _spTimeline_init (spTimeline* self, spTimelineType type,
 	void (*dispose) (spTimeline* self),
 	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
-		int* eventsCount, float alpha, int setupPose, int mixingOut),
+		int* eventsCount, float alpha, spMixPose pose, spMixDirection direction),
 	int (*getPropertyId) (const spTimeline* self));
 void _spTimeline_deinit (spTimeline* self);
 
@@ -284,7 +285,7 @@ void _spTimeline_deinit (spTimeline* self);
 
 void _spCurveTimeline_init (spCurveTimeline* self, spTimelineType type, int framesCount,
 	void (*dispose) (spTimeline* self),
-	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents, int* eventsCount, float alpha, int setupPose, int mixingOut),
+	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents, int* eventsCount, float alpha, spMixPose pose, spMixDirection direction),
 	int (*getPropertyId) (const spTimeline* self));
 void _spCurveTimeline_deinit (spCurveTimeline* self);
 int _spCurveTimeline_binarySearch (float *values, int valuesLength, float target, int step);

@@ -58,6 +58,17 @@ typedef struct spAnimation {
 #endif
 } spAnimation;
 
+typedef enum {
+	SP_MIX_POSE_SETUP,
+	SP_MIX_POSE_CURRENT,
+	SP_MIX_POSE_CURRENT_LAYERED
+} spMixPose;
+
+typedef enum {
+	SP_MIX_DIRECTION_IN,
+	SP_MIX_DIRECTION_OUT
+} spMixDirection;
+
 spAnimation* spAnimation_create (const char* name, int timelinesCount);
 void spAnimation_dispose (spAnimation* self);
 
@@ -65,7 +76,7 @@ void spAnimation_dispose (spAnimation* self);
  * @param lastTime The last time the animation was applied.
  * @param events Any triggered events are added. May be null.*/
 void spAnimation_apply (const spAnimation* self, struct spSkeleton* skeleton, float lastTime, float time, int loop,
-		spEvent** events, int* eventsCount, float alpha, int /*boolean*/ setupPose, int /*boolean*/ mixingOut);
+		spEvent** events, int* eventsCount, float alpha, spMixPose pose, spMixDirection direction);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spAnimation Animation;
@@ -108,7 +119,7 @@ struct spTimeline {
 
 void spTimeline_dispose (spTimeline* self);
 void spTimeline_apply (const spTimeline* self, struct spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
-		int* eventsCount, float alpha, int /*boolean*/ setupPose, int /*boolean*/ mixingOut);
+		int* eventsCount, float alpha, spMixPose pose, spMixDirection direction);
 int spTimeline_getPropertyId (const spTimeline* self);
 
 #ifdef SPINE_SHORT_NAMES

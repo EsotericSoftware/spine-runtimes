@@ -41,6 +41,7 @@ void _spBoundingBoxAttachment_dispose (spAttachment* attachment) {
 
 spBoundingBoxAttachment* spBoundingBoxAttachment_create (const char* name) {
 	spBoundingBoxAttachment* self = NEW(spBoundingBoxAttachment);
+	_spVertexAttachment_init(SUPER(self));
 	_spAttachment_init(SUPER(SUPER(self)), name, SP_ATTACHMENT_BOUNDING_BOX, _spBoundingBoxAttachment_dispose);
 	return self;
 }
