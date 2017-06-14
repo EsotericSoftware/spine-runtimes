@@ -45,6 +45,7 @@
   * Added `spClippingAttachment` and respective enum.
   * Added `spSkeletonClipper` and `spTriangulator`, used to implement software clipping of attachments.
   * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
+  * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
 
 ### Cocos2d-X
  * Fixed renderer to work with 3.6 changes
@@ -76,6 +77,7 @@
    *  `MeshAttachment.parentMesh` is now a private field to enforce using the `.ParentMesh` setter property in external code. The `MeshAttachment.ParentMesh` property is an appropriate replacement wherever `.parentMesh` was used.
  * **Additions**
    * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
+   * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
 
 ### Unity
  * Refactored renderer to work with new 3.6 features.
@@ -133,6 +135,7 @@
   * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
   * Added `SkeletonClipper` and `Triangulator`, used to implement software clipping of attachments.
   * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
+  * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
 
 ### libGDX
  * Fixed renderer to work with 3.6 changes
@@ -154,6 +157,7 @@
   * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
   * Added `SkeletonClipper` and `Triangulator`, used to implement software clipping of attachments.
   * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
+  * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
 
 ### Love2D
   * Fixed renderer to work with 3.6 changes
