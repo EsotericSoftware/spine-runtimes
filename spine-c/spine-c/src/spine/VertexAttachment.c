@@ -31,7 +31,7 @@
 #include <spine/VertexAttachment.h>
 #include <spine/extension.h>
 
-// FIXME this is not thread-safe
+/* FIXME this is not thread-safe */
 static int nextID = 0;
 
 void _spVertexAttachment_init (spVertexAttachment* attachment) {
