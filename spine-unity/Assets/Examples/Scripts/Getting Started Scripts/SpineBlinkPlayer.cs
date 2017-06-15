@@ -1,4 +1,4 @@
-﻿/******************************************************************************
+/******************************************************************************
  * Spine Runtimes Software License v2.5
  *
  * Copyright (c) 2013-2016, Esoteric Software
@@ -29,38 +29,25 @@
  *****************************************************************************/
 
 using UnityEngine;
-using UnityEngine.UI;
+using System.Collections;
+using Spine.Unity;
 
 namespace Spine.Unity.Examples {
-	public class AttackSpineboy : MonoBehaviour {
+	public class SpineBlinkPlayer : MonoBehaviour {
+		const int BlinkTrack = 1;
 
-		public SkeletonAnimation spineboy;
-		public SpineGauge gauge;
-		public Text healthText;
+		[SpineAnimation]
+		public string blinkAnimation;
+		public float minimumDelay = 0.15f;
+		public float maximumDelay = 3f;
 
-		int currentHealth = 100;
-		const int maxHealth = 100;
-
-		public UnityEngine.Events.UnityEvent onAttack;
-
-		void Update () {
-			if (Input.GetKeyDown(KeyCode.Space)) {
-				currentHealth -= 10;
-				healthText.text = currentHealth + "/" + maxHealth;
-
-				if (currentHealth > 0) {
-					spineboy.AnimationState.SetAnimation(0, "hit", false);
-					spineboy.AnimationState.AddAnimation(0, "idle", true, 0);
-					gauge.fillPercent = (float)currentHealth/(float)maxHealth;
-					onAttack.Invoke();
-				} else {
-					if (currentHealth >= 0) {
-						gauge.fillPercent = 0;
-						spineboy.AnimationState.SetAnimation(0, "death", false).TrackEnd = float.PositiveInfinity;
-					}
-				}
+		IEnumerator Start () {
+			var skeletonAnimation = GetComponent<SkeletonAnimation>(); if (skeletonAnimation == null) yield break;
+			while (true) {
+				skeletonAnimation.AnimationState.SetAnimation(SpineBlinkPlayer.BlinkTrack, blinkAnimation, false);
+				yield return new WaitForSeconds(Random.Range(minimumDelay, maximumDelay));
 			}
 		}
-	}
 
+	}
 }

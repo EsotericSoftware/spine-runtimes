@@ -119,6 +119,8 @@ GameObject:
   - component: {fileID: 351144569}
   - component: {fileID: 351144568}
   - component: {fileID: 351144567}
+  - component: {fileID: 351144571}
+  - component: {fileID: 351144572}
   m_Layer: 0
   m_Name: Spine GameObject (spineboy)
   m_TagString: Untagged
@@ -137,8 +139,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skeletonDataAsset: {fileID: 11400000, guid: 44691b56ed7d1f04da0cbc2a52a91b8d, type: 2}
-  initialSkinName: default
+  skeletonDataAsset: {fileID: 11400000, guid: a467507a4ffb1d542a558739b2fede77, type: 2}
+  initialSkinName: base
   initialFlipX: 0
   initialFlipY: 0
   separatorSlotNames: []
@@ -169,7 +171,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 1455e88fdb81ccc45bdeaedd657bad4d, type: 2}
+  - {fileID: 2100000, guid: 128e02fa6a4f5964fa898757a425b354, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -209,6 +211,40 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &351144571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 351144566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26947ae098a8447408d80c0c86e35b48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skeletonRenderer: {fileID: 351144567}
+  customSlotMaterials: []
+  customMaterialOverrides:
+  - overrideDisabled: 0
+    originalMaterial: {fileID: 2100000, guid: 1455e88fdb81ccc45bdeaedd657bad4d, type: 2}
+    replacementMaterial: {fileID: 2100000, guid: 128e02fa6a4f5964fa898757a425b354,
+      type: 2}
+--- !u!114 &351144572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 351144566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 395f769061839bf488f157c37d23835d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashCount: 3
+  flashColor: {r: 1, g: 1, b: 1, a: 1}
+  interval: 0.016666668
+  fillPhaseProperty: _FillPhase
+  fillColorProperty: _FillColor
 --- !u!1 &795271513
 GameObject:
   m_ObjectHideFlags: 0
@@ -364,6 +400,22 @@ MonoBehaviour:
   spineboy: {fileID: 351144567}
   gauge: {fileID: 795271514}
   healthText: {fileID: 1847717249}
+  onAttack:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 351144572}
+        m_MethodName: Flash
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
 --- !u!1 &1053578423
 GameObject:
   m_ObjectHideFlags: 0

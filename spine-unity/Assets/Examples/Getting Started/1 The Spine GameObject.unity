@@ -260,25 +260,27 @@ TextMesh:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 199409354}
-  m_Text: 'Spine GameObjects are GameObjects
+  m_Text: '"Spine GameObjects" are GameObjects with
 
-    with these components on it:
+    a SkeletonAnimation
 
-    - MeshFilter
+    (or SkeletonRenderer, SkeletonGraphic or SkeletonAnimator)
 
-    - MeshRenderer
-
-    - SkeletonAnimation
+    and its requisite Components.
 
 
     <b>SkeletonAnimation</b>
 
     is the Spine component you''ll likely be using most often.
 
+    It uses a Skeleton Data Asset.
 
-    It uses a Skeleton Data Asset (the Unity asset files with the Spine icon).
 
-    Skeleton Data Asset ties together your Spine exports (.json, .png and .atlas.txt)
+    <b>SkeletonData Asset</b>
+
+    (the asset files with the Spine icon)
+
+    SkeletonDataAssets ties together your Spine exports (.json, .png and .atlas.txt)
 
     See the Spine-Unity Documentation to learn more about the asset files.
 
@@ -556,7 +558,7 @@ TextMesh:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1945923976}
-  m_Text: Enter <b>PLAY MODE</b> in Unity to see Spineboy animate.
+  m_Text: Enter <b>PLAY MODE</b> in Unity to see Spine-Unity Girl animate.
   m_OffsetZ: 0
   m_CharacterSize: 0.12
   m_LineSpacing: 1

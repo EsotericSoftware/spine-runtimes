@@ -147,7 +147,7 @@ TextMesh:
   m_GameObject: {fileID: 199409354}
   m_Text: 'This scene will show you an example
 
-    of basic animation control through code.
+    of basic animation code.
 
 
     Open the SpineBeginnerTwo script attached
@@ -317,8 +317,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skeletonDataAsset: {fileID: 11400000, guid: a467507a4ffb1d542a558739b2fede77, type: 2}
-  initialSkinName: base
+  skeletonDataAsset: {fileID: 11400000, guid: 45a15bf53b040de42b2adbc759a40203, type: 2}
+  initialSkinName: default
   initialFlipX: 0
   initialFlipY: 0
   separatorSlotNames: []
@@ -349,7 +349,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 1455e88fdb81ccc45bdeaedd657bad4d, type: 2}
+  - {fileID: 2100000, guid: 86873d92b9c6412428e6e2d4f827c88b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -403,6 +403,8 @@ MonoBehaviour:
   idleAnimationName: idle
   walkAnimationName: walk
   shootAnimationName: shoot
+  idleTurnAnimationName: idle-turn
+  runToIdleAnimationName: run-to-idle
 --- !u!1 &926099111
 GameObject:
   m_ObjectHideFlags: 0
