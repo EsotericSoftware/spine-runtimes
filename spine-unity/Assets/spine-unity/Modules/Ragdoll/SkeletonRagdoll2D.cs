@@ -30,8 +30,6 @@
 
 // Contributed by: Mitch Thompson
 
-//#define FLIPDEBUG
-
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -42,14 +40,6 @@ namespace Spine.Unity.Modules {
 		static Transform parentSpaceHelper;
 
 		#region Inspector
-		#if FLIPDEBUG
-		[Header("DEBUG")]
-		public bool flipXInitially;
-		public bool flipYInitially;
-		public bool spawnKinematic;
-		public bool disableUpdateBones;
-		#endif
-
 		[Header("Hierarchy")]
 		[SpineBone]
 		public string startingBoneName = "";
@@ -94,19 +84,11 @@ namespace Spine.Unity.Modules {
 		IEnumerator Start () {
 			if (parentSpaceHelper == null) {
 				parentSpaceHelper = (new GameObject("Parent Space Helper")).transform;
-				#if !FLIPDEBUG
-				parentSpaceHelper.hideFlags = HideFlags.HideInHierarchy;
-				#endif
 			}
 
 			targetSkeletonComponent = GetComponent<SkeletonRenderer>() as ISkeletonAnimation;
 			if (targetSkeletonComponent == null) Debug.LogError("Attached Spine component does not implement ISkeletonAnimation. This script is not compatible.");
 			skeleton = targetSkeletonComponent.Skeleton;
-
-			#if FLIPDEBUG
-			skeleton.flipX = flipXInitially;
-			skeleton.flipY = flipYInitially;
-			#endif
 
 			if (applyOnStart) {
 				yield return null;
@@ -144,9 +126,6 @@ namespace Spine.Unity.Modules {
 			RecursivelyCreateBoneProxies(startingBone);
 
 			RootRigidbody = boneTable[startingBone].GetComponent<Rigidbody2D>();
-			#if FLIPDEBUG
-			if (!RootRigidbody.isKinematic)
-			#endif
 			RootRigidbody.isKinematic = pinStartBone;
 			RootRigidbody.mass = rootMass;
 			var boneColliders = new List<Collider2D>();
@@ -324,20 +303,12 @@ namespace Spine.Unity.Modules {
 			var rb = boneGameObject.AddComponent<Rigidbody2D>();
 			rb.gravityScale = this.gravityScale;
 
-			#if FLIPDEBUG
-			rb.isKinematic = spawnKinematic;
-			#endif
-
 			foreach (Bone child in b.Children)
 				RecursivelyCreateBoneProxies(child);
 		}
 
 		/// <summary>Performed every skeleton animation update to translate Unity Transforms positions into Spine bone transforms.</summary>
 		void UpdateSpineSkeleton (ISkeletonAnimation animatedSkeleton) {
-			#if FLIPDEBUG
-			if (disableUpdateBones) return;
-			#endif
-
 			bool flipX = skeleton.flipX;
 			bool flipY = skeleton.flipY;
 			bool flipXOR = flipX ^ flipY;

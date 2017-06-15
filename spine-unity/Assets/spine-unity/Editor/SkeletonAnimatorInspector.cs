@@ -36,19 +36,16 @@ namespace Spine.Unity.Editor {
 	[CustomEditor(typeof(SkeletonAnimator))]
 	[CanEditMultipleObjects]
 	public class SkeletonAnimatorInspector : SkeletonRendererInspector {
-		protected SerializedProperty layerMixModes;
-		protected SerializedProperty autoReset;
+		protected SerializedProperty mecanimTranslator;
 
 		protected override void OnEnable () {
 			base.OnEnable();
-			autoReset = serializedObject.FindProperty("autoReset");
-			layerMixModes = serializedObject.FindProperty("layerMixModes");
+			mecanimTranslator = serializedObject.FindProperty("mecanimTranslator");
 		}
 
 		protected override void DrawInspectorGUI (bool multi) {
 			base.DrawInspectorGUI(multi);
-			EditorGUILayout.PropertyField(autoReset);
-			EditorGUILayout.PropertyField(layerMixModes, true);
+			EditorGUILayout.PropertyField(mecanimTranslator, true);
 		}
 	}
 }
