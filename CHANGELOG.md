@@ -76,20 +76,20 @@
 ## C#
 * **Breaking changes**
   *  `MeshAttachment.parentMesh` is now a private field to enforce using the `.ParentMesh` setter property in external code. The `MeshAttachment.ParentMesh` property is an appropriate replacement wherever `.parentMesh` was used.
-  * `Skeleton.getBounds` takes a scratch array as input so it doesn't have to allocate a new array on each invocation itself. Reduces GC activity.
-  * Removed `Bone.worldToLocalRotationX` and `Bone.worldToLocalRotationY`. Replaced by `Bone.worldToLocalRotation` (rotation given relative to x-axis, counter-clockwise, in degrees).
-  * Added `stride` parameter to `VertexAttachment.computeWorldVertices`.
-  * Removed `RegionAttachment.vertices` field. The vertices array is provided to `RegionAttachment.computeWorldVertices` by the API user now.
-  * Removed `RegionAttachment.updateWorldVertices`, added `RegionAttachment.computeWorldVertices`. The new method now computes the x/y positions of the 4 vertices of the corner and places them in the provided `worldVertices` array, starting at `offset`, then moving by `stride` array elements when advancing to the next vertex. This allows to directly compose the vertex buffer and avoids a copy. The computation of the full vertices, including vertex colors and texture coordinates, is now done by the backend's respective renderer.
+  * `Skeleton.GetBounds` takes a scratch array as input so it doesn't have to allocate a new array on each invocation itself. Reduces GC activity.
+  * Removed `Bone.WorldToLocalRotationX` and `Bone.WorldToLocalRotationY`. Replaced by `Bone.WorldToLocalRotation` (rotation given relative to x-axis, counter-clockwise, in degrees).
+  * Added `stride` parameter to `VertexAttachment.ComputeWorldVertices`.
+  * Removed `RegionAttachment.Vertices` field. The vertices array is provided to `RegionAttachment.ComputeWorldVertices` by the API user now.
+  * Removed `RegionAttachment.UpdateWorldVertices`, added `RegionAttachment.ComputeWorldVertices`. The new method now computes the x/y positions of the 4 vertices of the corner and places them in the provided `worldVertices` array, starting at `offset`, then moving by `stride` array elements when advancing to the next vertex. This allows to directly compose the vertex buffer and avoids a copy. The computation of the full vertices, including vertex colors and texture coordinates, is now done by the backend's respective renderer.
  * **Additions**  
   * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
   * Added `Bone.localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).  
   * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.  
-  * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
-  * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
+  * Added `PointAttachment`, additional method `NewPointAttachment` in `AttachmentLoader` interface.
+  * Added `ClippingAttachment`, additional method `NewClippingAttachment` in `AttachmentLoader` interface.
   * Added `SkeletonClipper` and `Triangulator`, used to implement software clipping of attachments.
-  * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
-  * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
+  * `AnimationState.Apply` returns a bool indicating if any timeline was applied or not.
+  * `Animation.Apply` and `Timeline.Apply`` now take enums `MixPose` and `MixDirection` instead of bools.
 
 ### Unity
  * Refactored renderer to work with new 3.6 features.
