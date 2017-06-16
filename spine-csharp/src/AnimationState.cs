@@ -773,7 +773,7 @@ namespace Spine {
 		/// <summary>
 		/// Seconds for the last frame of this animation. Non-looping animations won't play past this time. Looping animations will 
 		/// loop back to <see cref="TrackEntry.AnimationStart"/> at this time. Defaults to the animation duration.</summary>
-		public float AnimationEnd { get { return animationEnd; } }
+		public float AnimationEnd { get { return animationEnd; } set { animationEnd = value; } }
 
 		/// <summary>
 		/// The time in seconds this animation was last applied. Some timelines use this for one-time triggers. Eg, when this
