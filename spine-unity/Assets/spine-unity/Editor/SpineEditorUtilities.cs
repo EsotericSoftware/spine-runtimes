@@ -64,6 +64,7 @@ namespace Spine.Unity.Editor {
 			public static Texture2D mesh;
 			public static Texture2D weights;
 			public static Texture2D path;
+			public static Texture2D clipping;
 			public static Texture2D skin;
 			public static Texture2D skinsRoot;
 			public static Texture2D animation;
@@ -85,39 +86,46 @@ namespace Spine.Unity.Editor {
 			public static Texture2D unity;
 //			public static Texture2D controllerIcon;
 
+			static Texture2D LoadIcon (string filename) {
+				return (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/" + filename);
+			}
+
 			public static void Initialize () {
-				skeleton = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-skeleton.png");
-				nullBone = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-null.png");
-				bone = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-bone.png");
-				poseBones = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-poseBones.png");
-				boneNib = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-boneNib.png");
-				slot = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-slot.png");
-				slotRoot = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-slotRoot.png");
-				skinPlaceholder = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-skinPlaceholder.png");
+				skeleton = LoadIcon("icon-skeleton.png");
+				nullBone = LoadIcon("icon-null.png");
+				bone = LoadIcon("icon-bone.png");
+				poseBones = LoadIcon("icon-poseBones.png");
+				boneNib = LoadIcon("icon-boneNib.png");
+				slot = LoadIcon("icon-slot.png");
+				slotRoot = LoadIcon("icon-slotRoot.png");
+				skinPlaceholder = LoadIcon("icon-skinPlaceholder.png");
 
-				genericAttachment = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-attachment.png");
-				image = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-image.png");
-				boundingBox = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-boundingBox.png");
-				mesh = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-mesh.png");
-				weights = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-weights.png");
-				skin = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-skin.png");
-				skinsRoot = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-skinsRoot.png");
-				animation = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-animation.png");
-				animationRoot = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-animationRoot.png");
-				spine = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-spine.png");
-				userEvent = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-event.png");
-				constraintNib = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-constraintNib.png");
+				genericAttachment = LoadIcon("icon-attachment.png");
+				image = LoadIcon("icon-image.png");
+				boundingBox = LoadIcon("icon-boundingBox.png");
+				mesh = LoadIcon("icon-mesh.png");
+				weights = LoadIcon("icon-weights.png");
+				path = LoadIcon("icon-path.png");
+				clipping = LoadIcon("icon-clipping.png");
 
-				constraintRoot = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-constraints.png");
-				constraintTransform = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-constraintTransform.png");
-				constraintPath = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-constraintPath.png");
-				constraintIK = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-constraintIK.png");
+				skin = LoadIcon("icon-skin.png");
+				skinsRoot = LoadIcon("icon-skinsRoot.png");
+				animation = LoadIcon("icon-animation.png");
+				animationRoot = LoadIcon("icon-animationRoot.png");
+				spine = LoadIcon("icon-spine.png");
+				userEvent = LoadIcon("icon-event.png");
+				constraintNib = LoadIcon("icon-constraintNib.png");
 
-				warning = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-warning.png");
-				skeletonUtility = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-skeletonUtility.png");
-				hingeChain = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-hingeChain.png");
-				subMeshRenderer = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-subMeshRenderer.png");
-				path = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-path.png");
+				constraintRoot = LoadIcon("icon-constraints.png");
+				constraintTransform = LoadIcon("icon-constraintTransform.png");
+				constraintPath = LoadIcon("icon-constraintPath.png");
+				constraintIK = LoadIcon("icon-constraintIK.png");
+
+				warning = LoadIcon("icon-warning.png");
+				skeletonUtility = LoadIcon("icon-skeletonUtility.png");
+				hingeChain = LoadIcon("icon-hingeChain.png");
+				subMeshRenderer = LoadIcon("icon-subMeshRenderer.png");
+
 
 				info = EditorGUIUtility.FindTexture("console.infoicon.sml");
 				unity = EditorGUIUtility.FindTexture("SceneAsset Icon");
@@ -125,15 +133,17 @@ namespace Spine.Unity.Editor {
 			}
 
 			public static Texture2D GetAttachmentIcon (Attachment attachment) {
+				// Analysis disable once CanBeReplacedWithTryCastAndCheckForNull
 				if (attachment is RegionAttachment)
 					return Icons.image;
-				// Analysis disable once CanBeReplacedWithTryCastAndCheckForNull
 				else if (attachment is MeshAttachment)
 					return ((MeshAttachment)attachment).IsWeighted() ? Icons.weights : Icons.mesh;
 				else if (attachment is BoundingBoxAttachment)
 					return Icons.boundingBox;
 				else if (attachment is PathAttachment)
 					return Icons.path;
+				else if (attachment is ClippingAttachment)
+					return Icons.clipping;
 				else
 					return Icons.warning;
 			}

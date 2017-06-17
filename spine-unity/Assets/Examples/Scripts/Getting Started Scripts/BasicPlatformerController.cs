@@ -37,15 +37,15 @@ namespace Spine.Unity.Examples {
 	[RequireComponent(typeof(CharacterController))]
 	public class BasicPlatformerController : MonoBehaviour {
 
-	    [Header("Controls")]
+		[Header("Controls")]
 		public string XAxis = "Horizontal";
 		public string YAxis = "Vertical";
 		public string JumpButton = "Jump";
 
 		[Header("Moving")]
-		public float walkSpeed = 4;
-		public float runSpeed = 10;
-		public float gravity = 65;
+		public float walkSpeed = 1.5f;
+		public float runSpeed = 7f;
+		public float gravityScale = 6.6f;
 
 		[Header("Jumping")]
 		public float jumpSpeed = 25;
@@ -55,7 +55,6 @@ namespace Spine.Unity.Examples {
 		public float forceCrouchDuration = 0.5f;
 
 		[Header("Graphics")]
-		public Transform graphicsRoot;
 		public SkeletonAnimation skeletonAnimation;
 
 		[Header("Animation")]
@@ -72,32 +71,30 @@ namespace Spine.Unity.Examples {
 		[SpineAnimation(dataField: "skeletonAnimation")]
 		public string crouchName = "Crouch";
 
-		[Header("Audio")]
+		[Header("Effects")]
 		public AudioSource jumpAudioSource;
 		public AudioSource hardfallAudioSource;
 		public AudioSource footstepAudioSource;
+		public ParticleSystem landParticles;
 		[SpineEvent]
 		public string footstepEventName = "Footstep";
 		CharacterController controller;
-		Vector2 velocity = Vector2.zero;
-		Vector2 lastVelocity = Vector2.zero;
-		bool lastGrounded = false;
+		Vector3 velocity = default(Vector3);
 		float jumpEndTime = 0;
 		bool jumpInterrupt = false;
 		float forceCrouchEndTime;
-		Quaternion flippedRotation = Quaternion.Euler(0, 180, 0);
+		Vector2 input;
+		bool wasGrounded = false;
 
 		void Awake () {
 			controller = GetComponent<CharacterController>();
 		}
 
 		void Start () {
-			// Register a callback for Spine Events (in this case, Footstep)
 			skeletonAnimation.AnimationState.Event += HandleEvent;
 		}
 
 		void HandleEvent (Spine.TrackEntry trackEntry, Spine.Event e) {
-			// Play some sound if footstep event fired
 			if (e.Data.Name == footstepEventName) {
 				footstepAudioSource.Stop();
 				footstepAudioSource.pitch = GetRandomPitch(0.2f);
@@ -105,100 +102,85 @@ namespace Spine.Unity.Examples {
 			}
 		}
 
-		void Update () {
-			//control inputs
-			float x = Input.GetAxis(XAxis);
-			float y = Input.GetAxis(YAxis);
-			//check for force crouch
-			bool crouching = (controller.isGrounded && y < -0.5f) || (forceCrouchEndTime > Time.time);
-			velocity.x = 0;
+		static float GetRandomPitch (float maxOffset) {
+			return 1f + Random.Range(-maxOffset, maxOffset);
+		}
 
-			//Calculate control velocity
+		void Update () {
+			input.x = Input.GetAxis(XAxis);
+			input.y = Input.GetAxis(YAxis);
+			bool crouching = (controller.isGrounded && input.y < -0.5f) || (forceCrouchEndTime > Time.time);
+			velocity.x = 0;
+			float dt = Time.deltaTime;
+
 			if (!crouching) { 
-				if (Input.GetButtonDown(JumpButton) && controller.isGrounded) {
-					//jump
+				if (Input.GetButtonDown(JumpButton) && controller.isGrounded) {					
 					jumpAudioSource.Stop();
 					jumpAudioSource.Play();
 					velocity.y = jumpSpeed;
 					jumpEndTime = Time.time + jumpDuration;
-				} else if (Time.time < jumpEndTime && Input.GetButtonUp(JumpButton)) {
-					jumpInterrupt = true;
+				} else {
+					jumpInterrupt |= Time.time < jumpEndTime && Input.GetButtonUp(JumpButton);
 				}
 
-	            
-				if (x != 0) {
-					//walk or run
-					velocity.x = Mathf.Abs(x) > 0.6f ? runSpeed : walkSpeed;
-					velocity.x *= Mathf.Sign(x);
+				if (input.x != 0) {
+					velocity.x = Mathf.Abs(input.x) > 0.6f ? runSpeed : walkSpeed;
+					velocity.x *= Mathf.Sign(input.x);
 				}
 
 				if (jumpInterrupt) {
-					//interrupt jump and smoothly cut Y velocity
 					if (velocity.y > 0) {
-						velocity.y = Mathf.MoveTowards(velocity.y, 0, Time.deltaTime * 100);
+						velocity.y = Mathf.MoveTowards(velocity.y, 0, dt * jumpInterruptFactor);
 					} else { 
 						jumpInterrupt = false;
 					}
 				}
 			}
 
-			//apply gravity F = mA (Learn it, love it, live it)
-			velocity.y -= gravity * Time.deltaTime;
+			var gravityDeltaVelocity = Physics.gravity * gravityScale * dt;
 
-			//move
-			controller.Move(new Vector3(velocity.x, velocity.y, 0) * Time.deltaTime);
-	        
 			if (controller.isGrounded) {
-				//cancel out Y velocity if on ground
-				velocity.y = -gravity * Time.deltaTime;
 				jumpInterrupt = false;
+			} else {
+				if (wasGrounded) {
+					if (velocity.y < 0)
+						velocity.y = 0;
+				} else {
+					velocity += gravityDeltaVelocity;
+				}
 			}
 
-	        
-			Vector2 deltaVelocity = lastVelocity - velocity;
+			wasGrounded = controller.isGrounded;
 
-			if (!lastGrounded && controller.isGrounded) {
-				//detect hard fall
-				if ((gravity * Time.deltaTime) - deltaVelocity.y > forceCrouchVelocity) {
+			controller.Move(velocity * dt);
+
+			if (!wasGrounded && controller.isGrounded) {
+				if (-velocity.y > forceCrouchVelocity) {
 					forceCrouchEndTime = Time.time + forceCrouchDuration;
 					hardfallAudioSource.Play();
 				} else {
-					//play footstep audio if light fall because why not
 					footstepAudioSource.Play();
 				}
-	            
+					
+				landParticles.Emit((int)(velocity.y / -9f) + 2);
 			}
 
-			//graphics updates
 			if (controller.isGrounded) {
-				if (crouching) { //crouch
+				if (crouching) {
 					skeletonAnimation.AnimationName = crouchName;
 				} else {
-					if (x == 0) //idle
+					if (input.x == 0)
 						skeletonAnimation.AnimationName = idleName;
-					else //move
-						skeletonAnimation.AnimationName = Mathf.Abs(x) > 0.6f ? runName : walkName;
+					else
+						skeletonAnimation.AnimationName = Mathf.Abs(input.x) > 0.6f ? runName : walkName;
 				}
 			} else {
-				if (velocity.y > 0) //jump
-					skeletonAnimation.AnimationName = jumpName;
-				else //fall
-					skeletonAnimation.AnimationName = fallName;
+				skeletonAnimation.AnimationName = velocity.y > 0 ? jumpName : fallName;
 			}
 
-			//flip left or right
-			if (x > 0)
-				graphicsRoot.localRotation = Quaternion.identity;
-			else if (x < 0)
-				graphicsRoot.localRotation = flippedRotation;
-
-			//store previous state
-			lastVelocity = velocity;
-			lastGrounded = controller.isGrounded;
-		}
+			if (input.x != 0)
+				skeletonAnimation.Skeleton.FlipX = input.x < 0;
 			
-		static float GetRandomPitch (float maxOffset) {
-			return 1f + Random.Range(-maxOffset, maxOffset);
 		}
 	}
 }

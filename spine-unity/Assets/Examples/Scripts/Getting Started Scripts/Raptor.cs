@@ -1,4 +1,4 @@
-﻿/******************************************************************************
+/******************************************************************************
  * Spine Runtimes Software License v2.5
  *
  * Copyright (c) 2013-2016, Esoteric Software
@@ -29,38 +29,57 @@
  *****************************************************************************/
 
 using UnityEngine;
-using UnityEngine.UI;
+using System.Collections;
+using Spine.Unity;
 
 namespace Spine.Unity.Examples {
-	public class AttackSpineboy : MonoBehaviour {
+	public class Raptor : MonoBehaviour {
 
-		public SkeletonAnimation spineboy;
-		public SpineGauge gauge;
-		public Text healthText;
+		#region Inspector
+		[SpineAnimation]
+		public string walk = "walk";
 
-		int currentHealth = 100;
-		const int maxHealth = 100;
+		[SpineAnimation]
+		public string gungrab = "gungrab";
 
-		public UnityEngine.Events.UnityEvent onAttack;
+		[SpineAnimation]
+		public string gunkeep = "gunkeep";
 
-		void Update () {
-			if (Input.GetKeyDown(KeyCode.Space)) {
-				currentHealth -= 10;
-				healthText.text = currentHealth + "/" + maxHealth;
+		[SpineEvent]
+		public string footstepEvent = "footstep";
 
-				if (currentHealth > 0) {
-					spineboy.AnimationState.SetAnimation(0, "hit", false);
-					spineboy.AnimationState.AddAnimation(0, "idle", true, 0);
-					gauge.fillPercent = (float)currentHealth/(float)maxHealth;
-					onAttack.Invoke();
-				} else {
-					if (currentHealth >= 0) {
-						gauge.fillPercent = 0;
-						spineboy.AnimationState.SetAnimation(0, "death", false).TrackEnd = float.PositiveInfinity;
-					}
-				}
+		public AudioSource footstepAudioSource;
+		#endregion
+
+		SkeletonAnimation skeletonAnimation;
+
+		void Start () {
+			skeletonAnimation = GetComponent<SkeletonAnimation>();
+			skeletonAnimation.AnimationState.Event += HandleEvent;
+			StartCoroutine(GunGrabRoutine());
+		}
+
+		void HandleEvent (Spine.TrackEntry trackEntry, Spine.Event e) {
+			if (e.Data.Name == footstepEvent) {
+				footstepAudioSource.pitch = 0.5f + Random.Range(-0.2f, 0.2f);
+				footstepAudioSource.Play();
 			}
 		}
-	}
 
+		IEnumerator GunGrabRoutine () {		
+			// Play the walk animation on track 0.
+			skeletonAnimation.AnimationState.SetAnimation(0, walk, true);
+
+			// Repeatedly play the gungrab and gunkeep animation on track 1.
+			while (true) {
+				yield return new WaitForSeconds(Random.Range(0.5f, 3f));
+				skeletonAnimation.AnimationState.SetAnimation(1, gungrab, false);
+
+				yield return new WaitForSeconds(Random.Range(0.5f, 3f));
+				skeletonAnimation.AnimationState.SetAnimation(1, gunkeep, false);
+			}
+
+		}
+
+	}
 }

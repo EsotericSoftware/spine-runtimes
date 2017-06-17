@@ -37,9 +37,6 @@ namespace Spine.Unity {
 	[RequireComponent(typeof(Animator))]
 	public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 
-		public enum MixMode { AlwaysMix, MixNext, SpineStyle }
-		public MixMode[] layerMixModes = new MixMode[0];
-
 		#region Bone Callbacks (ISkeletonAnimation)
 		protected event UpdateBonesDelegate _UpdateLocal;
 		protected event UpdateBonesDelegate _UpdateWorld;
@@ -63,13 +60,24 @@ namespace Spine.Unity {
 		public event UpdateBonesDelegate UpdateComplete { add { _UpdateComplete += value; } remove { _UpdateComplete -= value; } }
 		#endregion
 
-		public class SpineMecanimTranslator {
+		public bool AutoReset {
+			get { return mecanimTranslator.autoReset; }
+			set { mecanimTranslator.autoReset = value; }
+		}
+
+		[System.Serializable]
+		public class MecanimTranslator {
+			#region Inspector
+			public bool autoReset = true;
+			public MixMode[] layerMixModes = new MixMode[0];
+			#endregion
+
+			public enum MixMode { AlwaysMix, MixNext, SpineStyle }
+
 			readonly Dictionary<int, Spine.Animation> animationTable = new Dictionary<int, Spine.Animation>();
 			readonly Dictionary<AnimationClip, int> clipNameHashCodeTable = new Dictionary<AnimationClip, int>();
+			readonly List<Animation> previousAnimations = new List<Animation>();
 			Animator animator;
-
-			List<Animation> previousAnimations = new List<Animation>();
-			public bool autoReset = true;
 
 			public void Initialize (Animator animator, SkeletonDataAsset skeletonDataAsset) {
 				this.animator = animator;
@@ -77,15 +85,15 @@ namespace Spine.Unity {
 				clipNameHashCodeTable.Clear();
 				var data = skeletonDataAsset.GetSkeletonData(true);
 				foreach (var a in data.Animations)
-					animationTable.Add(a.Name.GetHashCode(), a);	
+					animationTable.Add(a.Name.GetHashCode(), a);
 			}
 
-			public void Apply (Skeleton skeleton, ref MixMode[] layerMixModes) {
+			public void Apply (Skeleton skeleton) {
 
 				if (layerMixModes.Length < animator.layerCount)
 					System.Array.Resize<MixMode>(ref layerMixModes, animator.layerCount);
 				
-				//skeleton.Update(Time.deltaTime); // Doesn't actually do anything, currently. (Spine 3.5).
+				//skeleton.Update(Time.deltaTime); // Doesn't actually do anything, currently. (Spine 3.6).
 
 				// Clear Previous
 				if (autoReset) {
@@ -138,7 +146,7 @@ namespace Spine.Unity {
 						// Always use Mix instead of Applying the first non-zero weighted clip.
 						for (int c = 0; c < clipInfo.Length; c++) {
 							var info = clipInfo[c];	float weight = info.weight * layerWeight; if (weight == 0) continue;
-							animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed <0), stateInfo.loop, null, weight, MixPose.Current, MixDirection.In);
+							animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, weight, MixPose.Current, MixDirection.In);
 						}
 						if (hasNext) {
 							for (int c = 0; c < nextClipInfo.Length; c++) {
@@ -151,13 +159,13 @@ namespace Spine.Unity {
 						int c = 0;
 						for (; c < clipInfo.Length; c++) {
 							var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-							animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed <0), stateInfo.loop, null, 1f, MixPose.Current, MixDirection.In);
+							animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, 1f, MixPose.Current, MixDirection.In);
 							break;
 						}
 						// Mix the rest
 						for (; c < clipInfo.Length; c++) {
 							var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-							animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed <0), stateInfo.loop, null, weight, MixPose.Current, MixDirection.In);
+							animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, weight, MixPose.Current, MixDirection.In);
 						}
 
 						c = 0;
@@ -206,21 +214,21 @@ namespace Spine.Unity {
 			}
 		}
 
-		public SpineMecanimTranslator translator;
+		public MecanimTranslator mecanimTranslator;
 
 		public override void Initialize (bool overwrite) {
 			if (valid && !overwrite) return;
 			base.Initialize(overwrite);
 			if (!valid) return;
 
-			translator = new SpineMecanimTranslator();
-			translator.Initialize(GetComponent<Animator>(), this.skeletonDataAsset);
+			mecanimTranslator = mecanimTranslator ?? new MecanimTranslator();
+			mecanimTranslator.Initialize(GetComponent<Animator>(), this.skeletonDataAsset);
 		}
 
 		public void Update () {
 			if (!valid) return;
 
-			translator.Apply(skeleton, ref layerMixModes);
+			mecanimTranslator.Apply(skeleton);
 
 			// UpdateWorldTransform and Bone Callbacks
 			{
