@@ -87,7 +87,7 @@ namespace Spine.Unity.Examples {
 			// STEP 1: "EQUIP" ITEMS USING SPRITES
 			// STEP 1.1 Find the original attachment.
 			// Step 1.2 Get a clone of the original attachment.
-			// Step 1.3 Apply the Sprite image to it.
+			// Step 1.3 Apply the Sprite image to the clone.
 			// Step 1.4 Add the remapped clone to the new custom skin.
 
 			// Let's do this for the visor.
