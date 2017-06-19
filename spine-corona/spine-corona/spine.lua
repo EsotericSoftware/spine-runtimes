@@ -169,20 +169,20 @@ function spine.Skeleton:updateWorldTransform()
 			elseif attachment.type == spine.AttachmentType.clipping then
 				self.clipper:clipStart(slot, attachment)
 			end
-			
-			local skeleton = slot.bone.skeleton
-			local skeletonColor = skeleton.color
-			local slotColor = slot.color
-			local attachmentColor = attachment.color
-			local alpha = skeletonColor.a * slotColor.a * attachmentColor.a
-			local multiplier = alpha
-			if premultipliedAlpha then multiplier = 1 end
-			color:set(skeletonColor.r * slotColor.r * attachmentColor.r * multiplier,
-								skeletonColor.g * slotColor.g * attachmentColor.g * multiplier,
-								skeletonColor.b * slotColor.b * attachmentColor.b * multiplier,
-								alpha)
 
 			if texture and vertices and indices then
+				local skeleton = slot.bone.skeleton
+				local skeletonColor = skeleton.color
+				local slotColor = slot.color
+				local attachmentColor = attachment.color
+				local alpha = skeletonColor.a * slotColor.a * attachmentColor.a
+				local multiplier = alpha
+				if premultipliedAlpha then multiplier = 1 end
+				color:set(skeletonColor.r * slotColor.r * attachmentColor.r * multiplier,
+									skeletonColor.g * slotColor.g * attachmentColor.g * multiplier,
+									skeletonColor.b * slotColor.b * attachmentColor.b * multiplier,
+									alpha)
+				
 				if not lastTexture then lastTexture = texture end
 				if lastColor.r == -1 then lastColor:setFrom(color) end
 				if not lastBlendMode then lastBlendMode = blendMode end

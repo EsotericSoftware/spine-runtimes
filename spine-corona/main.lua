@@ -75,13 +75,13 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 	return { skeleton = skeleton, state = animationState }
 end
 
-table.insert(skeletons, loadSkeleton("coin.atlas", "coin-pro.json", 240, 300, 0.4, "rotate"))
-table.insert(skeletons, loadSkeleton("spineboy.atlas", "spineboy-ess.json", 240, 300, 0.4, "walk"))
-table.insert(skeletons, loadSkeleton("raptor.atlas", "raptor-pro.json", 200, 300, 0.25, "walk"))
-table.insert(skeletons, loadSkeleton("goblins.atlas", "goblins-pro.json", 240, 300, 0.8, "walk", "goblin"))
-table.insert(skeletons, loadSkeleton("stretchyman.atlas", "stretchyman-pro.json", 40, 300, 0.5, "sneak"))
+-- table.insert(skeletons, loadSkeleton("coin.atlas", "coin-pro.json", 240, 300, 0.4, "rotate"))
+-- table.insert(skeletons, loadSkeleton("spineboy.atlas", "spineboy-ess.json", 240, 300, 0.4, "walk"))
+-- table.insert(skeletons, loadSkeleton("raptor.atlas", "raptor-pro.json", 200, 300, 0.25, "walk"))
+-- table.insert(skeletons, loadSkeleton("goblins.atlas", "goblins-pro.json", 240, 300, 0.8, "walk", "goblin"))
+-- table.insert(skeletons, loadSkeleton("stretchyman.atlas", "stretchyman-pro.json", 40, 300, 0.5, "sneak"))
 table.insert(skeletons, loadSkeleton("tank.atlas", "tank-pro.json", 400, 300, 0.2, "drive"))
-table.insert(skeletons, loadSkeleton("vine.atlas", "vine-pro.json", 240, 300, 0.3, "grow"))
+-- table.insert(skeletons, loadSkeleton("vine.atlas", "vine-pro.json", 240, 300, 0.3, "grow"))
 
 local triangulator = spine.Triangulator.new()
 local polygon = { 411, 219, 199, 230, 161, 362, 534, 407, 346, 305, 596, 265 }
