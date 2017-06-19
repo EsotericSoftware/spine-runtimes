@@ -90,7 +90,7 @@ end
 
 function PathConstraint:update ()
 	local attachment = self.target.attachment
-	if not (attachment.type == AttachmentType.path) then return end
+	if not attachment or not (attachment.type == AttachmentType.path) then return end
 
 	local rotateMix = self.rotateMix
 	local translateMix = self.translateMix

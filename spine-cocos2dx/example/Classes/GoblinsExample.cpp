@@ -43,7 +43,7 @@ Scene* GoblinsExample::scene () {
 bool GoblinsExample::init () {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
-	skeletonNode = SkeletonAnimation::createWithJsonFile("goblins-mesh.json", "goblins.atlas", 1.5f);
+	skeletonNode = SkeletonAnimation::createWithJsonFile("goblins-pro.json", "goblins.atlas", 1.5f);
 	skeletonNode->setAnimation(0, "walk", true);
 	skeletonNode->setSkin("goblin");
 
