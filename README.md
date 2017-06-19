@@ -18,7 +18,7 @@ Review our backlog of bugs, enhancements, and tasks in the [spine-runtimes](http
 
 ## Versioning
 
-The Git `master` branch is stable and works with data exported from the latest, non-beta version of the Spine editor. New development is done in an `X.X-beta` branch, which may be a work in progress. Important changes to the runtimes can be reviewed in the [CHANGELOG.md file](https://github.com/EsotericSoftware/spine-runtimes/blob/master/CHANGELOG.md). Occaisionally the Spine Runtimes are [tagged](https://github.com/EsotericSoftware/spine-runtimes/releases) with the specific Spine editor version they work with.
+The default branch on GitHub is stable and works with data exported from the latest, non-beta version of the Spine editor. New development is done in an `X.X-beta` branch, which may be a work in progress. Important changes to the runtimes can be reviewed in the [CHANGELOG.md file](https://github.com/EsotericSoftware/spine-runtimes/blob/master/CHANGELOG.md). Occasionally the Spine Runtimes are [tagged](https://github.com/EsotericSoftware/spine-runtimes/releases) with the specific Spine editor version they work with.
 
 It is highly suggested to [freeze](http://esotericsoftware.com/spine-settings#Version) the Spine editor version to match the Spine Runtimes source being used and to update them in lock step. See the [Spine Runtimes Guide](http://esotericsoftware.com/spine-runtime-architecture#Versioning) for more information.
 
