@@ -96,7 +96,7 @@ public class Box2DExample extends ApplicationAdapter {
 		};
 		SkeletonJson json = new SkeletonJson(atlasLoader);
 		json.setScale(0.6f * 0.05f);
-		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy.json"));
+		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy-ess.json"));
 		animation = skeletonData.findAnimation("walk");
 
 		skeleton = new Skeleton(skeletonData);

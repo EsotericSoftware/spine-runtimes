@@ -44,7 +44,7 @@ package spine.examples {
 	import starling.display.Sprite;
 
 	public class TankExample extends Sprite {
-		[Embed(source = "/tank.json", mimeType = "application/octet-stream")]
+		[Embed(source = "/tank-pro.json", mimeType = "application/octet-stream")]
 		static public const TankJson : Class;
 
 		[Embed(source = "/tank.atlas", mimeType = "application/octet-stream")]

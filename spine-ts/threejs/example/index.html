@@ -21,10 +21,10 @@ var lastFrameTime = Date.now() / 1000;
 
 function init () {
 	// create the THREE.JS camera, scene and renderer (WebGL)
-	var width = window.innerWidth, height = window.innerHeight;	
+	var width = window.innerWidth, height = window.innerHeight;
 	camera = new THREE.PerspectiveCamera(75, width / height, 1, 3000);
 	camera.position.y = 100;
-	camera.position.z = 400;	
+	camera.position.z = 400;
 	scene = new THREE.Scene();
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize(width, height);
@@ -33,7 +33,7 @@ function init () {
 
 	// load the assets required to display the Raptor model
 	assetManager = new spine.threejs.AssetManager();
-	assetManager.loadText("assets/raptor.json");
+	assetManager.loadText("assets/raptor-pro.json");
 	assetManager.loadText("assets/raptor.atlas");
 	assetManager.loadTexture("assets/raptor.png");
 
@@ -41,7 +41,7 @@ function init () {
 }
 
 function load (name, scale) {
-	if (assetManager.isLoadingComplete()) {	
+	if (assetManager.isLoadingComplete()) {
 		// Add a box to the scene to which we attach the skeleton mesh
 		geometry = new THREE.BoxGeometry(200, 200, 200);
 		material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
@@ -51,9 +51,9 @@ function load (name, scale) {
 		// Load the texture atlas using name.atlas and name.png from the AssetManager.
 		// The function passed to TextureAtlas is used to resolve relative paths.
 		atlas = new spine.TextureAtlas(assetManager.get("assets/raptor.atlas"), function(path) {
-			return assetManager.get("assets/" + path);		
+			return assetManager.get("assets/" + path);
 		});
-		var skeletonData = loadSkeleton("raptor", 0.4);
+		var skeletonData = loadSkeleton("raptor-pro", 0.4);
 
 		// Create a SkeletonMesh from the data and attach it to the scene
 		skeletonMesh = new spine.threejs.SkeletonMesh(skeletonData);
@@ -64,11 +64,11 @@ function load (name, scale) {
 	} else requestAnimationFrame(load);
 }
 
-function loadSkeleton (name, scale) {	
+function loadSkeleton (name, scale) {
 	// Load the texture atlas using name.atlas and name.png from the AssetManager.
 	// The function passed to TextureAtlas is used to resolve relative paths.
-	atlas = new spine.TextureAtlas(assetManager.get("assets/" + name + ".atlas"), function(path) {
-		return assetManager.get("assets/" + path);		
+	atlas = new spine.TextureAtlas(assetManager.get("assets/" + name.replace("-pro", "") + ".atlas"), function(path) {
+		return assetManager.get("assets/" + path);
 	});
 
 	// Create a AtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
@@ -76,7 +76,7 @@ function loadSkeleton (name, scale) {
 
 	// Create a SkeletonJson instance for parsing the .json file.
 	var skeletonJson = new spine.SkeletonJson(atlasLoader);
-	
+
 	// Set the scale to apply during parsing, parse the file, and create a new skeleton.
 	skeletonJson.scale = scale;
 	var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/" + name + ".json"));
@@ -89,7 +89,7 @@ function render() {
 	var now = Date.now() / 1000;
 	var delta = now - lastFrameTime;
 	lastFrameTime = now;
-	
+
 	// resize canvas to use full page, adjust camera/renderer
 	resize();
 
@@ -108,7 +108,7 @@ function render() {
 
 function resize () {
 	var w = window.innerWidth;
-	var h = window.innerHeight;	
+	var h = window.innerHeight;
 	if (canvas.width != w || canvas.height != h) {
 		canvas.width = w;
 		canvas.height = h;

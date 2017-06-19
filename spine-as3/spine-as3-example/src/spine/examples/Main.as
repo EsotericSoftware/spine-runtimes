@@ -47,7 +47,7 @@ package spine.examples {
 		[Embed(source = "/spineboy.png")]
 		static public const SpineboyAtlasTexture : Class;
 
-		[Embed(source = "/spineboy.json", mimeType = "application/octet-stream")]
+		[Embed(source = "/spineboy-ess.json", mimeType = "application/octet-stream")]
 		static public const SpineboyJson : Class;
 		private var skeleton : SkeletonAnimation;
 

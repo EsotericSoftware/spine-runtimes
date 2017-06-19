@@ -43,7 +43,7 @@
 	self = [super init];
 	if (!self) return nil;
 
-	skeletonNode = [SkeletonAnimation skeletonWithFile:@"spineboy.json" atlasFile:@"spineboy.atlas" scale:0.4];
+	skeletonNode = [SkeletonAnimation skeletonWithFile:@"spineboy-ess.json" atlasFile:@"spineboy.atlas" scale:0.4];
 	[skeletonNode setMixFrom:@"walk" to:@"jump" duration:0.2f];
 	[skeletonNode setMixFrom:@"jump" to:@"run" duration:0.2f];
 

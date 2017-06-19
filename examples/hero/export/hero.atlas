@@ -130,14 +130,14 @@ thigh2
   orig: 57, 64
   offset: 0, 0
   index: -1
-upperarm1
+upper-arm1
   rotate: true
   xy: 749, 197
   size: 50, 56
   orig: 50, 56
   offset: 0, 0
   index: -1
-upperarm2
+upper-arm2
   rotate: true
   xy: 688, 208
   size: 39, 59

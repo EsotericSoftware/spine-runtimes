@@ -4,14 +4,14 @@ size: 1024,256
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
-back arm
+back-arm
   rotate: true
   xy: 679, 173
   size: 72, 202
   orig: 72, 202
   offset: 0, 0
   index: -1
-back leg
+back-leg
   rotate: true
   xy: 2, 2
   size: 100, 318
@@ -25,7 +25,7 @@ body
   orig: 141, 452
   offset: 0, 0
   index: -1
-front arm
+front-arm
   rotate: true
   xy: 456, 100
   size: 145, 221

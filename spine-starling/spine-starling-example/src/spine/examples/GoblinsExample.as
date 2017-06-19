@@ -47,7 +47,7 @@ package spine.examples {
 	import starling.textures.TextureAtlas;
 
 	public class GoblinsExample extends Sprite {
-		[Embed(source = "/goblins-mesh.json", mimeType = "application/octet-stream")]
+		[Embed(source = "/goblins-pro.json", mimeType = "application/octet-stream")]
 		static public const GoblinsJson : Class;
 
 		[Embed(source = "/goblins.atlas", mimeType = "application/octet-stream")]
