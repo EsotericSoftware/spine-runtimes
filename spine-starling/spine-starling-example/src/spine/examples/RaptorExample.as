@@ -44,7 +44,7 @@ package spine.examples {
 	import starling.events.TouchPhase;
 
 	public class RaptorExample extends Sprite {
-		[Embed(source = "/raptor.json", mimeType = "application/octet-stream")]
+		[Embed(source = "/raptor-pro.json", mimeType = "application/octet-stream")]
 		static public const RaptorJson : Class;
 
 		[Embed(source = "/raptor.atlas", mimeType = "application/octet-stream")]
@@ -88,7 +88,7 @@ package spine.examples {
 					if (gunGrabbed)
 						skeleton.skeleton.setToSetupPose();
 					else
-						skeleton.state.setAnimationByName(1, "gungrab", false);
+						skeleton.state.setAnimationByName(1, "gun-grab", false);
 					gunGrabbed = !gunGrabbed;
 					gunGrabCount++;
 				} else {

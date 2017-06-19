@@ -46,7 +46,7 @@ package spine.examples {
 	import starling.events.TouchPhase;
 
 	public class SpineboyExample extends Sprite {
-		[Embed(source = "/spineboy.json", mimeType = "application/octet-stream")]
+		[Embed(source = "/spineboy-ess.json", mimeType = "application/octet-stream")]
 		static public const SpineboyJson : Class;
 
 		[Embed(source = "/spineboy.atlas", mimeType = "application/octet-stream")]

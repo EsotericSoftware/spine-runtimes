@@ -43,7 +43,7 @@
 	self = [super init];
 	if (!self) return nil;
 
-	skeletonNode = [SkeletonAnimation skeletonWithFile:@"coin.json" atlasFile:@"coin.atlas" scale:0.5];
+	skeletonNode = [SkeletonAnimation skeletonWithFile:@"coin-pro.json" atlasFile:@"coin.atlas" scale:0.5];
 
     __weak SkeletonAnimation* node = skeletonNode;
 	skeletonNode.twoColorTint = false;
