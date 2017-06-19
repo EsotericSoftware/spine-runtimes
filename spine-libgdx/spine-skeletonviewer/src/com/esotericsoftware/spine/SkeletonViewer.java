@@ -90,6 +90,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 	static final float checkModifiedInterval = 0.250f;
 	static final float reloadDelay = 1;
 	static float uiScale = 1;
+	static String[] atlasSuffixes = {".atlas", ".atlas.txt", "-pro.atlas", "-pro.atlas.txt", "-ess.atlas", "-ess.atlas.txt"};
 
 	UI ui;
 
@@ -143,7 +144,14 @@ public class SkeletonViewer extends ApplicationAdapter {
 			String atlasFileName = skeletonFile.nameWithoutExtension();
 			if (atlasFileName.endsWith(".json")) atlasFileName = new FileHandle(atlasFileName).nameWithoutExtension();
 			FileHandle atlasFile = skeletonFile.sibling(atlasFileName + ".atlas");
-			if (!atlasFile.exists()) atlasFile = skeletonFile.sibling(atlasFileName + ".atlas.txt");
+			if (!atlasFile.exists()) {
+				if (atlasFileName.endsWith("-pro") || atlasFileName.endsWith("-ess"))
+					atlasFileName = atlasFileName.substring(0, atlasFileName.length() - 4);
+				for (String suffix : atlasSuffixes) {
+					atlasFile = skeletonFile.sibling(atlasFileName + suffix);
+					if (atlasFile.exists()) break;
+				}
+			}
 			TextureAtlasData data = !atlasFile.exists() ? null : new TextureAtlasData(atlasFile, atlasFile.parent(), false);
 			TextureAtlas atlas = new TextureAtlas(data) {
 				public AtlasRegion findRegion (String name) {
@@ -188,6 +196,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		state = new AnimationState(new AnimationStateData(skeletonData));
 		state.addListener(new AnimationStateAdapter() {
+
 			public void event (TrackEntry entry, Event event) {
 				ui.toast(event.getData().getName());
 			}
