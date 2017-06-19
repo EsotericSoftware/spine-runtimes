@@ -36,6 +36,9 @@ using System.Collections.Generic;
 namespace Spine.Unity {
 	[RequireComponent(typeof(Animator))]
 	public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
+		
+		[SerializeField] protected MecanimTranslator translator;
+		public MecanimTranslator Translator { get { return translator; } }
 
 		#region Bone Callbacks (ISkeletonAnimation)
 		protected event UpdateBonesDelegate _UpdateLocal;
@@ -60,9 +63,35 @@ namespace Spine.Unity {
 		public event UpdateBonesDelegate UpdateComplete { add { _UpdateComplete += value; } remove { _UpdateComplete -= value; } }
 		#endregion
 
-		public bool AutoReset {
-			get { return mecanimTranslator.autoReset; }
-			set { mecanimTranslator.autoReset = value; }
+		public override void Initialize (bool overwrite) {
+			if (valid && !overwrite) return;
+			base.Initialize(overwrite);
+			if (!valid) return;
+
+			if (translator == null) translator = new MecanimTranslator();
+			translator.Initialize(GetComponent<Animator>(), this.skeletonDataAsset);
+		}
+
+		public void Update () {
+			if (!valid) return;
+
+			translator.Apply(skeleton);
+
+			// UpdateWorldTransform and Bone Callbacks
+			{
+				if (_UpdateLocal != null)
+					_UpdateLocal(this);
+
+				skeleton.UpdateWorldTransform();
+
+				if (_UpdateWorld != null) {
+					_UpdateWorld(this);
+					skeleton.UpdateWorldTransform();
+				}
+
+				if (_UpdateComplete != null)
+					_UpdateComplete(this);	
+			}
 		}
 
 		[System.Serializable]
@@ -79,6 +108,8 @@ namespace Spine.Unity {
 			readonly List<Animation> previousAnimations = new List<Animation>();
 			Animator animator;
 
+			public Animator Animator { get { return this.animator; } }
+
 			public void Initialize (Animator animator, SkeletonDataAsset skeletonDataAsset) {
 				this.animator = animator;
 				animationTable.Clear();
@@ -92,7 +123,7 @@ namespace Spine.Unity {
 
 				if (layerMixModes.Length < animator.layerCount)
 					System.Array.Resize<MixMode>(ref layerMixModes, animator.layerCount);
-				
+
 				//skeleton.Update(Time.deltaTime); // Doesn't actually do anything, currently. (Spine 3.6).
 
 				// Clear Previous
@@ -214,37 +245,5 @@ namespace Spine.Unity {
 			}
 		}
 
-		public MecanimTranslator mecanimTranslator;
-
-		public override void Initialize (bool overwrite) {
-			if (valid && !overwrite) return;
-			base.Initialize(overwrite);
-			if (!valid) return;
-
-			mecanimTranslator = mecanimTranslator ?? new MecanimTranslator();
-			mecanimTranslator.Initialize(GetComponent<Animator>(), this.skeletonDataAsset);
-		}
-
-		public void Update () {
-			if (!valid) return;
-
-			mecanimTranslator.Apply(skeleton);
-
-			// UpdateWorldTransform and Bone Callbacks
-			{
-				if (_UpdateLocal != null)
-					_UpdateLocal(this);
-
-				skeleton.UpdateWorldTransform();
-
-				if (_UpdateWorld != null) {
-					_UpdateWorld(this);
-					skeleton.UpdateWorldTransform();
-				}
-
-				if (_UpdateComplete != null)
-					_UpdateComplete(this);	
-			}
-		}
 	}
 }

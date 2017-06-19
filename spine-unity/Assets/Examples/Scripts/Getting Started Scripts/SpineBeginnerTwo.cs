@@ -55,6 +55,8 @@ namespace Spine.Unity.Examples {
 
 		[SpineAnimation]
 		public string runToIdleAnimationName;
+
+		public float runWalkDuration = 1.5f;
 		#endregion
 
 		SkeletonAnimation skeletonAnimation;
@@ -81,10 +83,10 @@ namespace Spine.Unity.Examples {
 				// Common Mistake: If you keep calling it in Update, it will keep showing the first pose of the animation, do don't do that.
 
 				spineAnimationState.SetAnimation(0, walkAnimationName, true);
-				yield return new WaitForSeconds(1.5f);
+				yield return new WaitForSeconds(runWalkDuration);
 
 				spineAnimationState.SetAnimation(0, runAnimationName, true);
-				yield return new WaitForSeconds(1.5f);
+				yield return new WaitForSeconds(runWalkDuration);
 
 				// AddAnimation queues up an animation to play after the previous one ends.
 				spineAnimationState.SetAnimation(0, runToIdleAnimationName, false);

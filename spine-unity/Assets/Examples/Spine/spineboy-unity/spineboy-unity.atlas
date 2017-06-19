@@ -1,0 +1,195 @@
+
+spineboy-unity.png
+size: 2048,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+eye_indifferent
+  rotate: false
+  xy: 652, 113
+  size: 93, 89
+  orig: 93, 89
+  offset: 0, 0
+  index: -1
+eye_surprised
+  rotate: false
+  xy: 747, 118
+  size: 93, 89
+  orig: 93, 89
+  offset: 0, 0
+  index: -1
+front_bracer
+  rotate: true
+  xy: 919, 276
+  size: 58, 80
+  orig: 58, 80
+  offset: 0, 0
+  index: -1
+front_fist_closed
+  rotate: false
+  xy: 1762, 420
+  size: 75, 82
+  orig: 75, 82
+  offset: 0, 0
+  index: -1
+front_fist_open
+  rotate: true
+  xy: 1673, 416
+  size: 86, 87
+  orig: 86, 87
+  offset: 0, 0
+  index: -1
+front_foot
+  rotate: false
+  xy: 1324, 433
+  size: 126, 69
+  orig: 126, 69
+  offset: 0, 0
+  index: -1
+front_foot_bend1
+  rotate: false
+  xy: 184, 30
+  size: 128, 70
+  orig: 128, 70
+  offset: 0, 0
+  index: -1
+front_foot_bend2
+  rotate: false
+  xy: 1214, 409
+  size: 108, 93
+  orig: 108, 93
+  offset: 0, 0
+  index: -1
+front_shin
+  rotate: true
+  xy: 466, 120
+  size: 82, 184
+  orig: 82, 184
+  offset: 0, 0
+  index: -1
+front_thigh
+  rotate: true
+  xy: 739, 209
+  size: 48, 112
+  orig: 48, 112
+  offset: 0, 0
+  index: -1
+front_upper_arm
+  rotate: true
+  xy: 1214, 268
+  size: 54, 97
+  orig: 54, 97
+  offset: 0, 0
+  index: -1
+goggles
+  rotate: false
+  xy: 739, 336
+  size: 261, 166
+  orig: 261, 166
+  offset: 0, 0
+  index: -1
+gun
+  rotate: false
+  xy: 1002, 299
+  size: 210, 203
+  orig: 210, 203
+  offset: 0, 0
+  index: -1
+head
+  rotate: false
+  xy: 466, 204
+  size: 271, 298
+  orig: 271, 298
+  offset: 0, 0
+  index: -1
+mouth_grind
+  rotate: false
+  xy: 1839, 443
+  size: 93, 59
+  orig: 93, 59
+  offset: 0, 0
+  index: -1
+mouth_oooo
+  rotate: false
+  xy: 1934, 443
+  size: 93, 59
+  orig: 93, 59
+  offset: 0, 0
+  index: -1
+mouth_smile
+  rotate: false
+  xy: 1324, 372
+  size: 93, 59
+  orig: 93, 59
+  offset: 0, 0
+  index: -1
+muzzle
+  rotate: false
+  xy: 2, 102
+  size: 462, 400
+  orig: 462, 400
+  offset: 0, 0
+  index: -1
+neck
+  rotate: false
+  xy: 853, 216
+  size: 36, 41
+  orig: 36, 41
+  offset: 0, 0
+  index: -1
+rear_bracer
+  rotate: true
+  xy: 1313, 265
+  size: 56, 72
+  orig: 56, 72
+  offset: 0, 0
+  index: -1
+rear_foot
+  rotate: false
+  xy: 1452, 442
+  size: 113, 60
+  orig: 113, 60
+  offset: 0, 0
+  index: -1
+rear_foot_bend1
+  rotate: false
+  xy: 314, 34
+  size: 117, 66
+  orig: 117, 66
+  offset: 0, 0
+  index: -1
+rear_foot_bend2
+  rotate: false
+  xy: 1214, 324
+  size: 103, 83
+  orig: 103, 83
+  offset: 0, 0
+  index: -1
+rear_shin
+  rotate: true
+  xy: 739, 259
+  size: 75, 178
+  orig: 75, 178
+  offset: 0, 0
+  index: -1
+rear_thigh
+  rotate: true
+  xy: 1567, 437
+  size: 65, 104
+  orig: 65, 104
+  offset: 0, 0
+  index: -1
+rear_upper_arm
+  rotate: true
+  xy: 1319, 323
+  size: 47, 87
+  orig: 47, 87
+  offset: 0, 0
+  index: -1
+torso
+  rotate: true
+  xy: 2, 2
+  size: 98, 180
+  orig: 98, 180
+  offset: 0, 0
+  index: -1

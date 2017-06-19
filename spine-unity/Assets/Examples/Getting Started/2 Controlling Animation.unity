@@ -405,6 +405,7 @@ MonoBehaviour:
   shootAnimationName: shoot
   idleTurnAnimationName: idle-turn
   runToIdleAnimationName: run-to-idle
+  runWalkDuration: 1.5
 --- !u!1 &926099111
 GameObject:
   m_ObjectHideFlags: 0
