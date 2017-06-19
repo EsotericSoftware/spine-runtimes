@@ -305,10 +305,8 @@ public class SkeletonRenderer {
 					float oldScaleY = rootBone.getScaleY();
 					float oldRotation = rootBone.getRotation();
 					attachmentSkeleton.setPosition(bone.getWorldX(), bone.getWorldY());
-					// rootBone.setScaleX(1 + bone.getWorldScaleX() -
-					// oldScaleX);
-					// rootBone.setScaleY(1 + bone.getWorldScaleY() -
-					// oldScaleY);
+					// rootBone.setScaleX(1 + bone.getWorldScaleX() - oldScaleX);
+					// rootBone.setScaleY(1 + bone.getWorldScaleY() - oldScaleY);
 					// Also set shear.
 					rootBone.setRotation(oldRotation + bone.getWorldRotationX());
 					attachmentSkeleton.updateWorldTransform();

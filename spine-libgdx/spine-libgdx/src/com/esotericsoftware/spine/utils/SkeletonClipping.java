@@ -49,9 +49,10 @@ public class SkeletonClipping {
 
 	public int clipStart (Slot slot, ClippingAttachment clip) {
 		if (clipAttachment != null) return 0;
+		int n = clip.getWorldVerticesLength();
+		if (n < 6) return 0;
 		clipAttachment = clip;
 
-		int n = clip.getWorldVerticesLength();
 		float[] vertices = clippingPolygon.setSize(n);
 		clip.computeWorldVertices(slot, 0, n, vertices, 0, 2);
 		makeClockwise(clippingPolygon);
