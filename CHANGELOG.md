@@ -96,6 +96,7 @@
    * **Two color tinting** is currently supported via extra UV2 and UV3 mesh vertex streams. To use Two color tinting, you need to:
      * switch on "Tint Black" under "Advanced...",
      * use the new `Spine/Skeleton Tint Black` shader, or your own shader that treats the UV2 and UV3 streams similarly.
+     * Additionally, for SkeletonGraphic, you can use `Spine/SkeletonGraphic Tint Black` (or the bundled SkeletonGraphicTintBlack material) or your own shader that uses UV2 and UV3 streams similarly. **Additional Shader Channels** TexCoord1 and TexCoord2 will need to be enabled from the Canvas component's inspector. These correspond to UV2 and UV3. 
    * **Clipping** is now supported. Caution: The SkeletonAnimation switches to slightly slower mesh generation code when clipping so limit your use of `ClippingAttachment`s when using on large numbers of skeletons.
  * **SkeletonRenderer.initialFlip** Spine components such as SkeletonRenderer, SkeletonAnimation, SkeletonAnimator now has `initialFlipX` and `initialFlipY` fields which are also visible in the inspector under "Advanced...". It will allow you to set and preview a starting flip value for your skeleton component. This is applied immediately when the internal skeleton object is instantiated. 
  * **[SpineAttribute] Improvements** 
