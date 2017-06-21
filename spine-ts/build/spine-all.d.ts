@@ -1699,6 +1699,10 @@ declare module spine.threejs {
 }
 declare module spine.threejs {
 	class SkeletonMesh extends THREE.Mesh {
+		tempPos: Vector2;
+		tempUv: Vector2;
+		tempLight: Color;
+		tempDark: Color;
 		skeleton: Skeleton;
 		state: AnimationState;
 		zOffset: number;
