@@ -1,6 +1,7 @@
 
 package com.esotericsoftware.spine.vertexeffects;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -22,15 +23,15 @@ public class SwirlEffect implements VertexEffect {
 		worldY = skeleton.getY() + centerY;
 	}
 
-	public void transform (Vector2 vertex) {
-		float x = vertex.x - worldX;
-		float y = vertex.y - worldY;
+	public void transform (Vector2 position, Vector2 uv, Color light, Color dark) {
+		float x = position.x - worldX;
+		float y = position.y - worldY;
 		float dist = (float)Math.sqrt(x * x + y * y);
 		if (dist < radius) {
 			float theta = interpolation.apply(0, angle, (radius - dist) / radius);
 			float cos = SpineUtils.cos(theta), sin = SpineUtils.sin(theta);
-			vertex.x = cos * x - sin * y + worldX;
-			vertex.y = sin * x + cos * y + worldY;
+			position.x = cos * x - sin * y + worldX;
+			position.y = sin * x + cos * y + worldY;
 		}
 	}
 

@@ -55,6 +55,11 @@ public class SkeletonRenderer {
 	private final SkeletonClipping clipper = new SkeletonClipping();
 	private VertexEffect vertexEffect;
 	private final Vector2 temp = new Vector2();
+	private final Vector2 temp2 = new Vector2();
+	private final Color temp3 = new Color();
+	private final Color temp4 = new Color();
+	private final Color temp5 = new Color();
+	private final Color temp6 = new Color();
 
 	public void draw (Batch batch, Skeleton skeleton) {
 		VertexEffect vertexEffect = this.vertexEffect;
@@ -84,7 +89,7 @@ public class SkeletonRenderer {
 					vertices[v + 2] = uvs[u + 1];
 				}
 
-				if (vertexEffect != null) applyVertexEffect(vertices, 20, 5);
+				if (vertexEffect != null) applyVertexEffect(vertices, 20, 5, c, 0);
 
 				BlendMode blendMode = slot.data.getBlendMode();
 				batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
@@ -132,7 +137,12 @@ public class SkeletonRenderer {
 
 	@SuppressWarnings("null")
 	public void draw (PolygonSpriteBatch batch, Skeleton skeleton) {
-		Vector2 temp = this.temp;
+		Vector2 tempPos = this.temp;
+		Vector2 tempUv = this.temp2;
+		Color tempLight = this.temp3;
+		Color tempDark = this.temp4;
+		Color temp5 = this.temp5;
+		Color temp6 = this.temp6;
 		VertexEffect vertexEffect = this.vertexEffect;
 		if (vertexEffect != null) vertexEffect.begin(skeleton);
 
@@ -219,20 +229,26 @@ public class SkeletonRenderer {
 					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, c, 0, false);
 					FloatArray clippedVertices = clipper.getClippedVertices();
 					ShortArray clippedTriangles = clipper.getClippedTriangles();
-					if (vertexEffect != null) applyVertexEffect(clippedVertices.items, clippedVertices.size, 5);
+					if (vertexEffect != null) applyVertexEffect(clippedVertices.items, clippedVertices.size, 5, c, 0);
 					batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,
 						clippedTriangles.size);
 				} else {
 					if (vertexEffect != null) {
+						temp5.set(NumberUtils.floatToIntColor(c));
+						temp6.set(0);
 						for (int v = 0, u = 0; v < verticesLength; v += 5, u += 2) {
-							temp.x = vertices[v];
-							temp.y = vertices[v + 1];
-							vertexEffect.transform(temp);
-							vertices[v] = temp.x;
-							vertices[v + 1] = temp.y;
-							vertices[v + 2] = c;
-							vertices[v + 3] = uvs[u];
-							vertices[v + 4] = uvs[u + 1];
+							tempPos.x = vertices[v];
+							tempPos.y = vertices[v + 1];
+							tempLight.set(temp5);
+							tempDark.set(temp6);
+							tempUv.x = uvs[u];
+							tempUv.y = uvs[u + 1];							
+							vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
+							vertices[v] = tempPos.x;
+							vertices[v + 1] = tempPos.y;
+							vertices[v + 2] = tempLight.toFloatBits();
+							vertices[v + 3] = tempUv.x;
+							vertices[v + 4] = tempUv.y;
 						}
 					} else {
 						for (int v = 2, u = 0; v < verticesLength; v += 5, u += 2) {
@@ -253,7 +269,12 @@ public class SkeletonRenderer {
 
 	@SuppressWarnings("null")
 	public void draw (TwoColorPolygonBatch batch, Skeleton skeleton) {
-		Vector2 temp = this.temp;
+		Vector2 tempPos = this.temp;
+		Vector2 tempUv = this.temp2;
+		Color tempLight = this.temp3;
+		Color tempDark = this.temp4;
+		Color temp5 = this.temp5;
+		Color temp6 = this.temp6;
 		VertexEffect vertexEffect = this.vertexEffect;
 		if (vertexEffect != null) vertexEffect.begin(skeleton);
 
@@ -344,21 +365,27 @@ public class SkeletonRenderer {
 					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, light, dark, true);
 					FloatArray clippedVertices = clipper.getClippedVertices();
 					ShortArray clippedTriangles = clipper.getClippedTriangles();
-					if (vertexEffect != null) applyVertexEffect(clippedVertices.items, clippedVertices.size, 6);
+					if (vertexEffect != null) applyVertexEffect(clippedVertices.items, clippedVertices.size, 6, light, dark);
 					batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,
 						clippedTriangles.size);
 				} else {
 					if (vertexEffect != null) {
+						temp5.set(NumberUtils.floatToIntColor(light));
+						temp6.set(NumberUtils.floatToIntColor(dark));
 						for (int v = 0, u = 0; v < verticesLength; v += 6, u += 2) {
-							temp.x = vertices[v];
-							temp.y = vertices[v + 1];
-							vertexEffect.transform(temp);
-							vertices[v] = temp.x;
-							vertices[v + 1] = temp.y;
-							vertices[v + 2] = light;
-							vertices[v + 3] = dark;
-							vertices[v + 4] = uvs[u];
-							vertices[v + 5] = uvs[u + 1];
+							tempPos.x = vertices[v];
+							tempPos.y = vertices[v + 1];
+							tempLight.set(temp5);
+							tempDark.set(temp6);
+							tempUv.x = uvs[u];
+							tempUv.y = uvs[u + 1];				
+							vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
+							vertices[v] = tempPos.x;
+							vertices[v + 1] = tempPos.y;
+							vertices[v + 2] = tempLight.toFloatBits();
+							vertices[v + 3] = tempDark.toFloatBits();
+							vertices[v + 4] = tempUv.x;
+							vertices[v + 5] = tempUv.y;
 						}
 					} else {
 						for (int v = 2, u = 0; v < verticesLength; v += 6, u += 2) {
@@ -378,15 +405,47 @@ public class SkeletonRenderer {
 		if (vertexEffect != null) vertexEffect.end();
 	}
 
-	private void applyVertexEffect (float[] vertices, int verticesLength, int stride) {
+	private void applyVertexEffect (float[] vertices, int verticesLength, int stride, float light, float dark) {
+		Vector2 tempPos = this.temp;
+		Vector2 tempUv = this.temp2;
+		Color tempLight = this.temp3;
+		Color tempDark = this.temp4;
+		Color temp5 = this.temp5;
+		Color temp6 = this.temp6;
 		VertexEffect vertexEffect = this.vertexEffect;
-		Vector2 temp = this.temp;
-		for (int v = 0; v < verticesLength; v += stride) {
-			temp.x = vertices[v];
-			temp.y = vertices[v + 1];
-			vertexEffect.transform(temp);
-			vertices[v] = temp.x;
-			vertices[v + 1] = temp.y;
+		temp5.set(NumberUtils.floatToIntColor(light));
+		temp6.set(NumberUtils.floatToIntColor(dark));
+		if (stride == 5) {
+			for (int v = 0; v < verticesLength; v += stride) {
+				tempPos.x = vertices[v];
+				tempPos.y = vertices[v + 1];
+				tempUv.x = vertices[v + 3];
+				tempUv.y = vertices[v + 4];
+				tempLight.set(temp5);
+				tempDark.set(temp6);
+				vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
+				vertices[v] = tempPos.x;
+				vertices[v + 1] = tempPos.y;
+				vertices[v + 2] = tempLight.toFloatBits();
+				vertices[v + 3] = tempUv.x;
+				vertices[v + 4] = tempUv.y;
+			}
+		} else {
+			for (int v = 0; v < verticesLength; v += stride) {
+				tempPos.x = vertices[v];
+				tempPos.y = vertices[v + 1];
+				tempUv.x = vertices[v + 4];
+				tempUv.y = vertices[v + 5];
+				tempLight.set(temp5);
+				tempDark.set(temp6);
+				vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
+				vertices[v] = tempPos.x;
+				vertices[v + 1] = tempPos.y;
+				vertices[v + 2] = tempLight.toFloatBits();
+				vertices[v + 3] = tempDark.toFloatBits();
+				vertices[v + 4] = tempUv.x;
+				vertices[v + 5] = tempUv.y;
+			}
 		}
 	}
 
@@ -409,7 +468,7 @@ public class SkeletonRenderer {
 	static public interface VertexEffect {
 		public void begin (Skeleton skeleton);
 
-		public void transform (Vector2 vertex);
+		public void transform (Vector2 position, Vector2 uv, Color color, Color darkColor);
 
 		public void end ();
 	}
