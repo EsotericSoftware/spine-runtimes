@@ -30,7 +30,7 @@
 
 module spine {
 	export class SwirlEffect implements VertexEffect {
-
+		static interpolation = new PowOut(2);
 		centerX = 0;
 		centerY = 0;
 		radius = 0;
@@ -53,7 +53,7 @@ module spine {
 			let y = position.y - this.worldY;
 			let dist = Math.sqrt(x * x + y * y);
 			if (dist < this.radius) {
-				let theta = radAngle * (Math.pow(((this.radius - dist) / this.radius) - 1, 2) * (2 % 2 == 0 ? -1 : 1) + 1);
+				let theta = SwirlEffect.interpolation.apply(0, radAngle, (this.radius - dist) / this.radius);
 				let cos = Math.cos(theta);
 				let sin = Math.sin(theta);
 				position.x = cos * x - sin * y + this.worldX;

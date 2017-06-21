@@ -12,7 +12,7 @@
 </body>
 <script>
 
-var FILE = "raptor";
+var FILE = "raptor-pro";
 var ANIMATION = "walk";
 var NUM_SKELETONS = 1;
 var SCALE = 0.5;
@@ -23,6 +23,9 @@ var timeKeeper;
 var label = document.getElementById("label");
 var updateMean = new spine.WindowedMean();
 var renderMean = new spine.WindowedMean();
+var swirlEffect = new spine.SwirlEffect();
+var swirlTime = 0;
+var interpolation = new spine.Pow(2);
 
 function init() {
 	canvas = document.getElementById("canvas");
@@ -36,13 +39,18 @@ function init() {
 	renderer.skeletonDebugRenderer.drawMeshHull = false;
 	renderer.skeletonDebugRenderer.drawRegionAttachments = false;
 	renderer.skeletonDebugRenderer.drawBoundingBoxes = false;
+	renderer.skeletonRenderer.vertexEffect = swirlEffect;
+
+	swirlEffect.centerX = 0;
+	swirlEffect.centerY = 200;
+	swirlEffect.radius = 500;
 
 	assetManager = new spine.webgl.AssetManager(context, "assets/");
 	var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
 	input = new spine.webgl.Input(canvas);
 
-	assetManager.loadTexture(FILE + ".png");
-	assetManager.loadText(FILE + ".atlas");
+	assetManager.loadTexture(FILE.replace("-pro", "").replace("-oss", "") + ".png");
+	assetManager.loadText(FILE.replace("-pro", "").replace("-oss", "") + ".atlas");
 	assetManager.loadText(FILE + ".json");
 
 	timeKeeper = new spine.TimeKeeper();
@@ -52,7 +60,7 @@ function init() {
 function load() {
 	timeKeeper.update();
 	if (assetManager.isLoadingComplete()) {
-		var atlas = new spine.TextureAtlas(assetManager.get(FILE + ".atlas"), function(path) {
+		var atlas = new spine.TextureAtlas(assetManager.get(FILE.replace("-pro", "").replace("-oss", "") + ".atlas"), function(path) {
 			return assetManager.get(path);
 		});
 		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
@@ -88,6 +96,11 @@ function render() {
 	timeKeeper.update();
 	var delta = timeKeeper.delta;
 	delta = 0.016;
+
+	swirlTime += delta;
+	var percent = swirlTime % 2;
+	if (percent > 1) percent = 1 - (percent - 1);
+	swirlEffect.angle = interpolation.apply(-60, 60, percent);
 
 	for (var i = 0; i < skeletons.length; i++) {
 		var state = skeletons[i].state;

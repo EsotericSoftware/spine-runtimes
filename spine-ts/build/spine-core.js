@@ -5747,6 +5747,16 @@ var spine;
 			var y = Math.pow(Math.abs(x), 1 / 3);
 			return x < 0 ? -y : y;
 		};
+		MathUtils.randomTriangular = function (min, max) {
+			return MathUtils.randomTriangularWith(min, max, (min + max) * 0.5);
+		};
+		MathUtils.randomTriangularWith = function (min, max, mode) {
+			var u = Math.random();
+			var d = max - min;
+			if (u <= (mode - min) / d)
+				return min + Math.sqrt(u * d * (mode - min));
+			return max - Math.sqrt((1 - u) * d * (max - mode));
+		};
 		return MathUtils;
 	}());
 	MathUtils.PI = 3.1415927;
@@ -5756,6 +5766,42 @@ var spine;
 	MathUtils.degreesToRadians = MathUtils.PI / 180;
 	MathUtils.degRad = MathUtils.degreesToRadians;
 	spine.MathUtils = MathUtils;
+	var Interpolation = (function () {
+		function Interpolation() {
+		}
+		Interpolation.prototype.apply = function (start, end, a) {
+			return start + (end - start) * this.applyInternal(a);
+		};
+		return Interpolation;
+	}());
+	spine.Interpolation = Interpolation;
+	var Pow = (function (_super) {
+		__extends(Pow, _super);
+		function Pow(power) {
+			var _this = _super.call(this) || this;
+			_this.power = 2;
+			_this.power = power;
+			return _this;
+		}
+		Pow.prototype.applyInternal = function (a) {
+			if (a <= 0.5)
+				return Math.pow(a * 2, this.power) / 2;
+			return Math.pow((a - 1) * 2, this.power) / (this.power % 2 == 0 ? -2 : 2) + 1;
+		};
+		return Pow;
+	}(Interpolation));
+	spine.Pow = Pow;
+	var PowOut = (function (_super) {
+		__extends(PowOut, _super);
+		function PowOut(power) {
+			return _super.call(this, power) || this;
+		}
+		PowOut.prototype.applyInternal = function (a) {
+			return Math.pow(a - 1, this.power) * (this.power % 2 == 0 ? -1 : 1) + 1;
+		};
+		return PowOut;
+	}(Pow));
+	spine.PowOut = PowOut;
 	var Utils = (function () {
 		function Utils() {
 		}
@@ -6315,5 +6361,62 @@ var spine;
 	RegionAttachment.U4 = 30;
 	RegionAttachment.V4 = 31;
 	spine.RegionAttachment = RegionAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var JitterEffect = (function () {
+		function JitterEffect(jitterX, jitterY) {
+			this.jitterX = 0;
+			this.jitterY = 0;
+			this.jitterX = jitterX;
+			this.jitterY = jitterY;
+		}
+		JitterEffect.prototype.begin = function (skeleton) {
+		};
+		JitterEffect.prototype.transform = function (position, uv, light, dark) {
+			position.x += spine.MathUtils.randomTriangular(-this.jitterX, this.jitterY);
+			position.y += spine.MathUtils.randomTriangular(-this.jitterX, this.jitterY);
+		};
+		JitterEffect.prototype.end = function () {
+		};
+		return JitterEffect;
+	}());
+	spine.JitterEffect = JitterEffect;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var SwirlEffect = (function () {
+		function SwirlEffect(radius) {
+			this.centerX = 0;
+			this.centerY = 0;
+			this.radius = 0;
+			this.angle = 0;
+			this.worldX = 0;
+			this.worldY = 0;
+			this.radius = radius;
+		}
+		SwirlEffect.prototype.begin = function (skeleton) {
+			this.worldX = skeleton.x + this.centerX;
+			this.worldY = skeleton.y + this.centerY;
+		};
+		SwirlEffect.prototype.transform = function (position, uv, light, dark) {
+			var radAngle = this.angle * spine.MathUtils.degreesToRadians;
+			var x = position.x - this.worldX;
+			var y = position.y - this.worldY;
+			var dist = Math.sqrt(x * x + y * y);
+			if (dist < this.radius) {
+				var theta = SwirlEffect.interpolation.apply(0, radAngle, (this.radius - dist) / this.radius);
+				var cos = Math.cos(theta);
+				var sin = Math.sin(theta);
+				position.x = cos * x - sin * y + this.worldX;
+				position.y = sin * x + cos * y + this.worldY;
+			}
+		};
+		SwirlEffect.prototype.end = function () {
+		};
+		return SwirlEffect;
+	}());
+	SwirlEffect.interpolation = new spine.PowOut(2);
+	spine.SwirlEffect = SwirlEffect;
 })(spine || (spine = {}));
 //# sourceMappingURL=spine-core.js.map

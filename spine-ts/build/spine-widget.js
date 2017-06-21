@@ -5747,6 +5747,16 @@ var spine;
 			var y = Math.pow(Math.abs(x), 1 / 3);
 			return x < 0 ? -y : y;
 		};
+		MathUtils.randomTriangular = function (min, max) {
+			return MathUtils.randomTriangularWith(min, max, (min + max) * 0.5);
+		};
+		MathUtils.randomTriangularWith = function (min, max, mode) {
+			var u = Math.random();
+			var d = max - min;
+			if (u <= (mode - min) / d)
+				return min + Math.sqrt(u * d * (mode - min));
+			return max - Math.sqrt((1 - u) * d * (max - mode));
+		};
 		return MathUtils;
 	}());
 	MathUtils.PI = 3.1415927;
@@ -5756,6 +5766,42 @@ var spine;
 	MathUtils.degreesToRadians = MathUtils.PI / 180;
 	MathUtils.degRad = MathUtils.degreesToRadians;
 	spine.MathUtils = MathUtils;
+	var Interpolation = (function () {
+		function Interpolation() {
+		}
+		Interpolation.prototype.apply = function (start, end, a) {
+			return start + (end - start) * this.applyInternal(a);
+		};
+		return Interpolation;
+	}());
+	spine.Interpolation = Interpolation;
+	var Pow = (function (_super) {
+		__extends(Pow, _super);
+		function Pow(power) {
+			var _this = _super.call(this) || this;
+			_this.power = 2;
+			_this.power = power;
+			return _this;
+		}
+		Pow.prototype.applyInternal = function (a) {
+			if (a <= 0.5)
+				return Math.pow(a * 2, this.power) / 2;
+			return Math.pow((a - 1) * 2, this.power) / (this.power % 2 == 0 ? -2 : 2) + 1;
+		};
+		return Pow;
+	}(Interpolation));
+	spine.Pow = Pow;
+	var PowOut = (function (_super) {
+		__extends(PowOut, _super);
+		function PowOut(power) {
+			return _super.call(this, power) || this;
+		}
+		PowOut.prototype.applyInternal = function (a) {
+			return Math.pow(a - 1, this.power) * (this.power % 2 == 0 ? -1 : 1) + 1;
+		};
+		return PowOut;
+	}(Pow));
+	spine.PowOut = PowOut;
 	var Utils = (function () {
 		function Utils() {
 		}
@@ -6315,6 +6361,63 @@ var spine;
 	RegionAttachment.U4 = 30;
 	RegionAttachment.V4 = 31;
 	spine.RegionAttachment = RegionAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var JitterEffect = (function () {
+		function JitterEffect(jitterX, jitterY) {
+			this.jitterX = 0;
+			this.jitterY = 0;
+			this.jitterX = jitterX;
+			this.jitterY = jitterY;
+		}
+		JitterEffect.prototype.begin = function (skeleton) {
+		};
+		JitterEffect.prototype.transform = function (position, uv, light, dark) {
+			position.x += spine.MathUtils.randomTriangular(-this.jitterX, this.jitterY);
+			position.y += spine.MathUtils.randomTriangular(-this.jitterX, this.jitterY);
+		};
+		JitterEffect.prototype.end = function () {
+		};
+		return JitterEffect;
+	}());
+	spine.JitterEffect = JitterEffect;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var SwirlEffect = (function () {
+		function SwirlEffect(radius) {
+			this.centerX = 0;
+			this.centerY = 0;
+			this.radius = 0;
+			this.angle = 0;
+			this.worldX = 0;
+			this.worldY = 0;
+			this.radius = radius;
+		}
+		SwirlEffect.prototype.begin = function (skeleton) {
+			this.worldX = skeleton.x + this.centerX;
+			this.worldY = skeleton.y + this.centerY;
+		};
+		SwirlEffect.prototype.transform = function (position, uv, light, dark) {
+			var radAngle = this.angle * spine.MathUtils.degreesToRadians;
+			var x = position.x - this.worldX;
+			var y = position.y - this.worldY;
+			var dist = Math.sqrt(x * x + y * y);
+			if (dist < this.radius) {
+				var theta = SwirlEffect.interpolation.apply(0, radAngle, (this.radius - dist) / this.radius);
+				var cos = Math.cos(theta);
+				var sin = Math.sin(theta);
+				position.x = cos * x - sin * y + this.worldX;
+				position.y = sin * x + cos * y + this.worldY;
+			}
+		};
+		SwirlEffect.prototype.end = function () {
+		};
+		return SwirlEffect;
+	}());
+	SwirlEffect.interpolation = new spine.PowOut(2);
+	spine.SwirlEffect = SwirlEffect;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
@@ -8420,12 +8523,17 @@ var spine;
 			function SkeletonRenderer(context, twoColorTint) {
 				if (twoColorTint === void 0) { twoColorTint = true; }
 				this.premultipliedAlpha = false;
+				this.vertexEffect = null;
 				this.tempColor = new spine.Color();
 				this.tempColor2 = new spine.Color();
 				this.vertexSize = 2 + 2 + 4;
 				this.twoColorTint = false;
 				this.renderable = new Renderable(null, 0, 0);
 				this.clipper = new spine.SkeletonClipping();
+				this.temp = new spine.Vector2();
+				this.temp2 = new spine.Vector2();
+				this.temp3 = new spine.Color();
+				this.temp4 = new spine.Color();
 				this.twoColorTint = twoColorTint;
 				if (twoColorTint)
 					this.vertexSize += 4;
@@ -8436,6 +8544,10 @@ var spine;
 				var premultipliedAlpha = this.premultipliedAlpha;
 				var twoColorTint = this.twoColorTint;
 				var blendMode = null;
+				var tempPos = this.temp;
+				var tempUv = this.temp2;
+				var tempLight = this.temp3;
+				var tempDark = this.temp4;
 				var renderable = this.renderable;
 				var uvs = null;
 				var triangles = null;
@@ -8510,28 +8622,75 @@ var spine;
 						}
 						else {
 							var verts = renderable.vertices;
-							if (!twoColorTint) {
-								for (var v = 2, u = 0, n_3 = renderable.numFloats; v < n_3; v += vertexSize, u += 2) {
-									verts[v] = finalColor.r;
-									verts[v + 1] = finalColor.g;
-									verts[v + 2] = finalColor.b;
-									verts[v + 3] = finalColor.a;
-									verts[v + 4] = uvs[u];
-									verts[v + 5] = uvs[u + 1];
+							if (this.vertexEffect != null) {
+								var vertexEffect = this.vertexEffect;
+								if (!twoColorTint) {
+									for (var v = 0, u = 0, n_3 = renderable.numFloats; v < n_3; v += vertexSize, u += 2) {
+										tempPos.x = verts[v];
+										tempPos.y = verts[v + 1];
+										tempUv.x = uvs[u];
+										tempUv.y = uvs[u + 1];
+										tempLight.setFromColor(finalColor);
+										tempDark.set(0, 0, 0, 0);
+										vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
+										verts[v] = tempPos.x;
+										verts[v + 1] = tempPos.y;
+										verts[v + 2] = tempLight.r;
+										verts[v + 3] = tempLight.g;
+										verts[v + 4] = tempLight.b;
+										verts[v + 5] = tempLight.a;
+										verts[v + 6] = tempUv.x;
+										verts[v + 7] = tempUv.y;
+									}
+								}
+								else {
+									for (var v = 0, u = 0, n_4 = renderable.numFloats; v < n_4; v += vertexSize, u += 2) {
+										tempPos.x = verts[v];
+										tempPos.y = verts[v + 1];
+										tempUv.x = uvs[u];
+										tempUv.y = uvs[u + 1];
+										tempLight.setFromColor(finalColor);
+										tempDark.setFromColor(darkColor);
+										vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
+										verts[v] = tempPos.x;
+										verts[v + 1] = tempPos.y;
+										verts[v + 2] = tempLight.r;
+										verts[v + 3] = tempLight.g;
+										verts[v + 4] = tempLight.b;
+										verts[v + 5] = tempLight.a;
+										verts[v + 6] = tempUv.x;
+										verts[v + 7] = tempUv.y;
+										verts[v + 8] = tempDark.r;
+										verts[v + 9] = tempDark.g;
+										verts[v + 10] = tempDark.b;
+										verts[v + 11] = tempDark.a;
+									}
 								}
 							}
 							else {
-								for (var v = 2, u = 0, n_4 = renderable.numFloats; v < n_4; v += vertexSize, u += 2) {
-									verts[v] = finalColor.r;
-									verts[v + 1] = finalColor.g;
-									verts[v + 2] = finalColor.b;
-									verts[v + 3] = finalColor.a;
-									verts[v + 4] = uvs[u];
-									verts[v + 5] = uvs[u + 1];
-									verts[v + 6] = darkColor.r;
-									verts[v + 7] = darkColor.g;
-									verts[v + 8] = darkColor.b;
-									verts[v + 9] = darkColor.a;
+								if (!twoColorTint) {
+									for (var v = 2, u = 0, n_5 = renderable.numFloats; v < n_5; v += vertexSize, u += 2) {
+										verts[v] = finalColor.r;
+										verts[v + 1] = finalColor.g;
+										verts[v + 2] = finalColor.b;
+										verts[v + 3] = finalColor.a;
+										verts[v + 4] = uvs[u];
+										verts[v + 5] = uvs[u + 1];
+									}
+								}
+								else {
+									for (var v = 2, u = 0, n_6 = renderable.numFloats; v < n_6; v += vertexSize, u += 2) {
+										verts[v] = finalColor.r;
+										verts[v + 1] = finalColor.g;
+										verts[v + 2] = finalColor.b;
+										verts[v + 3] = finalColor.a;
+										verts[v + 4] = uvs[u];
+										verts[v + 5] = uvs[u + 1];
+										verts[v + 6] = darkColor.r;
+										verts[v + 7] = darkColor.g;
+										verts[v + 8] = darkColor.b;
+										verts[v + 9] = darkColor.a;
+									}
 								}
 							}
 							var view = renderable.vertices.subarray(0, renderable.numFloats);
