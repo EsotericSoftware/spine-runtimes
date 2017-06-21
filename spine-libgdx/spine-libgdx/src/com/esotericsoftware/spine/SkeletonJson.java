@@ -122,6 +122,7 @@ public class SkeletonJson {
 			skeletonData.height = skeletonMap.getFloat("height", 0);
 			skeletonData.fps = skeletonMap.getFloat("fps", 30);
 			skeletonData.imagesPath = skeletonMap.getString("images", null);
+			skeletonData.audioPath = skeletonMap.getString("audio", null);
 		}
 
 		// Bones.
