@@ -156,6 +156,7 @@
  * Fixed renderer to work with 3.6 changes
  * Added support for two color tinting. Use the new `TwoColorPolygonBatch` together with `SkeletonRenderer`
  * Added support for clipping. See `SkeletonClipper`. Used automatically by `SkeletonRenderer`. Does not work when using a `SpriteBatch` with `SkeletonRenderer`. Use `PolygonSpriteBatch` or `TwoColorPolygonBatch` instead.
+ * Added `VertexEffect` interface, instances of which can be set on `SkeletonRenderer`. Allows to modify vertices before submitting them to GPU. See `SwirlEffect`, `JitterEffect` and `VertexEffectTest`.
 
 ## Lua
  * **Breaking changes**
