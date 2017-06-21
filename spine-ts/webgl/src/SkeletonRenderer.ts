@@ -37,6 +37,7 @@ module spine.webgl {
 		static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 
 		premultipliedAlpha = false;
+		vertexEffect: VertexEffect = null;
 		private tempColor = new Color();
 		private tempColor2 = new Color();
 		private vertices:ArrayLike<number>;
@@ -44,6 +45,10 @@ module spine.webgl {
 		private twoColorTint = false;
 		private renderable: Renderable = new Renderable(null, 0, 0);
 		private clipper: SkeletonClipping = new SkeletonClipping();
+		private temp = new Vector2();
+		private temp2 = new Vector2();
+		private temp3 = new Color();
+		private temp4 = new Color();
 
 		constructor (context: ManagedWebGLRenderingContext, twoColorTint: boolean = true) {
 			this.twoColorTint = twoColorTint;
@@ -57,6 +62,11 @@ module spine.webgl {
 			let premultipliedAlpha = this.premultipliedAlpha;
 			let twoColorTint = this.twoColorTint;
 			let blendMode: BlendMode = null;
+
+			let tempPos = this.temp;
+			let tempUv = this.temp2;
+			let tempLight = this.temp3;
+			let tempDark = this.temp4;
 
 			let renderable: Renderable = this.renderable;
 			let uvs: ArrayLike<number> = null;
@@ -128,27 +138,72 @@ module spine.webgl {
 						batcher.draw(texture, clippedVertices, clippedTriangles);
 					} else {
 						let verts = renderable.vertices;
-						if (!twoColorTint) {
-							for (let v = 2, u = 0, n = renderable.numFloats; v < n; v += vertexSize, u += 2) {
-								verts[v] = finalColor.r;
-								verts[v + 1] = finalColor.g;
-								verts[v + 2] = finalColor.b;
-								verts[v + 3] = finalColor.a;
-								verts[v + 4] = uvs[u];
-								verts[v + 5] = uvs[u + 1];
+						if (this.vertexEffect != null) {
+							let vertexEffect = this.vertexEffect;
+							if (!twoColorTint) {
+								for (let v = 0, u = 0, n = renderable.numFloats; v < n; v += vertexSize, u += 2) {
+									tempPos.x = verts[v];
+									tempPos.y = verts[v + 1];
+									tempUv.x = uvs[u];
+									tempUv.y = uvs[u + 1]
+									tempLight.setFromColor(finalColor);
+									tempDark.set(0, 0, 0, 0);
+									vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
+									verts[v] = tempPos.x;
+									verts[v + 1] = tempPos.y;
+									verts[v + 2] = tempLight.r;
+									verts[v + 3] = tempLight.g;
+									verts[v + 4] = tempLight.b;
+									verts[v + 5] = tempLight.a;
+									verts[v + 6] = tempUv.x;
+									verts[v + 7] = tempUv.y
+								}
+							} else {
+								for (let v = 0, u = 0, n = renderable.numFloats; v < n; v += vertexSize, u += 2) {
+									tempPos.x = verts[v];
+									tempPos.y = verts[v + 1];
+									tempUv.x = uvs[u];
+									tempUv.y = uvs[u + 1]
+									tempLight.setFromColor(finalColor);
+									tempDark.setFromColor(darkColor);
+									vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
+									verts[v] = tempPos.x;
+									verts[v + 1] = tempPos.y;
+									verts[v + 2] = tempLight.r;
+									verts[v + 3] = tempLight.g;
+									verts[v + 4] = tempLight.b;
+									verts[v + 5] = tempLight.a;
+									verts[v + 6] = tempUv.x;
+									verts[v + 7] = tempUv.y
+									verts[v + 8] = tempDark.r;
+									verts[v + 9] = tempDark.g;
+									verts[v + 10] = tempDark.b;
+									verts[v + 11] = tempDark.a;
+								}
 							}
 						} else {
-							for (let v = 2, u = 0, n = renderable.numFloats; v < n; v += vertexSize, u += 2) {
-								verts[v] = finalColor.r;
-								verts[v + 1] = finalColor.g;
-								verts[v + 2] = finalColor.b;
-								verts[v + 3] = finalColor.a;
-								verts[v + 4] = uvs[u];
-								verts[v + 5] = uvs[u + 1];
-								verts[v + 6] = darkColor.r;
-								verts[v + 7] = darkColor.g;
-								verts[v + 8] = darkColor.b;
-								verts[v + 9] = darkColor.a;
+							if (!twoColorTint) {
+								for (let v = 2, u = 0, n = renderable.numFloats; v < n; v += vertexSize, u += 2) {
+									verts[v] = finalColor.r;
+									verts[v + 1] = finalColor.g;
+									verts[v + 2] = finalColor.b;
+									verts[v + 3] = finalColor.a;
+									verts[v + 4] = uvs[u];
+									verts[v + 5] = uvs[u + 1];
+								}
+							} else {
+								for (let v = 2, u = 0, n = renderable.numFloats; v < n; v += vertexSize, u += 2) {
+									verts[v] = finalColor.r;
+									verts[v + 1] = finalColor.g;
+									verts[v + 2] = finalColor.b;
+									verts[v + 3] = finalColor.a;
+									verts[v + 4] = uvs[u];
+									verts[v + 5] = uvs[u + 1];
+									verts[v + 6] = darkColor.r;
+									verts[v + 7] = darkColor.g;
+									verts[v + 8] = darkColor.b;
+									verts[v + 9] = darkColor.a;
+								}
 							}
 						}
 						let view = (renderable.vertices as Float32Array).subarray(0, renderable.numFloats);

@@ -962,6 +962,8 @@ declare module spine {
         static signum(value: number): number;
         static toInt(x: number): number;
         static cbrt(x: number): number;
+        static randomTriangular(min: number, max: number): number;
+        static randomTriangularWith(min: number, max: number, mode: number): number;
     }
     class Utils {
         static SUPPORTS_TYPED_ARRAYS: boolean;
@@ -1022,8 +1024,8 @@ declare module spine {
 declare module spine {
     interface VertexEffect {
         begin(skeleton: Skeleton): void;
-        transform(): any;
-        end(): any;
+        transform(position: Vector2, uv: Vector2, light: Color, dark: Color): void;
+        end(): void;
     }
 }
 declare module spine {
@@ -1174,6 +1176,30 @@ declare module spine {
         updateOffset(): void;
         setRegion(region: TextureRegion): void;
         computeWorldVertices(bone: Bone, worldVertices: ArrayLike<number>, offset: number, stride: number): void;
+    }
+}
+declare module spine {
+    class JitterEffect implements VertexEffect {
+        jitterX: number;
+        jitterY: number;
+        constructor(jitterX: number, jitterY: number);
+        begin(skeleton: Skeleton): void;
+        transform(position: Vector2, uv: Vector2, light: Color, dark: Color): void;
+        end(): void;
+    }
+}
+declare module spine {
+    class SwirlEffect implements VertexEffect {
+        centerX: number;
+        centerY: number;
+        radius: number;
+        angle: number;
+        private worldX;
+        private worldY;
+        constructor(radius: number);
+        begin(skeleton: Skeleton): void;
+        transform(position: Vector2, uv: Vector2, light: Color, dark: Color): void;
+        end(): void;
     }
 }
 declare module spine.webgl {
@@ -1547,6 +1573,7 @@ declare module spine.webgl {
     class SkeletonRenderer {
         static QUAD_TRIANGLES: number[];
         premultipliedAlpha: boolean;
+        vertexEffect: VertexEffect;
         private tempColor;
         private tempColor2;
         private vertices;
@@ -1554,6 +1581,10 @@ declare module spine.webgl {
         private twoColorTint;
         private renderable;
         private clipper;
+        private temp;
+        private temp2;
+        private temp3;
+        private temp4;
         constructor(context: ManagedWebGLRenderingContext, twoColorTint?: boolean);
         draw(batcher: PolygonBatcher, skeleton: Skeleton): void;
     }
