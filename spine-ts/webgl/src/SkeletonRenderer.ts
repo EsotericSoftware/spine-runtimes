@@ -135,6 +135,51 @@ module spine.webgl {
 						clipper.clipTriangles(renderable.vertices, renderable.numFloats, triangles, triangles.length, uvs, finalColor, darkColor, twoColorTint);
 						let clippedVertices = new Float32Array(clipper.clippedVertices);
 						let clippedTriangles = clipper.clippedTriangles;
+						if (this.vertexEffect != null) {
+							let vertexEffect = this.vertexEffect;
+							let verts = clippedVertices;
+							if (!twoColorTint) {
+								for (let v = 0, n = clippedVertices.length; v < n; v += vertexSize) {
+									tempPos.x = verts[v];
+									tempPos.y = verts[v + 1];
+									tempLight.set(verts[v + 2], verts[v + 3], verts[v + 4], verts[v + 5]);
+									tempUv.x = verts[v + 6];
+									tempUv.y = verts[v + 7];
+									tempDark.set(0, 0, 0, 0);
+									vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
+									verts[v] = tempPos.x;
+									verts[v + 1] = tempPos.y;
+									verts[v + 2] = tempLight.r;
+									verts[v + 3] = tempLight.g;
+									verts[v + 4] = tempLight.b;
+									verts[v + 5] = tempLight.a;
+									verts[v + 6] = tempUv.x;
+									verts[v + 7] = tempUv.y
+								}
+							} else {
+								for (let v = 0, n = clippedVertices.length; v < n; v += vertexSize) {
+									tempPos.x = verts[v];
+									tempPos.y = verts[v + 1];
+									tempLight.set(verts[v + 2], verts[v + 3], verts[v + 4], verts[v + 5]);
+									tempUv.x = verts[v + 6];
+									tempUv.y = verts[v + 7];
+									tempDark.set(verts[v + 8], verts[v + 9], verts[v + 10], verts[v + 11]);
+									vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
+									verts[v] = tempPos.x;
+									verts[v + 1] = tempPos.y;
+									verts[v + 2] = tempLight.r;
+									verts[v + 3] = tempLight.g;
+									verts[v + 4] = tempLight.b;
+									verts[v + 5] = tempLight.a;
+									verts[v + 6] = tempUv.x;
+									verts[v + 7] = tempUv.y
+									verts[v + 8] = tempDark.r;
+									verts[v + 9] = tempDark.g;
+									verts[v + 10] = tempDark.b;
+									verts[v + 11] = tempDark.a;
+								}
+							}
+						}
 						batcher.draw(texture, clippedVertices, clippedTriangles);
 					} else {
 						let verts = renderable.vertices;

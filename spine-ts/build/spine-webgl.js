@@ -8618,6 +8618,52 @@ var spine;
 							clipper.clipTriangles(renderable.vertices, renderable.numFloats, triangles, triangles.length, uvs, finalColor, darkColor, twoColorTint);
 							var clippedVertices = new Float32Array(clipper.clippedVertices);
 							var clippedTriangles = clipper.clippedTriangles;
+							if (this.vertexEffect != null) {
+								var vertexEffect = this.vertexEffect;
+								var verts = clippedVertices;
+								if (!twoColorTint) {
+									for (var v = 0, n_3 = clippedVertices.length; v < n_3; v += vertexSize) {
+										tempPos.x = verts[v];
+										tempPos.y = verts[v + 1];
+										tempLight.set(verts[v + 2], verts[v + 3], verts[v + 4], verts[v + 5]);
+										tempUv.x = verts[v + 6];
+										tempUv.y = verts[v + 7];
+										tempDark.set(0, 0, 0, 0);
+										vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
+										verts[v] = tempPos.x;
+										verts[v + 1] = tempPos.y;
+										verts[v + 2] = tempLight.r;
+										verts[v + 3] = tempLight.g;
+										verts[v + 4] = tempLight.b;
+										verts[v + 5] = tempLight.a;
+										verts[v + 6] = tempUv.x;
+										verts[v + 7] = tempUv.y;
+									}
+								}
+								else {
+									for (var v = 0, n_4 = clippedVertices.length; v < n_4; v += vertexSize) {
+										tempPos.x = verts[v];
+										tempPos.y = verts[v + 1];
+										tempLight.set(verts[v + 2], verts[v + 3], verts[v + 4], verts[v + 5]);
+										tempUv.x = verts[v + 6];
+										tempUv.y = verts[v + 7];
+										tempDark.set(verts[v + 8], verts[v + 9], verts[v + 10], verts[v + 11]);
+										vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
+										verts[v] = tempPos.x;
+										verts[v + 1] = tempPos.y;
+										verts[v + 2] = tempLight.r;
+										verts[v + 3] = tempLight.g;
+										verts[v + 4] = tempLight.b;
+										verts[v + 5] = tempLight.a;
+										verts[v + 6] = tempUv.x;
+										verts[v + 7] = tempUv.y;
+										verts[v + 8] = tempDark.r;
+										verts[v + 9] = tempDark.g;
+										verts[v + 10] = tempDark.b;
+										verts[v + 11] = tempDark.a;
+									}
+								}
+							}
 							batcher.draw(texture, clippedVertices, clippedTriangles);
 						}
 						else {
@@ -8625,7 +8671,7 @@ var spine;
 							if (this.vertexEffect != null) {
 								var vertexEffect = this.vertexEffect;
 								if (!twoColorTint) {
-									for (var v = 0, u = 0, n_3 = renderable.numFloats; v < n_3; v += vertexSize, u += 2) {
+									for (var v = 0, u = 0, n_5 = renderable.numFloats; v < n_5; v += vertexSize, u += 2) {
 										tempPos.x = verts[v];
 										tempPos.y = verts[v + 1];
 										tempUv.x = uvs[u];
@@ -8644,7 +8690,7 @@ var spine;
 									}
 								}
 								else {
-									for (var v = 0, u = 0, n_4 = renderable.numFloats; v < n_4; v += vertexSize, u += 2) {
+									for (var v = 0, u = 0, n_6 = renderable.numFloats; v < n_6; v += vertexSize, u += 2) {
 										tempPos.x = verts[v];
 										tempPos.y = verts[v + 1];
 										tempUv.x = uvs[u];
@@ -8669,7 +8715,7 @@ var spine;
 							}
 							else {
 								if (!twoColorTint) {
-									for (var v = 2, u = 0, n_5 = renderable.numFloats; v < n_5; v += vertexSize, u += 2) {
+									for (var v = 2, u = 0, n_7 = renderable.numFloats; v < n_7; v += vertexSize, u += 2) {
 										verts[v] = finalColor.r;
 										verts[v + 1] = finalColor.g;
 										verts[v + 2] = finalColor.b;
@@ -8679,7 +8725,7 @@ var spine;
 									}
 								}
 								else {
-									for (var v = 2, u = 0, n_6 = renderable.numFloats; v < n_6; v += vertexSize, u += 2) {
+									for (var v = 2, u = 0, n_8 = renderable.numFloats; v < n_8; v += vertexSize, u += 2) {
 										verts[v] = finalColor.r;
 										verts[v + 1] = finalColor.g;
 										verts[v + 2] = finalColor.b;

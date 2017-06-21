@@ -1702,6 +1702,7 @@ declare module spine.threejs {
 		skeleton: Skeleton;
 		state: AnimationState;
 		zOffset: number;
+		vertexEffect: VertexEffect;
 		private batcher;
 		private clipper;
 		static QUAD_TRIANGLES: number[];
