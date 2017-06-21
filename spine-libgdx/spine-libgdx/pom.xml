@@ -10,7 +10,7 @@
 	<groupId>com.esotericsoftware.spine</groupId>
 	<artifactId>spine-libgdx</artifactId>
 	<packaging>jar</packaging>
-	<version>3.5.51.2-SNAPSHOT</version>
+	<version>3.7.0.1-SNAPSHOT</version>
 
 	<name>spine-libgdx</name>
 	<description>Spine Runtime for libGDX</description>

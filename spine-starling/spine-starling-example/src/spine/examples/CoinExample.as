@@ -45,7 +45,7 @@ package spine.examples {
 	import spine.starling.SkeletonAnimation;
 
 	public class CoinExample extends Sprite {
-		[Embed(source = "/coin.json", mimeType = "application/octet-stream")]
+		[Embed(source = "/coin-pro.json", mimeType = "application/octet-stream")]
 		static public const CoinJson : Class;
 
 		[Embed(source = "/coin.atlas", mimeType = "application/octet-stream")]

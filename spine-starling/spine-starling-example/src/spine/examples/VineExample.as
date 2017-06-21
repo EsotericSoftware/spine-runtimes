@@ -44,7 +44,7 @@ package spine.examples {
 	import starling.display.Sprite;
 
 	public class VineExample extends Sprite {
-		[Embed(source = "/vine.json", mimeType = "application/octet-stream")]
+		[Embed(source = "/vine-pro.json", mimeType = "application/octet-stream")]
 		static public const VineJson : Class;
 
 		[Embed(source = "/vine.atlas", mimeType = "application/octet-stream")]
@@ -66,7 +66,7 @@ package spine.examples {
 			skeleton = new SkeletonAnimation(skeletonData);
 			skeleton.x = 400;
 			skeleton.y = 560;
-			skeleton.state.setAnimationByName(0, "animation", true);
+			skeleton.state.setAnimationByName(0, "grow", true);
 
 			addChild(skeleton);
 			Starling.juggler.add(skeleton);

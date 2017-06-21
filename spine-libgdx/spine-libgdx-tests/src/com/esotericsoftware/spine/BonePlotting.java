@@ -69,9 +69,9 @@ public class BonePlotting {
 				return null;
 			}
 		});
-		SkeletonData skeletonData = json.readSkeletonData(new FileHandle("assets/spineboy/spineboy.json"));
+		SkeletonData skeletonData = json.readSkeletonData(new FileHandle("assets/spineboy/spineboy-ess.json"));
 		Skeleton skeleton = new Skeleton(skeletonData);
-		Bone bone = skeleton.findBone("gunTip");
+		Bone bone = skeleton.findBone("gun-tip");
 		float fps = 1 / 15f;
 		for (Animation animation : skeletonData.getAnimations()) {
 			float time = 0;

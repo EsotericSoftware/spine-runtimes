@@ -6,9 +6,9 @@
 <!-- You can programmatically initialize a widget -->
 <div id="spine-widget" style="margin-bottom: 20px; width: 640px; height: 480px;"></div>
 <!-- You can also specify your own x/y and scale for the skeleton -->
-<div style="margin-bottom: 20px; width: 100%; height: 150px;" class="spine-widget" data-json="assets/raptor.json" data-atlas="assets/raptor.atlas" data-animation="Jump" data-fit-to-canvas="false" data-scale="0.1" data-x="200" data-y="10"></div>
+<div style="margin-bottom: 20px; width: 100%; height: 150px;" class="spine-widget" data-json="assets/raptor-pro.json" data-atlas="assets/raptor.atlas" data-animation="jump" data-fit-to-canvas="false" data-scale="0.1" data-x="200" data-y="10"></div>
 <!-- Or make things real small -->
-<div style="margin-bottom: 20px; width: 320px; height: 240px;" class="spine-widget" data-json="assets/raptor.json" data-atlas="assets/raptor.atlas" data-animation="walk" data-background-color="#cc0000"></div>
+<div style="margin-bottom: 20px; width: 320px; height: 240px;" class="spine-widget" data-json="assets/raptor-pro.json" data-atlas="assets/raptor.atlas" data-animation="walk" data-background-color="#cc0000"></div>
 <!-- You can also specify the .JSON and .atlas files inline to reduce the number of requests made to the server -->
 <div id="spine-widget-inline" style="margin-bottom: 20px; width: 640px; height: 480px;"></div>
 </center>
@@ -86,7 +86,7 @@ if (!supportsWebGL()) {
 }
 
 spineWidget = new spine.SpineWidget("spine-widget", {
-	json: "assets/spineboy.json",
+	json: "assets/spineboy-ess.json",
 	atlas: "assets/spineboy.atlas",
 	animation: "run",
 	backgroundColor: "#00000000",

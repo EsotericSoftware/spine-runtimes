@@ -269,7 +269,7 @@ static void _sortPathConstraint(_spSkeleton* const internal, spPathConstraint* c
 		_sortPathConstraintAttachment(internal, skeleton->data->skins[i], slotIndex, slotBone);
 
 	attachment = slot->attachment;
-	if (attachment->type == SP_ATTACHMENT_PATH) _sortPathConstraintAttachmentBones(internal, attachment, slotBone);
+	if (attachment && attachment->type == SP_ATTACHMENT_PATH) _sortPathConstraintAttachmentBones(internal, attachment, slotBone);
 
 	constrained = constraint->bones;
 	boneCount = constraint->bonesCount;

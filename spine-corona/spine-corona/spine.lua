@@ -97,10 +97,7 @@ spine.Skeleton.new = function(skeletonData, group)
 end
 
 local function colorEquals(color1, color2)
-	if not color1 and not color2 then return true end
-	if not color1 and color2 then return false end
-	if color1 and not color2 then return false end
-	return color1[1] == color2[1] and color1[2] == color2[2] and color1[3] == color2[3] and color1[4] == color2[4]
+	return color1.r == color2.r and color1.g == color2.g and color1.b == color2.b and color1.a == color2.a
 end
 
 local function toCoronaBlendMode(blendMode)
@@ -172,20 +169,20 @@ function spine.Skeleton:updateWorldTransform()
 			elseif attachment.type == spine.AttachmentType.clipping then
 				self.clipper:clipStart(slot, attachment)
 			end
-			
-			local skeleton = slot.bone.skeleton
-			local skeletonColor = skeleton.color
-			local slotColor = slot.color
-			local attachmentColor = attachment.color
-			local alpha = skeletonColor.a * slotColor.a * attachmentColor.a
-			local multiplier = alpha
-			if premultipliedAlpha then multiplier = 1 end
-			color:set(skeletonColor.r * slotColor.r * attachmentColor.r * multiplier,
-								skeletonColor.g * slotColor.g * attachmentColor.g * multiplier,
-								skeletonColor.b * slotColor.b * attachmentColor.b * multiplier,
-								alpha)
 
 			if texture and vertices and indices then
+				local skeleton = slot.bone.skeleton
+				local skeletonColor = skeleton.color
+				local slotColor = slot.color
+				local attachmentColor = attachment.color
+				local alpha = skeletonColor.a * slotColor.a * attachmentColor.a
+				local multiplier = alpha
+				if premultipliedAlpha then multiplier = 1 end
+				color:set(skeletonColor.r * slotColor.r * attachmentColor.r * multiplier,
+									skeletonColor.g * slotColor.g * attachmentColor.g * multiplier,
+									skeletonColor.b * slotColor.b * attachmentColor.b * multiplier,
+									alpha)
+				
 				if not lastTexture then lastTexture = texture end
 				if lastColor.r == -1 then lastColor:setFrom(color) end
 				if not lastBlendMode then lastBlendMode = blendMode end
@@ -193,7 +190,7 @@ function spine.Skeleton:updateWorldTransform()
 				if (texture ~= lastTexture or not colorEquals(color, lastColor) or blendMode ~= lastBlendMode) then
 					self:flush(groupVertices, groupUvs, groupIndices, lastTexture, lastColor, lastBlendMode, drawingGroup)
 					lastTexture = texture
-					lastColor = color
+					lastColor:setFrom(color)
 					lastBlendMode = blendMode
 					groupVertices = {}
 					groupUvs = {}

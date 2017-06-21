@@ -43,7 +43,7 @@
     self = [super init];
     if (!self) return nil;
     
-    skeletonNode = [SkeletonAnimation skeletonWithFile:@"raptor.json" atlasFile:@"raptor.atlas" scale:0.3f];
+    skeletonNode = [SkeletonAnimation skeletonWithFile:@"raptor-pro.json" atlasFile:@"raptor.atlas" scale:0.3f];
     [skeletonNode setAnimationForTrack:0 name:@"walk" loop:YES];
     
     CGSize windowSize = [[CCDirector sharedDirector] viewSize];

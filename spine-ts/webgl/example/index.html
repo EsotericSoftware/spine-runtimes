@@ -61,25 +61,25 @@ function init () {
 
 	// Tell AssetManager to load the resources for each model, including the exported .json file, the .atlas file and the .png
 	// file for the atlas. We then wait until all resources are loaded in the load() method.
-	assetManager.loadText("assets/spineboy.json");
+	assetManager.loadText("assets/spineboy-ess.json");
 	assetManager.loadText("assets/spineboy.atlas");
 	assetManager.loadTexture("assets/spineboy.png");
-	assetManager.loadText("assets/raptor.json");
+	assetManager.loadText("assets/raptor-pro.json");
 	assetManager.loadText("assets/raptor.atlas");
 	assetManager.loadTexture("assets/raptor.png");
-	assetManager.loadText("assets/tank.json");
+	assetManager.loadText("assets/tank-pro.json");
 	assetManager.loadText("assets/tank.atlas");
 	assetManager.loadTexture("assets/tank.png");
-	assetManager.loadText("assets/goblins-mesh.json");
-	assetManager.loadText("assets/goblins-mesh.atlas");
+	assetManager.loadText("assets/goblins-pro.json");
+	assetManager.loadText("assets/goblins.atlas");
 	assetManager.loadTexture("assets/goblins.png");
-	assetManager.loadText("assets/vine.json");
+	assetManager.loadText("assets/vine-pro.json");
 	assetManager.loadText("assets/vine.atlas");
 	assetManager.loadTexture("assets/vine.png");
-	assetManager.loadText("assets/stretchyman.json");
+	assetManager.loadText("assets/stretchyman-pro.json");
 	assetManager.loadText("assets/stretchyman.atlas");
 	assetManager.loadTexture("assets/stretchyman.png");
-	assetManager.loadText("assets/coin.json");
+	assetManager.loadText("assets/coin-pro.json");
 	assetManager.loadText("assets/coin.atlas");
 	assetManager.loadTexture("assets/coin.png");
 	requestAnimationFrame(load);
@@ -88,13 +88,13 @@ function init () {
 function load () {
 	// Wait until the AssetManager has loaded all resources, then load the skeletons.
 	if (assetManager.isLoadingComplete()) {
-		skeletons["raptor"] = loadSkeleton("raptor", "walk", false);
-		skeletons["spineboy"] = loadSkeleton("spineboy", "run", false);
-		skeletons["tank"] = loadSkeleton("tank", "drive", false);
-		skeletons["goblins"] = loadSkeleton("goblins-mesh", "walk", false, "goblin");
-		skeletons["vine"] = loadSkeleton("vine", "animation", false);
-		skeletons["stretchyman"] = loadSkeleton("stretchyman", "sneak", false);
-		skeletons["coin"] = loadSkeleton("coin", "rotate", false);
+		skeletons["raptor"] = loadSkeleton("raptor-pro", "walk", false);
+		skeletons["spineboy"] = loadSkeleton("spineboy-ess", "run", false);
+		skeletons["tank"] = loadSkeleton("tank-pro", "drive", false);
+		skeletons["goblins"] = loadSkeleton("goblins-pro", "walk", false, "goblin");
+		skeletons["vine"] = loadSkeleton("vine-pro", "grow", false);
+		skeletons["stretchyman"] = loadSkeleton("stretchyman-pro", "sneak", false);
+		skeletons["coin"] = loadSkeleton("coin-pro", "rotate", false);
 		setupUI();
 		requestAnimationFrame(render);
 	} else {
@@ -107,7 +107,7 @@ function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 
 	// Load the texture atlas using name.atlas and name.png from the AssetManager.
 	// The function passed to TextureAtlas is used to resolve relative paths.
-	atlas = new spine.TextureAtlas(assetManager.get("assets/" + name + ".atlas"), function(path) {
+	atlas = new spine.TextureAtlas(assetManager.get("assets/" + name.replace("-ess", "").replace("-pro", "") + ".atlas"), function(path) {
 		return assetManager.get("assets/" + path);
 	});
 

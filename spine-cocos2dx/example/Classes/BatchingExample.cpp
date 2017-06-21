@@ -56,7 +56,7 @@ bool BatchingExample::init () {
 	// Load the skeleton data.
 	spSkeletonJson* json = spSkeletonJson_createWithLoader(_attachmentLoader);
 	json->scale = 0.6f; // Resizes skeleton data to 60% of the size it was in Spine.
-	_skeletonData = spSkeletonJson_readSkeletonDataFile(json, "spineboy.json");
+	_skeletonData = spSkeletonJson_readSkeletonDataFile(json, "spineboy-ess.json");
 	CCASSERT(_skeletonData, json->error ? json->error : "Error reading skeleton data file.");
 	spSkeletonJson_dispose(json);
 

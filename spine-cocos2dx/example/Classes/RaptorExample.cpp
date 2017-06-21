@@ -43,7 +43,7 @@ Scene* RaptorExample::scene () {
 bool RaptorExample::init () {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
-	skeletonNode = SkeletonAnimation::createWithJsonFile("raptor.json", "raptor.atlas", 0.5f);
+	skeletonNode = SkeletonAnimation::createWithJsonFile("raptor-pro.json", "raptor.atlas", 0.5f);
 	skeletonNode->setAnimation(0, "walk", true);
 	skeletonNode->setAnimation(1, "empty", false);
 	skeletonNode->addAnimation(1, "gungrab", false, 2);	

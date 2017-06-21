@@ -211,7 +211,7 @@ function Skeleton:sortPathConstraint(constraint)
 	end
 	
 	local attachment = slot.attachment
-	if attachment.type == AttachmentType.path then self:sortPathConstraintAttachmentWith(attachment, slotBone) end
+	if attachment and attachment.type == AttachmentType.path then self:sortPathConstraintAttachmentWith(attachment, slotBone) end
 	
 	local constrained = constraint.bones
 	for i,bone in ipairs(constrained) do

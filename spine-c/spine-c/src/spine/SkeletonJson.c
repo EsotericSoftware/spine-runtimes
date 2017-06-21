@@ -34,6 +34,7 @@
 #include "Json.h"
 #include <spine/extension.h>
 #include <spine/AtlasAttachmentLoader.h>
+#include <spine/Array.h>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #define strdup _strdup
@@ -513,7 +514,9 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 static void _readVertices (spSkeletonJson* self, Json* attachmentMap, spVertexAttachment* attachment, int verticesLength) {
 	Json* entry;
 	float* vertices;
-	int i, b, w, nn, entrySize;
+	int i, n, nn, entrySize;
+	spFloatArray* weights;
+	spIntArray* bones;
 
 	attachment->worldVerticesLength = verticesLength;
 
@@ -532,33 +535,31 @@ static void _readVertices (spSkeletonJson* self, Json* attachmentMap, spVertexAt
 
 		attachment->bonesCount = 0;
 		attachment->bones = 0;
-	} else {
-		attachment->verticesCount = 0;
-		attachment->bonesCount = 0;
-
-		for (i = 0; i < entrySize;) {
-			int bonesCount = (int)vertices[i];
-			attachment->bonesCount += 1 + bonesCount;
-			attachment->verticesCount += 3 * bonesCount;
-			i += 1 + bonesCount * 4;
-		}
-
-		attachment->vertices = MALLOC(float, attachment->verticesCount);
-		attachment->bones = MALLOC(int, attachment->bonesCount);
-
-		for (i = 0, b = 0, w = 0; i < entrySize;) {
-			int bonesCount = (int)vertices[i++];
-			attachment->bones[b++] = bonesCount;
-			for (nn = i + bonesCount * 4; i < nn;) {
-				attachment->bones[b++] = (int)vertices[i++];
-				attachment->vertices[w++] = vertices[i++] * self->scale;
-				attachment->vertices[w++] = vertices[i++] * self->scale;
-				attachment->vertices[w++] = vertices[i++];
-			}
-		}
-
-		FREE(vertices);
+		return;
 	}
+
+	weights = spFloatArray_create(verticesLength * 3 * 3);
+	bones = spIntArray_create(verticesLength * 3);
+
+	for (i = 0, n = entrySize; i < n;) {
+		int boneCount = (int)vertices[i++];
+		spIntArray_add(bones, boneCount);
+		for (nn = i + boneCount * 4; i < nn; i += 4) {
+			spIntArray_add(bones, (int)vertices[i]);
+			spFloatArray_add(weights, vertices[i + 1] * self->scale);
+			spFloatArray_add(weights, vertices[i + 2] * self->scale);
+			spFloatArray_add(weights, vertices[i + 3]);
+		}
+	}
+
+	attachment->verticesCount = weights->size;
+	attachment->vertices = weights->items;
+	FREE(weights);
+	attachment->bonesCount = bones->size;
+	attachment->bones = bones->items;
+	FREE(bones);
+
+	FREE(vertices);
 }
 
 spSkeletonData* spSkeletonJson_readSkeletonDataFile (spSkeletonJson* self, const char* path) {
@@ -1049,7 +1050,6 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						}
 						vertexCount = Json_getInt(attachmentMap, "vertexCount", 0) << 1;
 						_readVertices(self, attachmentMap, SUPER(clip), vertexCount);
-						clip->super.verticesCount = vertexCount;
 						spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 						break;
 					}

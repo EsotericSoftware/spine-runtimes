@@ -17,8 +17,8 @@ var assetManager;
 var skeleton, state, bounds;
 var skeletonRenderer;
 
-var skelName = "spineboy";
-var animName = "test";
+var skelName = "spineboy-ess";
+var animName = "walk";
 
 function init () {
 	canvas = document.getElementById("canvas");
@@ -35,8 +35,8 @@ function init () {
 	assetManager = new spine.canvas.AssetManager();
 
 	assetManager.loadText("assets/" + skelName + ".json");
-	assetManager.loadText("assets/" + skelName + ".atlas");
-	assetManager.loadTexture("assets/" + skelName + ".png");
+	assetManager.loadText("assets/" + skelName.replace("-pro", "").replace("-ess", "") + ".atlas");
+	assetManager.loadTexture("assets/" + skelName.replace("-pro", "").replace("-ess", "") + ".png");
 
 	requestAnimationFrame(load);
 }
@@ -58,7 +58,7 @@ function loadSkeleton (name, initialAnimation, skin) {
 
 	// Load the texture atlas using name.atlas and name.png from the AssetManager.
 	// The function passed to TextureAtlas is used to resolve relative paths.
-	atlas = new spine.TextureAtlas(assetManager.get("assets/" + name + ".atlas"), function(path) {
+	atlas = new spine.TextureAtlas(assetManager.get("assets/" + name.replace("-pro", "").replace("-ess", "") + ".atlas"), function(path) {
 		return assetManager.get("assets/" + path);
 	});
 
