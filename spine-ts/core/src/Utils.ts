@@ -171,6 +171,37 @@ module spine {
 		}
 	}
 
+	export abstract class Interpolation {
+		protected abstract applyInternal (a: number): number;
+		apply(start: number, end: number, a: number): number {
+			return start + (end - start) * this.applyInternal(a);
+		}
+	}
+
+	export class Pow extends Interpolation {
+		protected power = 2;
+
+		constructor (power: number) {
+			super();
+			this.power = power;
+		}
+
+		applyInternal (a: number): number {
+			if (a <= 0.5) return Math.pow(a * 2, this.power) / 2;
+			return Math.pow((a - 1) * 2, this.power) / (this.power % 2 == 0 ? -2 : 2) + 1;
+		}
+	}
+
+	export class PowOut extends Pow {
+		constructor (power: number) {
+			super(power);
+		}
+
+		applyInternal (a: number) : number {
+			return Math.pow(a - 1, this.power) * (this.power % 2 == 0 ? -1 : 1) + 1;
+		}
+	}
+
 	export class Utils {
 		static SUPPORTS_TYPED_ARRAYS = typeof(Float32Array) !== "undefined";
 

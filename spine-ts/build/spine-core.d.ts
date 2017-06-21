@@ -962,6 +962,21 @@ declare module spine {
 		static signum(value: number): number;
 		static toInt(x: number): number;
 		static cbrt(x: number): number;
+		static randomTriangular(min: number, max: number): number;
+		static randomTriangularWith(min: number, max: number, mode: number): number;
+	}
+	abstract class Interpolation {
+		protected abstract applyInternal(a: number): number;
+		apply(start: number, end: number, a: number): number;
+	}
+	class Pow extends Interpolation {
+		protected power: number;
+		constructor(power: number);
+		applyInternal(a: number): number;
+	}
+	class PowOut extends Pow {
+		constructor(power: number);
+		applyInternal(a: number): number;
 	}
 	class Utils {
 		static SUPPORTS_TYPED_ARRAYS: boolean;
@@ -1017,6 +1032,13 @@ declare module spine {
 		hasEnoughData(): boolean;
 		addValue(value: number): void;
 		getMean(): number;
+	}
+}
+declare module spine {
+	interface VertexEffect {
+		begin(skeleton: Skeleton): void;
+		transform(position: Vector2, uv: Vector2, light: Color, dark: Color): void;
+		end(): void;
 	}
 }
 declare module spine {
@@ -1167,5 +1189,30 @@ declare module spine {
 		updateOffset(): void;
 		setRegion(region: TextureRegion): void;
 		computeWorldVertices(bone: Bone, worldVertices: ArrayLike<number>, offset: number, stride: number): void;
+	}
+}
+declare module spine {
+	class JitterEffect implements VertexEffect {
+		jitterX: number;
+		jitterY: number;
+		constructor(jitterX: number, jitterY: number);
+		begin(skeleton: Skeleton): void;
+		transform(position: Vector2, uv: Vector2, light: Color, dark: Color): void;
+		end(): void;
+	}
+}
+declare module spine {
+	class SwirlEffect implements VertexEffect {
+		static interpolation: PowOut;
+		centerX: number;
+		centerY: number;
+		radius: number;
+		angle: number;
+		private worldX;
+		private worldY;
+		constructor(radius: number);
+		begin(skeleton: Skeleton): void;
+		transform(position: Vector2, uv: Vector2, light: Color, dark: Color): void;
+		end(): void;
 	}
 }
