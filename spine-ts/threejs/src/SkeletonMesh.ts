@@ -34,6 +34,7 @@ module spine.threejs {
 		skeleton: Skeleton;
 		state: AnimationState;
 		zOffset: number = 0.1;
+		vertexEffect: VertexEffect;
 
 		private batcher: MeshBatcher;
 		private clipper: SkeletonClipping = new SkeletonClipping();
