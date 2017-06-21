@@ -13,6 +13,8 @@
 <span>Skeleton:</span><select id="skeletonList"></select>
 <span>Animation:</span><select id="animationList"></select>
 <span>Skin:</span><select id="skinList"></select>
+<span>Vertex Effect:</span><select id="effectList"></select>
+<span>Debug:</span><input type="checkbox" id="debug">
 <div>
 </center>
 </body>
@@ -29,7 +31,10 @@ var skeletonRenderer;
 var debugRenderer;
 var shapes;
 var skeletons = {};
-var activeSkeleton = "vine";
+var activeSkeleton = "spineboy";
+var swirlEffect = new spine.SwirlEffect(0);
+var jitterEffect = new spine.JitterEffect(20, 20);
+var swirlTime = 0;
 
 function init () {
 	// Setup canvas and WebGL context. We pass alpha: false to canvas.getContext() so we don't use premultiplied alpha when
@@ -177,6 +182,14 @@ function setupUI () {
 		if (skeletonName === activeSkeleton) option.attr("selected", "selected");
 		skeletonList.append(option);
 	}
+	var effectList = $("#effectList");
+	var effects = ["None", "Swirl", "Jitter"];
+	for (var effect in effects) {
+		var effectName = effects[effect];
+		var option = $("<option></option>");
+		option.attr("value", effectName).text(effectName);
+		effectList.append(option);
+	}
 	var setupAnimationUI = function() {
 		var animationList = $("#animationList");
 		animationList.empty();
@@ -244,6 +257,7 @@ function render () {
 	// Apply the animation state based on the delta time.
 	var state = skeletons[activeSkeleton].state;
 	var skeleton = skeletons[activeSkeleton].skeleton;
+	var bounds = skeletons[activeSkeleton].bounds;
 	var premultipliedAlpha = skeletons[activeSkeleton].premultipliedAlpha;
 	state.update(delta);
 	state.apply(skeleton);
@@ -256,6 +270,24 @@ function render () {
 
 	// Start the batch and tell the SkeletonRenderer to render the active skeleton.
 	batcher.begin(shader);
+
+	var effect = $("#effectList option:selected").text();
+	if (effect == "None") {
+		skeletonRenderer.vertexEffect = null;
+	} else if (effect == "Swirl") {
+		swirlTime += delta;
+		var percent = swirlTime % 2;
+		if (percent > 1) percent = 1 - (percent -1 );
+		// swirlEffect.angle = -60 + 120 * (perecent < 0.5 ? Math.pow(percent * 2, 2) / 2 : Math.pow((percent - 1) * 2, 2) / -2 + 1);
+		swirlEffect.angle = 360 * percent;
+		swirlEffect.centerX = 200; //bounds.offset.x + bounds.size.x / 2
+		swirlEffect.centerY = 200; //bounds.offset.y + bounds.size.y / 2
+		swirlEffect.radius = Math.sqrt(bounds.size.x * bounds.size.x + bounds.size.y * bounds.size.y);
+		skeletonRenderer.vertexEffect = swirlEffect;
+	} else if (effect == "Jitter") {
+		skeletonRenderer.vertexEffect = jitterEffect;
+	}
+
 	skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
 	skeletonRenderer.draw(batcher, skeleton);
 	batcher.end();
@@ -263,13 +295,16 @@ function render () {
 	shader.unbind();
 
 	// draw debug information
-	debugShader.bind();
-	debugShader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, mvp.values);
-	debugRenderer.premultipliedAlpha = premultipliedAlpha;
-	shapes.begin(debugShader);
-	debugRenderer.draw(shapes, skeleton);
-	shapes.end();
-	debugShader.unbind();
+	var debug = $('#debug').is(':checked');
+	if (debug) {
+		debugShader.bind();
+		debugShader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, mvp.values);
+		debugRenderer.premultipliedAlpha = premultipliedAlpha;
+		shapes.begin(debugShader);
+		debugRenderer.draw(shapes, skeleton);
+		shapes.end();
+		debugShader.unbind();
+	}
 
 	requestAnimationFrame(render);
 }

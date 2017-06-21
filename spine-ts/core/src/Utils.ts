@@ -158,6 +158,17 @@ module spine {
 			var y = Math.pow(Math.abs(x), 1/3);
 			return x < 0 ? -y : y;
 		}
+
+		static randomTriangular (min: number, max: number): number {
+			return MathUtils.randomTriangularWith(min, max, (min + max) * 0.5);
+		}
+
+		static randomTriangularWith (min: number, max: number, mode: number): number {
+			let u = Math.random();
+			let d = max - min;
+			if (u <= (mode - min) / d) return min + Math.sqrt(u * d * (mode - min));
+			return max - Math.sqrt((1 - u) * d * (max - mode));
+		}
 	}
 
 	export class Utils {
