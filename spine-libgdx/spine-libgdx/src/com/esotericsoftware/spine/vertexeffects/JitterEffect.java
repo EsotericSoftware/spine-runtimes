@@ -1,6 +1,7 @@
 
 package com.esotericsoftware.spine.vertexeffects;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.spine.Skeleton;
@@ -17,9 +18,9 @@ public class JitterEffect implements VertexEffect {
 	public void begin (Skeleton skeleton) {
 	}
 
-	public void transform (Vector2 vertex) {
-		vertex.x += MathUtils.randomTriangular(-x, y);
-		vertex.y += MathUtils.randomTriangular(-x, y);
+	public void transform (Vector2 position, Vector2 uv, Color light, Color dark) {
+		position.x += MathUtils.randomTriangular(-x, y);
+		position.y += MathUtils.randomTriangular(-x, y);
 	}
 
 	public void end () {

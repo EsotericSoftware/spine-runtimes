@@ -80,7 +80,7 @@ public class VertexEffectTest extends ApplicationAdapter {
 		swirl = new SwirlEffect(400);
 		swirl.setCenter(0, 200);
 		renderer.setVertexEffect(swirl);
-		renderer.setVertexEffect(new JitterEffect(10, 10));
+		// renderer.setVertexEffect(new JitterEffect(10, 10));
 	}
 
 	public void render () {
