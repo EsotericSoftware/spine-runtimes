@@ -46,6 +46,8 @@ spBone* spBone_create (spBoneData* data, spSkeleton* skeleton, spBone* parent) {
 	CONST_CAST(spBoneData*, self->data) = data;
 	CONST_CAST(spSkeleton*, self->skeleton) = skeleton;
 	CONST_CAST(spBone*, self->parent) = parent;
+	CONST_CAST(float, self->a) = 1.0f;
+	CONST_CAST(float, self->d) = 1.0f;
 	spBone_setToSetupPose(self);
 	return self;
 }
