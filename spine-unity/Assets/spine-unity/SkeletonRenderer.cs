@@ -283,7 +283,7 @@ namespace Spine.Unity {
 					meshGenerator.BuildMeshWithArrays(currentInstructions, updateTriangles);
 			}
 
-			if (OnPostProcessVertices != null) OnPostProcessVertices.Invoke(this.meshGenerator);
+			if (OnPostProcessVertices != null) OnPostProcessVertices.Invoke(this.meshGenerator.Buffers);
 
 			// STEP 3. Move the mesh data into a UnityEngine.Mesh ===========================================================================
 			var currentMesh = currentSmartMesh.mesh;

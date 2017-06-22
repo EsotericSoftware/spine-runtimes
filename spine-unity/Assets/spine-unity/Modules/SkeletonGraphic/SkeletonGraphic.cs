@@ -272,7 +272,7 @@ namespace Spine.Unity {
 			}
 
 			if (canvas != null) meshGenerator.ScaleVertexData(canvas.referencePixelsPerUnit);
-			if (OnPostProcessVertices != null) OnPostProcessVertices.Invoke(this.meshGenerator);
+			if (OnPostProcessVertices != null) OnPostProcessVertices.Invoke(this.meshGenerator.Buffers);
 
 			var mesh = smartMesh.mesh;
 			meshGenerator.FillVertexData(mesh);
