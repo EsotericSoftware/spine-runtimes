@@ -95,7 +95,7 @@ namespace Spine.Unity.Editor {
 			var transform = skeletonRendererComponent.transform;
 			var skeleton = skeletonRendererComponent.skeleton;
 
-			if (string.IsNullOrEmpty(tbf.boneName)) {
+			if (string.IsNullOrEmpty(boneName.stringValue)) {
 				SpineHandles.DrawBones(transform, skeleton);
 				SpineHandles.DrawBoneNames(transform, skeleton);
 				Handles.Label(tbf.transform.position, "No bone selected", EditorStyles.helpBox);

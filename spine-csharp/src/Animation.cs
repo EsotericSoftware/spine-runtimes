@@ -797,6 +797,8 @@ namespace Spine {
 	}
 
 	public class DeformTimeline : CurveTimeline {
+		static float[] zeros = new float[64];
+
 		internal int slotIndex;
 		internal float[] frames;
 		internal float[][] frameVertices;
@@ -825,35 +827,51 @@ namespace Spine {
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixPose pose, MixDirection direction) {
 			Slot slot = skeleton.slots.Items[slotIndex];
-			VertexAttachment slotAttachment = slot.attachment as VertexAttachment;
-			if (slotAttachment == null || !slotAttachment.ApplyDeform(attachment)) return;
+			VertexAttachment vertexAttachment = slot.attachment as VertexAttachment;
+			if (vertexAttachment == null || !vertexAttachment.ApplyDeform(attachment)) return;
 
 			var verticesArray = slot.attachmentVertices;
 			float[][] frameVertices = this.frameVertices;
 			int vertexCount = frameVertices[0].Length;
-			if (verticesArray.Count != vertexCount && pose != MixPose.Setup) alpha = 1; // Don't mix from uninitialized slot vertices.
-			// verticesArray.SetSize(vertexCount) // Ensure size and preemptively set count.
-			if (verticesArray.Capacity < vertexCount) verticesArray.Capacity = vertexCount;
+			if (verticesArray.Capacity < vertexCount) verticesArray.Capacity = vertexCount;	// verticesArray.SetSize(vertexCount) // Ensure size and preemptively set count.
 			verticesArray.Count = vertexCount;
 			float[] vertices = verticesArray.Items;
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
+				
 				switch (pose) {
 				case MixPose.Setup:
-					verticesArray.Clear();
+					float[] zeroVertices;
+					if (vertexAttachment.bones == null) {
+						// Unweighted vertex positions (setup pose).
+						zeroVertices = vertexAttachment.vertices;
+					} else {
+						// Weighted deform offsets (zeros).
+						zeroVertices = DeformTimeline.zeros;
+						if (zeroVertices.Length < vertexCount) DeformTimeline.zeros = zeroVertices = new float[vertexCount];
+					}
+					Array.Copy(zeroVertices, 0, vertices, 0, vertexCount);
 					return;
 				case MixPose.Current:
-					alpha = 1 - alpha;
-					for (int i = 0; i < vertexCount; i++)
-						vertices[i] *= alpha;
-
+					if (alpha == 1) return;
+					if (vertexAttachment.bones == null) {
+						// Unweighted vertex positions.
+						float[] setupVertices = vertexAttachment.vertices;
+						for (int i = 0; i < vertexCount; i++)
+							vertices[i] += (setupVertices[i] - vertices[i]) * alpha;
+					} else {
+						// Weighted deform offsets.
+						alpha = 1 - alpha;
+						for (int i = 0; i < vertexCount; i++)
+							vertices[i] *= alpha;
+					}
+					return;
+				default:
 					return;
 				}
-				return;
+
 			}
-
-
 
 			if (time >= frames[frames.Length - 1]) { // Time is after last frame.
 				float[] lastVertices = frameVertices[frames.Length - 1];
@@ -861,7 +879,6 @@ namespace Spine {
 					// Vertex positions or deform offsets, no alpha.
 					Array.Copy(lastVertices, 0, vertices, 0, vertexCount);
 				} else if (pose == MixPose.Setup) {
-					VertexAttachment vertexAttachment = slotAttachment;
 					if (vertexAttachment.bones == null) {
 						// Unweighted vertex positions, with alpha.
 						float[] setupVertices = vertexAttachment.vertices;
@@ -896,7 +913,6 @@ namespace Spine {
 					vertices[i] = prev + (nextVertices[i] - prev) * percent;
 				}
 			} else if (pose == MixPose.Setup) {
-				VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
 				if (vertexAttachment.bones == null) {
 					// Unweighted vertex positions, with alpha.
 					var setupVertices = vertexAttachment.vertices;
