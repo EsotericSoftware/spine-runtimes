@@ -610,13 +610,9 @@ public class AnimationState {
 		propertyIDs.clear();
 		Array<TrackEntry> mixingTo = this.mixingTo;
 
-		TrackEntry lastEntry = null;
 		for (int i = 0, n = tracks.size; i < n; i++) {
 			TrackEntry entry = tracks.get(i);
-			if (entry != null) {
-				entry.setTimelineData(lastEntry, mixingTo, propertyIDs);
-				lastEntry = entry;
-			}
+			if (entry != null) entry.setTimelineData(null, mixingTo, propertyIDs);
 		}
 	}
 
