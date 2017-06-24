@@ -616,14 +616,10 @@ namespace Spine {
 			propertyIDs.Clear();
 			var mixingTo = this.mixingTo;
 
-			TrackEntry lastEntry = null;
 			var tracksItems = tracks.Items;
 			for (int i = 0, n = tracks.Count; i < n; i++) {
 				var entry = tracksItems[i];
-				if (entry != null) {
-					entry.SetTimelineData(lastEntry, mixingTo, propertyIDs);
-					lastEntry = entry;
-				}
+				if (entry != null) entry.SetTimelineData(null, mixingTo, propertyIDs);
 			}
 		}
 
