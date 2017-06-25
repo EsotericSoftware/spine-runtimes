@@ -292,6 +292,7 @@ public class SkeletonJson {
 			data.intValue = eventMap.getInt("int", 0);
 			data.floatValue = eventMap.getFloat("float", 0f);
 			data.stringValue = eventMap.getString("string", "");
+			data.audioPath = eventMap.getString("audio", "");
 			skeletonData.events.add(data);
 		}
 

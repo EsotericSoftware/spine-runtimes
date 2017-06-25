@@ -306,6 +306,7 @@ public class SkeletonBinary {
 				data.intValue = input.readInt(false);
 				data.floatValue = input.readFloat();
 				data.stringValue = input.readString();
+				data.audioPath = input.readString(); 
 				skeletonData.events.add(data);
 			}
 
