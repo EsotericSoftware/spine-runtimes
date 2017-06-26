@@ -52,6 +52,7 @@ namespace Spine {
 
 		Effect effect;
 		public Effect Effect { get { return effect; } set { effect = value; } }
+		public IVertexEffect VertexEffect { get; set; }
 
 		private bool premultipliedAlpha;
 		public bool PremultipliedAlpha { get { return premultipliedAlpha; } set { premultipliedAlpha = value; } }
@@ -93,6 +94,8 @@ namespace Spine {
 			var drawOrderItems = skeleton.DrawOrder.Items;
 			float skeletonR = skeleton.R, skeletonG = skeleton.G, skeletonB = skeleton.B, skeletonA = skeleton.A;
 			Color color = new Color();
+
+			if (VertexEffect != null) VertexEffect.Begin(skeleton);
 
 			for (int i = 0, n = drawOrder.Count; i < n; i++) {
 				Slot slot = drawOrderItems[i];
@@ -194,11 +197,13 @@ namespace Spine {
 					itemVertices[ii].Position.Z = 0;
 					itemVertices[ii].TextureCoordinate.X = uvs[v];
 					itemVertices[ii].TextureCoordinate.Y = uvs[v + 1];
+					if (VertexEffect != null) VertexEffect.Transform(ref itemVertices[ii]);
 				}
 
 				clipper.ClipEnd(slot);
 			}
 			clipper.ClipEnd();
+			if (VertexEffect != null) VertexEffect.End();
 		}
 	}
 }

@@ -47,6 +47,9 @@ namespace Spine {
 		Slot headSlot;
 		AnimationState state;
 		SkeletonBounds bounds = new SkeletonBounds();
+		JitterEffect jitter = new JitterEffect(10, 10);
+		SwirlEffect swirl = new SwirlEffect(600);
+		float swirlTime;
 
 #if WINDOWS_STOREAPP
 		private string assetsFolder = @"Assets\";
@@ -77,24 +80,23 @@ namespace Spine {
 
 			skeletonRenderer = new SkeletonRenderer(GraphicsDevice);
 			skeletonRenderer.PremultipliedAlpha = false;
-			skeletonRenderer.Effect = spineEffect;
+			skeletonRenderer.Effect = spineEffect;			
+			skeletonRenderer.VertexEffect = swirl;
 
-			// String name = "spineboy";
-			// String name = "goblins-mesh";
-			// String name = "raptor";
-			// String name = "tank";
-			// String name = "coin";
-			String name = "TwoColorTest";
+			// String name = "spineboy-ess";
+			// String name = "goblins-pro";
+			String name = "raptor-pro";
+			// String name = "tank-pro";
+			// String name = "coin-pro";			
 			bool binaryData = false;
 
-			Atlas atlas = new Atlas(assetsFolder + name + ".atlas", new XnaTextureLoader(GraphicsDevice));			
+			Atlas atlas = new Atlas(assetsFolder + name.Replace("-ess", "").Replace("-pro", "") + ".atlas", new XnaTextureLoader(GraphicsDevice));			
 
 			float scale = 1;
-			if (name == "spineboy") scale = 0.6f;
-			if (name == "raptor") scale = 0.5f;
-			if (name == "tank") scale = 0.3f;
-			if (name == "coin") scale = 1;
-			if (name == "TwoColorTest") scale = 0.5f;
+			if (name == "spineboy-ess") scale = 0.6f;
+			if (name == "raptor-pro") scale = 0.5f;
+			if (name == "tank-pro") scale = 0.3f;
+			if (name == "coin-pro") scale = 1;
 
 			SkeletonData skeletonData;
 			if (binaryData) {
@@ -107,13 +109,13 @@ namespace Spine {
 				skeletonData = json.ReadSkeletonData(assetsFolder + name + ".json");
 			}
 			skeleton = new Skeleton(skeletonData);
-			if (name == "goblins-mesh") skeleton.SetSkin("goblin");
+			if (name == "goblins-pro") skeleton.SetSkin("goblin");
 
 			// Define mixing between animations.
 			AnimationStateData stateData = new AnimationStateData(skeleton.Data);
 			state = new AnimationState(stateData);
 
-			if (name == "spineboy") {
+			if (name == "spineboy-ess") {
 				stateData.SetMix("run", "jump", 0.2f);
 				stateData.SetMix("jump", "run", 0.4f);
 
@@ -122,31 +124,27 @@ namespace Spine {
 				state.End += End;
 				state.Complete += Complete;
 				state.Event += Event;
-
-				state.SetAnimation(0, "test", false);
-				TrackEntry entry = state.AddAnimation(0, "jump", false, 0);
+			
+				TrackEntry entry = state.SetAnimation(0, "jump", false);
 				entry.End += End; // Event handling for queued animations.
 				state.AddAnimation(0, "run", true, 0);
 			}
-			else if (name == "raptor") {
+			else if (name == "raptor-pro") {
 				state.SetAnimation(0, "walk", true);
-				state.AddAnimation(1, "gungrab", false, 2);
+				state.AddAnimation(1, "gun-grab", false, 2);
 			}
-			else if (name == "coin") {
+			else if (name == "coin-pro") {
 				state.SetAnimation(0, "rotate", true);
 			}
-			else if (name == "tank") {
+			else if (name == "tank-pro") {
 				state.SetAnimation(0, "drive", true);
-			}
-			else if (name == "TwoColorTest") {
-				state.SetAnimation(0, "animation", true);
 			}
 			else {
 				state.SetAnimation(0, "walk", true);
 			}
 
 			skeleton.X = 400 + (name == "tank" ? 300: 0);
-			skeleton.Y = 580 + (name == "TwoColorTest" ? -400 : 0);
+			skeleton.Y = 600;		
 			skeleton.UpdateWorldTransform();
 
 			headSlot = skeleton.FindSlot("head");
@@ -168,14 +166,21 @@ namespace Spine {
 		protected override void Draw (GameTime gameTime) {
 			GraphicsDevice.Clear(Color.Black);
 
-			state.Update(gameTime.ElapsedGameTime.Milliseconds / 1000f);
+			float delta = gameTime.ElapsedGameTime.Milliseconds / 1000f;
+			swirlTime += delta;
+			float percent = swirlTime % 2;
+			if (percent > 1) percent = 1 - (percent - 1);
+			swirl.Angle = (IInterpolation.Pow2.Apply(-60, 60, percent));
+
+			state.Update(delta);
 			state.Apply(skeleton);			
 			skeleton.UpdateWorldTransform();
 			if (skeletonRenderer.Effect is BasicEffect) {
 				((BasicEffect)skeletonRenderer.Effect).Projection = Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 0, 1, 0);
 			} else {
 				skeletonRenderer.Effect.Parameters["Projection"].SetValue(Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 0, 1, 0));
-			}			
+			}
+			
 			skeletonRenderer.Begin();
 			skeletonRenderer.Draw(skeleton);
 			skeletonRenderer.End();

@@ -137,6 +137,7 @@
  * Removed `RegionBatcher` and `SkeletonRegionRenderer`, renamed `SkeletonMeshRenderer` to `SkeletonRenderer`
  * Added support for two color tint. For it to work, you need to add the `SpineEffect.fx` file to your content project, then load it via `var effect = Content.Load<Effect>("SpineEffect");`, and set it on the `SkeletonRenderer`. See the example project for code.
  * Added support for any `Effect` to be used by `SkeletonRenderer`
+ * Added support for `IVertexEffect` to modify vertices of skeletons on the CPU. `IVertexEffect` instances can be set on the `SkeletonRenderer`. See example project.
 
 ## Java
  * **Breaking changes**
