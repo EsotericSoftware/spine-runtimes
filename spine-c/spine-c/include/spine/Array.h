@@ -100,7 +100,6 @@ extern "C" {
 	void name##_removeAt(name* self, int index) { \
 		self->size--; \
 		memmove(self->items + index, self->items + index + 1, sizeof(itemType) * (self->size - index)); \
-		self->items[self->size] = 0; \
 	} \
 	int name##_contains(name* self, itemType value) { \
 		itemType* items = self->items; \
@@ -112,7 +111,6 @@ extern "C" {
 	} \
 	itemType name##_pop(name* self) { \
 		itemType item = self->items[--self->size]; \
-		self->items[self->size] = 0; \
 		return item; \
 	} \
 	itemType name##_peek(name* self) { \

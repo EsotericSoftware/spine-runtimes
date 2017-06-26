@@ -28,49 +28,57 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SPINE_COLOR_H_
-#define SPINE_COLOR_H_
+#ifndef SPINE_VERTEXEFFECT_H_
+#define SPINE_VERTEXEFFECT_H_
+
+#include <spine/Skeleton.h>
+#include <spine/Color.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct spColor {
-	float r, g, b, a;
+struct spVertexEffect;
 
-#ifdef __cplusplus
-	spColor() :
-		r(0), g(0), b(0), a(0) {
-	}
+typedef void (*spVertexEffectBegin)(struct spVertexEffect *self, spSkeleton *skeleton);
 
-	bool operator==(const spColor& rhs) {
-		return r == rhs.r && g == rhs.g && b == rhs.b && a == rhs.a;
-	}
-#endif
-} spColor;
+typedef void (*spVertexEffectTransform)(struct spVertexEffect *self, float *x, float *y, float *u, float *v,
+										spColor *light, spColor *dark);
 
-/* @param attachmentName May be 0 for no setup pose attachment. */
-spColor* spColor_create();
-void spColor_dispose(spColor* self);
-void spColor_setFromFloats(spColor* color, float r, float g, float b, float a);
-void spColor_setFromColor(spColor* color, spColor* otherColor);
-void spColor_addFloats(spColor* color, float r, float g, float b, float a);
-void spColor_addColor(spColor* color, spColor* otherColor);
-void spColor_clamp(spColor* color);
+typedef void (*spVertexEffectEnd)(struct spVertexEffect *self);
 
-#ifdef SPINE_SHORT_NAMES
-typedef spColor color;
-#define Color_create() spColor_create()
-#define Color_dispose(...) spColor_dispose(__VA_ARGS__)
-#define Color_setFromFloats(...) spColor_setFromFloats(__VA_ARGS__)
-#define Color_setFromColor(...) spColor_setFromColor(__VA_ARGS__)
-#define Color_addColor(...) spColor_addColor(__VA_ARGS__)
-#define Color_addFloats(...) spColor_addFloats(__VA_ARGS__)
-#define Color_clamp(...) spColor_clamp(__VA_ARGS__)
-#endif
+typedef struct spVertexEffect {
+	spVertexEffectBegin begin;
+	spVertexEffectTransform transform;
+	spVertexEffectEnd end;
+} spVertexEffect;
+
+typedef struct spJitterVertexEffect {
+	spVertexEffect super;
+	float jitterX;
+	float jitterY;
+} spJitterVertexEffect;
+
+typedef struct spSwirlVertexEffect {
+	spVertexEffect super;
+	float centerX;
+	float centerY;
+	float radius;
+	float angle;
+	float worldX;
+	float worldY;
+} spSwirlVertexEffect;
+
+spJitterVertexEffect *spJitterVertexEffect_create(float jitterX, float jitterY);
+
+void spJitterVertexEffect_dispose(spJitterVertexEffect *effect);
+
+spSwirlVertexEffect *spSwirlVertexEffect_create(float radius);
+
+void spSwirlVertexEffect_dispose(spSwirlVertexEffect *effect);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* SPINE_COLOR_H_ */
+#endif /* SPINE_VERTEX_EFFECT_H_ */

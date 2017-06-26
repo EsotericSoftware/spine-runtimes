@@ -204,6 +204,10 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 
+	spSwirlVertexEffect* effect = spSwirlVertexEffect_create(400);
+	effect->centerY = -200;
+	drawable->vertexEffect = &effect->super;
+
 	Skeleton* skeleton = drawable->skeleton;
 	skeleton->x = 320;
 	skeleton->y = 590;
@@ -216,6 +220,7 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
+	float swirlTime = 0;
 	while (window.isOpen()) {
 		while (window.pollEvent(event))
 			if (event.type == sf::Event::Closed) window.close();
@@ -223,12 +228,18 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
+		swirlTime += delta;
+		float percent = fmod(swirlTime, 2);
+		if (percent > 1) percent = 1 - (percent - 1);
+		effect->angle = _spMath_interpolate(_spMath_pow2_apply, -60, 60, percent);
+
 		drawable->update(delta);
 
 		window.clear();
 		window.draw(*drawable);
 		window.display();
 	}
+	spSwirlVertexEffect_dispose(effect);
 }
 
 void tank (SkeletonData* skeletonData, Atlas* atlas) {
@@ -338,6 +349,7 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
+	float swirlTime = 0;
 	while (window.isOpen()) {
 		while (window.pollEvent(event))
 			if (event.type == sf::Event::Closed) window.close();
@@ -384,7 +396,7 @@ int main () {
 	testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 1.0f);
 	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin.atlas", 0.5f);
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine.atlas", 0.5f);
-	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 0.2f);
+	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 0.2f);*/
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor.atlas", 0.5f);
 	testcase(spineboy, "data/spineboy-ess.json", "data/spineboy-ess.skel", "data/spineboy.atlas", 0.6f);
 	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins.atlas", 1.4f);

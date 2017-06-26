@@ -6,7 +6,7 @@
 
 #include "KMemory.h" // last include
 
-#define SPINEBOY_JSON "testdata/spineboy/spineboy.json"
+#define SPINEBOY_JSON "testdata/spineboy/spineboy-ess.json"
 #define SPINEBOY_ATLAS "testdata/spineboy/spineboy.atlas"
 
 #define MAX_RUN_TIME 6000 // equal to about 100 seconds of execution
