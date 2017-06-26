@@ -357,7 +357,7 @@ namespace Spine.Unity {
 						material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
 					}
 					#else
-					Material material = (rendererObject.GetType() == typeof(Material)) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
+					Material material = (rendererObject is Material) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
 					#endif
 
 					if (current.forceSeparate || (current.rawVertexCount > 0 && !System.Object.ReferenceEquals(current.material, material))) { // Material changed. Add the previous submesh.
