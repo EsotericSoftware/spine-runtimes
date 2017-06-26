@@ -6,13 +6,13 @@
 
 #include "KMemory.h" // last include
 
-#define SPINEBOY_JSON "testdata/spineboy/spineboy.json"
+#define SPINEBOY_JSON "testdata/spineboy/spineboy-ess.json"
 #define SPINEBOY_ATLAS "testdata/spineboy/spineboy.atlas"
 
-#define RAPTOR_JSON "testdata/raptor/raptor.json"
+#define RAPTOR_JSON "testdata/raptor/raptor-pro.json"
 #define RAPTOR_ATLAS "testdata/raptor/raptor.atlas"
 
-#define GOBLINS_JSON "testdata/goblins/goblins.json"
+#define GOBLINS_JSON "testdata/goblins/goblins-pro.json"
 #define GOBLINS_ATLAS "testdata/goblins/goblins.atlas"
 
 #define MAX_RUN_TIME 6000 // equal to about 100 seconds of execution

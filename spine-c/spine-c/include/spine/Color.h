@@ -42,6 +42,10 @@ typedef struct spColor {
 	spColor() :
 		r(0), g(0), b(0), a(0) {
 	}
+
+	bool operator==(const spColor& rhs) {
+		return r == rhs.r && g == rhs.g && b == rhs.b && a == rhs.a;
+	}
 #endif
 } spColor;
 

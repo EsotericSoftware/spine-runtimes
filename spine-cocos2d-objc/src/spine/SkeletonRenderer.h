@@ -47,6 +47,7 @@
 	float* _worldVertices;
 	CCBlendMode* screenMode;
 	spSkeletonClipping* _clipper;
+	spVertexEffect* _effect;
 }
 
 + (id) skeletonWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
@@ -90,5 +91,6 @@
 @property (nonatomic) bool debugBones;
 @property (nonatomic) bool skipVisibilityCheck;
 @property (nonatomic) spBone* rootBone;
+@property (nonatomic) spVertexEffect* effect;
 
 @end

@@ -59,6 +59,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../../../spine-c/spine-c/src/spine/TransformConstraint.c \
 				   ../../../../spine-c/spine-c/src/spine/TransformConstraintData.c \
 				   ../../../../spine-c/spine-c/src/spine/VertexAttachment.c \
+				   ../../../../spine-c/spine-c/src/spine/VertexEffect.c \
 				   ../../../../spine-c/spine-c/src/spine/extension.c
 
 

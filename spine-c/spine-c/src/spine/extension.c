@@ -31,10 +31,15 @@
 #include <spine/extension.h>
 #include <stdio.h>
 
+float _spRandom () {
+	return rand() / (float)RAND_MAX;
+}
+
 static void* (*mallocFunc) (size_t size) = malloc;
 static void* (*reallocFunc) (void* ptr, size_t size) = realloc;
 static void* (*debugMallocFunc) (size_t size, const char* file, int line) = NULL;
 static void (*freeFunc) (void* ptr) = free;
+static float (*randomFunc) () = _spRandom;
 
 void* _malloc (size_t size, const char* file, int line) {
 	if(debugMallocFunc)
@@ -54,6 +59,10 @@ void _free (void* ptr) {
 	freeFunc(ptr);
 }
 
+float _random () {
+	return randomFunc();
+}
+
 void _setDebugMalloc(void* (*malloc) (size_t size, const char* file, int line)) {
 	debugMallocFunc = malloc;
 }
@@ -70,6 +79,10 @@ void _setFree (void (*free) (void* ptr)) {
 	freeFunc = free;
 }
 
+void _setRandom (float (*random) ()) {
+	randomFunc = random;
+}
+
 char* _readFile (const char* path, int* length) {
 	char *data;
 	FILE *file = fopen(path, "rb");
@@ -84,4 +97,32 @@ char* _readFile (const char* path, int* length) {
 	fclose(file);
 
 	return data;
+}
+
+float _spMath_random(float min, float max) {
+	return min + (max - min) * _random();
+}
+
+float _spMath_randomTriangular(float min, float max) {
+	return _spMath_randomTriangularWith(min, max, (min + max) * 0.5f);
+}
+
+float _spMath_randomTriangularWith(float min, float max, float mode) {
+	float u = _random();
+	float d = max - min;
+	if (u <= (mode - min) / d) return min + SQRT(u * d * (mode - min));
+	return max - SQRT((1 - u) * d * (max - mode));
+}
+
+float _spMath_interpolate(float (*apply) (float a), float start, float end, float a) {
+	return start + (end - start) * apply(a);
+}
+
+float _spMath_pow2_apply(float a) {
+	if (a <= 0.5) return POW(a * 2, 2) / 2;
+	return POW((a - 1) * 2, 2) / -2 + 1;
+}
+
+float _spMath_pow2out_apply(float a) {
+	return POW(a - 1, 2) * -1 + 1;
 }

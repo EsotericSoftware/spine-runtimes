@@ -84,6 +84,7 @@
 		76F5BDAD1D2BDFA2005917E5 /* TankExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 76F5BDAC1D2BDFA2005917E5 /* TankExample.m */; };
 		76FAC1961E3FA15E001CCC8C /* Color.c in Sources */ = {isa = PBXBuildFile; fileRef = 76FAC1941E3FA15E001CCC8C /* Color.c */; };
 		76FAC1971E3FA15E001CCC8C /* PointAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 76FAC1951E3FA15E001CCC8C /* PointAttachment.c */; };
+		76FB151A1F01413B00C5377F /* VertexEffect.c in Sources */ = {isa = PBXBuildFile; fileRef = 76FB15191F01413B00C5377F /* VertexEffect.c */; };
 		83F1A0EF1986955A001F6B44 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83F1A0EE1986955A001F6B44 /* GLKit.framework */; };
 		9A5D2499170A94DA0030D4DD /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5D2498170A94DA0030D4DD /* QuartzCore.framework */; };
 		9A5D249B170A94DA0030D4DD /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5D249A170A94DA0030D4DD /* OpenGLES.framework */; };
@@ -137,7 +138,7 @@
 /* Begin PBXFileReference section */
 		43C3282D170B0C19004A9460 /* spine-cocos2d-objc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "spine-cocos2d-objc.m"; path = "src/spine/spine-cocos2d-objc.m"; sourceTree = "<group>"; };
 		43C3282E170B0C19004A9460 /* spine-cocos2d-objc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "spine-cocos2d-objc.h"; path = "src/spine/spine-cocos2d-objc.h"; sourceTree = "<group>"; };
-		43C32868170B0DA6004A9460 /* spineboy-ess.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = spineboy-ess.json; path = Resources/spineboy-ess.json; sourceTree = "<group>"; };
+		43C32868170B0DA6004A9460 /* spineboy-ess.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "spineboy-ess.json"; path = "Resources/spineboy-ess.json"; sourceTree = "<group>"; };
 		43C3286A170B0DA6004A9460 /* spineboy.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = spineboy.atlas; path = Resources/spineboy.atlas; sourceTree = "<group>"; };
 		43C3286B170B0DA6004A9460 /* spineboy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spineboy.png; path = Resources/spineboy.png; sourceTree = "<group>"; };
 		43C32871170B0DBE004A9460 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "Resources-ios/Default-568h@2x.png"; sourceTree = "<group>"; };
@@ -175,7 +176,7 @@
 		76EE4E441EB36DE6000254F4 /* SkeletonClipping.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SkeletonClipping.c; path = "../spine-c/spine-c/src/spine/SkeletonClipping.c"; sourceTree = "<group>"; };
 		76EE4E451EB36DE6000254F4 /* Triangulator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Triangulator.c; path = "../spine-c/spine-c/src/spine/Triangulator.c"; sourceTree = "<group>"; };
 		76EE4E4E1EB36E53000254F4 /* coin.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = coin.atlas; path = Resources/coin.atlas; sourceTree = "<group>"; };
-		76EE4E4F1EB36E53000254F4 /* coin-pro.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = coin-pro.json; path = Resources/coin-pro.json; sourceTree = "<group>"; };
+		76EE4E4F1EB36E53000254F4 /* coin-pro.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "coin-pro.json"; path = "Resources/coin-pro.json"; sourceTree = "<group>"; };
 		76EE4E501EB36E53000254F4 /* coin.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = coin.png; path = Resources/coin.png; sourceTree = "<group>"; };
 		76EE4E541EB36E94000254F4 /* CoinExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoinExample.h; path = example/CoinExample.h; sourceTree = "<group>"; };
 		76EE4E551EB36E94000254F4 /* CoinExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CoinExample.m; path = example/CoinExample.m; sourceTree = "<group>"; };
@@ -214,10 +215,10 @@
 		76F28D141DEC810300CDE54D /* TransformConstraintData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = TransformConstraintData.c; path = "../spine-c/spine-c/src/spine/TransformConstraintData.c"; sourceTree = "<group>"; };
 		76F28D151DEC810300CDE54D /* VertexAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VertexAttachment.c; path = "../spine-c/spine-c/src/spine/VertexAttachment.c"; sourceTree = "<group>"; };
 		76F5BD9C1D2BDE1C005917E5 /* raptor.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = raptor.atlas; path = Resources/raptor.atlas; sourceTree = "<group>"; };
-		76F5BD9D1D2BDE1C005917E5 /* raptor-pro.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = raptor-pro.json; path = Resources/raptor-pro.json; sourceTree = "<group>"; };
+		76F5BD9D1D2BDE1C005917E5 /* raptor-pro.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "raptor-pro.json"; path = "Resources/raptor-pro.json"; sourceTree = "<group>"; };
 		76F5BD9E1D2BDE1C005917E5 /* raptor.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = raptor.png; path = Resources/raptor.png; sourceTree = "<group>"; };
 		76F5BD9F1D2BDE1C005917E5 /* tank.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = tank.atlas; path = Resources/tank.atlas; sourceTree = "<group>"; };
-		76F5BDA01D2BDE1C005917E5 /* tank-pro.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = tank-pro.json; path = Resources/tank-pro.json; sourceTree = "<group>"; };
+		76F5BDA01D2BDE1C005917E5 /* tank-pro.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "tank-pro.json"; path = "Resources/tank-pro.json"; sourceTree = "<group>"; };
 		76F5BDA11D2BDE1C005917E5 /* tank.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tank.png; path = Resources/tank.png; sourceTree = "<group>"; };
 		76F5BDA81D2BDE67005917E5 /* RaptorExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RaptorExample.h; path = example/RaptorExample.h; sourceTree = "<group>"; };
 		76F5BDA91D2BDE67005917E5 /* RaptorExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RaptorExample.m; path = example/RaptorExample.m; sourceTree = "<group>"; };
@@ -225,6 +226,7 @@
 		76F5BDAC1D2BDFA2005917E5 /* TankExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TankExample.m; path = example/TankExample.m; sourceTree = "<group>"; };
 		76FAC1941E3FA15E001CCC8C /* Color.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Color.c; path = "../spine-c/spine-c/src/spine/Color.c"; sourceTree = "<group>"; };
 		76FAC1951E3FA15E001CCC8C /* PointAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = PointAttachment.c; path = "../spine-c/spine-c/src/spine/PointAttachment.c"; sourceTree = "<group>"; };
+		76FB15191F01413B00C5377F /* VertexEffect.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VertexEffect.c; path = "../spine-c/spine-c/src/spine/VertexEffect.c"; sourceTree = "<group>"; };
 		83F1A0EE1986955A001F6B44 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		9A5D2495170A94DA0030D4DD /* SpineExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpineExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A5D2498170A94DA0030D4DD /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -299,6 +301,7 @@
 		43C32822170B0BC2004A9460 /* spine-c */ = {
 			isa = PBXGroup;
 			children = (
+				76FB15191F01413B00C5377F /* VertexEffect.c */,
 				76EE4E421EB36DE6000254F4 /* Array.c */,
 				76EE4E431EB36DE6000254F4 /* ClippingAttachment.c */,
 				76EE4E441EB36DE6000254F4 /* SkeletonClipping.c */,
@@ -597,6 +600,7 @@
 				76BF7E071E66ED9C00485998 /* GLUtils.c in Sources */,
 				76EE4E481EB36DE6000254F4 /* SkeletonClipping.c in Sources */,
 				43C3282F170B0C19004A9460 /* spine-cocos2d-objc.m in Sources */,
+				76FB151A1F01413B00C5377F /* VertexEffect.c in Sources */,
 				76F28D1F1DEC810300CDE54D /* BoundingBoxAttachment.c in Sources */,
 				76F28D281DEC810300CDE54D /* PathConstraint.c in Sources */,
 				76F28D2F1DEC810300CDE54D /* SkeletonJson.c in Sources */,

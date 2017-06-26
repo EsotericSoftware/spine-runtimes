@@ -179,6 +179,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\TransformConstraint.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\TransformConstraintData.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\VertexAttachment.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\VertexEffect.c" />
     <ClCompile Include="..\..\src\spine\AttachmentVertices.cpp" />
     <ClCompile Include="..\..\src\spine\Cocos2dAttachmentLoader.cpp" />
     <ClCompile Include="..\..\src\spine\SkeletonAnimation.cpp" />

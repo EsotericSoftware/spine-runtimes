@@ -30,6 +30,7 @@
 
 using UnityEngine;
 using Spine.Unity.Modules.AttachmentTools;
+using System.Collections;
 
 namespace Spine.Unity.Examples {
 
@@ -69,10 +70,12 @@ namespace Spine.Unity.Examples {
 			}
 		}
 
-		void Start () {
+		IEnumerator Start () {
+			yield return new WaitForSeconds(1f); // Delay for 1 second. For testing.
 			Apply();
 		}
 
+		[ContextMenu("Apply")]
 		void Apply () {
 			var skeletonGraphic = GetComponent<SkeletonGraphic>();
 			var skeleton = skeletonGraphic.Skeleton;
@@ -81,7 +84,7 @@ namespace Spine.Unity.Examples {
 			// Let's prepare a new skin to be our custom skin with equips/customizations. We get a clone so our original skins are unaffected.
 			customSkin = customSkin ?? new Skin("custom skin"); // This requires that all customizations are done with skin placeholders defined in Spine.
 			//customSkin = customSkin ?? skeleton.UnshareSkin(true, false, skeletonAnimation.AnimationState); // use this if you are not customizing on the default skin and don't plan to remove 
-			// Next let's 
+			// Next let's get the skin that contains our source attachments. These are the attachments that 
 			var baseSkin = skeleton.Data.FindSkin(baseSkinName);
 
 			// STEP 1: "EQUIP" ITEMS USING SPRITES
@@ -113,7 +116,6 @@ namespace Spine.Unity.Examples {
 			// 				Repacking requires that you set all source textures/sprites/atlases to be Read/Write enabled in the inspector.
 			// 				Combine all the attachment sources into one skin. Usually this means the default skin and the custom skin.
 			// 				call Skin.GetRepackedSkin to get a cloned skin with cloned attachments that all use one texture.
-			//				Under the hood, this relies on 
 			if (repack)	{
 				var repackedSkin = new Skin("repacked skin");
 				repackedSkin.Append(skeleton.Data.DefaultSkin);
@@ -124,7 +126,8 @@ namespace Spine.Unity.Examples {
 				skeleton.SetSkin(customSkin);
 			}
 
-			skeleton.SetSlotsToSetupPose();
+			//skeleton.SetSlotsToSetupPose();
+			skeleton.SetToSetupPose();
 			skeletonGraphic.Update(0);
 			skeletonGraphic.OverrideTexture = runtimeAtlas;
 
