@@ -74,7 +74,7 @@ namespace Spine.Unity {
 
 		/// <summary>
 		/// Sets the target bone by its bone name. Returns false if no bone was found.</summary>
-		public bool SetBoneByName (string name) {
+		public bool SetBone (string name) {
 			bone = skeletonRenderer.skeleton.FindBone(name);
 			if (bone == null) {
 				Debug.LogError("Bone not found: " + name, this);
@@ -130,7 +130,7 @@ namespace Spine.Unity {
 			if (bone == null) {
 				if (string.IsNullOrEmpty(boneName)) return;
 				bone = skeletonRenderer.skeleton.FindBone(boneName);
-				if (!SetBoneByName(boneName)) return;
+				if (!SetBone(boneName)) return;
 			}
 
 			Transform thisTransform = this.transform;
