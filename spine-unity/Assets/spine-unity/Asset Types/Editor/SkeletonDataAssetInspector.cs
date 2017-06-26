@@ -198,6 +198,32 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.LabelField("spine-tk2d", EditorStyles.boldLabel);
 				EditorGUILayout.PropertyField(spriteCollection, true);
 				#endif
+
+				{
+					bool hasNulls = false;
+					foreach (var a in m_skeletonDataAsset.atlasAssets) {
+						if (a == null) {
+							hasNulls = true;
+							break;
+						}
+					}
+					if (hasNulls) {
+						if (m_skeletonDataAsset.atlasAssets.Length == 1) {
+							EditorGUILayout.HelpBox("Atlas array cannot have null entries!", MessageType.None);
+						} else {
+							EditorGUILayout.HelpBox("Atlas array should not have null entries!", MessageType.Error);
+							if (SpineInspectorUtility.CenteredButton(SpineInspectorUtility.TempContent("Remove null entries"))) {
+								var trimmedAtlasAssets = new List<AtlasAsset>();
+								foreach (var a in m_skeletonDataAsset.atlasAssets) {
+									if (a != null) trimmedAtlasAssets.Add(a);
+								}
+								m_skeletonDataAsset.atlasAssets = trimmedAtlasAssets.ToArray();
+								serializedObject.Update();
+							}
+						}
+
+					}
+				}
 			}
 
 			if (EditorGUI.EndChangeCheck()) {
@@ -446,25 +472,6 @@ namespace Spine.Unity.Editor {
 		void RepopulateWarnings () {
 			warnings.Clear();
 
-			// Clear null entries.
-			{
-				bool hasNulls = false;
-				foreach (var a in m_skeletonDataAsset.atlasAssets) {
-					if (a == null) {
-						hasNulls = true;
-						break;
-					}
-				}
-				if (hasNulls) {
-					var trimmedAtlasAssets = new List<AtlasAsset>();
-					foreach (var a in m_skeletonDataAsset.atlasAssets) {
-						if (a != null) trimmedAtlasAssets.Add(a);
-					}
-					m_skeletonDataAsset.atlasAssets = trimmedAtlasAssets.ToArray();
-				}
-				serializedObject.Update();
-			}
-
 			if (skeletonJSON.objectReferenceValue == null) {
 				warnings.Add("Missing Skeleton JSON");
 			} else {
@@ -475,8 +482,6 @@ namespace Spine.Unity.Editor {
 					bool searchForSpineAtlasAssets = true;
 					bool isSpriteCollectionNull = spriteCollection.objectReferenceValue == null;
 					if (!isSpriteCollectionNull) searchForSpineAtlasAssets = false;
-					//else
-					//	warnings.Add("Your sprite collection may have missing images.");
 					#else
 					const bool searchForSpineAtlasAssets = true;
 					#endif
