@@ -30,6 +30,7 @@
 
 using UnityEngine;
 using Spine.Unity.Modules.AttachmentTools;
+using System.Collections;
 
 namespace Spine.Unity.Examples {
 
@@ -69,7 +70,8 @@ namespace Spine.Unity.Examples {
 			}
 		}
 
-		void Start () {
+		IEnumerator Start () {
+			yield return new WaitForSeconds(1f); // Delay for one second before applying. For testing.
 			Apply();
 		}
 
