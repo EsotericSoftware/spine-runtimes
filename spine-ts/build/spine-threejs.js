@@ -3781,7 +3781,7 @@ var spine;
 							clippedVerticesItems[s + 7] = v1 * a + v2 * b + v3 * c;
 							if (twoColor) {
 								clippedVerticesItems[s + 8] = dark.r;
-								clippedVerticesItems[s + 8] = dark.g;
+								clippedVerticesItems[s + 9] = dark.g;
 								clippedVerticesItems[s + 10] = dark.b;
 								clippedVerticesItems[s + 11] = dark.a;
 							}

@@ -33,7 +33,7 @@ using System;
 using UnityEngine;
 using Spine;
 
-// TODO: handle TPackerCW flip mode (probably not swap uv horizontaly)
+// MITCH: handle TPackerCW flip mode (probably not swap uv horizontaly)
 namespace Spine.Unity.TK2D {
 	public class SpriteCollectionAttachmentLoader : AttachmentLoader {
 		private tk2dSpriteCollectionData sprites;
@@ -143,6 +143,14 @@ namespace Spine.Unity.TK2D {
 
 		public PathAttachment NewPathAttachment (Skin skin, string name) {
 			return new PathAttachment(name);
+		}
+
+		public PointAttachment NewPointAttachment (Skin skin, string name) {
+			return new PointAttachment(name);
+		}
+
+		public ClippingAttachment NewClippingAttachment (Skin skin, string name) {
+			return new ClippingAttachment(name);
 		}
 	}
 }

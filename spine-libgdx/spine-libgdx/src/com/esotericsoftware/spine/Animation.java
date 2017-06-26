@@ -930,10 +930,19 @@ public class Animation {
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
-
 				switch (pose) {
 				case setup:
-					break;
+					float[] zeroVertices;
+					if (vertexAttachment.getBones() == null) {
+						// Unweighted vertex positions (setup pose).
+						zeroVertices = vertexAttachment.getVertices();
+					} else {
+						// Weighted deform offsets (zeros).
+						zeroVertices = zeros;
+						if (zeroVertices.length < vertexCount) zeros = zeroVertices = new float[vertexCount];
+					}
+					System.arraycopy(zeroVertices, 0, vertices, 0, vertexCount);
+					return;
 				case current:
 					if (alpha == 1) break;
 					if (vertexAttachment.getBones() == null) {
@@ -947,21 +956,7 @@ public class Animation {
 						for (int i = 0; i < vertexCount; i++)
 							vertices[i] *= alpha;
 					}
-					// Fall thru.
-				default:
-					return;
 				}
-
-				float[] zeroVertices;
-				if (vertexAttachment.getBones() == null) {
-					// Unweighted vertex positions (setup pose).
-					zeroVertices = vertexAttachment.getVertices();
-				} else {
-					// Weighted deform offsets (zeros).
-					zeroVertices = zeros;
-					if (zeroVertices.length < vertexCount) zeros = zeroVertices = new float[vertexCount];
-				}
-				System.arraycopy(zeroVertices, 0, vertices, 0, vertexCount);
 				return;
 			}
 

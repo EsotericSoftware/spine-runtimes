@@ -73,7 +73,24 @@ namespace Spine.Unity {
 		public int SlotCount { get { return endSlot - startSlot; } }
 	}
 
-	public delegate void MeshGeneratorDelegate (MeshGenerator meshGenerator);
+	public delegate void MeshGeneratorDelegate (MeshGeneratorBuffers buffers);
+
+	public struct MeshGeneratorBuffers {
+		/// <summary>The vertex count that will actually be used for the mesh. The Lengths of the buffer arrays may be larger than this number.</summary>
+		public int vertexCount;
+
+		/// <summary> Vertex positions. To be used for UnityEngine.Mesh.vertices.</summary>
+		public Vector3[] vertexBuffer;
+
+		/// <summary> Vertex UVs. To be used for UnityEngine.Mesh.uvs.</summary>
+		public Vector2[] uvBuffer;
+
+		/// <summary> Vertex colors. To be used for UnityEngine.Mesh.colors32.</summary>
+		public Color32[] colorBuffer;
+
+		/// <summary> The Spine rendering component's MeshGenerator. </summary>
+		public MeshGenerator meshGenerator;
+	}
 
 	[System.Serializable]
 	public class MeshGenerator {
@@ -117,10 +134,6 @@ namespace Spine.Unity {
 		[NonSerialized] readonly ExposedList<Color32> colorBuffer = new ExposedList<Color32>(4);
 		[NonSerialized] readonly ExposedList<ExposedList<int>> submeshes = new ExposedList<ExposedList<int>> { new ExposedList<int>(6) }; // start with 1 submesh.
 
-		public Vector3[] VertexBuffer { get { return this.vertexBuffer.Items; } }
-		public Vector2[] UVBuffer { get { return this.uvBuffer.Items; } }
-		public Color32[] ColorBuffer { get { return this.colorBuffer.Items; } }
-
 		[NonSerialized] Vector2 meshBoundsMin, meshBoundsMax;
 		[NonSerialized] float meshBoundsThickness;
 		[NonSerialized] int submeshIndex = 0;
@@ -138,6 +151,18 @@ namespace Spine.Unity {
 		#endregion
 
 		public int VertexCount { get { return vertexBuffer.Count; } }
+
+		public MeshGeneratorBuffers Buffers {
+			get {
+				return new MeshGeneratorBuffers {
+					vertexCount = this.VertexCount,
+					vertexBuffer = this.vertexBuffer.Items,
+					uvBuffer = this.uvBuffer.Items,
+					colorBuffer = this.colorBuffer.Items,
+					meshGenerator = this
+				};
+			}
+		}
 
 		#region Step 1 : Generate Instructions
 		public static void GenerateSingleSubmeshInstruction (SkeletonRendererInstruction instructionOutput, Skeleton skeleton, Material material) {
@@ -332,7 +357,7 @@ namespace Spine.Unity {
 						material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
 					}
 					#else
-					Material material = (rendererObject.GetType() == typeof(Material)) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
+					Material material = (rendererObject is Material) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
 					#endif
 
 					if (current.forceSeparate || (current.rawVertexCount > 0 && !System.Object.ReferenceEquals(current.material, material))) { // Material changed. Add the previous submesh.

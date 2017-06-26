@@ -74,7 +74,8 @@ namespace Spine.Unity.Editor {
 			SpineEditorUtilities.ConfirmInitialization();
 			m_skeletonDataAsset = (SkeletonDataAsset)target;
 
-			atlasAssets = serializedObject.FindProperty("atlasAssets");
+			bool newAtlasAssets = atlasAssets == null;
+			if (newAtlasAssets) atlasAssets = serializedObject.FindProperty("atlasAssets");
 			skeletonJSON = serializedObject.FindProperty("skeletonJSON");
 			scale = serializedObject.FindProperty("scale");
 			fromAnimation = serializedObject.FindProperty("fromAnimation");
@@ -87,10 +88,10 @@ namespace Spine.Unity.Editor {
 			#endif
 
 			#if SPINE_TK2D
-			atlasAssets.isExpanded = false;
+			if (newAtlasAssets) atlasAssets.isExpanded = false;
 			spriteCollection = serializedObject.FindProperty("spriteCollection");
 			#else
-			atlasAssets.isExpanded = true;
+			if (newAtlasAssets) atlasAssets.isExpanded = true;
 			#endif
 
 			m_skeletonDataAssetGUID = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(m_skeletonDataAsset));
@@ -470,44 +471,56 @@ namespace Spine.Unity.Editor {
 				if (SpineEditorUtilities.IsSpineData((TextAsset)skeletonJSON.objectReferenceValue) == false) {
 					warnings.Add("Skeleton data file is not a valid JSON or binary file.");
 				} else {
-					#if !SPINE_TK2D
-					bool detectedNullAtlasEntry = false;
-					var atlasList = new List<Atlas>();
-					var actualAtlasAssets = m_skeletonDataAsset.atlasAssets;
-					for (int i = 0; i < actualAtlasAssets.Length; i++) {
-						if (m_skeletonDataAsset.atlasAssets[i] == null) {
-							detectedNullAtlasEntry = true;
-							break;
-						} else {
-							atlasList.Add(actualAtlasAssets[i].GetAtlas());
-						}
-					}
+					#if SPINE_TK2D
+					bool searchForSpineAtlasAssets = true;
+					bool isSpriteCollectionNull = spriteCollection.objectReferenceValue == null;
+					if (!isSpriteCollectionNull) searchForSpineAtlasAssets = false;
+					//else
+					//	warnings.Add("Your sprite collection may have missing images.");
+					#else
+					const bool searchForSpineAtlasAssets = true;
+					#endif
 
-					if (detectedNullAtlasEntry)
-						warnings.Add("AtlasAsset elements should not be null.");
-					else {
-						// Get requirements.
-						var missingPaths = SpineEditorUtilities.GetRequiredAtlasRegions(AssetDatabase.GetAssetPath((TextAsset)skeletonJSON.objectReferenceValue));
+					if (searchForSpineAtlasAssets) {
+						bool detectedNullAtlasEntry = false;
+						var atlasList = new List<Atlas>();
+						var actualAtlasAssets = m_skeletonDataAsset.atlasAssets;
 
-						foreach (var atlas in atlasList) {
-							for (int i = 0; i < missingPaths.Count; i++) {
-								if (atlas.FindRegion(missingPaths[i]) != null) {
-									missingPaths.RemoveAt(i);
-									i--;
-								}
+						for (int i = 0; i < actualAtlasAssets.Length; i++) {
+							if (m_skeletonDataAsset.atlasAssets[i] == null) {
+								detectedNullAtlasEntry = true;
+								break;
+							} else {
+								atlasList.Add(actualAtlasAssets[i].GetAtlas());
 							}
 						}
 
-						foreach (var str in missingPaths)
-							warnings.Add("Missing Region: '" + str + "'");
-						
+						if (detectedNullAtlasEntry) {
+							warnings.Add("AtlasAsset elements should not be null.");
+						} else {
+							// Get requirements.
+							var missingPaths = SpineEditorUtilities.GetRequiredAtlasRegions(AssetDatabase.GetAssetPath((TextAsset)skeletonJSON.objectReferenceValue));
+
+							foreach (var atlas in atlasList) {
+								for (int i = 0; i < missingPaths.Count; i++) {
+									if (atlas.FindRegion(missingPaths[i]) != null) {
+										missingPaths.RemoveAt(i);
+										i--;
+									}
+								}
+							}
+
+							#if SPINE_TK2D
+							if (missingPaths.Count > 0)
+								warnings.Add("Missing regions. SkeletonDataAsset requires tk2DSpriteCollectionData or Spine AtlasAssets.");
+							#endif
+
+							foreach (var str in missingPaths)
+								warnings.Add("Missing Region: '" + str + "'");
+
+						}
 					}
-					#else
-					if (spriteCollection.objectReferenceValue == null)
-						warnings.Add("SkeletonDataAsset requires tk2DSpriteCollectionData.");
-//					else
-//						warnings.Add("Your sprite collection may have missing images.");
-					#endif
+
 				}
 			}
 		}

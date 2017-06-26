@@ -47,9 +47,9 @@ namespace Spine.Unity {
 			}
 		}
 
-		/// <summary>If a bone isn't set in code, boneName is used to find the bone.</summary>
+		/// <summary>If a bone isn't set in code, boneName is used to find the bone at the beginning. For runtime switching by name, use SetBoneByName. You can also set the BoneFollower.bone field directly.</summary>
 		[SpineBone(dataField: "skeletonRenderer")]
-		public String boneName;
+		[SerializeField] public string boneName;
 
 		public bool followZPosition = true;
 		public bool followBoneRotation = true;
@@ -65,9 +65,24 @@ namespace Spine.Unity {
 		#endregion
 
 		[NonSerialized] public bool valid;
+		/// <summary>
+		/// The bone.
+		/// </summary>
 		[NonSerialized] public Bone bone;
 		Transform skeletonTransform;
 		bool skeletonTransformIsParent;
+
+		/// <summary>
+		/// Sets the target bone by its bone name. Returns false if no bone was found.</summary>
+		public bool SetBone (string name) {
+			bone = skeletonRenderer.skeleton.FindBone(name);
+			if (bone == null) {
+				Debug.LogError("Bone not found: " + name, this);
+				return false;
+			}
+			boneName = name;
+			return true;
+		}
 
 		public void Awake () {
 			if (initializeOnAwake) Initialize();
@@ -115,10 +130,7 @@ namespace Spine.Unity {
 			if (bone == null) {
 				if (string.IsNullOrEmpty(boneName)) return;
 				bone = skeletonRenderer.skeleton.FindBone(boneName);
-				if (bone == null) {
-					Debug.LogError("Bone not found: " + boneName, this);
-					return;
-				}
+				if (!SetBone(boneName)) return;
 			}
 
 			Transform thisTransform = this.transform;

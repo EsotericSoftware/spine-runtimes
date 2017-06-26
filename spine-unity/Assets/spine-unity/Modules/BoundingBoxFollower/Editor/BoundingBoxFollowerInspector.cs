@@ -156,7 +156,7 @@ namespace Spine.Unity.Editor {
 			if (Event.current.type == EventType.Repaint) {
 				if (addBoneFollower) {
 					var boneFollower = follower.gameObject.AddComponent<BoneFollower>();
-					boneFollower.boneName = follower.Slot.Data.BoneData.Name;
+					boneFollower.SetBone(follower.Slot.Data.BoneData.Name);
 					addBoneFollower = false;
 				}
 

@@ -216,6 +216,7 @@
  * Improved performance by using `DYNAMIC_DRAW` for vertex buffer objects and fixing bug that copied to much data to the GPU each frame in `PolygonBatcher`/`Mesh`.
  * Added two color tinting support, enabled by default. You can disable it via the constructors of `SceneRenderer`, `SkeletonRenderer`and `PolygonBatcher`. Note that you will need to use a shader created via `Shader.newTwoColoredTexturedShader` shader with `SkeletonRenderer` and `PolygonBatcher` if two color tinting is enabled.
  * Added clipping support
+ * Added `VertexEffect` interface, instances of which can be set on `SkeletonRenderer`. Allows to modify vertices before submitting them to GPU. See `SwirlEffect`, `JitterEffect`, and the example which allows to set effects.
 
 ### Canvas backend
  * Fixed renderer to work for 3.6 changes. Sadly, we can't support two color tinting via the Canvas API.
@@ -225,6 +226,7 @@
 ### Three.js backend
  * Fixed renderer to work with 3.6 changes. Two color tinting is not supported.
  * Added clipping support
+ * Added `VertexEffect` interface, instances of which can be set on `SkeletonMesh`. Allows to modify vertices before submitting them to GPU. See `SwirlEffect`, `JitterEffect`.
 
 ### Widget backend
  * Fixed WebGL context loss (see WebGL backend changes). Enabled automatically.
