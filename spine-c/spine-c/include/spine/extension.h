@@ -103,7 +103,7 @@
 #define COS(A) cosf(A)
 #define SQRT(A) sqrtf(A)
 #define ACOS(A) acosf(A)
-#define POW(A,B) pow(A, B);
+#define POW(A,B) pow(A, B)
 #else
 #define FMOD(A,B) (float)fmod(A, B)
 #define ATAN2(A,B) (float)atan2(A, B)

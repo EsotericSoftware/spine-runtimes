@@ -46,6 +46,7 @@
   * Added `spSkeletonClipper` and `spTriangulator`, used to implement software clipping of attachments.
   * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
   * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
+  * Added `spVertexEffect` and corresponding implementations `spJitterVertexEffect` and `spSwirlVertexEffect`. Create/dispose through the corresponding `spXXXVertexEffect_create()/dispose()` functions. Set on framework/engine specific renderer. See changes for spine-c based frameworks/engines below.
 
 ### Cocos2d-X
  * Fixed renderer to work with 3.6 changes
@@ -55,6 +56,7 @@
  * Added mesh debug rendering. Enable/Disable via `SkeletonRenderer::setDebugMeshesEnabled()`.
  * Added support for clipping.
  * SkeletonRenderer now combines the displayed color of the Node (cascaded from all parents) with the skeleton color for tinting.
+ * Added support for vertex effects. See `RaptorExample.cpp`.
 
 ### Cocos2d-Objc
  * Fixed renderer to work with 3.6 changes
@@ -64,6 +66,7 @@
 ### SFML
  * Fixed renderer to work with 3.6 changes. Sadly, two color tinting does not work, as the vertex format in SFML is fixed.
  * Added support for clipping.
+ * Added support for vertex effects. See raptor example.
 
 ### Unreal Engine 4
  * Fixed renderer to work with 3.6 changes

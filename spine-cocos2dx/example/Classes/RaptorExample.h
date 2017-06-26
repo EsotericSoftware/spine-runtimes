@@ -41,9 +41,12 @@ public:
 	CREATE_FUNC(RaptorExample);
 
 	virtual bool init ();
+	
+	virtual void update(float fDelta);
 
 private:
 	spine::SkeletonAnimation* skeletonNode;
+	float swirlTime;
 };
 
 #endif // _RAPTOREXAMPLE_H_
