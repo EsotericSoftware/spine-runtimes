@@ -801,7 +801,6 @@ void _spAnimationState_animationsChanged (spAnimationState* self) {
 	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
 	int i, n;
 	spTrackEntry* entry;
-	spTrackEntry* lastEntry = 0;
 	spTrackEntryArray* mixingTo;
 	internal->animationsChanged = 0;
 
@@ -812,10 +811,7 @@ void _spAnimationState_animationsChanged (spAnimationState* self) {
 
 	for (;i < n; i++) {
 		entry = self->tracks[i];
-		if (entry != 0) {
-			_spTrackEntry_setTimelineData(entry, lastEntry, mixingTo, self);
-			lastEntry = entry;
-		}
+		if (entry != 0) _spTrackEntry_setTimelineData(entry, 0, mixingTo, self);
 	}
 }
 

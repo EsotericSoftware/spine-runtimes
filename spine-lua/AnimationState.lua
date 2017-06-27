@@ -804,17 +804,15 @@ function AnimationState:disposeNext (entry)
 end
 
 function AnimationState:_animationsChanged ()
-  self.animationsChanged = false
+	self.animationsChanged = false
 
-  self.propertyIDs = {}
-  local propertyIDs = self.propertyIDs
+	self.propertyIDs = {}
+	local propertyIDs = self.propertyIDs
 	local mixingTo = self.mixingTo
-	
-  local lastEntry = nil
+	  
 	for i, entry in pairs(self.tracks) do
 		if entry then
-			entry:setTimelineData(lastEntry, mixingTo, propertyIDs)
-			lastEntry = entry
+			entry:setTimelineData(nil, mixingTo, propertyIDs)			
 		end
 	end
 end

@@ -1581,13 +1581,10 @@ var spine;
 			var propertyIDs = this.propertyIDs;
 			propertyIDs.clear();
 			var mixingTo = this.mixingTo;
-			var lastEntry = null;
 			for (var i = 0, n = this.tracks.length; i < n; i++) {
 				var entry = this.tracks[i];
-				if (entry != null) {
-					entry.setTimelineData(lastEntry, mixingTo, propertyIDs);
-					lastEntry = entry;
-				}
+				if (entry != null)
+					entry.setTimelineData(null, mixingTo, propertyIDs);
 			}
 		};
 		AnimationState.prototype.getCurrent = function (trackIndex) {
