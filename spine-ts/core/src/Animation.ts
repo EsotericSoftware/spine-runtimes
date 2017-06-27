@@ -677,6 +677,8 @@ module spine {
 		}
 	}
 
+	var zeros : ArrayLike<number> = null;
+
 	export class DeformTimeline extends CurveTimeline {
 		slotIndex: number;
 		attachment: VertexAttachment;
@@ -687,6 +689,7 @@ module spine {
 			super(frameCount);
 			this.frames = Utils.newFloatArray(frameCount);
 			this.frameVertices = new Array<ArrayLike<number>>(frameCount);
+			if (zeros == null) zeros = Utils.newFloatArray(64);
 		}
 
 		getPropertyId () {
@@ -703,26 +706,44 @@ module spine {
 			let slot: Slot = skeleton.slots[this.slotIndex];
 			let slotAttachment: Attachment = slot.getAttachment();
 			if (!(slotAttachment instanceof VertexAttachment) || !(<VertexAttachment>slotAttachment).applyDeform(this.attachment)) return;
-			
+
 			let verticesArray: Array<number> = slot.attachmentVertices;
-			let frameVertices = this.frameVertices;				
-			let vertexCount = frameVertices[0].length;					
-			if (verticesArray.length != vertexCount && pose != MixPose.setup) alpha = 1; // Don't mix from uninitialized slot vertices.
+			let frameVertices = this.frameVertices;
+			let vertexCount = frameVertices[0].length;
 			let vertices: Array<number> = Utils.setArraySize(verticesArray, vertexCount);
 
 			let frames = this.frames;
 			if (time < frames[0]) {
+				let vertexAttachment = <VertexAttachment>slotAttachment;
 				switch (pose) {
 				case MixPose.setup:
-					verticesArray.length = 0;
+					var zeroVertices: ArrayLike<number>;
+					if (vertexAttachment.bones == null) {
+						// Unweighted vertex positions (setup pose).
+						zeroVertices = vertexAttachment.vertices;
+					} else {
+						// Weighted deform offsets (zeros).
+						zeroVertices = zeros;
+						if (zeroVertices.length < vertexCount) zeros = zeroVertices = Utils.newFloatArray(vertexCount);
+					}
+					Utils.arrayCopy(zeroVertices, 0, vertices, 0, vertexCount);
 					return;
 				case MixPose.current:
-					alpha = 1 - alpha;
-					for (let i = 0; i < vertexCount; i++)
-						vertices[i] *= alpha;
+					if (alpha == 1) break;
+					if (vertexAttachment.bones == null) {
+						// Unweighted vertex positions.
+						var setupVertices = vertexAttachment.vertices;
+						for (var i = 0; i < vertexCount; i++)
+							vertices[i] += (setupVertices[i] - vertices[i]) * alpha;
+					} else {
+						// Weighted deform offsets.
+						alpha = 1 - alpha;
+						for (var i = 0; i < vertexCount; i++)
+							vertices[i] *= alpha;
+					}
 				}
 				return;
-			}			
+			}
 
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.
 				let lastVertices = frameVertices[frames.length - 1];
