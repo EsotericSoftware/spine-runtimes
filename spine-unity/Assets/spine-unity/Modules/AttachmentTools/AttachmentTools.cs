@@ -798,6 +798,14 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			if (pathAttachment != null)
 				return pathAttachment.GetClone();
 
+			var pointAttachment = o as PointAttachment;
+			if (pointAttachment != null)
+				return pointAttachment.GetClone();
+
+			var clippingAttachment = o as ClippingAttachment;
+			if (clippingAttachment != null)
+				return clippingAttachment.GetClone();
+
 			return null;
 		}
 
@@ -827,6 +835,23 @@ namespace Spine.Unity.Modules.AttachmentTools {
 				uvs = o.uvs.Clone() as float[],
 				offset = o.offset.Clone() as float[]
 			};
+		}
+
+		public static ClippingAttachment GetClone (this ClippingAttachment o) {
+			var ca = new ClippingAttachment(o.Name) {
+				endSlot = o.endSlot
+			};
+			CloneVertexAttachment(o, ca);
+			return ca;
+		}
+
+		public static PointAttachment GetClone (this PointAttachment o) {
+			var pa = new PointAttachment(o.Name) {
+				rotation = o.rotation,
+				x = o.x,
+				y = o.y
+			};
+			return pa;
 		}
 
 		public static BoundingBoxAttachment GetClone (this BoundingBoxAttachment o) {
