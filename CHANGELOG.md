@@ -179,15 +179,18 @@
   * Added `SkeletonClipper` and `Triangulator`, used to implement software clipping of attachments.
   * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
   * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
+  * Added `JitterEffect` and `SwirlEffect` and support for vertex effects in Corona and Love
 
 ### Love2D
   * Fixed renderer to work with 3.6 changes
   * Added support for two color tinting. Enable it via `SkeletonRenderer.new(true)`.
   * Added clipping support.
+  * Added support for vertex effects. Set an implementation like "JitterEffect" on `Skeleton.vertexEffect`. See `main.lua` for an example.
 
 ### Corona
   * Fixed renderer to work with 3.6 changes. Sadly, two color tinting is not supported, as Corona doesn't let us change the vertex format needed and its doesn't allow to modify shaders in the way needed for two color tinting
   * Added clipping support.
+  * Added support for vertex effects. Set an implementation like "JitterEffect" on `SkeletonRenderer.vertexEffect`. See `main.lua` for an example
 
 ## Typescript/Javascript
  * **Breaking changes**

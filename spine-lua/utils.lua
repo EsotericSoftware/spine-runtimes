@@ -30,6 +30,9 @@
 
 local utils = {}
 
+local math_sqrt = math.sqrt
+local math_random = math.random
+
 utils.degRad = math.pi / 180
 
 function tablePrint (tt, indent, done)
@@ -151,6 +154,17 @@ function utils.mod(a, b)
   else
     return a % b
   end
+end
+
+function utils.randomTriangular(min, max)
+	return utils.randomTriangularWith(min, max, (min + max) * 0.5)
+end
+
+function utils.randomTriangularWith(min, max, mode)
+	local u = math.random()
+	local d = max - min
+	if (u <= (mode - min) / d) then return min + math_sqrt(u * d * (mode - min)) end
+	return max - math_sqrt((1 - u) * d * (max - mode))
 end
 
 return utils
