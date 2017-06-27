@@ -551,14 +551,10 @@ package spine.animation {
 			animationsChanged = false;
 
 			var propertyIDs : Dictionary = this.propertyIDs = new Dictionary();					
-			var mixingTo : Vector.<TrackEntry> = this.mixingTo;
-			var lastEntry : TrackEntry = null;
+			var mixingTo : Vector.<TrackEntry> = this.mixingTo;			
 			for (var i : int = 0, n : int = tracks.length; i < n; i++) {
 				var entry : TrackEntry = tracks[i];
-				if (entry != null) {
-					entry.setTimelineData(lastEntry, mixingTo, propertyIDs);
-					lastEntry = entry;
-				}
+				if (entry != null) entry.setTimelineData(null, mixingTo, propertyIDs);				
 			}
 		}
 
