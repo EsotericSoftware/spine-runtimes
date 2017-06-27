@@ -29,6 +29,10 @@
  *****************************************************************************/
 
 package spine.examples {
+	import spine.interpolation.Pow;
+	import starling.animation.IAnimatable;
+	import spine.vertexeffects.SwirlEffect;
+	import spine.vertexeffects.JitterEffect;
 	import starling.display.DisplayObjectContainer;
 	import spine.atlas.Atlas;
 	import spine.*;
@@ -43,7 +47,7 @@ package spine.examples {
 	import starling.events.TouchEvent;
 	import starling.events.TouchPhase;
 
-	public class RaptorExample extends Sprite {
+	public class RaptorExample extends Sprite implements IAnimatable {
 		[Embed(source = "/raptor-pro.json", mimeType = "application/octet-stream")]
 		static public const RaptorJson : Class;
 
@@ -55,6 +59,10 @@ package spine.examples {
 		private var skeleton : SkeletonAnimation;
 		private var gunGrabbed : Boolean;
 		private var gunGrabCount : Number = 0;
+		
+		private var swirl : SwirlEffect;
+		private var swirlTime : Number = 0;
+		private var pow2 : Interpolation = new Pow(2);
 
 		public function RaptorExample() {
 			var attachmentLoader : AttachmentLoader;
@@ -74,9 +82,15 @@ package spine.examples {
 			skeleton.state.apply(skeleton.skeleton);
 			skeleton.skeleton.updateWorldTransform();
 			this.setRequiresRedraw();
+			
+			// skeleton.vertexEffect = new JitterEffect(10, 10);
+			swirl = new SwirlEffect(400);
+			swirl.centerY = -200;	
+			skeleton.vertexEffect = swirl;
 
 			addChild(skeleton);
 			Starling.juggler.add(skeleton);
+			Starling.juggler.add(this);
 
 			addEventListener(TouchEvent.TOUCH, onClick);
 		}
@@ -97,6 +111,13 @@ package spine.examples {
 					parent.addChild(new TankExample());
 				}
 			}
+		}
+
+		public function advanceTime(time : Number) : void {
+			swirlTime += time;
+			var percent : Number = swirlTime % 2;
+			if (percent > 1) percent = 1 - (percent - 1);
+			swirl.angle = pow2.apply(-60, 60, percent);
 		}
 	}
 }

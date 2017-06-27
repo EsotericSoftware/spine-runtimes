@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
+ 
 package spine {
 	public class MathUtils {
 		static public var PI : Number = Math.PI;
@@ -51,6 +51,17 @@ package spine {
 
 		static public function signum(value : Number) : Number {
 			return value > 0 ? 1 : value < 0 ? -1 : 0;
+		}
+
+		static public function randomTriangular(min : Number, max : Number) : Number {
+			return randomTriangularWith(min, max, (min + max) * 0.5);
+		}
+
+		static public function randomTriangularWith(min : Number, max : Number, mode : Number) : Number {
+			var u : Number = Math.random();
+			var d : Number = max - min;
+			if (u <= (mode - min) / d) return min + Math.sqrt(u * d * (mode - min));
+			return max - Math.sqrt((1 - u) * d * (max - mode));
 		}
 	}
 }
