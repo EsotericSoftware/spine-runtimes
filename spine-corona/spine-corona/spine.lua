@@ -65,6 +65,9 @@ spine.AtlasAttachmentLoader = require "spine-lua.AtlasAttachmentLoader"
 spine.Color = require "spine-lua.Color"
 spine.Triangulator = require "spine-lua.Triangulator"
 spine.SkeletonClipping = require "spine-lua.SkeletonClipping"
+spine.JitterEffect = require "spine-lua.vertexeffects.JitterEffect"
+spine.SwirlEffect = require "spine-lua.vertexeffects.SwirlEffect"
+spine.Interpolation = require "spine-lua.Interpolation"
 
 spine.utils.readFile = function (fileName, base)
 	if not base then base = system.ResourceDirectory end
@@ -92,6 +95,14 @@ spine.Skeleton.new = function(skeletonData, group)
 	self.batches = 0
 	self.tempColor = spine.Color.newWith(1, 1, 1, 1)
 	self.tempColor2 = spine.Color.newWith(-1, 1, 1, 1)
+	self.tempVertex = {
+		x = 0,
+		y = 0,
+		u = 0,
+		v = 0,
+		light = spine.Color.newWith(1, 1, 1, 1),
+		dark = spine.Color.newWith(0, 0, 0, 0)
+	}
 	self.clipper = spine.SkeletonClipping.new()
 	return self
 end
@@ -119,6 +130,8 @@ function spine.Skeleton:updateWorldTransform()
 	local premultipliedAlpha = self.premultipliedAlpha
 
 	self.batches = 0
+	
+	if (self.vertexEffect) then self.vertexEffect:beginEffect(self) end
 
 	-- Remove old drawing group, we will start anew
 	if self.drawingGroup then self.drawingGroup:removeSelf() end
@@ -217,6 +230,7 @@ function spine.Skeleton:updateWorldTransform()
 	end
 	
 	self.clipper:clipEnd2()
+	if (self.vertexEffect) then self.vertexEffect:endEffect() end
 end
 
 function spine.Skeleton:flush(groupVertices, groupUvs, groupIndices, texture, color, blendMode, drawingGroup)
@@ -250,13 +264,31 @@ function spine.Skeleton:batch(vertices, uvs, numVertices, indices, groupVertices
 	i = 1
 	local vertexStart = #groupVertices + 1
 	local vertexEnd = vertexStart + numVertices * 2
-	while vertexStart < vertexEnd do
-		groupVertices[vertexStart] = vertices[i]
-		groupVertices[vertexStart+1] = vertices[i+1]
-		groupUvs[vertexStart] = uvs[i]
-		groupUvs[vertexStart+1] = uvs[i+1]
-		vertexStart = vertexStart + 2
-		i = i + 2
+	if (self.vertexEffect) then
+		local effect = self.vertexEffect
+		local vertex = self.tempVertex
+		while vertexStart < vertexEnd do
+			vertex.x = vertices[i]
+			vertex.y = vertices[i+1]
+			vertex.u = uvs[i]
+			vertex.v = uvs[i+1]
+			effect:transform(vertex);
+			groupVertices[vertexStart] = vertex.x
+			groupVertices[vertexStart+1] = vertex.y
+			groupUvs[vertexStart] = vertex.u
+			groupUvs[vertexStart+1] = vertex.v
+			vertexStart = vertexStart + 2
+			i = i + 2
+		end
+	else
+		while vertexStart < vertexEnd do
+			groupVertices[vertexStart] = vertices[i]
+			groupVertices[vertexStart+1] = vertices[i+1]
+			groupUvs[vertexStart] = uvs[i]
+			groupUvs[vertexStart+1] = uvs[i+1]
+			vertexStart = vertexStart + 2
+			i = i + 2
+		end
 	end
 end
 
