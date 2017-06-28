@@ -73,15 +73,15 @@ namespace Spine.Unity {
 			return AddBoundingBoxAsComponent(box, slot, go, isTrigger);
 		}
 
-		public static PolygonCollider2D AddBoundingBoxAsComponent (BoundingBoxAttachment box, Slot slot, GameObject gameObject, bool isTrigger = true) {
+		public static PolygonCollider2D AddBoundingBoxAsComponent (BoundingBoxAttachment box, Slot slot, GameObject gameObject, bool isTrigger = true, bool isKinematic = true, float gravityScale = 0f) {
 			if (box == null) return null;
 
 			if (slot.bone != slot.Skeleton.RootBone) {
 				var rb = gameObject.GetComponent<Rigidbody2D>();
 				if (rb == null) {
 					rb = gameObject.AddComponent<Rigidbody2D>();
-					rb.isKinematic = true;
-					rb.gravityScale = 0;
+					rb.isKinematic = isKinematic;
+					rb.gravityScale = gravityScale;
 				}
 			}
 

@@ -628,12 +628,15 @@ var spine;
 		return AttachmentTimeline;
 	}());
 	spine.AttachmentTimeline = AttachmentTimeline;
+	var zeros = null;
 	var DeformTimeline = (function (_super) {
 		__extends(DeformTimeline, _super);
 		function DeformTimeline(frameCount) {
 			var _this = _super.call(this, frameCount) || this;
 			_this.frames = spine.Utils.newFloatArray(frameCount);
 			_this.frameVertices = new Array(frameCount);
+			if (zeros == null)
+				zeros = spine.Utils.newFloatArray(64);
 			return _this;
 		}
 		DeformTimeline.prototype.getPropertyId = function () {
@@ -651,19 +654,36 @@ var spine;
 			var verticesArray = slot.attachmentVertices;
 			var frameVertices = this.frameVertices;
 			var vertexCount = frameVertices[0].length;
-			if (verticesArray.length != vertexCount && pose != MixPose.setup)
-				alpha = 1;
 			var vertices = spine.Utils.setArraySize(verticesArray, vertexCount);
 			var frames = this.frames;
 			if (time < frames[0]) {
+				var vertexAttachment = slotAttachment;
 				switch (pose) {
 					case MixPose.setup:
-						verticesArray.length = 0;
+						var zeroVertices;
+						if (vertexAttachment.bones == null) {
+							zeroVertices = vertexAttachment.vertices;
+						}
+						else {
+							zeroVertices = zeros;
+							if (zeroVertices.length < vertexCount)
+								zeros = zeroVertices = spine.Utils.newFloatArray(vertexCount);
+						}
+						spine.Utils.arrayCopy(zeroVertices, 0, vertices, 0, vertexCount);
 						return;
 					case MixPose.current:
-						alpha = 1 - alpha;
-						for (var i = 0; i < vertexCount; i++)
-							vertices[i] *= alpha;
+						if (alpha == 1)
+							break;
+						if (vertexAttachment.bones == null) {
+							var setupVertices = vertexAttachment.vertices;
+							for (var i = 0; i < vertexCount; i++)
+								vertices[i] += (setupVertices[i] - vertices[i]) * alpha;
+						}
+						else {
+							alpha = 1 - alpha;
+							for (var i = 0; i < vertexCount; i++)
+								vertices[i] *= alpha;
+						}
 				}
 				return;
 			}
@@ -675,20 +695,20 @@ var spine;
 				else if (pose == MixPose.setup) {
 					var vertexAttachment = slotAttachment;
 					if (vertexAttachment.bones == null) {
-						var setupVertices = vertexAttachment.vertices;
-						for (var i = 0; i < vertexCount; i++) {
-							var setup = setupVertices[i];
-							vertices[i] = setup + (lastVertices[i] - setup) * alpha;
+						var setupVertices_1 = vertexAttachment.vertices;
+						for (var i_1 = 0; i_1 < vertexCount; i_1++) {
+							var setup = setupVertices_1[i_1];
+							vertices[i_1] = setup + (lastVertices[i_1] - setup) * alpha;
 						}
 					}
 					else {
-						for (var i = 0; i < vertexCount; i++)
-							vertices[i] = lastVertices[i] * alpha;
+						for (var i_2 = 0; i_2 < vertexCount; i_2++)
+							vertices[i_2] = lastVertices[i_2] * alpha;
 					}
 				}
 				else {
-					for (var i = 0; i < vertexCount; i++)
-						vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
+					for (var i_3 = 0; i_3 < vertexCount; i_3++)
+						vertices[i_3] += (lastVertices[i_3] - vertices[i_3]) * alpha;
 				}
 				return;
 			}
@@ -698,31 +718,31 @@ var spine;
 			var frameTime = frames[frame];
 			var percent = this.getCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime));
 			if (alpha == 1) {
-				for (var i = 0; i < vertexCount; i++) {
-					var prev = prevVertices[i];
-					vertices[i] = prev + (nextVertices[i] - prev) * percent;
+				for (var i_4 = 0; i_4 < vertexCount; i_4++) {
+					var prev = prevVertices[i_4];
+					vertices[i_4] = prev + (nextVertices[i_4] - prev) * percent;
 				}
 			}
 			else if (pose == MixPose.setup) {
 				var vertexAttachment = slotAttachment;
 				if (vertexAttachment.bones == null) {
-					var setupVertices = vertexAttachment.vertices;
-					for (var i = 0; i < vertexCount; i++) {
-						var prev = prevVertices[i], setup = setupVertices[i];
-						vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+					var setupVertices_2 = vertexAttachment.vertices;
+					for (var i_5 = 0; i_5 < vertexCount; i_5++) {
+						var prev = prevVertices[i_5], setup = setupVertices_2[i_5];
+						vertices[i_5] = setup + (prev + (nextVertices[i_5] - prev) * percent - setup) * alpha;
 					}
 				}
 				else {
-					for (var i = 0; i < vertexCount; i++) {
-						var prev = prevVertices[i];
-						vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
+					for (var i_6 = 0; i_6 < vertexCount; i_6++) {
+						var prev = prevVertices[i_6];
+						vertices[i_6] = (prev + (nextVertices[i_6] - prev) * percent) * alpha;
 					}
 				}
 			}
 			else {
-				for (var i = 0; i < vertexCount; i++) {
-					var prev = prevVertices[i];
-					vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+				for (var i_7 = 0; i_7 < vertexCount; i_7++) {
+					var prev = prevVertices[i_7];
+					vertices[i_7] += (prev + (nextVertices[i_7] - prev) * percent - vertices[i_7]) * alpha;
 				}
 			}
 		};
@@ -6638,8 +6658,8 @@ var spine;
 						break;
 					}
 					var listeners = _this.listeners;
-					for (var i_1 = 0; i_1 < listeners.length; i_1++) {
-						listeners[i_1].down(_this.currTouch.x, _this.currTouch.y);
+					for (var i_8 = 0; i_8 < listeners.length; i_8++) {
+						listeners[i_8].down(_this.currTouch.x, _this.currTouch.y);
 					}
 					console.log("Start " + _this.currTouch.x + ", " + _this.currTouch.y);
 					_this.lastX = _this.currTouch.x;
@@ -6657,8 +6677,8 @@ var spine;
 							var y = _this.currTouch.y = touch.clientY - rect.top;
 							_this.touchesPool.free(_this.currTouch);
 							var listeners = _this.listeners;
-							for (var i_2 = 0; i_2 < listeners.length; i_2++) {
-								listeners[i_2].up(x, y);
+							for (var i_9 = 0; i_9 < listeners.length; i_9++) {
+								listeners[i_9].up(x, y);
 							}
 							console.log("End " + x + ", " + y);
 							_this.lastX = x;
@@ -6680,8 +6700,8 @@ var spine;
 							var y = _this.currTouch.y = touch.clientY - rect.top;
 							_this.touchesPool.free(_this.currTouch);
 							var listeners = _this.listeners;
-							for (var i_3 = 0; i_3 < listeners.length; i_3++) {
-								listeners[i_3].up(x, y);
+							for (var i_10 = 0; i_10 < listeners.length; i_10++) {
+								listeners[i_10].up(x, y);
 							}
 							console.log("End " + x + ", " + y);
 							_this.lastX = x;
@@ -6704,8 +6724,8 @@ var spine;
 							var x = touch.clientX - rect.left;
 							var y = touch.clientY - rect.top;
 							var listeners = _this.listeners;
-							for (var i_4 = 0; i_4 < listeners.length; i_4++) {
-								listeners[i_4].dragged(x, y);
+							for (var i_11 = 0; i_11 < listeners.length; i_11++) {
+								listeners[i_11].dragged(x, y);
 							}
 							console.log("Drag " + x + ", " + y);
 							_this.lastX = _this.currTouch.x = x;
@@ -8484,11 +8504,11 @@ var spine;
 						var nn = clip.worldVerticesLength;
 						var world = this.temp = spine.Utils.setArraySize(this.temp, nn, 0);
 						clip.computeWorldVertices(slot, 0, nn, world, 0, 2);
-						for (var i_5 = 0, n_2 = world.length; i_5 < n_2; i_5 += 2) {
-							var x = world[i_5];
-							var y = world[i_5 + 1];
-							var x2 = world[(i_5 + 2) % world.length];
-							var y2 = world[(i_5 + 3) % world.length];
+						for (var i_12 = 0, n_2 = world.length; i_12 < n_2; i_12 += 2) {
+							var x = world[i_12];
+							var y = world[i_12 + 1];
+							var x2 = world[(i_12 + 2) % world.length];
+							var y2 = world[(i_12 + 3) % world.length];
 							shapes.line(x, y, x2, y2);
 						}
 					}

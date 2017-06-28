@@ -288,7 +288,7 @@ namespace Spine.Unity.Modules {
 			t.localScale = new Vector3(b.WorldScaleX, b.WorldScaleY, 0);
 
 			// MITCH: You left "todo: proper ragdoll branching"
-			var colliders = AttachBoundingBoxRagdollColliders(b, boneGameObject, skeleton);
+			var colliders = AttachBoundingBoxRagdollColliders(b, boneGameObject, skeleton, this.gravityScale);
 			if (colliders.Count == 0) {
 				float length = b.data.length;
 				if (length == 0) {
@@ -300,7 +300,9 @@ namespace Spine.Unity.Modules {
 					box.offset = new Vector2(length * 0.5f, 0); // box.center in UNITY_4
 				}
 			}
-			var rb = boneGameObject.AddComponent<Rigidbody2D>();
+
+			var rb = boneGameObject.GetComponent<Rigidbody2D>();
+			if (rb == null) rb = boneGameObject.AddComponent<Rigidbody2D>();
 			rb.gravityScale = this.gravityScale;
 
 			foreach (Bone child in b.Children)
@@ -354,7 +356,7 @@ namespace Spine.Unity.Modules {
 			}
 		}
 
-		static List<Collider2D> AttachBoundingBoxRagdollColliders (Bone b, GameObject go, Skeleton skeleton) {
+		static List<Collider2D> AttachBoundingBoxRagdollColliders (Bone b, GameObject go, Skeleton skeleton, float gravityScale) {
 			const string AttachmentNameMarker = "ragdoll";
 			var colliders = new List<Collider2D>();
 			var skin = skeleton.Skin ?? skeleton.Data.DefaultSkin;
@@ -369,7 +371,7 @@ namespace Spine.Unity.Modules {
 							if (!a.Name.ToLower().Contains(AttachmentNameMarker))
 								continue;
 
-							var bbCollider = SkeletonUtility.AddBoundingBoxAsComponent(bbAttachment, s, go, false);
+							var bbCollider = SkeletonUtility.AddBoundingBoxAsComponent(bbAttachment, s, go, isTrigger: false, isKinematic: false, gravityScale: gravityScale);
 							colliders.Add(bbCollider);
 						}
 					}

@@ -40,7 +40,7 @@ namespace Spine.Unity.Editor {
 
 		protected override void OnEnable () {
 			base.OnEnable();
-			mecanimTranslator = serializedObject.FindProperty("mecanimTranslator");
+			mecanimTranslator = serializedObject.FindProperty("translator");
 		}
 
 		protected override void DrawInspectorGUI (bool multi) {

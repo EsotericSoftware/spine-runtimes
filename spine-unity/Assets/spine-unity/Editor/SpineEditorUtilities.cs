@@ -228,12 +228,10 @@ namespace Spine.Unity.Editor {
 			EditorApplication.hierarchyWindowItemOnGUI += HierarchyDragAndDrop;
 
 			// Hierarchy Icons
-			EditorApplication.hierarchyWindowChanged -= HierarchyIconsOnChanged;
-			EditorApplication.hierarchyWindowChanged += HierarchyIconsOnChanged;
-			EditorApplication.hierarchyWindowItemOnGUI -= HierarchyIconsOnGUI;
-			EditorApplication.hierarchyWindowItemOnGUI += HierarchyIconsOnGUI;
+			EditorApplication.playmodeStateChanged -= HierarchyIconsOnPlaymodeStateChanged;
+			EditorApplication.playmodeStateChanged += HierarchyIconsOnPlaymodeStateChanged;
+			HierarchyIconsOnPlaymodeStateChanged();
 
-			HierarchyIconsOnChanged();
 			initialized = true;
 		}
 
@@ -255,7 +253,7 @@ namespace Spine.Unity.Editor {
 			showHierarchyIcons = EditorGUILayout.Toggle(new GUIContent("Show Hierarchy Icons", "Show relevant icons on GameObjects with Spine Components on them. Disable this if you have large, complex scenes."), showHierarchyIcons);
 			if (EditorGUI.EndChangeCheck()) {
 				EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, showHierarchyIcons);
-				HierarchyIconsOnChanged();
+				HierarchyIconsOnPlaymodeStateChanged();
 			}
 
 			EditorGUILayout.Separator();
@@ -496,58 +494,68 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Hierarchy
-		static void HierarchyIconsOnChanged () {
-			if (showHierarchyIcons) {
-				skeletonRendererTable.Clear();
-				skeletonUtilityBoneTable.Clear();
-				boundingBoxFollowerTable.Clear();
+		static void HierarchyIconsOnPlaymodeStateChanged () {
+			skeletonRendererTable.Clear();
+			skeletonUtilityBoneTable.Clear();
+			boundingBoxFollowerTable.Clear();
 
-				SkeletonRenderer[] arr = Object.FindObjectsOfType<SkeletonRenderer>();
-				foreach (SkeletonRenderer r in arr)
-					skeletonRendererTable.Add(r.gameObject.GetInstanceID(), r.gameObject);
+			EditorApplication.hierarchyWindowChanged -= HierarchyIconsOnChanged;
+			EditorApplication.hierarchyWindowItemOnGUI -= HierarchyIconsOnGUI;
 
-				SkeletonUtilityBone[] boneArr = Object.FindObjectsOfType<SkeletonUtilityBone>();
-				foreach (SkeletonUtilityBone b in boneArr)
-					skeletonUtilityBoneTable.Add(b.gameObject.GetInstanceID(), b);
-
-				BoundingBoxFollower[] bbfArr = Object.FindObjectsOfType<BoundingBoxFollower>();
-				foreach (BoundingBoxFollower bbf in bbfArr)
-					boundingBoxFollowerTable.Add(bbf.gameObject.GetInstanceID(), bbf);
+			if (!Application.isPlaying && showHierarchyIcons) {
+				EditorApplication.hierarchyWindowChanged += HierarchyIconsOnChanged;
+				EditorApplication.hierarchyWindowItemOnGUI += HierarchyIconsOnGUI;
+				HierarchyIconsOnChanged();
 			}
 		}
 
-		static void HierarchyIconsOnGUI (int instanceId, Rect selectionRect) {
-			if (showHierarchyIcons) {
-				Rect r = new Rect(selectionRect);
-				if (skeletonRendererTable.ContainsKey(instanceId)) {
-					r.x = r.width - 15;
-					r.width = 15;
-					GUI.Label(r, Icons.spine);
-				} else if (skeletonUtilityBoneTable.ContainsKey(instanceId)) {
-					r.x -= 26;
-					if (skeletonUtilityBoneTable[instanceId] != null) {
-						if (skeletonUtilityBoneTable[instanceId].transform.childCount == 0)
-							r.x += 13;
-						r.y += 2;
-						r.width = 13;
-						r.height = 13;
-						if (skeletonUtilityBoneTable[instanceId].mode == SkeletonUtilityBone.Mode.Follow)
-							GUI.DrawTexture(r, Icons.bone);
-						else
-							GUI.DrawTexture(r, Icons.poseBones);
-					}
-				} else if (boundingBoxFollowerTable.ContainsKey(instanceId)) {
-					r.x -= 26;
-					if (boundingBoxFollowerTable[instanceId] != null) {
-						if (boundingBoxFollowerTable[instanceId].transform.childCount == 0)
-							r.x += 13;
-						r.y += 2;
-						r.width = 13;
-						r.height = 13;
-						GUI.DrawTexture(r, Icons.boundingBox);
-					}
-				}
+		static void HierarchyIconsOnChanged () {
+			skeletonRendererTable.Clear();
+			skeletonUtilityBoneTable.Clear();
+			boundingBoxFollowerTable.Clear();
 
+			SkeletonRenderer[] arr = Object.FindObjectsOfType<SkeletonRenderer>();
+			foreach (SkeletonRenderer r in arr)
+				skeletonRendererTable.Add(r.gameObject.GetInstanceID(), r.gameObject);
+
+			SkeletonUtilityBone[] boneArr = Object.FindObjectsOfType<SkeletonUtilityBone>();
+			foreach (SkeletonUtilityBone b in boneArr)
+				skeletonUtilityBoneTable.Add(b.gameObject.GetInstanceID(), b);
+
+			BoundingBoxFollower[] bbfArr = Object.FindObjectsOfType<BoundingBoxFollower>();
+			foreach (BoundingBoxFollower bbf in bbfArr)
+				boundingBoxFollowerTable.Add(bbf.gameObject.GetInstanceID(), bbf);
+		}
+
+		static void HierarchyIconsOnGUI (int instanceId, Rect selectionRect) {
+			Rect r = new Rect(selectionRect);
+			if (skeletonRendererTable.ContainsKey(instanceId)) {
+				r.x = r.width - 15;
+				r.width = 15;
+				GUI.Label(r, Icons.spine);
+			} else if (skeletonUtilityBoneTable.ContainsKey(instanceId)) {
+				r.x -= 26;
+				if (skeletonUtilityBoneTable[instanceId] != null) {
+					if (skeletonUtilityBoneTable[instanceId].transform.childCount == 0)
+						r.x += 13;
+					r.y += 2;
+					r.width = 13;
+					r.height = 13;
+					if (skeletonUtilityBoneTable[instanceId].mode == SkeletonUtilityBone.Mode.Follow)
+						GUI.DrawTexture(r, Icons.bone);
+					else
+						GUI.DrawTexture(r, Icons.poseBones);
+				}
+			} else if (boundingBoxFollowerTable.ContainsKey(instanceId)) {
+				r.x -= 26;
+				if (boundingBoxFollowerTable[instanceId] != null) {
+					if (boundingBoxFollowerTable[instanceId].transform.childCount == 0)
+						r.x += 13;
+					r.y += 2;
+					r.width = 13;
+					r.height = 13;
+					GUI.DrawTexture(r, Icons.boundingBox);
+				}
 			}
 		}
 		#endregion
