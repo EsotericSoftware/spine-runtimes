@@ -253,7 +253,7 @@ namespace Spine.Unity.Editor {
 			showHierarchyIcons = EditorGUILayout.Toggle(new GUIContent("Show Hierarchy Icons", "Show relevant icons on GameObjects with Spine Components on them. Disable this if you have large, complex scenes."), showHierarchyIcons);
 			if (EditorGUI.EndChangeCheck()) {
 				EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, showHierarchyIcons);
-				HierarchyIconsOnChanged();
+				HierarchyIconsOnPlaymodeStateChanged();
 			}
 
 			EditorGUILayout.Separator();
