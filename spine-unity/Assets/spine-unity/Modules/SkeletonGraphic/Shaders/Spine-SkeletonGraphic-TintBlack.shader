@@ -15,6 +15,8 @@ Shader "Spine/SkeletonGraphic Tint Black (Premultiply Alpha)"
 		_StencilReadMask ("Stencil Read Mask", Float) = 255
 
 		_ColorMask ("Color Mask", Float) = 15
+
+		[Toggle(UNITY_UI_ALPHACLIP)] _UseUIAlphaClip ("Use Alpha Clip", Float) = 0
 	}
 
 	SubShader
@@ -50,9 +52,11 @@ Shader "Spine/SkeletonGraphic Tint Black (Premultiply Alpha)"
 		CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
+
 			#include "UnityCG.cginc"
-			fixed4 _Color;
-			fixed4 _Black;
+			#include "UnityUI.cginc"
+
+			#pragma multi_compile __ UNITY_UI_ALPHACLIP
 
 			struct VertexInput {
 				float4 vertex   : POSITION;
@@ -60,6 +64,7 @@ Shader "Spine/SkeletonGraphic Tint Black (Premultiply Alpha)"
 				float2 texcoord : TEXCOORD0;
 				float2 uv1 : TEXCOORD1;
 				float2 uv2 : TEXCOORD2;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
 			struct VertexOutput {
@@ -68,17 +73,24 @@ Shader "Spine/SkeletonGraphic Tint Black (Premultiply Alpha)"
 				half2 texcoord  : TEXCOORD0;
 				float2 uv1 : TEXCOORD1;
 				float2 uv2 : TEXCOORD2;
+				float4 worldPosition : TEXCOORD3;
+				UNITY_VERTEX_OUTPUT_STEREO
 			};
-			
+
+			fixed4 _Color;
+			fixed4 _Black;
+			fixed4 _TextureSampleAdd;
+			float4 _ClipRect;
 
 			VertexOutput vert (VertexInput IN) {
 				VertexOutput OUT;
-				OUT.vertex = UnityObjectToClipPos(IN.vertex);
-				OUT.texcoord = IN.texcoord;
 
-				#ifdef UNITY_HALF_TEXEL_OFFSET
-				OUT.vertex.xy += (_ScreenParams.zw-1.0) * float2(-1,1);
-				#endif
+				UNITY_SETUP_INSTANCE_ID(IN);
+				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
+
+				OUT.worldPosition = IN.vertex;
+				OUT.vertex = UnityObjectToClipPos(OUT.worldPosition);
+				OUT.texcoord = IN.texcoord;
 
 				OUT.color = IN.color * float4(_Color.rgb * _Color.a, _Color.a); // Combine a PMA version of _Color with vertexColor.
 				OUT.uv1 = IN.uv1;
@@ -90,8 +102,14 @@ Shader "Spine/SkeletonGraphic Tint Black (Premultiply Alpha)"
 
 			fixed4 frag (VertexOutput IN) : SV_Target
 			{
-				float4 texColor = tex2D(_MainTex, IN.texcoord);
-				//clip(color.a - 0.01);
+				half4 texColor = (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd);
+
+				texColor.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
+
+				#ifdef UNITY_UI_ALPHACLIP
+				clip (texColor.a - 0.001);
+				#endif
+
 				return (texColor * IN.color) + float4(((1-texColor.rgb) * texColor.a * (_Black.rgb + float3(IN.uv1.r, IN.uv1.g, IN.uv2.r))), 0);
 			}
 		ENDCG
