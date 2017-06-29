@@ -149,7 +149,7 @@ namespace Spine.Unity {
 			rendererBuffers.Dispose();
 		}
 
-		protected virtual void ClearState () {
+		public virtual void ClearState () {
 			meshFilter.sharedMesh = null;
 			currentInstructions.Clear();
 			if (skeleton != null) skeleton.SetToSetupPose();
