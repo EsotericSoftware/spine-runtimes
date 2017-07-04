@@ -112,27 +112,10 @@ namespace Spine.Unity {
 			}
 
 			if (this.gameObject.activeInHierarchy) {
-				foreach (var skin in skeleton.Data.Skins) {
-					var attachmentNames = new List<string>();
-					skin.FindNamesForSlot(slotIndex, attachmentNames);
+				foreach (var skin in skeleton.Data.Skins)
+					AddSkin(skin, skeleton, slotIndex);
 
-					foreach (var skinKey in attachmentNames) {
-						var attachment = skin.GetAttachment(slotIndex, skinKey);
-						var boundingBoxAttachment = attachment as BoundingBoxAttachment;
-
-						if (BoundingBoxFollower.DebugMessages && attachment != null && boundingBoxAttachment == null)
-							Debug.Log("BoundingBoxFollower tried to follow a slot that contains non-boundingbox attachments: " + slotName);
-
-						if (boundingBoxAttachment != null) {
-							var bbCollider = SkeletonUtility.AddBoundingBoxAsComponent(boundingBoxAttachment, slot, gameObject, isTrigger);
-							bbCollider.enabled = false;
-							bbCollider.hideFlags = HideFlags.NotEditable;
-							bbCollider.isTrigger = IsTrigger;
-							colliderTable.Add(boundingBoxAttachment, bbCollider);
-							nameTable.Add(boundingBoxAttachment, skinKey);
-						}
-					}
-				}
+				AddSkin(skeleton.skin, skeleton, slotIndex);
 			}
 
 			if (BoundingBoxFollower.DebugMessages) {
@@ -142,6 +125,28 @@ namespace Spine.Unity {
 						Debug.LogWarning("Bounding Box Follower not valid! Slot [" + slotName + "] does not contain any Bounding Box Attachments!");
 					else 
 						Debug.LogWarning("Bounding Box Follower tried to rebuild as a prefab.");
+				}
+			}
+		}
+
+		void AddSkin (Skin skin, Skeleton skeleton, int slotIndex) {
+			var attachmentNames = new List<string>();
+			skin.FindNamesForSlot(slotIndex, attachmentNames);
+
+			foreach (var skinKey in attachmentNames) {
+				var attachment = skin.GetAttachment(slotIndex, skinKey);
+				var boundingBoxAttachment = attachment as BoundingBoxAttachment;
+
+				if (BoundingBoxFollower.DebugMessages && attachment != null && boundingBoxAttachment == null)
+					Debug.Log("BoundingBoxFollower tried to follow a slot that contains non-boundingbox attachments: " + slotName);
+
+				if (boundingBoxAttachment != null) {
+					var bbCollider = SkeletonUtility.AddBoundingBoxAsComponent(boundingBoxAttachment, slot, gameObject, isTrigger);
+					bbCollider.enabled = false;
+					bbCollider.hideFlags = HideFlags.NotEditable;
+					bbCollider.isTrigger = IsTrigger;
+					colliderTable.Add(boundingBoxAttachment, bbCollider);
+					nameTable.Add(boundingBoxAttachment, skinKey);
 				}
 			}
 		}
