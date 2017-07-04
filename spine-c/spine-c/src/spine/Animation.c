@@ -851,22 +851,35 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 			slot->attachmentVerticesCapacity = vertexCount;
 		}
 	}
-	if (slot->attachmentVerticesCount != vertexCount && pose != SP_MIX_POSE_SETUP) alpha = 1; /* Don't mix from uninitialized slot vertices. */
 	slot->attachmentVerticesCount = vertexCount;
 
 	frameVertices = self->frameVertices;
 	vertices = slot->attachmentVertices;
 
 	if (time < frames[0]) { /* Time is before first frame. */
+		spVertexAttachment* vertexAttachment = SUB_CAST(spVertexAttachment, slot->attachment);
 		switch (pose) {
 			case SP_MIX_POSE_SETUP:
-				slot->attachmentVerticesCount = 0;
+				if (!vertexAttachment->bones) {
+					memcpy(vertices, vertexAttachment->vertices, vertexCount * sizeof(float));
+				} else {
+					for (i = 0; i < vertexCount; i++) vertices[i] = 0;
+				}
 				return;
 			case SP_MIX_POSE_CURRENT:
 			case SP_MIX_POSE_CURRENT_LAYERED: /* to appease compiler */
-				alpha = 1 - alpha;
-				for (i = 0; i < vertexCount; i++)
-					vertices[i] *= alpha;
+				if (alpha == 1) break;
+				if (!vertexAttachment->bones) {
+					float* setupVertices = vertexAttachment->vertices;
+					for (i = 0; i < vertexCount; i++) {
+						vertices[i] += (setupVertices[i] - vertices[i]) * alpha;
+					}
+				} else {
+					alpha = 1 - alpha;
+					for (i = 0; i < vertexCount; i++) {
+						vertices[i] *= alpha;
+					}
+				}
 		}
 		return;
 	}
