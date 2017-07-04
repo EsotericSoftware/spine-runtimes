@@ -38,7 +38,7 @@ namespace Spine.Unity {
 	[RequireComponent(typeof(ISkeletonAnimation))]
 	[ExecuteInEditMode]
 	public class SkeletonUtility : MonoBehaviour {
-	
+
 		#region BoundingBoxAttachment
 		public static PolygonCollider2D AddBoundingBoxGameObject (Skeleton skeleton, string skinName, string slotName, string attachmentName, Transform parent, bool isTrigger = true) {
 			Skin skin = string.IsNullOrEmpty(skinName) ? skeleton.data.defaultSkin : skeleton.data.FindSkin(skinName);
@@ -225,7 +225,7 @@ namespace Spine.Unity {
 				var ikConstraints = skeleton.IkConstraints;
 				for (int i = 0, n = ikConstraints.Count; i < n; i++)
 					constraintTargets.Add(ikConstraints.Items[i].target);
-				
+
 				var transformConstraints = skeleton.TransformConstraints;
 				for (int i = 0, n = transformConstraints.Count; i < n; i++)
 					constraintTargets.Add(transformConstraints.Items[i].target);
@@ -246,7 +246,7 @@ namespace Spine.Unity {
 
 					if (hasTransformBones || hasUtilityConstraints)
 						skeletonAnimation.UpdateWorld += UpdateWorld;
-					
+
 					if (hasUtilityConstraints)
 						skeletonAnimation.UpdateComplete += UpdateComplete;
 				}
@@ -283,7 +283,7 @@ namespace Spine.Unity {
 		void UpdateAllBones () {
 			if (boneRoot == null)
 				CollectBones();
-				
+
 			var utilityBones = this.utilityBones;
 			if (utilityBones == null) return;
 			for (int i = 0, n = utilityBones.Count; i < n; i++)

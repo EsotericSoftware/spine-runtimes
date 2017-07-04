@@ -380,7 +380,7 @@ namespace Spine.Unity.Modules {
 
 			return colliders;
 		}
-			
+
 		static float GetPropagatedRotation (Bone b) {
 			Bone parent = b.Parent;
 			float a = b.AppliedRotation;

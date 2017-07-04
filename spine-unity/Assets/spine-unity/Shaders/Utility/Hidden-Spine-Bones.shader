@@ -1,5 +1,3 @@
-// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
 Shader "Hidden/Spine/Bones" {
 Properties {
 	_Color ("Color", Color) = (0.5,0.5,0.5,0.5)

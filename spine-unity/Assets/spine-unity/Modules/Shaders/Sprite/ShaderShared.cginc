@@ -1,5 +1,3 @@
-// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
 #ifndef SHADER_SHARED_INCLUDED
 #define SHADER_SHARED_INCLUDED
 

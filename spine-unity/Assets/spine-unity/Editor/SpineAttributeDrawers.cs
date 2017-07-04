@@ -99,8 +99,9 @@ namespace Spine.Unity.Editor {
 				skeletonDataAsset = property.serializedObject.targetObject as SkeletonDataAsset;
 				if (skeletonDataAsset == null) return;
 			}
-
+				
 			position = EditorGUI.PrefixLabel(position, label);
+
 			var image = Icon;
 			var propertyStringValue = (property.hasMultipleDifferentValues) ? SpineInspectorUtility.EmDash : property.stringValue;
 			if (GUI.Button(position, string.IsNullOrEmpty(propertyStringValue) ? NoneLabel(image) : SpineInspectorUtility.TempContent(propertyStringValue, image), EditorStyles.popup))
