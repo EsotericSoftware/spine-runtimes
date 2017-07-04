@@ -800,21 +800,43 @@ function Animation.DeformTimeline.new (frameCount)
 
 		local frameVertices = self.frameVertices
 		local vertexCount = #(frameVertices[0])
-
-		if (#verticesArray ~= vertexCount and not setupPose) then alpha = 1 end -- Don't mix from uninitialized slot vertices.
 		local vertices = utils.setArraySize(verticesArray, vertexCount)
 		
 		if time < frames[0] then
+			local vertexAttachment = slotAttachment;
 			if pose == MixPose.setup then
-				verticesArray = {}
-				slot.attachmentVertices = verticesArray
-			elseif pose == MixPose.current then
-				alpha = 1 - alpha
-				local i = 1
-				while i <= vertexCount do
-					vertices[i] = vertices[i] * alpha
-					i = i + 1
+				if (vertexAttachment.bones == nil) then
+					local i = 1
+					local setupVertices = vertexAttachment.vertices
+					while i <= vertexCount do
+						vertices[i] = setupVertices[i]
+						i = i + 1
+					end
+				else
+					local i = 1
+					while i <= vertexCount do
+						vertices[i] = 0
+						i = i + 1
+					end
 				end
+			elseif pose == MixPose.current then
+				if (alpha ~= 1) then
+					if (vertexAttachment.bones == nil) then
+						local setupVertices = vertexAttachment.vertices
+						local i = 1
+						while i <= vertexCount do
+							vertices[i] = vertices[i] + (setupVertices[i] - vertices[i]) * alpha
+							i = i + 1
+						end
+					else
+						alpha = 1 - alpha
+						local i = 1
+						while i <= vertexCount do
+							vertices[i] = vertices[i] * alpha
+							i = i + 1
+						end
+					end
+				end				
 			end
 			return
 		end
