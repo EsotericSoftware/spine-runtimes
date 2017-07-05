@@ -54,6 +54,7 @@ namespace Spine.Unity.Examples {
 
 		[Header("Runtime Repack")]
 		public bool repack = true;
+		public BoundingBoxFollower bbFollower;
 
 		[Header("Do not assign")]
 		public Texture2D runtimeAtlas;
@@ -122,6 +123,7 @@ namespace Spine.Unity.Examples {
 				repackedSkin.Append(customSkin);
 				repackedSkin = repackedSkin.GetRepackedSkin("repacked skin", sourceMaterial, out runtimeMaterial, out runtimeAtlas);
 				skeleton.SetSkin(repackedSkin);
+				if (bbFollower != null) bbFollower.Initialize(true);
 			} else {
 				skeleton.SetSkin(customSkin);
 			}

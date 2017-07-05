@@ -115,7 +115,8 @@ namespace Spine.Unity {
 				foreach (var skin in skeleton.Data.Skins)
 					AddSkin(skin, slotIndex);
 
-				AddSkin(skeleton.skin, slotIndex);
+				if (skeleton.skin != null)
+					AddSkin(skeleton.skin, slotIndex);
 			}
 
 			if (BoundingBoxFollower.DebugMessages) {
