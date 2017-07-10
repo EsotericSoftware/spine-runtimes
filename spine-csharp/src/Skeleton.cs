@@ -513,16 +513,6 @@ namespace Spine {
 						mesh.ComputeWorldVertices(slot, 0, verticesLength, temp, 0);
 					}
 				}
-
-				if (vertices != null) {
-					for (int ii = 0; ii < verticesLength; ii += 2) {
-						float vx = vertices[ii], vy = vertices[ii + 1];
-						minX = Math.Min(minX, vx);
-						minY = Math.Min(minY, vy);
-						maxX = Math.Max(maxX, vx);
-						maxY = Math.Max(maxY, vy);
-					}
-				}
 			}
 			x = minX;
 			y = minY;
