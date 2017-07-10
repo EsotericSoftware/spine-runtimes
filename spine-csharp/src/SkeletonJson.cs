@@ -420,8 +420,10 @@ namespace Spine {
 					ClippingAttachment clip = attachmentLoader.NewClippingAttachment(skin, name);
 					if (clip == null) return null;
 
-					SlotData slot = skeletonData.FindSlot(GetString(map, "end", null));
-					if (slot == null) throw new Exception("Clipping end slot not found: " + GetString(map, "end", null));
+					var endString = GetString(map, "end", null);
+					if (endString == null) return null;
+					SlotData slot = skeletonData.FindSlot(endString);
+					if (slot == null) throw new Exception("Clipping end slot not found: " + endString);
 					clip.endSlot = slot;
 					ReadVertices(map, clip, GetInt(map, "vertexCount", 0) << 1);
 					return clip;
