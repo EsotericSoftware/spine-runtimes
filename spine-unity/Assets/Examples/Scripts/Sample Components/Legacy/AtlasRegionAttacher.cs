@@ -62,6 +62,7 @@ namespace Spine.Unity.Modules {
 			if (!this.enabled) return;
 
 			atlas = atlasAsset.GetAtlas();
+			if (atlas == null) return;
 			float scale = skeletonRenderer.skeletonDataAsset.scale;
 
 			foreach (var entry in attachments) {
