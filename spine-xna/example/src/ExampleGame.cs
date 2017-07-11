@@ -47,9 +47,6 @@ namespace Spine {
 		Slot headSlot;
 		AnimationState state;
 		SkeletonBounds bounds = new SkeletonBounds();
-		JitterEffect jitter = new JitterEffect(10, 10);
-		SwirlEffect swirl = new SwirlEffect(600);
-		float swirlTime;
 
 #if WINDOWS_STOREAPP
 		private string assetsFolder = @"Assets\";
@@ -80,17 +77,17 @@ namespace Spine {
 
 			skeletonRenderer = new SkeletonRenderer(GraphicsDevice);
 			skeletonRenderer.PremultipliedAlpha = false;
-			skeletonRenderer.Effect = spineEffect;			
-			skeletonRenderer.VertexEffect = swirl;
+			skeletonRenderer.Effect = spineEffect;
 
 			// String name = "spineboy-ess";
 			// String name = "goblins-pro";
-			String name = "raptor-pro";
+			// String name = "raptor-pro";
 			// String name = "tank-pro";
-			// String name = "coin-pro";			
+			String name = "coin-pro";
+			String atlasName = name.Replace("-pro", "").Replace("-ess", "");
 			bool binaryData = false;
 
-			Atlas atlas = new Atlas(assetsFolder + name.Replace("-ess", "").Replace("-pro", "") + ".atlas", new XnaTextureLoader(GraphicsDevice));			
+			Atlas atlas = new Atlas(assetsFolder + atlasName + ".atlas", new XnaTextureLoader(GraphicsDevice));			
 
 			float scale = 1;
 			if (name == "spineboy-ess") scale = 0.6f;
@@ -124,27 +121,28 @@ namespace Spine {
 				state.End += End;
 				state.Complete += Complete;
 				state.Event += Event;
-			
-				TrackEntry entry = state.SetAnimation(0, "jump", false);
+
+				state.SetAnimation(0, "test", false);
+				TrackEntry entry = state.AddAnimation(0, "jump", false, 0);
 				entry.End += End; // Event handling for queued animations.
 				state.AddAnimation(0, "run", true, 0);
 			}
 			else if (name == "raptor-pro") {
 				state.SetAnimation(0, "walk", true);
-				state.AddAnimation(1, "gun-grab", false, 2);
+				state.AddAnimation(1, "gungrab", false, 2);
 			}
 			else if (name == "coin-pro") {
 				state.SetAnimation(0, "rotate", true);
 			}
 			else if (name == "tank-pro") {
 				state.SetAnimation(0, "drive", true);
-			}
+			}			
 			else {
 				state.SetAnimation(0, "walk", true);
 			}
 
-			skeleton.X = 400 + (name == "tank" ? 300: 0);
-			skeleton.Y = 600;		
+			skeleton.X = 400 + (name == "tank-pro" ? 300: 0);
+			skeleton.Y = GraphicsDevice.Viewport.Height;
 			skeleton.UpdateWorldTransform();
 
 			headSlot = skeleton.FindSlot("head");
@@ -166,21 +164,14 @@ namespace Spine {
 		protected override void Draw (GameTime gameTime) {
 			GraphicsDevice.Clear(Color.Black);
 
-			float delta = gameTime.ElapsedGameTime.Milliseconds / 1000f;
-			swirlTime += delta;
-			float percent = swirlTime % 2;
-			if (percent > 1) percent = 1 - (percent - 1);
-			swirl.Angle = (IInterpolation.Pow2.Apply(-60, 60, percent));
-
-			state.Update(delta);
+			state.Update(gameTime.ElapsedGameTime.Milliseconds / 1000f);
 			state.Apply(skeleton);			
 			skeleton.UpdateWorldTransform();
 			if (skeletonRenderer.Effect is BasicEffect) {
 				((BasicEffect)skeletonRenderer.Effect).Projection = Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 0, 1, 0);
 			} else {
 				skeletonRenderer.Effect.Parameters["Projection"].SetValue(Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 0, 1, 0));
-			}
-			
+			}			
 			skeletonRenderer.Begin();
 			skeletonRenderer.Draw(skeleton);
 			skeletonRenderer.End();
