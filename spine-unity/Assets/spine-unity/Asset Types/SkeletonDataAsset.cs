@@ -98,7 +98,7 @@ namespace Spine.Unity {
 				return null;
 			}
 
-			// Support attachmentless/skinless SkeletonData.
+			// Disabled to support attachmentless/skinless SkeletonData.
 //			if (atlasAssets == null) {
 //				atlasAssets = new AtlasAsset[0];
 //				if (!quiet)

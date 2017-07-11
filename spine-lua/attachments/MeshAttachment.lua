@@ -103,6 +103,7 @@ function MeshAttachment:setParentMesh (parentMesh)
 	if parentMesh then
 		self.bones = parentMesh.bones
 		self.vertices = parentMesh.vertices
+		self.worldVerticesLength = parentMesh.worldVerticesLength
 		self.regionUVs = parentMesh.regionUVs
 		self.triangles = parentMesh.triangles
 		self.hullLength = parentMesh.hullLength

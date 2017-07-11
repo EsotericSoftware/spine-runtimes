@@ -113,9 +113,10 @@ namespace Spine.Unity {
 
 			if (this.gameObject.activeInHierarchy) {
 				foreach (var skin in skeleton.Data.Skins)
-					AddSkin(skin, skeleton, slotIndex);
+					AddSkin(skin, slotIndex);
 
-				AddSkin(skeleton.skin, skeleton, slotIndex);
+				if (skeleton.skin != null)
+					AddSkin(skeleton.skin, slotIndex);
 			}
 
 			if (BoundingBoxFollower.DebugMessages) {
@@ -129,7 +130,8 @@ namespace Spine.Unity {
 			}
 		}
 
-		void AddSkin (Skin skin, Skeleton skeleton, int slotIndex) {
+		void AddSkin (Skin skin, int slotIndex) {
+			if (skin == null) return;
 			var attachmentNames = new List<string>();
 			skin.FindNamesForSlot(slotIndex, attachmentNames);
 
@@ -141,12 +143,14 @@ namespace Spine.Unity {
 					Debug.Log("BoundingBoxFollower tried to follow a slot that contains non-boundingbox attachments: " + slotName);
 
 				if (boundingBoxAttachment != null) {
-					var bbCollider = SkeletonUtility.AddBoundingBoxAsComponent(boundingBoxAttachment, slot, gameObject, isTrigger);
-					bbCollider.enabled = false;
-					bbCollider.hideFlags = HideFlags.NotEditable;
-					bbCollider.isTrigger = IsTrigger;
-					colliderTable.Add(boundingBoxAttachment, bbCollider);
-					nameTable.Add(boundingBoxAttachment, skinKey);
+					if (!colliderTable.ContainsKey(boundingBoxAttachment)) {
+						var bbCollider = SkeletonUtility.AddBoundingBoxAsComponent(boundingBoxAttachment, slot, gameObject, isTrigger);
+						bbCollider.enabled = false;
+						bbCollider.hideFlags = HideFlags.NotEditable;
+						bbCollider.isTrigger = IsTrigger;
+						colliderTable.Add(boundingBoxAttachment, bbCollider);
+						nameTable.Add(boundingBoxAttachment, skinKey);
+					}
 				}
 			}
 		}

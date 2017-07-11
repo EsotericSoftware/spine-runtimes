@@ -126,8 +126,8 @@ namespace Spine.Unity {
 		public Texture OverrideTexture {
 			get { return overrideTexture; }
 			set {
-				canvasRenderer.SetTexture(value);
 				overrideTexture = value;
+				canvasRenderer.SetTexture(this.mainTexture); // Refresh canvasRenderer's texture. Make sure it handles null.
 			}
 		}
 		public override Texture mainTexture {
@@ -236,6 +236,7 @@ namespace Spine.Unity {
 			};
 
 			meshBuffers = new DoubleBuffered<MeshRendererBuffers.SmartMesh>();
+			canvasRenderer.SetTexture(this.mainTexture); // Needed for overwriting initializations.
 
 			// Set the initial Skin and Animation
 			if (!string.IsNullOrEmpty(initialSkinName))

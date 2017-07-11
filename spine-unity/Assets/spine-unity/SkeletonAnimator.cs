@@ -120,7 +120,6 @@ namespace Spine.Unity {
 			}
 
 			public void Apply (Skeleton skeleton) {
-
 				if (layerMixModes.Length < animator.layerCount)
 					System.Array.Resize<MixMode>(ref layerMixModes, animator.layerCount);
 

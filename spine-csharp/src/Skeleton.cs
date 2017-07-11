@@ -502,14 +502,16 @@ namespace Spine {
 				var regionAttachment = attachment as RegionAttachment;
 				if (regionAttachment != null) {
 					verticesLength = 8;
-					if (temp.Length < 8) temp = new float[8];
+					vertices = temp;
+					if (vertices.Length < 8) vertices = temp = new float[8];
 					regionAttachment.ComputeWorldVertices(slot.bone, temp, 0);
 				} else {
 					var meshAttachment = attachment as MeshAttachment;
 					if (meshAttachment != null) {
 						MeshAttachment mesh = meshAttachment;
 						verticesLength = mesh.WorldVerticesLength;
-						if (temp.Length < verticesLength) temp = new float[verticesLength];
+						vertices = temp;
+						if (vertices.Length < verticesLength) vertices = temp = new float[verticesLength];
 						mesh.ComputeWorldVertices(slot, 0, verticesLength, temp, 0);
 					}
 				}
