@@ -192,7 +192,7 @@ package spine {
 					this.b = za * lb + zb * ld;
 					this.c = zc * la + zd * lc;
 					this.d = zc * lb + zd * ld;
-					if (this.data.transformMode != TransformMode.noScaleOrReflection ? pa * pd - pb * pc < 0 : skeleton.flipX != skeleton.flipY) {
+					if (this.data.transformMode != TransformMode.noScaleOrReflection ? pa * pd - pb * pc < 0 : this.skeleton.flipX != this.skeleton.flipY) {
 						this.b = -this.b;
 						this.d = -this.d;
 					}
