@@ -25,6 +25,7 @@
  * Added support for clipping.
  * Added support for rotated regions in texture atlas loaded via StarlingAtlasAttachmentLoader.
  * Added support for vertex effects. See `RaptorExample.as`
+ * Added 'getTexture()' method to 'StarlingTextureAtlasAttachmentLoader'
 
 ## C
  * **Breaking changes**
