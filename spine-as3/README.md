@@ -18,7 +18,7 @@ spine-as3 does not yet support loading the binary format.
 
 ## Usage
 1. Create a new Flex or Adobe AIR project in your preferred IDE.
-2. Download the Spine Runtimes source using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip)
+2. Download the Spine Runtimes source using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/3.6.zip)
 3. Add the sources from `spine-as3/spine-as3/src/` to your project
 
 ## Example

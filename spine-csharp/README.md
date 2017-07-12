@@ -16,7 +16,7 @@ spine-csharp supports all Spine features.
 
 ## Setup
 
-1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
+1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/3.6.zip).
 1. Open the `spine-csharp.sln` Visual Studio 2015 Community project file.
 
 Alternatively, the contents of the `spine-csharp/src` directory can be copied into your project.
