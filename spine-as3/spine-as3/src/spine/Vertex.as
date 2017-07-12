@@ -39,5 +39,7 @@ package spine {
 		public var v : Number;
 		public var light : Color = new spine.Color(0, 0, 0);
 		public var dark : Color = new spine.Color(0, 0, 0);
+		
+		function Vertex() { }
 	}
 }
