@@ -56,6 +56,10 @@ package spine.starling {
 
 			Bone.yDown = true;
 		}
+		
+		protected function getTexture(path:String):Texture {
+            return atlas.getTexture(path);
+        }
 
 		public function newRegionAttachment(skin : Skin, name : String, path : String) : RegionAttachment {
 			var texture : Texture = atlas.getTexture(path);			
