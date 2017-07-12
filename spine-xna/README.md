@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-xna works with data exported from Spine 3.5.xx.
+spine-xna works with data exported from Spine 3.6.xx.
 
 spine-xna supports all Spine features.
 
