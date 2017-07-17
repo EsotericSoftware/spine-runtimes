@@ -281,6 +281,9 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		}
 		
 		color.a *= nodeColor.a * _skeleton->color.a * slot->color.a * 255;
+		// skip rendering if the color of this attachment is 0
+		if (color.a == 0)
+			continue;
 		float multiplier = _premultipliedAlpha ? color.a : 255;
 		color.r *= nodeColor.r * _skeleton->color.r * slot->color.r * multiplier;
 		color.g *= nodeColor.g * _skeleton->color.g * slot->color.g * multiplier;
