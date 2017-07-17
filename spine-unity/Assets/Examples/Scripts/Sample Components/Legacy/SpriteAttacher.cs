@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-// Contributed by: Mitch Thompson
+// Original Contribution by: Mitch Thompson
 
 using UnityEngine;
 using System.Collections.Generic;
@@ -41,6 +41,7 @@ namespace Spine.Unity.Modules {
 
 		#region Inspector
 		public bool attachOnStart = true;
+		public bool overrideAnimation = true;
 		public Sprite sprite;
 		[SpineSlot] public string slot;
 		#endregion
@@ -71,6 +72,7 @@ namespace Spine.Unity.Modules {
 		#endif
 
 		RegionAttachment attachment;
+		Slot spineSlot;
 		bool applyPMA;
 
 		static Dictionary<Texture, AtlasPage> atlasPageCache;
@@ -87,24 +89,58 @@ namespace Spine.Unity.Modules {
 		}
 
 		void Start () {
-			if (attachOnStart) Attach();
+			// Initialize slot and attachment references.
+			Initialize(false);
+
+			if (attachOnStart)
+				Attach();
 		}
 
-		public void Attach () {
-			var skeletonComponent = GetComponent<ISkeletonComponent>();
-			var skeletonRenderer = skeletonComponent as SkeletonRenderer;
-			if (skeletonRenderer != null)
-				this.applyPMA = skeletonRenderer.pmaVertexColors;
-			else {
-				var skeletonGraphic = skeletonComponent as SkeletonGraphic;
-				if (skeletonGraphic != null)
-					this.applyPMA = skeletonGraphic.MeshGenerator.settings.pmaVertexColors;
+		void AnimationOverrideSpriteAttach (ISkeletonAnimation animated) {
+			if (overrideAnimation && isActiveAndEnabled)
+				Attach();
+		}
+
+		public void Initialize (bool overwrite = true) {
+			if (overwrite || attachment == null) {
+				// Get the applyPMA value.
+				var skeletonComponent = GetComponent<ISkeletonComponent>();
+				var skeletonRenderer = skeletonComponent as SkeletonRenderer;
+				if (skeletonRenderer != null)
+					this.applyPMA = skeletonRenderer.pmaVertexColors;
+				else {
+					var skeletonGraphic = skeletonComponent as SkeletonGraphic;
+					if (skeletonGraphic != null)
+						this.applyPMA = skeletonGraphic.MeshGenerator.settings.pmaVertexColors;
+				}
+
+				// Subscribe to UpdateComplete to override animation keys.
+				if (overrideAnimation) {
+					var animatedSkeleton = skeletonComponent as ISkeletonAnimation;
+					if (animatedSkeleton != null) {
+						animatedSkeleton.UpdateComplete -= AnimationOverrideSpriteAttach;
+						animatedSkeleton.UpdateComplete += AnimationOverrideSpriteAttach;
+					}
+				}
+
+				spineSlot = spineSlot ?? skeletonComponent.Skeleton.FindSlot(slot);
+				Shader attachmentShader = applyPMA ? Shader.Find(DefaultPMAShader) : Shader.Find(DefaultStraightAlphaShader);
+				attachment = applyPMA ? sprite.ToRegionAttachmentPMAClone(attachmentShader) : sprite.ToRegionAttachment(SpriteAttacher.GetPageFor(sprite.texture, attachmentShader));
 			}
-
-			Shader attachmentShader = applyPMA ? Shader.Find(DefaultPMAShader) : Shader.Find(DefaultStraightAlphaShader);
-			attachment = applyPMA ? sprite.ToRegionAttachmentPMAClone(attachmentShader) : sprite.ToRegionAttachment(SpriteAttacher.GetPageFor(sprite.texture, attachmentShader));
-			skeletonComponent.Skeleton.FindSlot(slot).Attachment = attachment;
 		}
+
+		void OnDestroy () {
+			var animatedSkeleton = GetComponent<ISkeletonAnimation>();
+			if (animatedSkeleton != null)
+				animatedSkeleton.UpdateComplete -= AnimationOverrideSpriteAttach;
+		}
+
+		/// <summary>Update the slot's attachment to the Attachment generated from the sprite.</summary>
+		public void Attach () {
+			if (spineSlot != null)
+				spineSlot.Attachment = attachment;
+		}
+
 	}
 
 	public static class SpriteAttachmentExtensions {
