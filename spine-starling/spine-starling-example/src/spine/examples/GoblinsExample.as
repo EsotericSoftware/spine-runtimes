@@ -66,7 +66,7 @@ package spine.examples {
 		private var skinChangeCount: Number = 0;
 
 		public function GoblinsExample() {
-			var useStarlingAtlas : Boolean = false;
+			var useStarlingAtlas : Boolean = true;
 
 			var attachmentLoader : AttachmentLoader;
 			if (useStarlingAtlas) {
