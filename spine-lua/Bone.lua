@@ -190,16 +190,16 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		local lb = math_cos(math_rad(90 + shearY)) * scaleY;
 		local lc = math_sin(math_rad(shearX)) * scaleX;
 		local ld = math_sin(90 + shearY) * scaleY;
-		self.a = za * la + zb * lc
-		self.b = za * lb + zb * ld
-		self.c = zc * la + zd * lc
-		self.d = zc * lb + zd * ld
 		local flip = self.skeleton.flipX ~= self.skeleton.flipY
 		if transformMode ~= TransformMode.noScaleOrReflection then flip = pa * pd - pb * pc < 0 end
 		if flip then
-			self.b = -self.b
-			self.d = -self.d
+			zb = -zb
+			zd = -zd
 		end
+		self.a = za * la + zb * lc
+		self.b = za * lb + zb * ld
+		self.c = zc * la + zd * lc
+		self.d = zc * lb + zd * ld		
 		return
 	end
 	

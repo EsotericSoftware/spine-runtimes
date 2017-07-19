@@ -201,15 +201,15 @@ public class Bone implements Updatable {
 			float la = cosDeg(shearX) * scaleX;
 			float lb = cosDeg(90 + shearY) * scaleY;
 			float lc = sinDeg(shearX) * scaleX;
-			float ld = sinDeg(90 + shearY) * scaleY;
+			float ld = sinDeg(90 + shearY) * scaleY;			
+			if (data.transformMode != TransformMode.noScaleOrReflection ? pa * pd - pb * pc < 0 : skeleton.flipX != skeleton.flipY) {
+			    zb = -zb;
+			    zd = -zd;
+			}			
 			a = za * la + zb * lc;
 			b = za * lb + zb * ld;
 			c = zc * la + zd * lc;
 			d = zc * lb + zd * ld;
-			if (data.transformMode != TransformMode.noScaleOrReflection ? pa * pd - pb * pc < 0 : skeleton.flipX != skeleton.flipY) {
-				b = -b;
-				d = -d;
-			}
 			return;
 		}
 		}
