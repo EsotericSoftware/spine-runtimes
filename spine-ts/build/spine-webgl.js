@@ -2200,14 +2200,14 @@ var spine;
 					var lb = spine.MathUtils.cosDeg(90 + shearY) * scaleY;
 					var lc = spine.MathUtils.sinDeg(shearX) * scaleX;
 					var ld = spine.MathUtils.sinDeg(90 + shearY) * scaleY;
+					if (this.data.transformMode != spine.TransformMode.NoScaleOrReflection ? pa * pd - pb * pc < 0 : this.skeleton.flipX != this.skeleton.flipY) {
+						zb = -zb;
+						zd = -zd;
+					}
 					this.a = za * la + zb * lc;
 					this.b = za * lb + zb * ld;
 					this.c = zc * la + zd * lc;
 					this.d = zc * lb + zd * ld;
-					if (this.data.transformMode != spine.TransformMode.NoScaleOrReflection ? pa * pd - pb * pc < 0 : this.skeleton.flipX != this.skeleton.flipY) {
-						this.b = -this.b;
-						this.d = -this.d;
-					}
 					return;
 				}
 			}
