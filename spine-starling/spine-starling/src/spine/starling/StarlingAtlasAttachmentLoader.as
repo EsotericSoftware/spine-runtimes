@@ -59,7 +59,7 @@ package spine.starling {
 		}
 
 		public function newRegionAttachment(skin : Skin, name : String, path : String) : RegionAttachment {
-			var texture : Texture = atlas.getTexture(path);
+			var texture : Texture = getTexture(path);
 			if (texture == null)
 				throw new Error("Region not found in Starling atlas: " + path + " (region attachment: " + name + ")");
 			var attachment : RegionAttachment = new RegionAttachment(name);
@@ -96,7 +96,7 @@ package spine.starling {
 		}
 
 		public function newMeshAttachment(skin : Skin, name : String, path : String) : MeshAttachment {
-			var texture : Texture = atlas.getTexture(path);
+			var texture : Texture = getTexture(path);
 			if (texture == null)
 				throw new Error("Region not found in Starling atlas: " + path + " (mesh attachment: " + name + ")");
 			var rotated : Boolean = atlas.getRotation(path);
