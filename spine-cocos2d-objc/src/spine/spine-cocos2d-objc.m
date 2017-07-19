@@ -44,5 +44,5 @@ void _spAtlasPage_disposeTexture (spAtlasPage* self) {
 }
 
 char* _spUtil_readFile (const char* path, int* length) {
-	return _readFile([[[CCFileUtils sharedFileUtils] fullPathForFilename:@(path)] UTF8String], length);
+	return _spReadFile([[[CCFileUtils sharedFileUtils] fullPathForFilename:@(path)] UTF8String], length);
 }
