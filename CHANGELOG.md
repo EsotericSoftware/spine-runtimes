@@ -50,6 +50,7 @@
   * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
   * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
   * Added `spVertexEffect` and corresponding implementations `spJitterVertexEffect` and `spSwirlVertexEffect`. Create/dispose through the corresponding `spXXXVertexEffect_create()/dispose()` functions. Set on framework/engine specific renderer. See changes for spine-c based frameworks/engines below.
+  * Functions in `extension.h` are not prefixed with `_sp` instead of just `_` to avoid interference with other libraries.
 
 ### Cocos2d-X
  * Fixed renderer to work with 3.6 changes
