@@ -56,7 +56,7 @@ void _AtlasPage_disposeTexture (AtlasPage* self){
 }
 
 char* _Util_readFile (const char* path, int* length){
-	return _readFile(path, length);
+	return _spReadFile(path, length);
 }
 
 /**/
