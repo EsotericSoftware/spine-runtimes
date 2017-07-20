@@ -60,10 +60,7 @@ namespace Spine.Unity {
 
 		/// <summary>
 		/// Creates a runtime AtlasAsset. Only providing the textures is slower because it has to search for atlas page matches. <seealso cref="Spine.Unity.AtlasAsset.CreateRuntimeInstance(TextAsset, Material[], bool)"/></summary>
-		public static AtlasAsset CreateRuntimeInstance (TextAsset atlasText, Texture2D[] textures, Shader shader, bool initialize) {
-			if (shader == null)
-				shader = Shader.Find("Spine/Skeleton");
-
+		public static AtlasAsset CreateRuntimeInstance (TextAsset atlasText, Texture2D[] textures, Material materialPropertySource, bool initialize) {
 			// Get atlas page names.
 			string atlasString = atlasText.text;
 			atlasString = atlasString.Replace("\r", "");
@@ -84,7 +81,7 @@ namespace Spine.Unity {
 				for (int j = 0, m = textures.Length; j < m; j++) {
 					if (string.Equals(pageName, textures[j].name, System.StringComparison.OrdinalIgnoreCase)) {
 						// Match found.
-						mat = new Material(shader);
+						mat = new Material(materialPropertySource);
 						mat.mainTexture = textures[j];
 						break;
 					}
@@ -102,14 +99,12 @@ namespace Spine.Unity {
 
 		/// <summary>
 		/// Creates a runtime AtlasAsset. Only providing the textures is slower because it has to search for atlas page matches. <seealso cref="Spine.Unity.AtlasAsset.CreateRuntimeInstance(TextAsset, Material[], bool)"/></summary>
-		public static AtlasAsset CreateRuntimeInstance (TextAsset atlasText, Texture2D[] textures, Material materialPropertySource, bool initialize) {
-			var shader = materialPropertySource.shader;
-			var oa = CreateRuntimeInstance(atlasText, textures, shader, initialize);
+		public static AtlasAsset CreateRuntimeInstance (TextAsset atlasText, Texture2D[] textures, Shader shader, bool initialize) {
+			if (shader == null)
+				shader = Shader.Find("Spine/Skeleton");
 
-			foreach (var m in oa.materials) {
-				m.CopyPropertiesFromMaterial(materialPropertySource);
-				m.shaderKeywords = materialPropertySource.shaderKeywords;
-			}
+			Material materialProperySource = new Material(shader);
+			var oa = CreateRuntimeInstance(atlasText, textures, materialProperySource, initialize);
 
 			return oa;
 		}
