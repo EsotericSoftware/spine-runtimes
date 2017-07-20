@@ -1476,11 +1476,18 @@ namespace Spine.Unity.Editor {
 		#region TK2D Support
 		const string SPINE_TK2D_DEFINE = "SPINE_TK2D";
 
+		static bool IsInvalidGroup (BuildTargetGroup group) {
+			int gi = (int)group;
+			return
+				gi == 15 || gi == 16
+				||
+				group == BuildTargetGroup.Unknown;
+		}
+
 		static void EnableTK2D () {
 			bool added = false;
 			foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {				
-				int gi = (int)group;
-				if (gi == 15 || gi == 16 || group == BuildTargetGroup.Unknown)
+				if (IsInvalidGroup(group))
 					continue;
 
 				string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
@@ -1506,8 +1513,7 @@ namespace Spine.Unity.Editor {
 		static void DisableTK2D () {
 			bool removed = false;
 			foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
-				int gi = (int)group;
-				if (gi == 15 || gi == 16 || group == BuildTargetGroup.Unknown)
+				if (IsInvalidGroup(group))
 					continue;
 				
 				string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
