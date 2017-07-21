@@ -148,15 +148,15 @@ namespace Spine {
 			else if (name == "skeleton") {
 				skeleton.SetSkin("Pig_Normal");
 				skeleton.FlipY = true;
-				skeleton.Y -= 200;
-				state.SetAnimation(0, "BattleIdle", true);
+				// skeleton.Y -= 200;
+				// state.SetAnimation(0, "BattleIdle", true);
 			}		
 			else {
 				state.SetAnimation(0, "walk", true);
 			}
 
-			skeleton.X += 400;
-			skeleton.Y += GraphicsDevice.Viewport.Height;
+			// skeleton.X += 400;
+			// skeleton.Y += GraphicsDevice.Viewport.Height;
 			skeleton.UpdateWorldTransform();
 
 			headSlot = skeleton.FindSlot("head");

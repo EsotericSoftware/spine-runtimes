@@ -208,11 +208,12 @@ namespace Spine {
 					}
 
 					if (DrawClippingDecomposed) {
-						if (!skeleton.FlipY) SkeletonClipping.MakeClockwise(clippingPolygon);
-						var clippingPolygons = triangulator.Decompose(clippingPolygon, triangulator.Triangulate(clippingPolygon));
+						SkeletonClipping.MakeClockwise(clippingPolygon);
+						var triangles = triangulator.Triangulate(clippingPolygon);
+						var clippingPolygons = triangulator.Decompose(clippingPolygon, triangles);
 						renderer.SetColor(clipDecomposedColor);
 						foreach (var polygon in clippingPolygons) {
-							if (!skeleton.FlipY) SkeletonClipping.MakeClockwise(polygon);
+							SkeletonClipping.MakeClockwise(polygon);
 							polygon.Add(polygon.Items[0]);
 							polygon.Add(polygon.Items[1]);
 							renderer.Polygon(polygon.Items, 0, polygon.Count >> 1);
