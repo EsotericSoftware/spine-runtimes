@@ -83,6 +83,7 @@ namespace Spine {
 			skeletonDebugRenderer = new SkeletonDebugRenderer(GraphicsDevice);
 			skeletonDebugRenderer.DisableAll();
 			skeletonDebugRenderer.DrawClipping = true;
+			skeletonDebugRenderer.DrawClippingDecomposed = true;
 
 			// String name = "spineboy-ess";
 			// String name = "goblins-pro";

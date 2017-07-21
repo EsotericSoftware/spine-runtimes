@@ -46,6 +46,7 @@ namespace Spine {
 		private static Color triangleLineColor = new Color(1f, 0.64f, 0f, 0.5f);
 		private static Color pathColor = new Color(1f, 0.5f, 0f, 1f);
 		private static Color clipColor = new Color(0.8f, 0f, 0f, 1f);
+		private static Color clipDecomposedColor = new Color(0.8f, 0.8f, 0f, 1f);
 		private static Color aabbColor = new Color(0f, 1f, 0f, 0.5f);
 
 		public BasicEffect Effect { get { return renderer.Effect; } set { renderer.Effect = value; } }
@@ -56,6 +57,7 @@ namespace Spine {
 		public bool DrawMeshTriangles { get; set; }
 		public bool DrawPaths { get; set; }
 		public bool DrawClipping { get; set; }
+		public bool DrawClippingDecomposed { get; set; }
 		public bool DrawSkeletonXY { get; set; }
 		public void DisableAll() {
 			DrawBones = false;
@@ -204,14 +206,17 @@ namespace Spine {
 						clippingPolygon.Add(x);
 						clippingPolygon.Add(y);
 					}
-					
-					if (!skeleton.FlipY) SkeletonClipping.MakeClockwise(clippingPolygon);
-					var clippingPolygons = triangulator.Decompose(clippingPolygon, triangulator.Triangulate(clippingPolygon));
-					foreach (var polygon in clippingPolygons) {
-						if (!skeleton.FlipY) SkeletonClipping.MakeClockwise(polygon);
-						polygon.Add(polygon.Items[0]);
-						polygon.Add(polygon.Items[1]);
-						renderer.Polygon(polygon.Items, 0, polygon.Count >> 1);
+
+					if (DrawClippingDecomposed) {
+						if (!skeleton.FlipY) SkeletonClipping.MakeClockwise(clippingPolygon);
+						var clippingPolygons = triangulator.Decompose(clippingPolygon, triangulator.Triangulate(clippingPolygon));
+						renderer.SetColor(clipDecomposedColor);
+						foreach (var polygon in clippingPolygons) {
+							if (!skeleton.FlipY) SkeletonClipping.MakeClockwise(polygon);
+							polygon.Add(polygon.Items[0]);
+							polygon.Add(polygon.Items[1]);
+							renderer.Polygon(polygon.Items, 0, polygon.Count >> 1);
+						}
 					}
 				}
 			}
