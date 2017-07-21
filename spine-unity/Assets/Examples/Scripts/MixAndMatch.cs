@@ -39,7 +39,7 @@ namespace Spine.Unity.Examples {
 
 		#region Inspector
 		[SpineSkin]
-		public string baseSkinName = "base";
+		public string templateAttachmentsSkin = "base";
 		public Material sourceMaterial; // This will be used as the basis for shader and material property settings.
 
 		[Header("Visor")]
@@ -83,26 +83,25 @@ namespace Spine.Unity.Examples {
 			// STEP 0: PREPARE SKINS
 			// Let's prepare a new skin to be our custom skin with equips/customizations. We get a clone so our original skins are unaffected.
 			customSkin = customSkin ?? new Skin("custom skin"); // This requires that all customizations are done with skin placeholders defined in Spine.
-			//customSkin = customSkin ?? skeleton.UnshareSkin(true, false, skeletonAnimation.AnimationState); // use this if you are not customizing on the default skin and don't plan to remove 
-			// Next let's 
-			var baseSkin = skeleton.Data.FindSkin(baseSkinName);
+			//customSkin = customSkin ?? skeleton.UnshareSkin(true, false, skeletonAnimation.AnimationState); // use this if you are not customizing on the default skin.
+			var templateSkin = skeleton.Data.FindSkin(templateAttachmentsSkin);
 
 			// STEP 1: "EQUIP" ITEMS USING SPRITES
-			// STEP 1.1 Find the original attachment.
-			// Step 1.2 Get a clone of the original attachment.
+			// STEP 1.1 Find the original/template attachment.
+			// Step 1.2 Get a clone of the original/template attachment.
 			// Step 1.3 Apply the Sprite image to the clone.
 			// Step 1.4 Add the remapped clone to the new custom skin.
 
 			// Let's do this for the visor.
 			int visorSlotIndex = skeleton.FindSlotIndex(visorSlot); // You can access GetAttachment and SetAttachment via string, but caching the slotIndex is faster.
-			Attachment baseAttachment = baseSkin.GetAttachment(visorSlotIndex, visorKey);  // STEP 1.1
-			Attachment newAttachment = baseAttachment.GetRemappedClone(visorSprite, sourceMaterial); // STEP 1.2 - 1.3
+			Attachment templateAttachment = templateSkin.GetAttachment(visorSlotIndex, visorKey);  // STEP 1.1
+			Attachment newAttachment = templateAttachment.GetRemappedClone(visorSprite, sourceMaterial); // STEP 1.2 - 1.3
 			customSkin.SetAttachment(visorSlotIndex, visorKey, newAttachment); // STEP 1.4
 
 			// And now for the gun.
 			int gunSlotIndex = skeleton.FindSlotIndex(gunSlot);
-			Attachment baseGun = baseSkin.GetAttachment(gunSlotIndex, gunKey); // STEP 1.1
-			Attachment newGun = baseGun.GetRemappedClone(gunSprite, sourceMaterial); // STEP 1.2 - 1.3
+			Attachment templateGun = templateSkin.GetAttachment(gunSlotIndex, gunKey); // STEP 1.1
+			Attachment newGun = templateGun.GetRemappedClone(gunSprite, sourceMaterial); // STEP 1.2 - 1.3
 			if (newGun != null) customSkin.SetAttachment(gunSlotIndex, gunKey, newGun); // STEP 1.4
 
 			// customSkin.RemoveAttachment(gunSlotIndex, gunKey); // To remove an item.
@@ -119,17 +118,17 @@ namespace Spine.Unity.Examples {
 			//				Under the hood, this relies on 
 			if (repack)	{
 				var repackedSkin = new Skin("repacked skin");
-				repackedSkin.Append(skeleton.Data.DefaultSkin);
-				repackedSkin.Append(customSkin);
-				repackedSkin = repackedSkin.GetRepackedSkin("repacked skin", sourceMaterial, out runtimeMaterial, out runtimeAtlas);
-				skeleton.SetSkin(repackedSkin);
+				repackedSkin.Append(skeleton.Data.DefaultSkin); // Include the "default" skin. (everything outside of skin placeholders)
+				repackedSkin.Append(customSkin); // Include your new custom skin.
+				repackedSkin = repackedSkin.GetRepackedSkin("repacked skin", sourceMaterial, out runtimeMaterial, out runtimeAtlas); // Pack all the items in the skin.
+				skeleton.SetSkin(repackedSkin); // Assign the repacked skin to your Skeleton.
 				if (bbFollower != null) bbFollower.Initialize(true);
 			} else {
-				skeleton.SetSkin(customSkin);
+				skeleton.SetSkin(customSkin); // Just use the custom skin directly.
 			}
-
-			skeleton.SetSlotsToSetupPose();
-			skeletonAnimation.Update(0);
+				
+			skeleton.SetSlotsToSetupPose(); // Use the pose from setup pose.
+			skeletonAnimation.Update(0); // Use the pose in the currently active animation.
 
 			Resources.UnloadUnusedAssets();
 		}

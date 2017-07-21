@@ -55,6 +55,7 @@ spine-xna/obj
 spine-xna/example/bin
 spine-xna/example/obj
 spine-xna/example-content/obj/
+spine-xna/.vs/
 
 spine-unity/Assets/spine-csharp*
 !spine-unity/Assets/spine-csharp/Place spine-csharp src here.*

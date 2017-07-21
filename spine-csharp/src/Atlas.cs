@@ -28,6 +28,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if (UNITY_5 || UNITY_5_3_OR_NEWER || UNITY_WSA || UNITY_WP8 || UNITY_WP8_1)
+#define IS_UNITY
+#endif
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -44,7 +48,7 @@ namespace Spine {
 		List<AtlasRegion> regions = new List<AtlasRegion>();
 		TextureLoader textureLoader;
 
-		#if !(UNITY_5 || UNITY_4 || UNITY_WSA || UNITY_WP8 || UNITY_WP8_1) // !UNITY
+		#if !(IS_UNITY)
 		#if WINDOWS_STOREAPP
 		private async Task ReadFile(string path, TextureLoader textureLoader) {
 			var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
@@ -82,7 +86,7 @@ namespace Spine {
 		}
 		#endif // WINDOWS_STOREAPP
 
-		#endif // !(UNITY)
+		#endif
 
 		public Atlas (TextReader reader, string dir, TextureLoader textureLoader) {
 			Load(reader, dir, textureLoader);

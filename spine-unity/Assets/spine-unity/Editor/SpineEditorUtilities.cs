@@ -1213,7 +1213,7 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Checking Methods
-		static int[][] compatibleVersions = { new[] {3, 6, 0} };
+		static int[][] compatibleVersions = { new[] {3, 6, 0}, new[] {3, 5, 0} };
 		//static bool isFixVersionRequired = false;
 
 		static bool CheckForValidSkeletonData (string skeletonJSONPath) {
@@ -1272,10 +1272,10 @@ namespace Spine.Unity.Editor {
 
 			// Version warning
 			if (isSpineData) {
-				string runtimeVersion = compatibleVersions[0][0] + "." + compatibleVersions[0][1];
+				string runtimeVersionDebugString = compatibleVersions[0][0] + "." + compatibleVersions[0][1];
 
 				if (string.IsNullOrEmpty(rawVersion)) {
-					Debug.LogWarningFormat("Skeleton '{0}' has no version information. It may be incompatible with your runtime version: spine-unity v{1}", asset.name, runtimeVersion);
+					Debug.LogWarningFormat("Skeleton '{0}' has no version information. It may be incompatible with your runtime version: spine-unity v{1}", asset.name, runtimeVersionDebugString);
 				} else {
 					string[] versionSplit = rawVersion.Split('.');
 					bool match = false;
@@ -1292,7 +1292,7 @@ namespace Spine.Unity.Editor {
 					}
 
 					if (!match)
-						Debug.LogWarningFormat("Skeleton '{0}' (exported with Spine {1}) may be incompatible with your runtime version: spine-unity v{2}", asset.name, rawVersion, runtimeVersion);
+						Debug.LogWarningFormat("Skeleton '{0}' (exported with Spine {1}) may be incompatible with your runtime version: spine-unity v{2}", asset.name, rawVersion, runtimeVersionDebugString);
 				}
 			}
 
@@ -1476,11 +1476,18 @@ namespace Spine.Unity.Editor {
 		#region TK2D Support
 		const string SPINE_TK2D_DEFINE = "SPINE_TK2D";
 
+		static bool IsInvalidGroup (BuildTargetGroup group) {
+			int gi = (int)group;
+			return
+				gi == 15 || gi == 16
+				||
+				group == BuildTargetGroup.Unknown;
+		}
+
 		static void EnableTK2D () {
 			bool added = false;
 			foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {				
-				int gi = (int)group;
-				if (gi == 15 || gi == 16 || group == BuildTargetGroup.Unknown)
+				if (IsInvalidGroup(group))
 					continue;
 
 				string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
@@ -1506,8 +1513,7 @@ namespace Spine.Unity.Editor {
 		static void DisableTK2D () {
 			bool removed = false;
 			foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
-				int gi = (int)group;
-				if (gi == 15 || gi == 16 || group == BuildTargetGroup.Unknown)
+				if (IsInvalidGroup(group))
 					continue;
 				
 				string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);

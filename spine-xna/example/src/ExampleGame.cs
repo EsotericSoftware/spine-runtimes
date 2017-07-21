@@ -43,6 +43,7 @@ namespace Spine {
 	public class Example : Microsoft.Xna.Framework.Game {
 		GraphicsDeviceManager graphics;
 		SkeletonRenderer skeletonRenderer;
+		SkeletonDebugRenderer skeletonDebugRenderer;
 		Skeleton skeleton;
 		Slot headSlot;
 		AnimationState state;
@@ -79,12 +80,17 @@ namespace Spine {
 			skeletonRenderer.PremultipliedAlpha = false;
 			skeletonRenderer.Effect = spineEffect;
 
+			skeletonDebugRenderer = new SkeletonDebugRenderer(GraphicsDevice);
+			skeletonDebugRenderer.DisableAll();
+			skeletonDebugRenderer.DrawClipping = true;
+
 			// String name = "spineboy-ess";
-			// String name = "goblins-pro";
+			String name = "goblins-pro";
 			// String name = "raptor-pro";
 			// String name = "tank-pro";
-			String name = "coin-pro";
+			// String name = "coin-pro";
 			String atlasName = name.Replace("-pro", "").Replace("-ess", "");
+			if (name == "goblins-pro") atlasName = "goblins-mesh";
 			bool binaryData = false;
 
 			Atlas atlas = new Atlas(assetsFolder + atlasName + ".atlas", new XnaTextureLoader(GraphicsDevice));			
@@ -122,27 +128,28 @@ namespace Spine {
 				state.Complete += Complete;
 				state.Event += Event;
 
-				state.SetAnimation(0, "test", false);
+				state.SetAnimation(0, "run", true);
 				TrackEntry entry = state.AddAnimation(0, "jump", false, 0);
 				entry.End += End; // Event handling for queued animations.
 				state.AddAnimation(0, "run", true, 0);
 			}
 			else if (name == "raptor-pro") {
 				state.SetAnimation(0, "walk", true);
-				state.AddAnimation(1, "gungrab", false, 2);
+				state.AddAnimation(1, "gun-grab", false, 2);
 			}
 			else if (name == "coin-pro") {
 				state.SetAnimation(0, "rotate", true);
 			}
 			else if (name == "tank-pro") {
+				skeleton.X += 300;
 				state.SetAnimation(0, "drive", true);
-			}			
+			}	
 			else {
 				state.SetAnimation(0, "walk", true);
 			}
 
-			skeleton.X = 400 + (name == "tank-pro" ? 300: 0);
-			skeleton.Y = GraphicsDevice.Viewport.Height;
+			skeleton.X += 400;
+			skeleton.Y += GraphicsDevice.Viewport.Height;
 			skeleton.UpdateWorldTransform();
 
 			headSlot = skeleton.FindSlot("head");
@@ -175,6 +182,11 @@ namespace Spine {
 			skeletonRenderer.Begin();
 			skeletonRenderer.Draw(skeleton);
 			skeletonRenderer.End();
+
+			skeletonDebugRenderer.Effect.Projection = Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 0, 1, 0);
+			skeletonDebugRenderer.Begin();
+			skeletonDebugRenderer.Draw(skeleton);
+			skeletonDebugRenderer.End();
 
 			bounds.Update(skeleton, true);
 			MouseState mouse = Mouse.GetState();
