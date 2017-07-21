@@ -84,6 +84,7 @@ namespace Spine {
 						}
 						break;
 					}
+					outer:
 
 					if (next == 0) {
 						do {
@@ -97,7 +98,6 @@ namespace Spine {
 					i = next;
 					next = (next + 1) % vertexCount;
 				}
-				outer:
 
 				// Cut ear tip.
 				triangles.Add(indices[(vertexCount + i - 1) % vertexCount]);

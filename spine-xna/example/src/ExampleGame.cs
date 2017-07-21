@@ -83,15 +83,14 @@ namespace Spine {
 			skeletonDebugRenderer = new SkeletonDebugRenderer(GraphicsDevice);
 			skeletonDebugRenderer.DisableAll();
 			skeletonDebugRenderer.DrawClipping = true;
-			skeletonDebugRenderer.DrawClippingDecomposed = true;
 
 			// String name = "spineboy-ess";
-			// String name = "goblins-pro";
+			String name = "goblins-pro";
 			// String name = "raptor-pro";
 			// String name = "tank-pro";
 			// String name = "coin-pro";
-			String name = "skeleton";
 			String atlasName = name.Replace("-pro", "").Replace("-ess", "");
+			if (name == "goblins-pro") atlasName = "goblins-mesh";
 			bool binaryData = false;
 
 			Atlas atlas = new Atlas(assetsFolder + atlasName + ".atlas", new XnaTextureLoader(GraphicsDevice));			
@@ -145,18 +144,12 @@ namespace Spine {
 				skeleton.X += 300;
 				state.SetAnimation(0, "drive", true);
 			}	
-			else if (name == "skeleton") {
-				skeleton.SetSkin("Pig_Normal");
-				skeleton.FlipY = true;
-				// skeleton.Y -= 200;
-				// state.SetAnimation(0, "BattleIdle", true);
-			}		
 			else {
 				state.SetAnimation(0, "walk", true);
 			}
 
-			// skeleton.X += 400;
-			// skeleton.Y += GraphicsDevice.Viewport.Height;
+			skeleton.X += 400;
+			skeleton.Y += GraphicsDevice.Viewport.Height;
 			skeleton.UpdateWorldTransform();
 
 			headSlot = skeleton.FindSlot("head");

@@ -154,6 +154,7 @@ namespace Spine {
 		}
 
 		public void End() {
+			if (vertices.Count == 0) return;
 			var verticesArray = vertices.ToArray();
 
 			foreach (EffectPass pass in effect.CurrentTechnique.Passes) {
