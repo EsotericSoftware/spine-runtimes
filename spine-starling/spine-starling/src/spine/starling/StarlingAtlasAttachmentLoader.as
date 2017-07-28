@@ -50,7 +50,6 @@ package spine.starling {
 
 		public function StarlingAtlasAttachmentLoader(atlas : TextureAtlas) {
 			this.atlas = atlas;
-
 			Bone.yDown = true;
 		}
 
@@ -59,11 +58,11 @@ package spine.starling {
 		}
 
 		public function newRegionAttachment(skin : Skin, name : String, path : String) : RegionAttachment {
-			var texture : SubTexture = getTexture(path) as SubTexture;//atlas.getTexture() method always return type of SubTexture
+			var texture : SubTexture = getTexture(path) as SubTexture;
 			if (texture == null)
 				throw new Error("Region not found in Starling atlas: " + path + " (region attachment: " + name + ")");
 			var attachment : RegionAttachment = new RegionAttachment(name);
-			var rotated : Boolean = texture.rotated;//if texture == null you trhow exception, that is why atlas.getRotation() method always return texture.rotated.
+			var rotated : Boolean = texture.rotated;
 			attachment.rendererObject = new Image(Texture.fromTexture(texture)); // Discard frame.
 			var frame : Rectangle = texture.frame;
 			attachment.regionOffsetX = frame ? -frame.x : 0;
@@ -97,40 +96,26 @@ package spine.starling {
 			var texture : SubTexture = getTexture(path) as SubTexture;
 			if (texture == null)
 				throw new Error("Region not found in Starling atlas: " + path + " (mesh attachment: " + name + ")");
-			var rotated : Boolean =texture.rotated;
+			var rotated : Boolean = texture.rotated;
 			var attachment : MeshAttachment = new MeshAttachment(name);
 			attachment.regionRotate = rotated;
 			attachment.rendererObject = new Image(Texture.fromTexture(texture)); // Discard frame.
-//			var subTexture : SubTexture = texture as SubTexture;
-//			if (subTexture) {//subTexture can't be null (line 99)
-				var root : Texture = texture.root;
-				var rectRegion : Rectangle = atlas.getRegion(path);
-				if (!rotated) {
-					attachment.regionU = rectRegion.x / root.width;
-					attachment.regionV = rectRegion.y / root.height;
-					attachment.regionU2 = (rectRegion.x + texture.width) / root.width;
-					attachment.regionV2 = (rectRegion.y + texture.height) / root.height;
-				} else {
-					attachment.regionU2 = rectRegion.x / root.width;
-					attachment.regionV2 = rectRegion.y / root.height;
-					attachment.regionU = (rectRegion.x + texture.height) / root.width;
-					attachment.regionV = (rectRegion.y + texture.width) / root.height;
-				}
-				attachment.rendererObject = new Image(root);
-//			} else {
-				//Code never reached to here. if subTextre==null you throw exception.
-//				if (!rotated) {
-//					attachment.regionU = 0;
-//					attachment.regionV = 1;
-//					attachment.regionU2 = 1;
-//					attachment.regionV2 = 0;
-//				} else {
-//					attachment.regionU2 = 0;
-//					attachment.regionV2 = 1;
-//					attachment.regionU = 1;
-//					attachment.regionV = 0;
-//				}
-//			}
+
+			var root : Texture = texture.root;
+			var rectRegion : Rectangle = atlas.getRegion(path);
+			if (!rotated) {
+				attachment.regionU = rectRegion.x / root.width;
+				attachment.regionV = rectRegion.y / root.height;
+				attachment.regionU2 = (rectRegion.x + texture.width) / root.width;
+				attachment.regionV2 = (rectRegion.y + texture.height) / root.height;
+			} else {
+				attachment.regionU2 = rectRegion.x / root.width;
+				attachment.regionV2 = rectRegion.y / root.height;
+				attachment.regionU = (rectRegion.x + texture.height) / root.width;
+				attachment.regionV = (rectRegion.y + texture.width) / root.height;
+			}
+			attachment.rendererObject = new Image(root);
+
 			var frame : Rectangle = texture.frame;
 			attachment.regionOffsetX = frame ? -frame.x : 0;
 			attachment.regionOffsetY = frame ? -frame.y : 0;
