@@ -43,10 +43,20 @@ using Windows.Storage;
 #endif
 
 namespace Spine {
-	public class Atlas {
+	public class Atlas : IEnumerable<AtlasRegion> {
 		readonly List<AtlasPage> pages = new List<AtlasPage>();
 		List<AtlasRegion> regions = new List<AtlasRegion>();
 		TextureLoader textureLoader;
+
+		#region IEnumerable implementation
+		public IEnumerator<AtlasRegion> GetEnumerator () {
+			return regions.GetEnumerator();
+		}
+
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator () {
+			return regions.GetEnumerator();
+		}
+		#endregion
 
 		#if !(IS_UNITY)
 		#if WINDOWS_STOREAPP
@@ -99,7 +109,7 @@ namespace Spine {
 		}
 
 		private void Load (TextReader reader, string imagesDir, TextureLoader textureLoader) {
-			if (textureLoader == null) throw new ArgumentNullException("textureLoader cannot be null.");
+			if (textureLoader == null) throw new ArgumentNullException("textureLoader", "textureLoader cannot be null.");
 			this.textureLoader = textureLoader;
 
 			string[] tuple = new string[4];
@@ -168,11 +178,11 @@ namespace Spine {
 					region.height = Math.Abs(height);
 
 					if (ReadTuple(reader, tuple) == 4) { // split is optional
-						region.splits = new int[] {int.Parse(tuple[0]), int.Parse(tuple[1]),
+						region.splits = new [] {int.Parse(tuple[0]), int.Parse(tuple[1]),
 								int.Parse(tuple[2]), int.Parse(tuple[3])};
 
 						if (ReadTuple(reader, tuple) == 4) { // pad is optional, but only present with splits
-							region.pads = new int[] {int.Parse(tuple[0]), int.Parse(tuple[1]),
+							region.pads = new [] {int.Parse(tuple[0]), int.Parse(tuple[1]),
 									int.Parse(tuple[2]), int.Parse(tuple[3])};
 
 							ReadTuple(reader, tuple);

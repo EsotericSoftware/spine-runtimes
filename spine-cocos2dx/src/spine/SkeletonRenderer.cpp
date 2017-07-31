@@ -282,8 +282,10 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		
 		color.a *= nodeColor.a * _skeleton->color.a * slot->color.a * 255;
 		// skip rendering if the color of this attachment is 0
-		if (color.a == 0)
+		if (color.a == 0){
+			spSkeletonClipping_clipEnd(_clipper, slot);
 			continue;
+		}
 		float multiplier = _premultipliedAlpha ? color.a : 255;
 		color.r *= nodeColor.r * _skeleton->color.r * slot->color.r * multiplier;
 		color.g *= nodeColor.g * _skeleton->color.g * slot->color.g * multiplier;
@@ -313,8 +315,10 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				spSkeletonClipping_clipTriangles(_clipper, (float*)&triangles.verts[0].vertices, triangles.vertCount * sizeof(cocos2d::V3F_C4B_T2F) / 4, triangles.indices, triangles.indexCount, (float*)&triangles.verts[0].texCoords, 6);
 				batch->deallocateVertices(triangles.vertCount);
 				
-				if (_clipper->clippedTriangles->size == 0)
+				if (_clipper->clippedTriangles->size == 0){
+					spSkeletonClipping_clipEnd(_clipper, slot);
 					continue;
+				}
 				
 				triangles.vertCount = _clipper->clippedVertices->size >> 1;
 				triangles.verts = batch->allocateVertices(triangles.vertCount);
@@ -397,8 +401,10 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				spSkeletonClipping_clipTriangles(_clipper, (float*)&trianglesTwoColor.verts[0].position, trianglesTwoColor.vertCount * sizeof(V3F_C4B_C4B_T2F) / 4, trianglesTwoColor.indices, trianglesTwoColor.indexCount, (float*)&trianglesTwoColor.verts[0].texCoords, 7);
 				twoColorBatch->deallocateVertices(trianglesTwoColor.vertCount);
 				
-				if (_clipper->clippedTriangles->size == 0)
+				if (_clipper->clippedTriangles->size == 0){
+					spSkeletonClipping_clipEnd(_clipper, slot);
 					continue;
+				}
 				
 				trianglesTwoColor.vertCount = _clipper->clippedVertices->size >> 1;
 				trianglesTwoColor.verts = twoColorBatch->allocateVertices(trianglesTwoColor.vertCount);
