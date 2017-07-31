@@ -2628,7 +2628,10 @@ var spine;
 					lengths = spine.Utils.setArraySize(this.lengths, boneCount);
 				for (var i = 0, n = spacesCount - 1; i < n;) {
 					var bone = bones[i];
-					var setupLength = bone.data.length, x = setupLength * bone.a, y = setupLength * bone.c;
+					var setupLength = bone.data.length;
+					if (setupLength == 0)
+						setupLength = 0.0000001;
+					var x = setupLength * bone.a, y = setupLength * bone.c;
 					var length_1 = Math.sqrt(x * x + y * y);
 					if (scale)
 						lengths[i] = length_1;

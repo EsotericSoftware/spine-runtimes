@@ -118,6 +118,7 @@ function PathConstraint:update ()
 		while i < n do
 			local bone = bones[i + 1];
 			local setupLength = bone.data.length
+			if setupLength == 0 then setupLength = 0.0000001 end
 			local x = setupLength * bone.a
 			local y = setupLength * bone.c
 			local length = math_sqrt(x * x + y * y)

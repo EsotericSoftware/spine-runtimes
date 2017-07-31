@@ -91,7 +91,9 @@ namespace Spine {
 				if (scale) lengths = this.lengths.Resize(boneCount);
 				for (int i = 0, n = spacesCount - 1; i < n;) {
 					Bone bone = bonesItems[i];
-					float setupLength = bone.data.length, x = setupLength * bone.a, y = setupLength * bone.c;
+					float setupLength = bone.data.length
+					if (setupLength == 0) setupLength = 0.000000001;
+					float x = setupLength * bone.a, y = setupLength * bone.c;
 					float length = (float)Math.Sqrt(x * x + y * y);
 					if (scale) lengths.Items[i] = setupLength;
 					spaces.Items[++i] = (lengthSpacing ? Math.Max(0, setupLength + spacing) : spacing) * length / setupLength;
