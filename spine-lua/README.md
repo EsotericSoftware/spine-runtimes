@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-lua works with data exported from Spine 3.5.xx.
+spine-lua works with data exported from Spine 3.6.xx.
 
 spine-lua supports all Spine features.
 
@@ -18,7 +18,7 @@ spine-lua does not yet support loading the binary format.
 
 ## Setup
 
-1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
+1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/3.6.zip).
 1. Copy the contents of the `spine-lua` directory into your project.
 
 ## Runtimes Extending spine-lua

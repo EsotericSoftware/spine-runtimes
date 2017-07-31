@@ -34,20 +34,20 @@ using System.Collections.Generic;
 namespace Spine {
 	public class AnimationState {
 		static readonly Animation EmptyAnimation = new Animation("<empty>", new ExposedList<Timeline>(), 0);
-		internal const int SUBSEQUENT = 0, FIRST = 1, DIP = 2, DIP_MIX = 3;
+		internal const int Subsequent = 0, First = 1, Dip = 2, DipMix = 3;
 
 		private AnimationStateData data;
-		private readonly ExposedList<TrackEntry> tracks = new ExposedList<TrackEntry>();
-		private readonly HashSet<int> propertyIDs = new HashSet<int>();
-		private readonly ExposedList<Event> events = new ExposedList<Event>();
-		private readonly EventQueue queue;
 
+		Pool<TrackEntry> trackEntryPool = new Pool<TrackEntry>();
+		private readonly ExposedList<TrackEntry> tracks = new ExposedList<TrackEntry>();
+		private readonly ExposedList<Event> events = new ExposedList<Event>();
+		private readonly EventQueue queue; // Initialized by constructor.
+
+		private readonly HashSet<int> propertyIDs = new HashSet<int>();
 		private readonly ExposedList<TrackEntry> mixingTo = new ExposedList<TrackEntry>();
 		private bool animationsChanged;
 
 		private float timeScale = 1;
-
-		Pool<TrackEntry> trackEntryPool = new Pool<TrackEntry>();
 
 		public AnimationStateData Data { get { return data; } }
 		/// <summary>A list of tracks that have animations, which may contain nulls.</summary>
@@ -63,13 +63,13 @@ namespace Spine {
 		public AnimationState (AnimationStateData data) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
 			this.data = data;
-			this.queue = new EventQueue(this, HandleAnimationsChanged, trackEntryPool);
+			this.queue = new EventQueue(
+				this,
+				delegate { this.animationsChanged = true; },
+				trackEntryPool
+			);
 		}
-
-		void HandleAnimationsChanged () {
-			this.animationsChanged = true;
-		}
-
+			
 		/// <summary>
 		/// Increments the track entry times, setting queued animations as current if needed</summary>
 		/// <param name="delta">delta time</param>
@@ -155,7 +155,6 @@ namespace Spine {
 			return false;
 		}
 
-
 		/// <summary>
 		/// Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so the 
 		/// animation state can be applied to multiple skeletons to pose them identically.</summary>
@@ -197,7 +196,7 @@ namespace Spine {
 
 					for (int ii = 0; ii < timelineCount; ii++) {
 						Timeline timeline = timelinesItems[ii];
-						MixPose pose = timelineData[ii] >= FIRST ? MixPose.Setup : currentPose;
+						MixPose pose = timelineData[ii] >= AnimationState.First ? MixPose.Setup : currentPose;
 						var rotateTimeline = timeline as RotateTimeline;
 						if (rotateTimeline != null)
 							ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, mix, pose, timelinesRotation, ii << 1, firstFrame);
@@ -246,17 +245,17 @@ namespace Spine {
 			for (int i = 0; i < timelineCount; i++) {
 				Timeline timeline = timelinesItems[i];
 				switch (timelineData[i]) {
-				case SUBSEQUENT:
+				case Subsequent:
 					if (!attachments && timeline is AttachmentTimeline) continue;
 					if (!drawOrder && timeline is DrawOrderTimeline) continue;
 					pose = currentPose;
 					alpha = alphaMix;
 					break;
-				case FIRST:
+				case First:
 					pose = MixPose.Setup;
 					alpha = alphaMix;
 					break;
-				case DIP:
+				case Dip:
 					pose = MixPose.Setup;
 					alpha = alphaDip;
 					break;
@@ -421,6 +420,7 @@ namespace Spine {
 			queue.Drain();
 		}
 
+		/// <summary>Sets the active TrackEntry for a given track number.</summary>
 		private void SetCurrent (int index, TrackEntry current, bool interrupt) {
 			TrackEntry from = ExpandToIndex(index);
 			tracks.Items[index] = current;
@@ -437,12 +437,12 @@ namespace Spine {
 				from.timelinesRotation.Clear(); // Reset rotation for mixing out, in case entry was mixed in.
 			}
 
-			queue.Start(current);
+			queue.Start(current); // triggers AnimationsChanged
 		}
 
 
 		/// <summary>Sets an animation by name. <seealso cref="SetAnimation(int, Animation, bool)" /></summary>
-		public TrackEntry SetAnimation (int trackIndex, String animationName, bool loop) {
+		public TrackEntry SetAnimation (int trackIndex, string animationName, bool loop) {
 			Animation animation = data.skeletonData.FindAnimation(animationName);
 			if (animation == null) throw new ArgumentException("Animation not found: " + animationName, "animationName");
 			return SetAnimation(trackIndex, animation, loop);
@@ -480,7 +480,7 @@ namespace Spine {
 
 		/// <summary>Queues an animation by name.</summary>
 		/// <seealso cref="AddAnimation(int, Animation, bool, float)" />
-		public TrackEntry AddAnimation (int trackIndex, String animationName, bool loop, float delay) {
+		public TrackEntry AddAnimation (int trackIndex, string animationName, bool loop, float delay) {
 			Animation animation = data.skeletonData.FindAnimation(animationName);
 			if (animation == null) throw new ArgumentException("Animation not found: " + animationName, "animationName");
 			return AddAnimation(trackIndex, animation, loop, delay);
@@ -570,6 +570,7 @@ namespace Spine {
 			return null;
 		}
 
+		/// <summary>Object-pooling version of new TrackEntry. Obtain an unused TrackEntry from the pool and clear/initialize its values.</summary>
 		/// <param name="last">May be null.</param>
 		private TrackEntry NewTrackEntry (int trackIndex, Animation animation, bool loop, TrackEntry last) {
 			TrackEntry entry = trackEntryPool.Obtain(); // Pooling
@@ -589,7 +590,7 @@ namespace Spine {
 			entry.delay = 0;
 			entry.trackTime = 0;
 			entry.trackLast = -1;
-			entry.nextTrackLast = -1;
+			entry.nextTrackLast = -1; // nextTrackLast == -1 signifies a TrackEntry that wasn't applied yet.
 			entry.trackEnd = float.MaxValue; // loop ? float.MaxValue : animation.Duration;
 			entry.timeScale = 1;
 
@@ -600,6 +601,7 @@ namespace Spine {
 			return entry;
 		}
 
+		/// <summary>Dispose all track entries queued after the given TrackEntry.</summary>
 		private void DisposeNext (TrackEntry entry) {
 			TrackEntry next = entry.next;
 			while (next != null) {
@@ -628,7 +630,7 @@ namespace Spine {
 			return (trackIndex >= tracks.Count) ? null : tracks.Items[trackIndex];
 		}
 
-		override public String ToString () {
+		override public string ToString () {
 			var buffer = new System.Text.StringBuilder();
 			for (int i = 0, n = tracks.Count; i < n; i++) {
 				TrackEntry entry = tracks.Items[i];
@@ -680,11 +682,12 @@ namespace Spine {
 			Event = null;
 		}
 
+		/// <summary>Sets the timeline data.</summary>
 		/// <param name="to">May be null.</param>
 		internal TrackEntry SetTimelineData (TrackEntry to, ExposedList<TrackEntry> mixingToArray, HashSet<int> propertyIDs) {
 			if (to != null) mixingToArray.Add(to);
 			var lastEntry = mixingFrom != null ? mixingFrom.SetTimelineData(this, mixingToArray, propertyIDs) : this;
-			if (to != null) mixingToArray.RemoveAt(mixingToArray.Count - 1); // mixingToArray.pop();
+			if (to != null) mixingToArray.Pop();
 
 			var mixingTo = mixingToArray.Items;
 			int mixingToLast = mixingToArray.Count - 1;
@@ -698,21 +701,19 @@ namespace Spine {
 			for (int i = 0; i < timelinesCount; i++) {
 				int id = timelines[i].PropertyId;
 				if (!propertyIDs.Add(id)) {
-					timelineDataItems[i] = AnimationState.SUBSEQUENT;
+					timelineDataItems[i] = AnimationState.Subsequent;
 				} else if (to == null || !to.HasTimeline(id)) {
-					timelineDataItems[i] = AnimationState.FIRST;
+					timelineDataItems[i] = AnimationState.First;
 				} else {
 					for (int ii = mixingToLast; ii >= 0; ii--) {
 						var entry = mixingTo[ii];
-						if (!entry.HasTimeline(id)) {
-							if (entry.mixDuration > 0) {
-								timelineDataItems[i] = AnimationState.DIP_MIX;
-								timelineDipMixItems[i] = entry;
-								goto outer; // continue outer;
-							}
+						if (entry.mixDuration > 0 && !entry.HasTimeline(id)) {
+							timelineDataItems[i] = AnimationState.DipMix;
+							timelineDipMixItems[i] = entry;
+							goto outer; // continue outer;
 						}
 					}
-					timelineDataItems[i] = AnimationState.DIP;
+					timelineDataItems[i] = AnimationState.Dip;
 				}
 				outer: {}
 			}
@@ -886,20 +887,20 @@ namespace Spine {
 			timelinesRotation.Clear();
 		}
 
-		override public String ToString () {
+		override public string ToString () {
 			return animation == null ? "<none>" : animation.name;
 		}
 	}
 
 	class EventQueue {
 		private readonly List<EventQueueEntry> eventQueueEntries = new List<EventQueueEntry>();
-		public bool drainDisabled;
+		internal bool drainDisabled;
 
 		private readonly AnimationState state;
 		private readonly Pool<TrackEntry> trackEntryPool;
-		public event Action AnimationsChanged;
+		internal event Action AnimationsChanged;
 
-		public EventQueue (AnimationState state, Action HandleAnimationsChanged, Pool<TrackEntry> trackEntryPool) {
+		internal EventQueue (AnimationState state, Action HandleAnimationsChanged, Pool<TrackEntry> trackEntryPool) {
 			this.state = state;
 			this.AnimationsChanged += HandleAnimationsChanged;
 			this.trackEntryPool = trackEntryPool;
@@ -921,33 +922,34 @@ namespace Spine {
 			Start, Interrupt, End, Dispose, Complete, Event
 		}
 
-		public void Start (TrackEntry entry) {
+		internal void Start (TrackEntry entry) {
 			eventQueueEntries.Add(new EventQueueEntry(EventType.Start, entry));
 			if (AnimationsChanged != null) AnimationsChanged();
 		}
 
-		public void Interrupt (TrackEntry entry) {
+		internal void Interrupt (TrackEntry entry) {
 			eventQueueEntries.Add(new EventQueueEntry(EventType.Interrupt, entry));
 		}
 
-		public void End (TrackEntry entry) {
+		internal void End (TrackEntry entry) {
 			eventQueueEntries.Add(new EventQueueEntry(EventType.End, entry));
 			if (AnimationsChanged != null) AnimationsChanged();
 		}
 
-		public void Dispose (TrackEntry entry) {
+		internal void Dispose (TrackEntry entry) {
 			eventQueueEntries.Add(new EventQueueEntry(EventType.Dispose, entry));
 		}
 
-		public void Complete (TrackEntry entry) {
+		internal void Complete (TrackEntry entry) {
 			eventQueueEntries.Add(new EventQueueEntry(EventType.Complete, entry));
 		}
 
-		public void Event (TrackEntry entry, Event e) {
+		internal void Event (TrackEntry entry, Event e) {
 			eventQueueEntries.Add(new EventQueueEntry(EventType.Event, entry, e));
 		}
 
-		public void Drain () {
+		/// <summary>Raises all events in the queue and drains the queue.</summary>
+		internal void Drain () {
 			if (drainDisabled) return;
 			drainDisabled = true;
 
@@ -992,7 +994,7 @@ namespace Spine {
 			drainDisabled = false;
 		}
 
-		public void Clear () {
+		internal void Clear () {
 			eventQueueEntries.Clear();
 		}
 	}

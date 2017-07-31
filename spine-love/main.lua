@@ -32,6 +32,8 @@ local spine = require "spine-love.spine"
 
 local skeletons = {}
 local activeSkeleton = 1
+local swirl = spine.SwirlEffect.new(400)
+local swirlTime = 0
 
 function loadSkeleton (jsonFile, atlasFile, animation, skin, scale, x, y)
 	local loader = function (path) return love.graphics.newImage("data/" .. path) end
@@ -53,11 +55,17 @@ function loadSkeleton (jsonFile, atlasFile, animation, skin, scale, x, y)
 	local stateData = spine.AnimationStateData.new(skeletonData)
 	local state = spine.AnimationState.new(stateData)
 	state:setAnimationByName(0, animation, true)
-	if (jsonFile == "spineboy") then
+	if (jsonFile == "spineboy-ess") then
 		stateData:setMix("walk", "jump", 0.5)
 		stateData:setMix("jump", "run", 0.5)
 		state:addAnimationByName(0, "jump", false, 3)
 		state:addAnimationByName(0, "run", true, 0)
+	end
+	
+	if (jsonFile == "raptor-pro") then
+		swirl.centerY = -200
+		skeleton.vertexEffect = swirl
+		-- skeleton.vertexEffect = spine.JitterEffect.new(10, 10)
 	end
 	
 	-- set some event callbacks
@@ -88,6 +96,7 @@ end
 
 function love.load(arg)
 	if arg[#arg] == "-debug" then require("mobdebug").start() end
+	skeletonRenderer = spine.SkeletonRenderer.new(true)
 	table.insert(skeletons, loadSkeleton("coin-pro", "coin", "rotate", nil, 0.5, 400, 500))
 	table.insert(skeletons, loadSkeleton("spineboy-ess", "spineboy", "walk", nil, 0.5, 400, 500))
 	table.insert(skeletons, loadSkeleton("raptor-pro", "raptor", "walk", nil, 0.3, 400, 500))
@@ -95,7 +104,6 @@ function love.load(arg)
 	table.insert(skeletons, loadSkeleton("tank-pro", "tank", "drive", nil, 0.2, 600, 500))
 	table.insert(skeletons, loadSkeleton("vine-pro", "vine", "grow", nil, 0.3, 400, 500))
 	table.insert(skeletons, loadSkeleton("stretchyman-pro", "stretchyman", "sneak", nil, 0.3, 200, 500))
-	skeletonRenderer = spine.SkeletonRenderer.new(true)
 end
 
 function love.update (delta)
@@ -105,12 +113,25 @@ function love.update (delta)
 	state:update(delta)
 	state:apply(skeleton)
 	skeleton:updateWorldTransform()
+	
+	if (skeleton.vertexEffect) then
+		skeletonRenderer.vertexEffect = skeleton.vertexEffect
+		if (skeleton.vertexEffect == swirl) then
+			swirlTime = swirlTime + delta
+			local percent = swirlTime % 2
+			if (percent > 1) then percent = 1 - (percent - 1) end
+			swirl.angle = spine.Interpolation.apply(spine.Interpolation.pow2, -60, 60, percent)
+		end
+	else
+		skeletonRenderer.vertexEffect = nil
+	end
 end
 
 function love.draw ()
 	love.graphics.setBackgroundColor(128, 128, 128, 255)
 	love.graphics.setColor(255, 255, 255)
 	local skeleton = skeletons[activeSkeleton].skeleton
+	
 	skeletonRenderer:draw(skeleton)
 end
 

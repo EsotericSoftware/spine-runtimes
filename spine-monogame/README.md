@@ -10,18 +10,18 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-monogame works with data exported from Spine 3.5.xx.
+spine-monogame works with data exported from Spine 3.6.xx.
 
 spine-monogame supports all Spine features.
 
 ## Setup
 
-1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
+1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/3.6.zip).
 1. Copy the contents of the `spine-csharp/src` and `spine-xna/src` directories into your project.
 
 ## Example
 
-1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
+1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/3.6.zip).
 1. Open the `spine-monogame-example.sln` Solution in either Visual Studio 2015 or Xamarin Studio
 1. Right click the `spine-monogame-example` project in the solution explorer and select `Properties`
 1. Select `Debug` and set the working directory to point to `spine-runtimes/spine-xna/example`

@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-as3 works with data exported from Spine 3.5.xx.
+spine-as3 works with data exported from Spine 3.6.xx.
 
 spine-as3 supports all Spine features, including meshes. If using the `spine.flash` classes for rendering, meshes are not supported.
 
@@ -18,7 +18,7 @@ spine-as3 does not yet support loading the binary format.
 
 ## Usage
 1. Create a new Flex or Adobe AIR project in your preferred IDE.
-2. Download the Spine Runtimes source using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip)
+2. Download the Spine Runtimes source using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/3.6.zip)
 3. Add the sources from `spine-as3/spine-as3/src/` to your project
 
 ## Example

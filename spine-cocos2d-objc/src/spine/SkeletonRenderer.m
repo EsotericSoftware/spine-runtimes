@@ -50,6 +50,7 @@ static bool handlerQueued = false;
 @synthesize twoColorTint = _twoColorTint;
 @synthesize debugSlots = _debugSlots;
 @synthesize debugBones = _debugBones;
+@synthesize effect = _effect;
 
 + (id) skeletonWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
 	return [[[self alloc] initWithData:skeletonData ownsSkeletonData:ownsSkeletonData] autorelease];
@@ -91,6 +92,7 @@ static bool handlerQueued = false;
 	];
 	
 	_clipper = spSkeletonClipping_create();
+	_effect = 0;
 }
 
 - (id) initWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
@@ -172,6 +174,8 @@ static bool handlerQueued = false;
 		}];
 		handlerQueued = true;
 	}
+	
+	if (_effect) _effect->begin(_effect, _skeleton);
 	
 	CCColor* nodeColor = self.color;
 	_skeleton->color.r = nodeColor.red;
@@ -288,6 +292,20 @@ static bool handlerQueued = false;
 							vertex.position = GLKVector4Make(vertices[i * 2], vertices[i * 2 + 1], 0.0, 1.0);
 							vertex.color = GLKVector4Make(r, g, b, a);
 							vertex.texCoord1 = GLKVector2Make(uvs[i * 2], 1 - uvs[i * 2 + 1]);
+							if (_effect) {
+								spColor light;
+								spColor dark;
+								light.r = r;
+								light.g = g;
+								light.b = b;
+								light.a = a;
+								dark.r = dark.g = dark.b = dark.a = 0;
+								_effect->transform(_effect, &vertex.position.x, &vertex.position.y, &vertex.texCoord1.s, &vertex.texCoord1.t, &light, &dark);
+								vertex.color.r = light.r;
+								vertex.color.g = light.g;
+								vertex.color.b = light.b;
+								vertex.color.a = light.a;
+							}
 							CCRenderBufferSetVertex(buffer, i, CCVertexApplyTransform(vertex, transform));
 						}
 						for (int j = 0; j * 3 < trianglesCount; ++j) {
@@ -308,18 +326,50 @@ static bool handlerQueued = false;
 						spVertex* verts = &meshPart.mesh->vertices[meshPart.startVertex];
 						unsigned short* indices = &meshPart.mesh->indices[meshPart.startIndex];
 						
-						for (int i = 0; i * 2 < verticesCount; i++, verts++) {
-							CCVertex vertex;
-							vertex.position = GLKVector4Make(vertices[i * 2], vertices[i * 2 + 1], 0.0, 1.0);
-							vertex = CCVertexApplyTransform(vertex, transform);
-							verts->x = vertex.position.x;
-							verts->y = vertex.position.y;
-							verts->z = vertex.position.z;
-							verts->w = vertex.position.w;
-							verts->color = ((unsigned short)(r * 255))| ((unsigned short)(g * 255)) << 8 | ((unsigned short)(b * 255)) <<16 | ((unsigned short)(a * 255)) << 24;
-							verts->color2 = ((unsigned short)(dr * 255)) | ((unsigned short)(dg * 255)) << 8 | ((unsigned short)(db * 255)) << 16 | ((unsigned short)(255)) << 24;
-							verts->u = uvs[i * 2];
-							verts->v = 1 - uvs[i * 2 + 1];
+						if (_effect) {
+							spColor light;
+							light.r = r;
+							light.g = g;
+							light.b = b;
+							light.a = a;
+							spColor dark;
+							dark.r = dr;
+							dark.g = dg;
+							dark.b = db;
+							dark.a = 1;
+							for (int i = 0; i * 2 < verticesCount; i++, verts++) {
+								spColor lightCopy = light;
+								spColor darkCopy = dark;
+								
+								CCVertex vertex;
+								vertex.position = GLKVector4Make(vertices[i * 2], vertices[i * 2 + 1], 0.0, 1.0);
+								verts->u = uvs[i * 2];
+								verts->v = 1 - uvs[i * 2 + 1];
+								_effect->transform(_effect, &vertex.position.x, &vertex.position.y, &verts->u, &verts->v, &lightCopy, &darkCopy);
+								
+								vertex = CCVertexApplyTransform(vertex, transform);
+								verts->x = vertex.position.x;
+								verts->y = vertex.position.y;
+								verts->z = vertex.position.z;
+								verts->w = vertex.position.w;
+								verts->color = ((unsigned short)(lightCopy.r * 255))| ((unsigned short)(lightCopy.g * 255)) << 8 | ((unsigned short)(lightCopy.b * 255)) <<16 | ((unsigned short)(lightCopy.a * 255)) << 24;
+								verts->color2 = ((unsigned short)(darkCopy.r * 255)) | ((unsigned short)(darkCopy.g * 255)) << 8 | ((unsigned short)(darkCopy.b * 255)) << 16 | ((unsigned short)(255)) << 24;
+								
+							}
+						} else {
+							for (int i = 0; i * 2 < verticesCount; i++, verts++) {
+								CCVertex vertex;
+								vertex.position = GLKVector4Make(vertices[i * 2], vertices[i * 2 + 1], 0.0, 1.0);
+								vertex = CCVertexApplyTransform(vertex, transform);
+								verts->x = vertex.position.x;
+								verts->y = vertex.position.y;
+								verts->z = vertex.position.z;
+								verts->w = vertex.position.w;
+								verts->color = ((unsigned short)(r * 255))| ((unsigned short)(g * 255)) << 8 | ((unsigned short)(b * 255)) <<16 | ((unsigned short)(a * 255)) << 24;
+								verts->color2 = ((unsigned short)(dr * 255)) | ((unsigned short)(dg * 255)) << 8 | ((unsigned short)(db * 255)) << 16 | ((unsigned short)(255)) << 24;
+								verts->u = uvs[i * 2];
+								verts->v = 1 - uvs[i * 2 + 1];
+							}
 						}
 						
 						for (int j = 0; j < trianglesCount; j++, indices++) {
@@ -375,6 +425,8 @@ static bool handlerQueued = false;
 			if (i == 0) [_drawNode drawDot:ccp(bone->worldX, bone->worldY) radius:4 color:[CCColor blueColor]];
 		}
 	}
+	
+	if (_effect) _effect->end(_effect);
 }
 
 - (CCTexture*) getTextureForRegion:(spRegionAttachment*)attachment {

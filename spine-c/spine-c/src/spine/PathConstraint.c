@@ -114,7 +114,9 @@ void spPathConstraint_apply (spPathConstraint* self) {
 		}
 		for (i = 0, n = spacesCount - 1; i < n;) {
 			spBone* bone = bones[i];
-			setupLength = bone->data->length, x = setupLength * bone->a, y = setupLength * bone->c;
+			setupLength = bone->data->length;
+			if (setupLength == 0) setupLength = 0.000000001f;
+			x = setupLength * bone->a, y = setupLength * bone->c;
 			length = SQRT(x * x + y * y);
 			if (scale) lengths[i] = length;
 			spaces[++i] =  (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;

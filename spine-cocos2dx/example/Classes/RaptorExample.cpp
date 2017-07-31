@@ -30,9 +30,12 @@
 
 #include "RaptorExample.h"
 #include "TankExample.h"
+#include <spine/extension.h>
 
 USING_NS_CC;
 using namespace spine;
+
+spSwirlVertexEffect* effect = spSwirlVertexEffect_create(400);
 
 Scene* RaptorExample::scene () {
 	Scene *scene = Scene::create();
@@ -46,7 +49,13 @@ bool RaptorExample::init () {
 	skeletonNode = SkeletonAnimation::createWithJsonFile("raptor-pro.json", "raptor.atlas", 0.5f);
 	skeletonNode->setAnimation(0, "walk", true);
 	skeletonNode->setAnimation(1, "empty", false);
-	skeletonNode->addAnimation(1, "gungrab", false, 2);	
+	skeletonNode->addAnimation(1, "gungrab", false, 2);
+	skeletonNode->setTwoColorTint(true);
+	
+	effect->centerY = 200;
+	swirlTime = 0;
+	
+	skeletonNode->setVertexEffect(&effect->super);
 
 	skeletonNode->setPosition(Vec2(_contentSize.width / 2, 20));
 	addChild(skeletonNode);
@@ -67,4 +76,11 @@ bool RaptorExample::init () {
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
 	return true;
+}
+
+void RaptorExample::update(float fDelta) {
+	swirlTime += fDelta;
+	float percent = fmod(swirlTime, 2);
+	if (percent > 1) percent = 1 - (percent - 1);
+	effect->angle = _spMath_interpolate(_spMath_pow2_apply, -60, 60, percent);
 }

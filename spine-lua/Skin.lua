@@ -63,21 +63,24 @@ function Skin:getAttachment (slotIndex, name)
 end
 
 function Skin:attachAll(skeleton, oldSkin)
-	local slotIndex = 0
 	for i, slot in ipairs(skeleton.slots) do
 		local slotAttachment = slot.attachment
-		if slotAttachment and slotIndex <= #oldSkin.attachments then
-			local dictionary = oldSkin.attachments[slotIndex]
-			for key, value in dictionary do
-				local skinAttachment = value
-				if slotAttachment == skinAttachment then
-					local attachment = getAttachment(slotIndex, key)
-					if attachment then slot.attachment = attachment end
-					break
+		if slotAttachment then
+			local dictionary = oldSkin.attachments[i]
+			if (dictionary) then
+				for key, value in pairs(dictionary) do
+					local skinAttachment = value
+					if slotAttachment == skinAttachment then
+						local attachment = self:getAttachment(i, key)
+						if attachment then
+							print("Set attachment " .. attachment.name .. " on slot " .. slot.data.name)
+							slot:setAttachment(attachment) 
+						end
+						break
+					end
 				end
 			end
 		end
-		slotIndex = slotIndex + 1
 	end
 end
 

@@ -122,11 +122,18 @@ namespace Spine.Unity {
 
 		#region Internals
 		// This is used by the UI system to determine what to put in the MaterialPropertyBlock.
-		public Texture OverrideTexture { get; set; }
+		Texture overrideTexture;
+		public Texture OverrideTexture {
+			get { return overrideTexture; }
+			set {
+				overrideTexture = value;
+				canvasRenderer.SetTexture(this.mainTexture); // Refresh canvasRenderer's texture. Make sure it handles null.
+			}
+		}
 		public override Texture mainTexture {
 			get { 
 				// Fail loudly when incorrectly set up.
-				if (OverrideTexture != null) return OverrideTexture;
+				if (overrideTexture != null) return overrideTexture;
 				return skeletonDataAsset == null ? null : skeletonDataAsset.atlasAssets[0].materials[0].mainTexture;
 			}
 		}
@@ -229,6 +236,7 @@ namespace Spine.Unity {
 			};
 
 			meshBuffers = new DoubleBuffered<MeshRendererBuffers.SmartMesh>();
+			canvasRenderer.SetTexture(this.mainTexture); // Needed for overwriting initializations.
 
 			// Set the initial Skin and Animation
 			if (!string.IsNullOrEmpty(initialSkinName))

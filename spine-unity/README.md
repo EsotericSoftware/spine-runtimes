@@ -42,7 +42,7 @@ In the `Assets/Examples/Scenes` folder you will find many example scenes that de
 
 You can also choose to setup and run from the Git files:
 
-1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
+1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/3.6.zip).
 2. spine-unity requires both `spine-csharp` and `spine-unity`.
 	- Copy the contents of `spine-csharp/src` to `Assets/spine-csharp` in your Unity project directory.
 	- Copy the contents of `spine-unity/Assets` to `Assets` in your Unity project directory. Including `Gizmos` and `spine-unity` and `Examples` if you want them.

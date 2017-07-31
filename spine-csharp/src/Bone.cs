@@ -246,14 +246,14 @@ namespace Spine {
 					float lb = MathUtils.CosDeg(90 + shearY) * scaleY;
 					float lc = MathUtils.SinDeg(shearX) * scaleX;
 					float ld = MathUtils.SinDeg(90 + shearY) * scaleY;
+					if (data.transformMode != TransformMode.NoScaleOrReflection? pa * pd - pb* pc< 0 : skeleton.flipX != skeleton.flipY) {
+						zb = -zb;
+						zd = -zd;
+					}
 					a = za * la + zb * lc;
 					b = za * lb + zb * ld;
 					c = zc * la + zd * lc;
-					d = zc * lb + zd * ld;
-					if (data.transformMode != TransformMode.NoScaleOrReflection ? pa * pd - pb * pc < 0 : skeleton.flipX != skeleton.flipY) {
-						b = -b;
-						d = -d;
-					}
+					d = zc * lb + zd * ld;					
 					return;
 				}
 			}

@@ -357,7 +357,7 @@ namespace Spine.Unity {
 						material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
 					}
 					#else
-					Material material = (rendererObject.GetType() == typeof(Material)) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
+					Material material = (rendererObject is Material) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
 					#endif
 
 					if (current.forceSeparate || (current.rawVertexCount > 0 && !System.Object.ReferenceEquals(current.material, material))) { // Material changed. Add the previous submesh.
@@ -502,16 +502,16 @@ namespace Spine.Unity {
 				} else {
 					var mesh = attachment as MeshAttachment;
 					if (mesh != null) {
-						int meshVertexCount = mesh.worldVerticesLength;
-						if (workingVerts.Length < meshVertexCount) {
-							workingVerts = new float[meshVertexCount];
+						int meshVerticesLength = mesh.worldVerticesLength;
+						if (workingVerts.Length < meshVerticesLength) {
+							workingVerts = new float[meshVerticesLength];
 							this.tempVerts = workingVerts;
 						}
-						mesh.ComputeWorldVertices(slot, 0, meshVertexCount, workingVerts, 0); //meshAttachment.ComputeWorldVertices(slot, tempVerts);
+						mesh.ComputeWorldVertices(slot, 0, meshVerticesLength, workingVerts, 0); //meshAttachment.ComputeWorldVertices(slot, tempVerts);
 						uvs = mesh.uvs;
 						attachmentTriangleIndices = mesh.triangles;
 						c.r = mesh.r; c.g = mesh.g; c.b = mesh.b; c.a = mesh.a;
-						attachmentVertexCount = meshVertexCount >> 1; // meshVertexCount / 2;
+						attachmentVertexCount = meshVerticesLength >> 1; // meshVertexCount / 2;
 						attachmentIndexCount = mesh.triangles.Length;
 					} else {
 						if (useClipping) {

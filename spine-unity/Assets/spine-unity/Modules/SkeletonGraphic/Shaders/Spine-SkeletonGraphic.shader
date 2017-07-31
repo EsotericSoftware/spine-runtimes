@@ -1,4 +1,4 @@
-// This is a premultiply-alpha adaptation of the built-in Unity shader "UI/Default" to allow Unity UI stencil masking.
+// This is a premultiply-alpha adaptation of the built-in Unity shader "UI/Default" in Unity 5.6.2 to allow Unity UI stencil masking.
 
 Shader "Spine/SkeletonGraphic (Premultiply Alpha)"
 {
@@ -14,6 +14,8 @@ Shader "Spine/SkeletonGraphic (Premultiply Alpha)"
 		_StencilReadMask ("Stencil Read Mask", Float) = 255
 
 		_ColorMask ("Color Mask", Float) = 15
+
+		[Toggle(UNITY_UI_ALPHACLIP)] _UseUIAlphaClip ("Use Alpha Clip", Float) = 0
 	}
 
 	SubShader
@@ -49,25 +51,40 @@ Shader "Spine/SkeletonGraphic (Premultiply Alpha)"
 		CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
+			#pragma target 2.0
+
 			#include "UnityCG.cginc"
-			fixed4 _Color;
+			#include "UnityUI.cginc"
+
+			#pragma multi_compile __ UNITY_UI_ALPHACLIP
 
 			struct VertexInput {
 				float4 vertex   : POSITION;
 				float4 color    : COLOR;
 				float2 texcoord : TEXCOORD0;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
 			struct VertexOutput {
 				float4 vertex   : SV_POSITION;
 				fixed4 color    : COLOR;
 				half2 texcoord  : TEXCOORD0;
+				float4 worldPosition : TEXCOORD1;
+				UNITY_VERTEX_OUTPUT_STEREO
 			};
-			
+
+			fixed4 _Color;
+			fixed4 _TextureSampleAdd;
+			float4 _ClipRect;
 
 			VertexOutput vert (VertexInput IN) {
 				VertexOutput OUT;
-				OUT.vertex = UnityObjectToClipPos(IN.vertex);
+
+				UNITY_SETUP_INSTANCE_ID(IN);
+				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
+
+				OUT.worldPosition = IN.vertex;
+				OUT.vertex = UnityObjectToClipPos(OUT.worldPosition);
 				OUT.texcoord = IN.texcoord;
 
 				#ifdef UNITY_HALF_TEXEL_OFFSET
@@ -82,8 +99,14 @@ Shader "Spine/SkeletonGraphic (Premultiply Alpha)"
 
 			fixed4 frag (VertexOutput IN) : SV_Target
 			{
-				half4 color = tex2D(_MainTex, IN.texcoord) * IN.color;
-				//clip(color.a - 0.01);
+				half4 color = (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd) * IN.color;
+
+				color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
+
+				#ifdef UNITY_UI_ALPHACLIP
+				clip (color.a - 0.001);
+				#endif
+
 				return color;
 			}
 		ENDCG

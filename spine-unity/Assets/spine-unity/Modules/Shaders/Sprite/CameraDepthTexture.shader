@@ -283,7 +283,7 @@ struct appdata {
     float4 vertex : POSITION;
     float3 normal : NORMAL;
     fixed4 color : COLOR;
-	UNITY_INSTANCE_ID
+	UNITY_VERTEX_INPUT_INSTANCE_ID
 };
 v2f vert( appdata v ) {
 	v2f o;
@@ -324,7 +324,7 @@ struct appdata {
     float3 normal : NORMAL;
     fixed4 color : COLOR;
     float4 texcoord : TEXCOORD0;
-	UNITY_INSTANCE_ID
+	UNITY_VERTEX_INPUT_INSTANCE_ID
 };
 v2f vert( appdata v ) {
 	v2f o;
@@ -367,7 +367,7 @@ struct appdata {
     float3 normal : NORMAL;
     fixed4 color : COLOR;
     float4 texcoord : TEXCOORD0;
-	UNITY_INSTANCE_ID
+	UNITY_VERTEX_INPUT_INSTANCE_ID
 };
 v2f vert( appdata v ) {
 	v2f o;

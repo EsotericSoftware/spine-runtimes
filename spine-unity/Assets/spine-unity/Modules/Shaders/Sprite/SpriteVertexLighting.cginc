@@ -323,8 +323,8 @@ VertexOutput vert(VertexInput input)
 	output.pos = calculateLocalPos(input.vertex);
 	output.color = calculateVertexColor(input.color);
 	output.texcoord = float3(calculateTextureCoord(input.texcoord), 0);
-	
-	float3 viewPos = mul(UNITY_MATRIX_MV, input.vertex);
+
+	float3 viewPos = UnityObjectToViewPos(input.vertex);
 
 #if defined(PER_PIXEL_LIGHTING)
 	

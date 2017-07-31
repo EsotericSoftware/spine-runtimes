@@ -228,12 +228,10 @@ namespace Spine.Unity.Editor {
 			EditorApplication.hierarchyWindowItemOnGUI += HierarchyDragAndDrop;
 
 			// Hierarchy Icons
-			EditorApplication.hierarchyWindowChanged -= HierarchyIconsOnChanged;
-			EditorApplication.hierarchyWindowChanged += HierarchyIconsOnChanged;
-			EditorApplication.hierarchyWindowItemOnGUI -= HierarchyIconsOnGUI;
-			EditorApplication.hierarchyWindowItemOnGUI += HierarchyIconsOnGUI;
+			EditorApplication.playmodeStateChanged -= HierarchyIconsOnPlaymodeStateChanged;
+			EditorApplication.playmodeStateChanged += HierarchyIconsOnPlaymodeStateChanged;
+			HierarchyIconsOnPlaymodeStateChanged();
 
-			HierarchyIconsOnChanged();
 			initialized = true;
 		}
 
@@ -255,7 +253,7 @@ namespace Spine.Unity.Editor {
 			showHierarchyIcons = EditorGUILayout.Toggle(new GUIContent("Show Hierarchy Icons", "Show relevant icons on GameObjects with Spine Components on them. Disable this if you have large, complex scenes."), showHierarchyIcons);
 			if (EditorGUI.EndChangeCheck()) {
 				EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, showHierarchyIcons);
-				HierarchyIconsOnChanged();
+				HierarchyIconsOnPlaymodeStateChanged();
 			}
 
 			EditorGUILayout.Separator();
@@ -496,58 +494,68 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Hierarchy
-		static void HierarchyIconsOnChanged () {
-			if (showHierarchyIcons) {
-				skeletonRendererTable.Clear();
-				skeletonUtilityBoneTable.Clear();
-				boundingBoxFollowerTable.Clear();
+		static void HierarchyIconsOnPlaymodeStateChanged () {
+			skeletonRendererTable.Clear();
+			skeletonUtilityBoneTable.Clear();
+			boundingBoxFollowerTable.Clear();
 
-				SkeletonRenderer[] arr = Object.FindObjectsOfType<SkeletonRenderer>();
-				foreach (SkeletonRenderer r in arr)
-					skeletonRendererTable.Add(r.gameObject.GetInstanceID(), r.gameObject);
+			EditorApplication.hierarchyWindowChanged -= HierarchyIconsOnChanged;
+			EditorApplication.hierarchyWindowItemOnGUI -= HierarchyIconsOnGUI;
 
-				SkeletonUtilityBone[] boneArr = Object.FindObjectsOfType<SkeletonUtilityBone>();
-				foreach (SkeletonUtilityBone b in boneArr)
-					skeletonUtilityBoneTable.Add(b.gameObject.GetInstanceID(), b);
-
-				BoundingBoxFollower[] bbfArr = Object.FindObjectsOfType<BoundingBoxFollower>();
-				foreach (BoundingBoxFollower bbf in bbfArr)
-					boundingBoxFollowerTable.Add(bbf.gameObject.GetInstanceID(), bbf);
+			if (!Application.isPlaying && showHierarchyIcons) {
+				EditorApplication.hierarchyWindowChanged += HierarchyIconsOnChanged;
+				EditorApplication.hierarchyWindowItemOnGUI += HierarchyIconsOnGUI;
+				HierarchyIconsOnChanged();
 			}
 		}
 
-		static void HierarchyIconsOnGUI (int instanceId, Rect selectionRect) {
-			if (showHierarchyIcons) {
-				Rect r = new Rect(selectionRect);
-				if (skeletonRendererTable.ContainsKey(instanceId)) {
-					r.x = r.width - 15;
-					r.width = 15;
-					GUI.Label(r, Icons.spine);
-				} else if (skeletonUtilityBoneTable.ContainsKey(instanceId)) {
-					r.x -= 26;
-					if (skeletonUtilityBoneTable[instanceId] != null) {
-						if (skeletonUtilityBoneTable[instanceId].transform.childCount == 0)
-							r.x += 13;
-						r.y += 2;
-						r.width = 13;
-						r.height = 13;
-						if (skeletonUtilityBoneTable[instanceId].mode == SkeletonUtilityBone.Mode.Follow)
-							GUI.DrawTexture(r, Icons.bone);
-						else
-							GUI.DrawTexture(r, Icons.poseBones);
-					}
-				} else if (boundingBoxFollowerTable.ContainsKey(instanceId)) {
-					r.x -= 26;
-					if (boundingBoxFollowerTable[instanceId] != null) {
-						if (boundingBoxFollowerTable[instanceId].transform.childCount == 0)
-							r.x += 13;
-						r.y += 2;
-						r.width = 13;
-						r.height = 13;
-						GUI.DrawTexture(r, Icons.boundingBox);
-					}
-				}
+		static void HierarchyIconsOnChanged () {
+			skeletonRendererTable.Clear();
+			skeletonUtilityBoneTable.Clear();
+			boundingBoxFollowerTable.Clear();
 
+			SkeletonRenderer[] arr = Object.FindObjectsOfType<SkeletonRenderer>();
+			foreach (SkeletonRenderer r in arr)
+				skeletonRendererTable.Add(r.gameObject.GetInstanceID(), r.gameObject);
+
+			SkeletonUtilityBone[] boneArr = Object.FindObjectsOfType<SkeletonUtilityBone>();
+			foreach (SkeletonUtilityBone b in boneArr)
+				skeletonUtilityBoneTable.Add(b.gameObject.GetInstanceID(), b);
+
+			BoundingBoxFollower[] bbfArr = Object.FindObjectsOfType<BoundingBoxFollower>();
+			foreach (BoundingBoxFollower bbf in bbfArr)
+				boundingBoxFollowerTable.Add(bbf.gameObject.GetInstanceID(), bbf);
+		}
+
+		static void HierarchyIconsOnGUI (int instanceId, Rect selectionRect) {
+			Rect r = new Rect(selectionRect);
+			if (skeletonRendererTable.ContainsKey(instanceId)) {
+				r.x = r.width - 15;
+				r.width = 15;
+				GUI.Label(r, Icons.spine);
+			} else if (skeletonUtilityBoneTable.ContainsKey(instanceId)) {
+				r.x -= 26;
+				if (skeletonUtilityBoneTable[instanceId] != null) {
+					if (skeletonUtilityBoneTable[instanceId].transform.childCount == 0)
+						r.x += 13;
+					r.y += 2;
+					r.width = 13;
+					r.height = 13;
+					if (skeletonUtilityBoneTable[instanceId].mode == SkeletonUtilityBone.Mode.Follow)
+						GUI.DrawTexture(r, Icons.bone);
+					else
+						GUI.DrawTexture(r, Icons.poseBones);
+				}
+			} else if (boundingBoxFollowerTable.ContainsKey(instanceId)) {
+				r.x -= 26;
+				if (boundingBoxFollowerTable[instanceId] != null) {
+					if (boundingBoxFollowerTable[instanceId].transform.childCount == 0)
+						r.x += 13;
+					r.y += 2;
+					r.width = 13;
+					r.height = 13;
+					GUI.DrawTexture(r, Icons.boundingBox);
+				}
 			}
 		}
 		#endregion
@@ -1205,7 +1213,7 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Checking Methods
-		static int[][] compatibleVersions = { new[] {3, 6, 0} };
+		static int[][] compatibleVersions = { new[] {3, 6, 0}, new[] {3, 5, 0} };
 		//static bool isFixVersionRequired = false;
 
 		static bool CheckForValidSkeletonData (string skeletonJSONPath) {
@@ -1264,10 +1272,10 @@ namespace Spine.Unity.Editor {
 
 			// Version warning
 			if (isSpineData) {
-				string runtimeVersion = compatibleVersions[0][0] + "." + compatibleVersions[0][1];
+				string runtimeVersionDebugString = compatibleVersions[0][0] + "." + compatibleVersions[0][1];
 
 				if (string.IsNullOrEmpty(rawVersion)) {
-					Debug.LogWarningFormat("Skeleton '{0}' has no version information. It may be incompatible with your runtime version: spine-unity v{1}", asset.name, runtimeVersion);
+					Debug.LogWarningFormat("Skeleton '{0}' has no version information. It may be incompatible with your runtime version: spine-unity v{1}", asset.name, runtimeVersionDebugString);
 				} else {
 					string[] versionSplit = rawVersion.Split('.');
 					bool match = false;
@@ -1284,7 +1292,7 @@ namespace Spine.Unity.Editor {
 					}
 
 					if (!match)
-						Debug.LogWarningFormat("Skeleton '{0}' (exported with Spine {1}) may be incompatible with your runtime version: spine-unity v{2}", asset.name, rawVersion, runtimeVersion);
+						Debug.LogWarningFormat("Skeleton '{0}' (exported with Spine {1}) may be incompatible with your runtime version: spine-unity v{2}", asset.name, rawVersion, runtimeVersionDebugString);
 				}
 			}
 
@@ -1468,11 +1476,18 @@ namespace Spine.Unity.Editor {
 		#region TK2D Support
 		const string SPINE_TK2D_DEFINE = "SPINE_TK2D";
 
+		static bool IsInvalidGroup (BuildTargetGroup group) {
+			int gi = (int)group;
+			return
+				gi == 15 || gi == 16
+				||
+				group == BuildTargetGroup.Unknown;
+		}
+
 		static void EnableTK2D () {
 			bool added = false;
 			foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {				
-				int gi = (int)group;
-				if (gi == 15 || gi == 16 || group == BuildTargetGroup.Unknown)
+				if (IsInvalidGroup(group))
 					continue;
 
 				string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
@@ -1498,8 +1513,7 @@ namespace Spine.Unity.Editor {
 		static void DisableTK2D () {
 			bool removed = false;
 			foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
-				int gi = (int)group;
-				if (gi == 15 || gi == 16 || group == BuildTargetGroup.Unknown)
+				if (IsInvalidGroup(group))
 					continue;
 				
 				string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
@@ -1633,21 +1647,21 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		public static void DrawBoneNames (Transform transform, Skeleton skeleton) {
+		public static void DrawBoneNames (Transform transform, Skeleton skeleton, float positionScale = 1f) {
 			GUIStyle style = BoneNameStyle;
 			foreach (Bone b in skeleton.Bones) {
-				var pos = new Vector3(b.WorldX, b.WorldY, 0) + (new Vector3(b.A, b.C) * (b.Data.Length * 0.5f));
+				var pos = new Vector3(b.WorldX * positionScale, b.WorldY * positionScale, 0) + (new Vector3(b.A, b.C) * (b.Data.Length * 0.5f));
 				pos = transform.TransformPoint(pos);
 				Handles.Label(pos, b.Data.Name, style);
 			}
 		}
 
-		public static void DrawBones (Transform transform, Skeleton skeleton) {
+		public static void DrawBones (Transform transform, Skeleton skeleton, float positionScale = 1f) {
 			float boneScale = 1.8f; // Draw the root bone largest;
-			DrawCrosshairs2D(skeleton.Bones.Items[0].GetWorldPosition(transform), 0.08f);
+			DrawCrosshairs2D(skeleton.Bones.Items[0].GetWorldPosition(transform), 0.08f, positionScale);
 
 			foreach (Bone b in skeleton.Bones) {
-				DrawBone(transform, b, boneScale);
+				DrawBone(transform, b, boneScale, positionScale);
 				boneScale = 1f;
 			}
 		}
@@ -1660,45 +1674,45 @@ namespace Spine.Unity.Editor {
 			_boneWireBuffer[4] = _boneWireBuffer[0]; // closed polygon.
 			return _boneWireBuffer;
 		}
-		public static void DrawBoneWireframe (Transform transform, Bone b, Color color) {
+		public static void DrawBoneWireframe (Transform transform, Bone b, Color color, float skeletonRenderScale = 1f) {
 			Handles.color = color;
-			var pos = new Vector3(b.WorldX, b.WorldY, 0);
+			var pos = new Vector3(b.WorldX * skeletonRenderScale, b.WorldY * skeletonRenderScale, 0);
 			float length = b.Data.Length;
 
 			if (length > 0) {
 				Quaternion rot = Quaternion.Euler(0, 0, b.WorldRotationX);
-				Vector3 scale = Vector3.one * length * b.WorldScaleX;
+				Vector3 scale = Vector3.one * length * b.WorldScaleX * skeletonRenderScale;
 				const float my = 1.5f;
-				scale.y *= (SpineHandles.handleScale + 1f) * 0.5f;
-				scale.y = Mathf.Clamp(scale.x, -my, my);
+				scale.y *= (SpineHandles.handleScale + 1) * 0.5f;
+				scale.y = Mathf.Clamp(scale.x, -my * skeletonRenderScale, my * skeletonRenderScale);
 				Handles.DrawPolyLine(GetBoneWireBuffer(transform.localToWorldMatrix * Matrix4x4.TRS(pos, rot, scale)));
 				var wp = transform.TransformPoint(pos);
-				DrawBoneCircle(wp, color, transform.forward);
+				DrawBoneCircle(wp, color, transform.forward, skeletonRenderScale);
 			} else {
 				var wp = transform.TransformPoint(pos);
-				DrawBoneCircle(wp, color, transform.forward);
+				DrawBoneCircle(wp, color, transform.forward, skeletonRenderScale);
 			}
 		}
 
-		public static void DrawBone (Transform transform, Bone b, float boneScale) {
-			var pos = new Vector3(b.WorldX, b.WorldY, 0);
+		public static void DrawBone (Transform transform, Bone b, float boneScale, float skeletonRenderScale = 1f) {
+			var pos = new Vector3(b.WorldX * skeletonRenderScale, b.WorldY * skeletonRenderScale, 0);
 			float length = b.Data.Length;
 			if (length > 0) {
 				Quaternion rot = Quaternion.Euler(0, 0, b.WorldRotationX);
-				Vector3 scale = Vector3.one * length * b.WorldScaleX;
+				Vector3 scale = Vector3.one * length * b.WorldScaleX * skeletonRenderScale;
 				const float my = 1.5f;
 				scale.y *= (SpineHandles.handleScale + 1f) * 0.5f;
-				scale.y = Mathf.Clamp(scale.x, -my, my);
+				scale.y = Mathf.Clamp(scale.x, -my * skeletonRenderScale, my * skeletonRenderScale);
 				SpineHandles.GetBoneMaterial().SetPass(0);
 				Graphics.DrawMeshNow(SpineHandles.BoneMesh, transform.localToWorldMatrix * Matrix4x4.TRS(pos, rot, scale));
 			} else {
 				var wp = transform.TransformPoint(pos);
-				DrawBoneCircle(wp, SpineHandles.BoneColor, transform.forward, boneScale);
+				DrawBoneCircle(wp, SpineHandles.BoneColor, transform.forward, boneScale * skeletonRenderScale);
 			}
 		}
 
-		public static void DrawBone (Transform transform, Bone b, float boneScale, Color color) {
-			var pos = new Vector3(b.WorldX, b.WorldY, 0);
+		public static void DrawBone (Transform transform, Bone b, float boneScale, Color color, float skeletonRenderScale = 1f) {
+			var pos = new Vector3(b.WorldX * skeletonRenderScale, b.WorldY * skeletonRenderScale, 0);
 			float length = b.Data.Length;
 			if (length > 0) {
 				Quaternion rot = Quaternion.Euler(0, 0, b.WorldRotationX);
@@ -1710,7 +1724,7 @@ namespace Spine.Unity.Editor {
 				Graphics.DrawMeshNow(SpineHandles.BoneMesh, transform.localToWorldMatrix * Matrix4x4.TRS(pos, rot, scale));
 			} else {
 				var wp = transform.TransformPoint(pos);
-				DrawBoneCircle(wp, color, transform.forward, boneScale);
+				DrawBoneCircle(wp, color, transform.forward, boneScale * skeletonRenderScale);
 			}
 		}
 
@@ -1806,7 +1820,7 @@ namespace Spine.Unity.Editor {
 			Handles.DrawLine(lastVert, firstVert);
 		}
 
-		public static void DrawConstraints (Transform transform, Skeleton skeleton) {
+		public static void DrawConstraints (Transform transform, Skeleton skeleton, float skeletonRenderScale = 1f) {
 			Vector3 targetPos;
 			Vector3 pos;
 			bool active;
@@ -1818,19 +1832,19 @@ namespace Spine.Unity.Editor {
 			handleColor = SpineHandles.TransformContraintColor;
 			foreach (var tc in skeleton.TransformConstraints) {
 				var targetBone = tc.Target;
-				targetPos = targetBone.GetWorldPosition(transform);
+				targetPos = targetBone.GetWorldPosition(transform, skeletonRenderScale);
 
 				if (tc.TranslateMix > 0) {
 					if (tc.TranslateMix != 1f) {
 						Handles.color = handleColor;
 						foreach (var b in tc.Bones) {
-							pos = b.GetWorldPosition(transform);
+							pos = b.GetWorldPosition(transform, skeletonRenderScale);
 							Handles.DrawDottedLine(targetPos, pos, Thickness);
 						}
 					}
-					SpineHandles.DrawBoneCircle(targetPos, handleColor, normal, 1.3f);
+					SpineHandles.DrawBoneCircle(targetPos, handleColor, normal, 1.3f * skeletonRenderScale);
 					Handles.color = handleColor;
-					SpineHandles.DrawCrosshairs(targetPos, 0.2f, targetBone.A, targetBone.B, targetBone.C, targetBone.D, transform);
+					SpineHandles.DrawCrosshairs(targetPos, 0.2f, targetBone.A, targetBone.B, targetBone.C, targetBone.D, transform, skeletonRenderScale);
 				}
 			}
 
@@ -1838,25 +1852,25 @@ namespace Spine.Unity.Editor {
 			handleColor = SpineHandles.IkColor;
 			foreach (var ikc in skeleton.IkConstraints) {
 				Bone targetBone = ikc.Target;
-				targetPos = targetBone.GetWorldPosition(transform);
+				targetPos = targetBone.GetWorldPosition(transform, skeletonRenderScale);
 				var bones = ikc.Bones;
 				active = ikc.Mix > 0;
 				if (active) {
-					pos = bones.Items[0].GetWorldPosition(transform);
+					pos = bones.Items[0].GetWorldPosition(transform, skeletonRenderScale);
 					switch (bones.Count) {
 					case 1: {
 							Handles.color = handleColor;
 							Handles.DrawLine(targetPos, pos);
 							SpineHandles.DrawBoneCircle(targetPos, handleColor, normal);
 							var m = bones.Items[0].GetMatrix4x4();
-							m.m03 = targetBone.WorldX;
-							m.m13 = targetBone.WorldY;
+							m.m03 = targetBone.WorldX * skeletonRenderScale;
+							m.m13 = targetBone.WorldY * skeletonRenderScale;
 							SpineHandles.DrawArrowhead(transform.localToWorldMatrix * m);
 							break;	
 						}
 					case 2: {
 							Bone childBone = bones.Items[1];
-							Vector3 child = childBone.GetWorldPosition(transform);
+							Vector3 child = childBone.GetWorldPosition(transform, skeletonRenderScale);
 							Handles.color = handleColor;
 							Handles.DrawLine(child, pos);
 							Handles.DrawLine(targetPos, child);
@@ -1864,8 +1878,8 @@ namespace Spine.Unity.Editor {
 							SpineHandles.DrawBoneCircle(child, handleColor, normal, 0.5f);
 							SpineHandles.DrawBoneCircle(targetPos, handleColor, normal);
 							var m = childBone.GetMatrix4x4();
-							m.m03 = targetBone.WorldX;
-							m.m13 = targetBone.WorldY;
+							m.m03 = targetBone.WorldX * skeletonRenderScale;
+							m.m13 = targetBone.WorldY * skeletonRenderScale;
 							SpineHandles.DrawArrowhead(transform.localToWorldMatrix * m);
 							break;
 						}
@@ -1880,18 +1894,18 @@ namespace Spine.Unity.Editor {
 				active = pc.TranslateMix > 0;
 				if (active)
 					foreach (var b in pc.Bones)
-						SpineHandles.DrawBoneCircle(b.GetWorldPosition(transform), handleColor, normal, 1f);
+						SpineHandles.DrawBoneCircle(b.GetWorldPosition(transform, skeletonRenderScale), handleColor, normal, 1f * skeletonRenderScale);
 			}
 		}
 
-		static void DrawCrosshairs2D (Vector3 position, float scale) {
-			scale *= SpineHandles.handleScale;
+		static void DrawCrosshairs2D (Vector3 position, float scale, float skeletonRenderScale = 1f) {
+			scale *= SpineHandles.handleScale * skeletonRenderScale;
 			Handles.DrawLine(position + new Vector3(-scale, 0), position + new Vector3(scale, 0));
 			Handles.DrawLine(position + new Vector3(0, -scale), position + new Vector3(0, scale));
 		}
 
-		static void DrawCrosshairs (Vector3 position, float scale, float a, float b, float c, float d, Transform transform) {
-			scale *= SpineHandles.handleScale;
+		static void DrawCrosshairs (Vector3 position, float scale, float a, float b, float c, float d, Transform transform, float skeletonRenderScale = 1f) {
+			scale *= SpineHandles.handleScale * skeletonRenderScale;
 
 			var xOffset = (Vector3)(new Vector2(a, c).normalized * scale);
 			var yOffset = (Vector3)(new Vector2(b, d).normalized * scale);
@@ -1933,7 +1947,7 @@ namespace Spine.Unity.Editor {
 			float firstScale = 0.08f * scale;
 			Handles.DrawSolidDisc(pos, normal, firstScale);
 			const float Thickness = 0.03f;
-			float secondScale = firstScale - (Thickness  * SpineHandles.handleScale);
+			float secondScale = firstScale - (Thickness  * SpineHandles.handleScale * scale);
 
 			if (secondScale > 0f) {
 				Handles.color = new Color(0.3f, 0.3f, 0.3f, 0.5f);

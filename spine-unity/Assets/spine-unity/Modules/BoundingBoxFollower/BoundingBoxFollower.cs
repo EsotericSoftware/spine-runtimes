@@ -79,7 +79,7 @@ namespace Spine.Unity {
 
 		/// <summary>
 		/// Initialize and instantiate the BoundingBoxFollower colliders. This is method checks if the BoundingBoxFollower has already been initialized for the skeleton instance and slotName and prevents overwriting unless it detects a new setup.</summary>
-		public void Initialize () {
+		public void Initialize (bool overwrite = false) {
 			if (skeletonRenderer == null)
 				return;
 
@@ -89,7 +89,9 @@ namespace Spine.Unity {
 				return;
 
 			// Don't reinitialize if the setup did not change.
-			if (colliderTable.Count > 0 && slot != null			// Slot is set and colliders already populated.
+			if (!overwrite
+				&&
+				colliderTable.Count > 0 && slot != null			// Slot is set and colliders already populated.
 				&&
 				skeletonRenderer.skeleton == slot.Skeleton		// Skeleton object did not change.
 				&&
@@ -110,27 +112,11 @@ namespace Spine.Unity {
 			}
 
 			if (this.gameObject.activeInHierarchy) {
-				foreach (var skin in skeleton.Data.Skins) {
-					var attachmentNames = new List<string>();
-					skin.FindNamesForSlot(slotIndex, attachmentNames);
+				foreach (var skin in skeleton.Data.Skins)
+					AddSkin(skin, slotIndex);
 
-					foreach (var skinKey in attachmentNames) {
-						var attachment = skin.GetAttachment(slotIndex, skinKey);
-						var boundingBoxAttachment = attachment as BoundingBoxAttachment;
-
-						if (BoundingBoxFollower.DebugMessages && attachment != null && boundingBoxAttachment == null)
-							Debug.Log("BoundingBoxFollower tried to follow a slot that contains non-boundingbox attachments: " + slotName);						
-
-						if (boundingBoxAttachment != null) {
-							var bbCollider = SkeletonUtility.AddBoundingBoxAsComponent(boundingBoxAttachment, slot, gameObject, isTrigger);
-							bbCollider.enabled = false;
-							bbCollider.hideFlags = HideFlags.NotEditable;
-							bbCollider.isTrigger = IsTrigger;
-							colliderTable.Add(boundingBoxAttachment, bbCollider);
-							nameTable.Add(boundingBoxAttachment, skinKey);
-						}
-					}
-				}
+				if (skeleton.skin != null)
+					AddSkin(skeleton.skin, slotIndex);
 			}
 
 			if (BoundingBoxFollower.DebugMessages) {
@@ -140,6 +126,31 @@ namespace Spine.Unity {
 						Debug.LogWarning("Bounding Box Follower not valid! Slot [" + slotName + "] does not contain any Bounding Box Attachments!");
 					else 
 						Debug.LogWarning("Bounding Box Follower tried to rebuild as a prefab.");
+				}
+			}
+		}
+
+		void AddSkin (Skin skin, int slotIndex) {
+			if (skin == null) return;
+			var attachmentNames = new List<string>();
+			skin.FindNamesForSlot(slotIndex, attachmentNames);
+
+			foreach (var skinKey in attachmentNames) {
+				var attachment = skin.GetAttachment(slotIndex, skinKey);
+				var boundingBoxAttachment = attachment as BoundingBoxAttachment;
+
+				if (BoundingBoxFollower.DebugMessages && attachment != null && boundingBoxAttachment == null)
+					Debug.Log("BoundingBoxFollower tried to follow a slot that contains non-boundingbox attachments: " + slotName);
+
+				if (boundingBoxAttachment != null) {
+					if (!colliderTable.ContainsKey(boundingBoxAttachment)) {
+						var bbCollider = SkeletonUtility.AddBoundingBoxAsComponent(boundingBoxAttachment, slot, gameObject, isTrigger);
+						bbCollider.enabled = false;
+						bbCollider.hideFlags = HideFlags.NotEditable;
+						bbCollider.isTrigger = IsTrigger;
+						colliderTable.Add(boundingBoxAttachment, bbCollider);
+						nameTable.Add(boundingBoxAttachment, skinKey);
+					}
 				}
 			}
 		}
@@ -206,13 +217,23 @@ namespace Spine.Unity {
 
 			if (bbAttachment == null) {
 				currentCollider = null;
+				currentAttachment = null;
+				currentAttachmentName = null;
 			} else {
-				currentCollider = colliderTable[bbAttachment];
-				currentCollider.enabled = true;
+				PolygonCollider2D foundCollider;
+				colliderTable.TryGetValue(bbAttachment, out foundCollider);
+				if (foundCollider != null) {
+					currentCollider = foundCollider;
+					currentCollider.enabled = true;
+					currentAttachment = bbAttachment;
+					currentAttachmentName = nameTable[bbAttachment];
+				} else {
+					currentCollider = null;
+					currentAttachment = bbAttachment;
+					currentAttachmentName = null;
+					if (BoundingBoxFollower.DebugMessages) Debug.LogFormat("Collider for BoundingBoxAttachment named '{0}' was not initialized. It is possibly from a new skin. currentAttachmentName will be null. You may need to call BoundingBoxFollower.Initialize(overwrite: true);", bbAttachment.Name);
+				}
 			}
-
-			currentAttachment = bbAttachment;
-			currentAttachmentName = currentAttachment == null ? null : nameTable[bbAttachment];
 		}
 	}
 

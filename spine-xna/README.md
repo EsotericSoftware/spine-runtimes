@@ -10,13 +10,13 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-xna works with data exported from Spine 3.5.xx.
+spine-xna works with data exported from Spine 3.6.xx.
 
 spine-xna supports all Spine features.
 
 ## Setup
 
-1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
+1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/3.6.zip).
 1. For XNA with Visual Studio 2015, download [XNA 4.0 refresh for Visual Studio 2015](https://mxa.codeplex.com/releases/view/618279). Install each subfolder as per the README file.   
 1. Open the `spine-xna.sln` project file with Visual Studio.
 1. Set `spine-xna-example` as the startup project

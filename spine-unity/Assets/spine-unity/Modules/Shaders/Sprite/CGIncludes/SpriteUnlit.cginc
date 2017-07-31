@@ -12,7 +12,7 @@ struct VertexInput
 	float4 vertex : POSITION;
 	float4 texcoord : TEXCOORD0;
 	fixed4 color : COLOR;
-	UNITY_INSTANCE_ID
+	UNITY_VERTEX_INPUT_INSTANCE_ID
 };
 
 struct VertexOutput

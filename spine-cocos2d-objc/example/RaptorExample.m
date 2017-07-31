@@ -31,6 +31,8 @@
 #import "RaptorExample.h"
 #import "TankExample.h"
 
+spJitterVertexEffect* effect = 0;
+
 @implementation RaptorExample
 
 + (CCScene*) scene {
@@ -42,9 +44,12 @@
 -(id) init {
     self = [super init];
     if (!self) return nil;
+	
+	if (!effect) effect = spJitterVertexEffect_create(10, 10);
     
     skeletonNode = [SkeletonAnimation skeletonWithFile:@"raptor-pro.json" atlasFile:@"raptor.atlas" scale:0.3f];
     [skeletonNode setAnimationForTrack:0 name:@"walk" loop:YES];
+	[skeletonNode setEffect:&effect->super];
     
     CGSize windowSize = [[CCDirector sharedDirector] viewSize];
     [skeletonNode setPosition:ccp(windowSize.width / 2, 20)];

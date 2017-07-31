@@ -56,7 +56,8 @@ public class SkeletonClipping {
 		float[] vertices = clippingPolygon.setSize(n);
 		clip.computeWorldVertices(slot, 0, n, vertices, 0, 2);
 		makeClockwise(clippingPolygon);
-		clippingPolygons = triangulator.decompose(clippingPolygon, triangulator.triangulate(clippingPolygon));
+		ShortArray triangles = triangulator.triangulate(clippingPolygon);
+		clippingPolygons = triangulator.decompose(clippingPolygon, triangles);
 		for (FloatArray polygon : clippingPolygons) {
 			makeClockwise(polygon);
 			polygon.add(polygon.items[0]);

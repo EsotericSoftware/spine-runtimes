@@ -67,6 +67,9 @@ spine.AtlasAttachmentLoader = require "spine-lua.AtlasAttachmentLoader"
 spine.Color = require "spine-lua.Color"
 spine.Triangulator = require "spine-lua.Triangulator"
 spine.SkeletonClipping = require "spine-lua.SkeletonClipping"
+spine.JitterEffect = require "spine-lua.vertexeffects.JitterEffect"
+spine.SwirlEffect = require "spine-lua.vertexeffects.SwirlEffect"
+spine.Interpolation = require "spine-lua.Interpolation"
 
 spine.utils.readFile = function (fileName, base)
 	local path = fileName
@@ -139,7 +142,15 @@ function PolygonBatcher.new(vertexCount, useTwoColorTint)
 		vertex = { 0, 0, 0, 0, 0, 0, 0, 0 },
 		indices = nil,
 		useTwoColorTint = useTwoColorTint,
-		twoColorTintShader = twoColorTintShader
+		twoColorTintShader = twoColorTintShader,
+		tempVertex = {
+			x = 0,
+			y = 0,
+			u = 0,
+			v = 0,
+			light = spine.Color.newWith(1, 1, 1, 1),
+			dark = spine.Color.newWith(0, 0, 0, 0)
+		}
 	}
 
 	local indices = {}
@@ -163,7 +174,7 @@ function PolygonBatcher:begin ()
 	self.drawCalls = 0
 end
 
-function PolygonBatcher:draw (texture, vertices, uvs, numVertices, indices, color, darkColor)
+function PolygonBatcher:draw (texture, vertices, uvs, numVertices, indices, color, darkColor, vertexEffect)
 	local numIndices = #indices
 	local mesh = self.mesh
 
@@ -207,14 +218,44 @@ function PolygonBatcher:draw (texture, vertices, uvs, numVertices, indices, colo
 	end
 	
 	local v = 1
-	while vertexStart < vertexEnd do
-		vertex[1] = vertices[v]
-		vertex[2] = vertices[v + 1]
-		vertex[3] = uvs[v]
-		vertex[4] = uvs[v + 1]
-		mesh:setVertex(vertexStart, vertex)
-		vertexStart = vertexStart + 1
-		v = v + 2
+	if (vertexEffect) then
+		local tempVertex = self.tempVertex
+		while vertexStart < vertexEnd do
+			tempVertex.x = vertices[v]
+			tempVertex.y = vertices[v + 1]
+			tempVertex.u = uvs[v]
+			tempVertex.v = uvs[v + 1]
+			tempVertex.light:setFrom(color)
+			tempVertex.dark:setFrom(darkColor)
+			vertexEffect:transform(tempVertex)
+			vertex[1] = tempVertex.x
+			vertex[2] = tempVertex.y
+			vertex[3] = tempVertex.u
+			vertex[4] = tempVertex.v
+			vertex[5] = tempVertex.light.r * 255
+			vertex[6] = tempVertex.light.g * 255
+			vertex[7] = tempVertex.light.b * 255
+			vertex[8] = tempVertex.light.a * 255
+			if (self.useTwoColorTint) then
+				vertex[9] = tempVertex.dark.r * 255
+				vertex[10] = tempVertex.dark.g * 255
+				vertex[11] = tempVertex.dark.b * 255
+				vertex[12] = tempVertex.dark.a * 255
+			end
+			mesh:setVertex(vertexStart, vertex)
+			vertexStart = vertexStart + 1
+			v = v + 2
+		end
+	else
+		while vertexStart < vertexEnd do
+			vertex[1] = vertices[v]
+			vertex[2] = vertices[v + 1]
+			vertex[3] = uvs[v]
+			vertex[4] = uvs[v + 1]
+			mesh:setVertex(vertexStart, vertex)
+			vertexStart = vertexStart + 1
+			v = v + 2
+		end
 	end
 	self.verticesLength = self.verticesLength + numVertices
 end
@@ -255,7 +296,8 @@ function SkeletonRenderer.new (useTwoColorTint)
 		batcher = PolygonBatcher.new(3 * 500, useTwoColorTint),
 		premultipliedAlpha = false,
 		useTwoColorTint = useTwoColorTint,
-		clipper = spine.SkeletonClipping.new()
+		clipper = spine.SkeletonClipping.new(),
+		vertexEffect = nil
 	}
 
 	setmetatable(self, SkeletonRenderer)
@@ -269,6 +311,8 @@ local tmpColor2 = spine.Color.newWith(0, 0, 0, 0)
 function SkeletonRenderer:draw (skeleton)
 	local batcher = self.batcher
 	local premultipliedAlpha = self.premultipliedAlpha
+
+	if (self.vertexEffect) then self.vertexEffect:beginEffect(skeleton) end
 
 	local lastLoveBlendMode = love.graphics.getBlendMode()
 	love.graphics.setBlendMode("alpha")
@@ -342,7 +386,7 @@ function SkeletonRenderer:draw (skeleton)
 					indices = self.clipper.clippedTriangles
 				end
 				
-				batcher:draw(texture, vertices, uvs, numVertices, indices, color, dark)
+				batcher:draw(texture, vertices, uvs, numVertices, indices, color, dark, self.vertexEffect)
 			end
 			
 			self.clipper:clipEnd(slot)
@@ -352,6 +396,7 @@ function SkeletonRenderer:draw (skeleton)
 	batcher:stop()
 	love.graphics.setBlendMode(lastLoveBlendMode)
 	self.clipper:clipEnd2()
+	if (self.vertexEffect) then self.vertexEffect:endEffect(skeleton) end
 end
 
 spine.PolygonBatcher = PolygonBatcher

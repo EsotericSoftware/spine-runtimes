@@ -62,9 +62,9 @@
 #define SPINE_EXTENSION_H_
 
 /* All allocation uses these. */
-#define MALLOC(TYPE,COUNT) ((TYPE*)_malloc(sizeof(TYPE) * (COUNT), __FILE__, __LINE__))
-#define CALLOC(TYPE,COUNT) ((TYPE*)_calloc(COUNT, sizeof(TYPE), __FILE__, __LINE__))
-#define REALLOC(PTR,TYPE,COUNT) ((TYPE*)_realloc(PTR, sizeof(TYPE) * (COUNT)))
+#define MALLOC(TYPE,COUNT) ((TYPE*)_spMalloc(sizeof(TYPE) * (COUNT), __FILE__, __LINE__))
+#define CALLOC(TYPE,COUNT) ((TYPE*)_spCalloc(COUNT, sizeof(TYPE), __FILE__, __LINE__))
+#define REALLOC(PTR,TYPE,COUNT) ((TYPE*)_spRealloc(PTR, sizeof(TYPE) * (COUNT)))
 #define NEW(TYPE) CALLOC(TYPE,1)
 
 /* Gets the direct super class. Type safe. */
@@ -83,7 +83,7 @@
 #define VTABLE(TYPE,VALUE) ((_##TYPE##Vtable*)((TYPE*)VALUE)->vtable)
 
 /* Frees memory. Can be used on const types. */
-#define FREE(VALUE) _free((void*)VALUE)
+#define FREE(VALUE) _spFree((void*)VALUE)
 
 /* Allocates a new char[], assigns it to TO, and copies FROM to it. Can be used on const types. */
 #define MALLOC_STR(TO,FROM) strcpy(CONST_CAST(char*, TO) = (char*)MALLOC(char, strlen(FROM) + 1), FROM)
@@ -103,6 +103,7 @@
 #define COS(A) cosf(A)
 #define SQRT(A) sqrtf(A)
 #define ACOS(A) acosf(A)
+#define POW(A,B) pow(A, B)
 #else
 #define FMOD(A,B) (float)fmod(A, B)
 #define ATAN2(A,B) (float)atan2(A, B)
@@ -110,6 +111,7 @@
 #define SIN(A) (float)sin(A)
 #define SQRT(A) (float)sqrt(A)
 #define ACOS(A) (float)acos(A)
+#define POW(A,B) (float)pow(A, B)
 #endif
 
 #define SIN_DEG(A) SIN((A) * DEG_RAD)
@@ -162,17 +164,30 @@ char* _spUtil_readFile (const char* path, int* length);
  * Internal API available for extension:
  */
 
-void* _malloc (size_t size, const char* file, int line);
-void* _calloc (size_t num, size_t size, const char* file, int line);
-void* _realloc(void* ptr, size_t size);
-void _free (void* ptr);
+void* _spMalloc (size_t size, const char* file, int line);
+void* _spCalloc (size_t num, size_t size, const char* file, int line);
+void* _spRealloc(void* ptr, size_t size);
+void _spFree (void* ptr);
+float _spRandom ();
 
-void _setMalloc (void* (*_malloc) (size_t size));
-void _setDebugMalloc (void* (*_malloc) (size_t size, const char* file, int line));
-void _setRealloc(void* (*_realloc) (void* ptr, size_t size));
-void _setFree (void (*_free) (void* ptr));
+void _spSetMalloc (void* (*_malloc) (size_t size));
+void _spSetDebugMalloc (void* (*_malloc) (size_t size, const char* file, int line));
+void _spSetRealloc(void* (*_realloc) (void* ptr, size_t size));
+void _spSetFree (void (*_free) (void* ptr));
+void _spSetRandom(float (*_random) ());
 
-char* _readFile (const char* path, int* length);
+char* _spReadFile (const char* path, int* length);
+
+
+/*
+ * Math utilities
+ */
+float _spMath_random(float min, float max);
+float _spMath_randomTriangular(float min, float max);
+float _spMath_randomTriangularWith(float min, float max, float mode);
+float _spMath_interpolate(float (*apply) (float a), float start, float end, float a);
+float _spMath_pow2_apply(float a);
+float _spMath_pow2out_apply(float a);
 
 /**/
 

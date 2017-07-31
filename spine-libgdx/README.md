@@ -10,13 +10,13 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-libgdx works with data exported from Spine 3.5.xx.
+spine-libgdx works with data exported from Spine 3.6.xx.
 
 spine-libgdx supports all Spine features and is the reference runtime implementation.
 
 ## Setup
 
-1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
+1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/3.6.zip).
 1. Using Eclipse, import the project by choosing File -> Import -> Existing projects. For other IDEs you will need to create a new project and import the source.
 
 Alternatively, the contents of the `spine-libgdx/src` directory can be copied into your project.

@@ -154,7 +154,7 @@ namespace Spine {
 						clippedUVsItems[s + 2] = u2;
 						clippedUVsItems[s + 3] = v2;
 						clippedUVsItems[s + 4] = u3;
-						clippedUVsItems[s + 5] = v3;					
+						clippedUVsItems[s + 5] = v3;
 
 						s = clippedTriangles.Count;
 						int[] clippedTrianglesItems = clippedTriangles.Resize(s + 3).Items;
@@ -180,9 +180,9 @@ namespace Spine {
 			if (clippingArea.Count % 4 >= 2) {
 				input = output;
 				output = scratch;
-			}
-			else
+			} else {
 				input = scratch;
+			}
 
 			input.Clear();
 			input.Add(x1);
@@ -251,14 +251,14 @@ namespace Spine {
 				for (int i = 0, n = output.Count - 2; i < n; i++) {
 					originalOutput.Add(output.Items[i]);
 				}
-			}
-			else
+			} else {
 				originalOutput.Resize(originalOutput.Count - 2);
+			}
 
 			return clipped;
 		}
 
-		static void MakeClockwise (ExposedList<float> polygon) {
+		public static void MakeClockwise (ExposedList<float> polygon) {
 			float[] vertices = polygon.Items;
 			int verticeslength = polygon.Count;
 

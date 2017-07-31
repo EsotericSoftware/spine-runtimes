@@ -38,7 +38,7 @@ namespace Spine.Unity {
 	[RequireComponent(typeof(ISkeletonAnimation))]
 	[ExecuteInEditMode]
 	public class SkeletonUtility : MonoBehaviour {
-	
+
 		#region BoundingBoxAttachment
 		public static PolygonCollider2D AddBoundingBoxGameObject (Skeleton skeleton, string skinName, string slotName, string attachmentName, Transform parent, bool isTrigger = true) {
 			Skin skin = string.IsNullOrEmpty(skinName) ? skeleton.data.defaultSkin : skeleton.data.FindSkin(skinName);
@@ -73,15 +73,15 @@ namespace Spine.Unity {
 			return AddBoundingBoxAsComponent(box, slot, go, isTrigger);
 		}
 
-		public static PolygonCollider2D AddBoundingBoxAsComponent (BoundingBoxAttachment box, Slot slot, GameObject gameObject, bool isTrigger = true) {
+		public static PolygonCollider2D AddBoundingBoxAsComponent (BoundingBoxAttachment box, Slot slot, GameObject gameObject, bool isTrigger = true, bool isKinematic = true, float gravityScale = 0f) {
 			if (box == null) return null;
 
 			if (slot.bone != slot.Skeleton.RootBone) {
 				var rb = gameObject.GetComponent<Rigidbody2D>();
 				if (rb == null) {
 					rb = gameObject.AddComponent<Rigidbody2D>();
-					rb.isKinematic = true;
-					rb.gravityScale = 0;
+					rb.isKinematic = isKinematic;
+					rb.gravityScale = gravityScale;
 				}
 			}
 
@@ -225,7 +225,7 @@ namespace Spine.Unity {
 				var ikConstraints = skeleton.IkConstraints;
 				for (int i = 0, n = ikConstraints.Count; i < n; i++)
 					constraintTargets.Add(ikConstraints.Items[i].target);
-				
+
 				var transformConstraints = skeleton.TransformConstraints;
 				for (int i = 0, n = transformConstraints.Count; i < n; i++)
 					constraintTargets.Add(transformConstraints.Items[i].target);
@@ -246,7 +246,7 @@ namespace Spine.Unity {
 
 					if (hasTransformBones || hasUtilityConstraints)
 						skeletonAnimation.UpdateWorld += UpdateWorld;
-					
+
 					if (hasUtilityConstraints)
 						skeletonAnimation.UpdateComplete += UpdateComplete;
 				}
@@ -283,7 +283,7 @@ namespace Spine.Unity {
 		void UpdateAllBones () {
 			if (boneRoot == null)
 				CollectBones();
-				
+
 			var utilityBones = this.utilityBones;
 			if (utilityBones == null) return;
 			for (int i = 0, n = utilityBones.Count; i < n; i++)

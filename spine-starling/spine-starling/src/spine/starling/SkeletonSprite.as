@@ -39,6 +39,7 @@ package spine.starling {
 	import spine.attachments.Attachment;
 	import spine.attachments.MeshAttachment;
 	import spine.attachments.RegionAttachment;
+	import spine.VertexEffect;
 
 	import starling.display.BlendMode;
 	import starling.display.DisplayObject;
@@ -63,6 +64,11 @@ package spine.starling {
 		private var _smoothing : String = "bilinear";
 		private static var clipper: SkeletonClipping = new SkeletonClipping();
 		private static var QUAD_INDICES : Vector.<uint> = new <uint>[0, 1, 2, 2, 3, 0];
+		
+		public var vertexEffect : VertexEffect;
+		private var tempLight : spine.Color = new spine.Color(0, 0, 0);
+		private var tempDark : spine.Color = new spine.Color(0, 0, 0);
+		private var tempVertex : spine.Vertex = new spine.Vertex();
 
 		public function SkeletonSprite(skeletonData : SkeletonData) {
 			Bone.yDown = true;
@@ -86,6 +92,8 @@ package spine.starling {
 			var verticesLength : int, verticesCount : int, indicesLength : int;
 			var indexData : IndexData, indices : Vector.<uint>, vertexData : VertexData;
 			var uvs : Vector.<Number>;
+			
+			if (vertexEffect != null) vertexEffect.begin(skeleton);
 
 			for (var i : int = 0, n : int = drawOrder.length; i < n; ++i) {
 				var worldVertices : Vector.<Number> = _tempVertices;
@@ -171,13 +179,37 @@ package spine.starling {
 				}
 
 				vertexData = mesh.getVertexData();
-				vertexData.numVertices = verticesCount;				
-				vertexData.colorize("color", rgb, a);
-				vertexData.colorize("color2", dark);
-				for (ii = 0, iii = 0; ii < verticesCount; ii++, iii += 2) {
-					mesh.setVertexPosition(ii, worldVertices[iii], worldVertices[iii + 1]);
-					mesh.setTexCoords(ii, uvs[iii], uvs[iii + 1]);
-				}				
+				vertexData.numVertices = verticesCount;	
+				if (vertexEffect != null) {
+					tempLight.r = ((rgb >> 16) & 0xff) / 255.0;
+					tempLight.g = ((rgb >> 8) & 0xff) / 255.0;
+					tempLight.b = (rgb & 0xff) / 255.0;
+					tempLight.a = a;
+					tempDark.r = ((dark >> 16) & 0xff) / 255.0;
+					tempDark.g = ((dark >> 8) & 0xff) / 255.0;
+					tempDark.b = (dark & 0xff) / 255.0;
+					tempDark.a = 0;
+					for (ii = 0, iii = 0; ii < verticesCount; ii++, iii += 2) {
+						tempVertex.x = worldVertices[iii];
+						tempVertex.y = worldVertices[iii + 1];
+						tempVertex.u = uvs[iii];
+						tempVertex.v = uvs[iii + 1];
+						tempVertex.light.setFromColor(tempLight);
+						tempVertex.dark.setFromColor(tempDark);
+						vertexEffect.transform(tempVertex);
+						vertexData.colorize("color", Color.rgb(tempVertex.light.r * 255, tempVertex.light.g * 255, tempVertex.light.b * 255), tempVertex.light.a, ii, 1);
+						vertexData.colorize("color2", Color.rgb(tempVertex.dark.r * 255, tempVertex.dark.g * 255, tempVertex.dark.b * 255), a, ii, 1);						
+						mesh.setVertexPosition(ii, tempVertex.x, tempVertex.y);
+						mesh.setTexCoords(ii, tempVertex.u, tempVertex.v);
+					}
+				} else {
+					vertexData.colorize("color", rgb, a);
+					vertexData.colorize("color2", dark);
+					for (ii = 0, iii = 0; ii < verticesCount; ii++, iii += 2) {
+						mesh.setVertexPosition(ii, worldVertices[iii], worldVertices[iii + 1]);
+						mesh.setTexCoords(ii, uvs[iii], uvs[iii + 1]);
+					}				
+				}
 				painter.state.blendMode = blendModes[slot.data.blendMode.ordinal];				
 				painter.batchMesh(mesh);
 				
@@ -185,6 +217,8 @@ package spine.starling {
 			}
 			painter.state.blendMode = originalBlendMode;
 			clipper.clipEnd();
+			
+			if (vertexEffect != null) vertexEffect.end();
 		}
 
 		override public function hitTest(localPoint : Point) : DisplayObject {

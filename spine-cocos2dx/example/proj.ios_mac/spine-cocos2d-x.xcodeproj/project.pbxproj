@@ -170,6 +170,8 @@
 		76FAC18D1E3F97D2001CCC8C /* PointAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 76FAC18B1E3F97D2001CCC8C /* PointAttachment.c */; };
 		76FAC18F1E3F98A0001CCC8C /* Color.c in Sources */ = {isa = PBXBuildFile; fileRef = 76FAC18A1E3F97D2001CCC8C /* Color.c */; };
 		76FAC1901E3F98A0001CCC8C /* PointAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 76FAC18B1E3F97D2001CCC8C /* PointAttachment.c */; };
+		76FB150F1F01377200C5377F /* VertexEffect.c in Sources */ = {isa = PBXBuildFile; fileRef = 76FB150E1F01377200C5377F /* VertexEffect.c */; };
+		76FB15111F0139B400C5377F /* VertexEffect.c in Sources */ = {isa = PBXBuildFile; fileRef = 76FB150E1F01377200C5377F /* VertexEffect.c */; };
 		8262943E1AAF051F00CB7CF7 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8262943D1AAF051F00CB7CF7 /* Security.framework */; };
 		BF171245129291EC00B8313A /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF170DB012928DE900B8313A /* OpenGLES.framework */; };
 		BF1712471292920000B8313A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BF170DB412928DE900B8313A /* libz.dylib */; };
@@ -335,6 +337,7 @@
 		76F5BD541D2BD7D3005917E5 /* TankExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TankExample.h; sourceTree = "<group>"; };
 		76FAC18A1E3F97D2001CCC8C /* Color.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Color.c; path = "../../../spine-c/spine-c/src/spine/Color.c"; sourceTree = "<group>"; };
 		76FAC18B1E3F97D2001CCC8C /* PointAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = PointAttachment.c; path = "../../../spine-c/spine-c/src/spine/PointAttachment.c"; sourceTree = "<group>"; };
+		76FB150E1F01377200C5377F /* VertexEffect.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = VertexEffect.c; sourceTree = "<group>"; };
 		8262943D1AAF051F00CB7CF7 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		BF170DB012928DE900B8313A /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		BF170DB412928DE900B8313A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
@@ -552,6 +555,7 @@
 		76AAA3B21D180F7300C54FCB /* spine */ = {
 			isa = PBXGroup;
 			children = (
+				76FB150E1F01377200C5377F /* VertexEffect.c */,
 				76D520E11EB3625700572471 /* Array.c */,
 				76D520D71EB3611300572471 /* ClippingAttachment.c */,
 				76D520D81EB3611300572471 /* SkeletonClipping.c */,
@@ -803,6 +807,7 @@
 				76F28CB81DEC7EBB00CDE54D /* Bone.c in Sources */,
 				76F28CB61DEC7EBB00CDE54D /* Attachment.c in Sources */,
 				503AE10217EB989F00D1A890 /* RootViewController.mm in Sources */,
+				76FB150F1F01377200C5377F /* VertexEffect.c in Sources */,
 				503AE10117EB989F00D1A890 /* main.m in Sources */,
 				76D520DB1EB3611300572471 /* SkeletonClipping.c in Sources */,
 				76F28CCB1DEC7EBB00CDE54D /* Skin.c in Sources */,
@@ -820,6 +825,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				76FB15111F0139B400C5377F /* VertexEffect.c in Sources */,
 				76D520E71EB3634600572471 /* CoinExample.cpp in Sources */,
 				76D520E31EB3625B00572471 /* Array.c in Sources */,
 				76D520DE1EB3619800572471 /* ClippingAttachment.c in Sources */,

@@ -469,9 +469,9 @@ namespace Spine.Unity.Modules.AttachmentTools {
 				a.SetRegion(repackedRegions[regionIndexes[i]]);
 			}
 
-			// Clean up
-			foreach (var ttp in texturesToPack)
-				UnityEngine.Object.Destroy(ttp);
+//			// Clean up
+//			foreach (var ttp in texturesToPack)
+//				UnityEngine.Object.Destroy(ttp);
 
 			t = newTexture;
 			m = newMaterial;
@@ -482,20 +482,38 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			return Sprite.Create(ar.GetMainTexture(), ar.GetUnityRect(), new Vector2(0.5f, 0.5f), pixelsPerUnit);
 		}
 
+		static Dictionary<AtlasRegion, Texture2D> CachedRegionTextures = new Dictionary<AtlasRegion, Texture2D>();
+		static List<Texture2D> CachedRegionTexturesList = new List<Texture2D>();
+
+		public static void ClearCache () {
+			foreach (var t in CachedRegionTexturesList) {
+				UnityEngine.Object.Destroy(t);
+			}
+			CachedRegionTextures.Clear();
+			CachedRegionTexturesList.Clear();
+		}
+
 		/// <summary>Creates a new Texture2D object based on an AtlasRegion.
 		/// If applyImmediately is true, Texture2D.Apply is called immediately after the Texture2D is filled with data.</summary>
 		public static Texture2D ToTexture (this AtlasRegion ar, bool applyImmediately = true, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
-			Texture2D sourceTexture = ar.GetMainTexture();
-			Rect r = ar.GetUnityRect(sourceTexture.height);
-			int width = (int)r.width;
-			int height = (int)r.height;
-			Texture2D output = new Texture2D(width, height, textureFormat, mipmaps);
-			output.name = ar.name;
-			Color[] pixelBuffer = sourceTexture.GetPixels((int)r.x, (int)r.y, width, height);
-			output.SetPixels(pixelBuffer);
+			Texture2D output;
 
-			if (applyImmediately)
-				output.Apply();
+			CachedRegionTextures.TryGetValue(ar, out output);
+			if (output == null) {
+				Texture2D sourceTexture = ar.GetMainTexture();
+				Rect r = ar.GetUnityRect(sourceTexture.height);
+				int width = (int)r.width;
+				int height = (int)r.height;
+				output = new Texture2D(width, height, textureFormat, mipmaps);
+				output.name = ar.name;
+				Color[] pixelBuffer = sourceTexture.GetPixels((int)r.x, (int)r.y, width, height);
+				output.SetPixels(pixelBuffer);
+				CachedRegionTextures.Add(ar, output);
+				CachedRegionTexturesList.Add(output);
+
+				if (applyImmediately)
+					output.Apply();
+			}
 
 			return output;
 		}
@@ -798,6 +816,14 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			if (pathAttachment != null)
 				return pathAttachment.GetClone();
 
+			var pointAttachment = o as PointAttachment;
+			if (pointAttachment != null)
+				return pointAttachment.GetClone();
+
+			var clippingAttachment = o as ClippingAttachment;
+			if (clippingAttachment != null)
+				return clippingAttachment.GetClone();
+
 			return null;
 		}
 
@@ -827,6 +853,23 @@ namespace Spine.Unity.Modules.AttachmentTools {
 				uvs = o.uvs.Clone() as float[],
 				offset = o.offset.Clone() as float[]
 			};
+		}
+
+		public static ClippingAttachment GetClone (this ClippingAttachment o) {
+			var ca = new ClippingAttachment(o.Name) {
+				endSlot = o.endSlot
+			};
+			CloneVertexAttachment(o, ca);
+			return ca;
+		}
+
+		public static PointAttachment GetClone (this PointAttachment o) {
+			var pa = new PointAttachment(o.Name) {
+				rotation = o.rotation,
+				x = o.x,
+				y = o.y
+			};
+			return pa;
 		}
 
 		public static BoundingBoxAttachment GetClone (this BoundingBoxAttachment o) {

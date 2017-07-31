@@ -12,13 +12,13 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-c works with data exported from Spine 3.5.xx.
+spine-c works with data exported from Spine 3.6.xx.
 
 spine-c supports all Spine features.
 
 ## Setup
 
-1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
+1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/3.6.zip).
 1. Open the `spine-c.sln` Visual C++ 2010 Express project file. For other IDEs, you will need to create a new project and import the source.
 
 Alternatively, the contents of the `spine-c/spine-c/src` and `spine-c/spine-c/include` directories can be copied into your project. Be sure your header search is configured to find the contents of the `spine-c/spine-c/include` directory. Note that the includes use `spine/Xxx.h`, so the `spine` directory cannot be omitted when copying the files.

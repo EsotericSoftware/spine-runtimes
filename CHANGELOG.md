@@ -17,12 +17,14 @@
   * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
   * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
   * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
+  * Added `VertexEffect` and implementations `JitterEffect` and `SwirlEffect`. Allows you to modify vertices before they are submitted for drawing. See Starling changes.
 
 ### Starling
  * Fixed renderer to work with 3.6 changes.
  * Added support for two color tinting.
  * Added support for clipping.
  * Added support for rotated regions in texture atlas loaded via StarlingAtlasAttachmentLoader.
+ * Added support for vertex effects. See `RaptorExample.as`
 
 ## C
  * **Breaking changes**
@@ -46,6 +48,8 @@
   * Added `spSkeletonClipper` and `spTriangulator`, used to implement software clipping of attachments.
   * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
   * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
+  * Added `spVertexEffect` and corresponding implementations `spJitterVertexEffect` and `spSwirlVertexEffect`. Create/dispose through the corresponding `spXXXVertexEffect_create()/dispose()` functions. Set on framework/engine specific renderer. See changes for spine-c based frameworks/engines below.
+  * Functions in `extension.h` are not prefixed with `_sp` instead of just `_` to avoid interference with other libraries.
 
 ### Cocos2d-X
  * Fixed renderer to work with 3.6 changes
@@ -55,6 +59,7 @@
  * Added mesh debug rendering. Enable/Disable via `SkeletonRenderer::setDebugMeshesEnabled()`.
  * Added support for clipping.
  * SkeletonRenderer now combines the displayed color of the Node (cascaded from all parents) with the skeleton color for tinting.
+ * Added support for vertex effects. See `RaptorExample.cpp`.
 
 ### Cocos2d-Objc
  * Fixed renderer to work with 3.6 changes
@@ -64,6 +69,7 @@
 ### SFML
  * Fixed renderer to work with 3.6 changes. Sadly, two color tinting does not work, as the vertex format in SFML is fixed.
  * Added support for clipping.
+ * Added support for vertex effects. See raptor example.
 
 ### Unreal Engine 4
  * Fixed renderer to work with 3.6 changes
@@ -134,6 +140,7 @@
  * Removed `RegionBatcher` and `SkeletonRegionRenderer`, renamed `SkeletonMeshRenderer` to `SkeletonRenderer`
  * Added support for two color tint. For it to work, you need to add the `SpineEffect.fx` file to your content project, then load it via `var effect = Content.Load<Effect>("SpineEffect");`, and set it on the `SkeletonRenderer`. See the example project for code.
  * Added support for any `Effect` to be used by `SkeletonRenderer`
+ * Added `SkeletonDebugRenderer`
 
 ## Java
  * **Breaking changes**
@@ -174,15 +181,18 @@
   * Added `SkeletonClipper` and `Triangulator`, used to implement software clipping of attachments.
   * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
   * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
+  * Added `JitterEffect` and `SwirlEffect` and support for vertex effects in Corona and Love
 
 ### Love2D
   * Fixed renderer to work with 3.6 changes
   * Added support for two color tinting. Enable it via `SkeletonRenderer.new(true)`.
   * Added clipping support.
+  * Added support for vertex effects. Set an implementation like "JitterEffect" on `Skeleton.vertexEffect`. See `main.lua` for an example.
 
 ### Corona
   * Fixed renderer to work with 3.6 changes. Sadly, two color tinting is not supported, as Corona doesn't let us change the vertex format needed and its doesn't allow to modify shaders in the way needed for two color tinting
   * Added clipping support.
+  * Added support for vertex effects. Set an implementation like "JitterEffect" on `SkeletonRenderer.vertexEffect`. See `main.lua` for an example
 
 ## Typescript/Javascript
  * **Breaking changes**
@@ -216,6 +226,7 @@
  * Improved performance by using `DYNAMIC_DRAW` for vertex buffer objects and fixing bug that copied to much data to the GPU each frame in `PolygonBatcher`/`Mesh`.
  * Added two color tinting support, enabled by default. You can disable it via the constructors of `SceneRenderer`, `SkeletonRenderer`and `PolygonBatcher`. Note that you will need to use a shader created via `Shader.newTwoColoredTexturedShader` shader with `SkeletonRenderer` and `PolygonBatcher` if two color tinting is enabled.
  * Added clipping support
+ * Added `VertexEffect` interface, instances of which can be set on `SkeletonRenderer`. Allows to modify vertices before submitting them to GPU. See `SwirlEffect`, `JitterEffect`, and the example which allows to set effects.
 
 ### Canvas backend
  * Fixed renderer to work for 3.6 changes. Sadly, we can't support two color tinting via the Canvas API.
@@ -225,6 +236,7 @@
 ### Three.js backend
  * Fixed renderer to work with 3.6 changes. Two color tinting is not supported.
  * Added clipping support
+ * Added `VertexEffect` interface, instances of which can be set on `SkeletonMesh`. Allows to modify vertices before submitting them to GPU. See `SwirlEffect`, `JitterEffect`.
 
 ### Widget backend
  * Fixed WebGL context loss (see WebGL backend changes). Enabled automatically.

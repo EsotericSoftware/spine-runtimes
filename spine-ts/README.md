@@ -18,7 +18,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-ts works with data exported from Spine 3.6.xx
+spine-ts works with data exported from Spine 3.6.xx.
 
 spine-ts WebGL & Widget backends supports all Spine features. 
 
@@ -29,7 +29,7 @@ spine-ts THREE.JS does not support color tinting, blend modes and clipping. The 
 spine-ts does not yet support loading the binary format.
 
 ## Usage
-1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
+1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/3.6.zip).
 2. To use only the core library without rendering support, include the `build/spine-core.js` file in your project.
 3. To use the WebGL backend, include the `spine-webgl.js` file in your project.
 3. To use the Canvas backend, include the `spine-canvas.js` file in your project.

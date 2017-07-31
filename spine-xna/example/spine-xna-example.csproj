@@ -119,8 +119,11 @@
     <None Include="data\coin.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="data\coin.skel">
+    <None Include="data\coin-pro.skel">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="data\goblins-mesh.atlas">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="data\goblins.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -134,25 +137,16 @@
     <Content Include="data\tank.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data\TwoColorTest.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png" />
     <None Include="data\tank.atlas">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="data\tank.json">
+    <None Include="data\tank-pro.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="data\tank.skel">
+    <None Include="data\tank-pro.skel">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="data\TwoColorTest.atlas">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="data\TwoColorTest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -201,28 +195,25 @@
     <None Include="data\coin.atlas">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="data\coin.json">
+    <None Include="data\coin-pro.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="data\goblins-mesh.atlas">
+    <None Include="data\goblins-pro.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="data\goblins-mesh.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="data\goblins-mesh.skel">
+    <None Include="data\goblins-pro.skel">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="data\raptor.atlas">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="data\raptor.json">
+    <None Include="data\raptor-pro.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="data\spineboy.atlas">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="data\spineboy.json">
+    <None Include="data\spineboy-ess.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

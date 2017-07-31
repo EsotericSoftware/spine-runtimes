@@ -204,6 +204,10 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 
+	spSwirlVertexEffect* effect = spSwirlVertexEffect_create(400);
+	effect->centerY = -200;
+	drawable->vertexEffect = &effect->super;
+
 	Skeleton* skeleton = drawable->skeleton;
 	skeleton->x = 320;
 	skeleton->y = 590;
@@ -216,6 +220,7 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
+	float swirlTime = 0;
 	while (window.isOpen()) {
 		while (window.pollEvent(event))
 			if (event.type == sf::Event::Closed) window.close();
@@ -223,12 +228,18 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
+		swirlTime += delta;
+		float percent = fmod(swirlTime, 2);
+		if (percent > 1) percent = 1 - (percent - 1);
+		effect->angle = _spMath_interpolate(_spMath_pow2_apply, -60, 60, percent);
+
 		drawable->update(delta);
 
 		window.clear();
 		window.draw(*drawable);
 		window.display();
 	}
+	spSwirlVertexEffect_dispose(effect);
 }
 
 void tank (SkeletonData* skeletonData, Atlas* atlas) {
@@ -338,6 +349,7 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
+	float swirlTime = 0;
 	while (window.isOpen()) {
 		while (window.pollEvent(event))
 			if (event.type == sf::Event::Closed) window.close();

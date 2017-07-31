@@ -36,6 +36,7 @@ package spine.animation {
 	import spine.Slot;
 
 	public class DeformTimeline extends CurveTimeline {
+		private static var zeros : Vector.<Number> = new Vector.<Number>(64);
 		public var slotIndex : int;
 		public var frames : Vector.<Number>;
 		public var frameVertices : Vector.<Vector.<Number>>;
@@ -58,35 +59,54 @@ package spine.animation {
 		}
 
 		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
+			var vertexAttachment : VertexAttachment;
+			var setupVertices : Vector.<Number>;
 			var slot : Slot = skeleton.slots[slotIndex];
 			var slotAttachment : Attachment = slot.attachment;
 			if (!(slotAttachment is VertexAttachment) || !(VertexAttachment(slotAttachment)).applyDeform(attachment)) return;
 			
 			var verticesArray : Vector.<Number> = slot.attachmentVertices;
 			var frameVertices : Vector.<Vector.<Number>> = this.frameVertices;
-			var vertexCount : int = frameVertices[0].length;
-			if (verticesArray.length != vertexCount && pose != MixPose.setup) alpha = 1; // Don't mix from uninitialized slot vertices.
+			var vertexCount : int = frameVertices[0].length;			
 			verticesArray.length = vertexCount;
 			var vertices : Vector.<Number> = verticesArray;
 
 			var frames : Vector.<Number> = this.frames;
 			var i : int;			
 			if (time < frames[0]) {
+				vertexAttachment = VertexAttachment(slotAttachment);
 				switch (pose) {
 				case MixPose.setup:
-					verticesArray.length = 0;
+					var zeroVertices : Vector.<Number>;
+					if (vertexAttachment.bones == null) {
+						// Unweighted vertex positions (setup pose).
+						zeroVertices = vertexAttachment.vertices;
+					} else {
+						// Weighted deform offsets (zeros).
+						zeroVertices = zeros;
+						if (zeroVertices.length < vertexCount) zeros = zeroVertices = new Vector.<Number>(vertexCount);
+					}					
+					for (i = 0; i < vertexCount; i++)
+						vertices[i] = zeroVertices[i];
 					return;
 				case MixPose.current:
-					alpha = 1 - alpha;
-					for (i = 0; i < vertexCount; i++)
-						vertices[i] *= alpha;
+					if (alpha == 1) break;
+					if (vertexAttachment.bones == null) {
+						// Unweighted vertex positions.
+						setupVertices = vertexAttachment.vertices;
+						for (i = 0; i < vertexCount; i++)
+							vertices[i] += (setupVertices[i] - vertices[i]) * alpha;
+					} else {
+						// Weighted deform offsets.
+						alpha = 1 - alpha;
+						for (i = 0; i < vertexCount; i++)
+							vertices[i] *= alpha;
+					}
 				}
 				return;
 			}						
 
-			var n : int;
-			var vertexAttachment : VertexAttachment;
-			var setupVertices : Vector.<Number>;
+			var n : int;			
 			var setup : Number, prev : Number;
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.
 				var lastVertices : Vector.<Number> = frameVertices[frames.length - 1];

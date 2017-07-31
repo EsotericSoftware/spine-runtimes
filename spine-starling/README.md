@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-starling works with data exported from Spine 3.5.xx.
+spine-starling works with data exported from Spine 3.6.xx.
 
 spine-starling supports all Spine features.
 
@@ -18,7 +18,7 @@ spine-starling does not yet support loading the binary format.
 
 # Usage
 1. Create a new Starling 2.0 project as per the [documentation].
-2. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
+2. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/3.6.zip).
 3. Copy the sources in `spine-as3/spine-as3/src/` and `spine-starling/spine-starling/src/` into your project's source directory
 
 ## Example
