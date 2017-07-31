@@ -87,7 +87,9 @@ package spine {
 				}
 				for (var i : int = 0, n : int = spacesCount - 1; i < n;) {
 					var bone : Bone = bones[i];
-					var setupLength : Number = bone.data.length, x : Number = setupLength * bone.a, y : Number = setupLength * bone.c;
+					var setupLength : Number = bone.data.length;
+					if (setupLength == 0) setupLength = 0.000000001;
+					var x : Number = setupLength * bone.a, y : Number = setupLength * bone.c;
 					var length : Number = Math.sqrt(x * x + y * y);
 					if (scale) lengths[i] = length;
 					spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;

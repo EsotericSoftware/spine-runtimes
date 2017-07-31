@@ -80,7 +80,9 @@ module spine {
 				if (scale) lengths = Utils.setArraySize(this.lengths, boneCount);
 				for (let i = 0, n = spacesCount - 1; i < n;) {
 					let bone = bones[i];
-					let setupLength = bone.data.length, x = setupLength * bone.a, y = setupLength * bone.c;
+					let setupLength = bone.data.length;
+					if (setupLength == 0) setupLength = 0.0000001;
+					let x = setupLength * bone.a, y = setupLength * bone.c;
 					let length = Math.sqrt(x * x + y * y);
 					if (scale) lengths[i] = length;
 					spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
