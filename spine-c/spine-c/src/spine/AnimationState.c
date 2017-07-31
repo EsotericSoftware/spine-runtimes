@@ -899,7 +899,6 @@ spTrackEntry* _spTrackEntry_setTimelineData(spTrackEntry* self, spTrackEntry* to
 	spTrackEntryArray_clear(self->timelineDipMix);
 	timelineDipMix = spTrackEntryArray_setSize(self->timelineDipMix, timelinesCount)->items;
 
-	outer:
 	for (i = 0; i < timelinesCount; i++) {
 		int id = spTimeline_getPropertyId(timelines[i]);
 		if (!_spAnimationState_addPropertyID(state, id))
@@ -922,5 +921,6 @@ spTrackEntry* _spTrackEntry_setTimelineData(spTrackEntry* self, spTrackEntry* to
 			timelineData[i] = DIP;
 		}
 	}
+	outer:
 	return lastEntry;
 }
