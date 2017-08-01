@@ -64,6 +64,12 @@ public class Skin {
 		attachments.put(key, attachment);
 	}
 
+	/** Adds all attachments from the specified skin to this skin. */
+	public void addAttachments (Skin skin) {
+		for (Entry<Key, Attachment> entry : skin.attachments.entries())
+			addAttachment(entry.key.slotIndex, entry.key.name, entry.value);
+	}
+
 	/** Returns the attachment for the specified slot index and name, or null. */
 	public Attachment getAttachment (int slotIndex, String name) {
 		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
