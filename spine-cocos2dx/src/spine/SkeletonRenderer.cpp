@@ -176,6 +176,7 @@ void SkeletonRenderer::initWithBinaryFile (const std::string& skeletonDataFile, 
 
 
 void SkeletonRenderer::update (float deltaTime) {
+	Node::update(deltaTime);
 	spSkeleton_update(_skeleton, deltaTime * _timeScale);
 }
 
