@@ -88,7 +88,8 @@ module spine.canvas {
 				ctx.transform(bone.a, bone.c, bone.b, bone.d, bone.worldX, bone.worldY);
 				ctx.translate(attachment.offset[0], attachment.offset[1]);
 				ctx.rotate(attachment.rotation * Math.PI / 180);
-				ctx.scale(attachment.scaleX, attachment.scaleY);
+				let atlasScale = att.width / w;
+				ctx.scale(atlasScale * attachment.scaleX, atlasScale * attachment.scaleY);
 				ctx.translate(w / 2, h / 2);
 				if (attachment.region.rotate) {
 					let t = w;
