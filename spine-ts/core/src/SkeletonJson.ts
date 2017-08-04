@@ -699,7 +699,7 @@ module spine {
 					let eventMap = map.events[i];
 					let eventData = skeletonData.findEvent(eventMap.name);
 					if (eventData == null) throw new Error("Event not found: " + eventMap.name);
-					let event = new Event(eventMap.time, eventData);
+					let event = new Event(Utils.toSinglePrecision(eventMap.time), eventData);
 					event.intValue = this.getValue(eventMap, "int", eventData.intValue);
 					event.floatValue = this.getValue(eventMap, "float", eventData.floatValue);
 					event.stringValue = this.getValue(eventMap, "string", eventData.stringValue);
