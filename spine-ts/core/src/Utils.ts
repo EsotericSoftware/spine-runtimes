@@ -255,6 +255,11 @@ module spine {
 		static toFloatArray (array: Array<number>) {
 			return Utils.SUPPORTS_TYPED_ARRAYS ? new Float32Array(array) : array;
 		}
+
+
+		static toSinglePrecision (value: number) {
+			return Utils.SUPPORTS_TYPED_ARRAYS ? Math.fround(value) : value;
+		}
 	}
 
 	export class DebugUtils {
