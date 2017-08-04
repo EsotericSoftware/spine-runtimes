@@ -256,7 +256,6 @@ module spine {
 			return Utils.SUPPORTS_TYPED_ARRAYS ? new Float32Array(array) : array;
 		}
 
-
 		static toSinglePrecision (value: number) {
 			return Utils.SUPPORTS_TYPED_ARRAYS ? Math.fround(value) : value;
 		}

@@ -4,7 +4,7 @@ interface Math {
 
 (() => {
 	if (!Math.fround) {
-		Math.fround = Math.fround = (function (array) {
+		Math.fround = (function (array) {
 			return function (x: number) {
 				return array[0] = x, array[0];
 			};
