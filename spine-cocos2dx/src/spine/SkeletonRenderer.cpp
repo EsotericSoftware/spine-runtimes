@@ -198,7 +198,10 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	TwoColorTrianglesCommand* lastTwoColorTrianglesCommand = nullptr;
 	for (int i = 0, n = _skeleton->slotsCount; i < n; ++i) {
 		spSlot* slot = _skeleton->drawOrder[i];
-		if (!slot->attachment) continue;
+		if (!slot->attachment) {
+			spSkeletonClipping_clipEnd(_clipper, slot);
+			continue;
+		}
 		
 		cocos2d::TrianglesCommand::Triangles triangles;
 		TwoColorTriangles trianglesTwoColor;
@@ -267,6 +270,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 			spSkeletonClipping_clipStart(_clipper, slot, clip);
 		}
 		default:
+			spSkeletonClipping_clipEnd(_clipper, slot);
 			continue;
 		}
 		
