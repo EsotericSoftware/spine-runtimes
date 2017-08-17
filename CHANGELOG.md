@@ -71,6 +71,7 @@
  * Fixed renderer to work with 3.6 changes. Sadly, two color tinting does not work, as the vertex format in SFML is fixed.
  * Added support for clipping.
  * Added support for vertex effects. See raptor example.
+ * Added premultiplied alpha support to `SkeletonDrawable`.
 
 ### Unreal Engine 4
  * Fixed renderer to work with 3.6 changes
