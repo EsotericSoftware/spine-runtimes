@@ -36,6 +36,16 @@
 
 using namespace sf;
 
+sf::BlendMode normal = sf::BlendMode(sf::BlendMode::SrcAlpha, sf::BlendMode::OneMinusSrcAlpha);
+sf::BlendMode additive = sf::BlendMode(sf::BlendMode::SrcAlpha, sf::BlendMode::One);
+sf::BlendMode multiply = sf::BlendMode(sf::BlendMode::DstColor, sf::BlendMode::OneMinusSrcAlpha);
+sf::BlendMode screen = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcColor);
+
+sf::BlendMode normalPma = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcAlpha);
+sf::BlendMode additivePma = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::One);
+sf::BlendMode multiplyPma = sf::BlendMode(sf::BlendMode::DstColor, sf::BlendMode::OneMinusSrcAlpha);
+sf::BlendMode screenPma = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcColor);
+
 _SP_ARRAY_IMPLEMENT_TYPE(spColorArray, spColor)
 
 void _AtlasPage_createTexture (AtlasPage* self, const char* path){
@@ -163,16 +173,40 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		light.a = a / 255.0f;
 
 		sf::BlendMode blend;
-		switch (slot->data->blendMode) {
-			case BLEND_MODE_ADDITIVE:
-				blend = BlendAdd;
-				break;
-			case BLEND_MODE_MULTIPLY:
-				blend = BlendMultiply;
-				break;
-			case BLEND_MODE_SCREEN: // Unsupported, fall through.
-			default:
-				blend = BlendAlpha;
+		if (!usePremultipliedAlpha) {
+			switch (slot->data->blendMode) {
+				case BLEND_MODE_NORMAL:
+					blend = normal;
+					break;
+				case BLEND_MODE_ADDITIVE:
+					blend = additive;
+					break;
+				case BLEND_MODE_MULTIPLY:
+					blend = multiply;
+					break;
+				case BLEND_MODE_SCREEN:
+					blend = screen;
+					break;
+				default:
+					blend = normal;
+			}
+		} else {
+			switch (slot->data->blendMode) {
+				case BLEND_MODE_NORMAL:
+					blend = normalPma;
+					break;
+				case BLEND_MODE_ADDITIVE:
+					blend = additivePma;
+					break;
+				case BLEND_MODE_MULTIPLY:
+					blend = multiplyPma;
+					break;
+				case BLEND_MODE_SCREEN:
+					blend = screenPma;
+					break;
+				default:
+					blend = normalPma;
+			}
 		}
 
 		if (states.texture == 0) states.texture = texture;
