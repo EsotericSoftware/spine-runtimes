@@ -102,7 +102,7 @@ package spine.starling {
 			attachment.rendererObject = new Image(Texture.fromTexture(texture)); // Discard frame.
 
 			var root : Texture = texture.root;
-			var rectRegion : Rectangle = atlas.getRegion(path);
+			var rectRegion : Rectangle = texture.region;
 			if (!rotated) {
 				attachment.regionU = rectRegion.x / root.width;
 				attachment.regionV = rectRegion.y / root.height;
