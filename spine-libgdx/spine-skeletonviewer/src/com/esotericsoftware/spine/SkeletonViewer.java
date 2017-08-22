@@ -142,7 +142,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 			pixmap.dispose();
 
 			String atlasFileName = skeletonFile.nameWithoutExtension();
-			if (atlasFileName.endsWith(".json")) atlasFileName = new FileHandle(atlasFileName).nameWithoutExtension();
+			if (atlasFileName.endsWith(".json") || atlasFileName.endsWith(".skel"))
+				atlasFileName = atlasFileName.substring(0, atlasFileName.length() - 5);
 			FileHandle atlasFile = skeletonFile.sibling(atlasFileName + ".atlas");
 			if (!atlasFile.exists()) {
 				if (atlasFileName.endsWith("-pro") || atlasFileName.endsWith("-ess"))
@@ -706,6 +707,16 @@ public class SkeletonViewer extends ApplicationAdapter {
 				}
 			});
 
+			InputListener scrollFocusListener = new InputListener() {
+				public void enter (InputEvent event, float x, float y, int pointer, Actor fromActor) {
+					stage.setScrollFocus(event.getListenerActor());
+				}
+
+				public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
+					if (stage.getScrollFocus() == event.getListenerActor()) stage.setScrollFocus(null);
+				}
+			};
+
 			animationList.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
 					if (state != null) {
@@ -717,6 +728,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 					}
 				}
 			});
+			animationList.addListener(scrollFocusListener);
 
 			loopCheckbox.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
@@ -736,6 +748,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 					}
 				}
 			});
+			skinList.addListener(scrollFocusListener);
 
 			ChangeListener trackButtonListener = new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
