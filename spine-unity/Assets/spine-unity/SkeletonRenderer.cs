@@ -61,13 +61,14 @@ namespace Spine.Unity {
 		public bool useClipping = true;
 		public bool immutableTriangles = false;
 		public bool pmaVertexColors = true;
+		/// <summary>Clears the state when this component or its GameObject is disabled. This prevents previous state from being retained when it is enabled again. When pooling your skeleton, setting this to true can be helpful.</summary>
 		public bool clearStateOnDisable = false;
 		public bool tintBlack = false;
 		public bool singleSubmesh = false;
 
 		[UnityEngine.Serialization.FormerlySerializedAs("calculateNormals")]
-		public bool addNormals;
-		public bool calculateTangents;
+		public bool addNormals = false;
+		public bool calculateTangents = false;
 
 		public bool logErrors = false;
 
@@ -133,6 +134,18 @@ namespace Spine.Unity {
 				c.Initialize(false);
 			}
 			return c;
+		}
+
+		/// <summary>Applies MeshGenerator settings to the SkeletonRenderer and its internal MeshGenerator.</summary>
+		public void SetMeshSettings (MeshGenerator.Settings settings) {
+			this.calculateTangents = settings.calculateTangents;
+			this.immutableTriangles = settings.immutableTriangles;
+			this.pmaVertexColors = settings.pmaVertexColors;
+			this.tintBlack = settings.tintBlack;
+			this.useClipping = settings.useClipping;
+			this.zSpacing = settings.zSpacing;
+
+			this.meshGenerator.settings = settings;
 		}
 		#endregion
 
