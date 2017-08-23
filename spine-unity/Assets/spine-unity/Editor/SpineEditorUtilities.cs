@@ -1020,13 +1020,18 @@ namespace Spine.Unity.Editor {
 					pageFiles.Add(atlasLines[i + 1].Trim());
 			}
 
-			atlasAsset.materials = new Material[pageFiles.Count];
+			var populatingMaterials = new List<Material>(pageFiles.Count);//atlasAsset.materials = new Material[pageFiles.Count];
 
 			for (int i = 0; i < pageFiles.Count; i++) {
 				string texturePath = assetPath + "/" + pageFiles[i];
 				Texture2D texture = (Texture2D)AssetDatabase.LoadAssetAtPath(texturePath, typeof(Texture2D));
 
 				TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(texturePath);
+				if (texImporter == null) {
+					Debug.LogWarning(string.Format("{0} ::: Texture asset \"{1}\" not found. Skipping. Please check your atlas file for renamed files.", atlasAsset.name, texturePath));
+					continue;
+				}
+
 				#if UNITY_5_5_OR_NEWER
 				texImporter.textureCompression = TextureImporterCompression.Uncompressed;
 				texImporter.alphaSource = TextureImporterAlphaSource.FromInput;
@@ -1038,7 +1043,6 @@ namespace Spine.Unity.Editor {
 				texImporter.alphaIsTransparency = false; // Prevent the texture importer from applying bleed to the transparent parts.
 				texImporter.spriteImportMode = SpriteImportMode.None;
 				texImporter.maxTextureSize = 2048;
-
 
 				EditorUtility.SetDirty(texImporter);
 				AssetDatabase.ImportAsset(texturePath);
@@ -1064,8 +1068,10 @@ namespace Spine.Unity.Editor {
 				EditorUtility.SetDirty(mat);
 				AssetDatabase.SaveAssets();
 
-				atlasAsset.materials[i] = mat;
+				populatingMaterials.Add(mat); //atlasAsset.materials[i] = mat;
 			}
+
+			atlasAsset.materials = populatingMaterials.ToArray();
 
 			for (int i = 0; i < vestigialMaterials.Count; i++)
 				AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(vestigialMaterials[i]));
@@ -1077,6 +1083,11 @@ namespace Spine.Unity.Editor {
 
 			EditorUtility.SetDirty(atlasAsset);
 			AssetDatabase.SaveAssets();
+
+			if (pageFiles.Count != atlasAsset.materials.Length)
+				Debug.LogWarning(string.Format("{0} ::: Not all atlas pages were imported. If you rename your image files, please make sure you also edit the filenames specified in the atlas file.", atlasAsset.name));
+			else
+				Debug.Log(string.Format("{0} ::: Imported with {1} material", atlasAsset.name, atlasAsset.materials.Length));
 
 			// Iterate regions and bake marked.
 			Atlas atlas = atlasAsset.GetAtlas();
