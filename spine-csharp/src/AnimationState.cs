@@ -139,8 +139,9 @@ namespace Spine {
 			bool finished = UpdateMixingFrom(from, delta);
 
 			// Require mixTime > 0 to ensure the mixing from entry was applied at least once.
-			if (to.mixTime > 0 && (to.mixTime >= to.mixDuration || to.timeScale == 0)) {	
-				if (from.totalAlpha == 0) {
+			if (to.mixTime > 0 && (to.mixTime >= to.mixDuration || to.timeScale == 0)) {
+				// Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame).
+				if (from.totalAlpha == 0 || to.mixDuration == 0) {
 					to.mixingFrom = from.mixingFrom;
 					to.interruptAlpha = from.interruptAlpha;
 					queue.End(from);
