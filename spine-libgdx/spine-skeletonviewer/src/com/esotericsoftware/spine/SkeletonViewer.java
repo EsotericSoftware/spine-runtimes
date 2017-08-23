@@ -711,11 +711,11 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 			InputListener scrollFocusListener = new InputListener() {
 				public void enter (InputEvent event, float x, float y, int pointer, Actor fromActor) {
-					stage.setScrollFocus(event.getListenerActor());
+					if (pointer == -1) stage.setScrollFocus(event.getListenerActor());
 				}
 
 				public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
-					if (stage.getScrollFocus() == event.getListenerActor()) stage.setScrollFocus(null);
+					if (pointer == -1 && stage.getScrollFocus() == event.getListenerActor()) stage.setScrollFocus(null);
 				}
 			};
 
@@ -730,7 +730,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 					}
 				}
 			});
-			animationList.addListener(scrollFocusListener);
+			animationScroll.addListener(scrollFocusListener);
 
 			loopCheckbox.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
@@ -750,7 +750,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 					}
 				}
 			});
-			skinList.addListener(scrollFocusListener);
+			skinScroll.addListener(scrollFocusListener);
 
 			ChangeListener trackButtonListener = new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
