@@ -147,6 +147,7 @@ namespace Spine.Unity {
 
 		void OnDestroy () {
 			rendererBuffers.Dispose();
+			valid = false;
 		}
 
 		public virtual void ClearState () {
