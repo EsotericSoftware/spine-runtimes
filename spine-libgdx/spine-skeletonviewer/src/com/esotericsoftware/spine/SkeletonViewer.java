@@ -128,6 +128,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			Gdx.files.internal(Gdx.app.getPreferences("spine-skeletonviewer").getString("lastFile", "spineboy/spineboy.json")));
 
 		ui.loadPrefs();
+		ui.prefsLoaded = true;
 	}
 
 	void loadSkeleton (final FileHandle skeletonFile) {
@@ -381,6 +382,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 	}
 
 	class UI {
+		boolean prefsLoaded;
+
 		Stage stage = new Stage(new ScreenViewport());
 		com.badlogic.gdx.scenes.scene2d.ui.Skin skin = new com.badlogic.gdx.scenes.scene2d.ui.Skin(
 			Gdx.files.internal("skin/skin.json"));
@@ -437,7 +440,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		Label statusLabel = new Label("", skin);
 		WidgetGroup toasts = new WidgetGroup();
-		boolean prefsLoaded;
 
 		UI () {
 			initialize();
@@ -922,7 +924,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 			scaleSlider.setValue(prefs.getFloat("scale", 1));
 			animationList.setSelected(prefs.getString("animationName", null));
 			skinList.setSelected(prefs.getString("skinName", null));
-			prefsLoaded = true;
 		}
 	}
 
