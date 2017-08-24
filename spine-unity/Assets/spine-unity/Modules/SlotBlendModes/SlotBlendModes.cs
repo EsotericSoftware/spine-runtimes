@@ -133,7 +133,7 @@ namespace Spine.Unity.Modules {
 			}
 
 			Applied = false;
-			skeletonRenderer.LateUpdate();
+			if (skeletonRenderer.valid) skeletonRenderer.LateUpdate();
 		}
 
 		public void GetTexture () {

@@ -185,6 +185,20 @@ namespace Spine.Unity {
 			bone.WorldToLocal(worldPosition.x, worldPosition.y, out o.x, out o.y);
 			return o;
 		}
+
+		/// <summary>Sets the skeleton-space position of a bone.</summary>
+		/// <returns>The local position in its parent bone space, or in skeleton space if it is the root bone.</returns>
+		public static Vector2 SetPositionSkeletonSpace (this Bone bone, Vector2 skeletonSpacePosition) {
+			if (bone.parent == null) { // root bone
+				bone.SetPosition(skeletonSpacePosition);
+				return skeletonSpacePosition;
+			} else {
+				var parent = bone.parent;
+				Vector2 parentLocal = parent.WorldToLocal(skeletonSpacePosition);
+				bone.SetPosition(parentLocal);
+				return parentLocal;
+			}
+		}
 		#endregion
 
 		#region Attachments
