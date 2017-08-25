@@ -72,6 +72,14 @@ namespace Spine.Unity.Modules {
 		#endregion
 
 		#region Runtime Instantiation
+		/// <summary>Adds a SkeletonRenderSeparator and child SkeletonPartsRenderer GameObjects to a given SkeletonRenderer.</summary>
+		/// <returns>The to skeleton renderer.</returns>
+		/// <param name="skeletonRenderer">The target SkeletonRenderer or SkeletonAnimation.</param>
+		/// <param name="sortingLayerID">Sorting layer to be used for the parts renderers.</param>
+		/// <param name="extraPartsRenderers">Number of additional SkeletonPartsRenderers on top of the ones determined by counting the number of separator slots.</param>
+		/// <param name="sortingOrderIncrement">The integer to increment the sorting order per SkeletonPartsRenderer to separate them.</param>
+		/// <param name="baseSortingOrder">The sorting order value of the first SkeletonPartsRenderer.</param>
+		/// <param name="addMinimumPartsRenderers">If set to <c>true</c>, a minimum number of SkeletonPartsRenderer GameObjects (determined by separatorSlots.Count + 1) will be added.</param>
 		public static SkeletonRenderSeparator AddToSkeletonRenderer (SkeletonRenderer skeletonRenderer, int sortingLayerID = 0, int extraPartsRenderers = 0, int sortingOrderIncrement = DefaultSortingOrderIncrement, int baseSortingOrder = 0, bool addMinimumPartsRenderers = true) {
 			if (skeletonRenderer == null) {
 				Debug.Log("Tried to add SkeletonRenderSeparator to a null SkeletonRenderer reference.");
@@ -90,14 +98,33 @@ namespace Spine.Unity.Modules {
 			var componentRenderers = srs.partsRenderers;
 
 			for (int i = 0; i < count; i++) {
-				var smr = SkeletonPartsRenderer.NewPartsRendererGameObject(skeletonRendererTransform, i.ToString());
-				var mr = smr.MeshRenderer;
+				var spr = SkeletonPartsRenderer.NewPartsRendererGameObject(skeletonRendererTransform, i.ToString());
+				var mr = spr.MeshRenderer;
 				mr.sortingLayerID = sortingLayerID;
 				mr.sortingOrder = baseSortingOrder + (i * sortingOrderIncrement);
-				componentRenderers.Add(smr);
+				componentRenderers.Add(spr);
 			}
 
 			return srs;
+		}
+
+		/// <summary>Add a child SkeletonPartsRenderer GameObject to this SkeletonRenderSeparator.</summary>
+		public void AddPartsRenderer (int sortingOrderIncrement = DefaultSortingOrderIncrement) {
+			int sortingLayerID = 0;
+			int sortingOrder = 0;
+			if (partsRenderers.Count > 0) {
+				var previous = partsRenderers[partsRenderers.Count - 1];
+				var previousMeshRenderer = previous.MeshRenderer;
+				sortingLayerID = previousMeshRenderer.sortingLayerID;
+				sortingOrder = previousMeshRenderer.sortingOrder + sortingOrderIncrement;
+			}
+				
+			var spr = SkeletonPartsRenderer.NewPartsRendererGameObject(skeletonRenderer.transform, partsRenderers.Count.ToString());
+			partsRenderers.Add(spr);
+
+			var mr = spr.MeshRenderer;
+			mr.sortingLayerID = sortingLayerID;
+			mr.sortingOrder = sortingOrder;
 		}
 		#endregion
 
