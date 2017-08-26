@@ -122,6 +122,7 @@ public class SkeletonJson {
 			skeletonData.height = skeletonMap.getFloat("height", 0);
 			skeletonData.fps = skeletonMap.getFloat("fps", 30);
 			skeletonData.imagesPath = skeletonMap.getString("images", null);
+			skeletonData.audioPath = skeletonMap.getString("audio", null);
 		}
 
 		// Bones.
@@ -291,6 +292,7 @@ public class SkeletonJson {
 			data.intValue = eventMap.getInt("int", 0);
 			data.floatValue = eventMap.getFloat("float", 0f);
 			data.stringValue = eventMap.getString("string", "");
+			data.audioPath = eventMap.getString("audio", "");
 			skeletonData.events.add(data);
 		}
 
