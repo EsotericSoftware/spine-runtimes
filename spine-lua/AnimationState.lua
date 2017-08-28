@@ -346,7 +346,8 @@ function AnimationState:updateMixingFrom (to, delta)
 	
 	-- Require mixTime > 0 to ensure the mixing from entry was applied at least once.
 	if (to.mixTime > 0 and (to.mixTime >= to.mixDuration or to.timeScale == 0)) then
-		if (from.totalAlpha == 0) then
+		-- Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame).
+		if (from.totalAlpha == 0 or to.mixDuration == 0) then
 			to.mixingFrom = from.mixingFrom
 			to.interruptAlpha = from.interruptAlpha
 			self.queue:_end(from)

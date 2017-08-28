@@ -258,7 +258,7 @@ namespace Spine {
 			return clipped;
 		}
 
-		public static void MakeClockwise (ExposedList<float> polygon) {
+		static void MakeClockwise (ExposedList<float> polygon) {
 			float[] vertices = polygon.Items;
 			int verticeslength = polygon.Count;
 
