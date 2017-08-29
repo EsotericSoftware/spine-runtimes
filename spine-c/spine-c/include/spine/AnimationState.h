@@ -31,6 +31,7 @@
 #ifndef SPINE_ANIMATIONSTATE_H_
 #define SPINE_ANIMATIONSTATE_H_
 
+#include <spine/dll.h>
 #include <spine/Animation.h>
 #include <spine/AnimationStateData.h>
 #include <spine/Event.h>
@@ -116,38 +117,38 @@ struct spAnimationState {
 };
 
 /* @param data May be 0 for no mixing. */
-spAnimationState* spAnimationState_create (spAnimationStateData* data);
-void spAnimationState_dispose (spAnimationState* self);
+SP_API spAnimationState* spAnimationState_create (spAnimationStateData* data);
+SP_API void spAnimationState_dispose (spAnimationState* self);
 
-void spAnimationState_update (spAnimationState* self, float delta);
-int /**bool**/ spAnimationState_apply (spAnimationState* self, struct spSkeleton* skeleton);
+SP_API void spAnimationState_update (spAnimationState* self, float delta);
+SP_API int /**bool**/ spAnimationState_apply (spAnimationState* self, struct spSkeleton* skeleton);
 
-void spAnimationState_clearTracks (spAnimationState* self);
-void spAnimationState_clearTrack (spAnimationState* self, int trackIndex);
+SP_API void spAnimationState_clearTracks (spAnimationState* self);
+SP_API void spAnimationState_clearTrack (spAnimationState* self, int trackIndex);
 
 /** Set the current animation. Any queued animations are cleared. */
-spTrackEntry* spAnimationState_setAnimationByName (spAnimationState* self, int trackIndex, const char* animationName,
+SP_API spTrackEntry* spAnimationState_setAnimationByName (spAnimationState* self, int trackIndex, const char* animationName,
 		int/*bool*/loop);
-spTrackEntry* spAnimationState_setAnimation (spAnimationState* self, int trackIndex, spAnimation* animation, int/*bool*/loop);
+SP_API spTrackEntry* spAnimationState_setAnimation (spAnimationState* self, int trackIndex, spAnimation* animation, int/*bool*/loop);
 
 /** Adds an animation to be played delay seconds after the current or last queued animation, taking into account any mix
  * duration. */
-spTrackEntry* spAnimationState_addAnimationByName (spAnimationState* self, int trackIndex, const char* animationName,
+SP_API spTrackEntry* spAnimationState_addAnimationByName (spAnimationState* self, int trackIndex, const char* animationName,
 		int/*bool*/loop, float delay);
-spTrackEntry* spAnimationState_addAnimation (spAnimationState* self, int trackIndex, spAnimation* animation, int/*bool*/loop,
+SP_API spTrackEntry* spAnimationState_addAnimation (spAnimationState* self, int trackIndex, spAnimation* animation, int/*bool*/loop,
 		float delay);
-spTrackEntry* spAnimationState_setEmptyAnimation(spAnimationState* self, int trackIndex, float mixDuration);
-spTrackEntry* spAnimationState_addEmptyAnimation(spAnimationState* self, int trackIndex, float mixDuration, float delay);
-void spAnimationState_setEmptyAnimations(spAnimationState* self, float mixDuration);
+SP_API spTrackEntry* spAnimationState_setEmptyAnimation(spAnimationState* self, int trackIndex, float mixDuration);
+SP_API spTrackEntry* spAnimationState_addEmptyAnimation(spAnimationState* self, int trackIndex, float mixDuration, float delay);
+SP_API void spAnimationState_setEmptyAnimations(spAnimationState* self, float mixDuration);
 
-spTrackEntry* spAnimationState_getCurrent (spAnimationState* self, int trackIndex);
+SP_API spTrackEntry* spAnimationState_getCurrent (spAnimationState* self, int trackIndex);
 
-void spAnimationState_clearListenerNotifications(spAnimationState* self);
+SP_API void spAnimationState_clearListenerNotifications(spAnimationState* self);
 
-float spTrackEntry_getAnimationTime (spTrackEntry* entry);
+SP_API float spTrackEntry_getAnimationTime (spTrackEntry* entry);
 
 /** Use this to dispose static memory before your app exits to appease your memory leak detector*/
-void spAnimationState_disposeStatics ();
+SP_API void spAnimationState_disposeStatics ();
 
 #ifdef SPINE_SHORT_NAMES
 typedef spEventType EventType;

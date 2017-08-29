@@ -31,6 +31,7 @@
 #ifndef SPINE_SLOTDATA_H_
 #define SPINE_SLOTDATA_H_
 
+#include <spine/dll.h>
 #include <spine/BoneData.h>
 #include <spine/Color.h>
 
@@ -64,11 +65,11 @@ typedef struct spSlotData {
 #endif
 } spSlotData;
 
-spSlotData* spSlotData_create (const int index, const char* name, spBoneData* boneData);
-void spSlotData_dispose (spSlotData* self);
+SP_API spSlotData* spSlotData_create (const int index, const char* name, spBoneData* boneData);
+SP_API void spSlotData_dispose (spSlotData* self);
 
 /* @param attachmentName May be 0 for no setup pose attachment. */
-void spSlotData_setAttachmentName (spSlotData* self, const char* attachmentName);
+SP_API void spSlotData_setAttachmentName (spSlotData* self, const char* attachmentName);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spBlendMode BlendMode;

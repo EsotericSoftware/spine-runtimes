@@ -31,6 +31,7 @@
 #ifndef SPINE_VERTEXEFFECT_H_
 #define SPINE_VERTEXEFFECT_H_
 
+#include <spine/dll.h>
 #include <spine/Skeleton.h>
 #include <spine/Color.h>
 
@@ -69,13 +70,13 @@ typedef struct spSwirlVertexEffect {
 	float worldY;
 } spSwirlVertexEffect;
 
-spJitterVertexEffect *spJitterVertexEffect_create(float jitterX, float jitterY);
+SP_API spJitterVertexEffect *spJitterVertexEffect_create(float jitterX, float jitterY);
 
-void spJitterVertexEffect_dispose(spJitterVertexEffect *effect);
+SP_API void spJitterVertexEffect_dispose(spJitterVertexEffect *effect);
 
-spSwirlVertexEffect *spSwirlVertexEffect_create(float radius);
+SP_API spSwirlVertexEffect *spSwirlVertexEffect_create(float radius);
 
-void spSwirlVertexEffect_dispose(spSwirlVertexEffect *effect);
+SP_API void spSwirlVertexEffect_dispose(spSwirlVertexEffect *effect);
 
 #ifdef __cplusplus
 }

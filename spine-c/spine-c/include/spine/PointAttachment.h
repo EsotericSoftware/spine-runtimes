@@ -31,6 +31,7 @@
 #ifndef SPINE_POINTATTACHMENT_H_
 #define SPINE_POINTATTACHMENT_H_
 
+#include <spine/dll.h>
 #include <spine/Attachment.h>
 #include <spine/VertexAttachment.h>
 #include <spine/Atlas.h>
@@ -46,9 +47,9 @@ typedef struct spPointAttachment {
 	spColor color;
 } spPointAttachment;
 
-spPointAttachment* spPointAttachment_create (const char* name);
-void spPointAttachment_computeWorldPosition (spPointAttachment* self, spBone* bone, float* x, float* y);
-float spPointAttachment_computeWorldRotation (spPointAttachment* self, spBone* bone);
+SP_API spPointAttachment* spPointAttachment_create (const char* name);
+SP_API void spPointAttachment_computeWorldPosition (spPointAttachment* self, spBone* bone, float* x, float* y);
+SP_API float spPointAttachment_computeWorldRotation (spPointAttachment* self, spBone* bone);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spPointAttachment PointAttachment;
