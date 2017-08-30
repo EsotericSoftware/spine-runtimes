@@ -1216,7 +1216,7 @@ var spine;
 				return true;
 			var finished = this.updateMixingFrom(from, delta);
 			if (to.mixTime > 0 && (to.mixTime >= to.mixDuration || to.timeScale == 0)) {
-				if (from.totalAlpha == 0) {
+				if (from.totalAlpha == 0 || to.mixDuration == 0) {
 					to.mixingFrom = from.mixingFrom;
 					to.interruptAlpha = from.interruptAlpha;
 					this.queue.end(from);
@@ -2974,6 +2974,15 @@ var spine;
 		RotateMode[RotateMode["ChainScale"] = 2] = "ChainScale";
 	})(RotateMode = spine.RotateMode || (spine.RotateMode = {}));
 })(spine || (spine = {}));
+(function () {
+	if (!Math.fround) {
+		Math.fround = (function (array) {
+			return function (x) {
+				return array[0] = x, array[0];
+			};
+		})(new Float32Array(1));
+	}
+})();
 var spine;
 (function (spine) {
 	var Assets = (function () {
@@ -4745,7 +4754,7 @@ var spine;
 					var eventData = skeletonData.findEvent(eventMap.name);
 					if (eventData == null)
 						throw new Error("Event not found: " + eventMap.name);
-					var event_5 = new spine.Event(eventMap.time, eventData);
+					var event_5 = new spine.Event(spine.Utils.toSinglePrecision(eventMap.time), eventData);
 					event_5.intValue = this.getValue(eventMap, "int", eventData.intValue);
 					event_5.floatValue = this.getValue(eventMap, "float", eventData.floatValue);
 					event_5.stringValue = this.getValue(eventMap, "string", eventData.stringValue);
@@ -5878,6 +5887,9 @@ var spine;
 		};
 		Utils.toFloatArray = function (array) {
 			return Utils.SUPPORTS_TYPED_ARRAYS ? new Float32Array(array) : array;
+		};
+		Utils.toSinglePrecision = function (value) {
+			return Utils.SUPPORTS_TYPED_ARRAYS ? Math.fround(value) : value;
 		};
 		return Utils;
 	}());
