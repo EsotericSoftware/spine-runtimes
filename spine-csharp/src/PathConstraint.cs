@@ -92,7 +92,7 @@ namespace Spine {
 				for (int i = 0, n = spacesCount - 1; i < n;) {
 					Bone bone = bonesItems[i];
 					float setupLength = bone.data.length;
-					if (setupLength == 0) setupLength = 0.000000001f;
+					if (setupLength == 0) setupLength = Mathf.Epsilon;
 					float x = setupLength * bone.a, y = setupLength * bone.c;
 					float length = (float)Math.Sqrt(x * x + y * y);
 					if (scale) lengths.Items[i] = setupLength;
