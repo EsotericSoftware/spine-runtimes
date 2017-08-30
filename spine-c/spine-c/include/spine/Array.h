@@ -31,24 +31,26 @@
 #ifndef SPINE_ARRAY_H
 #define SPINE_ARRAY_H
 
+#include <spine/dll.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define _SP_ARRAY_DECLARE_TYPE(name, itemType) \
 	typedef struct name { int size; int capacity; itemType* items; } name; \
-	name* name##_create(int initialCapacity); \
-	void name##_dispose(name* self); \
-	void name##_clear(name* self); \
-	name* name##_setSize(name* self, int newSize); \
-	void name##_ensureCapacity(name* self, int newCapacity); \
-	void name##_add(name* self, itemType value); \
-	void name##_addAll(name* self, name* other); \
-	void name##_addAllValues(name* self, itemType* values, int offset, int count); \
-	void name##_removeAt(name* self, int index); \
-	int name##_contains(name* self, itemType value); \
-	itemType name##_pop(name* self); \
-	itemType name##_peek(name* self);
+	SP_API name* name##_create(int initialCapacity); \
+	SP_API void name##_dispose(name* self); \
+	SP_API void name##_clear(name* self); \
+	SP_API name* name##_setSize(name* self, int newSize); \
+	SP_API void name##_ensureCapacity(name* self, int newCapacity); \
+	SP_API void name##_add(name* self, itemType value); \
+	SP_API void name##_addAll(name* self, name* other); \
+	SP_API void name##_addAllValues(name* self, itemType* values, int offset, int count); \
+	SP_API void name##_removeAt(name* self, int index); \
+	SP_API int name##_contains(name* self, itemType value); \
+	SP_API itemType name##_pop(name* self); \
+	SP_API itemType name##_peek(name* self);
 
 #define _SP_ARRAY_IMPLEMENT_TYPE(name, itemType) \
 	name* name##_create(int initialCapacity) { \

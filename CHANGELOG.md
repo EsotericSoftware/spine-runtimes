@@ -51,6 +51,7 @@
   * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
   * Added `spVertexEffect` and corresponding implementations `spJitterVertexEffect` and `spSwirlVertexEffect`. Create/dispose through the corresponding `spXXXVertexEffect_create()/dispose()` functions. Set on framework/engine specific renderer. See changes for spine-c based frameworks/engines below.
   * Functions in `extension.h` are not prefixed with `_sp` instead of just `_` to avoid interference with other libraries.
+  * Introduced `SP_API` macro. Every spine-c function is prefixed with this macro. By default, it is an empty string. Can be used to markup spine-c functions with e.g. ``__declspec` when compiling to a dll or linking to that dll.
 
 ### Cocos2d-X
  * Fixed renderer to work with 3.6 changes
@@ -80,6 +81,7 @@
  * Switched from built-in ProceduralMeshComponent to RuntimeMeshComponent by Koderz (https://github.com/Koderz/UE4RuntimeMeshComponent, MIT). Needed for more flexibility regarding vertex format, should not have an impact on existing code/assets. You need to copy the RuntimeMeshComponentPlugin from our repository in `spine-ue4\Plugins\` to your project as well!
  * Added support for two color tinting. All base materials, e.g. SpineUnlitNormalMaterial, now do proper two color tinting. No material parameters have changed.
  * Updated to Unreal Engine 4.16.1. Note that 4.16 has a regression which will make it impossible to compile plain .c files!
+ * spine-c is now exposed from the plugin shared library on Windows via __declspec.
 
 ## C#
 * **Breaking changes**

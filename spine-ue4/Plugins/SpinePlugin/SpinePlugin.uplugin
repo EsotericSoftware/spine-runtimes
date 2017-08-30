@@ -14,16 +14,25 @@
 	"CanContainContent" : true,
 	"IsBetaVersion" : false,
 	"Installed" : false,
-	"Modules" :
-	[
-		{
-			"Name" : "SpinePlugin",
-			"Type" : "Runtime",
-			"LoadingPhase" : "PreDefault"			
-		},
-		{
-			"Name" : "SpineEditorPlugin",
-			"Type" : "Editor"
-		}
-	]
+  "Modules": [
+    {
+      "Name": "SpinePlugin",
+      "Type": "Runtime",
+      "LoadingPhase": "PreDefault"
+    },
+    {
+      "Name": "SpineEditorPlugin",
+      "Type": "Editor"
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "ProceduralMeshComponent",
+      "Enabled": true
+    },
+    {
+      "Name": "RuntimeMeshComponent",
+      "Enabled":  true
+    }
+  ]
 }

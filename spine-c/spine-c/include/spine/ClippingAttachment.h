@@ -31,6 +31,7 @@
 #ifndef SPINE_CLIPPINGATTACHMENT_H_
 #define SPINE_CLIPPINGATTACHMENT_H_
 
+#include <spine/dll.h>
 #include <spine/Attachment.h>
 #include <spine/VertexAttachment.h>
 #include <spine/Atlas.h>
@@ -45,8 +46,8 @@ typedef struct spClippingAttachment {
 	spSlotData* endSlot;
 } spClippingAttachment;
 
-void _spClippingAttachment_dispose(spAttachment* self);
-spClippingAttachment* spClippingAttachment_create (const char* name);
+SP_API void _spClippingAttachment_dispose(spAttachment* self);
+SP_API spClippingAttachment* spClippingAttachment_create (const char* name);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spClippingAttachment ClippingAttachment;
