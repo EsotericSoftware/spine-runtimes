@@ -155,8 +155,10 @@ namespace Spine.Unity.Modules {
 		}
 
 		void OnDestroy () {
-			for (int i = 0; i < maximumGhosts; i++)
-				if (pool[i] != null) pool[i].Cleanup();
+			if (pool != null) {
+				for (int i = 0; i < maximumGhosts; i++)
+					if (pool[i] != null) pool[i].Cleanup();
+			}
 
 			foreach (var mat in materialTable.Values)
 				Destroy(mat);
