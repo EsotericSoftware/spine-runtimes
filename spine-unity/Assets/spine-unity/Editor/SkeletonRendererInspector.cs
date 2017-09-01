@@ -139,7 +139,7 @@ namespace Spine.Unity.Editor {
 			var reloadButtonStyle = EditorStyles.miniButtonRight;
 
 			if (multi) {
-				using (new EditorGUILayout.HorizontalScope(EditorStyles.helpBox)) {
+				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
 					SpineInspectorUtility.PropertyFieldFitLabel(skeletonDataAsset, SkeletonDataAssetLabel);
 					if (GUILayout.Button(ReloadButtonLabel, reloadButtonStyle, reloadWidth)) {
 						foreach (var c in targets) {
@@ -187,7 +187,7 @@ namespace Spine.Unity.Editor {
 					component.LateUpdate();
 				}
 
-				using (new EditorGUILayout.HorizontalScope(EditorStyles.helpBox)) {
+				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
 					SpineInspectorUtility.PropertyFieldFitLabel(skeletonDataAsset, SkeletonDataAssetLabel);
 					if (component.valid) {
 						if (GUILayout.Button(ReloadButtonLabel, reloadButtonStyle, reloadWidth)) {
