@@ -436,11 +436,11 @@ namespace Spine {
 				}
 				// Mixing out uses sign of setup or current pose, else use sign of key.
 				if (direction == MixDirection.Out) {
-					x = Math.Abs(x) * Math.Sign(bx);
-					y = Math.Abs(y) * Math.Sign(by);
+					x = (x >= 0 ? x : -x) * (bx >= 0 ? 1 : -1);
+					y = (y >= 0 ? y : -y) * (by >= 0 ? 1 : -1);
 				} else {
-					bx = Math.Abs(bx) * Math.Sign(x);
-					by = Math.Abs(by) * Math.Sign(y);
+					bx = (bx >= 0 ? bx : -bx) * (x >= 0 ? 1 : -1);
+					by = (by >= 0 ? by : -by) * (y >= 0 ? 1 : -1);
 				}
 				bone.scaleX = bx + (x - bx) * alpha;
 				bone.scaleY = by + (y - by) * alpha;
