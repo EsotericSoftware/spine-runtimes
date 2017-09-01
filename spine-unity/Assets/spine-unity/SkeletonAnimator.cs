@@ -36,7 +36,7 @@ using System.Collections.Generic;
 namespace Spine.Unity {
 	[RequireComponent(typeof(Animator))]
 	public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
-		
+
 		[SerializeField] protected MecanimTranslator translator;
 		public MecanimTranslator Translator { get { return translator; } }
 
@@ -111,10 +111,10 @@ namespace Spine.Unity {
 			readonly Dictionary<int, Spine.Animation> animationTable = new Dictionary<int, Spine.Animation>(IntEqualityComparer.Instance);
 			readonly Dictionary<AnimationClip, int> clipNameHashCodeTable = new Dictionary<AnimationClip, int>(AnimationClipEqualityComparer.Instance);
 			readonly List<Animation> previousAnimations = new List<Animation>();
-#if UNITY_2017_1_OR_NEWER
+			#if UNITY_2017_1_OR_NEWER
 			readonly List<AnimatorClipInfo> clipInfoCache = new List<AnimatorClipInfo>();
 			readonly List<AnimatorClipInfo> nextClipInfoCache = new List<AnimatorClipInfo>();
-#endif
+			#endif
 			Animator animator;
 
 			public Animator Animator { get { return this.animator; } }
@@ -146,9 +146,9 @@ namespace Spine.Unity {
 						if (layerWeight <= 0) continue;
 
 						AnimatorStateInfo nextStateInfo = animator.GetNextAnimatorStateInfo(layer);
-						
+
 						bool hasNext = nextStateInfo.fullPathHash != 0;
-						
+
 						int clipInfoCount, nextClipInfoCount;
 						IList<AnimatorClipInfo> clipInfo, nextClipInfo;
 						GetAnimatorClipInfos(layer, out clipInfoCount, out nextClipInfoCount, out clipInfo, out nextClipInfo);
@@ -158,7 +158,7 @@ namespace Spine.Unity {
 							float weight = info.weight * layerWeight; if (weight == 0) continue;
 							previousAnimations.Add(animationTable[NameHashCode(info.clip)]);
 						}
-						
+
 						if (hasNext) {
 							for (int c = 0; c < nextClipInfoCount; c++) {
 								var info = nextClipInfo[c];
@@ -176,14 +176,10 @@ namespace Spine.Unity {
 					AnimatorStateInfo nextStateInfo = animator.GetNextAnimatorStateInfo(layer);
 
 					bool hasNext = nextStateInfo.fullPathHash != 0;
-					
+
 					int clipInfoCount, nextClipInfoCount;
 					IList<AnimatorClipInfo> clipInfo, nextClipInfo;
 					GetAnimatorClipInfos(layer, out clipInfoCount, out nextClipInfoCount, out clipInfo, out nextClipInfo);
-					//UNITY 4
-					//bool hasNext = nextStateInfo.nameHash != 0;
-					//var clipInfo = animator.GetCurrentAnimationClipState(i);
-					//var nextClipInfo = animator.GetNextAnimationClipState(i);
 
 					MixMode mode = layerMixModes[layer];
 					if (mode == MixMode.AlwaysMix) {
@@ -247,14 +243,14 @@ namespace Spine.Unity {
 
 				return normalizedTime * clipLength;
 			}
-			
-			void GetAnimatorClipInfos(
+
+			void GetAnimatorClipInfos (
 				int layer,
 				out int clipInfoCount,
 				out int nextClipInfoCount,
 				out IList<AnimatorClipInfo> clipInfo,
 				out IList<AnimatorClipInfo> nextClipInfo) {
-#if UNITY_2017_1_OR_NEWER
+				#if UNITY_2017_1_OR_NEWER
 				clipInfoCount = animator.GetCurrentAnimatorClipInfoCount(layer);
 				nextClipInfoCount = animator.GetNextAnimatorClipInfoCount(layer);
 				if (clipInfoCache.Capacity < clipInfoCount) clipInfoCache.Capacity = clipInfoCount;
@@ -264,13 +260,13 @@ namespace Spine.Unity {
 
 				clipInfo = clipInfoCache;
 				nextClipInfo = nextClipInfoCache;
-#else
+				#else
 				clipInfo = animator.GetCurrentAnimatorClipInfo(layer);
 				nextClipInfo = animator.GetNextAnimatorClipInfo(layer);
 
 				clipInfoCount = clipInfo.Count;
 				nextClipInfoCount = nextClipInfo.Count;
-#endif
+				#endif
 			}
 
 			int NameHashCode (AnimationClip clip) {
@@ -285,25 +281,19 @@ namespace Spine.Unity {
 			class AnimationClipEqualityComparer : IEqualityComparer<AnimationClip> {
 				internal static readonly IEqualityComparer<AnimationClip> Instance = new AnimationClipEqualityComparer();
 
-				public bool Equals(AnimationClip x, AnimationClip y) {
+				public bool Equals (AnimationClip x, AnimationClip y) {
 					return x.GetInstanceID() == y.GetInstanceID();
 				}
 
-				public int GetHashCode(AnimationClip o) {
+				public int GetHashCode (AnimationClip o) {
 					return o.GetInstanceID();
 				}
 			}
-			
+
 			class IntEqualityComparer : IEqualityComparer<int> {
 				internal static readonly IEqualityComparer<int> Instance = new IntEqualityComparer();
-
-				public bool Equals(int x, int y) {
-					return x == y;
-				}
-
-				public int GetHashCode(int o) {
-					return o;
-				}
+				public bool Equals (int x, int y) { return x == y; }
+				public int GetHashCode(int o) { return o; }
 			}
 		}
 
