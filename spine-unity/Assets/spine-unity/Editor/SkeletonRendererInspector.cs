@@ -170,7 +170,7 @@ namespace Spine.Unity.Editor {
 					#if NO_PREFAB_MESH
 					if (isInspectingPrefab) {
 						MeshFilter meshFilter = component.GetComponent<MeshFilter>();
-						if (meshFilter != null)
+						if (meshFilter != null && meshFilter.sharedMesh != null)
 							meshFilter.sharedMesh = null;
 					}
 					#endif
@@ -211,7 +211,7 @@ namespace Spine.Unity.Editor {
 				#if NO_PREFAB_MESH
 				if (isInspectingPrefab) {
 					MeshFilter meshFilter = component.GetComponent<MeshFilter>();
-					if (meshFilter != null)
+					if (meshFilter != null && meshFilter.sharedMesh != null)
 						meshFilter.sharedMesh = null;
 				}
 				#endif

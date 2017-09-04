@@ -5,21 +5,9 @@ using System.Collections.Generic;
 
 public class SpineUE4Target : TargetRules
 {
-	public SpineUE4Target(TargetInfo Target)
+	public SpineUE4Target(TargetInfo Target) : base(Target)
 	{
-		Type = TargetType.Game;		
-	}
-
-	//
-	// TargetRules interface.
-	//
-
-	public override void SetupBinaries(
-		TargetInfo Target,
-		ref List<UEBuildBinaryConfiguration> OutBuildBinaryConfigurations,
-		ref List<string> OutExtraModuleNames
-		)
-	{
-		OutExtraModuleNames.AddRange( new string[] { "SpineUE4" } );		
+		Type = TargetType.Game;
+		ExtraModuleNames.AddRange(new string[] { "SpineUE4" });
 	}
 }

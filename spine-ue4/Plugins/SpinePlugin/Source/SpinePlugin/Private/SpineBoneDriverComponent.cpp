@@ -31,7 +31,6 @@
 #include "SpinePluginPrivatePCH.h"
 
 USpineBoneDriverComponent::USpineBoneDriverComponent () {
-	bWantsBeginPlay = true;
 	PrimaryComponentTick.bCanEverTick = true;
 	bTickInEditor = true;
 	bAutoActivate = true;

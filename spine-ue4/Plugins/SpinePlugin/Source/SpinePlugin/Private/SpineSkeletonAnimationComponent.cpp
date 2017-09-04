@@ -73,7 +73,6 @@ void callback(spAnimationState* state, spEventType type, spTrackEntry* entry, sp
 }
 
 USpineSkeletonAnimationComponent::USpineSkeletonAnimationComponent () {
-	bWantsBeginPlay = true;
 	PrimaryComponentTick.bCanEverTick = true;
 	bTickInEditor = true;
 	bAutoActivate = true;

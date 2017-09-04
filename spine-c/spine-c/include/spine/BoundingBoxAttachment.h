@@ -31,6 +31,7 @@
 #ifndef SPINE_BOUNDINGBOXATTACHMENT_H_
 #define SPINE_BOUNDINGBOXATTACHMENT_H_
 
+#include <spine/dll.h>
 #include <spine/Attachment.h>
 #include <spine/VertexAttachment.h>
 #include <spine/Atlas.h>
@@ -44,7 +45,7 @@ typedef struct spBoundingBoxAttachment {
 	spVertexAttachment super;
 } spBoundingBoxAttachment;
 
-spBoundingBoxAttachment* spBoundingBoxAttachment_create (const char* name);
+SP_API spBoundingBoxAttachment* spBoundingBoxAttachment_create (const char* name);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spBoundingBoxAttachment BoundingBoxAttachment;
