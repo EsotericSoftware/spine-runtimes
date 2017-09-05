@@ -31,6 +31,7 @@
 #ifndef SPINE_SPINE_H_
 #define SPINE_SPINE_H_
 
+#include <spine/dll.h>
 #include <spine/Animation.h>
 #include <spine/AnimationState.h>
 #include <spine/AnimationStateData.h>

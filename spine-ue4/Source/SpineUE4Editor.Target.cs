@@ -5,21 +5,9 @@ using System.Collections.Generic;
 
 public class SpineUE4EditorTarget : TargetRules
 {
-	public SpineUE4EditorTarget(TargetInfo Target)
+	public SpineUE4EditorTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
-	}
-
-	//
-	// TargetRules interface.
-	//
-
-	public override void SetupBinaries(
-		TargetInfo Target,
-		ref List<UEBuildBinaryConfiguration> OutBuildBinaryConfigurations,
-		ref List<string> OutExtraModuleNames
-		)
-	{
-		OutExtraModuleNames.AddRange( new string[] { "SpineUE4" } );
+		ExtraModuleNames.AddRange(new string[] { "SpineUE4" });
 	}
 }

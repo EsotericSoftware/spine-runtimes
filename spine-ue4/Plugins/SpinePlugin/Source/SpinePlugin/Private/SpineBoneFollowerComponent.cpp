@@ -31,7 +31,6 @@
 #include "SpinePluginPrivatePCH.h"
 
 USpineBoneFollowerComponent::USpineBoneFollowerComponent () {	
-	bWantsBeginPlay = true;
 	PrimaryComponentTick.bCanEverTick = true;
 	bTickInEditor = true;
 	bAutoActivate = true;

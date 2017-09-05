@@ -265,7 +265,7 @@ namespace Spine.Unity {
 			bool hasSeparators = separatorCount > 0;
 
 			int clippingAttachmentSource = -1;
-			int lastPreActiveClipping = -1;
+			int lastPreActiveClipping = -1; // The index of the last slot that had an active ClippingAttachment.
 			SlotData clippingEndSlot = null;
 			int submeshIndex = 0;
 			var drawOrderItems = drawOrder.Items;
@@ -327,7 +327,7 @@ namespace Spine.Unity {
 				}
 
 				if (noRender) {
-					if (current.forceSeparate && generateMeshOverride && current.rawVertexCount > 0) {
+					if (current.forceSeparate && generateMeshOverride) { // && current.rawVertexCount > 0) {
 						{ // Add
 							current.endSlot = i;
 							current.preActiveClippingSlotSource = lastPreActiveClipping;

@@ -33,7 +33,6 @@
 #define LOCTEXT_NAMESPACE "Spine"
 
 USpineSkeletonComponent::USpineSkeletonComponent () {
-	bWantsBeginPlay = true;
 	PrimaryComponentTick.bCanEverTick = true;
 	bTickInEditor = true;
 	bAutoActivate = true;

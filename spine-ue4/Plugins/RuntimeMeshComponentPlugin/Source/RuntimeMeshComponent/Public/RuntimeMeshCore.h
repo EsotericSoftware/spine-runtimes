@@ -11,6 +11,7 @@
 
 class FRuntimeMeshVertexFactory;
 
+#pragma warning( disable : 4265 )
 
 template<typename T>
 struct FRuntimeMeshVertexTraits
