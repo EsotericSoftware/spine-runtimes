@@ -35,6 +35,7 @@
   * Removed `spBone_worldToLocalRotationX` and `spBone_worldToLocalRotationY`. Replaced by `spBone_worldToLocalRotation` (rotation given relative to x-axis, counter-clockwise, in degrees).
   * Replaced `r`, `g`, `b`, `a` fields with instances of new `spColor` struct in `spRegionAttachment`, `spMeshAttachment`, `spSkeleton`, `spSkeletonData`, `spSlot` and `spSlotData`.
   * Removed `spVertexIndex`from public API.
+  * Listeners on `spAnimationState` or `spTrackEntry` will now be also called in case a track entry is disposed as part of dispoing the `spAnimationState`.
  * **Additions**
   * Added support for local and relative transform constraint calculation, including additional fields in `spTransformConstraintData`.  
   * Added `spPointAttachment`, additional method `spAtlasAttachmentLoadeR_newPointAttachment`.
