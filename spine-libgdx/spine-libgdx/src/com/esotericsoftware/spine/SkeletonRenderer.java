@@ -100,7 +100,9 @@ public class SkeletonRenderer {
 				continue;
 
 			} else if (attachment instanceof MeshAttachment) {
-				throw new RuntimeException("SkeletonMeshRenderer is required to render meshes.");
+				throw new RuntimeException(
+					"SkeletonRenderer#draw(PolygonSpriteBatch, Skeleton) or #draw(TwoColorPolygonBatch, Skeleton) must be used to "
+						+ "render meshes.");
 
 			} else if (attachment instanceof SkeletonAttachment) {
 				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
@@ -242,7 +244,7 @@ public class SkeletonRenderer {
 							tempLight.set(temp5);
 							tempDark.set(temp6);
 							tempUv.x = uvs[u];
-							tempUv.y = uvs[u + 1];							
+							tempUv.y = uvs[u + 1];
 							vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
 							vertices[v] = tempPos.x;
 							vertices[v + 1] = tempPos.y;
@@ -378,7 +380,7 @@ public class SkeletonRenderer {
 							tempLight.set(temp5);
 							tempDark.set(temp6);
 							tempUv.x = uvs[u];
-							tempUv.y = uvs[u + 1];				
+							tempUv.y = uvs[u + 1];
 							vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
 							vertices[v] = tempPos.x;
 							vertices[v + 1] = tempPos.y;
