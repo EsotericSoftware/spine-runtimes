@@ -45,9 +45,9 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 			skeletonNoMix = new spine.Skeleton(skeleton.data);
 			state = createState(0.25);
 			state.multipleMixing = true;
-			setAnimations(state, 0);
+			setAnimations(state, 0, true);
 			stateNoMix = createState(0);
-			setAnimations(stateNoMix, -0.25);
+			setAnimations(stateNoMix, -0.25, true);
 
 			state.apply(skeleton);
 			skeleton.updateWorldTransform();
@@ -79,20 +79,18 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 		return state;
 	}
 
-	function setAnimations(state, mix) {
-		state.addAnimation(0, "idle", true, 0.7);
-		state.addAnimation(0, "walk", true, 0.7);
-		state.addAnimation(0, "idle", true, 0.8);
-		state.addAnimation(0, "run", true, 0.7);
-		state.addAnimation(0, "idle", true, 0.8);
+	function setAnimations(state, mix, first) {
+		state.addAnimation(0, "idle", true, first ? 0 : 0.6);
 		state.addAnimation(0, "walk", true, 0.6);
-		state.addAnimation(0, "run", true, 0.6);
-		state.addAnimation(0, "jump", false, 0.6);
+		state.addAnimation(0, "run", true, 1);
+		state.addAnimation(0, "walk", true, 1.2);
+		state.addAnimation(0, "run", true, 0.5);
+		state.addAnimation(0, "jump", false, 1);
 		state.addAnimation(0, "run", true, mix);
 		state.addAnimation(0, "jump", true, 0.5);
-		state.addAnimation(0, "run", true, mix).listener = {
+		state.addAnimation(0, "walk", true, mix).listener = {
 			start: function (trackIndex) {
-				setAnimations(state, mix);
+				setAnimations(state, mix, false);
 			}
 		};
 	}
@@ -134,7 +132,7 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 		state.update(delta);
 		state.apply(skeleton);
 		skeleton.updateWorldTransform();
-		skeleton.x = -300;
+		skeleton.x = -200;
 		skeleton.y = -100;
 		renderer.drawSkeleton(skeleton, true);
 

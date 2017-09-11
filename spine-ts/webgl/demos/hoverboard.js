@@ -46,16 +46,17 @@ var hoverboardDemo = function(loadingComplete, bgColor) {
 			});
 			var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json")["spineboy-hover"]);
+			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json")["spineboy"]);
 			skeleton = new spine.Skeleton(skeletonData);
 			state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
-			state.setAnimation(0, "idle", true);
+			state.setAnimation(0, "hoverboard", true);
 			state.apply(skeleton);
 			skeleton.updateWorldTransform();
 			var offset = new spine.Vector2();
 			bounds = new spine.Vector2();
 			skeleton.getBounds(offset, bounds, []);
-			for (var i = 0; i < controlBones.length; i++) hoverTargets.push(null);
+			for (var i = 0; i < controlBones.length; i++)
+				hoverTargets.push(null);
 
 			renderer.camera.position.x = offset.x + bounds.x / 2;
 			renderer.camera.position.y = offset.y + bounds.y / 2;

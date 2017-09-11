@@ -35,7 +35,7 @@ var imageChangesDemo = function(loadingComplete, bgColor) {
 	function load () {
 		timeKeeper.update();
 		if (assetManager.isLoadingComplete(DEMO_NAME)) {
-			skeletons["Alien"] = loadSkeleton("alien", "death", ["head", "splat01"]);
+			skeletons["Alien"] = loadSkeleton("alien", "death", ["head", "splat-fg", "splat-bg"]);
 			skeletons["Dragon"] = loadSkeleton("dragon", "flying", ["R_wing"])
 			setupUI();
 			loadingComplete(canvas, render);
@@ -109,9 +109,8 @@ var imageChangesDemo = function(loadingComplete, bgColor) {
 		for(var i = 0; i < sequenceSlots.length; i++) {
 			var slot = sequenceSlots[i];
 			var index = skeleton.findSlotIndex(slot);
-			for (var name in skeleton.skin.attachments[index]) {
+			for (var name in skeleton.skin.attachments[index])
 				regions.push(skeleton.skin.attachments[index][name]);
-			}
 		}
 
 		return {
@@ -138,17 +137,22 @@ var imageChangesDemo = function(loadingComplete, bgColor) {
 		var offset = active.bounds.offset;
 		var size = active.bounds.size;
 
-		var x = offset.x + size.x + 100, offsetY = offset.y;
+		var x = offset.x + size.x + 100, offsetY = offset.y, zoom = 1, rows, regionOffset = 0;
 		if (activeSkeleton === "Alien") {
-			renderer.camera.position.x = offset.x + size.x;
-			renderer.camera.position.y = offset.y + size.y / 2;
+			renderer.camera.position.x = offset.x + size.x + 400;
+			renderer.camera.position.y = offset.y + size.y / 2 + 450;
+			x += 400;
+			zoom = 0.31;
+			rows = 3;
+			regionOffset = 3;
 		} else {
 			renderer.camera.position.x = offset.x + size.x;
 			renderer.camera.position.y = offset.y + size.y / 2;
 			x += 100;
+			rows = 3;
 		}
-		renderer.camera.viewportWidth = size.x * 2.4;
-		renderer.camera.viewportHeight = size.y * 1.4;
+		renderer.camera.viewportWidth = size.x * 2.4 / zoom;
+		renderer.camera.viewportHeight = size.y * 1.4 / zoom;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
 
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
@@ -172,39 +176,33 @@ var imageChangesDemo = function(loadingComplete, bgColor) {
 
 		var y = offsetY;
 		var slotsWidth = 0, slotsHeight = 0;
-		var slotSize = size.y / 3;
+		var slotSize = size.y / rows;
 		var maxSlotWidth = 0;
 		var j = 0;
-		for (var i = 0; i < active.regions.length; i++) {
-			var region = active.regions[i].region;
-			var scale = Math.min(slotSize / region.height, slotSize / region.width);
-			renderer.drawRegion(region, x,  y, region.width * scale, region.height * scale);
+		for (var i = 0, n = active.regions.length; i < n; i++) {
+			var region = active.regions[(i + regionOffset) % n].region;
+			var width = region.rotate ? region.height : region.width;
+			var height = region.rotate ? region.width : region.height;
+			var scale = Math.min(slotSize / height, slotSize / width) / zoom;
+			renderer.drawRegion(region, x,  y, width * scale, height * scale);
 
 			var isVisible = false;
 			for (var ii = 0; ii < active.slots.length; ii++) {
 				var slotName = active.slots[ii];
-				var slotIndex = skeleton.findSlotIndex(slotName);
-
-				for (var iii = 0; iii < skeleton.drawOrder.length; iii++) {
-					var slot = skeleton.drawOrder[iii];
-					if (slot.data.index == slotIndex) {
-						if (slot.attachment != null) {
-							if (slot.attachment.name === active.regions[i].name) {
-								isVisible = true;
-								break;
-							}
-						}
-					}
+				var slot = skeleton.findSlot(slotName);
+				if (slot && slot.attachment && slot.attachment.name === region.name) {
+					isVisible = true;
+					break;
 				}
 				if (isVisible) break;
 			}
 
-			if (isVisible) renderer.rect(false, x, y, region.width * scale, region.height * scale, OUTLINE_COLOR);
+			if (isVisible) renderer.rect(false, x, y, width * scale, height * scale, OUTLINE_COLOR);
 
-			maxSlotWidth = Math.max(maxSlotWidth, region.width * scale);
-			y += slotSize;
+			maxSlotWidth = Math.max(maxSlotWidth, width * scale);
+			y += slotSize / zoom + 2;
 			j++;
-			if (j == 3) {
+			if (j == rows) {
 				x += maxSlotWidth + 10;
 				maxSlotWidth = 0;
 				y = offsetY;
