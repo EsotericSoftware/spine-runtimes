@@ -12,7 +12,7 @@ up into multiple modules:
 While the source code for the core library and backends is written in TypeScript, all code is compiled to easily consumable JavaScript.
 
 ## Licensing
-This Spine Runtime may only be used for personal or internal use, typically to evaluate Spine before purchasing. If you would like to incorporate a Spine Runtime into your applications, distribute software containing a Spine Runtime, or modify a Spine Runtime, then you will need a valid [Spine license](https://esotericsoftware.com/spine-purchase). Please see the [Spine Runtimes Software License](https://github.com/EsotericSoftware/spine-runtimes/blob/master/LICENSE) for detailed information.
+This Spine Runtime may only be used for personal or internal use, typically to evaluate Spine before purchasing. If you would like to incorporate a Spine Runtime into your applications, distribute software containing a Spine Runtime, or modify a Spine Runtime, then you will need a valid [Spine license](https://esotericsoftware.com/spine-purchase). Please see the [Spine Runtimes Software License](https://github.com/EsotericSoftware/spine-runtimes/blob/3.6/LICENSE) for detailed information.
 
 The Spine Runtimes are developed with the intent to be used with data exported from Spine. By purchasing Spine, `Section 2` of the [Spine Software License](https://esotericsoftware.com/files/license.txt) grants the right to create and distribute derivative works of the Spine Runtimes.
 
@@ -63,18 +63,18 @@ python -m SimpleHTTPServer
 Then open `http://localhost:8000/webgl/example`, `http://localhost:8000/canvas/example`, `https://localhost:8000/threejs/example` or `http://localhost:8000/widget/example` in your browser.
 
 ## WebGL Demos
-The spine-ts WebGL demos load their image, atlas, and JSON files from our webserver and so can be run directly, without needing a webserver. The demos can be viewed [all on one page](http://esotericsoftware.com/spine-demos/) or in individual, standalone pages which are easy for you to explore and edit. See the [standalone demos source code](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-ts/webgl/demos) and view the pages here:
+The spine-ts WebGL demos load their image, atlas, and JSON files from our webserver and so can be run directly, without needing a webserver. The demos can be viewed [all on one page](http://esotericsoftware.com/spine-demos/) or in individual, standalone pages which are easy for you to explore and edit. See the [standalone demos source code](https://github.com/EsotericSoftware/spine-runtimes/tree/3.6/spine-ts/webgl/demos) and view the pages here:
 
-- [Spine vs sprite sheets](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/spritesheets.html)
-- [Image changes](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/imagechanges.html)
-- [Transitions](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/transitions.html)
-- [Meshes](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/meshes.html)
-- [Skins](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/skins.html)
-- [Hoverboard](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/hoverboard.html)
-- [Transform constraints](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/transforms.html)
-- [Tank](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/tank.html)
-- [Vine](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/vine.html)
-- [Stretchyman](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/stretchyman.html)
+- [Spine vs sprite sheets](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/spritesheets.html)
+- [Image changes](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/imagechanges.html)
+- [Transitions](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/transitions.html)
+- [Meshes](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/meshes.html)
+- [Skins](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/skins.html)
+- [Hoverboard](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/hoverboard.html)
+- [Transform constraints](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/transforms.html)
+- [Tank](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/tank.html)
+- [Vine](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/vine.html)
+- [Stretchyman](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/stretchyman.html)
 
 Please note that Chrome and possibly other browsers do not use the original CORS headers when loading cached resources. After the initial page load for a demo, you may need to forcefully refresh (hold `shift` and click refresh) or clear your browser cache.
 
@@ -168,7 +168,7 @@ Create a HTML element on your website, either statically or via JavaScript:
 <div id="my-widget"></div>
 ```
 
-Then create a new `spine.SpineWidget`, providing a [`SpineWidgetConfiguration`](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-ts/widget/src/Widget.ts#L281) object, e.g.:
+Then create a new `spine.SpineWidget`, providing a [`SpineWidgetConfiguration`](https://github.com/EsotericSoftware/spine-runtimes/blob/3.6/spine-ts/widget/src/Widget.ts#L281) object, e.g.:
 
 ```JavaScript
 new spine.SpineWidget("my-widget", {
@@ -215,6 +215,6 @@ You can also create a HTML element with class `spine-widget` and `data-` attribu
 an element via JavaScript on demand.
 
 The resulting `SpineWidget` has various fields that let you modify the animation programmatically. Most notably, the `skeleton` and `state` fields
-let you modify all aspects of your animation as you wish. See the [example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-ts/widget/example/index.html#L21).
+let you modify all aspects of your animation as you wish. See the [example](https://github.com/EsotericSoftware/spine-runtimes/blob/3.6/spine-ts/widget/example/index.html#L21).
 
 You can also modify what debug information is shown by accessing `SpineWidget.debugRenderer` and set the various `drawXXX` fields to `true` or `false`.
