@@ -1,4 +1,4 @@
--------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------
 -- Spine Runtimes Software License v2.5
 --
 -- Copyright (c) 2013-2016, Esoteric Software
@@ -189,7 +189,7 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		local la = math_cos(math_rad(shearX)) * scaleX;
 		local lb = math_cos(math_rad(90 + shearY)) * scaleY;
 		local lc = math_sin(math_rad(shearX)) * scaleX;
-		local ld = math_sin(90 + shearY) * scaleY;
+		local ld = math_sin(math_rad(90 + shearY)) * scaleY;
 		local flip = self.skeleton.flipX ~= self.skeleton.flipY
 		if transformMode ~= TransformMode.noScaleOrReflection then flip = pa * pd - pb * pc < 0 end
 		if flip then
