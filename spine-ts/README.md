@@ -71,10 +71,11 @@ The spine-ts WebGL demos load their image, atlas, and JSON files from our webser
 - [Meshes](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/meshes.html)
 - [Skins](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/skins.html)
 - [Hoverboard](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/hoverboard.html)
-- [Transform constraints](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/transforms.html)
-- [Tank](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/tank.html)
 - [Vine](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/vine.html)
+- [Clipping](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/clipping.html)
 - [Stretchyman](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/stretchyman.html)
+- [Tank](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/tank.html)
+- [Transform constraints](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/transforms.html)
 
 Please note that Chrome and possibly other browsers do not use the original CORS headers when loading cached resources. After the initial page load for a demo, you may need to forcefully refresh (hold `shift` and click refresh) or clear your browser cache.
 

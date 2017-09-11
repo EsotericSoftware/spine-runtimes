@@ -86,6 +86,7 @@ var clippingDemo = function(loadingComplete, bgColor) {
 			}
 		};
 
+		renderer.skeletonDebugRenderer.drawRegionAttachments = false;
 		renderer.skeletonDebugRenderer.drawClipping = false;
 		renderer.skeletonDebugRenderer.drawBones = false;
 		renderer.skeletonDebugRenderer.drawMeshHull = false;
