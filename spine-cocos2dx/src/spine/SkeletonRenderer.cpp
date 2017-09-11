@@ -269,6 +269,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		case SP_ATTACHMENT_CLIPPING: {
 			spClippingAttachment* clip = (spClippingAttachment*)slot->attachment;
 			spSkeletonClipping_clipStart(_clipper, slot, clip);
+			continue;
 		}
 		default:
 			spSkeletonClipping_clipEnd(_clipper, slot);
