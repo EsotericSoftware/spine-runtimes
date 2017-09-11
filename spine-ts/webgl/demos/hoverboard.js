@@ -9,7 +9,7 @@ var hoverboardDemo = function(loadingComplete, bgColor) {
 	var timeKeeper, loadingScreen;
 	var target = null;
 	var hoverTargets = [];
-	var controlBones = ["hoverboard controller", "hip controller", "board target"];
+	var controlBones = ["hoverboard controller", "hip controller", "board target", "crosshair"];
 	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2(), temp3 = new spine.webgl.Vector3();
 	var isPlaying = true;
 
@@ -74,7 +74,7 @@ var hoverboardDemo = function(loadingComplete, bgColor) {
 		}
 	}
 
-	function setupUI() {
+	function setupUI () {
 		var checkbox = $("#hoverboard-drawbones");
 		renderer.skeletonDebugRenderer.drawRegionAttachments = false;
 		renderer.skeletonDebugRenderer.drawPaths = false;
@@ -83,9 +83,28 @@ var hoverboardDemo = function(loadingComplete, bgColor) {
 			renderer.skeletonDebugRenderer.drawPaths = this.checked;
 			renderer.skeletonDebugRenderer.drawBones = this.checked;
 		});
-	}
 
-	function setupInput (){
+		$("#hoverboard-aim").change(function () {
+			if (!this.checked)
+				state.setEmptyAnimation(1, 0.2);
+			else {
+				state.setEmptyAnimation(1, 0);
+				state.addAnimation(1, "aim", true, 0).mixDuration = 0.2;
+			}
+		});
+
+		$("#hoverboard-shoot").click(function () {
+			state.setAnimation(2, "aim", true);
+			state.setAnimation(3, "shoot", false).listener = {
+				complete: function (trackIndex) {
+					state.setEmptyAnimation(2, 0.2);
+					state.clearTrack(3);
+				}
+			};
+		});
+	}
+	
+	function setupInput () {
 		input.addListener({
 			down: function(x, y) {
 				isPlaying = false;
