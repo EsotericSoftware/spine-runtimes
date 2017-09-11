@@ -4,7 +4,7 @@ var meshesDemo = function(loadingComplete, bgColor) {
 	var timeKeeper, loadingScreen;
 	var skeletons = {};
 	var activeSkeleton = "Orange Girl";
-	var playButton, timeLine, isPlaying = true;
+	var playButton, timeline, isPlaying = true;
 
 	var DEMO_NAME = "MeshesDemo";
 
@@ -57,8 +57,8 @@ var meshesDemo = function(loadingComplete, bgColor) {
 		playButton.click(playButtonUpdate);
 		playButton.addClass("pause");
 
-		timeLine = $("#meshes-timeline").data("slider");
-		timeLine.changed = function (percent) {
+		timeline = $("#meshes-timeline").data("slider");
+		timeline.changed = function (percent) {
 			if (isPlaying) playButton.click();
 			if (!isPlaying) {
 				var active = skeletons[activeSkeleton];
@@ -82,7 +82,7 @@ var meshesDemo = function(loadingComplete, bgColor) {
 			activeSkeleton = $("#meshes-skeleton option:selected").text();
 			var active = skeletons[activeSkeleton];
 			var animationDuration = active.state.getCurrent(0).animation.duration;
-			timeLine.set(active.playTime / animationDuration);
+			timeline.set(active.playTime / animationDuration);
 		})
 
 		renderer.skeletonDebugRenderer.drawBones = false;
@@ -150,10 +150,9 @@ var meshesDemo = function(loadingComplete, bgColor) {
 		if (isPlaying) {
 			var animationDuration = state.getCurrent(0).animation.duration;
 			active.playTime += delta;
-			while (active.playTime >= animationDuration) {
+			while (active.playTime >= animationDuration)
 				active.playTime -= animationDuration;
-			}
-			timeLine.set(active.playTime / animationDuration);
+			timeline.set(active.playTime / animationDuration);
 
 			state.update(delta);
 			state.apply(skeleton);

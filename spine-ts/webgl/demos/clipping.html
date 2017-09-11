@@ -1,0 +1,24 @@
+<html>
+<meta charset="UTF-8">
+<title>Clipping - Spine Demo</title>
+<link rel="stylesheet" href="demos.css">
+<script src="../../build/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="utils.js"></script>
+<script src="clipping.js"></script>
+<body>
+
+<center>
+<div class="aspect"><div><canvas id="clipping-canvas"></canvas></div></div>
+<div id="clipping-timeline" class="slider"></div>
+<input id="clipping-playbutton" type="button" value="Pause"></input><br>
+<input id="clipping-drawtriangles" type="checkbox"></input> Draw triangles<br>
+</center>
+
+<script>
+spineDemos.loadSliders();
+clippingDemo(spineDemos.setupRendering);
+</script>
+
+</body>
+</html>
