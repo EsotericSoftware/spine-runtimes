@@ -84,23 +84,34 @@ var hoverboardDemo = function(loadingComplete, bgColor) {
 			renderer.skeletonDebugRenderer.drawBones = this.checked;
 		});
 
+		var aimTrack = 1;
+		var shootAimTrack = 2;
+		var shootTrack = 3;
+
 		$("#hoverboard-aim").change(function () {
 			if (!this.checked)
-				state.setEmptyAnimation(1, 0.2);
+				state.setEmptyAnimation(aimTrack, 0.2);
 			else {
-				state.setEmptyAnimation(1, 0);
-				state.addAnimation(1, "aim", true, 0).mixDuration = 0.2;
+				state.setEmptyAnimation(aimTrack, 0);
+				state.addAnimation(aimTrack, "aim", true, 0).mixDuration = 0.2;
 			}
 		});
 
 		$("#hoverboard-shoot").click(function () {
-			state.setAnimation(2, "aim", true);
-			state.setAnimation(3, "shoot", false).listener = {
+			state.setAnimation(shootAimTrack, "aim", true);
+			state.setAnimation(shootTrack, "shoot", false).listener = {
 				complete: function (trackIndex) {
-					state.setEmptyAnimation(2, 0.2);
-					state.clearTrack(3);
+					state.setEmptyAnimation(shootAimTrack, 0.2);
+					state.clearTrack(shootTrack);
 				}
 			};
+		});
+
+		$("#hoverboard-jump").click(function () {
+			state.setAnimation(aimTrack, "jump", false);
+			state.addEmptyAnimation(aimTrack, 0.6, 0);
+			if ($("#hoverboard-aim").prop("checked"))
+				state.addAnimation(aimTrack, "aim", true, 0.5).mixDuration = 0.2;
 		});
 	}
 	
