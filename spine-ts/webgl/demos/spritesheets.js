@@ -48,6 +48,7 @@ var spritesheetsDemo = function(loadingComplete, bgColor) {
 			skeleton = new spine.Skeleton(skeletonData);
 			var stateData = new spine.AnimationStateData(skeleton.data);
 			stateData.defaultMix = 0.5;
+			stateData.setMix("jump", "walk", 0.3);
 			animationState = new spine.AnimationState(stateData);
 			animationState.setAnimation(0, "walk", true);
 			animationState.apply(skeleton);
@@ -107,7 +108,7 @@ var spritesheetsDemo = function(loadingComplete, bgColor) {
 
 	function resize () {
 		renderer.camera.position.x = offset.x + viewportWidth / 2 - 25;
-		renderer.camera.position.y = offset.y + viewportHeight / 2  - 160;
+		renderer.camera.position.y = offset.y + viewportHeight / 2 - 100;
 		renderer.camera.viewportWidth = viewportWidth * 1.2;
 		renderer.camera.viewportHeight = viewportHeight * 1.2;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
