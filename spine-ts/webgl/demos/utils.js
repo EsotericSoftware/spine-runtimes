@@ -25,13 +25,15 @@ var spineDemos = {
 		}
 	}
 
-	function checkElementVisible (demo) {
-		var rect = demo.canvas.getBoundingClientRect();
-		var x = 0, y = 0;
-		var width = (window.innerHeight || document.documentElement.clientHeight);
-		var height = (window.innerWidth || document.documentElement.clientWidth);
-		demo.visible = rect.left < x + width && rect.right > x && rect.top < y + height && rect.bottom > y;		 
-	};
+	function checkElementVisible(demo) {
+		const rect = demo.canvas.getBoundingClientRect();
+		const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
+		const windowWidth = (window.innerWidth || document.documentElement.clientWidth);
+		const vertInView = (rect.top <= windowHeight) && ((rect.top + rect.height) >= 0);
+		const horInView = (rect.left <= windowWidth) && ((rect.left + rect.width) >= 0);
+
+		demo.visible = (vertInView && horInView);
+	}
 
 	spineDemos.setupRendering = function (canvas, renderFunc) {
 		var demo = {canvas: canvas, renderFunc: renderFunc, visible: false};
