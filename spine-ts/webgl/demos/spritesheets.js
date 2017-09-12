@@ -143,7 +143,7 @@ var spritesheetsDemo = function(loadingComplete, bgColor) {
 
 		animationState.update(delta);
 		var current = animationState.getCurrent(0);
-		if (current.animation.name == "walk") current.time = walkLastTimePrecise;
+		if (current.animation.name == "walk") current.trackTime = walkLastTimePrecise;
 		animationState.apply(skeleton);
 		skeleton.updateWorldTransform();
 
