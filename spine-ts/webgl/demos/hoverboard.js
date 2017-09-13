@@ -109,9 +109,9 @@ var hoverboardDemo = function(loadingComplete, bgColor) {
 
 		$("#hoverboard-jump").click(function () {
 			state.setAnimation(aimTrack, "jump", false);
-			state.addEmptyAnimation(aimTrack, 0.6, 0);
+			state.addEmptyAnimation(aimTrack, 0.5, 0);
 			if ($("#hoverboard-aim").prop("checked"))
-				state.addAnimation(aimTrack, "aim", true, 0.5).mixDuration = 0.2;
+				state.addAnimation(aimTrack, "aim", true, 0.4).mixDuration = 0.2;
 		});
 	}
 	
