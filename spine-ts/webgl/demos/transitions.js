@@ -45,9 +45,9 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 			skeletonNoMix = new spine.Skeleton(skeleton.data);
 			state = createState(0.25);
 			state.multipleMixing = true;
-			setAnimations(state, 0, true);
+			setAnimations(state, 0, 0);
 			stateNoMix = createState(0);
-			setAnimations(stateNoMix, -0.25, true);
+			setAnimations(stateNoMix, -0.25, 0);
 
 			state.apply(skeleton);
 			skeleton.updateWorldTransform();
@@ -64,33 +64,36 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 	}
 
 	function setupInput() {
-		input.addListener({
-			down: function(x, y) { },
-			up: function(x, y) { },
-			moved: function(x, y) {	},
-			dragged: function(x, y) { }
+		$("#transitions-die").click(function () {
+			var entry = state.setAnimation(0, "death", false);
+			setAnimations(state, 0, true, 0);
+			entry.next.mixDuration = 0.1;
+
+			var entry = stateNoMix.setAnimation(0, "death", false);
+			setAnimations(stateNoMix, -0.25, -0.25 + -0.1);
 		});
 	}
 
-	function createState(mix) {
+	function createState (mix) {
 		var stateData = new spine.AnimationStateData(skeleton.data);
 		stateData.defaultMix = mix;
 		var state = new spine.AnimationState(stateData);
 		return state;
 	}
 
-	function setAnimations(state, mix, first) {
-		state.addAnimation(0, "idle", true, first ? 0 : 0.6);
+	function setAnimations (state, delay, first) {
+		state.addAnimation(0, "idle", true, first);
 		state.addAnimation(0, "walk", true, 0.6);
-		state.addAnimation(0, "run", true, 1);
+		state.addAnimation(0, "jump", false, 1);
+		state.addAnimation(0, "run", true, delay);
 		state.addAnimation(0, "walk", true, 1.2);
 		state.addAnimation(0, "run", true, 0.5);
 		state.addAnimation(0, "jump", false, 1);
-		state.addAnimation(0, "run", true, mix);
+		state.addAnimation(0, "run", true, delay);
 		state.addAnimation(0, "jump", true, 0.5);
-		state.addAnimation(0, "walk", true, mix).listener = {
+		state.addAnimation(0, "walk", true, delay).listener = {
 			start: function (trackIndex) {
-				setAnimations(state, mix, false);
+				setAnimations(state, delay, 0.6);
 			}
 		};
 	}
