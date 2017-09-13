@@ -68,10 +68,10 @@ void SkeletonRenderer::initialize () {
 	_blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
 	setOpacityModifyRGB(true);
 
-	updateGLProgramState();
+	setupGLProgramState();
 }
 	
-void SkeletonRenderer::updateGLProgramState()
+void SkeletonRenderer::setupGLProgramState()
 {
     Texture2D *texture = nullptr;
     for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
