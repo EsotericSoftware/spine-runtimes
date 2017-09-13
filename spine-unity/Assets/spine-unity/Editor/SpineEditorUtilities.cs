@@ -188,6 +188,8 @@ namespace Spine.Unity.Editor {
 		const string SHOW_HIERARCHY_ICONS_KEY = "SPINE_SHOW_HIERARCHY_ICONS";
 		public static bool showHierarchyIcons = DEFAULT_SHOW_HIERARCHY_ICONS;
 
+		internal const float DEFAULT_MIPMAPBIAS = -0.5f;
+
 		public const float DEFAULT_SCENE_ICONS_SCALE = 1f;
 		public const string SCENE_ICONS_SCALE_KEY = "SPINE_SCENE_ICONS_SCALE";
 

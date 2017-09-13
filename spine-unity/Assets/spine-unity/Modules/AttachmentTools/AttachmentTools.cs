@@ -212,6 +212,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 	public static class SpriteAtlasRegionExtensions {
 		internal const TextureFormat SpineTextureFormat = TextureFormat.RGBA32;
+		internal const float DefaultMipmapBias = -0.5f;
 		internal const bool UseMipMaps = false;
 		internal const float DefaultScale = 0.01f;
 
@@ -440,6 +441,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 			// Fill a new texture with the collected attachment textures.
 			var newTexture = new Texture2D(maxAtlasSize, maxAtlasSize, textureFormat, mipmaps);
+			newTexture.mipMapBias = SpriteAtlasRegionExtensions.DefaultMipmapBias;
 			newTexture.anisoLevel = texturesToPack[0].anisoLevel;
 			newTexture.name = newName;
 			var rects = newTexture.PackTextures(texturesToPack.ToArray(), padding, maxAtlasSize);

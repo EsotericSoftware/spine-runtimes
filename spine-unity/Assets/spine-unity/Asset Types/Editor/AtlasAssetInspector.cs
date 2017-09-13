@@ -120,7 +120,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			if (materials.arraySize == 0) {
-				EditorGUILayout.HelpBox("Missing materials", MessageType.Error);
+				EditorGUILayout.HelpBox("No materials", MessageType.Error);
 				return;
 			}
 
@@ -134,6 +134,15 @@ namespace Spine.Unity.Editor {
 			}
 
 			EditorGUILayout.Space();
+			if (SpineInspectorUtility.LargeCenteredButton(SpineInspectorUtility.TempContent("Set Mipmap Bias to " + SpineEditorUtilities.DEFAULT_MIPMAPBIAS))) {
+				foreach (var m in atlasAsset.materials) {
+					var texture = m.mainTexture;
+					texture.mipMapBias = SpineEditorUtilities.DEFAULT_MIPMAPBIAS;
+				}
+				Debug.Log("Texture mipmap bias set to " + SpineEditorUtilities.DEFAULT_MIPMAPBIAS);
+			}
+
+			EditorGUILayout.Space();
 			if (atlasFile.objectReferenceValue != null) {
 				if (SpineInspectorUtility.LargeCenteredButton(SpriteSlicesLabel)) {
 					var atlas = atlasAsset.GetAtlas();
@@ -141,6 +150,8 @@ namespace Spine.Unity.Editor {
 						UpdateSpriteSlices(m.mainTexture, atlas);
 				}
 			}
+
+			EditorGUILayout.Space();
 
 			#if REGION_BAKING_MESH
 			if (atlasFile.objectReferenceValue != null) {
