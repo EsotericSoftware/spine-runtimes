@@ -113,6 +113,7 @@ var hoverboardDemo = function(canvas, bgColor) {
 				}
 			},
 			up: function(x, y) {
+				if (target && target.data.name == "crosshair") $("#hoverboard-shoot").click();
 				target = null;
 			},
 			dragged: function(x, y) {
