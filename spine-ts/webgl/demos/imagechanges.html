@@ -9,15 +9,17 @@
 <body>
 
 <center>
-<div class="aspect"><div><canvas id="imagechanges-canvas"></canvas></div></div>
+<div id="canvas"></div>
 <div id="imagechanges-timeline" class="slider"></div>
 <input id="imagechanges-playbutton" type="button" value="Pause"></input><br>
 <select id="imagechanges-skeleton" size="2"></select>
 </center>
 
 <script>
-spineDemos.loadSliders();
-imageChangesDemo(spineDemos.setupRendering);
+spineDemos.init();
+var canvas = spineDemos.obtainCanvas();
+document.getElementById("canvas").appendChild(canvas);
+imageChangesDemo(canvas, spineDemos.setupRendering);
 </script>
 
 </body>

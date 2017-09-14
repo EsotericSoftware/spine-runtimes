@@ -9,15 +9,17 @@
 <body>
 
 <center>
-<div class="aspect"><div><canvas id="clipping-canvas"></canvas></div></div>
+<div id="canvas"></div>
+<div id="clipping-playbutton"></div>
 <div id="clipping-timeline" class="slider"></div>
-<input id="clipping-playbutton" type="button" value="Pause"></input><br>
-<input id="clipping-drawtriangles" type="checkbox"></input> Draw triangles<br>
+<input id="clipping-drawtriangles" type="checkbox"></input> Draw triangles
 </center>
 
 <script>
-spineDemos.loadSliders();
-clippingDemo(spineDemos.setupRendering);
+spineDemos.init();
+var canvas = spineDemos.obtainCanvas();
+document.getElementById("canvas").appendChild(canvas);
+clippingDemo(canvas, spineDemos.setupRendering);
 </script>
 
 </body>

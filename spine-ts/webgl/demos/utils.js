@@ -3,9 +3,10 @@ var spineDemos = {
 	HOVER_COLOR_OUTER: new spine.Color(1, 1, 1, 1),
 	NON_HOVER_COLOR_INNER: new spine.Color(0.478, 0, 0, 0.5),
 	NON_HOVER_COLOR_OUTER: new spine.Color(1, 0, 0, 0.8),
-	assetManager: new spine.SharedAssetManager("http://esotericsoftware.com/demos/exports/"),
+	assetManager: new spine.SharedAssetManager("assets/"),
 	demos: [],
-	loopRunning: false
+	loopRunning: false,
+	canvases: []
 };
 (function () {
 	var timeKeeper = new spine.TimeKeeper();
@@ -13,7 +14,7 @@ var spineDemos = {
 		timeKeeper.update();
 		if (spineDemos.log) console.log(timeKeeper.delta + ", " + timeKeeper.framesPerSecond);
 		requestAnimationFrame(loop);
-		var demos = spineDemos.demos;		
+		var demos = spineDemos.demos;
 		for (var i = 0; i < demos.length; i++) {
 			var demo = demos[i];
 			var canvas = demo.canvas;
@@ -41,12 +42,33 @@ var spineDemos = {
 			checkElementVisible(demo);
 		});
 		checkElementVisible(demo);
-		if (!spineDemos.loopRunning) {			
+		if (!spineDemos.loopRunning) {
 			loop();
 			spineDemos.loopRunning = true;
 		}
 		spineDemos.demos.push(demo);
 	};
+
+	spineDemos.init = function () {
+		spineDemos.createCanvases(3);
+		spineDemos.loadSliders();
+	}
+
+	spineDemos.createCanvases = function (numCanvases) {
+		for (var i = 0; i < numCanvases; i++) {
+			var canvas = document.createElement("canvas");
+			canvas.ctx = new spine.webgl.ManagedWebGLRenderingContext(canvas, { alpha: false });
+			spineDemos.canvases.push(canvas);
+		}
+	}
+
+	spineDemos.obtainCanvas = function () {
+		return spineDemos.canvases.splice(0, 1)[0];
+	}
+
+	spineDemos.freeCanvas = function (canvas) {
+		canvases.push(canvas);
+	}
 
 	spineDemos.loadSliders = function () {
 		$(window).resize(function() {

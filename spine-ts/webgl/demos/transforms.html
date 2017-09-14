@@ -9,16 +9,18 @@
 <body>
 
 <center>
-<div class="aspect"><div><canvas id="transforms-canvas"></canvas></div></div>
+<div id="canvas"></div>
 Rotation offset
 <div id="transforms-rotationoffset" class="slider filled"></div><br>
 Translation mix
-<div id="transforms-translationmix" class="slider filled"></div>		
+<div id="transforms-translationmix" class="slider filled"></div>
 </center>
 
-<script>	
-spineDemos.loadSliders();
-transformsDemo(spineDemos.setupRendering);
+<script>
+spineDemos.init();
+var canvas = spineDemos.obtainCanvas();
+document.getElementById("canvas").appendChild(canvas);
+transformsDemo(canvas, spineDemos.setupRendering);
 </script>
 
 </body>

@@ -1,4 +1,4 @@
-var transformsDemo = function(loadingComplete, bgColor) {
+var transformsDemo = function(canvas, loadingComplete, bgColor) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -20,13 +20,8 @@ var transformsDemo = function(loadingComplete, bgColor) {
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
-		canvas = document.getElementById("transforms-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });
-		if (!gl) {
-			alert('WebGL is unavailable.');
-			return;
-		}
+		gl = canvas.ctx.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = spineDemos.assetManager;

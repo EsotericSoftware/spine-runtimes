@@ -1,4 +1,4 @@
-var transitionsDemo = function(loadingComplete, bgColor) {
+var transitionsDemo = function(canvas, loadingComplete, bgColor) {
 	var OUTLINE_COLOR = new spine.Color(0, 0.8, 0, 1);
 
 	var canvas, gl, renderer, input, assetManager;
@@ -15,13 +15,9 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 		timeSlider = $("#transitions-timeslider").data("slider");
 		timeSlider.set(0.5);
 		timeSliderLabel = $("#transitions-timeslider-label")[0];
-		canvas = document.getElementById("transitions-canvas");
+
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });
-		if (!gl) {
-			alert('WebGL is unavailable.');
-			return;
-		}
+		gl = canvas.ctx.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = spineDemos.assetManager;

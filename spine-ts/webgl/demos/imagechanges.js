@@ -1,4 +1,4 @@
-var imageChangesDemo = function(loadingComplete, bgColor) {
+var imageChangesDemo = function(canvas, loadingComplete, bgColor) {
 	var OUTLINE_COLOR = new spine.Color(0, 0.8, 0, 1);
 
 	var canvas, gl, renderer, input, assetManager;
@@ -13,13 +13,8 @@ var imageChangesDemo = function(loadingComplete, bgColor) {
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
-		canvas = document.getElementById("imagechanges-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });
-		if (!gl) {
-			alert('WebGL is unavailable.');
-			return;
-		}
+		gl = canvas.ctx.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = spineDemos.assetManager;

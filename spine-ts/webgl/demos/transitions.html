@@ -9,15 +9,17 @@
 <body>
 
 <center>
-<div class="aspect"><div><canvas id="transitions-canvas"></canvas></div></div>
+<div id="canvas"></div>
 Time multiplier
 <div id="transitions-timeslider" class="slider filled"></div><br>
 <button id="transitions-die">Die</button>
 </center>
 
 <script>
-spineDemos.loadSliders();
-transitionsDemo(spineDemos.setupRendering);
+spineDemos.init();
+var canvas = spineDemos.obtainCanvas();
+document.getElementById("canvas").appendChild(canvas);
+transitionsDemo(canvas, spineDemos.setupRendering);
 </script>
 
 </body>

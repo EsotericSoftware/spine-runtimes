@@ -1,4 +1,4 @@
-var skinsDemo = function(loadingComplete, bgColor) {
+var skinsDemo = function(canvas, loadingComplete, bgColor) {
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, state, offset, bounds;
 	var timeKeeper, loadingScreen;
@@ -10,13 +10,8 @@ var skinsDemo = function(loadingComplete, bgColor) {
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
-		canvas = document.getElementById("skins-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });
-		if (!gl) {
-			alert('WebGL is unavailable.');
-			return;
-		}
+		gl = canvas.ctx.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = spineDemos.assetManager;

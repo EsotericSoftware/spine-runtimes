@@ -9,15 +9,17 @@
 <body>
 
 <center>
-<div class="aspect"><div><canvas id="tank-canvas"></canvas></div></div>
+<div id="canvas"></div>
 <div id="tank-timeline" class="slider"></div>
 <input id="tank-playbutton" type="button" value="Pause"></input><br>
 <input id="tank-drawbones" type="checkbox"></input> Display bones
 </center>
 
 <script>
-spineDemos.loadSliders();
-tankDemo(spineDemos.setupRendering);
+spineDemos.init();
+var canvas = spineDemos.obtainCanvas();
+document.getElementById("canvas").appendChild(canvas);
+tankDemo(canvas, spineDemos.setupRendering);
 </script>
 
 </body>

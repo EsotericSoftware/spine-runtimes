@@ -1,5 +1,5 @@
-var clippingDemo = function(loadingComplete, bgColor) {
-	var canvas, gl, renderer, assetManager;
+var clippingDemo = function(canvas, loadingComplete, bgColor) {
+	var gl, renderer, assetManager;
 	var skeleton, state, bounds;
 	var timeKeeper, loadingScreen;
 	var playButton, timeline, isPlaying = true, playTime = 0;
@@ -9,14 +9,8 @@ var clippingDemo = function(loadingComplete, bgColor) {
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
-		canvas = document.getElementById("clipping-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });
-		if (!gl) {
-			alert('WebGL is unavailable.');
-			return;
-		}
-
+		gl = canvas.ctx.gl;
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = spineDemos.assetManager;
 		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };

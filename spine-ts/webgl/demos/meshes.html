@@ -9,7 +9,7 @@
 <body>
 
 <center>
-<div class="aspect"><div><canvas id="meshes-canvas"></canvas></div></div>
+<div id="canvas"></div>
 <div id="meshes-timeline" class="slider"></div>
 <input id="meshes-playbutton" type="button" value="Pause"></input><br>
 <select id="meshes-skeleton" size="3"></select><br>
@@ -18,8 +18,10 @@
 </center>
 
 <script>
-spineDemos.loadSliders();
-meshesDemo(spineDemos.setupRendering);
+spineDemos.init();
+var canvas = spineDemos.obtainCanvas();
+document.getElementById("canvas").appendChild(canvas);
+meshesDemo(canvas, spineDemos.setupRendering);
 </script>
 
 </body>

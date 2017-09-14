@@ -9,7 +9,7 @@
 <body>
 
 <center>
-<div class="aspect"><div><canvas id="hoverboard-canvas"></canvas></div></div>
+<div id="canvas"></div>>
 <input id="hoverboard-drawbones" type="checkbox"></input> Display Bones<br>
 <input id="hoverboard-aim" type="checkbox"></input> Aim<br>
 <button id="hoverboard-shoot">Shoot</button>
@@ -17,7 +17,10 @@
 </center>
 
 <script>
-hoverboardDemo(spineDemos.setupRendering);
+spineDemos.init();
+var canvas = spineDemos.obtainCanvas();
+document.getElementById("canvas").appendChild(canvas);
+hoverboardDemo(canvas, spineDemos.setupRendering);
 </script>
 
 </body>
