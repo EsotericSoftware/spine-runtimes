@@ -247,9 +247,8 @@ module spine.webgl {
 
 				void main () {
 					vec4 texColor = texture2D(u_texture, v_texCoords);
-					float alpha = texColor.a * v_light.a;
-					gl_FragColor.a = alpha;
-					gl_FragColor.rgb = (1.0 - texColor.rgb) * v_dark.rgb * alpha + texColor.rgb * v_light.rgb;
+					gl_FragColor.a = texColor.a * v_light.a;
+					gl_FragColor.rgb = ((texColor.a - 1.0) * v_dark.a + 1.0 - texColor.rgb) * v_dark.rgb + texColor.rgb * v_light.rgb;
 				}
 			`;
 

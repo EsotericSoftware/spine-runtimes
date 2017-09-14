@@ -122,8 +122,18 @@ module spine.webgl {
 						finalColor.b *= finalColor.a;
 					}
 					let darkColor = this.tempColor2;
-					if (slot.darkColor == null) darkColor.set(0, 0, 0, 1);
-					else darkColor.setFromColor(slot.darkColor);
+					if (slot.darkColor == null)
+						darkColor.set(0, 0, 0, 1.0);
+					else {
+						if (premultipliedAlpha) {
+							darkColor.r = slot.darkColor.r * finalColor.a;
+							darkColor.g = slot.darkColor.g * finalColor.a;
+							darkColor.b = slot.darkColor.b * finalColor.a;
+						} else {
+							darkColor.setFromColor(slot.darkColor);
+						}
+						darkColor.a = premultipliedAlpha ? 1.0 : 0.0;
+					}
 
 					let slotBlendMode = slot.data.blendMode;
 					if (slotBlendMode != blendMode) {
