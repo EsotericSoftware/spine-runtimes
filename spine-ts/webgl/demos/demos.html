@@ -1,10 +1,7 @@
-<!DOCTYPE html><html ><head>
-	<meta charset="utf-8">
-	<title>Spine: Demos</title>
-<body >
-
+<!DOCTYPE html><html><head>
+<meta charset="utf-8">
+<title>Spine: Demos</title>
 <link rel="stylesheet" href="demos.css">
-
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script src="../../build/spine-webgl.js"></script>
@@ -23,13 +20,15 @@
 <script src="transforms.js"></script>
 
 <script src="demos.js"></script>
+</head>
+<body>
 
 <div id="demos" class="demos-page">
-	<div>
+	<div class="demo">
 		<div>
 			<div>
 				<h2 id="Spine-versus-sprites-sheets"><a href="#Spine-versus-sprite-sheets">Spine versus sprite sheets</a></h2>
-				<div>
+				<div class="demo-container">
 					<div class="aspect"></div>
 					<div class="resize"></div>
 					<div id="spritesheets-overlay" class="overlay-hide">
@@ -37,13 +36,7 @@
 						<div class="overlay-label" style="left:50%;width:50%"><b>Sprite sheet</b><br><span class="hide-small">1 second of animation @ 30FPS<br></span><b>3.39 MB = 18x larger!</b></div>
 					</div>
 				</div>
-				<div>
-					<p>Traditional sprite animation requires an image for each frame of animation, resulting in massive sprite sheets. Each additional animation greatly increases your games' disk space and memory requirements, especially at frame rates necessary for smooth playback. It quickly becomes an enormous amount of work for your artists and your finished product suffers when the number of animations must be reduced to meet size constraints.</p>
-					<p>Spine animations store only the bone and animation data, coupled with a single set of individual images which are reused for every animation. This allows you to bring your games to life by packing them full of unique animations. Also, Spine animations are interpolated so playback is always perfectly smooth, regardless of the frame rate.</p>
-					<p><a href="/demos/assets/spine-versus-sprite-sheets.png" target="_blank">
-						<img src="/demos/assets/spine-versus-sprite-sheets-thumb.png" class="compare">
-						Compare the memory and disk space requirements of Spine versus sprite sheet animations.
-					</a></p>
+				<div class="demo-text">
 					<div class="controls">
 						<div class="control" style="padding-bottom:0px">
 							<div class="control-label"><span>Animation speed</span></div>
@@ -61,11 +54,11 @@
 			</div>
 		</div>
 	</div>
-	<div>
+	<div class="demo">
 		<div>
 			<div>
 				<h2 id="Spine-with-frame-based-animation"><a href="#Spine-with-frame-based-animation">Spine with frame-based animation</a></h2>
-				<div>
+				<div class="demo-container">
 					<div class="aspect"></div>
 					<table class="timeline layout"><tr>
 						<td><div id="imagechanges-playbutton" class="pause"></div></td>
@@ -73,9 +66,7 @@
 					</tr></table>
 					<div class="resize"></div>
 				</div>
-				<div>
-					<p>While Spine largely replaces the need for traditional frame-by-frame animation, images can still be swapped when needed. For example, a change of perspective for a torso or flapping wing, alternative facial expressions, or a muzzle flash.</p>
-					<p>Spine's slots, attachments, and draw order mechanisms allow you to easily integrate frame-by-frame animations in your otherwise fully dynamic Spine animations. Even better, Spine can manipulate the frame-by-frame images, shown in this demo by scaling on the alien's exploding head.</p>
+				<div class="demo-text">
 					<div class="controls">
 						<div class="control">
 							<label>Select a skeleton:</label>
@@ -88,11 +79,11 @@
 			</div>
 		</div>
 	</div>
-	<div>
+	<div class="demo">
 		<div>
 			<div>
 				<h2 id="Transitions-and-layering"><a href="#Transitions-and-layering">Transitions and layering</a></h2>
-				<div>
+				<div class="demo-container">
 					<div class="aspect"></div>
 					<div id="transitions-overlay" class="overlay-hide">
 						<div class="overlay-label" style="left:25%;"><b>Smooth</b></div>
@@ -100,9 +91,7 @@
 					</div>
 					<div class="resize"></div>
 				</div>
-				<div>
-					<p>An often felt disadvantage of 2D games is the lack of smooth animation transitions. In 3D games, transitions between animations can be calculated on-the-fly at runtime. Animations can even be blended, for example half walking and half running. In 2D games without Spine, blending is impossible and typically transitions are jarring. Artists can manually create frames for every possible transition, but even that doesn't help when animations can be interrupted mid playback.</p>
-					<p>Spine brings the benefits from the 3D world back to 2D. The Spine Runtimes smoothly and dynamically transition from one animation to the next, giving your characters natural looking fluidity. Layering allows animations to be blended on top of others, for example to play a shooting animation while your character is running or to blend walking and limping more and more as damage is taken.</p>
+				<div class="demo-text">
 					<div class="controls">
 						<div class="control" style="margin:0">
 							<div>
@@ -119,11 +108,11 @@
 			</div>
 		</div>
 	</div>
-	<div id="demo-mesh-deformations" >
+	<div class="demo" id="demo-mesh-deformations">
 		<div>
 			<div>
 				<h2 id="Mesh-deformations"><a href="#Mesh-deformations">Mesh deformation</a></h2>
-				<div>
+				<div class="demo-container">
 					<div class="aspect"></div>
 					<table class="timeline layout"><tr>
 						<td><div id="meshes-playbutton" class="pause"></div></td>
@@ -131,10 +120,7 @@
 					</tr></table>
 					<div class="resize"></div>
 				</div>
-				<div>
-					<p>A Spine character made up of rigid 2D images can already give excellent results, such as Spineboy in the demo above. To give your characters even more life, Spine brings more tricks from the 3D world in the form of meshes and weights. With meshes, images are no longer rigid and can bend and deform however you like. Weights bind meshes to bones, so the images deform automatically as the bones are moved.</p>
-					<p>Meshes can also improve your game's performance, reducing fill rate usage by not drawing transparent portions of your images. This is especially important on mobile devices.</p>
-					<p>The amazing art for this demo was kindly provided by Hwadock (a.k.a. dugy). Follow him on <a href="https://twitter.com/dugy_">Twitter</a> and his <a href="http://hwadock.dothome.co.kr/dugy/index.htm">blog</a>.</p>
+				<div class="demo-text">
 					<div class="controls">
 						<div class="control" style="padding-bottom:0">
 							<label>Select a character:</label>
@@ -161,18 +147,15 @@
 			</div>
 		</div>
 	</div>
-	<div id="demo-skins" >
+	<div class="demo" id="demo-skins">
 		<div>
 			<div>
 				<h2 id="Skins"><a href="#Skins">Skins</a></h2>
-				<div>
+				<div class="demo-container">
 					<div class="aspect"></div>
 					<div class="resize"></div>
 				</div>
-				<div>
-					<p>Spine's skins feature is perfect for providing customization and variety while keeping your workload reasonable. With skins, the work of animating only needs to be done once, then you can assign different looks to your skeletons while reusing all your animations. For ultimate flexibility, the Spine Runtimes let you combine parts from different skins at runtime, covering all possible customization needs.</p>
-					<p>Skins give players the ability to add their own touch to your game's world by outfitting their avatars with new looks, clothing, weapons, and other accessories. Skins also give you more mileage out of your animations: mix and match your art for enemies, items, and other game objects to greatly increase variety for little effort.</p>
-					<p>The art for this demo can be found in the <a href="https://www.assetstore.unity3d.com/en/#!/content/41338" target="_blank">2D Anim Heroes</a> character pack for Unity.
+				<div class="demo-text">
 					<div class="controls">
 						<div class="control">
 							<label>Select a skin:</label>
@@ -198,18 +181,15 @@
 			</div>
 		</div>
 	</div>
-	<div id="demo-ik-constraint" >
+	<div class="demo" id="demo-ik-constraint">
 		<div>
 			<div>
 				<h2 id="Inverse-kinematics"><a href="#Inverse-kinematics">Inverse kinematics</a></h2>
-				<div>
+				<div class="demo-container">
 					<div class="aspect"></div>
 					<div class="resize"></div>
 				</div>
-					<div>
-					<p>Spine's support for inverse kinematics allows for realistic and dynamic movement that would otherwise be difficult or impossible to animate. It also enables more advanced rigging, where complex poses can be easily controlled by a small number of bones.</p>
-					<p>Since Spine doesn't use baking or plotting, IK really shines at runtime. By dynamically positioning bones at runtime, IK constraints allow your character to easily react to the environment, such as aiming at enemies, having feet follow slopes and bumps in the terrain, and much more. In this demo Spineboy is balanced on a user controlled hover board while playing an animation at the same time.</p>
-					<p>Try it out! Drag the red circles around to dynamically pose Spineboy. The shoot and jump buttons and aim checkbox layer animations on top of the idle animation.</p>
+				<div class="demo-text">
 					<div class="controls">
 						<div class="control" style="margin:0">
 							<div>
@@ -236,11 +216,11 @@
 			</div>
 		</div>
 	</div>
-	<div id="demo-path-constraint" >
+	<div class="demo" id="demo-path-constraint">
 		<div>
 			<div>
 				<h2 id="Path-constraints"><a href="#Path-constraints">Path constraints</a></h2>
-				<div>
+				<div class="demo-container">
 					<div class="aspect"></div>
 					<table class="timeline layout"><tr>
 						<td><div id="vine-playbutton" class="pause"></div></td>
@@ -248,10 +228,7 @@
 					</tr></table>
 					<div class="resize"></div>
 				</div>
-				<div>
-					<p>Often a part of a character follows an open or closed path. Rather than key this movement manually, Spine's path constraints can be used to make bones automatically follow a path. The composite Bézier path is made up of a set of interconnected points that let you bend and shape the path. The path itself can be animated and even weighted to bones, so the path deforms automatically as the bones are moved.</p>
-					<p>In this demo a vine mesh is bound to bones which are constrained to a path. The more vertices in the mesh, the smoother it will bend.</p>
-					<p>Path constraints can also be used to great effect at runtime. Move the red handles to dynamically modify the path and watch the vine follow it seamlessly!</p>
+				<div class="demo-text">
 					<div class="controls">
 						<div class="control" style="padding-bottom:6px">
 							<div class="checkbox">
@@ -264,13 +241,11 @@
 				</div>
 			</div>
 			<div>
-				<div>
+				<div class="demo-container">
 					<div class="aspect"></div>
 					<div class="resize"></div>
 				</div>
-				<div>
-					<p>Path constraints enable powerful rigging, shown by Stretchyman in this demo. For the arms and legs, meshes are weighted to many small bones which are then constrained to follow simple paths for the limbs. The paths are then weighted to bones which can be moved to control the limbs. This setups allows a large number of bones to be controlled with just a few bones. Not only does this make animating easier, but at runtime only a few bones need to be adjusted for posing dynamically.</p>
-					<p>Move the red handles and make Stretchyman dance!</p>
+				<div class="demo-text">
 					<div class="controls">
 						<div class="control" style="padding-bottom:6px">
 							<div class="checkbox">
@@ -284,11 +259,11 @@
 			</div>
 		</div>
 	</div>
-	<div id="demo-clipping" >
+	<div class="demo" id="demo-clipping">
 		<div>
 			<div>
 				<h2 id="Clipping"><a href="#Clipping">Clipping</a></h2>
-				<div>
+				<div class="demo-container">
 					<div class="aspect"></div>
 					<table class="timeline layout"><tr>
 						<td><div id="clipping-playbutton" class="pause"></div></td>
@@ -296,8 +271,7 @@
 					</tr></table>
 					<div class="resize"></div>
 				</div>
-				<div>
-					<p>Sometimes parts of an animation must be partially hidden, like in this example where Spineboy comes out of a portal. Clipping comes in handy in these cases by restricting rendering to a polygonal area. Only the parts of the skeleton inside the predefined, animatable area are shown. This enables many effects that wouldn't otherwise be possible, such as windows, lighting effects, and more. It is also possible to have clipping only affect a subset of the skeleton. For example, an animation where a character goes through an x-ray.</p>
+				<div class="demo-text">
 					<div class="controls">
 						<div class="control" style="padding-bottom:6px">
 							<div class="checkbox">
@@ -311,11 +285,11 @@
 			</div>
 		</div>
 	</div>
-	<div id="demo-transform-constraint" >
+	<div class="demo" id="demo-transform-constraint">
 		<div>
 			<div>
 				<h2 id="Transform-constraints"><a href="#Transform-constraints">Transform constraints</a></h2>
-				<div>
+				<div class="demo-container">
 					<div class="aspect"></div>
 					<table class="timeline layout"><tr>
 						<td><div id="tank-playbutton" class="pause"></div></td>
@@ -323,10 +297,7 @@
 					</tr></table>
 					<div class="resize"></div>
 				</div>
-				<div>
-					<p>Animating complex skeletons with many interdependent pieces can be tedious. Spine's transform constraints remove this pain by unlocking more powerful rigging. By constraining bone transforms to the transform of another bone, you only need to animate one of the bones and the others are adjusted automatically. While seemingly simple on the surface, advanced rigging can make great use of this to automate how a skeleton behaves as it is posed.</p>
-					<p>Transform constraints are also great for machinery, such as the tank in this demo. Instead of keying the rotation of each individual wheel, a single wheel is animated while the others follow via a transform constraint. Offsetting and mixing can add individualism back to constrained parts.</p>
-					<p>The treads on the tank are circulated using a path constraint, which would be impossible to animate without paths. The path is weighted to the wheels, so the path bends automatically as the wheels move up and down.</p>
+				<div class="demo-text">
 					<div class="controls">
 						<div class="control" style="padding-bottom:6px">
 							<div class="checkbox">
@@ -339,12 +310,11 @@
 				</div>
 			</div>
 			<div>
-				<div>
+				<div class="demo-container">
 					<div class="aspect"></div>
 					<div class="resize"></div>
 				</div>
-				<div>
-					<p>In this demo, the rotation of the two smaller wheels is constrained by the big wheel's rotation. Also, the big wheel's translation is constrained so it stays between the two smaller wheels.</p>
+				<div class="demo-text">
 					<div class="controls">
 						<div class="control" style="padding-bottom:0px">
 							<div class="control-label"><span>Rotation offset</span></div>
