@@ -12,27 +12,27 @@ br {
 	content: "";
 	margin-top: 15px;
 }
-.aspect {
-	margin-bottom: 15px;
-	max-width: 800px;
-	text-align: center;
+canvas {
+	width: 640px;
+	height: 480px;
 }
-.aspect div {
-	position: relative;
-	padding-bottom: 70.14%;
+
+.play {
+	background: black;
+	background-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%3E%3Cpath%20fill%3D%27%23F2F2F2%27%20d%3D%27M30.185%2C15.5L12.556%2C24.8V6.201L30.185%2C15.5z%27%2F%3E%3C%2Fsvg%3E");
+	width: 40px;
+	height: 30px;
 }
-.aspect canvas {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	width: 100%;
-	height: 100%;
-	border: 1px solid black;
+.pause {
+	background: black;
+	background-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%3E%3Cpath%20fill%3D%22%23F2F2F2%22%20d%3D%22M26.94%2C6.978v17.045h-5.249V6.978H26.94z%22%2F%3E%3Cpath%20fill%3D%22%23F2F2F2%22%20d%3D%22M18.975%2C6.978v17.045h-5.249V6.978H18.975z%22%2F%3E%3C%2Fsvg%3E");
+	width: 40px;
+	height: 30px;
+	margin: 0;
 }
+
 .slider {
-	width: 100%;
+	width: 597px;
 	max-width: 800px;
 	border-radius: 3px;
 	text-align: left;
@@ -43,7 +43,7 @@ br {
 	height: 15px;
 	border: 1px solid #c5c5c5;
 }
-.slider div {	
+.slider div {
 	position: absolute;
 	top: -2px;
 	width: 10px;
@@ -56,7 +56,7 @@ br {
 .slider.filled {
 	border: 0;
 }
-.slider.filled div {	
+.slider.filled div {
 	top: -1px;
 	margin-left: 1px;
 }
@@ -72,4 +72,16 @@ br {
 	background: #222;
 	border-top-right-radius: 3px;
 	border-bottom-right-radius: 3px;
+}
+
+.overlay {
+	opacity: 1;
+	transition: opacity 0.5s ease;
+	z-index: 10;
+}
+.overlay-hide {
+	opacity: 0;
+}
+.overlay-label {
+	display: none;
 }
