@@ -9,7 +9,7 @@
 <body>
 
 <center>
-<div id="canvas"></div>
+<div class="aspect"></div>
 <button id="spritesheets-roar">Roar</button>
 <button id="spritesheets-jump">Jump</button><br>
 Time multiplier
@@ -18,9 +18,7 @@ Time multiplier
 
 <script>
 spineDemos.init();
-var canvas = spineDemos.obtainCanvas();
-document.getElementById("canvas").appendChild(canvas);
-spritesheetsDemo(canvas, spineDemos.setupRendering);
+spineDemos.addDemo(spritesheetsDemo, document.getElementsByClassName("aspect")[0]);
 </script>
 
 </body>

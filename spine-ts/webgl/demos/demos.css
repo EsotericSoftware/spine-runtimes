@@ -17,6 +17,11 @@ canvas {
 	height: 480px;
 }
 
+.aspect {
+	width: 640px;
+	height: 480px;
+}
+
 .play {
 	background: black;
 	background-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%3E%3Cpath%20fill%3D%27%23F2F2F2%27%20d%3D%27M30.185%2C15.5L12.556%2C24.8V6.201L30.185%2C15.5z%27%2F%3E%3C%2Fsvg%3E");

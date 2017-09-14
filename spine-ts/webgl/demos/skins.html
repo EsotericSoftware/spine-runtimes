@@ -9,7 +9,7 @@
 <body>
 
 <center>
-<div id="canvas"></div>
+<div class="aspect"></div>
 <select id="skins-skin"></select><br>
 <button id="skins-randomizeattachments">Random Attachments</button>
 <button id="skins-swingsword">Swing Sword</button><br>
@@ -18,9 +18,7 @@
 
 <script>
 spineDemos.init();
-var canvas = spineDemos.obtainCanvas();
-document.getElementById("canvas").appendChild(canvas);
-skinsDemo(canvas, spineDemos.setupRendering);
+spineDemos.addDemo(skinsDemo, document.getElementsByClassName("aspect")[0]);
 </script>
 
 </body>

@@ -18,16 +18,36 @@ var spineDemos = {
 		for (var i = 0; i < demos.length; i++) {
 			var demo = demos[i];
 			var canvas = demo.canvas;
-			var renderFunc = demo.renderFunc;
-			if (demo.visible) {
-				if (spineDemos.log) console.log("Rendering " + canvas.id);
-				renderFunc();
+
+			if (!spineDemos.assetManager.isLoadingComplete(demo.DEMO_NAME)) {
+				if (demo.visible) {
+					if (canvas.parentElement != demo.placeholder) {
+						$(canvas).detach();
+						demo.placeholder.appendChild(canvas);
+					}
+					demo.loadingScreen.draw();
+				}
+			} else {
+				if (!demo.loaded) {
+					demo.loadingComplete();
+					demo.loaded = true;
+				}
+
+				if (demo.visible) {
+					if (canvas.parentElement != demo.placeholder) {
+						$(canvas).detach();
+						demo.placeholder.appendChild(canvas);
+					}
+					if (spineDemos.log) console.log("Rendering " + canvas.id);
+					demo.render();
+					demo.loadingScreen.draw(true);
+				}
 			}
 		}
 	}
 
 	function checkElementVisible(demo) {
-		const rect = demo.canvas.getBoundingClientRect();
+		const rect = demo.placeholder.getBoundingClientRect();
 		const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
 		const windowWidth = (window.innerWidth || document.documentElement.clientWidth);
 		const vertInView = (rect.top <= windowHeight) && ((rect.top + rect.height) >= 0);
@@ -36,41 +56,37 @@ var spineDemos = {
 		demo.visible = (vertInView && horInView);
 	}
 
-	spineDemos.setupRendering = function (canvas, renderFunc) {
-		var demo = {canvas: canvas, renderFunc: renderFunc, visible: false};
-		$(window).on('DOMContentLoaded load resize scroll', function() {
-			checkElementVisible(demo);
-		});
-		checkElementVisible(demo);
-		if (!spineDemos.loopRunning) {
-			loop();
-			spineDemos.loopRunning = true;
-		}
-		spineDemos.demos.push(demo);
-	};
-
-	spineDemos.init = function () {
-		spineDemos.createCanvases(3);
-		spineDemos.loadSliders();
-	}
-
-	spineDemos.createCanvases = function (numCanvases) {
+	function createCanvases (numCanvases) {
 		for (var i = 0; i < numCanvases; i++) {
 			var canvas = document.createElement("canvas");
 			canvas.ctx = new spine.webgl.ManagedWebGLRenderingContext(canvas, { alpha: false });
+			canvas.id = "canvas-" + i;
 			spineDemos.canvases.push(canvas);
 		}
 	}
 
-	spineDemos.obtainCanvas = function () {
-		return spineDemos.canvases.splice(0, 1)[0];
+	spineDemos.init = function () {
+		createCanvases(3);
+		loadSliders();
+		requestAnimationFrame(loop);
 	}
 
-	spineDemos.freeCanvas = function (canvas) {
-		canvases.push(canvas);
+	spineDemos.addDemo = function (demo, placeholder) {
+		var canvas = spineDemos.canvases[spineDemos.demos.length % spineDemos.canvases.length];
+		demo(canvas);
+		demo.placeholder = placeholder;
+		demo.canvas = canvas;
+		demo.visible = false;
+		var renderer = new spine.webgl.SceneRenderer(canvas, canvas.ctx.gl);
+		demo.loadingScreen = new spine.webgl.LoadingScreen(renderer);
+		$(window).on('DOMContentLoaded load resize scroll', function() {
+			checkElementVisible(demo);
+		});
+		checkElementVisible(demo);
+		spineDemos.demos.push(demo);
 	}
 
-	spineDemos.loadSliders = function () {
+	loadSliders = function () {
 		$(window).resize(function() {
 			$(".slider").each(function () {
 				$(this).data("slider").resized();

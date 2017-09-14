@@ -9,7 +9,7 @@
 <body>
 
 <center>
-<div id="canvas"></div>
+<div class="aspect"></div>
 Rotation offset
 <div id="transforms-rotationoffset" class="slider filled"></div><br>
 Translation mix
@@ -18,9 +18,7 @@ Translation mix
 
 <script>
 spineDemos.init();
-var canvas = spineDemos.obtainCanvas();
-document.getElementById("canvas").appendChild(canvas);
-transformsDemo(canvas, spineDemos.setupRendering);
+spineDemos.addDemo(transformsDemo, document.getElementsByClassName("aspect")[0]);
 </script>
 
 </body>

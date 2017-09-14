@@ -4,8 +4,9 @@ $(function () {
 		alert("Error: " + message + "\n" + "URL:" + url + "\nLine: " + lineNo);
 	}
 
+
+	spineDemos.init();
 	spineDemos.assetManager = new spine.SharedAssetManager("assets/");
-	spineDemos.loadSliders();
 
 	var demos = [
 		spritesheetsDemo,
@@ -20,8 +21,11 @@ $(function () {
 		tankDemo,
 		transformsDemo,
 	];
+
+	var placeholders = document.getElementsByClassName("aspect");
+
 	for (var i = 0; i < demos.length; i++)
-		demos[i](spineDemos.setupRendering);
+		spineDemos.addDemo(demos[i], placeholders[i]);
 
 	function resizeSliders () {
 		$(".slider").each(function () {

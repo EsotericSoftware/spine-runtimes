@@ -1,7 +1,7 @@
-var clippingDemo = function(canvas, loadingComplete, bgColor) {
+var clippingDemo = function(canvas, bgColor) {
 	var gl, renderer, assetManager;
 	var skeleton, state, bounds;
-	var timeKeeper, loadingScreen;
+	var timeKeeper;
 	var playButton, timeline, isPlaying = true, playTime = 0;
 
 	var DEMO_NAME = "ClippingDemo";
@@ -18,41 +18,31 @@ var clippingDemo = function(canvas, loadingComplete, bgColor) {
 		assetManager.loadText(DEMO_NAME, "atlas1.atlas");
 		assetManager.loadJson(DEMO_NAME, "demos.json");
 		timeKeeper = new spine.TimeKeeper();
-		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		requestAnimationFrame(load);
 	}
 
-	function load () {
-		timeKeeper.update();
-		if (assetManager.isLoadingComplete(DEMO_NAME)) {
-			var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas1.atlas"), function(path) {
-				return assetManager.get(DEMO_NAME, path);
-			});
-			var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
-			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json")["spineboy"]);
-			skeleton = new spine.Skeleton(skeletonData);
-			state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
-			state.setAnimation(0, "portal", true);
-			state.apply(skeleton);
-			skeleton.updateWorldTransform();
-			var offset = new spine.Vector2();
-			bounds = new spine.Vector2();
-			skeleton.getBounds(offset, bounds, []);
+	function loadingComplete () {
+		var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas1.atlas"), function(path) {
+			return assetManager.get(DEMO_NAME, path);
+		});
+		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+		var skeletonJson = new spine.SkeletonJson(atlasLoader);
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json")["spineboy"]);
+		skeleton = new spine.Skeleton(skeletonData);
+		state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
+		state.setAnimation(0, "portal", true);
+		state.apply(skeleton);
+		skeleton.updateWorldTransform();
+		var offset = new spine.Vector2();
+		bounds = new spine.Vector2();
+		skeleton.getBounds(offset, bounds, []);
 
-			renderer.camera.position.x = offset.x + bounds.x + 200;
-			renderer.camera.position.y = offset.y + bounds.y / 2 + 100;
+		renderer.camera.position.x = offset.x + bounds.x + 200;
+		renderer.camera.position.y = offset.y + bounds.y / 2 + 100;
 
-			renderer.skeletonDebugRenderer.drawMeshHull = false;
-			renderer.skeletonDebugRenderer.drawMeshTriangles = false;
+		renderer.skeletonDebugRenderer.drawMeshHull = false;
+		renderer.skeletonDebugRenderer.drawMeshTriangles = false;
 
-			setupUI();
-
-			loadingComplete(canvas, render);
-		} else {
-			loadingScreen.draw();
-			requestAnimationFrame(load);
-		}
+		setupUI();
 	}
 
 	function setupUI() {
@@ -120,9 +110,10 @@ var clippingDemo = function(canvas, loadingComplete, bgColor) {
 		renderer.drawSkeleton(skeleton, true);
 		renderer.drawSkeletonDebug(skeleton, false, ["root"]);
 		renderer.end();
-
-		loadingScreen.draw(true);
 	}
 
+	clippingDemo.loadingComplete = loadingComplete;
+	clippingDemo.render = render;
+	clippingDemo.DEMO_NAME = DEMO_NAME;
 	init();
 };

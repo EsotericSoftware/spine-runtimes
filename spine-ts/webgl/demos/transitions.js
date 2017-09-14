@@ -5,7 +5,6 @@ var transitionsDemo = function(canvas, loadingComplete, bgColor) {
 	var skeleton, skeletonNoMix, state, stateNoMix, bounds;
 	var timeSlider, timeSliderLabel;
 	var timeKeeper;
-	var loadingScreen;
 
 	var DEMO_NAME = "TransitionsDemo";
 
@@ -29,34 +28,24 @@ var transitionsDemo = function(canvas, loadingComplete, bgColor) {
 
 		input = new spine.webgl.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();
-		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-
-		requestAnimationFrame(load);
 	}
 
-	function load () {
-		timeKeeper.update();
-		if (assetManager.isLoadingComplete(DEMO_NAME)) {
-			skeleton = loadSkeleton("spineboy");
-			skeletonNoMix = new spine.Skeleton(skeleton.data);
-			state = createState(0.25);
-			state.multipleMixing = true;
-			setAnimations(state, 0, 0);
-			stateNoMix = createState(0);
-			setAnimations(stateNoMix, -0.25, 0);
+	function loadingComplete () {
+		skeleton = loadSkeleton("spineboy");
+		skeletonNoMix = new spine.Skeleton(skeleton.data);
+		state = createState(0.25);
+		state.multipleMixing = true;
+		setAnimations(state, 0, 0);
+		stateNoMix = createState(0);
+		setAnimations(stateNoMix, -0.25, 0);
 
-			state.apply(skeleton);
-			skeleton.updateWorldTransform();
-			bounds = { offset: new spine.Vector2(), size: new spine.Vector2() };
-			skeleton.getBounds(bounds.offset, bounds.size, []);
-			setupInput();
-			$("#transitions-overlay").removeClass("overlay-hide");
-			$("#transitions-overlay").addClass("overlay");
-			loadingComplete(canvas, render);
-		} else {
-			loadingScreen.draw();
-			requestAnimationFrame(load);
-		}
+		state.apply(skeleton);
+		skeleton.updateWorldTransform();
+		bounds = { offset: new spine.Vector2(), size: new spine.Vector2() };
+		skeleton.getBounds(bounds.offset, bounds.size, []);
+		setupInput();
+		$("#transitions-overlay").removeClass("overlay-hide");
+		$("#transitions-overlay").addClass("overlay");
 	}
 
 	function setupInput() {
@@ -142,9 +131,10 @@ var transitionsDemo = function(canvas, loadingComplete, bgColor) {
 		skeletonNoMix.y = -100;
 		renderer.drawSkeleton(skeletonNoMix, true);
 		renderer.end();
-
-		loadingScreen.draw(true);
 	}
+
+	transitionsDemo.loadingComplete = loadingComplete;
+	transitionsDemo.render = render;
+	transitionsDemo.DEMO_NAME = DEMO_NAME;
 	init();
-	return render;
 };

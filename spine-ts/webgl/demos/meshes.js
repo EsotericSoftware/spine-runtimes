@@ -1,4 +1,4 @@
-var meshesDemo = function(canvas, loadingComplete, bgColor) {
+var meshesDemo = function(canvas, bgColor) {
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, bounds;
 	var timeKeeper, loadingScreen;
@@ -21,22 +21,14 @@ var meshesDemo = function(canvas, loadingComplete, bgColor) {
 		assetManager.loadText(DEMO_NAME, "atlas2.atlas");
 		assetManager.loadJson(DEMO_NAME, "demos.json");
 		timeKeeper = new spine.TimeKeeper();
-		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		requestAnimationFrame(load);
 	}
 
-	function load () {
+	function loadingComplete () {
 		timeKeeper.update();
-		if (assetManager.isLoadingComplete(DEMO_NAME)) {
-			skeletons["Orange Girl"] = loadSkeleton("orangegirl", "animation");
-			skeletons["Green Girl"] = loadSkeleton("greengirl", "animation");
-			skeletons["Armor Girl"] = loadSkeleton("armorgirl", "animation");
-			setupUI();
-			loadingComplete(canvas, render);
-		} else {
-			loadingScreen.draw();
-			requestAnimationFrame(load);
-		}
+		skeletons["Orange Girl"] = loadSkeleton("orangegirl", "animation");
+		skeletons["Green Girl"] = loadSkeleton("greengirl", "animation");
+		skeletons["Armor Girl"] = loadSkeleton("armorgirl", "animation");
+		setupUI();
 	}
 
 	function setupUI() {
@@ -157,9 +149,10 @@ var meshesDemo = function(canvas, loadingComplete, bgColor) {
 		renderer.drawSkeleton(skeleton, true);
 		renderer.drawSkeletonDebug(skeleton);
 		renderer.end();
-
-		loadingScreen.draw(true);
 	}
 
+	meshesDemo.loadingComplete = loadingComplete;
+	meshesDemo.render = render;
+	meshesDemo.DEMO_NAME = DEMO_NAME;
 	init();
 };

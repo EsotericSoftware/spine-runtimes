@@ -9,7 +9,7 @@
 <body>
 
 <center>
-<div id="canvas"></div>
+<div class="aspect"></div>
 <div id="vine-timeline" class="slider"></div>
 <input id="vine-playbutton" type="button" value="Pause"></input><br>
 <input id="vine-drawbones" type="checkbox"></input> Display bones &amp; path
@@ -17,9 +17,7 @@
 
 <script>
 spineDemos.init();
-var canvas = spineDemos.obtainCanvas();
-document.getElementById("canvas").appendChild(canvas);
-vineDemo(canvas, spineDemos.setupRendering);
+spineDemos.addDemo(vineDemo, document.getElementsByClassName("aspect")[0]);
 </script>
 
 </body>

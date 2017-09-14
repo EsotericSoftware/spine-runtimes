@@ -1,7 +1,7 @@
-var tankDemo = function(canvas, loadingComplete, bgColor) {
+var tankDemo = function(canvas, bgColor) {
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, state, offset, bounds;
-	var timeKeeper, loadingScreen;
+	var timeKeeper;
 	var playButton, timeLine, isPlaying = true, playTime = 0;
 
 	var DEMO_NAME = "TankDemo";
@@ -19,41 +19,32 @@ var tankDemo = function(canvas, loadingComplete, bgColor) {
 		assetManager.loadText(DEMO_NAME, "atlas2.atlas");
 		assetManager.loadJson(DEMO_NAME, "demos.json");
 		timeKeeper = new spine.TimeKeeper();
-		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		requestAnimationFrame(load);
 	}
 
-	function load () {
-		timeKeeper.update();
-		if (assetManager.isLoadingComplete(DEMO_NAME)) {
-			var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas2.atlas"), function(path) {
-				return assetManager.get(DEMO_NAME, path);
-			});
-			var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
-			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").tank);
-			skeleton = new spine.Skeleton(skeletonData);
-			state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
-			state.setAnimation(0, "drive", true);
-			state.apply(skeleton);
-			skeleton.updateWorldTransform();
-			offset = new spine.Vector2();
-			bounds = new spine.Vector2();
-			offset.x = -1204.22;
-			bounds.x = 1914.52;
-			bounds.y = 965.78;
-			// skeleton.getBounds(offset, bounds);
+	function loadingComplete () {
+		var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas2.atlas"), function(path) {
+			return assetManager.get(DEMO_NAME, path);
+		});
+		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+		var skeletonJson = new spine.SkeletonJson(atlasLoader);
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").tank);
+		skeleton = new spine.Skeleton(skeletonData);
+		state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
+		state.setAnimation(0, "drive", true);
+		state.apply(skeleton);
+		skeleton.updateWorldTransform();
+		offset = new spine.Vector2();
+		bounds = new spine.Vector2();
+		offset.x = -1204.22;
+		bounds.x = 1914.52;
+		bounds.y = 965.78;
+		// skeleton.getBounds(offset, bounds);
 
-			renderer.skeletonDebugRenderer.drawRegionAttachments = false;
-			renderer.skeletonDebugRenderer.drawMeshHull = false;
-			renderer.skeletonDebugRenderer.drawMeshTriangles = false;
+		renderer.skeletonDebugRenderer.drawRegionAttachments = false;
+		renderer.skeletonDebugRenderer.drawMeshHull = false;
+		renderer.skeletonDebugRenderer.drawMeshTriangles = false;
 
-			setupUI();
-			loadingComplete(canvas, render);
-		} else {
-			loadingScreen.draw();
-			requestAnimationFrame(load);
-		}
+		setupUI();
 	}
 
 	function setupUI() {
@@ -121,9 +112,10 @@ var tankDemo = function(canvas, loadingComplete, bgColor) {
 		renderer.drawSkeleton(skeleton, true);
 		renderer.drawSkeletonDebug(skeleton, true);
 		renderer.end();
-
-		loadingScreen.draw(true);
 	}
 
+	tankDemo.loadingComplete = loadingComplete;
+	tankDemo.render = render;
+	tankDemo.DEMO_NAME = DEMO_NAME;
 	init();
 };

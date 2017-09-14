@@ -1,4 +1,4 @@
-var skinsDemo = function(canvas, loadingComplete, bgColor) {
+var skinsDemo = function(canvas, bgColor) {
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, state, offset, bounds;
 	var timeKeeper, loadingScreen;
@@ -21,39 +21,30 @@ var skinsDemo = function(canvas, loadingComplete, bgColor) {
 		assetManager.loadJson(DEMO_NAME, "demos.json");
 		input = new spine.webgl.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();
-		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		requestAnimationFrame(load);
 	}
 
-	function load () {
-		timeKeeper.update();
-		if (assetManager.isLoadingComplete(DEMO_NAME)) {
-			var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "heroes.atlas"), function(path) {
-				return assetManager.get(DEMO_NAME, path);
-			});
-			var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
-			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").heroes);
-			skeleton = new spine.Skeleton(skeletonData);
-			skeleton.setSkinByName("Assassin");
-			var stateData = new spine.AnimationStateData(skeleton.data);
-			stateData.defaultMix = 0.2;
-			stateData.setMix("roll", "run", 0);
-			stateData.setMix("jump", "run2", 0);
-			state = new spine.AnimationState(stateData);
-			setupAnimations(state);
-			state.apply(skeleton);
-			skeleton.updateWorldTransform();
-			offset = new spine.Vector2();
-			bounds = new spine.Vector2();
-			skeleton.getBounds(offset, bounds, []);
-			setupUI();
-			setupInput();
-			loadingComplete(canvas, render);
-		} else {
-			loadingScreen.draw();
-			requestAnimationFrame(load);
-		}
+	function loadingComplete () {
+		var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "heroes.atlas"), function(path) {
+			return assetManager.get(DEMO_NAME, path);
+		});
+		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+		var skeletonJson = new spine.SkeletonJson(atlasLoader);
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").heroes);
+		skeleton = new spine.Skeleton(skeletonData);
+		skeleton.setSkinByName("Assassin");
+		var stateData = new spine.AnimationStateData(skeleton.data);
+		stateData.defaultMix = 0.2;
+		stateData.setMix("roll", "run", 0);
+		stateData.setMix("jump", "run2", 0);
+		state = new spine.AnimationState(stateData);
+		setupAnimations(state);
+		state.apply(skeleton);
+		skeleton.updateWorldTransform();
+		offset = new spine.Vector2();
+		bounds = new spine.Vector2();
+		skeleton.getBounds(offset, bounds, []);
+		setupUI();
+		setupInput();
 	}
 
 	function setupInput (){
@@ -213,9 +204,10 @@ var skinsDemo = function(canvas, loadingComplete, bgColor) {
 		var height = scale * texture.getImage().height;
 		renderer.drawTexture(texture, offset.x + bounds.x + 190, offset.y + bounds.y / 2 - height / 2 - 5, width, height);
 		renderer.end();
-
-		loadingScreen.draw(true);
 	}
 
+	skinsDemo.loadingComplete = loadingComplete;
+	skinsDemo.render = render;
+	skinsDemo.DEMO_NAME = DEMO_NAME;
 	init();
 };

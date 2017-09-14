@@ -9,7 +9,7 @@
 <body>
 
 <center>
-<div id="canvas"></div>
+<div class="aspect"></div>
 <div id="clipping-playbutton"></div>
 <div id="clipping-timeline" class="slider"></div>
 <input id="clipping-drawtriangles" type="checkbox"></input> Draw triangles
@@ -17,9 +17,7 @@
 
 <script>
 spineDemos.init();
-var canvas = spineDemos.obtainCanvas();
-document.getElementById("canvas").appendChild(canvas);
-clippingDemo(canvas, spineDemos.setupRendering);
+spineDemos.addDemo(clippingDemo, document.getElementsByClassName("aspect")[0]);
 </script>
 
 </body>

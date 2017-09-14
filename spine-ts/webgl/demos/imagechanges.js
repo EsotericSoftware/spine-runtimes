@@ -1,4 +1,4 @@
-var imageChangesDemo = function(canvas, loadingComplete, bgColor) {
+var imageChangesDemo = function(canvas, bgColor) {
 	var OUTLINE_COLOR = new spine.Color(0, 0.8, 0, 1);
 
 	var canvas, gl, renderer, input, assetManager;
@@ -23,21 +23,12 @@ var imageChangesDemo = function(canvas, loadingComplete, bgColor) {
 		assetManager.loadText(DEMO_NAME, "atlas1.atlas");
 		assetManager.loadJson(DEMO_NAME, "demos.json");
 		timeKeeper = new spine.TimeKeeper();
-		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		requestAnimationFrame(load);
 	}
 
-	function load () {
-		timeKeeper.update();
-		if (assetManager.isLoadingComplete(DEMO_NAME)) {
-			skeletons["Alien"] = loadSkeleton("alien", "death", ["head", "splat-fg", "splat-bg"]);
-			skeletons["Dragon"] = loadSkeleton("dragon", "flying", ["R_wing"])
-			setupUI();
-			loadingComplete(canvas, render);
-		} else {
-			loadingScreen.draw();
-			requestAnimationFrame(load);
-		}
+	function loadingComplete () {
+		skeletons["Alien"] = loadSkeleton("alien", "death", ["head", "splat-fg", "splat-bg"]);
+		skeletons["Dragon"] = loadSkeleton("dragon", "flying", ["R_wing"])
+		setupUI();
 	}
 
 	function setupUI() {
@@ -197,9 +188,10 @@ var imageChangesDemo = function(canvas, loadingComplete, bgColor) {
 		}
 
 		renderer.end();
-
-		loadingScreen.draw(true);
 	}
 
+	imageChangesDemo.loadingComplete = loadingComplete;
+	imageChangesDemo.render = render;
+	imageChangesDemo.DEMO_NAME = DEMO_NAME;
 	init();
 };
