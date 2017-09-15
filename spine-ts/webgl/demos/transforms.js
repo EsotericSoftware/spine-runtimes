@@ -1,4 +1,4 @@
-var transformsDemo = function(loadingComplete, bgColor) {
+var transformsDemo = function(canvas, bgColor) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -6,7 +6,7 @@ var transformsDemo = function(loadingComplete, bgColor) {
 
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, state, bounds;
-	var timeKeeper, loadingScreen;
+	var timeKeeper;
 	var rotateHandle;
 	var target = null;
 	var hoverTargets = [null, null, null];
@@ -20,13 +20,8 @@ var transformsDemo = function(loadingComplete, bgColor) {
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
-		canvas = document.getElementById("transforms-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });
-		if (!gl) {
-			alert('WebGL is unavailable.');
-			return;
-		}
+		gl = canvas.ctx.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = spineDemos.assetManager;
@@ -36,45 +31,35 @@ var transformsDemo = function(loadingComplete, bgColor) {
 		assetManager.loadJson(DEMO_NAME, "demos.json");
 		input = new spine.webgl.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();
-		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		requestAnimationFrame(load);
 	}
 
-	function load () {
-		timeKeeper.update();
-		if (assetManager.isLoadingComplete(DEMO_NAME)) {
-			var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas2.atlas"), function(path) {
-				return assetManager.get(DEMO_NAME, path);
-			});
-			var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
-			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").transforms);
-			skeleton = new spine.Skeleton(skeletonData);
-			skeleton.setToSetupPose();
-			skeleton.updateWorldTransform();
-			var offset = new spine.Vector2();
-			bounds = new spine.Vector2();
-			skeleton.getBounds(offset, bounds, []);
-			state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
-			skeleton.setToSetupPose();
-			skeleton.updateWorldTransform();
-			rotateHandle = skeleton.findBone("rotate-handle");
+	function loadingComplete () {
+		var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas2.atlas"), function(path) {
+			return assetManager.get(DEMO_NAME, path);
+		});
+		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+		var skeletonJson = new spine.SkeletonJson(atlasLoader);
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").transforms);
+		skeleton = new spine.Skeleton(skeletonData);
+		skeleton.setToSetupPose();
+		skeleton.updateWorldTransform();
+		var offset = new spine.Vector2();
+		bounds = new spine.Vector2();
+		skeleton.getBounds(offset, bounds, []);
+		state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
+		skeleton.setToSetupPose();
+		skeleton.updateWorldTransform();
+		rotateHandle = skeleton.findBone("rotate-handle");
 
-			renderer.camera.position.x = offset.x + bounds.x / 2;
-			renderer.camera.position.y = offset.y + bounds.y / 2;
+		renderer.camera.position.x = offset.x + bounds.x / 2;
+		renderer.camera.position.y = offset.y + bounds.y / 2;
 
-			renderer.skeletonDebugRenderer.drawRegionAttachments = false;
-			renderer.skeletonDebugRenderer.drawMeshHull = false;
-			renderer.skeletonDebugRenderer.drawMeshTriangles = false;
+		renderer.skeletonDebugRenderer.drawRegionAttachments = false;
+		renderer.skeletonDebugRenderer.drawMeshHull = false;
+		renderer.skeletonDebugRenderer.drawMeshTriangles = false;
 
-			setupUI();
-			setupInput();
-
-			loadingComplete(canvas, render);
-		} else {
-			loadingScreen.draw();
-			requestAnimationFrame(load);
-		}
+		setupUI();
+		setupInput();
 	}
 
 	function setupUI() {
@@ -183,9 +168,10 @@ var transformsDemo = function(loadingComplete, bgColor) {
 		}
 		gl.lineWidth(1);
 		renderer.end();
-
-		loadingScreen.draw(true);
 	}
 
+	transformsDemo.loadingComplete = loadingComplete;
+	transformsDemo.render = render;
+	transformsDemo.DEMO_NAME = DEMO_NAME;
 	init();
 };

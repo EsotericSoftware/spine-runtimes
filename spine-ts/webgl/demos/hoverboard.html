@@ -9,12 +9,16 @@
 <body>
 
 <center>
-<div class="aspect"><div><canvas id="hoverboard-canvas"></canvas></div></div>
-<input id="hoverboard-drawbones" type="checkbox"></input> Display Bones
+<div class="aspect"></div>
+<input id="hoverboard-drawbones" type="checkbox"></input> Display Bones<br>
+<input id="hoverboard-aim" type="checkbox"></input> Aim<br>
+<button id="hoverboard-shoot">Shoot</button>
+<button id="hoverboard-jump">Jump</button>
 </center>
 
 <script>
-hoverboardDemo(spineDemos.setupRendering);
+spineDemos.init();
+spineDemos.addDemo(hoverboardDemo, document.getElementsByClassName("aspect")[0]);
 </script>
 
 </body>

@@ -9,16 +9,16 @@
 <body>
 
 <center>
-<div class="aspect"><div><canvas id="spritesheets-canvas"></canvas></div></div>
+<div class="aspect"></div>
 <button id="spritesheets-roar">Roar</button>
 <button id="spritesheets-jump">Jump</button><br>
 Time multiplier
 <div id="spritesheets-timeslider" class="slider filled"></div>
 </center>
 
-<script>	
-spineDemos.loadSliders();
-spritesheetsDemo(spineDemos.setupRendering);
+<script>
+spineDemos.init();
+spineDemos.addDemo(spritesheetsDemo, document.getElementsByClassName("aspect")[0]);
 </script>
 
 </body>

@@ -31,8 +31,6 @@
 #ifndef SPINE_SHAREDLIB_H
 #define SPINE_SHAREDLIB_H
 
-#define SP_API
-
 #ifdef _WIN32
 	#define DLLIMPORT __declspec(dllimport)
 	#define DLLEXPORT __declspec(dllexport)
@@ -43,6 +41,8 @@
 
 #ifdef SPINEPLUGIN_API
 	#define SP_API SPINEPLUGIN_API
+#else
+	#define SP_API
 #endif
 
 #endif /* SPINE_SHAREDLIB_H */

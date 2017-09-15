@@ -9,15 +9,15 @@
 <body>
 
 <center>
-<div class="aspect"><div><canvas id="vine-canvas"></canvas></div></div>
+<div class="aspect"></div>
 <div id="vine-timeline" class="slider"></div>
 <input id="vine-playbutton" type="button" value="Pause"></input><br>
 <input id="vine-drawbones" type="checkbox"></input> Display bones &amp; path
 </center>
 
-<script>	
-spineDemos.loadSliders();
-vineDemo(spineDemos.setupRendering);
+<script>
+spineDemos.init();
+spineDemos.addDemo(vineDemo, document.getElementsByClassName("aspect")[0]);
 </script>
 
 </body>

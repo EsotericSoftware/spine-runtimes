@@ -1,4 +1,4 @@
-var imageChangesDemo = function(loadingComplete, bgColor) {
+var imageChangesDemo = function(canvas, bgColor) {
 	var OUTLINE_COLOR = new spine.Color(0, 0.8, 0, 1);
 
 	var canvas, gl, renderer, input, assetManager;
@@ -13,13 +13,8 @@ var imageChangesDemo = function(loadingComplete, bgColor) {
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
-		canvas = document.getElementById("imagechanges-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });
-		if (!gl) {
-			alert('WebGL is unavailable.');
-			return;
-		}
+		gl = canvas.ctx.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = spineDemos.assetManager;
@@ -28,21 +23,12 @@ var imageChangesDemo = function(loadingComplete, bgColor) {
 		assetManager.loadText(DEMO_NAME, "atlas1.atlas");
 		assetManager.loadJson(DEMO_NAME, "demos.json");
 		timeKeeper = new spine.TimeKeeper();
-		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		requestAnimationFrame(load);
 	}
 
-	function load () {
-		timeKeeper.update();
-		if (assetManager.isLoadingComplete(DEMO_NAME)) {
-			skeletons["Alien"] = loadSkeleton("alien", "death", ["head", "splat01"]);
-			skeletons["Dragon"] = loadSkeleton("dragon", "flying", ["R_wing"])
-			setupUI();
-			loadingComplete(canvas, render);
-		} else {
-			loadingScreen.draw();
-			requestAnimationFrame(load);
-		}
+	function loadingComplete () {
+		skeletons["Alien"] = loadSkeleton("alien", "death", ["head", "splat-fg", "splat-bg"]);
+		skeletons["Dragon"] = loadSkeleton("dragon", "flying", ["R_wing"])
+		setupUI();
 	}
 
 	function setupUI() {
@@ -107,11 +93,11 @@ var imageChangesDemo = function(loadingComplete, bgColor) {
 
 		var regions = [];
 		for(var i = 0; i < sequenceSlots.length; i++) {
-			var slot = sequenceSlots[i];
-			var index = skeleton.findSlotIndex(slot);
-			for (var name in skeleton.skin.attachments[index]) {
+			var slot = skeleton.findSlot(sequenceSlots[i]);
+			sequenceSlots[i] = slot;
+			var index = slot.data.index;
+			for (var name in skeleton.skin.attachments[index])
 				regions.push(skeleton.skin.attachments[index][name]);
-			}
 		}
 
 		return {
@@ -138,17 +124,19 @@ var imageChangesDemo = function(loadingComplete, bgColor) {
 		var offset = active.bounds.offset;
 		var size = active.bounds.size;
 
-		var x = offset.x + size.x + 100, offsetY = offset.y;
+		var x = offset.x + size.x + 100, offsetY = offset.y, zoom = 1;
 		if (activeSkeleton === "Alien") {
-			renderer.camera.position.x = offset.x + size.x;
-			renderer.camera.position.y = offset.y + size.y / 2;
+			renderer.camera.position.x = offset.x + size.x + 400;
+			renderer.camera.position.y = offset.y + size.y / 2 + 450;
+			x += 400;
+			zoom = 0.31;
 		} else {
 			renderer.camera.position.x = offset.x + size.x;
 			renderer.camera.position.y = offset.y + size.y / 2;
 			x += 100;
 		}
-		renderer.camera.viewportWidth = size.x * 2.4;
-		renderer.camera.viewportHeight = size.y * 1.4;
+		renderer.camera.viewportWidth = size.x * 2.4 / zoom;
+		renderer.camera.viewportHeight = size.y * 1.4 / zoom;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
 
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
@@ -175,34 +163,21 @@ var imageChangesDemo = function(loadingComplete, bgColor) {
 		var slotSize = size.y / 3;
 		var maxSlotWidth = 0;
 		var j = 0;
-		for (var i = 0; i < active.regions.length; i++) {
+		for (var i = 0, n = active.regions.length; i < n; i++) {
 			var region = active.regions[i].region;
-			var scale = Math.min(slotSize / region.height, slotSize / region.width);
+			var scale = Math.min(slotSize / region.height, slotSize / region.width) / zoom;
 			renderer.drawRegion(region, x,  y, region.width * scale, region.height * scale);
 
-			var isVisible = false;
 			for (var ii = 0; ii < active.slots.length; ii++) {
-				var slotName = active.slots[ii];
-				var slotIndex = skeleton.findSlotIndex(slotName);
-
-				for (var iii = 0; iii < skeleton.drawOrder.length; iii++) {
-					var slot = skeleton.drawOrder[iii];
-					if (slot.data.index == slotIndex) {
-						if (slot.attachment != null) {
-							if (slot.attachment.name === active.regions[i].name) {
-								isVisible = true;
-								break;
-							}
-						}
-					}
+				var slot = active.slots[ii];
+				if (slot.attachment && slot.attachment.name === region.name) {
+					renderer.rect(false, x, y, region.width * scale, region.height * scale, OUTLINE_COLOR);
+					break;
 				}
-				if (isVisible) break;
 			}
 
-			if (isVisible) renderer.rect(false, x, y, region.width * scale, region.height * scale, OUTLINE_COLOR);
-
 			maxSlotWidth = Math.max(maxSlotWidth, region.width * scale);
-			y += slotSize;
+			y += slotSize / zoom + 2;
 			j++;
 			if (j == 3) {
 				x += maxSlotWidth + 10;
@@ -213,9 +188,10 @@ var imageChangesDemo = function(loadingComplete, bgColor) {
 		}
 
 		renderer.end();
-
-		loadingScreen.draw(true);
 	}
 
+	imageChangesDemo.loadingComplete = loadingComplete;
+	imageChangesDemo.render = render;
+	imageChangesDemo.DEMO_NAME = DEMO_NAME;
 	init();
 };

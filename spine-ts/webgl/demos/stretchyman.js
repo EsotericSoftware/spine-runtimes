@@ -1,4 +1,4 @@
-var stretchymanDemo = function(loadingComplete, bgColor) {
+var stretchymanDemo = function(canvas, bgColor) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -26,13 +26,8 @@ var stretchymanDemo = function(loadingComplete, bgColor) {
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
-		canvas = document.getElementById("stretchyman-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });
-		if (!gl) {
-			alert('WebGL is unavailable.');
-			return;
-		}
+		gl = canvas.ctx.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = spineDemos.assetManager;
@@ -42,43 +37,33 @@ var stretchymanDemo = function(loadingComplete, bgColor) {
 		assetManager.loadText(DEMO_NAME, "atlas2.atlas");
 		assetManager.loadJson(DEMO_NAME, "demos.json");
 		timeKeeper = new spine.TimeKeeper();
-		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		requestAnimationFrame(load);
 	}
 
-	function load () {
-		timeKeeper.update();
-		if (assetManager.isLoadingComplete(DEMO_NAME)) {
-			var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas2.atlas"), function(path) {
-				return assetManager.get(DEMO_NAME, path);
-			});
-			var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
-			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").stretchyman);
-			skeleton = new spine.Skeleton(skeletonData);
-			skeleton.setToSetupPose();
-			skeleton.updateWorldTransform();
-			var offset = new spine.Vector2();
-			bounds = new spine.Vector2();
-			skeleton.getBounds(offset, bounds, []);
-			for (var i = 0; i < controlBones.length; i++) hoverTargets.push(null);
-			state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
-			state.setAnimation(0, "idle", true);
+	function loadingComplete () {
+		var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas2.atlas"), function(path) {
+			return assetManager.get(DEMO_NAME, path);
+		});
+		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+		var skeletonJson = new spine.SkeletonJson(atlasLoader);
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").stretchyman);
+		skeleton = new spine.Skeleton(skeletonData);
+		skeleton.setToSetupPose();
+		skeleton.updateWorldTransform();
+		var offset = new spine.Vector2();
+		bounds = new spine.Vector2();
+		skeleton.getBounds(offset, bounds, []);
+		for (var i = 0; i < controlBones.length; i++) hoverTargets.push(null);
+		state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
+		state.setAnimation(0, "idle", true);
 
-			renderer.camera.position.x = offset.x + bounds.x / 2;
-			renderer.camera.position.y = offset.y + bounds.y / 2;
+		renderer.camera.position.x = offset.x + bounds.x / 2;
+		renderer.camera.position.y = offset.y + bounds.y / 2;
 
-			renderer.skeletonDebugRenderer.drawMeshHull = false;
-			renderer.skeletonDebugRenderer.drawMeshTriangles = false;
+		renderer.skeletonDebugRenderer.drawMeshHull = false;
+		renderer.skeletonDebugRenderer.drawMeshTriangles = false;
 
-			setupUI();
-			setupInput();
-
-			loadingComplete(canvas, render);
-		} else {
-			loadingScreen.draw();
-			requestAnimationFrame(load);
-		}
+		setupUI();
+		setupInput();
 	}
 
 	function setupUI() {
@@ -194,9 +179,10 @@ var stretchymanDemo = function(loadingComplete, bgColor) {
 		}
 		renderer.end();
 		gl.lineWidth(1);
-
-		loadingScreen.draw(true);
 	}
 
+	stretchymanDemo.loadingComplete = loadingComplete;
+	stretchymanDemo.render = render;
+	stretchymanDemo.DEMO_NAME = DEMO_NAME;
 	init();
 };

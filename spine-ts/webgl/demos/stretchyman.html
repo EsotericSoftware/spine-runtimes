@@ -9,12 +9,13 @@
 <body>
 
 <center>
-<div class="aspect"><div><canvas id="stretchyman-canvas"></canvas></div></div>
+<div class="aspect"></div>
 <input id="stretchyman-drawbones" type="checkbox"></input> Display bones
 </center>
 
 <script>
-stretchymanDemo(spineDemos.setupRendering);
+spineDemos.init();
+spineDemos.addDemo(stretchymanDemo, document.getElementsByClassName("aspect")[0]);
 </script>
 
 </body>

@@ -1,6 +1,5 @@
 body, html {
 	margin: 0;
-	height: 100%;
 	font-family: Tahoma;
 	font-size: 11pt;
 }
@@ -12,16 +11,10 @@ br {
 	content: "";
 	margin-top: 15px;
 }
-.aspect {
-	margin-bottom: 15px;
-	max-width: 800px;
-	text-align: center;
+h2 {
+	padding-top: 1em;
 }
-.aspect div {
-	position: relative;
-	padding-bottom: 70.14%;
-}
-.aspect canvas {
+canvas {
 	position: absolute;
 	top: 0;
 	bottom: 0;
@@ -29,8 +22,49 @@ br {
 	right: 0;
 	width: 100%;
 	height: 100%;
-	border: 1px solid black;
 }
+
+.aspect {
+	position: relative;
+	width: 100%;
+}
+
+.demo {
+	clear: both;
+}
+.demo-container {
+	float: left;
+	width: 58%;
+}
+.demo-text {
+	float: left;
+	width: 38%;
+	margin-left: 2%;
+	margin-right: 2%;
+}
+
+.timeline, .timeline td:nth-child(2) {
+	width: 100%;
+}
+
+.play {
+	background: black;
+	background-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%3E%3Cpath%20fill%3D%27%23F2F2F2%27%20d%3D%27M30.185%2C15.5L12.556%2C24.8V6.201L30.185%2C15.5z%27%2F%3E%3C%2Fsvg%3E");
+	width: 40px;
+	height: 30px;
+}
+.pause {
+	background: black;
+	background-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%3E%3Cpath%20fill%3D%22%23F2F2F2%22%20d%3D%22M26.94%2C6.978v17.045h-5.249V6.978H26.94z%22%2F%3E%3Cpath%20fill%3D%22%23F2F2F2%22%20d%3D%22M18.975%2C6.978v17.045h-5.249V6.978H18.975z%22%2F%3E%3C%2Fsvg%3E");
+	width: 40px;
+	height: 30px;
+	margin: 0;
+}
+
+.checkbox {
+	display: inline;
+}
+
 .slider {
 	width: 100%;
 	max-width: 800px;
@@ -38,12 +72,13 @@ br {
 	text-align: left;
 	transform: translateZ(0);
 	background: #222;
+	display: inline-block;
 }
 .slider, .slider.filled span {
 	height: 15px;
 	border: 1px solid #c5c5c5;
 }
-.slider div {	
+.slider div {
 	position: absolute;
 	top: -2px;
 	width: 10px;
@@ -56,7 +91,7 @@ br {
 .slider.filled {
 	border: 0;
 }
-.slider.filled div {	
+.slider.filled div {
 	top: -1px;
 	margin-left: 1px;
 }
@@ -72,4 +107,16 @@ br {
 	background: #222;
 	border-top-right-radius: 3px;
 	border-bottom-right-radius: 3px;
+}
+
+.overlay {
+	opacity: 1;
+	transition: opacity 0.5s ease;
+	z-index: 10;
+}
+.overlay-hide {
+	opacity: 0;
+}
+.overlay-label {
+	display: none;
 }
