@@ -37,34 +37,37 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 		requestAnimationFrame(loop);
 		var demos = spineDemos.demos;
 		for (var i = 0; i < demos.length; i++) {
-			var demo = demos[i];
-			var canvas = demo.canvas;
+			var demo = demos[i];			
 
 			checkElementVisible(demo);
+			renderDemo(demo);
+		}
+	}
 
-			if (!spineDemos.assetManager.isLoadingComplete(demo.DEMO_NAME)) {
-				if (demo.visible) {
-					if (canvas.parentElement != demo.placeholder) {
-						$(canvas).detach();
-						demo.placeholder.appendChild(canvas);
-					}
-					demo.loadingScreen.draw();
+	function renderDemo(demo) {
+		var canvas = demo.canvas;
+		if (!spineDemos.assetManager.isLoadingComplete(demo.DEMO_NAME)) {
+			if (demo.visible) {
+				if (canvas.parentElement != demo.placeholder) {
+					$(canvas).detach();
+					demo.placeholder.appendChild(canvas);
 				}
-			} else {
-				if (!demo.loaded) {
-					demo.loadingComplete();
-					demo.loaded = true;
-				}
+				demo.loadingScreen.draw();
+			}
+		} else {
+			if (!demo.loaded) {
+				demo.loadingComplete();
+				demo.loaded = true;
+			}
 
-				if (demo.visible) {
-					if (canvas.parentElement != demo.placeholder) {
-						$(canvas).detach();
-						demo.placeholder.appendChild(canvas);
-					}
-					if (spineDemos.log) console.log("Rendering " + canvas.id);
-					demo.render();
-					demo.loadingScreen.draw(true);
+			if (demo.visible) {
+				if (canvas.parentElement != demo.placeholder) {
+					$(canvas).detach();
+					demo.placeholder.appendChild(canvas);
 				}
+				if (spineDemos.log) console.log("Rendering " + canvas.id);
+				demo.render();
+				demo.loadingScreen.draw(true);
 			}
 		}
 	}
@@ -73,8 +76,8 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 		const rect = demo.placeholder.getBoundingClientRect();
 		const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
 		const windowWidth = (window.innerWidth || document.documentElement.clientWidth);
-		const vertInView = (rect.top <= windowHeight) && ((rect.top + rect.height) >= 0);
-		const horInView = (rect.left <= windowWidth) && ((rect.left + rect.width) >= 0);
+		const vertInView = (rect.top <= windowHeight * 1.1) && ((rect.top + rect.height) >= windowHeight * -0.1);
+		const horInView = (rect.left <= windowWidth * 1.1) && ((rect.left + rect.width) >= windowWidth * -0.1);
 
 		demo.visible = (vertInView && horInView);
 	}
@@ -109,6 +112,7 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 		demo.loadingScreen = new spine.webgl.LoadingScreen(renderer);
 		$(window).on('DOMContentLoaded load resize scroll', function() {
 			checkElementVisible(demo);
+			renderDemo(demo);
 		});
 		checkElementVisible(demo);
 		spineDemos.demos.push(demo);
