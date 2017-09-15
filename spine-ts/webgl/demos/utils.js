@@ -8,6 +8,27 @@ var spineDemos = {
 	loopRunning: false,
 	canvases: []
 };
+
+window.onerror = function (msg, url, lineNo, columnNo, error) {
+    var string = msg.toLowerCase();
+    var substring = "script error";
+    if (string.indexOf(substring) > -1){
+        alert('Script Error: See Browser Console for Detail');
+    } else {
+        var message = [
+            'Message: ' + msg,
+            'URL: ' + url,
+            'Line: ' + lineNo,
+            'Column: ' + columnNo,
+            'Error object: ' + JSON.stringify(error)
+        ].join(' - ');
+
+        alert(message);
+    }
+
+    return false;
+};
+
 (function () {
 	var timeKeeper = new spine.TimeKeeper();
 	function loop () {
@@ -61,14 +82,19 @@ var spineDemos = {
 	function createCanvases (numCanvases) {
 		for (var i = 0; i < numCanvases; i++) {
 			var canvas = document.createElement("canvas");
+			canvas.width = 1; canvas.height = 1;
 			canvas.ctx = new spine.webgl.ManagedWebGLRenderingContext(canvas, { alpha: false });
-			canvas.id = "canvas-" + i;
+			canvas.id = "canvas-" + i;		
 			spineDemos.canvases.push(canvas);
 		}
 	}
 
 	spineDemos.init = function () {
-		createCanvases(4);
+		var numCanvases = 5;
+		var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+		var isAndroid = navigator.userAgent.toLowerCase().indexOf("android") > -1;
+		if (isFirefox && isAndroid) numCanvases = 2;
+		createCanvases(numCanvases);
 		loadSliders();
 		requestAnimationFrame(loop);
 	}
