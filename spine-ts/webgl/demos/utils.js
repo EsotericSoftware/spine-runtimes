@@ -68,7 +68,7 @@ var spineDemos = {
 	}
 
 	spineDemos.init = function () {
-		createCanvases(3);
+		createCanvases(4);
 		loadSliders();
 		requestAnimationFrame(loop);
 	}
