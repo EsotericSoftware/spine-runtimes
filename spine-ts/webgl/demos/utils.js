@@ -19,6 +19,8 @@ var spineDemos = {
 			var demo = demos[i];
 			var canvas = demo.canvas;
 
+			checkElementVisible(demo);
+
 			if (!spineDemos.assetManager.isLoadingComplete(demo.DEMO_NAME)) {
 				if (demo.visible) {
 					if (canvas.parentElement != demo.placeholder) {
