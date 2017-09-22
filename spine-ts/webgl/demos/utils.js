@@ -8,6 +8,27 @@ var spineDemos = {
 	loopRunning: false,
 	canvases: []
 };
+
+window.onerror = function (msg, url, lineNo, columnNo, error) {
+    var string = msg.toLowerCase();
+    var substring = "script error";
+    if (string.indexOf(substring) > -1){
+        alert('Script Error: See Browser Console for Detail');
+    } else {
+        var message = [
+            'Message: ' + msg,
+            'URL: ' + url,
+            'Line: ' + lineNo,
+            'Column: ' + columnNo,
+            'Error object: ' + JSON.stringify(error)
+        ].join(' - ');
+
+        alert(message);
+    }
+
+    return false;
+};
+
 (function () {
 	var timeKeeper = new spine.TimeKeeper();
 	function loop () {
@@ -16,32 +37,37 @@ var spineDemos = {
 		requestAnimationFrame(loop);
 		var demos = spineDemos.demos;
 		for (var i = 0; i < demos.length; i++) {
-			var demo = demos[i];
-			var canvas = demo.canvas;
+			var demo = demos[i];			
 
-			if (!spineDemos.assetManager.isLoadingComplete(demo.DEMO_NAME)) {
-				if (demo.visible) {
-					if (canvas.parentElement != demo.placeholder) {
-						$(canvas).detach();
-						demo.placeholder.appendChild(canvas);
-					}
-					demo.loadingScreen.draw();
-				}
-			} else {
-				if (!demo.loaded) {
-					demo.loadingComplete();
-					demo.loaded = true;
-				}
+			checkElementVisible(demo);
+			renderDemo(demo);
+		}
+	}
 
-				if (demo.visible) {
-					if (canvas.parentElement != demo.placeholder) {
-						$(canvas).detach();
-						demo.placeholder.appendChild(canvas);
-					}
-					if (spineDemos.log) console.log("Rendering " + canvas.id);
-					demo.render();
-					demo.loadingScreen.draw(true);
+	function renderDemo(demo) {
+		var canvas = demo.canvas;
+		if (!spineDemos.assetManager.isLoadingComplete(demo.DEMO_NAME)) {
+			if (demo.visible) {
+				if (canvas.parentElement != demo.placeholder) {
+					$(canvas).detach();
+					demo.placeholder.appendChild(canvas);
 				}
+				demo.loadingScreen.draw();
+			}
+		} else {
+			if (!demo.loaded) {
+				demo.loadingComplete();
+				demo.loaded = true;
+			}
+
+			if (demo.visible) {
+				if (canvas.parentElement != demo.placeholder) {
+					$(canvas).detach();
+					demo.placeholder.appendChild(canvas);
+				}
+				if (spineDemos.log) console.log("Rendering " + canvas.id);
+				demo.render();
+				demo.loadingScreen.draw(true);
 			}
 		}
 	}
@@ -50,8 +76,8 @@ var spineDemos = {
 		const rect = demo.placeholder.getBoundingClientRect();
 		const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
 		const windowWidth = (window.innerWidth || document.documentElement.clientWidth);
-		const vertInView = (rect.top <= windowHeight) && ((rect.top + rect.height) >= 0);
-		const horInView = (rect.left <= windowWidth) && ((rect.left + rect.width) >= 0);
+		const vertInView = (rect.top <= windowHeight * 1.1) && ((rect.top + rect.height) >= windowHeight * -0.1);
+		const horInView = (rect.left <= windowWidth * 1.1) && ((rect.left + rect.width) >= windowWidth * -0.1);
 
 		demo.visible = (vertInView && horInView);
 	}
@@ -59,14 +85,19 @@ var spineDemos = {
 	function createCanvases (numCanvases) {
 		for (var i = 0; i < numCanvases; i++) {
 			var canvas = document.createElement("canvas");
+			canvas.width = 1; canvas.height = 1;
 			canvas.ctx = new spine.webgl.ManagedWebGLRenderingContext(canvas, { alpha: false });
-			canvas.id = "canvas-" + i;
+			canvas.id = "canvas-" + i;		
 			spineDemos.canvases.push(canvas);
 		}
 	}
 
 	spineDemos.init = function () {
-		createCanvases(3);
+		var numCanvases = 5;
+		var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+		var isAndroid = navigator.userAgent.toLowerCase().indexOf("android") > -1;
+		if (isFirefox && isAndroid) numCanvases = 2;
+		createCanvases(numCanvases);
 		loadSliders();
 		requestAnimationFrame(loop);
 	}
@@ -81,6 +112,7 @@ var spineDemos = {
 		demo.loadingScreen = new spine.webgl.LoadingScreen(renderer);
 		$(window).on('DOMContentLoaded load resize scroll', function() {
 			checkElementVisible(demo);
+			renderDemo(demo);
 		});
 		checkElementVisible(demo);
 		spineDemos.demos.push(demo);

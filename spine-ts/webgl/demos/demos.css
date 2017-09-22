@@ -29,6 +29,11 @@ canvas {
 	width: 100%;
 }
 
+.standalone {
+	width: 640px;
+	height: 480px;
+}
+
 .demo {
 	clear: both;
 }
