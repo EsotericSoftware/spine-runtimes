@@ -457,6 +457,10 @@ public class Skeleton {
 	 * <p>
 	 * Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no
 	 * old skin, each slot's setup mode attachment is attached from the new skin.
+	 * <p>
+	 * After changing the skin, the visible attachments can be reset to those attached in the setup pose by calling
+	 * {@link #setSlotsToSetupPose()}. Also, often {@link AnimationState#apply(Skeleton)} is called before the next time the
+	 * skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin.
 	 * @param newSkin May be null. */
 	public void setSkin (Skin newSkin) {
 		if (newSkin != null) {
