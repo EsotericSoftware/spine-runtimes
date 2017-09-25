@@ -216,6 +216,7 @@ cp -f ../raptor/export/raptor.png ../../spine-ts/webgl/example/assets/
 cp -f ../spineboy/export/spineboy-ess.json ../../spine-ts/webgl/example/assets/
 cp -f ../spineboy/export/spineboy.atlas ../../spine-ts/webgl/example/assets/
 cp -f ../spineboy/export/spineboy.png ../../spine-ts/webgl/example/assets/
+cp -f ../spineboy/export/spineboy-pma.png ../../spine-ts/webgl/example/assets/
 
 cp -f ../tank/export/tank-pro.json ../../spine-ts/webgl/example/assets/
 cp -f ../tank/export/tank.atlas ../../spine-ts/webgl/example/assets/
