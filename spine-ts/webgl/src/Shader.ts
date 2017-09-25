@@ -39,7 +39,9 @@ module spine.webgl {
 
 		private context: ManagedWebGLRenderingContext;
 		private vs: WebGLShader = null;
+		private vsSource: string;
 		private fs: WebGLShader = null;
+		private fsSource: string;
 		private program: WebGLProgram = null;
 		private tmp2x2: Float32Array = new Float32Array(2 * 2);
 		private tmp3x3: Float32Array = new Float32Array(3 * 3);
@@ -48,8 +50,12 @@ module spine.webgl {
 		public getProgram () { return this.program; }
 		public getVertexShader () { return this.vertexShader; }
 		public getFragmentShader () { return this.fragmentShader; }
+		public getVertexShaderSource () { return this.vsSource; }
+		public getFragmentSource () { return this.fsSource; }
 
 		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, private vertexShader: string, private fragmentShader: string) {
+			this.vsSource = vertexShader;
+			this.fsSource = fragmentShader;
 			this.context = context instanceof ManagedWebGLRenderingContext? context : new ManagedWebGLRenderingContext(context);
 			this.context.addRestorable(this);
 			this.compile();
