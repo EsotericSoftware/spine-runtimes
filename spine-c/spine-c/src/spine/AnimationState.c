@@ -904,7 +904,9 @@ spTrackEntry* _spTrackEntry_setTimelineData(spTrackEntry* self, spTrackEntry* to
 	spTrackEntryArray_clear(self->timelineDipMix);
 	timelineDipMix = spTrackEntryArray_setSize(self->timelineDipMix, timelinesCount)->items;
 
-	for (i = 0; i < timelinesCount; i++) {
+	i = 0;
+	continue_outer:
+	for (; i < timelinesCount; i++) {
 		int id = spTimeline_getPropertyId(timelines[i]);
 		if (!_spAnimationState_addPropertyID(state, id))
 			timelineData[i] = SUBSEQUENT;
@@ -918,7 +920,7 @@ spTrackEntry* _spTrackEntry_setTimelineData(spTrackEntry* self, spTrackEntry* to
 						timelineData[i] = DIP_MIX;
 						timelineDipMix[i] = entry;
 						i++;
-						goto outer;
+						goto continue_outer;
 					}
 				}
 				break;
@@ -926,6 +928,5 @@ spTrackEntry* _spTrackEntry_setTimelineData(spTrackEntry* self, spTrackEntry* to
 			timelineData[i] = DIP;
 		}
 	}
-	outer:
 	return lastEntry;
 }
