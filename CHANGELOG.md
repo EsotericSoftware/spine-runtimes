@@ -63,6 +63,7 @@
  * Added support for clipping.
  * SkeletonRenderer now combines the displayed color of the Node (cascaded from all parents) with the skeleton color for tinting.
  * Added support for vertex effects. See `RaptorExample.cpp`.
+ * Added ETC1 support, thanks @halx99!
 
 ### Cocos2d-Objc
  * Fixed renderer to work with 3.6 changes

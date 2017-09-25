@@ -48,7 +48,7 @@ public:
 
 	virtual void update (float deltaTime) override;
 	virtual void draw (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags) override;
-    virtual void drawDebug (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags);
+	virtual void drawDebug (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags);
 	virtual cocos2d::Rect getBoundingBox () const override;
 	virtual void onEnter () override;
 	virtual void onExit () override;
@@ -104,10 +104,10 @@ public:
 	void setVertexEffect(spVertexEffect* effect);
 
     // --- BlendProtocol
-    virtual void setBlendFunc (const cocos2d::BlendFunc& blendFunc)override;
-    virtual const cocos2d::BlendFunc& getBlendFunc () const override;
-    virtual void setOpacityModifyRGB (bool value) override;
-    virtual bool isOpacityModifyRGB () const override;
+	virtual void setBlendFunc (const cocos2d::BlendFunc& blendFunc)override;
+	virtual const cocos2d::BlendFunc& getBlendFunc () const override;
+	virtual void setOpacityModifyRGB (bool value) override;
+	virtual bool isOpacityModifyRGB () const override;
 
 CC_CONSTRUCTOR_ACCESS:
 	SkeletonRenderer ();
@@ -120,11 +120,11 @@ CC_CONSTRUCTOR_ACCESS:
 	void initWithData (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
 	void initWithJsonFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 1);
 	void initWithJsonFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
-    void initWithBinaryFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 1);
-    void initWithBinaryFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
+	void initWithBinaryFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 1);
+	void initWithBinaryFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
 
 	virtual void initialize ();
-
+	void setupGLProgramState();
 protected:
 	void setSkeletonData (spSkeletonData* skeletonData, bool ownsSkeletonData);
 	virtual AttachmentVertices* getAttachmentVertices (spRegionAttachment* attachment) const;
