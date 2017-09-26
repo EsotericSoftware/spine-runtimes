@@ -135,24 +135,24 @@ namespace Spine {
 					IkConstraint constraint = ikConstraints.Items[ii];
 					if (constraint.data.order == i) {
 						SortIkConstraint(constraint);
-						goto outer; //continue outer;
+						goto continue_outer; //continue outer;
 					}
 				}
 				for (int ii = 0; ii < transformCount; ii++) {
 					TransformConstraint constraint = transformConstraints.Items[ii];
 					if (constraint.data.order == i) {
 						SortTransformConstraint(constraint);
-						goto outer; //continue outer;
+						goto continue_outer; //continue outer;
 					}
 				}
 				for (int ii = 0; ii < pathCount; ii++) {
 					PathConstraint constraint = pathConstraints.Items[ii];
 					if (constraint.data.order == i) {
 						SortPathConstraint(constraint);
-						goto outer; //continue outer;
+						goto continue_outer; //continue outer;
 					}
 				}
-				outer: {}
+				continue_outer: {}
 			}
 
 			for (int i = 0, n = bones.Count; i < n; i++)

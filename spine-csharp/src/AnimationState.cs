@@ -712,14 +712,14 @@ namespace Spine {
 							if (entry.mixDuration > 0) {
 								timelineDataItems[i] = AnimationState.DipMix;
 								timelineDipMixItems[i] = entry;
-								goto outer; // continue outer;
+								goto continue_outer; // continue outer;
 							}
 							break;
 						}
 					}
 					timelineDataItems[i] = AnimationState.Dip;
 				}
-				outer: {}
+				continue_outer: {}
 			}
 			return lastEntry;
 		}
