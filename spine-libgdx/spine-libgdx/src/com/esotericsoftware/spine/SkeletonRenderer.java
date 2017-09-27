@@ -106,29 +106,7 @@ public class SkeletonRenderer {
 
 			} else if (attachment instanceof SkeletonAttachment) {
 				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
-				if (attachmentSkeleton != null) {
-					Bone bone = slot.getBone();
-					Bone rootBone = attachmentSkeleton.getRootBone();
-					float oldScaleX = rootBone.getScaleX();
-					float oldScaleY = rootBone.getScaleY();
-					float oldRotation = rootBone.getRotation();
-					attachmentSkeleton.setPosition(bone.getWorldX(), bone.getWorldY());
-					// rootBone.setScaleX(1 + bone.getWorldScaleX() -
-					// oldScaleX);
-					// rootBone.setScaleY(1 + bone.getWorldScaleY() -
-					// oldScaleY);
-					// Set shear.
-					rootBone.setRotation(oldRotation + bone.getWorldRotationX());
-					attachmentSkeleton.updateWorldTransform();
-
-					draw(batch, attachmentSkeleton);
-
-					attachmentSkeleton.setX(0);
-					attachmentSkeleton.setY(0);
-					rootBone.setScaleX(oldScaleX);
-					rootBone.setScaleY(oldScaleY);
-					rootBone.setRotation(oldRotation);
-				}
+				if (attachmentSkeleton != null) draw(batch, attachmentSkeleton);
 			}
 
 			clipper.clipEnd(slot);
@@ -189,28 +167,7 @@ public class SkeletonRenderer {
 
 			} else if (attachment instanceof SkeletonAttachment) {
 				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
-				if (attachmentSkeleton != null) {
-					Bone bone = slot.getBone();
-					Bone rootBone = attachmentSkeleton.getRootBone();
-					float oldScaleX = rootBone.getScaleX();
-					float oldScaleY = rootBone.getScaleY();
-					float oldRotation = rootBone.getRotation();
-					attachmentSkeleton.setPosition(bone.getWorldX(), bone.getWorldY());
-					// rootBone.setScaleX(1 + bone.getWorldScaleX() -
-					// oldScaleX);
-					// rootBone.setScaleY(1 + bone.getWorldScaleY() -
-					// oldScaleY);
-					// Also set shear.
-					rootBone.setRotation(oldRotation + bone.getWorldRotationX());
-					attachmentSkeleton.updateWorldTransform();
-
-					draw(batch, attachmentSkeleton);
-
-					attachmentSkeleton.setPosition(0, 0);
-					rootBone.setScaleX(oldScaleX);
-					rootBone.setScaleY(oldScaleY);
-					rootBone.setRotation(oldRotation);
-				}
+				if (attachmentSkeleton != null) draw(batch, attachmentSkeleton);
 			}
 
 			if (texture != null) {
@@ -321,26 +278,7 @@ public class SkeletonRenderer {
 
 			} else if (attachment instanceof SkeletonAttachment) {
 				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
-				if (attachmentSkeleton != null) {
-					Bone bone = slot.getBone();
-					Bone rootBone = attachmentSkeleton.getRootBone();
-					float oldScaleX = rootBone.getScaleX();
-					float oldScaleY = rootBone.getScaleY();
-					float oldRotation = rootBone.getRotation();
-					attachmentSkeleton.setPosition(bone.getWorldX(), bone.getWorldY());
-					// rootBone.setScaleX(1 + bone.getWorldScaleX() - oldScaleX);
-					// rootBone.setScaleY(1 + bone.getWorldScaleY() - oldScaleY);
-					// Also set shear.
-					rootBone.setRotation(oldRotation + bone.getWorldRotationX());
-					attachmentSkeleton.updateWorldTransform();
-
-					draw(batch, attachmentSkeleton);
-
-					attachmentSkeleton.setPosition(0, 0);
-					rootBone.setScaleX(oldScaleX);
-					rootBone.setScaleY(oldScaleY);
-					rootBone.setRotation(oldRotation);
-				}
+				if (attachmentSkeleton != null) draw(batch, attachmentSkeleton);
 			}
 
 			if (texture != null) {

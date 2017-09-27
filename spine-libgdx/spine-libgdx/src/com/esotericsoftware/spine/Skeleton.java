@@ -30,6 +30,9 @@
 
 package com.esotericsoftware.spine;
 
+import static com.esotericsoftware.spine.utils.SpineUtils.cosDeg;
+import static com.esotericsoftware.spine.utils.SpineUtils.sinDeg;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -327,6 +330,62 @@ public class Skeleton {
 		Array<Updatable> updateCache = this.updateCache;
 		for (int i = 0, n = updateCache.size; i < n; i++)
 			updateCache.get(i).update();
+	}
+	
+	/** Updates the world transform for each bone and applies all constraints. The 
+	 *  root bone will be temporarily parented to the specified bone.
+	 * <p>
+	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
+	 * Runtimes Guide. */
+	public void updateWorldTransform (Bone parent) {
+		// This partial update avoids computing the world transform for constrained bones when 1) the bone is not updated
+		// before the constraint, 2) the constraint only needs to access the applied local transform, and 3) the constraint calls
+		// updateWorldTransform.
+		Array<Bone> updateCacheReset = this.updateCacheReset;
+		for (int i = 0, n = updateCacheReset.size; i < n; i++) {
+			Bone bone = updateCacheReset.get(i);
+			bone.ax = bone.x;
+			bone.ay = bone.y;
+			bone.arotation = bone.rotation;
+			bone.ascaleX = bone.scaleX;
+			bone.ascaleY = bone.scaleY;
+			bone.ashearX = bone.shearX;
+			bone.ashearY = bone.shearY;
+			bone.appliedValid = true;
+		}
+		
+		// Apply the parent bone transform to the root bone. The root bone
+		// always inherits scale, rotation and reflection.
+		Bone rootBone = getRootBone();
+		float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
+		rootBone.worldX = pa * x + pb * y + parent.worldX;
+		rootBone.worldY = pc * x + pd * y + parent.worldY;
+
+		float rotationY = rootBone.rotation + 90 + rootBone.shearY;
+		float la = cosDeg(rootBone.rotation + rootBone.shearX) * rootBone.scaleX;
+		float lb = cosDeg(rotationY) * rootBone.scaleY;
+		float lc = sinDeg(rootBone.rotation + rootBone.shearX) * rootBone.scaleX;
+		float ld = sinDeg(rotationY) * rootBone.scaleY;
+		rootBone.a = pa * la + pb * lc;
+		rootBone.b = pa * lb + pb * ld;
+		rootBone.c = pc * la + pd * lc;
+		rootBone.d = pc * lb + pd * ld;
+		
+		if (flipY) {
+			rootBone.a = -rootBone.a;
+			rootBone.b = -rootBone.b;
+		}
+		if (flipX) {
+			rootBone.c = -rootBone.c;
+			rootBone.d = -rootBone.d;
+		}
+		
+		// Update everything except root bone.
+		Array<Updatable> updateCache = this.updateCache;
+		for (int i = 0, n = updateCache.size; i < n; i++) {
+			Updatable updatable = updateCache.get(i);
+			if (updatable != rootBone) updatable.update();
+		}
 	}
 
 	/** Sets the bones, constraints, slots, and draw order to their setup pose values. */
