@@ -1517,7 +1517,9 @@ declare module spine.webgl {
 		static SAMPLER: string;
 		private context;
 		private vs;
+		private vsSource;
 		private fs;
+		private fsSource;
 		private program;
 		private tmp2x2;
 		private tmp3x3;
@@ -1525,6 +1527,8 @@ declare module spine.webgl {
 		getProgram(): WebGLProgram;
 		getVertexShader(): string;
 		getFragmentShader(): string;
+		getVertexShaderSource(): string;
+		getFragmentSource(): string;
 		constructor(context: ManagedWebGLRenderingContext | WebGLRenderingContext, vertexShader: string, fragmentShader: string);
 		private compile();
 		private compileShader(type, source);
