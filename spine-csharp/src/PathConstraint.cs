@@ -66,6 +66,7 @@ namespace Spine {
 			translateMix = data.translateMix;
 		}
 
+		/// <summary>Applies the constraint to the constrained bones.</summary>
 		public void Apply () {
 			Update();
 		}
@@ -95,8 +96,8 @@ namespace Spine {
 					if (setupLength == 0) setupLength = 0.000000001f;
 					float x = setupLength * bone.a, y = setupLength * bone.c;
 					float length = (float)Math.Sqrt(x * x + y * y);
-					if (scale) lengths.Items[i] = setupLength;
-					spaces.Items[++i] = (lengthSpacing ? Math.Max(0, setupLength + spacing) : spacing) * length / setupLength;
+					if (scale) lengths.Items[i] = length;
+					spaces.Items[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
 				}
 			} else {
 				for (int i = 1; i < spacesCount; i++)
