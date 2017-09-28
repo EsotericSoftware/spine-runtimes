@@ -220,7 +220,7 @@ void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices,
 	spFloatArray_clear(clippedUVs);
 	spUnsignedShortArray_clear(clippedTriangles);
 	i = 0;
-	outer:
+	continue_outer:
 	for (; i < trianglesLength; i += 3) {
 		int p;
 		int vertexOffset = triangles[i] * stride;
@@ -306,7 +306,7 @@ void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices,
 				clippedTrianglesItems[s + 2] = (unsigned short)(index + 2);
 				index += 3;
 				i += 3;
-				goto outer;
+				goto continue_outer;
 			}
 		}
 	}

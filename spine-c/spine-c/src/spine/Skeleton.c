@@ -351,14 +351,14 @@ void spSkeleton_updateCache (spSkeleton* self) {
 	constraintCount = ikCount + transformCount + pathCount;
 
 	i = 0;
-	outer:
+	continue_outer:
 	for (; i < constraintCount; i++) {
 		for (ii = 0; ii < ikCount; ii++) {
 			spIkConstraint* ikConstraint = ikConstraints[ii];
 			if (ikConstraint->data->order == i) {
 				_sortIkConstraint(internal, ikConstraint);
 				i++;
-				goto outer;
+				goto continue_outer;
 			}
 		}
 
@@ -367,7 +367,7 @@ void spSkeleton_updateCache (spSkeleton* self) {
 			if (transformConstraint->data->order == i) {
 				_sortTransformConstraint(internal, transformConstraint);
 				i++;
-				goto outer;
+				goto continue_outer;
 			}
 		}
 
@@ -376,7 +376,7 @@ void spSkeleton_updateCache (spSkeleton* self) {
 			if (pathConstraint->data->order == i) {
 				_sortPathConstraint(internal, pathConstraint);
 				i++;
-				goto outer;
+				goto continue_outer;
 			}
 		}
 	}

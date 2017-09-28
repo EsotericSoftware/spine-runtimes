@@ -160,7 +160,7 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 				y = SQRT(dd - r * r) * bendDir;
 				a1 = ta - ATAN2(y, r);
 				a2 = ATAN2(y / psy, (r - l1) / psx);
-				goto outer;
+				goto break_outer;
 			}
 		}
 		{
@@ -194,7 +194,7 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 			}
 		}
 	}
-	outer: {
+	break_outer: {
 		float os = ATAN2(cy, cx) * s2;
 		a1 = (a1 - os) * RAD_DEG + o1 - parent->arotation;
 		if (a1 > 180) a1 -= 360;

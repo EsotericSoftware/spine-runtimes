@@ -168,13 +168,13 @@ spShortArray* spTriangulator_triangulate(spTriangulator* self, spFloatArray* ver
 					vx = vertices[v]; vy = vertices[v + 1];
 					if (_positiveArea(p3x, p3y, p1x, p1y, vx, vy)) {
 						if (_positiveArea(p1x, p1y, p2x, p2y, vx, vy)) {
-							if (_positiveArea(p2x, p2y, p3x, p3y, vx, vy)) goto outer;
+							if (_positiveArea(p2x, p2y, p3x, p3y, vx, vy)) goto break_outer;
 						}
 					}
 				}
 				break;
 			}
-			outer:
+			break_outer:
 
 			if (next == 0) {
 				do {

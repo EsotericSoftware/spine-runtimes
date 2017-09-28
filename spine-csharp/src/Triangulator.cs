@@ -78,13 +78,13 @@ namespace Spine {
 							float vx = vertices[v], vy = vertices[v + 1];
 							if (PositiveArea(p3x, p3y, p1x, p1y, vx, vy)) {
 								if (PositiveArea(p1x, p1y, p2x, p2y, vx, vy)) {
-									if (PositiveArea(p2x, p2y, p3x, p3y, vx, vy)) goto outer; // break outer;
+									if (PositiveArea(p2x, p2y, p3x, p3y, vx, vy)) goto break_outer; // break outer;
 								}
 							}
 						}
 						break;
 					}
-					outer:
+					break_outer:
 
 					if (next == 0) {
 						do {

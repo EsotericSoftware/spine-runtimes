@@ -46,6 +46,7 @@ public class SkeletonAttachmentTest extends ApplicationAdapter {
 
 	Skeleton spineboy, goblin;
 	AnimationState spineboyState, goblinState;
+	Bone attachmentBone;
 
 	public void create () {
 		camera = new OrthographicCamera();
@@ -82,7 +83,9 @@ public class SkeletonAttachmentTest extends ApplicationAdapter {
 			// Instead of a right shoulder, spineboy will have a goblin!
 			SkeletonAttachment skeletonAttachment = new SkeletonAttachment("goblin");
 			skeletonAttachment.setSkeleton(goblin);
-			spineboy.findSlot("front-upper-arm").setAttachment(skeletonAttachment);
+			Slot slot = spineboy.findSlot("front-upper-arm");
+			slot.setAttachment(skeletonAttachment);
+			attachmentBone = slot.getBone();
 		}
 	}
 
@@ -93,7 +96,7 @@ public class SkeletonAttachmentTest extends ApplicationAdapter {
 
 		goblinState.update(Gdx.graphics.getDeltaTime());
 		goblinState.apply(goblin);
-		goblin.updateWorldTransform();
+		goblin.updateWorldTransform(attachmentBone);
 
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
