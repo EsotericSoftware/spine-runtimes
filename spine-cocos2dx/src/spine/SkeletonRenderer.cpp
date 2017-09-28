@@ -68,10 +68,15 @@ void SkeletonRenderer::initialize () {
 	_blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
 	setOpacityModifyRGB(true);
 
-	setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
+	setupGLProgramState(false);
 }
 	
-void SkeletonRenderer::setupGLProgramState () {
+void SkeletonRenderer::setupGLProgramState (bool twoColorTintEnabled) {
+	if (twoColorTintEnabled) {
+		setGLProgramState(SkeletonTwoColorBatch::getInstance()->getTwoColorTintProgramState());
+		return;
+	}
+	
 	Texture2D *texture = nullptr;
 	for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
 		spSlot* slot = _skeleton->drawOrder[i];
@@ -95,7 +100,6 @@ void SkeletonRenderer::setupGLProgramState () {
 			break;
 		}
 	}
-	
 	setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP, texture));
 }
 
@@ -737,10 +741,7 @@ bool SkeletonRenderer::setAttachment (const std::string& slotName, const char* a
 }
 	
 void SkeletonRenderer::setTwoColorTint(bool enabled) {
-	if (enabled)
-		setGLProgramState(SkeletonTwoColorBatch::getInstance()->getTwoColorTintProgramState());
-	else
-		setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
+	setupGLProgramState(enabled);
 }
 
 bool SkeletonRenderer::isTwoColorTint() {
