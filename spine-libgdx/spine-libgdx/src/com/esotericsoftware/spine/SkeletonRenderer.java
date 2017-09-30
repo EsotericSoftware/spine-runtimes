@@ -240,7 +240,7 @@ public class SkeletonRenderer {
 		if (vertexEffect != null) vertexEffect.begin(skeleton);
 
 		boolean premultipliedAlpha = this.premultipliedAlpha;
-		int darkAlpha = (premultipliedAlpha ? 255 : 0) << 24;
+		batch.setPremultipliedAlpha(premultipliedAlpha);
 		BlendMode blendMode = null;
 		int verticesLength = 0;
 		float[] vertices = null, uvs = null;
@@ -297,8 +297,7 @@ public class SkeletonRenderer {
 					| (int)(red * lightColor.r));
 				Color darkColor = slot.getDarkColor();
 				float dark = darkColor == null ? 0
-					: NumberUtils.intToFloatColor(darkAlpha //
-						| (int)(blue * darkColor.b) << 16 //
+					: NumberUtils.intToFloatColor((int)(blue * darkColor.b) << 16 //
 						| (int)(green * darkColor.g) << 8 //
 						| (int)(red * darkColor.r));
 
