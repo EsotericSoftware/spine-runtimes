@@ -227,6 +227,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	
     Color4F color;
 	Color4F darkColor;
+	float darkPremultipliedAlpha = _premultipliedAlpha ? 255 : 0;
 	AttachmentVertices* attachmentVertices = nullptr;
 	TwoColorTrianglesCommand* lastTwoColorTrianglesCommand = nullptr;
 	for (int i = 0, n = _skeleton->slotsCount; i < n; ++i) {
@@ -317,6 +318,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 			darkColor.g = 0;
 			darkColor.b = 0;
 		}
+		darkColor.a = darkPremultipliedAlpha;
 		
 		color.a *= nodeColor.a * _skeleton->color.a * slot->color.a * 255;
 		// skip rendering if the color of this attachment is 0
@@ -482,7 +484,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 						vertex->color2.r = (GLubyte)(darkCopy.r * 255);
 						vertex->color2.g = (GLubyte)(darkCopy.g * 255);
 						vertex->color2.b = (GLubyte)(darkCopy.b * 255);
-						vertex->color2.a = 1;
+						vertex->color2.a = (GLubyte)darkColor.a;
 					}
 				} else {
 					for (int v = 0, vn = batchedTriangles->getTriangles().vertCount, vv = 0; v < vn; ++v, vv += 2) {
@@ -498,7 +500,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 						vertex->color2.r = (GLubyte)darkColor.r;
 						vertex->color2.g = (GLubyte)darkColor.g;
 						vertex->color2.b = (GLubyte)darkColor.b;
-						vertex->color2.a = 1;
+						vertex->color2.a = (GLubyte)darkColor.a;
 					}
 				}
 			} else {
@@ -528,7 +530,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 						vertex->color2.r = (GLubyte)(darkCopy.r * 255);
 						vertex->color2.g = (GLubyte)(darkCopy.g * 255);
 						vertex->color2.b = (GLubyte)(darkCopy.b * 255);
-						vertex->color2.a = 1;
+						vertex->color2.a = (GLubyte)darkColor.a;
 					}
 				} else {
 					for (int v = 0, vn = batchedTriangles->getTriangles().vertCount; v < vn; ++v) {
@@ -540,7 +542,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 						vertex->color2.r = (GLubyte)darkColor.r;
 						vertex->color2.g = (GLubyte)darkColor.g;
 						vertex->color2.b = (GLubyte)darkColor.b;
-						vertex->color2.a = 1;
+						vertex->color2.a = (GLubyte)darkColor.a;
 					}
 				}
 			}
