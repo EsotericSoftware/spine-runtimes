@@ -192,7 +192,7 @@ static bool handlerQueued = false;
 	unsigned short* triangles = 0;
 	int trianglesCount = 0;
 	float r = 0, g = 0, b = 0, a = 0;
-	float dr = 0, dg = 0, db = 0;
+	float dr = 0, dg = 0, db = 0, da = _premultipliedAlpha ? 1 : 0;
 	for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
 		spSlot* slot = _skeleton->drawOrder[i];
 		if (!slot->attachment) continue;
@@ -336,7 +336,7 @@ static bool handlerQueued = false;
 							dark.r = dr;
 							dark.g = dg;
 							dark.b = db;
-							dark.a = 1;
+							dark.a = da;
 							for (int i = 0; i * 2 < verticesCount; i++, verts++) {
 								spColor lightCopy = light;
 								spColor darkCopy = dark;
@@ -353,7 +353,7 @@ static bool handlerQueued = false;
 								verts->z = vertex.position.z;
 								verts->w = vertex.position.w;
 								verts->color = ((unsigned short)(lightCopy.r * 255))| ((unsigned short)(lightCopy.g * 255)) << 8 | ((unsigned short)(lightCopy.b * 255)) <<16 | ((unsigned short)(lightCopy.a * 255)) << 24;
-								verts->color2 = ((unsigned short)(darkCopy.r * 255)) | ((unsigned short)(darkCopy.g * 255)) << 8 | ((unsigned short)(darkCopy.b * 255)) << 16 | ((unsigned short)(255)) << 24;
+								verts->color2 = ((unsigned short)(darkCopy.r * 255)) | ((unsigned short)(darkCopy.g * 255)) << 8 | ((unsigned short)(darkCopy.b * 255)) << 16 | ((unsigned short)(darkCopy.a * 255)) << 24;
 								
 							}
 						} else {
@@ -366,7 +366,7 @@ static bool handlerQueued = false;
 								verts->z = vertex.position.z;
 								verts->w = vertex.position.w;
 								verts->color = ((unsigned short)(r * 255))| ((unsigned short)(g * 255)) << 8 | ((unsigned short)(b * 255)) <<16 | ((unsigned short)(a * 255)) << 24;
-								verts->color2 = ((unsigned short)(dr * 255)) | ((unsigned short)(dg * 255)) << 8 | ((unsigned short)(db * 255)) << 16 | ((unsigned short)(255)) << 24;
+								verts->color2 = ((unsigned short)(dr * 255)) | ((unsigned short)(dg * 255)) << 8 | ((unsigned short)(db * 255)) << 16 | ((unsigned short)(da * 255)) << 24;
 								verts->u = uvs[i * 2];
 								verts->v = 1 - uvs[i * 2 + 1];
 							}
