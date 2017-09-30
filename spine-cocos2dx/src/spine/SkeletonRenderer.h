@@ -124,11 +124,12 @@ CC_CONSTRUCTOR_ACCESS:
 	void initWithBinaryFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
 
 	virtual void initialize ();
-	void setupGLProgramState();
+	
 protected:
 	void setSkeletonData (spSkeletonData* skeletonData, bool ownsSkeletonData);
 	virtual AttachmentVertices* getAttachmentVertices (spRegionAttachment* attachment) const;
-	virtual AttachmentVertices* getAttachmentVertices (spMeshAttachment* attachment) const;	
+	virtual AttachmentVertices* getAttachmentVertices (spMeshAttachment* attachment) const;
+	void setupGLProgramState(bool twoColorTintEnabled);
 
 	bool _ownsSkeletonData;
 	spAtlas* _atlas;

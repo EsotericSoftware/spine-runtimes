@@ -78,10 +78,11 @@ public class SkeletonRenderer {
 				region.computeWorldVertices(slot.getBone(), vertices, 0, 5);
 				Color color = region.getColor(), slotColor = slot.getColor();
 				float alpha = a * slotColor.a * color.a * 255;
+				float multiplier = premultipliedAlpha ? alpha : 255;
 				float c = NumberUtils.intToFloatColor(((int)alpha << 24) //
-					| ((int)(b * slotColor.b * color.b * alpha) << 16) //
-					| ((int)(g * slotColor.g * color.g * alpha) << 8) //
-					| (int)(r * slotColor.r * color.r * alpha));
+					| ((int)(b * slotColor.b * color.b * multiplier) << 16) //
+					| ((int)(g * slotColor.g * color.g * multiplier) << 8) //
+					| (int)(r * slotColor.r * color.r * multiplier));
 				float[] uvs = region.getUVs();
 				for (int u = 0, v = 2; u < 8; u += 2, v += 5) {
 					vertices[v] = c;
@@ -173,10 +174,11 @@ public class SkeletonRenderer {
 			if (texture != null) {
 				Color slotColor = slot.getColor();
 				float alpha = a * slotColor.a * color.a * 255;
+				float multiplier = premultipliedAlpha ? alpha : 255;
 				float c = NumberUtils.intToFloatColor(((int)alpha << 24) //
-					| ((int)(b * slotColor.b * color.b * alpha) << 16) //
-					| ((int)(g * slotColor.g * color.g * alpha) << 8) //
-					| (int)(r * slotColor.r * color.r * alpha));
+					| ((int)(b * slotColor.b * color.b * multiplier) << 16) //
+					| ((int)(g * slotColor.g * color.g * multiplier) << 8) //
+					| (int)(r * slotColor.r * color.r * multiplier));
 
 				BlendMode slotBlendMode = slot.data.getBlendMode();
 				if (slotBlendMode != blendMode) {
@@ -238,6 +240,7 @@ public class SkeletonRenderer {
 		if (vertexEffect != null) vertexEffect.begin(skeleton);
 
 		boolean premultipliedAlpha = this.premultipliedAlpha;
+		int darkPremultipliedAlpha = (premultipliedAlpha ? 255 : 0) << 24;
 		BlendMode blendMode = null;
 		int verticesLength = 0;
 		float[] vertices = null, uvs = null;
@@ -284,16 +287,17 @@ public class SkeletonRenderer {
 			if (texture != null) {
 				Color lightColor = slot.getColor();
 				float alpha = a * lightColor.a * color.a * 255;
+				float multiplier = premultipliedAlpha ? alpha : 255;
 				float light = NumberUtils.intToFloatColor(((int)alpha << 24) //
-					| ((int)(b * lightColor.b * color.b * alpha) << 16) //
-					| ((int)(g * lightColor.g * color.g * alpha) << 8) //
-					| (int)(r * lightColor.r * color.r * alpha));
+					| ((int)(b * lightColor.b * color.b * multiplier) << 16) //
+					| ((int)(g * lightColor.g * color.g * multiplier) << 8) //
+					| (int)(r * lightColor.r * color.r * multiplier));
 				Color darkColor = slot.getDarkColor();
 				if (darkColor == null) darkColor = Color.BLACK;
-				float dark = NumberUtils.intToFloatColor( //
-					((int)(b * darkColor.b * color.b * 255) << 16) //
-						| ((int)(g * darkColor.g * color.g * 255) << 8) //
-						| (int)(r * darkColor.r * color.r * 255));
+				float dark = darkColor == null ? 0 : NumberUtils.intToFloatColor(darkPremultipliedAlpha // 
+						| (int)(b * darkColor.b * color.b * multiplier) << 16 //
+						| (int)(g * darkColor.g * color.g * multiplier) << 8 //
+						| (int)(r * darkColor.r * color.r * multiplier));
 
 				BlendMode slotBlendMode = slot.data.getBlendMode();
 				if (slotBlendMode != blendMode) {
