@@ -457,7 +457,7 @@ namespace Spine.Unity.Editor {
 		static Bone extractionBone;
 		static Slot extractionSlot;
 
-		static Bone GetExtractionBone () {
+		internal static Bone GetExtractionBone () {
 			if (extractionBone != null)
 				return extractionBone;
 
@@ -479,7 +479,7 @@ namespace Spine.Unity.Editor {
 			return extractionBone;
 		}
 
-		static Slot GetExtractionSlot () {
+		internal static Slot GetExtractionSlot () {
 			if (extractionSlot != null)
 				return extractionSlot;
 
@@ -491,11 +491,14 @@ namespace Spine.Unity.Editor {
 			return extractionSlot;
 		}
 
-		static Mesh ExtractRegionAttachment (string name, RegionAttachment attachment, Mesh mesh = null) {
+		internal static Mesh ExtractRegionAttachment (string name, RegionAttachment attachment, Mesh mesh = null, bool centered = true) {
 			var bone = GetExtractionBone();
 
-			bone.X = -attachment.X;
-			bone.Y = -attachment.Y;
+			if (centered) {
+				bone.X = -attachment.X;
+				bone.Y = -attachment.Y;
+			}	
+
 			bone.UpdateWorldTransform();
 
 			Vector2[] uvs = ExtractUV(attachment.UVs);
@@ -504,12 +507,13 @@ namespace Spine.Unity.Editor {
 			Vector3[] verts = ExtractVerts(floatVerts);
 
 			//unrotate verts now that they're centered
-			for (int i = 0; i < verts.Length; i++) {
-				verts[i] = Quaternion.Euler(0, 0, -attachment.Rotation) * verts[i];
+			if (centered) {
+				for (int i = 0; i < verts.Length; i++)
+					verts[i] = Quaternion.Euler(0, 0, -attachment.Rotation) * verts[i];
 			}
 
-			int[] triangles = new int[6] { 1, 3, 0, 2, 3, 1 };
-			Color color = new Color(attachment.R, attachment.G, attachment.B, attachment.A);
+			int[] triangles = { 1, 3, 0, 2, 3, 1 };
+			Color color = attachment.GetColor();
 
 			if (mesh == null)
 				mesh = new Mesh();
@@ -519,7 +523,7 @@ namespace Spine.Unity.Editor {
 			mesh.vertices = verts;
 			mesh.uv = uvs;
 			mesh.triangles = triangles;
-			mesh.colors = new Color[] { color, color, color, color };
+			mesh.colors = new [] { color, color, color, color };
 			mesh.RecalculateBounds();
 			mesh.RecalculateNormals();
 			mesh.name = name;
@@ -527,7 +531,7 @@ namespace Spine.Unity.Editor {
 			return mesh;
 		}
 
-		static Mesh ExtractMeshAttachment (string name, MeshAttachment attachment, Mesh mesh = null) {
+		internal static Mesh ExtractMeshAttachment (string name, MeshAttachment attachment, Mesh mesh = null) {
 			var slot = GetExtractionSlot();
 
 			slot.Bone.X = 0;
@@ -592,7 +596,7 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		static Mesh ExtractWeightedMeshAttachment (string name, MeshAttachment attachment, int slotIndex, SkeletonData skeletonData, List<Transform> boneList, Mesh mesh = null) {
+		internal static Mesh ExtractWeightedMeshAttachment (string name, MeshAttachment attachment, int slotIndex, SkeletonData skeletonData, List<Transform> boneList, Mesh mesh = null) {
 			if (attachment.Bones == null)
 				throw new System.ArgumentException("Mesh is not weighted.", "attachment");
 
@@ -708,7 +712,7 @@ namespace Spine.Unity.Editor {
 			return mesh;
 		}
 
-		static Vector2[] ExtractUV (float[] floats) {
+		internal static Vector2[] ExtractUV (float[] floats) {
 			Vector2[] arr = new Vector2[floats.Length / 2];
 
 			for (int i = 0; i < floats.Length; i += 2) {
@@ -718,7 +722,7 @@ namespace Spine.Unity.Editor {
 			return arr;
 		}
 
-		static Vector3[] ExtractVerts (float[] floats) {
+		internal static Vector3[] ExtractVerts (float[] floats) {
 			Vector3[] arr = new Vector3[floats.Length / 2];
 
 			for (int i = 0; i < floats.Length; i += 2) {
