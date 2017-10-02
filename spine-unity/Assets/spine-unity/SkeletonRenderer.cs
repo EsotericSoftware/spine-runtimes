@@ -213,7 +213,7 @@ namespace Spine.Unity {
 			for (int i = 0; i < separatorSlotNames.Length; i++)
 				separatorSlots.Add(skeleton.FindSlot(separatorSlotNames[i]));
 
-			LateUpdate();
+			LateUpdate(); // Generate mesh for the first frame it exists.
 
 			if (OnRebuild != null)
 				OnRebuild(this);

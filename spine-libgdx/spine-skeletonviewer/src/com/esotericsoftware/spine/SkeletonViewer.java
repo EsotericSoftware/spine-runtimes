@@ -904,26 +904,31 @@ public class SkeletonViewer extends ApplicationAdapter {
 		}
 
 		void loadPrefs () {
-			debugBonesCheckbox.setChecked(prefs.getBoolean("debugBones", true));
-			debugRegionsCheckbox.setChecked(prefs.getBoolean("debugRegions", false));
-			debugMeshHullCheckbox.setChecked(prefs.getBoolean("debugMeshHull", false));
-			debugMeshTrianglesCheckbox.setChecked(prefs.getBoolean("debugMeshTriangles", false));
-			debugPathsCheckbox.setChecked(prefs.getBoolean("debugPaths", true));
-			debugPointsCheckbox.setChecked(prefs.getBoolean("debugPoints", true));
-			debugClippingCheckbox.setChecked(prefs.getBoolean("debugClipping", true));
-			premultipliedCheckbox.setChecked(prefs.getBoolean("premultiplied", true));
-			loopCheckbox.setChecked(prefs.getBoolean("loop", false));
-			speedSlider.setValue(prefs.getFloat("speed", 0.3f));
-			mixSlider.setValue(prefs.getFloat("mix", 0.3f));
+			try {
+				debugBonesCheckbox.setChecked(prefs.getBoolean("debugBones", true));
+				debugRegionsCheckbox.setChecked(prefs.getBoolean("debugRegions", false));
+				debugMeshHullCheckbox.setChecked(prefs.getBoolean("debugMeshHull", false));
+				debugMeshTrianglesCheckbox.setChecked(prefs.getBoolean("debugMeshTriangles", false));
+				debugPathsCheckbox.setChecked(prefs.getBoolean("debugPaths", true));
+				debugPointsCheckbox.setChecked(prefs.getBoolean("debugPoints", true));
+				debugClippingCheckbox.setChecked(prefs.getBoolean("debugClipping", true));
+				premultipliedCheckbox.setChecked(prefs.getBoolean("premultiplied", true));
+				loopCheckbox.setChecked(prefs.getBoolean("loop", false));
+				speedSlider.setValue(prefs.getFloat("speed", 0.3f));
+				mixSlider.setValue(prefs.getFloat("mix", 0.3f));
 
-			zoomSlider.setValue(prefs.getFloat("zoom", 1));
-			camera.zoom = 1 / prefs.getFloat("zoom", 1);
-			camera.position.x = prefs.getFloat("x", 0);
-			camera.position.y = prefs.getFloat("y", 0);
+				zoomSlider.setValue(prefs.getFloat("zoom", 1));
+				camera.zoom = 1 / prefs.getFloat("zoom", 1);
+				camera.position.x = prefs.getFloat("x", 0);
+				camera.position.y = prefs.getFloat("y", 0);
 
-			scaleSlider.setValue(prefs.getFloat("scale", 1));
-			animationList.setSelected(prefs.getString("animationName", null));
-			skinList.setSelected(prefs.getString("skinName", null));
+				scaleSlider.setValue(prefs.getFloat("scale", 1));
+				animationList.setSelected(prefs.getString("animationName", null));
+				skinList.setSelected(prefs.getString("skinName", null));
+			} catch (Exception ex) {
+				System.out.println("Unable to read preferences:");
+				ex.printStackTrace();
+			}
 		}
 	}
 
