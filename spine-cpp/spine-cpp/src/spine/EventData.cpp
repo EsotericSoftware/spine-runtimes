@@ -28,136 +28,58 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <spine/BoneData.h>
+#include <spine/EventData.h>
 
 #include <assert.h>
 
 namespace Spine
 {
-    BoneData::BoneData(int index, std::string name, BoneData* parent) :
-    _index(index),
+    EventData::EventData(std::string name) :
     _name(name),
-    _parent(parent),
-    _length(0),
-    _x(0),
-    _y(0),
-    _rotation(0),
-    _scaleX(1),
-    _scaleY(1),
-    _shearX(0),
-    _shearY(0),
-    _transformMode(TransformMode_Normal)
+    _intValue(0),
+    _floatValue(0),
+    _stringValue()
     {
-        assert(index < 0);
         assert(_name.length() > 0);
     }
     
-    const int BoneData::getIndex()
-    {
-        return _index;
-    }
-    
-    const std::string& BoneData::getName()
+    /// The name of the event, which is unique within the skeleton.
+    const std::string& EventData::getName()
     {
         return _name;
     }
     
-    const BoneData* BoneData::getParent()
+    int EventData::getIntValue()
     {
-        return _parent;
+        return _intValue;
     }
     
-    float BoneData::getLength()
+    void EventData::setIntValue(int inValue)
     {
-        return _length;
+        _intValue = inValue;
     }
     
-    void BoneData::setLength(float inValue)
+    float EventData::getFloatValue()
     {
-        _length = inValue;
+        return _floatValue;
     }
     
-    float BoneData::getX()
+    void EventData::setFloatValue(float inValue)
     {
-        return _x;
+        _floatValue = inValue;
     }
     
-    void BoneData::setX(float inValue)
+    std::string EventData::getStringValue()
     {
-        _x = inValue;
+        return _stringValue;
     }
     
-    float BoneData::getY()
+    void EventData::setStringValue(std::string inValue)
     {
-        return _y;
+        _stringValue = inValue;
     }
     
-    void BoneData::setY(float inValue)
-    {
-        _y = inValue;
-    }
-    
-    float BoneData::getRotation()
-    {
-        return _rotation;
-    }
-    
-    void BoneData::setRotation(float inValue)
-    {
-        _rotation = inValue;
-    }
-    
-    float BoneData::getScaleX()
-    {
-        return _scaleX;
-    }
-    
-    void BoneData::setScaleX(float inValue)
-    {
-        _scaleX = inValue;
-    }
-    
-    float BoneData::getScaleY()
-    {
-        return _scaleY;
-    }
-    
-    void BoneData::setScaleY(float inValue)
-    {
-        _scaleY = inValue;
-    }
-    
-    float BoneData::getShearX()
-    {
-        return _shearX;
-    }
-    
-    void BoneData::setShearX(float inValue)
-    {
-        _shearX = inValue;
-    }
-    
-    float BoneData::getShearY()
-    {
-        return _shearY;
-    }
-    
-    void BoneData::setShearY(float inValue)
-    {
-        _shearY = inValue;
-    }
-    
-    TransformMode BoneData::getTransformMode()
-    {
-        return _transformMode;
-    }
-    
-    void BoneData::setTransformMode(TransformMode inValue)
-    {
-        _transformMode = inValue;
-    }
-    
-    std::ostream& operator <<(std::ostream& os, const BoneData& ref)
+    std::ostream& operator <<(std::ostream& os, const EventData& ref)
     {
         os << ref._name;
         

@@ -28,18 +28,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_BlendMode_h
-#define Spine_BlendMode_h
+#ifndef Spine_SpacingMode_h
+#define Spine_SpacingMode_h
 
 namespace Spine
 {
-    enum BlendMode
+    enum SpacingMode
     {
-        BlendMode_Normal = 0,
-        BlendMode_Additive,
-        BlendMode_Multiply,
-        BlendMode_Screen
+        SpacingMode_Length = 0,
+        SpacingMode_Fixed,
+        SpacingMode_Percent
     };
 }
 
-#endif /* Spine_BlendMode_h */
+#endif /* Spine_SpacingMode_h */

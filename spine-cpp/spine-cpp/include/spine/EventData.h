@@ -28,18 +28,41 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_BlendMode_h
-#define Spine_BlendMode_h
+#ifndef Spine_EventData_h
+#define Spine_EventData_h
+
+#include <string>
 
 namespace Spine
 {
-    enum BlendMode
+    /// Stores the setup pose values for an Event.
+    class EventData
     {
-        BlendMode_Normal = 0,
-        BlendMode_Additive,
-        BlendMode_Multiply,
-        BlendMode_Screen
+    public:
+        int _intValue;
+        float _floatValue;
+        std::string _stringValue;
+        
+        EventData(std::string name);
+        
+        /// The name of the event, which is unique within the skeleton.
+        const std::string& getName();
+        
+        int getIntValue();
+        void setIntValue(int inValue);
+        
+        float getFloatValue();
+        void setFloatValue(float inValue);
+        
+        std::string getStringValue();
+        void setStringValue(std::string inValue);
+        
+    private:
+        friend class Event;
+        const std::string _name;
+        
+        friend std::ostream& operator <<(std::ostream& os, const EventData& ref);
     };
 }
 
-#endif /* Spine_BlendMode_h */
+#endif /* Spine_EventData_h */

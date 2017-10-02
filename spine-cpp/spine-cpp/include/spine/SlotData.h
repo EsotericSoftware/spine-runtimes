@@ -28,18 +28,65 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_BlendMode_h
-#define Spine_BlendMode_h
+#ifndef Spine_SlotData_h
+#define Spine_SlotData_h
+
+#include <spine/BlendMode.h>
+
+#include <string>
 
 namespace Spine
 {
-    enum BlendMode
+    class BoneData;
+    
+    class SlotData
     {
-        BlendMode_Normal = 0,
-        BlendMode_Additive,
-        BlendMode_Multiply,
-        BlendMode_Screen
+    public:
+        SlotData(int index, std::string name, const BoneData& boneData);
+        
+        const int getIndex();
+        
+        const std::string& getName();
+        
+        const BoneData& getBoneData();
+        
+        float getR();
+        void setR(float inValue);
+        float getG();
+        void setG(float inValue);
+        float getB();
+        void setB(float inValue);
+        float getA();
+        void setA(float inValue);
+        
+        float getR2();
+        void setR2(float inValue);
+        float getG2();
+        void setG2(float inValue);
+        float getB2();
+        void setB2(float inValue);
+        bool hasSecondColor();
+        void setHasSecondColor(bool inValue);
+        
+        /// May be empty.
+        std::string getAttachmentName();
+        void setAttachmentName(std::string inValue);
+        
+        BlendMode getBlendMode();
+        void setBlendMode(BlendMode inValue);
+        
+    private:
+        const int _index;
+        const std::string _name;
+        const BoneData& _boneData;
+        float _r, _g, _b, _a;
+        float _r2, _g2, _b2;
+        bool _hasSecondColor;
+        std::string _attachmentName;
+        BlendMode _blendMode;
+        
+        friend std::ostream& operator <<(std::ostream& os, const SlotData& ref);
     };
 }
 
-#endif /* Spine_BlendMode_h */
+#endif /* Spine_SlotData_h */

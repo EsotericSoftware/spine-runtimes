@@ -28,18 +28,22 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_BlendMode_h
-#define Spine_BlendMode_h
+#ifndef Spine_Constraint_h
+#define Spine_Constraint_h
 
 namespace Spine
 {
-    enum BlendMode
+    /// The interface for all constraints.
+    class Constraint : public Updatable
     {
-        BlendMode_Normal = 0,
-        BlendMode_Additive,
-        BlendMode_Multiply,
-        BlendMode_Screen
+    public:
+        Constraint();
+        
+        virtual Constraint();
+        
+        /// The ordinal for the order a skeleton's constraints will be applied.
+        virtual int getOrder() = 0;
     };
 }
 
-#endif /* Spine_BlendMode_h */
+#endif /* Spine_Constraint_h */

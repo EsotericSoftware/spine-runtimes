@@ -28,136 +28,142 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#include <spine/PathConstraintData.h>
+
 #include <spine/BoneData.h>
+#include <spine/SlotData.h>
 
 #include <assert.h>
 
 namespace Spine
 {
-    BoneData::BoneData(int index, std::string name, BoneData* parent) :
-    _index(index),
+    PathConstraintData::PathConstraintData(std::string name) :
     _name(name),
-    _parent(parent),
-    _length(0),
-    _x(0),
-    _y(0),
-    _rotation(0),
-    _scaleX(1),
-    _scaleY(1),
-    _shearX(0),
-    _shearY(0),
-    _transformMode(TransformMode_Normal)
+    _order(0),
+    _target(nullptr),
+    _positionMode(PositionMode_Fixed),
+    _spacingMode(SpacingMode_Length),
+    _rotateMode(RotateMode_Tangent),
+    _offsetRotation(0),
+    _position(0),
+    _spacing(0),
+    _rotateMix(0),
+    _translateMix(0)
     {
-        assert(index < 0);
         assert(_name.length() > 0);
     }
     
-    const int BoneData::getIndex()
-    {
-        return _index;
-    }
-    
-    const std::string& BoneData::getName()
+    const std::string& PathConstraintData::getName()
     {
         return _name;
     }
     
-    const BoneData* BoneData::getParent()
+    int PathConstraintData::getOrder()
     {
-        return _parent;
+        return _order;
     }
     
-    float BoneData::getLength()
+    void PathConstraintData::setOrder(int inValue)
     {
-        return _length;
+        _order = inValue;
     }
     
-    void BoneData::setLength(float inValue)
+    std::vector<BoneData*>& PathConstraintData::getBones()
     {
-        _length = inValue;
+        return _bones;
     }
     
-    float BoneData::getX()
+    SlotData* PathConstraintData::getTarget()
     {
-        return _x;
+        return _target;
     }
     
-    void BoneData::setX(float inValue)
+    void PathConstraintData::setTarget(SlotData* inValue)
     {
-        _x = inValue;
+        _target = inValue;
     }
     
-    float BoneData::getY()
+    PositionMode PathConstraintData::getPositionMode()
     {
-        return _y;
+        return _positionMode;
     }
     
-    void BoneData::setY(float inValue)
+    void PathConstraintData::setPositionMode(PositionMode inValue)
     {
-        _y = inValue;
+        _positionMode = inValue;
     }
     
-    float BoneData::getRotation()
+    SpacingMode PathConstraintData::getSpacingMode()
     {
-        return _rotation;
+        return _spacingMode;
     }
     
-    void BoneData::setRotation(float inValue)
+    void PathConstraintData::setSpacingMode(SpacingMode inValue)
     {
-        _rotation = inValue;
+        _spacingMode = inValue;
     }
     
-    float BoneData::getScaleX()
+    RotateMode PathConstraintData::getRotateMode()
     {
-        return _scaleX;
+        return _rotateMode;
     }
     
-    void BoneData::setScaleX(float inValue)
+    void PathConstraintData::setRotateMode(RotateMode inValue)
     {
-        _scaleX = inValue;
+        _rotateMode = inValue;
     }
     
-    float BoneData::getScaleY()
+    float PathConstraintData::getOffsetRotation()
     {
-        return _scaleY;
+        return _offsetRotation;
     }
     
-    void BoneData::setScaleY(float inValue)
+    void PathConstraintData::setOffsetRotation(float inValue)
     {
-        _scaleY = inValue;
+        _offsetRotation = inValue;
     }
     
-    float BoneData::getShearX()
+    float PathConstraintData::getPosition()
     {
-        return _shearX;
+        return _position;
     }
     
-    void BoneData::setShearX(float inValue)
+    void PathConstraintData::setPosition(float inValue)
     {
-        _shearX = inValue;
+        _position = inValue;
     }
     
-    float BoneData::getShearY()
+    float PathConstraintData::getSpacing()
     {
-        return _shearY;
+        return _spacing;
     }
     
-    void BoneData::setShearY(float inValue)
+    void PathConstraintData::setSpacing(float inValue)
     {
-        _shearY = inValue;
+        _spacing = inValue;
     }
     
-    TransformMode BoneData::getTransformMode()
+    float PathConstraintData::getRotateMix()
     {
-        return _transformMode;
+        return _rotateMix;
     }
     
-    void BoneData::setTransformMode(TransformMode inValue)
+    void PathConstraintData::setRotateMix(float inValue)
     {
-        _transformMode = inValue;
+        _rotateMix = inValue;
     }
     
-    std::ostream& operator <<(std::ostream& os, const BoneData& ref)
+    float PathConstraintData::getTranslateMix()
+    {
+        return _translateMix;
+    }
+    
+    void PathConstraintData::setTranslateMix(float inValue)
+    {
+        _translateMix = inValue;
+    }
+    
+    std::ostream& operator <<(std::ostream& os, const PathConstraintData& ref)
     {
         os << ref._name;
         

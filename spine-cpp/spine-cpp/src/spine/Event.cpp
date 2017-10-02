@@ -28,73 +28,65 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <spine/IkConstraintData.h>
+#include <spine/Event.h>
+
+#include <spine/EventData.h>
 
 namespace Spine
 {
-    IkConstraintData::IkConstraintData(std::string name) :
-    _name(name),
-    _order(0),
-    _target(nullptr),
-    _bendDirection(1),
-    _mix(1)
+    Event::Event(float time, const EventData& data) :
+    _time(time),
+    _data(data),
+    _intValue(0),
+    _floatValue(0),
+    _stringValue(0)
     {
         // Empty
     }
     
-    const std::string& IkConstraintData::getName()
+    const EventData& Event::getData()
     {
-        return _name;
+        return _data;
     }
     
-    int IkConstraintData::getOrder()
+    float Event::getTime()
     {
-        return _order;
+        return _time;
     }
     
-    void IkConstraintData::setOrder(int inValue)
+    int Event::getIntValue()
     {
-        _order = inValue;
+        return _intValue;
     }
     
-    std::vector<BoneData*>& IkConstraintData::getBones()
+    void Event::setIntValue(int inValue)
     {
-        return _bones;
+        _intValue = inValue;
     }
     
-    BoneData* IkConstraintData::getTarget()
+    float Event::getFloatValue()
     {
-        return _target;
+        return _floatValue;
     }
     
-    void IkConstraintData::setTarget(BoneData* inValue)
+    void Event::setFloatValue(int inValue)
     {
-        _target = inValue;
+        _floatValue = inValue;
     }
     
-    int IkConstraintData::getBendDirection()
+    std::string Event::getStringValue()
     {
-        return _bendDirection;
+        return _stringValue;
     }
     
-    void IkConstraintData::setBendDirection(int inValue)
+    void Event::setStringValue(std::string inValue)
     {
-        _bendDirection = inValue;
+        _stringValue = inValue;
     }
     
-    float IkConstraintData::getMix()
+    std::ostream& operator <<(std::ostream& os, const Event& ref)
     {
-        return _mix;
-    }
-    
-    void IkConstraintData::setMix(float inValue)
-    {
-        _mix = inValue;
-    }
-    
-    std::ostream& operator <<(std::ostream& os, const IkConstraintData& ref)
-    {
-        os << ref._name;
+        os << ref._data;
         
         return os;
     }

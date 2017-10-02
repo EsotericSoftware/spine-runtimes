@@ -28,136 +28,147 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <spine/BoneData.h>
+#include <spine/SlotData.h>
 
 #include <assert.h>
 
 namespace Spine
 {
-    BoneData::BoneData(int index, std::string name, BoneData* parent) :
+    SlotData::SlotData(int index, std::string name, const BoneData& boneData) :
     _index(index),
     _name(name),
-    _parent(parent),
-    _length(0),
-    _x(0),
-    _y(0),
-    _rotation(0),
-    _scaleX(1),
-    _scaleY(1),
-    _shearX(0),
-    _shearY(0),
-    _transformMode(TransformMode_Normal)
+    _boneData(boneData),
+    _r(1),
+    _g(1),
+    _b(1),
+    _a(1),
+    _r2(0),
+    _g2(0),
+    _b2(0),
+    _hasSecondColor(false),
+    _attachmentName(),
+    _blendMode(BlendMode_Normal)
     {
-        assert(index < 0);
+        assert(_index >= 0);
         assert(_name.length() > 0);
     }
     
-    const int BoneData::getIndex()
+    const int SlotData::getIndex()
     {
         return _index;
     }
     
-    const std::string& BoneData::getName()
+    const std::string& SlotData::getName()
     {
         return _name;
     }
     
-    const BoneData* BoneData::getParent()
+    const BoneData& SlotData::getBoneData()
     {
-        return _parent;
+        return _boneData;
     }
     
-    float BoneData::getLength()
+    float SlotData::getR()
     {
-        return _length;
+        return _r;
     }
     
-    void BoneData::setLength(float inValue)
+    void SlotData::setR(float inValue)
     {
-        _length = inValue;
+        _r = inValue;
     }
     
-    float BoneData::getX()
+    float SlotData::getG()
     {
-        return _x;
+        return _g;
     }
     
-    void BoneData::setX(float inValue)
+    void SlotData::setG(float inValue)
     {
-        _x = inValue;
+        _g = inValue;
     }
     
-    float BoneData::getY()
+    float SlotData::getB()
     {
-        return _y;
+        return _b;
     }
     
-    void BoneData::setY(float inValue)
+    void SlotData::setB(float inValue)
     {
-        _y = inValue;
+        _b = inValue;
     }
     
-    float BoneData::getRotation()
+    float SlotData::getA()
     {
-        return _rotation;
+        return _a;
     }
     
-    void BoneData::setRotation(float inValue)
+    void SlotData::setA(float inValue)
     {
-        _rotation = inValue;
+        _a = inValue;
     }
     
-    float BoneData::getScaleX()
+    float SlotData::getR2()
     {
-        return _scaleX;
+        return _r2;
     }
     
-    void BoneData::setScaleX(float inValue)
+    void SlotData::setR2(float inValue)
     {
-        _scaleX = inValue;
+        _r2 = inValue;
     }
     
-    float BoneData::getScaleY()
+    float SlotData::getG2()
     {
-        return _scaleY;
+        return _g2;
     }
     
-    void BoneData::setScaleY(float inValue)
+    void SlotData::setG2(float inValue)
     {
-        _scaleY = inValue;
+        _g2 = inValue;
     }
     
-    float BoneData::getShearX()
+    float SlotData::getB2()
     {
-        return _shearX;
+        return _b2;
     }
     
-    void BoneData::setShearX(float inValue)
+    void SlotData::setB2(float inValue)
     {
-        _shearX = inValue;
+        _b2 = inValue;
     }
     
-    float BoneData::getShearY()
+    bool SlotData::hasSecondColor()
     {
-        return _shearY;
+        return _hasSecondColor;
     }
     
-    void BoneData::setShearY(float inValue)
+    void SlotData::setHasSecondColor(bool inValue)
     {
-        _shearY = inValue;
+        _hasSecondColor = inValue;
     }
     
-    TransformMode BoneData::getTransformMode()
+    std::string SlotData::getAttachmentName()
     {
-        return _transformMode;
+        return _attachmentName;
     }
     
-    void BoneData::setTransformMode(TransformMode inValue)
+    void SlotData::setAttachmentName(std::string inValue)
     {
-        _transformMode = inValue;
+        _attachmentName = inValue;
     }
     
-    std::ostream& operator <<(std::ostream& os, const BoneData& ref)
+    BlendMode SlotData::getBlendMode()
+    {
+        return _blendMode;
+    }
+    
+    void SlotData::setBlendMode(BlendMode inValue)
+    {
+        _blendMode = inValue;
+    }
+    
+    std::ostream& operator <<(std::ostream& os, const SlotData& ref)
     {
         os << ref._name;
         

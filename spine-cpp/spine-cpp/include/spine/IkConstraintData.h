@@ -32,7 +32,7 @@
 #define Spine_IkConstraintData_h
 
 #include <string>
-#include <list>
+#include <vector>
 
 class BoneData;
 
@@ -50,7 +50,7 @@ namespace Spine
         void setOrder(int inValue);
         
         /// The bones that are constrained by this IK Constraint.
-        std::list<BoneData*>& getBones();
+        std::vector<BoneData*>& getBones();
         
         /// The bone that is the IK target.
         BoneData* getTarget();
@@ -66,7 +66,7 @@ namespace Spine
     private:
         const std::string _name;
         int _order;
-        std::list<BoneData*> _bones;
+        std::vector<BoneData*> _bones;
         BoneData* _target;
         int _bendDirection;
         float _mix;

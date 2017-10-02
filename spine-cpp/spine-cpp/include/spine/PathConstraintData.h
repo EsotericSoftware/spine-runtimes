@@ -28,18 +28,73 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_BlendMode_h
-#define Spine_BlendMode_h
+#ifndef Spine_PathConstraintData_h
+#define Spine_PathConstraintData_h
+
+#include <spine/PositionMode.h>
+#include <spine/SpacingMode.h>
+#include <spine/RotateMode.h>
+
+#include <string>
+#include <vector>
 
 namespace Spine
 {
-    enum BlendMode
+    class BoneData;
+    class SlotData;
+    
+    class PathConstraintData
     {
-        BlendMode_Normal = 0,
-        BlendMode_Additive,
-        BlendMode_Multiply,
-        BlendMode_Screen
+    public:
+        PathConstraintData(std::string name);
+        
+        const std::string& getName();
+        
+        int getOrder();
+        void setOrder(int inValue);
+        
+        std::vector<BoneData*>& getBones();
+        
+        SlotData* getTarget();
+        void setTarget(SlotData* inValue);
+        
+        PositionMode getPositionMode();
+        void setPositionMode(PositionMode inValue);
+        
+        SpacingMode getSpacingMode();
+        void setSpacingMode(SpacingMode inValue);
+        
+        RotateMode getRotateMode();
+        void setRotateMode(RotateMode inValue);
+        
+        float getOffsetRotation();
+        void setOffsetRotation(float inValue);
+        
+        float getPosition();
+        void setPosition(float inValue);
+        
+        float getSpacing();
+        void setSpacing(float inValue);
+        
+        float getRotateMix();
+        void setRotateMix(float inValue);
+        
+        float getTranslateMix();
+        void setTranslateMix(float inValue);
+        
+    private:
+        const std::string _name;
+        int _order;
+        std::vector<BoneData*> _bones;
+        SlotData* _target;
+        PositionMode _positionMode;
+        SpacingMode _spacingMode;
+        RotateMode _rotateMode;
+        float _offsetRotation;
+        float _position, _spacing, _rotateMix, _translateMix;
+        
+        friend std::ostream& operator <<(std::ostream& os, const PathConstraintData& ref);
     };
 }
 
-#endif /* Spine_BlendMode_h */
+#endif /* Spine_PathConstraintData_h */
