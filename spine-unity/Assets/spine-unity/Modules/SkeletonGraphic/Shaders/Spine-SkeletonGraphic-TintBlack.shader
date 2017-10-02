@@ -110,7 +110,7 @@ Shader "Spine/SkeletonGraphic Tint Black (Premultiply Alpha)"
 				clip (texColor.a - 0.001);
 				#endif
 
-				return (texColor * IN.color) + float4(((1-texColor.rgb) * texColor.a * (_Black.rgb + float3(IN.uv1.r, IN.uv1.g, IN.uv2.r))), 0);
+				return (texColor * IN.color) + float4(((1-texColor.rgb) * (_Black.rgb + float3(IN.uv1.r, IN.uv1.g, IN.uv2.r)) * texColor.a*_Color.a*i.vertexColor.a), 0);
 			}
 		ENDCG
 		}

@@ -54,6 +54,9 @@ public class TwoColorPolygonBatch {
 	private boolean drawing;
 	private int blendSrcFunc = GL20.GL_SRC_ALPHA;
 	private int blendDstFunc = GL20.GL_ONE_MINUS_SRC_ALPHA;
+	private int blendSrcFuncAlpha = GL20.GL_SRC_ALPHA;
+	private int blendDstFuncAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
+	private boolean premultipliedAlpha;
 
 	public TwoColorPolygonBatch (int size) {
 		this(size, size * 2);
@@ -69,7 +72,7 @@ public class TwoColorPolygonBatch {
 		mesh = new Mesh(vertexDataType, false, maxVertices, maxTriangles * 3, //
 			new VertexAttribute(Usage.Position, 2, "a_position"), //
 			new VertexAttribute(Usage.ColorPacked, 4, "a_light"), //
-			new VertexAttribute(Usage.ColorPacked, 4, "a_dark"), //
+			new VertexAttribute(Usage.ColorPacked, 4, "a_dark"), // Dark alpha is unused, but colors are packed as 4 byte floats.
 			new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0"));
 
 		vertices = new float[maxVertices * 6];
@@ -130,7 +133,7 @@ public class TwoColorPolygonBatch {
 		mesh.setVertices(vertices, 0, vertexIndex);
 		mesh.setIndices(triangles, 0, triangleIndex);
 		Gdx.gl.glEnable(GL20.GL_BLEND);
-		if (blendSrcFunc != -1) Gdx.gl.glBlendFunc(blendSrcFunc, blendDstFunc);
+		if (blendSrcFunc != -1) Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
 		mesh.render(shader, GL20.GL_TRIANGLES, 0, triangleIndex);
 
 		vertexIndex = 0;
@@ -150,25 +153,39 @@ public class TwoColorPolygonBatch {
 		return transformMatrix;
 	}
 
+	/** Flushes the batch. */
 	public void setProjectionMatrix (Matrix4 projection) {
 		if (drawing) flush();
 		projectionMatrix.set(projection);
 		if (drawing) setupMatrices();
 	}
 
+	/** Flushes the batch. */
 	public void setTransformMatrix (Matrix4 transform) {
 		if (drawing) flush();
 		transformMatrix.set(transform);
 		if (drawing) setupMatrices();
 	}
 
+	/** Specifies whether the texture colors have premultiplied alpha. Required for correct dark color tinting. Does not change the
+	 * blending function. Flushes the batch if the setting was changed. */
+	public void setPremultipliedAlpha (boolean premultipliedAlpha) {
+		if (this.premultipliedAlpha == premultipliedAlpha) return;
+		if (drawing) flush();
+		this.premultipliedAlpha = premultipliedAlpha;
+		if (drawing) setupMatrices();
+	}
+
 	private void setupMatrices () {
 		combinedMatrix.set(projectionMatrix).mul(transformMatrix);
+		shader.setUniformf("u_pma", premultipliedAlpha ? 1 : 0);
 		shader.setUniformMatrix("u_projTrans", combinedMatrix);
 		shader.setUniformi("u_texture", 0);
 	}
 
+	/** Flushes the batch if the shader was changed. */
 	public void setShader (ShaderProgram newShader) {
+		if (shader == newShader) return;
 		if (drawing) {
 			flush();
 			shader.end();
@@ -180,21 +197,30 @@ public class TwoColorPolygonBatch {
 		}
 	}
 
+	/** Flushes the batch if the blend function was changed. */
 	public void setBlendFunction (int srcFunc, int dstFunc) {
-		if (blendSrcFunc == srcFunc && blendDstFunc == dstFunc) return;
+		setBlendFunctionSeparate(srcFunc, dstFunc, srcFunc, dstFunc);
+	}
+
+	/** Flushes the batch if the blend function was changed. */
+	public void setBlendFunctionSeparate (int srcFuncColor, int dstFuncColor, int srcFuncAlpha, int dstFuncAlpha) {
+		if (blendSrcFunc == srcFuncColor && blendDstFunc == dstFuncColor && blendSrcFuncAlpha == srcFuncAlpha
+			&& blendDstFuncAlpha == dstFuncAlpha) return;
 		flush();
-		blendSrcFunc = srcFunc;
-		blendDstFunc = dstFunc;
+		blendSrcFunc = srcFuncColor;
+		blendDstFunc = dstFuncColor;
+		blendSrcFuncAlpha = srcFuncAlpha;
+		blendDstFuncAlpha = dstFuncAlpha;
 	}
 
 	private ShaderProgram createDefaultShader () {
 		String vertexShader = "attribute vec4 a_position;\n" //
 			+ "attribute vec4 a_light;\n" //
-			+ "attribute vec3 a_dark;\n" //
+			+ "attribute vec4 a_dark;\n" //
 			+ "attribute vec2 a_texCoord0;\n" //
 			+ "uniform mat4 u_projTrans;\n" //
 			+ "varying vec4 v_light;\n" //
-			+ "varying vec3 v_dark;\n" //
+			+ "varying vec4 v_dark;\n" //
 			+ "varying vec2 v_texCoords;\n" //
 			+ "\n" //
 			+ "void main()\n" //
@@ -212,14 +238,15 @@ public class TwoColorPolygonBatch {
 			+ "#define LOWP \n" //
 			+ "#endif\n" //
 			+ "varying LOWP vec4 v_light;\n" //
-			+ "varying LOWP vec3 v_dark;\n" //
+			+ "varying LOWP vec4 v_dark;\n" //
+			+ "uniform float u_pma;\n" //
 			+ "varying vec2 v_texCoords;\n" //
 			+ "uniform sampler2D u_texture;\n" //
 			+ "void main()\n"//
 			+ "{\n" //
 			+ "  vec4 texColor = texture2D(u_texture, v_texCoords);\n" //
 			+ "  gl_FragColor.a = texColor.a * v_light.a;\n" //
-			+ "  gl_FragColor.rgb = ((texColor.a - 1.0) * v_dark.a + 1.0 - texColor.rgb) * v_dark.rgb + texColor.rgb * v_light.rgb;\n" //
+			+ "  gl_FragColor.rgb = ((texColor.a - 1.0) * u_pma + 1.0 - texColor.rgb) * v_dark.rgb + texColor.rgb * v_light.rgb;\n" //
 			+ "}";
 
 		ShaderProgram shader = new ShaderProgram(vertexShader, fragmentShader);

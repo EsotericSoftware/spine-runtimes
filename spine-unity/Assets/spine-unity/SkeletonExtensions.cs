@@ -144,6 +144,12 @@ namespace Spine.Unity {
 			return new Quaternion(0, 0, Mathf.Sin(halfRotation), Mathf.Cos(halfRotation));
 		}
 
+		/// <summary>Gets a bone-local space UnityEngine.Quaternion representation of bone.rotation.</summary>
+		public static Quaternion GetLocalQuaternion (this Bone bone) {
+			var halfRotation = bone.rotation * Mathf.Deg2Rad * 0.5f;
+			return new Quaternion(0, 0, Mathf.Sin(halfRotation), Mathf.Cos(halfRotation));
+		}
+
 		/// <summary>Gets the PointAttachment's Unity World position using its Spine GameObject Transform.</summary>
 		public static Vector3 GetWorldPosition (this PointAttachment attachment, Slot slot, Transform spineGameObjectTransform) {
 			Vector3 skeletonSpacePosition;
@@ -286,6 +292,10 @@ namespace Spine {
 	public static class SkeletonExtensions {
 		public static bool IsWeighted (this VertexAttachment va) {
 			return va.bones != null && va.bones.Length > 0;
+		}
+
+		public static bool IsRenderable (this Attachment a) {
+			return a is RegionAttachment || a is MeshAttachment;
 		}
 
 		#region Transform Modes
