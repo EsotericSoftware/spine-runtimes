@@ -31,97 +31,78 @@
 #ifndef Spine_Skin_h
 #define Spine_Skin_h
 
+#include <string>
+#include <vector>
+#include <unordered_map>
+
 namespace Spine
 {
+    class Attachment;
+    class Skeleton;
+    
+    class AttachmentKey;
+    
     /// Stores attachments by slot index and attachment name.
     /// See SkeletonData::getDefaultSkin, Skeleton::getSkin, and
     /// http://esotericsoftware.com/spine-runtime-skins in the Spine Runtimes Guide.
     class Skin
     {
     public:
-        public std::string Name { get { return name; } }
-        public Dictionary<AttachmentKeyTuple, Attachment> Attachments { get { return attachments; } }
+        Skin(std::string name);
         
-        public Skin (std::string name) {
-            if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
-            this.name = name;
-        }
-        
-        /// Adds an attachment to the skin for the specified slot index and name. If the name already exists for the slot, the previous value is replaced.
-        public void AddAttachment (int slotIndex, std::string name, Attachment attachment) {
-            if (attachment == null) throw new ArgumentNullException("attachment", "attachment cannot be null.");
-            attachments[new AttachmentKeyTuple(slotIndex, name)] = attachment;
-        }
+        /// Adds an attachment to the skin for the specified slot index and name.
+        /// If the name already exists for the slot, the previous value is replaced.
+        void addAttachment(int slotIndex, std::string name, Attachment* attachment);
         
         /// Returns the attachment for the specified slot index and name, or null.
-        /// <returns>May be null.</returns>
-        public Attachment GetAttachment (int slotIndex, std::string name) {
-            Attachment attachment;
-            attachments.TryGetValue(new AttachmentKeyTuple(slotIndex, name), out attachment);
-            return attachment;
-        }
+        Attachment* getAttachment(int slotIndex, std::string name);
         
-        /// Finds the skin keys for a given slot. The results are added to the passed List(names).
-        /// <param name="slotIndex">The target slotIndex. To find the slot index, use <see cref="Spine.Skeleton.FindSlotIndex"/> or <see cref="Spine.SkeletonData.FindSlotIndex"/>
-        /// <param name="names">Found skin key names will be added to this list.</param>
-        public void FindNamesForSlot (int slotIndex, List<std::string> names) {
-            if (names == null) throw new ArgumentNullException("names", "names cannot be null.");
-            foreach (AttachmentKeyTuple key in attachments.Keys)
-            if (key.slotIndex == slotIndex) names.Add(key.name);
-        }
+        /// Finds the skin keys for a given slot. The results are added to the passed vector names.
+        /// @param slotIndex The target slotIndex. To find the slot index, use Skeleton::findSlotIndex or SkeletonData::findSlotIndex
+        /// @param names Found skin key names will be added to this vector.
+        void findNamesForSlot(int slotIndex, std::vector<std::string>& names);
         
         /// Finds the attachments for a given slot. The results are added to the passed List(Attachment).
-        /// <param name="slotIndex">The target slotIndex. To find the slot index, use <see cref="Spine.Skeleton.FindSlotIndex"/> or <see cref="Spine.SkeletonData.FindSlotIndex"/>
-        /// <param name="attachments">Found Attachments will be added to this list.</param>
-        public void FindAttachmentsForSlot (int slotIndex, List<Attachment> attachments) {
-            if (attachments == null) throw new ArgumentNullException("attachments", "attachments cannot be null.");
-            foreach (KeyValuePair<AttachmentKeyTuple, Attachment> entry in this.attachments)
-            if (entry.Key.slotIndex == slotIndex) attachments.Add(entry.Value);
-        }
+        /// @param slotIndex The target slotIndex. To find the slot index, use Skeleton::findSlotIndex or SkeletonData::findSlotIndex
+        /// @param attachments Found Attachments will be added to this vector.
+        void findAttachmentsForSlot(int slotIndex, std::vector<Attachment*>& attachments);
         
-        override public std::string ToString () {
-            return name;
-        }
+        const std::string& getName();
+        std::unordered_map<AttachmentKey, Attachment*>& getAttachments();
         
     private:
-        internal std::string name;
-        Dictionary<AttachmentKeyTuple, Attachment> attachments = new Dictionary<AttachmentKeyTuple, Attachment>(AttachmentKeyTupleComparer.Instance);
+        const std::string _name;
+        std::unordered_map<AttachmentKey, Attachment*> _attachments;
         
         /// Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached.
-        internal void AttachAll (Skeleton skeleton, Skin oldSkin) {
-            foreach (KeyValuePair<AttachmentKeyTuple, Attachment> entry in oldSkin.attachments) {
-                int slotIndex = entry.Key.slotIndex;
-                Slot slot = skeleton.slots.Items[slotIndex];
-                if (slot.Attachment == entry.Value) {
-                    Attachment attachment = GetAttachment(slotIndex, entry.Key.name);
-                    if (attachment != null) slot.Attachment = attachment;
+        void attachAll(Skeleton& skeleton, Skin& oldSkin);
+        
+        class AttachmentKey
+        {
+        public:
+            const int _slotIndex;
+            const std::string _name;
+            
+            AttachmentKey(int slotIndex, std::string name);
+            
+            bool operator==(const AttachmentKey &other) const;
+        };
+        
+        friend std::ostream& operator <<(std::ostream& os, const Skin& ref);
+        
+        namespace std
+        {
+            template <>
+            struct hash<AttachmentKey>
+            {
+                size_t operator()(const AttachmentKey& val) const
+                {
+                    size_t h1 = hash<int>{}(val._slotIndex);
+                    size_t h2 = hash<string>{}(val._name);
+                    
+                    return h1 ^ (h2 << 1);
                 }
-            }
-        }
-        
-        public struct AttachmentKeyTuple {
-            public readonly int slotIndex;
-            public readonly std::string name;
-            internal readonly int nameHashCode;
-            
-            public AttachmentKeyTuple (int slotIndex, std::string name) {
-                this.slotIndex = slotIndex;
-                this.name = name;
-                nameHashCode = this.name.GetHashCode();
-            }
-        }
-        
-        // Avoids boxing in the dictionary.
-        class AttachmentKeyTupleComparer : IEqualityComparer<AttachmentKeyTuple> {
-            internal static readonly AttachmentKeyTupleComparer Instance = new AttachmentKeyTupleComparer();
-            
-            bool IEqualityComparer<AttachmentKeyTuple>.Equals (AttachmentKeyTuple o1, AttachmentKeyTuple o2) {
-                return o1.slotIndex == o2.slotIndex && o1.nameHashCode == o2.nameHashCode && o1.name == o2.name;
-            }
-            
-            int IEqualityComparer<AttachmentKeyTuple>.GetHashCode (AttachmentKeyTuple o) {
-                return o.slotIndex;
-            }
+            };
         }
     };
 }
