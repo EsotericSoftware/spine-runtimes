@@ -12,7 +12,7 @@ up into multiple modules:
 While the source code for the core library and backends is written in TypeScript, all code is compiled to easily consumable JavaScript.
 
 ## Licensing
-This Spine Runtime may only be used for personal or internal use, typically to evaluate Spine before purchasing. If you would like to incorporate a Spine Runtime into your applications, distribute software containing a Spine Runtime, or modify a Spine Runtime, then you will need a valid [Spine license](https://esotericsoftware.com/spine-purchase). Please see the [Spine Runtimes Software License](https://github.com/EsotericSoftware/spine-runtimes/blob/3.6/LICENSE) for detailed information.
+This Spine Runtime may only be used for personal or internal use, typically to evaluate Spine before purchasing. If you would like to incorporate a Spine Runtime into your applications, distribute software containing a Spine Runtime, or modify a Spine Runtime, then you will need a valid [Spine license](https://esotericsoftware.com/spine-purchase). Please see the [Spine Runtimes Software License](http://esotericsoftware.com/git/spine-runtimes/blob/LICENSE) for detailed information.
 
 The Spine Runtimes are developed with the intent to be used with data exported from Spine. By purchasing Spine, `Section 2` of the [Spine Software License](https://esotericsoftware.com/files/license.txt) grants the right to create and distribute derivative works of the Spine Runtimes.
 
@@ -29,7 +29,7 @@ spine-ts THREE.JS does not support color tinting, blend modes and clipping. The 
 spine-ts does not yet support loading the binary format.
 
 ## Usage
-1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/3.6.zip).
+1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it as a zip via the download button above.
 2. To use only the core library without rendering support, include the `build/spine-core.js` file in your project.
 3. To use the WebGL backend, include the `spine-webgl.js` file in your project.
 3. To use the Canvas backend, include the `spine-canvas.js` file in your project.
@@ -63,7 +63,7 @@ python -m SimpleHTTPServer
 Then open `http://localhost:8000/webgl/example`, `http://localhost:8000/canvas/example`, `https://localhost:8000/threejs/example` or `http://localhost:8000/widget/example` in your browser.
 
 ## WebGL Demos
-The spine-ts WebGL demos load their image, atlas, and JSON files from our webserver and so can be run directly, without needing a webserver. The demos can be viewed [all on one page](http://esotericsoftware.com/spine-demos/) or in individual, standalone pages which are easy for you to explore and edit. See the [standalone demos source code](https://github.com/EsotericSoftware/spine-runtimes/tree/3.6/spine-ts/webgl/demos) and view the pages here:
+The spine-ts WebGL demos load their image, atlas, and JSON files from our webserver and so can be run directly, without needing a webserver. The demos can be viewed [all on one page](http://esotericsoftware.com/spine-demos/) or in individual, standalone pages which are easy for you to explore and edit. See the [standalone demos source code](webgl/demos) and view the pages here:
 
 - [Spine vs sprite sheets](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/spritesheets.html)
 - [Image changes](http://rawgit.com/EsotericSoftware/spine-runtimes/3.6/spine-ts/webgl/demos/imagechanges.html)
@@ -169,7 +169,7 @@ Create a HTML element on your website, either statically or via JavaScript:
 <div id="my-widget"></div>
 ```
 
-Then create a new `spine.SpineWidget`, providing a [`SpineWidgetConfiguration`](https://github.com/EsotericSoftware/spine-runtimes/blob/3.6/spine-ts/widget/src/Widget.ts#L281) object, e.g.:
+Then create a new `spine.SpineWidget`, providing a [`SpineWidgetConfiguration`](widget/src/Widget.ts#L281) object, e.g.:
 
 ```JavaScript
 new spine.SpineWidget("my-widget", {
@@ -216,6 +216,6 @@ You can also create a HTML element with class `spine-widget` and `data-` attribu
 an element via JavaScript on demand.
 
 The resulting `SpineWidget` has various fields that let you modify the animation programmatically. Most notably, the `skeleton` and `state` fields
-let you modify all aspects of your animation as you wish. See the [example](https://github.com/EsotericSoftware/spine-runtimes/blob/3.6/spine-ts/widget/example/index.html#L21).
+let you modify all aspects of your animation as you wish. See the [example](widget/example/index.html#L21).
 
 You can also modify what debug information is shown by accessing `SpineWidget.debugRenderer` and set the various `drawXXX` fields to `true` or `false`.
