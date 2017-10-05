@@ -291,6 +291,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			// Pose and render skeleton.
 			state.getData().setDefaultMix(ui.mixSlider.getValue());
 			renderer.setPremultipliedAlpha(ui.premultipliedCheckbox.isChecked());
+			batch.setPremultipliedAlpha(ui.premultipliedCheckbox.isChecked());
 
 			skeleton.setFlip(ui.flipXCheckbox.isChecked(), ui.flipYCheckbox.isChecked());
 
