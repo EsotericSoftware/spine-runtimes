@@ -44,13 +44,13 @@ The Spine SFML example works on Windows, Linux and Mac OS X.
 The entire example code is contained in [main.cpp](example/main.cpp#L61)
 
 ### Linux
-1. Install the SFML dependencies, e.g. on Ubuntu/Debian via `sudo apt-get install -y libpthread-stubs0-dev libgl1-mesa-dev libx11-dev libxrandr-dev libfreetype6-dev libglew1.5-dev libjpeg8-dev libsndfile1-dev libopenal-dev libudev-dev libxcb-image0-dev libjpeg-dev libflac-dev`
+1. Install the SFML dependencies, e.g. on Ubuntu/Debian via `sudo apt install libsfml-dev`
 2. Install CMake, e.g. on Ubuntu/Debian via `sudo apt-get install -y cmake`
 3. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
 4. Open a terminal, and `cd` into the `spine-runtimes/spine-sfml` folder
 5. Type `mkdir build && cd build && cmake ../..` to generate Make files
 6. Type `make` to compile the example
-7. Run the example by `cd spine-sfml-example && ./spine-sfml-example`
+7. Run the example by `cd spine-sfml && ./spine-sfml-example`
 
 ### Mac OS X
 1. Install [Xcode](https://developer.apple.com/xcode/)
