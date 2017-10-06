@@ -40,14 +40,23 @@ namespace Spine
     class Attachment;
     class Skeleton;
     
-    class AttachmentKey;
-    
     /// Stores attachments by slot index and attachment name.
     /// See SkeletonData::getDefaultSkin, Skeleton::getSkin, and
     /// http://esotericsoftware.com/spine-runtime-skins in the Spine Runtimes Guide.
     class Skin
     {
     public:
+        class AttachmentKey
+        {
+            public:
+            const int _slotIndex;
+            const std::string _name;
+            
+            AttachmentKey(int slotIndex, std::string name);
+            
+            bool operator==(const AttachmentKey &other) const;
+        };
+        
         Skin(std::string name);
         
         /// Adds an attachment to the skin for the specified slot index and name.
@@ -77,32 +86,21 @@ namespace Spine
         /// Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached.
         void attachAll(Skeleton& skeleton, Skin& oldSkin);
         
-        class AttachmentKey
-        {
-        public:
-            const int _slotIndex;
-            const std::string _name;
-            
-            AttachmentKey(int slotIndex, std::string name);
-            
-            bool operator==(const AttachmentKey &other) const;
-        };
-        
         friend std::ostream& operator <<(std::ostream& os, const Skin& ref);
-        
-        namespace std
+    };
+}
+
+namespace std
+{
+    template <>
+    struct hash<Spine::Skin::AttachmentKey>
+    {
+        std::size_t operator()(const Spine::Skin::AttachmentKey& val) const
         {
-            template <>
-            struct hash<AttachmentKey>
-            {
-                size_t operator()(const AttachmentKey& val) const
-                {
-                    size_t h1 = hash<int>{}(val._slotIndex);
-                    size_t h2 = hash<string>{}(val._name);
-                    
-                    return h1 ^ (h2 << 1);
-                }
-            };
+            size_t h1 = hash<int>{}(val._slotIndex);
+            size_t h2 = hash<string>{}(val._name);
+            
+            return h1 ^ (h2 << 1);
         }
     };
 }

@@ -30,10 +30,27 @@
 
 #include <spine/Skin.h>
 
+#include <spine/Attachment.h>
+#include <spine/Skeleton.h>
+
+#include <spine/Slot.h>
+
 #include <assert.h>
 
 namespace Spine
 {
+    Skin::AttachmentKey::AttachmentKey(int slotIndex, std::string name) :
+    _slotIndex(slotIndex),
+    _name(name)
+    {
+        // Empty
+    }
+    
+    bool Skin::AttachmentKey::operator==(const AttachmentKey &other) const
+    {
+        return _slotIndex == other._slotIndex && _name == other._name;
+    }
+    
     Skin::Skin(std::string name) : _name(name)
     {
         assert(_name.length() > 0);
@@ -46,10 +63,9 @@ namespace Spine
         _attachments[AttachmentKey(slotIndex, name)] = attachment;
     }
     
-    /// Returns the attachment for the specified slot index and name, or null.
     Attachment* Skin::getAttachment(int slotIndex, std::string name)
     {
-        std::iterator<AttachmentKey, Attachment*> q = _attachments.find(AttachmentKey(slotIndex, name));
+        std::unordered_map<AttachmentKey, Attachment*>::iterator q = _attachments.find(AttachmentKey(slotIndex, name));
         
         Attachment* ret = nullptr;
         
@@ -61,73 +77,59 @@ namespace Spine
         return ret;
     }
     
-    struct sum
-    {
-        sum(int * t):total(t){};
-        int * total;
-        
-        void operator()(AttachmentKey key)
-        {
-            *total+=element;
-        }
-    };
-    
-    /// Finds the skin keys for a given slot. The results are added to the passed vector names.
-    /// @param slotIndex The target slotIndex. To find the slot index, use Skeleton::findSlotIndex or SkeletonData::findSlotIndex
-    /// @param names Found skin key names will be added to this vector.
     void Skin::findNamesForSlot(int slotIndex, std::vector<std::string>& names)
     {
-        foreach (AttachmentKey key in attachments.Keys)
-        if (key.slotIndex == slotIndex) names.Add(key.name);
-    }
-    
-    /// Finds the attachments for a given slot. The results are added to the passed List(Attachment).
-    /// @param slotIndex The target slotIndex. To find the slot index, use Skeleton::findSlotIndex or SkeletonData::findSlotIndex
-    /// @param attachments Found Attachments will be added to this vector.
-    void Skin::findAttachmentsForSlot(int slotIndex, std::vector<Attachment*>& attachments)
-    {
-        foreach (KeyValuePair<AttachmentKey, Attachment> entry in this.attachments)
-        if (entry.Key.slotIndex == slotIndex) attachments.Add(entry.Value);
-    }
-    
-    const std::string& Skin::getName()
-    {
-        //
-    }
-    
-    std::unordered_map<AttachmentKey, Attachment*>& Skin::getAttachments()
-    {
-        //
-    }
-    
-    void Skin::attachAll(Skeleton& skeleton, Skin& oldSkin)
-    {
-        foreach (KeyValuePair<AttachmentKey, Attachment> entry in oldSkin.attachments)
+        for (std::unordered_map<AttachmentKey, Attachment*>::iterator i = _attachments.begin(); i != _attachments.end(); ++i)
         {
-            int slotIndex = entry.Key.slotIndex;
-            Slot slot = skeleton.slots.Items[slotIndex];
-            if (slot.Attachment == entry.Value) {
-                Attachment attachment = GetAttachment(slotIndex, entry.Key.name);
-                if (attachment != null) slot.Attachment = attachment;
+            if (i->first._slotIndex == slotIndex)
+            {
+                names.push_back(i->first._name);
             }
         }
     }
     
-    AttachmentKey::AttachmentKey(int slotIndex, std::string name) :
-    _slotIndex(slotIndex),
-    _name(name)
+    void Skin::findAttachmentsForSlot(int slotIndex, std::vector<Attachment*>& attachments)
     {
-        // Empty
+        for (std::unordered_map<AttachmentKey, Attachment*>::iterator i = _attachments.begin(); i != _attachments.end(); ++i)
+        {
+            if (i->first._slotIndex == slotIndex)
+            {
+                attachments.push_back(i->second);
+            }
+        }
     }
     
-    bool AttachmentKey::operator==(const AttachmentKey &other) const
+    const std::string& Skin::getName()
     {
-        return _slotIndex == other._slotIndex && _name == other._name;
+        return _name;
+    }
+    
+    std::unordered_map<Skin::AttachmentKey, Attachment*>& Skin::getAttachments()
+    {
+        return _attachments;
+    }
+    
+    void Skin::attachAll(Skeleton& skeleton, Skin& oldSkin)
+    {
+        for (std::unordered_map<AttachmentKey, Attachment*>::iterator i = oldSkin.getAttachments().begin(); i != oldSkin.getAttachments().end(); ++i)
+        {
+            int slotIndex = i->first._slotIndex;
+            Slot* slot = skeleton.getSlots().at(slotIndex);
+            
+            if (slot->getAttachment() == i->second)
+            {
+                Attachment* attachment = nullptr;
+                if ((attachment = getAttachment(slotIndex, i->first._name)))
+                {
+                    slot->setAttachment(attachment);
+                }
+            }
+        }
     }
     
     std::ostream& operator <<(std::ostream& os, const Skin& ref)
     {
-        os << ref.getName();
+        os << ref._name;
         
         return os;
     }
