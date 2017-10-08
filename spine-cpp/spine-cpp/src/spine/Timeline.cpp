@@ -28,14 +28,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <spine/Bone.h>
+#include <spine/Timeline.h>
+
+#include <spine/Skeleton.h>
+#include <spine/Event.h>
 
 namespace Spine
 {
-    std::ostream& operator <<(std::ostream& os, const Bone& ref)
+    Timeline::Timeline()
     {
-        os << ref._data._name;
-        
-        return os;
+        // Empty
+    }
+    
+    Timeline::~Timeline()
+    {
+        // Empty
     }
 }

@@ -28,26 +28,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Constraint_h
-#define Spine_Constraint_h
-
-#include <spine/Updatable.h>
+#ifndef Spine_MixDirection_h
+#define Spine_MixDirection_h
 
 namespace Spine
 {
-    /// The interface for all constraints.
-    class Constraint : public Updatable
+    /// 
+    /// Indicates whether a timeline's alpha is mixing out over time toward 0 (the setup or current pose) or mixing in toward 1 (the timeline's pose).
+    /// See also Timeline::apply(Skeleton&, float, float, std::vector&, float, MixPose, MixDirection)
+    enum MixDirection
     {
-    public:
-        Constraint();
-        
-        virtual ~Constraint();
-        
-        virtual void update() = 0;
-        
-        /// The ordinal for the order a skeleton's constraints will be applied.
-        virtual int getOrder() = 0;
+        MixDirection_In = 0,
+        MixDirection_Out
     };
 }
 
-#endif /* Spine_Constraint_h */
+#endif /* Spine_MixDirection_h */

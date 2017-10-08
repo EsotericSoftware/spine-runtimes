@@ -43,69 +43,71 @@ namespace Spine
     ///
     class Bone : public Updatable
     {
+        friend class RotateTimeline;
+        
     public:
     private:
         static public bool yDown;
         
-        internal BoneData data;
-        internal Skeleton skeleton;
-        internal Bone parent;
-        internal ExposedList<Bone> children = new ExposedList<Bone>();
-        internal float x, y, rotation, scaleX, scaleY, shearX, shearY;
-        internal float ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY;
-        internal bool appliedValid;
+        internal BoneData _data;
+        internal Skeleton _skeleton;
+        internal Bone _parent;
+        internal ExposedList<Bone> _children = new ExposedList<Bone>();
+        internal float _x, _y, _rotation, _scaleX, _scaleY, _shearX, _shearY;
+        internal float _ax, _ay, _arotation, _ascaleX, _ascaleY, _ashearX, _ashearY;
+        internal bool _appliedValid;
         
-        internal float a, b, worldX;
-        internal float c, d, worldY;
+        internal float _a, _b, _worldX;
+        internal float _c, _d, _worldY;
         
         //        internal float worldSignX, worldSignY;
         //        public float WorldSignX { get { return worldSignX; } }
         //        public float WorldSignY { get { return worldSignY; } }
         
-        internal bool sorted;
+        internal bool _sorted;
         
         public BoneData Data { get { return data; } }
         public Skeleton Skeleton { get { return skeleton; } }
         public Bone Parent { get { return parent; } }
         public ExposedList<Bone> Children { get { return children; } }
-        /// <summary>The local X translation.</summary>
+        /// The local X translation.
         public float X { get { return x; } set { x = value; } }
-        /// <summary>The local Y translation.</summary>
+        /// The local Y translation.
         public float Y { get { return y; } set { y = value; } }
-        /// <summary>The local rotation.</summary>
+        /// The local rotation.
         public float Rotation { get { return rotation; } set { rotation = value; } }
         
-        /// <summary>The local scaleX.</summary>
+        /// The local scaleX.
         public float ScaleX { get { return scaleX; } set { scaleX = value; } }
         
-        /// <summary>The local scaleY.</summary>
+        /// The local scaleY.
         public float ScaleY { get { return scaleY; } set { scaleY = value; } }
         
-        /// <summary>The local shearX.</summary>
+        /// The local shearX.
         public float ShearX { get { return shearX; } set { shearX = value; } }
         
-        /// <summary>The local shearY.</summary>
+        /// The local shearY.
         public float ShearY { get { return shearY; } set { shearY = value; } }
         
-        /// <summary>The rotation, as calculated by any constraints.</summary>
+        /// The rotation, as calculated by any constraints.
         public float AppliedRotation { get { return arotation; } set { arotation = value; } }
         
-        /// <summary>The applied local x translation.</summary>
+        /// The applied local x translation.
         public float AX { get { return ax; } set { ax = value; } }
         
-        /// <summary>The applied local y translation.</summary>
+        /// The applied local y translation.
         public float AY { get { return ay; } set { ay = value; } }
         
-        /// <summary>The applied local scaleX.</summary>
+        /// The applied local scaleX.
         public float AScaleX { get { return ascaleX; } set { ascaleX = value; } }
         
-        /// <summary>The applied local scaleY.</summary>
+        /// The applied local scaleY.
         public float AScaleY { get { return ascaleY; } set { ascaleY = value; } }
         
-        /// <summary>The applied local shearX.</summary>
+        /// The applied local shearX.
         public float AShearX { get { return ashearX; } set { ashearX = value; } }
         
-        /// <summary>The applied local shearY.</summary>
+        /// The applied local shearY.
         public float AShearY { get { return ashearY; } set { ashearY = value; } }
         
         public float A { get { return a; } }
@@ -118,12 +120,12 @@ namespace Spine
         public float WorldRotationX { get { return MathUtils.Atan2(c, a) * MathUtils.RadDeg; } }
         public float WorldRotationY { get { return MathUtils.Atan2(d, b) * MathUtils.RadDeg; } }
         
-        /// <summary>Returns the magnitide (always positive) of the world scale X.</summary>
+        /// Returns the magnitide (always positive) of the world scale X.
         public float WorldScaleX { get { return (float)Math.Sqrt(a * a + c * c); } }
-        /// <summary>Returns the magnitide (always positive) of the world scale Y.</summary>
+        /// Returns the magnitide (always positive) of the world scale Y.
         public float WorldScaleY { get { return (float)Math.Sqrt(b * b + d * d); } }
         
-        /// <param name="parent">May be null.</param>
+        /// @param parent May be null.
         public Bone (BoneData data, Skeleton skeleton, Bone parent) {
             if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
             if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
@@ -133,17 +135,17 @@ namespace Spine
             SetToSetupPose();
         }
         
-        /// <summary>Same as <see cref="UpdateWorldTransform"/>. This method exists for Bone to implement <see cref="Spine.IUpdatable"/>.</summary>
+        /// Same as <see cref="UpdateWorldTransform"/>. This method exists for Bone to implement <see cref="Spine.IUpdatable"/>.
         public void Update () {
             UpdateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
         }
         
-        /// <summary>Computes the world transform using the parent bone and this bone's local transform.</summary>
+        /// Computes the world transform using the parent bone and this bone's local transform.
         public void UpdateWorldTransform () {
             UpdateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
         }
         
-        /// <summary>Computes the world transform using the parent bone and the specified local transform.</summary>
+        /// Computes the world transform using the parent bone and the specified local transform.
         public void UpdateWorldTransform (float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
             ax = x;
             ay = y;
@@ -284,12 +286,12 @@ namespace Spine
             shearY = data.shearY;
         }
         
-        /// <summary>
+        /// 
         /// Computes the individual applied transform values from the world transform. This can be useful to perform processing using
         /// the applied transform after the world transform has been modified directly (eg, by a constraint)..
         ///
         /// Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation.
-        /// </summary>
+        /// 
         internal void UpdateAppliedTransform () {
             appliedValid = true;
             Bone parent = this.parent;
@@ -372,11 +374,12 @@ namespace Spine
             return MathUtils.Atan2(cos * c + sin * d, cos * a + sin * b) * MathUtils.RadDeg;
         }
         
-        /// <summary>
+        /// 
         /// Rotates the world transform the specified amount and sets isAppliedValid to false.
-        /// </summary>
-        /// <param name="degrees">Degrees.</param>
-        public void RotateWorld (float degrees) {
+        /// 
+        /// @param degrees Degrees.
+        public void RotateWorld (float degrees)
+        {
             float a = this.a, b = this.b, c = this.c, d = this.d;
             float cos = MathUtils.CosDeg(degrees), sin = MathUtils.SinDeg(degrees);
             this.a = cos * a - sin * c;
@@ -386,9 +389,7 @@ namespace Spine
             appliedValid = false;
         }
         
-        override public string ToString () {
-            return data.name;
-        }
+        friend std::ostream& operator <<(std::ostream& os, const Bone& ref);
     };
 }
 

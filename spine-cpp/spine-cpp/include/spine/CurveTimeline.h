@@ -28,26 +28,50 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Constraint_h
-#define Spine_Constraint_h
+#ifndef Spine_CurveTimeline_h
+#define Spine_CurveTimeline_h
 
-#include <spine/Updatable.h>
+#include <spine/Timeline.h>
+
+#include <vector>
+#include <assert.h>
 
 namespace Spine
 {
-    /// The interface for all constraints.
-    class Constraint : public Updatable
+    /// Base class for frames that use an interpolation bezier curve.
+    class CurveTimeline : public Timeline
     {
     public:
-        Constraint();
+        CurveTimeline(int frameCount);
         
-        virtual ~Constraint();
+        virtual void apply(Skeleton& skeleton, float lastTime, float time, std::vector<Event*>& events, float alpha, MixPose pose, MixDirection direction) = 0;
         
-        virtual void update() = 0;
+        virtual int getPropertyId() = 0;
         
-        /// The ordinal for the order a skeleton's constraints will be applied.
-        virtual int getOrder() = 0;
+        int getFrameCount();
+        
+        void setLinear(int frameIndex);
+        
+        void setStepped(int frameIndex);
+        
+        /// Sets the control handle positions for an interpolation bezier curve used to transition from this keyframe to the next.
+        /// cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
+        /// the difference between the keyframe's values.
+        void setCurve(int frameIndex, float cx1, float cy1, float cx2, float cy2);
+        
+        float getCurvePercent(int frameIndex, float percent);
+        
+        float getCurveType(int frameIndex);
+        
+    protected:
+        static const float LINEAR;
+        static const float STEPPED;
+        static const float BEZIER;
+        static const int BEZIER_SIZE;
+        
+    private:
+        std::vector<float> _curves; // type, x, y, ...
     };
 }
 
-#endif /* Spine_Constraint_h */
+#endif /* Spine_CurveTimeline_h */

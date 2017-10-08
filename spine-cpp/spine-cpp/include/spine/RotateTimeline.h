@@ -28,26 +28,41 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Constraint_h
-#define Spine_Constraint_h
+#ifndef Spine_RotateTimeline_h
+#define Spine_RotateTimeline_h
 
-#include <spine/Updatable.h>
+#include <spine/CurveTimeline.h>
 
 namespace Spine
 {
-    /// The interface for all constraints.
-    class Constraint : public Updatable
+    class RotateTimeline : public CurveTimeline
     {
     public:
-        Constraint();
+        static const int ENTRIES = 2;
         
-        virtual ~Constraint();
+        RotateTimeline(int frameCount);
         
-        virtual void update() = 0;
+        virtual void apply(Skeleton& skeleton, float lastTime, float time, std::vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
         
-        /// The ordinal for the order a skeleton's constraints will be applied.
-        virtual int getOrder() = 0;
+        virtual int getPropertyId();
+        
+        /// Sets the time and value of the specified keyframe.
+        void setFrame(int frameIndex, float time, float degrees);
+        
+        int getBoneIndex();
+        void setBoneIndex(int inValue);
+        
+        std::vector<float>& getFrames();
+        void setFrames(std::vector<float> inValue);
+        
+    private:
+        static const int PREV_TIME = -2;
+        static const int PREV_ROTATION = -1;
+        static const int ROTATION = 1;
+        
+        int _boneIndex;
+        std::vector<float> _frames; // time, angle, ...
     };
 }
 
-#endif /* Spine_Constraint_h */
+#endif /* Spine_RotateTimeline_h */

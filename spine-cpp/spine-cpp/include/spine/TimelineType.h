@@ -28,26 +28,29 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Constraint_h
-#define Spine_Constraint_h
-
-#include <spine/Updatable.h>
+#ifndef Spine_TimelineType_h
+#define Spine_TimelineType_h
 
 namespace Spine
 {
-    /// The interface for all constraints.
-    class Constraint : public Updatable
+    enum TimelineType
     {
-    public:
-        Constraint();
-        
-        virtual ~Constraint();
-        
-        virtual void update() = 0;
-        
-        /// The ordinal for the order a skeleton's constraints will be applied.
-        virtual int getOrder() = 0;
+        TimelineType_Rotate = 0,
+        TimelineType_Translate,
+        TimelineType_Scale,
+        TimelineType_Shear,
+        TimelineType_Attachment,
+        TimelineType_Color,
+        TimelineType_Deform,
+        TimelineType_Event,
+        TimelineType_DrawOrder,
+        TimelineType_IkConstraint,
+        TimelineType_TransformConstraint,
+        TimelineType_PathConstraintPosition,
+        TimelineType_PathConstraintSpacing,
+        TimelineType_PathConstraintMix,
+        TimelineType_TwoColor
     };
 }
 
-#endif /* Spine_Constraint_h */
+#endif /* Spine_TimelineType_h */

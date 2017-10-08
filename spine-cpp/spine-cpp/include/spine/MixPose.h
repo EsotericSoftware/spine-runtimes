@@ -28,26 +28,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Constraint_h
-#define Spine_Constraint_h
-
-#include <spine/Updatable.h>
+#ifndef Spine_MixPose_h
+#define Spine_MixPose_h
 
 namespace Spine
 {
-    /// The interface for all constraints.
-    class Constraint : public Updatable
+    ///
+    /// Controls how a timeline is mixed with the setup or current pose.
+    /// See also Timeline::apply(Skeleton&, float, float, std::vector&, float, MixPose, MixDirection)
+    enum MixPose
     {
-    public:
-        Constraint();
-        
-        virtual ~Constraint();
-        
-        virtual void update() = 0;
-        
-        /// The ordinal for the order a skeleton's constraints will be applied.
-        virtual int getOrder() = 0;
+        ///  The timeline value is mixed with the setup pose (the current pose is not used).
+        MixPose_Setup = 0,
+        ///  The timeline value is mixed with the current pose. The setup pose is used as the timeline value before the first key,
+        /// except for timelines which perform instant transitions, such as DrawOrderTimeline or AttachmentTimeline.
+        MixPose_Current,
+        ///  The timeline value is mixed with the current pose. No change is made before the first key (the current pose is kept until the first key).
+        MixPose_CurrentLayered
     };
 }
 
-#endif /* Spine_Constraint_h */
+#endif /* Spine_MixPose_h */

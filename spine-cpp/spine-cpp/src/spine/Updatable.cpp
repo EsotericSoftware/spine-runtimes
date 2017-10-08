@@ -28,14 +28,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <spine/Bone.h>
+#include <spine/Updatable.h>
 
 namespace Spine
 {
-    std::ostream& operator <<(std::ostream& os, const Bone& ref)
+    Updatable::Updatable()
     {
-        os << ref._data._name;
-        
-        return os;
+        // Empty
+    }
+    
+    Updatable::~Updatable()
+    {
+        // Empty
     }
 }

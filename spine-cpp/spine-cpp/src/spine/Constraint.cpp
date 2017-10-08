@@ -28,26 +28,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Constraint_h
-#define Spine_Constraint_h
-
-#include <spine/Updatable.h>
+#include <spine/Constraint.h>
 
 namespace Spine
 {
-    /// The interface for all constraints.
-    class Constraint : public Updatable
+    Constraint::Constraint()
     {
-    public:
-        Constraint();
-        
-        virtual ~Constraint();
-        
-        virtual void update() = 0;
-        
-        /// The ordinal for the order a skeleton's constraints will be applied.
-        virtual int getOrder() = 0;
-    };
+        // Empty
+    }
+    
+    Constraint::~Constraint()
+    {
+        // Empty
+    }
 }
 
-#endif /* Spine_Constraint_h */

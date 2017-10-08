@@ -28,6 +28,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#include <spine/Skeleton.h>
+
+#include <spine/SkeletonData.h>
+#include <spine/Bone.h>
+#include <spine/Updatable.h>
+#include <spine/Slot.h>
+#include <spine/IkConstraint.h>
+#include <spine/PathConstraint.h>
+#include <spine/TransformConstraint.h>
+#include <spine/Skin.h>
+
 namespace Spine
 {
     // TODO
