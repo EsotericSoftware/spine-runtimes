@@ -101,9 +101,8 @@ public class SkeletonRenderer {
 				continue;
 
 			} else if (attachment instanceof MeshAttachment) {
-				throw new RuntimeException(
-					"SkeletonRenderer#draw(PolygonSpriteBatch, Skeleton) or #draw(TwoColorPolygonBatch, Skeleton) must be used to "
-						+ "render meshes.");
+				throw new RuntimeException(batch.getClass().getSimpleName()
+					+ " cannot render meshes, PolygonSpriteBatch or TwoColorPolygonBatch is required.");
 
 			} else if (attachment instanceof SkeletonAttachment) {
 				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
