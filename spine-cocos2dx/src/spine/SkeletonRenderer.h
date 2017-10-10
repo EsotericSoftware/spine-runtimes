@@ -108,6 +108,9 @@ public:
 	virtual const cocos2d::BlendFunc& getBlendFunc () const override;
 	virtual void setOpacityModifyRGB (bool value) override;
 	virtual bool isOpacityModifyRGB () const override;
+	
+	// Frees global memory used for temporay vertex transformations.
+	static void destroyScratchBuffers();
 
 CC_CONSTRUCTOR_ACCESS:
 	SkeletonRenderer ();
@@ -136,7 +139,6 @@ protected:
 	spAttachmentLoader* _attachmentLoader;
 	cocos2d::CustomCommand _debugCommand;
 	cocos2d::BlendFunc _blendFunc;
-	float* _worldVertices;
 	bool _premultipliedAlpha;
 	spSkeleton* _skeleton;
 	float _timeScale;
