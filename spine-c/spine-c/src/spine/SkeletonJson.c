@@ -30,7 +30,6 @@
 
 #include <spine/SkeletonJson.h>
 #include <stdio.h>
-#include <locale.h>
 #include "Json.h"
 #include <spine/extension.h>
 #include <spine/AtlasAttachmentLoader.h>
@@ -579,24 +578,13 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	int i, ii;
 	spSkeletonData* skeletonData;
 	Json *root, *skeleton, *bones, *boneMap, *ik, *transform, *path, *slots, *skins, *animations, *events;
-	char* oldLocale;
 	_spSkeletonJson* internal = SUB_CAST(_spSkeletonJson, self);
 
 	FREE(self->error);
 	CONST_CAST(char*, self->error) = 0;
 	internal->linkedMeshCount = 0;
 
-#ifndef __ANDROID__
-	oldLocale = strdup(setlocale(LC_NUMERIC, NULL));
-	setlocale(LC_NUMERIC, "C");
-#endif
-
 	root = Json_create(json);
-
-#ifndef __ANDROID__
-	setlocale(LC_NUMERIC, oldLocale);
-	free(oldLocale);
-#endif
 
 	if (!root) {
 		_spSkeletonJson_setError(self, 0, "Invalid skeleton JSON: ", Json_getError());

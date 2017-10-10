@@ -66,6 +66,7 @@ public class SkeletonRenderer {
 		if (vertexEffect != null) vertexEffect.begin(skeleton);
 
 		boolean premultipliedAlpha = this.premultipliedAlpha;
+		BlendMode blendMode = null;
 		float[] vertices = this.vertices.items;
 		Color skeletonColor = skeleton.color;
 		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
@@ -79,6 +80,17 @@ public class SkeletonRenderer {
 				Color color = region.getColor(), slotColor = slot.getColor();
 				float alpha = a * slotColor.a * color.a * 255;
 				float multiplier = premultipliedAlpha ? alpha : 255;
+
+				BlendMode slotBlendMode = slot.data.getBlendMode();
+				if (slotBlendMode != blendMode) {
+					if (slotBlendMode == BlendMode.additive && premultipliedAlpha) {
+						slotBlendMode = BlendMode.normal;
+						alpha = 0;
+					}
+					blendMode = slotBlendMode;
+					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
+				}
+
 				float c = NumberUtils.intToFloatColor(((int)alpha << 24) //
 					| ((int)(b * slotColor.b * color.b * multiplier) << 16) //
 					| ((int)(g * slotColor.g * color.g * multiplier) << 8) //
@@ -92,8 +104,6 @@ public class SkeletonRenderer {
 
 				if (vertexEffect != null) applyVertexEffect(vertices, 20, 5, c, 0);
 
-				BlendMode blendMode = slot.data.getBlendMode();
-				batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
 				batch.draw(region.getRegion().getTexture(), vertices, 0, 20);
 
 			} else if (attachment instanceof ClippingAttachment) {
@@ -101,9 +111,8 @@ public class SkeletonRenderer {
 				continue;
 
 			} else if (attachment instanceof MeshAttachment) {
-				throw new RuntimeException(
-					"SkeletonRenderer#draw(PolygonSpriteBatch, Skeleton) or #draw(TwoColorPolygonBatch, Skeleton) must be used to "
-						+ "render meshes.");
+				throw new RuntimeException(batch.getClass().getSimpleName()
+					+ " cannot render meshes, PolygonSpriteBatch or TwoColorPolygonBatch is required.");
 
 			} else if (attachment instanceof SkeletonAttachment) {
 				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
@@ -175,16 +184,21 @@ public class SkeletonRenderer {
 				Color slotColor = slot.getColor();
 				float alpha = a * slotColor.a * color.a * 255;
 				float multiplier = premultipliedAlpha ? alpha : 255;
+
+				BlendMode slotBlendMode = slot.data.getBlendMode();
+				if (slotBlendMode != blendMode) {
+					if (slotBlendMode == BlendMode.additive && premultipliedAlpha) {
+						slotBlendMode = BlendMode.normal;
+						alpha = 0;
+					}
+					blendMode = slotBlendMode;
+					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
+				}
+
 				float c = NumberUtils.intToFloatColor(((int)alpha << 24) //
 					| ((int)(b * slotColor.b * color.b * multiplier) << 16) //
 					| ((int)(g * slotColor.g * color.g * multiplier) << 8) //
 					| (int)(r * slotColor.r * color.r * multiplier));
-
-				BlendMode slotBlendMode = slot.data.getBlendMode();
-				if (slotBlendMode != blendMode) {
-					blendMode = slotBlendMode;
-					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
-				}
 
 				if (clipper.isClipping()) {
 					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, c, 0, false);
@@ -288,6 +302,17 @@ public class SkeletonRenderer {
 				Color lightColor = slot.getColor();
 				float alpha = a * lightColor.a * color.a * 255;
 				float multiplier = premultipliedAlpha ? alpha : 255;
+
+				BlendMode slotBlendMode = slot.data.getBlendMode();
+				if (slotBlendMode != blendMode) {
+					if (slotBlendMode == BlendMode.additive && premultipliedAlpha) {
+						slotBlendMode = BlendMode.normal;
+						alpha = 0;
+					}
+					blendMode = slotBlendMode;
+					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
+				}
+
 				float red = r * color.r * multiplier;
 				float green = g * color.g * multiplier;
 				float blue = b * color.b * multiplier;
@@ -300,12 +325,6 @@ public class SkeletonRenderer {
 					: NumberUtils.intToFloatColor((int)(blue * darkColor.b) << 16 //
 						| (int)(green * darkColor.g) << 8 //
 						| (int)(red * darkColor.r));
-
-				BlendMode slotBlendMode = slot.data.getBlendMode();
-				if (slotBlendMode != blendMode) {
-					blendMode = slotBlendMode;
-					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
-				}
 
 				if (clipper.isClipping()) {
 					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, light, dark, true);

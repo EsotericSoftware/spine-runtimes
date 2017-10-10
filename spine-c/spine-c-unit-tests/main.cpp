@@ -22,11 +22,11 @@ void RegisterMemoryLeakDetector()
 {
 	// Register our malloc and free functions to track memory leaks
 	#ifdef KANJI_MEMTRACE
-	_setDebugMalloc(_kanjimalloc);
+	_spSetDebugMalloc(_kanjimalloc);
 	#endif
-	_setMalloc(_kanjimalloc);
-	_setRealloc(_kanjirealloc);
-	_setFree(_kanjifree);
+	_spSetMalloc(_kanjimalloc);
+	_spSetRealloc(_kanjirealloc);
+	_spSetFree(_kanjifree);
 }
 
 int main(int argc, char* argv[])
@@ -74,6 +74,6 @@ extern "C" { // probably unnecessary
 	}
 
 	char* _spUtil_readFile(const char* path, int* length) {
-		return _readFile(path, length);
+		return _spReadFile(path, length);
 	}
 }
