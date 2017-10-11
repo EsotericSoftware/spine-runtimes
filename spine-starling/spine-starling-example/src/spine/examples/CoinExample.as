@@ -45,13 +45,13 @@ package spine.examples {
 	import spine.starling.SkeletonAnimation;
 
 	public class CoinExample extends Sprite {
-		[Embed(source = "/coin-pro.json", mimeType = "application/octet-stream")]
+		[Embed(source = "/Divico.json", mimeType = "application/octet-stream")]
 		static public const CoinJson : Class;
 
-		[Embed(source = "/coin.atlas", mimeType = "application/octet-stream")]
+		[Embed(source = "/Divico.atlas", mimeType = "application/octet-stream")]
 		static public const CoinAtlas : Class;
 
-		[Embed(source = "/coin.png")]
+		[Embed(source = "/Divico.png")]
 		static public const CoinAtlasTexture : Class;
 		private var skeleton : SkeletonAnimation;
 
@@ -68,7 +68,9 @@ package spine.examples {
 			this.y = 600;
 
 			skeleton = new SkeletonAnimation(skeletonData);
-			skeleton.state.setAnimationByName(0, "rotate", true);
+			skeleton.state.data.defaultMix = 2;
+			skeleton.state.setAnimationByName(0, "airattack1", true);
+			skeleton.state.addAnimationByName(0, "idle", true, 3);
 			skeleton.state.timeScale = 0.5;
 			skeleton.state.update(0.25);
 			skeleton.state.apply(skeleton.skeleton);
