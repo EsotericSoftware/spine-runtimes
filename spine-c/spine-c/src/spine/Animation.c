@@ -851,7 +851,7 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 			slot->attachmentVerticesCapacity = vertexCount;
 		}
 	}
-	slot->attachmentVerticesCount = vertexCount;
+	if (slot->attachmentVerticesCount == 0) alpha = 1;
 
 	frameVertices = self->frameVertices;
 	vertices = slot->attachmentVertices;
@@ -860,15 +860,15 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 		spVertexAttachment* vertexAttachment = SUB_CAST(spVertexAttachment, slot->attachment);
 		switch (pose) {
 			case SP_MIX_POSE_SETUP:
-				if (!vertexAttachment->bones) {
-					memcpy(vertices, vertexAttachment->vertices, vertexCount * sizeof(float));
-				} else {
-					for (i = 0; i < vertexCount; i++) vertices[i] = 0;
-				}
+				slot->attachmentVerticesCount = 0;
 				return;
 			case SP_MIX_POSE_CURRENT:
 			case SP_MIX_POSE_CURRENT_LAYERED: /* to appease compiler */
-				if (alpha == 1) break;
+				if (alpha == 1) {
+					slot->attachmentVerticesCount = 0;
+					return;
+				}
+				slot->attachmentVerticesCount = vertexCount;
 				if (!vertexAttachment->bones) {
 					float* setupVertices = vertexAttachment->vertices;
 					for (i = 0; i < vertexCount; i++) {
@@ -884,6 +884,7 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 		return;
 	}
 
+	slot->attachmentVerticesCount = vertexCount;
 	if (time >= frames[framesCount - 1]) { /* Time is after last frame. */
 		const float* lastVertices = self->frameVertices[framesCount - 1];
 		if (alpha == 1) {
