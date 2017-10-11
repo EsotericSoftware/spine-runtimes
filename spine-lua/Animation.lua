@@ -797,50 +797,43 @@ function Animation.DeformTimeline.new (frameCount)
 
 		local frames = self.frames
 		local verticesArray = slot.attachmentVertices
+    if #(verticesArray) == 0 then alpha = 1 end
 
 		local frameVertices = self.frameVertices
-		local vertexCount = #(frameVertices[0])
-		local vertices = utils.setArraySize(verticesArray, vertexCount)
+		local vertexCount = #(frameVertices[0])		
 		
 		if time < frames[0] then
 			local vertexAttachment = slotAttachment;
 			if pose == MixPose.setup then
-				if (vertexAttachment.bones == nil) then
-					local i = 1
-					local setupVertices = vertexAttachment.vertices
-					while i <= vertexCount do
-						vertices[i] = setupVertices[i]
-						i = i + 1
-					end
-				else
-					local i = 1
-					while i <= vertexCount do
-						vertices[i] = 0
-						i = i + 1
-					end
-				end
+        slot.attachmentVertices = {}
+        return;
 			elseif pose == MixPose.current then
-				if (alpha ~= 1) then
-					if (vertexAttachment.bones == nil) then
-						local setupVertices = vertexAttachment.vertices
-						local i = 1
-						while i <= vertexCount do
-							vertices[i] = vertices[i] + (setupVertices[i] - vertices[i]) * alpha
-							i = i + 1
-						end
-					else
-						alpha = 1 - alpha
-						local i = 1
-						while i <= vertexCount do
-							vertices[i] = vertices[i] * alpha
-							i = i + 1
-						end
-					end
-				end				
+        if (alpha == 1) then
+          slot.attachmentVertices = {}
+          return;
+        end
+
+        local vertices = utils.setArraySize(verticesArray, vertexCount)
+        if (vertexAttachment.bones == nil) then
+          local setupVertices = vertexAttachment.vertices
+          local i = 1
+          while i <= vertexCount do
+            vertices[i] = vertices[i] + (setupVertices[i] - vertices[i]) * alpha
+            i = i + 1
+          end
+        else
+          alpha = 1 - alpha
+          local i = 1
+          while i <= vertexCount do
+            vertices[i] = vertices[i] * alpha
+            i = i + 1
+          end
+        end
 			end
 			return
 		end
 
+    local vertices = utils.setArraySize(verticesArray, vertexCount)
 		if time >= frames[zlen(frames) - 1] then -- Time is after last frame.
 			local lastVertices = frameVertices[zlen(frames) - 1]
 			if alpha == 1 then
