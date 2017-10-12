@@ -84,7 +84,8 @@ struct spTrackEntry {
 		timelineData(0),
 		timelineDipMix(0),
 		timelinesRotation(0),
-		timelinesRotationCount(0) {
+		timelinesRotationCount(0),
+		rendererObject(0), userData(0) {
 	}
 #endif
 };
@@ -102,6 +103,7 @@ struct spAnimationState {
 	spTrackEntryArray* mixingTo;
 
 	void* rendererObject;
+	void* userData;
 
 #ifdef __cplusplus
 	spAnimationState() :
@@ -111,7 +113,8 @@ struct spAnimationState {
 		listener(0),
 		timeScale(0),
 		mixingTo(0),
-		rendererObject(0) {
+		rendererObject(0),
+		userData(0) {
 	}
 #endif
 };
