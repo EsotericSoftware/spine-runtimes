@@ -52,6 +52,7 @@
   * Added `spVertexEffect` and corresponding implementations `spJitterVertexEffect` and `spSwirlVertexEffect`. Create/dispose through the corresponding `spXXXVertexEffect_create()/dispose()` functions. Set on framework/engine specific renderer. See changes for spine-c based frameworks/engines below.
   * Functions in `extension.h` are not prefixed with `_sp` instead of just `_` to avoid interference with other libraries.
   * Introduced `SP_API` macro. Every spine-c function is prefixed with this macro. By default, it is an empty string. Can be used to markup spine-c functions with e.g. ``__declspec` when compiling to a dll or linking to that dll.
+  * Added `void* userData` to `spAnimationState` to be consumed in callbacks.
 
 ### Cocos2d-X
  * Fixed renderer to work with 3.6 changes
