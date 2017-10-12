@@ -52,6 +52,7 @@
   * Added `spVertexEffect` and corresponding implementations `spJitterVertexEffect` and `spSwirlVertexEffect`. Create/dispose through the corresponding `spXXXVertexEffect_create()/dispose()` functions. Set on framework/engine specific renderer. See changes for spine-c based frameworks/engines below.
   * Functions in `extension.h` are not prefixed with `_sp` instead of just `_` to avoid interference with other libraries.
   * Introduced `SP_API` macro. Every spine-c function is prefixed with this macro. By default, it is an empty string. Can be used to markup spine-c functions with e.g. ``__declspec` when compiling to a dll or linking to that dll.
+  * Added `void* userData` to `spAnimationState` to be consumed in callbacks.
 
 ### Cocos2d-X
  * Fixed renderer to work with 3.6 changes
@@ -83,6 +84,7 @@
  * Added support for two color tinting. All base materials, e.g. SpineUnlitNormalMaterial, now do proper two color tinting. No material parameters have changed.
  * Updated to Unreal Engine 4.16.1. Note that 4.16 has a regression which will make it impossible to compile plain .c files!
  * spine-c is now exposed from the plugin shared library on Windows via __declspec.
+ * `SkeletonRenderComponent` now generates collision meshes by default.
 
 ## C#
 * **Breaking changes**

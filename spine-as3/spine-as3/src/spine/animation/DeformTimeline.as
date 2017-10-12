@@ -35,8 +35,7 @@ package spine.animation {
 	import spine.Skeleton;
 	import spine.Slot;
 
-	public class DeformTimeline extends CurveTimeline {
-		private static var zeros : Vector.<Number> = new Vector.<Number>(64);
+	public class DeformTimeline extends CurveTimeline {		
 		public var slotIndex : int;
 		public var frames : Vector.<Number>;
 		public var frameVertices : Vector.<Vector.<Number>>;
@@ -66,10 +65,11 @@ package spine.animation {
 			if (!(slotAttachment is VertexAttachment) || !(VertexAttachment(slotAttachment)).applyDeform(attachment)) return;
 			
 			var verticesArray : Vector.<Number> = slot.attachmentVertices;
+			if (verticesArray.length == 0) alpha = 1;
+			
 			var frameVertices : Vector.<Vector.<Number>> = this.frameVertices;
-			var vertexCount : int = frameVertices[0].length;			
-			verticesArray.length = vertexCount;
-			var vertices : Vector.<Number> = verticesArray;
+			var vertexCount : int = frameVertices[0].length;
+			var vertices : Vector.<Number>;		
 
 			var frames : Vector.<Number> = this.frames;
 			var i : int;			
@@ -77,20 +77,15 @@ package spine.animation {
 				vertexAttachment = VertexAttachment(slotAttachment);
 				switch (pose) {
 				case MixPose.setup:
-					var zeroVertices : Vector.<Number>;
-					if (vertexAttachment.bones == null) {
-						// Unweighted vertex positions (setup pose).
-						zeroVertices = vertexAttachment.vertices;
-					} else {
-						// Weighted deform offsets (zeros).
-						zeroVertices = zeros;
-						if (zeroVertices.length < vertexCount) zeros = zeroVertices = new Vector.<Number>(vertexCount);
-					}					
-					for (i = 0; i < vertexCount; i++)
-						vertices[i] = zeroVertices[i];
+					verticesArray.length = 0;
 					return;
 				case MixPose.current:
-					if (alpha == 1) break;
+					if (alpha == 1) {
+						verticesArray.length = 0;
+						return;
+					}
+					verticesArray.length = vertexCount;
+					vertices = verticesArray;
 					if (vertexAttachment.bones == null) {
 						// Unweighted vertex positions.
 						setupVertices = vertexAttachment.vertices;
@@ -106,6 +101,8 @@ package spine.animation {
 				return;
 			}						
 
+			verticesArray.length = vertexCount;
+			vertices = verticesArray;
 			var n : int;			
 			var setup : Number, prev : Number;
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.

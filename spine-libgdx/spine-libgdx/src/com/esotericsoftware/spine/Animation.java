@@ -862,8 +862,6 @@ public class Animation {
 
 	/** Changes a slot's {@link Slot#getAttachmentVertices()} to deform a {@link VertexAttachment}. */
 	static public class DeformTimeline extends CurveTimeline {
-		static private float[] zeros = new float[64];
-
 		int slotIndex;
 		VertexAttachment attachment;
 		private final float[] frames; // time, ...
@@ -923,28 +921,24 @@ public class Animation {
 			if (!(slotAttachment instanceof VertexAttachment) || !((VertexAttachment)slotAttachment).applyDeform(attachment)) return;
 
 			FloatArray verticesArray = slot.getAttachmentVertices();
+			if (verticesArray.size == 0) alpha = 1;
+
 			float[][] frameVertices = this.frameVertices;
 			int vertexCount = frameVertices[0].length;
-			float[] vertices = verticesArray.setSize(vertexCount);
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
 				switch (pose) {
 				case setup:
-					float[] zeroVertices;
-					if (vertexAttachment.getBones() == null) {
-						// Unweighted vertex positions (setup pose).
-						zeroVertices = vertexAttachment.getVertices();
-					} else {
-						// Weighted deform offsets (zeros).
-						zeroVertices = zeros;
-						if (zeroVertices.length < vertexCount) zeros = zeroVertices = new float[vertexCount];
-					}
-					System.arraycopy(zeroVertices, 0, vertices, 0, vertexCount);
+					verticesArray.clear();
 					return;
 				case current:
-					if (alpha == 1) break;
+					if (alpha == 1) {
+						verticesArray.clear();
+						return;
+					}
+					float[] vertices = verticesArray.setSize(vertexCount);
 					if (vertexAttachment.getBones() == null) {
 						// Unweighted vertex positions.
 						float[] setupVertices = vertexAttachment.getVertices();
@@ -959,6 +953,8 @@ public class Animation {
 				}
 				return;
 			}
+
+			float[] vertices = verticesArray.setSize(vertexCount);
 
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.
 				float[] lastVertices = frameVertices[frames.length - 1];
