@@ -84,6 +84,7 @@
  * Added support for two color tinting. All base materials, e.g. SpineUnlitNormalMaterial, now do proper two color tinting. No material parameters have changed.
  * Updated to Unreal Engine 4.16.1. Note that 4.16 has a regression which will make it impossible to compile plain .c files!
  * spine-c is now exposed from the plugin shared library on Windows via __declspec.
+ * `SkeletonRenderComponent` now generates collision meshes by default.
 
 ## C#
 * **Breaking changes**
