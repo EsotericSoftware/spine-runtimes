@@ -45,6 +45,7 @@ namespace Spine {
 		SkeletonClipping clipper = new SkeletonClipping();	
 		GraphicsDevice device;
 		MeshBatcher batcher;
+		public MeshBatcher Batcher { get { return batcher; } }
 		RasterizerState rasterizerState;
 		float[] vertices = new float[8];
 		int[] quadTriangles = { 0, 1, 2, 2, 3, 0 };
