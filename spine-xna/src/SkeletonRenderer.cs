@@ -163,8 +163,13 @@ namespace Spine {
 
 				Color darkColor = new Color();
 				if (slot.HasSecondColor) {
-					darkColor = new Color(slot.R2, slot.G2, slot.B2);
+					if (premultipliedAlpha) {
+						darkColor = new Color(slot.R2 * a, slot.G2 * a, slot.B2 * a);
+					} else {
+						darkColor = new Color(slot.R2 * a, slot.G2 * a, slot.B2 * a);
+					}
 				}
+				darkColor.A = premultipliedAlpha ? (byte)255 : (byte)0;
 
 				// clip
 				if (clipper.IsClipping()) {
