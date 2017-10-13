@@ -25,6 +25,7 @@
  * Added support for clipping.
  * Added support for rotated regions in texture atlas loaded via StarlingAtlasAttachmentLoader.
  * Added support for vertex effects. See `RaptorExample.as`
+ * Added 'getTexture()' method to 'StarlingTextureAtlasAttachmentLoader'
 
 ## C
  * **Breaking changes**
@@ -52,7 +53,6 @@
   * Added `spVertexEffect` and corresponding implementations `spJitterVertexEffect` and `spSwirlVertexEffect`. Create/dispose through the corresponding `spXXXVertexEffect_create()/dispose()` functions. Set on framework/engine specific renderer. See changes for spine-c based frameworks/engines below.
   * Functions in `extension.h` are not prefixed with `_sp` instead of just `_` to avoid interference with other libraries.
   * Introduced `SP_API` macro. Every spine-c function is prefixed with this macro. By default, it is an empty string. Can be used to markup spine-c functions with e.g. ``__declspec` when compiling to a dll or linking to that dll.
-  * Added `void* userData` to `spAnimationState` to be consumed in callbacks.
 
 ### Cocos2d-X
  * Fixed renderer to work with 3.6 changes
@@ -64,6 +64,7 @@
  * SkeletonRenderer now combines the displayed color of the Node (cascaded from all parents) with the skeleton color for tinting.
  * Added support for vertex effects. See `RaptorExample.cpp`.
  * Added ETC1 alpha support, thanks @halx99! Does not work when two color tint is enabled.
+ * Added `spAtlasPage_setCustomTextureLoader()` which let's you do texture loading manually. Thanks @jareguo.
 
 ### Cocos2d-Objc
  * Fixed renderer to work with 3.6 changes
@@ -84,7 +85,6 @@
  * Added support for two color tinting. All base materials, e.g. SpineUnlitNormalMaterial, now do proper two color tinting. No material parameters have changed.
  * Updated to Unreal Engine 4.16.1. Note that 4.16 has a regression which will make it impossible to compile plain .c files!
  * spine-c is now exposed from the plugin shared library on Windows via __declspec.
- * `SkeletonRenderComponent` now generates collision meshes by default.
 
 ## C#
 * **Breaking changes**
@@ -147,6 +147,7 @@
  * Removed `RegionBatcher` and `SkeletonRegionRenderer`, renamed `SkeletonMeshRenderer` to `SkeletonRenderer`
  * Added support for two color tint. For it to work, you need to add the `SpineEffect.fx` file to your content project, then load it via `var effect = Content.Load<Effect>("SpineEffect");`, and set it on the `SkeletonRenderer`. See the example project for code.
  * Added support for any `Effect` to be used by `SkeletonRenderer`
+ * Added support for `IVertexEffect` to modify vertices of skeletons on the CPU. `IVertexEffect` instances can be set on the `SkeletonRenderer`. See example project.
  * Added `SkeletonDebugRenderer`
 
 ## Java
