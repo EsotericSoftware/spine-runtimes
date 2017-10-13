@@ -149,6 +149,7 @@
  * Added support for any `Effect` to be used by `SkeletonRenderer`
  * Added support for `IVertexEffect` to modify vertices of skeletons on the CPU. `IVertexEffect` instances can be set on the `SkeletonRenderer`. See example project.
  * Added `SkeletonDebugRenderer`
+ * Made `MeshBatcher` of SkeletonRenderer accessible via a getter. Allows user to batch their own geometry together with skeleton meshes for maximum batching instead of using XNA SpriteBatcher.
 
 ## Java
  * **Breaking changes**
