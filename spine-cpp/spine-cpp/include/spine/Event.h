@@ -63,8 +63,6 @@ namespace Spine
         int _intValue;
         float _floatValue;
         std::string _stringValue;
-        
-        friend std::ostream& operator <<(std::ostream& os, const Event& ref);
     };
 }
 

@@ -388,8 +388,6 @@ namespace Spine
             this.d = sin * b + cos * d;
             appliedValid = false;
         }
-        
-        friend std::ostream& operator <<(std::ostream& os, const Bone& ref);
     };
 }
 

@@ -57,7 +57,7 @@ namespace Spine
         _order = inValue;
     }
     
-    std::vector<BoneData*>& IkConstraintData::getBones()
+    SimpleArray<BoneData*>& IkConstraintData::getBones()
     {
         return _bones;
     }
@@ -90,12 +90,5 @@ namespace Spine
     void IkConstraintData::setMix(float inValue)
     {
         _mix = inValue;
-    }
-    
-    std::ostream& operator <<(std::ostream& os, const IkConstraintData& ref)
-    {
-        os << ref._name;
-        
-        return os;
     }
 }

@@ -196,20 +196,13 @@ namespace Spine
         _attachmentTime = _skeleton.getTime() - inValue;
     }
     
-    std::vector<float>& Slot::getAttachmentVertices()
+    SimpleArray<float>& Slot::getAttachmentVertices()
     {
         return _attachmentVertices;
     }
     
-    void Slot::setAttachmentVertices(std::vector<float> inValue)
+    void Slot::setAttachmentVertices(SimpleArray<float> inValue)
     {
         _attachmentVertices = inValue;
-    }
-    
-    std::ostream& operator <<(std::ostream& os, const Slot& ref)
-    {
-        os << ref._slotData.getName();
-        
-        return os;
     }
 }

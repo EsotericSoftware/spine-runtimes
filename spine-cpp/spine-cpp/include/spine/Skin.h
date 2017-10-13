@@ -32,8 +32,10 @@
 #define Spine_Skin_h
 
 #include <string>
-#include <vector>
-#include <unordered_map>
+#include <spine/HashMap.h>
+#include <spine/SimpleArray.h>
+
+struct HashAttachmentKey;
 
 namespace Spine
 {
@@ -66,43 +68,37 @@ namespace Spine
         /// Returns the attachment for the specified slot index and name, or null.
         Attachment* getAttachment(int slotIndex, std::string name);
         
-        /// Finds the skin keys for a given slot. The results are added to the passed vector names.
+        /// Finds the skin keys for a given slot. The results are added to the passed array of names.
         /// @param slotIndex The target slotIndex. To find the slot index, use Skeleton::findSlotIndex or SkeletonData::findSlotIndex
-        /// @param names Found skin key names will be added to this vector.
-        void findNamesForSlot(int slotIndex, std::vector<std::string>& names);
+        /// @param names Found skin key names will be added to this array.
+        void findNamesForSlot(int slotIndex, SimpleArray<std::string>& names);
         
-        /// Finds the attachments for a given slot. The results are added to the passed List(Attachment).
+        /// Finds the attachments for a given slot. The results are added to the passed array of Attachments.
         /// @param slotIndex The target slotIndex. To find the slot index, use Skeleton::findSlotIndex or SkeletonData::findSlotIndex
-        /// @param attachments Found Attachments will be added to this vector.
-        void findAttachmentsForSlot(int slotIndex, std::vector<Attachment*>& attachments);
+        /// @param attachments Found Attachments will be added to this array.
+        void findAttachmentsForSlot(int slotIndex, SimpleArray<Attachment*>& attachments);
         
         const std::string& getName();
-        std::unordered_map<AttachmentKey, Attachment*>& getAttachments();
+        HashMap<AttachmentKey, Attachment*, HashAttachmentKey>& getAttachments();
         
     private:
         const std::string _name;
-        std::unordered_map<AttachmentKey, Attachment*> _attachments;
+        HashMap<AttachmentKey, Attachment*, HashAttachmentKey> _attachments;
         
         /// Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached.
         void attachAll(Skeleton& skeleton, Skin& oldSkin);
-        
-        friend std::ostream& operator <<(std::ostream& os, const Skin& ref);
     };
 }
 
-namespace std
+struct HashAttachmentKey
 {
-    template <>
-    struct hash<Spine::Skin::AttachmentKey>
+    std::size_t operator()(const Spine::Skin::AttachmentKey& val) const
     {
-        std::size_t operator()(const Spine::Skin::AttachmentKey& val) const
-        {
-            size_t h1 = hash<int>{}(val._slotIndex);
-            size_t h2 = hash<string>{}(val._name);
-            
-            return h1 ^ (h2 << 1);
-        }
-    };
-}
+        std::size_t h1 = std::hash<int>{}(val._slotIndex);
+        std::size_t h2 = std::hash<std::string>{}(val._name);
+        
+        return h1 ^ (h2 << 1);
+    }
+};
 
 #endif /* Spine_Skin_h */

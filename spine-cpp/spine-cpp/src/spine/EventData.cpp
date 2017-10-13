@@ -78,11 +78,4 @@ namespace Spine
     {
         _stringValue = inValue;
     }
-    
-    std::ostream& operator <<(std::ostream& os, const EventData& ref)
-    {
-        os << ref._name;
-        
-        return os;
-    }
 }

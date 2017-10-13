@@ -167,11 +167,4 @@ namespace Spine
     {
         _blendMode = inValue;
     }
-    
-    std::ostream& operator <<(std::ostream& os, const SlotData& ref)
-    {
-        os << ref._name;
-        
-        return os;
-    }
 }

@@ -65,36 +65,36 @@ namespace Spine
     
     Attachment* Skin::getAttachment(int slotIndex, std::string name)
     {
-        std::unordered_map<AttachmentKey, Attachment*>::iterator q = _attachments.find(AttachmentKey(slotIndex, name));
+        HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = _attachments.find(AttachmentKey(slotIndex, name));
         
         Attachment* ret = nullptr;
         
-        if (q != _attachments.end())
+        if (i != _attachments.end())
         {
-            ret = q->second;
+            ret = i.second();
         }
         
         return ret;
     }
     
-    void Skin::findNamesForSlot(int slotIndex, std::vector<std::string>& names)
+    void Skin::findNamesForSlot(int slotIndex, SimpleArray<std::string>& names)
     {
-        for (std::unordered_map<AttachmentKey, Attachment*>::iterator i = _attachments.begin(); i != _attachments.end(); ++i)
+        for (HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = _attachments.begin(); i != _attachments.end(); ++i)
         {
-            if (i->first._slotIndex == slotIndex)
+            if (i.first()._slotIndex == slotIndex)
             {
-                names.push_back(i->first._name);
+                names.push_back(i.first()._name);
             }
         }
     }
     
-    void Skin::findAttachmentsForSlot(int slotIndex, std::vector<Attachment*>& attachments)
+    void Skin::findAttachmentsForSlot(int slotIndex, SimpleArray<Attachment*>& attachments)
     {
-        for (std::unordered_map<AttachmentKey, Attachment*>::iterator i = _attachments.begin(); i != _attachments.end(); ++i)
+        for (HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = _attachments.begin(); i != _attachments.end(); ++i)
         {
-            if (i->first._slotIndex == slotIndex)
+            if (i.first()._slotIndex == slotIndex)
             {
-                attachments.push_back(i->second);
+                attachments.push_back(i.second());
             }
         }
     }
@@ -104,33 +104,26 @@ namespace Spine
         return _name;
     }
     
-    std::unordered_map<Skin::AttachmentKey, Attachment*>& Skin::getAttachments()
+    HashMap<Skin::AttachmentKey, Attachment*, HashAttachmentKey>& Skin::getAttachments()
     {
         return _attachments;
     }
     
     void Skin::attachAll(Skeleton& skeleton, Skin& oldSkin)
     {
-        for (std::unordered_map<AttachmentKey, Attachment*>::iterator i = oldSkin.getAttachments().begin(); i != oldSkin.getAttachments().end(); ++i)
+        for (HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = oldSkin.getAttachments().begin(); i != oldSkin.getAttachments().end(); ++i)
         {
-            int slotIndex = i->first._slotIndex;
+            int slotIndex = i.first()._slotIndex;
             Slot* slot = skeleton.getSlots().at(slotIndex);
             
-            if (slot->getAttachment() == i->second)
+            if (slot->getAttachment() == i.second())
             {
                 Attachment* attachment = nullptr;
-                if ((attachment = getAttachment(slotIndex, i->first._name)))
+                if ((attachment = getAttachment(slotIndex, i.first()._name)))
                 {
                     slot->setAttachment(attachment);
                 }
             }
         }
-    }
-    
-    std::ostream& operator <<(std::ostream& os, const Skin& ref)
-    {
-        os << ref._name;
-        
-        return os;
     }
 }

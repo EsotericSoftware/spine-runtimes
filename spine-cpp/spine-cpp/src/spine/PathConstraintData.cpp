@@ -68,7 +68,7 @@ namespace Spine
         _order = inValue;
     }
     
-    std::vector<BoneData*>& PathConstraintData::getBones()
+    SimpleArray<BoneData*>& PathConstraintData::getBones()
     {
         return _bones;
     }
@@ -161,12 +161,5 @@ namespace Spine
     void PathConstraintData::setTranslateMix(float inValue)
     {
         _translateMix = inValue;
-    }
-    
-    std::ostream& operator <<(std::ostream& os, const PathConstraintData& ref)
-    {
-        os << ref._name;
-        
-        return os;
     }
 }

@@ -42,7 +42,7 @@ namespace Spine
         
         RotateTimeline(int frameCount);
         
-        virtual void apply(Skeleton& skeleton, float lastTime, float time, std::vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
+        virtual void apply(Skeleton& skeleton, float lastTime, float time, SimpleArray<Event*>& events, float alpha, MixPose pose, MixDirection direction);
         
         virtual int getPropertyId();
         
@@ -52,8 +52,8 @@ namespace Spine
         int getBoneIndex();
         void setBoneIndex(int inValue);
         
-        std::vector<float>& getFrames();
-        void setFrames(std::vector<float> inValue);
+        SimpleArray<float>& getFrames();
+        void setFrames(SimpleArray<float> inValue);
         
     private:
         static const int PREV_TIME = -2;
@@ -61,7 +61,7 @@ namespace Spine
         static const int ROTATION = 1;
         
         int _boneIndex;
-        std::vector<float> _frames; // time, angle, ...
+        SimpleArray<float> _frames; // time, angle, ...
     };
 }
 

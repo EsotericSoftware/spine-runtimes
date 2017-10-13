@@ -60,8 +60,6 @@ namespace Spine
     private:
         friend class Event;
         const std::string _name;
-        
-        friend std::ostream& operator <<(std::ostream& os, const EventData& ref);
     };
 }
 

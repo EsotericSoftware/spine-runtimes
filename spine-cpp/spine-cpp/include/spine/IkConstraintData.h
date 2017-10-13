@@ -31,8 +31,9 @@
 #ifndef Spine_IkConstraintData_h
 #define Spine_IkConstraintData_h
 
+#include <spine/SimpleArray.h>
+
 #include <string>
-#include <vector>
 
 class BoneData;
 
@@ -50,7 +51,7 @@ namespace Spine
         void setOrder(int inValue);
         
         /// The bones that are constrained by this IK Constraint.
-        std::vector<BoneData*>& getBones();
+        SimpleArray<BoneData*>& getBones();
         
         /// The bone that is the IK target.
         BoneData* getTarget();
@@ -66,12 +67,10 @@ namespace Spine
     private:
         const std::string _name;
         int _order;
-        std::vector<BoneData*> _bones;
+        SimpleArray<BoneData*> _bones;
         BoneData* _target;
         int _bendDirection;
         float _mix;
-        
-        friend std::ostream& operator <<(std::ostream& os, const IkConstraintData& ref);
     };
 }
 

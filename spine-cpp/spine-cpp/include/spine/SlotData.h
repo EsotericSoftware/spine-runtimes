@@ -84,8 +84,6 @@ namespace Spine
         bool _hasSecondColor;
         std::string _attachmentName;
         BlendMode _blendMode;
-        
-        friend std::ostream& operator <<(std::ostream& os, const SlotData& ref);
     };
 }
 

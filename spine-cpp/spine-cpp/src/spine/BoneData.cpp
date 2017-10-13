@@ -156,11 +156,4 @@ namespace Spine
     {
         _transformMode = inValue;
     }
-    
-    std::ostream& operator <<(std::ostream& os, const BoneData& ref)
-    {
-        os << ref._name;
-        
-        return os;
-    }
 }

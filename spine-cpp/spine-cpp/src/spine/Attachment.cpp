@@ -43,11 +43,4 @@ namespace Spine
     {
         return _name;
     }
-    
-    std::ostream& operator <<(std::ostream& os, const Attachment& ref)
-    {
-        os << ref._name;
-        
-        return os;
-    }
 }

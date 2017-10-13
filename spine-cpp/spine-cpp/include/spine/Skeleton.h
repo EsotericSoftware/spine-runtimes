@@ -31,8 +31,9 @@
 #ifndef Spine_Skeleton_h
 #define Spine_Skeleton_h
 
+#include <spine/SimpleArray.h>
+
 #include <string>
-#include <vector>
 
 namespace Spine
 {
@@ -49,13 +50,13 @@ namespace Spine
     {
     public:
         SkeletonData* getData();
-        std::vector<Bone*> getBones();
-        std::vector<Updatable*> getUpdateCacheList();
-        std::vector<Slot*> getSlots();
-        std::vector<Slot*> getDrawOrder();
-        std::vector<IkConstraint*> getIkConstraints();
-        std::vector<PathConstraint*> getPathConstraints();
-        std::vector<TransformConstraint*> getTransformConstraints();
+        SimpleArray<Bone*> getBones();
+        SimpleArray<Updatable*> getUpdateCacheList();
+        SimpleArray<Slot*> getSlots();
+        SimpleArray<Slot*> getDrawOrder();
+        SimpleArray<IkConstraint*> getIkConstraints();
+        SimpleArray<PathConstraint*> getPathConstraints();
+        SimpleArray<TransformConstraint*> getTransformConstraints();
         
         Skin* getSkin { get { return skin; } set { skin = value; } }
         float getR { get { return r; } set { r = value; } }
@@ -83,7 +84,7 @@ namespace Spine
             
             this.data = data;
             
-            bones = new std::vector<Bone>(data.bones.Count);
+            bones = new SimpleArray<Bone>(data.bones.Count);
             foreach (BoneData boneData in data.bones)
             {
                 Bone bone;
@@ -100,8 +101,8 @@ namespace Spine
                 bones.Add(bone);
             }
             
-            slots = new std::vector<Slot>(data.slots.Count);
-            drawOrder = new std::vector<Slot>(data.slots.Count);
+            slots = new SimpleArray<Slot>(data.slots.Count);
+            drawOrder = new SimpleArray<Slot>(data.slots.Count);
             foreach (SlotData slotData in data.slots)
             {
                 Bone bone = bones.Items[slotData.boneData.index];
@@ -110,15 +111,15 @@ namespace Spine
                 drawOrder.Add(slot);
             }
             
-            ikConstraints = new std::vector<IkConstraint>(data.ikConstraints.Count);
+            ikConstraints = new SimpleArray<IkConstraint>(data.ikConstraints.Count);
             foreach (IkConstraintData ikConstraintData in data.ikConstraints)
             ikConstraints.Add(new IkConstraint(ikConstraintData, this));
             
-            transformConstraints = new std::vector<TransformConstraint>(data.transformConstraints.Count);
+            transformConstraints = new SimpleArray<TransformConstraint>(data.transformConstraints.Count);
             foreach (TransformConstraintData transformConstraintData in data.transformConstraints)
             transformConstraints.Add(new TransformConstraint(transformConstraintData, this));
             
-            pathConstraints = new std::vector<PathConstraint> (data.pathConstraints.Count);
+            pathConstraints = new SimpleArray<PathConstraint> (data.pathConstraints.Count);
             foreach (PathConstraintData pathConstraintData in data.pathConstraints)
             pathConstraints.Add(new PathConstraint(pathConstraintData, this));
             
@@ -135,17 +136,17 @@ namespace Spine
         /// or removed.
         void updateCache()
         {
-            std::vector<IUpdatable> updateCache = this.updateCache;
+            SimpleArray<IUpdatable> updateCache = this.updateCache;
             updateCache.Clear();
             this.updateCacheReset.Clear();
             
-            std::vector<Bone> bones = this.bones;
+            SimpleArray<Bone> bones = this.bones;
             for (int i = 0, n = bones.Count; i < n; i++)
             {
                 bones.Items[i].sorted = false;
             }
             
-            std::vector<IkConstraint> ikConstraints = this.ikConstraints;
+            SimpleArray<IkConstraint> ikConstraints = this.ikConstraints;
             var transformConstraints = this.transformConstraints;
             var pathConstraints = this.pathConstraints;
             int ikCount = IkConstraints.Count, transformCount = transformConstraints.Count, pathCount = pathConstraints.Count;
@@ -391,7 +392,7 @@ namespace Spine
                 }
                 else
                 {
-                    std::vector<Slot> slots = this.slots;
+                    SimpleArray<Slot> slots = this.slots;
                     for (int i = 0, n = slots.Count; i < n; i++)
                     {
                         Slot slot = slots.Items[i];
@@ -445,7 +446,7 @@ namespace Spine
                 throw new ArgumentNullException("slotName", "slotName cannot be null.");
             }
             
-            std::vector<Slot> slots = this.slots;
+            SimpleArray<Slot> slots = this.slots;
             for (int i = 0, n = slots.Count; i < n; i++)
             {
                 Slot slot = slots.Items[i];
@@ -478,7 +479,7 @@ namespace Spine
                 throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
             }
             
-            std::vector<IkConstraint> ikConstraints = this.ikConstraints;
+            SimpleArray<IkConstraint> ikConstraints = this.ikConstraints;
             for (int i = 0, n = ikConstraints.Count; i < n; i++)
             {
                 IkConstraint ikConstraint = ikConstraints.Items[i];
@@ -496,7 +497,7 @@ namespace Spine
                 throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
             }
             
-            std::vector<TransformConstraint> transformConstraints = this.transformConstraints;
+            SimpleArray<TransformConstraint> transformConstraints = this.transformConstraints;
             for (int i = 0, n = transformConstraints.Count; i < n; i++)
             {
                 TransformConstraint transformConstraint = transformConstraints.Items[i];
@@ -514,7 +515,7 @@ namespace Spine
                 throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
             }
             
-            std::vector<PathConstraint> pathConstraints = this.pathConstraints;
+            SimpleArray<PathConstraint> pathConstraints = this.pathConstraints;
             for (int i = 0, n = pathConstraints.Count; i < n; i++)
             {
                 PathConstraint constraint = pathConstraints.Items[i];
@@ -594,14 +595,14 @@ namespace Spine
         
     private:
         SkeletonData* _data;
-        std::vector<Bone*> _bones;
-        std::vector<Slot*> _slots;
-        std::vector<Slot*> _drawOrder;
-        std::vector<IkConstraint*> _ikConstraints;
-        std::vector<TransformConstraint*> _transformConstraints;
-        std::vector<PathConstraint*> _pathConstraints;
-        std::vector<IUpdatable*> _updateCache = new std::vector<IUpdatable>();
-        std::vector<Bone*> _updateCacheReset = new std::vector<Bone>();
+        SimpleArray<Bone*> _bones;
+        SimpleArray<Slot*> _slots;
+        SimpleArray<Slot*> _drawOrder;
+        SimpleArray<IkConstraint*> _ikConstraints;
+        SimpleArray<TransformConstraint*> _transformConstraints;
+        SimpleArray<PathConstraint*> _pathConstraints;
+        SimpleArray<IUpdatable*> _updateCache = new SimpleArray<IUpdatable>();
+        SimpleArray<Bone*> _updateCacheReset = new SimpleArray<Bone>();
         Skin _skin;
         float _r = 1, _g = 1, _b = 1, _a = 1;
         float _time;
@@ -763,7 +764,7 @@ namespace Spine
             updateCache.Add(bone);
         }
         
-        static void sortReset(std::vector<Bone*>& bones)
+        static void sortReset(SimpleArray<Bone*>& bones)
         {
             var bonesItems = bones.Items;
             for (int i = 0, n = bones.Count; i < n; i++)

@@ -31,8 +31,9 @@
 #ifndef Spine_TransformConstraintData_h
 #define Spine_TransformConstraintData_h
 
+#include <spine/SimpleArray.h>
+
 #include <string>
-#include <vector>
 
 namespace Spine
 {
@@ -45,7 +46,7 @@ namespace Spine
         
         const std::string& getName();
         int getOrder();
-        std::vector<BoneData*>& getBones();
+        SimpleArray<BoneData*>& getBones();
         BoneData* getTarget();
         float getRotateMix();
         float getTranslateMix();
@@ -65,13 +66,11 @@ namespace Spine
     private:
         const std::string _name;
         int _order;
-        std::vector<BoneData*> _bones;
+        SimpleArray<BoneData*> _bones;
         BoneData* _target;
         float _rotateMix, _translateMix, _scaleMix, _shearMix;
         float _offsetRotation, _offsetX, _offsetY, _offsetScaleX, _offsetScaleY, _offsetShearY;
         bool _relative, _local;
-        
-        friend std::ostream& operator <<(std::ostream& os, const TransformConstraintData& ref);
     };
 }
 

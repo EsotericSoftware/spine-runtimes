@@ -93,8 +93,6 @@ namespace Spine
         float _length;
         float _x, _y, _rotation, _scaleX, _scaleY, _shearX, _shearY;
         TransformMode _transformMode;
-        
-        friend std::ostream& operator <<(std::ostream& os, const BoneData& ref);
     };
 }
 

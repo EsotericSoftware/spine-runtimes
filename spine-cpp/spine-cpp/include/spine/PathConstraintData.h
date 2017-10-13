@@ -34,9 +34,9 @@
 #include <spine/PositionMode.h>
 #include <spine/SpacingMode.h>
 #include <spine/RotateMode.h>
+#include <spine/SimpleArray.h>
 
 #include <string>
-#include <vector>
 
 namespace Spine
 {
@@ -53,7 +53,7 @@ namespace Spine
         int getOrder();
         void setOrder(int inValue);
         
-        std::vector<BoneData*>& getBones();
+        SimpleArray<BoneData*>& getBones();
         
         SlotData* getTarget();
         void setTarget(SlotData* inValue);
@@ -85,15 +85,13 @@ namespace Spine
     private:
         const std::string _name;
         int _order;
-        std::vector<BoneData*> _bones;
+        SimpleArray<BoneData*> _bones;
         SlotData* _target;
         PositionMode _positionMode;
         SpacingMode _spacingMode;
         RotateMode _rotateMode;
         float _offsetRotation;
         float _position, _spacing, _rotateMix, _translateMix;
-        
-        friend std::ostream& operator <<(std::ostream& os, const PathConstraintData& ref);
     };
 }
 

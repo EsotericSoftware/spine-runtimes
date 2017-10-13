@@ -65,7 +65,7 @@ namespace Spine
     {
         return _order;
     }
-    std::vector<BoneData*>& TransformConstraintData::getBones()
+    SimpleArray<BoneData*>& TransformConstraintData::getBones()
     {
         return _bones;
     }
@@ -133,12 +133,5 @@ namespace Spine
     bool TransformConstraintData::isLocal()
     {
         return _local;
-    }
-    
-    std::ostream& operator <<(std::ostream& os, const TransformConstraintData& ref)
-    {
-        os << ref._name;
-        
-        return os;
     }
 }

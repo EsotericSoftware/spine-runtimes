@@ -31,8 +31,9 @@
 #ifndef Spine_Slot_h
 #define Spine_Slot_h
 
+#include <spine/SimpleArray.h>
+
 #include <string>
-#include <vector>
 
 namespace Spine
 {
@@ -77,8 +78,8 @@ namespace Spine
         float getAttachmentTime();
         void setAttachmentTime(float inValue);
         
-        std::vector<float>& getAttachmentVertices();
-        void setAttachmentVertices(std::vector<float> inValue);
+        SimpleArray<float>& getAttachmentVertices();
+        void setAttachmentVertices(SimpleArray<float> inValue);
         
     private:
         const SlotData& _slotData;
@@ -89,10 +90,8 @@ namespace Spine
         bool _hasSecondColor;
         Attachment* _attachment;
         float _attachmentTime;
-        std::vector<float> _attachmentVertices;
-        
-        friend std::ostream& operator <<(std::ostream& os, const Slot& ref);
-    }
+        SimpleArray<float> _attachmentVertices;
+    };
 }
 
 #endif /* Spine_Slot_h */

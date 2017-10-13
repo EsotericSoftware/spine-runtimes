@@ -32,10 +32,5 @@
 
 namespace Spine
 {
-    std::ostream& operator <<(std::ostream& os, const Bone& ref)
-    {
-        os << ref._data._name;
-        
-        return os;
-    }
+    // TODO
 }

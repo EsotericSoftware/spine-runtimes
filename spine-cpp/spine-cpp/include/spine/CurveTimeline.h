@@ -32,8 +32,8 @@
 #define Spine_CurveTimeline_h
 
 #include <spine/Timeline.h>
+#include <spine/SimpleArray.h>
 
-#include <vector>
 #include <assert.h>
 
 namespace Spine
@@ -44,7 +44,7 @@ namespace Spine
     public:
         CurveTimeline(int frameCount);
         
-        virtual void apply(Skeleton& skeleton, float lastTime, float time, std::vector<Event*>& events, float alpha, MixPose pose, MixDirection direction) = 0;
+        virtual void apply(Skeleton& skeleton, float lastTime, float time, SimpleArray<Event*>& events, float alpha, MixPose pose, MixDirection direction) = 0;
         
         virtual int getPropertyId() = 0;
         
@@ -70,7 +70,7 @@ namespace Spine
         static const int BEZIER_SIZE;
         
     private:
-        std::vector<float> _curves; // type, x, y, ...
+        SimpleArray<float> _curves; // type, x, y, ...
     };
 }
 
