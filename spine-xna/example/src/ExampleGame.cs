@@ -85,10 +85,10 @@ namespace Spine {
 			skeletonDebugRenderer.DrawClipping = true;
 
 			// String name = "spineboy-ess";
-			String name = "goblins-pro";
+			// String name = "goblins-pro";
 			// String name = "raptor-pro";
 			// String name = "tank-pro";
-			// String name = "coin-pro";
+			String name = "coin-pro";
 			String atlasName = name.Replace("-pro", "").Replace("-ess", "");
 			if (name == "goblins-pro") atlasName = "goblins-mesh";
 			bool binaryData = false;

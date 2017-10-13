@@ -25,6 +25,7 @@
  * Added support for clipping.
  * Added support for rotated regions in texture atlas loaded via StarlingAtlasAttachmentLoader.
  * Added support for vertex effects. See `RaptorExample.as`
+ * Added 'getTexture()' method to 'StarlingTextureAtlasAttachmentLoader'
 
 ## C
  * **Breaking changes**
@@ -63,6 +64,7 @@
  * SkeletonRenderer now combines the displayed color of the Node (cascaded from all parents) with the skeleton color for tinting.
  * Added support for vertex effects. See `RaptorExample.cpp`.
  * Added ETC1 alpha support, thanks @halx99! Does not work when two color tint is enabled.
+ * Added `spAtlasPage_setCustomTextureLoader()` which let's you do texture loading manually. Thanks @jareguo.
 
 ### Cocos2d-Objc
  * Fixed renderer to work with 3.6 changes
@@ -145,7 +147,9 @@
  * Removed `RegionBatcher` and `SkeletonRegionRenderer`, renamed `SkeletonMeshRenderer` to `SkeletonRenderer`
  * Added support for two color tint. For it to work, you need to add the `SpineEffect.fx` file to your content project, then load it via `var effect = Content.Load<Effect>("SpineEffect");`, and set it on the `SkeletonRenderer`. See the example project for code.
  * Added support for any `Effect` to be used by `SkeletonRenderer`
+ * Added support for `IVertexEffect` to modify vertices of skeletons on the CPU. `IVertexEffect` instances can be set on the `SkeletonRenderer`. See example project.
  * Added `SkeletonDebugRenderer`
+ * Made `MeshBatcher` of SkeletonRenderer accessible via a getter. Allows user to batch their own geometry together with skeleton meshes for maximum batching instead of using XNA SpriteBatcher.
 
 ## Java
  * **Breaking changes**
