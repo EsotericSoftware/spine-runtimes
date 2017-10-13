@@ -20,8 +20,8 @@
 	}}
 
 	@media only screen and (min-width: 30em) {
-		.content { width: 60%; height: 100%; padding: 0 }
-		.sidebar { width: 40%; height: 100%; padding: 0 }
+		.content { width: 50%; height: 100%; padding: 0 }
+		.sidebar { width: 50%; height: 100%; padding: 0 }
 	}
 	body {
 		margin: 0;
@@ -57,21 +57,40 @@
 </div>
 </body>
 
+<script id="initialJs" type="text/plain">
+	var canvas = document.getElementById("canvas");
+	var config = { alpha: false };
+	var context = new spine.webgl.ManagedWebGLRenderingContext(canvas, config);
+	var gl = context.gl;
+
+	function render() {
+		gl.clearColor(0.2, 0.2, 0.2, 1);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+
+		requestAnimationFrame(render);
+	}
+
+	requestAnimationFrame(render);
+</script>
+
 <script src="js/ace.js" type="text/javascript" charset="utf-8"></script>
 <script>
-	var editorJs = ace.edit("codeJs");
-	editorJs.setTheme("ace/theme/monokai");
-	editorJs.getSession().setMode("ace/mode/javascript");
-	editorJs.setValue("");
+	$(document).ready(function() {
+		var editorJs = ace.edit("codeJs");
+		editorJs.setTheme("ace/theme/monokai");
+		editorJs.getSession().setMode("ace/mode/javascript");
+		editorJs.setValue(document.getElementById("initialJs").innerHTML);
 
-	var editorHtml = ace.edit("codeHtml");
-	editorHtml.setTheme("ace/theme/monokai");
-	editorHtml.getSession().setMode("ace/mode/html");
-	editorHtml.setValue('<canvas style="background: #cccccc; width: 100%; height: 100%;"></canvas><');
+		var editorHtml = ace.edit("codeHtml");
+		editorHtml.setTheme("ace/theme/monokai");
+		editorHtml.getSession().setMode("ace/mode/html");
+		editorHtml.setValue('<script src="../../build/spine-webgl.js"><\/script>\n<canvas id="canvas" style="width: 100%; height: 98vh;"></canvas>');
 
-	$("#playButton").click(function() {
-		var iframe = document.getElementById("iframe");
-		iframe.srcdoc = '<html><body>' + editorHtml.getValue() + '<script>' + editorJs.getValue() + "</script></body></html>";
+		$("#playButton").click(function() {
+			var iframe = document.getElementById("iframe");
+			var source = "<html><body>" + editorHtml.getValue() + "<script>" + editorJs.getValue() + "<\/script></body></html>";
+			iframe.srcdoc = source;
+		});
 	});
 </script>
 </html>
