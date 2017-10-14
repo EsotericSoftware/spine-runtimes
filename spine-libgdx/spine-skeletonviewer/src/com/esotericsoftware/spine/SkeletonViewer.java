@@ -57,6 +57,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData.Page;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
@@ -96,6 +97,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 	OrthographicCamera camera;
 	TwoColorPolygonBatch batch;
+	TextureAtlas atlas;
 	SkeletonRenderer renderer;
 	SkeletonRendererDebug debugRenderer;
 	SkeletonData skeletonData;
@@ -155,7 +157,20 @@ public class SkeletonViewer extends ApplicationAdapter {
 				}
 			}
 			TextureAtlasData data = !atlasFile.exists() ? null : new TextureAtlasData(atlasFile, atlasFile.parent(), false);
-			TextureAtlas atlas = new TextureAtlas(data) {
+
+			if (data != null) {
+				boolean linear = true;
+				for (int i = 0, n = data.getPages().size; i < n; i++) {
+					Page page = data.getPages().get(i);
+					if (page.minFilter != TextureFilter.Linear || page.magFilter != TextureFilter.Linear) {
+						linear = false;
+						break;
+					}
+				}
+				ui.linearCheckbox.setChecked(linear);
+			}
+
+			atlas = new TextureAtlas(data) {
 				public AtlasRegion findRegion (String name) {
 					AtlasRegion region = super.findRegion(name);
 					if (region == null) {
@@ -416,6 +431,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		CheckBox premultipliedCheckbox = new CheckBox("Premultiplied", skin);
 
+		CheckBox linearCheckbox = new CheckBox("Linear", skin);
+
 		TextButton bonesSetupPoseButton = new TextButton("Bones", skin);
 		TextButton slotsSetupPoseButton = new TextButton("Slots", skin);
 		TextButton setupPoseButton = new TextButton("Both", skin);
@@ -457,6 +474,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 			animationList.getSelection().setRequired(false);
 
 			premultipliedCheckbox.setChecked(true);
+
+			linearCheckbox.setChecked(true);
 
 			loopCheckbox.setChecked(true);
 
@@ -519,7 +538,13 @@ public class SkeletonViewer extends ApplicationAdapter {
 			root.add();
 			root.add(table(debugMeshHullCheckbox, debugMeshTrianglesCheckbox)).row();
 			root.add("Atlas alpha:");
-			root.add(premultipliedCheckbox).row();
+			{
+				Table table = table();
+				table.add(premultipliedCheckbox);
+				table.add("Filtering:").growX().getActor().setAlignment(Align.right);
+				table.add(linearCheckbox);
+				root.add(table).fill().row();
+			}
 
 			root.add(new Image(skin.newDrawable("white", new Color(0x4e4e4eff)))).height(1).fillX().colspan(2).pad(-3, 0, 1, 0)
 				.row();
@@ -739,6 +764,15 @@ public class SkeletonViewer extends ApplicationAdapter {
 				}
 			});
 
+			linearCheckbox.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					if (atlas == null) return;
+					TextureFilter filter = linearCheckbox.isChecked() ? TextureFilter.Linear : TextureFilter.Nearest;
+					for (Texture texture : atlas.getTextures())
+						texture.setFilter(filter, filter);
+				}
+			});
+
 			skinList.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
 					if (skeleton != null) {
@@ -834,7 +868,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 		}
 
 		Table table (Actor... actors) {
-			Table table = new Table();
+			Table table = new Table(skin);
 			table.defaults().space(6);
 			table.add(actors);
 			return table;
