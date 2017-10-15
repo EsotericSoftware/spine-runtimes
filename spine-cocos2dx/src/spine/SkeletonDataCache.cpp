@@ -3,12 +3,10 @@
 static auto error_log = &cocos2d::log;
 
 namespace spine {
-extern void(*onLoadTextureFailed)(const char* format, ...);
 
 void SkeletonDataCache::setErrorLogFunc(void(*errorfunc)(const char* pszFormat, ...))
 {
-	error_log = errorfunc;
-	spine::onLoadTextureFailed = errorfunc;
+        error_log = errorfunc;
 }
 
 SkeletonDataCache* SkeletonDataCache::getInstance()
