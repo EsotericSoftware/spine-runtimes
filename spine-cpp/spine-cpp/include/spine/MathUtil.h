@@ -32,9 +32,69 @@
 #define Spine_MathUtil_h
 
 #include <math.h>
+#include <float.h>
+
+#define SPINE_PI 3.1415927f
+#define SPINE_PI_2 PI * 2
+#define RadDeg 180.0f / SPINE_PI
+#define DegRad SPINE_PI / 180.0f
+#define SIN_BITS 14 // 16KB. Adjust for accuracy.
+#define SIN_MASK ~(-(1 << SIN_BITS))
+#define SIN_COUNT SIN_MASK + 1
+#define RadFull SPINE_PI * 2
+#define DegFull 360
+#define RadToIndex SIN_COUNT / RadFull
+#define DegToIndex SIN_COUNT / DegFull
 
 namespace Spine
 {
+    inline bool areFloatsPracticallyEqual(float A, float B, float maxDiff = 0.0000000000000001f, float maxRelDiff = FLT_EPSILON)
+    {
+        // Check if the numbers are really close -- needed
+        // when comparing numbers near zero.
+        float diff = fabs(A - B);
+        if (diff <= maxDiff)
+        {
+            return true;
+        }
+        
+        A = fabs(A);
+        B = fabs(B);
+        
+        float largest = (B > A) ? B : A;
+        
+        if (diff <= largest * maxRelDiff)
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    class MathUtil
+    {
+    public:
+        static float SIN_TABLE[SIN_COUNT];
+        
+        MathUtil();
+        
+        /// Returns the sine in radians from a lookup table.
+        static float sin(float radians);
+        
+        /// Returns the cosine in radians from a lookup table.
+        static float cos(float radians);
+        
+        /// Returns the sine in radians from a lookup table.
+        static float sinDeg(float degrees);
+        
+        /// Returns the cosine in radians from a lookup table.
+        static float cosDeg(float degrees);
+        
+        /// Returns atan2 in radians, faster but less accurate than Math.Atan2. Average error of 0.00231 radians (0.1323
+        /// degrees), largest error of 0.00488 radians (0.2796 degrees).
+        static float atan2(float y, float x);
+    };
+    
     inline float clamp(float x, float lower, float upper)
     {
         return fminf(upper, fmaxf(x, lower));
