@@ -89,7 +89,7 @@ namespace Spine
             Entry* _entry;
         };
         
-        HashMap(int capacity) : _capacity(capacity), _hashFunction(), _header(), _trailer()
+        HashMap(size_t capacity) : _capacity(capacity), _hashFunction(), _header(), _trailer()
         {
             _hashTable = new Entry[capacity];
             for (int i = 0; i < _capacity; ++i)
@@ -136,13 +136,13 @@ namespace Spine
             return Iterator(_header);
         }
         
-        Iterator insert(const K& key, const V& value)
+        std::pair<Iterator, bool> insert(const K& key, const V& value)
         {
             Iterator iter = find(key);
             
             if (iter._entry != &_trailer)
             {
-                return Iterator(&_trailer);
+                return std::make_pair(iter, false);
             }
             
             size_t index = hash(key);
@@ -162,7 +162,7 @@ namespace Spine
                 entry->next = &_trailer;
                 _trailer.prev = entry;
                 
-                return Iterator(entry);
+                return std::make_pair(Iterator(entry), true);
             }
             
             if (_hashTable[index].next == NULL)
@@ -198,7 +198,7 @@ namespace Spine
                     entry->prev->next = entry;
                 }
                 
-                return Iterator(entry);
+                return std::make_pair(Iterator(entry), true);
             }
             
             if (index == hash(_header.next->_key))
@@ -218,7 +218,7 @@ namespace Spine
                 _hashTable[index].next = entry;
             }
             
-            return Iterator(entry);
+            return std::make_pair(Iterator(entry), true);
         }
         
         Iterator find(const K& key)
@@ -336,7 +336,7 @@ namespace Spine
         };
         
         const H _hashFunction;
-        const int _capacity;
+        const size_t _capacity;
         Entry* _hashTable;
         Entry _header;
         Entry _trailer;
