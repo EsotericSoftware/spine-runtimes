@@ -40,7 +40,7 @@ namespace Spine
     PathConstraintData::PathConstraintData(std::string name) :
     _name(name),
     _order(0),
-    _target(nullptr),
+    _target(NULL),
     _positionMode(PositionMode_Fixed),
     _spacingMode(SpacingMode_Length),
     _rotateMode(RotateMode_Tangent),

@@ -38,8 +38,786 @@
 #include <spine/PathConstraint.h>
 #include <spine/TransformConstraint.h>
 #include <spine/Skin.h>
+#include <spine/Attachment.h>
 
 namespace Spine
 {
-    // TODO
+    Skeleton::Skeleton(SkeletonData& data) : _data(data)
+    {
+        _bones.reserve(_data->getBones().size());
+        bones = new SimpleArray<Bone>(data.bones.Count);
+        foreach (BoneData boneData in data.bones)
+        {
+            Bone bone;
+            if (boneData.parent == NULL)
+            {
+                bone = new Bone(boneData, this, NULL);
+            }
+            else
+            {
+                Bone parent = bones.Items[boneData.parent.index];
+                bone = new Bone(boneData, this, parent);
+                parent.children.Add(bone);
+            }
+            
+            bones.Add(bone);
+        }
+        
+        slots = new SimpleArray<Slot>(data.slots.Count);
+        drawOrder = new SimpleArray<Slot>(data.slots.Count);
+        foreach (SlotData slotData in data.slots)
+        {
+            Bone bone = bones.Items[slotData.boneData.index];
+            Slot slot = new Slot(slotData, bone);
+            slots.Add(slot);
+            drawOrder.Add(slot);
+        }
+        
+        ikConstraints = new SimpleArray<IkConstraint>(data.ikConstraints.Count);
+        foreach (IkConstraintData ikConstraintData in data.ikConstraints)
+        ikConstraints.Add(new IkConstraint(ikConstraintData, this));
+        
+        transformConstraints = new SimpleArray<TransformConstraint>(data.transformConstraints.Count);
+        foreach (TransformConstraintData transformConstraintData in data.transformConstraints)
+        transformConstraints.Add(new TransformConstraint(transformConstraintData, this));
+        
+        pathConstraints = new SimpleArray<PathConstraint> (data.pathConstraints.Count);
+        foreach (PathConstraintData pathConstraintData in data.pathConstraints)
+        pathConstraints.Add(new PathConstraint(pathConstraintData, this));
+        
+        updateCache();
+        updateWorldTransform();
+    }
+    
+    void Skeleton::updateCache()
+    {
+        SimpleArray<IUpdatable> updateCache = _updateCache;
+        updateCache.Clear();
+        _updateCacheReset.Clear();
+        
+        SimpleArray<Bone> bones = _bones;
+        for (int i = 0, n = bones.Count; i < n; ++i)
+        {
+            bones.Items[i].sorted = false;
+        }
+        
+        SimpleArray<IkConstraint> ikConstraints = _ikConstraints;
+        var transformConstraints = _transformConstraints;
+        var pathConstraints = _pathConstraints;
+        int ikCount = IkConstraints.Count, transformCount = transformConstraints.Count, pathCount = pathConstraints.Count;
+        int constraintCount = ikCount + transformCount + pathCount;
+        //outer:
+        for (int i = 0; i < constraintCount; ++i)
+        {
+            for (int ii = 0; ii < ikCount; ++ii)
+            {
+                IkConstraint constraint = ikConstraints.Items[ii];
+                if (constraint.data.order == i)
+                {
+                    sortIkConstraint(constraint);
+                    goto continue_outer; //continue outer;
+                }
+            }
+            for (int ii = 0; ii < transformCount; ++ii)
+            {
+                TransformConstraint constraint = transformConstraints.Items[ii];
+                if (constraint.data.order == i)
+                {
+                    sortTransformConstraint(constraint);
+                    goto continue_outer; //continue outer;
+                }
+            }
+            for (int ii = 0; ii < pathCount; ++ii)
+            {
+                PathConstraint constraint = pathConstraints.Items[ii];
+                if (constraint.data.order == i)
+                {
+                    sortPathConstraint(constraint);
+                    goto continue_outer; //continue outer;
+                }
+            }
+        continue_outer: {}
+        }
+        
+        for (int i = 0, n = bones.Count; i < n; ++i)
+        {
+            sortBone(bones.Items[i]);
+        }
+    }
+    
+    void Skeleton::updateWorldTransform()
+    {
+        var updateCacheReset = _updateCacheReset;
+        var updateCacheResetItems = updateCacheReset.Items;
+        for (int i = 0, n = updateCacheReset.Count; i < n; ++i)
+        {
+            Bone bone = updateCacheResetItems[i];
+            bone.ax = bone.x;
+            bone.ay = bone.y;
+            bone.arotation = bone.rotation;
+            bone.ascaleX = bone.scaleX;
+            bone.ascaleY = bone.scaleY;
+            bone.ashearX = bone.shearX;
+            bone.ashearY = bone.shearY;
+            bone.appliedValid = true;
+        }
+        
+        var updateItems = _updateCache.Items;
+        for (int i = 0, n = updateCache.Count; i < n; ++i)
+        {
+            updateItems[i].update();
+        }
+    }
+    
+    void Skeleton::setToSetupPose()
+    {
+        setBonesToSetupPose();
+        setSlotsToSetupPose();
+    }
+    
+    void Skeleton::setBonesToSetupPose()
+    {
+        var bonesItems = _bones.Items;
+        for (int i = 0, n = bones.Count; i < n; ++i)
+        {
+            bonesItems[i].setToSetupPose();
+        }
+        
+        var ikConstraintsItems = _ikConstraints.Items;
+        for (int i = 0, n = ikConstraints.Count; i < n; ++i)
+        {
+            IkConstraint constraint = ikConstraintsItems[i];
+            constraint.bendDirection = constraint.data.bendDirection;
+            constraint.mix = constraint.data.mix;
+        }
+        
+        var transformConstraintsItems = _transformConstraints.Items;
+        for (int i = 0, n = transformConstraints.Count; i < n; ++i)
+        {
+            TransformConstraint constraint = transformConstraintsItems[i];
+            TransformConstraintData constraintData = constraint.data;
+            constraint.rotateMix = constraintData.rotateMix;
+            constraint.translateMix = constraintData.translateMix;
+            constraint.scaleMix = constraintData.scaleMix;
+            constraint.shearMix = constraintData.shearMix;
+        }
+        
+        var pathConstraintItems = _pathConstraints.Items;
+        for (int i = 0, n = pathConstraints.Count; i < n; ++i)
+        {
+            PathConstraint constraint = pathConstraintItems[i];
+            PathConstraintData constraintData = constraint.data;
+            constraint.position = constraintData.position;
+            constraint.spacing = constraintData.spacing;
+            constraint.rotateMix = constraintData.rotateMix;
+            constraint.translateMix = constraintData.translateMix;
+        }
+    }
+    
+    void Skeleton::setSlotsToSetupPose()
+    {
+        var slots = _slots;
+        var slotsItems = slots.Items;
+        drawOrder.Clear();
+        for (int i = 0, n = slots.Count; i < n; ++i)
+        {
+            drawOrder.Add(slotsItems[i]);
+        }
+        
+        for (int i = 0, n = slots.Count; i < n; ++i)
+        {
+            slotsItems[i].setToSetupPose();
+        }
+    }
+    
+    Bone* Skeleton::findBone(std::string boneName)
+    {
+        assert(boneName.length() > 0);
+        
+        var bones = _bones;
+        var bonesItems = bones.Items;
+        for (int i = 0, n = bones.Count; i < n; ++i)
+        {
+            Bone bone = bonesItems[i];
+            if (bone.data.name == boneName)
+            {
+                return bone;
+            }
+        }
+        
+        return NULL;
+    }
+    
+    int Skeleton::findBoneIndex(std::string boneName)
+    {
+        assert(boneName.length() > 0);
+        
+        var bones = _bones;
+        var bonesItems = bones.Items;
+        for (int i = 0, n = bones.Count; i < n; ++i)
+        {
+            if (bonesItems[i].data.name == boneName)
+            {
+                return i;
+            }
+        }
+        
+        return -1;
+    }
+    
+    Slot* Skeleton::findSlot(std::string slotName)
+    {
+        assert(slotName.length() > 0);
+        
+        var slots = _slots;
+        var slotsItems = slots.Items;
+        for (int i = 0, n = slots.Count; i < n; ++i)
+        {
+            Slot slot = slotsItems[i];
+            if (slot.data.name == slotName)
+            {
+                return slot;
+            }
+        }
+        
+        return NULL;
+    }
+    
+    int Skeleton::findSlotIndex(std::string slotName)
+    {
+        assert(slotName.length() > 0);
+        
+        var slots = _slots;
+        var slotsItems = slots.Items;
+        for (int i = 0, n = slots.Count; i < n; ++i)
+        {
+            if (slotsItems[i].data.name.Equals(slotName))
+            {
+                return i;
+            }
+        }
+        
+        return -1;
+    }
+    
+    void Skeleton::setSkin(std::string skinName)
+    {
+        Skin foundSkin = data.FindSkin(skinName);
+        
+        assert(foundSkin != NULL);
+        
+        setSkin(foundSkin);
+    }
+    
+    void Skeleton::setSkin(Skin newSkin)
+    {
+        if (newSkin != NULL)
+        {
+            if (skin != NULL)
+            {
+                newSkin.AttachAll(this, skin);
+            }
+            else
+            {
+                SimpleArray<Slot> slots = _slots;
+                for (int i = 0, n = slots.Count; i < n; ++i)
+                {
+                    Slot slot = slots.Items[i];
+                    std::string name = slot.data.attachmentName;
+                    if (name != NULL)
+                    {
+                        Attachment attachment = newSkin.getAttachment(i, name);
+                        if (attachment != NULL)
+                        {
+                            slot.Attachment = attachment;
+                        }
+                    }
+                }
+            }
+        }
+        skin = newSkin;
+    }
+    
+    Attachment* Skeleton::getAttachment(std::string slotName, std::string attachmentName)
+    {
+        return getAttachment(data.findSlotIndex(slotName), attachmentName);
+    }
+    
+    Attachment* Skeleton::getAttachment(int slotIndex, std::string attachmentName)
+    {
+        assert(attachmentName.length() > 0);
+        
+        if (skin != NULL)
+        {
+            Attachment attachment = skin.getAttachment(slotIndex, attachmentName);
+            if (attachment != NULL)
+            {
+                return attachment;
+            }
+        }
+        
+        return data.defaultSkin != NULL ? data.defaultSkin.getAttachment(slotIndex, attachmentName) : NULL;
+    }
+    
+    void Skeleton::setAttachment(std::string slotName, std::string attachmentName)
+    {
+        assert(slotName.length() > 0);
+        
+        SimpleArray<Slot> slots = _slots;
+        for (int i = 0, n = slots.Count; i < n; ++i)
+        {
+            Slot slot = slots.Items[i];
+            if (slot.data.name == slotName)
+            {
+                Attachment attachment = NULL;
+                if (attachmentName != NULL)
+                {
+                    attachment = getAttachment(i, attachmentName);
+                    
+                    assert(attachment != NULL);
+                }
+                
+                slot.Attachment = attachment;
+                
+                return;
+            }
+        }
+        
+        printf("Slot not found: %s" + slotName.c_str());
+        
+        assert(false);
+    }
+    
+    IkConstraint* Skeleton::findIkConstraint(std::string constraintName)
+    {
+        assert(constraintName.length() > 0);
+        
+        SimpleArray<IkConstraint> ikConstraints = _ikConstraints;
+        for (int i = 0, n = ikConstraints.Count; i < n; ++i)
+        {
+            IkConstraint ikConstraint = ikConstraints.Items[i];
+            if (ikConstraint.data.name == constraintName)
+            {
+                return ikConstraint;
+            }
+        }
+        return NULL;
+    }
+    
+    TransformConstraint* Skeleton::findTransformConstraint(std::string constraintName)
+    {
+        assert(constraintName.length() > 0);
+        
+        SimpleArray<TransformConstraint> transformConstraints = _transformConstraints;
+        for (int i = 0, n = transformConstraints.Count; i < n; ++i)
+        {
+            TransformConstraint transformConstraint = transformConstraints.Items[i];
+            if (transformConstraint.data.name == constraintName)
+            {
+                return transformConstraint;
+            }
+        }
+        
+        return NULL;
+    }
+    
+    PathConstraint* Skeleton::findPathConstraint(std::string constraintName)
+    {
+        assert(constraintName.length() > 0);
+        
+        SimpleArray<PathConstraint> pathConstraints = _pathConstraints;
+        for (int i = 0, n = pathConstraints.Count; i < n; ++i)
+        {
+            PathConstraint constraint = pathConstraints.Items[i];
+            if (constraint.data.name.Equals(constraintName))
+            {
+                return constraint;
+            }
+        }
+        
+        return NULL;
+    }
+    
+    void Skeleton::update(float delta)
+    {
+        _time += delta;
+    }
+    
+    void Skeleton::getBounds(float& outX, float& outY, float& outWidth, float& outHeight, SimpleArray<float>& vertexBuffer)
+    {
+        float minX = std::numeric_limits<float>::max();
+        float minY = std::numeric_limits<float>::max();
+        float maxX = std::numeric_limits<float>::min();
+        float maxY = std::numeric_limits<float>::min();
+        
+        for (Slot* i = _drawOrder.begin(); i != _drawOrder.end(); ++i)
+        {
+            Slot* slot = i;
+            int verticesLength = 0;
+            Attachment* attachment = slot->getAttachment();
+            
+            if (attachment != NULL && attachment->getRTTI().derivesFrom(RegionAttachment::rtti))
+            {
+                RegionAttachment* regionAttachment = static_cast<RegionAttachment*>(attachment);
+                
+                verticesLength = 8;
+                if (vertexBuffer.size() < 8)
+                {
+                    vertexBuffer.reserve(8);
+                }
+                regionAttachment->computeWorldVertices(slot->getBone(), vertexBuffer, 0);
+            }
+            else if (attachment != NULL && attachment->getRTTI().derivesFrom(MeshAttachment::rtti))
+            {
+                MeshAttachment* mesh = static_cast<MeshAttachment*>(attachment);
+                
+                verticesLength = mesh->getWorldVerticesLength();
+                if (vertexBuffer.size() < verticesLength)
+                {
+                    vertexBuffer.reserve(verticesLength);
+                }
+                
+                mesh->computeWorldVertices(slot, 0, verticesLength, vertexBuffer, 0);
+            }
+            
+            for (int ii = 0; ii < verticesLength; ii += 2)
+            {
+                float vx = vertexBuffer[ii];
+                float vy = vertexBuffer[ii + 1];
+                
+                minX = MIN(minX, vx);
+                minY = MIN(minY, vy);
+                maxX = MAX(maxX, vx);
+                maxY = MAX(maxY, vy);
+            }
+        }
+        
+        x = minX;
+        y = minY;
+        width = maxX - minX;
+        height = maxY - minY;
+    }
+    
+    Bone* Skeleton::getRootBone()
+    {
+        return _bones.size() == 0 ? NULL : &_bones[0];
+    }
+    
+    const SkeletonData& Skeleton::getData()
+    {
+        return _data;
+    }
+    
+    SimpleArray<Bone*>& Skeleton::getBones()
+    {
+        return _bones;
+    }
+    
+    SimpleArray<Updatable*>& Skeleton::getUpdateCacheList()
+    {
+        return _updateCache;
+    }
+    
+    SimpleArray<Slot*>& Skeleton::getSlots()
+    {
+        return _slots;
+    }
+    
+    SimpleArray<Slot*>& Skeleton::getDrawOrder()
+    {
+        return _drawOrder;
+    }
+    
+    SimpleArray<IkConstraint*>& Skeleton::getIkConstraints()
+    {
+        return _ikConstraints;
+    }
+    
+    SimpleArray<PathConstraint*>& Skeleton::getPathConstraints()
+    {
+        return _pathConstraints;
+    }
+    
+    SimpleArray<TransformConstraint*>& Skeleton::getTransformConstraints()
+    {
+        return _transformConstraints;
+    }
+    
+    Skin* Skeleton::getSkin()
+    {
+        return _skin;
+    }
+    
+    void Skeleton::setSkin(Skin* inValue)
+    {
+        _skin = inValue;
+    }
+    
+    float Skeleton::getR()
+    {
+        return _r;
+    }
+    
+    void Skeleton::setR(float inValue)
+    {
+        _r = inValue;
+    }
+    
+    float Skeleton::getG()
+    {
+        return _g;
+    }
+    
+    void Skeleton::setG(float inValue)
+    {
+        _g = inValue;
+    }
+    
+    float Skeleton::getB()
+    {
+        return _b;
+    }
+    
+    void Skeleton::setB(float inValue)
+    {
+        _b = inValue;
+    }
+    
+    float Skeleton::getA()
+    {
+        return _a;
+    }
+    
+    void Skeleton::setA(float inValue)
+    {
+        _a = inValue;
+    }
+    
+    float Skeleton::getTime()
+    {
+        return _time;
+    }
+    
+    void Skeleton::setTime(float inValue)
+    {
+        _time = inValue;
+    }
+    
+    float Skeleton::getX()
+    {
+        return _x;
+    }
+    
+    void Skeleton::setX(float inValue)
+    {
+        _x = inValue;
+    }
+    
+    float Skeleton::getY()
+    {
+        return _y;
+    }
+    
+    void Skeleton::setY(float inValue)
+    {
+        _y = inValue;
+    }
+    
+    bool Skeleton::getFlipX()
+    {
+        return _flipX;
+    }
+    
+    void Skeleton::setFlipX(float inValue)
+    {
+        _flipX = inValue;
+    }
+    
+    bool Skeleton::getFlipY()
+    {
+        return _flipY;
+    }
+    
+    void Skeleton::setFlipY(float inValue)
+    {
+        _flipY = inValue;
+    }
+    
+    void Skeleton::sortIkConstraint(IkConstraint constraint)
+    {
+        Bone target = constraint.target;
+        sortBone(target);
+        
+        var constrained = constraint.bones;
+        Bone parent = constrained.Items[0];
+        sortBone(parent);
+        
+        if (constrained.Count > 1)
+        {
+            Bone child = constrained.Items[constrained.Count - 1];
+            if (!updateCache.Contains(child))
+            {
+                updateCacheReset.Add(child);
+            }
+        }
+        
+        updateCache.Add(constraint);
+        
+        sortReset(parent.children);
+        constrained.Items[constrained.Count - 1].sorted = true;
+    }
+    
+    void Skeleton::sortPathConstraint(PathConstraint constraint)
+    {
+        Slot slot = constraint.target;
+        int slotIndex = slot.data.index;
+        Bone slotBone = slot.bone;
+        
+        if (skin != NULL)
+        {
+            sortPathConstraintAttachment(skin, slotIndex, slotBone);
+        }
+        
+        if (data.defaultSkin != NULL && data.defaultSkin != skin)
+        {
+            sortPathConstraintAttachment(data.defaultSkin, slotIndex, slotBone);
+        }
+        
+        for (int ii = 0, nn = data.skins.Count; ii < nn; ++ii)
+        {
+            sortPathConstraintAttachment(data.skins.Items[ii], slotIndex, slotBone);
+        }
+        
+        Attachment attachment = slot.attachment;
+        if (attachment is PathAttachment)
+        {
+            sortPathConstraintAttachment(attachment, slotBone);
+        }
+        
+        var constrained = constraint.bones;
+        int boneCount = constrained.Count;
+        for (int i = 0; i < boneCount; ++i)
+        {
+            sortBone(constrained.Items[i]);
+        }
+        
+        updateCache.Add(constraint);
+        
+        for (int i = 0; i < boneCount; ++i)
+        {
+            sortReset(constrained.Items[i].children);
+        }
+        
+        for (int i = 0; i < boneCount; ++i)
+        {
+            constrained.Items[i].sorted = true;
+        }
+    }
+    
+    void Skeleton::sortTransformConstraint(TransformConstraint constraint)
+    {
+        sortBone(constraint.target);
+        
+        var constrained = constraint.bones;
+        int boneCount = constrained.Count;
+        if (constraint.data.local)
+        {
+            for (int i = 0; i < boneCount; ++i)
+            {
+                Bone child = constrained.Items[i];
+                sortBone(child.parent);
+                if (!updateCache.Contains(child))
+                {
+                    updateCacheReset.Add(child);
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < boneCount; ++i)
+            {
+                sortBone(constrained.Items[i]);
+            }
+        }
+        
+        updateCache.Add(constraint);
+        
+        for (int i = 0; i < boneCount; ++i)
+        {
+            sortReset(constrained.Items[i].children);
+        }
+        for (int i = 0; i < boneCount; ++i)
+        {
+            constrained.Items[i].sorted = true;
+        }
+    }
+    
+    void Skeleton::sortPathConstraintAttachment(Skin skin, int slotIndex, Bone slotBone)
+    {
+        foreach (var entry in skin.Attachments)
+        {
+            if (entry.Key.slotIndex == slotIndex)
+            {
+                sortPathConstraintAttachment(entry.Value, slotBone);
+            }
+        }
+    }
+    
+    void Skeleton::sortPathConstraintAttachment(Attachment attachment, Bone slotBone)
+    {
+        if (!(attachment is PathAttachment))
+        {
+            return;
+        }
+        
+        int[] pathBones = ((PathAttachment)attachment).bones;
+        if (pathBones == NULL)
+        {
+            sortBone(slotBone);
+        }
+        else
+        {
+            var bones = _bones;
+            for (int i = 0, n = pathBones.Length; i < n;)
+            {
+                int nn = pathBones[i++];
+                nn += i;
+                while (i < nn)
+                {
+                    sortBone(bones.Items[pathBones[i++]]);
+                }
+            }
+        }
+    }
+    
+    void Skeleton::sortBone(Bone bone)
+    {
+        if (bone.sorted)
+        {
+            return;
+        }
+        
+        Bone parent = bone.parent;
+        if (parent != NULL)
+        {
+            sortBone(parent);
+        }
+        
+        bone.sorted = true;
+        updateCache.Add(bone);
+    }
+    
+    void Skeleton::sortReset(SimpleArray<Bone*>& bones)
+    {
+        for (Bone* i = bones.begin(); i != bones.end(); ++i)
+        {
+            Bone* bone = i;
+            if (bone->isSorted())
+            {
+                sortReset(bone->getChildren());
+            }
+            
+            bone->setSorted(false);
+        }
+    }
 }

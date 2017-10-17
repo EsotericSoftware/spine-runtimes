@@ -50,6 +50,10 @@ namespace Spine
         friend class RotateTimeline;
         
     public:
+        static void setYDown(bool inValue);
+        
+        static bool isYDown();
+        
         /// @param parent May be null.
         Bone(BoneData& data, Skeleton& skeleton, Bone* parent);
         
@@ -160,6 +164,8 @@ namespace Spine
         float getWorldScaleY();
         
     private:
+        static bool yDown;
+        
         BoneData& _data;
         Skeleton& _skeleton;
         Bone* _parent;

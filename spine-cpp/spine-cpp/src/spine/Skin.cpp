@@ -67,7 +67,7 @@ namespace Spine
     {
         HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = _attachments.find(AttachmentKey(slotIndex, name));
         
-        Attachment* ret = nullptr;
+        Attachment* ret = NULL;
         
         if (i != _attachments.end())
         {
@@ -118,7 +118,7 @@ namespace Spine
             
             if (slot->getAttachment() == i.second())
             {
-                Attachment* attachment = nullptr;
+                Attachment* attachment = NULL;
                 if ((attachment = getAttachment(slotIndex, i.first()._name)))
                 {
                     slot->setAttachment(attachment);

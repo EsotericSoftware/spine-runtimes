@@ -39,7 +39,7 @@ namespace Spine
     TransformConstraintData::TransformConstraintData(std::string name) :
     _name(name),
     _order(0),
-    _target(nullptr),
+    _target(NULL),
     _rotateMix(0),
     _translateMix(0),
     _scaleMix(0),

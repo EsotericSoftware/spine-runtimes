@@ -38,6 +38,18 @@
 
 namespace Spine
 {
+    bool Bone::yDown = false;
+    
+    void Bone::setYDown(bool inValue)
+    {
+        yDown = inValue;
+    }
+    
+    bool Bone::isYDown()
+    {
+        return yDown;
+    }
+    
     Bone::Bone(BoneData& data, Skeleton& skeleton, Bone* parent) : Updatable(),
     _data(data),
     _skeleton(skeleton),
@@ -104,6 +116,13 @@ namespace Spine
                 x = -x;
                 la = -la;
                 lb = -lb;
+            }
+            
+            if (_skeleton.isFlipY() != Bone::isYDown())
+            {
+                y = -y;
+                lc = -lc;
+                ld = -ld;
             }
             
             _a = la;
@@ -223,6 +242,12 @@ namespace Spine
         {
             _a = -_a;
             _b = -_b;
+        }
+        
+        if (skeleton.isFlipY() != Bone::isYDown())
+        {
+            c = -c;
+            d = -d;
         }
     }
     

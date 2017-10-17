@@ -35,7 +35,7 @@ namespace Spine
     IkConstraintData::IkConstraintData(std::string name) :
     _name(name),
     _order(0),
-    _target(nullptr),
+    _target(NULL),
     _bendDirection(1),
     _mix(1)
     {

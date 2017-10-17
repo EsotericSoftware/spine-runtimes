@@ -147,7 +147,7 @@ namespace Spine
             
             size_t index = hash(key);
             
-            Entry* entry = new Entry;
+            Entry* entry = new Entry();
             entry->_key = key;
             entry->_value = value;
             
@@ -240,10 +240,12 @@ namespace Spine
             return Iterator(&_trailer);
         }
         
-        void erase(Iterator pos)
+        Iterator erase(Iterator pos)
         {
             if (pos._entry != &_header && pos._entry != &_trailer)
             {
+                Entry* next = pos._entry->next;
+                
                 size_t index = hash(pos._entry->_key);
                 
                 if (_hashTable[index].next == pos._entry && _hashTable[index].prev == pos._entry)
@@ -310,7 +312,11 @@ namespace Spine
                 }
                 
                 _hashSize--;
+                
+                return Iterator(next);
             }
+            
+            return Iterator(&_trailer);
         }
         
         V operator[](const K& key)

@@ -49,7 +49,7 @@ namespace Spine
     _g2(0),
     _b2(0),
     _hasSecondColor(false),
-    _attachment(nullptr),
+    _attachment(NULL),
     _attachmentTime(0)
     {
         setToSetupPose();
@@ -65,12 +65,12 @@ namespace Spine
         std::string attachmentName = _slotData.getAttachmentName();
         if (attachmentName.length() > 0)
         {
-            _attachment = nullptr;
+            _attachment = NULL;
             setAttachment(_skeleton.getAttachment(_slotData.getIndex(), attachmentName));
         }
         else
         {
-            setAttachment(nullptr);
+            setAttachment(NULL);
         }
     }
     
