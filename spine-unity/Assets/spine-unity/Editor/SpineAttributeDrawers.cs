@@ -380,7 +380,7 @@ namespace Spine.Unity.Editor {
 			if (skeletonComponent != null && targetAttribute.currentSkinOnly) {
 				Skin currentSkin = null;
 
-				var skinProperty = property.FindPropertyRelative(targetAttribute.skinField);
+				var skinProperty = property.serializedObject.FindProperty(targetAttribute.skinField);
 				if (skinProperty != null) currentSkin = skeletonComponent.Skeleton.Data.FindSkin(skinProperty.stringValue);
 
 				currentSkin = currentSkin ?? skeletonComponent.Skeleton.Skin;
