@@ -1,4 +1,4 @@
-﻿//
+//
 // System.Collections.Generic.List
 //
 // Authors:
@@ -97,9 +97,9 @@ namespace Spine {
 //				var newItems = new T[newSize];
 //				Array.Copy(oldItems, newItems, Count);
 //				Items = newItems;
-			} else if (newSize > itemsLength) {
+			} else if (newSize < itemsLength) {
 				// Allow nulling of T reference type to allow GC.
-				for (int i = Count; i < itemsLength; i++)
+				for (int i = newSize; i < itemsLength; i++)
 					oldItems[i] = default(T);
 			}
 			Count = newSize;
