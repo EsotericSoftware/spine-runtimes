@@ -173,7 +173,7 @@ namespace Spine {
 				darkColor.A = premultipliedAlpha ? (byte)255 : (byte)0;
 
 				// clip
-				if (clipper.IsClipping()) {
+				if (clipper.IsClipping) {
 					clipper.ClipTriangles(vertices, verticesCount << 1, indices, indicesCount, uvs);
 					vertices = clipper.ClippedVertices.Items;
 					verticesCount = clipper.ClippedVertices.Count >> 1;
