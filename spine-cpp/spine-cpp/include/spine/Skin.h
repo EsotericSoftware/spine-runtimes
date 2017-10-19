@@ -94,8 +94,14 @@ struct HashAttachmentKey
 {
     std::size_t operator()(const Spine::Skin::AttachmentKey& val) const
     {
-        std::size_t h1 = std::hash<int>{}(val._slotIndex);
-        std::size_t h2 = std::hash<std::string>{}(val._name);
+        std::size_t h1 = static_cast<int(val._slotIndex);
+        
+        std::size_t h2 = 7;
+        size_t strlen = val._name.length();
+        for (int i = 0; i < strlen; ++i)
+        {
+            h2 = h2 * 31 + val._name.at(i);
+        }
         
         return h1 ^ (h2 << 1);
     }

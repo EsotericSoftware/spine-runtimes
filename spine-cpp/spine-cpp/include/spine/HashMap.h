@@ -89,7 +89,7 @@ namespace Spine
             Entry* _entry;
         };
         
-        HashMap(size_t capacity) : _capacity(capacity), _hashFunction(), _header(), _trailer()
+        HashMap(size_t capacity = 65535) : _capacity(capacity), _hashFunction(), _header(), _trailer()
         {
             _hashTable = new Entry[capacity];
             for (int i = 0; i < _capacity; ++i)

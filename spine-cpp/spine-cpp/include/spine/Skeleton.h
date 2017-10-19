@@ -120,7 +120,7 @@ namespace Spine
         /// @param width The width of the AABB
         /// @param height The height of the AABB.
         /// @param vertexBuffer Reference to hold a SimpleArray of floats. This method will assign it with new floats as needed.
-        void getBounds(float& outX, float& outY, float& outWidth, float& outHeight, SimpleArray<float>& vertexBuffer);
+        void getBounds(float& outX, float& outY, float& outWidth, float& outHeight, SimpleArray<float>& outVertexBuffer);
         
         Bone* getRootBone();
         
@@ -170,15 +170,15 @@ namespace Spine
         bool _flipX, _flipY;
         float _x, _y;
         
-        void sortIkConstraint(IkConstraint constraint);
+        void sortIkConstraint(IkConstraint* constraint);
         
-        void sortPathConstraint(PathConstraint constraint);
+        void sortPathConstraint(PathConstraint* constraint);
         
-        void sortTransformConstraint(TransformConstraint constraint);
+        void sortTransformConstraint(TransformConstraint* constraint);
         
-        void sortPathConstraintAttachment(Skin skin, int slotIndex, Bone slotBone);
+        void sortPathConstraintAttachment(Skin* skin, int slotIndex, Bone* slotBone);
         
-        void sortPathConstraintAttachment(Attachment attachment, Bone slotBone);
+        void sortPathConstraintAttachment(Attachment* attachment, Bone* slotBone);
         
         void sortBone(Bone bone);
         

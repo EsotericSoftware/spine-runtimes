@@ -42,10 +42,21 @@
 
 namespace Spine
 {
-    Skeleton::Skeleton(SkeletonData& data) : _data(data)
+    Skeleton::Skeleton(SkeletonData& data) :
+    _data(data),
+    _skin(NULL),
+    _r(1),
+    _g(1),
+    _b(1),
+    _a(1),
+    _time(0),
+    _flipX(false),
+    _flipY(false),
+    _x(0),
+    _y(0)
     {
-        _bones.reserve(_data->getBones().size());
-        bones = new SimpleArray<Bone>(data.bones.Count);
+        _bones.reserve(_data.getBones().size());
+        
         foreach (BoneData boneData in data.bones)
         {
             Bone bone;
@@ -63,8 +74,9 @@ namespace Spine
             bones.Add(bone);
         }
         
-        slots = new SimpleArray<Slot>(data.slots.Count);
-        drawOrder = new SimpleArray<Slot>(data.slots.Count);
+        _slots.reserve(_data.getSlots().size());
+        _drawOrder.reserve(_data.getSlots().size());
+        
         foreach (SlotData slotData in data.slots)
         {
             Bone bone = bones.Items[slotData.boneData.index];
@@ -74,16 +86,23 @@ namespace Spine
         }
         
         ikConstraints = new SimpleArray<IkConstraint>(data.ikConstraints.Count);
+        
         foreach (IkConstraintData ikConstraintData in data.ikConstraints)
-        ikConstraints.Add(new IkConstraint(ikConstraintData, this));
+        {
+            ikConstraints.Add(new IkConstraint(ikConstraintData, this));
+        }
         
         transformConstraints = new SimpleArray<TransformConstraint>(data.transformConstraints.Count);
         foreach (TransformConstraintData transformConstraintData in data.transformConstraints)
-        transformConstraints.Add(new TransformConstraint(transformConstraintData, this));
+        {
+            transformConstraints.Add(new TransformConstraint(transformConstraintData, this));
+        }
         
         pathConstraints = new SimpleArray<PathConstraint> (data.pathConstraints.Count);
         foreach (PathConstraintData pathConstraintData in data.pathConstraints)
-        pathConstraints.Add(new PathConstraint(pathConstraintData, this));
+        {
+            pathConstraints.Add(new PathConstraint(pathConstraintData, this));
+        }
         
         updateCache();
         updateWorldTransform();
@@ -443,7 +462,7 @@ namespace Spine
         _time += delta;
     }
     
-    void Skeleton::getBounds(float& outX, float& outY, float& outWidth, float& outHeight, SimpleArray<float>& vertexBuffer)
+    void Skeleton::getBounds(float& outX, float& outY, float& outWidth, float& outHeight, SimpleArray<float>& outVertexBuffer)
     {
         float minX = std::numeric_limits<float>::max();
         float minY = std::numeric_limits<float>::max();
@@ -643,7 +662,7 @@ namespace Spine
         _flipY = inValue;
     }
     
-    void Skeleton::sortIkConstraint(IkConstraint constraint)
+    void Skeleton::sortIkConstraint(IkConstraint* constraint)
     {
         Bone target = constraint.target;
         sortBone(target);
@@ -667,7 +686,7 @@ namespace Spine
         constrained.Items[constrained.Count - 1].sorted = true;
     }
     
-    void Skeleton::sortPathConstraint(PathConstraint constraint)
+    void Skeleton::sortPathConstraint(PathConstraint* constraint)
     {
         Slot slot = constraint.target;
         int slotIndex = slot.data.index;
@@ -714,7 +733,7 @@ namespace Spine
         }
     }
     
-    void Skeleton::sortTransformConstraint(TransformConstraint constraint)
+    void Skeleton::sortTransformConstraint(TransformConstraint* constraint)
     {
         sortBone(constraint.target);
         
@@ -752,7 +771,7 @@ namespace Spine
         }
     }
     
-    void Skeleton::sortPathConstraintAttachment(Skin skin, int slotIndex, Bone slotBone)
+    void Skeleton::sortPathConstraintAttachment(Skin* skin, int slotIndex, Bone* slotBone)
     {
         foreach (var entry in skin.Attachments)
         {
@@ -763,7 +782,7 @@ namespace Spine
         }
     }
     
-    void Skeleton::sortPathConstraintAttachment(Attachment attachment, Bone slotBone)
+    void Skeleton::sortPathConstraintAttachment(Attachment* attachment, Bone* slotBone)
     {
         if (!(attachment is PathAttachment))
         {
@@ -790,7 +809,7 @@ namespace Spine
         }
     }
     
-    void Skeleton::sortBone(Bone bone)
+    void Skeleton::sortBone(Bone* bone)
     {
         if (bone.sorted)
         {
