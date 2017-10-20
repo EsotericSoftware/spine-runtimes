@@ -35,6 +35,7 @@
 #define PATHCONSTRAINT_NONE -1
 #define PATHCONSTRAINT_BEFORE -2
 #define PATHCONSTRAINT_AFTER -3
+#define EPSILON 0.00001f
 
 spPathConstraint* spPathConstraint_create (spPathConstraintData* data, const spSkeleton* skeleton) {
 	int i;
@@ -113,13 +114,17 @@ void spPathConstraint_apply (spPathConstraint* self) {
 			lengths = self->lengths;
 		}
 		for (i = 0, n = spacesCount - 1; i < n;) {
-			spBone* bone = bones[i];
+			spBone *bone = bones[i];
 			setupLength = bone->data->length;
-			if (setupLength == 0) setupLength = 0.000000001f;
-			x = setupLength * bone->a, y = setupLength * bone->c;
-			length = SQRT(x * x + y * y);
-			if (scale) lengths[i] = length;
-			spaces[++i] =  (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
+			if (setupLength < EPSILON) {
+				if (scale) lengths[i] = 0;
+				spaces[++i] = 0;
+			} else {
+				x = setupLength * bone->a, y = setupLength * bone->c;
+				length = SQRT(x * x + y * y);
+				if (scale) lengths[i] = length;
+				spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
+			}
 		}
 	} else {
 		for (i = 1; i < spacesCount; i++) {
