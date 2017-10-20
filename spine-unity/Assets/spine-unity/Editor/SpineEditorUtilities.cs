@@ -230,9 +230,16 @@ namespace Spine.Unity.Editor {
 			EditorApplication.hierarchyWindowItemOnGUI += HierarchyDragAndDrop;
 
 			// Hierarchy Icons
+			#if UNITY_2017_2_OR_NEWER
+			EditorApplication.playModeStateChanged -= HierarchyIconsOnPlaymodeStateChanged;
+			EditorApplication.playModeStateChanged += HierarchyIconsOnPlaymodeStateChanged;
+			HierarchyIconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
+			#else
 			EditorApplication.playmodeStateChanged -= HierarchyIconsOnPlaymodeStateChanged;
 			EditorApplication.playmodeStateChanged += HierarchyIconsOnPlaymodeStateChanged;
 			HierarchyIconsOnPlaymodeStateChanged();
+			#endif
+
 
 			initialized = true;
 		}
@@ -255,7 +262,11 @@ namespace Spine.Unity.Editor {
 			showHierarchyIcons = EditorGUILayout.Toggle(new GUIContent("Show Hierarchy Icons", "Show relevant icons on GameObjects with Spine Components on them. Disable this if you have large, complex scenes."), showHierarchyIcons);
 			if (EditorGUI.EndChangeCheck()) {
 				EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, showHierarchyIcons);
+				#if UNITY_2017_2_OR_NEWER
+				HierarchyIconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
+				#else
 				HierarchyIconsOnPlaymodeStateChanged();
+				#endif
 			}
 
 			EditorGUILayout.Separator();
@@ -496,7 +507,11 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Hierarchy
+		#if UNITY_2017_2_OR_NEWER
+		static void HierarchyIconsOnPlaymodeStateChanged (PlayModeStateChange stateChange) {
+		#else
 		static void HierarchyIconsOnPlaymodeStateChanged () {
+		#endif
 			skeletonRendererTable.Clear();
 			skeletonUtilityBoneTable.Clear();
 			boundingBoxFollowerTable.Clear();

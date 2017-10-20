@@ -811,19 +811,19 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 				public boolean touchDown (int screenX, int screenY, int pointer, int button) {
 					offsetX = screenX;
-					offsetY = Gdx.graphics.getHeight() - screenY;
+					offsetY = Gdx.graphics.getHeight() - 1 - screenY;
 					return false;
 				}
 
 				public boolean touchDragged (int screenX, int screenY, int pointer) {
 					float deltaX = screenX - offsetX;
-					float deltaY = Gdx.graphics.getHeight() - screenY - offsetY;
+					float deltaY = Gdx.graphics.getHeight() - 1 - screenY - offsetY;
 
 					camera.position.x -= deltaX * camera.zoom;
 					camera.position.y -= deltaY * camera.zoom;
 
 					offsetX = screenX;
-					offsetY = Gdx.graphics.getHeight() - screenY;
+					offsetY = Gdx.graphics.getHeight() - 1 - screenY;
 					return false;
 				}
 

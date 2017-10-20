@@ -517,12 +517,19 @@ public class AnimationState {
 	}
 
 	/** Sets an empty animation for a track, discarding any queued animations, and sets the track entry's
-	 * {@link TrackEntry#getMixDuration()}.
+	 * {@link TrackEntry#getMixDuration()}. An empty animation has no timelines and serves as a placeholder for mixing in or out.
 	 * <p>
-	 * Mixing out is done by setting an empty animation. A mix duration of 0 still mixes out over one frame.
+	 * Mixing out is done by setting an empty animation with a mix duration using either {@link #setEmptyAnimation(int, float)},
+	 * {@link #setEmptyAnimations(float)}, or {@link #addEmptyAnimation(int, float, float)}. Mixing to an empty animation causes
+	 * the previous animation to be applied less and less over the mix duration. Properties keyed in the previous animation
+	 * transition to the value from lower tracks or to the setup pose value if no lower tracks key the property. A mix duration of
+	 * 0 still mixes out over one frame.
 	 * <p>
-	 * To mix in, first set an empty animation and add an animation using {@link #addAnimation(int, Animation, boolean, float)},
-	 * then set the {@link TrackEntry#setMixDuration(float)} on the returned track entry. */
+	 * Mixing in is done by first setting an empty animation, then adding an animation using
+	 * {@link #addAnimation(int, Animation, boolean, float)} and on the returned track entry, set the
+	 * {@link TrackEntry#setMixDuration(float)}. Mixing from an empty animation causes the new animation to be applied more and
+	 * more over the mix duration. Properties keyed in the new animation transition from the value from lower tracks or from the
+	 * setup pose value if no lower tracks key the property to the value keyed in the new animation. */
 	public TrackEntry setEmptyAnimation (int trackIndex, float mixDuration) {
 		TrackEntry entry = setAnimation(trackIndex, emptyAnimation, false);
 		entry.mixDuration = mixDuration;
@@ -533,6 +540,8 @@ public class AnimationState {
 	/** Adds an empty animation to be played after the current or last queued animation for a track, and sets the track entry's
 	 * {@link TrackEntry#getMixDuration()}. If the track is empty, it is equivalent to calling
 	 * {@link #setEmptyAnimation(int, float)}.
+	 * <p>
+	 * See {@link #setEmptyAnimation(int, float)}.
 	 * @param delay Seconds to begin this animation after the start of the previous animation. May be <= 0 to use the animation
 	 *           duration of the previous track minus any mix duration plus <code>delay</code>.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
@@ -810,8 +819,8 @@ public class AnimationState {
 		 * is reached, no other animations are queued for playback, and mixing from any previous animations is complete, then the
 		 * properties keyed by the animation are set to the setup pose and the track is cleared.
 		 * <p>
-		 * It may be desired to use {@link AnimationState#addEmptyAnimation(int, float, float)} to mix the properties back to the
-		 * setup pose over time, rather than have it happen instantly. */
+		 * It may be desired to use {@link AnimationState#addEmptyAnimation(int, float, float)} rather than have the animation
+		 * abruptly cease being applied. */
 		public float getTrackEnd () {
 			return trackEnd;
 		}
