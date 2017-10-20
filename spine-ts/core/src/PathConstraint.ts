@@ -31,6 +31,7 @@
 module spine {
 	export class PathConstraint implements Constraint {
 		static NONE = -1; static BEFORE = -2; static AFTER = -3;
+		static epsilon = 0.00001;
 
 		data: PathConstraintData;
 		bones: Array<Bone>;
@@ -81,11 +82,15 @@ module spine {
 				for (let i = 0, n = spacesCount - 1; i < n;) {
 					let bone = bones[i];
 					let setupLength = bone.data.length;
-					if (setupLength == 0) setupLength = 0.0000001;
-					let x = setupLength * bone.a, y = setupLength * bone.c;
-					let length = Math.sqrt(x * x + y * y);
-					if (scale) lengths[i] = length;
-					spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
+					if (setupLength < PathConstraint.epsilon) {
+						if (scale) lengths[i] = 0;
+						spaces[++i] = 0;
+					} else {
+						let x = setupLength * bone.a, y = setupLength * bone.c;
+						let length = Math.sqrt(x * x + y * y);
+						if (scale) lengths[i] = length;
+						spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
+					}										
 				}
 			} else {
 				for (let i = 1; i < spacesCount; i++)

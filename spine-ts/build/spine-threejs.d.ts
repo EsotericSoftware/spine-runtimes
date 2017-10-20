@@ -681,6 +681,7 @@ declare module spine {
 		static NONE: number;
 		static BEFORE: number;
 		static AFTER: number;
+		static epsilon: number;
 		data: PathConstraintData;
 		bones: Array<Bone>;
 		target: Slot;
