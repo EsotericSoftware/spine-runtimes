@@ -96,7 +96,7 @@ public class NormalMapTest extends ApplicationAdapter {
 		atlasTexture = atlas.getRegions().first().getTexture();
 
 		normalMapTexture = new Texture(Gdx.files.internal(skeletonPath + "-normal.png"));
-	
+
 		SkeletonJson json = new SkeletonJson(atlas);
 		skeletonData = json.readSkeletonData(Gdx.files.internal(skeletonPath + ".json"));
 		if (animationName != null) animation = skeletonData.findAnimation(animationName);
@@ -116,7 +116,7 @@ public class NormalMapTest extends ApplicationAdapter {
 			}
 
 			public boolean touchDragged (int screenX, int screenY, int pointer) {
-				skeleton.setPosition(screenX, Gdx.graphics.getHeight() - screenY);
+				skeleton.setPosition(screenX, Gdx.graphics.getHeight() - 1 - screenY);
 				return true;
 			}
 
@@ -137,7 +137,7 @@ public class NormalMapTest extends ApplicationAdapter {
 		skeleton.update(Gdx.graphics.getDeltaTime());
 
 		lightPosition.x = Gdx.input.getX();
-		lightPosition.y = (Gdx.graphics.getHeight() - Gdx.input.getY());
+		lightPosition.y = (Gdx.graphics.getHeight() - 1 - Gdx.input.getY());
 
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
