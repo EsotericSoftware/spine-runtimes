@@ -43,7 +43,7 @@ namespace Spine
         _frames.reserve(frameCount << 1);
     }
     
-    void RotateTimeline::apply(Skeleton& skeleton, float lastTime, float time, SimpleArray<Event*>& events, float alpha, MixPose pose, MixDirection direction)
+    void RotateTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
     {
         Bone* bone = skeleton.getBones().at(_boneIndex);
         
@@ -127,12 +127,12 @@ namespace Spine
         _boneIndex = inValue;
     }
     
-    SimpleArray<float>& RotateTimeline::getFrames()
+    Vector<float>& RotateTimeline::getFrames()
     {
         return _frames;
     }
     
-    void RotateTimeline::setFrames(SimpleArray<float> inValue)
+    void RotateTimeline::setFrames(Vector<float> inValue)
     {
         _frames = inValue;
     }

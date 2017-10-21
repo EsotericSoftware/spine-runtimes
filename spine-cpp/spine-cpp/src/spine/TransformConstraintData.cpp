@@ -65,7 +65,7 @@ namespace Spine
     {
         return _order;
     }
-    SimpleArray<BoneData*>& TransformConstraintData::getBones()
+    Vector<BoneData*>& TransformConstraintData::getBones()
     {
         return _bones;
     }

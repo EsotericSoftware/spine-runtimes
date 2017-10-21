@@ -77,7 +77,7 @@ namespace Spine
         return ret;
     }
     
-    void Skin::findNamesForSlot(int slotIndex, SimpleArray<std::string>& names)
+    void Skin::findNamesForSlot(int slotIndex, Vector<std::string>& names)
     {
         for (HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = _attachments.begin(); i != _attachments.end(); ++i)
         {
@@ -88,7 +88,7 @@ namespace Spine
         }
     }
     
-    void Skin::findAttachmentsForSlot(int slotIndex, SimpleArray<Attachment*>& attachments)
+    void Skin::findAttachmentsForSlot(int slotIndex, Vector<Attachment*>& attachments)
     {
         for (HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = _attachments.begin(); i != _attachments.end(); ++i)
         {

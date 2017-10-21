@@ -33,7 +33,7 @@
 
 #include <spine/Updatable.h>
 
-#include <spine/SimpleArray.h>
+#include <spine/Vector.h>
 
 namespace Spine
 {
@@ -54,7 +54,7 @@ namespace Spine
         
         static bool isYDown();
         
-        /// @param parent May be null.
+        /// @param parent May be NULL.
         Bone(BoneData& data, Skeleton& skeleton, Bone* parent);
         
         /// Same as updateWorldTransform. This method exists for Bone to implement Spine::Updatable.
@@ -89,7 +89,7 @@ namespace Spine
         BoneData& getData();
         Skeleton& getSkeleton();
         Bone* getParent();
-        SimpleArray<Bone*>& getChildren();
+        Vector<Bone*>& getChildren();
         
         /// The local X translation.
         float getX();
@@ -169,7 +169,7 @@ namespace Spine
         BoneData& _data;
         Skeleton& _skeleton;
         Bone* _parent;
-        SimpleArray<Bone*> _children;
+        Vector<Bone*> _children;
         float _x, _y, _rotation, _scaleX, _scaleY, _shearX, _shearY;
         float _ax, _ay, _arotation, _ascaleX, _ascaleY, _ashearX, _ashearY;
         bool _appliedValid;

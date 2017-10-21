@@ -48,7 +48,7 @@ namespace Spine
         /// The name of the bone, which is unique within the skeleton.
         const std::string& getName();
         
-        /// May be null.
+        /// May be NULL.
         const BoneData* getParent();
         
         float getLength();

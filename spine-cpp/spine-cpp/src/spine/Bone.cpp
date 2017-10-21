@@ -369,7 +369,7 @@ namespace Spine
         return _parent;
     }
     
-    SimpleArray<Bone*>& Bone::getChildren()
+    Vector<Bone*>& Bone::getChildren()
     {
         return _children;
     }

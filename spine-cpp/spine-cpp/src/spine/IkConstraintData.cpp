@@ -57,7 +57,7 @@ namespace Spine
         _order = inValue;
     }
     
-    SimpleArray<BoneData*>& IkConstraintData::getBones()
+    Vector<BoneData*>& IkConstraintData::getBones()
     {
         return _bones;
     }

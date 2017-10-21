@@ -28,8 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_SimpleArray_h
-#define Spine_SimpleArray_h
+#ifndef Spine_Vector_h
+#define Spine_Vector_h
 
 #include <memory>
 #include <assert.h>
@@ -37,19 +37,19 @@
 namespace Spine
 {
     template <typename T>
-    class SimpleArray
+    class Vector
     {
     public:
-        SimpleArray() : _size(0), _capacity(0), _buffer(nullptr)
+        Vector() : _size(0), _capacity(0), _buffer(NULL)
         {
             // Empty
         }
         
-        SimpleArray(const SimpleArray& inArray)
+        Vector(const Vector& inArray)
         {
             _size = inArray._size;
             _capacity = inArray._capacity;
-            if (_capacity)
+            if (_capacity > 0)
             {
                 _buffer = allocate(_capacity);
                 for (size_t i = 0; i < _size; ++i)
@@ -59,7 +59,7 @@ namespace Spine
             }
         }
         
-        ~SimpleArray()
+        ~Vector()
         {
             clear();
             deallocate(_buffer);
@@ -184,4 +184,4 @@ namespace Spine
     };
 }
 
-#endif /* Spine_SimpleArray_h */
+#endif /* Spine_Vector_h */

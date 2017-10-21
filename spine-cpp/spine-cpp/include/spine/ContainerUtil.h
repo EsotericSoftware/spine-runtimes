@@ -31,7 +31,7 @@
 #ifndef Spine_Attachment_h
 #define Spine_Attachment_h
 
-#include <spine/SimpleArray.h>
+#include <spine/Vector.h>
 #include <spine/HashMap.h>
 
 namespace Spine
@@ -40,7 +40,7 @@ namespace Spine
     {
     public:
         template<typename T>
-        static void cleanUpSimpleArrayOfPointers(SimpleArray<T*>& items)
+        static void cleanUpVectorOfPointers(Vector<T*>& items)
         {
             for (size_t i = 0; i < items.size(); )
             {

@@ -31,7 +31,7 @@
 #ifndef Spine_Skeleton_h
 #define Spine_Skeleton_h
 
-#include <spine/SimpleArray.h>
+#include <spine/Vector.h>
 #include <spine/MathUtil.h>
 
 #include <string>
@@ -115,23 +115,23 @@ namespace Spine
         void update(float delta);
         
         /// Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
-        /// @param x The horizontal distance between the skeleton origin and the left side of the AABB.
-        /// @param y The vertical distance between the skeleton origin and the bottom side of the AABB.
-        /// @param width The width of the AABB
-        /// @param height The height of the AABB.
-        /// @param vertexBuffer Reference to hold a SimpleArray of floats. This method will assign it with new floats as needed.
-        void getBounds(float& outX, float& outY, float& outWidth, float& outHeight, SimpleArray<float>& outVertexBuffer);
+        /// @param outX The horizontal distance between the skeleton origin and the left side of the AABB.
+        /// @param outY The vertical distance between the skeleton origin and the bottom side of the AABB.
+        /// @param outWidth The width of the AABB
+        /// @param outHeight The height of the AABB.
+        /// @param outVertexBuffer Reference to hold a Vector of floats. This method will assign it with new floats as needed.
+        void getBounds(float& outX, float& outY, float& outWidth, float& outHeight, Vector<float>& outVertexBuffer);
         
         Bone* getRootBone();
         
         const SkeletonData& getData();
-        SimpleArray<Bone*>& getBones();
-        SimpleArray<Updatable*>& getUpdateCacheList();
-        SimpleArray<Slot*>& getSlots();
-        SimpleArray<Slot*>& getDrawOrder();
-        SimpleArray<IkConstraint*>& getIkConstraints();
-        SimpleArray<PathConstraint*>& getPathConstraints();
-        SimpleArray<TransformConstraint*>& getTransformConstraints();
+        Vector<Bone*>& getBones();
+        Vector<Updatable*>& getUpdateCacheList();
+        Vector<Slot*>& getSlots();
+        Vector<Slot*>& getDrawOrder();
+        Vector<IkConstraint*>& getIkConstraints();
+        Vector<PathConstraint*>& getPathConstraints();
+        Vector<TransformConstraint*>& getTransformConstraints();
         
         Skin* getSkin();
         void setSkin(Skin* inValue);
@@ -156,14 +156,14 @@ namespace Spine
         
     private:
         const SkeletonData& _data;
-        SimpleArray<Bone*> _bones;
-        SimpleArray<Slot*> _slots;
-        SimpleArray<Slot*> _drawOrder;
-        SimpleArray<IkConstraint*> _ikConstraints;
-        SimpleArray<TransformConstraint*> _transformConstraints;
-        SimpleArray<PathConstraint*> _pathConstraints;
-        SimpleArray<Updatable*> _updateCache;
-        SimpleArray<Bone*> _updateCacheReset;
+        Vector<Bone*> _bones;
+        Vector<Slot*> _slots;
+        Vector<Slot*> _drawOrder;
+        Vector<IkConstraint*> _ikConstraints;
+        Vector<TransformConstraint*> _transformConstraints;
+        Vector<PathConstraint*> _pathConstraints;
+        Vector<Updatable*> _updateCache;
+        Vector<Bone*> _updateCacheReset;
         Skin* _skin;
         float _r = 1, _g = 1, _b = 1, _a = 1;
         float _time;
@@ -182,7 +182,7 @@ namespace Spine
         
         void sortBone(Bone bone);
         
-        static void sortReset(SimpleArray<Bone*>& bones);
+        static void sortReset(Vector<Bone*>& bones);
     };
 }
 

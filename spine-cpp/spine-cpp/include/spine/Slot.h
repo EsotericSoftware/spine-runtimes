@@ -31,7 +31,7 @@
 #ifndef Spine_Slot_h
 #define Spine_Slot_h
 
-#include <spine/SimpleArray.h>
+#include <spine/Vector.h>
 
 #include <string>
 
@@ -71,15 +71,15 @@ namespace Spine
         bool hasSecondColor();
         void setHasSecondColor(bool inValue);
         
-        /// May be null.
+        /// May be NULL.
         Attachment* getAttachment();
         void setAttachment(Attachment* inValue);
         
         float getAttachmentTime();
         void setAttachmentTime(float inValue);
         
-        SimpleArray<float>& getAttachmentVertices();
-        void setAttachmentVertices(SimpleArray<float> inValue);
+        Vector<float>& getAttachmentVertices();
+        void setAttachmentVertices(Vector<float> inValue);
         
     private:
         const SlotData& _slotData;
@@ -90,7 +90,7 @@ namespace Spine
         bool _hasSecondColor;
         Attachment* _attachment;
         float _attachmentTime;
-        SimpleArray<float> _attachmentVertices;
+        Vector<float> _attachmentVertices;
     };
 }
 

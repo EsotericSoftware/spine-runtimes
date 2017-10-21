@@ -57,7 +57,7 @@ namespace Spine
     {
         _bones.reserve(_data.getBones().size());
         
-        foreach (BoneData boneData in data.bones)
+        foreach (BoneData boneData in _data.getBones())
         {
             Bone bone;
             if (boneData.parent == NULL)
@@ -85,20 +85,20 @@ namespace Spine
             drawOrder.Add(slot);
         }
         
-        ikConstraints = new SimpleArray<IkConstraint>(data.ikConstraints.Count);
+        ikConstraints = new Vector<IkConstraint>(data.ikConstraints.Count);
         
         foreach (IkConstraintData ikConstraintData in data.ikConstraints)
         {
             ikConstraints.Add(new IkConstraint(ikConstraintData, this));
         }
         
-        transformConstraints = new SimpleArray<TransformConstraint>(data.transformConstraints.Count);
+        transformConstraints = new Vector<TransformConstraint>(data.transformConstraints.Count);
         foreach (TransformConstraintData transformConstraintData in data.transformConstraints)
         {
             transformConstraints.Add(new TransformConstraint(transformConstraintData, this));
         }
         
-        pathConstraints = new SimpleArray<PathConstraint> (data.pathConstraints.Count);
+        pathConstraints = new Vector<PathConstraint> (data.pathConstraints.Count);
         foreach (PathConstraintData pathConstraintData in data.pathConstraints)
         {
             pathConstraints.Add(new PathConstraint(pathConstraintData, this));
@@ -110,17 +110,17 @@ namespace Spine
     
     void Skeleton::updateCache()
     {
-        SimpleArray<IUpdatable> updateCache = _updateCache;
+        Vector<IUpdatable> updateCache = _updateCache;
         updateCache.Clear();
         _updateCacheReset.Clear();
         
-        SimpleArray<Bone> bones = _bones;
+        Vector<Bone> bones = _bones;
         for (int i = 0, n = bones.Count; i < n; ++i)
         {
             bones.Items[i].sorted = false;
         }
         
-        SimpleArray<IkConstraint> ikConstraints = _ikConstraints;
+        Vector<IkConstraint> ikConstraints = _ikConstraints;
         var transformConstraints = _transformConstraints;
         var pathConstraints = _pathConstraints;
         int ikCount = IkConstraints.Count, transformCount = transformConstraints.Count, pathCount = pathConstraints.Count;
@@ -338,7 +338,7 @@ namespace Spine
             }
             else
             {
-                SimpleArray<Slot> slots = _slots;
+                Vector<Slot> slots = _slots;
                 for (int i = 0, n = slots.Count; i < n; ++i)
                 {
                     Slot slot = slots.Items[i];
@@ -382,7 +382,7 @@ namespace Spine
     {
         assert(slotName.length() > 0);
         
-        SimpleArray<Slot> slots = _slots;
+        Vector<Slot> slots = _slots;
         for (int i = 0, n = slots.Count; i < n; ++i)
         {
             Slot slot = slots.Items[i];
@@ -411,7 +411,7 @@ namespace Spine
     {
         assert(constraintName.length() > 0);
         
-        SimpleArray<IkConstraint> ikConstraints = _ikConstraints;
+        Vector<IkConstraint> ikConstraints = _ikConstraints;
         for (int i = 0, n = ikConstraints.Count; i < n; ++i)
         {
             IkConstraint ikConstraint = ikConstraints.Items[i];
@@ -427,7 +427,7 @@ namespace Spine
     {
         assert(constraintName.length() > 0);
         
-        SimpleArray<TransformConstraint> transformConstraints = _transformConstraints;
+        Vector<TransformConstraint> transformConstraints = _transformConstraints;
         for (int i = 0, n = transformConstraints.Count; i < n; ++i)
         {
             TransformConstraint transformConstraint = transformConstraints.Items[i];
@@ -444,7 +444,7 @@ namespace Spine
     {
         assert(constraintName.length() > 0);
         
-        SimpleArray<PathConstraint> pathConstraints = _pathConstraints;
+        Vector<PathConstraint> pathConstraints = _pathConstraints;
         for (int i = 0, n = pathConstraints.Count; i < n; ++i)
         {
             PathConstraint constraint = pathConstraints.Items[i];
@@ -462,7 +462,7 @@ namespace Spine
         _time += delta;
     }
     
-    void Skeleton::getBounds(float& outX, float& outY, float& outWidth, float& outHeight, SimpleArray<float>& outVertexBuffer)
+    void Skeleton::getBounds(float& outX, float& outY, float& outWidth, float& outHeight, Vector<float>& outVertexBuffer)
     {
         float minX = std::numeric_limits<float>::max();
         float minY = std::numeric_limits<float>::max();
@@ -527,37 +527,37 @@ namespace Spine
         return _data;
     }
     
-    SimpleArray<Bone*>& Skeleton::getBones()
+    Vector<Bone*>& Skeleton::getBones()
     {
         return _bones;
     }
     
-    SimpleArray<Updatable*>& Skeleton::getUpdateCacheList()
+    Vector<Updatable*>& Skeleton::getUpdateCacheList()
     {
         return _updateCache;
     }
     
-    SimpleArray<Slot*>& Skeleton::getSlots()
+    Vector<Slot*>& Skeleton::getSlots()
     {
         return _slots;
     }
     
-    SimpleArray<Slot*>& Skeleton::getDrawOrder()
+    Vector<Slot*>& Skeleton::getDrawOrder()
     {
         return _drawOrder;
     }
     
-    SimpleArray<IkConstraint*>& Skeleton::getIkConstraints()
+    Vector<IkConstraint*>& Skeleton::getIkConstraints()
     {
         return _ikConstraints;
     }
     
-    SimpleArray<PathConstraint*>& Skeleton::getPathConstraints()
+    Vector<PathConstraint*>& Skeleton::getPathConstraints()
     {
         return _pathConstraints;
     }
     
-    SimpleArray<TransformConstraint*>& Skeleton::getTransformConstraints()
+    Vector<TransformConstraint*>& Skeleton::getTransformConstraints()
     {
         return _transformConstraints;
     }
@@ -826,7 +826,7 @@ namespace Spine
         updateCache.Add(bone);
     }
     
-    void Skeleton::sortReset(SimpleArray<Bone*>& bones)
+    void Skeleton::sortReset(Vector<Bone*>& bones)
     {
         for (Bone* i = bones.begin(); i != bones.end(); ++i)
         {

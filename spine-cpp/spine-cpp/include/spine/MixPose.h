@@ -35,7 +35,7 @@ namespace Spine
 {
     ///
     /// Controls how a timeline is mixed with the setup or current pose.
-    /// See also Timeline::apply(Skeleton&, float, float, SimpleArray&, float, MixPose, MixDirection)
+    /// See also Timeline::apply(Skeleton&, float, float, Vector&, float, MixPose, MixDirection)
     enum MixPose
     {
         ///  The timeline value is mixed with the setup pose (the current pose is not used).

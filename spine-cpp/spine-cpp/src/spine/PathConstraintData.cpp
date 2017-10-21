@@ -68,7 +68,7 @@ namespace Spine
         _order = inValue;
     }
     
-    SimpleArray<BoneData*>& PathConstraintData::getBones()
+    Vector<BoneData*>& PathConstraintData::getBones()
     {
         return _bones;
     }
