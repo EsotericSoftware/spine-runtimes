@@ -258,13 +258,17 @@ namespace Spine {
 					break;
 				case Dip:
 					pose = MixPose.Setup;
-					alpha = alphaDip;
+					alpha = mix == 1 ? 0 : alphaDip;
 					break;
 				default:
 					pose = MixPose.Setup;
-					alpha = alphaDip;
-					var dipMix = timelineDipMix[i];
-					alpha *= Math.Max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
+					if (mix == 1) {
+						alpha = 0;
+					} else {
+						alpha = alphaDip;
+						var dipMix = timelineDipMix[i];
+						alpha *= Math.Max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
+					}
 					break;
 				}
 				from.totalAlpha += alpha;
