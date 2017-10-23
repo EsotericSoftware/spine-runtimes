@@ -51,7 +51,31 @@ import com.esotericsoftware.spine.Animation.Timeline;
  * See <a href='http://esotericsoftware.com/spine-applying-animations/'>Applying Animations</a> in the Spine Runtimes Guide. */
 public class AnimationState {
 	static private final Animation emptyAnimation = new Animation("<empty>", new Array(0), 0);
-	static private final int SUBSEQUENT = 0, FIRST = 1, DIP = 2, DIP_MIX = 3;
+
+	/** 1) A previously applied timeline has set this property.<br>
+	 * Result: Mix from the current pose to the timeline pose. */
+	static private final int SUBSEQUENT = 0;
+	/** 1) This is the first timeline to set this property.<br>
+	 * 2) The next track entry applied after this one does not have a timeline to set this property.<br>
+	 * Result: Mix from the setup pose to the timeline pose. */
+	static private final int FIRST = 1;
+	/** 1) This is the first timeline to set this property.<br>
+	 * 2) The next track entry to be applied does have a timeline to set this property.<br>
+	 * 3) The next track entry after that one does not have a timeline to set this property.<br>
+	 * Result: Mix from the setup pose to the timeline pose, but avoid the "dipping" problem by not using the mix percentage. This
+	 * means the timeline pose won't mix out toward the setup pose. A subsequent timeline will set this property using a mix. */
+	static private final int DIP = 2;
+	/** 1) This is the first timeline to set this property.<br>
+	 * 2) The next track entry to be applied does have a timeline to set this property.<br>
+	 * 3) The next track entry after that one does have a timeline to set this property.<br>
+	 * 4) timelineDipMix stores the first subsequent track entry that does not have a timeline to set this property.<br>
+	 * Result: This is the same as DIP except the mix percentage from the timelineDipMix track entry is used. This handles when
+	 * more than 2 track entries in a row have a timeline which sets the same property.<br>
+	 * Eg, A -> B -> C -> D where A, B, and C have a timeline to set the same property, but D does not. When A is applied, A's mix
+	 * percentage is not used to avoid dipping, however a later track entry (D, the first entry without a timeline which sets the
+	 * property) is actually mixing out A (which affects B and C). Without using D's mix percentage, A would be applied fully until
+	 * mixed out, causing snapping. */
+	static private final int DIP_MIX = 3;
 
 	private AnimationStateData data;
 	final Array<TrackEntry> tracks = new Array();
