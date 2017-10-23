@@ -281,13 +281,17 @@ public class AnimationState {
 				break;
 			case DIP:
 				pose = MixPose.setup;
-				alpha = alphaDip;
+				alpha = mix == 1 ? 0 : alphaDip;
 				break;
 			default:
 				pose = MixPose.setup;
-				alpha = alphaDip;
-				TrackEntry dipMix = (TrackEntry)timelineDipMix[i];
-				alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
+				if (mix == 1)
+					alpha = 0;
+				else {
+					alpha = alphaDip;
+					TrackEntry dipMix = (TrackEntry)timelineDipMix[i];
+					alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
+				}
 				break;
 			}
 			from.totalAlpha += alpha;
