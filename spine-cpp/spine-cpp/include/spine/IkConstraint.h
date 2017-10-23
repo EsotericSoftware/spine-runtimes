@@ -31,9 +31,57 @@
 #ifndef Spine_IkConstraint_h
 #define Spine_IkConstraint_h
 
+#include <spine/Constraint.h>
+
+#include <spine/Vector.h>
+
 namespace Spine
 {
-    // TODO
+    class IkConstraintData;
+    class Skeleton;
+    class Bone;
+    
+    class IkConstraint : public Constraint
+    {
+    public:
+        /// Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified
+        /// in the world coordinate system.
+        static void apply(Bone& bone, float targetX, float targetY, float alpha);
+        
+        /// Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as
+        /// possible. The target is specified in the world coordinate system.
+        /// @param child A direct descendant of the parent bone.
+        static void apply(Bone& parent, Bone& child, float targetX, float targetY, int bendDir, float alpha);
+        
+        IkConstraint(IkConstraintData& data, Skeleton& skeleton);
+        
+        /// Applies the constraint to the constrained bones.
+        void apply();
+        
+        virtual void update();
+        
+        virtual int getOrder();
+        
+        IkConstraintData& getData();
+        
+        Vector<Bone*>& getBones();
+        
+        Bone* getTarget();
+        void setTarget(Bone* inValue);
+        
+        int getBendDirection();
+        void setBendDirection(int inValue);
+        
+        float getMix();
+        void setMix(float inValue);
+        
+    private:
+        IkConstraintData& _data;
+        Vector<Bone*> _bones;
+        Bone* _target;
+        float _mix;
+        int _bendDirection;
+    };
 }
 
 #endif /* Spine_IkConstraint_h */

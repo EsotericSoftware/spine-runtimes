@@ -48,6 +48,8 @@ namespace Spine
     class Bone : public Updatable
     {
         friend class RotateTimeline;
+        friend class IkConstraint;
+        friend class TransformConstraint;
         
     public:
         static void setYDown(bool inValue);
@@ -55,7 +57,7 @@ namespace Spine
         static bool isYDown();
         
         /// @param parent May be NULL.
-        Bone(BoneData& data, Skeleton& skeleton, Bone* parent);
+        Bone(BoneData& data, Skeleton& skeleton, Bone* parent = NULL);
         
         /// Same as updateWorldTransform. This method exists for Bone to implement Spine::Updatable.
         virtual void update();

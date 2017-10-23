@@ -43,4 +43,6 @@ namespace Spine
     {
         return _name;
     }
+    
+    RTTI_IMPL_NOPARENT(Attachment);
 }

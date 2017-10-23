@@ -48,7 +48,7 @@ namespace Spine
     
     int CurveTimeline::getFrameCount()
     {
-        return _curves.size() / BEZIER_SIZE + 1;
+        return static_cast<int>(_curves.size() / BEZIER_SIZE + 1);
     }
     
     void CurveTimeline::setLinear(int frameIndex)

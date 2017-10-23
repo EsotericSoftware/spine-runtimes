@@ -114,7 +114,7 @@ namespace Spine
         for (HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = oldSkin.getAttachments().begin(); i != oldSkin.getAttachments().end(); ++i)
         {
             int slotIndex = i.first()._slotIndex;
-            Slot* slot = skeleton.getSlots().at(slotIndex);
+            Slot* slot = skeleton.getSlots()[slotIndex];
             
             if (slot->getAttachment() == i.second())
             {

@@ -28,63 +28,56 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_SlotData_h
-#define Spine_SlotData_h
+#ifndef Spine_VertexAttachment_h
+#define Spine_VertexAttachment_h
 
-#include <spine/BlendMode.h>
+#include <spine/Attachment.h>
 
-#include <string>
+#include <spine/Vector.h>
 
 namespace Spine
 {
-    class BoneData;
+    class Slot;
     
-    class SlotData
+    /// An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's vertices.
+    class VertexAttachment : Attachment
     {
     public:
-        SlotData(int index, std::string name, const BoneData& boneData);
+        VertexAttachment(std::string name);
         
-        const int getIndex();
+        void computeWorldVertices(Slot& slot, Vector<float>& worldVertices);
         
-        const std::string& getName();
+        /// Transforms local vertices to world coordinates.
+        /// @param start The index of the first Vertices value to transform. Each vertex has 2 values, x and y.
+        /// @param count The number of world vertex values to output. Must be less than or equal to WorldVerticesLength - start.
+        /// @param worldVertices The output world vertices. Must have a length greater than or equal to offset + count.
+        /// @param offset The worldVertices index to begin writing values.
+        /// @param stride The number of worldVertices entries between the value pairs written.
+        void computeWorldVertices(Slot& slot, int start, int count, Vector<float>& worldVertices, int offset, int stride = 2);
         
-        BoneData& getBoneData();
+        /// @return true if a deform originally applied to the specified attachment should be applied to this attachment.
+        virtual bool applyDeform(VertexAttachment* sourceAttachment);
         
-        float getR();
-        void setR(float inValue);
-        float getG();
-        void setG(float inValue);
-        float getB();
-        void setB(float inValue);
-        float getA();
-        void setA(float inValue);
+        /// Gets a unique ID for this attachment.
+        int getId();
         
-        float getR2();
-        void setR2(float inValue);
-        float getG2();
-        void setG2(float inValue);
-        float getB2();
-        void setB2(float inValue);
-        bool hasSecondColor();
-        void setHasSecondColor(bool inValue);
+        Vector<int> getBones();
+        void setBones(Vector<int> inValue);
         
-        /// May be empty.
-        std::string getAttachmentName();
-        void setAttachmentName(std::string inValue);
+        Vector<float> getVertices();
+        void setVertices(Vector<float> inValue);
         
-        BlendMode getBlendMode();
-        void setBlendMode(BlendMode inValue);
+        int getWorldVerticesLength();
+        void setWorldVerticesLength(int inValue);
         
     private:
-        const int _index;
-        const std::string _name;
-        BoneData& _boneData;
-        float _r, _g, _b, _a;
-        float _r2, _g2, _b2;
-        bool _hasSecondColor;
-        std::string _attachmentName;
-        BlendMode _blendMode;
+        const int _id;
+        Vector<int> _bones;
+        Vector<float> _vertices;
+        int _worldVerticesLength;
+        
+        static int getNextID();
     };
 }
 
-#endif /* Spine_SlotData_h */
+#endif /* Spine_VertexAttachment_h */

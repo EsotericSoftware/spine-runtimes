@@ -35,10 +35,10 @@
 
 #include <string>
 
-class BoneData;
-
 namespace Spine
 {
+    class BoneData;
+    
     class IkConstraintData
     {
     public:

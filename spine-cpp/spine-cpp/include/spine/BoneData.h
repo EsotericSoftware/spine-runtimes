@@ -40,7 +40,7 @@ namespace Spine
     class BoneData
     {
     public:
-        BoneData(int index, std::string name, BoneData* parent);
+        BoneData(int index, std::string name, BoneData* parent = NULL);
         
         /// The index of the bone in Skeleton.Bones
         const int getIndex();
@@ -49,7 +49,7 @@ namespace Spine
         const std::string& getName();
         
         /// May be NULL.
-        const BoneData* getParent();
+        BoneData* getParent();
         
         float getLength();
         void setLength(float inValue);
@@ -89,7 +89,7 @@ namespace Spine
     private:
         const int _index;
         const std::string _name;
-        const BoneData* _parent;
+        BoneData* _parent;
         float _length;
         float _x, _y, _rotation, _scaleX, _scaleY, _shearX, _shearY;
         TransformMode _transformMode;

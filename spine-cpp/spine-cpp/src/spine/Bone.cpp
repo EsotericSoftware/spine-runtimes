@@ -111,14 +111,14 @@ namespace Spine
             float lb = MathUtil::cosDeg(rotationY) * scaleY;
             float lc = MathUtil::sinDeg(rotation + shearX) * scaleX;
             float ld = MathUtil::sinDeg(rotationY) * scaleY;
-            if (_skeleton.isFlipX())
+            if (_skeleton.getFlipX())
             {
                 x = -x;
                 la = -la;
                 lb = -lb;
             }
             
-            if (_skeleton.isFlipY() != Bone::isYDown())
+            if (_skeleton.getFlipY() != Bone::isYDown())
             {
                 y = -y;
                 lc = -lc;
@@ -223,7 +223,7 @@ namespace Spine
                 float lc = MathUtil::sinDeg(shearX) * scaleX;
                 float ld = MathUtil::sinDeg(90 + shearY) * scaleY;
                 
-                if (_data.getTransformMode() != TransformMode_NoScaleOrReflection ? pa * pd - pb * pc < 0 : _skeleton.isFlipX() != _skeleton.isFlipY())
+                if (_data.getTransformMode() != TransformMode_NoScaleOrReflection ? pa * pd - pb * pc < 0 : _skeleton.getFlipX() != _skeleton.getFlipY())
                 {
                     zb = -zb;
                     zd = -zd;
@@ -238,16 +238,16 @@ namespace Spine
             }
         }
         
-        if (_skeleton.isFlipX())
+        if (_skeleton.getFlipX())
         {
             _a = -_a;
             _b = -_b;
         }
         
-        if (skeleton.isFlipY() != Bone::isYDown())
+        if (skeleton.getFlipY() != Bone::isYDown())
         {
-            c = -c;
-            d = -d;
+            _c = -_c;
+            _d = -_d;
         }
     }
     

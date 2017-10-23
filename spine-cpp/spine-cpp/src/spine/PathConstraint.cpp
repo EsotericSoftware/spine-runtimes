@@ -28,7 +28,606 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#include <spine/PathConstraint.h>
+
+#include <spine/PathConstraintData.h>
+#include <spine/Skeleton.h>
+#include <spine/PathAttachment.h>
+#include <spine/Bone.h>
+#include <spine/Slot.h>
+
+#include <spine/SlotData.h>
+#include <spine/BoneData.h>
+#include <spine/SpacingMode.h>
+#include <spine/PositionMode.h>
+#include <spine/RotateMode.h>
+#include <spine/MathUtil.h>
+
 namespace Spine
 {
-    // TODO
+    const float PathConstraint::EPSILON = 0.00001f;
+    const int PathConstraint::NONE = -1;
+    const int PathConstraint::BEFORE = -2;
+    const int PathConstraint::AFTER = -3;
+    
+    PathConstraint::PathConstraint(PathConstraintData& data, Skeleton& skeleton) : Constraint(),
+    _data(data),
+    _position(data.getPosition()),
+    _spacing(data.getSpacing()),
+    _rotateMix(data.getRotateMix()),
+    _translateMix(data.getTranslateMix()),
+    _target(skeleton.findSlot(data.getTarget()->getName()))
+    {
+        _bones.reserve(_data.getBones().size());
+        for (BoneData** i = _data.getBones().begin(); i != _data.getBones().end(); ++i)
+        {
+            BoneData* boneData = (*i);
+            
+            _bones.push_back(skeleton.findBone(boneData->getName()));
+        }
+        
+        _segments.reserve(10);
+    }
+    
+    void PathConstraint::apply()
+    {
+        update();
+    }
+    
+    void PathConstraint::update()
+    {
+        Attachment* baseAttachment = _target->getAttachment();
+        if (baseAttachment == NULL || !baseAttachment->getRTTI().derivesFrom(PathAttachment::rtti))
+        {
+            return;
+        }
+        
+        PathAttachment* attachment = static_cast<PathAttachment*>(baseAttachment);
+        
+        float rotateMix = _rotateMix;
+        float translateMix = _translateMix;
+        bool translate = translateMix > 0;
+        bool rotate = rotateMix > 0;
+        if (!translate && !rotate)
+        {
+            return;
+        }
+        
+        PathConstraintData data = _data;
+        SpacingMode spacingMode = data.spacingMode;
+        bool lengthSpacing = spacingMode == SpacingMode.Length;
+        RotateMode rotateMode = data.rotateMode;
+        bool tangents = rotateMode == RotateMode_Tangent, scale = rotateMode == RotateMode_ChainScale;
+        int boneCount = _bones.Count, spacesCount = tangents ? boneCount : boneCount + 1;
+        Bone[] bonesItems = _bones.Items;
+        Vector<float> spaces = _spaces.Resize(spacesCount), lengths = NULL;
+        float spacing = _spacing;
+        if (scale || lengthSpacing)
+        {
+            if (scale)
+            {
+                lengths = _lengths.Resize(boneCount);
+            }
+            
+            for (int i = 0, n = spacesCount - 1; i < n;)
+            {
+                Bone bone = bonesItems[i];
+                float setupLength = bone.data.length;
+                if (setupLength < PathConstraint.EPSILON)
+                {
+                    if (scale)
+                    {
+                        lengths.Items[i] = 0;
+                    }
+                    spaces.Items[++i] = 0;
+                }
+                else
+                {
+                    float x = setupLength * bone.a, y = setupLength * bone.c;
+                    float length = (float)Math.Sqrt(x * x + y * y);
+                    if (scale)
+                    {
+                        lengths.Items[i] = length;
+                    }
+                    spaces.Items[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
+                }
+            }
+        }
+        else
+        {
+            for (int i = 1; i < spacesCount; ++i)
+            {
+                spaces.Items[i] = spacing;
+            }
+        }
+        
+        float[] positions = computeWorldPositions(attachment, spacesCount, tangents, data.positionMode == PositionMode_Percent, spacingMode == SpacingMode_Percent);
+        float boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
+        bool tip;
+        if (offsetRotation == 0)
+        {
+            tip = rotateMode == RotateMode_Chain;
+        }
+        else
+        {
+            tip = false;
+            Bone p = target.bone;
+            offsetRotation *= p.a * p.d - p.b * p.c > 0 ? DegRad : -DegRad;
+        }
+        
+        for (int i = 0, p = 3; i < boneCount; i++, p += 3)
+        {
+            Bone bone = bonesItems[i];
+            bone.worldX += (boneX - bone.worldX) * translateMix;
+            bone.worldY += (boneY - bone.worldY) * translateMix;
+            float x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
+            if (scale)
+            {
+                float length = lengths.Items[i];
+                if (length >= PathConstraint.EPSILON)
+                {
+                    float s = ((float)Math.Sqrt(dx * dx + dy * dy) / length - 1) * rotateMix + 1;
+                    bone.a *= s;
+                    bone.c *= s;
+                }
+            }
+            
+            boneX = x;
+            boneY = y;
+            
+            if (rotate)
+            {
+                float a = bone.a, b = bone.b, c = bone.c, d = bone.d, r, cos, sin;
+                if (tangents)
+                {
+                    r = positions[p - 1];
+                }
+                else if (spaces.Items[i + 1] < PathConstraint.EPSILON)
+                {
+                    r = positions[p + 2];
+                }
+                else
+                {
+                    r = MathUtil::atan2(dy, dx);
+                }
+                
+                r -= MathUtil::atan2(c, a);
+                
+                if (tip)
+                {
+                    cos = MathUtil::cos(r);
+                    sin = MathUtil::sin(r);
+                    float length = bone.data.length;
+                    boneX += (length * (cos * a - sin * c) - dx) * rotateMix;
+                    boneY += (length * (sin * a + cos * c) - dy) * rotateMix;
+                }
+                else
+                {
+                    r += offsetRotation;
+                }
+                
+                if (r > SPINE_PI)
+                {
+                    r -= SPINE_PI_2;
+                }
+                else if (r < -SPINE_PI)
+                {
+                    r += SPINE_PI_2;
+                }
+                
+                r *= rotateMix;
+                cos = MathUtil::cos(r);
+                sin = MathUtil::sin(r);
+                bone.a = cos * a - sin * c;
+                bone.b = cos * b - sin * d;
+                bone.c = sin * a + cos * c;
+                bone.d = sin * b + cos * d;
+            }
+            bone.appliedValid = false;
+        }
+    }
+    
+    int PathConstraint::getOrder()
+    {
+        return _data.getOrder();
+    }
+    
+    float PathConstraint::getPosition()
+    {
+        return _position;
+    }
+    
+    void PathConstraint::setPosition(float inValue)
+    {
+        _position = inValue;
+    }
+    
+    float PathConstraint::getSpacing()
+    {
+        return _spacing;
+    }
+    
+    void PathConstraint::setSpacing(float inValue)
+    {
+        _spacing = inValue;
+    }
+    
+    float PathConstraint::getRotateMix()
+    {
+        return _rotateMix;
+    }
+    
+    void PathConstraint::setRotateMix(float inValue)
+    {
+        _rotateMix = inValue;
+    }
+    
+    float PathConstraint::getTranslateMix()
+    {
+        return _translateMix;
+    }
+    
+    void PathConstraint::setTranslateMix(float inValue)
+    {
+        _translateMix = inValue;
+    }
+    
+    Vector<Bone*>& PathConstraint::getBones()
+    {
+        return _bones;
+    }
+    
+    Slot* PathConstraint::getTarget()
+    {
+        return _target;
+    }
+    
+    void PathConstraint::setTarget(Slot* inValue)
+    {
+        _target = inValue;
+    }
+    
+    PathConstraintData& PathConstraint::getData()
+    {
+        return _data;
+    }
+    
+    Vector<float> PathConstraint::computeWorldPositions(PathAttachment& path, int spacesCount, bool tangents, bool percentPosition, bool percentSpacing)
+    {
+        Slot target = *_target;
+        float position = _position;
+        float[] spacesItems = _spaces.Items, output = _positions.Resize(spacesCount * 3 + 2).Items, world;
+        bool closed = path.Closed;
+        int verticesLength = path.WorldVerticesLength, curveCount = verticesLength / 6, prevCurve = NONE;
+        
+        float pathLength;
+        if (!path.ConstantSpeed)
+        {
+            float[] lengths = path.Lengths;
+            curveCount -= closed ? 1 : 2;
+            pathLength = lengths[curveCount];
+            if (percentPosition)
+            {
+                position *= pathLength;
+            }
+            
+            if (percentSpacing)
+            {
+                for (int i = 0; i < spacesCount; ++i)
+                {
+                    spacesItems[i] *= pathLength;
+                }
+            }
+            
+            world = _world.Resize(8).Items;
+            for (int i = 0, o = 0, curve = 0; i < spacesCount; i++, o += 3)
+            {
+                float space = spacesItems[i];
+                position += space;
+                float p = position;
+                
+                if (closed)
+                {
+                    p %= pathLength;
+                    if (p < 0)
+                    {
+                        p += pathLength;
+                    }
+                    curve = 0;
+                }
+                else if (p < 0)
+                {
+                    if (prevCurve != BEFORE)
+                    {
+                        prevCurve = BEFORE;
+                        path.ComputeWorldVertices(target, 2, 4, world, 0);
+                    }
+                    
+                    addBeforePosition(p, world, 0, output, o);
+                    
+                    continue;
+                }
+                else if (p > pathLength)
+                {
+                    if (prevCurve != AFTER)
+                    {
+                        prevCurve = AFTER;
+                        path.ComputeWorldVertices(target, verticesLength - 6, 4, world, 0);
+                    }
+                    
+                    addAfterPosition(p - pathLength, world, 0, output, o);
+                    
+                    continue;
+                }
+                
+                // Determine curve containing position.
+                for (;; curve++)
+                {
+                    float length = lengths[curve];
+                    if (p > length)
+                    {
+                        continue;
+                    }
+                    
+                    if (curve == 0)
+                    {
+                        p /= length;
+                    }
+                    else
+                    {
+                        float prev = lengths[curve - 1];
+                        p = (p - prev) / (length - prev);
+                    }
+                    break;
+                }
+                
+                if (curve != prevCurve)
+                {
+                    prevCurve = curve;
+                    if (closed && curve == curveCount)
+                    {
+                        path.ComputeWorldVertices(target, verticesLength - 4, 4, world, 0);
+                        path.ComputeWorldVertices(target, 0, 4, world, 4);
+                    }
+                    else
+                    {
+                        path.ComputeWorldVertices(target, curve * 6 + 2, 8, world, 0);
+                    }
+                }
+                
+                addCurvePosition(p, world[0], world[1], world[2], world[3], world[4], world[5], world[6], world[7], output, o, tangents || (i > 0 && space < EPSILON));
+            }
+            return output;
+        }
+        
+        // World vertices.
+        if (closed)
+        {
+            verticesLength += 2;
+            world = _world.Resize(verticesLength).Items;
+            path.ComputeWorldVertices(target, 2, verticesLength - 4, world, 0);
+            path.ComputeWorldVertices(target, 0, 2, world, verticesLength - 4);
+            world[verticesLength - 2] = world[0];
+            world[verticesLength - 1] = world[1];
+        }
+        else
+        {
+            curveCount--;
+            verticesLength -= 4;
+            world = _world.Resize(verticesLength).Items;
+            path.ComputeWorldVertices(target, 2, verticesLength, world, 0);
+        }
+        
+        // Curve lengths.
+        float[] curves = _curves.Resize(curveCount).Items;
+        pathLength = 0;
+        float x1 = world[0], y1 = world[1], cx1 = 0, cy1 = 0, cx2 = 0, cy2 = 0, x2 = 0, y2 = 0;
+        float tmpx, tmpy, dddfx, dddfy, ddfx, ddfy, dfx, dfy;
+        for (int i = 0, w = 2; i < curveCount; i++, w += 6)
+        {
+            cx1 = world[w];
+            cy1 = world[w + 1];
+            cx2 = world[w + 2];
+            cy2 = world[w + 3];
+            x2 = world[w + 4];
+            y2 = world[w + 5];
+            tmpx = (x1 - cx1 * 2 + cx2) * 0.1875f;
+            tmpy = (y1 - cy1 * 2 + cy2) * 0.1875f;
+            dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.09375f;
+            dddfy = ((cy1 - cy2) * 3 - y1 + y2) * 0.09375f;
+            ddfx = tmpx * 2 + dddfx;
+            ddfy = tmpy * 2 + dddfy;
+            dfx = (cx1 - x1) * 0.75f + tmpx + dddfx * 0.16666667f;
+            dfy = (cy1 - y1) * 0.75f + tmpy + dddfy * 0.16666667f;
+            pathLength += (float)Math.Sqrt(dfx * dfx + dfy * dfy);
+            dfx += ddfx;
+            dfy += ddfy;
+            ddfx += dddfx;
+            ddfy += dddfy;
+            pathLength += (float)Math.Sqrt(dfx * dfx + dfy * dfy);
+            dfx += ddfx;
+            dfy += ddfy;
+            pathLength += (float)Math.Sqrt(dfx * dfx + dfy * dfy);
+            dfx += ddfx + dddfx;
+            dfy += ddfy + dddfy;
+            pathLength += (float)Math.Sqrt(dfx * dfx + dfy * dfy);
+            curves[i] = pathLength;
+            x1 = x2;
+            y1 = y2;
+        }
+        
+        if (percentPosition)
+        {
+            position *= pathLength;
+        }
+        
+        if (percentSpacing)
+        {
+            for (int i = 0; i < spacesCount; ++i)
+            {
+                spacesItems[i] *= pathLength;
+            }
+        }
+        
+        float[] segments = _segments;
+        float curveLength = 0;
+        for (int i = 0, o = 0, curve = 0, segment = 0; i < spacesCount; i++, o += 3)
+        {
+            float space = spacesItems[i];
+            position += space;
+            float p = position;
+            
+            if (closed)
+            {
+                p %= pathLength;
+                if (p < 0)
+                {
+                    p += pathLength;
+                }
+                curve = 0;
+            }
+            else if (p < 0)
+            {
+                addBeforePosition(p, world, 0, output, o);
+                continue;
+            }
+            else if (p > pathLength)
+            {
+                addAfterPosition(p - pathLength, world, verticesLength - 4, output, o);
+                continue;
+            }
+            
+            // Determine curve containing position.
+            for (;; curve++)
+            {
+                float length = curves[curve];
+                if (p > length)
+                {
+                    continue;
+                }
+                
+                if (curve == 0)
+                {
+                    p /= length;
+                }
+                else
+                {
+                    float prev = curves[curve - 1];
+                    p = (p - prev) / (length - prev);
+                }
+                break;
+            }
+            
+            // Curve segment lengths.
+            if (curve != prevCurve)
+            {
+                prevCurve = curve;
+                int ii = curve * 6;
+                x1 = world[ii];
+                y1 = world[ii + 1];
+                cx1 = world[ii + 2];
+                cy1 = world[ii + 3];
+                cx2 = world[ii + 4];
+                cy2 = world[ii + 5];
+                x2 = world[ii + 6];
+                y2 = world[ii + 7];
+                tmpx = (x1 - cx1 * 2 + cx2) * 0.03f;
+                tmpy = (y1 - cy1 * 2 + cy2) * 0.03f;
+                dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.006f;
+                dddfy = ((cy1 - cy2) * 3 - y1 + y2) * 0.006f;
+                ddfx = tmpx * 2 + dddfx;
+                ddfy = tmpy * 2 + dddfy;
+                dfx = (cx1 - x1) * 0.3f + tmpx + dddfx * 0.16666667f;
+                dfy = (cy1 - y1) * 0.3f + tmpy + dddfy * 0.16666667f;
+                curveLength = (float)Math.Sqrt(dfx * dfx + dfy * dfy);
+                segments[0] = curveLength;
+                for (ii = 1; ii < 8; ii++)
+                {
+                    dfx += ddfx;
+                    dfy += ddfy;
+                    ddfx += dddfx;
+                    ddfy += dddfy;
+                    curveLength += (float)Math.Sqrt(dfx * dfx + dfy * dfy);
+                    segments[ii] = curveLength;
+                }
+                dfx += ddfx;
+                dfy += ddfy;
+                curveLength += (float)Math.Sqrt(dfx * dfx + dfy * dfy);
+                segments[8] = curveLength;
+                dfx += ddfx + dddfx;
+                dfy += ddfy + dddfy;
+                curveLength += (float)Math.Sqrt(dfx * dfx + dfy * dfy);
+                segments[9] = curveLength;
+                segment = 0;
+            }
+            
+            // Weight by segment length.
+            p *= curveLength;
+            for (;; segment++)
+            {
+                float length = segments[segment];
+                if (p > length)
+                {
+                    continue;
+                }
+                
+                if (segment == 0)
+                {
+                    p /= length;
+                }
+                else
+                {
+                    float prev = segments[segment - 1];
+                    p = segment + (p - prev) / (length - prev);
+                }
+                break;
+            }
+            addCurvePosition(p * 0.1f, x1, y1, cx1, cy1, cx2, cy2, x2, y2, output, o, tangents || (i > 0 && space < EPSILON));
+        }
+        
+        return output;
+    }
+    
+    void PathConstraint::addBeforePosition(float p, Vector<float>& temp, int i, Vector<float>& output, int o)
+    {
+        float x1 = temp[i];
+        float y1 = temp[i + 1];
+        float dx = temp[i + 2] - x1;
+        float dy = temp[i + 3] - y1;
+        float r = MathUtil::atan2(dy, dx);
+        
+        output[o] = x1 + p * MathUtil::cos(r);
+        output[o + 1] = y1 + p * MathUtil::sin(r);
+        output[o + 2] = r;
+    }
+    
+    void PathConstraint::addAfterPosition(float p, Vector<float>& temp, int i, Vector<float>& output, int o)
+    {
+        float x1 = temp[i + 2];
+        float y1 = temp[i + 3];
+        float dx = x1 - temp[i];
+        float dy = y1 - temp[i + 1];
+        float r = MathUtil::atan2(dy, dx);
+        output[o] = x1 + p * MathUtil::cos(r);
+        output[o + 1] = y1 + p * MathUtil::sin(r);
+        output[o + 2] = r;
+    }
+    
+    void PathConstraint::addCurvePosition(float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2, Vector<float>& output, int o, bool tangents)
+    {
+        if (p < EPSILON || float.IsNaN(p))
+        {
+            p = EPSILON;
+        }
+        
+        float tt = p * p, ttt = tt * p, u = 1 - p, uu = u * u, uuu = uu * u;
+        float ut = u * p, ut3 = ut * 3, uut3 = u * ut3, utt3 = ut3 * p;
+        float x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
+        output[o] = x;
+        output[o + 1] = y;
+        if (tangents)
+        {
+            output[o + 2] = (float)Math.Atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+        }
+    }
 }

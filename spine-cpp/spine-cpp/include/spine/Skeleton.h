@@ -54,6 +54,8 @@ namespace Spine
     public:
         Skeleton(SkeletonData& data);
         
+        ~Skeleton();
+        
         /// Caches information about bones and constraints. Must be called if bones, constraints or weighted path attachments are added
         /// or removed.
         void updateCache();
@@ -155,7 +157,7 @@ namespace Spine
         void setFlipY(float inValue);
         
     private:
-        const SkeletonData& _data;
+        SkeletonData& _data;
         Vector<Bone*> _bones;
         Vector<Slot*> _slots;
         Vector<Slot*> _drawOrder;

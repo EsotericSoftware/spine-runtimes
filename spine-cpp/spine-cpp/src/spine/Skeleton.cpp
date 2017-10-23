@@ -40,6 +40,14 @@
 #include <spine/Skin.h>
 #include <spine/Attachment.h>
 
+#include <spine/BoneData.h>
+#include <spine/SlotData.h>
+#include <spine/IkConstraintData.h>
+#include <spine/TransformConstraintData.h>
+#include <spine/PathConstraintData.h>
+
+#include <spine/ContainerUtil.h>
+
 namespace Spine
 {
     Skeleton::Skeleton(SkeletonData& data) :
@@ -56,61 +64,78 @@ namespace Spine
     _y(0)
     {
         _bones.reserve(_data.getBones().size());
-        
-        foreach (BoneData boneData in _data.getBones())
+        for (BoneData** i = _data.getBones().begin(); i != _data.getBones().end(); ++i)
         {
-            Bone bone;
-            if (boneData.parent == NULL)
+            BoneData* data = (*i);
+            
+            Bone* bone;
+            if (data->getParent() == NULL)
             {
-                bone = new Bone(boneData, this, NULL);
+                bone = new Bone(*data, *this, NULL);
             }
             else
             {
-                Bone parent = bones.Items[boneData.parent.index];
-                bone = new Bone(boneData, this, parent);
-                parent.children.Add(bone);
+                Bone* parent = _bones[data->getParent()->getIndex()];
+                bone = new Bone(*data, *this, parent);
+                parent->getChildren().push_back(bone);
             }
             
-            bones.Add(bone);
+            _bones.push_back(bone);
         }
         
         _slots.reserve(_data.getSlots().size());
         _drawOrder.reserve(_data.getSlots().size());
-        
-        foreach (SlotData slotData in data.slots)
+        for (SlotData** i = _data.getSlots().begin(); i != _data.getSlots().end(); ++i)
         {
-            Bone bone = bones.Items[slotData.boneData.index];
-            Slot slot = new Slot(slotData, bone);
-            slots.Add(slot);
-            drawOrder.Add(slot);
+            SlotData* data = (*i);
+            
+            Bone* bone = _bones[data->getBoneData().getIndex()];
+            Slot* slot = new Slot(*data, *bone);
+            
+            _slots.push_back(slot);
+            _drawOrder.push_back(slot);
         }
         
-        ikConstraints = new Vector<IkConstraint>(data.ikConstraints.Count);
-        
-        foreach (IkConstraintData ikConstraintData in data.ikConstraints)
+        _ikConstraints.reserve(_data.getIkConstraints().size());
+        for (IkConstraintData** i = _data.getIkConstraints().begin(); i != _data.getIkConstraints().end(); ++i)
         {
-            ikConstraints.Add(new IkConstraint(ikConstraintData, this));
+            IkConstraintData* data = (*i);
+            
+            _ikConstraints.push_back(new IkConstraint(*data, *this));
         }
         
-        transformConstraints = new Vector<TransformConstraint>(data.transformConstraints.Count);
-        foreach (TransformConstraintData transformConstraintData in data.transformConstraints)
+        _transformConstraints.reserve(_data.getTransformConstraints().size());
+        for (TransformConstraintData** i = _data.getTransformConstraints().begin(); i != _data.getTransformConstraints().end(); ++i)
         {
-            transformConstraints.Add(new TransformConstraint(transformConstraintData, this));
+            TransformConstraintData* data = (*i);
+            
+            _transformConstraints.push_back(new TransformConstraint(*data, *this));
         }
         
-        pathConstraints = new Vector<PathConstraint> (data.pathConstraints.Count);
-        foreach (PathConstraintData pathConstraintData in data.pathConstraints)
+        _pathConstraints.reserve(_data.getPathConstraints().size());
+        for (PathConstraintData** i = _data.getPathConstraints().begin(); i != _data.getPathConstraints().end(); ++i)
         {
-            pathConstraints.Add(new PathConstraint(pathConstraintData, this));
+            PathConstraintData* data = (*i);
+            
+            _pathConstraints.push_back(new PathConstraint(*data, *this));
         }
         
         updateCache();
         updateWorldTransform();
     }
     
+    Skeleton::~Skeleton()
+    {
+        ContainerUtil::cleanUpVectorOfPointers(_bones);
+        ContainerUtil::cleanUpVectorOfPointers(_slots);
+        ContainerUtil::cleanUpVectorOfPointers(_ikConstraints);
+        ContainerUtil::cleanUpVectorOfPointers(_transformConstraints);
+        ContainerUtil::cleanUpVectorOfPointers(_pathConstraints);
+    }
+    
     void Skeleton::updateCache()
     {
-        Vector<IUpdatable> updateCache = _updateCache;
+        Vector<Updatable> updateCache = _updateCache;
         updateCache.Clear();
         _updateCacheReset.Clear();
         

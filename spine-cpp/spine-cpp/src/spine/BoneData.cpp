@@ -62,7 +62,7 @@ namespace Spine
         return _name;
     }
     
-    const BoneData* BoneData::getParent()
+    BoneData* BoneData::getParent()
     {
         return _parent;
     }

@@ -35,7 +35,7 @@
 #include <float.h>
 
 #define SPINE_PI 3.1415927f
-#define SPINE_PI_2 PI * 2
+#define SPINE_PI_2 SPINE_PI * 2
 #define RadDeg 180.0f / SPINE_PI
 #define DegRad SPINE_PI / 180.0f
 #define SIN_BITS 14 // 16KB. Adjust for accuracy.
