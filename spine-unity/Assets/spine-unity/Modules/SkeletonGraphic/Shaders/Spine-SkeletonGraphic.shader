@@ -91,7 +91,7 @@ Shader "Spine/SkeletonGraphic (Premultiply Alpha)"
 				OUT.vertex.xy += (_ScreenParams.zw-1.0) * float2(-1,1);
 				#endif
 
-				OUT.color = IN.color * _Color;
+				OUT.color = IN.color * float4(_Color.rgb * _Color.a, _Color.a); // Combine a PMA version of _Color with vertexColor.
 				return OUT;
 			}
 
