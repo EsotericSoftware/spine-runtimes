@@ -74,17 +74,17 @@ namespace Spine
         }
     }
     
-    const SlotData& Slot::getSlotData()
+    SlotData& Slot::getSlotData()
     {
         return _slotData;
     }
     
-    const Bone& Slot::getBone()
+    Bone& Slot::getBone()
     {
         return _bone;
     }
     
-    const Skeleton& Slot::getSkeleton()
+    Skeleton& Slot::getSkeleton()
     {
         return _skeleton;
     }

@@ -50,6 +50,7 @@ namespace Spine
         friend class RotateTimeline;
         friend class IkConstraint;
         friend class TransformConstraint;
+        friend class VertexAttachment;
         
     public:
         static void setYDown(bool inValue);

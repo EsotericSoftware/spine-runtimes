@@ -44,14 +44,16 @@ namespace Spine
     
     class Slot
     {
+        friend class VertexAttachment;
+        
     public:
         Slot(SlotData& data, Bone& bone);
         
         void setToSetupPose();
         
-        const SlotData& getSlotData();
-        const Bone& getBone();
-        const Skeleton& getSkeleton();
+        SlotData& getSlotData();
+        Bone& getBone();
+        Skeleton& getSkeleton();
         
         float getR();
         void setR(float inValue);
@@ -82,9 +84,9 @@ namespace Spine
         void setAttachmentVertices(Vector<float> inValue);
         
     private:
-        const SlotData& _slotData;
-        const Bone& _bone;
-        const Skeleton& _skeleton;
+        SlotData& _slotData;
+        Bone& _bone;
+        Skeleton& _skeleton;
         float _r, _g, _b, _a;
         float _r2, _g2, _b2;
         bool _hasSecondColor;

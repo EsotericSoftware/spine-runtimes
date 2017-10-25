@@ -34,7 +34,9 @@
 #include <spine/Event.h>
 
 #include <spine/Bone.h>
+#include <spine/BoneData.h>
 #include <spine/Animation.h>
+#include <spine/TimelineType.h>
 
 namespace Spine
 {
@@ -45,20 +47,29 @@ namespace Spine
     
     void RotateTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
     {
-        Bone* bone = skeleton.getBones().at(_boneIndex);
+        Bone* bone = skeleton.getBones()[_boneIndex];
         
         if (time < _frames[0])
         {
             switch (pose)
             {
                 case MixPose_Setup:
-                    bone->_rotation = bone->_data->_rotation;
-                    return;
+                {
+                    bone->_rotation = bone->_data._rotation;
+                    break;
+                }
                 case MixPose_Current:
-                    float rr = bone->_data->_rotation - bone->_rotation;
+                {
+                    float rr = bone->_data._rotation - bone->_rotation;
                     rr -= (16384 - (int)(16384.499999999996 - rr / 360)) * 360;
                     bone->_rotation += rr * alpha;
-                    return;
+                    break;
+                }
+                case MixPose_CurrentLayered:
+                {
+                    // TODO?
+                    break;
+                }
             }
             
             return;
@@ -69,11 +80,11 @@ namespace Spine
             // Time is after last frame.
             if (pose == MixPose_Setup)
             {
-                bone->_rotation = bone->_data->_rotation + _frames[_frames.size() + PREV_ROTATION] * alpha;
+                bone->_rotation = bone->_data._rotation + _frames[_frames.size() + PREV_ROTATION] * alpha;
             }
             else
             {
-                float rr = bone->_data->_rotation + _frames[_frames.size() + PREV_ROTATION] - bone->_rotation;
+                float rr = bone->_data._rotation + _frames[_frames.size() + PREV_ROTATION] - bone->_rotation;
                 rr -= (16384 - (int)(16384.499999999996 - rr / 360)) * 360; // Wrap within -180 and 180.
                 bone->_rotation += rr * alpha;
             }
@@ -94,11 +105,11 @@ namespace Spine
         if (pose == MixPose_Setup)
         {
             r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
-            bone->_rotation = bone->_data->_rotation + r * alpha;
+            bone->_rotation = bone->_data._rotation + r * alpha;
         }
         else
         {
-            r = bone->_data->_rotation + r - bone->_rotation;
+            r = bone->_data._rotation + r - bone->_rotation;
             r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
             bone->_rotation += r * alpha;
         }
