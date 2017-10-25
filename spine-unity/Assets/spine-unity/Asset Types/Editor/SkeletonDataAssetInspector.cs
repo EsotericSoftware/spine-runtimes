@@ -726,6 +726,9 @@ namespace Spine.Unity.Editor {
 		}
 
 		void DoRenderPreview (bool drawHandles) {
+			if (this.PreviewUtilityCamera.activeTexture == null || this.PreviewUtilityCamera.targetTexture == null )
+				return;
+
 			GameObject go = this.m_previewInstance;
 
 			if (m_requireRefresh && go != null) {
