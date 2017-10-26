@@ -57,7 +57,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.esotericsoftware.spine.Animation.MixDirection;
-import com.esotericsoftware.spine.Animation.MixPose;
+import com.esotericsoftware.spine.Animation.MixBlend;
 
 public class NormalMapTest extends ApplicationAdapter {
 	String skeletonPath, animationName;
@@ -132,7 +132,7 @@ public class NormalMapTest extends ApplicationAdapter {
 	public void render () {
 		float lastTime = time;
 		time += Gdx.graphics.getDeltaTime();
-		if (animation != null) animation.apply(skeleton, lastTime, time, true, null, 1, MixPose.current, MixDirection.in);
+		if (animation != null) animation.apply(skeleton, lastTime, time, true, null, 1, MixBlend.first, MixDirection.in);
 		skeleton.updateWorldTransform();
 		skeleton.update(Gdx.graphics.getDeltaTime());
 

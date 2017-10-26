@@ -40,8 +40,8 @@ import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
+import com.esotericsoftware.spine.Animation.MixBlend;
 import com.esotericsoftware.spine.Animation.MixDirection;
-import com.esotericsoftware.spine.Animation.MixPose;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 
@@ -197,12 +197,14 @@ public class AnimationState {
 			TrackEntry current = tracks.get(i);
 			if (current == null || current.delay > 0) continue;
 			applied = true;
-			MixPose currentPose = i == 0 ? MixPose.current : MixPose.currentLayered;
+
+			// Track 0 animations aren't for layering, so do not show the previously applied animations before the first key.
+			MixBlend blend = i == 0 ? MixBlend.first : current.mixBlend;
 
 			// Apply mixing from entries first.
 			float mix = current.alpha;
 			if (current.mixingFrom != null)
-				mix *= applyMixingFrom(current, skeleton, currentPose);
+				mix *= applyMixingFrom(current, skeleton, blend);
 			else if (current.trackTime >= current.trackEnd && current.next == null) //
 				mix = 0; // Set to setup pose the last time the entry will be applied.
 
@@ -210,9 +212,9 @@ public class AnimationState {
 			float animationLast = current.animationLast, animationTime = current.getAnimationTime();
 			int timelineCount = current.animation.timelines.size;
 			Object[] timelines = current.animation.timelines.items;
-			if (mix == 1) {
+			if (mix == 1 || blend == MixBlend.add) {
 				for (int ii = 0; ii < timelineCount; ii++)
-					((Timeline)timelines[ii]).apply(skeleton, animationLast, animationTime, events, 1, MixPose.setup, MixDirection.in);
+					((Timeline)timelines[ii]).apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection.in);
 			} else {
 				int[] timelineData = current.timelineData.items;
 
@@ -222,11 +224,12 @@ public class AnimationState {
 
 				for (int ii = 0; ii < timelineCount; ii++) {
 					Timeline timeline = (Timeline)timelines[ii];
-					MixPose pose = timelineData[ii] >= FIRST ? MixPose.setup : currentPose;
-					if (timeline instanceof RotateTimeline)
-						applyRotateTimeline(timeline, skeleton, animationTime, mix, pose, timelinesRotation, ii << 1, firstFrame);
-					else
-						timeline.apply(skeleton, animationLast, animationTime, events, mix, pose, MixDirection.in);
+					MixBlend timelineBlend = timelineData[ii] >= FIRST ? MixBlend.setup : blend;
+					if (timeline instanceof RotateTimeline) {
+						applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1,
+							firstFrame);
+					} else
+						timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineBlend, MixDirection.in);
 				}
 			}
 			queueEvents(current, animationTime);
@@ -239,9 +242,9 @@ public class AnimationState {
 		return applied;
 	}
 
-	private float applyMixingFrom (TrackEntry to, Skeleton skeleton, MixPose currentPose) {
+	private float applyMixingFrom (TrackEntry to, Skeleton skeleton, MixBlend blend) {
 		TrackEntry from = to.mixingFrom;
-		if (from.mixingFrom != null) applyMixingFrom(from, skeleton, currentPose);
+		if (from.mixingFrom != null) applyMixingFrom(from, skeleton, blend);
 
 		float mix;
 		if (to.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
@@ -256,45 +259,58 @@ public class AnimationState {
 		float animationLast = from.animationLast, animationTime = from.getAnimationTime();
 		int timelineCount = from.animation.timelines.size;
 		Object[] timelines = from.animation.timelines.items;
-		int[] timelineData = from.timelineData.items;
-		Object[] timelineDipMix = from.timelineDipMix.items;
-
-		boolean firstFrame = from.timelinesRotation.size == 0;
-		if (firstFrame) from.timelinesRotation.setSize(timelineCount << 1);
-		float[] timelinesRotation = from.timelinesRotation.items;
-
-		MixPose pose;
 		float alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix), alpha;
-		from.totalAlpha = 0;
-		for (int i = 0; i < timelineCount; i++) {
-			Timeline timeline = (Timeline)timelines[i];
-			switch (timelineData[i]) {
-			case SUBSEQUENT:
-				if (!attachments && timeline instanceof AttachmentTimeline) continue;
-				if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
-				pose = currentPose;
-				alpha = alphaMix;
-				break;
-			case FIRST:
-				pose = MixPose.setup;
-				alpha = alphaMix;
-				break;
-			case DIP:
-				pose = MixPose.setup;
-				alpha = alphaDip;
-				break;
-			default:
-				pose = MixPose.setup;
-				alpha = alphaDip;
-				TrackEntry dipMix = (TrackEntry)timelineDipMix[i];
-				alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
-				break;
+
+		if (blend != MixBlend.first) blend = from.mixBlend;
+		if (blend == MixBlend.add) {
+			for (int i = 0; i < timelineCount; i++)
+				((Timeline)timelines[i]).apply(skeleton, animationLast, animationTime, events, alphaMix, blend, MixDirection.out);
+		} else {
+			int[] timelineData = from.timelineData.items;
+			Object[] timelineDipMix = from.timelineDipMix.items;
+
+			boolean firstFrame = from.timelinesRotation.size == 0;
+			if (firstFrame) from.timelinesRotation.setSize(timelineCount << 1);
+			float[] timelinesRotation = from.timelinesRotation.items;
+
+			from.totalAlpha = 0;
+			for (int i = 0; i < timelineCount; i++) {
+				Timeline timeline = (Timeline)timelines[i];
+				MixBlend timelineBlend;
+				switch (timelineData[i]) {
+				case SUBSEQUENT:
+					if (!attachments && timeline instanceof AttachmentTimeline) continue;
+					if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
+					timelineBlend = blend;
+					alpha = alphaMix;
+					break;
+				case FIRST:
+					timelineBlend = MixBlend.setup;
+					alpha = alphaMix;
+					break;
+				case DIP:
+					timelineBlend = MixBlend.setup;
+// alpha = mix == 1 ? 0 : alphaDip;
+					alpha = alphaDip;
+					break;
+				default:
+					timelineBlend = MixBlend.setup;
+					// BOZO! - Bad fix.
+// if (mix == 1)
+// alpha = 0;
+// else {
+					TrackEntry dipMix = (TrackEntry)timelineDipMix[i];
+					alpha = alphaDip * Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
+// }
+					break;
+				}
+				from.totalAlpha += alpha;
+				if (timeline instanceof RotateTimeline) {
+					applyRotateTimeline(timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1,
+						firstFrame);
+				} else
+					timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, MixDirection.out);
 			}
-			from.totalAlpha += alpha;
-			if (timeline instanceof RotateTimeline)
-				applyRotateTimeline(timeline, skeleton, animationTime, alpha, pose, timelinesRotation, i << 1, firstFrame);
-			else
-				timeline.apply(skeleton, animationLast, animationTime, events, alpha, pose, MixDirection.out);
 		}
 
 		if (to.mixDuration > 0) queueEvents(from, animationTime);
@@ -305,13 +321,13 @@ public class AnimationState {
 		return mix;
 	}
 
-	private void applyRotateTimeline (Timeline timeline, Skeleton skeleton, float time, float alpha, MixPose pose,
+	private void applyRotateTimeline (Timeline timeline, Skeleton skeleton, float time, float alpha, MixBlend blend,
 		float[] timelinesRotation, int i, boolean firstFrame) {
 
 		if (firstFrame) timelinesRotation[i] = 0;
 
 		if (alpha == 1) {
-			timeline.apply(skeleton, 0, time, null, 1, pose, MixDirection.in);
+			timeline.apply(skeleton, 0, time, null, 1, blend, MixDirection.in);
 			return;
 		}
 
@@ -319,7 +335,7 @@ public class AnimationState {
 		Bone bone = skeleton.bones.get(rotateTimeline.boneIndex);
 		float[] frames = rotateTimeline.frames;
 		if (time < frames[0]) { // Time is before first frame.
-			if (pose == MixPose.setup) bone.rotation = bone.data.rotation;
+			if (blend == MixBlend.setup) bone.rotation = bone.data.rotation;
 			return;
 		}
 
@@ -341,7 +357,7 @@ public class AnimationState {
 		}
 
 		// Mix between rotations using the direction of the shortest route on the first frame.
-		float r1 = pose == MixPose.setup ? bone.data.rotation : bone.rotation;
+		float r1 = blend == MixBlend.setup ? bone.data.rotation : bone.rotation;
 		float total, diff = r2 - r1;
 		if (diff == 0)
 			total = timelinesRotation[i];
@@ -646,7 +662,7 @@ public class AnimationState {
 
 		for (int i = 0, n = tracks.size; i < n; i++) {
 			TrackEntry entry = tracks.get(i);
-			if (entry != null) entry.setTimelineData(null, mixingTo, propertyIDs);
+			if (entry != null && entry.mixBlend != MixBlend.add) entry.setTimelineData(null, mixingTo, propertyIDs);
 		}
 	}
 
@@ -731,6 +747,7 @@ public class AnimationState {
 		float animationStart, animationEnd, animationLast, nextAnimationLast;
 		float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
 		float alpha, mixTime, mixDuration, interruptAlpha, totalAlpha;
+		MixBlend mixBlend = MixBlend.replace;
 		final IntArray timelineData = new IntArray();
 		final Array<TrackEntry> timelineDipMix = new Array();
 		final FloatArray timelinesRotation = new FloatArray();
@@ -999,8 +1016,8 @@ public class AnimationState {
 		 * {@link AnimationStateData#getMix(Animation, Animation)} based on the animation before this animation (if any).
 		 * <p>
 		 * The <code>mixDuration</code> can be set manually rather than use the value from
-		 * {@link AnimationStateData#getMix(Animation, Animation)}. In that case, the <code>mixDuration</code> must be set for a new
-		 * track entry before {@link AnimationState#update(float)} is next called.
+		 * {@link AnimationStateData#getMix(Animation, Animation)}. In that case, the <code>mixDuration</code> can be set for a new
+		 * track entry only before {@link AnimationState#update(float)} is first called.
 		 * <p>
 		 * When using {@link AnimationState#addAnimation(int, Animation, boolean, float)} with a <code>delay</code> <= 0, note the
 		 * {@link #getDelay()} is set using the mix duration from the {@link AnimationStateData}. */
@@ -1012,6 +1029,20 @@ public class AnimationState {
 			this.mixDuration = mixDuration;
 		}
 
+		/** Controls how properties keyed in the animation are mixed with lower tracks. Defaults to {@link MixBlend#replace}, which
+		 * replaces the values from the lower tracks with the animation values. {@link MixBlend#add} adds the animation values to
+		 * the values from the lower tracks.
+		 * <p>
+		 * The <code>mixBlend</code> can be set for a new track entry only before {@link AnimationState#apply(Skeleton)} is first
+		 * called. */
+		public MixBlend getMixBlend () {
+			return mixBlend;
+		}
+
+		public void setMixBlend (MixBlend mixBlend) {
+			this.mixBlend = mixBlend;
+		}
+
 		/** The track entry for the previous animation when mixing from the previous animation to this animation, or null if no
 		 * mixing is currently occuring. When mixing from multiple animations, <code>mixingFrom</code> makes up a linked list. */
 		public TrackEntry getMixingFrom () {
@@ -1021,10 +1052,10 @@ public class AnimationState {
 		/** Resets the rotation directions for mixing this entry's rotate timelines. This can be useful to avoid bones rotating the
 		 * long way around when using {@link #alpha} and starting animations on other tracks.
 		 * <p>
-		 * Mixing involves finding a rotation between two others, which has two possible solutions: the short way or the long way
-		 * around. The two rotations likely change over time, so which direction is the short or long way also changes. If the short
-		 * way was always chosen, bones would flip to the other side when that direction became the long way. TrackEntry chooses the
-		 * short way the first time it is applied and remembers that direction. */
+		 * Mixing with {@link MixBlend#replace} involves finding a rotation between two others, which has two possible solutions:
+		 * the short way or the long way around. The two rotations likely change over time, so which direction is the short or long
+		 * way also changes. If the short way was always chosen, bones would flip to the other side when that direction became the
+		 * long way. TrackEntry chooses the short way the first time it is applied and remembers that direction. */
 		public void resetRotationDirections () {
 			timelinesRotation.clear();
 		}
