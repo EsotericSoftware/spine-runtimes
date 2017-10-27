@@ -259,7 +259,7 @@ public class AnimationState {
 		float animationLast = from.animationLast, animationTime = from.getAnimationTime();
 		int timelineCount = from.animation.timelines.size;
 		Object[] timelines = from.animation.timelines.items;
-		float alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix), alpha;
+		float alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix);
 
 		if (blend != MixBlend.first) blend = from.mixBlend;
 		if (blend == MixBlend.add) {
@@ -277,6 +277,7 @@ public class AnimationState {
 			for (int i = 0; i < timelineCount; i++) {
 				Timeline timeline = (Timeline)timelines[i];
 				MixBlend timelineBlend;
+				float alpha;
 				switch (timelineData[i]) {
 				case SUBSEQUENT:
 					if (!attachments && timeline instanceof AttachmentTimeline) continue;
@@ -290,18 +291,12 @@ public class AnimationState {
 					break;
 				case DIP:
 					timelineBlend = MixBlend.setup;
-// alpha = mix == 1 ? 0 : alphaDip;
 					alpha = alphaDip;
 					break;
 				default:
 					timelineBlend = MixBlend.setup;
-					// BOZO! - Bad fix.
-// if (mix == 1)
-// alpha = 0;
-// else {
 					TrackEntry dipMix = (TrackEntry)timelineDipMix[i];
 					alpha = alphaDip * Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
-// }
 					break;
 				}
 				from.totalAlpha += alpha;
