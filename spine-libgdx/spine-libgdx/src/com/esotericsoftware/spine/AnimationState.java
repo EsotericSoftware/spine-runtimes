@@ -247,11 +247,13 @@ public class AnimationState {
 		if (from.mixingFrom != null) applyMixingFrom(from, skeleton, blend);
 
 		float mix;
-		if (to.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
+		if (to.mixDuration == 0) { // Single frame mix to undo mixingFrom changes.
 			mix = 1;
-		else {
+			blend = MixBlend.setup;
+		} else {
 			mix = to.mixTime / to.mixDuration;
 			if (mix > 1) mix = 1;
+			if (blend != MixBlend.first) blend = from.mixBlend;
 		}
 
 		Array<Event> events = mix < from.eventThreshold ? this.events : null;
@@ -261,7 +263,6 @@ public class AnimationState {
 		Object[] timelines = from.animation.timelines.items;
 		float alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix);
 
-		if (blend != MixBlend.first) blend = from.mixBlend;
 		if (blend == MixBlend.add) {
 			for (int i = 0; i < timelineCount; i++)
 				((Timeline)timelines[i]).apply(skeleton, animationLast, animationTime, events, alphaMix, blend, MixDirection.out);
