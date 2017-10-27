@@ -244,9 +244,10 @@ public class AnimationState {
 		if (from.mixingFrom != null) applyMixingFrom(from, skeleton, currentPose);
 
 		float mix;
-		if (to.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
+		if (to.mixDuration == 0) { // Single frame mix to undo mixingFrom changes.
 			mix = 1;
-		else {
+			currentPose = MixPose.setup;
+		} else {
 			mix = to.mixTime / to.mixDuration;
 			if (mix > 1) mix = 1;
 		}
