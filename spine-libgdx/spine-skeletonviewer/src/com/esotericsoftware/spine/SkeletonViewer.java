@@ -1001,6 +1001,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 		config.height = (int)(600 * uiScale);
 		config.title = "Skeleton Viewer";
 		config.allowSoftwareMode = true;
+		config.samples = 2;
 		new LwjglApplication(new SkeletonViewer(), config);
 	}
 }
