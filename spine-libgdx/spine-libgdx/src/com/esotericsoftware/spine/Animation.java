@@ -535,17 +535,18 @@ public class Animation {
 						bone.scaleX = bx + (Math.abs(x) * Math.signum(bx) - bx) * alpha;
 						bone.scaleY = by + (Math.abs(y) * Math.signum(by) - by) * alpha;
 						break;
+					case first:
+					case replace:
+						bx = bone.scaleX;
+						by = bone.scaleY;
+						bone.scaleX = bx + (Math.abs(x) * Math.signum(bx) - bx) * alpha;
+						bone.scaleY = by + (Math.abs(y) * Math.signum(by) - by) * alpha;
+						break;
 					case add:
 						bx = bone.scaleX;
 						by = bone.scaleY;
 						bone.scaleX = bx + (Math.abs(x) * Math.signum(bx) - bone.data.scaleX) * alpha;
 						bone.scaleY = by + (Math.abs(y) * Math.signum(by) - bone.data.scaleY) * alpha;
-						break;
-					default:
-						bx = bone.scaleX;
-						by = bone.scaleY;
-						bone.scaleX = bx + (Math.abs(x) * Math.signum(bx) - bx) * alpha;
-						bone.scaleY = by + (Math.abs(y) * Math.signum(by) - by) * alpha;
 					}
 				} else {
 					switch (blend) {
@@ -555,15 +556,16 @@ public class Animation {
 						bone.scaleX = bx + (x - bx) * alpha;
 						bone.scaleY = by + (y - by) * alpha;
 						break;
+					case first:
+					case replace:
+						bone.scaleX += (x - bone.scaleX * Math.signum(x)) * alpha;
+						bone.scaleY += (y - bone.scaleY * Math.signum(y)) * alpha;
+						break;
 					case add:
 						bx = Math.signum(x);
 						by = Math.signum(y);
 						bone.scaleX = Math.abs(bone.scaleX) * bx + (x - Math.abs(bone.data.scaleX) * bx) * alpha;
 						bone.scaleY = Math.abs(bone.scaleY) * by + (y - Math.abs(bone.data.scaleY) * by) * alpha;
-						break;
-					default:
-						bone.scaleX += (x - bone.scaleX * Math.signum(x)) * alpha;
-						bone.scaleY += (y - bone.scaleY * Math.signum(y)) * alpha;
 					}
 				}
 			}
@@ -614,12 +616,19 @@ public class Animation {
 				x = x + (frames[frame + X] - x) * percent;
 				y = y + (frames[frame + Y] - y) * percent;
 			}
-			if (blend == setup) {
+			switch (blend) {
+			case setup:
 				bone.shearX = bone.data.shearX + x * alpha;
 				bone.shearY = bone.data.shearY + y * alpha;
-			} else {
+				break;
+			case first:
+			case replace:
 				bone.shearX += (bone.data.shearX + x - bone.shearX) * alpha;
 				bone.shearY += (bone.data.shearY + y - bone.shearY) * alpha;
+				break;
+			case add:
+				bone.shearX += x * alpha;
+				bone.shearY += y * alpha;
 			}
 		}
 	}
