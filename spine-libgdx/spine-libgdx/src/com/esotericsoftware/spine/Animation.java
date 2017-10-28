@@ -336,8 +336,7 @@ public class Animation {
 					return;
 				case first:
 					float r = bone.data.rotation - bone.rotation;
-					r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
-					bone.rotation += r * alpha;
+					bone.rotation += (r - (16384 - (int)(16384.499999999996 - r / 360)) * 360) * alpha;
 				}
 				return;
 			}
@@ -351,7 +350,7 @@ public class Animation {
 				case first:
 				case replace:
 					r += bone.data.rotation - bone.rotation;
-					r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360; // Wrap within -180 and 180.
+					r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
 					// Fall through.
 				case add:
 					bone.rotation += r * alpha;
@@ -366,20 +365,17 @@ public class Animation {
 			float percent = getCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
 			float r = frames[frame + ROTATION] - prevRotation;
-			r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
-			r = prevRotation + r * percent;
+			r = prevRotation + (r - (16384 - (int)(16384.499999999996 - r / 360)) * 360) * percent;
 			switch (blend) {
 			case setup:
-				r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
-				bone.rotation = bone.data.rotation + r * alpha;
+				bone.rotation = bone.data.rotation + (r - (16384 - (int)(16384.499999999996 - r / 360)) * 360) * alpha;
 				break;
 			case first:
 			case replace:
 				r += bone.data.rotation - bone.rotation;
 				// Fall through.
 			case add:
-				r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
-				bone.rotation += r * alpha;
+				bone.rotation += (r - (16384 - (int)(16384.499999999996 - r / 360)) * 360) * alpha;
 			}
 		}
 	}
@@ -459,12 +455,19 @@ public class Animation {
 				x += (frames[frame + X] - x) * percent;
 				y += (frames[frame + Y] - y) * percent;
 			}
-			if (blend == setup) {
+			switch (blend) {
+			case setup:
 				bone.x = bone.data.x + x * alpha;
 				bone.y = bone.data.y + y * alpha;
-			} else {
+				break;
+			case first:
+			case replace:
 				bone.x += (bone.data.x + x - bone.x) * alpha;
 				bone.y += (bone.data.y + y - bone.y) * alpha;
+				break;
+			case add:
+				bone.x += x * alpha;
+				bone.y += y * alpha;
 			}
 		}
 	}
@@ -514,27 +517,55 @@ public class Animation {
 				y = (y + (frames[frame + Y] - y) * percent) * bone.data.scaleY;
 			}
 			if (alpha == 1) {
-				bone.scaleX = x;
-				bone.scaleY = y;
+				if (blend == add) {
+					bone.scaleX += x - bone.data.scaleX;
+					bone.scaleY += y - bone.data.scaleY;
+				} else {
+					bone.scaleX = x;
+					bone.scaleY = y;
+				}
 			} else {
-				float bx, by;
-				if (blend == setup) {
-					bx = bone.data.scaleX;
-					by = bone.data.scaleY;
-				} else {
-					bx = bone.scaleX;
-					by = bone.scaleY;
-				}
 				// Mixing out uses sign of setup or current pose, else use sign of key.
+				float bx, by;
 				if (direction == out) {
-					x = Math.abs(x) * Math.signum(bx);
-					y = Math.abs(y) * Math.signum(by);
+					switch (blend) {
+					case setup:
+						bx = bone.data.scaleX;
+						by = bone.data.scaleY;
+						bone.scaleX = bx + (Math.abs(x) * Math.signum(bx) - bx) * alpha;
+						bone.scaleY = by + (Math.abs(y) * Math.signum(by) - by) * alpha;
+						break;
+					case add:
+						bx = bone.scaleX;
+						by = bone.scaleY;
+						bone.scaleX = bx + (Math.abs(x) * Math.signum(bx) - bone.data.scaleX) * alpha;
+						bone.scaleY = by + (Math.abs(y) * Math.signum(by) - bone.data.scaleY) * alpha;
+						break;
+					default:
+						bx = bone.scaleX;
+						by = bone.scaleY;
+						bone.scaleX = bx + (Math.abs(x) * Math.signum(bx) - bx) * alpha;
+						bone.scaleY = by + (Math.abs(y) * Math.signum(by) - by) * alpha;
+					}
 				} else {
-					bx = Math.abs(bx) * Math.signum(x);
-					by = Math.abs(by) * Math.signum(y);
+					switch (blend) {
+					case setup:
+						bx = Math.abs(bone.data.scaleX) * Math.signum(x);
+						by = Math.abs(bone.data.scaleY) * Math.signum(y);
+						bone.scaleX = bx + (x - bx) * alpha;
+						bone.scaleY = by + (y - by) * alpha;
+						break;
+					case add:
+						bx = Math.signum(x);
+						by = Math.signum(y);
+						bone.scaleX = Math.abs(bone.scaleX) * bx + (x - Math.abs(bone.data.scaleX) * bx) * alpha;
+						bone.scaleY = Math.abs(bone.scaleY) * by + (y - Math.abs(bone.data.scaleY) * by) * alpha;
+						break;
+					default:
+						bone.scaleX += (x - bone.scaleX * Math.signum(x)) * alpha;
+						bone.scaleY += (y - bone.scaleY * Math.signum(y)) * alpha;
+					}
 				}
-				bone.scaleX = bx + (x - bx) * alpha;
-				bone.scaleY = by + (y - by) * alpha;
 			}
 		}
 	}
