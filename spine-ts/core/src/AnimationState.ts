@@ -191,9 +191,10 @@ module spine {
 			if (from.mixingFrom != null) this.applyMixingFrom(from, skeleton, currentPose);
 
 			let mix = 0;
-			if (to.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
+			if (to.mixDuration == 0) { // Single frame mix to undo mixingFrom changes.
 				mix = 1;
-			else {
+				currentPose = MixPose.setup;
+			} else {
 				mix = to.mixTime / to.mixDuration;
 				if (mix > 1) mix = 1;
 			}

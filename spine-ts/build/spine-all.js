@@ -1715,8 +1715,10 @@ var spine;
 			if (from.mixingFrom != null)
 				this.applyMixingFrom(from, skeleton, currentPose);
 			var mix = 0;
-			if (to.mixDuration == 0)
+			if (to.mixDuration == 0) {
 				mix = 1;
+				currentPose = spine.MixPose.setup;
+			}
 			else {
 				mix = to.mixTime / to.mixDuration;
 				if (mix > 1)

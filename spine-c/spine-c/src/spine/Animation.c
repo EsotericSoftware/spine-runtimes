@@ -253,10 +253,10 @@ void _spRotateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 				bone->rotation = bone->data->rotation;
 				return;
 			case SP_MIX_POSE_CURRENT:
-			case SP_MIX_POSE_CURRENT_LAYERED: /* to appease compiler */
 				r = bone->data->rotation - bone->rotation;
 				r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
 				bone->rotation += r * alpha;
+			case SP_MIX_POSE_CURRENT_LAYERED:; /* to appease compiler */
 		}
 		return;
 	}
@@ -333,9 +333,9 @@ void _spTranslateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleto
 				bone->y = bone->data->y;
 				return;
 			case SP_MIX_POSE_CURRENT:
-			case SP_MIX_POSE_CURRENT_LAYERED: /* to appease compiler */
 				bone->x += (bone->data->x - bone->x) * alpha;
 				bone->y += (bone->data->y - bone->y) * alpha;
+			case SP_MIX_POSE_CURRENT_LAYERED:; /* to appease compiler */
 		}
 		return;
 	}
@@ -405,9 +405,9 @@ void _spScaleTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 				bone->scaleY = bone->data->scaleY;
 				return;
 			case SP_MIX_POSE_CURRENT:
-			case SP_MIX_POSE_CURRENT_LAYERED: /* to appease compiler */
 				bone->scaleX += (bone->data->scaleX - bone->scaleX) * alpha;
 				bone->scaleY += (bone->data->scaleY - bone->scaleY) * alpha;
+			case SP_MIX_POSE_CURRENT_LAYERED:; /* to appease compiler */
 		}
 		return;
 	}
@@ -492,9 +492,9 @@ void _spShearTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 				bone->shearY = bone->data->shearY;
 				return;
 			case SP_MIX_POSE_CURRENT:
-			case SP_MIX_POSE_CURRENT_LAYERED: /* to appease compiler */
 				bone->shearX += (bone->data->shearX - bone->shearX) * alpha;
 				bone->shearY += (bone->data->shearY - bone->shearY) * alpha;
+			case SP_MIX_POSE_CURRENT_LAYERED:; /* to appease compiler */
 		}
 		return;
 	}
@@ -561,11 +561,11 @@ void _spColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 				spColor_setFromColor(&slot->color, &slot->data->color);
 				return;
 			case SP_MIX_POSE_CURRENT:
-			case SP_MIX_POSE_CURRENT_LAYERED: /* to appease compiler */
 				color = &slot->color;
 				setup = &slot->data->color;
 				spColor_addFloats(color, (setup->r - color->r) * alpha, (setup->g - color->g) * alpha, (setup->b - color->b) * alpha,
 						  (setup->a - color->a) * alpha);
+			case SP_MIX_POSE_CURRENT_LAYERED:; /* to appease compiler */
 		}
 		return;
 	}
@@ -651,7 +651,6 @@ void _spTwoColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton
 				spColor_setFromColor(slot->darkColor, slot->data->darkColor);
 				return;
 			case SP_MIX_POSE_CURRENT:
-			case SP_MIX_POSE_CURRENT_LAYERED: /* to appease compiler */
 				light = &slot->color;
 				dark = slot->darkColor;
 				setupLight = &slot->data->color;
@@ -659,6 +658,7 @@ void _spTwoColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton
 				spColor_addFloats(light, (setupLight->r - light->r) * alpha, (setupLight->g - light->g) * alpha, (setupLight->b - light->b) * alpha,
 						  (setupLight->a - light->a) * alpha);
 				spColor_addFloats(dark, (setupDark->r - dark->r) * alpha, (setupDark->g - dark->g) * alpha, (setupDark->b - dark->b) * alpha, 0);
+			case SP_MIX_POSE_CURRENT_LAYERED:; /* to appease compiler */
 		}
 		return;
 	}
@@ -863,7 +863,6 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 				slot->attachmentVerticesCount = 0;
 				return;
 			case SP_MIX_POSE_CURRENT:
-			case SP_MIX_POSE_CURRENT_LAYERED: /* to appease compiler */
 				if (alpha == 1) {
 					slot->attachmentVerticesCount = 0;
 					return;
@@ -880,6 +879,7 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 						vertices[i] *= alpha;
 					}
 				}
+			case SP_MIX_POSE_CURRENT_LAYERED:; /* to appease compiler */
 		}
 		return;
 	}
@@ -1164,9 +1164,9 @@ void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skel
 				constraint->bendDirection = constraint->data->bendDirection;
 				return;
 			case SP_MIX_POSE_CURRENT:
-			case SP_MIX_POSE_CURRENT_LAYERED: /* to appease compiler */
 				constraint->mix += (constraint->data->mix - constraint->mix) * alpha;
 				constraint->bendDirection = constraint->data->bendDirection;
+			case SP_MIX_POSE_CURRENT_LAYERED:; /* to appease compiler */
 		}
 		return;
 	}
@@ -1250,11 +1250,11 @@ void _spTransformConstraintTimeline_apply (const spTimeline* timeline, spSkeleto
 				constraint->shearMix = data->shearMix;
 				return;
 			case SP_MIX_POSE_CURRENT:
-			case SP_MIX_POSE_CURRENT_LAYERED: /* to appease compiler */
 				constraint->rotateMix += (data->rotateMix - constraint->rotateMix) * alpha;
 				constraint->translateMix += (data->translateMix - constraint->translateMix) * alpha;
 				constraint->scaleMix += (data->scaleMix - constraint->scaleMix) * alpha;
 				constraint->shearMix += (data->shearMix - constraint->shearMix) * alpha;
+			case SP_MIX_POSE_CURRENT_LAYERED:; /* to appease compiler */
 		}
 		return;
 		return;
@@ -1341,8 +1341,8 @@ void _spPathConstraintPositionTimeline_apply(const spTimeline* timeline, spSkele
 				constraint->position = constraint->data->position;
 				return;
 			case SP_MIX_POSE_CURRENT:
-			case SP_MIX_POSE_CURRENT_LAYERED: /* to appease compiler */
 				constraint->position += (constraint->data->position - constraint->position) * alpha;
+			case SP_MIX_POSE_CURRENT_LAYERED:; /* to appease compiler */
 		}
 		return;
 	}
@@ -1406,8 +1406,8 @@ void _spPathConstraintSpacingTimeline_apply(const spTimeline* timeline, spSkelet
 				constraint->spacing = constraint->data->spacing;
 				return;
 			case SP_MIX_POSE_CURRENT:
-			case SP_MIX_POSE_CURRENT_LAYERED: /* to appease compiler */
 				constraint->spacing += (constraint->data->spacing - constraint->spacing) * alpha;
+			case SP_MIX_POSE_CURRENT_LAYERED:; /* to appease compiler */
 		}
 		return;
 	}
@@ -1476,9 +1476,9 @@ void _spPathConstraintMixTimeline_apply(const spTimeline* timeline, spSkeleton* 
 				constraint->translateMix = constraint->data->translateMix;
 				return;
 			case SP_MIX_POSE_CURRENT:
-			case SP_MIX_POSE_CURRENT_LAYERED: /* to appease compiler */
 				constraint->rotateMix += (constraint->data->rotateMix - constraint->rotateMix) * alpha;
 				constraint->translateMix += (constraint->data->translateMix - constraint->translateMix) * alpha;
+			case SP_MIX_POSE_CURRENT_LAYERED:; /* to appease compiler */
 		}
 		return;
 	}
