@@ -220,9 +220,10 @@ namespace Spine {
 			if (from.mixingFrom != null) ApplyMixingFrom(from, skeleton, currentPose);
 
 			float mix;
-			if (to.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
+			if (to.mixDuration == 0) { // Single frame mix to undo mixingFrom changes.
 				mix = 1;
-			else {
+				currentPose = MixPose.Setup;
+			} else {
 				mix = to.mixTime / to.mixDuration;
 				if (mix > 1) mix = 1;
 			}
