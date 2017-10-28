@@ -249,11 +249,11 @@ public class AnimationState {
 		float mix;
 		if (to.mixDuration == 0) { // Single frame mix to undo mixingFrom changes.
 			mix = 1;
-			blend = MixBlend.setup;
+			if (blend == MixBlend.first) blend = MixBlend.setup; // Tracks >0 are transparent and can't reset to setup pose.
 		} else {
 			mix = to.mixTime / to.mixDuration;
 			if (mix > 1) mix = 1;
-			if (blend != MixBlend.first) blend = from.mixBlend;
+			if (blend != MixBlend.first) blend = from.mixBlend; // Track 0 ignores track mix blend.
 		}
 
 		Array<Event> events = mix < from.eventThreshold ? this.events : null;
