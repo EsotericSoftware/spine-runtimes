@@ -419,9 +419,10 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* t
 	spTrackEntry* from = to->mixingFrom;
 	if (from->mixingFrom) _spAnimationState_applyMixingFrom(self, from, skeleton, currentPose);
 
-	if (to->mixDuration == 0) /* Single frame mix to undo mixingFrom changes. */
+	if (to->mixDuration == 0) { /* Single frame mix to undo mixingFrom changes. */
 		mix = 1;
-	else {
+		currentPose = SP_MIX_POSE_SETUP;
+	} else {
 		mix = to->mixTime / to->mixDuration;
 		if (mix > 1) mix = 1;
 	}
