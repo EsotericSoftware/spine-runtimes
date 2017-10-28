@@ -173,10 +173,14 @@ public class Animation {
 		 * <code>first</code> is intended for the first animations applied, not for animations layered on top of those. */
 		first,
 		/** Transitions from the current value to the timeline value. No change is made before the first key (the current value is
-		 * kept until the first key). */
+		 * kept until the first key).
+		 * <p>
+		 * <code>replace</code> is intended for animations layered on top of others, not for the first animations applied. */
 		replace,
 		/** Transitions from the current value to the current value plus the timeline value. No change is made before the first key
-		 * (the current value is kept until the first key). */
+		 * (the current value is kept until the first key).
+		 * <p>
+		 * <code>add</code> is intended for animations layered on top of others, not for the first animations applied. */
 		add
 	}
 
@@ -1016,26 +1020,49 @@ public class Animation {
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.
 				float[] lastVertices = frameVertices[frames.length - 1];
 				if (alpha == 1) {
-					// Vertex positions or deform offsets, no alpha.
-					System.arraycopy(lastVertices, 0, vertices, 0, vertexCount);
-				} else if (blend == setup) {
-					VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
-					if (vertexAttachment.getBones() == null) {
-						// Unweighted vertex positions, with alpha.
-						float[] setupVertices = vertexAttachment.getVertices();
-						for (int i = 0; i < vertexCount; i++) {
-							float setup = setupVertices[i];
-							vertices[i] = setup + (lastVertices[i] - setup) * alpha;
+					if (blend == add) {
+						VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
+						if (vertexAttachment.getBones() == null) {
+							// Unweighted vertex positions, no alpha.
+							float[] setupVertices = vertexAttachment.getVertices();
+							for (int i = 0; i < vertexCount; i++)
+								vertices[i] += lastVertices[i] - setupVertices[i];
+						} else {
+							// Weighted deform offsets, no alpha.
+							for (int i = 0; i < vertexCount; i++)
+								vertices[i] += lastVertices[i];
 						}
 					} else {
-						// Weighted deform offsets, with alpha.
-						for (int i = 0; i < vertexCount; i++)
-							vertices[i] = lastVertices[i] * alpha;
+						// Vertex positions or deform offsets, no alpha.
+						System.arraycopy(lastVertices, 0, vertices, 0, vertexCount);
 					}
 				} else {
-					// Vertex positions or deform offsets, with alpha.
-					for (int i = 0; i < vertexCount; i++)
-						vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
+					switch (blend) {
+					case setup:
+						VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
+						if (vertexAttachment.getBones() == null) {
+							// Unweighted vertex positions, with alpha.
+							float[] setupVertices = vertexAttachment.getVertices();
+							for (int i = 0; i < vertexCount; i++) {
+								float setup = setupVertices[i];
+								vertices[i] = setup + (lastVertices[i] - setup) * alpha;
+							}
+						} else {
+							// Weighted deform offsets, with alpha.
+							for (int i = 0; i < vertexCount; i++)
+								vertices[i] = lastVertices[i] * alpha;
+						}
+						break;
+					case first:
+					case replace:
+						// Vertex positions or deform offsets, with alpha.
+						for (int i = 0; i < vertexCount; i++)
+							vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
+						break;
+					case add:
+						for (int i = 0; i < vertexCount; i++)
+							vertices[i] += lastVertices[i] * alpha;
+					}
 				}
 				return;
 			}
@@ -1048,32 +1075,73 @@ public class Animation {
 			float percent = getCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime));
 
 			if (alpha == 1) {
-				// Vertex positions or deform offsets, no alpha.
-				for (int i = 0; i < vertexCount; i++) {
-					float prev = prevVertices[i];
-					vertices[i] = prev + (nextVertices[i] - prev) * percent;
-				}
-			} else if (blend == setup) {
-				VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
-				if (vertexAttachment.getBones() == null) {
-					// Unweighted vertex positions, with alpha.
-					float[] setupVertices = vertexAttachment.getVertices();
-					for (int i = 0; i < vertexCount; i++) {
-						float prev = prevVertices[i], setup = setupVertices[i];
-						vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+				if (blend == add) {
+					VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
+					if (vertexAttachment.getBones() == null) {
+						// Unweighted vertex positions, no alpha.
+						float[] setupVertices = vertexAttachment.getVertices();
+						for (int i = 0; i < vertexCount; i++) {
+							float prev = prevVertices[i];
+							vertices[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
+						}
+					} else {
+						// Weighted deform offsets, no alpha.
+						for (int i = 0; i < vertexCount; i++) {
+							float prev = prevVertices[i];
+							vertices[i] += prev + (nextVertices[i] - prev) * percent;
+						}
 					}
 				} else {
-					// Weighted deform offsets, with alpha.
+					// Vertex positions or deform offsets, no alpha.
 					for (int i = 0; i < vertexCount; i++) {
 						float prev = prevVertices[i];
-						vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
+						vertices[i] = prev + (nextVertices[i] - prev) * percent;
 					}
 				}
 			} else {
-				// Vertex positions or deform offsets, with alpha.
-				for (int i = 0; i < vertexCount; i++) {
-					float prev = prevVertices[i];
-					vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+				switch (blend) {
+				case setup: {
+					VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
+					if (vertexAttachment.getBones() == null) {
+						// Unweighted vertex positions, with alpha.
+						float[] setupVertices = vertexAttachment.getVertices();
+						for (int i = 0; i < vertexCount; i++) {
+							float prev = prevVertices[i], setup = setupVertices[i];
+							vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+						}
+					} else {
+						// Weighted deform offsets, with alpha.
+						for (int i = 0; i < vertexCount; i++) {
+							float prev = prevVertices[i];
+							vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
+						}
+					}
+					break;
+				}
+				case first:
+				case replace:
+					// Vertex positions or deform offsets, with alpha.
+					for (int i = 0; i < vertexCount; i++) {
+						float prev = prevVertices[i];
+						vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+					}
+					break;
+				case add:
+					VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
+					if (vertexAttachment.getBones() == null) {
+						// Unweighted vertex positions, with alpha.
+						float[] setupVertices = vertexAttachment.getVertices();
+						for (int i = 0; i < vertexCount; i++) {
+							float prev = prevVertices[i];
+							vertices[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
+						}
+					} else {
+						// Weighted deform offsets, with alpha.
+						for (int i = 0; i < vertexCount; i++) {
+							float prev = prevVertices[i];
+							vertices[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
+						}
+					}
 				}
 			}
 		}

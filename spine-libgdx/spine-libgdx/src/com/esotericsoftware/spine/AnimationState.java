@@ -224,7 +224,7 @@ public class AnimationState {
 
 				for (int ii = 0; ii < timelineCount; ii++) {
 					Timeline timeline = (Timeline)timelines[ii];
-					MixBlend timelineBlend = timelineData[ii] >= FIRST ? MixBlend.setup : blend;
+					MixBlend timelineBlend = timelineData[ii] == SUBSEQUENT ? blend : MixBlend.setup;
 					if (timeline instanceof RotateTimeline) {
 						applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1,
 							firstFrame);
