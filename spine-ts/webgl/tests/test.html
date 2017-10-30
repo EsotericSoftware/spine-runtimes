@@ -45,7 +45,7 @@ function init() {
 	swirlEffect.centerY = 200;
 	swirlEffect.radius = 500;
 
-	assetManager = new spine.webgl.AssetManager(context, "assets/");
+	assetManager = new spine.webgl.AssetManager(context, "../example/assets/");
 	var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
 	input = new spine.webgl.Input(canvas);
 
