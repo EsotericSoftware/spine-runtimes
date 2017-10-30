@@ -562,8 +562,10 @@ public class Animation {
 						break;
 					case first:
 					case replace:
-						bone.scaleX += (x - bone.scaleX * Math.signum(x)) * alpha;
-						bone.scaleY += (y - bone.scaleY * Math.signum(y)) * alpha;
+						bx = Math.abs(bone.scaleX) * Math.signum(x);
+						by = Math.abs(bone.scaleY) * Math.signum(y);
+						bone.scaleX = bx + (x - bx) * alpha;
+						bone.scaleY = by + (y - by) * alpha;
 						break;
 					case add:
 						bx = Math.signum(x);
