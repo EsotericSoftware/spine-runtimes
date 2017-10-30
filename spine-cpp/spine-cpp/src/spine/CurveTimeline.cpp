@@ -133,4 +133,6 @@ namespace Spine
     {
         return _curves[frameIndex * BEZIER_SIZE];
     }
+    
+    RTTI_IMPL(CurveTimeline, Timeline);
 }

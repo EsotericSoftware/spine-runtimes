@@ -42,6 +42,7 @@ namespace Spine
     class TransformConstraintData
     {
         friend class TransformConstraint;
+        friend class Skeleton;
         
     public:
         TransformConstraintData(std::string name);

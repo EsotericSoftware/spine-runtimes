@@ -40,8 +40,10 @@ namespace Spine
     class Slot;
     
     /// An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's vertices.
-    class VertexAttachment : Attachment
+    class VertexAttachment : public Attachment
     {
+        RTTI_DECL;
+        
     public:
         VertexAttachment(std::string name);
         
@@ -61,10 +63,10 @@ namespace Spine
         /// Gets a unique ID for this attachment.
         int getId();
         
-        Vector<int> getBones();
+        Vector<int>& getBones();
         void setBones(Vector<int> inValue);
         
-        Vector<float> getVertices();
+        Vector<float>& getVertices();
         void setVertices(Vector<float> inValue);
         
         int getWorldVerticesLength();

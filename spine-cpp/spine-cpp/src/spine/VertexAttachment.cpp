@@ -138,7 +138,7 @@ namespace Spine
         return _id;
     }
     
-    Vector<int> VertexAttachment::getBones()
+    Vector<int>& VertexAttachment::getBones()
     {
         return _bones;
     }
@@ -148,7 +148,7 @@ namespace Spine
         _bones = inValue;
     }
     
-    Vector<float> VertexAttachment::getVertices()
+    Vector<float>& VertexAttachment::getVertices()
     {
         return _vertices;
     }
@@ -174,4 +174,6 @@ namespace Spine
         
         return (nextID++ & 65535) << 11;
     }
+    
+    RTTI_IMPL(VertexAttachment, Attachment);
 }

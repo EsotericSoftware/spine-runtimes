@@ -28,22 +28,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <spine/Timeline.h>
-
-#include <spine/Skeleton.h>
-#include <spine/Event.h>
+#include <spine/RegionAttachment.h>
 
 namespace Spine
 {
-    Timeline::Timeline()
-    {
-        // Empty
-    }
-    
-    Timeline::~Timeline()
-    {
-        // Empty
-    }
-    
-    RTTI_IMPL_NOPARENT(Timeline);
+    RTTI_IMPL(RegionAttachment, Attachment);
 }

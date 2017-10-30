@@ -43,6 +43,10 @@ namespace Spine
     
     class TransformConstraint : public Constraint
     {
+        friend class Skeleton;
+        
+        RTTI_DECL;
+        
     public:
         TransformConstraint(TransformConstraintData& data, Skeleton& skeleton);
         

@@ -46,10 +46,14 @@
 namespace Spine
 {
     SkeletonData::SkeletonData() :
+    _name(),
     _defaultSkin(NULL),
     _width(0),
     _height(0),
-    _fps(0)
+    _version(),
+    _hash(),
+    _fps(0),
+    _imagesPath()
     {
         // Empty
     }

@@ -45,6 +45,11 @@ namespace Spine
     
     class PathConstraint : public Constraint
     {
+        friend class Skeleton;
+        
+        RTTI_DECL;
+        
+    public:
         PathConstraint(PathConstraintData& data, Skeleton& skeleton);
         
         /// Applies the constraint to the constrained bones.

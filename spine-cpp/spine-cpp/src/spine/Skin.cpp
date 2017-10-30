@@ -60,7 +60,7 @@ namespace Spine
     {
         assert(attachment);
         
-        _attachments[AttachmentKey(slotIndex, name)] = attachment;
+        _attachments.insert(AttachmentKey(slotIndex, name), attachment);
     }
     
     Attachment* Skin::getAttachment(int slotIndex, std::string name)
@@ -104,17 +104,19 @@ namespace Spine
         return _name;
     }
     
-    HashMap<Skin::AttachmentKey, Attachment*, HashAttachmentKey>& Skin::getAttachments()
+    HashMap<Skin::AttachmentKey, Attachment*, Skin::HashAttachmentKey>& Skin::getAttachments()
     {
         return _attachments;
     }
     
     void Skin::attachAll(Skeleton& skeleton, Skin& oldSkin)
     {
+        Vector<Slot*>& slots = skeleton.getSlots();
+        
         for (HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = oldSkin.getAttachments().begin(); i != oldSkin.getAttachments().end(); ++i)
         {
             int slotIndex = i.first()._slotIndex;
-            Slot* slot = skeleton.getSlots()[slotIndex];
+            Slot* slot = slots[slotIndex];
             
             if (slot->getAttachment() == i.second())
             {

@@ -73,11 +73,14 @@ namespace Spine
         return false;
     }
     
+    inline float clamp(float x, float lower, float upper)
+    {
+        return fminf(upper, fmaxf(x, lower));
+    }
+    
     class MathUtil
     {
     public:
-        static float SIN_TABLE[SIN_COUNT];
-        
         MathUtil();
         
         /// Returns the sine in radians from a lookup table.
@@ -95,12 +98,10 @@ namespace Spine
         /// Returns atan2 in radians, faster but less accurate than Math.Atan2. Average error of 0.00231 radians (0.1323
         /// degrees), largest error of 0.00488 radians (0.2796 degrees).
         static float atan2(float y, float x);
-    };
     
-    inline float clamp(float x, float lower, float upper)
-    {
-        return fminf(upper, fmaxf(x, lower));
-    }
+    private:
+        static float SIN_TABLE[SIN_COUNT];
+    };
 }
 
 #endif /* Spine_MathUtil_h */

@@ -357,4 +357,6 @@ namespace Spine
     {
         _mix = inValue;
     }
+    
+    RTTI_IMPL(IkConstraint, Constraint);
 }

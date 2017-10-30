@@ -147,4 +147,6 @@ namespace Spine
     {
         _frames = inValue;
     }
+    
+    RTTI_IMPL(RotateTimeline, CurveTimeline);
 }

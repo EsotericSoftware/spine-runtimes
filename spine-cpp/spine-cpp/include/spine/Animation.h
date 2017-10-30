@@ -28,73 +28,55 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Slot_h
-#define Spine_Slot_h
+#ifndef Spine_Animation_h
+#define Spine_Animation_h
 
 #include <spine/Vector.h>
+#include <spine/MixPose.h>
+#include <spine/MixDirection.h>
 
 #include <string>
 
 namespace Spine
 {
-    class SlotData;
-    class Bone;
+    class Timeline;
     class Skeleton;
-    class Attachment;
+    class Event;
     
-    class Slot
+    class Animation
     {
-        friend class VertexAttachment;
-        friend class Skeleton;
+        friend class RotateTimeline;
         
     public:
-        Slot(SlotData& data, Bone& bone);
+        Animation(std::string name, Vector<Timeline*>& timelines, float duration);
         
-        void setToSetupPose();
+        /// Applies all the animation's timelines to the specified skeleton.
+        /// See also Timeline::apply(Skeleton&, float, float, Vector, float, MixPose, MixDirection)
+        void apply(Skeleton& skeleton, float lastTime, float time, bool loop, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
         
-        SlotData& getData();
-        Bone& getBone();
-        Skeleton& getSkeleton();
+        std::string getName();
         
-        float getR();
-        void setR(float inValue);
-        float getG();
-        void setG(float inValue);
-        float getB();
-        void setB(float inValue);
-        float getA();
-        void setA(float inValue);
+        Vector<Timeline*> getTimelines();
         
-        float getR2();
-        void setR2(float inValue);
-        float getG2();
-        void setG2(float inValue);
-        float getB2();
-        void setB2(float inValue);
-        bool hasSecondColor();
-        void setHasSecondColor(bool inValue);
+        void setTimelines(Vector<Timeline*> inValue);
         
-        /// May be NULL.
-        Attachment* getAttachment();
-        void setAttachment(Attachment* inValue);
+        float getDuration();
         
-        float getAttachmentTime();
-        void setAttachmentTime(float inValue);
-        
-        Vector<float>& getAttachmentVertices();
-        void setAttachmentVertices(Vector<float> inValue);
+        void setDuration(float inValue);
         
     private:
-        SlotData& _data;
-        Bone& _bone;
-        Skeleton& _skeleton;
-        float _r, _g, _b, _a;
-        float _r2, _g2, _b2;
-        bool _hasSecondColor;
-        Attachment* _attachment;
-        float _attachmentTime;
-        Vector<float> _attachmentVertices;
+        Vector<Timeline*> _timelines;
+        float _duration;
+        std::string _name;
+        
+        /// @param target After the first and before the last entry.
+        static int binarySearch(Vector<float>& values, float target, int step);
+        
+        /// @param target After the first and before the last entry.
+        static int binarySearch(Vector<float>& values, float target);
+        
+        static int linearSearch(Vector<float>& values, float target, int step);
     };
 }
 
-#endif /* Spine_Slot_h */
+#endif /* Spine_Animation_h */

@@ -43,6 +43,10 @@ namespace Spine
     
     class IkConstraint : public Constraint
     {
+        friend class Skeleton;
+        
+        RTTI_DECL;
+        
     public:
         /// Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified
         /// in the world coordinate system.
@@ -78,9 +82,9 @@ namespace Spine
     private:
         IkConstraintData& _data;
         Vector<Bone*> _bones;
-        Bone* _target;
         float _mix;
         int _bendDirection;
+        Bone* _target;
     };
 }
 

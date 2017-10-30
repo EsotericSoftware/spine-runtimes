@@ -38,11 +38,9 @@ namespace Spine
     /// Stores the setup pose values for an Event.
     class EventData
     {
-    public:
-        int _intValue;
-        float _floatValue;
-        std::string _stringValue;
+        friend class Event;
         
+    public:
         EventData(std::string name);
         
         /// The name of the event, which is unique within the skeleton.
@@ -58,8 +56,10 @@ namespace Spine
         void setStringValue(std::string inValue);
         
     private:
-        friend class Event;
         const std::string _name;
+        int _intValue;
+        float _floatValue;
+        std::string _stringValue;
     };
 }
 

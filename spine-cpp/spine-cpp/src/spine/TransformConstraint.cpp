@@ -427,22 +427,24 @@ namespace Spine
             {
                 if (scaleX > 0.00001f)
                 {
-                    scaleX *= ((target._ascaleX - 1 + data.offsetScaleX) * scaleMix) + 1;
+                    scaleX *= ((target._ascaleX - 1 + _data._offsetScaleX) * scaleMix) + 1;
                 }
                 
                 if (scaleY > 0.00001f)
                 {
-                    scaleY *= ((target._ascaleY - 1 + data.offsetScaleY) * scaleMix) + 1;
+                    scaleY *= ((target._ascaleY - 1 + _data._offsetScaleY) * scaleMix) + 1;
                 }
             }
             
             float shearY = bone._ashearY;
             if (shearMix > 0)
             {
-                shearY += (target._ashearY + data.offsetShearY) * shearMix;
+                shearY += (target._ashearY + _data._offsetShearY) * shearMix;
             }
             
             bone.updateWorldTransform(x, y, rotation, scaleX, scaleY, bone._ashearX, shearY);
         }
     }
+    
+    RTTI_IMPL(TransformConstraint, Constraint);
 }

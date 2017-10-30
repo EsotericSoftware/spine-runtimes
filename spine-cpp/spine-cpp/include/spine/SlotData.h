@@ -42,7 +42,7 @@ namespace Spine
     class SlotData
     {
     public:
-        SlotData(int index, std::string name, const BoneData& boneData);
+        SlotData(int index, std::string name, BoneData& boneData);
         
         const int getIndex();
         

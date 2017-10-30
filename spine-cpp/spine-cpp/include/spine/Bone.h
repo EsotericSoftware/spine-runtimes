@@ -47,10 +47,14 @@ namespace Spine
     /// constraint or application code modifies the world transform after it was computed from the local transform.
     class Bone : public Updatable
     {
+        RTTI_DECL;
+        
         friend class RotateTimeline;
         friend class IkConstraint;
         friend class TransformConstraint;
         friend class VertexAttachment;
+        friend class PathConstraint;
+        friend class Skeleton;
         
     public:
         static void setYDown(bool inValue);

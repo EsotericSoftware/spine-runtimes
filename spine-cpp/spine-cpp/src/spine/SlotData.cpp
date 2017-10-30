@@ -34,7 +34,7 @@
 
 namespace Spine
 {
-    SlotData::SlotData(int index, std::string name, const BoneData& boneData) :
+    SlotData::SlotData(int index, std::string name, BoneData& boneData) :
     _index(index),
     _name(name),
     _boneData(boneData),
@@ -63,7 +63,7 @@ namespace Spine
         return _name;
     }
     
-    const BoneData& SlotData::getBoneData()
+    BoneData& SlotData::getBoneData()
     {
         return _boneData;
     }

@@ -90,11 +90,11 @@ namespace Spine
         /// If there was no old skin, each slot's setup mode attachment is attached from the new skin.
         /// After changing the skin, the visible attachments can be reset to those attached in the setup pose by calling
         /// See Skeleton::setSlotsToSetupPose()
-        /// Also, often AnimationState::Apply(Skeleton&) is called before the next time the
+        /// Also, often AnimationState::apply(Skeleton&) is called before the next time the
         /// skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin.
         ///
         /// @param newSkin May be NULL.
-        void setSkin(Skin newSkin);
+        void setSkin(Skin* newSkin);
         
         /// @return May be NULL.
         Attachment* getAttachment(std::string slotName, std::string attachmentName);
@@ -136,7 +136,6 @@ namespace Spine
         Vector<TransformConstraint*>& getTransformConstraints();
         
         Skin* getSkin();
-        void setSkin(Skin* inValue);
         float getR();
         void setR(float inValue);
         float getG();
@@ -167,7 +166,7 @@ namespace Spine
         Vector<Updatable*> _updateCache;
         Vector<Bone*> _updateCacheReset;
         Skin* _skin;
-        float _r = 1, _g = 1, _b = 1, _a = 1;
+        float _r, _g, _b, _a;
         float _time;
         bool _flipX, _flipY;
         float _x, _y;
@@ -178,11 +177,11 @@ namespace Spine
         
         void sortTransformConstraint(TransformConstraint* constraint);
         
-        void sortPathConstraintAttachment(Skin* skin, int slotIndex, Bone* slotBone);
+        void sortPathConstraintAttachment(Skin* skin, int slotIndex, Bone& slotBone);
         
-        void sortPathConstraintAttachment(Attachment* attachment, Bone* slotBone);
+        void sortPathConstraintAttachment(Attachment* attachment, Bone& slotBone);
         
-        void sortBone(Bone bone);
+        void sortBone(Bone* bone);
         
         static void sortReset(Vector<Bone*>& bones);
     };

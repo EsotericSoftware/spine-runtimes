@@ -39,7 +39,7 @@ namespace Spine
     _data(data),
     _intValue(0),
     _floatValue(0),
-    _stringValue(0)
+    _stringValue()
     {
         // Empty
     }

@@ -41,5 +41,6 @@ namespace Spine
     {
         // Empty
     }
+    
+    RTTI_IMPL(Constraint, Updatable);
 }
-

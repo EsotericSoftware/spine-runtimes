@@ -621,4 +621,6 @@ namespace Spine
             _arotation = 90 - MathUtil::atan2(rd, rb) * RadDeg;
         }
     }
+    
+    RTTI_IMPL(Bone, Updatable);
 }

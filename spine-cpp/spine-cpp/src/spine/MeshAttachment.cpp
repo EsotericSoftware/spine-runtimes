@@ -1,4 +1,4 @@
-/******************************************************************************
+	/******************************************************************************
 * Spine Runtimes Software License v2.5
 *
 * Copyright (c) 2013-2016, Esoteric Software
@@ -28,22 +28,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <spine/Timeline.h>
-
-#include <spine/Skeleton.h>
-#include <spine/Event.h>
+#include <spine/MeshAttachment.h>
 
 namespace Spine
 {
-    Timeline::Timeline()
-    {
-        // Empty
-    }
-    
-    Timeline::~Timeline()
-    {
-        // Empty
-    }
-    
-    RTTI_IMPL_NOPARENT(Timeline);
+    RTTI_IMPL(MeshAttachment, VertexAttachment);
 }

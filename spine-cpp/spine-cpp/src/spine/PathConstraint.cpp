@@ -94,42 +94,45 @@ namespace Spine
         }
         
         PathConstraintData data = _data;
-        SpacingMode spacingMode = data.spacingMode;
-        bool lengthSpacing = spacingMode == SpacingMode.Length;
-        RotateMode rotateMode = data.rotateMode;
+        SpacingMode spacingMode = data._spacingMode;
+        bool lengthSpacing = spacingMode == SpacingMode_Length;
+        RotateMode rotateMode = data._rotateMode;
         bool tangents = rotateMode == RotateMode_Tangent, scale = rotateMode == RotateMode_ChainScale;
-        int boneCount = _bones.Count, spacesCount = tangents ? boneCount : boneCount + 1;
-        Bone[] bonesItems = _bones.Items;
-        Vector<float> spaces = _spaces.Resize(spacesCount), lengths = NULL;
+        size_t boneCount = _bones.size();
+        int spacesCount = static_cast<int>(tangents ? boneCount : boneCount + 1);
+        _spaces.reserve(spacesCount);
         float spacing = _spacing;
         if (scale || lengthSpacing)
         {
             if (scale)
             {
-                lengths = _lengths.Resize(boneCount);
+                _lengths.reserve(boneCount);
             }
             
             for (int i = 0, n = spacesCount - 1; i < n;)
             {
-                Bone bone = bonesItems[i];
-                float setupLength = bone.data.length;
-                if (setupLength < PathConstraint.EPSILON)
+                Bone* boneP = _bones[i];
+                Bone bone = *boneP;
+                float setupLength = bone._data.getLength();
+                if (setupLength < PathConstraint::EPSILON)
                 {
                     if (scale)
                     {
-                        lengths.Items[i] = 0;
+                        _lengths[i] = 0;
                     }
-                    spaces.Items[++i] = 0;
+                    _spaces[++i] = 0;
                 }
                 else
                 {
-                    float x = setupLength * bone.a, y = setupLength * bone.c;
-                    float length = (float)Math.Sqrt(x * x + y * y);
+                    float x = setupLength * bone._a;
+                    float y = setupLength * bone._c;
+                    float length = (float)sqrt(x * x + y * y);
                     if (scale)
                     {
-                        lengths.Items[i] = length;
+                        _lengths[i] = length;
                     }
-                    spaces.Items[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
+                    
+                    _spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
                 }
             }
         }
@@ -137,12 +140,14 @@ namespace Spine
         {
             for (int i = 1; i < spacesCount; ++i)
             {
-                spaces.Items[i] = spacing;
+                _spaces[i] = spacing;
             }
         }
         
-        float[] positions = computeWorldPositions(attachment, spacesCount, tangents, data.positionMode == PositionMode_Percent, spacingMode == SpacingMode_Percent);
-        float boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
+        Vector<float> positions = computeWorldPositions(*attachment, spacesCount, tangents, data.getPositionMode() == PositionMode_Percent, spacingMode == SpacingMode_Percent);
+        float boneX = positions[0];
+        float boneY = positions[1];
+        float offsetRotation = data.getOffsetRotation();
         bool tip;
         if (offsetRotation == 0)
         {
@@ -151,24 +156,28 @@ namespace Spine
         else
         {
             tip = false;
-            Bone p = target.bone;
-            offsetRotation *= p.a * p.d - p.b * p.c > 0 ? DegRad : -DegRad;
+            Bone p = _target->getBone();
+            offsetRotation *= p.getA() * p.getD() - p.getB() * p.getC() > 0 ? DegRad : -DegRad;
         }
         
         for (int i = 0, p = 3; i < boneCount; i++, p += 3)
         {
-            Bone bone = bonesItems[i];
-            bone.worldX += (boneX - bone.worldX) * translateMix;
-            bone.worldY += (boneY - bone.worldY) * translateMix;
-            float x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
+            Bone* boneP = _bones[i];
+            Bone bone = *boneP;
+            bone._worldX += (boneX - bone._worldX) * translateMix;
+            bone._worldY += (boneY - bone._worldY) * translateMix;
+            float x = positions[p];
+            float y = positions[p + 1];
+            float dx = x - boneX;
+            float dy = y - boneY;
             if (scale)
             {
-                float length = lengths.Items[i];
-                if (length >= PathConstraint.EPSILON)
+                float length = _lengths[i];
+                if (length >= PathConstraint::EPSILON)
                 {
-                    float s = ((float)Math.Sqrt(dx * dx + dy * dy) / length - 1) * rotateMix + 1;
-                    bone.a *= s;
-                    bone.c *= s;
+                    float s = ((float)sqrt(dx * dx + dy * dy) / length - 1) * rotateMix + 1;
+                    bone._a *= s;
+                    bone._c *= s;
                 }
             }
             
@@ -177,12 +186,12 @@ namespace Spine
             
             if (rotate)
             {
-                float a = bone.a, b = bone.b, c = bone.c, d = bone.d, r, cos, sin;
+                float a = bone._a, b = bone._b, c = bone._c, d = bone._d, r, cos, sin;
                 if (tangents)
                 {
                     r = positions[p - 1];
                 }
-                else if (spaces.Items[i + 1] < PathConstraint.EPSILON)
+                else if (_spaces[i + 1] < PathConstraint::EPSILON)
                 {
                     r = positions[p + 2];
                 }
@@ -197,7 +206,7 @@ namespace Spine
                 {
                     cos = MathUtil::cos(r);
                     sin = MathUtil::sin(r);
-                    float length = bone.data.length;
+                    float length = bone._data.getLength();
                     boneX += (length * (cos * a - sin * c) - dx) * rotateMix;
                     boneY += (length * (sin * a + cos * c) - dy) * rotateMix;
                 }
@@ -218,12 +227,13 @@ namespace Spine
                 r *= rotateMix;
                 cos = MathUtil::cos(r);
                 sin = MathUtil::sin(r);
-                bone.a = cos * a - sin * c;
-                bone.b = cos * b - sin * d;
-                bone.c = sin * a + cos * c;
-                bone.d = sin * b + cos * d;
+                bone._a = cos * a - sin * c;
+                bone._b = cos * b - sin * d;
+                bone._c = sin * a + cos * c;
+                bone._d = sin * b + cos * d;
             }
-            bone.appliedValid = false;
+            
+            bone._appliedValid = false;
         }
     }
     
@@ -296,14 +306,18 @@ namespace Spine
     {
         Slot target = *_target;
         float position = _position;
-        float[] spacesItems = _spaces.Items, output = _positions.Resize(spacesCount * 3 + 2).Items, world;
-        bool closed = path.Closed;
-        int verticesLength = path.WorldVerticesLength, curveCount = verticesLength / 6, prevCurve = NONE;
+//        float[] spacesItems = _spaces.Items;
+//        float[] output = _positions.Resize(spacesCount * 3 + 2).Items;
+        _positions.reserve(spacesCount * 3 + 2);
+        bool closed = path.isClosed();
+        int verticesLength = path.getWorldVerticesLength();
+        int curveCount = verticesLength / 6;
+        int prevCurve = NONE;
         
         float pathLength;
-        if (!path.ConstantSpeed)
+        if (!path.isConstantSpeed())
         {
-            float[] lengths = path.Lengths;
+            Vector<float>& lengths = path.getLengths();
             curveCount -= closed ? 1 : 2;
             pathLength = lengths[curveCount];
             if (percentPosition)
@@ -315,20 +329,21 @@ namespace Spine
             {
                 for (int i = 0; i < spacesCount; ++i)
                 {
-                    spacesItems[i] *= pathLength;
+                    _spaces[i] *= pathLength;
                 }
             }
             
-            world = _world.Resize(8).Items;
+            _world.reserve(8);
             for (int i = 0, o = 0, curve = 0; i < spacesCount; i++, o += 3)
             {
-                float space = spacesItems[i];
+                float space = _spaces[i];
                 position += space;
                 float p = position;
                 
                 if (closed)
                 {
-                    p %= pathLength;
+                    p = fmod(p, pathLength);
+                    
                     if (p < 0)
                     {
                         p += pathLength;
@@ -340,10 +355,10 @@ namespace Spine
                     if (prevCurve != BEFORE)
                     {
                         prevCurve = BEFORE;
-                        path.ComputeWorldVertices(target, 2, 4, world, 0);
+                        path.computeWorldVertices(target, 2, 4, _world, 0);
                     }
                     
-                    addBeforePosition(p, world, 0, output, o);
+                    addBeforePosition(p, _world, 0, _positions, o);
                     
                     continue;
                 }
@@ -352,10 +367,10 @@ namespace Spine
                     if (prevCurve != AFTER)
                     {
                         prevCurve = AFTER;
-                        path.ComputeWorldVertices(target, verticesLength - 6, 4, world, 0);
+                        path.computeWorldVertices(target, verticesLength - 6, 4, _world, 0);
                     }
                     
-                    addAfterPosition(p - pathLength, world, 0, output, o);
+                    addAfterPosition(p - pathLength, _world, 0, _positions, o);
                     
                     continue;
                 }
@@ -386,51 +401,51 @@ namespace Spine
                     prevCurve = curve;
                     if (closed && curve == curveCount)
                     {
-                        path.ComputeWorldVertices(target, verticesLength - 4, 4, world, 0);
-                        path.ComputeWorldVertices(target, 0, 4, world, 4);
+                        path.computeWorldVertices(target, verticesLength - 4, 4, _world, 0);
+                        path.computeWorldVertices(target, 0, 4, _world, 4);
                     }
                     else
                     {
-                        path.ComputeWorldVertices(target, curve * 6 + 2, 8, world, 0);
+                        path.computeWorldVertices(target, curve * 6 + 2, 8, _world, 0);
                     }
                 }
                 
-                addCurvePosition(p, world[0], world[1], world[2], world[3], world[4], world[5], world[6], world[7], output, o, tangents || (i > 0 && space < EPSILON));
+                addCurvePosition(p, _world[0], _world[1], _world[2], _world[3], _world[4], _world[5], _world[6], _world[7], _positions, o, tangents || (i > 0 && space < EPSILON));
             }
-            return output;
+            return _world;
         }
         
         // World vertices.
         if (closed)
         {
             verticesLength += 2;
-            world = _world.Resize(verticesLength).Items;
-            path.ComputeWorldVertices(target, 2, verticesLength - 4, world, 0);
-            path.ComputeWorldVertices(target, 0, 2, world, verticesLength - 4);
-            world[verticesLength - 2] = world[0];
-            world[verticesLength - 1] = world[1];
+            _world.reserve(verticesLength);
+            path.computeWorldVertices(target, 2, verticesLength - 4, _world, 0);
+            path.computeWorldVertices(target, 0, 2, _world, verticesLength - 4);
+            _world[verticesLength - 2] = _world[0];
+            _world[verticesLength - 1] = _world[1];
         }
         else
         {
             curveCount--;
             verticesLength -= 4;
-            world = _world.Resize(verticesLength).Items;
-            path.ComputeWorldVertices(target, 2, verticesLength, world, 0);
+            _world.reserve(verticesLength);
+            path.computeWorldVertices(target, 2, verticesLength, _world, 0);
         }
         
         // Curve lengths.
-        float[] curves = _curves.Resize(curveCount).Items;
+        _curves.reserve(curveCount);
         pathLength = 0;
-        float x1 = world[0], y1 = world[1], cx1 = 0, cy1 = 0, cx2 = 0, cy2 = 0, x2 = 0, y2 = 0;
+        float x1 = _world[0], y1 = _world[1], cx1 = 0, cy1 = 0, cx2 = 0, cy2 = 0, x2 = 0, y2 = 0;
         float tmpx, tmpy, dddfx, dddfy, ddfx, ddfy, dfx, dfy;
         for (int i = 0, w = 2; i < curveCount; i++, w += 6)
         {
-            cx1 = world[w];
-            cy1 = world[w + 1];
-            cx2 = world[w + 2];
-            cy2 = world[w + 3];
-            x2 = world[w + 4];
-            y2 = world[w + 5];
+            cx1 = _world[w];
+            cy1 = _world[w + 1];
+            cx2 = _world[w + 2];
+            cy2 = _world[w + 3];
+            x2 = _world[w + 4];
+            y2 = _world[w + 5];
             tmpx = (x1 - cx1 * 2 + cx2) * 0.1875f;
             tmpy = (y1 - cy1 * 2 + cy2) * 0.1875f;
             dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.09375f;
@@ -439,19 +454,19 @@ namespace Spine
             ddfy = tmpy * 2 + dddfy;
             dfx = (cx1 - x1) * 0.75f + tmpx + dddfx * 0.16666667f;
             dfy = (cy1 - y1) * 0.75f + tmpy + dddfy * 0.16666667f;
-            pathLength += (float)Math.Sqrt(dfx * dfx + dfy * dfy);
+            pathLength += (float)sqrt(dfx * dfx + dfy * dfy);
             dfx += ddfx;
             dfy += ddfy;
             ddfx += dddfx;
             ddfy += dddfy;
-            pathLength += (float)Math.Sqrt(dfx * dfx + dfy * dfy);
+            pathLength += (float)sqrt(dfx * dfx + dfy * dfy);
             dfx += ddfx;
             dfy += ddfy;
-            pathLength += (float)Math.Sqrt(dfx * dfx + dfy * dfy);
+            pathLength += (float)sqrt(dfx * dfx + dfy * dfy);
             dfx += ddfx + dddfx;
             dfy += ddfy + dddfy;
-            pathLength += (float)Math.Sqrt(dfx * dfx + dfy * dfy);
-            curves[i] = pathLength;
+            pathLength += (float)sqrt(dfx * dfx + dfy * dfy);
+            _curves[i] = pathLength;
             x1 = x2;
             y1 = y2;
         }
@@ -465,21 +480,21 @@ namespace Spine
         {
             for (int i = 0; i < spacesCount; ++i)
             {
-                spacesItems[i] *= pathLength;
+                _spaces[i] *= pathLength;
             }
         }
         
-        float[] segments = _segments;
         float curveLength = 0;
         for (int i = 0, o = 0, curve = 0, segment = 0; i < spacesCount; i++, o += 3)
         {
-            float space = spacesItems[i];
+            float space = _spaces[i];
             position += space;
             float p = position;
             
             if (closed)
             {
-                p %= pathLength;
+                p = fmod(p, pathLength);
+                
                 if (p < 0)
                 {
                     p += pathLength;
@@ -488,19 +503,19 @@ namespace Spine
             }
             else if (p < 0)
             {
-                addBeforePosition(p, world, 0, output, o);
+                addBeforePosition(p, _world, 0, _positions, o);
                 continue;
             }
             else if (p > pathLength)
             {
-                addAfterPosition(p - pathLength, world, verticesLength - 4, output, o);
+                addAfterPosition(p - pathLength, _world, verticesLength - 4, _positions, o);
                 continue;
             }
             
             // Determine curve containing position.
             for (;; curve++)
             {
-                float length = curves[curve];
+                float length = _curves[curve];
                 if (p > length)
                 {
                     continue;
@@ -512,7 +527,7 @@ namespace Spine
                 }
                 else
                 {
-                    float prev = curves[curve - 1];
+                    float prev = _curves[curve - 1];
                     p = (p - prev) / (length - prev);
                 }
                 break;
@@ -523,14 +538,14 @@ namespace Spine
             {
                 prevCurve = curve;
                 int ii = curve * 6;
-                x1 = world[ii];
-                y1 = world[ii + 1];
-                cx1 = world[ii + 2];
-                cy1 = world[ii + 3];
-                cx2 = world[ii + 4];
-                cy2 = world[ii + 5];
-                x2 = world[ii + 6];
-                y2 = world[ii + 7];
+                x1 = _world[ii];
+                y1 = _world[ii + 1];
+                cx1 = _world[ii + 2];
+                cy1 = _world[ii + 3];
+                cx2 = _world[ii + 4];
+                cy2 = _world[ii + 5];
+                x2 = _world[ii + 6];
+                y2 = _world[ii + 7];
                 tmpx = (x1 - cx1 * 2 + cx2) * 0.03f;
                 tmpy = (y1 - cy1 * 2 + cy2) * 0.03f;
                 dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.006f;
@@ -539,25 +554,25 @@ namespace Spine
                 ddfy = tmpy * 2 + dddfy;
                 dfx = (cx1 - x1) * 0.3f + tmpx + dddfx * 0.16666667f;
                 dfy = (cy1 - y1) * 0.3f + tmpy + dddfy * 0.16666667f;
-                curveLength = (float)Math.Sqrt(dfx * dfx + dfy * dfy);
-                segments[0] = curveLength;
+                curveLength = (float)sqrt(dfx * dfx + dfy * dfy);
+                _segments[0] = curveLength;
                 for (ii = 1; ii < 8; ii++)
                 {
                     dfx += ddfx;
                     dfy += ddfy;
                     ddfx += dddfx;
                     ddfy += dddfy;
-                    curveLength += (float)Math.Sqrt(dfx * dfx + dfy * dfy);
-                    segments[ii] = curveLength;
+                    curveLength += (float)sqrt(dfx * dfx + dfy * dfy);
+                    _segments[ii] = curveLength;
                 }
                 dfx += ddfx;
                 dfy += ddfy;
-                curveLength += (float)Math.Sqrt(dfx * dfx + dfy * dfy);
-                segments[8] = curveLength;
+                curveLength += (float)sqrt(dfx * dfx + dfy * dfy);
+                _segments[8] = curveLength;
                 dfx += ddfx + dddfx;
                 dfy += ddfy + dddfy;
-                curveLength += (float)Math.Sqrt(dfx * dfx + dfy * dfy);
-                segments[9] = curveLength;
+                curveLength += (float)sqrt(dfx * dfx + dfy * dfy);
+                _segments[9] = curveLength;
                 segment = 0;
             }
             
@@ -565,7 +580,7 @@ namespace Spine
             p *= curveLength;
             for (;; segment++)
             {
-                float length = segments[segment];
+                float length = _segments[segment];
                 if (p > length)
                 {
                     continue;
@@ -577,15 +592,15 @@ namespace Spine
                 }
                 else
                 {
-                    float prev = segments[segment - 1];
+                    float prev = _segments[segment - 1];
                     p = segment + (p - prev) / (length - prev);
                 }
                 break;
             }
-            addCurvePosition(p * 0.1f, x1, y1, cx1, cy1, cx2, cy2, x2, y2, output, o, tangents || (i > 0 && space < EPSILON));
+            addCurvePosition(p * 0.1f, x1, y1, cx1, cy1, cx2, cy2, x2, y2, _positions, o, tangents || (i > 0 && space < EPSILON));
         }
         
-        return output;
+        return _positions;
     }
     
     void PathConstraint::addBeforePosition(float p, Vector<float>& temp, int i, Vector<float>& output, int o)
@@ -615,7 +630,7 @@ namespace Spine
     
     void PathConstraint::addCurvePosition(float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2, Vector<float>& output, int o, bool tangents)
     {
-        if (p < EPSILON || float.IsNaN(p))
+        if (p < EPSILON || isnan(p))
         {
             p = EPSILON;
         }
@@ -627,7 +642,9 @@ namespace Spine
         output[o + 1] = y;
         if (tangents)
         {
-            output[o + 2] = (float)Math.Atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+            output[o + 2] = (float)atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
         }
     }
+    
+    RTTI_IMPL(PathConstraint, Constraint);
 }

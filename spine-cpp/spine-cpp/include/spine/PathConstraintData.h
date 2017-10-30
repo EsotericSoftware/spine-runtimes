@@ -45,6 +45,9 @@ namespace Spine
     
     class PathConstraintData
     {
+        friend class PathConstraint;
+        friend class Skeleton;
+        
     public:
         PathConstraintData(std::string name);
         

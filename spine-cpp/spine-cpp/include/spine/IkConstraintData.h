@@ -41,6 +41,9 @@ namespace Spine
     
     class IkConstraintData
     {
+        friend class IkConstraint;
+        friend class Skeleton;
+        
     public:
         IkConstraintData(std::string name);
         

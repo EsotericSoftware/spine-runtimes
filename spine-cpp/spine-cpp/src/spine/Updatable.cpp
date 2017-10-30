@@ -41,4 +41,6 @@ namespace Spine
     {
         // Empty
     }
+    
+    RTTI_IMPL_NOPARENT(Updatable);
 }

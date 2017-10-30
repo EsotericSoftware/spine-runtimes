@@ -38,9 +38,9 @@
 namespace Spine
 {
     Slot::Slot(SlotData& data, Bone& bone) :
-    _slotData(data),
+    _data(data),
     _bone(bone),
-    _skeleton(bone.getSkeletion()),
+    _skeleton(bone.getSkeleton()),
     _r(1),
     _g(1),
     _b(1),
@@ -57,16 +57,16 @@ namespace Spine
     
     void Slot::setToSetupPose()
     {
-        _r = _slotData.getR();
-        _g = _slotData.getG();
-        _b = _slotData.getB();
-        _a = _slotData.getA();
+        _r = _data.getR();
+        _g = _data.getG();
+        _b = _data.getB();
+        _a = _data.getA();
         
-        std::string attachmentName = _slotData.getAttachmentName();
+        std::string attachmentName = _data.getAttachmentName();
         if (attachmentName.length() > 0)
         {
             _attachment = NULL;
-            setAttachment(_skeleton.getAttachment(_slotData.getIndex(), attachmentName));
+            setAttachment(_skeleton.getAttachment(_data.getIndex(), attachmentName));
         }
         else
         {
@@ -74,9 +74,9 @@ namespace Spine
         }
     }
     
-    SlotData& Slot::getSlotData()
+    SlotData& Slot::getData()
     {
-        return _slotData;
+        return _data;
     }
     
     Bone& Slot::getBone()

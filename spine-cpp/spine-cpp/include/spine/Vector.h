@@ -65,43 +65,56 @@ namespace Spine
             deallocate(_buffer);
         }
         
-        void push_back(const T& _value)
+        bool contains(const T& inValue)
         {
-            if (_size == _capacity)
+            for (size_t i = 0; i < _size; ++i)
             {
-                reserve();
+                if (_buffer[i] == inValue)
+                {
+                    return true;
+                }
             }
             
-            construct(_buffer + _size++, _value);
+            return false;
         }
         
-        void insert(size_t _index, const T& _value)
+        void push_back(const T& inValue)
         {
-            assert(_index < _size);
+            if (_size == _capacity)
+            {
+                reserve();
+            }
+            
+            construct(_buffer + _size++, inValue);
+        }
+        
+        void insert(size_t inIndex, const T& inValue)
+        {
+            assert(inIndex < _size);
             
             if (_size == _capacity)
             {
                 reserve();
             }
             
-            for (size_t i = ++_size - 1; i > _index; --i)
+            for (size_t i = ++_size - 1; i > inIndex; --i)
             {
                 construct(_buffer + i, _buffer[i - 1]);
                 destroy(_buffer + (i - 1));
             }
             
-            construct(_buffer + _index, _value);
+            construct(_buffer + inIndex, inValue);
         }
         
-        void erase(size_t _index)
+        void erase(size_t inIndex)
         {
-            assert(_index < _size);
+            assert(inIndex < _size);
             
             --_size;
             
-            if (_index != _size)
+            if (inIndex != _size)
             {
-                for (size_t i = _index; i < _size; ++i)
+                for (size_t i = inIndex; i < _size; ++i)
                 {
                     _buffer[i] = std::move(_buffer[i + 1]);
                 }
@@ -125,18 +138,21 @@ namespace Spine
             return _size;
         }
         
-        T& operator[](size_t _index)
+        T& operator[](size_t inIndex)
         {
-            assert(_index < _size);
+            assert(inIndex < _size);
             
-            return _buffer[_index];
+            return _buffer[inIndex];
         }
         
-        void reserve(long inCapacity = -1)
+        void reserve(size_t inCapacity = 0)
         {
-            size_t newCapacity = inCapacity != -1 ? inCapacity : _capacity ? _capacity * 2 : 1;
-            _buffer = static_cast<T*>(realloc(_buffer, newCapacity * sizeof(T)));
-            _capacity = newCapacity;
+            size_t newCapacity = inCapacity > 0 ? inCapacity : _capacity > 0 ? _capacity * 2 : 1;
+            if (newCapacity > _capacity)
+            {
+                _buffer = static_cast<T*>(realloc(_buffer, newCapacity * sizeof(T)));
+                _capacity = newCapacity;
+            }
         }
         
         T* begin()

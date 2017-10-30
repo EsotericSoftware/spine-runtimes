@@ -37,23 +37,23 @@ namespace Spine
 {
     class PathAttachment : public VertexAttachment
     {
+        RTTI_DECL;
+        
     public:
-        PathAttachment(std::string name) : VertexAttachment(name)
-        {
-            // Empty
-        }
+        PathAttachment(std::string name);
         
         /// The length in the setup pose from the start of the path to the end of each curve.
-        float[] Lengths { return lengths; }
-        set { lengths = value; }
-        bool Closed { return closed; }
-        set { closed = value; }
-        bool ConstantSpeed { return constantSpeed; }
-        set { constantSpeed = value; }
+        Vector<float>& getLengths();
+        void setLengths(Vector<float> inValue);
+        bool isClosed();
+        void setClosed(bool inValue);
+        bool isConstantSpeed();
+        void setConstantSpeed(bool inValue);
         
     private:
-        float[] lengths;
-        bool closed, constantSpeed;
+        Vector<float> _lengths;
+        bool _closed;
+        bool _constantSpeed;
     };
 }
 

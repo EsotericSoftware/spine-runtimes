@@ -49,6 +49,8 @@ namespace Spine
     /// Stores the setup pose and all of the stateless data for a skeleton.
     class SkeletonData
     {
+        friend class Skeleton;
+        
     public:
         SkeletonData();
         

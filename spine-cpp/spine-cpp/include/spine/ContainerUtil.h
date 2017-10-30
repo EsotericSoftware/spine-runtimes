@@ -28,8 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Attachment_h
-#define Spine_Attachment_h
+#ifndef Spine_ContainerUtil_h
+#define Spine_ContainerUtil_h
 
 #include <spine/Vector.h>
 #include <spine/HashMap.h>
@@ -50,7 +50,7 @@ namespace Spine
         {
             assert(name.length() > 0);
             
-            for (typename T* i = items.begin(); i != items.end(); ++i)
+            for (T** i = items.begin(); i != items.end(); ++i)
             {
                 T* item = (*i);
                 if (item->getName() == name)
@@ -68,12 +68,50 @@ namespace Spine
         {
             assert(name.length() > 0);
             
-            for (size_t i = 0, size_t len = items.size(); i < len; ++i)
+            for (size_t i = 0, len = items.size(); i < len; ++i)
             {
                 T* item = items[i];
                 if (item->getName() == name)
                 {
-                    return i;
+                    return static_cast<int>(i);
+                }
+            }
+            
+            return -1;
+        }
+        
+        /// Finds an item by comparing each item's name.
+        /// It is more efficient to cache the results of this method than to call it multiple times.
+        /// @return May be NULL.
+        template<typename T>
+        static T* findWithDataName(Vector<T*>& items, std::string name)
+        {
+            assert(name.length() > 0);
+            
+            for (T** i = items.begin(); i != items.end(); ++i)
+            {
+                T* item = (*i);
+                if (item->getData().getName() == name)
+                {
+                    return item;
+                }
+            }
+            
+            return NULL;
+        }
+        
+        /// @return -1 if the item was not found.
+        template<typename T>
+        static int findIndexWithDataName(Vector<T*>& items, std::string name)
+        {
+            assert(name.length() > 0);
+            
+            for (size_t i = 0, len = items.size(); i < len; ++i)
+            {
+                T* item = items[i];
+                if (item->getData().getName() == name)
+                {
+                    return static_cast<int>(i);
                 }
             }
             
@@ -111,4 +149,4 @@ namespace Spine
     };
 }
 
-#endif /* defined(__noctisgames__ContainerUtil__) */
+#endif /* Spine_ContainerUtil_h */

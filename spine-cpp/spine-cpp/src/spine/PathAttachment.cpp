@@ -28,7 +28,44 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#include <spine/PathAttachment.h>
+
 namespace Spine
 {
-    // TODO
+    PathAttachment::PathAttachment(std::string name) : VertexAttachment(name)
+    {
+        // Empty
+    }
+    
+    Vector<float>& PathAttachment::getLengths()
+    {
+        return _lengths;
+    }
+    
+    void PathAttachment::setLengths(Vector<float> inValue)
+    {
+        _lengths = inValue;
+    }
+    
+    bool PathAttachment::isClosed()
+    {
+        return _closed;
+    }
+    
+    void PathAttachment::setClosed(bool inValue)
+    {
+        _closed = inValue;
+    }
+    
+    bool PathAttachment::isConstantSpeed()
+    {
+        return _constantSpeed;
+    }
+    
+    void PathAttachment::setConstantSpeed(bool inValue)
+    {
+        _constantSpeed = inValue;
+    }
+    
+    RTTI_IMPL(PathAttachment, VertexAttachment);
 }

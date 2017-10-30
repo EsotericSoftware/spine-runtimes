@@ -35,8 +35,6 @@
 #include <spine/HashMap.h>
 #include <spine/Vector.h>
 
-struct HashAttachmentKey;
-
 namespace Spine
 {
     class Attachment;
@@ -47,16 +45,35 @@ namespace Spine
     /// http://esotericsoftware.com/spine-runtime-skins in the Spine Runtimes Guide.
     class Skin
     {
+        friend class Skeleton;
+        
     public:
         class AttachmentKey
         {
-            public:
-            const int _slotIndex;
-            const std::string _name;
+        public:
+            int _slotIndex;
+            std::string _name;
             
-            AttachmentKey(int slotIndex, std::string name);
+            AttachmentKey(int slotIndex = 0, std::string name = "");
             
             bool operator==(const AttachmentKey &other) const;
+        };
+        
+        struct HashAttachmentKey
+        {
+            std::size_t operator()(const Spine::Skin::AttachmentKey& val) const
+            {
+                std::size_t h1 = val._slotIndex;
+                
+                std::size_t h2 = 7;
+                size_t strlen = val._name.length();
+                for (int i = 0; i < strlen; ++i)
+                {
+                    h2 = h2 * 31 + val._name.at(i);
+                }
+                
+                return h1 ^ (h2 << 1);
+            }
         };
         
         Skin(std::string name);
@@ -89,22 +106,5 @@ namespace Spine
         void attachAll(Skeleton& skeleton, Skin& oldSkin);
     };
 }
-
-struct HashAttachmentKey
-{
-    std::size_t operator()(const Spine::Skin::AttachmentKey& val) const
-    {
-        std::size_t h1 = static_cast<int(val._slotIndex);
-        
-        std::size_t h2 = 7;
-        size_t strlen = val._name.length();
-        for (int i = 0; i < strlen; ++i)
-        {
-            h2 = h2 * 31 + val._name.at(i);
-        }
-        
-        return h1 ^ (h2 << 1);
-    }
-};
 
 #endif /* Spine_Skin_h */
