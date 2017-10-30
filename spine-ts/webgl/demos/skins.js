@@ -59,7 +59,7 @@ var skinsDemo = function(canvas, bgColor) {
 	}
 
 	function setupAnimations(state) {
-		/*state.addAnimation(0, "idle", true, 1);
+		state.addAnimation(0, "idle", true, 1);
 		state.addAnimation(0, "walk", true, 2);
 		state.addAnimation(0, "run", true, 4);
 		state.addAnimation(0, "roll", false, 3);
@@ -78,10 +78,10 @@ var skinsDemo = function(canvas, bgColor) {
 		state.addAnimation(0, "punch1", false, 1.5);
 		state.addAnimation(0, "punch2", false, 0);
 		state.addAnimation(0, "block", true, 0);
-		state.addAnimation(0, "hitBig", false, 1.5);*/
+		state.addAnimation(0, "hitBig", false, 1.5);
 		state.addAnimation(0, "floorIdle", true, 0);
 		state.addAnimation(0, "floorGetUp", false, 1.5);
-		/*state.addAnimation(0, "idle", true, 0);
+		state.addAnimation(0, "idle", true, 0);
 		state.addAnimation(0, "meleeSwing1-fullBody", false, 1.5);
 		state.addAnimation(0, "idle", true, 0);
 		state.addAnimation(0, "meleeSwing2-fullBody", false, 1.5);
@@ -96,7 +96,7 @@ var skinsDemo = function(canvas, bgColor) {
 		};
 
 		state.setAnimation(1, "empty", false, 0);
-		state.setAnimation(1, "hideSword", false, 2);*/
+		state.setAnimation(1, "hideSword", false, 2);
 	}
 
 	function setupUI() {
