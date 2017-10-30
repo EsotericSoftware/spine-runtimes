@@ -1,0 +1,70 @@
+<html>
+<script src="../../build/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<style>
+	* { margin: 0; padding: 0; }
+	body, html { height: 100% }
+	canvas { position: absolute; width: 100% ;height: 100%; }
+</style>
+<body>
+<div id="label" style="position: absolute; top: 0; left: 0; color: #fff; z-index: 10"></div>
+<canvas id="canvas" style="background: #ff00ff;"></canvas>
+</body>
+<script>
+var canvas = document.getElementById("canvas");
+canvas.width = canvas.clientWidth;
+canvas.height = canvas.clientHeight;
+var context = new spine.webgl.ManagedWebGLRenderingContext(canvas, { alpha: false });
+var gl = context.gl;
+
+var vertices = [ -1, -1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+				 1, -1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,
+				 0, 1, 1, 1, 1, 1, 0.5, 1, 0, 0, 0, 0];
+var indices = [ 0, 1, 2 ];
+var mesh = new spine.webgl.Mesh(context,
+								[new spine.webgl.Position2Attribute(), new spine.webgl.ColorAttribute(), new spine.webgl.TexCoordAttribute()],
+								10920, 10920 * 3);
+mesh.setVertices(vertices);
+mesh.setIndices(indices);
+
+var shader = spine.webgl.Shader.newTwoColoredTextured(context);
+
+var assetManager = new spine.webgl.AssetManager(context);
+assetManager.loadTexture("assets/spineboy.png");
+
+var camMatrix = new spine.webgl.Matrix4();
+
+var batcher = new spine.webgl.PolygonBatcher(context, true);
+
+requestAnimationFrame(load);
+
+function load () {
+	if (assetManager.isLoadingComplete()) {
+		texture = assetManager.get("assets/spineboy.png");
+		requestAnimationFrame(render);
+	} else requestAnimationFrame(load);
+}
+
+function render() {
+	gl.clearColor(1, 0, 0, 1);
+	gl.clear(gl.COLOR_BUFFER_BIT);
+
+	shader.bind();
+	shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, camMatrix.values);
+	shader.setUniformi("u_texture", 0);
+	if (texture != null) {
+		/*gl.enable(gl.BLEND);
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+		mesh.setVertices(vertices);
+		mesh.setIndices(indices);
+		mesh.draw(shader, gl.TRIANGLES);*/
+
+		batcher.begin(shader);
+		batcher.draw(texture, vertices, indices);
+		batcher.end();
+	}
+	shader.unbind();
+
+	requestAnimationFrame(render);
+}
+</script>
