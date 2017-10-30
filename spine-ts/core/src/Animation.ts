@@ -428,8 +428,10 @@ module spine {
 						break;
 					case MixBlend.first:
 					case MixBlend.replace:
-						bone.scaleX += (x - bone.scaleX * MathUtils.signum(x)) * alpha;
-						bone.scaleY += (y - bone.scaleY * MathUtils.signum(y)) * alpha;
+						bx = Math.abs(bone.scaleX) * MathUtils.signum(x);
+						by = Math.abs(bone.scaleY) * MathUtils.signum(y);
+						bone.scaleX = bx + (x - bx) * alpha;
+						bone.scaleY = by + (y - by) * alpha;
 						break;
 					case MixBlend.add:
 						bx = MathUtils.signum(x);

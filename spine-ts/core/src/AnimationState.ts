@@ -550,7 +550,7 @@ module spine {
 
 			for (var i = 0, n = this.tracks.length; i < n; i++) {
 				let entry = this.tracks[i];
-				if (entry != null && entry.mixBlend != MixBlend.add) entry.setTimelineData(null, mixingTo, propertyIDs);
+				if (entry != null && (i == 0 || entry.mixBlend != MixBlend.add)) entry.setTimelineData(null, mixingTo, propertyIDs);
 			}
 		}
 
