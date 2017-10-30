@@ -658,7 +658,7 @@ public class AnimationState {
 
 		for (int i = 0, n = tracks.size; i < n; i++) {
 			TrackEntry entry = tracks.get(i);
-			if (entry != null && entry.mixBlend != MixBlend.add) entry.setTimelineData(null, mixingTo, propertyIDs);
+			if (entry != null && (i == 0 || entry.mixBlend != MixBlend.add)) entry.setTimelineData(null, mixingTo, propertyIDs);
 		}
 	}
 
