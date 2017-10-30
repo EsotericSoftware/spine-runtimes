@@ -84,8 +84,8 @@
 	var ivanShader = loadIvanShader(context, shader);
 
 	var assetManager = new spine.webgl.AssetManager(context);
-	assetManager.loadTexture("assets/spineboy.png");
-	assetManager.loadTexture("assets/spineboy-pma.png");
+	assetManager.loadTexture("../example/assets/spineboy.png");
+	assetManager.loadTexture("../example/assets/spineboy-pma.png");
 
 	var camMatrix = new spine.webgl.Matrix4();
 
@@ -95,8 +95,8 @@
 
 	function load () {
 		if (assetManager.isLoadingComplete()) {
-			texture = assetManager.get("assets/spineboy.png");
-			texturePma = assetManager.get("assets/spineboy-pma.png");
+			texture = assetManager.get("../example/assets/spineboy.png");
+			texturePma = assetManager.get("../example/assets/spineboy-pma.png");
 			requestAnimationFrame(render);
 		} else requestAnimationFrame(load);
 	}
