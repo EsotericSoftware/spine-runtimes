@@ -33,6 +33,7 @@ package spine {
 
 	public class PathConstraint implements Constraint {
 		private static const NONE : int = -1, BEFORE : int = -2, AFTER : int = -3;
+		private static const epsilon : Number = 0.00001;
 		internal var _data : PathConstraintData;
 		internal var _bones : Vector.<Bone>;
 		public var target : Slot;
@@ -88,11 +89,15 @@ package spine {
 				for (var i : int = 0, n : int = spacesCount - 1; i < n;) {
 					var bone : Bone = bones[i];
 					var setupLength : Number = bone.data.length;
-					if (setupLength == 0) setupLength = 0.000000001;
-					var x : Number = setupLength * bone.a, y : Number = setupLength * bone.c;
-					var length : Number = Math.sqrt(x * x + y * y);
-					if (scale) lengths[i] = length;
-					spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
+					if (setupLength < epsilon) {
+						if (scale) lengths[i] = 0;
+						spaces[++i] = 0;
+					} else {
+						var x : Number = setupLength * bone.a, y : Number = setupLength * bone.c;
+						var length : Number = Math.sqrt(x * x + y * y);
+						if (scale) lengths[i] = length;
+						spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
+					}
 				}
 			} else {
 				for (i = 1; i < spacesCount; i++)

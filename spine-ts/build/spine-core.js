@@ -1266,8 +1266,10 @@ var spine;
 			if (from.mixingFrom != null)
 				this.applyMixingFrom(from, skeleton, currentPose);
 			var mix = 0;
-			if (to.mixDuration == 0)
+			if (to.mixDuration == 0) {
 				mix = 1;
+				currentPose = spine.MixPose.setup;
+			}
 			else {
 				mix = to.mixTime / to.mixDuration;
 				if (mix > 1)
@@ -2969,13 +2971,18 @@ var spine;
 				for (var i = 0, n = spacesCount - 1; i < n;) {
 					var bone = bones[i];
 					var setupLength = bone.data.length;
-					if (setupLength == 0)
-						setupLength = 0.0000001;
-					var x = setupLength * bone.a, y = setupLength * bone.c;
-					var length_1 = Math.sqrt(x * x + y * y);
-					if (scale)
-						lengths[i] = length_1;
-					spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length_1 / setupLength;
+					if (setupLength < PathConstraint.epsilon) {
+						if (scale)
+							lengths[i] = 0;
+						spaces[++i] = 0;
+					}
+					else {
+						var x = setupLength * bone.a, y = setupLength * bone.c;
+						var length_1 = Math.sqrt(x * x + y * y);
+						if (scale)
+							lengths[i] = length_1;
+						spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length_1 / setupLength;
+					}
 				}
 			}
 			else {
@@ -3281,6 +3288,7 @@ var spine;
 		PathConstraint.NONE = -1;
 		PathConstraint.BEFORE = -2;
 		PathConstraint.AFTER = -3;
+		PathConstraint.epsilon = 0.00001;
 		return PathConstraint;
 	}());
 	spine.PathConstraint = PathConstraint;

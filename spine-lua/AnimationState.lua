@@ -428,6 +428,7 @@ function AnimationState:applyMixingFrom (to, skeleton, currentPose)
 	local mix = 0
 	if to.mixDuration == 0 then -- Single frame mix to undo mixingFrom changes.
 		mix = 1
+    currentPose = MixPose.setup
 	else
 		mix = to.mixTime / to.mixDuration
 		if mix > 1 then mix = 1 end

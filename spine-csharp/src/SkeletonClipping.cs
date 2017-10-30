@@ -47,7 +47,7 @@ namespace Spine {
 		public ExposedList<int> ClippedTriangles { get { return clippedTriangles; } }
 		public ExposedList<float> ClippedUVs { get { return clippedUVs; } }
 
-		public bool IsClipping () { return clipAttachment != null; }
+		public bool IsClipping { get { return clipAttachment != null; } }
 
 		public int ClipStart (Slot slot, ClippingAttachment clip) {
 			if (clipAttachment != null) return 0;
@@ -89,7 +89,7 @@ namespace Spine {
 			clippedVertices.Clear();
 			clippedUVs.Clear();
 			clippedTriangles.Clear();
-			//outer: // libgdx
+			//outer:
 			for (int i = 0; i < trianglesLength; i += 3) {
 				int vertexOffset = triangles[i] << 1;
 				float x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
@@ -258,7 +258,7 @@ namespace Spine {
 			return clipped;
 		}
 
-		public static void MakeClockwise (ExposedList<float> polygon) {
+		static void MakeClockwise (ExposedList<float> polygon) {
 			float[] vertices = polygon.Items;
 			int verticeslength = polygon.Count;
 

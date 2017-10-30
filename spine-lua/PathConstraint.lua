@@ -55,6 +55,7 @@ PathConstraint.__index = PathConstraint
 PathConstraint.NONE = -1
 PathConstraint.BEFORE = -2
 PathConstraint.AFTER = -3
+PathConstraint.epsilon = 0.00001
 
 function PathConstraint.new (data, skeleton)
 	if not data then error("data cannot be nil", 2) end
@@ -118,13 +119,22 @@ function PathConstraint:update ()
 		while i < n do
 			local bone = bones[i + 1];
 			local setupLength = bone.data.length
-			if setupLength == 0 then setupLength = 0.0000001 end
-			local x = setupLength * bone.a
-			local y = setupLength * bone.c
-			local length = math_sqrt(x * x + y * y)
-			if scale then lengths[i + 1] = length end
-			i = i + 1
-			if lengthSpacing then spaces[i + 1] = (setupLength + spacing) * length / setupLength else spaces[i + 1] = spacing * length / setupLength end
+      if setupLength < PathConstraint.epsilon then
+        if scale then lengths[i + 1] = 0 end
+        i = i + 1
+        spaces[i + 1] = 0
+      else
+   			local x = setupLength * bone.a
+        local y = setupLength * bone.c
+        local length = math_sqrt(x * x + y * y)
+        if scale then lengths[i + 1] = length end
+        i = i + 1
+        if lengthSpacing then 
+          spaces[i + 1] = (setupLength + spacing) * length / setupLength
+        else
+          spaces[i + 1] = spacing * length / setupLength
+        end
+      end
 		end
 	else
 		local i = 1

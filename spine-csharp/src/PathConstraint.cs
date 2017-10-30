@@ -33,6 +33,7 @@ using System;
 namespace Spine {
 	public class PathConstraint : IConstraint {
 		const int NONE = -1, BEFORE = -2, AFTER = -3;
+		const float Epsilon = 0.00001f;
 
 		internal PathConstraintData data;
 		internal ExposedList<Bone> bones;
@@ -93,11 +94,15 @@ namespace Spine {
 				for (int i = 0, n = spacesCount - 1; i < n;) {
 					Bone bone = bonesItems[i];
 					float setupLength = bone.data.length;
-					if (setupLength == 0) setupLength = 0.000000001f;
-					float x = setupLength * bone.a, y = setupLength * bone.c;
-					float length = (float)Math.Sqrt(x * x + y * y);
-					if (scale) lengths.Items[i] = length;
-					spaces.Items[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
+					if (setupLength < PathConstraint.Epsilon) {
+						if (scale) lengths.Items[i] = 0;
+						spaces.Items[++i] = 0;
+					} else {
+						float x = setupLength * bone.a, y = setupLength * bone.c;
+						float length = (float)Math.Sqrt(x * x + y * y);
+						if (scale) lengths.Items[i] = length;
+						spaces.Items[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
+					}
 				}
 			} else {
 				for (int i = 1; i < spacesCount; i++)
@@ -122,7 +127,7 @@ namespace Spine {
 				float x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
 				if (scale) {
 					float length = lengths.Items[i];
-					if (length != 0) {
+					if (length >= PathConstraint.Epsilon) {
 						float s = ((float)Math.Sqrt(dx * dx + dy * dy) / length - 1) * rotateMix + 1;
 						bone.a *= s;
 						bone.c *= s;
@@ -134,7 +139,7 @@ namespace Spine {
 					float a = bone.a, b = bone.b, c = bone.c, d = bone.d, r, cos, sin;
 					if (tangents)
 						r = positions[p - 1];
-					else if (spaces.Items[i + 1] == 0)
+					else if (spaces.Items[i + 1] < PathConstraint.Epsilon)
 						r = positions[p + 2];
 					else
 						r = MathUtils.Atan2(dy, dx);
@@ -230,7 +235,7 @@ namespace Spine {
 							path.ComputeWorldVertices(target, curve * 6 + 2, 8, world, 0);
 					}
 					AddCurvePosition(p, world[0], world[1], world[2], world[3], world[4], world[5], world[6], world[7], output, o,
-						tangents || (i > 0 && space == 0));
+						tangents || (i > 0 && space < PathConstraint.Epsilon));
 				}
 				return output;
 			}
@@ -378,7 +383,7 @@ namespace Spine {
 					}
 					break;
 				}
-				AddCurvePosition(p * 0.1f, x1, y1, cx1, cy1, cx2, cy2, x2, y2, output, o, tangents || (i > 0 && space == 0));
+				AddCurvePosition(p * 0.1f, x1, y1, cx1, cy1, cx2, cy2, x2, y2, output, o, tangents || (i > 0 && space < PathConstraint.Epsilon));
 			}
 			return output;
 		}
@@ -399,13 +404,14 @@ namespace Spine {
 
 		static void AddCurvePosition (float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2,
 			float[] output, int o, bool tangents) {
-			if (p == 0 || float.IsNaN(p)) p = 0.0001f;
+			if (p < PathConstraint.Epsilon || float.IsNaN(p)) p = PathConstraint.Epsilon;
 			float tt = p * p, ttt = tt * p, u = 1 - p, uu = u * u, uuu = uu * u;
 			float ut = u * p, ut3 = ut * 3, uut3 = u * ut3, utt3 = ut3 * p;
 			float x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
 			output[o] = x;
 			output[o + 1] = y;
-			if (tangents) output[o + 2] = (float)Math.Atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+			if (tangents)
+				output[o + 2] = (float)Math.Atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
 		}
 	}
 }

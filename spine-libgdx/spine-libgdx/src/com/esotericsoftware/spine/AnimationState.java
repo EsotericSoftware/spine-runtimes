@@ -51,7 +51,31 @@ import com.esotericsoftware.spine.Animation.Timeline;
  * See <a href='http://esotericsoftware.com/spine-applying-animations/'>Applying Animations</a> in the Spine Runtimes Guide. */
 public class AnimationState {
 	static private final Animation emptyAnimation = new Animation("<empty>", new Array(0), 0);
-	static private final int SUBSEQUENT = 0, FIRST = 1, DIP = 2, DIP_MIX = 3;
+
+	/** 1) A previously applied timeline has set this property.<br>
+	 * Result: Mix from the current pose to the timeline pose. */
+	static private final int SUBSEQUENT = 0;
+	/** 1) This is the first timeline to set this property.<br>
+	 * 2) The next track entry applied after this one does not have a timeline to set this property.<br>
+	 * Result: Mix from the setup pose to the timeline pose. */
+	static private final int FIRST = 1;
+	/** 1) This is the first timeline to set this property.<br>
+	 * 2) The next track entry to be applied does have a timeline to set this property.<br>
+	 * 3) The next track entry after that one does not have a timeline to set this property.<br>
+	 * Result: Mix from the setup pose to the timeline pose, but avoid the "dipping" problem by not using the mix percentage. This
+	 * means the timeline pose won't mix out toward the setup pose. A subsequent timeline will set this property using a mix. */
+	static private final int DIP = 2;
+	/** 1) This is the first timeline to set this property.<br>
+	 * 2) The next track entry to be applied does have a timeline to set this property.<br>
+	 * 3) The next track entry after that one does have a timeline to set this property.<br>
+	 * 4) timelineDipMix stores the first subsequent track entry that does not have a timeline to set this property.<br>
+	 * Result: This is the same as DIP except the mix percentage from the timelineDipMix track entry is used. This handles when
+	 * more than 2 track entries in a row have a timeline which sets the same property.<br>
+	 * Eg, A -> B -> C -> D where A, B, and C have a timeline to set the same property, but D does not. When A is applied, A's mix
+	 * percentage is not used to avoid dipping, however a later track entry (D, the first entry without a timeline which sets the
+	 * property) is actually mixing out A (which affects B and C). Without using D's mix percentage, A would be applied fully until
+	 * mixed out, causing snapping. */
+	static private final int DIP_MIX = 3;
 
 	private AnimationStateData data;
 	final Array<TrackEntry> tracks = new Array();
@@ -220,9 +244,10 @@ public class AnimationState {
 		if (from.mixingFrom != null) applyMixingFrom(from, skeleton, currentPose);
 
 		float mix;
-		if (to.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
+		if (to.mixDuration == 0) { // Single frame mix to undo mixingFrom changes.
 			mix = 1;
-		else {
+			currentPose = MixPose.setup;
+		} else {
 			mix = to.mixTime / to.mixDuration;
 			if (mix > 1) mix = 1;
 		}
@@ -261,10 +286,8 @@ public class AnimationState {
 				break;
 			default:
 				pose = MixPose.setup;
-				alpha = alphaDip;
 				TrackEntry dipMix = (TrackEntry)timelineDipMix[i];
-				alpha *= Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
-				break;
+				alpha = alphaDip * Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
 			}
 			from.totalAlpha += alpha;
 			if (timeline instanceof RotateTimeline)
@@ -517,12 +540,19 @@ public class AnimationState {
 	}
 
 	/** Sets an empty animation for a track, discarding any queued animations, and sets the track entry's
-	 * {@link TrackEntry#getMixDuration()}.
+	 * {@link TrackEntry#getMixDuration()}. An empty animation has no timelines and serves as a placeholder for mixing in or out.
 	 * <p>
-	 * Mixing out is done by setting an empty animation. A mix duration of 0 still mixes out over one frame.
+	 * Mixing out is done by setting an empty animation with a mix duration using either {@link #setEmptyAnimation(int, float)},
+	 * {@link #setEmptyAnimations(float)}, or {@link #addEmptyAnimation(int, float, float)}. Mixing to an empty animation causes
+	 * the previous animation to be applied less and less over the mix duration. Properties keyed in the previous animation
+	 * transition to the value from lower tracks or to the setup pose value if no lower tracks key the property. A mix duration of
+	 * 0 still mixes out over one frame.
 	 * <p>
-	 * To mix in, first set an empty animation and add an animation using {@link #addAnimation(int, Animation, boolean, float)},
-	 * then set the {@link TrackEntry#setMixDuration(float)} on the returned track entry. */
+	 * Mixing in is done by first setting an empty animation, then adding an animation using
+	 * {@link #addAnimation(int, Animation, boolean, float)} and on the returned track entry, set the
+	 * {@link TrackEntry#setMixDuration(float)}. Mixing from an empty animation causes the new animation to be applied more and
+	 * more over the mix duration. Properties keyed in the new animation transition from the value from lower tracks or from the
+	 * setup pose value if no lower tracks key the property to the value keyed in the new animation. */
 	public TrackEntry setEmptyAnimation (int trackIndex, float mixDuration) {
 		TrackEntry entry = setAnimation(trackIndex, emptyAnimation, false);
 		entry.mixDuration = mixDuration;
@@ -533,6 +563,8 @@ public class AnimationState {
 	/** Adds an empty animation to be played after the current or last queued animation for a track, and sets the track entry's
 	 * {@link TrackEntry#getMixDuration()}. If the track is empty, it is equivalent to calling
 	 * {@link #setEmptyAnimation(int, float)}.
+	 * <p>
+	 * See {@link #setEmptyAnimation(int, float)}.
 	 * @param delay Seconds to begin this animation after the start of the previous animation. May be <= 0 to use the animation
 	 *           duration of the previous track minus any mix duration plus <code>delay</code>.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
@@ -810,8 +842,8 @@ public class AnimationState {
 		 * is reached, no other animations are queued for playback, and mixing from any previous animations is complete, then the
 		 * properties keyed by the animation are set to the setup pose and the track is cleared.
 		 * <p>
-		 * It may be desired to use {@link AnimationState#addEmptyAnimation(int, float, float)} to mix the properties back to the
-		 * setup pose over time, rather than have it happen instantly. */
+		 * It may be desired to use {@link AnimationState#addEmptyAnimation(int, float, float)} rather than have the animation
+		 * abruptly cease being applied. */
 		public float getTrackEnd () {
 			return trackEnd;
 		}
