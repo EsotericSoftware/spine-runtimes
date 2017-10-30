@@ -812,7 +812,7 @@ module spine {
 					}
 				} else {
 					switch (blend) {
-					case MixBlend.setup:
+					case MixBlend.setup: {
 						let vertexAttachment = slotAttachment as VertexAttachment;
 						if (vertexAttachment.bones == null) {
 							// Unweighted vertex positions, with alpha.
@@ -827,13 +827,24 @@ module spine {
 								vertices[i] = lastVertices[i] * alpha;
 						}
 						break;
+					}
 					case MixBlend.first:
 					case MixBlend.replace:
 						for (let i = 0; i < vertexCount; i++)
 						vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
 					case MixBlend.add:
-						for (let i = 0; i < vertexCount; i++)
-							vertices[i] += lastVertices[i] * alpha;
+						let vertexAttachment = slotAttachment as VertexAttachment;
+						if (vertexAttachment.bones == null) {
+							// Unweighted vertex positions, with alpha.
+							let setupVertices = vertexAttachment.vertices;
+							for (let i = 0; i < vertexCount; i++) {
+								vertices[i] += (lastVertices[i] - setupVertices[i]) * alpha;
+							}
+						} else {
+							// Weighted deform offsets, with alpha.
+							for (let i = 0; i < vertexCount; i++)
+								vertices[i] += lastVertices[i] * alpha;
+						}
 					}
 				}
 				return;
