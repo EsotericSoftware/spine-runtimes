@@ -591,8 +591,13 @@ namespace Spine.Unity.Modules.AttachmentTools {
 				output.name = ar.name;
 				Color[] pixelBuffer = sourceTexture.GetPixels((int)r.x, (int)r.y, width, height);
 				output.SetPixels(pixelBuffer);
-				CachedRegionTextures.Add(ar, output);
-				CachedRegionTexturesList.Add(output);
+
+                if (CachedRegionTextures.ContainsKey(ar))
+                    CachedRegionTextures[ar] = output;
+                else
+                    CachedRegionTextures.Add(ar, output);
+
+                CachedRegionTexturesList.Add(output);
 
 				if (applyImmediately)
 					output.Apply();
