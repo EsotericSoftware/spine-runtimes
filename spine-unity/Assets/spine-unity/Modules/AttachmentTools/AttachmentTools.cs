@@ -399,7 +399,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		/// <param name = "outputAttachments">The List(Attachment) to populate with the newly created Attachment objects.</param>
 		/// 
 		/// <param name="materialPropertySource">May be null. If no Material property source is provided, no special </param>
-		public static void GetRepackedAttachments (List<Attachment> sourceAttachments, List<Attachment> outputAttachments, Material materialPropertySource, out Material outputMaterial, out Texture2D outputTexture, int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps, string newAssetName = "Repacked Attachments") {
+		public static void GetRepackedAttachments (List<Attachment> sourceAttachments, List<Attachment> outputAttachments, Material materialPropertySource, out Material outputMaterial, out Texture2D outputTexture, int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps, string newAssetName = "Repacked Attachments", bool clearCache = false) {
 			if (sourceAttachments == null) throw new System.ArgumentNullException("sourceAttachments");
 			if (outputAttachments == null) throw new System.ArgumentNullException("outputAttachments");
 
@@ -468,8 +468,8 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			}
 
 			// Clean up.
-			foreach (var ttp in texturesToPack)
-				UnityEngine.Object.Destroy(ttp);
+			if (clearCache)
+				AtlasUtilities.ClearCache();
 
 			outputTexture = newTexture;
 			outputMaterial = newMaterial;
@@ -485,7 +485,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		/// <summary>
 		/// Creates and populates a duplicate skin with cloned attachments that are backed by a new packed texture atlas comprised of all the regions from the original skin.</summary>
 		/// <remarks>No Spine.Atlas object is created so there is no way to find AtlasRegions except through the Attachments using them.</remarks>
-		public static Skin GetRepackedSkin (this Skin o, string newName, Shader shader, out Material outputMaterial, out Texture2D outputTexture, int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps, Material materialPropertySource = null) {
+		public static Skin GetRepackedSkin (this Skin o, string newName, Shader shader, out Material outputMaterial, out Texture2D outputTexture, int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps, Material materialPropertySource = null, bool clearCache = false) {
 			var skinAttachments = o.Attachments;
 			var newSkin = new Skin(newName);
 
@@ -553,8 +553,8 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			}
 
 			// Clean up.
-			foreach (var ttp in texturesToPack)
-				UnityEngine.Object.Destroy(ttp);
+			if (clearCache)
+				AtlasUtilities.ClearCache();
 
 			outputTexture = newTexture;
 			outputMaterial = newMaterial;
