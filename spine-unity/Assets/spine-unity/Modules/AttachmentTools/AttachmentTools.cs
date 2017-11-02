@@ -585,14 +585,24 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			if (output == null) {
 				Texture2D sourceTexture = ar.GetMainTexture();
 				Rect r = ar.GetUnityRect(sourceTexture.height);
-				int width = (int)r.width;
-				int height = (int)r.height;
-				output = new Texture2D(width, height, textureFormat, mipmaps);
+				int width = Mathf.Min(sourceTexture.width, (int)r.width);
+                int height = Mathf.Min(sourceTexture.height, (int)r.height);
+                output = new Texture2D(width, height, textureFormat, mipmaps);
 				output.name = ar.name;
-				Color[] pixelBuffer = sourceTexture.GetPixels((int)r.x, (int)r.y, width, height);
+                Color[] pixelBuffer = null;
+                int x = Mathf.Max(0, (int)r.x);
+                int y = Mathf.Max(0, (int)r.y);
+                
+                pixelBuffer = sourceTexture.GetPixels(x, y, width, height);
+
 				output.SetPixels(pixelBuffer);
-				CachedRegionTextures.Add(ar, output);
-				CachedRegionTexturesList.Add(output);
+
+                if (CachedRegionTextures.ContainsKey(ar))
+                    CachedRegionTextures[ar] = output;
+                else
+                    CachedRegionTextures.Add(ar, output);
+
+                CachedRegionTexturesList.Add(output);
 
 				if (applyImmediately)
 					output.Apply();
