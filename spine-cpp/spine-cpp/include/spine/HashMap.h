@@ -176,20 +176,6 @@ namespace Spine
                     _header.next->prev = entry;
                     _header.next = entry;
                 }
-                else if (index > hash(_header.next->_key) && index < hash(_trailer.prev->_key))
-                {
-                    size_t prev_index = index;
-                    
-                    while (_hashTable[--prev_index].next != NULL)
-                    {
-                        // Empty
-                    }
-                    
-                    entry->next = _hashTable[prev_index].prev->next;
-                    entry->prev = _hashTable[prev_index].prev;
-                    _hashTable[prev_index].prev->next = entry;
-                    entry->next->prev = entry;
-                }
                 else
                 {
                     entry->next = &_trailer;
