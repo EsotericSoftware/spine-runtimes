@@ -116,7 +116,7 @@ namespace Spine
             {
                 for (size_t i = inIndex; i < _size; ++i)
                 {
-                    _buffer[i] = std::swap(_buffer[i + 1]);
+                    std::swap(_buffer[i], _buffer[i + 1]);
                 }
             }
             
