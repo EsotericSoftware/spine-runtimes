@@ -31,6 +31,7 @@
 #ifndef Spine_Vector_h
 #define Spine_Vector_h
 
+#include <stdlib.h>
 #include <memory>
 #include <assert.h>
 
