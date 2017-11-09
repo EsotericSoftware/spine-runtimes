@@ -35,8 +35,8 @@
 namespace Spine
 {
     Event::Event(float time, const EventData& data) :
-    _time(time),
     _data(data),
+    _time(time),
     _intValue(0),
     _floatValue(0),
     _stringValue()

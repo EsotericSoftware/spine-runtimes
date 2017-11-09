@@ -41,11 +41,11 @@ namespace Spine
 {
     TransformConstraint::TransformConstraint(TransformConstraintData& data, Skeleton& skeleton) : Constraint(),
     _data(data),
+    _target(skeleton.findBone(data.getTarget()->getName())),
     _rotateMix(data.getRotateMix()),
     _translateMix(data.getTranslateMix()),
     _scaleMix(data.getScaleMix()),
-    _shearMix(data.getShearMix()),
-    _target(skeleton.findBone(data.getTarget()->getName()))
+    _shearMix(data.getShearMix())
     {
         _bones.reserve(_data.getBones().size());
         for (BoneData** i = _data.getBones().begin(); i != _data.getBones().end(); ++i)

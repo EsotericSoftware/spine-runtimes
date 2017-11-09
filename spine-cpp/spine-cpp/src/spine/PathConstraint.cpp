@@ -52,11 +52,11 @@ namespace Spine
     
     PathConstraint::PathConstraint(PathConstraintData& data, Skeleton& skeleton) : Constraint(),
     _data(data),
+    _target(skeleton.findSlot(data.getTarget()->getName())),
     _position(data.getPosition()),
     _spacing(data.getSpacing()),
     _rotateMix(data.getRotateMix()),
-    _translateMix(data.getTranslateMix()),
-    _target(skeleton.findSlot(data.getTarget()->getName()))
+    _translateMix(data.getTranslateMix())
     {
         _bones.reserve(_data.getBones().size());
         for (BoneData** i = _data.getBones().begin(); i != _data.getBones().end(); ++i)
