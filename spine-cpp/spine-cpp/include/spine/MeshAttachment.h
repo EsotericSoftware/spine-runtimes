@@ -33,6 +33,8 @@
 
 #include <spine/VertexAttachment.h>
 
+#include <spine/Vector.h>
+
 namespace Spine
 {
     /// Attachment that displays a texture region using a mesh.
@@ -42,18 +44,18 @@ namespace Spine
         
     public:
 //        int HullLength { get { return _hulllength; } set { _hulllength = value; } }
-//        float[] RegionUVs { get { return _regionUVs; } set { _regionUVs = value; } }
+//        Vector<float>& RegionUVs { get { return _regionUVs; } set { _regionUVs = value; } }
 //        /// The UV pair for each vertex, normalized within the entire texture. <seealso cref="MeshAttachment.updateUVs"/>
-//        float[] UVs { get { return _uvs; } set { _uvs = value; } }
-//        int[] Triangles { get { return _triangles; } set { _triangles = value; } }
+//        Vector<float>& UVs { get { return _uvs; } set { _uvs = value; } }
+//        Vector<int>& Triangles { get { return _triangles; } set { _triangles = value; } }
 //
 //        float R { get { return r; } set { r = value; } }
 //        float G { get { return g; } set { g = value; } }
 //        float B { get { return b; } set { b = value; } }
 //        float A { get { return a; } set { a = value; } }
 //
-//        string Path { get; set; }
-//        object RendererObject; //Object RendererObject { get; set; }
+//        std::string Path { get; set; }
+//        void* RendererObject; //Object RendererObject { get; set; }
 //        float RegionU { get; set; }
 //        float RegionV { get; set; }
 //        float RegionU2 { get; set; }
@@ -87,15 +89,15 @@ namespace Spine
 //        }
 //
 //        // Nonessential.
-//        int[] Edges { get; set; }
+//        Vector<int>& Edges { get; set; }
 //        float Width { get; set; }
 //        float Height { get; set; }
-//
-//        MeshAttachment (string name) : VertexAttachment(name)
-//        {
-//            // Empty
-//        }
-//
+
+        MeshAttachment(std::string name) : VertexAttachment(name)
+        {
+            // Empty
+        }
+
 //        void updateUVs()
 //        {
 //            float u = RegionU, v = RegionV, width = RegionU2 - RegionU, height = RegionV2 - RegionV;
@@ -104,7 +106,7 @@ namespace Spine
 //                _uvs = new float[_regionUVs.Length];
 //            }
 //
-//            float[] _uvs = _uvs;
+//            Vector<float> _uvs = _uvs;
 //            if (_regionRotate)
 //            {
 //                for (int i = 0, n = _uvs.Length; i < n; i += 2)
@@ -131,8 +133,10 @@ namespace Spine
     private:
         float _regionOffsetX, _regionOffsetY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight;
         MeshAttachment* _parentMesh;
-//        float[] _uvs, _regionUVs;
-//        int[] _triangles;
+        Vector<float> _uvs;
+        Vector<float> _regionUVs;
+        Vector<int> _triangles;
+        Vector<int> _edges;
         float _r = 1, _g = 1, _b = 1, _a = 1;
         int _hulllength;
         bool _inheritDeform;

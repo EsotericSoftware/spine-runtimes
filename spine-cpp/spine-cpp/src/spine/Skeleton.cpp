@@ -480,7 +480,7 @@ namespace Spine
                 {
                     outVertexBuffer.reserve(8);
                 }
-//                regionAttachment->computeWorldVertices(slot->getBone(), outVertexBuffer, 0);
+                regionAttachment->computeWorldVertices(slot->getBone(), outVertexBuffer, 0);
             }
             else if (attachment != NULL && attachment->getRTTI().derivesFrom(MeshAttachment::rtti))
             {
@@ -492,7 +492,7 @@ namespace Spine
                     outVertexBuffer.reserve(verticesLength);
                 }
 
-//                mesh->computeWorldVertices(slot, 0, verticesLength, outVertexBuffer, 0);
+                mesh->computeWorldVertices(*slot, 0, verticesLength, outVertexBuffer, 0);
             }
             
             for (int ii = 0; ii < verticesLength; ii += 2)

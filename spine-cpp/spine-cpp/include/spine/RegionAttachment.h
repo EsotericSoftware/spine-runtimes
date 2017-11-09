@@ -38,6 +38,8 @@
 
 #include <assert.h>
 
+#define NUM_UVS 8
+
 namespace Spine
 {
     class Bone;
@@ -47,16 +49,7 @@ namespace Spine
     {
         RTTI_DECL;
         
-//    public:
-//        const int BLX = 0;
-//        const int BLY = 1;
-//        const int ULX = 2;
-//        const int ULY = 3;
-//        const int URX = 4;
-//        const int URY = 5;
-//        const int BRX = 6;
-//        const int BRY = 7;
-//        
+    public:
 //        float X { get { return x; } set { x = value; } }
 //        float Y { get { return y; } set { y = value; } }
 //        float Rotation { get { return _rotation; } set { _rotation = value; } }
@@ -71,7 +64,7 @@ namespace Spine
 //        float A { get { return a; } set { a = value; } }
 //        
 //        std::string Path { get; set; }
-//        object RendererObject; //object RendererObject { get; set; }
+//        void* RendererObject; //object RendererObject { get; set; }
 //        float RegionOffsetX { get { return _regionOffsetX; } set { _regionOffsetX = value; } }
 //        float RegionOffsetY { get { return _regionOffsetY; } set { _regionOffsetY = value; } } // Pixels stripped from the bottom left, unrotated.
 //        float RegionWidth { get { return _regionWidth; } set { _regionWidth = value; } }
@@ -79,14 +72,15 @@ namespace Spine
 //        float RegionOriginalWidth { get { return _regionOriginalWidth; } set { _regionOriginalWidth = value; } }
 //        float RegionOriginalHeight { get { return _regionOriginalHeight; } set { _regionOriginalHeight = value; } } // Unrotated, unstripped size.
 //        
-//        float[] Offset { get { return _offset; } }
-//        float[] UVs { get { return _uvs; } }
+//        Vector<float>& Offset { get { return _offset; } }
+//        Vector<float>& UVs { get { return _uvs; } }
 //        
-//        RegionAttachment (std::string name) : Attachment(name)
-//        {
-//            // Empty
-//        }
-//        
+        RegionAttachment(std::string name) : Attachment(name)
+        {
+            _offset.reserve(NUM_UVS);
+            _uvs.reserve(NUM_UVS);
+        }
+//
 //        void updateOffset()
 //        {
 //            float regionScaleX = _width / _regionOriginalWidth * _scaleX;
@@ -142,50 +136,28 @@ namespace Spine
 //            }
 //        }
 //        
-//        /// Transforms the attachment's four vertices to world coordinates.
-//        /// @param bone The parent bone.
-//        /// @param worldVertices The output world vertices. Must have a length greater than or equal to offset + 8.
-//        /// @param offset The worldVertices index to begin writing values.
-//        /// @param stride The number of worldVertices entries between the value pairs written.
-//        void computeWorldVertices(Bone& bone, Vector<float> worldVertices, int offset, int stride = 2)
-//        {
-//            assert(worldVertices.size() >= 8);
-//            
-//            float[] vertexOffset = _offset;
-//            float bwx = bone.worldX, bwy = bone.worldY;
-//            float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-//            float offsetX, offsetY;
-//            
-//            offsetX = vertexOffset[BRX]; // 0
-//            offsetY = vertexOffset[BRY]; // 1
-//            worldVertices[offset] = offsetX * a + offsetY * b + bwx; // bl
-//            worldVertices[offset + 1] = offsetX * c + offsetY * d + bwy;
-//            offset += stride;
-//            
-//            offsetX = vertexOffset[BLX]; // 2
-//            offsetY = vertexOffset[BLY]; // 3
-//            worldVertices[offset] = offsetX * a + offsetY * b + bwx; // ul
-//            worldVertices[offset + 1] = offsetX * c + offsetY * d + bwy;
-//            offset += stride;
-//            
-//            offsetX = vertexOffset[ULX]; // 4
-//            offsetY = vertexOffset[ULY]; // 5
-//            worldVertices[offset] = offsetX * a + offsetY * b + bwx; // ur
-//            worldVertices[offset + 1] = offsetX * c + offsetY * d + bwy;
-//            offset += stride;
-//            
-//            offsetX = vertexOffset[URX]; // 6
-//            offsetY = vertexOffset[URY]; // 7
-//            worldVertices[offset] = offsetX * a + offsetY * b + bwx; // br
-//            worldVertices[offset + 1] = offsetX * c + offsetY * d + bwy;
-//        }
-//        
-//    private:
-//        float _x, _y, _rotation, _scaleX = 1, _scaleY = 1, _width, _height;
-//        float _regionOffsetX, _regionOffsetY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight;
-//        float[] _offset = new float[8];
-//        float[] _uvs = new float[8];
-//        float r = 1, g = 1, b = 1, a = 1;
+        /// Transforms the attachment's four vertices to world coordinates.
+        /// @param bone The parent bone.
+        /// @param worldVertices The output world vertices. Must have a length greater than or equal to offset + 8.
+        /// @param offset The worldVertices index to begin writing values.
+        /// @param stride The number of worldVertices entries between the value pairs written.
+        void computeWorldVertices(Bone& bone, Vector<float>& worldVertices, int offset, int stride = 2);
+        
+    private:
+        static const int BLX;
+        static const int BLY;
+        static const int ULX;
+        static const int ULY;
+        static const int URX;
+        static const int URY;
+        static const int BRX;
+        static const int BRY;
+        
+        float _x, _y, _rotation, _scaleX = 1, _scaleY = 1, _width, _height;
+        float _regionOffsetX, _regionOffsetY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight;
+        Vector<float> _offset;
+        Vector<float> _uvs;
+        float r = 1, g = 1, b = 1, a = 1;
     };
 }
 

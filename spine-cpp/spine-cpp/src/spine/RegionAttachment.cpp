@@ -30,7 +30,50 @@
 
 #include <spine/RegionAttachment.h>
 
+#include <spine/Bone.h>
+
 namespace Spine
 {
+    const int RegionAttachment::BLX = 0;
+    const int RegionAttachment::BLY = 1;
+    const int RegionAttachment::ULX = 2;
+    const int RegionAttachment::ULY = 3;
+    const int RegionAttachment::URX = 4;
+    const int RegionAttachment::URY = 5;
+    const int RegionAttachment::BRX = 6;
+    const int RegionAttachment::BRY = 7;
+    
+    void RegionAttachment::computeWorldVertices(Bone& bone, Vector<float>& worldVertices, int offset, int stride)
+    {
+        assert(worldVertices.size() >= (offset + 8));
+        
+        float bwx = bone._worldX, bwy = bone._worldY;
+        float a = bone._a, b = bone._b, c = bone._c, d = bone._d;
+        float offsetX, offsetY;
+        
+        offsetX = _offset[BRX]; // 0
+        offsetY = _offset[BRY]; // 1
+        worldVertices[offset] = offsetX * a + offsetY * b + bwx; // bl
+        worldVertices[offset + 1] = offsetX * c + offsetY * d + bwy;
+        offset += stride;
+        
+        offsetX = _offset[BLX]; // 2
+        offsetY = _offset[BLY]; // 3
+        worldVertices[offset] = offsetX * a + offsetY * b + bwx; // ul
+        worldVertices[offset + 1] = offsetX * c + offsetY * d + bwy;
+        offset += stride;
+        
+        offsetX = _offset[ULX]; // 4
+        offsetY = _offset[ULY]; // 5
+        worldVertices[offset] = offsetX * a + offsetY * b + bwx; // ur
+        worldVertices[offset + 1] = offsetX * c + offsetY * d + bwy;
+        offset += stride;
+        
+        offsetX = _offset[URX]; // 6
+        offsetY = _offset[URY]; // 7
+        worldVertices[offset] = offsetX * a + offsetY * b + bwx; // br
+        worldVertices[offset + 1] = offsetX * c + offsetY * d + bwy;
+    }
+    
     RTTI_IMPL(RegionAttachment, Attachment);
 }
