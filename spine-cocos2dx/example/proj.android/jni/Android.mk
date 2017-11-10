@@ -12,21 +12,26 @@ LOCAL_MODULE := MyGame_shared
 LOCAL_MODULE_FILENAME := libMyGame
 
 LOCAL_SRC_FILES := hellocpp/main.cpp \
-                   ../../Classes/AppDelegate.cpp \
-                   ../../Classes/BatchingExample.cpp \
-                   ../../Classes/GoblinsExample.cpp \
-                   ../../Classes/RaptorExample.cpp \
-                   ../../Classes/SimpleCommand.cpp \
-                   ../../Classes/SpineboyExample.cpp \
-                   ../../Classes/TankExample.cpp \
-                   ../../../src/spine/AttachmentVertices.cpp \
-                   ../../../src/spine/Cocos2dAttachmentLoader.cpp \
-                   ../../../src/spine/SkeletonAnimation.cpp \
-                   ../../../src/spine/SkeletonBatch.cpp \
-                   ../../../src/spine/SkeletonTwoColorBatch.cpp \
-                   ../../../src/spine/SkeletonRenderer.cpp \
-                   ../../../src/spine/spine-cocos2dx.cpp \
-                   ../../../../spine-c/spine-c/src/spine/Animation.c \
+				   ../../Classes/AppDelegate.cpp \
+				   ../../Classes/BatchingExample.cpp \
+				   ../../Classes/GoblinsExample.cpp \
+				   ../../Classes/RaptorExample.cpp \
+				   ../../Classes/SimpleCommand.cpp \
+				   ../../Classes/SpineboyExample.cpp \
+				   ../../Classes/CoinExample.cpp \
+				   ../../Classes/TankExample.cpp \
+				   ../../../src/spine/AttachmentVertices.cpp \
+				   ../../../src/spine/Cocos2dAttachmentLoader.cpp \
+				   ../../../src/spine/SkeletonAnimation.cpp \
+				   ../../../src/spine/SkeletonBatch.cpp \
+				   ../../../src/spine/SkeletonTwoColorBatch.cpp \
+				   ../../../src/spine/SkeletonRenderer.cpp \
+				   ../../../src/spine/spine-cocos2dx.cpp \
+				   ../../../../spine-c/spine-c/src/spine/Animation.c \
+				   ../../../../spine-c/spine-c/src/spine/ClippingAttachment.c \
+				   ../../../../spine-c/spine-c/src/spine/SkeletonClipping.c \
+				   ../../../../spine-c/spine-c/src/spine/Triangulator.c \
+				   ../../../../spine-c/spine-c/src/spine/Array.c \
 				   ../../../../spine-c/spine-c/src/spine/AnimationState.c \
 				   ../../../../spine-c/spine-c/src/spine/AnimationStateData.c \
 				   ../../../../spine-c/spine-c/src/spine/Atlas.c \
