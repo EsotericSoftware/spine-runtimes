@@ -30,7 +30,7 @@ mesh.setIndices(indices);
 var shader = spine.webgl.Shader.newTwoColoredTextured(context);
 
 var assetManager = new spine.webgl.AssetManager(context);
-assetManager.loadTexture("assets/spineboy.png");
+assetManager.loadTexture("../example/assets/spineboy.png");
 
 var camMatrix = new spine.webgl.Matrix4();
 
@@ -40,7 +40,7 @@ requestAnimationFrame(load);
 
 function load () {
 	if (assetManager.isLoadingComplete()) {
-		texture = assetManager.get("assets/spineboy.png");
+		texture = assetManager.get("../example/assets/spineboy.png");
 		requestAnimationFrame(render);
 	} else requestAnimationFrame(load);
 }
