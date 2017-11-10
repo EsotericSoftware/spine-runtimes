@@ -150,10 +150,18 @@ float USpineSkeletonAnimationComponent::GetTimeScale() {
 	return 1;
 }
 
+// we need to disable the queue when setting or adding animations, see #1037
+extern "C" {
+	void _spAnimationState_disableQueue(spAnimationState* state);
+	void _spAnimationState_enableQueue(spAnimationState* state);
+}
+
 UTrackEntry* USpineSkeletonAnimationComponent::SetAnimation (int trackIndex, FString animationName, bool loop) {
 	CheckState();
 	if (state && spSkeletonData_findAnimation(skeleton->data, TCHAR_TO_UTF8(*animationName))) {
+		_spAnimationState_disableQueue(state);
 		spTrackEntry* entry = spAnimationState_setAnimationByName(state, trackIndex, TCHAR_TO_UTF8(*animationName), loop ? 1 : 0);
+		_spAnimationState_enableQueue(state);
 		UTrackEntry* uEntry = NewObject<UTrackEntry>();
 		uEntry->SetTrackEntry(entry);
 		trackEntries.Add(uEntry);
@@ -165,7 +173,9 @@ UTrackEntry* USpineSkeletonAnimationComponent::SetAnimation (int trackIndex, FSt
 UTrackEntry* USpineSkeletonAnimationComponent::AddAnimation (int trackIndex, FString animationName, bool loop, float delay) {
 	CheckState();
 	if (state && spSkeletonData_findAnimation(skeleton->data, TCHAR_TO_UTF8(*animationName))) {
+		_spAnimationState_disableQueue(state);
 		spTrackEntry* entry = spAnimationState_addAnimationByName(state, trackIndex, TCHAR_TO_UTF8(*animationName), loop ? 1 : 0, delay);		
+		_spAnimationState_enableQueue(state);
 		UTrackEntry* uEntry = NewObject<UTrackEntry>();
 		uEntry->SetTrackEntry(entry);
 		trackEntries.Add(uEntry);
