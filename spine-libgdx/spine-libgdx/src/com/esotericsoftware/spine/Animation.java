@@ -562,8 +562,10 @@ public class Animation {
 						break;
 					case first:
 					case replace:
-						bone.scaleX += (x - bone.scaleX * Math.signum(x)) * alpha;
-						bone.scaleY += (y - bone.scaleY * Math.signum(y)) * alpha;
+						bx = Math.abs(bone.scaleX) * Math.signum(x);
+						by = Math.abs(bone.scaleY) * Math.signum(y);
+						bone.scaleX = bx + (x - bx) * alpha;
+						bone.scaleY = by + (y - by) * alpha;
 						break;
 					case add:
 						bx = Math.signum(x);
@@ -1038,7 +1040,7 @@ public class Animation {
 					}
 				} else {
 					switch (blend) {
-					case setup:
+					case setup: {
 						VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
 						if (vertexAttachment.getBones() == null) {
 							// Unweighted vertex positions, with alpha.
@@ -1053,6 +1055,7 @@ public class Animation {
 								vertices[i] = lastVertices[i] * alpha;
 						}
 						break;
+					}
 					case first:
 					case replace:
 						// Vertex positions or deform offsets, with alpha.
@@ -1060,8 +1063,17 @@ public class Animation {
 							vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
 						break;
 					case add:
-						for (int i = 0; i < vertexCount; i++)
-							vertices[i] += lastVertices[i] * alpha;
+						VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
+						if (vertexAttachment.getBones() == null) {
+							// Unweighted vertex positions, no alpha.
+							float[] setupVertices = vertexAttachment.getVertices();
+							for (int i = 0; i < vertexCount; i++)
+								vertices[i] += (lastVertices[i] - setupVertices[i]) * alpha;
+						} else {
+							// Weighted deform offsets, alpha.
+							for (int i = 0; i < vertexCount; i++)
+								vertices[i] += lastVertices[i] * alpha;
+						}
 					}
 				}
 				return;

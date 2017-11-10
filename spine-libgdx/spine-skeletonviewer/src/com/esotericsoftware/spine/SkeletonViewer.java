@@ -496,6 +496,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 			alphaSlider.setValue(1);
 			alphaSlider.setDisabled(true);
+			
+			addCheckbox.setDisabled(true);
 
 			window.setMovable(false);
 			window.setResizable(false);
