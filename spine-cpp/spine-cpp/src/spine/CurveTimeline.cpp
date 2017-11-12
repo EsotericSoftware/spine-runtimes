@@ -34,6 +34,8 @@
 
 namespace Spine
 {
+    RTTI_IMPL(CurveTimeline, Timeline);
+    
     const float CurveTimeline::LINEAR = 0;
     const float CurveTimeline::STEPPED = 1;
     const float CurveTimeline::BEZIER = 2;
@@ -133,6 +135,4 @@ namespace Spine
     {
         return _curves[frameIndex * BEZIER_SIZE];
     }
-    
-    RTTI_IMPL(CurveTimeline, Timeline);
 }

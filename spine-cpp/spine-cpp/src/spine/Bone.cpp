@@ -38,6 +38,8 @@
 
 namespace Spine
 {
+    RTTI_IMPL(Bone, Updatable);
+    
     bool Bone::yDown = false;
     
     void Bone::setYDown(bool inValue)
@@ -621,6 +623,4 @@ namespace Spine
             _arotation = 90 - MathUtil::atan2(rd, rb) * RadDeg;
         }
     }
-    
-    RTTI_IMPL(Bone, Updatable);
 }

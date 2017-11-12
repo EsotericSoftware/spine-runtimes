@@ -39,6 +39,8 @@
 
 namespace Spine
 {
+    RTTI_IMPL(TransformConstraint, Constraint);
+    
     TransformConstraint::TransformConstraint(TransformConstraintData& data, Skeleton& skeleton) : Constraint(),
     _data(data),
     _target(skeleton.findBone(data.getTarget()->getName())),
@@ -445,6 +447,4 @@ namespace Spine
             bone.updateWorldTransform(x, y, rotation, scaleX, scaleY, bone._ashearX, shearY);
         }
     }
-    
-    RTTI_IMPL(TransformConstraint, Constraint);
 }

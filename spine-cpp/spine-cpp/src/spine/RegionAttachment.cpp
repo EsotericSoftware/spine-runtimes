@@ -32,8 +32,14 @@
 
 #include <spine/Bone.h>
 
+#include <spine/MathUtil.h>
+
+#include <assert.h>
+
 namespace Spine
 {
+    RTTI_IMPL(RegionAttachment, Attachment);
+    
     const int RegionAttachment::BLX = 0;
     const int RegionAttachment::BLY = 1;
     const int RegionAttachment::ULX = 2;
@@ -42,6 +48,67 @@ namespace Spine
     const int RegionAttachment::URY = 5;
     const int RegionAttachment::BRX = 6;
     const int RegionAttachment::BRY = 7;
+    
+    RegionAttachment::RegionAttachment(std::string name) : Attachment(name)
+    {
+        _offset.reserve(NUM_UVS);
+        _uvs.reserve(NUM_UVS);
+    }
+    
+    void RegionAttachment::updateOffset()
+    {
+        float regionScaleX = _width / _regionOriginalWidth * _scaleX;
+        float regionScaleY = _height / _regionOriginalHeight * _scaleY;
+        float localX = -_width / 2 * _scaleX + _regionOffsetX * regionScaleX;
+        float localY = -_height / 2 * _scaleY + _regionOffsetY * regionScaleY;
+        float localX2 = localX + _regionWidth * regionScaleX;
+        float localY2 = localY + _regionHeight * regionScaleY;
+        float cos = MathUtil::cosDeg(_rotation);
+        float sin = MathUtil::sinDeg(_rotation);
+        float localXCos = localX * cos + _x;
+        float localXSin = localX * sin;
+        float localYCos = localY * cos + _y;
+        float localYSin = localY * sin;
+        float localX2Cos = localX2 * cos + _x;
+        float localX2Sin = localX2 * sin;
+        float localY2Cos = localY2 * cos + _y;
+        float localY2Sin = localY2 * sin;
+        
+        _offset[BLX] = localXCos - localYSin;
+        _offset[BLY] = localYCos + localXSin;
+        _offset[ULX] = localXCos - localY2Sin;
+        _offset[ULY] = localY2Cos + localXSin;
+        _offset[URX] = localX2Cos - localY2Sin;
+        _offset[URY] = localY2Cos + localX2Sin;
+        _offset[BRX] = localX2Cos - localYSin;
+        _offset[BRY] = localYCos + localX2Sin;
+    }
+    
+    void RegionAttachment::setUVs(float u, float v, float u2, float v2, bool rotate)
+    {
+        if (rotate)
+        {
+            _uvs[URX] = u;
+            _uvs[URY] = v2;
+            _uvs[BRX] = u;
+            _uvs[BRY] = v;
+            _uvs[BLX] = u2;
+            _uvs[BLY] = v;
+            _uvs[ULX] = u2;
+            _uvs[ULY] = v2;
+        }
+        else
+        {
+            _uvs[ULX] = u;
+            _uvs[ULY] = v2;
+            _uvs[URX] = u;
+            _uvs[URY] = v;
+            _uvs[BRX] = u2;
+            _uvs[BRY] = v;
+            _uvs[BLX] = u2;
+            _uvs[BLY] = v2;
+        }
+    }
     
     void RegionAttachment::computeWorldVertices(Bone& bone, Vector<float>& worldVertices, int offset, int stride)
     {
@@ -75,5 +142,203 @@ namespace Spine
         worldVertices[offset + 1] = offsetX * c + offsetY * d + bwy;
     }
     
-    RTTI_IMPL(RegionAttachment, Attachment);
+    float RegionAttachment::getX()
+    {
+        return _x;
+    }
+    
+    void RegionAttachment::setX(float inValue)
+    {
+        _x = inValue;
+    }
+    
+    float RegionAttachment::getY()
+    {
+        return _y;
+    }
+    
+    void RegionAttachment::setY(float inValue)
+    {
+        _y = inValue;
+    }
+    
+    float RegionAttachment::getRotation()
+    {
+        return _rotation;
+    }
+    
+    void RegionAttachment::setRotation(float inValue)
+    {
+        _rotation = inValue;
+    }
+    
+    float RegionAttachment::getScaleX()
+    {
+        return _scaleX;
+    }
+    
+    void RegionAttachment::setScaleX(float inValue)
+    {
+        _scaleX = inValue;
+    }
+    
+    float RegionAttachment::getScaleY()
+    {
+        return _scaleY;
+    }
+    
+    void RegionAttachment::setScaleY(float inValue)
+    {
+        _scaleY = inValue;
+    }
+    
+    float RegionAttachment::getWidth()
+    {
+        return _width;
+    }
+    
+    void RegionAttachment::setWidth(float inValue)
+    {
+        _width = inValue;
+    }
+    
+    float RegionAttachment::getHeight()
+    {
+        return _height;
+    }
+    
+    void RegionAttachment::setHeight(float inValue)
+    {
+        _height = inValue;
+    }
+    
+    float RegionAttachment::getR()
+    {
+        return _r;
+    }
+    
+    void RegionAttachment::setR(float inValue)
+    {
+        _r = inValue;
+    }
+    
+    float RegionAttachment::getG()
+    {
+        return _g;
+    }
+    
+    void RegionAttachment::setG(float inValue)
+    {
+        _g = inValue;
+    }
+    
+    float RegionAttachment::getB()
+    {
+        return _b;
+    }
+    
+    void RegionAttachment::setB(float inValue)
+    {
+        _b = inValue;
+    }
+    
+    float RegionAttachment::getA()
+    {
+        return _a;
+    }
+    
+    void RegionAttachment::setA(float inValue)
+    {
+        _a = inValue;
+    }
+    
+    std::string RegionAttachment::getPath()
+    {
+        return _path;
+    }
+    
+    void RegionAttachment::setPath(std::string inValue)
+    {
+        _path = inValue;
+    }
+    
+    void* RegionAttachment::getRendererObject()
+    {
+        return _rendererObject;
+    }
+    
+    void RegionAttachment::setRendererObject(void* inValue)
+    {
+        _rendererObject = inValue;
+    }
+    
+    float RegionAttachment::getRegionOffsetX()
+    {
+        return _regionOffsetX;
+    }
+    
+    void RegionAttachment::setRegionOffsetX(float inValue)
+    {
+        _regionOffsetX = inValue;
+    }
+    
+    float RegionAttachment::getRegionOffsetY()
+    {
+        return _regionOffsetY;
+    }
+    
+    void RegionAttachment::setRegionOffsetY(float inValue)
+    {
+        _regionOffsetY = inValue;
+    }
+    
+    float RegionAttachment::getRegionWidth()
+    {
+        return _regionWidth;
+    }
+    
+    void RegionAttachment::setRegionWidth(float inValue)
+    {
+        _regionWidth = inValue;
+    }
+    
+    float RegionAttachment::getRegionHeight()
+    {
+        return _regionHeight;
+    }
+    
+    void RegionAttachment::setRegionHeight(float inValue)
+    {
+        _regionHeight = inValue;
+    }
+    
+    float RegionAttachment::getRegionOriginalWidth()
+    {
+        return _regionOriginalWidth;
+    }
+    
+    void RegionAttachment::setRegionOriginalWidth(float inValue)
+    {
+        _regionOriginalWidth = inValue;
+    }
+    
+    float RegionAttachment::getRegionOriginalHeight()
+    {
+        return _regionOriginalHeight;
+    }
+    
+    void RegionAttachment::setRegionOriginalHeight(float inValue)
+    {
+        _regionOriginalHeight = inValue;
+    }
+    
+    Vector<float>& RegionAttachment::getOffset()
+    {
+        return _offset;
+    }
+    
+    Vector<float>& RegionAttachment::getUVs()
+    {
+        return _uvs;
+    }
 }

@@ -37,7 +37,9 @@
 
 namespace Spine
 {
-    VertexAttachment::VertexAttachment(std::string name) : Attachment(name), _id(getNextID()), _worldVerticesLength(0)
+    RTTI_IMPL(VertexAttachment, Attachment);
+    
+    VertexAttachment::VertexAttachment(std::string name) : Attachment(name), _worldVerticesLength(0), _id(getNextID())
     {
         // Empty
     }
@@ -174,6 +176,4 @@ namespace Spine
         
         return (nextID++ & 65535) << 11;
     }
-    
-    RTTI_IMPL(VertexAttachment, Attachment);
 }

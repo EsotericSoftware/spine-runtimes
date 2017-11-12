@@ -32,6 +32,8 @@
 
 namespace Spine
 {
+    RTTI_IMPL(PathAttachment, VertexAttachment);
+    
     PathAttachment::PathAttachment(std::string name) : VertexAttachment(name)
     {
         // Empty
@@ -66,6 +68,4 @@ namespace Spine
     {
         _constantSpeed = inValue;
     }
-    
-    RTTI_IMPL(PathAttachment, VertexAttachment);
 }

@@ -34,6 +34,8 @@
 
 namespace Spine
 {
+    RTTI_IMPL_NOPARENT(Attachment);
+    
     Attachment::Attachment(std::string name) : _name(name)
     {
         assert(_name.length() > 0);
@@ -43,6 +45,4 @@ namespace Spine
     {
         return _name;
     }
-    
-    RTTI_IMPL_NOPARENT(Attachment);
 }

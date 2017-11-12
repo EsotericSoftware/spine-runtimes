@@ -72,11 +72,13 @@ namespace Spine
         int getWorldVerticesLength();
         void setWorldVerticesLength(int inValue);
         
-    private:
-        const int _id;
+    protected:
         Vector<int> _bones;
         Vector<float> _vertices;
         int _worldVerticesLength;
+        
+    private:
+        const int _id;
         
         static int getNextID();
     };

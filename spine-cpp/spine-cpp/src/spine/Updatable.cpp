@@ -32,6 +32,8 @@
 
 namespace Spine
 {
+    RTTI_IMPL_NOPARENT(Updatable);
+    
     Updatable::Updatable()
     {
         // Empty
@@ -41,6 +43,4 @@ namespace Spine
     {
         // Empty
     }
-    
-    RTTI_IMPL_NOPARENT(Updatable);
 }

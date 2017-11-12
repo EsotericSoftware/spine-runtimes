@@ -35,6 +35,8 @@
 
 #include <spine/Vector.h>
 
+#include <string>
+
 namespace Spine
 {
     /// Attachment that displays a texture region using a mesh.
@@ -43,92 +45,88 @@ namespace Spine
         RTTI_DECL;
         
     public:
-//        int HullLength { get { return _hulllength; } set { _hulllength = value; } }
-//        Vector<float>& RegionUVs { get { return _regionUVs; } set { _regionUVs = value; } }
-//        /// The UV pair for each vertex, normalized within the entire texture. <seealso cref="MeshAttachment.updateUVs"/>
-//        Vector<float>& UVs { get { return _uvs; } set { _uvs = value; } }
-//        Vector<int>& Triangles { get { return _triangles; } set { _triangles = value; } }
-//
-//        float R { get { return r; } set { r = value; } }
-//        float G { get { return g; } set { g = value; } }
-//        float B { get { return b; } set { b = value; } }
-//        float A { get { return a; } set { a = value; } }
-//
-//        std::string Path { get; set; }
-//        void* RendererObject; //Object RendererObject { get; set; }
-//        float RegionU { get; set; }
-//        float RegionV { get; set; }
-//        float RegionU2 { get; set; }
-//        float RegionV2 { get; set; }
-//        bool RegionRotate { get; set; }
-//        float RegionOffsetX { get { return _regionOffsetX; } set { _regionOffsetX = value; } }
-//        float RegionOffsetY { get { return _regionOffsetY; } set { _regionOffsetY = value; } } // Pixels stripped from the bottom left, unrotated.
-//        float RegionWidth { get { return _regionWidth; } set { _regionWidth = value; } }
-//        float RegionHeight { get { return _regionHeight; } set { _regionHeight = value; } } // Unrotated, stripped size.
-//        float RegionOriginalWidth { get { return _regionOriginalWidth; } set { _regionOriginalWidth = value; } }
-//        float RegionOriginalHeight { get { return _regionOriginalHeight; } set { _regionOriginalHeight = value; } } // Unrotated, unstripped size.
-//
-//        bool InheritDeform { get { return _inheritDeform; } set { _inheritDeform = value; } }
-//
-//        MeshAttachment ParentMesh {
-//            get { return _parentMesh; }
-//            set {
-//                _parentMesh = value;
-//                if (value != null) {
-//                    bones = value.bones;
-//                    vertices = value.vertices;
-//                    worldVerticesLength = value.worldVerticesLength;
-//                    _regionUVs = value._regionUVs;
-//                    _triangles = value._triangles;
-//                    HullLength = value.HullLength;
-//                    Edges = value.Edges;
-//                    Width = value.Width;
-//                    Height = value.Height;
-//                }
-//            }
-//        }
-//
-//        // Nonessential.
-//        Vector<int>& Edges { get; set; }
-//        float Width { get; set; }
-//        float Height { get; set; }
+        MeshAttachment(std::string name);
 
-        MeshAttachment(std::string name) : VertexAttachment(name)
-        {
-            // Empty
-        }
+        void updateUVs();
 
-//        void updateUVs()
-//        {
-//            float u = RegionU, v = RegionV, width = RegionU2 - RegionU, height = RegionV2 - RegionV;
-//            if (_uvs == null || _uvs.Length != _regionUVs.Length)
-//            {
-//                _uvs = new float[_regionUVs.Length];
-//            }
-//
-//            Vector<float> _uvs = _uvs;
-//            if (_regionRotate)
-//            {
-//                for (int i = 0, n = _uvs.Length; i < n; i += 2)
-//                {
-//                    _uvs[i] = u + _regionUVs[i + 1] * width;
-//                    _uvs[i + 1] = v + height - _regionUVs[i] * height;
-//                }
-//            }
-//            else
-//            {
-//                for (int i = 0, n = _uvs.Length; i < n; i += 2)
-//                {
-//                    _uvs[i] = u + _regionUVs[i] * width;
-//                    _uvs[i + 1] = v + _regionUVs[i + 1] * height;
-//                }
-//            }
-//        }
-
-        virtual bool applyDeform(VertexAttachment* sourceAttachment)
-        {
-            return this == sourceAttachment || (_inheritDeform && _parentMesh == sourceAttachment);
-        }
+        virtual bool applyDeform(VertexAttachment* sourceAttachment);
+        
+        int getHullLength();
+        void setHullLength(float inValue);
+        
+        Vector<float>& getRegionUVs();
+        void setRegionUVs(Vector<float>& inValue);
+        
+        /// The UV pair for each vertex, normalized within the entire texture. See also MeshAttachment::updateUVs
+        Vector<float>& getUVs();
+        void setUVs(Vector<float>& inValue);
+        
+        Vector<int>& getTriangles();
+        void setTriangles(Vector<int>& inValue);
+        
+        float getR();
+        void setR(float inValue);
+        float getG();
+        void setG(float inValue);
+        float getB();
+        void setB(float inValue);
+        float getA();
+        void setA(float inValue);
+        
+        std::string getPath();
+        void setPath(std::string inValue);
+        void* getRendererObject();
+        void setRendererObject(void* inValue);
+        
+        float getRegionU();
+        void setRegionU(float inValue);
+        
+        float getRegionV();
+        void setRegionV(float inValue);
+        
+        float getRegionU2();
+        void setRegionU2(float inValue);
+        
+        float getRegionV2();
+        void setRegionV2(float inValue);
+        
+        bool getRegionRotate();
+        void setRegionRotate(float inValue);
+        
+        float getRegionOffsetX();
+        void setRegionOffsetX(float inValue);
+        
+        // Pixels stripped from the bottom left, unrotated.
+        float getRegionOffsetY();
+        void setRegionOffsetY(float inValue);
+        
+        float getRegionWidth();
+        void setRegionWidth(float inValue);
+        
+        // Unrotated, stripped size.
+        float getRegionHeight();
+        void setRegionHeight(float inValue);
+        
+        float getRegionOriginalWidth();
+        void setRegionOriginalWidth(float inValue);
+        
+        // Unrotated, unstripped size.
+        float getRegionOriginalHeight();
+        void setRegionOriginalHeight(float inValue);
+        
+        bool getInheritDeform();
+        void setInheritDeform(bool inValue);
+        
+        MeshAttachment* getParentMesh();
+        void setParentMesh(MeshAttachment* inValue);
+        
+        // Nonessential.
+        Vector<int>& getEdges();
+        void setEdges(Vector<int>& inValue);
+        float getWidth();
+        void setWidth(float inValue);
+        float getHeight();
+        void setHeight(float inValue);
 
     private:
         float _regionOffsetX, _regionOffsetY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight;
@@ -137,8 +135,16 @@ namespace Spine
         Vector<float> _regionUVs;
         Vector<int> _triangles;
         Vector<int> _edges;
-        float _r = 1, _g = 1, _b = 1, _a = 1;
-        int _hulllength;
+        void* _rendererObject;
+        std::string _path;
+        float _regionU;
+        float _regionV;
+        float _regionU2;
+        float _regionV2;
+        float _width;
+        float _height;
+        float _r, _g, _b, _a;
+        int _hullLength;
         bool _inheritDeform;
         bool _regionRotate;
     };

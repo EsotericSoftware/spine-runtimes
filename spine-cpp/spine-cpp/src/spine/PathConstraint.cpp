@@ -45,6 +45,8 @@
 
 namespace Spine
 {
+    RTTI_IMPL(PathConstraint, Constraint);
+    
     const float PathConstraint::EPSILON = 0.00001f;
     const int PathConstraint::NONE = -1;
     const int PathConstraint::BEFORE = -2;
@@ -645,6 +647,4 @@ namespace Spine
             output[o + 2] = (float)atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
         }
     }
-    
-    RTTI_IMPL(PathConstraint, Constraint);
 }

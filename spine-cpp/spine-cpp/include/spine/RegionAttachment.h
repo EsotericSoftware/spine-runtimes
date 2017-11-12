@@ -34,9 +34,8 @@
 #include <spine/Attachment.h>
 
 #include <spine/Vector.h>
-#include <spine/MathUtil.h>
 
-#include <assert.h>
+#include <string>
 
 #define NUM_UVS 8
 
@@ -50,98 +49,68 @@ namespace Spine
         RTTI_DECL;
         
     public:
-//        float X { get { return x; } set { x = value; } }
-//        float Y { get { return y; } set { y = value; } }
-//        float Rotation { get { return _rotation; } set { _rotation = value; } }
-//        float ScaleX { get { return scaleX; } set { scaleX = value; } }
-//        float ScaleY { get { return scaleY; } set { scaleY = value; } }
-//        float Width { get { return width; } set { width = value; } }
-//        float Height { get { return height; } set { height = value; } }
-//        
-//        float R { get { return r; } set { r = value; } }
-//        float G { get { return g; } set { g = value; } }
-//        float B { get { return b; } set { b = value; } }
-//        float A { get { return a; } set { a = value; } }
-//        
-//        std::string Path { get; set; }
-//        void* RendererObject; //object RendererObject { get; set; }
-//        float RegionOffsetX { get { return _regionOffsetX; } set { _regionOffsetX = value; } }
-//        float RegionOffsetY { get { return _regionOffsetY; } set { _regionOffsetY = value; } } // Pixels stripped from the bottom left, unrotated.
-//        float RegionWidth { get { return _regionWidth; } set { _regionWidth = value; } }
-//        float RegionHeight { get { return _regionHeight; } set { _regionHeight = value; } } // Unrotated, stripped size.
-//        float RegionOriginalWidth { get { return _regionOriginalWidth; } set { _regionOriginalWidth = value; } }
-//        float RegionOriginalHeight { get { return _regionOriginalHeight; } set { _regionOriginalHeight = value; } } // Unrotated, unstripped size.
-//        
-//        Vector<float>& Offset { get { return _offset; } }
-//        Vector<float>& UVs { get { return _uvs; } }
-//        
-        RegionAttachment(std::string name) : Attachment(name)
-        {
-            _offset.reserve(NUM_UVS);
-            _uvs.reserve(NUM_UVS);
-        }
-//
-//        void updateOffset()
-//        {
-//            float regionScaleX = _width / _regionOriginalWidth * _scaleX;
-//            float regionScaleY = _height / _regionOriginalHeight * _scaleY;
-//            float localX = -_width / 2 * _scaleX + _regionOffsetX * regionScaleX;
-//            float localY = -_height / 2 * _scaleY + _regionOffsetY * regionScaleY;
-//            float localX2 = localX + _regionWidth * regionScaleX;
-//            float localY2 = localY + _regionHeight * regionScaleY;
-//            float cos = MathUtil::cosDeg(_rotation);
-//            float sin = MathUtil::sinDeg(_rotation);
-//            float localXCos = localX * cos + _x;
-//            float localXSin = localX * sin;
-//            float localYCos = localY * cos + _y;
-//            float localYSin = localY * sin;
-//            float localX2Cos = localX2 * cos + _x;
-//            float localX2Sin = localX2 * sin;
-//            float localY2Cos = localY2 * cos + _y;
-//            float localY2Sin = localY2 * sin;
-//            
-//            _offset[BLX] = localXCos - localYSin;
-//            _offset[BLY] = localYCos + localXSin;
-//            _offset[ULX] = localXCos - localY2Sin;
-//            _offset[ULY] = localY2Cos + localXSin;
-//            _offset[URX] = localX2Cos - localY2Sin;
-//            _offset[URY] = localY2Cos + localX2Sin;
-//            _offset[BRX] = localX2Cos - localYSin;
-//            _offset[BRY] = localYCos + localX2Sin;
-//        }
-//        
-//        void setUVs(float u, float v, float u2, float v2, bool rotate)
-//        {
-//            if (rotate)
-//            {
-//                _uvs[URX] = u;
-//                _uvs[URY] = v2;
-//                _uvs[BRX] = u;
-//                _uvs[BRY] = v;
-//                _uvs[BLX] = u2;
-//                _uvs[BLY] = v;
-//                _uvs[ULX] = u2;
-//                _uvs[ULY] = v2;
-//            }
-//            else
-//            {
-//                _uvs[ULX] = u;
-//                _uvs[ULY] = v2;
-//                _uvs[URX] = u;
-//                _uvs[URY] = v;
-//                _uvs[BRX] = u2;
-//                _uvs[BRY] = v;
-//                _uvs[BLX] = u2;
-//                _uvs[BLY] = v2;
-//            }
-//        }
-//        
+        RegionAttachment(std::string name);
+
+        void updateOffset();
+        
+        void setUVs(float u, float v, float u2, float v2, bool rotate);
+        
         /// Transforms the attachment's four vertices to world coordinates.
         /// @param bone The parent bone.
         /// @param worldVertices The output world vertices. Must have a length greater than or equal to offset + 8.
         /// @param offset The worldVertices index to begin writing values.
         /// @param stride The number of worldVertices entries between the value pairs written.
         void computeWorldVertices(Bone& bone, Vector<float>& worldVertices, int offset, int stride = 2);
+        
+        float getX();
+        void setX(float inValue);
+        float getY();
+        void setY(float inValue);
+        float getRotation();
+        void setRotation(float inValue);
+        float getScaleX();
+        void setScaleX(float inValue);
+        float getScaleY();
+        void setScaleY(float inValue);
+        float getWidth();
+        void setWidth(float inValue);
+        float getHeight();
+        void setHeight(float inValue);
+        
+        float getR();
+        void setR(float inValue);
+        float getG();
+        void setG(float inValue);
+        float getB();
+        void setB(float inValue);
+        float getA();
+        void setA(float inValue);
+        
+        std::string getPath();
+        void setPath(std::string inValue);
+        void* getRendererObject();
+        void setRendererObject(void* inValue);
+        float getRegionOffsetX();
+        void setRegionOffsetX(float inValue);
+        
+        // Pixels stripped from the bottom left, unrotated.
+        float getRegionOffsetY();
+        void setRegionOffsetY(float inValue);
+        float getRegionWidth();
+        void setRegionWidth(float inValue);
+        
+        // Unrotated, stripped size.
+        float getRegionHeight();
+        void setRegionHeight(float inValue);
+        float getRegionOriginalWidth();
+        void setRegionOriginalWidth(float inValue);
+        
+        // Unrotated, unstripped size.
+        float getRegionOriginalHeight();
+        void setRegionOriginalHeight(float inValue);
+        
+        Vector<float>& getOffset();
+        Vector<float>& getUVs();
         
     private:
         static const int BLX;
@@ -157,7 +126,13 @@ namespace Spine
         float _regionOffsetX, _regionOffsetY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight;
         Vector<float> _offset;
         Vector<float> _uvs;
-        float r = 1, g = 1, b = 1, a = 1;
+        void* _rendererObject;
+        std::string _path;
+        float _regionU;
+        float _regionV;
+        float _regionU2;
+        float _regionV2;
+        float _r, _g, _b, _a;
     };
 }
 

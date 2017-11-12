@@ -40,6 +40,8 @@
 
 namespace Spine
 {
+    RTTI_IMPL(RotateTimeline, CurveTimeline);
+    
     RotateTimeline::RotateTimeline(int frameCount) : CurveTimeline(frameCount), _boneIndex(0)
     {
         _frames.reserve(frameCount << 1);
@@ -147,6 +149,4 @@ namespace Spine
     {
         _frames = inValue;
     }
-    
-    RTTI_IMPL(RotateTimeline, CurveTimeline);
 }
