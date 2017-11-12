@@ -28,57 +28,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Animation_h
-#define Spine_Animation_h
+#ifndef Spine_PointAttachment_h
+#define Spine_PointAttachment_h
 
-#include <spine/Vector.h>
-#include <spine/MixPose.h>
-#include <spine/MixDirection.h>
-
-#include <string>
+#include <spine/Attachment.h>
 
 namespace Spine
 {
-    class Timeline;
-    class Skeleton;
-    class Event;
+    class Bone;
     
-    class Animation
+    /// 
+    /// An attachment which is a single point and a rotation. This can be used to spawn projectiles, particles, etc. A bone can be
+    /// used in similar ways, but a PointAttachment is slightly less expensive to compute and can be hidden, shown, and placed in a
+    /// skin.
+    ///
+    /// See http://esotericsoftware.com/spine-point-attachments for Point Attachments in the Spine User Guide.
+    /// 
+    class PointAttachment : public Attachment
     {
-        friend class RotateTimeline;
-        friend class TranslateTimeline;
-        friend class AnimationStateData;
+        RTTI_DECL;
         
-    public:
-        Animation(std::string name, Vector<Timeline*>& timelines, float duration);
+        PointAttachment(std::string name);
         
-        /// Applies all the animation's timelines to the specified skeleton.
-        /// See also Timeline::apply(Skeleton&, float, float, Vector, float, MixPose, MixDirection)
-        void apply(Skeleton& skeleton, float lastTime, float time, bool loop, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
+        void computeWorldPosition(Bone& bone, float& ox, float& oy);
         
-        std::string getName();
+        float computeWorldRotation(Bone& bone);
         
-        Vector<Timeline*> getTimelines();
+        float getX();
+        void setX(float inValue);
         
-        void setTimelines(Vector<Timeline*> inValue);
+        float getY();
+        void setY(float inValue);
         
-        float getDuration();
-        
-        void setDuration(float inValue);
+        float getRotation();
+        void setRotation(float inValue);
         
     private:
-        Vector<Timeline*> _timelines;
-        float _duration;
-        std::string _name;
-        
-        /// @param target After the first and before the last entry.
-        static int binarySearch(Vector<float>& values, float target, int step);
-        
-        /// @param target After the first and before the last entry.
-        static int binarySearch(Vector<float>& values, float target);
-        
-        static int linearSearch(Vector<float>& values, float target, int step);
-    };
+        float _x, _y, _rotation;
+    }
 }
 
-#endif /* Spine_Animation_h */
+#endif /* Spine_PointAttachment_h */

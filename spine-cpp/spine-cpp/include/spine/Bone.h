@@ -56,6 +56,7 @@ namespace Spine
         friend class PathConstraint;
         friend class Skeleton;
         friend class RegionAttachment;
+        friend class PointAttachment;
         
     public:
         static void setYDown(bool inValue);

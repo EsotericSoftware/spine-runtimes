@@ -28,57 +28,43 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Animation_h
-#define Spine_Animation_h
+#ifndef Spine_AttachmentLoader_h
+#define Spine_AttachmentLoader_h
 
-#include <spine/Vector.h>
-#include <spine/MixPose.h>
-#include <spine/MixDirection.h>
+#include <spine/RTTI.h>
 
 #include <string>
 
 namespace Spine
 {
-    class Timeline;
-    class Skeleton;
-    class Event;
+    class RegionAttachment;
+    class MeshAttachment;
+    class BoundingBoxAttachment;
+    class PathAttachment;
+    class PointAttachment;
+    class ClippingAttachment;
+    class Skin;
     
-    class Animation
+    class AttachmentLoader
     {
-        friend class RotateTimeline;
-        friend class TranslateTimeline;
-        friend class AnimationStateData;
+        RTTI_DECL;
         
-    public:
-        Animation(std::string name, Vector<Timeline*>& timelines, float duration);
+        /// @return May be NULL to not load any attachment.
+        virtual RegionAttachment* newRegionAttachment(Skin& skin, std::string name, std::string path) = 0;
         
-        /// Applies all the animation's timelines to the specified skeleton.
-        /// See also Timeline::apply(Skeleton&, float, float, Vector, float, MixPose, MixDirection)
-        void apply(Skeleton& skeleton, float lastTime, float time, bool loop, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
+        /// @return May be NULL to not load any attachment.
+        virtual MeshAttachment* newMeshAttachment(Skin& skin, std::string name, std::string path) = 0;
         
-        std::string getName();
+        /// @return May be NULL to not load any attachment.
+        virtual BoundingBoxAttachment* NewBoundingBoxAttachment(Skin& skin, std::string name) = 0;
         
-        Vector<Timeline*> getTimelines();
+        /// @return May be NULL to not load any attachment
+        virtual PathAttachment* newPathAttachment(Skin& skin, std::string name) = 0;
         
-        void setTimelines(Vector<Timeline*> inValue);
+        virtual PointAttachment* newPointAttachment(Skin& skin, std::string name) = 0;
         
-        float getDuration();
-        
-        void setDuration(float inValue);
-        
-    private:
-        Vector<Timeline*> _timelines;
-        float _duration;
-        std::string _name;
-        
-        /// @param target After the first and before the last entry.
-        static int binarySearch(Vector<float>& values, float target, int step);
-        
-        /// @param target After the first and before the last entry.
-        static int binarySearch(Vector<float>& values, float target);
-        
-        static int linearSearch(Vector<float>& values, float target, int step);
-    };
+        virtual ClippingAttachment* newClippingAttachment(Skin& skin, std::string name) = 0;
+    }
 }
 
-#endif /* Spine_Animation_h */
+#endif /* Spine_AttachmentLoader_h */

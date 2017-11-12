@@ -61,19 +61,7 @@ namespace Spine
         
         struct HashAttachmentKey
         {
-            std::size_t operator()(const Spine::Skin::AttachmentKey& val) const
-            {
-                std::size_t h1 = val._slotIndex;
-                
-                std::size_t h2 = 7;
-                size_t strlen = val._name.length();
-                for (int i = 0; i < strlen; ++i)
-                {
-                    h2 = h2 * 31 + val._name.at(i);
-                }
-                
-                return h1 ^ (h2 << 1);
-            }
+            std::size_t operator()(const Spine::Skin::AttachmentKey& val) const;
         };
         
         Skin(std::string name);

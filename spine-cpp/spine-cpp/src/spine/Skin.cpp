@@ -51,6 +51,13 @@ namespace Spine
         return _slotIndex == other._slotIndex && _name == other._name;
     }
     
+    std::size_t Skin::HashAttachmentKey::operator()(const Spine::Skin::AttachmentKey& val) const
+    {
+        std::size_t h1 = val._slotIndex;
+        
+        return h1;
+    }
+    
     Skin::Skin(std::string name) : _name(name)
     {
         assert(_name.length() > 0);

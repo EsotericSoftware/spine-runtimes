@@ -28,57 +28,28 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Animation_h
-#define Spine_Animation_h
+#ifndef Spine_ClippingAttachment_h
+#define Spine_ClippingAttachment_h
 
-#include <spine/Vector.h>
-#include <spine/MixPose.h>
-#include <spine/MixDirection.h>
-
-#include <string>
+#include <spine/VertexAttachment.h>
 
 namespace Spine
 {
-    class Timeline;
-    class Skeleton;
-    class Event;
+    class SlotData;
     
-    class Animation
+    class ClippingAttachment : public VertexAttachment
     {
-        friend class RotateTimeline;
-        friend class TranslateTimeline;
-        friend class AnimationStateData;
+        RTTI_DECL;
         
     public:
-        Animation(std::string name, Vector<Timeline*>& timelines, float duration);
+        ClippingAttachment(std::string name);
         
-        /// Applies all the animation's timelines to the specified skeleton.
-        /// See also Timeline::apply(Skeleton&, float, float, Vector, float, MixPose, MixDirection)
-        void apply(Skeleton& skeleton, float lastTime, float time, bool loop, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
-        
-        std::string getName();
-        
-        Vector<Timeline*> getTimelines();
-        
-        void setTimelines(Vector<Timeline*> inValue);
-        
-        float getDuration();
-        
-        void setDuration(float inValue);
+        SlotData* getEndSlot();
+        void setEndSlot(SlotData* inValue);
         
     private:
-        Vector<Timeline*> _timelines;
-        float _duration;
-        std::string _name;
-        
-        /// @param target After the first and before the last entry.
-        static int binarySearch(Vector<float>& values, float target, int step);
-        
-        /// @param target After the first and before the last entry.
-        static int binarySearch(Vector<float>& values, float target);
-        
-        static int linearSearch(Vector<float>& values, float target, int step);
+        SlotData* _endSlot;
     };
 }
 
-#endif /* Spine_Animation_h */
+#endif /* Spine_ClippingAttachment_h */

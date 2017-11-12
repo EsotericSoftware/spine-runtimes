@@ -153,7 +153,7 @@ namespace Spine
             
             Entry* entry = new Entry();
             entry->_key = key;
-            entry->_value = value;
+            entry->_value = inValue;
             
             _hashSize++;
             

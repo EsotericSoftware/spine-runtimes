@@ -28,57 +28,66 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Animation_h
-#define Spine_Animation_h
+#ifndef Spine_AnimationStateData_h
+#define Spine_AnimationStateData_h
 
-#include <spine/Vector.h>
-#include <spine/MixPose.h>
-#include <spine/MixDirection.h>
+#include <spine/HashMap.h>
 
+#include <assert.h>
 #include <string>
 
 namespace Spine
 {
-    class Timeline;
-    class Skeleton;
-    class Event;
+    class SkeletonData;
+    class Animation;
     
-    class Animation
+    /// Stores mix (crossfade) durations to be applied when AnimationState animations are changed.
+    class AnimationStateData
     {
-        friend class RotateTimeline;
-        friend class TranslateTimeline;
-        friend class AnimationStateData;
-        
     public:
-        Animation(std::string name, Vector<Timeline*>& timelines, float duration);
+        /// The SkeletonData to look up animations when they are specified by name.
+        SkeletonData& getSkeletonData();
         
-        /// Applies all the animation's timelines to the specified skeleton.
-        /// See also Timeline::apply(Skeleton&, float, float, Vector, float, MixPose, MixDirection)
-        void apply(Skeleton& skeleton, float lastTime, float time, bool loop, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
+        /// The mix duration to use when no mix duration has been specifically defined between two animations.
+        float getDefaultMix();
+        void setDefaultMix(float inValue);
         
-        std::string getName();
+        AnimationStateData(SkeletonData& skeletonData);
         
-        Vector<Timeline*> getTimelines();
+        /// Sets a mix duration by animation names.
+        void setMix(std::string fromName, std::string toName, float duration);
         
-        void setTimelines(Vector<Timeline*> inValue);
+        /// Sets a mix duration when changing from the specified animation to the other.
+        /// See TrackEntry.MixDuration.
+        void setMix(Animation& from, Animation& to, float duration);
         
-        float getDuration();
-        
-        void setDuration(float inValue);
+        ///
+        /// The mix duration to use when changing from the specified animation to the other,
+        /// or the DefaultMix if no mix duration has been set.
+        ///
+        float getMix(Animation& from, Animation& to);
         
     private:
-        Vector<Timeline*> _timelines;
-        float _duration;
-        std::string _name;
+        class AnimationPair
+        {
+        public:
+            Animation& _a1;
+            Animation& _a2;
+            
+            AnimationPair(Animation& a1, Animation& a2);
+            
+            bool operator==(const AnimationPair &other) const;
+        };
         
-        /// @param target After the first and before the last entry.
-        static int binarySearch(Vector<float>& values, float target, int step);
+        struct HashAnimationPair
+        {
+            std::size_t operator()(const Spine::AnimationStateData::AnimationPair& val) const;
+        };
         
-        /// @param target After the first and before the last entry.
-        static int binarySearch(Vector<float>& values, float target);
-        
-        static int linearSearch(Vector<float>& values, float target, int step);
+        SkeletonData& _skeletonData;
+        float _defaultMix;
+        HashMap<AnimationPair, float, HashAnimationPair> _animationToMixTime;
     };
 }
 
-#endif /* Spine_Animation_h */
+#endif /* Spine_AnimationStateData_h */

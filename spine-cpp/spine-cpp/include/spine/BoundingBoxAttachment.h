@@ -28,57 +28,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Animation_h
-#define Spine_Animation_h
+#ifndef Spine_BoundingBoxAttachment_h
+#define Spine_BoundingBoxAttachment_h
 
-#include <spine/Vector.h>
-#include <spine/MixPose.h>
-#include <spine/MixDirection.h>
-
-#include <string>
+#include <spine/VertexAttachment.h>
 
 namespace Spine
 {
-    class Timeline;
-    class Skeleton;
-    class Event;
-    
-    class Animation
+    /// Attachment that has a polygon for bounds checking.
+    class BoundingBoxAttachment : public VertexAttachment
     {
-        friend class RotateTimeline;
-        friend class TranslateTimeline;
-        friend class AnimationStateData;
+        RTTI_DECL;
         
-    public:
-        Animation(std::string name, Vector<Timeline*>& timelines, float duration);
-        
-        /// Applies all the animation's timelines to the specified skeleton.
-        /// See also Timeline::apply(Skeleton&, float, float, Vector, float, MixPose, MixDirection)
-        void apply(Skeleton& skeleton, float lastTime, float time, bool loop, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
-        
-        std::string getName();
-        
-        Vector<Timeline*> getTimelines();
-        
-        void setTimelines(Vector<Timeline*> inValue);
-        
-        float getDuration();
-        
-        void setDuration(float inValue);
-        
-    private:
-        Vector<Timeline*> _timelines;
-        float _duration;
-        std::string _name;
-        
-        /// @param target After the first and before the last entry.
-        static int binarySearch(Vector<float>& values, float target, int step);
-        
-        /// @param target After the first and before the last entry.
-        static int binarySearch(Vector<float>& values, float target);
-        
-        static int linearSearch(Vector<float>& values, float target, int step);
+        BoundingBoxAttachment(std::string name);
     };
 }
 
-#endif /* Spine_Animation_h */
+#endif /* Spine_BoundingBoxAttachment_h */

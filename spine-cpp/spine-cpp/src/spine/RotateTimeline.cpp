@@ -122,7 +122,6 @@ namespace Spine
         return ((int)TimelineType_Rotate << 24) + _boneIndex;
     }
     
-    /// Sets the time and value of the specified keyframe.
     void RotateTimeline::setFrame(int frameIndex, float time, float degrees)
     {
         frameIndex <<= 1;

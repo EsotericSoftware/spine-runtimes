@@ -28,57 +28,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Animation_h
-#define Spine_Animation_h
-
-#include <spine/Vector.h>
-#include <spine/MixPose.h>
-#include <spine/MixDirection.h>
-
-#include <string>
+#ifndef Spine_AttachmentType_h
+#define Spine_AttachmentType_h
 
 namespace Spine
 {
-    class Timeline;
-    class Skeleton;
-    class Event;
-    
-    class Animation
+    enum AttachmentType
     {
-        friend class RotateTimeline;
-        friend class TranslateTimeline;
-        friend class AnimationStateData;
-        
-    public:
-        Animation(std::string name, Vector<Timeline*>& timelines, float duration);
-        
-        /// Applies all the animation's timelines to the specified skeleton.
-        /// See also Timeline::apply(Skeleton&, float, float, Vector, float, MixPose, MixDirection)
-        void apply(Skeleton& skeleton, float lastTime, float time, bool loop, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
-        
-        std::string getName();
-        
-        Vector<Timeline*> getTimelines();
-        
-        void setTimelines(Vector<Timeline*> inValue);
-        
-        float getDuration();
-        
-        void setDuration(float inValue);
-        
-    private:
-        Vector<Timeline*> _timelines;
-        float _duration;
-        std::string _name;
-        
-        /// @param target After the first and before the last entry.
-        static int binarySearch(Vector<float>& values, float target, int step);
-        
-        /// @param target After the first and before the last entry.
-        static int binarySearch(Vector<float>& values, float target);
-        
-        static int linearSearch(Vector<float>& values, float target, int step);
+        AttachmentType_Region,
+        AttachmentType_Boundingbox,
+        AttachmentType_Mesh,
+        AttachmentType_Linkedmesh,
+        AttachmentType_Path,
+        AttachmentType_Point,
+        AttachmentType_Clipping
     };
 }
 
-#endif /* Spine_Animation_h */
+#endif /* Spine_AttachmentType_h */
