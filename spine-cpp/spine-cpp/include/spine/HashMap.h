@@ -31,8 +31,7 @@
 #ifndef Spine_HashMap_h
 #define Spine_HashMap_h
 
-#include <iostream>
-#include <string>
+#include <memory>
 
 namespace Spine
 {
@@ -153,7 +152,7 @@ namespace Spine
             
             Entry* entry = new Entry();
             entry->_key = key;
-            entry->_value = inValue;
+            entry->_value = value;
             
             _hashSize++;
             
