@@ -46,10 +46,8 @@ namespace Spine
             // Empty
         }
         
-        Vector(const Vector& inArray)
+        Vector(const Vector& inArray) : _size(inArray._size), _capacity(inArray._capacity), _buffer(NULL)
         {
-            _size = inArray._size;
-            _capacity = inArray._capacity;
             if (_capacity > 0)
             {
                 _buffer = allocate(_capacity);
