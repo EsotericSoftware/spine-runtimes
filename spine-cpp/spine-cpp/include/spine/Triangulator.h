@@ -32,6 +32,7 @@
 #define Spine_Triangulator_h
 
 #include <spine/Vector.h>
+#include <spine/Pool.h>
 
 namespace Spine
 {
@@ -305,15 +306,15 @@ namespace Spine
         }
         
     private:
-        Vector<Vector<float>> convexPolygons;
-        Vector<Vector<int>> convexPolygonsIndices;
+        Vector<Vector<float>> _convexPolygons;
+        Vector<Vector<int>> _convexPolygonsIndices;
         
-        Vector<int> indicesArray;
-        Vector<bool> isConcaveArray;
-        Vector<int> triangles;
+        Vector<int> _indicesArray;
+        Vector<bool> _isConcaveArray;
+        Vector<int> _triangles;
         
-        Pool<Vector<float>> polygonPool;
-        Pool<Vector<int>> polygonIndicesPool;
+        Pool<Vector<float>> _polygonPool;
+        Pool<Vector<int>> _polygonIndicesPool;
         
         static bool isConcave(int index, int vertexCount, Vector<float> vertices, Vector<int> indices)
         {
