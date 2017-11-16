@@ -33,8 +33,12 @@
 
 #include <spine/AttachmentLoader.h>
 
+#include <spine/Vector.h>
+
 namespace Spine
 {
+    class Atlas;
+    
     ///
     /// An AttachmentLoader that configures attachments using texture regions from an Atlas.
     /// See http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data about Loading Skeleton Data in the Spine Runtimes Guide.
@@ -44,16 +48,12 @@ namespace Spine
         RTTI_DECL;
         
     public:
-    private:
-        Vector<Atlas> atlasArray;
-        
-        public AtlasAttachmentLoader (params Atlas[] atlasArray)
+        AtlasAttachmentLoader (Vector<Atlas*>& inAtlasArray) : _atlasArray(inAtlasArray)
         {
-            if (atlasArray == NULL) throw new ArgumentNullException("atlas array cannot be NULL.");
-            _atlasArray = atlasArray;
+            // Empty
         }
         
-        public RegionAttachment newRegionAttachment(Skin skin, std::string name, std::string path)
+        RegionAttachment newRegionAttachment(Skin skin, std::string name, std::string path)
         {
             AtlasRegion* region = findRegion(path);
             if (region == NULL) throw new ArgumentException(std::string.Format("Region not found in atlas: {0} (region attachment: {1})", path, name));
@@ -69,7 +69,7 @@ namespace Spine
             return attachment;
         }
         
-        public MeshAttachment newMeshAttachment(Skin skin, std::string name, std::string path)
+        MeshAttachment newMeshAttachment(Skin skin, std::string name, std::string path)
         {
             AtlasRegion region = findRegion(path);
             if (region == NULL) throw new ArgumentException(std::string.Format("Region not found in atlas: {0} (region attachment: {1})", path, name));
@@ -91,41 +91,44 @@ namespace Spine
             return attachment;
         }
         
-        public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, std::string name)
+        BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, std::string name)
         {
             return new BoundingBoxAttachment(name);
         }
         
-        public PathAttachment newPathAttachment(Skin skin, std::string name)
+        PathAttachment newPathAttachment(Skin skin, std::string name)
         {
             return new PathAttachment(name);
         }
         
-        public PointAttachment newPointAttachment(Skin skin, std::string name)
+        PointAttachment newPointAttachment(Skin skin, std::string name)
         {
             return new PointAttachment(name);
         }
         
-        public ClippingAttachment newClippingAttachment(Skin skin, std::string name)
+        ClippingAttachment newClippingAttachment(Skin skin, std::string name)
         {
             return new ClippingAttachment(name);
         }
         
-        public AtlasRegion findRegion (std::string name)
+        AtlasRegion* findRegion(std::string name)
         {
-            AtlasRegion region;
+            AtlasRegion* ret;
             
-            for (int i = 0; i < atlasArray.Length; i++)
+            for (int i = 0; i < _atlasArray.size(); i++)
             {
-                region = atlasArray[i].findRegion(name);
-                if (region != NULL)
+                ret = _atlasArray[i]->findRegion(name);
+                if (ret != NULL)
                 {
-                    return region;
+                    return ret;
                 }
             }
             
             return NULL;
         }
+        
+    private:
+        Vector<Atlas*> _atlasArray;
     }
 }
 

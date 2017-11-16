@@ -28,38 +28,80 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Triangulator_h
-#define Spine_Triangulator_h
+#ifndef Spine_Atlas_h
+#define Spine_Atlas_h
 
 #include <spine/Vector.h>
-#include <spine/Pool.h>
+
+#include <string>
 
 namespace Spine
 {
-    class Triangulator
+    enum Format
+    {
+        Format_Alpha,
+        Format_Intensity,
+        Format_LuminanceAlpha,
+        Format_RGB565,
+        Format_RGBA4444,
+        Format_RGB888,
+        Format_RGBA8888
+    };
+    
+    enum TextureFilter
+    {
+        TextureFilter_Nearest,
+        TextureFilter_Linear,
+        TextureFilter_MipMap,
+        TextureFilter_MipMapNearestNearest,
+        TextureFilter_MipMapLinearNearest,
+        TextureFilter_MipMapNearestLinear,
+        TextureFilter_MipMapLinearLinear
+    };
+    
+    enum TextureWrap
+    {
+        TextureWrap_MirroredRepeat,
+        TextureWrap_ClampToEdge,
+        TextureWrap_Repeat
+    };
+    
+    class AtlasPage
     {
     public:
-        Vector<int>& triangulate(Vector<float>& vertices);
-        
-        Vector<Vector<float>* > decompose(Vector<float>& vertices, Vector<int>& triangles);
-        
-    private:
-        Vector<Vector<float>* > _convexPolygons;
-        Vector<Vector<int>* > _convexPolygonsIndices;
-        
-        Vector<int> _indices;
-        Vector<bool> _isConcaveArray;
-        Vector<int> _triangles;
-        
-        Pool<Vector<float> > _polygonPool;
-        Pool<Vector<int> > _polygonIndicesPool;
-        
-        static bool isConcave(int index, int vertexCount, Vector<float>& vertices, Vector<int>& indices);
-        
-        static bool positiveArea(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y);
-        
-        static int winding(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y);
+        std::string name;
+        Format format;
+        TextureFilter minFilter;
+        TextureFilter magFilter;
+        TextureWrap uWrap;
+        TextureWrap vWrap;
+        void* rendererObject;
+        int width, height;
+    };
+    
+    class AtlasRegion
+    {
+    public:
+        AtlasPage page;
+        std::string name;
+        int x, y, width, height;
+        float u, v, u2, v2;
+        float offsetX, offsetY;
+        int originalWidth, originalHeight;
+        int index;
+        bool rotate;
+        Vector<int> splits;
+        Vector<int> pads;
+    };
+    
+    class Atlas
+    {
+    public:
+        /// Returns the first region found with the specified name. This method uses string comparison to find the region, so the result
+        /// should be cached rather than calling this method multiple times.
+        /// @return The region, or NULL.
+        AtlasRegion* findRegion(std::string name);
     };
 }
 
-#endif /* Spine_Triangulator_h */
+#endif /* Spine_Atlas_h */

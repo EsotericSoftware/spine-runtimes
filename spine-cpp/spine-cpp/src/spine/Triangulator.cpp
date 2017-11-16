@@ -34,7 +34,7 @@
 
 namespace Spine
 {
-    Vector<int> Triangulator::triangulate(Vector<float>& vertices)
+    Vector<int>& Triangulator::triangulate(Vector<float>& vertices)
     {
         int vertexCount = static_cast<int>(vertices.size() >> 1);
         
@@ -79,7 +79,7 @@ namespace Spine
                         }
                         
                         int v = indices[ii] << 1;
-                        float vx = vertices[v], vy = vertices[v + 1];
+                        float& vx = vertices[v], vy = vertices[v + 1];
                         if (positiveArea(p3x, p3y, p1x, p1y, vx, vy))
                         {
                             if (positiveArea(p1x, p1y, p2x, p2y, vx, vy))
@@ -117,8 +117,8 @@ namespace Spine
             triangles.push_back(indices[(vertexCount + i - 1) % vertexCount]);
             triangles.push_back(indices[i]);
             triangles.push_back(indices[(i + 1) % vertexCount]);
-            indices.RemoveAt(i);
-            isConcaveArray.RemoveAt(i);
+            indices.erase(i);
+            isConcaveArray.erase(i);
             vertexCount--;
             
             int previousIndex = (vertexCount + i - 1) % vertexCount;
@@ -137,51 +137,52 @@ namespace Spine
         return triangles;
     }
     
-    Vector<Vector<float> > Triangulator::decompose(Vector<float>& vertices, Vector<int>& triangles)
+    Vector<Vector<float>* > Triangulator::decompose(Vector<float>& vertices, Vector<int>& triangles)
     {
-        Vector<Vector<float> >& convexPolygons = _convexPolygons;
-        for (int i = 0, n = convexPolygons.size(); i < n; ++i)
+        Vector<Vector<float>* >&convexPolygons = _convexPolygons;
+        for (size_t i = 0, n = convexPolygons.size(); i < n; ++i)
         {
-            polygonPool.Free(convexPolygons[i]);
+            _polygonPool.free(convexPolygons[i]);
         }
-        convexPolygons.Clear();
+        convexPolygons.clear();
         
-        Vector<Vector<int> >& convexPolygonsIndices = _convexPolygonsIndices;
-        for (int i = 0, n = convexPolygonsIndices.size(); i < n; ++i)
+        Vector<Vector<int>* > convexPolygonsIndices = _convexPolygonsIndices;
+        for (size_t i = 0, n = convexPolygonsIndices.size(); i < n; ++i)
         {
             _polygonIndicesPool.free(convexPolygonsIndices[i]);
         }
         convexPolygonsIndices.clear();
         
-        var polygonIndices = _polygonIndicesPool.Obtain();
-        polygonIndices.Clear();
+        Vector<int>* polygonIndicesP = _polygonIndicesPool.obtain();
+        Vector<int>& polygonIndices = *polygonIndicesP;
+        polygonIndices.clear();
         
-        var polygon = polygonPool.Obtain();
-        polygon.Clear();
+        Vector<float>* polygonP = _polygonPool.obtain();
+        Vector<float>& polygon = *polygonP;
+        polygon.clear();
         
         // Merge subsequent triangles if they form a triangle fan.
         int fanBaseIndex = -1, lastwinding = 0;
-        int[] trianglesItems = triangles.Items;
-        for (int i = 0, n = triangles.Count; i < n; i += 3)
+        for (size_t i = 0, n = triangles.size(); i < n; i += 3)
         {
-            int t1 = trianglesItems[i] << 1, t2 = trianglesItems[i + 1] << 1, t3 = trianglesItems[i + 2] << 1;
+            int t1 = triangles[i] << 1, t2 = triangles[i + 1] << 1, t3 = triangles[i + 2] << 1;
             float x1 = vertices[t1], y1 = vertices[t1 + 1];
             float x2 = vertices[t2], y2 = vertices[t2 + 1];
             float x3 = vertices[t3], y3 = vertices[t3 + 1];
             
             // If the base of the last triangle is the same as this triangle, check if they form a convex polygon (triangle fan).
-            var merged = false;
+            bool merged = false;
             if (fanBaseIndex == t1)
             {
-                int o = polygon.Count - 4;
-                float[] p = polygon.Items;
+                size_t o = polygon.size() - 4;
+                Vector<float>& p = polygon;
                 int winding1 = winding(p[o], p[o + 1], p[o + 2], p[o + 3], x3, y3);
                 int winding2 = winding(x3, y3, p[0], p[1], p[2], p[3]);
                 if (winding1 == lastwinding && winding2 == lastwinding)
                 {
-                    polygon.Add(x3);
-                    polygon.Add(y3);
-                    polygonIndices.Add(t3);
+                    polygon.push_back(x3);
+                    polygon.push_back(y3);
+                    polygonIndices.push_back(t3);
                     merged = true;
                 }
             }
@@ -189,57 +190,59 @@ namespace Spine
             // Otherwise make this triangle the new base.
             if (!merged)
             {
-                if (polygon.Count > 0)
+                if (polygon.size() > 0)
                 {
-                    convexPolygons.Add(polygon);
-                    convexPolygonsIndices.Add(polygonIndices);
+                    convexPolygons.push_back(&polygon);
+                    convexPolygonsIndices.push_back(&polygonIndices);
                 }
                 else
                 {
-                    polygonPool.Free(polygon);
-                    _polygonIndicesPool.Free(polygonIndices);
+                    _polygonPool.free(&polygon);
+                    _polygonIndicesPool.free(&polygonIndices);
                 }
                 
-                polygon = polygonPool.Obtain();
-                polygon.Clear();
-                polygon.Add(x1);
-                polygon.Add(y1);
-                polygon.Add(x2);
-                polygon.Add(y2);
-                polygon.Add(x3);
-                polygon.Add(y3);
-                polygonIndices = _polygonIndicesPool.obtain();
-                polygonIndices.Clear();
-                polygonIndices.Add(t1);
-                polygonIndices.Add(t2);
-                polygonIndices.Add(t3);
+                polygon = *_polygonPool.obtain();
+                polygon.clear();
+                polygon.push_back(x1);
+                polygon.push_back(y1);
+                polygon.push_back(x2);
+                polygon.push_back(y2);
+                polygon.push_back(x3);
+                polygon.push_back(y3);
+                polygonIndices = *_polygonIndicesPool.obtain();
+                polygonIndices.clear();
+                polygonIndices.push_back(t1);
+                polygonIndices.push_back(t2);
+                polygonIndices.push_back(t3);
                 lastwinding = winding(x1, y1, x2, y2, x3, y3);
                 fanBaseIndex = t1;
             }
         }
         
-        if (polygon.Count > 0)
+        if (polygon.size() > 0)
         {
-            convexPolygons.Add(polygon);
-            convexPolygonsIndices.Add(polygonIndices);
+            convexPolygons.push_back(&polygon);
+            convexPolygonsIndices.push_back(&polygonIndices);
         }
         
         // Go through the list of polygons and try to merge the remaining triangles with the found triangle fans.
-        for (int i = 0, n = convexPolygons.Count; i < n; ++i)
+        for (size_t i = 0, n = convexPolygons.size(); i < n; ++i)
         {
-            polygonIndices = convexPolygonsIndices.Items[i];
-            if (polygonIndices.Count == 0) continue;
-            int firstIndex = polygonIndices.Items[0];
-            int lastIndex = polygonIndices.Items[polygonIndices.Count - 1];
+            polygonIndicesP = convexPolygonsIndices[i];
+            polygonIndices = *polygonIndicesP;
             
-            polygon = convexPolygons.Items[i];
-            int o = polygon.Count - 4;
-            float[] p = polygon.Items;
+            if (polygonIndices.size() == 0) continue;
+            int firstIndex = polygonIndices[0];
+            int lastIndex = polygonIndices[polygonIndices.size() - 1];
+            
+            polygon = *convexPolygons[i];
+            size_t o = polygon.size() - 4;
+            Vector<float>& p = polygon;
             float prevPrevX = p[o], prevPrevY = p[o + 1];
             float prevX = p[o + 2], prevY = p[o + 3];
             float firstX = p[0], firstY = p[1];
             float secondX = p[2], secondY = p[3];
-            int winding = winding(prevPrevX, prevPrevY, prevX, prevY, firstX, firstY);
+            int winding0 = winding(prevPrevX, prevPrevY, prevX, prevY, firstX, firstY);
             
             for (int ii = 0; ii < n; ++ii)
             {
@@ -248,19 +251,22 @@ namespace Spine
                     continue;
                 }
                 
-                var otherIndices = convexPolygonsIndices.Items[ii];
+                Vector<int>* otherIndicesP = convexPolygonsIndices[ii];
+                Vector<int>& otherIndices = *otherIndicesP;
                 
-                if (otherIndices.Count != 3)
+                if (otherIndices.size() != 3)
                 {
                     continue;
                 }
                 
-                int otherFirstIndex = otherIndices.Items[0];
-                int otherSecondIndex = otherIndices.Items[1];
-                int otherLastIndex = otherIndices.Items[2];
+                int otherFirstIndex = otherIndices[0];
+                int otherSecondIndex = otherIndices[1];
+                int otherLastIndex = otherIndices[2];
                 
-                var otherPoly = convexPolygons.Items[ii];
-                float x3 = otherPoly.Items[otherPoly.Count - 2], y3 = otherPoly.Items[otherPoly.Count - 1];
+                Vector<float>* otherPolyP = convexPolygons[ii];
+                Vector<float>& otherPoly = *otherPolyP;
+                
+                float x3 = otherPoly[otherPoly.size() - 2], y3 = otherPoly[otherPoly.size() - 1];
                 
                 if (otherFirstIndex != firstIndex || otherSecondIndex != lastIndex)
                 {
@@ -269,13 +275,13 @@ namespace Spine
                 
                 int winding1 = winding(prevPrevX, prevPrevY, prevX, prevY, x3, y3);
                 int winding2 = winding(x3, y3, firstX, firstY, secondX, secondY);
-                if (winding1 == winding && winding2 == winding)
+                if (winding1 == winding0 && winding2 == winding0)
                 {
-                    otherPoly.Clear();
-                    otherIndices.Clear();
-                    polygon.Add(x3);
-                    polygon.Add(y3);
-                    polygonIndices.Add(otherLastIndex);
+                    otherPoly.clear();
+                    otherIndices.clear();
+                    polygon.push_back(x3);
+                    polygon.push_back(y3);
+                    polygonIndices.push_back(otherLastIndex);
                     prevPrevX = prevX;
                     prevPrevY = prevY;
                     prevX = x3;
@@ -286,16 +292,16 @@ namespace Spine
         }
         
         // Remove empty polygons that resulted from the merge step above.
-        for (int i = convexPolygons.Count - 1; i >= 0; --i)
+        for (int i = static_cast<int>(convexPolygons.size()) - 1; i >= 0; --i)
         {
-            polygon = convexPolygons.Items[i];
-            if (polygon.Count == 0)
+            polygon = *convexPolygons[i];
+            if (polygon.size() == 0)
             {
-                convexPolygons.RemoveAt(i);
-                polygonPool.Free(polygon);
-                polygonIndices = convexPolygonsIndices.Items[i];
-                convexPolygonsIndices.RemoveAt(i);
-                _polygonIndicesPool.Free(polygonIndices);
+                convexPolygons.erase(i);
+                _polygonPool.free(&polygon);
+                polygonIndices = *convexPolygonsIndices[i];
+                convexPolygonsIndices.erase(i);
+                _polygonIndicesPool.free(&polygonIndices);
             }
         }
         
@@ -308,8 +314,7 @@ namespace Spine
         int current = indices[index] << 1;
         int next = indices[(index + 1) % vertexCount] << 1;
         
-        return !positiveArea(vertices[previous], vertices[previous + 1], vertices[current], vertices[current + 1], vertices[next],
-                             vertices[next + 1]);
+        return !positiveArea(vertices[previous], vertices[previous + 1], vertices[current], vertices[current + 1], vertices[next], vertices[next + 1]);
     }
     
     bool Triangulator::positiveArea(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y)
