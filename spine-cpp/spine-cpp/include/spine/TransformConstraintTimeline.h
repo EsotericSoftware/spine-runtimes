@@ -39,93 +39,93 @@ namespace Spine
     {
         RTTI_DECL;
         
-        public const int ENTRIES = 5;
-        private const int PREV_TIME = -5, PREV_ROTATE = -4, PREV_TRANSLATE = -3, PREV_SCALE = -2, PREV_SHEAR = -1;
-        private const int ROTATE = 1, TRANSLATE = 2, SCALE = 3, SHEAR = 4;
-        
-        internal int transformConstraintIndex;
-        internal float[] frames;
-        
-        public int TransformConstraintIndex { return transformConstraintIndex; } set { transformConstraintIndex = inValue; }
-        public float[] Frames { return frames; } set { frames = inValue; } // time, rotate mix, translate mix, scale mix, shear mix, ...
-        
-        override public int PropertyId {
-            get { return ((int)TimelineType.TransformConstraint << 24) + transformConstraintIndex; }
-        }
-        
-        public TransformConstraintTimeline (int frameCount)
-        : base(frameCount) {
-            frames = new float[frameCount * ENTRIES];
-        }
-        
-        public void SetFrame (int frameIndex, float time, float rotateMix, float translateMix, float scaleMix, float shearMix) {
-            frameIndex *= ENTRIES;
-            frames[frameIndex] = time;
-            frames[frameIndex + ROTATE] = rotateMix;
-            frames[frameIndex + TRANSLATE] = translateMix;
-            frames[frameIndex + SCALE] = scaleMix;
-            frames[frameIndex + SHEAR] = shearMix;
-        }
-        
-        override public void Apply (Skeleton skeleton, float lastTime, float time, Vector<Event> firedEvents, float alpha, MixPose pose, MixDirection direction) {
-            TransformConstraint constraint = skeleton.transformConstraints.Items[transformConstraintIndex];
-            float[] frames = _frames;
-            if (time < frames[0]) {
-                var data = constraint.data;
-                switch (pose) {
-                    case MixPose_Setup:
-                        constraint.rotateMix = data.rotateMix;
-                        constraint.translateMix = data.translateMix;
-                        constraint.scaleMix = data.scaleMix;
-                        constraint.shearMix = data.shearMix;
-                        return;
-                    case MixPose_Current:
-                        constraint.rotateMix += (data.rotateMix - constraint.rotateMix) * alpha;
-                        constraint.translateMix += (data.translateMix - constraint.translateMix) * alpha;
-                        constraint.scaleMix += (data.scaleMix - constraint.scaleMix) * alpha;
-                        constraint.shearMix += (data.shearMix - constraint.shearMix) * alpha;
-                        return;
-                }
-                return;
-            }
-            
-            float rotate, translate, scale, shear;
-            if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
-                int i = frames.Length;
-                rotate = frames[i + PREV_ROTATE];
-                translate = frames[i + PREV_TRANSLATE];
-                scale = frames[i + PREV_SCALE];
-                shear = frames[i + PREV_SHEAR];
-            } else {
-                // Interpolate between the previous frame and the current frame.
-                int frame = Animation.BinarySearch(frames, time, ENTRIES);
-                rotate = frames[frame + PREV_ROTATE];
-                translate = frames[frame + PREV_TRANSLATE];
-                scale = frames[frame + PREV_SCALE];
-                shear = frames[frame + PREV_SHEAR];
-                float frameTime = frames[frame];
-                float percent = GetCurvePercent(frame / ENTRIES - 1,
-                                                1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-                
-                rotate += (frames[frame + ROTATE] - rotate) * percent;
-                translate += (frames[frame + TRANSLATE] - translate) * percent;
-                scale += (frames[frame + SCALE] - scale) * percent;
-                shear += (frames[frame + SHEAR] - shear) * percent;
-            }
-            if (pose == MixPose_Setup) {
-                TransformConstraintData data = constraint.data;
-                constraint.rotateMix = data.rotateMix + (rotate - data.rotateMix) * alpha;
-                constraint.translateMix = data.translateMix + (translate - data.translateMix) * alpha;
-                constraint.scaleMix = data.scaleMix + (scale - data.scaleMix) * alpha;
-                constraint.shearMix = data.shearMix + (shear - data.shearMix) * alpha;
-            } else {
-                constraint.rotateMix += (rotate - constraint.rotateMix) * alpha;
-                constraint.translateMix += (translate - constraint.translateMix) * alpha;
-                constraint.scaleMix += (scale - constraint.scaleMix) * alpha;
-                constraint.shearMix += (shear - constraint.shearMix) * alpha;
-            }
-        }
-    }
+//        public const int ENTRIES = 5;
+//        private const int PREV_TIME = -5, PREV_ROTATE = -4, PREV_TRANSLATE = -3, PREV_SCALE = -2, PREV_SHEAR = -1;
+//        private const int ROTATE = 1, TRANSLATE = 2, SCALE = 3, SHEAR = 4;
+//
+//        internal int transformConstraintIndex;
+//        internal float[] frames;
+//
+//        public int TransformConstraintIndex { return transformConstraintIndex; } set { transformConstraintIndex = inValue; }
+//        public float[] Frames { return frames; } set { frames = inValue; } // time, rotate mix, translate mix, scale mix, shear mix, ...
+//
+//        override public int PropertyId {
+//            get { return ((int)TimelineType.TransformConstraint << 24) + transformConstraintIndex; }
+//        }
+//
+//        public TransformConstraintTimeline (int frameCount)
+//        : base(frameCount) {
+//            frames = new float[frameCount * ENTRIES];
+//        }
+//
+//        public void SetFrame (int frameIndex, float time, float rotateMix, float translateMix, float scaleMix, float shearMix) {
+//            frameIndex *= ENTRIES;
+//            frames[frameIndex] = time;
+//            frames[frameIndex + ROTATE] = rotateMix;
+//            frames[frameIndex + TRANSLATE] = translateMix;
+//            frames[frameIndex + SCALE] = scaleMix;
+//            frames[frameIndex + SHEAR] = shearMix;
+//        }
+//
+//        override public void Apply (Skeleton skeleton, float lastTime, float time, Vector<Event> firedEvents, float alpha, MixPose pose, MixDirection direction) {
+//            TransformConstraint constraint = skeleton.transformConstraints.Items[transformConstraintIndex];
+//            float[] frames = _frames;
+//            if (time < frames[0]) {
+//                var data = constraint.data;
+//                switch (pose) {
+//                    case MixPose_Setup:
+//                        constraint.rotateMix = data.rotateMix;
+//                        constraint.translateMix = data.translateMix;
+//                        constraint.scaleMix = data.scaleMix;
+//                        constraint.shearMix = data.shearMix;
+//                        return;
+//                    case MixPose_Current:
+//                        constraint.rotateMix += (data.rotateMix - constraint.rotateMix) * alpha;
+//                        constraint.translateMix += (data.translateMix - constraint.translateMix) * alpha;
+//                        constraint.scaleMix += (data.scaleMix - constraint.scaleMix) * alpha;
+//                        constraint.shearMix += (data.shearMix - constraint.shearMix) * alpha;
+//                        return;
+//                }
+//                return;
+//            }
+//
+//            float rotate, translate, scale, shear;
+//            if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
+//                int i = frames.Length;
+//                rotate = frames[i + PREV_ROTATE];
+//                translate = frames[i + PREV_TRANSLATE];
+//                scale = frames[i + PREV_SCALE];
+//                shear = frames[i + PREV_SHEAR];
+//            } else {
+//                // Interpolate between the previous frame and the current frame.
+//                int frame = Animation.BinarySearch(frames, time, ENTRIES);
+//                rotate = frames[frame + PREV_ROTATE];
+//                translate = frames[frame + PREV_TRANSLATE];
+//                scale = frames[frame + PREV_SCALE];
+//                shear = frames[frame + PREV_SHEAR];
+//                float frameTime = frames[frame];
+//                float percent = GetCurvePercent(frame / ENTRIES - 1,
+//                                                1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+//
+//                rotate += (frames[frame + ROTATE] - rotate) * percent;
+//                translate += (frames[frame + TRANSLATE] - translate) * percent;
+//                scale += (frames[frame + SCALE] - scale) * percent;
+//                shear += (frames[frame + SHEAR] - shear) * percent;
+//            }
+//            if (pose == MixPose_Setup) {
+//                TransformConstraintData data = constraint.data;
+//                constraint.rotateMix = data.rotateMix + (rotate - data.rotateMix) * alpha;
+//                constraint.translateMix = data.translateMix + (translate - data.translateMix) * alpha;
+//                constraint.scaleMix = data.scaleMix + (scale - data.scaleMix) * alpha;
+//                constraint.shearMix = data.shearMix + (shear - data.shearMix) * alpha;
+//            } else {
+//                constraint.rotateMix += (rotate - constraint.rotateMix) * alpha;
+//                constraint.translateMix += (translate - constraint.translateMix) * alpha;
+//                constraint.scaleMix += (scale - constraint.scaleMix) * alpha;
+//                constraint.shearMix += (shear - constraint.shearMix) * alpha;
+//            }
+//        }
+    };
 }
 
 #endif /* Spine_TransformConstraintTimeline_h */

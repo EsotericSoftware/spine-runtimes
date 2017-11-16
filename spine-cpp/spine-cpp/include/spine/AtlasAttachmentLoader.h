@@ -53,83 +53,83 @@ namespace Spine
             // Empty
         }
         
-        RegionAttachment newRegionAttachment(Skin skin, std::string name, std::string path)
-        {
-            AtlasRegion* region = findRegion(path);
-            if (region == NULL) throw new ArgumentException(std::string.Format("Region not found in atlas: {0} (region attachment: {1})", path, name));
-            RegionAttachment attachment = new RegionAttachment(name);
-            attachment.RendererObject = region;
-            attachment.SetUVs(region.u, region.v, region.u2, region.v2, region.rotate);
-            attachment.regionOffsetX = region.offsetX;
-            attachment.regionOffsetY = region.offsetY;
-            attachment.regionWidth = region.width;
-            attachment.regionHeight = region.height;
-            attachment.regionOriginalWidth = region.originalWidth;
-            attachment.regionOriginalHeight = region.originalHeight;
-            return attachment;
-        }
-        
-        MeshAttachment newMeshAttachment(Skin skin, std::string name, std::string path)
-        {
-            AtlasRegion region = findRegion(path);
-            if (region == NULL) throw new ArgumentException(std::string.Format("Region not found in atlas: {0} (region attachment: {1})", path, name));
-            
-            MeshAttachment attachment = new MeshAttachment(name);
-            attachment.RendererObject = region;
-            attachment.RegionU = region.u;
-            attachment.RegionV = region.v;
-            attachment.RegionU2 = region.u2;
-            attachment.RegionV2 = region.v2;
-            attachment.RegionRotate = region.rotate;
-            attachment.regionOffsetX = region.offsetX;
-            attachment.regionOffsetY = region.offsetY;
-            attachment.regionWidth = region.width;
-            attachment.regionHeight = region.height;
-            attachment.regionOriginalWidth = region.originalWidth;
-            attachment.regionOriginalHeight = region.originalHeight;
-            
-            return attachment;
-        }
-        
-        BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, std::string name)
-        {
-            return new BoundingBoxAttachment(name);
-        }
-        
-        PathAttachment newPathAttachment(Skin skin, std::string name)
-        {
-            return new PathAttachment(name);
-        }
-        
-        PointAttachment newPointAttachment(Skin skin, std::string name)
-        {
-            return new PointAttachment(name);
-        }
-        
-        ClippingAttachment newClippingAttachment(Skin skin, std::string name)
-        {
-            return new ClippingAttachment(name);
-        }
-        
-        AtlasRegion* findRegion(std::string name)
-        {
-            AtlasRegion* ret;
-            
-            for (int i = 0; i < _atlasArray.size(); i++)
-            {
-                ret = _atlasArray[i]->findRegion(name);
-                if (ret != NULL)
-                {
-                    return ret;
-                }
-            }
-            
-            return NULL;
-        }
+//        RegionAttachment newRegionAttachment(Skin skin, std::string name, std::string path)
+//        {
+//            AtlasRegion* region = findRegion(path);
+//            if (region == NULL) throw new ArgumentException(std::string.Format("Region not found in atlas: {0} (region attachment: {1})", path, name));
+//            RegionAttachment attachment = new RegionAttachment(name);
+//            attachment.RendererObject = region;
+//            attachment.SetUVs(region.u, region.v, region.u2, region.v2, region.rotate);
+//            attachment.regionOffsetX = region.offsetX;
+//            attachment.regionOffsetY = region.offsetY;
+//            attachment.regionWidth = region.width;
+//            attachment.regionHeight = region.height;
+//            attachment.regionOriginalWidth = region.originalWidth;
+//            attachment.regionOriginalHeight = region.originalHeight;
+//            return attachment;
+//        }
+//
+//        MeshAttachment newMeshAttachment(Skin skin, std::string name, std::string path)
+//        {
+//            AtlasRegion region = findRegion(path);
+//            if (region == NULL) throw new ArgumentException(std::string.Format("Region not found in atlas: {0} (region attachment: {1})", path, name));
+//
+//            MeshAttachment attachment = new MeshAttachment(name);
+//            attachment.RendererObject = region;
+//            attachment.RegionU = region.u;
+//            attachment.RegionV = region.v;
+//            attachment.RegionU2 = region.u2;
+//            attachment.RegionV2 = region.v2;
+//            attachment.RegionRotate = region.rotate;
+//            attachment.regionOffsetX = region.offsetX;
+//            attachment.regionOffsetY = region.offsetY;
+//            attachment.regionWidth = region.width;
+//            attachment.regionHeight = region.height;
+//            attachment.regionOriginalWidth = region.originalWidth;
+//            attachment.regionOriginalHeight = region.originalHeight;
+//
+//            return attachment;
+//        }
+//
+//        BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, std::string name)
+//        {
+//            return new BoundingBoxAttachment(name);
+//        }
+//
+//        PathAttachment newPathAttachment(Skin skin, std::string name)
+//        {
+//            return new PathAttachment(name);
+//        }
+//
+//        PointAttachment newPointAttachment(Skin skin, std::string name)
+//        {
+//            return new PointAttachment(name);
+//        }
+//
+//        ClippingAttachment newClippingAttachment(Skin skin, std::string name)
+//        {
+//            return new ClippingAttachment(name);
+//        }
+//
+//        AtlasRegion* findRegion(std::string name)
+//        {
+//            AtlasRegion* ret;
+//
+//            for (int i = 0; i < _atlasArray.size(); i++)
+//            {
+//                ret = _atlasArray[i]->findRegion(name);
+//                if (ret != NULL)
+//                {
+//                    return ret;
+//                }
+//            }
+//
+//            return NULL;
+//        }
         
     private:
         Vector<Atlas*> _atlasArray;
-    }
+    };
 }
 
 #endif /* Spine_AtlasAttachmentLoader_h */

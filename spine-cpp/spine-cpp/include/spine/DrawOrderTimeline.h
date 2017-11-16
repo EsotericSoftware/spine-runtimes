@@ -39,61 +39,61 @@ namespace Spine
     {
         RTTI_DECL;
         
-        internal float[] frames;
-        private int[][] drawOrders;
-        
-        public float[] Frames { return frames; } set { frames = inValue; } // time, ...
-        public int[][] DrawOrders { return drawOrders; } set { drawOrders = inValue; }
-        public int FrameCount { return frames.Length; }
-        
-        public int PropertyId {
-            get { return ((int)TimelineType.DrawOrder << 24); }
-        }
-        
-        public DrawOrderTimeline (int frameCount) {
-            frames = new float[frameCount];
-            drawOrders = new int[frameCount][];
-        }
-        
-        /// Sets the time and value of the specified keyframe.
-        /// <param name="drawOrder">May be NULL to use bind pose draw order.</param>
-        public void SetFrame (int frameIndex, float time, int[] drawOrder) {
-            frames[frameIndex] = time;
-            drawOrders[frameIndex] = drawOrder;
-        }
-        
-        public void Apply (Skeleton skeleton, float lastTime, float time, Vector<Event> firedEvents, float alpha, MixPose pose, MixDirection direction) {
-            Vector<Slot> drawOrder = skeleton.drawOrder;
-            Vector<Slot> slots = skeleton.slots;
-            if (direction == MixDirection_Out && pose == MixPose_Setup) {
-                Array.Copy(slots.Items, 0, drawOrder.Items, 0, slots.Count);
-                return;
-            }
-            
-            float[] frames = _frames;
-            if (time < frames[0]) {
-                if (pose == MixPose_Setup) Array.Copy(slots.Items, 0, drawOrder.Items, 0, slots.Count);
-                return;
-            }
-            
-            int frame;
-            if (time >= frames[frames.Length - 1]) // Time is after last frame.
-                frame = frames.Length - 1;
-            else
-                frame = Animation.BinarySearch(frames, time) - 1;
-            
-            int[] drawOrderToSetupIndex = drawOrders[frame];
-            if (drawOrderToSetupIndex == NULL) {
-                drawOrder.Clear();
-                for (int i = 0, n = slots.Count; i < n; i++)
-                    drawOrder.Add(slots.Items[i]);
-            } else {
-                var drawOrderItems = drawOrder.Items;
-                var slotsItems = slots.Items;
-                for (int i = 0, n = drawOrderToSetupIndex.Length; i < n; i++)
-                    drawOrderItems[i] = slotsItems[drawOrderToSetupIndex[i]];
-            }
-        }
+//        internal float[] frames;
+//        private int[][] drawOrders;
+//        
+//        public float[] Frames { return frames; } set { frames = inValue; } // time, ...
+//        public int[][] DrawOrders { return drawOrders; } set { drawOrders = inValue; }
+//        public int FrameCount { return frames.Length; }
+//        
+//        public int PropertyId {
+//            get { return ((int)TimelineType.DrawOrder << 24); }
+//        }
+//        
+//        public DrawOrderTimeline (int frameCount) {
+//            frames = new float[frameCount];
+//            drawOrders = new int[frameCount][];
+//        }
+//        
+//        /// Sets the time and value of the specified keyframe.
+//        /// <param name="drawOrder">May be NULL to use bind pose draw order.</param>
+//        public void SetFrame (int frameIndex, float time, int[] drawOrder) {
+//            frames[frameIndex] = time;
+//            drawOrders[frameIndex] = drawOrder;
+//        }
+//        
+//        public void Apply (Skeleton skeleton, float lastTime, float time, Vector<Event> firedEvents, float alpha, MixPose pose, MixDirection direction) {
+//            Vector<Slot> drawOrder = skeleton.drawOrder;
+//            Vector<Slot> slots = skeleton.slots;
+//            if (direction == MixDirection_Out && pose == MixPose_Setup) {
+//                Array.Copy(slots.Items, 0, drawOrder.Items, 0, slots.Count);
+//                return;
+//            }
+//            
+//            float[] frames = _frames;
+//            if (time < frames[0]) {
+//                if (pose == MixPose_Setup) Array.Copy(slots.Items, 0, drawOrder.Items, 0, slots.Count);
+//                return;
+//            }
+//            
+//            int frame;
+//            if (time >= frames[frames.Length - 1]) // Time is after last frame.
+//                frame = frames.Length - 1;
+//            else
+//                frame = Animation.BinarySearch(frames, time) - 1;
+//            
+//            int[] drawOrderToSetupIndex = drawOrders[frame];
+//            if (drawOrderToSetupIndex == NULL) {
+//                drawOrder.Clear();
+//                for (int i = 0, n = slots.Count; i < n; i++)
+//                    drawOrder.Add(slots.Items[i]);
+//            } else {
+//                var drawOrderItems = drawOrder.Items;
+//                var slotsItems = slots.Items;
+//                for (int i = 0, n = drawOrderToSetupIndex.Length; i < n; i++)
+//                    drawOrderItems[i] = slotsItems[drawOrderToSetupIndex[i]];
+//            }
+//        }
     };
 }
 

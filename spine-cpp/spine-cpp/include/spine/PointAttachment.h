@@ -48,6 +48,7 @@ namespace Spine
     {
         RTTI_DECL;
         
+    public:
         PointAttachment(std::string name);
         
         void computeWorldPosition(Bone& bone, float& ox, float& oy);
@@ -65,7 +66,7 @@ namespace Spine
         
     private:
         float _x, _y, _rotation;
-    }
+    };
 }
 
 #endif /* Spine_PointAttachment_h */

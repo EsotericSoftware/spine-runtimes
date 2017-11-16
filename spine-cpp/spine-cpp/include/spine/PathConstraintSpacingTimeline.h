@@ -39,49 +39,49 @@ namespace Spine
     {
         RTTI_DECL;
         
-        override public int PropertyId {
-            get { return ((int)TimelineType.PathConstraintSpacing << 24) + pathConstraintIndex; }
-        }
-        
-        public PathConstraintSpacingTimeline (int frameCount)
-        : base(frameCount) {
-        }
-        
-        override public void Apply (Skeleton skeleton, float lastTime, float time, Vector<Event> firedEvents, float alpha, MixPose pose, MixDirection direction) {
-            PathConstraint constraint = skeleton.pathConstraints.Items[pathConstraintIndex];
-            float[] frames = _frames;
-            if (time < frames[0]) {
-                switch (pose) {
-                    case MixPose_Setup:
-                        constraint.spacing = constraint.data.spacing;
-                        return;
-                    case MixPose_Current:
-                        constraint.spacing += (constraint.data.spacing - constraint.spacing) * alpha;
-                        return;
-                }
-                return;
-            }
-            
-            float spacing;
-            if (time >= frames[frames.Length - ENTRIES]) // Time is after last frame.
-                spacing = frames[frames.Length + PREV_VALUE];
-            else {
-                // Interpolate between the previous frame and the current frame.
-                int frame = Animation.BinarySearch(frames, time, ENTRIES);
-                spacing = frames[frame + PREV_VALUE];
-                float frameTime = frames[frame];
-                float percent = GetCurvePercent(frame / ENTRIES - 1,
-                                                1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-                
-                spacing += (frames[frame + VALUE] - spacing) * percent;
-            }
-            
-            if (pose == MixPose_Setup)
-                constraint.spacing = constraint.data.spacing + (spacing - constraint.data.spacing) * alpha;
-            else
-                constraint.spacing += (spacing - constraint.spacing) * alpha;
-        }
-    }
+//        override public int PropertyId {
+//            get { return ((int)TimelineType.PathConstraintSpacing << 24) + pathConstraintIndex; }
+//        }
+//
+//        public PathConstraintSpacingTimeline (int frameCount)
+//        : base(frameCount) {
+//        }
+//
+//        override public void Apply (Skeleton skeleton, float lastTime, float time, Vector<Event> firedEvents, float alpha, MixPose pose, MixDirection direction) {
+//            PathConstraint constraint = skeleton.pathConstraints.Items[pathConstraintIndex];
+//            float[] frames = _frames;
+//            if (time < frames[0]) {
+//                switch (pose) {
+//                    case MixPose_Setup:
+//                        constraint.spacing = constraint.data.spacing;
+//                        return;
+//                    case MixPose_Current:
+//                        constraint.spacing += (constraint.data.spacing - constraint.spacing) * alpha;
+//                        return;
+//                }
+//                return;
+//            }
+//
+//            float spacing;
+//            if (time >= frames[frames.Length - ENTRIES]) // Time is after last frame.
+//                spacing = frames[frames.Length + PREV_VALUE];
+//            else {
+//                // Interpolate between the previous frame and the current frame.
+//                int frame = Animation.BinarySearch(frames, time, ENTRIES);
+//                spacing = frames[frame + PREV_VALUE];
+//                float frameTime = frames[frame];
+//                float percent = GetCurvePercent(frame / ENTRIES - 1,
+//                                                1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+//
+//                spacing += (frames[frame + VALUE] - spacing) * percent;
+//            }
+//
+//            if (pose == MixPose_Setup)
+//                constraint.spacing = constraint.data.spacing + (spacing - constraint.data.spacing) * alpha;
+//            else
+//                constraint.spacing += (spacing - constraint.spacing) * alpha;
+//        }
+    };
 }
 
 #endif /* Spine_PathConstraintSpacingTimeline_h */

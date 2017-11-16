@@ -64,7 +64,7 @@ namespace Spine
         virtual PointAttachment* newPointAttachment(Skin& skin, std::string name) = 0;
         
         virtual ClippingAttachment* newClippingAttachment(Skin& skin, std::string name) = 0;
-    }
+    };
 }
 
 #endif /* Spine_AttachmentLoader_h */

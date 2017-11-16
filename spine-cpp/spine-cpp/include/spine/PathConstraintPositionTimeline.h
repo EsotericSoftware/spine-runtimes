@@ -37,66 +37,68 @@ namespace Spine
 {
     class PathConstraintPositionTimeline : public CurveTimeline
     {
-        public const int ENTRIES = 2;
-        protected const int PREV_TIME = -2, PREV_VALUE = -1;
-        protected const int VALUE = 1;
+        RTTI_DECL;
         
-        internal int pathConstraintIndex;
-        internal float[] frames;
-        
-        override public int PropertyId {
-            get { return ((int)TimelineType.PathConstraintPosition << 24) + pathConstraintIndex; }
-        }
-        
-        public PathConstraintPositionTimeline (int frameCount)
-        : base(frameCount) {
-            frames = new float[frameCount * ENTRIES];
-        }
-        
-        public int PathConstraintIndex { return pathConstraintIndex; } set { pathConstraintIndex = inValue; }
-        public float[] Frames { return frames; } set { frames = inValue; } // time, position, ...
-        
-        /// Sets the time and value of the specified keyframe.
-        public void SetFrame (int frameIndex, float time, float value) {
-            frameIndex *= ENTRIES;
-            frames[frameIndex] = time;
-            frames[frameIndex + VALUE] = inValue;
-        }
-        
-        override public void Apply (Skeleton skeleton, float lastTime, float time, Vector<Event> firedEvents, float alpha, MixPose pose, MixDirection direction) {
-            PathConstraint constraint = skeleton.pathConstraints.Items[pathConstraintIndex];
-            float[] frames = _frames;
-            if (time < frames[0]) {
-                switch (pose) {
-                    case MixPose_Setup:
-                        constraint.position = constraint.data.position;
-                        return;
-                    case MixPose_Current:
-                        constraint.position += (constraint.data.position - constraint.position) * alpha;
-                        return;
-                }
-                return;
-            }
-            
-            float position;
-            if (time >= frames[frames.Length - ENTRIES]) // Time is after last frame.
-                position = frames[frames.Length + PREV_VALUE];
-            else {
-                // Interpolate between the previous frame and the current frame.
-                int frame = Animation.BinarySearch(frames, time, ENTRIES);
-                position = frames[frame + PREV_VALUE];
-                float frameTime = frames[frame];
-                float percent = GetCurvePercent(frame / ENTRIES - 1,
-                                                1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-                
-                position += (frames[frame + VALUE] - position) * percent;
-            }
-            if (pose == MixPose_Setup)
-                constraint.position = constraint.data.position + (position - constraint.data.position) * alpha;
-            else
-                constraint.position += (position - constraint.position) * alpha;
-        }
-    }
+//        public const int ENTRIES = 2;
+//        protected const int PREV_TIME = -2, PREV_VALUE = -1;
+//        protected const int VALUE = 1;
+//        
+//        internal int pathConstraintIndex;
+//        internal float[] frames;
+//        
+//        override public int PropertyId {
+//            get { return ((int)TimelineType.PathConstraintPosition << 24) + pathConstraintIndex; }
+//        }
+//        
+//        public PathConstraintPositionTimeline (int frameCount)
+//        : base(frameCount) {
+//            frames = new float[frameCount * ENTRIES];
+//        }
+//        
+//        public int PathConstraintIndex { return pathConstraintIndex; } set { pathConstraintIndex = inValue; }
+//        public float[] Frames { return frames; } set { frames = inValue; } // time, position, ...
+//        
+//        /// Sets the time and value of the specified keyframe.
+//        public void SetFrame (int frameIndex, float time, float value) {
+//            frameIndex *= ENTRIES;
+//            frames[frameIndex] = time;
+//            frames[frameIndex + VALUE] = inValue;
+//        }
+//        
+//        override public void Apply (Skeleton skeleton, float lastTime, float time, Vector<Event> firedEvents, float alpha, MixPose pose, MixDirection direction) {
+//            PathConstraint constraint = skeleton.pathConstraints.Items[pathConstraintIndex];
+//            float[] frames = _frames;
+//            if (time < frames[0]) {
+//                switch (pose) {
+//                    case MixPose_Setup:
+//                        constraint.position = constraint.data.position;
+//                        return;
+//                    case MixPose_Current:
+//                        constraint.position += (constraint.data.position - constraint.position) * alpha;
+//                        return;
+//                }
+//                return;
+//            }
+//            
+//            float position;
+//            if (time >= frames[frames.Length - ENTRIES]) // Time is after last frame.
+//                position = frames[frames.Length + PREV_VALUE];
+//            else {
+//                // Interpolate between the previous frame and the current frame.
+//                int frame = Animation.BinarySearch(frames, time, ENTRIES);
+//                position = frames[frame + PREV_VALUE];
+//                float frameTime = frames[frame];
+//                float percent = GetCurvePercent(frame / ENTRIES - 1,
+//                                                1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+//                
+//                position += (frames[frame + VALUE] - position) * percent;
+//            }
+//            if (pose == MixPose_Setup)
+//                constraint.position = constraint.data.position + (position - constraint.data.position) * alpha;
+//            else
+//                constraint.position += (position - constraint.position) * alpha;
+//        }
+    };
 }
 
 #endif /* Spine_PathConstraintPositionTimeline_h */

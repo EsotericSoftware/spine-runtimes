@@ -59,22 +59,22 @@ namespace Spine
         
         /// Sets a mix duration when changing from the specified animation to the other.
         /// See TrackEntry.MixDuration.
-        void setMix(Animation& from, Animation& to, float duration);
+        void setMix(Animation* from, Animation* to, float duration);
         
         ///
         /// The mix duration to use when changing from the specified animation to the other,
         /// or the DefaultMix if no mix duration has been set.
         ///
-        float getMix(Animation& from, Animation& to);
+        float getMix(Animation* from, Animation* to);
         
     private:
         class AnimationPair
         {
         public:
-            Animation& _a1;
-            Animation& _a2;
+            Animation* _a1;
+            Animation* _a2;
             
-            AnimationPair(Animation& a1, Animation& a2);
+            AnimationPair(Animation* a1 = NULL, Animation* a2 = NULL);
             
             bool operator==(const AnimationPair &other) const;
         };
