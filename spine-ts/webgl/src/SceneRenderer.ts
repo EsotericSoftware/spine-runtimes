@@ -144,6 +144,70 @@ module spine.webgl {
 			this.batcher.draw(texture, quad, this.QUAD_TRIANGLES);
 		}
 
+		drawTextureUV (texture: GLTexture, x: number, y: number, width: number, height: number, u: number, v: number, u2: number, v2: number, color: Color = null) {
+			this.enableRenderer(this.batcher);
+			if (color === null) color = this.WHITE;
+			let quad = this.QUAD;
+			var i = 0;
+			quad[i++] = x;
+			quad[i++] = y;
+			quad[i++] = color.r;
+			quad[i++] = color.g;
+			quad[i++] = color.b;
+			quad[i++] = color.a;
+			quad[i++] = u;
+			quad[i++] = v;
+			if (this.twoColorTint) {
+				quad[i++] = 0;
+				quad[i++] = 0;
+				quad[i++] = 0;
+				quad[i++] = 0;
+			}
+			quad[i++] = x + width;
+			quad[i++] = y;
+			quad[i++] = color.r;
+			quad[i++] = color.g;
+			quad[i++] = color.b;
+			quad[i++] = color.a;
+			quad[i++] = u2;
+			quad[i++] = v;
+			if (this.twoColorTint) {
+				quad[i++] = 0;
+				quad[i++] = 0;
+				quad[i++] = 0;
+				quad[i++] = 0;
+			}
+			quad[i++] = x + width;
+			quad[i++] = y + height;
+			quad[i++] = color.r;
+			quad[i++] = color.g;
+			quad[i++] = color.b;
+			quad[i++] = color.a;
+			quad[i++] = u2;
+			quad[i++] = v2;
+			if (this.twoColorTint) {
+				quad[i++] = 0;
+				quad[i++] = 0;
+				quad[i++] = 0;
+				quad[i++] = 0;
+			}
+			quad[i++] = x;
+			quad[i++] = y + height;
+			quad[i++] = color.r;
+			quad[i++] = color.g;
+			quad[i++] = color.b;
+			quad[i++] = color.a;
+			quad[i++] = u;
+			quad[i++] = v2;
+			if (this.twoColorTint) {
+				quad[i++] = 0;
+				quad[i++] = 0;
+				quad[i++] = 0;
+				quad[i++] = 0;
+			}
+			this.batcher.draw(texture, quad, this.QUAD_TRIANGLES);
+		}
+
 		drawTextureRotated (texture: GLTexture, x: number, y: number, width: number, height: number, pivotX: number, pivotY: number, angle: number, color: Color = null, premultipliedAlpha: boolean = false) {
 			this.enableRenderer(this.batcher);
 			if (color === null) color = this.WHITE;
