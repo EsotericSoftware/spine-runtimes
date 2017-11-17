@@ -67,26 +67,19 @@ function init () {
 	// Tell AssetManager to load the resources for each model, including the exported .json file, the .atlas file and the .png
 	// file for the atlas. We then wait until all resources are loaded in the load() method.
 	assetManager.loadText("assets/spineboy-ess.json");
-	assetManager.loadText("assets/spineboy.atlas");
-	assetManager.loadTexture("assets/spineboy.png");
+	assetManager.loadTextureAtlas("assets/spineboy.atlas");
 	assetManager.loadText("assets/raptor-pro.json");
-	assetManager.loadText("assets/raptor.atlas");
-	assetManager.loadTexture("assets/raptor.png");
+	assetManager.loadTextureAtlas("assets/raptor.atlas");
 	assetManager.loadText("assets/tank-pro.json");
-	assetManager.loadText("assets/tank.atlas");
-	assetManager.loadTexture("assets/tank.png");
+	assetManager.loadTextureAtlas("assets/tank.atlas");
 	assetManager.loadText("assets/goblins-pro.json");
-	assetManager.loadText("assets/goblins.atlas");
-	assetManager.loadTexture("assets/goblins.png");
+	assetManager.loadTextureAtlas("assets/goblins.atlas");
 	assetManager.loadText("assets/vine-pro.json");
-	assetManager.loadText("assets/vine.atlas");
-	assetManager.loadTexture("assets/vine.png");
+	assetManager.loadTextureAtlas("assets/vine.atlas");
 	assetManager.loadText("assets/stretchyman-pro.json");
-	assetManager.loadText("assets/stretchyman.atlas");
-	assetManager.loadTexture("assets/stretchyman.png");
+	assetManager.loadTextureAtlas("assets/stretchyman.atlas");
 	assetManager.loadText("assets/coin-pro.json");
-	assetManager.loadText("assets/coin.atlas");
-	assetManager.loadTexture("assets/coin.png");
+	assetManager.loadTextureAtlas("assets/coin.atlas");
 	requestAnimationFrame(load);
 }
 
@@ -110,11 +103,8 @@ function load () {
 function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 	if (skin === undefined) skin = "default";
 
-	// Load the texture atlas using name.atlas and name.png from the AssetManager.
-	// The function passed to TextureAtlas is used to resolve relative paths.
-	atlas = new spine.TextureAtlas(assetManager.get("assets/" + name.replace("-ess", "").replace("-pro", "") + ".atlas"), function(path) {
-		return assetManager.get("assets/" + path);
-	});
+	// Load the texture atlas using name.atlas from the AssetManager.
+	atlas = assetManager.get("assets/" + name.replace("-ess", "").replace("-pro", "") + ".atlas");
 
 	// Create a AtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
 	atlasLoader = new spine.AtlasAttachmentLoader(atlas);

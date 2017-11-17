@@ -42,34 +42,61 @@ module spine {
 			this.pathPrefix = pathPrefix;
 		}
 
+		private static downloadText (url: string, success: (data: string) => void, error: (status: number, responseText: string) => void) {
+			let request = new XMLHttpRequest();
+			request.open("GET", url, true);
+			request.onload = () => {
+				if (request.status == 200) {
+					success(request.responseText);
+				} else {
+					error(request.status, request.responseText);
+				}
+			}
+			request.onerror = () => {
+				error(request.status, request.responseText);
+			}
+			request.send();
+		}
+
+		private static downloadBinary (url: string, success: (data: Uint8Array) => void, error: (status: number, responseText: string) => void) {
+			let request = new XMLHttpRequest();
+			request.open("GET", url, true);
+			request.responseType = "arraybuffer";
+			request.onload = () => {
+				if (request.status == 200) {
+					success(new Uint8Array(request.response as ArrayBuffer));
+				} else {
+					error(request.status, request.responseText);
+				}
+			}
+			request.onerror = () => {
+				error(request.status, request.responseText);
+			}
+			request.send();
+		}
+
 		loadText(path: string,
 			success: (path: string, text: string) => void = null,
-			error: (path: string, error: string) => void = null
-		) {
+			error: (path: string, error: string) => void = null) {
 			path = this.pathPrefix + path;
 			this.toLoad++;
-			let request = new XMLHttpRequest();
-			request.onreadystatechange = () => {
-				if (request.readyState == XMLHttpRequest.DONE) {
-					if (request.status >= 200 && request.status < 300) {
-						this.assets[path] = request.responseText;
-						if (success) success(path, request.responseText);
-					} else {
-						this.errors[path] = `Couldn't load text ${path}: status ${request.status}, ${request.responseText}`;
-						if (error) error(path, `Couldn't load text ${path}: status ${request.status}, ${request.responseText}`);
-					}
-					this.toLoad--;
-					this.loaded++;
-				}
-			};
-			request.open("GET", path, true);
-			request.send();
+
+			AssetManager.downloadText(path, (data: string): void => {
+				this.assets[path] = data;
+				if (success) success(path, data);
+				this.toLoad--;
+				this.loaded++;
+			}, (state: number, responseText: string): void => {
+				this.errors[path] = `Couldn't load text ${path}: status ${status}, ${responseText}`;
+				if (error) error(path, `Couldn't load text ${path}: status ${status}, ${responseText}`);
+				this.toLoad--;
+				this.loaded++;
+			});
 		}
 
 		loadTexture (path: string,
 			success: (path: string, image: HTMLImageElement) => void = null,
-			error: (path: string, error: string) => void = null
-		) {
+			error: (path: string, error: string) => void = null) {
 			path = this.pathPrefix + path;
 			this.toLoad++;
 			let img = new Image();
@@ -92,8 +119,7 @@ module spine {
 
 		loadTextureData(path: string, data: string,
 			success: (path: string, image: HTMLImageElement) => void = null,
-			error: (path: string, error: string) => void = null
-		) {
+			error: (path: string, error: string) => void = null) {
 			path = this.pathPrefix + path;
 			this.toLoad++;
 			let img = new Image();
@@ -111,6 +137,82 @@ module spine {
 				if (error) error(path, `Couldn't load image ${path}`);
 			}
 			img.src = data;
+		}
+
+		loadTextureAtlas (path: string,
+				   success: (path: string, atlas: TextureAtlas) => void = null,
+				   error: (path: string, error: string) => void = null) {
+			let parent = path.lastIndexOf("/") >= 0 ? path.substring(0, path.lastIndexOf("/")) : "";
+			path = this.pathPrefix + path;
+			this.toLoad++;
+
+			AssetManager.downloadText(path, (atlasData: string): void => {
+				var atlasPages = new Array<string>();
+				try {
+					let atlas = new spine.TextureAtlas(atlasData, (path: string) => {
+						atlasPages.push(parent + "/" + path);
+						let image = document.createElement("img") as HTMLImageElement;
+						image.width = 16;
+						image.height = 16;
+						return new spine.FakeTexture(image);
+					});
+				} catch (e) {
+					let ex = e as Error;
+					this.errors[path] = `Couldn't load texture atlas ${path}: ${ex.message}`;
+					if (error) error(path, `Couldn't load texture atlas ${path}: ${ex.message}`);
+					this.toLoad--;
+					this.loaded++;
+					return;
+				}
+
+				for (let atlasPage of atlasPages) {
+					let pagesLoaded = 0;
+					let pageLoadError = false;
+					this.loadTexture(atlasPage, (imagePath: string, image: HTMLImageElement) => {
+						pagesLoaded++;
+
+						if (pagesLoaded == atlasPages.length) {
+							if (!pageLoadError) {
+								try {
+									let atlas = new spine.TextureAtlas(atlasData, (path: string) => {
+										return this.get(parent + "/" + path);
+									});
+									this.assets[path] = atlas;
+									if (success) success(path, atlas);
+									this.toLoad--;
+									this.loaded++;
+								} catch (e) {
+									let ex = e as Error;
+									this.errors[path] = `Couldn't load texture atlas ${path}: ${ex.message}`;
+									if (error) error(path, `Couldn't load texture atlas ${path}: ${ex.message}`);
+									this.toLoad--;
+									this.loaded++;
+								}
+							} else {
+								this.errors[path] = `Couldn't load texture atlas page ${imagePath}} of atlas ${path}`;
+								if (error) error(path, `Couldn't load texture atlas page ${imagePath} of atlas ${path}`);
+								this.toLoad--;
+								this.loaded++;
+							}
+						}
+					}, (imagePath: string, errorMessage: string) => {
+						pageLoadError = true;
+						pagesLoaded++;
+
+						if (pagesLoaded == atlasPages.length) {
+							this.errors[path] = `Couldn't load texture atlas page ${imagePath}} of atlas ${path}`;
+							if (error) error(path, `Couldn't load texture atlas page ${imagePath} of atlas ${path}`);
+							this.toLoad--;
+							this.loaded++;
+						}
+					});
+				}
+			}, (state: number, responseText: string): void => {
+				this.errors[path] = `Couldn't load texture atlas ${path}: status ${status}, ${responseText}`;
+				if (error) error(path, `Couldn't load texture atlas ${path}: status ${status}, ${responseText}`);
+				this.toLoad--;
+				this.loaded++;
+			});
 		}
 
 		get (path: string) {
