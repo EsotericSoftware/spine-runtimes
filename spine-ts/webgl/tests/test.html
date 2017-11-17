@@ -46,11 +46,9 @@ function init() {
 	swirlEffect.radius = 500;
 
 	assetManager = new spine.webgl.AssetManager(context, "../example/assets/");
-	var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
 	input = new spine.webgl.Input(canvas);
 
-	assetManager.loadTexture(FILE.replace("-pro", "").replace("-oss", "") + ".png");
-	assetManager.loadText(FILE.replace("-pro", "").replace("-oss", "") + ".atlas");
+	assetManager.loadTextureAtlas(FILE.replace("-pro", "").replace("-oss", "") + ".atlas");
 	assetManager.loadText(FILE + ".json");
 
 	timeKeeper = new spine.TimeKeeper();
@@ -60,9 +58,7 @@ function init() {
 function load() {
 	timeKeeper.update();
 	if (assetManager.isLoadingComplete()) {
-		var atlas = new spine.TextureAtlas(assetManager.get(FILE.replace("-pro", "").replace("-oss", "") + ".atlas"), function(path) {
-			return assetManager.get(path);
-		});
+		var atlas = assetManager.get(FILE.replace("-pro", "").replace("-oss", "") + ".atlas");
 		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
 		skeletonJson.scale = SCALE;

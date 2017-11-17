@@ -222,6 +222,7 @@
   * Added `SkeletonClipper` and `Triangulator`, used to implement software clipping of attachments.
   * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
   * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
+  * Added `AssetManager.loadTextureAtlas`. Instead of loading the `.atlas` and corresponding image files manually, you can simply specify the location of the `.atlas` file and AssetManager will load the atlas and all its images automatically. `AssetManager.get("atlasname.atlas")` will then return an instance of `spine.TextureAtlas`.
 
 
 ### WebGL backend
