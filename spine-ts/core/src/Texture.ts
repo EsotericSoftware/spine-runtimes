@@ -92,4 +92,10 @@ module spine {
 		offsetX = 0; offsetY = 0;
 		originalWidth = 0; originalHeight = 0;
 	}
+
+	export class FakeTexture extends spine.Texture {
+		setFilters(minFilter: spine.TextureFilter, magFilter: spine.TextureFilter) { }
+		setWraps(uWrap: spine.TextureWrap, vWrap: spine.TextureWrap) { }
+		dispose() { }
+	}
 }
