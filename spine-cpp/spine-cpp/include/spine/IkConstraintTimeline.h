@@ -37,7 +37,7 @@ namespace Spine
 {
     class IkConstraintTimeline : public CurveTimeline
     {
-        RTTI_DECL;
+        SPINE_RTTI_DECL;
         
 //        public const int ENTRIES = 3;
 //        private const int PREV_TIME = -3, PREV_MIX = -2, PREV_BEND_DIRECTION = -1;

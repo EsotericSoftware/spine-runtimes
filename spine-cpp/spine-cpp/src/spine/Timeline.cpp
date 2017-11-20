@@ -35,7 +35,7 @@
 
 namespace Spine
 {
-    RTTI_IMPL_NOPARENT(Timeline);
+    SPINE_RTTI_IMPL_NOPARENT(Timeline);
     
     Timeline::Timeline()
     {

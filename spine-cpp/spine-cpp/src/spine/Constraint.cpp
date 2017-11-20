@@ -32,7 +32,7 @@
 
 namespace Spine
 {
-    RTTI_IMPL(Constraint, Updatable);
+    SPINE_RTTI_IMPL(Constraint, Updatable);
     
     Constraint::Constraint()
     {

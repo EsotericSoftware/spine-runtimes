@@ -32,5 +32,5 @@
 
 namespace Spine
 {
-    RTTI_IMPL_NOPARENT(AttachmentLoader);
+    SPINE_RTTI_IMPL_NOPARENT(AttachmentLoader);
 }

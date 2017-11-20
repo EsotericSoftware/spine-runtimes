@@ -37,7 +37,7 @@ namespace Spine
 {
     class ShearTimeline : public TranslateTimeline
     {
-        RTTI_DECL;
+        SPINE_RTTI_DECL;
         
 //        override public int PropertyId {
 //            get { return ((int)TimelineType.Shear << 24) + boneIndex; }

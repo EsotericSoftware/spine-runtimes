@@ -32,5 +32,5 @@
 
 namespace Spine
 {
-    RTTI_IMPL(EventTimeline, Timeline);
+    SPINE_RTTI_IMPL(EventTimeline, Timeline);
 }

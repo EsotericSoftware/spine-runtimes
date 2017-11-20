@@ -46,7 +46,7 @@ namespace Spine
     
     class AttachmentTimeline : public Timeline
     {
-        RTTI_DECL;
+        SPINE_RTTI_DECL;
         
     public:
         AttachmentTimeline(int frameCount)

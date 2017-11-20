@@ -39,7 +39,7 @@ namespace Spine
     
     class ClippingAttachment : public VertexAttachment
     {
-        RTTI_DECL;
+        SPINE_RTTI_DECL;
         
     public:
         ClippingAttachment(std::string name);

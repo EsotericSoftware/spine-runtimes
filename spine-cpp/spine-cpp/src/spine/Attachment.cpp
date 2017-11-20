@@ -34,7 +34,7 @@
 
 namespace Spine
 {
-    RTTI_IMPL_NOPARENT(Attachment);
+    SPINE_RTTI_IMPL_NOPARENT(Attachment);
     
     Attachment::Attachment(std::string name) : _name(name)
     {

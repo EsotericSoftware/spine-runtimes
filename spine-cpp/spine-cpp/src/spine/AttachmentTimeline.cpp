@@ -38,5 +38,5 @@
 
 namespace Spine
 {
-    RTTI_IMPL(AttachmentTimeline, Timeline);
+    SPINE_RTTI_IMPL(AttachmentTimeline, Timeline);
 }

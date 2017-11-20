@@ -38,7 +38,7 @@
 
 namespace Spine
 {
-    RTTI_IMPL(RegionAttachment, Attachment);
+    SPINE_RTTI_IMPL(RegionAttachment, Attachment);
     
     const int RegionAttachment::BLX = 0;
     const int RegionAttachment::BLY = 1;

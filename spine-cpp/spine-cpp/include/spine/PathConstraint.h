@@ -47,7 +47,7 @@ namespace Spine
     {
         friend class Skeleton;
         
-        RTTI_DECL;
+        SPINE_RTTI_DECL;
         
     public:
         PathConstraint(PathConstraintData& data, Skeleton& skeleton);

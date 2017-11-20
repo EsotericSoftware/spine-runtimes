@@ -31,7 +31,7 @@
 #ifndef Spine_AttachmentLoader_h
 #define Spine_AttachmentLoader_h
 
-#include <spine/RTTI.h>
+#include <spine/SpineRTTI.h>
 
 #include <string>
 
@@ -47,7 +47,7 @@ namespace Spine
     
     class AttachmentLoader
     {
-        RTTI_DECL;
+        SPINE_RTTI_DECL;
         
         /// @return May be NULL to not load any attachment.
         virtual RegionAttachment* newRegionAttachment(Skin& skin, std::string name, std::string path) = 0;

@@ -471,7 +471,7 @@ namespace Spine
             int verticesLength = 0;
             Attachment* attachment = slot->getAttachment();
             
-            if (attachment != NULL && attachment->getRTTI().derivesFrom(RegionAttachment::rtti))
+            if (attachment != NULL && attachment->getSPINE_RTTI().derivesFrom(RegionAttachment::rtti))
             {
                 RegionAttachment* regionAttachment = static_cast<RegionAttachment*>(attachment);
 
@@ -482,7 +482,7 @@ namespace Spine
                 }
                 regionAttachment->computeWorldVertices(slot->getBone(), outVertexBuffer, 0);
             }
-            else if (attachment != NULL && attachment->getRTTI().derivesFrom(MeshAttachment::rtti))
+            else if (attachment != NULL && attachment->getSPINE_RTTI().derivesFrom(MeshAttachment::rtti))
             {
                 MeshAttachment* mesh = static_cast<MeshAttachment*>(attachment);
 
@@ -699,7 +699,7 @@ namespace Spine
         }
         
         Attachment* attachment = slot->_attachment;
-        if (attachment != NULL && attachment->getRTTI().derivesFrom(PathAttachment::rtti))
+        if (attachment != NULL && attachment->getSPINE_RTTI().derivesFrom(PathAttachment::rtti))
         {
             sortPathConstraintAttachment(attachment, slotBone);
         }
@@ -780,7 +780,7 @@ namespace Spine
     
     void Skeleton::sortPathConstraintAttachment(Attachment* attachment, Bone& slotBone)
     {
-        if (attachment == NULL || attachment->getRTTI().derivesFrom(PathAttachment::rtti))
+        if (attachment == NULL || attachment->getSPINE_RTTI().derivesFrom(PathAttachment::rtti))
         {
             return;
         }

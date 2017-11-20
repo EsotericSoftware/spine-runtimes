@@ -45,7 +45,7 @@ namespace Spine
     ///
     class AtlasAttachmentLoader : public AttachmentLoader
     {
-        RTTI_DECL;
+        SPINE_RTTI_DECL;
         
     public:
         AtlasAttachmentLoader (Vector<Atlas*>& inAtlasArray) : _atlasArray(inAtlasArray)

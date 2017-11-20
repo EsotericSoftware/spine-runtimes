@@ -32,5 +32,5 @@
 
 namespace Spine
 {
-    RTTI_IMPL(PathConstraintPositionTimeline, CurveTimeline);
+    SPINE_RTTI_IMPL(PathConstraintPositionTimeline, CurveTimeline);
 }

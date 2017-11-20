@@ -37,7 +37,7 @@ namespace Spine
 {
     class DrawOrderTimeline : public Timeline
     {
-        RTTI_DECL;
+        SPINE_RTTI_DECL;
         
 //        internal float[] frames;
 //        private int[][] drawOrders;

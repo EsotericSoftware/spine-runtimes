@@ -37,7 +37,7 @@ namespace Spine
 {
     class ColorTimeline : public CurveTimeline
     {
-        RTTI_DECL;
+        SPINE_RTTI_DECL;
         
 //        public const int ENTRIES = 5;
 //        protected const int PREV_TIME = -5, PREV_R = -4, PREV_G = -3, PREV_B = -2, PREV_A = -1;

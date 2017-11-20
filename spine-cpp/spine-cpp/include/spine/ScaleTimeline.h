@@ -37,7 +37,7 @@ namespace Spine
 {
     class ScaleTimeline : public TranslateTimeline
     {
-        RTTI_DECL;
+        SPINE_RTTI_DECL;
         
 //        override public int PropertyId {
 //            get { return ((int)TimelineType.Scale << 24) + boneIndex; }

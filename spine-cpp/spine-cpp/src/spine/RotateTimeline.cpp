@@ -40,7 +40,7 @@
 
 namespace Spine
 {
-    RTTI_IMPL(RotateTimeline, CurveTimeline);
+    SPINE_RTTI_IMPL(RotateTimeline, CurveTimeline);
     
     RotateTimeline::RotateTimeline(int frameCount) : CurveTimeline(frameCount), _boneIndex(0)
     {

@@ -37,7 +37,7 @@ namespace Spine
 {
     class PathConstraintSpacingTimeline : public PathConstraintPositionTimeline
     {
-        RTTI_DECL;
+        SPINE_RTTI_DECL;
         
 //        override public int PropertyId {
 //            get { return ((int)TimelineType.PathConstraintSpacing << 24) + pathConstraintIndex; }

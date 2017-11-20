@@ -46,7 +46,7 @@ namespace Spine
     /// Attachment that displays a texture region.
     class RegionAttachment : public Attachment
     {
-        RTTI_DECL;
+        SPINE_RTTI_DECL;
         
     public:
         RegionAttachment(std::string name);

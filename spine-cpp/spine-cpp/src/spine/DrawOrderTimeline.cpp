@@ -32,5 +32,5 @@
 
 namespace Spine
 {
-    RTTI_IMPL(DrawOrderTimeline, Timeline);
+    SPINE_RTTI_IMPL(DrawOrderTimeline, Timeline);
 }

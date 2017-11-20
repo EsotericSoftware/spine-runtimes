@@ -40,7 +40,7 @@ namespace Spine
 {
     class TranslateTimeline : public CurveTimeline
     {
-        RTTI_DECL;
+        SPINE_RTTI_DECL;
         
 //        public const int ENTRIES = 3;
 //        protected const int PREV_TIME = -3, PREV_X = -2, PREV_Y = -1;

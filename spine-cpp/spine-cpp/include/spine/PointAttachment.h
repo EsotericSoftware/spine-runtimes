@@ -46,7 +46,7 @@ namespace Spine
     /// 
     class PointAttachment : public Attachment
     {
-        RTTI_DECL;
+        SPINE_RTTI_DECL;
         
     public:
         PointAttachment(std::string name);

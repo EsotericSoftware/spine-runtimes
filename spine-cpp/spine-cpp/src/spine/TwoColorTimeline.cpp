@@ -32,5 +32,5 @@
 
 namespace Spine
 {
-    RTTI_IMPL(TwoColorTimeline, CurveTimeline);
+    SPINE_RTTI_IMPL(TwoColorTimeline, CurveTimeline);
 }

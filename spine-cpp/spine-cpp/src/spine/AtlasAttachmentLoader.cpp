@@ -32,5 +32,5 @@
 
 namespace Spine
 {
-    RTTI_IMPL(AtlasAttachmentLoader, AttachmentLoader);
+    SPINE_RTTI_IMPL(AtlasAttachmentLoader, AttachmentLoader);
 }

@@ -37,7 +37,7 @@ namespace Spine
 {
     class RotateTimeline : public CurveTimeline
     {
-        RTTI_DECL;
+        SPINE_RTTI_DECL;
         
     public:
         static const int ENTRIES = 2;

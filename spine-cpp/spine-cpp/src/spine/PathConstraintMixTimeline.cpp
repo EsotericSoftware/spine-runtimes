@@ -32,5 +32,5 @@
 
 namespace Spine
 {
-    RTTI_IMPL(PathConstraintMixTimeline, CurveTimeline);
+    SPINE_RTTI_IMPL(PathConstraintMixTimeline, CurveTimeline);
 }

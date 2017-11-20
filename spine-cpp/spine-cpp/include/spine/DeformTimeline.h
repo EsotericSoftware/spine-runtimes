@@ -37,7 +37,7 @@ namespace Spine
 {
     class DeformTimeline : CurveTimeline
     {
-        RTTI_DECL;
+        SPINE_RTTI_DECL;
         
 //        internal int slotIndex;
 //        internal float[] frames;

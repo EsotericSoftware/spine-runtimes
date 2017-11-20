@@ -32,7 +32,7 @@
 
 namespace Spine
 {
-    RTTI_IMPL(PathAttachment, VertexAttachment);
+    SPINE_RTTI_IMPL(PathAttachment, VertexAttachment);
     
     PathAttachment::PathAttachment(std::string name) : VertexAttachment(name)
     {

@@ -28,48 +28,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_RTTI_h
-#define Spine_RTTI_h
+#ifndef Spine_SPINE_RTTI_h
+#define Spine_SPINE_RTTI_h
 
 #include <string>
 
 namespace Spine
 {
-    class RTTI
+    class SPINE_RTTI
     {
     public:
-        RTTI(const std::string& className);
+        SPINE_RTTI(const std::string& className);
         
-        RTTI(const std::string& className, const RTTI& baseRTTI);
+        SPINE_RTTI(const std::string& className, const SPINE_RTTI& baseSPINE_RTTI);
         
         const std::string& getClassName() const;
         
-        bool isExactly(const RTTI& rtti) const;
+        bool isExactly(const SPINE_RTTI& rtti) const;
         
-        bool derivesFrom(const RTTI& rtti) const;
+        bool derivesFrom(const SPINE_RTTI& rtti) const;
         
     private:
         // Prevent copying
-        RTTI(const RTTI& obj);
-        RTTI& operator=(const RTTI& obj);
+        SPINE_RTTI(const SPINE_RTTI& obj);
+        SPINE_RTTI& operator=(const SPINE_RTTI& obj);
         
         const std::string m_className;
-        const RTTI *m_pBaseRTTI;
+        const SPINE_RTTI *m_pBaseSPINE_RTTI;
     };
 }
 
-#define RTTI_DECL \
+#define SPINE_RTTI_DECL \
 public: \
-static const Spine::RTTI rtti; \
-virtual const Spine::RTTI& getRTTI();
+static const Spine::SPINE_RTTI rtti; \
+virtual const Spine::SPINE_RTTI& getSPINE_RTTI();
 
-#define RTTI_IMPL_NOPARENT(name) \
-const Spine::RTTI name::rtti(#name); \
-const Spine::RTTI& name::getRTTI() { return rtti; }
+#define SPINE_RTTI_IMPL_NOPARENT(name) \
+const Spine::SPINE_RTTI name::rtti(#name); \
+const Spine::SPINE_RTTI& name::getSPINE_RTTI() { return rtti; }
 
-#define RTTI_IMPL(name,parent) \
-const Spine::RTTI name::rtti(#name, parent::rtti); \
-const Spine::RTTI& name::getRTTI() { return rtti; }
+#define SPINE_RTTI_IMPL(name,parent) \
+const Spine::SPINE_RTTI name::rtti(#name, parent::rtti); \
+const Spine::SPINE_RTTI& name::getSPINE_RTTI() { return rtti; }
 
-#endif /* Spine_RTTI_h */
+#endif /* Spine_SPINE_RTTI_h */
 
