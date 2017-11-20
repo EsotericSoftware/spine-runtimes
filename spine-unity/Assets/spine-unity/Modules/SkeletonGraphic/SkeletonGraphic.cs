@@ -80,14 +80,16 @@ namespace Spine.Unity {
 							
 					}
 
+					// Only provide visual feedback to inspector changes in Unity Editor Edit mode.
 					if (!Application.isPlaying) {
 						skeleton.flipX = this.initialFlipX;
 						skeleton.flipY = this.initialFlipY;
+
+						skeleton.SetToSetupPose();
+						if (!string.IsNullOrEmpty(startingAnimation))
+							skeleton.PoseWithAnimation(startingAnimation, 0f, false);
 					}
 
-					skeleton.SetToSetupPose();
-					if (!string.IsNullOrEmpty(startingAnimation))
-						skeleton.PoseWithAnimation(startingAnimation, 0f, false);
 				}
 			} else {
 				if (skeletonDataAsset != null)
