@@ -69,7 +69,7 @@ namespace Spine {
 				trackEntryPool
 			);
 		}
-			
+
 		/// <summary>
 		/// Increments the track entry times, setting queued animations as current if needed</summary>
 		/// <param name="delta">delta time</param>
@@ -259,17 +259,12 @@ namespace Spine {
 					break;
 				case Dip:
 					pose = MixPose.Setup;
-					alpha = mix == 1 ? 0 : alphaDip;
+					alpha = alphaDip;
 					break;
 				default:
 					pose = MixPose.Setup;
-					if (mix == 1) {
-						alpha = 0;
-					} else {
-						alpha = alphaDip;
-						var dipMix = timelineDipMix[i];
-						alpha *= Math.Max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
-					}
+					TrackEntry dipMix = timelineDipMix[i];
+					alpha = alphaDip * Math.Max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
 					break;
 				}
 				from.totalAlpha += alpha;
