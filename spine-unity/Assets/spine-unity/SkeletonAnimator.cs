@@ -76,8 +76,13 @@ namespace Spine.Unity {
 			if (!valid) return;
 
 			#if UNITY_EDITOR
-			if (Application.isPlaying)
+			if (Application.isPlaying) {
 				translator.Apply(skeleton);
+			} else {
+				var translatorAnimator = translator.Animator;
+				if (translatorAnimator != null && translatorAnimator.isInitialized)
+					translator.Apply(skeleton);
+			}
 			#else
 			translator.Apply(skeleton);
 			#endif
