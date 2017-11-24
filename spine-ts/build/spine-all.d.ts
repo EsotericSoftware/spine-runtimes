@@ -1483,8 +1483,8 @@ declare module spine.webgl {
 		private shapes;
 		private shapesShader;
 		private activeRenderer;
-		private skeletonRenderer;
-		private skeletonDebugRenderer;
+		skeletonRenderer: SkeletonRenderer;
+		skeletonDebugRenderer: SkeletonDebugRenderer;
 		private QUAD;
 		private QUAD_TRIANGLES;
 		private WHITE;
