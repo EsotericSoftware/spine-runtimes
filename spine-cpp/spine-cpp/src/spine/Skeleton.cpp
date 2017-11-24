@@ -50,6 +50,7 @@
 #include <spine/PathAttachment.h>
 
 #include <spine/ContainerUtil.h>
+#include <spine/Extension.h>
 
 namespace Spine
 {
@@ -74,12 +75,14 @@ namespace Spine
             Bone* bone;
             if (data->getParent() == NULL)
             {
-                bone = new Bone(*data, *this, NULL);
+                bone = MALLOC(Bone, 1);
+                new (bone) Bone(*data, *this, NULL);
             }
             else
             {
                 Bone* parent = _bones[data->getParent()->getIndex()];
-                bone = new Bone(*data, *this, parent);
+                bone = MALLOC(Bone, 1);
+                new (bone) Bone(*data, *this, parent);
                 parent->getChildren().push_back(bone);
             }
             
@@ -93,7 +96,8 @@ namespace Spine
             SlotData* data = (*i);
             
             Bone* bone = _bones[data->getBoneData().getIndex()];
-            Slot* slot = new Slot(*data, *bone);
+            Slot* slot = MALLOC(Slot, 1);
+            new (slot) Slot(*data, *bone);
             
             _slots.push_back(slot);
             _drawOrder.push_back(slot);
@@ -104,7 +108,10 @@ namespace Spine
         {
             IkConstraintData* data = (*i);
             
-            _ikConstraints.push_back(new IkConstraint(*data, *this));
+            IkConstraint* constraint = MALLOC(IkConstraint, 1);
+            new (constraint) IkConstraint(*data, *this);
+            
+            _ikConstraints.push_back(constraint);
         }
         
         _transformConstraints.reserve(_data.getTransformConstraints().size());
@@ -112,7 +119,10 @@ namespace Spine
         {
             TransformConstraintData* data = (*i);
             
-            _transformConstraints.push_back(new TransformConstraint(*data, *this));
+            TransformConstraint* constraint = MALLOC(TransformConstraint, 1);
+            new (constraint) TransformConstraint(*data, *this);
+            
+            _transformConstraints.push_back(constraint);
         }
         
         _pathConstraints.reserve(_data.getPathConstraints().size());
@@ -120,7 +130,10 @@ namespace Spine
         {
             PathConstraintData* data = (*i);
             
-            _pathConstraints.push_back(new PathConstraint(*data, *this));
+            PathConstraint* constraint = MALLOC(PathConstraint, 1);
+            new (constraint) PathConstraint(*data, *this);
+            
+            _pathConstraints.push_back(constraint);
         }
         
         updateCache();

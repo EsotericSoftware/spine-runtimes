@@ -32,6 +32,7 @@
 #define Spine_Atlas_h
 
 #include <spine/Vector.h>
+#include <spine/Extension.h>
 
 #include <string>
 
@@ -77,12 +78,14 @@ namespace Spine
         TextureWrap vWrap;
         void* rendererObject;
         int width, height;
+        
+        AtlasPage(std::string inName) : name(inName) {}
     };
     
     class AtlasRegion
     {
     public:
-        AtlasPage page;
+        AtlasPage* page;
         std::string name;
         int x, y, width, height;
         float u, v, u2, v2;
@@ -94,14 +97,70 @@ namespace Spine
         Vector<int> pads;
     };
     
+    class TextureLoader
+    {
+    public:
+        virtual void load(AtlasPage page, std::string path) = 0;
+        virtual void unload(void* texture) = 0;
+    };
+    
     class Atlas
     {
     public:
-        /// Returns the first region found with the specified name. This method uses string comparison to find the region, so the result
+        Atlas(const char* path, TextureLoader& textureLoader);
+        
+        Atlas(const char* data, int length, const char* dir, TextureLoader& textureLoader);
+        
+        ~Atlas();
+        
+        void flipV();
+        
+        /// Returns the first region found with the specified name. This method uses std::string comparison to find the region, so the result
         /// should be cached rather than calling this method multiple times.
         /// @return The region, or NULL.
         AtlasRegion* findRegion(std::string name);
+        
+        void dispose();
+        
+    private:
+        Vector<AtlasPage*> _pages;
+        Vector<AtlasRegion*> _regions;
+        TextureLoader& _textureLoader;
+        
+        void load(const char* begin, int length, const char* dir);
+        
+        class Str
+        {
+        public:
+            const char* begin;
+            const char* end;
+        };
+        
+        static void trim(Str* str);
+        
+        /// Tokenize string without modification. Returns 0 on failure
+        static int readLine(const char** begin, const char* end, Str* str);
+        
+        /// Moves str->begin past the first occurence of c. Returns 0 on failure
+        static int beginPast(Str* str, char c);
+        
+        /// Returns 0 on failure
+        static int readValue(const char** begin, const char* end, Str* str);
+        
+        /// Returns the number of tuple values read (1, 2, 4, or 0 for failure)
+        static int readTuple(const char** begin, const char* end, Str tuple[]);
+        
+        static char* mallocString(Str* str);
+        
+        static int indexOf(const char** array, int count, Str* str);
+        
+        static int equals(Str* str, const char* other);
+        
+        static int toInt(Str* str);
+        
+        static Atlas* abortAtlas(Atlas* atlas);
     };
 }
 
 #endif /* Spine_Atlas_h */
+

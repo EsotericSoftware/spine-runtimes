@@ -28,58 +28,29 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Pool_h
-#define Spine_Pool_h
+#ifndef Spine_Extension_h
+#define Spine_Extension_h
 
-#include <spine/Vector.h>
-#include <spine/ContainerUtil.h>
-#include <spine/Extension.h>
+/* All allocation uses these. */
+#define MALLOC(TYPE,COUNT) ((TYPE*)spineAlloc(sizeof(TYPE) * (COUNT), __FILE__, __LINE__))
+#define REALLOC(PTR,TYPE,COUNT) ((TYPE*)spineRealloc(PTR, sizeof(TYPE) * (COUNT), __FILE__, __LINE__))
+
+/* Frees memory. Can be used on const types. */
+#define FREE(VALUE) spineFree((void*)VALUE)
+
+#include <stdlib.h>
 
 namespace Spine
 {
-    template <typename T>
-    class Pool
-    {
-    public:
-        Pool()
-        {
-            // Empty
-        }
-        
-        ~Pool()
-        {
-            ContainerUtil::cleanUpVectorOfPointers(_objects);
-        }
-        
-        T* obtain()
-        {
-            if (_objects.size() > 0)
-            {
-                T** object = _objects.begin();
-                _objects.erase(0);
-                
-                return *object;
-            }
-            else
-            {
-                T* ret = MALLOC(T, 1);
-                new (ret) T();
-                
-                return ret;
-            }
-        }
-        
-        void free(T* object)
-        {
-            if (!_objects.contains(object))
-            {
-                _objects.push_back(object);
-            }
-        }
-        
-    private:
-        Vector<T*> _objects;
-    };
+    /// Implement this function to use your own memory allocator.
+    void* spineAlloc(size_t size, const char* file, int line);
+    
+    void* spineRealloc(void* ptr, size_t size, const char* file, int line);
+    
+    /// If you implement spineAlloc, you should also implement this function.
+    void spineFree(void* mem);
+    
+    char* spineReadFile(const char* path, int* length);
 }
 
-#endif /* Spine_Pool_h */
+#endif /* Spine_Extension_h */

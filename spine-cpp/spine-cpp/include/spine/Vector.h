@@ -31,6 +31,8 @@
 #ifndef Spine_Vector_h
 #define Spine_Vector_h
 
+#include <spine/Extension.h>
+
 #include <stdlib.h>
 #include <memory>
 #include <assert.h>
@@ -149,7 +151,7 @@ namespace Spine
             size_t newCapacity = inCapacity > 0 ? inCapacity : _capacity > 0 ? _capacity * 2 : 1;
             if (newCapacity > _capacity)
             {
-                _buffer = static_cast<T*>(realloc(_buffer, newCapacity * sizeof(T)));
+                _buffer = REALLOC(_buffer, T, newCapacity);
                 _capacity = newCapacity;
             }
         }
@@ -173,10 +175,11 @@ namespace Spine
         {
             assert(n > 0);
             
-            void* ptr = malloc(n * sizeof(T));
+            T* ptr = MALLOC(T, n);
+            
             assert(ptr);
             
-            return static_cast<T*>(ptr);
+            return ptr;
         }
         
         void deallocate(T* buffer)

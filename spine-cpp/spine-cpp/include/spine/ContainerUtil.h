@@ -33,6 +33,7 @@
 
 #include <spine/Vector.h>
 #include <spine/HashMap.h>
+#include <spine/Extension.h>
 
 #include <string>
 #include <assert.h>
@@ -124,20 +125,10 @@ namespace Spine
             for (size_t i = 0; i < items.size(); )
             {
                 T* item = items[i];
-                delete item;
+                
+                FREE(item);
                 
                 items.erase(i);
-            }
-        }
-        
-        template<typename K, typename T, typename H>
-        static void cleanUpHashMapOfPointers(HashMap<K, T*, H>& hashMap)
-        {
-            for (typename HashMap<K, T*, H>::Iterator i = hashMap.begin(); i != hashMap.end(); )
-            {
-                delete i.second();
-                
-                i = hashMap.erase(i);
             }
         }
         
