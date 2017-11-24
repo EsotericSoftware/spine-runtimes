@@ -37,17 +37,21 @@
 
 namespace Spine
 {
+    class Skin;
     class RegionAttachment;
     class MeshAttachment;
     class BoundingBoxAttachment;
     class PathAttachment;
     class PointAttachment;
     class ClippingAttachment;
-    class Skin;
     
     class AttachmentLoader
     {
         SPINE_RTTI_DECL;
+        
+        AttachmentLoader();
+        
+        virtual ~AttachmentLoader();
         
         /// @return May be NULL to not load any attachment.
         virtual RegionAttachment* newRegionAttachment(Skin& skin, std::string name, std::string path) = 0;
@@ -56,7 +60,7 @@ namespace Spine
         virtual MeshAttachment* newMeshAttachment(Skin& skin, std::string name, std::string path) = 0;
         
         /// @return May be NULL to not load any attachment.
-        virtual BoundingBoxAttachment* NewBoundingBoxAttachment(Skin& skin, std::string name) = 0;
+        virtual BoundingBoxAttachment* newBoundingBoxAttachment(Skin& skin, std::string name) = 0;
         
         /// @return May be NULL to not load any attachment
         virtual PathAttachment* newPathAttachment(Skin& skin, std::string name) = 0;

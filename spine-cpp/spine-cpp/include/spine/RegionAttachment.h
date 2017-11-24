@@ -48,6 +48,8 @@ namespace Spine
     {
         SPINE_RTTI_DECL;
         
+        friend class AtlasAttachmentLoader;
+        
     public:
         RegionAttachment(std::string name);
 

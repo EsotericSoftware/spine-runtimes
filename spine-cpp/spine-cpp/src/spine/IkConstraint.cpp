@@ -49,7 +49,7 @@ namespace Spine
         }
         
         Bone* parent = bone.getParent();
-        Bone p = *parent;
+        Bone& p = *parent;
         
         float id = 1 / (p._a * p._d - p._b * p._c);
         float x = targetX - p._worldX, y = targetY - p._worldY;
@@ -151,7 +151,7 @@ namespace Spine
         }
         
         Bone* parentparent = parent._parent;
-        Bone pp = *parentparent;
+        Bone& pp = *parentparent;
         
         a = pp._a;
         b = pp._b;

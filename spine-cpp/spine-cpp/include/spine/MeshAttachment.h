@@ -44,6 +44,8 @@ namespace Spine
     {
         SPINE_RTTI_DECL;
         
+        friend class AtlasAttachmentLoader;
+        
     public:
         MeshAttachment(std::string name);
 

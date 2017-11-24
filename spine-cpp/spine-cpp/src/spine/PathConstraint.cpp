@@ -114,7 +114,7 @@ namespace Spine
             for (int i = 0, n = spacesCount - 1; i < n;)
             {
                 Bone* boneP = _bones[i];
-                Bone bone = *boneP;
+                Bone& bone = *boneP;
                 float setupLength = bone._data.getLength();
                 if (setupLength < PathConstraint::EPSILON)
                 {
@@ -165,7 +165,7 @@ namespace Spine
         for (int i = 0, p = 3; i < boneCount; i++, p += 3)
         {
             Bone* boneP = _bones[i];
-            Bone bone = *boneP;
+            Bone& bone = *boneP;
             bone._worldX += (boneX - bone._worldX) * translateMix;
             bone._worldY += (boneY - bone._worldY) * translateMix;
             float x = positions[p];
@@ -306,10 +306,8 @@ namespace Spine
     
     Vector<float> PathConstraint::computeWorldPositions(PathAttachment& path, int spacesCount, bool tangents, bool percentPosition, bool percentSpacing)
     {
-        Slot target = *_target;
+        Slot& target = *_target;
         float position = _position;
-//        float[] spacesItems = _spaces.Items;
-//        float[] output = _positions.Resize(spacesCount * 3 + 2).Items;
         _positions.reserve(spacesCount * 3 + 2);
         bool closed = path.isClosed();
         int verticesLength = path.getWorldVerticesLength();

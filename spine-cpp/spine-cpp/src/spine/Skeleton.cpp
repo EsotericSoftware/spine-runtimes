@@ -232,7 +232,7 @@ namespace Spine
         for (int i = 0, n = static_cast<int>(_updateCacheReset.size()); i < n; ++i)
         {
             Bone* boneP = _updateCacheReset[i];
-            Bone bone = *boneP;
+            Bone& bone = *boneP;
             bone._ax = bone._x;
             bone._ay = bone._y;
             bone._arotation = bone._rotation;
@@ -265,7 +265,7 @@ namespace Spine
         for (int i = 0, n = static_cast<int>(_ikConstraints.size()); i < n; ++i)
         {
             IkConstraint* constraintP = _ikConstraints[i];
-            IkConstraint constraint = *constraintP;
+            IkConstraint& constraint = *constraintP;
             
             constraint._bendDirection = constraint._data._bendDirection;
             constraint._mix = constraint._data._mix;
@@ -274,7 +274,7 @@ namespace Spine
         for (int i = 0, n = static_cast<int>(_transformConstraints.size()); i < n; ++i)
         {
             TransformConstraint* constraintP = _transformConstraints[i];
-            TransformConstraint constraint = *constraintP;
+            TransformConstraint& constraint = *constraintP;
             TransformConstraintData& constraintData = constraint._data;
             
             constraint._rotateMix = constraintData._rotateMix;
@@ -286,7 +286,7 @@ namespace Spine
         for (int i = 0, n = static_cast<int>(_pathConstraints.size()); i < n; ++i)
         {
             PathConstraint* constraintP = _pathConstraints[i];
-            PathConstraint constraint = *constraintP;
+            PathConstraint& constraint = *constraintP;
             PathConstraintData& constraintData = constraint._data;
             
             constraint._position = constraintData._position;
@@ -353,7 +353,7 @@ namespace Spine
                 for (int i = 0, n = static_cast<int>(_slots.size()); i < n; ++i)
                 {
                     Slot* slotP = _slots[i];
-                    Slot slot = *slotP;
+                    Slot& slot = *slotP;
                     std::string name = slot._data.getAttachmentName();
                     if (name.length() > 0)
                     {

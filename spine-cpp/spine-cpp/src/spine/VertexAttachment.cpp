@@ -96,7 +96,7 @@ namespace Spine
                 for (; v < n; v++, b += 3)
                 {
                     Bone* boneP = skeletonBones[bones[v]];
-                    Bone bone = *boneP;
+                    Bone& bone = *boneP;
                     float vx = vertices[b];
                     float vy = vertices[b + 1];
                     float weight = vertices[b + 2];
@@ -117,7 +117,7 @@ namespace Spine
                 for (; v < n; v++, b += 3, f += 2)
                 {
                     Bone* boneP = skeletonBones[bones[v]];
-                    Bone bone = *boneP;
+                    Bone& bone = *boneP;
                     float vx = vertices[b] + deformArray[f];
                     float vy = vertices[b + 1] + deformArray[f + 1];
                     float weight = vertices[b + 2];

@@ -157,7 +157,7 @@ namespace Spine
     void TransformConstraint::applyAbsoluteWorld()
     {
         float rotateMix = _rotateMix, translateMix = _translateMix, scaleMix = _scaleMix, shearMix = _shearMix;
-        Bone target = *_target;
+        Bone& target = *_target;
         float ta = target._a, tb = target._b, tc = target._c, td = target._d;
         float degRadReflect = ta * td - tb * tc > 0 ? DegRad : -DegRad;
         float offsetRotation = _data._offsetRotation * degRadReflect, offsetShearY = _data._offsetShearY * degRadReflect;
@@ -252,7 +252,7 @@ namespace Spine
     void TransformConstraint::applyRelativeWorld()
     {
         float rotateMix = _rotateMix, translateMix = _translateMix, scaleMix = _scaleMix, shearMix = _shearMix;
-        Bone target = *_target;
+        Bone& target = *_target;
         float ta = target._a, tb = target._b, tc = target._c, td = target._d;
         float degRadReflect = ta * td - tb * tc > 0 ? DegRad : -DegRad;
         float offsetRotation = _data._offsetRotation * degRadReflect, offsetShearY = _data._offsetShearY * degRadReflect;
@@ -335,7 +335,7 @@ namespace Spine
     void TransformConstraint::applyAbsoluteLocal()
     {
         float rotateMix = _rotateMix, translateMix = _translateMix, scaleMix = _scaleMix, shearMix = _shearMix;
-        Bone target = *_target;
+        Bone& target = *_target;
         if (!target._appliedValid)
         {
             target.updateAppliedTransform();
@@ -395,7 +395,7 @@ namespace Spine
     void TransformConstraint::applyRelativeLocal()
     {
         float rotateMix = _rotateMix, translateMix = _translateMix, scaleMix = _scaleMix, shearMix = _shearMix;
-        Bone target = *_target;
+        Bone& target = *_target;
         if (!target._appliedValid)
         {
             target.updateAppliedTransform();

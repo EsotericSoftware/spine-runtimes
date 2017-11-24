@@ -77,7 +77,7 @@ namespace Spine
         for (size_t i = 0, n = _regions.size(); i < n; ++i)
         {
             AtlasRegion* regionP = _regions[i];
-            AtlasRegion region = *regionP;
+            AtlasRegion& region = *regionP;
             region.v = 1 - region.v;
             region.v2 = 1 - region.v2;
         }
@@ -284,7 +284,11 @@ namespace Spine
     
     int Atlas::readLine(const char** begin, const char* end, Str* str)
     {
-        if (*begin == end) return 0;
+        if (*begin == end)
+        {
+            return 0;
+        }
+        
         str->begin = *begin;
         
         /* Find next delimiter. */
@@ -307,7 +311,8 @@ namespace Spine
     int Atlas::beginPast(Str* str, char c)
     {
         const char* begin = str->begin;
-        while (1) {
+        while (1)
+        {
             char lastSkippedChar = *begin;
             if (begin == str->end)
             {
