@@ -184,7 +184,7 @@ namespace Spine
         
         void deallocate(T* buffer)
         {
-            free(buffer);
+            FREE(buffer);
         }
         
         void construct(T* buffer, const T& val)

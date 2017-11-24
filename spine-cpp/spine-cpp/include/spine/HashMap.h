@@ -31,7 +31,7 @@
 #ifndef Spine_HashMap_h
 #define Spine_HashMap_h
 
-#include <memory>
+#include <spine/Vector.h>
 
 namespace Spine
 {
@@ -95,10 +95,10 @@ namespace Spine
         _trailer(),
         _hashSize(0)
         {
-            _hashTable = new Entry[capacity];
+            _hashTable.reserve(capacity);
             for (int i = 0; i < _capacity; ++i)
             {
-                _hashTable[i] = Entry();
+                _hashTable.push_back(Entry());
             }
             
             _header.prev = &_header;
@@ -109,8 +109,6 @@ namespace Spine
         
         ~HashMap()
         {
-            delete [] _hashTable;
-            
             _hashSize = 0;
         }
         
@@ -150,7 +148,8 @@ namespace Spine
             
             size_t index = hash(key);
             
-            Entry* entry = new Entry();
+            Entry* entry = MALLOC(Entry, 1);
+            new (entry) Entry();
             entry->_key = key;
             entry->_value = value;
             
@@ -258,7 +257,7 @@ namespace Spine
                         pos._entry->next->prev = pos._entry->prev;
                     }
                     
-                    delete pos._entry;
+                    DESTROY(Entry, pos._entry);
                 }
                 else if (_hashTable[index].next == pos._entry)
                 {
@@ -274,7 +273,7 @@ namespace Spine
                         pos._entry->next->prev = pos._entry->prev;
                     }
                     
-                    delete pos._entry;
+                    DESTROY(Entry, pos._entry);
                 }
                 else if (_hashTable[index].prev == pos._entry)
                 {
@@ -290,14 +289,14 @@ namespace Spine
                         pos._entry->next->prev = pos._entry->prev;
                     }
                     
-                    delete pos._entry;
+                    DESTROY(Entry, pos._entry);
                 }
                 else
                 {
                     pos._entry->prev->next = pos._entry->next;
                     pos._entry->next->prev = pos._entry->prev;
                     
-                    delete pos._entry;
+                    DESTROY(Entry, pos._entry);
                 }
                 
                 _hashSize--;
@@ -332,7 +331,7 @@ namespace Spine
         
         const H _hashFunction;
         const size_t _capacity;
-        Entry* _hashTable;
+        Vector<Entry> _hashTable;
         Entry _header;
         Entry _trailer;
         size_t _hashSize;

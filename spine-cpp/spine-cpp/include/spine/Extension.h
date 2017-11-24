@@ -38,6 +38,9 @@
 /* Frees memory. Can be used on const types. */
 #define FREE(VALUE) spineFree((void*)VALUE)
 
+/* Call destructor and then frees memory. Can be used on const types. */
+#define DESTROY(TYPE,VALUE) VALUE->~TYPE(); spineFree((void*)VALUE)
+
 #include <stdlib.h>
 
 namespace Spine

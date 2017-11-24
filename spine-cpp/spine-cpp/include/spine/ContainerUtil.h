@@ -126,7 +126,7 @@ namespace Spine
             {
                 T* item = items[i];
                 
-                FREE(item);
+                DESTROY(T, item);
                 
                 items.erase(i);
             }
