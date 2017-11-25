@@ -49,6 +49,6 @@ namespace Spine
     
     int PathConstraintMixTimeline::getPropertyId()
     {
-        return 0;
+        return ((int)TimelineType_PathConstraintMix << 24) + _pathConstraintIndex;
     }
 }

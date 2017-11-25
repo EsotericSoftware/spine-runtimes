@@ -39,23 +39,23 @@ namespace Spine
     {
         SPINE_RTTI_DECL;
         
+    public:
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
         
         virtual int getPropertyId();
         
+    private:
+        int _pathConstraintIndex;
+        
 //        public const int ENTRIES = 3;
 //        private const int PREV_TIME = -3, PREV_ROTATE = -2, PREV_TRANSLATE = -1;
 //        private const int ROTATE = 1, TRANSLATE = 2;
-//        
-//        internal int pathConstraintIndex;
+//
 //        internal float[] frames;
 //        
 //        public int PathConstraintIndex { return pathConstraintIndex; } set { pathConstraintIndex = inValue; }
 //        public float[] Frames { return frames; } set { frames = inValue; } // time, rotate mix, translate mix, ...
-//        
-//        override public int PropertyId {
-//            get { return ((int)TimelineType.PathConstraintMix << 24) + pathConstraintIndex; }
-//        }
+//
 //        
 //        public PathConstraintMixTimeline (int frameCount)
 //        : base(frameCount) {
@@ -63,7 +63,7 @@ namespace Spine
 //        }
 //        
 //        /// Sets the time and mixes of the specified keyframe.
-//        public void SetFrame (int frameIndex, float time, float rotateMix, float translateMix) {
+//        public void setFrame (int frameIndex, float time, float rotateMix, float translateMix) {
 //            frameIndex *= ENTRIES;
 //            frames[frameIndex] = time;
 //            frames[frameIndex + ROTATE] = rotateMix;

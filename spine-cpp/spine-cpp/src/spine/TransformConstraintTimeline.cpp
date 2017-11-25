@@ -42,6 +42,17 @@ namespace Spine
 {
     SPINE_RTTI_IMPL(TransformConstraintTimeline, CurveTimeline);
     
+    const int TransformConstraintTimeline::ENTRIES = 5;
+    const int TransformConstraintTimeline::PREV_TIME = -5;
+    const int TransformConstraintTimeline::PREV_ROTATE = -4;
+    const int TransformConstraintTimeline::PREV_TRANSLATE = -3;
+    const int TransformConstraintTimeline::PREV_SCALE = -2;
+    const int TransformConstraintTimeline::PREV_SHEAR = -1;
+    const int TransformConstraintTimeline::ROTATE = 1;
+    const int TransformConstraintTimeline::TRANSLATE = 2;
+    const int TransformConstraintTimeline::SCALE = 3;
+    const int TransformConstraintTimeline::SHEAR = 4;
+    
     void TransformConstraintTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
     {
         // TODO
@@ -49,6 +60,6 @@ namespace Spine
     
     int TransformConstraintTimeline::getPropertyId()
     {
-        return 0;
+        return ((int)TimelineType_TransformConstraint << 24) + _transformConstraintIndex;
     }
 }

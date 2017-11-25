@@ -39,9 +39,13 @@ namespace Spine
     {
         SPINE_RTTI_DECL;
         
+    public:
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
         
         virtual int getPropertyId();
+        
+    private:
+        int _slotIndex;
         
 //        public const int ENTRIES = 8;
 //        protected const int PREV_TIME = -8, PREV_R = -7, PREV_G = -6, PREV_B = -5, PREV_A = -4;
@@ -51,7 +55,6 @@ namespace Spine
 //        internal float[] frames; // time, r, g, b, a, r2, g2, b2, ...
 //        public float[] Frames { return frames; }
 //
-//        internal int slotIndex;
 //        public int SlotIndex {
 //            get { return slotIndex; }
 //            set {
@@ -60,9 +63,6 @@ namespace Spine
 //            }
 //        }
 //
-//        override public int PropertyId {
-//            get { return ((int)TimelineType.TwoColor << 24) + slotIndex; }
-//        }
 //
 //        public TwoColorTimeline (int frameCount) :
 //        base(frameCount) {
@@ -70,7 +70,7 @@ namespace Spine
 //        }
 //
 //        /// Sets the time and value of the specified keyframe.
-//        public void SetFrame (int frameIndex, float time, float r, float g, float b, float a, float r2, float g2, float b2) {
+//        public void setFrame (int frameIndex, float time, float r, float g, float b, float a, float r2, float g2, float b2) {
 //            frameIndex *= ENTRIES;
 //            frames[frameIndex] = time;
 //            frames[frameIndex + R] = r;

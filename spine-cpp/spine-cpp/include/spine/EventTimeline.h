@@ -49,10 +49,7 @@ namespace Spine
 //        public float[] Frames { return frames; } set { frames = inValue; } // time, ...
 //        public Event[] Events { return events; } set { events = inValue; }
 //        public int FrameCount { return frames.Length; }
-//        
-//        public int PropertyId {
-//            get { return ((int)TimelineType.Event << 24); }
-//        }
+//
 //        
 //        public EventTimeline (int frameCount) {
 //            frames = new float[frameCount];
@@ -60,7 +57,7 @@ namespace Spine
 //        }
 //        
 //        /// Sets the time and value of the specified keyframe.
-//        public void SetFrame (int frameIndex, Event e) {
+//        public void setFrame (int frameIndex, Event e) {
 //            frames[frameIndex] = e.Time;
 //            events[frameIndex] = e;
 //        }

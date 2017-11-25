@@ -42,24 +42,23 @@ namespace Spine
     {
         SPINE_RTTI_DECL;
         
+    public:
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
         
         virtual int getPropertyId();
+        
+    protected:
+        int _boneIndex;
         
 //        public const int ENTRIES = 3;
 //        protected const int PREV_TIME = -3, PREV_X = -2, PREV_Y = -1;
 //        protected const int X = 1, Y = 2;
 //
-//        internal int boneIndex;
 //        internal float[] frames;
 //
 //        public int getBoneIndex { return boneIndex; } set { boneIndex = inValue; }
 //        public Vector<float> getFrames { return frames; } set { frames = inValue; } // time, value, value, ...
 //
-//        virtual int getPropertyId()
-//        {
-//            return ((int)TimelineType_Translate << 24) + boneIndex;
-//        }
 //
 //        public TranslateTimeline(int frameCount) : CurveTimeline(frameCount)
 //        {

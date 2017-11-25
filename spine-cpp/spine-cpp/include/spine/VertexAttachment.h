@@ -44,6 +44,8 @@ namespace Spine
     {
         SPINE_RTTI_DECL;
         
+        friend class DeformTimeline;
+        
     public:
         VertexAttachment(std::string name);
         

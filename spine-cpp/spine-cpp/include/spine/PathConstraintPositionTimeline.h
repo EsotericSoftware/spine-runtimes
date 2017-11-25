@@ -39,31 +39,32 @@ namespace Spine
     {
         SPINE_RTTI_DECL;
         
+    public:
+        static const int ENTRIES;
+        
+        PathConstraintPositionTimeline(int frameCount);
+        
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
         
         virtual int getPropertyId();
         
-//        public const int ENTRIES = 2;
-//        protected const int PREV_TIME = -2, PREV_VALUE = -1;
-//        protected const int VALUE = 1;
-//        
-//        internal int pathConstraintIndex;
-//        internal float[] frames;
-//        
-//        override public int PropertyId {
-//            get { return ((int)TimelineType.PathConstraintPosition << 24) + pathConstraintIndex; }
-//        }
-//        
-//        public PathConstraintPositionTimeline (int frameCount)
-//        : base(frameCount) {
-//            frames = new float[frameCount * ENTRIES];
-//        }
+    protected:
+        static const int PREV_TIME, PREV_VALUE;
+        static const int VALUE;
+        
+        Vector<float> _frames;
+        int _pathConstraintIndex;
+        
+        
+//
+//
+//
 //        
 //        public int PathConstraintIndex { return pathConstraintIndex; } set { pathConstraintIndex = inValue; }
 //        public float[] Frames { return frames; } set { frames = inValue; } // time, position, ...
 //        
 //        /// Sets the time and value of the specified keyframe.
-//        public void SetFrame (int frameIndex, float time, float value) {
+//        public void setFrame (int frameIndex, float time, float value) {
 //            frameIndex *= ENTRIES;
 //            frames[frameIndex] = time;
 //            frames[frameIndex + VALUE] = inValue;

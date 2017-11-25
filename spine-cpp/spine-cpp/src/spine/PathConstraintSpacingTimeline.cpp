@@ -42,6 +42,11 @@ namespace Spine
 {
     SPINE_RTTI_IMPL(PathConstraintSpacingTimeline, PathConstraintPositionTimeline);
     
+    PathConstraintSpacingTimeline::PathConstraintSpacingTimeline(int frameCount) : PathConstraintPositionTimeline(frameCount)
+    {
+        // Empty
+    }
+    
     void PathConstraintSpacingTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
     {
         // TODO
@@ -49,6 +54,6 @@ namespace Spine
     
     int PathConstraintSpacingTimeline::getPropertyId()
     {
-        return 0;
+        return ((int)TimelineType_PathConstraintSpacing << 24) + _pathConstraintIndex;
     }
 }

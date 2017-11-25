@@ -49,6 +49,6 @@ namespace Spine
     
     int ShearTimeline::getPropertyId()
     {
-        return 0;
+        return ((int)TimelineType_Shear << 24) + _boneIndex;
     }
 }

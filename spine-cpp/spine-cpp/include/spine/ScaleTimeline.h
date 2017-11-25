@@ -43,10 +43,6 @@ namespace Spine
         
         virtual int getPropertyId();
         
-//        override public int PropertyId {
-//            get { return ((int)TimelineType.Scale << 24) + boneIndex; }
-//        }
-//
 //        public ScaleTimeline (int frameCount)
 //        : base(frameCount) {
 //        }

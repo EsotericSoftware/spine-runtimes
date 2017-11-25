@@ -49,6 +49,6 @@ namespace Spine
     
     int TranslateTimeline::getPropertyId()
     {
-        return 0;
+        return ((int)TimelineType_Translate << 24) + _boneIndex;
     }
 }

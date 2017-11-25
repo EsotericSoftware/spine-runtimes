@@ -49,6 +49,6 @@ namespace Spine
     
     int TwoColorTimeline::getPropertyId()
     {
-        return 0;
+        return ((int)TimelineType_TwoColor << 24) + _slotIndex;
     }
 }

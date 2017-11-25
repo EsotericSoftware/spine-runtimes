@@ -39,14 +39,11 @@ namespace Spine
     {
         SPINE_RTTI_DECL;
         
+    public:
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
         
         virtual int getPropertyId();
         
-//        override public int PropertyId {
-//            get { return ((int)TimelineType.Shear << 24) + boneIndex; }
-//        }
-//
 //        public ShearTimeline (int frameCount)
 //        : base(frameCount) {
 //        }

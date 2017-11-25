@@ -61,15 +61,15 @@ namespace Spine
 #define SPINE_RTTI_DECL \
 public: \
 static const Spine::SPINE_RTTI rtti; \
-virtual const Spine::SPINE_RTTI& getSPINE_RTTI();
+virtual const Spine::SPINE_RTTI& getRTTI();
 
 #define SPINE_RTTI_IMPL_NOPARENT(name) \
 const Spine::SPINE_RTTI name::rtti(#name); \
-const Spine::SPINE_RTTI& name::getSPINE_RTTI() { return rtti; }
+const Spine::SPINE_RTTI& name::getRTTI() { return rtti; }
 
 #define SPINE_RTTI_IMPL(name,parent) \
 const Spine::SPINE_RTTI name::rtti(#name, parent::rtti); \
-const Spine::SPINE_RTTI& name::getSPINE_RTTI() { return rtti; }
+const Spine::SPINE_RTTI& name::getRTTI() { return rtti; }
 
 #endif /* Spine_SPINE_RTTI_h */
 

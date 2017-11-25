@@ -42,13 +42,103 @@ namespace Spine
 {
     SPINE_RTTI_IMPL(DrawOrderTimeline, Timeline);
     
+    DrawOrderTimeline::DrawOrderTimeline(int frameCount) : Timeline()
+    {
+        _frames.reserve(frameCount);
+        _drawOrders.reserve(frameCount);
+    }
+    
     void DrawOrderTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
     {
-        // TODO
+        Vector<Slot*>& drawOrder = skeleton._drawOrder;
+        Vector<Slot*>& slots = skeleton._slots;
+        if (direction == MixDirection_Out && pose == MixPose_Setup)
+        {
+            drawOrder.clear();
+            drawOrder.reserve(slots.size());
+            for (int i = 0, n = static_cast<int>(slots.size()); i < n; ++i)
+            {
+                drawOrder.push_back(slots[i]);
+            }
+            return;
+        }
+        
+        if (time < _frames[0])
+        {
+            if (pose == MixPose_Setup)
+            {
+                drawOrder.clear();
+                drawOrder.reserve(slots.size());
+                for (int i = 0, n = static_cast<int>(slots.size()); i < n; ++i)
+                {
+                    drawOrder.push_back(slots[i]);
+                }
+            }
+            return;
+        }
+        
+        int frame;
+        if (time >= _frames[_frames.size() - 1])
+        {
+            // Time is after last frame.
+            frame = static_cast<int>(_frames.size()) - 1;
+        }
+        else
+        {
+            frame = Animation::binarySearch(_frames, time) - 1;
+        }
+        
+        Vector<int>& drawOrderToSetupIndex = _drawOrders[frame];
+        if (drawOrderToSetupIndex.size() == 0)
+        {
+            drawOrder.clear();
+            for (int i = 0, n = static_cast<int>(slots.size()); i < n; ++i)
+            {
+                drawOrder.push_back(slots[i]);
+            }
+        }
+        else
+        {
+            for (int i = 0, n = static_cast<int>(drawOrderToSetupIndex.size()); i < n; ++i)
+            {
+                drawOrder[i] = slots[drawOrderToSetupIndex[i]];
+            }
+        }
     }
     
     int DrawOrderTimeline::getPropertyId()
     {
-        return 0;
+        return ((int)TimelineType_DrawOrder << 24);
+    }
+    
+    void DrawOrderTimeline::setFrame(int frameIndex, float time, Vector<int>& drawOrder)
+    {
+        _frames[frameIndex] = time;
+        _drawOrders[frameIndex] = drawOrder;
+    }
+    
+    Vector<float>& DrawOrderTimeline::getFrames()
+    {
+        return _frames;
+    }
+    
+    void DrawOrderTimeline::setFrames(Vector<float>& inValue)
+    {
+        _frames = inValue;
+    }
+    
+    Vector< Vector<int> >& DrawOrderTimeline::getDrawOrders()
+    {
+        return _drawOrders;
+    }
+    
+    void DrawOrderTimeline::setDrawOrders(Vector< Vector<int> >& inValue)
+    {
+        _drawOrders = inValue;
+    }
+    
+    int DrawOrderTimeline::getFrameCount()
+    {
+        return static_cast<int>(_frames.size());
     }
 }

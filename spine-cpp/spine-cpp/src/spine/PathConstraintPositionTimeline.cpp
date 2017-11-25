@@ -42,6 +42,16 @@ namespace Spine
 {
     SPINE_RTTI_IMPL(PathConstraintPositionTimeline, CurveTimeline);
     
+    const int PathConstraintPositionTimeline::ENTRIES = 2;
+    const int PathConstraintPositionTimeline::PREV_TIME = -2;
+    const int PathConstraintPositionTimeline::PREV_VALUE = -1;
+    const int PathConstraintPositionTimeline::VALUE = 1;
+    
+    PathConstraintPositionTimeline::PathConstraintPositionTimeline(int frameCount) : CurveTimeline(frameCount)
+    {
+        _frames.reserve(frameCount * ENTRIES);
+    }
+    
     void PathConstraintPositionTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
     {
         // TODO
@@ -49,6 +59,6 @@ namespace Spine
     
     int PathConstraintPositionTimeline::getPropertyId()
     {
-        return 0;
+        return ((int)TimelineType_PathConstraintPosition << 24) + _pathConstraintIndex;
     }
 }

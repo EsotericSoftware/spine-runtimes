@@ -49,6 +49,6 @@ namespace Spine
     
     int EventTimeline::getPropertyId()
     {
-        return 0;
+        return ((int)TimelineType_Event << 24);
     }
 }

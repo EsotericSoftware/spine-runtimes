@@ -39,31 +39,29 @@ namespace Spine
     {
         SPINE_RTTI_DECL;
         
+    public:
+        static const int ENTRIES;
+        
+        IkConstraintTimeline(int frameCount);
+        
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
         
         virtual int getPropertyId();
         
-//        public const int ENTRIES = 3;
-//        private const int PREV_TIME = -3, PREV_MIX = -2, PREV_BEND_DIRECTION = -1;
-//        private const int MIX = 1, BEND_DIRECTION = 2;
-//        
-//        internal int ikConstraintIndex;
-//        internal float[] frames;
-//        
+    private:
+        static const int PREV_TIME, PREV_MIX, PREV_BEND_DIRECTION;
+        static const int MIX, BEND_DIRECTION;
+        
+        Vector<float> _frames;
+        int _ikConstraintIndex;
+        
 //        public int IkConstraintIndex { return ikConstraintIndex; } set { ikConstraintIndex = inValue; }
 //        public float[] Frames { return frames; } set { frames = inValue; } // time, mix, bendDirection, ...
-//        
-//        override public int PropertyId {
-//            get { return ((int)TimelineType.IkConstraint << 24) + ikConstraintIndex; }
-//        }
-//        
-//        public IkConstraintTimeline (int frameCount)
-//        : base(frameCount) {
-//            frames = new float[frameCount * ENTRIES];
-//        }
+//
+//
 //        
 //        /// Sets the time, mix and bend direction of the specified keyframe.
-//        public void SetFrame (int frameIndex, float time, float mix, int bendDirection) {
+//        public void setFrame (int frameIndex, float time, float mix, int bendDirection) {
 //            frameIndex *= ENTRIES;
 //            frames[frameIndex] = time;
 //            frames[frameIndex + MIX] = mix;

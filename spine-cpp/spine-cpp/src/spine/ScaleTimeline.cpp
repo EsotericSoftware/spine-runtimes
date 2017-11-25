@@ -49,6 +49,6 @@ namespace Spine
     
     int ScaleTimeline::getPropertyId()
     {
-        return 0;
+        return ((int)TimelineType_Scale << 24) + _boneIndex;
     }
 }

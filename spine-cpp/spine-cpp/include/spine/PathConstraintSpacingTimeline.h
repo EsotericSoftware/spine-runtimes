@@ -39,18 +39,13 @@ namespace Spine
     {
         SPINE_RTTI_DECL;
         
+    public:
+        PathConstraintSpacingTimeline(int frameCount);
+        
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
         
         virtual int getPropertyId();
         
-//        override public int PropertyId {
-//            get { return ((int)TimelineType.PathConstraintSpacing << 24) + pathConstraintIndex; }
-//        }
-//
-//        public PathConstraintSpacingTimeline (int frameCount)
-//        : base(frameCount) {
-//        }
-//
 //        override public void Apply (Skeleton skeleton, float lastTime, float time, Vector<Event> firedEvents, float alpha, MixPose pose, MixDirection direction) {
 //            PathConstraint constraint = skeleton.pathConstraints.Items[pathConstraintIndex];
 //            float[] frames = _frames;

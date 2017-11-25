@@ -35,155 +35,36 @@
 
 namespace Spine
 {
-    class DeformTimeline : CurveTimeline
+    class VertexAttachment;
+    
+    class DeformTimeline : public CurveTimeline
     {
         SPINE_RTTI_DECL;
+        
+    public:
+        DeformTimeline(int frameCount);
         
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
         
         virtual int getPropertyId();
         
-//        internal int slotIndex;
-//        internal float[] frames;
-//        internal float[][] frameVertices;
-//        internal VertexAttachment attachment;
-//        
-//        public int SlotIndex { return slotIndex; } set { slotIndex = inValue; }
-//        public float[] Frames { return frames; } set { frames = inValue; } // time, ...
-//        public float[][] Vertices { return frameVertices; } set { frameVertices = inValue; }
-//        public VertexAttachment Attachment { return attachment; } set { attachment = inValue; }
-//        
-//        override public int PropertyId {
-//            get { return ((int)TimelineType.Deform << 24) + attachment.id + slotIndex; }
-//        }
-//        
-//        public DeformTimeline (int frameCount)
-//        : base(frameCount) {
-//            frames = new float[frameCount];
-//            frameVertices = new float[frameCount][];
-//        }
-//        
-//        /// Sets the time and value of the specified keyframe.
-//        public void SetFrame (int frameIndex, float time, float[] vertices) {
-//            frames[frameIndex] = time;
-//            frameVertices[frameIndex] = vertices;
-//        }
-//        
-//        override public void Apply (Skeleton skeleton, float lastTime, float time, Vector<Event> firedEvents, float alpha, MixPose pose, MixDirection direction) {
-//            Slot slot = skeleton.slots.Items[slotIndex];
-//            VertexAttachment vertexAttachment = slot.attachment as VertexAttachment;
-//            if (vertexAttachment == NULL || !vertexAttachment.ApplyDeform(attachment)) return;
-//            
-//            var verticesArray = slot.attachmentVertices;
-//            if (verticesArray.Count == 0) alpha = 1;
-//            
-//            float[][] frameVertices = _frameVertices;
-//            int vertexCount = frameVertices[0].Length;
-//            float[] frames = _frames;
-//            float[] vertices;
-//            
-//            if (time < frames[0]) {
-//                
-//                switch (pose) {
-//                    case MixPose_Setup:
-//                        verticesArray.Clear();
-//                        return;
-//                    case MixPose_Current:
-//                        if (alpha == 1) {
-//                            verticesArray.Clear();
-//                            return;
-//                        }
-//                        
-//                        // verticesArray.SetSize(vertexCount) // Ensure size and preemptively set count.
-//                        if (verticesArray.Capacity < vertexCount) verticesArray.Capacity = vertexCount;
-//                        verticesArray.Count = vertexCount;
-//                        vertices = verticesArray.Items;
-//                        
-//                        if (vertexAttachment.bones == NULL) {
-//                            // Unweighted vertex positions.
-//                            float[] setupVertices = vertexAttachment.vertices;
-//                            for (int i = 0; i < vertexCount; i++)
-//                                vertices[i] += (setupVertices[i] - vertices[i]) * alpha;
-//                        } else {
-//                            // Weighted deform offsets.
-//                            alpha = 1 - alpha;
-//                            for (int i = 0; i < vertexCount; i++)
-//                                vertices[i] *= alpha;
-//                        }
-//                        return;
-//                    default:
-//                        return;
-//                }
-//                
-//            }
-//            
-//            // verticesArray.SetSize(vertexCount) // Ensure size and preemptively set count.
-//            if (verticesArray.Capacity < vertexCount) verticesArray.Capacity = vertexCount;
-//            verticesArray.Count = vertexCount;
-//            vertices = verticesArray.Items;
-//            
-//            if (time >= frames[frames.Length - 1]) { // Time is after last frame.
-//                float[] lastVertices = frameVertices[frames.Length - 1];
-//                if (alpha == 1) {
-//                    // Vertex positions or deform offsets, no alpha.
-//                    Array.Copy(lastVertices, 0, vertices, 0, vertexCount);
-//                } else if (pose == MixPose_Setup) {
-//                    if (vertexAttachment.bones == NULL) {
-//                        // Unweighted vertex positions, with alpha.
-//                        float[] setupVertices = vertexAttachment.vertices;
-//                        for (int i = 0; i < vertexCount; i++) {
-//                            float setup = setupVertices[i];
-//                            vertices[i] = setup + (lastVertices[i] - setup) * alpha;
-//                        }
-//                    } else {
-//                        // Weighted deform offsets, with alpha.
-//                        for (int i = 0; i < vertexCount; i++)
-//                            vertices[i] = lastVertices[i] * alpha;
-//                    }
-//                } else {
-//                    // Vertex positions or deform offsets, with alpha.
-//                    for (int i = 0; i < vertexCount; i++)
-//                        vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
-//                }
-//                return;
-//            }
-//            
-//            // Interpolate between the previous frame and the current frame.
-//            int frame = Animation::binarySearch(frames, time);
-//            float[] prevVertices = frameVertices[frame - 1];
-//            float[] nextVertices = frameVertices[frame];
-//            float frameTime = frames[frame];
-//            float percent = GetCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime));
-//            
-//            if (alpha == 1) {
-//                // Vertex positions or deform offsets, no alpha.
-//                for (int i = 0; i < vertexCount; i++) {
-//                    float prev = prevVertices[i];
-//                    vertices[i] = prev + (nextVertices[i] - prev) * percent;
-//                }
-//            } else if (pose == MixPose_Setup) {
-//                if (vertexAttachment.bones == NULL) {
-//                    // Unweighted vertex positions, with alpha.
-//                    var setupVertices = vertexAttachment.vertices;
-//                    for (int i = 0; i < vertexCount; i++) {
-//                        float prev = prevVertices[i], setup = setupVertices[i];
-//                        vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
-//                    }
-//                } else {
-//                    // Weighted deform offsets, with alpha.
-//                    for (int i = 0; i < vertexCount; i++) {
-//                        float prev = prevVertices[i];
-//                        vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
-//                    }
-//                }
-//            } else {
-//                // Vertex positions or deform offsets, with alpha.
-//                for (int i = 0; i < vertexCount; i++) {
-//                    float prev = prevVertices[i];
-//                    vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
-//                }
-//            }
-//        }
+        /// Sets the time and value of the specified keyframe.
+        void setFrame(int frameIndex, float time, Vector<float>& vertices);
+        
+        int getSlotIndex();
+        void setSlotIndex(int inValue);
+        Vector<float>& getFrames();
+        void setFrames(Vector<float>& inValue); // time, ...
+        Vector< Vector<float> >& getVertices();
+        void setVertices(Vector< Vector<float> >& inValue);
+        VertexAttachment* getAttachment();
+        void setAttachment(VertexAttachment* inValue);
+        
+    private:
+        int _slotIndex;
+        Vector<float> _frames;
+        Vector< Vector<float> > _frameVertices;
+        VertexAttachment* _attachment;
     };
 }
 

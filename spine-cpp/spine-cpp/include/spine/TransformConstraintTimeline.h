@@ -39,30 +39,31 @@ namespace Spine
     {
         SPINE_RTTI_DECL;
         
+    public:
+        static const int ENTRIES;
+        
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
         
         virtual int getPropertyId();
         
-//        public const int ENTRIES = 5;
-//        private const int PREV_TIME = -5, PREV_ROTATE = -4, PREV_TRANSLATE = -3, PREV_SCALE = -2, PREV_SHEAR = -1;
-//        private const int ROTATE = 1, TRANSLATE = 2, SCALE = 3, SHEAR = 4;
-//
-//        internal int transformConstraintIndex;
+    private:
+        static const int PREV_TIME, PREV_ROTATE, PREV_TRANSLATE, PREV_SCALE, PREV_SHEAR;
+        static const int ROTATE, TRANSLATE, SCALE, SHEAR;
+        
+        int _transformConstraintIndex;
+        
 //        internal float[] frames;
 //
 //        public int TransformConstraintIndex { return transformConstraintIndex; } set { transformConstraintIndex = inValue; }
 //        public float[] Frames { return frames; } set { frames = inValue; } // time, rotate mix, translate mix, scale mix, shear mix, ...
 //
-//        override public int PropertyId {
-//            get { return ((int)TimelineType.TransformConstraint << 24) + transformConstraintIndex; }
-//        }
 //
 //        public TransformConstraintTimeline (int frameCount)
 //        : base(frameCount) {
 //            frames = new float[frameCount * ENTRIES];
 //        }
 //
-//        public void SetFrame (int frameIndex, float time, float rotateMix, float translateMix, float scaleMix, float shearMix) {
+//        public void setFrame (int frameIndex, float time, float rotateMix, float translateMix, float scaleMix, float shearMix) {
 //            frameIndex *= ENTRIES;
 //            frames[frameIndex] = time;
 //            frames[frameIndex + ROTATE] = rotateMix;

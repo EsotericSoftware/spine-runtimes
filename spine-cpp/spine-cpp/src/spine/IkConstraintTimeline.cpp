@@ -42,6 +42,18 @@ namespace Spine
 {
     SPINE_RTTI_IMPL(IkConstraintTimeline, CurveTimeline);
     
+    const int IkConstraintTimeline::ENTRIES = 3;
+    const int IkConstraintTimeline::PREV_TIME = -3;
+    const int IkConstraintTimeline::PREV_MIX = -2;
+    const int IkConstraintTimeline::PREV_BEND_DIRECTION = -1;
+    const int IkConstraintTimeline::MIX = 1;
+    const int IkConstraintTimeline::BEND_DIRECTION = 2;
+    
+    IkConstraintTimeline::IkConstraintTimeline(int frameCount) : CurveTimeline(frameCount), _ikConstraintIndex(0)
+    {
+        _frames.reserve(frameCount * ENTRIES);
+    }
+    
     void IkConstraintTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
     {
         // TODO
@@ -49,6 +61,6 @@ namespace Spine
     
     int IkConstraintTimeline::getPropertyId()
     {
-        return 0;
+        return ((int)TimelineType_IkConstraint << 24) + _ikConstraintIndex;
     }
 }

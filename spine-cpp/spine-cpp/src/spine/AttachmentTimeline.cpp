@@ -42,7 +42,7 @@ namespace Spine
 {
     SPINE_RTTI_IMPL(AttachmentTimeline, Timeline);
     
-    AttachmentTimeline::AttachmentTimeline(int frameCount)
+    AttachmentTimeline::AttachmentTimeline(int frameCount) : Timeline(), _slotIndex(0)
     {
         _frames.reserve(frameCount);
         _attachmentNames.reserve(frameCount);
