@@ -28,30 +28,49 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_ClippingAttachment_h
-#define Spine_ClippingAttachment_h
+#ifndef Spine_SkeletonClipping_h
+#define Spine_SkeletonClipping_h
 
-#include <spine/VertexAttachment.h>
+#include <spine/Vector.h>
+#include <spine/Triangulator.h>
 
 namespace Spine
 {
-    class SlotData;
+    class Slot;
+    class ClippingAttachment;
     
-    class ClippingAttachment : public VertexAttachment
+    class SkeletonClipping
     {
-        SPINE_RTTI_DECL;
-        
-        friend class SkeletonClipping;
-        
     public:
-        ClippingAttachment(std::string name);
+        SkeletonClipping();
         
-        SlotData* getEndSlot();
-        void setEndSlot(SlotData* inValue);
+        int clipStart(Slot& slot, ClippingAttachment* clip);
+        
+        void clipEnd(Slot& slot);
+        
+        void clipEnd();
+        
+        void clipTriangles(Vector<float>& vertices, int verticesLength, Vector<int>& triangles, int trianglesLength, Vector<float>& uvs);
+        
+        bool isClipping();
         
     private:
-        SlotData* _endSlot;
+        Triangulator _triangulator;
+        Vector<float> _clippingPolygon;
+        Vector<float> _clipOutput;
+        Vector<float> _clippedVertices;
+        Vector<int> _clippedTriangles;
+        Vector<float> _clippedUVs;
+        Vector<float> _scratch;
+        ClippingAttachment* _clipAttachment;
+        Vector< Vector<float> > _clippingPolygons;
+        
+        /** Clips the input triangle against the convex, clockwise clipping area. If the triangle lies entirely within the clipping
+                  * area, false is returned. The clipping area must duplicate the first vertex at the end of the vertices list. */
+        bool clip(float x1, float y1, float x2, float y2, float x3, float y3, Vector<float>& clippingArea, Vector<float>& output);
+        
+        static void makeClockwise(Vector<float>& polygon);
     };
 }
 
-#endif /* Spine_ClippingAttachment_h */
+#endif /* Spine_SkeletonClipping_h */

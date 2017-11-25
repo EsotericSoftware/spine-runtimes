@@ -46,6 +46,7 @@ namespace Spine
     {
         friend class VertexAttachment;
         friend class Skeleton;
+        friend class SkeletonClipping;
         
         friend class AttachmentTimeline;
         friend class ColorTimeline;

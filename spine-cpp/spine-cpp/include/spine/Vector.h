@@ -79,6 +79,19 @@ namespace Spine
             return false;
         }
         
+        int indexOf(const T& inValue)
+        {
+            for (size_t i = 0; i < _size; ++i)
+            {
+                if (_buffer[i] == inValue)
+                {
+                    return static_cast<int>(i);
+                }
+            }
+            
+            return -1;
+        }
+        
         void push_back(const T& inValue)
         {
             if (_size == _capacity)
