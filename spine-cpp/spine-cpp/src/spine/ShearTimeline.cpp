@@ -30,7 +30,25 @@
 
 #include <spine/ShearTimeline.h>
 
+#include <spine/Skeleton.h>
+#include <spine/Event.h>
+
+#include <spine/Animation.h>
+#include <spine/TimelineType.h>
+#include <spine/Slot.h>
+#include <spine/SlotData.h>
+
 namespace Spine
 {
     SPINE_RTTI_IMPL(ShearTimeline, TranslateTimeline);
+    
+    void ShearTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
+    {
+        // TODO
+    }
+    
+    int ShearTimeline::getPropertyId()
+    {
+        return 0;
+    }
 }

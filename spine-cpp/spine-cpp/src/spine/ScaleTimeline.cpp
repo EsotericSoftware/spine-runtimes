@@ -30,7 +30,25 @@
 
 #include <spine/ScaleTimeline.h>
 
+#include <spine/Skeleton.h>
+#include <spine/Event.h>
+
+#include <spine/Animation.h>
+#include <spine/TimelineType.h>
+#include <spine/Slot.h>
+#include <spine/SlotData.h>
+
 namespace Spine
 {
     SPINE_RTTI_IMPL(ScaleTimeline, TranslateTimeline);
+    
+    void ScaleTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
+    {
+        // TODO
+    }
+    
+    int ScaleTimeline::getPropertyId()
+    {
+        return 0;
+    }
 }

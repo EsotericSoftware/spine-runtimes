@@ -30,7 +30,25 @@
 
 #include <spine/PathConstraintSpacingTimeline.h>
 
+#include <spine/Skeleton.h>
+#include <spine/Event.h>
+
+#include <spine/Animation.h>
+#include <spine/TimelineType.h>
+#include <spine/Slot.h>
+#include <spine/SlotData.h>
+
 namespace Spine
 {
     SPINE_RTTI_IMPL(PathConstraintSpacingTimeline, PathConstraintPositionTimeline);
+    
+    void PathConstraintSpacingTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
+    {
+        // TODO
+    }
+    
+    int PathConstraintSpacingTimeline::getPropertyId()
+    {
+        return 0;
+    }
 }

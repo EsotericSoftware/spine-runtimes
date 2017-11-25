@@ -49,68 +49,22 @@ namespace Spine
         SPINE_RTTI_DECL;
         
     public:
-        AttachmentTimeline(int frameCount)
-        {
-            _frames.reserve(frameCount);
-            _attachmentNames.reserve(frameCount);
-        }
+        AttachmentTimeline(int frameCount);
         
-//        virtual int getPropertyId()
-//        {
-//            return ((int)TimelineType_Attachment << 24) + slotIndex;
-//        }
-//        
-//        /// Sets the time and value of the specified keyframe.
-//        void setFrame(int frameIndex, float time, std::string attachmentName)
-//        {
-//            frames[frameIndex] = time;
-//            attachmentNames[frameIndex] = attachmentName;
-//        }
-//        
-//        void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*> firedEvents, float alpha, MixPose pose, MixDirection direction)
-//        {
-//            std::string attachmentName;
-//            Slot slot = skeleton.slots.Items[slotIndex];
-//            if (direction == MixDirection_Out && pose == MixPose_Setup)
-//            {
-//                attachmentName = slot.data.attachmentName;
-//                slot.Attachment = attachmentName == NULL ? NULL : skeleton.getAttachment(slotIndex, attachmentName);
-//                return;
-//            }
-//            
-//            float[] frames = _frames;
-//            if (time < frames[0])
-//            {
-//                // Time is before first frame.
-//                if (pose == MixPose_Setup)
-//                {
-//                    attachmentName = slot.data.attachmentName;
-//                    slot.Attachment = attachmentName == NULL ? NULL : skeleton.getAttachment(slotIndex, attachmentName);
-//                }
-//                return;
-//            }
-//            
-//            int frameIndex;
-//            if (time >= frames[frames.Length - 1]) // Time is after last frame.
-//            {
-//                frameIndex = frames.Length - 1;
-//            }
-//            else
-//            {
-//                frameIndex = Animation::binarySearch(frames, time, 1) - 1;
-//            }
-//            
-//            attachmentName = attachmentNames[frameIndex];
-//            slot.Attachment = attachmentName == NULL ? NULL : skeleton.getAttachment(slotIndex, attachmentName);
-//        }
-//        
-//        int getSlotIndex() { return _slotIndex; }
-//        void setSlotIndex(int inValue) { _slotIndex = inValue; }
-//        Vector<float>& getFrames() { return _frames; }
-//        void setFrames(Vector<float>& inValue) { _frames = inValue; } // time, ...
-//        Vector<std::string> getAttachmentNames() { return _attachmentNames; }
-//        set { attachmentNames = inValue; }
-//        int getFrameCount() { return frames.Length; }
+        virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
+        
+        virtual int getPropertyId();
+        
+        /// Sets the time and value of the specified keyframe.
+        void setFrame(int frameIndex, float time, std::string attachmentName);
+        
+        int getSlotIndex();
+        void setSlotIndex(int inValue);
+        Vector<float>& getFrames();
+        void setFrames(Vector<float>& inValue); // time, ...
+        Vector<std::string> getAttachmentNames();
+        void setAttachmentNames(Vector<std::string>& inValue);
+        int getFrameCount();
         
     private:
         int _slotIndex;

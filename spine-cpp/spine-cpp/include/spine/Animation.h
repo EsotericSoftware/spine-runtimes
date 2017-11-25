@@ -49,6 +49,21 @@ namespace Spine
         friend class TranslateTimeline;
         friend class AnimationStateData;
         
+        friend class AttachmentTimeline;
+        friend class ColorTimeline;
+        friend class DeformTimeline;
+        friend class DrawOrderTimeline;
+        friend class EventTimeline;
+        friend class IkConstraintTimeline;
+        friend class PathConstraintMixTimeline;
+        friend class PathConstraintPositionTimeline;
+        friend class PathConstraintSpacingTimeline;
+        friend class ScaleTimeline;
+        friend class ShearTimeline;
+        friend class TransformConstraintTimeline;
+        friend class TranslateTimeline;
+        friend class TwoColorTimeline;
+        
     public:
         Animation(std::string name, Vector<Timeline*>& timelines, float duration);
         

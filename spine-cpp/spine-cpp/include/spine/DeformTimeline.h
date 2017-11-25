@@ -39,6 +39,10 @@ namespace Spine
     {
         SPINE_RTTI_DECL;
         
+        virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
+        
+        virtual int getPropertyId();
+        
 //        internal int slotIndex;
 //        internal float[] frames;
 //        internal float[][] frameVertices;

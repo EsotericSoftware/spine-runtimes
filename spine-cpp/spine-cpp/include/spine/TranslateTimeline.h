@@ -42,6 +42,10 @@ namespace Spine
     {
         SPINE_RTTI_DECL;
         
+        virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
+        
+        virtual int getPropertyId();
+        
 //        public const int ENTRIES = 3;
 //        protected const int PREV_TIME = -3, PREV_X = -2, PREV_Y = -1;
 //        protected const int X = 1, Y = 2;

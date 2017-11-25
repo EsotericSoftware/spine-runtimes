@@ -47,6 +47,21 @@ namespace Spine
         friend class VertexAttachment;
         friend class Skeleton;
         
+        friend class AttachmentTimeline;
+        friend class ColorTimeline;
+        friend class DeformTimeline;
+        friend class DrawOrderTimeline;
+        friend class EventTimeline;
+        friend class IkConstraintTimeline;
+        friend class PathConstraintMixTimeline;
+        friend class PathConstraintPositionTimeline;
+        friend class PathConstraintSpacingTimeline;
+        friend class ScaleTimeline;
+        friend class ShearTimeline;
+        friend class TransformConstraintTimeline;
+        friend class TranslateTimeline;
+        friend class TwoColorTimeline;
+        
     public:
         Slot(SlotData& data, Bone& bone);
         
