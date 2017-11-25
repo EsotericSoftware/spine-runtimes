@@ -31,6 +31,7 @@
 #ifndef Spine_HashMap_h
 #define Spine_HashMap_h
 
+#include <spine/Extension.h>
 #include <spine/Vector.h>
 
 namespace Spine

@@ -31,9 +31,9 @@
 #ifndef Spine_ContainerUtil_h
 #define Spine_ContainerUtil_h
 
+#include <spine/Extension.h>
 #include <spine/Vector.h>
 #include <spine/HashMap.h>
-#include <spine/Extension.h>
 
 #include <string>
 #include <assert.h>
