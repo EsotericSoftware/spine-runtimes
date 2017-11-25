@@ -28,33 +28,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/SpineRTTI.h>
+#include <spine/RTTI.h>
 
 namespace Spine
 {
-    SPINE_RTTI::SPINE_RTTI(const std::string& className) : m_className(className), m_pBaseSPINE_RTTI(NULL)
+    RTTI::RTTI(const std::string& className) : m_className(className), m_pBaseRTTI(NULL)
     {
         // Empty
     }
     
-    SPINE_RTTI::SPINE_RTTI(const std::string& className, const SPINE_RTTI& baseSPINE_RTTI) : m_className(className), m_pBaseSPINE_RTTI(&baseSPINE_RTTI)
+    RTTI::RTTI(const std::string& className, const RTTI& baseRTTI) : m_className(className), m_pBaseRTTI(&baseRTTI)
     {
         // Empty
     }
     
-    const std::string& SPINE_RTTI::getClassName() const
+    const std::string& RTTI::getClassName() const
     {
         return m_className;
     }
     
-    bool SPINE_RTTI::isExactly(const SPINE_RTTI& rtti) const
+    bool RTTI::isExactly(const RTTI& rtti) const
     {
         return (this == &rtti);
     }
     
-    bool SPINE_RTTI::derivesFrom(const SPINE_RTTI& rtti) const
+    bool RTTI::derivesFrom(const RTTI& rtti) const
     {
-        const SPINE_RTTI * pCompare = this;
+        const RTTI * pCompare = this;
         
         while (pCompare)
         {
@@ -63,7 +63,7 @@ namespace Spine
                 return true;
             }
             
-            pCompare = pCompare->m_pBaseSPINE_RTTI;
+            pCompare = pCompare->m_pBaseRTTI;
         }
         
         return false;

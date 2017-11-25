@@ -40,7 +40,7 @@
 
 namespace Spine
 {
-    SPINE_RTTI_IMPL(EventTimeline, Timeline);
+    RTTI_IMPL(EventTimeline, Timeline);
     
     void EventTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
     {

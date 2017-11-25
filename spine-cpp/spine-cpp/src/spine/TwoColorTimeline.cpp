@@ -40,7 +40,7 @@
 
 namespace Spine
 {
-    SPINE_RTTI_IMPL(TwoColorTimeline, CurveTimeline);
+    RTTI_IMPL(TwoColorTimeline, CurveTimeline);
     
     void TwoColorTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
     {

@@ -42,7 +42,7 @@ namespace Spine
     /// An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's vertices.
     class VertexAttachment : public Attachment
     {
-        SPINE_RTTI_DECL;
+        RTTI_DECL;
         
         friend class DeformTimeline;
         

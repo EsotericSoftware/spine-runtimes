@@ -42,7 +42,7 @@
 
 namespace Spine
 {
-    SPINE_RTTI_IMPL(AtlasAttachmentLoader, AttachmentLoader);
+    RTTI_IMPL(AtlasAttachmentLoader, AttachmentLoader);
     
     AtlasAttachmentLoader::AtlasAttachmentLoader(Vector<Atlas*>& inAtlasArray) : AttachmentLoader(), _atlasArray(inAtlasArray)
     {

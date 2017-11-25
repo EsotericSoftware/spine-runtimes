@@ -40,7 +40,7 @@
 
 namespace Spine
 {
-    SPINE_RTTI_IMPL_NOPARENT(AttachmentLoader);
+    RTTI_IMPL_NOPARENT(AttachmentLoader);
     
     AttachmentLoader::AttachmentLoader()
     {

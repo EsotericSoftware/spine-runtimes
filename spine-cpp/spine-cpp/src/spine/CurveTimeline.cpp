@@ -34,7 +34,7 @@
 
 namespace Spine
 {
-    SPINE_RTTI_IMPL(CurveTimeline, Timeline);
+    RTTI_IMPL(CurveTimeline, Timeline);
     
     const float CurveTimeline::LINEAR = 0;
     const float CurveTimeline::STEPPED = 1;

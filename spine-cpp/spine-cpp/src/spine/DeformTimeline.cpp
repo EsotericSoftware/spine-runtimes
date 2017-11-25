@@ -42,7 +42,7 @@
 
 namespace Spine
 {
-    SPINE_RTTI_IMPL(DeformTimeline, CurveTimeline);
+    RTTI_IMPL(DeformTimeline, CurveTimeline);
     
     DeformTimeline::DeformTimeline(int frameCount) : CurveTimeline(frameCount), _slotIndex(0), _attachment(NULL)
     {

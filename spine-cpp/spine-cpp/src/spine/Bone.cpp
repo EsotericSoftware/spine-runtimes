@@ -38,7 +38,7 @@
 
 namespace Spine
 {
-    SPINE_RTTI_IMPL(Bone, Updatable);
+    RTTI_IMPL(Bone, Updatable);
     
     bool Bone::yDown = false;
     

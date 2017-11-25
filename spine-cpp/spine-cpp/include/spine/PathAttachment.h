@@ -37,7 +37,7 @@ namespace Spine
 {
     class PathAttachment : public VertexAttachment
     {
-        SPINE_RTTI_DECL;
+        RTTI_DECL;
         
     public:
         PathAttachment(std::string name);

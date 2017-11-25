@@ -40,7 +40,7 @@
 
 namespace Spine
 {
-    SPINE_RTTI_IMPL(PathConstraintMixTimeline, CurveTimeline);
+    RTTI_IMPL(PathConstraintMixTimeline, CurveTimeline);
     
     void PathConstraintMixTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
     {

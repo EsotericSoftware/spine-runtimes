@@ -51,6 +51,9 @@ namespace Spine
     
     class Skeleton
     {
+        friend class SkeletonBounds;
+        friend class SkeletonClipping;
+        
         friend class AttachmentTimeline;
         friend class ColorTimeline;
         friend class DeformTimeline;

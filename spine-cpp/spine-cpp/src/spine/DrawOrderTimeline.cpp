@@ -40,7 +40,7 @@
 
 namespace Spine
 {
-    SPINE_RTTI_IMPL(DrawOrderTimeline, Timeline);
+    RTTI_IMPL(DrawOrderTimeline, Timeline);
     
     DrawOrderTimeline::DrawOrderTimeline(int frameCount) : Timeline()
     {

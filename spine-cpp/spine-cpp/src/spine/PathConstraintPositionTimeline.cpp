@@ -40,7 +40,7 @@
 
 namespace Spine
 {
-    SPINE_RTTI_IMPL(PathConstraintPositionTimeline, CurveTimeline);
+    RTTI_IMPL(PathConstraintPositionTimeline, CurveTimeline);
     
     const int PathConstraintPositionTimeline::ENTRIES = 2;
     const int PathConstraintPositionTimeline::PREV_TIME = -2;

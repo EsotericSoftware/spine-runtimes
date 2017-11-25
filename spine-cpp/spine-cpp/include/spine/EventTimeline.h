@@ -37,7 +37,7 @@ namespace Spine
 {
     class EventTimeline : public Timeline
     {
-        SPINE_RTTI_DECL;
+        RTTI_DECL;
         
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
         

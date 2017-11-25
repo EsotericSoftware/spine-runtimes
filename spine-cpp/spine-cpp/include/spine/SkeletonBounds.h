@@ -69,7 +69,7 @@ namespace Spine
         bool aabbIntersectsSkeleton(SkeletonBounds bounds);
         
         /// Returns true if the polygon contains the point.
-        bool containsPoint(Polygon polygon, float x, float y);
+        bool containsPoint(Polygon* polygon, float x, float y);
         
         /// Returns the first bounding box attachment that contains the point, or NULL. When doing many checks, it is usually more
         /// efficient to only call this method if {@link #aabbcontainsPoint(float, float)} returns true.

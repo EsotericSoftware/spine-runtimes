@@ -42,7 +42,7 @@ namespace Spine
     /// Attachment that displays a texture region using a mesh.
     class MeshAttachment : public VertexAttachment
     {
-        SPINE_RTTI_DECL;
+        RTTI_DECL;
         
         friend class AtlasAttachmentLoader;
         

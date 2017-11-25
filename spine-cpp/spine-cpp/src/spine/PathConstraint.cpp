@@ -45,7 +45,7 @@
 
 namespace Spine
 {
-    SPINE_RTTI_IMPL(PathConstraint, Constraint);
+    RTTI_IMPL(PathConstraint, Constraint);
     
     const float PathConstraint::EPSILON = 0.00001f;
     const int PathConstraint::NONE = -1;

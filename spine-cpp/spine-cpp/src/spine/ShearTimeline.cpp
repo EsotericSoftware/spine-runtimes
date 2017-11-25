@@ -40,7 +40,7 @@
 
 namespace Spine
 {
-    SPINE_RTTI_IMPL(ShearTimeline, TranslateTimeline);
+    RTTI_IMPL(ShearTimeline, TranslateTimeline);
     
     void ShearTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
     {

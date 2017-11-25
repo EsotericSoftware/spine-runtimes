@@ -28,48 +28,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_SPINE_RTTI_h
-#define Spine_SPINE_RTTI_h
+#ifndef Spine_RTTI_h
+#define Spine_RTTI_h
 
 #include <string>
 
 namespace Spine
 {
-    class SPINE_RTTI
+    class RTTI
     {
     public:
-        SPINE_RTTI(const std::string& className);
+        RTTI(const std::string& className);
         
-        SPINE_RTTI(const std::string& className, const SPINE_RTTI& baseSPINE_RTTI);
+        RTTI(const std::string& className, const RTTI& baseRTTI);
         
         const std::string& getClassName() const;
         
-        bool isExactly(const SPINE_RTTI& rtti) const;
+        bool isExactly(const RTTI& rtti) const;
         
-        bool derivesFrom(const SPINE_RTTI& rtti) const;
+        bool derivesFrom(const RTTI& rtti) const;
         
     private:
         // Prevent copying
-        SPINE_RTTI(const SPINE_RTTI& obj);
-        SPINE_RTTI& operator=(const SPINE_RTTI& obj);
+        RTTI(const RTTI& obj);
+        RTTI& operator=(const RTTI& obj);
         
         const std::string m_className;
-        const SPINE_RTTI *m_pBaseSPINE_RTTI;
+        const RTTI *m_pBaseRTTI;
     };
 }
 
-#define SPINE_RTTI_DECL \
+#define RTTI_DECL \
 public: \
-static const Spine::SPINE_RTTI rtti; \
-virtual const Spine::SPINE_RTTI& getRTTI();
+static const Spine::RTTI rtti; \
+virtual const Spine::RTTI& getRTTI();
 
-#define SPINE_RTTI_IMPL_NOPARENT(name) \
-const Spine::SPINE_RTTI name::rtti(#name); \
-const Spine::SPINE_RTTI& name::getRTTI() { return rtti; }
+#define RTTI_IMPL_NOPARENT(name) \
+const Spine::RTTI name::rtti(#name); \
+const Spine::RTTI& name::getRTTI() { return rtti; }
 
-#define SPINE_RTTI_IMPL(name,parent) \
-const Spine::SPINE_RTTI name::rtti(#name, parent::rtti); \
-const Spine::SPINE_RTTI& name::getRTTI() { return rtti; }
+#define RTTI_IMPL(name,parent) \
+const Spine::RTTI name::rtti(#name, parent::rtti); \
+const Spine::RTTI& name::getRTTI() { return rtti; }
 
-#endif /* Spine_SPINE_RTTI_h */
+#endif /* Spine_RTTI_h */
 

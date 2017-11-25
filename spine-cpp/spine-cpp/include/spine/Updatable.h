@@ -31,13 +31,13 @@
 #ifndef Spine_Updatable_h
 #define Spine_Updatable_h
 
-#include <spine/SpineRTTI.h>
+#include <spine/RTTI.h>
 
 namespace Spine
 {
     class Updatable
     {
-        SPINE_RTTI_DECL;
+        RTTI_DECL;
         
     public:
         Updatable();

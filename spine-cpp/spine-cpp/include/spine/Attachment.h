@@ -31,7 +31,7 @@
 #ifndef Spine_Attachment_h
 #define Spine_Attachment_h
 
-#include <spine/SpineRTTI.h>
+#include <spine/RTTI.h>
 
 #include <string>
 
@@ -39,7 +39,7 @@ namespace Spine
 {
     class Attachment
     {
-        SPINE_RTTI_DECL;
+        RTTI_DECL;
         
     public:
         Attachment(std::string name);

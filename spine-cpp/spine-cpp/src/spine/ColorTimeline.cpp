@@ -40,7 +40,7 @@
 
 namespace Spine
 {
-    SPINE_RTTI_IMPL(ColorTimeline, CurveTimeline);
+    RTTI_IMPL(ColorTimeline, CurveTimeline);
     
     const int ColorTimeline::ENTRIES = 5;
     const int ColorTimeline::PREV_TIME = -5;

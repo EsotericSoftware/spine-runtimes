@@ -39,7 +39,7 @@
 
 namespace Spine
 {
-    SPINE_RTTI_IMPL(IkConstraint, Constraint);
+    RTTI_IMPL(IkConstraint, Constraint);
     
     void IkConstraint::apply(Bone& bone, float targetX, float targetY, float alpha)
     {

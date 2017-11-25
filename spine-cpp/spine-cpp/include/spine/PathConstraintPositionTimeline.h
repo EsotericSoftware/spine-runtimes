@@ -37,7 +37,7 @@ namespace Spine
 {
     class PathConstraintPositionTimeline : public CurveTimeline
     {
-        SPINE_RTTI_DECL;
+        RTTI_DECL;
         
     public:
         static const int ENTRIES;

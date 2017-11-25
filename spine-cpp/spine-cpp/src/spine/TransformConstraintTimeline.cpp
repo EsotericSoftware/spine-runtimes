@@ -40,7 +40,7 @@
 
 namespace Spine
 {
-    SPINE_RTTI_IMPL(TransformConstraintTimeline, CurveTimeline);
+    RTTI_IMPL(TransformConstraintTimeline, CurveTimeline);
     
     const int TransformConstraintTimeline::ENTRIES = 5;
     const int TransformConstraintTimeline::PREV_TIME = -5;

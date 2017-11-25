@@ -31,7 +31,7 @@
 #ifndef Spine_AttachmentLoader_h
 #define Spine_AttachmentLoader_h
 
-#include <spine/SpineRTTI.h>
+#include <spine/RTTI.h>
 
 #include <string>
 
@@ -47,7 +47,7 @@ namespace Spine
     
     class AttachmentLoader
     {
-        SPINE_RTTI_DECL;
+        RTTI_DECL;
         
         AttachmentLoader();
         

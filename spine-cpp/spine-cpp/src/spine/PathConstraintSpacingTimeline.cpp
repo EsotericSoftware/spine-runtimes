@@ -40,7 +40,7 @@
 
 namespace Spine
 {
-    SPINE_RTTI_IMPL(PathConstraintSpacingTimeline, PathConstraintPositionTimeline);
+    RTTI_IMPL(PathConstraintSpacingTimeline, PathConstraintPositionTimeline);
     
     PathConstraintSpacingTimeline::PathConstraintSpacingTimeline(int frameCount) : PathConstraintPositionTimeline(frameCount)
     {

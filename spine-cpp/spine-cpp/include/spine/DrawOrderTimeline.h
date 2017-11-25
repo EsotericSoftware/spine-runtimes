@@ -37,7 +37,7 @@ namespace Spine
 {
     class DrawOrderTimeline : public Timeline
     {
-        SPINE_RTTI_DECL;
+        RTTI_DECL;
     
     public:
         DrawOrderTimeline(int frameCount);

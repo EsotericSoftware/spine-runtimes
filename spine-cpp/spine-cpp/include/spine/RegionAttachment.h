@@ -46,7 +46,7 @@ namespace Spine
     /// Attachment that displays a texture region.
     class RegionAttachment : public Attachment
     {
-        SPINE_RTTI_DECL;
+        RTTI_DECL;
         
         friend class AtlasAttachmentLoader;
         

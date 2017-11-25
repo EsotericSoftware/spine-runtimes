@@ -31,7 +31,7 @@
 #ifndef Spine_Timeline_h
 #define Spine_Timeline_h
 
-#include <spine/SpineRTTI.h>
+#include <spine/RTTI.h>
 #include <spine/Vector.h>
 #include <spine/MixPose.h>
 #include <spine/MixDirection.h>
@@ -43,7 +43,7 @@ namespace Spine
     
     class Timeline
     {
-        SPINE_RTTI_DECL;
+        RTTI_DECL;
         
     public:
         Timeline();

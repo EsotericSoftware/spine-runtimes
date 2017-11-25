@@ -39,7 +39,7 @@ namespace Spine
     
     class ClippingAttachment : public VertexAttachment
     {
-        SPINE_RTTI_DECL;
+        RTTI_DECL;
         
         friend class SkeletonClipping;
         

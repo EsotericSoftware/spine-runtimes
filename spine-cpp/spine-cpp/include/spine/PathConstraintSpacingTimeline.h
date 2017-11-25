@@ -37,7 +37,7 @@ namespace Spine
 {
     class PathConstraintSpacingTimeline : public PathConstraintPositionTimeline
     {
-        SPINE_RTTI_DECL;
+        RTTI_DECL;
         
     public:
         PathConstraintSpacingTimeline(int frameCount);

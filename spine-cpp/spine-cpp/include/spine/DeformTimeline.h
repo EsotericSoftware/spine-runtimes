@@ -39,7 +39,7 @@ namespace Spine
     
     class DeformTimeline : public CurveTimeline
     {
-        SPINE_RTTI_DECL;
+        RTTI_DECL;
         
     public:
         DeformTimeline(int frameCount);

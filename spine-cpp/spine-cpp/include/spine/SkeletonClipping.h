@@ -63,7 +63,7 @@ namespace Spine
         Vector<float> _clippedUVs;
         Vector<float> _scratch;
         ClippingAttachment* _clipAttachment;
-        Vector< Vector<float> > _clippingPolygons;
+        Vector< Vector<float>* > _clippingPolygons;
         
         /** Clips the input triangle against the convex, clockwise clipping area. If the triangle lies entirely within the clipping
                   * area, false is returned. The clipping area must duplicate the first vertex at the end of the vertices list. */

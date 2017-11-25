@@ -40,7 +40,7 @@ namespace Spine
 {
     class TranslateTimeline : public CurveTimeline
     {
-        SPINE_RTTI_DECL;
+        RTTI_DECL;
         
     public:
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
