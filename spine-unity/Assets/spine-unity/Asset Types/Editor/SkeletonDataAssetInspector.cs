@@ -387,6 +387,9 @@ namespace Spine.Unity.Editor {
 			}
 
 			EditorGUILayout.LabelField("Name", "      Duration");
+			bool nonessential = m_skeletonData.ImagesPath != null;
+			float fps = m_skeletonData.Fps;
+			if (nonessential && fps == 0) fps = 30;
 			foreach (Spine.Animation animation in m_skeletonData.Animations) {
 				using (new GUILayout.HorizontalScope()) {
 					if (m_skeletonAnimation != null && m_skeletonAnimation.state != null) {
@@ -403,7 +406,8 @@ namespace Spine.Unity.Editor {
 					} else {
 						GUILayout.Label("-", GUILayout.Width(24));
 					}
-					EditorGUILayout.LabelField(new GUIContent(animation.Name, Icons.animation), SpineInspectorUtility.TempContent(animation.Duration.ToString("f3") + "s" + ("(" + (Mathf.RoundToInt(animation.Duration * 30)) + ")").PadLeft(12, ' ')));
+					string frameCountString = (fps > 0) ? ("(" + (Mathf.RoundToInt(animation.Duration * fps)) + ")").PadLeft(12, ' ') : string.Empty;
+					EditorGUILayout.LabelField(new GUIContent(animation.Name, Icons.animation), SpineInspectorUtility.TempContent(animation.Duration.ToString("f3") + "s" + frameCountString));
 				}
 			}
 		}
