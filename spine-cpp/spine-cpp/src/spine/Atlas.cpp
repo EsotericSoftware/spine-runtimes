@@ -32,6 +32,8 @@
 
 #include <spine/ContainerUtil.h>
 
+#include <cstring>
+
 namespace Spine
 {
     Atlas::Atlas(const char* path, TextureLoader& textureLoader) : _textureLoader(textureLoader)
@@ -40,7 +42,7 @@ namespace Spine
         char *dir;
         int length;
         const char* data;
-        
+
         /* Get directory from atlas path. */
         const char* lastForwardSlash = strrchr(path, '/');
         const char* lastBackwardSlash = strrchr(path, '\\');
@@ -50,28 +52,28 @@ namespace Spine
         dir = MALLOC(char, dirLength + 1);
         memcpy(dir, path, dirLength);
         dir[dirLength] = '\0';
-        
+
         data = spineReadFile(path, &length);
         if (data)
         {
             load(data, length, dir);
         }
-        
+
         FREE(data);
         FREE(dir);
     }
-    
+
     Atlas::Atlas(const char* data, int length, const char* dir, TextureLoader& textureLoader) : _textureLoader(textureLoader)
     {
         load(data, length, dir);
     }
-    
+
     Atlas::~Atlas()
     {
         ContainerUtil::cleanUpVectorOfPointers(_pages);
         ContainerUtil::cleanUpVectorOfPointers(_regions);
     }
-    
+
     void Atlas::flipV()
     {
         for (size_t i = 0, n = _regions.size(); i < n; ++i)
@@ -82,7 +84,7 @@ namespace Spine
             region.v2 = 1 - region.v2;
         }
     }
-    
+
     AtlasRegion* Atlas::findRegion(std::string name)
     {
         for (size_t i = 0, n = _regions.size(); i < n; ++i)
@@ -92,10 +94,10 @@ namespace Spine
                 return _regions[i];
             }
         }
-        
+
         return NULL;
     }
-    
+
     void Atlas::dispose()
     {
         for (size_t i = 0, n = _pages.size(); i < n; ++i)
@@ -103,22 +105,22 @@ namespace Spine
             _textureLoader.unload(_pages[i]->rendererObject);
         }
     }
-    
+
     void Atlas::load(const char* begin, int length, const char* dir)
     {
         static const char* formatNames[] = { "", "Alpha", "Intensity", "LuminanceAlpha", "RGB565", "RGBA4444", "RGB888", "RGBA8888" };
         static const char* textureFilterNames[] = { "", "Nearest", "Linear", "MipMap", "MipMapNearestNearest", "MipMapLinearNearest",
             "MipMapNearestLinear", "MipMapLinearLinear" };
-        
+
         int count;
         const char* end = begin + length;
         int dirLength = (int)strlen(dir);
         int needsSlash = dirLength > 0 && dir[dirLength - 1] != '/' && dir[dirLength - 1] != '\\';
-        
+
         AtlasPage *page = 0;
         Str str;
         Str tuple[4];
-        
+
         while (readLine(&begin, end, &str))
         {
             if (str.end - str.begin == 0)
@@ -135,27 +137,27 @@ namespace Spine
                     path[dirLength] = '/';
                 }
                 strcpy(path + dirLength + needsSlash, name);
-                
+
                 AtlasPage* page = MALLOC(AtlasPage, 1);
                 new (page) AtlasPage(std::string(name));
-                
+
                 FREE(name);
-                
+
                 assert(readTuple(&begin, end, tuple) == 2);
-                
+
                 /* size is only optional for an atlas packed with an old TexturePacker. */
                 page->width = toInt(tuple);
                 page->height = toInt(tuple + 1);
                 assert(readTuple(&begin, end, tuple));
-                
+
                 page->format = (Format)indexOf(formatNames, 8, tuple);
-                
+
                 assert(readTuple(&begin, end, tuple));
                 page->minFilter = (TextureFilter)indexOf(textureFilterNames, 8, tuple);
                 page->magFilter = (TextureFilter)indexOf(textureFilterNames, 8, tuple + 1);
-                
+
                 assert(readValue(&begin, end, &str));
-                
+
                 page->uWrap = TextureWrap_ClampToEdge;
                 page->vWrap = TextureWrap_ClampToEdge;
                 if (!equals(&str, "none"))
@@ -177,32 +179,32 @@ namespace Spine
                         page->vWrap = TextureWrap_Repeat;
                     }
                 }
-                
+
                 _textureLoader.load(*page, std::string(path));
-                
+
                 FREE(path);
-                
+
                 _pages.push_back(page);
             }
             else
             {
                 AtlasRegion* region = MALLOC(AtlasRegion, 1);
                 new (region) AtlasRegion();
-                
+
                 region->page = page;
                 region->name = mallocString(&str);
-                
+
                 assert(readValue(&begin, end, &str));
                 region->rotate = equals(&str, "true");
-                
+
                 assert(readTuple(&begin, end, tuple) == 2);
                 region->x = toInt(tuple);
                 region->y = toInt(tuple + 1);
-                
+
                 assert(readTuple(&begin, end, tuple) == 2);
                 region->width = toInt(tuple);
                 region->height = toInt(tuple + 1);
-                
+
                 region->u = region->x / (float)page->width;
                 region->v = region->y / (float)page->height;
                 if (region->rotate)
@@ -215,10 +217,10 @@ namespace Spine
                     region->u2 = (region->x + region->width) / (float)page->width;
                     region->v2 = (region->y + region->height) / (float)page->height;
                 }
-                
+
                 count = readTuple(&begin, end, tuple);
                 assert(count);
-                
+
                 if (count == 4)
                 {
                     /* split is optional */
@@ -227,10 +229,10 @@ namespace Spine
                     region->splits[1] = toInt(tuple + 1);
                     region->splits[2] = toInt(tuple + 2);
                     region->splits[3] = toInt(tuple + 3);
-                    
+
                     count = readTuple(&begin, end, tuple);
                     assert(count);
-                    
+
                     if (count == 4)
                     {
                         /* pad is optional, but only present with splits */
@@ -239,75 +241,75 @@ namespace Spine
                         region->pads[1] = toInt(tuple + 1);
                         region->pads[2] = toInt(tuple + 2);
                         region->pads[3] = toInt(tuple + 3);
-                        
+
                         assert(readTuple(&begin, end, tuple));
                     }
                 }
-                
+
                 region->originalWidth = toInt(tuple);
                 region->originalHeight = toInt(tuple + 1);
-                
+
                 readTuple(&begin, end, tuple);
                 region->offsetX = toInt(tuple);
                 region->offsetY = toInt(tuple + 1);
-                
+
                 assert(readValue(&begin, end, &str));
-                
+
                 region->index = toInt(&str);
-                
+
                 _regions.push_back(region);
             }
         }
     }
-    
+
     void Atlas::trim(Str* str)
     {
         while (isspace((unsigned char)*str->begin) && str->begin < str->end)
         {
             (str->begin)++;
         }
-        
+
         if (str->begin == str->end)
         {
             return;
         }
-        
+
         str->end--;
-        
+
         while (isspace((unsigned char)*str->end) && str->end >= str->begin)
         {
             str->end--;
         }
-        
+
         str->end++;
     }
-    
+
     int Atlas::readLine(const char** begin, const char* end, Str* str)
     {
         if (*begin == end)
         {
             return 0;
         }
-        
+
         str->begin = *begin;
-        
+
         /* Find next delimiter. */
         while (*begin != end && **begin != '\n')
         {
             (*begin)++;
         }
-        
+
         str->end = *begin;
         trim(str);
-        
+
         if (*begin != end)
         {
             (*begin)++;
         }
-        
+
         return 1;
     }
-    
+
     int Atlas::beginPast(Str* str, char c)
     {
         const char* begin = str->begin;
@@ -327,7 +329,7 @@ namespace Spine
         str->begin = begin;
         return 1;
     }
-    
+
     int Atlas::readValue(const char** begin, const char* end, Str* str)
     {
         readLine(begin, end, str);
@@ -335,11 +337,11 @@ namespace Spine
         {
             return 0;
         }
-        
+
         trim(str);
         return 1;
     }
-    
+
     int Atlas::readTuple(const char** begin, const char* end, Str tuple[])
     {
         int i;
@@ -349,7 +351,7 @@ namespace Spine
         {
             return 0;
         }
-        
+
         for (i = 0; i < 3; ++i)
         {
             tuple[i].begin = str.begin;
@@ -357,18 +359,18 @@ namespace Spine
             {
                 break;
             }
-            
+
             tuple[i].end = str.begin - 2;
             trim(&tuple[i]);
         }
-        
+
         tuple[i].begin = str.begin;
         tuple[i].end = str.end;
         trim(&tuple[i]);
-        
+
         return i + 1;
     }
-    
+
     char* Atlas::mallocString(Str* str)
     {
         int length = (int)(str->end - str->begin);
@@ -377,7 +379,7 @@ namespace Spine
         string[length] = '\0';
         return string;
     }
-    
+
     int Atlas::indexOf(const char** array, int count, Str* str)
     {
         int length = (int)(str->end - str->begin);
@@ -391,12 +393,12 @@ namespace Spine
         }
         return 0;
     }
-    
+
     int Atlas::equals(Str* str, const char* other)
     {
         return strncmp(other, str->begin, str->end - str->begin) == 0;
     }
-    
+
     int Atlas::toInt(Str* str)
     {
         return (int)strtol(str->begin, (char**)&str->end, 10);
