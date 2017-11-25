@@ -102,7 +102,7 @@ namespace Spine
 //                shear = frames[i + PREV_SHEAR];
 //            } else {
 //                // Interpolate between the previous frame and the current frame.
-//                int frame = Animation.BinarySearch(frames, time, ENTRIES);
+//                int frame = Animation::binarySearch(frames, time, ENTRIES);
 //                rotate = frames[frame + PREV_ROTATE];
 //                translate = frames[frame + PREV_TRANSLATE];
 //                scale = frames[frame + PREV_SCALE];

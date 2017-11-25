@@ -75,7 +75,7 @@ namespace Spine
 //                y = frames[frames.Length + PREV_Y] * bone.data.scaleY;
 //            } else {
 //                // Interpolate between the previous frame and the current frame.
-//                int frame = Animation.BinarySearch(frames, time, ENTRIES);
+//                int frame = Animation::binarySearch(frames, time, ENTRIES);
 //                x = frames[frame + PREV_X];
 //                y = frames[frame + PREV_Y];
 //                float frameTime = frames[frame];

@@ -71,7 +71,7 @@ namespace Spine
 //                spacing = frames[frames.Length + PREV_VALUE];
 //            else {
 //                // Interpolate between the previous frame and the current frame.
-//                int frame = Animation.BinarySearch(frames, time, ENTRIES);
+//                int frame = Animation::binarySearch(frames, time, ENTRIES);
 //                spacing = frames[frame + PREV_VALUE];
 //                float frameTime = frames[frame];
 //                float percent = GetCurvePercent(frame / ENTRIES - 1,

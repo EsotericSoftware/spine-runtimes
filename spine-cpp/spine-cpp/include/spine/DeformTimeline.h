@@ -149,7 +149,7 @@ namespace Spine
 //            }
 //            
 //            // Interpolate between the previous frame and the current frame.
-//            int frame = Animation.BinarySearch(frames, time);
+//            int frame = Animation::binarySearch(frames, time);
 //            float[] prevVertices = frameVertices[frame - 1];
 //            float[] nextVertices = frameVertices[frame];
 //            float frameTime = frames[frame];

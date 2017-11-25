@@ -84,7 +84,7 @@ namespace Spine
 //            if (time >= frames[frames.Length - 1]) // Time is after last frame.
 //                frame = frames.Length - 1;
 //            else
-//                frame = Animation.BinarySearch(frames, time) - 1;
+//                frame = Animation::binarySearch(frames, time) - 1;
 //            
 //            int[] drawOrderToSetupIndex = drawOrders[frame];
 //            if (drawOrderToSetupIndex == NULL) {

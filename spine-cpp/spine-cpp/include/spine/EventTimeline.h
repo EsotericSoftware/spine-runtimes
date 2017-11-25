@@ -82,7 +82,7 @@ namespace Spine
 //            if (lastTime < frames[0])
 //                frame = 0;
 //            else {
-//                frame = Animation.BinarySearch(frames, lastTime);
+//                frame = Animation::binarySearch(frames, lastTime);
 //                float frameTime = frames[frame];
 //                while (frame > 0) { // Fire multiple events with the same frame.
 //                    if (frames[frame - 1] != frameTime) break;

@@ -124,7 +124,7 @@ namespace Spine
 //                b2 = frames[i + PREV_B2];
 //            } else {
 //                // Interpolate between the previous frame and the current frame.
-//                int frame = Animation.BinarySearch(frames, time, ENTRIES);
+//                int frame = Animation::binarySearch(frames, time, ENTRIES);
 //                r = frames[frame + PREV_R];
 //                g = frames[frame + PREV_G];
 //                b = frames[frame + PREV_B];
