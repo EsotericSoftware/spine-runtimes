@@ -28,7 +28,99 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#include <spine/AnimationState.h>
+
+#include <spine/Animation.h>
+
+#include <spine/MathUtil.h>
+
 namespace Spine
 {
-    // TODO
+    TrackEntry::TrackEntry()
+    {
+        
+    }
+    
+    int TrackEntry::getTrackIndex() { return _trackIndex; }
+    
+    Animation* TrackEntry::getAnimation() { return _animation; }
+    
+    bool TrackEntry::getLoop() { return _loop; }
+    void TrackEntry::setLoop(bool inValue) { _loop = inValue; }
+
+    float TrackEntry::getDelay() { return _delay; }
+    void TrackEntry::setDelay(float inValue) { _delay = inValue; }
+
+    float TrackEntry::getTrackTime() { return _trackTime; }
+    void TrackEntry::setTrackTime(float inValue) { _trackTime = inValue; }
+
+    float TrackEntry::getTrackEnd() { return _trackEnd; }
+    void TrackEntry::setTrackEnd(float inValue) { _trackEnd = inValue; }
+
+    float TrackEntry::getAnimationStart() { return _animationStart; }
+    void TrackEntry::setAnimationStart(float inValue) { _animationStart = inValue; }
+
+    float TrackEntry::getAnimationEnd() { return _animationEnd; }
+    void TrackEntry::setAnimationEnd(float inValue) { _animationEnd = inValue; }
+
+    float TrackEntry::getAnimationLast() { return _animationLast; }
+    void TrackEntry::setAnimationLast(float inValue)
+    {
+        _animationLast = inValue;
+        _nextAnimationLast = inValue;
+    }
+
+    float TrackEntry::getAnimationTime()
+    {
+        if (_loop)
+        {
+            float duration = _animationEnd - _animationStart;
+            if (duration == 0)
+            {
+                return _animationStart;
+            }
+
+            return fmodf(_trackTime, duration) + _animationStart;
+        }
+
+        return MIN(_trackTime + _animationStart, _animationEnd);
+    }
+
+    float TrackEntry::getTimeScale() { return _timeScale; }
+    void TrackEntry::setTimeScale(float inValue) { _timeScale = inValue; }
+
+    float TrackEntry::getAlpha() { return _alpha; }
+    void TrackEntry::setAlpha(float inValue) { _alpha = inValue; }
+
+    float TrackEntry::getEventThreshold() { return _eventThreshold; }
+    void TrackEntry::setEventThreshold(float inValue) { _eventThreshold = inValue; }
+
+    float TrackEntry::getAttachmentThreshold() { return _attachmentThreshold; }
+    void TrackEntry::setAttachmentThreshold(float inValue) { _attachmentThreshold = inValue; }
+
+    float TrackEntry::getDrawOrderThreshold() { return _drawOrderThreshold; }
+    void TrackEntry::setDrawOrderThreshold(float inValue) { _drawOrderThreshold = inValue; }
+
+    TrackEntry* TrackEntry::getNext() { return _next; }
+
+    bool TrackEntry::isComplete()
+    {
+        return _trackTime >= _animationEnd - _animationStart;
+    }
+
+    float TrackEntry::getMixTime() { return _mixTime; }
+    void TrackEntry::setMixTime(float inValue) { _mixTime = inValue; }
+
+    float TrackEntry::getMixDuration() { return _mixDuration; }
+    void TrackEntry::setMixDuration(float inValue) { _mixDuration = inValue; }
+
+    TrackEntry* TrackEntry::getMixingFrom() { return _mixingFrom; }
+    
+//    event AnimationState.TrackEntryDelegate Start, Interrupt, End, Dispose, Complete;
+//    event AnimationState.TrackEntryEventDelegate Event;
+    
+    void TrackEntry::resetRotationDirections()
+    {
+        _timelinesRotation.clear();
+    }
 }

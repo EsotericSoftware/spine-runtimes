@@ -38,7 +38,7 @@ namespace Spine
 {
     RTTI_IMPL(PointAttachment, Attachment);
     
-    PointAttachment::PointAttachment(std::string name) : Attachment(name)
+    PointAttachment::PointAttachment(std::string name) : Attachment(name), _x(0), _y(0), _rotation(0)
     {
         // Empty
     }

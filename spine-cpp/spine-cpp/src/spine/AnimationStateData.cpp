@@ -35,7 +35,7 @@
 
 namespace Spine
 {
-    AnimationStateData::AnimationStateData(SkeletonData& skeletonData) : _skeletonData(skeletonData)
+    AnimationStateData::AnimationStateData(SkeletonData& skeletonData) : _skeletonData(skeletonData), _defaultMix(0)
     {
         // Empty
     }

@@ -35,7 +35,7 @@
 
 namespace Spine
 {
-    SkeletonClipping::SkeletonClipping()
+    SkeletonClipping::SkeletonClipping() : _clipAttachment(NULL)
     {
         _clipOutput.reserve(128);
         _clippedVertices.reserve(128);

@@ -124,7 +124,7 @@ namespace Spine
         static const int BRX;
         static const int BRY;
         
-        float _x, _y, _rotation, _scaleX = 1, _scaleY = 1, _width, _height;
+        float _x, _y, _rotation, _scaleX, _scaleY, _width, _height;
         float _regionOffsetX, _regionOffsetY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight;
         Vector<float> _offset;
         Vector<float> _uvs;
