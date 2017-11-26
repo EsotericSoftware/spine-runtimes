@@ -43,89 +43,23 @@ namespace Spine
         RTTI_DECL;
         
     public:
+        static const int ENTRIES;
+        
+        TranslateTimeline(int frameCount);
+        
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
         
         virtual int getPropertyId();
         
-    protected:
-        int _boneIndex;
+        /// Sets the time and value of the specified keyframe.
+        void setFrame(int frameIndex, float time, float x, float y);
         
-//        public const int ENTRIES = 3;
-//        protected const int PREV_TIME = -3, PREV_X = -2, PREV_Y = -1;
-//        protected const int X = 1, Y = 2;
-//
-//        internal float[] frames;
-//
-//        public int getBoneIndex { return boneIndex; } set { boneIndex = inValue; }
-//        public Vector<float> getFrames { return frames; } set { frames = inValue; } // time, value, value, ...
-//
-//
-//        public TranslateTimeline(int frameCount) : CurveTimeline(frameCount)
-//        {
-//            frames = new float[frameCount * ENTRIES];
-//        }
-//
-//        /// Sets the time and value of the specified keyframe.
-//        public void setFrame(int frameIndex, float time, float x, float y)
-//        {
-//            frameIndex *= ENTRIES;
-//            frames[frameIndex] = time;
-//            frames[frameIndex + X] = x;
-//            frames[frameIndex + Y] = y;
-//        }
-//
-//        override public void apply(Skeleton skeleton, float lastTime, float time, Vector<Event> firedEvents, float alpha, MixPose pose, MixDirection direction)
-//        {
-//            Bone bone = skeleton.bones.Items[boneIndex];
-//
-//            float[] frames = _frames;
-//            if (time < frames[0])
-//            {
-//                switch (pose)
-//                {
-//                    case MixPose_Setup:
-//                        bone.x = bone.data.x;
-//                        bone.y = bone.data.y;
-//                        return;
-//                    case MixPose_Current:
-//                        bone.x += (bone.data.x - bone.x) * alpha;
-//                        bone.y += (bone.data.y - bone.y) * alpha;
-//                        return;
-//                }
-//                return;
-//            }
-//
-//            float x, y;
-//            if (time >= frames[frames.Length - ENTRIES])
-//            {
-//                // Time is after last frame.
-//                x = frames[frames.Length + PREV_X];
-//                y = frames[frames.Length + PREV_Y];
-//            }
-//            else
-//            {
-//                // Interpolate between the previous frame and the current frame.
-//                int frame = Animation::binarySearch(frames, time, ENTRIES);
-//                x = frames[frame + PREV_X];
-//                y = frames[frame + PREV_Y];
-//                float frameTime = frames[frame];
-//                float percent = GetCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-//
-//                x += (frames[frame + X] - x) * percent;
-//                y += (frames[frame + Y] - y) * percent;
-//            }
-//
-//            if (pose == MixPose_Setup)
-//            {
-//                bone.x = bone.data.x + x * alpha;
-//                bone.y = bone.data.y + y * alpha;
-//            }
-//            else
-//            {
-//                bone.x += (bone.data.x + x - bone.x) * alpha;
-//                bone.y += (bone.data.y + y - bone.y) * alpha;
-//            }
-//        }
+    protected:
+        static const int PREV_TIME, PREV_X, PREV_Y;
+        static const int X, Y;
+        
+        Vector<float> _frames;
+        int _boneIndex;
     };
 }
 

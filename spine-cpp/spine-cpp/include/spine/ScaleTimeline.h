@@ -39,72 +39,12 @@ namespace Spine
     {
         RTTI_DECL;
         
+    public:
+        ScaleTimeline(int frameCount);
+        
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
         
         virtual int getPropertyId();
-        
-//        public ScaleTimeline (int frameCount)
-//        : base(frameCount) {
-//        }
-//
-//        override public void Apply (Skeleton skeleton, float lastTime, float time, Vector<Event> firedEvents, float alpha, MixPose pose, MixDirection direction) {
-//            Bone bone = skeleton.bones.Items[boneIndex];
-//
-//            float[] frames = _frames;
-//            if (time < frames[0]) {
-//                switch (pose) {
-//                    case MixPose_Setup:
-//                        bone.scaleX = bone.data.scaleX;
-//                        bone.scaleY = bone.data.scaleY;
-//                        return;
-//                    case MixPose_Current:
-//                        bone.scaleX += (bone.data.scaleX - bone.scaleX) * alpha;
-//                        bone.scaleY += (bone.data.scaleY - bone.scaleY) * alpha;
-//                        return;
-//                }
-//                return;
-//            }
-//
-//            float x, y;
-//            if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
-//                x = frames[frames.Length + PREV_X] * bone.data.scaleX;
-//                y = frames[frames.Length + PREV_Y] * bone.data.scaleY;
-//            } else {
-//                // Interpolate between the previous frame and the current frame.
-//                int frame = Animation::binarySearch(frames, time, ENTRIES);
-//                x = frames[frame + PREV_X];
-//                y = frames[frame + PREV_Y];
-//                float frameTime = frames[frame];
-//                float percent = GetCurvePercent(frame / ENTRIES - 1,
-//                                                1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-//
-//                x = (x + (frames[frame + X] - x) * percent) * bone.data.scaleX;
-//                y = (y + (frames[frame + Y] - y) * percent) * bone.data.scaleY;
-//            }
-//            if (alpha == 1) {
-//                bone.scaleX = x;
-//                bone.scaleY = y;
-//            } else {
-//                float bx, by;
-//                if (pose == MixPose_Setup) {
-//                    bx = bone.data.scaleX;
-//                    by = bone.data.scaleY;
-//                } else {
-//                    bx = bone.scaleX;
-//                    by = bone.scaleY;
-//                }
-//                // Mixing out uses sign of setup or current pose, else use sign of key.
-//                if (direction == MixDirection_Out) {
-//                    x = (x >= 0 ? x : -x) * (bx >= 0 ? 1 : -1);
-//                    y = (y >= 0 ? y : -y) * (by >= 0 ? 1 : -1);
-//                } else {
-//                    bx = (bx >= 0 ? bx : -bx) * (x >= 0 ? 1 : -1);
-//                    by = (by >= 0 ? by : -by) * (y >= 0 ? 1 : -1);
-//                }
-//                bone.scaleX = bx + (x - bx) * alpha;
-//                bone.scaleY = by + (y - by) * alpha;
-//            }
-//        }
     };
 }
 

@@ -44,6 +44,7 @@ namespace Spine
     class IkConstraint : public Constraint
     {
         friend class Skeleton;
+        friend class IkConstraintTimeline;
         
         RTTI_DECL;
         

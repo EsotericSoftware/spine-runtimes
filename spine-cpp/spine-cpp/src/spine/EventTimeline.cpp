@@ -37,18 +37,83 @@
 #include <spine/TimelineType.h>
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
+#include <spine/Event.h>
 
 namespace Spine
 {
     RTTI_IMPL(EventTimeline, Timeline);
     
+    EventTimeline::EventTimeline(int frameCount) : Timeline()
+    {
+        _frames.reserve(frameCount);
+        _events.reserve(frameCount);
+    }
+    
     void EventTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
     {
-        // TODO
+        if (events.size() == 0)
+        {
+            return;
+        }
+        
+        int frameCount = static_cast<int>(_frames.size());
+        
+        if (lastTime > time)
+        {
+            // Fire events after last time for looped animations.
+            apply(skeleton, lastTime, std::numeric_limits<int>::max(), events, alpha, pose, direction);
+            lastTime = -1.0f;
+        }
+        else if (lastTime >= _frames[frameCount - 1]) // Last time is after last frame.
+        {
+            return;
+        }
+       
+        if (time < _frames[0])
+        {
+            return; // Time is before first frame.
+        }
+        
+        int frame;
+        if (lastTime < _frames[0])
+        {
+            frame = 0;
+        }
+        else
+        {
+            frame = Animation::binarySearch(_frames, lastTime);
+            float frameTime = _frames[frame];
+            while (frame > 0)
+            {
+                // Fire multiple events with the same frame.
+                if (_frames[frame - 1] != frameTime)
+                {
+                    break;
+                }
+                frame--;
+            }
+        }
+        
+        for (; frame < frameCount && time >= _frames[frame]; ++frame)
+        {
+            events.push_back(_events[frame]);
+        }
     }
     
     int EventTimeline::getPropertyId()
     {
         return ((int)TimelineType_Event << 24);
     }
+    
+    void EventTimeline::setFrame(int frameIndex, Event* e)
+    {
+        _frames[frameIndex] = e->getTime();
+        _events[frameIndex] = e;
+    }
+    
+    Vector<float> EventTimeline::getFrames() { return _frames; }
+    void EventTimeline::setFrames(Vector<float>& inValue) { _frames = inValue; } // time, ...
+    Vector<Event*>& EventTimeline::getEvents() { return _events; }
+    void EventTimeline::setEvents(Vector<Event*>& inValue) { _events = inValue; }
+    int EventTimeline::getFrameCount() { return static_cast<int>(_frames.size()); }
 }

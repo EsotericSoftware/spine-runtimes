@@ -43,6 +43,7 @@ namespace Spine
     {
         friend class IkConstraint;
         friend class Skeleton;
+        friend class IkConstraintTimeline;
         
     public:
         IkConstraintData(std::string name);

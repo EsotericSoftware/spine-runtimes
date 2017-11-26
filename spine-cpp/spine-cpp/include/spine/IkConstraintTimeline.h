@@ -48,69 +48,15 @@ namespace Spine
         
         virtual int getPropertyId();
         
+        /// Sets the time, mix and bend direction of the specified keyframe.
+        void setFrame (int frameIndex, float time, float mix, int bendDirection);
+        
     private:
         static const int PREV_TIME, PREV_MIX, PREV_BEND_DIRECTION;
         static const int MIX, BEND_DIRECTION;
         
         Vector<float> _frames;
         int _ikConstraintIndex;
-        
-//        public int IkConstraintIndex { return ikConstraintIndex; } set { ikConstraintIndex = inValue; }
-//        public float[] Frames { return frames; } set { frames = inValue; } // time, mix, bendDirection, ...
-//
-//
-//        
-//        /// Sets the time, mix and bend direction of the specified keyframe.
-//        public void setFrame (int frameIndex, float time, float mix, int bendDirection) {
-//            frameIndex *= ENTRIES;
-//            frames[frameIndex] = time;
-//            frames[frameIndex + MIX] = mix;
-//            frames[frameIndex + BEND_DIRECTION] = bendDirection;
-//        }
-//        
-//        override public void Apply (Skeleton skeleton, float lastTime, float time, Vector<Event> firedEvents, float alpha, MixPose pose, MixDirection direction) {
-//            IkConstraint constraint = skeleton.ikConstraints.Items[ikConstraintIndex];
-//            float[] frames = _frames;
-//            if (time < frames[0]) {
-//                switch (pose) {
-//                    case MixPose_Setup:
-//                        constraint.mix = constraint.data.mix;
-//                        constraint.bendDirection = constraint.data.bendDirection;
-//                        return;
-//                    case MixPose_Current:
-//                        constraint.mix += (constraint.data.mix - constraint.mix) * alpha;
-//                        constraint.bendDirection = constraint.data.bendDirection;
-//                        return;
-//                }
-//                return;
-//            }
-//            
-//            if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
-//                if (pose == MixPose_Setup) {
-//                    constraint.mix = constraint.data.mix + (frames[frames.Length + PREV_MIX] - constraint.data.mix) * alpha;
-//                    constraint.bendDirection = direction == MixDirection_Out ? constraint.data.bendDirection
-//                    : (int)frames[frames.Length + PREV_BEND_DIRECTION];
-//                } else {
-//                    constraint.mix += (frames[frames.Length + PREV_MIX] - constraint.mix) * alpha;
-//                    if (direction == MixDirection_In) constraint.bendDirection = (int)frames[frames.Length + PREV_BEND_DIRECTION];
-//                }
-//                return;
-//            }
-//            
-//            // Interpolate between the previous frame and the current frame.
-//            int frame = Animation::binarySearch(frames, time, ENTRIES);
-//            float mix = frames[frame + PREV_MIX];
-//            float frameTime = frames[frame];
-//            float percent = GetCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-//            
-//            if (pose == MixPose_Setup) {
-//                constraint.mix = constraint.data.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.data.mix) * alpha;
-//                constraint.bendDirection = direction == MixDirection_Out ? constraint.data.bendDirection : (int)frames[frame + PREV_BEND_DIRECTION];
-//            } else {
-//                constraint.mix += (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
-//                if (direction == MixDirection_In) constraint.bendDirection = (int)frames[frame + PREV_BEND_DIRECTION];
-//            }
-//        }
     };
 }
 

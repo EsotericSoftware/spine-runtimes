@@ -47,6 +47,9 @@ namespace Spine
     {
         friend class PathConstraint;
         friend class Skeleton;
+        friend class PathConstraintMixTimeline;
+        friend class PathConstraintPositionTimeline;
+        friend class PathConstraintSpacingTimeline;
         
     public:
         PathConstraintData(std::string name);

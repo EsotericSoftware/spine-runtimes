@@ -57,6 +57,9 @@ namespace Spine
         friend class Skeleton;
         friend class RegionAttachment;
         friend class PointAttachment;
+        friend class ScaleTimeline;
+        friend class ShearTimeline;
+        friend class TranslateTimeline;
         
     public:
         static void setYDown(bool inValue);

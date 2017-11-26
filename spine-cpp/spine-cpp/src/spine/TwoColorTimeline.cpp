@@ -42,13 +42,169 @@ namespace Spine
 {
     RTTI_IMPL(TwoColorTimeline, CurveTimeline);
     
+    const int TwoColorTimeline::ENTRIES = 8;
+    const int TwoColorTimeline::PREV_TIME = -8;
+    const int TwoColorTimeline::PREV_R = -7;
+    const int TwoColorTimeline::PREV_G = -6;
+    const int TwoColorTimeline::PREV_B = -5;
+    const int TwoColorTimeline::PREV_A = -4;
+    const int TwoColorTimeline::PREV_R2 = -3;
+    const int TwoColorTimeline::PREV_G2 = -2;
+    const int TwoColorTimeline::PREV_B2 = -1;
+    const int TwoColorTimeline::R = 1;
+    const int TwoColorTimeline::G = 2;
+    const int TwoColorTimeline::B = 3;
+    const int TwoColorTimeline::A = 4;
+    const int TwoColorTimeline::R2 = 5;
+    const int TwoColorTimeline::G2 = 6;
+    const int TwoColorTimeline::B2 = 7;
+    
+    TwoColorTimeline::TwoColorTimeline(int frameCount) : CurveTimeline(frameCount)
+    {
+        _frames.reserve(frameCount * ENTRIES);
+    }
+    
     void TwoColorTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
     {
-        // TODO
+        Slot* slotP = skeleton._slots[_slotIndex];
+        Slot& slot = *slotP;
+        
+        if (time < _frames[0])
+        {
+            // Time is before first frame.
+            switch (pose)
+            {
+                case MixPose_Setup:
+                    slot._r = slot._data._r;
+                    slot._g = slot._data._g;
+                    slot._b = slot._data._b;
+                    slot._a = slot._data._a;
+                    slot._r2 = slot._data._r2;
+                    slot._g2 = slot._data._g2;
+                    slot._b2 = slot._data._b2;
+                    return;
+                case MixPose_Current:
+                    slot._r += (slot._r - slot._data._r) * alpha;
+                    slot._g += (slot._g - slot._data._g) * alpha;
+                    slot._b += (slot._b - slot._data._b) * alpha;
+                    slot._a += (slot._a - slot._data._a) * alpha;
+                    slot._r2 += (slot._r2 - slot._data._r2) * alpha;
+                    slot._g2 += (slot._g2 - slot._data._g2) * alpha;
+                    slot._b2 += (slot._b2 - slot._data._b2) * alpha;
+                    return;
+                case MixPose_CurrentLayered:
+                default:
+                    return;
+            }
+        }
+        
+        float r, g, b, a, r2, g2, b2;
+        if (time >= _frames[_frames.size() - ENTRIES])
+        {
+            // Time is after last frame.
+            int i = static_cast<int>(_frames.size());
+            r = _frames[i + PREV_R];
+            g = _frames[i + PREV_G];
+            b = _frames[i + PREV_B];
+            a = _frames[i + PREV_A];
+            r2 = _frames[i + PREV_R2];
+            g2 = _frames[i + PREV_G2];
+            b2 = _frames[i + PREV_B2];
+        }
+        else
+        {
+            // Interpolate between the previous frame and the current frame.
+            int frame = Animation::binarySearch(_frames, time, ENTRIES);
+            r = _frames[frame + PREV_R];
+            g = _frames[frame + PREV_G];
+            b = _frames[frame + PREV_B];
+            a = _frames[frame + PREV_A];
+            r2 = _frames[frame + PREV_R2];
+            g2 = _frames[frame + PREV_G2];
+            b2 = _frames[frame + PREV_B2];
+            float frameTime = _frames[frame];
+            float percent = getCurvePercent(frame / ENTRIES - 1,
+                                            1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
+            
+            r += (_frames[frame + R] - r) * percent;
+            g += (_frames[frame + G] - g) * percent;
+            b += (_frames[frame + B] - b) * percent;
+            a += (_frames[frame + A] - a) * percent;
+            r2 += (_frames[frame + R2] - r2) * percent;
+            g2 += (_frames[frame + G2] - g2) * percent;
+            b2 += (_frames[frame + B2] - b2) * percent;
+        }
+        
+        if (alpha == 1)
+        {
+            slot._r = r;
+            slot._g = g;
+            slot._b = b;
+            slot._a = a;
+            slot._r2 = r2;
+            slot._g2 = g2;
+            slot._b2 = b2;
+        }
+        else
+        {
+            float br, bg, bb, ba, br2, bg2, bb2;
+            if (pose == MixPose_Setup)
+            {
+                br = slot._data._r;
+                bg = slot._data._g;
+                bb = slot._data._b;
+                ba = slot._data._a;
+                br2 = slot._data._r2;
+                bg2 = slot._data._g2;
+                bb2 = slot._data._b2;
+            }
+            else
+            {
+                br = slot._r;
+                bg = slot._g;
+                bb = slot._b;
+                ba = slot._a;
+                br2 = slot._r2;
+                bg2 = slot._g2;
+                bb2 = slot._b2;
+            }
+            
+            slot._r = br + ((r - br) * alpha);
+            slot._g = bg + ((g - bg) * alpha);
+            slot._b = bb + ((b - bb) * alpha);
+            slot._a = ba + ((a - ba) * alpha);
+            slot._r2 = br2 + ((r2 - br2) * alpha);
+            slot._g2 = bg2 + ((g2 - bg2) * alpha);
+            slot._b2 = bb2 + ((b2 - bb2) * alpha);
+        }
     }
     
     int TwoColorTimeline::getPropertyId()
     {
         return ((int)TimelineType_TwoColor << 24) + _slotIndex;
+    }
+    
+    void TwoColorTimeline::setFrame(int frameIndex, float time, float r, float g, float b, float a, float r2, float g2, float b2)
+    {
+        frameIndex *= ENTRIES;
+        _frames[frameIndex] = time;
+        _frames[frameIndex + R] = r;
+        _frames[frameIndex + G] = g;
+        _frames[frameIndex + B] = b;
+        _frames[frameIndex + A] = a;
+        _frames[frameIndex + R2] = r2;
+        _frames[frameIndex + G2] = g2;
+        _frames[frameIndex + B2] = b2;
+    }
+    
+    int TwoColorTimeline::getSlotIndex()
+    {
+        return _slotIndex;
+    }
+    
+    void TwoColorTimeline::setSlotIndex(int inValue)
+    {
+        assert(inValue >= 0);
+        _slotIndex = inValue;
     }
 }

@@ -56,7 +56,9 @@ namespace Spine
         _clippingPolygon.reserve(n);
         clip->computeWorldVertices(slot, 0, n, _clippingPolygon, 0, 2);
         makeClockwise(_clippingPolygon);
-        _clippingPolygons = _triangulator.decompose(_clippingPolygon, _triangulator.triangulate(_clippingPolygon));
+        Vector< Vector<float>* > clippingPolygons = _triangulator.decompose(_clippingPolygon, _triangulator.triangulate(_clippingPolygon));
+        
+        _clippingPolygons = clippingPolygons;
         
         for (Vector<float>** i = _clippingPolygons.begin(); i != _clippingPolygons.end(); ++i)
         {
@@ -97,14 +99,13 @@ namespace Spine
         Vector<float>& clipOutput = _clipOutput, clippedVertices = _clippedVertices;
         Vector<int>& clippedTriangles = _clippedTriangles;
         Vector< Vector<float>* >& polygons = _clippingPolygons;
-        int polygonsCount = _clippingPolygons.size();
+        int polygonsCount = static_cast<int>(_clippingPolygons.size());
 
         int index = 0;
         clippedVertices.clear();
         _clippedUVs.clear();
         clippedTriangles.clear();
         
-        //outer:
         for (int i = 0; i < trianglesLength; i += 3)
         {
             int vertexOffset = triangles[i] << 1;
@@ -121,73 +122,72 @@ namespace Spine
 
             for (int p = 0; p < polygonsCount; p++)
             {
-                int s = clippedVertices.size();
-//                if (clip(x1, y1, x2, y2, x3, y3, polygons[p], clipOutput))
-//                {
-//                    int clipOutputLength = clipOutput.Count;
-//                    if (clipOutputLength == 0)
-//                    {
-//                        continue;
-//                    }
-//                    float d0 = y2 - y3, d1 = x3 - x2, d2 = x1 - x3, d4 = y3 - y1;
-//                    float d = 1 / (d0 * d2 + d1 * (y1 - y3));
-//
-//                    int clipOutputCount = clipOutputLength >> 1;
-//                    float[] clipOutputItems = clipOutput.Items;
-//                    float[] clippedVerticesItems = clippedVertices.Resize(s + clipOutputCount * 2).Items;
-//                    float[] clippedUVsItems = clippedUVs.Resize(s + clipOutputCount * 2).Items;
-//                    for (int ii = 0; ii < clipOutputLength; ii += 2)
-//                    {
-//                        float x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
-//                        clippedVerticesItems[s] = x;
-//                        clippedVerticesItems[s + 1] = y;
-//                        float c0 = x - x3, c1 = y - y3;
-//                        float a = (d0 * c0 + d1 * c1) * d;
-//                        float b = (d4 * c0 + d2 * c1) * d;
-//                        float c = 1 - a - b;
-//                        clippedUVsItems[s] = u1 * a + u2 * b + u3 * c;
-//                        clippedUVsItems[s + 1] = v1 * a + v2 * b + v3 * c;
-//                        s += 2;
-//                    }
-//
-//                    s = clippedTriangles.Count;
-//                    int[] clippedTrianglesItems = clippedTriangles.Resize(s + 3 * (clipOutputCount - 2)).Items;
-//                    clipOutputCount--;
-//                    for (int ii = 1; ii < clipOutputCount; ii++)
-//                    {
-//                        clippedTrianglesItems[s] = index;
-//                        clippedTrianglesItems[s + 1] = index + ii;
-//                        clippedTrianglesItems[s + 2] = index + ii + 1;
-//                        s += 3;
-//                    }
-//                    index += clipOutputCount + 1;
-//                }
-//                else
-//                {
-//                    float[] clippedVerticesItems = clippedVertices.Resize(s + 3 * 2).Items;
-//                    float[] clippedUVsItems = clippedUVs.Resize(s + 3 * 2).Items;
-//                    clippedVerticesItems[s] = x1;
-//                    clippedVerticesItems[s + 1] = y1;
-//                    clippedVerticesItems[s + 2] = x2;
-//                    clippedVerticesItems[s + 3] = y2;
-//                    clippedVerticesItems[s + 4] = x3;
-//                    clippedVerticesItems[s + 5] = y3;
-//
-//                    clippedUVsItems[s] = u1;
-//                    clippedUVsItems[s + 1] = v1;
-//                    clippedUVsItems[s + 2] = u2;
-//                    clippedUVsItems[s + 3] = v2;
-//                    clippedUVsItems[s + 4] = u3;
-//                    clippedUVsItems[s + 5] = v3;
-//
-//                    s = clippedTriangles.Count;
-//                    int[] clippedTrianglesItems = clippedTriangles.Resize(s + 3).Items;
-//                    clippedTrianglesItems[s] = index;
-//                    clippedTrianglesItems[s + 1] = index + 1;
-//                    clippedTrianglesItems[s + 2] = index + 2;
-//                    index += 3;
-//                    break; //continue outer;
-//                }
+                int s = static_cast<int>(clippedVertices.size());
+                if (clip(x1, y1, x2, y2, x3, y3, *polygons[p], clipOutput))
+                {
+                    int clipOutputLength = static_cast<int>(clipOutput.size());
+                    if (clipOutputLength == 0)
+                    {
+                        continue;
+                    }
+                    float d0 = y2 - y3, d1 = x3 - x2, d2 = x1 - x3, d4 = y3 - y1;
+                    float d = 1 / (d0 * d2 + d1 * (y1 - y3));
+
+                    int clipOutputCount = clipOutputLength >> 1;
+                    clippedVertices.reserve(s + clipOutputCount * 2);
+                    _clippedUVs.reserve(s + clipOutputCount * 2);
+                    for (int ii = 0; ii < clipOutputLength; ii += 2)
+                    {
+                        float x = clipOutput[ii], y = clipOutput[ii + 1];
+                        clippedVertices[s] = x;
+                        clippedVertices[s + 1] = y;
+                        float c0 = x - x3, c1 = y - y3;
+                        float a = (d0 * c0 + d1 * c1) * d;
+                        float b = (d4 * c0 + d2 * c1) * d;
+                        float c = 1 - a - b;
+                        _clippedUVs[s] = u1 * a + u2 * b + u3 * c;
+                        _clippedUVs[s + 1] = v1 * a + v2 * b + v3 * c;
+                        s += 2;
+                    }
+
+                    s = static_cast<int>(clippedTriangles.size());
+                    clippedTriangles.reserve(s + 3 * (clipOutputCount - 2));
+                    clipOutputCount--;
+                    for (int ii = 1; ii < clipOutputCount; ii++)
+                    {
+                        clippedTriangles[s] = index;
+                        clippedTriangles[s + 1] = index + ii;
+                        clippedTriangles[s + 2] = index + ii + 1;
+                        s += 3;
+                    }
+                    index += clipOutputCount + 1;
+                }
+                else
+                {
+                    clippedVertices.reserve(s + 3 * 2);
+                    _clippedUVs.reserve(s + 3 * 2);
+                    clippedVertices[s] = x1;
+                    clippedVertices[s + 1] = y1;
+                    clippedVertices[s + 2] = x2;
+                    clippedVertices[s + 3] = y2;
+                    clippedVertices[s + 4] = x3;
+                    clippedVertices[s + 5] = y3;
+
+                    _clippedUVs[s] = u1;
+                    _clippedUVs[s + 1] = v1;
+                    _clippedUVs[s + 2] = u2;
+                    _clippedUVs[s + 3] = v2;
+                    _clippedUVs[s + 4] = u3;
+                    _clippedUVs[s + 5] = v3;
+
+                    s = static_cast<int>(clippedTriangles.size());
+                    clippedTriangles.reserve(s + 3);
+                    clippedTriangles[s] = index;
+                    clippedTriangles[s + 1] = index + 1;
+                    clippedTriangles[s + 2] = index + 2;
+                    index += 3;
+                    break;
+                }
             }
         }
     }
@@ -201,105 +201,105 @@ namespace Spine
     {
         Vector<float> originalOutput = output;
         bool clipped = false;
-//
-//        // Avoid copy at the end.
-//        Vector<float> input = NULL;
-//        if (clippingArea.Count % 4 >= 2)
-//        {
-//            input = output;
-//            output = scratch;
-//        }
-//        else
-//        {
-//            input = scratch;
-//        }
-//
-//        input.Clear();
-//        input.push_back(x1);
-//        input.push_back(y1);
-//        input.push_back(x2);
-//        input.push_back(y2);
-//        input.push_back(x3);
-//        input.push_back(y3);
-//        input.push_back(x1);
-//        input.push_back(y1);
-//        output.Clear();
-//
-//        Vector<float> clippingVertices = clippingArea.Items;
-//        int clippingVerticesLast = clippingArea.Count - 4;
-//        for (int i = 0; ; i += 2)
-//        {
-//            float edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
-//            float edgeX2 = clippingVertices[i + 2], edgeY2 = clippingVertices[i + 3];
-//            float deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;
-//
-//            Vector<float> inputVertices = input.Items;
-//            int inputVerticesLength = input.Count - 2, outputStart = output.Count;
-//            for (int ii = 0; ii < inputVerticesLength; ii += 2)
-//            {
-//                float inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
-//                float inputX2 = inputVertices[ii + 2], inputY2 = inputVertices[ii + 3];
-//                bool side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0;
-//                if (deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0)
-//                {
-//                    if (side2)
-//                    {
-//                        // v1 inside, v2 inside
-//                        output.push_back(inputX2);
-//                        output.push_back(inputY2);
-//                        continue;
-//                    }
-//                    // v1 inside, v2 outside
-//                    float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-//                    float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
-//                    output.push_back(edgeX + (edgeX2 - edgeX) * ua);
-//                    output.push_back(edgeY + (edgeY2 - edgeY) * ua);
-//                }
-//                else if (side2)
-//                {
-//                    // v1 outside, v2 inside
-//                    float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-//                    float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
-//                    output.push_back(edgeX + (edgeX2 - edgeX) * ua);
-//                    output.push_back(edgeY + (edgeY2 - edgeY) * ua);
-//                    output.push_back(inputX2);
-//                    output.push_back(inputY2);
-//                }
-//                clipped = true;
-//            }
-//
-//            if (outputStart == output.Count)
-//            {
-//                // All edges outside.
-//                originalOutput.Clear();
-//                return true;
-//            }
-//
-//            output.push_back(output.Items[0]);
-//            output.push_back(output.Items[1]);
-//
-//            if (i == clippingVerticesLast)
-//            {
-//                break;
-//            }
-//            var temp = output;
-//            output = input;
-//            output.Clear();
-//            input = temp;
-//        }
-//
-//        if (originalOutput != output)
-//        {
-//            originalOutput.Clear();
-//            for (int i = 0, n = output.Count - 2; i < n; i++)
-//            {
-//                originalOutput.push_back(output.Items[i]);
-//            }
-//        }
-//        else
-//        {
-//            originalOutput.Resize(originalOutput.Count - 2);
-//        }
+
+        // Avoid copy at the end.
+        Vector<float> input;
+        if (clippingArea.size() % 4 >= 2)
+        {
+            input = output;
+            output = _scratch;
+        }
+        else
+        {
+            input = _scratch;
+        }
+
+        input.clear();
+        input.push_back(x1);
+        input.push_back(y1);
+        input.push_back(x2);
+        input.push_back(y2);
+        input.push_back(x3);
+        input.push_back(y3);
+        input.push_back(x1);
+        input.push_back(y1);
+        output.clear();
+
+        Vector<float> clippingVertices = clippingArea;
+        int clippingVerticesLast = static_cast<int>(clippingArea.size()) - 4;
+        for (int i = 0; ; i += 2)
+        {
+            float edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
+            float edgeX2 = clippingVertices[i + 2], edgeY2 = clippingVertices[i + 3];
+            float deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;
+
+            Vector<float> inputVertices = input;
+            int inputVerticesLength = static_cast<int>(input.size()) - 2, outputStart = static_cast<int>(output.size());
+            for (int ii = 0; ii < inputVerticesLength; ii += 2)
+            {
+                float inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
+                float inputX2 = inputVertices[ii + 2], inputY2 = inputVertices[ii + 3];
+                bool side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0;
+                if (deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0)
+                {
+                    if (side2)
+                    {
+                        // v1 inside, v2 inside
+                        output.push_back(inputX2);
+                        output.push_back(inputY2);
+                        continue;
+                    }
+                    // v1 inside, v2 outside
+                    float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
+                    float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
+                    output.push_back(edgeX + (edgeX2 - edgeX) * ua);
+                    output.push_back(edgeY + (edgeY2 - edgeY) * ua);
+                }
+                else if (side2)
+                {
+                    // v1 outside, v2 inside
+                    float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
+                    float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
+                    output.push_back(edgeX + (edgeX2 - edgeX) * ua);
+                    output.push_back(edgeY + (edgeY2 - edgeY) * ua);
+                    output.push_back(inputX2);
+                    output.push_back(inputY2);
+                }
+                clipped = true;
+            }
+
+            if (outputStart == output.size())
+            {
+                // All edges outside.
+                originalOutput.clear();
+                return true;
+            }
+
+            output.push_back(output[0]);
+            output.push_back(output[1]);
+
+            if (i == clippingVerticesLast)
+            {
+                break;
+            }
+            Vector<float> temp = output;
+            output = input;
+            output.clear();
+            input = temp;
+        }
+
+        if (originalOutput != output)
+        {
+            originalOutput.clear();
+            for (int i = 0, n = static_cast<int>(output.size()) - 2; i < n; ++i)
+            {
+                originalOutput.push_back(output[i]);
+            }
+        }
+        else
+        {
+            originalOutput.reserve(originalOutput.size() - 2);
+        }
 
         return clipped;
     }

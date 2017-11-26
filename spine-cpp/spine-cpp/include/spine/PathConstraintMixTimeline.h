@@ -40,78 +40,23 @@ namespace Spine
         RTTI_DECL;
         
     public:
+        static const int ENTRIES;
+        
+        PathConstraintMixTimeline(int frameCount);
+        
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
         
         virtual int getPropertyId();
         
     private:
+        static const int PREV_TIME, PREV_ROTATE, PREV_TRANSLATE;
+        static const int ROTATE, TRANSLATE;
+        
+        Vector<float> _frames;
         int _pathConstraintIndex;
         
-//        public const int ENTRIES = 3;
-//        private const int PREV_TIME = -3, PREV_ROTATE = -2, PREV_TRANSLATE = -1;
-//        private const int ROTATE = 1, TRANSLATE = 2;
-//
-//        internal float[] frames;
-//        
-//        public int PathConstraintIndex { return pathConstraintIndex; } set { pathConstraintIndex = inValue; }
-//        public float[] Frames { return frames; } set { frames = inValue; } // time, rotate mix, translate mix, ...
-//
-//        
-//        public PathConstraintMixTimeline (int frameCount)
-//        : base(frameCount) {
-//            frames = new float[frameCount * ENTRIES];
-//        }
-//        
-//        /// Sets the time and mixes of the specified keyframe.
-//        public void setFrame (int frameIndex, float time, float rotateMix, float translateMix) {
-//            frameIndex *= ENTRIES;
-//            frames[frameIndex] = time;
-//            frames[frameIndex + ROTATE] = rotateMix;
-//            frames[frameIndex + TRANSLATE] = translateMix;
-//        }
-//        
-//        override public void Apply (Skeleton skeleton, float lastTime, float time, Vector<Event> firedEvents, float alpha, MixPose pose, MixDirection direction) {
-//            PathConstraint constraint = skeleton.pathConstraints.Items[pathConstraintIndex];
-//            float[] frames = _frames;
-//            if (time < frames[0]) {
-//                switch (pose) {
-//                    case MixPose_Setup:
-//                        constraint.rotateMix = constraint.data.rotateMix;
-//                        constraint.translateMix = constraint.data.translateMix;
-//                        return;
-//                    case MixPose_Current:
-//                        constraint.rotateMix += (constraint.data.rotateMix - constraint.rotateMix) * alpha;
-//                        constraint.translateMix += (constraint.data.translateMix - constraint.translateMix) * alpha;
-//                        return;
-//                }
-//                return;
-//            }
-//            
-//            float rotate, translate;
-//            if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
-//                rotate = frames[frames.Length + PREV_ROTATE];
-//                translate = frames[frames.Length + PREV_TRANSLATE];
-//            } else {
-//                // Interpolate between the previous frame and the current frame.
-//                int frame = Animation::binarySearch(frames, time, ENTRIES);
-//                rotate = frames[frame + PREV_ROTATE];
-//                translate = frames[frame + PREV_TRANSLATE];
-//                float frameTime = frames[frame];
-//                float percent = GetCurvePercent(frame / ENTRIES - 1,
-//                                                1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-//                
-//                rotate += (frames[frame + ROTATE] - rotate) * percent;
-//                translate += (frames[frame + TRANSLATE] - translate) * percent;
-//            }
-//            
-//            if (pose == MixPose_Setup) {
-//                constraint.rotateMix = constraint.data.rotateMix + (rotate - constraint.data.rotateMix) * alpha;
-//                constraint.translateMix = constraint.data.translateMix + (translate - constraint.data.translateMix) * alpha;
-//            } else {
-//                constraint.rotateMix += (rotate - constraint.rotateMix) * alpha;
-//                constraint.translateMix += (translate - constraint.translateMix) * alpha;
-//            }
-//        }
+        /// Sets the time and mixes of the specified keyframe.
+        void setFrame(int frameIndex, float time, float rotateMix, float translateMix);
     };
 }
 

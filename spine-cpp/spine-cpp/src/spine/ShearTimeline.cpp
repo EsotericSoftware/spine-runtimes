@@ -37,14 +37,72 @@
 #include <spine/TimelineType.h>
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
+#include <spine/Bone.h>
+#include <spine/BoneData.h>
 
 namespace Spine
 {
     RTTI_IMPL(ShearTimeline, TranslateTimeline);
     
+    ShearTimeline::ShearTimeline(int frameCount) : TranslateTimeline(frameCount)
+    {
+        // Empty
+    }
+    
     void ShearTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
     {
-        // TODO
+        Bone* boneP = skeleton._bones[_boneIndex];
+        Bone& bone = *boneP;
+        
+        if (time < _frames[0])
+        {
+            switch (pose)
+            {
+                case MixPose_Setup:
+                    bone._shearX = bone._data._shearX;
+                    bone._shearY = bone._data._shearY;
+                    return;
+                case MixPose_Current:
+                    bone._shearX += (bone._data._shearX - bone._shearX) * alpha;
+                    bone._shearY += (bone._data._shearY - bone._shearY) * alpha;
+                    return;
+                case MixPose_CurrentLayered:
+                default:
+                    return;
+            }
+        }
+        
+        float x, y;
+        if (time >= _frames[_frames.size() - ENTRIES])
+        {
+            // Time is after last frame.
+            x = _frames[_frames.size() + PREV_X];
+            y = _frames[_frames.size() + PREV_Y];
+        }
+        else
+        {
+            // Interpolate between the previous frame and the current frame.
+            int frame = Animation::binarySearch(_frames, time, ENTRIES);
+            x = _frames[frame + PREV_X];
+            y = _frames[frame + PREV_Y];
+            float frameTime = _frames[frame];
+            float percent = getCurvePercent(frame / ENTRIES - 1,
+                                            1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
+            
+            x = x + (_frames[frame + X] - x) * percent;
+            y = y + (_frames[frame + Y] - y) * percent;
+        }
+        
+        if (pose == MixPose_Setup)
+        {
+            bone._shearX = bone._data._shearX + x * alpha;
+            bone._shearY = bone._data._shearY + y * alpha;
+        }
+        else
+        {
+            bone._shearX += (bone._data._shearX + x - bone._shearX) * alpha;
+            bone._shearY += (bone._data._shearY + y - bone._shearY) * alpha;
+        }
     }
     
     int ShearTimeline::getPropertyId()

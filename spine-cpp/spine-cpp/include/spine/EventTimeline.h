@@ -39,56 +39,25 @@ namespace Spine
     {
         RTTI_DECL;
         
+    public:
+        EventTimeline(int frameCount);
+        
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
         
         virtual int getPropertyId();
         
-//        internal float[] frames;
-//        private Event[] events;
-//        
-//        public float[] Frames { return frames; } set { frames = inValue; } // time, ...
-//        public Event[] Events { return events; } set { events = inValue; }
-//        public int FrameCount { return frames.Length; }
-//
-//        
-//        public EventTimeline (int frameCount) {
-//            frames = new float[frameCount];
-//            events = new Event[frameCount];
-//        }
-//        
-//        /// Sets the time and value of the specified keyframe.
-//        public void setFrame (int frameIndex, Event e) {
-//            frames[frameIndex] = e.Time;
-//            events[frameIndex] = e;
-//        }
-//        
-//        /// Fires events for frames &gt; lastTime and &lt;= time.
-//        public void Apply (Skeleton skeleton, float lastTime, float time, Vector<Event> firedEvents, float alpha, MixPose pose, MixDirection direction) {
-//            if (firedEvents == NULL) return;
-//            float[] frames = _frames;
-//            int frameCount = frames.Length;
-//            
-//            if (lastTime > time) { // Fire events after last time for looped animations.
-//                Apply(skeleton, lastTime, int.MaxValue, firedEvents, alpha, pose, direction);
-//                lastTime = -1f;
-//            } else if (lastTime >= frames[frameCount - 1]) // Last time is after last frame.
-//                return;
-//            if (time < frames[0]) return; // Time is before first frame.
-//            
-//            int frame;
-//            if (lastTime < frames[0])
-//                frame = 0;
-//            else {
-//                frame = Animation::binarySearch(frames, lastTime);
-//                float frameTime = frames[frame];
-//                while (frame > 0) { // Fire multiple events with the same frame.
-//                    if (frames[frame - 1] != frameTime) break;
-//                    frame--;
-//                }
-//            }
-//            for (; frame < frameCount && time >= frames[frame]; frame++)
-//                firedEvents.push_back(events[frame]);
-//        }
+        /// Sets the time and value of the specified keyframe.
+        void setFrame(int frameIndex, Event* e);
+        
+        Vector<float> getFrames();
+        void setFrames(Vector<float>& inValue);
+        Vector<Event*>& getEvents();
+        void setEvents(Vector<Event*>& inValue);
+        int getFrameCount();
+        
+    private:
+        Vector<float> _frames;
+        Vector<Event*> _events;
     };
 }
 

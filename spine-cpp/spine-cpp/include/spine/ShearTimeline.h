@@ -40,55 +40,11 @@ namespace Spine
         RTTI_DECL;
         
     public:
+        ShearTimeline(int frameCount);
+        
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
         
         virtual int getPropertyId();
-        
-//        public ShearTimeline (int frameCount)
-//        : base(frameCount) {
-//        }
-//
-//        override public void Apply (Skeleton skeleton, float lastTime, float time, Vector<Event> firedEvents, float alpha, MixPose pose, MixDirection direction) {
-//            Bone bone = skeleton.bones.Items[boneIndex];
-//            float[] frames = _frames;
-//            if (time < frames[0]) {
-//                switch (pose) {
-//                    case MixPose_Setup:
-//                        bone.shearX = bone.data.shearX;
-//                        bone.shearY = bone.data.shearY;
-//                        return;
-//                    case MixPose_Current:
-//                        bone.shearX += (bone.data.shearX - bone.shearX) * alpha;
-//                        bone.shearY += (bone.data.shearY - bone.shearY) * alpha;
-//                        return;
-//                }
-//                return;
-//            }
-//
-//            float x, y;
-//            if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
-//                x = frames[frames.Length + PREV_X];
-//                y = frames[frames.Length + PREV_Y];
-//            } else {
-//                // Interpolate between the previous frame and the current frame.
-//                int frame = Animation::binarySearch(frames, time, ENTRIES);
-//                x = frames[frame + PREV_X];
-//                y = frames[frame + PREV_Y];
-//                float frameTime = frames[frame];
-//                float percent = GetCurvePercent(frame / ENTRIES - 1,
-//                                                1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-//
-//                x = x + (frames[frame + X] - x) * percent;
-//                y = y + (frames[frame + Y] - y) * percent;
-//            }
-//            if (pose == MixPose_Setup) {
-//                bone.shearX = bone.data.shearX + x * alpha;
-//                bone.shearY = bone.data.shearY + y * alpha;
-//            } else {
-//                bone.shearX += (bone.data.shearX + x - bone.shearX) * alpha;
-//                bone.shearY += (bone.data.shearY + y - bone.shearY) * alpha;
-//            }
-//        }
     };
 }
 

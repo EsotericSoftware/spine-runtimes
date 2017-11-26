@@ -40,6 +40,9 @@ namespace Spine
     class BoneData
     {
         friend class RotateTimeline;
+        friend class ScaleTimeline;
+        friend class ShearTimeline;
+        friend class TranslateTimeline;
         
     public:
         BoneData(int index, std::string name, BoneData* parent = NULL);
