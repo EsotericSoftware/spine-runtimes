@@ -60,18 +60,6 @@ namespace Spine
             }
         }
         
-        Vector(Vector& inVector) : _size(inVector._size), _capacity(inVector._capacity), _buffer(NULL)
-        {
-            if (_capacity > 0)
-            {
-                _buffer = allocate(_capacity);
-                for (size_t i = 0; i < _size; ++i)
-                {
-                    construct(_buffer + i, inVector._buffer[i]);
-                }
-            }
-        }
-        
         Vector& operator=(Vector& inVector)
         {
             if (this != &inVector)
