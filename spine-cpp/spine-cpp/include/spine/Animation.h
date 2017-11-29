@@ -45,8 +45,8 @@ namespace Spine
     
     class Animation
     {
-        friend class RotateTimeline;
-        friend class TranslateTimeline;
+        friend class AnimationState;
+        friend class TrackEntry;
         friend class AnimationStateData;
         
         friend class AttachmentTimeline;
@@ -58,6 +58,7 @@ namespace Spine
         friend class PathConstraintMixTimeline;
         friend class PathConstraintPositionTimeline;
         friend class PathConstraintSpacingTimeline;
+        friend class RotateTimeline;
         friend class ScaleTimeline;
         friend class ShearTimeline;
         friend class TransformConstraintTimeline;

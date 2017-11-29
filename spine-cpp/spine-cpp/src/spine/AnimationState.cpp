@@ -31,6 +31,9 @@
 #include <spine/AnimationState.h>
 
 #include <spine/Animation.h>
+#include <spine/Event.h>
+
+#include <spine/Timeline.h>
 
 #include <spine/MathUtil.h>
 
@@ -38,7 +41,7 @@ namespace Spine
 {
     TrackEntry::TrackEntry()
     {
-        
+        // Empty
     }
     
     int TrackEntry::getTrackIndex() { return _trackIndex; }
@@ -116,11 +119,199 @@ namespace Spine
 
     TrackEntry* TrackEntry::getMixingFrom() { return _mixingFrom; }
     
-//    event AnimationState.TrackEntryDelegate Start, Interrupt, End, Dispose, Complete;
-//    event AnimationState.TrackEntryEventDelegate Event;
-    
     void TrackEntry::resetRotationDirections()
     {
         _timelinesRotation.clear();
+    }
+    
+    void TrackEntry::setOnAnimationEventFunc(OnAnimationEventFunc inValue)
+    {
+        _onAnimationEventFunc = inValue;
+    }
+    
+    TrackEntry* TrackEntry::setTimelineData(TrackEntry* to, Vector<TrackEntry*>& mixingToArray, Vector<int>& propertyIDs)
+    {
+        if (to != NULL)
+        {
+            mixingToArray.push_back(to);
+        }
+        
+        TrackEntry* lastEntry = _mixingFrom != NULL ? _mixingFrom->setTimelineData(this, mixingToArray, propertyIDs) : this;
+        
+        if (to != NULL)
+        {
+            mixingToArray.erase(mixingToArray.size() - 1);
+        }
+        
+        int mixingToLast = static_cast<int>(mixingToArray.size()) - 1;
+        Vector<Timeline*>& timelines = _animation->_timelines;
+        int timelinesCount = static_cast<int>(timelines.size());
+        _timelineData.reserve(timelinesCount);
+        _timelineDipMix.clear();
+        _timelineDipMix.reserve(timelinesCount);
+        
+        // outer:
+        for (int i = 0; i < timelinesCount; ++i)
+        {
+            int id = timelines[i]->getPropertyId();
+            if (propertyIDs.contains(id))
+            {
+                _timelineData[i] = AnimationState::Subsequent;
+            }
+            else if (to == NULL || !to->hasTimeline(id))
+            {
+                _timelineData[i] = AnimationState::First;
+            }
+            else
+            {
+                for (int ii = mixingToLast; ii >= 0; --ii)
+                {
+                    TrackEntry* entry = mixingToArray[ii];
+                    if (!entry->hasTimeline(id))
+                    {
+                        if (entry->_mixDuration > 0)
+                        {
+                            _timelineData[i] = AnimationState::DipMix;
+                            _timelineDipMix[i] = entry;
+                            goto continue_outer; // continue outer;
+                        }
+                        break;
+                    }
+                }
+                _timelineData[i] = AnimationState::Dip;
+            }
+        continue_outer: {}
+        }
+        
+        return lastEntry;
+    }
+    
+    bool TrackEntry::hasTimeline(int inId)
+    {
+        Vector<Timeline*>& timelines = _animation->_timelines;
+        for (int i = 0, n = static_cast<int>(timelines.size()); i < n; ++i)
+        {
+            if (timelines[i]->getPropertyId() == inId)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    void TrackEntry::reset()
+    {
+        _animation = NULL;
+        _next = NULL;
+        _mixingFrom = NULL;
+        
+        _timelineData.clear();
+        _timelineDipMix.clear();
+        _timelinesRotation.clear();
+        
+        _onAnimationEventFunc = NULL;
+    }
+    
+    EventQueue::EventQueue(AnimationState& state, Pool<TrackEntry>& trackEntryPool) : _state(state), _trackEntryPool(trackEntryPool)
+    {
+        // Empty
+    }
+    
+    void EventQueue::start(TrackEntry* entry)
+    {
+        _eventQueueEntries.push_back(new EventQueueEntry(EventType_Start, entry));
+        _state._animationsChanged = true;
+    }
+    
+    void EventQueue::interrupt(TrackEntry* entry)
+    {
+        _eventQueueEntries.push_back(new EventQueueEntry(EventType_Interrupt, entry));
+    }
+    
+    void EventQueue::end(TrackEntry* entry)
+    {
+        _eventQueueEntries.push_back(new EventQueueEntry(EventType_End, entry));
+        _state._animationsChanged = true;
+    }
+    
+    void EventQueue::dispose(TrackEntry* entry)
+    {
+        _eventQueueEntries.push_back(new EventQueueEntry(EventType_Dispose, entry));
+    }
+    
+    void EventQueue::complete(TrackEntry* entry)
+    {
+        _eventQueueEntries.push_back(new EventQueueEntry(EventType_Complete, entry));
+    }
+    
+    void EventQueue::event(TrackEntry* entry, Event* e)
+    {
+        _eventQueueEntries.push_back(new EventQueueEntry(EventType_Event, entry, e));
+    }
+    
+    /// Raises all events in the queue and drains the queue.
+    void EventQueue::drain()
+    {
+        if (_drainDisabled)
+        {
+            return;
+        }
+        
+        _drainDisabled = true;
+        
+        AnimationState& state = _state;
+        
+        // Don't cache entries.size() so callbacks can queue their own events (eg, call setAnimation in AnimationState_Complete).
+        for (int i = 0; i < _eventQueueEntries.size(); ++i)
+        {
+            EventQueueEntry* queueEntry = _eventQueueEntries[i];
+            TrackEntry* trackEntry = queueEntry->_entry;
+            
+            switch (queueEntry->_type)
+            {
+//                case EventType_Start:
+//                    trackEntry.onStart();
+//                    state.onStart(trackEntry);
+//                    break;
+//                case EventType_Interrupt:
+//                    trackEntry.onInterrupt();
+//                    state.onInterrupt(trackEntry);
+//                    break;
+//                case EventType_End:
+//                    trackEntry.onEnd();
+//                    state.onEnd(trackEntry);
+//                case EventType_Dispose:
+//                    trackEntry.onDispose();
+//                    state.onDispose(trackEntry);
+//                    trackEntryPool.Free(trackEntry); // Pooling
+//                    break;
+//                case EventType_Complete:
+//                    trackEntry.onComplete();
+//                    state.onComplete(trackEntry);
+//                    break;
+//                case EventType_Event:
+//                    trackEntry.onEvent(queueEntry.e);
+//                    state.onEvent(trackEntry, queueEntry.e);
+//                    break;
+            }
+        }
+        _eventQueueEntries.clear();
+        
+        _drainDisabled = false;
+    }
+    
+    void EventQueue::clear()
+    {
+        _eventQueueEntries.clear();
+    }
+    
+    const int AnimationState::Subsequent = 0;
+    const int AnimationState::First = 1;
+    const int AnimationState::Dip = 2;
+    const int AnimationState::DipMix = 3;
+    
+    void AnimationState::setOnAnimationEventFunc(OnAnimationEventFunc inValue)
+    {
+        _onAnimationEventFunc = inValue;
     }
 }
