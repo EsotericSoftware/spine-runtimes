@@ -52,11 +52,13 @@ namespace Spine
     class Animation;
     class Event;
     
-    typedef void (*OnAnimationEventFunc) (AnimationState* state, EventType type, TrackEntry* entry, Event* event);
+    typedef void (*OnAnimationEventFunc) (AnimationState& state, EventType type, TrackEntry* entry, Event* event);
     
     /// State for the playback of an animation
     class TrackEntry
     {
+        friend class EventQueue;
+        
     public:
         TrackEntry();
         
@@ -218,7 +220,7 @@ namespace Spine
         bool _loop;
         float _eventThreshold, _attachmentThreshold, _drawOrderThreshold;
         float _animationStart, _animationEnd, _animationLast, _nextAnimationLast;
-        float _delay, _trackTime, _trackLast, _nextTrackLast, _trackEnd, _timeScale = 1.0f;
+        float _delay, _trackTime, _trackLast, _nextTrackLast, _trackEnd, _timeScale;
         float _alpha, _mixTime, _mixDuration, _interruptAlpha, _totalAlpha;
         Vector<int> _timelineData;
         Vector<TrackEntry*> _timelineDipMix;
@@ -288,6 +290,8 @@ namespace Spine
         friend class EventQueue;
         
     public:
+        AnimationState();
+        
         void setOnAnimationEventFunc(OnAnimationEventFunc inValue);
         
     private:

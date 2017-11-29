@@ -39,7 +39,12 @@
 
 namespace Spine
 {
-    TrackEntry::TrackEntry()
+    void dummyOnAnimationEventFunc(AnimationState& state, EventType type, TrackEntry* entry, Event* event = NULL)
+    {
+        // Empty
+    }
+    
+    TrackEntry::TrackEntry() : _animation(NULL), _next(NULL), _mixingFrom(NULL), _trackIndex(0), _loop(false), _eventThreshold(0), _attachmentThreshold(0), _drawOrderThreshold(0), _animationStart(0), _animationEnd(0), _animationLast(0), _nextAnimationLast(0), _delay(0), _trackTime(0), _trackLast(0), _nextTrackLast(0), _trackEnd(0), _timeScale(1.0f), _alpha(0), _mixTime(0), _mixDuration(0), _interruptAlpha(0), _totalAlpha(0), _onAnimationEventFunc(dummyOnAnimationEventFunc)
     {
         // Empty
     }
@@ -269,30 +274,25 @@ namespace Spine
             
             switch (queueEntry->_type)
             {
-//                case EventType_Start:
-//                    trackEntry.onStart();
-//                    state.onStart(trackEntry);
-//                    break;
-//                case EventType_Interrupt:
-//                    trackEntry.onInterrupt();
-//                    state.onInterrupt(trackEntry);
-//                    break;
-//                case EventType_End:
-//                    trackEntry.onEnd();
-//                    state.onEnd(trackEntry);
-//                case EventType_Dispose:
-//                    trackEntry.onDispose();
-//                    state.onDispose(trackEntry);
-//                    trackEntryPool.Free(trackEntry); // Pooling
-//                    break;
-//                case EventType_Complete:
-//                    trackEntry.onComplete();
-//                    state.onComplete(trackEntry);
-//                    break;
-//                case EventType_Event:
-//                    trackEntry.onEvent(queueEntry.e);
-//                    state.onEvent(trackEntry, queueEntry.e);
-//                    break;
+                case EventType_Start:
+                case EventType_Interrupt:
+                case EventType_Complete:
+                    trackEntry->_onAnimationEventFunc(state, queueEntry->_type, trackEntry, NULL);
+                    state._onAnimationEventFunc(state, queueEntry->_type, trackEntry, NULL);
+                    break;
+                case EventType_End:
+                    trackEntry->_onAnimationEventFunc(state, queueEntry->_type, trackEntry, NULL);
+                    state._onAnimationEventFunc(state, queueEntry->_type, trackEntry, NULL);
+                    /* Yes, we want to fall through here */
+                case EventType_Dispose:
+                    trackEntry->_onAnimationEventFunc(state, EventType_Dispose, trackEntry, NULL);
+                    state._onAnimationEventFunc(state, EventType_Dispose, trackEntry, NULL);
+                    _trackEntryPool.free(trackEntry);
+                    break;
+                case EventType_Event:
+                    trackEntry->_onAnimationEventFunc(state, queueEntry->_type, trackEntry, queueEntry->_event);
+                    state._onAnimationEventFunc(state, queueEntry->_type, trackEntry, queueEntry->_event);
+                    break;
             }
         }
         _eventQueueEntries.clear();
@@ -309,6 +309,11 @@ namespace Spine
     const int AnimationState::First = 1;
     const int AnimationState::Dip = 2;
     const int AnimationState::DipMix = 3;
+    
+    AnimationState::AnimationState() : _onAnimationEventFunc(dummyOnAnimationEventFunc)
+    {
+        // Empty
+    }
     
     void AnimationState::setOnAnimationEventFunc(OnAnimationEventFunc inValue)
     {
