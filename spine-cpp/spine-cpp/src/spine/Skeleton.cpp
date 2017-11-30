@@ -75,13 +75,13 @@ namespace Spine
             Bone* bone;
             if (data->getParent() == NULL)
             {
-                bone = MALLOC(Bone, 1);
+                bone = NEW(Bone);
                 new (bone) Bone(*data, *this, NULL);
             }
             else
             {
                 Bone* parent = _bones[data->getParent()->getIndex()];
-                bone = MALLOC(Bone, 1);
+                bone = NEW(Bone);
                 new (bone) Bone(*data, *this, parent);
                 parent->getChildren().push_back(bone);
             }
@@ -96,7 +96,7 @@ namespace Spine
             SlotData* data = (*i);
             
             Bone* bone = _bones[data->getBoneData().getIndex()];
-            Slot* slot = MALLOC(Slot, 1);
+            Slot* slot = NEW(Slot);
             new (slot) Slot(*data, *bone);
             
             _slots.push_back(slot);
@@ -108,7 +108,7 @@ namespace Spine
         {
             IkConstraintData* data = (*i);
             
-            IkConstraint* constraint = MALLOC(IkConstraint, 1);
+            IkConstraint* constraint = NEW(IkConstraint);
             new (constraint) IkConstraint(*data, *this);
             
             _ikConstraints.push_back(constraint);
@@ -119,7 +119,7 @@ namespace Spine
         {
             TransformConstraintData* data = (*i);
             
-            TransformConstraint* constraint = MALLOC(TransformConstraint, 1);
+            TransformConstraint* constraint = NEW(TransformConstraint);
             new (constraint) TransformConstraint(*data, *this);
             
             _transformConstraints.push_back(constraint);
@@ -130,7 +130,7 @@ namespace Spine
         {
             PathConstraintData* data = (*i);
             
-            PathConstraint* constraint = MALLOC(PathConstraint, 1);
+            PathConstraint* constraint = NEW(PathConstraint);
             new (constraint) PathConstraint(*data, *this);
             
             _pathConstraints.push_back(constraint);

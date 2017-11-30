@@ -76,7 +76,7 @@ namespace Spine
             }
             else
             {
-                Polygon* polygonP = MALLOC(Polygon, 1);
+                Polygon* polygonP = NEW(Polygon);
                 new (polygonP) Polygon();
             }
 

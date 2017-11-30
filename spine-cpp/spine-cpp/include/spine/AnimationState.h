@@ -33,6 +33,7 @@
 
 #include <spine/Vector.h>
 #include <spine/Pool.h>
+#include <spine/MixPose.h>
 
 namespace Spine
 {
@@ -51,6 +52,9 @@ namespace Spine
 
     class Animation;
     class Event;
+    class AnimationStateData;
+    class Skeleton;
+    class RotateTimeline;
     
     typedef void (*OnAnimationEventFunc) (AnimationState& state, EventType type, TrackEntry* entry, Event* event);
     
@@ -58,6 +62,7 @@ namespace Spine
     class TrackEntry
     {
         friend class EventQueue;
+        friend class AnimationState;
         
     public:
         TrackEntry();
@@ -245,12 +250,7 @@ namespace Spine
         TrackEntry* _entry;
         Event* _event;
         
-        EventQueueEntry(EventType eventType, TrackEntry* trackEntry, Event* event = NULL)
-        {
-            _type = eventType;
-            _entry = trackEntry;
-            _event = event;
-        }
+        EventQueueEntry(EventType eventType, TrackEntry* trackEntry, Event* event = NULL);
     };
     
     class EventQueue
@@ -259,13 +259,18 @@ namespace Spine
         
     private:
         Vector<EventQueueEntry*> _eventQueueEntries;
-        bool _drainDisabled;
-
         AnimationState& _state;
         Pool<TrackEntry>& _trackEntryPool;
+        bool _drainDisabled;
+        
+        static EventQueue* newEventQueue(AnimationState& state, Pool<TrackEntry>& trackEntryPool);
 
+        static EventQueueEntry* newEventQueueEntry(EventType eventType, TrackEntry* entry, Event* event = NULL);
+        
         EventQueue(AnimationState& state, Pool<TrackEntry>& trackEntryPool);
-
+        
+        ~EventQueue();
+        
         void start(TrackEntry* entry);
 
         void interrupt(TrackEntry* entry);
@@ -276,12 +281,10 @@ namespace Spine
 
         void complete(TrackEntry* entry);
 
-        void event(TrackEntry* entry, Event* e);
+        void event(TrackEntry* entry, Event* event);
 
         /// Raises all events in the queue and drains the queue.
         void drain();
-
-        void clear();
     };
     
     class AnimationState
@@ -290,49 +293,17 @@ namespace Spine
         friend class EventQueue;
         
     public:
-        AnimationState();
+        AnimationState(AnimationStateData& data);
+        
+        ~AnimationState();
         
         void setOnAnimationEventFunc(OnAnimationEventFunc inValue);
         
-    private:
-        static const int Subsequent, First, Dip, DipMix;
-//        static readonly Animation EmptyAnimation = new Animation("<empty>", new Vector<Timeline>(), 0);
-        
-//
-//        private AnimationStateData data;
-//
-//        Pool<TrackEntry> trackEntryPool = new Pool<TrackEntry>();
-//        private readonly Vector<TrackEntry> tracks = new Vector<TrackEntry>();
-//        private readonly Vector<Event> events = new Vector<Event>();
-//        private readonly EventQueue queue; // Initialized by constructor.
-//
-//        private readonly HashSet<int> propertyIDs = new HashSet<int>();
-//        private readonly Vector<TrackEntry> mixingTo = new Vector<TrackEntry>();
-        bool _animationsChanged;
-//
-//        private float timeScale = 1;
-//
-//        public AnimationStateData Data { get { return data; } }
-//        /// A list of tracks that have animations, which may contain NULLs.
-//        public Vector<TrackEntry> Tracks { get { return tracks; } }
-//        public float TimeScale { get { return timeScale; } set { timeScale = value; } }
-//
-        OnAnimationEventFunc _onAnimationEventFunc;
-//
-//        public AnimationState(AnimationStateData data) {
-//            if (data == NULL) throw new ArgumentNULLException("data", "data cannot be NULL.");
-//            _data = data;
-//            _queue = new EventQueue(
-//                                        this,
-//                                        delegate { _animationsChanged = true; },
-//                                        trackEntryPool
-//                                        );
-//        }
-//
-//        ///
-//        /// Increments the track entry times, setting queued animations as current if needed
-//        /// @param delta delta time
-//        public void update(float delta) {
+        ///
+        /// Increments the track entry times, setting queued animations as current if needed
+        /// @param delta delta time
+        void update(float delta)
+        {
 //            delta *= timeScale;
 //            var tracksItems = tracks.Items;
 //            for (int i = 0, n = tracks.Count; i < n; i++) {
@@ -388,43 +359,18 @@ namespace Spine
 //            }
 //
 //            queue.drain();
-//        }
-//
-//        /// Returns true when all mixing from entries are complete.
-//        private bool updateMixingFrom(TrackEntry to, float delta) {
-//            TrackEntry from = to.mixingFrom;
-//            if (from == NULL) return true;
-//
-//            bool finished = updateMixingFrom(from, delta);
-//
-//            // Require mixTime > 0 to ensure the mixing from entry was applied at least once.
-//            if (to.mixTime > 0 && (to.mixTime >= to.mixDuration || to.timeScale == 0)) {
-//                // Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame).
-//                if (from.totalAlpha == 0 || to.mixDuration == 0) {
-//                    to.mixingFrom = from.mixingFrom;
-//                    to.interruptAlpha = from.interruptAlpha;
-//                    queue.end(from);
-//                }
-//                return finished;
-//            }
-//
-//            from.animationLast = from.nextAnimationLast;
-//            from.trackLast = from.nextTrackLast;
-//            from.trackTime += delta * from.timeScale;
-//            to.mixTime += delta * to.timeScale;
-//            return false;
-//        }
-//
-//        ///
-//        /// Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so the
-//        /// animation state can be applied to multiple skeletons to pose them identically.
-//        public bool apply(Skeleton skeleton) {
-//            if (skeleton == NULL) throw new ArgumentNULLException("skeleton", "skeleton cannot be NULL.");
+        }
+        
+        ///
+        /// Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so the
+        /// animation state can be applied to multiple skeletons to pose them identically.
+        bool apply(Skeleton& skeleton)
+        {
 //            if (animationsChanged) animationsChanged();
 //
 //            var events = _events;
 //
-//            bool applied = false;
+            bool applied = false;
 //            var tracksItems = tracks.Items;
 //            for (int i = 0, m = tracks.Count; i < m; i++) {
 //                TrackEntry current = tracksItems[i];
@@ -471,10 +417,312 @@ namespace Spine
 //            }
 //
 //            queue.drain();
-//            return applied;
-//        }
+            return applied;
+        }
+        
+        ///
+        /// Removes all animations from all tracks, leaving skeletons in their previous pose.
+        /// It may be desired to use AnimationState.setEmptyAnimations(float) to mix the skeletons back to the setup pose,
+        /// rather than leaving them in their previous pose.
+        void clearTracks()
+        {
+//            bool olddrainDisabled = queue.drainDisabled;
+//            queue.drainDisabled = true;
+//            for (int i = 0, n = tracks.Count; i < n; i++) {
+//                clearTrack(i);
+//            }
+//            tracks.clear();
+//            queue.drainDisabled = olddrainDisabled;
+//            queue.drain();
+        }
+        
+        ///
+        /// Removes all animations from the tracks, leaving skeletons in their previous pose.
+        /// It may be desired to use AnimationState.setEmptyAnimations(float) to mix the skeletons back to the setup pose,
+        /// rather than leaving them in their previous pose.
+        void clearTrack(int trackIndex)
+        {
+//            if (trackIndex >= tracks.Count) return;
+//            TrackEntry current = tracks.Items[trackIndex];
+//            if (current == NULL) return;
 //
-//        private float applyMixingFrom(TrackEntry to, Skeleton skeleton, MixPose currentPose) {
+//            queue.end(current);
+//
+//            disposeNext(current);
+//
+//            TrackEntry entry = current;
+//            while (true) {
+//                TrackEntry from = entry.mixingFrom;
+//                if (from == NULL) break;
+//                queue.end(from);
+//                entry.mixingFrom = NULL;
+//                entry = from;
+//            }
+//
+//            tracks.Items[current.trackIndex] = NULL;
+//
+//            queue.drain();
+        }
+        
+        /// Sets an animation by name. setAnimation(int, Animation, bool)
+        TrackEntry* setAnimation(int trackIndex, std::string animationName, bool loop)
+        {
+//            Animation animation = data.skeletonData.FindAnimation(animationName);
+//            if (animation == NULL) throw new ArgumentException("Animation not found: " + animationName, "animationName");
+//            return setAnimation(trackIndex, animation, loop);
+            return NULL;
+        }
+        
+        /// Sets the current animation for a track, discarding any queued animations.
+        /// @param loop If true, the animation will repeat.
+        /// If false, it will not, instead its last frame is applied if played beyond its duration.
+        /// In either case TrackEntry.TrackEnd determines when the track is cleared.
+        /// @return
+        /// A track entry to allow further customization of animation playback. References to the track entry must not be kept
+        /// after AnimationState.Dispose.
+        TrackEntry* setAnimation(int trackIndex, Animation& animation, bool loop)
+        {
+//            bool interrupt = true;
+//            TrackEntry current = expandToIndex(trackIndex);
+//            if (current != NULL) {
+//                if (current.nextTrackLast == -1) {
+//                    // Don't mix from an entry that was never applied.
+//                    tracks.Items[trackIndex] = current.mixingFrom;
+//                    queue.interrupt(current);
+//                    queue.end(current);
+//                    disposeNext(current);
+//                    current = current.mixingFrom;
+//                    interrupt = false;
+//                } else {
+//                    disposeNext(current);
+//                }
+//            }
+//            TrackEntry entry = newTrackEntry(trackIndex, animation, loop, current);
+//            setCurrent(trackIndex, entry, interrupt);
+//            queue.drain();
+//            return entry;
+            return NULL;
+        }
+        
+        /// Queues an animation by name.
+        /// addAnimation(int, Animation, bool, float)
+        TrackEntry* addAnimation(int trackIndex, std::string animationName, bool loop, float delay)
+        {
+//            Animation animation = data.skeletonData.FindAnimation(animationName);
+//            if (animation == NULL) throw new ArgumentException("Animation not found: " + animationName, "animationName");
+//            return addAnimation(trackIndex, animation, loop, delay);
+            return NULL;
+        }
+        
+        /// Adds an animation to be played delay seconds after the current or last queued animation
+        /// for a track. If the track is empty, it is equivalent to calling setAnimation.
+        /// @param delay
+        /// Seconds to begin this animation after the start of the previous animation. May be &lt;= 0 to use the animation
+        /// duration of the previous track minus any mix duration plus the negative delay.
+        ///
+        /// @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
+        /// after AnimationState.Dispose
+        TrackEntry* addAnimation(int trackIndex, Animation& animation, bool loop, float delay)
+        {
+//            TrackEntry last = expandToIndex(trackIndex);
+//            if (last != NULL) {
+//                while (last.next != NULL)
+//                    last = last.next;
+//            }
+//
+//            TrackEntry entry = newTrackEntry(trackIndex, animation, loop, last);
+//
+//            if (last == NULL) {
+//                setCurrent(trackIndex, entry, true);
+//                queue.drain();
+//            } else {
+//                last.next = entry;
+//                if (delay <= 0) {
+//                    float duration = last.animationEnd - last.animationStart;
+//                    if (duration != 0)
+//                        delay += duration * (1 + (int)(last.trackTime / duration)) - data.GetMix(last.animation, animation);
+//                    else
+//                        delay = 0;
+//                }
+//            }
+//
+//            entry.delay = delay;
+//            return entry;
+            return NULL;
+        }
+        
+        ///
+        /// Sets an empty animation for a track, discarding any queued animations, and mixes to it over the specified mix duration.
+        TrackEntry* setEmptyAnimation(int trackIndex, float mixDuration)
+        {
+            TrackEntry* entry = setAnimation(trackIndex, AnimationState::getEmptyAnimation(), false);
+            entry->_mixDuration = mixDuration;
+            entry->_trackEnd = mixDuration;
+            return entry;
+        }
+        
+        ///
+        /// Adds an empty animation to be played after the current or last queued animation for a track, and mixes to it over the
+        /// specified mix duration.
+        /// @return
+        /// A track entry to allow further customization of animation playback. References to the track entry must not be kept after AnimationState.Dispose.
+        ///
+        /// @param trackIndex Track number.
+        /// @param mixDuration Mix duration.
+        /// @param delay Seconds to begin this animation after the start of the previous animation. May be &lt;= 0 to use the animation
+        /// duration of the previous track minus any mix duration plus the negative delay.
+        TrackEntry* addEmptyAnimation(int trackIndex, float mixDuration, float delay)
+        {
+            if (delay <= 0)
+            {
+                delay -= mixDuration;
+            }
+            
+            TrackEntry* entry = addAnimation(trackIndex, AnimationState::getEmptyAnimation(), false, delay);
+            entry->_mixDuration = mixDuration;
+            entry->_trackEnd = mixDuration;
+            return entry;
+        }
+        
+        ///
+        /// Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix duration.
+        void setEmptyAnimations(float mixDuration)
+        {
+//            bool olddrainDisabled = queue.drainDisabled;
+//            queue.drainDisabled = true;
+//            for (int i = 0, n = tracks.Count; i < n; i++)
+//            {
+//                TrackEntry current = tracks.Items[i];
+//                if (current != NULL) setEmptyAnimation(i, mixDuration);
+//            }
+//            queue.drainDisabled = olddrainDisabled;
+//            queue.drain();
+        }
+        
+        /// @return The track entry for the animation currently playing on the track, or NULL if no animation is currently playing.
+        TrackEntry* getCurrent(int trackIndex)
+        {
+            return trackIndex >= _tracks.size() ? NULL : _tracks[trackIndex];
+        }
+        
+//        AnimationStateData Data { get { return data; } }
+//        /// A list of tracks that have animations, which may contain NULLs.
+//        Vector<TrackEntry> Tracks { get { return tracks; } }
+//        float TimeScale { get { return timeScale; } set { timeScale = value; } }
+        
+    private:
+        static const int Subsequent, First, Dip, DipMix;
+        
+        AnimationStateData& _data;
+
+        Pool<TrackEntry> _trackEntryPool;
+        Vector<TrackEntry*> _tracks;
+        Vector<Event> _events;
+        EventQueue* _queue;
+
+        Vector<int> _propertyIDs;
+        Vector<TrackEntry> _mixingTo;
+        bool _animationsChanged;
+
+        OnAnimationEventFunc _onAnimationEventFunc;
+        
+        float _timeScale;
+
+        static Animation& getEmptyAnimation();
+        
+        static void applyRotateTimeline(RotateTimeline* rotateTimeline, Skeleton& skeleton, float time, float alpha, MixPose pose,
+                                        Vector<float>& timelinesRotation, int i, bool firstFrame)
+        {
+//            if (firstFrame) timelinesRotation[i] = 0;
+//            
+//            if (alpha == 1) {
+//                rotateTimeline.apply(skeleton, 0, time, NULL, 1, pose, MixDirection.In);
+//                return;
+//            }
+//            
+//            Bone bone = skeleton.bones.Items[rotateTimeline.boneIndex];
+//            float[] frames = rotateTimeline.frames;
+//            if (time < frames[0]) {
+//                if (pose == MixPose.Setup) bone.rotation = bone.data.rotation;
+//                return;
+//            }
+//            
+//            float r2;
+//            if (time >= frames[frames.Length - RotateTimeline.ENTRIES]) // Time is after last frame.
+//                r2 = bone.data.rotation + frames[frames.Length + RotateTimeline.PREV_ROTATION];
+//            else {
+//                // Interpolate between the previous frame and the current frame.
+//                int frame = Animation.BinarySearch(frames, time, RotateTimeline.ENTRIES);
+//                float prevRotation = frames[frame + RotateTimeline.PREV_ROTATION];
+//                float frameTime = frames[frame];
+//                float percent = rotateTimeline.GetCurvePercent((frame >> 1) - 1,
+//                                                               1 - (time - frameTime) / (frames[frame + RotateTimeline.PREV_TIME] - frameTime));
+//                
+//                r2 = frames[frame + RotateTimeline.ROTATION] - prevRotation;
+//                r2 -= (16384 - (int)(16384.499999999996 - r2 / 360)) * 360;
+//                r2 = prevRotation + r2 * percent + bone.data.rotation;
+//                r2 -= (16384 - (int)(16384.499999999996 - r2 / 360)) * 360;
+//            }
+//            
+//            // Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
+//            float r1 = pose == MixPose.Setup ? bone.data.rotation : bone.rotation;
+//            float total, diff = r2 - r1;
+//            if (diff == 0) {
+//                total = timelinesRotation[i];
+//            } else {
+//                diff -= (16384 - (int)(16384.499999999996 - diff / 360)) * 360;
+//                float lastTotal, lastDiff;
+//                if (firstFrame) {
+//                    lastTotal = 0;
+//                    lastDiff = diff;
+//                } else {
+//                    lastTotal = timelinesRotation[i]; // Angle and direction of mix, including loops.
+//                    lastDiff = timelinesRotation[i + 1]; // Difference between bones.
+//                }
+//                bool current = diff > 0, dir = lastTotal >= 0;
+//                // Detect cross at 0 (not 180).
+//                if (Math.Sign(lastDiff) != Math.Sign(diff) && Math.Abs(lastDiff) <= 90) {
+//                    // A cross after a 360 rotation is a loop.
+//                    if (Math.Abs(lastTotal) > 180) lastTotal += 360 * Math.Sign(lastTotal);
+//                    dir = current;
+//                }
+//                total = diff + lastTotal - lastTotal % 360; // Store loops as part of lastTotal.
+//                if (dir != current) total += 360 * Math.Sign(lastTotal);
+//                timelinesRotation[i] = total;
+//            }
+//            timelinesRotation[i + 1] = diff;
+//            r1 += total * alpha;
+//            bone.rotation = r1 - (16384 - (int)(16384.499999999996 - r1 / 360)) * 360;
+        }
+        
+        /// Returns true when all mixing from entries are complete.
+        bool updateMixingFrom(TrackEntry to, float delta)
+        {
+//            TrackEntry from = to.mixingFrom;
+//            if (from == NULL) return true;
+//
+//            bool finished = updateMixingFrom(from, delta);
+//
+//            // Require mixTime > 0 to ensure the mixing from entry was applied at least once.
+//            if (to.mixTime > 0 && (to.mixTime >= to.mixDuration || to.timeScale == 0)) {
+//                // Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame).
+//                if (from.totalAlpha == 0 || to.mixDuration == 0) {
+//                    to.mixingFrom = from.mixingFrom;
+//                    to.interruptAlpha = from.interruptAlpha;
+//                    queue.end(from);
+//                }
+//                return finished;
+//            }
+//
+//            from.animationLast = from.nextAnimationLast;
+//            from.trackLast = from.nextTrackLast;
+//            from.trackTime += delta * from.timeScale;
+//            to.mixTime += delta * to.timeScale;
+            return false;
+        }
+        
+        float applyMixingFrom(TrackEntry* to, Skeleton& skeleton, MixPose currentPose)
+        {
 //            TrackEntry from = to.mixingFrom;
 //            if (from.mixingFrom != NULL) applyMixingFrom(from, skeleton, currentPose);
 //
@@ -541,74 +789,11 @@ namespace Spine
 //            from.nextTrackLast = from.trackTime;
 //
 //            return mix;
-//        }
-//
-//        static private void applyRotateTimeline(RotateTimeline rotateTimeline, Skeleton skeleton, float time, float alpha, MixPose pose,
-//                                                 float[] timelinesRotation, int i, bool firstFrame) {
-//
-//            if (firstFrame) timelinesRotation[i] = 0;
-//
-//            if (alpha == 1) {
-//                rotateTimeline.apply(skeleton, 0, time, NULL, 1, pose, MixDirection.In);
-//                return;
-//            }
-//
-//            Bone bone = skeleton.bones.Items[rotateTimeline.boneIndex];
-//            float[] frames = rotateTimeline.frames;
-//            if (time < frames[0]) {
-//                if (pose == MixPose.Setup) bone.rotation = bone.data.rotation;
-//                return;
-//            }
-//
-//            float r2;
-//            if (time >= frames[frames.Length - RotateTimeline.ENTRIES]) // Time is after last frame.
-//                r2 = bone.data.rotation + frames[frames.Length + RotateTimeline.PREV_ROTATION];
-//            else {
-//                // Interpolate between the previous frame and the current frame.
-//                int frame = Animation.BinarySearch(frames, time, RotateTimeline.ENTRIES);
-//                float prevRotation = frames[frame + RotateTimeline.PREV_ROTATION];
-//                float frameTime = frames[frame];
-//                float percent = rotateTimeline.GetCurvePercent((frame >> 1) - 1,
-//                                                               1 - (time - frameTime) / (frames[frame + RotateTimeline.PREV_TIME] - frameTime));
-//
-//                r2 = frames[frame + RotateTimeline.ROTATION] - prevRotation;
-//                r2 -= (16384 - (int)(16384.499999999996 - r2 / 360)) * 360;
-//                r2 = prevRotation + r2 * percent + bone.data.rotation;
-//                r2 -= (16384 - (int)(16384.499999999996 - r2 / 360)) * 360;
-//            }
-//
-//            // Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
-//            float r1 = pose == MixPose.Setup ? bone.data.rotation : bone.rotation;
-//            float total, diff = r2 - r1;
-//            if (diff == 0) {
-//                total = timelinesRotation[i];
-//            } else {
-//                diff -= (16384 - (int)(16384.499999999996 - diff / 360)) * 360;
-//                float lastTotal, lastDiff;
-//                if (firstFrame) {
-//                    lastTotal = 0;
-//                    lastDiff = diff;
-//                } else {
-//                    lastTotal = timelinesRotation[i]; // Angle and direction of mix, including loops.
-//                    lastDiff = timelinesRotation[i + 1]; // Difference between bones.
-//                }
-//                bool current = diff > 0, dir = lastTotal >= 0;
-//                // Detect cross at 0 (not 180).
-//                if (Math.Sign(lastDiff) != Math.Sign(diff) && Math.Abs(lastDiff) <= 90) {
-//                    // A cross after a 360 rotation is a loop.
-//                    if (Math.Abs(lastTotal) > 180) lastTotal += 360 * Math.Sign(lastTotal);
-//                    dir = current;
-//                }
-//                total = diff + lastTotal - lastTotal % 360; // Store loops as part of lastTotal.
-//                if (dir != current) total += 360 * Math.Sign(lastTotal);
-//                timelinesRotation[i] = total;
-//            }
-//            timelinesRotation[i + 1] = diff;
-//            r1 += total * alpha;
-//            bone.rotation = r1 - (16384 - (int)(16384.499999999996 - r1 / 360)) * 360;
-//        }
-//
-//        private void queueEvents(TrackEntry entry, float animationTime) {
+            return 0;
+        }
+        
+        void queueEvents(TrackEntry* entry, float animationTime)
+        {
 //            float animationStart = entry.animationStart, animationEnd = entry.animationEnd;
 //            float duration = animationEnd - animationStart;
 //            float trackLastWrapped = entry.trackLast % duration;
@@ -636,52 +821,11 @@ namespace Spine
 //                if (e.time < animationStart) continue; // Discard events outside animation start/end.
 //                queue.event(entry, eventsItems[i]);
 //            }
-//        }
-//
-//        ///
-//        /// Removes all animations from all tracks, leaving skeletons in their previous pose.
-//        /// It may be desired to use AnimationState.setEmptyAnimations(float) to mix the skeletons back to the setup pose,
-//        /// rather than leaving them in their previous pose.
-//        public void clearTracks() {
-//            bool olddrainDisabled = queue.drainDisabled;
-//            queue.drainDisabled = true;
-//            for (int i = 0, n = tracks.Count; i < n; i++) {
-//                clearTrack(i);
-//            }
-//            tracks.clear();
-//            queue.drainDisabled = olddrainDisabled;
-//            queue.drain();
-//        }
-//
-//        ///
-//        /// Removes all animations from the tracks, leaving skeletons in their previous pose.
-//        /// It may be desired to use AnimationState.setEmptyAnimations(float) to mix the skeletons back to the setup pose,
-//        /// rather than leaving them in their previous pose.
-//        public void clearTrack(int trackIndex) {
-//            if (trackIndex >= tracks.Count) return;
-//            TrackEntry current = tracks.Items[trackIndex];
-//            if (current == NULL) return;
-//
-//            queue.end(current);
-//
-//            disposeNext(current);
-//
-//            TrackEntry entry = current;
-//            while (true) {
-//                TrackEntry from = entry.mixingFrom;
-//                if (from == NULL) break;
-//                queue.end(from);
-//                entry.mixingFrom = NULL;
-//                entry = from;
-//            }
-//
-//            tracks.Items[current.trackIndex] = NULL;
-//
-//            queue.drain();
-//        }
-//
-//        /// Sets the active TrackEntry for a given track number.
-//        private void setCurrent(int index, TrackEntry current, bool interrupt) {
+        }
+        
+        /// Sets the active TrackEntry for a given track number.
+        void setCurrent(int index, TrackEntry* current, bool interrupt)
+        {
 //            TrackEntry from = expandToIndex(index);
 //            tracks.Items[index] = current;
 //
@@ -698,141 +842,22 @@ namespace Spine
 //            }
 //
 //            queue.start(current); // triggers animationsChanged
-//        }
-//
-//
-//        /// Sets an animation by name. setAnimation(int, Animation, bool)
-//        public TrackEntry setAnimation(int trackIndex, string animationName, bool loop) {
-//            Animation animation = data.skeletonData.FindAnimation(animationName);
-//            if (animation == NULL) throw new ArgumentException("Animation not found: " + animationName, "animationName");
-//            return setAnimation(trackIndex, animation, loop);
-//        }
-//
-//        /// Sets the current animation for a track, discarding any queued animations.
-//        /// @param loop If true, the animation will repeat.
-//        /// If false, it will not, instead its last frame is applied if played beyond its duration.
-//        /// In either case TrackEntry.TrackEnd determines when the track is cleared.
-//        /// @return
-//        /// A track entry to allow further customization of animation playback. References to the track entry must not be kept
-//        /// after AnimationState.Dispose.
-//        public TrackEntry setAnimation(int trackIndex, Animation animation, bool loop) {
-//            if (animation == NULL) throw new ArgumentNULLException("animation", "animation cannot be NULL.");
-//            bool interrupt = true;
-//            TrackEntry current = expandToIndex(trackIndex);
-//            if (current != NULL) {
-//                if (current.nextTrackLast == -1) {
-//                    // Don't mix from an entry that was never applied.
-//                    tracks.Items[trackIndex] = current.mixingFrom;
-//                    queue.interrupt(current);
-//                    queue.end(current);
-//                    disposeNext(current);
-//                    current = current.mixingFrom;
-//                    interrupt = false;
-//                } else {
-//                    disposeNext(current);
-//                }
-//            }
-//            TrackEntry entry = newTrackEntry(trackIndex, animation, loop, current);
-//            setCurrent(trackIndex, entry, interrupt);
-//            queue.drain();
-//            return entry;
-//        }
-//
-//        /// Queues an animation by name.
-//        /// addAnimation(int, Animation, bool, float)
-//        public TrackEntry addAnimation(int trackIndex, string animationName, bool loop, float delay) {
-//            Animation animation = data.skeletonData.FindAnimation(animationName);
-//            if (animation == NULL) throw new ArgumentException("Animation not found: " + animationName, "animationName");
-//            return addAnimation(trackIndex, animation, loop, delay);
-//        }
-//
-//        /// Adds an animation to be played delay seconds after the current or last queued animation
-//        /// for a track. If the track is empty, it is equivalent to calling setAnimation.
-//        /// @param delay
-//        /// Seconds to begin this animation after the start of the previous animation. May be &lt;= 0 to use the animation
-//        /// duration of the previous track minus any mix duration plus the negative delay.
-//        ///
-//        /// @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
-//        /// after AnimationState.Dispose
-//        public TrackEntry addAnimation(int trackIndex, Animation animation, bool loop, float delay) {
-//            if (animation == NULL) throw new ArgumentNULLException("animation", "animation cannot be NULL.");
-//
-//            TrackEntry last = expandToIndex(trackIndex);
-//            if (last != NULL) {
-//                while (last.next != NULL)
-//                    last = last.next;
-//            }
-//
-//            TrackEntry entry = newTrackEntry(trackIndex, animation, loop, last);
-//
-//            if (last == NULL) {
-//                setCurrent(trackIndex, entry, true);
-//                queue.drain();
-//            } else {
-//                last.next = entry;
-//                if (delay <= 0) {
-//                    float duration = last.animationEnd - last.animationStart;
-//                    if (duration != 0)
-//                        delay += duration * (1 + (int)(last.trackTime / duration)) - data.GetMix(last.animation, animation);
-//                    else
-//                        delay = 0;
-//                }
-//            }
-//
-//            entry.delay = delay;
-//            return entry;
-//        }
-//
-//        ///
-//        /// Sets an empty animation for a track, discarding any queued animations, and mixes to it over the specified mix duration.
-//        public TrackEntry setEmptyAnimation(int trackIndex, float mixDuration) {
-//            TrackEntry entry = setAnimation(trackIndex, AnimationState.EmptyAnimation, false);
-//            entry.mixDuration = mixDuration;
-//            entry.trackEnd = mixDuration;
-//            return entry;
-//        }
-//
-//        ///
-//        /// Adds an empty animation to be played after the current or last queued animation for a track, and mixes to it over the
-//        /// specified mix duration.
-//        /// @return
-//        /// A track entry to allow further customization of animation playback. References to the track entry must not be kept after AnimationState.Dispose.
-//        ///
-//        /// @param trackIndex Track number.
-//        /// @param mixDuration Mix duration.
-//        /// @param delay Seconds to begin this animation after the start of the previous animation. May be &lt;= 0 to use the animation
-//        /// duration of the previous track minus any mix duration plus the negative delay.
-//        public TrackEntry addEmptyAnimation(int trackIndex, float mixDuration, float delay) {
-//            if (delay <= 0) delay -= mixDuration;
-//            TrackEntry entry = addAnimation(trackIndex, AnimationState.EmptyAnimation, false, delay);
-//            entry.mixDuration = mixDuration;
-//            entry.trackEnd = mixDuration;
-//            return entry;
-//        }
-//
-//        ///
-//        /// Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix duration.
-//        public void setEmptyAnimations(float mixDuration) {
-//            bool olddrainDisabled = queue.drainDisabled;
-//            queue.drainDisabled = true;
-//            for (int i = 0, n = tracks.Count; i < n; i++) {
-//                TrackEntry current = tracks.Items[i];
-//                if (current != NULL) setEmptyAnimation(i, mixDuration);
-//            }
-//            queue.drainDisabled = olddrainDisabled;
-//            queue.drain();
-//        }
-//
-//        private TrackEntry expandToIndex(int index) {
+        }
+
+        TrackEntry* expandToIndex(int index)
+        {
 //            if (index < tracks.Count) return tracks.Items[index];
 //            while (index >= tracks.Count)
+//            {
 //                tracks.Add(NULL);
-//            return NULL;
-//        }
-//
-//        /// Object-pooling version of new TrackEntry. Obtain an unused TrackEntry from the pool and clear/initialize its values.
-//        /// @param last May be NULL.
-//        private TrackEntry newTrackEntry(int trackIndex, Animation animation, bool loop, TrackEntry last) {
+//            }
+            return NULL;
+        }
+
+        /// Object-pooling version of new TrackEntry. Obtain an unused TrackEntry from the pool and clear/initialize its values.
+        /// @param last May be NULL.
+        TrackEntry* newTrackEntry(int trackIndex, Animation* animation, bool loop, TrackEntry* last)
+        {
 //            TrackEntry entry = trackEntryPool.Obtain(); // Pooling
 //            entry.trackIndex = trackIndex;
 //            entry.animation = animation;
@@ -859,19 +884,23 @@ namespace Spine
 //            entry.mixTime = 0;
 //            entry.mixDuration = (last == NULL) ? 0 : data.GetMix(last.animation, animation);
 //            return entry;
-//        }
-//
-//        /// Dispose all track entries queued after the given TrackEntry.
-//        private void disposeNext(TrackEntry entry) {
+            return NULL;
+        }
+
+        /// Dispose all track entries queued after the given TrackEntry.
+        void disposeNext(TrackEntry* entry)
+        {
 //            TrackEntry next = entry.next;
-//            while (next != NULL) {
+//            while (next != NULL)
+//            {
 //                queue.dispose(next);
 //                next = next.next;
 //            }
 //            entry.next = NULL;
-//        }
-//
-//        private void animationsChanged() {
+        }
+
+        void animationsChanged()
+        {
 //            animationsChanged = false;
 //
 //            var propertyIDs = _propertyIDs;
@@ -879,23 +908,15 @@ namespace Spine
 //            var mixingTo = _mixingTo;
 //
 //            var tracksItems = tracks.Items;
-//            for (int i = 0, n = tracks.Count; i < n; i++) {
+//            for (int i = 0, n = tracks.Count; i < n; i++)
+//            {
 //                var entry = tracksItems[i];
-//                if (entry != NULL) entry.setTimelineData(NULL, mixingTo, propertyIDs);
+//                if (entry != NULL)
+//                {
+//                    entry.setTimelineData(NULL, mixingTo, propertyIDs);
+//                }
 //            }
-//        }
-//
-//        /// @return The track entry for the animation currently playing on the track, or NULL if no animation is currently playing.
-//        public TrackEntry getCurrent(int trackIndex) {
-//            return (trackIndex >= tracks.Count) ? NULL : tracks.Items[trackIndex];
-//        }
-//
-//        internal void onStart(TrackEntry entry) { if (Start != NULL) Start(entry); }
-//        internal void onInterrupt(TrackEntry entry) { if (Interrupt != NULL) Interrupt(entry); }
-//        internal void onEnd(TrackEntry entry) { if (End != NULL) End(entry); }
-//        internal void onDispose(TrackEntry entry) { if (Dispose != NULL) Dispose(entry); }
-//        internal void onComplete(TrackEntry entry) { if (Complete != NULL) Complete(entry); }
-//        internal void onEvent(TrackEntry entry, Event e) { if (Event != NULL) Event(entry, e); }
+        }
     };
 }
 

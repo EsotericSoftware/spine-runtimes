@@ -32,10 +32,14 @@
 
 #include <spine/Animation.h>
 #include <spine/Event.h>
+#include <spine/AnimationStateData.h>
+#include <spine/Skeleton.h>
+#include <spine/RotateTimeline.h>
 
 #include <spine/Timeline.h>
 
 #include <spine/MathUtil.h>
+#include <spine/ContainerUtil.h>
 
 namespace Spine
 {
@@ -163,27 +167,32 @@ namespace Spine
             {
                 _timelineData[i] = AnimationState::Subsequent;
             }
-            else if (to == NULL || !to->hasTimeline(id))
-            {
-                _timelineData[i] = AnimationState::First;
-            }
             else
             {
-                for (int ii = mixingToLast; ii >= 0; --ii)
+                propertyIDs.push_back(id);
+                
+                if (to == NULL || !to->hasTimeline(id))
                 {
-                    TrackEntry* entry = mixingToArray[ii];
-                    if (!entry->hasTimeline(id))
-                    {
-                        if (entry->_mixDuration > 0)
-                        {
-                            _timelineData[i] = AnimationState::DipMix;
-                            _timelineDipMix[i] = entry;
-                            goto continue_outer; // continue outer;
-                        }
-                        break;
-                    }
+                    _timelineData[i] = AnimationState::First;
                 }
-                _timelineData[i] = AnimationState::Dip;
+                else
+                {
+                    for (int ii = mixingToLast; ii >= 0; --ii)
+                    {
+                        TrackEntry* entry = mixingToArray[ii];
+                        if (!entry->hasTimeline(id))
+                        {
+                            if (entry->_mixDuration > 0)
+                            {
+                                _timelineData[i] = AnimationState::DipMix;
+                                _timelineDipMix[i] = entry;
+                                goto continue_outer; // continue outer;
+                            }
+                            break;
+                        }
+                    }
+                    _timelineData[i] = AnimationState::Dip;
+                }
             }
         continue_outer: {}
         }
@@ -217,41 +226,70 @@ namespace Spine
         _onAnimationEventFunc = NULL;
     }
     
-    EventQueue::EventQueue(AnimationState& state, Pool<TrackEntry>& trackEntryPool) : _state(state), _trackEntryPool(trackEntryPool)
+    EventQueueEntry::EventQueueEntry(EventType eventType, TrackEntry* trackEntry, Event* event) :
+    _type(eventType),
+    _entry(trackEntry),
+    _event(event)
     {
         // Empty
     }
     
+    EventQueue* EventQueue::newEventQueue(AnimationState& state, Pool<TrackEntry>& trackEntryPool)
+    {
+        EventQueue* ret = NEW(EventQueue);
+        new (ret) EventQueue(state, trackEntryPool);
+        
+        return ret;
+    }
+    
+    EventQueueEntry* EventQueue::newEventQueueEntry(EventType eventType, TrackEntry* entry, Event* event)
+    {
+        EventQueueEntry* ret = NEW(EventQueueEntry);
+        new (ret) EventQueueEntry(eventType, entry, event);
+        
+        return ret;
+    }
+    
+    EventQueue::EventQueue(AnimationState& state, Pool<TrackEntry>& trackEntryPool) : _state(state), _trackEntryPool(trackEntryPool), _drainDisabled(false)
+    {
+        // Empty
+    }
+    
+    EventQueue::~EventQueue()
+    {
+        ContainerUtil::cleanUpVectorOfPointers(_eventQueueEntries);
+    }
+    
     void EventQueue::start(TrackEntry* entry)
     {
-        _eventQueueEntries.push_back(new EventQueueEntry(EventType_Start, entry));
+        _eventQueueEntries.push_back(newEventQueueEntry(EventType_Start, entry));
         _state._animationsChanged = true;
     }
     
     void EventQueue::interrupt(TrackEntry* entry)
     {
-        _eventQueueEntries.push_back(new EventQueueEntry(EventType_Interrupt, entry));
+        _eventQueueEntries.push_back(newEventQueueEntry(EventType_Interrupt, entry));
     }
     
     void EventQueue::end(TrackEntry* entry)
     {
-        _eventQueueEntries.push_back(new EventQueueEntry(EventType_End, entry));
+        _eventQueueEntries.push_back(newEventQueueEntry(EventType_End, entry));
         _state._animationsChanged = true;
     }
     
     void EventQueue::dispose(TrackEntry* entry)
     {
-        _eventQueueEntries.push_back(new EventQueueEntry(EventType_Dispose, entry));
+        _eventQueueEntries.push_back(newEventQueueEntry(EventType_Dispose, entry));
     }
     
     void EventQueue::complete(TrackEntry* entry)
     {
-        _eventQueueEntries.push_back(new EventQueueEntry(EventType_Complete, entry));
+        _eventQueueEntries.push_back(newEventQueueEntry(EventType_Complete, entry));
     }
     
-    void EventQueue::event(TrackEntry* entry, Event* e)
+    void EventQueue::event(TrackEntry* entry, Event* event)
     {
-        _eventQueueEntries.push_back(new EventQueueEntry(EventType_Event, entry, e));
+        _eventQueueEntries.push_back(newEventQueueEntry(EventType_Event, entry, event));
     }
     
     /// Raises all events in the queue and drains the queue.
@@ -266,7 +304,7 @@ namespace Spine
         
         AnimationState& state = _state;
         
-        // Don't cache entries.size() so callbacks can queue their own events (eg, call setAnimation in AnimationState_Complete).
+        // Don't cache _eventQueueEntries.size() so callbacks can queue their own events (eg, call setAnimation in AnimationState_Complete).
         for (int i = 0; i < _eventQueueEntries.size(); ++i)
         {
             EventQueueEntry* queueEntry = _eventQueueEntries[i];
@@ -300,23 +338,34 @@ namespace Spine
         _drainDisabled = false;
     }
     
-    void EventQueue::clear()
-    {
-        _eventQueueEntries.clear();
-    }
-    
     const int AnimationState::Subsequent = 0;
     const int AnimationState::First = 1;
     const int AnimationState::Dip = 2;
     const int AnimationState::DipMix = 3;
     
-    AnimationState::AnimationState() : _onAnimationEventFunc(dummyOnAnimationEventFunc)
+    AnimationState::AnimationState(AnimationStateData& data) :
+    _data(data),
+    _queue(EventQueue::newEventQueue(*this, _trackEntryPool)),
+    _onAnimationEventFunc(dummyOnAnimationEventFunc),
+    _timeScale(1)
     {
         // Empty
+    }
+    
+    AnimationState::~AnimationState()
+    {
+        DESTROY(EventQueue, _queue);
     }
     
     void AnimationState::setOnAnimationEventFunc(OnAnimationEventFunc inValue)
     {
         _onAnimationEventFunc = inValue;
+    }
+    
+    Animation& AnimationState::getEmptyAnimation()
+    {
+        static Vector<Timeline*> timelines;
+        static Animation ret(std::string("<empty>"), timelines, 0);
+        return ret;
     }
 }

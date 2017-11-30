@@ -138,7 +138,7 @@ namespace Spine
                 }
                 strcpy(path + dirLength + needsSlash, name);
 
-                AtlasPage* page = MALLOC(AtlasPage, 1);
+                AtlasPage* page = NEW(AtlasPage);
                 new (page) AtlasPage(std::string(name));
 
                 FREE(name);
@@ -188,7 +188,7 @@ namespace Spine
             }
             else
             {
-                AtlasRegion* region = MALLOC(AtlasRegion, 1);
+                AtlasRegion* region = NEW(AtlasRegion);
                 new (region) AtlasRegion();
 
                 region->page = page;

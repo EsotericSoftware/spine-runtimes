@@ -33,6 +33,7 @@
 
 /* All allocation uses these. */
 #define MALLOC(TYPE,COUNT) ((TYPE*)spineAlloc(sizeof(TYPE) * (COUNT), __FILE__, __LINE__))
+#define NEW(TYPE) ((TYPE*)spineAlloc(sizeof(TYPE), __FILE__, __LINE__))
 #define REALLOC(PTR,TYPE,COUNT) ((TYPE*)spineRealloc(PTR, sizeof(TYPE) * (COUNT), __FILE__, __LINE__))
 
 /* Frees memory. Can be used on const types. */

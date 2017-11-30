@@ -56,7 +56,7 @@ namespace Spine
         
         AtlasRegion& region = *regionP;
         
-        RegionAttachment* attachmentP = MALLOC(RegionAttachment, 1);
+        RegionAttachment* attachmentP = NEW(RegionAttachment);
         new (attachmentP) RegionAttachment(name);
         
         RegionAttachment& attachment = *attachmentP;
@@ -79,7 +79,7 @@ namespace Spine
         
         AtlasRegion& region = *regionP;
         
-        MeshAttachment* attachmentP = MALLOC(MeshAttachment, 1);
+        MeshAttachment* attachmentP = NEW(MeshAttachment);
         new (attachmentP) MeshAttachment(name);
         
         MeshAttachment& attachment = *attachmentP;
@@ -101,7 +101,7 @@ namespace Spine
     
     BoundingBoxAttachment* AtlasAttachmentLoader::newBoundingBoxAttachment(Skin& skin, std::string name)
     {
-        BoundingBoxAttachment* attachmentP = MALLOC(BoundingBoxAttachment, 1);
+        BoundingBoxAttachment* attachmentP = NEW(BoundingBoxAttachment);
         new (attachmentP) BoundingBoxAttachment(name);
         
         return attachmentP;
@@ -109,7 +109,7 @@ namespace Spine
     
     PathAttachment* AtlasAttachmentLoader::newPathAttachment(Skin& skin, std::string name)
     {
-        PathAttachment* attachmentP = MALLOC(PathAttachment, 1);
+        PathAttachment* attachmentP = NEW(PathAttachment);
         new (attachmentP) PathAttachment(name);
         
         return attachmentP;
@@ -117,7 +117,7 @@ namespace Spine
     
     PointAttachment* AtlasAttachmentLoader::newPointAttachment(Skin& skin, std::string name)
     {
-        PointAttachment* attachmentP = MALLOC(PointAttachment, 1);
+        PointAttachment* attachmentP = NEW(PointAttachment);
         new (attachmentP) PointAttachment(name);
         
         return attachmentP;
@@ -125,7 +125,7 @@ namespace Spine
     
     ClippingAttachment* AtlasAttachmentLoader::newClippingAttachment(Skin& skin, std::string name)
     {
-        ClippingAttachment* attachmentP = MALLOC(ClippingAttachment, 1);
+        ClippingAttachment* attachmentP = NEW(ClippingAttachment);
         new (attachmentP) ClippingAttachment(name);
         
         return attachmentP;
