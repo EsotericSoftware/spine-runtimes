@@ -30,31 +30,33 @@
 
 #include <spine/Extension.h>
 
-//#include <iostream>
 #include <fstream>
+#include <assert.h>
 
 namespace Spine
 {
-    void* spineAlloc(size_t size, const char* file, int line)
+    SpineExtension* SpineExtension::_spineExtension = NULL;
+    
+    void SpineExtension::setInstance(SpineExtension* inValue)
     {
-        //printf("spineAlloc size: %lu, file: %s, line: %d \n", size, file, line);
+        assert(!_spineExtension);
         
-        return malloc(size);
+        _spineExtension = inValue;
     }
     
-    void* spineRealloc(void* ptr, size_t size, const char* file, int line)
+    SpineExtension* SpineExtension::getInstance()
     {
-        //printf("spineRealloc size: %lu, file: %s, line: %d \n", size, file, line);
+        assert(_spineExtension);
         
-        return realloc(ptr, size);
+        return _spineExtension;
     }
     
-    void spineFree(void* mem)
+    SpineExtension::~SpineExtension()
     {
-        free(mem);
+        // Empty
     }
     
-    char* spineReadFile(const char* path, int* length)
+    char* SpineExtension::spineReadFile(const char* path, int* length)
     {
         char *data;
         FILE *file = fopen(path, "rb");
@@ -69,5 +71,41 @@ namespace Spine
         fclose(file);
         
         return data;
+    }
+    
+    SpineExtension::SpineExtension()
+    {
+        // Empty
+    }
+    
+    DefaultSpineExtension* DefaultSpineExtension::getInstance()
+    {
+        static DefaultSpineExtension ret;
+        return &ret;
+    }
+    
+    DefaultSpineExtension::~DefaultSpineExtension()
+    {
+        // Empty
+    }
+    
+    void* DefaultSpineExtension::spineAlloc(size_t size, const char* file, int line)
+    {
+        return malloc(size);
+    }
+    
+    void* DefaultSpineExtension::spineRealloc(void* ptr, size_t size, const char* file, int line)
+    {
+        return realloc(ptr, size);
+    }
+    
+    void DefaultSpineExtension::spineFree(void* mem)
+    {
+        free(mem);
+    }
+    
+    DefaultSpineExtension::DefaultSpineExtension() : SpineExtension()
+    {
+        // Empty
     }
 }

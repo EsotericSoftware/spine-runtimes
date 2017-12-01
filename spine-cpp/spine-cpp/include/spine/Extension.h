@@ -31,30 +31,65 @@
 #ifndef Spine_Extension_h
 #define Spine_Extension_h
 
+#include <stdlib.h>
+
+#define SPINE_EXTENSION (SpineExtension::getInstance())
+
 /* All allocation uses these. */
-#define MALLOC(TYPE,COUNT) ((TYPE*)spineAlloc(sizeof(TYPE) * (COUNT), __FILE__, __LINE__))
-#define NEW(TYPE) ((TYPE*)spineAlloc(sizeof(TYPE), __FILE__, __LINE__))
-#define REALLOC(PTR,TYPE,COUNT) ((TYPE*)spineRealloc(PTR, sizeof(TYPE) * (COUNT), __FILE__, __LINE__))
+#define MALLOC(TYPE,COUNT) ((TYPE*)SPINE_EXTENSION->spineAlloc(sizeof(TYPE) * (COUNT), __FILE__, __LINE__))
+#define NEW(TYPE) ((TYPE*)SPINE_EXTENSION->spineAlloc(sizeof(TYPE), __FILE__, __LINE__))
+#define REALLOC(PTR,TYPE,COUNT) ((TYPE*)SPINE_EXTENSION->spineRealloc(PTR, sizeof(TYPE) * (COUNT), __FILE__, __LINE__))
 
 /* Frees memory. Can be used on const types. */
-#define FREE(VALUE) spineFree((void*)VALUE)
+#define FREE(VALUE) SPINE_EXTENSION->spineFree((void*)VALUE)
 
 /* Call destructor and then frees memory. Can be used on const types. */
-#define DESTROY(TYPE,VALUE) VALUE->~TYPE(); spineFree((void*)VALUE)
-
-#include <stdlib.h>
+#define DESTROY(TYPE,VALUE) VALUE->~TYPE(); SPINE_EXTENSION->spineFree((void*)VALUE)
 
 namespace Spine
 {
-    /// Implement this function to use your own memory allocator.
-    void* spineAlloc(size_t size, const char* file, int line);
+    class SpineExtension
+    {
+    public:
+        static void setInstance(SpineExtension* inSpineExtension);
+        
+        static SpineExtension* getInstance();
+        
+        virtual ~SpineExtension();
+        
+        /// Implement this function to use your own memory allocator
+        virtual void* spineAlloc(size_t size, const char* file, int line) = 0;
+        
+        virtual void* spineRealloc(void* ptr, size_t size, const char* file, int line) = 0;
+        
+        /// If you provide a spineAllocFunc, you should also provide a spineFreeFunc
+        virtual void spineFree(void* mem) = 0;
+        
+        virtual char* spineReadFile(const char* path, int* length);
+        
+    protected:
+        SpineExtension();
+        
+    private:
+        static SpineExtension* _spineExtension;
+    };
     
-    void* spineRealloc(void* ptr, size_t size, const char* file, int line);
-    
-    /// If you implement spineAlloc, you should also implement this function.
-    void spineFree(void* mem);
-    
-    char* spineReadFile(const char* path, int* length);
+    class DefaultSpineExtension : public SpineExtension
+    {
+    public:
+        static DefaultSpineExtension* getInstance();
+        
+        virtual ~DefaultSpineExtension();
+        
+        virtual void* spineAlloc(size_t size, const char* file, int line);
+        
+        virtual void* spineRealloc(void* ptr, size_t size, const char* file, int line);
+        
+        virtual void spineFree(void* mem);
+        
+    protected:
+        DefaultSpineExtension();
+    };
 }
 
 #endif /* Spine_Extension_h */

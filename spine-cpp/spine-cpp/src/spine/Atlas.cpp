@@ -53,7 +53,7 @@ namespace Spine
         memcpy(dir, path, dirLength);
         dir[dirLength] = '\0';
 
-        data = spineReadFile(path, &length);
+        data = SPINE_EXTENSION->spineReadFile(path, &length);
         if (data)
         {
             load(data, length, dir);
