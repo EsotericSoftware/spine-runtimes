@@ -805,10 +805,10 @@ namespace Spine
             
             bool current = diff > 0, dir = lastTotal >= 0;
             // Detect cross at 0 (not 180).
-            if (sign(lastDiff) != sign(diff) && abs(lastDiff) <= 90)
+            if (sign(lastDiff) != sign(diff) && fabs(lastDiff) <= 90)
             {
                 // A cross after a 360 rotation is a loop.
-                if (abs(lastTotal) > 180)
+                if (fabs(lastTotal) > 180)
                 {
                     lastTotal += 360 * sign(lastTotal);
                 }
