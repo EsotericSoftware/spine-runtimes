@@ -49,8 +49,15 @@ namespace Spine
         _events.reserve(frameCount);
     }
     
-    void EventTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
+    void EventTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
     {
+        if (pEvents == NULL)
+        {
+            return;
+        }
+        
+        Vector<Event*>& events = *pEvents;
+        
         if (events.size() == 0)
         {
             return;
@@ -61,7 +68,7 @@ namespace Spine
         if (lastTime > time)
         {
             // Fire events after last time for looped animations.
-            apply(skeleton, lastTime, std::numeric_limits<int>::max(), events, alpha, pose, direction);
+            apply(skeleton, lastTime, std::numeric_limits<int>::max(), pEvents, alpha, pose, direction);
             lastTime = -1.0f;
         }
         else if (lastTime >= _frames[frameCount - 1]) // Last time is after last frame.

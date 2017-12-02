@@ -50,6 +50,12 @@
 
 namespace Spine
 {
+    template <typename T>
+    int sign(T val)
+    {
+        return (T(0) < val) - (val < T(0));
+    }
+    
     inline bool areFloatsPracticallyEqual(float A, float B, float maxDiff = 0.0000000000000001f, float maxRelDiff = FLT_EPSILON)
     {
         // Check if the numbers are really close -- needed

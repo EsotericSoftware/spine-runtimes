@@ -60,7 +60,7 @@ namespace Spine
         _frames.reserve(frameCount * ENTRIES);
     }
     
-    void TransformConstraintTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
+    void TransformConstraintTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
     {
         TransformConstraint* constraintP = skeleton._transformConstraints[_transformConstraintIndex];
         TransformConstraint& constraint = *constraintP;

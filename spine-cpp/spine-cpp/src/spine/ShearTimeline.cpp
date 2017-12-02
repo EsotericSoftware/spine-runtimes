@@ -49,7 +49,7 @@ namespace Spine
         // Empty
     }
     
-    void ShearTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
+    void ShearTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
     {
         Bone* boneP = skeleton._bones[_boneIndex];
         Bone& bone = *boneP;

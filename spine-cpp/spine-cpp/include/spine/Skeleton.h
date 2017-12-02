@@ -51,6 +51,7 @@ namespace Spine
     
     class Skeleton
     {
+        friend class AnimationState;
         friend class SkeletonBounds;
         friend class SkeletonClipping;
         

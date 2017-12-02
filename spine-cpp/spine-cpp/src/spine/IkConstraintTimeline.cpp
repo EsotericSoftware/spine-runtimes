@@ -56,7 +56,7 @@ namespace Spine
         _frames.reserve(frameCount * ENTRIES);
     }
     
-    void IkConstraintTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
+    void IkConstraintTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
     {
         IkConstraint* constraintP = skeleton._ikConstraints[_ikConstraintIndex];
         IkConstraint& constraint = *constraintP;

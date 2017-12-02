@@ -39,6 +39,8 @@ namespace Spine
 {
     class BoneData
     {
+        friend class AnimationState;
+        
         friend class RotateTimeline;
         friend class ScaleTimeline;
         friend class ShearTimeline;

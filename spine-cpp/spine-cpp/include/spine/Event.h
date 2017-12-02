@@ -40,6 +40,8 @@ namespace Spine
     /// Stores the current pose values for an Event.
     class Event
     {
+        friend class AnimationState;
+        
     public:
         Event(float time, const EventData& data);
         

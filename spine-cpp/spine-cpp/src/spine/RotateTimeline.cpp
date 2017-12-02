@@ -47,7 +47,7 @@ namespace Spine
         _frames.reserve(frameCount << 1);
     }
     
-    void RotateTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
+    void RotateTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
     {
         Bone* bone = skeleton.getBones()[_boneIndex];
         

@@ -49,7 +49,7 @@ namespace Spine
         // Empty
     }
     
-    void PathConstraintSpacingTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
+    void PathConstraintSpacingTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
     {
         PathConstraint* constraintP = skeleton._pathConstraints[_pathConstraintIndex];
         PathConstraint& constraint = *constraintP;

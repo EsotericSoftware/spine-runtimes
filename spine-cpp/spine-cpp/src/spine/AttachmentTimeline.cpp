@@ -48,7 +48,7 @@ namespace Spine
         _attachmentNames.reserve(frameCount);
     }
     
-    void AttachmentTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
+    void AttachmentTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
     {
         assert(_slotIndex < skeleton._slots.size());
         

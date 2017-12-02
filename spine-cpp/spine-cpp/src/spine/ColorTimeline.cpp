@@ -58,7 +58,7 @@ namespace Spine
         _frames.reserve(frameCount * ENTRIES);
     }
     
-    void ColorTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
+    void ColorTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
     {
         Slot* slotP = skeleton._slots[_slotIndex];
         Slot& slot = *slotP;

@@ -56,7 +56,7 @@ namespace Spine
         _frames.reserve(frameCount * ENTRIES);
     }
     
-    void PathConstraintMixTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
+    void PathConstraintMixTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
     {
         PathConstraint* constraintP = skeleton._pathConstraints[_pathConstraintIndex];
         PathConstraint& constraint = *constraintP;

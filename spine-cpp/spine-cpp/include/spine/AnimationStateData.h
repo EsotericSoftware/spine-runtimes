@@ -44,6 +44,8 @@ namespace Spine
     /// Stores mix (crossfade) durations to be applied when AnimationState animations are changed.
     class AnimationStateData
     {
+        friend class AnimationState;
+        
     public:
         /// The SkeletonData to look up animations when they are specified by name.
         SkeletonData& getSkeletonData();

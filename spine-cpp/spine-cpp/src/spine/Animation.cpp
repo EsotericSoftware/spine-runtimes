@@ -47,7 +47,7 @@ namespace Spine
         assert(_name.length() > 0);
     }
     
-    void Animation::apply(Skeleton& skeleton, float lastTime, float time, bool loop, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
+    void Animation::apply(Skeleton& skeleton, float lastTime, float time, bool loop, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
     {
         if (loop && _duration != 0)
         {
@@ -60,7 +60,7 @@ namespace Spine
         
         for (int i = 0, n = static_cast<int>(_timelines.size()); i < n; ++i)
         {
-            _timelines[i]->apply(skeleton, lastTime, time, events, alpha, pose, direction);
+            _timelines[i]->apply(skeleton, lastTime, time, pEvents, alpha, pose, direction);
         }
     }
     

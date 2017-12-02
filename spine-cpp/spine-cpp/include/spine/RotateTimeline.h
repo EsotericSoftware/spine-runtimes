@@ -37,6 +37,8 @@ namespace Spine
 {
     class RotateTimeline : public CurveTimeline
     {
+        friend class AnimationState;
+        
         RTTI_DECL;
         
     public:
@@ -44,7 +46,7 @@ namespace Spine
         
         RotateTimeline(int frameCount);
         
-        virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction);
+        virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction);
         
         virtual int getPropertyId();
         

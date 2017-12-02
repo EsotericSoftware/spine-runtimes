@@ -48,7 +48,7 @@ namespace Spine
         _drawOrders.reserve(frameCount);
     }
     
-    void DrawOrderTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction)
+    void DrawOrderTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
     {
         Vector<Slot*>& drawOrder = skeleton._drawOrder;
         Vector<Slot*>& slots = skeleton._slots;

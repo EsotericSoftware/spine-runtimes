@@ -49,6 +49,8 @@ namespace Spine
     {
         RTTI_DECL;
         
+        friend class AnimationState;
+        
         friend class RotateTimeline;
         friend class IkConstraint;
         friend class TransformConstraint;

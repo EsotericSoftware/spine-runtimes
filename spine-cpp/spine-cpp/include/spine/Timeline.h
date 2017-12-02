@@ -61,7 +61,7 @@ namespace Spine
         ///      apply animations on top of each other (layered).
         /// @param pose Controls how mixing is applied when alpha is than 1.
         /// @param direction Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions such as DrawOrderTimeline and AttachmentTimeline.
-        virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>& events, float alpha, MixPose pose, MixDirection direction) = 0;
+        virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) = 0;
         
         virtual int getPropertyId() = 0;
     };
