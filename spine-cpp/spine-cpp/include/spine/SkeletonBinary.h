@@ -31,9 +31,86 @@
 #ifndef Spine_SkeletonBinary_h
 #define Spine_SkeletonBinary_h
 
+#include <spine/TransformMode.h>
+#include <spine/Vector.h>
+
+#include <string>
+
 namespace Spine
 {
-    // TODO
+    class SkeletonData;
+    class Atlas;
+    class AttachmentLoader;
+    class LinkedMesh;
+    
+    class SkeletonBinary
+    {
+    public:
+        static const int BONE_ROTATE;
+        static const int BONE_TRANSLATE;
+        static const int BONE_SCALE;
+        static const int BONE_SHEAR;
+        
+        static const int SLOT_ATTACHMENT;
+        static const int SLOT_COLOR;
+        static const int SLOT_TWO_COLOR;
+        
+        static const int PATH_POSITION;
+        static const int PATH_SPACING;
+        static const int PATH_MIX;
+        
+        static const int CURVE_LINEAR;
+        static const int CURVE_STEPPED;
+        static const int CURVE_BEZIER;
+        
+        static const TransformMode TRANSFORM_MODE_VALUES[5];
+        
+        SkeletonBinary(Vector<Atlas*>& atlasArray);
+        
+        SkeletonBinary(AttachmentLoader* attachmentLoader);
+        
+        ~SkeletonBinary();
+        
+        SkeletonData* readSkeletonData(const unsigned char* binary, const int length);
+        
+        SkeletonData* readSkeletonDataFile(const char* path);
+        
+    private:
+        class Vertices
+        {
+        public:
+            Vector<int> _bones;
+            Vector<float> _vertices;
+        };
+        
+        struct DataInput
+        {
+            const unsigned char* cursor;
+            const unsigned char* end;
+        };
+        
+        AttachmentLoader* _attachmentLoader;
+        Vector<LinkedMesh*> _linkedMeshes;
+        std::string _error;
+        float _scale;
+        const bool _ownsLoader;
+        
+        void setError(const char* value1, const char* value2);
+        
+        char* readString(DataInput* input);
+        
+        float readFloat(DataInput* input);
+        
+        static unsigned char readByte(DataInput* input);
+        
+        static signed char readSByte(DataInput* input);
+        
+        static int readBoolean(DataInput* input);
+        
+        static int readInt(DataInput* input);
+        
+        static int readVarint(DataInput* input, bool optimizePositive);
+    };
 }
 
 #endif /* Spine_SkeletonBinary_h */

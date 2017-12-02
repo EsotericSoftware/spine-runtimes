@@ -58,6 +58,21 @@ namespace Spine
         // Empty
     }
     
+    SkeletonData::~SkeletonData()
+    {
+        ContainerUtil::cleanUpVectorOfPointers(_bones);
+        ContainerUtil::cleanUpVectorOfPointers(_slots);
+        ContainerUtil::cleanUpVectorOfPointers(_skins);
+        
+        delete _defaultSkin;
+        
+        ContainerUtil::cleanUpVectorOfPointers(_events);
+        ContainerUtil::cleanUpVectorOfPointers(_animations);
+        ContainerUtil::cleanUpVectorOfPointers(_ikConstraints);
+        ContainerUtil::cleanUpVectorOfPointers(_transformConstraints);
+        ContainerUtil::cleanUpVectorOfPointers(_pathConstraints);
+    }
+    
     BoneData* SkeletonData::findBone(std::string boneName)
     {
         return ContainerUtil::findWithName(_bones, boneName);

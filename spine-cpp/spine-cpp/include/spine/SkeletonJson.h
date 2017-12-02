@@ -31,9 +31,34 @@
 #ifndef Spine_SkeletonJson_h
 #define Spine_SkeletonJson_h
 
+#include <spine/Vector.h>
+
 namespace Spine
 {
-    // TODO
+    class SkeletonData;
+    class Atlas;
+    class AttachmentLoader;
+    class LinkedMesh;
+    
+    class SkeletonJson
+    {
+    public:
+        SkeletonJson(Vector<Atlas*>& atlasArray);
+        
+        SkeletonJson(AttachmentLoader* attachmentLoader);
+        
+        ~SkeletonJson();
+        
+        SkeletonData* readSkeletonData(const char* json);
+        
+        SkeletonData* readSkeletonDataFile(const char* path);
+        
+    private:
+        AttachmentLoader* _attachmentLoader;
+        Vector<LinkedMesh*> _linkedMeshes;
+        float _scale;
+        const bool _ownsLoader;
+    };
 }
 
 #endif /* Spine_SkeletonJson_h */

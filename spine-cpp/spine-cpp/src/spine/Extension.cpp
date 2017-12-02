@@ -35,20 +35,20 @@
 
 namespace Spine
 {
-    SpineExtension* SpineExtension::_spineExtension = NULL;
+    SpineExtension* SpineExtension::_instance = NULL;
     
     void SpineExtension::setInstance(SpineExtension* inValue)
     {
-        assert(!_spineExtension);
+        assert(!_instance);
         
-        _spineExtension = inValue;
+        _instance = inValue;
     }
     
     SpineExtension* SpineExtension::getInstance()
     {
-        assert(_spineExtension);
+        assert(_instance);
         
-        return _spineExtension;
+        return _instance;
     }
     
     SpineExtension::~SpineExtension()
@@ -92,6 +92,17 @@ namespace Spine
     void* DefaultSpineExtension::spineAlloc(size_t size, const char* file, int line)
     {
         return malloc(size);
+    }
+    
+    void* DefaultSpineExtension::spineCalloc(size_t num, size_t size, const char* file, int line)
+    {
+        void* ptr = spineAlloc(num * size, file, line);
+        if (ptr)
+        {
+            memset(ptr, 0, num * size);
+        }
+        
+        return ptr;
     }
     
     void* DefaultSpineExtension::spineRealloc(void* ptr, size_t size, const char* file, int line)

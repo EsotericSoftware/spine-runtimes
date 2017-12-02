@@ -352,6 +352,7 @@ namespace Spine
     AnimationState::AnimationState(AnimationStateData& data) :
     _data(data),
     _queue(EventQueue::newEventQueue(*this, _trackEntryPool)),
+    _animationsChanged(false),
     _onAnimationEventFunc(dummyOnAnimationEventFunc),
     _timeScale(1)
     {

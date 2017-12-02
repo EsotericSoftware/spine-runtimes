@@ -49,10 +49,14 @@ namespace Spine
     /// Stores the setup pose and all of the stateless data for a skeleton.
     class SkeletonData
     {
+        friend class SkeletonBinary;
+        friend class SkeletonJson;
         friend class Skeleton;
         
     public:
         SkeletonData();
+        
+        ~SkeletonData();
         
         /// Finds a bone by comparing each bone's name.
         /// It is more efficient to cache the results of this method than to call it multiple times.

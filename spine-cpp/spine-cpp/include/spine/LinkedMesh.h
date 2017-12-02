@@ -28,80 +28,26 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_BoneData_h
-#define Spine_BoneData_h
-
-#include <spine/TransformMode.h>
+#ifndef Spine_LinkedMesh_h
+#define Spine_LinkedMesh_h
 
 #include <string>
 
 namespace Spine
 {
-    class BoneData
+    class MeshAttachment;
+    
+    class LinkedMesh
     {
-        friend class SkeletonBinary;
-        friend class AnimationState;
-        
-        friend class RotateTimeline;
-        friend class ScaleTimeline;
-        friend class ShearTimeline;
-        friend class TranslateTimeline;
-        
     public:
-        BoneData(int index, std::string name, BoneData* parent = NULL);
-        
-        /// The index of the bone in Skeleton.Bones
-        const int getIndex();
-        
-        /// The name of the bone, which is unique within the skeleton.
-        const std::string& getName();
-        
-        /// May be NULL.
-        BoneData* getParent();
-        
-        float getLength();
-        void setLength(float inValue);
-        
-        /// Local X translation.
-        float getX();
-        void setX(float inValue);
-        
-        /// Local Y translation.
-        float getY();
-        void setY(float inValue);
-        
-        /// Local rotation.
-        float getRotation();
-        void setRotation(float inValue);
-        
-        /// Local scaleX.
-        float getScaleX();
-        void setScaleX(float inValue);
-        
-        /// Local scaleY.
-        float getScaleY();
-        void setScaleY(float inValue);
-        
-        /// Local shearX.
-        float getShearX();
-        void setShearX(float inValue);
-        
-        /// Local shearY.
-        float getShearY();
-        void setShearY(float inValue);
-        
-        /// The transform mode for how parent world transforms affect this bone.
-        TransformMode getTransformMode();
-        void setTransformMode(TransformMode inValue);
+        LinkedMesh(MeshAttachment* mesh, std::string skin, int slotIndex, std::string parent);
         
     private:
-        const int _index;
-        const std::string _name;
-        BoneData* _parent;
-        float _length;
-        float _x, _y, _rotation, _scaleX, _scaleY, _shearX, _shearY;
-        TransformMode _transformMode;
+        MeshAttachment* _mesh;
+        std::string _skin;
+        int _slotIndex;
+        std::string _parent;
     };
 }
 
-#endif /* Spine_BoneData_h */
+#endif /* Spine_LinkedMesh_h */

@@ -28,44 +28,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <spine/SkeletonJson.h>
-
-#include <spine/Atlas.h>
-#include <spine/AtlasAttachmentLoader.h>
 #include <spine/LinkedMesh.h>
 
-#include <spine/Extension.h>
-#include <spine/ContainerUtil.h>
+#include <spine/MeshAttachment.h>
 
 namespace Spine
 {
-    SkeletonJson::SkeletonJson(Vector<Atlas*>& atlasArray) : _attachmentLoader(NEW(AtlasAttachmentLoader)), _scale(1), _ownsLoader(true)
+    LinkedMesh::LinkedMesh(MeshAttachment* mesh, std::string skin, int slotIndex, std::string parent) :
+    _mesh(mesh),
+    _skin(skin),
+    _slotIndex(slotIndex),
+    _parent(parent)
     {
-        new (_attachmentLoader) AtlasAttachmentLoader(atlasArray);
-    }
-    
-    SkeletonJson::SkeletonJson(AttachmentLoader* attachmentLoader) : _attachmentLoader(attachmentLoader), _scale(1), _ownsLoader(false)
-    {
-        assert(_attachmentLoader != NULL);
-    }
-    
-    SkeletonJson::~SkeletonJson()
-    {
-        ContainerUtil::cleanUpVectorOfPointers(_linkedMeshes);
-        
-        if (_ownsLoader)
-        {
-            DESTROY(AttachmentLoader, _attachmentLoader);
-        }
-    }
-    
-    SkeletonData* SkeletonJson::readSkeletonData(const char* json)
-    {
-        return NULL;
-    }
-    
-    SkeletonData* SkeletonJson::readSkeletonDataFile(const char* path)
-    {
-        return NULL;
+        // Empty
     }
 }

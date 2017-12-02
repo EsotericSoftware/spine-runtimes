@@ -37,6 +37,7 @@
 
 /* All allocation uses these. */
 #define MALLOC(TYPE,COUNT) ((TYPE*)SPINE_EXTENSION->spineAlloc(sizeof(TYPE) * (COUNT), __FILE__, __LINE__))
+#define CALLOC(TYPE,COUNT) ((TYPE*)SPINE_EXTENSION->spineCalloc(COUNT, sizeof(TYPE), __FILE__, __LINE__))
 #define NEW(TYPE) ((TYPE*)SPINE_EXTENSION->spineAlloc(sizeof(TYPE), __FILE__, __LINE__))
 #define REALLOC(PTR,TYPE,COUNT) ((TYPE*)SPINE_EXTENSION->spineRealloc(PTR, sizeof(TYPE) * (COUNT), __FILE__, __LINE__))
 
@@ -60,6 +61,8 @@ namespace Spine
         /// Implement this function to use your own memory allocator
         virtual void* spineAlloc(size_t size, const char* file, int line) = 0;
         
+        virtual void* spineCalloc(size_t num, size_t size, const char* file, int line) = 0;
+        
         virtual void* spineRealloc(void* ptr, size_t size, const char* file, int line) = 0;
         
         /// If you provide a spineAllocFunc, you should also provide a spineFreeFunc
@@ -71,7 +74,7 @@ namespace Spine
         SpineExtension();
         
     private:
-        static SpineExtension* _spineExtension;
+        static SpineExtension* _instance;
     };
     
     class DefaultSpineExtension : public SpineExtension
@@ -82,6 +85,8 @@ namespace Spine
         virtual ~DefaultSpineExtension();
         
         virtual void* spineAlloc(size_t size, const char* file, int line);
+        
+        virtual void* spineCalloc(size_t num, size_t size, const char* file, int line);
         
         virtual void* spineRealloc(void* ptr, size_t size, const char* file, int line);
         
