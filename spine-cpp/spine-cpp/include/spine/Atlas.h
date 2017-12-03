@@ -97,12 +97,7 @@ namespace Spine
         Vector<int> pads;
     };
     
-    class TextureLoader
-    {
-    public:
-        virtual void load(AtlasPage page, std::string path) = 0;
-        virtual void unload(void* texture) = 0;
-    };
+    class TextureLoader;
     
     class Atlas
     {

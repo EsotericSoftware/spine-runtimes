@@ -30,6 +30,8 @@
 
 #include <spine/Atlas.h>
 
+#include <spine/TextureLoader.h>
+
 #include <spine/ContainerUtil.h>
 
 #include <cstring>
