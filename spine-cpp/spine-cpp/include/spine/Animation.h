@@ -68,6 +68,8 @@ namespace Spine
     public:
         Animation(std::string name, Vector<Timeline*>& timelines, float duration);
         
+        ~Animation();
+        
         /// Applies all the animation's timelines to the specified skeleton.
         /// See also Timeline::apply(Skeleton&, float, float, Vector, float, MixPose, MixDirection)
         void apply(Skeleton& skeleton, float lastTime, float time, bool loop, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction);

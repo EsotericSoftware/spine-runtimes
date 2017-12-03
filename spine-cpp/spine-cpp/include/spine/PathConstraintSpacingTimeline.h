@@ -37,6 +37,9 @@ namespace Spine
 {
     class PathConstraintSpacingTimeline : public PathConstraintPositionTimeline
     {
+        friend class SkeletonBinary;
+        friend class SkeletonJson;
+        
         RTTI_DECL;
         
     public:

@@ -57,6 +57,24 @@
 #include <spine/PointAttachment.h>
 #include <spine/ClippingAttachment.h>
 #include <spine/EventData.h>
+#include <spine/AttachmentTimeline.h>
+#include <spine/MathUtil.h>
+#include <spine/ColorTimeline.h>
+#include <spine/TwoColorTimeline.h>
+#include <spine/RotateTimeline.h>
+#include <spine/TranslateTimeline.h>
+#include <spine/ScaleTimeline.h>
+#include <spine/ShearTimeline.h>
+#include <spine/IkConstraintTimeline.h>
+#include <spine/TransformConstraintTimeline.h>
+#include <spine/PathConstraintPositionTimeline.h>
+#include <spine/PathConstraintSpacingTimeline.h>
+#include <spine/PathConstraintPositionTimeline.h>
+#include <spine/PathConstraintMixTimeline.h>
+#include <spine/DeformTimeline.h>
+#include <spine/DrawOrderTimeline.h>
+#include <spine/EventTimeline.h>
+#include <spine/Event.h>
 
 namespace Spine
 {
@@ -351,7 +369,7 @@ namespace Spine
         }
 
         /* Linked meshes. */
-        for (int i = 0, n = static_cast<int>(_linkedMeshes.size()); i < n; i++)
+        for (int i = 0, n = static_cast<int>(_linkedMeshes.size()); i < n; ++i)
         {
             LinkedMesh* linkedMesh = _linkedMeshes[i];
             Skin* skin = linkedMesh->_skin.length() == 0 ? skeletonData->getDefaultSkin() : skeletonData->findSkin(linkedMesh->_skin);
@@ -386,7 +404,9 @@ namespace Spine
             FREE(name);
             eventData->_intValue = readVarint(input, 0);
             eventData->_floatValue = readFloat(input);
-            eventData->_stringValue = readString(input);
+            const char* eventData_stringValue = readString(input);
+            eventData->_stringValue = std::string(eventData_stringValue);
+            FREE(eventData_stringValue);
             skeletonData->_events[i] = eventData;
         }
 
@@ -695,6 +715,9 @@ namespace Spine
                     FREE(name);
                 }
                 
+                FREE(skinName);
+                FREE(parent);
+                
                 return mesh;
             }
             case AttachmentType_Path:
@@ -847,395 +870,459 @@ namespace Spine
     
     Animation* SkeletonBinary::readAnimation(const char* name, DataInput* input, SkeletonData *skeletonData)
     {
-//        var timelines = new ExposedList<Timeline>();
-//        float scale = Scale;
-//        float duration = 0;
-//
-//        // Slot timelines.
-//        for (int i = 0, n = ReadVarint(input, true); i < n; i++)
-//        {
-//            int slotIndex = ReadVarint(input, true);
-//            for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
-//            {
-//                int timelineType = input.ReadByte();
-//                int frameCount = ReadVarint(input, true);
-//                switch (timelineType)
-//                {
-//                    case SLOT_ATTACHMENT:
-//                    {
-//                        AttachmentTimeline timeline = new AttachmentTimeline(frameCount);
-//                        timeline.slotIndex = slotIndex;
-//                        for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
-//                        {
-//                            timeline.SetFrame(frameIndex, ReadFloat(input), ReadString(input));
-//                        }
-//                        timelines.Add(timeline);
-//                        duration = Math.Max(duration, timeline.frames[frameCount - 1]);
-//                        break;
-//                    }
-//                    case SLOT_COLOR:
-//                    {
-//                        ColorTimeline timeline = new ColorTimeline(frameCount);
-//                        timeline.slotIndex = slotIndex;
-//                        for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)\
-//                        {
-//                            float time = ReadFloat(input);
-//                            int color = ReadInt(input);
-//                            float r = ((color & 0xff000000) >> 24) / 255f;
-//                            float g = ((color & 0x00ff0000) >> 16) / 255f;
-//                            float b = ((color & 0x0000ff00) >> 8) / 255f;
-//                            float a = ((color & 0x000000ff)) / 255f;
-//                            timeline.SetFrame(frameIndex, time, r, g, b, a);
-//                            if (frameIndex < frameCount - 1)
-//                            {
-//                                ReadCurve(input, frameIndex, timeline);
-//                            }
-//                        }
-//                        timelines.Add(timeline);
-//                        duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * ColorTimeline.ENTRIES]);
-//                        break;
-//                    }
-//                    case SLOT_TWO_COLOR:
-//                    {
-//                        TwoColorTimeline timeline = new TwoColorTimeline(frameCount);
-//                        timeline.slotIndex = slotIndex;
-//                        for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
-//                        {
-//                            float time = ReadFloat(input);
-//                            int color = ReadInt(input);
-//                            float r = ((color & 0xff000000) >> 24) / 255f;
-//                            float g = ((color & 0x00ff0000) >> 16) / 255f;
-//                            float b = ((color & 0x0000ff00) >> 8) / 255f;
-//                            float a = ((color & 0x000000ff)) / 255f;
-//                            int color2 = ReadInt(input); // 0x00rrggbb
-//                            float r2 = ((color2 & 0x00ff0000) >> 16) / 255f;
-//                            float g2 = ((color2 & 0x0000ff00) >> 8) / 255f;
-//                            float b2 = ((color2 & 0x000000ff)) / 255f;
-//
-//                            timeline.SetFrame(frameIndex, time, r, g, b, a, r2, g2, b2);
-//                            if (frameIndex < frameCount - 1)
-//                            {
-//                                ReadCurve(input, frameIndex, timeline);
-//                            }
-//                        }
-//                        timelines.Add(timeline);
-//                        duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * TwoColorTimeline.ENTRIES]);
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//
-//        // Bone timelines.
-//        for (int i = 0, n = ReadVarint(input, true); i < n; i++)
-//        {
-//            int boneIndex = ReadVarint(input, true);
-//            for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
-//            {
-//                int timelineType = input.ReadByte();
-//                int frameCount = ReadVarint(input, true);
-//                switch (timelineType)
-//                {
-//                    case BONE_ROTATE:
-//                    {
-//                        RotateTimeline timeline = new RotateTimeline(frameCount);
-//                        timeline.boneIndex = boneIndex;
-//                        for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
-//                        {
-//                            timeline.SetFrame(frameIndex, ReadFloat(input), ReadFloat(input));
-//                            if (frameIndex < frameCount - 1)
-//                            {
-//                                ReadCurve(input, frameIndex, timeline);
-//                            }
-//                        }
-//                        timelines.Add(timeline);
-//                        duration = Math.Max(duration, timeline.frames[(frameCount - 1) * RotateTimeline.ENTRIES]);
-//                        break;
-//                    }
-//                    case BONE_TRANSLATE:
-//                    case BONE_SCALE:
-//                    case BONE_SHEAR:
-//                    {
-//                        TranslateTimeline timeline;
-//                        float timelineScale = 1;
-//                        if (timelineType == BONE_SCALE)
-//                        {
-//                            timeline = new ScaleTimeline(frameCount);
-//                        }
-//                        else if (timelineType == BONE_SHEAR)
-//                        {
-//                            timeline = new ShearTimeline(frameCount);
-//                        }
-//                        else
-//                        {
-//                            timeline = new TranslateTimeline(frameCount);
-//                            timelineScale = scale;
-//                        }
-//                        timeline.boneIndex = boneIndex;
-//                        for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
-//                        {
-//                            timeline.SetFrame(frameIndex, ReadFloat(input), ReadFloat(input) * timelineScale, ReadFloat(input)
-//                                              * timelineScale);
-//                            if (frameIndex < frameCount - 1)
-//                            {
-//                                ReadCurve(input, frameIndex, timeline);
-//                            }
-//                        }
-//                        timelines.Add(timeline);
-//                        duration = Math.Max(duration, timeline.frames[(frameCount - 1) * TranslateTimeline.ENTRIES]);
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//
-//        // IK timelines.
-//        for (int i = 0, n = ReadVarint(input, true); i < n; i++)
-//        {
-//            int index = ReadVarint(input, true);
-//            int frameCount = ReadVarint(input, true);
-//            IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount);
-//            timeline.ikConstraintIndex = index;
-//            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
-//            {
-//                timeline.SetFrame(frameIndex, ReadFloat(input), ReadFloat(input), ReadSByte(input));
-//                if (frameIndex < frameCount - 1)
-//                {
-//                    ReadCurve(input, frameIndex, timeline);
-//                }
-//            }
-//            timelines.Add(timeline);
-//            duration = Math.Max(duration, timeline.frames[(frameCount - 1) * IkConstraintTimeline.ENTRIES]);
-//        }
-//
-//        // Transform constraint timelines.
-//        for (int i = 0, n = ReadVarint(input, true); i < n; i++)
-//        {
-//            int index = ReadVarint(input, true);
-//            int frameCount = ReadVarint(input, true);
-//            TransformConstraintTimeline timeline = new TransformConstraintTimeline(frameCount);
-//            timeline.transformConstraintIndex = index;
-//            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
-//            {
-//                timeline.SetFrame(frameIndex, ReadFloat(input), ReadFloat(input), ReadFloat(input), ReadFloat(input), ReadFloat(input));
-//                if (frameIndex < frameCount - 1)
-//                {
-//                    ReadCurve(input, frameIndex, timeline);
-//                }
-//            }
-//            timelines.Add(timeline);
-//            duration = Math.Max(duration, timeline.frames[(frameCount - 1) * TransformConstraintTimeline.ENTRIES]);
-//        }
-//
-//        // Path constraint timelines.
-//        for (int i = 0, n = ReadVarint(input, true); i < n; i++)
-//        {
-//            int index = ReadVarint(input, true);
-//            PathConstraintData data = skeletonData.pathConstraints.Items[index];
-//            for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
-//            {
-//                int timelineType = ReadSByte(input);
-//                int frameCount = ReadVarint(input, true);
-//                switch(timelineType)
-//                {
-//                    case PATH_POSITION:
-//                    case PATH_SPACING:
-//                    {
-//                        PathConstraintPositionTimeline timeline;
-//                        float timelineScale = 1;
-//                        if (timelineType == PATH_SPACING)
-//                        {
-//                            timeline = new PathConstraintSpacingTimeline(frameCount);
-//                            if (data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed)
-//                            {
-//                                timelineScale = scale;
-//                            }
-//                        }
-//                        else
-//                        {
-//                            timeline = new PathConstraintPositionTimeline(frameCount);
-//                            if (data.positionMode == PositionMode.Fixed)
-//                            {
-//                                timelineScale = scale;
-//                            }
-//                        }
-//                        timeline.pathConstraintIndex = index;
-//                        for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
-//                        {
-//                            timeline.SetFrame(frameIndex, ReadFloat(input), ReadFloat(input) * timelineScale);
-//                            if (frameIndex < frameCount - 1)
-//                            {
-//                                ReadCurve(input, frameIndex, timeline);
-//                            }
-//                        }
-//                        timelines.Add(timeline);
-//                        duration = Math.Max(duration, timeline.frames[(frameCount - 1) * PathConstraintPositionTimeline.ENTRIES]);
-//                        break;
-//                    }
-//                    case PATH_MIX:
-//                    {
-//                        PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(frameCount);
-//                        timeline.pathConstraintIndex = index;
-//                        for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
-//                        {
-//                            timeline.SetFrame(frameIndex, ReadFloat(input), ReadFloat(input), ReadFloat(input));
-//                            if (frameIndex < frameCount - 1)
-//                            {
-//                                ReadCurve(input, frameIndex, timeline);
-//                            }
-//                        }
-//                        timelines.Add(timeline);
-//                        duration = Math.Max(duration, timeline.frames[(frameCount - 1) * PathConstraintMixTimeline.ENTRIES]);
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//
-//        // Deform timelines.
-//        for (int i = 0, n = ReadVarint(input, true); i < n; i++)
-//        {
-//            Skin skin = skeletonData.skins.Items[ReadVarint(input, true)];
-//            for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
-//            {
-//                int slotIndex = ReadVarint(input, true);
-//                for (int iii = 0, nnn = ReadVarint(input, true); iii < nnn; iii++)
-//                {
-//                    VertexAttachment attachment = (VertexAttachment)skin.GetAttachment(slotIndex, ReadString(input));
-//                    bool weighted = attachment.bones != null;
-//                    float[] vertices = attachment.vertices;
-//                    int deformLength = weighted ? vertices.Length / 3 * 2 : vertices.Length;
-//
-//                    int frameCount = ReadVarint(input, true);
-//                    DeformTimeline timeline = new DeformTimeline(frameCount);
-//                    timeline.slotIndex = slotIndex;
-//                    timeline.attachment = attachment;
-//
-//                    for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
-//                    {
-//                        float time = ReadFloat(input);
-//                        float[] deform;
-//                        int end = ReadVarint(input, true);
-//                        if (end == 0)
-//                        {
-//                            deform = weighted ? new float[deformLength] : vertices;
-//                        }
-//                        else
-//                        {
-//                            deform = new float[deformLength];
-//                            int start = ReadVarint(input, true);
-//                            end += start;
-//                            if (scale == 1)
-//                            {
-//                                for (int v = start; v < end; v++)
-//                                {
-//                                    deform[v] = ReadFloat(input);
-//                                }
-//                            }
-//                            else
-//                            {
-//                                for (int v = start; v < end; v++)
-//                                {
-//                                    deform[v] = ReadFloat(input) * scale;
-//                                }
-//                            }
-//
-//                            if (!weighted)
-//                            {
-//                                for (int v = 0, vn = deform.Length; v < vn; v++)
-//                                {
-//                                    deform[v] += vertices[v];
-//                                }
-//                            }
-//                        }
-//
-//                        timeline.SetFrame(frameIndex, time, deform);
-//                        if (frameIndex < frameCount - 1)
-//                        {
-//                            ReadCurve(input, frameIndex, timeline);
-//                        }
-//                    }
-//
-//                    timelines.Add(timeline);
-//                    duration = Math.Max(duration, timeline.frames[frameCount - 1]);
-//                }
-//            }
-//        }
-//
-//        // Draw order timeline.
-//        int drawOrderCount = ReadVarint(input, true);
-//        if (drawOrderCount > 0)
-//        {
-//            DrawOrderTimeline timeline = new DrawOrderTimeline(drawOrderCount);
-//            int slotCount = skeletonData.slots.Count;
-//            for (int i = 0; i < drawOrderCount; i++)
-//            {
-//                float time = ReadFloat(input);
-//                int offsetCount = ReadVarint(input, true);
-//                int[] drawOrder = new int[slotCount];
-//                for (int ii = slotCount - 1; ii >= 0; ii--)
-//                {
-//                    drawOrder[ii] = -1;
-//                }
-//                int[] unchanged = new int[slotCount - offsetCount];
-//                int originalIndex = 0, unchangedIndex = 0;
-//                for (int ii = 0; ii < offsetCount; ii++)
-//                {
-//                    int slotIndex = ReadVarint(input, true);
-//                    // Collect unchanged items.
-//                    while (originalIndex != slotIndex)
-//                    {
-//                        unchanged[unchangedIndex++] = originalIndex++;
-//                    }
-//                    // Set changed items.
-//                    drawOrder[originalIndex + ReadVarint(input, true)] = originalIndex++;
-//                }
-//
-//                // Collect remaining unchanged items.
-//                while (originalIndex < slotCount)
-//                {
-//                    unchanged[unchangedIndex++] = originalIndex++;
-//                }
-//
-//                // Fill in unchanged items.
-//                for (int ii = slotCount - 1; ii >= 0; ii--)
-//                {
-//                    if (drawOrder[ii] == -1)
-//                    {
-//                        drawOrder[ii] = unchanged[--unchangedIndex];
-//                    }
-//                }
-//                timeline.SetFrame(i, time, drawOrder);
-//            }
-//            timelines.Add(timeline);
-//            duration = Math.Max(duration, timeline.frames[drawOrderCount - 1]);
-//        }
-//
-//        // Event timeline.
-//        int eventCount = ReadVarint(input, true);
-//        if (eventCount > 0)
-//        {
-//            EventTimeline timeline = new EventTimeline(eventCount);
-//            for (int i = 0; i < eventCount; i++)
-//            {
-//                float time = ReadFloat(input);
-//                EventData eventData = skeletonData.events.Items[ReadVarint(input, true)];
-//                Event e = new Event(time, eventData);
-//                e.Int = ReadVarint(input, false);
-//                e.Float = ReadFloat(input);
-//                e.String = ReadBoolean(input) ? ReadString(input) : eventData.String;
-//                timeline.SetFrame(i, e);
-//            }
-//
-//            timelines.Add(timeline);
-//            duration = Math.Max(duration, timeline.frames[eventCount - 1]);
-//        }
-//
-//        timelines.TrimExcess();
-//
+        Vector<Timeline*> timelines;
+        float scale = _scale;
+        float duration = 0;
+
+        // Slot timelines.
+        for (int i = 0, n = readVarint(input, true); i < n; ++i)
+        {
+            int slotIndex = readVarint(input, true);
+            for (int ii = 0, nn = readVarint(input, true); ii < nn; ++ii)
+            {
+                unsigned char timelineType = readByte(input);
+                int frameCount = readVarint(input, true);
+                switch (timelineType)
+                {
+                    case SLOT_ATTACHMENT:
+                    {
+                        AttachmentTimeline* timeline = NEW(AttachmentTimeline);
+                        new(timeline) AttachmentTimeline(frameCount);
+                        timeline->_slotIndex = slotIndex;
+                        for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex)
+                        {
+                            const char* attachmentName = readString(input);
+                            timeline->setFrame(frameIndex, readFloat(input), std::string(attachmentName));
+                            FREE(attachmentName);
+                        }
+                        timelines.push_back(timeline);
+                        duration = MAX(duration, timeline->_frames[frameCount - 1]);
+                        break;
+                    }
+                    case SLOT_COLOR:
+                    {
+                        ColorTimeline* timeline = NEW(ColorTimeline);
+                        new(timeline) ColorTimeline(frameCount);
+                        timeline->_slotIndex = slotIndex;
+                        for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex)
+                        {
+                            float time = readFloat(input);
+                            int color = readInt(input);
+                            float r = ((color & 0xff000000) >> 24) / 255.0f;
+                            float g = ((color & 0x00ff0000) >> 16) / 255.0f;
+                            float b = ((color & 0x0000ff00) >> 8) / 255.0f;
+                            float a = ((color & 0x000000ff)) / 255.0f;
+                            timeline->setFrame(frameIndex, time, r, g, b, a);
+                            if (frameIndex < frameCount - 1)
+                            {
+                                readCurve(input, frameIndex, timeline);
+                            }
+                        }
+                        timelines.push_back(timeline);
+                        duration = MAX(duration, timeline->_frames[(frameCount - 1) * ColorTimeline::ENTRIES]);
+                        break;
+                    }
+                    case SLOT_TWO_COLOR:
+                    {
+                        TwoColorTimeline* timeline = NEW(TwoColorTimeline);
+                        new(timeline) TwoColorTimeline(frameCount);
+                        timeline->_slotIndex = slotIndex;
+                        for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex)
+                        {
+                            float time = readFloat(input);
+                            int color = readInt(input);
+                            float r = ((color & 0xff000000) >> 24) / 255.0f;
+                            float g = ((color & 0x00ff0000) >> 16) / 255.0f;
+                            float b = ((color & 0x0000ff00) >> 8) / 255.0f;
+                            float a = ((color & 0x000000ff)) / 255.0f;
+                            int color2 = readInt(input); // 0x00rrggbb
+                            float r2 = ((color2 & 0x00ff0000) >> 16) / 255.0f;
+                            float g2 = ((color2 & 0x0000ff00) >> 8) / 255.0f;
+                            float b2 = ((color2 & 0x000000ff)) / 255.0f;
+
+                            timeline->setFrame(frameIndex, time, r, g, b, a, r2, g2, b2);
+                            if (frameIndex < frameCount - 1)
+                            {
+                                readCurve(input, frameIndex, timeline);
+                            }
+                        }
+                        timelines.push_back(timeline);
+                        duration = MAX(duration, timeline->_frames[(frameCount - 1) * TwoColorTimeline::ENTRIES]);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Bone timelines.
+        for (int i = 0, n = readVarint(input, true); i < n; ++i)
+        {
+            int boneIndex = readVarint(input, true);
+            for (int ii = 0, nn = readVarint(input, true); ii < nn; ++ii)
+            {
+                unsigned char timelineType = readByte(input);
+                int frameCount = readVarint(input, true);
+                switch (timelineType)
+                {
+                    case BONE_ROTATE:
+                    {
+                        RotateTimeline* timeline = NEW(RotateTimeline);
+                        new(timeline) RotateTimeline(frameCount);
+                        timeline->_boneIndex = boneIndex;
+                        for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex)
+                        {
+                            timeline->setFrame(frameIndex, readFloat(input), readFloat(input));
+                            if (frameIndex < frameCount - 1)
+                            {
+                                readCurve(input, frameIndex, timeline);
+                            }
+                        }
+                        timelines.push_back(timeline);
+                        duration = MAX(duration, timeline->_frames[(frameCount - 1) * RotateTimeline::ENTRIES]);
+                        break;
+                    }
+                    case BONE_TRANSLATE:
+                    case BONE_SCALE:
+                    case BONE_SHEAR:
+                    {
+                        TranslateTimeline* timeline;
+                        float timelineScale = 1;
+                        if (timelineType == BONE_SCALE)
+                        {
+                            timeline = NEW(ScaleTimeline);
+                            new(timeline) ScaleTimeline(frameCount);
+                        }
+                        else if (timelineType == BONE_SHEAR)
+                        {
+                            timeline = NEW(ShearTimeline);
+                            new(timeline) ShearTimeline(frameCount);
+                        }
+                        else
+                        {
+                            timeline = NEW(TranslateTimeline);
+                            new(timeline) TranslateTimeline(frameCount);
+                            timelineScale = scale;
+                        }
+                        timeline->_boneIndex = boneIndex;
+                        for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex)
+                        {
+                            timeline->setFrame(frameIndex, readFloat(input), readFloat(input) * timelineScale, readFloat(input) * timelineScale);
+                            if (frameIndex < frameCount - 1)
+                            {
+                                readCurve(input, frameIndex, timeline);
+                            }
+                        }
+                        timelines.push_back(timeline);
+                        duration = MAX(duration, timeline->_frames[(frameCount - 1) * TranslateTimeline::ENTRIES]);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // IK timelines.
+        for (int i = 0, n = readVarint(input, true); i < n; ++i)
+        {
+            int index = readVarint(input, true);
+            int frameCount = readVarint(input, true);
+            IkConstraintTimeline* timeline = NEW(IkConstraintTimeline);
+            new(timeline) IkConstraintTimeline(frameCount);
+            timeline->_ikConstraintIndex = index;
+            for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex)
+            {
+                timeline->setFrame(frameIndex, readFloat(input), readFloat(input), readSByte(input));
+                if (frameIndex < frameCount - 1)
+                {
+                    readCurve(input, frameIndex, timeline);
+                }
+            }
+            timelines.push_back(timeline);
+            duration = MAX(duration, timeline->_frames[(frameCount - 1) * IkConstraintTimeline::ENTRIES]);
+        }
+
+        // Transform constraint timelines.
+        for (int i = 0, n = readVarint(input, true); i < n; ++i)
+        {
+            int index = readVarint(input, true);
+            int frameCount = readVarint(input, true);
+            TransformConstraintTimeline* timeline = NEW(TransformConstraintTimeline);
+            new(timeline) TransformConstraintTimeline(frameCount);
+            timeline->_transformConstraintIndex = index;
+            for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex)
+            {
+                timeline->setFrame(frameIndex, readFloat(input), readFloat(input), readFloat(input), readFloat(input), readFloat(input));
+                if (frameIndex < frameCount - 1)
+                {
+                    readCurve(input, frameIndex, timeline);
+                }
+            }
+            timelines.push_back(timeline);
+            duration = MAX(duration, timeline->_frames[(frameCount - 1) * TransformConstraintTimeline::ENTRIES]);
+        }
+
+        // Path constraint timelines.
+        for (int i = 0, n = readVarint(input, true); i < n; ++i)
+        {
+            int index = readVarint(input, true);
+            PathConstraintData* data = skeletonData->_pathConstraints[index];
+            for (int ii = 0, nn = readVarint(input, true); ii < nn; ++ii)
+            {
+                int timelineType = readSByte(input);
+                int frameCount = readVarint(input, true);
+                switch(timelineType)
+                {
+                    case PATH_POSITION:
+                    case PATH_SPACING:
+                    {
+                        PathConstraintPositionTimeline* timeline;
+                        float timelineScale = 1;
+                        if (timelineType == PATH_SPACING)
+                        {
+                            timeline = NEW(PathConstraintSpacingTimeline);
+                            new(timeline) PathConstraintSpacingTimeline(frameCount);
+                            
+                            if (data->_spacingMode == SpacingMode_Length || data->_spacingMode == SpacingMode_Fixed)
+                            {
+                                timelineScale = scale;
+                            }
+                        }
+                        else
+                        {
+                            timeline = NEW(PathConstraintPositionTimeline);
+                            new(timeline) PathConstraintPositionTimeline(frameCount);
+                            
+                            if (data->_positionMode == PositionMode_Fixed)
+                            {
+                                timelineScale = scale;
+                            }
+                        }
+                        timeline->_pathConstraintIndex = index;
+                        for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex)
+                        {
+                            timeline->setFrame(frameIndex, readFloat(input), readFloat(input) * timelineScale);
+                            if (frameIndex < frameCount - 1)
+                            {
+                                readCurve(input, frameIndex, timeline);
+                            }
+                        }
+                        timelines.push_back(timeline);
+                        duration = MAX(duration, timeline->_frames[(frameCount - 1) * PathConstraintPositionTimeline::ENTRIES]);
+                        break;
+                    }
+                    case PATH_MIX:
+                    {
+                        PathConstraintMixTimeline* timeline = NEW(PathConstraintMixTimeline);
+                        new(timeline) PathConstraintMixTimeline(frameCount);
+                        
+                        timeline->_pathConstraintIndex = index;
+                        for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex)
+                        {
+                            timeline->setFrame(frameIndex, readFloat(input), readFloat(input), readFloat(input));
+                            if (frameIndex < frameCount - 1)
+                            {
+                                readCurve(input, frameIndex, timeline);
+                            }
+                        }
+                        timelines.push_back(timeline);
+                        duration = MAX(duration, timeline->_frames[(frameCount - 1) * PathConstraintMixTimeline::ENTRIES]);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Deform timelines.
+        for (int i = 0, n = readVarint(input, true); i < n; ++i)
+        {
+            Skin* skin = skeletonData->_skins[readVarint(input, true)];
+            for (int ii = 0, nn = readVarint(input, true); ii < nn; ++ii)
+            {
+                int slotIndex = readVarint(input, true);
+                for (int iii = 0, nnn = readVarint(input, true); iii < nnn; iii++)
+                {
+                    const char* vertexAttachmentName = readString(input);
+                    VertexAttachment* attachment = static_cast<VertexAttachment*>(skin->getAttachment(slotIndex, std::string(vertexAttachmentName)));
+                    FREE(vertexAttachmentName);
+                    bool weighted = attachment->_bones.size() > 0;
+                    Vector<float>& vertices = attachment->_vertices;
+                    int deformLength = weighted ? static_cast<int>(vertices.size()) / 3 * 2 : static_cast<int>(vertices.size());
+
+                    int frameCount = readVarint(input, true);
+                    
+                    DeformTimeline* timeline = NEW(DeformTimeline);
+                    new(timeline) DeformTimeline(frameCount);
+                    
+                    timeline->_slotIndex = slotIndex;
+                    timeline->_attachment = attachment;
+
+                    for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex)
+                    {
+                        float time = readFloat(input);
+                        Vector<float> deform;
+                        int end = readVarint(input, true);
+                        if (end == 0)
+                        {
+                            if (weighted)
+                            {
+                                deform.reserve(deformLength);
+                            }
+                            else
+                            {
+                                deform = vertices;
+                            }
+                        }
+                        else
+                        {
+                            deform.reserve(deformLength);
+                            int start = readVarint(input, true);
+                            end += start;
+                            if (scale == 1)
+                            {
+                                for (int v = start; v < end; ++v)
+                                {
+                                    deform[v] = readFloat(input);
+                                }
+                            }
+                            else
+                            {
+                                for (int v = start; v < end; ++v)
+                                {
+                                    deform[v] = readFloat(input) * scale;
+                                }
+                            }
+
+                            if (!weighted)
+                            {
+                                for (int v = 0, vn = static_cast<int>(deform.size()); v < vn; ++v)
+                                {
+                                    deform[v] += vertices[v];
+                                }
+                            }
+                        }
+
+                        timeline->setFrame(frameIndex, time, deform);
+                        if (frameIndex < frameCount - 1)
+                        {
+                            readCurve(input, frameIndex, timeline);
+                        }
+                    }
+
+                    timelines.push_back(timeline);
+                    duration = MAX(duration, timeline->_frames[frameCount - 1]);
+                }
+            }
+        }
+
+        // Draw order timeline.
+        int drawOrderCount = readVarint(input, true);
+        if (drawOrderCount > 0)
+        {
+            DrawOrderTimeline* timeline = NEW(DrawOrderTimeline);
+            new(timeline) DrawOrderTimeline(drawOrderCount);
+            
+            int slotCount = static_cast<int>(skeletonData->_slots.size());
+            for (int i = 0; i < drawOrderCount; ++i)
+            {
+                float time = readFloat(input);
+                int offsetCount = readVarint(input, true);
+                
+                Vector<int> drawOrder;
+                drawOrder.reserve(slotCount);
+                for (int ii = slotCount - 1; ii >= 0; --ii)
+                {
+                    drawOrder[ii] = -1;
+                }
+                
+                Vector<int> unchanged;
+                unchanged.reserve(slotCount - offsetCount);
+                int originalIndex = 0, unchangedIndex = 0;
+                for (int ii = 0; ii < offsetCount; ++ii)
+                {
+                    int slotIndex = readVarint(input, true);
+                    // Collect unchanged items.
+                    while (originalIndex != slotIndex)
+                    {
+                        unchanged[unchangedIndex++] = originalIndex++;
+                    }
+                    // Set changed items.
+                    int index = originalIndex;
+                    drawOrder[index + readVarint(input, true)] = originalIndex++;
+                }
+
+                // Collect remaining unchanged items.
+                while (originalIndex < slotCount)
+                {
+                    unchanged[unchangedIndex++] = originalIndex++;
+                }
+
+                // Fill in unchanged items.
+                for (int ii = slotCount - 1; ii >= 0; --ii)
+                {
+                    if (drawOrder[ii] == -1)
+                    {
+                        drawOrder[ii] = unchanged[--unchangedIndex];
+                    }
+                }
+                timeline->setFrame(i, time, drawOrder);
+            }
+            timelines.push_back(timeline);
+            duration = MAX(duration, timeline->_frames[drawOrderCount - 1]);
+        }
+
+        // Event timeline.
+        int eventCount = readVarint(input, true);
+        if (eventCount > 0)
+        {
+            EventTimeline* timeline = NEW(EventTimeline);
+            new(timeline) EventTimeline(eventCount);
+            
+            for (int i = 0; i < eventCount; ++i)
+            {
+                float time = readFloat(input);
+                EventData* eventData = skeletonData->_events[readVarint(input, true)];
+                Event* event = NEW(Event);
+                new(event) Event(time, *eventData);
+                
+                event->_intValue = readVarint(input, false);
+                event->_floatValue = readFloat(input);
+                bool freeString = readBoolean(input);
+                const char* event_stringValue = freeString ? readString(input) : eventData->_stringValue.c_str();
+                event->_stringValue = std::string(event_stringValue);
+                if (freeString)
+                {
+                    FREE(event_stringValue);
+                }
+                timeline->setFrame(i, event);
+            }
+
+            timelines.push_back(timeline);
+            duration = MAX(duration, timeline->_frames[eventCount - 1]);
+        }
+
         Animation* ret = NEW(Animation);
-//        new (ret) Animation(std::string(name), timelines, duration);
+        new (ret) Animation(std::string(name), timelines, duration);
         
         return ret;
+    }
+    
+    void SkeletonBinary::readCurve(DataInput* input, int frameIndex, CurveTimeline* timeline)
+    {
+        switch (readByte(input))
+        {
+            case CURVE_STEPPED:
+            {
+                timeline->setStepped(frameIndex);
+                break;
+            }
+            case CURVE_BEZIER:
+            {
+                float cx1 = readFloat(input);
+                float cy1 = readFloat(input);
+                float cx2 = readFloat(input);
+                float cy2 = readFloat(input);
+                timeline->setCurve(frameIndex, cx1, cy1, cx2, cy2);
+                break;
+            }
+        }
     }
 }

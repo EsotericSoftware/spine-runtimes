@@ -37,6 +37,9 @@ namespace Spine
 {
     class ScaleTimeline : public TranslateTimeline
     {
+        friend class SkeletonBinary;
+        friend class SkeletonJson;
+        
         RTTI_DECL;
         
     public:

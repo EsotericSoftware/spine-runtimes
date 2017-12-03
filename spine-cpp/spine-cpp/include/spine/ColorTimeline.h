@@ -37,6 +37,9 @@ namespace Spine
 {
     class ColorTimeline : public CurveTimeline
     {
+        friend class SkeletonBinary;
+        friend class SkeletonJson;
+        
         RTTI_DECL;
         
     public:

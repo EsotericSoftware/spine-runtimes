@@ -46,6 +46,7 @@ namespace Spine
     class Attachment;
     class VertexAttachment;
     class Animation;
+    class CurveTimeline;
     
     class SkeletonBinary
     {
@@ -128,6 +129,8 @@ namespace Spine
         Vector<short> readShortArray(DataInput *input);
         
         Animation* readAnimation(const char* name, DataInput* input, SkeletonData *skeletonData);
+        
+        void readCurve(DataInput* input, int frameIndex, CurveTimeline* timeline);
     };
 }
 

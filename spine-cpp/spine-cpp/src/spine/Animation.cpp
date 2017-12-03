@@ -34,6 +34,8 @@
 #include <spine/Skeleton.h>
 #include <spine/Event.h>
 
+#include <spine/ContainerUtil.h>
+
 #include <assert.h>
 #include <math.h> /* fmod */
 
@@ -45,6 +47,11 @@ namespace Spine
     _name(name)
     {
         assert(_name.length() > 0);
+    }
+    
+    Animation::~Animation()
+    {
+        ContainerUtil::cleanUpVectorOfPointers(_timelines);
     }
     
     void Animation::apply(Skeleton& skeleton, float lastTime, float time, bool loop, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
