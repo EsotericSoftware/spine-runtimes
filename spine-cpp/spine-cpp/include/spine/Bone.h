@@ -47,8 +47,6 @@ namespace Spine
     /// constraint or application code modifies the world transform after it was computed from the local transform.
     class Bone : public Updatable
     {
-        RTTI_DECL;
-        
         friend class AnimationState;
         
         friend class RotateTimeline;
@@ -62,6 +60,8 @@ namespace Spine
         friend class ScaleTimeline;
         friend class ShearTimeline;
         friend class TranslateTimeline;
+        
+        RTTI_DECL;
         
     public:
         static void setYDown(bool inValue);

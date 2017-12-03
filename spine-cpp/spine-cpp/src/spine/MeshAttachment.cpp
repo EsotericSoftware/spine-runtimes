@@ -123,12 +123,12 @@ namespace Spine
         _uvs = inValue;
     }
     
-    Vector<int>& MeshAttachment::getTriangles()
+    Vector<short>& MeshAttachment::getTriangles()
     {
         return _triangles;
     }
     
-    void MeshAttachment::setTriangles(Vector<int>& inValue)
+    void MeshAttachment::setTriangles(Vector<short>& inValue)
     {
         _triangles = inValue;
     }
@@ -335,12 +335,12 @@ namespace Spine
         }
     }
     
-    Vector<int>& MeshAttachment::getEdges()
+    Vector<short>& MeshAttachment::getEdges()
     {
         return _edges;
     }
     
-    void MeshAttachment::setEdges(Vector<int>& inValue)
+    void MeshAttachment::setEdges(Vector<short>& inValue)
     {
         _edges = inValue;
     }

@@ -46,9 +46,11 @@ namespace Spine
     /// Attachment that displays a texture region.
     class RegionAttachment : public Attachment
     {
-        RTTI_DECL;
-        
+        friend class SkeletonBinary;
+        friend class SkeletonJson;
         friend class AtlasAttachmentLoader;
+        
+        RTTI_DECL;
         
     public:
         RegionAttachment(std::string name);

@@ -34,10 +34,29 @@
 #include <spine/Atlas.h>
 #include <spine/AtlasAttachmentLoader.h>
 #include <spine/LinkedMesh.h>
+#include <spine/Skin.h>
+#include <spine/Attachment.h>
+#include <spine/VertexAttachment.h>
+#include <spine/Animation.h>
 
 #include <spine/Extension.h>
 #include <spine/ContainerUtil.h>
 #include <spine/BoneData.h>
+#include <spine/SlotData.h>
+#include <spine/IkConstraintData.h>
+#include <spine/TransformConstraintData.h>
+#include <spine/PathConstraintData.h>
+#include <spine/PositionMode.h>
+#include <spine/SpacingMode.h>
+#include <spine/RotateMode.h>
+#include <spine/AttachmentType.h>
+#include <spine/RegionAttachment.h>
+#include <spine/BoundingBoxAttachment.h>
+#include <spine/MeshAttachment.h>
+#include <spine/PathAttachment.h>
+#include <spine/PointAttachment.h>
+#include <spine/ClippingAttachment.h>
+#include <spine/EventData.h>
 
 namespace Spine
 {
@@ -170,199 +189,223 @@ namespace Spine
                 readInt(input);
             }
             
-            skeletonData->_bones.push_back(data);
+            skeletonData->_bones[i] = data;
         }
 
         /* Slots. */
-//        skeletonData->slotsCount = readVarint(input, 1);
-//        skeletonData->slots = MALLOC(spSlotData*, skeletonData->slotsCount);
-//        for (i = 0; i < skeletonData->slotsCount; ++i)
-//        {
-//            int r, g, b, a;
-//            const char* slotName = readString(input);
-//            spBoneData* boneData = skeletonData->bones[readVarint(input, 1)];
-//            /* TODO Avoid copying of slotName */
-//            spSlotData* slotData = spSlotData_create(i, slotName, boneData);
-//            FREE(slotName);
-//            readColor(input, &slotData->color.r, &slotData->color.g, &slotData->color.b, &slotData->color.a);
-//            r = readByte(input);
-//            g = readByte(input);
-//            b = readByte(input);
-//            a = readByte(input);
-//            if (!(r == 0xff && g == 0xff && b == 0xff && a == 0xff))
-//            {
-//                slotData->darkColor = spColor_create();
-//                spColor_setFromFloats(slotData->darkColor, r / 255.0f, g / 255.0f, b / 255.0f, 1);
-//            }
-//            slotData->attachmentName = readString(input);
-//            slotData->blendMode = (spBlendMode)readVarint(input, 1);
-//            skeletonData->slots[i] = slotData;
-//        }
-//
-//        /* IK constraints. */
-//        skeletonData->ikConstraintsCount = readVarint(input, 1);
-//        skeletonData->ikConstraints = MALLOC(spIkConstraintData*, skeletonData->ikConstraintsCount);
-//        for (i = 0; i < skeletonData->ikConstraintsCount; ++i)
-//        {
-//            const char* name = readString(input);
-//            /* TODO Avoid copying of name */
-//            spIkConstraintData* data = spIkConstraintData_create(name);
-//            data->order = readVarint(input, 1);
-//            FREE(name);
-//            data->bonesCount = readVarint(input, 1);
-//            data->bones = MALLOC(spBoneData*, data->bonesCount);
-//            for (ii = 0; ii < data->bonesCount; ++ii)
-//                data->bones[ii] = skeletonData->bones[readVarint(input, 1)];
-//            data->target = skeletonData->bones[readVarint(input, 1)];
-//            data->mix = readFloat(input);
-//            data->bendDirection = readSByte(input);
-//            skeletonData->ikConstraints[i] = data;
-//        }
-//
-//        /* Transform constraints. */
-//        skeletonData->transformConstraintsCount = readVarint(input, 1);
-//        skeletonData->transformConstraints = MALLOC(spTransformConstraintData*, skeletonData->transformConstraintsCount);
-//        for (i = 0; i < skeletonData->transformConstraintsCount; ++i)
-//        {
-//            const char* name = readString(input);
-//            /* TODO Avoid copying of name */
-//            spTransformConstraintData* data = spTransformConstraintData_create(name);
-//            data->order = readVarint(input, 1);
-//            FREE(name);
-//            data->bonesCount = readVarint(input, 1);
-//            CONST_CAST(spBoneData**, data->bones) = MALLOC(spBoneData*, data->bonesCount);
-//            for (ii = 0; ii < data->bonesCount; ++ii)
-//            {
-//                data->bones[ii] = skeletonData->bones[readVarint(input, 1)];
-//            }
-//            data->target = skeletonData->bones[readVarint(input, 1)];
-//            data->local = readBoolean(input);
-//            data->relative = readBoolean(input);
-//            data->offsetRotation = readFloat(input);
-//            data->offsetX = readFloat(input) * _scale;
-//            data->offsetY = readFloat(input) * _scale;
-//            data->offsetScaleX = readFloat(input);
-//            data->offsetScaleY = readFloat(input);
-//            data->offsetShearY = readFloat(input);
-//            data->rotateMix = readFloat(input);
-//            data->translateMix = readFloat(input);
-//            data->scaleMix = readFloat(input);
-//            data->shearMix = readFloat(input);
-//            skeletonData->transformConstraints[i] = data;
-//        }
-//
-//        /* Path constraints */
-//        skeletonData->pathConstraintsCount = readVarint(input, 1);
-//        skeletonData->pathConstraints = MALLOC(spPathConstraintData*, skeletonData->pathConstraintsCount);
-//        for (i = 0; i < skeletonData->pathConstraintsCount; ++i)
-//        {
-//            const char* name = readString(input);
-//            /* TODO Avoid copying of name */
-//            spPathConstraintData* data = spPathConstraintData_create(name);
-//            data->order = readVarint(input, 1);
-//            FREE(name);
-//            data->bonesCount = readVarint(input, 1);
-//            CONST_CAST(spBoneData**, data->bones) = MALLOC(spBoneData*, data->bonesCount);
-//            for (ii = 0; ii < data->bonesCount; ++ii)
-//            {
-//                data->bones[ii] = skeletonData->bones[readVarint(input, 1)];
-//            }
-//            data->target = skeletonData->slots[readVarint(input, 1)];
-//            data->positionMode = (spPositionMode)readVarint(input, 1);
-//            data->spacingMode = (spSpacingMode)readVarint(input, 1);
-//            data->rotateMode = (spRotateMode)readVarint(input, 1);
-//            data->offsetRotation = readFloat(input);
-//            data->position = readFloat(input);
-//            if (data->positionMode == SP_POSITION_MODE_FIXED) data->position *= _scale;
-//            data->spacing = readFloat(input);
-//            if (data->spacingMode == SP_SPACING_MODE_LENGTH || data->spacingMode == SP_SPACING_MODE_FIXED) data->spacing *= _scale;
-//            data->rotateMix = readFloat(input);
-//            data->translateMix = readFloat(input);
-//            skeletonData->pathConstraints[i] = data;
-//        }
-//
-//        /* Default skin. */
-//        skeletonData->defaultSkin = spSkeletonBinary_readSkin(self, input, "default", skeletonData, nonessential);
-//        skeletonData->skinsCount = readVarint(input, 1);
-//
-//        if (skeletonData->defaultSkin)
-//        {
-//            ++skeletonData->skinsCount;
-//        }
-//
-//        skeletonData->skins = MALLOC(spSkin*, skeletonData->skinsCount);
-//
-//        if (skeletonData->defaultSkin)
-//        {
-//            skeletonData->skins[0] = skeletonData->defaultSkin;
-//        }
-//
-//        /* Skins. */
-//        for (i = skeletonData->defaultSkin ? 1 : 0; i < skeletonData->skinsCount; ++i)
-//        {
-//            const char* skinName = readString(input);
-//            /* TODO Avoid copying of skinName */
-//            skeletonData->skins[i] = spSkeletonBinary_readSkin(self, input, skinName, skeletonData, nonessential);
-//            FREE(skinName);
-//        }
-//
-//        /* Linked meshes. */
-//        for (i = 0; i < internal->linkedMeshCount; ++i)
-//        {
-//            _spLinkedMesh* linkedMesh = internal->linkedMeshes + i;
-//            spSkin* skin = !linkedMesh->skin ? skeletonData->defaultSkin : spSkeletonData_findSkin(skeletonData, linkedMesh->skin);
-//            spAttachment* parent;
-//            if (!skin)
-//            {
-//                FREE(input);
-//                spSkeletonData_dispose(skeletonData);
-//                _spSkeletonBinary_setError(self, "Skin not found: ", linkedMesh->skin);
-//                return 0;
-//            }
-//            parent = spSkin_getAttachment(skin, linkedMesh->slotIndex, linkedMesh->parent);
-//            if (!parent)
-//            {
-//                FREE(input);
-//                spSkeletonData_dispose(skeletonData);
-//                _spSkeletonBinary_setError(self, "Parent mesh not found: ", linkedMesh->parent);
-//                return 0;
-//            }
-//            spMeshAttachment_setParentMesh(linkedMesh->mesh, SUB_CAST(spMeshAttachment, parent));
-//            spMeshAttachment_updateUVs(linkedMesh->mesh);
-//            spAttachmentLoader_configureAttachment(self->attachmentLoader, SUPER(SUPER(linkedMesh->mesh)));
-//        }
-//
-//        /* Events. */
-//        skeletonData->eventsCount = readVarint(input, 1);
-//        skeletonData->events = MALLOC(spEventData*, skeletonData->eventsCount);
-//        for (i = 0; i < skeletonData->eventsCount; ++i)
-//        {
-//            const char* name = readString(input);
-//            /* TODO Avoid copying of skinName */
-//            spEventData* eventData = spEventData_create(name);
-//            FREE(name);
-//            eventData->intValue = readVarint(input, 0);
-//            eventData->floatValue = readFloat(input);
-//            eventData->stringValue = readString(input);
-//            skeletonData->events[i] = eventData;
-//        }
-//
-//        /* Animations. */
-//        skeletonData->animationsCount = readVarint(input, 1);
-//        skeletonData->animations = MALLOC(spAnimation*, skeletonData->animationsCount);
-//        for (i = 0; i < skeletonData->animationsCount; ++i)
-//        {
-//            const char* name = readString(input);
-//            spAnimation* animation = _spSkeletonBinary_readAnimation(self, name, input, skeletonData);
-//            FREE(name);
-//            if (!animation)
-//            {
-//                FREE(input);
-//                spSkeletonData_dispose(skeletonData);
-//                return 0;
-//            }
-//            skeletonData->animations[i] = animation;
-//        }
+        int slotsCount = readVarint(input, 1);
+        skeletonData->_slots.reserve(slotsCount);
+        for (i = 0; i < slotsCount; ++i)
+        {
+            int r, g, b, a;
+            const char* slotName = readString(input);
+            BoneData* boneData = skeletonData->_bones[readVarint(input, 1)];
+            
+            SlotData* slotData = NEW(SlotData);
+            new (slotData) SlotData(i, std::string(slotName), *boneData);
+            
+            FREE(slotName);
+            readColor(input, &slotData->_r, &slotData->_g, &slotData->_b, &slotData->_a);
+            r = readByte(input);
+            g = readByte(input);
+            b = readByte(input);
+            a = readByte(input);
+            if (!(r == 0xff && g == 0xff && b == 0xff && a == 0xff))
+            {
+                slotData->_r2 = r / 255.0f;
+                slotData->_g2 = g / 255.0f;
+                slotData->_b2 = b / 255.0f;
+            }
+            char* slotData_attachmentName = readString(input);
+            slotData->_attachmentName = std::string(slotData_attachmentName);
+            FREE(slotData_attachmentName);
+            slotData->_blendMode = static_cast<BlendMode>(readVarint(input, 1));
+            
+            skeletonData->_slots[i] = slotData;
+        }
+
+        /* IK constraints. */
+        int ikConstraintsCount = readVarint(input, 1);
+        skeletonData->_ikConstraints.reserve(ikConstraintsCount);
+        for (i = 0; i < ikConstraintsCount; ++i)
+        {
+            const char* name = readString(input);
+            
+            IkConstraintData* data = NEW(IkConstraintData);
+            new (data) IkConstraintData(std::string(name));
+            
+            data->_order = readVarint(input, 1);
+            
+            FREE(name);
+            int bonesCount = readVarint(input, 1);
+            data->_bones.reserve(bonesCount);
+            for (ii = 0; ii < bonesCount; ++ii)
+            {
+                data->_bones[ii] = skeletonData->_bones[readVarint(input, 1)];
+            }
+            data->_target = skeletonData->_bones[readVarint(input, 1)];
+            data->_mix = readFloat(input);
+            data->_bendDirection = readSByte(input);
+            
+            skeletonData->_ikConstraints[i] = data;
+        }
+
+        /* Transform constraints. */
+        int transformConstraintsCount = readVarint(input, 1);
+        skeletonData->_transformConstraints.reserve(transformConstraintsCount);
+        for (i = 0; i < transformConstraintsCount; ++i)
+        {
+            const char* name = readString(input);
+            
+            TransformConstraintData* data = NEW(TransformConstraintData);
+            new (data) TransformConstraintData(std::string(name));
+            
+            data->_order = readVarint(input, 1);
+            FREE(name);
+            int bonesCount = readVarint(input, 1);
+            data->_bones.reserve(bonesCount);
+            for (ii = 0; ii < bonesCount; ++ii)
+            {
+                data->_bones[ii] = skeletonData->_bones[readVarint(input, 1)];
+            }
+            data->_target = skeletonData->_bones[readVarint(input, 1)];
+            data->_local = readBoolean(input);
+            data->_relative = readBoolean(input);
+            data->_offsetRotation = readFloat(input);
+            data->_offsetX = readFloat(input) * _scale;
+            data->_offsetY = readFloat(input) * _scale;
+            data->_offsetScaleX = readFloat(input);
+            data->_offsetScaleY = readFloat(input);
+            data->_offsetShearY = readFloat(input);
+            data->_rotateMix = readFloat(input);
+            data->_translateMix = readFloat(input);
+            data->_scaleMix = readFloat(input);
+            data->_shearMix = readFloat(input);
+            
+            skeletonData->_transformConstraints[i] = data;
+        }
+
+        /* Path constraints */
+        int pathConstraintsCount = readVarint(input, 1);
+        skeletonData->_pathConstraints.reserve(pathConstraintsCount);
+        for (i = 0; i < pathConstraintsCount; ++i)
+        {
+            const char* name = readString(input);
+            
+            PathConstraintData* data = NEW(PathConstraintData);
+            new (data) PathConstraintData(std::string(name));
+            
+            data->_order = readVarint(input, 1);
+            FREE(name);
+            
+            int bonesCount = readVarint(input, 1);
+            data->_bones.reserve(bonesCount);
+            for (ii = 0; ii < bonesCount; ++ii)
+            {
+                data->_bones[ii] = skeletonData->_bones[readVarint(input, 1)];
+            }
+            data->_target = skeletonData->_slots[readVarint(input, 1)];
+            data->_positionMode = static_cast<PositionMode>(readVarint(input, 1));
+            data->_spacingMode = static_cast<SpacingMode>(readVarint(input, 1));
+            data->_rotateMode = static_cast<RotateMode>(readVarint(input, 1));
+            data->_offsetRotation = readFloat(input);
+            data->_position = readFloat(input);
+            if (data->_positionMode == PositionMode_Fixed)
+            {
+                data->_position *= _scale;
+            }
+            
+            data->_spacing = readFloat(input);
+            if (data->_spacingMode == SpacingMode_Length || data->_spacingMode == SpacingMode_Fixed)
+            {
+                data->_spacing *= _scale;
+            }
+            data->_rotateMix = readFloat(input);
+            data->_translateMix = readFloat(input);
+            
+            skeletonData->_pathConstraints[i] = data;
+        }
+
+        /* Default skin. */
+        skeletonData->_defaultSkin = readSkin(input, "default", skeletonData, nonessential);
+        int skinsCount = readVarint(input, 1);
+
+        if (skeletonData->_defaultSkin)
+        {
+            ++skinsCount;
+        }
+
+        skeletonData->_skins.reserve(skinsCount);
+
+        if (skeletonData->_defaultSkin)
+        {
+            skeletonData->_skins[0] = skeletonData->_defaultSkin;
+        }
+
+        /* Skins. */
+        for (i = skeletonData->_defaultSkin ? 1 : 0; i < skeletonData->_skins.size(); ++i)
+        {
+            const char* skinName = readString(input);
+            skeletonData->_skins[i] = readSkin(input, skinName, skeletonData, nonessential);
+            FREE(skinName);
+        }
+
+        /* Linked meshes. */
+        for (int i = 0, n = static_cast<int>(_linkedMeshes.size()); i < n; i++)
+        {
+            LinkedMesh* linkedMesh = _linkedMeshes[i];
+            Skin* skin = linkedMesh->_skin.length() == 0 ? skeletonData->getDefaultSkin() : skeletonData->findSkin(linkedMesh->_skin);
+            if (skin == NULL)
+            {
+                FREE(input);
+                DESTROY(SkeletonData, skeletonData);
+                setError("Skin not found: ", linkedMesh->_skin.c_str());
+                return NULL;
+            }
+            Attachment* parent = skin->getAttachment(linkedMesh->_slotIndex, linkedMesh->_parent);
+            if (parent == NULL)
+            {
+                FREE(input);
+                DESTROY(SkeletonData, skeletonData);
+                setError("Parent mesh not found: ", linkedMesh->_parent.c_str());
+                return NULL;
+            }
+            linkedMesh->_mesh->_parentMesh = static_cast<MeshAttachment*>(parent);
+            linkedMesh->_mesh->updateUVs();
+        }
+        _linkedMeshes.clear();
+
+        /* Events. */
+        int eventsCount = readVarint(input, 1);
+        skeletonData->_events.reserve(eventsCount);
+        for (i = 0; i < eventsCount; ++i)
+        {
+            const char* name = readString(input);
+            EventData* eventData = NEW(EventData);
+            new (eventData) EventData(std::string(name));
+            FREE(name);
+            eventData->_intValue = readVarint(input, 0);
+            eventData->_floatValue = readFloat(input);
+            eventData->_stringValue = readString(input);
+            skeletonData->_events[i] = eventData;
+        }
+
+        /* Animations. */
+        int animationsCount = readVarint(input, 1);
+        skeletonData->_animations.reserve(animationsCount);
+        for (i = 0; i < animationsCount; ++i)
+        {
+            const char* name = readString(input);
+            Animation* animation = readAnimation(name, input, skeletonData);
+            FREE(name);
+            if (!animation)
+            {
+                FREE(input);
+                DESTROY(SkeletonData, skeletonData);
+                return NULL;
+            }
+            skeletonData->_animations[i] = animation;
+        }
 
         FREE(input);
         
@@ -403,7 +446,7 @@ namespace Spine
         int length = readVarint(input, 1);
         char* string;
         if (length == 0) {
-            return 0;
+            return NULL;
         }
         string = MALLOC(char, length);
         memcpy(string, input->cursor, length - 1);
@@ -452,6 +495,14 @@ namespace Spine
         return result;
     }
     
+    void SkeletonBinary::readColor(DataInput* input, float *r, float *g, float *b, float *a)
+    {
+        *r = readByte(input) / 255.0f;
+        *g = readByte(input) / 255.0f;
+        *b = readByte(input) / 255.0f;
+        *a = readByte(input) / 255.0f;
+    }
+    
     int SkeletonBinary::readVarint(DataInput* input, bool optimizePositive)
     {
         unsigned char b = readByte(input);
@@ -479,5 +530,712 @@ namespace Spine
         }
         
         return value;
+    }
+    
+    Skin* SkeletonBinary::readSkin(DataInput* input, const char* skinName, SkeletonData* skeletonData, bool nonessential)
+    {
+        Skin* skin = NULL;
+        int slotCount = readVarint(input, 1);
+        int i, ii, nn;
+        if (slotCount == 0)
+        {
+            return 0;
+        }
+        
+        skin = NEW(Skin);
+        new (skin) Skin(std::string(skinName));
+        
+        for (i = 0; i < slotCount; ++i)
+        {
+            int slotIndex = readVarint(input, 1);
+            for (ii = 0, nn = readVarint(input, 1); ii < nn; ++ii)
+            {
+                const char* name = readString(input);
+                Attachment* attachment = readAttachment(input, skin, slotIndex, name, skeletonData, nonessential);
+                if (attachment)
+                {
+                    skin->addAttachment(slotIndex, std::string(name), attachment);
+                }
+                FREE(name);
+            }
+        }
+        
+        return skin;
+    }
+    
+    Attachment* SkeletonBinary::readAttachment(DataInput* input, Skin* skin, int slotIndex, const char* attachmentName, SkeletonData* skeletonData, bool nonessential)
+    {
+        int i;
+        AttachmentType type;
+        const char* name = readString(input);
+        int freeName = name != 0;
+        if (!name)
+        {
+            freeName = 0;
+            name = attachmentName;
+        }
+        
+        type = static_cast<AttachmentType>(readByte(input));
+        
+        switch (type)
+        {
+            case AttachmentType_Region:
+            {
+                const char* path = readString(input);
+                RegionAttachment* region;
+                if (!path)
+                {
+                    path = name;
+                }
+                region = _attachmentLoader->newRegionAttachment(*skin, std::string(name), std::string(path));
+                region->_path = std::string(path);
+                region->_rotation = readFloat(input);
+                region->_x = readFloat(input) * _scale;
+                region->_y = readFloat(input) * _scale;
+                region->_scaleX = readFloat(input);
+                region->_scaleY = readFloat(input);
+                region->_width = readFloat(input) * _scale;
+                region->_height = readFloat(input) * _scale;
+                readColor(input, &region->_r, &region->_g, &region->_b, &region->_a);
+                region->updateOffset();
+                
+                if (freeName)
+                {
+                    FREE(name);
+                }
+                
+                return region;
+            }
+            case AttachmentType_Boundingbox:
+            {
+                int vertexCount = readVarint(input, 1);
+                BoundingBoxAttachment* box = _attachmentLoader->newBoundingBoxAttachment(*skin, std::string(name));
+                readVertices(input, static_cast<VertexAttachment*>(box), vertexCount);
+                if (nonessential)
+                {
+                    /* Skip color. */
+                    readInt(input);
+                }
+                if (freeName)
+                {
+                    FREE(name);
+                }
+                
+                return box;
+            }
+            case AttachmentType_Mesh:
+            {
+                int vertexCount;
+                MeshAttachment* mesh;
+                const char* path = readString(input);
+                if (!path)
+                {
+                    path = name;
+                }
+                mesh = _attachmentLoader->newMeshAttachment(*skin, std::string(name), std::string(path));
+                mesh->_path = std::string(path);
+                readColor(input, &mesh->_r, &mesh->_g, &mesh->_b, &mesh->_a);
+                vertexCount = readVarint(input, 1);
+                Vector<float> float_array = readFloatArray(input, vertexCount << 1, 1);
+                mesh->setRegionUVs(float_array);
+                Vector<short> triangles = readShortArray(input);
+                mesh->setTriangles(triangles);
+                readVertices(input, static_cast<VertexAttachment*>(mesh), vertexCount);
+                mesh->updateUVs();
+                mesh->_hullLength = readVarint(input, 1) << 1;
+                if (nonessential)
+                {
+                    Vector<short> edges = readShortArray(input);
+                    mesh->setEdges(edges);
+                    mesh->_width = readFloat(input) * _scale;
+                    mesh->_height = readFloat(input) * _scale;
+                }
+                else
+                {
+                    mesh->_width = 0;
+                    mesh->_height = 0;
+                }
+                
+                if (freeName)
+                {
+                    FREE(name);
+                }
+                
+                return mesh;
+            }
+            case AttachmentType_Linkedmesh:
+            {
+                const char* skinName;
+                const char* parent;
+                MeshAttachment* mesh;
+                const char* path = readString(input);
+                if (!path)
+                {
+                    path = name;
+                }
+                
+                mesh = _attachmentLoader->newMeshAttachment(*skin, std::string(name), std::string(path));
+                mesh->_path = path;
+                readColor(input, &mesh->_r, &mesh->_g, &mesh->_b, &mesh->_a);
+                skinName = readString(input);
+                parent = readString(input);
+                mesh->_inheritDeform = readBoolean(input);
+                if (nonessential)
+                {
+                    mesh->_width = readFloat(input) * _scale;
+                    mesh->_height = readFloat(input) * _scale;
+                }
+                
+                LinkedMesh* linkedMesh = NEW(LinkedMesh);
+                new (linkedMesh) LinkedMesh(mesh, std::string(skinName), slotIndex, std::string(parent));
+                _linkedMeshes.push_back(linkedMesh);
+                
+                if (freeName)
+                {
+                    FREE(name);
+                }
+                
+                return mesh;
+            }
+            case AttachmentType_Path:
+            {
+                PathAttachment* path = _attachmentLoader->newPathAttachment(*skin, std::string(name));
+                int vertexCount = 0;
+                path->_closed = readBoolean(input);
+                path->_constantSpeed = readBoolean(input);
+                vertexCount = readVarint(input, 1);
+                readVertices(input, static_cast<VertexAttachment*>(path), vertexCount);
+                int lengthsLength = vertexCount / 3;
+                path->_lengths.reserve(lengthsLength);
+                for (i = 0; i < lengthsLength; ++i)
+                {
+                    path->_lengths[i] = readFloat(input) * _scale;
+                }
+                
+                if (nonessential)
+                {
+                    /* Skip color. */
+                    readInt(input);
+                }
+                
+                if (freeName)
+                {
+                    FREE(name);
+                }
+                
+                return path;
+            }
+            case AttachmentType_Point:
+            {
+                PointAttachment* point = _attachmentLoader->newPointAttachment(*skin, std::string(name));
+                point->_rotation = readFloat(input);
+                point->_x = readFloat(input) * _scale;
+                point->_y = readFloat(input) * _scale;
+                
+                if (nonessential)
+                {
+                    /* Skip color. */
+                    readInt(input);
+                }
+                
+                return point;
+            }
+            case AttachmentType_Clipping:
+            {
+                int endSlotIndex = readVarint(input, 1);
+                int vertexCount = readVarint(input, 1);
+                ClippingAttachment* clip = _attachmentLoader->newClippingAttachment(*skin, name);
+                readVertices(input, static_cast<VertexAttachment*>(clip), vertexCount);
+                
+                if (nonessential)
+                {
+                    /* Skip color. */
+                    readInt(input);
+                }
+                
+                clip->_endSlot = skeletonData->_slots[endSlotIndex];
+                
+                if (freeName)
+                {
+                    FREE(name);
+                }
+                
+                return clip;
+            }
+        }
+        
+        if (freeName)
+        {
+            FREE(name);
+        }
+        
+        return NULL;
+    }
+    
+    void SkeletonBinary::readVertices(DataInput* input, VertexAttachment* attachment, int vertexCount)
+    {
+        float scale = _scale;
+        int verticesLength = vertexCount << 1;
+        
+        if (!readBoolean(input))
+        {
+            attachment->setVertices(readFloatArray(input, verticesLength, scale));
+            return;
+        }
+        
+        Vertices vertices;
+        vertices._bones.reserve(verticesLength * 3);
+        vertices._vertices.reserve(verticesLength * 3 * 3);
+        
+        for (int i = 0; i < vertexCount; ++i)
+        {
+            int boneCount = readVarint(input, true);
+            vertices._bones.push_back(boneCount);
+            for (int ii = 0; ii < boneCount; ++ii)
+            {
+                vertices._bones.push_back(readVarint(input, true));
+                vertices._vertices.push_back(readFloat(input) * scale);
+                vertices._vertices.push_back(readFloat(input) * scale);
+                vertices._vertices.push_back(readFloat(input));
+            }
+        }
+        
+        attachment->setVertices(vertices._vertices);
+        attachment->setBones(vertices._bones);
+    }
+    
+    Vector<float> SkeletonBinary::readFloatArray(DataInput *input, int n, float scale)
+    {
+        Vector<float> array;
+        array.reserve(n);
+        
+        int i;
+        if (scale == 1)
+        {
+            for (i = 0; i < n; ++i)
+            {
+                array[i] = readFloat(input);
+            }
+        }
+        else
+        {
+            for (i = 0; i < n; ++i)
+            {
+                array[i] = readFloat(input) * scale;
+            }
+        }
+        
+        return array;
+    }
+    
+    Vector<short> SkeletonBinary::readShortArray(DataInput *input)
+    {
+        int n = readVarint(input, 1);
+        
+        Vector<short> array;
+        array.reserve(n);
+        
+        int i;
+        for (i = 0; i < n; ++i)
+        {
+            array[i] = readByte(input) << 8;
+            array[i] |= readByte(input);
+        }
+        
+        return array;
+    }
+    
+    Animation* SkeletonBinary::readAnimation(const char* name, DataInput* input, SkeletonData *skeletonData)
+    {
+//        var timelines = new ExposedList<Timeline>();
+//        float scale = Scale;
+//        float duration = 0;
+//
+//        // Slot timelines.
+//        for (int i = 0, n = ReadVarint(input, true); i < n; i++)
+//        {
+//            int slotIndex = ReadVarint(input, true);
+//            for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
+//            {
+//                int timelineType = input.ReadByte();
+//                int frameCount = ReadVarint(input, true);
+//                switch (timelineType)
+//                {
+//                    case SLOT_ATTACHMENT:
+//                    {
+//                        AttachmentTimeline timeline = new AttachmentTimeline(frameCount);
+//                        timeline.slotIndex = slotIndex;
+//                        for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+//                        {
+//                            timeline.SetFrame(frameIndex, ReadFloat(input), ReadString(input));
+//                        }
+//                        timelines.Add(timeline);
+//                        duration = Math.Max(duration, timeline.frames[frameCount - 1]);
+//                        break;
+//                    }
+//                    case SLOT_COLOR:
+//                    {
+//                        ColorTimeline timeline = new ColorTimeline(frameCount);
+//                        timeline.slotIndex = slotIndex;
+//                        for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)\
+//                        {
+//                            float time = ReadFloat(input);
+//                            int color = ReadInt(input);
+//                            float r = ((color & 0xff000000) >> 24) / 255f;
+//                            float g = ((color & 0x00ff0000) >> 16) / 255f;
+//                            float b = ((color & 0x0000ff00) >> 8) / 255f;
+//                            float a = ((color & 0x000000ff)) / 255f;
+//                            timeline.SetFrame(frameIndex, time, r, g, b, a);
+//                            if (frameIndex < frameCount - 1)
+//                            {
+//                                ReadCurve(input, frameIndex, timeline);
+//                            }
+//                        }
+//                        timelines.Add(timeline);
+//                        duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * ColorTimeline.ENTRIES]);
+//                        break;
+//                    }
+//                    case SLOT_TWO_COLOR:
+//                    {
+//                        TwoColorTimeline timeline = new TwoColorTimeline(frameCount);
+//                        timeline.slotIndex = slotIndex;
+//                        for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+//                        {
+//                            float time = ReadFloat(input);
+//                            int color = ReadInt(input);
+//                            float r = ((color & 0xff000000) >> 24) / 255f;
+//                            float g = ((color & 0x00ff0000) >> 16) / 255f;
+//                            float b = ((color & 0x0000ff00) >> 8) / 255f;
+//                            float a = ((color & 0x000000ff)) / 255f;
+//                            int color2 = ReadInt(input); // 0x00rrggbb
+//                            float r2 = ((color2 & 0x00ff0000) >> 16) / 255f;
+//                            float g2 = ((color2 & 0x0000ff00) >> 8) / 255f;
+//                            float b2 = ((color2 & 0x000000ff)) / 255f;
+//
+//                            timeline.SetFrame(frameIndex, time, r, g, b, a, r2, g2, b2);
+//                            if (frameIndex < frameCount - 1)
+//                            {
+//                                ReadCurve(input, frameIndex, timeline);
+//                            }
+//                        }
+//                        timelines.Add(timeline);
+//                        duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * TwoColorTimeline.ENTRIES]);
+//                        break;
+//                    }
+//                }
+//            }
+//        }
+//
+//        // Bone timelines.
+//        for (int i = 0, n = ReadVarint(input, true); i < n; i++)
+//        {
+//            int boneIndex = ReadVarint(input, true);
+//            for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
+//            {
+//                int timelineType = input.ReadByte();
+//                int frameCount = ReadVarint(input, true);
+//                switch (timelineType)
+//                {
+//                    case BONE_ROTATE:
+//                    {
+//                        RotateTimeline timeline = new RotateTimeline(frameCount);
+//                        timeline.boneIndex = boneIndex;
+//                        for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+//                        {
+//                            timeline.SetFrame(frameIndex, ReadFloat(input), ReadFloat(input));
+//                            if (frameIndex < frameCount - 1)
+//                            {
+//                                ReadCurve(input, frameIndex, timeline);
+//                            }
+//                        }
+//                        timelines.Add(timeline);
+//                        duration = Math.Max(duration, timeline.frames[(frameCount - 1) * RotateTimeline.ENTRIES]);
+//                        break;
+//                    }
+//                    case BONE_TRANSLATE:
+//                    case BONE_SCALE:
+//                    case BONE_SHEAR:
+//                    {
+//                        TranslateTimeline timeline;
+//                        float timelineScale = 1;
+//                        if (timelineType == BONE_SCALE)
+//                        {
+//                            timeline = new ScaleTimeline(frameCount);
+//                        }
+//                        else if (timelineType == BONE_SHEAR)
+//                        {
+//                            timeline = new ShearTimeline(frameCount);
+//                        }
+//                        else
+//                        {
+//                            timeline = new TranslateTimeline(frameCount);
+//                            timelineScale = scale;
+//                        }
+//                        timeline.boneIndex = boneIndex;
+//                        for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+//                        {
+//                            timeline.SetFrame(frameIndex, ReadFloat(input), ReadFloat(input) * timelineScale, ReadFloat(input)
+//                                              * timelineScale);
+//                            if (frameIndex < frameCount - 1)
+//                            {
+//                                ReadCurve(input, frameIndex, timeline);
+//                            }
+//                        }
+//                        timelines.Add(timeline);
+//                        duration = Math.Max(duration, timeline.frames[(frameCount - 1) * TranslateTimeline.ENTRIES]);
+//                        break;
+//                    }
+//                }
+//            }
+//        }
+//
+//        // IK timelines.
+//        for (int i = 0, n = ReadVarint(input, true); i < n; i++)
+//        {
+//            int index = ReadVarint(input, true);
+//            int frameCount = ReadVarint(input, true);
+//            IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount);
+//            timeline.ikConstraintIndex = index;
+//            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+//            {
+//                timeline.SetFrame(frameIndex, ReadFloat(input), ReadFloat(input), ReadSByte(input));
+//                if (frameIndex < frameCount - 1)
+//                {
+//                    ReadCurve(input, frameIndex, timeline);
+//                }
+//            }
+//            timelines.Add(timeline);
+//            duration = Math.Max(duration, timeline.frames[(frameCount - 1) * IkConstraintTimeline.ENTRIES]);
+//        }
+//
+//        // Transform constraint timelines.
+//        for (int i = 0, n = ReadVarint(input, true); i < n; i++)
+//        {
+//            int index = ReadVarint(input, true);
+//            int frameCount = ReadVarint(input, true);
+//            TransformConstraintTimeline timeline = new TransformConstraintTimeline(frameCount);
+//            timeline.transformConstraintIndex = index;
+//            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+//            {
+//                timeline.SetFrame(frameIndex, ReadFloat(input), ReadFloat(input), ReadFloat(input), ReadFloat(input), ReadFloat(input));
+//                if (frameIndex < frameCount - 1)
+//                {
+//                    ReadCurve(input, frameIndex, timeline);
+//                }
+//            }
+//            timelines.Add(timeline);
+//            duration = Math.Max(duration, timeline.frames[(frameCount - 1) * TransformConstraintTimeline.ENTRIES]);
+//        }
+//
+//        // Path constraint timelines.
+//        for (int i = 0, n = ReadVarint(input, true); i < n; i++)
+//        {
+//            int index = ReadVarint(input, true);
+//            PathConstraintData data = skeletonData.pathConstraints.Items[index];
+//            for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
+//            {
+//                int timelineType = ReadSByte(input);
+//                int frameCount = ReadVarint(input, true);
+//                switch(timelineType)
+//                {
+//                    case PATH_POSITION:
+//                    case PATH_SPACING:
+//                    {
+//                        PathConstraintPositionTimeline timeline;
+//                        float timelineScale = 1;
+//                        if (timelineType == PATH_SPACING)
+//                        {
+//                            timeline = new PathConstraintSpacingTimeline(frameCount);
+//                            if (data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed)
+//                            {
+//                                timelineScale = scale;
+//                            }
+//                        }
+//                        else
+//                        {
+//                            timeline = new PathConstraintPositionTimeline(frameCount);
+//                            if (data.positionMode == PositionMode.Fixed)
+//                            {
+//                                timelineScale = scale;
+//                            }
+//                        }
+//                        timeline.pathConstraintIndex = index;
+//                        for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+//                        {
+//                            timeline.SetFrame(frameIndex, ReadFloat(input), ReadFloat(input) * timelineScale);
+//                            if (frameIndex < frameCount - 1)
+//                            {
+//                                ReadCurve(input, frameIndex, timeline);
+//                            }
+//                        }
+//                        timelines.Add(timeline);
+//                        duration = Math.Max(duration, timeline.frames[(frameCount - 1) * PathConstraintPositionTimeline.ENTRIES]);
+//                        break;
+//                    }
+//                    case PATH_MIX:
+//                    {
+//                        PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(frameCount);
+//                        timeline.pathConstraintIndex = index;
+//                        for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+//                        {
+//                            timeline.SetFrame(frameIndex, ReadFloat(input), ReadFloat(input), ReadFloat(input));
+//                            if (frameIndex < frameCount - 1)
+//                            {
+//                                ReadCurve(input, frameIndex, timeline);
+//                            }
+//                        }
+//                        timelines.Add(timeline);
+//                        duration = Math.Max(duration, timeline.frames[(frameCount - 1) * PathConstraintMixTimeline.ENTRIES]);
+//                        break;
+//                    }
+//                }
+//            }
+//        }
+//
+//        // Deform timelines.
+//        for (int i = 0, n = ReadVarint(input, true); i < n; i++)
+//        {
+//            Skin skin = skeletonData.skins.Items[ReadVarint(input, true)];
+//            for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
+//            {
+//                int slotIndex = ReadVarint(input, true);
+//                for (int iii = 0, nnn = ReadVarint(input, true); iii < nnn; iii++)
+//                {
+//                    VertexAttachment attachment = (VertexAttachment)skin.GetAttachment(slotIndex, ReadString(input));
+//                    bool weighted = attachment.bones != null;
+//                    float[] vertices = attachment.vertices;
+//                    int deformLength = weighted ? vertices.Length / 3 * 2 : vertices.Length;
+//
+//                    int frameCount = ReadVarint(input, true);
+//                    DeformTimeline timeline = new DeformTimeline(frameCount);
+//                    timeline.slotIndex = slotIndex;
+//                    timeline.attachment = attachment;
+//
+//                    for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+//                    {
+//                        float time = ReadFloat(input);
+//                        float[] deform;
+//                        int end = ReadVarint(input, true);
+//                        if (end == 0)
+//                        {
+//                            deform = weighted ? new float[deformLength] : vertices;
+//                        }
+//                        else
+//                        {
+//                            deform = new float[deformLength];
+//                            int start = ReadVarint(input, true);
+//                            end += start;
+//                            if (scale == 1)
+//                            {
+//                                for (int v = start; v < end; v++)
+//                                {
+//                                    deform[v] = ReadFloat(input);
+//                                }
+//                            }
+//                            else
+//                            {
+//                                for (int v = start; v < end; v++)
+//                                {
+//                                    deform[v] = ReadFloat(input) * scale;
+//                                }
+//                            }
+//
+//                            if (!weighted)
+//                            {
+//                                for (int v = 0, vn = deform.Length; v < vn; v++)
+//                                {
+//                                    deform[v] += vertices[v];
+//                                }
+//                            }
+//                        }
+//
+//                        timeline.SetFrame(frameIndex, time, deform);
+//                        if (frameIndex < frameCount - 1)
+//                        {
+//                            ReadCurve(input, frameIndex, timeline);
+//                        }
+//                    }
+//
+//                    timelines.Add(timeline);
+//                    duration = Math.Max(duration, timeline.frames[frameCount - 1]);
+//                }
+//            }
+//        }
+//
+//        // Draw order timeline.
+//        int drawOrderCount = ReadVarint(input, true);
+//        if (drawOrderCount > 0)
+//        {
+//            DrawOrderTimeline timeline = new DrawOrderTimeline(drawOrderCount);
+//            int slotCount = skeletonData.slots.Count;
+//            for (int i = 0; i < drawOrderCount; i++)
+//            {
+//                float time = ReadFloat(input);
+//                int offsetCount = ReadVarint(input, true);
+//                int[] drawOrder = new int[slotCount];
+//                for (int ii = slotCount - 1; ii >= 0; ii--)
+//                {
+//                    drawOrder[ii] = -1;
+//                }
+//                int[] unchanged = new int[slotCount - offsetCount];
+//                int originalIndex = 0, unchangedIndex = 0;
+//                for (int ii = 0; ii < offsetCount; ii++)
+//                {
+//                    int slotIndex = ReadVarint(input, true);
+//                    // Collect unchanged items.
+//                    while (originalIndex != slotIndex)
+//                    {
+//                        unchanged[unchangedIndex++] = originalIndex++;
+//                    }
+//                    // Set changed items.
+//                    drawOrder[originalIndex + ReadVarint(input, true)] = originalIndex++;
+//                }
+//
+//                // Collect remaining unchanged items.
+//                while (originalIndex < slotCount)
+//                {
+//                    unchanged[unchangedIndex++] = originalIndex++;
+//                }
+//
+//                // Fill in unchanged items.
+//                for (int ii = slotCount - 1; ii >= 0; ii--)
+//                {
+//                    if (drawOrder[ii] == -1)
+//                    {
+//                        drawOrder[ii] = unchanged[--unchangedIndex];
+//                    }
+//                }
+//                timeline.SetFrame(i, time, drawOrder);
+//            }
+//            timelines.Add(timeline);
+//            duration = Math.Max(duration, timeline.frames[drawOrderCount - 1]);
+//        }
+//
+//        // Event timeline.
+//        int eventCount = ReadVarint(input, true);
+//        if (eventCount > 0)
+//        {
+//            EventTimeline timeline = new EventTimeline(eventCount);
+//            for (int i = 0; i < eventCount; i++)
+//            {
+//                float time = ReadFloat(input);
+//                EventData eventData = skeletonData.events.Items[ReadVarint(input, true)];
+//                Event e = new Event(time, eventData);
+//                e.Int = ReadVarint(input, false);
+//                e.Float = ReadFloat(input);
+//                e.String = ReadBoolean(input) ? ReadString(input) : eventData.String;
+//                timeline.SetFrame(i, e);
+//            }
+//
+//            timelines.Add(timeline);
+//            duration = Math.Max(duration, timeline.frames[eventCount - 1]);
+//        }
+//
+//        timelines.TrimExcess();
+//
+        Animation* ret = NEW(Animation);
+//        new (ret) Animation(std::string(name), timelines, duration);
+        
+        return ret;
     }
 }

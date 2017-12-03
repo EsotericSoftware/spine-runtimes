@@ -41,6 +41,9 @@ namespace Spine
     
     class TransformConstraintData
     {
+        friend class SkeletonBinary;
+        friend class SkeletonJson;
+        
         friend class TransformConstraint;
         friend class Skeleton;
         friend class TransformConstraintTimeline;

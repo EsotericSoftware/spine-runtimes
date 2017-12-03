@@ -37,6 +37,9 @@ namespace Spine
 {
     class PathAttachment : public VertexAttachment
     {
+        friend class SkeletonBinary;
+        friend class SkeletonJson;
+        
         RTTI_DECL;
         
     public:

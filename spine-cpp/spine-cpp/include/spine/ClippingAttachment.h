@@ -39,9 +39,12 @@ namespace Spine
     
     class ClippingAttachment : public VertexAttachment
     {
-        RTTI_DECL;
+        friend class SkeletonBinary;
+        friend class SkeletonJson;
         
         friend class SkeletonClipping;
+        
+        RTTI_DECL;
         
     public:
         ClippingAttachment(std::string name);

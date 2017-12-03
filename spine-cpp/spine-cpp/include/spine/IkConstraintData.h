@@ -41,6 +41,8 @@ namespace Spine
     
     class IkConstraintData
     {
+        friend class SkeletonBinary;
+        friend class SkeletonJson;
         friend class IkConstraint;
         friend class Skeleton;
         friend class IkConstraintTimeline;

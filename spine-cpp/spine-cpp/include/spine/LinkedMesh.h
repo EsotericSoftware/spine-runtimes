@@ -39,6 +39,9 @@ namespace Spine
     
     class LinkedMesh
     {
+        friend class SkeletonBinary;
+        friend class SkeletonJson;
+        
     public:
         LinkedMesh(MeshAttachment* mesh, std::string skin, int slotIndex, std::string parent);
         

@@ -41,6 +41,9 @@ namespace Spine
     
     class SlotData
     {
+        friend class SkeletonBinary;
+        friend class SkeletonJson;
+        
         friend class AttachmentTimeline;
         friend class ColorTimeline;
         friend class DeformTimeline;
@@ -95,7 +98,7 @@ namespace Spine
         const std::string _name;
         BoneData& _boneData;
         float _r, _g, _b, _a;
-        float _r2, _g2, _b2;
+        float _r2, _g2, _b2, _a2;
         bool _hasSecondColor;
         std::string _attachmentName;
         BlendMode _blendMode;

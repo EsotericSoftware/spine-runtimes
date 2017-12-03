@@ -40,6 +40,8 @@ namespace Spine
     class BoneData
     {
         friend class SkeletonBinary;
+        friend class SkeletonJson;
+        
         friend class AnimationState;
         
         friend class RotateTimeline;

@@ -38,6 +38,8 @@ namespace Spine
     /// Stores the setup pose values for an Event.
     class EventData
     {
+        friend class SkeletonBinary;
+        friend class SkeletonJson;
         friend class Event;
         
     public:

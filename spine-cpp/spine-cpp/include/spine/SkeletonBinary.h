@@ -42,6 +42,10 @@ namespace Spine
     class Atlas;
     class AttachmentLoader;
     class LinkedMesh;
+    class Skin;
+    class Attachment;
+    class VertexAttachment;
+    class Animation;
     
     class SkeletonBinary
     {
@@ -101,15 +105,29 @@ namespace Spine
         
         float readFloat(DataInput* input);
         
-        static unsigned char readByte(DataInput* input);
+        unsigned char readByte(DataInput* input);
         
-        static signed char readSByte(DataInput* input);
+        signed char readSByte(DataInput* input);
         
-        static int readBoolean(DataInput* input);
+        int readBoolean(DataInput* input);
         
-        static int readInt(DataInput* input);
+        int readInt(DataInput* input);
         
-        static int readVarint(DataInput* input, bool optimizePositive);
+        void readColor(DataInput* input, float *r, float *g, float *b, float *a);
+        
+        int readVarint(DataInput* input, bool optimizePositive);
+        
+        Skin* readSkin(DataInput* input, const char* skinName, SkeletonData* skeletonData, bool nonessential);
+        
+        Attachment* readAttachment(DataInput* input, Skin* skin, int slotIndex, const char* attachmentName, SkeletonData* skeletonData, bool nonessential);
+        
+        void readVertices(DataInput* input, VertexAttachment* attachment, int vertexCount);
+        
+        Vector<float> readFloatArray(DataInput *input, int n, float scale);
+        
+        Vector<short> readShortArray(DataInput *input);
+        
+        Animation* readAnimation(const char* name, DataInput* input, SkeletonData *skeletonData);
     };
 }
 

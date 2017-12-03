@@ -45,6 +45,9 @@ namespace Spine
     
     class PathConstraintData
     {
+        friend class SkeletonBinary;
+        friend class SkeletonJson;
+        
         friend class PathConstraint;
         friend class Skeleton;
         friend class PathConstraintMixTimeline;

@@ -46,6 +46,9 @@ namespace Spine
     /// 
     class PointAttachment : public Attachment
     {
+        friend class SkeletonBinary;
+        friend class SkeletonJson;
+        
         RTTI_DECL;
         
     public:

@@ -42,9 +42,11 @@ namespace Spine
     /// Attachment that displays a texture region using a mesh.
     class MeshAttachment : public VertexAttachment
     {
-        RTTI_DECL;
-        
+        friend class SkeletonBinary;
+        friend class SkeletonJson;
         friend class AtlasAttachmentLoader;
+        
+        RTTI_DECL;
         
     public:
         MeshAttachment(std::string name);
@@ -63,8 +65,8 @@ namespace Spine
         Vector<float>& getUVs();
         void setUVs(Vector<float>& inValue);
         
-        Vector<int>& getTriangles();
-        void setTriangles(Vector<int>& inValue);
+        Vector<short>& getTriangles();
+        void setTriangles(Vector<short>& inValue);
         
         float getR();
         void setR(float inValue);
@@ -123,8 +125,8 @@ namespace Spine
         void setParentMesh(MeshAttachment* inValue);
         
         // Nonessential.
-        Vector<int>& getEdges();
-        void setEdges(Vector<int>& inValue);
+        Vector<short>& getEdges();
+        void setEdges(Vector<short>& inValue);
         float getWidth();
         void setWidth(float inValue);
         float getHeight();
@@ -135,8 +137,8 @@ namespace Spine
         MeshAttachment* _parentMesh;
         Vector<float> _uvs;
         Vector<float> _regionUVs;
-        Vector<int> _triangles;
-        Vector<int> _edges;
+        Vector<short> _triangles;
+        Vector<short> _edges;
         void* _rendererObject;
         std::string _path;
         float _regionU;

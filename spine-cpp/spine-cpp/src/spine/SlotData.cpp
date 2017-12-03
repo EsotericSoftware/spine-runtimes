@@ -45,6 +45,7 @@ namespace Spine
     _r2(0),
     _g2(0),
     _b2(0),
+    _a2(1),
     _hasSecondColor(false),
     _attachmentName(),
     _blendMode(BlendMode_Normal)
