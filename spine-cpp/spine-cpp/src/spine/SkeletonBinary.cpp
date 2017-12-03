@@ -440,7 +440,7 @@ namespace Spine
         if (length == 0 || !binary)
         {
             setError("Unable to read skeleton file: ", path);
-            return 0;
+            return NULL;
         }
         skeletonData = readSkeletonData((unsigned char*)binary, length);
         FREE(binary);
@@ -559,7 +559,7 @@ namespace Spine
         int i, ii, nn;
         if (slotCount == 0)
         {
-            return 0;
+            return NULL;
         }
         
         skin = NEW(Skin);
@@ -950,6 +950,12 @@ namespace Spine
                         duration = MAX(duration, timeline->_frames[(frameCount - 1) * TwoColorTimeline::ENTRIES]);
                         break;
                     }
+                    default:
+                    {
+                        ContainerUtil::cleanUpVectorOfPointers(timelines);
+                        setError("Invalid timeline type for a slot: ", skeletonData->_slots[slotIndex]->_name.c_str());
+                        return NULL;
+                    }
                 }
             }
         }
@@ -1015,6 +1021,12 @@ namespace Spine
                         timelines.push_back(timeline);
                         duration = MAX(duration, timeline->_frames[(frameCount - 1) * TranslateTimeline::ENTRIES]);
                         break;
+                    }
+                    default:
+                    {
+                        ContainerUtil::cleanUpVectorOfPointers(timelines);
+                        setError("Invalid timeline type for a bone: ", skeletonData->_bones[boneIndex]->_name.c_str());
+                        return NULL;
                     }
                 }
             }
@@ -1140,9 +1152,21 @@ namespace Spine
                 int slotIndex = readVarint(input, true);
                 for (int iii = 0, nnn = readVarint(input, true); iii < nnn; iii++)
                 {
-                    const char* vertexAttachmentName = readString(input);
-                    VertexAttachment* attachment = static_cast<VertexAttachment*>(skin->getAttachment(slotIndex, std::string(vertexAttachmentName)));
-                    FREE(vertexAttachmentName);
+                    const char* attachmentName = readString(input);
+                    Attachment* baseAttachment = skin->getAttachment(slotIndex, std::string(attachmentName));
+                    
+                    if (!baseAttachment)
+                    {
+                        ContainerUtil::cleanUpVectorOfPointers(timelines);
+                        setError("Attachment not found: ", attachmentName);
+                        FREE(attachmentName);
+                        return NULL;
+                    }
+                    
+                    FREE(attachmentName);
+                    
+                    VertexAttachment* attachment = static_cast<VertexAttachment*>(baseAttachment);
+                    
                     bool weighted = attachment->_bones.size() > 0;
                     Vector<float>& vertices = attachment->_vertices;
                     int deformLength = weighted ? static_cast<int>(vertices.size()) / 3 * 2 : static_cast<int>(vertices.size());
