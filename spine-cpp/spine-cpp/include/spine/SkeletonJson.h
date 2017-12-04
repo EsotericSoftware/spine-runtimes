@@ -33,8 +33,15 @@
 
 #include <spine/Vector.h>
 
+#include <string>
+
 namespace Spine
 {
+    class MeshAttachment;
+    class CurveTimeline;
+    class VertexAttachment;
+    class Animation;
+    class Json;
     class SkeletonData;
     class Atlas;
     class AttachmentLoader;
@@ -49,15 +56,28 @@ namespace Spine
         
         ~SkeletonJson();
         
-        SkeletonData* readSkeletonData(const char* json);
-        
         SkeletonData* readSkeletonDataFile(const char* path);
+        
+        SkeletonData* readSkeletonData(const char* json);
         
     private:
         AttachmentLoader* _attachmentLoader;
         Vector<LinkedMesh*> _linkedMeshes;
         float _scale;
         const bool _ownsLoader;
+        std::string _error;
+        
+        static float toColor(const char* value, int index);
+        
+        static void readCurve(Json* frame, CurveTimeline* timeline, int frameIndex);
+        
+        void addLinkedMesh(MeshAttachment* mesh, const char* skin, int slotIndex, const char* parent);
+        
+        Animation* readAnimation(Json* root, SkeletonData *skeletonData);
+        
+        void readVertices(Json* attachmentMap, VertexAttachment* attachment, int verticesLength);
+        
+        void setError(Json* root, const char* value1, const char* value2);
     };
 }
 
