@@ -62,7 +62,7 @@ namespace Spine
     const int Json::JSON_ARRAY = 5;
     const int Json::JSON_OBJECT = 6;
     
-    const char* Json::JSON_ERROR = NULL;
+    const char* Json::_error = NULL;
     
     Json* Json::getItem(Json *object, const char* string)
     {
@@ -99,7 +99,7 @@ namespace Spine
     
     const char* Json::getError()
     {
-        return JSON_ERROR;
+        return _error;
     }
     
     Json::Json(const char* value) :
@@ -227,7 +227,7 @@ namespace Spine
                 break;
         }
         
-        JSON_ERROR = value;
+        _error = value;
         return NULL; /* failure. */
     }
     
@@ -242,7 +242,7 @@ namespace Spine
         if (*str != '\"')
         {
             /* TODO: don't need this check when called from parseValue, but do need from parseObject */
-            JSON_ERROR = str;
+            _error = str;
             return 0;
         } /* not a string! */
         
@@ -453,8 +453,8 @@ namespace Spine
         }
         else
         {
-            /* Parse failure, JSON_ERROR is set. */
-            JSON_ERROR = num;
+            /* Parse failure, _error is set. */
+            _error = num;
             return NULL;
         }
     }
@@ -520,7 +520,7 @@ namespace Spine
             return value + 1; /* end of array */
         }
         
-        JSON_ERROR = value;
+        _error = value;
         
         return NULL; /* malformed. */
     }
@@ -560,7 +560,7 @@ namespace Spine
         child->_valueString = 0;
         if (*value != ':')
         {
-            JSON_ERROR = value;
+            _error = value;
             return NULL;
         } /* fail! */
         
@@ -594,7 +594,7 @@ namespace Spine
             child->_valueString = 0;
             if (*value != ':')
             {
-                JSON_ERROR = value;
+                _error = value;
                 return NULL;
             } /* fail! */
             
@@ -611,7 +611,7 @@ namespace Spine
             return value + 1; /* end of array */
         }
         
-        JSON_ERROR = value;
+        _error = value;
         
         return NULL; /* malformed. */
     }

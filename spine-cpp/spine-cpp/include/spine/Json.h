@@ -40,6 +40,8 @@ namespace Spine
 {
     class Json
     {
+        friend class SkeletonJson;
+        
     public:
         /* Json Types: */
         static const int JSON_FALSE;
@@ -68,7 +70,7 @@ namespace Spine
         ~Json();
         
     private:
-        static const char* JSON_ERROR;
+        static const char* _error;
         
         Json* _next;
 #if SPINE_JSON_HAVE_PREV

@@ -28,54 +28,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_SkeletonJson_h
-#define Spine_SkeletonJson_h
+#ifndef Spine_Vertices_h
+#define Spine_Vertices_h
 
 #include <spine/Vector.h>
 
-#include <string>
-
 namespace Spine
 {
-    class CurveTimeline;
-    class VertexAttachment;
-    class Animation;
-    class Json;
-    class SkeletonData;
-    class Atlas;
-    class AttachmentLoader;
-    class LinkedMesh;
-    
-    class SkeletonJson
+    class Vertices
     {
     public:
-        SkeletonJson(Vector<Atlas*>& atlasArray);
-        
-        SkeletonJson(AttachmentLoader* attachmentLoader);
-        
-        ~SkeletonJson();
-        
-        SkeletonData* readSkeletonDataFile(const char* path);
-        
-        SkeletonData* readSkeletonData(const char* json);
-        
-    private:
-        AttachmentLoader* _attachmentLoader;
-        Vector<LinkedMesh*> _linkedMeshes;
-        float _scale;
-        const bool _ownsLoader;
-        std::string _error;
-        
-        static float toColor(const char* value, int index);
-        
-        static void readCurve(Json* frame, CurveTimeline* timeline, int frameIndex);
-        
-        Animation* readAnimation(Json* root, SkeletonData *skeletonData);
-        
-        void readVertices(Json* attachmentMap, VertexAttachment* attachment, int verticesLength);
-        
-        void setError(Json* root, const char* value1, const char* value2);
+        Vector<int> _bones;
+        Vector<float> _vertices;
     };
 }
 
-#endif /* Spine_SkeletonJson_h */
+#endif /* Spine_Vertices_h */

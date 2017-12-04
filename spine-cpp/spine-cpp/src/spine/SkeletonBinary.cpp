@@ -38,6 +38,7 @@
 #include <spine/Attachment.h>
 #include <spine/VertexAttachment.h>
 #include <spine/Animation.h>
+#include <spine/CurveTimeline.h>
 
 #include <spine/Extension.h>
 #include <spine/ContainerUtil.h>
@@ -75,6 +76,7 @@
 #include <spine/DrawOrderTimeline.h>
 #include <spine/EventTimeline.h>
 #include <spine/Event.h>
+#include <spine/Vertices.h>
 
 namespace Spine
 {

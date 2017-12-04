@@ -81,13 +81,6 @@ namespace Spine
         SkeletonData* readSkeletonDataFile(const char* path);
         
     private:
-        class Vertices
-        {
-        public:
-            Vector<int> _bones;
-            Vector<float> _vertices;
-        };
-        
         struct DataInput
         {
             const unsigned char* cursor;
