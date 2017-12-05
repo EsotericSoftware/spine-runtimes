@@ -45,12 +45,14 @@ namespace Spine
     public:
         EventTimeline(int frameCount);
         
+        ~EventTimeline();
+        
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction);
         
         virtual int getPropertyId();
         
         /// Sets the time and value of the specified keyframe.
-        void setFrame(int frameIndex, Event* e);
+        void setFrame(int frameIndex, Event* event);
         
         Vector<float> getFrames();
         void setFrames(Vector<float>& inValue);

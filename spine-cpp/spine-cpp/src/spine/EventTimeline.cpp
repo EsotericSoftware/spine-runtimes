@@ -38,6 +38,7 @@
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
 #include <spine/Event.h>
+#include <spine/ContainerUtil.h>
 
 namespace Spine
 {
@@ -47,6 +48,11 @@ namespace Spine
     {
         _frames.reserve(frameCount);
         _events.reserve(frameCount);
+    }
+    
+    EventTimeline::~EventTimeline()
+    {
+        ContainerUtil::cleanUpVectorOfPointers(_events);
     }
     
     void EventTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
@@ -112,10 +118,10 @@ namespace Spine
         return ((int)TimelineType_Event << 24);
     }
     
-    void EventTimeline::setFrame(int frameIndex, Event* e)
+    void EventTimeline::setFrame(int frameIndex, Event* event)
     {
-        _frames[frameIndex] = e->getTime();
-        _events[frameIndex] = e;
+        _frames[frameIndex] = event->getTime();
+        _events[frameIndex] = event;
     }
     
     Vector<float> EventTimeline::getFrames() { return _frames; }
