@@ -345,7 +345,7 @@ VertexOutput vert(VertexInput input)
 	output.color = calculateVertexColor(input.color);
 	output.texcoord = float3(calculateTextureCoord(input.texcoord), 0);
 
-	float3 viewPos = UnityObjectViewPos(input.vertex); //float3 viewPos = mul(UNITY_MATRIX_MV, input.vertex);
+	float3 viewPos = UnityObjectToViewPos(input.vertex);  //float3 viewPos = mul(UNITY_MATRIX_MV, input.vertex); //
 #if defined(FIXED_NORMALS_BACKFACE_RENDERING) || defined(_RIM_LIGHTING)
 	float4 powWorld = calculateWorldPos(input.vertex);
 #endif	
