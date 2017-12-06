@@ -1201,35 +1201,35 @@ namespace Spine
                     for (valueMap = timelineMap->_child, frameIndex = 0; valueMap; valueMap = valueMap->_next, ++frameIndex)
                     {
                         Json* vertices = Json::getItem(valueMap, "vertices");
-                        Vector<float> deform2;
+                        Vector<float> deform;
                         if (!vertices)
                         {
                             if (weighted)
                             {
-                                deform2 = tempDeform;
+                                deform = tempDeform;
                             }
                             else
                             {
-                                deform2 = attachment->_vertices;
+                                deform = attachment->_vertices;
                             }
                         }
                         else
                         {
                             int v, start = Json::getInt(valueMap, "offset", 0);
                             Json* vertex;
-                            deform2 = tempDeform;
+                            deform = tempDeform;
                             if (_scale == 1)
                             {
                                 for (vertex = vertices->_child, v = start; vertex; vertex = vertex->_next, ++v)
                                 {
-                                    deform2[v] = vertex->_valueFloat;
+                                    deform[v] = vertex->_valueFloat;
                                 }
                             }
                             else
                             {
                                 for (vertex = vertices->_child, v = start; vertex; vertex = vertex->_next, ++v)
                                 {
-                                    deform2[v] = vertex->_valueFloat * _scale;
+                                    deform[v] = vertex->_valueFloat * _scale;
                                 }
                             }
                             if (!weighted)
@@ -1237,11 +1237,11 @@ namespace Spine
                                 Vector<float>& verticesAttachment = attachment->_vertices;
                                 for (v = 0; v < deformLength; ++v)
                                 {
-                                    deform2[v] += verticesAttachment[v];
+                                    deform[v] += verticesAttachment[v];
                                 }
                             }
                         }
-                        timeline->setFrame(frameIndex, Json::getFloat(valueMap, "time", 0), deform2);
+                        timeline->setFrame(frameIndex, Json::getFloat(valueMap, "time", 0), deform);
                         readCurve(valueMap, timeline, frameIndex);
                     }
 
