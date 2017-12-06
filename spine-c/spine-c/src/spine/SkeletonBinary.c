@@ -309,8 +309,9 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 					break;
 				}
 				default: {
-					for (iii = 0; iii < kv_size(timelines); ++iii)
-						spTimeline_dispose(kv_A(timelines, iii));
+					int i;
+					for (i = 0; i < kv_size(timelines); ++i)
+						spTimeline_dispose(kv_A(timelines, i));
 					kv_destroy(timelines);
 					_spSkeletonBinary_setError(self, "Invalid timeline type for a slot: ", skeletonData->slots[slotIndex]->name);
 					return 0;
@@ -371,8 +372,9 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 					break;
 				}
 				default: {
-					for (iii = 0; iii < kv_size(timelines); ++iii)
-						spTimeline_dispose(kv_A(timelines, iii));
+					int i;
+					for (i = 0; i < kv_size(timelines); ++i)
+						spTimeline_dispose(kv_A(timelines, i));
 					kv_destroy(timelines);
 					_spSkeletonBinary_setError(self, "Invalid timeline type for a bone: ", skeletonData->bones[boneIndex]->name);
 					return 0;
@@ -482,9 +484,9 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 				spVertexAttachment* attachment = SUB_CAST(spVertexAttachment,
 						spSkin_getAttachment(skin, slotIndex, attachmentName));
 				if (!attachment) {
-					int iiii;
-					for (iiii = 0; iiii < kv_size(timelines); ++iiii)
-						spTimeline_dispose(kv_A(timelines, iiii));
+					int i;
+					for (i = 0; i < kv_size(timelines); ++i)
+						spTimeline_dispose(kv_A(timelines, i));
 					kv_destroy(timelines);
 					_spSkeletonBinary_setError(self, "Attachment not found: ", attachmentName);
 					FREE(attachmentName);
@@ -601,7 +603,7 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 	animation = spAnimation_create(name, 0);
 	FREE(animation->timelines);
 	animation->duration = duration;
-	animation->timelinesCount = (int)kv_size(timelines);
+	animation->timelinesCount = kv_size(timelines);
 	animation->timelines = kv_array(timelines);
 	return animation;
 }
@@ -665,11 +667,11 @@ static void _readVertices(spSkeletonBinary* self, _dataInput* input, spVertexAtt
 	}
 
 	kv_trim(float, weights);
-	attachment->verticesCount = (int)kv_size(weights);
+	attachment->verticesCount = kv_size(weights);
 	attachment->vertices = kv_array(weights);
 
 	kv_trim(int, bones);
-	attachment->bonesCount = (int)kv_size(bones);
+	attachment->bonesCount = kv_size(bones);
 	attachment->bones = kv_array(bones);
 }
 
