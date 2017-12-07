@@ -378,8 +378,7 @@ namespace Spine.Unity.Editor {
 
 			if (m_skeletonAnimation != null && m_skeletonAnimation.state != null) {
 				if (GUILayout.Button(SpineInspectorUtility.TempContent("Setup Pose", Icons.skeleton), GUILayout.Width(105), GUILayout.Height(18))) {
-					StopAnimation();
-					m_skeletonAnimation.skeleton.SetToSetupPose();
+					ClearAnimationSetupPose();
 					m_requireRefresh = true;
 				}
 			} else {
@@ -394,14 +393,10 @@ namespace Spine.Unity.Editor {
 				using (new GUILayout.HorizontalScope()) {
 					if (m_skeletonAnimation != null && m_skeletonAnimation.state != null) {
 						var activeTrack = m_skeletonAnimation.state.GetCurrent(0);
-						if (activeTrack != null && activeTrack.Animation == animation) {
-							if (GUILayout.Button("\u25BA", activePlayButtonStyle, GUILayout.Width(24))) {
-								StopAnimation();
-							}
-						} else {
-							if (GUILayout.Button("\u25BA", idlePlayButtonStyle, GUILayout.Width(24))) {
-								PlayAnimation(animation.Name, true);
-							}
+						bool active = activeTrack != null && activeTrack.Animation == animation;
+						//bool sameAndPlaying = active && activeTrack.TimeScale > 0f;
+						if (GUILayout.Button("\u25BA", active ? activePlayButtonStyle : idlePlayButtonStyle, GUILayout.Width(24))) {
+							PlayPauseAnimation(animation.Name, true);
 						}
 					} else {
 						GUILayout.Label("-", GUILayout.Width(24));
@@ -555,36 +550,62 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		void StopAnimation () {
+		void ClearAnimationSetupPose () {
 			if (m_skeletonAnimation == null) {
 				Debug.LogWarning("Animation was stopped but preview doesn't exist. It's possible that the Preview Panel is closed.");
 			}
 
-			m_skeletonAnimation.state.ClearTrack(0);
-			m_playing = false;
+			m_skeletonAnimation.AnimationState.ClearTracks();
+			m_skeletonAnimation.Skeleton.SetToSetupPose();
 		}
 
 		List<Spine.Event> m_animEvents = new List<Spine.Event>();
 		List<float> m_animEventFrames = new List<float>();
 
-		void PlayAnimation (string animName, bool loop) {
-			m_animEvents.Clear();
-			m_animEventFrames.Clear();
-
-			m_skeletonAnimation.state.SetAnimation(0, animName, loop);
-
-			Spine.Animation a = m_skeletonAnimation.state.GetCurrent(0).Animation;
-			foreach (Timeline t in a.Timelines) {
-				if (t.GetType() == typeof(EventTimeline)) {
-					var et = (EventTimeline)t;
-					for (int i = 0; i < et.Events.Length; i++) {
-						m_animEvents.Add(et.Events[i]);
-						m_animEventFrames.Add(et.Frames[i]);
-					}
-				}
+		void PlayPauseAnimation (string animationName, bool loop) {
+			if (m_skeletonAnimation == null) {
+				Debug.LogWarning("Animation was stopped but preview doesn't exist. It's possible that the Preview Panel is closed.");
 			}
 
-			m_playing = true;
+			var targetAnimation = m_skeletonData.FindAnimation(animationName);
+			if (targetAnimation != null) {
+				var currentTrack = m_skeletonAnimation.AnimationState.GetCurrent(0);
+				bool isEmpty = (currentTrack == null);
+				bool isNewAnimation = isEmpty || currentTrack.Animation != targetAnimation;
+
+				if (isEmpty) {
+					m_skeletonAnimation.Skeleton.SetToSetupPose();
+					m_skeletonAnimation.AnimationState.SetAnimation(0, targetAnimation, loop);
+				} else {					
+					var sameAnimation = (currentTrack.Animation == targetAnimation);
+					if (sameAnimation) {
+						currentTrack.TimeScale = (currentTrack.TimeScale == 0) ? 1f : 0f; // pause/play
+					} else {
+						currentTrack.TimeScale = 1f;
+						m_skeletonAnimation.AnimationState.SetAnimation(0, targetAnimation, loop);
+					}
+				}
+
+				if (isNewAnimation) {
+					m_animEvents.Clear();
+					m_animEventFrames.Clear();
+					foreach (Timeline timeline in targetAnimation.Timelines) {
+						var eventTimeline = timeline as EventTimeline;
+						if (eventTimeline != null) {
+							for (int i = 0; i < eventTimeline.Events.Length; i++) {
+								m_animEvents.Add(eventTimeline.Events[i]);
+								m_animEventFrames.Add(eventTimeline.Frames[i]);
+							}
+						}
+					}
+				}
+
+				currentTrack = m_skeletonAnimation.AnimationState.GetCurrent(0); // currentTrack may have changed when new animation was set.
+				m_playing = currentTrack.TimeScale > 0;
+			} else {
+				Debug.LogFormat("Something went wrong. The Spine.Animation named '{0}' was not found.", animationName);
+			}
+
 		}
 
 		void InitPreview () {
