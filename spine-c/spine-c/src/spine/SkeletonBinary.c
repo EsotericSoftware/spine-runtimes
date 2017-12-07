@@ -262,12 +262,10 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 			unsigned char timelineType = readByte(input);
 			int frameCount = readVarint(input, 1);
 			switch (timelineType) {
-				case SLOT_ATTACHMENT:
-                {
+				case SLOT_ATTACHMENT: {
 					spAttachmentTimeline* timeline = spAttachmentTimeline_create(frameCount);
 					timeline->slotIndex = slotIndex;
-					for (frameIndex = 0; frameIndex < frameCount; ++frameIndex)
-                    {
+					for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
 						float time = readFloat(input);
 						const char* attachmentName = readString(input);
 						/* TODO Avoid copying of attachmentName inside */
