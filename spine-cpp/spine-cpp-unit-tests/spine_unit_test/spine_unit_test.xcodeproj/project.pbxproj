@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BB4E38561FD9C85600709FF2 /* spineboy-ess.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = BB4E38541FD9C85600709FF2 /* spineboy-ess.json */; };
+		BB4E38571FD9C85600709FF2 /* spineboy.atlas in CopyFiles */ = {isa = PBXBuildFile; fileRef = BB4E38551FD9C85600709FF2 /* spineboy.atlas */; };
+		BB4E385A1FD9C86400709FF2 /* raptor.atlas in CopyFiles */ = {isa = PBXBuildFile; fileRef = BB4E38581FD9C86400709FF2 /* raptor.atlas */; };
+		BB4E385B1FD9C86400709FF2 /* raptor-pro.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = BB4E38591FD9C86400709FF2 /* raptor-pro.json */; };
+		BB4E385E1FD9C87700709FF2 /* goblins-pro.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = BB4E385C1FD9C87600709FF2 /* goblins-pro.json */; };
+		BB4E385F1FD9C87700709FF2 /* goblins.atlas in CopyFiles */ = {isa = PBXBuildFile; fileRef = BB4E385D1FD9C87700709FF2 /* goblins.atlas */; };
 		BB6017131FD9289A009BD546 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB6017121FD9289A009BD546 /* main.cpp */; };
 		BB6017A21FD928AC009BD546 /* Attachment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB6017671FD928AC009BD546 /* Attachment.cpp */; };
 		BB6017A31FD928AC009BD546 /* Skeleton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB6017681FD928AC009BD546 /* Skeleton.cpp */; };
@@ -76,6 +82,39 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		BB4E38471FD9C72600709FF2 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = testdata/spineboy;
+			dstSubfolderSpec = 16;
+			files = (
+				BB4E38561FD9C85600709FF2 /* spineboy-ess.json in CopyFiles */,
+				BB4E38571FD9C85600709FF2 /* spineboy.atlas in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BB4E384A1FD9C79D00709FF2 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = testdata/raptor;
+			dstSubfolderSpec = 16;
+			files = (
+				BB4E385A1FD9C86400709FF2 /* raptor.atlas in CopyFiles */,
+				BB4E385B1FD9C86400709FF2 /* raptor-pro.json in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BB4E384B1FD9C79E00709FF2 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = testdata/goblins;
+			dstSubfolderSpec = 16;
+			files = (
+				BB4E385E1FD9C87700709FF2 /* goblins-pro.json in CopyFiles */,
+				BB4E385F1FD9C87700709FF2 /* goblins.atlas in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BB60170D1FD9289A009BD546 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -88,6 +127,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BB4E38541FD9C85600709FF2 /* spineboy-ess.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "spineboy-ess.json"; path = "../../../examples/spineboy/export/spineboy-ess.json"; sourceTree = "<group>"; };
+		BB4E38551FD9C85600709FF2 /* spineboy.atlas */ = {isa = PBXFileReference; lastKnownFileType = text; name = spineboy.atlas; path = ../../../examples/spineboy/export/spineboy.atlas; sourceTree = "<group>"; };
+		BB4E38581FD9C86400709FF2 /* raptor.atlas */ = {isa = PBXFileReference; lastKnownFileType = text; name = raptor.atlas; path = ../../../examples/raptor/export/raptor.atlas; sourceTree = "<group>"; };
+		BB4E38591FD9C86400709FF2 /* raptor-pro.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "raptor-pro.json"; path = "../../../examples/raptor/export/raptor-pro.json"; sourceTree = "<group>"; };
+		BB4E385C1FD9C87600709FF2 /* goblins-pro.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "goblins-pro.json"; path = "../../../examples/goblins/export/goblins-pro.json"; sourceTree = "<group>"; };
+		BB4E385D1FD9C87700709FF2 /* goblins.atlas */ = {isa = PBXFileReference; lastKnownFileType = text; name = goblins.atlas; path = ../../../examples/goblins/export/goblins.atlas; sourceTree = "<group>"; };
 		BB60170F1FD9289A009BD546 /* spine_unit_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = spine_unit_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB6017121FD9289A009BD546 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		BB60171C1FD928AC009BD546 /* DeformTimeline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeformTimeline.h; sourceTree = "<group>"; };
@@ -252,6 +297,12 @@
 		BB6017061FD9289A009BD546 = {
 			isa = PBXGroup;
 			children = (
+				BB4E385C1FD9C87600709FF2 /* goblins-pro.json */,
+				BB4E385D1FD9C87700709FF2 /* goblins.atlas */,
+				BB4E38591FD9C86400709FF2 /* raptor-pro.json */,
+				BB4E38581FD9C86400709FF2 /* raptor.atlas */,
+				BB4E38541FD9C85600709FF2 /* spineboy-ess.json */,
+				BB4E38551FD9C85600709FF2 /* spineboy.atlas */,
 				BB6017F11FD92AF3009BD546 /* tests */,
 				BB6017E81FD929F4009BD546 /* teamcity */,
 				BB6017E41FD929D0009BD546 /* minicppunit */,
@@ -506,6 +557,9 @@
 				BB60170B1FD9289A009BD546 /* Sources */,
 				BB60170C1FD9289A009BD546 /* Frameworks */,
 				BB60170D1FD9289A009BD546 /* CopyFiles */,
+				BB4E38471FD9C72600709FF2 /* CopyFiles */,
+				BB4E384A1FD9C79D00709FF2 /* CopyFiles */,
+				BB4E384B1FD9C79E00709FF2 /* CopyFiles */,
 			);
 			buildRules = (
 			);
