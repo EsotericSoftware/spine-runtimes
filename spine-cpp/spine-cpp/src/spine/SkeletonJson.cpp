@@ -543,237 +543,232 @@ namespace Spine
                             return NULL;
                         }
 
-//                        switch (type)
-//                        {
-//                            case AttachmentType_Region:
-//                            {
-//                                attachment = _attachmentLoader->newRegionAttachment(*skin, attachmentName, attachmentPath);
-//                                if (!attachment)
-//                                {
-//                                    DESTROY(SkeletonData, skeletonData);
-//                                    setError(root, "Error reading attachment: ", skinAttachmentName);
-//                                    return NULL;
-//                                }
-//
-//                                RegionAttachment* region = static_cast<RegionAttachment*>(attachment);
-//                                region->_path = attachmentPath;
-//
-//                                region->_x = Json::getFloat(attachmentMap, "x", 0) * _scale;
-//                                region->_y = Json::getFloat(attachmentMap, "y", 0) * _scale;
-//                                region->_scaleX = Json::getFloat(attachmentMap, "scaleX", 1);
-//                                region->_scaleY = Json::getFloat(attachmentMap, "scaleY", 1);
-//                                region->_rotation = Json::getFloat(attachmentMap, "rotation", 0);
-//                                region->_width = Json::getFloat(attachmentMap, "width", 32) * _scale;
-//                                region->_height = Json::getFloat(attachmentMap, "height", 32) * _scale;
-//
-//                                color = Json::getString(attachmentMap, "color", 0);
-//                                if (color)
-//                                {
-//                                    spColor_setFromFloats(&region->color,
-//                                                          toColor(color, 0),
-//                                                          toColor(color, 1),
-//                                                          toColor(color, 2),
-//                                                          toColor(color, 3));
-//                                }
-//
-//                                region->updateOffset();
-//
-//                                break;
-//                            }
-//                            case AttachmentType_Mesh:
-//                            case AttachmentType_Linkedmesh:
-//                            {
-//                                MeshAttachment* mesh = SUB_CAST(MeshAttachment, attachment);
-//
-//                                MALLOC_STR(mesh->path, attachmentPath);
-//
-//                                color = Json::getString(attachmentMap, "color", 0);
-//                                if (color)
-//                                {
-//                                    spColor_setFromFloats(&mesh->color,
-//                                                          toColor(color, 0),
-//                                                          toColor(color, 1),
-//                                                          toColor(color, 2),
-//                                                          toColor(color, 3));
-//                                }
-//
-//                                mesh->width = Json::getFloat(attachmentMap, "width", 32) * _scale;
-//                                mesh->height = Json::getFloat(attachmentMap, "height", 32) * _scale;
-//
-//                                entry = Json::getItem(attachmentMap, "parent");
-//                                if (!entry)
-//                                {
-//                                    int verticesLength;
-//                                    entry = Json::getItem(attachmentMap, "triangles");
-//                                    mesh->_triangles.reserve(entry->_size);
-//                                    for (entry = entry->_child, ii = 0; entry; entry = entry->_next, ++ii)
-//                                    {
-//                                        mesh->triangles[ii] = (unsigned short)entry->_valueInt;
-//                                    }
-//
-//                                    entry = Json::getItem(attachmentMap, "uvs");
-//                                    verticesLength = entry->_size;
-//                                    mesh->_regionUVs.reserve(verticesLength);
-//                                    for (entry = entry->_child, ii = 0; entry; entry = entry->_next, ++ii)
-//                                    {
-//                                        mesh->regionUVs[ii] = entry->_valueFloat;
-//                                    }
-//
-//                                    _readVertices(self, attachmentMap, SUPER(mesh), verticesLength);
-//
-//                                    MeshAttachment_updateUVs(mesh);
-//
-//                                    mesh->hullLength = Json::getInt(attachmentMap, "hull", 0);
-//
-//                                    entry = Json::getItem(attachmentMap, "edges");
-//                                    if (entry)
-//                                    {
-//                                        mesh->edgesCount = entry->_size;
-//                                        mesh->_edges.reserve(entry->_size);
-//                                        for (entry = entry->_child, ii = 0; entry; entry = entry->_next, ++ii)
-//                                        {
-//                                            mesh->edges[ii] = entry->_valueInt;
-//                                        }
-//                                    }
-//                                }
-//                                else
-//                                {
-//                                    mesh->inheritDeform = Json::getInt(attachmentMap, "deform", 1);
-//                                    _spSkeletonJson_addLinkedMesh(self, SUB_CAST(MeshAttachment, attachment), Json::getString(attachmentMap, "skin", 0), slotIndex,
-//                                                                  entry->_valueString);
-//                                }
-//                                break;
-//                            }
-//                            case AttachmentType_Boundingbox:
-//                            {
-//                                BoundingBoxAttachment* box = SUB_CAST(BoundingBoxAttachment, attachment);
-//                                int vertexCount = Json::getInt(attachmentMap, "vertexCount", 0) << 1;
-//                                _readVertices(self, attachmentMap, SUPER(box), vertexCount);
-//                                box->super.verticesCount = vertexCount;
-//                                break;
-//                            }
-//                            case AttachmentType_Path:
-//                            {
-//                                PathAttachment* pathAttatchment = SUB_CAST(PathAttachment, attachment);
-//                                int vertexCount = 0;
-//                                pathAttatchment->closed = Json::getInt(attachmentMap, "closed", 0);
-//                                pathAttatchment->constantSpeed = Json::getInt(attachmentMap, "constantSpeed", 1);
-//                                vertexCount = Json::getInt(attachmentMap, "vertexCount", 0);
-//                                _readVertices(self, attachmentMap, SUPER(pathAttatchment), vertexCount << 1);
-//
-//                                pathAttatchment->lengthsLength = vertexCount / 3;
-//                                pathAttatchment->_lengths.reserve(vertexCount / 3);
-//
-//                                curves = Json::getItem(attachmentMap, "lengths");
-//                                for (curves = curves->_child, ii = 0; curves; curves = curves->_next, ++ii)
-//                                {
-//                                    pathAttatchment->lengths[ii] = curves->_valueFloat * _scale;
-//                                }
-//                                break;
-//                            }
-//                            case AttachmentType_Point:
-//                            {
-//                                PointAttachment* point = SUB_CAST(PointAttachment, attachment);
-//                                point->x = Json::getFloat(attachmentMap, "x", 0) * _scale;
-//                                point->y = Json::getFloat(attachmentMap, "y", 0) * _scale;
-//                                point->rotation = Json::getFloat(attachmentMap, "rotation", 0);
-//
-//                                color = Json::getString(attachmentMap, "color", 0);
-//                                if (color)
-//                                {
-//                                    spColor_setFromFloats(&point->color,
-//                                                          toColor(color, 0),
-//                                                          toColor(color, 1),
-//                                                          toColor(color, 2),
-//                                                          toColor(color, 3));
-//                                }
-//                                break;
-//                            }
-//                            case AttachmentType_Clipping:
-//                            {
-//                                ClippingAttachment* clip = SUB_CAST(ClippingAttachment, attachment);
-//                                int vertexCount = 0;
-//                                const char* end = Json::getString(attachmentMap, "end", 0);
-//                                if (end)
-//                                {
-//                                    spSlotData* slot = skeletonData->findSlot(end);
-//                                    clip->endSlot = slot;
-//                                }
-//                                vertexCount = Json::getInt(attachmentMap, "vertexCount", 0) << 1;
-//                                _readVertices(self, attachmentMap, SUPER(clip), vertexCount);
-//                                break;
-//                            }
-//                        }
-//
-//                        Skin_addAttachment(skin, slotIndex, skinAttachmentName, attachment);
+                        switch (type)
+                        {
+                            case AttachmentType_Region:
+                            {
+                                attachment = _attachmentLoader->newRegionAttachment(*skin, attachmentName, attachmentPath);
+                                if (!attachment)
+                                {
+                                    DESTROY(SkeletonData, skeletonData);
+                                    setError(root, "Error reading attachment: ", skinAttachmentName);
+                                    return NULL;
+                                }
+
+                                RegionAttachment* region = static_cast<RegionAttachment*>(attachment);
+                                region->_path = attachmentPath;
+
+                                region->_x = Json::getFloat(attachmentMap, "x", 0) * _scale;
+                                region->_y = Json::getFloat(attachmentMap, "y", 0) * _scale;
+                                region->_scaleX = Json::getFloat(attachmentMap, "scaleX", 1);
+                                region->_scaleY = Json::getFloat(attachmentMap, "scaleY", 1);
+                                region->_rotation = Json::getFloat(attachmentMap, "rotation", 0);
+                                region->_width = Json::getFloat(attachmentMap, "width", 32) * _scale;
+                                region->_height = Json::getFloat(attachmentMap, "height", 32) * _scale;
+
+                                color = Json::getString(attachmentMap, "color", 0);
+                                if (color)
+                                {
+                                    region->_r = toColor(color, 0);
+                                    region->_g = toColor(color, 1);
+                                    region->_b = toColor(color, 2);
+                                    region->_a = toColor(color, 3);
+                                }
+
+                                region->updateOffset();
+
+                                break;
+                            }
+                            case AttachmentType_Mesh:
+                            case AttachmentType_Linkedmesh:
+                            {
+                                attachment = _attachmentLoader->newMeshAttachment(*skin, attachmentName, attachmentPath);
+                                
+                                MeshAttachment* mesh = static_cast<MeshAttachment*>(attachment);
+                                mesh->_path = attachmentPath;
+
+                                color = Json::getString(attachmentMap, "color", 0);
+                                if (color)
+                                {
+                                    mesh->_r = toColor(color, 0);
+                                    mesh->_g = toColor(color, 1);
+                                    mesh->_b = toColor(color, 2);
+                                    mesh->_a = toColor(color, 3);
+                                }
+
+                                mesh->_width = Json::getFloat(attachmentMap, "width", 32) * _scale;
+                                mesh->_height = Json::getFloat(attachmentMap, "height", 32) * _scale;
+
+                                entry = Json::getItem(attachmentMap, "parent");
+                                if (!entry)
+                                {
+                                    int verticesLength;
+                                    entry = Json::getItem(attachmentMap, "triangles");
+                                    mesh->_triangles.reserve(entry->_size);
+                                    for (entry = entry->_child, ii = 0; entry; entry = entry->_next, ++ii)
+                                    {
+                                        mesh->_triangles[ii] = (unsigned short)entry->_valueInt;
+                                    }
+
+                                    entry = Json::getItem(attachmentMap, "uvs");
+                                    verticesLength = entry->_size;
+                                    mesh->_regionUVs.reserve(verticesLength);
+                                    for (entry = entry->_child, ii = 0; entry; entry = entry->_next, ++ii)
+                                    {
+                                        mesh->_regionUVs[ii] = entry->_valueFloat;
+                                    }
+
+                                    readVertices(attachmentMap, mesh, verticesLength);
+
+                                    mesh->updateUVs();
+
+                                    mesh->_hullLength = Json::getInt(attachmentMap, "hull", 0);
+
+                                    entry = Json::getItem(attachmentMap, "edges");
+                                    if (entry)
+                                    {
+                                        mesh->_edges.reserve(entry->_size);
+                                        for (entry = entry->_child, ii = 0; entry; entry = entry->_next, ++ii)
+                                        {
+                                            mesh->_edges[ii] = entry->_valueInt;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    mesh->_inheritDeform = Json::getInt(attachmentMap, "deform", 1);
+                                    LinkedMesh* linkedMesh = NEW(LinkedMesh);
+                                    new (linkedMesh) LinkedMesh(mesh, std::string(Json::getString(attachmentMap, "skin", 0)), slotIndex, std::string(entry->_valueString));
+                                    _linkedMeshes.push_back(linkedMesh);
+                                }
+                                break;
+                            }
+                            case AttachmentType_Boundingbox:
+                            {
+                                attachment = _attachmentLoader->newBoundingBoxAttachment(*skin, attachmentName);
+                                
+                                BoundingBoxAttachment* box = static_cast<BoundingBoxAttachment*>(attachment);
+                                
+                                int vertexCount = Json::getInt(attachmentMap, "vertexCount", 0) << 1;
+                                readVertices(attachmentMap, box, vertexCount);
+                                break;
+                            }
+                            case AttachmentType_Path:
+                            {
+                                attachment = _attachmentLoader->newPathAttachment(*skin, attachmentName);
+                                
+                                PathAttachment* pathAttatchment = static_cast<PathAttachment*>(attachment);
+                                
+                                int vertexCount = 0;
+                                pathAttatchment->_closed = Json::getInt(attachmentMap, "closed", 0);
+                                pathAttatchment->_constantSpeed = Json::getInt(attachmentMap, "constantSpeed", 1);
+                                vertexCount = Json::getInt(attachmentMap, "vertexCount", 0);
+                                readVertices(attachmentMap, pathAttatchment, vertexCount << 1);
+
+                                pathAttatchment->_lengths.reserve(vertexCount / 3);
+
+                                curves = Json::getItem(attachmentMap, "lengths");
+                                for (curves = curves->_child, ii = 0; curves; curves = curves->_next, ++ii)
+                                {
+                                    pathAttatchment->_lengths[ii] = curves->_valueFloat * _scale;
+                                }
+                                break;
+                            }
+                            case AttachmentType_Point:
+                            {
+                                attachment = _attachmentLoader->newPointAttachment(*skin, attachmentName);
+                                
+                                PointAttachment* point = static_cast<PointAttachment*>(attachment);
+                                
+                                point->_x = Json::getFloat(attachmentMap, "x", 0) * _scale;
+                                point->_y = Json::getFloat(attachmentMap, "y", 0) * _scale;
+                                point->_rotation = Json::getFloat(attachmentMap, "rotation", 0);
+                                break;
+                            }
+                            case AttachmentType_Clipping:
+                            {
+                                attachment = _attachmentLoader->newClippingAttachment(*skin, attachmentName);
+                                
+                                ClippingAttachment* clip = static_cast<ClippingAttachment*>(attachment);
+                                
+                                int vertexCount = 0;
+                                const char* end = Json::getString(attachmentMap, "end", 0);
+                                if (end)
+                                {
+                                    SlotData* slot = skeletonData->findSlot(end);
+                                    clip->_endSlot = slot;
+                                }
+                                vertexCount = Json::getInt(attachmentMap, "vertexCount", 0) << 1;
+                                readVertices(attachmentMap, clip, vertexCount);
+                                break;
+                            }
+                        }
+
+                        skin->addAttachment(slotIndex, skinAttachmentName, attachment);
                     }
                 }
             }
         }
-
+        
         /* Linked meshes. */
-//        for (i = 0; i < internal->linkedMeshCount; i++)
-//        {
-//            Attachment* parent;
-//            _spLinkedMesh* linkedMesh = internal->linkedMeshes + i;
-//            Skin* skin = !linkedMesh->skin ? skeletonData->_defaultSkin : SkeletonData_findSkin(skeletonData, linkedMesh->skin);
-//            if (!skin)
-//            {
-//                DESTROY(SkeletonData, skeletonData);
-//                setError(root, "Skin not found: ", linkedMesh->skin);
-//                return NULL;
-//            }
-//            parent = Skin_getAttachment(skin, linkedMesh->slotIndex, linkedMesh->parent);
-//            if (!parent)
-//            {
-//                DESTROY(SkeletonData, skeletonData);
-//                setError(root, "Parent mesh not found: ", linkedMesh->parent);
-//                return NULL;
-//            }
-//            MeshAttachment_setParentMesh(linkedMesh->mesh, SUB_CAST(MeshAttachment, parent));
-//            MeshAttachment_updateUVs(linkedMesh->mesh);
-//            AttachmentLoader_configureAttachment(_attachmentLoader, SUPER(SUPER(linkedMesh->mesh)));
-//        }
+        for (int i = 0, n = static_cast<int>(_linkedMeshes.size()); i < n; ++i)
+        {
+            LinkedMesh* linkedMesh = _linkedMeshes[i];
+            Skin* skin = linkedMesh->_skin.length() == 0 ? skeletonData->getDefaultSkin() : skeletonData->findSkin(linkedMesh->_skin);
+            if (skin == NULL)
+            {
+                DESTROY(SkeletonData, skeletonData);
+                setError(root, "Skin not found: ", linkedMesh->_skin.c_str());
+                return NULL;
+            }
+            Attachment* parent = skin->getAttachment(linkedMesh->_slotIndex, linkedMesh->_parent);
+            if (parent == NULL)
+            {
+                DESTROY(SkeletonData, skeletonData);
+                setError(root, "Parent mesh not found: ", linkedMesh->_parent.c_str());
+                return NULL;
+            }
+            linkedMesh->_mesh->_parentMesh = static_cast<MeshAttachment*>(parent);
+            linkedMesh->_mesh->updateUVs();
+        }
+        _linkedMeshes.clear();
 
         /* Events. */
         events = Json::getItem(root, "events");
         if (events)
         {
-//            Json *eventMap;
-//            const char* stringValue;
-//            skeletonData->_events.reserve(events->_size);
-//            for (eventMap = events->_child, i = 0; eventMap; eventMap = eventMap->_next, ++i)
-//            {
-//                EventData* eventData = EventData_create(eventMap->_name);
-//                eventData->intValue = Json::getInt(eventMap, "int", 0);
-//                eventData->floatValue = Json::getFloat(eventMap, "float", 0);
-//                stringValue = Json::getString(eventMap, "string", 0);
-//                if (stringValue)
-//                {
-//                    MALLOC_STR(eventData->stringValue, stringValue);
-//                }
-//                skeletonData->_events[i] = eventData;
-//            }
+            Json *eventMap;
+            skeletonData->_events.reserve(events->_size);
+            for (eventMap = events->_child, i = 0; eventMap; eventMap = eventMap->_next, ++i)
+            {
+                EventData* eventData = NEW(EventData);
+                new (eventData) EventData(std::string(eventMap->_name));
+                
+                eventData->_intValue = Json::getInt(eventMap, "int", 0);
+                eventData->_floatValue = Json::getFloat(eventMap, "float", 0);
+                eventData->_stringValue = Json::getString(eventMap, "string", 0);
+                skeletonData->_events[i] = eventData;
+            }
         }
 
         /* Animations. */
         animations = Json::getItem(root, "animations");
         if (animations)
         {
-//            Json *animationMap;
-//            skeletonData->_animations.reserve(animations->_size);
-//            int animationsIndex = 0;
-//            for (animationMap = animations->_child; animationMap; animationMap = animationMap->_next)
-//            {
-//                Animation* animation = readAnimation(animationMap, skeletonData);
-//                if (!animation)
-//                {
-//                    DESTROY(SkeletonData, SkeletonData);
-//                    DESTROY(Json, root);
-//                    return NULL;
-//                }
-//                skeletonData->_animations[animationsIndex++] = animation;
-//            }
+            Json *animationMap;
+            skeletonData->_animations.reserve(animations->_size);
+            int animationsIndex = 0;
+            for (animationMap = animations->_child; animationMap; animationMap = animationMap->_next)
+            {
+                Animation* animation = readAnimation(animationMap, skeletonData);
+                if (!animation)
+                {
+                    DESTROY(SkeletonData, skeletonData);
+                    DESTROY(Json, root);
+                    return NULL;
+                }
+                skeletonData->_animations[animationsIndex++] = animation;
+            }
         }
 
         DESTROY(Json, root);
