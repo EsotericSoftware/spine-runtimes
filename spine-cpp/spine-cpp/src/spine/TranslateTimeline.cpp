@@ -54,6 +54,7 @@ namespace Spine
     TranslateTimeline::TranslateTimeline(int frameCount) : CurveTimeline(frameCount), _boneIndex(0)
     {
         _frames.reserve(frameCount * ENTRIES);
+        _frames.setSize(frameCount * ENTRIES);
     }
     
     void TranslateTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)

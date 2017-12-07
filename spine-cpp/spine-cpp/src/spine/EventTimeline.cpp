@@ -48,6 +48,9 @@ namespace Spine
     {
         _frames.reserve(frameCount);
         _events.reserve(frameCount);
+        
+        _frames.setSize(frameCount);
+        _events.setSize(frameCount);
     }
     
     EventTimeline::~EventTimeline()

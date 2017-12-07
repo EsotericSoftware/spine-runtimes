@@ -48,7 +48,7 @@ namespace Spine
     _shearY(0),
     _transformMode(TransformMode_Normal)
     {
-        assert(index < 0);
+        assert(index >= 0);
         assert(_name.length() > 0);
     }
     

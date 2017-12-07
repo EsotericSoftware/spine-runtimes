@@ -62,6 +62,7 @@ namespace Spine
     TwoColorTimeline::TwoColorTimeline(int frameCount) : CurveTimeline(frameCount), _slotIndex(0)
     {
         _frames.reserve(frameCount * ENTRIES);
+        _frames.setSize(frameCount * ENTRIES);
     }
     
     void TwoColorTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)

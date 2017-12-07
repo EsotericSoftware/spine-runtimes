@@ -46,6 +46,7 @@ namespace Spine
         assert(frameCount > 0);
         
         _curves.reserve((frameCount - 1) * BEZIER_SIZE);
+        _curves.setSize((frameCount - 1) * BEZIER_SIZE);
     }
     
     int CurveTimeline::getFrameCount()

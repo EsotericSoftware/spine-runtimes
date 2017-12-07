@@ -41,6 +41,7 @@ namespace Spine
         Vector<int>& indices = _indices;
         indices.clear();
         indices.reserve(vertexCount);
+        indices.setSize(vertexCount);
         for (int i = 0; i < vertexCount; ++i)
         {
             indices[i] = i;
@@ -48,6 +49,7 @@ namespace Spine
         
         Vector<bool>& isConcaveArray = _isConcaveArray;
         isConcaveArray.reserve(vertexCount);
+        isConcaveArray.setSize(vertexCount);
         for (int i = 0, n = vertexCount; i < n; ++i)
         {
             isConcaveArray[i] = isConcave(i, vertexCount, vertices, indices);
@@ -137,16 +139,16 @@ namespace Spine
         return triangles;
     }
     
-    Vector<Vector<float>* > Triangulator::decompose(Vector<float>& vertices, Vector<int>& triangles)
+    Vector< Vector<float>* > Triangulator::decompose(Vector<float>& vertices, Vector<int>& triangles)
     {
-        Vector<Vector<float>* >&convexPolygons = _convexPolygons;
+        Vector< Vector<float>* >&convexPolygons = _convexPolygons;
         for (size_t i = 0, n = convexPolygons.size(); i < n; ++i)
         {
             _polygonPool.free(convexPolygons[i]);
         }
         convexPolygons.clear();
         
-        Vector<Vector<int>* > convexPolygonsIndices = _convexPolygonsIndices;
+        Vector< Vector<int>* > convexPolygonsIndices = _convexPolygonsIndices;
         for (size_t i = 0, n = convexPolygonsIndices.size(); i < n; ++i)
         {
             _polygonIndicesPool.free(convexPolygonsIndices[i]);

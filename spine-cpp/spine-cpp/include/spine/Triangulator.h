@@ -41,18 +41,18 @@ namespace Spine
     public:
         Vector<int>& triangulate(Vector<float>& vertices);
         
-        Vector<Vector<float>* > decompose(Vector<float>& vertices, Vector<int>& triangles);
+        Vector< Vector<float>* > decompose(Vector<float>& vertices, Vector<int>& triangles);
         
     private:
-        Vector<Vector<float>* > _convexPolygons;
-        Vector<Vector<int>* > _convexPolygonsIndices;
+        Vector< Vector<float>* > _convexPolygons;
+        Vector< Vector<int>* > _convexPolygonsIndices;
         
         Vector<int> _indices;
         Vector<bool> _isConcaveArray;
         Vector<int> _triangles;
         
-        Pool<Vector<float> > _polygonPool;
-        Pool<Vector<int> > _polygonIndicesPool;
+        Pool< Vector<float> > _polygonPool;
+        Pool< Vector<int> > _polygonIndicesPool;
         
         static bool isConcave(int index, int vertexCount, Vector<float>& vertices, Vector<int>& indices);
         

@@ -162,6 +162,7 @@ namespace Spine
         /* Bones. */
         int bonesCount = readVarint(input, 1);
         skeletonData->_bones.reserve(bonesCount);
+        skeletonData->_bones.setSize(bonesCount);
         for (i = 0; i < bonesCount; ++i)
         {
             BoneData* data;
@@ -215,6 +216,7 @@ namespace Spine
         /* Slots. */
         int slotsCount = readVarint(input, 1);
         skeletonData->_slots.reserve(slotsCount);
+        skeletonData->_slots.setSize(slotsCount);
         for (i = 0; i < slotsCount; ++i)
         {
             int r, g, b, a;
@@ -247,6 +249,7 @@ namespace Spine
         /* IK constraints. */
         int ikConstraintsCount = readVarint(input, 1);
         skeletonData->_ikConstraints.reserve(ikConstraintsCount);
+        skeletonData->_ikConstraints.setSize(ikConstraintsCount);
         for (i = 0; i < ikConstraintsCount; ++i)
         {
             const char* name = readString(input);
@@ -259,6 +262,7 @@ namespace Spine
             FREE(name);
             int bonesCount = readVarint(input, 1);
             data->_bones.reserve(bonesCount);
+            data->_bones.setSize(bonesCount);
             for (ii = 0; ii < bonesCount; ++ii)
             {
                 data->_bones[ii] = skeletonData->_bones[readVarint(input, 1)];
@@ -273,6 +277,7 @@ namespace Spine
         /* Transform constraints. */
         int transformConstraintsCount = readVarint(input, 1);
         skeletonData->_transformConstraints.reserve(transformConstraintsCount);
+        skeletonData->_transformConstraints.setSize(transformConstraintsCount);
         for (i = 0; i < transformConstraintsCount; ++i)
         {
             const char* name = readString(input);
@@ -284,6 +289,7 @@ namespace Spine
             FREE(name);
             int bonesCount = readVarint(input, 1);
             data->_bones.reserve(bonesCount);
+            data->_bones.setSize(bonesCount);
             for (ii = 0; ii < bonesCount; ++ii)
             {
                 data->_bones[ii] = skeletonData->_bones[readVarint(input, 1)];
@@ -308,6 +314,7 @@ namespace Spine
         /* Path constraints */
         int pathConstraintsCount = readVarint(input, 1);
         skeletonData->_pathConstraints.reserve(pathConstraintsCount);
+        skeletonData->_pathConstraints.setSize(pathConstraintsCount);
         for (i = 0; i < pathConstraintsCount; ++i)
         {
             const char* name = readString(input);
@@ -320,6 +327,7 @@ namespace Spine
             
             int bonesCount = readVarint(input, 1);
             data->_bones.reserve(bonesCount);
+            data->_bones.setSize(bonesCount);
             for (ii = 0; ii < bonesCount; ++ii)
             {
                 data->_bones[ii] = skeletonData->_bones[readVarint(input, 1)];
@@ -356,6 +364,7 @@ namespace Spine
         }
 
         skeletonData->_skins.reserve(skinsCount);
+        skeletonData->_skins.setSize(skinsCount);
 
         if (skeletonData->_defaultSkin)
         {
@@ -398,6 +407,7 @@ namespace Spine
         /* Events. */
         int eventsCount = readVarint(input, 1);
         skeletonData->_events.reserve(eventsCount);
+        skeletonData->_events.setSize(eventsCount);
         for (i = 0; i < eventsCount; ++i)
         {
             const char* name = readString(input);
@@ -415,6 +425,7 @@ namespace Spine
         /* Animations. */
         int animationsCount = readVarint(input, 1);
         skeletonData->_animations.reserve(animationsCount);
+        skeletonData->_animations.setSize(animationsCount);
         for (i = 0; i < animationsCount; ++i)
         {
             const char* name = readString(input);
@@ -732,6 +743,7 @@ namespace Spine
                 readVertices(input, static_cast<VertexAttachment*>(path), vertexCount);
                 int lengthsLength = vertexCount / 3;
                 path->_lengths.reserve(lengthsLength);
+                path->_lengths.setSize(lengthsLength);
                 for (i = 0; i < lengthsLength; ++i)
                 {
                     path->_lengths[i] = readFloat(input) * _scale;
@@ -833,6 +845,7 @@ namespace Spine
     {
         Vector<float> array;
         array.reserve(n);
+        array.setSize(n);
         
         int i;
         if (scale == 1)
@@ -859,6 +872,7 @@ namespace Spine
         
         Vector<short> array;
         array.reserve(n);
+        array.setSize(n);
         
         int i;
         for (i = 0; i < n; ++i)
@@ -1191,6 +1205,10 @@ namespace Spine
                             if (weighted)
                             {
                                 deform.reserve(deformLength);
+                                for (int i = 0; i < deformLength; ++i)
+                                {
+                                    deform.push_back(0);
+                                }
                             }
                             else
                             {

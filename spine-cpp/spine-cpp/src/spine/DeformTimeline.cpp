@@ -48,6 +48,14 @@ namespace Spine
     {
         _frames.reserve(frameCount);
         _frameVertices.reserve(frameCount);
+        
+        _frames.setSize(frameCount);
+        
+        for (int i = 0; i < frameCount; ++i)
+        {
+            Vector<float> vec;
+            _frameVertices.push_back(vec);
+        }
     }
     
     void DeformTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
@@ -90,6 +98,7 @@ namespace Spine
                     
                     // Ensure size and preemptively set count.
                     vertices.reserve(vertexCount);
+                    vertices.setSize(vertexCount);
                     
                     if (vertexAttachment->_bones.size() == 0)
                     {
@@ -117,6 +126,7 @@ namespace Spine
         
         // Ensure size and preemptively set count.
         vertices.reserve(vertexCount);
+        vertices.setSize(vertexCount);
         
         if (time >= _frames[_frames.size() - 1])
         {

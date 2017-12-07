@@ -46,6 +46,13 @@ namespace Spine
     {
         _frames.reserve(frameCount);
         _attachmentNames.reserve(frameCount);
+        
+        _frames.setSize(frameCount);
+        
+        for (int i = 0; i < frameCount; ++i)
+        {
+            _attachmentNames.push_back(std::string(""));
+        }
     }
     
     void AttachmentTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)

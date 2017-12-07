@@ -119,7 +119,7 @@ namespace Spine
         int dirLength = (int)strlen(dir);
         int needsSlash = dirLength > 0 && dir[dirLength - 1] != '/' && dir[dirLength - 1] != '\\';
 
-        AtlasPage *page = 0;
+        AtlasPage *page = NULL;
         Str str;
         Str tuple[4];
 
@@ -140,7 +140,7 @@ namespace Spine
                 }
                 strcpy(path + dirLength + needsSlash, name);
 
-                AtlasPage* page = NEW(AtlasPage);
+                page = NEW(AtlasPage);
                 new (page) AtlasPage(std::string(name));
 
                 FREE(name);
@@ -228,6 +228,7 @@ namespace Spine
                 {
                     /* split is optional */
                     region->splits.reserve(4);
+                    region->splits.setSize(4);
                     region->splits[0] = toInt(tuple);
                     region->splits[1] = toInt(tuple + 1);
                     region->splits[2] = toInt(tuple + 2);
@@ -240,6 +241,7 @@ namespace Spine
                     {
                         /* pad is optional, but only present with splits */
                         region->pads.reserve(4);
+                        region->pads.setSize(4);
                         region->pads[0] = toInt(tuple);
                         region->pads[1] = toInt(tuple + 1);
                         region->pads[2] = toInt(tuple + 2);

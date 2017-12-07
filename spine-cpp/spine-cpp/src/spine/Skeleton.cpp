@@ -54,8 +54,8 @@
 
 namespace Spine
 {
-    Skeleton::Skeleton(SkeletonData& data) :
-    _data(data),
+    Skeleton::Skeleton(SkeletonData& skeletonData) :
+    _data(skeletonData),
     _skin(NULL),
     _r(1),
     _g(1),
@@ -492,6 +492,7 @@ namespace Spine
                 if (outVertexBuffer.size() < 8)
                 {
                     outVertexBuffer.reserve(8);
+                    outVertexBuffer.setSize(8);
                 }
                 regionAttachment->computeWorldVertices(slot->getBone(), outVertexBuffer, 0);
             }
@@ -503,6 +504,7 @@ namespace Spine
                 if (outVertexBuffer.size() < verticesLength)
                 {
                     outVertexBuffer.reserve(verticesLength);
+                    outVertexBuffer.setSize(verticesLength);
                 }
 
                 mesh->computeWorldVertices(*slot, 0, verticesLength, outVertexBuffer, 0);

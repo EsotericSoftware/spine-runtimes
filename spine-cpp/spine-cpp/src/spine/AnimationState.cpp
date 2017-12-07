@@ -161,8 +161,10 @@ namespace Spine
         Vector<Timeline*>& timelines = _animation->_timelines;
         int timelinesCount = static_cast<int>(timelines.size());
         _timelineData.reserve(timelinesCount);
+        _timelineData.setSize(timelinesCount);
         _timelineDipMix.clear();
         _timelineDipMix.reserve(timelinesCount);
+        _timelineDipMix.setSize(timelinesCount);
         
         // outer:
         for (int i = 0; i < timelinesCount; ++i)
@@ -491,6 +493,7 @@ namespace Spine
                 if (firstFrame)
                 {
                     current._timelinesRotation.reserve(timelines.size() << 1);
+                    current._timelinesRotation.setSize(timelines.size() << 1);
                 }
                 Vector<float>& timelinesRotation = current._timelinesRotation;
                 
@@ -906,6 +909,7 @@ namespace Spine
         {
             // from.timelinesRotation.setSize
             from->_timelinesRotation.reserve(timelines.size() << 1);
+            from->_timelinesRotation.setSize(timelines.size() << 1);
         }
         
         Vector<float>& timelinesRotation = from->_timelinesRotation;

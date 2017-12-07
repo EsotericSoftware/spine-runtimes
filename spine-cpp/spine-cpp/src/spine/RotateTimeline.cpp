@@ -45,6 +45,7 @@ namespace Spine
     RotateTimeline::RotateTimeline(int frameCount) : CurveTimeline(frameCount), _boneIndex(0)
     {
         _frames.reserve(frameCount << 1);
+        _frames.setSize(frameCount << 1);
     }
     
     void RotateTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)

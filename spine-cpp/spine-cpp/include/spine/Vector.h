@@ -192,6 +192,11 @@ namespace Spine
             }
         }
         
+        void setSize(size_t inValue)
+        {
+            _size = inValue;
+        }
+        
         T* begin()
         {
             return &_buffer[0];
@@ -243,7 +248,10 @@ namespace Spine
         
         void deallocate(T* buffer)
         {
-            FREE(buffer);
+            if (_buffer)
+            {
+                FREE(buffer);
+            }
         }
         
         void construct(T* buffer, const T& val)

@@ -46,6 +46,14 @@ namespace Spine
     {
         _frames.reserve(frameCount);
         _drawOrders.reserve(frameCount);
+        
+        _frames.setSize(frameCount);
+        
+        for (int i = 0; i < frameCount; ++i)
+        {
+            Vector<int> vec;
+            _drawOrders.push_back(vec);
+        }
     }
     
     void DrawOrderTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)

@@ -54,6 +54,7 @@ namespace Spine
     IkConstraintTimeline::IkConstraintTimeline(int frameCount) : CurveTimeline(frameCount), _ikConstraintIndex(0)
     {
         _frames.reserve(frameCount * ENTRIES);
+        _frames.setSize(frameCount * ENTRIES);
     }
     
     void IkConstraintTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)

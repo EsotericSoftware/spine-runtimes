@@ -52,6 +52,7 @@ namespace Spine
     PathConstraintPositionTimeline::PathConstraintPositionTimeline(int frameCount) : CurveTimeline(frameCount), _pathConstraintIndex(0)
     {
         _frames.reserve(frameCount * ENTRIES);
+        _frames.setSize(frameCount * ENTRIES);
     }
     
     void PathConstraintPositionTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)

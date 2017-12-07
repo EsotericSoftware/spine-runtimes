@@ -71,7 +71,7 @@ namespace Spine
         friend class TwoColorTimeline;
         
     public:
-        Skeleton(SkeletonData& data);
+        Skeleton(SkeletonData& skeletonData);
         
         ~Skeleton();
         

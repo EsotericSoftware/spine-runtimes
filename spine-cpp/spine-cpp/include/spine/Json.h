@@ -105,7 +105,7 @@ namespace Spine
         /* Build an object from the text. */
         static const char* parseObject(Json *item, const char* value);
         
-        static int strcasecmp(const char* s1, const char* s2);
+        static int json_strcasecmp(const char* s1, const char* s2);
     };
 }
 

@@ -67,8 +67,8 @@ namespace Spine
         if (_uvs.size() != _regionUVs.size())
         {
             _uvs.reserve(_regionUVs.size());
+            _uvs.setSize(_regionUVs.size());
         }
-        
         
         if (_regionRotate)
         {

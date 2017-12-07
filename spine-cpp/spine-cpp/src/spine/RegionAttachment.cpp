@@ -76,6 +76,9 @@ namespace Spine
     {
         _offset.reserve(NUM_UVS);
         _uvs.reserve(NUM_UVS);
+        
+        _offset.setSize(NUM_UVS);
+        _uvs.setSize(NUM_UVS);
     }
     
     void RegionAttachment::updateOffset()

@@ -67,7 +67,7 @@ namespace Spine
     Json* Json::getItem(Json *object, const char* string)
     {
         Json *c = object->_child;
-        while (c && strcasecmp(c->_name, string))
+        while (c && json_strcasecmp(c->_name, string))
         {
             c = c->_next;
         }
@@ -616,7 +616,7 @@ namespace Spine
         return NULL; /* malformed. */
     }
     
-    int Json::strcasecmp(const char* s1, const char* s2)
+    int Json::json_strcasecmp(const char* s1, const char* s2)
     {
         /* TODO we may be able to elide these NULL checks if we can prove
          * the graph and input (only callsite is Json_getItem) should not have NULLs

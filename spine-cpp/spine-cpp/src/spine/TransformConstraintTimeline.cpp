@@ -58,6 +58,7 @@ namespace Spine
     TransformConstraintTimeline::TransformConstraintTimeline(int frameCount) : CurveTimeline(frameCount), _transformConstraintIndex(0)
     {
         _frames.reserve(frameCount * ENTRIES);
+        _frames.setSize(frameCount * ENTRIES);
     }
     
     void TransformConstraintTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)

@@ -64,7 +64,7 @@ namespace Spine
         ContainerUtil::cleanUpVectorOfPointers(_slots);
         ContainerUtil::cleanUpVectorOfPointers(_skins);
         
-        delete _defaultSkin;
+        _defaultSkin = NULL;
         
         ContainerUtil::cleanUpVectorOfPointers(_events);
         ContainerUtil::cleanUpVectorOfPointers(_animations);
