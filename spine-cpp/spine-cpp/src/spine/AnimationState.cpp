@@ -48,7 +48,7 @@
 
 namespace Spine
 {
-    void dummyOnAnimationEventFunc(AnimationState& state, EventType type, TrackEntry* entry, Event* event = NULL)
+    void dummyOnAnimationEventFunc(AnimationState* state, EventType type, TrackEntry* entry, Event* event = NULL)
     {
         // Empty
     }
@@ -320,22 +320,22 @@ namespace Spine
                 case EventType_Start:
                 case EventType_Interrupt:
                 case EventType_Complete:
-                    trackEntry->_onAnimationEventFunc(state, queueEntry->_type, trackEntry, NULL);
-                    state._onAnimationEventFunc(state, queueEntry->_type, trackEntry, NULL);
+                    trackEntry->_onAnimationEventFunc(&state, queueEntry->_type, trackEntry, NULL);
+                    state._onAnimationEventFunc(&state, queueEntry->_type, trackEntry, NULL);
                     break;
                 case EventType_End:
-                    trackEntry->_onAnimationEventFunc(state, queueEntry->_type, trackEntry, NULL);
-                    state._onAnimationEventFunc(state, queueEntry->_type, trackEntry, NULL);
+                    trackEntry->_onAnimationEventFunc(&state, queueEntry->_type, trackEntry, NULL);
+                    state._onAnimationEventFunc(&state, queueEntry->_type, trackEntry, NULL);
                     /* Yes, we want to fall through here */
                 case EventType_Dispose:
-                    trackEntry->_onAnimationEventFunc(state, EventType_Dispose, trackEntry, NULL);
-                    state._onAnimationEventFunc(state, EventType_Dispose, trackEntry, NULL);
+                    trackEntry->_onAnimationEventFunc(&state, EventType_Dispose, trackEntry, NULL);
+                    state._onAnimationEventFunc(&state, EventType_Dispose, trackEntry, NULL);
                     trackEntry->reset();
                     _trackEntryPool.free(trackEntry);
                     break;
                 case EventType_Event:
-                    trackEntry->_onAnimationEventFunc(state, queueEntry->_type, trackEntry, queueEntry->_event);
-                    state._onAnimationEventFunc(state, queueEntry->_type, trackEntry, queueEntry->_event);
+                    trackEntry->_onAnimationEventFunc(&state, queueEntry->_type, trackEntry, queueEntry->_event);
+                    state._onAnimationEventFunc(&state, queueEntry->_type, trackEntry, queueEntry->_event);
                     break;
             }
         }
@@ -730,6 +730,16 @@ namespace Spine
     void AnimationState::setOnAnimationEventFunc(OnAnimationEventFunc inValue)
     {
         _onAnimationEventFunc = inValue;
+    }
+    
+    void AnimationState::setRendererObject(void* inValue)
+    {
+        _rendererObject = inValue;
+    }
+    
+    void* AnimationState::getRendererObject()
+    {
+        return _rendererObject;
     }
     
     Animation* AnimationState::getEmptyAnimation()

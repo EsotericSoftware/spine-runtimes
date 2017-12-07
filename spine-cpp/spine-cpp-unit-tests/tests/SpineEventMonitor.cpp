@@ -2,7 +2,12 @@
 
 #include "KString.h"
 
+#include <spine/Animation.h>
+#include <spine/Event.h>
+
 #include "KMemory.h" // Last include
+
+using namespace Spine;
 
 SpineEventMonitor::SpineEventMonitor(AnimationState* _pAnimationState /*= nullptr*/)
 {
@@ -17,53 +22,53 @@ SpineEventMonitor::~SpineEventMonitor()
 
 void SpineEventMonitor::RegisterListener(AnimationState * _pAnimationState)
 {
-//    if (_pAnimationState)
-//    {
-//        _pAnimationState->rendererObject = this;
-//        _pAnimationState->listener = (spAnimationStateListener)&SpineEventMonitor::spineAnimStateHandler;
-//    }
-//    pAnimState = _pAnimationState;
+    if (_pAnimationState)
+    {
+        _pAnimationState->setRendererObject(this);
+        _pAnimationState->setOnAnimationEventFunc(&SpineEventMonitor::spineAnimStateHandler);
+    }
+    pAnimState = _pAnimationState;
 }
 
 bool SpineEventMonitor::isAnimationPlaying()
 {
-//    if (pAnimState)
-//    {
-//        return spAnimationState_getCurrent(pAnimState, 0) != 0;
-//    }
+    if (pAnimState)
+    {
+        return pAnimState->getCurrent(0) != NULL;
+    }
 	return false;
 }
 
-void SpineEventMonitor::spineAnimStateHandler(AnimationState * state, int type, spTrackEntry * entry, spEvent * event)
+void SpineEventMonitor::spineAnimStateHandler(AnimationState* state, EventType type, TrackEntry* entry, Event* event)
 {
-//    if (state && state->rendererObject)
-//    {
-//        SpineEventMonitor* pEventMonitor = (SpineEventMonitor*)state->rendererObject;
-//        pEventMonitor->OnSpineAnimationStateEvent(state, type, entry, event);
-//    }
+    if (state && state->getRendererObject())
+    {
+        SpineEventMonitor* pEventMonitor = (SpineEventMonitor*)state->getRendererObject();
+        pEventMonitor->OnSpineAnimationStateEvent(state, type, entry, event);
+    }
 }
 
-void SpineEventMonitor::OnSpineAnimationStateEvent(AnimationState * state, int type, spTrackEntry * trackEntry, spEvent * event)
+void SpineEventMonitor::OnSpineAnimationStateEvent(AnimationState* state, EventType type, TrackEntry* entry, Event* event)
 {
-//    const char* eventName = 0;
-//    if (state == pAnimState)
-//    {
-//        // only monitor ours
-//        switch(type)
-//        {
-//        case SP_ANIMATION_START: eventName = "SP_ANIMATION_START"; break;
-//        case SP_ANIMATION_INTERRUPT: eventName = "SP_ANIMATION_INTERRUPT"; break;
-//        case SP_ANIMATION_END: eventName = "SP_ANIMATION_END"; break;
-//        case SP_ANIMATION_COMPLETE: eventName = "SP_ANIMATION_COMPLETE"; break;
-//        case SP_ANIMATION_DISPOSE: eventName = "SP_ANIMATION_DISPOSE"; break;
-//        case SP_ANIMATION_EVENT: eventName = "SP_ANIMATION_EVENT"; break;
-//        default:
-//            break;
-//        }
-//
-//        if (bLogging && eventName && trackEntry && trackEntry->animation && trackEntry->animation->name)
-//            KOutputDebug(DEBUGLVL, "[%s : '%s']\n", eventName,  trackEntry->animation->name);//*/
-//    }
+    const char* eventName = 0;
+    if (state == pAnimState)
+    {
+        // only monitor ours
+        switch(type)
+        {
+        case EventType_Start: eventName = "EventType_Start"; break;
+        case EventType_Interrupt: eventName = "EventType_Interrupt"; break;
+        case EventType_End: eventName = "EventType_End"; break;
+        case EventType_Complete: eventName = "EventType_Complete"; break;
+        case EventType_Dispose: eventName = "EventType_Dispose"; break;
+        case EventType_Event: eventName = "EventType_Event"; break;
+        default:
+            break;
+        }
+
+        if (bLogging && eventName && entry && entry->getAnimation())
+            KOutputDebug(DEBUGLVL, "[%s : '%s']\n", eventName, entry->getAnimation()->getName().c_str());//*/
+    }
 }
 
 InterruptMonitor::InterruptMonitor(AnimationState * _pAnimationState):
@@ -98,7 +103,7 @@ InterruptMonitor& InterruptMonitor::AddInterruptEvent(int theEventType, const st
 }
 
 // stops the first encounter of spEventType on the specified TrackEntry
-InterruptMonitor& InterruptMonitor::AddInterruptEvent(int theEventType, spTrackEntry * theTrackEntry)
+InterruptMonitor& InterruptMonitor::AddInterruptEvent(int theEventType, TrackEntry * theTrackEntry)
 {
 	InterruptEvent ev;
 	ev.mEventType = theEventType;
@@ -117,7 +122,7 @@ InterruptMonitor& InterruptMonitor::AddInterruptEventTrigger(const std::string &
 	return *this;
 }
 
-void InterruptMonitor::OnSpineAnimationStateEvent(AnimationState * state, int type, spTrackEntry * trackEntry, spEvent * event)
+void InterruptMonitor::OnSpineAnimationStateEvent(AnimationState * state, EventType type, TrackEntry * trackEntry, Event * event)
 {
 	SpineEventMonitor::OnSpineAnimationStateEvent(state, type, trackEntry, event);
 
@@ -136,41 +141,41 @@ void InterruptMonitor::OnSpineAnimationStateEvent(AnimationState * state, int ty
 	}
 }
 
-inline bool InterruptMonitor::InterruptEvent::matches(AnimationState * state, int type, spTrackEntry * trackEntry, spEvent * event)
+inline bool InterruptMonitor::InterruptEvent::matches(AnimationState * state, EventType type, TrackEntry * trackEntry, Event * event)
 {
 	// Must match spEventType {SP_ANIMATION_START, SP_ANIMATION_INTERRUPT, SP_ANIMATION_END, SP_ANIMATION_COMPLETE, SP_ANIMATION_DISPOSE, SP_ANIMATION_EVENT }
-//    if (mEventType == type)
-//    {
-//        // Looking for specific TrackEntry by pointer
-//        if (mTrackEntry != 0)
-//        {
-//            return mTrackEntry == trackEntry;
-//        }
-//
-//        // looking for Animation Track by name
-//        if (!mAnimName.empty())
-//        {
-//            if (trackEntry && trackEntry->animation && trackEntry->animation->name)
-//            {
-//                if (CompareNoCase(trackEntry->animation->name, mAnimName) == 0)
-//                {
-//                    return true;
-//                }
-//            }
-//            return false;
-//        }
-//
-//        // looking for Event String Text
-//        if (!mEventName.empty())
-//        {
-//            if (event && event->stringValue)
-//            {
-//                return (CompareNoCase(event->stringValue, mEventName) == 0);
-//            }
-//            return false;
-//        }
-//
-//        return true; // waiting for ANY spEventType that matches
-//    }
+    if (mEventType == type)
+    {
+        // Looking for specific TrackEntry by pointer
+        if (mTrackEntry != 0)
+        {
+            return mTrackEntry == trackEntry;
+        }
+
+        // looking for Animation Track by name
+        if (!mAnimName.empty())
+        {
+            if (trackEntry && trackEntry->getAnimation())
+            {
+                if (CompareNoCase(trackEntry->getAnimation()->getName(), mAnimName) == 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // looking for Event String Text
+        if (!mEventName.empty())
+        {
+            if (event)
+            {
+                return (CompareNoCase(event->getStringValue(), mEventName) == 0);
+            }
+            return false;
+        }
+
+        return true; // waiting for ANY spEventType that matches
+    }
 	return false;
 }

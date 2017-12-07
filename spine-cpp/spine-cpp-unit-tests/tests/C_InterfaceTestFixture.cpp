@@ -37,8 +37,6 @@
 
 #define MAX_RUN_TIME 6000 // equal to about 100 seconds of execution
 
-using namespace Spine;
-
 void C_InterfaceTestFixture::setUp()
 {
 }
@@ -47,8 +45,10 @@ void C_InterfaceTestFixture::tearDown()
 {
 }
 
-static SkeletonData* readSkeletonJsonData(const char* filename, Atlas* atlas)
+static Spine::SkeletonData* readSkeletonJsonData(const char* filename, Atlas* atlas)
 {
+    using namespace Spine;
+    
     Vector<Atlas*> atlasArray;
     atlasArray.push_back(atlas);
     

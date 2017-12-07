@@ -145,7 +145,8 @@ namespace Spine
 
                 FREE(name);
 
-                assert(readTuple(&begin, end, tuple) == 2);
+                int tupleVal = readTuple(&begin, end, tuple);
+                assert(tupleVal == 2);
 
                 /* size is only optional for an atlas packed with an old TexturePacker. */
                 page->width = toInt(tuple);

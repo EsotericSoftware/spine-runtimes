@@ -56,7 +56,7 @@ namespace Spine
     class Skeleton;
     class RotateTimeline;
     
-    typedef void (*OnAnimationEventFunc) (AnimationState& state, EventType type, TrackEntry* entry, Event* event);
+    typedef void (*OnAnimationEventFunc) (AnimationState* state, EventType type, TrackEntry* entry, Event* event);
     
     /// State for the playback of an animation
     class TrackEntry
@@ -375,6 +375,8 @@ namespace Spine
         float getTimeScale();
         void setTimeScale(float inValue);
         void setOnAnimationEventFunc(OnAnimationEventFunc inValue);
+        void setRendererObject(void* inValue);
+        void* getRendererObject();
         
     private:
         static const int Subsequent, First, Dip, DipMix;
@@ -389,6 +391,8 @@ namespace Spine
         Vector<int> _propertyIDs;
         Vector<TrackEntry*> _mixingTo;
         bool _animationsChanged;
+        
+        void* _rendererObject;
 
         OnAnimationEventFunc _onAnimationEventFunc;
         

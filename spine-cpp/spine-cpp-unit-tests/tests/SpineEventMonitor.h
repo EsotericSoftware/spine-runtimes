@@ -9,11 +9,6 @@
 #include <vector>
 #include <string>
 
-// forward declarations
-typedef struct spAnimationState spAnimationState;
-typedef struct spTrackEntry spTrackEntry;
-typedef struct spEvent spEvent;
-
 #include <spine/AnimationState.h>
 
 using namespace Spine;
@@ -22,7 +17,7 @@ using namespace Spine;
 //	class: 	SpineEventMonitor
 //	
 //	purpose:	Monitor spAnimationState Events and report when there
-//				are no more spTrackEntry(s) waiting to play on track 0;
+//				are no more TrackEntry(s) waiting to play on track 0;
 //
 //				Also allows for debug printing of Events to console.
 /////////////////////////////////////////////////////////////////////
@@ -40,8 +35,8 @@ public:
 	virtual bool isAnimationPlaying();
 
 protected:
-	static void	spineAnimStateHandler(AnimationState* state, int type, spTrackEntry* entry, spEvent* event);
-	virtual void OnSpineAnimationStateEvent(AnimationState* state, int type, spTrackEntry* trackEntry, spEvent* event);
+	static void	spineAnimStateHandler(AnimationState* state, EventType type, TrackEntry* entry, Event* event);
+	virtual void OnSpineAnimationStateEvent(AnimationState* state, EventType type, TrackEntry* entry, Event* event);
 
 protected:
 	AnimationState	*pAnimState;
@@ -65,11 +60,11 @@ private:
 			mTrackEntry = 0;
 		}
 
-		bool matches(AnimationState* state, int type, spTrackEntry* trackEntry, spEvent* event);
+		bool matches(AnimationState* state, EventType type, TrackEntry* trackEntry, Event* event);
 
 		std::string mAnimName;
 		int mEventType;
-		spTrackEntry* mTrackEntry;
+		TrackEntry* mTrackEntry;
 		std::string mEventName;
 	};
 	typedef std::vector<InterruptEvent> InterruptEventStack;
@@ -84,11 +79,11 @@ public:
 public:
 	InterruptMonitor& AddInterruptEvent(int theEventType);
 	InterruptMonitor& AddInterruptEvent(int theEventType, const std::string& theAnimationName);
-	InterruptMonitor& AddInterruptEvent(int theEventType, spTrackEntry* theTrackEntry);
+	InterruptMonitor& AddInterruptEvent(int theEventType, TrackEntry* theTrackEntry);
 	InterruptMonitor& AddInterruptEventTrigger(const std::string& theEventTriggerName);
 
 protected:
-	virtual void OnSpineAnimationStateEvent(AnimationState* state, int type, spTrackEntry* trackEntry, spEvent* event) override;
+	virtual void OnSpineAnimationStateEvent(AnimationState* state, EventType type, TrackEntry* trackEntry, Event* event) override;
 	virtual void OnMatchingComplete() {}
 
 protected:
@@ -119,7 +114,7 @@ eventMonitor.SetDebugLogging(true);
 
 // Interrupt the animation on this specific sequence of spEventType(s)
 eventMonitor
-	.AddInterruptEvent(SP_ANIMATION_INTERRUPT, "jump")	// First, wait for INTERRUPT signal on the 'jump' animation spTrackEntry
+	.AddInterruptEvent(SP_ANIMATION_INTERRUPT, "jump")	// First, wait for INTERRUPT signal on the 'jump' animation TrackEntry
 	.AddInterruptEvent(SP_ANIMATION_START);				// Then, stop on any following START signal
 
 
