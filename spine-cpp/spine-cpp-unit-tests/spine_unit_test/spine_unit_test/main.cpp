@@ -86,13 +86,18 @@ KanjiSpineExtension::KanjiSpineExtension() : DefaultSpineExtension()
     // Empty
 }
 
+double timeNow()
+{
+    timespec lTimeVal;
+    clock_gettime(CLOCK_MONOTONIC, &lTimeVal);
+    return lTimeVal.tv_sec + (lTimeVal.tv_nsec * 1.0e-9);
+}
+
 int main(int argc, char* argv[])
 {
     SpineExtension::setInstance(KanjiSpineExtension::getInstance());
     
-    // Start Timing
-    time_t start_time, end_time;
-    time(&start_time);
+    double startTime = timeNow();
     
     /* Set working directory to current location for opening test data */
 #ifdef WIN32
@@ -105,9 +110,10 @@ int main(int argc, char* argv[])
     MemoryTest::test();
     
     // End Timing
-    time(&end_time);
-    double secs = difftime(end_time,start_time);
-    printf("\n\n%i minutes and %i seconds of your life taken from you by these tests.\n", ((int)secs) / 60, ((int)secs) % 60);
+    double endTime = timeNow();
+    double timeElapsed = (endTime - startTime);
+    printf("\n\n%i minutes and %i seconds of your life taken from you by these tests.\n", ((int)timeElapsed) / 60, ((int)timeElapsed) % 60);
+    printf("timeElapsed: %f \n", timeElapsed);
     
     return 0;
 }
