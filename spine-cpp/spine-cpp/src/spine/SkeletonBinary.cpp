@@ -78,6 +78,8 @@
 #include <spine/Event.h>
 #include <spine/Vertices.h>
 
+#include <cstring>
+
 namespace Spine
 {
     const int SkeletonBinary::BONE_ROTATE = 0;
