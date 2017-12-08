@@ -162,12 +162,18 @@ namespace Spine
         void setAShearY(float inValue);
         
         float getA();
+        void setA(float inValue);
         float getB();
+        void setB(float inValue);
         float getC();
+        void setC(float inValue);
         float getD();
+        void setD(float inValue);
         
         float getWorldX();
+        void setWorldX(float inValue);
         float getWorldY();
+        void setWorldY(float inValue);
         float getWorldRotationX();
         float getWorldRotationY();
         

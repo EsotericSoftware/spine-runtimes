@@ -281,6 +281,7 @@
 		BB6017F01FD92A5B009BD546 /* SimpleTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SimpleTest.h; sourceTree = "<group>"; };
 		BB6017FC1FD92AF3009BD546 /* SpineEventMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpineEventMonitor.h; sourceTree = "<group>"; };
 		BB6017FD1FD92AF3009BD546 /* SpineEventMonitor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpineEventMonitor.cpp; sourceTree = "<group>"; };
+		BBFB507F1FDAF6CD005B22B6 /* MemoryTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MemoryTest.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -326,6 +327,7 @@
 			children = (
 				BB6017121FD9289A009BD546 /* main.cpp */,
 				BB6017F01FD92A5B009BD546 /* SimpleTest.h */,
+				BBFB507F1FDAF6CD005B22B6 /* MemoryTest.h */,
 			);
 			path = spine_unit_test;
 			sourceTree = "<group>";

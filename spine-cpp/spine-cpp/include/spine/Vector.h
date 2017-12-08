@@ -66,6 +66,7 @@ namespace Spine
             {
                 clear();
                 deallocate(_buffer);
+                _buffer = NULL;
                 
                 _size = inVector._size;
                 _capacity = inVector._capacity;
@@ -194,6 +195,8 @@ namespace Spine
         
         void setSize(size_t inValue)
         {
+            assert(inValue <= _capacity);
+            
             _size = inValue;
         }
         

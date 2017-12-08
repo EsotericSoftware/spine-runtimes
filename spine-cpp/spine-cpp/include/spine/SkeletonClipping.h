@@ -54,6 +54,10 @@ namespace Spine
         
         bool isClipping();
         
+        Vector<float>& getClippedVertices();
+        Vector<int>& getClippedTriangles();
+        Vector<float>& getClippedUVs();
+        
     private:
         Triangulator _triangulator;
         Vector<float> _clippingPolygon;

@@ -521,9 +521,19 @@ namespace Spine
         return _a;
     }
     
+    void Bone::setA(float inValue)
+    {
+        _a = inValue;
+    }
+    
     float Bone::getB()
     {
         return _b;
+    }
+    
+    void Bone::setB(float inValue)
+    {
+        _b = inValue;
     }
     
     float Bone::getC()
@@ -531,9 +541,19 @@ namespace Spine
         return _c;
     }
     
+    void Bone::setC(float inValue)
+    {
+        _c = inValue;
+    }
+    
     float Bone::getD()
     {
         return _d;
+    }
+    
+    void Bone::setD(float inValue)
+    {
+        _d = inValue;
     }
     
     float Bone::getWorldX()
@@ -541,9 +561,19 @@ namespace Spine
         return _worldX;
     }
     
+    void Bone::setWorldX(float inValue)
+    {
+        _worldX = inValue;
+    }
+    
     float Bone::getWorldY()
     {
         return _worldY;
+    }
+    
+    void Bone::setWorldY(float inValue)
+    {
+        _worldY = inValue;
     }
     
     float Bone::getWorldRotationX()

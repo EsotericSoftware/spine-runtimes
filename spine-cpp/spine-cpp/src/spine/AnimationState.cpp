@@ -230,7 +230,7 @@ namespace Spine
         _timelineDipMix.clear();
         _timelinesRotation.clear();
         
-        _onAnimationEventFunc = NULL;
+        _onAnimationEventFunc = dummyOnAnimationEventFunc;
     }
     
     EventQueueEntry::EventQueueEntry(EventType eventType, TrackEntry* trackEntry, Event* event) :

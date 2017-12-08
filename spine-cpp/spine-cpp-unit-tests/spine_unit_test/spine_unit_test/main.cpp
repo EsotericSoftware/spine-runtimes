@@ -19,6 +19,7 @@
 #include "spine/Extension.h"
 
 #include "SimpleTest.h"
+#include "MemoryTest.h"
 
 #include "KMemory.h" // last include
 
@@ -101,6 +102,7 @@ int main(int argc, char* argv[])
 #endif
     
     SimpleTest::test();
+    MemoryTest::test();
     
     // End Timing
     time(&end_time);

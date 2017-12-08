@@ -1,6 +1,6 @@
 //
 //  SimpleTest.h
-//  TestHarness
+//  spine_unit_test
 //
 //  Created by Stephen Gowen on 11/9/17.
 //  Copyright © 2017 Noctis Games. All rights reserved.

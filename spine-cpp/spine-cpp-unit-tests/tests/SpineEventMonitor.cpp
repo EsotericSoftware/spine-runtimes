@@ -116,7 +116,7 @@ InterruptMonitor& InterruptMonitor::AddInterruptEvent(int theEventType, TrackEnt
 InterruptMonitor& InterruptMonitor::AddInterruptEventTrigger(const std::string & theEventTriggerName)
 {
 	InterruptEvent ev;
-//    ev.mEventType = SP_ANIMATION_EVENT;
+    ev.mEventType = EventType_Event;
 	ev.mEventName = theEventTriggerName;
 	mEventStack.push_back(ev);
 	return *this;
@@ -143,7 +143,7 @@ void InterruptMonitor::OnSpineAnimationStateEvent(AnimationState * state, EventT
 
 inline bool InterruptMonitor::InterruptEvent::matches(AnimationState * state, EventType type, TrackEntry * trackEntry, Event * event)
 {
-	// Must match spEventType {SP_ANIMATION_START, SP_ANIMATION_INTERRUPT, SP_ANIMATION_END, SP_ANIMATION_COMPLETE, SP_ANIMATION_DISPOSE, SP_ANIMATION_EVENT }
+	// Must match EventType {EventType_Start, EventType_Interrupt, EventType_End, EventType_Complete, EventType_Dispose, EventType_Event }
     if (mEventType == type)
     {
         // Looking for specific TrackEntry by pointer

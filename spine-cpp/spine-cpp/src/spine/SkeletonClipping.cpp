@@ -54,6 +54,7 @@ namespace Spine
 
         int n = clip->getWorldVerticesLength();
         _clippingPolygon.reserve(n);
+        _clippingPolygon.setSize(n);
         clip->computeWorldVertices(slot, 0, n, _clippingPolygon, 0, 2);
         makeClockwise(_clippingPolygon);
         Vector< Vector<float>* > clippingPolygons = _triangulator.decompose(_clippingPolygon, _triangulator.triangulate(_clippingPolygon));
@@ -96,7 +97,8 @@ namespace Spine
     
     void SkeletonClipping::clipTriangles(Vector<float>& vertices, int verticesLength, Vector<int>& triangles, int trianglesLength, Vector<float>& uvs)
     {
-        Vector<float>& clipOutput = _clipOutput, clippedVertices = _clippedVertices;
+        Vector<float>& clipOutput = _clipOutput;
+        Vector<float>& clippedVertices = _clippedVertices;
         Vector<int>& clippedTriangles = _clippedTriangles;
         Vector< Vector<float>* >& polygons = _clippingPolygons;
         int polygonsCount = static_cast<int>(_clippingPolygons.size());
@@ -135,7 +137,9 @@ namespace Spine
 
                     int clipOutputCount = clipOutputLength >> 1;
                     clippedVertices.reserve(s + clipOutputCount * 2);
+                    clippedVertices.setSize(s + clipOutputCount * 2);
                     _clippedUVs.reserve(s + clipOutputCount * 2);
+                    _clippedUVs.setSize(s + clipOutputCount * 2);
                     for (int ii = 0; ii < clipOutputLength; ii += 2)
                     {
                         float x = clipOutput[ii], y = clipOutput[ii + 1];
@@ -152,6 +156,7 @@ namespace Spine
 
                     s = static_cast<int>(clippedTriangles.size());
                     clippedTriangles.reserve(s + 3 * (clipOutputCount - 2));
+                    clippedTriangles.setSize(s + 3 * (clipOutputCount - 2));
                     clipOutputCount--;
                     for (int ii = 1; ii < clipOutputCount; ii++)
                     {
@@ -165,7 +170,9 @@ namespace Spine
                 else
                 {
                     clippedVertices.reserve(s + 3 * 2);
+                    clippedVertices.setSize(s + 3 * 2);
                     _clippedUVs.reserve(s + 3 * 2);
+                    _clippedUVs.setSize(s + 3 * 2);
                     clippedVertices[s] = x1;
                     clippedVertices[s + 1] = y1;
                     clippedVertices[s + 2] = x2;
@@ -182,6 +189,7 @@ namespace Spine
 
                     s = static_cast<int>(clippedTriangles.size());
                     clippedTriangles.reserve(s + 3);
+                    clippedTriangles.setSize(s + 3);
                     clippedTriangles[s] = index;
                     clippedTriangles[s + 1] = index + 1;
                     clippedTriangles[s + 2] = index + 2;
@@ -197,9 +205,24 @@ namespace Spine
         return _clipAttachment != NULL;
     }
     
+    Vector<float>& SkeletonClipping::getClippedVertices()
+    {
+        return _clippedVertices;
+    }
+    
+    Vector<int>& SkeletonClipping::getClippedTriangles()
+    {
+        return _clippedTriangles;
+    }
+    
+    Vector<float>& SkeletonClipping::getClippedUVs()
+    {
+        return _clippedUVs;
+    }
+    
     bool SkeletonClipping::clip(float x1, float y1, float x2, float y2, float x3, float y3, Vector<float>& clippingArea, Vector<float>& output)
     {
-        Vector<float> originalOutput = output;
+        Vector<float>& originalOutput = output;
         bool clipped = false;
 
         // Avoid copy at the end.
@@ -225,7 +248,7 @@ namespace Spine
         input.push_back(y1);
         output.clear();
 
-        Vector<float> clippingVertices = clippingArea;
+        Vector<float>& clippingVertices = clippingArea;
         int clippingVerticesLast = static_cast<int>(clippingArea.size()) - 4;
         for (int i = 0; ; i += 2)
         {
@@ -233,7 +256,7 @@ namespace Spine
             float edgeX2 = clippingVertices[i + 2], edgeY2 = clippingVertices[i + 3];
             float deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;
 
-            Vector<float> inputVertices = input;
+            Vector<float>& inputVertices = input;
             int inputVerticesLength = static_cast<int>(input.size()) - 2, outputStart = static_cast<int>(output.size());
             for (int ii = 0; ii < inputVerticesLength; ii += 2)
             {
@@ -299,6 +322,7 @@ namespace Spine
         else
         {
             originalOutput.reserve(originalOutput.size() - 2);
+            originalOutput.setSize(originalOutput.size() - 2);
         }
 
         return clipped;
