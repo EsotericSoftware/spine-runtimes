@@ -56,9 +56,10 @@ namespace Spine
             if (_objects.size() > 0)
             {
                 T** object = _objects.begin();
+                T* ret = *object;
                 _objects.erase(0);
                 
-                return *object;
+                return ret;
             }
             else
             {
