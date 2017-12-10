@@ -120,15 +120,6 @@ namespace Spine.Unity.Editor {
 				
 		}
 
-		void HandlePreviewSkinChanged (string skinName) {
-			EditorPrefs.SetString(LastSkinKey, skinName);
-		}
-
-		void OnDestroy () {
-			EditorApplication.update -= EditorUpdate;
-			preview.OnDestroy();
-		}
-
 		void EditorUpdate () {
 			preview.AdjustCamera();
 
@@ -498,13 +489,6 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(line, Icons.warning));
 		}
 
-		void DoReimport () {
-			SpineEditorUtilities.ImportSpineContent(new [] { AssetDatabase.GetAssetPath(skeletonJSON.objectReferenceValue) }, true);
-			preview.Clear();
-			InitializeEditor();
-			EditorUtility.SetDirty(targetSkeletonDataAsset);
-		}
-
 		void PopulateWarnings () {
 			warnings.Clear();
 
@@ -565,6 +549,22 @@ namespace Spine.Unity.Editor {
 
 				}
 			}
+		}
+
+		void DoReimport () {
+			SpineEditorUtilities.ImportSpineContent(new [] { AssetDatabase.GetAssetPath(skeletonJSON.objectReferenceValue) }, true);
+			preview.Clear();
+			InitializeEditor();
+			EditorUtility.SetDirty(targetSkeletonDataAsset);
+		}
+
+		void HandlePreviewSkinChanged (string skinName) {
+			EditorPrefs.SetString(LastSkinKey, skinName);
+		}
+
+		void OnDestroy () {
+			EditorApplication.update -= EditorUpdate;
+			preview.OnDestroy();
 		}
 
 		#region Preview Handlers
