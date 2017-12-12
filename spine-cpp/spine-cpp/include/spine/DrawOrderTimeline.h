@@ -35,8 +35,7 @@
 
 namespace Spine
 {
-    class DrawOrderTimeline : public Timeline
-    {
+    class DrawOrderTimeline : public Timeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

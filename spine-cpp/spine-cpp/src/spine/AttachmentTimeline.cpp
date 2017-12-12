@@ -42,38 +42,32 @@ namespace Spine
 {
     RTTI_IMPL(AttachmentTimeline, Timeline);
     
-    AttachmentTimeline::AttachmentTimeline(int frameCount) : Timeline(), _slotIndex(0)
-    {
+    AttachmentTimeline::AttachmentTimeline(int frameCount) : Timeline(), _slotIndex(0) {
         _frames.reserve(frameCount);
         _attachmentNames.reserve(frameCount);
         
         _frames.setSize(frameCount);
         
-        for (int i = 0; i < frameCount; ++i)
-        {
+        for (int i = 0; i < frameCount; ++i) {
             _attachmentNames.push_back(std::string(""));
         }
     }
     
-    void AttachmentTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
-    {
+    void AttachmentTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
         assert(_slotIndex < skeleton._slots.size());
         
         std::string attachmentName;
         Slot* slotP = skeleton._slots[_slotIndex];
         Slot& slot = *slotP;
-        if (direction == MixDirection_Out && pose == MixPose_Setup)
-        {
+        if (direction == MixDirection_Out && pose == MixPose_Setup) {
             attachmentName = slot._data._attachmentName;
             slot._attachment = attachmentName.length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, attachmentName);
             return;
         }
         
-        if (time < _frames[0])
-        {
+        if (time < _frames[0]) {
             // Time is before first frame.
-            if (pose == MixPose_Setup)
-            {
+            if (pose == MixPose_Setup) {
                 attachmentName = slot._data._attachmentName;
                 slot._attachment = attachmentName.length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, attachmentName);
             }
@@ -81,12 +75,11 @@ namespace Spine
         }
         
         int frameIndex;
-        if (time >= _frames[_frames.size() - 1]) // Time is after last frame.
-        {
+        if (time >= _frames[_frames.size() - 1]) {
+            // Time is after last frame.
             frameIndex = static_cast<int>(_frames.size()) - 1;
         }
-        else
-        {
+        else {
             frameIndex = Animation::binarySearch(_frames, time, 1) - 1;
         }
         
@@ -94,49 +87,40 @@ namespace Spine
         slot._attachment = attachmentName.length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, attachmentName);
     }
     
-    int AttachmentTimeline::getPropertyId()
-    {
+    int AttachmentTimeline::getPropertyId() {
         return ((int)TimelineType_Attachment << 24) + _slotIndex;
     }
     
-    void AttachmentTimeline::setFrame(int frameIndex, float time, std::string attachmentName)
-    {
+    void AttachmentTimeline::setFrame(int frameIndex, float time, std::string attachmentName) {
         _frames[frameIndex] = time;
         _attachmentNames[frameIndex] = attachmentName;
     }
     
-    int AttachmentTimeline::getSlotIndex()
-    {
+    int AttachmentTimeline::getSlotIndex() {
         return _slotIndex;
     }
     
-    void AttachmentTimeline::setSlotIndex(int inValue)
-    {
+    void AttachmentTimeline::setSlotIndex(int inValue) {
         _slotIndex = inValue;
     }
     
-    Vector<float>& AttachmentTimeline::getFrames()
-    {
+    Vector<float>& AttachmentTimeline::getFrames() {
         return _frames;
     }
     
-    void AttachmentTimeline::setFrames(Vector<float>& inValue)
-    {
+    void AttachmentTimeline::setFrames(Vector<float>& inValue) {
         _frames = inValue;
     }
     
-    Vector<std::string> AttachmentTimeline::getAttachmentNames()
-    {
+    Vector<std::string> AttachmentTimeline::getAttachmentNames() {
         return _attachmentNames;
     }
     
-    void AttachmentTimeline::setAttachmentNames(Vector<std::string>& inValue)
-    {
+    void AttachmentTimeline::setAttachmentNames(Vector<std::string>& inValue) {
         _attachmentNames = inValue;
     }
     
-    int AttachmentTimeline::getFrameCount()
-    {
+    int AttachmentTimeline::getFrameCount() {
         return static_cast<int>(_frames.size());
     }
 }

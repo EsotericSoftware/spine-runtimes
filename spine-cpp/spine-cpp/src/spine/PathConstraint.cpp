@@ -58,11 +58,9 @@ namespace Spine
     _position(data.getPosition()),
     _spacing(data.getSpacing()),
     _rotateMix(data.getRotateMix()),
-    _translateMix(data.getTranslateMix())
-    {
+    _translateMix(data.getTranslateMix()) {
         _bones.reserve(_data.getBones().size());
-        for (BoneData** i = _data.getBones().begin(); i != _data.getBones().end(); ++i)
-        {
+        for (BoneData** i = _data.getBones().begin(); i != _data.getBones().end(); ++i) {
             BoneData* boneData = (*i);
             
             _bones.push_back(skeleton.findBone(boneData->getName()));
@@ -72,16 +70,13 @@ namespace Spine
         _segments.setSize(10);
     }
     
-    void PathConstraint::apply()
-    {
+    void PathConstraint::apply() {
         update();
     }
     
-    void PathConstraint::update()
-    {
+    void PathConstraint::update() {
         Attachment* baseAttachment = _target->getAttachment();
-        if (baseAttachment == NULL || !baseAttachment->getRTTI().derivesFrom(PathAttachment::rtti))
-        {
+        if (baseAttachment == NULL || !baseAttachment->getRTTI().derivesFrom(PathAttachment::rtti)) {
             return;
         }
         
@@ -91,8 +86,7 @@ namespace Spine
         float translateMix = _translateMix;
         bool translate = translateMix > 0;
         bool rotate = rotateMix > 0;
-        if (!translate && !rotate)
-        {
+        if (!translate && !rotate) {
             return;
         }
         
@@ -106,34 +100,27 @@ namespace Spine
         _spaces.reserve(spacesCount);
         _spaces.setSize(spacesCount);
         float spacing = _spacing;
-        if (scale || lengthSpacing)
-        {
-            if (scale)
-            {
+        if (scale || lengthSpacing) {
+            if (scale) {
                 _lengths.reserve(boneCount);
                 _lengths.setSize(boneCount);
             }
             
-            for (int i = 0, n = spacesCount - 1; i < n;)
-            {
+            for (int i = 0, n = spacesCount - 1; i < n;) {
                 Bone* boneP = _bones[i];
                 Bone& bone = *boneP;
                 float setupLength = bone._data.getLength();
-                if (setupLength < PathConstraint::EPSILON)
-                {
-                    if (scale)
-                    {
+                if (setupLength < PathConstraint::EPSILON) {
+                    if (scale) {
                         _lengths[i] = 0;
                     }
                     _spaces[++i] = 0;
                 }
-                else
-                {
+                else {
                     float x = setupLength * bone._a;
                     float y = setupLength * bone._c;
                     float length = (float)sqrt(x * x + y * y);
-                    if (scale)
-                    {
+                    if (scale) {
                         _lengths[i] = length;
                     }
                     
@@ -141,10 +128,8 @@ namespace Spine
                 }
             }
         }
-        else
-        {
-            for (int i = 1; i < spacesCount; ++i)
-            {
+        else {
+            for (int i = 1; i < spacesCount; ++i) {
                 _spaces[i] = spacing;
             }
         }
@@ -154,19 +139,16 @@ namespace Spine
         float boneY = positions[1];
         float offsetRotation = data.getOffsetRotation();
         bool tip;
-        if (offsetRotation == 0)
-        {
+        if (offsetRotation == 0) {
             tip = rotateMode == RotateMode_Chain;
         }
-        else
-        {
+        else {
             tip = false;
             Bone p = _target->getBone();
             offsetRotation *= p.getA() * p.getD() - p.getB() * p.getC() > 0 ? DegRad : -DegRad;
         }
         
-        for (int i = 0, p = 3; i < boneCount; i++, p += 3)
-        {
+        for (int i = 0, p = 3; i < boneCount; i++, p += 3) {
             Bone* boneP = _bones[i];
             Bone& bone = *boneP;
             bone._worldX += (boneX - bone._worldX) * translateMix;
@@ -175,11 +157,9 @@ namespace Spine
             float y = positions[p + 1];
             float dx = x - boneX;
             float dy = y - boneY;
-            if (scale)
-            {
+            if (scale) {
                 float length = _lengths[i];
-                if (length >= PathConstraint::EPSILON)
-                {
+                if (length >= PathConstraint::EPSILON) {
                     float s = ((float)sqrt(dx * dx + dy * dy) / length - 1) * rotateMix + 1;
                     bone._a *= s;
                     bone._c *= s;
@@ -189,43 +169,35 @@ namespace Spine
             boneX = x;
             boneY = y;
             
-            if (rotate)
-            {
+            if (rotate) {
                 float a = bone._a, b = bone._b, c = bone._c, d = bone._d, r, cos, sin;
-                if (tangents)
-                {
+                if (tangents) {
                     r = positions[p - 1];
                 }
-                else if (_spaces[i + 1] < PathConstraint::EPSILON)
-                {
+                else if (_spaces[i + 1] < PathConstraint::EPSILON) {
                     r = positions[p + 2];
                 }
-                else
-                {
+                else {
                     r = MathUtil::atan2(dy, dx);
                 }
                 
                 r -= MathUtil::atan2(c, a);
                 
-                if (tip)
-                {
+                if (tip) {
                     cos = MathUtil::cos(r);
                     sin = MathUtil::sin(r);
                     float length = bone._data.getLength();
                     boneX += (length * (cos * a - sin * c) - dx) * rotateMix;
                     boneY += (length * (sin * a + cos * c) - dy) * rotateMix;
                 }
-                else
-                {
+                else {
                     r += offsetRotation;
                 }
                 
-                if (r > SPINE_PI)
-                {
+                if (r > SPINE_PI) {
                     r -= SPINE_PI_2;
                 }
-                else if (r < -SPINE_PI)
-                {
+                else if (r < -SPINE_PI) {
                     r += SPINE_PI_2;
                 }
                 
@@ -242,73 +214,59 @@ namespace Spine
         }
     }
     
-    int PathConstraint::getOrder()
-    {
+    int PathConstraint::getOrder() {
         return _data.getOrder();
     }
     
-    float PathConstraint::getPosition()
-    {
+    float PathConstraint::getPosition() {
         return _position;
     }
     
-    void PathConstraint::setPosition(float inValue)
-    {
+    void PathConstraint::setPosition(float inValue) {
         _position = inValue;
     }
     
-    float PathConstraint::getSpacing()
-    {
+    float PathConstraint::getSpacing() {
         return _spacing;
     }
     
-    void PathConstraint::setSpacing(float inValue)
-    {
+    void PathConstraint::setSpacing(float inValue) {
         _spacing = inValue;
     }
     
-    float PathConstraint::getRotateMix()
-    {
+    float PathConstraint::getRotateMix() {
         return _rotateMix;
     }
     
-    void PathConstraint::setRotateMix(float inValue)
-    {
+    void PathConstraint::setRotateMix(float inValue) {
         _rotateMix = inValue;
     }
     
-    float PathConstraint::getTranslateMix()
-    {
+    float PathConstraint::getTranslateMix() {
         return _translateMix;
     }
     
-    void PathConstraint::setTranslateMix(float inValue)
-    {
+    void PathConstraint::setTranslateMix(float inValue) {
         _translateMix = inValue;
     }
     
-    Vector<Bone*>& PathConstraint::getBones()
-    {
+    Vector<Bone*>& PathConstraint::getBones() {
         return _bones;
     }
     
-    Slot* PathConstraint::getTarget()
-    {
+    Slot* PathConstraint::getTarget() {
         return _target;
     }
     
-    void PathConstraint::setTarget(Slot* inValue)
-    {
+    void PathConstraint::setTarget(Slot* inValue) {
         _target = inValue;
     }
     
-    PathConstraintData& PathConstraint::getData()
-    {
+    PathConstraintData& PathConstraint::getData() {
         return _data;
     }
     
-    Vector<float> PathConstraint::computeWorldPositions(PathAttachment& path, int spacesCount, bool tangents, bool percentPosition, bool percentSpacing)
-    {
+    Vector<float> PathConstraint::computeWorldPositions(PathAttachment& path, int spacesCount, bool tangents, bool percentPosition, bool percentSpacing) {
         Slot& target = *_target;
         float position = _position;
         _positions.reserve(spacesCount * 3 + 2);
@@ -319,46 +277,37 @@ namespace Spine
         int prevCurve = NONE;
         
         float pathLength;
-        if (!path.isConstantSpeed())
-        {
+        if (!path.isConstantSpeed()) {
             Vector<float>& lengths = path.getLengths();
             curveCount -= closed ? 1 : 2;
             pathLength = lengths[curveCount];
-            if (percentPosition)
-            {
+            if (percentPosition) {
                 position *= pathLength;
             }
             
-            if (percentSpacing)
-            {
-                for (int i = 0; i < spacesCount; ++i)
-                {
+            if (percentSpacing) {
+                for (int i = 0; i < spacesCount; ++i) {
                     _spaces[i] *= pathLength;
                 }
             }
             
             _world.reserve(8);
             _world.setSize(8);
-            for (int i = 0, o = 0, curve = 0; i < spacesCount; i++, o += 3)
-            {
+            for (int i = 0, o = 0, curve = 0; i < spacesCount; i++, o += 3) {
                 float space = _spaces[i];
                 position += space;
                 float p = position;
                 
-                if (closed)
-                {
+                if (closed) {
                     p = fmod(p, pathLength);
                     
-                    if (p < 0)
-                    {
+                    if (p < 0) {
                         p += pathLength;
                     }
                     curve = 0;
                 }
-                else if (p < 0)
-                {
-                    if (prevCurve != BEFORE)
-                    {
+                else if (p < 0) {
+                    if (prevCurve != BEFORE) {
                         prevCurve = BEFORE;
                         path.computeWorldVertices(target, 2, 4, _world, 0);
                     }
@@ -367,10 +316,8 @@ namespace Spine
                     
                     continue;
                 }
-                else if (p > pathLength)
-                {
-                    if (prevCurve != AFTER)
-                    {
+                else if (p > pathLength) {
+                    if (prevCurve != AFTER) {
                         prevCurve = AFTER;
                         path.computeWorldVertices(target, verticesLength - 6, 4, _world, 0);
                     }
@@ -381,36 +328,29 @@ namespace Spine
                 }
                 
                 // Determine curve containing position.
-                for (;; curve++)
-                {
+                for (;; curve++) {
                     float length = lengths[curve];
-                    if (p > length)
-                    {
+                    if (p > length) {
                         continue;
                     }
                     
-                    if (curve == 0)
-                    {
+                    if (curve == 0) {
                         p /= length;
                     }
-                    else
-                    {
+                    else {
                         float prev = lengths[curve - 1];
                         p = (p - prev) / (length - prev);
                     }
                     break;
                 }
                 
-                if (curve != prevCurve)
-                {
+                if (curve != prevCurve) {
                     prevCurve = curve;
-                    if (closed && curve == curveCount)
-                    {
+                    if (closed && curve == curveCount) {
                         path.computeWorldVertices(target, verticesLength - 4, 4, _world, 0);
                         path.computeWorldVertices(target, 0, 4, _world, 4);
                     }
-                    else
-                    {
+                    else {
                         path.computeWorldVertices(target, curve * 6 + 2, 8, _world, 0);
                     }
                 }
@@ -421,8 +361,7 @@ namespace Spine
         }
         
         // World vertices.
-        if (closed)
-        {
+        if (closed) {
             verticesLength += 2;
             _world.reserve(verticesLength);
             _world.setSize(verticesLength);
@@ -431,8 +370,7 @@ namespace Spine
             _world[verticesLength - 2] = _world[0];
             _world[verticesLength - 1] = _world[1];
         }
-        else
-        {
+        else {
             curveCount--;
             verticesLength -= 4;
             _world.reserve(verticesLength);
@@ -446,8 +384,7 @@ namespace Spine
         pathLength = 0;
         float x1 = _world[0], y1 = _world[1], cx1 = 0, cy1 = 0, cx2 = 0, cy2 = 0, x2 = 0, y2 = 0;
         float tmpx, tmpy, dddfx, dddfy, ddfx, ddfy, dfx, dfy;
-        for (int i = 0, w = 2; i < curveCount; i++, w += 6)
-        {
+        for (int i = 0, w = 2; i < curveCount; i++, w += 6) {
             cx1 = _world[w];
             cy1 = _world[w + 1];
             cx2 = _world[w + 2];
@@ -479,62 +416,50 @@ namespace Spine
             y1 = y2;
         }
         
-        if (percentPosition)
-        {
+        if (percentPosition) {
             position *= pathLength;
         }
         
-        if (percentSpacing)
-        {
-            for (int i = 0; i < spacesCount; ++i)
-            {
+        if (percentSpacing) {
+            for (int i = 0; i < spacesCount; ++i) {
                 _spaces[i] *= pathLength;
             }
         }
         
         float curveLength = 0;
-        for (int i = 0, o = 0, curve = 0, segment = 0; i < spacesCount; i++, o += 3)
-        {
+        for (int i = 0, o = 0, curve = 0, segment = 0; i < spacesCount; i++, o += 3) {
             float space = _spaces[i];
             position += space;
             float p = position;
             
-            if (closed)
-            {
+            if (closed) {
                 p = fmod(p, pathLength);
                 
-                if (p < 0)
-                {
+                if (p < 0) {
                     p += pathLength;
                 }
                 curve = 0;
             }
-            else if (p < 0)
-            {
+            else if (p < 0) {
                 addBeforePosition(p, _world, 0, _positions, o);
                 continue;
             }
-            else if (p > pathLength)
-            {
+            else if (p > pathLength) {
                 addAfterPosition(p - pathLength, _world, verticesLength - 4, _positions, o);
                 continue;
             }
             
             // Determine curve containing position.
-            for (;; curve++)
-            {
+            for (;; curve++) {
                 float length = _curves[curve];
-                if (p > length)
-                {
+                if (p > length) {
                     continue;
                 }
                 
-                if (curve == 0)
-                {
+                if (curve == 0) {
                     p /= length;
                 }
-                else
-                {
+                else {
                     float prev = _curves[curve - 1];
                     p = (p - prev) / (length - prev);
                 }
@@ -542,8 +467,7 @@ namespace Spine
             }
             
             // Curve segment lengths.
-            if (curve != prevCurve)
-            {
+            if (curve != prevCurve) {
                 prevCurve = curve;
                 int ii = curve * 6;
                 x1 = _world[ii];
@@ -564,8 +488,7 @@ namespace Spine
                 dfy = (cy1 - y1) * 0.3f + tmpy + dddfy * 0.16666667f;
                 curveLength = (float)sqrt(dfx * dfx + dfy * dfy);
                 _segments[0] = curveLength;
-                for (ii = 1; ii < 8; ii++)
-                {
+                for (ii = 1; ii < 8; ii++) {
                     dfx += ddfx;
                     dfy += ddfy;
                     ddfx += dddfx;
@@ -586,20 +509,16 @@ namespace Spine
             
             // Weight by segment length.
             p *= curveLength;
-            for (;; segment++)
-            {
+            for (;; segment++) {
                 float length = _segments[segment];
-                if (p > length)
-                {
+                if (p > length) {
                     continue;
                 }
                 
-                if (segment == 0)
-                {
+                if (segment == 0) {
                     p /= length;
                 }
-                else
-                {
+                else {
                     float prev = _segments[segment - 1];
                     p = segment + (p - prev) / (length - prev);
                 }
@@ -611,8 +530,7 @@ namespace Spine
         return _positions;
     }
     
-    void PathConstraint::addBeforePosition(float p, Vector<float>& temp, int i, Vector<float>& output, int o)
-    {
+    void PathConstraint::addBeforePosition(float p, Vector<float>& temp, int i, Vector<float>& output, int o) {
         float x1 = temp[i];
         float y1 = temp[i + 1];
         float dx = temp[i + 2] - x1;
@@ -624,8 +542,7 @@ namespace Spine
         output[o + 2] = r;
     }
     
-    void PathConstraint::addAfterPosition(float p, Vector<float>& temp, int i, Vector<float>& output, int o)
-    {
+    void PathConstraint::addAfterPosition(float p, Vector<float>& temp, int i, Vector<float>& output, int o) {
         float x1 = temp[i + 2];
         float y1 = temp[i + 3];
         float dx = x1 - temp[i];
@@ -636,10 +553,8 @@ namespace Spine
         output[o + 2] = r;
     }
     
-    void PathConstraint::addCurvePosition(float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2, Vector<float>& output, int o, bool tangents)
-    {
-        if (p < EPSILON || isnan(p))
-        {
+    void PathConstraint::addCurvePosition(float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2, Vector<float>& output, int o, bool tangents) {
+        if (p < EPSILON || isnan(p)) {
             p = EPSILON;
         }
         
@@ -648,8 +563,7 @@ namespace Spine
         float x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
         output[o] = x;
         output[o + 1] = y;
-        if (tangents)
-        {
+        if (tangents) {
             output[o + 2] = (float)atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
         }
     }

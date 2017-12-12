@@ -44,54 +44,45 @@ namespace Spine
 {
     RTTI_IMPL(DeformTimeline, CurveTimeline);
     
-    DeformTimeline::DeformTimeline(int frameCount) : CurveTimeline(frameCount), _slotIndex(0), _attachment(NULL)
-    {
+    DeformTimeline::DeformTimeline(int frameCount) : CurveTimeline(frameCount), _slotIndex(0), _attachment(NULL) {
         _frames.reserve(frameCount);
         _frameVertices.reserve(frameCount);
         
         _frames.setSize(frameCount);
         
-        for (int i = 0; i < frameCount; ++i)
-        {
+        for (int i = 0; i < frameCount; ++i) {
             Vector<float> vec;
             _frameVertices.push_back(vec);
         }
     }
     
-    void DeformTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
-    {
+    void DeformTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
         Slot* slotP = skeleton._slots[_slotIndex];
         Slot& slot = *slotP;
         
-        if (slot._attachment == NULL || !slot._attachment->getRTTI().derivesFrom(VertexAttachment::rtti))
-        {
+        if (slot._attachment == NULL || !slot._attachment->getRTTI().derivesFrom(VertexAttachment::rtti)) {
             return;
         }
         
         VertexAttachment* vertexAttachment = static_cast<VertexAttachment*>(slot._attachment);
-        if (!vertexAttachment->applyDeform(_attachment))
-        {
+        if (!vertexAttachment->applyDeform(_attachment)) {
             return;
         }
         
         Vector<float>& vertices = slot._attachmentVertices;
-        if (vertices.size() == 0)
-        {
+        if (vertices.size() == 0) {
             alpha = 1;
         }
         
         int vertexCount = static_cast<int>(_frameVertices[0].size());
         
-        if (time < _frames[0])
-        {
-            switch (pose)
-            {
+        if (time < _frames[0]) {
+            switch (pose) {
                 case MixPose_Setup:
                     vertices.clear();
                     return;
                 case MixPose_Current:
-                    if (alpha == 1)
-                    {
+                    if (alpha == 1) {
                         vertices.clear();
                         return;
                     }
@@ -100,21 +91,17 @@ namespace Spine
                     vertices.reserve(vertexCount);
                     vertices.setSize(vertexCount);
                     
-                    if (vertexAttachment->_bones.size() == 0)
-                    {
+                    if (vertexAttachment->_bones.size() == 0) {
                         // Unweighted vertex positions.
                         Vector<float>& setupVertices = vertexAttachment->_vertices;
-                        for (int i = 0; i < vertexCount; ++i)
-                        {
+                        for (int i = 0; i < vertexCount; ++i) {
                             vertices[i] += (setupVertices[i] - vertices[i]) * alpha;
                         }
                     }
-                    else
-                    {
+                    else {
                         // Weighted deform offsets.
                         alpha = 1 - alpha;
-                        for (int i = 0; i < vertexCount; ++i)
-                        {
+                        for (int i = 0; i < vertexCount; ++i) {
                             vertices[i] *= alpha;
                         }
                     }
@@ -128,46 +115,36 @@ namespace Spine
         vertices.reserve(vertexCount);
         vertices.setSize(vertexCount);
         
-        if (time >= _frames[_frames.size() - 1])
-        {
+        if (time >= _frames[_frames.size() - 1]) {
             // Time is after last frame.
             Vector<float>& lastVertices = _frameVertices[_frames.size() - 1];
-            if (alpha == 1)
-            {
+            if (alpha == 1) {
                 // Vertex positions or deform offsets, no alpha.
                 vertices.clear();
-                for (int i = 0; i < vertexCount; ++i)
-                {
+                for (int i = 0; i < vertexCount; ++i) {
                     float vertex = lastVertices[i];
                     vertices.push_back(vertex);
                 }
             }
-            else if (pose == MixPose_Setup)
-            {
-                if (vertexAttachment->_bones.size() == 0)
-                {
+            else if (pose == MixPose_Setup) {
+                if (vertexAttachment->_bones.size() == 0) {
                     // Unweighted vertex positions, with alpha.
                     Vector<float>& setupVertices = vertexAttachment->_vertices;
-                    for (int i = 0; i < vertexCount; i++)
-                    {
+                    for (int i = 0; i < vertexCount; i++) {
                         float setup = setupVertices[i];
                         vertices[i] = setup + (lastVertices[i] - setup) * alpha;
                     }
                 }
-                else
-                {
+                else {
                     // Weighted deform offsets, with alpha.
-                    for (int i = 0; i < vertexCount; ++i)
-                    {
+                    for (int i = 0; i < vertexCount; ++i) {
                         vertices[i] = lastVertices[i] * alpha;
                     }
                 }
             }
-            else
-            {
+            else {
                 // Vertex positions or deform offsets, with alpha.
-                for (int i = 0; i < vertexCount; ++i)
-                {
+                for (int i = 0; i < vertexCount; ++i) {
                     vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
                 }
             }
@@ -181,98 +158,79 @@ namespace Spine
         float frameTime = _frames[frame];
         float percent = getCurvePercent(frame - 1, 1 - (time - frameTime) / (_frames[frame - 1] - frameTime));
         
-        if (alpha == 1)
-        {
+        if (alpha == 1) {
             // Vertex positions or deform offsets, no alpha.
-            for (int i = 0; i < vertexCount; ++i)
-            {
+            for (int i = 0; i < vertexCount; ++i) {
                 float prev = prevVertices[i];
                 vertices[i] = prev + (nextVertices[i] - prev) * percent;
             }
         }
-        else if (pose == MixPose_Setup)
-        {
-            if (vertexAttachment->_bones.size() == 0)
-            {
+        else if (pose == MixPose_Setup) {
+            if (vertexAttachment->_bones.size() == 0) {
                 // Unweighted vertex positions, with alpha.
                 Vector<float>& setupVertices = vertexAttachment->_vertices;
-                for (int i = 0; i < vertexCount; ++i)
-                {
+                for (int i = 0; i < vertexCount; ++i) {
                     float prev = prevVertices[i], setup = setupVertices[i];
                     vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
                 }
             }
-            else
-            {
+            else {
                 // Weighted deform offsets, with alpha.
-                for (int i = 0; i < vertexCount; ++i)
-                {
+                for (int i = 0; i < vertexCount; ++i) {
                     float prev = prevVertices[i];
                     vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
                 }
             }
         }
-        else
-        {
+        else {
             // Vertex positions or deform offsets, with alpha.
-            for (int i = 0; i < vertexCount; ++i)
-            {
+            for (int i = 0; i < vertexCount; ++i) {
                 float prev = prevVertices[i];
                 vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
             }
         }
     }
     
-    int DeformTimeline::getPropertyId()
-    {
+    int DeformTimeline::getPropertyId() {
         assert(_attachment != NULL);
         
         return ((int)TimelineType_Deform << 24) + _attachment->_id + _slotIndex;
     }
     
-    void DeformTimeline::setFrame(int frameIndex, float time, Vector<float>& vertices)
-    {
+    void DeformTimeline::setFrame(int frameIndex, float time, Vector<float>& vertices) {
         _frames[frameIndex] = time;
         _frameVertices[frameIndex] = vertices;
     }
     
-    int DeformTimeline::getSlotIndex()
-    {
+    int DeformTimeline::getSlotIndex() {
         return _slotIndex;
     }
     
-    void DeformTimeline::setSlotIndex(int inValue)
-    {
+    void DeformTimeline::setSlotIndex(int inValue) {
         _slotIndex = inValue;
     }
     
-    Vector<float>& DeformTimeline::getFrames()
-    {
+    Vector<float>& DeformTimeline::getFrames() {
         return _frames;
     }
     
-    void DeformTimeline::setFrames(Vector<float>& inValue)
-    {
+    void DeformTimeline::setFrames(Vector<float>& inValue) {
         _frames = inValue;
     }
     
-    Vector< Vector<float> >& DeformTimeline::getVertices()
-    {
+    Vector< Vector<float> >& DeformTimeline::getVertices() {
         return _frameVertices;
     }
     
-    void DeformTimeline::setVertices(Vector< Vector<float> >& inValue)
-    {
+    void DeformTimeline::setVertices(Vector< Vector<float> >& inValue) {
         _frameVertices = inValue;
     }
     
-    VertexAttachment* DeformTimeline::getAttachment()
-    {
+    VertexAttachment* DeformTimeline::getAttachment() {
         return _attachment;
     }
     
-    void DeformTimeline::setAttachment(VertexAttachment* inValue)
-    {
+    void DeformTimeline::setAttachment(VertexAttachment* inValue) {
         _attachment = inValue;
     }
 }

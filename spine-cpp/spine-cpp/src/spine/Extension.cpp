@@ -38,27 +38,23 @@ namespace Spine
 {
     SpineExtension* SpineExtension::_instance = NULL;
     
-    void SpineExtension::setInstance(SpineExtension* inValue)
-    {
+    void SpineExtension::setInstance(SpineExtension* inValue) {
         assert(!_instance);
         
         _instance = inValue;
     }
     
-    SpineExtension* SpineExtension::getInstance()
-    {
+    SpineExtension* SpineExtension::getInstance() {
         assert(_instance);
         
         return _instance;
     }
     
-    SpineExtension::~SpineExtension()
-    {
+    SpineExtension::~SpineExtension() {
         // Empty
     }
     
-    char* SpineExtension::spineReadFile(const char* path, int* length)
-    {
+    char* SpineExtension::spineReadFile(const char* path, int* length) {
         char *data;
         FILE *file = fopen(path, "rb");
         if (!file) return 0;
@@ -74,50 +70,41 @@ namespace Spine
         return data;
     }
     
-    SpineExtension::SpineExtension()
-    {
+    SpineExtension::SpineExtension() {
         // Empty
     }
     
-    DefaultSpineExtension* DefaultSpineExtension::getInstance()
-    {
+    DefaultSpineExtension* DefaultSpineExtension::getInstance() {
         static DefaultSpineExtension ret;
         return &ret;
     }
     
-    DefaultSpineExtension::~DefaultSpineExtension()
-    {
+    DefaultSpineExtension::~DefaultSpineExtension() {
         // Empty
     }
     
-    void* DefaultSpineExtension::spineAlloc(size_t size, const char* file, int line)
-    {
+    void* DefaultSpineExtension::spineAlloc(size_t size, const char* file, int line) {
         return malloc(size);
     }
     
-    void* DefaultSpineExtension::spineCalloc(size_t num, size_t size, const char* file, int line)
-    {
+    void* DefaultSpineExtension::spineCalloc(size_t num, size_t size, const char* file, int line) {
         void* ptr = spineAlloc(num * size, file, line);
-        if (ptr)
-        {
+        if (ptr) {
             memset(ptr, 0, num * size);
         }
         
         return ptr;
     }
     
-    void* DefaultSpineExtension::spineRealloc(void* ptr, size_t size, const char* file, int line)
-    {
+    void* DefaultSpineExtension::spineRealloc(void* ptr, size_t size, const char* file, int line) {
         return realloc(ptr, size);
     }
     
-    void DefaultSpineExtension::spineFree(void* mem)
-    {
+    void DefaultSpineExtension::spineFree(void* mem) {
         free(mem);
     }
     
-    DefaultSpineExtension::DefaultSpineExtension() : SpineExtension()
-    {
+    DefaultSpineExtension::DefaultSpineExtension() : SpineExtension() {
         // Empty
     }
 }

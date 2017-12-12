@@ -38,44 +38,36 @@ namespace Spine
     _name(name),
     _intValue(0),
     _floatValue(0),
-    _stringValue()
-    {
+    _stringValue() {
         assert(_name.length() > 0);
     }
     
     /// The name of the event, which is unique within the skeleton.
-    const std::string& EventData::getName()
-    {
+    const std::string& EventData::getName() {
         return _name;
     }
     
-    int EventData::getIntValue()
-    {
+    int EventData::getIntValue() {
         return _intValue;
     }
     
-    void EventData::setIntValue(int inValue)
-    {
+    void EventData::setIntValue(int inValue) {
         _intValue = inValue;
     }
     
-    float EventData::getFloatValue()
-    {
+    float EventData::getFloatValue() {
         return _floatValue;
     }
     
-    void EventData::setFloatValue(float inValue)
-    {
+    void EventData::setFloatValue(float inValue) {
         _floatValue = inValue;
     }
     
-    std::string EventData::getStringValue()
-    {
+    std::string EventData::getStringValue() {
         return _stringValue;
     }
     
-    void EventData::setStringValue(std::string inValue)
-    {
+    void EventData::setStringValue(std::string inValue) {
         _stringValue = inValue;
     }
 }

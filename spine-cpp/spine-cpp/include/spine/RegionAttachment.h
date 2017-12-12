@@ -44,8 +44,7 @@ namespace Spine
     class Bone;
     
     /// Attachment that displays a texture region.
-    class RegionAttachment : public Attachment
-    {
+    class RegionAttachment : public Attachment {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         friend class AtlasAttachmentLoader;

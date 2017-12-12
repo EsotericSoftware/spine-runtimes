@@ -38,8 +38,7 @@ namespace Spine
     _mesh(mesh),
     _skin(skin),
     _slotIndex(slotIndex),
-    _parent(parent)
-    {
+    _parent(parent) {
         // Empty
     }
 }

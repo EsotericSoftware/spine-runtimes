@@ -44,13 +44,11 @@ namespace Spine
 {
     RTTI_IMPL(AtlasAttachmentLoader, AttachmentLoader);
     
-    AtlasAttachmentLoader::AtlasAttachmentLoader(Vector<Atlas*>& inAtlasArray) : AttachmentLoader(), _atlasArray(inAtlasArray)
-    {
+    AtlasAttachmentLoader::AtlasAttachmentLoader(Vector<Atlas*>& inAtlasArray) : AttachmentLoader(), _atlasArray(inAtlasArray) {
         // Empty
     }
     
-    RegionAttachment* AtlasAttachmentLoader::newRegionAttachment(Skin& skin, std::string name, std::string path)
-    {
+    RegionAttachment* AtlasAttachmentLoader::newRegionAttachment(Skin& skin, std::string name, std::string path) {
         AtlasRegion* regionP = findRegion(path);
         assert(regionP != NULL);
         
@@ -72,8 +70,7 @@ namespace Spine
         return attachmentP;
     }
     
-    MeshAttachment* AtlasAttachmentLoader::newMeshAttachment(Skin& skin, std::string name, std::string path)
-    {
+    MeshAttachment* AtlasAttachmentLoader::newMeshAttachment(Skin& skin, std::string name, std::string path) {
         AtlasRegion* regionP = findRegion(path);
         assert(regionP != NULL);
         
@@ -99,47 +96,40 @@ namespace Spine
         return attachmentP;
     }
     
-    BoundingBoxAttachment* AtlasAttachmentLoader::newBoundingBoxAttachment(Skin& skin, std::string name)
-    {
+    BoundingBoxAttachment* AtlasAttachmentLoader::newBoundingBoxAttachment(Skin& skin, std::string name) {
         BoundingBoxAttachment* attachmentP = NEW(BoundingBoxAttachment);
         new (attachmentP) BoundingBoxAttachment(name);
         
         return attachmentP;
     }
     
-    PathAttachment* AtlasAttachmentLoader::newPathAttachment(Skin& skin, std::string name)
-    {
+    PathAttachment* AtlasAttachmentLoader::newPathAttachment(Skin& skin, std::string name) {
         PathAttachment* attachmentP = NEW(PathAttachment);
         new (attachmentP) PathAttachment(name);
         
         return attachmentP;
     }
     
-    PointAttachment* AtlasAttachmentLoader::newPointAttachment(Skin& skin, std::string name)
-    {
+    PointAttachment* AtlasAttachmentLoader::newPointAttachment(Skin& skin, std::string name) {
         PointAttachment* attachmentP = NEW(PointAttachment);
         new (attachmentP) PointAttachment(name);
         
         return attachmentP;
     }
     
-    ClippingAttachment* AtlasAttachmentLoader::newClippingAttachment(Skin& skin, std::string name)
-    {
+    ClippingAttachment* AtlasAttachmentLoader::newClippingAttachment(Skin& skin, std::string name) {
         ClippingAttachment* attachmentP = NEW(ClippingAttachment);
         new (attachmentP) ClippingAttachment(name);
         
         return attachmentP;
     }
     
-    AtlasRegion* AtlasAttachmentLoader::findRegion(std::string name)
-    {
+    AtlasRegion* AtlasAttachmentLoader::findRegion(std::string name) {
         AtlasRegion* ret;
         
-        for (int i = 0; i < _atlasArray.size(); i++)
-        {
+        for (int i = 0; i < _atlasArray.size(); i++) {
             ret = _atlasArray[i]->findRegion(name);
-            if (ret != NULL)
-            {
+            if (ret != NULL) {
                 return ret;
             }
         }

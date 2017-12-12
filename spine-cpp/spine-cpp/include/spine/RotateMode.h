@@ -33,8 +33,7 @@
 
 namespace Spine
 {
-    enum RotateMode
-    {
+    enum RotateMode {
         RotateMode_Tangent = 0,
         RotateMode_Chain,
         RotateMode_ChainScale

@@ -37,13 +37,11 @@ namespace Spine
 {
     RTTI_IMPL_NOPARENT(Timeline);
     
-    Timeline::Timeline()
-    {
+    Timeline::Timeline() {
         // Empty
     }
     
-    Timeline::~Timeline()
-    {
+    Timeline::~Timeline() {
         // Empty
     }
 }

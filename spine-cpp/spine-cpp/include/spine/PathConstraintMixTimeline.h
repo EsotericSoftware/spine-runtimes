@@ -35,8 +35,7 @@
 
 namespace Spine
 {
-    class PathConstraintMixTimeline : public CurveTimeline
-    {
+    class PathConstraintMixTimeline : public CurveTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

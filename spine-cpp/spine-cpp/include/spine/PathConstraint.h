@@ -43,8 +43,7 @@ namespace Spine
     class Bone;
     class Slot;
     
-    class PathConstraint : public Constraint
-    {
+    class PathConstraint : public Constraint {
         friend class Skeleton;
         friend class PathConstraintMixTimeline;
         friend class PathConstraintPositionTimeline;

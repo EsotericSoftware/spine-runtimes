@@ -51,21 +51,17 @@ namespace Spine
     const int TranslateTimeline::X = 1;
     const int TranslateTimeline::Y = 2;
     
-    TranslateTimeline::TranslateTimeline(int frameCount) : CurveTimeline(frameCount), _boneIndex(0)
-    {
+    TranslateTimeline::TranslateTimeline(int frameCount) : CurveTimeline(frameCount), _boneIndex(0) {
         _frames.reserve(frameCount * ENTRIES);
         _frames.setSize(frameCount * ENTRIES);
     }
     
-    void TranslateTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
-    {
+    void TranslateTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
         Bone* boneP = skeleton._bones[_boneIndex];
         Bone& bone = *boneP;
         
-        if (time < _frames[0])
-        {
-            switch (pose)
-            {
+        if (time < _frames[0]) {
+            switch (pose) {
                 case MixPose_Setup:
                     bone._x = bone._data._x;
                     bone._y = bone._data._y;
@@ -81,14 +77,12 @@ namespace Spine
         }
         
         float x, y;
-        if (time >= _frames[_frames.size() - ENTRIES])
-        {
+        if (time >= _frames[_frames.size() - ENTRIES]) {
             // Time is after last frame.
             x = _frames[_frames.size() + PREV_X];
             y = _frames[_frames.size() + PREV_Y];
         }
-        else
-        {
+        else {
             // Interpolate between the previous frame and the current frame.
             int frame = Animation::binarySearch(_frames, time, ENTRIES);
             x = _frames[frame + PREV_X];
@@ -100,25 +94,21 @@ namespace Spine
             y += (_frames[frame + Y] - y) * percent;
         }
         
-        if (pose == MixPose_Setup)
-        {
+        if (pose == MixPose_Setup) {
             bone._x = bone._data._x + x * alpha;
             bone._y = bone._data._y + y * alpha;
         }
-        else
-        {
+        else {
             bone._x += (bone._data._x + x - bone._x) * alpha;
             bone._y += (bone._data._y + y - bone._y) * alpha;
         }
     }
     
-    int TranslateTimeline::getPropertyId()
-    {
+    int TranslateTimeline::getPropertyId() {
         return ((int)TimelineType_Translate << 24) + _boneIndex;
     }
     
-    void TranslateTimeline::setFrame(int frameIndex, float time, float x, float y)
-    {
+    void TranslateTimeline::setFrame(int frameIndex, float time, float x, float y) {
         frameIndex *= ENTRIES;
         _frames[frameIndex] = time;
         _frames[frameIndex + X] = x;

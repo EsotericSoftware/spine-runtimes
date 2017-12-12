@@ -36,18 +36,15 @@ namespace Spine
 {
     RTTI_IMPL(ClippingAttachment, VertexAttachment);
     
-    ClippingAttachment::ClippingAttachment(std::string name) : VertexAttachment(name), _endSlot(NULL)
-    {
+    ClippingAttachment::ClippingAttachment(std::string name) : VertexAttachment(name), _endSlot(NULL) {
         // Empty
     }
     
-    SlotData* ClippingAttachment::getEndSlot()
-    {
+    SlotData* ClippingAttachment::getEndSlot() {
         return _endSlot;
     }
     
-    void ClippingAttachment::setEndSlot(SlotData* inValue)
-    {
+    void ClippingAttachment::setEndSlot(SlotData* inValue) {
         _endSlot = inValue;
     }
 }

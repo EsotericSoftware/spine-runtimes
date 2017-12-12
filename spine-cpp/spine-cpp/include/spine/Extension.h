@@ -49,8 +49,7 @@
 
 namespace Spine
 {
-    class SpineExtension
-    {
+    class SpineExtension {
     public:
         static void setInstance(SpineExtension* inSpineExtension);
         
@@ -77,8 +76,7 @@ namespace Spine
         static SpineExtension* _instance;
     };
     
-    class DefaultSpineExtension : public SpineExtension
-    {
+    class DefaultSpineExtension : public SpineExtension {
     public:
         static DefaultSpineExtension* getInstance();
         

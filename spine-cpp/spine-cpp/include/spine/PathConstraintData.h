@@ -43,8 +43,7 @@ namespace Spine
     class BoneData;
     class SlotData;
     
-    class PathConstraintData
-    {
+    class PathConstraintData {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

@@ -46,8 +46,7 @@ namespace Spine
     class AttachmentLoader;
     class LinkedMesh;
     
-    class SkeletonJson
-    {
+    class SkeletonJson {
     public:
         SkeletonJson(Vector<Atlas*>& atlasArray);
         

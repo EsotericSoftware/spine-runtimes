@@ -37,8 +37,7 @@ namespace Spine
 {
     class MeshAttachment;
     
-    class LinkedMesh
-    {
+    class LinkedMesh {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

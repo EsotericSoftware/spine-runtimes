@@ -39,58 +39,47 @@ namespace Spine
     _order(0),
     _target(NULL),
     _bendDirection(1),
-    _mix(1)
-    {
+    _mix(1) {
         // Empty
     }
     
-    const std::string& IkConstraintData::getName()
-    {
+    const std::string& IkConstraintData::getName() {
         return _name;
     }
     
-    int IkConstraintData::getOrder()
-    {
+    int IkConstraintData::getOrder() {
         return _order;
     }
     
-    void IkConstraintData::setOrder(int inValue)
-    {
+    void IkConstraintData::setOrder(int inValue) {
         _order = inValue;
     }
     
-    Vector<BoneData*>& IkConstraintData::getBones()
-    {
+    Vector<BoneData*>& IkConstraintData::getBones() {
         return _bones;
     }
     
-    BoneData* IkConstraintData::getTarget()
-    {
+    BoneData* IkConstraintData::getTarget() {
         return _target;
     }
     
-    void IkConstraintData::setTarget(BoneData* inValue)
-    {
+    void IkConstraintData::setTarget(BoneData* inValue) {
         _target = inValue;
     }
     
-    int IkConstraintData::getBendDirection()
-    {
+    int IkConstraintData::getBendDirection() {
         return _bendDirection;
     }
     
-    void IkConstraintData::setBendDirection(int inValue)
-    {
+    void IkConstraintData::setBendDirection(int inValue) {
         _bendDirection = inValue;
     }
     
-    float IkConstraintData::getMix()
-    {
+    float IkConstraintData::getMix() {
         return _mix;
     }
     
-    void IkConstraintData::setMix(float inValue)
-    {
+    void IkConstraintData::setMix(float inValue) {
         _mix = inValue;
     }
 }

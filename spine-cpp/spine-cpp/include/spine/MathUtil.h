@@ -51,18 +51,15 @@
 namespace Spine
 {
     template <typename T>
-    int sign(T val)
-    {
+    int sign(T val) {
         return (T(0) < val) - (val < T(0));
     }
     
-    inline bool areFloatsPracticallyEqual(float A, float B, float maxDiff = 0.0000000000000001f, float maxRelDiff = FLT_EPSILON)
-    {
+    inline bool areFloatsPracticallyEqual(float A, float B, float maxDiff = 0.0000000000000001f, float maxRelDiff = FLT_EPSILON) {
         // Check if the numbers are really close -- needed
         // when comparing numbers near zero.
         float diff = fabs(A - B);
-        if (diff <= maxDiff)
-        {
+        if (diff <= maxDiff) {
             return true;
         }
         
@@ -71,21 +68,18 @@ namespace Spine
         
         float largest = (B > A) ? B : A;
         
-        if (diff <= largest * maxRelDiff)
-        {
+        if (diff <= largest * maxRelDiff) {
             return true;
         }
         
         return false;
     }
     
-    inline float clamp(float x, float lower, float upper)
-    {
+    inline float clamp(float x, float lower, float upper) {
         return fminf(upper, fmaxf(x, lower));
     }
     
-    class MathUtil
-    {
+    class MathUtil {
     public:
         MathUtil();
         

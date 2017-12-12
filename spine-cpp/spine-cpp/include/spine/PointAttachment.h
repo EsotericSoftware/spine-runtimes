@@ -44,8 +44,7 @@ namespace Spine
     ///
     /// See http://esotericsoftware.com/spine-point-attachments for Point Attachments in the Spine User Guide.
     /// 
-    class PointAttachment : public Attachment
-    {
+    class PointAttachment : public Attachment {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

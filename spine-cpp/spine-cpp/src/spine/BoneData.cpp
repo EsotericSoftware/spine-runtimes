@@ -46,114 +46,92 @@ namespace Spine
     _scaleY(1),
     _shearX(0),
     _shearY(0),
-    _transformMode(TransformMode_Normal)
-    {
+    _transformMode(TransformMode_Normal) {
         assert(index >= 0);
         assert(_name.length() > 0);
     }
     
-    const int BoneData::getIndex()
-    {
+    const int BoneData::getIndex() {
         return _index;
     }
     
-    const std::string& BoneData::getName()
-    {
+    const std::string& BoneData::getName() {
         return _name;
     }
     
-    BoneData* BoneData::getParent()
-    {
+    BoneData* BoneData::getParent() {
         return _parent;
     }
     
-    float BoneData::getLength()
-    {
+    float BoneData::getLength() {
         return _length;
     }
     
-    void BoneData::setLength(float inValue)
-    {
+    void BoneData::setLength(float inValue) {
         _length = inValue;
     }
     
-    float BoneData::getX()
-    {
+    float BoneData::getX() {
         return _x;
     }
     
-    void BoneData::setX(float inValue)
-    {
+    void BoneData::setX(float inValue) {
         _x = inValue;
     }
     
-    float BoneData::getY()
-    {
+    float BoneData::getY() {
         return _y;
     }
     
-    void BoneData::setY(float inValue)
-    {
+    void BoneData::setY(float inValue) {
         _y = inValue;
     }
     
-    float BoneData::getRotation()
-    {
+    float BoneData::getRotation() {
         return _rotation;
     }
     
-    void BoneData::setRotation(float inValue)
-    {
+    void BoneData::setRotation(float inValue) {
         _rotation = inValue;
     }
     
-    float BoneData::getScaleX()
-    {
+    float BoneData::getScaleX() {
         return _scaleX;
     }
     
-    void BoneData::setScaleX(float inValue)
-    {
+    void BoneData::setScaleX(float inValue) {
         _scaleX = inValue;
     }
     
-    float BoneData::getScaleY()
-    {
+    float BoneData::getScaleY() {
         return _scaleY;
     }
     
-    void BoneData::setScaleY(float inValue)
-    {
+    void BoneData::setScaleY(float inValue) {
         _scaleY = inValue;
     }
     
-    float BoneData::getShearX()
-    {
+    float BoneData::getShearX() {
         return _shearX;
     }
     
-    void BoneData::setShearX(float inValue)
-    {
+    void BoneData::setShearX(float inValue) {
         _shearX = inValue;
     }
     
-    float BoneData::getShearY()
-    {
+    float BoneData::getShearY() {
         return _shearY;
     }
     
-    void BoneData::setShearY(float inValue)
-    {
+    void BoneData::setShearY(float inValue) {
         _shearY = inValue;
     }
     
-    TransformMode BoneData::getTransformMode()
-    {
+    TransformMode BoneData::getTransformMode() {
         return _transformMode;
     }
     
-    void BoneData::setTransformMode(TransformMode inValue)
-    {
+    void BoneData::setTransformMode(TransformMode inValue) {
         _transformMode = inValue;
     }
 }

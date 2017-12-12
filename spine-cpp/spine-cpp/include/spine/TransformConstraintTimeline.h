@@ -35,8 +35,7 @@
 
 namespace Spine
 {
-    class TransformConstraintTimeline : public CurveTimeline
-    {
+    class TransformConstraintTimeline : public CurveTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

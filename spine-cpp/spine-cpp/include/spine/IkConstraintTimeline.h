@@ -35,8 +35,7 @@
 
 namespace Spine
 {
-    class IkConstraintTimeline : public CurveTimeline
-    {
+    class IkConstraintTimeline : public CurveTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

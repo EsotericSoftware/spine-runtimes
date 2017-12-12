@@ -40,22 +40,18 @@
 
 namespace Spine
 {
-    class ContainerUtil
-    {
+    class ContainerUtil {
     public:
         /// Finds an item by comparing each item's name.
         /// It is more efficient to cache the results of this method than to call it multiple times.
         /// @return May be NULL.
         template<typename T>
-        static T* findWithName(Vector<T*>& items, std::string name)
-        {
+        static T* findWithName(Vector<T*>& items, std::string name) {
             assert(name.length() > 0);
             
-            for (T** i = items.begin(); i != items.end(); ++i)
-            {
+            for (T** i = items.begin(); i != items.end(); ++i) {
                 T* item = (*i);
-                if (item->getName() == name)
-                {
+                if (item->getName() == name) {
                     return item;
                 }
             }
@@ -65,15 +61,12 @@ namespace Spine
         
         /// @return -1 if the item was not found.
         template<typename T>
-        static int findIndexWithName(Vector<T*>& items, std::string name)
-        {
+        static int findIndexWithName(Vector<T*>& items, std::string name) {
             assert(name.length() > 0);
             
-            for (size_t i = 0, len = items.size(); i < len; ++i)
-            {
+            for (size_t i = 0, len = items.size(); i < len; ++i) {
                 T* item = items[i];
-                if (item->getName() == name)
-                {
+                if (item->getName() == name) {
                     return static_cast<int>(i);
                 }
             }
@@ -85,15 +78,12 @@ namespace Spine
         /// It is more efficient to cache the results of this method than to call it multiple times.
         /// @return May be NULL.
         template<typename T>
-        static T* findWithDataName(Vector<T*>& items, std::string name)
-        {
+        static T* findWithDataName(Vector<T*>& items, std::string name) {
             assert(name.length() > 0);
             
-            for (T** i = items.begin(); i != items.end(); ++i)
-            {
+            for (T** i = items.begin(); i != items.end(); ++i) {
                 T* item = (*i);
-                if (item->getData().getName() == name)
-                {
+                if (item->getData().getName() == name) {
                     return item;
                 }
             }
@@ -103,15 +93,12 @@ namespace Spine
         
         /// @return -1 if the item was not found.
         template<typename T>
-        static int findIndexWithDataName(Vector<T*>& items, std::string name)
-        {
+        static int findIndexWithDataName(Vector<T*>& items, std::string name) {
             assert(name.length() > 0);
             
-            for (size_t i = 0, len = items.size(); i < len; ++i)
-            {
+            for (size_t i = 0, len = items.size(); i < len; ++i) {
                 T* item = items[i];
-                if (item->getData().getName() == name)
-                {
+                if (item->getData().getName() == name) {
                     return static_cast<int>(i);
                 }
             }
@@ -120,10 +107,8 @@ namespace Spine
         }
         
         template<typename T>
-        static void cleanUpVectorOfPointers(Vector<T*>& items)
-        {
-            for (size_t i = 0; i < items.size(); )
-            {
+        static void cleanUpVectorOfPointers(Vector<T*>& items) {
+            for (size_t i = 0; i < items.size(); ) {
                 T* item = items[i];
                 
                 DESTROY(T, item);

@@ -35,8 +35,7 @@
 
 namespace Spine
 {
-    class RTTI
-    {
+    class RTTI {
     public:
         RTTI(const std::string& className);
         

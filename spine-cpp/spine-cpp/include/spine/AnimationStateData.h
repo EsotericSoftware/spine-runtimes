@@ -42,8 +42,7 @@ namespace Spine
     class Animation;
     
     /// Stores mix (crossfade) durations to be applied when AnimationState animations are changed.
-    class AnimationStateData
-    {
+    class AnimationStateData {
         friend class AnimationState;
         
     public:
@@ -70,8 +69,7 @@ namespace Spine
         float getMix(Animation* from, Animation* to);
         
     private:
-        class AnimationPair
-        {
+        class AnimationPair {
         public:
             Animation* _a1;
             Animation* _a2;
@@ -81,8 +79,7 @@ namespace Spine
             bool operator==(const AnimationPair &other) const;
         };
         
-        struct HashAnimationPair
-        {
+        struct HashAnimationPair {
             std::size_t operator()(const Spine::AnimationStateData::AnimationPair& val) const;
         };
         

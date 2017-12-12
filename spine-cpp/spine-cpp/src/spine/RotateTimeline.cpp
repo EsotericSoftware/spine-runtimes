@@ -42,34 +42,27 @@ namespace Spine
 {
     RTTI_IMPL(RotateTimeline, CurveTimeline);
     
-    RotateTimeline::RotateTimeline(int frameCount) : CurveTimeline(frameCount), _boneIndex(0)
-    {
+    RotateTimeline::RotateTimeline(int frameCount) : CurveTimeline(frameCount), _boneIndex(0) {
         _frames.reserve(frameCount << 1);
         _frames.setSize(frameCount << 1);
     }
     
-    void RotateTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
-    {
+    void RotateTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
         Bone* bone = skeleton.getBones()[_boneIndex];
         
-        if (time < _frames[0])
-        {
-            switch (pose)
-            {
-                case MixPose_Setup:
-                {
+        if (time < _frames[0]) {
+            switch (pose) {
+                case MixPose_Setup: {
                     bone->_rotation = bone->_data._rotation;
                     break;
                 }
-                case MixPose_Current:
-                {
+                case MixPose_Current: {
                     float rr = bone->_data._rotation - bone->_rotation;
                     rr -= (16384 - (int)(16384.499999999996 - rr / 360)) * 360;
                     bone->_rotation += rr * alpha;
                     break;
                 }
-                case MixPose_CurrentLayered:
-                {
+                case MixPose_CurrentLayered: {
                     // TODO?
                     break;
                 }
@@ -78,15 +71,12 @@ namespace Spine
             return;
         }
         
-        if (time >= _frames[_frames.size() - ENTRIES])
-        {
+        if (time >= _frames[_frames.size() - ENTRIES]) {
             // Time is after last frame.
-            if (pose == MixPose_Setup)
-            {
+            if (pose == MixPose_Setup) {
                 bone->_rotation = bone->_data._rotation + _frames[_frames.size() + PREV_ROTATION] * alpha;
             }
-            else
-            {
+            else {
                 float rr = bone->_data._rotation + _frames[_frames.size() + PREV_ROTATION] - bone->_rotation;
                 rr -= (16384 - (int)(16384.499999999996 - rr / 360)) * 360; // Wrap within -180 and 180.
                 bone->_rotation += rr * alpha;
@@ -105,48 +95,40 @@ namespace Spine
         r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
         r = prevRotation + r * percent;
         
-        if (pose == MixPose_Setup)
-        {
+        if (pose == MixPose_Setup) {
             r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
             bone->_rotation = bone->_data._rotation + r * alpha;
         }
-        else
-        {
+        else {
             r = bone->_data._rotation + r - bone->_rotation;
             r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
             bone->_rotation += r * alpha;
         }
     }
     
-    int RotateTimeline::getPropertyId()
-    {
+    int RotateTimeline::getPropertyId() {
         return ((int)TimelineType_Rotate << 24) + _boneIndex;
     }
     
-    void RotateTimeline::setFrame(int frameIndex, float time, float degrees)
-    {
+    void RotateTimeline::setFrame(int frameIndex, float time, float degrees) {
         frameIndex <<= 1;
         _frames[frameIndex] = time;
         _frames[frameIndex + ROTATION] = degrees;
     }
     
-    int RotateTimeline::getBoneIndex()
-    {
+    int RotateTimeline::getBoneIndex() {
         return _boneIndex;
     }
     
-    void RotateTimeline::setBoneIndex(int inValue)
-    {
+    void RotateTimeline::setBoneIndex(int inValue) {
         _boneIndex = inValue;
     }
     
-    Vector<float>& RotateTimeline::getFrames()
-    {
+    Vector<float>& RotateTimeline::getFrames() {
         return _frames;
     }
     
-    void RotateTimeline::setFrames(Vector<float> inValue)
-    {
+    void RotateTimeline::setFrames(Vector<float> inValue) {
         _frames = inValue;
     }
 }

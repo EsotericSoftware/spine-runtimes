@@ -49,20 +49,16 @@ namespace Spine
     const int PathConstraintPositionTimeline::PREV_VALUE = -1;
     const int PathConstraintPositionTimeline::VALUE = 1;
     
-    PathConstraintPositionTimeline::PathConstraintPositionTimeline(int frameCount) : CurveTimeline(frameCount), _pathConstraintIndex(0)
-    {
+    PathConstraintPositionTimeline::PathConstraintPositionTimeline(int frameCount) : CurveTimeline(frameCount), _pathConstraintIndex(0) {
         _frames.reserve(frameCount * ENTRIES);
         _frames.setSize(frameCount * ENTRIES);
     }
     
-    void PathConstraintPositionTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
-    {
+    void PathConstraintPositionTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
         PathConstraint* constraintP = skeleton._pathConstraints[_pathConstraintIndex];
         PathConstraint& constraint = *constraintP;
-        if (time < _frames[0])
-        {
-            switch (pose)
-            {
+        if (time < _frames[0]) {
+            switch (pose) {
                 case MixPose_Setup:
                     constraint._position = constraint._data._position;
                     return;
@@ -76,12 +72,11 @@ namespace Spine
         }
         
         float position;
-        if (time >= _frames[_frames.size() - ENTRIES]) // Time is after last frame.
-        {
+        if (time >= _frames[_frames.size() - ENTRIES]) {
+            // Time is after last frame.
             position = _frames[_frames.size() + PREV_VALUE];
         }
-        else
-        {
+        else {
             // Interpolate between the previous frame and the current frame.
             int frame = Animation::binarySearch(_frames, time, ENTRIES);
             position = _frames[frame + PREV_VALUE];
@@ -91,23 +86,19 @@ namespace Spine
             
             position += (_frames[frame + VALUE] - position) * percent;
         }
-        if (pose == MixPose_Setup)
-        {
+        if (pose == MixPose_Setup) {
             constraint._position = constraint._data._position + (position - constraint._data._position) * alpha;
         }
-        else
-        {
+        else {
             constraint._position += (position - constraint._position) * alpha;
         }
     }
     
-    int PathConstraintPositionTimeline::getPropertyId()
-    {
+    int PathConstraintPositionTimeline::getPropertyId() {
         return ((int)TimelineType_PathConstraintPosition << 24) + _pathConstraintIndex;
     }
     
-    void PathConstraintPositionTimeline::setFrame(int frameIndex, float time, float value)
-    {
+    void PathConstraintPositionTimeline::setFrame(int frameIndex, float time, float value) {
         frameIndex *= ENTRIES;
         _frames[frameIndex] = time;
         _frames[frameIndex + VALUE] = value;

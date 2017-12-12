@@ -44,82 +44,65 @@ namespace Spine
     Animation::Animation(std::string name, Vector<Timeline*>& timelines, float duration) :
     _timelines(timelines),
     _duration(duration),
-    _name(name)
-    {
+    _name(name) {
         assert(_name.length() > 0);
     }
     
-    Animation::~Animation()
-    {
+    Animation::~Animation() {
         ContainerUtil::cleanUpVectorOfPointers(_timelines);
     }
     
-    void Animation::apply(Skeleton& skeleton, float lastTime, float time, bool loop, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
-    {
-        if (loop && _duration != 0)
-        {
+    void Animation::apply(Skeleton& skeleton, float lastTime, float time, bool loop, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
+        if (loop && _duration != 0) {
             time = fmod(time, _duration);
-            if (lastTime > 0)
-            {
+            if (lastTime > 0) {
                 lastTime = fmod(lastTime, _duration);
             }
         }
         
-        for (int i = 0, n = static_cast<int>(_timelines.size()); i < n; ++i)
-        {
+        for (int i = 0, n = static_cast<int>(_timelines.size()); i < n; ++i) {
             _timelines[i]->apply(skeleton, lastTime, time, pEvents, alpha, pose, direction);
         }
     }
     
-    std::string Animation::getName()
-    {
+    std::string Animation::getName() {
         return _name;
     }
     
-    Vector<Timeline*> Animation::getTimelines()
-    {
+    Vector<Timeline*> Animation::getTimelines() {
         return _timelines;
     }
     
-    void Animation::setTimelines(Vector<Timeline*> inValue)
-    {
+    void Animation::setTimelines(Vector<Timeline*> inValue) {
         _timelines = inValue;
     }
     
-    float Animation::getDuration()
-    {
+    float Animation::getDuration() {
         return _duration;
     }
     
-    void Animation::setDuration(float inValue)
-    {
+    void Animation::setDuration(float inValue) {
         _duration = inValue;
     }
     
-    int Animation::binarySearch(Vector<float>& values, float target, int step)
-    {
+    int Animation::binarySearch(Vector<float>& values, float target, int step) {
         int low = 0;
         int size = static_cast<int>(values.size());
         int high = size / step - 2;
-        if (high == 0)
-        {
+        if (high == 0) {
             return step;
         }
         
         int current = (int)(static_cast<uint32_t>(high) >> 1);
-        while (true)
-        {
-            if (values[(current + 1) * step] <= target)
-            {
+        while (true) {
+            if (values[(current + 1) * step] <= target) {
                 low = current + 1;
             }
-            else
-            {
+            else {
                 high = current;
             }
             
-            if (low == high)
-            {
+            if (low == high) {
                 return (low + 1) * step;
             }
             
@@ -127,30 +110,24 @@ namespace Spine
         }
     }
     
-    int Animation::binarySearch(Vector<float>& values, float target)
-    {
+    int Animation::binarySearch(Vector<float>& values, float target) {
         int low = 0;
         int size = static_cast<int>(values.size());
         int high = size - 2;
-        if (high == 0)
-        {
+        if (high == 0) {
             return 1;
         }
         
         int current = (int)(static_cast<uint32_t>(high) >> 1);
-        while (true)
-        {
-            if (values[(current + 1)] <= target)
-            {
+        while (true) {
+            if (values[(current + 1)] <= target) {
                 low = current + 1;
             }
-            else
-            {
+            else {
                 high = current;
             }
             
-            if (low == high)
-            {
+            if (low == high) {
                 return (low + 1);
             }
             
@@ -158,12 +135,9 @@ namespace Spine
         }
     }
     
-    int Animation::linearSearch(Vector<float>& values, float target, int step)
-    {
-        for (int i = 0, last = static_cast<int>(values.size()) - step; i <= last; i += step)
-        {
-            if (values[i] > target)
-            {
+    int Animation::linearSearch(Vector<float>& values, float target, int step) {
+        for (int i = 0, last = static_cast<int>(values.size()) - step; i <= last; i += step) {
+            if (values[i] > target) {
                 return i;
             }
         }

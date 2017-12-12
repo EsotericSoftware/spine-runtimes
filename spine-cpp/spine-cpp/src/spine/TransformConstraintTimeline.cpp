@@ -55,21 +55,17 @@ namespace Spine
     const int TransformConstraintTimeline::SCALE = 3;
     const int TransformConstraintTimeline::SHEAR = 4;
     
-    TransformConstraintTimeline::TransformConstraintTimeline(int frameCount) : CurveTimeline(frameCount), _transformConstraintIndex(0)
-    {
+    TransformConstraintTimeline::TransformConstraintTimeline(int frameCount) : CurveTimeline(frameCount), _transformConstraintIndex(0) {
         _frames.reserve(frameCount * ENTRIES);
         _frames.setSize(frameCount * ENTRIES);
     }
     
-    void TransformConstraintTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
-    {
+    void TransformConstraintTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
         TransformConstraint* constraintP = skeleton._transformConstraints[_transformConstraintIndex];
         TransformConstraint& constraint = *constraintP;
         
-        if (time < _frames[0])
-        {
-            switch (pose)
-            {
+        if (time < _frames[0]) {
+            switch (pose) {
                 case MixPose_Setup:
                     constraint._rotateMix = constraint._data._rotateMix;
                     constraint._translateMix = constraint._data._translateMix;
@@ -89,8 +85,7 @@ namespace Spine
         }
         
         float rotate, translate, scale, shear;
-        if (time >= _frames[_frames.size() - ENTRIES])
-        {
+        if (time >= _frames[_frames.size() - ENTRIES]) {
             // Time is after last frame.
             int i = static_cast<int>(_frames.size());
             rotate = _frames[i + PREV_ROTATE];
@@ -98,8 +93,7 @@ namespace Spine
             scale = _frames[i + PREV_SCALE];
             shear = _frames[i + PREV_SHEAR];
         }
-        else
-        {
+        else {
             // Interpolate between the previous frame and the current frame.
             int frame = Animation::binarySearch(_frames, time, ENTRIES);
             rotate = _frames[frame + PREV_ROTATE];
@@ -116,16 +110,14 @@ namespace Spine
             shear += (_frames[frame + SHEAR] - shear) * percent;
         }
         
-        if (pose == MixPose_Setup)
-        {
+        if (pose == MixPose_Setup) {
             TransformConstraintData& data = constraint._data;
             constraint._rotateMix = data._rotateMix + (rotate - data._rotateMix) * alpha;
             constraint._translateMix = data._translateMix + (translate - data._translateMix) * alpha;
             constraint._scaleMix = data._scaleMix + (scale - data._scaleMix) * alpha;
             constraint._shearMix = data._shearMix + (shear - data._shearMix) * alpha;
         }
-        else
-        {
+        else {
             constraint._rotateMix += (rotate - constraint._rotateMix) * alpha;
             constraint._translateMix += (translate - constraint._translateMix) * alpha;
             constraint._scaleMix += (scale - constraint._scaleMix) * alpha;
@@ -133,13 +125,11 @@ namespace Spine
         }
     }
     
-    int TransformConstraintTimeline::getPropertyId()
-    {
+    int TransformConstraintTimeline::getPropertyId() {
         return ((int)TimelineType_TransformConstraint << 24) + _transformConstraintIndex;
     }
     
-    void TransformConstraintTimeline::setFrame(int frameIndex, float time, float rotateMix, float translateMix, float scaleMix, float shearMix)
-    {
+    void TransformConstraintTimeline::setFrame(int frameIndex, float time, float rotateMix, float translateMix, float scaleMix, float shearMix) {
         frameIndex *= ENTRIES;
         _frames[frameIndex] = time;
         _frames[frameIndex + ROTATE] = rotateMix;

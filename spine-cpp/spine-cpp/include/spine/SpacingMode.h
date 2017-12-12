@@ -33,8 +33,7 @@
 
 namespace Spine
 {
-    enum SpacingMode
-    {
+    enum SpacingMode {
         SpacingMode_Length = 0,
         SpacingMode_Fixed,
         SpacingMode_Percent

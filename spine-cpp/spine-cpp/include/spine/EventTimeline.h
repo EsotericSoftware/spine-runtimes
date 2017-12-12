@@ -35,8 +35,7 @@
 
 namespace Spine
 {
-    class EventTimeline : public Timeline
-    {
+    class EventTimeline : public Timeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

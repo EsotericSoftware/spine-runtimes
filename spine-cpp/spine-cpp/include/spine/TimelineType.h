@@ -33,8 +33,7 @@
 
 namespace Spine
 {
-    enum TimelineType
-    {
+    enum TimelineType {
         TimelineType_Rotate = 0,
         TimelineType_Translate,
         TimelineType_Scale,

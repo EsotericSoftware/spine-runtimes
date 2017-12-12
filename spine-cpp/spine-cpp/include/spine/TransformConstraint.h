@@ -41,8 +41,7 @@ namespace Spine
     class Skeleton;
     class Bone;
     
-    class TransformConstraint : public Constraint
-    {
+    class TransformConstraint : public Constraint {
         friend class Skeleton;
         friend class TransformConstraintTimeline;
         

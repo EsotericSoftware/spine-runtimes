@@ -35,8 +35,7 @@
 
 namespace Spine
 {
-    class RotateTimeline : public CurveTimeline
-    {
+    class RotateTimeline : public CurveTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         friend class AnimationState;

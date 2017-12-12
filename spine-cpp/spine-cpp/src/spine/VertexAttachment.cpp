@@ -39,27 +39,22 @@ namespace Spine
 {
     RTTI_IMPL(VertexAttachment, Attachment);
     
-    VertexAttachment::VertexAttachment(std::string name) : Attachment(name), _worldVerticesLength(0), _id(getNextID())
-    {
+    VertexAttachment::VertexAttachment(std::string name) : Attachment(name), _worldVerticesLength(0), _id(getNextID()) {
         // Empty
     }
     
-    void VertexAttachment::computeWorldVertices(Slot& slot, Vector<float>& worldVertices)
-    {
+    void VertexAttachment::computeWorldVertices(Slot& slot, Vector<float>& worldVertices) {
         computeWorldVertices(slot, 0, _worldVerticesLength, worldVertices, 0);
     }
     
-    void VertexAttachment::computeWorldVertices(Slot& slot, int start, int count, Vector<float>& worldVertices, int offset, int stride)
-    {
+    void VertexAttachment::computeWorldVertices(Slot& slot, int start, int count, Vector<float>& worldVertices, int offset, int stride) {
         count = offset + (count >> 1) * stride;
         Skeleton& skeleton = slot._bone._skeleton;
         Vector<float>& deformArray = slot.getAttachmentVertices();
         Vector<float>& vertices = _vertices;
         Vector<int>& bones = _bones;
-        if (bones.size() == 0)
-        {
-            if (deformArray.size() > 0)
-            {
+        if (bones.size() == 0) {
+            if (deformArray.size() > 0) {
                 vertices = deformArray;
             }
             
@@ -67,8 +62,7 @@ namespace Spine
             float x = bone._worldX;
             float y = bone._worldY;
             float a = bone._a, b = bone._b, c = bone._c, d = bone._d;
-            for (int vv = start, w = offset; w < count; vv += 2, w += stride)
-            {
+            for (int vv = start, w = offset; w < count; vv += 2, w += stride) {
                 float vx = vertices[vv];
                 float vy = vertices[vv + 1];
                 worldVertices[w] = vx * a + vy * b + x;
@@ -78,23 +72,19 @@ namespace Spine
         }
         
         int v = 0, skip = 0;
-        for (int i = 0; i < start; i += 2)
-        {
+        for (int i = 0; i < start; i += 2) {
             int n = bones[v];
             v += n + 1;
             skip += n;
         }
         
         Vector<Bone*>& skeletonBones = skeleton.getBones();
-        if (deformArray.size() == 0)
-        {
-            for (int w = offset, b = skip * 3; w < count; w += stride)
-            {
+        if (deformArray.size() == 0) {
+            for (int w = offset, b = skip * 3; w < count; w += stride) {
                 float wx = 0, wy = 0;
                 int n = bones[v++];
                 n += v;
-                for (; v < n; v++, b += 3)
-                {
+                for (; v < n; v++, b += 3) {
                     Bone* boneP = skeletonBones[bones[v]];
                     Bone& bone = *boneP;
                     float vx = vertices[b];
@@ -107,15 +97,12 @@ namespace Spine
                 worldVertices[w + 1] = wy;
             }
         }
-        else
-        {
-            for (int w = offset, b = skip * 3, f = skip << 1; w < count; w += stride)
-            {
+        else {
+            for (int w = offset, b = skip * 3, f = skip << 1; w < count; w += stride) {
                 float wx = 0, wy = 0;
                 int n = bones[v++];
                 n += v;
-                for (; v < n; v++, b += 3, f += 2)
-                {
+                for (; v < n; v++, b += 3, f += 2) {
                     Bone* boneP = skeletonBones[bones[v]];
                     Bone& bone = *boneP;
                     float vx = vertices[b] + deformArray[f];
@@ -130,48 +117,39 @@ namespace Spine
         }
     }
     
-    bool VertexAttachment::applyDeform(VertexAttachment* sourceAttachment)
-    {
+    bool VertexAttachment::applyDeform(VertexAttachment* sourceAttachment) {
         return this == sourceAttachment;
     }
     
-    int VertexAttachment::getId()
-    {
+    int VertexAttachment::getId() {
         return _id;
     }
     
-    Vector<int>& VertexAttachment::getBones()
-    {
+    Vector<int>& VertexAttachment::getBones() {
         return _bones;
     }
     
-    void VertexAttachment::setBones(Vector<int> inValue)
-    {
+    void VertexAttachment::setBones(Vector<int> inValue) {
         _bones = inValue;
     }
     
-    Vector<float>& VertexAttachment::getVertices()
-    {
+    Vector<float>& VertexAttachment::getVertices() {
         return _vertices;
     }
     
-    void VertexAttachment::setVertices(Vector<float> inValue)
-    {
+    void VertexAttachment::setVertices(Vector<float> inValue) {
         _vertices = inValue;
     }
     
-    int VertexAttachment::getWorldVerticesLength()
-    {
+    int VertexAttachment::getWorldVerticesLength() {
         return _worldVerticesLength;
     }
     
-    void VertexAttachment::setWorldVerticesLength(int inValue)
-    {
+    void VertexAttachment::setWorldVerticesLength(int inValue) {
         _worldVerticesLength = inValue;
     }
     
-    int VertexAttachment::getNextID()
-    {
+    int VertexAttachment::getNextID() {
         static int nextID = 0;
         
         return (nextID++ & 65535) << 11;

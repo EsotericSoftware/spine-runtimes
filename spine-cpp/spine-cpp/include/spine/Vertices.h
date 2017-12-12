@@ -35,8 +35,7 @@
 
 namespace Spine
 {
-    class Vertices
-    {
+    class Vertices {
     public:
         Vector<int> _bones;
         Vector<float> _vertices;

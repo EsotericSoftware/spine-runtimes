@@ -44,19 +44,15 @@ namespace Spine
 {
     RTTI_IMPL(PathConstraintSpacingTimeline, PathConstraintPositionTimeline);
     
-    PathConstraintSpacingTimeline::PathConstraintSpacingTimeline(int frameCount) : PathConstraintPositionTimeline(frameCount)
-    {
+    PathConstraintSpacingTimeline::PathConstraintSpacingTimeline(int frameCount) : PathConstraintPositionTimeline(frameCount) {
         // Empty
     }
     
-    void PathConstraintSpacingTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
-    {
+    void PathConstraintSpacingTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
         PathConstraint* constraintP = skeleton._pathConstraints[_pathConstraintIndex];
         PathConstraint& constraint = *constraintP;
-        if (time < _frames[0])
-        {
-            switch (pose)
-            {
+        if (time < _frames[0]) {
+            switch (pose) {
                 case MixPose_Setup:
                     constraint._spacing = constraint._data._spacing;
                     return;
@@ -70,12 +66,11 @@ namespace Spine
         }
         
         float spacing;
-        if (time >= _frames[_frames.size() - ENTRIES]) // Time is after last frame.
-        {
+        if (time >= _frames[_frames.size() - ENTRIES]) {
+            // Time is after last frame.
             spacing = _frames[_frames.size() + PREV_VALUE];
         }
-        else
-        {
+        else {
             // Interpolate between the previous frame and the current frame.
             int frame = Animation::binarySearch(_frames, time, ENTRIES);
             spacing = _frames[frame + PREV_VALUE];
@@ -86,18 +81,15 @@ namespace Spine
             spacing += (_frames[frame + VALUE] - spacing) * percent;
         }
         
-        if (pose == MixPose_Setup)
-        {
+        if (pose == MixPose_Setup) {
             constraint._spacing = constraint._data._spacing + (spacing - constraint._data._spacing) * alpha;
         }
-        else
-        {
+        else {
             constraint._spacing += (spacing - constraint._spacing) * alpha;
         }
     }
     
-    int PathConstraintSpacingTimeline::getPropertyId()
-    {
+    int PathConstraintSpacingTimeline::getPropertyId() {
         return ((int)TimelineType_PathConstraintSpacing << 24) + _pathConstraintIndex;
     }
 }

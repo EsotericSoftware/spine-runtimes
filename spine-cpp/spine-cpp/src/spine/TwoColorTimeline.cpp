@@ -59,22 +59,18 @@ namespace Spine
     const int TwoColorTimeline::G2 = 6;
     const int TwoColorTimeline::B2 = 7;
     
-    TwoColorTimeline::TwoColorTimeline(int frameCount) : CurveTimeline(frameCount), _slotIndex(0)
-    {
+    TwoColorTimeline::TwoColorTimeline(int frameCount) : CurveTimeline(frameCount), _slotIndex(0) {
         _frames.reserve(frameCount * ENTRIES);
         _frames.setSize(frameCount * ENTRIES);
     }
     
-    void TwoColorTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
-    {
+    void TwoColorTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
         Slot* slotP = skeleton._slots[_slotIndex];
         Slot& slot = *slotP;
         
-        if (time < _frames[0])
-        {
+        if (time < _frames[0]) {
             // Time is before first frame.
-            switch (pose)
-            {
+            switch (pose) {
                 case MixPose_Setup:
                     slot._r = slot._data._r;
                     slot._g = slot._data._g;
@@ -100,8 +96,7 @@ namespace Spine
         }
         
         float r, g, b, a, r2, g2, b2;
-        if (time >= _frames[_frames.size() - ENTRIES])
-        {
+        if (time >= _frames[_frames.size() - ENTRIES]) {
             // Time is after last frame.
             int i = static_cast<int>(_frames.size());
             r = _frames[i + PREV_R];
@@ -112,8 +107,7 @@ namespace Spine
             g2 = _frames[i + PREV_G2];
             b2 = _frames[i + PREV_B2];
         }
-        else
-        {
+        else {
             // Interpolate between the previous frame and the current frame.
             int frame = Animation::binarySearch(_frames, time, ENTRIES);
             r = _frames[frame + PREV_R];
@@ -136,8 +130,7 @@ namespace Spine
             b2 += (_frames[frame + B2] - b2) * percent;
         }
         
-        if (alpha == 1)
-        {
+        if (alpha == 1) {
             slot._r = r;
             slot._g = g;
             slot._b = b;
@@ -146,11 +139,9 @@ namespace Spine
             slot._g2 = g2;
             slot._b2 = b2;
         }
-        else
-        {
+        else {
             float br, bg, bb, ba, br2, bg2, bb2;
-            if (pose == MixPose_Setup)
-            {
+            if (pose == MixPose_Setup) {
                 br = slot._data._r;
                 bg = slot._data._g;
                 bb = slot._data._b;
@@ -159,8 +150,7 @@ namespace Spine
                 bg2 = slot._data._g2;
                 bb2 = slot._data._b2;
             }
-            else
-            {
+            else {
                 br = slot._r;
                 bg = slot._g;
                 bb = slot._b;
@@ -180,13 +170,11 @@ namespace Spine
         }
     }
     
-    int TwoColorTimeline::getPropertyId()
-    {
+    int TwoColorTimeline::getPropertyId() {
         return ((int)TimelineType_TwoColor << 24) + _slotIndex;
     }
     
-    void TwoColorTimeline::setFrame(int frameIndex, float time, float r, float g, float b, float a, float r2, float g2, float b2)
-    {
+    void TwoColorTimeline::setFrame(int frameIndex, float time, float r, float g, float b, float a, float r2, float g2, float b2) {
         frameIndex *= ENTRIES;
         _frames[frameIndex] = time;
         _frames[frameIndex + R] = r;
@@ -198,13 +186,11 @@ namespace Spine
         _frames[frameIndex + B2] = b2;
     }
     
-    int TwoColorTimeline::getSlotIndex()
-    {
+    int TwoColorTimeline::getSlotIndex() {
         return _slotIndex;
     }
     
-    void TwoColorTimeline::setSlotIndex(int inValue)
-    {
+    void TwoColorTimeline::setSlotIndex(int inValue) {
         assert(inValue >= 0);
         _slotIndex = inValue;
     }

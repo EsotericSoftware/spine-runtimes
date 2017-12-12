@@ -51,20 +51,16 @@ namespace Spine
     const int PathConstraintMixTimeline::ROTATE = 1;
     const int PathConstraintMixTimeline::TRANSLATE = 2;
     
-    PathConstraintMixTimeline::PathConstraintMixTimeline(int frameCount) : CurveTimeline(frameCount), _pathConstraintIndex(0)
-    {
+    PathConstraintMixTimeline::PathConstraintMixTimeline(int frameCount) : CurveTimeline(frameCount), _pathConstraintIndex(0) {
         _frames.reserve(frameCount * ENTRIES);
         _frames.setSize(frameCount * ENTRIES);
     }
     
-    void PathConstraintMixTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
-    {
+    void PathConstraintMixTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
         PathConstraint* constraintP = skeleton._pathConstraints[_pathConstraintIndex];
         PathConstraint& constraint = *constraintP;
-        if (time < _frames[0])
-        {
-            switch (pose)
-            {
+        if (time < _frames[0]) {
+            switch (pose) {
                 case MixPose_Setup:
                     constraint._rotateMix = constraint._data._rotateMix;
                     constraint._translateMix = constraint._data._translateMix;
@@ -80,14 +76,12 @@ namespace Spine
         }
         
         float rotate, translate;
-        if (time >= _frames[_frames.size() - ENTRIES])
-        {
+        if (time >= _frames[_frames.size() - ENTRIES]) {
             // Time is after last frame.
             rotate = _frames[_frames.size() + PREV_ROTATE];
             translate = _frames[_frames.size() + PREV_TRANSLATE];
         }
-        else
-        {
+        else {
             // Interpolate between the previous frame and the current frame.
             int frame = Animation::binarySearch(_frames, time, ENTRIES);
             rotate = _frames[frame + PREV_ROTATE];
@@ -100,25 +94,21 @@ namespace Spine
             translate += (_frames[frame + TRANSLATE] - translate) * percent;
         }
         
-        if (pose == MixPose_Setup)
-        {
+        if (pose == MixPose_Setup) {
             constraint._rotateMix = constraint._data._rotateMix + (rotate - constraint._data._rotateMix) * alpha;
             constraint._translateMix = constraint._data._translateMix + (translate - constraint._data._translateMix) * alpha;
         }
-        else
-        {
+        else {
             constraint._rotateMix += (rotate - constraint._rotateMix) * alpha;
             constraint._translateMix += (translate - constraint._translateMix) * alpha;
         }
     }
     
-    int PathConstraintMixTimeline::getPropertyId()
-    {
+    int PathConstraintMixTimeline::getPropertyId() {
         return ((int)TimelineType_PathConstraintMix << 24) + _pathConstraintIndex;
     }
     
-    void PathConstraintMixTimeline::setFrame(int frameIndex, float time, float rotateMix, float translateMix)
-    {
+    void PathConstraintMixTimeline::setFrame(int frameIndex, float time, float rotateMix, float translateMix) {
         frameIndex *= ENTRIES;
         _frames[frameIndex] = time;
         _frames[frameIndex + ROTATE] = rotateMix;

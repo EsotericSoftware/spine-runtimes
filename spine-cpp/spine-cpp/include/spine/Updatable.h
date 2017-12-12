@@ -35,8 +35,7 @@
 
 namespace Spine
 {
-    class Updatable
-    {
+    class Updatable {
         RTTI_DECL;
         
     public:

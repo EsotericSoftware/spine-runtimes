@@ -48,8 +48,7 @@ namespace Spine
     class Animation;
     class CurveTimeline;
     
-    class SkeletonBinary
-    {
+    class SkeletonBinary {
     public:
         static const int BONE_ROTATE;
         static const int BONE_TRANSLATE;
@@ -81,8 +80,7 @@ namespace Spine
         SkeletonData* readSkeletonDataFile(const char* path);
         
     private:
-        struct DataInput
-        {
+        struct DataInput {
             const unsigned char* cursor;
             const unsigned char* end;
         };

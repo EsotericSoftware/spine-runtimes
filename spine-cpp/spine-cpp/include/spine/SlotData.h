@@ -39,8 +39,7 @@ namespace Spine
 {
     class BoneData;
     
-    class SlotData
-    {
+    class SlotData {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

@@ -37,51 +37,42 @@
 namespace Spine
 {
     template <typename K, typename V, typename H>
-    class HashMap
-    {
+    class HashMap {
     private:
         class Entry;
         
     public:
-        class Iterator
-        {
+        class Iterator {
             friend class HashMap;
             
         public:
-            Iterator(Entry* entry = NULL) : _entry(entry)
-            {
+            Iterator(Entry* entry = NULL) : _entry(entry) {
                 // Empty
             }
             
-            Iterator& operator++()
-            {
+            Iterator& operator++() {
                 _entry = _entry->next;
                 return *this;
             }
             
-            Iterator& operator--()
-            {
+            Iterator& operator--() {
                 _entry = _entry->prev;
                 return *this;
             }
             
-            bool operator==(const Iterator& p) const
-            {
+            bool operator==(const Iterator& p) const {
                 return _entry == p._entry;
             }
             
-            bool operator!=(const Iterator& p) const
-            {
+            bool operator!=(const Iterator& p) const {
                 return _entry != p._entry;
             }
             
-            K& first()
-            {
+            K& first() {
                 return _entry->_key;
             }
             
-            V& second()
-            {
+            V& second() {
                 return _entry->_value;
             }
             
@@ -94,11 +85,9 @@ namespace Spine
         _capacity(capacity),
         _header(),
         _trailer(),
-        _hashSize(0)
-        {
+        _hashSize(0) {
             _hashTable.reserve(capacity);
-            for (int i = 0; i < _capacity; ++i)
-            {
+            for (int i = 0; i < _capacity; ++i) {
                 _hashTable.push_back(Entry());
             }
             
@@ -108,42 +97,34 @@ namespace Spine
             _trailer.next = &_trailer;
         }
         
-        ~HashMap()
-        {
+        ~HashMap() {
             _hashSize = 0;
         }
         
-        size_t size()
-        {
+        size_t size() {
             return _hashSize;
         }
         
-        Iterator begin()
-        {
+        Iterator begin() {
             return Iterator(_header.next);
         }
         
-        Iterator end()
-        {
+        Iterator end() {
             return Iterator(&_trailer);
         }
         
-        Iterator rbegin()
-        {
+        Iterator rbegin() {
             return Iterator(_trailer.prev);
         }
         
-        Iterator rend()
-        {
+        Iterator rend() {
             return Iterator(_header);
         }
         
-        std::pair<Iterator, bool> insert(const K& key, const V& value)
-        {
+        std::pair<Iterator, bool> insert(const K& key, const V& value) {
             Iterator iter = find(key);
             
-            if (iter._entry != &_trailer)
-            {
+            if (iter._entry != &_trailer) {
                 return std::make_pair(iter, false);
             }
             
@@ -156,8 +137,7 @@ namespace Spine
             
             _hashSize++;
             
-            if (_header.next == (&_trailer))
-            {
+            if (_header.next == (&_trailer)) {
                 _hashTable[index].next = entry;
                 _hashTable[index].prev = entry;
                 _header.next = entry;
@@ -168,19 +148,16 @@ namespace Spine
                 return std::make_pair(Iterator(entry), true);
             }
             
-            if (_hashTable[index].next == NULL)
-            {
+            if (_hashTable[index].next == NULL) {
                 _hashTable[index].next = entry;
                 _hashTable[index].prev = entry;
-                if (index < hash(_header.next->_key))
-                {
+                if (index < hash(_header.next->_key)) {
                     entry->next = _header.next;
                     entry->prev = &_header;
                     _header.next->prev = entry;
                     _header.next = entry;
                 }
-                else
-                {
+                else {
                     entry->next = &_trailer;
                     entry->prev = _trailer.prev;
                     _trailer.prev = entry;
@@ -190,16 +167,14 @@ namespace Spine
                 return std::make_pair(Iterator(entry), true);
             }
             
-            if (index == hash(_header.next->_key))
-            {
+            if (index == hash(_header.next->_key)) {
                 _header.next = entry;
                 entry->next = _hashTable[index].next;
                 entry->prev = &_header;
                 _hashTable[index].next->prev = entry;
                 _hashTable[index].next = entry;
             }
-            else
-            {
+            else {
                 entry->next = _hashTable[index].next;
                 entry->prev = _hashTable[index].next->prev;
                 entry->next->prev = entry;
@@ -210,17 +185,13 @@ namespace Spine
             return std::make_pair(Iterator(entry), true);
         }
         
-        Iterator find(const K& key)
-        {
+        Iterator find(const K& key) {
             const size_t index = hash(key);
             Iterator iter(_hashTable[index].next);
             
-            if (iter._entry != NULL)
-            {
-                for ( ; hash(iter._entry->_key) == index ; ++iter)
-                {
-                    if (iter._entry->_key == key)
-                    {
+            if (iter._entry != NULL) {
+                for ( ; hash(iter._entry->_key) == index ; ++iter) {
+                    if (iter._entry->_key == key) {
                         return iter;
                     }
                 }
@@ -229,71 +200,58 @@ namespace Spine
             return Iterator(&_trailer);
         }
         
-        Iterator erase(Iterator pos)
-        {
-            if (pos._entry != &_header && pos._entry != &_trailer)
-            {
+        Iterator erase(Iterator pos) {
+            if (pos._entry != &_header && pos._entry != &_trailer) {
                 Entry* next = pos._entry->next;
                 
                 size_t index = hash(pos._entry->_key);
                 
-                if (_hashTable[index].next == pos._entry && _hashTable[index].prev == pos._entry)
-                {
+                if (_hashTable[index].next == pos._entry && _hashTable[index].prev == pos._entry) {
                     _hashTable[index].next = NULL;
                     _hashTable[index].prev = NULL;
                     
-                    if (_header.next == pos._entry)
-                    {
+                    if (_header.next == pos._entry) {
                         _header.next = pos._entry->next;
                         pos._entry->next->prev = &_header;
                     }
-                    else if (_trailer.prev == pos._entry)
-                    {
+                    else if (_trailer.prev == pos._entry) {
                         _trailer.prev = pos._entry->prev;
                         pos._entry->prev->next = &_trailer;
                     }
-                    else
-                    {
+                    else {
                         pos._entry->prev->next = pos._entry->next;
                         pos._entry->next->prev = pos._entry->prev;
                     }
                     
                     DESTROY(Entry, pos._entry);
                 }
-                else if (_hashTable[index].next == pos._entry)
-                {
+                else if (_hashTable[index].next == pos._entry) {
                     _hashTable[index].next = pos._entry->next;
-                    if (_header.next == pos._entry)
-                    {
+                    if (_header.next == pos._entry) {
                         _header.next = pos._entry->next;
                         pos._entry->next->prev = &_header;
                     }
-                    else
-                    {
+                    else {
                         pos._entry->prev->next = pos._entry->next;
                         pos._entry->next->prev = pos._entry->prev;
                     }
                     
                     DESTROY(Entry, pos._entry);
                 }
-                else if (_hashTable[index].prev == pos._entry)
-                {
+                else if (_hashTable[index].prev == pos._entry) {
                     _hashTable[index].prev = pos._entry->prev;
-                    if (_trailer.prev == pos._entry)
-                    {
+                    if (_trailer.prev == pos._entry) {
                         _trailer.prev = pos._entry->prev;
                         pos._entry->prev->next = &_trailer;
                     }
-                    else
-                    {
+                    else {
                         pos._entry->prev->next = pos._entry->next;
                         pos._entry->next->prev = pos._entry->prev;
                     }
                     
                     DESTROY(Entry, pos._entry);
                 }
-                else
-                {
+                else {
                     pos._entry->prev->next = pos._entry->next;
                     pos._entry->next->prev = pos._entry->prev;
                     
@@ -308,12 +266,10 @@ namespace Spine
             return Iterator(&_trailer);
         }
         
-        V operator[](const K& key)
-        {
+        V operator[](const K& key) {
             Iterator iter = find(key);
             
-            if (iter._entry != _trailer)
-            {
+            if (iter._entry != _trailer) {
                 return iter._entry->_value;
             }
             
@@ -321,8 +277,7 @@ namespace Spine
         }
         
     private:
-        class Entry
-        {
+        class Entry {
         public:
             K _key;
             V _value;
@@ -337,8 +292,7 @@ namespace Spine
         Entry _trailer;
         size_t _hashSize;
         
-        size_t hash(const K& key)
-        {
+        size_t hash(const K& key) {
             return _hashFunction(key) % _capacity;
         }
     };

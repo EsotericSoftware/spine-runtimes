@@ -35,8 +35,7 @@
 
 namespace Spine
 {
-    class ColorTimeline : public CurveTimeline
-    {
+    class ColorTimeline : public CurveTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

@@ -42,13 +42,11 @@ namespace Spine
 {
     RTTI_IMPL_NOPARENT(AttachmentLoader);
     
-    AttachmentLoader::AttachmentLoader()
-    {
+    AttachmentLoader::AttachmentLoader() {
         // Empty
     }
     
-    AttachmentLoader::~AttachmentLoader()
-    {
+    AttachmentLoader::~AttachmentLoader() {
         // Empty
     }
 }

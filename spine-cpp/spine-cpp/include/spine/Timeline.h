@@ -41,8 +41,7 @@ namespace Spine
     class Skeleton;
     class Event;
     
-    class Timeline
-    {
+    class Timeline {
         RTTI_DECL;
         
     public:

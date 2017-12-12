@@ -48,124 +48,100 @@ namespace Spine
     _a2(1),
     _hasSecondColor(false),
     _attachmentName(),
-    _blendMode(BlendMode_Normal)
-    {
+    _blendMode(BlendMode_Normal) {
         assert(_index >= 0);
         assert(_name.length() > 0);
     }
     
-    const int SlotData::getIndex()
-    {
+    const int SlotData::getIndex() {
         return _index;
     }
     
-    const std::string& SlotData::getName()
-    {
+    const std::string& SlotData::getName() {
         return _name;
     }
     
-    BoneData& SlotData::getBoneData()
-    {
+    BoneData& SlotData::getBoneData() {
         return _boneData;
     }
     
-    float SlotData::getR()
-    {
+    float SlotData::getR() {
         return _r;
     }
     
-    void SlotData::setR(float inValue)
-    {
+    void SlotData::setR(float inValue) {
         _r = inValue;
     }
     
-    float SlotData::getG()
-    {
+    float SlotData::getG() {
         return _g;
     }
     
-    void SlotData::setG(float inValue)
-    {
+    void SlotData::setG(float inValue) {
         _g = inValue;
     }
     
-    float SlotData::getB()
-    {
+    float SlotData::getB() {
         return _b;
     }
     
-    void SlotData::setB(float inValue)
-    {
+    void SlotData::setB(float inValue) {
         _b = inValue;
     }
     
-    float SlotData::getA()
-    {
+    float SlotData::getA() {
         return _a;
     }
     
-    void SlotData::setA(float inValue)
-    {
+    void SlotData::setA(float inValue) {
         _a = inValue;
     }
     
-    float SlotData::getR2()
-    {
+    float SlotData::getR2() {
         return _r2;
     }
     
-    void SlotData::setR2(float inValue)
-    {
+    void SlotData::setR2(float inValue) {
         _r2 = inValue;
     }
     
-    float SlotData::getG2()
-    {
+    float SlotData::getG2() {
         return _g2;
     }
     
-    void SlotData::setG2(float inValue)
-    {
+    void SlotData::setG2(float inValue) {
         _g2 = inValue;
     }
     
-    float SlotData::getB2()
-    {
+    float SlotData::getB2() {
         return _b2;
     }
     
-    void SlotData::setB2(float inValue)
-    {
+    void SlotData::setB2(float inValue) {
         _b2 = inValue;
     }
     
-    bool SlotData::hasSecondColor()
-    {
+    bool SlotData::hasSecondColor() {
         return _hasSecondColor;
     }
     
-    void SlotData::setHasSecondColor(bool inValue)
-    {
+    void SlotData::setHasSecondColor(bool inValue) {
         _hasSecondColor = inValue;
     }
     
-    std::string SlotData::getAttachmentName()
-    {
+    std::string SlotData::getAttachmentName() {
         return _attachmentName;
     }
     
-    void SlotData::setAttachmentName(std::string inValue)
-    {
+    void SlotData::setAttachmentName(std::string inValue) {
         _attachmentName = inValue;
     }
     
-    BlendMode SlotData::getBlendMode()
-    {
+    BlendMode SlotData::getBlendMode() {
         return _blendMode;
     }
     
-    void SlotData::setBlendMode(BlendMode inValue)
-    {
+    void SlotData::setBlendMode(BlendMode inValue) {
         _blendMode = inValue;
     }
 }

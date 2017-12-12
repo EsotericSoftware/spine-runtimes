@@ -39,8 +39,7 @@ namespace Spine
     class Slot;
     class ClippingAttachment;
     
-    class SkeletonClipping
-    {
+    class SkeletonClipping {
     public:
         SkeletonClipping();
         

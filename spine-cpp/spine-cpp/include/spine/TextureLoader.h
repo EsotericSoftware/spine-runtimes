@@ -37,8 +37,7 @@ namespace Spine
 {
     class AtlasPage;
     
-    class TextureLoader
-    {
+    class TextureLoader {
     public:
         TextureLoader();
         

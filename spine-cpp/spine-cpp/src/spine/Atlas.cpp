@@ -38,8 +38,7 @@
 
 namespace Spine
 {
-    Atlas::Atlas(const char* path, TextureLoader& textureLoader) : _textureLoader(textureLoader)
-    {
+    Atlas::Atlas(const char* path, TextureLoader& textureLoader) : _textureLoader(textureLoader) {
         int dirLength;
         char *dir;
         int length;
@@ -56,8 +55,7 @@ namespace Spine
         dir[dirLength] = '\0';
 
         data = SPINE_EXTENSION->spineReadFile(path, &length);
-        if (data)
-        {
+        if (data) {
             load(data, length, dir);
         }
 
@@ -65,21 +63,17 @@ namespace Spine
         FREE(dir);
     }
 
-    Atlas::Atlas(const char* data, int length, const char* dir, TextureLoader& textureLoader) : _textureLoader(textureLoader)
-    {
+    Atlas::Atlas(const char* data, int length, const char* dir, TextureLoader& textureLoader) : _textureLoader(textureLoader) {
         load(data, length, dir);
     }
 
-    Atlas::~Atlas()
-    {
+    Atlas::~Atlas() {
         ContainerUtil::cleanUpVectorOfPointers(_pages);
         ContainerUtil::cleanUpVectorOfPointers(_regions);
     }
 
-    void Atlas::flipV()
-    {
-        for (size_t i = 0, n = _regions.size(); i < n; ++i)
-        {
+    void Atlas::flipV() {
+        for (size_t i = 0, n = _regions.size(); i < n; ++i) {
             AtlasRegion* regionP = _regions[i];
             AtlasRegion& region = *regionP;
             region.v = 1 - region.v;
@@ -87,12 +81,9 @@ namespace Spine
         }
     }
 
-    AtlasRegion* Atlas::findRegion(std::string name)
-    {
-        for (size_t i = 0, n = _regions.size(); i < n; ++i)
-        {
-            if (_regions[i]->name == name)
-            {
+    AtlasRegion* Atlas::findRegion(std::string name) {
+        for (size_t i = 0, n = _regions.size(); i < n; ++i) {
+            if (_regions[i]->name == name) {
                 return _regions[i];
             }
         }
@@ -100,16 +91,13 @@ namespace Spine
         return NULL;
     }
 
-    void Atlas::dispose()
-    {
-        for (size_t i = 0, n = _pages.size(); i < n; ++i)
-        {
+    void Atlas::dispose() {
+        for (size_t i = 0, n = _pages.size(); i < n; ++i) {
             _textureLoader.unload(_pages[i]->rendererObject);
         }
     }
 
-    void Atlas::load(const char* begin, int length, const char* dir)
-    {
+    void Atlas::load(const char* begin, int length, const char* dir) {
         static const char* formatNames[] = { "", "Alpha", "Intensity", "LuminanceAlpha", "RGB565", "RGBA4444", "RGB888", "RGBA8888" };
         static const char* textureFilterNames[] = { "", "Nearest", "Linear", "MipMap", "MipMapNearestNearest", "MipMapLinearNearest",
             "MipMapNearestLinear", "MipMapLinearLinear" };
@@ -123,19 +111,15 @@ namespace Spine
         Str str;
         Str tuple[4];
 
-        while (readLine(&begin, end, &str))
-        {
-            if (str.end - str.begin == 0)
-            {
+        while (readLine(&begin, end, &str)) {
+            if (str.end - str.begin == 0) {
                 page = 0;
             }
-            else if (!page)
-            {
+            else if (!page) {
                 char* name = mallocString(&str);
                 char* path = MALLOC(char, dirLength + needsSlash + strlen(name) + 1);
                 memcpy(path, dir, dirLength);
-                if (needsSlash)
-                {
+                if (needsSlash) {
                     path[dirLength] = '/';
                 }
                 strcpy(path + dirLength + needsSlash, name);
@@ -163,21 +147,16 @@ namespace Spine
 
                 page->uWrap = TextureWrap_ClampToEdge;
                 page->vWrap = TextureWrap_ClampToEdge;
-                if (!equals(&str, "none"))
-                {
-                    if (str.end - str.begin == 1)
-                    {
-                        if (*str.begin == 'x')
-                        {
+                if (!equals(&str, "none")) {
+                    if (str.end - str.begin == 1) {
+                        if (*str.begin == 'x') {
                             page->uWrap = TextureWrap_Repeat;
                         }
-                        else if (*str.begin == 'y')
-                        {
+                        else if (*str.begin == 'y') {
                             page->vWrap = TextureWrap_Repeat;
                         }
                     }
-                    else if (equals(&str, "xy"))
-                    {
+                    else if (equals(&str, "xy")) {
                         page->uWrap = TextureWrap_Repeat;
                         page->vWrap = TextureWrap_Repeat;
                     }
@@ -189,8 +168,7 @@ namespace Spine
 
                 _pages.push_back(page);
             }
-            else
-            {
+            else {
                 AtlasRegion* region = NEW(AtlasRegion);
                 new (region) AtlasRegion();
 
@@ -210,13 +188,11 @@ namespace Spine
 
                 region->u = region->x / (float)page->width;
                 region->v = region->y / (float)page->height;
-                if (region->rotate)
-                {
+                if (region->rotate) {
                     region->u2 = (region->x + region->height) / (float)page->width;
                     region->v2 = (region->y + region->width) / (float)page->height;
                 }
-                else
-                {
+                else {
                     region->u2 = (region->x + region->width) / (float)page->width;
                     region->v2 = (region->y + region->height) / (float)page->height;
                 }
@@ -224,8 +200,7 @@ namespace Spine
                 count = readTuple(&begin, end, tuple);
                 assert(count);
 
-                if (count == 4)
-                {
+                if (count == 4) {
                     /* split is optional */
                     region->splits.reserve(4);
                     region->splits.setSize(4);
@@ -237,8 +212,7 @@ namespace Spine
                     count = readTuple(&begin, end, tuple);
                     assert(count);
 
-                    if (count == 4)
-                    {
+                    if (count == 4) {
                         /* pad is optional, but only present with splits */
                         region->pads.reserve(4);
                         region->pads.setSize(4);
@@ -267,67 +241,55 @@ namespace Spine
         }
     }
 
-    void Atlas::trim(Str* str)
-    {
-        while (isspace((unsigned char)*str->begin) && str->begin < str->end)
-        {
+    void Atlas::trim(Str* str) {
+        while (isspace((unsigned char)*str->begin) && str->begin < str->end) {
             (str->begin)++;
         }
 
-        if (str->begin == str->end)
-        {
+        if (str->begin == str->end) {
             return;
         }
 
         str->end--;
 
-        while (isspace((unsigned char)*str->end) && str->end >= str->begin)
-        {
+        while (isspace((unsigned char)*str->end) && str->end >= str->begin) {
             str->end--;
         }
 
         str->end++;
     }
 
-    int Atlas::readLine(const char** begin, const char* end, Str* str)
-    {
-        if (*begin == end)
-        {
+    int Atlas::readLine(const char** begin, const char* end, Str* str) {
+        if (*begin == end) {
             return 0;
         }
 
         str->begin = *begin;
 
         /* Find next delimiter. */
-        while (*begin != end && **begin != '\n')
-        {
+        while (*begin != end && **begin != '\n') {
             (*begin)++;
         }
 
         str->end = *begin;
         trim(str);
 
-        if (*begin != end)
-        {
+        if (*begin != end) {
             (*begin)++;
         }
 
         return 1;
     }
 
-    int Atlas::beginPast(Str* str, char c)
-    {
+    int Atlas::beginPast(Str* str, char c) {
         const char* begin = str->begin;
-        while (1)
-        {
+        while (1) {
             char lastSkippedChar = *begin;
-            if (begin == str->end)
-            {
+            if (begin == str->end) {
                 return 0;
             }
             begin++;
-            if (lastSkippedChar == c)
-            {
+            if (lastSkippedChar == c) {
                 break;
             }
         }
@@ -335,11 +297,9 @@ namespace Spine
         return 1;
     }
 
-    int Atlas::readValue(const char** begin, const char* end, Str* str)
-    {
+    int Atlas::readValue(const char** begin, const char* end, Str* str) {
         readLine(begin, end, str);
-        if (!beginPast(str, ':'))
-        {
+        if (!beginPast(str, ':')) {
             return 0;
         }
 
@@ -347,21 +307,17 @@ namespace Spine
         return 1;
     }
 
-    int Atlas::readTuple(const char** begin, const char* end, Str tuple[])
-    {
+    int Atlas::readTuple(const char** begin, const char* end, Str tuple[]) {
         int i;
         Str str = { NULL, NULL };
         readLine(begin, end, &str);
-        if (!beginPast(&str, ':'))
-        {
+        if (!beginPast(&str, ':')) {
             return 0;
         }
 
-        for (i = 0; i < 3; ++i)
-        {
+        for (i = 0; i < 3; ++i) {
             tuple[i].begin = str.begin;
-            if (!beginPast(&str, ','))
-            {
+            if (!beginPast(&str, ',')) {
                 break;
             }
 
@@ -376,8 +332,7 @@ namespace Spine
         return i + 1;
     }
 
-    char* Atlas::mallocString(Str* str)
-    {
+    char* Atlas::mallocString(Str* str) {
         int length = (int)(str->end - str->begin);
         char* string = MALLOC(char, length + 1);
         memcpy(string, str->begin, length);
@@ -385,27 +340,22 @@ namespace Spine
         return string;
     }
 
-    int Atlas::indexOf(const char** array, int count, Str* str)
-    {
+    int Atlas::indexOf(const char** array, int count, Str* str) {
         int length = (int)(str->end - str->begin);
         int i;
-        for (i = count - 1; i >= 0; i--)
-        {
-            if (strncmp(array[i], str->begin, length) == 0)
-            {
+        for (i = count - 1; i >= 0; i--) {
+            if (strncmp(array[i], str->begin, length) == 0) {
                 return i;
             }
         }
         return 0;
     }
 
-    int Atlas::equals(Str* str, const char* other)
-    {
+    int Atlas::equals(Str* str, const char* other) {
         return strncmp(other, str->begin, str->end - str->begin) == 0;
     }
 
-    int Atlas::toInt(Str* str)
-    {
+    int Atlas::toInt(Str* str) {
         return (int)strtol(str->begin, (char**)&str->end, 10);
     }
 }

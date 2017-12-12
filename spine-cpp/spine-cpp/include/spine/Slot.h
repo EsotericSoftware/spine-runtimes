@@ -42,8 +42,7 @@ namespace Spine
     class Skeleton;
     class Attachment;
     
-    class Slot
-    {
+    class Slot {
         friend class VertexAttachment;
         friend class Skeleton;
         friend class SkeletonBounds;

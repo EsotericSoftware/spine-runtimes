@@ -35,8 +35,7 @@
 
 namespace Spine
 {
-    class ShearTimeline : public TranslateTimeline
-    {
+    class ShearTimeline : public TranslateTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

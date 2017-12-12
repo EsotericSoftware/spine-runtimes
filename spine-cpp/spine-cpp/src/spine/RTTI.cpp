@@ -32,34 +32,27 @@
 
 namespace Spine
 {
-    RTTI::RTTI(const std::string& className) : m_className(className), m_pBaseRTTI(NULL)
-    {
+    RTTI::RTTI(const std::string& className) : m_className(className), m_pBaseRTTI(NULL) {
         // Empty
     }
     
-    RTTI::RTTI(const std::string& className, const RTTI& baseRTTI) : m_className(className), m_pBaseRTTI(&baseRTTI)
-    {
+    RTTI::RTTI(const std::string& className, const RTTI& baseRTTI) : m_className(className), m_pBaseRTTI(&baseRTTI) {
         // Empty
     }
     
-    const std::string& RTTI::getClassName() const
-    {
+    const std::string& RTTI::getClassName() const {
         return m_className;
     }
     
-    bool RTTI::isExactly(const RTTI& rtti) const
-    {
+    bool RTTI::isExactly(const RTTI& rtti) const {
         return (this == &rtti);
     }
     
-    bool RTTI::derivesFrom(const RTTI& rtti) const
-    {
+    bool RTTI::derivesFrom(const RTTI& rtti) const {
         const RTTI * pCompare = this;
         
-        while (pCompare)
-        {
-            if (pCompare == &rtti)
-            {
+        while (pCompare) {
+            if (pCompare == &rtti) {
                 return true;
             }
             

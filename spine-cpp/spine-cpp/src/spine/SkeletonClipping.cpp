@@ -35,18 +35,15 @@
 
 namespace Spine
 {
-    SkeletonClipping::SkeletonClipping() : _clipAttachment(NULL)
-    {
+    SkeletonClipping::SkeletonClipping() : _clipAttachment(NULL) {
         _clipOutput.reserve(128);
         _clippedVertices.reserve(128);
         _clippedTriangles.reserve(128);
         _clippedUVs.reserve(128);
     }
     
-    int SkeletonClipping::clipStart(Slot& slot, ClippingAttachment* clip)
-    {
-        if (_clipAttachment != NULL)
-        {
+    int SkeletonClipping::clipStart(Slot& slot, ClippingAttachment* clip) {
+        if (_clipAttachment != NULL) {
             return 0;
         }
         
@@ -61,8 +58,7 @@ namespace Spine
         
         _clippingPolygons = clippingPolygons;
         
-        for (Vector<float>** i = _clippingPolygons.begin(); i != _clippingPolygons.end(); ++i)
-        {
+        for (Vector<float>** i = _clippingPolygons.begin(); i != _clippingPolygons.end(); ++i) {
             Vector<float>* polygonP = (*i);
             Vector<float>& polygon = *polygonP;
             makeClockwise(polygon);
@@ -73,18 +69,14 @@ namespace Spine
         return static_cast<int>(_clippingPolygons.size());
     }
     
-    void SkeletonClipping::clipEnd(Slot& slot)
-    {
-        if (_clipAttachment != NULL && _clipAttachment->_endSlot == &slot._data)
-        {
+    void SkeletonClipping::clipEnd(Slot& slot) {
+        if (_clipAttachment != NULL && _clipAttachment->_endSlot == &slot._data) {
             clipEnd();
         }
     }
     
-    void SkeletonClipping::clipEnd()
-    {
-        if (_clipAttachment == NULL)
-        {
+    void SkeletonClipping::clipEnd() {
+        if (_clipAttachment == NULL) {
             return;
         }
         
@@ -95,8 +87,7 @@ namespace Spine
         _clippingPolygon.clear();
     }
     
-    void SkeletonClipping::clipTriangles(Vector<float>& vertices, int verticesLength, Vector<int>& triangles, int trianglesLength, Vector<float>& uvs)
-    {
+    void SkeletonClipping::clipTriangles(Vector<float>& vertices, int verticesLength, Vector<int>& triangles, int trianglesLength, Vector<float>& uvs) {
         Vector<float>& clipOutput = _clipOutput;
         Vector<float>& clippedVertices = _clippedVertices;
         Vector<int>& clippedTriangles = _clippedTriangles;
@@ -108,8 +99,7 @@ namespace Spine
         _clippedUVs.clear();
         clippedTriangles.clear();
         
-        for (int i = 0; i < trianglesLength; i += 3)
-        {
+        for (int i = 0; i < trianglesLength; i += 3) {
             int vertexOffset = triangles[i] << 1;
             float x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
             float u1 = uvs[vertexOffset], v1 = uvs[vertexOffset + 1];
@@ -122,14 +112,11 @@ namespace Spine
             float x3 = vertices[vertexOffset], y3 = vertices[vertexOffset + 1];
             float u3 = uvs[vertexOffset], v3 = uvs[vertexOffset + 1];
 
-            for (int p = 0; p < polygonsCount; p++)
-            {
+            for (int p = 0; p < polygonsCount; p++) {
                 int s = static_cast<int>(clippedVertices.size());
-                if (clip(x1, y1, x2, y2, x3, y3, *polygons[p], clipOutput))
-                {
+                if (clip(x1, y1, x2, y2, x3, y3, *polygons[p], clipOutput)) {
                     int clipOutputLength = static_cast<int>(clipOutput.size());
-                    if (clipOutputLength == 0)
-                    {
+                    if (clipOutputLength == 0) {
                         continue;
                     }
                     float d0 = y2 - y3, d1 = x3 - x2, d2 = x1 - x3, d4 = y3 - y1;
@@ -140,8 +127,7 @@ namespace Spine
                     clippedVertices.setSize(s + clipOutputCount * 2);
                     _clippedUVs.reserve(s + clipOutputCount * 2);
                     _clippedUVs.setSize(s + clipOutputCount * 2);
-                    for (int ii = 0; ii < clipOutputLength; ii += 2)
-                    {
+                    for (int ii = 0; ii < clipOutputLength; ii += 2) {
                         float x = clipOutput[ii], y = clipOutput[ii + 1];
                         clippedVertices[s] = x;
                         clippedVertices[s + 1] = y;
@@ -158,8 +144,7 @@ namespace Spine
                     clippedTriangles.reserve(s + 3 * (clipOutputCount - 2));
                     clippedTriangles.setSize(s + 3 * (clipOutputCount - 2));
                     clipOutputCount--;
-                    for (int ii = 1; ii < clipOutputCount; ii++)
-                    {
+                    for (int ii = 1; ii < clipOutputCount; ii++) {
                         clippedTriangles[s] = index;
                         clippedTriangles[s + 1] = index + ii;
                         clippedTriangles[s + 2] = index + ii + 1;
@@ -167,8 +152,7 @@ namespace Spine
                     }
                     index += clipOutputCount + 1;
                 }
-                else
-                {
+                else {
                     clippedVertices.reserve(s + 3 * 2);
                     clippedVertices.setSize(s + 3 * 2);
                     _clippedUVs.reserve(s + 3 * 2);
@@ -200,40 +184,33 @@ namespace Spine
         }
     }
     
-    bool SkeletonClipping::isClipping()
-    {
+    bool SkeletonClipping::isClipping() {
         return _clipAttachment != NULL;
     }
     
-    Vector<float>& SkeletonClipping::getClippedVertices()
-    {
+    Vector<float>& SkeletonClipping::getClippedVertices() {
         return _clippedVertices;
     }
     
-    Vector<int>& SkeletonClipping::getClippedTriangles()
-    {
+    Vector<int>& SkeletonClipping::getClippedTriangles() {
         return _clippedTriangles;
     }
     
-    Vector<float>& SkeletonClipping::getClippedUVs()
-    {
+    Vector<float>& SkeletonClipping::getClippedUVs() {
         return _clippedUVs;
     }
     
-    bool SkeletonClipping::clip(float x1, float y1, float x2, float y2, float x3, float y3, Vector<float>& clippingArea, Vector<float>& output)
-    {
+    bool SkeletonClipping::clip(float x1, float y1, float x2, float y2, float x3, float y3, Vector<float>& clippingArea, Vector<float>& output) {
         Vector<float>& originalOutput = output;
         bool clipped = false;
 
         // Avoid copy at the end.
         Vector<float> input;
-        if (clippingArea.size() % 4 >= 2)
-        {
+        if (clippingArea.size() % 4 >= 2) {
             input = output;
             output = _scratch;
         }
-        else
-        {
+        else {
             input = _scratch;
         }
 
@@ -250,23 +227,19 @@ namespace Spine
 
         Vector<float>& clippingVertices = clippingArea;
         int clippingVerticesLast = static_cast<int>(clippingArea.size()) - 4;
-        for (int i = 0; ; i += 2)
-        {
+        for (int i = 0; ; i += 2) {
             float edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
             float edgeX2 = clippingVertices[i + 2], edgeY2 = clippingVertices[i + 3];
             float deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;
 
             Vector<float>& inputVertices = input;
             int inputVerticesLength = static_cast<int>(input.size()) - 2, outputStart = static_cast<int>(output.size());
-            for (int ii = 0; ii < inputVerticesLength; ii += 2)
-            {
+            for (int ii = 0; ii < inputVerticesLength; ii += 2) {
                 float inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
                 float inputX2 = inputVertices[ii + 2], inputY2 = inputVertices[ii + 3];
                 bool side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0;
-                if (deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0)
-                {
-                    if (side2)
-                    {
+                if (deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0) {
+                    if (side2) {
                         // v1 inside, v2 inside
                         output.push_back(inputX2);
                         output.push_back(inputY2);
@@ -278,8 +251,7 @@ namespace Spine
                     output.push_back(edgeX + (edgeX2 - edgeX) * ua);
                     output.push_back(edgeY + (edgeY2 - edgeY) * ua);
                 }
-                else if (side2)
-                {
+                else if (side2) {
                     // v1 outside, v2 inside
                     float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
                     float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
@@ -291,8 +263,7 @@ namespace Spine
                 clipped = true;
             }
 
-            if (outputStart == output.size())
-            {
+            if (outputStart == output.size()) {
                 // All edges outside.
                 originalOutput.clear();
                 return true;
@@ -301,8 +272,7 @@ namespace Spine
             output.push_back(output[0]);
             output.push_back(output[1]);
 
-            if (i == clippingVerticesLast)
-            {
+            if (i == clippingVerticesLast) {
                 break;
             }
             Vector<float> temp = output;
@@ -311,16 +281,13 @@ namespace Spine
             input = temp;
         }
 
-        if (originalOutput != output)
-        {
+        if (originalOutput != output) {
             originalOutput.clear();
-            for (int i = 0, n = static_cast<int>(output.size()) - 2; i < n; ++i)
-            {
+            for (int i = 0, n = static_cast<int>(output.size()) - 2; i < n; ++i) {
                 originalOutput.push_back(output[i]);
             }
         }
-        else
-        {
+        else {
             originalOutput.reserve(originalOutput.size() - 2);
             originalOutput.setSize(originalOutput.size() - 2);
         }
@@ -328,14 +295,12 @@ namespace Spine
         return clipped;
     }
     
-    void SkeletonClipping::makeClockwise(Vector<float>& polygon)
-    {
+    void SkeletonClipping::makeClockwise(Vector<float>& polygon) {
         int verticeslength = static_cast<int>(polygon.size());
 
         float area = polygon[verticeslength - 2] * polygon[1] - polygon[0] * polygon[verticeslength - 1], p1x, p1y, p2x, p2y;
         
-        for (int i = 0, n = verticeslength - 3; i < n; i += 2)
-        {
+        for (int i = 0, n = verticeslength - 3; i < n; i += 2) {
             p1x = polygon[i];
             p1y = polygon[i + 1];
             p2x = polygon[i + 2];
@@ -343,13 +308,11 @@ namespace Spine
             area += p1x * p2y - p2x * p1y;
         }
         
-        if (area < 0)
-        {
+        if (area < 0) {
             return;
         }
 
-        for (int i = 0, lastX = verticeslength - 2, n = verticeslength >> 1; i < n; i += 2)
-        {
+        for (int i = 0, lastX = verticeslength - 2, n = verticeslength >> 1; i < n; i += 2) {
             float x = polygon[i], y = polygon[i + 1];
             int other = lastX - i;
             polygon[i] = polygon[other];

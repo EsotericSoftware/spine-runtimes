@@ -38,8 +38,7 @@ namespace Spine
     class EventData;
     
     /// Stores the current pose values for an Event.
-    class Event
-    {
+    class Event {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         friend class AnimationState;

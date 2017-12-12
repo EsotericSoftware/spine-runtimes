@@ -43,8 +43,7 @@ namespace Spine
     class Skeleton;
     class Event;
     
-    class Animation
-    {
+    class Animation {
         friend class AnimationState;
         friend class TrackEntry;
         friend class AnimationStateData;

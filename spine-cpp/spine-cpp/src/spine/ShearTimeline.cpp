@@ -44,20 +44,16 @@ namespace Spine
 {
     RTTI_IMPL(ShearTimeline, TranslateTimeline);
     
-    ShearTimeline::ShearTimeline(int frameCount) : TranslateTimeline(frameCount)
-    {
+    ShearTimeline::ShearTimeline(int frameCount) : TranslateTimeline(frameCount) {
         // Empty
     }
     
-    void ShearTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction)
-    {
+    void ShearTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
         Bone* boneP = skeleton._bones[_boneIndex];
         Bone& bone = *boneP;
         
-        if (time < _frames[0])
-        {
-            switch (pose)
-            {
+        if (time < _frames[0]) {
+            switch (pose) {
                 case MixPose_Setup:
                     bone._shearX = bone._data._shearX;
                     bone._shearY = bone._data._shearY;
@@ -73,14 +69,12 @@ namespace Spine
         }
         
         float x, y;
-        if (time >= _frames[_frames.size() - ENTRIES])
-        {
+        if (time >= _frames[_frames.size() - ENTRIES]) {
             // Time is after last frame.
             x = _frames[_frames.size() + PREV_X];
             y = _frames[_frames.size() + PREV_Y];
         }
-        else
-        {
+        else {
             // Interpolate between the previous frame and the current frame.
             int frame = Animation::binarySearch(_frames, time, ENTRIES);
             x = _frames[frame + PREV_X];
@@ -93,20 +87,17 @@ namespace Spine
             y = y + (_frames[frame + Y] - y) * percent;
         }
         
-        if (pose == MixPose_Setup)
-        {
+        if (pose == MixPose_Setup) {
             bone._shearX = bone._data._shearX + x * alpha;
             bone._shearY = bone._data._shearY + y * alpha;
         }
-        else
-        {
+        else {
             bone._shearX += (bone._data._shearX + x - bone._shearX) * alpha;
             bone._shearY += (bone._data._shearY + y - bone._shearY) * alpha;
         }
     }
     
-    int ShearTimeline::getPropertyId()
-    {
+    int ShearTimeline::getPropertyId() {
         return ((int)TimelineType_Shear << 24) + _boneIndex;
     }
 }

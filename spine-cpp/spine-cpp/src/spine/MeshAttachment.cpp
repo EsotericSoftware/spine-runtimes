@@ -56,273 +56,218 @@ namespace Spine
     _a(1),
     _hullLength(0),
     _inheritDeform(false),
-    _regionRotate(false)
-    {
+    _regionRotate(false) {
         // Empty
     }
     
-    void MeshAttachment::updateUVs()
-    {
+    void MeshAttachment::updateUVs() {
         float u = _regionU, v = _regionV, width = _regionU2 - _regionU, height = _regionV2 - _regionV;
-        if (_uvs.size() != _regionUVs.size())
-        {
+        if (_uvs.size() != _regionUVs.size()) {
             _uvs.reserve(_regionUVs.size());
             _uvs.setSize(_regionUVs.size());
         }
         
-        if (_regionRotate)
-        {
-            for (size_t i = 0, n = _uvs.size(); i < n; i += 2)
-            {
+        if (_regionRotate) {
+            for (size_t i = 0, n = _uvs.size(); i < n; i += 2) {
                 _uvs[i] = u + _regionUVs[i + 1] * width;
                 _uvs[i + 1] = v + height - _regionUVs[i] * height;
             }
         }
-        else
-        {
-            for (size_t i = 0, n = _uvs.size(); i < n; i += 2)
-            {
+        else {
+            for (size_t i = 0, n = _uvs.size(); i < n; i += 2) {
                 _uvs[i] = u + _regionUVs[i] * width;
                 _uvs[i + 1] = v + _regionUVs[i + 1] * height;
             }
         }
     }
     
-    bool MeshAttachment::applyDeform(VertexAttachment* sourceAttachment)
-    {
+    bool MeshAttachment::applyDeform(VertexAttachment* sourceAttachment) {
         return this == sourceAttachment || (_inheritDeform && _parentMesh == sourceAttachment);
     }
     
-    int MeshAttachment::getHullLength()
-    {
+    int MeshAttachment::getHullLength() {
         return _hullLength;
     }
     
-    void MeshAttachment::setHullLength(float inValue)
-    {
+    void MeshAttachment::setHullLength(float inValue) {
         _hullLength = inValue;
     }
     
-    Vector<float>& MeshAttachment::getRegionUVs()
-    {
+    Vector<float>& MeshAttachment::getRegionUVs() {
         return _regionUVs;
     }
     
-    void MeshAttachment::setRegionUVs(Vector<float>& inValue)
-    {
+    void MeshAttachment::setRegionUVs(Vector<float>& inValue) {
         _regionUVs = inValue;
     }
     
-    Vector<float>& MeshAttachment::getUVs()
-    {
+    Vector<float>& MeshAttachment::getUVs() {
         return _uvs;
     }
     
-    void MeshAttachment::setUVs(Vector<float>& inValue)
-    {
+    void MeshAttachment::setUVs(Vector<float>& inValue) {
         _uvs = inValue;
     }
     
-    Vector<short>& MeshAttachment::getTriangles()
-    {
+    Vector<short>& MeshAttachment::getTriangles() {
         return _triangles;
     }
     
-    void MeshAttachment::setTriangles(Vector<short>& inValue)
-    {
+    void MeshAttachment::setTriangles(Vector<short>& inValue) {
         _triangles = inValue;
     }
     
-    float MeshAttachment::getR()
-    {
+    float MeshAttachment::getR() {
         return _r;
     }
     
-    void MeshAttachment::setR(float inValue)
-    {
+    void MeshAttachment::setR(float inValue) {
         _r = inValue;
     }
     
-    float MeshAttachment::getG()
-    {
+    float MeshAttachment::getG() {
         return _g;
     }
     
-    void MeshAttachment::setG(float inValue)
-    {
+    void MeshAttachment::setG(float inValue) {
         _g = inValue;
     }
     
-    float MeshAttachment::getB()
-    {
+    float MeshAttachment::getB() {
         return _b;
     }
     
-    void MeshAttachment::setB(float inValue)
-    {
+    void MeshAttachment::setB(float inValue) {
         _b = inValue;
     }
     
-    float MeshAttachment::getA()
-    {
+    float MeshAttachment::getA() {
         return _a;
     }
     
-    void MeshAttachment::setA(float inValue)
-    {
+    void MeshAttachment::setA(float inValue) {
         _a = inValue;
     }
     
-    std::string MeshAttachment::getPath()
-    {
+    std::string MeshAttachment::getPath() {
         return _path;
     }
     
-    void MeshAttachment::setPath(std::string inValue)
-    {
+    void MeshAttachment::setPath(std::string inValue) {
         _path = inValue;
     }
     
-    void* MeshAttachment::getRendererObject()
-    {
+    void* MeshAttachment::getRendererObject() {
         return _rendererObject;
     }
     
-    void MeshAttachment::setRendererObject(void* inValue)
-    {
+    void MeshAttachment::setRendererObject(void* inValue) {
         _rendererObject = inValue;
     }
     
-    float MeshAttachment::getRegionU()
-    {
+    float MeshAttachment::getRegionU() {
         return _regionU;
     }
     
-    void MeshAttachment::setRegionU(float inValue)
-    {
+    void MeshAttachment::setRegionU(float inValue) {
         _regionU = inValue;
     }
     
-    float MeshAttachment::getRegionV()
-    {
+    float MeshAttachment::getRegionV() {
         return _regionV;
     }
     
-    void MeshAttachment::setRegionV(float inValue)
-    {
+    void MeshAttachment::setRegionV(float inValue) {
         _regionV = inValue;
     }
     
-    float MeshAttachment::getRegionU2()
-    {
+    float MeshAttachment::getRegionU2() {
         return _regionU2;
     }
     
-    void MeshAttachment::setRegionU2(float inValue)
-    {
+    void MeshAttachment::setRegionU2(float inValue) {
         _regionU2 = inValue;
     }
     
-    float MeshAttachment::getRegionV2()
-    {
+    float MeshAttachment::getRegionV2() {
         return _regionV2;
     }
     
-    void MeshAttachment::setRegionV2(float inValue)
-    {
+    void MeshAttachment::setRegionV2(float inValue) {
         _regionV2 = inValue;
     }
     
-    bool MeshAttachment::getRegionRotate()
-    {
+    bool MeshAttachment::getRegionRotate() {
         return _regionRotate;
     }
     
-    void MeshAttachment::setRegionRotate(float inValue)
-    {
+    void MeshAttachment::setRegionRotate(float inValue) {
         _regionRotate = inValue;
     }
     
-    float MeshAttachment::getRegionOffsetX()
-    {
+    float MeshAttachment::getRegionOffsetX() {
         return _regionOffsetX;
     }
     
-    void MeshAttachment::setRegionOffsetX(float inValue)
-    {
+    void MeshAttachment::setRegionOffsetX(float inValue) {
         _regionOffsetX = inValue;
     }
     
-    float MeshAttachment::getRegionOffsetY()
-    {
+    float MeshAttachment::getRegionOffsetY() {
         return _regionOffsetY;
     }
     
-    void MeshAttachment::setRegionOffsetY(float inValue)
-    {
+    void MeshAttachment::setRegionOffsetY(float inValue) {
         _regionOffsetY = inValue;
     }
     
-    float MeshAttachment::getRegionWidth()
-    {
+    float MeshAttachment::getRegionWidth() {
         return _regionWidth;
     }
     
-    void MeshAttachment::setRegionWidth(float inValue)
-    {
+    void MeshAttachment::setRegionWidth(float inValue) {
         _regionWidth = inValue;
     }
     
-    float MeshAttachment::getRegionHeight()
-    {
+    float MeshAttachment::getRegionHeight() {
         return _regionHeight;
     }
     
-    void MeshAttachment::setRegionHeight(float inValue)
-    {
+    void MeshAttachment::setRegionHeight(float inValue) {
         _regionHeight = inValue;
     }
     
-    float MeshAttachment::getRegionOriginalWidth()
-    {
+    float MeshAttachment::getRegionOriginalWidth() {
         return _regionOriginalWidth;
     }
     
-    void MeshAttachment::setRegionOriginalWidth(float inValue)
-    {
+    void MeshAttachment::setRegionOriginalWidth(float inValue) {
         _regionOriginalWidth = inValue;
     }
     
-    float MeshAttachment::getRegionOriginalHeight()
-    {
+    float MeshAttachment::getRegionOriginalHeight() {
         return _regionOriginalHeight;
     }
     
-    void MeshAttachment::setRegionOriginalHeight(float inValue)
-    {
+    void MeshAttachment::setRegionOriginalHeight(float inValue) {
         _regionOriginalHeight = inValue;
     }
     
-    bool MeshAttachment::getInheritDeform()
-    {
+    bool MeshAttachment::getInheritDeform() {
         return _inheritDeform;
     }
     
-    void MeshAttachment::setInheritDeform(bool inValue)
-    {
+    void MeshAttachment::setInheritDeform(bool inValue) {
         _inheritDeform = inValue;
     }
     
-    MeshAttachment* MeshAttachment::getParentMesh()
-    {
+    MeshAttachment* MeshAttachment::getParentMesh() {
         return _parentMesh;
     }
     
-    void MeshAttachment::setParentMesh(MeshAttachment* inValue)
-    {
+    void MeshAttachment::setParentMesh(MeshAttachment* inValue) {
         _parentMesh = inValue;
-        if (inValue != NULL)
-        {
+        if (inValue != NULL) {
             _bones = inValue->_bones;
             _vertices = inValue->_vertices;
             _worldVerticesLength = inValue->_worldVerticesLength;
@@ -335,33 +280,27 @@ namespace Spine
         }
     }
     
-    Vector<short>& MeshAttachment::getEdges()
-    {
+    Vector<short>& MeshAttachment::getEdges() {
         return _edges;
     }
     
-    void MeshAttachment::setEdges(Vector<short>& inValue)
-    {
+    void MeshAttachment::setEdges(Vector<short>& inValue) {
         _edges = inValue;
     }
     
-    float MeshAttachment::getWidth()
-    {
+    float MeshAttachment::getWidth() {
         return _width;
     }
     
-    void MeshAttachment::setWidth(float inValue)
-    {
+    void MeshAttachment::setWidth(float inValue) {
         _width = inValue;
     }
     
-    float MeshAttachment::getHeight()
-    {
+    float MeshAttachment::getHeight() {
         return _height;
     }
     
-    void MeshAttachment::setHeight(float inValue)
-    {
+    void MeshAttachment::setHeight(float inValue) {
         _height = inValue;
     }
 }

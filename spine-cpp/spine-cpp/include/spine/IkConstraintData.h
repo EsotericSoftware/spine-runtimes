@@ -39,8 +39,7 @@ namespace Spine
 {
     class BoneData;
     
-    class IkConstraintData
-    {
+    class IkConstraintData {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         friend class IkConstraint;

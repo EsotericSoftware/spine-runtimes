@@ -32,13 +32,11 @@
 
 namespace Spine
 {
-    TextureLoader::TextureLoader()
-    {
+    TextureLoader::TextureLoader() {
         // Empty
     }
     
-    TextureLoader::~TextureLoader()
-    {
+    TextureLoader::~TextureLoader() {
         // Empty
     }
 }

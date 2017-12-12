@@ -33,8 +33,7 @@
 
 namespace Spine
 {
-    enum TransformMode
-    {
+    enum TransformMode {
         //0000 0 Flip Scale Rotation
         TransformMode_Normal = 0, // 0000
         TransformMode_OnlyTranslation = 7, // 0111

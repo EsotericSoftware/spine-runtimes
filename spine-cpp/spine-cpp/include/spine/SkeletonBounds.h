@@ -44,8 +44,7 @@ namespace Spine
     /// Collects each BoundingBoxAttachment that is visible and computes the world vertices for its polygon.
     /// The polygon vertices are provided along with convenience methods for doing hit detection.
     ///
-    class SkeletonBounds
-    {
+    class SkeletonBounds {
     public:
         SkeletonBounds();
         
@@ -96,14 +95,12 @@ namespace Spine
         void aabbCompute();
     };
     
-    class Polygon
-    {
+    class Polygon {
     public:
         Vector<float> _vertices;
         int _count;
         
-        Polygon() : _count(0)
-        {
+        Polygon() : _count(0) {
             _vertices.reserve(16);
         }
     };

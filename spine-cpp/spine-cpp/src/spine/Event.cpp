@@ -39,48 +39,39 @@ namespace Spine
     _time(time),
     _intValue(0),
     _floatValue(0),
-    _stringValue()
-    {
+    _stringValue() {
         // Empty
     }
     
-    const EventData& Event::getData()
-    {
+    const EventData& Event::getData() {
         return _data;
     }
     
-    float Event::getTime()
-    {
+    float Event::getTime() {
         return _time;
     }
     
-    int Event::getIntValue()
-    {
+    int Event::getIntValue() {
         return _intValue;
     }
     
-    void Event::setIntValue(int inValue)
-    {
+    void Event::setIntValue(int inValue) {
         _intValue = inValue;
     }
     
-    float Event::getFloatValue()
-    {
+    float Event::getFloatValue() {
         return _floatValue;
     }
     
-    void Event::setFloatValue(int inValue)
-    {
+    void Event::setFloatValue(int inValue) {
         _floatValue = inValue;
     }
     
-    std::string Event::getStringValue()
-    {
+    std::string Event::getStringValue() {
         return _stringValue;
     }
     
-    void Event::setStringValue(std::string inValue)
-    {
+    void Event::setStringValue(std::string inValue) {
         _stringValue = inValue;
     }
 }

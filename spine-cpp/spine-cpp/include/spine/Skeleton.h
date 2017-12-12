@@ -49,8 +49,7 @@ namespace Spine
     class Skin;
     class Attachment;
     
-    class Skeleton
-    {
+    class Skeleton {
         friend class AnimationState;
         friend class SkeletonBounds;
         friend class SkeletonClipping;

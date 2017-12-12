@@ -44,8 +44,7 @@ namespace Spine
     class Skeleton;
     class Event;
     
-    class AttachmentTimeline : public Timeline
-    {
+    class AttachmentTimeline : public Timeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

@@ -38,31 +38,25 @@
 namespace Spine
 {
     template <typename T>
-    class Pool
-    {
+    class Pool {
     public:
-        Pool()
-        {
+        Pool() {
             // Empty
         }
         
-        ~Pool()
-        {
+        ~Pool() {
             ContainerUtil::cleanUpVectorOfPointers(_objects);
         }
         
-        T* obtain()
-        {
-            if (_objects.size() > 0)
-            {
+        T* obtain() {
+            if (_objects.size() > 0) {
                 T** object = _objects.begin();
                 T* ret = *object;
                 _objects.erase(0);
                 
                 return ret;
             }
-            else
-            {
+            else {
                 T* ret = NEW(T);
                 new (ret) T();
                 
@@ -70,10 +64,8 @@ namespace Spine
             }
         }
         
-        void free(T* object)
-        {
-            if (!_objects.contains(object))
-            {
+        void free(T* object) {
+            if (!_objects.contains(object)) {
                 _objects.push_back(object);
             }
         }

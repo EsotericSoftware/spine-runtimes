@@ -34,38 +34,31 @@ namespace Spine
 {
     RTTI_IMPL(PathAttachment, VertexAttachment);
     
-    PathAttachment::PathAttachment(std::string name) : VertexAttachment(name), _closed(false), _constantSpeed(false)
-    {
+    PathAttachment::PathAttachment(std::string name) : VertexAttachment(name), _closed(false), _constantSpeed(false) {
         // Empty
     }
     
-    Vector<float>& PathAttachment::getLengths()
-    {
+    Vector<float>& PathAttachment::getLengths() {
         return _lengths;
     }
     
-    void PathAttachment::setLengths(Vector<float> inValue)
-    {
+    void PathAttachment::setLengths(Vector<float> inValue) {
         _lengths = inValue;
     }
     
-    bool PathAttachment::isClosed()
-    {
+    bool PathAttachment::isClosed() {
         return _closed;
     }
     
-    void PathAttachment::setClosed(bool inValue)
-    {
+    void PathAttachment::setClosed(bool inValue) {
         _closed = inValue;
     }
     
-    bool PathAttachment::isConstantSpeed()
-    {
+    bool PathAttachment::isConstantSpeed() {
         return _constantSpeed;
     }
     
-    void PathAttachment::setConstantSpeed(bool inValue)
-    {
+    void PathAttachment::setConstantSpeed(bool inValue) {
         _constantSpeed = inValue;
     }
 }

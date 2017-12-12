@@ -35,21 +35,18 @@
 
 namespace Spine
 {
-    AnimationStateData::AnimationStateData(SkeletonData& skeletonData) : _skeletonData(skeletonData), _defaultMix(0)
-    {
+    AnimationStateData::AnimationStateData(SkeletonData& skeletonData) : _skeletonData(skeletonData), _defaultMix(0) {
         // Empty
     }
     
-    void AnimationStateData::setMix(std::string fromName, std::string toName, float duration)
-    {
+    void AnimationStateData::setMix(std::string fromName, std::string toName, float duration) {
         Animation* from = _skeletonData.findAnimation(fromName);
         Animation* to = _skeletonData.findAnimation(toName);
         
         setMix(from, to, duration);
     }
     
-    void AnimationStateData::setMix(Animation* from, Animation* to, float duration)
-    {
+    void AnimationStateData::setMix(Animation* from, Animation* to, float duration) {
         assert(from != NULL);
         assert(to != NULL);
         
@@ -59,8 +56,7 @@ namespace Spine
         _animationToMixTime.insert(key, duration);
     }
     
-    float AnimationStateData::getMix(Animation* from, Animation* to)
-    {
+    float AnimationStateData::getMix(Animation* from, Animation* to) {
         assert(from != NULL);
         assert(to != NULL);
         
@@ -68,52 +64,43 @@ namespace Spine
         
         HashMap<AnimationPair, float, HashAnimationPair>::Iterator i = _animationToMixTime.find(key);
         
-        if (i != _animationToMixTime.end())
-        {
+        if (i != _animationToMixTime.end()) {
             return i.second();
         }
         
         return _defaultMix;
     }
     
-    SkeletonData& AnimationStateData::getSkeletonData()
-    {
+    SkeletonData& AnimationStateData::getSkeletonData() {
         return _skeletonData;
     }
     
-    float AnimationStateData::getDefaultMix()
-    {
+    float AnimationStateData::getDefaultMix() {
         return _defaultMix;
     }
     
-    void AnimationStateData::setDefaultMix(float inValue)
-    {
+    void AnimationStateData::setDefaultMix(float inValue) {
         _defaultMix = inValue;
     }
     
-    AnimationStateData::AnimationPair::AnimationPair(Animation* a1, Animation* a2) : _a1(a1), _a2(a2)
-    {
+    AnimationStateData::AnimationPair::AnimationPair(Animation* a1, Animation* a2) : _a1(a1), _a2(a2) {
         // Empty
     }
     
-    bool AnimationStateData::AnimationPair::operator==(const AnimationPair &other) const
-    {
+    bool AnimationStateData::AnimationPair::operator==(const AnimationPair &other) const {
         return _a1->_name == other._a1->_name && _a2->_name == other._a2->_name;
     }
     
-    std::size_t AnimationStateData::HashAnimationPair::operator()(const Spine::AnimationStateData::AnimationPair& val) const
-    {
+    std::size_t AnimationStateData::HashAnimationPair::operator()(const Spine::AnimationStateData::AnimationPair& val) const {
         std::size_t h1 = 7;
         size_t strlen = val._a1->_name.length();
-        for (int i = 0; i < strlen; ++i)
-        {
+        for (int i = 0; i < strlen; ++i) {
             h1 = h1 * 31 + val._a1->_name.at(i);
         }
         
         std::size_t h2 = 7;
         strlen = val._a2->_name.length();
-        for (int i = 0; i < strlen; ++i)
-        {
+        for (int i = 0; i < strlen; ++i) {
             h2 = h2 * 31 + val._a2->_name.at(i);
         }
         

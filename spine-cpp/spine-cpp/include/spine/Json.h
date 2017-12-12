@@ -38,8 +38,7 @@
 
 namespace Spine
 {
-    class Json
-    {
+    class Json {
         friend class SkeletonJson;
         
     public:

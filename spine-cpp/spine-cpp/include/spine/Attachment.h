@@ -37,8 +37,7 @@
 
 namespace Spine
 {
-    class Attachment
-    {
+    class Attachment {
         RTTI_DECL;
         
     public:

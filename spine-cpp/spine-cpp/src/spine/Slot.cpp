@@ -50,134 +50,108 @@ namespace Spine
     _b2(0),
     _hasSecondColor(false),
     _attachment(NULL),
-    _attachmentTime(0)
-    {
+    _attachmentTime(0) {
         setToSetupPose();
     }
     
-    void Slot::setToSetupPose()
-    {
+    void Slot::setToSetupPose() {
         _r = _data.getR();
         _g = _data.getG();
         _b = _data.getB();
         _a = _data.getA();
         
         std::string attachmentName = _data.getAttachmentName();
-        if (attachmentName.length() > 0)
-        {
+        if (attachmentName.length() > 0) {
             _attachment = NULL;
             setAttachment(_skeleton.getAttachment(_data.getIndex(), attachmentName));
         }
-        else
-        {
+        else {
             setAttachment(NULL);
         }
     }
     
-    SlotData& Slot::getData()
-    {
+    SlotData& Slot::getData() {
         return _data;
     }
     
-    Bone& Slot::getBone()
-    {
+    Bone& Slot::getBone() {
         return _bone;
     }
     
-    Skeleton& Slot::getSkeleton()
-    {
+    Skeleton& Slot::getSkeleton() {
         return _skeleton;
     }
     
-    float Slot::getR()
-    {
+    float Slot::getR() {
         return _r;
     }
     
-    void Slot::setR(float inValue)
-    {
+    void Slot::setR(float inValue) {
         _r = inValue;
     }
     
-    float Slot::getG()
-    {
+    float Slot::getG() {
         return _g;
     }
     
-    void Slot::setG(float inValue)
-    {
+    void Slot::setG(float inValue) {
         _g = inValue;
     }
     
-    float Slot::getB()
-    {
+    float Slot::getB() {
         return _b;
     }
     
-    void Slot::setB(float inValue)
-    {
+    void Slot::setB(float inValue) {
         _b = inValue;
     }
     
-    float Slot::getA()
-    {
+    float Slot::getA() {
         return _a;
     }
     
-    void Slot::setA(float inValue)
-    {
+    void Slot::setA(float inValue) {
         _a = inValue;
     }
     
-    float Slot::getR2()
-    {
+    float Slot::getR2() {
         return _r2;
     }
     
-    void Slot::setR2(float inValue)
-    {
+    void Slot::setR2(float inValue) {
         _r2 = inValue;
     }
     
-    float Slot::getG2()
-    {
+    float Slot::getG2() {
         return _g2;
     }
     
-    void Slot::setG2(float inValue)
-    {
+    void Slot::setG2(float inValue) {
         _g2 = inValue;
     }
     
-    float Slot::getB2()
-    {
+    float Slot::getB2() {
         return _b2;
     }
     
-    void Slot::setB2(float inValue)
-    {
+    void Slot::setB2(float inValue) {
         _b2 = inValue;
     }
     
-    bool Slot::hasSecondColor()
-    {
+    bool Slot::hasSecondColor() {
         return _hasSecondColor;
     }
     
-    void Slot::setHasSecondColor(bool inValue)
-    {
+    void Slot::setHasSecondColor(bool inValue) {
         _hasSecondColor = inValue;
     }
     
-    Attachment* Slot::getAttachment()
-    {
+    Attachment* Slot::getAttachment() {
         return _attachment;
     }
     
-    void Slot::setAttachment(Attachment* inValue)
-    {
-        if (_attachment == inValue)
-        {
+    void Slot::setAttachment(Attachment* inValue) {
+        if (_attachment == inValue) {
             return;
         }
         
@@ -186,23 +160,19 @@ namespace Spine
         _attachmentVertices.clear();
     }
     
-    float Slot::getAttachmentTime()
-    {
+    float Slot::getAttachmentTime() {
         return _skeleton.getTime() - _attachmentTime;
     }
     
-    void Slot::setAttachmentTime(float inValue)
-    {
+    void Slot::setAttachmentTime(float inValue) {
         _attachmentTime = _skeleton.getTime() - inValue;
     }
     
-    Vector<float>& Slot::getAttachmentVertices()
-    {
+    Vector<float>& Slot::getAttachmentVertices() {
         return _attachmentVertices;
     }
     
-    void Slot::setAttachmentVertices(Vector<float> inValue)
-    {
+    void Slot::setAttachmentVertices(Vector<float> inValue) {
         _attachmentVertices = inValue;
     }
 }

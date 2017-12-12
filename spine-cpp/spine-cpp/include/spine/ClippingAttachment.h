@@ -37,8 +37,7 @@ namespace Spine
 {
     class SlotData;
     
-    class ClippingAttachment : public VertexAttachment
-    {
+    class ClippingAttachment : public VertexAttachment {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

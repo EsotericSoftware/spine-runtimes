@@ -34,24 +34,21 @@
 
 namespace Spine
 {
-    Vector<int>& Triangulator::triangulate(Vector<float>& vertices)
-    {
+    Vector<int>& Triangulator::triangulate(Vector<float>& vertices) {
         int vertexCount = static_cast<int>(vertices.size() >> 1);
         
         Vector<int>& indices = _indices;
         indices.clear();
         indices.reserve(vertexCount);
         indices.setSize(vertexCount);
-        for (int i = 0; i < vertexCount; ++i)
-        {
+        for (int i = 0; i < vertexCount; ++i) {
             indices[i] = i;
         }
         
         Vector<bool>& isConcaveArray = _isConcaveArray;
         isConcaveArray.reserve(vertexCount);
         isConcaveArray.setSize(vertexCount);
-        for (int i = 0, n = vertexCount; i < n; ++i)
-        {
+        for (int i = 0, n = vertexCount; i < n; ++i) {
             isConcaveArray[i] = isConcave(i, vertexCount, vertices, indices);
         }
         
@@ -59,35 +56,27 @@ namespace Spine
         triangles.clear();
         triangles.reserve(MAX(0, vertexCount - 2) << 2);
         
-        while (vertexCount > 3)
-        {
+        while (vertexCount > 3) {
             // Find ear tip.
             int previous = vertexCount - 1, i = 0, next = 1;
             
             // outer:
-            while (true)
-            {
-                if (!isConcaveArray[i])
-                {
+            while (true) {
+                if (!isConcaveArray[i]) {
                     int p1 = indices[previous] << 1, p2 = indices[i] << 1, p3 = indices[next] << 1;
                     float p1x = vertices[p1], p1y = vertices[p1 + 1];
                     float p2x = vertices[p2], p2y = vertices[p2 + 1];
                     float p3x = vertices[p3], p3y = vertices[p3 + 1];
-                    for (int ii = (next + 1) % vertexCount; ii != previous; ii = (ii + 1) % vertexCount)
-                    {
-                        if (!isConcaveArray[ii])
-                        {
+                    for (int ii = (next + 1) % vertexCount; ii != previous; ii = (ii + 1) % vertexCount) {
+                        if (!isConcaveArray[ii]) {
                             continue;
                         }
                         
                         int v = indices[ii] << 1;
                         float& vx = vertices[v], vy = vertices[v + 1];
-                        if (positiveArea(p3x, p3y, p1x, p1y, vx, vy))
-                        {
-                            if (positiveArea(p1x, p1y, p2x, p2y, vx, vy))
-                            {
-                                if (positiveArea(p2x, p2y, p3x, p3y, vx, vy))
-                                {
+                        if (positiveArea(p3x, p3y, p1x, p1y, vx, vy)) {
+                            if (positiveArea(p1x, p1y, p2x, p2y, vx, vy)) {
+                                if (positiveArea(p2x, p2y, p3x, p3y, vx, vy)) {
                                     goto break_outer; // break outer;
                                 }
                             }
@@ -97,12 +86,9 @@ namespace Spine
                 }
             break_outer:
                 
-                if (next == 0)
-                {
-                    do
-                    {
-                        if (!isConcaveArray[i])
-                        {
+                if (next == 0) {
+                    do {
+                        if (!isConcaveArray[i]) {
                             break;
                         }
                         i--;
@@ -129,8 +115,7 @@ namespace Spine
             isConcaveArray[nextIndex] = isConcave(nextIndex, vertexCount, vertices, indices);
         }
         
-        if (vertexCount == 3)
-        {
+        if (vertexCount == 3) {
             triangles.push_back(indices[2]);
             triangles.push_back(indices[0]);
             triangles.push_back(indices[1]);
@@ -139,18 +124,15 @@ namespace Spine
         return triangles;
     }
     
-    Vector< Vector<float>* > Triangulator::decompose(Vector<float>& vertices, Vector<int>& triangles)
-    {
+    Vector< Vector<float>* > Triangulator::decompose(Vector<float>& vertices, Vector<int>& triangles) {
         Vector< Vector<float>* >&convexPolygons = _convexPolygons;
-        for (size_t i = 0, n = convexPolygons.size(); i < n; ++i)
-        {
+        for (size_t i = 0, n = convexPolygons.size(); i < n; ++i) {
             _polygonPool.free(convexPolygons[i]);
         }
         convexPolygons.clear();
         
         Vector< Vector<int>* > convexPolygonsIndices = _convexPolygonsIndices;
-        for (size_t i = 0, n = convexPolygonsIndices.size(); i < n; ++i)
-        {
+        for (size_t i = 0, n = convexPolygonsIndices.size(); i < n; ++i) {
             _polygonIndicesPool.free(convexPolygonsIndices[i]);
         }
         convexPolygonsIndices.clear();
@@ -165,8 +147,7 @@ namespace Spine
         
         // Merge subsequent triangles if they form a triangle fan.
         int fanBaseIndex = -1, lastwinding = 0;
-        for (size_t i = 0, n = triangles.size(); i < n; i += 3)
-        {
+        for (size_t i = 0, n = triangles.size(); i < n; i += 3) {
             int t1 = triangles[i] << 1, t2 = triangles[i + 1] << 1, t3 = triangles[i + 2] << 1;
             float x1 = vertices[t1], y1 = vertices[t1 + 1];
             float x2 = vertices[t2], y2 = vertices[t2 + 1];
@@ -174,14 +155,12 @@ namespace Spine
             
             // If the base of the last triangle is the same as this triangle, check if they form a convex polygon (triangle fan).
             bool merged = false;
-            if (fanBaseIndex == t1)
-            {
+            if (fanBaseIndex == t1) {
                 size_t o = polygon.size() - 4;
                 Vector<float>& p = polygon;
                 int winding1 = winding(p[o], p[o + 1], p[o + 2], p[o + 3], x3, y3);
                 int winding2 = winding(x3, y3, p[0], p[1], p[2], p[3]);
-                if (winding1 == lastwinding && winding2 == lastwinding)
-                {
+                if (winding1 == lastwinding && winding2 == lastwinding) {
                     polygon.push_back(x3);
                     polygon.push_back(y3);
                     polygonIndices.push_back(t3);
@@ -190,15 +169,12 @@ namespace Spine
             }
             
             // Otherwise make this triangle the new base.
-            if (!merged)
-            {
-                if (polygon.size() > 0)
-                {
+            if (!merged) {
+                if (polygon.size() > 0) {
                     convexPolygons.push_back(&polygon);
                     convexPolygonsIndices.push_back(&polygonIndices);
                 }
-                else
-                {
+                else {
                     _polygonPool.free(&polygon);
                     _polygonIndicesPool.free(&polygonIndices);
                 }
@@ -221,15 +197,13 @@ namespace Spine
             }
         }
         
-        if (polygon.size() > 0)
-        {
+        if (polygon.size() > 0) {
             convexPolygons.push_back(&polygon);
             convexPolygonsIndices.push_back(&polygonIndices);
         }
         
         // Go through the list of polygons and try to merge the remaining triangles with the found triangle fans.
-        for (size_t i = 0, n = convexPolygons.size(); i < n; ++i)
-        {
+        for (size_t i = 0, n = convexPolygons.size(); i < n; ++i) {
             polygonIndicesP = convexPolygonsIndices[i];
             polygonIndices = *polygonIndicesP;
             
@@ -246,18 +220,15 @@ namespace Spine
             float secondX = p[2], secondY = p[3];
             int winding0 = winding(prevPrevX, prevPrevY, prevX, prevY, firstX, firstY);
             
-            for (int ii = 0; ii < n; ++ii)
-            {
-                if (ii == i)
-                {
+            for (int ii = 0; ii < n; ++ii) {
+                if (ii == i) {
                     continue;
                 }
                 
                 Vector<int>* otherIndicesP = convexPolygonsIndices[ii];
                 Vector<int>& otherIndices = *otherIndicesP;
                 
-                if (otherIndices.size() != 3)
-                {
+                if (otherIndices.size() != 3) {
                     continue;
                 }
                 
@@ -270,15 +241,13 @@ namespace Spine
                 
                 float x3 = otherPoly[otherPoly.size() - 2], y3 = otherPoly[otherPoly.size() - 1];
                 
-                if (otherFirstIndex != firstIndex || otherSecondIndex != lastIndex)
-                {
+                if (otherFirstIndex != firstIndex || otherSecondIndex != lastIndex) {
                     continue;
                 }
                 
                 int winding1 = winding(prevPrevX, prevPrevY, prevX, prevY, x3, y3);
                 int winding2 = winding(x3, y3, firstX, firstY, secondX, secondY);
-                if (winding1 == winding0 && winding2 == winding0)
-                {
+                if (winding1 == winding0 && winding2 == winding0) {
                     otherPoly.clear();
                     otherIndices.clear();
                     polygon.push_back(x3);
@@ -294,11 +263,9 @@ namespace Spine
         }
         
         // Remove empty polygons that resulted from the merge step above.
-        for (int i = static_cast<int>(convexPolygons.size()) - 1; i >= 0; --i)
-        {
+        for (int i = static_cast<int>(convexPolygons.size()) - 1; i >= 0; --i) {
             polygon = *convexPolygons[i];
-            if (polygon.size() == 0)
-            {
+            if (polygon.size() == 0) {
                 convexPolygons.erase(i);
                 _polygonPool.free(&polygon);
                 polygonIndices = *convexPolygonsIndices[i];
@@ -310,8 +277,7 @@ namespace Spine
         return convexPolygons;
     }
     
-    bool Triangulator::isConcave(int index, int vertexCount, Vector<float>& vertices, Vector<int>& indices)
-    {
+    bool Triangulator::isConcave(int index, int vertexCount, Vector<float>& vertices, Vector<int>& indices) {
         int previous = indices[(vertexCount + index - 1) % vertexCount] << 1;
         int current = indices[index] << 1;
         int next = indices[(index + 1) % vertexCount] << 1;
@@ -319,13 +285,11 @@ namespace Spine
         return !positiveArea(vertices[previous], vertices[previous + 1], vertices[current], vertices[current + 1], vertices[next], vertices[next + 1]);
     }
     
-    bool Triangulator::positiveArea(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y)
-    {
+    bool Triangulator::positiveArea(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {
         return p1x * (p3y - p2y) + p2x * (p1y - p3y) + p3x * (p2y - p1y) >= 0;
     }
     
-    int Triangulator::winding(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y)
-    {
+    int Triangulator::winding(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {
         float px = p2x - p1x, py = p2y - p1y;
         
         return p3x * py - p3y * px + px * p1y - p1x * py >= 0 ? 1 : -1;

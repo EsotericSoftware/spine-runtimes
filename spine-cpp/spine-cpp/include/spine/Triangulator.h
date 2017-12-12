@@ -36,8 +36,7 @@
 
 namespace Spine
 {
-    class Triangulator
-    {
+    class Triangulator {
     public:
         Vector<int>& triangulate(Vector<float>& vertices);
         

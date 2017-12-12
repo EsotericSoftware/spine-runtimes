@@ -41,10 +41,8 @@ namespace Spine
 {
     RTTI_IMPL(IkConstraint, Constraint);
     
-    void IkConstraint::apply(Bone& bone, float targetX, float targetY, float alpha)
-    {
-        if (!bone._appliedValid)
-        {
+    void IkConstraint::apply(Bone& bone, float targetX, float targetY, float alpha) {
+        if (!bone._appliedValid) {
             bone.updateAppliedTransform();
         }
         
@@ -56,39 +54,32 @@ namespace Spine
         float tx = (x * p._d - y * p._b) * id - bone._ax, ty = (y * p._a - x * p._c) * id - bone._ay;
         float rotationIK = (float)atan2(ty, tx) * RadDeg - bone._ashearX - bone._arotation;
         
-        if (bone._ascaleX < 0)
-        {
+        if (bone._ascaleX < 0) {
             rotationIK += 180;
         }
         
-        if (rotationIK > 180)
-        {
+        if (rotationIK > 180) {
             rotationIK -= 360;
         }
-        else if (rotationIK < -180)
-        {
+        else if (rotationIK < -180) {
             rotationIK += 360;
         }
         
         bone.updateWorldTransform(bone._ax, bone._ay, bone._arotation + rotationIK * alpha, bone._ascaleX, bone._ascaleY, bone._ashearX, bone._ashearY);
     }
     
-    void IkConstraint::apply(Bone& parent, Bone& child, float targetX, float targetY, int bendDir, float alpha)
-    {
-        if (areFloatsPracticallyEqual(alpha, 0))
-        {
+    void IkConstraint::apply(Bone& parent, Bone& child, float targetX, float targetY, int bendDir, float alpha) {
+        if (areFloatsPracticallyEqual(alpha, 0)) {
             child.updateWorldTransform();
             
             return;
         }
         
-        if (!parent._appliedValid)
-        {
+        if (!parent._appliedValid) {
             parent.updateAppliedTransform();
         }
         
-        if (!child._appliedValid)
-        {
+        if (!child._appliedValid) {
             child.updateAppliedTransform();
         }
         
@@ -99,31 +90,26 @@ namespace Spine
         float csx = child._ascaleX;
         
         int os1, os2, s2;
-        if (psx < 0)
-        {
+        if (psx < 0) {
             psx = -psx;
             os1 = 180;
             s2 = -1;
         }
-        else
-        {
+        else {
             os1 = 0;
             s2 = 1;
         }
         
-        if (psy < 0)
-        {
+        if (psy < 0) {
             psy = -psy;
             s2 = -s2;
         }
         
-        if (csx < 0)
-        {
+        if (csx < 0) {
             csx = -csx;
             os2 = 180;
         }
-        else
-        {
+        else {
             os2 = 0;
         }
         
@@ -137,14 +123,12 @@ namespace Spine
         float d = parent._d;
         
         bool u = fabs(psx - psy) <= 0.0001f;
-        if (!u)
-        {
+        if (!u) {
             cy = 0;
             cwx = a * cx + parent._worldX;
             cwy = c * cx + parent._worldY;
         }
-        else
-        {
+        else {
             cy = child._ay;
             cwx = a * cx + b * cy + parent._worldX;
             cwy = c * cx + d * cy + parent._worldY;
@@ -164,16 +148,13 @@ namespace Spine
         y = cwy - pp._worldY;
         float dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
         float l1 = (float)sqrt(dx * dx + dy * dy), l2 = child._data.getLength() * csx, a1, a2;
-        if (u)
-        {
+        if (u) {
             l2 *= psx;
             float cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
-            if (cos < -1)
-            {
+            if (cos < -1) {
                 cos = -1;
             }
-            else if (cos > 1)
-            {
+            else if (cos > 1) {
                 cos = 1;
             }
             
@@ -182,23 +163,20 @@ namespace Spine
             b = l2 * (float)sin(a2);
             a1 = (float)atan2(ty * a - tx * b, tx * a + ty * b);
         }
-        else
-        {
+        else {
             a = psx * l2;
             b = psy * l2;
             float aa = a * a, bb = b * b, dd = tx * tx + ty * ty, ta = (float)atan2(ty, tx);
             c = bb * l1 * l1 + aa * dd - aa * bb;
             float c1 = -2 * bb * l1, c2 = bb - aa;
             d = c1 * c1 - 4 * c2 * c;
-            if (d >= 0)
-            {
+            if (d >= 0) {
                 float q = (float)sqrt(d);
                 if (c1 < 0) q = -q;
                 q = -(c1 + q) / 2;
                 float r0 = q / c2, r1 = c / q;
                 float r = fabs(r0) < fabs(r1) ? r0 : r1;
-                if (r * r <= dd)
-                {
+                if (r * r <= dd) {
                     y = (float)sqrt(dd - r * r) * bendDir;
                     a1 = ta - (float)atan2(y, r);
                     a2 = (float)atan2(y / psy, (r - l1) / psx);
@@ -206,12 +184,10 @@ namespace Spine
                     float os = (float)atan2(cy, cx) * s2;
                     float rotation = parent._arotation;
                     a1 = (a1 - os) * RadDeg + os1 - rotation;
-                    if (a1 > 180)
-                    {
+                    if (a1 > 180) {
                         a1 -= 360;
                     }
-                    else if (a1 < -180)
-                    {
+                    else if (a1 < -180) {
                         a1 += 360;
                     }
                     
@@ -219,12 +195,10 @@ namespace Spine
                     rotation = child._arotation;
                     a2 = ((a2 + os) * RadDeg - child._ashearX) * s2 + os2 - rotation;
                     
-                    if (a2 > 180)
-                    {
+                    if (a2 > 180) {
                         a2 -= 360;
                     }
-                    else if (a2 < -180)
-                    {
+                    else if (a2 < -180) {
                         a2 += 360;
                     }
                     
@@ -237,23 +211,20 @@ namespace Spine
             float minAngle = SPINE_PI, minX = l1 - a, minDist = minX * minX, minY = 0;
             float maxAngle = 0, maxX = l1 + a, maxDist = maxX * maxX, maxY = 0;
             c = -a * l1 / (aa - bb);
-            if (c >= -1 && c <= 1)
-            {
+            if (c >= -1 && c <= 1) {
                 c = (float)acos(c);
                 x = a * (float)cos(c) + l1;
                 y = b * (float)sin(c);
                 d = x * x + y * y;
                 
-                if (d < minDist)
-                {
+                if (d < minDist) {
                     minAngle = c;
                     minDist = d;
                     minX = x;
                     minY = y;
                 }
                 
-                if (d > maxDist)
-                {
+                if (d > maxDist) {
                     maxAngle = c;
                     maxDist = d;
                     maxX = x;
@@ -261,13 +232,11 @@ namespace Spine
                 }
             }
             
-            if (dd <= (minDist + maxDist) / 2)
-            {
+            if (dd <= (minDist + maxDist) / 2) {
                 a1 = ta - (float)atan2(minY * bendDir, minX);
                 a2 = minAngle * bendDir;
             }
-            else
-            {
+            else {
                 a1 = ta - (float)atan2(maxY * bendDir, maxX);
                 a2 = maxAngle * bendDir;
             }
@@ -278,11 +247,9 @@ namespace Spine
     _data(data),
     _mix(data.getMix()),
     _bendDirection(data.getBendDirection()),
-    _target(skeleton.findBone(data.getTarget()->getName()))
-    {
+    _target(skeleton.findBone(data.getTarget()->getName())) {
         _bones.reserve(_data.getBones().size());
-        for (BoneData** i = _data.getBones().begin(); i != _data.getBones().end(); ++i)
-        {
+        for (BoneData** i = _data.getBones().begin(); i != _data.getBones().end(); ++i) {
             BoneData* boneData = (*i);
             
             _bones.push_back(skeleton.findBone(boneData->getName()));
@@ -290,23 +257,18 @@ namespace Spine
     }
     
     /// Applies the constraint to the constrained bones.
-    void IkConstraint::apply()
-    {
+    void IkConstraint::apply() {
         update();
     }
     
-    void IkConstraint::update()
-    {
-        switch (_bones.size())
-        {
-            case 1:
-            {
+    void IkConstraint::update() {
+        switch (_bones.size()) {
+            case 1: {
                 Bone* bone0 = _bones[0];
                 apply(*bone0, _target->getWorldX(), _target->getWorldY(), _mix);
             }
                 break;
-            case 2:
-            {
+            case 2: {
                 Bone* bone0 = _bones[0];
                 Bone* bone1 = _bones[1];
                 apply(*bone0, *bone1, _target->getWorldX(), _target->getWorldY(), _bendDirection, _mix);
@@ -315,48 +277,39 @@ namespace Spine
         }
     }
     
-    int IkConstraint::getOrder()
-    {
+    int IkConstraint::getOrder() {
         return _data.getOrder();
     }
     
-    IkConstraintData& IkConstraint::getData()
-    {
+    IkConstraintData& IkConstraint::getData() {
         return _data;
     }
     
-    Vector<Bone*>& IkConstraint::getBones()
-    {
+    Vector<Bone*>& IkConstraint::getBones() {
         return _bones;
     }
     
-    Bone* IkConstraint::getTarget()
-    {
+    Bone* IkConstraint::getTarget() {
         return _target;
     }
     
-    void IkConstraint::setTarget(Bone* inValue)
-    {
+    void IkConstraint::setTarget(Bone* inValue) {
         _target = inValue;
     }
     
-    int IkConstraint::getBendDirection()
-    {
+    int IkConstraint::getBendDirection() {
         return _bendDirection;
     }
     
-    void IkConstraint::setBendDirection(int inValue)
-    {
+    void IkConstraint::setBendDirection(int inValue) {
         _bendDirection = inValue;
     }
     
-    float IkConstraint::getMix()
-    {
+    float IkConstraint::getMix() {
         return _mix;
     }
     
-    void IkConstraint::setMix(float inValue)
-    {
+    void IkConstraint::setMix(float inValue) {
         _mix = inValue;
     }
 }

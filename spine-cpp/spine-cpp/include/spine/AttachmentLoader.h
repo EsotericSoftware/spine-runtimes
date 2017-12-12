@@ -45,8 +45,7 @@ namespace Spine
     class PointAttachment;
     class ClippingAttachment;
     
-    class AttachmentLoader
-    {
+    class AttachmentLoader {
         RTTI_DECL;
         
         AttachmentLoader();

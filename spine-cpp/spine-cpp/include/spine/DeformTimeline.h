@@ -37,8 +37,7 @@ namespace Spine
 {
     class VertexAttachment;
     
-    class DeformTimeline : public CurveTimeline
-    {
+    class DeformTimeline : public CurveTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

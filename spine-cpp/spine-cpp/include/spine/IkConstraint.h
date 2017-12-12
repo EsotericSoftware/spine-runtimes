@@ -41,8 +41,7 @@ namespace Spine
     class Skeleton;
     class Bone;
     
-    class IkConstraint : public Constraint
-    {
+    class IkConstraint : public Constraint {
         friend class Skeleton;
         friend class IkConstraintTimeline;
         

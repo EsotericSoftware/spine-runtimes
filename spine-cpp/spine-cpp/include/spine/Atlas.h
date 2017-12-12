@@ -38,8 +38,7 @@
 
 namespace Spine
 {
-    enum Format
-    {
+    enum Format {
         Format_Alpha,
         Format_Intensity,
         Format_LuminanceAlpha,
@@ -49,8 +48,7 @@ namespace Spine
         Format_RGBA8888
     };
     
-    enum TextureFilter
-    {
+    enum TextureFilter {
         TextureFilter_Nearest,
         TextureFilter_Linear,
         TextureFilter_MipMap,
@@ -60,15 +58,13 @@ namespace Spine
         TextureFilter_MipMapLinearLinear
     };
     
-    enum TextureWrap
-    {
+    enum TextureWrap {
         TextureWrap_MirroredRepeat,
         TextureWrap_ClampToEdge,
         TextureWrap_Repeat
     };
     
-    class AtlasPage
-    {
+    class AtlasPage {
     public:
         std::string name;
         Format format;
@@ -82,8 +78,7 @@ namespace Spine
         AtlasPage(std::string inName) : name(inName) {}
     };
     
-    class AtlasRegion
-    {
+    class AtlasRegion {
     public:
         AtlasPage* page;
         std::string name;
@@ -99,8 +94,7 @@ namespace Spine
     
     class TextureLoader;
     
-    class Atlas
-    {
+    class Atlas {
     public:
         Atlas(const char* path, TextureLoader& textureLoader);
         
@@ -124,8 +118,7 @@ namespace Spine
         
         void load(const char* begin, int length, const char* dir);
         
-        class Str
-        {
+        class Str {
         public:
             const char* begin;
             const char* end;

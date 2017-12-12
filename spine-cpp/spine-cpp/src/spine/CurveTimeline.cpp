@@ -41,31 +41,26 @@ namespace Spine
     const float CurveTimeline::BEZIER = 2;
     const int CurveTimeline::BEZIER_SIZE = 10 * 2 - 1;
     
-    CurveTimeline::CurveTimeline(int frameCount)
-    {
+    CurveTimeline::CurveTimeline(int frameCount) {
         assert(frameCount > 0);
         
         _curves.reserve((frameCount - 1) * BEZIER_SIZE);
         _curves.setSize((frameCount - 1) * BEZIER_SIZE);
     }
     
-    int CurveTimeline::getFrameCount()
-    {
+    int CurveTimeline::getFrameCount() {
         return static_cast<int>(_curves.size() / BEZIER_SIZE + 1);
     }
     
-    void CurveTimeline::setLinear(int frameIndex)
-    {
+    void CurveTimeline::setLinear(int frameIndex) {
         _curves[frameIndex * BEZIER_SIZE] = LINEAR;
     }
     
-    void CurveTimeline::setStepped(int frameIndex)
-    {
+    void CurveTimeline::setStepped(int frameIndex) {
         _curves[frameIndex * BEZIER_SIZE] = STEPPED;
     }
     
-    void CurveTimeline::setCurve(int frameIndex, float cx1, float cy1, float cx2, float cy2)
-    {
+    void CurveTimeline::setCurve(int frameIndex, float cx1, float cy1, float cx2, float cy2) {
         float tmpx = (-cx1 * 2 + cx2) * 0.03f, tmpy = (-cy1 * 2 + cy2) * 0.03f;
         float dddfx = ((cx1 - cx2) * 3 + 1) * 0.006f, dddfy = ((cy1 - cy2) * 3 + 1) * 0.006f;
         float ddfx = tmpx * 2 + dddfx, ddfy = tmpy * 2 + dddfy;
@@ -75,8 +70,7 @@ namespace Spine
         _curves[i++] = BEZIER;
         
         float x = dfx, y = dfy;
-        for (int n = i + BEZIER_SIZE - 1; i < n; i += 2)
-        {
+        for (int n = i + BEZIER_SIZE - 1; i < n; i += 2) {
             _curves[i] = x;
             _curves[i + 1] = y;
             dfx += ddfx;
@@ -88,37 +82,30 @@ namespace Spine
         }
     }
     
-    float CurveTimeline::getCurvePercent(int frameIndex, float percent)
-    {
+    float CurveTimeline::getCurvePercent(int frameIndex, float percent) {
         percent = clamp(percent, 0, 1);
         int i = frameIndex * BEZIER_SIZE;
         float type = _curves[i];
         
-        if (type == LINEAR)
-        {
+        if (type == LINEAR) {
             return percent;
         }
         
-        if (type == STEPPED)
-        {
+        if (type == STEPPED) {
             return 0;
         }
         
         i++;
         float x = 0;
-        for (int start = i, n = i + BEZIER_SIZE - 1; i < n; i += 2)
-        {
+        for (int start = i, n = i + BEZIER_SIZE - 1; i < n; i += 2) {
             x = _curves[i];
-            if (x >= percent)
-            {
+            if (x >= percent) {
                 float prevX, prevY;
-                if (i == start)
-                {
+                if (i == start) {
                     prevX = 0;
                     prevY = 0;
                 }
-                else
-                {
+                else {
                     prevX = _curves[i - 2];
                     prevY = _curves[i - 1];
                 }
@@ -132,8 +119,7 @@ namespace Spine
         return y + (1 - y) * (percent - x) / (1 - x); // Last point is 1,1.
     }
     
-    float CurveTimeline::getCurveType(int frameIndex)
-    {
+    float CurveTimeline::getCurveType(int frameIndex) {
         return _curves[frameIndex * BEZIER_SIZE];
     }
 }

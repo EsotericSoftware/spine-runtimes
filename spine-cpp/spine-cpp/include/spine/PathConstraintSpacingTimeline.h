@@ -35,8 +35,7 @@
 
 namespace Spine
 {
-    class PathConstraintSpacingTimeline : public PathConstraintPositionTimeline
-    {
+    class PathConstraintSpacingTimeline : public PathConstraintPositionTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

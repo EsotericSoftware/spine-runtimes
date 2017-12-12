@@ -51,87 +51,70 @@ namespace Spine
     _offsetScaleY(0),
     _offsetShearY(0),
     _relative(false),
-    _local(false)
-    {
+    _local(false) {
         assert(_name.length() > 0);
     }
     
-    const std::string& TransformConstraintData::getName()
-    {
+    const std::string& TransformConstraintData::getName() {
         return _name;
     }
     
-    int TransformConstraintData::getOrder()
-    {
+    int TransformConstraintData::getOrder() {
         return _order;
     }
-    Vector<BoneData*>& TransformConstraintData::getBones()
-    {
+    Vector<BoneData*>& TransformConstraintData::getBones() {
         return _bones;
     }
     
-    BoneData* TransformConstraintData::getTarget()
-    {
+    BoneData* TransformConstraintData::getTarget() {
         return _target;
     }
     
-    float TransformConstraintData::getRotateMix()
-    {
+    float TransformConstraintData::getRotateMix() {
         return _rotateMix;
     }
     
-    float TransformConstraintData::getTranslateMix()
-    {
+    float TransformConstraintData::getTranslateMix() {
         return _translateMix;
     }
     
-    float TransformConstraintData::getScaleMix()
-    {
+    float TransformConstraintData::getScaleMix() {
         return _scaleMix;
     }
     
-    float TransformConstraintData::getShearMix()
-    {
+    float TransformConstraintData::getShearMix() {
         return _shearMix;
     }
     
-    float TransformConstraintData::getOffsetRotation()
-    {
+    float TransformConstraintData::getOffsetRotation() {
         return _offsetRotation;
     }
     
-    float TransformConstraintData::getOffsetX()
-    {
+    float TransformConstraintData::getOffsetX() {
         return _offsetX;
     }
     
-    float TransformConstraintData::getOffsetY()
-    {
+    float TransformConstraintData::getOffsetY() {
         return _offsetY;
     }
     
-    float TransformConstraintData::getOffsetScaleX()
-    {
+    float TransformConstraintData::getOffsetScaleX() {
         return _offsetScaleX;
     }
     
-    float TransformConstraintData::getOffsetScaleY()
-    {
+    float TransformConstraintData::getOffsetScaleY() {
         return _offsetScaleY;
     }
     
-    float TransformConstraintData::getOffsetShearY()
-    {
+    float TransformConstraintData::getOffsetShearY() {
         return _offsetShearY;
     }
     
-    bool TransformConstraintData::isRelative()
-    {
+    bool TransformConstraintData::isRelative() {
         return _relative;
     }
     
-    bool TransformConstraintData::isLocal()
-    {
+    bool TransformConstraintData::isLocal() {
         return _local;
     }
 }

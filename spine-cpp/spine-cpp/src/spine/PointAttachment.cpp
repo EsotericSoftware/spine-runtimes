@@ -38,18 +38,15 @@ namespace Spine
 {
     RTTI_IMPL(PointAttachment, Attachment);
     
-    PointAttachment::PointAttachment(std::string name) : Attachment(name), _x(0), _y(0), _rotation(0)
-    {
+    PointAttachment::PointAttachment(std::string name) : Attachment(name), _x(0), _y(0), _rotation(0) {
         // Empty
     }
     
-    void PointAttachment::computeWorldPosition(Bone& bone, float& ox, float& oy)
-    {
+    void PointAttachment::computeWorldPosition(Bone& bone, float& ox, float& oy) {
         bone.localToWorld(_x, _y, ox, oy);
     }
     
-    float PointAttachment::computeWorldRotation(Bone& bone)
-    {
+    float PointAttachment::computeWorldRotation(Bone& bone) {
         float cos = MathUtil::cosDeg(_rotation);
         float sin = MathUtil::sinDeg(_rotation);
         float ix = cos * bone._a + sin * bone._b;
@@ -58,33 +55,27 @@ namespace Spine
         return MathUtil::atan2(iy, ix) * RadDeg;
     }
     
-    float PointAttachment::getX()
-    {
+    float PointAttachment::getX() {
         return _x;
     }
     
-    void PointAttachment::setX(float inValue)
-    {
+    void PointAttachment::setX(float inValue) {
         _x = inValue;
     }
     
-    float PointAttachment::getY()
-    {
+    float PointAttachment::getY() {
         return _y;
     }
     
-    void PointAttachment::setY(float inValue)
-    {
+    void PointAttachment::setY(float inValue) {
         _y = inValue;
     }
     
-    float PointAttachment::getRotation()
-    {
+    float PointAttachment::getRotation() {
         return _rotation;
     }
     
-    void PointAttachment::setRotation(float inValue)
-    {
+    void PointAttachment::setRotation(float inValue) {
         _rotation = inValue;
     }
 }

@@ -53,13 +53,11 @@ namespace Spine
     _version(),
     _hash(),
     _fps(0),
-    _imagesPath()
-    {
+    _imagesPath() {
         // Empty
     }
     
-    SkeletonData::~SkeletonData()
-    {
+    SkeletonData::~SkeletonData() {
         ContainerUtil::cleanUpVectorOfPointers(_bones);
         ContainerUtil::cleanUpVectorOfPointers(_slots);
         ContainerUtil::cleanUpVectorOfPointers(_skins);
@@ -73,208 +71,167 @@ namespace Spine
         ContainerUtil::cleanUpVectorOfPointers(_pathConstraints);
     }
     
-    BoneData* SkeletonData::findBone(std::string boneName)
-    {
+    BoneData* SkeletonData::findBone(std::string boneName) {
         return ContainerUtil::findWithName(_bones, boneName);
     }
     
-    int SkeletonData::findBoneIndex(std::string boneName)
-    {
+    int SkeletonData::findBoneIndex(std::string boneName) {
         return ContainerUtil::findIndexWithName(_bones, boneName);
     }
     
-    SlotData* SkeletonData::findSlot(std::string slotName)
-    {
+    SlotData* SkeletonData::findSlot(std::string slotName) {
         return ContainerUtil::findWithName(_slots, slotName);
     }
     
-    int SkeletonData::findSlotIndex(std::string slotName)
-    {
+    int SkeletonData::findSlotIndex(std::string slotName) {
         return ContainerUtil::findIndexWithName(_slots, slotName);
     }
     
-    Skin* SkeletonData::findSkin(std::string skinName)
-    {
+    Skin* SkeletonData::findSkin(std::string skinName) {
         return ContainerUtil::findWithName(_skins, skinName);
     }
     
-    EventData* SkeletonData::findEvent(std::string eventDataName)
-    {
+    EventData* SkeletonData::findEvent(std::string eventDataName) {
         return ContainerUtil::findWithName(_events, eventDataName);
     }
     
-    Animation* SkeletonData::findAnimation(std::string animationName)
-    {
+    Animation* SkeletonData::findAnimation(std::string animationName) {
         return ContainerUtil::findWithName(_animations, animationName);
     }
     
-    IkConstraintData* SkeletonData::findIkConstraint(std::string constraintName)
-    {
+    IkConstraintData* SkeletonData::findIkConstraint(std::string constraintName) {
         return ContainerUtil::findWithName(_ikConstraints, constraintName);
     }
     
-    TransformConstraintData* SkeletonData::findTransformConstraint(std::string constraintName)
-    {
+    TransformConstraintData* SkeletonData::findTransformConstraint(std::string constraintName) {
         return ContainerUtil::findWithName(_transformConstraints, constraintName);
     }
     
-    PathConstraintData* SkeletonData::findPathConstraint(std::string constraintName)
-    {
+    PathConstraintData* SkeletonData::findPathConstraint(std::string constraintName) {
         return ContainerUtil::findWithName(_pathConstraints, constraintName);
     }
     
-    int SkeletonData::findPathConstraintIndex(std::string pathConstraintName)
-    {
+    int SkeletonData::findPathConstraintIndex(std::string pathConstraintName) {
         return ContainerUtil::findIndexWithName(_pathConstraints, pathConstraintName);
     }
     
-    std::string SkeletonData::getName()
-    {
+    std::string SkeletonData::getName() {
         return _name;
     }
     
-    void SkeletonData::setName(std::string inValue)
-    {
+    void SkeletonData::setName(std::string inValue) {
         _name = inValue;
     }
     
-    Vector<BoneData*>& SkeletonData::getBones()
-    {
+    Vector<BoneData*>& SkeletonData::getBones() {
         return _bones;
     }
     
-    Vector<SlotData*>& SkeletonData::getSlots()
-    {
+    Vector<SlotData*>& SkeletonData::getSlots() {
         return _slots;
     }
     
-    Vector<Skin*>& SkeletonData::getSkins()
-    {
+    Vector<Skin*>& SkeletonData::getSkins() {
         return _skins;
     }
     
-    void SkeletonData::setSkins(Vector<Skin*>& inValue)
-    {
+    void SkeletonData::setSkins(Vector<Skin*>& inValue) {
         _skins = inValue;
     }
     
-    Skin* SkeletonData::getDefaultSkin()
-    {
+    Skin* SkeletonData::getDefaultSkin() {
         return _defaultSkin;
     }
     
-    void SkeletonData::setDefaultSkin(Skin* inValue)
-    {
+    void SkeletonData::setDefaultSkin(Skin* inValue) {
         _defaultSkin = inValue;
     }
     
-    Vector<EventData*>& SkeletonData::getEvents()
-    {
+    Vector<EventData*>& SkeletonData::getEvents() {
         return _events;
     }
     
-    void SkeletonData::setEvents(Vector<EventData*>& inValue)
-    {
+    void SkeletonData::setEvents(Vector<EventData*>& inValue) {
         _events = inValue;
     }
     
-    Vector<Animation*>& SkeletonData::getAnimations()
-    {
+    Vector<Animation*>& SkeletonData::getAnimations() {
         return _animations;
     }
     
-    void SkeletonData::setAnimations(Vector<Animation*>& inValue)
-    {
+    void SkeletonData::setAnimations(Vector<Animation*>& inValue) {
         _animations = inValue;
     }
     
-    Vector<IkConstraintData*>& SkeletonData::getIkConstraints()
-    {
+    Vector<IkConstraintData*>& SkeletonData::getIkConstraints() {
         return _ikConstraints;
     }
     
-    void SkeletonData::setIkConstraints(Vector<IkConstraintData*>& inValue)
-    {
+    void SkeletonData::setIkConstraints(Vector<IkConstraintData*>& inValue) {
         _ikConstraints = inValue;
     }
     
-    Vector<TransformConstraintData*>& SkeletonData::getTransformConstraints()
-    {
+    Vector<TransformConstraintData*>& SkeletonData::getTransformConstraints() {
         return _transformConstraints;
     }
     
-    void SkeletonData::setTransformConstraints(Vector<TransformConstraintData*>& inValue)
-    {
+    void SkeletonData::setTransformConstraints(Vector<TransformConstraintData*>& inValue) {
         _transformConstraints = inValue;
     }
     
-    Vector<PathConstraintData*>& SkeletonData::getPathConstraints()
-    {
+    Vector<PathConstraintData*>& SkeletonData::getPathConstraints() {
         return _pathConstraints;
     }
     
-    void SkeletonData::setPathConstraints(Vector<PathConstraintData*>& inValue)
-    {
+    void SkeletonData::setPathConstraints(Vector<PathConstraintData*>& inValue) {
         _pathConstraints = inValue;
     }
     
-    float SkeletonData::getWidth()
-    {
+    float SkeletonData::getWidth() {
         return _width;
     }
     
-    void SkeletonData::setWidth(float inValue)
-    {
+    void SkeletonData::setWidth(float inValue) {
         _width = inValue;
     }
     
-    float SkeletonData::getHeight()
-    {
+    float SkeletonData::getHeight() {
         return _height;
     }
     
-    void SkeletonData::setHeight(float inValue)
-    {
+    void SkeletonData::setHeight(float inValue) {
         _height = inValue;
     }
     
-    std::string SkeletonData::getVersion()
-    {
+    std::string SkeletonData::getVersion() {
         return _version;
     }
     
-    void SkeletonData::setVersion(std::string inValue)
-    {
+    void SkeletonData::setVersion(std::string inValue) {
         _version = inValue;
     }
     
-    std::string SkeletonData::getHash()
-    {
+    std::string SkeletonData::getHash() {
         return _hash;
     }
     
-    void SkeletonData::setHash(std::string inValue)
-    {
+    void SkeletonData::setHash(std::string inValue) {
         _hash = inValue;
     }
     
-    std::string SkeletonData::getImagesPath()
-    {
+    std::string SkeletonData::getImagesPath() {
         return _imagesPath;
     }
     
-    void SkeletonData::setImagesPath(std::string inValue)
-    {
+    void SkeletonData::setImagesPath(std::string inValue) {
         _imagesPath = inValue;
     }
     
-    float SkeletonData::getFps()
-    {
+    float SkeletonData::getFps() {
         return _fps;
     }
     
-    void SkeletonData::setFps(float inValue)
-    {
+    void SkeletonData::setFps(float inValue) {
         _fps = inValue;
     }
 }

@@ -33,8 +33,7 @@
 
 namespace Spine
 {
-    enum AttachmentType
-    {
+    enum AttachmentType {
         AttachmentType_Region,
         AttachmentType_Boundingbox,
         AttachmentType_Mesh,
