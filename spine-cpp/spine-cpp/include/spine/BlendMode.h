@@ -31,8 +31,7 @@
 #ifndef Spine_BlendMode_h
 #define Spine_BlendMode_h
 
-namespace Spine
-{
+namespace Spine {
     enum BlendMode {
         BlendMode_Normal = 0,
         BlendMode_Additive,

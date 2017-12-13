@@ -40,8 +40,7 @@
 #include <spine/Bone.h>
 #include <spine/BoneData.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(TranslateTimeline, CurveTimeline);
     
     const int TranslateTimeline::ENTRIES = 3;

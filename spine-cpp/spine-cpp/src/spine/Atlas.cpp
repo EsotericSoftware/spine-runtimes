@@ -36,8 +36,7 @@
 
 #include <cstring>
 
-namespace Spine
-{
+namespace Spine {
     Atlas::Atlas(const char* path, TextureLoader& textureLoader) : _textureLoader(textureLoader) {
         int dirLength;
         char *dir;

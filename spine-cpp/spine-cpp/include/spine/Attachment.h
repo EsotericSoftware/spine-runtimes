@@ -35,8 +35,7 @@
 
 #include <string>
 
-namespace Spine
-{
+namespace Spine {
     class Attachment {
         RTTI_DECL;
         

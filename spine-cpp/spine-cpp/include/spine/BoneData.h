@@ -35,8 +35,7 @@
 
 #include <string>
 
-namespace Spine
-{
+namespace Spine {
     class BoneData {
         friend class SkeletonBinary;
         friend class SkeletonJson;

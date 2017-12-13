@@ -35,8 +35,7 @@
 #include <spine/Vector.h>
 #include <spine/ContainerUtil.h>
 
-namespace Spine
-{
+namespace Spine {
     template <typename T>
     class Pool {
     public:

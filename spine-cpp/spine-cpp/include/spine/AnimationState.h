@@ -35,8 +35,7 @@
 #include <spine/Pool.h>
 #include <spine/MixPose.h>
 
-namespace Spine
-{
+namespace Spine {
     enum EventType {
         EventType_Start,
         EventType_Interrupt,

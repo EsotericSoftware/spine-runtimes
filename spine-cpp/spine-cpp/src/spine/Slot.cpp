@@ -35,8 +35,7 @@
 #include <spine/Skeleton.h>
 #include <spine/Attachment.h>
 
-namespace Spine
-{
+namespace Spine {
     Slot::Slot(SlotData& data, Bone& bone) :
     _data(data),
     _bone(bone),

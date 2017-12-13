@@ -36,8 +36,7 @@
 
 #include <string>
 
-namespace Spine
-{
+namespace Spine {
     enum Format {
         Format_Alpha,
         Format_Intensity,

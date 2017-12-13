@@ -32,8 +32,7 @@
 
 #include <assert.h>
 
-namespace Spine
-{
+namespace Spine {
     SlotData::SlotData(int index, std::string name, BoneData& boneData) :
     _index(index),
     _name(name),

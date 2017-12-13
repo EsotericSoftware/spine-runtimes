@@ -35,8 +35,7 @@
 #include <spine/Bone.h>
 #include <spine/Skeleton.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(VertexAttachment, Attachment);
     
     VertexAttachment::VertexAttachment(std::string name) : Attachment(name), _worldVerticesLength(0), _id(getNextID()) {

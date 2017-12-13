@@ -35,8 +35,7 @@
 
 #include <spine/Vector.h>
 
-namespace Spine
-{
+namespace Spine {
     class Atlas;
     class AtlasRegion;
     

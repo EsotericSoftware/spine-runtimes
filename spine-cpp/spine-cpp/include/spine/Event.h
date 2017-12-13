@@ -33,8 +33,7 @@
 
 #include <string>
 
-namespace Spine
-{
+namespace Spine {
     class EventData;
     
     /// Stores the current pose values for an Event.

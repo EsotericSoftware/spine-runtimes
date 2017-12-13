@@ -35,8 +35,7 @@
 
 #include <assert.h>
 
-namespace Spine
-{
+namespace Spine {
     PathConstraintData::PathConstraintData(std::string name) :
     _name(name),
     _order(0),

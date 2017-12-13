@@ -32,8 +32,7 @@
 
 #include <assert.h>
 
-namespace Spine
-{
+namespace Spine {
     EventData::EventData(std::string name) :
     _name(name),
     _intValue(0),

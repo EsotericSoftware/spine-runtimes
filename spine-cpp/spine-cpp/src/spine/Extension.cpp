@@ -34,8 +34,7 @@
 #include <assert.h>
 #include <cstring>
 
-namespace Spine
-{
+namespace Spine {
     SpineExtension* SpineExtension::_instance = NULL;
     
     void SpineExtension::setInstance(SpineExtension* inValue) {

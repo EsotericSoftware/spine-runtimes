@@ -36,8 +36,7 @@
 #include <assert.h>
 #include <string>
 
-namespace Spine
-{
+namespace Spine {
     class SkeletonData;
     class Animation;
     

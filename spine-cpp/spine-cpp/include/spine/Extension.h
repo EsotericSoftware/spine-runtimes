@@ -47,8 +47,7 @@
 /* Call destructor and then frees memory. Can be used on const types. */
 #define DESTROY(TYPE,VALUE) VALUE->~TYPE(); SPINE_EXTENSION->spineFree((void*)VALUE)
 
-namespace Spine
-{
+namespace Spine {
     class SpineExtension {
     public:
         static void setInstance(SpineExtension* inSpineExtension);

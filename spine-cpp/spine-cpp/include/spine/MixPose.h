@@ -31,8 +31,7 @@
 #ifndef Spine_MixPose_h
 #define Spine_MixPose_h
 
-namespace Spine
-{
+namespace Spine {
     ///
     /// Controls how a timeline is mixed with the setup or current pose.
     /// See also Timeline::apply(Skeleton&, float, float, Vector&, float, MixPose, MixDirection)

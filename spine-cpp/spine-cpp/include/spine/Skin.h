@@ -35,8 +35,7 @@
 #include <spine/HashMap.h>
 #include <spine/Vector.h>
 
-namespace Spine
-{
+namespace Spine {
     class Attachment;
     class Skeleton;
     

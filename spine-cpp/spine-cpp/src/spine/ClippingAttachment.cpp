@@ -32,8 +32,7 @@
 
 #include <spine/SlotData.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(ClippingAttachment, VertexAttachment);
     
     ClippingAttachment::ClippingAttachment(std::string name) : VertexAttachment(name), _endSlot(NULL) {

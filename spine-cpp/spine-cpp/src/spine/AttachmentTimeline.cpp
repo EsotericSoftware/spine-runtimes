@@ -38,8 +38,7 @@
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(AttachmentTimeline, Timeline);
     
     AttachmentTimeline::AttachmentTimeline(int frameCount) : Timeline(), _slotIndex(0) {

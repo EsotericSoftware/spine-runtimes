@@ -40,8 +40,7 @@
 #include <spine/Event.h>
 #include <spine/ContainerUtil.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(EventTimeline, Timeline);
     
     EventTimeline::EventTimeline(int frameCount) : Timeline() {

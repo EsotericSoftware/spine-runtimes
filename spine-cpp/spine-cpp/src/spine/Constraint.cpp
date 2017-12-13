@@ -30,8 +30,7 @@
 
 #include <spine/Constraint.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(Constraint, Updatable);
     
     Constraint::Constraint() {

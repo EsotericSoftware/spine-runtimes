@@ -33,8 +33,7 @@
 
 #include <spine/Vector.h>
 
-namespace Spine
-{
+namespace Spine {
     class Vertices {
     public:
         Vector<int> _bones;

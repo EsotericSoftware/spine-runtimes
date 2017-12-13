@@ -32,8 +32,7 @@
 
 #include <spine/MathUtil.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(CurveTimeline, Timeline);
     
     const float CurveTimeline::LINEAR = 0;

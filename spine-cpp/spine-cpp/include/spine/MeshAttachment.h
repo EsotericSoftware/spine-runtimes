@@ -37,8 +37,7 @@
 
 #include <string>
 
-namespace Spine
-{
+namespace Spine {
     /// Attachment that displays a texture region using a mesh.
     class MeshAttachment : public VertexAttachment {
         friend class SkeletonBinary;

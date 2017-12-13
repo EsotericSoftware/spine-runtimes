@@ -37,8 +37,7 @@
 #include <spine/BoneData.h>
 #include <spine/MathUtil.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(TransformConstraint, Constraint);
     
     TransformConstraint::TransformConstraint(TransformConstraintData& data, Skeleton& skeleton) : Constraint(),

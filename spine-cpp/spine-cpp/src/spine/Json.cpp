@@ -52,8 +52,7 @@
 #include <spine/Extension.h>
 #include <new>
 
-namespace Spine
-{
+namespace Spine {
     const int Json::JSON_FALSE = 0;
     const int Json::JSON_TRUE = 1;
     const int Json::JSON_NULL = 2;

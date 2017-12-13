@@ -37,8 +37,7 @@
 
 #include <string>
 
-namespace Spine
-{
+namespace Spine {
     class Timeline;
     class Skeleton;
     class Event;

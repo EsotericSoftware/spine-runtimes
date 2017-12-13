@@ -48,8 +48,7 @@
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
-namespace Spine
-{
+namespace Spine {
     template <typename T>
     int sign(T val) {
         return (T(0) < val) - (val < T(0));

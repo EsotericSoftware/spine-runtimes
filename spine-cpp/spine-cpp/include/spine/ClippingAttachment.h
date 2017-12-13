@@ -33,8 +33,7 @@
 
 #include <spine/VertexAttachment.h>
 
-namespace Spine
-{
+namespace Spine {
     class SlotData;
     
     class ClippingAttachment : public VertexAttachment {

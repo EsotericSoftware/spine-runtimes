@@ -40,8 +40,7 @@
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(DeformTimeline, CurveTimeline);
     
     DeformTimeline::DeformTimeline(int frameCount) : CurveTimeline(frameCount), _slotIndex(0), _attachment(NULL) {

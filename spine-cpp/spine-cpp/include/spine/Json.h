@@ -36,8 +36,7 @@
 #define SPINE_JSON_HAVE_PREV 0
 #endif
 
-namespace Spine
-{
+namespace Spine {
     class Json {
         friend class SkeletonJson;
         

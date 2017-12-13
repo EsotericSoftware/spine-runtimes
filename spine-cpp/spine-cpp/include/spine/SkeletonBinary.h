@@ -36,8 +36,7 @@
 
 #include <string>
 
-namespace Spine
-{
+namespace Spine {
     class SkeletonData;
     class Atlas;
     class AttachmentLoader;

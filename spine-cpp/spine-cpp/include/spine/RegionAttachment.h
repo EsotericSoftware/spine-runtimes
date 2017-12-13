@@ -39,8 +39,7 @@
 
 #define NUM_UVS 8
 
-namespace Spine
-{
+namespace Spine {
     class Bone;
     
     /// Attachment that displays a texture region.

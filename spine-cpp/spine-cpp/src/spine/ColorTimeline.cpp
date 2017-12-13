@@ -38,8 +38,7 @@
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(ColorTimeline, CurveTimeline);
     
     const int ColorTimeline::ENTRIES = 5;

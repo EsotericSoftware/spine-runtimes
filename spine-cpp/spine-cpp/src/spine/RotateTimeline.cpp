@@ -38,8 +38,7 @@
 #include <spine/Animation.h>
 #include <spine/TimelineType.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(RotateTimeline, CurveTimeline);
     
     RotateTimeline::RotateTimeline(int frameCount) : CurveTimeline(frameCount), _boneIndex(0) {

@@ -43,8 +43,7 @@
 #include <spine/RotateMode.h>
 #include <spine/MathUtil.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(PathConstraint, Constraint);
     
     const float PathConstraint::EPSILON = 0.00001f;

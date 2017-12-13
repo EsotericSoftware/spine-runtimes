@@ -85,8 +85,7 @@
 #define strdup _strdup
 #endif
 
-namespace Spine
-{
+namespace Spine {
     SkeletonJson::SkeletonJson(Vector<Atlas*>& atlasArray) : _attachmentLoader(NEW(AtlasAttachmentLoader)), _scale(1), _ownsLoader(true) {
         new (_attachmentLoader) AtlasAttachmentLoader(atlasArray);
     }

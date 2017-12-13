@@ -43,8 +43,7 @@
 
 #include <assert.h>
 
-namespace Spine
-{
+namespace Spine {
     SkeletonData::SkeletonData() :
     _name(),
     _defaultSkin(NULL),

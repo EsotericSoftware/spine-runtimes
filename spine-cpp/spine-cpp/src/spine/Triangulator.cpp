@@ -32,8 +32,7 @@
 
 #include <spine/MathUtil.h>
 
-namespace Spine
-{
+namespace Spine {
     Vector<int>& Triangulator::triangulate(Vector<float>& vertices) {
         int vertexCount = static_cast<int>(vertices.size() >> 1);
         

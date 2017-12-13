@@ -40,8 +40,7 @@
 #include <spine/Bone.h>
 #include <spine/BoneData.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(ScaleTimeline, TranslateTimeline);
     
     ScaleTimeline::ScaleTimeline(int frameCount) : TranslateTimeline(frameCount) {

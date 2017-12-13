@@ -33,8 +33,7 @@
 
 #include <string>
 
-namespace Spine
-{
+namespace Spine {
     class MeshAttachment;
     
     class LinkedMesh {

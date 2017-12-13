@@ -40,8 +40,7 @@
 #include <spine/IkConstraint.h>
 #include <spine/IkConstraintData.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(IkConstraintTimeline, CurveTimeline);
     
     const int IkConstraintTimeline::ENTRIES = 3;

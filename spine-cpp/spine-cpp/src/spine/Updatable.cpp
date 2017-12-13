@@ -30,8 +30,7 @@
 
 #include <spine/Updatable.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL_NOPARENT(Updatable);
     
     Updatable::Updatable() {

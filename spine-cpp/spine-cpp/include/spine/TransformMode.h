@@ -31,8 +31,7 @@
 #ifndef Spine_TransformMode_h
 #define Spine_TransformMode_h
 
-namespace Spine
-{
+namespace Spine {
     enum TransformMode {
         //0000 0 Flip Scale Rotation
         TransformMode_Normal = 0, // 0000

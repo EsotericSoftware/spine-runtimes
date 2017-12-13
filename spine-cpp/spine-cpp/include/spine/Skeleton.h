@@ -37,8 +37,7 @@
 #include <string>
 #include <limits> // std::numeric_limits
 
-namespace Spine
-{
+namespace Spine {
     class SkeletonData;
     class Bone;
     class Updatable;

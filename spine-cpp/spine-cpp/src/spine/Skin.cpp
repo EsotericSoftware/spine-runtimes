@@ -37,8 +37,7 @@
 
 #include <assert.h>
 
-namespace Spine
-{
+namespace Spine {
     Skin::AttachmentKey::AttachmentKey(int slotIndex, std::string name) :
     _slotIndex(slotIndex),
     _name(name) {

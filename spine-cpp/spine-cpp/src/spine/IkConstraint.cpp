@@ -37,8 +37,7 @@
 #include <spine/BoneData.h>
 #include <spine/MathUtil.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(IkConstraint, Constraint);
     
     void IkConstraint::apply(Bone& bone, float targetX, float targetY, float alpha) {

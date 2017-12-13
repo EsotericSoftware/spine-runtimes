@@ -30,8 +30,7 @@
 
 #include <spine/MathUtil.h>
 
-namespace Spine
-{
+namespace Spine {
     float MathUtil::SIN_TABLE[SIN_COUNT] = {0.0f};
     
     MathUtil::MathUtil() {

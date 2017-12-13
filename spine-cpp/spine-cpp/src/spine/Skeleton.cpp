@@ -52,8 +52,7 @@
 #include <spine/ContainerUtil.h>
 #include <spine/Extension.h>
 
-namespace Spine
-{
+namespace Spine {
     Skeleton::Skeleton(SkeletonData& skeletonData) :
     _data(skeletonData),
     _skin(NULL),

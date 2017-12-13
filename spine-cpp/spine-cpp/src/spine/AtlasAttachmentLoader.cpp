@@ -40,8 +40,7 @@
 
 #include <spine/Atlas.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(AtlasAttachmentLoader, AttachmentLoader);
     
     AtlasAttachmentLoader::AtlasAttachmentLoader(Vector<Atlas*>& inAtlasArray) : AttachmentLoader(), _atlasArray(inAtlasArray) {

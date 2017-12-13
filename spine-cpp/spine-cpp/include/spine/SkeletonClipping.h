@@ -34,8 +34,7 @@
 #include <spine/Vector.h>
 #include <spine/Triangulator.h>
 
-namespace Spine
-{
+namespace Spine {
     class Slot;
     class ClippingAttachment;
     

@@ -33,8 +33,7 @@
 
 #include <spine/Timeline.h>
 
-namespace Spine
-{
+namespace Spine {
     class EventTimeline : public Timeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;

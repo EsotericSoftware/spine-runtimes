@@ -32,8 +32,7 @@
 
 #include <assert.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL_NOPARENT(Attachment);
     
     Attachment::Attachment(std::string name) : _name(name) {

@@ -36,8 +36,7 @@
 #include <spine/MathUtil.h>
 #include <spine/TransformMode.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(Bone, Updatable);
     
     bool Bone::yDown = false;

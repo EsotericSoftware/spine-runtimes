@@ -33,8 +33,7 @@
 
 #include <string>
 
-namespace Spine
-{
+namespace Spine {
     /// Stores the setup pose values for an Event.
     class EventData {
         friend class SkeletonBinary;

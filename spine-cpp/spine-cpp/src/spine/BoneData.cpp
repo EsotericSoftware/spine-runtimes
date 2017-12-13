@@ -32,8 +32,7 @@
 
 #include <assert.h>
 
-namespace Spine
-{
+namespace Spine {
     BoneData::BoneData(int index, std::string name, BoneData* parent) :
     _index(index),
     _name(name),

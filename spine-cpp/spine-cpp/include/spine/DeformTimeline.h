@@ -33,8 +33,7 @@
 
 #include <spine/CurveTimeline.h>
 
-namespace Spine
-{
+namespace Spine {
     class VertexAttachment;
     
     class DeformTimeline : public CurveTimeline {

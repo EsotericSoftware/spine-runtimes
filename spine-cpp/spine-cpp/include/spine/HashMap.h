@@ -34,8 +34,7 @@
 #include <spine/Extension.h>
 #include <spine/Vector.h>
 
-namespace Spine
-{
+namespace Spine {
     template <typename K, typename V, typename H>
     class HashMap {
     private:

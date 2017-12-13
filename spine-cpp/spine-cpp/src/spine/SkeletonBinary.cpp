@@ -80,8 +80,7 @@
 
 #include <cstring>
 
-namespace Spine
-{
+namespace Spine {
     const int SkeletonBinary::BONE_ROTATE = 0;
     const int SkeletonBinary::BONE_TRANSLATE = 1;
     const int SkeletonBinary::BONE_SCALE = 2;

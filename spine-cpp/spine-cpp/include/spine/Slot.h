@@ -35,8 +35,7 @@
 
 #include <string>
 
-namespace Spine
-{
+namespace Spine {
     class SlotData;
     class Bone;
     class Skeleton;

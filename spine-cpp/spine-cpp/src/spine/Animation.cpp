@@ -39,8 +39,7 @@
 #include <assert.h>
 #include <math.h> /* fmod */
 
-namespace Spine
-{
+namespace Spine {
     Animation::Animation(std::string name, Vector<Timeline*>& timelines, float duration) :
     _timelines(timelines),
     _duration(duration),

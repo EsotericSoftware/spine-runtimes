@@ -33,8 +33,7 @@
 
 #include <spine/RTTI.h>
 
-namespace Spine
-{
+namespace Spine {
     class Updatable {
         RTTI_DECL;
         

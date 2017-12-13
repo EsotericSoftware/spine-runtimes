@@ -30,8 +30,7 @@
 
 #include <spine/RTTI.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI::RTTI(const std::string& className) : m_className(className), m_pBaseRTTI(NULL) {
         // Empty
     }

@@ -37,8 +37,7 @@
 #include <memory>
 #include <assert.h>
 
-namespace Spine
-{
+namespace Spine {
     template <typename T>
     class Vector {
     public:

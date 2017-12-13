@@ -30,8 +30,7 @@
 
 #include <spine/MeshAttachment.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(MeshAttachment, VertexAttachment);
     
     MeshAttachment::MeshAttachment(std::string name) : VertexAttachment(name),

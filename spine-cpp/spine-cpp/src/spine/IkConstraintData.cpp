@@ -32,8 +32,7 @@
 
 #include <spine/BoneData.h>
 
-namespace Spine
-{
+namespace Spine {
     IkConstraintData::IkConstraintData(std::string name) :
     _name(name),
     _order(0),

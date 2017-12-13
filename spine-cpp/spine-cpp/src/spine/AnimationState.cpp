@@ -46,8 +46,7 @@
 #include <spine/MathUtil.h>
 #include <spine/ContainerUtil.h>
 
-namespace Spine
-{
+namespace Spine {
     void dummyOnAnimationEventFunc(AnimationState* state, EventType type, TrackEntry* entry, Event* event = NULL) {
         // Empty
     }

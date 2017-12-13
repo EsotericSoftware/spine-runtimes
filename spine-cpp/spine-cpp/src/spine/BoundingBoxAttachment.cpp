@@ -30,8 +30,7 @@
 
 #include <spine/BoundingBoxAttachment.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(BoundingBoxAttachment, VertexAttachment);
     
     BoundingBoxAttachment::BoundingBoxAttachment(std::string name) : VertexAttachment(name) {

@@ -33,8 +33,7 @@
 
 #include <spine/VertexAttachment.h>
 
-namespace Spine
-{
+namespace Spine {
     /// Attachment that has a polygon for bounds checking.
     class BoundingBoxAttachment : public VertexAttachment {
         RTTI_DECL;

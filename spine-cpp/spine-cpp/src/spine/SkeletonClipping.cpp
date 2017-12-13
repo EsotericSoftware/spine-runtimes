@@ -33,8 +33,7 @@
 #include <spine/Slot.h>
 #include <spine/ClippingAttachment.h>
 
-namespace Spine
-{
+namespace Spine {
     SkeletonClipping::SkeletonClipping() : _clipAttachment(NULL) {
         _clipOutput.reserve(128);
         _clippedVertices.reserve(128);

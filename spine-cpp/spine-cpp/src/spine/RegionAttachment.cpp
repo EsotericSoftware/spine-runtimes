@@ -36,8 +36,7 @@
 
 #include <assert.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(RegionAttachment, Attachment);
     
     const int RegionAttachment::BLX = 0;

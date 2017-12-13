@@ -40,8 +40,7 @@
 #include <spine/TransformConstraint.h>
 #include <spine/TransformConstraintData.h>
 
-namespace Spine
-{
+namespace Spine {
     RTTI_IMPL(TransformConstraintTimeline, CurveTimeline);
     
     const int TransformConstraintTimeline::ENTRIES = 5;
