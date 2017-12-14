@@ -290,7 +290,7 @@ namespace Spine {
                 data->_target = skeletonData->findBone(targetName);
                 if (!data->_target) {
                     DESTROY(SkeletonData, skeletonData);
-                    setError(root, "Target bone not found: ", boneMap->_name);
+                    setError(root, "Target bone not found: ", targetName);
                     return NULL;
                 }
 
@@ -331,7 +331,7 @@ namespace Spine {
                 data->_target = skeletonData->findBone(name);
                 if (!data->_target) {
                     DESTROY(SkeletonData, skeletonData);
-                    setError(root, "Target bone not found: ", boneMap->_name);
+                    setError(root, "Target bone not found: ", name);
                     return NULL;
                 }
 
@@ -384,7 +384,7 @@ namespace Spine {
                 data->_target = skeletonData->findSlot(name);
                 if (!data->_target) {
                     DESTROY(SkeletonData, skeletonData);
-                    setError(root, "Target slot not found: ", boneMap->_name);
+                    setError(root, "Target slot not found: ", name);
                     return NULL;
                 }
 
