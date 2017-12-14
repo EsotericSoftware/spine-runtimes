@@ -74,15 +74,16 @@ namespace Spine.Unity.Editor {
 				return;
 			}
 
-			var dataField = property.FindBaseOrSiblingProperty(TargetAttribute.dataField);
+			SerializedProperty dataField = property.FindBaseOrSiblingProperty(TargetAttribute.dataField);
 			if (dataField != null) {
-				if (dataField.objectReferenceValue is SkeletonDataAsset) {
-					skeletonDataAsset = (SkeletonDataAsset)dataField.objectReferenceValue;
-				} else if (dataField.objectReferenceValue is ISkeletonComponent) {
-					var skeletonComponent = (ISkeletonComponent)dataField.objectReferenceValue;
+				var objectReferenceValue = dataField.objectReferenceValue;
+				if (objectReferenceValue is SkeletonDataAsset) {
+					skeletonDataAsset = (SkeletonDataAsset)objectReferenceValue;
+				} else if (objectReferenceValue is ISkeletonComponent) {
+					var skeletonComponent = (ISkeletonComponent)objectReferenceValue;
 					if (skeletonComponent != null)
 						skeletonDataAsset = skeletonComponent.SkeletonDataAsset;
-				} else {
+				} else if (objectReferenceValue != null) {
 					EditorGUI.LabelField(position, "ERROR:", "Invalid reference type");
 					return;
 				}
@@ -95,7 +96,12 @@ namespace Spine.Unity.Editor {
 			}
 
 			if (skeletonDataAsset == null) {
-				EditorGUI.LabelField(position, "ERROR:", "Must have reference to a SkeletonDataAsset");
+				if (TargetAttribute.fallbackToTextField) {
+					EditorGUI.PropertyField(position, property); //EditorGUI.TextField(position, label, property.stringValue);
+				} else {
+					EditorGUI.LabelField(position, "ERROR:", "Must have reference to a SkeletonDataAsset");
+				}
+
 				skeletonDataAsset = property.serializedObject.targetObject as SkeletonDataAsset;
 				if (skeletonDataAsset == null) return;
 			}

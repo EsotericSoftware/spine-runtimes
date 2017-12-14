@@ -180,7 +180,7 @@ void _spEventQueue_drain (_spEventQueue* self) {
 	self->drainDisabled = 0;
 }
 
-// These two functions are needed in the UE4 runtime, see #1037
+/* These two functions are needed in the UE4 runtime, see #1037 */
 void _spAnimationState_enableQueue(spAnimationState* self) {
 	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
 	internal->queue->drainDisabled = 0;

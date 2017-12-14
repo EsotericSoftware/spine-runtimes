@@ -39,8 +39,8 @@ module spine.webgl {
 		private shapes: ShapeRenderer;
 		private shapesShader: Shader;
 		private activeRenderer: PolygonBatcher | ShapeRenderer | SkeletonDebugRenderer = null;
-		private skeletonRenderer: SkeletonRenderer;
-		private skeletonDebugRenderer: SkeletonDebugRenderer;
+		skeletonRenderer: SkeletonRenderer;
+		skeletonDebugRenderer: SkeletonDebugRenderer;
 		private QUAD = [
 			0, 0, 1, 1, 1, 1, 0, 0,
 			0, 0, 1, 1, 1, 1, 0, 0,
