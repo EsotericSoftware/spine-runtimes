@@ -732,7 +732,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			data->target = spSkeletonData_findBone(skeletonData, targetName);
 			if (!data->target) {
 				spSkeletonData_dispose(skeletonData);
-				_spSkeletonJson_setError(self, root, "Target bone not found: ", boneMap->name);
+				_spSkeletonJson_setError(self, root, "Target bone not found: ", targetName);
 				return 0;
 			}
 
@@ -771,7 +771,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			data->target = spSkeletonData_findBone(skeletonData, name);
 			if (!data->target) {
 				spSkeletonData_dispose(skeletonData);
-				_spSkeletonJson_setError(self, root, "Target bone not found: ", boneMap->name);
+				_spSkeletonJson_setError(self, root, "Target bone not found: ", name);
 				return 0;
 			}
 
@@ -822,7 +822,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			data->target = spSkeletonData_findSlot(skeletonData, name);
 			if (!data->target) {
 				spSkeletonData_dispose(skeletonData);
-				_spSkeletonJson_setError(self, root, "Target slot not found: ", boneMap->name);
+				_spSkeletonJson_setError(self, root, "Target slot not found: ", name);
 				return 0;
 			}
 
