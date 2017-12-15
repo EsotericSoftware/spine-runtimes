@@ -305,9 +305,9 @@ namespace Spine.Unity {
 			rendererBuffers.UpdateSharedMaterials(workingSubmeshInstructions);
 			if (updateTriangles) { // Check if the triangles should also be updated.
 				meshGenerator.FillTriangles(currentMesh);
-				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedShaderdMaterialsArray();
+				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedSharedMaterialsArray();
 			} else if (rendererBuffers.MaterialsChangedInLastUpdate()) {
-				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedShaderdMaterialsArray();
+				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedSharedMaterialsArray();
 			}
 
 

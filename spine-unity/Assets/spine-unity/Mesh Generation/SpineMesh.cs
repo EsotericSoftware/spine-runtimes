@@ -1161,7 +1161,7 @@ namespace Spine.Unity {
 			doubleBufferedMesh = new DoubleBuffered<SmartMesh>();
 		}
 
-		public Material[] GetUpdatedShaderdMaterialsArray () {
+		public Material[] GetUpdatedSharedMaterialsArray () {
 			if (submeshMaterials.Count == sharedMaterials.Length)
 				submeshMaterials.CopyTo(sharedMaterials);
 			else
