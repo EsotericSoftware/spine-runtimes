@@ -73,7 +73,7 @@ namespace Spine.Unity {
 		bool skeletonTransformIsParent;
 
 		/// <summary>
-		/// Sets the target bone by its bone name. Returns false if no bone was found.</summary>
+		/// Sets the target bone by its bone name. Returns false if no bone was found. To set the bone by reference, use BoneFollower.bone directly.</summary>
 		public bool SetBone (string name) {
 			bone = skeletonRenderer.skeleton.FindBone(name);
 			if (bone == null) {

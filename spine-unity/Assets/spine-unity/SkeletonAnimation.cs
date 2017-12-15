@@ -126,11 +126,16 @@ namespace Spine.Unity {
 		}
 		#endregion
 
+		/// <summary>
+		/// Clears the previously generated mesh, resets the skeleton's pose, and clears all previously active animations.</summary>
 		public override void ClearState () {
 			base.ClearState();
 			if (state != null) state.ClearTracks();
 		}
 
+		/// <summary>
+		/// Initialize this component. Attempts to load the SkeletonData and creates the internal Spine objects and buffers.</summary>
+		/// <param name="overwrite">If set to <c>true</c>, force overwrite an already initialized object.</param>
 		public override void Initialize (bool overwrite) {
 			if (valid && !overwrite)
 				return;
