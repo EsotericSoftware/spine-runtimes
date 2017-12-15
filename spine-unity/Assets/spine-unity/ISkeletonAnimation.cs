@@ -37,8 +37,14 @@ namespace Spine.Unity {
 		event UpdateBonesDelegate UpdateWorld;
 		event UpdateBonesDelegate UpdateComplete;
 
-		void LateUpdate ();
+		//void LateUpdate ();
 		Skeleton Skeleton { get; }
+	}
+
+	/// <summary>Holds a reference to a SkeletonDataAsset.</summary>
+	public interface ISkeletonDataAssetComponent {
+		/// <summary>Gets the SkeletonDataAsset of the Spine Component.</summary>
+		SkeletonDataAsset SkeletonDataAsset { get; }
 	}
 
 	/// <summary>A Spine-Unity Component that manages a Spine.Skeleton instance, instantiated from a SkeletonDataAsset.</summary>
