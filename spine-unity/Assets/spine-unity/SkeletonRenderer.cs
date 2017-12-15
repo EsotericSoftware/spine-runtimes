@@ -38,7 +38,7 @@ namespace Spine.Unity {
 	/// <summary>Renders a skeleton.</summary>
 	[ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer)), DisallowMultipleComponent]
 	[HelpURL("http://esotericsoftware.com/spine-unity-documentation#Rendering")]
-	public class SkeletonRenderer : MonoBehaviour, ISkeletonComponent {
+	public class SkeletonRenderer : MonoBehaviour, ISkeletonComponent, ISkeletonDataAssetComponent {
 
 		public delegate void SkeletonRendererDelegate (SkeletonRenderer skeletonRenderer);
 		public event SkeletonRendererDelegate OnRebuild;
@@ -163,12 +163,17 @@ namespace Spine.Unity {
 			valid = false;
 		}
 
+		/// <summary>
+		/// Clears the previously generated mesh and resets the skeleton's pose.</summary>
 		public virtual void ClearState () {
 			meshFilter.sharedMesh = null;
 			currentInstructions.Clear();
 			if (skeleton != null) skeleton.SetToSetupPose();
 		}
 
+		/// <summary>
+		/// Initialize this component. Attempts to load the SkeletonData and creates the internal Skeleton object and buffers.</summary>
+		/// <param name="overwrite">If set to <c>true</c>, it will overwrite internal objects if they were already generated. Otherwise, the initialized component will ignore subsequent calls to initialize.</param>
 		public virtual void Initialize (bool overwrite) {
 			if (valid && !overwrite)
 				return;
@@ -219,6 +224,8 @@ namespace Spine.Unity {
 				OnRebuild(this);
 		}
 
+		/// <summary>
+		/// Generates a new UnityEngine.Mesh from the internal Skeleton.</summary>
 		public virtual void LateUpdate () {
 			if (!valid) return;
 
@@ -305,9 +312,9 @@ namespace Spine.Unity {
 			rendererBuffers.UpdateSharedMaterials(workingSubmeshInstructions);
 			if (updateTriangles) { // Check if the triangles should also be updated.
 				meshGenerator.FillTriangles(currentMesh);
-				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedShaderdMaterialsArray();
+				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedSharedMaterialsArray();
 			} else if (rendererBuffers.MaterialsChangedInLastUpdate()) {
-				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedShaderdMaterialsArray();
+				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedSharedMaterialsArray();
 			}
 
 
