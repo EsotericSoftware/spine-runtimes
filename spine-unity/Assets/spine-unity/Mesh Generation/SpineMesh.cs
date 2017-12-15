@@ -501,6 +501,7 @@ namespace Spine.Unity {
 
 				Color c = default(Color);
 
+				// Identify and prepare values.
 				var region = attachment as RegionAttachment;
 				if (region != null) {
 					region.ComputeWorldVertices(slot.bone, workingVerts, 0);
@@ -531,6 +532,9 @@ namespace Spine.Unity {
 								continue;
 							}
 						}
+
+						// If not any renderable attachment.
+						clipper.ClipEnd(slot);
 						continue;
 					}
 				}
@@ -557,6 +561,7 @@ namespace Spine.Unity {
 					uvs = clipper.clippedUVs.Items;
 				}
 
+				// Actually add slot/attachment data into buffers.
 				if (attachmentVertexCount != 0 && attachmentIndexCount != 0) {
 					if (tintBlack)
 						AddAttachmentTintBlack(slot.r2, slot.g2, slot.b2, attachmentVertexCount);
@@ -633,6 +638,7 @@ namespace Spine.Unity {
 							submeshItems[oldTriangleCount + i] = attachmentTriangleIndices[i] + ovc;
 					}
 				}
+
 				clipper.ClipEnd(slot);
 			}
 			clipper.ClipEnd();
@@ -1155,7 +1161,7 @@ namespace Spine.Unity {
 			doubleBufferedMesh = new DoubleBuffered<SmartMesh>();
 		}
 
-		public Material[] GetUpdatedShaderdMaterialsArray () {
+		public Material[] GetUpdatedSharedMaterialsArray () {
 			if (submeshMaterials.Count == sharedMaterials.Length)
 				submeshMaterials.CopyTo(sharedMaterials);
 			else
