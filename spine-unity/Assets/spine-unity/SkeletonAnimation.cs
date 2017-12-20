@@ -161,8 +161,11 @@ namespace Spine.Unity {
 			}
 			#else
 			if (!string.IsNullOrEmpty(_animationName)) {
-				state.SetAnimation(0, _animationName, loop);
-				Update(0);
+				var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(_animationName);
+				if (animationObject != null) {
+					state.SetAnimation(0, animationObject, loop);
+					Update(0);
+				}
 			}
 			#endif
 		}
