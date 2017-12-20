@@ -41,6 +41,8 @@ namespace Spine.Unity {
 		public static Color GetColor (this Skeleton s) { return new Color(s.r, s.g, s.b, s.a); }
 		public static Color GetColor (this RegionAttachment a) { return new Color(a.r, a.g, a.b, a.a); }
 		public static Color GetColor (this MeshAttachment a) { return new Color(a.r, a.g, a.b, a.a); }
+		public static Color GetColor (this Slot s) { return new Color(s.r, s.g, s.b, s.a); }
+		public static Color GetColorTintBlack (this Slot s) { return new Color(s.r2, s.g2, s.b2, 1f); }
 
 		public static void SetColor (this Skeleton skeleton, Color color) {
 			skeleton.A = color.a;
