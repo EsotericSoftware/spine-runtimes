@@ -46,7 +46,7 @@ package spine.animation {
 		public var eventThreshold : Number, attachmentThreshold : Number, drawOrderThreshold : Number;
 		public var animationStart : Number, animationEnd : Number, animationLast : Number, nextAnimationLast : Number;
 		public var delay : Number, trackTime : Number, trackLast : Number, nextTrackLast : Number, trackEnd : Number, timeScale : Number;
-		public var alpha : Number, mixTime : Number, mixDuration : Number, interruptAlpha : Number, totalAlpha : Number;
+		public var alpha : Number, mixTime : Number, mixDuration : Number, interruptAlpha : Number, totalAlpha : Number = 0;
 		public var timelineData : Vector.<int> = new Vector.<int>();
 		public var timelineDipMix : Vector.<TrackEntry> = new Vector.<TrackEntry>();
 		public var timelinesRotation : Vector.<Number> = new Vector.<Number>();
@@ -97,12 +97,13 @@ package spine.animation {
 			for (var i : int = 0; i < timelinesCount; i++) {
 				var intId : int = timelines[i].getPropertyId();
 				var id : String = intId.toString();
-				if (!(propertyIDs[id] == false)) {
-					propertyIDs[id] = true;
+				var contained: Object = propertyIDs[id];
+				propertyIDs[id] = true;
+				if (contained != undefined) {					
 					timelineData[i] = AnimationState.SUBSEQUENT;
-				} else if (to == null || !to.hasTimeline(intId))
+				} else if (to == null || !to.hasTimeline(intId)) {				
 					timelineData[i] = AnimationState.FIRST;
-				else {					
+				} else {					
 					for (var ii : int = mixingToLast; ii >= 0; ii--) {
 						var entry : TrackEntry = mixingTo[ii];
 						if (!entry.hasTimeline(intId)) {
