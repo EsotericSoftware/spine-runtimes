@@ -75,13 +75,13 @@ namespace Spine.Unity.Editor {
 				serializedObject.ApplyModifiedProperties();
 			}
 
-			var sr = skeletonRenderer.objectReferenceValue as SkeletonRenderer;
-			if (sr != null && sr.gameObject == follower.gameObject) {
+			var skeletonRendererValue = skeletonRenderer.objectReferenceValue as SkeletonRenderer;
+			if (skeletonRendererValue != null && skeletonRendererValue.gameObject == follower.gameObject) {
 				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
 					EditorGUILayout.HelpBox("It's ideal to add BoundingBoxFollower to a separate child GameObject of the Spine GameObject.", MessageType.Warning);
 
 					if (GUILayout.Button(new GUIContent("Move BoundingBoxFollower to new GameObject", Icons.boundingBox), GUILayout.Height(50f))) {
-						AddBoundingBoxFollowerChild(sr, follower);
+						AddBoundingBoxFollowerChild(skeletonRendererValue, follower);
 						DestroyImmediate(follower);
 						return;
 					}
@@ -156,6 +156,7 @@ namespace Spine.Unity.Editor {
 			if (Event.current.type == EventType.Repaint) {
 				if (addBoneFollower) {
 					var boneFollower = follower.gameObject.AddComponent<BoneFollower>();
+					boneFollower.skeletonRenderer = skeletonRendererValue;
 					boneFollower.SetBone(follower.Slot.Data.BoneData.Name);
 					addBoneFollower = false;
 				}

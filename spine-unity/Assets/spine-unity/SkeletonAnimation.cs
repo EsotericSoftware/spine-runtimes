@@ -76,31 +76,38 @@ namespace Spine.Unity {
 		[SerializeField]
 		[SpineAnimation]
 		private string _animationName;
+
+		/// <summary>
+		/// Setting this property sets the animation of the skeleton. If invalid, it will store the animation name for the next time the skeleton is properly initialized.
+		/// Getting this property gets the name of the currently playing animation. If invalid, it will return the last stored animation name set through this property.</summary>
 		public string AnimationName {
 			get {
 				if (!valid) {
-					Debug.LogWarning("You tried access AnimationName but the SkeletonAnimation was not valid. Try checking your Skeleton Data for errors.");
-					return null;
+					return _animationName;
+				} else {
+					TrackEntry entry = state.GetCurrent(0);
+					return entry == null ? null : entry.Animation.Name;
 				}
-
-				TrackEntry entry = state.GetCurrent(0);
-				return entry == null ? null : entry.Animation.Name;
 			}
 			set {
 				if (_animationName == value)
 					return;
 				_animationName = value;
 
-				if (!valid) {
-					Debug.LogWarning("You tried to change AnimationName but the SkeletonAnimation was not valid. Try checking your Skeleton Data for errors.");
-					return;
-				}
-
-				if (string.IsNullOrEmpty(value))
+				if (string.IsNullOrEmpty(value)) {
 					state.ClearTrack(0);
-				else
-					state.SetAnimation(0, value, loop);
+				} else {
+					TrySetAnimation(value, loop);
+				}
 			}
+		}
+
+		TrackEntry TrySetAnimation (string animationName, bool animationLoop) {
+			var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(animationName);
+			if (animationObject != null)
+				return state.SetAnimation(0, animationObject, animationLoop);
+
+			return null;
 		}
 
 		/// <summary>Whether or not <see cref="AnimationName"/> should loop. This only applies to the initial animation specified in the inspector, or any subsequent Animations played through .AnimationName. Animations set through state.SetAnimation are unaffected.</summary>
@@ -150,19 +157,21 @@ namespace Spine.Unity {
 			#if UNITY_EDITOR
 			if (!string.IsNullOrEmpty(_animationName)) {
 				if (Application.isPlaying) {
-					state.SetAnimation(0, _animationName, loop);
+					TrackEntry startingTrack = TrySetAnimation(_animationName, loop);
+					if (startingTrack != null)
+						Update(0);
 				} else {
 					// Assume SkeletonAnimation is valid for skeletonData and skeleton. Checked above.
 					var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(_animationName);
 					if (animationObject != null)
 						animationObject.PoseSkeleton(skeleton, 0f);
 				}
-				Update(0);
 			}
 			#else
 			if (!string.IsNullOrEmpty(_animationName)) {
-				state.SetAnimation(0, _animationName, loop);
-				Update(0);
+				TrackEntry startingTrack = TrySetAnimation(_animationName, loop);
+				if (startingTrack != null)
+					Update(0);
 			}
 			#endif
 		}
