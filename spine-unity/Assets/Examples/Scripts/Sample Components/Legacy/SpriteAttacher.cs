@@ -142,27 +142,32 @@ namespace Spine.Unity.Modules {
 		}
 
 	}
+		
 
 	public static class SpriteAttachmentExtensions {
-		public static RegionAttachment AttachUnitySprite (this Skeleton skeleton, string slotName, Sprite sprite, string shaderName = SpriteAttacher.DefaultPMAShader, bool applyPMA = true) {
-			return skeleton.AttachUnitySprite(slotName, sprite, Shader.Find(shaderName), applyPMA);
+		[System.Obsolete]
+		public static RegionAttachment AttachUnitySprite (this Skeleton skeleton, string slotName, Sprite sprite, string shaderName = SpriteAttacher.DefaultPMAShader, bool applyPMA = true, float rotation = 0f) {
+			return skeleton.AttachUnitySprite(slotName, sprite, Shader.Find(shaderName), applyPMA, rotation: rotation);
 		}
 
-		public static RegionAttachment AddUnitySprite (this SkeletonData skeletonData, string slotName, Sprite sprite, string skinName = "", string shaderName = SpriteAttacher.DefaultPMAShader, bool applyPMA = true) {
-			return skeletonData.AddUnitySprite(slotName, sprite, skinName, Shader.Find(shaderName), applyPMA);
+		[System.Obsolete]
+		public static RegionAttachment AddUnitySprite (this SkeletonData skeletonData, string slotName, Sprite sprite, string skinName = "", string shaderName = SpriteAttacher.DefaultPMAShader, bool applyPMA = true, float rotation = 0f) {
+			return skeletonData.AddUnitySprite(slotName, sprite, skinName, Shader.Find(shaderName), applyPMA, rotation: rotation);
 		}
 
-		public static RegionAttachment AttachUnitySprite (this Skeleton skeleton, string slotName, Sprite sprite, Shader shader, bool applyPMA) {
-			RegionAttachment att = applyPMA ? sprite.ToRegionAttachmentPMAClone(shader) : sprite.ToRegionAttachment(new Material(shader));
+		[System.Obsolete]
+		public static RegionAttachment AttachUnitySprite (this Skeleton skeleton, string slotName, Sprite sprite, Shader shader, bool applyPMA, float rotation = 0f) {
+			RegionAttachment att = applyPMA ? sprite.ToRegionAttachmentPMAClone(shader, rotation: rotation) : sprite.ToRegionAttachment(new Material(shader), rotation: rotation);
 			skeleton.FindSlot(slotName).Attachment = att;
 			return att;
 		}
 
-		public static RegionAttachment AddUnitySprite (this SkeletonData skeletonData, string slotName, Sprite sprite, string skinName, Shader shader, bool applyPMA) {
-			RegionAttachment att = applyPMA ? sprite.ToRegionAttachmentPMAClone(shader) : sprite.ToRegionAttachment(new Material(shader));
+		[System.Obsolete]
+		public static RegionAttachment AddUnitySprite (this SkeletonData skeletonData, string slotName, Sprite sprite, string skinName, Shader shader, bool applyPMA, float rotation = 0f) {
+			RegionAttachment att = applyPMA ? sprite.ToRegionAttachmentPMAClone(shader, rotation: rotation) : sprite.ToRegionAttachment(new Material(shader), rotation);
 
 			var slotIndex = skeletonData.FindSlotIndex(slotName);
-			Skin skin = skeletonData.defaultSkin;
+			Skin skin = skeletonData.DefaultSkin;
 			if (skinName != "")
 				skin = skeletonData.FindSkin(skinName);
 
