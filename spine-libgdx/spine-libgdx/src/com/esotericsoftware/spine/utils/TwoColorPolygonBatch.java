@@ -1344,6 +1344,7 @@ public class TwoColorPolygonBatch implements Batch {
 	}
 
 	/** Flushes the batch if the blend function was changed. */
+	@Override
 	public void setBlendFunctionSeparate (int srcFuncColor, int dstFuncColor, int srcFuncAlpha, int dstFuncAlpha) {
 		if (blendSrcFunc == srcFuncColor && blendDstFunc == dstFuncColor && blendSrcFuncAlpha == srcFuncAlpha
 			&& blendDstFuncAlpha == dstFuncAlpha) return;
