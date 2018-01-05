@@ -120,17 +120,25 @@ namespace Spine.Unity {
 			readonly List<AnimatorClipInfo> clipInfoCache = new List<AnimatorClipInfo>();
 			readonly List<AnimatorClipInfo> nextClipInfoCache = new List<AnimatorClipInfo>();
 			#endif
-			Animator animator;
 
+			Animator animator;
 			public Animator Animator { get { return this.animator; } }
 
 			public void Initialize (Animator animator, SkeletonDataAsset skeletonDataAsset) {
 				this.animator = animator;
+
+				previousAnimations.Clear();
+
 				animationTable.Clear();
-				clipNameHashCodeTable.Clear();
 				var data = skeletonDataAsset.GetSkeletonData(true);
 				foreach (var a in data.Animations)
 					animationTable.Add(a.Name.GetHashCode(), a);
+
+				clipNameHashCodeTable.Clear();
+				#if UNITY_2017_1_OR_NEWER
+				clipInfoCache.Clear();
+				nextClipInfoCache.Clear();
+				#endif
 			}
 
 			public void Apply (Skeleton skeleton) {
