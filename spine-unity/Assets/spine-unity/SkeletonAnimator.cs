@@ -28,7 +28,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-// Contributed by: Mitch Thompson
+#if UNITY_5_6_OR_NEWER
+#define UNITY_CLIPINFOCACHE
+#endif
 
 using UnityEngine;
 using System.Collections.Generic;
@@ -116,7 +118,7 @@ namespace Spine.Unity {
 			readonly Dictionary<int, Spine.Animation> animationTable = new Dictionary<int, Spine.Animation>(IntEqualityComparer.Instance);
 			readonly Dictionary<AnimationClip, int> clipNameHashCodeTable = new Dictionary<AnimationClip, int>(AnimationClipEqualityComparer.Instance);
 			readonly List<Animation> previousAnimations = new List<Animation>();
-			#if UNITY_2017_1_OR_NEWER
+			#if UNITY_CLIPINFOCACHE
 			readonly List<AnimatorClipInfo> clipInfoCache = new List<AnimatorClipInfo>();
 			readonly List<AnimatorClipInfo> nextClipInfoCache = new List<AnimatorClipInfo>();
 			#endif
@@ -135,7 +137,7 @@ namespace Spine.Unity {
 					animationTable.Add(a.Name.GetHashCode(), a);
 
 				clipNameHashCodeTable.Clear();
-				#if UNITY_2017_1_OR_NEWER
+				#if UNITY_CLIPINFOCACHE
 				clipInfoCache.Clear();
 				nextClipInfoCache.Clear();
 				#endif
@@ -263,7 +265,7 @@ namespace Spine.Unity {
 				out int nextClipInfoCount,
 				out IList<AnimatorClipInfo> clipInfo,
 				out IList<AnimatorClipInfo> nextClipInfo) {
-				#if UNITY_2017_1_OR_NEWER
+				#if UNITY_CLIPINFOCACHE
 				clipInfoCount = animator.GetCurrentAnimatorClipInfoCount(layer);
 				nextClipInfoCount = animator.GetNextAnimatorClipInfoCount(layer);
 				if (clipInfoCache.Capacity < clipInfoCount) clipInfoCache.Capacity = clipInfoCount;
