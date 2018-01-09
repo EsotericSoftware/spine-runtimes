@@ -163,6 +163,7 @@ namespace Spine.Unity {
 
 				if (followBoneRotation) {
 					Vector3 worldRotation = skeletonTransform.rotation.eulerAngles;
+					if (followLocalScale && bone.scaleX < 0) boneWorldRotation += 180f;
 					#if UNITY_5_6_OR_NEWER
 					thisTransform.SetPositionAndRotation(targetWorldPosition, Quaternion.Euler(worldRotation.x, worldRotation.y, skeletonTransform.rotation.eulerAngles.z + boneWorldRotation));
 					#else
