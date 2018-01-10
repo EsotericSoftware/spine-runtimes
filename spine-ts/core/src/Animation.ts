@@ -709,7 +709,7 @@ module spine {
 
 			let frames = this.frames;
 			if (time < frames[0]) {
-				if (blend == MixBlend.setup) {
+				if (blend == MixBlend.setup || blend == MixBlend.first) {
 					let attachmentName = slot.data.attachmentName;
 					slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(this.slotIndex, attachmentName));
 				}
