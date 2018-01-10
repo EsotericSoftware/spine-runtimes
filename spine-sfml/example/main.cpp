@@ -30,6 +30,7 @@
 
 #include <iostream>
 #include <string.h>
+#define SPINE_SHORT_NAMES
 #include <spine/spine-sfml.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Mouse.hpp>

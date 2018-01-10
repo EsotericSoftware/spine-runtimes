@@ -31,7 +31,6 @@
 #ifndef SPINE_SFML_H_
 #define SPINE_SFML_H_
 
-#define SPINE_SHORT_NAMES
 #include <spine/spine.h>
 #include <spine/extension.h>
 #include <SFML/Graphics/Vertex.hpp>
@@ -46,13 +45,13 @@ namespace spine {
 
 class SkeletonDrawable: public sf::Drawable {
 public:
-	Skeleton* skeleton;
-	AnimationState* state;
+	spSkeleton* skeleton;
+	spAnimationState* state;
 	float timeScale;
 	sf::VertexArray* vertexArray;
 	spVertexEffect* vertexEffect;
 
-	SkeletonDrawable (SkeletonData* skeleton, AnimationStateData* stateData = 0);
+	SkeletonDrawable (spSkeletonData* skeleton, spAnimationStateData* stateData = 0);
 	~SkeletonDrawable ();
 
 	void update (float deltaTime);

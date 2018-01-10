@@ -1,3 +1,10 @@
+# 3.7
+
+## C
+### SFML
+* `spine-sfml.h` no longer defines `SPINE_SHORT_NAMES` to avoid collisions with other APIs. See #1058.
+
+
 # 3.6
 
 ## AS3
@@ -11,7 +18,7 @@
  * **Additions**
   * Added `Skeleton.getBounds` from reference implementation.
   * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
-  * Added `Bone.localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).    
+  * Added `Bone.localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).
   * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.
   * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
   * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
@@ -38,10 +45,10 @@
   * Removed `spVertexIndex`from public API.
   * Listeners on `spAnimationState` or `spTrackEntry` will now be also called in case a track entry is disposed as part of dispoing the `spAnimationState`.
  * **Additions**
-  * Added support for local and relative transform constraint calculation, including additional fields in `spTransformConstraintData`.  
+  * Added support for local and relative transform constraint calculation, including additional fields in `spTransformConstraintData`.
   * Added `spPointAttachment`, additional method `spAtlasAttachmentLoadeR_newPointAttachment`.
   * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
-  * Added `spBone_localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).  	
+  * Added `spBone_localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).
    * Added two color tinting support, including `spTwoColorTimeline` and additional fields on `spSlot` and `spSlotData`.
   * Added `userData` field to `spTrackEntry`, so users can expose data in `spAnimationState` callbacks.
   * Modified kvec.h used by SkeletonBinary.c to use Spine's MALLOC/FREE macros. That way there's only one place to inject custom allocators ([extension.h](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-c/spine-c/include/spine/extension.h)) [commit](https://github.com/EsotericSoftware/spine-runtimes/commit/c2cfbc6cb8709daa082726222d558188d75a004f)
@@ -95,10 +102,10 @@
   * Added `stride` parameter to `VertexAttachment.ComputeWorldVertices`.
   * Removed `RegionAttachment.Vertices` field. The vertices array is provided to `RegionAttachment.ComputeWorldVertices` by the API user now.
   * Removed `RegionAttachment.UpdateWorldVertices`, added `RegionAttachment.ComputeWorldVertices`. The new method now computes the x/y positions of the 4 vertices of the corner and places them in the provided `worldVertices` array, starting at `offset`, then moving by `stride` array elements when advancing to the next vertex. This allows to directly compose the vertex buffer and avoids a copy. The computation of the full vertices, including vertex colors and texture coordinates, is now done by the backend's respective renderer.
- * **Additions**  
+ * **Additions**
   * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
-  * Added `Bone.localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).  
-  * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.  
+  * Added `Bone.localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).
+  * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.
   * Added `PointAttachment`, additional method `NewPointAttachment` in `AttachmentLoader` interface.
   * Added `ClippingAttachment`, additional method `NewClippingAttachment` in `AttachmentLoader` interface.
   * Added `SkeletonClipper` and `Triangulator`, used to implement software clipping of attachments.
@@ -110,10 +117,10 @@
    * **Two color tinting** is currently supported via extra UV2 and UV3 mesh vertex streams. To use Two color tinting, you need to:
      * switch on "Tint Black" under "Advanced...",
      * use the new `Spine/Skeleton Tint Black` shader, or your own shader that treats the UV2 and UV3 streams similarly.
-     * Additionally, for SkeletonGraphic, you can use `Spine/SkeletonGraphic Tint Black` (or the bundled SkeletonGraphicTintBlack material) or your own shader that uses UV2 and UV3 streams similarly. **Additional Shader Channels** TexCoord1 and TexCoord2 will need to be enabled from the Canvas component's inspector. These correspond to UV2 and UV3. 
+     * Additionally, for SkeletonGraphic, you can use `Spine/SkeletonGraphic Tint Black` (or the bundled SkeletonGraphicTintBlack material) or your own shader that uses UV2 and UV3 streams similarly. **Additional Shader Channels** TexCoord1 and TexCoord2 will need to be enabled from the Canvas component's inspector. These correspond to UV2 and UV3.
    * **Clipping** is now supported. Caution: The SkeletonAnimation switches to slightly slower mesh generation code when clipping so limit your use of `ClippingAttachment`s when using on large numbers of skeletons.
- * **SkeletonRenderer.initialFlip** Spine components such as SkeletonRenderer, SkeletonAnimation, SkeletonAnimator now has `initialFlipX` and `initialFlipY` fields which are also visible in the inspector under "Advanced...". It will allow you to set and preview a starting flip value for your skeleton component. This is applied immediately when the internal skeleton object is instantiated. 
- * **[SpineAttribute] Improvements** 
+ * **SkeletonRenderer.initialFlip** Spine components such as SkeletonRenderer, SkeletonAnimation, SkeletonAnimator now has `initialFlipX` and `initialFlipY` fields which are also visible in the inspector under "Advanced...". It will allow you to set and preview a starting flip value for your skeleton component. This is applied immediately when the internal skeleton object is instantiated.
+ * **[SpineAttribute] Improvements**
    * **Icons have been added to SpineAttributeDrawers**. This should make your default inspectors easier to understand at a glance.
    * **Added Constraint Attributes** You can now use `[SpineIkConstraint]` `[SpineTransformConstraint]` `[SpinePathConstraint]`
    * **SpineAttribute dataField** parameter can also now detect sibling fields within arrays and serializable structs/classes.
@@ -127,12 +134,12 @@
  * **SkeletonRenderer.OnPostProcessVertices** is a new callback that gives you a reference to the MeshGenerator after it has generated a mesh from the current skeleton pose. You can access `meshGenerator.VertexBuffer` or `meshGenerator.ColorBuffer` to modify these before they get pushed into the UnityEngine.Mesh for rendering. This can be useful for non-shader vertex effects.
  * **Examples**
    * **Examples now use properties**. The code in the example scripts have been switched over to using properties instead of fields to encourage their use for consistency. This is in anticipation of both users who want to move the Spine folders to the Unity Plugins folder (compiled as a different assembly), and of Unity 2017's ability to manually define different assemblies for shorter compilation times.
-   * **Mix And Match**. The mix-and-match example scene, code and data have been updated to reflect the current recommended setup for animation-compatible custom equip systems The underlying API has changed since 3.5 and the new API calls in MixAndMatch.cs is recommended. Documentation is in progress.  
+   * **Mix And Match**. The mix-and-match example scene, code and data have been updated to reflect the current recommended setup for animation-compatible custom equip systems The underlying API has changed since 3.5 and the new API calls in MixAndMatch.cs is recommended. Documentation is in progress.
    * **Sample Components**. `AtasRegionAttacher` and `SpriteAttacher` are now part of `Sample Components`, to reflect that they are meant to be used as sample code rather than production. A few other sample components have also been added. New imports of the unitypackage Examples folder will see a "Legacy" folder comprised of old sample components that no longer contain the most up-to-date and recommended workflows, but are kept in case old setups used them for production.
  * **Spine folder**. In the unitypackage, the "spine-csharp" and "spine-unity" folders are now inside a "Spine" folder. This change will only affect fresh imports. Importing the unitypackage to update Spine-Unity in your existing project will update the appropriate files however you chose to arrange them, as long as the meta files are intact.
  * **Breaking changes**
    * The Sprite shaders module was updated to the latest version from the [source](https://github.com/traggett/UnitySpriteShaders/commits/master). Some changes were made to the underlying keyword structure. You may need to review the settings of your lit materials. Particularly, your Fixed Normals settings.
-   * The `Spine/Skeleton Lit` shader was switched over to non-fixed-function code. It now no longer requires mesh normals and has fixed normals at the shader level. 
+   * The `Spine/Skeleton Lit` shader was switched over to non-fixed-function code. It now no longer requires mesh normals and has fixed normals at the shader level.
    * The old MeshGenerator classes, interfaces and code in `Spine.Unity.MeshGeneration` are now deprecated. All mesh-generating components now share the class `Spine.Unity.MeshGenerator` defined in `SpineMesh.cs`. MeshGenerator is a serializable class.
      * The `SkeletonRenderer.renderMeshes` optimization is currently non-functional.
      * Old triangle-winding code has been removed from `SkeletonRenderer`. Please use shaders that have backface culling off.
@@ -161,15 +168,15 @@
   * Removed `RegionAttachment.updateWorldVertices`, added `RegionAttachment.computeWorldVertices`. The new method now computes the x/y positions of the 4 vertices of the corner and places them in the provided `worldVertices` array, starting at `offset`, then moving by `stride` array elements when advancing to the next vertex. This allows to directly compose the vertex buffer and avoids a copy. The computation of the full vertices, including vertex colors and texture coordinates, is now done by the backend's respective renderer.
   * Skeleton attachments: Moved update of attached skeleton out of libGDX `SkeletonRenderer`, added overloaded method `Skeleton#updateWorldTransform(Bone), used for `SkeletonAttachment`. You now MUST call this new method
   with the bone of the parent skeleton to which the child skeleton is attached. See `SkeletonAttachmentTest` for and example.
- * **Additions**  
+ * **Additions**
   * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
-  * Added `Bone.localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).  
-  * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.  
+  * Added `Bone.localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).
+  * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.
   * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
   * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
   * Added `SkeletonClipper` and `Triangulator`, used to implement software clipping of attachments.
   * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
-  * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans  
+  * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
 
 ### libGDX
  * Fixed renderer to work with 3.6 changes
@@ -187,7 +194,7 @@
  * **Additions**
   * Added `Bone:localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).
   * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.
-  * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.  
+  * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
   * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
   * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
   * Added `SkeletonClipper` and `Triangulator`, used to implement software clipping of attachments.
@@ -213,10 +220,10 @@
   * Removed `VertexAttachment.computeWorldVertices` overload, changed `VertexAttachment.computeWorldVerticesWith` to `VertexAttachment.computeWorldVertices`, added `stride` parameter.
   * Removed `RegionAttachment.vertices` field. The vertices array is provided to `RegionAttachment.computeWorldVertices` by the API user now.
   * Removed `RegionAttachment.updateWorldVertices`, added `RegionAttachment.computeWorldVertices`. The new method now computes the x/y positions of the 4 vertices of the corner and places them in the provided `worldVertices` array, starting at `offset`, then moving by `stride` array elements when advancing to the next vertex. This allows to directly compose the vertex buffer and avoids a copy. The computation of the full vertices, including vertex colors and texture coordinates, is now done by the backend's respective renderer.
- * **Additions**  
+ * **Additions**
   * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
-  * Added `Bone.localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).  
-  * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.  
+  * Added `Bone.localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).
+  * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.
   * Added `PointAttachment`, additional method `newPointAttachment` in `AttachmentLoader` interface.
   * Added `ClippingAttachment`, additional method `newClippingAttachment` in `AttachmentLoader` interface.
   * Added `SkeletonClipper` and `Triangulator`, used to implement software clipping of attachments.
