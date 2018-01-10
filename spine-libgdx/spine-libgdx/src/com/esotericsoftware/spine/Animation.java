@@ -905,7 +905,7 @@ public class Animation {
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
-				if (blend == setup) {
+				if (blend == setup || blend == first) {
 					String attachmentName = slot.data.attachmentName;
 					slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slotIndex, attachmentName));
 				}
