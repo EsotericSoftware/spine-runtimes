@@ -468,9 +468,12 @@ package spine.animation {
 				last.next = entry;
 				if (delay <= 0) {
 					var duration : Number = last.animationEnd - last.animationStart;
-					if (duration != 0)
-						delay += duration * (1 + (int)(last.trackTime / duration)) - data.getMix(last.animation, animation);
-					else
+					if (duration != 0) {
+						if (last.loop)
+						    delay += duration * (1 + (int)(last.trackTime / duration));
+						else
+						    delay += duration;						
+					} else
 						delay = 0;
 				}
 			}
