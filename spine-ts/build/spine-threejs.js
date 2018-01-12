@@ -1862,11 +1862,11 @@ var spine;
 				throw new Error("from cannot be null.");
 			if (to == null)
 				throw new Error("to cannot be null.");
-			var key = from.name + to.name;
+			var key = from.name + "." + to.name;
 			this.animationToMixTime[key] = duration;
 		};
 		AnimationStateData.prototype.getMix = function (from, to) {
-			var key = from.name + to.name;
+			var key = from.name + "." + to.name;
 			var value = this.animationToMixTime[key];
 			return value === undefined ? this.defaultMix : value;
 		};
