@@ -269,6 +269,11 @@ void SkeletonTwoColorBatch::batch (TwoColorTrianglesCommand* command) {
 		flush(_lastCommand);
 	}
 	
+	uint32_t materialID = command->getMaterialID();
+	if (_lastCommand && _lastCommand->getMaterialID() != materialID) {
+		flush(_lastCommand);
+	}
+	
 	memcpy(_vertexBuffer + _numVerticesBuffer, command->getTriangles().verts, sizeof(V3F_C4B_C4B_T2F) * command->getTriangles().vertCount);
 	const Mat4& modelView = command->getModelView();
 	for (int i = _numVerticesBuffer; i < _numVerticesBuffer + command->getTriangles().vertCount; i++) {
@@ -284,10 +289,8 @@ void SkeletonTwoColorBatch::batch (TwoColorTrianglesCommand* command) {
 	_numVerticesBuffer += command->getTriangles().vertCount;
 	_numIndicesBuffer += command->getTriangles().indexCount;
 	
-	uint32_t materialID = command->getMaterialID();
-	
-	if ((_lastCommand && _lastCommand->getMaterialID() != materialID) || command->isForceFlush()) {
-		flush(_lastCommand);
+	if (command->isForceFlush()) {
+		flush(command);
 	}
 	_lastCommand = command;
 }
