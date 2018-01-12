@@ -167,8 +167,8 @@ public class Animation {
 		 * value is set. */
 		setup,
 		/** Transitions from the current value to the timeline value. Before the first key, transitions from the current value to
-		 * the setup value, except for timelines which perform instant transitions, such as {@link DrawOrderTimeline} or
-		 * {@link AttachmentTimeline}.
+		 * the setup value. Timelines which perform instant transitions, such as {@link DrawOrderTimeline} or
+		 * {@link AttachmentTimeline}, use the setup value before the first key.
 		 * <p>
 		 * <code>first</code> is intended for the first animations applied, not for animations layered on top of those. */
 		first,
@@ -1274,7 +1274,7 @@ public class Animation {
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
-				if (blend == setup) System.arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
+				if (blend == setup || blend == first) System.arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
 				return;
 			}
 
