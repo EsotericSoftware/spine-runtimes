@@ -935,7 +935,7 @@ var spine;
 			}
 			var frames = this.frames;
 			if (time < frames[0]) {
-				if (blend == MixBlend.setup)
+				if (blend == MixBlend.setup || blend == MixBlend.first)
 					spine.Utils.arrayCopy(skeleton.slots, 0, skeleton.drawOrder, 0, skeleton.slots.length);
 				return;
 			}
