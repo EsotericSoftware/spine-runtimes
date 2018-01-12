@@ -519,8 +519,9 @@ public class AnimationState {
 
 	/** Adds an animation to be played after the current or last queued animation for a track. If the track is empty, it is
 	 * equivalent to calling {@link #setAnimation(int, Animation, boolean)}.
-	 * @param delay Seconds to begin this animation after the start of the previous animation. May be <= 0 to use the animation
-	 *           duration of the previous track minus any mix duration plus the <code>delay</code>.
+	 * @param delay Seconds to begin this animation after the start of the previous animation. If <= 0, uses the duration of the
+	 *           previous track entry minus any mix duration plus the specified <code>delay</code>. If the previous entry is
+	 *           looping, its next loop completion is used instead of the duration.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
 	 *         after the {@link AnimationStateListener#dispose(TrackEntry)} event occurs. */
 	public TrackEntry addAnimation (int trackIndex, Animation animation, boolean loop, float delay) {
@@ -543,11 +544,11 @@ public class AnimationState {
 				float duration = last.animationEnd - last.animationStart;
 				if (duration != 0) {
 					if (last.loop)
-					    delay += duration * (1 + (int)(last.trackTime / duration));
+						delay += duration * (1 + (int)(last.trackTime / duration));
 					else
-					    delay += duration;
-					delay -= data.getMix(last.animation, animation);				
-				}	else
+						delay += duration;
+					delay -= data.getMix(last.animation, animation);
+				} else
 					delay = 0;
 			}
 		}
@@ -582,8 +583,9 @@ public class AnimationState {
 	 * {@link #setEmptyAnimation(int, float)}.
 	 * <p>
 	 * See {@link #setEmptyAnimation(int, float)}.
-	 * @param delay Seconds to begin this animation after the start of the previous animation. May be <= 0 to use the animation
-	 *           duration of the previous track minus any mix duration plus <code>delay</code>.
+	 * @param delay Seconds to begin this animation after the start of the previous animation. If <= 0, uses the duration of the
+	 *           previous track entry minus any mix duration plus the specified <code>delay</code>. If the previous entry is
+	 *           looping, its next loop completion is used instead of the duration.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
 	 *         after the {@link AnimationStateListener#dispose(TrackEntry)} event occurs. */
 	public TrackEntry addEmptyAnimation (int trackIndex, float mixDuration, float delay) {
