@@ -453,9 +453,13 @@ module spine {
 				last.next = entry;
 				if (delay <= 0) {
 					let duration = last.animationEnd - last.animationStart;
-					if (duration != 0)
-						delay += duration * (1 + ((last.trackTime / duration) | 0)) - this.data.getMix(last.animation, animation);
-					else
+					if (duration != 0) {
+						if (last.loop)
+							delay += duration * (1 + ((last.trackTime / duration) | 0));
+						else
+							delay += duration;
+						delay -= this.data.getMix(last.animation, animation);
+					} else
 						delay = 0;
 				}
 			}

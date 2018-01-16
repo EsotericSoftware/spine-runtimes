@@ -720,7 +720,12 @@ function AnimationState:addAnimation (trackIndex, animation, loop, delay)
     if delay <= 0 then
       local duration = last.animationEnd - last.animationStart
       if duration ~= 0 then
-        delay = delay + duration * (1 + math_floor(last.trackTime / duration)) - data:getMix(last.animation, animation)
+				if last.loop then
+					delay = delay + duration * (1 + math_floor(last.trackTime / duration))
+				else
+					delay = delay + duration
+				end
+        delay = delay - data:getMix(last.animation, animation)
       else
         delay = 0
       end
