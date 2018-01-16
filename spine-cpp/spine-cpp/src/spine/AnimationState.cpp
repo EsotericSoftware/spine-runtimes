@@ -568,9 +568,13 @@ namespace Spine {
             if (delay <= 0) {
                 float duration = last->_animationEnd - last->_animationStart;
                 if (duration != 0) {
-                    delay += duration * (1 + (int)(last->_trackTime / duration)) - _data.getMix(last->_animation, animation);
-                }
-                else {
+                    if (last->_loop) {
+                        delay += duration * (1 + (int)(last->_trackTime / duration));
+                    } else {
+                        delay += duration;
+                    }
+                    delay -= _data.getMix(last->_animation, animation);
+                } else {
                     delay = 0;
                 }
             }
