@@ -623,7 +623,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		}
 
 		static bool IsRenderable (Attachment a) {
-			return a is RegionAttachment || a is MeshAttachment;
+			return a is IHasRendererObject;
 		}
 
 		/// <summary>

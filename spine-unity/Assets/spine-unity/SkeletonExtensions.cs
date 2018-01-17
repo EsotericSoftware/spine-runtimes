@@ -294,7 +294,7 @@ namespace Spine {
 		}
 
 		public static bool IsRenderable (this Attachment a) {
-			return a is RegionAttachment || a is MeshAttachment;
+			return a is IHasRendererObject;
 		}
 
 		#region Transform Modes
