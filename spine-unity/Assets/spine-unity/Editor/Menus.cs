@@ -45,7 +45,7 @@ namespace Spine.Unity.Editor {
 			CreateAsset<SkeletonDataAsset>("New SkeletonData");
 		}
 
-		static private void CreateAsset <T> (String name) where T : ScriptableObject {
+		static void CreateAsset<T> (String name) where T : ScriptableObject {
 			var dir = "Assets/";
 			var selected = Selection.activeObject;
 			if (selected != null) {
@@ -70,7 +70,7 @@ namespace Spine.Unity.Editor {
 			CreateSpineGameObject<SkeletonAnimation>("New SkeletonAnimation");
 		}
 
-		static public void CreateSpineGameObject<T> (string name) where T : MonoBehaviour {
+		static void CreateSpineGameObject<T> (string name) where T : MonoBehaviour {
 			var parentGameObject = Selection.activeObject as GameObject;
 			var parentTransform = parentGameObject == null ? null : parentGameObject.transform;
 
