@@ -619,7 +619,7 @@ module spine {
 					slot.color.setFromColor(slot.data.color);
 					slot.darkColor.setFromColor(slot.data.darkColor);
 					return;
-				case MixBlend.setup:
+				case MixBlend.first:
 					let light = slot.color, dark = slot.darkColor, setupLight = slot.data.color, setupDark = slot.data.darkColor;
 					light.add((setupLight.r - light.r) * alpha, (setupLight.g - light.g) * alpha, (setupLight.b - light.b) * alpha,
 						(setupLight.a - light.a) * alpha);
@@ -1146,7 +1146,7 @@ module spine {
 					constraint.scaleMix = data.scaleMix;
 					constraint.shearMix = data.shearMix;
 					return;
-				case MixBlend.setup:
+				case MixBlend.first:
 					constraint.rotateMix += (data.rotateMix - constraint.rotateMix) * alpha;
 					constraint.translateMix += (data.translateMix - constraint.translateMix) * alpha;
 					constraint.scaleMix += (data.scaleMix - constraint.scaleMix) * alpha;
