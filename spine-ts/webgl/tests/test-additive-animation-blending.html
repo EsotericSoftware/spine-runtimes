@@ -7,14 +7,25 @@
 			input, label {
 				display: block;
 			}
+			#controls {
+				position: absolute;
+			}
+
+			#controls * {
+				position: relative;
+				top: 0;
+				left: 0;
+			}
 		</style>
 	</head>
 	<body>
 		<canvas id="canvas" style="width: 640px; height: 480px;"></canvas>
-		<label>Up</label><input type="range" id="up" min="0" max="100" value="0"></input>
-		<label>Down</label><input type="range" id="down" min="0" max="100" value="0"></input>
-		<label>Left</label><input type="range" id="left" min="0" max="100" value="0"></input>
-		<label>Right</label><input type="range" id="right" min="0" max="100" value="0"></input>
+		<div id="controls">
+			<label>Up</label><input type="range" id="up" min="0" max="100" value="0"></input>
+			<label>Down</label><input type="range" id="down" min="0" max="100" value="0"></input>
+			<label>Left</label><input type="range" id="left" min="0" max="100" value="0"></input>
+			<label>Right</label><input type="range" id="right" min="0" max="100" value="0"></input>
+		</div>
 	</body>
 	<script>
 		var canvas = document.getElementById("canvas");
@@ -28,25 +39,25 @@
 		var skeleton, animationState;
 		var upEntry, downEntry, leftEntry, rightEntry;
 
-		assetManager.loadTexture("deform_sample.png");
-		assetManager.loadText("deform_sample.atlas");
-		assetManager.loadText("deform_sample.json");
+		assetManager.loadTexture("owl.png");
+		assetManager.loadText("owl.atlas");
+		assetManager.loadText("owl-pro.json");
 
 		function load () {
 			if (assetManager.isLoadingComplete()) {
-				var atlas = new spine.TextureAtlas(assetManager.get("deform_sample.atlas"), function(path) {
+				var atlas = new spine.TextureAtlas(assetManager.get("owl.atlas"), function(path) {
 					return assetManager.get(path);
 				});
 				var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 				var skeletonJson = new spine.SkeletonJson(atlasLoader);
 				skeletonJson.scale = 0.5;
-				var skeletonData = skeletonJson.readSkeletonData(JSON.parse(assetManager.get("deform_sample.json")));
+				var skeletonData = skeletonJson.readSkeletonData(JSON.parse(assetManager.get("owl-pro.json")));
 				skeleton = new spine.Skeleton(skeletonData);
 				var animationStateData = new spine.AnimationStateData(skeletonData);
 				animationStateData.defaultMix = 0.3;
 				animationState = new spine.AnimationState(animationStateData);
 
-				animationState.setAnimation(0, "breath", true);
+				animationState.setAnimation(0, "blink", true);
 				upEntry = animationState.setAnimation(1, "up", true);
 				upEntry.alpha = 0;
 				upEntry.mixBlend = spine.MixBlend.add;
