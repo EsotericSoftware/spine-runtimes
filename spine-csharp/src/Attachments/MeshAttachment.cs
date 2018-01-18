@@ -32,7 +32,7 @@ using System;
 
 namespace Spine {
 	/// <summary>Attachment that displays a texture region using a mesh.</summary>
-	public class MeshAttachment : VertexAttachment {
+	public class MeshAttachment : VertexAttachment, IHasRendererObject {
 		internal float regionOffsetX, regionOffsetY, regionWidth, regionHeight, regionOriginalWidth, regionOriginalHeight;
 		private MeshAttachment parentMesh;
 		internal float[] uvs, regionUVs;
@@ -53,7 +53,7 @@ namespace Spine {
 		public float A { get { return a; } set { a = value; } }
 
 		public string Path { get; set; }
-		public object RendererObject; //public Object RendererObject { get; set; }
+		public object RendererObject { get; set; }
 		public float RegionU { get; set; }
 		public float RegionV { get; set; }
 		public float RegionU2 { get; set; }

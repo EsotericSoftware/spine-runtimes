@@ -212,14 +212,11 @@ namespace Spine.Unity {
 		#region Attachments
 		public static Material GetMaterial (this Attachment a) {
 			object rendererObject = null;
-			var regionAttachment = a as RegionAttachment;
-			if (regionAttachment != null)
-				rendererObject = regionAttachment.RendererObject;
-
-			var meshAttachment = a as MeshAttachment;
-			if (meshAttachment != null)
-				rendererObject = meshAttachment.RendererObject;
-
+			var renderableAttachment = a as IHasRendererObject;
+			if (renderableAttachment != null) {
+				rendererObject = renderableAttachment.RendererObject;
+			}
+			
 			if (rendererObject == null)
 				return null;
 			
@@ -297,7 +294,7 @@ namespace Spine {
 		}
 
 		public static bool IsRenderable (this Attachment a) {
-			return a is RegionAttachment || a is MeshAttachment;
+			return a is IHasRendererObject;
 		}
 
 		#region Transform Modes
