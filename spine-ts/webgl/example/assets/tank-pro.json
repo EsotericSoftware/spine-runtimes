@@ -1,5 +1,12 @@
 {
-"skeleton": { "hash": "gMeaUupgVoo14IkopUhIqYGpDOU", "spine": "3.6.32", "width": 7202.61, "height": 1298.88, "images": "./images/" },
+"skeleton": {
+	"hash": "JWZpG/bZaODL9WMrHd/eWznhkD0",
+	"spine": "3.7.08-beta",
+	"width": 7202.61,
+	"height": 1298.88,
+	"images": "./images/",
+	"audio": ""
+},
 "bones": [
 	{ "name": "root" },
 	{ "name": "tank-root", "parent": "root", "y": 146.79 },
@@ -755,7 +762,7 @@
 			"antenna": {
 				"type": "mesh",
 				"uvs": [ 0.64286, 0.07876, 0.65354, 0.1535, 0.66325, 0.22138, 0.67367, 0.29433, 0.68383, 0.36543, 0.6936, 0.43374, 0.70311, 0.5003, 0.71311, 0.57031, 0.72327, 0.64139, 0.73406, 0.71689, 0.74441, 0.7893, 0.75614, 0.87141, 0.76905, 0.94311, 1, 0.94311, 1, 1, 0, 1, 0, 0.94311, 0.20106, 0.94311, 0.20106, 0.87094, 0.21461, 0.78847, 0.22651, 0.71607, 0.23886, 0.64099, 0.25036, 0.57105, 0.26206, 0.49983, 0.27306, 0.43291, 0.2843, 0.36454, 0.29593, 0.29382, 0.308, 0.22038, 0.319, 0.15345, 0.33142, 0.07796, 0.34423, 0, 0.63161, 0 ],
-				"triangles": [ 29, 0, 1, 29, 30, 0, 30, 31, 0, 27, 2, 3, 27, 28, 2, 28, 1, 2, 28, 29, 1, 26, 27, 3, 25, 4, 5, 25, 26, 4, 26, 3, 4, 24, 25, 5, 7, 23, 6, 23, 24, 6, 24, 5, 6, 7, 22, 23, 21, 8, 9, 21, 22, 8, 22, 7, 8, 20, 21, 9, 19, 20, 10, 20, 9, 10, 14, 15, 12, 15, 17, 12, 12, 13, 14, 15, 16, 17, 17, 11, 12, 17, 18, 11, 18, 19, 11, 19, 10, 11 ],
+				"triangles": [ 30, 31, 0, 29, 30, 0, 29, 0, 1, 28, 29, 1, 28, 1, 2, 27, 28, 2, 27, 2, 3, 26, 3, 4, 25, 26, 4, 25, 4, 5, 26, 27, 3, 24, 5, 6, 23, 24, 6, 7, 23, 6, 24, 25, 5, 22, 7, 8, 21, 22, 8, 21, 8, 9, 7, 22, 23, 20, 9, 10, 19, 20, 10, 20, 21, 9, 19, 10, 11, 18, 19, 11, 17, 18, 11, 17, 11, 12, 15, 16, 17, 12, 13, 14, 15, 17, 12, 14, 15, 12 ],
 				"vertices": [ 2, 10, 65.38, -3.14, 0.3125, 11, 23.38, -3.14, 0.6875, 2, 10, 42.73, -3.38, 0.66667, 11, 0.73, -3.38, 0.33333, 2, 9, 64.17, -3.59, 0.33333, 10, 22.17, -3.59, 0.66667, 2, 9, 42.06, -3.82, 0.66667, 10, 0.06, -3.82, 0.33333, 2, 8, 62.52, -4.04, 0.33333, 9, 20.52, -4.04, 0.66667, 2, 8, 41.82, -4.26, 0.66667, 9, -0.18, -4.26, 0.33333, 2, 7, 63.65, -4.47, 0.33333, 8, 21.65, -4.47, 0.66667, 2, 7, 42.44, -4.69, 0.66667, 8, 0.44, -4.69, 0.33333, 2, 6, 62.9, -4.91, 0.33333, 7, 20.9, -4.91, 0.66667, 2, 6, 40.03, -5.15, 0.66667, 7, -1.97, -5.15, 0.33333, 2, 5, 5.38, 58.09, 0.4, 6, 18.09, -5.38, 0.6, 1, 5, 5.64, 33.21, 1, 1, 5, 5.92, 11.48, 1, 1, 5, 11, 11.48, 1, 1, 5, 11, -5.76, 1, 1, 5, -11, -5.76, 1, 1, 5, -11, 11.48, 1, 1, 5, -6.58, 11.48, 1, 1, 5, -6.58, 33.35, 1, 2, 5, -6.28, 58.34, 0.4, 6, 18.34, 6.28, 0.6, 2, 6, 40.27, 6.02, 0.66667, 7, -1.73, 6.02, 0.33333, 2, 6, 63.03, 5.75, 0.33333, 7, 21.03, 5.75, 0.66667, 2, 7, 42.22, 5.49, 0.66667, 8, 0.22, 5.49, 0.33333, 2, 7, 63.8, 5.23, 0.33333, 8, 21.8, 5.23, 0.66667, 2, 8, 42.07, 4.99, 0.66667, 9, 0.07, 4.99, 0.33333, 2, 8, 62.79, 4.75, 0.33333, 9, 20.79, 4.75, 0.66667, 2, 9, 42.22, 4.49, 0.66667, 10, 0.22, 4.49, 0.33333, 2, 9, 64.47, 4.22, 0.33333, 10, 22.47, 4.22, 0.66667, 2, 10, 42.75, 3.98, 0.66667, 11, 0.75, 3.98, 0.33333, 2, 10, 65.62, 3.71, 0.3125, 11, 23.62, 3.71, 0.6875, 1, 11, 47.24, 3.43, 1, 1, 11, 47.24, -2.9, 1 ],
 				"hull": 32,
 				"edges": [ 28, 30, 28, 26, 30, 32, 26, 24, 24, 22, 32, 34, 34, 24, 34, 36, 36, 22, 60, 62, 38, 36, 20, 22, 38, 20, 40, 38, 18, 20, 40, 18, 42, 40, 16, 18, 42, 16, 44, 42, 14, 16, 44, 14, 46, 44, 12, 14, 46, 12, 48, 46, 10, 12, 48, 10, 50, 48, 8, 10, 50, 8, 52, 50, 6, 8, 52, 6, 54, 52, 4, 6, 54, 4, 56, 54, 2, 4, 56, 2, 60, 58, 58, 56, 62, 0, 0, 2, 58, 0 ],
@@ -773,7 +780,7 @@
 			"cannon-connector": {
 				"type": "mesh",
 				"uvs": [ 1, 0.03237, 1, 0.10603, 0.90988, 0.32859, 0.81975, 0.55116, 0.72963, 0.77373, 0.6395, 0.9963, 0.42157, 0.9963, 0.20364, 0.9963, 0, 0.85434, 0, 0.69902, 0.02268, 0.52884, 0, 0.31444, 0.21602, 0.12998, 0.43368, 0, 0.63547, 0.0037, 0.48408, 0.77059, 0.31496, 0.52497, 0.64133, 0.19648, 0.21516, 0.76766, 0.58346, 0.56471, 0.68444, 0.40146, 0.46758, 0.36649, 0.28935, 0.34604 ],
-				"triangles": [ 7, 18, 6, 6, 18, 15, 7, 8, 18, 8, 9, 18, 18, 16, 15, 15, 16, 19, 9, 10, 18, 18, 10, 16, 16, 21, 19, 19, 21, 20, 10, 22, 16, 10, 11, 22, 16, 22, 21, 21, 17, 20, 21, 12, 13, 17, 13, 14, 17, 21, 13, 11, 12, 22, 21, 22, 12, 6, 15, 5, 5, 15, 4, 15, 19, 4, 4, 19, 3, 19, 20, 3, 3, 20, 2, 20, 17, 2, 2, 17, 1, 17, 14, 1, 14, 0, 1 ],
+				"triangles": [ 21, 22, 12, 11, 12, 22, 17, 21, 13, 17, 13, 14, 21, 12, 13, 21, 17, 20, 16, 22, 21, 10, 11, 22, 10, 22, 16, 19, 21, 20, 16, 21, 19, 18, 10, 16, 9, 10, 18, 15, 16, 19, 18, 16, 15, 8, 9, 18, 7, 8, 18, 6, 18, 15, 7, 18, 6, 14, 0, 1, 17, 14, 1, 2, 17, 1, 20, 17, 2, 3, 20, 2, 19, 20, 3, 4, 19, 3, 15, 19, 4, 5, 15, 4, 6, 15, 5 ],
 				"vertices": [ 1, 12, 35.91, 69.08, 1, 1, 12, 35.91, 59.14, 1, 1, 12, 25.82, 29.09, 1, 1, 12, 15.72, -0.95, 1, 1, 12, 5.63, -31, 1, 1, 12, -4.46, -61.05, 1, 2, 12, -28.87, -61.05, 0.33333, 14, 28.87, 61.03, 0.66667, 1, 14, 53.28, 61.02, 1, 1, 14, 76.09, 41.84, 1, 1, 14, 71.17, 21.63, 1, 1, 14, 72.83, -1.62, 1, 1, 14, 70.38, -29.12, 1, 1, 14, 50.67, -56.14, 1, 2, 12, -28.43, 74.38, 0.41, 14, 28.43, -74.4, 0.59, 2, 12, -4.92, 72.95, 0.52, 14, 4.92, -72.95, 0.48, 2, 12, -21.87, -30.58, 0.49, 14, 21.87, 30.57, 0.51, 1, 14, 40.81, -2.6, 1, 2, 12, -4.26, 46.93, 0.49, 14, 4.26, -46.93, 0.51, 1, 14, 51.99, 30.15, 1, 2, 12, -10.74, -2.78, 0.49, 14, 10.74, 2.78, 0.51, 2, 12, 0.57, 19.25, 0.49, 14, -0.57, -19.25, 0.51, 1, 14, 23.72, -23.99, 1, 1, 14, 43.68, -26.76, 1 ],
 				"hull": 15,
 				"edges": [ 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 22, 22, 24, 24, 26, 26, 28, 28, 0 ],
@@ -2241,7 +2248,7 @@
 			},
 			"smoke-glow": {
 				"color": [
-					{ "time": 0.1333, "color": "fffffffe" },
+					{ "time": 0.1333, "color": "ffffffff" },
 					{ "time": 0.1667, "color": "ffbc8af4" },
 					{ "time": 0.2, "color": "fc8e8e90" },
 					{ "time": 0.2667, "color": "fa3e3e1e" }
@@ -2253,9 +2260,9 @@
 			},
 			"smoke-puff1-bg": {
 				"twoColor": [
-					{ "time": 0.0667, "light": "ffd50cfe", "dark": "3b2c23" },
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.6, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.0667, "light": "ffd50cff", "dark": "3b2c23" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.6, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 1.0333, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2264,9 +2271,9 @@
 			},
 			"smoke-puff1-bg2": {
 				"twoColor": [
-					{ "time": 0.0667, "light": "ffd50cfe", "dark": "3b2c23" },
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.0667, "light": "ffd50cff", "dark": "3b2c23" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.8333, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2275,9 +2282,9 @@
 			},
 			"smoke-puff1-bg3": {
 				"twoColor": [
-					{ "time": 0.0667, "light": "ffd50cfe", "dark": "3b2c23" },
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.0667, "light": "ffd50cff", "dark": "3b2c23" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.8333, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2286,9 +2293,9 @@
 			},
 			"smoke-puff1-bg4": {
 				"twoColor": [
-					{ "time": 0.0667, "light": "ffd50cfe", "dark": "3b2c23" },
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.6, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.0667, "light": "ffd50cff", "dark": "3b2c23" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.6, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.9, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2297,9 +2304,9 @@
 			},
 			"smoke-puff1-bg5": {
 				"twoColor": [
-					{ "time": 0.0667, "light": "ffd50cfe", "dark": "3b2c23" },
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.6, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.0667, "light": "ffd50cff", "dark": "3b2c23" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.6, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.9, "light": "ffd50c00", "dark": "604a3f" }
 				],
 				"attachment": [
@@ -2308,9 +2315,9 @@
 			},
 			"smoke-puff1-bg6": {
 				"twoColor": [
-					{ "time": 0.0667, "light": "ffd50cfe", "dark": "3b2c23" },
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.0667, "light": "ffd50cff", "dark": "3b2c23" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.7, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2319,9 +2326,9 @@
 			},
 			"smoke-puff1-bg7": {
 				"twoColor": [
-					{ "time": 0.0667, "light": "ffd50cfe", "dark": "3b2c23" },
-					{ "time": 0.3333, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.0667, "light": "ffd50cff", "dark": "3b2c23" },
+					{ "time": 0.3333, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.8333, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2330,9 +2337,9 @@
 			},
 			"smoke-puff1-bg8": {
 				"twoColor": [
-					{ "time": 0.0667, "light": "ffd50cfe", "dark": "3b2c23" },
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.4333, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.0667, "light": "ffd50cff", "dark": "3b2c23" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.4333, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.9333, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2341,9 +2348,9 @@
 			},
 			"smoke-puff1-bg9": {
 				"twoColor": [
-					{ "time": 0.1333, "light": "ffd50cfe", "dark": "3b2c23" },
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.5333, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.1333, "light": "ffd50cff", "dark": "3b2c23" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.5333, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.8333, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2352,9 +2359,9 @@
 			},
 			"smoke-puff1-bg10": {
 				"twoColor": [
-					{ "time": 0.1333, "light": "ffd50cfe", "dark": "3b2c23" },
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.5333, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.1333, "light": "ffd50cff", "dark": "3b2c23" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.5333, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.8333, "light": "ffd50c00", "dark": "604a3f" }
 				],
 				"attachment": [
@@ -2363,8 +2370,8 @@
 			},
 			"smoke-puff1-bg11": {
 				"twoColor": [
-					{ "time": 0.1333, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.1333, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.7667, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2373,8 +2380,8 @@
 			},
 			"smoke-puff1-bg12": {
 				"twoColor": [
-					{ "time": 0.3333, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.6, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.3333, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.6, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.8667, "light": "ffd50c00", "dark": "604a3f" }
 				],
 				"attachment": [
@@ -2383,8 +2390,8 @@
 			},
 			"smoke-puff1-bg13": {
 				"twoColor": [
-					{ "time": 0.3667, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.3667, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 1, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2393,8 +2400,8 @@
 			},
 			"smoke-puff1-bg14": {
 				"twoColor": [
-					{ "time": 0.4333, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.6, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.4333, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.6, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 1.0667, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2403,8 +2410,8 @@
 			},
 			"smoke-puff1-bg15": {
 				"twoColor": [
-					{ "time": 0.4, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.4, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.8333, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2413,8 +2420,8 @@
 			},
 			"smoke-puff1-bg16": {
 				"twoColor": [
-					{ "time": 0.4, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.4, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.7, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2423,9 +2430,9 @@
 			},
 			"smoke-puff1-bg17": {
 				"twoColor": [
-					{ "time": 0.2333, "light": "ffd50cfe", "dark": "534035" },
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.4, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.2333, "light": "ffd50cff", "dark": "534035" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.4, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.6667, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2434,9 +2441,9 @@
 			},
 			"smoke-puff1-bg18": {
 				"twoColor": [
-					{ "time": 0.0667, "light": "ffd50cfe", "dark": "3b2c23" },
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.5, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.0667, "light": "ffd50cff", "dark": "3b2c23" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.5, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.8, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2445,9 +2452,9 @@
 			},
 			"smoke-puff1-bg20": {
 				"twoColor": [
-					{ "time": 0.0667, "light": "ffd50cfe", "dark": "3b2c23" },
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.0667, "light": "ffd50cff", "dark": "3b2c23" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.8, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2456,25 +2463,25 @@
 			},
 			"smoke-puff1-bg21": {
 				"twoColor": [
-					{ "time": 0.0667, "light": "ffd50cfe", "dark": "3b2c23" },
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.0667, "light": "ffd50cff", "dark": "3b2c23" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.7, "light": "ffd50c00", "dark": "604b3f" }
 				]
 			},
 			"smoke-puff1-bg22": {
 				"twoColor": [
-					{ "time": 0.0667, "light": "ffd50cfe", "dark": "3b2c23" },
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.0667, "light": "ffd50cff", "dark": "3b2c23" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.7, "light": "ffd50c00", "dark": "604b3f" }
 				]
 			},
 			"smoke-puff1-bg23": {
 				"twoColor": [
-					{ "time": 0.0667, "light": "ffd50cfe", "dark": "3b2c23" },
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.5, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.0667, "light": "ffd50cff", "dark": "3b2c23" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.5, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.7667, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2483,8 +2490,8 @@
 			},
 			"smoke-puff1-bg24": {
 				"twoColor": [
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.7, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2493,8 +2500,8 @@
 			},
 			"smoke-puff1-bg25": {
 				"twoColor": [
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 1, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2503,8 +2510,8 @@
 			},
 			"smoke-puff1-bg26": {
 				"twoColor": [
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.6, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.6, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.9333, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2513,8 +2520,8 @@
 			},
 			"smoke-puff1-bg27": {
 				"twoColor": [
-					{ "time": 0.3, "light": "ffd50cfe", "dark": "604b3f", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ffd50cfe", "dark": "604b3f" },
+					{ "time": 0.3, "light": "ffd50cff", "dark": "604b3f", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ffd50cff", "dark": "604b3f" },
 					{ "time": 0.7333, "light": "ffd50c00", "dark": "604b3f" }
 				],
 				"attachment": [
@@ -2523,12 +2530,12 @@
 			},
 			"smoke-puff1-fg": {
 				"twoColor": [
-					{ "time": 0.0667, "light": "ffdf31fe", "dark": "ff0000" },
-					{ "time": 0.1333, "light": "fde252fe", "dark": "ff0000" },
-					{ "time": 0.1667, "light": "ffe568fe", "dark": "e26425" },
-					{ "time": 0.2, "light": "ffe568fe", "dark": "ab774c" },
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.6, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.0667, "light": "ffdf31ff", "dark": "ff0000" },
+					{ "time": 0.1333, "light": "fde252ff", "dark": "ff0000" },
+					{ "time": 0.1667, "light": "ffe568ff", "dark": "e26425" },
+					{ "time": 0.2, "light": "ffe568ff", "dark": "ab774c" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.6, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 1.0333, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2540,11 +2547,11 @@
 			},
 			"smoke-puff1-fg2": {
 				"twoColor": [
-					{ "time": 0.1333, "light": "ffdf31fe", "dark": "ff0000" },
-					{ "time": 0.1667, "light": "ffe568fe", "dark": "e26425" },
-					{ "time": 0.2, "light": "ffe568fe", "dark": "ab774c" },
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.1333, "light": "ffdf31ff", "dark": "ff0000" },
+					{ "time": 0.1667, "light": "ffe568ff", "dark": "e26425" },
+					{ "time": 0.2, "light": "ffe568ff", "dark": "ab774c" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.8333, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2556,11 +2563,11 @@
 			},
 			"smoke-puff1-fg3": {
 				"twoColor": [
-					{ "time": 0.1333, "light": "ffe457fe", "dark": "ff0000" },
-					{ "time": 0.1667, "light": "ffe568fe", "dark": "e26425" },
-					{ "time": 0.2, "light": "ffe568fe", "dark": "ab774c" },
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.1333, "light": "ffe457ff", "dark": "ff0000" },
+					{ "time": 0.1667, "light": "ffe568ff", "dark": "e26425" },
+					{ "time": 0.2, "light": "ffe568ff", "dark": "ab774c" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.8333, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2572,11 +2579,11 @@
 			},
 			"smoke-puff1-fg4": {
 				"twoColor": [
-					{ "time": 0.1333, "light": "fae781fe", "dark": "ff0000" },
-					{ "time": 0.1667, "light": "ffe568fe", "dark": "e26425" },
-					{ "time": 0.2, "light": "ffe568fe", "dark": "ab774c" },
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.6, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.1333, "light": "fae781ff", "dark": "ff0000" },
+					{ "time": 0.1667, "light": "ffe568ff", "dark": "e26425" },
+					{ "time": 0.2, "light": "ffe568ff", "dark": "ab774c" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.6, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.9, "light": "ac8c7500", "dark": "604a3f" }
 				],
 				"attachment": [
@@ -2588,11 +2595,11 @@
 			},
 			"smoke-puff1-fg5": {
 				"twoColor": [
-					{ "time": 0.1333, "light": "ffdf31fe", "dark": "ff0000" },
-					{ "time": 0.1667, "light": "ffe568fe", "dark": "e26425" },
-					{ "time": 0.2, "light": "ffe568fe", "dark": "ab774c" },
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.6, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.1333, "light": "ffdf31ff", "dark": "ff0000" },
+					{ "time": 0.1667, "light": "ffe568ff", "dark": "e26425" },
+					{ "time": 0.2, "light": "ffe568ff", "dark": "ab774c" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.6, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.9, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2604,11 +2611,11 @@
 			},
 			"smoke-puff1-fg6": {
 				"twoColor": [
-					{ "time": 0.1333, "light": "ffdf31fe", "dark": "ff0000" },
-					{ "time": 0.1667, "light": "ffe568fe", "dark": "e26425" },
-					{ "time": 0.2, "light": "ffe568fe", "dark": "ab774c" },
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.1333, "light": "ffdf31ff", "dark": "ff0000" },
+					{ "time": 0.1667, "light": "ffe568ff", "dark": "e26425" },
+					{ "time": 0.2, "light": "ffe568ff", "dark": "ab774c" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.7, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2620,11 +2627,11 @@
 			},
 			"smoke-puff1-fg7": {
 				"twoColor": [
-					{ "time": 0.1333, "light": "ffdf31fe", "dark": "ff0000" },
-					{ "time": 0.1667, "light": "ffe568fe", "dark": "e26425" },
-					{ "time": 0.2, "light": "ffe568fe", "dark": "ab774c" },
-					{ "time": 0.3333, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.1333, "light": "ffdf31ff", "dark": "ff0000" },
+					{ "time": 0.1667, "light": "ffe568ff", "dark": "e26425" },
+					{ "time": 0.2, "light": "ffe568ff", "dark": "ab774c" },
+					{ "time": 0.3333, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.8333, "light": "ac8c7500", "dark": "604a3f" }
 				],
 				"attachment": [
@@ -2636,11 +2643,11 @@
 			},
 			"smoke-puff1-fg8": {
 				"twoColor": [
-					{ "time": 0.1333, "light": "ffdf31fe", "dark": "ff0000" },
-					{ "time": 0.1667, "light": "ffe568fe", "dark": "e26425" },
-					{ "time": 0.2, "light": "ffe568fe", "dark": "ab774c" },
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.4333, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.1333, "light": "ffdf31ff", "dark": "ff0000" },
+					{ "time": 0.1667, "light": "ffe568ff", "dark": "e26425" },
+					{ "time": 0.2, "light": "ffe568ff", "dark": "ab774c" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.4333, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.9333, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2652,11 +2659,11 @@
 			},
 			"smoke-puff1-fg9": {
 				"twoColor": [
-					{ "time": 0.1333, "light": "ffdf31fe", "dark": "ff0000" },
-					{ "time": 0.1667, "light": "ffe568fe", "dark": "e26425" },
-					{ "time": 0.2, "light": "ffe568fe", "dark": "ab774c" },
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.5333, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.1333, "light": "ffdf31ff", "dark": "ff0000" },
+					{ "time": 0.1667, "light": "ffe568ff", "dark": "e26425" },
+					{ "time": 0.2, "light": "ffe568ff", "dark": "ab774c" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.5333, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.8333, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2668,11 +2675,11 @@
 			},
 			"smoke-puff1-fg10": {
 				"twoColor": [
-					{ "time": 0.1333, "light": "fce35dfe", "dark": "ff0000" },
-					{ "time": 0.1667, "light": "ffe568fe", "dark": "e26425" },
-					{ "time": 0.2, "light": "ffe568fe", "dark": "ab774c" },
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.5333, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.1333, "light": "fce35dff", "dark": "ff0000" },
+					{ "time": 0.1667, "light": "ffe568ff", "dark": "e26425" },
+					{ "time": 0.2, "light": "ffe568ff", "dark": "ab774c" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.5333, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.8333, "light": "ac8c7500", "dark": "604a3f" }
 				],
 				"attachment": [
@@ -2684,8 +2691,8 @@
 			},
 			"smoke-puff1-fg11": {
 				"twoColor": [
-					{ "time": 0.3333, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.3333, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.7667, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2694,8 +2701,8 @@
 			},
 			"smoke-puff1-fg12": {
 				"twoColor": [
-					{ "time": 0.3667, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.6, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.3667, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.6, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.8667, "light": "ac8c7500", "dark": "604a3f" }
 				],
 				"attachment": [
@@ -2704,8 +2711,8 @@
 			},
 			"smoke-puff1-fg13": {
 				"twoColor": [
-					{ "time": 0.3667, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.3667, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 1, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2714,8 +2721,8 @@
 			},
 			"smoke-puff1-fg14": {
 				"twoColor": [
-					{ "time": 0.4333, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.6, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.4333, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.6, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 1.0667, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2724,8 +2731,8 @@
 			},
 			"smoke-puff1-fg15": {
 				"twoColor": [
-					{ "time": 0.4, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.4, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.8333, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2734,8 +2741,8 @@
 			},
 			"smoke-puff1-fg16": {
 				"twoColor": [
-					{ "time": 0.4, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.4, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.7, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2744,9 +2751,9 @@
 			},
 			"smoke-puff1-fg17": {
 				"twoColor": [
-					{ "time": 0.2333, "light": "e3c05efe", "dark": "ab7e59" },
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.4, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.2333, "light": "e3c05eff", "dark": "ab7e59" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.4, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.6667, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2755,11 +2762,11 @@
 			},
 			"smoke-puff1-fg18": {
 				"twoColor": [
-					{ "time": 0.1333, "light": "ffdf31fe", "dark": "ff0000" },
-					{ "time": 0.1667, "light": "ffe568fe", "dark": "e26425" },
-					{ "time": 0.2, "light": "ffe568fe", "dark": "ab774c" },
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.5, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.1333, "light": "ffdf31ff", "dark": "ff0000" },
+					{ "time": 0.1667, "light": "ffe568ff", "dark": "e26425" },
+					{ "time": 0.2, "light": "ffe568ff", "dark": "ab774c" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.5, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.7667, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2769,11 +2776,11 @@
 			},
 			"smoke-puff1-fg20": {
 				"twoColor": [
-					{ "time": 0.1333, "light": "ffdf31fe", "dark": "ff0000" },
-					{ "time": 0.1667, "light": "ffe568fe", "dark": "e26425" },
-					{ "time": 0.2, "light": "ffe568fe", "dark": "ab774c" },
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.1333, "light": "ffdf31ff", "dark": "ff0000" },
+					{ "time": 0.1667, "light": "ffe568ff", "dark": "e26425" },
+					{ "time": 0.2, "light": "ffe568ff", "dark": "ab774c" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.8, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2782,31 +2789,31 @@
 			},
 			"smoke-puff1-fg21": {
 				"twoColor": [
-					{ "time": 0.1333, "light": "ffdf31fe", "dark": "ff0000" },
-					{ "time": 0.1667, "light": "ffe568fe", "dark": "e26425" },
-					{ "time": 0.2, "light": "ffe568fe", "dark": "ab774c" },
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.1333, "light": "ffdf31ff", "dark": "ff0000" },
+					{ "time": 0.1667, "light": "ffe568ff", "dark": "e26425" },
+					{ "time": 0.2, "light": "ffe568ff", "dark": "ab774c" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.7, "light": "ab764c00", "dark": "ac8d75" }
 				]
 			},
 			"smoke-puff1-fg22": {
 				"twoColor": [
-					{ "time": 0.1333, "light": "ffdf31fe", "dark": "ff0000" },
-					{ "time": 0.1667, "light": "ffe568fe", "dark": "e26425" },
-					{ "time": 0.2, "light": "ffe568fe", "dark": "ab774c" },
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.1333, "light": "ffdf31ff", "dark": "ff0000" },
+					{ "time": 0.1667, "light": "ffe568ff", "dark": "e26425" },
+					{ "time": 0.2, "light": "ffe568ff", "dark": "ab774c" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.7, "light": "ab764c00", "dark": "ac8d75" }
 				]
 			},
 			"smoke-puff1-fg23": {
 				"twoColor": [
-					{ "time": 0.1333, "light": "ffdf31fe", "dark": "ff0000" },
-					{ "time": 0.1667, "light": "ffe568fe", "dark": "e26425" },
-					{ "time": 0.2, "light": "ffe568fe", "dark": "ab774c" },
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.5, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.1333, "light": "ffdf31ff", "dark": "ff0000" },
+					{ "time": 0.1667, "light": "ffe568ff", "dark": "e26425" },
+					{ "time": 0.2, "light": "ffe568ff", "dark": "ab774c" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.5, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.7667, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2815,8 +2822,8 @@
 			},
 			"smoke-puff1-fg24": {
 				"twoColor": [
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.7, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2825,8 +2832,8 @@
 			},
 			"smoke-puff1-fg25": {
 				"twoColor": [
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 1, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2835,8 +2842,8 @@
 			},
 			"smoke-puff1-fg26": {
 				"twoColor": [
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.6, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.6, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.9333, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [
@@ -2845,8 +2852,8 @@
 			},
 			"smoke-puff1-fg27": {
 				"twoColor": [
-					{ "time": 0.3, "light": "ab764cfe", "dark": "ac8d75", "curve": "stepped" },
-					{ "time": 0.4667, "light": "ab764cfe", "dark": "ac8d75" },
+					{ "time": 0.3, "light": "ab764cff", "dark": "ac8d75", "curve": "stepped" },
+					{ "time": 0.4667, "light": "ab764cff", "dark": "ac8d75" },
 					{ "time": 0.7333, "light": "ab764c00", "dark": "ac8d75" }
 				],
 				"attachment": [

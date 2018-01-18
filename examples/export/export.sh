@@ -23,6 +23,7 @@ rm -rf ../stretchyman/export/*
 rm -rf ../raptor/export/*
 rm -rf ../tank/export/*
 rm -rf ../vine/export/*
+rm -rf ../owl/export/*
 
 echo ""
 echo "Exporting..."
@@ -98,4 +99,9 @@ echo "Exporting..."
 -i ../vine/vine-pro.spine -o ../vine/export -e json.json \
 -i ../vine/vine-pro.spine -o ../vine/export -e binary.json \
 -i ../vine/images -o ../vine/export -n vine -p atlas-1.0.json \
--i ../vine/images -o ../vine/export -n vine-pma -p atlas-1.0-pma.json
+-i ../vine/images -o ../vine/export -n vine-pma -p atlas-1.0-pma.json \
+\
+-i ../owl/owl-pro.spine -o ../owl/export -e json.json \
+-i ../owl/owl-pro.spine -o ../owl/export -e binary.json \
+-i ../owl/images -o ../owl/export -n owl -p atlas-0.5.json \
+-i ../owl/images -o ../owl/export -n owl-pma -p atlas-0.5-pma.json
