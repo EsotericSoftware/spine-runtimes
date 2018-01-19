@@ -151,8 +151,12 @@ namespace Spine {
 
 			if (nonessential) {
 				skeletonData.fps = ReadFloat(input);
+
 				skeletonData.imagesPath = ReadString(input);
-				if (skeletonData.imagesPath.Length == 0) skeletonData.imagesPath = null;
+				if (string.IsNullOrEmpty(skeletonData.imagesPath)) skeletonData.imagesPath = null;
+
+				skeletonData.audioPath = ReadString(input);
+				if (string.IsNullOrEmpty(skeletonData.audioPath)) skeletonData.audioPath = null;
 			}
 
 			// Bones.
@@ -280,6 +284,7 @@ namespace Spine {
 				data.Int = ReadVarint(input, false);
 				data.Float = ReadFloat(input);
 				data.String = ReadString(input);
+				data.AudioPath = ReadString(input);
 				skeletonData.events.Add(data);
 			}
 
