@@ -9,8 +9,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a6b194f808b1af6499c93410e504af42, type: 3}
-  m_Name: spineboy_Atlas
+  m_Name: spineboy-pro_Atlas
   m_EditorClassIdentifier: 
-  atlasFile: {fileID: 4900000, guid: baa2a4228a0622e48ade89f9329a21db, type: 3}
+  atlasFile: {fileID: 4900000, guid: 9b2378ddc54f1c94fb80411958000a8c, type: 3}
   materials:
-  - {fileID: 2100000, guid: 86873d92b9c6412428e6e2d4f827c88b, type: 2}
+  - {fileID: 2100000, guid: f89bbf05902e77242a3ad20f3c927353, type: 2}
