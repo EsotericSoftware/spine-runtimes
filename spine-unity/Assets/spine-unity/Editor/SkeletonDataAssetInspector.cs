@@ -625,7 +625,7 @@ namespace Spine.Unity.Editor {
 
 		public event Action<string> OnSkinChanged;
 
-		Texture previewTexture = new Texture();
+		Texture previewTexture;
 		PreviewRenderUtility previewRenderUtility;
 		Camera PreviewUtilityCamera {
 			get {
