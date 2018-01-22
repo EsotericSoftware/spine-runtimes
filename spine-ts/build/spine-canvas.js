@@ -2131,6 +2131,7 @@ var spine;
 			path = this.pathPrefix + path;
 			this.toLoad++;
 			AssetManager.downloadText(path, function (atlasData) {
+				var pagesLoaded = { count: 0 };
 				var atlasPages = new Array();
 				try {
 					var atlas = new spine.TextureAtlas(atlasData, function (path) {
@@ -2151,11 +2152,10 @@ var spine;
 					return;
 				}
 				var _loop_1 = function (atlasPage) {
-					var pagesLoaded = 0;
 					var pageLoadError = false;
 					_this.loadTexture(atlasPage, function (imagePath, image) {
-						pagesLoaded++;
-						if (pagesLoaded == atlasPages.length) {
+						pagesLoaded.count++;
+						if (pagesLoaded.count == atlasPages.length) {
 							if (!pageLoadError) {
 								try {
 									var atlas = new spine.TextureAtlas(atlasData, function (path) {
@@ -2186,8 +2186,8 @@ var spine;
 						}
 					}, function (imagePath, errorMessage) {
 						pageLoadError = true;
-						pagesLoaded++;
-						if (pagesLoaded == atlasPages.length) {
+						pagesLoaded.count++;
+						if (pagesLoaded.count == atlasPages.length) {
 							_this.errors[path] = "Couldn't load texture atlas page " + imagePath + "} of atlas " + path;
 							if (error)
 								error(path, "Couldn't load texture atlas page " + imagePath + " of atlas " + path);

@@ -257,6 +257,7 @@
  * Fixed renderer to work with 3.6 changes. Two color tinting is not supported.
  * Added clipping support
  * Added `VertexEffect` interface, instances of which can be set on `SkeletonMesh`. Allows to modify vertices before submitting them to GPU. See `SwirlEffect`, `JitterEffect`.
+ * Added support for multi-page atlases
 
 ### Widget backend
  * Fixed WebGL context loss (see WebGL backend changes). Enabled automatically.

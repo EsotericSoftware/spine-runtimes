@@ -2131,6 +2131,7 @@ var spine;
 			path = this.pathPrefix + path;
 			this.toLoad++;
 			AssetManager.downloadText(path, function (atlasData) {
+				var pagesLoaded = { count: 0 };
 				var atlasPages = new Array();
 				try {
 					var atlas = new spine.TextureAtlas(atlasData, function (path) {
@@ -2151,11 +2152,10 @@ var spine;
 					return;
 				}
 				var _loop_1 = function (atlasPage) {
-					var pagesLoaded = 0;
 					var pageLoadError = false;
 					_this.loadTexture(atlasPage, function (imagePath, image) {
-						pagesLoaded++;
-						if (pagesLoaded == atlasPages.length) {
+						pagesLoaded.count++;
+						if (pagesLoaded.count == atlasPages.length) {
 							if (!pageLoadError) {
 								try {
 									var atlas = new spine.TextureAtlas(atlasData, function (path) {
@@ -2186,8 +2186,8 @@ var spine;
 						}
 					}, function (imagePath, errorMessage) {
 						pageLoadError = true;
-						pagesLoaded++;
-						if (pagesLoaded == atlasPages.length) {
+						pagesLoaded.count++;
+						if (pagesLoaded.count == atlasPages.length) {
 							_this.errors[path] = "Couldn't load texture atlas page " + imagePath + "} of atlas " + path;
 							if (error)
 								error(path, "Couldn't load texture atlas page " + imagePath + " of atlas " + path);
@@ -6734,18 +6734,19 @@ var spine;
 (function (spine) {
 	var threejs;
 	(function (threejs) {
-		var MeshBatcher = (function () {
-			function MeshBatcher(mesh, maxVertices) {
+		var MeshBatcher = (function (_super) {
+			__extends(MeshBatcher, _super);
+			function MeshBatcher(maxVertices) {
 				if (maxVertices === void 0) { maxVertices = 10920; }
-				this.verticesLength = 0;
-				this.indicesLength = 0;
+				var _this = _super.call(this) || this;
+				_this.verticesLength = 0;
+				_this.indicesLength = 0;
 				if (maxVertices > 10920)
 					throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
-				var vertices = this.vertices = new Float32Array(maxVertices * MeshBatcher.VERTEX_SIZE);
-				var indices = this.indices = new Uint16Array(maxVertices * 3);
-				this.mesh = mesh;
+				var vertices = _this.vertices = new Float32Array(maxVertices * MeshBatcher.VERTEX_SIZE);
+				var indices = _this.indices = new Uint16Array(maxVertices * 3);
 				var geo = new THREE.BufferGeometry();
-				var vertexBuffer = this.vertexBuffer = new THREE.InterleavedBuffer(vertices, MeshBatcher.VERTEX_SIZE);
+				var vertexBuffer = _this.vertexBuffer = new THREE.InterleavedBuffer(vertices, MeshBatcher.VERTEX_SIZE);
 				vertexBuffer.dynamic = true;
 				geo.addAttribute("position", new THREE.InterleavedBufferAttribute(vertexBuffer, 3, 0, false));
 				geo.addAttribute("color", new THREE.InterleavedBufferAttribute(vertexBuffer, 4, 3, false));
@@ -6754,11 +6755,26 @@ var spine;
 				geo.getIndex().dynamic = true;
 				geo.drawRange.start = 0;
 				geo.drawRange.count = 0;
-				mesh.geometry = geo;
+				_this.geometry = geo;
+				_this.material = new threejs.SkeletonMeshMaterial();
+				return _this;
 			}
+			MeshBatcher.prototype.clear = function () {
+				var geo = this.geometry;
+				geo.drawRange.start = 0;
+				geo.drawRange.count = 0;
+				this.material.uniforms.map.value = null;
+			};
 			MeshBatcher.prototype.begin = function () {
 				this.verticesLength = 0;
 				this.indicesLength = 0;
+			};
+			MeshBatcher.prototype.canBatch = function (verticesLength, indicesLength) {
+				if (this.indicesLength + indicesLength >= this.indices.byteLength / 2)
+					return false;
+				if (this.verticesLength + verticesLength >= this.vertices.byteLength / 2)
+					return false;
+				return true;
 			};
 			MeshBatcher.prototype.batch = function (vertices, verticesLength, indices, indicesLength, z) {
 				if (z === void 0) { z = 0; }
@@ -6787,7 +6803,7 @@ var spine;
 				this.vertexBuffer.needsUpdate = true;
 				this.vertexBuffer.updateRange.offset = 0;
 				this.vertexBuffer.updateRange.count = this.verticesLength;
-				var geo = this.mesh.geometry;
+				var geo = this.geometry;
 				geo.getIndex().needsUpdate = true;
 				geo.getIndex().updateRange.offset = 0;
 				geo.getIndex().updateRange.count = this.indicesLength;
@@ -6795,7 +6811,7 @@ var spine;
 				geo.drawRange.count = this.indicesLength;
 			};
 			return MeshBatcher;
-		}());
+		}(THREE.Mesh));
 		MeshBatcher.VERTEX_SIZE = 9;
 		threejs.MeshBatcher = MeshBatcher;
 	})(threejs = spine.threejs || (spine.threejs = {}));
@@ -6804,6 +6820,29 @@ var spine;
 (function (spine) {
 	var threejs;
 	(function (threejs) {
+		var SkeletonMeshMaterial = (function (_super) {
+			__extends(SkeletonMeshMaterial, _super);
+			function SkeletonMeshMaterial() {
+				var _this = this;
+				var vertexShader = "\n\t\t\t\tattribute vec4 color;\n\t\t\t\tvarying vec2 vUv;\n\t\t\t\tvarying vec4 vColor;\n\t\t\t\tvoid main() {\n\t\t\t\t\tvUv = uv;\n\t\t\t\t\tvColor = color;\n\t\t\t\t\tgl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);\n\t\t\t\t}\n\t\t\t";
+				var fragmentShader = "\n\t\t\t\tuniform sampler2D map;\n\t\t\t\tvarying vec2 vUv;\n\t\t\t\tvarying vec4 vColor;\n\t\t\t\tvoid main(void) {\n\t\t\t\t\tgl_FragColor = texture2D(map, vUv)*vColor;\n\t\t\t\t}\n\t\t\t";
+				var parameters = {
+					uniforms: {
+						map: { type: "t", value: null }
+					},
+					vertexShader: vertexShader,
+					fragmentShader: fragmentShader,
+					side: THREE.DoubleSide,
+					transparent: true,
+					alphaTest: 0.5
+				};
+				_this = _super.call(this, parameters) || this;
+				return _this;
+			}
+			;
+			return SkeletonMeshMaterial;
+		}(THREE.ShaderMaterial));
+		threejs.SkeletonMeshMaterial = SkeletonMeshMaterial;
 		var SkeletonMesh = (function (_super) {
 			__extends(SkeletonMesh, _super);
 			function SkeletonMesh(skeletonData) {
@@ -6813,17 +6852,14 @@ var spine;
 				_this.tempLight = new spine.Color();
 				_this.tempDark = new spine.Color();
 				_this.zOffset = 0.1;
+				_this.batches = new Array();
+				_this.nextBatchIndex = 0;
 				_this.clipper = new spine.SkeletonClipping();
 				_this.vertices = spine.Utils.newFloatArray(1024);
 				_this.tempColor = new spine.Color();
 				_this.skeleton = new spine.Skeleton(skeletonData);
 				var animData = new spine.AnimationStateData(skeletonData);
 				_this.state = new spine.AnimationState(animData);
-				var material = _this.material = new THREE.MeshBasicMaterial();
-				material.side = THREE.DoubleSide;
-				material.transparent = true;
-				material.alphaTest = 0.5;
-				_this.batcher = new threejs.MeshBatcher(_this);
 				return _this;
 			}
 			SkeletonMesh.prototype.update = function (deltaTime) {
@@ -6834,12 +6870,29 @@ var spine;
 				skeleton.updateWorldTransform();
 				this.updateGeometry();
 			};
+			SkeletonMesh.prototype.clearBatches = function () {
+				for (var i = 0; i < this.batches.length; i++) {
+					this.batches[i].clear();
+					this.batches[i].visible = false;
+				}
+				this.nextBatchIndex = 0;
+			};
+			SkeletonMesh.prototype.nextBatch = function () {
+				if (this.batches.length == this.nextBatchIndex) {
+					var batch_1 = new threejs.MeshBatcher();
+					this.add(batch_1);
+					this.batches.push(batch_1);
+				}
+				var batch = this.batches[this.nextBatchIndex++];
+				batch.visible = true;
+				return batch;
+			};
 			SkeletonMesh.prototype.updateGeometry = function () {
+				this.clearBatches();
 				var tempPos = this.tempPos;
 				var tempUv = this.tempUv;
 				var tempLight = this.tempLight;
 				var tempDark = this.tempDark;
-				var geometry = this.geometry;
 				var numVertices = 0;
 				var verticesLength = 0;
 				var indicesLength = 0;
@@ -6849,8 +6902,8 @@ var spine;
 				var triangles = null;
 				var uvs = null;
 				var drawOrder = this.skeleton.drawOrder;
-				var batcher = this.batcher;
-				batcher.begin();
+				var batch = this.nextBatch();
+				batch.begin();
 				var z = 0;
 				var zOffset = this.zOffset;
 				for (var i = 0, n = drawOrder.length; i < n; i++) {
@@ -6891,17 +6944,16 @@ var spine;
 					else
 						continue;
 					if (texture != null) {
-						if (!this.material.map) {
-							var mat = this.material;
-							mat.map = texture.texture;
-							mat.needsUpdate = true;
-						}
 						var skeleton = slot.bone.skeleton;
 						var skeletonColor = skeleton.color;
 						var slotColor = slot.color;
 						var alpha = skeletonColor.a * slotColor.a * attachmentColor.a;
 						var color = this.tempColor;
 						color.set(skeletonColor.r * slotColor.r * attachmentColor.r, skeletonColor.g * slotColor.g * attachmentColor.g, skeletonColor.b * slotColor.b * attachmentColor.b, alpha);
+						var finalVertices = void 0;
+						var finalVerticesLength = void 0;
+						var finalIndices = void 0;
+						var finalIndicesLength = void 0;
 						if (clipper.isClipping()) {
 							clipper.clipTriangles(vertices, numFloats, triangles, triangles.length, uvs, color, null, false);
 							var clippedVertices = clipper.clippedVertices;
@@ -6927,7 +6979,10 @@ var spine;
 									verts[v + 7] = tempUv.y;
 								}
 							}
-							batcher.batch(clippedVertices, clippedVertices.length, clippedTriangles, clippedTriangles.length, z);
+							finalVertices = clippedVertices;
+							finalVerticesLength = clippedVertices.length;
+							finalIndices = clippedTriangles;
+							finalIndicesLength = clippedTriangles.length;
 						}
 						else {
 							var verts = vertices;
@@ -6961,15 +7016,40 @@ var spine;
 									verts[v + 5] = uvs[u + 1];
 								}
 							}
-							batcher.batch(vertices, numFloats, triangles, triangles.length, z);
+							finalVertices = vertices;
+							finalVerticesLength = numFloats;
+							finalIndices = triangles;
+							finalIndicesLength = triangles.length;
 						}
+						if (finalVerticesLength == 0 || finalIndicesLength == 0)
+							continue;
+						if (!batch.canBatch(finalVerticesLength, finalIndicesLength)) {
+							batch.end();
+							batch = this.nextBatch();
+							batch.begin();
+						}
+						var batchMaterial = batch.material;
+						if (batchMaterial.uniforms.map.value == null) {
+							batchMaterial.uniforms.map.value = texture.texture;
+						}
+						if (batchMaterial.uniforms.map.value != texture.texture) {
+							batch.end();
+							batch = this.nextBatch();
+							batch.begin();
+							batchMaterial = batch.material;
+							batchMaterial.uniforms.map.value = texture.texture;
+						}
+						batchMaterial.needsUpdate = true;
+						batch.batch(finalVertices, finalVerticesLength, finalIndices, finalIndicesLength, z);
 						z += zOffset;
 					}
+					clipper.clipEndWithSlot(slot);
 				}
-				batcher.end();
+				clipper.clipEnd();
+				batch.end();
 			};
 			return SkeletonMesh;
-		}(THREE.Mesh));
+		}(THREE.Object3D));
 		SkeletonMesh.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 		SkeletonMesh.VERTEX_SIZE = 2 + 2 + 4;
 		threejs.SkeletonMesh = SkeletonMesh;
