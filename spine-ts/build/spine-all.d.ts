@@ -1701,22 +1701,26 @@ declare module spine.threejs {
 	}
 }
 declare module spine.threejs {
-	class MeshBatcher {
-		mesh: THREE.Mesh;
+	class MeshBatcher extends THREE.Mesh {
 		private static VERTEX_SIZE;
 		private vertexBuffer;
 		private vertices;
 		private verticesLength;
 		private indices;
 		private indicesLength;
-		constructor(mesh: THREE.Mesh, maxVertices?: number);
+		constructor(maxVertices?: number);
+		clear(): void;
 		begin(): void;
+		canBatch(verticesLength: number, indicesLength: number): boolean;
 		batch(vertices: ArrayLike<number>, verticesLength: number, indices: ArrayLike<number>, indicesLength: number, z?: number): void;
 		end(): void;
 	}
 }
 declare module spine.threejs {
-	class SkeletonMesh extends THREE.Mesh {
+	class SkeletonMeshMaterial extends THREE.ShaderMaterial {
+		constructor();
+	}
+	class SkeletonMesh extends THREE.Object3D {
 		tempPos: Vector2;
 		tempUv: Vector2;
 		tempLight: Color;
@@ -1725,7 +1729,8 @@ declare module spine.threejs {
 		state: AnimationState;
 		zOffset: number;
 		vertexEffect: VertexEffect;
-		private batcher;
+		private batches;
+		private nextBatchIndex;
 		private clipper;
 		static QUAD_TRIANGLES: number[];
 		static VERTEX_SIZE: number;
@@ -1733,6 +1738,8 @@ declare module spine.threejs {
 		private tempColor;
 		constructor(skeletonData: SkeletonData);
 		update(deltaTime: number): void;
+		private clearBatches();
+		private nextBatch();
 		private updateGeometry();
 	}
 }

@@ -29,7 +29,42 @@
  *****************************************************************************/
 
 module spine.threejs {
-	export class SkeletonMesh extends THREE.Mesh {
+	export class SkeletonMeshMaterial extends THREE.ShaderMaterial {
+		constructor () {
+			let vertexShader = `
+				attribute vec4 color;
+				varying vec2 vUv;
+				varying vec4 vColor;
+				void main() {
+					vUv = uv;
+					vColor = color;
+					gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);
+				}
+			`;
+			let fragmentShader = `
+				uniform sampler2D map;
+				varying vec2 vUv;
+				varying vec4 vColor;
+				void main(void) {
+					gl_FragColor = texture2D(map, vUv)*vColor;
+				}
+			`;
+
+			let parameters: THREE.ShaderMaterialParameters = {
+				uniforms: {
+					map: { type: "t", value: null }
+				},
+				vertexShader: vertexShader,
+				fragmentShader: fragmentShader,
+				side: THREE.DoubleSide,
+				transparent: true,
+				alphaTest: 0.5
+			};
+			super(parameters);
+		};
+	}
+
+	export class SkeletonMesh extends THREE.Object3D {
 		tempPos: Vector2 = new Vector2();
 		tempUv: Vector2 = new Vector2();
 		tempLight = new Color();
@@ -39,7 +74,8 @@ module spine.threejs {
 		zOffset: number = 0.1;
 		vertexEffect: VertexEffect;
 
-		private batcher: MeshBatcher;
+		private batches = new Array<MeshBatcher>();
+		private nextBatchIndex = 0;
 		private clipper: SkeletonClipping = new SkeletonClipping();
 
 		static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
@@ -54,12 +90,6 @@ module spine.threejs {
 			this.skeleton = new Skeleton(skeletonData);
 			let animData = new AnimationStateData(skeletonData);
 			this.state = new AnimationState(animData);
-
-			let material = this.material = new THREE.MeshBasicMaterial();
-			material.side = THREE.DoubleSide;
-			material.transparent = true;
-			material.alphaTest = 0.5;
-			this.batcher = new MeshBatcher(this);
 		}
 
 		update(deltaTime: number) {
@@ -73,13 +103,33 @@ module spine.threejs {
 			this.updateGeometry();
 		}
 
+		private clearBatches () {
+			for (var i = 0; i < this.batches.length; i++) {
+				this.batches[i].clear();
+				this.batches[i].visible = false;
+			}
+			this.nextBatchIndex = 0;
+		}
+
+		private nextBatch () {
+			if (this.batches.length == this.nextBatchIndex) {
+				let batch = new MeshBatcher();
+				this.add(batch);
+				this.batches.push(batch);
+			}
+			let batch = this.batches[this.nextBatchIndex++];
+			batch.visible = true;
+			return batch;
+		}
+
 		private updateGeometry() {
+			this.clearBatches();
+
 			let tempPos = this.tempPos;
 			let tempUv = this.tempUv;
 			let tempLight = this.tempLight;
 			let tempDark = this.tempDark;
 
-			let geometry = <THREE.BufferGeometry>this.geometry;
 			var numVertices = 0;
 			var verticesLength = 0;
 			var indicesLength = 0;
@@ -91,8 +141,8 @@ module spine.threejs {
 			let triangles: Array<number> = null;
 			let uvs: ArrayLike<number> = null;
 			let drawOrder = this.skeleton.drawOrder;
-			let batcher = this.batcher;
-			batcher.begin();
+			let batch = this.nextBatch();
+			batch.begin();
 			let z = 0;
 			let zOffset = this.zOffset;
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
@@ -130,12 +180,6 @@ module spine.threejs {
 				} else continue;
 
 				if (texture != null) {
-					if (!(<THREE.MeshBasicMaterial>this.material).map) {
-						let mat = <THREE.MeshBasicMaterial>this.material;
-						mat.map = texture.texture;
-						mat.needsUpdate = true;
-					}
-
 					let skeleton = slot.bone.skeleton;
 					let skeletonColor = skeleton.color;
 					let slotColor = slot.color;
@@ -145,12 +189,11 @@ module spine.threejs {
 							skeletonColor.g * slotColor.g * attachmentColor.g,
 							skeletonColor.b * slotColor.b * attachmentColor.b,
 							alpha);
-					// FIXME per slot blending would require multiple material support
-					//let slotBlendMode = slot.data.blendMode;
-					//if (slotBlendMode != blendMode) {
-					//	blendMode = slotBlendMode;
-					//	batcher.setBlendMode(getSourceGLBlendMode(this._gl, blendMode, premultipliedAlpha), getDestGLBlendMode(this._gl, blendMode));
-					//}
+
+					let finalVertices: ArrayLike<number>;
+					let finalVerticesLength: number;
+					let finalIndices: ArrayLike<number>;
+					let finalIndicesLength: number;
 
 					if (clipper.isClipping()) {
 						clipper.clipTriangles(vertices, numFloats, triangles, triangles.length, uvs, color, null, false);
@@ -177,7 +220,10 @@ module spine.threejs {
 								verts[v + 7] = tempUv.y;
 							}
 						}
-						batcher.batch(clippedVertices, clippedVertices.length, clippedTriangles, clippedTriangles.length, z);
+						finalVertices = clippedVertices;
+						finalVerticesLength = clippedVertices.length;
+						finalIndices = clippedTriangles;
+						finalIndicesLength = clippedTriangles.length;
 					} else {
 						let verts = vertices;
 						if (this.vertexEffect != null) {
@@ -209,13 +255,50 @@ module spine.threejs {
 								verts[v + 5] = uvs[u + 1];
 							}
 						}
-						batcher.batch(vertices, numFloats, triangles, triangles.length, z);
+						finalVertices = vertices;
+						finalVerticesLength = numFloats;
+						finalIndices = triangles;
+						finalIndicesLength = triangles.length;
 					}
+
+					if (finalVerticesLength == 0 || finalIndicesLength == 0)
+						continue;
+
+					// Start new batch if this one can't hold vertices/indices
+					if (!batch.canBatch(finalVerticesLength, finalIndicesLength)) {
+						batch.end();
+						batch = this.nextBatch();
+						batch.begin();
+					}
+
+					// FIXME per slot blending would require multiple material support
+					//let slotBlendMode = slot.data.blendMode;
+					//if (slotBlendMode != blendMode) {
+					//	blendMode = slotBlendMode;
+					//	batcher.setBlendMode(getSourceGLBlendMode(this._gl, blendMode, premultipliedAlpha), getDestGLBlendMode(this._gl, blendMode));
+					//}
+
+					let batchMaterial = <SkeletonMeshMaterial>batch.material;
+					if (batchMaterial.uniforms.map.value == null) {
+						batchMaterial.uniforms.map.value = texture.texture;
+					}
+					if (batchMaterial.uniforms.map.value != texture.texture) {
+						batch.end();
+						batch = this.nextBatch();
+						batch.begin();
+						batchMaterial = <SkeletonMeshMaterial>batch.material;
+						batchMaterial.uniforms.map.value = texture.texture;
+					}
+					batchMaterial.needsUpdate = true;
+
+					batch.batch(finalVertices, finalVerticesLength, finalIndices, finalIndicesLength, z);
 					z += zOffset;
 				}
-			}
 
-			batcher.end();
+				clipper.clipEndWithSlot(slot);
+			}
+			clipper.clipEnd();
+			batch.end();
 		}
 	}
 }

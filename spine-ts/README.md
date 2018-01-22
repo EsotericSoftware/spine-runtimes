@@ -20,11 +20,11 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 spine-ts works with data exported from Spine 3.6.xx.
 
-spine-ts WebGL & Widget backends supports all Spine features. 
+spine-ts WebGL & Widget backends supports all Spine features.
 
-spine-ts Canvas does not support color tinting, mesh attachments and clipping. Only the alpha channel from tint colors is applied. Experimental support for mesh attachments can be enabled by setting `spine.canvas.SkeletonRenderer.useTriangleRendering` to true. Note that this method is slow and may lead to artifacts on some browsers. 
+spine-ts Canvas does not support color tinting, mesh attachments and clipping. Only the alpha channel from tint colors is applied. Experimental support for mesh attachments can be enabled by setting `spine.canvas.SkeletonRenderer.useTriangleRendering` to true. Note that this method is slow and may lead to artifacts on some browsers.
 
-spine-ts THREE.JS does not support color tinting, blend modes and clipping. The THREE.JS backend provides `SkeletonMesh.zOffset` to avoid z-fighting. Adjust to your near/far plane settings.
+spine-ts THREE.JS does not support two color tinting & blend modes. The THREE.JS backend provides `SkeletonMesh.zOffset` to avoid z-fighting. Adjust to your near/far plane settings.
 
 spine-ts does not yet support loading the binary format.
 
@@ -115,7 +115,7 @@ You can disable two-color tinting like this:
 // If you use SceneRenderer, disable two-color tinting via the last constructor argument
 var sceneRenderer = new spine.SceneRenderer(canvas, gl, false);
 
-// If you use SkeletonRenderer and PolygonBatcher directly, 
+// If you use SkeletonRenderer and PolygonBatcher directly,
 // disable two-color tinting in the respective constructor
 // and use the shader returned by Shader.newColoredTextured()
 // instead of Shader.newTwoColoredTextured()

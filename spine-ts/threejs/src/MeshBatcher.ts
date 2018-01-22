@@ -29,9 +29,7 @@
  *****************************************************************************/
 
 module spine.threejs {
-	export class MeshBatcher {
-		mesh: THREE.Mesh;
-
+	export class MeshBatcher extends THREE.Mesh {
 		private static VERTEX_SIZE = 9;
 		private vertexBuffer: THREE.InterleavedBuffer;
 		private vertices: Float32Array;
@@ -39,12 +37,11 @@ module spine.threejs {
 		private indices: Uint16Array;
 		private indicesLength = 0;
 
-		constructor (mesh: THREE.Mesh, maxVertices: number = 10920) {
+		constructor (maxVertices: number = 10920) {
+			super();
 			if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
-
 			let vertices = this.vertices = new Float32Array(maxVertices * MeshBatcher.VERTEX_SIZE);
 			let indices = this.indices = new Uint16Array(maxVertices * 3);
-			this.mesh = mesh;
 			let geo = new THREE.BufferGeometry();
 			let vertexBuffer = this.vertexBuffer = new THREE.InterleavedBuffer(vertices, MeshBatcher.VERTEX_SIZE);
 			vertexBuffer.dynamic = true;
@@ -55,12 +52,26 @@ module spine.threejs {
 			geo.getIndex().dynamic = true;
 			geo.drawRange.start = 0;
 			geo.drawRange.count = 0;
-			mesh.geometry = geo;
+			this.geometry = geo;
+			this.material = new SkeletonMeshMaterial();
+		}
+
+		clear () {
+			let geo = (<THREE.BufferGeometry>this.geometry);
+			geo.drawRange.start = 0;
+			geo.drawRange.count = 0;
+			(<SkeletonMeshMaterial>this.material).uniforms.map.value = null;
 		}
 
 		begin () {
 			this.verticesLength = 0;
 			this.indicesLength = 0;
+		}
+
+		canBatch(verticesLength: number, indicesLength: number) {
+			if (this.indicesLength + indicesLength >= this.indices.byteLength / 2) return false;
+			if (this.verticesLength + verticesLength >= this.vertices.byteLength / 2) return false;
+			return true;
 		}
 
 		batch (vertices: ArrayLike<number>, verticesLength: number, indices: ArrayLike<number>, indicesLength: number, z: number = 0) {
@@ -91,7 +102,7 @@ module spine.threejs {
 			this.vertexBuffer.needsUpdate = true;
 			this.vertexBuffer.updateRange.offset = 0;
 			this.vertexBuffer.updateRange.count = this.verticesLength;
-			let geo = (<THREE.BufferGeometry>this.mesh.geometry);
+			let geo = (<THREE.BufferGeometry>this.geometry);
 			geo.getIndex().needsUpdate = true;
 			geo.getIndex().updateRange.offset = 0;
 			geo.getIndex().updateRange.count = this.indicesLength;

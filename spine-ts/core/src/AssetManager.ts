@@ -147,6 +147,7 @@ module spine {
 			this.toLoad++;
 
 			AssetManager.downloadText(path, (atlasData: string): void => {
+				var pagesLoaded: any = { count: 0 };
 				var atlasPages = new Array<string>();
 				try {
 					let atlas = new spine.TextureAtlas(atlasData, (path: string) => {
@@ -166,12 +167,11 @@ module spine {
 				}
 
 				for (let atlasPage of atlasPages) {
-					let pagesLoaded = 0;
 					let pageLoadError = false;
 					this.loadTexture(atlasPage, (imagePath: string, image: HTMLImageElement) => {
-						pagesLoaded++;
+						pagesLoaded.count++;
 
-						if (pagesLoaded == atlasPages.length) {
+						if (pagesLoaded.count == atlasPages.length) {
 							if (!pageLoadError) {
 								try {
 									let atlas = new spine.TextureAtlas(atlasData, (path: string) => {
@@ -197,9 +197,9 @@ module spine {
 						}
 					}, (imagePath: string, errorMessage: string) => {
 						pageLoadError = true;
-						pagesLoaded++;
+						pagesLoaded.count++;
 
-						if (pagesLoaded == atlasPages.length) {
+						if (pagesLoaded.count == atlasPages.length) {
 							this.errors[path] = `Couldn't load texture atlas page ${imagePath}} of atlas ${path}`;
 							if (error) error(path, `Couldn't load texture atlas page ${imagePath} of atlas ${path}`);
 							this.toLoad--;
