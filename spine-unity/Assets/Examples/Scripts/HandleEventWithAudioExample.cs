@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
  * Spine Runtimes Software License v2.5
  *
  * Copyright (c) 2013-2016, Esoteric Software
@@ -28,45 +28,53 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
 using System.Collections;
-using Spine.Unity;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Spine.Unity.Examples {
-	public class Raptor : MonoBehaviour {
+	public class HandleEventWithAudioExample : MonoBehaviour {
 
-		#region Inspector
-		[SpineAnimation]
-		public string walk = "walk";
+		public SkeletonAnimation skeletonAnimation;
+		[SpineEvent(dataField: "skeletonAnimation", fallbackToTextField: true)]
+		public string eventName;
 
-		[SpineAnimation]
-		public string gungrab = "gungrab";
+		[Space]
+		public AudioSource audioSource;
+		public AudioClip audioClip;
+		public float basePitch = 1f;
+		public float randomPitchOffset = 0.1f;
 
-		[SpineAnimation]
-		public string gunkeep = "gunkeep";
-		#endregion
+		[Space]
+		public bool logDebugMessage = false;
 
-		SkeletonAnimation skeletonAnimation;
+		Spine.EventData eventData;
+
+		void OnValidate () {
+			if (skeletonAnimation == null) GetComponent<SkeletonAnimation>();
+			if (audioSource == null) GetComponent<AudioSource>();
+		}
 
 		void Start () {
-			skeletonAnimation = GetComponent<SkeletonAnimation>();
-			StartCoroutine(GunGrabRoutine());
+			if (audioSource == null) return;
+			if (skeletonAnimation == null) return;
+			skeletonAnimation.Initialize(false);
+			if (!skeletonAnimation.valid) return;
+
+			eventData = skeletonAnimation.Skeleton.Data.FindEvent(eventName);
+			skeletonAnimation.AnimationState.Event += HandleAnimationStateEvent;
 		}
 
-		IEnumerator GunGrabRoutine () {		
-			// Play the walk animation on track 0.
-			skeletonAnimation.AnimationState.SetAnimation(0, walk, true);
-
-			// Repeatedly play the gungrab and gunkeep animation on track 1.
-			while (true) {
-				yield return new WaitForSeconds(Random.Range(0.5f, 3f));
-				skeletonAnimation.AnimationState.SetAnimation(1, gungrab, false);
-
-				yield return new WaitForSeconds(Random.Range(0.5f, 3f));
-				skeletonAnimation.AnimationState.SetAnimation(1, gunkeep, false);
+		private void HandleAnimationStateEvent (TrackEntry trackEntry, Event e) {
+			if (logDebugMessage) Debug.Log("Event fired! " + e.Data.Name);
+			//bool eventMatch = string.Equals(e.Data.Name, eventName, System.StringComparison.Ordinal); // Testing recommendation: String compare.
+			bool eventMatch = (eventData == e.Data); // Performance recommendation: Match cached reference instead of string.
+			if (eventMatch) {
+				audioSource.pitch = basePitch + Random.Range(-randomPitchOffset, randomPitchOffset);
+				audioSource.clip = audioClip;
+				audioSource.Play();
 			}
-
 		}
-
 	}
+
 }
