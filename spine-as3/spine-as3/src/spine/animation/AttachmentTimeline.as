@@ -57,17 +57,17 @@ package spine.animation {
 			attachmentNames[frameIndex] = attachmentName;
 		}
 
-		public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
+		public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			var attachmentName : String;
 			var slot : Slot = skeleton.slots[slotIndex];
-			if (direction == MixDirection.Out && pose == MixPose.setup) {
+			if (direction == MixDirection.Out && blend == MixBlend.setup) {
 				attachmentName = slot.data.attachmentName;
 				slot.attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName);
 				return;
 			}
 			var frames : Vector.<Number> = this.frames;
 			if (time < frames[0]) {
-				if (pose == MixPose.setup) {
+				if (blend == MixBlend.setup || blend == MixBlend.first) {
 					attachmentName = slot.data.attachmentName;
 					slot.attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName);
 				}

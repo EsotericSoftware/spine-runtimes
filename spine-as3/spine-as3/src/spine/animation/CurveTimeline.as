@@ -45,7 +45,7 @@ package spine.animation {
 			curves = new Vector.<Number>((frameCount - 1) * BEZIER_SIZE, true);
 		}
 
-		public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
+		public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 		}
 
 		public function getPropertyId() : int {

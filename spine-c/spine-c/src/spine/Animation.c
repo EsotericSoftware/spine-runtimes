@@ -489,8 +489,10 @@ void _spScaleTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 					break;
 				case SP_MIX_BLEND_FIRST:
 				case SP_MIX_BLEND_REPLACE:
-					bone->scaleX += (x - bone->scaleX * SIGNUM(x)) * alpha;
-					bone->scaleY += (y - bone->scaleY * SIGNUM(y)) * alpha;
+					bx = ABS(bone->scaleX) * SIGNUM(x);
+					by = ABS(bone->scaleY) * SIGNUM(y);
+					bone->scaleX = bx + (x - bx) * alpha;
+					bone->scaleY = by + (y - by) * alpha;
 					break;
 				case SP_MIX_BLEND_ADD:
 					bx = SIGNUM(x);

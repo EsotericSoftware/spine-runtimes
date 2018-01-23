@@ -57,15 +57,15 @@ package spine.animation {
 			frames[int(frameIndex + BEND_DIRECTION)] = bendDirection;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
+		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			var constraint : IkConstraint = skeleton.ikConstraints[ikConstraintIndex];
 			if (time < frames[0]) {
-				switch (pose) {
-				case MixPose.setup:
+				switch (blend) {
+				case MixBlend.setup:
 					constraint.mix = constraint.data.mix;
 					constraint.bendDirection = constraint.data.bendDirection;
 					return;
-				case MixPose.current:
+				case MixBlend.first:
 					constraint.mix += (constraint.data.mix - constraint.mix) * alpha;
 					constraint.bendDirection = constraint.data.bendDirection;
 				}
@@ -73,7 +73,7 @@ package spine.animation {
 			}
 
 			if (time >= frames[int(frames.length - ENTRIES)]) { // Time is after last frame.
-				if (pose == MixPose.setup) {
+				if (blend == MixBlend.setup) {
 					constraint.mix = constraint.data.mix + (frames[frames.length + PREV_MIX] - constraint.data.mix) * alpha;
 					constraint.bendDirection = direction == MixDirection.Out ? constraint.data.bendDirection : int(frames[frames.length + PREV_BEND_DIRECTION]);
 				} else {
@@ -89,7 +89,7 @@ package spine.animation {
 			var frameTime : Number = frames[frame];
 			var percent : Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-			if (pose == MixPose.setup) {
+			if (blend == MixBlend.setup) {
 				constraint.mix = constraint.data.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.data.mix) * alpha;
 				constraint.bendDirection = direction == MixDirection.Out ? constraint.data.bendDirection : int(frames[frame + PREV_BEND_DIRECTION]);
 			} else {
