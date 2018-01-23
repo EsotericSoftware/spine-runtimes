@@ -885,6 +885,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		/* Skip images path & fps */
 		readFloat(input);
 		FREE(readString(input));
+		FREE(readString(input));
 	}
 
 	/* Bones. */
@@ -1072,6 +1073,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		eventData->intValue = readVarint(input, 0);
 		eventData->floatValue = readFloat(input);
 		eventData->stringValue = readString(input);
+		eventData->audioPath = readString(input);
 		skeletonData->events[i] = eventData;
 	}
 

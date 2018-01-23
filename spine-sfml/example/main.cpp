@@ -124,7 +124,7 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 	Skeleton_setToSetupPose(skeleton);
 
 	skeleton->x = 320;
-	skeleton->y = 460;
+	skeleton->y = 590;
 	Skeleton_updateWorldTransform(skeleton);
 
 	Slot* headSlot = Skeleton_findSlot(skeleton, "head");
@@ -134,7 +134,7 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 	AnimationState_addAnimationByName(drawable->state, 0, "jump", false, 3);
 	AnimationState_addAnimationByName(drawable->state, 0, "run", true, 0);
 
-	sf::RenderWindow window(sf::VideoMode(640, 480), "Spine SFML - spineboy");
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - spineboy");
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
