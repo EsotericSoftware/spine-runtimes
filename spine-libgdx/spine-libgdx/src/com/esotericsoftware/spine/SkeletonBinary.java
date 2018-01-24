@@ -182,8 +182,12 @@ public class SkeletonBinary {
 
 			if (nonessential) {
 				skeletonData.fps = input.readFloat();
+
 				skeletonData.imagesPath = input.readString();
 				if (skeletonData.imagesPath.isEmpty()) skeletonData.imagesPath = null;
+
+				skeletonData.audioPath = input.readString();
+				if (skeletonData.audioPath.isEmpty()) skeletonData.audioPath = null;
 			}
 
 			// Bones.
@@ -302,6 +306,7 @@ public class SkeletonBinary {
 				data.intValue = input.readInt(false);
 				data.floatValue = input.readFloat();
 				data.stringValue = input.readString();
+				data.audioPath = input.readString(); 
 				skeletonData.events.add(data);
 			}
 

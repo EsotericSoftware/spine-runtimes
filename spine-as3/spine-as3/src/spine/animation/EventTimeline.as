@@ -56,11 +56,11 @@ package spine.animation {
 		}
 
 		/** Fires events for frames > lastTime and <= time. */
-		public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
+		public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			if (!firedEvents) return;
 
 			if (lastTime > time) { // Fire events after last time for looped animations.
-				apply(skeleton, lastTime, int.MAX_VALUE, firedEvents, alpha, pose, direction);
+				apply(skeleton, lastTime, int.MAX_VALUE, firedEvents, alpha, blend, direction);
 				lastTime = -1;
 			} else if (lastTime >= frames[int(frameCount - 1)]) // Last time is after last frame.
 				return;

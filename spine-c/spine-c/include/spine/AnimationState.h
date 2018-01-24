@@ -63,6 +63,7 @@ struct spTrackEntry {
 	float animationStart, animationEnd, animationLast, nextAnimationLast;
 	float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
 	float alpha, mixTime, mixDuration, interruptAlpha, totalAlpha;
+	spMixBlend mixBlend;
 	spIntArray* timelineData;
 	spTrackEntryArray* timelineDipMix;
 	float* timelinesRotation;
@@ -81,6 +82,7 @@ struct spTrackEntry {
 		animationStart(0), animationEnd(0), animationLast(0), nextAnimationLast(0),
 		delay(0), trackTime(0), trackLast(0), nextTrackLast(0), trackEnd(0), timeScale(0),
 		alpha(0), mixTime(0), mixDuration(0), interruptAlpha(0), totalAlpha(0),
+		mixBlend(SP_MIX_BLEND_REPLACE),
 		timelineData(0),
 		timelineDipMix(0),
 		timelinesRotation(0),

@@ -28,6 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#define SPINE_SHORT_NAMES
 #include <spine/spine-sfml.h>
 
 #ifndef SPINE_MESH_VERTEX_COUNT_MAX

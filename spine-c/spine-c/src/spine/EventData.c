@@ -38,6 +38,7 @@ spEventData* spEventData_create (const char* name) {
 }
 
 void spEventData_dispose (spEventData* self) {
+	FREE(self->audioPath);
 	FREE(self->stringValue);
 	FREE(self->name);
 	FREE(self);

@@ -83,6 +83,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.esotericsoftware.spine.Animation.MixBlend;
 import com.esotericsoftware.spine.AnimationState.AnimationStateAdapter;
 import com.esotericsoftware.spine.AnimationState.TrackEntry;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
@@ -264,6 +265,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 		} else {
 			entry = state.setAnimation(track, ui.animationList.getSelected(), ui.loopCheckbox.isChecked());
 		}
+		entry.setMixBlend(ui.addCheckbox.isChecked() ? MixBlend.add : MixBlend.replace);
 		entry.setAlpha(ui.alphaSlider.getValue());
 	}
 
@@ -442,6 +444,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		ButtonGroup<TextButton> trackButtons = new ButtonGroup();
 		CheckBox loopCheckbox = new CheckBox("Loop", skin);
+		CheckBox addCheckbox = new CheckBox("Add", skin);
 
 		Slider alphaSlider = new Slider(0, 1, 0.01f, false, skin);
 		Label alphaLabel = new Label("1.0", skin);
@@ -493,6 +496,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 			alphaSlider.setValue(1);
 			alphaSlider.setDisabled(true);
+			
+			addCheckbox.setDisabled(true);
 
 			window.setMovable(false);
 			window.setResizable(false);
@@ -562,6 +567,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				for (TextButton button : trackButtons.getButtons())
 					table.add(button);
 				table.add(loopCheckbox);
+				table.add(addCheckbox);
 				root.add(table).row();
 			}
 			root.add("Entry alpha:");
@@ -764,6 +770,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 				}
 			});
 
+			addCheckbox.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					setAnimation();
+				}
+			});
+
 			linearCheckbox.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
 					if (atlas == null) return;
@@ -799,7 +811,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 					alphaSlider.setDisabled(track == 0);
 					alphaSlider.setValue(current == null ? 1 : current.alpha);
 
-					if (current != null) loopCheckbox.setChecked(current.getLoop());
+					addCheckbox.setDisabled(track == 0);
+
+					if (current != null) {
+						loopCheckbox.setChecked(current.getLoop());
+						addCheckbox.setChecked(current.getMixBlend() == MixBlend.add);
+					}
 				}
 			};
 			for (TextButton button : trackButtons.getButtons())
@@ -856,6 +873,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			debugClippingCheckbox.addListener(savePrefsListener);
 			premultipliedCheckbox.addListener(savePrefsListener);
 			loopCheckbox.addListener(savePrefsListener);
+			addCheckbox.addListener(savePrefsListener);
 			speedSlider.addListener(savePrefsListener);
 			speedResetButton.addListener(savePrefsListener);
 			mixSlider.addListener(savePrefsListener);
@@ -920,6 +938,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			prefs.putBoolean("debugClipping", debugClippingCheckbox.isChecked());
 			prefs.putBoolean("premultiplied", premultipliedCheckbox.isChecked());
 			prefs.putBoolean("loop", loopCheckbox.isChecked());
+			prefs.putBoolean("add", addCheckbox.isChecked());
 			prefs.putFloat("speed", speedSlider.getValue());
 			prefs.putFloat("mix", mixSlider.getValue());
 			prefs.putFloat("scale", scaleSlider.getValue());
@@ -948,7 +967,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 				debugPointsCheckbox.setChecked(prefs.getBoolean("debugPoints", true));
 				debugClippingCheckbox.setChecked(prefs.getBoolean("debugClipping", true));
 				premultipliedCheckbox.setChecked(prefs.getBoolean("premultiplied", true));
-				loopCheckbox.setChecked(prefs.getBoolean("loop", false));
+				loopCheckbox.setChecked(prefs.getBoolean("loop", true));
+				addCheckbox.setChecked(prefs.getBoolean("add", false));
 				speedSlider.setValue(prefs.getFloat("speed", 0.3f));
 				mixSlider.setValue(prefs.getFloat("mix", 0.3f));
 
@@ -983,6 +1003,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 		config.height = (int)(600 * uiScale);
 		config.title = "Skeleton Viewer";
 		config.allowSoftwareMode = true;
+		config.samples = 2;
 		new LwjglApplication(new SkeletonViewer(), config);
 	}
 }

@@ -52,7 +52,7 @@ public class SkeletonData {
 
 	// Nonessential.
 	float fps = 30;
-	String imagesPath;
+	String imagesPath, audioPath;
 
 	// --- Bones.
 
@@ -273,7 +273,7 @@ public class SkeletonData {
 		this.hash = hash;
 	}
 
-	/** The path to the image directory as defined in Spine. Available only when nonessential data was exported.
+	/** The path to the images directory as defined in Spine. Available only when nonessential data was exported.
 	 * @return May be null. */
 	public String getImagesPath () {
 		return imagesPath;
@@ -282,6 +282,17 @@ public class SkeletonData {
 	/** @param imagesPath May be null. */
 	public void setImagesPath (String imagesPath) {
 		this.imagesPath = imagesPath;
+	}
+
+	/** The path to the audio directory as defined in Spine. Available only when nonessential data was exported.
+	 * @return May be null. */
+	public String getAudioPath () {
+		return audioPath;
+	}
+
+	/** @param audioPath May be null. */
+	public void setAudioPath (String audioPath) {
+		this.audioPath = audioPath;
 	}
 
 	/** The dopesheet FPS in Spine. Available only when nonessential data was exported. */

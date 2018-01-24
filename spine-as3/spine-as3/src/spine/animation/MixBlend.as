@@ -29,15 +29,16 @@
  *****************************************************************************/
 
 package spine.animation {
-	public class MixPose {
+	public class MixBlend {
 		public var ordinal : int;
 
-		public function MixPose(order : int) {
+		public function MixBlend(order : int) {
 			this.ordinal = order;
 		}
 
-		public static const setup : MixPose = new MixPose(0);
-		public static const current : MixPose = new MixPose(1);
-		public static const currentLayered : MixPose = new MixPose(2);
+		public static const setup : MixBlend = new MixBlend(0);
+		public static const first : MixBlend = new MixBlend(1);
+		public static const replace : MixBlend = new MixBlend(2);
+		public static const add : MixBlend = new MixBlend(3);
 	}
 }

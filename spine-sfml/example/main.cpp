@@ -30,6 +30,7 @@
 
 #include <iostream>
 #include <string.h>
+#define SPINE_SHORT_NAMES
 #include <spine/spine-sfml.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Mouse.hpp>
@@ -123,7 +124,7 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 	Skeleton_setToSetupPose(skeleton);
 
 	skeleton->x = 320;
-	skeleton->y = 460;
+	skeleton->y = 590;
 	Skeleton_updateWorldTransform(skeleton);
 
 	Slot* headSlot = Skeleton_findSlot(skeleton, "head");
@@ -133,7 +134,7 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 	AnimationState_addAnimationByName(drawable->state, 0, "jump", false, 3);
 	AnimationState_addAnimationByName(drawable->state, 0, "run", true, 0);
 
-	sf::RenderWindow window(sf::VideoMode(640, 480), "Spine SFML - spineboy");
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - spineboy");
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
@@ -365,6 +366,60 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 	}
 }
 
+void owl (SkeletonData* skeletonData, Atlas* atlas) {
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+
+	Skeleton* skeleton = drawable->skeleton;
+	skeleton->x = 320;
+	skeleton->y = 400;
+	Skeleton_updateWorldTransform(skeleton);
+
+	AnimationState_setAnimationByName(drawable->state, 0, "idle", true);
+	AnimationState_setAnimationByName(drawable->state, 1, "blink", true);
+	spTrackEntry* left = AnimationState_setAnimationByName(drawable->state, 2, "left", true);
+	spTrackEntry* right = AnimationState_setAnimationByName(drawable->state, 3, "right", true);
+	spTrackEntry* up = AnimationState_setAnimationByName(drawable->state, 4, "up", true);
+	spTrackEntry* down = AnimationState_setAnimationByName(drawable->state, 5, "down", true);
+
+	left->alpha = 0;
+	left->mixBlend = SP_MIX_BLEND_ADD;
+	right->alpha = 0;
+	right->mixBlend = SP_MIX_BLEND_ADD;
+	up->alpha = 0;
+	up->mixBlend = SP_MIX_BLEND_ADD;
+	down->alpha = 0;
+	down->mixBlend = SP_MIX_BLEND_ADD;
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - owl");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event)) {
+			if (event.type == sf::Event::Closed) window.close();
+			if (event.type == sf::Event::MouseMoved) {
+				float x = event.mouseMove.x / 640.0f;
+				left->alpha = (MAX(x, 0.5f) - 0.5f) * 2;
+				right->alpha = (0.5 - MIN(x, 0.5)) * 2;
+
+				float y = event.mouseMove.y / 640.0f;
+				down->alpha = (MAX(y, 0.5f) - 0.5f) * 2;
+				up->alpha = (0.5 - MIN(y, 0.5)) * 2;
+			}
+		}
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable->update(delta);
+
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+}
+
 /**
  * Used for debugging purposes during runtime development
  */
@@ -394,6 +449,7 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 
 int main () {
 	testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 1.0f);
+	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl.atlas", 0.5f);
 	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin.atlas", 0.5f);
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine.atlas", 0.5f);
 	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 0.2f);

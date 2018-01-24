@@ -50,8 +50,8 @@ void spAnimationState_disposeStatics () {
 void _spAnimationState_disposeTrackEntry (spTrackEntry* entry);
 void _spAnimationState_disposeTrackEntries (spAnimationState* state, spTrackEntry* entry);
 int /*boolean*/ _spAnimationState_updateMixingFrom (spAnimationState* self, spTrackEntry* entry, float delta);
-float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* entry, spSkeleton* skeleton, spMixPose currentPose);
-void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* timeline, spSkeleton* skeleton, float time, float alpha, spMixPose pose, float* timelinesRotation, int i, int /*boolean*/ firstFrame);
+float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* entry, spSkeleton* skeleton, spMixBlend currentBlend);
+void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* timeline, spSkeleton* skeleton, float time, float alpha, spMixBlend blend, float* timelinesRotation, int i, int /*boolean*/ firstFrame);
 void _spAnimationState_queueEvents (spAnimationState* self, spTrackEntry* entry, float animationTime);
 void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEntry* current, int /*boolean*/ interrupt);
 spTrackEntry* _spAnimationState_expandToIndex (spAnimationState* self, int index);
@@ -354,8 +354,8 @@ int spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 	float* timelinesRotation;
 	spTimeline* timeline;
 	int applied = 0;
-	spMixPose currentPose;
-	spMixPose pose;
+	spMixBlend blend;
+	spMixBlend timelineBlend;
 
 	if (internal->animationsChanged) _spAnimationState_animationsChanged(self);
 
@@ -364,12 +364,12 @@ int spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 		current = self->tracks[i];
 		if (!current || current->delay > 0) continue;
 		applied = -1;
-		currentPose = i == 0 ? SP_MIX_POSE_CURRENT : SP_MIX_POSE_CURRENT_LAYERED;
+		blend = i == 0 ? SP_MIX_BLEND_FIRST : current->mixBlend;
 
 		/* Apply mixing from entries first. */
 		mix = current->alpha;
 		if (current->mixingFrom)
-            mix *= _spAnimationState_applyMixingFrom(self, current, skeleton, currentPose);
+            mix *= _spAnimationState_applyMixingFrom(self, current, skeleton, blend);
         else if (current->trackTime >= current->trackEnd && current->next == 0)
             mix = 0;
 
@@ -377,9 +377,9 @@ int spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 		animationLast = current->animationLast; animationTime = spTrackEntry_getAnimationTime(current);
 		timelineCount = current->animation->timelinesCount;
 		timelines = current->animation->timelines;
-		if (mix == 1) {
+		if (mix == 1 || blend == SP_MIX_BLEND_ADD) {
 			for (ii = 0; ii < timelineCount; ii++)
-				spTimeline_apply(timelines[ii], skeleton, animationLast, animationTime, internal->events, &internal->eventsCount, 1, SP_MIX_POSE_SETUP, SP_MIX_DIRECTION_IN);
+				spTimeline_apply(timelines[ii], skeleton, animationLast, animationTime, internal->events, &internal->eventsCount, mix, blend, SP_MIX_DIRECTION_IN);
 		} else {
 			spIntArray* timelineData = current->timelineData;
 
@@ -389,11 +389,11 @@ int spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 
 			for (ii = 0; ii < timelineCount; ii++) {
 				timeline = timelines[ii];
-				pose = timelineData->items[ii] >= FIRST ? SP_MIX_POSE_SETUP : currentPose;
+				timelineBlend = timelineData->items[ii] == SUBSEQUENT ? blend : SP_MIX_BLEND_SETUP;
 				if (timeline->type == SP_TIMELINE_ROTATE)
-					_spAnimationState_applyRotateTimeline(self, timeline, skeleton, animationTime, mix, pose, timelinesRotation, ii << 1, firstFrame);
+					_spAnimationState_applyRotateTimeline(self, timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
 				else
-					spTimeline_apply(timeline, skeleton, animationLast, animationTime, internal->events, &internal->eventsCount, mix, pose, SP_MIX_DIRECTION_IN);
+					spTimeline_apply(timeline, skeleton, animationLast, animationTime, internal->events, &internal->eventsCount, mix, timelineBlend, SP_MIX_DIRECTION_IN);
 			}
 		}
 		_spAnimationState_queueEvents(self, current, animationTime);
@@ -406,7 +406,7 @@ int spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 	return applied;
 }
 
-float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* to, spSkeleton* skeleton, spMixPose currentPose) {
+float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* to, spSkeleton* skeleton, spMixBlend blend) {
 	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
 	float mix;
 	spEvent** events;
@@ -418,24 +418,25 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* t
 	spTimeline** timelines;
 	spIntArray* timelineData;
 	spTrackEntryArray* timelineDipMix;
+	spMixBlend timelineBlend;
 	float alphaDip;
 	float alphaMix;
 	float alpha;
 	int /*boolean*/ firstFrame;
 	float* timelinesRotation;
-	spMixPose pose;
 	int i;
 	spTrackEntry* dipMix;
 
 	spTrackEntry* from = to->mixingFrom;
-	if (from->mixingFrom) _spAnimationState_applyMixingFrom(self, from, skeleton, currentPose);
+	if (from->mixingFrom) _spAnimationState_applyMixingFrom(self, from, skeleton, blend);
 
 	if (to->mixDuration == 0) { /* Single frame mix to undo mixingFrom changes. */
 		mix = 1;
-		currentPose = SP_MIX_POSE_SETUP;
+		if (blend == SP_MIX_BLEND_FIRST) blend = SP_MIX_BLEND_SETUP;
 	} else {
 		mix = to->mixTime / to->mixDuration;
 		if (mix > 1) mix = 1;
+		if (blend != SP_MIX_BLEND_FIRST) blend = from->mixBlend;
 	}
 
 	events = mix < from->eventThreshold ? internal->events : 0;
@@ -445,44 +446,52 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* t
 	animationTime = spTrackEntry_getAnimationTime(from);
 	timelineCount = from->animation->timelinesCount;
 	timelines = from->animation->timelines;
-	timelineData = from->timelineData;
-	timelineDipMix = from->timelineDipMix;
-
-	firstFrame = from->timelinesRotationCount == 0;
-	if (firstFrame) _spAnimationState_resizeTimelinesRotation(from, timelineCount << 1);
-	timelinesRotation = from->timelinesRotation;
-
 	alphaDip = from->alpha * to->interruptAlpha; alphaMix = alphaDip * (1 - mix);
-	from->totalAlpha = 0;
-	for (i = 0; i < timelineCount; i++) {
-		spTimeline* timeline = timelines[i];
-		switch (timelineData->items[i]) {
-			case SUBSEQUENT:
-				if (!attachments && timeline->type == SP_TIMELINE_ATTACHMENT) continue;
-				if (!drawOrder && timeline->type == SP_TIMELINE_DRAWORDER) continue;
-				pose = currentPose;
-				alpha = alphaMix;
-				break;
-			case FIRST:
-				pose = SP_MIX_POSE_SETUP;
-				alpha = alphaMix;
-				break;
-			case DIP:
-				pose = SP_MIX_POSE_SETUP;
-				alpha = alphaDip;
-				break;
-			default:
-				pose = SP_MIX_POSE_SETUP;
-				alpha = alphaDip;
-				dipMix = timelineDipMix->items[i];
-				alpha *= MAX(0, 1 - dipMix->mixTime / dipMix->mixDuration);
-				break;
+	if (blend == SP_MIX_BLEND_ADD) {
+		for (i = 0; i < timelineCount; i++) {
+			spTimeline *timeline = timelines[i];
+			spTimeline_apply(timeline, skeleton, animationLast, animationTime, events, &internal->eventsCount, alphaMix, blend, SP_MIX_DIRECTION_OUT);
 		}
-		from->totalAlpha += alpha;
-		if (timeline->type == SP_TIMELINE_ROTATE)
-			_spAnimationState_applyRotateTimeline(self, timeline, skeleton, animationTime, alpha, pose, timelinesRotation, i << 1, firstFrame);
-		else {
-			spTimeline_apply(timeline, skeleton, animationLast, animationTime, events, &internal->eventsCount, alpha, pose, SP_MIX_DIRECTION_OUT);
+	} else {
+		timelineData = from->timelineData;
+		timelineDipMix = from->timelineDipMix;
+
+		firstFrame = from->timelinesRotationCount == 0;
+		if (firstFrame) _spAnimationState_resizeTimelinesRotation(from, timelineCount << 1);
+		timelinesRotation = from->timelinesRotation;
+
+		from->totalAlpha = 0;
+		for (i = 0; i < timelineCount; i++) {
+			spTimeline *timeline = timelines[i];
+			switch (timelineData->items[i]) {
+				case SUBSEQUENT:
+					if (!attachments && timeline->type == SP_TIMELINE_ATTACHMENT) continue;
+					if (!drawOrder && timeline->type == SP_TIMELINE_DRAWORDER) continue;
+					timelineBlend = blend;
+					alpha = alphaMix;
+					break;
+				case FIRST:
+					timelineBlend = SP_MIX_BLEND_SETUP;
+					alpha = alphaMix;
+					break;
+				case DIP:
+					timelineBlend = SP_MIX_BLEND_SETUP;
+					alpha = alphaDip;
+					break;
+				default:
+					timelineBlend = SP_MIX_BLEND_SETUP;
+					dipMix = timelineDipMix->items[i];
+					alpha = alphaDip * MAX(0, 1 - dipMix->mixTime / dipMix->mixDuration);
+					break;
+			}
+			from->totalAlpha += alpha;
+			if (timeline->type == SP_TIMELINE_ROTATE)
+				_spAnimationState_applyRotateTimeline(self, timeline, skeleton, animationTime, alpha, timelineBlend,
+													  timelinesRotation, i << 1, firstFrame);
+			else {
+				spTimeline_apply(timeline, skeleton, animationLast, animationTime, events, &internal->eventsCount,
+								 alpha, timelineBlend, SP_MIX_DIRECTION_OUT);
+			}
 		}
 	}
 
@@ -495,7 +504,7 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* t
 	return mix;
 }
 
-void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* timeline, spSkeleton* skeleton, float time, float alpha, spMixPose pose, float* timelinesRotation, int i, int /*boolean*/ firstFrame) {
+void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* timeline, spSkeleton* skeleton, float time, float alpha, spMixBlend blend, float* timelinesRotation, int i, int /*boolean*/ firstFrame) {
 	spRotateTimeline *rotateTimeline;
 	float *frames;
 	spBone* bone;
@@ -510,7 +519,7 @@ void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* 
 	if (firstFrame) timelinesRotation[i] = 0;
 
 	if (alpha == 1) {
-		spTimeline_apply(timeline, skeleton, 0, time, 0, 0, 1, pose, SP_MIX_DIRECTION_IN);
+		spTimeline_apply(timeline, skeleton, 0, time, 0, 0, 1, blend, SP_MIX_DIRECTION_IN);
 		return;
 	}
 
@@ -518,7 +527,7 @@ void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* 
 	frames = rotateTimeline->frames;
 	bone = skeleton->bones[rotateTimeline->boneIndex];
 	if (time < frames[0]) {
-		if (pose == SP_MIX_POSE_SETUP) {
+		if (blend == SP_MIX_BLEND_SETUP) {
 			bone->rotation = bone->data->rotation;
 		}
 		return; /* Time is before first frame. */
@@ -541,7 +550,7 @@ void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* 
 	}
 
 	/* Mix between rotations using the direction of the shortest route on the first frame while detecting crosses. */
-	r1 = pose == SP_MIX_POSE_SETUP ? bone->data->rotation : bone->rotation;
+	r1 = blend == SP_MIX_BLEND_SETUP ? bone->data->rotation : bone->rotation;
 	diff = r2 - r1;
 	if (diff == 0) {
 		total = timelinesRotation[i];
@@ -803,6 +812,7 @@ spTrackEntry* _spAnimationState_trackEntry (spAnimationState* self, int trackInd
 	entry->interruptAlpha = 1;
 	entry->mixTime = 0;
 	entry->mixDuration = !last ? 0 : spAnimationStateData_getMix(self->data, last->animation, animation);
+	entry->mixBlend = SP_MIX_BLEND_REPLACE;
 
 	entry->timelineData = spIntArray_create(16);
 	entry->timelineDipMix = spTrackEntryArray_create(16);
@@ -833,7 +843,7 @@ void _spAnimationState_animationsChanged (spAnimationState* self) {
 
 	for (;i < n; i++) {
 		entry = self->tracks[i];
-		if (entry != 0) _spTrackEntry_setTimelineData(entry, 0, mixingTo, self);
+		if (entry != 0 && entry->mixBlend != SP_MIX_BLEND_ADD) _spTrackEntry_setTimelineData(entry, 0, mixingTo, self);
 	}
 }
 

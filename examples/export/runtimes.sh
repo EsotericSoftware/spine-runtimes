@@ -101,6 +101,10 @@ cp -f ../stretchyman/export/stretchyman-pro.json ../../spine-corona/data
 cp -f ../stretchyman/export/stretchyman.atlas ../../spine-corona/data
 cp -f ../stretchyman/export/stretchyman.png ../../spine-corona/data
 
+cp -f ../owl/export/owl-pro.json ../../spine-corona/data
+cp -f ../owl/export/owl.atlas ../../spine-corona/data
+cp -f ../owl/export/owl.png ../../spine-corona/data
+
 echo "spine-love"
 rm -f ../../spine-love/data/*
 cp -f ../coin/export/coin-pro.json ../../spine-love/data
@@ -168,6 +172,11 @@ cp -f ../stretchyman/export/stretchyman-pro.skel ../../spine-sfml/data/
 cp -f ../stretchyman/export/stretchyman.atlas ../../spine-sfml/data/
 cp -f ../stretchyman/export/stretchyman.png ../../spine-sfml/data/
 
+cp -f ../owl/export/owl-pro.json ../../spine-sfml/data/
+cp -f ../owl/export/owl-pro.skel ../../spine-sfml/data/
+cp -f ../owl/export/owl.atlas ../../spine-sfml/data/
+cp -f ../owl/export/owl.png ../../spine-sfml/data/
+
 echo "spine-starling"
 # DO NOT DELETE EVERYTHING IN SOURCE, ESPECIALLY goblins-mesh-starling.png/.xml
 cp -f ../coin/export/coin-pro.json ../../spine-starling/spine-starling-example/src/
@@ -198,6 +207,9 @@ cp -f ../stretchyman/export/stretchyman-pro.json ../../spine-starling/spine-star
 cp -f ../stretchyman/export/stretchyman.atlas ../../spine-starling/spine-starling-example/src/
 cp -f ../stretchyman/export/stretchyman.png ../../spine-starling/spine-starling-example/src/
 
+cp -f ../owl/export/owl-pro.json ../../spine-starling/spine-starling-example/src/
+cp -f ../owl/export/owl.atlas ../../spine-starling/spine-starling-example/src/
+cp -f ../owl/export/owl.png ../../spine-starling/spine-starling-example/src/
 
 echo "spine-ts"
 rm -f ../../spine-ts/webgl/example/assets/*
@@ -225,6 +237,10 @@ cp -f ../tank/export/tank.png ../../spine-ts/webgl/example/assets/
 cp -f ../vine/export/vine-pro.json ../../spine-ts/webgl/example/assets/
 cp -f ../vine/export/vine.atlas ../../spine-ts/webgl/example/assets/
 cp -f ../vine/export/vine.png ../../spine-ts/webgl/example/assets/
+
+cp -f ../owl/export/owl-pro.json ../../spine-ts/webgl/example/assets/
+cp -f ../owl/export/owl.atlas ../../spine-ts/webgl/example/assets/
+cp -f ../owl/export/owl.png ../../spine-ts/webgl/example/assets/
 
 cp -f ../stretchyman/export/stretchyman-pro.json ../../spine-ts/webgl/example/assets/
 cp -f ../stretchyman/export/stretchyman.atlas ../../spine-ts/webgl/example/assets/

@@ -43,17 +43,17 @@ package spine.animation {
 			return (TimelineType.scale.ordinal << 24) + boneIndex;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
+		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			var frames : Vector.<Number> = this.frames;
 			var bone : Bone = skeleton.bones[boneIndex];
 
 			if (time < frames[0]) {
-				switch (pose) {
-				case MixPose.setup:
+				switch (blend) {
+				case MixBlend.setup:
 					bone.scaleX = bone.data.scaleX;
 					bone.scaleY = bone.data.scaleY;
 					return;
-				case MixPose.current:
+				case MixBlend.first:
 					bone.scaleX += (bone.data.scaleX - bone.scaleX) * alpha;
 					bone.scaleY += (bone.data.scaleY - bone.scaleY) * alpha;
 				}
@@ -76,27 +76,58 @@ package spine.animation {
 				y = (y + (frames[frame + Y] - y) * percent) * bone.data.scaleY;
 			}
 			if (alpha == 1) {
-				bone.scaleX = x;
-				bone.scaleY = y;
+				if (blend == MixBlend.add) {
+					bone.scaleX += x - bone.data.scaleX;
+					bone.scaleY += y - bone.data.scaleY;	
+				} else {
+					bone.scaleX = x;
+					bone.scaleY = y;
+				}
 			} else {
 				var bx : Number, by : Number;
-				if (pose == MixPose.setup) {
-					bx = bone.data.scaleX;
-					by = bone.data.scaleY;
-				} else {
-					bx = bone.scaleX;
-					by = bone.scaleY;
-				}
-				// Mixing out uses sign of setup or current pose, else use sign of key.
 				if (direction == MixDirection.Out) {
-					x = Math.abs(x) * MathUtils.signum(bx);
-					y = Math.abs(y) * MathUtils.signum(by);
+					switch (blend) {
+						case MixBlend.setup:
+							bx = bone.data.scaleX;
+							by = bone.data.scaleY;
+							bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
+							bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
+							break;
+						case MixBlend.first:
+						case MixBlend.replace:
+							bx = bone.scaleX;
+							by = bone.scaleY;
+							bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
+							bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
+							break;
+						case MixBlend.add:
+							bx = bone.scaleX;
+							by = bone.scaleY;
+							bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bone.data.scaleX) * alpha;
+							bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - bone.data.scaleY) * alpha;
+					}
 				} else {
-					bx = Math.abs(bx) * MathUtils.signum(x);
-					by = Math.abs(by) * MathUtils.signum(y);
+					switch (blend) {
+						case MixBlend.setup:
+							bx = Math.abs(bone.data.scaleX) * MathUtils.signum(x);
+							by = Math.abs(bone.data.scaleY) * MathUtils.signum(y);
+							bone.scaleX = bx + (x - bx) * alpha;
+							bone.scaleY = by + (y - by) * alpha;
+							break;
+						case MixBlend.first:
+						case MixBlend.replace:
+							bx = Math.abs(bone.scaleX) * MathUtils.signum(x);
+							by = Math.abs(bone.scaleY) * MathUtils.signum(y);
+							bone.scaleX = bx + (x - bx) * alpha;
+							bone.scaleY = by + (y - by) * alpha;
+							break;
+						case MixBlend.add:
+							bx = MathUtils.signum(x);
+							by = MathUtils.signum(y);
+							bone.scaleX = Math.abs(bone.scaleX) * bx + (x - Math.abs(bone.data.scaleX) * bx) * alpha;
+							bone.scaleY = Math.abs(bone.scaleY) * by + (y - Math.abs(bone.data.scaleY) * by) * alpha;
+					}
 				}
-				bone.scaleX = bx + (x - bx) * alpha;
-				bone.scaleY = by + (y - by) * alpha;
 			}
 		}
 	}
