@@ -218,6 +218,7 @@ package spine {
 		}
 
 		private function sortPathConstraintAttachment(skin : Skin, slotIndex : int, slotBone : Bone) : void {
+			if (!skin.attachments.hasOwnProperty(slotIndex)) return;
 			var dict : Dictionary = skin.attachments[slotIndex];
 			if (!dict) return;
 

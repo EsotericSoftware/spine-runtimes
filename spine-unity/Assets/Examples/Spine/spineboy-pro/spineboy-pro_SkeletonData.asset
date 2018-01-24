@@ -9,12 +9,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1b3b4b945939a54ea0b23d3396115fb, type: 3}
-  m_Name: spineboy_SkeletonData
+  m_Name: spineboy-pro_SkeletonData
   m_EditorClassIdentifier: 
   atlasAssets:
-  - {fileID: 11400000, guid: 2fc9866d5b475d74b981f97a77312320, type: 2}
+  - {fileID: 11400000, guid: 2bedc3c43dd49f346a4c9e8a87e2fed7, type: 2}
   scale: 0.01
-  skeletonJSON: {fileID: 4900000, guid: c4a131ce07ddbbf4fa38e01f472a366f, type: 3}
+  skeletonJSON: {fileID: 4900000, guid: 8160b67e4c41bd041b948b5e5a86e242, type: 3}
   fromAnimation:
   - idle
   - run
