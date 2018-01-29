@@ -54,7 +54,7 @@ function Animation.new (name, timelines, duration)
 		duration = duration
 	}
 
-	function self:apply (skeleton, lastTime, time, loop, events, alpha, pose, direction)
+	function self:apply (skeleton, lastTime, time, loop, events, alpha, blend, direction)
 		if not skeleton then error("skeleton cannot be nil.", 2) end
 
 		if loop and duration > 0 then
@@ -63,7 +63,7 @@ function Animation.new (name, timelines, duration)
 		end
 
 		for i,timeline in ipairs(self.timelines) do
-			timeline:apply(skeleton, lastTime, time, events, alpha, pose, direction)
+			timeline:apply(skeleton, lastTime, time, events, alpha, blend, direction)
 		end
 	end
 
@@ -113,12 +113,13 @@ local function linearSearch (values, target, step)
 	return -1
 end
 
-Animation.MixPose = {
+Animation.MixBlend = {
 	setup = 0,
-	current = 1,
-	currentLayered = 2
+	first = 1,
+	replace = 2,
+	add = 3
 }
-local MixPose = Animation.MixPose
+local MixBlend = Animation.MixBlend
 
 Animation.MixDirection = {
 	_in = 0, out = 1
@@ -255,28 +256,30 @@ function Animation.RotateTimeline.new (frameCount)
 		self.frames[frameIndex + ROTATION] = degrees
 	end
 
-	function self:apply (skeleton, lastTime, time, firedEvents, alpha, pose, direction)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local frames = self.frames
 
 		local bone = skeleton.bones[self.boneIndex]
 		if time < frames[0] then
-			if pose == MixPose.setup then
+			if blend == MixBlend.setup then
 				bone.rotation = bone.data.rotation
-			elseif pose == MixPose.current then
+			elseif blend == MixBlend.first then
 				local r = bone.data.rotation - bone.rotation
-				r = r - (16384 - math_floor(16384.499999999996 - r / 360)) * 360 -- Wrap within -180 and 180.
-				bone.rotation = bone.rotation + r * alpha
+				bone.rotation = bone.rotation + (r - (16384 - math_floor(16384.499999999996 - r / 360)) * 360) * alpha
 			end
 			return
 		end
 
 		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
-			if pose == MixPose.setup then
-				bone.rotation = bone.data.rotation + frames[zlen(frames) + PREV_ROTATION] * alpha
-			else
-				local r = bone.data.rotation + frames[zlen(frames) + PREV_ROTATION] - bone.rotation
+			local r = frames[zlen(frames) + PREV_ROTATION]
+			if blend == MixBlend.setup then
+				bone.rotation = bone.data.rotation + r * alpha
+			elseif blend == MixBlend.first or blend == MixBlend.replace then
+				r = r + bone.data.rotation - bone.rotation
 				r = r - (16384 - math_floor(16384.499999999996 - r / 360)) * 360 -- Wrap within -180 and 180.
 				bone.rotation = bone.rotation + r * alpha;
+			elseif blend == MixBlend.add then
+				bone.rotation = bone.rotation + r * alpha;				
 			end
 			return;
 		end
@@ -288,15 +291,14 @@ function Animation.RotateTimeline.new (frameCount)
 		local percent = self:getCurvePercent((math.floor(frame / 2)) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
 
 		local r = frames[frame + ROTATION] - prevRotation
-		r = r - (16384 - math_floor(16384.499999999996 - r / 360)) * 360
-		r = prevRotation + r * percent
-		if pose == MixPose.setup then
-			r = r - (16384 - math_floor(16384.499999999996 - r / 360)) * 360
-			bone.rotation = bone.data.rotation + r * alpha
-		else
-			r = bone.data.rotation + r - bone.rotation;
-			r = r - (16384 - math_floor(16384.499999999996 - r / 360)) * 360
-			bone.rotation = bone.rotation + r * alpha
+		r = prevRotation + (r - (16384 - math_floor(16384.499999999996 - r / 360)) * 360) * percent
+		if blend == MixBlend.setup then
+			bone.rotation = bone.data.rotation + (r - (16384 - math_floor(16384.499999999996 - r / 360)) * 360) * alpha
+		elseif blend == MixBlend.first or blend == MixBlend.replace then
+			r = r + bone.data.rotation - bone.rotation;
+			bone.rotation = bone.rotation + (r - (16384 - math_floor(16384.499999999996 - r / 360)) * 360) * alpha
+		elseif blend == MixBlend.add then
+			bone.rotation = bone.rotation + (r - (16384 - math_floor(16384.499999999996 - r / 360)) * 360) * alpha
 		end
 	end
 
@@ -329,15 +331,15 @@ function Animation.TranslateTimeline.new (frameCount)
 		self.frames[frameIndex + Y] = y
 	end
 
-	function self:apply (skeleton, lastTime, time, firedEvents, alpha, pose, direction)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local frames = self.frames
 
 		local bone = skeleton.bones[self.boneIndex]
 		if time < frames[0] then 
-			if pose == MixPose.setup then
+			if blend == MixBlend.setup then
 				bone.x = bone.data.x
 				bone.y = bone.data.y
-			elseif pose == MixPose.current then
+			elseif blend == MixBlend.first then
 				bone.x = bone.x + (bone.data.x - bone.x) * alpha
 				bone.y = bone.y + (bone.data.y - bone.y) * alpha
 			end
@@ -361,12 +363,15 @@ function Animation.TranslateTimeline.new (frameCount)
 			x = x + (frames[frame + X] - x) * percent
 			y = y + (frames[frame + Y] - y) * percent
 		end
-		if pose == MixPose.setup then
+		if blend == MixBlend.setup then
 			bone.x = bone.data.x + x * alpha
 			bone.y = bone.data.y + y * alpha
-		else
+		elseif blend == MixBlend.first or blend == MixBlend.replace then
 			bone.x = bone.x + (bone.data.x + x - bone.x) * alpha
 			bone.y = bone.y + (bone.data.y + y - bone.y) * alpha
+		elseif blend == MixBlend.add then
+			bone.x = bone.x + x * alpha
+			bone.y = bone.y + y * alpha
 		end
 	end
 
@@ -390,15 +395,15 @@ function Animation.ScaleTimeline.new (frameCount)
 		return TimelineType.scale * SHL_24 + self.boneIndex
 	end
 
-	function self:apply (skeleton, lastTime, time, firedEvents, alpha, pose, direction)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local frames = self.frames
 
 		local bone = skeleton.bones[self.boneIndex]
 		if time < frames[0] then
-			if pose == MixPose.setup then
+			if blend == MixBlend.setup then
 				bone.scaleX = bone.data.scaleX
 				bone.scaleY = bone.data.scaleY
-			elseif pose == MixPose.current then
+			elseif blend == MixBlend.first then
 				bone.scaleX = bone.scaleX + (bone.data.scaleX - bone.scaleX) * alpha
 				bone.scaleY = bone.scaleY + (bone.data.scaleY - bone.scaleY) * alpha
 			end
@@ -423,28 +428,51 @@ function Animation.ScaleTimeline.new (frameCount)
 			y = (y + (frames[frame + Y] - y) * percent) * bone.data.scaleY
 		end
 		if alpha == 1 then
-			bone.scaleX = x
-			bone.scaleY = y
+			if blend == MixBlend.add then
+				bone.scaleX = bone.scaleX + x - bone.data.scaleX
+				bone.scaleY = bone.scaleY + y - bone.data.scaleY
+			else
+				bone.scaleX = x
+				bone.scaleY = y
+			end
 		else
 			local bx = 0
 			local by = 0
-			if pose == MixPose.setup then
-				bx = bone.data.scaleX
-				by = bone.data.scaleY
+			if direction == MixDirection.out then 
+				if blend == MixBlend.setup then
+					bx = bone.data.scaleX
+					by = bone.data.scaleY
+					bone.scaleX = bx + (math_abs(x) * math_signum(bx) - bx) * alpha
+					bone.scaleY = by + (math_abs(y) * math_signum(by) - by) * alpha
+				elseif blend == MixBlend.first or blend == MixBlend.replace then
+					bx = bone.scaleX
+					by = bone.scaleY
+					bone.scaleX = bx + (math_abs(x) * math_signum(bx) - bx) * alpha
+					bone.scaleY = by + (math_abs(y) * math_signum(by) - by) * alpha
+				elseif blend == MixBlend.add then
+					bx = bone.scaleX
+					by = bone.scaleY
+					bone.scaleX = bx + (math_abs(x) * math_signum(bx) - bone.data.scaleX) * alpha
+					bone.scaleY = by + (math_abs(y) * math_signum(by) - bone.data.scaleY) * alpha
+				end
 			else
-				bx = bone.scaleX
-				by = bone.scaleY
+				if blend == MixBlend.setup then
+					bx = math_abs(bone.data.scaleX) * math_signum(x)
+					by = math_abs(bone.data.scaleY) * math_signum(y)
+					bone.scaleX = bx + (x - bx) * alpha
+					bone.scaleY = by + (y - by) * alpha
+				elseif blend == MixBlend.first or blend == MixBlend.replace then
+					bx = math_abs(bone.scaleX) * math_signum(x)
+					by = math_abs(bone.scaleY) * math_signum(y)
+					bone.scaleX = bx + (x - bx) * alpha
+					bone.scaleY = by + (y - by) * alpha
+				elseif blend == MixBlend.add then
+					bx = math_signum(x)
+					by = math_signum(y)
+					bone.scaleX = math_abs(bone.scaleX) * bx + (x - math_abs(bone.data.scaleX) * bx) * alpha
+					bone.scaleY = math_abs(bone.scaleY) * by + (y - math_abs(bone.data.scaleY) * by) * alpha
+				end
 			end
-			-- Mixing out uses sign of setup or current pose, else use sign of key.
-			if direction == MixDirection.out then
-				x = math_abs(x) * math_signum(bx)
-				y = math_abs(y) * math_signum(by)
-			else
-				bx = math_abs(bx) * math_signum(x)
-				by = math_abs(by) * math_signum(y)
-			end
-			bone.scaleX = bx + (x - bx) * alpha
-			bone.scaleY = by + (y - by) * alpha
 		end
 	end
 
@@ -468,15 +496,15 @@ function Animation.ShearTimeline.new (frameCount)
 		return TimelineType.shear * SHL_24 + self.boneIndex
 	end
 
-	function self:apply (skeleton, lastTime, time, firedEvents, alpha, pose, direction)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local frames = self.frames
 
 		local bone = skeleton.bones[self.boneIndex]
 		if time < frames[0] then
-			if pose == MixPose.setup then
+			if blend == MixBlend.setup then
 				bone.shearX = bone.data.shearX
 				bone.shearY = bone.data.shearY
-			elseif pose == MixPose.current then
+			elseif blend == MixBlend.first then
 				bone.shearX = bone.shearX + (bone.data.shearX - bone.shearX) * alpha
 				bone.shearY = bone.shearX + (bone.data.shearY - bone.shearY) * alpha
 			end
@@ -500,12 +528,15 @@ function Animation.ShearTimeline.new (frameCount)
 			x = x + (frames[frame + X] - x) * percent
 			y = y + (frames[frame + Y] - y) * percent
 		end
-		if pose == MixPose.setup then
+		if blend == MixBlend.setup then
 			bone.shearX = bone.data.shearX + x * alpha
 			bone.shearY = bone.data.shearY + y * alpha
-		else
+		elseif blend == MixBlend.first or blend == MixBlend.replace then
 			bone.shearX = bone.shearX + (bone.data.shearX + x - bone.shearX) * alpha
 			bone.shearY = bone.shearY + (bone.data.shearY + y - bone.shearY) * alpha
+		elseif blend == MixBlend.add then
+			bone.shearX = bone.shearX + x * alpha
+			bone.shearY = bone.shearY + y * alpha
 		end
 	end
 
@@ -544,13 +575,13 @@ function Animation.ColorTimeline.new (frameCount)
 		self.frames[frameIndex + A] = a
 	end
 
-	function self:apply (skeleton, lastTime, time, firedEvents, alpha, pose, direction)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local frames = self.frames
 		local slot = skeleton.slots[self.slotIndex]
 		if time < frames[0] then 
-			if pose == MixPose.setup then
+			if blend == MixBlend.setup then
 				slot.color:setFrom(slot.data.color)
-			elseif pose == MixPose.current then
+			elseif blend == MixBlend.first then
 				local color = slot.color
 				local setup = slot.data.color
 				color:add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha,
@@ -586,7 +617,7 @@ function Animation.ColorTimeline.new (frameCount)
 			slot.color:set(r, g, b, a)
 		else
 			local color = slot.color
-			if pose == MixPose.setup then color:setFrom(slot.data.color) end
+			if blend == MixBlend.setup then color:setFrom(slot.data.color) end
 			color:add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha)
 		end
 	end
@@ -635,14 +666,14 @@ function Animation.TwoColorTimeline.new (frameCount)
 		self.frames[frameIndex + B2] = b2
 	end
 
-	function self:apply (skeleton, lastTime, time, firedEvents, alpha, pose, direction)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local frames = self.frames
 		local slot = skeleton.slots[self.slotIndex]
 		if time < frames[0] then 
-			if pose == MixPose.setup then
+			if blend == MixBlend.setup then
 				slot.color:setFrom(slot.data.color)
 				slot.darkColor:setFrom(slot.data.darkColor)
-			elseif pose == MixPose.current then
+			elseif blend == MixBlend.first then
 				local light = slot.color
 				local dark = slot.darkColor
 				local setupLight = slot.data.color
@@ -692,7 +723,7 @@ function Animation.TwoColorTimeline.new (frameCount)
 		else
 			local light = slot.color
 			local dark = slot.darkColor
-			if pose == MixPose.setup then 
+			if blend == MixBlend.setup then 
 				light:setFrom(slot.data.color)
 				dark:setFrom(slot.data.darkColor)
 			end
@@ -726,10 +757,10 @@ function Animation.AttachmentTimeline.new (frameCount)
 		return TimelineType.attachment * SHL_24 + self.slotIndex
 	end
 
-	function self:apply (skeleton, lastTime, time, firedEvents, alpha, pose, direction)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local slot = skeleton.slots[self.slotIndex]
 		local attachmentName
-		if direction == MixDirection.out and pose == MixPose.setup then
+		if direction == MixDirection.out and blend == MixBlend.setup then
 			attachmentName = slot.data.attachmentName
 			if not attachmentName then
 				slot:setAttachment(nil)
@@ -741,7 +772,7 @@ function Animation.AttachmentTimeline.new (frameCount)
 		
 		local frames = self.frames
 		if time < frames[0] then 
-			if pose == MixPose.setup then
+			if blend == MixBlend.setup or blend == MixBlend.first then
 				attachmentName = slot.data.attachmentName
 				if not attachmentName then
 					slot:setAttachment(nil)
@@ -788,7 +819,7 @@ function Animation.DeformTimeline.new (frameCount)
 		self.frameVertices[frameIndex] = vertices
 	end
 
-	function self:apply (skeleton, lastTime, time, firedEvents, alpha, pose, direction)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local slot = skeleton.slots[self.slotIndex]
 		local slotAttachment = slot.attachment
 		if not slotAttachment then return end
@@ -797,17 +828,17 @@ function Animation.DeformTimeline.new (frameCount)
 
 		local frames = self.frames
 		local verticesArray = slot.attachmentVertices
-    if #(verticesArray) == 0 then alpha = 1 end
+    if #(verticesArray) == 0 then blend = MixBlend.setup end
 
 		local frameVertices = self.frameVertices
 		local vertexCount = #(frameVertices[0])		
 		
 		if time < frames[0] then
 			local vertexAttachment = slotAttachment;
-			if pose == MixPose.setup then
+			if blend == MixBlend.setup then
         slot.attachmentVertices = {}
         return;
-			elseif pose == MixPose.current then
+			elseif blend == MixBlend.first then
         if (alpha == 1) then
           slot.attachmentVertices = {}
           return;
@@ -837,37 +868,90 @@ function Animation.DeformTimeline.new (frameCount)
 		if time >= frames[zlen(frames) - 1] then -- Time is after last frame.
 			local lastVertices = frameVertices[zlen(frames) - 1]
 			if alpha == 1 then
-				-- Vertex positions or deform offsets, no alpha.
-				local i = 1
-				while i <= vertexCount do
-					vertices[i] = lastVertices[i]
-					i = i + 1
-				end
-			elseif pose == MixPose.setup then
-				local vertexAttachment = slotAttachment
-				if vertexAttachment.bones == nil then
-					-- Unweighted vertex positions, with alpha.
-					local setupVertices = vertexAttachment.vertices
-					local i = 1
-					while i <= vertexCount do
-						local setup = setupVertices[i]
-						vertices[i] = setup + (lastVertices[i] - setup) * alpha
-						i = i + 1
+				if blend == MixBlend.add then
+					local vertexAttachment = slotAttachment
+					if vertexAttachment.bones == nil then
+						-- Unweighted vertex positions, with alpha.
+						local setupVertices = vertexAttachment.vertices
+						local i = 1
+						while i <= vertexCount do
+							vertices[i] = vertices[i] + lastVertices[i] - setupVertices[i]
+							i = i + 1
+						end
+					else
+						-- Weighted deform offsets, with alpha.
+						local i = 1
+						while i <= vertexCount do
+							vertices[i] = vertices[i] + lastVertices[i]
+							i = i + 1
+						end
 					end
 				else
-					-- Weighted deform offsets, with alpha.
 					local i = 1
 					while i <= vertexCount do
-						vertices[i] = lastVertices[i] * alpha
+						vertices[i] = lastVertices[i]
 						i = i + 1
 					end
 				end
 			else
-				-- Vertex positions or deform offsets, with alpha.
-				local i = 1
-				while i <= vertexCount do
-					vertices[i] = vertices[i] + (lastVertices[i] - vertices[i]) * alpha
-					i = i + 1
+				if blend == MixBlend.setup then
+					local vertexAttachment = slotAttachment
+					if vertexAttachment.bones == nil then
+						-- Unweighted vertex positions, with alpha.
+						local setupVertices = vertexAttachment.vertices
+						local i = 1
+						while i <= vertexCount do
+							local setup = setupVertices[i]
+							vertices[i] = setup + (lastVertices[i] - setup) * alpha
+							i = i + 1
+						end
+					else
+						-- Weighted deform offsets, with alpha.
+						local i = 1
+						while i <= vertexCount do
+							vertices[i] = lastVertices[i] * alpha
+							i = i + 1
+						end
+					end
+				elseif blend == MixBlend.first or blend == MixBlend.replace then
+					local i = 1
+					while i <= vertexCount do
+						vertices[i] = vertices[i] + (lastVertices[i] - vertices[i]) * alpha
+						i = i + 1
+					end
+					local vertexAttachment = slotAttachment
+					if vertexAttachment.bones == nil then
+						local setupVertices = vertexAttachment.vertices
+						local i = 1
+						while i <= vertexCount do
+							vertices[i] = vertices[i] + (lastVertices[i] - setupVertices[i]) * alpha
+							i = i + 1
+						end
+					else
+						-- Weighted deform offsets, with alpha.
+						local i = 1
+						while i <= vertexCount do
+							vertices[i] = vertices[i] + lastVertices[i] * alpha
+							i = i + 1
+						end
+					end
+				elseif blend == MixBlend.add then
+					local vertexAttachment = slotAttachment
+					if vertexAttachment.bones == nil then
+						local setupVertices = vertexAttachment.vertices
+						local i = 1
+						while i <= vertexCount do
+							vertices[i] = vertices[i] + (lastVertices[i] - setupVertices[i]) * alpha
+							i = i + 1
+						end
+					else
+						-- Weighted deform offsets, with alpha.
+						local i = 1
+						while i <= vertexCount do
+							vertices[i] = vertices[i] + lastVertices[i] * alpha
+							i = i + 1
+						end
+					end
 				end
 			end
 			return;
@@ -881,41 +965,82 @@ function Animation.DeformTimeline.new (frameCount)
 		local percent = self:getCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime))
 
 		if alpha == 1 then
-			-- Vertex positions or deform offsets, no alpha.
-			local i = 1
-			while i <= vertexCount do
-				local prev = prevVertices[i]
-				vertices[i] = prev + (nextVertices[i] - prev) * percent
-				i = i + 1
-			end
-		elseif pose == MixPose.setup then
-			local vertexAttachment = slotAttachment
-			if vertexAttachment.bones == nil then
-				-- Unweighted vertex positions, with alpha.
-				local setupVertices = vertexAttachment.vertices
-				local i = 1
-				while i <= vertexCount do
-					local prev = prevVertices[i]
-					local setup = setupVertices[i]
-					vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha
-					i = i + 1
+			if blend == MixBlend.add then
+				local vertexAttachment = slotAttachment
+				if vertexAttachment.bones == nil then
+					-- Unweighted vertex positions, with alpha.
+					local setupVertices = vertexAttachment.vertices
+					local i = 1
+					while i <= vertexCount do
+						local prev = prevVertices[i]
+						vertices[i] = vertices[i] + prev + (nextVertices[i] - prev) * precent - setupVertices[i]
+						i = i + 1
+					end
+				else
+					-- Weighted deform offsets, with alpha.
+					local i = 1
+					while i <= vertexCount do
+						local prev = prevVertices[i]
+						vertices[i] = vertices[i] + prev + (nextVertices[i] - prev) * percent
+						i = i + 1
+					end
 				end
 			else
-				-- Weighted deform offsets, with alpha.
 				local i = 1
 				while i <= vertexCount do
 					local prev = prevVertices[i]
-					vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha
+					vertices[i] = prev + (nextVertices[i] - prev) * percent
 					i = i + 1
 				end
 			end
 		else
-			-- Vertex positions or deform offsets, with alpha.
-			local i = 1
-			while i <= vertexCount do
-				local prev = prevVertices[i]
-				vertices[i] = vertices[i] + (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha
-				i = i + 1
+			if blend == MixBlend.setup then
+				local vertexAttachment = slotAttachment
+				if vertexAttachment.bones == nil then
+					-- Unweighted vertex positions, with alpha.
+					local setupVertices = vertexAttachment.vertices
+					local i = 1
+					while i <= vertexCount do
+						local prev = prevVertices[i]
+						local setup = setupVertices[i]
+						vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha
+						i = i + 1
+					end
+				else
+					-- Weighted deform offsets, with alpha.
+					local i = 1
+					while i <= vertexCount do
+						local prev = prevVertices[i]
+						vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha
+						i = i + 1
+					end
+				end
+			elseif blend == MixBlend.first or blend == MixBlend.replace then
+				local i = 1
+				while i <= vertexCount do
+					local prev = prevVertices[i]
+					vertices[i] = vertices[i] + (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha
+					i = i + 1
+				end
+			elseif blend == MixBlend.add then
+				local vertexAttachment = slotAttachment
+				if vertexAttachment.bones == nil then
+					local setupVertices = vertexAttachment.vertices
+					local i = 1
+					while i <= vertexCount do
+						local prev = prevVertices[i]
+						vertices[i] = vertices[i] + (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha
+						i = i + 1
+					end
+				else
+					-- Weighted deform offsets, with alpha.
+					local i = 1
+					while i <= vertexCount do
+						local prev = prevVertices[i]
+						vertices[i] = vertices[i] + (prev + (nextVertices[i] - prev) * percent) * alpha
+						i = i + 1
+					end
+				end
 			end
 		end
 	end
@@ -945,14 +1070,14 @@ function Animation.EventTimeline.new (frameCount)
 	end
 
 	-- Fires events for frames > lastTime and <= time.
-	function self:apply (skeleton, lastTime, time, firedEvents, alpha, pose, direction)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		if not firedEvents then return end
 
 		local frames = self.frames
 		local frameCount = zlen(frames)
 
 		if lastTime > time then -- Fire events after last time for looped animations.
-			self:apply(skeleton, lastTime, 999999, firedEvents, alpha, pose, direction)
+			self:apply(skeleton, lastTime, 999999, firedEvents, alpha, blend, direction)
 			lastTime = -1
 		elseif lastTime >= frames[frameCount - 1] then -- Last time is after last frame.
 			return
@@ -1001,18 +1126,19 @@ function Animation.DrawOrderTimeline.new (frameCount)
 		self.drawOrders[frameIndex] = drawOrder
 	end
 
-	function self:apply (skeleton, lastTime, time, firedEvents, alpha, pose, direction)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local drawOrder = skeleton.drawOrder
 		local slots = skeleton.slots
-		if mixingOut and setupPose then
+		if direction == MixDirection.out and blend == MixBlend.setup then
 			for i,slot in ipairs(slots) do
 				drawOrder[i] = slots[i]
 			end
 			return;
 		end
+		
 		local frames = self.frames
 		if time < frames[0] then 
-			if pose == MixPose.setup then
+			if blend == MixBlend.setup or blend == MixBlend.first then
 				for i,slot in ipairs(slots) do
 					drawOrder[i] = slots[i]
 				end
@@ -1068,15 +1194,15 @@ function Animation.IkConstraintTimeline.new (frameCount)
 		self.frames[frameIndex + BEND_DIRECTION] = bendDirection
 	end
 
-	function self:apply (skeleton, lastTime, time, firedEvents, alpha, pose, direction)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local frames = self.frames
 
 		local constraint = skeleton.ikConstraints[self.ikConstraintIndex]
 		if time < frames[0] then
-			if pose == MixPose.setup then
+			if blend == MixBlend.setup then
 				constraint.mix = constraint.data.mix
 				constraint.bendDirection = constraint.data.bendDirection
-			elseif pose == MixPose.current then
+			elseif blend == MixBlend.first then
 				constraint.mix = constraint.mix + (constraint.data.mix - constraint.mix) * alpha
 				constraint.bendDirection = constraint.data.bendDirection
 			end
@@ -1084,7 +1210,7 @@ function Animation.IkConstraintTimeline.new (frameCount)
 		end
 
 		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
-			if pose == MixPose.setup then
+			if blend == MixBlend.setup then
 				constraint.mix = constraint.data.mix + (frames[zlen(frames) + PREV_MIX] - constraint.data.mix) * alpha
 				if direction == MixDirection.out then 
 					constraint.bendDirection = constraint.data.bendDirection
@@ -1105,7 +1231,7 @@ function Animation.IkConstraintTimeline.new (frameCount)
 		local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1,
 				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
 
-		if pose == MixPose.setup then
+		if blend == MixBlend.setup then
 			constraint.mix = constraint.data.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.data.mix) * alpha
 			if direction == MixDirection.out then
 				constraint.bendDirection = constraint.data.bendDirection
@@ -1153,18 +1279,18 @@ function Animation.TransformConstraintTimeline.new (frameCount)
 		self.frames[frameIndex + SHEAR] = shearMix
 	end
 
-	function self:apply (skeleton, lastTime, time, firedEvents, alpha, pose, direction)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local frames = self.frames
 
 		local constraint = skeleton.transformConstraints[self.transformConstraintIndex]
 		if time < frames[0] then
 			local data = constraint.data
-			if pose == MixPose.setup then
+			if blend == MixBlend.setup then
 				constraint.rotateMix = data.rotateMix
 				constraint.translateMix = data.translateMix
 				constraint.scaleMix = data.scaleMix
 				constraint.shearMix = data.shearMix
-			elseif pose == MixPose.current then
+			elseif blend == MixBlend.first then
 				constraint.rotateMix = constraint.rotateMix + (data.rotateMix - constraint.rotateMix) * alpha
 				constraint.translateMix = constraint.translateMix + (data.translateMix - constraint.translateMix) * alpha
 				constraint.scaleMix = constraint.scaleMix + (data.scaleMix - constraint.scaleMix) * alpha
@@ -1199,7 +1325,7 @@ function Animation.TransformConstraintTimeline.new (frameCount)
 			scale = scale + (frames[frame + SCALE] - scale) * percent
 			shear = shear + (frames[frame + SHEAR] - shear) * percent
 		end
-		if pose == MixPose.setup then
+		if blend == MixBlend.setup then
 			local data = constraint.data
 			constraint.rotateMix = data.rotateMix + (rotate - data.rotateMix) * alpha
 			constraint.translateMix = data.translateMix + (translate - data.translateMix) * alpha
@@ -1239,14 +1365,14 @@ function Animation.PathConstraintPositionTimeline.new (frameCount)
 		self.frames[frameIndex + VALUE] = value
 	end
 
-	function self:apply (skeleton, lastTime, time, firedEvents, alpha, pose, direction)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local frames = self.frames
 
 		local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
 		if (time < frames[0]) then
-			if pose == MixPose.setup then
+			if blend == MixBlend.setup then
 				constraint.position = constraint.data.position	
-			elseif pose == MixPose.current then
+			elseif blend == MixBlend.first then
 				constraint.position = constraint.position + (constraint.data.position - constraint.position) * alpha
 			end
 			return
@@ -1265,7 +1391,7 @@ function Animation.PathConstraintPositionTimeline.new (frameCount)
 
 			position = position + (frames[frame + VALUE] - position) * percent
 		end
-		if pose == MixPose.setup then
+		if blend == MixBlend.setup then
 			constraint.position = constraint.data.position + (position - constraint.data.position) * alpha
 		else
 			constraint.position = constraint.position + (position - constraint.position) * alpha
@@ -1298,14 +1424,14 @@ function Animation.PathConstraintSpacingTimeline.new (frameCount)
 		self.frames[frameIndex + VALUE] = value
 	end
 
-	function self:apply (skeleton, lastTime, time, firedEvents, alpha, pose, direction)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local frames = self.frames
 
 		local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
 		if (time < frames[0]) then
-			if pose == MixPose.setup then
+			if blend == MixBlend.setup then
 				constraint.spacing = constraint.data.spacing
-			elseif pose == MixPose.current then
+			elseif blend == MixBlend.first then
 				constraint.spacing = constraint.spacing + (constraint.data.spacing - constraint.spacing) * alpha
 			end
 			return
@@ -1325,7 +1451,7 @@ function Animation.PathConstraintSpacingTimeline.new (frameCount)
 			spacing = spacing + (frames[frame + VALUE] - spacing) * percent
 		end
 
-		if pose == MixPose.setup then
+		if blend == MixBlend.setup then
 			constraint.spacing = constraint.data.spacing + (spacing - constraint.data.spacing) * alpha
 		else
 			constraint.spacing = constraint.spacing + (spacing - constraint.spacing) * alpha
@@ -1361,15 +1487,15 @@ function Animation.PathConstraintMixTimeline.new (frameCount)
 		self.frames[frameIndex + TRANSLATE] = translateMix
 	end
 
-	function self:apply (skeleton, lastTime, time, firedEvents, alpha, pose, direction)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local frames = self.frames
 
 		local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
 		if (time < frames[0]) then
-			if pose == MixPose.setup then
+			if blend == MixBlend.setup then
 				constraint.rotateMix = constraint.data.rotateMix
 				constraint.translateMix = constraint.data.translateMix
-			elseif pose == MixPose.current then
+			elseif blend == MixBlend.first then
 				constraint.rotateMix = constraint.rotateMix + (constraint.data.rotateMix - constraint.rotateMix) * alpha
 				constraint.translateMix = constraint.translateMix + (constraint.data.translateMix - constraint.translateMix) * alpha
 			end
@@ -1394,7 +1520,7 @@ function Animation.PathConstraintMixTimeline.new (frameCount)
 			translate = translate + (frames[frame + TRANSLATE] - translate) * percent
 		end
 
-		if pose == MixPose.setup then
+		if blend == MixBlend.setup then
 			constraint.rotateMix = constraint.data.rotateMix + (rotate - constraint.data.rotateMix) * alpha
 			constraint.translateMix = constraint.data.translateMix + (translate - constraint.data.translateMix) * alpha
 		else

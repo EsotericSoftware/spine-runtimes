@@ -833,7 +833,7 @@ module spine {
 					case MixBlend.first:
 					case MixBlend.replace:
 						for (let i = 0; i < vertexCount; i++)
-						vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
+							vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
 					case MixBlend.add:
 						let vertexAttachment = slotAttachment as VertexAttachment;
 						if (vertexAttachment.bones == null) {
