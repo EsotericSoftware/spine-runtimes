@@ -9,7 +9,7 @@ Shader "Spine/Skeleton Fill" {
 		[NoScaleOffset]_MainTex ("MainTex", 2D) = "white" {}
 	}
 	SubShader {
-		Tags { "IgnoreProjector"="True" "Queue"="Transparent" "RenderType"="Transparent" "PreviewType"="Plane" }
+		Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" "PreviewType"="Plane" }
 		Blend One OneMinusSrcAlpha
 		Cull Off
 		ZWrite Off
