@@ -138,7 +138,7 @@ namespace Spine.Unity {
 				// Recommended setup: Use local transform properties if Spine GameObject is the immediate parent
 				thisTransform.localPosition = new Vector3(bone.worldX, bone.worldY, followZPosition ? 0f : thisTransform.localPosition.z);
 				if (followBoneRotation) {
-					var halfRotation = Mathf.Atan2(bone.c, bone.a) * 0.5f;
+					float halfRotation = Mathf.Atan2(bone.c, bone.a) * 0.5f;
 					if (followLocalScale && bone.scaleX < 0) // Negate rotation from negative scaleX. Don't use negative determinant. local scaleY doesn't factor into used rotation.
 						halfRotation += Mathf.PI * 0.5f;
 
