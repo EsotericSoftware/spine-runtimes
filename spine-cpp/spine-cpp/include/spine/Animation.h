@@ -34,6 +34,7 @@
 #include <spine/Vector.h>
 #include <spine/MixPose.h>
 #include <spine/MixDirection.h>
+#include <spine/SpineObject.h>
 
 #include <string>
 
@@ -42,7 +43,7 @@ namespace Spine {
     class Skeleton;
     class Event;
     
-    class Animation {
+    class Animation : public SpineObject {
         friend class AnimationState;
         friend class TrackEntry;
         friend class AnimationStateData;

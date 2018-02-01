@@ -33,15 +33,16 @@
 
 #include <spine/Extension.h>
 #include <spine/Vector.h>
+#include <spine/SpineObject.h>
 
 namespace Spine {
     template <typename K, typename V, typename H>
-    class HashMap {
+    class HashMap : public SpineObject {
     private:
         class Entry;
         
     public:
-        class Iterator {
+        class Iterator : public SpineObject {
             friend class HashMap;
             
         public:
@@ -129,8 +130,7 @@ namespace Spine {
             
             size_t index = hash(key);
             
-            Entry* entry = NEW(Entry);
-            new (entry) Entry();
+            Entry* entry = new Entry();
             entry->_key = key;
             entry->_value = value;
             
@@ -222,7 +222,7 @@ namespace Spine {
                         pos._entry->next->prev = pos._entry->prev;
                     }
                     
-                    DESTROY(Entry, pos._entry);
+                    delete pos._entry;
                 }
                 else if (_hashTable[index].next == pos._entry) {
                     _hashTable[index].next = pos._entry->next;
@@ -235,7 +235,7 @@ namespace Spine {
                         pos._entry->next->prev = pos._entry->prev;
                     }
                     
-                    DESTROY(Entry, pos._entry);
+                    delete pos._entry;
                 }
                 else if (_hashTable[index].prev == pos._entry) {
                     _hashTable[index].prev = pos._entry->prev;
@@ -248,13 +248,13 @@ namespace Spine {
                         pos._entry->next->prev = pos._entry->prev;
                     }
                     
-                    DESTROY(Entry, pos._entry);
+                    delete pos._entry;
                 }
                 else {
                     pos._entry->prev->next = pos._entry->next;
                     pos._entry->next->prev = pos._entry->prev;
                     
-                    DESTROY(Entry, pos._entry);
+                    delete pos._entry;
                 }
                 
                 _hashSize--;
@@ -276,7 +276,7 @@ namespace Spine {
         }
         
     private:
-        class Entry {
+        class Entry : public SpineObject {
         public:
             K _key;
             V _value;

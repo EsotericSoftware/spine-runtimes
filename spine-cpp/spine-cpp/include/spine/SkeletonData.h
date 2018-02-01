@@ -46,7 +46,7 @@ namespace Spine {
     class PathConstraintData;
     
     /// Stores the setup pose and all of the stateless data for a skeleton.
-    class SkeletonData {
+    class SkeletonData : public SpineObject {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         friend class Skeleton;

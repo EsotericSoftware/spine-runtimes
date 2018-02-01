@@ -31,12 +31,14 @@
 #ifndef Spine_TextureLoader_h
 #define Spine_TextureLoader_h
 
+#include <spine/SpineObject.h>
+
 #include <string>
 
 namespace Spine {
     class AtlasPage;
     
-    class TextureLoader {
+    class TextureLoader : public SpineObject {
     public:
         TextureLoader();
         

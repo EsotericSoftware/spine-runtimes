@@ -32,7 +32,7 @@
 #define Spine_Bone_h
 
 #include <spine/Updatable.h>
-
+#include <spine/SpineObject.h>
 #include <spine/Vector.h>
 
 namespace Spine {

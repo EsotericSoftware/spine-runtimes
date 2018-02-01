@@ -31,10 +31,11 @@
 #ifndef Spine_RTTI_h
 #define Spine_RTTI_h
 
+#include <spine/SpineObject.h>
 #include <string>
 
 namespace Spine {
-    class RTTI {
+    class RTTI : public SpineObject {
     public:
         RTTI(const std::string& className);
         

@@ -35,7 +35,7 @@
 #include <spine/Pool.h>
 
 namespace Spine {
-    class Triangulator {
+    class Triangulator : public SpineObject {
     public:
         Vector<int>& triangulate(Vector<float>& vertices);
         

@@ -32,6 +32,7 @@
 #define Spine_SkeletonBounds_h
 
 #include <spine/Vector.h>
+#include <spine/SpineObject.h>
 
 namespace Spine {
     class Skeleton;
@@ -43,7 +44,7 @@ namespace Spine {
     /// Collects each BoundingBoxAttachment that is visible and computes the world vertices for its polygon.
     /// The polygon vertices are provided along with convenience methods for doing hit detection.
     ///
-    class SkeletonBounds {
+    class SkeletonBounds : public SpineObject {
     public:
         SkeletonBounds();
         
@@ -94,7 +95,7 @@ namespace Spine {
         void aabbCompute();
     };
     
-    class Polygon {
+    class Polygon : public SpineObject {
     public:
         Vector<float> _vertices;
         int _count;

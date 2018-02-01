@@ -32,11 +32,11 @@
 #define Spine_Attachment_h
 
 #include <spine/RTTI.h>
-
+#include <spine/SpineObject.h>
 #include <string>
 
 namespace Spine {
-    class Attachment {
+    class Attachment : public SpineObject {
         RTTI_DECL;
         
     public:

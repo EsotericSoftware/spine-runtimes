@@ -33,6 +33,7 @@
 
 #include <spine/Vector.h>
 #include <spine/Extension.h>
+#include <spine/SpineObject.h>
 
 #include <string>
 
@@ -63,7 +64,7 @@ namespace Spine {
         TextureWrap_Repeat
     };
     
-    class AtlasPage {
+    class AtlasPage : public SpineObject {
     public:
         std::string name;
         Format format;
@@ -77,7 +78,7 @@ namespace Spine {
         AtlasPage(std::string inName) : name(inName) {}
     };
     
-    class AtlasRegion {
+    class AtlasRegion : public SpineObject {
     public:
         AtlasPage* page;
         std::string name;
@@ -93,7 +94,7 @@ namespace Spine {
     
     class TextureLoader;
     
-    class Atlas {
+    class Atlas : SpineObject {
     public:
         Atlas(const char* path, TextureLoader& textureLoader);
         

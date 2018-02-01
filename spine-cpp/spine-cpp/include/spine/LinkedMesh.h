@@ -31,12 +31,14 @@
 #ifndef Spine_LinkedMesh_h
 #define Spine_LinkedMesh_h
 
+#include <spine/SpineObject.h>
+
 #include <string>
 
 namespace Spine {
     class MeshAttachment;
     
-    class LinkedMesh {
+    class LinkedMesh : public SpineObject {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

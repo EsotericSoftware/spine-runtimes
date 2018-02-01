@@ -48,7 +48,7 @@ void C_InterfaceTestFixture::tearDown()
 static Spine::SkeletonData* readSkeletonJsonData(const char* filename, Atlas* atlas)
 {
     using namespace Spine;
-    
+
     Vector<Atlas*> atlasArray;
     atlasArray.push_back(atlas);
     

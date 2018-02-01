@@ -42,11 +42,11 @@ namespace Spine {
     /// Stores attachments by slot index and attachment name.
     /// See SkeletonData::getDefaultSkin, Skeleton::getSkin, and
     /// http://esotericsoftware.com/spine-runtime-skins in the Spine Runtimes Guide.
-    class Skin {
+    class Skin : public SpineObject {
         friend class Skeleton;
         
     public:
-        class AttachmentKey {
+        class AttachmentKey : public SpineObject {
         public:
             int _slotIndex;
             std::string _name;
@@ -56,7 +56,7 @@ namespace Spine {
             bool operator==(const AttachmentKey &other) const;
         };
         
-        struct HashAttachmentKey {
+        struct HashAttachmentKey : public SpineObject {
             std::size_t operator()(const Spine::Skin::AttachmentKey& val) const;
         };
         

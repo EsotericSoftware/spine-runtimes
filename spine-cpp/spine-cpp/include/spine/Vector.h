@@ -32,6 +32,7 @@
 #define Spine_Vector_h
 
 #include <spine/Extension.h>
+#include <spine/SpineObject.h>
 
 #include <stdlib.h>
 #include <memory>
@@ -39,7 +40,7 @@
 
 namespace Spine {
     template <typename T>
-    class Vector {
+    class Vector : public SpineObject {
     public:
         Vector() : _size(0), _capacity(0), _buffer(NULL) {
             // Empty
@@ -157,7 +158,7 @@ namespace Spine {
         void reserve(size_t inCapacity = 0) {
             size_t newCapacity = inCapacity > 0 ? inCapacity : _capacity > 0 ? _capacity * 2 : 1;
             if (newCapacity > _capacity) {
-                _buffer = REALLOC(_buffer, T, newCapacity);
+                _buffer = (T*)SpineExtension::realloc<T>(_buffer, newCapacity, __FILE__, __LINE__);
                 _capacity = newCapacity;
             }
         }
@@ -202,7 +203,7 @@ namespace Spine {
         T* allocate(size_t n) {
             assert(n > 0);
             
-            T* ptr = MALLOC(T, n);
+            T* ptr = (T*)SpineExtension::alloc<T>(n, __FILE__, __LINE__);
             
             assert(ptr);
             
@@ -211,7 +212,7 @@ namespace Spine {
         
         void deallocate(T* buffer) {
             if (_buffer) {
-                FREE(buffer);
+                SpineExtension::free<T>(buffer);
             }
         }
         

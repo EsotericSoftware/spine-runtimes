@@ -32,6 +32,7 @@
 #define Spine_Slot_h
 
 #include <spine/Vector.h>
+#include <spine/SpineObject.h>
 
 #include <string>
 
@@ -41,7 +42,7 @@ namespace Spine {
     class Skeleton;
     class Attachment;
     
-    class Slot {
+    class Slot : public SpineObject {
         friend class VertexAttachment;
         friend class Skeleton;
         friend class SkeletonBounds;

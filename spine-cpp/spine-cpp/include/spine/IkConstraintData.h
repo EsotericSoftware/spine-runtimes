@@ -32,13 +32,14 @@
 #define Spine_IkConstraintData_h
 
 #include <spine/Vector.h>
+#include <spine/SpineObject.h>
 
 #include <string>
 
 namespace Spine {
     class BoneData;
     
-    class IkConstraintData {
+    class IkConstraintData : public SpineObject {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         friend class IkConstraint;

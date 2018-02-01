@@ -32,7 +32,7 @@
 #define Spine_AttachmentLoader_h
 
 #include <spine/RTTI.h>
-
+#include <spine/SpineObject.h>
 #include <string>
 
 namespace Spine {
@@ -44,7 +44,7 @@ namespace Spine {
     class PointAttachment;
     class ClippingAttachment;
     
-    class AttachmentLoader {
+    class AttachmentLoader : public SpineObject {
         RTTI_DECL;
         
         AttachmentLoader();

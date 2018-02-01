@@ -32,6 +32,7 @@
 #define Spine_AnimationStateData_h
 
 #include <spine/HashMap.h>
+#include <spine/SpineObject.h>
 
 #include <assert.h>
 #include <string>
@@ -41,7 +42,7 @@ namespace Spine {
     class Animation;
     
     /// Stores mix (crossfade) durations to be applied when AnimationState animations are changed.
-    class AnimationStateData {
+    class AnimationStateData : public SpineObject {
         friend class AnimationState;
         
     public:
@@ -68,7 +69,7 @@ namespace Spine {
         float getMix(Animation* from, Animation* to);
         
     private:
-        class AnimationPair {
+        class AnimationPair : public SpineObject {
         public:
             Animation* _a1;
             Animation* _a2;
@@ -78,7 +79,7 @@ namespace Spine {
             bool operator==(const AnimationPair &other) const;
         };
         
-        struct HashAnimationPair {
+        struct HashAnimationPair : public SpineObject {
             std::size_t operator()(const Spine::AnimationStateData::AnimationPair& val) const;
         };
         

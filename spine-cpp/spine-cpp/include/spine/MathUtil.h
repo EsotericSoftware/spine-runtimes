@@ -31,6 +31,8 @@
 #ifndef Spine_MathUtil_h
 #define Spine_MathUtil_h
 
+#include <spine/SpineObject.h>
+
 #include <math.h>
 #include <float.h>
 
@@ -78,7 +80,7 @@ namespace Spine {
         return fminf(upper, fmaxf(x, lower));
     }
     
-    class MathUtil {
+    class MathUtil : public SpineObject {
     public:
         MathUtil();
         

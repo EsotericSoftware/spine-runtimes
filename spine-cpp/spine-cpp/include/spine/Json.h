@@ -31,13 +31,15 @@
 #ifndef Spine_Json_h
 #define Spine_Json_h
 
+#include <spine/SpineObject.h>
+
 #ifndef SPINE_JSON_HAVE_PREV
 /* Spine doesn't use the "prev" link in the Json sibling lists. */
 #define SPINE_JSON_HAVE_PREV 0
 #endif
 
 namespace Spine {
-    class Json {
+    class Json : public SpineObject {
         friend class SkeletonJson;
         
     public:

@@ -49,17 +49,17 @@ namespace Spine {
         const char* lastSlash = lastForwardSlash > lastBackwardSlash ? lastForwardSlash : lastBackwardSlash;
         if (lastSlash == path) lastSlash++; /* Never drop starting slash. */
         dirLength = (int)(lastSlash ? lastSlash - path : 0);
-        dir = MALLOC(char, dirLength + 1);
+        dir = SpineExtension::alloc<char>(dirLength + 1, __FILE__, __LINE__);
         memcpy(dir, path, dirLength);
         dir[dirLength] = '\0';
 
-        data = SPINE_EXTENSION->spineReadFile(path, &length);
+        data = SpineExtension::readFile(path, &length);
         if (data) {
             load(data, length, dir);
         }
 
-        FREE(data);
-        FREE(dir);
+        SpineExtension::free(data);
+        SpineExtension::free(dir);
     }
 
     Atlas::Atlas(const char* data, int length, const char* dir, TextureLoader& textureLoader) : _textureLoader(textureLoader) {
@@ -116,17 +116,16 @@ namespace Spine {
             }
             else if (!page) {
                 char* name = mallocString(&str);
-                char* path = MALLOC(char, dirLength + needsSlash + strlen(name) + 1);
+                char* path = SpineExtension::alloc<char>(dirLength + needsSlash + strlen(name) + 1, __FILE__, __LINE__);
                 memcpy(path, dir, dirLength);
                 if (needsSlash) {
                     path[dirLength] = '/';
                 }
                 strcpy(path + dirLength + needsSlash, name);
 
-                page = NEW(AtlasPage);
-                new (page) AtlasPage(std::string(name));
+                page = new AtlasPage(std::string(name));
 
-                FREE(name);
+                SpineExtension::free(name);
 
                 int tupleVal = readTuple(&begin, end, tuple);
                 assert(tupleVal == 2);
@@ -163,13 +162,12 @@ namespace Spine {
 
                 _textureLoader.load(*page, std::string(path));
 
-                FREE(path);
+                SpineExtension::free(path);
 
                 _pages.push_back(page);
             }
             else {
-                AtlasRegion* region = NEW(AtlasRegion);
-                new (region) AtlasRegion();
+                AtlasRegion* region = new AtlasRegion();
 
                 region->page = page;
                 region->name = mallocString(&str);
@@ -333,7 +331,7 @@ namespace Spine {
 
     char* Atlas::mallocString(Str* str) {
         int length = (int)(str->end - str->begin);
-        char* string = MALLOC(char, length + 1);
+        char* string = SpineExtension::alloc<char>(length + 1, __FILE__, __LINE__);
         memcpy(string, str->begin, length);
         string[length] = '\0';
         return string;

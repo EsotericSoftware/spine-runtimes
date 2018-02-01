@@ -28,77 +28,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <spine/Extension.h>
-
-#include <fstream>
-#include <assert.h>
-#include <cstring>
+#include <spine/SpineObject.h>
 
 namespace Spine {
-    SpineExtension* SpineExtension::_instance = NULL;
-    
-    void SpineExtension::setInstance(SpineExtension* inValue) {
-        assert(!_instance);
-        
-        _instance = inValue;
-    }
-    
-    SpineExtension* SpineExtension::getInstance() {
-        assert(_instance);
-        
-        return _instance;
-    }
-    
-    SpineExtension::~SpineExtension() {
-        // Empty
-    }
-    
-    char* SpineExtension::_readFile(const char* path, int* length) {
-        char *data;
-        FILE *file = fopen(path, "rb");
-        if (!file) return 0;
-        
-        fseek(file, 0, SEEK_END);
-        *length = (int)ftell(file);
-        fseek(file, 0, SEEK_SET);
-        
-        data = SpineExtension::alloc<char>(*length, __FILE__, __LINE__);
-        fread(data, 1, *length, file);
-        fclose(file);
-        
-        return data;
-    }
-    
-    SpineExtension::SpineExtension() {
-        // Empty
-    }
-    
-    DefaultSpineExtension::~DefaultSpineExtension() {
-        // Empty
-    }
-    
-    void* DefaultSpineExtension::_alloc(size_t size, const char* file, int line) {
-        return ::malloc(size);
-    }
-    
-    void* DefaultSpineExtension::_calloc(size_t size, const char* file, int line) {
-        void* ptr = _alloc(size, file, line);
-        if (ptr) {
-            memset(ptr, 0, size);
-        }
-        
-        return ptr;
-    }
-    
-    void* DefaultSpineExtension::_realloc(void* ptr, size_t size, const char* file, int line) {
-        return ::realloc(ptr, size);
-    }
-    
-    void DefaultSpineExtension::_free(void* mem) {
-        free(mem);
-    }
-    
-    DefaultSpineExtension::DefaultSpineExtension() : SpineExtension() {
-        // Empty
-    }
+
 }

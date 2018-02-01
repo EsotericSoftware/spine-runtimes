@@ -34,10 +34,11 @@
 #include <spine/Extension.h>
 #include <spine/Vector.h>
 #include <spine/ContainerUtil.h>
+#include <spine/SpineObject.h>
 
 namespace Spine {
     template <typename T>
-    class Pool {
+    class Pool : public SpineObject {
     public:
         Pool() {
             // Empty
@@ -56,8 +57,7 @@ namespace Spine {
                 return ret;
             }
             else {
-                T* ret = NEW(T);
-                new (ret) T();
+                T* ret = new T();
                 
                 return ret;
             }

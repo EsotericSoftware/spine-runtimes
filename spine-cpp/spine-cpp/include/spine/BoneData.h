@@ -32,11 +32,11 @@
 #define Spine_BoneData_h
 
 #include <spine/TransformMode.h>
-
+#include <spine/SpineObject.h>
 #include <string>
 
 namespace Spine {
-    class BoneData {
+    class BoneData : public SpineObject {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

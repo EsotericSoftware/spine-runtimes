@@ -115,19 +115,19 @@ namespace Spine {
     
     Json::~Json() {
         if (_child) {
-            DESTROY(Json, _child);
+            delete _child;
         }
         
         if (_valueString) {
-            FREE(_valueString);
+            SpineExtension::free(_valueString);
         }
         
         if (_name) {
-            FREE(_name);
+            SpineExtension::free(_name);
         }
         
         if (_next) {
-            DESTROY(Json, _next);
+            delete _next;
         }
     }
     
@@ -223,7 +223,7 @@ namespace Spine {
             }
         }
         
-        out = MALLOC(char, len + 1); /* The length needed for the string, roughly. */
+        out = (char*)SpineExtension::alloc<char>(len + 1, __FILE__, __LINE__); /* The length needed for the string, roughly. */
         if (!out) {
             return 0;
         }
@@ -313,7 +313,7 @@ namespace Spine {
             }
         }
         
-        *ptr2 = NULL;
+        *ptr2 = 0;
         
         if (*ptr == '\"') {
             ptr++; /* TODO error handling if not \" or \0 ? */
@@ -415,8 +415,7 @@ namespace Spine {
             return value + 1; /* empty array. */
         }
         
-        item->_child = child = NEW(Json);
-        new (item->_child) Json(NULL);
+        item->_child = child = new Json(NULL);
         if (!item->_child) {
             return NULL; /* memory fail */
         }
@@ -430,8 +429,7 @@ namespace Spine {
         item->_size = 1;
         
         while (*value == ',') {
-            Json *new_item = NEW(Json);
-            new (new_item) Json(NULL);
+            Json *new_item = new Json(NULL);
             if (!new_item) {
                 return NULL; /* memory fail */
             }
@@ -473,8 +471,7 @@ namespace Spine {
             return value + 1; /* empty array. */
         }
         
-        item->_child = child = NEW(Json);
-        new (item->_child) Json(NULL);
+        item->_child = child = new Json(NULL);
         if (!item->_child) {
             return NULL;
         }
@@ -497,8 +494,7 @@ namespace Spine {
         item->_size = 1;
         
         while (*value == ',') {
-            Json *new_item = NEW(Json);
-            new (new_item) Json(NULL);
+            Json *new_item = new Json(NULL);
             if (!new_item) {
                 return NULL; /* memory fail */
             }

@@ -34,12 +34,13 @@
 #include <spine/Extension.h>
 #include <spine/Vector.h>
 #include <spine/HashMap.h>
+#include <spine/SpineObject.h>
 
 #include <string>
 #include <assert.h>
 
 namespace Spine {
-    class ContainerUtil {
+    class ContainerUtil : public SpineObject {
     public:
         /// Finds an item by comparing each item's name.
         /// It is more efficient to cache the results of this method than to call it multiple times.
@@ -110,7 +111,7 @@ namespace Spine {
             for (size_t i = 0; i < items.size(); ) {
                 T* item = items[i];
                 
-                DESTROY(T, item);
+                delete item;
                 
                 items.erase(i);
             }

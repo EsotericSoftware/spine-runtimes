@@ -35,12 +35,13 @@
 #include <spine/Vector.h>
 #include <spine/MixPose.h>
 #include <spine/MixDirection.h>
+#include <spine/SpineObject.h>
 
 namespace Spine {
     class Skeleton;
     class Event;
     
-    class Timeline {
+    class Timeline : public SpineObject {
         RTTI_DECL;
         
     public:

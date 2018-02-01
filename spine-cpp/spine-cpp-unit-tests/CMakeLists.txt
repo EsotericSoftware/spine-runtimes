@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.9)
-project(spine_unit_test)
+project(spine_cpp_unit_test)
 
 set(CMAKE_INSTALL_PREFIX "./")
 set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -38,21 +38,21 @@ set(MEMLEAK_SRC
 #########################################################
 # setup main project
 #########################################################
-add_executable(spine_unit_test main.cpp ${MINICPP_SRC} ${TEAMCITY_SRC} ${TEST_SRC} ${MEMLEAK_SRC})
-target_link_libraries(spine_unit_test spine-cpp)
+add_executable(spine_cpp_unit_test main.cpp ${MINICPP_SRC} ${TEAMCITY_SRC} ${TEST_SRC} ${MEMLEAK_SRC})
+target_link_libraries(spine_cpp_unit_test spine-cpp)
 
 
 #########################################################
 # copy resources to build output directory
 #########################################################
-add_custom_command(TARGET spine_unit_test PRE_BUILD
+add_custom_command(TARGET spine_cpp_unit_test PRE_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_directory
-		${CMAKE_CURRENT_LIST_DIR}/../../examples/spineboy/export $<TARGET_FILE_DIR:spine_unit_test>/testdata/spineboy)
+		${CMAKE_CURRENT_LIST_DIR}/../../examples/spineboy/export $<TARGET_FILE_DIR:spine_cpp_unit_test>/testdata/spineboy)
 
-add_custom_command(TARGET spine_unit_test PRE_BUILD
+add_custom_command(TARGET spine_cpp_unit_test PRE_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_directory
-		${CMAKE_CURRENT_LIST_DIR}/../../examples/raptor/export $<TARGET_FILE_DIR:spine_unit_test>/testdata/raptor)
+		${CMAKE_CURRENT_LIST_DIR}/../../examples/raptor/export $<TARGET_FILE_DIR:spine_cpp_unit_test>/testdata/raptor)
 
-add_custom_command(TARGET spine_unit_test PRE_BUILD
+add_custom_command(TARGET spine_cpp_unit_test PRE_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_directory
-		${CMAKE_CURRENT_LIST_DIR}/../../examples/goblins/export $<TARGET_FILE_DIR:spine_unit_test>/testdata/goblins)
+		${CMAKE_CURRENT_LIST_DIR}/../../examples/goblins/export $<TARGET_FILE_DIR:spine_cpp_unit_test>/testdata/goblins)

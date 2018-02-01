@@ -32,9 +32,10 @@
 #define Spine_Updatable_h
 
 #include <spine/RTTI.h>
+#include <spine/SpineObject.h>
 
 namespace Spine {
-    class Updatable {
+    class Updatable : public SpineObject {
         RTTI_DECL;
         
     public:

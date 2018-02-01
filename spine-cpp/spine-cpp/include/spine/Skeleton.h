@@ -33,6 +33,7 @@
 
 #include <spine/Vector.h>
 #include <spine/MathUtil.h>
+#include <spine/SpineObject.h>
 
 #include <string>
 #include <limits> // std::numeric_limits
@@ -48,7 +49,7 @@ namespace Spine {
     class Skin;
     class Attachment;
     
-    class Skeleton {
+    class Skeleton : public SpineObject {
         friend class AnimationState;
         friend class SkeletonBounds;
         friend class SkeletonClipping;

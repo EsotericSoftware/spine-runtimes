@@ -34,6 +34,7 @@
 #include <spine/Vector.h>
 #include <spine/Pool.h>
 #include <spine/MixPose.h>
+#include <spine/SpineObject.h>
 
 namespace Spine {
     enum EventType {
@@ -57,7 +58,7 @@ namespace Spine {
     typedef void (*OnAnimationEventFunc) (AnimationState* state, EventType type, TrackEntry* entry, Event* event);
     
     /// State for the playback of an animation
-    class TrackEntry {
+    class TrackEntry : public SpineObject {
         friend class EventQueue;
         friend class AnimationState;
         
@@ -238,7 +239,7 @@ namespace Spine {
         void reset();
     };
     
-    class EventQueueEntry {
+    class EventQueueEntry : public SpineObject {
         friend class EventQueue;
         
     public:
@@ -249,7 +250,7 @@ namespace Spine {
         EventQueueEntry(EventType eventType, TrackEntry* trackEntry, Event* event = NULL);
     };
     
-    class EventQueue {
+    class EventQueue : public SpineObject {
         friend class AnimationState;
         
     private:
@@ -282,7 +283,7 @@ namespace Spine {
         void drain();
     };
     
-    class AnimationState {
+    class AnimationState : public SpineObject {
         friend class TrackEntry;
         friend class EventQueue;
         

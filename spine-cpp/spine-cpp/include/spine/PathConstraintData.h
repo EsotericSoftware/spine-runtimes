@@ -35,6 +35,7 @@
 #include <spine/SpacingMode.h>
 #include <spine/RotateMode.h>
 #include <spine/Vector.h>
+#include <spine/SpineObject.h>
 
 #include <string>
 
@@ -42,7 +43,7 @@ namespace Spine {
     class BoneData;
     class SlotData;
     
-    class PathConstraintData {
+    class PathConstraintData : public SpineObject {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

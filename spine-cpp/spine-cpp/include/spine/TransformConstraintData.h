@@ -32,13 +32,14 @@
 #define Spine_TransformConstraintData_h
 
 #include <spine/Vector.h>
+#include <spine/SpineObject.h>
 
 #include <string>
 
 namespace Spine {
     class BoneData;
     
-    class TransformConstraintData {
+    class TransformConstraintData : public SpineObject {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

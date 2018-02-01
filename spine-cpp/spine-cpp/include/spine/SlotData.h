@@ -32,13 +32,14 @@
 #define Spine_SlotData_h
 
 #include <spine/BlendMode.h>
+#include <spine/SpineObject.h>
 
 #include <string>
 
 namespace Spine {
     class BoneData;
     
-    class SlotData {
+    class SlotData : public SpineObject {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

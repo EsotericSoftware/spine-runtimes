@@ -32,8 +32,8 @@
 #define Spine_AtlasAttachmentLoader_h
 
 #include <spine/AttachmentLoader.h>
-
 #include <spine/Vector.h>
+
 
 namespace Spine {
     class Atlas;
@@ -47,7 +47,7 @@ namespace Spine {
         RTTI_DECL;
         
     public:
-        AtlasAttachmentLoader(Vector<Atlas*>& inAtlasArray);
+        AtlasAttachmentLoader(Atlas& atlas);
         
         virtual RegionAttachment* newRegionAttachment(Skin& skin, std::string name, std::string path);
         
@@ -64,7 +64,7 @@ namespace Spine {
         AtlasRegion* findRegion(std::string name);
         
     private:
-        Vector<Atlas*> _atlasArray;
+        Atlas& _atlas;
     };
 }
 

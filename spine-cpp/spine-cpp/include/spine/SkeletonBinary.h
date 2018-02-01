@@ -33,6 +33,7 @@
 
 #include <spine/TransformMode.h>
 #include <spine/Vector.h>
+#include <spine/SpineObject.h>
 
 #include <string>
 
@@ -47,7 +48,7 @@ namespace Spine {
     class Animation;
     class CurveTimeline;
     
-    class SkeletonBinary {
+    class SkeletonBinary : public SpineObject {
     public:
         static const int BONE_ROTATE;
         static const int BONE_TRANSLATE;
@@ -68,7 +69,7 @@ namespace Spine {
         
         static const TransformMode TRANSFORM_MODE_VALUES[5];
         
-        SkeletonBinary(Vector<Atlas*>& atlasArray);
+        SkeletonBinary(Atlas& atlasArray);
         
         SkeletonBinary(AttachmentLoader* attachmentLoader);
         
@@ -79,7 +80,7 @@ namespace Spine {
         SkeletonData* readSkeletonDataFile(const char* path);
         
     private:
-        struct DataInput {
+        struct DataInput : public SpineObject {
             const unsigned char* cursor;
             const unsigned char* end;
         };
