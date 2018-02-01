@@ -220,9 +220,9 @@ namespace Spine.Unity.Editor {
 		public static bool TargetsUseSameData (SerializedObject so) {
 			if (so.isEditingMultipleObjects) {
 				int n = so.targetObjects.Length;
-				var first = so.targetObjects[0] as ISkeletonComponent;
+				var first = so.targetObjects[0] as IHasSkeletonDataAsset;
 				for (int i = 1; i < n; i++) {
-					var sr = so.targetObjects[i] as ISkeletonComponent;
+					var sr = so.targetObjects[i] as IHasSkeletonDataAsset;
 					if (sr != null && sr.SkeletonDataAsset != first.SkeletonDataAsset)
 						return false;
 				}
