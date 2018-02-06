@@ -267,27 +267,27 @@ namespace Spine.Unity {
 			for (int i = 0, n = utilityBones.Count; i < n; i++)
 				utilityBones[i].transformLerpComplete = false;
 
-			UpdateAllBones();
+			UpdateAllBones(SkeletonUtilityBone.UpdatePhase.Local);
 		}
 
 		void UpdateWorld (ISkeletonAnimation anim) {
-			UpdateAllBones();
+			UpdateAllBones(SkeletonUtilityBone.UpdatePhase.World);
 			for (int i = 0, n = utilityConstraints.Count; i < n; i++)
 				utilityConstraints[i].DoUpdate();
 		}
 
 		void UpdateComplete (ISkeletonAnimation anim) {
-			UpdateAllBones();
+			UpdateAllBones(SkeletonUtilityBone.UpdatePhase.Complete);
 		}
 
-		void UpdateAllBones () {
+		void UpdateAllBones (SkeletonUtilityBone.UpdatePhase phase) {
 			if (boneRoot == null)
 				CollectBones();
 
 			var utilityBones = this.utilityBones;
 			if (utilityBones == null) return;
 			for (int i = 0, n = utilityBones.Count; i < n; i++)
-				utilityBones[i].DoUpdate();
+				utilityBones[i].DoUpdate(phase);
 		}
 
 		public Transform GetBoneRoot () {

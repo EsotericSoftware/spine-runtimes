@@ -42,7 +42,7 @@ namespace Spine.Unity {
 	}
 
 	/// <summary>Holds a reference to a SkeletonDataAsset.</summary>
-	public interface ISkeletonDataAssetComponent {
+	public interface IHasSkeletonDataAsset {
 		/// <summary>Gets the SkeletonDataAsset of the Spine Component.</summary>
 		SkeletonDataAsset SkeletonDataAsset { get; }
 	}

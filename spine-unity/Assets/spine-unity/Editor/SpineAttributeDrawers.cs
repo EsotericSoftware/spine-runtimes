@@ -79,10 +79,10 @@ namespace Spine.Unity.Editor {
 				var objectReferenceValue = dataField.objectReferenceValue;
 				if (objectReferenceValue is SkeletonDataAsset) {
 					skeletonDataAsset = (SkeletonDataAsset)objectReferenceValue;
-				} else if (objectReferenceValue is ISkeletonComponent) {
-					var skeletonComponent = (ISkeletonComponent)objectReferenceValue;
-					if (skeletonComponent != null)
-						skeletonDataAsset = skeletonComponent.SkeletonDataAsset;
+				} else if (objectReferenceValue is IHasSkeletonDataAsset) {
+					var hasSkeletonDataAsset = (IHasSkeletonDataAsset)objectReferenceValue;
+					if (hasSkeletonDataAsset != null)
+						skeletonDataAsset = hasSkeletonDataAsset.SkeletonDataAsset;
 				} else if (objectReferenceValue != null) {
 					EditorGUI.LabelField(position, "ERROR:", "Invalid reference type");
 					return;
@@ -90,9 +90,9 @@ namespace Spine.Unity.Editor {
 
 			} else if (property.serializedObject.targetObject is Component) {
 				var component = (Component)property.serializedObject.targetObject;
-				var skeletonComponent = component.GetComponentInChildren(typeof(ISkeletonComponent)) as ISkeletonComponent;
-				if (skeletonComponent != null)
-					skeletonDataAsset = skeletonComponent.SkeletonDataAsset;
+				var hasSkeletonDataAsset = component.GetComponentInChildren(typeof(IHasSkeletonDataAsset)) as IHasSkeletonDataAsset;
+				if (hasSkeletonDataAsset != null)
+					skeletonDataAsset = hasSkeletonDataAsset.SkeletonDataAsset;
 			}
 
 			if (skeletonDataAsset == null) {
