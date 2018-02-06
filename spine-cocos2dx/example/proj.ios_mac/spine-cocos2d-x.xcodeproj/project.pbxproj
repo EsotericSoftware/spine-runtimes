@@ -52,7 +52,6 @@
 		76AAA3C11D180F7C00C54FCB /* BatchingExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3B61D180F7C00C54FCB /* BatchingExample.cpp */; };
 		76AAA3C21D180F7C00C54FCB /* GoblinsExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3B81D180F7C00C54FCB /* GoblinsExample.cpp */; };
 		76AAA3C31D180F7C00C54FCB /* RaptorExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3BA1D180F7C00C54FCB /* RaptorExample.cpp */; };
-		76AAA3C41D180F7C00C54FCB /* SimpleCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3BC1D180F7C00C54FCB /* SimpleCommand.cpp */; };
 		76AAA3C51D180F7C00C54FCB /* SpineboyExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3BE1D180F7C00C54FCB /* SpineboyExample.cpp */; };
 		76AAA40C1D18106000C54FCB /* AttachmentVertices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA4001D18106000C54FCB /* AttachmentVertices.cpp */; };
 		76AAA40D1D18106000C54FCB /* Cocos2dAttachmentLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA4021D18106000C54FCB /* Cocos2dAttachmentLoader.cpp */; };
@@ -81,12 +80,12 @@
 		76AAA4411D1811B000C54FCB /* GoblinsExample.h in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3B91D180F7C00C54FCB /* GoblinsExample.h */; };
 		76AAA4421D1811B000C54FCB /* RaptorExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3BA1D180F7C00C54FCB /* RaptorExample.cpp */; };
 		76AAA4431D1811B000C54FCB /* RaptorExample.h in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3BB1D180F7C00C54FCB /* RaptorExample.h */; };
-		76AAA4441D1811B000C54FCB /* SimpleCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3BC1D180F7C00C54FCB /* SimpleCommand.cpp */; };
-		76AAA4451D1811B000C54FCB /* SimpleCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3BD1D180F7C00C54FCB /* SimpleCommand.h */; };
 		76AAA4461D1811B000C54FCB /* SpineboyExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3BE1D180F7C00C54FCB /* SpineboyExample.cpp */; };
 		76AAA4471D1811B000C54FCB /* SpineboyExample.h in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3BF1D180F7C00C54FCB /* SpineboyExample.h */; };
 		76AAA4571D18132D00C54FCB /* common in Resources */ = {isa = PBXBuildFile; fileRef = 76AAA4521D18132D00C54FCB /* common */; };
 		76AAA4581D18132D00C54FCB /* common in Resources */ = {isa = PBXBuildFile; fileRef = 76AAA4521D18132D00C54FCB /* common */; };
+		76D1BFE02029E35200A0272D /* SkeletonRendererSeparatorExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D1BFDF2029E35200A0272D /* SkeletonRendererSeparatorExample.cpp */; };
+		76D1BFE12029E37700A0272D /* SkeletonRendererSeparatorExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D1BFDF2029E35200A0272D /* SkeletonRendererSeparatorExample.cpp */; };
 		76D520DA1EB3611300572471 /* ClippingAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 76D520D71EB3611300572471 /* ClippingAttachment.c */; };
 		76D520DB1EB3611300572471 /* SkeletonClipping.c in Sources */ = {isa = PBXBuildFile; fileRef = 76D520D81EB3611300572471 /* SkeletonClipping.c */; };
 		76D520DC1EB3611300572471 /* Triangulator.c in Sources */ = {isa = PBXBuildFile; fileRef = 76D520D91EB3611300572471 /* Triangulator.c */; };
@@ -276,8 +275,6 @@
 		76AAA3B91D180F7C00C54FCB /* GoblinsExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoblinsExample.h; sourceTree = "<group>"; };
 		76AAA3BA1D180F7C00C54FCB /* RaptorExample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RaptorExample.cpp; sourceTree = "<group>"; };
 		76AAA3BB1D180F7C00C54FCB /* RaptorExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RaptorExample.h; sourceTree = "<group>"; };
-		76AAA3BC1D180F7C00C54FCB /* SimpleCommand.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SimpleCommand.cpp; sourceTree = "<group>"; };
-		76AAA3BD1D180F7C00C54FCB /* SimpleCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleCommand.h; sourceTree = "<group>"; };
 		76AAA3BE1D180F7C00C54FCB /* SpineboyExample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpineboyExample.cpp; sourceTree = "<group>"; };
 		76AAA3BF1D180F7C00C54FCB /* SpineboyExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpineboyExample.h; sourceTree = "<group>"; };
 		76AAA4001D18106000C54FCB /* AttachmentVertices.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AttachmentVertices.cpp; path = ../../src/spine/AttachmentVertices.cpp; sourceTree = "<group>"; };
@@ -293,6 +290,8 @@
 		76AAA40A1D18106000C54FCB /* spine-cocos2dx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "spine-cocos2dx.cpp"; path = "../../src/spine/spine-cocos2dx.cpp"; sourceTree = "<group>"; };
 		76AAA40B1D18106000C54FCB /* spine-cocos2dx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "spine-cocos2dx.h"; path = "../../src/spine/spine-cocos2dx.h"; sourceTree = "<group>"; };
 		76AAA4521D18132D00C54FCB /* common */ = {isa = PBXFileReference; lastKnownFileType = folder; path = common; sourceTree = "<group>"; };
+		76D1BFDE2029E35100A0272D /* SkeletonRendererSeparatorExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkeletonRendererSeparatorExample.h; sourceTree = "<group>"; };
+		76D1BFDF2029E35200A0272D /* SkeletonRendererSeparatorExample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SkeletonRendererSeparatorExample.cpp; sourceTree = "<group>"; };
 		76D520D71EB3611300572471 /* ClippingAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ClippingAttachment.c; path = "../../../spine-c/spine-c/src/spine/ClippingAttachment.c"; sourceTree = "<group>"; };
 		76D520D81EB3611300572471 /* SkeletonClipping.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SkeletonClipping.c; path = "../../../spine-c/spine-c/src/spine/SkeletonClipping.c"; sourceTree = "<group>"; };
 		76D520D91EB3611300572471 /* Triangulator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Triangulator.c; path = "../../../spine-c/spine-c/src/spine/Triangulator.c"; sourceTree = "<group>"; };
@@ -483,6 +482,8 @@
 		46880B8319C43A87006E1F66 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				76D1BFDF2029E35200A0272D /* SkeletonRendererSeparatorExample.cpp */,
+				76D1BFDE2029E35100A0272D /* SkeletonRendererSeparatorExample.h */,
 				76D520E41EB362DD00572471 /* CoinExample.cpp */,
 				76D520E51EB362DD00572471 /* CoinExample.h */,
 				76F5BD531D2BD7D3005917E5 /* TankExample.cpp */,
@@ -496,8 +497,6 @@
 				76AAA3B91D180F7C00C54FCB /* GoblinsExample.h */,
 				76AAA3BA1D180F7C00C54FCB /* RaptorExample.cpp */,
 				76AAA3BB1D180F7C00C54FCB /* RaptorExample.h */,
-				76AAA3BC1D180F7C00C54FCB /* SimpleCommand.cpp */,
-				76AAA3BD1D180F7C00C54FCB /* SimpleCommand.h */,
 				76AAA3BE1D180F7C00C54FCB /* SpineboyExample.cpp */,
 				76AAA3BF1D180F7C00C54FCB /* SpineboyExample.h */,
 			);
@@ -763,6 +762,7 @@
 			files = (
 				76F28CCA1DEC7EBB00CDE54D /* SkeletonJson.c in Sources */,
 				76AAA40C1D18106000C54FCB /* AttachmentVertices.cpp in Sources */,
+				76D1BFE02029E35200A0272D /* SkeletonRendererSeparatorExample.cpp in Sources */,
 				76F28CC81DEC7EBB00CDE54D /* SkeletonBounds.c in Sources */,
 				76F28CB71DEC7EBB00CDE54D /* AttachmentLoader.c in Sources */,
 				76F5BD551D2BD7D3005917E5 /* TankExample.cpp in Sources */,
@@ -785,7 +785,6 @@
 				76AAA3C01D180F7C00C54FCB /* AppDelegate.cpp in Sources */,
 				76FAC18D1E3F97D2001CCC8C /* PointAttachment.c in Sources */,
 				76F28CC31DEC7EBB00CDE54D /* PathConstraint.c in Sources */,
-				76AAA3C41D180F7C00C54FCB /* SimpleCommand.cpp in Sources */,
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
 				76F28CC11DEC7EBB00CDE54D /* MeshAttachment.c in Sources */,
 				76F28CC01DEC7EBB00CDE54D /* Json.c in Sources */,
@@ -825,6 +824,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				76D1BFE12029E37700A0272D /* SkeletonRendererSeparatorExample.cpp in Sources */,
 				76FB15111F0139B400C5377F /* VertexEffect.c in Sources */,
 				76D520E71EB3634600572471 /* CoinExample.cpp in Sources */,
 				76D520E31EB3625B00572471 /* Array.c in Sources */,
@@ -878,8 +878,6 @@
 				76AAA4411D1811B000C54FCB /* GoblinsExample.h in Sources */,
 				76AAA4421D1811B000C54FCB /* RaptorExample.cpp in Sources */,
 				76AAA4431D1811B000C54FCB /* RaptorExample.h in Sources */,
-				76AAA4441D1811B000C54FCB /* SimpleCommand.cpp in Sources */,
-				76AAA4451D1811B000C54FCB /* SimpleCommand.h in Sources */,
 				76AAA4461D1811B000C54FCB /* SpineboyExample.cpp in Sources */,
 				76AAA4471D1811B000C54FCB /* SpineboyExample.h in Sources */,
 				76AAA4121D18119F00C54FCB /* AttachmentVertices.cpp in Sources */,

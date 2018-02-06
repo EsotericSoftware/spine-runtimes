@@ -36,6 +36,7 @@
 #include "RaptorExample.h"
 #include "BatchingExample.h"
 #include "CoinExample.h"
+#include "SkeletonRendererSeparatorExample.h"
 #include "AppMacros.h"
 
 USING_NS_CC;
@@ -99,7 +100,7 @@ bool AppDelegate::applicationDidFinishLaunching () {
 
 	// create a scene. it's an autorelease object
 	//auto scene = RaptorExample::scene();
-	auto scene = BatchingExample::scene();
+	auto scene = SkeletonRendererSeparatorExample::scene();
 
 	// run
 	director->runWithScene(scene);
