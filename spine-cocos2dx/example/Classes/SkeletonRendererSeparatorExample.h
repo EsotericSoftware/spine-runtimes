@@ -28,23 +28,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef _SIMPLECOMMAND_H_
-#define _SIMPLECOMMAND_H_
+#ifndef _SKELETONRENDERERSEPARATOREXAMPLE_H_
+#define _SKELETONRENDERERSEPARATOREXAMPLE_H_
 
 #include "cocos2d.h"
+#include <spine/spine-cocos2dx.h>
 
-
-class SimpleCommand : public cocos2d::Node {
+class SkeletonRendererSeparatorExample : public cocos2d::LayerColor {
 public:
 	static cocos2d::Scene* scene ();
 
+	CREATE_FUNC (SkeletonRendererSeparatorExample);
+
 	virtual bool init ();
-	virtual void draw (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags) override;
 
-	CREATE_FUNC (SimpleCommand);
+	virtual void update (float deltaTime);
 
-protected:
-	cocos2d::Texture2D* _texture;
+private:
+	spine::SkeletonAnimation* backNode;
+	spine::SkeletonRenderer* frontNode;
+	cocos2d::DrawNode* betweenNode;
+	
 };
 
-#endif // _SIMPLECOMMAND_H_
+#endif // _SKELETONRENDERERSEPARATOREXAMPLE_H_

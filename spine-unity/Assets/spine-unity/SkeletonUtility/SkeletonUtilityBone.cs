@@ -43,6 +43,12 @@ namespace Spine.Unity {
 			Override
 		}
 
+		public enum UpdatePhase {
+			Local,
+			World,
+			Complete
+		}
+
 		#region Inspector
 		/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
 		public string boneName;
@@ -71,7 +77,7 @@ namespace Spine.Unity {
 			skeletonTransform = skeletonUtility.transform;
 			skeletonUtility.OnReset -= HandleOnReset;
 			skeletonUtility.OnReset += HandleOnReset;
-			DoUpdate();
+			DoUpdate(UpdatePhase.Local);
 		}
 
 		void OnEnable () {
@@ -95,7 +101,7 @@ namespace Spine.Unity {
 			}
 		}
 
-		public void DoUpdate () {
+		public void DoUpdate (UpdatePhase phase) {
 			if (!valid) {
 				Reset();
 				return;
@@ -112,46 +118,72 @@ namespace Spine.Unity {
 				}
 			}
 
+			var thisTransform = cachedTransform;
 			float skeletonFlipRotation = (skeleton.flipX ^ skeleton.flipY) ? -1f : 1f;
 			if (mode == Mode.Follow) {
-				if (!bone.appliedValid)
-					bone.UpdateAppliedTransform();			
+				switch (phase) {
+					case UpdatePhase.Local:
+						if (position)
+							thisTransform.localPosition = new Vector3(bone.x, bone.y, 0);
 
-				if (position)
-					cachedTransform.localPosition = new Vector3(bone.ax, bone.ay, 0);
+						if (rotation) {
+							if (bone.data.transformMode.InheritsRotation()) {
+								thisTransform.localRotation = Quaternion.Euler(0, 0, bone.rotation);
+							} else {
+								Vector3 euler = skeletonTransform.rotation.eulerAngles;
+								thisTransform.rotation = Quaternion.Euler(euler.x, euler.y, euler.z + (bone.WorldRotationX * skeletonFlipRotation));
+							}
+						}
+
+						if (scale) {
+							thisTransform.localScale = new Vector3(bone.scaleX, bone.scaleY, 1f);
+							incompatibleTransformMode = BoneTransformModeIncompatible(bone);
+						}
+						break;
+					case UpdatePhase.World:
+					case UpdatePhase.Complete:
+						// Use Applied transform values (ax, ay, AppliedRotation, ascale) if world values were modified by constraints.
+						if (!bone.appliedValid) {
+							bone.UpdateAppliedTransform();
+							if (position)
+								thisTransform.localPosition = new Vector3(bone.ax, bone.ay, 0);
+
+							if (rotation) {
+								if (bone.data.transformMode.InheritsRotation()) {
+									thisTransform.localRotation = Quaternion.Euler(0, 0, bone.AppliedRotation);
+								} else {
+									Vector3 euler = skeletonTransform.rotation.eulerAngles;
+									thisTransform.rotation = Quaternion.Euler(euler.x, euler.y, euler.z + (bone.WorldRotationX * skeletonFlipRotation));
+								}
+							}
+
+							if (scale) {
+								thisTransform.localScale = new Vector3(bone.ascaleX, bone.ascaleY, 1f);
+								incompatibleTransformMode = BoneTransformModeIncompatible(bone);
+							}
+						}
+						break;
+				}
 				
-				if (rotation) {
-					if (bone.data.transformMode.InheritsRotation()) {
-						cachedTransform.localRotation = Quaternion.Euler(0, 0, bone.AppliedRotation);
-					} else {
-						Vector3 euler = skeletonTransform.rotation.eulerAngles;
-						cachedTransform.rotation = Quaternion.Euler(euler.x, euler.y, euler.z + (bone.WorldRotationX * skeletonFlipRotation));
-					}
-				}
-
-				if (scale) {
-					cachedTransform.localScale = new Vector3(bone.ascaleX, bone.ascaleY, 1f);
-					incompatibleTransformMode = BoneTransformModeIncompatible(bone);
-				}
 			} else if (mode == Mode.Override) {
 				if (transformLerpComplete)
 					return;
 
 				if (parentReference == null) {
 					if (position) {
-						Vector3 clp = cachedTransform.localPosition;
+						Vector3 clp = thisTransform.localPosition;
 						bone.x = Mathf.Lerp(bone.x, clp.x, overrideAlpha);
 						bone.y = Mathf.Lerp(bone.y, clp.y, overrideAlpha);
 					}
 
 					if (rotation) {
-						float angle = Mathf.LerpAngle(bone.Rotation, cachedTransform.localRotation.eulerAngles.z, overrideAlpha);
+						float angle = Mathf.LerpAngle(bone.Rotation, thisTransform.localRotation.eulerAngles.z, overrideAlpha);
 						bone.Rotation = angle;
 						bone.AppliedRotation = angle;
 					}
 
 					if (scale) {
-						Vector3 cls = cachedTransform.localScale;
+						Vector3 cls = thisTransform.localScale;
 						bone.scaleX = Mathf.Lerp(bone.scaleX, cls.x, overrideAlpha);
 						bone.scaleY = Mathf.Lerp(bone.scaleY, cls.y, overrideAlpha);
 					}
@@ -161,19 +193,19 @@ namespace Spine.Unity {
 						return;
 
 					if (position) {
-						Vector3 pos = parentReference.InverseTransformPoint(cachedTransform.position);
+						Vector3 pos = parentReference.InverseTransformPoint(thisTransform.position);
 						bone.x = Mathf.Lerp(bone.x, pos.x, overrideAlpha);
 						bone.y = Mathf.Lerp(bone.y, pos.y, overrideAlpha);
 					}
 
 					if (rotation) {
-						float angle = Mathf.LerpAngle(bone.Rotation, Quaternion.LookRotation(Vector3.forward, parentReference.InverseTransformDirection(cachedTransform.up)).eulerAngles.z, overrideAlpha);
+						float angle = Mathf.LerpAngle(bone.Rotation, Quaternion.LookRotation(Vector3.forward, parentReference.InverseTransformDirection(thisTransform.up)).eulerAngles.z, overrideAlpha);
 						bone.Rotation = angle;
 						bone.AppliedRotation = angle;
 					}
 
 					if (scale) {
-						Vector3 cls = cachedTransform.localScale;
+						Vector3 cls = thisTransform.localScale;
 						bone.scaleX = Mathf.Lerp(bone.scaleX, cls.x, overrideAlpha);
 						bone.scaleY = Mathf.Lerp(bone.scaleY, cls.y, overrideAlpha);
 					}

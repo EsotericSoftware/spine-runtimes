@@ -42,6 +42,7 @@ class AttachmentVertices;
 class SkeletonRenderer: public cocos2d::Node, public cocos2d::BlendProtocol {
 public:
 	CREATE_FUNC(SkeletonRenderer);
+	static SkeletonRenderer* createWithSkeleton(spSkeleton* skeleton, bool ownsSkeleton = false, bool ownsSkeletonData = false);
 	static SkeletonRenderer* createWithData (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
 	static SkeletonRenderer* createWithFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 1);
 	static SkeletonRenderer* createWithFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
@@ -102,6 +103,9 @@ public:
 	
 	/* Sets the vertex effect to be used, set to 0 to disable vertex effects */
 	void setVertexEffect(spVertexEffect* effect);
+	
+	/* Sets the range of slots that should be rendered. Use -1, -1 to clear the range */
+	void setSlotsRange(int startSlotIndex, int endSlotIndex);
 
     // --- BlendProtocol
 	virtual void setBlendFunc (const cocos2d::BlendFunc& blendFunc)override;
@@ -114,12 +118,14 @@ public:
 
 CC_CONSTRUCTOR_ACCESS:
 	SkeletonRenderer ();
+	SkeletonRenderer(spSkeleton* skeleton, bool ownsSkeleton = false, bool ownsSkeletonData = false);
 	SkeletonRenderer (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
 	SkeletonRenderer (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 1);
 	SkeletonRenderer (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
 
 	virtual ~SkeletonRenderer ();
 
+	void initWithSkeleton(spSkeleton* skeleton, bool ownsSkeleton = false, bool ownsSkeletonData = false);
 	void initWithData (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
 	void initWithJsonFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 1);
 	void initWithJsonFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
@@ -135,6 +141,7 @@ protected:
 	void setupGLProgramState(bool twoColorTintEnabled);
 
 	bool _ownsSkeletonData;
+	bool _ownsSkeleton;
 	spAtlas* _atlas;
 	spAttachmentLoader* _attachmentLoader;
 	cocos2d::CustomCommand _debugCommand;
@@ -147,6 +154,9 @@ protected:
 	bool _debugMeshes;
 	spSkeletonClipping* _clipper;
 	spVertexEffect* _effect;
+	
+	int _startSlotIndex;
+	int _endSlotIndex;
 };
 
 }

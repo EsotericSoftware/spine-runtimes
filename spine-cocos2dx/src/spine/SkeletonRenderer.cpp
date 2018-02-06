@@ -64,6 +64,12 @@ void SkeletonRenderer::destroyScratchBuffers() {
 		worldVerticesLength = 0;
 	}
 }
+
+SkeletonRenderer* SkeletonRenderer::createWithSkeleton(spSkeleton* skeleton, bool ownsSkeleton, bool ownsSkeletonData) {
+	SkeletonRenderer* node = new SkeletonRenderer(skeleton, ownsSkeleton, ownsSkeletonData);
+	node->autorelease();
+	return node;
+}
 	
 SkeletonRenderer* SkeletonRenderer::createWithData (spSkeletonData* skeletonData, bool ownsSkeletonData) {
 	SkeletonRenderer* node = new SkeletonRenderer(skeletonData, ownsSkeletonData);
@@ -135,35 +141,48 @@ void SkeletonRenderer::setSkeletonData (spSkeletonData *skeletonData, bool ownsS
 }
 
 SkeletonRenderer::SkeletonRenderer ()
-	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _timeScale(1), _effect(nullptr) {
+	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _timeScale(1), _effect(nullptr), _startSlotIndex(-1), _endSlotIndex(-1) {
+}
+	
+SkeletonRenderer::SkeletonRenderer(spSkeleton* skeleton, bool ownsSkeleton, bool ownsSkeletonData)
+	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _timeScale(1), _effect(nullptr), _startSlotIndex(-1), _endSlotIndex(-1) {
+	initWithSkeleton(skeleton, ownsSkeleton, ownsSkeletonData);
 }
 
 SkeletonRenderer::SkeletonRenderer (spSkeletonData *skeletonData, bool ownsSkeletonData)
-	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _timeScale(1), _effect(nullptr) {
+	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _timeScale(1), _effect(nullptr), _startSlotIndex(-1), _endSlotIndex(-1) {
 	initWithData(skeletonData, ownsSkeletonData);
 }
 
 SkeletonRenderer::SkeletonRenderer (const std::string& skeletonDataFile, spAtlas* atlas, float scale)
-	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _timeScale(1), _effect(nullptr) {
+	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _timeScale(1), _effect(nullptr), _startSlotIndex(-1), _endSlotIndex(-1) {
 	initWithJsonFile(skeletonDataFile, atlas, scale);
 }
 
 SkeletonRenderer::SkeletonRenderer (const std::string& skeletonDataFile, const std::string& atlasFile, float scale)
-	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _timeScale(1), _effect(nullptr) {
+	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _timeScale(1), _effect(nullptr), _startSlotIndex(-1), _endSlotIndex(-1) {
 	initWithJsonFile(skeletonDataFile, atlasFile, scale);
 }
 
 SkeletonRenderer::~SkeletonRenderer () {
 	if (_ownsSkeletonData) spSkeletonData_dispose(_skeleton->data);
-	spSkeleton_dispose(_skeleton);
+	if (_ownsSkeleton) spSkeleton_dispose(_skeleton);
 	if (_atlas) spAtlas_dispose(_atlas);
 	if (_attachmentLoader) spAttachmentLoader_dispose(_attachmentLoader);	
 	spSkeletonClipping_dispose(_clipper);
 }
 
+void SkeletonRenderer::initWithSkeleton(spSkeleton* skeleton, bool ownsSkeleton, bool ownsSkeletonData) {
+	_skeleton = skeleton;
+	_ownsSkeleton = ownsSkeleton;
+	_ownsSkeletonData = ownsSkeletonData;
+	
+	initialize();
+}
+	
 void SkeletonRenderer::initWithData (spSkeletonData* skeletonData, bool ownsSkeletonData) {
+	_ownsSkeleton = true;
 	setSkeletonData(skeletonData, ownsSkeletonData);
-
 	initialize();
 }
 
@@ -177,6 +196,7 @@ void SkeletonRenderer::initWithJsonFile (const std::string& skeletonDataFile, sp
 	CCASSERT(skeletonData, json->error ? json->error : "Error reading skeleton data.");
 	spSkeletonJson_dispose(json);
 
+	_ownsSkeleton = true;
 	setSkeletonData(skeletonData, true);
 
 	initialize();
@@ -194,6 +214,7 @@ void SkeletonRenderer::initWithJsonFile (const std::string& skeletonDataFile, co
 	CCASSERT(skeletonData, json->error ? json->error : "Error reading skeleton data file.");
 	spSkeletonJson_dispose(json);
 
+	_ownsSkeleton = true;
 	setSkeletonData(skeletonData, true);
 
 	initialize();
@@ -208,7 +229,7 @@ void SkeletonRenderer::initWithBinaryFile (const std::string& skeletonDataFile, 
     spSkeletonData* skeletonData = spSkeletonBinary_readSkeletonDataFile(binary, skeletonDataFile.c_str());
     CCASSERT(skeletonData, binary->error ? binary->error : "Error reading skeleton data file.");
     spSkeletonBinary_dispose(binary);
-    
+    _ownsSkeleton = true;
     setSkeletonData(skeletonData, true);
     
     initialize();
@@ -225,7 +246,7 @@ void SkeletonRenderer::initWithBinaryFile (const std::string& skeletonDataFile, 
     spSkeletonData* skeletonData = spSkeletonBinary_readSkeletonDataFile(binary, skeletonDataFile.c_str());
     CCASSERT(skeletonData, binary->error ? binary->error : "Error reading skeleton data file.");
     spSkeletonBinary_dispose(binary);
-    
+    _ownsSkeleton = true;
     setSkeletonData(skeletonData, true);
     
     initialize();
@@ -234,7 +255,7 @@ void SkeletonRenderer::initWithBinaryFile (const std::string& skeletonDataFile, 
 
 void SkeletonRenderer::update (float deltaTime) {
 	Node::update(deltaTime);
-	spSkeleton_update(_skeleton, deltaTime * _timeScale);
+	if (_ownsSkeleton) spSkeleton_update(_skeleton, deltaTime * _timeScale);
 }
 
 void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t transformFlags) {
@@ -255,8 +276,23 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	float darkPremultipliedAlpha = _premultipliedAlpha ? 255 : 0;
 	AttachmentVertices* attachmentVertices = nullptr;
 	TwoColorTrianglesCommand* lastTwoColorTrianglesCommand = nullptr;
-	for (int i = 0, n = _skeleton->slotsCount; i < n; ++i) {
+	bool inRange = _startSlotIndex != -1 || _endSlotIndex != -1 ? false : true;
+	for (int i = 0, n = _skeleton->slotsCount; i < n; ++i) {		
 		spSlot* slot = _skeleton->drawOrder[i];
+		
+		if (_startSlotIndex >= 0 && _startSlotIndex == slot->data->index) {
+			inRange = true;
+		}
+		
+		if (!inRange) {
+			spSkeletonClipping_clipEnd(_clipper, slot);
+			continue;
+		}
+		
+		if (_endSlotIndex >= 0 && _endSlotIndex == slot->data->index) {
+			inRange = false;
+		}
+		
 		if (!slot->attachment) {
 			spSkeletonClipping_clipEnd(_clipper, slot);
 			continue;
@@ -779,6 +815,11 @@ bool SkeletonRenderer::isTwoColorTint() {
 	
 void SkeletonRenderer::setVertexEffect(spVertexEffect *effect) {
 	this->_effect = effect;
+}
+	
+void SkeletonRenderer::setSlotsRange(int startSlotIndex, int endSlotIndex) {
+	this->_startSlotIndex = startSlotIndex;
+	this->_endSlotIndex = endSlotIndex;
 }
 
 spSkeleton* SkeletonRenderer::getSkeleton () {
