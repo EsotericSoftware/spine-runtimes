@@ -28,7 +28,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+//#define HINGECHAIN2D
 // Contributed by: Mitch Thompson
+
 
 using UnityEngine;
 using UnityEditor;
@@ -277,6 +279,54 @@ namespace Spine.Unity.Editor {
 			EditorGUIUtility.PingObject(go);
 		}
 
+
+#if HINGECHAIN2D
+		bool CanCreateHingeChain () {
+			if (utilityBone == null) return false;
+			if (utilityBone.GetComponent<Rigidbody2D>() != null) return false;
+			if (utilityBone.bone != null && utilityBone.bone.Children.Count == 0) return false;
+			var rigidbodies = utilityBone.GetComponentsInChildren<Rigidbody2D>();
+			return rigidbodies.Length <= 0;
+		}
+
+		void CreateHingeChain () {
+			var utilBoneArr = utilityBone.GetComponentsInChildren<SkeletonUtilityBone>();
+
+			foreach (var utilBone in utilBoneArr) {
+				if (utilBone.GetComponent<Collider2D>() == null) {
+					if (utilBone.bone.Data.Length == 0) {
+						var sphere = utilBone.gameObject.AddComponent<CircleCollider2D>();
+						sphere.radius = 0.1f;
+					} else {
+						float length = utilBone.bone.Data.Length;
+						var box = utilBone.gameObject.AddComponent<BoxCollider2D>();
+						box.size = new Vector3(length, length / 3f, 0.2f);
+						box.offset = new Vector3(length / 2f, 0, 0);
+					}
+				}
+
+				utilBone.gameObject.AddComponent<Rigidbody2D>();
+			}
+
+			utilityBone.GetComponent<Rigidbody2D>().isKinematic = true;
+
+			foreach (var utilBone in utilBoneArr) {
+				if (utilBone == utilityBone)
+					continue;
+
+				utilBone.mode = SkeletonUtilityBone.Mode.Override;
+
+				var joint = utilBone.gameObject.AddComponent<HingeJoint2D>();
+				joint.connectedBody = utilBone.transform.parent.GetComponent<Rigidbody2D>();
+				joint.useLimits = true;
+				joint.limits = new JointAngleLimits2D {
+					min = -20,
+					max = 20
+				};
+				utilBone.GetComponent<Rigidbody2D>().mass = utilBone.transform.parent.GetComponent<Rigidbody2D>().mass * 0.75f;
+			}
+		}
+#else
 		bool CanCreateHingeChain () {
 			if (utilityBone == null)
 				return false;
@@ -285,7 +335,7 @@ namespace Spine.Unity.Editor {
 			if (utilityBone.bone != null && utilityBone.bone.Children.Count == 0)
 				return false;
 
-			Rigidbody[] rigidbodies = utilityBone.GetComponentsInChildren<Rigidbody>();
+			var rigidbodies = utilityBone.GetComponentsInChildren<Rigidbody>();
 
 			return rigidbodies.Length <= 0;
 		}
@@ -332,6 +382,7 @@ namespace Spine.Unity.Editor {
 
 			utilBone.gameObject.AddComponent<Rigidbody>();
 		}
+#endif
 	}
 
 }
