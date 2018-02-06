@@ -32,7 +32,6 @@
 #define SPINE_SFML_H_
 
 #include <spine/spine.h>
-#include <spine/extension.h>
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/Texture.hpp>
