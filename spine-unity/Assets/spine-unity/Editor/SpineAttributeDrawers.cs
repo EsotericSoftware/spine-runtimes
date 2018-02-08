@@ -159,6 +159,10 @@ namespace Spine.Unity.Editor {
 		protected override Texture2D Icon {	get { return SpineEditorUtilities.Icons.slot; } }
 
 		protected override void PopulateMenu (GenericMenu menu, SerializedProperty property, SpineSlot targetAttribute, SkeletonData data) {
+
+			if (TargetAttribute.includeNone)
+				menu.AddItem(new GUIContent(NoneString), string.IsNullOrEmpty(property.stringValue), HandleSelect, new SpineDrawerValuePair(string.Empty, property));
+
 			for (int i = 0; i < data.Slots.Count; i++) {
 				string name = data.Slots.Items[i].Name;
 				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal)) {
