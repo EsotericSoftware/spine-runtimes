@@ -39,6 +39,7 @@ package spine.starling {
 
 	public class TwoColorEffect extends MeshEffect {
 		public  static const VERTEX_FORMAT : VertexDataFormat = TwoColorMeshStyle.VERTEX_FORMAT;
+		private static const VECTOR_ONES:Vector.<Number> = Vector.<Number>([1, 1, 1, 1]);
 
 		override protected function createProgram() : Program {
 			// v0 -> tex coords
@@ -75,7 +76,7 @@ package spine.starling {
 			vertexFormat.setVertexBufferAt(3, vertexBuffer, "color2");
 			
 			// fc0 -> (1, 1, 1, 1) 
-			context.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([1, 1, 1, 1]));
+			context.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, VECTOR_ONES);
 		}
 
 		override protected function afterDraw(context : Context3D) : void {

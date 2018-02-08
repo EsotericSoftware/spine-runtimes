@@ -33,6 +33,7 @@
  * Added support for rotated regions in texture atlas loaded via StarlingAtlasAttachmentLoader.
  * Added support for vertex effects. See `RaptorExample.as`
  * Added 'getTexture()' method to 'StarlingTextureAtlasAttachmentLoader'
+ * Breaking change: if a skeleton requires two color tinting, you have to enable it via `SkeletonSprite.twoColorTint = true`. In this case the skeleton will use the `TwoColorMeshStyle`, which internally uses a different vertex layout and shader. This means that skeletons with two color tinting enabled will break batching and hence increase the number of draw calls in your app.
 
 ## C
  * **Breaking changes**
