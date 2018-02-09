@@ -36,9 +36,11 @@ namespace Spine.Unity {
 
 	[ExecuteInEditMode]
 	[AddComponentMenu("Spine/Point Follower")]
-	public class PointFollower : MonoBehaviour {
+	public class PointFollower : MonoBehaviour, IHasSkeletonRenderer, IHasSkeletonComponent {
 
-		public SkeletonRenderer skeletonRenderer;
+		[SerializeField] public SkeletonRenderer skeletonRenderer;
+		public SkeletonRenderer SkeletonRenderer { get { return this.skeletonRenderer; } }
+		public ISkeletonComponent SkeletonComponent { get { return skeletonRenderer as ISkeletonComponent; } }
 
 		[SpineSlot(dataField:"skeletonRenderer", includeNone: true)]
 		public string slotName;
@@ -55,16 +57,7 @@ namespace Spine.Unity {
 		PointAttachment point;
 		Bone bone;
 		bool valid;
-
-		#if UNITY_EDITOR
-		void OnValidate () {
-			if (skeletonRenderer == null) {
-				skeletonRenderer = GetComponent<SkeletonRenderer>();
-				if (skeletonRenderer == null)
-					skeletonRenderer = GetComponentInParent<SkeletonRenderer>();
-			}
-		}
-		#endif
+		public bool IsValid { get { return valid; } }
 
 		public void Initialize () {
 			valid = skeletonRenderer != null && skeletonRenderer.valid;
@@ -92,6 +85,7 @@ namespace Spine.Unity {
 			point = null;
 			if (!string.IsNullOrEmpty(pointAttachmentName)) {
 				var skeleton = skeletonRenderer.skeleton;
+
 				int slotIndex = skeleton.FindSlotIndex(slotName);
 				if (slotIndex >= 0) {
 					var slot = skeleton.slots.Items[slotIndex];

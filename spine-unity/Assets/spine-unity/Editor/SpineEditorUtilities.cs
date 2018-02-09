@@ -1577,6 +1577,7 @@ namespace Spine.Unity.Editor {
 		public static Color PathColor { get { return new Color(254/255f, 127/255f, 0); } }
 		public static Color TransformContraintColor { get { return new Color(170/255f, 226/255f, 35/255f); } }
 		public static Color IkColor { get { return new Color(228/255f,90/255f,43/255f); } }
+		public static Color PointColor { get { return new Color(1f, 1f, 0f, 1f);  } }
 
 		static Vector3[] _boneMeshVerts = {
 			new Vector3(0, 0, 0),
@@ -1674,6 +1675,17 @@ namespace Spine.Unity.Editor {
 					_pathNameStyle.normal.textColor = SpineHandles.PathColor;
 				}
 				return _pathNameStyle;
+			}
+		}
+
+		static GUIStyle _pointNameStyle;
+		public static GUIStyle PointNameStyle {
+			get {
+				if (_pointNameStyle == null) {
+					_pointNameStyle = new GUIStyle(SpineHandles.BoneNameStyle);
+					_pointNameStyle.normal.textColor = SpineHandles.PointColor;
+				}
+				return _pointNameStyle;
 			}
 		}
 
@@ -1850,6 +1862,19 @@ namespace Spine.Unity.Editor {
 			Handles.DrawLine(lastVert, firstVert);
 		}
 
+		public static void DrawPointAttachment (Bone bone, PointAttachment pointAttachment, Transform skeletonTransform) {
+			if (bone == null) return;
+			if (pointAttachment == null) return;
+
+			Vector2 localPos;
+			pointAttachment.ComputeWorldPosition(bone, out localPos.x, out localPos.y);
+			float localRotation = pointAttachment.ComputeWorldRotation(bone);
+			Matrix4x4 m = Matrix4x4.TRS(localPos, Quaternion.Euler(0, 0, localRotation), Vector3.one) * Matrix4x4.TRS(Vector3.right * 0.25f, Quaternion.identity, Vector3.one);
+
+			DrawBoneCircle(skeletonTransform.TransformPoint(localPos), SpineHandles.PointColor, Vector3.back, 1.3f);
+			DrawArrowhead(skeletonTransform.localToWorldMatrix * m);
+		}
+
 		public static void DrawConstraints (Transform transform, Skeleton skeleton, float skeletonRenderScale = 1f) {
 			Vector3 targetPos;
 			Vector3 pos;
@@ -1951,6 +1976,10 @@ namespace Spine.Unity.Editor {
 
 			SpineHandles.IKMaterial.SetPass(0);
 			Graphics.DrawMeshNow(SpineHandles.ArrowheadMesh, Matrix4x4.TRS(pos, Quaternion.Euler(0, 0, localRotation), new Vector3(scale, scale, scale)));
+		}
+
+		static void DrawArrowhead (Vector3 pos, Quaternion worldQuaternion) {
+			Graphics.DrawMeshNow(SpineHandles.ArrowheadMesh, pos, worldQuaternion, 0);
 		}
 
 		static void DrawArrowhead (Matrix4x4 m) {
