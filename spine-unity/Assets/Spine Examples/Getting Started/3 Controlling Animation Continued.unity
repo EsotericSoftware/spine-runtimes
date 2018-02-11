@@ -267,7 +267,7 @@ MonoBehaviour:
   zSpacing: 0
   useClipping: 1
   immutableTriangles: 0
-  pmaVertexColors: 1
+  pmaVertexColors: 0
   clearStateOnDisable: 0
   tintBlack: 0
   singleSubmesh: 0
@@ -348,7 +348,7 @@ MonoBehaviour:
   audioClip: {fileID: 8300000, guid: e885484e1bc99fb47a0ac3f6bfa586b1, type: 3}
   basePitch: 0.5
   randomPitchOffset: 0.25
-  debugMessage: 0
+  logDebugMessage: 0
 --- !u!114 &1256911799
 MonoBehaviour:
   m_ObjectHideFlags: 0
