@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "fdIxd7co0AmzNYI1JtoFSg51K0U",
-	"spine": "3.6.30-beta",
+	"hash": "/TOc8ZCRqVHx2Z5rHf8FIeR4q4E",
+	"spine": "3.6.52",
 	"width": 470.71,
 	"height": 731.57,
 	"images": "C:/Program Files (x86)/Spine/examples/spineboy/images/"
@@ -77,7 +77,8 @@
 	{ "name": "gun2", "bone": "gun2" },
 	{ "name": "gun3", "bone": "gun3" },
 	{ "name": "gun4", "bone": "gun4" },
-	{ "name": "gunspath", "bone": "pathbone", "attachment": "gunspath" }
+	{ "name": "gunspath", "bone": "pathbone", "attachment": "gunspath" },
+	{ "name": "projectile source", "bone": "gunTip", "attachment": "projectile source" }
 ],
 "ik": [
 	{
@@ -185,6 +186,9 @@
 		},
 		"neck": {
 			"neck": { "x": 9.77, "y": -3.01, "rotation": -55.22, "width": 36, "height": 41 }
+		},
+		"projectile source": {
+			"projectile source": { "type": "point", "x": 7.43, "y": -0.34 }
 		},
 		"rear_bracer": {
 			"rear_bracer": { "x": 11.15, "y": -2.2, "rotation": 66.17, "width": 56, "height": 72 }
@@ -790,19 +794,19 @@
 			"muzzle": {
 				"color": [
 					{ "time": 0, "color": "00008000", "curve": "stepped" },
-					{ "time": 0.7667, "color": "fffffffe", "curve": "stepped" },
+					{ "time": 0.7667, "color": "ffffffff", "curve": "stepped" },
 					{ "time": 0.8, "color": "ffffff00", "curve": "stepped" },
-					{ "time": 0.8333, "color": "fffffffe", "curve": "stepped" },
+					{ "time": 0.8333, "color": "ffffffff", "curve": "stepped" },
 					{ "time": 0.8667, "color": "ffffff00", "curve": "stepped" },
-					{ "time": 0.9, "color": "fffffffe", "curve": "stepped" },
+					{ "time": 0.9, "color": "ffffffff", "curve": "stepped" },
 					{ "time": 0.9333, "color": "ffffff00", "curve": "stepped" },
-					{ "time": 0.9667, "color": "fffffffe", "curve": "stepped" },
+					{ "time": 0.9667, "color": "ffffffff", "curve": "stepped" },
 					{ "time": 1, "color": "ffffff00", "curve": "stepped" },
-					{ "time": 1.1, "color": "fffffffe", "curve": "stepped" },
+					{ "time": 1.1, "color": "ffffffff", "curve": "stepped" },
 					{ "time": 1.1333, "color": "ffffff00", "curve": "stepped" },
-					{ "time": 1.2, "color": "fffffffe", "curve": "stepped" },
+					{ "time": 1.2, "color": "ffffffff", "curve": "stepped" },
 					{ "time": 1.2333, "color": "ffffff00", "curve": "stepped" },
-					{ "time": 1.2667, "color": "fffffffe", "curve": "stepped" },
+					{ "time": 1.2667, "color": "ffffffff", "curve": "stepped" },
 					{ "time": 1.3333, "color": "ffffff00", "curve": "stepped" },
 					{ "time": 2.5333, "color": "ffffff00" }
 				],
@@ -5025,15 +5029,15 @@
 				"color": [
 					{
 						"time": 0.0225,
-						"color": "ffad76fe",
+						"color": "ffad76ff",
 						"curve": [ 0.175, 0.43, 0.534, 0.75 ]
 					},
 					{
 						"time": 0.0333,
-						"color": "ffc197fe",
+						"color": "ffc197ff",
 						"curve": [ 0.286, 0.99, 0.774, 1 ]
 					},
-					{ "time": 0.0667, "color": "fffffffe" },
+					{ "time": 0.0667, "color": "ffffffff" },
 					{ "time": 0.1, "color": "ffbc8fee" },
 					{ "time": 0.1667, "color": "ffa18000" }
 				],
