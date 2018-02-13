@@ -37,7 +37,7 @@
 #include <cstring>
 
 namespace Spine {
-    Atlas::Atlas(const char* path, TextureLoader& textureLoader) : _textureLoader(textureLoader) {
+    Atlas::Atlas(const char* path, TextureLoader* textureLoader) : _textureLoader(textureLoader) {
         int dirLength;
         char *dir;
         int length;
@@ -58,11 +58,11 @@ namespace Spine {
             load(data, length, dir);
         }
 
-        SpineExtension::free(data);
-        SpineExtension::free(dir);
+        SpineExtension::free(data, __FILE__, __LINE__);
+        SpineExtension::free(dir, __FILE__, __LINE__);
     }
 
-    Atlas::Atlas(const char* data, int length, const char* dir, TextureLoader& textureLoader) : _textureLoader(textureLoader) {
+    Atlas::Atlas(const char* data, int length, const char* dir, TextureLoader* textureLoader) : _textureLoader(textureLoader) {
         load(data, length, dir);
     }
 
@@ -91,8 +91,9 @@ namespace Spine {
     }
 
     void Atlas::dispose() {
+        if (!_textureLoader) return;
         for (size_t i = 0, n = _pages.size(); i < n; ++i) {
-            _textureLoader.unload(_pages[i]->rendererObject);
+            _textureLoader->unload(_pages[i]->rendererObject);
         }
     }
 
@@ -123,9 +124,9 @@ namespace Spine {
                 }
                 strcpy(path + dirLength + needsSlash, name);
 
-                page = new AtlasPage(std::string(name));
+                page = new (__FILE__, __LINE__) AtlasPage(std::string(name));
 
-                SpineExtension::free(name);
+                SpineExtension::free(name, __FILE__, __LINE__);
 
                 int tupleVal = readTuple(&begin, end, tuple);
                 assert(tupleVal == 2);
@@ -160,17 +161,20 @@ namespace Spine {
                     }
                 }
 
-                _textureLoader.load(*page, std::string(path));
+                if (_textureLoader) _textureLoader->load(*page, std::string(path));
 
-                SpineExtension::free(path);
+                SpineExtension::free(path, __FILE__, __LINE__);
 
                 _pages.push_back(page);
             }
             else {
-                AtlasRegion* region = new AtlasRegion();
+                AtlasRegion* region = new (__FILE__, __LINE__) AtlasRegion();
 
                 region->page = page;
-                region->name = mallocString(&str);
+
+				char* name = mallocString(&str);
+                region->name = std::string(name);
+				SpineExtension::free(name, __FILE__, __LINE__);
 
                 assert(readValue(&begin, end, &str));
                 region->rotate = equals(&str, "true");

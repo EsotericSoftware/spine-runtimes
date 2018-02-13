@@ -53,7 +53,7 @@ namespace Spine {
         
         AtlasRegion& region = *regionP;
         
-        RegionAttachment* attachmentP = new RegionAttachment(name);
+        RegionAttachment* attachmentP = new (__FILE__, __LINE__) RegionAttachment(name);
         
         RegionAttachment& attachment = *attachmentP;
         attachment._rendererObject = regionP;
@@ -74,7 +74,7 @@ namespace Spine {
         
         AtlasRegion& region = *regionP;
         
-        MeshAttachment* attachmentP = new MeshAttachment(name);
+        MeshAttachment* attachmentP = new (__FILE__, __LINE__) MeshAttachment(name);
         
         MeshAttachment& attachment = *attachmentP;
         attachment._rendererObject = regionP;
@@ -94,19 +94,19 @@ namespace Spine {
     }
     
     BoundingBoxAttachment* AtlasAttachmentLoader::newBoundingBoxAttachment(Skin& skin, std::string name) {
-        return new BoundingBoxAttachment(name);
+        return new (__FILE__, __LINE__)  BoundingBoxAttachment(name);
     }
     
     PathAttachment* AtlasAttachmentLoader::newPathAttachment(Skin& skin, std::string name) {
-        return new PathAttachment(name);
+        return new (__FILE__, __LINE__) PathAttachment(name);
     }
     
     PointAttachment* AtlasAttachmentLoader::newPointAttachment(Skin& skin, std::string name) {
-        return new PointAttachment(name);
+        return new (__FILE__, __LINE__) PointAttachment(name);
     }
     
     ClippingAttachment* AtlasAttachmentLoader::newClippingAttachment(Skin& skin, std::string name) {
-        return new ClippingAttachment(name);
+        return new (__FILE__, __LINE__) ClippingAttachment(name);
     }
     
     AtlasRegion* AtlasAttachmentLoader::findRegion(std::string name) {

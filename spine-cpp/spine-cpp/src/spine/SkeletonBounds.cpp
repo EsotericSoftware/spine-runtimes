@@ -68,7 +68,7 @@ namespace Spine {
                 _polygonPool.erase(poolCount - 1);
             }
             else {
-                Polygon* polygonP = new Polygon();
+                Polygon* polygonP = new (__FILE__, __LINE__) Polygon();
             }
 
             _polygons.push_back(polygonP);

@@ -28,50 +28,45 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Pool_h
-#define Spine_Pool_h
+
+#ifndef SPINE_TESTHARNESS_H
+#define SPINE_TESTHARNESS_H
 
 #include <spine/Extension.h>
-#include <spine/Vector.h>
-#include <spine/ContainerUtil.h>
-#include <spine/SpineObject.h>
+#include <vector>
 
 namespace Spine {
-    template <typename T>
-    class Pool : public SpineObject {
-    public:
-        Pool() {
-            // Empty
-        }
-        
-        ~Pool() {
-            ContainerUtil::cleanUpVectorOfPointers(_objects);
-        }
-        
-        T* obtain() {
-            if (_objects.size() > 0) {
-                T** object = _objects.begin();
-                T* ret = *object;
-                _objects.erase(0);
-                
-                return ret;
-            }
-            else {
-                T* ret = new (__FILE__, __LINE__)  T();
-                
-                return ret;
-            }
-        }
-        
-        void free(T* object) {
-            if (!_objects.contains(object)) {
-                _objects.push_back(object);
-            }
-        }
-        
-    private:
-        Vector<T*> _objects;
-    };
+	struct Allocation {
+		void* address;
+		size_t size;
+		const char* fileName;
+		int line;
+
+		Allocation() : Allocation (0, 0, 0, 0) {
+		}
+
+		Allocation(void* a, size_t s, const char* f, int l) : address(a), size(s), fileName(f), line(l) {
+		}
+	};
+
+	class TestSpineExtension: public DefaultSpineExtension {
+	public:
+		void reportLeaks ();
+		void clearAllocations();
+
+	protected:
+		virtual void* _alloc(size_t size, const char* file, int line);
+
+		virtual void* _calloc(size_t size, const char* file, int line);
+
+		virtual void* _realloc(void* ptr, size_t size, const char* file, int line);
+
+		virtual void _free(void* mem, const char* file, int line);
+
+	private:
+		std::vector<Allocation> allocated;
+	};
 }
 
-#endif /* Spine_Pool_h */
+
+#endif //SPINE_TESTHARNESS_H

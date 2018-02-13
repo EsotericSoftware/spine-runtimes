@@ -28,50 +28,57 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Pool_h
-#define Spine_Pool_h
 
-#include <spine/Extension.h>
-#include <spine/Vector.h>
-#include <spine/ContainerUtil.h>
-#include <spine/SpineObject.h>
+#include "TestHarness.h"
 
-namespace Spine {
-    template <typename T>
-    class Pool : public SpineObject {
-    public:
-        Pool() {
-            // Empty
-        }
-        
-        ~Pool() {
-            ContainerUtil::cleanUpVectorOfPointers(_objects);
-        }
-        
-        T* obtain() {
-            if (_objects.size() > 0) {
-                T** object = _objects.begin();
-                T* ret = *object;
-                _objects.erase(0);
-                
-                return ret;
-            }
-            else {
-                T* ret = new (__FILE__, __LINE__)  T();
-                
-                return ret;
-            }
-        }
-        
-        void free(T* object) {
-            if (!_objects.contains(object)) {
-                _objects.push_back(object);
-            }
-        }
-        
-    private:
-        Vector<T*> _objects;
-    };
+void *Spine::TestSpineExtension::_alloc(size_t size, const char *file, int line) {
+	void* result = DefaultSpineExtension::_alloc(size, file, line);
+	allocated.push_back(Allocation(result, size, file, line));
+	return result;
 }
 
-#endif /* Spine_Pool_h */
+void *Spine::TestSpineExtension::_calloc(size_t size, const char *file, int line) {
+	void* result = DefaultSpineExtension::_calloc(size, file, line);
+	allocated.push_back(Allocation(result, size, file, line));
+	return result;
+}
+
+void *Spine::TestSpineExtension::_realloc(void *ptr, size_t size, const char *file, int line) {
+	void* result = DefaultSpineExtension::_realloc(ptr, size, file, line);
+
+	for (std::vector<Allocation>::iterator it = allocated.begin(); it != allocated.end(); it++) {
+		if (it->address == ptr) {
+			it->address = result;
+			it->size = size;
+			it->fileName = file;
+			it->line = line;
+			return result;
+		}
+	}
+
+	allocated.push_back(Allocation(result, size, file, line));
+	return result;
+}
+
+void Spine::TestSpineExtension::_free(void *mem, const char *file, int line) {
+	DefaultSpineExtension::_free(mem, file, line);
+
+	for (std::vector<Allocation>::iterator it = allocated.begin(); it != allocated.end(); it++) {
+		if (it->address == mem) {
+			allocated.erase(it);
+			return;
+		}
+	}
+
+	printf("%s:%i (address %p): Double free or not allocatedö through SpineExtension", file, line, mem);
+}
+
+void Spine::TestSpineExtension::reportLeaks() {
+	for (std::vector<Allocation>::iterator it = allocated.begin(); it != allocated.end(); it++) {
+		printf("\"%s:%i (%zu bytes at %p)\n", it->fileName, it->line, it->size, it->address);
+	}
+}
+
+void Spine::TestSpineExtension::clearAllocations() {
+	allocated.resize(0);
+}

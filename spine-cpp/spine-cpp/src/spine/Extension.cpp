@@ -94,8 +94,8 @@ namespace Spine {
         return ::realloc(ptr, size);
     }
     
-    void DefaultSpineExtension::_free(void* mem) {
-        free(mem);
+    void DefaultSpineExtension::_free(void* mem, const char* file, int line) {
+        ::free(mem);
     }
     
     DefaultSpineExtension::DefaultSpineExtension() : SpineExtension() {

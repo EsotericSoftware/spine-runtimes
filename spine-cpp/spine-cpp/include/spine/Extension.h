@@ -33,22 +33,6 @@
 
 #include <stdlib.h>
 
-// #define SPINE_EXTENSION (SpineExtension::getInstance())
-
-/* All allocation uses these. */
-/*
-#define MALLOC(TYPE,COUNT) ((TYPE*)SPINE_EXTENSION->spineAlloc(sizeof(TYPE) * (COUNT), __FILE__, __LINE__))
-#define CALLOC(TYPE,COUNT) ((TYPE*)SPINE_EXTENSION->spineCalloc(COUNT, sizeof(TYPE), __FILE__, __LINE__))
-#define NEW(TYPE) CALLOC(TYPE,1)
-#define REALLOC(PTR,TYPE,COUNT) ((TYPE*)SPINE_EXTENSION->spineRealloc(PTR, sizeof(TYPE) * (COUNT), __FILE__, __LINE__))
-*/
-
-/* Frees memory. Can be used on const types. */
-// #define FREE(VALUE) SPINE_EXTENSION->spinefree(VALUE)
-
-/* Call destructor and then frees memory. Can be used on const types. */
-// #define DESTROY(TYPE,VALUE) VALUE->~TYPE(); SPINE_EXTENSION->spinefree(VALUE)
-
 namespace Spine {
     class SpineExtension {
     public:
@@ -64,8 +48,8 @@ namespace Spine {
             return (T*)getInstance()->_realloc(ptr, sizeof(T) * num, file, line);
         }
 
-        template <typename T> static void free(T* ptr) {
-            getInstance()->_free((void*)ptr);
+        template <typename T> static void free(T* ptr, const char* file, int line) {
+            getInstance()->_free((void*)ptr, file, line);
         }
 
         static char* readFile(const char* path, int* length) {
@@ -87,18 +71,19 @@ namespace Spine {
         virtual void* _realloc(void* ptr, size_t size, const char* file, int line) = 0;
         
         /// If you provide a spineAllocFunc, you should also provide a spineFreeFunc
-        virtual void _free(void* mem) = 0;
+        virtual void _free(void* mem, const char* file, int line) = 0;
         
         virtual char* _readFile(const char* path, int* length);
 
         SpineExtension();
-        
+
     private:
         static SpineExtension* _instance;
     };
     
     class DefaultSpineExtension : public SpineExtension {
     public:
+        DefaultSpineExtension();
         virtual ~DefaultSpineExtension();
 
     protected:
@@ -108,9 +93,7 @@ namespace Spine {
         
         virtual void* _realloc(void* ptr, size_t size, const char* file, int line);
 
-        virtual void _free(void* mem);
-
-        DefaultSpineExtension();
+        virtual void _free(void* mem, const char* file, int line);
     };
 }
 

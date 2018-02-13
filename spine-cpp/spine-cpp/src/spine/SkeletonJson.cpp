@@ -86,7 +86,7 @@
 #endif
 
 namespace Spine {
-    SkeletonJson::SkeletonJson(Atlas& atlas) : _attachmentLoader(new AtlasAttachmentLoader(atlas)), _scale(1), _ownsLoader(true) {
+    SkeletonJson::SkeletonJson(Atlas& atlas) : _attachmentLoader(new (__FILE__, __LINE__) AtlasAttachmentLoader(atlas)), _scale(1), _ownsLoader(true) {
     }
     
     SkeletonJson::SkeletonJson(AttachmentLoader* attachmentLoader) : _attachmentLoader(attachmentLoader), _scale(1), _ownsLoader(false) {
@@ -112,7 +112,7 @@ namespace Spine {
         
         skeletonData = readSkeletonData(json);
         
-        SpineExtension::free(json);
+        SpineExtension::free(json, __FILE__, __LINE__);
         
         return skeletonData;
     }
@@ -125,14 +125,14 @@ namespace Spine {
         _error.clear();
         _linkedMeshes.clear();
 
-        root = new Json(json);
+        root = new (__FILE__, __LINE__) Json(json);
         
         if (!root) {
             setError(NULL, "Invalid skeleton JSON: ", Json::getError());
             return NULL;
         }
 
-        skeletonData = new SkeletonData();
+        skeletonData = new (__FILE__, __LINE__) SkeletonData();
 
         skeleton = Json::getItem(root, "skeleton");
         if (skeleton) {
@@ -162,7 +162,7 @@ namespace Spine {
                 }
             }
 
-            data = new BoneData(bonesCount, Json::getString(boneMap, "name", 0), parent);
+            data = new (__FILE__, __LINE__) BoneData(bonesCount, Json::getString(boneMap, "name", 0), parent);
             
             data->_length = Json::getFloat(boneMap, "length", 0) * _scale;
             data->_x = Json::getFloat(boneMap, "x", 0) * _scale;
@@ -214,7 +214,7 @@ namespace Spine {
                     return NULL;
                 }
 
-                data = new SlotData(i, Json::getString(slotMap, "name", 0), *boneData);
+                data = new (__FILE__, __LINE__) SlotData(i, Json::getString(slotMap, "name", 0), *boneData);
 
                 color = Json::getString(slotMap, "color", 0);
                 if (color) {
@@ -264,7 +264,7 @@ namespace Spine {
             for (constraintMap = ik->_child, i = 0; constraintMap; constraintMap = constraintMap->_next, ++i) {
                 const char* targetName;
 
-                IkConstraintData* data = new IkConstraintData(Json::getString(constraintMap, "name", 0));
+                IkConstraintData* data = new (__FILE__, __LINE__) IkConstraintData(Json::getString(constraintMap, "name", 0));
                 
                 data->_order = Json::getInt(constraintMap, "order", 0);
 
@@ -304,7 +304,7 @@ namespace Spine {
             for (constraintMap = transform->_child, i = 0; constraintMap; constraintMap = constraintMap->_next, ++i) {
                 const char* name;
 
-                TransformConstraintData* data = new TransformConstraintData(Json::getString(constraintMap, "name", 0));
+                TransformConstraintData* data = new (__FILE__, __LINE__) TransformConstraintData(Json::getString(constraintMap, "name", 0));
                 
                 data->_order = Json::getInt(constraintMap, "order", 0);
 
@@ -356,7 +356,7 @@ namespace Spine {
                 const char* name;
                 const char* item;
 
-                PathConstraintData* data = new PathConstraintData(Json::getString(constraintMap, "name", 0));
+                PathConstraintData* data = new (__FILE__, __LINE__) PathConstraintData(Json::getString(constraintMap, "name", 0));
                 
                 data->_order = Json::getInt(constraintMap, "order", 0);
 
@@ -437,7 +437,7 @@ namespace Spine {
                 Json *attachmentsMap;
                 Json *curves;
                 
-                Skin* skin = new Skin(skinMap->_name);
+                Skin* skin = new (__FILE__, __LINE__) Skin(skinMap->_name);
 
                 skeletonData->_skins[skinsIndex++] = skin;
                 if (strcmp(skinMap->_name, "default") == 0) {
@@ -567,7 +567,7 @@ namespace Spine {
                                 }
                                 else {
                                     mesh->_inheritDeform = Json::getInt(attachmentMap, "deform", 1);
-                                    LinkedMesh* linkedMesh = new LinkedMesh(mesh, std::string(Json::getString(attachmentMap, "skin", 0)), slotIndex, std::string(entry->_valueString));
+                                    LinkedMesh* linkedMesh = new (__FILE__, __LINE__) LinkedMesh(mesh, std::string(Json::getString(attachmentMap, "skin", 0)), slotIndex, std::string(entry->_valueString));
                                     _linkedMeshes.push_back(linkedMesh);
                                 }
                                 break;
@@ -661,7 +661,7 @@ namespace Spine {
             skeletonData->_events.reserve(events->_size);
             skeletonData->_events.setSize(events->_size);
             for (eventMap = events->_child, i = 0; eventMap; eventMap = eventMap->_next, ++i) {
-                EventData* eventData = new EventData(std::string(eventMap->_name));
+                EventData* eventData = new (__FILE__, __LINE__) EventData(std::string(eventMap->_name));
                 
                 eventData->_intValue = Json::getInt(eventMap, "int", 0);
                 eventData->_floatValue = Json::getFloat(eventMap, "float", 0);
@@ -796,7 +796,7 @@ namespace Spine {
 
             for (timelineMap = slotMap->_child; timelineMap; timelineMap = timelineMap->_next) {
                 if (strcmp(timelineMap->_name, "attachment") == 0) {
-                    AttachmentTimeline *timeline = new AttachmentTimeline(timelineMap->_size);
+                    AttachmentTimeline *timeline = new (__FILE__, __LINE__) AttachmentTimeline(timelineMap->_size);
                     
                     timeline->_slotIndex = slotIndex;
 
@@ -811,7 +811,7 @@ namespace Spine {
 
                 }
                 else if (strcmp(timelineMap->_name, "color") == 0) {
-                    ColorTimeline *timeline = new ColorTimeline(timelineMap->_size);
+                    ColorTimeline *timeline = new (__FILE__, __LINE__) ColorTimeline(timelineMap->_size);
                     
                     timeline->_slotIndex = slotIndex;
 
@@ -826,7 +826,7 @@ namespace Spine {
 
                 }
                 else if (strcmp(timelineMap->_name, "twoColor") == 0) {
-                    TwoColorTimeline *timeline = new TwoColorTimeline(timelineMap->_size);
+                    TwoColorTimeline *timeline = new (__FILE__, __LINE__) TwoColorTimeline(timelineMap->_size);
                     
                     timeline->_slotIndex = slotIndex;
 
@@ -862,7 +862,7 @@ namespace Spine {
 
             for (timelineMap = boneMap->_child; timelineMap; timelineMap = timelineMap->_next) {
                 if (strcmp(timelineMap->_name, "rotate") == 0) {
-                    RotateTimeline *timeline = new RotateTimeline(timelineMap->_size);
+                    RotateTimeline *timeline = new (__FILE__, __LINE__) RotateTimeline(timelineMap->_size);
                     
                     timeline->_boneIndex = boneIndex;
 
@@ -882,13 +882,13 @@ namespace Spine {
                         float timelineScale = isTranslate ? _scale: 1;
                         TranslateTimeline *timeline = 0;
                         if (isScale) {
-                            timeline = new ScaleTimeline(timelineMap->_size);
+                            timeline = new (__FILE__, __LINE__) ScaleTimeline(timelineMap->_size);
                         }
                         else if (isTranslate) {
-                            timeline = new TranslateTimeline(timelineMap->_size);
+                            timeline = new (__FILE__, __LINE__) TranslateTimeline(timelineMap->_size);
                         }
                         else if (isShear) {
-                            timeline = new ShearTimeline(timelineMap->_size);
+                            timeline = new (__FILE__, __LINE__) ShearTimeline(timelineMap->_size);
                         }
                         timeline->_boneIndex = boneIndex;
 
@@ -913,7 +913,7 @@ namespace Spine {
         /** IK constraint timelines. */
         for (constraintMap = ik ? ik->_child : 0; constraintMap; constraintMap = constraintMap->_next) {
             IkConstraintData* constraint = skeletonData->findIkConstraint(constraintMap->_name);
-            IkConstraintTimeline *timeline = new IkConstraintTimeline(constraintMap->_size);
+            IkConstraintTimeline *timeline = new (__FILE__, __LINE__) IkConstraintTimeline(constraintMap->_size);
             
             for (frameIndex = 0; frameIndex < static_cast<int>(skeletonData->_ikConstraints.size()); ++frameIndex) {
                 if (constraint == skeletonData->_ikConstraints[frameIndex]) {
@@ -933,7 +933,7 @@ namespace Spine {
         /** Transform constraint timelines. */
         for (constraintMap = transform ? transform->_child : 0; constraintMap; constraintMap = constraintMap->_next) {
             TransformConstraintData* constraint = skeletonData->findTransformConstraint(constraintMap->_name);
-            TransformConstraintTimeline *timeline = new TransformConstraintTimeline(constraintMap->_size);
+            TransformConstraintTimeline *timeline = new (__FILE__, __LINE__) TransformConstraintTimeline(constraintMap->_size);
             
             for (frameIndex = 0; frameIndex < skeletonData->_transformConstraints.size(); ++frameIndex) {
                 if (constraint == skeletonData->_transformConstraints[frameIndex]) {
@@ -975,14 +975,14 @@ namespace Spine {
                     PathConstraintPositionTimeline* timeline;
                     float timelineScale = 1;
                     if (strcmp(timelineName, "spacing") == 0) {
-                        timeline = new PathConstraintSpacingTimeline(timelineMap->_size);
+                        timeline = new (__FILE__, __LINE__) PathConstraintSpacingTimeline(timelineMap->_size);
                         
                         if (data->_spacingMode == SpacingMode_Length || data->_spacingMode == SpacingMode_Fixed) {
                             timelineScale = _scale;
                         }
                     }
                     else {
-                        timeline = new PathConstraintPositionTimeline(timelineMap->_size);
+                        timeline = new (__FILE__, __LINE__) PathConstraintPositionTimeline(timelineMap->_size);
                         
                         if (data->_positionMode == PositionMode_Fixed) {
                             timelineScale = _scale;
@@ -999,7 +999,7 @@ namespace Spine {
                     duration = MAX(duration, timeline->_frames[(timelineMap->_size - 1) * PathConstraintPositionTimeline::ENTRIES]);
                 }
                 else if (strcmp(timelineName, "mix") == 0) {
-                    PathConstraintMixTimeline* timeline = new PathConstraintMixTimeline(timelineMap->_size);
+                    PathConstraintMixTimeline* timeline = new (__FILE__, __LINE__) PathConstraintMixTimeline(timelineMap->_size);
                     timeline->_pathConstraintIndex = constraintIndex;
                     for (valueMap = timelineMap->_child, frameIndex = 0; valueMap; valueMap = valueMap->_next, ++frameIndex) {
                         timeline->setFrame(frameIndex, Json::getFloat(valueMap, "time", 0), Json::getFloat(valueMap, "rotateMix", 1), Json::getFloat(valueMap, "translateMix", 1));
@@ -1041,7 +1041,7 @@ namespace Spine {
                         tempDeform.push_back(0);
                     }
 
-                    timeline = new DeformTimeline(timelineMap->_size);
+                    timeline = new (__FILE__, __LINE__) DeformTimeline(timelineMap->_size);
                     
                     timeline->_slotIndex = slotIndex;
                     timeline->_attachment = attachment;
@@ -1091,7 +1091,7 @@ namespace Spine {
 
         /** Draw order timeline. */
         if (drawOrder) {
-            DrawOrderTimeline* timeline = new DrawOrderTimeline(drawOrder->_size);
+            DrawOrderTimeline* timeline = new (__FILE__, __LINE__) DrawOrderTimeline(drawOrder->_size);
             
             for (valueMap = drawOrder->_child, frameIndex = 0; valueMap; valueMap = valueMap->_next, ++frameIndex) {
                 int ii;
@@ -1145,7 +1145,7 @@ namespace Spine {
 
         /** Event timeline. */
         if (events) {
-            EventTimeline* timeline = new EventTimeline(events->_size);
+            EventTimeline* timeline = new (__FILE__, __LINE__) EventTimeline(events->_size);
             
             for (valueMap = events->_child, frameIndex = 0; valueMap; valueMap = valueMap->_next, ++frameIndex) {
                 Event* event;
@@ -1156,7 +1156,7 @@ namespace Spine {
                     return NULL;
                 }
                 
-                event = new Event(Json::getFloat(valueMap, "time", 0), *eventData);
+                event = new (__FILE__, __LINE__) Event(Json::getFloat(valueMap, "time", 0), *eventData);
                 event->_intValue = Json::getInt(valueMap, "int", eventData->_intValue);
                 event->_floatValue = Json::getFloat(valueMap, "float", eventData->_floatValue);
                 event->_stringValue = Json::getString(valueMap, "string", eventData->_stringValue.c_str());
@@ -1167,7 +1167,7 @@ namespace Spine {
             duration = MAX(duration, timeline->_frames[events->_size - 1]);
         }
         
-        return new Animation(std::string(root->_name), timelines, duration);
+        return new (__FILE__, __LINE__) Animation(std::string(root->_name), timelines, duration);
     }
     
     void SkeletonJson::readVertices(Json* attachmentMap, VertexAttachment* attachment, int verticesLength) {

@@ -130,7 +130,7 @@ namespace Spine {
             
             size_t index = hash(key);
             
-            Entry* entry = new Entry();
+            Entry* entry = new (__FILE__, __LINE__) Entry();
             entry->_key = key;
             entry->_value = value;
             

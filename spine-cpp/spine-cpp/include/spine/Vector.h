@@ -50,29 +50,9 @@ namespace Spine {
             if (_capacity > 0) {
                 _buffer = allocate(_capacity);
                 for (size_t i = 0; i < _size; ++i) {
-                    construct(_buffer + i, inVector._buffer[i]);
+                    _buffer[i] = inVector._buffer[i];
                 }
             }
-        }
-        
-        Vector& operator=(Vector& inVector) {
-            if (this != &inVector) {
-                clear();
-                deallocate(_buffer);
-                _buffer = NULL;
-                
-                _size = inVector._size;
-                _capacity = inVector._capacity;
-                
-                if (_capacity > 0) {
-                    _buffer = allocate(_capacity);
-                    for (size_t i = 0; i < _size; ++i) {
-                        construct(_buffer + i, inVector._buffer[i]);
-                    }
-                }
-            }
-            
-            return *this;
         }
         
         ~Vector() {
@@ -105,7 +85,7 @@ namespace Spine {
                 reserve();
             }
             
-            construct(_buffer + _size++, inValue);
+           _buffer[_size++] = inValue;
         }
         
         void insert(size_t inIndex, const T& inValue) {
@@ -116,11 +96,10 @@ namespace Spine {
             }
             
             for (size_t i = ++_size - 1; i > inIndex; --i) {
-                construct(_buffer + i, _buffer[i - 1]);
-                destroy(_buffer + (i - 1));
+                _buffer[i] = _buffer[i - 1];
             }
             
-            construct(_buffer + inIndex, inValue);
+            _buffer[inIndex] = inValue;
         }
         
         void erase(size_t inIndex) {
@@ -133,15 +112,9 @@ namespace Spine {
                     std::swap(_buffer[i], _buffer[i + 1]);
                 }
             }
-            
-            destroy(_buffer + _size);
         }
         
         void clear() {
-            for (size_t i = 0; i < _size; ++i) {
-                destroy(_buffer + (_size - 1 - i));
-            }
-            
             _size = 0;
         }
         
@@ -212,19 +185,8 @@ namespace Spine {
         
         void deallocate(T* buffer) {
             if (_buffer) {
-                SpineExtension::free<T>(buffer);
+                SpineExtension::free<T>(buffer, __FILE__, __LINE__);
             }
-        }
-        
-        void construct(T* buffer, const T& val) {
-            /// This is a placement new operator
-            /// which basically means we are contructing a new object
-            /// using pre-allocated memory
-            new (buffer) T(val);
-        }
-        
-        void destroy(T* buffer) {
-            buffer->~T();
         }
     };
 }

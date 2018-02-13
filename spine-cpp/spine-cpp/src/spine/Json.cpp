@@ -119,11 +119,11 @@ namespace Spine {
         }
         
         if (_valueString) {
-            SpineExtension::free(_valueString);
+            SpineExtension::free(_valueString, __FILE__, __LINE__);
         }
         
         if (_name) {
-            SpineExtension::free(_name);
+            SpineExtension::free(_name, __FILE__, __LINE__);
         }
         
         if (_next) {
@@ -415,7 +415,7 @@ namespace Spine {
             return value + 1; /* empty array. */
         }
         
-        item->_child = child = new Json(NULL);
+        item->_child = child = new (__FILE__, __LINE__) Json(NULL);
         if (!item->_child) {
             return NULL; /* memory fail */
         }
@@ -429,7 +429,7 @@ namespace Spine {
         item->_size = 1;
         
         while (*value == ',') {
-            Json *new_item = new Json(NULL);
+            Json *new_item = new (__FILE__, __LINE__) Json(NULL);
             if (!new_item) {
                 return NULL; /* memory fail */
             }
@@ -471,7 +471,7 @@ namespace Spine {
             return value + 1; /* empty array. */
         }
         
-        item->_child = child = new Json(NULL);
+        item->_child = child = new (__FILE__, __LINE__) Json(NULL);
         if (!item->_child) {
             return NULL;
         }
@@ -494,7 +494,7 @@ namespace Spine {
         item->_size = 1;
         
         while (*value == ',') {
-            Json *new_item = new Json(NULL);
+            Json *new_item = new (__FILE__, __LINE__) Json(NULL);
             if (!new_item) {
                 return NULL; /* memory fail */
             }

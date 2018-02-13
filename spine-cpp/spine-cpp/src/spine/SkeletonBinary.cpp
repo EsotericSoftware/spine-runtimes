@@ -106,7 +106,7 @@ namespace Spine {
         TransformMode_NoScaleOrReflection
     };
     
-    SkeletonBinary::SkeletonBinary(Atlas& atlasArray) : _attachmentLoader(new AtlasAttachmentLoader(atlasArray)), _error(), _scale(1), _ownsLoader(true) {
+    SkeletonBinary::SkeletonBinary(Atlas& atlasArray) : _attachmentLoader(new (__FILE__, __LINE__) AtlasAttachmentLoader(atlasArray)), _error(), _scale(1), _ownsLoader(true) {
 
     }
     
@@ -126,21 +126,21 @@ namespace Spine {
         int i, ii, nonessential;
         SkeletonData* skeletonData;
         
-        DataInput* input = new DataInput();
+        DataInput* input = new (__FILE__, __LINE__) DataInput();
         input->cursor = binary;
         input->end = binary + length;
         
         _linkedMeshes.clear();
         
-        skeletonData = new SkeletonData();
+        skeletonData = new (__FILE__, __LINE__) SkeletonData();
         
         char* skeletonData_hash = readString(input);
         skeletonData->_hash = std::string(skeletonData_hash);
-        SpineExtension::free(skeletonData_hash);
+        SpineExtension::free(skeletonData_hash, __FILE__, __LINE__);
         
         char* skeletonData_version = readString(input);
         skeletonData->_version = std::string(skeletonData_version);
-        SpineExtension::free(skeletonData_version);
+        SpineExtension::free(skeletonData_version, __FILE__, __LINE__);
         
         skeletonData->_width = readFloat(input);
         skeletonData->_height = readFloat(input);
@@ -150,7 +150,7 @@ namespace Spine {
         if (nonessential) {
             /* Skip images path & fps */
             readFloat(input);
-            SpineExtension::free(readString(input));
+            SpineExtension::free(readString(input), __FILE__, __LINE__);
         }
         
         /* Bones. */
@@ -163,9 +163,9 @@ namespace Spine {
             const char* name = readString(input);
             BoneData* parent = i == 0 ? 0 : skeletonData->_bones[readVarint(input, 1)];
             
-            data = new BoneData(i, std::string(name), parent);
+            data = new (__FILE__, __LINE__) BoneData(i, std::string(name), parent);
 
-            SpineExtension::free(name);
+            SpineExtension::free(name, __FILE__, __LINE__);
             
             data->_rotation = readFloat(input);
             data->_x = readFloat(input) * _scale;
@@ -212,9 +212,9 @@ namespace Spine {
             const char* slotName = readString(input);
             BoneData* boneData = skeletonData->_bones[readVarint(input, 1)];
             
-            SlotData* slotData = new SlotData(i, std::string(slotName), *boneData);
+            SlotData* slotData = new (__FILE__, __LINE__) SlotData(i, std::string(slotName), *boneData);
 
-            SpineExtension::free(slotName);
+            SpineExtension::free(slotName, __FILE__, __LINE__);
             readColor(input, &slotData->_r, &slotData->_g, &slotData->_b, &slotData->_a);
             r = readByte(input);
             g = readByte(input);
@@ -227,7 +227,7 @@ namespace Spine {
             }
             char* slotData_attachmentName = readString(input);
             slotData->_attachmentName = std::string(slotData_attachmentName);
-            SpineExtension::free(slotData_attachmentName);
+            SpineExtension::free(slotData_attachmentName, __FILE__, __LINE__);
             slotData->_blendMode = static_cast<BlendMode>(readVarint(input, 1));
             
             skeletonData->_slots[i] = slotData;
@@ -240,11 +240,11 @@ namespace Spine {
         for (i = 0; i < ikConstraintsCount; ++i) {
             const char* name = readString(input);
             
-            IkConstraintData* data = new IkConstraintData(std::string(name));
+            IkConstraintData* data = new (__FILE__, __LINE__) IkConstraintData(std::string(name));
             
             data->_order = readVarint(input, 1);
 
-            SpineExtension::free(name);
+            SpineExtension::free(name, __FILE__, __LINE__);
             int bonesCount = readVarint(input, 1);
             data->_bones.reserve(bonesCount);
             data->_bones.setSize(bonesCount);
@@ -265,10 +265,10 @@ namespace Spine {
         for (i = 0; i < transformConstraintsCount; ++i) {
             const char* name = readString(input);
             
-            TransformConstraintData* data = new TransformConstraintData(std::string(name));
+            TransformConstraintData* data = new (__FILE__, __LINE__) TransformConstraintData(std::string(name));
             
             data->_order = readVarint(input, 1);
-            SpineExtension::free(name);
+            SpineExtension::free(name, __FILE__, __LINE__);
             int bonesCount = readVarint(input, 1);
             data->_bones.reserve(bonesCount);
             data->_bones.setSize(bonesCount);
@@ -299,10 +299,10 @@ namespace Spine {
         for (i = 0; i < pathConstraintsCount; ++i) {
             const char* name = readString(input);
             
-            PathConstraintData* data = new PathConstraintData(std::string(name));
+            PathConstraintData* data = new (__FILE__, __LINE__) PathConstraintData(std::string(name));
             
             data->_order = readVarint(input, 1);
-            SpineExtension::free(name);
+            SpineExtension::free(name, __FILE__, __LINE__);
             
             int bonesCount = readVarint(input, 1);
             data->_bones.reserve(bonesCount);
@@ -349,7 +349,7 @@ namespace Spine {
         for (i = skeletonData->_defaultSkin ? 1 : 0; i < skeletonData->_skins.size(); ++i) {
             const char* skinName = readString(input);
             skeletonData->_skins[i] = readSkin(input, skinName, skeletonData, nonessential);
-            SpineExtension::free(skinName);
+            SpineExtension::free(skinName, __FILE__, __LINE__);
         }
 
         /* Linked meshes. */
@@ -380,13 +380,13 @@ namespace Spine {
         skeletonData->_events.setSize(eventsCount);
         for (i = 0; i < eventsCount; ++i) {
             const char* name = readString(input);
-            EventData* eventData = new EventData(std::string(name));
-            SpineExtension::free(name);
+            EventData* eventData = new (__FILE__, __LINE__) EventData(std::string(name));
+            SpineExtension::free(name, __FILE__, __LINE__);
             eventData->_intValue = readVarint(input, 0);
             eventData->_floatValue = readFloat(input);
             const char* eventData_stringValue = readString(input);
             eventData->_stringValue = std::string(eventData_stringValue);
-            SpineExtension::free(eventData_stringValue);
+            SpineExtension::free(eventData_stringValue, __FILE__, __LINE__);
             skeletonData->_events[i] = eventData;
         }
 
@@ -397,7 +397,7 @@ namespace Spine {
         for (i = 0; i < animationsCount; ++i) {
             const char* name = readString(input);
             Animation* animation = readAnimation(name, input, skeletonData);
-            SpineExtension::free(name);
+            SpineExtension::free(name, __FILE__, __LINE__);
             if (!animation) {
                 delete input;
                 delete skeletonData;
@@ -420,7 +420,7 @@ namespace Spine {
             return NULL;
         }
         skeletonData = readSkeletonData((unsigned char*)binary, length);
-        SpineExtension::free(binary);
+        SpineExtension::free(binary, __FILE__, __LINE__);
         return skeletonData;
     }
     
@@ -522,7 +522,7 @@ namespace Spine {
             return NULL;
         }
         
-        skin = new Skin(std::string(skinName));
+        skin = new (__FILE__, __LINE__) Skin(std::string(skinName));
         
         for (i = 0; i < slotCount; ++i) {
             int slotIndex = readVarint(input, 1);
@@ -532,7 +532,7 @@ namespace Spine {
                 if (attachment) {
                     skin->addAttachment(slotIndex, std::string(name), attachment);
                 }
-                SpineExtension::free(name);
+                SpineExtension::free(name, __FILE__, __LINE__);
             }
         }
         
@@ -571,7 +571,7 @@ namespace Spine {
                 region->updateOffset();
                 
                 if (freeName) {
-                    SpineExtension::free(name);
+                    SpineExtension::free(name, __FILE__, __LINE__);
                 }
                 
                 return region;
@@ -585,7 +585,7 @@ namespace Spine {
                     readInt(input);
                 }
                 if (freeName) {
-                    SpineExtension::free(name);
+                    SpineExtension::free(name, __FILE__, __LINE__);
                 }
                 
                 return box;
@@ -620,7 +620,7 @@ namespace Spine {
                 }
                 
                 if (freeName) {
-                    SpineExtension::free(name);
+                    SpineExtension::free(name, __FILE__, __LINE__);
                 }
                 
                 return mesh;
@@ -645,15 +645,15 @@ namespace Spine {
                     mesh->_height = readFloat(input) * _scale;
                 }
                 
-                LinkedMesh* linkedMesh = new LinkedMesh(mesh, std::string(skinName), slotIndex, std::string(parent));
+                LinkedMesh* linkedMesh = new (__FILE__, __LINE__) LinkedMesh(mesh, std::string(skinName), slotIndex, std::string(parent));
                 _linkedMeshes.push_back(linkedMesh);
                 
                 if (freeName) {
-                    SpineExtension::free(name);
+                    SpineExtension::free(name, __FILE__, __LINE__);
                 }
                 
-                SpineExtension::free(skinName);
-                SpineExtension::free(parent);
+                SpineExtension::free(skinName, __FILE__, __LINE__);
+                SpineExtension::free(parent, __FILE__, __LINE__);
                 
                 return mesh;
             }
@@ -677,7 +677,7 @@ namespace Spine {
                 }
                 
                 if (freeName) {
-                    SpineExtension::free(name);
+                    SpineExtension::free(name, __FILE__, __LINE__);
                 }
                 
                 return path;
@@ -709,7 +709,7 @@ namespace Spine {
                 clip->_endSlot = skeletonData->_slots[endSlotIndex];
                 
                 if (freeName) {
-                    SpineExtension::free(name);
+                    SpineExtension::free(name, __FILE__, __LINE__);
                 }
                 
                 return clip;
@@ -717,7 +717,7 @@ namespace Spine {
         }
         
         if (freeName) {
-            SpineExtension::free(name);
+            SpineExtension::free(name, __FILE__, __LINE__);
         }
         
         return NULL;
@@ -800,19 +800,19 @@ namespace Spine {
                 int frameCount = readVarint(input, true);
                 switch (timelineType) {
                     case SLOT_ATTACHMENT: {
-                        AttachmentTimeline* timeline = new AttachmentTimeline(frameCount);
+                        AttachmentTimeline* timeline = new (__FILE__, __LINE__) AttachmentTimeline(frameCount);
                         timeline->_slotIndex = slotIndex;
                         for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
                             const char* attachmentName = readString(input);
                             timeline->setFrame(frameIndex, readFloat(input), std::string(attachmentName));
-                            SpineExtension::free(attachmentName);
+                            SpineExtension::free(attachmentName, __FILE__, __LINE__);
                         }
                         timelines.push_back(timeline);
                         duration = MAX(duration, timeline->_frames[frameCount - 1]);
                         break;
                     }
                     case SLOT_COLOR: {
-                        ColorTimeline* timeline = new ColorTimeline(frameCount);
+                        ColorTimeline* timeline = new (__FILE__, __LINE__) ColorTimeline(frameCount);
                         timeline->_slotIndex = slotIndex;
                         for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
                             float time = readFloat(input);
@@ -831,7 +831,7 @@ namespace Spine {
                         break;
                     }
                     case SLOT_TWO_COLOR: {
-                        TwoColorTimeline* timeline = new TwoColorTimeline(frameCount);
+                        TwoColorTimeline* timeline = new (__FILE__, __LINE__) TwoColorTimeline(frameCount);
                         timeline->_slotIndex = slotIndex;
                         for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
                             float time = readFloat(input);
@@ -871,7 +871,7 @@ namespace Spine {
                 int frameCount = readVarint(input, true);
                 switch (timelineType) {
                     case BONE_ROTATE: {
-                        RotateTimeline* timeline = new RotateTimeline(frameCount);
+                        RotateTimeline* timeline = new (__FILE__, __LINE__) RotateTimeline(frameCount);
                         timeline->_boneIndex = boneIndex;
                         for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
                             timeline->setFrame(frameIndex, readFloat(input), readFloat(input));
@@ -889,13 +889,13 @@ namespace Spine {
                         TranslateTimeline* timeline;
                         float timelineScale = 1;
                         if (timelineType == BONE_SCALE) {
-                            timeline = new ScaleTimeline(frameCount);
+                            timeline = new (__FILE__, __LINE__) ScaleTimeline(frameCount);
                         }
                         else if (timelineType == BONE_SHEAR) {
-                            timeline = new ShearTimeline(frameCount);
+                            timeline = new (__FILE__, __LINE__) ShearTimeline(frameCount);
                         }
                         else {
-                            timeline = new TranslateTimeline(frameCount);
+                            timeline = new (__FILE__, __LINE__) TranslateTimeline(frameCount);
                             timelineScale = scale;
                         }
                         timeline->_boneIndex = boneIndex;
@@ -922,7 +922,7 @@ namespace Spine {
         for (int i = 0, n = readVarint(input, true); i < n; ++i) {
             int index = readVarint(input, true);
             int frameCount = readVarint(input, true);
-            IkConstraintTimeline* timeline = new IkConstraintTimeline(frameCount);
+            IkConstraintTimeline* timeline = new (__FILE__, __LINE__) IkConstraintTimeline(frameCount);
             timeline->_ikConstraintIndex = index;
             for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
                 timeline->setFrame(frameIndex, readFloat(input), readFloat(input), readSByte(input));
@@ -938,7 +938,7 @@ namespace Spine {
         for (int i = 0, n = readVarint(input, true); i < n; ++i) {
             int index = readVarint(input, true);
             int frameCount = readVarint(input, true);
-            TransformConstraintTimeline* timeline = new TransformConstraintTimeline(frameCount);
+            TransformConstraintTimeline* timeline = new (__FILE__, __LINE__) TransformConstraintTimeline(frameCount);
             timeline->_transformConstraintIndex = index;
             for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
                 timeline->setFrame(frameIndex, readFloat(input), readFloat(input), readFloat(input), readFloat(input), readFloat(input));
@@ -963,14 +963,14 @@ namespace Spine {
                         PathConstraintPositionTimeline* timeline;
                         float timelineScale = 1;
                         if (timelineType == PATH_SPACING) {
-                            timeline = new PathConstraintSpacingTimeline(frameCount);
+                            timeline = new (__FILE__, __LINE__) PathConstraintSpacingTimeline(frameCount);
                             
                             if (data->_spacingMode == SpacingMode_Length || data->_spacingMode == SpacingMode_Fixed) {
                                 timelineScale = scale;
                             }
                         }
                         else {
-                            timeline = new PathConstraintPositionTimeline(frameCount);
+                            timeline = new (__FILE__, __LINE__) PathConstraintPositionTimeline(frameCount);
                             
                             if (data->_positionMode == PositionMode_Fixed) {
                                 timelineScale = scale;
@@ -988,7 +988,7 @@ namespace Spine {
                         break;
                     }
                     case PATH_MIX: {
-                        PathConstraintMixTimeline* timeline = new PathConstraintMixTimeline(frameCount);
+                        PathConstraintMixTimeline* timeline = new (__FILE__, __LINE__) PathConstraintMixTimeline(frameCount);
                         
                         timeline->_pathConstraintIndex = index;
                         for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
@@ -1017,11 +1017,11 @@ namespace Spine {
                     if (!baseAttachment) {
                         ContainerUtil::cleanUpVectorOfPointers(timelines);
                         setError("Attachment not found: ", attachmentName);
-                        SpineExtension::free(attachmentName);
+                        SpineExtension::free(attachmentName, __FILE__, __LINE__);
                         return NULL;
                     }
                     
-                    SpineExtension::free(attachmentName);
+                    SpineExtension::free(attachmentName, __FILE__, __LINE__);
                     
                     VertexAttachment* attachment = static_cast<VertexAttachment*>(baseAttachment);
                     
@@ -1031,7 +1031,7 @@ namespace Spine {
 
                     int frameCount = readVarint(input, true);
                     
-                    DeformTimeline* timeline = new DeformTimeline(frameCount);
+                    DeformTimeline* timeline = new (__FILE__, __LINE__) DeformTimeline(frameCount);
                     
                     timeline->_slotIndex = slotIndex;
                     timeline->_attachment = attachment;
@@ -1088,7 +1088,7 @@ namespace Spine {
         // Draw order timeline.
         int drawOrderCount = readVarint(input, true);
         if (drawOrderCount > 0) {
-            DrawOrderTimeline* timeline = new DrawOrderTimeline(drawOrderCount);
+            DrawOrderTimeline* timeline = new (__FILE__, __LINE__) DrawOrderTimeline(drawOrderCount);
             
             int slotCount = static_cast<int>(skeletonData->_slots.size());
             for (int i = 0; i < drawOrderCount; ++i) {
@@ -1135,12 +1135,12 @@ namespace Spine {
         // Event timeline.
         int eventCount = readVarint(input, true);
         if (eventCount > 0) {
-            EventTimeline* timeline =new EventTimeline(eventCount);
+            EventTimeline* timeline = new (__FILE__, __LINE__) EventTimeline(eventCount);
             
             for (int i = 0; i < eventCount; ++i) {
                 float time = readFloat(input);
                 EventData* eventData = skeletonData->_events[readVarint(input, true)];
-                Event* event = new Event(time, *eventData);
+                Event* event = new (__FILE__, __LINE__) Event(time, *eventData);
                 
                 event->_intValue = readVarint(input, false);
                 event->_floatValue = readFloat(input);
@@ -1148,7 +1148,7 @@ namespace Spine {
                 const char* event_stringValue = freeString ? readString(input) : eventData->_stringValue.c_str();
                 event->_stringValue = std::string(event_stringValue);
                 if (freeString) {
-                    SpineExtension::free(event_stringValue);
+                    SpineExtension::free(event_stringValue, __FILE__, __LINE__);
                 }
                 timeline->setFrame(i, event);
             }
@@ -1157,7 +1157,7 @@ namespace Spine {
             duration = MAX(duration, timeline->_frames[eventCount - 1]);
         }
 
-        return new Animation(std::string(name), timelines, duration);
+        return new (__FILE__, __LINE__) Animation(std::string(name), timelines, duration);
     }
     
     void SkeletonBinary::readCurve(DataInput* input, int frameIndex, CurveTimeline* timeline) {

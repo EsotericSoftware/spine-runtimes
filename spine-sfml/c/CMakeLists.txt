@@ -1,48 +1,4 @@
 cmake_minimum_required(VERSION 2.8.9)
-#
-# First download and extract SFML 2.3.2 for the respective OS we are on
-#
-set(DEPS_DIR "${CMAKE_CURRENT_LIST_DIR}/dependencies/")
-message(${DEPS_DIR})
-if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(SFML_URL "http://www.sfml-dev.org/files/SFML-2.4.1-osx-clang.tar.gz")
-    set(SFML_DIR ${DEPS_DIR}/SFML-2.4.1-osx-clang)
-	if (NOT EXISTS "${SFML_DIR}")
-		message("Downloading SFML for Mac OS X")
-		file(DOWNLOAD "${SFML_URL}" "${DEPS_DIR}/sfml.tar.gz")
-		execute_process(
-			COMMAND ${CMAKE_COMMAND} -E tar xzf  ${DEPS_DIR}/sfml.tar.gz
-			WORKING_DIRECTORY ${DEPS_DIR}
-    	)
-		# copy freetype over to Frameworks/ so rpath resoultion works
-		execute_process(
-				COMMAND ${CMAKE_COMMAND} -E copy_directory ${SFML_DIR}/extlibs/freetype.framework ${SFML_DIR}/Frameworks/freetype.framework
-				WORKING_DIRECTORY ${SFML_DIR}
-		)
-	endif()
-elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    set(SFML_URL "http://www.sfml-dev.org/files/SFML-2.4.1-linux-gcc-64-bit.tar.gz")
-    set(SFML_DIR ${DEPS_DIR}/SFML-2.4.1)
-	if (NOT EXISTS ${SFML_DIR})
-		message("Downloading SFML for Linux 64-bit")
-		file(DOWNLOAD "${SFML_URL}" "${DEPS_DIR}/sfml.tar.gz")
-		execute_process(
-			COMMAND ${CMAKE_COMMAND} -E tar xzf  ${DEPS_DIR}/sfml.tar.gz
-			WORKING_DIRECTORY ${DEPS_DIR}
-    	)
-	endif()
-else()
-	set(SFML_URL "http://www.sfml-dev.org/files/SFML-2.4.1-windows-vc14-32-bit.zip")
-	set(SFML_DIR ${DEPS_DIR}/SFML-2.4.1)
-	if (NOT EXISTS ${SFML_DIR})
-		message("Downloading SFML for Windows 32-bit")
-		file(DOWNLOAD "${SFML_URL}" "${DEPS_DIR}/sfml.zip")
-		execute_process(
-			COMMAND ${CMAKE_COMMAND} -E tar x  ${DEPS_DIR}/sfml.zip
-			WORKING_DIRECTORY ${DEPS_DIR}
-    	)
-	endif()
-endif()
 
 # Define spine-sfml library
 include_directories(src ${SFML_DIR}/include)

@@ -94,11 +94,11 @@ namespace Spine {
     
     class TextureLoader;
     
-    class Atlas : SpineObject {
+    class Atlas : public SpineObject {
     public:
-        Atlas(const char* path, TextureLoader& textureLoader);
+        Atlas(const char* path, TextureLoader* textureLoader);
         
-        Atlas(const char* data, int length, const char* dir, TextureLoader& textureLoader);
+        Atlas(const char* data, int length, const char* dir, TextureLoader* textureLoader);
         
         ~Atlas();
         
@@ -114,7 +114,7 @@ namespace Spine {
     private:
         Vector<AtlasPage*> _pages;
         Vector<AtlasRegion*> _regions;
-        TextureLoader& _textureLoader;
+        TextureLoader* _textureLoader;
         
         void load(const char* begin, int length, const char* dir);
         

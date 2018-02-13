@@ -71,11 +71,11 @@ namespace Spine {
             
             Bone* bone;
             if (data->getParent() == NULL) {
-                bone = new Bone(*data, *this, NULL);
+                bone = new (__FILE__, __LINE__) Bone(*data, *this, NULL);
             }
             else {
                 Bone* parent = _bones[data->getParent()->getIndex()];
-                bone = new Bone(*data, *this, parent);
+                bone = new (__FILE__, __LINE__) Bone(*data, *this, parent);
                 parent->getChildren().push_back(bone);
             }
             
@@ -88,7 +88,7 @@ namespace Spine {
             SlotData* data = (*i);
             
             Bone* bone = _bones[data->getBoneData().getIndex()];
-            Slot* slot = new Slot(*data, *bone);
+            Slot* slot = new (__FILE__, __LINE__) Slot(*data, *bone);
             
             _slots.push_back(slot);
             _drawOrder.push_back(slot);
@@ -98,7 +98,7 @@ namespace Spine {
         for (IkConstraintData** i = _data.getIkConstraints().begin(); i != _data.getIkConstraints().end(); ++i) {
             IkConstraintData* data = (*i);
             
-            IkConstraint* constraint = new IkConstraint(*data, *this);
+            IkConstraint* constraint = new (__FILE__, __LINE__) IkConstraint(*data, *this);
             
             _ikConstraints.push_back(constraint);
         }
@@ -107,7 +107,7 @@ namespace Spine {
         for (TransformConstraintData** i = _data.getTransformConstraints().begin(); i != _data.getTransformConstraints().end(); ++i) {
             TransformConstraintData* data = (*i);
             
-            TransformConstraint* constraint = new TransformConstraint(*data, *this);
+            TransformConstraint* constraint = new (__FILE__, __LINE__) TransformConstraint(*data, *this);
             
             _transformConstraints.push_back(constraint);
         }
@@ -116,7 +116,7 @@ namespace Spine {
         for (PathConstraintData** i = _data.getPathConstraints().begin(); i != _data.getPathConstraints().end(); ++i) {
             PathConstraintData* data = (*i);
             
-            PathConstraint* constraint = new PathConstraint(*data, *this);
+            PathConstraint* constraint = new (__FILE__, __LINE__) PathConstraint(*data, *this);
             
             _pathConstraints.push_back(constraint);
         }

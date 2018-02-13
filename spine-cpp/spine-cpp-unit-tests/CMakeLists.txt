@@ -3,42 +3,16 @@ project(spine_cpp_unit_test)
 
 set(CMAKE_INSTALL_PREFIX "./")
 set(CMAKE_VERBOSE_MAKEFILE ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_CRT_SECURE_NO_WARNINGS -DKANJI_MEMTRACE -DUSE_CPP11_MUTEX -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++	")
 
-#########################################################
-# set includes
-#########################################################
 include_directories(../spine-cpp/include teamcity minicppunit tests memory)
 
-#########################################################
-# Add Sources
-#########################################################
-set(MINICPP_SRC
-	minicppunit/MiniCppUnit.cxx
+set(SRC
+	src/main.cpp
+	src/TestHarness.cpp
 )
 
-set(TEAMCITY_SRC
-	teamcity/teamcity_cppunit.cpp
-	teamcity/teamcity_messages.cpp
-)
-
-set(TEST_SRC
-	tests/SpineEventMonitor.cpp
-	tests/EmptyTestFixture.cpp
-	tests/C_InterfaceTestFixture.cpp
-	tests/CPP_InterfaceTestFixture.cpp
-	tests/MemoryTestFixture.cpp
-)
-
-set(MEMLEAK_SRC
-	memory/KMemory.cpp
-	memory/KString.cpp
-)
-
-#########################################################
-# setup main project
-#########################################################
-add_executable(spine_cpp_unit_test main.cpp ${MINICPP_SRC} ${TEAMCITY_SRC} ${TEST_SRC} ${MEMLEAK_SRC})
+add_executable(spine_cpp_unit_test ${SRC})
 target_link_libraries(spine_cpp_unit_test spine-cpp)
 
 

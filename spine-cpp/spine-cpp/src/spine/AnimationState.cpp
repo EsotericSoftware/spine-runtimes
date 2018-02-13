@@ -216,11 +216,11 @@ namespace Spine {
     }
     
     EventQueue* EventQueue::newEventQueue(AnimationState& state, Pool<TrackEntry>& trackEntryPool) {
-        return new EventQueue(state, trackEntryPool);
+        return new (__FILE__, __LINE__) EventQueue(state, trackEntryPool);
     }
     
     EventQueueEntry* EventQueue::newEventQueueEntry(EventType eventType, TrackEntry* entry, Event* event) {
-        return new EventQueueEntry(eventType, entry, event);
+        return new (__FILE__, __LINE__) EventQueueEntry(eventType, entry, event);
     }
     
     EventQueue::EventQueue(AnimationState& state, Pool<TrackEntry>& trackEntryPool) : _state(state), _trackEntryPool(trackEntryPool), _drainDisabled(false) {

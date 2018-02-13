@@ -28,50 +28,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Pool_h
-#define Spine_Pool_h
+#include <stdio.h>
+#include <spine/spine.h>
 
-#include <spine/Extension.h>
-#include <spine/Vector.h>
-#include <spine/ContainerUtil.h>
-#include <spine/SpineObject.h>
+#include "TestHarness.h"
 
-namespace Spine {
-    template <typename T>
-    class Pool : public SpineObject {
-    public:
-        Pool() {
-            // Empty
-        }
-        
-        ~Pool() {
-            ContainerUtil::cleanUpVectorOfPointers(_objects);
-        }
-        
-        T* obtain() {
-            if (_objects.size() > 0) {
-                T** object = _objects.begin();
-                T* ret = *object;
-                _objects.erase(0);
-                
-                return ret;
-            }
-            else {
-                T* ret = new (__FILE__, __LINE__)  T();
-                
-                return ret;
-            }
-        }
-        
-        void free(T* object) {
-            if (!_objects.contains(object)) {
-                _objects.push_back(object);
-            }
-        }
-        
-    private:
-        Vector<T*> _objects;
-    };
+#define SPINEBOY_JSON "testdata/spineboy/spineboy-ess.json"
+#define SPINEBOY_ATLAS "testdata/spineboy/spineboy.atlas"
+
+using namespace Spine;
+
+int main (int argc, char** argv) {
+	TestSpineExtension* ext = new TestSpineExtension();
+	SpineExtension::setInstance(ext);
+
+	Atlas* atlas = new (__FILE__, __LINE__) Atlas(SPINEBOY_ATLAS, 0);
+
+
+	delete atlas;
+
+	ext->reportLeaks();
 }
-
-#endif /* Spine_Pool_h */
