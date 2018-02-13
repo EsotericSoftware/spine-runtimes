@@ -152,22 +152,6 @@ namespace Spine.Unity {
 			return new Quaternion(0, 0, Mathf.Sin(halfRotation), Mathf.Cos(halfRotation));
 		}
 
-		/// <summary>Gets the PointAttachment's Unity World position using its Spine GameObject Transform.</summary>
-		public static Vector3 GetWorldPosition (this PointAttachment attachment, Slot slot, Transform spineGameObjectTransform) {
-			Vector3 skeletonSpacePosition;
-			skeletonSpacePosition.z = 0;
-			attachment.ComputeWorldPosition(slot.bone, out skeletonSpacePosition.x, out skeletonSpacePosition.y);
-			return spineGameObjectTransform.TransformPoint(skeletonSpacePosition);
-		}
-
-		/// <summary>Gets the PointAttachment's Unity World position using its Spine GameObject Transform.</summary>
-		public static Vector3 GetWorldPosition (this PointAttachment attachment, Bone bone, Transform spineGameObjectTransform) {
-			Vector3 skeletonSpacePosition;
-			skeletonSpacePosition.z = 0;
-			attachment.ComputeWorldPosition(bone, out skeletonSpacePosition.x, out skeletonSpacePosition.y);
-			return spineGameObjectTransform.TransformPoint(skeletonSpacePosition);
-		}
-
 		/// <summary>Gets the internal bone matrix as a Unity bonespace-to-skeletonspace transformation matrix.</summary>
 		public static Matrix4x4 GetMatrix4x4 (this Bone bone) {
 			return new Matrix4x4 {
@@ -280,6 +264,22 @@ namespace Spine.Unity {
 			}
 
 			return buffer;
+		}
+
+		/// <summary>Gets the PointAttachment's Unity World position using its Spine GameObject Transform.</summary>
+		public static Vector3 GetWorldPosition (this PointAttachment attachment, Slot slot, Transform spineGameObjectTransform) {
+			Vector3 skeletonSpacePosition;
+			skeletonSpacePosition.z = 0;
+			attachment.ComputeWorldPosition(slot.bone, out skeletonSpacePosition.x, out skeletonSpacePosition.y);
+			return spineGameObjectTransform.TransformPoint(skeletonSpacePosition);
+		}
+
+		/// <summary>Gets the PointAttachment's Unity World position using its Spine GameObject Transform.</summary>
+		public static Vector3 GetWorldPosition (this PointAttachment attachment, Bone bone, Transform spineGameObjectTransform) {
+			Vector3 skeletonSpacePosition;
+			skeletonSpacePosition.z = 0;
+			attachment.ComputeWorldPosition(bone, out skeletonSpacePosition.x, out skeletonSpacePosition.y);
+			return spineGameObjectTransform.TransformPoint(skeletonSpacePosition);
 		}
 		#endregion
 	}
