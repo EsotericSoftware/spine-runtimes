@@ -34,13 +34,13 @@
 #include <spine/Animation.h>
 
 namespace Spine {
-    AnimationStateData::AnimationStateData(SkeletonData& skeletonData) : _skeletonData(skeletonData), _defaultMix(0) {
+    AnimationStateData::AnimationStateData(SkeletonData* skeletonData) : _skeletonData(skeletonData), _defaultMix(0) {
         // Empty
     }
     
     void AnimationStateData::setMix(std::string fromName, std::string toName, float duration) {
-        Animation* from = _skeletonData.findAnimation(fromName);
-        Animation* to = _skeletonData.findAnimation(toName);
+        Animation* from = _skeletonData->findAnimation(fromName);
+        Animation* to = _skeletonData->findAnimation(toName);
         
         setMix(from, to, duration);
     }
@@ -64,13 +64,13 @@ namespace Spine {
         HashMap<AnimationPair, float, HashAnimationPair>::Iterator i = _animationToMixTime.find(key);
         
         if (i != _animationToMixTime.end()) {
-            return i.second();
+            return i.value();
         }
         
         return _defaultMix;
     }
     
-    SkeletonData& AnimationStateData::getSkeletonData() {
+    SkeletonData* AnimationStateData::getSkeletonData() {
         return _skeletonData;
     }
     

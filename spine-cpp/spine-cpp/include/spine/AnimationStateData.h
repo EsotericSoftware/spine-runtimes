@@ -47,13 +47,13 @@ namespace Spine {
         
     public:
         /// The SkeletonData to look up animations when they are specified by name.
-        SkeletonData& getSkeletonData();
+        SkeletonData* getSkeletonData();
         
         /// The mix duration to use when no mix duration has been specifically defined between two animations.
         float getDefaultMix();
         void setDefaultMix(float inValue);
         
-        AnimationStateData(SkeletonData& skeletonData);
+        AnimationStateData(SkeletonData* skeletonData);
         
         /// Sets a mix duration by animation names.
         void setMix(std::string fromName, std::string toName, float duration);
@@ -83,7 +83,7 @@ namespace Spine {
             std::size_t operator()(const Spine::AnimationStateData::AnimationPair& val) const;
         };
         
-        SkeletonData& _skeletonData;
+        SkeletonData* _skeletonData;
         float _defaultMix;
         HashMap<AnimationPair, float, HashAnimationPair> _animationToMixTime;
     };

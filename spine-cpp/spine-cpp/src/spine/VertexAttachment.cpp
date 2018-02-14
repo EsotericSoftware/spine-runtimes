@@ -41,6 +41,10 @@ namespace Spine {
     VertexAttachment::VertexAttachment(std::string name) : Attachment(name), _worldVerticesLength(0), _id(getNextID()) {
         // Empty
     }
+
+    VertexAttachment::~VertexAttachment() {
+        // Empty
+    }
     
     void VertexAttachment::computeWorldVertices(Slot& slot, Vector<float>& worldVertices) {
         computeWorldVertices(slot, 0, _worldVerticesLength, worldVertices, 0);

@@ -52,6 +52,10 @@ namespace Spine {
         _frames.reserve(frameCount * ENTRIES);
         _frames.setSize(frameCount * ENTRIES);
     }
+
+    PathConstraintPositionTimeline::~PathConstraintPositionTimeline() {
+        // Empty
+    }
     
     void PathConstraintPositionTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
         PathConstraint* constraintP = skeleton._pathConstraints[_pathConstraintIndex];

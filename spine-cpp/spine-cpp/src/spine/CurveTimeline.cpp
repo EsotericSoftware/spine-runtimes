@@ -46,6 +46,9 @@ namespace Spine {
         _curves.reserve((frameCount - 1) * BEZIER_SIZE);
         _curves.setSize((frameCount - 1) * BEZIER_SIZE);
     }
+
+    CurveTimeline::~CurveTimeline() {
+    }
     
     int CurveTimeline::getFrameCount() {
         return static_cast<int>(_curves.size() / BEZIER_SIZE + 1);

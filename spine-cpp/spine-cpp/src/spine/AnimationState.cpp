@@ -305,7 +305,7 @@ namespace Spine {
     const int AnimationState::Dip = 2;
     const int AnimationState::DipMix = 3;
     
-    AnimationState::AnimationState(AnimationStateData& data) :
+    AnimationState::AnimationState(AnimationStateData* data) :
     _data(data),
     _queue(EventQueue::newEventQueue(*this, _trackEntryPool)),
     _animationsChanged(false),
@@ -501,7 +501,7 @@ namespace Spine {
     }
     
     TrackEntry* AnimationState::setAnimation(int trackIndex, std::string animationName, bool loop) {
-        Animation* animation = _data._skeletonData.findAnimation(animationName);
+        Animation* animation = _data->_skeletonData->findAnimation(animationName);
         assert(animation != NULL);
         
         return setAnimation(trackIndex, animation, loop);
@@ -535,7 +535,7 @@ namespace Spine {
     }
     
     TrackEntry* AnimationState::addAnimation(int trackIndex, std::string animationName, bool loop, float delay) {
-        Animation* animation = _data._skeletonData.findAnimation(animationName);
+        Animation* animation = _data->_skeletonData->findAnimation(animationName);
         assert(animation != NULL);
         
         return addAnimation(trackIndex, animation, loop, delay);
@@ -567,7 +567,7 @@ namespace Spine {
                     } else {
                         delay += duration;
                     }
-                    delay -= _data.getMix(last->_animation, animation);
+                    delay -= _data->getMix(last->_animation, animation);
                 } else {
                     delay = 0;
                 }
@@ -613,7 +613,7 @@ namespace Spine {
         return trackIndex >= _tracks.size() ? NULL : _tracks[trackIndex];
     }
     
-    AnimationStateData& AnimationState::getData() {
+    AnimationStateData* AnimationState::getData() {
         return _data;
     }
     
@@ -940,7 +940,7 @@ namespace Spine {
         entry._alpha = 1;
         entry._interruptAlpha = 1;
         entry._mixTime = 0;
-        entry._mixDuration = (last == NULL) ? 0 : _data.getMix(last->_animation, animation);
+        entry._mixDuration = (last == NULL) ? 0 : _data->getMix(last->_animation, animation);
         
         return entryP;
     }

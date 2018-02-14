@@ -34,11 +34,14 @@
 namespace Spine {
 
 	void *SpineObject::operator new(size_t sz, const char* file, int line) {
-		return SpineExtension::alloc<SpineObject>(sz, file, line);
+		return SpineExtension::calloc<SpineObject>(sz, file, line);
 	}
 
 	void SpineObject::operator delete(void *p) {
-		((SpineObject*)p)->~SpineObject();
 		SpineExtension::free(p, __FILE__, __LINE__);
+	}
+
+	SpineObject::~SpineObject() {
+		// Empty
 	}
 }

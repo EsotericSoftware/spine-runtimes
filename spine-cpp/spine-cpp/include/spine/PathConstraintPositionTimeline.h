@@ -44,6 +44,8 @@ namespace Spine {
         static const int ENTRIES;
         
         PathConstraintPositionTimeline(int frameCount);
+
+        virtual ~PathConstraintPositionTimeline();
         
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction);
         

@@ -33,19 +33,53 @@
 
 #include "TestHarness.h"
 
-#define SPINEBOY_JSON "testdata/spineboy/spineboy-ess.json"
-#define SPINEBOY_ATLAS "testdata/spineboy/spineboy.atlas"
+#define SPINEBOY_JSON "testdata/raptor/raptor-pro.json"
+#define SPINEBOY_ATLAS "testdata/raptor/raptor.atlas"
 
 using namespace Spine;
+
+void loadSpineboy(Atlas* &atlas, SkeletonData* &skeletonData, AnimationStateData* &stateData, Skeleton* &skeleton, AnimationState* &state) {
+	atlas = new (__FILE__, __LINE__) Atlas(SPINEBOY_ATLAS, 0);
+	assert(atlas != 0);
+
+	SkeletonJson json(atlas);
+	skeletonData = json.readSkeletonDataFile(SPINEBOY_JSON);
+	assert(skeletonData);
+
+	skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
+	assert(skeleton != 0);
+
+	stateData = new (__FILE__, __LINE__) AnimationStateData(skeletonData);
+	assert(stateData != 0);
+	stateData->setDefaultMix(0.4f);
+
+	state = new (__FILE__, __LINE__) AnimationState(stateData);
+}
+
+void dispose(Atlas* atlas, SkeletonData* skeletonData, AnimationStateData* stateData, Skeleton* skeleton, AnimationState* state) {
+	delete skeleton;
+	delete state;
+	delete stateData;
+	delete skeletonData;
+	delete atlas;
+}
+
+void reproduceIssue_776() {
+	Atlas* atlas = 0;
+	SkeletonData* skeletonData = 0;
+	AnimationStateData* stateData = 0;
+	Skeleton* skeleton = 0;
+	AnimationState* state = 0;
+
+	loadSpineboy(atlas, skeletonData, stateData, skeleton, state);
+	dispose(atlas, skeletonData, stateData, skeleton, state);
+}
 
 int main (int argc, char** argv) {
 	TestSpineExtension* ext = new TestSpineExtension();
 	SpineExtension::setInstance(ext);
 
-	Atlas* atlas = new (__FILE__, __LINE__) Atlas(SPINEBOY_ATLAS, 0);
-
-
-	delete atlas;
+	reproduceIssue_776();
 
 	ext->reportLeaks();
 }

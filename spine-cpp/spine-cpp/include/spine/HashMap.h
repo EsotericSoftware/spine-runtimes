@@ -51,14 +51,9 @@ namespace Spine {
             }
             
             Iterator& operator++() {
-                _entry = _entry->next;
-                return *this;
-            }
-            
-            Iterator& operator--() {
-                _entry = _entry->prev;
-                return *this;
-            }
+				_entry = _entry->next;
+				return *this;
+			}
             
             bool operator==(const Iterator& p) const {
                 return _entry == p._entry;
@@ -68,11 +63,11 @@ namespace Spine {
                 return _entry != p._entry;
             }
             
-            K& first() {
+            K& key() {
                 return _entry->_key;
             }
             
-            V& second() {
+            V& value() {
                 return _entry->_value;
             }
             
@@ -98,6 +93,9 @@ namespace Spine {
         }
         
         ~HashMap() {
+            for (Iterator it = begin(); it != end(); ++it) {
+                delete it._entry;
+            }
             _hashSize = 0;
         }
         
@@ -111,14 +109,6 @@ namespace Spine {
         
         Iterator end() {
             return Iterator(&_trailer);
-        }
-        
-        Iterator rbegin() {
-            return Iterator(_trailer.prev);
-        }
-        
-        Iterator rend() {
-            return Iterator(_header);
         }
         
         std::pair<Iterator, bool> insert(const K& key, const V& value) {

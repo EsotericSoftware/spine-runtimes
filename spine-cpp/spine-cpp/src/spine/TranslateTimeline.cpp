@@ -54,6 +54,10 @@ namespace Spine {
         _frames.reserve(frameCount * ENTRIES);
         _frames.setSize(frameCount * ENTRIES);
     }
+
+    TranslateTimeline::~TranslateTimeline() {
+        // Empty
+    }
     
     void TranslateTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
         Bone* boneP = skeleton._bones[_boneIndex];

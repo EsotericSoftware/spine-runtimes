@@ -47,7 +47,7 @@ namespace Spine {
         RTTI_DECL;
         
     public:
-        AtlasAttachmentLoader(Atlas& atlas);
+        AtlasAttachmentLoader(Atlas* atlas);
         
         virtual RegionAttachment* newRegionAttachment(Skin& skin, std::string name, std::string path);
         
@@ -64,7 +64,7 @@ namespace Spine {
         AtlasRegion* findRegion(std::string name);
         
     private:
-        Atlas& _atlas;
+        Atlas* _atlas;
     };
 }
 

@@ -56,7 +56,6 @@ namespace Spine {
         }
         
         ~Vector() {
-            clear();
             deallocate(_buffer);
         }
         
@@ -149,21 +148,21 @@ namespace Spine {
         T* end() {
             return &_buffer[_size];
         }
-        
+
         friend bool operator==(Vector<T>& lhs, Vector<T>& rhs) {
             if (lhs.size() != rhs.size()) {
                 return false;
             }
-            
+
             for (int i = 0, n = static_cast<int>(lhs.size()); i < n; ++i) {
                 if (lhs[i] != rhs[i]) {
                     return false;
                 }
             }
-            
+
             return true;
         }
-        
+
         friend bool operator!=(Vector<T>& lhs, Vector<T>& rhs) {
             return !(lhs == rhs);
         }
@@ -186,6 +185,7 @@ namespace Spine {
         void deallocate(T* buffer) {
             if (_buffer) {
                 SpineExtension::free<T>(buffer, __FILE__, __LINE__);
+                // _buffer = 0;
             }
         }
     };

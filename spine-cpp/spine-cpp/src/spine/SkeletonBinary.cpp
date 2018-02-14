@@ -106,7 +106,7 @@ namespace Spine {
         TransformMode_NoScaleOrReflection
     };
     
-    SkeletonBinary::SkeletonBinary(Atlas& atlasArray) : _attachmentLoader(new (__FILE__, __LINE__) AtlasAttachmentLoader(atlasArray)), _error(), _scale(1), _ownsLoader(true) {
+    SkeletonBinary::SkeletonBinary(Atlas* atlasArray) : _attachmentLoader(new (__FILE__, __LINE__) AtlasAttachmentLoader(atlasArray)), _error(), _scale(1), _ownsLoader(true) {
 
     }
     

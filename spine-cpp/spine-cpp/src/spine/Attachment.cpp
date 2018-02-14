@@ -38,6 +38,9 @@ namespace Spine {
     Attachment::Attachment(std::string name) : _name(name) {
         assert(_name.length() > 0);
     }
+
+    Attachment::~Attachment() {
+    }
     
     const std::string& Attachment::getName() {
         return _name;

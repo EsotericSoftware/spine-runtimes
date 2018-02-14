@@ -53,7 +53,7 @@
 #include <spine/Extension.h>
 
 namespace Spine {
-    Skeleton::Skeleton(SkeletonData& skeletonData) :
+    Skeleton::Skeleton(SkeletonData* skeletonData) :
     _data(skeletonData),
     _skin(NULL),
     _r(1),
@@ -65,8 +65,8 @@ namespace Spine {
     _flipY(false),
     _x(0),
     _y(0) {
-        _bones.reserve(_data.getBones().size());
-        for (BoneData** i = _data.getBones().begin(); i != _data.getBones().end(); ++i) {
+        _bones.reserve(_data->getBones().size());
+        for (BoneData** i = _data->getBones().begin(); i != _data->getBones().end(); ++i) {
             BoneData* data = (*i);
             
             Bone* bone;
@@ -82,9 +82,9 @@ namespace Spine {
             _bones.push_back(bone);
         }
         
-        _slots.reserve(_data.getSlots().size());
-        _drawOrder.reserve(_data.getSlots().size());
-        for (SlotData** i = _data.getSlots().begin(); i != _data.getSlots().end(); ++i) {
+        _slots.reserve(_data->getSlots().size());
+        _drawOrder.reserve(_data->getSlots().size());
+        for (SlotData** i = _data->getSlots().begin(); i != _data->getSlots().end(); ++i) {
             SlotData* data = (*i);
             
             Bone* bone = _bones[data->getBoneData().getIndex()];
@@ -94,8 +94,8 @@ namespace Spine {
             _drawOrder.push_back(slot);
         }
         
-        _ikConstraints.reserve(_data.getIkConstraints().size());
-        for (IkConstraintData** i = _data.getIkConstraints().begin(); i != _data.getIkConstraints().end(); ++i) {
+        _ikConstraints.reserve(_data->getIkConstraints().size());
+        for (IkConstraintData** i = _data->getIkConstraints().begin(); i != _data->getIkConstraints().end(); ++i) {
             IkConstraintData* data = (*i);
             
             IkConstraint* constraint = new (__FILE__, __LINE__) IkConstraint(*data, *this);
@@ -103,8 +103,8 @@ namespace Spine {
             _ikConstraints.push_back(constraint);
         }
         
-        _transformConstraints.reserve(_data.getTransformConstraints().size());
-        for (TransformConstraintData** i = _data.getTransformConstraints().begin(); i != _data.getTransformConstraints().end(); ++i) {
+        _transformConstraints.reserve(_data->getTransformConstraints().size());
+        for (TransformConstraintData** i = _data->getTransformConstraints().begin(); i != _data->getTransformConstraints().end(); ++i) {
             TransformConstraintData* data = (*i);
             
             TransformConstraint* constraint = new (__FILE__, __LINE__) TransformConstraint(*data, *this);
@@ -112,8 +112,8 @@ namespace Spine {
             _transformConstraints.push_back(constraint);
         }
         
-        _pathConstraints.reserve(_data.getPathConstraints().size());
-        for (PathConstraintData** i = _data.getPathConstraints().begin(); i != _data.getPathConstraints().end(); ++i) {
+        _pathConstraints.reserve(_data->getPathConstraints().size());
+        for (PathConstraintData** i = _data->getPathConstraints().begin(); i != _data->getPathConstraints().end(); ++i) {
             PathConstraintData* data = (*i);
             
             PathConstraint* constraint = new (__FILE__, __LINE__) PathConstraint(*data, *this);
@@ -286,7 +286,7 @@ namespace Spine {
     }
     
     void Skeleton::setSkin(std::string skinName) {
-        Skin* foundSkin = _data.findSkin(skinName);
+        Skin* foundSkin = _data->findSkin(skinName);
         
         assert(foundSkin != NULL);
         
@@ -318,7 +318,7 @@ namespace Spine {
     }
     
     Attachment* Skeleton::getAttachment(std::string slotName, std::string attachmentName) {
-        return getAttachment(_data.findSlotIndex(slotName), attachmentName);
+        return getAttachment(_data->findSlotIndex(slotName), attachmentName);
     }
     
     Attachment* Skeleton::getAttachment(int slotIndex, std::string attachmentName) {
@@ -331,7 +331,7 @@ namespace Spine {
             }
         }
         
-        return _data.getDefaultSkin() != NULL ? _data.getDefaultSkin()->getAttachment(slotIndex, attachmentName) : NULL;
+        return _data->getDefaultSkin() != NULL ? _data->getDefaultSkin()->getAttachment(slotIndex, attachmentName) : NULL;
     }
     
     void Skeleton::setAttachment(std::string slotName, std::string attachmentName) {
@@ -454,7 +454,7 @@ namespace Spine {
         return _bones.size() == 0 ? NULL : _bones[0];
     }
     
-    const SkeletonData& Skeleton::getData() {
+    const SkeletonData* Skeleton::getData() {
         return _data;
     }
     
@@ -592,12 +592,12 @@ namespace Spine {
             sortPathConstraintAttachment(_skin, slotIndex, slotBone);
         }
         
-        if (_data._defaultSkin != NULL && _data._defaultSkin != _skin) {
-            sortPathConstraintAttachment(_data._defaultSkin, slotIndex, slotBone);
+        if (_data->_defaultSkin != NULL && _data->_defaultSkin != _skin) {
+            sortPathConstraintAttachment(_data->_defaultSkin, slotIndex, slotBone);
         }
         
-        for (int ii = 0, nn = static_cast<int>(_data._skins.size()); ii < nn; ++ii) {
-            sortPathConstraintAttachment(_data._skins[ii], slotIndex, slotBone);
+        for (int ii = 0, nn = static_cast<int>(_data->_skins.size()); ii < nn; ++ii) {
+            sortPathConstraintAttachment(_data->_skins[ii], slotIndex, slotBone);
         }
         
         Attachment* attachment = slot->_attachment;
@@ -657,9 +657,9 @@ namespace Spine {
         HashMap<Skin::AttachmentKey, Attachment*, Skin::HashAttachmentKey>& attachments = skin->getAttachments();
         
         for (typename HashMap<Skin::AttachmentKey, Attachment*, Skin::HashAttachmentKey>::Iterator i = attachments.begin(); i != attachments.end(); ++i) {
-            Skin::AttachmentKey key = i.first();
+            Skin::AttachmentKey key = i.key();
             if (key._slotIndex == slotIndex) {
-                Attachment* value = i.second();
+                Attachment* value = i.value();
                 sortPathConstraintAttachment(value, slotBone);
             }
         }

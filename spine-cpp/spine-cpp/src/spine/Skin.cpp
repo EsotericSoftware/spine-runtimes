@@ -57,6 +57,16 @@ namespace Spine {
     Skin::Skin(std::string name) : _name(name) {
         assert(_name.length() > 0);
     }
+
+    Skin::~Skin() {
+        HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = _attachments.begin();
+        printf("Disposing skin\n");
+        for (; i != _attachments.end(); ++i) {
+            printf("%p %s\n", i.value(), i.value()->getName().c_str());
+			delete i.value();
+        }
+        printf("Disposing skin done\n");
+    }
     
     void Skin::addAttachment(int slotIndex, std::string name, Attachment* attachment) {
         assert(attachment);
@@ -70,7 +80,7 @@ namespace Spine {
         Attachment* ret = NULL;
         
         if (i != _attachments.end()) {
-            ret = i.second();
+            ret = i.value();
         }
         
         return ret;
@@ -78,16 +88,16 @@ namespace Spine {
     
     void Skin::findNamesForSlot(int slotIndex, Vector<std::string>& names) {
         for (HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = _attachments.begin(); i != _attachments.end(); ++i) {
-            if (i.first()._slotIndex == slotIndex) {
-                names.push_back(i.first()._name);
+            if (i.key()._slotIndex == slotIndex) {
+                names.push_back(i.key()._name);
             }
         }
     }
     
     void Skin::findAttachmentsForSlot(int slotIndex, Vector<Attachment*>& attachments) {
         for (HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = _attachments.begin(); i != _attachments.end(); ++i) {
-            if (i.first()._slotIndex == slotIndex) {
-                attachments.push_back(i.second());
+            if (i.key()._slotIndex == slotIndex) {
+                attachments.push_back(i.value());
             }
         }
     }
@@ -104,12 +114,12 @@ namespace Spine {
         Vector<Slot*>& slots = skeleton.getSlots();
         
         for (HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = oldSkin.getAttachments().begin(); i != oldSkin.getAttachments().end(); ++i) {
-            int slotIndex = i.first()._slotIndex;
+            int slotIndex = i.key()._slotIndex;
             Slot* slot = slots[slotIndex];
             
-            if (slot->getAttachment() == i.second()) {
+            if (slot->getAttachment() == i.value()) {
                 Attachment* attachment = NULL;
-                if ((attachment = getAttachment(slotIndex, i.first()._name))) {
+                if ((attachment = getAttachment(slotIndex, i.key()._name))) {
                     slot->setAttachment(attachment);
                 }
             }

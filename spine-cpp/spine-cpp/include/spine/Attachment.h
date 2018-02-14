@@ -41,6 +41,7 @@ namespace Spine {
         
     public:
         Attachment(std::string name);
+        virtual ~Attachment();
         
         const std::string& getName();
         

@@ -26,7 +26,7 @@
 * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
-*****************************************************************************/
+******************************************************S**********************/
 
 #include <spine/AtlasAttachmentLoader.h>
 
@@ -43,7 +43,7 @@
 namespace Spine {
     RTTI_IMPL(AtlasAttachmentLoader, AttachmentLoader);
     
-    AtlasAttachmentLoader::AtlasAttachmentLoader(Atlas& atlas) : AttachmentLoader(), _atlas(atlas) {
+    AtlasAttachmentLoader::AtlasAttachmentLoader(Atlas* atlas) : AttachmentLoader(), _atlas(atlas) {
         // Empty
     }
     
@@ -64,7 +64,7 @@ namespace Spine {
         attachment._regionHeight = region.height;
         attachment._regionOriginalWidth = region.originalWidth;
         attachment._regionOriginalHeight = region.originalHeight;
-        
+        printf("New region attachment, %p %p\n", &attachmentP->getUVs(), &attachmentP->getOffset());
         return attachmentP;
     }
     
@@ -111,6 +111,6 @@ namespace Spine {
     
     AtlasRegion* AtlasAttachmentLoader::findRegion(std::string name) {
         AtlasRegion* ret;
-        return _atlas.findRegion(name);
+        return _atlas->findRegion(name);
     }
 }

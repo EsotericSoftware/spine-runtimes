@@ -78,23 +78,39 @@ namespace Spine {
     }
     
     void* DefaultSpineExtension::_alloc(size_t size, const char* file, int line) {
-        return ::malloc(size);
+		if (size == 0)
+			return 0;
+        void* ptr = ::malloc(size);
+        printf("alloc %lu bytes at %p\n", size, ptr);
+        return ptr;
     }
     
     void* DefaultSpineExtension::_calloc(size_t size, const char* file, int line) {
-        void* ptr = _alloc(size, file, line);
+		if (size == 0)
+			return 0;
+
+        void* ptr = ::malloc(size);
         if (ptr) {
             memset(ptr, 0, size);
         }
-        
+        printf("calloc %lu bytes at %p\n", size, ptr);
         return ptr;
     }
     
     void* DefaultSpineExtension::_realloc(void* ptr, size_t size, const char* file, int line) {
-        return ::realloc(ptr, size);
+        void* mem = NULL;
+		if (size == 0)
+			return 0;
+        if (ptr == NULL)
+            mem = ::malloc(size);
+        else
+            mem = ::realloc(ptr, size);
+        printf("realloc %lu bytes from %p to %p\n", size, ptr, mem);
+        return mem;
     }
     
     void DefaultSpineExtension::_free(void* mem, const char* file, int line) {
+        printf("free %p\n", mem);
         ::free(mem);
     }
     

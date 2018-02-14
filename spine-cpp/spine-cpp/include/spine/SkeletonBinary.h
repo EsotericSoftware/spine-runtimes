@@ -69,7 +69,7 @@ namespace Spine {
         
         static const TransformMode TRANSFORM_MODE_VALUES[5];
         
-        SkeletonBinary(Atlas& atlasArray);
+        SkeletonBinary(Atlas* atlasArray);
         
         SkeletonBinary(AttachmentLoader* attachmentLoader);
         

@@ -61,16 +61,16 @@ void *Spine::TestSpineExtension::_realloc(void *ptr, size_t size, const char *fi
 }
 
 void Spine::TestSpineExtension::_free(void *mem, const char *file, int line) {
-	DefaultSpineExtension::_free(mem, file, line);
 
 	for (std::vector<Allocation>::iterator it = allocated.begin(); it != allocated.end(); it++) {
 		if (it->address == mem) {
+			DefaultSpineExtension::_free(mem, file, line);
 			allocated.erase(it);
 			return;
 		}
 	}
 
-	printf("%s:%i (address %p): Double free or not allocatedö through SpineExtension", file, line, mem);
+	printf("%s:%i (address %p): Double free or not allocated through SpineExtension\n", file, line, mem);
 }
 
 void Spine::TestSpineExtension::reportLeaks() {

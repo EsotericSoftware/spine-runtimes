@@ -43,6 +43,8 @@ namespace Spine {
         
     public:
         CurveTimeline(int frameCount);
+
+        virtual ~CurveTimeline();
         
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) = 0;
         

@@ -288,7 +288,7 @@ namespace Spine {
         friend class EventQueue;
         
     public:
-        AnimationState(AnimationStateData& data);
+        AnimationState(AnimationStateData* data);
         
         ~AnimationState();
         
@@ -363,7 +363,7 @@ namespace Spine {
         /// @return The track entry for the animation currently playing on the track, or NULL if no animation is currently playing.
         TrackEntry* getCurrent(int trackIndex);
         
-        AnimationStateData& getData();
+        AnimationStateData* getData();
         
         /// A list of tracks that have animations, which may contain NULLs.
         Vector<TrackEntry*> getTracks();
@@ -376,7 +376,7 @@ namespace Spine {
     private:
         static const int Subsequent, First, Dip, DipMix;
         
-        AnimationStateData& _data;
+        AnimationStateData* _data;
 
         Pool<TrackEntry> _trackEntryPool;
         Vector<TrackEntry*> _tracks;

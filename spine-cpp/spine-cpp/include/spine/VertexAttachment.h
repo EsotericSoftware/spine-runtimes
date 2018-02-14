@@ -48,6 +48,8 @@ namespace Spine {
         
     public:
         VertexAttachment(std::string name);
+
+        virtual ~VertexAttachment();
         
         void computeWorldVertices(Slot& slot, Vector<float>& worldVertices);
         

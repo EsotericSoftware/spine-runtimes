@@ -61,6 +61,7 @@ namespace Spine {
         };
         
         Skin(std::string name);
+        ~Skin();
         
         /// Adds an attachment to the skin for the specified slot index and name.
         /// If the name already exists for the slot, the previous value is replaced.
