@@ -60,12 +60,9 @@ namespace Spine {
 
     Skin::~Skin() {
         HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = _attachments.begin();
-        printf("Disposing skin\n");
         for (; i != _attachments.end(); ++i) {
-            printf("%p %s\n", i.value(), i.value()->getName().c_str());
 			delete i.value();
         }
-        printf("Disposing skin done\n");
     }
     
     void Skin::addAttachment(int slotIndex, std::string name, Attachment* attachment) {

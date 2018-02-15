@@ -47,7 +47,7 @@ namespace Spine {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         
-        RTTI_DECL;
+        RTTI_DECL
         
     public:
         PointAttachment(std::string name);

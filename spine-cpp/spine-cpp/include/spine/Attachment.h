@@ -37,7 +37,7 @@
 
 namespace Spine {
     class Attachment : public SpineObject {
-        RTTI_DECL;
+        RTTI_DECL
         
     public:
         Attachment(std::string name);

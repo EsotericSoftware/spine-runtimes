@@ -44,7 +44,7 @@ namespace Spine {
         friend class SkeletonJson;
         friend class DeformTimeline;
         
-        RTTI_DECL;
+        RTTI_DECL
         
     public:
         VertexAttachment(std::string name);

@@ -52,7 +52,7 @@ namespace Spine {
         
         /// The index of the bone in Skeleton.Bones
         const int getIndex();
-        
+
         /// The name of the bone, which is unique within the skeleton.
         const std::string& getName();
         

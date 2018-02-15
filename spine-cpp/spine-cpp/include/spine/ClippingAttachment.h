@@ -42,7 +42,7 @@ namespace Spine {
         
         friend class SkeletonClipping;
         
-        RTTI_DECL;
+        RTTI_DECL
         
     public:
         ClippingAttachment(std::string name);

@@ -46,12 +46,17 @@ namespace Spine {
         friend class Skeleton;
         
     public:
-        class AttachmentKey : public SpineObject {
+        class AttachmentKey {
         public:
             int _slotIndex;
             std::string _name;
             
             AttachmentKey(int slotIndex = 0, std::string name = "");
+
+            AttachmentKey(const AttachmentKey &other) {
+                this->_slotIndex = other._slotIndex;
+                this->_name = other._name;
+            }
             
             bool operator==(const AttachmentKey &other) const;
         };

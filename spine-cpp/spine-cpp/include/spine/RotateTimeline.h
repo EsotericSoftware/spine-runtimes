@@ -39,7 +39,7 @@ namespace Spine {
         friend class SkeletonJson;
         friend class AnimationState;
         
-        RTTI_DECL;
+        RTTI_DECL
         
     public:
         static const int ENTRIES = 2;

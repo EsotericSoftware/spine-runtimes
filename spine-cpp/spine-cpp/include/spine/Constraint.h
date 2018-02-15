@@ -36,7 +36,7 @@
 namespace Spine {
     /// The interface for all constraints.
     class Constraint : public Updatable {
-        RTTI_DECL;
+        RTTI_DECL
         
     public:
         Constraint();

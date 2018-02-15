@@ -656,7 +656,7 @@ namespace Spine {
     void Skeleton::sortPathConstraintAttachment(Skin* skin, int slotIndex, Bone& slotBone) {
         HashMap<Skin::AttachmentKey, Attachment*, Skin::HashAttachmentKey>& attachments = skin->getAttachments();
         
-        for (typename HashMap<Skin::AttachmentKey, Attachment*, Skin::HashAttachmentKey>::Iterator i = attachments.begin(); i != attachments.end(); ++i) {
+        for (HashMap<Skin::AttachmentKey, Attachment*, Skin::HashAttachmentKey>::Iterator i = attachments.begin(); i != attachments.end(); ++i) {
             Skin::AttachmentKey key = i.key();
             if (key._slotIndex == slotIndex) {
                 Attachment* value = i.value();

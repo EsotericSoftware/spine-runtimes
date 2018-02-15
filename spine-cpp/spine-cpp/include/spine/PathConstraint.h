@@ -48,7 +48,7 @@ namespace Spine {
         friend class PathConstraintPositionTimeline;
         friend class PathConstraintSpacingTimeline;
         
-        RTTI_DECL;
+        RTTI_DECL
         
     public:
         PathConstraint(PathConstraintData& data, Skeleton& skeleton);

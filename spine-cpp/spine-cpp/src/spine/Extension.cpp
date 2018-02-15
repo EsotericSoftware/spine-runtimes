@@ -35,10 +35,11 @@
 #include <cstring>
 
 namespace Spine {
-    SpineExtension* SpineExtension::_instance = NULL;
+    DefaultSpineExtension _defaultExtension;
+    SpineExtension* SpineExtension::_instance = &_defaultExtension;
     
     void SpineExtension::setInstance(SpineExtension* inValue) {
-        assert(!_instance);
+        assert(inValue);
         
         _instance = inValue;
     }
@@ -81,7 +82,6 @@ namespace Spine {
 		if (size == 0)
 			return 0;
         void* ptr = ::malloc(size);
-        printf("alloc %lu bytes at %p\n", size, ptr);
         return ptr;
     }
     
@@ -93,7 +93,6 @@ namespace Spine {
         if (ptr) {
             memset(ptr, 0, size);
         }
-        printf("calloc %lu bytes at %p\n", size, ptr);
         return ptr;
     }
     
@@ -105,12 +104,10 @@ namespace Spine {
             mem = ::malloc(size);
         else
             mem = ::realloc(ptr, size);
-        printf("realloc %lu bytes from %p to %p\n", size, ptr, mem);
         return mem;
     }
     
     void DefaultSpineExtension::_free(void* mem, const char* file, int line) {
-        printf("free %p\n", mem);
         ::free(mem);
     }
     

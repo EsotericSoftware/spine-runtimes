@@ -64,7 +64,6 @@ namespace Spine {
         attachment._regionHeight = region.height;
         attachment._regionOriginalWidth = region.originalWidth;
         attachment._regionOriginalHeight = region.originalHeight;
-        printf("New region attachment, %p %p\n", &attachmentP->getUVs(), &attachmentP->getOffset());
         return attachmentP;
     }
     

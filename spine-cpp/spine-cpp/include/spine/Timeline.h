@@ -42,7 +42,7 @@ namespace Spine {
     class Event;
     
     class Timeline : public SpineObject {
-        RTTI_DECL;
+        RTTI_DECL
         
     public:
         Timeline();

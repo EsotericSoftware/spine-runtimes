@@ -48,7 +48,7 @@ namespace Spine {
         friend class SkeletonJson;
         friend class AtlasAttachmentLoader;
         
-        RTTI_DECL;
+        RTTI_DECL
         
     public:
         RegionAttachment(std::string name);

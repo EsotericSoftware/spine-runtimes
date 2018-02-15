@@ -44,7 +44,7 @@ namespace Spine {
         friend class Skeleton;
         friend class IkConstraintTimeline;
         
-        RTTI_DECL;
+        RTTI_DECL
         
     public:
         /// Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified

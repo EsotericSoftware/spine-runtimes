@@ -37,6 +37,10 @@ namespace Spine {
 		return SpineExtension::calloc<SpineObject>(sz, file, line);
 	}
 
+	void *SpineObject::operator new(size_t sz, void* ptr) {
+		return ptr;
+	}
+
 	void SpineObject::operator delete(void *p) {
 		SpineExtension::free(p, __FILE__, __LINE__);
 	}

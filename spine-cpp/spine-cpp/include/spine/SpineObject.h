@@ -37,6 +37,7 @@ namespace Spine {
 	class SpineObject {
 	public:
 		void* operator new(size_t sz, const char* file, int line);
+		void* operator new(size_t sz, void* ptr);
 		void operator delete(void* p);
 		virtual ~SpineObject();
 	};

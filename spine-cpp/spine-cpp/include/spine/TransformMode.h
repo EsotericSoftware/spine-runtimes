@@ -38,7 +38,7 @@ namespace Spine {
         TransformMode_OnlyTranslation = 7, // 0111
         TransformMode_NoRotationOrReflection = 1, // 0001
         TransformMode_NoScale = 2, // 0010
-        TransformMode_NoScaleOrReflection = 6, // 0110
+        TransformMode_NoScaleOrReflection = 6 // 0110
     };
 }
 

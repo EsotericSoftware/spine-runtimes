@@ -42,7 +42,7 @@ namespace Spine {
 		const char* fileName;
 		int line;
 
-		Allocation() : Allocation (0, 0, 0, 0) {
+		Allocation() : address(0), size(0), fileName(0), line(0) {
 		}
 
 		Allocation(void* a, size_t s, const char* f, int l) : address(a), size(s), fileName(f), line(l) {

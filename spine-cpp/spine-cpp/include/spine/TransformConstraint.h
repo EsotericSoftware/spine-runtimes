@@ -44,7 +44,7 @@ namespace Spine {
         friend class Skeleton;
         friend class TransformConstraintTimeline;
         
-        RTTI_DECL;
+        RTTI_DECL
         
     public:
         TransformConstraint(TransformConstraintData& data, Skeleton& skeleton);

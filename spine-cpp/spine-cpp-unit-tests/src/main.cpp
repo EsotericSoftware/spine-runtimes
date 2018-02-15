@@ -79,7 +79,7 @@ int main (int argc, char** argv) {
 	TestSpineExtension* ext = new TestSpineExtension();
 	SpineExtension::setInstance(ext);
 
-	reproduceIssue_776();
+ 	reproduceIssue_776();
 
 	ext->reportLeaks();
 }

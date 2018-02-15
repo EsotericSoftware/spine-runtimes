@@ -71,12 +71,14 @@ void Spine::TestSpineExtension::_free(void *mem, const char *file, int line) {
 	}
 
 	printf("%s:%i (address %p): Double free or not allocated through SpineExtension\n", file, line, mem);
+	DefaultSpineExtension::_free(mem, file, line);
 }
 
 void Spine::TestSpineExtension::reportLeaks() {
 	for (std::vector<Allocation>::iterator it = allocated.begin(); it != allocated.end(); it++) {
 		printf("\"%s:%i (%zu bytes at %p)\n", it->fileName, it->line, it->size, it->address);
 	}
+	if (allocated.size() == 0) printf("No leaks detected");
 }
 
 void Spine::TestSpineExtension::clearAllocations() {

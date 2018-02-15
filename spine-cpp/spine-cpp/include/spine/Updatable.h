@@ -36,7 +36,7 @@
 
 namespace Spine {
     class Updatable : public SpineObject {
-        RTTI_DECL;
+        RTTI_DECL
         
     public:
         Updatable();

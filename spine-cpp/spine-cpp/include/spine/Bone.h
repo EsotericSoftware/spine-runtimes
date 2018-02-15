@@ -59,7 +59,7 @@ namespace Spine {
         friend class ShearTimeline;
         friend class TranslateTimeline;
         
-        RTTI_DECL;
+        RTTI_DECL
         
     public:
         static void setYDown(bool inValue);

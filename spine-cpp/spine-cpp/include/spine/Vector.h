@@ -32,11 +32,12 @@
 #define Spine_Vector_h
 
 #include <spine/Extension.h>
-#include <spine/SpineObject.h>
 
 #include <stdlib.h>
 #include <memory>
 #include <assert.h>
+#include <spine/SpineObject.h>
+#include <spine/Extension.h>
 
 namespace Spine {
     template <typename T>
@@ -45,106 +46,134 @@ namespace Spine {
         Vector() : _size(0), _capacity(0), _buffer(NULL) {
             // Empty
         }
-        
+
         Vector(const Vector& inVector) : _size(inVector._size), _capacity(inVector._capacity), _buffer(NULL) {
             if (_capacity > 0) {
                 _buffer = allocate(_capacity);
                 for (size_t i = 0; i < _size; ++i) {
-                    _buffer[i] = inVector._buffer[i];
+                    construct(_buffer + i, inVector._buffer[i]);
                 }
             }
         }
-        
+
+        Vector& operator=(Vector& inVector) {
+            if (this != &inVector) {
+                clear();
+                deallocate(_buffer);
+                _buffer = NULL;
+
+                _size = inVector._size;
+                _capacity = inVector._capacity;
+
+                if (_capacity > 0) {
+                    _buffer = allocate(_capacity);
+                    for (size_t i = 0; i < _size; ++i) {
+                        construct(_buffer + i, inVector._buffer[i]);
+                    }
+                }
+            }
+
+            return *this;
+        }
+
         ~Vector() {
+            clear();
             deallocate(_buffer);
         }
-        
+
         bool contains(const T& inValue) {
             for (size_t i = 0; i < _size; ++i) {
                 if (_buffer[i] == inValue) {
                     return true;
                 }
             }
-            
+
             return false;
         }
-        
+
         int indexOf(const T& inValue) {
             for (size_t i = 0; i < _size; ++i) {
                 if (_buffer[i] == inValue) {
                     return static_cast<int>(i);
                 }
             }
-            
+
             return -1;
         }
-        
+
         void push_back(const T& inValue) {
             if (_size == _capacity) {
                 reserve();
             }
-            
-           _buffer[_size++] = inValue;
+
+            construct(_buffer + _size++, inValue);
         }
-        
+
         void insert(size_t inIndex, const T& inValue) {
             assert(inIndex < _size);
-            
+
             if (_size == _capacity) {
                 reserve();
             }
-            
+
             for (size_t i = ++_size - 1; i > inIndex; --i) {
-                _buffer[i] = _buffer[i - 1];
+                construct(_buffer + i, _buffer[i - 1]);
+                destroy(_buffer + (i - 1));
             }
-            
-            _buffer[inIndex] = inValue;
+
+            construct(_buffer + inIndex, inValue);
         }
-        
+
         void erase(size_t inIndex) {
             assert(inIndex < _size);
-            
+
             --_size;
-            
+
             if (inIndex != _size) {
                 for (size_t i = inIndex; i < _size; ++i) {
                     std::swap(_buffer[i], _buffer[i + 1]);
                 }
             }
+
+            destroy(_buffer + _size);
         }
-        
+
         void clear() {
+            for (size_t i = 0; i < _size; ++i) {
+                destroy(_buffer + (_size - 1 - i));
+            }
+
             _size = 0;
         }
-        
+
         size_t size() const {
             return _size;
         }
-        
+
         T& operator[](size_t inIndex) {
             assert(inIndex < _size);
-            
+
             return _buffer[inIndex];
         }
-        
+
         void reserve(size_t inCapacity = 0) {
             size_t newCapacity = inCapacity > 0 ? inCapacity : _capacity > 0 ? _capacity * 2 : 1;
             if (newCapacity > _capacity) {
-                _buffer = (T*)SpineExtension::realloc<T>(_buffer, newCapacity, __FILE__, __LINE__);
+                _buffer = SpineExtension::realloc<T>(_buffer, newCapacity, __FILE__, __LINE__);
                 _capacity = newCapacity;
             }
         }
-        
+
         void setSize(size_t inValue) {
             assert(inValue <= _capacity);
-            
+
             _size = inValue;
         }
-        
+
         T* begin() {
             return &_buffer[0];
         }
-        
+
         T* end() {
             return &_buffer[_size];
         }
@@ -166,27 +195,37 @@ namespace Spine {
         friend bool operator!=(Vector<T>& lhs, Vector<T>& rhs) {
             return !(lhs == rhs);
         }
-        
+
     private:
         size_t _size;
         size_t _capacity;
         T* _buffer;
-        
+
         T* allocate(size_t n) {
             assert(n > 0);
-            
-            T* ptr = (T*)SpineExtension::alloc<T>(n, __FILE__, __LINE__);
-            
+
+            T* ptr = SpineExtension::alloc<T>(n, __FILE__, __LINE__);
+
             assert(ptr);
-            
+
             return ptr;
         }
-        
+
         void deallocate(T* buffer) {
             if (_buffer) {
-                SpineExtension::free<T>(buffer, __FILE__, __LINE__);
-                // _buffer = 0;
+                SpineExtension::free(buffer, __FILE__, __LINE__);
             }
+        }
+
+        void construct(T* buffer, const T& val) {
+            /// This is a placement new operator
+            /// which basically means we are contructing a new object
+            /// using pre-allocated memory
+            new (buffer) T(val);
+        }
+
+        void destroy(T* buffer) {
+            buffer->~T();
         }
     };
 }
