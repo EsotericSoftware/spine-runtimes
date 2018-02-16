@@ -46,7 +46,7 @@ namespace Spine {
             friend class HashMap;
             
         public:
-            Iterator(Entry* entry = NULL) : _entry(entry) {
+            explicit Iterator(Entry* entry = NULL) : _entry(entry) {
                 // Empty
             }
             

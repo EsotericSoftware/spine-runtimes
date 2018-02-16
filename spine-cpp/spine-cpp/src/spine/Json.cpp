@@ -114,9 +114,7 @@ namespace Spine {
     }
     
     Json::~Json() {
-        if (_child) {
-            delete _child;
-        }
+        delete _child;
         
         if (_valueString) {
             SpineExtension::free(_valueString, __FILE__, __LINE__);
@@ -125,10 +123,8 @@ namespace Spine {
         if (_name) {
             SpineExtension::free(_name, __FILE__, __LINE__);
         }
-        
-        if (_next) {
-            delete _next;
-        }
+
+        delete _next;
     }
     
     const char* Json::skip(const char* inValue) {
@@ -223,7 +219,7 @@ namespace Spine {
             }
         }
         
-        out = (char*)SpineExtension::alloc<char>(len + 1, __FILE__, __LINE__); /* The length needed for the string, roughly. */
+        out = SpineExtension::alloc<char>(len + 1, __FILE__, __LINE__); /* The length needed for the string, roughly. */
         if (!out) {
             return 0;
         }

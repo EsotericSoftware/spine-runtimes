@@ -46,7 +46,7 @@ namespace Spine {
         friend class IkConstraintTimeline;
         
     public:
-        IkConstraintData(const String& name);
+        explicit IkConstraintData(const String& name);
         
         /// The IK constraint's name, which is unique within the skeleton.
         const String& getName();

@@ -73,8 +73,11 @@ namespace Spine {
         TextureWrap vWrap;
         void* rendererObject;
         int width, height;
-        
-        AtlasPage(const String& inName) : name(inName) {}
+
+        explicit AtlasPage(const String& inName) : name(inName), format(Format_RGBA8888), minFilter(TextureFilter_Nearest),
+                                          magFilter(TextureFilter_Nearest), uWrap(TextureWrap_ClampToEdge),
+                                          vWrap(TextureWrap_ClampToEdge) {
+        }
     };
     
     class AtlasRegion : public SpineObject {

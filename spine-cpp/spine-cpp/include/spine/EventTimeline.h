@@ -41,7 +41,7 @@ namespace Spine {
         RTTI_DECL
         
     public:
-        EventTimeline(int frameCount);
+        explicit EventTimeline(int frameCount);
         
         ~EventTimeline();
         

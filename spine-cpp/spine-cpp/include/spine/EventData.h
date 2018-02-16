@@ -42,7 +42,7 @@ namespace Spine {
         friend class Event;
         
     public:
-        EventData(const String& name);
+        explicit EventData(const String& name);
         
         /// The name of the event, which is unique within the skeleton.
         const String& getName();

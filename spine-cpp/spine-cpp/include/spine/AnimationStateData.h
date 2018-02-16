@@ -52,8 +52,8 @@ namespace Spine {
         /// The mix duration to use when no mix duration has been specifically defined between two animations.
         float getDefaultMix();
         void setDefaultMix(float inValue);
-        
-        AnimationStateData(SkeletonData* skeletonData);
+
+        explicit AnimationStateData(SkeletonData* skeletonData);
         
         /// Sets a mix duration by animation names.
         void setMix(const String& fromName, const String& toName, float duration);
@@ -73,8 +73,8 @@ namespace Spine {
         public:
             Animation* _a1;
             Animation* _a2;
-            
-            AnimationPair(Animation* a1 = NULL, Animation* a2 = NULL);
+
+            explicit AnimationPair(Animation* a1 = NULL, Animation* a2 = NULL);
             
             bool operator==(const AnimationPair &other) const;
         };

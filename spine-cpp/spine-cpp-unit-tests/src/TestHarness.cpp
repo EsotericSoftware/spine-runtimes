@@ -78,7 +78,7 @@ void Spine::TestSpineExtension::reportLeaks() {
 	for (std::vector<Allocation>::iterator it = allocated.begin(); it != allocated.end(); it++) {
 		printf("\"%s:%i (%zu bytes at %p)\n", it->fileName, it->line, it->size, it->address);
 	}
-	if (allocated.size() == 0) printf("No leaks detected");
+	if (allocated.empty()) printf("No leaks detected");
 }
 
 void Spine::TestSpineExtension::clearAllocations() {

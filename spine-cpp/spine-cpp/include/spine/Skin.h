@@ -50,8 +50,8 @@ namespace Spine {
         public:
             int _slotIndex;
             String _name;
-            
-            AttachmentKey(int slotIndex = 0, const String& name = "");
+
+            explicit AttachmentKey(int slotIndex = 0, const String& name = "");
 
             AttachmentKey(const AttachmentKey &other) {
                 this->_slotIndex = other._slotIndex;
@@ -64,8 +64,8 @@ namespace Spine {
         struct HashAttachmentKey : public SpineObject {
             std::size_t operator()(const Spine::Skin::AttachmentKey& val) const;
         };
-        
-        Skin(const String& name);
+
+        explicit Skin(const String& name);
         ~Skin();
         
         /// Adds an attachment to the skin for the specified slot index and name.

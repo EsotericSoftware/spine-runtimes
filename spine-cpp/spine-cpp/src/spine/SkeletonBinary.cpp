@@ -153,14 +153,14 @@ namespace Spine {
         }
         
         /* Bones. */
-        int bonesCount = readVarint(input, 1);
+        int bonesCount = readVarint(input, true);
         skeletonData->_bones.reserve(bonesCount);
         skeletonData->_bones.setSize(bonesCount);
         for (i = 0; i < bonesCount; ++i) {
             BoneData* data;
             int mode;
             const char* name = readString(input);
-            BoneData* parent = i == 0 ? 0 : skeletonData->_bones[readVarint(input, 1)];
+            BoneData* parent = i == 0 ? 0 : skeletonData->_bones[readVarint(input, true)];
             
             data = new (__FILE__, __LINE__) BoneData(i, String(name, true), parent);
             data->_rotation = readFloat(input);
@@ -172,7 +172,7 @@ namespace Spine {
             data->_shearY = readFloat(input);
             data->_length = readFloat(input) * _scale;
             
-            mode = readVarint(input, 1);
+            mode = readVarint(input, true);
             switch (mode) {
                 case 0:
                     data->_transformMode = TransformMode_Normal;
@@ -200,13 +200,13 @@ namespace Spine {
         }
 
         /* Slots. */
-        int slotsCount = readVarint(input, 1);
+        int slotsCount = readVarint(input, true);
         skeletonData->_slots.reserve(slotsCount);
         skeletonData->_slots.setSize(slotsCount);
         for (i = 0; i < slotsCount; ++i) {
             int r, g, b, a;
             const char* slotName = readString(input);
-            BoneData* boneData = skeletonData->_bones[readVarint(input, 1)];
+            BoneData* boneData = skeletonData->_bones[readVarint(input, true)];
             
             SlotData* slotData = new (__FILE__, __LINE__) SlotData(i, String(slotName, true), *boneData);
 
@@ -221,13 +221,13 @@ namespace Spine {
                 slotData->_b2 = b / 255.0f;
             }
             slotData->_attachmentName.own(readString(input));
-            slotData->_blendMode = static_cast<BlendMode>(readVarint(input, 1));
+            slotData->_blendMode = static_cast<BlendMode>(readVarint(input, true));
             
             skeletonData->_slots[i] = slotData;
         }
 
         /* IK constraints. */
-        int ikConstraintsCount = readVarint(input, 1);
+        int ikConstraintsCount = readVarint(input, true);
         skeletonData->_ikConstraints.reserve(ikConstraintsCount);
         skeletonData->_ikConstraints.setSize(ikConstraintsCount);
         for (i = 0; i < ikConstraintsCount; ++i) {
@@ -235,15 +235,15 @@ namespace Spine {
             
             IkConstraintData* data = new (__FILE__, __LINE__) IkConstraintData(String(name, true));
             
-            data->_order = readVarint(input, 1);
+            data->_order = readVarint(input, true);
 
-            int bonesCount = readVarint(input, 1);
+            int bonesCount = readVarint(input, true);
             data->_bones.reserve(bonesCount);
             data->_bones.setSize(bonesCount);
             for (ii = 0; ii < bonesCount; ++ii) {
-                data->_bones[ii] = skeletonData->_bones[readVarint(input, 1)];
+                data->_bones[ii] = skeletonData->_bones[readVarint(input, true)];
             }
-            data->_target = skeletonData->_bones[readVarint(input, 1)];
+            data->_target = skeletonData->_bones[readVarint(input, true)];
             data->_mix = readFloat(input);
             data->_bendDirection = readSByte(input);
             
@@ -251,7 +251,7 @@ namespace Spine {
         }
 
         /* Transform constraints. */
-        int transformConstraintsCount = readVarint(input, 1);
+        int transformConstraintsCount = readVarint(input, true);
         skeletonData->_transformConstraints.reserve(transformConstraintsCount);
         skeletonData->_transformConstraints.setSize(transformConstraintsCount);
         for (i = 0; i < transformConstraintsCount; ++i) {
@@ -259,14 +259,14 @@ namespace Spine {
             
             TransformConstraintData* data = new (__FILE__, __LINE__) TransformConstraintData(String(name, true));
             
-            data->_order = readVarint(input, 1);
-            int bonesCount = readVarint(input, 1);
+            data->_order = readVarint(input, true);
+            int bonesCount = readVarint(input, true);
             data->_bones.reserve(bonesCount);
             data->_bones.setSize(bonesCount);
             for (ii = 0; ii < bonesCount; ++ii) {
-                data->_bones[ii] = skeletonData->_bones[readVarint(input, 1)];
+                data->_bones[ii] = skeletonData->_bones[readVarint(input, true)];
             }
-            data->_target = skeletonData->_bones[readVarint(input, 1)];
+            data->_target = skeletonData->_bones[readVarint(input, true)];
             data->_local = readBoolean(input);
             data->_relative = readBoolean(input);
             data->_offsetRotation = readFloat(input);
@@ -284,7 +284,7 @@ namespace Spine {
         }
 
         /* Path constraints */
-        int pathConstraintsCount = readVarint(input, 1);
+        int pathConstraintsCount = readVarint(input, true);
         skeletonData->_pathConstraints.reserve(pathConstraintsCount);
         skeletonData->_pathConstraints.setSize(pathConstraintsCount);
         for (i = 0; i < pathConstraintsCount; ++i) {
@@ -292,18 +292,18 @@ namespace Spine {
             
             PathConstraintData* data = new (__FILE__, __LINE__) PathConstraintData(String(name, true));
             
-            data->_order = readVarint(input, 1);
+            data->_order = readVarint(input, true);
             
-            int bonesCount = readVarint(input, 1);
+            int bonesCount = readVarint(input, true);
             data->_bones.reserve(bonesCount);
             data->_bones.setSize(bonesCount);
             for (ii = 0; ii < bonesCount; ++ii) {
-                data->_bones[ii] = skeletonData->_bones[readVarint(input, 1)];
+                data->_bones[ii] = skeletonData->_bones[readVarint(input, true)];
             }
-            data->_target = skeletonData->_slots[readVarint(input, 1)];
-            data->_positionMode = static_cast<PositionMode>(readVarint(input, 1));
-            data->_spacingMode = static_cast<SpacingMode>(readVarint(input, 1));
-            data->_rotateMode = static_cast<RotateMode>(readVarint(input, 1));
+            data->_target = skeletonData->_slots[readVarint(input, true)];
+            data->_positionMode = static_cast<PositionMode>(readVarint(input, true));
+            data->_spacingMode = static_cast<SpacingMode>(readVarint(input, true));
+            data->_rotateMode = static_cast<RotateMode>(readVarint(input, true));
             data->_offsetRotation = readFloat(input);
             data->_position = readFloat(input);
             if (data->_positionMode == PositionMode_Fixed) {
@@ -322,7 +322,7 @@ namespace Spine {
 
         /* Default skin. */
         skeletonData->_defaultSkin = readSkin(input, "default", skeletonData, nonessential);
-        int skinsCount = readVarint(input, 1);
+        int skinsCount = readVarint(input, true);
 
         if (skeletonData->_defaultSkin) {
             ++skinsCount;
@@ -365,13 +365,13 @@ namespace Spine {
         _linkedMeshes.clear();
 
         /* Events. */
-        int eventsCount = readVarint(input, 1);
+        int eventsCount = readVarint(input, true);
         skeletonData->_events.reserve(eventsCount);
         skeletonData->_events.setSize(eventsCount);
         for (i = 0; i < eventsCount; ++i) {
             const char* name = readString(input);
             EventData* eventData = new (__FILE__, __LINE__) EventData(String(name, true));
-            eventData->_intValue = readVarint(input, 0);
+            eventData->_intValue = readVarint(input, false);
             eventData->_floatValue = readFloat(input);
             eventData->_stringValue.own(readString(input));
             SpineExtension::free(readString(input), __FILE__, __LINE__); // skip audio path
@@ -379,7 +379,7 @@ namespace Spine {
         }
 
         /* Animations. */
-        int animationsCount = readVarint(input, 1);
+        int animationsCount = readVarint(input, true);
         skeletonData->_animations.reserve(animationsCount);
         skeletonData->_animations.setSize(animationsCount);
         for (i = 0; i < animationsCount; ++i) {
@@ -421,11 +421,11 @@ namespace Spine {
             strncat(message + length, value2, 255 - length);
         }
         
-        _error = message;
+        _error = String(message);
     }
     
     char* SkeletonBinary::readString(DataInput* input) {
-        int length = readVarint(input, 1);
+        int length = readVarint(input, true);
         char* string;
         if (length == 0) {
             return NULL;
@@ -456,7 +456,7 @@ namespace Spine {
         return (signed char)readByte(input);
     }
     
-    int SkeletonBinary::readBoolean(DataInput* input) {
+    bool SkeletonBinary::readBoolean(DataInput* input) {
         return readByte(input) != 0;
     }
     
@@ -504,7 +504,7 @@ namespace Spine {
     
     Skin* SkeletonBinary::readSkin(DataInput* input, const char* skinName, SkeletonData* skeletonData, bool nonessential) {
         Skin* skin = NULL;
-        int slotCount = readVarint(input, 1);
+        int slotCount = readVarint(input, true);
         int i, ii, nn;
         if (slotCount == 0) {
             return NULL;
@@ -513,8 +513,8 @@ namespace Spine {
         skin = new (__FILE__, __LINE__) Skin(String(skinName));
         
         for (i = 0; i < slotCount; ++i) {
-            int slotIndex = readVarint(input, 1);
-            for (ii = 0, nn = readVarint(input, 1); ii < nn; ++ii) {
+            int slotIndex = readVarint(input, true);
+            for (ii = 0, nn = readVarint(input, true); ii < nn; ++ii) {
                 const char* name = readString(input);
                 Attachment* attachment = readAttachment(input, skin, slotIndex, name, skeletonData, nonessential);
                 if (attachment) {
@@ -565,7 +565,7 @@ namespace Spine {
                 return region;
             }
             case AttachmentType_Boundingbox: {
-                int vertexCount = readVarint(input, 1);
+                int vertexCount = readVarint(input, true);
                 BoundingBoxAttachment* box = _attachmentLoader->newBoundingBoxAttachment(*skin, String(name));
                 readVertices(input, static_cast<VertexAttachment*>(box), vertexCount);
                 if (nonessential) {
@@ -588,14 +588,14 @@ namespace Spine {
                 mesh = _attachmentLoader->newMeshAttachment(*skin, String(name), String(path));
                 mesh->_path = String(path);
                 readColor(input, &mesh->_r, &mesh->_g, &mesh->_b, &mesh->_a);
-                vertexCount = readVarint(input, 1);
+                vertexCount = readVarint(input, true);
                 Vector<float> float_array = readFloatArray(input, vertexCount << 1, 1);
                 mesh->setRegionUVs(float_array);
                 Vector<short> triangles = readShortArray(input);
                 mesh->setTriangles(triangles);
                 readVertices(input, static_cast<VertexAttachment*>(mesh), vertexCount);
                 mesh->updateUVs();
-                mesh->_hullLength = readVarint(input, 1) << 1;
+                mesh->_hullLength = readVarint(input, true) << 1;
                 if (nonessential) {
                     Vector<short> edges = readShortArray(input);
                     mesh->setEdges(edges);
@@ -650,7 +650,7 @@ namespace Spine {
                 int vertexCount = 0;
                 path->_closed = readBoolean(input);
                 path->_constantSpeed = readBoolean(input);
-                vertexCount = readVarint(input, 1);
+                vertexCount = readVarint(input, true);
                 readVertices(input, static_cast<VertexAttachment*>(path), vertexCount);
                 int lengthsLength = vertexCount / 3;
                 path->_lengths.reserve(lengthsLength);
@@ -684,8 +684,8 @@ namespace Spine {
                 return point;
             }
             case AttachmentType_Clipping: {
-                int endSlotIndex = readVarint(input, 1);
-                int vertexCount = readVarint(input, 1);
+                int endSlotIndex = readVarint(input, true);
+                int vertexCount = readVarint(input, true);
                 ClippingAttachment* clip = _attachmentLoader->newClippingAttachment(*skin, name);
                 readVertices(input, static_cast<VertexAttachment*>(clip), vertexCount);
                 
@@ -760,7 +760,7 @@ namespace Spine {
     }
     
     Vector<short> SkeletonBinary::readShortArray(DataInput *input) {
-        int n = readVarint(input, 1);
+        int n = readVarint(input, true);
         
         Vector<short> array;
         array.reserve(n);

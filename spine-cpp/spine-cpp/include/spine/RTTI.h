@@ -38,7 +38,7 @@
 namespace Spine {
     class RTTI : public SpineObject {
     public:
-        RTTI(const std::string& className);
+        explicit RTTI(const std::string& className);
         
         RTTI(const std::string& className, const RTTI& baseRTTI);
         
@@ -53,7 +53,7 @@ namespace Spine {
         RTTI(const RTTI& obj);
         RTTI& operator=(const RTTI& obj);
         
-        const std::string& _className;
+        const std::string _className;
         const RTTI *_pBaseRTTI;
     };
 }

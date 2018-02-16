@@ -45,8 +45,8 @@ namespace Spine {
         
     public:
         static const int ENTRIES;
-        
-        TranslateTimeline(int frameCount);
+
+        explicit TranslateTimeline(int frameCount);
 
         virtual ~TranslateTimeline();
         

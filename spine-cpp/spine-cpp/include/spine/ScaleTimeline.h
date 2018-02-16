@@ -41,7 +41,7 @@ namespace Spine {
         RTTI_DECL
         
     public:
-        ScaleTimeline(int frameCount);
+        explicit ScaleTimeline(int frameCount);
         
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction);
         

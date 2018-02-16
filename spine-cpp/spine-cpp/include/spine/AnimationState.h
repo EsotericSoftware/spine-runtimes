@@ -289,7 +289,7 @@ namespace Spine {
         friend class EventQueue;
         
     public:
-        AnimationState(AnimationStateData* data);
+        explicit AnimationState(AnimationStateData* data);
         
         ~AnimationState();
         

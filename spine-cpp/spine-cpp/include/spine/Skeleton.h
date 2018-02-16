@@ -70,7 +70,7 @@ namespace Spine {
         friend class TwoColorTimeline;
         
     public:
-        Skeleton(SkeletonData* skeletonData);
+        explicit Skeleton(SkeletonData* skeletonData);
         
         ~Skeleton();
         
@@ -169,9 +169,9 @@ namespace Spine {
         float getY();
         void setY(float inValue);
         bool getFlipX();
-        void setFlipX(float inValue);
+        void setFlipX(bool inValue);
         bool getFlipY();
-        void setFlipY(float inValue);
+        void setFlipY(bool inValue);
         
     private:
         SkeletonData* _data;

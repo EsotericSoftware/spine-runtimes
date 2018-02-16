@@ -118,7 +118,7 @@ namespace Spine {
                 else {
                     float x = setupLength * bone._a;
                     float y = setupLength * bone._c;
-                    float length = (float)sqrt(x * x + y * y);
+                    float length = sqrt(x * x + y * y);
                     if (scale) {
                         _lengths[i] = length;
                     }
@@ -159,7 +159,7 @@ namespace Spine {
             if (scale) {
                 float length = _lengths[i];
                 if (length >= PathConstraint::EPSILON) {
-                    float s = ((float)sqrt(dx * dx + dy * dy) / length - 1) * rotateMix + 1;
+                    float s = (sqrt(dx * dx + dy * dy) / length - 1) * rotateMix + 1;
                     bone._a *= s;
                     bone._c *= s;
                 }
@@ -398,18 +398,18 @@ namespace Spine {
             ddfy = tmpy * 2 + dddfy;
             dfx = (cx1 - x1) * 0.75f + tmpx + dddfx * 0.16666667f;
             dfy = (cy1 - y1) * 0.75f + tmpy + dddfy * 0.16666667f;
-            pathLength += (float)sqrt(dfx * dfx + dfy * dfy);
+            pathLength += sqrt(dfx * dfx + dfy * dfy);
             dfx += ddfx;
             dfy += ddfy;
             ddfx += dddfx;
             ddfy += dddfy;
-            pathLength += (float)sqrt(dfx * dfx + dfy * dfy);
+            pathLength += sqrt(dfx * dfx + dfy * dfy);
             dfx += ddfx;
             dfy += ddfy;
-            pathLength += (float)sqrt(dfx * dfx + dfy * dfy);
+            pathLength += sqrt(dfx * dfx + dfy * dfy);
             dfx += ddfx + dddfx;
             dfy += ddfy + dddfy;
-            pathLength += (float)sqrt(dfx * dfx + dfy * dfy);
+            pathLength += sqrt(dfx * dfx + dfy * dfy);
             _curves[i] = pathLength;
             x1 = x2;
             y1 = y2;
@@ -485,23 +485,23 @@ namespace Spine {
                 ddfy = tmpy * 2 + dddfy;
                 dfx = (cx1 - x1) * 0.3f + tmpx + dddfx * 0.16666667f;
                 dfy = (cy1 - y1) * 0.3f + tmpy + dddfy * 0.16666667f;
-                curveLength = (float)sqrt(dfx * dfx + dfy * dfy);
+                curveLength = sqrt(dfx * dfx + dfy * dfy);
                 _segments[0] = curveLength;
                 for (ii = 1; ii < 8; ii++) {
                     dfx += ddfx;
                     dfy += ddfy;
                     ddfx += dddfx;
                     ddfy += dddfy;
-                    curveLength += (float)sqrt(dfx * dfx + dfy * dfy);
+                    curveLength += sqrt(dfx * dfx + dfy * dfy);
                     _segments[ii] = curveLength;
                 }
                 dfx += ddfx;
                 dfy += ddfy;
-                curveLength += (float)sqrt(dfx * dfx + dfy * dfy);
+                curveLength += sqrt(dfx * dfx + dfy * dfy);
                 _segments[8] = curveLength;
                 dfx += ddfx + dddfx;
                 dfy += ddfy + dddfy;
-                curveLength += (float)sqrt(dfx * dfx + dfy * dfy);
+                curveLength += sqrt(dfx * dfx + dfy * dfy);
                 _segments[9] = curveLength;
                 segment = 0;
             }
@@ -563,7 +563,7 @@ namespace Spine {
         output[o] = x;
         output[o + 1] = y;
         if (tangents) {
-            output[o + 2] = (float)atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+            output[o + 2] = atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
         }
     }
 }

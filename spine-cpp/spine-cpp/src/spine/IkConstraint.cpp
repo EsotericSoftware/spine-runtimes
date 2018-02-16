@@ -51,7 +51,7 @@ namespace Spine {
         float id = 1 / (p._a * p._d - p._b * p._c);
         float x = targetX - p._worldX, y = targetY - p._worldY;
         float tx = (x * p._d - y * p._b) * id - bone._ax, ty = (y * p._a - x * p._c) * id - bone._ay;
-        float rotationIK = (float)atan2(ty, tx) * RadDeg - bone._ashearX - bone._arotation;
+        float rotationIK = atan2(ty, tx) * RadDeg - bone._ashearX - bone._arotation;
         
         if (bone._ascaleX < 0) {
             rotationIK += 180;
@@ -146,7 +146,7 @@ namespace Spine {
         x = cwx - pp._worldX;
         y = cwy - pp._worldY;
         float dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
-        float l1 = (float)sqrt(dx * dx + dy * dy), l2 = child._data.getLength() * csx, a1, a2;
+        float l1 = sqrt(dx * dx + dy * dy), l2 = child._data.getLength() * csx, a1, a2;
         if (u) {
             l2 *= psx;
             float cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
@@ -157,30 +157,30 @@ namespace Spine {
                 cos = 1;
             }
             
-            a2 = (float)acos(cos) * bendDir;
+            a2 = acos(cos) * bendDir;
             a = l1 + l2 * cos;
-            b = l2 * (float)sin(a2);
-            a1 = (float)atan2(ty * a - tx * b, tx * a + ty * b);
+            b = l2 * sin(a2);
+            a1 = atan2(ty * a - tx * b, tx * a + ty * b);
         }
         else {
             a = psx * l2;
             b = psy * l2;
-            float aa = a * a, bb = b * b, dd = tx * tx + ty * ty, ta = (float)atan2(ty, tx);
+            float aa = a * a, bb = b * b, dd = tx * tx + ty * ty, ta = atan2(ty, tx);
             c = bb * l1 * l1 + aa * dd - aa * bb;
             float c1 = -2 * bb * l1, c2 = bb - aa;
             d = c1 * c1 - 4 * c2 * c;
             if (d >= 0) {
-                float q = (float)sqrt(d);
+                float q = sqrt(d);
                 if (c1 < 0) q = -q;
                 q = -(c1 + q) / 2;
                 float r0 = q / c2, r1 = c / q;
                 float r = fabs(r0) < fabs(r1) ? r0 : r1;
                 if (r * r <= dd) {
-                    y = (float)sqrt(dd - r * r) * bendDir;
-                    a1 = ta - (float)atan2(y, r);
-                    a2 = (float)atan2(y / psy, (r - l1) / psx);
+                    y = sqrt(dd - r * r) * bendDir;
+                    a1 = ta - atan2(y, r);
+                    a2 = atan2(y / psy, (r - l1) / psx);
                     
-                    float os = (float)atan2(cy, cx) * s2;
+                    float os = atan2(cy, cx) * s2;
                     float rotation = parent._arotation;
                     a1 = (a1 - os) * RadDeg + os1 - rotation;
                     if (a1 > 180) {
@@ -211,8 +211,8 @@ namespace Spine {
             float maxAngle = 0, maxX = l1 + a, maxDist = maxX * maxX, maxY = 0;
             c = -a * l1 / (aa - bb);
             if (c >= -1 && c <= 1) {
-                c = (float)acos(c);
-                x = a * (float)cos(c) + l1;
+                c = acos(c);
+                x = a * cos(c) + l1;
                 y = b * (float)sin(c);
                 d = x * x + y * y;
                 
@@ -232,11 +232,11 @@ namespace Spine {
             }
             
             if (dd <= (minDist + maxDist) / 2) {
-                a1 = ta - (float)atan2(minY * bendDir, minX);
+                a1 = ta - atan2(minY * bendDir, minX);
                 a2 = minAngle * bendDir;
             }
             else {
-                a1 = ta - (float)atan2(maxY * bendDir, maxX);
+                a1 = ta - atan2(maxY * bendDir, maxX);
                 a2 = maxAngle * bendDir;
             }
         }

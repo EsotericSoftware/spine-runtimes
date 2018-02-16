@@ -51,7 +51,7 @@ namespace Spine {
         RTTI_DECL
         
     public:
-        RegionAttachment(const String& name);
+        explicit RegionAttachment(const String& name);
 
         void updateOffset();
         

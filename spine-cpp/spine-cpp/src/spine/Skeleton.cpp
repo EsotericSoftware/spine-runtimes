@@ -550,7 +550,7 @@ namespace Spine {
         return _flipX;
     }
     
-    void Skeleton::setFlipX(float inValue) {
+    void Skeleton::setFlipX(bool inValue) {
         _flipX = inValue;
     }
     
@@ -558,7 +558,7 @@ namespace Spine {
         return _flipY;
     }
     
-    void Skeleton::setFlipY(float inValue) {
+    void Skeleton::setFlipY(bool inValue) {
         _flipY = inValue;
     }
     

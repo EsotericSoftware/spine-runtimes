@@ -43,8 +43,8 @@ namespace Spine {
         
     public:
         static const int ENTRIES = 2;
-        
-        RotateTimeline(int frameCount);
+
+        explicit RotateTimeline(int frameCount);
         
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction);
         

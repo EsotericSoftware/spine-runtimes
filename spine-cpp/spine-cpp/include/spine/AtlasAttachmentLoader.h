@@ -48,7 +48,7 @@ namespace Spine {
         RTTI_DECL
         
     public:
-        AtlasAttachmentLoader(Atlas* atlas);
+        explicit AtlasAttachmentLoader(Atlas* atlas);
         
         virtual RegionAttachment* newRegionAttachment(Skin& skin, const String& name, const String& path);
         

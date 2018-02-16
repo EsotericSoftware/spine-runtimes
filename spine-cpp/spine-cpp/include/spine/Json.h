@@ -65,7 +65,7 @@ namespace Spine {
         static const char* getError();
         
         /* Supply a block of JSON, and this returns a Json object you can interrogate. Call Json_dispose when finished. */
-        Json(const char* value);
+        explicit Json(const char* value);
         
         ~Json();
         

@@ -1226,8 +1226,6 @@ namespace Spine {
         
         _error = String(message);
         
-        if (root) {
-            delete root;
-        }
+        delete root;
     }
 }

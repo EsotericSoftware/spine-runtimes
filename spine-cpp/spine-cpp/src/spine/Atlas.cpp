@@ -279,7 +279,7 @@ namespace Spine {
 
     int Atlas::beginPast(Str* str, char c) {
         const char* begin = str->begin;
-        while (1) {
+        while (true) {
             char lastSkippedChar = *begin;
             if (begin == str->end) {
                 return 0;

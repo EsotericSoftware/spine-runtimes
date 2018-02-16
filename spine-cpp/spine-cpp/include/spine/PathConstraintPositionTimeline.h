@@ -43,7 +43,7 @@ namespace Spine {
     public:
         static const int ENTRIES;
         
-        PathConstraintPositionTimeline(int frameCount);
+        explicit PathConstraintPositionTimeline(int frameCount);
 
         virtual ~PathConstraintPositionTimeline();
         

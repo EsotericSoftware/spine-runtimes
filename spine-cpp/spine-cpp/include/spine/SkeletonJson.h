@@ -47,9 +47,9 @@ namespace Spine {
     
     class SkeletonJson : public SpineObject {
     public:
-        SkeletonJson(Atlas* atlas);
-        
-        SkeletonJson(AttachmentLoader* attachmentLoader);
+        explicit SkeletonJson(Atlas* atlas);
+
+        explicit SkeletonJson(AttachmentLoader* attachmentLoader);
         
         ~SkeletonJson();
         

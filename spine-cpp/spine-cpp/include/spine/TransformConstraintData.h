@@ -47,7 +47,7 @@ namespace Spine {
         friend class TransformConstraintTimeline;
         
     public:
-        TransformConstraintData(const String& name);
+        explicit TransformConstraintData(const String& name);
 
         const String& getName();
         int getOrder();

@@ -42,8 +42,8 @@ namespace Spine {
         
     public:
         static const int ENTRIES;
-        
-        TransformConstraintTimeline(int frameCount);
+
+        explicit TransformConstraintTimeline(int frameCount);
         
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction);
         

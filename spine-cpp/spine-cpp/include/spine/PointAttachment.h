@@ -50,7 +50,7 @@ namespace Spine {
         RTTI_DECL
         
     public:
-        PointAttachment(const String& name);
+        explicit PointAttachment(const String& name);
         
         void computeWorldPosition(Bone& bone, float& ox, float& oy);
         

@@ -35,11 +35,11 @@ namespace Spine {
     
     MathUtil::MathUtil() {
         for (int i = 0; i < SIN_COUNT; ++i) {
-            SIN_TABLE[i] = (float)sin((i + 0.5f) / SIN_COUNT * RadFull);
+            SIN_TABLE[i] = sin((i + 0.5f) / SIN_COUNT * RadFull);
         }
         
         for (int i = 0; i < 360; i += 90) {
-            SIN_TABLE[(int)(i * DegToIndex) & SIN_MASK] = (float)sin(i * DegRad);
+            SIN_TABLE[i * DegToIndex & SIN_MASK] = sin(i * DegRad);
         }
     }
     

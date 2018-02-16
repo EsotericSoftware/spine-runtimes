@@ -37,18 +37,18 @@
 #include <float.h>
 
 #define SPINE_PI 3.1415927f
-#define SPINE_PI_2 SPINE_PI * 2
-#define RadDeg 180.0f / SPINE_PI
-#define DegRad SPINE_PI / 180.0f
+#define SPINE_PI_2 (SPINE_PI * 2)
+#define RadDeg (180.0f / SPINE_PI)
+#define DegRad (SPINE_PI / 180.0f)
 #define SIN_BITS 14 // 16KB. Adjust for accuracy.
-#define SIN_MASK ~(-(1 << SIN_BITS))
-#define SIN_COUNT SIN_MASK + 1
-#define RadFull SPINE_PI * 2
+#define SIN_MASK (~(-(1 << SIN_BITS)))
+#define SIN_COUNT (SIN_MASK + 1)
+#define RadFull (SPINE_PI * 2)
 #define DegFull 360
-#define RadToIndex SIN_COUNT / RadFull
-#define DegToIndex SIN_COUNT / DegFull
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define RadToIndex (SIN_COUNT / RadFull)
+#define DegToIndex (SIN_COUNT / DegFull)
+#define MAX(a, b) ((((a) > (b)) ? (a) : (b)))
+#define MIN(a, b) ((((a) < (b)) ? (a) : (b)))
 
 namespace Spine {
     template <typename T>

@@ -32,7 +32,6 @@
 
 #include <fstream>
 #include <assert.h>
-#include <cstring>
 
 namespace Spine {
     DefaultSpineExtension _defaultExtension;

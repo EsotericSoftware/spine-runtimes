@@ -45,36 +45,36 @@
 using namespace Spine;
 
 void loadBinary(const char* binaryFile, const char* atlasFile, Atlas* &atlas, SkeletonData* &skeletonData, AnimationStateData* &stateData, Skeleton* &skeleton, AnimationState* &state) {
-	atlas = new (__FILE__, __LINE__) Atlas(atlasFile, 0);
-	assert(atlas != 0);
+	atlas = new (__FILE__, __LINE__) Atlas(atlasFile, NULL);
+	assert(atlas != NULL);
 
 	SkeletonBinary binary(atlas);
 	skeletonData = binary.readSkeletonDataFile(binaryFile);
 	assert(skeletonData);
 
 	skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
-	assert(skeleton != 0);
+	assert(skeleton != NULL);
 
 	stateData = new (__FILE__, __LINE__) AnimationStateData(skeletonData);
-	assert(stateData != 0);
+	assert(stateData != NULL);
 	stateData->setDefaultMix(0.4f);
 
 	state = new (__FILE__, __LINE__) AnimationState(stateData);
 }
 
 void loadJson(const char* jsonFile, const char* atlasFile, Atlas* &atlas, SkeletonData* &skeletonData, AnimationStateData* &stateData, Skeleton* &skeleton, AnimationState* &state) {
-	atlas = new (__FILE__, __LINE__) Atlas(atlasFile, 0);
-	assert(atlas != 0);
+	atlas = new (__FILE__, __LINE__) Atlas(atlasFile, NULL);
+	assert(atlas != NULL);
 
 	SkeletonJson json(atlas);
 	skeletonData = json.readSkeletonDataFile(jsonFile);
 	assert(skeletonData);
 
 	skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
-	assert(skeleton != 0);
+	assert(skeleton != NULL);
 
 	stateData = new (__FILE__, __LINE__) AnimationStateData(skeletonData);
-	assert(stateData != 0);
+	assert(stateData != NULL);
 	stateData->setDefaultMix(0.4f);
 
 	state = new (__FILE__, __LINE__) AnimationState(stateData);
@@ -89,11 +89,11 @@ void dispose(Atlas* atlas, SkeletonData* skeletonData, AnimationStateData* state
 }
 
 void reproduceIssue_776() {
-	Atlas* atlas = 0;
-	SkeletonData* skeletonData = 0;
-	AnimationStateData* stateData = 0;
-	Skeleton* skeleton = 0;
-	AnimationState* state = 0;
+	Atlas* atlas = NULL;
+	SkeletonData* skeletonData = NULL;
+	AnimationStateData* stateData = NULL;
+	Skeleton* skeleton = NULL;
+	AnimationState* state = NULL;
 
 	loadJson(R_JSON, R_ATLAS, atlas, skeletonData, stateData, skeleton, state);
 	dispose(atlas, skeletonData, stateData, skeleton, state);

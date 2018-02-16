@@ -53,7 +53,7 @@ namespace Spine {
         friend class PathConstraintSpacingTimeline;
         
     public:
-        PathConstraintData(const String& name);
+        explicit PathConstraintData(const String& name);
 
         const String& getName();
         

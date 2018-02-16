@@ -40,7 +40,7 @@ namespace Spine {
         RTTI_DECL
         
     public:
-        Attachment(const String& name);
+        explicit Attachment(const String& name);
         virtual ~Attachment();
 
         const String& getName();

@@ -67,14 +67,14 @@ namespace Spine {
         static const int CURVE_BEZIER;
         
         static const TransformMode TRANSFORM_MODE_VALUES[5];
-        
-        SkeletonBinary(Atlas* atlasArray);
-        
-        SkeletonBinary(AttachmentLoader* attachmentLoader);
+
+        explicit SkeletonBinary(Atlas* atlasArray);
+
+        explicit SkeletonBinary(AttachmentLoader* attachmentLoader);
         
         ~SkeletonBinary();
         
-        SkeletonData* readSkeletonData(const unsigned char* binary, const int length);
+        SkeletonData* readSkeletonData(const unsigned char* binary, int length);
         
         SkeletonData* readSkeletonDataFile(const char* path);
         
@@ -100,7 +100,7 @@ namespace Spine {
         
         signed char readSByte(DataInput* input);
         
-        int readBoolean(DataInput* input);
+        bool readBoolean(DataInput* input);
         
         int readInt(DataInput* input);
         

@@ -310,7 +310,8 @@ namespace Spine {
     _queue(EventQueue::newEventQueue(*this, _trackEntryPool)),
     _animationsChanged(false),
     _onAnimationEventFunc(dummyOnAnimationEventFunc),
-    _timeScale(1) {
+    _timeScale(1),
+    _rendererObject(NULL){
         // Empty
     }
     

@@ -56,7 +56,7 @@ namespace Spine {
             }
         }
 
-        Vector& operator=(Vector& inVector) {
+        Vector& operator=(const Vector& inVector) {
             if (this != &inVector) {
                 clear();
                 deallocate(_buffer);

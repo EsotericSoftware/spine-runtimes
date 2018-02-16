@@ -45,7 +45,7 @@ namespace Spine {
         RTTI_DECL
         
     public:
-        MeshAttachment(const String& name);
+        explicit MeshAttachment(const String& name);
 
         void updateUVs();
 
