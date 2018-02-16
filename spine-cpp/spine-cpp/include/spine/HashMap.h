@@ -79,7 +79,7 @@ namespace Spine {
         _head(NULL),
         _hashFunction(),
         _size(0) {
-
+            // Empty
         }
         
         ~HashMap() {

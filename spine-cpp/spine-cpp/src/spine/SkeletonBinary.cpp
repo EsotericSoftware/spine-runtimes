@@ -148,8 +148,9 @@ namespace Spine {
         nonessential = readBoolean(input);
         
         if (nonessential) {
-            /* Skip images path & fps */
+            /* Skip images path, audio path & fps */
             readFloat(input);
+            SpineExtension::free(readString(input), __FILE__, __LINE__);
             SpineExtension::free(readString(input), __FILE__, __LINE__);
         }
         
@@ -387,6 +388,7 @@ namespace Spine {
             const char* eventData_stringValue = readString(input);
             eventData->_stringValue = std::string(eventData_stringValue);
             SpineExtension::free(eventData_stringValue, __FILE__, __LINE__);
+            SpineExtension::free(readString(input), __FILE__, __LINE__); // skip audio path
             skeletonData->_events[i] = eventData;
         }
 

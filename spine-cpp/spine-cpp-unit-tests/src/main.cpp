@@ -33,17 +33,41 @@
 
 #include "TestHarness.h"
 
-#define SPINEBOY_JSON "testdata/raptor/raptor-pro.json"
-#define SPINEBOY_ATLAS "testdata/raptor/raptor.atlas"
+
+#define R_JSON "testdata/raptor/raptor-pro.json"
+#define R_BINARY "testdata/raptor/raptor-pro.skel"
+#define R_ATLAS "testdata/raptor/raptor.atlas"
+
+#define SPINEBOY_JSON "testdata/spineboy/spineboy-pro.json"
+#define SPINEBOY_BINARY "testdata/spineboy/spineboy-pro.skel"
+#define SPINEBOY_ATLAS "testdata/spineboy/spineboy.atlas"
 
 using namespace Spine;
 
-void loadSpineboy(Atlas* &atlas, SkeletonData* &skeletonData, AnimationStateData* &stateData, Skeleton* &skeleton, AnimationState* &state) {
-	atlas = new (__FILE__, __LINE__) Atlas(SPINEBOY_ATLAS, 0);
+void loadBinary(const char* binaryFile, const char* atlasFile, Atlas* &atlas, SkeletonData* &skeletonData, AnimationStateData* &stateData, Skeleton* &skeleton, AnimationState* &state) {
+	atlas = new (__FILE__, __LINE__) Atlas(atlasFile, 0);
+	assert(atlas != 0);
+
+	SkeletonBinary binary(atlas);
+	skeletonData = binary.readSkeletonDataFile(binaryFile);
+	assert(skeletonData);
+
+	skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
+	assert(skeleton != 0);
+
+	stateData = new (__FILE__, __LINE__) AnimationStateData(skeletonData);
+	assert(stateData != 0);
+	stateData->setDefaultMix(0.4f);
+
+	state = new (__FILE__, __LINE__) AnimationState(stateData);
+}
+
+void loadJson(const char* jsonFile, const char* atlasFile, Atlas* &atlas, SkeletonData* &skeletonData, AnimationStateData* &stateData, Skeleton* &skeleton, AnimationState* &state) {
+	atlas = new (__FILE__, __LINE__) Atlas(atlasFile, 0);
 	assert(atlas != 0);
 
 	SkeletonJson json(atlas);
-	skeletonData = json.readSkeletonDataFile(SPINEBOY_JSON);
+	skeletonData = json.readSkeletonDataFile(jsonFile);
 	assert(skeletonData);
 
 	skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
@@ -71,7 +95,10 @@ void reproduceIssue_776() {
 	Skeleton* skeleton = 0;
 	AnimationState* state = 0;
 
-	loadSpineboy(atlas, skeletonData, stateData, skeleton, state);
+	loadJson(R_JSON, R_ATLAS, atlas, skeletonData, stateData, skeleton, state);
+	dispose(atlas, skeletonData, stateData, skeleton, state);
+
+	loadBinary(R_BINARY, R_ATLAS, atlas, skeletonData, stateData, skeleton, state);
 	dispose(atlas, skeletonData, stateData, skeleton, state);
 }
 
