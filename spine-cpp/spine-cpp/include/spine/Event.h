@@ -32,8 +32,7 @@
 #define Spine_Event_h
 
 #include <spine/SpineObject.h>
-
-#include <string>
+#include <spine/String.h>
 
 namespace Spine {
     class EventData;
@@ -57,16 +56,16 @@ namespace Spine {
         
         float getFloatValue();
         void setFloatValue(int inValue);
-        
-        std::string getStringValue();
-        void setStringValue(std::string inValue);
+
+        const String& getStringValue();
+        void setStringValue(const String& inValue);
         
     private:
         const EventData& _data;
         const float _time;
         int _intValue;
         float _floatValue;
-        std::string _stringValue;
+        String _stringValue;
     };
 }
 

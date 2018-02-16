@@ -33,8 +33,7 @@
 
 #include <spine/Vector.h>
 #include <spine/SpineObject.h>
-
-#include <string>
+#include <spine/String.h>
 
 namespace Spine {
     class BoneData;
@@ -48,9 +47,9 @@ namespace Spine {
         friend class TransformConstraintTimeline;
         
     public:
-        TransformConstraintData(std::string name);
-        
-        const std::string& getName();
+        TransformConstraintData(const String& name);
+
+        const String& getName();
         int getOrder();
         Vector<BoneData*>& getBones();
         BoneData* getTarget();
@@ -70,7 +69,7 @@ namespace Spine {
         bool isLocal();
         
     private:
-        const std::string _name;
+        const String _name;
         int _order;
         Vector<BoneData*> _bones;
         BoneData* _target;

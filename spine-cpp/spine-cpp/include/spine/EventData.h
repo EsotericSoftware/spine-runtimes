@@ -32,8 +32,7 @@
 #define Spine_EventData_h
 
 #include <spine/SpineObject.h>
-
-#include <string>
+#include <spine/String.h>
 
 namespace Spine {
     /// Stores the setup pose values for an Event.
@@ -43,10 +42,10 @@ namespace Spine {
         friend class Event;
         
     public:
-        EventData(std::string name);
+        EventData(const String& name);
         
         /// The name of the event, which is unique within the skeleton.
-        const std::string& getName();
+        const String& getName();
         
         int getIntValue();
         void setIntValue(int inValue);
@@ -54,14 +53,14 @@ namespace Spine {
         float getFloatValue();
         void setFloatValue(float inValue);
         
-        std::string getStringValue();
-        void setStringValue(std::string inValue);
+        const String& getStringValue();
+        void setStringValue(const String& inValue);
         
     private:
-        const std::string _name;
+        const String _name;
         int _intValue;
         float _floatValue;
-        std::string _stringValue;
+        String _stringValue;
     };
 }
 

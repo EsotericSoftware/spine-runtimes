@@ -500,7 +500,7 @@ namespace Spine {
         _queue->drain();
     }
     
-    TrackEntry* AnimationState::setAnimation(int trackIndex, std::string animationName, bool loop) {
+    TrackEntry* AnimationState::setAnimation(int trackIndex, const String& animationName, bool loop) {
         Animation* animation = _data->_skeletonData->findAnimation(animationName);
         assert(animation != NULL);
         
@@ -534,7 +534,7 @@ namespace Spine {
         return entry;
     }
     
-    TrackEntry* AnimationState::addAnimation(int trackIndex, std::string animationName, bool loop, float delay) {
+    TrackEntry* AnimationState::addAnimation(int trackIndex, const String& animationName, bool loop, float delay) {
         Animation* animation = _data->_skeletonData->findAnimation(animationName);
         assert(animation != NULL);
         
@@ -643,7 +643,7 @@ namespace Spine {
     
     Animation* AnimationState::getEmptyAnimation() {
         static Vector<Timeline*> timelines;
-        static Animation ret(std::string("<empty>"), timelines, 0);
+        static Animation ret(String("<empty>"), timelines, 0);
         return &ret;
     }
     

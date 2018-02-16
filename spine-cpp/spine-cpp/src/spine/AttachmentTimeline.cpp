@@ -48,27 +48,27 @@ namespace Spine {
         _frames.setSize(frameCount);
         
         for (int i = 0; i < frameCount; ++i) {
-            _attachmentNames.push_back(std::string(""));
+            _attachmentNames.push_back(String());
         }
     }
     
     void AttachmentTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
         assert(_slotIndex < skeleton._slots.size());
-        
-        std::string attachmentName;
+
+        String* attachmentName;
         Slot* slotP = skeleton._slots[_slotIndex];
         Slot& slot = *slotP;
         if (direction == MixDirection_Out && pose == MixPose_Setup) {
-            attachmentName = slot._data._attachmentName;
-            slot._attachment = attachmentName.length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, attachmentName);
+            attachmentName = &slot._data._attachmentName;
+            slot._attachment = attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName);
             return;
         }
         
         if (time < _frames[0]) {
             // Time is before first frame.
             if (pose == MixPose_Setup) {
-                attachmentName = slot._data._attachmentName;
-                slot._attachment = attachmentName.length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, attachmentName);
+                attachmentName = &slot._data._attachmentName;
+                slot._attachment = attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName);
             }
             return;
         }
@@ -82,15 +82,15 @@ namespace Spine {
             frameIndex = Animation::binarySearch(_frames, time, 1) - 1;
         }
         
-        attachmentName = _attachmentNames[frameIndex];
-        slot._attachment = attachmentName.length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, attachmentName);
+        attachmentName = &_attachmentNames[frameIndex];
+        slot._attachment = attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName);
     }
     
     int AttachmentTimeline::getPropertyId() {
         return ((int)TimelineType_Attachment << 24) + _slotIndex;
     }
     
-    void AttachmentTimeline::setFrame(int frameIndex, float time, std::string attachmentName) {
+    void AttachmentTimeline::setFrame(int frameIndex, float time, const String& attachmentName) {
         _frames[frameIndex] = time;
         _attachmentNames[frameIndex] = attachmentName;
     }
@@ -103,7 +103,7 @@ namespace Spine {
         _slotIndex = inValue;
     }
     
-    Vector<float>& AttachmentTimeline::getFrames() {
+    const Vector<float>& AttachmentTimeline::getFrames() {
         return _frames;
     }
     
@@ -111,11 +111,11 @@ namespace Spine {
         _frames = inValue;
     }
     
-    Vector<std::string> AttachmentTimeline::getAttachmentNames() {
+    const Vector<String>& AttachmentTimeline::getAttachmentNames() {
         return _attachmentNames;
     }
     
-    void AttachmentTimeline::setAttachmentNames(Vector<std::string>& inValue) {
+    void AttachmentTimeline::setAttachmentNames(Vector<String>& inValue) {
         _attachmentNames = inValue;
     }
     

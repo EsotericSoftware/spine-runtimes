@@ -32,6 +32,7 @@
 #define Spine_RTTI_h
 
 #include <spine/SpineObject.h>
+
 #include <string>
 
 namespace Spine {
@@ -52,8 +53,8 @@ namespace Spine {
         RTTI(const RTTI& obj);
         RTTI& operator=(const RTTI& obj);
         
-        const std::string m_className;
-        const RTTI *m_pBaseRTTI;
+        const std::string& _className;
+        const RTTI *_pBaseRTTI;
     };
 }
 

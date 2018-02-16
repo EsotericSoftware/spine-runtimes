@@ -35,7 +35,7 @@
 namespace Spine {
     RTTI_IMPL(ClippingAttachment, VertexAttachment);
     
-    ClippingAttachment::ClippingAttachment(std::string name) : VertexAttachment(name), _endSlot(NULL) {
+    ClippingAttachment::ClippingAttachment(const String& name) : VertexAttachment(name), _endSlot(NULL) {
         // Empty
     }
     

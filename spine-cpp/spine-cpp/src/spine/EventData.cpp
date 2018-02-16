@@ -33,7 +33,7 @@
 #include <assert.h>
 
 namespace Spine {
-    EventData::EventData(std::string name) :
+    EventData::EventData(const String& name) :
     _name(name),
     _intValue(0),
     _floatValue(0),
@@ -42,7 +42,7 @@ namespace Spine {
     }
     
     /// The name of the event, which is unique within the skeleton.
-    const std::string& EventData::getName() {
+    const String& EventData::getName() {
         return _name;
     }
     
@@ -62,11 +62,11 @@ namespace Spine {
         _floatValue = inValue;
     }
     
-    std::string EventData::getStringValue() {
+    const String& EventData::getStringValue() {
         return _stringValue;
     }
     
-    void EventData::setStringValue(std::string inValue) {
+    void EventData::setStringValue(const String& inValue) {
         _stringValue = inValue;
     }
 }

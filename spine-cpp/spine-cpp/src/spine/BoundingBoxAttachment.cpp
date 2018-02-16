@@ -33,7 +33,7 @@
 namespace Spine {
     RTTI_IMPL(BoundingBoxAttachment, VertexAttachment);
     
-    BoundingBoxAttachment::BoundingBoxAttachment(std::string name) : VertexAttachment(name) {
+    BoundingBoxAttachment::BoundingBoxAttachment(const String& name) : VertexAttachment(name) {
         // Empty
     }
 }

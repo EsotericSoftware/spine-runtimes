@@ -38,7 +38,7 @@
 namespace Spine {
     RTTI_IMPL(VertexAttachment, Attachment);
     
-    VertexAttachment::VertexAttachment(std::string name) : Attachment(name), _worldVerticesLength(0), _id(getNextID()) {
+    VertexAttachment::VertexAttachment(const String& name) : Attachment(name), _worldVerticesLength(0), _id(getNextID()) {
         // Empty
     }
 

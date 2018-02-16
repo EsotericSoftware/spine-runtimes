@@ -59,7 +59,7 @@ namespace Spine {
         _b = _data.getB();
         _a = _data.getA();
         
-        std::string attachmentName = _data.getAttachmentName();
+        const String& attachmentName = _data.getAttachmentName();
         if (attachmentName.length() > 0) {
             _attachment = NULL;
             setAttachment(_skeleton.getAttachment(_data.getIndex(), attachmentName));

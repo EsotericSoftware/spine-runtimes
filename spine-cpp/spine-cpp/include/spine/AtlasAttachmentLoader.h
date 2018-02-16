@@ -33,6 +33,7 @@
 
 #include <spine/AttachmentLoader.h>
 #include <spine/Vector.h>
+#include <spine/String.h>
 
 
 namespace Spine {
@@ -49,19 +50,19 @@ namespace Spine {
     public:
         AtlasAttachmentLoader(Atlas* atlas);
         
-        virtual RegionAttachment* newRegionAttachment(Skin& skin, std::string name, std::string path);
+        virtual RegionAttachment* newRegionAttachment(Skin& skin, const String& name, const String& path);
         
-        virtual MeshAttachment* newMeshAttachment(Skin& skin, std::string name, std::string path);
+        virtual MeshAttachment* newMeshAttachment(Skin& skin, const String& name, const String& path);
         
-        virtual BoundingBoxAttachment* newBoundingBoxAttachment(Skin& skin, std::string name);
+        virtual BoundingBoxAttachment* newBoundingBoxAttachment(Skin& skin, const String& name);
         
-        virtual PathAttachment* newPathAttachment(Skin& skin, std::string name);
+        virtual PathAttachment* newPathAttachment(Skin& skin, const String& name);
         
-        virtual PointAttachment* newPointAttachment(Skin& skin, std::string name);
+        virtual PointAttachment* newPointAttachment(Skin& skin, const String& name);
         
-        virtual ClippingAttachment* newClippingAttachment(Skin& skin, std::string name);
+        virtual ClippingAttachment* newClippingAttachment(Skin& skin, const String& name);
         
-        AtlasRegion* findRegion(std::string name);
+        AtlasRegion* findRegion(const String& name);
         
     private:
         Atlas* _atlas;

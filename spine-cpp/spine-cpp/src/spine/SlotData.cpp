@@ -33,7 +33,7 @@
 #include <assert.h>
 
 namespace Spine {
-    SlotData::SlotData(int index, std::string name, BoneData& boneData) :
+    SlotData::SlotData(int index, const String& name, BoneData& boneData) :
     _index(index),
     _name(name),
     _boneData(boneData),
@@ -56,7 +56,7 @@ namespace Spine {
         return _index;
     }
     
-    const std::string& SlotData::getName() {
+    const String& SlotData::getName() {
         return _name;
     }
     
@@ -128,11 +128,11 @@ namespace Spine {
         _hasSecondColor = inValue;
     }
     
-    std::string SlotData::getAttachmentName() {
+    const String& SlotData::getAttachmentName() {
         return _attachmentName;
     }
     
-    void SlotData::setAttachmentName(std::string inValue) {
+    void SlotData::setAttachmentName(const String& inValue) {
         _attachmentName = inValue;
     }
     

@@ -45,7 +45,7 @@ namespace Spine {
         RTTI_DECL
         
     public:
-        ClippingAttachment(std::string name);
+        ClippingAttachment(const String& name);
         
         SlotData* getEndSlot();
         void setEndSlot(SlotData* inValue);

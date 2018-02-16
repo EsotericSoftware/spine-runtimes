@@ -65,12 +65,12 @@ namespace Spine {
     void Event::setFloatValue(int inValue) {
         _floatValue = inValue;
     }
-    
-    std::string Event::getStringValue() {
+
+    const String& Event::getStringValue() {
         return _stringValue;
     }
     
-    void Event::setStringValue(std::string inValue) {
+    void Event::setStringValue(const String& inValue) {
         _stringValue = inValue;
     }
 }

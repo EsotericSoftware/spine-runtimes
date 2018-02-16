@@ -88,6 +88,7 @@
 #include <spine/SkeletonJson.h>
 #include <spine/Skin.h>
 #include <spine/SpineObject.h>
+#include <spine/String.h>
 #include <spine/TextureLoader.h>
 #include <spine/Timeline.h>
 #include <spine/TimelineType.h>

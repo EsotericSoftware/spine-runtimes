@@ -36,7 +36,7 @@
 #include <assert.h>
 
 namespace Spine {
-    PathConstraintData::PathConstraintData(std::string name) :
+    PathConstraintData::PathConstraintData(const String& name) :
     _name(name),
     _order(0),
     _target(NULL),
@@ -50,8 +50,8 @@ namespace Spine {
     _translateMix(0) {
         assert(_name.length() > 0);
     }
-    
-    const std::string& PathConstraintData::getName() {
+
+    const String& PathConstraintData::getName() {
         return _name;
     }
     

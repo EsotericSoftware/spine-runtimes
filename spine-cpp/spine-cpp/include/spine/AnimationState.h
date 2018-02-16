@@ -35,6 +35,7 @@
 #include <spine/Pool.h>
 #include <spine/MixPose.h>
 #include <spine/SpineObject.h>
+#include <spine/String.h>
 
 namespace Spine {
     enum EventType {
@@ -315,7 +316,7 @@ namespace Spine {
         void clearTrack(int trackIndex);
         
         /// Sets an animation by name. setAnimation(int, Animation, bool)
-        TrackEntry* setAnimation(int trackIndex, std::string animationName, bool loop);
+        TrackEntry* setAnimation(int trackIndex, const String& animationName, bool loop);
         
         /// Sets the current animation for a track, discarding any queued animations.
         /// @param loop If true, the animation will repeat.
@@ -328,7 +329,7 @@ namespace Spine {
         
         /// Queues an animation by name.
         /// addAnimation(int, Animation, bool, float)
-        TrackEntry* addAnimation(int trackIndex, std::string animationName, bool loop, float delay);
+        TrackEntry* addAnimation(int trackIndex, const String& animationName, bool loop, float delay);
         
         /// Adds an animation to be played delay seconds after the current or last queued animation
         /// for a track. If the track is empty, it is equivalent to calling setAnimation.

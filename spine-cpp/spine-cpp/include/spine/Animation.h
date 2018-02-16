@@ -35,8 +35,7 @@
 #include <spine/MixPose.h>
 #include <spine/MixDirection.h>
 #include <spine/SpineObject.h>
-
-#include <string>
+#include <spine/String.h>
 
 namespace Spine {
     class Timeline;
@@ -65,7 +64,7 @@ namespace Spine {
         friend class TwoColorTimeline;
         
     public:
-        Animation(std::string name, Vector<Timeline*>& timelines, float duration);
+        Animation(const String& name, Vector<Timeline*>& timelines, float duration);
         
         ~Animation();
         
@@ -73,7 +72,7 @@ namespace Spine {
         /// See also Timeline::apply(Skeleton&, float, float, Vector, float, MixPose, MixDirection)
         void apply(Skeleton& skeleton, float lastTime, float time, bool loop, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction);
         
-        std::string getName();
+        const String& getName();
         
         Vector<Timeline*> getTimelines();
         
@@ -86,7 +85,7 @@ namespace Spine {
     private:
         Vector<Timeline*> _timelines;
         float _duration;
-        std::string _name;
+        String _name;
         
         /// @param target After the first and before the last entry.
         static int binarySearch(Vector<float>& values, float target, int step);

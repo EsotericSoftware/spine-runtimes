@@ -33,7 +33,7 @@
 namespace Spine {
     RTTI_IMPL(MeshAttachment, VertexAttachment);
     
-    MeshAttachment::MeshAttachment(std::string name) : VertexAttachment(name),
+    MeshAttachment::MeshAttachment(const String& name) : VertexAttachment(name),
     _regionOffsetX(0),
     _regionOffsetY(0),
     _regionWidth(0),
@@ -148,11 +148,11 @@ namespace Spine {
         _a = inValue;
     }
     
-    std::string MeshAttachment::getPath() {
+    const String& MeshAttachment::getPath() {
         return _path;
     }
     
-    void MeshAttachment::setPath(std::string inValue) {
+    void MeshAttachment::setPath(const String& inValue) {
         _path = inValue;
     }
     

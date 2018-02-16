@@ -33,8 +33,7 @@
 
 #include <spine/Vector.h>
 #include <spine/SpineObject.h>
-
-#include <string>
+#include <spine/String.h>
 
 namespace Spine {
     class CurveTimeline;
@@ -63,7 +62,7 @@ namespace Spine {
         Vector<LinkedMesh*> _linkedMeshes;
         float _scale;
         const bool _ownsLoader;
-        std::string _error;
+        String _error;
         
         static float toColor(const char* value, int index);
         

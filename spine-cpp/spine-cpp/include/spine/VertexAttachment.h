@@ -47,7 +47,7 @@ namespace Spine {
         RTTI_DECL
         
     public:
-        VertexAttachment(std::string name);
+        VertexAttachment(const String& name);
 
         virtual ~VertexAttachment();
         

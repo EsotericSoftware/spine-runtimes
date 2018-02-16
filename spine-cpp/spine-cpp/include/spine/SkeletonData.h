@@ -32,8 +32,7 @@
 #define Spine_SkeletonData_h
 
 #include <spine/Vector.h>
-
-#include <string>
+#include <spine/String.h>
 
 namespace Spine {
     class BoneData;
@@ -59,40 +58,40 @@ namespace Spine {
         /// Finds a bone by comparing each bone's name.
         /// It is more efficient to cache the results of this method than to call it multiple times.
         /// @return May be NULL.
-        BoneData* findBone(std::string boneName);
+        BoneData* findBone(const String& boneName);
         
         /// @return -1 if the bone was not found.
-        int findBoneIndex(std::string boneName);
+        int findBoneIndex(const String& boneName);
         
         /// @return May be NULL.
-        SlotData* findSlot(std::string slotName);
+        SlotData* findSlot(const String& slotName);
         
         /// @return -1 if the slot was not found.
-        int findSlotIndex(std::string slotName);
+        int findSlotIndex(const String& slotName);
         
         /// @return May be NULL.
-        Skin* findSkin(std::string skinName);
+        Skin* findSkin(const String& skinName);
         
         /// @return May be NULL.
-        EventData* findEvent(std::string eventDataName);
+        EventData* findEvent(const String& eventDataName);
         
         /// @return May be NULL.
-        Animation* findAnimation(std::string animationName);
+        Animation* findAnimation(const String& animationName);
         
         /// @return May be NULL.
-        IkConstraintData* findIkConstraint(std::string constraintName);
+        IkConstraintData* findIkConstraint(const String& constraintName);
         
         /// @return May be NULL.
-        TransformConstraintData* findTransformConstraint(std::string constraintName);
+        TransformConstraintData* findTransformConstraint(const String& constraintName);
         
         /// @return May be NULL.
-        PathConstraintData* findPathConstraint(std::string constraintName);
+        PathConstraintData* findPathConstraint(const String& constraintName);
         
         /// @return -1 if the path constraint was not found.
-        int findPathConstraintIndex(std::string pathConstraintName);
-        
-        std::string getName();
-        void setName(std::string inValue);
+        int findPathConstraintIndex(const String& pathConstraintName);
+
+        const String& getName();
+        void setName(const String& inValue);
         
         /// The skeleton's bones, sorted parent first. The root bone is always the first bone.
         Vector<BoneData*>& getBones();
@@ -112,12 +111,16 @@ namespace Spine {
         
         Vector<EventData*>& getEvents();
         void setEvents(Vector<EventData*>& inValue);
+
         Vector<Animation*>& getAnimations();
         void setAnimations(Vector<Animation*>& inValue);
+
         Vector<IkConstraintData*>& getIkConstraints();
         void setIkConstraints(Vector<IkConstraintData*>& inValue);
+
         Vector<TransformConstraintData*>& getTransformConstraints();
         void setTransformConstraints(Vector<TransformConstraintData*>& inValue);
+
         Vector<PathConstraintData*>& getPathConstraints();
         void setPathConstraints(Vector<PathConstraintData*>& inValue);
         
@@ -127,19 +130,19 @@ namespace Spine {
         void setHeight(float inValue);
         
         /// The Spine version used to export this data, or NULL.
-        std::string getVersion();
-        void setVersion(std::string inValue);
-        std::string getHash();
-        void setHash(std::string inValue);
-        std::string getImagesPath();
-        void setImagesPath(std::string inValue);
+        const String& getVersion();
+        void setVersion(const String& inValue);
+        const String& getHash();
+        void setHash(const String& inValue);
+        const String& getImagesPath();
+        void setImagesPath(const String& inValue);
         
         /// The dopesheet FPS in Spine. Available only when nonessential data was exported.
         float getFps();
         void setFps(float inValue);
         
     private:
-        std::string _name;
+        String _name;
         Vector<BoneData*> _bones; // Ordered parents first
         Vector<SlotData*> _slots; // Setup pose draw order.
         Vector<Skin*> _skins;
@@ -150,12 +153,12 @@ namespace Spine {
         Vector<TransformConstraintData*> _transformConstraints;
         Vector<PathConstraintData*> _pathConstraints;
         float _width, _height;
-        std::string _version;
-        std::string _hash;
+        String _version;
+        String _hash;
         
         // Nonessential.
         float _fps;
-        std::string _imagesPath;
+        String _imagesPath;
     };
 }
 

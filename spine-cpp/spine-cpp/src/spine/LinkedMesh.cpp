@@ -33,7 +33,7 @@
 #include <spine/MeshAttachment.h>
 
 namespace Spine {
-    LinkedMesh::LinkedMesh(MeshAttachment* mesh, std::string skin, int slotIndex, std::string parent) :
+    LinkedMesh::LinkedMesh(MeshAttachment* mesh, const String& skin, int slotIndex, const String& parent) :
     _mesh(mesh),
     _skin(skin),
     _slotIndex(slotIndex),

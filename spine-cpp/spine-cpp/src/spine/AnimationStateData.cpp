@@ -38,7 +38,7 @@ namespace Spine {
         // Empty
     }
     
-    void AnimationStateData::setMix(std::string fromName, std::string toName, float duration) {
+    void AnimationStateData::setMix(const String& fromName, const String& toName, float duration) {
         Animation* from = _skeletonData->findAnimation(fromName);
         Animation* to = _skeletonData->findAnimation(toName);
         
@@ -94,13 +94,13 @@ namespace Spine {
         std::size_t h1 = 7;
         size_t strlen = val._a1->_name.length();
         for (int i = 0; i < strlen; ++i) {
-            h1 = h1 * 31 + val._a1->_name.at(i);
+            h1 = h1 * 31 + val._a1->_name.buffer()[i];
         }
         
         std::size_t h2 = 7;
         strlen = val._a2->_name.length();
         for (int i = 0; i < strlen; ++i) {
-            h2 = h2 * 31 + val._a2->_name.at(i);
+            h2 = h2 * 31 + val._a2->_name.buffer()[i];
         }
         
         return (((h1 << 5) + h1) ^ h2);

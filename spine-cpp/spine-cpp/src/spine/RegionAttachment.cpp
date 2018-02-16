@@ -48,7 +48,7 @@ namespace Spine {
     const int RegionAttachment::BRX = 6;
     const int RegionAttachment::BRY = 7;
     
-    RegionAttachment::RegionAttachment(std::string name) : Attachment(name),
+    RegionAttachment::RegionAttachment(const String& name) : Attachment(name),
     _x(0),
     _y(0),
     _rotation(0),
@@ -249,11 +249,11 @@ namespace Spine {
         _a = inValue;
     }
     
-    std::string RegionAttachment::getPath() {
+    const String& RegionAttachment::getPath() {
         return _path;
     }
     
-    void RegionAttachment::setPath(std::string inValue) {
+    void RegionAttachment::setPath(const String& inValue) {
         _path = inValue;
     }
     

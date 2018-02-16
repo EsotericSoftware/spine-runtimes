@@ -32,8 +32,7 @@
 #define Spine_TextureLoader_h
 
 #include <spine/SpineObject.h>
-
-#include <string>
+#include <spine/String.h>
 
 namespace Spine {
     class AtlasPage;
@@ -44,7 +43,7 @@ namespace Spine {
         
         virtual ~TextureLoader();
         
-        virtual void load(AtlasPage& page, std::string path) = 0;
+        virtual void load(AtlasPage& page, const String& path) = 0;
         
         virtual void unload(void* texture) = 0;
     };

@@ -33,20 +33,20 @@
 
 #include <spine/RTTI.h>
 #include <spine/SpineObject.h>
-#include <string>
+#include <spine/String.h>
 
 namespace Spine {
     class Attachment : public SpineObject {
         RTTI_DECL
         
     public:
-        Attachment(std::string name);
+        Attachment(const String& name);
         virtual ~Attachment();
-        
-        const std::string& getName();
+
+        const String& getName();
         
     private:
-        const std::string _name;
+        const String _name;
     };
 }
 

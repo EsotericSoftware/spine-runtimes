@@ -33,9 +33,9 @@
 
 #include <spine/HashMap.h>
 #include <spine/SpineObject.h>
+#include <spine/String.h>
 
 #include <assert.h>
-#include <string>
 
 namespace Spine {
     class SkeletonData;
@@ -56,7 +56,7 @@ namespace Spine {
         AnimationStateData(SkeletonData* skeletonData);
         
         /// Sets a mix duration by animation names.
-        void setMix(std::string fromName, std::string toName, float duration);
+        void setMix(const String& fromName, const String& toName, float duration);
         
         /// Sets a mix duration when changing from the specified animation to the other.
         /// See TrackEntry.MixDuration.

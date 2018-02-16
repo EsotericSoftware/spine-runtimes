@@ -35,14 +35,14 @@
 namespace Spine {
     RTTI_IMPL_NOPARENT(Attachment);
     
-    Attachment::Attachment(std::string name) : _name(name) {
+    Attachment::Attachment(const String& name) : _name(name) {
         assert(_name.length() > 0);
     }
 
     Attachment::~Attachment() {
     }
-    
-    const std::string& Attachment::getName() {
+
+    const String& Attachment::getName() {
         return _name;
     }
 }

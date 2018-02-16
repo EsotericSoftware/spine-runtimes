@@ -80,7 +80,7 @@ namespace Spine {
         }
     }
 
-    AtlasRegion* Atlas::findRegion(std::string name) {
+    AtlasRegion* Atlas::findRegion(const String& name) {
         for (size_t i = 0, n = _regions.size(); i < n; ++i) {
             if (_regions[i]->name == name) {
                 return _regions[i];
@@ -124,9 +124,7 @@ namespace Spine {
                 }
                 strcpy(path + dirLength + needsSlash, name);
 
-                page = new (__FILE__, __LINE__) AtlasPage(std::string(name));
-
-                SpineExtension::free(name, __FILE__, __LINE__);
+                page = new (__FILE__, __LINE__) AtlasPage(String(name, true));
 
                 int tupleVal = readTuple(&begin, end, tuple);
                 assert(tupleVal == 2);
@@ -161,7 +159,7 @@ namespace Spine {
                     }
                 }
 
-                if (_textureLoader) _textureLoader->load(*page, std::string(path));
+                if (_textureLoader) _textureLoader->load(*page, String(path));
 
                 SpineExtension::free(path, __FILE__, __LINE__);
 
@@ -171,10 +169,7 @@ namespace Spine {
                 AtlasRegion* region = new (__FILE__, __LINE__) AtlasRegion();
 
                 region->page = page;
-
-				char* name = mallocString(&str);
-                region->name = std::string(name);
-				SpineExtension::free(name, __FILE__, __LINE__);
+                region->name = String(mallocString(&str), true);
 
                 assert(readValue(&begin, end, &str));
                 region->rotate = equals(&str, "true");

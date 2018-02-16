@@ -33,7 +33,7 @@
 
 #include <spine/TransformMode.h>
 #include <spine/SpineObject.h>
-#include <string>
+#include <spine/String.h>
 
 namespace Spine {
     class BoneData : public SpineObject {
@@ -48,13 +48,13 @@ namespace Spine {
         friend class TranslateTimeline;
         
     public:
-        BoneData(int index, std::string name, BoneData* parent = NULL);
+        BoneData(int index, const String& name, BoneData* parent = NULL);
         
         /// The index of the bone in Skeleton.Bones
-        const int getIndex();
+        int getIndex();
 
         /// The name of the bone, which is unique within the skeleton.
-        const std::string& getName();
+        const String& getName();
         
         /// May be NULL.
         BoneData* getParent();
@@ -96,7 +96,7 @@ namespace Spine {
         
     private:
         const int _index;
-        const std::string _name;
+        const String _name;
         BoneData* _parent;
         float _length;
         float _x, _y, _rotation, _scaleX, _scaleY, _shearX, _shearY;

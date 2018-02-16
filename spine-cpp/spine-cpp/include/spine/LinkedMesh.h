@@ -32,8 +32,7 @@
 #define Spine_LinkedMesh_h
 
 #include <spine/SpineObject.h>
-
-#include <string>
+#include <spine/String.h>
 
 namespace Spine {
     class MeshAttachment;
@@ -43,13 +42,13 @@ namespace Spine {
         friend class SkeletonJson;
         
     public:
-        LinkedMesh(MeshAttachment* mesh, std::string skin, int slotIndex, std::string parent);
+        LinkedMesh(MeshAttachment* mesh, const String& skin, int slotIndex, const String& parent);
         
     private:
         MeshAttachment* _mesh;
-        std::string _skin;
+        String _skin;
         int _slotIndex;
-        std::string _parent;
+        String _parent;
     };
 }
 

@@ -33,8 +33,7 @@
 
 #include <spine/Vector.h>
 #include <spine/SpineObject.h>
-
-#include <string>
+#include <spine/String.h>
 
 namespace Spine {
     class BoneData;
@@ -47,10 +46,10 @@ namespace Spine {
         friend class IkConstraintTimeline;
         
     public:
-        IkConstraintData(std::string name);
+        IkConstraintData(const String& name);
         
         /// The IK constraint's name, which is unique within the skeleton.
-        const std::string& getName();
+        const String& getName();
         
         int getOrder();
         void setOrder(int inValue);
@@ -70,7 +69,7 @@ namespace Spine {
         void setMix(float inValue);
         
     private:
-        const std::string _name;
+        const String _name;
         int _order;
         Vector<BoneData*> _bones;
         BoneData* _target;

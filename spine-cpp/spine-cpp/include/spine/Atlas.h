@@ -34,8 +34,7 @@
 #include <spine/Vector.h>
 #include <spine/Extension.h>
 #include <spine/SpineObject.h>
-
-#include <string>
+#include <spine/String.h>
 
 namespace Spine {
     enum Format {
@@ -66,7 +65,7 @@ namespace Spine {
     
     class AtlasPage : public SpineObject {
     public:
-        std::string name;
+        String name;
         Format format;
         TextureFilter minFilter;
         TextureFilter magFilter;
@@ -75,13 +74,13 @@ namespace Spine {
         void* rendererObject;
         int width, height;
         
-        AtlasPage(std::string inName) : name(inName) {}
+        AtlasPage(const String& inName) : name(inName) {}
     };
     
     class AtlasRegion : public SpineObject {
     public:
         AtlasPage* page;
-        std::string name;
+        String name;
         int x, y, width, height;
         float u, v, u2, v2;
         float offsetX, offsetY;
@@ -104,10 +103,10 @@ namespace Spine {
         
         void flipV();
         
-        /// Returns the first region found with the specified name. This method uses std::string comparison to find the region, so the result
+        /// Returns the first region found with the specified name. This method uses String comparison to find the region, so the result
         /// should be cached rather than calling this method multiple times.
         /// @return The region, or NULL.
-        AtlasRegion* findRegion(std::string name);
+        AtlasRegion* findRegion(const String& name);
         
         void dispose();
         

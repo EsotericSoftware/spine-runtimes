@@ -70,55 +70,55 @@ namespace Spine {
         ContainerUtil::cleanUpVectorOfPointers(_pathConstraints);
     }
     
-    BoneData* SkeletonData::findBone(std::string boneName) {
+    BoneData* SkeletonData::findBone(const String& boneName) {
         return ContainerUtil::findWithName(_bones, boneName);
     }
     
-    int SkeletonData::findBoneIndex(std::string boneName) {
+    int SkeletonData::findBoneIndex(const String& boneName) {
         return ContainerUtil::findIndexWithName(_bones, boneName);
     }
     
-    SlotData* SkeletonData::findSlot(std::string slotName) {
+    SlotData* SkeletonData::findSlot(const String& slotName) {
         return ContainerUtil::findWithName(_slots, slotName);
     }
     
-    int SkeletonData::findSlotIndex(std::string slotName) {
+    int SkeletonData::findSlotIndex(const String& slotName) {
         return ContainerUtil::findIndexWithName(_slots, slotName);
     }
     
-    Skin* SkeletonData::findSkin(std::string skinName) {
+    Skin* SkeletonData::findSkin(const String& skinName) {
         return ContainerUtil::findWithName(_skins, skinName);
     }
     
-    EventData* SkeletonData::findEvent(std::string eventDataName) {
+    EventData* SkeletonData::findEvent(const String& eventDataName) {
         return ContainerUtil::findWithName(_events, eventDataName);
     }
     
-    Animation* SkeletonData::findAnimation(std::string animationName) {
+    Animation* SkeletonData::findAnimation(const String& animationName) {
         return ContainerUtil::findWithName(_animations, animationName);
     }
     
-    IkConstraintData* SkeletonData::findIkConstraint(std::string constraintName) {
+    IkConstraintData* SkeletonData::findIkConstraint(const String& constraintName) {
         return ContainerUtil::findWithName(_ikConstraints, constraintName);
     }
     
-    TransformConstraintData* SkeletonData::findTransformConstraint(std::string constraintName) {
+    TransformConstraintData* SkeletonData::findTransformConstraint(const String& constraintName) {
         return ContainerUtil::findWithName(_transformConstraints, constraintName);
     }
     
-    PathConstraintData* SkeletonData::findPathConstraint(std::string constraintName) {
+    PathConstraintData* SkeletonData::findPathConstraint(const String& constraintName) {
         return ContainerUtil::findWithName(_pathConstraints, constraintName);
     }
     
-    int SkeletonData::findPathConstraintIndex(std::string pathConstraintName) {
+    int SkeletonData::findPathConstraintIndex(const String& pathConstraintName) {
         return ContainerUtil::findIndexWithName(_pathConstraints, pathConstraintName);
     }
     
-    std::string SkeletonData::getName() {
+    const String& SkeletonData::getName() {
         return _name;
     }
     
-    void SkeletonData::setName(std::string inValue) {
+    void SkeletonData::setName(const String& inValue) {
         _name = inValue;
     }
     
@@ -202,27 +202,27 @@ namespace Spine {
         _height = inValue;
     }
     
-    std::string SkeletonData::getVersion() {
+    const String& SkeletonData::getVersion() {
         return _version;
     }
     
-    void SkeletonData::setVersion(std::string inValue) {
+    void SkeletonData::setVersion(const String& inValue) {
         _version = inValue;
     }
     
-    std::string SkeletonData::getHash() {
+    const String& SkeletonData::getHash() {
         return _hash;
     }
     
-    void SkeletonData::setHash(std::string inValue) {
+    void SkeletonData::setHash(const String& inValue) {
         _hash = inValue;
     }
     
-    std::string SkeletonData::getImagesPath() {
+    const String& SkeletonData::getImagesPath() {
         return _imagesPath;
     }
     
-    void SkeletonData::setImagesPath(std::string inValue) {
+    void SkeletonData::setImagesPath(const String& inValue) {
         _imagesPath = inValue;
     }
     

@@ -36,8 +36,8 @@
 #include <spine/Vector.h>
 #include <spine/MixPose.h>
 #include <spine/MixDirection.h>
+#include <spine/String.h>
 
-#include <string>
 
 namespace Spine {
     class Skeleton;
@@ -57,20 +57,20 @@ namespace Spine {
         virtual int getPropertyId();
         
         /// Sets the time and value of the specified keyframe.
-        void setFrame(int frameIndex, float time, std::string attachmentName);
+        void setFrame(int frameIndex, float time, const String& attachmentName);
         
         int getSlotIndex();
         void setSlotIndex(int inValue);
-        Vector<float>& getFrames();
+        const Vector<float>& getFrames();
         void setFrames(Vector<float>& inValue); // time, ...
-        Vector<std::string> getAttachmentNames();
-        void setAttachmentNames(Vector<std::string>& inValue);
+        const Vector<String>& getAttachmentNames();
+        void setAttachmentNames(Vector<String>& inValue);
         int getFrameCount();
         
     private:
         int _slotIndex;
         Vector<float> _frames;
-        Vector<std::string> _attachmentNames;
+        Vector<String> _attachmentNames;
     };
 }
 

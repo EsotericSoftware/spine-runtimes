@@ -35,7 +35,7 @@
 #include <assert.h>
 
 namespace Spine {
-    TransformConstraintData::TransformConstraintData(std::string name) :
+    TransformConstraintData::TransformConstraintData(const String& name) :
     _name(name),
     _order(0),
     _target(NULL),
@@ -54,7 +54,7 @@ namespace Spine {
         assert(_name.length() > 0);
     }
     
-    const std::string& TransformConstraintData::getName() {
+    const String& TransformConstraintData::getName() {
         return _name;
     }
     

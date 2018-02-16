@@ -40,7 +40,7 @@
 #include <math.h> /* fmod */
 
 namespace Spine {
-    Animation::Animation(std::string name, Vector<Timeline*>& timelines, float duration) :
+    Animation::Animation(const String& name, Vector<Timeline*>& timelines, float duration) :
     _timelines(timelines),
     _duration(duration),
     _name(name) {
@@ -64,7 +64,7 @@ namespace Spine {
         }
     }
     
-    std::string Animation::getName() {
+    const String& Animation::getName() {
         return _name;
     }
     

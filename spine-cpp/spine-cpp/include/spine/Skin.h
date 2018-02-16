@@ -31,9 +31,9 @@
 #ifndef Spine_Skin_h
 #define Spine_Skin_h
 
-#include <string>
 #include <spine/HashMap.h>
 #include <spine/Vector.h>
+#include <spine/String.h>
 
 namespace Spine {
     class Attachment;
@@ -49,9 +49,9 @@ namespace Spine {
         class AttachmentKey {
         public:
             int _slotIndex;
-            std::string _name;
+            String _name;
             
-            AttachmentKey(int slotIndex = 0, std::string name = "");
+            AttachmentKey(int slotIndex = 0, const String& name = "");
 
             AttachmentKey(const AttachmentKey &other) {
                 this->_slotIndex = other._slotIndex;
@@ -65,31 +65,31 @@ namespace Spine {
             std::size_t operator()(const Spine::Skin::AttachmentKey& val) const;
         };
         
-        Skin(std::string name);
+        Skin(const String& name);
         ~Skin();
         
         /// Adds an attachment to the skin for the specified slot index and name.
         /// If the name already exists for the slot, the previous value is replaced.
-        void addAttachment(int slotIndex, std::string name, Attachment* attachment);
+        void addAttachment(int slotIndex, const String& name, Attachment* attachment);
         
         /// Returns the attachment for the specified slot index and name, or NULL.
-        Attachment* getAttachment(int slotIndex, std::string name);
+        Attachment* getAttachment(int slotIndex, const String& name);
         
         /// Finds the skin keys for a given slot. The results are added to the passed array of names.
         /// @param slotIndex The target slotIndex. To find the slot index, use Skeleton::findSlotIndex or SkeletonData::findSlotIndex
         /// @param names Found skin key names will be added to this array.
-        void findNamesForSlot(int slotIndex, Vector<std::string>& names);
+        void findNamesForSlot(int slotIndex, Vector<String>& names);
         
         /// Finds the attachments for a given slot. The results are added to the passed array of Attachments.
         /// @param slotIndex The target slotIndex. To find the slot index, use Skeleton::findSlotIndex or SkeletonData::findSlotIndex
         /// @param attachments Found Attachments will be added to this array.
         void findAttachmentsForSlot(int slotIndex, Vector<Attachment*>& attachments);
-        
-        const std::string& getName();
+
+        const String& getName();
         HashMap<AttachmentKey, Attachment*, HashAttachmentKey>& getAttachments();
         
     private:
-        const std::string _name;
+        const String _name;
         HashMap<AttachmentKey, Attachment*, HashAttachmentKey> _attachments;
         
         /// Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached.

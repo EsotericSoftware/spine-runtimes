@@ -33,7 +33,7 @@
 
 #include <spine/RTTI.h>
 #include <spine/SpineObject.h>
-#include <string>
+#include <spine/String.h>
 
 namespace Spine {
     class Skin;
@@ -52,20 +52,20 @@ namespace Spine {
         virtual ~AttachmentLoader();
         
         /// @return May be NULL to not load any attachment.
-        virtual RegionAttachment* newRegionAttachment(Skin& skin, std::string name, std::string path) = 0;
+        virtual RegionAttachment* newRegionAttachment(Skin& skin, const String& name, const String& path) = 0;
         
         /// @return May be NULL to not load any attachment.
-        virtual MeshAttachment* newMeshAttachment(Skin& skin, std::string name, std::string path) = 0;
+        virtual MeshAttachment* newMeshAttachment(Skin& skin, const String& name, const String& path) = 0;
         
         /// @return May be NULL to not load any attachment.
-        virtual BoundingBoxAttachment* newBoundingBoxAttachment(Skin& skin, std::string name) = 0;
+        virtual BoundingBoxAttachment* newBoundingBoxAttachment(Skin& skin, const String& name) = 0;
         
         /// @return May be NULL to not load any attachment
-        virtual PathAttachment* newPathAttachment(Skin& skin, std::string name) = 0;
+        virtual PathAttachment* newPathAttachment(Skin& skin, const String& name) = 0;
         
-        virtual PointAttachment* newPointAttachment(Skin& skin, std::string name) = 0;
+        virtual PointAttachment* newPointAttachment(Skin& skin, const String& name) = 0;
         
-        virtual ClippingAttachment* newClippingAttachment(Skin& skin, std::string name) = 0;
+        virtual ClippingAttachment* newClippingAttachment(Skin& skin, const String& name) = 0;
     };
 }
 

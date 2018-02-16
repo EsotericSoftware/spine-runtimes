@@ -29,7 +29,7 @@ Spine::SpineExtension::setInstance(Spine::DefaultSpineExtension::getInstance());
 
 class MyTextureLoader : public TextureLoader
 {
-  virtual void load(AtlasPage& page, std::string path) { // TODO }
+  virtual void load(AtlasPage& page, const String& path) { // TODO }
 
   virtual void unload(void* texture) { // TODO }
 };

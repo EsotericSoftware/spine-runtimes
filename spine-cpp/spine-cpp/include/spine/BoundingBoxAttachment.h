@@ -39,7 +39,7 @@ namespace Spine {
     class BoundingBoxAttachment : public VertexAttachment {
         RTTI_DECL
         
-        BoundingBoxAttachment(std::string name);
+        BoundingBoxAttachment(const String& name);
     };
 }
 

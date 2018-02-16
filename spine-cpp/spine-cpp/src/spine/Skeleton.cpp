@@ -269,23 +269,23 @@ namespace Spine {
         }
     }
     
-    Bone* Skeleton::findBone(std::string boneName) {
+    Bone* Skeleton::findBone(const String& boneName) {
         return ContainerUtil::findWithDataName(_bones, boneName);
     }
     
-    int Skeleton::findBoneIndex(std::string boneName) {
+    int Skeleton::findBoneIndex(const String& boneName) {
         return ContainerUtil::findIndexWithDataName(_bones, boneName);
     }
     
-    Slot* Skeleton::findSlot(std::string slotName) {
+    Slot* Skeleton::findSlot(const String& slotName) {
         return ContainerUtil::findWithDataName(_slots, slotName);
     }
     
-    int Skeleton::findSlotIndex(std::string slotName) {
+    int Skeleton::findSlotIndex(const String& slotName) {
         return ContainerUtil::findIndexWithDataName(_slots, slotName);
     }
     
-    void Skeleton::setSkin(std::string skinName) {
+    void Skeleton::setSkin(const String& skinName) {
         Skin* foundSkin = _data->findSkin(skinName);
         
         assert(foundSkin != NULL);
@@ -303,7 +303,7 @@ namespace Spine {
                 for (int i = 0, n = static_cast<int>(_slots.size()); i < n; ++i) {
                     Slot* slotP = _slots[i];
                     Slot& slot = *slotP;
-                    std::string name = slot._data.getAttachmentName();
+                    const String& name = slot._data.getAttachmentName();
                     if (name.length() > 0) {
                         Attachment* attachment = newSkin->getAttachment(i, name);
                         if (attachment != NULL) {
@@ -317,11 +317,11 @@ namespace Spine {
         _skin = newSkin;
     }
     
-    Attachment* Skeleton::getAttachment(std::string slotName, std::string attachmentName) {
+    Attachment* Skeleton::getAttachment(const String& slotName, const String& attachmentName) {
         return getAttachment(_data->findSlotIndex(slotName), attachmentName);
     }
     
-    Attachment* Skeleton::getAttachment(int slotIndex, std::string attachmentName) {
+    Attachment* Skeleton::getAttachment(int slotIndex, const String& attachmentName) {
         assert(attachmentName.length() > 0);
         
         if (_skin != NULL) {
@@ -334,7 +334,7 @@ namespace Spine {
         return _data->getDefaultSkin() != NULL ? _data->getDefaultSkin()->getAttachment(slotIndex, attachmentName) : NULL;
     }
     
-    void Skeleton::setAttachment(std::string slotName, std::string attachmentName) {
+    void Skeleton::setAttachment(const String& slotName, const String& attachmentName) {
         assert(slotName.length() > 0);
         
         for (int i = 0, n = static_cast<int>(_slots.size()); i < n; ++i) {
@@ -353,12 +353,12 @@ namespace Spine {
             }
         }
         
-        printf("Slot not found: %s", slotName.c_str());
+        printf("Slot not found: %s", slotName.buffer());
         
         assert(false);
     }
     
-    IkConstraint* Skeleton::findIkConstraint(std::string constraintName) {
+    IkConstraint* Skeleton::findIkConstraint(const String& constraintName) {
         assert(constraintName.length() > 0);
         
         for (int i = 0, n = static_cast<int>(_ikConstraints.size()); i < n; ++i) {
@@ -370,7 +370,7 @@ namespace Spine {
         return NULL;
     }
     
-    TransformConstraint* Skeleton::findTransformConstraint(std::string constraintName) {
+    TransformConstraint* Skeleton::findTransformConstraint(const String& constraintName) {
         assert(constraintName.length() > 0);
         
         for (int i = 0, n = static_cast<int>(_transformConstraints.size()); i < n; ++i) {
@@ -383,7 +383,7 @@ namespace Spine {
         return NULL;
     }
     
-    PathConstraint* Skeleton::findPathConstraint(std::string constraintName) {
+    PathConstraint* Skeleton::findPathConstraint(const String& constraintName) {
         assert(constraintName.length() > 0);
         
         for (int i = 0, n = static_cast<int>(_pathConstraints.size()); i < n; ++i) {

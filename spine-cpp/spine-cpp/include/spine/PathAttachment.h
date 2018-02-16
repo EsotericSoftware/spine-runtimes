@@ -41,7 +41,7 @@ namespace Spine {
         RTTI_DECL
         
     public:
-        PathAttachment(std::string name);
+        PathAttachment(const String& name);
         
         /// The length in the setup pose from the start of the path to the end of each curve.
         Vector<float>& getLengths();

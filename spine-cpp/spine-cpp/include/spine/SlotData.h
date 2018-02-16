@@ -33,8 +33,7 @@
 
 #include <spine/BlendMode.h>
 #include <spine/SpineObject.h>
-
-#include <string>
+#include <spine/String.h>
 
 namespace Spine {
     class BoneData;
@@ -59,11 +58,11 @@ namespace Spine {
         friend class TwoColorTimeline;
         
     public:
-        SlotData(int index, std::string name, BoneData& boneData);
+        SlotData(int index, const String& name, BoneData& boneData);
         
         const int getIndex();
         
-        const std::string& getName();
+        const String& getName();
         
         BoneData& getBoneData();
         
@@ -86,20 +85,20 @@ namespace Spine {
         void setHasSecondColor(bool inValue);
         
         /// May be empty.
-        std::string getAttachmentName();
-        void setAttachmentName(std::string inValue);
+        const String& getAttachmentName();
+        void setAttachmentName(const String& inValue);
         
         BlendMode getBlendMode();
         void setBlendMode(BlendMode inValue);
         
     private:
         const int _index;
-        const std::string _name;
+        String _name;
         BoneData& _boneData;
         float _r, _g, _b, _a;
         float _r2, _g2, _b2, _a2;
         bool _hasSecondColor;
-        std::string _attachmentName;
+        String _attachmentName;
         BlendMode _blendMode;
     };
 }

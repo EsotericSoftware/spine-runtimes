@@ -122,7 +122,7 @@ namespace Spine {
         SkeletonData* skeletonData;
         Json *root, *skeleton, *bones, *boneMap, *ik, *transform, *path, *slots, *skins, *animations, *events;
 
-        _error.clear();
+        _error = "";
         _linkedMeshes.clear();
 
         root = new (__FILE__, __LINE__) Json(json);
@@ -567,7 +567,7 @@ namespace Spine {
                                 }
                                 else {
                                     mesh->_inheritDeform = Json::getInt(attachmentMap, "deform", 1);
-                                    LinkedMesh* linkedMesh = new (__FILE__, __LINE__) LinkedMesh(mesh, std::string(Json::getString(attachmentMap, "skin", 0)), slotIndex, std::string(entry->_valueString));
+                                    LinkedMesh* linkedMesh = new (__FILE__, __LINE__) LinkedMesh(mesh, String(Json::getString(attachmentMap, "skin", 0)), slotIndex, String(entry->_valueString));
                                     _linkedMeshes.push_back(linkedMesh);
                                 }
                                 break;
@@ -640,13 +640,13 @@ namespace Spine {
             Skin* skin = linkedMesh->_skin.length() == 0 ? skeletonData->getDefaultSkin() : skeletonData->findSkin(linkedMesh->_skin);
             if (skin == NULL) {
                 delete skeletonData;
-                setError(root, "Skin not found: ", linkedMesh->_skin.c_str());
+                setError(root, "Skin not found: ", linkedMesh->_skin.buffer());
                 return NULL;
             }
             Attachment* parent = skin->getAttachment(linkedMesh->_slotIndex, linkedMesh->_parent);
             if (parent == NULL) {
                 delete skeletonData;
-                setError(root, "Parent mesh not found: ", linkedMesh->_parent.c_str());
+                setError(root, "Parent mesh not found: ", linkedMesh->_parent.buffer());
                 return NULL;
             }
             linkedMesh->_mesh->_parentMesh = static_cast<MeshAttachment*>(parent);
@@ -661,12 +661,12 @@ namespace Spine {
             skeletonData->_events.reserve(events->_size);
             skeletonData->_events.setSize(events->_size);
             for (eventMap = events->_child, i = 0; eventMap; eventMap = eventMap->_next, ++i) {
-                EventData* eventData = new (__FILE__, __LINE__) EventData(std::string(eventMap->_name));
+                EventData* eventData = new (__FILE__, __LINE__) EventData(String(eventMap->_name));
                 
                 eventData->_intValue = Json::getInt(eventMap, "int", 0);
                 eventData->_floatValue = Json::getFloat(eventMap, "float", 0);
                 const char* stringValue = Json::getString(eventMap, "string", 0);
-                eventData->_stringValue = std::string(stringValue ? stringValue : "");
+                eventData->_stringValue = stringValue;
                 skeletonData->_events[i] = eventData;
             }
         }
@@ -802,7 +802,7 @@ namespace Spine {
 
                     for (valueMap = timelineMap->_child, frameIndex = 0; valueMap; valueMap = valueMap->_next, ++frameIndex) {
                         Json* name = Json::getItem(valueMap, "name");
-                        std::string attachmentName = name->_type == Json::JSON_NULL ? std::string("") : std::string(name->_valueString);
+                        String attachmentName = name->_type == Json::JSON_NULL ? "" : name->_valueString;
                         timeline->setFrame(frameIndex, Json::getFloat(valueMap, "time", 0), attachmentName);
                     }
                     timelines.push_back(timeline);
@@ -1159,7 +1159,7 @@ namespace Spine {
                 event = new (__FILE__, __LINE__) Event(Json::getFloat(valueMap, "time", 0), *eventData);
                 event->_intValue = Json::getInt(valueMap, "int", eventData->_intValue);
                 event->_floatValue = Json::getFloat(valueMap, "float", eventData->_floatValue);
-                event->_stringValue = Json::getString(valueMap, "string", eventData->_stringValue.c_str());
+                event->_stringValue = Json::getString(valueMap, "string", eventData->_stringValue.buffer());
                 timeline->setFrame(frameIndex, event);
             }
             timelines.push_back(timeline);
@@ -1167,7 +1167,7 @@ namespace Spine {
             duration = MAX(duration, timeline->_frames[events->_size - 1]);
         }
         
-        return new (__FILE__, __LINE__) Animation(std::string(root->_name), timelines, duration);
+        return new (__FILE__, __LINE__) Animation(String(root->_name), timelines, duration);
     }
     
     void SkeletonJson::readVertices(Json* attachmentMap, VertexAttachment* attachment, int verticesLength) {
@@ -1224,7 +1224,7 @@ namespace Spine {
             strncat(message + length, value2, 255 - length);
         }
         
-        _error = std::string(message);
+        _error = String(message);
         
         if (root) {
             delete root;

@@ -34,8 +34,7 @@
 #include <spine/TransformMode.h>
 #include <spine/Vector.h>
 #include <spine/SpineObject.h>
-
-#include <string>
+#include <spine/String.h>
 
 namespace Spine {
     class SkeletonData;
@@ -87,7 +86,7 @@ namespace Spine {
         
         AttachmentLoader* _attachmentLoader;
         Vector<LinkedMesh*> _linkedMeshes;
-        std::string _error;
+        String _error;
         float _scale;
         const bool _ownsLoader;
         

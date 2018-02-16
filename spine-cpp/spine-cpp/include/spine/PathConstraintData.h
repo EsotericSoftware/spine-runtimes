@@ -36,8 +36,7 @@
 #include <spine/RotateMode.h>
 #include <spine/Vector.h>
 #include <spine/SpineObject.h>
-
-#include <string>
+#include <spine/String.h>
 
 namespace Spine {
     class BoneData;
@@ -54,9 +53,9 @@ namespace Spine {
         friend class PathConstraintSpacingTimeline;
         
     public:
-        PathConstraintData(std::string name);
-        
-        const std::string& getName();
+        PathConstraintData(const String& name);
+
+        const String& getName();
         
         int getOrder();
         void setOrder(int inValue);
@@ -91,7 +90,7 @@ namespace Spine {
         void setTranslateMix(float inValue);
         
     private:
-        const std::string _name;
+        const String _name;
         int _order;
         Vector<BoneData*> _bones;
         SlotData* _target;

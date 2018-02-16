@@ -33,7 +33,7 @@
 #include <assert.h>
 
 namespace Spine {
-    BoneData::BoneData(int index, std::string name, BoneData* parent) :
+    BoneData::BoneData(int index, const String& name, BoneData* parent) :
     _index(index),
     _name(name),
     _parent(parent),
@@ -50,11 +50,11 @@ namespace Spine {
         assert(_name.length() > 0);
     }
     
-    const int BoneData::getIndex() {
+    int BoneData::getIndex() {
         return _index;
     }
     
-    const std::string& BoneData::getName() {
+    const String& BoneData::getName() {
         return _name;
     }
     

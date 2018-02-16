@@ -34,8 +34,8 @@
 #include <spine/Vector.h>
 #include <spine/MathUtil.h>
 #include <spine/SpineObject.h>
+#include <spine/String.h>
 
-#include <string>
 #include <limits> // std::numeric_limits
 
 namespace Spine {
@@ -90,19 +90,19 @@ namespace Spine {
         void setSlotsToSetupPose();
         
         /// @return May be NULL.
-        Bone* findBone(std::string boneName);
+        Bone* findBone(const String& boneName);
         
         /// @return -1 if the bone was not found.
-        int findBoneIndex(std::string boneName);
+        int findBoneIndex(const String& boneName);
         
         /// @return May be NULL.
-        Slot* findSlot(std::string slotName);
+        Slot* findSlot(const String& slotName);
         
         /// @return -1 if the bone was not found.
-        int findSlotIndex(std::string slotName);
+        int findSlotIndex(const String& slotName);
         
         /// Sets a skin by name (see setSkin).
-        void setSkin(std::string skinName);
+        void setSkin(const String& skinName);
         
         /// Attachments from the new skin are attached if the corresponding attachment from the old skin was attached.
         /// If there was no old skin, each slot's setup mode attachment is attached from the new skin.
@@ -115,22 +115,22 @@ namespace Spine {
         void setSkin(Skin* newSkin);
         
         /// @return May be NULL.
-        Attachment* getAttachment(std::string slotName, std::string attachmentName);
+        Attachment* getAttachment(const String& slotName, const String& attachmentName);
         
         /// @return May be NULL.
-        Attachment* getAttachment(int slotIndex, std::string attachmentName);
+        Attachment* getAttachment(int slotIndex, const String& attachmentName);
         
         /// @param attachmentName May be empty.
-        void setAttachment(std::string slotName, std::string attachmentName);
+        void setAttachment(const String& slotName, const String& attachmentName);
         
         /// @return May be NULL.
-        IkConstraint* findIkConstraint(std::string constraintName);
+        IkConstraint* findIkConstraint(const String& constraintName);
         
         /// @return May be NULL.
-        TransformConstraint* findTransformConstraint(std::string constraintName);
+        TransformConstraint* findTransformConstraint(const String& constraintName);
         
         /// @return May be NULL.
-        PathConstraint* findPathConstraint(std::string constraintName);
+        PathConstraint* findPathConstraint(const String& constraintName);
         
         void update(float delta);
         

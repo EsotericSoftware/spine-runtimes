@@ -47,7 +47,7 @@ namespace Spine {
         // Empty
     }
     
-    RegionAttachment* AtlasAttachmentLoader::newRegionAttachment(Skin& skin, std::string name, std::string path) {
+    RegionAttachment* AtlasAttachmentLoader::newRegionAttachment(Skin& skin, const String& name, const String& path) {
         AtlasRegion* regionP = findRegion(path);
         assert(regionP != NULL);
         
@@ -67,7 +67,7 @@ namespace Spine {
         return attachmentP;
     }
     
-    MeshAttachment* AtlasAttachmentLoader::newMeshAttachment(Skin& skin, std::string name, std::string path) {
+    MeshAttachment* AtlasAttachmentLoader::newMeshAttachment(Skin& skin, const String& name, const String& path) {
         AtlasRegion* regionP = findRegion(path);
         assert(regionP != NULL);
         
@@ -92,23 +92,23 @@ namespace Spine {
         return attachmentP;
     }
     
-    BoundingBoxAttachment* AtlasAttachmentLoader::newBoundingBoxAttachment(Skin& skin, std::string name) {
+    BoundingBoxAttachment* AtlasAttachmentLoader::newBoundingBoxAttachment(Skin& skin, const String& name) {
         return new (__FILE__, __LINE__)  BoundingBoxAttachment(name);
     }
     
-    PathAttachment* AtlasAttachmentLoader::newPathAttachment(Skin& skin, std::string name) {
+    PathAttachment* AtlasAttachmentLoader::newPathAttachment(Skin& skin, const String& name) {
         return new (__FILE__, __LINE__) PathAttachment(name);
     }
     
-    PointAttachment* AtlasAttachmentLoader::newPointAttachment(Skin& skin, std::string name) {
+    PointAttachment* AtlasAttachmentLoader::newPointAttachment(Skin& skin, const String& name) {
         return new (__FILE__, __LINE__) PointAttachment(name);
     }
     
-    ClippingAttachment* AtlasAttachmentLoader::newClippingAttachment(Skin& skin, std::string name) {
+    ClippingAttachment* AtlasAttachmentLoader::newClippingAttachment(Skin& skin, const String& name) {
         return new (__FILE__, __LINE__) ClippingAttachment(name);
     }
     
-    AtlasRegion* AtlasAttachmentLoader::findRegion(std::string name) {
+    AtlasRegion* AtlasAttachmentLoader::findRegion(const String& name) {
         AtlasRegion* ret;
         return _atlas->findRegion(name);
     }

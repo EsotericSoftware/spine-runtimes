@@ -33,7 +33,7 @@
 #include <spine/BoneData.h>
 
 namespace Spine {
-    IkConstraintData::IkConstraintData(std::string name) :
+    IkConstraintData::IkConstraintData(const String& name) :
     _name(name),
     _order(0),
     _target(NULL),
@@ -42,7 +42,7 @@ namespace Spine {
         // Empty
     }
     
-    const std::string& IkConstraintData::getName() {
+    const String& IkConstraintData::getName() {
         return _name;
     }
     

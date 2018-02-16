@@ -51,7 +51,7 @@ namespace Spine {
         RTTI_DECL
         
     public:
-        RegionAttachment(std::string name);
+        RegionAttachment(const String& name);
 
         void updateOffset();
         
@@ -87,9 +87,9 @@ namespace Spine {
         void setB(float inValue);
         float getA();
         void setA(float inValue);
-        
-        std::string getPath();
-        void setPath(std::string inValue);
+
+        const String& getPath();
+        void setPath(const String& inValue);
         void* getRendererObject();
         void setRendererObject(void* inValue);
         float getRegionOffsetX();
@@ -129,7 +129,7 @@ namespace Spine {
         Vector<float> _offset;
         Vector<float> _uvs;
         void* _rendererObject;
-        std::string _path;
+        String _path;
         float _regionU;
         float _regionV;
         float _regionU2;

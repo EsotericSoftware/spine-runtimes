@@ -32,10 +32,8 @@
 #define Spine_MeshAttachment_h
 
 #include <spine/VertexAttachment.h>
-
 #include <spine/Vector.h>
 
-#include <string>
 
 namespace Spine {
     /// Attachment that displays a texture region using a mesh.
@@ -47,7 +45,7 @@ namespace Spine {
         RTTI_DECL
         
     public:
-        MeshAttachment(std::string name);
+        MeshAttachment(const String& name);
 
         void updateUVs();
 
@@ -75,8 +73,8 @@ namespace Spine {
         float getA();
         void setA(float inValue);
         
-        std::string getPath();
-        void setPath(std::string inValue);
+        const String& getPath();
+        void setPath(const String& inValue);
         void* getRendererObject();
         void setRendererObject(void* inValue);
         
@@ -138,7 +136,7 @@ namespace Spine {
         Vector<short> _triangles;
         Vector<short> _edges;
         void* _rendererObject;
-        std::string _path;
+        String _path;
         float _regionU;
         float _regionV;
         float _regionU2;
