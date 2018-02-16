@@ -57,7 +57,7 @@ module spine.webgl {
 			this.vertices = Utils.newFloatArray(this.vertexSize * 1024);
 		}
 
-		draw (batcher: PolygonBatcher, skeleton: Skeleton) {
+		draw (batcher: PolygonBatcher, skeleton: Skeleton, slotRangeStart: number = -1, slotRangeEnd: number = -1) {
 			let clipper = this.clipper;
 			let premultipliedAlpha = this.premultipliedAlpha;
 			let twoColorTint = this.twoColorTint;
@@ -75,9 +75,25 @@ module spine.webgl {
 			let attachmentColor: Color = null;
 			let skeletonColor = skeleton.color;
 			let vertexSize = twoColorTint ? 12 : 8;
+			let inRange = false;
+			if (slotRangeStart == -1) inRange = true;
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				let clippedVertexSize = clipper.isClipping() ? 2 : vertexSize;
 				let slot = drawOrder[i];
+
+				if (slotRangeStart >= 0 && slotRangeStart == slot.data.index) {
+					inRange = true;
+				}
+
+				if (!inRange) {
+					clipper.clipEndWithSlot(slot);
+					continue;
+				}
+
+				if (slotRangeEnd >= 0 && slotRangeEnd == slot.data.index) {
+					inRange = false;
+				}
+
 				let attachment = slot.getAttachment();
 				let texture: GLTexture = null;
 				if (attachment instanceof RegionAttachment) {

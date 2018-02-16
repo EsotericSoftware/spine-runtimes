@@ -7,7 +7,7 @@
 var canvas = document.getElementsByTagName("canvas")[0];
 canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 var context = new spine.webgl.ManagedWebGLRenderingContext(canvas);
-var assetManager = new spine.webgl.AssetManager(context, "https://esotericsoftware.com/sketch/files/4772/");
+var assetManager = new spine.webgl.AssetManager(context, "../example/assets/");
 var renderer = new spine.webgl.SceneRenderer(canvas, context);
 var time = new spine.TimeKeeper();
 var loadingScreen = new spine.webgl.LoadingScreen(new spine.webgl.SceneRenderer(canvas, context));
@@ -15,16 +15,16 @@ var loadingScreen = new spine.webgl.LoadingScreen(new spine.webgl.SceneRenderer(
 var skeleton = null;
 var animationState = null;
 
-assetManager.loadText("Spineboy/spineboy-pro.json");
-assetManager.loadTextureAtlas("Spineboy/spineboy-pro.atlas");
+assetManager.loadText("spineboy-ess.json");
+assetManager.loadTextureAtlas("spineboy.atlas");
 
 requestAnimationFrame(load);
 
 function load () {
     if (assetManager.isLoadingComplete()) {
-        var atlas = assetManager.get("Spineboy/spineboy-pro.atlas");
+        var atlas = assetManager.get("spineboy.atlas");
         var skeletonJson = new spine.SkeletonJson(new spine.AtlasAttachmentLoader(atlas));
-        var skeletonData = skeletonJson.readSkeletonData(assetManager.get("Spineboy/spineboy-pro.json"));
+        var skeletonData = skeletonJson.readSkeletonData(assetManager.get("spineboy-ess.json"));
         var animationStateData = new spine.AnimationStateData(skeletonData);
 
         skeleton = new spine.Skeleton(skeletonData);

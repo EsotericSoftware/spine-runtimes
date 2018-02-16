@@ -8004,11 +8004,13 @@ var spine;
 				this.camera.update();
 				this.enableRenderer(this.batcher);
 			};
-			SceneRenderer.prototype.drawSkeleton = function (skeleton, premultipliedAlpha) {
+			SceneRenderer.prototype.drawSkeleton = function (skeleton, premultipliedAlpha, slotRangeStart, slotRangeEnd) {
 				if (premultipliedAlpha === void 0) { premultipliedAlpha = false; }
+				if (slotRangeStart === void 0) { slotRangeStart = -1; }
+				if (slotRangeEnd === void 0) { slotRangeEnd = -1; }
 				this.enableRenderer(this.batcher);
 				this.skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
-				this.skeletonRenderer.draw(this.batcher, skeleton);
+				this.skeletonRenderer.draw(this.batcher, skeleton, slotRangeStart, slotRangeEnd);
 			};
 			SceneRenderer.prototype.drawSkeletonDebug = function (skeleton, premultipliedAlpha, ignoredBones) {
 				if (premultipliedAlpha === void 0) { premultipliedAlpha = false; }
@@ -9157,7 +9159,9 @@ var spine;
 					this.vertexSize += 4;
 				this.vertices = spine.Utils.newFloatArray(this.vertexSize * 1024);
 			}
-			SkeletonRenderer.prototype.draw = function (batcher, skeleton) {
+			SkeletonRenderer.prototype.draw = function (batcher, skeleton, slotRangeStart, slotRangeEnd) {
+				if (slotRangeStart === void 0) { slotRangeStart = -1; }
+				if (slotRangeEnd === void 0) { slotRangeEnd = -1; }
 				var clipper = this.clipper;
 				var premultipliedAlpha = this.premultipliedAlpha;
 				var twoColorTint = this.twoColorTint;
@@ -9173,9 +9177,22 @@ var spine;
 				var attachmentColor = null;
 				var skeletonColor = skeleton.color;
 				var vertexSize = twoColorTint ? 12 : 8;
+				var inRange = false;
+				if (slotRangeStart == -1)
+					inRange = true;
 				for (var i = 0, n = drawOrder.length; i < n; i++) {
 					var clippedVertexSize = clipper.isClipping() ? 2 : vertexSize;
 					var slot = drawOrder[i];
+					if (slotRangeStart >= 0 && slotRangeStart == slot.data.index) {
+						inRange = true;
+					}
+					if (!inRange) {
+						clipper.clipEndWithSlot(slot);
+						continue;
+					}
+					if (slotRangeEnd >= 0 && slotRangeEnd == slot.data.index) {
+						inRange = false;
+					}
 					var attachment = slot.getAttachment();
 					var texture = null;
 					if (attachment instanceof spine.RegionAttachment) {
