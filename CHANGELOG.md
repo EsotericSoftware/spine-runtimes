@@ -242,6 +242,7 @@
  * Added two color tinting support, enabled by default. You can disable it via the constructors of `SceneRenderer`, `SkeletonRenderer`and `PolygonBatcher`. Note that you will need to use a shader created via `Shader.newTwoColoredTexturedShader` shader with `SkeletonRenderer` and `PolygonBatcher` if two color tinting is enabled.
  * Added clipping support
  * Added `VertexEffect` interface, instances of which can be set on `SkeletonRenderer`. Allows to modify vertices before submitting them to GPU. See `SwirlEffect`, `JitterEffect`, and the example which allows to set effects.
+ * Added `slotRangeStart` and `slotRangeEnd` parameters to `SkeletonRenderer#draw` and `SceneRenderer#drawSkeleton`. This allows you to render only a range of slots in the draw order. See `spine-ts/webgl/tests/test-slot-range.html` for an example.
 
 ### Canvas backend
  * Fixed renderer to work for 3.6 changes. Sadly, we can't support two color tinting via the Canvas API.
