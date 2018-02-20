@@ -29,6 +29,7 @@
 *****************************************************************************/
 
 #include <spine/MathUtil.h>
+#include <math.h>
 
 namespace Spine {
     float MathUtil::SIN_TABLE[SIN_COUNT] = {0.0f};
@@ -41,6 +42,34 @@ namespace Spine {
         for (int i = 0; i < 360; i += 90) {
             SIN_TABLE[i * DegToIndex & SIN_MASK] = sin(i * DegRad);
         }
+    }
+
+    int MathUtil::sign(float val) {
+        return (0 < val) - (val < 0);
+    }
+
+    bool MathUtil::areFloatsPracticallyEqual(float A, float B, float maxDiff, float maxRelDiff) {
+        // Check if the numbers are really close -- needed
+        // when comparing numbers near zero.
+        float diff = fabs(A - B);
+        if (diff <= maxDiff) {
+            return true;
+        }
+
+        A = fabs(A);
+        B = fabs(B);
+
+        float largest = (B > A) ? B : A;
+
+        if (diff <= largest * maxRelDiff) {
+            return true;
+        }
+
+        return false;
+    }
+
+    float MathUtil::clamp(float x, float lower, float upper) {
+        return fminf(upper, fmaxf(x, lower));
     }
     
     /// Returns the sine in radians from a lookup table.
@@ -92,5 +121,31 @@ namespace Spine {
         atan = SPINE_PI / 2 - z / (z * z + 0.28f);
         
         return y < 0.0f ? atan - SPINE_PI : atan;
+    }
+
+    float MathUtil::acos(float v) {
+        return ::acos(v);
+    }
+
+    float MathUtil::sqrt(float v) {
+        return ::sqrt(v);
+    }
+
+    float MathUtil::fmod(float a, float b) {
+        return ::fmod(a, b);
+    }
+
+    float MathUtil::abs(float v) {
+        return ::fabs(v);
+    }
+
+    /* Need to pass 0 as an argument, so VC++ doesn't error with C2124 */
+    static bool _isNan(float value, float zero) {
+        float _nan =  (float)0.0 / zero;
+        return 0 == memcmp((void*)&value, (void*)&_nan, sizeof(value));
+    }
+
+    bool MathUtil::isNan(float v) {
+        return _isNan(v, 0);
     }
 }

@@ -161,7 +161,7 @@ namespace Spine {
             case TransformMode_NoRotationOrReflection: {
                 float s = pa * pa + pc * pc, prx;
                 if (s > 0.0001f) {
-                    s = fabs(pa * pd - pb * pc) / s;
+                    s = MathUtil::abs(pa * pd - pb * pc) / s;
                     pb = pc * s;
                     pd = pa * s;
                     prx = MathUtil::atan2(pc, pa) * RadDeg;
@@ -191,14 +191,14 @@ namespace Spine {
                 float sin = MathUtil::sinDeg(rotation);
                 float za = pa * cos + pb * sin;
                 float zc = pc * cos + pd * sin;
-                float s = sqrt(za * za + zc * zc);
+                float s = MathUtil::sqrt(za * za + zc * zc);
                 if (s > 0.00001f) {
                     s = 1 / s;
                 }
                 
                 za *= s;
                 zc *= s;
-                s = sqrt(za * za + zc * zc);
+                s = MathUtil::sqrt(za * za + zc * zc);
                 float r = SPINE_PI / 2 + MathUtil::atan2(zc, za);
                 float zb = MathUtil::cos(r) * s;
                 float zd = MathUtil::sin(r) * s;
@@ -510,11 +510,11 @@ namespace Spine {
     }
     
     float Bone::getWorldScaleX() {
-        return sqrt(_a * _a + _c * _c);
+        return MathUtil::sqrt(_a * _a + _c * _c);
     }
     
     float Bone::getWorldScaleY() {
-        return sqrt(_b * _b + _d * _d);
+        return MathUtil::sqrt(_b * _b + _d * _d);
     }
     
     void Bone::updateAppliedTransform() {
@@ -524,8 +524,8 @@ namespace Spine {
             _ax = _worldX;
             _ay = _worldY;
             _arotation = MathUtil::atan2(_c, _a) * RadDeg;
-            _ascaleX = sqrt(_a * _a + _c * _c);
-            _ascaleY = sqrt(_b * _b + _d * _d);
+            _ascaleX = MathUtil::sqrt(_a * _a + _c * _c);
+            _ascaleY = MathUtil::sqrt(_b * _b + _d * _d);
             _ashearX = 0;
             _ashearY = MathUtil::atan2(_a * _b + _c * _d, _a * _d - _b * _c) * RadDeg;
             
@@ -555,7 +555,7 @@ namespace Spine {
         float rd = id * _d - ic * _b;
         
         _ashearX = 0;
-        _ascaleX = sqrt(ra * ra + rc * rc);
+        _ascaleX = MathUtil::sqrt(ra * ra + rc * rc);
         
         if (_ascaleX > 0.0001f) {
             float det = ra * rd - rb * rc;
@@ -565,7 +565,7 @@ namespace Spine {
         }
         else {
             _ascaleX = 0;
-            _ascaleY = sqrt(rb * rb + rd * rd);
+            _ascaleY = MathUtil::sqrt(rb * rb + rd * rd);
             _ashearY = 0;
             _arotation = 90 - MathUtil::atan2(rd, rb) * RadDeg;
         }

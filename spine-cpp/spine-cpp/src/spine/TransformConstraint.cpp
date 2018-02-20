@@ -171,17 +171,17 @@ namespace Spine {
             }
             
             if (scaleMix > 0) {
-                float s = sqrt(bone._a * bone._a + bone._c * bone._c);
+                float s = MathUtil::sqrt(bone._a * bone._a + bone._c * bone._c);
                 
                 if (s > 0.00001f) {
-                    s = (s + (sqrt(ta * ta + tc * tc) - s + _data._offsetScaleX) * scaleMix) / s;
+                    s = (s + (MathUtil::sqrt(ta * ta + tc * tc) - s + _data._offsetScaleX) * scaleMix) / s;
                 }
                 bone._a *= s;
                 bone._c *= s;
-                s = sqrt(bone._b * bone._b + bone._d * bone._d);
+                s = MathUtil::sqrt(bone._b * bone._b + bone._d * bone._d);
                 
                 if (s > 0.00001f) {
-                    s = (s + (sqrt(tb * tb + td * td) - s + _data._offsetScaleY) * scaleMix) / s;
+                    s = (s + (MathUtil::sqrt(tb * tb + td * td) - s + _data._offsetScaleY) * scaleMix) / s;
                 }
                 bone._b *= s;
                 bone._d *= s;
@@ -200,7 +200,7 @@ namespace Spine {
                 }
                 
                 r = by + (r + offsetShearY) * shearMix;
-                float s = sqrt(b * b + d * d);
+                float s = MathUtil::sqrt(b * b + d * d);
                 bone._b = MathUtil::cos(r) * s;
                 bone._d = MathUtil::sin(r) * s;
                 modified = true;
@@ -252,10 +252,10 @@ namespace Spine {
             }
             
             if (scaleMix > 0) {
-                float s = (sqrt(ta * ta + tc * tc) - 1 + _data._offsetScaleX) * scaleMix + 1;
+                float s = (MathUtil::sqrt(ta * ta + tc * tc) - 1 + _data._offsetScaleX) * scaleMix + 1;
                 bone._a *= s;
                 bone._c *= s;
-                s = (sqrt(tb * tb + td * td) - 1 + _data._offsetScaleY) * scaleMix + 1;
+                s = (MathUtil::sqrt(tb * tb + td * td) - 1 + _data._offsetScaleY) * scaleMix + 1;
                 bone._b *= s;
                 bone._d *= s;
                 modified = true;
@@ -272,7 +272,7 @@ namespace Spine {
                 
                 float b = bone._b, d = bone._d;
                 r = MathUtil::atan2(d, b) + (r - SPINE_PI / 2 + offsetShearY) * shearMix;
-                float s = sqrt(b * b + d * d);
+                float s = MathUtil::sqrt(b * b + d * d);
                 bone._b = MathUtil::cos(r) * s;
                 bone._d = MathUtil::sin(r) * s;
                 modified = true;

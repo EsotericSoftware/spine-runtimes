@@ -37,7 +37,6 @@
 #include <spine/ContainerUtil.h>
 
 #include <assert.h>
-#include <math.h> /* fmod */
 
 namespace Spine {
     Animation::Animation(const String& name, Vector<Timeline*>& timelines, float duration) :
@@ -53,9 +52,9 @@ namespace Spine {
     
     void Animation::apply(Skeleton& skeleton, float lastTime, float time, bool loop, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
         if (loop && _duration != 0) {
-            time = fmod(time, _duration);
+            time = MathUtil::fmod(time, _duration);
             if (lastTime > 0) {
-                lastTime = fmod(lastTime, _duration);
+                lastTime = MathUtil::fmod(lastTime, _duration);
             }
         }
         

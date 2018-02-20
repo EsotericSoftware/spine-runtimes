@@ -118,7 +118,7 @@ namespace Spine {
                 else {
                     float x = setupLength * bone._a;
                     float y = setupLength * bone._c;
-                    float length = sqrt(x * x + y * y);
+                    float length = MathUtil::sqrt(x * x + y * y);
                     if (scale) {
                         _lengths[i] = length;
                     }
@@ -159,7 +159,7 @@ namespace Spine {
             if (scale) {
                 float length = _lengths[i];
                 if (length >= PathConstraint::EPSILON) {
-                    float s = (sqrt(dx * dx + dy * dy) / length - 1) * rotateMix + 1;
+                    float s = (MathUtil::sqrt(dx * dx + dy * dy) / length - 1) * rotateMix + 1;
                     bone._a *= s;
                     bone._c *= s;
                 }
@@ -298,7 +298,7 @@ namespace Spine {
                 float p = position;
                 
                 if (closed) {
-                    p = fmod(p, pathLength);
+                    p = MathUtil::fmod(p, pathLength);
                     
                     if (p < 0) {
                         p += pathLength;
@@ -398,18 +398,18 @@ namespace Spine {
             ddfy = tmpy * 2 + dddfy;
             dfx = (cx1 - x1) * 0.75f + tmpx + dddfx * 0.16666667f;
             dfy = (cy1 - y1) * 0.75f + tmpy + dddfy * 0.16666667f;
-            pathLength += sqrt(dfx * dfx + dfy * dfy);
+            pathLength += MathUtil::sqrt(dfx * dfx + dfy * dfy);
             dfx += ddfx;
             dfy += ddfy;
             ddfx += dddfx;
             ddfy += dddfy;
-            pathLength += sqrt(dfx * dfx + dfy * dfy);
+            pathLength += MathUtil::sqrt(dfx * dfx + dfy * dfy);
             dfx += ddfx;
             dfy += ddfy;
-            pathLength += sqrt(dfx * dfx + dfy * dfy);
+            pathLength += MathUtil::sqrt(dfx * dfx + dfy * dfy);
             dfx += ddfx + dddfx;
             dfy += ddfy + dddfy;
-            pathLength += sqrt(dfx * dfx + dfy * dfy);
+            pathLength += MathUtil::sqrt(dfx * dfx + dfy * dfy);
             _curves[i] = pathLength;
             x1 = x2;
             y1 = y2;
@@ -432,7 +432,7 @@ namespace Spine {
             float p = position;
             
             if (closed) {
-                p = fmod(p, pathLength);
+                p = MathUtil::fmod(p, pathLength);
                 
                 if (p < 0) {
                     p += pathLength;
@@ -485,23 +485,23 @@ namespace Spine {
                 ddfy = tmpy * 2 + dddfy;
                 dfx = (cx1 - x1) * 0.3f + tmpx + dddfx * 0.16666667f;
                 dfy = (cy1 - y1) * 0.3f + tmpy + dddfy * 0.16666667f;
-                curveLength = sqrt(dfx * dfx + dfy * dfy);
+                curveLength = MathUtil::sqrt(dfx * dfx + dfy * dfy);
                 _segments[0] = curveLength;
                 for (ii = 1; ii < 8; ii++) {
                     dfx += ddfx;
                     dfy += ddfy;
                     ddfx += dddfx;
                     ddfy += dddfy;
-                    curveLength += sqrt(dfx * dfx + dfy * dfy);
+                    curveLength += MathUtil::sqrt(dfx * dfx + dfy * dfy);
                     _segments[ii] = curveLength;
                 }
                 dfx += ddfx;
                 dfy += ddfy;
-                curveLength += sqrt(dfx * dfx + dfy * dfy);
+                curveLength += MathUtil::sqrt(dfx * dfx + dfy * dfy);
                 _segments[8] = curveLength;
                 dfx += ddfx + dddfx;
                 dfy += ddfy + dddfy;
-                curveLength += sqrt(dfx * dfx + dfy * dfy);
+                curveLength += MathUtil::sqrt(dfx * dfx + dfy * dfy);
                 _segments[9] = curveLength;
                 segment = 0;
             }
@@ -553,7 +553,7 @@ namespace Spine {
     }
     
     void PathConstraint::addCurvePosition(float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2, Vector<float>& output, int o, bool tangents) {
-        if (p < EPSILON || isnan(p)) {
+        if (p < EPSILON || MathUtil::isNan(p)) {
             p = EPSILON;
         }
         
@@ -563,7 +563,7 @@ namespace Spine {
         output[o] = x;
         output[o + 1] = y;
         if (tangents) {
-            output[o + 2] = atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+            output[o + 2] = MathUtil::atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
         }
     }
 }

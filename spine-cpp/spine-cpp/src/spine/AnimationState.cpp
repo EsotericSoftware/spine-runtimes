@@ -90,7 +90,7 @@ namespace Spine {
                 return _animationStart;
             }
 
-            return fmodf(_trackTime, duration) + _animationStart;
+            return MathUtil::fmod(_trackTime, duration) + _animationStart;
         }
 
         return MIN(_trackTime + _animationStart, _animationEnd);
@@ -705,17 +705,17 @@ namespace Spine {
             
             bool current = diff > 0, dir = lastTotal >= 0;
             // Detect cross at 0 (not 180).
-            if (sign(lastDiff) != sign(diff) && fabs(lastDiff) <= 90) {
+            if (MathUtil::sign(lastDiff) != MathUtil::sign(diff) && MathUtil::abs(lastDiff) <= 90) {
                 // A cross after a 360 rotation is a loop.
-                if (fabs(lastTotal) > 180) {
-                    lastTotal += 360 * sign(lastTotal);
+                if (MathUtil::abs(lastTotal) > 180) {
+                    lastTotal += 360 * MathUtil::sign(lastTotal);
                 }
                 dir = current;
             }
             
-            total = diff + lastTotal - fmod(lastTotal, 360); // Store loops as part of lastTotal.
+            total = diff + lastTotal - MathUtil::fmod(lastTotal, 360); // Store loops as part of lastTotal.
             if (dir != current) {
-                total += 360 * sign(lastTotal);
+                total += 360 * MathUtil::sign(lastTotal);
             }
             timelinesRotation[i] = total;
         }
@@ -847,7 +847,7 @@ namespace Spine {
     void AnimationState::queueEvents(TrackEntry* entry, float animationTime) {
         float animationStart = entry->_animationStart, animationEnd = entry->_animationEnd;
         float duration = animationEnd - animationStart;
-        float trackLastWrapped = fmodf(entry->_trackLast, duration);
+        float trackLastWrapped = MathUtil::fmod(entry->_trackLast, duration);
         
         // Queue events before complete.
         int i = 0, n = static_cast<int>(_events.size());
@@ -864,7 +864,7 @@ namespace Spine {
         }
         
         // Queue complete if completed a loop iteration or the animation.
-        if (entry->_loop ? (trackLastWrapped > fmod(entry->_trackTime, duration)) : (animationTime >= animationEnd && entry->_animationLast < animationEnd)) {
+        if (entry->_loop ? (trackLastWrapped > MathUtil::fmod(entry->_trackTime, duration)) : (animationTime >= animationEnd && entry->_animationLast < animationEnd)) {
             _queue->complete(entry);
         }
         

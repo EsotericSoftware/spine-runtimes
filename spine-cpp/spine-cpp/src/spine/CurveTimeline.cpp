@@ -85,7 +85,7 @@ namespace Spine {
     }
     
     float CurveTimeline::getCurvePercent(int frameIndex, float percent) {
-        percent = clamp(percent, 0, 1);
+        percent = MathUtil::clamp(percent, 0, 1);
         int i = frameIndex * BEZIER_SIZE;
         float type = _curves[i];
         

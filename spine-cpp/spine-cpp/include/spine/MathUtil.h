@@ -33,8 +33,8 @@
 
 #include <spine/SpineObject.h>
 
-#include <math.h>
 #include <float.h>
+#include <string.h>
 
 #define SPINE_PI 3.1415927f
 #define SPINE_PI_2 (SPINE_PI * 2)
@@ -50,39 +50,20 @@
 #define MAX(a, b) ((((a) > (b)) ? (a) : (b)))
 #define MIN(a, b) ((((a) < (b)) ? (a) : (b)))
 
+
 namespace Spine {
-    template <typename T>
-    int sign(T val) {
-        return (T(0) < val) - (val < T(0));
-    }
-    
-    inline bool areFloatsPracticallyEqual(float A, float B, float maxDiff = 0.0000000000000001f, float maxRelDiff = FLT_EPSILON) {
-        // Check if the numbers are really close -- needed
-        // when comparing numbers near zero.
-        float diff = fabs(A - B);
-        if (diff <= maxDiff) {
-            return true;
-        }
-        
-        A = fabs(A);
-        B = fabs(B);
-        
-        float largest = (B > A) ? B : A;
-        
-        if (diff <= largest * maxRelDiff) {
-            return true;
-        }
-        
-        return false;
-    }
-    
-    inline float clamp(float x, float lower, float upper) {
-        return fminf(upper, fmaxf(x, lower));
-    }
     
     class MathUtil : public SpineObject {
     public:
         MathUtil();
+
+        static int sign(float val);
+
+        static bool areFloatsPracticallyEqual(float A, float B, float maxDiff = 0.0000000000000001f, float maxRelDiff = FLT_EPSILON);
+
+        static float clamp(float x, float lower, float upper);
+
+        static float abs(float v);
         
         /// Returns the sine in radians from a lookup table.
         static float sin(float radians);
@@ -99,6 +80,14 @@ namespace Spine {
         /// Returns atan2 in radians, faster but less accurate than Math.Atan2. Average error of 0.00231 radians (0.1323
         /// degrees), largest error of 0.00488 radians (0.2796 degrees).
         static float atan2(float y, float x);
+
+        static float acos(float v);
+
+        static float sqrt(float v);
+
+        static float fmod(float a, float b);
+
+        static bool isNan(float v);
     
     private:
         static float SIN_TABLE[SIN_COUNT];
