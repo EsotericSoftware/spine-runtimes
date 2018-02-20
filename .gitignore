@@ -16,6 +16,8 @@ target
 .idea/
 build/
 
+cmake-build-debug/
+
 spine-c/Debug/*
 
 spine-cpp/Debug/*
