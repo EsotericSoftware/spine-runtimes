@@ -35,10 +35,10 @@
 
 namespace Spine {
     SkeletonClipping::SkeletonClipping() : _clipAttachment(NULL) {
-        _clipOutput.reserve(128);
-        _clippedVertices.reserve(128);
-        _clippedTriangles.reserve(128);
-        _clippedUVs.reserve(128);
+		_clipOutput.ensureCapacity(128);
+		_clippedVertices.ensureCapacity(128);
+		_clippedTriangles.ensureCapacity(128);
+		_clippedUVs.ensureCapacity(128);
     }
     
     int SkeletonClipping::clipStart(Slot& slot, ClippingAttachment* clip) {
@@ -49,7 +49,7 @@ namespace Spine {
         _clipAttachment = clip;
 
         int n = clip->getWorldVerticesLength();
-        _clippingPolygon.reserve(n);
+		_clippingPolygon.ensureCapacity(n);
         _clippingPolygon.setSize(n);
         clip->computeWorldVertices(slot, 0, n, _clippingPolygon, 0, 2);
         makeClockwise(_clippingPolygon);
@@ -61,8 +61,8 @@ namespace Spine {
             Vector<float>* polygonP = (*i);
             Vector<float>& polygon = *polygonP;
             makeClockwise(polygon);
-            polygon.push_back(polygon[0]);
-            polygon.push_back(polygon[1]);
+            polygon.add(polygon[0]);
+            polygon.add(polygon[1]);
         }
         
         return static_cast<int>(_clippingPolygons.size());
@@ -122,9 +122,9 @@ namespace Spine {
                     float d = 1 / (d0 * d2 + d1 * (y1 - y3));
 
                     int clipOutputCount = clipOutputLength >> 1;
-                    clippedVertices.reserve(s + clipOutputCount * 2);
+					clippedVertices.ensureCapacity(s + clipOutputCount * 2);
                     clippedVertices.setSize(s + clipOutputCount * 2);
-                    _clippedUVs.reserve(s + clipOutputCount * 2);
+					_clippedUVs.ensureCapacity(s + clipOutputCount * 2);
                     _clippedUVs.setSize(s + clipOutputCount * 2);
                     for (int ii = 0; ii < clipOutputLength; ii += 2) {
                         float x = clipOutput[ii], y = clipOutput[ii + 1];
@@ -140,7 +140,7 @@ namespace Spine {
                     }
 
                     s = static_cast<int>(clippedTriangles.size());
-                    clippedTriangles.reserve(s + 3 * (clipOutputCount - 2));
+					clippedTriangles.ensureCapacity(s + 3 * (clipOutputCount - 2));
                     clippedTriangles.setSize(s + 3 * (clipOutputCount - 2));
                     clipOutputCount--;
                     for (int ii = 1; ii < clipOutputCount; ii++) {
@@ -152,9 +152,9 @@ namespace Spine {
                     index += clipOutputCount + 1;
                 }
                 else {
-                    clippedVertices.reserve(s + 3 * 2);
+					clippedVertices.ensureCapacity(s + 3 * 2);
                     clippedVertices.setSize(s + 3 * 2);
-                    _clippedUVs.reserve(s + 3 * 2);
+					_clippedUVs.ensureCapacity(s + 3 * 2);
                     _clippedUVs.setSize(s + 3 * 2);
                     clippedVertices[s] = x1;
                     clippedVertices[s + 1] = y1;
@@ -171,7 +171,7 @@ namespace Spine {
                     _clippedUVs[s + 5] = v3;
 
                     s = static_cast<int>(clippedTriangles.size());
-                    clippedTriangles.reserve(s + 3);
+					clippedTriangles.ensureCapacity(s + 3);
                     clippedTriangles.setSize(s + 3);
                     clippedTriangles[s] = index;
                     clippedTriangles[s + 1] = index + 1;
@@ -214,14 +214,14 @@ namespace Spine {
         }
 
         input.clear();
-        input.push_back(x1);
-        input.push_back(y1);
-        input.push_back(x2);
-        input.push_back(y2);
-        input.push_back(x3);
-        input.push_back(y3);
-        input.push_back(x1);
-        input.push_back(y1);
+        input.add(x1);
+        input.add(y1);
+        input.add(x2);
+        input.add(y2);
+        input.add(x3);
+        input.add(y3);
+        input.add(x1);
+        input.add(y1);
         output.clear();
 
         Vector<float>& clippingVertices = clippingArea;
@@ -240,24 +240,24 @@ namespace Spine {
                 if (deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0) {
                     if (side2) {
                         // v1 inside, v2 inside
-                        output.push_back(inputX2);
-                        output.push_back(inputY2);
+                        output.add(inputX2);
+                        output.add(inputY2);
                         continue;
                     }
                     // v1 inside, v2 outside
                     float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
                     float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
-                    output.push_back(edgeX + (edgeX2 - edgeX) * ua);
-                    output.push_back(edgeY + (edgeY2 - edgeY) * ua);
+                    output.add(edgeX + (edgeX2 - edgeX) * ua);
+                    output.add(edgeY + (edgeY2 - edgeY) * ua);
                 }
                 else if (side2) {
                     // v1 outside, v2 inside
                     float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
                     float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
-                    output.push_back(edgeX + (edgeX2 - edgeX) * ua);
-                    output.push_back(edgeY + (edgeY2 - edgeY) * ua);
-                    output.push_back(inputX2);
-                    output.push_back(inputY2);
+                    output.add(edgeX + (edgeX2 - edgeX) * ua);
+                    output.add(edgeY + (edgeY2 - edgeY) * ua);
+                    output.add(inputX2);
+                    output.add(inputY2);
                 }
                 clipped = true;
             }
@@ -268,8 +268,8 @@ namespace Spine {
                 return true;
             }
 
-            output.push_back(output[0]);
-            output.push_back(output[1]);
+            output.add(output[0]);
+            output.add(output[1]);
 
             if (i == clippingVerticesLast) {
                 break;
@@ -283,11 +283,11 @@ namespace Spine {
         if (originalOutput != output) {
             originalOutput.clear();
             for (int i = 0, n = static_cast<int>(output.size()) - 2; i < n; ++i) {
-                originalOutput.push_back(output[i]);
+                originalOutput.add(output[i]);
             }
         }
         else {
-            originalOutput.reserve(originalOutput.size() - 2);
+			originalOutput.ensureCapacity(originalOutput.size() - 2);
             originalOutput.setSize(originalOutput.size() - 2);
         }
 

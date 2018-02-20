@@ -44,14 +44,14 @@ namespace Spine {
     RTTI_IMPL(DeformTimeline, CurveTimeline);
     
     DeformTimeline::DeformTimeline(int frameCount) : CurveTimeline(frameCount), _slotIndex(0), _attachment(NULL) {
-        _frames.reserve(frameCount);
-        _frameVertices.reserve(frameCount);
+        _frames.ensureCapacity(frameCount);
+        _frameVertices.ensureCapacity(frameCount);
         
         _frames.setSize(frameCount);
         
         for (int i = 0; i < frameCount; ++i) {
             Vector<float> vec;
-            _frameVertices.push_back(vec);
+            _frameVertices.add(vec);
         }
     }
     
@@ -87,7 +87,7 @@ namespace Spine {
                     }
                     
                     // Ensure size and preemptively set count.
-                    vertices.reserve(vertexCount);
+                    vertices.ensureCapacity(vertexCount);
                     vertices.setSize(vertexCount);
                     
                     if (vertexAttachment->_bones.size() == 0) {
@@ -111,7 +111,7 @@ namespace Spine {
         }
         
         // Ensure size and preemptively set count.
-        vertices.reserve(vertexCount);
+        vertices.ensureCapacity(vertexCount);
         vertices.setSize(vertexCount);
         
         if (time >= _frames[_frames.size() - 1]) {
@@ -122,7 +122,7 @@ namespace Spine {
                 vertices.clear();
                 for (int i = 0; i < vertexCount; ++i) {
                     float vertex = lastVertices[i];
-                    vertices.push_back(vertex);
+                    vertices.add(vertex);
                 }
             }
             else if (pose == MixPose_Setup) {

@@ -42,13 +42,13 @@ namespace Spine {
     RTTI_IMPL(AttachmentTimeline, Timeline);
     
     AttachmentTimeline::AttachmentTimeline(int frameCount) : Timeline(), _slotIndex(0) {
-        _frames.reserve(frameCount);
-        _attachmentNames.reserve(frameCount);
+        _frames.ensureCapacity(frameCount);
+        _attachmentNames.ensureCapacity(frameCount);
         
         _frames.setSize(frameCount);
         
         for (int i = 0; i < frameCount; ++i) {
-            _attachmentNames.push_back(String());
+            _attachmentNames.add(String());
         }
     }
     

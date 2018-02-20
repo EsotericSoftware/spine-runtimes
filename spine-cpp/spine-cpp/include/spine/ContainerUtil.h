@@ -112,8 +112,8 @@ namespace Spine {
                 T* item = items[i];
                 
                 delete item;
-                
-                items.erase(i);
+
+                items.removeAt(i);
             }
         }
         

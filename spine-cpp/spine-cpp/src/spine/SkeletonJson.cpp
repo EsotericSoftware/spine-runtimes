@@ -144,7 +144,7 @@ namespace Spine {
 
         /* Bones. */
         bones = Json::getItem(root, "bones");
-        skeletonData->_bones.reserve(bones->_size);
+        skeletonData->_bones.ensureCapacity(bones->_size);
         skeletonData->_bones.setSize(bones->_size);
         int bonesCount = 0;
         for (boneMap = bones->_child, i = 0; boneMap; boneMap = boneMap->_next, ++i) {
@@ -198,7 +198,7 @@ namespace Spine {
         slots = Json::getItem(root, "slots");
         if (slots) {
             Json *slotMap;
-            skeletonData->_slots.reserve(slots->_size);
+            skeletonData->_slots.ensureCapacity(slots->_size);
             skeletonData->_slots.setSize(slots->_size);
             for (slotMap = slots->_child, i = 0; slotMap; slotMap = slotMap->_next, ++i) {
                 SlotData* data;
@@ -259,7 +259,7 @@ namespace Spine {
         ik = Json::getItem(root, "ik");
         if (ik) {
             Json *constraintMap;
-            skeletonData->_ikConstraints.reserve(ik->_size);
+            skeletonData->_ikConstraints.ensureCapacity(ik->_size);
             skeletonData->_ikConstraints.setSize(ik->_size);
             for (constraintMap = ik->_child, i = 0; constraintMap; constraintMap = constraintMap->_next, ++i) {
                 const char* targetName;
@@ -269,7 +269,7 @@ namespace Spine {
                 data->_order = Json::getInt(constraintMap, "order", 0);
 
                 boneMap = Json::getItem(constraintMap, "bones");
-                data->_bones.reserve(boneMap->_size);
+                data->_bones.ensureCapacity(boneMap->_size);
                 data->_bones.setSize(boneMap->_size);
                 for (boneMap = boneMap->_child, ii = 0; boneMap; boneMap = boneMap->_next, ++ii) {
                     data->_bones[ii] = skeletonData->findBone(boneMap->_valueString);
@@ -299,7 +299,7 @@ namespace Spine {
         transform = Json::getItem(root, "transform");
         if (transform) {
             Json *constraintMap;
-            skeletonData->_transformConstraints.reserve(transform->_size);
+            skeletonData->_transformConstraints.ensureCapacity(transform->_size);
             skeletonData->_transformConstraints.setSize(transform->_size);
             for (constraintMap = transform->_child, i = 0; constraintMap; constraintMap = constraintMap->_next, ++i) {
                 const char* name;
@@ -309,7 +309,7 @@ namespace Spine {
                 data->_order = Json::getInt(constraintMap, "order", 0);
 
                 boneMap = Json::getItem(constraintMap, "bones");
-                data->_bones.reserve(boneMap->_size);
+                data->_bones.ensureCapacity(boneMap->_size);
                 data->_bones.setSize(boneMap->_size);
                 for (boneMap = boneMap->_child, ii = 0; boneMap; boneMap = boneMap->_next, ++ii) {
                     data->_bones[ii] = skeletonData->findBone(boneMap->_valueString);
@@ -350,7 +350,7 @@ namespace Spine {
         path = Json::getItem(root, "path");
         if (path) {
             Json *constraintMap;
-            skeletonData->_pathConstraints.reserve(path->_size);
+            skeletonData->_pathConstraints.ensureCapacity(path->_size);
             skeletonData->_pathConstraints.setSize(path->_size);
             for (constraintMap = path->_child, i = 0; constraintMap; constraintMap = constraintMap->_next, ++i) {
                 const char* name;
@@ -361,7 +361,7 @@ namespace Spine {
                 data->_order = Json::getInt(constraintMap, "order", 0);
 
                 boneMap = Json::getItem(constraintMap, "bones");
-                data->_bones.reserve(boneMap->_size);
+                data->_bones.ensureCapacity(boneMap->_size);
                 data->_bones.setSize(boneMap->_size);
                 for (boneMap = boneMap->_child, ii = 0; boneMap; boneMap = boneMap->_next, ++ii) {
                     data->_bones[ii] = skeletonData->findBone(boneMap->_valueString);
@@ -430,7 +430,7 @@ namespace Spine {
         skins = Json::getItem(root, "skins");
         if (skins) {
             Json *skinMap;
-            skeletonData->_skins.reserve(skins->_size);
+            skeletonData->_skins.ensureCapacity(skins->_size);
             skeletonData->_skins.setSize(skins->_size);
             int skinsIndex = 0;
             for (skinMap = skins->_child, i = 0; skinMap; skinMap = skinMap->_next, ++i) {
@@ -536,7 +536,7 @@ namespace Spine {
                                 if (!entry) {
                                     int verticesLength;
                                     entry = Json::getItem(attachmentMap, "triangles");
-                                    mesh->_triangles.reserve(entry->_size);
+                                    mesh->_triangles.ensureCapacity(entry->_size);
                                     mesh->_triangles.setSize(entry->_size);
                                     for (entry = entry->_child, ii = 0; entry; entry = entry->_next, ++ii) {
                                         mesh->_triangles[ii] = (unsigned short)entry->_valueInt;
@@ -544,7 +544,7 @@ namespace Spine {
 
                                     entry = Json::getItem(attachmentMap, "uvs");
                                     verticesLength = entry->_size;
-                                    mesh->_regionUVs.reserve(verticesLength);
+                                    mesh->_regionUVs.ensureCapacity(verticesLength);
                                     mesh->_regionUVs.setSize(verticesLength);
                                     for (entry = entry->_child, ii = 0; entry; entry = entry->_next, ++ii) {
                                         mesh->_regionUVs[ii] = entry->_valueFloat;
@@ -558,7 +558,7 @@ namespace Spine {
 
                                     entry = Json::getItem(attachmentMap, "edges");
                                     if (entry) {
-                                        mesh->_edges.reserve(entry->_size);
+                                        mesh->_edges.ensureCapacity(entry->_size);
                                         mesh->_edges.setSize(entry->_size);
                                         for (entry = entry->_child, ii = 0; entry; entry = entry->_next, ++ii) {
                                             mesh->_edges[ii] = entry->_valueInt;
@@ -568,7 +568,7 @@ namespace Spine {
                                 else {
                                     mesh->_inheritDeform = Json::getInt(attachmentMap, "deform", 1);
                                     LinkedMesh* linkedMesh = new (__FILE__, __LINE__) LinkedMesh(mesh, String(Json::getString(attachmentMap, "skin", 0)), slotIndex, String(entry->_valueString));
-                                    _linkedMeshes.push_back(linkedMesh);
+									_linkedMeshes.add(linkedMesh);
                                 }
                                 break;
                             }
@@ -592,7 +592,7 @@ namespace Spine {
                                 vertexCount = Json::getInt(attachmentMap, "vertexCount", 0);
                                 readVertices(attachmentMap, pathAttatchment, vertexCount << 1);
 
-                                pathAttatchment->_lengths.reserve(vertexCount / 3);
+                                pathAttatchment->_lengths.ensureCapacity(vertexCount / 3);
                                 pathAttatchment->_lengths.setSize(vertexCount / 3);
 
                                 curves = Json::getItem(attachmentMap, "lengths");
@@ -658,7 +658,7 @@ namespace Spine {
         events = Json::getItem(root, "events");
         if (events) {
             Json *eventMap;
-            skeletonData->_events.reserve(events->_size);
+            skeletonData->_events.ensureCapacity(events->_size);
             skeletonData->_events.setSize(events->_size);
             for (eventMap = events->_child, i = 0; eventMap; eventMap = eventMap->_next, ++i) {
                 EventData* eventData = new (__FILE__, __LINE__) EventData(String(eventMap->_name));
@@ -675,7 +675,7 @@ namespace Spine {
         animations = Json::getItem(root, "animations");
         if (animations) {
             Json *animationMap;
-            skeletonData->_animations.reserve(animations->_size);
+            skeletonData->_animations.ensureCapacity(animations->_size);
             skeletonData->_animations.setSize(animations->_size);
             int animationsIndex = 0;
             for (animationMap = animations->_child; animationMap; animationMap = animationMap->_next) {
@@ -805,7 +805,7 @@ namespace Spine {
                         String attachmentName = name->_type == Json::JSON_NULL ? "" : name->_valueString;
                         timeline->setFrame(frameIndex, Json::getFloat(valueMap, "time", 0), attachmentName);
                     }
-                    timelines.push_back(timeline);
+					timelines.add(timeline);
                     timelinesCount++;
                     duration = MAX(duration, timeline->_frames[timelineMap->_size - 1]);
 
@@ -820,7 +820,7 @@ namespace Spine {
                         timeline->setFrame(frameIndex, Json::getFloat(valueMap, "time", 0), toColor(s, 0), toColor(s, 1), toColor(s, 2), toColor(s, 3));
                         readCurve(valueMap, timeline, frameIndex);
                     }
-                    timelines.push_back(timeline);
+					timelines.add(timeline);
                     timelinesCount++;
                     duration = MAX(duration, timeline->_frames[(timelineMap->_size - 1) * ColorTimeline::ENTRIES]);
 
@@ -837,7 +837,7 @@ namespace Spine {
                                                     toColor(s, 3), toColor(ds, 0), toColor(ds, 1), toColor(ds, 2));
                         readCurve(valueMap, timeline, frameIndex);
                     }
-                    timelines.push_back(timeline);
+					timelines.add(timeline);
                     timelinesCount++;
                     duration = MAX(duration, timeline->_frames[(timelineMap->_size - 1) * TwoColorTimeline::ENTRIES]);
                 }
@@ -870,7 +870,7 @@ namespace Spine {
                         timeline->setFrame(frameIndex, Json::getFloat(valueMap, "time", 0), Json::getFloat(valueMap, "angle", 0));
                         readCurve(valueMap, timeline, frameIndex);
                     }
-                    timelines.push_back(timeline);
+					timelines.add(timeline);
                     timelinesCount++;
                     duration = MAX(duration, timeline->_frames[(timelineMap->_size - 1) * RotateTimeline::ENTRIES]);
                 }
@@ -897,7 +897,7 @@ namespace Spine {
                             readCurve(valueMap, timeline, frameIndex);
                         }
 
-                        timelines.push_back(timeline);
+						timelines.add(timeline);
                     timelinesCount++;
                         duration = MAX(duration, timeline->_frames[(timelineMap->_size - 1) * TranslateTimeline::ENTRIES]);
                     }
@@ -925,7 +925,7 @@ namespace Spine {
                 timeline->setFrame(frameIndex, Json::getFloat(valueMap, "time", 0), Json::getFloat(valueMap, "mix", 1), Json::getInt(valueMap, "bendPositive", 1) ? 1 : -1);
                 readCurve(valueMap, timeline, frameIndex);
             }
-            timelines.push_back(timeline);
+			timelines.add(timeline);
                     timelinesCount++;
             duration = MAX(duration, timeline->_frames[(constraintMap->_size - 1) * IkConstraintTimeline::ENTRIES]);
         }
@@ -945,7 +945,7 @@ namespace Spine {
                 timeline->setFrame(frameIndex, Json::getFloat(valueMap, "time", 0), Json::getFloat(valueMap, "rotateMix", 1), Json::getFloat(valueMap, "translateMix", 1), Json::getFloat(valueMap, "scaleMix", 1), Json::getFloat(valueMap, "shearMix", 1));
                 readCurve(valueMap, timeline, frameIndex);
             }
-            timelines.push_back(timeline);
+			timelines.add(timeline);
                     timelinesCount++;
             duration = MAX(duration, timeline->_frames[(constraintMap->_size - 1) * TransformConstraintTimeline::ENTRIES]);
         }
@@ -994,7 +994,7 @@ namespace Spine {
                         timeline->setFrame(frameIndex, Json::getFloat(valueMap, "time", 0), Json::getFloat(valueMap, timelineName, 0) * timelineScale);
                         readCurve(valueMap, timeline, frameIndex);
                     }
-                    timelines.push_back(timeline);
+					timelines.add(timeline);
                     timelinesCount++;
                     duration = MAX(duration, timeline->_frames[(timelineMap->_size - 1) * PathConstraintPositionTimeline::ENTRIES]);
                 }
@@ -1005,7 +1005,7 @@ namespace Spine {
                         timeline->setFrame(frameIndex, Json::getFloat(valueMap, "time", 0), Json::getFloat(valueMap, "rotateMix", 1), Json::getFloat(valueMap, "translateMix", 1));
                         readCurve(valueMap, timeline, frameIndex);
                     }
-                    timelines.push_back(timeline);
+					timelines.add(timeline);
                     timelinesCount++;
                     duration = MAX(duration, timeline->_frames[(timelineMap->_size - 1) * PathConstraintMixTimeline::ENTRIES]);
                 }
@@ -1036,9 +1036,9 @@ namespace Spine {
                     Vector<float>& vertices = attachment->_vertices;
                     deformLength = weighted ? static_cast<int>(vertices.size()) / 3 * 2 : static_cast<int>(vertices.size());
                     Vector<float> tempDeform;
-                    tempDeform.reserve(deformLength);
+                    tempDeform.ensureCapacity(deformLength);
                     for (int i = 0; i < deformLength; ++i) {
-                        tempDeform.push_back(0);
+						tempDeform.add(0);
                     }
 
                     timeline = new (__FILE__, __LINE__) DeformTimeline(timelineMap->_size);
@@ -1082,7 +1082,7 @@ namespace Spine {
                         readCurve(valueMap, timeline, frameIndex);
                     }
 
-                    timelines.push_back(timeline);
+					timelines.add(timeline);
                     timelinesCount++;
                     duration = MAX(duration, timeline->_frames[timelineMap->_size - 1]);
                 }
@@ -1100,11 +1100,11 @@ namespace Spine {
                 if (offsets) {
                     Json* offsetMap;
                     Vector<int> unchanged;
-                    unchanged.reserve(skeletonData->_slots.size() - offsets->_size);
+                    unchanged.ensureCapacity(skeletonData->_slots.size() - offsets->_size);
                     unchanged.setSize(skeletonData->_slots.size() - offsets->_size);
                     int originalIndex = 0, unchangedIndex = 0;
 
-                    drawOrder2.reserve(skeletonData->_slots.size());
+                    drawOrder2.ensureCapacity(skeletonData->_slots.size());
                     drawOrder2.setSize(skeletonData->_slots.size());
                     for (ii = static_cast<int>(skeletonData->_slots.size()) - 1; ii >= 0; --ii) {
                         drawOrder2[ii] = -1;
@@ -1138,7 +1138,7 @@ namespace Spine {
                 }
                 timeline->setFrame(frameIndex, Json::getFloat(valueMap, "time", 0), drawOrder2);
             }
-            timelines.push_back(timeline);
+			timelines.add(timeline);
                     timelinesCount++;
             duration = MAX(duration, timeline->_frames[drawOrder->_size - 1]);
         }
@@ -1162,7 +1162,7 @@ namespace Spine {
                 event->_stringValue = Json::getString(valueMap, "string", eventData->_stringValue.buffer());
                 timeline->setFrame(frameIndex, event);
             }
-            timelines.push_back(timeline);
+			timelines.add(timeline);
                     timelinesCount++;
             duration = MAX(duration, timeline->_frames[events->_size - 1]);
         }
@@ -1179,7 +1179,7 @@ namespace Spine {
 
         entry = Json::getItem(attachmentMap, "vertices");
         entrySize = entry->_size;
-        vertices.reserve(entrySize);
+        vertices.ensureCapacity(entrySize);
         vertices.setSize(entrySize);
         for (entry = entry->_child, i = 0; entry; entry = entry->_next, ++i) {
             vertices[i] = entry->_valueFloat;
@@ -1197,17 +1197,17 @@ namespace Spine {
         }
 
         Vertices bonesAndWeights;
-        bonesAndWeights._bones.reserve(verticesLength * 3);
-        bonesAndWeights._vertices.reserve(verticesLength * 3 * 3);
+        bonesAndWeights._bones.ensureCapacity(verticesLength * 3);
+        bonesAndWeights._vertices.ensureCapacity(verticesLength * 3 * 3);
 
         for (i = 0, n = entrySize; i < n;) {
             int boneCount = (int)vertices[i++];
-            bonesAndWeights._bones.push_back(boneCount);
+			bonesAndWeights._bones.add(boneCount);
             for (nn = i + boneCount * 4; i < nn; i += 4) {
-                bonesAndWeights._bones.push_back((int)vertices[i]);
-                bonesAndWeights._vertices.push_back(vertices[i + 1] * _scale);
-                bonesAndWeights._vertices.push_back(vertices[i + 2] * _scale);
-                bonesAndWeights._vertices.push_back(vertices[i + 3]);
+				bonesAndWeights._bones.add((int) vertices[i]);
+				bonesAndWeights._vertices.add(vertices[i + 1] * _scale);
+				bonesAndWeights._vertices.add(vertices[i + 2] * _scale);
+				bonesAndWeights._vertices.add(vertices[i + 3]);
             }
         }
 
@@ -1225,7 +1225,7 @@ namespace Spine {
         }
         
         _error = String(message);
-        
+
         delete root;
     }
 }

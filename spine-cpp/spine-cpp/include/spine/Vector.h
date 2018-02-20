@@ -81,6 +81,57 @@ namespace Spine {
             deallocate(_buffer);
         }
 
+        void clear () {
+            for (size_t i = 0; i < _size; ++i) {
+                destroy(_buffer + (_size - 1 - i));
+            }
+
+            _size = 0;
+        }
+
+        size_t size() const {
+            return _size;
+        }
+
+        void setSize(size_t newSize) {
+            assert(newSize >= 0);
+            _size = newSize;
+            if (_capacity < newSize) {
+                _capacity = (int)(_size  * 1.75f);
+                if (_capacity < 8) _capacity = 8;
+                _buffer = Spine::SpineExtension::realloc<T>(_buffer, _capacity, __FILE__, __LINE__);
+            }
+        }
+
+        void ensureCapacity(size_t newCapacity = 0) {
+            if (_capacity >= newCapacity) return;
+            _capacity = newCapacity;
+            _buffer = SpineExtension::realloc<T>(_buffer, newCapacity, __FILE__, __LINE__);
+        }
+
+		void add(const T &inValue) {
+			if (_size == _capacity) {
+                _capacity = (int)(_size  * 1.75f);
+                if (_capacity < 8) _capacity = 8;
+                _buffer = Spine::SpineExtension::realloc<T>(_buffer, _capacity, __FILE__, __LINE__);
+			}
+			construct(_buffer + _size++, inValue);
+		}
+
+        void removeAt(size_t inIndex) {
+            assert(inIndex < _size);
+
+            --_size;
+
+            if (inIndex != _size) {
+                for (size_t i = inIndex; i < _size; ++i) {
+                    std::swap(_buffer[i], _buffer[i + 1]);
+                }
+            }
+
+            destroy(_buffer + _size);
+        }
+
         bool contains(const T& inValue) {
             for (size_t i = 0; i < _size; ++i) {
                 if (_buffer[i] == inValue) {
@@ -101,73 +152,10 @@ namespace Spine {
             return -1;
         }
 
-        void push_back(const T& inValue) {
-            if (_size == _capacity) {
-                reserve();
-            }
-
-            construct(_buffer + _size++, inValue);
-        }
-
-        void insert(size_t inIndex, const T& inValue) {
-            assert(inIndex < _size);
-
-            if (_size == _capacity) {
-                reserve();
-            }
-
-            for (size_t i = ++_size - 1; i > inIndex; --i) {
-                construct(_buffer + i, _buffer[i - 1]);
-                destroy(_buffer + (i - 1));
-            }
-
-            construct(_buffer + inIndex, inValue);
-        }
-
-        void erase(size_t inIndex) {
-            assert(inIndex < _size);
-
-            --_size;
-
-            if (inIndex != _size) {
-                for (size_t i = inIndex; i < _size; ++i) {
-                    std::swap(_buffer[i], _buffer[i + 1]);
-                }
-            }
-
-            destroy(_buffer + _size);
-        }
-
-        void clear() {
-            for (size_t i = 0; i < _size; ++i) {
-                destroy(_buffer + (_size - 1 - i));
-            }
-
-            _size = 0;
-        }
-
-        size_t size() const {
-            return _size;
-        }
-
         T& operator[](size_t inIndex) {
             assert(inIndex < _size);
 
             return _buffer[inIndex];
-        }
-
-        void reserve(size_t inCapacity = 0) {
-            size_t newCapacity = inCapacity > 0 ? inCapacity : _capacity > 0 ? _capacity * 2 : 1;
-            if (newCapacity > _capacity) {
-                _buffer = SpineExtension::realloc<T>(_buffer, newCapacity, __FILE__, __LINE__);
-                _capacity = newCapacity;
-            }
-        }
-
-        void setSize(size_t inValue) {
-            assert(inValue <= _capacity);
-
-            _size = inValue;
         }
 
         T* begin() {

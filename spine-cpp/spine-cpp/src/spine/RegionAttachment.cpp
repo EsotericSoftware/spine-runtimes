@@ -72,8 +72,8 @@ namespace Spine {
     _g(0),
     _b(0),
     _a(0) {
-        _offset.reserve(NUM_UVS);
-        _uvs.reserve(NUM_UVS);
+        _offset.ensureCapacity(NUM_UVS);
+        _uvs.ensureCapacity(NUM_UVS);
         
         _offset.setSize(NUM_UVS);
         _uvs.setSize(NUM_UVS);

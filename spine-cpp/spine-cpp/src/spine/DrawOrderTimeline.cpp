@@ -42,14 +42,14 @@ namespace Spine {
     RTTI_IMPL(DrawOrderTimeline, Timeline);
     
     DrawOrderTimeline::DrawOrderTimeline(int frameCount) : Timeline() {
-        _frames.reserve(frameCount);
-        _drawOrders.reserve(frameCount);
+		_frames.ensureCapacity(frameCount);
+		_drawOrders.ensureCapacity(frameCount);
         
         _frames.setSize(frameCount);
         
         for (int i = 0; i < frameCount; ++i) {
             Vector<int> vec;
-            _drawOrders.push_back(vec);
+            _drawOrders.add(vec);
         }
     }
     
@@ -58,9 +58,9 @@ namespace Spine {
         Vector<Slot*>& slots = skeleton._slots;
         if (direction == MixDirection_Out && pose == MixPose_Setup) {
             drawOrder.clear();
-            drawOrder.reserve(slots.size());
+			drawOrder.ensureCapacity(slots.size());
             for (int i = 0, n = static_cast<int>(slots.size()); i < n; ++i) {
-                drawOrder.push_back(slots[i]);
+                drawOrder.add(slots[i]);
             }
             return;
         }
@@ -68,9 +68,9 @@ namespace Spine {
         if (time < _frames[0]) {
             if (pose == MixPose_Setup) {
                 drawOrder.clear();
-                drawOrder.reserve(slots.size());
+				drawOrder.ensureCapacity(slots.size());
                 for (int i = 0, n = static_cast<int>(slots.size()); i < n; ++i) {
-                    drawOrder.push_back(slots[i]);
+                    drawOrder.add(slots[i]);
                 }
             }
             return;
@@ -89,7 +89,7 @@ namespace Spine {
         if (drawOrderToSetupIndex.size() == 0) {
             drawOrder.clear();
             for (int i = 0, n = static_cast<int>(slots.size()); i < n; ++i) {
-                drawOrder.push_back(slots[i]);
+                drawOrder.add(slots[i]);
             }
         }
         else {

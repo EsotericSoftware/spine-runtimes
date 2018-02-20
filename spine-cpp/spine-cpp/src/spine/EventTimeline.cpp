@@ -44,8 +44,8 @@ namespace Spine {
     RTTI_IMPL(EventTimeline, Timeline);
     
     EventTimeline::EventTimeline(int frameCount) : Timeline() {
-        _frames.reserve(frameCount);
-        _events.reserve(frameCount);
+		_frames.ensureCapacity(frameCount);
+		_events.ensureCapacity(frameCount);
         
         _frames.setSize(frameCount);
         _events.setSize(frameCount);
@@ -99,7 +99,7 @@ namespace Spine {
         }
         
         for (; frame < frameCount && time >= _frames[frame]; ++frame) {
-            events.push_back(_events[frame]);
+            events.add(_events[frame]);
         }
     }
     

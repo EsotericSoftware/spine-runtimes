@@ -47,7 +47,7 @@ namespace Spine {
 
         _boundingBoxes.clear();
         for (int i = 0, n = static_cast<int>(_polygons.size()); i < n; ++i) {
-            _polygonPool.push_back(_polygons[i]);
+            _polygonPool.add(_polygons[i]);
         }
 
         _polygons.clear();
@@ -59,26 +59,26 @@ namespace Spine {
                 continue;
             }
             BoundingBoxAttachment* boundingBox = static_cast<BoundingBoxAttachment*>(attachment);
-            _boundingBoxes.push_back(boundingBox);
+            _boundingBoxes.add(boundingBox);
 
             Polygon* polygonP = NULL;
             int poolCount = static_cast<int>(_polygonPool.size());
             if (poolCount > 0) {
                 polygonP = _polygonPool[poolCount - 1];
-                _polygonPool.erase(poolCount - 1);
+                _polygonPool.removeAt(poolCount - 1);
             }
             else {
                 Polygon* polygonP = new (__FILE__, __LINE__) Polygon();
             }
 
-            _polygons.push_back(polygonP);
+            _polygons.add(polygonP);
 
             Polygon& polygon = *polygonP;
 
             int count = boundingBox->getWorldVerticesLength();
             polygon._count = count;
             if (polygon._vertices.size() < count) {
-                polygon._vertices.reserve(count);
+                polygon._vertices.ensureCapacity(count);
             }
             boundingBox->computeWorldVertices(*slot, polygon._vertices);
         }

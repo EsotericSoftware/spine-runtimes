@@ -65,7 +65,7 @@ namespace Spine {
     _flipY(false),
     _x(0),
     _y(0) {
-        _bones.reserve(_data->getBones().size());
+        _bones.ensureCapacity(_data->getBones().size());
         for (BoneData** i = _data->getBones().begin(); i != _data->getBones().end(); ++i) {
             BoneData* data = (*i);
             
@@ -76,49 +76,49 @@ namespace Spine {
             else {
                 Bone* parent = _bones[data->getParent()->getIndex()];
                 bone = new (__FILE__, __LINE__) Bone(*data, *this, parent);
-                parent->getChildren().push_back(bone);
+				parent->getChildren().add(bone);
             }
-            
-            _bones.push_back(bone);
+
+			_bones.add(bone);
         }
-        
-        _slots.reserve(_data->getSlots().size());
-        _drawOrder.reserve(_data->getSlots().size());
+
+        _slots.ensureCapacity(_data->getSlots().size());
+        _drawOrder.ensureCapacity(_data->getSlots().size());
         for (SlotData** i = _data->getSlots().begin(); i != _data->getSlots().end(); ++i) {
             SlotData* data = (*i);
             
             Bone* bone = _bones[data->getBoneData().getIndex()];
             Slot* slot = new (__FILE__, __LINE__) Slot(*data, *bone);
-            
-            _slots.push_back(slot);
-            _drawOrder.push_back(slot);
+
+			_slots.add(slot);
+			_drawOrder.add(slot);
         }
-        
-        _ikConstraints.reserve(_data->getIkConstraints().size());
+
+        _ikConstraints.ensureCapacity(_data->getIkConstraints().size());
         for (IkConstraintData** i = _data->getIkConstraints().begin(); i != _data->getIkConstraints().end(); ++i) {
             IkConstraintData* data = (*i);
             
             IkConstraint* constraint = new (__FILE__, __LINE__) IkConstraint(*data, *this);
-            
-            _ikConstraints.push_back(constraint);
+
+			_ikConstraints.add(constraint);
         }
-        
-        _transformConstraints.reserve(_data->getTransformConstraints().size());
+
+        _transformConstraints.ensureCapacity(_data->getTransformConstraints().size());
         for (TransformConstraintData** i = _data->getTransformConstraints().begin(); i != _data->getTransformConstraints().end(); ++i) {
             TransformConstraintData* data = (*i);
             
             TransformConstraint* constraint = new (__FILE__, __LINE__) TransformConstraint(*data, *this);
-            
-            _transformConstraints.push_back(constraint);
+
+			_transformConstraints.add(constraint);
         }
-        
-        _pathConstraints.reserve(_data->getPathConstraints().size());
+
+        _pathConstraints.ensureCapacity(_data->getPathConstraints().size());
         for (PathConstraintData** i = _data->getPathConstraints().begin(); i != _data->getPathConstraints().end(); ++i) {
             PathConstraintData* data = (*i);
             
             PathConstraint* constraint = new (__FILE__, __LINE__) PathConstraint(*data, *this);
-            
-            _pathConstraints.push_back(constraint);
+
+			_pathConstraints.add(constraint);
         }
         
         updateCache();
@@ -261,7 +261,7 @@ namespace Spine {
     void Skeleton::setSlotsToSetupPose() {
         _drawOrder.clear();
         for (int i = 0, n = static_cast<int>(_slots.size()); i < n; ++i) {
-            _drawOrder.push_back(_slots[i]);
+			_drawOrder.add(_slots[i]);
         }
         
         for (int i = 0, n = static_cast<int>(_slots.size()); i < n; ++i) {
@@ -416,7 +416,7 @@ namespace Spine {
 
                 verticesLength = 8;
                 if (outVertexBuffer.size() < 8) {
-                    outVertexBuffer.reserve(8);
+                    outVertexBuffer.ensureCapacity(8);
                     outVertexBuffer.setSize(8);
                 }
                 regionAttachment->computeWorldVertices(slot->getBone(), outVertexBuffer, 0);
@@ -426,7 +426,7 @@ namespace Spine {
 
                 verticesLength = mesh->getWorldVerticesLength();
                 if (outVertexBuffer.size() < verticesLength) {
-                    outVertexBuffer.reserve(verticesLength);
+                    outVertexBuffer.ensureCapacity(verticesLength);
                     outVertexBuffer.setSize(verticesLength);
                 }
 
@@ -573,11 +573,11 @@ namespace Spine {
         if (constrained.size() > 1) {
             Bone* child = constrained[constrained.size() - 1];
             if (!_updateCache.contains(child)) {
-                _updateCacheReset.push_back(child);
+				_updateCacheReset.add(child);
             }
         }
-        
-        _updateCache.push_back(constraint);
+
+		_updateCache.add(constraint);
         
         sortReset(parent->getChildren());
         constrained[constrained.size() - 1]->_sorted = true;
@@ -610,8 +610,8 @@ namespace Spine {
         for (int i = 0; i < boneCount; ++i) {
             sortBone(constrained[i]);
         }
-        
-        _updateCache.push_back(constraint);
+
+		_updateCache.add(constraint);
         
         for (int i = 0; i < boneCount; ++i) {
             sortReset(constrained[i]->getChildren());
@@ -632,7 +632,7 @@ namespace Spine {
                 Bone* child = constrained[i];
                 sortBone(child->getParent());
                 if (!_updateCache.contains(child)) {
-                    _updateCacheReset.push_back(child);
+					_updateCacheReset.add(child);
                 }
             }
         }
@@ -641,8 +641,8 @@ namespace Spine {
                 sortBone(constrained[i]);
             }
         }
-        
-        _updateCache.push_back(constraint);
+
+		_updateCache.add(constraint);
         
         for (int i = 0; i < boneCount; ++i) {
             sortReset(constrained[i]->getChildren());
@@ -700,8 +700,8 @@ namespace Spine {
         }
         
         bone->_sorted = true;
-        
-        _updateCache.push_back(bone);
+
+		_updateCache.add(bone);
     }
     
     void Skeleton::sortReset(Vector<Bone*>& bones) {

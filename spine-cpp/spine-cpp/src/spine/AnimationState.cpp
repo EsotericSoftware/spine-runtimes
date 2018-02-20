@@ -135,22 +135,22 @@ namespace Spine {
     
     TrackEntry* TrackEntry::setTimelineData(TrackEntry* to, Vector<TrackEntry*>& mixingToArray, Vector<int>& propertyIDs) {
         if (to != NULL) {
-            mixingToArray.push_back(to);
+            mixingToArray.add(to);
         }
         
         TrackEntry* lastEntry = _mixingFrom != NULL ? _mixingFrom->setTimelineData(this, mixingToArray, propertyIDs) : this;
         
         if (to != NULL) {
-            mixingToArray.erase(mixingToArray.size() - 1);
+            mixingToArray.removeAt(mixingToArray.size() - 1);
         }
         
         int mixingToLast = static_cast<int>(mixingToArray.size()) - 1;
         Vector<Timeline*>& timelines = _animation->_timelines;
         int timelinesCount = static_cast<int>(timelines.size());
-        _timelineData.reserve(timelinesCount);
+        _timelineData.ensureCapacity(timelinesCount);
         _timelineData.setSize(timelinesCount);
         _timelineDipMix.clear();
-        _timelineDipMix.reserve(timelinesCount);
+        _timelineDipMix.ensureCapacity(timelinesCount);
         _timelineDipMix.setSize(timelinesCount);
         
         // outer:
@@ -160,7 +160,7 @@ namespace Spine {
                 _timelineData[i] = AnimationState::Subsequent;
             }
             else {
-                propertyIDs.push_back(id);
+                propertyIDs.add(id);
                 
                 if (to == NULL || !to->hasTimeline(id)) {
                     _timelineData[i] = AnimationState::First;
@@ -232,29 +232,29 @@ namespace Spine {
     }
     
     void EventQueue::start(TrackEntry* entry) {
-        _eventQueueEntries.push_back(newEventQueueEntry(EventType_Start, entry));
+        _eventQueueEntries.add(newEventQueueEntry(EventType_Start, entry));
         _state._animationsChanged = true;
     }
     
     void EventQueue::interrupt(TrackEntry* entry) {
-        _eventQueueEntries.push_back(newEventQueueEntry(EventType_Interrupt, entry));
+        _eventQueueEntries.add(newEventQueueEntry(EventType_Interrupt, entry));
     }
     
     void EventQueue::end(TrackEntry* entry) {
-        _eventQueueEntries.push_back(newEventQueueEntry(EventType_End, entry));
+        _eventQueueEntries.add(newEventQueueEntry(EventType_End, entry));
         _state._animationsChanged = true;
     }
     
     void EventQueue::dispose(TrackEntry* entry) {
-        _eventQueueEntries.push_back(newEventQueueEntry(EventType_Dispose, entry));
+        _eventQueueEntries.add(newEventQueueEntry(EventType_Dispose, entry));
     }
     
     void EventQueue::complete(TrackEntry* entry) {
-        _eventQueueEntries.push_back(newEventQueueEntry(EventType_Complete, entry));
+        _eventQueueEntries.add(newEventQueueEntry(EventType_Complete, entry));
     }
     
     void EventQueue::event(TrackEntry* entry, Event* event) {
-        _eventQueueEntries.push_back(newEventQueueEntry(EventType_Event, entry, event));
+        _eventQueueEntries.add(newEventQueueEntry(EventType_Event, entry, event));
     }
     
     /// Raises all events in the queue and drains the queue.
@@ -424,7 +424,7 @@ namespace Spine {
                 
                 bool firstFrame = current._timelinesRotation.size() == 0;
                 if (firstFrame) {
-                    current._timelinesRotation.reserve(timelines.size() << 1);
+                    current._timelinesRotation.ensureCapacity(timelines.size() << 1);
                     current._timelinesRotation.setSize(timelines.size() << 1);
                 }
                 Vector<float>& timelinesRotation = current._timelinesRotation;
@@ -781,7 +781,7 @@ namespace Spine {
         bool firstFrame = from->_timelinesRotation.size() == 0;
         if (firstFrame) {
             // from.timelinesRotation.setSize
-            from->_timelinesRotation.reserve(timelines.size() << 1);
+            from->_timelinesRotation.ensureCapacity(timelines.size() << 1);
             from->_timelinesRotation.setSize(timelines.size() << 1);
         }
         
@@ -908,7 +908,7 @@ namespace Spine {
         }
         
         while (index >= _tracks.size()) {
-            _tracks.push_back(NULL);
+            _tracks.add(NULL);
         }
         
         return NULL;

@@ -34,6 +34,8 @@
 #include <new>
 
 namespace Spine {
+	class String;
+
 	class SpineObject {
 	public:
 		void* operator new(size_t sz, const char* file, int line);

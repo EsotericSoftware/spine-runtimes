@@ -247,11 +247,11 @@ namespace Spine {
     _mix(data.getMix()),
     _bendDirection(data.getBendDirection()),
     _target(skeleton.findBone(data.getTarget()->getName())) {
-        _bones.reserve(_data.getBones().size());
+        _bones.ensureCapacity(_data.getBones().size());
         for (BoneData** i = _data.getBones().begin(); i != _data.getBones().end(); ++i) {
             BoneData* boneData = (*i);
-            
-            _bones.push_back(skeleton.findBone(boneData->getName()));
+
+            _bones.add(skeleton.findBone(boneData->getName()));
         }
     }
     

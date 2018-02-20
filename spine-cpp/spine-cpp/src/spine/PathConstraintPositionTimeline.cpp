@@ -49,7 +49,7 @@ namespace Spine {
     const int PathConstraintPositionTimeline::VALUE = 1;
     
     PathConstraintPositionTimeline::PathConstraintPositionTimeline(int frameCount) : CurveTimeline(frameCount), _pathConstraintIndex(0) {
-        _frames.reserve(frameCount * ENTRIES);
+		_frames.ensureCapacity(frameCount * ENTRIES);
         _frames.setSize(frameCount * ENTRIES);
     }
 

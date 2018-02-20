@@ -59,7 +59,7 @@ namespace Spine {
     const int TwoColorTimeline::B2 = 7;
     
     TwoColorTimeline::TwoColorTimeline(int frameCount) : CurveTimeline(frameCount), _slotIndex(0) {
-        _frames.reserve(frameCount * ENTRIES);
+		_frames.ensureCapacity(frameCount * ENTRIES);
         _frames.setSize(frameCount * ENTRIES);
     }
     

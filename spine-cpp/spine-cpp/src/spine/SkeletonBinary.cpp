@@ -154,7 +154,7 @@ namespace Spine {
         
         /* Bones. */
         int bonesCount = readVarint(input, true);
-        skeletonData->_bones.reserve(bonesCount);
+        skeletonData->_bones.ensureCapacity(bonesCount);
         skeletonData->_bones.setSize(bonesCount);
         for (i = 0; i < bonesCount; ++i) {
             BoneData* data;
@@ -201,7 +201,7 @@ namespace Spine {
 
         /* Slots. */
         int slotsCount = readVarint(input, true);
-        skeletonData->_slots.reserve(slotsCount);
+        skeletonData->_slots.ensureCapacity(slotsCount);
         skeletonData->_slots.setSize(slotsCount);
         for (i = 0; i < slotsCount; ++i) {
             int r, g, b, a;
@@ -228,7 +228,7 @@ namespace Spine {
 
         /* IK constraints. */
         int ikConstraintsCount = readVarint(input, true);
-        skeletonData->_ikConstraints.reserve(ikConstraintsCount);
+        skeletonData->_ikConstraints.ensureCapacity(ikConstraintsCount);
         skeletonData->_ikConstraints.setSize(ikConstraintsCount);
         for (i = 0; i < ikConstraintsCount; ++i) {
             const char* name = readString(input);
@@ -238,7 +238,7 @@ namespace Spine {
             data->_order = readVarint(input, true);
 
             int bonesCount = readVarint(input, true);
-            data->_bones.reserve(bonesCount);
+            data->_bones.ensureCapacity(bonesCount);
             data->_bones.setSize(bonesCount);
             for (ii = 0; ii < bonesCount; ++ii) {
                 data->_bones[ii] = skeletonData->_bones[readVarint(input, true)];
@@ -252,7 +252,7 @@ namespace Spine {
 
         /* Transform constraints. */
         int transformConstraintsCount = readVarint(input, true);
-        skeletonData->_transformConstraints.reserve(transformConstraintsCount);
+        skeletonData->_transformConstraints.ensureCapacity(transformConstraintsCount);
         skeletonData->_transformConstraints.setSize(transformConstraintsCount);
         for (i = 0; i < transformConstraintsCount; ++i) {
             const char* name = readString(input);
@@ -261,7 +261,7 @@ namespace Spine {
             
             data->_order = readVarint(input, true);
             int bonesCount = readVarint(input, true);
-            data->_bones.reserve(bonesCount);
+            data->_bones.ensureCapacity(bonesCount);
             data->_bones.setSize(bonesCount);
             for (ii = 0; ii < bonesCount; ++ii) {
                 data->_bones[ii] = skeletonData->_bones[readVarint(input, true)];
@@ -285,7 +285,7 @@ namespace Spine {
 
         /* Path constraints */
         int pathConstraintsCount = readVarint(input, true);
-        skeletonData->_pathConstraints.reserve(pathConstraintsCount);
+        skeletonData->_pathConstraints.ensureCapacity(pathConstraintsCount);
         skeletonData->_pathConstraints.setSize(pathConstraintsCount);
         for (i = 0; i < pathConstraintsCount; ++i) {
             const char* name = readString(input);
@@ -295,7 +295,7 @@ namespace Spine {
             data->_order = readVarint(input, true);
             
             int bonesCount = readVarint(input, true);
-            data->_bones.reserve(bonesCount);
+            data->_bones.ensureCapacity(bonesCount);
             data->_bones.setSize(bonesCount);
             for (ii = 0; ii < bonesCount; ++ii) {
                 data->_bones[ii] = skeletonData->_bones[readVarint(input, true)];
@@ -328,7 +328,7 @@ namespace Spine {
             ++skinsCount;
         }
 
-        skeletonData->_skins.reserve(skinsCount);
+        skeletonData->_skins.ensureCapacity(skinsCount);
         skeletonData->_skins.setSize(skinsCount);
 
         if (skeletonData->_defaultSkin) {
@@ -366,7 +366,7 @@ namespace Spine {
 
         /* Events. */
         int eventsCount = readVarint(input, true);
-        skeletonData->_events.reserve(eventsCount);
+        skeletonData->_events.ensureCapacity(eventsCount);
         skeletonData->_events.setSize(eventsCount);
         for (i = 0; i < eventsCount; ++i) {
             const char* name = readString(input);
@@ -380,7 +380,7 @@ namespace Spine {
 
         /* Animations. */
         int animationsCount = readVarint(input, true);
-        skeletonData->_animations.reserve(animationsCount);
+        skeletonData->_animations.ensureCapacity(animationsCount);
         skeletonData->_animations.setSize(animationsCount);
         for (i = 0; i < animationsCount; ++i) {
             const char* name = readString(input);
@@ -634,7 +634,7 @@ namespace Spine {
                 }
                 
                 LinkedMesh* linkedMesh = new (__FILE__, __LINE__) LinkedMesh(mesh, String(skinName), slotIndex, String(parent));
-                _linkedMeshes.push_back(linkedMesh);
+				_linkedMeshes.add(linkedMesh);
                 
                 if (freeName) {
                     SpineExtension::free(name, __FILE__, __LINE__);
@@ -653,7 +653,7 @@ namespace Spine {
                 vertexCount = readVarint(input, true);
                 readVertices(input, static_cast<VertexAttachment*>(path), vertexCount);
                 int lengthsLength = vertexCount / 3;
-                path->_lengths.reserve(lengthsLength);
+                path->_lengths.ensureCapacity(lengthsLength);
                 path->_lengths.setSize(lengthsLength);
                 for (i = 0; i < lengthsLength; ++i) {
                     path->_lengths[i] = readFloat(input) * _scale;
@@ -721,17 +721,17 @@ namespace Spine {
         }
         
         Vertices vertices;
-        vertices._bones.reserve(verticesLength * 3);
-        vertices._vertices.reserve(verticesLength * 3 * 3);
+        vertices._bones.ensureCapacity(verticesLength * 3);
+        vertices._vertices.ensureCapacity(verticesLength * 3 * 3);
         
         for (int i = 0; i < vertexCount; ++i) {
             int boneCount = readVarint(input, true);
-            vertices._bones.push_back(boneCount);
+			vertices._bones.add(boneCount);
             for (int ii = 0; ii < boneCount; ++ii) {
-                vertices._bones.push_back(readVarint(input, true));
-                vertices._vertices.push_back(readFloat(input) * scale);
-                vertices._vertices.push_back(readFloat(input) * scale);
-                vertices._vertices.push_back(readFloat(input));
+				vertices._bones.add(readVarint(input, true));
+				vertices._vertices.add(readFloat(input) * scale);
+				vertices._vertices.add(readFloat(input) * scale);
+				vertices._vertices.add(readFloat(input));
             }
         }
         
@@ -741,7 +741,7 @@ namespace Spine {
     
     Vector<float> SkeletonBinary::readFloatArray(DataInput *input, int n, float scale) {
         Vector<float> array;
-        array.reserve(n);
+        array.ensureCapacity(n);
         array.setSize(n);
         
         int i;
@@ -763,7 +763,7 @@ namespace Spine {
         int n = readVarint(input, true);
         
         Vector<short> array;
-        array.reserve(n);
+        array.ensureCapacity(n);
         array.setSize(n);
         
         int i;
@@ -791,10 +791,9 @@ namespace Spine {
                         AttachmentTimeline* timeline = new (__FILE__, __LINE__) AttachmentTimeline(frameCount);
                         timeline->_slotIndex = slotIndex;
                         for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-                            const char* attachmentName = readString(input);
-                            timeline->setFrame(frameIndex, readFloat(input), String(attachmentName, true));
+                            timeline->setFrame(frameIndex, readFloat(input), String(readString(input), true));
                         }
-                        timelines.push_back(timeline);
+						timelines.add(timeline);
                         duration = MAX(duration, timeline->_frames[frameCount - 1]);
                         break;
                     }
@@ -813,7 +812,7 @@ namespace Spine {
                                 readCurve(input, frameIndex, timeline);
                             }
                         }
-                        timelines.push_back(timeline);
+						timelines.add(timeline);
                         duration = MAX(duration, timeline->_frames[(frameCount - 1) * ColorTimeline::ENTRIES]);
                         break;
                     }
@@ -837,7 +836,7 @@ namespace Spine {
                                 readCurve(input, frameIndex, timeline);
                             }
                         }
-                        timelines.push_back(timeline);
+						timelines.add(timeline);
                         duration = MAX(duration, timeline->_frames[(frameCount - 1) * TwoColorTimeline::ENTRIES]);
                         break;
                     }
@@ -866,7 +865,7 @@ namespace Spine {
                                 readCurve(input, frameIndex, timeline);
                             }
                         }
-                        timelines.push_back(timeline);
+						timelines.add(timeline);
                         duration = MAX(duration, timeline->_frames[(frameCount - 1) * RotateTimeline::ENTRIES]);
                         break;
                     }
@@ -892,7 +891,7 @@ namespace Spine {
                                 readCurve(input, frameIndex, timeline);
                             }
                         }
-                        timelines.push_back(timeline);
+						timelines.add(timeline);
                         duration = MAX(duration, timeline->_frames[(frameCount - 1) * TranslateTimeline::ENTRIES]);
                         break;
                     }
@@ -917,7 +916,7 @@ namespace Spine {
                     readCurve(input, frameIndex, timeline);
                 }
             }
-            timelines.push_back(timeline);
+			timelines.add(timeline);
             duration = MAX(duration, timeline->_frames[(frameCount - 1) * IkConstraintTimeline::ENTRIES]);
         }
 
@@ -933,7 +932,7 @@ namespace Spine {
                     readCurve(input, frameIndex, timeline);
                 }
             }
-            timelines.push_back(timeline);
+			timelines.add(timeline);
             duration = MAX(duration, timeline->_frames[(frameCount - 1) * TransformConstraintTimeline::ENTRIES]);
         }
 
@@ -970,7 +969,7 @@ namespace Spine {
                                 readCurve(input, frameIndex, timeline);
                             }
                         }
-                        timelines.push_back(timeline);
+						timelines.add(timeline);
                         duration = MAX(duration, timeline->_frames[(frameCount - 1) * PathConstraintPositionTimeline::ENTRIES]);
                         break;
                     }
@@ -984,7 +983,7 @@ namespace Spine {
                                 readCurve(input, frameIndex, timeline);
                             }
                         }
-                        timelines.push_back(timeline);
+						timelines.add(timeline);
                         duration = MAX(duration, timeline->_frames[(frameCount - 1) * PathConstraintMixTimeline::ENTRIES]);
                         break;
                     }
@@ -1026,9 +1025,9 @@ namespace Spine {
                         int end = readVarint(input, true);
                         if (end == 0) {
                             if (weighted) {
-                                deform.reserve(deformLength);
+                                deform.setSize(deformLength);
                                 for (int i = 0; i < deformLength; ++i) {
-                                    deform.push_back(0);
+									deform.add(0);
                                 }
                             }
                             else {
@@ -1036,7 +1035,7 @@ namespace Spine {
                             }
                         }
                         else {
-                            deform.reserve(deformLength);
+                            deform.setSize(deformLength);
                             int start = readVarint(input, true);
                             end += start;
                             if (scale == 1) {
@@ -1063,7 +1062,7 @@ namespace Spine {
                         }
                     }
 
-                    timelines.push_back(timeline);
+					timelines.add(timeline);
                     duration = MAX(duration, timeline->_frames[frameCount - 1]);
                 }
             }
@@ -1080,13 +1079,13 @@ namespace Spine {
                 int offsetCount = readVarint(input, true);
                 
                 Vector<int> drawOrder;
-                drawOrder.reserve(slotCount);
+                drawOrder.ensureCapacity(slotCount);
                 for (int ii = slotCount - 1; ii >= 0; --ii) {
                     drawOrder[ii] = -1;
                 }
                 
                 Vector<int> unchanged;
-                unchanged.reserve(slotCount - offsetCount);
+                unchanged.ensureCapacity(slotCount - offsetCount);
                 int originalIndex = 0, unchangedIndex = 0;
                 for (int ii = 0; ii < offsetCount; ++ii) {
                     int slotIndex = readVarint(input, true);
@@ -1112,7 +1111,7 @@ namespace Spine {
                 }
                 timeline->setFrame(i, time, drawOrder);
             }
-            timelines.push_back(timeline);
+			timelines.add(timeline);
             duration = MAX(duration, timeline->_frames[drawOrderCount - 1]);
         }
 
@@ -1137,7 +1136,7 @@ namespace Spine {
                 timeline->setFrame(i, event);
             }
 
-            timelines.push_back(timeline);
+			timelines.add(timeline);
             duration = MAX(duration, timeline->_frames[eventCount - 1]);
         }
 

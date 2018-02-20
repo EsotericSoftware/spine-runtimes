@@ -98,8 +98,8 @@ void reproduceIssue_776() {
 	loadJson(R_JSON, R_ATLAS, atlas, skeletonData, stateData, skeleton, state);
 	dispose(atlas, skeletonData, stateData, skeleton, state);
 
-	// loadBinary(R_BINARY, R_ATLAS, atlas, skeletonData, stateData, skeleton, state);
-	// dispose(atlas, skeletonData, stateData, skeleton, state);
+	loadBinary(R_BINARY, R_ATLAS, atlas, skeletonData, stateData, skeleton, state);
+	dispose(atlas, skeletonData, stateData, skeleton, state);
 }
 
 int main (int argc, char** argv) {

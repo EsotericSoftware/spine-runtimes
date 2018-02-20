@@ -62,7 +62,7 @@ namespace Spine {
     void MeshAttachment::updateUVs() {
         float u = _regionU, v = _regionV, width = _regionU2 - _regionU, height = _regionV2 - _regionV;
         if (_uvs.size() != _regionUVs.size()) {
-            _uvs.reserve(_regionUVs.size());
+			_uvs.ensureCapacity(_regionUVs.size());
             _uvs.setSize(_regionUVs.size());
         }
         

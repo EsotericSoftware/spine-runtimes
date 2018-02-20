@@ -101,7 +101,7 @@ namespace Spine {
         int _count;
         
         Polygon() : _count(0) {
-            _vertices.reserve(16);
+			_vertices.ensureCapacity(16);
         }
     };
 }

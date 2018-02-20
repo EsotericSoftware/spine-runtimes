@@ -52,7 +52,7 @@ namespace Spine {
 					_buffer = SpineExtension::alloc<char>(_length + 1, __FILE__, __LINE__);
 					memcpy((void *) _buffer, chars, _length + 1);
 				} else {
-					_buffer = chars;
+					_buffer = (char*)chars;
 				}
 			}
 		}
@@ -98,7 +98,7 @@ namespace Spine {
 				_buffer = 0;
 			} else {
 				_length = strlen(chars);
-				_buffer = chars;
+				_buffer = (char*)chars;
 			}
 		}
 
@@ -134,6 +134,26 @@ namespace Spine {
 			return *this;
 		}
 
+		String& operator+ (const char* chars) {
+			size_t len = strlen(chars);
+			size_t thisLen = _length;
+			_length = _length + len;
+			bool same = chars == _buffer;
+			_buffer = SpineExtension::realloc(_buffer, _length + 1, __FILE__, __LINE__);
+			memcpy((void*)(_buffer + thisLen), (void*)(same ? _buffer: chars), len + 1);
+			return *this;
+		}
+
+		String& operator+ (const String& other) {
+			size_t len = other.length();
+			size_t thisLen = _length;
+			_length = _length + len;
+			bool same = other._buffer == _buffer;
+			_buffer = SpineExtension::realloc(_buffer, _length + 1, __FILE__, __LINE__);
+			memcpy((void*)(_buffer + thisLen), (void*)(same ? _buffer: other._buffer), len + 1);
+			return *this;
+		}
+
 		friend bool operator== (const String& a, const String& b) {
 			if (a._buffer == b._buffer) return true;
 			if (a._length != b._length) return false;
@@ -155,7 +175,7 @@ namespace Spine {
 		}
 	private:
 		mutable size_t _length;
-		mutable const char* _buffer;
+		mutable char* _buffer;
 	};
 }
 

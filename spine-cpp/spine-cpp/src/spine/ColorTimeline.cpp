@@ -53,7 +53,7 @@ namespace Spine {
     const int ColorTimeline::A = 4;
     
     ColorTimeline::ColorTimeline(int frameCount) : CurveTimeline(frameCount), _slotIndex(0) {
-        _frames.reserve(frameCount * ENTRIES);
+		_frames.ensureCapacity(frameCount * ENTRIES);
         _frames.setSize(frameCount * ENTRIES);
     }
     

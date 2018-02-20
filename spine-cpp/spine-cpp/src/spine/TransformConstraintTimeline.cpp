@@ -55,7 +55,7 @@ namespace Spine {
     const int TransformConstraintTimeline::SHEAR = 4;
     
     TransformConstraintTimeline::TransformConstraintTimeline(int frameCount) : CurveTimeline(frameCount), _transformConstraintIndex(0) {
-        _frames.reserve(frameCount * ENTRIES);
+		_frames.ensureCapacity(frameCount * ENTRIES);
         _frames.setSize(frameCount * ENTRIES);
     }
     

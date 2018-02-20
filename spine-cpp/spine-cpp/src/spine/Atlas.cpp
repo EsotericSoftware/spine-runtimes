@@ -163,7 +163,7 @@ namespace Spine {
 
                 SpineExtension::free(path, __FILE__, __LINE__);
 
-                _pages.push_back(page);
+                _pages.add(page);
             }
             else {
                 AtlasRegion* region = new (__FILE__, __LINE__) AtlasRegion();
@@ -198,7 +198,7 @@ namespace Spine {
 
                 if (count == 4) {
                     /* split is optional */
-                    region->splits.reserve(4);
+                    region->splits.ensureCapacity(4);
                     region->splits.setSize(4);
                     region->splits[0] = toInt(tuple);
                     region->splits[1] = toInt(tuple + 1);
@@ -210,7 +210,7 @@ namespace Spine {
 
                     if (count == 4) {
                         /* pad is optional, but only present with splits */
-                        region->pads.reserve(4);
+                        region->pads.ensureCapacity(4);
                         region->pads.setSize(4);
                         region->pads[0] = toInt(tuple);
                         region->pads[1] = toInt(tuple + 1);
@@ -232,7 +232,7 @@ namespace Spine {
 
                 region->index = toInt(&str);
 
-                _regions.push_back(region);
+                _regions.add(region);
             }
         }
     }

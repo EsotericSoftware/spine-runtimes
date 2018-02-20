@@ -52,7 +52,7 @@ namespace Spine {
             if (_objects.size() > 0) {
                 T** object = _objects.begin();
                 T* ret = *object;
-                _objects.erase(0);
+                _objects.removeAt(0);
                 
                 return ret;
             }
@@ -65,7 +65,7 @@ namespace Spine {
         
         void free(T* object) {
             if (!_objects.contains(object)) {
-                _objects.push_back(object);
+                _objects.add(object);
             }
         }
         

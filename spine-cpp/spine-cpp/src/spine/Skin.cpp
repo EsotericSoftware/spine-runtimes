@@ -86,7 +86,7 @@ namespace Spine {
     void Skin::findNamesForSlot(int slotIndex, Vector<String>& names) {
         for (HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = _attachments.begin(); i != _attachments.end(); ++i) {
             if (i.key()._slotIndex == slotIndex) {
-                names.push_back(i.key()._name);
+                names.add(i.key()._name);
             }
         }
     }
@@ -94,7 +94,7 @@ namespace Spine {
     void Skin::findAttachmentsForSlot(int slotIndex, Vector<Attachment*>& attachments) {
         for (HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = _attachments.begin(); i != _attachments.end(); ++i) {
             if (i.key()._slotIndex == slotIndex) {
-                attachments.push_back(i.value());
+                attachments.add(i.value());
             }
         }
     }
