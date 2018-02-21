@@ -44,6 +44,7 @@ namespace Spine {
     class Atlas;
     class AttachmentLoader;
     class LinkedMesh;
+    class String;
     
     class SkeletonJson : public SpineObject {
     public:
@@ -53,7 +54,7 @@ namespace Spine {
         
         ~SkeletonJson();
         
-        SkeletonData* readSkeletonDataFile(const char* path);
+        SkeletonData* readSkeletonDataFile(const String& path);
         
         SkeletonData* readSkeletonData(const char* json);
         
@@ -72,7 +73,7 @@ namespace Spine {
         
         void readVertices(Json* attachmentMap, VertexAttachment* attachment, int verticesLength);
         
-        void setError(Json* root, const char* value1, const char* value2);
+        void setError(Json* root, const String& value1, const String& value2);
     };
 }
 

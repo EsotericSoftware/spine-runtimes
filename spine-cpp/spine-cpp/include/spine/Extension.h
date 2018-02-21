@@ -34,6 +34,8 @@
 #include <stdlib.h>
 
 namespace Spine {
+    class String;
+
     class SpineExtension {
     public:
         template <typename T> static T* alloc(size_t num, const char* file, int line) {
@@ -52,7 +54,7 @@ namespace Spine {
             getInstance()->_free((void*)ptr, file, line);
         }
 
-        static char* readFile(const char* path, int* length) {
+        static char* readFile(const String& path, int* length) {
             return getInstance()->_readFile(path, length);
         }
 
@@ -73,7 +75,7 @@ namespace Spine {
         /// If you provide a spineAllocFunc, you should also provide a spineFreeFunc
         virtual void _free(void* mem, const char* file, int line) = 0;
         
-        virtual char* _readFile(const char* path, int* length);
+        virtual char* _readFile(const String& path, int* length) = 0;
 
         SpineExtension();
 
@@ -94,6 +96,8 @@ namespace Spine {
         virtual void* _realloc(void* ptr, size_t size, const char* file, int line);
 
         virtual void _free(void* mem, const char* file, int line);
+
+        virtual char* _readFile(const String& path, int* length);
     };
 }
 

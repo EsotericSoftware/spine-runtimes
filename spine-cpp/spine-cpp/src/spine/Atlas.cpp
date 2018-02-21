@@ -37,20 +37,20 @@
 #include <cstring>
 
 namespace Spine {
-    Atlas::Atlas(const char* path, TextureLoader* textureLoader) : _textureLoader(textureLoader) {
+    Atlas::Atlas(const String& path, TextureLoader* textureLoader) : _textureLoader(textureLoader) {
         int dirLength;
         char *dir;
         int length;
         const char* data;
 
         /* Get directory from atlas path. */
-        const char* lastForwardSlash = strrchr(path, '/');
-        const char* lastBackwardSlash = strrchr(path, '\\');
+        const char* lastForwardSlash = strrchr(path.buffer(), '/');
+        const char* lastBackwardSlash = strrchr(path.buffer(), '\\');
         const char* lastSlash = lastForwardSlash > lastBackwardSlash ? lastForwardSlash : lastBackwardSlash;
         if (lastSlash == path) lastSlash++; /* Never drop starting slash. */
-        dirLength = (int)(lastSlash ? lastSlash - path : 0);
+        dirLength = (int)(lastSlash ? lastSlash - path.buffer() : 0);
         dir = SpineExtension::alloc<char>(dirLength + 1, __FILE__, __LINE__);
-        memcpy(dir, path, dirLength);
+        memcpy(dir, path.buffer(), dirLength);
         dir[dirLength] = '\0';
 
         data = SpineExtension::readFile(path, &length);
@@ -198,7 +198,6 @@ namespace Spine {
 
                 if (count == 4) {
                     /* split is optional */
-                    region->splits.ensureCapacity(4);
                     region->splits.setSize(4);
                     region->splits[0] = toInt(tuple);
                     region->splits[1] = toInt(tuple + 1);
@@ -210,7 +209,6 @@ namespace Spine {
 
                     if (count == 4) {
                         /* pad is optional, but only present with splits */
-                        region->pads.ensureCapacity(4);
                         region->pads.setSize(4);
                         region->pads[0] = toInt(tuple);
                         region->pads[1] = toInt(tuple + 1);

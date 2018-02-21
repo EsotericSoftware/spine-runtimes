@@ -42,7 +42,6 @@ namespace Spine {
     RTTI_IMPL(RotateTimeline, CurveTimeline);
     
     RotateTimeline::RotateTimeline(int frameCount) : CurveTimeline(frameCount), _boneIndex(0) {
-		_frames.ensureCapacity(frameCount << 1);
         _frames.setSize(frameCount << 1);
     }
     

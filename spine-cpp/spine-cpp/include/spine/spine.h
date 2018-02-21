@@ -45,6 +45,7 @@
 #include <spine/BoneData.h>
 #include <spine/BoundingBoxAttachment.h>
 #include <spine/ClippingAttachment.h>
+#include <spine/Color.h>
 #include <spine/ColorTimeline.h>
 #include <spine/Constraint.h>
 #include <spine/ContainerUtil.h>

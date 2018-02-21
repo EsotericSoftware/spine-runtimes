@@ -34,6 +34,7 @@
 #include <spine/BlendMode.h>
 #include <spine/SpineObject.h>
 #include <spine/String.h>
+#include <spine/Color.h>
 
 namespace Spine {
     class BoneData;
@@ -65,24 +66,12 @@ namespace Spine {
         const String& getName();
         
         BoneData& getBoneData();
-        
-        float getR();
-        void setR(float inValue);
-        float getG();
-        void setG(float inValue);
-        float getB();
-        void setB(float inValue);
-        float getA();
-        void setA(float inValue);
-        
-        float getR2();
-        void setR2(float inValue);
-        float getG2();
-        void setG2(float inValue);
-        float getB2();
-        void setB2(float inValue);
-        bool hasSecondColor();
-        void setHasSecondColor(bool inValue);
+
+        Color& getColor();
+        Color& getDarkColor();
+
+        bool hasDarkColor();
+        void setHasDarkColor(bool inValue);
         
         /// May be empty.
         const String& getAttachmentName();
@@ -95,9 +84,10 @@ namespace Spine {
         const int _index;
         String _name;
         BoneData& _boneData;
-        float _r, _g, _b, _a;
-        float _r2, _g2, _b2, _a2;
-        bool _hasSecondColor;
+        Color _color;
+        Color _darkColor;
+
+        bool _hasDarkColor;
         String _attachmentName;
         BlendMode _blendMode;
     };

@@ -33,6 +33,7 @@
 
 #include <spine/VertexAttachment.h>
 #include <spine/Vector.h>
+#include <spine/Color.h>
 
 
 namespace Spine {
@@ -64,14 +65,7 @@ namespace Spine {
         Vector<short>& getTriangles();
         void setTriangles(Vector<short>& inValue);
         
-        float getR();
-        void setR(float inValue);
-        float getG();
-        void setG(float inValue);
-        float getB();
-        void setB(float inValue);
-        float getA();
-        void setA(float inValue);
+        Color& getColor();
         
         const String& getPath();
         void setPath(const String& inValue);
@@ -143,7 +137,7 @@ namespace Spine {
         float _regionV2;
         float _width;
         float _height;
-        float _r, _g, _b, _a;
+        Color _color;
         int _hullLength;
         bool _inheritDeform;
         bool _regionRotate;

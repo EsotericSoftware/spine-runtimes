@@ -29,6 +29,7 @@
 *****************************************************************************/
 
 #include <spine/Extension.h>
+#include <spine/String.h>
 
 #include <fstream>
 #include <assert.h>
@@ -51,22 +52,6 @@ namespace Spine {
     
     SpineExtension::~SpineExtension() {
         // Empty
-    }
-    
-    char* SpineExtension::_readFile(const char* path, int* length) {
-        char *data;
-        FILE *file = fopen(path, "rb");
-        if (!file) return 0;
-        
-        fseek(file, 0, SEEK_END);
-        *length = (int)ftell(file);
-        fseek(file, 0, SEEK_SET);
-        
-        data = SpineExtension::alloc<char>(*length, __FILE__, __LINE__);
-        fread(data, 1, *length, file);
-        fclose(file);
-        
-        return data;
     }
     
     SpineExtension::SpineExtension() {
@@ -108,6 +93,22 @@ namespace Spine {
     
     void DefaultSpineExtension::_free(void* mem, const char* file, int line) {
         ::free(mem);
+    }
+
+    char* DefaultSpineExtension::_readFile(const String &path, int *length) {
+        char *data;
+        FILE *file = fopen(path.buffer(), "rb");
+        if (!file) return 0;
+
+        fseek(file, 0, SEEK_END);
+        *length = (int)ftell(file);
+        fseek(file, 0, SEEK_SET);
+
+        data = SpineExtension::alloc<char>(*length, __FILE__, __LINE__);
+        fread(data, 1, *length, file);
+        fclose(file);
+
+        return data;
     }
     
     DefaultSpineExtension::DefaultSpineExtension() : SpineExtension() {

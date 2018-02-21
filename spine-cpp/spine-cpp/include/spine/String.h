@@ -144,7 +144,7 @@ namespace Spine {
 			return *this;
 		}
 
-		String& operator+ (const String& other) {
+		String& operator+= (const String& other) {
 			size_t len = other.length();
 			size_t thisLen = _length;
 			_length = _length + len;
@@ -152,6 +152,10 @@ namespace Spine {
 			_buffer = SpineExtension::realloc(_buffer, _length + 1, __FILE__, __LINE__);
 			memcpy((void*)(_buffer + thisLen), (void*)(same ? _buffer: other._buffer), len + 1);
 			return *this;
+		}
+
+		friend String operator+ (const String& a, const String& b) {
+			return String(a) += b;
 		}
 
 		friend bool operator== (const String& a, const String& b) {

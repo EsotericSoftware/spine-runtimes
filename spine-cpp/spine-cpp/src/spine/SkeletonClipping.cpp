@@ -49,7 +49,6 @@ namespace Spine {
         _clipAttachment = clip;
 
         int n = clip->getWorldVerticesLength();
-		_clippingPolygon.ensureCapacity(n);
         _clippingPolygon.setSize(n);
         clip->computeWorldVertices(slot, 0, n, _clippingPolygon, 0, 2);
         makeClockwise(_clippingPolygon);
@@ -122,9 +121,7 @@ namespace Spine {
                     float d = 1 / (d0 * d2 + d1 * (y1 - y3));
 
                     int clipOutputCount = clipOutputLength >> 1;
-					clippedVertices.ensureCapacity(s + clipOutputCount * 2);
                     clippedVertices.setSize(s + clipOutputCount * 2);
-					_clippedUVs.ensureCapacity(s + clipOutputCount * 2);
                     _clippedUVs.setSize(s + clipOutputCount * 2);
                     for (int ii = 0; ii < clipOutputLength; ii += 2) {
                         float x = clipOutput[ii], y = clipOutput[ii + 1];
@@ -140,7 +137,6 @@ namespace Spine {
                     }
 
                     s = static_cast<int>(clippedTriangles.size());
-					clippedTriangles.ensureCapacity(s + 3 * (clipOutputCount - 2));
                     clippedTriangles.setSize(s + 3 * (clipOutputCount - 2));
                     clipOutputCount--;
                     for (int ii = 1; ii < clipOutputCount; ii++) {
@@ -152,9 +148,7 @@ namespace Spine {
                     index += clipOutputCount + 1;
                 }
                 else {
-					clippedVertices.ensureCapacity(s + 3 * 2);
                     clippedVertices.setSize(s + 3 * 2);
-					_clippedUVs.ensureCapacity(s + 3 * 2);
                     _clippedUVs.setSize(s + 3 * 2);
                     clippedVertices[s] = x1;
                     clippedVertices[s + 1] = y1;
@@ -171,7 +165,6 @@ namespace Spine {
                     _clippedUVs[s + 5] = v3;
 
                     s = static_cast<int>(clippedTriangles.size());
-					clippedTriangles.ensureCapacity(s + 3);
                     clippedTriangles.setSize(s + 3);
                     clippedTriangles[s] = index;
                     clippedTriangles[s + 1] = index + 1;
@@ -287,7 +280,6 @@ namespace Spine {
             }
         }
         else {
-			originalOutput.ensureCapacity(originalOutput.size() - 2);
             originalOutput.setSize(originalOutput.size() - 2);
         }
 

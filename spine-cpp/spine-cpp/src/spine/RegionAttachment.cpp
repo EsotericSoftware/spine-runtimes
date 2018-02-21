@@ -35,6 +35,7 @@
 #include <spine/MathUtil.h>
 
 #include <assert.h>
+#include <spine/Color.h>
 
 namespace Spine {
     RTTI_IMPL(RegionAttachment, Attachment);
@@ -68,13 +69,7 @@ namespace Spine {
     _regionV(0),
     _regionU2(0),
     _regionV2(0),
-    _r(0),
-    _g(0),
-    _b(0),
-    _a(0) {
-        _offset.ensureCapacity(NUM_UVS);
-        _uvs.ensureCapacity(NUM_UVS);
-        
+    _color(1, 1, 1, 1) {
         _offset.setSize(NUM_UVS);
         _uvs.setSize(NUM_UVS);
     }
@@ -217,38 +212,6 @@ namespace Spine {
         _height = inValue;
     }
     
-    float RegionAttachment::getR() {
-        return _r;
-    }
-    
-    void RegionAttachment::setR(float inValue) {
-        _r = inValue;
-    }
-    
-    float RegionAttachment::getG() {
-        return _g;
-    }
-    
-    void RegionAttachment::setG(float inValue) {
-        _g = inValue;
-    }
-    
-    float RegionAttachment::getB() {
-        return _b;
-    }
-    
-    void RegionAttachment::setB(float inValue) {
-        _b = inValue;
-    }
-    
-    float RegionAttachment::getA() {
-        return _a;
-    }
-    
-    void RegionAttachment::setA(float inValue) {
-        _a = inValue;
-    }
-    
     const String& RegionAttachment::getPath() {
         return _path;
     }
@@ -319,5 +282,9 @@ namespace Spine {
     
     Vector<float>& RegionAttachment::getUVs() {
         return _uvs;
+    }
+
+    Spine::Color& RegionAttachment::getColor() {
+        return _color;
     }
 }

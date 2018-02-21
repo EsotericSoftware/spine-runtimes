@@ -78,7 +78,7 @@ namespace Spine {
             int count = boundingBox->getWorldVerticesLength();
             polygon._count = count;
             if (polygon._vertices.size() < count) {
-                polygon._vertices.ensureCapacity(count);
+                polygon._vertices.setSize(count);
             }
             boundingBox->computeWorldVertices(*slot, polygon._vertices);
         }

@@ -51,7 +51,6 @@ namespace Spine {
     const int PathConstraintMixTimeline::TRANSLATE = 2;
     
     PathConstraintMixTimeline::PathConstraintMixTimeline(int frameCount) : CurveTimeline(frameCount), _pathConstraintIndex(0) {
-		_frames.ensureCapacity(frameCount * ENTRIES);
         _frames.setSize(frameCount * ENTRIES);
     }
     

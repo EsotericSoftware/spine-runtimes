@@ -29,8 +29,9 @@
 *****************************************************************************/
 
 #include <spine/MeshAttachment.h>
+#include <spine/Color.h>
 
-namespace Spine {
+    namespace Spine {
     RTTI_IMPL(MeshAttachment, VertexAttachment);
     
     MeshAttachment::MeshAttachment(const String& name) : VertexAttachment(name),
@@ -49,10 +50,7 @@ namespace Spine {
     _regionV2(0),
     _width(0),
     _height(0),
-    _r(1),
-    _g(1),
-    _b(1),
-    _a(1),
+    _color(1, 1, 1, 1),
     _hullLength(0),
     _inheritDeform(false),
     _regionRotate(false) {
@@ -62,7 +60,6 @@ namespace Spine {
     void MeshAttachment::updateUVs() {
         float u = _regionU, v = _regionV, width = _regionU2 - _regionU, height = _regionV2 - _regionV;
         if (_uvs.size() != _regionUVs.size()) {
-			_uvs.ensureCapacity(_regionUVs.size());
             _uvs.setSize(_regionUVs.size());
         }
         
@@ -114,38 +111,6 @@ namespace Spine {
     
     void MeshAttachment::setTriangles(Vector<short>& inValue) {
         _triangles = inValue;
-    }
-    
-    float MeshAttachment::getR() {
-        return _r;
-    }
-    
-    void MeshAttachment::setR(float inValue) {
-        _r = inValue;
-    }
-    
-    float MeshAttachment::getG() {
-        return _g;
-    }
-    
-    void MeshAttachment::setG(float inValue) {
-        _g = inValue;
-    }
-    
-    float MeshAttachment::getB() {
-        return _b;
-    }
-    
-    void MeshAttachment::setB(float inValue) {
-        _b = inValue;
-    }
-    
-    float MeshAttachment::getA() {
-        return _a;
-    }
-    
-    void MeshAttachment::setA(float inValue) {
-        _a = inValue;
     }
     
     const String& MeshAttachment::getPath() {
@@ -301,5 +266,9 @@ namespace Spine {
     
     void MeshAttachment::setHeight(float inValue) {
         _height = inValue;
+    }
+
+    Spine::Color& MeshAttachment::getColor() {
+        return _color;
     }
 }

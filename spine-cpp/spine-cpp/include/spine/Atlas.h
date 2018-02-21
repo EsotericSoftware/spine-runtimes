@@ -98,7 +98,7 @@ namespace Spine {
     
     class Atlas : public SpineObject {
     public:
-        Atlas(const char* path, TextureLoader* textureLoader);
+        Atlas(const String& path, TextureLoader* textureLoader);
         
         Atlas(const char* data, int length, const char* dir, TextureLoader* textureLoader);
         

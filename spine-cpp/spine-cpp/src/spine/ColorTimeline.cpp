@@ -53,7 +53,6 @@ namespace Spine {
     const int ColorTimeline::A = 4;
     
     ColorTimeline::ColorTimeline(int frameCount) : CurveTimeline(frameCount), _slotIndex(0) {
-		_frames.ensureCapacity(frameCount * ENTRIES);
         _frames.setSize(frameCount * ENTRIES);
     }
     
@@ -64,17 +63,16 @@ namespace Spine {
             SlotData& slotData = slot._data;
             switch (pose) {
                 case MixPose_Setup:
-                    slot._r = slotData._r;
-                    slot._g = slotData._g;
-                    slot._b = slotData._b;
-                    slot._a = slotData._a;
+                    slot.getColor().set(slotData.getColor());
                     return;
-                case MixPose_Current:
-                    slot._r += (slot._r - slotData._r) * alpha;
-                    slot._g += (slot._g - slotData._g) * alpha;
-                    slot._b += (slot._b - slotData._b) * alpha;
-                    slot._a += (slot._a - slotData._a) * alpha;
+                case MixPose_Current: {
+                    Color &color = slot.getColor();
+                    Color &setup = slot.getData().getColor();
+                    color.add((setup._r - color._r) * alpha, (setup._g - color._g) * alpha,
+                              (setup._b - color._b) * alpha,
+                              (setup._a - color._a) * alpha);
                     return;
+                }
                 case MixPose_CurrentLayered:
                 default:
                     return;
@@ -107,29 +105,11 @@ namespace Spine {
         }
         
         if (alpha == 1) {
-            slot._r = r;
-            slot._g = g;
-            slot._b = b;
-            slot._a = a;
-        }
-        else {
-            float br, bg, bb, ba;
-            if (pose == MixPose_Setup) {
-                br = slot._data._r;
-                bg = slot._data._g;
-                bb = slot._data._b;
-                ba = slot._data._a;
-            }
-            else {
-                br = slot._r;
-                bg = slot._g;
-                bb = slot._b;
-                ba = slot._a;
-            }
-            slot._r = br + ((r - br) * alpha);
-            slot._g = bg + ((g - bg) * alpha);
-            slot._b = bb + ((b - bb) * alpha);
-            slot._a = ba + ((a - ba) * alpha);
+            slot.getColor().set(r, g, b, a);
+        } else {
+            Color& color = slot.getColor();
+            if (pose == MixPose_Setup) color.set(slot.getData().getColor());
+            color.add((r - color._r) * alpha, (g - color._g) * alpha, (b - color._b) * alpha, (a - color._a) * alpha);
         }
     }
     

@@ -33,18 +33,9 @@
 
 #include "TestHarness.h"
 
-
-#define R_JSON "testdata/raptor/raptor-pro.json"
-#define R_BINARY "testdata/raptor/raptor-pro.skel"
-#define R_ATLAS "testdata/raptor/raptor.atlas"
-
-#define SPINEBOY_JSON "testdata/spineboy/spineboy-pro.json"
-#define SPINEBOY_BINARY "testdata/spineboy/spineboy-pro.skel"
-#define SPINEBOY_ATLAS "testdata/spineboy/spineboy.atlas"
-
 using namespace Spine;
 
-void loadBinary(const char* binaryFile, const char* atlasFile, Atlas* &atlas, SkeletonData* &skeletonData, AnimationStateData* &stateData, Skeleton* &skeleton, AnimationState* &state) {
+void loadBinary(const String& binaryFile, const String& atlasFile, Atlas* &atlas, SkeletonData* &skeletonData, AnimationStateData* &stateData, Skeleton* &skeleton, AnimationState* &state) {
 	atlas = new (__FILE__, __LINE__) Atlas(atlasFile, NULL);
 	assert(atlas != NULL);
 
@@ -62,7 +53,7 @@ void loadBinary(const char* binaryFile, const char* atlasFile, Atlas* &atlas, Sk
 	state = new (__FILE__, __LINE__) AnimationState(stateData);
 }
 
-void loadJson(const char* jsonFile, const char* atlasFile, Atlas* &atlas, SkeletonData* &skeletonData, AnimationStateData* &stateData, Skeleton* &skeleton, AnimationState* &state) {
+void loadJson(const String& jsonFile, const String& atlasFile, Atlas* &atlas, SkeletonData* &skeletonData, AnimationStateData* &stateData, Skeleton* &skeleton, AnimationState* &state) {
 	atlas = new (__FILE__, __LINE__) Atlas(atlasFile, NULL);
 	assert(atlas != NULL);
 
@@ -88,25 +79,46 @@ void dispose(Atlas* atlas, SkeletonData* skeletonData, AnimationStateData* state
 	delete atlas;
 }
 
-void reproduceIssue_776() {
-	Atlas* atlas = NULL;
-	SkeletonData* skeletonData = NULL;
-	AnimationStateData* stateData = NULL;
-	Skeleton* skeleton = NULL;
-	AnimationState* state = NULL;
+struct TestData {
+	TestData(const String& jsonSkeleton, const String& binarySkeleton, const String& atlas) : _jsonSkeleton(jsonSkeleton), _binarySkeleton(binarySkeleton), _atlas(atlas) { }
 
-	loadJson(R_JSON, R_ATLAS, atlas, skeletonData, stateData, skeleton, state);
-	dispose(atlas, skeletonData, stateData, skeleton, state);
+	String _jsonSkeleton;
+	String _binarySkeleton;
+	String _atlas;
+};
 
-	loadBinary(R_BINARY, R_ATLAS, atlas, skeletonData, stateData, skeleton, state);
-	dispose(atlas, skeletonData, stateData, skeleton, state);
+void testLoading() {
+	Vector<TestData> testData;
+	testData.add(TestData("testdata/coin/coin-pro.json", "testdata/coin/coin-pro.skel", "testdata/coin/coin.atlas"));
+	testData.add(TestData("testdata/goblins/goblins-pro.json", "testdata/goblins/goblins-pro.skel", "testdata/goblins/goblins.atlas"));
+	testData.add(TestData("testdata/raptor/raptor-pro.json", "testdata/raptor/raptor-pro.skel", "testdata/raptor/raptor.atlas"));
+	testData.add(TestData("testdata/spineboy/spineboy-pro.json", "testdata/spineboy/spineboy-pro.skel", "testdata/spineboy/spineboy.atlas"));
+	testData.add(TestData("testdata/stretchyman/stretchyman-pro.json", "testdata/stretchyman/stretchyman-pro.skel", "testdata/stretchyman/stretchyman.atlas"));
+	testData.add(TestData("testdata/tank/tank-pro.json", "testdata/tank/tank-pro.skel", "testdata/tank/tank.atlas"));
+
+	for (size_t i = 0; i < testData.size(); i++) {
+		TestData& data = testData[i];
+		Atlas* atlas = NULL;
+		SkeletonData* skeletonData = NULL;
+		AnimationStateData* stateData = NULL;
+		Skeleton* skeleton = NULL;
+		AnimationState* state = NULL;
+
+		printf("Loading %s\n", data._jsonSkeleton.buffer());
+		loadJson(data._jsonSkeleton, data._atlas, atlas, skeletonData, stateData, skeleton, state);
+		dispose(atlas, skeletonData, stateData, skeleton, state);
+
+		printf("Loading %s\n", data._binarySkeleton.buffer());
+		loadBinary(data._binarySkeleton, data._atlas, atlas, skeletonData, stateData, skeleton, state);
+		dispose(atlas, skeletonData, stateData, skeleton, state);
+	}
 }
 
 int main (int argc, char** argv) {
 	TestSpineExtension* ext = new TestSpineExtension();
 	SpineExtension::setInstance(ext);
 
- 	reproduceIssue_776();
+ 	testLoading();
 
 	ext->reportLeaks();
 }

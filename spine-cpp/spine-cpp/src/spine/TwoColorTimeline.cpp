@@ -71,23 +71,22 @@ namespace Spine {
             // Time is before first frame.
             switch (pose) {
                 case MixPose_Setup:
-                    slot._r = slot._data._r;
-                    slot._g = slot._data._g;
-                    slot._b = slot._data._b;
-                    slot._a = slot._data._a;
-                    slot._r2 = slot._data._r2;
-                    slot._g2 = slot._data._g2;
-                    slot._b2 = slot._data._b2;
+                    slot.getColor().set(slot.getData().getColor());
+                    slot.getDarkColor().set(slot.getData().getDarkColor());
                     return;
-                case MixPose_Current:
-                    slot._r += (slot._r - slot._data._r) * alpha;
-                    slot._g += (slot._g - slot._data._g) * alpha;
-                    slot._b += (slot._b - slot._data._b) * alpha;
-                    slot._a += (slot._a - slot._data._a) * alpha;
-                    slot._r2 += (slot._r2 - slot._data._r2) * alpha;
-                    slot._g2 += (slot._g2 - slot._data._g2) * alpha;
-                    slot._b2 += (slot._b2 - slot._data._b2) * alpha;
+                case MixPose_Current: {
+                    Color& color = slot.getColor();
+                    color._r += (color._r - slot._data.getColor()._r) * alpha;
+                    color._g += (color._g - slot._data.getColor()._g) * alpha;
+                    color._b += (color._b - slot._data.getColor()._b) * alpha;
+                    color._a += (color._a - slot._data.getColor()._a) * alpha;
+
+                    Color& darkColor = slot.getDarkColor();
+                    darkColor._r += (darkColor._r - slot._data.getDarkColor()._r) * alpha;
+                    darkColor._g += (darkColor._g - slot._data.getDarkColor()._g) * alpha;
+                    darkColor._b += (darkColor._b - slot._data.getDarkColor()._b) * alpha;
                     return;
+                }
                 case MixPose_CurrentLayered:
                 default:
                     return;
@@ -130,42 +129,51 @@ namespace Spine {
         }
         
         if (alpha == 1) {
-            slot._r = r;
-            slot._g = g;
-            slot._b = b;
-            slot._a = a;
-            slot._r2 = r2;
-            slot._g2 = g2;
-            slot._b2 = b2;
+            Color& color = slot.getColor();
+            color._r = r;
+            color._g = g;
+            color._b = b;
+            color._a = a;
+
+            Color& darkColor = slot.getDarkColor();
+            darkColor._r = r2;
+            darkColor._g = g2;
+            darkColor._b = b2;
         }
         else {
             float br, bg, bb, ba, br2, bg2, bb2;
             if (pose == MixPose_Setup) {
-                br = slot._data._r;
-                bg = slot._data._g;
-                bb = slot._data._b;
-                ba = slot._data._a;
-                br2 = slot._data._r2;
-                bg2 = slot._data._g2;
-                bb2 = slot._data._b2;
+                br = slot._data.getColor()._r;
+                bg = slot._data.getColor()._g;
+                bb = slot._data.getColor()._b;
+                ba = slot._data.getColor()._a;
+                br2 = slot._data.getDarkColor()._r;
+                bg2 = slot._data.getDarkColor()._g;
+                bb2 = slot._data.getDarkColor()._b;
             }
             else {
-                br = slot._r;
-                bg = slot._g;
-                bb = slot._b;
-                ba = slot._a;
-                br2 = slot._r2;
-                bg2 = slot._g2;
-                bb2 = slot._b2;
+                Color& color = slot.getColor();
+                br = color._r;
+                bg = color._g;
+                bb = color._b;
+                ba = color._a;
+
+                Color& darkColor = slot.getDarkColor();
+                br2 = darkColor._r;
+                bg2 = darkColor._g;
+                bb2 = darkColor._b;
             }
-            
-            slot._r = br + ((r - br) * alpha);
-            slot._g = bg + ((g - bg) * alpha);
-            slot._b = bb + ((b - bb) * alpha);
-            slot._a = ba + ((a - ba) * alpha);
-            slot._r2 = br2 + ((r2 - br2) * alpha);
-            slot._g2 = bg2 + ((g2 - bg2) * alpha);
-            slot._b2 = bb2 + ((b2 - bb2) * alpha);
+
+            Color& color = slot.getColor();
+            color._r = br + ((r - br) * alpha);
+            color._g = bg + ((g - bg) * alpha);
+            color._b = bb + ((b - bb) * alpha);
+            color._a = ba + ((a - ba) * alpha);
+
+            Color& darkColor = slot.getDarkColor();
+            darkColor._r = br2 + ((r2 - br2) * alpha);
+            darkColor._g = bg2 + ((g2 - bg2) * alpha);
+            darkColor._b = bb2 + ((b2 - bb2) * alpha);
         }
     }
     

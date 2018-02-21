@@ -32,8 +32,8 @@
 #define Spine_RegionAttachment_h
 
 #include <spine/Attachment.h>
-
 #include <spine/Vector.h>
+#include <spine/Color.h>
 
 #include <string>
 
@@ -78,15 +78,8 @@ namespace Spine {
         void setWidth(float inValue);
         float getHeight();
         void setHeight(float inValue);
-        
-        float getR();
-        void setR(float inValue);
-        float getG();
-        void setG(float inValue);
-        float getB();
-        void setB(float inValue);
-        float getA();
-        void setA(float inValue);
+
+        Color& getColor();
 
         const String& getPath();
         void setPath(const String& inValue);
@@ -134,7 +127,7 @@ namespace Spine {
         float _regionV;
         float _regionU2;
         float _regionV2;
-        float _r, _g, _b, _a;
+        Color _color;
     };
 }
 

@@ -44,9 +44,6 @@ namespace Spine {
     RTTI_IMPL(EventTimeline, Timeline);
     
     EventTimeline::EventTimeline(int frameCount) : Timeline() {
-		_frames.ensureCapacity(frameCount);
-		_events.ensureCapacity(frameCount);
-        
         _frames.setSize(frameCount);
         _events.setSize(frameCount);
     }

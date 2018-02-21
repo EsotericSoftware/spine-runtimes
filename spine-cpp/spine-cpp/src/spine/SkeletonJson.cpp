@@ -101,7 +101,7 @@ namespace Spine {
         }
     }
     
-    SkeletonData* SkeletonJson::readSkeletonDataFile(const char* path) {
+    SkeletonData* SkeletonJson::readSkeletonDataFile(const String& path) {
         int length;
         SkeletonData* skeletonData;
         const char* json = SpineExtension::readFile(path, &length);
@@ -218,19 +218,21 @@ namespace Spine {
 
                 color = Json::getString(slotMap, "color", 0);
                 if (color) {
-                    data->_r = toColor(color, 0);
-                    data->_g = toColor(color, 1);
-                    data->_b = toColor(color, 2);
-                    data->_a = toColor(color, 3);
+					Color& c = data->getColor();
+                    c._r = toColor(color, 0);
+                    c._g = toColor(color, 1);
+                    c._b = toColor(color, 2);
+                    c._a = toColor(color, 3);
                 }
 
                 dark = Json::getString(slotMap, "dark", 0);
                 if (dark) {
-                    data->_r2 = toColor(dark, 0);
-                    data->_g2 = toColor(dark, 1);
-                    data->_b2 = toColor(dark, 2);
-                    data->_a2 = toColor(dark, 3);
-                    data->_hasSecondColor = true;
+					Color& darkColor = data->getDarkColor();
+					darkColor._r = toColor(dark, 0);
+					darkColor._g = toColor(dark, 1);
+					darkColor._b = toColor(dark, 2);
+					darkColor._a = toColor(dark, 3);
+                    data->setHasDarkColor(true);
                 }
 
                 item = Json::getItem(slotMap, "attachment");
@@ -504,10 +506,10 @@ namespace Spine {
 
                                 color = Json::getString(attachmentMap, "color", 0);
                                 if (color) {
-                                    region->_r = toColor(color, 0);
-                                    region->_g = toColor(color, 1);
-                                    region->_b = toColor(color, 2);
-                                    region->_a = toColor(color, 3);
+                                    region->getColor()._r = toColor(color, 0);
+                                    region->getColor()._g = toColor(color, 1);
+                                    region->getColor()._b = toColor(color, 2);
+                                    region->getColor()._a = toColor(color, 3);
                                 }
 
                                 region->updateOffset();
@@ -523,10 +525,10 @@ namespace Spine {
 
                                 color = Json::getString(attachmentMap, "color", 0);
                                 if (color) {
-                                    mesh->_r = toColor(color, 0);
-                                    mesh->_g = toColor(color, 1);
-                                    mesh->_b = toColor(color, 2);
-                                    mesh->_a = toColor(color, 3);
+                                    mesh->getColor()._r = toColor(color, 0);
+                                    mesh->getColor()._g = toColor(color, 1);
+                                    mesh->getColor()._b = toColor(color, 2);
+                                    mesh->getColor()._a = toColor(color, 3);
                                 }
 
                                 mesh->_width = Json::getFloat(attachmentMap, "width", 32) * _scale;
@@ -652,6 +654,7 @@ namespace Spine {
             linkedMesh->_mesh->_parentMesh = static_cast<MeshAttachment*>(parent);
             linkedMesh->_mesh->updateUVs();
         }
+        ContainerUtil::cleanUpVectorOfPointers(_linkedMeshes);
         _linkedMeshes.clear();
 
         /* Events. */
@@ -1215,16 +1218,8 @@ namespace Spine {
         attachment->setBones(bonesAndWeights._bones);
     }
     
-    void SkeletonJson::setError(Json* root, const char* value1, const char* value2) {
-        char message[256];
-        int length;
-        strcpy(message, value1);
-        length = (int)strlen(value1);
-        if (value2) {
-            strncat(message + length, value2, 255 - length);
-        }
-        
-        _error = String(message);
+    void SkeletonJson::setError(Json* root, const String& value1, const String& value2) {
+        _error = String(value1 + value2);
 
         delete root;
     }

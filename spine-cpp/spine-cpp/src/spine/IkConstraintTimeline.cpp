@@ -51,7 +51,6 @@ namespace Spine {
     const int IkConstraintTimeline::BEND_DIRECTION = 2;
     
     IkConstraintTimeline::IkConstraintTimeline(int frameCount) : CurveTimeline(frameCount), _ikConstraintIndex(0) {
-		_frames.ensureCapacity(frameCount * ENTRIES);
         _frames.setSize(frameCount * ENTRIES);
     }
     

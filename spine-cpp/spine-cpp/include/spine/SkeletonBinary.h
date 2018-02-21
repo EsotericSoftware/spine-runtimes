@@ -35,6 +35,7 @@
 #include <spine/Vector.h>
 #include <spine/SpineObject.h>
 #include <spine/String.h>
+#include <spine/Color.h>
 
 namespace Spine {
     class SkeletonData;
@@ -76,7 +77,7 @@ namespace Spine {
         
         SkeletonData* readSkeletonData(const unsigned char* binary, int length);
         
-        SkeletonData* readSkeletonDataFile(const char* path);
+        SkeletonData* readSkeletonDataFile(const String& path);
         
     private:
         struct DataInput : public SpineObject {
@@ -104,7 +105,7 @@ namespace Spine {
         
         int readInt(DataInput* input);
         
-        void readColor(DataInput* input, float *r, float *g, float *b, float *a);
+        void readColor(DataInput* input, Color& color);
         
         int readVarint(DataInput* input, bool optimizePositive);
         

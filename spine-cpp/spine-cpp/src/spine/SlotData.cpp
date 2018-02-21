@@ -37,15 +37,9 @@ namespace Spine {
     _index(index),
     _name(name),
     _boneData(boneData),
-    _r(1),
-    _g(1),
-    _b(1),
-    _a(1),
-    _r2(0),
-    _g2(0),
-    _b2(0),
-    _a2(1),
-    _hasSecondColor(false),
+    _color(1, 1, 1, 1),
+    _darkColor(0, 0, 0, 0),
+    _hasDarkColor(false),
     _attachmentName(),
     _blendMode(BlendMode_Normal) {
         assert(_index >= 0);
@@ -63,69 +57,21 @@ namespace Spine {
     BoneData& SlotData::getBoneData() {
         return _boneData;
     }
-    
-    float SlotData::getR() {
-        return _r;
+
+    Color& SlotData::getColor() {
+        return _color;
     }
-    
-    void SlotData::setR(float inValue) {
-        _r = inValue;
+
+    Color& SlotData::getDarkColor() {
+        return _darkColor;
     }
-    
-    float SlotData::getG() {
-        return _g;
+
+    bool SlotData::hasDarkColor() {
+        return _hasDarkColor;
     }
-    
-    void SlotData::setG(float inValue) {
-        _g = inValue;
-    }
-    
-    float SlotData::getB() {
-        return _b;
-    }
-    
-    void SlotData::setB(float inValue) {
-        _b = inValue;
-    }
-    
-    float SlotData::getA() {
-        return _a;
-    }
-    
-    void SlotData::setA(float inValue) {
-        _a = inValue;
-    }
-    
-    float SlotData::getR2() {
-        return _r2;
-    }
-    
-    void SlotData::setR2(float inValue) {
-        _r2 = inValue;
-    }
-    
-    float SlotData::getG2() {
-        return _g2;
-    }
-    
-    void SlotData::setG2(float inValue) {
-        _g2 = inValue;
-    }
-    
-    float SlotData::getB2() {
-        return _b2;
-    }
-    
-    void SlotData::setB2(float inValue) {
-        _b2 = inValue;
-    }
-    
-    bool SlotData::hasSecondColor() {
-        return _hasSecondColor;
-    }
-    
-    void SlotData::setHasSecondColor(bool inValue) {
-        _hasSecondColor = inValue;
+
+    void SlotData::setHasDarkColor(bool inValue) {
+        _hasDarkColor = inValue;
     }
     
     const String& SlotData::getAttachmentName() {

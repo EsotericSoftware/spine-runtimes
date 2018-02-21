@@ -40,24 +40,16 @@ namespace Spine {
     _data(data),
     _bone(bone),
     _skeleton(bone.getSkeleton()),
-    _r(1),
-    _g(1),
-    _b(1),
-    _a(1),
-    _r2(0),
-    _g2(0),
-    _b2(0),
-    _hasSecondColor(false),
+    _color(1, 1, 1, 1),
+    _darkColor(0, 0, 0, 0),
+    _hasDarkColor(false),
     _attachment(NULL),
     _attachmentTime(0) {
         setToSetupPose();
     }
     
     void Slot::setToSetupPose() {
-        _r = _data.getR();
-        _g = _data.getG();
-        _b = _data.getB();
-        _a = _data.getA();
+        _color.set(_data.getColor());
         
         const String& attachmentName = _data.getAttachmentName();
         if (attachmentName.length() > 0) {
@@ -81,68 +73,20 @@ namespace Spine {
         return _skeleton;
     }
     
-    float Slot::getR() {
-        return _r;
+    Color& Slot::getColor() {
+        return _color;
+    }
+
+    Color& Slot::getDarkColor() {
+        return _darkColor;
     }
     
-    void Slot::setR(float inValue) {
-        _r = inValue;
+    bool Slot::hasDarkColor() {
+        return _hasDarkColor;
     }
     
-    float Slot::getG() {
-        return _g;
-    }
-    
-    void Slot::setG(float inValue) {
-        _g = inValue;
-    }
-    
-    float Slot::getB() {
-        return _b;
-    }
-    
-    void Slot::setB(float inValue) {
-        _b = inValue;
-    }
-    
-    float Slot::getA() {
-        return _a;
-    }
-    
-    void Slot::setA(float inValue) {
-        _a = inValue;
-    }
-    
-    float Slot::getR2() {
-        return _r2;
-    }
-    
-    void Slot::setR2(float inValue) {
-        _r2 = inValue;
-    }
-    
-    float Slot::getG2() {
-        return _g2;
-    }
-    
-    void Slot::setG2(float inValue) {
-        _g2 = inValue;
-    }
-    
-    float Slot::getB2() {
-        return _b2;
-    }
-    
-    void Slot::setB2(float inValue) {
-        _b2 = inValue;
-    }
-    
-    bool Slot::hasSecondColor() {
-        return _hasSecondColor;
-    }
-    
-    void Slot::setHasSecondColor(bool inValue) {
-        _hasSecondColor = inValue;
+    void Slot::setHasDarkColor(bool inValue) {
+        _hasDarkColor = inValue;
     }
     
     Attachment* Slot::getAttachment() {

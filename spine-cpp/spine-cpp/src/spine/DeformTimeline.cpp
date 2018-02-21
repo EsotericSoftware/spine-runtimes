@@ -87,7 +87,6 @@ namespace Spine {
                     }
                     
                     // Ensure size and preemptively set count.
-                    vertices.ensureCapacity(vertexCount);
                     vertices.setSize(vertexCount);
                     
                     if (vertexAttachment->_bones.size() == 0) {
@@ -111,7 +110,6 @@ namespace Spine {
         }
         
         // Ensure size and preemptively set count.
-        vertices.ensureCapacity(vertexCount);
         vertices.setSize(vertexCount);
         
         if (time >= _frames[_frames.size() - 1]) {
