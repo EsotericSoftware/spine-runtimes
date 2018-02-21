@@ -33,20 +33,23 @@
 
 void *Spine::TestSpineExtension::_alloc(size_t size, const char *file, int line) {
 	void* result = DefaultSpineExtension::_alloc(size, file, line);
-	allocated.push_back(Allocation(result, size, file, line));
+	_allocated.push_back(Allocation(result, size, file, line));
+	_allocations++;
 	return result;
 }
 
 void *Spine::TestSpineExtension::_calloc(size_t size, const char *file, int line) {
 	void* result = DefaultSpineExtension::_calloc(size, file, line);
-	allocated.push_back(Allocation(result, size, file, line));
+	_allocated.push_back(Allocation(result, size, file, line));
+	_allocations++;
 	return result;
 }
 
 void *Spine::TestSpineExtension::_realloc(void *ptr, size_t size, const char *file, int line) {
 	void* result = DefaultSpineExtension::_realloc(ptr, size, file, line);
+	_reallocations++;
 
-	for (std::vector<Allocation>::iterator it = allocated.begin(); it != allocated.end(); it++) {
+	for (std::vector<Allocation>::iterator it = _allocated.begin(); it != _allocated.end(); it++) {
 		if (it->address == ptr) {
 			it->address = result;
 			it->size = size;
@@ -56,16 +59,17 @@ void *Spine::TestSpineExtension::_realloc(void *ptr, size_t size, const char *fi
 		}
 	}
 
-	allocated.push_back(Allocation(result, size, file, line));
+	_allocated.push_back(Allocation(result, size, file, line));
 	return result;
 }
 
 void Spine::TestSpineExtension::_free(void *mem, const char *file, int line) {
 
-	for (std::vector<Allocation>::iterator it = allocated.begin(); it != allocated.end(); it++) {
+	for (std::vector<Allocation>::iterator it = _allocated.begin(); it != _allocated.end(); it++) {
 		if (it->address == mem) {
 			DefaultSpineExtension::_free(mem, file, line);
-			allocated.erase(it);
+			_frees++;
+			_allocated.erase(it);
 			return;
 		}
 	}
@@ -75,12 +79,13 @@ void Spine::TestSpineExtension::_free(void *mem, const char *file, int line) {
 }
 
 void Spine::TestSpineExtension::reportLeaks() {
-	for (std::vector<Allocation>::iterator it = allocated.begin(); it != allocated.end(); it++) {
+	for (std::vector<Allocation>::iterator it = _allocated.begin(); it != _allocated.end(); it++) {
 		printf("\"%s:%i (%zu bytes at %p)\n", it->fileName, it->line, it->size, it->address);
 	}
-	if (allocated.empty()) printf("No leaks detected");
+	printf("allocations: %lu, reallocations: %lu, frees: %lu\n", _allocations, _reallocations, _frees);
+	if (_allocated.empty()) printf("No leaks detected");
 }
 
 void Spine::TestSpineExtension::clearAllocations() {
-	allocated.resize(0);
+	_allocated.resize(0);
 }

@@ -64,7 +64,10 @@ namespace Spine {
 		virtual void _free(void* mem, const char* file, int line);
 
 	private:
-		std::vector<Allocation> allocated;
+		std::vector<Allocation> _allocated;
+		size_t _allocations;
+		size_t _reallocations;
+		size_t _frees;
 	};
 }
 
