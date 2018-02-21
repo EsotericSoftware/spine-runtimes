@@ -51,15 +51,12 @@ namespace Spine {
     }
     
     SpineExtension::~SpineExtension() {
-        // Empty
     }
     
     SpineExtension::SpineExtension() {
-        // Empty
     }
     
     DefaultSpineExtension::~DefaultSpineExtension() {
-        // Empty
     }
     
     void* DefaultSpineExtension::_alloc(size_t size, const char* file, int line) {
@@ -112,6 +109,5 @@ namespace Spine {
     }
     
     DefaultSpineExtension::DefaultSpineExtension() : SpineExtension() {
-        // Empty
     }
 }

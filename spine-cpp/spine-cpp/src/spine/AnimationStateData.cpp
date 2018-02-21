@@ -35,7 +35,6 @@
 
 namespace Spine {
     AnimationStateData::AnimationStateData(SkeletonData* skeletonData) : _skeletonData(skeletonData), _defaultMix(0) {
-        // Empty
     }
     
     void AnimationStateData::setMix(const String& fromName, const String& toName, float duration) {
@@ -83,7 +82,6 @@ namespace Spine {
     }
     
     AnimationStateData::AnimationPair::AnimationPair(Animation* a1, Animation* a2) : _a1(a1), _a2(a2) {
-        // Empty
     }
     
     bool AnimationStateData::AnimationPair::operator==(const AnimationPair &other) const {

@@ -44,7 +44,6 @@ namespace Spine {
     class Vector : public SpineObject {
     public:
         Vector() : _size(0), _capacity(0), _buffer(NULL) {
-            // Empty
         }
 
         Vector(const Vector& inVector) : _size(inVector._size), _capacity(inVector._capacity), _buffer(NULL) {

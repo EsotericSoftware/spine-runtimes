@@ -39,7 +39,6 @@ namespace Spine {
     _intValue(0),
     _floatValue(0),
     _stringValue() {
-        // Empty
     }
     
     const EventData& Event::getData() {

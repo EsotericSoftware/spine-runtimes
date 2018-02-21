@@ -56,10 +56,7 @@ namespace Spine {
     Skeleton::Skeleton(SkeletonData* skeletonData) :
     _data(skeletonData),
     _skin(NULL),
-    _r(1),
-    _g(1),
-    _b(1),
-    _a(1),
+    _color(1, 1, 1, 1),
     _time(0),
     _flipX(false),
     _flipY(false),
@@ -488,37 +485,9 @@ namespace Spine {
         return _skin;
     }
     
-    float Skeleton::getR() {
-        return _r;
-    }
-    
-    void Skeleton::setR(float inValue) {
-        _r = inValue;
-    }
-    
-    float Skeleton::getG() {
-        return _g;
-    }
-    
-    void Skeleton::setG(float inValue) {
-        _g = inValue;
-    }
-    
-    float Skeleton::getB() {
-        return _b;
-    }
-    
-    void Skeleton::setB(float inValue) {
-        _b = inValue;
-    }
-    
-    float Skeleton::getA() {
-        return _a;
-    }
-    
-    void Skeleton::setA(float inValue) {
-        _a = inValue;
-    }
+    Color& Skeleton::getColor() {
+		return _color;
+	}
     
     float Skeleton::getTime() {
         return _time;

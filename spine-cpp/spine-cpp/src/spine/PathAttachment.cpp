@@ -34,7 +34,6 @@ namespace Spine {
     RTTI_IMPL(PathAttachment, VertexAttachment);
     
     PathAttachment::PathAttachment(const String& name) : VertexAttachment(name), _closed(false), _constantSpeed(false) {
-        // Empty
     }
     
     Vector<float>& PathAttachment::getLengths() {

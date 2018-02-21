@@ -44,7 +44,6 @@ namespace Spine {
     RTTI_IMPL(ShearTimeline, TranslateTimeline);
     
     ShearTimeline::ShearTimeline(int frameCount) : TranslateTimeline(frameCount) {
-        // Empty
     }
     
     void ShearTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {

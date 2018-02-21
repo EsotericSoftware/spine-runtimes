@@ -48,11 +48,9 @@
 
 namespace Spine {
     void dummyOnAnimationEventFunc(AnimationState* state, EventType type, TrackEntry* entry, Event* event = NULL) {
-        // Empty
     }
     
     TrackEntry::TrackEntry() : _animation(NULL), _next(NULL), _mixingFrom(NULL), _trackIndex(0), _loop(false), _eventThreshold(0), _attachmentThreshold(0), _drawOrderThreshold(0), _animationStart(0), _animationEnd(0), _animationLast(0), _nextAnimationLast(0), _delay(0), _trackTime(0), _trackLast(0), _nextTrackLast(0), _trackEnd(0), _timeScale(1.0f), _alpha(0), _mixTime(0), _mixDuration(0), _interruptAlpha(0), _totalAlpha(0), _onAnimationEventFunc(dummyOnAnimationEventFunc) {
-        // Empty
     }
     
     int TrackEntry::getTrackIndex() { return _trackIndex; }
@@ -210,7 +208,6 @@ namespace Spine {
     _type(eventType),
     _entry(trackEntry),
     _event(event) {
-        // Empty
     }
     
     EventQueue* EventQueue::newEventQueue(AnimationState& state, Pool<TrackEntry>& trackEntryPool) {
@@ -222,7 +219,6 @@ namespace Spine {
     }
     
     EventQueue::EventQueue(AnimationState& state, Pool<TrackEntry>& trackEntryPool) : _state(state), _trackEntryPool(trackEntryPool), _drainDisabled(false) {
-        // Empty
     }
     
     EventQueue::~EventQueue() {
@@ -310,7 +306,6 @@ namespace Spine {
     _onAnimationEventFunc(dummyOnAnimationEventFunc),
     _timeScale(1),
     _rendererObject(NULL){
-        // Empty
     }
     
     AnimationState::~AnimationState() {

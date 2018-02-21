@@ -53,7 +53,6 @@ namespace Spine {
     _hash(),
     _fps(0),
     _imagesPath() {
-        // Empty
     }
     
     SkeletonData::~SkeletonData() {

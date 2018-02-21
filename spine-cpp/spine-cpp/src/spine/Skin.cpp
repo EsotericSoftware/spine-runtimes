@@ -41,7 +41,6 @@ namespace Spine {
     Skin::AttachmentKey::AttachmentKey(int slotIndex, const String& name) :
     _slotIndex(slotIndex),
     _name(name) {
-        // Empty
     }
     
     bool Skin::AttachmentKey::operator==(const AttachmentKey &other) const {

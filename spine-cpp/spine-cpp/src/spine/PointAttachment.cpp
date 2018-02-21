@@ -38,7 +38,6 @@ namespace Spine {
     RTTI_IMPL(PointAttachment, Attachment);
     
     PointAttachment::PointAttachment(const String& name) : Attachment(name), _x(0), _y(0), _rotation(0) {
-        // Empty
     }
     
     void PointAttachment::computeWorldPosition(Bone& bone, float& ox, float& oy) {

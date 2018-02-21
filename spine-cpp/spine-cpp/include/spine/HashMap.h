@@ -47,7 +47,6 @@ namespace Spine {
             
         public:
             explicit Iterator(Entry* entry = NULL) : _entry(entry) {
-                // Empty
             }
             
             Iterator& operator++() {
@@ -79,7 +78,6 @@ namespace Spine {
         _head(NULL),
         _hashFunction(),
         _size(0) {
-            // Empty
         }
         
         ~HashMap() {

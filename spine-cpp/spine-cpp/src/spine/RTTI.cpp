@@ -33,11 +33,9 @@
 
 namespace Spine {
     RTTI::RTTI(const std::string& className) : _className(className), _pBaseRTTI(NULL) {
-        // Empty
     }
     
     RTTI::RTTI(const std::string& className, const RTTI& baseRTTI) : _className(className), _pBaseRTTI(&baseRTTI) {
-        // Empty
     }
     
     const std::string& RTTI::getClassName() const {

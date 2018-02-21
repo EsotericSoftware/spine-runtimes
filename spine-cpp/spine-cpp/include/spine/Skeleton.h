@@ -35,6 +35,7 @@
 #include <spine/MathUtil.h>
 #include <spine/SpineObject.h>
 #include <spine/String.h>
+#include <spine/Color.h>
 
 #include <limits> // std::numeric_limits
 
@@ -154,14 +155,7 @@ namespace Spine {
         Vector<TransformConstraint*>& getTransformConstraints();
         
         Skin* getSkin();
-        float getR();
-        void setR(float inValue);
-        float getG();
-        void setG(float inValue);
-        float getB();
-        void setB(float inValue);
-        float getA();
-        void setA(float inValue);
+        Color& getColor();
         float getTime();
         void setTime(float inValue);
         float getX();
@@ -184,7 +178,7 @@ namespace Spine {
         Vector<Updatable*> _updateCache;
         Vector<Bone*> _updateCacheReset;
         Skin* _skin;
-        float _r, _g, _b, _a;
+        Color _color;
         float _time;
         bool _flipX, _flipY;
         float _x, _y;

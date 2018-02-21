@@ -39,7 +39,6 @@ namespace Spine {
     _target(NULL),
     _bendDirection(1),
     _mix(1) {
-        // Empty
     }
     
     const String& IkConstraintData::getName() {

@@ -54,7 +54,6 @@
     _hullLength(0),
     _inheritDeform(false),
     _regionRotate(false) {
-        // Empty
     }
     
     void MeshAttachment::updateUVs() {

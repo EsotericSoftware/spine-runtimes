@@ -44,7 +44,6 @@ namespace Spine {
     RTTI_IMPL(ScaleTimeline, TranslateTimeline);
     
     ScaleTimeline::ScaleTimeline(int frameCount) : TranslateTimeline(frameCount) {
-        // Empty
     }
     
     void ScaleTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {

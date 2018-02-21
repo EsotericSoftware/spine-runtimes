@@ -38,6 +38,5 @@ namespace Spine {
     _skin(skin),
     _slotIndex(slotIndex),
     _parent(parent) {
-        // Empty
     }
 }

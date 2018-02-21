@@ -44,7 +44,6 @@ namespace Spine {
     RTTI_IMPL(AtlasAttachmentLoader, AttachmentLoader);
     
     AtlasAttachmentLoader::AtlasAttachmentLoader(Atlas* atlas) : AttachmentLoader(), _atlas(atlas) {
-        // Empty
     }
     
     RegionAttachment* AtlasAttachmentLoader::newRegionAttachment(Skin& skin, const String& name, const String& path) {

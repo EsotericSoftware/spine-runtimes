@@ -41,7 +41,6 @@ namespace Spine {
     class Pool : public SpineObject {
     public:
         Pool() {
-            // Empty
         }
         
         ~Pool() {

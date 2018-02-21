@@ -46,6 +46,5 @@ namespace Spine {
 	}
 
 	SpineObject::~SpineObject() {
-		// Empty
 	}
 }

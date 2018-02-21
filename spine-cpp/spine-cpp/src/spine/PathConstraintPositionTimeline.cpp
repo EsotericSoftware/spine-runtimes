@@ -53,7 +53,6 @@ namespace Spine {
     }
 
     PathConstraintPositionTimeline::~PathConstraintPositionTimeline() {
-        // Empty
     }
     
     void PathConstraintPositionTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
