@@ -57,6 +57,10 @@ namespace Spine {
         SkeletonData* readSkeletonDataFile(const String& path);
         
         SkeletonData* readSkeletonData(const char* json);
+
+        void setScale (float scale) { _scale = scale; }
+
+        String& getError() { return _error; }
         
     private:
         AttachmentLoader* _attachmentLoader;

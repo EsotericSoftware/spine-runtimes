@@ -36,103 +36,102 @@
 #include <SFML/Window/Mouse.hpp>
 
 using namespace std;
-using namespace spine;
+using namespace Spine;
 #include <stdio.h>
 #include <stdlib.h>
 
 void callback (AnimationState* state, EventType type, TrackEntry* entry, Event* event) {
-	const char* animationName = (entry && entry->animation) ? entry->animation->name : 0;
+	const String& animationName = (entry && entry->getAnimation()) ? entry->getAnimation()->getName() : String("");
 
 	switch (type) {
-	case ANIMATION_START:
-		printf("%d start: %s\n", entry->trackIndex, animationName);
+	case EventType_Start:
+		printf("%d start: %s\n", entry->getTrackIndex(), animationName.buffer());
 		break;
-	case ANIMATION_INTERRUPT:
-		printf("%d interrupt: %s\n", entry->trackIndex, animationName);
+	case EventType_Interrupt:
+		printf("%d interrupt: %s\n", entry->getTrackIndex(), animationName.buffer());
 		break;
-	case ANIMATION_END:
-		printf("%d end: %s\n", entry->trackIndex, animationName);
+	case EventType_End:
+		printf("%d end: %s\n", entry->getTrackIndex(), animationName.buffer());
 		break;
-	case ANIMATION_COMPLETE:
-		printf("%d complete: %s\n", entry->trackIndex, animationName);
+	case EventType_Complete:
+		printf("%d complete: %s\n", entry->getTrackIndex(), animationName.buffer());
 		break;
-	case ANIMATION_DISPOSE:
-		printf("%d dispose: %s\n", entry->trackIndex, animationName);
+	case EventType_Dispose:
+		printf("%d dispose: %s\n", entry->getTrackIndex(), animationName.buffer());
 		break;
-	case ANIMATION_EVENT:
-		printf("%d event: %s, %s: %d, %f, %s\n", entry->trackIndex, animationName, event->data->name, event->intValue, event->floatValue,
-				event->stringValue);
+	case EventType_Event:
+		printf("%d event: %s, %s: %d, %f, %s\n", entry->getTrackIndex(), animationName.buffer(), event->getData().getName().buffer(), event->getIntValue(), event->getFloatValue(),
+				event->getStringValue().buffer());
 		break;
 	}
 	fflush(stdout);
 }
 
-SkeletonData* readSkeletonJsonData (const char* filename, Atlas* atlas, float scale) {
-	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = scale;
-	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, filename);
+SkeletonData* readSkeletonJsonData (const String& filename, Atlas* atlas, float scale) {
+	SkeletonJson* json = new (__FILE__, __LINE__) SkeletonJson(atlas);
+	json->setScale(scale);
+	SkeletonData* skeletonData = json->readSkeletonDataFile(filename);
 	if (!skeletonData) {
-		printf("%s\n", json->error);
+		printf("%s\n", json->getError().buffer());
 		exit(0);
 	}
-	SkeletonJson_dispose(json);
+	delete json;
 	return skeletonData;
 }
 
 SkeletonData* readSkeletonBinaryData (const char* filename, Atlas* atlas, float scale) {
-	SkeletonBinary* binary = SkeletonBinary_create(atlas);
-	binary->scale = scale;
-	SkeletonData *skeletonData = SkeletonBinary_readSkeletonDataFile(binary, filename);
+	SkeletonBinary* binary = new (__FILE__, __LINE__) SkeletonBinary(atlas);
+	binary->setScale(scale);
+	SkeletonData *skeletonData = binary->readSkeletonDataFile(filename);
 	if (!skeletonData) {
-		printf("%s\n", binary->error);
+		printf("%s\n", binary->getError().buffer());
 		exit(0);
 	}
-	SkeletonBinary_dispose(binary);
+	delete binary;
 	return skeletonData;
 }
 
 void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
 		const char* jsonName, const char* binaryName, const char* atlasName,
 		float scale) {
-	Atlas* atlas = Atlas_createFromFile(atlasName, 0);
+	Atlas* atlas = new (__FILE__, __LINE__) Atlas(atlasName, 0);
 
 	SkeletonData* skeletonData = readSkeletonJsonData(jsonName, atlas, scale);
 	func(skeletonData, atlas);
-	SkeletonData_dispose(skeletonData);
+	delete skeletonData;
 
 	skeletonData = readSkeletonBinaryData(binaryName, atlas, scale);
 	func(skeletonData, atlas);
-	SkeletonData_dispose(skeletonData);
+	delete skeletonData;
 
-	Atlas_dispose(atlas);
+	delete atlas;
 }
 
 void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
-	SkeletonBounds* bounds = SkeletonBounds_create();
+	SkeletonBounds bounds;
 
 	// Configure mixing.
-	AnimationStateData* stateData = AnimationStateData_create(skeletonData);
-	AnimationStateData_setMixByName(stateData, "walk", "jump", 0.2f);
-	AnimationStateData_setMixByName(stateData, "jump", "run", 0.2f);
+	AnimationStateData stateData(skeletonData);
+	stateData.setMix("walk", "jump", 0.2f);
+	stateData.setMix("jump", "run", 0.2f);
 
-	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData, stateData);
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData, &stateData);
 	drawable->timeScale = 1;
 
 	Skeleton* skeleton = drawable->skeleton;
-	skeleton->flipX = false;
-	skeleton->flipY = false;
-	Skeleton_setToSetupPose(skeleton);
+	skeleton->setFlipX(false);
+	skeleton->setFlipY(false);
+	skeleton->setToSetupPose();
 
-	skeleton->x = 320;
-	skeleton->y = 590;
-	Skeleton_updateWorldTransform(skeleton);
+	skeleton->setPosition(320, 590);
+	skeleton->updateWorldTransform();
 
-	Slot* headSlot = Skeleton_findSlot(skeleton, "head");
+	Slot* headSlot = skeleton->findSlot("head");
 
-	drawable->state->listener = callback;
-	AnimationState_addAnimationByName(drawable->state, 0, "walk", true, 0);
-	AnimationState_addAnimationByName(drawable->state, 0, "jump", false, 3);
-	AnimationState_addAnimationByName(drawable->state, 0, "run", true, 0);
+	drawable->state->setOnAnimationEventFunc(callback);
+	drawable->state->addAnimation(0, "walk", true, 0);
+	drawable->state->addAnimation(0, "jump", false, 3);
+	drawable->state->addAnimation(0, "run", true, 0);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - spineboy");
 	window.setFramerateLimit(60);
@@ -145,14 +144,14 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
-		SkeletonBounds_update(bounds, skeleton, true);
+		bounds.update(*skeleton, true);
 		sf::Vector2i position = sf::Mouse::getPosition(window);
-		if (SkeletonBounds_containsPoint(bounds, position.x, position.y)) {
-			headSlot->color.g = 0;
-			headSlot->color.b = 0;
+		if (bounds.containsPoint(position.x, position.y)) {
+			headSlot->getColor()._g = 0;
+			headSlot->getColor()._b = 0;
 		} else {
-			headSlot->color.g = 1;
-			headSlot->color.b = 1;
+			headSlot->getColor()._g = 1;
+			headSlot->getColor()._b = 1;
 		}
 
 		drawable->update(delta);
@@ -162,7 +161,7 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 		window.display();
 	}
 
-	SkeletonBounds_dispose(bounds);
+	delete drawable;
 }
 
 void goblins (SkeletonData* skeletonData, Atlas* atlas) {
@@ -170,17 +169,15 @@ void goblins (SkeletonData* skeletonData, Atlas* atlas) {
 	drawable->timeScale = 1;
 
 	Skeleton* skeleton = drawable->skeleton;
-	skeleton->flipX = false;
-	skeleton->flipY = false;
-	Skeleton_setSkinByName(skeleton, "goblin");
-	Skeleton_setSlotsToSetupPose(skeleton);
-	//Skeleton_setAttachment(skeleton, "left hand item", "dagger");
+	skeleton->setFlipX(false);
+	skeleton->setFlipY(false);
+	skeleton->setSkin("goblin");
+	skeleton->setSlotsToSetupPose();
 
-	skeleton->x = 320;
-	skeleton->y = 590;
-	Skeleton_updateWorldTransform(skeleton);
+	skeleton->setPosition(320, 590);
+	skeleton->updateWorldTransform();
 
-	AnimationState_setAnimationByName(drawable->state, 0, "walk", true);
+	drawable->state->setAnimation(0, "walk", true);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - goblins");
 	window.setFramerateLimit(60);
@@ -205,17 +202,16 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 
-	spSwirlVertexEffect* effect = spSwirlVertexEffect_create(400);
-	effect->centerY = -200;
-	drawable->vertexEffect = &effect->super;
+	// BOZO spSwirlVertexEffect* effect = spSwirlVertexEffect_create(400);
+	// effect->centerY = -200;
+	// drawable->vertexEffect = &effect->super;
 
 	Skeleton* skeleton = drawable->skeleton;
-	skeleton->x = 320;
-	skeleton->y = 590;
-	Skeleton_updateWorldTransform(skeleton);
+	skeleton->setPosition(320, 590);
+	skeleton->updateWorldTransform();
 
-	AnimationState_setAnimationByName(drawable->state, 0, "walk", true);
-	AnimationState_addAnimationByName(drawable->state, 1, "gun-grab", false, 2);
+	drawable->state->setAnimation(0, "walk", true);
+	drawable->state->addAnimation(1, "gun-grab", false, 2);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - raptor");
 	window.setFramerateLimit(60);
@@ -230,9 +226,9 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 		deltaClock.restart();
 
 		swirlTime += delta;
-		float percent = fmod(swirlTime, 2);
+		float percent = MathUtil::fmod(swirlTime, 2);
 		if (percent > 1) percent = 1 - (percent - 1);
-		effect->angle = _spMath_interpolate(_spMath_pow2_apply, -60, 60, percent);
+		// BOZO effect->angle = _spMath_interpolate(_spMath_pow2_apply, -60, 60, percent);
 
 		drawable->update(delta);
 
@@ -240,7 +236,7 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 		window.draw(*drawable);
 		window.display();
 	}
-	spSwirlVertexEffect_dispose(effect);
+	// BOZO spSwirlVertexEffect_dispose(effect);
 }
 
 void tank (SkeletonData* skeletonData, Atlas* atlas) {
@@ -248,11 +244,10 @@ void tank (SkeletonData* skeletonData, Atlas* atlas) {
 	drawable->timeScale = 1;
 
 	Skeleton* skeleton = drawable->skeleton;
-	skeleton->x = 500;
-	skeleton->y = 590;
-	Skeleton_updateWorldTransform(skeleton);
+	skeleton->setPosition(500, 590);
+	skeleton->updateWorldTransform();
 
-	AnimationState_setAnimationByName(drawable->state, 0, "drive", true);
+	drawable->state->setAnimation(0, "drive", true);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - tank");
 	window.setFramerateLimit(60);
@@ -277,11 +272,10 @@ void vine (SkeletonData* skeletonData, Atlas* atlas) {
 	drawable->timeScale = 1;
 
 	Skeleton* skeleton = drawable->skeleton;
-	skeleton->x = 320;
-	skeleton->y = 590;
-	Skeleton_updateWorldTransform(skeleton);
+	skeleton->setPosition(320, 590);
+	skeleton->updateWorldTransform();
 
-	AnimationState_setAnimationByName(drawable->state, 0, "grow", true);
+	drawable->state->setAnimation(0, "grow", true);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - vine");
 	window.setFramerateLimit(60);
@@ -307,14 +301,13 @@ void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
 	drawable->timeScale = 1;
 
 	Skeleton* skeleton = drawable->skeleton;
-	skeleton->flipX = false;
-	skeleton->flipY = false;
+	skeleton->setFlipX(false);
+	skeleton->setFlipY(false);
 
-	skeleton->x = 100;
-	skeleton->y = 590;
-	Skeleton_updateWorldTransform(skeleton);
+	skeleton->setPosition(100, 590);
+	skeleton->updateWorldTransform();
 
-	AnimationState_setAnimationByName(drawable->state, 0, "sneak", true);
+	drawable->state->setAnimation(0, "sneak", true);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - Streatchyman");
 	window.setFramerateLimit(60);
@@ -340,11 +333,10 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 	drawable->timeScale = 1;
 
 	Skeleton* skeleton = drawable->skeleton;
-	skeleton->x = 320;
-	skeleton->y = 590;
-	Skeleton_updateWorldTransform(skeleton);
+	skeleton->setPosition(320, 590);
+	skeleton->updateWorldTransform();
 
-	AnimationState_setAnimationByName(drawable->state, 0, "rotate", true);
+	drawable->state->setAnimation(0, "rotate", true);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - vine");
 	window.setFramerateLimit(60);
@@ -371,25 +363,24 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
 	drawable->timeScale = 1;
 
 	Skeleton* skeleton = drawable->skeleton;
-	skeleton->x = 320;
-	skeleton->y = 400;
-	Skeleton_updateWorldTransform(skeleton);
+	skeleton->setPosition(320, 400);
+	skeleton->updateWorldTransform();
 
-	AnimationState_setAnimationByName(drawable->state, 0, "idle", true);
-	AnimationState_setAnimationByName(drawable->state, 1, "blink", true);
-	spTrackEntry* left = AnimationState_setAnimationByName(drawable->state, 2, "left", true);
-	spTrackEntry* right = AnimationState_setAnimationByName(drawable->state, 3, "right", true);
-	spTrackEntry* up = AnimationState_setAnimationByName(drawable->state, 4, "up", true);
-	spTrackEntry* down = AnimationState_setAnimationByName(drawable->state, 5, "down", true);
+	drawable->state->setAnimation(0, "idle", true);
+	drawable->state->setAnimation(1, "blink", true);
+	TrackEntry* left = drawable->state->setAnimation(2, "left", true);
+	TrackEntry* right = drawable->state->setAnimation(3, "right", true);
+	TrackEntry* up = drawable->state->setAnimation(4, "up", true);
+	TrackEntry* down = drawable->state->setAnimation(5, "down", true);
 
-	left->alpha = 0;
-	left->mixBlend = SP_MIX_BLEND_ADD;
-	right->alpha = 0;
-	right->mixBlend = SP_MIX_BLEND_ADD;
-	up->alpha = 0;
-	up->mixBlend = SP_MIX_BLEND_ADD;
-	down->alpha = 0;
-	down->mixBlend = SP_MIX_BLEND_ADD;
+	left->setAlpha(0);
+	// BOZO left->setMixBlend(SP_MIX_BLEND_ADD);
+	right->setAlpha(0);
+	// BOZO right->mixBlend = SP_MIX_BLEND_ADD;
+	up->setAlpha(0);
+	// BOZO up->mixBlend = SP_MIX_BLEND_ADD;
+	down->setAlpha(0);
+	// BOZO down->mixBlend = SP_MIX_BLEND_ADD;
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - owl");
 	window.setFramerateLimit(60);
@@ -400,12 +391,12 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
 			if (event.type == sf::Event::Closed) window.close();
 			if (event.type == sf::Event::MouseMoved) {
 				float x = event.mouseMove.x / 640.0f;
-				left->alpha = (MAX(x, 0.5f) - 0.5f) * 2;
-				right->alpha = (0.5 - MIN(x, 0.5)) * 2;
+				left->setAlpha((MAX(x, 0.5f) - 0.5f) * 2);
+				right->setAlpha((0.5 - MIN(x, 0.5)) * 2);
 
 				float y = event.mouseMove.y / 640.0f;
-				down->alpha = (MAX(y, 0.5f) - 0.5f) * 2;
-				up->alpha = (0.5 - MIN(y, 0.5)) * 2;
+				down->setAlpha((MAX(y, 0.5f) - 0.5f) * 2);
+				up->setAlpha((0.5 - MIN(y, 0.5)) * 2);
 			}
 		}
 
@@ -424,38 +415,40 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
  * Used for debugging purposes during runtime development
  */
 void test (SkeletonData* skeletonData, Atlas* atlas) {
-	spSkeleton* skeleton = Skeleton_create(skeletonData);
-	spAnimationStateData* animData = spAnimationStateData_create(skeletonData);
-	spAnimationState* animState = spAnimationState_create(animData);
-	spAnimationState_setAnimationByName(animState, 0, "drive", true);
-
+	Skeleton* skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
+	AnimationStateData* animData = new (__FILE__, __LINE__) AnimationStateData(skeletonData);
+	AnimationState* animState = new (__FILE__, __LINE__) AnimationState(animData);
+	animState->setAnimation(0, "drive", true);
 
 	float d = 3;
 	for (int i = 0; i < 1; i++) {
-		spSkeleton_update(skeleton, d);
-		spAnimationState_update(animState, d);
-		spAnimationState_apply(animState, skeleton);
-		spSkeleton_updateWorldTransform(skeleton);
-		for (int ii = 0; ii < skeleton->bonesCount; ii++) {
-			spBone* bone = skeleton->bones[ii];
-			printf("%s %f %f %f %f %f %f\n", bone->data->name, bone->a, bone->b, bone->c, bone->d, bone->worldX, bone->worldY);
+		skeleton->update(d);
+		animState->update(d);
+		animState->apply(*skeleton);
+		skeleton->updateWorldTransform();
+		for (int ii = 0; ii < skeleton->getBones().size(); ii++) {
+			Bone* bone = skeleton->getBones()[ii];
+			printf("%s %f %f %f %f %f %f\n", bone->getData().getName().buffer(), bone->getA(), bone->getB(), bone->getC(), bone->getD(), bone->getWorldX(), bone->getWorldY());
 		}
 		printf("========================================\n");
 		d += 0.1f;
 	}
 
-	Skeleton_dispose(skeleton);
+	delete skeleton;
+	delete animData;
+	delete animState;
 }
 
 int main () {
 	testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 1.0f);
-	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl.atlas", 0.5f);
+	testcase(spineboy, "data/spineboy-ess.json", "data/spineboy-ess.skel", "data/spineboy.atlas", 0.6f);
+	/*testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl.atlas", 0.5f);
 	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin.atlas", 0.5f);
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine.atlas", 0.5f);
 	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 0.2f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor.atlas", 0.5f);
 	testcase(spineboy, "data/spineboy-ess.json", "data/spineboy-ess.skel", "data/spineboy.atlas", 0.6f);
 	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins.atlas", 1.4f);
-	testcase(stretchyman, "data/stretchyman-pro.json", "data/stretchyman-pro.skel", "data/stretchyman.atlas", 0.6f);
+	testcase(stretchyman, "data/stretchyman-pro.json", "data/stretchyman-pro.skel", "data/stretchyman.atlas", 0.6f);*/
 	return 0;
 }

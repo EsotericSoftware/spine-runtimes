@@ -85,10 +85,10 @@ namespace Spine {
         _clippingPolygon.clear();
     }
     
-    void SkeletonClipping::clipTriangles(Vector<float>& vertices, int verticesLength, Vector<int>& triangles, int trianglesLength, Vector<float>& uvs) {
+    void SkeletonClipping::clipTriangles(Vector<float>& vertices, int verticesLength, Vector<unsigned short>& triangles, int trianglesLength, Vector<float>& uvs) {
         Vector<float>& clipOutput = _clipOutput;
         Vector<float>& clippedVertices = _clippedVertices;
-        Vector<int>& clippedTriangles = _clippedTriangles;
+        Vector<unsigned short>& clippedTriangles = _clippedTriangles;
         Vector< Vector<float>* >& polygons = _clippingPolygons;
         int polygonsCount = static_cast<int>(_clippingPolygons.size());
 
@@ -184,7 +184,7 @@ namespace Spine {
         return _clippedVertices;
     }
     
-    Vector<int>& SkeletonClipping::getClippedTriangles() {
+    Vector<unsigned short>& SkeletonClipping::getClippedTriangles() {
         return _clippedTriangles;
     }
     

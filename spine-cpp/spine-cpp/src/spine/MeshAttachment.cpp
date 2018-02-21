@@ -104,11 +104,11 @@
         _uvs = inValue;
     }
     
-    Vector<short>& MeshAttachment::getTriangles() {
+    Vector<unsigned short>& MeshAttachment::getTriangles() {
         return _triangles;
     }
     
-    void MeshAttachment::setTriangles(Vector<short>& inValue) {
+    void MeshAttachment::setTriangles(Vector<unsigned short>& inValue) {
         _triangles = inValue;
     }
     
@@ -243,11 +243,11 @@
         }
     }
     
-    Vector<short>& MeshAttachment::getEdges() {
+    Vector<unsigned short>& MeshAttachment::getEdges() {
         return _edges;
     }
     
-    void MeshAttachment::setEdges(Vector<short>& inValue) {
+    void MeshAttachment::setEdges(Vector<unsigned short>& inValue) {
         _edges = inValue;
     }
     

@@ -47,14 +47,13 @@ sf::BlendMode additivePma = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::One
 sf::BlendMode multiplyPma = sf::BlendMode(sf::BlendMode::DstColor, sf::BlendMode::OneMinusSrcAlpha);
 sf::BlendMode screenPma = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcColor);
 
-_SP_ARRAY_IMPLEMENT_TYPE(spColorArray, spColor)
 
-void _AtlasPage_createTexture (AtlasPage* self, const char* path){
+void _AtlasPage_createTexture (Spine::AtlasPage* self, const char* path){
 	Texture* texture = new Texture();
 	if (!texture->loadFromFile(path)) return;
 
-	if (self->magFilter == SP_ATLAS_LINEAR) texture->setSmooth(true);
-	if (self->uWrap == SP_ATLAS_REPEAT && self->vWrap == SP_ATLAS_REPEAT) texture->setRepeated(true);
+	if (self->magFilter == Spine::TextureFilter_Nearest) texture->setSmooth(true);
+	if (self->uWrap == Spine::TextureWrap_Repeat && self->vWrap == Spine::TextureWrap_Repeat) texture->setRepeated(true);
 
 	self->rendererObject = texture;
 	Vector2u size = texture->getSize();
@@ -62,147 +61,146 @@ void _AtlasPage_createTexture (AtlasPage* self, const char* path){
 	self->height = size.y;
 }
 
-void _AtlasPage_disposeTexture (AtlasPage* self){
+void _AtlasPage_disposeTexture (Spine::AtlasPage* self){
 	delete (Texture*)self->rendererObject;
 }
 
 char* _Util_readFile (const char* path, int* length){
-	return _spReadFile(path, length);
+	return Spine::SpineExtension::readFile(Spine::String(path), length);
 }
 
 /**/
 
-namespace spine {
+namespace Spine {
 
 SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData, AnimationStateData* stateData) :
 		timeScale(1),
-		vertexArray(new VertexArray(Triangles, skeletonData->bonesCount * 4)),
-		vertexEffect(0),
-		worldVertices(0), clipper(0) {
-	Bone_setYDown(true);
-	worldVertices = MALLOC(float, SPINE_MESH_VERTEX_COUNT_MAX);
-	skeleton = Skeleton_create(skeletonData);
-	tempUvs = spFloatArray_create(16);
-	tempColors = spColorArray_create(16);
+		vertexArray(new VertexArray(Triangles, skeletonData->getBones().size() * 4)),
+		worldVertices(), clipper() {
+	Bone::setYDown(true);
+	worldVertices.setSize(SPINE_MESH_VERTEX_COUNT_MAX);
+	skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
+	tempUvs.ensureCapacity(16);
+	tempColors.ensureCapacity(16);
 
 	ownsAnimationStateData = stateData == 0;
-	if (ownsAnimationStateData) stateData = AnimationStateData_create(skeletonData);
+	if (ownsAnimationStateData) stateData = new (__FILE__, __LINE__) AnimationStateData(skeletonData);
 
-	state = AnimationState_create(stateData);
-
-	clipper = spSkeletonClipping_create();
+	state = new (__FILE__, __LINE__) AnimationState(stateData);
 }
 
 SkeletonDrawable::~SkeletonDrawable () {
 	delete vertexArray;
-	FREE(worldVertices);
-	if (ownsAnimationStateData) AnimationStateData_dispose(state->data);
-	AnimationState_dispose(state);
-	Skeleton_dispose(skeleton);
-	spSkeletonClipping_dispose(clipper);
-	spFloatArray_dispose(tempUvs);
-	spColorArray_dispose(tempColors);
+	if (ownsAnimationStateData) delete state->getData();
+	delete state;
+	delete skeleton;
 }
 
 void SkeletonDrawable::update (float deltaTime) {
-	Skeleton_update(skeleton, deltaTime);
-	AnimationState_update(state, deltaTime * timeScale);
-	AnimationState_apply(state, skeleton);
-	Skeleton_updateWorldTransform(skeleton);
+	skeleton->update(deltaTime);
+	state->update(deltaTime * timeScale);
+	state->apply(*skeleton);
+	skeleton->updateWorldTransform();
 }
 
 void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 	vertexArray->clear();
-	states.texture = 0;
-	unsigned short quadIndices[6] = { 0, 1, 2, 2, 3, 0 };
+	states.texture = NULL;
+	Vector<unsigned short> quadIndices;
+	quadIndices.add(0);
+	quadIndices.add(1);
+	quadIndices.add(2);
+	quadIndices.add(2);
+	quadIndices.add(3);
+	quadIndices.add(0);
 
-	if (vertexEffect != 0) vertexEffect->begin(vertexEffect, skeleton);
+	// BOZO if (vertexEffect != 0) vertexEffect->begin(vertexEffect, skeleton);
 
 	sf::Vertex vertex;
-	Texture* texture = 0;
-	for (int i = 0; i < skeleton->slotsCount; ++i) {
-		Slot* slot = skeleton->drawOrder[i];
-		Attachment* attachment = slot->attachment;
+	Texture* texture = NULL;
+	for (int i = 0; i < skeleton->getSlots().size(); ++i) {
+		Slot& slot = *skeleton->getDrawOrder()[i];
+		Attachment* attachment = slot.getAttachment();
 		if (!attachment) continue;
 
-		float* vertices = worldVertices;
+		Vector<float>* vertices = &worldVertices;
 		int verticesCount = 0;
-		float* uvs = 0;
-		unsigned short* indices = 0;
+		Vector<float>* uvs = NULL;
+		Vector<unsigned short>* indices = NULL;
 		int indicesCount = 0;
-		spColor* attachmentColor;
+		Color* attachmentColor;
 
-		if (attachment->type == ATTACHMENT_REGION) {
+		if (attachment->rtti.derivesFrom(RegionAttachment::rtti)) {
 			RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
-			spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, vertices, 0, 2);
+			regionAttachment->computeWorldVertices(slot.getBone(), worldVertices, 0, 2);
 			verticesCount = 4;
-			uvs = regionAttachment->uvs;
-			indices = quadIndices;
+			uvs = &regionAttachment->getUVs();
+			indices = &quadIndices;
 			indicesCount = 6;
-			texture = (Texture*)((AtlasRegion*)regionAttachment->rendererObject)->page->rendererObject;
-			attachmentColor = &regionAttachment->color;
+			texture = (Texture*)((AtlasRegion*)regionAttachment->getRendererObject())->page->rendererObject;
+			attachmentColor = &regionAttachment->getColor();
 
-		} else if (attachment->type == ATTACHMENT_MESH) {
+		} else if (attachment->rtti.derivesFrom(MeshAttachment::rtti)) {
 			MeshAttachment* mesh = (MeshAttachment*)attachment;
-			if (mesh->super.worldVerticesLength > SPINE_MESH_VERTEX_COUNT_MAX) continue;
-			texture = (Texture*)((AtlasRegion*)mesh->rendererObject)->page->rendererObject;
-			spVertexAttachment_computeWorldVertices(SUPER(mesh), slot, 0, mesh->super.worldVerticesLength, worldVertices, 0, 2);
-			verticesCount = mesh->super.worldVerticesLength >> 1;
-			uvs = mesh->uvs;
-			indices = mesh->triangles;
-			indicesCount = mesh->trianglesCount;
-			attachmentColor = &mesh->color;
-		} else if (attachment->type == SP_ATTACHMENT_CLIPPING) {
-			spClippingAttachment* clip = (spClippingAttachment*)slot->attachment;
-			spSkeletonClipping_clipStart(clipper, slot, clip);
+			if (mesh->getWorldVerticesLength() > worldVertices.size()) worldVertices.setSize(mesh->getWorldVerticesLength());
+			texture = (Texture*)((AtlasRegion*)mesh->getRendererObject())->page->rendererObject;
+			mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices, 0, 2);
+			verticesCount = mesh->getWorldVerticesLength() >> 1;
+			uvs = &mesh->getUVs();
+			indices = &mesh->getTriangles();
+			indicesCount = mesh->getTriangles().size();
+			attachmentColor = &mesh->getColor();
+		} else if (attachment->rtti.derivesFrom(ClippingAttachment::rtti)) {
+			ClippingAttachment* clip = (ClippingAttachment*)slot.getAttachment();
+			clipper.clipStart(slot, clip);
 			continue;
 		} else continue;
 
-		Uint8 r = static_cast<Uint8>(skeleton->color.r * slot->color.r * attachmentColor->r * 255);
-		Uint8 g = static_cast<Uint8>(skeleton->color.g * slot->color.g * attachmentColor->g * 255);
-		Uint8 b = static_cast<Uint8>(skeleton->color.b * slot->color.b * attachmentColor->b * 255);
-		Uint8 a = static_cast<Uint8>(skeleton->color.a * slot->color.a * attachmentColor->a * 255);
+		Uint8 r = static_cast<Uint8>(skeleton->getColor()._r * slot.getColor()._r * attachmentColor->_r * 255);
+		Uint8 g = static_cast<Uint8>(skeleton->getColor()._g * slot.getColor()._g * attachmentColor->_g * 255);
+		Uint8 b = static_cast<Uint8>(skeleton->getColor()._b * slot.getColor()._b * attachmentColor->_b * 255);
+		Uint8 a = static_cast<Uint8>(skeleton->getColor()._a * slot.getColor()._a * attachmentColor->_a * 255);
 		vertex.color.r = r;
 		vertex.color.g = g;
 		vertex.color.b = b;
 		vertex.color.a = a;
 
-		spColor light;
-		light.r = r / 255.0f;
-		light.g = g / 255.0f;
-		light.b = b / 255.0f;
-		light.a = a / 255.0f;
+		Color light;
+		light._r = r / 255.0f;
+		light._g = g / 255.0f;
+		light._b = b / 255.0f;
+		light._a = a / 255.0f;
 
 		sf::BlendMode blend;
 		if (!usePremultipliedAlpha) {
-			switch (slot->data->blendMode) {
-				case BLEND_MODE_NORMAL:
+			switch (slot.getData().getBlendMode()) {
+				case BlendMode_Normal:
 					blend = normal;
 					break;
-				case BLEND_MODE_ADDITIVE:
+				case BlendMode_Additive:
 					blend = additive;
 					break;
-				case BLEND_MODE_MULTIPLY:
+				case BlendMode_Multiply:
 					blend = multiply;
 					break;
-				case BLEND_MODE_SCREEN:
+				case BlendMode_Screen:
 					blend = screen;
 					break;
 				default:
 					blend = normal;
 			}
 		} else {
-			switch (slot->data->blendMode) {
-				case BLEND_MODE_NORMAL:
+			switch (slot.getData().getBlendMode()) {
+				case BlendMode_Normal:
 					blend = normalPma;
 					break;
-				case BLEND_MODE_ADDITIVE:
+				case BlendMode_Additive:
 					blend = additivePma;
 					break;
-				case BLEND_MODE_MULTIPLY:
+				case BlendMode_Multiply:
 					blend = multiplyPma;
 					break;
-				case BLEND_MODE_SCREEN:
+				case BlendMode_Screen:
 					blend = screenPma;
 					break;
 				default:
@@ -219,18 +217,18 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 			states.texture = texture;
 		}
 
-		if (spSkeletonClipping_isClipping(clipper)) {
-			spSkeletonClipping_clipTriangles(clipper, vertices, verticesCount << 1, indices, indicesCount, uvs, 2);
-			vertices = clipper->clippedVertices->items;
-			verticesCount = clipper->clippedVertices->size >> 1;
-			uvs = clipper->clippedUVs->items;
-			indices = clipper->clippedTriangles->items;
-			indicesCount = clipper->clippedTriangles->size;
+		if (clipper.isClipping()) {
+			clipper.clipTriangles(worldVertices, verticesCount << 1, *indices, indicesCount, *uvs);
+			vertices = &clipper.getClippedVertices();
+			verticesCount = clipper.getClippedVertices().size() >> 1;
+			uvs = &clipper.getClippedUVs();
+			indices = &clipper.getClippedTriangles();
+			indicesCount = clipper.getClippedTriangles().size();
 		}
 
 		Vector2u size = texture->getSize();
 
-		if (vertexEffect != 0) {
+		/* BOZO if (vertexEffect != 0) {
 			spFloatArray_clear(tempUvs);
 			spColorArray_clear(tempColors);
 			for (int i = 0; i < verticesCount; i++) {
@@ -263,23 +261,23 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 				vertex.color.a = static_cast<Uint8>(vertexColor.a * 255);
 				vertexArray->append(vertex);
 			}
-		} else {
+		} else {*/
 			for (int i = 0; i < indicesCount; ++i) {
-				int index = indices[i] << 1;
-				vertex.position.x = vertices[index];
-				vertex.position.y = vertices[index + 1];
-				vertex.texCoords.x = uvs[index] * size.x;
-				vertex.texCoords.y = uvs[index + 1] * size.y;
+				int index = (*indices)[i] << 1;
+				vertex.position.x = (*vertices)[index];
+				vertex.position.y = (*vertices)[index + 1];
+				vertex.texCoords.x = (*uvs)[index] * size.x;
+				vertex.texCoords.y = (*uvs)[index + 1] * size.y;
 				vertexArray->append(vertex);
 			}
-		}
+		// }
 
-		spSkeletonClipping_clipEnd(clipper, slot);
+		clipper.clipEnd(slot);
 	}
 	target.draw(*vertexArray, states);
-	spSkeletonClipping_clipEnd2(clipper);
+	clipper.clipEnd();
 
-	if (vertexEffect != 0) vertexEffect->end(vertexEffect);
+	// BOZO if (vertexEffect != 0) vertexEffect->end(vertexEffect);
 }
 
 } /* namespace spine */

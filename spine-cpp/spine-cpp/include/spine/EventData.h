@@ -45,7 +45,7 @@ namespace Spine {
         explicit EventData(const String& name);
         
         /// The name of the event, which is unique within the skeleton.
-        const String& getName();
+        const String& getName() const;
         
         int getIntValue();
         void setIntValue(int inValue);

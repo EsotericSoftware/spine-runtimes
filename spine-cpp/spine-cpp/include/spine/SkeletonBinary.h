@@ -78,6 +78,10 @@ namespace Spine {
         SkeletonData* readSkeletonData(const unsigned char* binary, int length);
         
         SkeletonData* readSkeletonDataFile(const String& path);
+
+        void setScale(float scale) { _scale = scale; }
+
+        String& getError() { return _error; }
         
     private:
         struct DataInput : public SpineObject {
@@ -115,9 +119,9 @@ namespace Spine {
         
         void readVertices(DataInput* input, VertexAttachment* attachment, int vertexCount);
         
-        Vector<float> readFloatArray(DataInput *input, int n, float scale);
+        void readFloatArray(DataInput *input, int n, float scale, Vector<float>& array);
         
-        Vector<short> readShortArray(DataInput *input);
+        void readShortArray(DataInput *input, Vector<unsigned short>& array);
         
         Animation* readAnimation(const char* name, DataInput* input, SkeletonData *skeletonData);
         

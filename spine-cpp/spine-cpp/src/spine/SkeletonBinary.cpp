@@ -579,16 +579,13 @@ namespace Spine {
                 mesh->_path = String(path);
                 readColor(input, mesh->getColor());
                 vertexCount = readVarint(input, true);
-                Vector<float> float_array = readFloatArray(input, vertexCount << 1, 1);
-                mesh->setRegionUVs(float_array);
-                Vector<short> triangles = readShortArray(input);
-                mesh->setTriangles(triangles);
+                readFloatArray(input, vertexCount << 1, 1, mesh->getRegionUVs());
+                readShortArray(input, mesh->getTriangles());
                 readVertices(input, static_cast<VertexAttachment*>(mesh), vertexCount);
                 mesh->updateUVs();
                 mesh->_hullLength = readVarint(input, true) << 1;
                 if (nonessential) {
-                    Vector<short> edges = readShortArray(input);
-                    mesh->setEdges(edges);
+                    readShortArray(input, mesh->getEdges());
                     mesh->_width = readFloat(input) * _scale;
                     mesh->_height = readFloat(input) * _scale;
                 }
@@ -705,7 +702,7 @@ namespace Spine {
         int verticesLength = vertexCount << 1;
         
         if (!readBoolean(input)) {
-            attachment->setVertices(readFloatArray(input, verticesLength, scale));
+            readFloatArray(input, verticesLength, scale, attachment->getVertices());
             return;
         }
         
@@ -728,8 +725,7 @@ namespace Spine {
         attachment->setBones(vertices._bones);
     }
     
-    Vector<float> SkeletonBinary::readFloatArray(DataInput *input, int n, float scale) {
-        Vector<float> array;
+    void SkeletonBinary::readFloatArray(DataInput *input, int n, float scale, Vector<float>& array) {
         array.setSize(n);
         
         int i;
@@ -743,14 +739,10 @@ namespace Spine {
                 array[i] = readFloat(input) * scale;
             }
         }
-        
-        return array;
     }
     
-    Vector<short> SkeletonBinary::readShortArray(DataInput *input) {
+    void SkeletonBinary::readShortArray(DataInput *input, Vector<unsigned short>& array) {
         int n = readVarint(input, true);
-        
-        Vector<short> array;
         array.setSize(n);
         
         int i;
@@ -758,8 +750,6 @@ namespace Spine {
             array[i] = readByte(input) << 8;
             array[i] |= readByte(input);
         }
-        
-        return array;
     }
     
     Animation* SkeletonBinary::readAnimation(const char* name, DataInput* input, SkeletonData *skeletonData) {

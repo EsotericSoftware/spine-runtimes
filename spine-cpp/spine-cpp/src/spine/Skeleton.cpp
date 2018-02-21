@@ -119,7 +119,6 @@ namespace Spine {
         }
         
         updateCache();
-        updateWorldTransform();
     }
     
     Skeleton::~Skeleton() {
@@ -495,6 +494,11 @@ namespace Spine {
     
     void Skeleton::setTime(float inValue) {
         _time = inValue;
+    }
+
+    void Skeleton::setPosition(float x, float y) {
+        _x = x;
+        _y = y;
     }
     
     float Skeleton::getX() {

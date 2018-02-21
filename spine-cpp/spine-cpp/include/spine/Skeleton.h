@@ -158,6 +158,7 @@ namespace Spine {
         Color& getColor();
         float getTime();
         void setTime(float inValue);
+        void setPosition(float x, float y);
         float getX();
         void setX(float inValue);
         float getY();

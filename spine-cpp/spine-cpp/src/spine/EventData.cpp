@@ -42,7 +42,7 @@ namespace Spine {
     }
     
     /// The name of the event, which is unique within the skeleton.
-    const String& EventData::getName() {
+    const String& EventData::getName() const {
         return _name;
     }
     

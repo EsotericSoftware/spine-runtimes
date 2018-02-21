@@ -48,12 +48,12 @@ namespace Spine {
         
         void clipEnd();
         
-        void clipTriangles(Vector<float>& vertices, int verticesLength, Vector<int>& triangles, int trianglesLength, Vector<float>& uvs);
+        void clipTriangles(Vector<float>& vertices, int verticesLength, Vector<unsigned short>& triangles, int trianglesLength, Vector<float>& uvs);
         
         bool isClipping();
         
         Vector<float>& getClippedVertices();
-        Vector<int>& getClippedTriangles();
+        Vector<unsigned short>& getClippedTriangles();
         Vector<float>& getClippedUVs();
         
     private:
@@ -61,7 +61,7 @@ namespace Spine {
         Vector<float> _clippingPolygon;
         Vector<float> _clipOutput;
         Vector<float> _clippedVertices;
-        Vector<int> _clippedTriangles;
+        Vector<unsigned short> _clippedTriangles;
         Vector<float> _clippedUVs;
         Vector<float> _scratch;
         ClippingAttachment* _clipAttachment;

@@ -38,34 +38,32 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 
-_SP_ARRAY_DECLARE_TYPE(spColorArray, spColor)
 
-namespace spine {
+namespace Spine {
 
 class SkeletonDrawable: public sf::Drawable {
 public:
-	spSkeleton* skeleton;
-	spAnimationState* state;
+	Skeleton* skeleton;
+	AnimationState* state;
 	float timeScale;
 	sf::VertexArray* vertexArray;
-	spVertexEffect* vertexEffect;
 
-	SkeletonDrawable (spSkeletonData* skeleton, spAnimationStateData* stateData = 0);
+	SkeletonDrawable (SkeletonData* skeleton, AnimationStateData* stateData = 0);
 	~SkeletonDrawable ();
 
 	void update (float deltaTime);
 
-	virtual void draw (sf::RenderTarget& target, sf::RenderStates states) const;
+	virtual void draw (sf::RenderTarget& target, sf::RenderStates states) const ;
 
 	void setUsePremultipliedAlpha(bool usePMA) { usePremultipliedAlpha = usePMA; };
 	bool getUsePremultipliedAlpha() { return usePremultipliedAlpha; };
 private:
-	bool ownsAnimationStateData;
-	float* worldVertices;
-	spFloatArray* tempUvs;
-	spColorArray* tempColors;
-	spSkeletonClipping* clipper;
-	bool usePremultipliedAlpha;
+	mutable bool ownsAnimationStateData;
+	mutable Vector<float> worldVertices;
+	mutable Vector<float> tempUvs;
+	mutable Vector<Color> tempColors;
+	mutable SkeletonClipping clipper;
+	mutable bool usePremultipliedAlpha;
 };
 
 } /* namespace spine */

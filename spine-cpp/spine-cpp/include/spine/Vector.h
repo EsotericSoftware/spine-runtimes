@@ -175,6 +175,10 @@ namespace Spine {
             return !(lhs == rhs);
         }
 
+		T* buffer() {
+			return _buffer;
+		}
+
     private:
         size_t _size;
         size_t _capacity;

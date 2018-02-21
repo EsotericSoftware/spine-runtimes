@@ -32,18 +32,6 @@
 #include <math.h>
 
 namespace Spine {
-    float MathUtil::SIN_TABLE[SIN_COUNT] = {0.0f};
-    
-    MathUtil::MathUtil() {
-        for (int i = 0; i < SIN_COUNT; ++i) {
-            SIN_TABLE[i] = sin((i + 0.5f) / SIN_COUNT * RadFull);
-        }
-        
-        for (int i = 0; i < 360; i += 90) {
-            SIN_TABLE[i * DegToIndex & SIN_MASK] = sin(i * DegRad);
-        }
-    }
-
     int MathUtil::sign(float val) {
         return (0 < val) - (val < 0);
     }
@@ -74,53 +62,28 @@ namespace Spine {
     
     /// Returns the sine in radians from a lookup table.
     float MathUtil::sin(float radians) {
-        return SIN_TABLE[(int)(radians * RadToIndex) & SIN_MASK];
+        return ::sin(radians);
     }
     
     /// Returns the cosine in radians from a lookup table.
     float MathUtil::cos(float radians) {
-        return SIN_TABLE[(int)((radians + SPINE_PI / 2) * RadToIndex) & SIN_MASK];
+        return ::cos(radians);
     }
     
     /// Returns the sine in radians from a lookup table.
     float MathUtil::sinDeg(float degrees) {
-        return SIN_TABLE[(int)(degrees * DegToIndex) & SIN_MASK];
+        return ::sin(degrees * DegRad);
     }
     
     /// Returns the cosine in radians from a lookup table.
     float MathUtil::cosDeg(float degrees) {
-        return SIN_TABLE[(int)((degrees + 90) * DegToIndex) & SIN_MASK];
+        return ::cos(degrees * DegRad);
     }
     
     /// Returns atan2 in radians, faster but less accurate than Math.Atan2. Average error of 0.00231 radians (0.1323
     /// degrees), largest error of 0.00488 radians (0.2796 degrees).
     float MathUtil::atan2(float y, float x) {
-        if (areFloatsPracticallyEqual(x, 0.0f)) {
-            if (y > 0.0f) {
-                return SPINE_PI / 2;
-            }
-            
-            if (areFloatsPracticallyEqual(y, 0.0f)) {
-                return 0.0f;
-            }
-            
-            return -SPINE_PI / 2;
-        }
-        
-        float atan, z = y / x;
-        
-        if (fabs(z) < 1.0f) {
-            atan = z / (1.0f + 0.28f * z * z);
-            if (x < 0.0f) {
-                return atan + (y < 0.0f ? -SPINE_PI : SPINE_PI);
-            }
-            
-            return atan;
-        }
-        
-        atan = SPINE_PI / 2 - z / (z * z + 0.28f);
-        
-        return y < 0.0f ? atan - SPINE_PI : atan;
+        return ::atan2(y, x);
     }
 
     float MathUtil::acos(float v) {

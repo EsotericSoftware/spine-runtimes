@@ -62,8 +62,8 @@ namespace Spine {
         Vector<float>& getUVs();
         void setUVs(Vector<float>& inValue);
         
-        Vector<short>& getTriangles();
-        void setTriangles(Vector<short>& inValue);
+        Vector<unsigned short>& getTriangles();
+        void setTriangles(Vector<unsigned short>& inValue);
         
         Color& getColor();
         
@@ -115,8 +115,8 @@ namespace Spine {
         void setParentMesh(MeshAttachment* inValue);
         
         // Nonessential.
-        Vector<short>& getEdges();
-        void setEdges(Vector<short>& inValue);
+        Vector<unsigned short>& getEdges();
+        void setEdges(Vector<unsigned short>& inValue);
         float getWidth();
         void setWidth(float inValue);
         float getHeight();
@@ -127,8 +127,8 @@ namespace Spine {
         MeshAttachment* _parentMesh;
         Vector<float> _uvs;
         Vector<float> _regionUVs;
-        Vector<short> _triangles;
-        Vector<short> _edges;
+        Vector<unsigned short> _triangles;
+        Vector<unsigned short> _edges;
         void* _rendererObject;
         String _path;
         float _regionU;
