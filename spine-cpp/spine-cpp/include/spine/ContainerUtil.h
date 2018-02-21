@@ -49,8 +49,8 @@ namespace Spine {
         static T* findWithName(Vector<T*>& items, const String& name) {
             assert(name.length() > 0);
             
-            for (T** i = items.begin(); i != items.end(); ++i) {
-                T* item = (*i);
+            for (size_t i = 0; i < items.size(); ++i) {
+                T* item = items[i];
                 if (item->getName() == name) {
                     return item;
                 }
@@ -81,8 +81,8 @@ namespace Spine {
         static T* findWithDataName(Vector<T*>& items, const String& name) {
             assert(name.length() > 0);
             
-            for (T** i = items.begin(); i != items.end(); ++i) {
-                T* item = (*i);
+            for (size_t i = 0; i < items.size(); ++i) {
+                T* item = items[i];
                 if (item->getData().getName() == name) {
                     return item;
                 }

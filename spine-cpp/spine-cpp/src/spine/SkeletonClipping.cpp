@@ -56,8 +56,8 @@ namespace Spine {
         
         _clippingPolygons = clippingPolygons;
         
-        for (Vector<float>** i = _clippingPolygons.begin(); i != _clippingPolygons.end(); ++i) {
-            Vector<float>* polygonP = (*i);
+        for (size_t i = 0; i < _clippingPolygons.size(); ++i) {
+            Vector<float>* polygonP = _clippingPolygons[i];
             Vector<float>& polygon = *polygonP;
             makeClockwise(polygon);
             polygon.add(polygon[0]);
@@ -112,7 +112,7 @@ namespace Spine {
 
             for (int p = 0; p < polygonsCount; p++) {
                 int s = static_cast<int>(clippedVertices.size());
-                if (clip(x1, y1, x2, y2, x3, y3, *polygons[p], clipOutput)) {
+                if (clip(x1, y1, x2, y2, x3, y3, &(*polygons[p]), &clipOutput)) {
                     int clipOutputLength = static_cast<int>(clipOutput.size());
                     if (clipOutputLength == 0) {
                         continue;
@@ -192,40 +192,40 @@ namespace Spine {
         return _clippedUVs;
     }
     
-    bool SkeletonClipping::clip(float x1, float y1, float x2, float y2, float x3, float y3, Vector<float>& clippingArea, Vector<float>& output) {
-        Vector<float>& originalOutput = output;
+    bool SkeletonClipping::clip(float x1, float y1, float x2, float y2, float x3, float y3, Vector<float>* clippingArea, Vector<float>* output) {
+        Vector<float>* originalOutput = output;
         bool clipped = false;
 
         // Avoid copy at the end.
-        Vector<float> input;
-        if (clippingArea.size() % 4 >= 2) {
+        Vector<float>* input;
+        if (clippingArea->size() % 4 >= 2) {
             input = output;
-            output = _scratch;
+            output = &_scratch;
         }
         else {
-            input = _scratch;
+            input = &_scratch;
         }
 
-        input.clear();
-        input.add(x1);
-        input.add(y1);
-        input.add(x2);
-        input.add(y2);
-        input.add(x3);
-        input.add(y3);
-        input.add(x1);
-        input.add(y1);
-        output.clear();
+        input->clear();
+        input->add(x1);
+        input->add(y1);
+        input->add(x2);
+        input->add(y2);
+        input->add(x3);
+        input->add(y3);
+        input->add(x1);
+        input->add(y1);
+        output->clear();
 
-        Vector<float>& clippingVertices = clippingArea;
-        int clippingVerticesLast = static_cast<int>(clippingArea.size()) - 4;
+        Vector<float>& clippingVertices = *clippingArea;
+        int clippingVerticesLast = static_cast<int>(clippingArea->size()) - 4;
         for (int i = 0; ; i += 2) {
             float edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
             float edgeX2 = clippingVertices[i + 2], edgeY2 = clippingVertices[i + 3];
             float deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;
 
-            Vector<float>& inputVertices = input;
-            int inputVerticesLength = static_cast<int>(input.size()) - 2, outputStart = static_cast<int>(output.size());
+            Vector<float>& inputVertices = *input;
+            int inputVerticesLength = static_cast<int>(input->size()) - 2, outputStart = static_cast<int>(output->size());
             for (int ii = 0; ii < inputVerticesLength; ii += 2) {
                 float inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
                 float inputX2 = inputVertices[ii + 2], inputY2 = inputVertices[ii + 3];
@@ -233,54 +233,54 @@ namespace Spine {
                 if (deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0) {
                     if (side2) {
                         // v1 inside, v2 inside
-                        output.add(inputX2);
-                        output.add(inputY2);
+                        output->add(inputX2);
+                        output->add(inputY2);
                         continue;
                     }
                     // v1 inside, v2 outside
                     float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
                     float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
-                    output.add(edgeX + (edgeX2 - edgeX) * ua);
-                    output.add(edgeY + (edgeY2 - edgeY) * ua);
+                    output->add(edgeX + (edgeX2 - edgeX) * ua);
+                    output->add(edgeY + (edgeY2 - edgeY) * ua);
                 }
                 else if (side2) {
                     // v1 outside, v2 inside
                     float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
                     float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
-                    output.add(edgeX + (edgeX2 - edgeX) * ua);
-                    output.add(edgeY + (edgeY2 - edgeY) * ua);
-                    output.add(inputX2);
-                    output.add(inputY2);
+                    output->add(edgeX + (edgeX2 - edgeX) * ua);
+                    output->add(edgeY + (edgeY2 - edgeY) * ua);
+                    output->add(inputX2);
+                    output->add(inputY2);
                 }
                 clipped = true;
             }
 
-            if (outputStart == output.size()) {
+            if (outputStart == output->size()) {
                 // All edges outside.
-                originalOutput.clear();
+                originalOutput->clear();
                 return true;
             }
 
-            output.add(output[0]);
-            output.add(output[1]);
+            output->add((*output)[0]);
+            output->add((*output)[1]);
 
             if (i == clippingVerticesLast) {
                 break;
             }
-            Vector<float> temp = output;
+            Vector<float>* temp = output;
             output = input;
-            output.clear();
+            output->clear();
             input = temp;
         }
 
         if (originalOutput != output) {
-            originalOutput.clear();
-            for (int i = 0, n = static_cast<int>(output.size()) - 2; i < n; ++i) {
-                originalOutput.add(output[i]);
+            originalOutput->clear();
+            for (int i = 0, n = static_cast<int>(output->size()) - 2; i < n; ++i) {
+                originalOutput->add((*output)[i]);
             }
         }
         else {
-            originalOutput.setSize(originalOutput.size() - 2);
+            originalOutput->setSize(originalOutput->size() - 2);
         }
 
         return clipped;

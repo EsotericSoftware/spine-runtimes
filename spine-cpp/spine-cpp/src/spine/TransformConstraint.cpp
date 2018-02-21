@@ -48,8 +48,8 @@ namespace Spine {
     _scaleMix(data.getScaleMix()),
     _shearMix(data.getShearMix()) {
         _bones.ensureCapacity(_data.getBones().size());
-        for (BoneData** i = _data.getBones().begin(); i != _data.getBones().end(); ++i) {
-            BoneData* boneData = (*i);
+        for (size_t i = 0; i < _data.getBones().size(); ++i) {
+            BoneData* boneData = _data.getBones()[i];
 
             _bones.add(skeleton.findBone(boneData->getName()));
         }
@@ -137,8 +137,8 @@ namespace Spine {
         float degRadReflect = ta * td - tb * tc > 0 ? DegRad : -DegRad;
         float offsetRotation = _data._offsetRotation * degRadReflect, offsetShearY = _data._offsetShearY * degRadReflect;
         
-        for (Bone** i = _bones.begin(); i != _bones.end(); ++i) {
-            Bone* item = (*i);
+        for (size_t i = 0; i < _bones.size(); ++i) {
+            Bone* item = _bones[i];
             Bone& bone = *item;
             
             bool modified = false;
@@ -218,8 +218,8 @@ namespace Spine {
         float ta = target._a, tb = target._b, tc = target._c, td = target._d;
         float degRadReflect = ta * td - tb * tc > 0 ? DegRad : -DegRad;
         float offsetRotation = _data._offsetRotation * degRadReflect, offsetShearY = _data._offsetShearY * degRadReflect;
-        for (Bone** i = _bones.begin(); i != _bones.end(); ++i) {
-            Bone* item = (*i);
+        for (size_t i = 0; i < _bones.size(); ++i) {
+            Bone* item = _bones[i];
             Bone& bone = *item;
             
             bool modified = false;
@@ -291,8 +291,8 @@ namespace Spine {
             target.updateAppliedTransform();
         }
         
-        for (Bone** i = _bones.begin(); i != _bones.end(); ++i) {
-            Bone* item = (*i);
+        for (size_t i = 0; i < _bones.size(); ++i) {
+            Bone* item = _bones[i];
             Bone& bone = *item;
             
             if (!bone._appliedValid) {
@@ -341,8 +341,8 @@ namespace Spine {
             target.updateAppliedTransform();
         }
         
-        for (Bone** i = _bones.begin(); i != _bones.end(); ++i) {
-            Bone* item = (*i);
+        for (size_t i = 0; i < _bones.size(); ++i) {
+            Bone* item = _bones[i];
             Bone& bone = *item;
             
             if (!bone._appliedValid) {

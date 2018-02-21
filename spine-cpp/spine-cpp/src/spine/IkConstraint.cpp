@@ -248,9 +248,8 @@ namespace Spine {
     _bendDirection(data.getBendDirection()),
     _target(skeleton.findBone(data.getTarget()->getName())) {
         _bones.ensureCapacity(_data.getBones().size());
-        for (BoneData** i = _data.getBones().begin(); i != _data.getBones().end(); ++i) {
-            BoneData* boneData = (*i);
-
+        for (size_t i = 0; i < _data.getBones().size(); i++) {
+            BoneData* boneData = _data.getBones()[i];
             _bones.add(skeleton.findBone(boneData->getName()));
         }
     }

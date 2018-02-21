@@ -63,8 +63,8 @@ namespace Spine {
     _x(0),
     _y(0) {
         _bones.ensureCapacity(_data->getBones().size());
-        for (BoneData** i = _data->getBones().begin(); i != _data->getBones().end(); ++i) {
-            BoneData* data = (*i);
+        for (size_t i = 0; i < _data->getBones().size(); ++i) {
+            BoneData* data = _data->getBones()[i];
             
             Bone* bone;
             if (data->getParent() == NULL) {
@@ -81,8 +81,8 @@ namespace Spine {
 
         _slots.ensureCapacity(_data->getSlots().size());
         _drawOrder.ensureCapacity(_data->getSlots().size());
-        for (SlotData** i = _data->getSlots().begin(); i != _data->getSlots().end(); ++i) {
-            SlotData* data = (*i);
+        for (size_t i = 0; i < _data->getSlots().size(); ++i) {
+            SlotData* data = _data->getSlots()[i];
             
             Bone* bone = _bones[data->getBoneData().getIndex()];
             Slot* slot = new (__FILE__, __LINE__) Slot(*data, *bone);
@@ -92,8 +92,8 @@ namespace Spine {
         }
 
         _ikConstraints.ensureCapacity(_data->getIkConstraints().size());
-        for (IkConstraintData** i = _data->getIkConstraints().begin(); i != _data->getIkConstraints().end(); ++i) {
-            IkConstraintData* data = (*i);
+        for (size_t i = 0; i < _data->getIkConstraints().size(); ++i) {
+            IkConstraintData* data = _data->getIkConstraints()[i];
             
             IkConstraint* constraint = new (__FILE__, __LINE__) IkConstraint(*data, *this);
 
@@ -101,8 +101,8 @@ namespace Spine {
         }
 
         _transformConstraints.ensureCapacity(_data->getTransformConstraints().size());
-        for (TransformConstraintData** i = _data->getTransformConstraints().begin(); i != _data->getTransformConstraints().end(); ++i) {
-            TransformConstraintData* data = (*i);
+        for (size_t i = 0; i < _data->getTransformConstraints().size(); ++i) {
+            TransformConstraintData* data = _data->getTransformConstraints()[i];
             
             TransformConstraint* constraint = new (__FILE__, __LINE__) TransformConstraint(*data, *this);
 
@@ -110,8 +110,8 @@ namespace Spine {
         }
 
         _pathConstraints.ensureCapacity(_data->getPathConstraints().size());
-        for (PathConstraintData** i = _data->getPathConstraints().begin(); i != _data->getPathConstraints().end(); ++i) {
-            PathConstraintData* data = (*i);
+        for (size_t i = 0; i < _data->getPathConstraints().size(); ++i) {
+            PathConstraintData* data = _data->getPathConstraints()[i];
             
             PathConstraint* constraint = new (__FILE__, __LINE__) PathConstraint(*data, *this);
 
@@ -403,8 +403,8 @@ namespace Spine {
         float maxX = std::numeric_limits<float>::min();
         float maxY = std::numeric_limits<float>::min();
         
-        for (Slot** i = _drawOrder.begin(); i != _drawOrder.end(); ++i) {
-            Slot* slot = (*i);
+        for (size_t i = 0; i < _drawOrder.size(); ++i) {
+            Slot* slot = _drawOrder[i];
             int verticesLength = 0;
             Attachment* attachment = slot->getAttachment();
             
@@ -672,8 +672,8 @@ namespace Spine {
     }
     
     void Skeleton::sortReset(Vector<Bone*>& bones) {
-        for (Bone** i = bones.begin(); i != bones.end(); ++i) {
-            Bone* bone = (*i);
+        for (size_t i = 0; i < bones.size(); ++i) {
+            Bone* bone = bones[i];
             if (bone->_sorted) {
                 sortReset(bone->getChildren());
             }

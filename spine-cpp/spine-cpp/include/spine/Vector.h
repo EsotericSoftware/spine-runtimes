@@ -157,14 +157,6 @@ namespace Spine {
             return _buffer[inIndex];
         }
 
-        T* begin() {
-            return &_buffer[0];
-        }
-
-        T* end() {
-            return &_buffer[_size];
-        }
-
         friend bool operator==(Vector<T>& lhs, Vector<T>& rhs) {
             if (lhs.size() != rhs.size()) {
                 return false;
@@ -188,7 +180,7 @@ namespace Spine {
         size_t _capacity;
         T* _buffer;
 
-        T* allocate(size_t n) {
+        inline T* allocate(size_t n) {
             assert(n > 0);
 
             T* ptr = SpineExtension::alloc<T>(n, __FILE__, __LINE__);
@@ -198,20 +190,17 @@ namespace Spine {
             return ptr;
         }
 
-        void deallocate(T* buffer) {
+        inline void deallocate(T* buffer) {
             if (_buffer) {
                 SpineExtension::free(buffer, __FILE__, __LINE__);
             }
         }
 
-        void construct(T* buffer, const T& val) {
-            /// This is a placement new operator
-            /// which basically means we are contructing a new object
-            /// using pre-allocated memory
+        inline void construct(T* buffer, const T& val) {
             new (buffer) T(val);
         }
 
-        void destroy(T* buffer) {
+        inline void destroy(T* buffer) {
             buffer->~T();
         }
     };

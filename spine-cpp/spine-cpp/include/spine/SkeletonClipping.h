@@ -69,7 +69,7 @@ namespace Spine {
         
         /** Clips the input triangle against the convex, clockwise clipping area. If the triangle lies entirely within the clipping
                   * area, false is returned. The clipping area must duplicate the first vertex at the end of the vertices list. */
-        bool clip(float x1, float y1, float x2, float y2, float x3, float y3, Vector<float>& clippingArea, Vector<float>& output);
+        bool clip(float x1, float y1, float x2, float y2, float x3, float y3, Vector<float>* clippingArea, Vector<float>* output);
         
         static void makeClockwise(Vector<float>& polygon);
     };

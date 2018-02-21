@@ -49,7 +49,7 @@ namespace Spine {
         
         T* obtain() {
             if (_objects.size() > 0) {
-                T** object = _objects.end();
+                T** object = &_objects[_objects.size() - 1];
                 T* ret = *object;
                 _objects.removeAt(_objects.size() - 1);
                 
