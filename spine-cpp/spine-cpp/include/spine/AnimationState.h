@@ -255,14 +255,14 @@ namespace Spine {
         friend class AnimationState;
         
     private:
-        Vector<EventQueueEntry*> _eventQueueEntries;
+        Vector<EventQueueEntry> _eventQueueEntries;
         AnimationState& _state;
         Pool<TrackEntry>& _trackEntryPool;
         bool _drainDisabled;
         
         static EventQueue* newEventQueue(AnimationState& state, Pool<TrackEntry>& trackEntryPool);
 
-        static EventQueueEntry* newEventQueueEntry(EventType eventType, TrackEntry* entry, Event* event = NULL);
+        static EventQueueEntry newEventQueueEntry(EventType eventType, TrackEntry* entry, Event* event = NULL);
         
         EventQueue(AnimationState& state, Pool<TrackEntry>& trackEntryPool);
         

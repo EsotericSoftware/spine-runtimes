@@ -1038,11 +1038,6 @@ namespace Spine {
                     weighted = attachment->_bones.size() != 0;
                     Vector<float>& vertices = attachment->_vertices;
                     deformLength = weighted ? static_cast<int>(vertices.size()) / 3 * 2 : static_cast<int>(vertices.size());
-                    Vector<float> tempDeform;
-                    tempDeform.ensureCapacity(deformLength);
-                    for (int i = 0; i < deformLength; ++i) {
-						tempDeform.add(0);
-                    }
 
                     timeline = new (__FILE__, __LINE__) DeformTimeline(timelineMap->_size);
                     
@@ -1054,7 +1049,10 @@ namespace Spine {
                         Vector<float> deform;
                         if (!vertices) {
                             if (weighted) {
-                                deform = tempDeform;
+                                deform.setSize(deformLength);
+                                for (int i = 0; i < deformLength; ++i) {
+                                    deform[i] = 0;
+                                }
                             }
                             else {
                                 deform = attachment->_vertices;
@@ -1063,7 +1061,7 @@ namespace Spine {
                         else {
                             int v, start = Json::getInt(valueMap, "offset", 0);
                             Json* vertex;
-                            deform = tempDeform;
+                            deform.setSize(deformLength);
                             if (_scale == 1) {
                                 for (vertex = vertices->_child, v = start; vertex; vertex = vertex->_next, ++v) {
                                     deform[v] = vertex->_valueFloat;

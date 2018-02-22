@@ -214,15 +214,14 @@ namespace Spine {
         return new (__FILE__, __LINE__) EventQueue(state, trackEntryPool);
     }
     
-    EventQueueEntry* EventQueue::newEventQueueEntry(EventType eventType, TrackEntry* entry, Event* event) {
-        return new (__FILE__, __LINE__) EventQueueEntry(eventType, entry, event);
+    EventQueueEntry EventQueue::newEventQueueEntry(EventType eventType, TrackEntry* entry, Event* event) {
+        return EventQueueEntry(eventType, entry, event);
     }
     
     EventQueue::EventQueue(AnimationState& state, Pool<TrackEntry>& trackEntryPool) : _state(state), _trackEntryPool(trackEntryPool), _drainDisabled(false) {
     }
     
     EventQueue::~EventQueue() {
-        ContainerUtil::cleanUpVectorOfPointers(_eventQueueEntries);
     }
     
     void EventQueue::start(TrackEntry* entry) {
@@ -263,7 +262,7 @@ namespace Spine {
         
         // Don't cache _eventQueueEntries.size() so callbacks can queue their own events (eg, call setAnimation in AnimationState_Complete).
         for (int i = 0; i < _eventQueueEntries.size(); ++i) {
-            EventQueueEntry* queueEntry = _eventQueueEntries[i];
+            EventQueueEntry* queueEntry = &_eventQueueEntries[i];
             TrackEntry* trackEntry = queueEntry->_entry;
             
             switch (queueEntry->_type) {
