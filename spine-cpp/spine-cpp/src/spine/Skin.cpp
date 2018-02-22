@@ -49,7 +49,6 @@ namespace Spine {
     
     std::size_t Skin::HashAttachmentKey::operator()(const Spine::Skin::AttachmentKey& val) const {
         std::size_t h1 = val._slotIndex;
-        
         return h1;
     }
     

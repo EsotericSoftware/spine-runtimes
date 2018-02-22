@@ -54,7 +54,7 @@ namespace Spine {
         for (int i = 0; i < slotCount; i++) {
             Slot* slot = slots[i];
             Attachment* attachment = slot->_attachment;
-            if (attachment == NULL || !attachment->getRTTI().derivesFrom(BoundingBoxAttachment::rtti)) {
+            if (attachment == NULL || !attachment->getRTTI().instanceOf(BoundingBoxAttachment::rtti)) {
                 continue;
             }
             BoundingBoxAttachment* boundingBox = static_cast<BoundingBoxAttachment*>(attachment);

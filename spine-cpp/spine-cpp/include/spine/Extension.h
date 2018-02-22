@@ -99,6 +99,19 @@ namespace Spine {
 
         virtual char* _readFile(const String& path, int* length);
     };
+
+    struct Allocation {
+        void* address;
+        size_t size;
+        const char* fileName;
+        int line;
+
+        Allocation() : address(NULL), size(0), fileName(NULL), line(0) {
+        }
+
+        Allocation(void* a, size_t s, const char* f, int l) : address(a), size(s), fileName(f), line(l) {
+        }
+    };
 }
 
 #endif /* Spine_Extension_h */

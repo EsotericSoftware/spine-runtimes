@@ -30,8 +30,8 @@
 
 #include <iostream>
 #include <string.h>
-#define SPINE_SHORT_NAMES
 #include <spine/spine-sfml.h>
+#include <spine/Debug.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Mouse.hpp>
 
@@ -94,7 +94,8 @@ SkeletonData* readSkeletonBinaryData (const char* filename, Atlas* atlas, float 
 void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
 		const char* jsonName, const char* binaryName, const char* atlasName,
 		float scale) {
-	Atlas* atlas = new (__FILE__, __LINE__) Atlas(atlasName, 0);
+	SFMLTextureLoader textureLoader;
+	Atlas* atlas = new (__FILE__, __LINE__) Atlas(atlasName, &textureLoader);
 
 	SkeletonData* skeletonData = readSkeletonJsonData(jsonName, atlas, scale);
 	func(skeletonData, atlas);
@@ -440,15 +441,17 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 int main () {
+	DebugExtension dbgExtension;
+	SpineExtension::setInstance(&dbgExtension);
 	testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 1.0f);
 	testcase(spineboy, "data/spineboy-ess.json", "data/spineboy-ess.skel", "data/spineboy.atlas", 0.6f);
-	/*testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl.atlas", 0.5f);
+	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl.atlas", 0.5f);
 	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin.atlas", 0.5f);
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine.atlas", 0.5f);
 	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 0.2f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor.atlas", 0.5f);
-	testcase(spineboy, "data/spineboy-ess.json", "data/spineboy-ess.skel", "data/spineboy.atlas", 0.6f);
 	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins.atlas", 1.4f);
-	testcase(stretchyman, "data/stretchyman-pro.json", "data/stretchyman-pro.skel", "data/stretchyman.atlas", 0.6f);*/
+	testcase(stretchyman, "data/stretchyman-pro.json", "data/stretchyman-pro.skel", "data/stretchyman.atlas", 0.6f);
+	dbgExtension.reportLeaks();
 	return 0;
 }

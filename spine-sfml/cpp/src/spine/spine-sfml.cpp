@@ -130,7 +130,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		int indicesCount = 0;
 		Color* attachmentColor;
 
-		if (attachment->rtti.derivesFrom(RegionAttachment::rtti)) {
+		if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
 			RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
 			regionAttachment->computeWorldVertices(slot.getBone(), worldVertices, 0, 2);
 			verticesCount = 4;
@@ -140,7 +140,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 			texture = (Texture*)((AtlasRegion*)regionAttachment->getRendererObject())->page->rendererObject;
 			attachmentColor = &regionAttachment->getColor();
 
-		} else if (attachment->rtti.derivesFrom(MeshAttachment::rtti)) {
+		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 			MeshAttachment* mesh = (MeshAttachment*)attachment;
 			if (mesh->getWorldVerticesLength() > worldVertices.size()) worldVertices.setSize(mesh->getWorldVerticesLength());
 			texture = (Texture*)((AtlasRegion*)mesh->getRendererObject())->page->rendererObject;
@@ -150,7 +150,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 			indices = &mesh->getTriangles();
 			indicesCount = mesh->getTriangles().size();
 			attachmentColor = &mesh->getColor();
-		} else if (attachment->rtti.derivesFrom(ClippingAttachment::rtti)) {
+		} else if (attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
 			ClippingAttachment* clip = (ClippingAttachment*)slot.getAttachment();
 			clipper.clipStart(slot, clip);
 			continue;
@@ -280,4 +280,20 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 	// BOZO if (vertexEffect != 0) vertexEffect->end(vertexEffect);
 }
 
+void SFMLTextureLoader::load(AtlasPage &page, const String &path) {
+	Texture* texture = new Texture();
+	if (!texture->loadFromFile(path.buffer())) return;
+
+	if (page.magFilter == TextureFilter_Linear) texture->setSmooth(true);
+	if (page.uWrap == TextureWrap_Repeat && page.vWrap == TextureWrap_Repeat) texture->setRepeated(true);
+
+	page.rendererObject = texture;
+	Vector2u size = texture->getSize();
+	page.width = size.x;
+	page.height = size.y;
+}
+
+void SFMLTextureLoader::unload(void *texture) {
+	delete (Texture*)texture;
+}
 } /* namespace spine */

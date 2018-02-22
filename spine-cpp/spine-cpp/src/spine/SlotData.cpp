@@ -46,7 +46,7 @@ namespace Spine {
         assert(_name.length() > 0);
     }
     
-    const int SlotData::getIndex() {
+    int SlotData::getIndex() {
         return _index;
     }
     

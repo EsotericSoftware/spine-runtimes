@@ -78,6 +78,8 @@ namespace Spine {
         /// Caches information about bones and constraints. Must be called if bones, constraints or weighted path attachments are added
         /// or removed.
         void updateCache();
+
+        void printUpdateCache ();
         
         /// Updates the world transform for each bone and applies constraints.
         void updateWorldTransform();

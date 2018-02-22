@@ -10,7 +10,6 @@ include_directories(../spine-cpp/include teamcity minicppunit tests memory)
 
 set(SRC
 	src/main.cpp
-	src/TestHarness.cpp
 )
 
 add_executable(spine_cpp_unit_test ${SRC})

@@ -113,9 +113,9 @@ namespace Spine {
         
         int readVarint(DataInput* input, bool optimizePositive);
         
-        Skin* readSkin(DataInput* input, const char* skinName, SkeletonData* skeletonData, bool nonessential);
+        Skin* readSkin(DataInput* input, const String& skinName, SkeletonData* skeletonData, bool nonessential);
         
-        Attachment* readAttachment(DataInput* input, Skin* skin, int slotIndex, const char* attachmentName, SkeletonData* skeletonData, bool nonessential);
+        Attachment* readAttachment(DataInput* input, Skin* skin, int slotIndex, const String& attachmentName, SkeletonData* skeletonData, bool nonessential);
         
         void readVertices(DataInput* input, VertexAttachment* attachment, int vertexCount);
         

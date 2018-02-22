@@ -59,7 +59,7 @@ namespace Spine {
         Slot* slotP = skeleton._slots[_slotIndex];
         Slot& slot = *slotP;
         
-        if (slot._attachment == NULL || !slot._attachment->getRTTI().derivesFrom(VertexAttachment::rtti)) {
+        if (slot._attachment == NULL || !slot._attachment->getRTTI().instanceOf(VertexAttachment::rtti)) {
             return;
         }
         

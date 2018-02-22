@@ -492,7 +492,7 @@ namespace Spine {
         return value;
     }
     
-    Skin* SkeletonBinary::readSkin(DataInput* input, const char* skinName, SkeletonData* skeletonData, bool nonessential) {
+    Skin* SkeletonBinary::readSkin(DataInput* input, const String& skinName, SkeletonData* skeletonData, bool nonessential) {
         Skin* skin = NULL;
         int slotCount = readVarint(input, true);
         int i, ii, nn;
@@ -500,7 +500,7 @@ namespace Spine {
             return NULL;
         }
         
-        skin = new (__FILE__, __LINE__) Skin(String(skinName));
+        skin = new (__FILE__, __LINE__) Skin(skinName);
         
         for (i = 0; i < slotCount; ++i) {
             int slotIndex = readVarint(input, true);
@@ -517,27 +517,17 @@ namespace Spine {
         return skin;
     }
     
-    Attachment* SkeletonBinary::readAttachment(DataInput* input, Skin* skin, int slotIndex, const char* attachmentName, SkeletonData* skeletonData, bool nonessential) {
-        int i;
-        AttachmentType type;
-        const char* name = readString(input);
-        int freeName = name != 0;
-        if (!name) {
-            freeName = 0;
-            name = attachmentName;
-        }
-        
-        type = static_cast<AttachmentType>(readByte(input));
-        
+    Attachment* SkeletonBinary::readAttachment(DataInput* input, Skin* skin, int slotIndex, const String& attachmentName, SkeletonData* skeletonData, bool nonessential) {
+        String name(readString(input), true);
+        if (name.isEmpty()) name = attachmentName;
+
+        AttachmentType type = static_cast<AttachmentType>(readByte(input));
         switch (type) {
             case AttachmentType_Region: {
-                const char* path = readString(input);
-                RegionAttachment* region;
-                if (!path) {
-                    path = name;
-                }
-                region = _attachmentLoader->newRegionAttachment(*skin, String(name), String(path));
-                region->_path = String(path);
+                String path(readString(input), true);
+                if (path.isEmpty()) path = name;
+                RegionAttachment *region = _attachmentLoader->newRegionAttachment(*skin, String(name), String(path));
+                region->_path = path;
                 region->_rotation = readFloat(input);
                 region->_x = readFloat(input) * _scale;
                 region->_y = readFloat(input) * _scale;
@@ -547,68 +537,50 @@ namespace Spine {
                 region->_height = readFloat(input) * _scale;
                 readColor(input, region->getColor());
                 region->updateOffset();
-                
-                if (freeName) {
-                    SpineExtension::free(name, __FILE__, __LINE__);
-                }
-                
                 return region;
             }
             case AttachmentType_Boundingbox: {
                 int vertexCount = readVarint(input, true);
-                BoundingBoxAttachment* box = _attachmentLoader->newBoundingBoxAttachment(*skin, String(name));
-                readVertices(input, static_cast<VertexAttachment*>(box), vertexCount);
+                BoundingBoxAttachment *box = _attachmentLoader->newBoundingBoxAttachment(*skin, String(name));
+                readVertices(input, static_cast<VertexAttachment *>(box), vertexCount);
                 if (nonessential) {
                     /* Skip color. */
                     readInt(input);
                 }
-                if (freeName) {
-                    SpineExtension::free(name, __FILE__, __LINE__);
-                }
-                
                 return box;
             }
             case AttachmentType_Mesh: {
                 int vertexCount;
-                MeshAttachment* mesh;
-                const char* path = readString(input);
-                if (!path) {
-                    path = name;
-                }
+                MeshAttachment *mesh;
+                String path(readString(input), true);
+                if (path.isEmpty()) path = name;
+
                 mesh = _attachmentLoader->newMeshAttachment(*skin, String(name), String(path));
                 mesh->_path = String(path);
                 readColor(input, mesh->getColor());
                 vertexCount = readVarint(input, true);
                 readFloatArray(input, vertexCount << 1, 1, mesh->getRegionUVs());
                 readShortArray(input, mesh->getTriangles());
-                readVertices(input, static_cast<VertexAttachment*>(mesh), vertexCount);
+                readVertices(input, static_cast<VertexAttachment *>(mesh), vertexCount);
                 mesh->updateUVs();
                 mesh->_hullLength = readVarint(input, true) << 1;
                 if (nonessential) {
                     readShortArray(input, mesh->getEdges());
                     mesh->_width = readFloat(input) * _scale;
                     mesh->_height = readFloat(input) * _scale;
-                }
-                else {
+                } else {
                     mesh->_width = 0;
                     mesh->_height = 0;
                 }
-                
-                if (freeName) {
-                    SpineExtension::free(name, __FILE__, __LINE__);
-                }
-                
                 return mesh;
             }
             case AttachmentType_Linkedmesh: {
-                const char* skinName;
-                const char* parent;
-                MeshAttachment* mesh;
-                const char* path = readString(input);
-                if (!path) {
-                    path = name;
-                }
-                
+                const char *skinName;
+                const char *parent;
+                MeshAttachment *mesh;
+                String path(readString(input), true);
+                if (path.isEmpty()) path = name;
+
                 mesh = _attachmentLoader->newMeshAttachment(*skin, String(name), String(path));
                 mesh->_path = path;
                 readColor(input, mesh->getColor());
@@ -619,110 +591,91 @@ namespace Spine {
                     mesh->_width = readFloat(input) * _scale;
                     mesh->_height = readFloat(input) * _scale;
                 }
-                
-                LinkedMesh* linkedMesh = new (__FILE__, __LINE__) LinkedMesh(mesh, String(skinName), slotIndex, String(parent));
-				_linkedMeshes.add(linkedMesh);
-                
-                if (freeName) {
-                    SpineExtension::free(name, __FILE__, __LINE__);
-                }
-                
+
+                LinkedMesh *linkedMesh = new(__FILE__, __LINE__) LinkedMesh(mesh, String(skinName), slotIndex,
+                                                                            String(parent));
+                _linkedMeshes.add(linkedMesh);
+
                 SpineExtension::free(skinName, __FILE__, __LINE__);
                 SpineExtension::free(parent, __FILE__, __LINE__);
-                
+
                 return mesh;
             }
             case AttachmentType_Path: {
-                PathAttachment* path = _attachmentLoader->newPathAttachment(*skin, String(name));
+                PathAttachment *path = _attachmentLoader->newPathAttachment(*skin, String(name));
                 int vertexCount = 0;
                 path->_closed = readBoolean(input);
                 path->_constantSpeed = readBoolean(input);
                 vertexCount = readVarint(input, true);
-                readVertices(input, static_cast<VertexAttachment*>(path), vertexCount);
+                readVertices(input, static_cast<VertexAttachment *>(path), vertexCount);
                 int lengthsLength = vertexCount / 3;
                 path->_lengths.setSize(lengthsLength);
-                for (i = 0; i < lengthsLength; ++i) {
+                for (int i = 0; i < lengthsLength; ++i) {
                     path->_lengths[i] = readFloat(input) * _scale;
                 }
-                
+
                 if (nonessential) {
                     /* Skip color. */
                     readInt(input);
                 }
-                
-                if (freeName) {
-                    SpineExtension::free(name, __FILE__, __LINE__);
-                }
-                
                 return path;
             }
             case AttachmentType_Point: {
-                PointAttachment* point = _attachmentLoader->newPointAttachment(*skin, String(name));
+                PointAttachment *point = _attachmentLoader->newPointAttachment(*skin, String(name));
                 point->_rotation = readFloat(input);
                 point->_x = readFloat(input) * _scale;
                 point->_y = readFloat(input) * _scale;
-                
+
                 if (nonessential) {
                     /* Skip color. */
                     readInt(input);
                 }
-                
+
                 return point;
             }
             case AttachmentType_Clipping: {
                 int endSlotIndex = readVarint(input, true);
                 int vertexCount = readVarint(input, true);
-                ClippingAttachment* clip = _attachmentLoader->newClippingAttachment(*skin, name);
-                readVertices(input, static_cast<VertexAttachment*>(clip), vertexCount);
-                
+                ClippingAttachment *clip = _attachmentLoader->newClippingAttachment(*skin, name);
+                readVertices(input, static_cast<VertexAttachment *>(clip), vertexCount);
+
                 if (nonessential) {
                     /* Skip color. */
                     readInt(input);
                 }
-                
+
                 clip->_endSlot = skeletonData->_slots[endSlotIndex];
-                
-                if (freeName) {
-                    SpineExtension::free(name, __FILE__, __LINE__);
-                }
-                
                 return clip;
             }
         }
-        
-        if (freeName) {
-            SpineExtension::free(name, __FILE__, __LINE__);
-        }
-        
         return NULL;
     }
     
     void SkeletonBinary::readVertices(DataInput* input, VertexAttachment* attachment, int vertexCount) {
         float scale = _scale;
         int verticesLength = vertexCount << 1;
-        
+        attachment->setWorldVerticesLength(vertexCount << 1);
+
         if (!readBoolean(input)) {
             readFloatArray(input, verticesLength, scale, attachment->getVertices());
             return;
         }
-        
-        Vertices vertices;
-        vertices._bones.ensureCapacity(verticesLength * 3);
-        vertices._vertices.ensureCapacity(verticesLength * 3 * 3);
+
+        Vector<float>& vertices = attachment->getVertices();
+        Vector<int>& bones = attachment->getBones();
+        vertices.ensureCapacity(verticesLength * 3 * 3);
+        bones.ensureCapacity(verticesLength * 3);
         
         for (int i = 0; i < vertexCount; ++i) {
             int boneCount = readVarint(input, true);
-			vertices._bones.add(boneCount);
+			bones.add(boneCount);
             for (int ii = 0; ii < boneCount; ++ii) {
-				vertices._bones.add(readVarint(input, true));
-				vertices._vertices.add(readFloat(input) * scale);
-				vertices._vertices.add(readFloat(input) * scale);
-				vertices._vertices.add(readFloat(input));
+				bones.add(readVarint(input, true));
+				vertices.add(readFloat(input) * scale);
+				vertices.add(readFloat(input) * scale);
+				vertices.add(readFloat(input));
             }
         }
-        
-        attachment->setVertices(vertices._vertices);
-        attachment->setBones(vertices._bones);
     }
     
     void SkeletonBinary::readFloatArray(DataInput *input, int n, float scale, Vector<float>& array) {

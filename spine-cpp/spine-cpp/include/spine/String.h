@@ -72,6 +72,10 @@ namespace Spine {
 			return _length;
 		}
 
+		bool isEmpty () const {
+			return _length == 0;
+		}
+
 		const char* buffer () const {
 			return _buffer;
 		}

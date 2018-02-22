@@ -73,7 +73,7 @@ namespace Spine {
     
     void PathConstraint::update() {
         Attachment* baseAttachment = _target->getAttachment();
-        if (baseAttachment == NULL || !baseAttachment->getRTTI().derivesFrom(PathAttachment::rtti)) {
+        if (baseAttachment == NULL || !baseAttachment->getRTTI().instanceOf(PathAttachment::rtti)) {
             return;
         }
         

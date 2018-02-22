@@ -61,7 +61,7 @@ namespace Spine {
     public:
         SlotData(int index, const String& name, BoneData& boneData);
         
-        const int getIndex();
+        int getIndex();
         
         const String& getName();
         

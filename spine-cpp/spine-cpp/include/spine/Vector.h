@@ -80,7 +80,7 @@ namespace Spine {
             deallocate(_buffer);
         }
 
-        void clear () {
+        inline void clear () {
             for (size_t i = 0; i < _size; ++i) {
                 destroy(_buffer + (_size - 1 - i));
             }
@@ -88,11 +88,11 @@ namespace Spine {
             _size = 0;
         }
 
-        size_t size() const {
+        inline size_t size() const {
             return _size;
         }
 
-        void setSize(size_t newSize) {
+        inline void setSize(size_t newSize) {
             assert(newSize >= 0);
             _size = newSize;
             if (_capacity < newSize) {
@@ -102,13 +102,13 @@ namespace Spine {
             }
         }
 
-        void ensureCapacity(size_t newCapacity = 0) {
+        inline void ensureCapacity(size_t newCapacity = 0) {
             if (_capacity >= newCapacity) return;
             _capacity = newCapacity;
             _buffer = SpineExtension::realloc<T>(_buffer, newCapacity, __FILE__, __LINE__);
         }
 
-		void add(const T &inValue) {
+		inline void add(const T &inValue) {
 			if (_size == _capacity) {
                 _capacity = (int)(_size  * 1.75f);
                 if (_capacity < 8) _capacity = 8;
@@ -117,7 +117,7 @@ namespace Spine {
 			construct(_buffer + _size++, inValue);
 		}
 
-        void removeAt(size_t inIndex) {
+        inline void removeAt(size_t inIndex) {
             assert(inIndex < _size);
 
             --_size;
@@ -131,7 +131,7 @@ namespace Spine {
             destroy(_buffer + _size);
         }
 
-        bool contains(const T& inValue) {
+        inline bool contains(const T& inValue) {
             for (size_t i = 0; i < _size; ++i) {
                 if (_buffer[i] == inValue) {
                     return true;
@@ -141,7 +141,7 @@ namespace Spine {
             return false;
         }
 
-        int indexOf(const T& inValue) {
+        inline int indexOf(const T& inValue) {
             for (size_t i = 0; i < _size; ++i) {
                 if (_buffer[i] == inValue) {
                     return static_cast<int>(i);
@@ -151,13 +151,13 @@ namespace Spine {
             return -1;
         }
 
-        T& operator[](size_t inIndex) {
+        inline T& operator[](size_t inIndex) {
             assert(inIndex < _size);
 
             return _buffer[inIndex];
         }
 
-        friend bool operator==(Vector<T>& lhs, Vector<T>& rhs) {
+        inline friend bool operator==(Vector<T>& lhs, Vector<T>& rhs) {
             if (lhs.size() != rhs.size()) {
                 return false;
             }
@@ -171,11 +171,11 @@ namespace Spine {
             return true;
         }
 
-        friend bool operator!=(Vector<T>& lhs, Vector<T>& rhs) {
+        inline friend bool operator!=(Vector<T>& lhs, Vector<T>& rhs) {
             return !(lhs == rhs);
         }
 
-		T* buffer() {
+		inline T* buffer() {
 			return _buffer;
 		}
 

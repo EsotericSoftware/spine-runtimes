@@ -45,18 +45,18 @@ namespace Spine {
     bool RTTI::isExactly(const RTTI& rtti) const {
         return (this == &rtti);
     }
-    
-    bool RTTI::derivesFrom(const RTTI& rtti) const {
+
+    bool RTTI::instanceOf(const RTTI &rtti) const {
         const RTTI * pCompare = this;
-        
+
         while (pCompare) {
             if (pCompare == &rtti) {
                 return true;
             }
-            
+
             pCompare = pCompare->_pBaseRTTI;
         }
-        
+
         return false;
     }
 }

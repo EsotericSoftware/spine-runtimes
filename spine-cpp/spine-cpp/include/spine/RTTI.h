@@ -45,8 +45,8 @@ namespace Spine {
         const std::string& getClassName() const;
         
         bool isExactly(const RTTI& rtti) const;
-        
-        bool derivesFrom(const RTTI& rtti) const;
+
+        bool instanceOf(const RTTI &rtti) const;
         
     private:
         // Prevent copying

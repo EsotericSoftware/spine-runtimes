@@ -66,5 +66,12 @@ private:
 	mutable bool usePremultipliedAlpha;
 };
 
+class SFMLTextureLoader: public TextureLoader {
+public:
+	virtual void load(AtlasPage& page, const String& path);
+
+	virtual void unload(void* texture);
+};
+
 } /* namespace spine */
 #endif /* SPINE_SFML_H_ */

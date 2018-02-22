@@ -30,8 +30,7 @@
 
 #include <stdio.h>
 #include <spine/spine.h>
-
-#include "TestHarness.h"
+#include <spine/Debug.h>
 
 using namespace Spine;
 
@@ -115,7 +114,7 @@ void testLoading() {
 }
 
 int main (int argc, char** argv) {
-	TestSpineExtension* ext = new TestSpineExtension();
+	DebugExtension* ext = new DebugExtension();
 	SpineExtension::setInstance(ext);
 
  	testLoading();

@@ -142,55 +142,55 @@ namespace Spine {
         int pathCount = static_cast<int>(_pathConstraints.size());
         
         int constraintCount = ikCount + transformCount + pathCount;
-        
-        for (int i = 0; i < constraintCount; ++i) {
-            bool gotoNextConstraintCount = false;
-            
+
+        int i = 0;
+        continue_outer:
+        for (; i < constraintCount; ++i) {
             for (int ii = 0; ii < ikCount; ++ii) {
                 IkConstraint* constraint = _ikConstraints[ii];
                 if (constraint->getData().getOrder() == i) {
                     sortIkConstraint(constraint);
-                    
-                    gotoNextConstraintCount = true;
-                    break;
+                    i++;
+                    goto continue_outer;
                 }
-            }
-            
-            if (gotoNextConstraintCount) {
-                break;
             }
             
             for (int ii = 0; ii < transformCount; ++ii) {
                 TransformConstraint* constraint = _transformConstraints[ii];
                 if (constraint->getData().getOrder() == i) {
                     sortTransformConstraint(constraint);
-                    
-                    gotoNextConstraintCount = true;
-                    break;
+                    i++;
+                    goto continue_outer;
                 }
-            }
-            
-            if (gotoNextConstraintCount) {
-                break;
             }
             
             for (int ii = 0; ii < pathCount; ++ii) {
                 PathConstraint* constraint = _pathConstraints[ii];
                 if (constraint->getData().getOrder() == i) {
                     sortPathConstraint(constraint);
-                    
-                    gotoNextConstraintCount = true;
-                    break;
+                    i++;
+                    goto continue_outer;
                 }
-            }
-            
-            if (gotoNextConstraintCount) {
-                break;
             }
         }
         
         for (int i = 0, n = static_cast<int>(_bones.size()); i < n; ++i) {
             sortBone(_bones[i]);
+        }
+    }
+
+    void Skeleton::printUpdateCache () {
+        for (size_t i = 0; i < _updateCache.size(); i++) {
+            Updatable* updatable = _updateCache[i];
+            if (updatable->getRTTI().isExactly(Bone::rtti)) {
+                printf("bone %s\n", ((Bone*)updatable)->getData().getName().buffer());
+            } else if (updatable->getRTTI().isExactly(TransformConstraint::rtti)) {
+                printf("transform constraint %s\n", ((TransformConstraint*)updatable)->getData().getName().buffer());
+            } else if (updatable->getRTTI().isExactly(IkConstraint::rtti)) {
+                printf("ik constraint %s\n", ((IkConstraint*)updatable)->getData().getName().buffer());
+            } else if (updatable->getRTTI().isExactly(PathConstraint::rtti)) {
+                printf("path constraint %s\n", ((PathConstraint*)updatable)->getData().getName().buffer());
+            }
         }
     }
     
@@ -407,7 +407,7 @@ namespace Spine {
             int verticesLength = 0;
             Attachment* attachment = slot->getAttachment();
             
-            if (attachment != NULL && attachment->getRTTI().derivesFrom(RegionAttachment::rtti)) {
+            if (attachment != NULL && attachment->getRTTI().instanceOf(RegionAttachment::rtti)) {
                 RegionAttachment* regionAttachment = static_cast<RegionAttachment*>(attachment);
 
                 verticesLength = 8;
@@ -416,7 +416,7 @@ namespace Spine {
                 }
                 regionAttachment->computeWorldVertices(slot->getBone(), outVertexBuffer, 0);
             }
-            else if (attachment != NULL && attachment->getRTTI().derivesFrom(MeshAttachment::rtti)) {
+            else if (attachment != NULL && attachment->getRTTI().instanceOf(MeshAttachment::rtti)) {
                 MeshAttachment* mesh = static_cast<MeshAttachment*>(attachment);
 
                 verticesLength = mesh->getWorldVerticesLength();
@@ -543,9 +543,7 @@ namespace Spine {
         
         if (constrained.size() > 1) {
             Bone* child = constrained[constrained.size() - 1];
-            if (!_updateCache.contains(child)) {
-				_updateCacheReset.add(child);
-            }
+            if (!_updateCache.contains(child)) _updateCacheReset.add(child);
         }
 
 		_updateCache.add(constraint);
@@ -556,72 +554,55 @@ namespace Spine {
     
     void Skeleton::sortPathConstraint(PathConstraint* constraint) {
         Slot* slot = constraint->getTarget();
-        int slotIndex = slot->_data.getIndex();
-        Bone& slotBone = slot->_bone;
-        
-        if (_skin != NULL) {
-            sortPathConstraintAttachment(_skin, slotIndex, slotBone);
-        }
-        
-        if (_data->_defaultSkin != NULL && _data->_defaultSkin != _skin) {
+        int slotIndex = slot->getData().getIndex();
+        Bone& slotBone = slot->getBone();
+        if (_skin != NULL) sortPathConstraintAttachment(_skin, slotIndex, slotBone);
+        if (_data->_defaultSkin != NULL && _data->_defaultSkin != _skin)
             sortPathConstraintAttachment(_data->_defaultSkin, slotIndex, slotBone);
-        }
-        
-        for (int ii = 0, nn = static_cast<int>(_data->_skins.size()); ii < nn; ++ii) {
+        for (size_t ii = 0, nn = _data->_skins.size(); ii < nn; ii++)
             sortPathConstraintAttachment(_data->_skins[ii], slotIndex, slotBone);
-        }
         
         Attachment* attachment = slot->_attachment;
-        if (attachment != NULL && attachment->getRTTI().derivesFrom(PathAttachment::rtti)) {
+        if (attachment != NULL && attachment->getRTTI().instanceOf(PathAttachment::rtti))
             sortPathConstraintAttachment(attachment, slotBone);
-        }
         
         Vector<Bone*>& constrained = constraint->getBones();
-        int boneCount = static_cast<int>(constrained.size());
-        for (int i = 0; i < boneCount; ++i) {
+        size_t boneCount = constrained.size();
+        for (size_t i = 0; i < boneCount; ++i) {
             sortBone(constrained[i]);
         }
 
 		_updateCache.add(constraint);
         
-        for (int i = 0; i < boneCount; ++i) {
+        for (int i = 0; i < boneCount; i++)
             sortReset(constrained[i]->getChildren());
-        }
-        
-        for (int i = 0; i < boneCount; ++i) {
+        for (int i = 0; i < boneCount; i++)
             constrained[i]->_sorted = true;
-        }
     }
     
     void Skeleton::sortTransformConstraint(TransformConstraint* constraint) {
         sortBone(constraint->getTarget());
         
         Vector<Bone*>& constrained = constraint->getBones();
-        int boneCount = static_cast<int>(constrained.size());
+        size_t boneCount = constrained.size();
         if (constraint->_data.isLocal()) {
-            for (int i = 0; i < boneCount; ++i) {
+            for (size_t i = 0; i < boneCount; i++) {
                 Bone* child = constrained[i];
                 sortBone(child->getParent());
-                if (!_updateCache.contains(child)) {
-					_updateCacheReset.add(child);
-                }
+                if (!_updateCache.contains(child)) _updateCacheReset.add(child);
             }
-        }
-        else {
-            for (int i = 0; i < boneCount; ++i) {
+        } else {
+            for (size_t i = 0; i < boneCount; ++i) {
                 sortBone(constrained[i]);
             }
         }
 
 		_updateCache.add(constraint);
         
-        for (int i = 0; i < boneCount; ++i) {
+        for (size_t i = 0; i < boneCount; ++i)
             sortReset(constrained[i]->getChildren());
-        }
-        
-        for (int i = 0; i < boneCount; ++i) {
+        for (size_t i = 0; i < boneCount; ++i)
             constrained[i]->_sorted = true;
-        }
     }
     
     void Skeleton::sortPathConstraintAttachment(Skin* skin, int slotIndex, Bone& slotBone) {
@@ -638,18 +619,12 @@ namespace Spine {
     }
     
     void Skeleton::sortPathConstraintAttachment(Attachment* attachment, Bone& slotBone) {
-        if (attachment == NULL || attachment->getRTTI().derivesFrom(PathAttachment::rtti)) {
-            return;
-        }
-        
-        PathAttachment* pathAttachment = static_cast<PathAttachment*>(attachment);
-        Vector<int>& pathBonesRef = pathAttachment->getBones();
-        Vector<int> pathBones = pathBonesRef;
-        if (pathBones.size() == 0) {
+        if (attachment == NULL || !attachment->getRTTI().instanceOf(PathAttachment::rtti)) return;
+        Vector<int>& pathBones = static_cast<PathAttachment*>(attachment)->getBones();
+        if (pathBones.size() == 0)
             sortBone(&slotBone);
-        }
         else {
-            for (int i = 0, n = static_cast<int>(pathBones.size()); i < n;) {
+            for (size_t i = 0, n = pathBones.size(); i < n;) {
                 int nn = pathBones[i++];
                 nn += i;
                 while (i < nn) {
@@ -660,29 +635,17 @@ namespace Spine {
     }
     
     void Skeleton::sortBone(Bone* bone) {
-        assert(bone != NULL);
-        
-        if (bone->_sorted) {
-            return;
-        }
-        
+        if (bone->_sorted) return;
         Bone* parent = bone->_parent;
-        if (parent != NULL) {
-            sortBone(parent);
-        }
-        
+        if (parent != NULL) sortBone(parent);
         bone->_sorted = true;
-
 		_updateCache.add(bone);
     }
     
     void Skeleton::sortReset(Vector<Bone*>& bones) {
-        for (size_t i = 0; i < bones.size(); ++i) {
+        for (size_t i = 0, n = bones.size(); i < n; ++i) {
             Bone* bone = bones[i];
-            if (bone->_sorted) {
-                sortReset(bone->getChildren());
-            }
-            
+            if (bone->_sorted) sortReset(bone->getChildren());
             bone->_sorted = false;
         }
     }

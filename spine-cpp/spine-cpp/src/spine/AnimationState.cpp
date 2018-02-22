@@ -428,7 +428,7 @@ namespace Spine {
                     MixPose pose = timelineData[ii] >= AnimationState::First ? MixPose_Setup : currentPose;
                     
                     RotateTimeline* rotateTimeline = NULL;
-                    if (timeline->getRTTI().derivesFrom(RotateTimeline::rtti)) {
+                    if (timeline->getRTTI().isExactly(RotateTimeline::rtti)) {
                         rotateTimeline = static_cast<RotateTimeline*>(timeline);
                     }
                     
@@ -784,10 +784,10 @@ namespace Spine {
             Timeline* timeline = timelines[i];
             switch (timelineData[i]) {
                 case Subsequent:
-                    if (!attachments && timeline->getRTTI().derivesFrom(AttachmentTimeline::rtti)) {
+                    if (!attachments && timeline->getRTTI().isExactly(AttachmentTimeline::rtti)) {
                         continue;
                     }
-                    if (!drawOrder && timeline->getRTTI().derivesFrom(DrawOrderTimeline::rtti)) {
+                    if (!drawOrder && timeline->getRTTI().isExactly(DrawOrderTimeline::rtti)) {
                         continue;
                     }
                     
@@ -811,7 +811,7 @@ namespace Spine {
             from->_totalAlpha += alpha;
             
             RotateTimeline* rotateTimeline = NULL;
-            if (timeline->getRTTI().derivesFrom(RotateTimeline::rtti)) {
+            if (timeline->getRTTI().isExactly(RotateTimeline::rtti)) {
                 rotateTimeline = static_cast<RotateTimeline*>(timeline);
             }
             
