@@ -49,9 +49,7 @@ namespace Spine {
         assert(to != NULL);
         
         AnimationPair key(from, to);
-        HashMap<AnimationPair, float, HashAnimationPair>::Iterator i = _animationToMixTime.find(key);
-        _animationToMixTime.erase(i);
-        _animationToMixTime.insert(key, duration);
+        _animationToMixTime.put(key, duration);
     }
     
     float AnimationStateData::getMix(Animation* from, Animation* to) {
@@ -60,12 +58,7 @@ namespace Spine {
         
         AnimationPair key(from, to);
         
-        HashMap<AnimationPair, float, HashAnimationPair>::Iterator i = _animationToMixTime.find(key);
-        
-        if (i != _animationToMixTime.end()) {
-            return i.value();
-        }
-        
+        if (_animationToMixTime.containsKey(key)) return _animationToMixTime[key];
         return _defaultMix;
     }
     

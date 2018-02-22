@@ -86,11 +86,11 @@ namespace Spine {
         void findAttachmentsForSlot(int slotIndex, Vector<Attachment*>& attachments);
 
         const String& getName();
-        HashMap<AttachmentKey, Attachment*, HashAttachmentKey>& getAttachments();
+        HashMap<AttachmentKey, Attachment*>& getAttachments();
         
     private:
         const String _name;
-        HashMap<AttachmentKey, Attachment*, HashAttachmentKey> _attachments;
+        HashMap<AttachmentKey, Attachment*> _attachments;
         
         /// Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached.
         void attachAll(Skeleton& skeleton, Skin& oldSkin);

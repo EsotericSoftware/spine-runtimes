@@ -625,12 +625,13 @@ namespace Spine {
     }
     
     void Skeleton::sortPathConstraintAttachment(Skin* skin, int slotIndex, Bone& slotBone) {
-        HashMap<Skin::AttachmentKey, Attachment*, Skin::HashAttachmentKey>& attachments = skin->getAttachments();
+        HashMap<Skin::AttachmentKey, Attachment*>& attachments = skin->getAttachments();
         
-        for (HashMap<Skin::AttachmentKey, Attachment*, Skin::HashAttachmentKey>::Iterator i = attachments.begin(); i != attachments.end(); ++i) {
-            Skin::AttachmentKey key = i.key();
+        for (HashMap<Skin::AttachmentKey, Attachment*>::Entries entries = attachments.getEntries(); entries.hasNext();) {
+            HashMap<Skin::AttachmentKey, Attachment*>::Pair pair = entries.next();
+            Skin::AttachmentKey& key = pair.key;
             if (key._slotIndex == slotIndex) {
-                Attachment* value = i.value();
+                Attachment* value = pair.value;
                 sortPathConstraintAttachment(value, slotBone);
             }
         }

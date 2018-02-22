@@ -85,7 +85,7 @@ namespace Spine {
         
         SkeletonData* _skeletonData;
         float _defaultMix;
-        HashMap<AnimationPair, float, HashAnimationPair> _animationToMixTime;
+        HashMap<AnimationPair, float> _animationToMixTime;
     };
 }
 

@@ -58,42 +58,43 @@ namespace Spine {
     }
 
     Skin::~Skin() {
-        HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = _attachments.begin();
-        for (; i != _attachments.end(); ++i) {
-			delete i.value();
+        HashMap<AttachmentKey, Attachment*>::Entries entries = _attachments.getEntries();
+        while(entries.hasNext()) {
+            HashMap<AttachmentKey, Attachment*>::Pair pair = entries.next();
+			delete pair.value;
         }
     }
     
     void Skin::addAttachment(int slotIndex, const String& name, Attachment* attachment) {
         assert(attachment);
-        
-        _attachments.insert(AttachmentKey(slotIndex, name), attachment);
+        _attachments.put(AttachmentKey(slotIndex, name), attachment);
     }
     
     Attachment* Skin::getAttachment(int slotIndex, const String& name) {
-        HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = _attachments.find(AttachmentKey(slotIndex, name));
-        
-        Attachment* ret = NULL;
-        
-        if (i != _attachments.end()) {
-            ret = i.value();
+        AttachmentKey key(slotIndex, name);
+        if (_attachments.containsKey(key)) {
+            return _attachments[key];
+        } else {
+            return NULL;
         }
-        
-        return ret;
     }
     
     void Skin::findNamesForSlot(int slotIndex, Vector<String>& names) {
-        for (HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = _attachments.begin(); i != _attachments.end(); ++i) {
-            if (i.key()._slotIndex == slotIndex) {
-                names.add(i.key()._name);
+        HashMap<AttachmentKey, Attachment*>::Entries entries = _attachments.getEntries();
+        while(entries.hasNext()) {
+            HashMap<AttachmentKey, Attachment*>::Pair pair = entries.next();
+            if (pair.key._slotIndex == slotIndex) {
+                names.add(pair.key._name);
             }
         }
     }
     
     void Skin::findAttachmentsForSlot(int slotIndex, Vector<Attachment*>& attachments) {
-        for (HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = _attachments.begin(); i != _attachments.end(); ++i) {
-            if (i.key()._slotIndex == slotIndex) {
-                attachments.add(i.value());
+        HashMap<AttachmentKey, Attachment*>::Entries entries = _attachments.getEntries();
+        while(entries.hasNext()) {
+            HashMap<AttachmentKey, Attachment*>::Pair pair = entries.next();
+            if (pair.key._slotIndex == slotIndex) {
+                attachments.add(pair.value);
             }
         }
     }
@@ -102,20 +103,21 @@ namespace Spine {
         return _name;
     }
     
-    HashMap<Skin::AttachmentKey, Attachment*, Skin::HashAttachmentKey>& Skin::getAttachments() {
+    HashMap<Skin::AttachmentKey, Attachment*>& Skin::getAttachments() {
         return _attachments;
     }
     
     void Skin::attachAll(Skeleton& skeleton, Skin& oldSkin) {
         Vector<Slot*>& slots = skeleton.getSlots();
-        
-        for (HashMap<AttachmentKey, Attachment*, HashAttachmentKey>::Iterator i = oldSkin.getAttachments().begin(); i != oldSkin.getAttachments().end(); ++i) {
-            int slotIndex = i.key()._slotIndex;
+        HashMap<AttachmentKey, Attachment*>::Entries entries = oldSkin.getAttachments().getEntries();
+        while(entries.hasNext()) {
+            HashMap<AttachmentKey, Attachment*>::Pair pair = entries.next();
+            int slotIndex = pair.key._slotIndex;
             Slot* slot = slots[slotIndex];
             
-            if (slot->getAttachment() == i.value()) {
+            if (slot->getAttachment() == pair.value) {
                 Attachment* attachment = NULL;
-                if ((attachment = getAttachment(slotIndex, i.key()._name))) {
+                if ((attachment = getAttachment(slotIndex, pair.key._name))) {
                     slot->setAttachment(attachment);
                 }
             }

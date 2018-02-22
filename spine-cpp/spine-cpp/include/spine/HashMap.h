@@ -36,53 +36,57 @@
 #include <spine/SpineObject.h>
 
 namespace Spine {
-    template <typename K, typename V, typename H>
+    template <typename K, typename V>
     class HashMap : public SpineObject {
     private:
         class Entry;
         
     public:
-        class Iterator : public SpineObject {
-            friend class HashMap;
-            
+        class Pair {
         public:
-            explicit Iterator(Entry* entry = NULL) : _entry(entry) {
+            explicit Pair(K& k, V& v) : key(k), value(v) {}
+
+            K& key;
+            V& value;
+        };
+
+        class Entries {
+        public:
+            friend class HashMap;
+
+            explicit Entries(Entry *entry) : _entry(NULL), _hasChecked(false) {
+                _start.next = entry;
+                _entry = &_start;
             }
-            
-            Iterator& operator++() {
-				_entry = _entry->next;
-				return *this;
-			}
-            
-            bool operator==(const Iterator& p) const {
-                return _entry == p._entry;
+
+            Pair next() {
+                assert(_entry);
+                assert(_hasChecked);
+                _entry = _entry->next;
+                Pair pair(_entry->_key, _entry->_value);
+                _hasChecked = false;
+                return pair;
             }
-            
-            bool operator!=(const Iterator& p) const {
-                return _entry != p._entry;
+
+            bool hasNext() {
+                _hasChecked = true;
+                return _entry->next;
             }
-            
-            K& key() {
-                return _entry->_key;
-            }
-            
-            V& value() {
-                return _entry->_value;
-            }
-            
+
         private:
+            bool _hasChecked;
+            Entry _start;
             Entry* _entry;
         };
-        
+
         HashMap() :
         _head(NULL),
-        _hashFunction(),
         _size(0) {
         }
         
         ~HashMap() {
-            for (Iterator it = begin(); it != end(); ++it) {
-                delete it._entry;
+            for (Entry* entry = _head; entry != NULL; entry = entry->next) {
+                delete entry;
             }
         }
         
@@ -90,16 +94,8 @@ namespace Spine {
             return _size;
         }
         
-        Iterator begin() {
-            return Iterator(_head);
-        }
-        
-        Iterator end() {
-            return Iterator(NULL);
-        }
-        
-        void insert(const K& key, const V& value) {
-            Entry* entry = find(key)._entry;
+        void put(const K& key, const V& value) {
+            Entry* entry = find(key);
             if (entry) {
                 entry->_key = key;
                 entry->_value = value;
@@ -117,19 +113,18 @@ namespace Spine {
                 } else {
                     _head = entry;
                 }
+                _size++;
             }
         }
         
-        Iterator find(const K& key) {
-            for (Iterator it = begin(); it != end(); ++it) {
-                if (it._entry && it.key() == key)
-                    return it;
-            }
-            return end();
+        bool containsKey(const K& key) {
+            return find(key) != NULL;
         }
         
-        Iterator erase(Iterator pos) {
-            Entry* entry = pos._entry;
+        bool remove(const K& key) {
+            Entry* entry = find(key);
+            if (!entry) return false;
+
             Entry* prev = entry->prev;
             Entry* next = entry->next;
 
@@ -138,15 +133,30 @@ namespace Spine {
             if (next) next->prev = entry->prev;
 
             delete entry;
-            return Iterator(next);
+            _size--;
+
+            return true;
         }
         
         V operator[](const K& key) {
-            Iterator iter = find(key);
-            return iter;
+            Entry* entry = find(key);
+            if (entry) return entry->_value;
+            else assert(false);
+        }
+
+        Entries getEntries() {
+            return Entries(_head);
         }
         
     private:
+        Entry* find(const K& key) {
+            for (Entry* entry = _head; entry != NULL; entry = entry->next) {
+                if (entry->_key == key)
+                    return entry;
+            }
+            return NULL;
+        }
+
         class Entry : public SpineObject {
         public:
             K _key;
@@ -156,8 +166,7 @@ namespace Spine {
 
             Entry () : next(NULL), prev(NULL) {}
         };
-        
-        const H _hashFunction;
+
         Entry* _head;
         size_t _size;
     };
