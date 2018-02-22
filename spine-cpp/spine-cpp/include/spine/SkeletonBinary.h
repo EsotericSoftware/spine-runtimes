@@ -66,8 +66,6 @@ namespace Spine {
         static const int CURVE_LINEAR;
         static const int CURVE_STEPPED;
         static const int CURVE_BEZIER;
-        
-        static const TransformMode TRANSFORM_MODE_VALUES[5];
 
         explicit SkeletonBinary(Atlas* atlasArray);
 
@@ -123,7 +121,7 @@ namespace Spine {
         
         void readShortArray(DataInput *input, Vector<unsigned short>& array);
         
-        Animation* readAnimation(const char* name, DataInput* input, SkeletonData *skeletonData);
+        Animation* readAnimation(const String& name, DataInput* input, SkeletonData *skeletonData);
         
         void readCurve(DataInput* input, int frameIndex, CurveTimeline* timeline);
     };

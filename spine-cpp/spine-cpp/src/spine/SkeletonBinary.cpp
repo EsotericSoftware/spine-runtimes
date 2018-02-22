@@ -98,14 +98,6 @@ namespace Spine {
     const int SkeletonBinary::CURVE_STEPPED = 1;
     const int SkeletonBinary::CURVE_BEZIER = 2;
     
-    const TransformMode SkeletonBinary::TRANSFORM_MODE_VALUES[5] = {
-        TransformMode_Normal,
-        TransformMode_OnlyTranslation,
-        TransformMode_NoRotationOrReflection,
-        TransformMode_NoScale,
-        TransformMode_NoScaleOrReflection
-    };
-    
     SkeletonBinary::SkeletonBinary(Atlas* atlasArray) : _attachmentLoader(new (__FILE__, __LINE__) AtlasAttachmentLoader(atlasArray)), _error(), _scale(1), _ownsLoader(true) {
 
     }
@@ -124,7 +116,7 @@ namespace Spine {
     }
     
     SkeletonData* SkeletonBinary::readSkeletonData(const unsigned char* binary, const int length) {
-        int i, ii, nonessential;
+        bool nonessential;
         SkeletonData* skeletonData;
         
         DataInput* input = new (__FILE__, __LINE__) DataInput();
@@ -149,20 +141,17 @@ namespace Spine {
         if (nonessential) {
             /* Skip images path, audio path & fps */
             readFloat(input);
-            SpineExtension::free(readString(input), __FILE__, __LINE__);
-            SpineExtension::free(readString(input), __FILE__, __LINE__);
+            String(readString(input), true);
+            String(readString(input), true);
         }
         
         /* Bones. */
         int bonesCount = readVarint(input, true);
         skeletonData->_bones.setSize(bonesCount);
-        for (i = 0; i < bonesCount; ++i) {
-            BoneData* data;
-            int mode;
+        for (int i = 0; i < bonesCount; ++i) {
             const char* name = readString(input);
             BoneData* parent = i == 0 ? 0 : skeletonData->_bones[readVarint(input, true)];
-            
-            data = new (__FILE__, __LINE__) BoneData(i, String(name, true), parent);
+            BoneData* data = new (__FILE__, __LINE__) BoneData(i, String(name, true), parent);
             data->_rotation = readFloat(input);
             data->_x = readFloat(input) * _scale;
             data->_y = readFloat(input) * _scale;
@@ -171,93 +160,64 @@ namespace Spine {
             data->_shearX = readFloat(input);
             data->_shearY = readFloat(input);
             data->_length = readFloat(input) * _scale;
-            
-            mode = readVarint(input, true);
-            switch (mode) {
-                case 0:
-                    data->_transformMode = TransformMode_Normal;
-                    break;
-                case 1:
-                    data->_transformMode = TransformMode_OnlyTranslation;
-                    break;
-                case 2:
-                    data->_transformMode = TransformMode_NoRotationOrReflection;
-                    break;
-                case 3:
-                    data->_transformMode = TransformMode_NoScale;
-                    break;
-                case 4:
-                    data->_transformMode = TransformMode_NoScaleOrReflection;
-                    break;
-            }
-            
+            data->_transformMode = static_cast<TransformMode>(readVarint(input, true));
             if (nonessential) {
                 /* Skip bone color. */
                 readInt(input);
             }
-            
             skeletonData->_bones[i] = data;
         }
 
         /* Slots. */
         int slotsCount = readVarint(input, true);
         skeletonData->_slots.setSize(slotsCount);
-        for (i = 0; i < slotsCount; ++i) {
-            int r, g, b, a;
+        for (int i = 0; i < slotsCount; ++i) {
             const char* slotName = readString(input);
             BoneData* boneData = skeletonData->_bones[readVarint(input, true)];
-            
             SlotData* slotData = new (__FILE__, __LINE__) SlotData(i, String(slotName, true), *boneData);
 
             readColor(input, slotData->getColor());
-            r = readByte(input);
-            g = readByte(input);
-            b = readByte(input);
-            a = readByte(input);
+            unsigned char r = readByte(input);
+            unsigned char g = readByte(input);
+            unsigned char b = readByte(input);
+            unsigned char a = readByte(input);
             if (!(r == 0xff && g == 0xff && b == 0xff && a == 0xff)) {
                 slotData->getDarkColor().set(r / 255.0f, g  / 255.0f, b / 255.0f, 0);
                 slotData->setHasDarkColor(true);
             }
             slotData->_attachmentName.own(readString(input));
             slotData->_blendMode = static_cast<BlendMode>(readVarint(input, true));
-            
             skeletonData->_slots[i] = slotData;
         }
 
         /* IK constraints. */
         int ikConstraintsCount = readVarint(input, true);
         skeletonData->_ikConstraints.setSize(ikConstraintsCount);
-        for (i = 0; i < ikConstraintsCount; ++i) {
+        for (int i = 0; i < ikConstraintsCount; ++i) {
             const char* name = readString(input);
-            
             IkConstraintData* data = new (__FILE__, __LINE__) IkConstraintData(String(name, true));
-            
             data->_order = readVarint(input, true);
-
             int bonesCount = readVarint(input, true);
             data->_bones.setSize(bonesCount);
-            for (ii = 0; ii < bonesCount; ++ii) {
+            for (int ii = 0; ii < bonesCount; ++ii) {
                 data->_bones[ii] = skeletonData->_bones[readVarint(input, true)];
             }
             data->_target = skeletonData->_bones[readVarint(input, true)];
             data->_mix = readFloat(input);
             data->_bendDirection = readSByte(input);
-            
             skeletonData->_ikConstraints[i] = data;
         }
 
         /* Transform constraints. */
         int transformConstraintsCount = readVarint(input, true);
         skeletonData->_transformConstraints.setSize(transformConstraintsCount);
-        for (i = 0; i < transformConstraintsCount; ++i) {
+        for (int i = 0; i < transformConstraintsCount; ++i) {
             const char* name = readString(input);
-            
             TransformConstraintData* data = new (__FILE__, __LINE__) TransformConstraintData(String(name, true));
-            
             data->_order = readVarint(input, true);
             int bonesCount = readVarint(input, true);
             data->_bones.setSize(bonesCount);
-            for (ii = 0; ii < bonesCount; ++ii) {
+            for (int ii = 0; ii < bonesCount; ++ii) {
                 data->_bones[ii] = skeletonData->_bones[readVarint(input, true)];
             }
             data->_target = skeletonData->_bones[readVarint(input, true)];
@@ -273,23 +233,19 @@ namespace Spine {
             data->_translateMix = readFloat(input);
             data->_scaleMix = readFloat(input);
             data->_shearMix = readFloat(input);
-            
             skeletonData->_transformConstraints[i] = data;
         }
 
         /* Path constraints */
         int pathConstraintsCount = readVarint(input, true);
         skeletonData->_pathConstraints.setSize(pathConstraintsCount);
-        for (i = 0; i < pathConstraintsCount; ++i) {
+        for (int i = 0; i < pathConstraintsCount; ++i) {
             const char* name = readString(input);
-            
             PathConstraintData* data = new (__FILE__, __LINE__) PathConstraintData(String(name, true));
-            
             data->_order = readVarint(input, true);
-            
             int bonesCount = readVarint(input, true);
             data->_bones.setSize(bonesCount);
-            for (ii = 0; ii < bonesCount; ++ii) {
+            for (int ii = 0; ii < bonesCount; ++ii) {
                 data->_bones[ii] = skeletonData->_bones[readVarint(input, true)];
             }
             data->_target = skeletonData->_slots[readVarint(input, true)];
@@ -298,43 +254,33 @@ namespace Spine {
             data->_rotateMode = static_cast<RotateMode>(readVarint(input, true));
             data->_offsetRotation = readFloat(input);
             data->_position = readFloat(input);
-            if (data->_positionMode == PositionMode_Fixed) {
-                data->_position *= _scale;
-            }
-            
+            if (data->_positionMode == PositionMode_Fixed) data->_position *= _scale;
             data->_spacing = readFloat(input);
-            if (data->_spacingMode == SpacingMode_Length || data->_spacingMode == SpacingMode_Fixed) {
-                data->_spacing *= _scale;
-            }
+            if (data->_spacingMode == SpacingMode_Length || data->_spacingMode == SpacingMode_Fixed) data->_spacing *= _scale;
             data->_rotateMix = readFloat(input);
             data->_translateMix = readFloat(input);
-            
             skeletonData->_pathConstraints[i] = data;
         }
 
         /* Default skin. */
         skeletonData->_defaultSkin = readSkin(input, "default", skeletonData, nonessential);
         int skinsCount = readVarint(input, true);
-
         if (skeletonData->_defaultSkin) {
             ++skinsCount;
         }
-
         skeletonData->_skins.setSize(skinsCount);
-
         if (skeletonData->_defaultSkin) {
             skeletonData->_skins[0] = skeletonData->_defaultSkin;
         }
 
         /* Skins. */
-        for (i = skeletonData->_defaultSkin ? 1 : 0; i < skeletonData->_skins.size(); ++i) {
-            const char* skinName = readString(input);
+        for (int i = skeletonData->_defaultSkin ? 1 : 0; i < skeletonData->_skins.size(); ++i) {
+            String skinName(readString(input), true);
             skeletonData->_skins[i] = readSkin(input, skinName, skeletonData, nonessential);
-            SpineExtension::free(skinName, __FILE__, __LINE__);
         }
 
         /* Linked meshes. */
-        for (int i = 0, n = static_cast<int>(_linkedMeshes.size()); i < n; ++i) {
+        for (int i = 0, n = _linkedMeshes.size(); i < n; ++i) {
             LinkedMesh* linkedMesh = _linkedMeshes[i];
             Skin* skin = linkedMesh->_skin.length() == 0 ? skeletonData->getDefaultSkin() : skeletonData->findSkin(linkedMesh->_skin);
             if (skin == NULL) {
@@ -350,7 +296,7 @@ namespace Spine {
                 setError("Parent mesh not found: ", linkedMesh->_parent.buffer());
                 return NULL;
             }
-            linkedMesh->_mesh->_parentMesh = static_cast<MeshAttachment*>(parent);
+            linkedMesh->_mesh->setParentMesh(static_cast<MeshAttachment*>(parent));
             linkedMesh->_mesh->updateUVs();
         }
         ContainerUtil::cleanUpVectorOfPointers(_linkedMeshes);
@@ -359,23 +305,22 @@ namespace Spine {
         /* Events. */
         int eventsCount = readVarint(input, true);
         skeletonData->_events.setSize(eventsCount);
-        for (i = 0; i < eventsCount; ++i) {
+        for (int i = 0; i < eventsCount; ++i) {
             const char* name = readString(input);
             EventData* eventData = new (__FILE__, __LINE__) EventData(String(name, true));
             eventData->_intValue = readVarint(input, false);
             eventData->_floatValue = readFloat(input);
             eventData->_stringValue.own(readString(input));
-            SpineExtension::free(readString(input), __FILE__, __LINE__); // skip audio path
+            String(readString(input), true); // skip audio path
             skeletonData->_events[i] = eventData;
         }
 
         /* Animations. */
         int animationsCount = readVarint(input, true);
         skeletonData->_animations.setSize(animationsCount);
-        for (i = 0; i < animationsCount; ++i) {
-            const char* name = readString(input);
+        for (int i = 0; i < animationsCount; ++i) {
+            String name(readString(input), true);
             Animation* animation = readAnimation(name, input, skeletonData);
-            SpineExtension::free(name, __FILE__, __LINE__);
             if (!animation) {
                 delete input;
                 delete skeletonData;
@@ -385,7 +330,6 @@ namespace Spine {
         }
 
         delete input;
-        
         return skeletonData;
     }
     
@@ -493,27 +437,17 @@ namespace Spine {
     }
     
     Skin* SkeletonBinary::readSkin(DataInput* input, const String& skinName, SkeletonData* skeletonData, bool nonessential) {
-        Skin* skin = NULL;
         int slotCount = readVarint(input, true);
-        int i, ii, nn;
-        if (slotCount == 0) {
-            return NULL;
-        }
-        
-        skin = new (__FILE__, __LINE__) Skin(skinName);
-        
-        for (i = 0; i < slotCount; ++i) {
+        if (slotCount == 0) return NULL;
+        Skin* skin = new (__FILE__, __LINE__) Skin(skinName);
+        for (int i = 0; i < slotCount; ++i) {
             int slotIndex = readVarint(input, true);
-            for (ii = 0, nn = readVarint(input, true); ii < nn; ++ii) {
-                const char* name = readString(input);
+            for (int ii = 0, nn = readVarint(input, true); ii < nn; ++ii) {
+                String name(readString(input), true);
                 Attachment* attachment = readAttachment(input, skin, slotIndex, name, skeletonData, nonessential);
-                if (attachment) {
-                    skin->addAttachment(slotIndex, String(name), attachment);
-                }
-                SpineExtension::free(name, __FILE__, __LINE__);
+                if (attachment) skin->addAttachment(slotIndex, String(name), attachment);
             }
         }
-        
         return skin;
     }
     
@@ -556,7 +490,7 @@ namespace Spine {
                 if (path.isEmpty()) path = name;
 
                 mesh = _attachmentLoader->newMeshAttachment(*skin, String(name), String(path));
-                mesh->_path = String(path);
+                mesh->_path = path;
                 readColor(input, mesh->getColor());
                 vertexCount = readVarint(input, true);
                 readFloatArray(input, vertexCount << 1, 1, mesh->getRegionUVs());
@@ -575,45 +509,35 @@ namespace Spine {
                 return mesh;
             }
             case AttachmentType_Linkedmesh: {
-                const char *skinName;
-                const char *parent;
-                MeshAttachment *mesh;
                 String path(readString(input), true);
                 if (path.isEmpty()) path = name;
 
-                mesh = _attachmentLoader->newMeshAttachment(*skin, String(name), String(path));
+                MeshAttachment* mesh = _attachmentLoader->newMeshAttachment(*skin, String(name), String(path));
                 mesh->_path = path;
                 readColor(input, mesh->getColor());
-                skinName = readString(input);
-                parent = readString(input);
+                String skinName(readString(input), true);
+                String parent(readString(input), true);
                 mesh->_inheritDeform = readBoolean(input);
                 if (nonessential) {
                     mesh->_width = readFloat(input) * _scale;
                     mesh->_height = readFloat(input) * _scale;
                 }
 
-                LinkedMesh *linkedMesh = new(__FILE__, __LINE__) LinkedMesh(mesh, String(skinName), slotIndex,
-                                                                            String(parent));
+                LinkedMesh *linkedMesh = new(__FILE__, __LINE__) LinkedMesh(mesh, String(skinName), slotIndex, String(parent));
                 _linkedMeshes.add(linkedMesh);
-
-                SpineExtension::free(skinName, __FILE__, __LINE__);
-                SpineExtension::free(parent, __FILE__, __LINE__);
-
                 return mesh;
             }
             case AttachmentType_Path: {
                 PathAttachment *path = _attachmentLoader->newPathAttachment(*skin, String(name));
-                int vertexCount = 0;
                 path->_closed = readBoolean(input);
                 path->_constantSpeed = readBoolean(input);
-                vertexCount = readVarint(input, true);
+                int vertexCount = readVarint(input, true);
                 readVertices(input, static_cast<VertexAttachment *>(path), vertexCount);
                 int lengthsLength = vertexCount / 3;
                 path->_lengths.setSize(lengthsLength);
                 for (int i = 0; i < lengthsLength; ++i) {
                     path->_lengths[i] = readFloat(input) * _scale;
                 }
-
                 if (nonessential) {
                     /* Skip color. */
                     readInt(input);
@@ -638,13 +562,11 @@ namespace Spine {
                 int vertexCount = readVarint(input, true);
                 ClippingAttachment *clip = _attachmentLoader->newClippingAttachment(*skin, name);
                 readVertices(input, static_cast<VertexAttachment *>(clip), vertexCount);
-
+                clip->_endSlot = skeletonData->_slots[endSlotIndex];
                 if (nonessential) {
                     /* Skip color. */
                     readInt(input);
                 }
-
-                clip->_endSlot = skeletonData->_slots[endSlotIndex];
                 return clip;
             }
         }
@@ -705,7 +627,7 @@ namespace Spine {
         }
     }
     
-    Animation* SkeletonBinary::readAnimation(const char* name, DataInput* input, SkeletonData *skeletonData) {
+    Animation* SkeletonBinary::readAnimation(const String& name, DataInput* input, SkeletonData *skeletonData) {
         Vector<Timeline*> timelines;
         float scale = _scale;
         float duration = 0;

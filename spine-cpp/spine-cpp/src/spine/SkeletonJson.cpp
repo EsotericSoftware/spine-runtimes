@@ -651,7 +651,7 @@ namespace Spine {
                 setError(root, "Parent mesh not found: ", linkedMesh->_parent.buffer());
                 return NULL;
             }
-            linkedMesh->_mesh->_parentMesh = static_cast<MeshAttachment*>(parent);
+            linkedMesh->_mesh->setParentMesh(static_cast<MeshAttachment*>(parent));
             linkedMesh->_mesh->updateUVs();
         }
         ContainerUtil::cleanUpVectorOfPointers(_linkedMeshes);
