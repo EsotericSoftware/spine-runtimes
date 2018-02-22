@@ -879,7 +879,7 @@ namespace Spine {
                             if (weighted) {
                                 deform.setSize(deformLength);
                                 for (int i = 0; i < deformLength; ++i) {
-									deform.add(0);
+									deform[i] = 0;
                                 }
                             }
                             else {
