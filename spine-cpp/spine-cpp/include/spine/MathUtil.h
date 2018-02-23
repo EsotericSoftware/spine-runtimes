@@ -37,10 +37,10 @@
 #include <string.h>
 
 namespace Spine {
-    static const float PI = 3.1415927f;
+    static const float PI = 3.1415926535897932385f;
     static const float PI_2 = PI * 2;
-    static const float RAD_DEG = (180.0f / PI);
     static const float DEG_RAD = (PI / 180.0f);
+    static const float RAD_DEG = (180.0f / PI);
 
     class MathUtil : public SpineObject {
     public:
@@ -51,8 +51,6 @@ namespace Spine {
         template <typename T> static inline T max(T a, T b) { return a > b ? a : b; }
 
         static int sign(float val);
-
-        static bool areFloatsPracticallyEqual(float A, float B, float maxDiff = 0.0000000000000001f, float maxRelDiff = FLT_EPSILON);
 
         static float clamp(float x, float lower, float upper);
 

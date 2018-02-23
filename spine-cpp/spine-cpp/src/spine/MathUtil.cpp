@@ -32,42 +32,44 @@
 #include <math.h>
 
 namespace Spine {
-    int MathUtil::sign(float val) {
-        return (0 < val) - (val < 0);
+    float MathUtil::abs(float v) {
+        return ((v) < 0? -(v): (v));
     }
 
-    bool MathUtil::areFloatsPracticallyEqual(float A, float B, float maxDiff, float maxRelDiff) {
-        // Check if the numbers are really close -- needed
-        // when comparing numbers near zero.
-        float diff = fabs(A - B);
-        if (diff <= maxDiff) {
-            return true;
-        }
-
-        A = fabs(A);
-        B = fabs(B);
-
-        float largest = (B > A) ? B : A;
-
-        if (diff <= largest * maxRelDiff) {
-            return true;
-        }
-
-        return false;
+    int MathUtil::sign(float v) {
+        return ((v) < 0? -1: (v) > 0 ? 1 : 0);
     }
 
-    float MathUtil::clamp(float x, float lower, float upper) {
-        return fminf(upper, fmaxf(x, lower));
+    float MathUtil::clamp(float x, float min, float max) {
+        return((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)));
     }
-    
+
+    float MathUtil::fmod(float a, float b) {
+        return ::fmod(a, b);
+    }
+
+    /// Returns atan2 in radians, faster but less accurate than Math.Atan2. Average error of 0.00231 radians (0.1323
+    /// degrees), largest error of 0.00488 radians (0.2796 degrees).
+    float MathUtil::atan2(float y, float x) {
+        return ::atan2(y, x);
+    }
+
+    /// Returns the cosine in radians from a lookup table.
+    float MathUtil::cos(float radians) {
+        return ::cos(radians);
+    }
+
     /// Returns the sine in radians from a lookup table.
     float MathUtil::sin(float radians) {
         return ::sin(radians);
     }
-    
-    /// Returns the cosine in radians from a lookup table.
-    float MathUtil::cos(float radians) {
-        return ::cos(radians);
+
+    float MathUtil::sqrt(float v) {
+        return ::sqrt(v);
+    }
+
+    float MathUtil::acos(float v) {
+        return ::acos(v);
     }
     
     /// Returns the sine in radians from a lookup table.
@@ -78,28 +80,6 @@ namespace Spine {
     /// Returns the cosine in radians from a lookup table.
     float MathUtil::cosDeg(float degrees) {
         return ::cos(degrees * DEG_RAD);
-    }
-    
-    /// Returns atan2 in radians, faster but less accurate than Math.Atan2. Average error of 0.00231 radians (0.1323
-    /// degrees), largest error of 0.00488 radians (0.2796 degrees).
-    float MathUtil::atan2(float y, float x) {
-        return ::atan2(y, x);
-    }
-
-    float MathUtil::acos(float v) {
-        return ::acos(v);
-    }
-
-    float MathUtil::sqrt(float v) {
-        return ::sqrt(v);
-    }
-
-    float MathUtil::fmod(float a, float b) {
-        return ::fmod(a, b);
-    }
-
-    float MathUtil::abs(float v) {
-        return ::fabs(v);
     }
 
     /* Need to pass 0 as an argument, so VC++ doesn't error with C2124 */
