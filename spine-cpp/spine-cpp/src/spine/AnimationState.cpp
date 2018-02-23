@@ -132,42 +132,36 @@ namespace Spine {
     }
     
     TrackEntry* TrackEntry::setTimelineData(TrackEntry* to, Vector<TrackEntry*>& mixingToArray, Vector<int>& propertyIDs) {
-        if (to != NULL) {
-            mixingToArray.add(to);
-        }
-        
+        if (to != NULL) mixingToArray.add(to);
         TrackEntry* lastEntry = _mixingFrom != NULL ? _mixingFrom->setTimelineData(this, mixingToArray, propertyIDs) : this;
-        
-        if (to != NULL) {
-            mixingToArray.removeAt(mixingToArray.size() - 1);
-        }
+        if (to != NULL) mixingToArray.removeAt(mixingToArray.size() - 1);
         
         int mixingToLast = static_cast<int>(mixingToArray.size()) - 1;
         Vector<Timeline*>& timelines = _animation->_timelines;
         int timelinesCount = static_cast<int>(timelines.size());
         _timelineData.setSize(timelinesCount);
-        _timelineDipMix.clear();
         _timelineDipMix.setSize(timelinesCount);
         
         // outer:
-        for (int i = 0; i < timelinesCount; ++i) {
+        int i = 0;
+        continue_outer:
+        for (; i < timelinesCount; ++i) {
             int id = timelines[i]->getPropertyId();
             if (propertyIDs.contains(id)) {
                 _timelineData[i] = AnimationState::Subsequent;
-            }
-            else {
+            } else {
                 propertyIDs.add(id);
                 
                 if (to == NULL || !to->hasTimeline(id)) {
                     _timelineData[i] = AnimationState::First;
-                }
-                else {
+                } else {
                     for (int ii = mixingToLast; ii >= 0; --ii) {
                         TrackEntry* entry = mixingToArray[ii];
                         if (!entry->hasTimeline(id)) {
                             if (entry->_mixDuration > 0) {
                                 _timelineData[i] = AnimationState::DipMix;
                                 _timelineDipMix[i] = entry;
+                                i++;
                                 goto continue_outer; // continue outer;
                             }
                             break;
@@ -176,7 +170,6 @@ namespace Spine {
                     _timelineData[i] = AnimationState::Dip;
                 }
             }
-        continue_outer: {}
         }
         
         return lastEntry;

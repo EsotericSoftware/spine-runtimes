@@ -83,7 +83,7 @@ namespace Spine {
                     }
                     break;
                 }
-            break_outer:
+                break_outer:
                 
                 if (next == 0) {
                     do {
