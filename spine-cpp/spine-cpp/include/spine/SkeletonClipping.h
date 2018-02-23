@@ -55,6 +55,8 @@ namespace Spine {
         Vector<float>& getClippedVertices();
         Vector<unsigned short>& getClippedTriangles();
         Vector<float>& getClippedUVs();
+
+        String toString() const;
         
     private:
         Triangulator _triangulator;

@@ -287,4 +287,10 @@ namespace Spine {
     Spine::Color& RegionAttachment::getColor() {
         return _color;
     }
+
+	String RegionAttachment::toString() const {
+	    String str;
+        str.append("RegionAttachment { name: ").appendString(getName()).append(", path: ").appendString(_path).append(" }");
+        return str;
+	}
 }

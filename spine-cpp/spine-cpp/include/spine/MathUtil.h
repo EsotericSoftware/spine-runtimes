@@ -36,26 +36,19 @@
 #include <float.h>
 #include <string.h>
 
-#define SPINE_PI 3.1415927f
-#define SPINE_PI_2 (SPINE_PI * 2)
-#define RadDeg (180.0f / SPINE_PI)
-#define DegRad (SPINE_PI / 180.0f)
-#define SIN_BITS 14 // 16KB. Adjust for accuracy.
-#define SIN_MASK (~(-(1 << SIN_BITS)))
-#define SIN_COUNT (SIN_MASK + 1)
-#define RadFull (SPINE_PI * 2)
-#define DegFull 360
-#define RadToIndex (SIN_COUNT / RadFull)
-#define DegToIndex (SIN_COUNT / DegFull)
-#define MAX(a, b) ((((a) > (b)) ? (a) : (b)))
-#define MIN(a, b) ((((a) < (b)) ? (a) : (b)))
-
-
 namespace Spine {
-    
+    static const float PI = 3.1415927f;
+    static const float PI_2 = PI * 2;
+    static const float RAD_DEG = (180.0f / PI);
+    static const float DEG_RAD = (PI / 180.0f);
+
     class MathUtil : public SpineObject {
     public:
         MathUtil();
+
+        template <typename T> static inline T min(T a, T b) { return a < b ? a : b; }
+
+        template <typename T> static inline T max(T a, T b) { return a > b ? a : b; }
 
         static int sign(float val);
 
@@ -88,9 +81,6 @@ namespace Spine {
         static float fmod(float a, float b);
 
         static bool isNan(float v);
-    
-    private:
-        static float SIN_TABLE[SIN_COUNT];
     };
 }
 

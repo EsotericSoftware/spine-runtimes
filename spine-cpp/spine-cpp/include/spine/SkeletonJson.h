@@ -61,6 +61,8 @@ namespace Spine {
         void setScale (float scale) { _scale = scale; }
 
         String& getError() { return _error; }
+
+        String toString() const;
         
     private:
         AttachmentLoader* _attachmentLoader;

@@ -72,4 +72,8 @@ namespace Spine {
     void Event::setStringValue(const String& inValue) {
         _stringValue = inValue;
     }
+
+    String Event::toString() const {
+        return String("Event");
+    }
 }

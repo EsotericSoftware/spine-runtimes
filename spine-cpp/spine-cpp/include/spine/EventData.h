@@ -55,7 +55,9 @@ namespace Spine {
         
         const String& getStringValue();
         void setStringValue(const String& inValue);
-        
+
+        String toString() const;
+
     private:
         const String _name;
         int _intValue;

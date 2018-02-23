@@ -72,12 +72,12 @@ namespace Spine {
     
     /// Returns the sine in radians from a lookup table.
     float MathUtil::sinDeg(float degrees) {
-        return ::sin(degrees * DegRad);
+        return ::sin(degrees * DEG_RAD);
     }
     
     /// Returns the cosine in radians from a lookup table.
     float MathUtil::cosDeg(float degrees) {
-        return ::cos(degrees * DegRad);
+        return ::cos(degrees * DEG_RAD);
     }
     
     /// Returns atan2 in radians, faster but less accurate than Math.Atan2. Average error of 0.00231 radians (0.1323

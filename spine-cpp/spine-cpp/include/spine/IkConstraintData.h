@@ -67,7 +67,9 @@ namespace Spine {
         
         float getMix();
         void setMix(float inValue);
-        
+
+        String toString() const;
+
     private:
         const String _name;
         int _order;

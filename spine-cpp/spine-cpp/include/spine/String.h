@@ -35,6 +35,7 @@
 #include <spine/Extension.h>
 
 #include <string.h>
+#include <stdio.h>
 
 namespace Spine {
 	class String : public SpineObject {
@@ -138,7 +139,7 @@ namespace Spine {
 			return *this;
 		}
 
-		String& operator+ (const char* chars) {
+		String& append (const char* chars) {
 			size_t len = strlen(chars);
 			size_t thisLen = _length;
 			_length = _length + len;
@@ -148,7 +149,7 @@ namespace Spine {
 			return *this;
 		}
 
-		String& operator+= (const String& other) {
+		String& appendString (const String& other) {
 			size_t len = other.length();
 			size_t thisLen = _length;
 			_length = _length + len;
@@ -158,8 +159,28 @@ namespace Spine {
 			return *this;
 		}
 
-		friend String operator+ (const String& a, const String& b) {
-			return String(a) += b;
+		String& append (int other) {
+			char str[100];
+			sprintf(str, "%i", other);
+			append(str);
+			return *this;
+		}
+
+		String& append (float other) {
+			char str[100];
+			sprintf(str, "%f", other);
+			append(str);
+			return *this;
+		}
+
+		String& append(const SpineObject& object) {
+			appendString(object.toString());
+			return *this;
+		}
+
+		String& append(const SpineObject* object) {
+			appendString(object->toString());
+			return *this;
 		}
 
 		friend bool operator== (const String& a, const String& b) {
@@ -180,6 +201,10 @@ namespace Spine {
 			if (_buffer) {
 				SpineExtension::free(_buffer, __FILE__, __LINE__);
 			}
+		}
+
+		String toString () const {
+			return *this;
 		}
 	private:
 		mutable size_t _length;

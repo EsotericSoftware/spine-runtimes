@@ -47,7 +47,8 @@ namespace Spine {
         bool isExactly(const RTTI& rtti) const;
 
         bool instanceOf(const RTTI &rtti) const;
-        
+
+        String toString() const;
     private:
         // Prevent copying
         RTTI(const RTTI& obj);
@@ -61,15 +62,15 @@ namespace Spine {
 #define RTTI_DECL \
 public: \
 static const Spine::RTTI rtti; \
-virtual const Spine::RTTI& getRTTI();
+virtual const Spine::RTTI& getRTTI() const;
 
 #define RTTI_IMPL_NOPARENT(name) \
 const Spine::RTTI name::rtti(#name); \
-const Spine::RTTI& name::getRTTI() { return rtti; }
+const Spine::RTTI& name::getRTTI() const { return rtti; }
 
 #define RTTI_IMPL(name,parent) \
 const Spine::RTTI name::rtti(#name, parent::rtti); \
-const Spine::RTTI& name::getRTTI() { return rtti; }
+const Spine::RTTI& name::getRTTI() const { return rtti; }
 
 #endif /* Spine_RTTI_h */
 

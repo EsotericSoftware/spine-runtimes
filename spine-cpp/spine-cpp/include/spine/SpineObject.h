@@ -42,6 +42,7 @@ namespace Spine {
 		void* operator new(size_t sz, void* ptr);
 		void operator delete(void* p);
 		virtual ~SpineObject();
+		virtual String toString() const = 0;
 	};
 }
 

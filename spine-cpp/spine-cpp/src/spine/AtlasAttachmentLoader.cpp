@@ -111,4 +111,8 @@ namespace Spine {
         AtlasRegion* ret;
         return _atlas->findRegion(name);
     }
+
+    String AtlasAttachmentLoader::toString() const {
+        return String("AtlasAttachmentLoader");
+    }
 }

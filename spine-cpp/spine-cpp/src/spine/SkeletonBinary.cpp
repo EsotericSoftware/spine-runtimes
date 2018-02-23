@@ -646,7 +646,7 @@ namespace Spine {
                             timeline->setFrame(frameIndex, readFloat(input), String(readString(input), true));
                         }
 						timelines.add(timeline);
-                        duration = MAX(duration, timeline->_frames[frameCount - 1]);
+                        duration = MathUtil::max(duration, timeline->_frames[frameCount - 1]);
                         break;
                     }
                     case SLOT_COLOR: {
@@ -665,7 +665,7 @@ namespace Spine {
                             }
                         }
 						timelines.add(timeline);
-                        duration = MAX(duration, timeline->_frames[(frameCount - 1) * ColorTimeline::ENTRIES]);
+                        duration = MathUtil::max(duration, timeline->_frames[(frameCount - 1) * ColorTimeline::ENTRIES]);
                         break;
                     }
                     case SLOT_TWO_COLOR: {
@@ -689,7 +689,7 @@ namespace Spine {
                             }
                         }
 						timelines.add(timeline);
-                        duration = MAX(duration, timeline->_frames[(frameCount - 1) * TwoColorTimeline::ENTRIES]);
+                        duration = MathUtil::max(duration, timeline->_frames[(frameCount - 1) * TwoColorTimeline::ENTRIES]);
                         break;
                     }
                     default: {
@@ -718,7 +718,7 @@ namespace Spine {
                             }
                         }
 						timelines.add(timeline);
-                        duration = MAX(duration, timeline->_frames[(frameCount - 1) * RotateTimeline::ENTRIES]);
+                        duration = MathUtil::max(duration, timeline->_frames[(frameCount - 1) * RotateTimeline::ENTRIES]);
                         break;
                     }
                     case BONE_TRANSLATE:
@@ -744,7 +744,7 @@ namespace Spine {
                             }
                         }
 						timelines.add(timeline);
-                        duration = MAX(duration, timeline->_frames[(frameCount - 1) * TranslateTimeline::ENTRIES]);
+                        duration = MathUtil::max(duration, timeline->_frames[(frameCount - 1) * TranslateTimeline::ENTRIES]);
                         break;
                     }
                     default: {
@@ -769,7 +769,7 @@ namespace Spine {
                 }
             }
 			timelines.add(timeline);
-            duration = MAX(duration, timeline->_frames[(frameCount - 1) * IkConstraintTimeline::ENTRIES]);
+            duration = MathUtil::max(duration, timeline->_frames[(frameCount - 1) * IkConstraintTimeline::ENTRIES]);
         }
 
         // Transform constraint timelines.
@@ -785,7 +785,7 @@ namespace Spine {
                 }
             }
 			timelines.add(timeline);
-            duration = MAX(duration, timeline->_frames[(frameCount - 1) * TransformConstraintTimeline::ENTRIES]);
+            duration = MathUtil::max(duration, timeline->_frames[(frameCount - 1) * TransformConstraintTimeline::ENTRIES]);
         }
 
         // Path constraint timelines.
@@ -822,7 +822,7 @@ namespace Spine {
                             }
                         }
 						timelines.add(timeline);
-                        duration = MAX(duration, timeline->_frames[(frameCount - 1) * PathConstraintPositionTimeline::ENTRIES]);
+                        duration = MathUtil::max(duration, timeline->_frames[(frameCount - 1) * PathConstraintPositionTimeline::ENTRIES]);
                         break;
                     }
                     case PATH_MIX: {
@@ -836,7 +836,7 @@ namespace Spine {
                             }
                         }
 						timelines.add(timeline);
-                        duration = MAX(duration, timeline->_frames[(frameCount - 1) * PathConstraintMixTimeline::ENTRIES]);
+                        duration = MathUtil::max(duration, timeline->_frames[(frameCount - 1) * PathConstraintMixTimeline::ENTRIES]);
                         break;
                     }
                 }
@@ -915,7 +915,7 @@ namespace Spine {
                     }
 
 					timelines.add(timeline);
-                    duration = MAX(duration, timeline->_frames[frameCount - 1]);
+                    duration = MathUtil::max(duration, timeline->_frames[frameCount - 1]);
                 }
             }
         }
@@ -964,7 +964,7 @@ namespace Spine {
                 timeline->setFrame(i, time, drawOrder);
             }
 			timelines.add(timeline);
-            duration = MAX(duration, timeline->_frames[drawOrderCount - 1]);
+            duration = MathUtil::max(duration, timeline->_frames[drawOrderCount - 1]);
         }
 
         // Event timeline.
@@ -989,7 +989,7 @@ namespace Spine {
             }
 
 			timelines.add(timeline);
-            duration = MAX(duration, timeline->_frames[eventCount - 1]);
+            duration = MathUtil::max(duration, timeline->_frames[eventCount - 1]);
         }
 
         return new (__FILE__, __LINE__) Animation(String(name), timelines, duration);
@@ -1011,4 +1011,8 @@ namespace Spine {
             }
         }
     }
+
+	String SkeletonBinary::toString() const {
+		return String("SkeletonBinary");
+	}
 }

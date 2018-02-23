@@ -77,6 +77,8 @@ namespace Spine {
         
         float getMix();
         void setMix(float inValue);
+
+        String toString() const;
         
     private:
         IkConstraintData& _data;

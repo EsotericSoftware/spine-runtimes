@@ -431,10 +431,10 @@ namespace Spine {
                 float vx = outVertexBuffer[ii];
                 float vy = outVertexBuffer[ii + 1];
                 
-                minX = MIN(minX, vx);
-                minY = MIN(minY, vy);
-                maxX = MAX(maxX, vx);
-                maxY = MAX(maxY, vy);
+                minX = MathUtil::min(minX, vx);
+                minY = MathUtil::min(minY, vy);
+                maxX = MathUtil::max(maxX, vx);
+                maxY = MathUtil::max(maxY, vy);
             }
         }
         
@@ -648,5 +648,17 @@ namespace Spine {
             if (bone->_sorted) sortReset(bone->getChildren());
             bone->_sorted = false;
         }
+    }
+
+    String Skeleton::toString() const {
+        String str;
+
+        str.append("Skeleton {\n");
+        str.append("   bones: ").append(_bones);
+        str.append(",\n slots: ").append(_slots);
+        str.append(",\n drawOrder: ").append(_drawOrder);
+        str.append(",\n animations: ").append(_data->getAnimations());
+        str.append(" }");
+        return str;
     }
 }

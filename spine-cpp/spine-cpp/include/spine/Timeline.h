@@ -63,6 +63,8 @@ namespace Spine {
         virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) = 0;
         
         virtual int getPropertyId() = 0;
+
+        virtual String toString() const;
     };
 }
 

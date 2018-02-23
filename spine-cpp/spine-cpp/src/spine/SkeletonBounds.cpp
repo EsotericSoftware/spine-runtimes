@@ -222,16 +222,26 @@ namespace Spine {
             for (int ii = 0, nn = polygon->_count; ii < nn; ii += 2) {
                 float x = vertices[ii];
                 float y = vertices[ii + 1];
-                minX = MIN(minX, x);
-                minY = MIN(minY, y);
-                maxX = MAX(maxX, x);
-                maxY = MAX(maxY, y);
+                minX = MathUtil::min(minX, x);
+                minY = MathUtil::min(minY, y);
+                maxX = MathUtil::max(maxX, x);
+                maxY = MathUtil::max(maxY, y);
             }
         }
         _minX = minX;
         _minY = minY;
         _maxX = maxX;
         _maxY = maxY;
+    }
+
+	String SkeletonBounds::toString() const {
+		return String("SkeletonBounds");
+	}
+
+    String Polygon::toString() const {
+        String str;
+        str.append("Polygon { count: ").append(_count).append(", vertices: ").append(_vertices).append(" }");
+        return str;
     }
 }
 

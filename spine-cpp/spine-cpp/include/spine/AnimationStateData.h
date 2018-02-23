@@ -67,7 +67,9 @@ namespace Spine {
         /// or the DefaultMix if no mix duration has been set.
         ///
         float getMix(Animation* from, Animation* to);
-        
+
+        String toString() const;
+
     private:
         class AnimationPair : public SpineObject {
         public:
@@ -77,6 +79,8 @@ namespace Spine {
             explicit AnimationPair(Animation* a1 = NULL, Animation* a2 = NULL);
             
             bool operator==(const AnimationPair &other) const;
+
+            String toString() const;
         };
         
         struct HashAnimationPair : public SpineObject {

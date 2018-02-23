@@ -68,7 +68,8 @@ namespace Spine {
         explicit Json(const char* value);
         
         ~Json();
-        
+
+        String toString() const;
     private:
         static const char* _error;
         

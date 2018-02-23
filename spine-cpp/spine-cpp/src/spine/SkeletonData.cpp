@@ -232,4 +232,8 @@ namespace Spine {
     void SkeletonData::setFps(float inValue) {
         _fps = inValue;
     }
+
+    String SkeletonData::toString() const {
+        return String("SkeletonData");
+    }
 }

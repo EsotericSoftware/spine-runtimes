@@ -139,8 +139,8 @@ namespace Spine {
         }
         else {
             tip = false;
-            Bone p = _target->getBone();
-            offsetRotation *= p.getA() * p.getD() - p.getB() * p.getC() > 0 ? DegRad : -DegRad;
+            Bone& p = _target->getBone();
+            offsetRotation *= p.getA() * p.getD() - p.getB() * p.getC() > 0 ? DEG_RAD : -DEG_RAD;
         }
         
         for (int i = 0, p = 3; i < boneCount; i++, p += 3) {
@@ -189,11 +189,11 @@ namespace Spine {
                     r += offsetRotation;
                 }
                 
-                if (r > SPINE_PI) {
-                    r -= SPINE_PI_2;
+                if (r > PI) {
+                    r -= PI_2;
                 }
-                else if (r < -SPINE_PI) {
-                    r += SPINE_PI_2;
+                else if (r < -PI) {
+                    r += PI_2;
                 }
                 
                 r *= rotateMix;
@@ -556,5 +556,11 @@ namespace Spine {
         if (tangents) {
             output[o + 2] = MathUtil::atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
         }
+    }
+
+    String PathConstraint::toString() const {
+        String str;
+        str.append("TransformConstraint { name: ").appendString(_data.getName()).append(" }");
+        return str;
     }
 }

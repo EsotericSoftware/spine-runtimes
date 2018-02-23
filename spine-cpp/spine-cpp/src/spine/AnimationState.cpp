@@ -91,7 +91,7 @@ namespace Spine {
             return MathUtil::fmod(_trackTime, duration) + _animationStart;
         }
 
-        return MIN(_trackTime + _animationStart, _animationEnd);
+        return MathUtil::min(_trackTime + _animationStart, _animationEnd);
     }
 
     float TrackEntry::getTimeScale() { return _timeScale; }
@@ -203,13 +203,21 @@ namespace Spine {
         
         _onAnimationEventFunc = dummyOnAnimationEventFunc;
     }
-    
+
+    String TrackEntry::toString() const {
+        return String("TrackEntry");
+    }
+
     EventQueueEntry::EventQueueEntry(EventType eventType, TrackEntry* trackEntry, Event* event) :
     _type(eventType),
     _entry(trackEntry),
     _event(event) {
     }
-    
+
+    String EventQueueEntry::toString() const {
+        return String("EventQueueEntry");
+    }
+
     EventQueue* EventQueue::newEventQueue(AnimationState& state, Pool<TrackEntry>& trackEntryPool) {
         return new (__FILE__, __LINE__) EventQueue(state, trackEntryPool);
     }
@@ -292,7 +300,11 @@ namespace Spine {
         
         _drainDisabled = false;
     }
-    
+
+    String EventQueue::toString() const {
+        return String("EventQueue");
+    }
+
     const int AnimationState::Subsequent = 0;
     const int AnimationState::First = 1;
     const int AnimationState::Dip = 2;
@@ -804,7 +816,7 @@ namespace Spine {
                 default:
                     pose = MixPose_Setup;
                     TrackEntry* dipMix = timelineDipMix[i];
-                    alpha = alphaDip * MAX(0, 1 - dipMix->_mixTime / dipMix->_mixDuration);
+                    alpha = alphaDip * MathUtil::max(0.0f, 1 - dipMix->_mixTime / dipMix->_mixDuration);
                     break;
             }
             from->_totalAlpha += alpha;
@@ -882,7 +894,7 @@ namespace Spine {
             
             // Store interrupted mix percentage.
             if (from->_mixingFrom != NULL && from->_mixDuration > 0) {
-                current->_interruptAlpha *= MIN(1, from->_mixTime / from->_mixDuration);
+                current->_interruptAlpha *= MathUtil::min(1.0f, from->_mixTime / from->_mixDuration);
             }
             
             from->_timelinesRotation.clear(); // Reset rotation for mixing out, in case entry was mixed in.
@@ -955,5 +967,9 @@ namespace Spine {
                 entry->setTimelineData(NULL, _mixingTo, _propertyIDs);
             }
         }
+    }
+
+    String AnimationState::toString() const {
+        return String("AnimationState");
     }
 }

@@ -169,7 +169,9 @@ namespace Spine {
         void setFlipX(bool inValue);
         bool getFlipY();
         void setFlipY(bool inValue);
-        
+
+        String toString() const;
+
     private:
         SkeletonData* _data;
         Vector<Bone*> _bones;

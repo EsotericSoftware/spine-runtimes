@@ -71,6 +71,8 @@ public:
 	virtual void load(AtlasPage& page, const String& path);
 
 	virtual void unload(void* texture);
+
+	String toString() const;
 };
 
 } /* namespace spine */

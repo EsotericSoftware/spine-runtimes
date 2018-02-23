@@ -88,7 +88,9 @@ namespace Spine {
         
         Vector<float>& getAttachmentVertices();
         void setAttachmentVertices(Vector<float> inValue);
-        
+
+        String toString() const;
+
     private:
         SlotData& _data;
         Bone& _bone;

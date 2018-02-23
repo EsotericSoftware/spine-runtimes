@@ -42,7 +42,7 @@ namespace Spine {
     Attachment::~Attachment() {
     }
 
-    const String& Attachment::getName() {
+    const String& Attachment::getName() const {
         return _name;
     }
 }

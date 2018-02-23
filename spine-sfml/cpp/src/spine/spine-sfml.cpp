@@ -296,4 +296,8 @@ void SFMLTextureLoader::load(AtlasPage &page, const String &path) {
 void SFMLTextureLoader::unload(void *texture) {
 	delete (Texture*)texture;
 }
+
+	String SFMLTextureLoader::toString() const {
+		return String("SFMLTextureLoader");
+	}
 } /* namespace spine */

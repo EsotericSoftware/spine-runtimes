@@ -66,7 +66,6 @@ namespace Spine {
         const Vector<String>& getAttachmentNames();
         void setAttachmentNames(Vector<String>& inValue);
         int getFrameCount();
-        
     private:
         int _slotIndex;
         Vector<float> _frames;

@@ -40,6 +40,8 @@ namespace Spine {
         Vector<int>& triangulate(Vector<float>& vertices);
         
         Vector< Vector<float>* > decompose(Vector<float>& vertices, Vector<int>& triangles);
+
+        String toString() const;
         
     private:
         Vector< Vector<float>* > _convexPolygons;

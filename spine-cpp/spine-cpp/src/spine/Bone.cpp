@@ -164,12 +164,12 @@ namespace Spine {
                     s = MathUtil::abs(pa * pd - pb * pc) / s;
                     pb = pc * s;
                     pd = pa * s;
-                    prx = MathUtil::atan2(pc, pa) * RadDeg;
+                    prx = MathUtil::atan2(pc, pa) * RAD_DEG;
                 }
                 else {
                     pa = 0;
                     pc = 0;
-                    prx = 90 - MathUtil::atan2(pd, pb) * RadDeg;
+                    prx = 90 - MathUtil::atan2(pd, pb) * RAD_DEG;
                 }
                 float rx = rotation + shearX - prx;
                 float ry = rotation + shearY - prx + 90;
@@ -199,7 +199,7 @@ namespace Spine {
                 za *= s;
                 zc *= s;
                 s = MathUtil::sqrt(za * za + zc * zc);
-                float r = SPINE_PI / 2 + MathUtil::atan2(zc, za);
+                float r = PI / 2 + MathUtil::atan2(zc, za);
                 float zb = MathUtil::cos(r) * s;
                 float zd = MathUtil::sin(r) * s;
                 float la = MathUtil::cosDeg(shearX) * scaleX;
@@ -266,14 +266,14 @@ namespace Spine {
         float sin = MathUtil::sinDeg(worldRotation);
         float cos = MathUtil::cosDeg(worldRotation);
         
-        return MathUtil::atan2(_a * sin - _c * cos, _d * cos - _b * sin) * RadDeg;
+        return MathUtil::atan2(_a * sin - _c * cos, _d * cos - _b * sin) * RAD_DEG;
     }
     
     float Bone::localToWorldRotation(float localRotation) {
         float sin = MathUtil::sinDeg(localRotation);
         float cos = MathUtil::cosDeg(localRotation);
         
-        return MathUtil::atan2(cos * _c + sin * _d, cos * _a + sin * _b) * RadDeg;
+        return MathUtil::atan2(cos * _c + sin * _d, cos * _a + sin * _b) * RAD_DEG;
     }
     
     void Bone::rotateWorld(float degrees) {
@@ -306,7 +306,7 @@ namespace Spine {
         float a = _a;
         float c = _c;
         
-        return MathUtil::atan2(pa * c - pc * a, pd * a - pb * c) * RadDeg;
+        return MathUtil::atan2(pa * c - pc * a, pd * a - pb * c) * RAD_DEG;
     }
     
     float Bone::getWorldToLocalRotationY() {
@@ -322,7 +322,7 @@ namespace Spine {
         float b = _b;
         float d = _d;
         
-        return MathUtil::atan2(pa * d - pc * b, pd * b - pb * d) * RadDeg;
+        return MathUtil::atan2(pa * d - pc * b, pd * b - pb * d) * RAD_DEG;
     }
     
     BoneData& Bone::getData() {
@@ -502,11 +502,11 @@ namespace Spine {
     }
     
     float Bone::getWorldRotationX() {
-        return MathUtil::atan2(_c, _a) * RadDeg;
+        return MathUtil::atan2(_c, _a) * RAD_DEG;
     }
     
     float Bone::getWorldRotationY() {
-        return MathUtil::atan2(_d, _b) * RadDeg;
+        return MathUtil::atan2(_d, _b) * RAD_DEG;
     }
     
     float Bone::getWorldScaleX() {
@@ -523,11 +523,11 @@ namespace Spine {
         if (!parent) {
             _ax = _worldX;
             _ay = _worldY;
-            _arotation = MathUtil::atan2(_c, _a) * RadDeg;
+            _arotation = MathUtil::atan2(_c, _a) * RAD_DEG;
             _ascaleX = MathUtil::sqrt(_a * _a + _c * _c);
             _ascaleY = MathUtil::sqrt(_b * _b + _d * _d);
             _ashearX = 0;
-            _ashearY = MathUtil::atan2(_a * _b + _c * _d, _a * _d - _b * _c) * RadDeg;
+            _ashearY = MathUtil::atan2(_a * _b + _c * _d, _a * _d - _b * _c) * RAD_DEG;
             
             return;
         }
@@ -560,14 +560,22 @@ namespace Spine {
         if (_ascaleX > 0.0001f) {
             float det = ra * rd - rb * rc;
             _ascaleY = det / _ascaleX;
-            _ashearY = MathUtil::atan2(ra * rb + rc * rd, det) * RadDeg;
-            _arotation = MathUtil::atan2(rc, ra) * RadDeg;
+            _ashearY = MathUtil::atan2(ra * rb + rc * rd, det) * RAD_DEG;
+            _arotation = MathUtil::atan2(rc, ra) * RAD_DEG;
         }
         else {
             _ascaleX = 0;
             _ascaleY = MathUtil::sqrt(rb * rb + rd * rd);
             _ashearY = 0;
-            _arotation = 90 - MathUtil::atan2(rd, rb) * RadDeg;
+            _arotation = 90 - MathUtil::atan2(rd, rb) * RAD_DEG;
         }
+    }
+
+    String Bone::toString() const {
+        String str;
+        str.append("Bone { name: ").appendString(_data.getName());
+        str.append(", a: ").append(_a).append(", b: ").append(_b).append(", c").append(_c).append(", d: ").append(_d);
+        str.append(", worldX: ").append(_worldX).append(", worldY: ").append(_worldY).append(" }");
+        return str;
     }
 }

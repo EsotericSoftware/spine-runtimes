@@ -53,7 +53,7 @@ namespace Spine {
         
         Vector<int>& triangles = _triangles;
         triangles.clear();
-		triangles.ensureCapacity(MAX(0, vertexCount - 2) << 2);
+		triangles.ensureCapacity(MathUtil::max(0, vertexCount - 2) << 2);
         
         while (vertexCount > 3) {
             // Find ear tip.
@@ -293,4 +293,8 @@ namespace Spine {
         
         return p3x * py - p3y * px + px * p1y - p1x * py >= 0 ? 1 : -1;
     }
+
+	String Triangulator::toString() const {
+		return String("Triangulator");
+	}
 }

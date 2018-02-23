@@ -50,7 +50,7 @@ namespace Spine {
         float ix = cos * bone._a + sin * bone._b;
         float iy = cos * bone._c + sin * bone._d;
         
-        return MathUtil::atan2(iy, ix) * RadDeg;
+        return MathUtil::atan2(iy, ix) * RAD_DEG;
     }
     
     float PointAttachment::getX() {
@@ -75,5 +75,11 @@ namespace Spine {
     
     void PointAttachment::setRotation(float inValue) {
         _rotation = inValue;
+    }
+
+    String PointAttachment::toString() const {
+        String str;
+        str.append("PointAttachment { name: ").appendString(getName()).append(" }");
+        return str;
     }
 }

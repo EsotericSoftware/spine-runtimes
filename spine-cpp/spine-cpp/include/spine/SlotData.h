@@ -79,7 +79,9 @@ namespace Spine {
         
         BlendMode getBlendMode();
         void setBlendMode(BlendMode inValue);
-        
+
+        String toString() const;
+
     private:
         const int _index;
         String _name;

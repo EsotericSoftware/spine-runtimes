@@ -340,6 +340,7 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 	skeleton->updateWorldTransform();
 
 	drawable->state->setAnimation(0, "rotate", true);
+	drawable->update(0.1);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - vine");
 	window.setFramerateLimit(60);
@@ -353,7 +354,7 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
-		drawable->update(delta);
+		// drawable->update(delta);
 
 		window.clear();
 		window.draw(*drawable);
@@ -394,12 +395,12 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
 			if (event.type == sf::Event::Closed) window.close();
 			if (event.type == sf::Event::MouseMoved) {
 				float x = event.mouseMove.x / 640.0f;
-				left->setAlpha((MAX(x, 0.5f) - 0.5f) * 2);
-				right->setAlpha((0.5 - MIN(x, 0.5)) * 2);
+				left->setAlpha((MathUtil::max(x, 0.5f) - 0.5f) * 2);
+				right->setAlpha((0.5 - MathUtil::min(x, 0.5f)) * 2);
 
 				float y = event.mouseMove.y / 640.0f;
-				down->setAlpha((MAX(y, 0.5f) - 0.5f) * 2);
-				up->setAlpha((0.5 - MIN(y, 0.5)) * 2);
+				down->setAlpha((MathUtil::max(y, 0.5f) - 0.5f) * 2);
+				up->setAlpha((0.5 - MathUtil::min(y, 0.5f)) * 2);
 			}
 		}
 
@@ -425,14 +426,10 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 
 	float d = 3;
 	for (int i = 0; i < 1; i++) {
-		skeleton->update(d);
 		animState->update(d);
 		animState->apply(*skeleton);
 		skeleton->updateWorldTransform();
-		for (int ii = 0; ii < skeleton->getBones().size(); ii++) {
-			Bone* bone = skeleton->getBones()[ii];
-			printf("%s %f %f %f %f %f %f\n", bone->getData().getName().buffer(), bone->getA(), bone->getB(), bone->getC(), bone->getD(), bone->getWorldX(), bone->getWorldY());
-		}
+		printf("%s\n", skeleton->toString().buffer());
 		printf("========================================\n");
 		d += 0.1f;
 	}
@@ -444,15 +441,16 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 
 int main () {
 	DebugExtension dbgExtension;
-	SpineExtension::setInstance(&dbgExtension);
-	/*testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 1.0f);
+	// SpineExtension::setInstance(&dbgExtension);
+	testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 1.0f);
+	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin.atlas", 0.5f);
 	testcase(spineboy, "data/spineboy-ess.json", "data/spineboy-ess.skel", "data/spineboy.atlas", 0.6f);
 	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl.atlas", 0.5f);
 	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin.atlas", 0.5f);
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine.atlas", 0.5f);
 	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 0.2f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor.atlas", 0.5f);
-	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins.atlas", 1.4f);*/
+	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins.atlas", 1.4f);
 	testcase(stretchyman, "data/stretchyman-pro.json", "data/stretchyman-pro.skel", "data/stretchyman.atlas", 0.6f);
 	dbgExtension.reportLeaks();
 	return 0;

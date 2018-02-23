@@ -78,6 +78,15 @@ namespace Spine {
                                           magFilter(TextureFilter_Nearest), uWrap(TextureWrap_ClampToEdge),
                                           vWrap(TextureWrap_ClampToEdge) {
         }
+
+        String toString() const {
+            String str;
+            str.append("AtlasPage { name: ").appendString(name)
+                    .append(", width: ").append(width)
+                    .append(", height: ").append(height)
+                    .append(" }");
+            return str;
+        }
     };
     
     class AtlasRegion : public SpineObject {
@@ -92,6 +101,12 @@ namespace Spine {
         bool rotate;
         Vector<int> splits;
         Vector<int> pads;
+
+        String toString() const {
+            String str;
+            str.append("AtlasRegion { name: ").appendString(name).append(" }");
+            return str;
+        }
     };
     
     class TextureLoader;
@@ -112,6 +127,8 @@ namespace Spine {
         AtlasRegion* findRegion(const String& name);
         
         void dispose();
+
+        String toString() const;
         
     private:
         Vector<AtlasPage*> _pages;

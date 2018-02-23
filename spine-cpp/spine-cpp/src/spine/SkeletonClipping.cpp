@@ -96,8 +96,10 @@ namespace Spine {
         clippedVertices.clear();
         _clippedUVs.clear();
         clippedTriangles.clear();
-        
-        for (int i = 0; i < trianglesLength; i += 3) {
+
+        int i = 0;
+        continue_outer:
+        for (; i < trianglesLength; i += 3) {
             int vertexOffset = triangles[i] << 1;
             float x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
             float u1 = uvs[vertexOffset], v1 = uvs[vertexOffset + 1];
@@ -170,7 +172,8 @@ namespace Spine {
                     clippedTriangles[s + 1] = index + 1;
                     clippedTriangles[s + 2] = index + 2;
                     index += 3;
-                    break;
+                    i += 3;
+                    goto continue_outer;
                 }
             }
         }
@@ -312,4 +315,8 @@ namespace Spine {
             polygon[other + 1] = y;
         }
     }
+
+	String SkeletonClipping::toString() const {
+		return String("SkeletonClipping");
+	}
 }

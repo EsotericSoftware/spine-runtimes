@@ -34,6 +34,7 @@
 #include <spine/Extension.h>
 #include <spine/Vector.h>
 #include <spine/SpineObject.h>
+#include <spine/String.h>
 
 namespace Spine {
     template <typename K, typename V>
@@ -144,8 +145,24 @@ namespace Spine {
             else assert(false);
         }
 
-        Entries getEntries() {
+        Entries getEntries() const {
             return Entries(_head);
+        }
+
+        String toString() const {
+            String str;
+
+            str.append("{");
+            Entries entries = getEntries();
+
+            while(entries.hasNext()) {
+                Pair pair = entries.next();
+                str.append(pair.key);
+                str.append("->");
+                str.append(pair.value);
+            }
+            str.append("}");
+            return str;
         }
         
     private:
@@ -165,6 +182,12 @@ namespace Spine {
             Entry* prev;
 
             Entry () : next(NULL), prev(NULL) {}
+
+            String toString() const {
+                String str;
+                str.append("Entry { key: ").append(_key).append(" -> ").append(_value);
+                return str;
+            }
         };
 
         Entry* _head;

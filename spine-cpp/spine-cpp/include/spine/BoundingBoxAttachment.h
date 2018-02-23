@@ -40,6 +40,8 @@ namespace Spine {
         RTTI_DECL
         
         explicit BoundingBoxAttachment(const String& name);
+
+        String toString() const;
     };
 }
 

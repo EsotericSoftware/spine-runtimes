@@ -85,6 +85,8 @@ namespace Spine {
 
         float getWidth();
         float getHeight();
+
+        String toString() const;
         
     private:
         Vector<Polygon*> _polygonPool;
@@ -103,6 +105,8 @@ namespace Spine {
         Polygon() : _count(0) {
 			_vertices.ensureCapacity(16);
         }
+
+        String toString() const;
     };
 }
 

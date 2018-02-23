@@ -138,4 +138,10 @@ namespace Spine {
     void PathConstraintData::setTranslateMix(float inValue) {
         _translateMix = inValue;
     }
+
+	String PathConstraintData::toString() const {
+		String str;
+        str.append("PathConstraintData { name: ").appendString(_name).append(" }");
+        return str;
+	}
 }

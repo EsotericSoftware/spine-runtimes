@@ -41,204 +41,143 @@ namespace Spine {
     RTTI_IMPL(IkConstraint, Constraint);
     
     void IkConstraint::apply(Bone& bone, float targetX, float targetY, float alpha) {
-        if (!bone._appliedValid) {
-            bone.updateAppliedTransform();
-        }
-        
-        Bone* parent = bone.getParent();
-        Bone& p = *parent;
-        
-        float id = 1 / (p._a * p._d - p._b * p._c);
-        float x = targetX - p._worldX, y = targetY - p._worldY;
-        float tx = (x * p._d - y * p._b) * id - bone._ax, ty = (y * p._a - x * p._c) * id - bone._ay;
-        float rotationIK = MathUtil::atan2(ty, tx) * RadDeg - bone._ashearX - bone._arotation;
-        
-        if (bone._ascaleX < 0) {
-            rotationIK += 180;
-        }
-        
-        if (rotationIK > 180) {
-            rotationIK -= 360;
-        }
-        else if (rotationIK < -180) {
-            rotationIK += 360;
-        }
-        
-        bone.updateWorldTransform(bone._ax, bone._ay, bone._arotation + rotationIK * alpha, bone._ascaleX, bone._ascaleY, bone._ashearX, bone._ashearY);
+        Bone* p = bone.getParent();
+        float id, x, y, tx, ty, rotationIK;
+        if (!bone._appliedValid) bone.updateAppliedTransform();
+        id = 1 / (p->_a * p->_d - p->_b * p->_c);
+        x = targetX - p->_worldX, y = targetY - p->_worldY;
+        tx = (x * p->_d - y * p->_b) * id - bone._ax; ty = (y * p->_a - x * p->_c) * id - bone._ay;
+        rotationIK = MathUtil::atan2(ty, tx) * RAD_DEG - bone._ashearX - bone._arotation;
+        if (bone._ascaleX < 0) rotationIK += 180;
+        if (rotationIK > 180) rotationIK -= 360;
+        else if (rotationIK < -180) rotationIK += 360;
+        bone.updateWorldTransform(bone._ax, bone._ay, bone._arotation + rotationIK * alpha, bone._ascaleX,
+                                        bone._ascaleY, bone._ashearX, bone._ashearY);
     }
     
     void IkConstraint::apply(Bone& parent, Bone& child, float targetX, float targetY, int bendDir, float alpha) {
-        if (MathUtil::areFloatsPracticallyEqual(alpha, 0)) {
+        float px, py, psx, psy;
+        float cx, cy, csx, cwx, cwy;
+        int o1, o2, s2, u;
+        Bone* pp = parent.getParent();
+        float tx, ty, dx, dy, l1, l2, a1, a2, r;
+        float id, x, y;
+        if (alpha == 0) {
             child.updateWorldTransform();
-            
             return;
         }
-        
-        if (!parent._appliedValid) {
-            parent.updateAppliedTransform();
-        }
-        
-        if (!child._appliedValid) {
-            child.updateAppliedTransform();
-        }
-        
-        float px = parent._ax;
-        float py = parent._ay;
-        float psx = parent._ascaleX;
-        float psy = parent._ascaleY;
-        float csx = child._ascaleX;
-        
-        int os1, os2, s2;
+        if (!parent._appliedValid) parent.updateAppliedTransform();
+        if (!child._appliedValid) child.updateAppliedTransform();
+        px = parent._ax; py = parent._ay; psx = parent._ascaleX; psy = parent._ascaleY; csx = child._ascaleX;
         if (psx < 0) {
             psx = -psx;
-            os1 = 180;
+            o1 = 180;
             s2 = -1;
-        }
-        else {
-            os1 = 0;
+        } else {
+            o1 = 0;
             s2 = 1;
         }
-        
         if (psy < 0) {
             psy = -psy;
             s2 = -s2;
         }
-        
         if (csx < 0) {
             csx = -csx;
-            os2 = 180;
-        }
-        else {
-            os2 = 0;
-        }
-        
-        float cx = child._ax;
-        float cy;
-        float cwx;
-        float cwy;
-        float a = parent._a;
-        float b = parent._b;
-        float c = parent._c;
-        float d = parent._d;
-        
-        bool u = MathUtil::abs(psx - psy) <= 0.0001f;
+            o2 = 180;
+        } else
+            o2 = 0;
+        r = psx - psy;
+        cx = child._ax;
+        u = (r < 0 ? -r : r) <= 0.0001f;
         if (!u) {
             cy = 0;
-            cwx = a * cx + parent._worldX;
-            cwy = c * cx + parent._worldY;
-        }
-        else {
+            cwx = parent._a * cx + parent._worldX;
+            cwy = parent._c * cx + parent._worldY;
+        } else {
             cy = child._ay;
-            cwx = a * cx + b * cy + parent._worldX;
-            cwy = c * cx + d * cy + parent._worldY;
+            cwx = parent._a * cx + parent._b * cy + parent._worldX;
+            cwy = parent._c * cx + parent._d * cy + parent._worldY;
         }
-        
-        Bone* parentparent = parent._parent;
-        Bone& pp = *parentparent;
-        
-        a = pp._a;
-        b = pp._b;
-        c = pp._c;
-        d = pp._d;
-        
-        float id = 1 / (a * d - b * c), x = targetX - pp._worldX, y = targetY - pp._worldY;
-        float tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py;
-        x = cwx - pp._worldX;
-        y = cwy - pp._worldY;
-        float dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
-        float l1 = MathUtil::sqrt(dx * dx + dy * dy), l2 = child._data.getLength() * csx, a1, a2;
+        id = 1 / (pp->_a * pp->_d - pp->_b * pp->_c);
+        x = targetX - pp->_worldX;
+        y = targetY - pp->_worldY;
+        tx = (x * pp->_d - y * pp->_b) * id - px;
+        ty = (y * pp->_a - x * pp->_c) * id - py;
+        x = cwx - pp->_worldX;
+        y = cwy - pp->_worldY;
+        dx = (x * pp->_d - y * pp->_b) * id - px;
+        dy = (y * pp->_a - x * pp->_c) * id - py;
+        l1 = MathUtil::sqrt(dx * dx + dy * dy);
+        l2 = child.getData().getLength() * csx;
         if (u) {
+            float cosine, a, b;
             l2 *= psx;
-            float cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
-            if (cos < -1) {
-                cos = -1;
-            }
-            else if (cos > 1) {
-                cos = 1;
-            }
-            
-            a2 = MathUtil::acos(cos) * bendDir;
-            a = l1 + l2 * cos;
+            cosine = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
+            if (cosine < -1) cosine = -1;
+            else if (cosine > 1) cosine = 1;
+            a2 = MathUtil::acos(cosine) * bendDir;
+            a = l1 + l2 * cosine;
             b = l2 * MathUtil::sin(a2);
             a1 = MathUtil::atan2(ty * a - tx * b, tx * a + ty * b);
-        }
-        else {
-            a = psx * l2;
-            b = psy * l2;
-            float aa = a * a, bb = b * b, dd = tx * tx + ty * ty, ta = MathUtil::atan2(ty, tx);
-            c = bb * l1 * l1 + aa * dd - aa * bb;
-            float c1 = -2 * bb * l1, c2 = bb - aa;
-            d = c1 * c1 - 4 * c2 * c;
+        } else {
+            float a = psx * l2, b = psy * l2;
+            float aa = a * a, bb = b * b, ll = l1 * l1, dd = tx * tx + ty * ty, ta = MathUtil::atan2(ty, tx);
+            float c0 = bb * ll + aa * dd - aa * bb, c1 = -2 * bb * l1, c2 = bb - aa;
+            float d = c1 * c1 - 4 * c2 * c0;
             if (d >= 0) {
-                float q = MathUtil::sqrt(d);
+                float q = MathUtil::sqrt(d), r0, r1;
                 if (c1 < 0) q = -q;
                 q = -(c1 + q) / 2;
-                float r0 = q / c2, r1 = c / q;
-                float r = MathUtil::abs(r0) < MathUtil::abs(r1) ? r0 : r1;
+                r0 = q / c2; r1 = c0 / q;
+                r = MathUtil::abs(r0) < MathUtil::abs(r1) ? r0 : r1;
                 if (r * r <= dd) {
                     y = MathUtil::sqrt(dd - r * r) * bendDir;
                     a1 = ta - MathUtil::atan2(y, r);
                     a2 = MathUtil::atan2(y / psy, (r - l1) / psx);
-                    
-                    float os = MathUtil::atan2(cy, cx) * s2;
-                    float rotation = parent._arotation;
-                    a1 = (a1 - os) * RadDeg + os1 - rotation;
-                    if (a1 > 180) {
-                        a1 -= 360;
-                    }
-                    else if (a1 < -180) {
-                        a1 += 360;
-                    }
-                    
-                    parent.updateWorldTransform(px, py, rotation + a1 * alpha, parent._scaleX, parent._ascaleY, 0, 0);
-                    rotation = child._arotation;
-                    a2 = ((a2 + os) * RadDeg - child._ashearX) * s2 + os2 - rotation;
-                    
-                    if (a2 > 180) {
-                        a2 -= 360;
-                    }
-                    else if (a2 < -180) {
-                        a2 += 360;
-                    }
-                    
-                    child.updateWorldTransform(cx, cy, rotation + a2 * alpha, child._ascaleX, child._ascaleY, child._ashearX, child._ashearY);
-                    
-                    return;
+                    goto break_outer;
                 }
             }
-            
-            float minAngle = SPINE_PI, minX = l1 - a, minDist = minX * minX, minY = 0;
-            float maxAngle = 0, maxX = l1 + a, maxDist = maxX * maxX, maxY = 0;
-            c = -a * l1 / (aa - bb);
-            if (c >= -1 && c <= 1) {
-                c = MathUtil::acos(c);
-                x = a * MathUtil::cos(c) + l1;
-                y = b * (float)MathUtil::sin(c);
-                d = x * x + y * y;
-                
-                if (d < minDist) {
-                    minAngle = c;
-                    minDist = d;
-                    minX = x;
-                    minY = y;
+            {
+                float minAngle = PI, minX = l1 - a, minDist = minX * minX, minY = 0;
+                float maxAngle = 0, maxX = l1 + a, maxDist = maxX * maxX, maxY = 0;
+                c0 = -a * l1 / (aa - bb);
+                if (c0 >= -1 && c0 <= 1) {
+                    c0 = MathUtil::acos(c0);
+                    x = a * MathUtil::cos(c0) + l1;
+                    y = b * MathUtil::sin(c0);
+                    d = x * x + y * y;
+                    if (d < minDist) {
+                        minAngle = c0;
+                        minDist = d;
+                        minX = x;
+                        minY = y;
+                    }
+                    if (d > maxDist) {
+                        maxAngle = c0;
+                        maxDist = d;
+                        maxX = x;
+                        maxY = y;
+                    }
                 }
-                
-                if (d > maxDist) {
-                    maxAngle = c;
-                    maxDist = d;
-                    maxX = x;
-                    maxY = y;
+                if (dd <= (minDist + maxDist) / 2) {
+                    a1 = ta - MathUtil::atan2(minY * bendDir, minX);
+                    a2 = minAngle * bendDir;
+                } else {
+                    a1 = ta - MathUtil::atan2(maxY * bendDir, maxX);
+                    a2 = maxAngle * bendDir;
                 }
             }
-            
-            if (dd <= (minDist + maxDist) / 2) {
-                a1 = ta - MathUtil::atan2(minY * bendDir, minX);
-                a2 = minAngle * bendDir;
-            }
-            else {
-                a1 = ta - MathUtil::atan2(maxY * bendDir, maxX);
-                a2 = maxAngle * bendDir;
-            }
+        }
+        break_outer: {
+            float os = MathUtil::atan2(cy, cx) * s2;
+            a1 = (a1 - os) * RAD_DEG + o1 - parent._arotation;
+            if (a1 > 180) a1 -= 360;
+            else if (a1 < -180) a1 += 360;
+            parent.updateWorldTransform(px, py, parent._rotation + a1 * alpha, parent._ascaleX, parent._ascaleY, 0, 0);
+            a2 = ((a2 + os) * RAD_DEG - child._ashearX) * s2 + o2 - child._arotation;
+            if (a2 > 180) a2 -= 360;
+            else if (a2 < -180) a2 += 360;
+            child.updateWorldTransform(cx, cy, child._arotation + a2 * alpha, child._ascaleX, child._ascaleY, child._ashearX, child._ashearY);
         }
     }
     
@@ -309,5 +248,12 @@ namespace Spine {
     
     void IkConstraint::setMix(float inValue) {
         _mix = inValue;
+    }
+
+    String IkConstraint::toString() const {
+        String str;
+        str.append("IkConstraint { name: ").appendString(_data.getName());
+        str.append("}");
+        return str;
     }
 }

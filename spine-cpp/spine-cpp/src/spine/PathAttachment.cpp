@@ -59,4 +59,12 @@ namespace Spine {
     void PathAttachment::setConstantSpeed(bool inValue) {
         _constantSpeed = inValue;
     }
+
+    String PathAttachment::toString() const {
+        String str;
+        str.append("PathAttachment { name: ").appendString(getName()).append(", closed: ").append(_closed).append(", constantSpeed: ").append(_constantSpeed);
+        str.append(", worldVerticesLength: ").append(_worldVerticesLength);
+        str.append(", bones: ").append(_bones).append(", weights: ").append(_vertices).append(" }");
+        return str;
+    }
 }

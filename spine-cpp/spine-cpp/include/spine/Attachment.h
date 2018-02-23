@@ -43,7 +43,7 @@ namespace Spine {
         explicit Attachment(const String& name);
         virtual ~Attachment();
 
-        const String& getName();
+        const String& getName() const;
         
     private:
         const String _name;

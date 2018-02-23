@@ -93,6 +93,8 @@ namespace Spine {
         /// The transform mode for how parent world transforms affect this bone.
         TransformMode getTransformMode();
         void setTransformMode(TransformMode inValue);
+
+        String toString() const;
         
     private:
         const int _index;

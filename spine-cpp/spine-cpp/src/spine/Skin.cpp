@@ -46,8 +46,14 @@ namespace Spine {
     bool Skin::AttachmentKey::operator==(const AttachmentKey &other) const {
         return _slotIndex == other._slotIndex && _name == other._name;
     }
-    
-    std::size_t Skin::HashAttachmentKey::operator()(const Spine::Skin::AttachmentKey& val) const {
+
+	String Skin::AttachmentKey::toString() const {
+		String str;
+        str.append("AttachmentKey { slotIndex: ").append(_slotIndex).append(", name: ").appendString(_name).append(" }");
+        return str;
+	}
+
+	std::size_t Skin::HashAttachmentKey::operator()(const Spine::Skin::AttachmentKey& val) const {
         std::size_t h1 = val._slotIndex;
         return h1;
     }
@@ -121,5 +127,13 @@ namespace Spine {
                 }
             }
         }
+    }
+
+    String Skin::toString() const {
+        String str;
+        str.append("Skin { name: ").appendString(_name);
+        str.append(",\n attachments: ").append(_attachments);
+        str.append(" }");
+        return str;
     }
 }

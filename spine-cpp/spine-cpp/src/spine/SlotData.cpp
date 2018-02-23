@@ -89,4 +89,8 @@ namespace Spine {
     void SlotData::setBlendMode(BlendMode inValue) {
         _blendMode = inValue;
     }
+
+    String SlotData::toString() const {
+        return String("SlotData");
+    }
 }

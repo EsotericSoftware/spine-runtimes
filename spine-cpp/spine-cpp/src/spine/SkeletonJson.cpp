@@ -810,7 +810,7 @@ namespace Spine {
                     }
 					timelines.add(timeline);
                     timelinesCount++;
-                    duration = MAX(duration, timeline->_frames[timelineMap->_size - 1]);
+                    duration = MathUtil::max(duration, timeline->_frames[timelineMap->_size - 1]);
 
                 }
                 else if (strcmp(timelineMap->_name, "color") == 0) {
@@ -825,7 +825,7 @@ namespace Spine {
                     }
 					timelines.add(timeline);
                     timelinesCount++;
-                    duration = MAX(duration, timeline->_frames[(timelineMap->_size - 1) * ColorTimeline::ENTRIES]);
+                    duration = MathUtil::max(duration, timeline->_frames[(timelineMap->_size - 1) * ColorTimeline::ENTRIES]);
 
                 }
                 else if (strcmp(timelineMap->_name, "twoColor") == 0) {
@@ -842,7 +842,7 @@ namespace Spine {
                     }
 					timelines.add(timeline);
                     timelinesCount++;
-                    duration = MAX(duration, timeline->_frames[(timelineMap->_size - 1) * TwoColorTimeline::ENTRIES]);
+                    duration = MathUtil::max(duration, timeline->_frames[(timelineMap->_size - 1) * TwoColorTimeline::ENTRIES]);
                 }
                 else {
                     ContainerUtil::cleanUpVectorOfPointers(timelines);
@@ -875,7 +875,7 @@ namespace Spine {
                     }
 					timelines.add(timeline);
                     timelinesCount++;
-                    duration = MAX(duration, timeline->_frames[(timelineMap->_size - 1) * RotateTimeline::ENTRIES]);
+                    duration = MathUtil::max(duration, timeline->_frames[(timelineMap->_size - 1) * RotateTimeline::ENTRIES]);
                 }
                 else {
                     int isScale = strcmp(timelineMap->_name, "scale") == 0;
@@ -902,7 +902,7 @@ namespace Spine {
 
 						timelines.add(timeline);
                     timelinesCount++;
-                        duration = MAX(duration, timeline->_frames[(timelineMap->_size - 1) * TranslateTimeline::ENTRIES]);
+                        duration = MathUtil::max(duration, timeline->_frames[(timelineMap->_size - 1) * TranslateTimeline::ENTRIES]);
                     }
                     else {
                         ContainerUtil::cleanUpVectorOfPointers(timelines);
@@ -930,7 +930,7 @@ namespace Spine {
             }
 			timelines.add(timeline);
                     timelinesCount++;
-            duration = MAX(duration, timeline->_frames[(constraintMap->_size - 1) * IkConstraintTimeline::ENTRIES]);
+            duration = MathUtil::max(duration, timeline->_frames[(constraintMap->_size - 1) * IkConstraintTimeline::ENTRIES]);
         }
 
         /** Transform constraint timelines. */
@@ -950,7 +950,7 @@ namespace Spine {
             }
 			timelines.add(timeline);
                     timelinesCount++;
-            duration = MAX(duration, timeline->_frames[(constraintMap->_size - 1) * TransformConstraintTimeline::ENTRIES]);
+            duration = MathUtil::max(duration, timeline->_frames[(constraintMap->_size - 1) * TransformConstraintTimeline::ENTRIES]);
         }
 
         /** Path constraint timelines. */
@@ -999,7 +999,7 @@ namespace Spine {
                     }
 					timelines.add(timeline);
                     timelinesCount++;
-                    duration = MAX(duration, timeline->_frames[(timelineMap->_size - 1) * PathConstraintPositionTimeline::ENTRIES]);
+                    duration = MathUtil::max(duration, timeline->_frames[(timelineMap->_size - 1) * PathConstraintPositionTimeline::ENTRIES]);
                 }
                 else if (strcmp(timelineName, "mix") == 0) {
                     PathConstraintMixTimeline* timeline = new (__FILE__, __LINE__) PathConstraintMixTimeline(timelineMap->_size);
@@ -1010,7 +1010,7 @@ namespace Spine {
                     }
 					timelines.add(timeline);
                     timelinesCount++;
-                    duration = MAX(duration, timeline->_frames[(timelineMap->_size - 1) * PathConstraintMixTimeline::ENTRIES]);
+                    duration = MathUtil::max(duration, timeline->_frames[(timelineMap->_size - 1) * PathConstraintMixTimeline::ENTRIES]);
                 }
             }
         }
@@ -1085,7 +1085,7 @@ namespace Spine {
 
 					timelines.add(timeline);
                     timelinesCount++;
-                    duration = MAX(duration, timeline->_frames[timelineMap->_size - 1]);
+                    duration = MathUtil::max(duration, timeline->_frames[timelineMap->_size - 1]);
                 }
             }
         }
@@ -1141,7 +1141,7 @@ namespace Spine {
             }
 			timelines.add(timeline);
                     timelinesCount++;
-            duration = MAX(duration, timeline->_frames[drawOrder->_size - 1]);
+            duration = MathUtil::max(duration, timeline->_frames[drawOrder->_size - 1]);
         }
 
         /** Event timeline. */
@@ -1165,7 +1165,7 @@ namespace Spine {
             }
 			timelines.add(timeline);
                     timelinesCount++;
-            duration = MAX(duration, timeline->_frames[events->_size - 1]);
+            duration = MathUtil::max(duration, timeline->_frames[events->_size - 1]);
         }
         
         return new (__FILE__, __LINE__) Animation(String(root->_name), timelines, duration);
@@ -1217,8 +1217,12 @@ namespace Spine {
     }
     
     void SkeletonJson::setError(Json* root, const String& value1, const String& value2) {
-        _error = String(value1 + value2);
+        _error = String(value1).append(value2);
 
         delete root;
+    }
+
+    String SkeletonJson::toString() const {
+        return String("SkeletonJson");
     }
 }

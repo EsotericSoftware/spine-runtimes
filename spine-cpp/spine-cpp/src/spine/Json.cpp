@@ -42,6 +42,8 @@
 #endif
 
 #include <spine/Json.h>
+#include <spine/Extension.h>
+#include <spine/String.h>
 
 #include <assert.h>
 #include <math.h>
@@ -49,7 +51,6 @@
 #include <ctype.h>
 #include <stdlib.h> /* strtod (C89), strtof (C99) */
 #include <string.h> /* strcasecmp (4.4BSD - compatibility), _stricmp (_WIN32) */
-#include <spine/Extension.h>
 #include <new>
 
 namespace Spine {
@@ -548,5 +549,9 @@ namespace Spine {
                 return 1; /* s2 is nul    s1 is not */
             }
         }
+    }
+
+    String Json::toString() const {
+        return String("Json");
     }
 }

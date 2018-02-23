@@ -118,4 +118,13 @@ namespace Spine {
     void Slot::setAttachmentVertices(Vector<float> inValue) {
         _attachmentVertices = inValue;
     }
+
+    String Slot::toString() const {
+        String str;
+        str.append("Slot { name: ").appendString(_data.getName());
+        str.append(", color: ").appendString(_color.toString());
+        if (_hasDarkColor) str.append(", darkColor: ").appendString(_darkColor.toString());
+        str.append("}");
+        return str;
+    }
 }

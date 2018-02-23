@@ -106,6 +106,8 @@ namespace Spine {
         
         Vector<float>& getOffset();
         Vector<float>& getUVs();
+
+        String toString() const;
         
     private:
         static const int BLX;

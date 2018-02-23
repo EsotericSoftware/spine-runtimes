@@ -213,7 +213,8 @@ namespace Spine {
         void resetRotationDirections();
         
         void setOnAnimationEventFunc(OnAnimationEventFunc inValue);
-        
+
+        String toString() const;
     private:
         Animation* _animation;
         
@@ -249,6 +250,8 @@ namespace Spine {
         Event* _event;
         
         EventQueueEntry(EventType eventType, TrackEntry* trackEntry, Event* event = NULL);
+
+		String toString() const;
     };
     
     class EventQueue : public SpineObject {
@@ -282,6 +285,8 @@ namespace Spine {
 
         /// Raises all events in the queue and drains the queue.
         void drain();
+
+		String toString() const ;
     };
     
     class AnimationState : public SpineObject {
@@ -373,6 +378,8 @@ namespace Spine {
         void setOnAnimationEventFunc(OnAnimationEventFunc inValue);
         void setRendererObject(void* inValue);
         void* getRendererObject();
+
+        String toString() const;
         
     private:
         static const int Subsequent, First, Dip, DipMix;

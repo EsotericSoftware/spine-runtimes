@@ -43,7 +43,8 @@ namespace Spine {
         
     public:
         LinkedMesh(MeshAttachment* mesh, const String& skin, int slotIndex, const String& parent);
-        
+
+        String toString() const;
     private:
         MeshAttachment* _mesh;
         String _skin;

@@ -33,7 +33,7 @@
 #include <spine/MathUtil.h>
 
 namespace Spine {
-	class Color {
+	class Color : public SpineObject {
 	public:
 		Color() : _r(0), _g(0), _b(0), _a(0) {
 		}
@@ -87,6 +87,12 @@ namespace Spine {
 		}
 
 		float _r, _g, _b, _a;
+
+		inline String toString() const {
+			String str;
+			str.append("Color { r: ").append(_r).append(", g: ").append(_g).append(", b: ").append(_b).append(", a: ").append(_a).append(" }");
+			return str;
+		}
 	};
 }
 

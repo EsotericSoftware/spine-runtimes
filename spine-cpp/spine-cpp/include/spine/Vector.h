@@ -32,12 +32,11 @@
 #define Spine_Vector_h
 
 #include <spine/Extension.h>
-
+#include <spine/SpineObject.h>
+#include <spine/String.h>
 #include <stdlib.h>
 #include <memory>
 #include <assert.h>
-#include <spine/SpineObject.h>
-#include <spine/Extension.h>
 
 namespace Spine {
     template <typename T>
@@ -109,13 +108,13 @@ namespace Spine {
         }
 
 		inline void add(const T &inValue) {
-			if (_size == _capacity) {
+            if (_size == _capacity) {
                 _capacity = (int)(_size  * 1.75f);
                 if (_capacity < 8) _capacity = 8;
                 _buffer = Spine::SpineExtension::realloc<T>(_buffer, _capacity, __FILE__, __LINE__);
-			}
-			construct(_buffer + _size++, inValue);
-		}
+            }
+            construct(_buffer + _size++, inValue);
+        }
 
         inline void removeAt(size_t inIndex) {
             assert(inIndex < _size);
@@ -178,6 +177,18 @@ namespace Spine {
 		inline T* buffer() {
 			return _buffer;
 		}
+
+        String toString () const {
+            String str;
+            str.append("Vector { size: ").append((int)_size).append(", items: [\n");
+            for (size_t i = 0; i < _size; i++) {
+                str.append("   ").append(_buffer[i]);
+                if (i != _size - 1) str.append(",\n");
+                else str.append("\n");
+            }
+            str.append("] }");
+            return str;
+        }
 
     private:
         size_t _size;

@@ -46,7 +46,7 @@ namespace Spine {
         friend class Skeleton;
         
     public:
-        class AttachmentKey {
+        class AttachmentKey: public SpineObject {
         public:
             int _slotIndex;
             String _name;
@@ -59,6 +59,8 @@ namespace Spine {
             }
             
             bool operator==(const AttachmentKey &other) const;
+
+            String toString() const;
         };
         
         struct HashAttachmentKey : public SpineObject {
@@ -87,6 +89,8 @@ namespace Spine {
 
         const String& getName();
         HashMap<AttachmentKey, Attachment*>& getAttachments();
+
+        String toString() const;
         
     private:
         const String _name;

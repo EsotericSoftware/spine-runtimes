@@ -134,7 +134,7 @@ namespace Spine {
         float rotateMix = _rotateMix, translateMix = _translateMix, scaleMix = _scaleMix, shearMix = _shearMix;
         Bone& target = *_target;
         float ta = target._a, tb = target._b, tc = target._c, td = target._d;
-        float degRadReflect = ta * td - tb * tc > 0 ? DegRad : -DegRad;
+        float degRadReflect = ta * td - tb * tc > 0 ? DEG_RAD : -DEG_RAD;
         float offsetRotation = _data._offsetRotation * degRadReflect, offsetShearY = _data._offsetShearY * degRadReflect;
         
         for (size_t i = 0; i < _bones.size(); ++i) {
@@ -146,11 +146,11 @@ namespace Spine {
             if (rotateMix != 0) {
                 float a = bone._a, b = bone._b, c = bone._c, d = bone._d;
                 float r = MathUtil::atan2(tc, ta) - MathUtil::atan2(c, a) + offsetRotation;
-                if (r > SPINE_PI) {
-                    r -= SPINE_PI_2;
+                if (r > PI) {
+                    r -= PI_2;
                 }
-                else if (r < -SPINE_PI) {
-                    r += SPINE_PI_2;
+                else if (r < -PI) {
+                    r += PI_2;
                 }
                 
                 r *= rotateMix;
@@ -192,11 +192,11 @@ namespace Spine {
                 float b = bone._b, d = bone._d;
                 float by = MathUtil::atan2(d, b);
                 float r = MathUtil::atan2(td, tb) - MathUtil::atan2(tc, ta) - (by - MathUtil::atan2(bone._c, bone._a));
-                if (r > SPINE_PI) {
-                    r -= SPINE_PI_2;
+                if (r > PI) {
+                    r -= PI_2;
                 }
-                else if (r < -SPINE_PI) {
-                    r += SPINE_PI_2;
+                else if (r < -PI) {
+                    r += PI_2;
                 }
                 
                 r = by + (r + offsetShearY) * shearMix;
@@ -216,7 +216,7 @@ namespace Spine {
         float rotateMix = _rotateMix, translateMix = _translateMix, scaleMix = _scaleMix, shearMix = _shearMix;
         Bone& target = *_target;
         float ta = target._a, tb = target._b, tc = target._c, td = target._d;
-        float degRadReflect = ta * td - tb * tc > 0 ? DegRad : -DegRad;
+        float degRadReflect = ta * td - tb * tc > 0 ? DEG_RAD : -DEG_RAD;
         float offsetRotation = _data._offsetRotation * degRadReflect, offsetShearY = _data._offsetShearY * degRadReflect;
         for (size_t i = 0; i < _bones.size(); ++i) {
             Bone* item = _bones[i];
@@ -227,11 +227,11 @@ namespace Spine {
             if (rotateMix != 0) {
                 float a = bone._a, b = bone._b, c = bone._c, d = bone._d;
                 float r = MathUtil::atan2(tc, ta) + offsetRotation;
-                if (r > SPINE_PI) {
-                    r -= SPINE_PI_2;
+                if (r > PI) {
+                    r -= PI_2;
                 }
-                else if (r < -SPINE_PI) {
-                    r += SPINE_PI_2;
+                else if (r < -PI) {
+                    r += PI_2;
                 }
                 
                 r *= rotateMix;
@@ -263,15 +263,15 @@ namespace Spine {
             
             if (shearMix > 0) {
                 float r = MathUtil::atan2(td, tb) - MathUtil::atan2(tc, ta);
-                if (r > SPINE_PI) {
-                    r -= SPINE_PI_2;
+                if (r > PI) {
+                    r -= PI_2;
                 }
-                else if (r < -SPINE_PI) {
-                    r += SPINE_PI_2;
+                else if (r < -PI) {
+                    r += PI_2;
                 }
                 
                 float b = bone._b, d = bone._d;
-                r = MathUtil::atan2(d, b) + (r - SPINE_PI / 2 + offsetShearY) * shearMix;
+                r = MathUtil::atan2(d, b) + (r - PI / 2 + offsetShearY) * shearMix;
                 float s = MathUtil::sqrt(b * b + d * d);
                 bone._b = MathUtil::cos(r) * s;
                 bone._d = MathUtil::sin(r) * s;
@@ -378,5 +378,11 @@ namespace Spine {
             
             bone.updateWorldTransform(x, y, rotation, scaleX, scaleY, bone._ashearX, shearY);
         }
+    }
+
+    String TransformConstraint::toString() const {
+        String str;
+        str.append("TransformConstraint { name: ").appendString(_data.getName()).append(" }");
+        return str;
     }
 }

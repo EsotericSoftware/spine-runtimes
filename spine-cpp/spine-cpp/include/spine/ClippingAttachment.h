@@ -49,6 +49,8 @@ namespace Spine {
         
         SlotData* getEndSlot();
         void setEndSlot(SlotData* inValue);
+
+        String toString() const;
         
     private:
         SlotData* _endSlot;

@@ -88,7 +88,8 @@ namespace Spine {
         
         float getTranslateMix();
         void setTranslateMix(float inValue);
-        
+
+        String toString() const;
     private:
         const String _name;
         int _order;

@@ -142,4 +142,12 @@ namespace Spine {
         
         return -1;
     }
+
+	String Animation::toString() const {
+		String str;
+        str.append("Animation { name: ").appendString(_name).append(", duration: ").append(_duration);
+        str.append(",\n timelines: ").appendString(_timelines.toString());
+        str.append("}");
+        return str;
+	}
 }

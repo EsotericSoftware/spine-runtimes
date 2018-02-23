@@ -140,7 +140,9 @@ namespace Spine {
         /// The dopesheet FPS in Spine. Available only when nonessential data was exported.
         float getFps();
         void setFps(float inValue);
-        
+
+        String toString() const;
+
     private:
         String _name;
         Vector<BoneData*> _bones; // Ordered parents first

@@ -64,6 +64,8 @@ namespace Spine {
         
         float getRotation();
         void setRotation(float inValue);
+
+        String toString() const;
         
     private:
         float _x, _y, _rotation;

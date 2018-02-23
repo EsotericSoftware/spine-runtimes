@@ -63,6 +63,8 @@ namespace Spine {
         virtual ClippingAttachment* newClippingAttachment(Skin& skin, const String& name);
         
         AtlasRegion* findRegion(const String& name);
+
+        String toString() const;
         
     private:
         Atlas* _atlas;

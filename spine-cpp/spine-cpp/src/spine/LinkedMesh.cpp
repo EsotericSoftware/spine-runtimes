@@ -39,4 +39,8 @@ namespace Spine {
     _slotIndex(slotIndex),
     _parent(parent) {
     }
+
+    String LinkedMesh::toString() const {
+        return String("LinkedMesh");
+    }
 }

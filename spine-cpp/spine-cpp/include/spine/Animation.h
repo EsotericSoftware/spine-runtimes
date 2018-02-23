@@ -81,6 +81,8 @@ namespace Spine {
         float getDuration();
         
         void setDuration(float inValue);
+
+        String toString() const;
         
     private:
         Vector<Timeline*> _timelines;
