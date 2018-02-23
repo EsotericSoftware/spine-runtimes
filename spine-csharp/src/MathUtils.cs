@@ -46,6 +46,8 @@ namespace Spine {
 		const float DegToIndex = SIN_COUNT / DegFull;
 		static float[] sin = new float[SIN_COUNT];
 
+		static Random random = new Random();
+
 		static MathUtils () {
 			for (int i = 0; i < SIN_COUNT; i++)
 				sin[i] = (float)Math.Sin((i + 0.5f) / SIN_COUNT * RadFull);
@@ -95,6 +97,50 @@ namespace Spine {
 			if (value < min) return min;
 			if (value > max) return max;
 			return value;
+		}
+
+		static public float RandomTriangle(float min, float max) {
+			return RandomTriangle(min, max, (min + max) * 0.5f);
+		}
+
+		static public float RandomTriangle(float min, float max, float mode) {
+			float u = (float)random.NextDouble();
+			float d = max - min;
+			if (u <= (mode - min) / d) return min + (float)Math.Sqrt(u * d * (mode - min));
+			return max - (float)Math.Sqrt((1 - u) * d * (max - mode));
+		}
+	}
+
+	public abstract class IInterpolation {
+		public static IInterpolation Pow2 = new Pow(2);
+		public static IInterpolation Pow2Out = new PowOut(2);
+
+		protected abstract float Apply(float a);
+
+		public float Apply(float start, float end, float a) {
+			return start + (end - start) * Apply(a);
+		}
+	}
+
+	public class Pow: IInterpolation {
+		public float Power { get; set; }
+
+		public Pow(float power) {
+			Power = power;
+		}
+
+		protected override float Apply(float a) {
+			if (a <= 0.5f) return (float)Math.Pow(a * 2, Power) / 2;
+			return (float)Math.Pow((a - 1) * 2, Power) / (Power % 2 == 0 ? -2 : 2) + 1;
+		}
+	}
+
+	public class PowOut : Pow {
+		public PowOut(float power) : base(power) {
+		}
+
+		protected override float Apply(float a) {
+			return (float)Math.Pow(a - 1, Power) * (Power % 2 == 0 ? -1 : 1) + 1;
 		}
 	}
 }

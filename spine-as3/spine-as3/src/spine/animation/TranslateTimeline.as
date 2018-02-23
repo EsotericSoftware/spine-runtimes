@@ -57,17 +57,17 @@ package spine.animation {
 			frames[int(frameIndex + Y)] = y;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
+		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			var frames : Vector.<Number> = this.frames;
 
 			var bone : Bone = skeleton.bones[boneIndex];
 			if (time < frames[0]) {
-				switch (pose) {
-				case MixPose.setup:
+				switch (blend) {
+				case MixBlend.setup:
 					bone.x = bone.data.x;
 					bone.y = bone.data.y;
 					return;
-				case MixPose.current:
+				case MixBlend.first:
 					bone.x += (bone.data.x - bone.x) * alpha;
 					bone.y += (bone.data.y - bone.y) * alpha;
 				}
@@ -89,12 +89,19 @@ package spine.animation {
 				x += (frames[frame + X] - x) * percent;
 				y += (frames[frame + Y] - y) * percent;
 			}
-			if (pose == MixPose.setup) {
-				bone.x = bone.data.x + x * alpha;
-				bone.y = bone.data.y + y * alpha;
-			} else {
-				bone.x += (bone.data.x + x - bone.x) * alpha;
-				bone.y += (bone.data.y + y - bone.y) * alpha;
+			switch (blend) {
+				case MixBlend.setup:
+					bone.x = bone.data.x + x * alpha;
+					bone.y = bone.data.y + y * alpha;
+					break;
+				case MixBlend.first:
+				case MixBlend.replace:
+					bone.x += (bone.data.x + x - bone.x) * alpha;
+					bone.y += (bone.data.y + y - bone.y) * alpha;
+					break;
+				case MixBlend.add:
+					bone.x += x * alpha;
+					bone.y += y * alpha;
 			}
 		}
 	}

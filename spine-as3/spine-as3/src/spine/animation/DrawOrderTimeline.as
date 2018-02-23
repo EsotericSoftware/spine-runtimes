@@ -56,8 +56,8 @@ package spine.animation {
 			drawOrders[frameIndex] = drawOrder;
 		}
 
-		public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
-			if (direction == MixDirection.Out && pose == MixPose.setup) {
+		public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
+			if (direction == MixDirection.Out && blend == MixBlend.setup) {
 				for (var ii : int = 0, n : int = skeleton.slots.length; ii < n; ii++)
 					skeleton.drawOrder[ii] = skeleton.slots[ii];
 				return;
@@ -68,7 +68,7 @@ package spine.animation {
 			var slot : Slot;
 			var i : int = 0;
 			if (time < frames[0]) {
-				if (pose == MixPose.setup) {
+				if (blend == MixBlend.setup || blend == MixBlend.first) {
 					for each (slot in slots)
 						drawOrder[i++] = slot;
 				}

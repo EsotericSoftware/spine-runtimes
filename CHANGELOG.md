@@ -1,3 +1,10 @@
+# 3.7
+
+## C
+### SFML
+* `spine-sfml.h` no longer defines `SPINE_SHORT_NAMES` to avoid collisions with other APIs. See #1058.
+
+
 # 3.6
 
 ## AS3

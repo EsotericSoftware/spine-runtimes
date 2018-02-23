@@ -792,16 +792,16 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 		/// <summary>Adds an attachment to the skin for the specified slot index and name. If the name already exists for the slot, the previous value is replaced.</summary>
 		public static void SetAttachment (this Skin skin, string slotName, string keyName, Attachment attachment, Skeleton skeleton) {
-			int slotIndex = skeleton.FindSlotIndex(slotName);
 			if (skeleton == null) throw new System.ArgumentNullException("skeleton", "skeleton cannot be null.");
+			int slotIndex = skeleton.FindSlotIndex(slotName);
 			if (slotIndex == -1) throw new System.ArgumentException(string.Format("Slot '{0}' does not exist in skeleton.", slotName), "slotName");
 			skin.AddAttachment(slotIndex, keyName, attachment);
 		}
 
 		/// <summary>Gets an attachment from the skin for the specified slot index and name.</summary>
 		public static Attachment GetAttachment (this Skin skin, string slotName, string keyName, Skeleton skeleton) {
-			int slotIndex = skeleton.FindSlotIndex(slotName);
 			if (skeleton == null) throw new System.ArgumentNullException("skeleton", "skeleton cannot be null.");
+			int slotIndex = skeleton.FindSlotIndex(slotName);
 			if (slotIndex == -1) throw new System.ArgumentException(string.Format("Slot '{0}' does not exist in skeleton.", slotName), "slotName");
 			return skin.GetAttachment(slotIndex, keyName);
 		}
@@ -813,8 +813,8 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 		/// <summary>Removes the attachment. Returns true if the element is successfully found and removed; otherwise, false.</summary>
 		public static bool RemoveAttachment (this Skin skin, string slotName, string keyName, Skeleton skeleton) {
-			int slotIndex = skeleton.FindSlotIndex(slotName);
 			if (skeleton == null) throw new System.ArgumentNullException("skeleton", "skeleton cannot be null.");
+			int slotIndex = skeleton.FindSlotIndex(slotName);
 			if (slotIndex == -1) throw new System.ArgumentException(string.Format("Slot '{0}' does not exist in skeleton.", slotName), "slotName");
 			return skin.RemoveAttachment(slotIndex, keyName);
 		}

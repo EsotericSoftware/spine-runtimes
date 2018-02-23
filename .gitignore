@@ -16,13 +16,16 @@ target
 .idea/
 build/
 
+cmake-build-debug/
+
 spine-c/Debug/*
 
 spine-cpp/Debug/*
 
 spine-sfml/Debug/*
 spine-sfml/SFML
-spine-sfml/dependencies
+spine-sfml/c/dependencies
+spine-sfml/cpp/dependencies
 
 spine-libgdx/spine-libgdx/bin
 spine-libgdx/spine-libgdx-tests/bin

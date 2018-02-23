@@ -47,6 +47,7 @@ package spine.animation {
 		public var animationStart : Number, animationEnd : Number, animationLast : Number, nextAnimationLast : Number;
 		public var delay : Number, trackTime : Number, trackLast : Number, nextTrackLast : Number, trackEnd : Number, timeScale : Number;
 		public var alpha : Number, mixTime : Number, mixDuration : Number, interruptAlpha : Number, totalAlpha : Number = 0;
+		public var mixBlend: MixBlend = MixBlend.replace;
 		public var timelineData : Vector.<int> = new Vector.<int>();
 		public var timelineDipMix : Vector.<TrackEntry> = new Vector.<TrackEntry>();
 		public var timelinesRotation : Vector.<Number> = new Vector.<Number>();

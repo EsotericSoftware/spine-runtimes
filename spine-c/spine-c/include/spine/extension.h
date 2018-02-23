@@ -287,7 +287,7 @@ void _spVertexAttachment_deinit (spVertexAttachment* self);
 void _spTimeline_init (spTimeline* self, spTimelineType type,
 	void (*dispose) (spTimeline* self),
 	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
-		int* eventsCount, float alpha, spMixPose pose, spMixDirection direction),
+		int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction),
 	int (*getPropertyId) (const spTimeline* self));
 void _spTimeline_deinit (spTimeline* self);
 
@@ -300,7 +300,7 @@ void _spTimeline_deinit (spTimeline* self);
 
 void _spCurveTimeline_init (spCurveTimeline* self, spTimelineType type, int framesCount,
 	void (*dispose) (spTimeline* self),
-	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents, int* eventsCount, float alpha, spMixPose pose, spMixDirection direction),
+	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents, int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction),
 	int (*getPropertyId) (const spTimeline* self));
 void _spCurveTimeline_deinit (spCurveTimeline* self);
 int _spCurveTimeline_binarySearch (float *values, int valuesLength, float target, int step);

@@ -1,5 +1,12 @@
 {
-"skeleton": { "hash": "K7oDNcMxrFpZQBcQZLCdAEjLad8", "spine": "3.6.32", "width": 470.72, "height": 731.57, "images": "./images/" },
+"skeleton": {
+	"hash": "0DoQUqP6ATLL322RHY3r98lgFr8",
+	"spine": "3.7.08-beta",
+	"width": 470.72,
+	"height": 731.57,
+	"images": "./images/",
+	"audio": ""
+},
 "bones": [
 	{ "name": "root" },
 	{ "name": "dust", "parent": "root", "x": -303.6, "y": 32.64, "scaleX": 1.457 },
@@ -1095,10 +1102,10 @@
 					{ "time": 0, "color": "ffffff1e" },
 					{ "time": 0.0333, "color": "ffffff00", "curve": "stepped" },
 					{ "time": 0.1667, "color": "ffffff00" },
-					{ "time": 0.2, "color": "fffffffe" },
+					{ "time": 0.2, "color": "ffffffff" },
 					{ "time": 0.4667, "color": "ffffff00", "curve": "stepped" },
 					{ "time": 0.5333, "color": "ffffff00" },
-					{ "time": 0.5667, "color": "fffffffe" },
+					{ "time": 0.5667, "color": "ffffffff" },
 					{ "time": 0.8, "color": "ffffff1e" }
 				],
 				"attachment": [

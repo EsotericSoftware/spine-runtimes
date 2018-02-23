@@ -104,6 +104,7 @@ namespace Spine {
 				skeletonData.height = GetFloat(skeletonMap, "height", 0);
 				skeletonData.fps = GetFloat(skeletonMap, "fps", 0);
 				skeletonData.imagesPath = GetString(skeletonMap, "images", null);
+				skeletonData.audioPath = GetString(skeletonMap, "audio", null);
 			}
 
 			// Bones.
@@ -293,6 +294,7 @@ namespace Spine {
 					data.Int = GetInt(entryMap, "int", 0);
 					data.Float = GetFloat(entryMap, "float", 0);
 					data.String = GetString(entryMap, "string", string.Empty);
+					data.AudioPath = GetString(entryMap, "audio", string.Empty);
 					skeletonData.events.Add(data);
 				}
 			}

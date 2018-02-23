@@ -1,5 +1,12 @@
 {
-"skeleton": { "hash": "opir+OM2Pc8jor3YUJ3TGCWEXQY", "spine": "3.6.32", "width": 365.79, "height": 391.51, "images": "./images/" },
+"skeleton": {
+	"hash": "1WH+BPDx5fIR5Td0X/LQY1L6yi8",
+	"spine": "3.7.08-beta",
+	"width": 365.79,
+	"height": 391.51,
+	"images": "./images/",
+	"audio": ""
+},
 "bones": [
 	{ "name": "root" },
 	{ "name": "hip", "parent": "root", "x": -8.17, "y": 73.5, "color": "fff200ff" },
@@ -159,7 +166,7 @@
 			},
 			"splat01": {
 				"color": [
-					{ "time": 1.5667, "color": "fffffffe" },
+					{ "time": 1.5667, "color": "ffffffff" },
 					{
 						"time": 1.7333,
 						"color": "ffffffba",
