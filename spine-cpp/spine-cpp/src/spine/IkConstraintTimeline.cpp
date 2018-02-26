@@ -51,7 +51,7 @@ namespace Spine {
     const int IkConstraintTimeline::BEND_DIRECTION = 2;
     
     IkConstraintTimeline::IkConstraintTimeline(int frameCount) : CurveTimeline(frameCount), _ikConstraintIndex(0) {
-        _frames.setSize(frameCount * ENTRIES);
+        _frames.setSize(frameCount * ENTRIES, 0);
     }
     
     void IkConstraintTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {

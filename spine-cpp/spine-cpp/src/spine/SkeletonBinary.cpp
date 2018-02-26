@@ -147,7 +147,7 @@ namespace Spine {
         
         /* Bones. */
         int bonesCount = readVarint(input, true);
-        skeletonData->_bones.setSize(bonesCount);
+        skeletonData->_bones.setSize(bonesCount, 0);
         for (int i = 0; i < bonesCount; ++i) {
             const char* name = readString(input);
             BoneData* parent = i == 0 ? 0 : skeletonData->_bones[readVarint(input, true)];
@@ -170,7 +170,7 @@ namespace Spine {
 
         /* Slots. */
         int slotsCount = readVarint(input, true);
-        skeletonData->_slots.setSize(slotsCount);
+        skeletonData->_slots.setSize(slotsCount, 0);
         for (int i = 0; i < slotsCount; ++i) {
             const char* slotName = readString(input);
             BoneData* boneData = skeletonData->_bones[readVarint(input, true)];
@@ -192,13 +192,13 @@ namespace Spine {
 
         /* IK constraints. */
         int ikConstraintsCount = readVarint(input, true);
-        skeletonData->_ikConstraints.setSize(ikConstraintsCount);
+        skeletonData->_ikConstraints.setSize(ikConstraintsCount, 0);
         for (int i = 0; i < ikConstraintsCount; ++i) {
             const char* name = readString(input);
             IkConstraintData* data = new (__FILE__, __LINE__) IkConstraintData(String(name, true));
             data->_order = readVarint(input, true);
             int bonesCount = readVarint(input, true);
-            data->_bones.setSize(bonesCount);
+            data->_bones.setSize(bonesCount, 0);
             for (int ii = 0; ii < bonesCount; ++ii) {
                 data->_bones[ii] = skeletonData->_bones[readVarint(input, true)];
             }
@@ -210,13 +210,13 @@ namespace Spine {
 
         /* Transform constraints. */
         int transformConstraintsCount = readVarint(input, true);
-        skeletonData->_transformConstraints.setSize(transformConstraintsCount);
+        skeletonData->_transformConstraints.setSize(transformConstraintsCount, 0);
         for (int i = 0; i < transformConstraintsCount; ++i) {
             const char* name = readString(input);
             TransformConstraintData* data = new (__FILE__, __LINE__) TransformConstraintData(String(name, true));
             data->_order = readVarint(input, true);
             int bonesCount = readVarint(input, true);
-            data->_bones.setSize(bonesCount);
+            data->_bones.setSize(bonesCount, 0);
             for (int ii = 0; ii < bonesCount; ++ii) {
                 data->_bones[ii] = skeletonData->_bones[readVarint(input, true)];
             }
@@ -238,13 +238,13 @@ namespace Spine {
 
         /* Path constraints */
         int pathConstraintsCount = readVarint(input, true);
-        skeletonData->_pathConstraints.setSize(pathConstraintsCount);
+        skeletonData->_pathConstraints.setSize(pathConstraintsCount, 0);
         for (int i = 0; i < pathConstraintsCount; ++i) {
             const char* name = readString(input);
             PathConstraintData* data = new (__FILE__, __LINE__) PathConstraintData(String(name, true));
             data->_order = readVarint(input, true);
             int bonesCount = readVarint(input, true);
-            data->_bones.setSize(bonesCount);
+            data->_bones.setSize(bonesCount, 0);
             for (int ii = 0; ii < bonesCount; ++ii) {
                 data->_bones[ii] = skeletonData->_bones[readVarint(input, true)];
             }
@@ -268,7 +268,7 @@ namespace Spine {
         if (skeletonData->_defaultSkin) {
             ++skinsCount;
         }
-        skeletonData->_skins.setSize(skinsCount);
+        skeletonData->_skins.setSize(skinsCount, 0);
         if (skeletonData->_defaultSkin) {
             skeletonData->_skins[0] = skeletonData->_defaultSkin;
         }
@@ -304,7 +304,7 @@ namespace Spine {
 
         /* Events. */
         int eventsCount = readVarint(input, true);
-        skeletonData->_events.setSize(eventsCount);
+        skeletonData->_events.setSize(eventsCount, 0);
         for (int i = 0; i < eventsCount; ++i) {
             const char* name = readString(input);
             EventData* eventData = new (__FILE__, __LINE__) EventData(String(name, true));
@@ -317,7 +317,7 @@ namespace Spine {
 
         /* Animations. */
         int animationsCount = readVarint(input, true);
-        skeletonData->_animations.setSize(animationsCount);
+        skeletonData->_animations.setSize(animationsCount, 0);
         for (int i = 0; i < animationsCount; ++i) {
             String name(readString(input), true);
             Animation* animation = readAnimation(name, input, skeletonData);
@@ -534,7 +534,7 @@ namespace Spine {
                 int vertexCount = readVarint(input, true);
                 readVertices(input, static_cast<VertexAttachment *>(path), vertexCount);
                 int lengthsLength = vertexCount / 3;
-                path->_lengths.setSize(lengthsLength);
+                path->_lengths.setSize(lengthsLength, 0);
                 for (int i = 0; i < lengthsLength; ++i) {
                     path->_lengths[i] = readFloat(input) * _scale;
                 }
@@ -601,7 +601,7 @@ namespace Spine {
     }
     
     void SkeletonBinary::readFloatArray(DataInput *input, int n, float scale, Vector<float>& array) {
-        array.setSize(n);
+        array.setSize(n, 0);
         
         int i;
         if (scale == 1) {
@@ -618,7 +618,7 @@ namespace Spine {
     
     void SkeletonBinary::readShortArray(DataInput *input, Vector<unsigned short>& array) {
         int n = readVarint(input, true);
-        array.setSize(n);
+        array.setSize(n, 0);
         
         int i;
         for (i = 0; i < n; ++i) {
@@ -877,17 +877,17 @@ namespace Spine {
                         int end = readVarint(input, true);
                         if (end == 0) {
                             if (weighted) {
-                                deform.setSize(deformLength);
+                                deform.setSize(deformLength, 0);
                                 for (int i = 0; i < deformLength; ++i) {
 									deform[i] = 0;
                                 }
                             }
                             else {
-                                deform = vertices;
+                                deform.clearAndAddAll(vertices);
                             }
                         }
                         else {
-                            deform.setSize(deformLength);
+                            deform.setSize(deformLength, 0);
                             int start = readVarint(input, true);
                             end += start;
                             if (scale == 1) {
@@ -931,13 +931,13 @@ namespace Spine {
                 int offsetCount = readVarint(input, true);
                 
                 Vector<int> drawOrder;
-                drawOrder.setSize(slotCount);
+                drawOrder.setSize(slotCount, 0);
                 for (int ii = slotCount - 1; ii >= 0; --ii) {
                     drawOrder[ii] = -1;
                 }
                 
                 Vector<int> unchanged;
-                unchanged.setSize(slotCount - offsetCount);
+                unchanged.setSize(slotCount - offsetCount, 0);
                 int originalIndex = 0, unchangedIndex = 0;
                 for (int ii = 0; ii < offsetCount; ++ii) {
                     int slotIndex = readVarint(input, true);

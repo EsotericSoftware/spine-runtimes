@@ -205,7 +205,8 @@ public class SkeletonRenderer {
 					FloatArray clippedVertices = clipper.getClippedVertices();
 					ShortArray clippedTriangles = clipper.getClippedTriangles();
 					if (vertexEffect != null) applyVertexEffect(clippedVertices.items, clippedVertices.size, 5, c, 0);
-					batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,
+					printAttachmentVertices(attachment.getName() + " (clipped)", clippedVertices.items, clippedVertices.size, clippedTriangles.items, clippedTriangles.size);
+					batch.draw(texture, clippedVertices.items, 0, clippedVertices.size / 5, clippedTriangles.items, 0,
 						clippedTriangles.size);
 				} else {
 					if (vertexEffect != null) {
@@ -232,6 +233,7 @@ public class SkeletonRenderer {
 							vertices[v + 2] = uvs[u + 1];
 						}
 					}
+					printAttachmentVertices(attachment.getName(), vertices, verticesLength / 5, triangles, triangles.length);
 					batch.draw(texture, vertices, 0, verticesLength, triangles, 0, triangles.length);
 				}
 			}
@@ -240,6 +242,22 @@ public class SkeletonRenderer {
 		}
 		clipper.clipEnd();
 		if (vertexEffect != null) vertexEffect.end();
+		System.out.println("=====================\n");
+	}
+	
+	private void printAttachmentVertices(String name, float[] vertices, int vertexCount, short[] triangles, int triangleCount) {
+		System.out.println("attachment: " + name);
+		System.out.print("indices (" + triangleCount + "): ");
+		for(int i = 0; i < triangleCount; i++) {
+			System.out.print(triangles[i] + " ");
+		}
+		
+		System.out.print("\nvertices (" + vertexCount + "): ");
+		for(int i = 0; i < triangleCount; i++) {
+			int index = triangles[i] * 5;			
+			System.out.print((int)vertices[index] + " " + ((int)vertices[index + 1] + " "));
+		}
+		System.out.println("\n");
 	}
 
 	@SuppressWarnings("null")

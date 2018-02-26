@@ -71,8 +71,9 @@ namespace Spine {
         return _timelines;
     }
     
-    void Animation::setTimelines(Vector<Timeline*> inValue) {
-        _timelines = inValue;
+    void Animation::setTimelines(Vector<Timeline*>& inValue) {
+        _timelines.clear();
+        _timelines.addAll(inValue);
     }
     
     float Animation::getDuration() {

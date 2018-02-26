@@ -412,7 +412,7 @@ namespace Spine {
 
                 verticesLength = 8;
                 if (outVertexBuffer.size() < 8) {
-                    outVertexBuffer.setSize(8);
+                    outVertexBuffer.setSize(8, 0);
                 }
                 regionAttachment->computeWorldVertices(slot->getBone(), outVertexBuffer, 0);
             }
@@ -421,7 +421,7 @@ namespace Spine {
 
                 verticesLength = mesh->getWorldVerticesLength();
                 if (outVertexBuffer.size() < verticesLength) {
-                    outVertexBuffer.setSize(verticesLength);
+                    outVertexBuffer.setSize(verticesLength, 0);
                 }
 
                 mesh->computeWorldVertices(*slot, 0, verticesLength, outVertexBuffer, 0);

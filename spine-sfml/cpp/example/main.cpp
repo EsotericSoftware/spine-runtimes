@@ -354,7 +354,7 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
-		// drawable->update(delta);
+		drawable->update(delta);
 
 		window.clear();
 		window.draw(*drawable);

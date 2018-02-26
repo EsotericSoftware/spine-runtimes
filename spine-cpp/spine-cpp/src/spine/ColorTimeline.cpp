@@ -53,7 +53,7 @@ namespace Spine {
     const int ColorTimeline::A = 4;
     
     ColorTimeline::ColorTimeline(int frameCount) : CurveTimeline(frameCount), _slotIndex(0) {
-        _frames.setSize(frameCount * ENTRIES);
+        _frames.setSize(frameCount * ENTRIES, 0);
     }
     
     void ColorTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
@@ -139,6 +139,7 @@ namespace Spine {
     }
     
     void ColorTimeline::setFrames(Vector<float>& inValue) {
-        _frames = inValue;
+        _frames.clear();
+        _frames.addAll(inValue);
     }
 }

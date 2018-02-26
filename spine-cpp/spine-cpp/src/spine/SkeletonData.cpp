@@ -134,7 +134,7 @@ namespace Spine {
     }
     
     void SkeletonData::setSkins(Vector<Skin*>& inValue) {
-        _skins = inValue;
+        _skins.clearAndAddAll(inValue);
     }
     
     Skin* SkeletonData::getDefaultSkin() {
@@ -150,7 +150,7 @@ namespace Spine {
     }
     
     void SkeletonData::setEvents(Vector<EventData*>& inValue) {
-        _events = inValue;
+        _events.clearAndAddAll(inValue);
     }
     
     Vector<Animation*>& SkeletonData::getAnimations() {
@@ -158,7 +158,7 @@ namespace Spine {
     }
     
     void SkeletonData::setAnimations(Vector<Animation*>& inValue) {
-        _animations = inValue;
+        _animations.clearAndAddAll(inValue);
     }
     
     Vector<IkConstraintData*>& SkeletonData::getIkConstraints() {
@@ -166,7 +166,7 @@ namespace Spine {
     }
     
     void SkeletonData::setIkConstraints(Vector<IkConstraintData*>& inValue) {
-        _ikConstraints = inValue;
+        _ikConstraints.clearAndAddAll(inValue);
     }
     
     Vector<TransformConstraintData*>& SkeletonData::getTransformConstraints() {
@@ -174,7 +174,7 @@ namespace Spine {
     }
     
     void SkeletonData::setTransformConstraints(Vector<TransformConstraintData*>& inValue) {
-        _transformConstraints = inValue;
+        _transformConstraints.clearAndAddAll(inValue);
     }
     
     Vector<PathConstraintData*>& SkeletonData::getPathConstraints() {
@@ -182,7 +182,7 @@ namespace Spine {
     }
     
     void SkeletonData::setPathConstraints(Vector<PathConstraintData*>& inValue) {
-        _pathConstraints = inValue;
+        _pathConstraints.clearAndAddAll(inValue);
     }
     
     float SkeletonData::getWidth() {

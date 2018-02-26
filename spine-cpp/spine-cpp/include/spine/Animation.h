@@ -76,7 +76,7 @@ namespace Spine {
         
         Vector<Timeline*> getTimelines();
         
-        void setTimelines(Vector<Timeline*> inValue);
+        void setTimelines(Vector<Timeline*>& inValue);
         
         float getDuration();
         

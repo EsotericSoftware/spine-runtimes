@@ -78,7 +78,7 @@ SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData, AnimationStateDa
 		vertexArray(new VertexArray(Triangles, skeletonData->getBones().size() * 4)),
 		worldVertices(), clipper() {
 	Bone::setYDown(true);
-	worldVertices.setSize(SPINE_MESH_VERTEX_COUNT_MAX);
+	worldVertices.ensureCapacity(SPINE_MESH_VERTEX_COUNT_MAX);
 	skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
 	tempUvs.ensureCapacity(16);
 	tempColors.ensureCapacity(16);
@@ -132,6 +132,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 
 		if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
 			RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
+			worldVertices.setSize(8, 0);
 			regionAttachment->computeWorldVertices(slot.getBone(), worldVertices, 0, 2);
 			verticesCount = 4;
 			uvs = &regionAttachment->getUVs();
@@ -142,7 +143,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 
 		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 			MeshAttachment* mesh = (MeshAttachment*)attachment;
-			if (mesh->getWorldVerticesLength() > worldVertices.size()) worldVertices.setSize(mesh->getWorldVerticesLength());
+			worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
 			texture = (Texture*)((AtlasRegion*)mesh->getRendererObject())->page->rendererObject;
 			mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices, 0, 2);
 			verticesCount = mesh->getWorldVerticesLength() >> 1;
@@ -262,16 +263,14 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 				vertexArray->append(vertex);
 			}
 		} else {*/
-			for (int i = 0; i < indicesCount; ++i) {
-				int index = (*indices)[i] << 1;
-				vertex.position.x = (*vertices)[index];
-				vertex.position.y = (*vertices)[index + 1];
-				vertex.texCoords.x = (*uvs)[index] * size.x;
-				vertex.texCoords.y = (*uvs)[index + 1] * size.y;
-				vertexArray->append(vertex);
-			}
-		// }
-
+		for (int ii = 0; ii < indicesCount; ++ii) {
+			int index = (*indices)[ii] << 1;
+			vertex.position.x = (*vertices)[index];
+			vertex.position.y = (*vertices)[index + 1];
+			vertex.texCoords.x = (*uvs)[index] * size.x;
+			vertex.texCoords.y = (*uvs)[index + 1] * size.y;
+			vertexArray->append(vertex);
+		}
 		clipper.clipEnd(slot);
 	}
 	target.draw(*vertexArray, states);

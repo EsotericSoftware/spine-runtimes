@@ -19,6 +19,12 @@ cp -f ../spineboy/export/*.json ../../spine-libgdx/spine-libgdx-tests/assets/spi
 cp -r ../spineboy/export/*.skel ../../spine-libgdx/spine-libgdx-tests/assets/spineboy/
 cp -r ../spineboy/export/*-pma.* ../../spine-libgdx/spine-libgdx-tests/assets/spineboy/
 
+rm -rf ../../spine-libgdx/spine-libgdx-tests/assets/coin/*
+mkdir ../../spine-libgdx/spine-libgdx-tests/assets/coin/
+cp -f ../coin/export/*.json ../../spine-libgdx/spine-libgdx-tests/assets/coin/
+cp -f ../coin/export/*.skel ../../spine-libgdx/spine-libgdx-tests/assets/coin/
+cp -f ../coin/export/*-pma.* ../../spine-libgdx/spine-libgdx-tests/assets/coin/
+
 echo "spine-as3"
 rm -f ../../spine-as3/spine-as3-example/src/spineboy.*
 cp -f ../spineboy/export/spineboy-ess.json ../../spine-as3/spine-as3-example/src/

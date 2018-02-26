@@ -50,7 +50,7 @@ namespace Spine {
 			} else {
 				_length = strlen(chars);
 				if (!own) {
-					_buffer = SpineExtension::alloc<char>(_length + 1, __FILE__, __LINE__);
+					_buffer = SpineExtension::calloc<char>(_length + 1, __FILE__, __LINE__);
 					memcpy((void *) _buffer, chars, _length + 1);
 				} else {
 					_buffer = (char*)chars;
@@ -64,7 +64,7 @@ namespace Spine {
 				_buffer = NULL;
 			} else {
 				_length = other._length;
-				_buffer = SpineExtension::alloc<char>(other._length + 1, __FILE__, __LINE__);
+				_buffer = SpineExtension::calloc<char>(other._length + 1, __FILE__, __LINE__);
 				memcpy((void*)_buffer, other._buffer, other._length + 1);
 			}
 		}
@@ -117,7 +117,7 @@ namespace Spine {
 				_buffer = NULL;
 			} else {
 				_length = other._length;
-				_buffer = SpineExtension::alloc<char>(other._length + 1, __FILE__, __LINE__);
+				_buffer = SpineExtension::calloc<char>(other._length + 1, __FILE__, __LINE__);
 				memcpy((void*)_buffer, other._buffer, other._length + 1);
 			}
 			return *this;
@@ -133,7 +133,7 @@ namespace Spine {
 				_buffer = NULL;
 			} else {
 				_length = strlen(chars);
-				_buffer = SpineExtension::alloc<char>(_length + 1, __FILE__, __LINE__);
+				_buffer = SpineExtension::calloc<char>(_length + 1, __FILE__, __LINE__);
 				memcpy((void*)_buffer, chars, _length + 1);
 			}
 			return *this;

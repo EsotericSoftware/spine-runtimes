@@ -115,8 +115,8 @@ namespace Spine {
         return _attachmentVertices;
     }
     
-    void Slot::setAttachmentVertices(Vector<float> inValue) {
-        _attachmentVertices = inValue;
+    void Slot::setAttachmentVertices(Vector<float>& inValue) {
+        _attachmentVertices.clearAndAddAll(inValue);
     }
 
     String Slot::toString() const {

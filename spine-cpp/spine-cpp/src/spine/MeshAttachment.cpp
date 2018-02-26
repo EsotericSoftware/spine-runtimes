@@ -59,7 +59,7 @@
     void MeshAttachment::updateUVs() {
         float u = _regionU, v = _regionV, width = _regionU2 - _regionU, height = _regionV2 - _regionV;
         if (_uvs.size() != _regionUVs.size()) {
-            _uvs.setSize(_regionUVs.size());
+            _uvs.setSize(_regionUVs.size(), 0);
         }
         
         if (_regionRotate) {
@@ -93,7 +93,8 @@
     }
     
     void MeshAttachment::setRegionUVs(Vector<float>& inValue) {
-        _regionUVs = inValue;
+        _regionUVs.clear();
+        _regionUVs.addAll(inValue);
     }
     
     Vector<float>& MeshAttachment::getUVs() {
@@ -101,7 +102,8 @@
     }
     
     void MeshAttachment::setUVs(Vector<float>& inValue) {
-        _uvs = inValue;
+        _uvs.clear();
+        _uvs.addAll(inValue);
     }
     
     Vector<unsigned short>& MeshAttachment::getTriangles() {
@@ -109,7 +111,8 @@
     }
     
     void MeshAttachment::setTriangles(Vector<unsigned short>& inValue) {
-        _triangles = inValue;
+        _triangles.clear();
+        _triangles.addAll(inValue);
     }
     
     const String& MeshAttachment::getPath() {
@@ -231,13 +234,13 @@
     void MeshAttachment::setParentMesh(MeshAttachment* inValue) {
         _parentMesh = inValue;
         if (inValue != NULL) {
-            _bones = inValue->_bones;
-            _vertices = inValue->_vertices;
+            _bones.clearAndAddAll(inValue->_bones);
+            _vertices.clearAndAddAll(inValue->_vertices);
             _worldVerticesLength = inValue->_worldVerticesLength;
-            _regionUVs = inValue->_regionUVs;
-            _triangles = inValue->_triangles;
+            _regionUVs.clearAndAddAll(inValue->_regionUVs);
+            _triangles.clearAndAddAll(inValue->_triangles);
             _hullLength = inValue->_hullLength;
-            _edges = inValue->_edges;
+            _edges.clearAndAddAll(inValue->_edges);
             _width = inValue->_width;
             _height = inValue->_height;
         }
@@ -248,7 +251,7 @@
     }
     
     void MeshAttachment::setEdges(Vector<unsigned short>& inValue) {
-        _edges = inValue;
+        _edges.clearAndAddAll(inValue);
     }
     
     float MeshAttachment::getWidth() {

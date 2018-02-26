@@ -45,7 +45,7 @@ namespace Spine {
 		_frames.ensureCapacity(frameCount);
 		_drawOrders.ensureCapacity(frameCount);
         
-        _frames.setSize(frameCount);
+        _frames.setSize(frameCount, 0);
         
         for (int i = 0; i < frameCount; ++i) {
             Vector<int> vec;
@@ -105,7 +105,8 @@ namespace Spine {
     
     void DrawOrderTimeline::setFrame(int frameIndex, float time, Vector<int>& drawOrder) {
         _frames[frameIndex] = time;
-        _drawOrders[frameIndex] = drawOrder;
+        _drawOrders[frameIndex].clear();
+        _drawOrders[frameIndex].addAll(drawOrder);
     }
     
     Vector<float>& DrawOrderTimeline::getFrames() {
@@ -113,7 +114,8 @@ namespace Spine {
     }
     
     void DrawOrderTimeline::setFrames(Vector<float>& inValue) {
-        _frames = inValue;
+        _frames.clear();
+        _frames.addAll(inValue);
     }
     
     Vector< Vector<int> >& DrawOrderTimeline::getDrawOrders() {
@@ -121,7 +123,8 @@ namespace Spine {
     }
     
     void DrawOrderTimeline::setDrawOrders(Vector< Vector<int> >& inValue) {
-        _drawOrders = inValue;
+        _drawOrders.clear();
+        _drawOrders.addAll(inValue);
     }
     
     int DrawOrderTimeline::getFrameCount() {

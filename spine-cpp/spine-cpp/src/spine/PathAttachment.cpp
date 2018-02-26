@@ -40,8 +40,9 @@ namespace Spine {
         return _lengths;
     }
     
-    void PathAttachment::setLengths(Vector<float> inValue) {
-        _lengths = inValue;
+    void PathAttachment::setLengths(Vector<float>& inValue) {
+        _lengths.clear();
+        _lengths.addAll(inValue);
     }
     
     bool PathAttachment::isClosed() {

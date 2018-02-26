@@ -42,7 +42,7 @@ namespace Spine {
     RTTI_IMPL(RotateTimeline, CurveTimeline);
     
     RotateTimeline::RotateTimeline(int frameCount) : CurveTimeline(frameCount), _boneIndex(0) {
-        _frames.setSize(frameCount << 1);
+        _frames.setSize(frameCount << 1, 0);
     }
     
     void RotateTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
@@ -127,6 +127,6 @@ namespace Spine {
     }
     
     void RotateTimeline::setFrames(Vector<float> inValue) {
-        _frames = inValue;
+        _frames.clearAndAddAll(inValue);
     }
 }

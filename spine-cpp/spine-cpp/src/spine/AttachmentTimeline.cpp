@@ -45,7 +45,7 @@ namespace Spine {
         _frames.ensureCapacity(frameCount);
         _attachmentNames.ensureCapacity(frameCount);
         
-        _frames.setSize(frameCount);
+        _frames.setSize(frameCount, 0);
         
         for (int i = 0; i < frameCount; ++i) {
             _attachmentNames.add(String());
@@ -108,7 +108,8 @@ namespace Spine {
     }
     
     void AttachmentTimeline::setFrames(Vector<float>& inValue) {
-        _frames = inValue;
+        _frames.clear();
+        _frames.addAll(inValue);
     }
     
     const Vector<String>& AttachmentTimeline::getAttachmentNames() {
@@ -116,7 +117,8 @@ namespace Spine {
     }
     
     void AttachmentTimeline::setAttachmentNames(Vector<String>& inValue) {
-        _attachmentNames = inValue;
+        _attachmentNames.clear();
+        _attachmentNames.addAll(inValue);
     }
     
     int AttachmentTimeline::getFrameCount() {

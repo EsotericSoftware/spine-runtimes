@@ -51,7 +51,7 @@ namespace Spine {
     const int PathConstraintMixTimeline::TRANSLATE = 2;
     
     PathConstraintMixTimeline::PathConstraintMixTimeline(int frameCount) : CurveTimeline(frameCount), _pathConstraintIndex(0) {
-        _frames.setSize(frameCount * ENTRIES);
+        _frames.setSize(frameCount * ENTRIES, 0);
     }
     
     void PathConstraintMixTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {

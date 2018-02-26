@@ -47,7 +47,7 @@ namespace Spine {
         _frames.ensureCapacity(frameCount);
         _frameVertices.ensureCapacity(frameCount);
         
-        _frames.setSize(frameCount);
+        _frames.setSize(frameCount, 0);
         
         for (int i = 0; i < frameCount; ++i) {
             Vector<float> vec;
@@ -87,7 +87,7 @@ namespace Spine {
                     }
                     
                     // Ensure size and preemptively set count.
-                    vertices.setSize(vertexCount);
+                    vertices.setSize(vertexCount, 0);
                     
                     if (vertexAttachment->_bones.size() == 0) {
                         // Unweighted vertex positions.
@@ -110,7 +110,7 @@ namespace Spine {
         }
         
         // Ensure size and preemptively set count.
-        vertices.setSize(vertexCount);
+        vertices.setSize(vertexCount, 0);
         
         if (time >= _frames[_frames.size() - 1]) {
             // Time is after last frame.
@@ -196,7 +196,8 @@ namespace Spine {
     
     void DeformTimeline::setFrame(int frameIndex, float time, Vector<float>& vertices) {
         _frames[frameIndex] = time;
-        _frameVertices[frameIndex] = vertices;
+        _frameVertices[frameIndex].clear();
+        _frameVertices[frameIndex].addAll(vertices);
     }
     
     int DeformTimeline::getSlotIndex() {
@@ -212,7 +213,8 @@ namespace Spine {
     }
     
     void DeformTimeline::setFrames(Vector<float>& inValue) {
-        _frames = inValue;
+        _frames.clear();
+        _frames.addAll(inValue);
     }
     
     Vector< Vector<float> >& DeformTimeline::getVertices() {
@@ -220,7 +222,8 @@ namespace Spine {
     }
     
     void DeformTimeline::setVertices(Vector< Vector<float> >& inValue) {
-        _frameVertices = inValue;
+        _frameVertices.clear();
+        _frameVertices.addAll(inValue);
     }
     
     VertexAttachment* DeformTimeline::getAttachment() {

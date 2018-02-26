@@ -121,7 +121,7 @@ namespace Spine {
         
         float _x, _y, _rotation, _scaleX, _scaleY, _width, _height;
         float _regionOffsetX, _regionOffsetY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight;
-        Vector<float> _offset;
+        Vector<float> _vertexOffset;
         Vector<float> _uvs;
         void* _rendererObject;
         String _path;

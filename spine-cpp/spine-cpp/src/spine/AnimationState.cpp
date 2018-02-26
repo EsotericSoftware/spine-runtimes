@@ -139,8 +139,8 @@ namespace Spine {
         int mixingToLast = static_cast<int>(mixingToArray.size()) - 1;
         Vector<Timeline*>& timelines = _animation->_timelines;
         int timelinesCount = static_cast<int>(timelines.size());
-        _timelineData.setSize(timelinesCount);
-        _timelineDipMix.setSize(timelinesCount);
+        _timelineData.setSize(timelinesCount, 0);
+        _timelineDipMix.setSize(timelinesCount, 0);
         
         // outer:
         int i = 0;
@@ -421,7 +421,7 @@ namespace Spine {
                 
                 bool firstFrame = current._timelinesRotation.size() == 0;
                 if (firstFrame) {
-                    current._timelinesRotation.setSize(timelines.size() << 1);
+                    current._timelinesRotation.setSize(timelines.size() << 1, 0);
                 }
                 Vector<float>& timelinesRotation = current._timelinesRotation;
                 
@@ -776,7 +776,7 @@ namespace Spine {
         
         bool firstFrame = from->_timelinesRotation.size() == 0;
         if (firstFrame) {
-            from->_timelinesRotation.setSize(timelines.size() << 1);
+            from->_timelinesRotation.setSize(timelines.size() << 1, 0);
         }
         
         Vector<float>& timelinesRotation = from->_timelinesRotation;

@@ -87,7 +87,7 @@ namespace Spine {
         void setAttachmentTime(float inValue);
         
         Vector<float>& getAttachmentVertices();
-        void setAttachmentVertices(Vector<float> inValue);
+        void setAttachmentVertices(Vector<float>& inValue);
 
         String toString() const;
 

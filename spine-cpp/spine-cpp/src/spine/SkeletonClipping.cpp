@@ -49,12 +49,12 @@ namespace Spine {
         _clipAttachment = clip;
 
         int n = clip->getWorldVerticesLength();
-        _clippingPolygon.setSize(n);
+        _clippingPolygon.setSize(n, 0);
         clip->computeWorldVertices(slot, 0, n, _clippingPolygon, 0, 2);
         makeClockwise(_clippingPolygon);
         Vector< Vector<float>* > clippingPolygons = _triangulator.decompose(_clippingPolygon, _triangulator.triangulate(_clippingPolygon));
         
-        _clippingPolygons = clippingPolygons;
+        _clippingPolygons.clearAndAddAll(clippingPolygons);
         
         for (size_t i = 0; i < _clippingPolygons.size(); ++i) {
             Vector<float>* polygonP = _clippingPolygons[i];
@@ -123,8 +123,8 @@ namespace Spine {
                     float d = 1 / (d0 * d2 + d1 * (y1 - y3));
 
                     int clipOutputCount = clipOutputLength >> 1;
-                    clippedVertices.setSize(s + clipOutputCount * 2);
-                    _clippedUVs.setSize(s + clipOutputCount * 2);
+                    clippedVertices.setSize(s + clipOutputCount * 2, 0);
+                    _clippedUVs.setSize(s + clipOutputCount * 2, 0);
                     for (int ii = 0; ii < clipOutputLength; ii += 2) {
                         float x = clipOutput[ii], y = clipOutput[ii + 1];
                         clippedVertices[s] = x;
@@ -139,7 +139,7 @@ namespace Spine {
                     }
 
                     s = static_cast<int>(clippedTriangles.size());
-                    clippedTriangles.setSize(s + 3 * (clipOutputCount - 2));
+                    clippedTriangles.setSize(s + 3 * (clipOutputCount - 2), 0);
                     clipOutputCount--;
                     for (int ii = 1; ii < clipOutputCount; ii++) {
                         clippedTriangles[s] = index;
@@ -150,8 +150,8 @@ namespace Spine {
                     index += clipOutputCount + 1;
                 }
                 else {
-                    clippedVertices.setSize(s + 3 * 2);
-                    _clippedUVs.setSize(s + 3 * 2);
+                    clippedVertices.setSize(s + 3 * 2, 0);
+                    _clippedUVs.setSize(s + 3 * 2, 0);
                     clippedVertices[s] = x1;
                     clippedVertices[s + 1] = y1;
                     clippedVertices[s + 2] = x2;
@@ -167,7 +167,7 @@ namespace Spine {
                     _clippedUVs[s + 5] = v3;
 
                     s = static_cast<int>(clippedTriangles.size());
-                    clippedTriangles.setSize(s + 3);
+                    clippedTriangles.setSize(s + 3, 0);
                     clippedTriangles[s] = index;
                     clippedTriangles[s + 1] = index + 1;
                     clippedTriangles[s + 2] = index + 2;
@@ -283,7 +283,7 @@ namespace Spine {
             }
         }
         else {
-            originalOutput->setSize(originalOutput->size() - 2);
+            originalOutput->setSize(originalOutput->size() - 2, 0);
         }
 
         return clipped;

@@ -49,7 +49,7 @@ namespace Spine {
         const char* lastSlash = lastForwardSlash > lastBackwardSlash ? lastForwardSlash : lastBackwardSlash;
         if (lastSlash == path) lastSlash++; /* Never drop starting slash. */
         dirLength = (int)(lastSlash ? lastSlash - path.buffer() : 0);
-        dir = SpineExtension::alloc<char>(dirLength + 1, __FILE__, __LINE__);
+        dir = SpineExtension::calloc<char>(dirLength + 1, __FILE__, __LINE__);
         memcpy(dir, path.buffer(), dirLength);
         dir[dirLength] = '\0';
 
@@ -117,7 +117,7 @@ namespace Spine {
             }
             else if (!page) {
                 char* name = mallocString(&str);
-                char* path = SpineExtension::alloc<char>(dirLength + needsSlash + strlen(name) + 1, __FILE__, __LINE__);
+                char* path = SpineExtension::calloc<char>(dirLength + needsSlash + strlen(name) + 1, __FILE__, __LINE__);
                 memcpy(path, dir, dirLength);
                 if (needsSlash) {
                     path[dirLength] = '/';
@@ -198,7 +198,7 @@ namespace Spine {
 
                 if (count == 4) {
                     /* split is optional */
-                    region->splits.setSize(4);
+                    region->splits.setSize(4, 0);
                     region->splits[0] = toInt(tuple);
                     region->splits[1] = toInt(tuple + 1);
                     region->splits[2] = toInt(tuple + 2);
@@ -209,7 +209,7 @@ namespace Spine {
 
                     if (count == 4) {
                         /* pad is optional, but only present with splits */
-                        region->pads.setSize(4);
+                        region->pads.setSize(4, 0);
                         region->pads[0] = toInt(tuple);
                         region->pads[1] = toInt(tuple + 1);
                         region->pads[2] = toInt(tuple + 2);
@@ -328,7 +328,7 @@ namespace Spine {
 
     char* Atlas::mallocString(Str* str) {
         int length = (int)(str->end - str->begin);
-        char* string = SpineExtension::alloc<char>(length + 1, __FILE__, __LINE__);
+        char* string = SpineExtension::calloc<char>(length + 1, __FILE__, __LINE__);
         memcpy(string, str->begin, length);
         string[length] = '\0';
         return string;

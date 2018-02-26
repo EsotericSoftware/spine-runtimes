@@ -38,14 +38,15 @@
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
 #include <spine/Event.h>
+#include <spine/EventData.h>
 #include <spine/ContainerUtil.h>
 
 namespace Spine {
     RTTI_IMPL(EventTimeline, Timeline);
     
     EventTimeline::EventTimeline(int frameCount) : Timeline() {
-        _frames.setSize(frameCount);
-        _events.setSize(frameCount);
+        _frames.setSize(frameCount, 0);
+        _events.setSize(frameCount, NULL);
     }
     
     EventTimeline::~EventTimeline() {
@@ -110,8 +111,8 @@ namespace Spine {
     }
     
     Vector<float> EventTimeline::getFrames() { return _frames; }
-    void EventTimeline::setFrames(Vector<float>& inValue) { _frames = inValue; } // time, ...
+    void EventTimeline::setFrames(Vector<float>& inValue) { _frames.clear(); _frames.addAll(inValue); } // time, ...
     Vector<Event*>& EventTimeline::getEvents() { return _events; }
-    void EventTimeline::setEvents(Vector<Event*>& inValue) { _events = inValue; }
+    void EventTimeline::setEvents(Vector<Event*>& inValue) { _events.clear(); _events.addAll(inValue); }
     int EventTimeline::getFrameCount() { return static_cast<int>(_frames.size()); }
 }

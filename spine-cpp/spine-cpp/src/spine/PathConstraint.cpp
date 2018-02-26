@@ -64,7 +64,7 @@ namespace Spine {
             _bones.add(skeleton.findBone(boneData->getName()));
         }
 
-        _segments.setSize(10);
+        _segments.setSize(10, 0);
     }
     
     void PathConstraint::apply() {
@@ -94,11 +94,11 @@ namespace Spine {
         bool tangents = rotateMode == RotateMode_Tangent, scale = rotateMode == RotateMode_ChainScale;
         size_t boneCount = _bones.size();
         int spacesCount = static_cast<int>(tangents ? boneCount : boneCount + 1);
-        _spaces.setSize(spacesCount);
+        _spaces.setSize(spacesCount, 0);
         float spacing = _spacing;
         if (scale || lengthSpacing) {
             if (scale) {
-                _lengths.setSize(boneCount);
+                _lengths.setSize(boneCount, 0);
             }
             
             for (int i = 0, n = spacesCount - 1; i < n;) {
@@ -264,7 +264,7 @@ namespace Spine {
     Vector<float> PathConstraint::computeWorldPositions(PathAttachment& path, int spacesCount, bool tangents, bool percentPosition, bool percentSpacing) {
         Slot& target = *_target;
         float position = _position;
-        _positions.setSize(spacesCount * 3 + 2);
+        _positions.setSize(spacesCount * 3 + 2, 0);
         bool closed = path.isClosed();
         int verticesLength = path.getWorldVerticesLength();
         int curveCount = verticesLength / 6;
@@ -285,7 +285,7 @@ namespace Spine {
                 }
             }
 
-            _world.setSize(8);
+            _world.setSize(8, 0);
             for (int i = 0, o = 0, curve = 0; i < spacesCount; i++, o += 3) {
                 float space = _spaces[i];
                 position += space;
@@ -356,7 +356,7 @@ namespace Spine {
         // World vertices.
         if (closed) {
             verticesLength += 2;
-            _world.setSize(verticesLength);
+            _world.setSize(verticesLength, 0);
             path.computeWorldVertices(target, 2, verticesLength - 4, _world, 0);
             path.computeWorldVertices(target, 0, 2, _world, verticesLength - 4);
             _world[verticesLength - 2] = _world[0];
@@ -365,12 +365,12 @@ namespace Spine {
         else {
             curveCount--;
             verticesLength -= 4;
-            _world.setSize(verticesLength);
+            _world.setSize(verticesLength, 0);
             path.computeWorldVertices(target, 2, verticesLength, _world, 0);
         }
         
         // Curve lengths.
-        _curves.setSize(curveCount);
+        _curves.setSize(curveCount, 0);
         pathLength = 0;
         float x1 = _world[0], y1 = _world[1], cx1 = 0, cy1 = 0, cx2 = 0, cy2 = 0, x2 = 0, y2 = 0;
         float tmpx, tmpy, dddfx, dddfy, ddfx, ddfy, dfx, dfy;

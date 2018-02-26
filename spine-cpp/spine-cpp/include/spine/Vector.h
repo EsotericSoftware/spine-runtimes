@@ -54,7 +54,7 @@ namespace Spine {
             }
         }
 
-        Vector& operator=(const Vector& inVector) {
+        /*Vector& operator=(const Vector& inVector) {
             if (this != &inVector) {
                 clear();
                 deallocate(_buffer);
@@ -72,7 +72,7 @@ namespace Spine {
             }
 
             return *this;
-        }
+        }*/
 
         ~Vector() {
             clear();
@@ -91,13 +91,19 @@ namespace Spine {
             return _size;
         }
 
-        inline void setSize(size_t newSize) {
+        inline void setSize(size_t newSize, const T &defaultValue) {
             assert(newSize >= 0);
+            size_t oldSize = _size;
             _size = newSize;
             if (_capacity < newSize) {
                 _capacity = (int)(_size  * 1.75f);
                 if (_capacity < 8) _capacity = 8;
                 _buffer = Spine::SpineExtension::realloc<T>(_buffer, _capacity, __FILE__, __LINE__);
+            }
+            if (oldSize < _size) {
+                for (size_t i = oldSize; i < _size; i++) {
+                    construct(_buffer + i, defaultValue);
+                }
             }
         }
 
@@ -114,6 +120,18 @@ namespace Spine {
                 _buffer = Spine::SpineExtension::realloc<T>(_buffer, _capacity, __FILE__, __LINE__);
             }
             construct(_buffer + _size++, inValue);
+        }
+
+        inline void addAll(Vector<T> &inValue) {
+            ensureCapacity(this->size() + inValue.size());
+            for (size_t i = 0; i < inValue.size(); i++) {
+                add(inValue[i]);
+            }
+        }
+
+        inline void clearAndAddAll(Vector<T> &inValue) {
+            this->clear();
+            this->addAll(inValue);
         }
 
         inline void removeAt(size_t inIndex) {
@@ -198,7 +216,7 @@ namespace Spine {
         inline T* allocate(size_t n) {
             assert(n > 0);
 
-            T* ptr = SpineExtension::alloc<T>(n, __FILE__, __LINE__);
+            T* ptr = SpineExtension::calloc<T>(n, __FILE__, __LINE__);
 
             assert(ptr);
 
@@ -218,6 +236,8 @@ namespace Spine {
         inline void destroy(T* buffer) {
             buffer->~T();
         }
+
+        Vector& operator=(const Vector& inVector) { };
     };
 }
 

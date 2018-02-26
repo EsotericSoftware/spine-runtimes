@@ -51,11 +51,11 @@ namespace Spine {
     void VertexAttachment::computeWorldVertices(Slot& slot, int start, int count, Vector<float>& worldVertices, int offset, int stride) {
         count = offset + (count >> 1) * stride;
         Skeleton& skeleton = slot._bone._skeleton;
-        Vector<float>& deformArray = slot.getAttachmentVertices();
-        Vector<float>& vertices = _vertices;
+        Vector<float>* deformArray = &slot.getAttachmentVertices();
+        Vector<float>* vertices = &_vertices;
         Vector<int>& bones = _bones;
         if (bones.size() == 0) {
-            if (deformArray.size() > 0) {
+            if (deformArray->size() > 0) {
                 vertices = deformArray;
             }
             
@@ -64,8 +64,8 @@ namespace Spine {
             float y = bone._worldY;
             float a = bone._a, b = bone._b, c = bone._c, d = bone._d;
             for (int vv = start, w = offset; w < count; vv += 2, w += stride) {
-                float vx = vertices[vv];
-                float vy = vertices[vv + 1];
+                float vx = (*vertices)[vv];
+                float vy = (*vertices)[vv + 1];
                 worldVertices[w] = vx * a + vy * b + x;
                 worldVertices[w + 1] = vx * c + vy * d + y;
             }
@@ -80,7 +80,7 @@ namespace Spine {
         }
         
         Vector<Bone*>& skeletonBones = skeleton.getBones();
-        if (deformArray.size() == 0) {
+        if (deformArray->size() == 0) {
             for (int w = offset, b = skip * 3; w < count; w += stride) {
                 float wx = 0, wy = 0;
                 int n = bones[v++];
@@ -88,9 +88,9 @@ namespace Spine {
                 for (; v < n; v++, b += 3) {
                     Bone* boneP = skeletonBones[bones[v]];
                     Bone& bone = *boneP;
-                    float vx = vertices[b];
-                    float vy = vertices[b + 1];
-                    float weight = vertices[b + 2];
+                    float vx = (*vertices)[b];
+                    float vy = (*vertices)[b + 1];
+                    float weight = (*vertices)[b + 2];
                     wx += (vx * bone._a + vy * bone._b + bone._worldX) * weight;
                     wy += (vx * bone._c + vy * bone._d + bone._worldY) * weight;
                 }
@@ -106,9 +106,9 @@ namespace Spine {
                 for (; v < n; v++, b += 3, f += 2) {
                     Bone* boneP = skeletonBones[bones[v]];
                     Bone& bone = *boneP;
-                    float vx = vertices[b] + deformArray[f];
-                    float vy = vertices[b + 1] + deformArray[f + 1];
-                    float weight = vertices[b + 2];
+                    float vx = (*vertices)[b] + (*deformArray)[f];
+                    float vy = (*vertices)[b + 1] + (*deformArray)[f + 1];
+                    float weight = (*vertices)[b + 2];
                     wx += (vx * bone._a + vy * bone._b + bone._worldX) * weight;
                     wy += (vx * bone._c + vy * bone._d + bone._worldY) * weight;
                 }
@@ -131,7 +131,7 @@ namespace Spine {
     }
     
     void VertexAttachment::setBones(Vector<int> inValue) {
-        _bones = inValue;
+        _bones.clearAndAddAll(inValue);
     }
     
     Vector<float>& VertexAttachment::getVertices() {
@@ -139,7 +139,7 @@ namespace Spine {
     }
     
     void VertexAttachment::setVertices(Vector<float> inValue) {
-        _vertices = inValue;
+        _vertices.clearAndAddAll(inValue);
     }
     
     int VertexAttachment::getWorldVerticesLength() {

@@ -70,8 +70,8 @@ namespace Spine {
     _regionU2(0),
     _regionV2(0),
     _color(1, 1, 1, 1) {
-        _offset.setSize(NUM_UVS);
-        _uvs.setSize(NUM_UVS);
+        _vertexOffset.setSize(NUM_UVS, 0);
+        _uvs.setSize(NUM_UVS, 0);
     }
     
     void RegionAttachment::updateOffset() {
@@ -92,14 +92,14 @@ namespace Spine {
         float localY2Cos = localY2 * cos + _y;
         float localY2Sin = localY2 * sin;
         
-        _offset[BLX] = localXCos - localYSin;
-        _offset[BLY] = localYCos + localXSin;
-        _offset[ULX] = localXCos - localY2Sin;
-        _offset[ULY] = localY2Cos + localXSin;
-        _offset[URX] = localX2Cos - localY2Sin;
-        _offset[URY] = localY2Cos + localX2Sin;
-        _offset[BRX] = localX2Cos - localYSin;
-        _offset[BRY] = localYCos + localX2Sin;
+        _vertexOffset[BLX] = localXCos - localYSin;
+        _vertexOffset[BLY] = localYCos + localXSin;
+        _vertexOffset[ULX] = localXCos - localY2Sin;
+        _vertexOffset[ULY] = localY2Cos + localXSin;
+        _vertexOffset[URX] = localX2Cos - localY2Sin;
+        _vertexOffset[URY] = localY2Cos + localX2Sin;
+        _vertexOffset[BRX] = localX2Cos - localYSin;
+        _vertexOffset[BRY] = localYCos + localX2Sin;
     }
     
     void RegionAttachment::setUVs(float u, float v, float u2, float v2, bool rotate) {
@@ -127,33 +127,33 @@ namespace Spine {
     
     void RegionAttachment::computeWorldVertices(Bone& bone, Vector<float>& worldVertices, int offset, int stride) {
         assert(worldVertices.size() >= (offset + 8));
-        
-        float bwx = bone._worldX, bwy = bone._worldY;
-        float a = bone._a, b = bone._b, c = bone._c, d = bone._d;
+
+        float x = bone.getWorldX(), y = bone.getWorldY();
+        float a = bone.getA(), b = bone.getB(), c = bone.getC(), d = bone.getD();
         float offsetX, offsetY;
-        
-        offsetX = _offset[BRX]; // 0
-        offsetY = _offset[BRY]; // 1
-        worldVertices[offset] = offsetX * a + offsetY * b + bwx; // bl
-        worldVertices[offset + 1] = offsetX * c + offsetY * d + bwy;
+
+        offsetX = _vertexOffset[BRX];
+        offsetY = _vertexOffset[BRY];
+        worldVertices[offset] = offsetX * a + offsetY * b + x; // br
+        worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
         offset += stride;
-        
-        offsetX = _offset[BLX]; // 2
-        offsetY = _offset[BLY]; // 3
-        worldVertices[offset] = offsetX * a + offsetY * b + bwx; // ul
-        worldVertices[offset + 1] = offsetX * c + offsetY * d + bwy;
+
+        offsetX = _vertexOffset[BLX];
+        offsetY = _vertexOffset[BLY];
+        worldVertices[offset] = offsetX * a + offsetY * b + x; // bl
+        worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
         offset += stride;
-        
-        offsetX = _offset[ULX]; // 4
-        offsetY = _offset[ULY]; // 5
-        worldVertices[offset] = offsetX * a + offsetY * b + bwx; // ur
-        worldVertices[offset + 1] = offsetX * c + offsetY * d + bwy;
+
+        offsetX = _vertexOffset[ULX];
+        offsetY = _vertexOffset[ULY];
+        worldVertices[offset] = offsetX * a + offsetY * b + x; // ul
+        worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
         offset += stride;
-        
-        offsetX = _offset[URX]; // 6
-        offsetY = _offset[URY]; // 7
-        worldVertices[offset] = offsetX * a + offsetY * b + bwx; // br
-        worldVertices[offset + 1] = offsetX * c + offsetY * d + bwy;
+
+        offsetX = _vertexOffset[URX];
+        offsetY = _vertexOffset[URY];
+        worldVertices[offset] = offsetX * a + offsetY * b + x; // ur
+        worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
     }
     
     float RegionAttachment::getX() {
@@ -277,7 +277,7 @@ namespace Spine {
     }
     
     Vector<float>& RegionAttachment::getOffset() {
-        return _offset;
+        return _vertexOffset;
     }
     
     Vector<float>& RegionAttachment::getUVs() {

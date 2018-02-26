@@ -52,7 +52,7 @@ namespace Spine {
     
     TranslateTimeline::TranslateTimeline(int frameCount) : CurveTimeline(frameCount), _boneIndex(0) {
 		_frames.ensureCapacity(frameCount * ENTRIES);
-        _frames.setSize(frameCount * ENTRIES);
+        _frames.setSize(frameCount * ENTRIES, 0);
     }
 
     TranslateTimeline::~TranslateTimeline() {

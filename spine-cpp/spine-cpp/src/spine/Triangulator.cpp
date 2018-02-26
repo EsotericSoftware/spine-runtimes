@@ -39,14 +39,14 @@ namespace Spine {
         Vector<int>& indices = _indices;
         indices.clear();
 		indices.ensureCapacity(vertexCount);
-        indices.setSize(vertexCount);
+        indices.setSize(vertexCount, 0);
         for (int i = 0; i < vertexCount; ++i) {
             indices[i] = i;
         }
         
         Vector<bool>& isConcaveArray = _isConcaveArray;
 		isConcaveArray.ensureCapacity(vertexCount);
-        isConcaveArray.setSize(vertexCount);
+        isConcaveArray.setSize(vertexCount, 0);
         for (int i = 0, n = vertexCount; i < n; ++i) {
             isConcaveArray[i] = isConcave(i, vertexCount, vertices, indices);
         }
@@ -136,13 +136,11 @@ namespace Spine {
         }
         convexPolygonsIndices.clear();
         
-        Vector<int>* polygonIndicesP = _polygonIndicesPool.obtain();
-        Vector<int>& polygonIndices = *polygonIndicesP;
-        polygonIndices.clear();
+        Vector<int>* polygonIndices = _polygonIndicesPool.obtain();
+        polygonIndices->clear();
         
-        Vector<float>* polygonP = _polygonPool.obtain();
-        Vector<float>& polygon = *polygonP;
-        polygon.clear();
+        Vector<float>* polygon = _polygonPool.obtain();
+        polygon->clear();
         
         // Merge subsequent triangles if they form a triangle fan.
         int fanBaseIndex = -1, lastwinding = 0;
@@ -155,64 +153,63 @@ namespace Spine {
             // If the base of the last triangle is the same as this triangle, check if they form a convex polygon (triangle fan).
             bool merged = false;
             if (fanBaseIndex == t1) {
-                size_t o = polygon.size() - 4;
-                Vector<float>& p = polygon;
+                size_t o = polygon->size() - 4;
+                Vector<float>& p = *polygon;
                 int winding1 = winding(p[o], p[o + 1], p[o + 2], p[o + 3], x3, y3);
                 int winding2 = winding(x3, y3, p[0], p[1], p[2], p[3]);
                 if (winding1 == lastwinding && winding2 == lastwinding) {
-                    polygon.add(x3);
-                    polygon.add(y3);
-                    polygonIndices.add(t3);
+                    polygon->add(x3);
+                    polygon->add(y3);
+                    polygonIndices->add(t3);
                     merged = true;
                 }
             }
             
             // Otherwise make this triangle the new base.
             if (!merged) {
-                if (polygon.size() > 0) {
-                    convexPolygons.add(&polygon);
-                    convexPolygonsIndices.add(&polygonIndices);
+                if (polygon->size() > 0) {
+                    convexPolygons.add(polygon);
+                    convexPolygonsIndices.add(polygonIndices);
                 }
                 else {
-                    _polygonPool.free(&polygon);
-                    _polygonIndicesPool.free(&polygonIndices);
+                    _polygonPool.free(polygon);
+                    _polygonIndicesPool.free(polygonIndices);
                 }
                 
-                polygon = *_polygonPool.obtain();
-                polygon.clear();
-                polygon.add(x1);
-                polygon.add(y1);
-                polygon.add(x2);
-                polygon.add(y2);
-                polygon.add(x3);
-                polygon.add(y3);
-                polygonIndices = *_polygonIndicesPool.obtain();
-                polygonIndices.clear();
-                polygonIndices.add(t1);
-                polygonIndices.add(t2);
-                polygonIndices.add(t3);
+                polygon = _polygonPool.obtain();
+                polygon->clear();
+                polygon->add(x1);
+                polygon->add(y1);
+                polygon->add(x2);
+                polygon->add(y2);
+                polygon->add(x3);
+                polygon->add(y3);
+                polygonIndices = _polygonIndicesPool.obtain();
+                polygonIndices->clear();
+                polygonIndices->add(t1);
+                polygonIndices->add(t2);
+                polygonIndices->add(t3);
                 lastwinding = winding(x1, y1, x2, y2, x3, y3);
                 fanBaseIndex = t1;
             }
         }
         
-        if (polygon.size() > 0) {
-            convexPolygons.add(&polygon);
-            convexPolygonsIndices.add(&polygonIndices);
+        if (polygon->size() > 0) {
+            convexPolygons.add(polygon);
+            convexPolygonsIndices.add(polygonIndices);
         }
         
         // Go through the list of polygons and try to merge the remaining triangles with the found triangle fans.
         for (size_t i = 0, n = convexPolygons.size(); i < n; ++i) {
-            polygonIndicesP = convexPolygonsIndices[i];
-            polygonIndices = *polygonIndicesP;
+            polygonIndices = convexPolygonsIndices[i];
             
-            if (polygonIndices.size() == 0) continue;
-            int firstIndex = polygonIndices[0];
-            int lastIndex = polygonIndices[polygonIndices.size() - 1];
+            if (polygonIndices->size() == 0) continue;
+            int firstIndex = (*polygonIndices)[0];
+            int lastIndex = (*polygonIndices)[polygonIndices->size() - 1];
             
-            polygon = *convexPolygons[i];
-            size_t o = polygon.size() - 4;
-            Vector<float>& p = polygon;
+            polygon = convexPolygons[i];
+            size_t o = polygon->size() - 4;
+            Vector<float>& p = *polygon;
             float prevPrevX = p[o], prevPrevY = p[o + 1];
             float prevX = p[o + 2], prevY = p[o + 3];
             float firstX = p[0], firstY = p[1];
@@ -249,9 +246,9 @@ namespace Spine {
                 if (winding1 == winding0 && winding2 == winding0) {
                     otherPoly.clear();
                     otherIndices.clear();
-                    polygon.add(x3);
-                    polygon.add(y3);
-                    polygonIndices.add(otherLastIndex);
+                    polygon->add(x3);
+                    polygon->add(y3);
+                    polygonIndices->add(otherLastIndex);
                     prevPrevX = prevX;
                     prevPrevY = prevY;
                     prevX = x3;
@@ -263,13 +260,13 @@ namespace Spine {
         
         // Remove empty polygons that resulted from the merge step above.
         for (int i = static_cast<int>(convexPolygons.size()) - 1; i >= 0; --i) {
-            polygon = *convexPolygons[i];
-            if (polygon.size() == 0) {
+            polygon = convexPolygons[i];
+            if (polygon->size() == 0) {
                 convexPolygons.removeAt(i);
-                _polygonPool.free(&polygon);
-                polygonIndices = *convexPolygonsIndices[i];
+                _polygonPool.free(polygon);
+                polygonIndices = convexPolygonsIndices[i];
                 convexPolygonsIndices.removeAt(i);
-                _polygonIndicesPool.free(&polygonIndices);
+                _polygonIndicesPool.free(polygonIndices);
             }
         }
         
