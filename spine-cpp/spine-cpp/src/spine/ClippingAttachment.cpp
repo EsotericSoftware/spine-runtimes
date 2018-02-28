@@ -33,24 +33,24 @@
 #include <spine/SlotData.h>
 
 namespace Spine {
-    RTTI_IMPL(ClippingAttachment, VertexAttachment);
-    
-    ClippingAttachment::ClippingAttachment(const String& name) : VertexAttachment(name), _endSlot(NULL) {
-    }
-    
-    SlotData* ClippingAttachment::getEndSlot() {
-        return _endSlot;
-    }
-    
-    void ClippingAttachment::setEndSlot(SlotData* inValue) {
-        _endSlot = inValue;
-    }
+RTTI_IMPL(ClippingAttachment, VertexAttachment);
 
-    String ClippingAttachment::toString() const {
-        String str;
-        str.append("Clipping { name: ").appendString(getName());
-        str.append(", worldVerticesLength: ").append(_worldVerticesLength);
-        str.append(", bones: ").append(_bones).append(", weights: ").append(_vertices).append(" }");
-        return str;
-    }
+ClippingAttachment::ClippingAttachment(const String &name) : VertexAttachment(name), _endSlot(NULL) {
+}
+
+SlotData *ClippingAttachment::getEndSlot() {
+	return _endSlot;
+}
+
+void ClippingAttachment::setEndSlot(SlotData *inValue) {
+	_endSlot = inValue;
+}
+
+String ClippingAttachment::toString() const {
+	String str;
+	str.append("Clipping { name: ").appendString(getName());
+	str.append(", worldVerticesLength: ").append(_worldVerticesLength);
+	str.append(", bones: ").append(_bones).append(", weights: ").append(_vertices).append(" }");
+	return str;
+}
 }

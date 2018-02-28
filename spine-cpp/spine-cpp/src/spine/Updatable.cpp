@@ -31,11 +31,11 @@
 #include <spine/Updatable.h>
 
 namespace Spine {
-    RTTI_IMPL_NOPARENT(Updatable);
-    
-    Updatable::Updatable() {
-    }
-    
-    Updatable::~Updatable() {
-    }
+RTTI_IMPL_NOPARENT(Updatable);
+
+Updatable::Updatable() {
+}
+
+Updatable::~Updatable() {
+}
 }

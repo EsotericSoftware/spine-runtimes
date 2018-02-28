@@ -41,21 +41,23 @@
 
 namespace Spine {
 
-class SkeletonDrawable: public sf::Drawable {
+class SkeletonDrawable : public sf::Drawable {
 public:
-	Skeleton* skeleton;
-	AnimationState* state;
+	Skeleton *skeleton;
+	AnimationState *state;
 	float timeScale;
-	sf::VertexArray* vertexArray;
+	sf::VertexArray *vertexArray;
 
-	SkeletonDrawable (SkeletonData* skeleton, AnimationStateData* stateData = 0);
-	~SkeletonDrawable ();
+	SkeletonDrawable(SkeletonData *skeleton, AnimationStateData *stateData = 0);
 
-	void update (float deltaTime);
+	~SkeletonDrawable();
 
-	virtual void draw (sf::RenderTarget& target, sf::RenderStates states) const ;
+	void update(float deltaTime);
+
+	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 
 	void setUsePremultipliedAlpha(bool usePMA) { usePremultipliedAlpha = usePMA; };
+
 	bool getUsePremultipliedAlpha() { return usePremultipliedAlpha; };
 private:
 	mutable bool ownsAnimationStateData;
@@ -66,11 +68,11 @@ private:
 	mutable bool usePremultipliedAlpha;
 };
 
-class SFMLTextureLoader: public TextureLoader {
+class SFMLTextureLoader : public TextureLoader {
 public:
-	virtual void load(AtlasPage& page, const String& path);
+	virtual void load(AtlasPage &page, const String &path);
 
-	virtual void unload(void* texture);
+	virtual void unload(void *texture);
 
 	String toString() const;
 };

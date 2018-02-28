@@ -35,35 +35,40 @@
 #include <spine/String.h>
 
 namespace Spine {
-    /// Stores the setup pose values for an Event.
-    class EventData : public SpineObject {
-        friend class SkeletonBinary;
-        friend class SkeletonJson;
-        friend class Event;
-        
-    public:
-        explicit EventData(const String& name);
-        
-        /// The name of the event, which is unique within the skeleton.
-        const String& getName() const;
-        
-        int getIntValue();
-        void setIntValue(int inValue);
-        
-        float getFloatValue();
-        void setFloatValue(float inValue);
-        
-        const String& getStringValue();
-        void setStringValue(const String& inValue);
+/// Stores the setup pose values for an Event.
+class EventData : public SpineObject {
+	friend class SkeletonBinary;
 
-        String toString() const;
+	friend class SkeletonJson;
 
-    private:
-        const String _name;
-        int _intValue;
-        float _floatValue;
-        String _stringValue;
-    };
+	friend class Event;
+
+public:
+	explicit EventData(const String &name);
+
+	/// The name of the event, which is unique within the skeleton.
+	const String &getName() const;
+
+	int getIntValue();
+
+	void setIntValue(int inValue);
+
+	float getFloatValue();
+
+	void setFloatValue(float inValue);
+
+	const String &getStringValue();
+
+	void setStringValue(const String &inValue);
+
+	String toString() const;
+
+private:
+	const String _name;
+	int _intValue;
+	float _floatValue;
+	String _stringValue;
+};
 }
 
 #endif /* Spine_EventData_h */

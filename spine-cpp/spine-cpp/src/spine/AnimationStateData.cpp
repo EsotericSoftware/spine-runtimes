@@ -34,76 +34,77 @@
 #include <spine/Animation.h>
 
 namespace Spine {
-    AnimationStateData::AnimationStateData(SkeletonData* skeletonData) : _skeletonData(skeletonData), _defaultMix(0) {
-    }
-    
-    void AnimationStateData::setMix(const String& fromName, const String& toName, float duration) {
-        Animation* from = _skeletonData->findAnimation(fromName);
-        Animation* to = _skeletonData->findAnimation(toName);
-        
-        setMix(from, to, duration);
-    }
-    
-    void AnimationStateData::setMix(Animation* from, Animation* to, float duration) {
-        assert(from != NULL);
-        assert(to != NULL);
-        
-        AnimationPair key(from, to);
-        _animationToMixTime.put(key, duration);
-    }
-    
-    float AnimationStateData::getMix(Animation* from, Animation* to) {
-        assert(from != NULL);
-        assert(to != NULL);
-        
-        AnimationPair key(from, to);
-        
-        if (_animationToMixTime.containsKey(key)) return _animationToMixTime[key];
-        return _defaultMix;
-    }
-    
-    SkeletonData* AnimationStateData::getSkeletonData() {
-        return _skeletonData;
-    }
-    
-    float AnimationStateData::getDefaultMix() {
-        return _defaultMix;
-    }
-    
-    void AnimationStateData::setDefaultMix(float inValue) {
-        _defaultMix = inValue;
-    }
+AnimationStateData::AnimationStateData(SkeletonData *skeletonData) : _skeletonData(skeletonData), _defaultMix(0) {
+}
 
-    String AnimationStateData::toString() const {
-        return String("AnimationStateData");
-    }
+void AnimationStateData::setMix(const String &fromName, const String &toName, float duration) {
+	Animation *from = _skeletonData->findAnimation(fromName);
+	Animation *to = _skeletonData->findAnimation(toName);
 
-    AnimationStateData::AnimationPair::AnimationPair(Animation* a1, Animation* a2) : _a1(a1), _a2(a2) {
-    }
-    
-    bool AnimationStateData::AnimationPair::operator==(const AnimationPair &other) const {
-        return _a1->_name == other._a1->_name && _a2->_name == other._a2->_name;
-    }
+	setMix(from, to, duration);
+}
 
-    String AnimationStateData::AnimationPair::toString() const {
-        String str;
-        str.append("AnimationPair { ").append(_a1->_name).append(" -> ").append(_a2->_name).append(" } ");
-        return str;
-    }
+void AnimationStateData::setMix(Animation *from, Animation *to, float duration) {
+	assert(from != NULL);
+	assert(to != NULL);
 
-    std::size_t AnimationStateData::HashAnimationPair::operator()(const Spine::AnimationStateData::AnimationPair& val) const {
-        std::size_t h1 = 7;
-        size_t strlen = val._a1->_name.length();
-        for (int i = 0; i < strlen; ++i) {
-            h1 = h1 * 31 + val._a1->_name.buffer()[i];
-        }
-        
-        std::size_t h2 = 7;
-        strlen = val._a2->_name.length();
-        for (int i = 0; i < strlen; ++i) {
-            h2 = h2 * 31 + val._a2->_name.buffer()[i];
-        }
-        
-        return (((h1 << 5) + h1) ^ h2);
-    }
+	AnimationPair key(from, to);
+	_animationToMixTime.put(key, duration);
+}
+
+float AnimationStateData::getMix(Animation *from, Animation *to) {
+	assert(from != NULL);
+	assert(to != NULL);
+
+	AnimationPair key(from, to);
+
+	if (_animationToMixTime.containsKey(key)) return _animationToMixTime[key];
+	return _defaultMix;
+}
+
+SkeletonData *AnimationStateData::getSkeletonData() {
+	return _skeletonData;
+}
+
+float AnimationStateData::getDefaultMix() {
+	return _defaultMix;
+}
+
+void AnimationStateData::setDefaultMix(float inValue) {
+	_defaultMix = inValue;
+}
+
+String AnimationStateData::toString() const {
+	return String("AnimationStateData");
+}
+
+AnimationStateData::AnimationPair::AnimationPair(Animation *a1, Animation *a2) : _a1(a1), _a2(a2) {
+}
+
+bool AnimationStateData::AnimationPair::operator==(const AnimationPair &other) const {
+	return _a1->_name == other._a1->_name && _a2->_name == other._a2->_name;
+}
+
+String AnimationStateData::AnimationPair::toString() const {
+	String str;
+	str.append("AnimationPair { ").append(_a1->_name).append(" -> ").append(_a2->_name).append(" } ");
+	return str;
+}
+
+std::size_t
+AnimationStateData::HashAnimationPair::operator()(const Spine::AnimationStateData::AnimationPair &val) const {
+	std::size_t h1 = 7;
+	size_t strlen = val._a1->_name.length();
+	for (int i = 0; i < strlen; ++i) {
+		h1 = h1 * 31 + val._a1->_name.buffer()[i];
+	}
+
+	std::size_t h2 = 7;
+	strlen = val._a2->_name.length();
+	for (int i = 0; i < strlen; ++i) {
+		h2 = h2 * 31 + val._a2->_name.buffer()[i];
+	}
+
+	return (((h1 << 5) + h1) ^ h2);
+}
 }

@@ -35,16 +35,16 @@
 #include <spine/SpineObject.h>
 
 namespace Spine {
-    class Updatable : public SpineObject {
-        RTTI_DECL
-        
-    public:
-        Updatable();
-        
-        virtual ~Updatable();
-        
-        virtual void update() = 0;
-    };
+class Updatable : public SpineObject {
+RTTI_DECL
+
+public:
+	Updatable();
+
+	virtual ~Updatable();
+
+	virtual void update() = 0;
+};
 }
 
 #endif /* Spine_Updatable_h */

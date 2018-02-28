@@ -32,18 +32,18 @@
 #define Spine_MixPose_h
 
 namespace Spine {
-    ///
-    /// Controls how a timeline is mixed with the setup or current pose.
-    /// See also Timeline::apply(Skeleton&, float, float, Vector&, float, MixPose, MixDirection)
-    enum MixPose {
-        ///  The timeline value is mixed with the setup pose (the current pose is not used).
-        MixPose_Setup = 0,
-        ///  The timeline value is mixed with the current pose. The setup pose is used as the timeline value before the first key,
-        /// except for timelines which perform instant transitions, such as DrawOrderTimeline or AttachmentTimeline.
-        MixPose_Current,
-        ///  The timeline value is mixed with the current pose. No change is made before the first key (the current pose is kept until the first key).
-        MixPose_CurrentLayered
-    };
+///
+/// Controls how a timeline is mixed with the setup or current pose.
+/// See also Timeline::apply(Skeleton&, float, float, Vector&, float, MixPose, MixDirection)
+enum MixPose {
+	///  The timeline value is mixed with the setup pose (the current pose is not used).
+			MixPose_Setup = 0,
+	///  The timeline value is mixed with the current pose. The setup pose is used as the timeline value before the first key,
+	/// except for timelines which perform instant transitions, such as DrawOrderTimeline or AttachmentTimeline.
+			MixPose_Current,
+	///  The timeline value is mixed with the current pose. No change is made before the first key (the current pose is kept until the first key).
+			MixPose_CurrentLayered
+};
 }
 
 #endif /* Spine_MixPose_h */

@@ -33,64 +33,64 @@
 #include <assert.h>
 
 namespace Spine {
-    SlotData::SlotData(int index, const String& name, BoneData& boneData) :
-    _index(index),
-    _name(name),
-    _boneData(boneData),
-    _color(1, 1, 1, 1),
-    _darkColor(0, 0, 0, 0),
-    _hasDarkColor(false),
-    _attachmentName(),
-    _blendMode(BlendMode_Normal) {
-        assert(_index >= 0);
-        assert(_name.length() > 0);
-    }
-    
-    int SlotData::getIndex() {
-        return _index;
-    }
-    
-    const String& SlotData::getName() {
-        return _name;
-    }
-    
-    BoneData& SlotData::getBoneData() {
-        return _boneData;
-    }
+SlotData::SlotData(int index, const String &name, BoneData &boneData) :
+		_index(index),
+		_name(name),
+		_boneData(boneData),
+		_color(1, 1, 1, 1),
+		_darkColor(0, 0, 0, 0),
+		_hasDarkColor(false),
+		_attachmentName(),
+		_blendMode(BlendMode_Normal) {
+	assert(_index >= 0);
+	assert(_name.length() > 0);
+}
 
-    Color& SlotData::getColor() {
-        return _color;
-    }
+int SlotData::getIndex() {
+	return _index;
+}
 
-    Color& SlotData::getDarkColor() {
-        return _darkColor;
-    }
+const String &SlotData::getName() {
+	return _name;
+}
 
-    bool SlotData::hasDarkColor() {
-        return _hasDarkColor;
-    }
+BoneData &SlotData::getBoneData() {
+	return _boneData;
+}
 
-    void SlotData::setHasDarkColor(bool inValue) {
-        _hasDarkColor = inValue;
-    }
-    
-    const String& SlotData::getAttachmentName() {
-        return _attachmentName;
-    }
-    
-    void SlotData::setAttachmentName(const String& inValue) {
-        _attachmentName = inValue;
-    }
-    
-    BlendMode SlotData::getBlendMode() {
-        return _blendMode;
-    }
-    
-    void SlotData::setBlendMode(BlendMode inValue) {
-        _blendMode = inValue;
-    }
+Color &SlotData::getColor() {
+	return _color;
+}
 
-    String SlotData::toString() const {
-        return String("SlotData");
-    }
+Color &SlotData::getDarkColor() {
+	return _darkColor;
+}
+
+bool SlotData::hasDarkColor() {
+	return _hasDarkColor;
+}
+
+void SlotData::setHasDarkColor(bool inValue) {
+	_hasDarkColor = inValue;
+}
+
+const String &SlotData::getAttachmentName() {
+	return _attachmentName;
+}
+
+void SlotData::setAttachmentName(const String &inValue) {
+	_attachmentName = inValue;
+}
+
+BlendMode SlotData::getBlendMode() {
+	return _blendMode;
+}
+
+void SlotData::setBlendMode(BlendMode inValue) {
+	_blendMode = inValue;
+}
+
+String SlotData::toString() const {
+	return String("SlotData");
+}
 }

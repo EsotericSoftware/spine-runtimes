@@ -36,95 +36,94 @@
 #include <spine/Attachment.h>
 
 namespace Spine {
-    Slot::Slot(SlotData& data, Bone& bone) :
-    _data(data),
-    _bone(bone),
-    _skeleton(bone.getSkeleton()),
-    _color(1, 1, 1, 1),
-    _darkColor(0, 0, 0, 0),
-    _hasDarkColor(false),
-    _attachment(NULL),
-    _attachmentTime(0) {
-        setToSetupPose();
-    }
-    
-    void Slot::setToSetupPose() {
-        _color.set(_data.getColor());
-        
-        const String& attachmentName = _data.getAttachmentName();
-        if (attachmentName.length() > 0) {
-            _attachment = NULL;
-            setAttachment(_skeleton.getAttachment(_data.getIndex(), attachmentName));
-        }
-        else {
-            setAttachment(NULL);
-        }
-    }
-    
-    SlotData& Slot::getData() {
-        return _data;
-    }
-    
-    Bone& Slot::getBone() {
-        return _bone;
-    }
-    
-    Skeleton& Slot::getSkeleton() {
-        return _skeleton;
-    }
-    
-    Color& Slot::getColor() {
-        return _color;
-    }
+Slot::Slot(SlotData &data, Bone &bone) :
+		_data(data),
+		_bone(bone),
+		_skeleton(bone.getSkeleton()),
+		_color(1, 1, 1, 1),
+		_darkColor(0, 0, 0, 0),
+		_hasDarkColor(false),
+		_attachment(NULL),
+		_attachmentTime(0) {
+	setToSetupPose();
+}
 
-    Color& Slot::getDarkColor() {
-        return _darkColor;
-    }
-    
-    bool Slot::hasDarkColor() {
-        return _hasDarkColor;
-    }
-    
-    void Slot::setHasDarkColor(bool inValue) {
-        _hasDarkColor = inValue;
-    }
-    
-    Attachment* Slot::getAttachment() {
-        return _attachment;
-    }
-    
-    void Slot::setAttachment(Attachment* inValue) {
-        if (_attachment == inValue) {
-            return;
-        }
-        
-        _attachment = inValue;
-        _attachmentTime = _skeleton.getTime();
-        _attachmentVertices.clear();
-    }
-    
-    float Slot::getAttachmentTime() {
-        return _skeleton.getTime() - _attachmentTime;
-    }
-    
-    void Slot::setAttachmentTime(float inValue) {
-        _attachmentTime = _skeleton.getTime() - inValue;
-    }
-    
-    Vector<float>& Slot::getAttachmentVertices() {
-        return _attachmentVertices;
-    }
-    
-    void Slot::setAttachmentVertices(Vector<float>& inValue) {
-        _attachmentVertices.clearAndAddAll(inValue);
-    }
+void Slot::setToSetupPose() {
+	_color.set(_data.getColor());
 
-    String Slot::toString() const {
-        String str;
-        str.append("Slot { name: ").appendString(_data.getName());
-        str.append(", color: ").appendString(_color.toString());
-        if (_hasDarkColor) str.append(", darkColor: ").appendString(_darkColor.toString());
-        str.append("}");
-        return str;
-    }
+	const String &attachmentName = _data.getAttachmentName();
+	if (attachmentName.length() > 0) {
+		_attachment = NULL;
+		setAttachment(_skeleton.getAttachment(_data.getIndex(), attachmentName));
+	} else {
+		setAttachment(NULL);
+	}
+}
+
+SlotData &Slot::getData() {
+	return _data;
+}
+
+Bone &Slot::getBone() {
+	return _bone;
+}
+
+Skeleton &Slot::getSkeleton() {
+	return _skeleton;
+}
+
+Color &Slot::getColor() {
+	return _color;
+}
+
+Color &Slot::getDarkColor() {
+	return _darkColor;
+}
+
+bool Slot::hasDarkColor() {
+	return _hasDarkColor;
+}
+
+void Slot::setHasDarkColor(bool inValue) {
+	_hasDarkColor = inValue;
+}
+
+Attachment *Slot::getAttachment() {
+	return _attachment;
+}
+
+void Slot::setAttachment(Attachment *inValue) {
+	if (_attachment == inValue) {
+		return;
+	}
+
+	_attachment = inValue;
+	_attachmentTime = _skeleton.getTime();
+	_attachmentVertices.clear();
+}
+
+float Slot::getAttachmentTime() {
+	return _skeleton.getTime() - _attachmentTime;
+}
+
+void Slot::setAttachmentTime(float inValue) {
+	_attachmentTime = _skeleton.getTime() - inValue;
+}
+
+Vector<float> &Slot::getAttachmentVertices() {
+	return _attachmentVertices;
+}
+
+void Slot::setAttachmentVertices(Vector<float> &inValue) {
+	_attachmentVertices.clearAndAddAll(inValue);
+}
+
+String Slot::toString() const {
+	String str;
+	str.append("Slot { name: ").appendString(_data.getName());
+	str.append(", color: ").appendString(_color.toString());
+	if (_hasDarkColor) str.append(", darkColor: ").appendString(_darkColor.toString());
+	str.append("}");
+	return str;
+}
 }

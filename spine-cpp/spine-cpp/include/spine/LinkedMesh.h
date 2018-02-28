@@ -35,22 +35,24 @@
 #include <spine/String.h>
 
 namespace Spine {
-    class MeshAttachment;
-    
-    class LinkedMesh : public SpineObject {
-        friend class SkeletonBinary;
-        friend class SkeletonJson;
-        
-    public:
-        LinkedMesh(MeshAttachment* mesh, const String& skin, int slotIndex, const String& parent);
+class MeshAttachment;
 
-        String toString() const;
-    private:
-        MeshAttachment* _mesh;
-        String _skin;
-        int _slotIndex;
-        String _parent;
-    };
+class LinkedMesh : public SpineObject {
+	friend class SkeletonBinary;
+
+	friend class SkeletonJson;
+
+public:
+	LinkedMesh(MeshAttachment *mesh, const String &skin, int slotIndex, const String &parent);
+
+	String toString() const;
+
+private:
+	MeshAttachment *_mesh;
+	String _skin;
+	int _slotIndex;
+	String _parent;
+};
 }
 
 #endif /* Spine_LinkedMesh_h */

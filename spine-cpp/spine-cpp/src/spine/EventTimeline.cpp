@@ -37,82 +37,89 @@
 #include <spine/TimelineType.h>
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
-#include <spine/Event.h>
 #include <spine/EventData.h>
 #include <spine/ContainerUtil.h>
 
 namespace Spine {
-    RTTI_IMPL(EventTimeline, Timeline);
-    
-    EventTimeline::EventTimeline(int frameCount) : Timeline() {
-        _frames.setSize(frameCount, 0);
-        _events.setSize(frameCount, NULL);
-    }
-    
-    EventTimeline::~EventTimeline() {
-        ContainerUtil::cleanUpVectorOfPointers(_events);
-    }
-    
-    void EventTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
-        if (pEvents == NULL) {
-            return;
-        }
-        
-        Vector<Event*>& events = *pEvents;
-        
-        if (events.size() == 0) {
-            return;
-        }
-        
-        int frameCount = static_cast<int>(_frames.size());
-        
-        if (lastTime > time) {
-            // Fire events after last time for looped animations.
-            apply(skeleton, lastTime, std::numeric_limits<int>::max(), pEvents, alpha, pose, direction);
-            lastTime = -1.0f;
-        }
-        else if (lastTime >= _frames[frameCount - 1]) {
-            // Last time is after last frame.
-            return;
-        }
-       
-        if (time < _frames[0]) {
-            return; // Time is before first frame.
-        }
-        
-        int frame;
-        if (lastTime < _frames[0]) {
-            frame = 0;
-        }
-        else {
-            frame = Animation::binarySearch(_frames, lastTime);
-            float frameTime = _frames[frame];
-            while (frame > 0) {
-                // Fire multiple events with the same frame.
-                if (_frames[frame - 1] != frameTime) {
-                    break;
-                }
-                frame--;
-            }
-        }
-        
-        for (; frame < frameCount && time >= _frames[frame]; ++frame) {
-            events.add(_events[frame]);
-        }
-    }
-    
-    int EventTimeline::getPropertyId() {
-        return ((int)TimelineType_Event << 24);
-    }
-    
-    void EventTimeline::setFrame(int frameIndex, Event* event) {
-        _frames[frameIndex] = event->getTime();
-        _events[frameIndex] = event;
-    }
-    
-    Vector<float> EventTimeline::getFrames() { return _frames; }
-    void EventTimeline::setFrames(Vector<float>& inValue) { _frames.clear(); _frames.addAll(inValue); } // time, ...
-    Vector<Event*>& EventTimeline::getEvents() { return _events; }
-    void EventTimeline::setEvents(Vector<Event*>& inValue) { _events.clear(); _events.addAll(inValue); }
-    int EventTimeline::getFrameCount() { return static_cast<int>(_frames.size()); }
+RTTI_IMPL(EventTimeline, Timeline);
+
+EventTimeline::EventTimeline(int frameCount) : Timeline() {
+	_frames.setSize(frameCount, 0);
+	_events.setSize(frameCount, NULL);
+}
+
+EventTimeline::~EventTimeline() {
+	ContainerUtil::cleanUpVectorOfPointers(_events);
+}
+
+void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
+						  MixPose pose, MixDirection direction) {
+	if (pEvents == NULL) {
+		return;
+	}
+
+	Vector<Event *> &events = *pEvents;
+
+	if (events.size() == 0) {
+		return;
+	}
+
+	int frameCount = static_cast<int>(_frames.size());
+
+	if (lastTime > time) {
+		// Fire events after last time for looped animations.
+		apply(skeleton, lastTime, std::numeric_limits<int>::max(), pEvents, alpha, pose, direction);
+		lastTime = -1.0f;
+	} else if (lastTime >= _frames[frameCount - 1]) {
+		// Last time is after last frame.
+		return;
+	}
+
+	if (time < _frames[0]) {
+		return; // Time is before first frame.
+	}
+
+	int frame;
+	if (lastTime < _frames[0]) {
+		frame = 0;
+	} else {
+		frame = Animation::binarySearch(_frames, lastTime);
+		float frameTime = _frames[frame];
+		while (frame > 0) {
+			// Fire multiple events with the same frame.
+			if (_frames[frame - 1] != frameTime) {
+				break;
+			}
+			frame--;
+		}
+	}
+
+	for (; frame < frameCount && time >= _frames[frame]; ++frame) {
+		events.add(_events[frame]);
+	}
+}
+
+int EventTimeline::getPropertyId() {
+	return ((int) TimelineType_Event << 24);
+}
+
+void EventTimeline::setFrame(int frameIndex, Event *event) {
+	_frames[frameIndex] = event->getTime();
+	_events[frameIndex] = event;
+}
+
+Vector<float> EventTimeline::getFrames() { return _frames; }
+
+void EventTimeline::setFrames(Vector<float> &inValue) {
+	_frames.clear();
+	_frames.addAll(inValue);
+} // time, ...
+Vector<Event *> &EventTimeline::getEvents() { return _events; }
+
+void EventTimeline::setEvents(Vector<Event *> &inValue) {
+	_events.clear();
+	_events.addAll(inValue);
+}
+
+int EventTimeline::getFrameCount() { return static_cast<int>(_frames.size()); }
 }

@@ -38,70 +38,96 @@
 #include <string>
 
 namespace Spine {
-    class SlotData;
-    class Bone;
-    class Skeleton;
-    class Attachment;
-    
-    class Slot : public SpineObject {
-        friend class VertexAttachment;
-        friend class Skeleton;
-        friend class SkeletonBounds;
-        friend class SkeletonClipping;
-        
-        friend class AttachmentTimeline;
-        friend class ColorTimeline;
-        friend class DeformTimeline;
-        friend class DrawOrderTimeline;
-        friend class EventTimeline;
-        friend class IkConstraintTimeline;
-        friend class PathConstraintMixTimeline;
-        friend class PathConstraintPositionTimeline;
-        friend class PathConstraintSpacingTimeline;
-        friend class ScaleTimeline;
-        friend class ShearTimeline;
-        friend class TransformConstraintTimeline;
-        friend class TranslateTimeline;
-        friend class TwoColorTimeline;
-        
-    public:
-        Slot(SlotData& data, Bone& bone);
-        
-        void setToSetupPose();
-        
-        SlotData& getData();
-        Bone& getBone();
-        Skeleton& getSkeleton();
-        
-        Color& getColor();
-        Color& getDarkColor();
+class SlotData;
 
-        bool hasDarkColor();
-        void setHasDarkColor(bool inValue);
-        
-        /// May be NULL.
-        Attachment* getAttachment();
-        void setAttachment(Attachment* inValue);
-        
-        float getAttachmentTime();
-        void setAttachmentTime(float inValue);
-        
-        Vector<float>& getAttachmentVertices();
-        void setAttachmentVertices(Vector<float>& inValue);
+class Bone;
 
-        String toString() const;
+class Skeleton;
 
-    private:
-        SlotData& _data;
-        Bone& _bone;
-        Skeleton& _skeleton;
-        Color _color;
-        Color _darkColor;
-        bool _hasDarkColor;
-        Attachment* _attachment;
-        float _attachmentTime;
-        Vector<float> _attachmentVertices;
-    };
+class Attachment;
+
+class Slot : public SpineObject {
+	friend class VertexAttachment;
+
+	friend class Skeleton;
+
+	friend class SkeletonBounds;
+
+	friend class SkeletonClipping;
+
+	friend class AttachmentTimeline;
+
+	friend class ColorTimeline;
+
+	friend class DeformTimeline;
+
+	friend class DrawOrderTimeline;
+
+	friend class EventTimeline;
+
+	friend class IkConstraintTimeline;
+
+	friend class PathConstraintMixTimeline;
+
+	friend class PathConstraintPositionTimeline;
+
+	friend class PathConstraintSpacingTimeline;
+
+	friend class ScaleTimeline;
+
+	friend class ShearTimeline;
+
+	friend class TransformConstraintTimeline;
+
+	friend class TranslateTimeline;
+
+	friend class TwoColorTimeline;
+
+public:
+	Slot(SlotData &data, Bone &bone);
+
+	void setToSetupPose();
+
+	SlotData &getData();
+
+	Bone &getBone();
+
+	Skeleton &getSkeleton();
+
+	Color &getColor();
+
+	Color &getDarkColor();
+
+	bool hasDarkColor();
+
+	void setHasDarkColor(bool inValue);
+
+	/// May be NULL.
+	Attachment *getAttachment();
+
+	void setAttachment(Attachment *inValue);
+
+	float getAttachmentTime();
+
+	void setAttachmentTime(float inValue);
+
+	Vector<float> &getAttachmentVertices();
+
+	void setAttachmentVertices(Vector<float> &inValue);
+
+	String toString() const;
+
+private:
+	SlotData &_data;
+	Bone &_bone;
+	Skeleton &_skeleton;
+	Color _color;
+	Color _darkColor;
+	bool _hasDarkColor;
+	Attachment *_attachment;
+	float _attachmentTime;
+	Vector<float> _attachmentVertices;
+};
 }
 
 #endif /* Spine_Slot_h */

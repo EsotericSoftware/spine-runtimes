@@ -39,89 +39,90 @@
 #include <spine/SlotData.h>
 
 namespace Spine {
-    RTTI_IMPL(AttachmentTimeline, Timeline);
-    
-    AttachmentTimeline::AttachmentTimeline(int frameCount) : Timeline(), _slotIndex(0) {
-        _frames.ensureCapacity(frameCount);
-        _attachmentNames.ensureCapacity(frameCount);
-        
-        _frames.setSize(frameCount, 0);
-        
-        for (int i = 0; i < frameCount; ++i) {
-            _attachmentNames.add(String());
-        }
-    }
-    
-    void AttachmentTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
-        assert(_slotIndex < skeleton._slots.size());
+RTTI_IMPL(AttachmentTimeline, Timeline);
 
-        String* attachmentName;
-        Slot* slotP = skeleton._slots[_slotIndex];
-        Slot& slot = *slotP;
-        if (direction == MixDirection_Out && pose == MixPose_Setup) {
-            attachmentName = &slot._data._attachmentName;
-            slot._attachment = attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName);
-            return;
-        }
-        
-        if (time < _frames[0]) {
-            // Time is before first frame.
-            if (pose == MixPose_Setup) {
-                attachmentName = &slot._data._attachmentName;
-                slot._attachment = attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName);
-            }
-            return;
-        }
-        
-        int frameIndex;
-        if (time >= _frames[_frames.size() - 1]) {
-            // Time is after last frame.
-            frameIndex = static_cast<int>(_frames.size()) - 1;
-        }
-        else {
-            frameIndex = Animation::binarySearch(_frames, time, 1) - 1;
-        }
-        
-        attachmentName = &_attachmentNames[frameIndex];
-        slot._attachment = attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName);
-    }
-    
-    int AttachmentTimeline::getPropertyId() {
-        return ((int)TimelineType_Attachment << 24) + _slotIndex;
-    }
-    
-    void AttachmentTimeline::setFrame(int frameIndex, float time, const String& attachmentName) {
-        _frames[frameIndex] = time;
-        _attachmentNames[frameIndex] = attachmentName;
-    }
-    
-    int AttachmentTimeline::getSlotIndex() {
-        return _slotIndex;
-    }
-    
-    void AttachmentTimeline::setSlotIndex(int inValue) {
-        _slotIndex = inValue;
-    }
-    
-    const Vector<float>& AttachmentTimeline::getFrames() {
-        return _frames;
-    }
-    
-    void AttachmentTimeline::setFrames(Vector<float>& inValue) {
-        _frames.clear();
-        _frames.addAll(inValue);
-    }
-    
-    const Vector<String>& AttachmentTimeline::getAttachmentNames() {
-        return _attachmentNames;
-    }
-    
-    void AttachmentTimeline::setAttachmentNames(Vector<String>& inValue) {
-        _attachmentNames.clear();
-        _attachmentNames.addAll(inValue);
-    }
-    
-    int AttachmentTimeline::getFrameCount() {
-        return static_cast<int>(_frames.size());
-    }
+AttachmentTimeline::AttachmentTimeline(int frameCount) : Timeline(), _slotIndex(0) {
+	_frames.ensureCapacity(frameCount);
+	_attachmentNames.ensureCapacity(frameCount);
+
+	_frames.setSize(frameCount, 0);
+
+	for (int i = 0; i < frameCount; ++i) {
+		_attachmentNames.add(String());
+	}
+}
+
+void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
+							   MixPose pose, MixDirection direction) {
+	assert(_slotIndex < skeleton._slots.size());
+
+	String *attachmentName;
+	Slot *slotP = skeleton._slots[_slotIndex];
+	Slot &slot = *slotP;
+	if (direction == MixDirection_Out && pose == MixPose_Setup) {
+		attachmentName = &slot._data._attachmentName;
+		slot._attachment = attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName);
+		return;
+	}
+
+	if (time < _frames[0]) {
+		// Time is before first frame.
+		if (pose == MixPose_Setup) {
+			attachmentName = &slot._data._attachmentName;
+			slot._attachment =
+					attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName);
+		}
+		return;
+	}
+
+	int frameIndex;
+	if (time >= _frames[_frames.size() - 1]) {
+		// Time is after last frame.
+		frameIndex = static_cast<int>(_frames.size()) - 1;
+	} else {
+		frameIndex = Animation::binarySearch(_frames, time, 1) - 1;
+	}
+
+	attachmentName = &_attachmentNames[frameIndex];
+	slot._attachment = attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName);
+}
+
+int AttachmentTimeline::getPropertyId() {
+	return ((int) TimelineType_Attachment << 24) + _slotIndex;
+}
+
+void AttachmentTimeline::setFrame(int frameIndex, float time, const String &attachmentName) {
+	_frames[frameIndex] = time;
+	_attachmentNames[frameIndex] = attachmentName;
+}
+
+int AttachmentTimeline::getSlotIndex() {
+	return _slotIndex;
+}
+
+void AttachmentTimeline::setSlotIndex(int inValue) {
+	_slotIndex = inValue;
+}
+
+const Vector<float> &AttachmentTimeline::getFrames() {
+	return _frames;
+}
+
+void AttachmentTimeline::setFrames(Vector<float> &inValue) {
+	_frames.clear();
+	_frames.addAll(inValue);
+}
+
+const Vector<String> &AttachmentTimeline::getAttachmentNames() {
+	return _attachmentNames;
+}
+
+void AttachmentTimeline::setAttachmentNames(Vector<String> &inValue) {
+	_attachmentNames.clear();
+	_attachmentNames.addAll(inValue);
+}
+
+int AttachmentTimeline::getFrameCount() {
+	return static_cast<int>(_frames.size());
+}
 }

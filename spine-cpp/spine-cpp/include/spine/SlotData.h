@@ -37,62 +37,80 @@
 #include <spine/Color.h>
 
 namespace Spine {
-    class BoneData;
-    
-    class SlotData : public SpineObject {
-        friend class SkeletonBinary;
-        friend class SkeletonJson;
-        
-        friend class AttachmentTimeline;
-        friend class ColorTimeline;
-        friend class DeformTimeline;
-        friend class DrawOrderTimeline;
-        friend class EventTimeline;
-        friend class IkConstraintTimeline;
-        friend class PathConstraintMixTimeline;
-        friend class PathConstraintPositionTimeline;
-        friend class PathConstraintSpacingTimeline;
-        friend class ScaleTimeline;
-        friend class ShearTimeline;
-        friend class TransformConstraintTimeline;
-        friend class TranslateTimeline;
-        friend class TwoColorTimeline;
-        
-    public:
-        SlotData(int index, const String& name, BoneData& boneData);
-        
-        int getIndex();
-        
-        const String& getName();
-        
-        BoneData& getBoneData();
+class BoneData;
 
-        Color& getColor();
-        Color& getDarkColor();
+class SlotData : public SpineObject {
+	friend class SkeletonBinary;
 
-        bool hasDarkColor();
-        void setHasDarkColor(bool inValue);
-        
-        /// May be empty.
-        const String& getAttachmentName();
-        void setAttachmentName(const String& inValue);
-        
-        BlendMode getBlendMode();
-        void setBlendMode(BlendMode inValue);
+	friend class SkeletonJson;
 
-        String toString() const;
+	friend class AttachmentTimeline;
 
-    private:
-        const int _index;
-        String _name;
-        BoneData& _boneData;
-        Color _color;
-        Color _darkColor;
+	friend class ColorTimeline;
 
-        bool _hasDarkColor;
-        String _attachmentName;
-        BlendMode _blendMode;
-    };
+	friend class DeformTimeline;
+
+	friend class DrawOrderTimeline;
+
+	friend class EventTimeline;
+
+	friend class IkConstraintTimeline;
+
+	friend class PathConstraintMixTimeline;
+
+	friend class PathConstraintPositionTimeline;
+
+	friend class PathConstraintSpacingTimeline;
+
+	friend class ScaleTimeline;
+
+	friend class ShearTimeline;
+
+	friend class TransformConstraintTimeline;
+
+	friend class TranslateTimeline;
+
+	friend class TwoColorTimeline;
+
+public:
+	SlotData(int index, const String &name, BoneData &boneData);
+
+	int getIndex();
+
+	const String &getName();
+
+	BoneData &getBoneData();
+
+	Color &getColor();
+
+	Color &getDarkColor();
+
+	bool hasDarkColor();
+
+	void setHasDarkColor(bool inValue);
+
+	/// May be empty.
+	const String &getAttachmentName();
+
+	void setAttachmentName(const String &inValue);
+
+	BlendMode getBlendMode();
+
+	void setBlendMode(BlendMode inValue);
+
+	String toString() const;
+
+private:
+	const int _index;
+	String _name;
+	BoneData &_boneData;
+	Color _color;
+	Color _darkColor;
+
+	bool _hasDarkColor;
+	String _attachmentName;
+	BlendMode _blendMode;
+};
 }
 
 #endif /* Spine_SlotData_h */

@@ -38,65 +38,84 @@
 #include <spine/String.h>
 
 namespace Spine {
-    class Timeline;
-    class Skeleton;
-    class Event;
-    
-    class Animation : public SpineObject {
-        friend class AnimationState;
-        friend class TrackEntry;
-        friend class AnimationStateData;
-        
-        friend class AttachmentTimeline;
-        friend class ColorTimeline;
-        friend class DeformTimeline;
-        friend class DrawOrderTimeline;
-        friend class EventTimeline;
-        friend class IkConstraintTimeline;
-        friend class PathConstraintMixTimeline;
-        friend class PathConstraintPositionTimeline;
-        friend class PathConstraintSpacingTimeline;
-        friend class RotateTimeline;
-        friend class ScaleTimeline;
-        friend class ShearTimeline;
-        friend class TransformConstraintTimeline;
-        friend class TranslateTimeline;
-        friend class TwoColorTimeline;
-        
-    public:
-        Animation(const String& name, Vector<Timeline*>& timelines, float duration);
-        
-        ~Animation();
-        
-        /// Applies all the animation's timelines to the specified skeleton.
-        /// See also Timeline::apply(Skeleton&, float, float, Vector, float, MixPose, MixDirection)
-        void apply(Skeleton& skeleton, float lastTime, float time, bool loop, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction);
-        
-        const String& getName();
-        
-        Vector<Timeline*> getTimelines();
-        
-        void setTimelines(Vector<Timeline*>& inValue);
-        
-        float getDuration();
-        
-        void setDuration(float inValue);
+class Timeline;
 
-        String toString() const;
-        
-    private:
-        Vector<Timeline*> _timelines;
-        float _duration;
-        String _name;
-        
-        /// @param target After the first and before the last entry.
-        static int binarySearch(Vector<float>& values, float target, int step);
-        
-        /// @param target After the first and before the last entry.
-        static int binarySearch(Vector<float>& values, float target);
-        
-        static int linearSearch(Vector<float>& values, float target, int step);
-    };
+class Skeleton;
+
+class Event;
+
+class Animation : public SpineObject {
+	friend class AnimationState;
+
+	friend class TrackEntry;
+
+	friend class AnimationStateData;
+
+	friend class AttachmentTimeline;
+
+	friend class ColorTimeline;
+
+	friend class DeformTimeline;
+
+	friend class DrawOrderTimeline;
+
+	friend class EventTimeline;
+
+	friend class IkConstraintTimeline;
+
+	friend class PathConstraintMixTimeline;
+
+	friend class PathConstraintPositionTimeline;
+
+	friend class PathConstraintSpacingTimeline;
+
+	friend class RotateTimeline;
+
+	friend class ScaleTimeline;
+
+	friend class ShearTimeline;
+
+	friend class TransformConstraintTimeline;
+
+	friend class TranslateTimeline;
+
+	friend class TwoColorTimeline;
+
+public:
+	Animation(const String &name, Vector<Timeline *> &timelines, float duration);
+
+	~Animation();
+
+	/// Applies all the animation's timelines to the specified skeleton.
+	/// See also Timeline::apply(Skeleton&, float, float, Vector, float, MixPose, MixDirection)
+	void apply(Skeleton &skeleton, float lastTime, float time, bool loop, Vector<Event *> *pEvents, float alpha,
+			   MixPose pose, MixDirection direction);
+
+	const String &getName();
+
+	Vector<Timeline *> getTimelines();
+
+	void setTimelines(Vector<Timeline *> &inValue);
+
+	float getDuration();
+
+	void setDuration(float inValue);
+
+	String toString() const;
+
+private:
+	Vector<Timeline *> _timelines;
+	float _duration;
+	String _name;
+
+	/// @param target After the first and before the last entry.
+	static int binarySearch(Vector<float> &values, float target, int step);
+
+	/// @param target After the first and before the last entry.
+	static int binarySearch(Vector<float> &values, float target);
+
+	static int linearSearch(Vector<float> &values, float target, int step);
+};
 }
 
 #endif /* Spine_Animation_h */

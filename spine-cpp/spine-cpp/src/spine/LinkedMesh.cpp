@@ -33,14 +33,14 @@
 #include <spine/MeshAttachment.h>
 
 namespace Spine {
-    LinkedMesh::LinkedMesh(MeshAttachment* mesh, const String& skin, int slotIndex, const String& parent) :
-    _mesh(mesh),
-    _skin(skin),
-    _slotIndex(slotIndex),
-    _parent(parent) {
-    }
+LinkedMesh::LinkedMesh(MeshAttachment *mesh, const String &skin, int slotIndex, const String &parent) :
+		_mesh(mesh),
+		_skin(skin),
+		_slotIndex(slotIndex),
+		_parent(parent) {
+}
 
-    String LinkedMesh::toString() const {
-        return String("LinkedMesh");
-    }
+String LinkedMesh::toString() const {
+	return String("LinkedMesh");
+}
 }

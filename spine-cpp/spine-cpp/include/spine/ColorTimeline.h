@@ -34,37 +34,43 @@
 #include <spine/CurveTimeline.h>
 
 namespace Spine {
-    class ColorTimeline : public CurveTimeline {
-        friend class SkeletonBinary;
-        friend class SkeletonJson;
-        
-        RTTI_DECL
-        
-    public:
-        static const int ENTRIES;
-        
-        explicit ColorTimeline (int frameCount);
-        
-        virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction);
-        
-        virtual int getPropertyId();
-        
-        /// Sets the time and value of the specified keyframe.
-        void setFrame(int frameIndex, float time, float r, float g, float b, float a);
-        
-        int getSlotIndex();
-        void setSlotIndex(int inValue);
-        Vector<float>& getFrames();
-        void setFrames(Vector<float>& inValue); // time, r, g, b, a, ...
-        
-    protected:
-        static const int PREV_TIME, PREV_R, PREV_G, PREV_B, PREV_A;
-        static const int R, G, B, A;
-        
-    private:
-        int _slotIndex;
-        Vector<float> _frames;
-    };
+class ColorTimeline : public CurveTimeline {
+	friend class SkeletonBinary;
+
+	friend class SkeletonJson;
+
+RTTI_DECL
+
+public:
+	static const int ENTRIES;
+
+	explicit ColorTimeline(int frameCount);
+
+	virtual void
+	apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha, MixPose pose,
+		  MixDirection direction);
+
+	virtual int getPropertyId();
+
+	/// Sets the time and value of the specified keyframe.
+	void setFrame(int frameIndex, float time, float r, float g, float b, float a);
+
+	int getSlotIndex();
+
+	void setSlotIndex(int inValue);
+
+	Vector<float> &getFrames();
+
+	void setFrames(Vector<float> &inValue); // time, r, g, b, a, ...
+
+protected:
+	static const int PREV_TIME, PREV_R, PREV_G, PREV_B, PREV_A;
+	static const int R, G, B, A;
+
+private:
+	int _slotIndex;
+	Vector<float> _frames;
+};
 }
 
 #endif /* Spine_ColorTimeline_h */

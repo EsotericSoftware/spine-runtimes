@@ -32,63 +32,63 @@
 #include <math.h>
 
 namespace Spine {
-    float MathUtil::abs(float v) {
-        return ((v) < 0? -(v): (v));
-    }
+float MathUtil::abs(float v) {
+	return ((v) < 0 ? -(v) : (v));
+}
 
-    int MathUtil::sign(float v) {
-        return ((v) < 0? -1: (v) > 0 ? 1 : 0);
-    }
+int MathUtil::sign(float v) {
+	return ((v) < 0 ? -1 : (v) > 0 ? 1 : 0);
+}
 
-    float MathUtil::clamp(float x, float min, float max) {
-        return((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)));
-    }
+float MathUtil::clamp(float x, float min, float max) {
+	return ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)));
+}
 
-    float MathUtil::fmod(float a, float b) {
-        return ::fmod(a, b);
-    }
+float MathUtil::fmod(float a, float b) {
+	return ::fmod(a, b);
+}
 
-    /// Returns atan2 in radians, faster but less accurate than Math.Atan2. Average error of 0.00231 radians (0.1323
-    /// degrees), largest error of 0.00488 radians (0.2796 degrees).
-    float MathUtil::atan2(float y, float x) {
-        return ::atan2(y, x);
-    }
+/// Returns atan2 in radians, faster but less accurate than Math.Atan2. Average error of 0.00231 radians (0.1323
+/// degrees), largest error of 0.00488 radians (0.2796 degrees).
+float MathUtil::atan2(float y, float x) {
+	return ::atan2(y, x);
+}
 
-    /// Returns the cosine in radians from a lookup table.
-    float MathUtil::cos(float radians) {
-        return ::cos(radians);
-    }
+/// Returns the cosine in radians from a lookup table.
+float MathUtil::cos(float radians) {
+	return ::cos(radians);
+}
 
-    /// Returns the sine in radians from a lookup table.
-    float MathUtil::sin(float radians) {
-        return ::sin(radians);
-    }
+/// Returns the sine in radians from a lookup table.
+float MathUtil::sin(float radians) {
+	return ::sin(radians);
+}
 
-    float MathUtil::sqrt(float v) {
-        return ::sqrt(v);
-    }
+float MathUtil::sqrt(float v) {
+	return ::sqrt(v);
+}
 
-    float MathUtil::acos(float v) {
-        return ::acos(v);
-    }
-    
-    /// Returns the sine in radians from a lookup table.
-    float MathUtil::sinDeg(float degrees) {
-        return ::sin(degrees * DEG_RAD);
-    }
-    
-    /// Returns the cosine in radians from a lookup table.
-    float MathUtil::cosDeg(float degrees) {
-        return ::cos(degrees * DEG_RAD);
-    }
+float MathUtil::acos(float v) {
+	return ::acos(v);
+}
 
-    /* Need to pass 0 as an argument, so VC++ doesn't error with C2124 */
-    static bool _isNan(float value, float zero) {
-        float _nan =  (float)0.0 / zero;
-        return 0 == memcmp((void*)&value, (void*)&_nan, sizeof(value));
-    }
+/// Returns the sine in radians from a lookup table.
+float MathUtil::sinDeg(float degrees) {
+	return ::sin(degrees * DEG_RAD);
+}
 
-    bool MathUtil::isNan(float v) {
-        return _isNan(v, 0);
-    }
+/// Returns the cosine in radians from a lookup table.
+float MathUtil::cosDeg(float degrees) {
+	return ::cos(degrees * DEG_RAD);
+}
+
+/* Need to pass 0 as an argument, so VC++ doesn't error with C2124 */
+static bool _isNan(float value, float zero) {
+	float _nan = (float) 0.0 / zero;
+	return 0 == memcmp((void *) &value, (void *) &_nan, sizeof(value));
+}
+
+bool MathUtil::isNan(float v) {
+	return _isNan(v, 0);
+}
 }

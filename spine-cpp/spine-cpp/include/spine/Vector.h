@@ -39,206 +39,206 @@
 #include <assert.h>
 
 namespace Spine {
-    template <typename T>
-    class Vector : public SpineObject {
-    public:
-        Vector() : _size(0), _capacity(0), _buffer(NULL) {
-        }
+template<typename T>
+class Vector : public SpineObject {
+public:
+	Vector() : _size(0), _capacity(0), _buffer(NULL) {
+	}
 
-        Vector(const Vector& inVector) : _size(inVector._size), _capacity(inVector._capacity), _buffer(NULL) {
-            if (_capacity > 0) {
-                _buffer = allocate(_capacity);
-                for (size_t i = 0; i < _size; ++i) {
-                    construct(_buffer + i, inVector._buffer[i]);
-                }
-            }
-        }
+	Vector(const Vector &inVector) : _size(inVector._size), _capacity(inVector._capacity), _buffer(NULL) {
+		if (_capacity > 0) {
+			_buffer = allocate(_capacity);
+			for (size_t i = 0; i < _size; ++i) {
+				construct(_buffer + i, inVector._buffer[i]);
+			}
+		}
+	}
 
-        /*Vector& operator=(const Vector& inVector) {
-            if (this != &inVector) {
-                clear();
-                deallocate(_buffer);
-                _buffer = NULL;
+	/*Vector& operator=(const Vector& inVector) {
+		if (this != &inVector) {
+			clear();
+			deallocate(_buffer);
+			_buffer = NULL;
 
-                _size = inVector._size;
-                _capacity = inVector._capacity;
+			_size = inVector._size;
+			_capacity = inVector._capacity;
 
-                if (_capacity > 0) {
-                    _buffer = allocate(_capacity);
-                    for (size_t i = 0; i < _size; ++i) {
-                        construct(_buffer + i, inVector._buffer[i]);
-                    }
-                }
-            }
-
-            return *this;
-        }*/
-
-        ~Vector() {
-            clear();
-            deallocate(_buffer);
-        }
-
-        inline void clear () {
-            for (size_t i = 0; i < _size; ++i) {
-                destroy(_buffer + (_size - 1 - i));
-            }
-
-            _size = 0;
-        }
-
-        inline size_t size() const {
-            return _size;
-        }
-
-        inline void setSize(size_t newSize, const T &defaultValue) {
-            assert(newSize >= 0);
-            size_t oldSize = _size;
-            _size = newSize;
-            if (_capacity < newSize) {
-                _capacity = (int)(_size  * 1.75f);
-                if (_capacity < 8) _capacity = 8;
-                _buffer = Spine::SpineExtension::realloc<T>(_buffer, _capacity, __FILE__, __LINE__);
-            }
-            if (oldSize < _size) {
-                for (size_t i = oldSize; i < _size; i++) {
-                    construct(_buffer + i, defaultValue);
-                }
-            }
-        }
-
-        inline void ensureCapacity(size_t newCapacity = 0) {
-            if (_capacity >= newCapacity) return;
-            _capacity = newCapacity;
-            _buffer = SpineExtension::realloc<T>(_buffer, newCapacity, __FILE__, __LINE__);
-        }
-
-		inline void add(const T &inValue) {
-            if (_size == _capacity) {
-                _capacity = (int)(_size  * 1.75f);
-                if (_capacity < 8) _capacity = 8;
-                _buffer = Spine::SpineExtension::realloc<T>(_buffer, _capacity, __FILE__, __LINE__);
-            }
-            construct(_buffer + _size++, inValue);
-        }
-
-        inline void addAll(Vector<T> &inValue) {
-            ensureCapacity(this->size() + inValue.size());
-            for (size_t i = 0; i < inValue.size(); i++) {
-                add(inValue[i]);
-            }
-        }
-
-        inline void clearAndAddAll(Vector<T> &inValue) {
-            this->clear();
-            this->addAll(inValue);
-        }
-
-        inline void removeAt(size_t inIndex) {
-            assert(inIndex < _size);
-
-            --_size;
-
-            if (inIndex != _size) {
-                for (size_t i = inIndex; i < _size; ++i) {
-                    std::swap(_buffer[i], _buffer[i + 1]);
-                }
-            }
-
-            destroy(_buffer + _size);
-        }
-
-        inline bool contains(const T& inValue) {
-            for (size_t i = 0; i < _size; ++i) {
-                if (_buffer[i] == inValue) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        inline int indexOf(const T& inValue) {
-            for (size_t i = 0; i < _size; ++i) {
-                if (_buffer[i] == inValue) {
-                    return static_cast<int>(i);
-                }
-            }
-
-            return -1;
-        }
-
-        inline T& operator[](size_t inIndex) {
-            assert(inIndex < _size);
-
-            return _buffer[inIndex];
-        }
-
-        inline friend bool operator==(Vector<T>& lhs, Vector<T>& rhs) {
-            if (lhs.size() != rhs.size()) {
-                return false;
-            }
-
-            for (int i = 0, n = static_cast<int>(lhs.size()); i < n; ++i) {
-                if (lhs[i] != rhs[i]) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        inline friend bool operator!=(Vector<T>& lhs, Vector<T>& rhs) {
-            return !(lhs == rhs);
-        }
-
-		inline T* buffer() {
-			return _buffer;
+			if (_capacity > 0) {
+				_buffer = allocate(_capacity);
+				for (size_t i = 0; i < _size; ++i) {
+					construct(_buffer + i, inVector._buffer[i]);
+				}
+			}
 		}
 
-        String toString () const {
-            String str;
-            str.append("Vector { size: ").append((int)_size).append(", items: [\n");
-            for (size_t i = 0; i < _size; i++) {
-                str.append("   ").append(_buffer[i]);
-                if (i != _size - 1) str.append(",\n");
-                else str.append("\n");
-            }
-            str.append("] }");
-            return str;
-        }
+		return *this;
+	}*/
 
-    private:
-        size_t _size;
-        size_t _capacity;
-        T* _buffer;
+	~Vector() {
+		clear();
+		deallocate(_buffer);
+	}
 
-        inline T* allocate(size_t n) {
-            assert(n > 0);
+	inline void clear() {
+		for (size_t i = 0; i < _size; ++i) {
+			destroy(_buffer + (_size - 1 - i));
+		}
 
-            T* ptr = SpineExtension::calloc<T>(n, __FILE__, __LINE__);
+		_size = 0;
+	}
 
-            assert(ptr);
+	inline size_t size() const {
+		return _size;
+	}
 
-            return ptr;
-        }
+	inline void setSize(size_t newSize, const T &defaultValue) {
+		assert(newSize >= 0);
+		size_t oldSize = _size;
+		_size = newSize;
+		if (_capacity < newSize) {
+			_capacity = (int) (_size * 1.75f);
+			if (_capacity < 8) _capacity = 8;
+			_buffer = Spine::SpineExtension::realloc<T>(_buffer, _capacity, __FILE__, __LINE__);
+		}
+		if (oldSize < _size) {
+			for (size_t i = oldSize; i < _size; i++) {
+				construct(_buffer + i, defaultValue);
+			}
+		}
+	}
 
-        inline void deallocate(T* buffer) {
-            if (_buffer) {
-                SpineExtension::free(buffer, __FILE__, __LINE__);
-            }
-        }
+	inline void ensureCapacity(size_t newCapacity = 0) {
+		if (_capacity >= newCapacity) return;
+		_capacity = newCapacity;
+		_buffer = SpineExtension::realloc<T>(_buffer, newCapacity, __FILE__, __LINE__);
+	}
 
-        inline void construct(T* buffer, const T& val) {
-            new (buffer) T(val);
-        }
+	inline void add(const T &inValue) {
+		if (_size == _capacity) {
+			_capacity = (int) (_size * 1.75f);
+			if (_capacity < 8) _capacity = 8;
+			_buffer = Spine::SpineExtension::realloc<T>(_buffer, _capacity, __FILE__, __LINE__);
+		}
+		construct(_buffer + _size++, inValue);
+	}
 
-        inline void destroy(T* buffer) {
-            buffer->~T();
-        }
+	inline void addAll(Vector<T> &inValue) {
+		ensureCapacity(this->size() + inValue.size());
+		for (size_t i = 0; i < inValue.size(); i++) {
+			add(inValue[i]);
+		}
+	}
 
-        Vector& operator=(const Vector& inVector) { };
-    };
+	inline void clearAndAddAll(Vector<T> &inValue) {
+		this->clear();
+		this->addAll(inValue);
+	}
+
+	inline void removeAt(size_t inIndex) {
+		assert(inIndex < _size);
+
+		--_size;
+
+		if (inIndex != _size) {
+			for (size_t i = inIndex; i < _size; ++i) {
+				std::swap(_buffer[i], _buffer[i + 1]);
+			}
+		}
+
+		destroy(_buffer + _size);
+	}
+
+	inline bool contains(const T &inValue) {
+		for (size_t i = 0; i < _size; ++i) {
+			if (_buffer[i] == inValue) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	inline int indexOf(const T &inValue) {
+		for (size_t i = 0; i < _size; ++i) {
+			if (_buffer[i] == inValue) {
+				return static_cast<int>(i);
+			}
+		}
+
+		return -1;
+	}
+
+	inline T &operator[](size_t inIndex) {
+		assert(inIndex < _size);
+
+		return _buffer[inIndex];
+	}
+
+	inline friend bool operator==(Vector<T> &lhs, Vector<T> &rhs) {
+		if (lhs.size() != rhs.size()) {
+			return false;
+		}
+
+		for (int i = 0, n = static_cast<int>(lhs.size()); i < n; ++i) {
+			if (lhs[i] != rhs[i]) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	inline friend bool operator!=(Vector<T> &lhs, Vector<T> &rhs) {
+		return !(lhs == rhs);
+	}
+
+	inline T *buffer() {
+		return _buffer;
+	}
+
+	String toString() const {
+		String str;
+		str.append("Vector { size: ").append((int) _size).append(", items: [\n");
+		for (size_t i = 0; i < _size; i++) {
+			str.append("   ").append(_buffer[i]);
+			if (i != _size - 1) str.append(",\n");
+			else str.append("\n");
+		}
+		str.append("] }");
+		return str;
+	}
+
+private:
+	size_t _size;
+	size_t _capacity;
+	T *_buffer;
+
+	inline T *allocate(size_t n) {
+		assert(n > 0);
+
+		T *ptr = SpineExtension::calloc<T>(n, __FILE__, __LINE__);
+
+		assert(ptr);
+
+		return ptr;
+	}
+
+	inline void deallocate(T *buffer) {
+		if (_buffer) {
+			SpineExtension::free(buffer, __FILE__, __LINE__);
+		}
+	}
+
+	inline void construct(T *buffer, const T &val) {
+		new(buffer) T(val);
+	}
+
+	inline void destroy(T *buffer) {
+		buffer->~T();
+	}
+
+	Vector &operator=(const Vector &inVector) {};
+};
 }
 
 #endif /* Spine_Vector_h */

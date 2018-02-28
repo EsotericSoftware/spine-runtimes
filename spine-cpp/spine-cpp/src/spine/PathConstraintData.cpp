@@ -36,112 +36,112 @@
 #include <assert.h>
 
 namespace Spine {
-    PathConstraintData::PathConstraintData(const String& name) :
-    _name(name),
-    _order(0),
-    _target(NULL),
-    _positionMode(PositionMode_Fixed),
-    _spacingMode(SpacingMode_Length),
-    _rotateMode(RotateMode_Tangent),
-    _offsetRotation(0),
-    _position(0),
-    _spacing(0),
-    _rotateMix(0),
-    _translateMix(0) {
-        assert(_name.length() > 0);
-    }
+PathConstraintData::PathConstraintData(const String &name) :
+		_name(name),
+		_order(0),
+		_target(NULL),
+		_positionMode(PositionMode_Fixed),
+		_spacingMode(SpacingMode_Length),
+		_rotateMode(RotateMode_Tangent),
+		_offsetRotation(0),
+		_position(0),
+		_spacing(0),
+		_rotateMix(0),
+		_translateMix(0) {
+	assert(_name.length() > 0);
+}
 
-    const String& PathConstraintData::getName() {
-        return _name;
-    }
-    
-    int PathConstraintData::getOrder() {
-        return _order;
-    }
-    
-    void PathConstraintData::setOrder(int inValue) {
-        _order = inValue;
-    }
-    
-    Vector<BoneData*>& PathConstraintData::getBones() {
-        return _bones;
-    }
-    
-    SlotData* PathConstraintData::getTarget() {
-        return _target;
-    }
-    
-    void PathConstraintData::setTarget(SlotData* inValue) {
-        _target = inValue;
-    }
-    
-    PositionMode PathConstraintData::getPositionMode() {
-        return _positionMode;
-    }
-    
-    void PathConstraintData::setPositionMode(PositionMode inValue) {
-        _positionMode = inValue;
-    }
-    
-    SpacingMode PathConstraintData::getSpacingMode() {
-        return _spacingMode;
-    }
-    
-    void PathConstraintData::setSpacingMode(SpacingMode inValue) {
-        _spacingMode = inValue;
-    }
-    
-    RotateMode PathConstraintData::getRotateMode() {
-        return _rotateMode;
-    }
-    
-    void PathConstraintData::setRotateMode(RotateMode inValue) {
-        _rotateMode = inValue;
-    }
-    
-    float PathConstraintData::getOffsetRotation() {
-        return _offsetRotation;
-    }
-    
-    void PathConstraintData::setOffsetRotation(float inValue) {
-        _offsetRotation = inValue;
-    }
-    
-    float PathConstraintData::getPosition() {
-        return _position;
-    }
-    
-    void PathConstraintData::setPosition(float inValue) {
-        _position = inValue;
-    }
-    
-    float PathConstraintData::getSpacing() {
-        return _spacing;
-    }
-    
-    void PathConstraintData::setSpacing(float inValue) {
-        _spacing = inValue;
-    }
-    
-    float PathConstraintData::getRotateMix() {
-        return _rotateMix;
-    }
-    
-    void PathConstraintData::setRotateMix(float inValue) {
-        _rotateMix = inValue;
-    }
-    
-    float PathConstraintData::getTranslateMix() {
-        return _translateMix;
-    }
-    
-    void PathConstraintData::setTranslateMix(float inValue) {
-        _translateMix = inValue;
-    }
+const String &PathConstraintData::getName() {
+	return _name;
+}
 
-	String PathConstraintData::toString() const {
-		String str;
-        str.append("PathConstraintData { name: ").appendString(_name).append(" }");
-        return str;
-	}
+int PathConstraintData::getOrder() {
+	return _order;
+}
+
+void PathConstraintData::setOrder(int inValue) {
+	_order = inValue;
+}
+
+Vector<BoneData *> &PathConstraintData::getBones() {
+	return _bones;
+}
+
+SlotData *PathConstraintData::getTarget() {
+	return _target;
+}
+
+void PathConstraintData::setTarget(SlotData *inValue) {
+	_target = inValue;
+}
+
+PositionMode PathConstraintData::getPositionMode() {
+	return _positionMode;
+}
+
+void PathConstraintData::setPositionMode(PositionMode inValue) {
+	_positionMode = inValue;
+}
+
+SpacingMode PathConstraintData::getSpacingMode() {
+	return _spacingMode;
+}
+
+void PathConstraintData::setSpacingMode(SpacingMode inValue) {
+	_spacingMode = inValue;
+}
+
+RotateMode PathConstraintData::getRotateMode() {
+	return _rotateMode;
+}
+
+void PathConstraintData::setRotateMode(RotateMode inValue) {
+	_rotateMode = inValue;
+}
+
+float PathConstraintData::getOffsetRotation() {
+	return _offsetRotation;
+}
+
+void PathConstraintData::setOffsetRotation(float inValue) {
+	_offsetRotation = inValue;
+}
+
+float PathConstraintData::getPosition() {
+	return _position;
+}
+
+void PathConstraintData::setPosition(float inValue) {
+	_position = inValue;
+}
+
+float PathConstraintData::getSpacing() {
+	return _spacing;
+}
+
+void PathConstraintData::setSpacing(float inValue) {
+	_spacing = inValue;
+}
+
+float PathConstraintData::getRotateMix() {
+	return _rotateMix;
+}
+
+void PathConstraintData::setRotateMix(float inValue) {
+	_rotateMix = inValue;
+}
+
+float PathConstraintData::getTranslateMix() {
+	return _translateMix;
+}
+
+void PathConstraintData::setTranslateMix(float inValue) {
+	_translateMix = inValue;
+}
+
+String PathConstraintData::toString() const {
+	String str;
+	str.append("PathConstraintData { name: ").appendString(_name).append(" }");
+	return str;
+}
 }

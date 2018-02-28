@@ -34,84 +34,89 @@
 #include <stdlib.h>
 
 namespace Spine {
-    class String;
+class String;
 
-    class SpineExtension {
-    public:
-        template <typename T> static T* alloc(size_t num, const char* file, int line) {
-            return (T*)getInstance()->_alloc(sizeof(T) * num, file, line);
-        }
+class SpineExtension {
+public:
+	template<typename T>
+	static T *alloc(size_t num, const char *file, int line) {
+		return (T *) getInstance()->_alloc(sizeof(T) * num, file, line);
+	}
 
-        template <typename T> static T* calloc(size_t num, const char* file, int line) {
-            return (T*)getInstance()->_calloc(sizeof(T) * num, file, line);
-        }
+	template<typename T>
+	static T *calloc(size_t num, const char *file, int line) {
+		return (T *) getInstance()->_calloc(sizeof(T) * num, file, line);
+	}
 
-        template <typename T> static T* realloc(T* ptr, size_t num, const char* file, int line) {
-            return (T*)getInstance()->_realloc(ptr, sizeof(T) * num, file, line);
-        }
+	template<typename T>
+	static T *realloc(T *ptr, size_t num, const char *file, int line) {
+		return (T *) getInstance()->_realloc(ptr, sizeof(T) * num, file, line);
+	}
 
-        template <typename T> static void free(T* ptr, const char* file, int line) {
-            getInstance()->_free((void*)ptr, file, line);
-        }
+	template<typename T>
+	static void free(T *ptr, const char *file, int line) {
+		getInstance()->_free((void *) ptr, file, line);
+	}
 
-        static char* readFile(const String& path, int* length) {
-            return getInstance()->_readFile(path, length);
-        }
+	static char *readFile(const String &path, int *length) {
+		return getInstance()->_readFile(path, length);
+	}
 
-        static void setInstance(SpineExtension* inSpineExtension);
+	static void setInstance(SpineExtension *inSpineExtension);
 
-        static SpineExtension* getInstance();
+	static SpineExtension *getInstance();
 
-        virtual ~SpineExtension();
+	virtual ~SpineExtension();
 
-    protected:
-        /// Implement this function to use your own memory allocator
-        virtual void* _alloc(size_t size, const char* file, int line) = 0;
-        
-        virtual void* _calloc(size_t size, const char* file, int line) = 0;
-        
-        virtual void* _realloc(void* ptr, size_t size, const char* file, int line) = 0;
-        
-        /// If you provide a spineAllocFunc, you should also provide a spineFreeFunc
-        virtual void _free(void* mem, const char* file, int line) = 0;
-        
-        virtual char* _readFile(const String& path, int* length) = 0;
+protected:
+	/// Implement this function to use your own memory allocator
+	virtual void *_alloc(size_t size, const char *file, int line) = 0;
 
-        SpineExtension();
+	virtual void *_calloc(size_t size, const char *file, int line) = 0;
 
-    private:
-        static SpineExtension* _instance;
-    };
-    
-    class DefaultSpineExtension : public SpineExtension {
-    public:
-        DefaultSpineExtension();
-        virtual ~DefaultSpineExtension();
+	virtual void *_realloc(void *ptr, size_t size, const char *file, int line) = 0;
 
-    protected:
-        virtual void* _alloc(size_t size, const char* file, int line);
-        
-        virtual void* _calloc(size_t size, const char* file, int line);
-        
-        virtual void* _realloc(void* ptr, size_t size, const char* file, int line);
+	/// If you provide a spineAllocFunc, you should also provide a spineFreeFunc
+	virtual void _free(void *mem, const char *file, int line) = 0;
 
-        virtual void _free(void* mem, const char* file, int line);
+	virtual char *_readFile(const String &path, int *length) = 0;
 
-        virtual char* _readFile(const String& path, int* length);
-    };
+	SpineExtension();
 
-    struct Allocation {
-        void* address;
-        size_t size;
-        const char* fileName;
-        int line;
+private:
+	static SpineExtension *_instance;
+};
 
-        Allocation() : address(NULL), size(0), fileName(NULL), line(0) {
-        }
+class DefaultSpineExtension : public SpineExtension {
+public:
+	DefaultSpineExtension();
 
-        Allocation(void* a, size_t s, const char* f, int l) : address(a), size(s), fileName(f), line(l) {
-        }
-    };
+	virtual ~DefaultSpineExtension();
+
+protected:
+	virtual void *_alloc(size_t size, const char *file, int line);
+
+	virtual void *_calloc(size_t size, const char *file, int line);
+
+	virtual void *_realloc(void *ptr, size_t size, const char *file, int line);
+
+	virtual void _free(void *mem, const char *file, int line);
+
+	virtual char *_readFile(const String &path, int *length);
+};
+
+struct Allocation {
+	void *address;
+	size_t size;
+	const char *fileName;
+	int line;
+
+	Allocation() : address(NULL), size(0), fileName(NULL), line(0) {
+	}
+
+	Allocation(void *a, size_t s, const char *f, int l) : address(a), size(s), fileName(f), line(l) {
+	}
+};
 }
 
 #endif /* Spine_Extension_h */

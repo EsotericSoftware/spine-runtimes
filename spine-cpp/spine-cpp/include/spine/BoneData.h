@@ -36,74 +36,87 @@
 #include <spine/String.h>
 
 namespace Spine {
-    class BoneData : public SpineObject {
-        friend class SkeletonBinary;
-        friend class SkeletonJson;
-        
-        friend class AnimationState;
-        
-        friend class RotateTimeline;
-        friend class ScaleTimeline;
-        friend class ShearTimeline;
-        friend class TranslateTimeline;
-        
-    public:
-        BoneData(int index, const String& name, BoneData* parent = NULL);
-        
-        /// The index of the bone in Skeleton.Bones
-        int getIndex();
+class BoneData : public SpineObject {
+	friend class SkeletonBinary;
 
-        /// The name of the bone, which is unique within the skeleton.
-        const String& getName();
-        
-        /// May be NULL.
-        BoneData* getParent();
-        
-        float getLength();
-        void setLength(float inValue);
-        
-        /// Local X translation.
-        float getX();
-        void setX(float inValue);
-        
-        /// Local Y translation.
-        float getY();
-        void setY(float inValue);
-        
-        /// Local rotation.
-        float getRotation();
-        void setRotation(float inValue);
-        
-        /// Local scaleX.
-        float getScaleX();
-        void setScaleX(float inValue);
-        
-        /// Local scaleY.
-        float getScaleY();
-        void setScaleY(float inValue);
-        
-        /// Local shearX.
-        float getShearX();
-        void setShearX(float inValue);
-        
-        /// Local shearY.
-        float getShearY();
-        void setShearY(float inValue);
-        
-        /// The transform mode for how parent world transforms affect this bone.
-        TransformMode getTransformMode();
-        void setTransformMode(TransformMode inValue);
+	friend class SkeletonJson;
 
-        String toString() const;
-        
-    private:
-        const int _index;
-        const String _name;
-        BoneData* _parent;
-        float _length;
-        float _x, _y, _rotation, _scaleX, _scaleY, _shearX, _shearY;
-        TransformMode _transformMode;
-    };
+	friend class AnimationState;
+
+	friend class RotateTimeline;
+
+	friend class ScaleTimeline;
+
+	friend class ShearTimeline;
+
+	friend class TranslateTimeline;
+
+public:
+	BoneData(int index, const String &name, BoneData *parent = NULL);
+
+	/// The index of the bone in Skeleton.Bones
+	int getIndex();
+
+	/// The name of the bone, which is unique within the skeleton.
+	const String &getName();
+
+	/// May be NULL.
+	BoneData *getParent();
+
+	float getLength();
+
+	void setLength(float inValue);
+
+	/// Local X translation.
+	float getX();
+
+	void setX(float inValue);
+
+	/// Local Y translation.
+	float getY();
+
+	void setY(float inValue);
+
+	/// Local rotation.
+	float getRotation();
+
+	void setRotation(float inValue);
+
+	/// Local scaleX.
+	float getScaleX();
+
+	void setScaleX(float inValue);
+
+	/// Local scaleY.
+	float getScaleY();
+
+	void setScaleY(float inValue);
+
+	/// Local shearX.
+	float getShearX();
+
+	void setShearX(float inValue);
+
+	/// Local shearY.
+	float getShearY();
+
+	void setShearY(float inValue);
+
+	/// The transform mode for how parent world transforms affect this bone.
+	TransformMode getTransformMode();
+
+	void setTransformMode(TransformMode inValue);
+
+	String toString() const;
+
+private:
+	const int _index;
+	const String _name;
+	BoneData *_parent;
+	float _length;
+	float _x, _y, _rotation, _scaleX, _scaleY, _shearX, _shearY;
+	TransformMode _transformMode;
+};
 }
 
 #endif /* Spine_BoneData_h */

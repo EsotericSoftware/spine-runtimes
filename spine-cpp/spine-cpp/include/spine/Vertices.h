@@ -34,15 +34,15 @@
 #include <spine/Vector.h>
 
 namespace Spine {
-    class Vertices : public SpineObject {
-    public:
-        Vector<int> _bones;
-        Vector<float> _vertices;
+class Vertices : public SpineObject {
+public:
+	Vector<int> _bones;
+	Vector<float> _vertices;
 
-        String toString() const {
-            return String("Vertices");
-        };
-    };
+	String toString() const {
+		return String("Vertices");
+	};
+};
 }
 
 #endif /* Spine_Vertices_h */

@@ -31,11 +31,11 @@
 #include <spine/Constraint.h>
 
 namespace Spine {
-    RTTI_IMPL(Constraint, Updatable);
-    
-    Constraint::Constraint() {
-    }
-    
-    Constraint::~Constraint() {
-    }
+RTTI_IMPL(Constraint, Updatable);
+
+Constraint::Constraint() {
+}
+
+Constraint::~Constraint() {
+}
 }

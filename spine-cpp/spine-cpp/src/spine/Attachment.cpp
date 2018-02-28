@@ -33,16 +33,16 @@
 #include <assert.h>
 
 namespace Spine {
-    RTTI_IMPL_NOPARENT(Attachment);
-    
-    Attachment::Attachment(const String& name) : _name(name) {
-        assert(_name.length() > 0);
-    }
+RTTI_IMPL_NOPARENT(Attachment);
 
-    Attachment::~Attachment() {
-    }
+Attachment::Attachment(const String &name) : _name(name) {
+	assert(_name.length() > 0);
+}
 
-    const String& Attachment::getName() const {
-        return _name;
-    }
+Attachment::~Attachment() {
+}
+
+const String &Attachment::getName() const {
+	return _name;
+}
 }

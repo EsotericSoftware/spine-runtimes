@@ -31,41 +31,42 @@
 #include <spine/PathAttachment.h>
 
 namespace Spine {
-    RTTI_IMPL(PathAttachment, VertexAttachment);
-    
-    PathAttachment::PathAttachment(const String& name) : VertexAttachment(name), _closed(false), _constantSpeed(false) {
-    }
-    
-    Vector<float>& PathAttachment::getLengths() {
-        return _lengths;
-    }
-    
-    void PathAttachment::setLengths(Vector<float>& inValue) {
-        _lengths.clear();
-        _lengths.addAll(inValue);
-    }
-    
-    bool PathAttachment::isClosed() {
-        return _closed;
-    }
-    
-    void PathAttachment::setClosed(bool inValue) {
-        _closed = inValue;
-    }
-    
-    bool PathAttachment::isConstantSpeed() {
-        return _constantSpeed;
-    }
-    
-    void PathAttachment::setConstantSpeed(bool inValue) {
-        _constantSpeed = inValue;
-    }
+RTTI_IMPL(PathAttachment, VertexAttachment);
 
-    String PathAttachment::toString() const {
-        String str;
-        str.append("PathAttachment { name: ").appendString(getName()).append(", closed: ").append(_closed).append(", constantSpeed: ").append(_constantSpeed);
-        str.append(", worldVerticesLength: ").append(_worldVerticesLength);
-        str.append(", bones: ").append(_bones).append(", weights: ").append(_vertices).append(" }");
-        return str;
-    }
+PathAttachment::PathAttachment(const String &name) : VertexAttachment(name), _closed(false), _constantSpeed(false) {
+}
+
+Vector<float> &PathAttachment::getLengths() {
+	return _lengths;
+}
+
+void PathAttachment::setLengths(Vector<float> &inValue) {
+	_lengths.clear();
+	_lengths.addAll(inValue);
+}
+
+bool PathAttachment::isClosed() {
+	return _closed;
+}
+
+void PathAttachment::setClosed(bool inValue) {
+	_closed = inValue;
+}
+
+bool PathAttachment::isConstantSpeed() {
+	return _constantSpeed;
+}
+
+void PathAttachment::setConstantSpeed(bool inValue) {
+	_constantSpeed = inValue;
+}
+
+String PathAttachment::toString() const {
+	String str;
+	str.append("PathAttachment { name: ").appendString(getName()).append(", closed: ").append(_closed).append(
+			", constantSpeed: ").append(_constantSpeed);
+	str.append(", worldVerticesLength: ").append(_worldVerticesLength);
+	str.append(", bones: ").append(_bones).append(", weights: ").append(_vertices).append(" }");
+	return str;
+}
 }

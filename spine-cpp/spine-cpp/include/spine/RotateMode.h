@@ -32,11 +32,11 @@
 #define Spine_RotateMode_h
 
 namespace Spine {
-    enum RotateMode {
-        RotateMode_Tangent = 0,
-        RotateMode_Chain,
-        RotateMode_ChainScale
-    };
+enum RotateMode {
+	RotateMode_Tangent = 0,
+	RotateMode_Chain,
+	RotateMode_ChainScale
+};
 }
 
 #endif /* Spine_RotateMode_h */

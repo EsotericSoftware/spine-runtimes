@@ -35,51 +35,51 @@
 #include <spine/MathUtil.h>
 
 namespace Spine {
-    RTTI_IMPL(PointAttachment, Attachment);
-    
-    PointAttachment::PointAttachment(const String& name) : Attachment(name), _x(0), _y(0), _rotation(0) {
-    }
-    
-    void PointAttachment::computeWorldPosition(Bone& bone, float& ox, float& oy) {
-        bone.localToWorld(_x, _y, ox, oy);
-    }
-    
-    float PointAttachment::computeWorldRotation(Bone& bone) {
-        float cos = MathUtil::cosDeg(_rotation);
-        float sin = MathUtil::sinDeg(_rotation);
-        float ix = cos * bone._a + sin * bone._b;
-        float iy = cos * bone._c + sin * bone._d;
-        
-        return MathUtil::atan2(iy, ix) * RAD_DEG;
-    }
-    
-    float PointAttachment::getX() {
-        return _x;
-    }
-    
-    void PointAttachment::setX(float inValue) {
-        _x = inValue;
-    }
-    
-    float PointAttachment::getY() {
-        return _y;
-    }
-    
-    void PointAttachment::setY(float inValue) {
-        _y = inValue;
-    }
-    
-    float PointAttachment::getRotation() {
-        return _rotation;
-    }
-    
-    void PointAttachment::setRotation(float inValue) {
-        _rotation = inValue;
-    }
+RTTI_IMPL(PointAttachment, Attachment);
 
-    String PointAttachment::toString() const {
-        String str;
-        str.append("PointAttachment { name: ").appendString(getName()).append(" }");
-        return str;
-    }
+PointAttachment::PointAttachment(const String &name) : Attachment(name), _x(0), _y(0), _rotation(0) {
+}
+
+void PointAttachment::computeWorldPosition(Bone &bone, float &ox, float &oy) {
+	bone.localToWorld(_x, _y, ox, oy);
+}
+
+float PointAttachment::computeWorldRotation(Bone &bone) {
+	float cos = MathUtil::cosDeg(_rotation);
+	float sin = MathUtil::sinDeg(_rotation);
+	float ix = cos * bone._a + sin * bone._b;
+	float iy = cos * bone._c + sin * bone._d;
+
+	return MathUtil::atan2(iy, ix) * RAD_DEG;
+}
+
+float PointAttachment::getX() {
+	return _x;
+}
+
+void PointAttachment::setX(float inValue) {
+	_x = inValue;
+}
+
+float PointAttachment::getY() {
+	return _y;
+}
+
+void PointAttachment::setY(float inValue) {
+	_y = inValue;
+}
+
+float PointAttachment::getRotation() {
+	return _rotation;
+}
+
+void PointAttachment::setRotation(float inValue) {
+	_rotation = inValue;
+}
+
+String PointAttachment::toString() const {
+	String str;
+	str.append("PointAttachment { name: ").appendString(getName()).append(" }");
+	return str;
+}
 }

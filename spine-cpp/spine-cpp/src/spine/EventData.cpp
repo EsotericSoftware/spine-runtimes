@@ -33,44 +33,44 @@
 #include <assert.h>
 
 namespace Spine {
-    EventData::EventData(const String& name) :
-    _name(name),
-    _intValue(0),
-    _floatValue(0),
-    _stringValue() {
-        assert(_name.length() > 0);
-    }
-    
-    /// The name of the event, which is unique within the skeleton.
-    const String& EventData::getName() const {
-        return _name;
-    }
-    
-    int EventData::getIntValue() {
-        return _intValue;
-    }
-    
-    void EventData::setIntValue(int inValue) {
-        _intValue = inValue;
-    }
-    
-    float EventData::getFloatValue() {
-        return _floatValue;
-    }
-    
-    void EventData::setFloatValue(float inValue) {
-        _floatValue = inValue;
-    }
-    
-    const String& EventData::getStringValue() {
-        return _stringValue;
-    }
-    
-    void EventData::setStringValue(const String& inValue) {
-        _stringValue = inValue;
-    }
+EventData::EventData(const String &name) :
+		_name(name),
+		_intValue(0),
+		_floatValue(0),
+		_stringValue() {
+	assert(_name.length() > 0);
+}
 
-    String EventData::toString() const {
-        return String("EventData");
-    }
+/// The name of the event, which is unique within the skeleton.
+const String &EventData::getName() const {
+	return _name;
+}
+
+int EventData::getIntValue() {
+	return _intValue;
+}
+
+void EventData::setIntValue(int inValue) {
+	_intValue = inValue;
+}
+
+float EventData::getFloatValue() {
+	return _floatValue;
+}
+
+void EventData::setFloatValue(float inValue) {
+	_floatValue = inValue;
+}
+
+const String &EventData::getStringValue() {
+	return _stringValue;
+}
+
+void EventData::setStringValue(const String &inValue) {
+	_stringValue = inValue;
+}
+
+String EventData::toString() const {
+	return String("EventData");
+}
 }

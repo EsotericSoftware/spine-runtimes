@@ -37,49 +37,51 @@
 #include <string.h>
 
 namespace Spine {
-    static const float PI = 3.1415926535897932385f;
-    static const float PI_2 = PI * 2;
-    static const float DEG_RAD = (PI / 180.0f);
-    static const float RAD_DEG = (180.0f / PI);
+static const float PI = 3.1415926535897932385f;
+static const float PI_2 = PI * 2;
+static const float DEG_RAD = (PI / 180.0f);
+static const float RAD_DEG = (180.0f / PI);
 
-    class MathUtil : public SpineObject {
-    public:
-        MathUtil();
+class MathUtil : public SpineObject {
+public:
+	MathUtil();
 
-        template <typename T> static inline T min(T a, T b) { return a < b ? a : b; }
+	template<typename T>
+	static inline T min(T a, T b) { return a < b ? a : b; }
 
-        template <typename T> static inline T max(T a, T b) { return a > b ? a : b; }
+	template<typename T>
+	static inline T max(T a, T b) { return a > b ? a : b; }
 
-        static int sign(float val);
+	static int sign(float val);
 
-        static float clamp(float x, float lower, float upper);
+	static float clamp(float x, float lower, float upper);
 
-        static float abs(float v);
-        
-        /// Returns the sine in radians from a lookup table.
-        static float sin(float radians);
-        
-        /// Returns the cosine in radians from a lookup table.
-        static float cos(float radians);
-        
-        /// Returns the sine in radians from a lookup table.
-        static float sinDeg(float degrees);
-        
-        /// Returns the cosine in radians from a lookup table.
-        static float cosDeg(float degrees);
-        
-        /// Returns atan2 in radians, faster but less accurate than Math.Atan2. Average error of 0.00231 radians (0.1323
-        /// degrees), largest error of 0.00488 radians (0.2796 degrees).
-        static float atan2(float y, float x);
+	static float abs(float v);
 
-        static float acos(float v);
+	/// Returns the sine in radians from a lookup table.
+	static float sin(float radians);
 
-        static float sqrt(float v);
+	/// Returns the cosine in radians from a lookup table.
+	static float cos(float radians);
 
-        static float fmod(float a, float b);
+	/// Returns the sine in radians from a lookup table.
+	static float sinDeg(float degrees);
 
-        static bool isNan(float v);
-    };
+	/// Returns the cosine in radians from a lookup table.
+	static float cosDeg(float degrees);
+
+	/// Returns atan2 in radians, faster but less accurate than Math.Atan2. Average error of 0.00231 radians (0.1323
+	/// degrees), largest error of 0.00488 radians (0.2796 degrees).
+	static float atan2(float y, float x);
+
+	static float acos(float v);
+
+	static float sqrt(float v);
+
+	static float fmod(float a, float b);
+
+	static bool isNan(float v);
+};
 }
 
 #endif /* Spine_MathUtil_h */

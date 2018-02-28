@@ -34,17 +34,17 @@
 #include <spine/Event.h>
 
 namespace Spine {
-    RTTI_IMPL_NOPARENT(Timeline);
-    
-    Timeline::Timeline() {
-    }
-    
-    Timeline::~Timeline() {
-    }
+RTTI_IMPL_NOPARENT(Timeline);
 
-	String Timeline::toString() const {
-		String str;
-		str.appendString(getRTTI().toString());
-		return str;
-	}
+Timeline::Timeline() {
+}
+
+Timeline::~Timeline() {
+}
+
+String Timeline::toString() const {
+	String str;
+	str.appendString(getRTTI().toString());
+	return str;
+}
 }

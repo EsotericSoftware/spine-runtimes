@@ -32,11 +32,11 @@
 #define Spine_SpacingMode_h
 
 namespace Spine {
-    enum SpacingMode {
-        SpacingMode_Length = 0,
-        SpacingMode_Fixed,
-        SpacingMode_Percent
-    };
+enum SpacingMode {
+	SpacingMode_Length = 0,
+	SpacingMode_Fixed,
+	SpacingMode_Percent
+};
 }
 
 #endif /* Spine_SpacingMode_h */

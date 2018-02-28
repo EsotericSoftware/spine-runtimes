@@ -33,47 +33,47 @@
 #include <spine/EventData.h>
 
 namespace Spine {
-    Event::Event(float time, const EventData& data) :
-    _data(data),
-    _time(time),
-    _intValue(0),
-    _floatValue(0),
-    _stringValue() {
-    }
-    
-    const EventData& Event::getData() {
-        return _data;
-    }
-    
-    float Event::getTime() {
-        return _time;
-    }
-    
-    int Event::getIntValue() {
-        return _intValue;
-    }
-    
-    void Event::setIntValue(int inValue) {
-        _intValue = inValue;
-    }
-    
-    float Event::getFloatValue() {
-        return _floatValue;
-    }
-    
-    void Event::setFloatValue(int inValue) {
-        _floatValue = inValue;
-    }
+Event::Event(float time, const EventData &data) :
+		_data(data),
+		_time(time),
+		_intValue(0),
+		_floatValue(0),
+		_stringValue() {
+}
 
-    const String& Event::getStringValue() {
-        return _stringValue;
-    }
-    
-    void Event::setStringValue(const String& inValue) {
-        _stringValue = inValue;
-    }
+const EventData &Event::getData() {
+	return _data;
+}
 
-    String Event::toString() const {
-        return String("Event");
-    }
+float Event::getTime() {
+	return _time;
+}
+
+int Event::getIntValue() {
+	return _intValue;
+}
+
+void Event::setIntValue(int inValue) {
+	_intValue = inValue;
+}
+
+float Event::getFloatValue() {
+	return _floatValue;
+}
+
+void Event::setFloatValue(int inValue) {
+	_floatValue = inValue;
+}
+
+const String &Event::getStringValue() {
+	return _stringValue;
+}
+
+void Event::setStringValue(const String &inValue) {
+	_stringValue = inValue;
+}
+
+String Event::toString() const {
+	return String("Event");
+}
 }

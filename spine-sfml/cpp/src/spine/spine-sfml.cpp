@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 #define SPINE_SHORT_NAMES
+
 #include <spine/spine-sfml.h>
 
 #ifndef SPINE_MESH_VERTEX_COUNT_MAX
@@ -47,63 +48,39 @@ sf::BlendMode additivePma = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::One
 sf::BlendMode multiplyPma = sf::BlendMode(sf::BlendMode::DstColor, sf::BlendMode::OneMinusSrcAlpha);
 sf::BlendMode screenPma = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcColor);
 
-
-void _AtlasPage_createTexture (Spine::AtlasPage* self, const char* path){
-	Texture* texture = new Texture();
-	if (!texture->loadFromFile(path)) return;
-
-	if (self->magFilter == Spine::TextureFilter_Nearest) texture->setSmooth(true);
-	if (self->uWrap == Spine::TextureWrap_Repeat && self->vWrap == Spine::TextureWrap_Repeat) texture->setRepeated(true);
-
-	self->rendererObject = texture;
-	Vector2u size = texture->getSize();
-	self->width = size.x;
-	self->height = size.y;
-}
-
-void _AtlasPage_disposeTexture (Spine::AtlasPage* self){
-	delete (Texture*)self->rendererObject;
-}
-
-char* _Util_readFile (const char* path, int* length){
-	return Spine::SpineExtension::readFile(Spine::String(path), length);
-}
-
-/**/
-
 namespace Spine {
 
-SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData, AnimationStateData* stateData) :
+SkeletonDrawable::SkeletonDrawable(SkeletonData *skeletonData, AnimationStateData *stateData) :
 		timeScale(1),
 		vertexArray(new VertexArray(Triangles, skeletonData->getBones().size() * 4)),
 		worldVertices(), clipper() {
 	Bone::setYDown(true);
 	worldVertices.ensureCapacity(SPINE_MESH_VERTEX_COUNT_MAX);
-	skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
+	skeleton = new(__FILE__, __LINE__) Skeleton(skeletonData);
 	tempUvs.ensureCapacity(16);
 	tempColors.ensureCapacity(16);
 
 	ownsAnimationStateData = stateData == 0;
-	if (ownsAnimationStateData) stateData = new (__FILE__, __LINE__) AnimationStateData(skeletonData);
+	if (ownsAnimationStateData) stateData = new(__FILE__, __LINE__) AnimationStateData(skeletonData);
 
-	state = new (__FILE__, __LINE__) AnimationState(stateData);
+	state = new(__FILE__, __LINE__) AnimationState(stateData);
 }
 
-SkeletonDrawable::~SkeletonDrawable () {
+SkeletonDrawable::~SkeletonDrawable() {
 	delete vertexArray;
 	if (ownsAnimationStateData) delete state->getData();
 	delete state;
 	delete skeleton;
 }
 
-void SkeletonDrawable::update (float deltaTime) {
+void SkeletonDrawable::update(float deltaTime) {
 	skeleton->update(deltaTime);
 	state->update(deltaTime * timeScale);
 	state->apply(*skeleton);
 	skeleton->updateWorldTransform();
 }
 
-void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
+void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 	vertexArray->clear();
 	states.texture = NULL;
 	Vector<unsigned short> quadIndices;
@@ -117,34 +94,34 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 	// BOZO if (vertexEffect != 0) vertexEffect->begin(vertexEffect, skeleton);
 
 	sf::Vertex vertex;
-	Texture* texture = NULL;
+	Texture *texture = NULL;
 	for (int i = 0; i < skeleton->getSlots().size(); ++i) {
-		Slot& slot = *skeleton->getDrawOrder()[i];
-		Attachment* attachment = slot.getAttachment();
+		Slot &slot = *skeleton->getDrawOrder()[i];
+		Attachment *attachment = slot.getAttachment();
 		if (!attachment) continue;
 
-		Vector<float>* vertices = &worldVertices;
+		Vector<float> *vertices = &worldVertices;
 		int verticesCount = 0;
-		Vector<float>* uvs = NULL;
-		Vector<unsigned short>* indices = NULL;
+		Vector<float> *uvs = NULL;
+		Vector<unsigned short> *indices = NULL;
 		int indicesCount = 0;
-		Color* attachmentColor;
+		Color *attachmentColor;
 
 		if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
-			RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
+			RegionAttachment *regionAttachment = (RegionAttachment *) attachment;
 			worldVertices.setSize(8, 0);
 			regionAttachment->computeWorldVertices(slot.getBone(), worldVertices, 0, 2);
 			verticesCount = 4;
 			uvs = &regionAttachment->getUVs();
 			indices = &quadIndices;
 			indicesCount = 6;
-			texture = (Texture*)((AtlasRegion*)regionAttachment->getRendererObject())->page->rendererObject;
+			texture = (Texture *) ((AtlasRegion *) regionAttachment->getRendererObject())->page->rendererObject;
 			attachmentColor = &regionAttachment->getColor();
 
 		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
-			MeshAttachment* mesh = (MeshAttachment*)attachment;
+			MeshAttachment *mesh = (MeshAttachment *) attachment;
 			worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
-			texture = (Texture*)((AtlasRegion*)mesh->getRendererObject())->page->rendererObject;
+			texture = (Texture *) ((AtlasRegion *) mesh->getRendererObject())->page->rendererObject;
 			mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices, 0, 2);
 			verticesCount = mesh->getWorldVerticesLength() >> 1;
 			uvs = &mesh->getUVs();
@@ -152,7 +129,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 			indicesCount = mesh->getTriangles().size();
 			attachmentColor = &mesh->getColor();
 		} else if (attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
-			ClippingAttachment* clip = (ClippingAttachment*)slot.getAttachment();
+			ClippingAttachment *clip = (ClippingAttachment *) slot.getAttachment();
 			clipper.clipStart(slot, clip);
 			continue;
 		} else continue;
@@ -280,7 +257,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 }
 
 void SFMLTextureLoader::load(AtlasPage &page, const String &path) {
-	Texture* texture = new Texture();
+	Texture *texture = new Texture();
 	if (!texture->loadFromFile(path.buffer())) return;
 
 	if (page.magFilter == TextureFilter_Linear) texture->setSmooth(true);
@@ -293,10 +270,11 @@ void SFMLTextureLoader::load(AtlasPage &page, const String &path) {
 }
 
 void SFMLTextureLoader::unload(void *texture) {
-	delete (Texture*)texture;
+	delete (Texture *) texture;
 }
 
-	String SFMLTextureLoader::toString() const {
-		return String("SFMLTextureLoader");
-	}
-} /* namespace spine */
+String SFMLTextureLoader::toString() const {
+	return String("SFMLTextureLoader");
+}
+
+}

@@ -37,162 +37,163 @@
 #include <spine/String.h>
 
 namespace Spine {
-    template <typename K, typename V>
-    class HashMap : public SpineObject {
-    private:
-        class Entry;
-        
-    public:
-        class Pair {
-        public:
-            explicit Pair(K& k, V& v) : key(k), value(v) {}
+template<typename K, typename V>
+class HashMap : public SpineObject {
+private:
+	class Entry;
 
-            K& key;
-            V& value;
-        };
+public:
+	class Pair {
+	public:
+		explicit Pair(K &k, V &v) : key(k), value(v) {}
 
-        class Entries {
-        public:
-            friend class HashMap;
+		K &key;
+		V &value;
+	};
 
-            explicit Entries(Entry *entry) : _entry(NULL), _hasChecked(false) {
-                _start.next = entry;
-                _entry = &_start;
-            }
+	class Entries {
+	public:
+		friend class HashMap;
 
-            Pair next() {
-                assert(_entry);
-                assert(_hasChecked);
-                _entry = _entry->next;
-                Pair pair(_entry->_key, _entry->_value);
-                _hasChecked = false;
-                return pair;
-            }
+		explicit Entries(Entry *entry) : _entry(NULL), _hasChecked(false) {
+			_start.next = entry;
+			_entry = &_start;
+		}
 
-            bool hasNext() {
-                _hasChecked = true;
-                return _entry->next;
-            }
+		Pair next() {
+			assert(_entry);
+			assert(_hasChecked);
+			_entry = _entry->next;
+			Pair pair(_entry->_key, _entry->_value);
+			_hasChecked = false;
+			return pair;
+		}
 
-        private:
-            bool _hasChecked;
-            Entry _start;
-            Entry* _entry;
-        };
+		bool hasNext() {
+			_hasChecked = true;
+			return _entry->next;
+		}
 
-        HashMap() :
-        _head(NULL),
-        _size(0) {
-        }
-        
-        ~HashMap() {
-            for (Entry* entry = _head; entry != NULL; entry = entry->next) {
-                delete entry;
-            }
-        }
-        
-        size_t size() {
-            return _size;
-        }
-        
-        void put(const K& key, const V& value) {
-            Entry* entry = find(key);
-            if (entry) {
-                entry->_key = key;
-                entry->_value = value;
-            } else {
-                entry = new (__FILE__, __LINE__) Entry();
-                entry->_key = key;
-                entry->_value = value;
+	private:
+		bool _hasChecked;
+		Entry _start;
+		Entry *_entry;
+	};
 
-                Entry* oldHead = _head;
+	HashMap() :
+			_head(NULL),
+			_size(0) {
+	}
 
-                if (oldHead) {
-                    _head = entry;
-                    oldHead->prev = entry;
-                    entry->next = oldHead;
-                } else {
-                    _head = entry;
-                }
-                _size++;
-            }
-        }
-        
-        bool containsKey(const K& key) {
-            return find(key) != NULL;
-        }
-        
-        bool remove(const K& key) {
-            Entry* entry = find(key);
-            if (!entry) return false;
+	~HashMap() {
+		for (Entry *entry = _head; entry != NULL; entry = entry->next) {
+			delete entry;
+		}
+	}
 
-            Entry* prev = entry->prev;
-            Entry* next = entry->next;
+	size_t size() {
+		return _size;
+	}
 
-            if (prev) prev->next = next;
-            else _head = next;
-            if (next) next->prev = entry->prev;
+	void put(const K &key, const V &value) {
+		Entry *entry = find(key);
+		if (entry) {
+			entry->_key = key;
+			entry->_value = value;
+		} else {
+			entry = new(__FILE__, __LINE__) Entry();
+			entry->_key = key;
+			entry->_value = value;
 
-            delete entry;
-            _size--;
+			Entry *oldHead = _head;
 
-            return true;
-        }
-        
-        V operator[](const K& key) {
-            Entry* entry = find(key);
-            if (entry) return entry->_value;
-            else assert(false);
-        }
+			if (oldHead) {
+				_head = entry;
+				oldHead->prev = entry;
+				entry->next = oldHead;
+			} else {
+				_head = entry;
+			}
+			_size++;
+		}
+	}
 
-        Entries getEntries() const {
-            return Entries(_head);
-        }
+	bool containsKey(const K &key) {
+		return find(key) != NULL;
+	}
 
-        String toString() const {
-            String str;
+	bool remove(const K &key) {
+		Entry *entry = find(key);
+		if (!entry) return false;
 
-            str.append("{");
-            Entries entries = getEntries();
+		Entry *prev = entry->prev;
+		Entry *next = entry->next;
 
-            while(entries.hasNext()) {
-                Pair pair = entries.next();
-                str.append(pair.key);
-                str.append("->");
-                str.append(pair.value);
-            }
-            str.append("}");
-            return str;
-        }
-        
-    private:
-        Entry* find(const K& key) {
-            for (Entry* entry = _head; entry != NULL; entry = entry->next) {
-                if (entry->_key == key)
-                    return entry;
-            }
-            return NULL;
-        }
+		if (prev) prev->next = next;
+		else _head = next;
+		if (next) next->prev = entry->prev;
 
-        class Entry : public SpineObject {
-        public:
-            K _key;
-            V _value;
-            Entry* next;
-            Entry* prev;
+		delete entry;
+		_size--;
 
-            Entry () : next(NULL), prev(NULL) {}
+		return true;
+	}
 
-            String toString() const {
-                String str;
-                str.append("Entry { key: ").append(_key).append(" -> ").append(_value);
-                return str;
-            }
-        };
+	V operator[](const K &key) {
+		Entry *entry = find(key);
+		if (entry) return entry->_value;
+		else
+			assert(false);
+	}
 
-        Entry* _head;
-        size_t _size;
-    };
+	Entries getEntries() const {
+		return Entries(_head);
+	}
+
+	String toString() const {
+		String str;
+
+		str.append("{");
+		Entries entries = getEntries();
+
+		while (entries.hasNext()) {
+			Pair pair = entries.next();
+			str.append(pair.key);
+			str.append("->");
+			str.append(pair.value);
+		}
+		str.append("}");
+		return str;
+	}
+
+private:
+	Entry *find(const K &key) {
+		for (Entry *entry = _head; entry != NULL; entry = entry->next) {
+			if (entry->_key == key)
+				return entry;
+		}
+		return NULL;
+	}
+
+	class Entry : public SpineObject {
+	public:
+		K _key;
+		V _value;
+		Entry *next;
+		Entry *prev;
+
+		Entry() : next(NULL), prev(NULL) {}
+
+		String toString() const {
+			String str;
+			str.append("Entry { key: ").append(_key).append(" -> ").append(_value);
+			return str;
+		}
+	};
+
+	Entry *_head;
+	size_t _size;
+};
 }
 
 #endif /* Spine_HashMap_h */

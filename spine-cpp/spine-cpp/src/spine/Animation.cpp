@@ -36,119 +36,116 @@
 
 #include <spine/ContainerUtil.h>
 
-#include <assert.h>
-
 namespace Spine {
-    Animation::Animation(const String& name, Vector<Timeline*>& timelines, float duration) :
-    _timelines(timelines),
-    _duration(duration),
-    _name(name) {
-        assert(_name.length() > 0);
-    }
-    
-    Animation::~Animation() {
-        ContainerUtil::cleanUpVectorOfPointers(_timelines);
-    }
-    
-    void Animation::apply(Skeleton& skeleton, float lastTime, float time, bool loop, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
-        if (loop && _duration != 0) {
-            time = MathUtil::fmod(time, _duration);
-            if (lastTime > 0) {
-                lastTime = MathUtil::fmod(lastTime, _duration);
-            }
-        }
-        
-        for (int i = 0, n = static_cast<int>(_timelines.size()); i < n; ++i) {
-            _timelines[i]->apply(skeleton, lastTime, time, pEvents, alpha, pose, direction);
-        }
-    }
-    
-    const String& Animation::getName() {
-        return _name;
-    }
-    
-    Vector<Timeline*> Animation::getTimelines() {
-        return _timelines;
-    }
-    
-    void Animation::setTimelines(Vector<Timeline*>& inValue) {
-        _timelines.clear();
-        _timelines.addAll(inValue);
-    }
-    
-    float Animation::getDuration() {
-        return _duration;
-    }
-    
-    void Animation::setDuration(float inValue) {
-        _duration = inValue;
-    }
-    
-    int Animation::binarySearch(Vector<float>& values, float target, int step) {
-        int low = 0;
-        int size = static_cast<int>(values.size());
-        int high = size / step - 2;
-        if (high == 0) {
-            return step;
-        }
-        
-        int current = (int)(static_cast<uint32_t>(high) >> 1);
-        while (true) {
-            if (values[(current + 1) * step] <= target) {
-                low = current + 1;
-            }
-            else {
-                high = current;
-            }
-            
-            if (low == high) {
-                return (low + 1) * step;
-            }
-            
-            current = (int)(static_cast<uint32_t>(low + high) >> 1);
-        }
-    }
-    
-    int Animation::binarySearch(Vector<float>& values, float target) {
-        int low = 0;
-        int size = static_cast<int>(values.size());
-        int high = size - 2;
-        if (high == 0) {
-            return 1;
-        }
-        
-        int current = (int)(static_cast<uint32_t>(high) >> 1);
-        while (true) {
-            if (values[(current + 1)] <= target) {
-                low = current + 1;
-            }
-            else {
-                high = current;
-            }
-            
-            if (low == high) {
-                return (low + 1);
-            }
-            
-            current = (int)(static_cast<uint32_t>(low + high) >> 1);
-        }
-    }
-    
-    int Animation::linearSearch(Vector<float>& values, float target, int step) {
-        for (int i = 0, last = static_cast<int>(values.size()) - step; i <= last; i += step) {
-            if (values[i] > target) {
-                return i;
-            }
-        }
-        
-        return -1;
-    }
+Animation::Animation(const String &name, Vector<Timeline *> &timelines, float duration) :
+		_timelines(timelines),
+		_duration(duration),
+		_name(name) {
+	assert(_name.length() > 0);
+}
 
-	String Animation::toString() const {
-		String str;
-        str.append("Animation { name: ").appendString(_name).append(", duration: ").append(_duration);
-        str.append(",\n timelines: ").appendString(_timelines.toString());
-        str.append("}");
-        return str;
+Animation::~Animation() {
+	ContainerUtil::cleanUpVectorOfPointers(_timelines);
+}
+
+void Animation::apply(Skeleton &skeleton, float lastTime, float time, bool loop, Vector<Event *> *pEvents, float alpha,
+					  MixPose pose, MixDirection direction) {
+	if (loop && _duration != 0) {
+		time = MathUtil::fmod(time, _duration);
+		if (lastTime > 0) {
+			lastTime = MathUtil::fmod(lastTime, _duration);
+		}
 	}
+
+	for (int i = 0, n = static_cast<int>(_timelines.size()); i < n; ++i) {
+		_timelines[i]->apply(skeleton, lastTime, time, pEvents, alpha, pose, direction);
+	}
+}
+
+const String &Animation::getName() {
+	return _name;
+}
+
+Vector<Timeline *> Animation::getTimelines() {
+	return _timelines;
+}
+
+void Animation::setTimelines(Vector<Timeline *> &inValue) {
+	_timelines.clear();
+	_timelines.addAll(inValue);
+}
+
+float Animation::getDuration() {
+	return _duration;
+}
+
+void Animation::setDuration(float inValue) {
+	_duration = inValue;
+}
+
+int Animation::binarySearch(Vector<float> &values, float target, int step) {
+	int low = 0;
+	int size = static_cast<int>(values.size());
+	int high = size / step - 2;
+	if (high == 0) {
+		return step;
+	}
+
+	int current = (int) (static_cast<uint32_t>(high) >> 1);
+	while (true) {
+		if (values[(current + 1) * step] <= target) {
+			low = current + 1;
+		} else {
+			high = current;
+		}
+
+		if (low == high) {
+			return (low + 1) * step;
+		}
+
+		current = (int) (static_cast<uint32_t>(low + high) >> 1);
+	}
+}
+
+int Animation::binarySearch(Vector<float> &values, float target) {
+	int low = 0;
+	int size = static_cast<int>(values.size());
+	int high = size - 2;
+	if (high == 0) {
+		return 1;
+	}
+
+	int current = (int) (static_cast<uint32_t>(high) >> 1);
+	while (true) {
+		if (values[(current + 1)] <= target) {
+			low = current + 1;
+		} else {
+			high = current;
+		}
+
+		if (low == high) {
+			return (low + 1);
+		}
+
+		current = (int) (static_cast<uint32_t>(low + high) >> 1);
+	}
+}
+
+int Animation::linearSearch(Vector<float> &values, float target, int step) {
+	for (int i = 0, last = static_cast<int>(values.size()) - step; i <= last; i += step) {
+		if (values[i] > target) {
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+String Animation::toString() const {
+	String str;
+	str.append("Animation { name: ").appendString(_name).append(", duration: ").append(_duration);
+	str.append(",\n timelines: ").appendString(_timelines.toString());
+	str.append("}");
+	return str;
+}
 }

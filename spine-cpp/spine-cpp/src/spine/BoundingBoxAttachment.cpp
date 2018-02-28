@@ -31,15 +31,16 @@
 #include <spine/BoundingBoxAttachment.h>
 
 namespace Spine {
-    RTTI_IMPL(BoundingBoxAttachment, VertexAttachment);
-    
-    BoundingBoxAttachment::BoundingBoxAttachment(const String& name) : VertexAttachment(name) {
-    }
+RTTI_IMPL(BoundingBoxAttachment, VertexAttachment);
 
-    String BoundingBoxAttachment::toString() const {
-        String str;
-        str.append("BoundingBoxAttachment { name: ").appendString(getName()).append(", worldVerticesLength: ").append(_worldVerticesLength);
-        str.append(",\n bones: ").append(_bones).append(",\n weights: ").append(_vertices).append(" }");
-        return str;
-    }
+BoundingBoxAttachment::BoundingBoxAttachment(const String &name) : VertexAttachment(name) {
+}
+
+String BoundingBoxAttachment::toString() const {
+	String str;
+	str.append("BoundingBoxAttachment { name: ").appendString(getName()).append(", worldVerticesLength: ").append(
+			_worldVerticesLength);
+	str.append(",\n bones: ").append(_bones).append(",\n weights: ").append(_vertices).append(" }");
+	return str;
+}
 }

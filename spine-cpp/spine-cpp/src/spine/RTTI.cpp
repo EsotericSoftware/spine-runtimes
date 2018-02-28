@@ -32,37 +32,37 @@
 #include <spine/String.h>
 
 namespace Spine {
-    RTTI::RTTI(const std::string& className) : _className(className), _pBaseRTTI(NULL) {
-    }
-    
-    RTTI::RTTI(const std::string& className, const RTTI& baseRTTI) : _className(className), _pBaseRTTI(&baseRTTI) {
-    }
-    
-    const std::string& RTTI::getClassName() const {
-        return _className;
-    }
-    
-    bool RTTI::isExactly(const RTTI& rtti) const {
-        return (this == &rtti);
-    }
+RTTI::RTTI(const std::string &className) : _className(className), _pBaseRTTI(NULL) {
+}
 
-    bool RTTI::instanceOf(const RTTI &rtti) const {
-        const RTTI * pCompare = this;
+RTTI::RTTI(const std::string &className, const RTTI &baseRTTI) : _className(className), _pBaseRTTI(&baseRTTI) {
+}
 
-        while (pCompare) {
-            if (pCompare == &rtti) {
-                return true;
-            }
+const std::string &RTTI::getClassName() const {
+	return _className;
+}
 
-            pCompare = pCompare->_pBaseRTTI;
-        }
+bool RTTI::isExactly(const RTTI &rtti) const {
+	return (this == &rtti);
+}
 
-        return false;
-    }
+bool RTTI::instanceOf(const RTTI &rtti) const {
+	const RTTI *pCompare = this;
 
-    String RTTI::toString() const {
-        String str;
-        str.append("RTTI { name: ").append(_className.c_str()).append(" }");
-        return str;
-    }
+	while (pCompare) {
+		if (pCompare == &rtti) {
+			return true;
+		}
+
+		pCompare = pCompare->_pBaseRTTI;
+	}
+
+	return false;
+}
+
+String RTTI::toString() const {
+	String str;
+	str.append("RTTI { name: ").append(_className.c_str()).append(" }");
+	return str;
+}
 }

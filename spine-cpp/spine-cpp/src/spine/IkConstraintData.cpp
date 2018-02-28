@@ -33,55 +33,55 @@
 #include <spine/BoneData.h>
 
 namespace Spine {
-    IkConstraintData::IkConstraintData(const String& name) :
-    _name(name),
-    _order(0),
-    _target(NULL),
-    _bendDirection(1),
-    _mix(1) {
-    }
-    
-    const String& IkConstraintData::getName() {
-        return _name;
-    }
-    
-    int IkConstraintData::getOrder() {
-        return _order;
-    }
-    
-    void IkConstraintData::setOrder(int inValue) {
-        _order = inValue;
-    }
-    
-    Vector<BoneData*>& IkConstraintData::getBones() {
-        return _bones;
-    }
-    
-    BoneData* IkConstraintData::getTarget() {
-        return _target;
-    }
-    
-    void IkConstraintData::setTarget(BoneData* inValue) {
-        _target = inValue;
-    }
-    
-    int IkConstraintData::getBendDirection() {
-        return _bendDirection;
-    }
-    
-    void IkConstraintData::setBendDirection(int inValue) {
-        _bendDirection = inValue;
-    }
-    
-    float IkConstraintData::getMix() {
-        return _mix;
-    }
-    
-    void IkConstraintData::setMix(float inValue) {
-        _mix = inValue;
-    }
+IkConstraintData::IkConstraintData(const String &name) :
+		_name(name),
+		_order(0),
+		_target(NULL),
+		_bendDirection(1),
+		_mix(1) {
+}
 
-    String IkConstraintData::toString() const {
-        return String("IkConstraintData");
-    }
+const String &IkConstraintData::getName() {
+	return _name;
+}
+
+int IkConstraintData::getOrder() {
+	return _order;
+}
+
+void IkConstraintData::setOrder(int inValue) {
+	_order = inValue;
+}
+
+Vector<BoneData *> &IkConstraintData::getBones() {
+	return _bones;
+}
+
+BoneData *IkConstraintData::getTarget() {
+	return _target;
+}
+
+void IkConstraintData::setTarget(BoneData *inValue) {
+	_target = inValue;
+}
+
+int IkConstraintData::getBendDirection() {
+	return _bendDirection;
+}
+
+void IkConstraintData::setBendDirection(int inValue) {
+	_bendDirection = inValue;
+}
+
+float IkConstraintData::getMix() {
+	return _mix;
+}
+
+void IkConstraintData::setMix(float inValue) {
+	_mix = inValue;
+}
+
+String IkConstraintData::toString() const {
+	return String("IkConstraintData");
+}
 }

@@ -38,102 +38,102 @@
 #include <assert.h>
 
 namespace Spine {
-    Skin::AttachmentKey::AttachmentKey(int slotIndex, const String& name) :
-    _slotIndex(slotIndex),
-    _name(name) {
-    }
-    
-    bool Skin::AttachmentKey::operator==(const AttachmentKey &other) const {
-        return _slotIndex == other._slotIndex && _name == other._name;
-    }
+Skin::AttachmentKey::AttachmentKey(int slotIndex, const String &name) :
+		_slotIndex(slotIndex),
+		_name(name) {
+}
 
-	String Skin::AttachmentKey::toString() const {
-		String str;
-        str.append("AttachmentKey { slotIndex: ").append(_slotIndex).append(", name: ").appendString(_name).append(" }");
-        return str;
+bool Skin::AttachmentKey::operator==(const AttachmentKey &other) const {
+	return _slotIndex == other._slotIndex && _name == other._name;
+}
+
+String Skin::AttachmentKey::toString() const {
+	String str;
+	str.append("AttachmentKey { slotIndex: ").append(_slotIndex).append(", name: ").appendString(_name).append(" }");
+	return str;
+}
+
+std::size_t Skin::HashAttachmentKey::operator()(const Spine::Skin::AttachmentKey &val) const {
+	std::size_t h1 = val._slotIndex;
+	return h1;
+}
+
+Skin::Skin(const String &name) : _name(name) {
+	assert(_name.length() > 0);
+}
+
+Skin::~Skin() {
+	HashMap<AttachmentKey, Attachment *>::Entries entries = _attachments.getEntries();
+	while (entries.hasNext()) {
+		HashMap<AttachmentKey, Attachment *>::Pair pair = entries.next();
+		delete pair.value;
 	}
+}
 
-	std::size_t Skin::HashAttachmentKey::operator()(const Spine::Skin::AttachmentKey& val) const {
-        std::size_t h1 = val._slotIndex;
-        return h1;
-    }
-    
-    Skin::Skin(const String& name) : _name(name) {
-        assert(_name.length() > 0);
-    }
+void Skin::addAttachment(int slotIndex, const String &name, Attachment *attachment) {
+	assert(attachment);
+	_attachments.put(AttachmentKey(slotIndex, name), attachment);
+}
 
-    Skin::~Skin() {
-        HashMap<AttachmentKey, Attachment*>::Entries entries = _attachments.getEntries();
-        while(entries.hasNext()) {
-            HashMap<AttachmentKey, Attachment*>::Pair pair = entries.next();
-			delete pair.value;
-        }
-    }
-    
-    void Skin::addAttachment(int slotIndex, const String& name, Attachment* attachment) {
-        assert(attachment);
-        _attachments.put(AttachmentKey(slotIndex, name), attachment);
-    }
-    
-    Attachment* Skin::getAttachment(int slotIndex, const String& name) {
-        AttachmentKey key(slotIndex, name);
-        if (_attachments.containsKey(key)) {
-            return _attachments[key];
-        } else {
-            return NULL;
-        }
-    }
-    
-    void Skin::findNamesForSlot(int slotIndex, Vector<String>& names) {
-        HashMap<AttachmentKey, Attachment*>::Entries entries = _attachments.getEntries();
-        while(entries.hasNext()) {
-            HashMap<AttachmentKey, Attachment*>::Pair pair = entries.next();
-            if (pair.key._slotIndex == slotIndex) {
-                names.add(pair.key._name);
-            }
-        }
-    }
-    
-    void Skin::findAttachmentsForSlot(int slotIndex, Vector<Attachment*>& attachments) {
-        HashMap<AttachmentKey, Attachment*>::Entries entries = _attachments.getEntries();
-        while(entries.hasNext()) {
-            HashMap<AttachmentKey, Attachment*>::Pair pair = entries.next();
-            if (pair.key._slotIndex == slotIndex) {
-                attachments.add(pair.value);
-            }
-        }
-    }
+Attachment *Skin::getAttachment(int slotIndex, const String &name) {
+	AttachmentKey key(slotIndex, name);
+	if (_attachments.containsKey(key)) {
+		return _attachments[key];
+	} else {
+		return NULL;
+	}
+}
 
-	const String& Skin::getName() {
-        return _name;
-    }
-    
-    HashMap<Skin::AttachmentKey, Attachment*>& Skin::getAttachments() {
-        return _attachments;
-    }
-    
-    void Skin::attachAll(Skeleton& skeleton, Skin& oldSkin) {
-        Vector<Slot*>& slots = skeleton.getSlots();
-        HashMap<AttachmentKey, Attachment*>::Entries entries = oldSkin.getAttachments().getEntries();
-        while(entries.hasNext()) {
-            HashMap<AttachmentKey, Attachment*>::Pair pair = entries.next();
-            int slotIndex = pair.key._slotIndex;
-            Slot* slot = slots[slotIndex];
-            
-            if (slot->getAttachment() == pair.value) {
-                Attachment* attachment = NULL;
-                if ((attachment = getAttachment(slotIndex, pair.key._name))) {
-                    slot->setAttachment(attachment);
-                }
-            }
-        }
-    }
+void Skin::findNamesForSlot(int slotIndex, Vector<String> &names) {
+	HashMap<AttachmentKey, Attachment *>::Entries entries = _attachments.getEntries();
+	while (entries.hasNext()) {
+		HashMap<AttachmentKey, Attachment *>::Pair pair = entries.next();
+		if (pair.key._slotIndex == slotIndex) {
+			names.add(pair.key._name);
+		}
+	}
+}
 
-    String Skin::toString() const {
-        String str;
-        str.append("Skin { name: ").appendString(_name);
-        str.append(",\n attachments: ").append(_attachments);
-        str.append(" }");
-        return str;
-    }
+void Skin::findAttachmentsForSlot(int slotIndex, Vector<Attachment *> &attachments) {
+	HashMap<AttachmentKey, Attachment *>::Entries entries = _attachments.getEntries();
+	while (entries.hasNext()) {
+		HashMap<AttachmentKey, Attachment *>::Pair pair = entries.next();
+		if (pair.key._slotIndex == slotIndex) {
+			attachments.add(pair.value);
+		}
+	}
+}
+
+const String &Skin::getName() {
+	return _name;
+}
+
+HashMap<Skin::AttachmentKey, Attachment *> &Skin::getAttachments() {
+	return _attachments;
+}
+
+void Skin::attachAll(Skeleton &skeleton, Skin &oldSkin) {
+	Vector<Slot *> &slots = skeleton.getSlots();
+	HashMap<AttachmentKey, Attachment *>::Entries entries = oldSkin.getAttachments().getEntries();
+	while (entries.hasNext()) {
+		HashMap<AttachmentKey, Attachment *>::Pair pair = entries.next();
+		int slotIndex = pair.key._slotIndex;
+		Slot *slot = slots[slotIndex];
+
+		if (slot->getAttachment() == pair.value) {
+			Attachment *attachment = NULL;
+			if ((attachment = getAttachment(slotIndex, pair.key._name))) {
+				slot->setAttachment(attachment);
+			}
+		}
+	}
+}
+
+String Skin::toString() const {
+	String str;
+	str.append("Skin { name: ").appendString(_name);
+	str.append(",\n attachments: ").append(_attachments);
+	str.append(" }");
+	return str;
+}
 }

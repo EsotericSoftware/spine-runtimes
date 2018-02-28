@@ -35,40 +35,45 @@
 #include <spine/String.h>
 
 namespace Spine {
-    class EventData;
-    
-    /// Stores the current pose values for an Event.
-    class Event : public SpineObject {
-        friend class SkeletonBinary;
-        friend class SkeletonJson;
-        friend class AnimationState;
-        
-    public:
-        Event(float time, const EventData& data);
-        
-        const EventData& getData();
-        
-        /// The animation time this event was keyed.
-        float getTime();
-        
-        int getIntValue();
-        void setIntValue(int inValue);
-        
-        float getFloatValue();
-        void setFloatValue(int inValue);
+class EventData;
 
-        const String& getStringValue();
-        void setStringValue(const String& inValue);
+/// Stores the current pose values for an Event.
+class Event : public SpineObject {
+	friend class SkeletonBinary;
 
-        String toString() const;
-        
-    private:
-        const EventData& _data;
-        const float _time;
-        int _intValue;
-        float _floatValue;
-        String _stringValue;
-    };
+	friend class SkeletonJson;
+
+	friend class AnimationState;
+
+public:
+	Event(float time, const EventData &data);
+
+	const EventData &getData();
+
+	/// The animation time this event was keyed.
+	float getTime();
+
+	int getIntValue();
+
+	void setIntValue(int inValue);
+
+	float getFloatValue();
+
+	void setFloatValue(int inValue);
+
+	const String &getStringValue();
+
+	void setStringValue(const String &inValue);
+
+	String toString() const;
+
+private:
+	const EventData &_data;
+	const float _time;
+	int _intValue;
+	float _floatValue;
+	String _stringValue;
+};
 }
 
 #endif /* Spine_Event_h */

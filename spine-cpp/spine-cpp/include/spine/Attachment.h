@@ -36,18 +36,19 @@
 #include <spine/String.h>
 
 namespace Spine {
-    class Attachment : public SpineObject {
-        RTTI_DECL
-        
-    public:
-        explicit Attachment(const String& name);
-        virtual ~Attachment();
+class Attachment : public SpineObject {
+RTTI_DECL
 
-        const String& getName() const;
-        
-    private:
-        const String _name;
-    };
+public:
+	explicit Attachment(const String &name);
+
+	virtual ~Attachment();
+
+	const String &getName() const;
+
+private:
+	const String _name;
+};
 }
 
 #endif /* Spine_Attachment_h */

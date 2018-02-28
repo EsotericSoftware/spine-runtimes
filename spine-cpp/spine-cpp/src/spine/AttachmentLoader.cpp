@@ -39,11 +39,11 @@
 #include <spine/ClippingAttachment.h>
 
 namespace Spine {
-    RTTI_IMPL_NOPARENT(AttachmentLoader);
-    
-    AttachmentLoader::AttachmentLoader() {
-    }
-    
-    AttachmentLoader::~AttachmentLoader() {
-    }
+RTTI_IMPL_NOPARENT(AttachmentLoader);
+
+AttachmentLoader::AttachmentLoader() {
+}
+
+AttachmentLoader::~AttachmentLoader() {
+}
 }

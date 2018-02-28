@@ -41,80 +41,85 @@
 #include <spine/IkConstraintData.h>
 
 namespace Spine {
-    RTTI_IMPL(IkConstraintTimeline, CurveTimeline);
-    
-    const int IkConstraintTimeline::ENTRIES = 3;
-    const int IkConstraintTimeline::PREV_TIME = -3;
-    const int IkConstraintTimeline::PREV_MIX = -2;
-    const int IkConstraintTimeline::PREV_BEND_DIRECTION = -1;
-    const int IkConstraintTimeline::MIX = 1;
-    const int IkConstraintTimeline::BEND_DIRECTION = 2;
-    
-    IkConstraintTimeline::IkConstraintTimeline(int frameCount) : CurveTimeline(frameCount), _ikConstraintIndex(0) {
-        _frames.setSize(frameCount * ENTRIES, 0);
-    }
-    
-    void IkConstraintTimeline::apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) {
-        IkConstraint* constraintP = skeleton._ikConstraints[_ikConstraintIndex];
-        IkConstraint& constraint = *constraintP;
-        if (time < _frames[0]) {
-            switch (pose) {
-                case MixPose_Setup:
-                    constraint._mix = constraint._data._mix;
-                    constraint._bendDirection = constraint._data._bendDirection;
-                    return;
-                case MixPose_Current:
-                    constraint._mix += (constraint._data._mix - constraint._mix) * alpha;
-                    constraint._bendDirection = constraint._data._bendDirection;
-                    return;
-                case MixPose_CurrentLayered:
-                default:
-                    return;
-            }
-        }
-        
-        if (time >= _frames[_frames.size() - ENTRIES]) {
-            // Time is after last frame.
-            if (pose == MixPose_Setup) {
-                constraint._mix = constraint._data._mix + (_frames[_frames.size() + PREV_MIX] - constraint._data._mix) * alpha;
-                constraint._bendDirection = direction == MixDirection_Out ? constraint._data._bendDirection
-                : (int)_frames[_frames.size() + PREV_BEND_DIRECTION];
-            }
-            else {
-                constraint._mix += (_frames[_frames.size() + PREV_MIX] - constraint._mix) * alpha;
-                if (direction == MixDirection_In) {
-                    constraint._bendDirection = (int)_frames[_frames.size() + PREV_BEND_DIRECTION];
-                }
-            }
-            return;
-        }
-        
-        // Interpolate between the previous frame and the current frame.
-        int frame = Animation::binarySearch(_frames, time, ENTRIES);
-        float mix = _frames[frame + PREV_MIX];
-        float frameTime = _frames[frame];
-        float percent = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
-        
-        if (pose == MixPose_Setup) {
-            constraint._mix = constraint._data._mix + (mix + (_frames[frame + MIX] - mix) * percent - constraint._data._mix) * alpha;
-            constraint._bendDirection = direction == MixDirection_Out ? constraint._data._bendDirection : (int)_frames[frame + PREV_BEND_DIRECTION];
-        }
-        else {
-            constraint._mix += (mix + (_frames[frame + MIX] - mix) * percent - constraint._mix) * alpha;
-            if (direction == MixDirection_In) {
-                constraint._bendDirection = (int)_frames[frame + PREV_BEND_DIRECTION];
-            }
-        }
-    }
-    
-    int IkConstraintTimeline::getPropertyId() {
-        return ((int)TimelineType_IkConstraint << 24) + _ikConstraintIndex;
-    }
-    
-    void IkConstraintTimeline::setFrame(int frameIndex, float time, float mix, int bendDirection) {
-        frameIndex *= ENTRIES;
-        _frames[frameIndex] = time;
-        _frames[frameIndex + MIX] = mix;
-        _frames[frameIndex + BEND_DIRECTION] = bendDirection;
-    }
+RTTI_IMPL(IkConstraintTimeline, CurveTimeline);
+
+const int IkConstraintTimeline::ENTRIES = 3;
+const int IkConstraintTimeline::PREV_TIME = -3;
+const int IkConstraintTimeline::PREV_MIX = -2;
+const int IkConstraintTimeline::PREV_BEND_DIRECTION = -1;
+const int IkConstraintTimeline::MIX = 1;
+const int IkConstraintTimeline::BEND_DIRECTION = 2;
+
+IkConstraintTimeline::IkConstraintTimeline(int frameCount) : CurveTimeline(frameCount), _ikConstraintIndex(0) {
+	_frames.setSize(frameCount * ENTRIES, 0);
+}
+
+void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
+								 MixPose pose, MixDirection direction) {
+	IkConstraint *constraintP = skeleton._ikConstraints[_ikConstraintIndex];
+	IkConstraint &constraint = *constraintP;
+	if (time < _frames[0]) {
+		switch (pose) {
+			case MixPose_Setup:
+				constraint._mix = constraint._data._mix;
+				constraint._bendDirection = constraint._data._bendDirection;
+				return;
+			case MixPose_Current:
+				constraint._mix += (constraint._data._mix - constraint._mix) * alpha;
+				constraint._bendDirection = constraint._data._bendDirection;
+				return;
+			case MixPose_CurrentLayered:
+			default:
+				return;
+		}
+	}
+
+	if (time >= _frames[_frames.size() - ENTRIES]) {
+		// Time is after last frame.
+		if (pose == MixPose_Setup) {
+			constraint._mix =
+					constraint._data._mix + (_frames[_frames.size() + PREV_MIX] - constraint._data._mix) * alpha;
+			constraint._bendDirection = direction == MixDirection_Out ? constraint._data._bendDirection
+																	  : (int) _frames[_frames.size() +
+																					  PREV_BEND_DIRECTION];
+		} else {
+			constraint._mix += (_frames[_frames.size() + PREV_MIX] - constraint._mix) * alpha;
+			if (direction == MixDirection_In) {
+				constraint._bendDirection = (int) _frames[_frames.size() + PREV_BEND_DIRECTION];
+			}
+		}
+		return;
+	}
+
+	// Interpolate between the previous frame and the current frame.
+	int frame = Animation::binarySearch(_frames, time, ENTRIES);
+	float mix = _frames[frame + PREV_MIX];
+	float frameTime = _frames[frame];
+	float percent = getCurvePercent(frame / ENTRIES - 1,
+									1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
+
+	if (pose == MixPose_Setup) {
+		constraint._mix =
+				constraint._data._mix + (mix + (_frames[frame + MIX] - mix) * percent - constraint._data._mix) * alpha;
+		constraint._bendDirection =
+				direction == MixDirection_Out ? constraint._data._bendDirection : (int) _frames[frame +
+																								PREV_BEND_DIRECTION];
+	} else {
+		constraint._mix += (mix + (_frames[frame + MIX] - mix) * percent - constraint._mix) * alpha;
+		if (direction == MixDirection_In) {
+			constraint._bendDirection = (int) _frames[frame + PREV_BEND_DIRECTION];
+		}
+	}
+}
+
+int IkConstraintTimeline::getPropertyId() {
+	return ((int) TimelineType_IkConstraint << 24) + _ikConstraintIndex;
+}
+
+void IkConstraintTimeline::setFrame(int frameIndex, float time, float mix, int bendDirection) {
+	frameIndex *= ENTRIES;
+	_frames[frameIndex] = time;
+	_frames[frameIndex + MIX] = mix;
+	_frames[frameIndex + BEND_DIRECTION] = bendDirection;
+}
 }

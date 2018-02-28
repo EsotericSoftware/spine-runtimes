@@ -36,51 +36,59 @@
 #include <spine/String.h>
 
 namespace Spine {
-    class CurveTimeline;
-    class VertexAttachment;
-    class Animation;
-    class Json;
-    class SkeletonData;
-    class Atlas;
-    class AttachmentLoader;
-    class LinkedMesh;
-    class String;
-    
-    class SkeletonJson : public SpineObject {
-    public:
-        explicit SkeletonJson(Atlas* atlas);
+class CurveTimeline;
 
-        explicit SkeletonJson(AttachmentLoader* attachmentLoader);
-        
-        ~SkeletonJson();
-        
-        SkeletonData* readSkeletonDataFile(const String& path);
-        
-        SkeletonData* readSkeletonData(const char* json);
+class VertexAttachment;
 
-        void setScale (float scale) { _scale = scale; }
+class Animation;
 
-        String& getError() { return _error; }
+class Json;
 
-        String toString() const;
-        
-    private:
-        AttachmentLoader* _attachmentLoader;
-        Vector<LinkedMesh*> _linkedMeshes;
-        float _scale;
-        const bool _ownsLoader;
-        String _error;
-        
-        static float toColor(const char* value, int index);
-        
-        static void readCurve(Json* frame, CurveTimeline* timeline, int frameIndex);
-        
-        Animation* readAnimation(Json* root, SkeletonData *skeletonData);
-        
-        void readVertices(Json* attachmentMap, VertexAttachment* attachment, int verticesLength);
-        
-        void setError(Json* root, const String& value1, const String& value2);
-    };
+class SkeletonData;
+
+class Atlas;
+
+class AttachmentLoader;
+
+class LinkedMesh;
+
+class String;
+
+class SkeletonJson : public SpineObject {
+public:
+	explicit SkeletonJson(Atlas *atlas);
+
+	explicit SkeletonJson(AttachmentLoader *attachmentLoader);
+
+	~SkeletonJson();
+
+	SkeletonData *readSkeletonDataFile(const String &path);
+
+	SkeletonData *readSkeletonData(const char *json);
+
+	void setScale(float scale) { _scale = scale; }
+
+	String &getError() { return _error; }
+
+	String toString() const;
+
+private:
+	AttachmentLoader *_attachmentLoader;
+	Vector<LinkedMesh *> _linkedMeshes;
+	float _scale;
+	const bool _ownsLoader;
+	String _error;
+
+	static float toColor(const char *value, int index);
+
+	static void readCurve(Json *frame, CurveTimeline *timeline, int frameIndex);
+
+	Animation *readAnimation(Json *root, SkeletonData *skeletonData);
+
+	void readVertices(Json *attachmentMap, VertexAttachment *attachment, int verticesLength);
+
+	void setError(Json *root, const String &value1, const String &value2);
+};
 }
 
 #endif /* Spine_SkeletonJson_h */

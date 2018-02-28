@@ -36,27 +36,29 @@
 #include <string>
 
 namespace Spine {
-    class RTTI : public SpineObject {
-    public:
-        explicit RTTI(const std::string& className);
-        
-        RTTI(const std::string& className, const RTTI& baseRTTI);
-        
-        const std::string& getClassName() const;
-        
-        bool isExactly(const RTTI& rtti) const;
+class RTTI : public SpineObject {
+public:
+	explicit RTTI(const std::string &className);
 
-        bool instanceOf(const RTTI &rtti) const;
+	RTTI(const std::string &className, const RTTI &baseRTTI);
 
-        String toString() const;
-    private:
-        // Prevent copying
-        RTTI(const RTTI& obj);
-        RTTI& operator=(const RTTI& obj);
-        
-        const std::string _className;
-        const RTTI *_pBaseRTTI;
-    };
+	const std::string &getClassName() const;
+
+	bool isExactly(const RTTI &rtti) const;
+
+	bool instanceOf(const RTTI &rtti) const;
+
+	String toString() const;
+
+private:
+	// Prevent copying
+	RTTI(const RTTI &obj);
+
+	RTTI &operator=(const RTTI &obj);
+
+	const std::string _className;
+	const RTTI *_pBaseRTTI;
+};
 }
 
 #define RTTI_DECL \
@@ -68,7 +70,7 @@ virtual const Spine::RTTI& getRTTI() const;
 const Spine::RTTI name::rtti(#name); \
 const Spine::RTTI& name::getRTTI() const { return rtti; }
 
-#define RTTI_IMPL(name,parent) \
+#define RTTI_IMPL(name, parent) \
 const Spine::RTTI name::rtti(#name, parent::rtti); \
 const Spine::RTTI& name::getRTTI() const { return rtti; }
 

@@ -41,78 +41,78 @@
 #include <spine/Atlas.h>
 
 namespace Spine {
-    RTTI_IMPL(AtlasAttachmentLoader, AttachmentLoader);
-    
-    AtlasAttachmentLoader::AtlasAttachmentLoader(Atlas* atlas) : AttachmentLoader(), _atlas(atlas) {
-    }
-    
-    RegionAttachment* AtlasAttachmentLoader::newRegionAttachment(Skin& skin, const String& name, const String& path) {
-        AtlasRegion* regionP = findRegion(path);
-        assert(regionP != NULL);
-        
-        AtlasRegion& region = *regionP;
-        
-        RegionAttachment* attachmentP = new (__FILE__, __LINE__) RegionAttachment(name);
-        
-        RegionAttachment& attachment = *attachmentP;
-        attachment._rendererObject = regionP;
-        attachment.setUVs(region.u, region.v, region.u2, region.v2, region.rotate);
-        attachment._regionOffsetX = region.offsetX;
-        attachment._regionOffsetY = region.offsetY;
-        attachment._regionWidth = region.width;
-        attachment._regionHeight = region.height;
-        attachment._regionOriginalWidth = region.originalWidth;
-        attachment._regionOriginalHeight = region.originalHeight;
-        return attachmentP;
-    }
-    
-    MeshAttachment* AtlasAttachmentLoader::newMeshAttachment(Skin& skin, const String& name, const String& path) {
-        AtlasRegion* regionP = findRegion(path);
-        assert(regionP != NULL);
-        
-        AtlasRegion& region = *regionP;
-        
-        MeshAttachment* attachmentP = new (__FILE__, __LINE__) MeshAttachment(name);
-        
-        MeshAttachment& attachment = *attachmentP;
-        attachment._rendererObject = regionP;
-        attachment._regionU = region.u;
-        attachment._regionV = region.v;
-        attachment._regionU2 = region.u2;
-        attachment._regionV2 = region.v2;
-        attachment._regionRotate = region.rotate;
-        attachment._regionOffsetX = region.offsetX;
-        attachment._regionOffsetY = region.offsetY;
-        attachment._regionWidth = region.width;
-        attachment._regionHeight = region.height;
-        attachment._regionOriginalWidth = region.originalWidth;
-        attachment._regionOriginalHeight = region.originalHeight;
-        
-        return attachmentP;
-    }
-    
-    BoundingBoxAttachment* AtlasAttachmentLoader::newBoundingBoxAttachment(Skin& skin, const String& name) {
-        return new (__FILE__, __LINE__)  BoundingBoxAttachment(name);
-    }
-    
-    PathAttachment* AtlasAttachmentLoader::newPathAttachment(Skin& skin, const String& name) {
-        return new (__FILE__, __LINE__) PathAttachment(name);
-    }
-    
-    PointAttachment* AtlasAttachmentLoader::newPointAttachment(Skin& skin, const String& name) {
-        return new (__FILE__, __LINE__) PointAttachment(name);
-    }
-    
-    ClippingAttachment* AtlasAttachmentLoader::newClippingAttachment(Skin& skin, const String& name) {
-        return new (__FILE__, __LINE__) ClippingAttachment(name);
-    }
-    
-    AtlasRegion* AtlasAttachmentLoader::findRegion(const String& name) {
-        AtlasRegion* ret;
-        return _atlas->findRegion(name);
-    }
+RTTI_IMPL(AtlasAttachmentLoader, AttachmentLoader);
 
-    String AtlasAttachmentLoader::toString() const {
-        return String("AtlasAttachmentLoader");
-    }
+AtlasAttachmentLoader::AtlasAttachmentLoader(Atlas *atlas) : AttachmentLoader(), _atlas(atlas) {
+}
+
+RegionAttachment *AtlasAttachmentLoader::newRegionAttachment(Skin &skin, const String &name, const String &path) {
+	AtlasRegion *regionP = findRegion(path);
+	assert(regionP != NULL);
+
+	AtlasRegion &region = *regionP;
+
+	RegionAttachment *attachmentP = new(__FILE__, __LINE__) RegionAttachment(name);
+
+	RegionAttachment &attachment = *attachmentP;
+	attachment._rendererObject = regionP;
+	attachment.setUVs(region.u, region.v, region.u2, region.v2, region.rotate);
+	attachment._regionOffsetX = region.offsetX;
+	attachment._regionOffsetY = region.offsetY;
+	attachment._regionWidth = region.width;
+	attachment._regionHeight = region.height;
+	attachment._regionOriginalWidth = region.originalWidth;
+	attachment._regionOriginalHeight = region.originalHeight;
+	return attachmentP;
+}
+
+MeshAttachment *AtlasAttachmentLoader::newMeshAttachment(Skin &skin, const String &name, const String &path) {
+	AtlasRegion *regionP = findRegion(path);
+	assert(regionP != NULL);
+
+	AtlasRegion &region = *regionP;
+
+	MeshAttachment *attachmentP = new(__FILE__, __LINE__) MeshAttachment(name);
+
+	MeshAttachment &attachment = *attachmentP;
+	attachment._rendererObject = regionP;
+	attachment._regionU = region.u;
+	attachment._regionV = region.v;
+	attachment._regionU2 = region.u2;
+	attachment._regionV2 = region.v2;
+	attachment._regionRotate = region.rotate;
+	attachment._regionOffsetX = region.offsetX;
+	attachment._regionOffsetY = region.offsetY;
+	attachment._regionWidth = region.width;
+	attachment._regionHeight = region.height;
+	attachment._regionOriginalWidth = region.originalWidth;
+	attachment._regionOriginalHeight = region.originalHeight;
+
+	return attachmentP;
+}
+
+BoundingBoxAttachment *AtlasAttachmentLoader::newBoundingBoxAttachment(Skin &skin, const String &name) {
+	return new(__FILE__, __LINE__)  BoundingBoxAttachment(name);
+}
+
+PathAttachment *AtlasAttachmentLoader::newPathAttachment(Skin &skin, const String &name) {
+	return new(__FILE__, __LINE__) PathAttachment(name);
+}
+
+PointAttachment *AtlasAttachmentLoader::newPointAttachment(Skin &skin, const String &name) {
+	return new(__FILE__, __LINE__) PointAttachment(name);
+}
+
+ClippingAttachment *AtlasAttachmentLoader::newClippingAttachment(Skin &skin, const String &name) {
+	return new(__FILE__, __LINE__) ClippingAttachment(name);
+}
+
+AtlasRegion *AtlasAttachmentLoader::findRegion(const String &name) {
+	AtlasRegion *ret;
+	return _atlas->findRegion(name);
+}
+
+String AtlasAttachmentLoader::toString() const {
+	return String("AtlasAttachmentLoader");
+}
 }

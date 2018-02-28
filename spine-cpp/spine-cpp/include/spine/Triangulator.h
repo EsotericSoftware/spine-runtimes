@@ -35,31 +35,37 @@
 #include <spine/Pool.h>
 
 namespace Spine {
-    class Triangulator : public SpineObject {
-    public:
-        Vector<int>& triangulate(Vector<float>& vertices);
-        
-        Vector< Vector<float>* > decompose(Vector<float>& vertices, Vector<int>& triangles);
+class Triangulator : public SpineObject {
+public:
+	Vector<int> &triangulate(Vector<float> &vertices);
 
-        String toString() const;
-        
-    private:
-        Vector< Vector<float>* > _convexPolygons;
-        Vector< Vector<int>* > _convexPolygonsIndices;
-        
-        Vector<int> _indices;
-        Vector<bool> _isConcaveArray;
-        Vector<int> _triangles;
-        
-        Pool< Vector<float> > _polygonPool;
-        Pool< Vector<int> > _polygonIndicesPool;
-        
-        static bool isConcave(int index, int vertexCount, Vector<float>& vertices, Vector<int>& indices);
-        
-        static bool positiveArea(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y);
-        
-        static int winding(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y);
-    };
+	Vector<Vector < float>* >
+	decompose(Vector<float>
+	& vertices,
+	Vector<int> &triangles
+	);
+
+	String toString() const;
+
+private:
+	Vector<Vector < float>* >
+	_convexPolygons;
+	Vector<Vector < int>* >
+	_convexPolygonsIndices;
+
+	Vector<int> _indices;
+	Vector<bool> _isConcaveArray;
+	Vector<int> _triangles;
+
+	Pool <Vector<float>> _polygonPool;
+	Pool <Vector<int>> _polygonIndicesPool;
+
+	static bool isConcave(int index, int vertexCount, Vector<float> &vertices, Vector<int> &indices);
+
+	static bool positiveArea(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y);
+
+	static int winding(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y);
+};
 }
 
 #endif /* Spine_Triangulator_h */

@@ -36,57 +36,63 @@
 #include <spine/Vector.h>
 
 namespace Spine {
-    class IkConstraintData;
-    class Skeleton;
-    class Bone;
-    
-    class IkConstraint : public Constraint {
-        friend class Skeleton;
-        friend class IkConstraintTimeline;
-        
-        RTTI_DECL
-        
-    public:
-        /// Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified
-        /// in the world coordinate system.
-        static void apply(Bone& bone, float targetX, float targetY, float alpha);
-        
-        /// Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as
-        /// possible. The target is specified in the world coordinate system.
-        /// @param child A direct descendant of the parent bone.
-        static void apply(Bone& parent, Bone& child, float targetX, float targetY, int bendDir, float alpha);
-        
-        IkConstraint(IkConstraintData& data, Skeleton& skeleton);
-        
-        /// Applies the constraint to the constrained bones.
-        void apply();
-        
-        virtual void update();
-        
-        virtual int getOrder();
-        
-        IkConstraintData& getData();
-        
-        Vector<Bone*>& getBones();
-        
-        Bone* getTarget();
-        void setTarget(Bone* inValue);
-        
-        int getBendDirection();
-        void setBendDirection(int inValue);
-        
-        float getMix();
-        void setMix(float inValue);
+class IkConstraintData;
 
-        String toString() const;
-        
-    private:
-        IkConstraintData& _data;
-        Vector<Bone*> _bones;
-        float _mix;
-        int _bendDirection;
-        Bone* _target;
-    };
+class Skeleton;
+
+class Bone;
+
+class IkConstraint : public Constraint {
+	friend class Skeleton;
+
+	friend class IkConstraintTimeline;
+
+RTTI_DECL
+
+public:
+	/// Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified
+	/// in the world coordinate system.
+	static void apply(Bone &bone, float targetX, float targetY, float alpha);
+
+	/// Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as
+	/// possible. The target is specified in the world coordinate system.
+	/// @param child A direct descendant of the parent bone.
+	static void apply(Bone &parent, Bone &child, float targetX, float targetY, int bendDir, float alpha);
+
+	IkConstraint(IkConstraintData &data, Skeleton &skeleton);
+
+	/// Applies the constraint to the constrained bones.
+	void apply();
+
+	virtual void update();
+
+	virtual int getOrder();
+
+	IkConstraintData &getData();
+
+	Vector<Bone *> &getBones();
+
+	Bone *getTarget();
+
+	void setTarget(Bone *inValue);
+
+	int getBendDirection();
+
+	void setBendDirection(int inValue);
+
+	float getMix();
+
+	void setMix(float inValue);
+
+	String toString() const;
+
+private:
+	IkConstraintData &_data;
+	Vector<Bone *> _bones;
+	float _mix;
+	int _bendDirection;
+	Bone *_target;
+};
 }
 
 #endif /* Spine_IkConstraint_h */

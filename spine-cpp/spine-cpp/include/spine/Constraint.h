@@ -34,20 +34,20 @@
 #include <spine/Updatable.h>
 
 namespace Spine {
-    /// The interface for all constraints.
-    class Constraint : public Updatable {
-        RTTI_DECL
-        
-    public:
-        Constraint();
-        
-        virtual ~Constraint();
-        
-        virtual void update() = 0;
-        
-        /// The ordinal for the order a skeleton's constraints will be applied.
-        virtual int getOrder() = 0;
-    };
+/// The interface for all constraints.
+class Constraint : public Updatable {
+RTTI_DECL
+
+public:
+	Constraint();
+
+	virtual ~Constraint();
+
+	virtual void update() = 0;
+
+	/// The ordinal for the order a skeleton's constraints will be applied.
+	virtual int getOrder() = 0;
+};
 }
 
 #endif /* Spine_Constraint_h */
