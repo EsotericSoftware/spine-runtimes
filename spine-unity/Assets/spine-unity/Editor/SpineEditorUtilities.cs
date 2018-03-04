@@ -155,16 +155,17 @@ namespace Spine.Unity.Editor {
 		public static string editorGUIPath = "";
 		public static bool initialized;
 
-		/// This list keeps the asset reference temporarily during importing.
+		/// HACK: This list keeps the asset reference temporarily during importing.
 		/// 
 		/// In cases of very large projects/sufficient RAM pressure, when AssetDatabase.SaveAssets is called,
 		/// Unity can mistakenly unload assets whose references are only on the stack.
 		/// This leads to MissingReferenceException and other errors.
 		static readonly List<ScriptableObject> protectFromStackGarbageCollection = new List<ScriptableObject>();
-		static HashSet<string> assetsImportedInWrongState;
-		static Dictionary<int, GameObject> skeletonRendererTable;
-		static Dictionary<int, SkeletonUtilityBone> skeletonUtilityBoneTable;
-		static Dictionary<int, BoundingBoxFollower> boundingBoxFollowerTable;
+		static HashSet<string> assetsImportedInWrongState = new HashSet<string>();
+
+		static Dictionary<int, GameObject> skeletonRendererTable = new Dictionary<int, GameObject>();
+		static Dictionary<int, SkeletonUtilityBone> skeletonUtilityBoneTable = new Dictionary<int, SkeletonUtilityBone>();
+		static Dictionary<int, BoundingBoxFollower> boundingBoxFollowerTable = new Dictionary<int, BoundingBoxFollower>();
 
 		#if SPINE_TK2D
 		const float DEFAULT_DEFAULT_SCALE = 1f;
@@ -219,11 +220,6 @@ namespace Spine.Unity.Editor {
 			editorGUIPath = editorPath + "/GUI";
 
 			Icons.Initialize();
-
-			assetsImportedInWrongState = new HashSet<string>();
-			skeletonRendererTable = new Dictionary<int, GameObject>();
-			skeletonUtilityBoneTable = new Dictionary<int, SkeletonUtilityBone>();
-			boundingBoxFollowerTable = new Dictionary<int, BoundingBoxFollower>();
 
 			// Drag and Drop
 			SceneView.onSceneGUIDelegate -= SceneViewDragAndDrop;
@@ -535,15 +531,15 @@ namespace Spine.Unity.Editor {
 
 			SkeletonRenderer[] arr = Object.FindObjectsOfType<SkeletonRenderer>();
 			foreach (SkeletonRenderer r in arr)
-				skeletonRendererTable.Add(r.gameObject.GetInstanceID(), r.gameObject);
+				skeletonRendererTable[r.gameObject.GetInstanceID()] = r.gameObject;
 
 			SkeletonUtilityBone[] boneArr = Object.FindObjectsOfType<SkeletonUtilityBone>();
 			foreach (SkeletonUtilityBone b in boneArr)
-				skeletonUtilityBoneTable.Add(b.gameObject.GetInstanceID(), b);
+				skeletonUtilityBoneTable[b.gameObject.GetInstanceID()] = b;
 
 			BoundingBoxFollower[] bbfArr = Object.FindObjectsOfType<BoundingBoxFollower>();
 			foreach (BoundingBoxFollower bbf in bbfArr)
-				boundingBoxFollowerTable.Add(bbf.gameObject.GetInstanceID(), bbf);
+				boundingBoxFollowerTable[bbf.gameObject.GetInstanceID()] = bbf;
 		}
 
 		static void HierarchyIconsOnGUI (int instanceId, Rect selectionRect) {
