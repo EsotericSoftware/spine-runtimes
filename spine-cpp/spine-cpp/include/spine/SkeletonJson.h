@@ -70,8 +70,6 @@ public:
 
 	String &getError() { return _error; }
 
-
-
 private:
 	AttachmentLoader *_attachmentLoader;
 	Vector<LinkedMesh *> _linkedMeshes;

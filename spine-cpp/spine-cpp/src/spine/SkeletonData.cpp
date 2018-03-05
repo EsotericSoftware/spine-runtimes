@@ -41,7 +41,8 @@
 
 #include <spine/ContainerUtil.h>
 
-namespace Spine {
+using namespace Spine;
+
 SkeletonData::SkeletonData() :
 		_name(),
 		_defaultSkin(NULL),
@@ -131,10 +132,6 @@ Vector<Skin *> &SkeletonData::getSkins() {
 	return _skins;
 }
 
-void SkeletonData::setSkins(Vector<Skin *> &inValue) {
-	_skins.clearAndAddAll(inValue);
-}
-
 Skin *SkeletonData::getDefaultSkin() {
 	return _defaultSkin;
 }
@@ -147,40 +144,20 @@ Vector<EventData *> &SkeletonData::getEvents() {
 	return _events;
 }
 
-void SkeletonData::setEvents(Vector<EventData *> &inValue) {
-	_events.clearAndAddAll(inValue);
-}
-
 Vector<Animation *> &SkeletonData::getAnimations() {
 	return _animations;
-}
-
-void SkeletonData::setAnimations(Vector<Animation *> &inValue) {
-	_animations.clearAndAddAll(inValue);
 }
 
 Vector<IkConstraintData *> &SkeletonData::getIkConstraints() {
 	return _ikConstraints;
 }
 
-void SkeletonData::setIkConstraints(Vector<IkConstraintData *> &inValue) {
-	_ikConstraints.clearAndAddAll(inValue);
-}
-
 Vector<TransformConstraintData *> &SkeletonData::getTransformConstraints() {
 	return _transformConstraints;
 }
 
-void SkeletonData::setTransformConstraints(Vector<TransformConstraintData *> &inValue) {
-	_transformConstraints.clearAndAddAll(inValue);
-}
-
 Vector<PathConstraintData *> &SkeletonData::getPathConstraints() {
 	return _pathConstraints;
-}
-
-void SkeletonData::setPathConstraints(Vector<PathConstraintData *> &inValue) {
-	_pathConstraints.clearAndAddAll(inValue);
 }
 
 float SkeletonData::getWidth() {
@@ -229,5 +206,4 @@ float SkeletonData::getFps() {
 
 void SkeletonData::setFps(float inValue) {
 	_fps = inValue;
-}
 }

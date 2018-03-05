@@ -60,8 +60,6 @@ public:
 		}
 
 		bool operator==(const AttachmentKey &other) const;
-
-
 	};
 
 	struct HashAttachmentKey : public SpineObject {
@@ -92,8 +90,6 @@ public:
 	const String &getName();
 
 	HashMap<AttachmentKey, Attachment *> &getAttachments();
-
-
 
 private:
 	const String _name;

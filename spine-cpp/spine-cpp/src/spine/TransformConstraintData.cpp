@@ -34,7 +34,7 @@
 
 #include <assert.h>
 
-namespace Spine {
+using namespace Spine;
 TransformConstraintData::TransformConstraintData(const String &name) :
 		_name(name),
 		_order(0),
@@ -116,6 +116,4 @@ bool TransformConstraintData::isRelative() {
 
 bool TransformConstraintData::isLocal() {
 	return _local;
-}
-
 }

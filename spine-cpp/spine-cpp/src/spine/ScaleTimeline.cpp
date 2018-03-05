@@ -38,7 +38,8 @@
 #include <spine/Bone.h>
 #include <spine/BoneData.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(ScaleTimeline, TranslateTimeline);
 
 ScaleTimeline::ScaleTimeline(int frameCount) : TranslateTimeline(frameCount) {
@@ -110,5 +111,4 @@ void ScaleTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 
 int ScaleTimeline::getPropertyId() {
 	return ((int) TimelineType_Scale << 24) + _boneIndex;
-}
 }

@@ -57,7 +57,6 @@ namespace Spine {
         void setBoneIndex(int inValue);
         
         Vector<float>& getFrames();
-        void setFrames(Vector<float> inValue);
         
     private:
         static const int PREV_TIME = -2;

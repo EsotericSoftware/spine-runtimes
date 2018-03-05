@@ -35,58 +35,58 @@
 namespace Spine {
 class Color : public SpineObject {
 public:
-	Color() : _r(0), _g(0), _b(0), _a(0) {
+	Color() : r(0), g(0), b(0), a(0) {
 	}
 
-	Color(float r, float g, float b, float a) : _r(r), _g(g), _b(b), _a(a) {
+	Color(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {
 		clamp();
 	}
 
 	inline Color &set(float r, float g, float b, float a) {
-		_r = r;
-		_g = g;
-		_b = b;
-		_a = a;
+		r = r;
+		g = g;
+		b = b;
+		a = a;
 		clamp();
 		return *this;
 	}
 
 	inline Color &set(const Color &other) {
-		_r = other._r;
-		_g = other._g;
-		_b = other._b;
-		_a = other._a;
+		r = other.r;
+		g = other.g;
+		b = other.b;
+		a = other.a;
 		clamp();
 		return *this;
 	}
 
 	inline Color &add(float r, float g, float b, float a) {
-		_r += r;
-		_g += g;
-		_b += b;
-		_a += a;
+		r += r;
+		g += g;
+		b += b;
+		a += a;
 		clamp();
 		return *this;
 	}
 
 	inline Color &add(const Color &other) {
-		_r += other._r;
-		_g += other._g;
-		_b += other._b;
-		_a += other._a;
+		r += other.r;
+		g += other.g;
+		b += other.b;
+		a += other.a;
 		clamp();
 		return *this;
 	}
 
 	inline Color &clamp() {
-		_r = MathUtil::clamp(this->_r, 0, 1);
-		_g = MathUtil::clamp(this->_g, 0, 1);
-		_b = MathUtil::clamp(this->_b, 0, 1);
-		_a = MathUtil::clamp(this->_a, 0, 1);
+		r = MathUtil::clamp(this->r, 0, 1);
+		g = MathUtil::clamp(this->g, 0, 1);
+		b = MathUtil::clamp(this->b, 0, 1);
+		a = MathUtil::clamp(this->a, 0, 1);
 		return *this;
 	}
 
-	float _r, _g, _b, _a;
+	float r, g, b, a;
 };
 }
 

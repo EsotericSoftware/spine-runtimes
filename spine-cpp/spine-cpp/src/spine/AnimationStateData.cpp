@@ -33,7 +33,8 @@
 #include <spine/SkeletonData.h>
 #include <spine/Animation.h>
 
-namespace Spine {
+using namespace Spine;
+
 AnimationStateData::AnimationStateData(SkeletonData *skeletonData) : _skeletonData(skeletonData), _defaultMix(0) {
 }
 
@@ -96,5 +97,4 @@ AnimationStateData::HashAnimationPair::operator()(const Spine::AnimationStateDat
 	}
 
 	return (((h1 << 5) + h1) ^ h2);
-}
 }

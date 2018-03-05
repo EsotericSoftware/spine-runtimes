@@ -36,7 +36,8 @@
 
 #include <spine/BoneData.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(IkConstraint, Constraint);
 
 void IkConstraint::apply(Bone &bone, float targetX, float targetY, float alpha) {
@@ -256,6 +257,4 @@ float IkConstraint::getMix() {
 
 void IkConstraint::setMix(float inValue) {
 	_mix = inValue;
-}
-
 }

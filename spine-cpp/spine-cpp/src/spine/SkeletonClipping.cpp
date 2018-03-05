@@ -33,7 +33,8 @@
 #include <spine/Slot.h>
 #include <spine/ClippingAttachment.h>
 
-namespace Spine {
+using namespace Spine;
+
 SkeletonClipping::SkeletonClipping() : _clipAttachment(NULL) {
 	_clipOutput.ensureCapacity(128);
 	_clippedVertices.ensureCapacity(128);
@@ -314,6 +315,4 @@ void SkeletonClipping::makeClockwise(Vector<float> &polygon) {
 		polygon[other] = x;
 		polygon[other + 1] = y;
 	}
-}
-
 }

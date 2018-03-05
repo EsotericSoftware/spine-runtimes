@@ -32,7 +32,8 @@
 
 #include <spine/EventData.h>
 
-namespace Spine {
+using namespace Spine;
+
 Event::Event(float time, const EventData &data) :
 		_data(data),
 		_time(time),
@@ -71,6 +72,4 @@ const String &Event::getStringValue() {
 
 void Event::setStringValue(const String &inValue) {
 	_stringValue = inValue;
-}
-
 }

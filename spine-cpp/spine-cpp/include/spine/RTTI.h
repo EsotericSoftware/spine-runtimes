@@ -48,8 +48,6 @@ public:
 
 	bool instanceOf(const RTTI &rtti) const;
 
-
-
 private:
 	// Prevent copying
 	RTTI(const RTTI &obj);

@@ -43,8 +43,6 @@ public:
 
 	Vector< Vector<float>* > &decompose(Vector<float> &vertices, Vector<int> &triangles);
 
-
-
 private:
 	Vector<Vector < float>* > _convexPolygons;
 	Vector<Vector < int>* > _convexPolygonsIndices;

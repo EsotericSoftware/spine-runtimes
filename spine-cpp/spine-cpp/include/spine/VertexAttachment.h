@@ -68,10 +68,8 @@ namespace Spine {
         int getId();
         
         Vector<int>& getBones();
-        void setBones(Vector<int> inValue);
         
         Vector<float>& getVertices();
-        void setVertices(Vector<float> inValue);
         
         int getWorldVerticesLength();
         void setWorldVerticesLength(int inValue);

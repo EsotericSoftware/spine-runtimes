@@ -33,7 +33,8 @@
 #include <spine/BoneData.h>
 #include <spine/Skeleton.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(Bone, Updatable);
 
 bool Bone::yDown = false;
@@ -543,6 +544,4 @@ void Bone::updateAppliedTransform() {
 			_arotation = 90 - MathUtil::atan2(rd, rb) * RAD_DEG;
 		}
 	}
-}
-
 }

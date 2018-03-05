@@ -250,8 +250,6 @@ namespace Spine {
         Event* _event;
         
         EventQueueEntry(EventType eventType, TrackEntry* trackEntry, Event* event = NULL);
-
-
     };
     
     class EventQueue : public SpineObject {
@@ -370,14 +368,15 @@ namespace Spine {
         AnimationStateData* getData();
         
         /// A list of tracks that have animations, which may contain NULLs.
-        Vector<TrackEntry*> getTracks();
+        Vector<TrackEntry*> &getTracks();
+
         float getTimeScale();
         void setTimeScale(float inValue);
+
         void setOnAnimationEventFunc(OnAnimationEventFunc inValue);
+
         void setRendererObject(void* inValue);
         void* getRendererObject();
-
-
         
     private:
         static const int Subsequent, First, Dip, DipMix;

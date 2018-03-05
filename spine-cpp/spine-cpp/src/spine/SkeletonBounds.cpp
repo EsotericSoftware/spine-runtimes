@@ -35,7 +35,8 @@
 
 #include <spine/Slot.h>
 
-namespace Spine {
+using namespace Spine;
+
 SkeletonBounds::SkeletonBounds() : _minX(0), _minY(0), _maxX(0), _maxY(0) {
 }
 
@@ -231,6 +232,3 @@ void SkeletonBounds::aabbCompute() {
 	_maxX = maxX;
 	_maxY = maxY;
 }
-
-}
-

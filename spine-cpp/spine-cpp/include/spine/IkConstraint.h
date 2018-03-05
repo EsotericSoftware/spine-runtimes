@@ -84,8 +84,6 @@ public:
 
 	void setMix(float inValue);
 
-
-
 private:
 	IkConstraintData &_data;
 	Vector<Bone *> _bones;

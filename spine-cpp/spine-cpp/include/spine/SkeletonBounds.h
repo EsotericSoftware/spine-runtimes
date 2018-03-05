@@ -37,7 +37,6 @@
 namespace Spine {
     class Skeleton;
     class BoundingBoxAttachment;
-    
     class Polygon;
     
     /// 
@@ -86,8 +85,6 @@ namespace Spine {
         float getWidth();
         float getHeight();
 
-
-        
     private:
         Vector<Polygon*> _polygonPool;
         Vector<BoundingBoxAttachment*> _boundingBoxes;
@@ -105,8 +102,6 @@ namespace Spine {
         Polygon() : _count(0) {
 			_vertices.ensureCapacity(16);
         }
-
-
     };
 }
 

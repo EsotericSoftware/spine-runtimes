@@ -38,7 +38,8 @@
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(ColorTimeline, CurveTimeline);
 
 const int ColorTimeline::ENTRIES = 5;
@@ -69,9 +70,9 @@ void ColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 			case MixPose_Current: {
 				Color &color = slot.getColor();
 				Color &setup = slot.getData().getColor();
-				color.add((setup._r - color._r) * alpha, (setup._g - color._g) * alpha,
-						  (setup._b - color._b) * alpha,
-						  (setup._a - color._a) * alpha);
+				color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha,
+						  (setup.b - color.b) * alpha,
+						  (setup.a - color.a) * alpha);
 				return;
 			}
 			case MixPose_CurrentLayered:
@@ -110,7 +111,7 @@ void ColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 	} else {
 		Color &color = slot.getColor();
 		if (pose == MixPose_Setup) color.set(slot.getData().getColor());
-		color.add((r - color._r) * alpha, (g - color._g) * alpha, (b - color._b) * alpha, (a - color._a) * alpha);
+		color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 	}
 }
 
@@ -137,10 +138,4 @@ void ColorTimeline::setSlotIndex(int inValue) {
 
 Vector<float> &ColorTimeline::getFrames() {
 	return _frames;
-}
-
-void ColorTimeline::setFrames(Vector<float> &inValue) {
-	_frames.clear();
-	_frames.addAll(inValue);
-}
 }

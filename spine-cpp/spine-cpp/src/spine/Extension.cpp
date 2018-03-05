@@ -33,7 +33,8 @@
 
 #include <assert.h>
 
-namespace Spine {
+using namespace Spine;
+
 DefaultSpineExtension _defaultExtension;
 SpineExtension *SpineExtension::_instance = &_defaultExtension;
 
@@ -108,5 +109,4 @@ char *DefaultSpineExtension::_readFile(const String &path, int *length) {
 }
 
 DefaultSpineExtension::DefaultSpineExtension() : SpineExtension() {
-}
 }

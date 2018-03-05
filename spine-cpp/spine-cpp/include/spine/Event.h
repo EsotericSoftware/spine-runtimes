@@ -65,8 +65,6 @@ public:
 
 	void setStringValue(const String &inValue);
 
-
-
 private:
 	const EventData &_data;
 	const float _time;

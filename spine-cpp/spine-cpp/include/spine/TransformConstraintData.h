@@ -67,8 +67,6 @@ namespace Spine {
         
         bool isRelative();
         bool isLocal();
-
-
         
     private:
         const String _name;

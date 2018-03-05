@@ -55,9 +55,7 @@ namespace Spine {
         int getSlotIndex();
         void setSlotIndex(int inValue);
         Vector<float>& getFrames();
-        void setFrames(Vector<float>& inValue); // time, ...
         Vector< Vector<float> >& getVertices();
-        void setVertices(Vector< Vector<float> >& inValue);
         VertexAttachment* getAttachment();
         void setAttachment(VertexAttachment* inValue);
         

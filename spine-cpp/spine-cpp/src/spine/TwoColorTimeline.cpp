@@ -38,7 +38,8 @@
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(TwoColorTimeline, CurveTimeline);
 
 const int TwoColorTimeline::ENTRIES = 8;
@@ -77,15 +78,15 @@ void TwoColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vec
 				return;
 			case MixPose_Current: {
 				Color &color = slot.getColor();
-				color._r += (color._r - slot._data.getColor()._r) * alpha;
-				color._g += (color._g - slot._data.getColor()._g) * alpha;
-				color._b += (color._b - slot._data.getColor()._b) * alpha;
-				color._a += (color._a - slot._data.getColor()._a) * alpha;
+				color.r += (color.r - slot._data.getColor().r) * alpha;
+				color.g += (color.g - slot._data.getColor().g) * alpha;
+				color.b += (color.b - slot._data.getColor().b) * alpha;
+				color.a += (color.a - slot._data.getColor().a) * alpha;
 
 				Color &darkColor = slot.getDarkColor();
-				darkColor._r += (darkColor._r - slot._data.getDarkColor()._r) * alpha;
-				darkColor._g += (darkColor._g - slot._data.getDarkColor()._g) * alpha;
-				darkColor._b += (darkColor._b - slot._data.getDarkColor()._b) * alpha;
+				darkColor.r += (darkColor.r - slot._data.getDarkColor().r) * alpha;
+				darkColor.g += (darkColor.g - slot._data.getDarkColor().g) * alpha;
+				darkColor.b += (darkColor.b - slot._data.getDarkColor().b) * alpha;
 				return;
 			}
 			case MixPose_CurrentLayered:
@@ -130,48 +131,48 @@ void TwoColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vec
 
 	if (alpha == 1) {
 		Color &color = slot.getColor();
-		color._r = r;
-		color._g = g;
-		color._b = b;
-		color._a = a;
+		color.r = r;
+		color.g = g;
+		color.b = b;
+		color.a = a;
 
 		Color &darkColor = slot.getDarkColor();
-		darkColor._r = r2;
-		darkColor._g = g2;
-		darkColor._b = b2;
+		darkColor.r = r2;
+		darkColor.g = g2;
+		darkColor.b = b2;
 	} else {
 		float br, bg, bb, ba, br2, bg2, bb2;
 		if (pose == MixPose_Setup) {
-			br = slot._data.getColor()._r;
-			bg = slot._data.getColor()._g;
-			bb = slot._data.getColor()._b;
-			ba = slot._data.getColor()._a;
-			br2 = slot._data.getDarkColor()._r;
-			bg2 = slot._data.getDarkColor()._g;
-			bb2 = slot._data.getDarkColor()._b;
+			br = slot._data.getColor().r;
+			bg = slot._data.getColor().g;
+			bb = slot._data.getColor().b;
+			ba = slot._data.getColor().a;
+			br2 = slot._data.getDarkColor().r;
+			bg2 = slot._data.getDarkColor().g;
+			bb2 = slot._data.getDarkColor().b;
 		} else {
 			Color &color = slot.getColor();
-			br = color._r;
-			bg = color._g;
-			bb = color._b;
-			ba = color._a;
+			br = color.r;
+			bg = color.g;
+			bb = color.b;
+			ba = color.a;
 
 			Color &darkColor = slot.getDarkColor();
-			br2 = darkColor._r;
-			bg2 = darkColor._g;
-			bb2 = darkColor._b;
+			br2 = darkColor.r;
+			bg2 = darkColor.g;
+			bb2 = darkColor.b;
 		}
 
 		Color &color = slot.getColor();
-		color._r = br + ((r - br) * alpha);
-		color._g = bg + ((g - bg) * alpha);
-		color._b = bb + ((b - bb) * alpha);
-		color._a = ba + ((a - ba) * alpha);
+		color.r = br + ((r - br) * alpha);
+		color.g = bg + ((g - bg) * alpha);
+		color.b = bb + ((b - bb) * alpha);
+		color.a = ba + ((a - ba) * alpha);
 
 		Color &darkColor = slot.getDarkColor();
-		darkColor._r = br2 + ((r2 - br2) * alpha);
-		darkColor._g = bg2 + ((g2 - bg2) * alpha);
-		darkColor._b = bb2 + ((b2 - bb2) * alpha);
+		darkColor.r = br2 + ((r2 - br2) * alpha);
+		darkColor.g = bg2 + ((g2 - bg2) * alpha);
+		darkColor.b = bb2 + ((b2 - bb2) * alpha);
 	}
 }
 
@@ -199,5 +200,4 @@ int TwoColorTimeline::getSlotIndex() {
 void TwoColorTimeline::setSlotIndex(int inValue) {
 	assert(inValue >= 0);
 	_slotIndex = inValue;
-}
 }

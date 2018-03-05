@@ -40,7 +40,8 @@
 #include <spine/PathConstraint.h>
 #include <spine/PathConstraintData.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(PathConstraintPositionTimeline, CurveTimeline);
 
 const int PathConstraintPositionTimeline::ENTRIES = 2;
@@ -103,5 +104,4 @@ void PathConstraintPositionTimeline::setFrame(int frameIndex, float time, float 
 	frameIndex *= ENTRIES;
 	_frames[frameIndex] = time;
 	_frames[frameIndex + VALUE] = value;
-}
 }

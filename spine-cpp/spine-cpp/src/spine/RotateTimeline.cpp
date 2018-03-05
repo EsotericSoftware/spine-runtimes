@@ -38,7 +38,8 @@
 #include <spine/Animation.h>
 #include <spine/TimelineType.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(RotateTimeline, CurveTimeline);
 
 RotateTimeline::RotateTimeline(int frameCount) : CurveTimeline(frameCount), _boneIndex(0) {
@@ -124,9 +125,4 @@ void RotateTimeline::setBoneIndex(int inValue) {
 
 Vector<float> &RotateTimeline::getFrames() {
 	return _frames;
-}
-
-void RotateTimeline::setFrames(Vector<float> inValue) {
-	_frames.clearAndAddAll(inValue);
-}
 }

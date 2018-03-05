@@ -53,9 +53,7 @@ namespace Spine {
         void setFrame(int frameIndex, Event* event);
         
         Vector<float> getFrames();
-        void setFrames(Vector<float>& inValue);
         Vector<Event*>& getEvents();
-        void setEvents(Vector<Event*>& inValue);
         int getFrameCount();
         
     private:

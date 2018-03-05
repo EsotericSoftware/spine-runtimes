@@ -30,7 +30,8 @@
 
 #include <spine/MeshAttachment.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(MeshAttachment, VertexAttachment);
 
 MeshAttachment::MeshAttachment(const String &name) : VertexAttachment(name),
@@ -90,27 +91,12 @@ Vector<float> &MeshAttachment::getRegionUVs() {
 	return _regionUVs;
 }
 
-void MeshAttachment::setRegionUVs(Vector<float> &inValue) {
-	_regionUVs.clear();
-	_regionUVs.addAll(inValue);
-}
-
 Vector<float> &MeshAttachment::getUVs() {
 	return _uvs;
 }
 
-void MeshAttachment::setUVs(Vector<float> &inValue) {
-	_uvs.clear();
-	_uvs.addAll(inValue);
-}
-
 Vector<unsigned short> &MeshAttachment::getTriangles() {
 	return _triangles;
-}
-
-void MeshAttachment::setTriangles(Vector<unsigned short> &inValue) {
-	_triangles.clear();
-	_triangles.addAll(inValue);
 }
 
 const String &MeshAttachment::getPath() {
@@ -248,10 +234,6 @@ Vector<unsigned short> &MeshAttachment::getEdges() {
 	return _edges;
 }
 
-void MeshAttachment::setEdges(Vector<unsigned short> &inValue) {
-	_edges.clearAndAddAll(inValue);
-}
-
 float MeshAttachment::getWidth() {
 	return _width;
 }
@@ -270,6 +252,4 @@ void MeshAttachment::setHeight(float inValue) {
 
 Spine::Color &MeshAttachment::getColor() {
 	return _color;
-}
-
 }

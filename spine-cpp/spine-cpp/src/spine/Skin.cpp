@@ -37,7 +37,8 @@
 
 #include <assert.h>
 
-namespace Spine {
+using namespace Spine;
+
 Skin::AttachmentKey::AttachmentKey(int slotIndex, const String &name) :
 		_slotIndex(slotIndex),
 		_name(name) {
@@ -121,5 +122,4 @@ void Skin::attachAll(Skeleton &skeleton, Skin &oldSkin) {
 			}
 		}
 	}
-}
 }

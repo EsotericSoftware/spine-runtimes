@@ -39,7 +39,8 @@
 #include <spine/SlotData.h>
 #include <spine/BoneData.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(PathConstraint, Constraint);
 
 const float PathConstraint::EPSILON = 0.00001f;
@@ -545,6 +546,4 @@ void PathConstraint::addCurvePosition(float p, float x1, float y1, float cx1, fl
 		output[o + 2] = MathUtil::atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt),
 										x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
 	}
-}
-
 }

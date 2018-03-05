@@ -38,7 +38,8 @@
 #include <spine/Bone.h>
 #include <spine/BoneData.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(TranslateTimeline, CurveTimeline);
 
 const int TranslateTimeline::ENTRIES = 3;
@@ -113,5 +114,4 @@ void TranslateTimeline::setFrame(int frameIndex, float time, float x, float y) {
 	_frames[frameIndex] = time;
 	_frames[frameIndex + X] = x;
 	_frames[frameIndex + Y] = y;
-}
 }

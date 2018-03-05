@@ -36,7 +36,8 @@
 
 #include <spine/ContainerUtil.h>
 
-namespace Spine {
+using namespace Spine;
+
 Animation::Animation(const String &name, Vector<Timeline *> &timelines, float duration) :
 		_timelines(timelines),
 		_duration(duration),
@@ -66,13 +67,8 @@ const String &Animation::getName() {
 	return _name;
 }
 
-Vector<Timeline *> Animation::getTimelines() {
+Vector<Timeline *> &Animation::getTimelines() {
 	return _timelines;
-}
-
-void Animation::setTimelines(Vector<Timeline *> &inValue) {
-	_timelines.clear();
-	_timelines.addAll(inValue);
 }
 
 float Animation::getDuration() {
@@ -139,5 +135,4 @@ int Animation::linearSearch(Vector<float> &values, float target, int step) {
 	}
 
 	return -1;
-}
 }

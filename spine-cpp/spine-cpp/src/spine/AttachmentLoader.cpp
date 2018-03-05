@@ -38,12 +38,12 @@
 #include <spine/PointAttachment.h>
 #include <spine/ClippingAttachment.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL_NOPARENT(AttachmentLoader);
 
 AttachmentLoader::AttachmentLoader() {
 }
 
 AttachmentLoader::~AttachmentLoader() {
-}
 }

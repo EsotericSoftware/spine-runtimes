@@ -45,8 +45,6 @@ class LinkedMesh : public SpineObject {
 public:
 	LinkedMesh(MeshAttachment *mesh, const String &skin, int slotIndex, const String &parent);
 
-
-
 private:
 	MeshAttachment *_mesh;
 	String _skin;

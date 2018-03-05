@@ -32,7 +32,8 @@
 
 #include <assert.h>
 
-namespace Spine {
+using namespace Spine;
+
 BoneData::BoneData(int index, const String &name, BoneData *parent) :
 		_index(index),
 		_name(name),
@@ -132,6 +133,4 @@ TransformMode BoneData::getTransformMode() {
 
 void BoneData::setTransformMode(TransformMode inValue) {
 	_transformMode = inValue;
-}
-
 }

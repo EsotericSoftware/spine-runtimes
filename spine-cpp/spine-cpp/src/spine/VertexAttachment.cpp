@@ -35,7 +35,8 @@
 #include <spine/Bone.h>
 #include <spine/Skeleton.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(VertexAttachment, Attachment);
 
 VertexAttachment::VertexAttachment(const String &name) : Attachment(name), _worldVerticesLength(0), _id(getNextID()) {
@@ -130,16 +131,8 @@ Vector<int> &VertexAttachment::getBones() {
 	return _bones;
 }
 
-void VertexAttachment::setBones(Vector<int> inValue) {
-	_bones.clearAndAddAll(inValue);
-}
-
 Vector<float> &VertexAttachment::getVertices() {
 	return _vertices;
-}
-
-void VertexAttachment::setVertices(Vector<float> inValue) {
-	_vertices.clearAndAddAll(inValue);
 }
 
 int VertexAttachment::getWorldVerticesLength() {
@@ -154,5 +147,4 @@ int VertexAttachment::getNextID() {
 	static int nextID = 0;
 
 	return (nextID++ & 65535) << 11;
-}
 }

@@ -40,7 +40,8 @@
 #include <spine/PathConstraint.h>
 #include <spine/PathConstraintData.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(PathConstraintMixTimeline, CurveTimeline);
 
 const int PathConstraintMixTimeline::ENTRIES = 3;
@@ -113,5 +114,4 @@ void PathConstraintMixTimeline::setFrame(int frameIndex, float time, float rotat
 	_frames[frameIndex] = time;
 	_frames[frameIndex + ROTATE] = rotateMix;
 	_frames[frameIndex + TRANSLATE] = translateMix;
-}
 }

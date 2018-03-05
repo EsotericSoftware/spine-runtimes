@@ -32,7 +32,8 @@
 
 #include <assert.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL_NOPARENT(Attachment);
 
 Attachment::Attachment(const String &name) : _name(name) {
@@ -44,5 +45,4 @@ Attachment::~Attachment() {
 
 const String &Attachment::getName() const {
 	return _name;
-}
 }

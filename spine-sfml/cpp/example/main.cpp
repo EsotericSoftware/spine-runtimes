@@ -146,11 +146,11 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 		bounds.update(*skeleton, true);
 		sf::Vector2i position = sf::Mouse::getPosition(window);
 		if (bounds.containsPoint(position.x, position.y)) {
-			headSlot->getColor()._g = 0;
-			headSlot->getColor()._b = 0;
+			headSlot->getColor().g = 0;
+			headSlot->getColor().b = 0;
 		} else {
-			headSlot->getColor()._g = 1;
-			headSlot->getColor()._b = 1;
+			headSlot->getColor().g = 1;
+			headSlot->getColor().b = 1;
 		}
 
 		drawable->update(delta);

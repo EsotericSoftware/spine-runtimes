@@ -52,9 +52,7 @@ namespace Spine {
         void setFrame(int frameIndex, float time, Vector<int>& drawOrder);
         
         Vector<float>& getFrames();
-        void setFrames(Vector<float>& inValue); // time, ...
         Vector< Vector<int> >& getDrawOrders();
-        void setDrawOrders(Vector< Vector<int> >& inValue);
         int getFrameCount();
     
     private:

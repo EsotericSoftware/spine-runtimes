@@ -38,7 +38,8 @@
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(AttachmentTimeline, Timeline);
 
 AttachmentTimeline::AttachmentTimeline(int frameCount) : Timeline(), _slotIndex(0) {
@@ -108,21 +109,10 @@ const Vector<float> &AttachmentTimeline::getFrames() {
 	return _frames;
 }
 
-void AttachmentTimeline::setFrames(Vector<float> &inValue) {
-	_frames.clear();
-	_frames.addAll(inValue);
-}
-
 const Vector<String> &AttachmentTimeline::getAttachmentNames() {
 	return _attachmentNames;
 }
 
-void AttachmentTimeline::setAttachmentNames(Vector<String> &inValue) {
-	_attachmentNames.clear();
-	_attachmentNames.addAll(inValue);
-}
-
 int AttachmentTimeline::getFrameCount() {
 	return static_cast<int>(_frames.size());
-}
 }

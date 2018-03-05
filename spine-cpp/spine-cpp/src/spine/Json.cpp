@@ -48,7 +48,8 @@
 #include <assert.h>
 #include <math.h>
 
-namespace Spine {
+using namespace Spine;
+
 const int Json::JSON_FALSE = 0;
 const int Json::JSON_TRUE = 1;
 const int Json::JSON_NULL = 2;
@@ -536,6 +537,4 @@ int Json::json_strcasecmp(const char *s1, const char *s2) {
 			return 1; /* s2 is nul    s1 is not */
 		}
 	}
-}
-
 }

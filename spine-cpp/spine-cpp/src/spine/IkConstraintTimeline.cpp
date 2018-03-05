@@ -40,7 +40,8 @@
 #include <spine/IkConstraint.h>
 #include <spine/IkConstraintData.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(IkConstraintTimeline, CurveTimeline);
 
 const int IkConstraintTimeline::ENTRIES = 3;
@@ -121,5 +122,4 @@ void IkConstraintTimeline::setFrame(int frameIndex, float time, float mix, int b
 	_frames[frameIndex] = time;
 	_frames[frameIndex + MIX] = mix;
 	_frames[frameIndex + BEND_DIRECTION] = bendDirection;
-}
 }

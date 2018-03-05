@@ -35,7 +35,8 @@
 
 #include <assert.h>
 
-namespace Spine {
+using namespace Spine;
+
 PathConstraintData::PathConstraintData(const String &name) :
 		_name(name),
 		_order(0),
@@ -137,6 +138,4 @@ float PathConstraintData::getTranslateMix() {
 
 void PathConstraintData::setTranslateMix(float inValue) {
 	_translateMix = inValue;
-}
-
 }

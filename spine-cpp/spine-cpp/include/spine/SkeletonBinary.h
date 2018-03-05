@@ -80,8 +80,6 @@ namespace Spine {
         void setScale(float scale) { _scale = scale; }
 
         String& getError() { return _error; }
-
-
         
     private:
         struct DataInput : public SpineObject {

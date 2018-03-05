@@ -30,7 +30,8 @@
 
 #include <spine/PathAttachment.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(PathAttachment, VertexAttachment);
 
 PathAttachment::PathAttachment(const String &name) : VertexAttachment(name), _closed(false), _constantSpeed(false) {
@@ -38,11 +39,6 @@ PathAttachment::PathAttachment(const String &name) : VertexAttachment(name), _cl
 
 Vector<float> &PathAttachment::getLengths() {
 	return _lengths;
-}
-
-void PathAttachment::setLengths(Vector<float> &inValue) {
-	_lengths.clear();
-	_lengths.addAll(inValue);
 }
 
 bool PathAttachment::isClosed() {
@@ -59,6 +55,4 @@ bool PathAttachment::isConstantSpeed() {
 
 void PathAttachment::setConstantSpeed(bool inValue) {
 	_constantSpeed = inValue;
-}
-
 }

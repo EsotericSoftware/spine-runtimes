@@ -98,8 +98,6 @@ public:
 
 	void setBlendMode(BlendMode inValue);
 
-
-
 private:
 	const int _index;
 	String _name;

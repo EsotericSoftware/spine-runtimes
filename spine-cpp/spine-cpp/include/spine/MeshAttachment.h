@@ -35,7 +35,6 @@
 #include <spine/Vector.h>
 #include <spine/Color.h>
 
-
 namespace Spine {
     /// Attachment that displays a texture region using a mesh.
     class MeshAttachment : public VertexAttachment {
@@ -56,14 +55,11 @@ namespace Spine {
         void setHullLength(float inValue);
         
         Vector<float>& getRegionUVs();
-        void setRegionUVs(Vector<float>& inValue);
         
         /// The UV pair for each vertex, normalized within the entire texture. See also MeshAttachment::updateUVs
         Vector<float>& getUVs();
-        void setUVs(Vector<float>& inValue);
         
         Vector<unsigned short>& getTriangles();
-        void setTriangles(Vector<unsigned short>& inValue);
         
         Color& getColor();
         
@@ -116,13 +112,10 @@ namespace Spine {
         
         // Nonessential.
         Vector<unsigned short>& getEdges();
-        void setEdges(Vector<unsigned short>& inValue);
         float getWidth();
         void setWidth(float inValue);
         float getHeight();
         void setHeight(float inValue);
-
-
 
     private:
         float _regionOffsetX, _regionOffsetY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight;

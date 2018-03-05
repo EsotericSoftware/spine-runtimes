@@ -36,7 +36,8 @@
 
 #include <spine/BoneData.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(TransformConstraint, Constraint);
 
 TransformConstraint::TransformConstraint(TransformConstraintData &data, Skeleton &skeleton) : Constraint(),
@@ -375,5 +376,4 @@ void TransformConstraint::applyRelativeLocal() {
 
 		bone.updateWorldTransform(x, y, rotation, scaleX, scaleY, bone._ashearX, shearY);
 	}
-}
 }

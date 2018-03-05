@@ -78,8 +78,6 @@ namespace Spine {
         void setTarget(Slot* inValue);
         
         PathConstraintData& getData();
-
-
         
     private:
         static const float EPSILON;

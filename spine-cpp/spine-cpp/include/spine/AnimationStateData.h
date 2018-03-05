@@ -68,8 +68,6 @@ namespace Spine {
         ///
         float getMix(Animation* from, Animation* to);
 
-
-
     private:
         class AnimationPair : public SpineObject {
         public:
@@ -79,8 +77,6 @@ namespace Spine {
             explicit AnimationPair(Animation* a1 = NULL, Animation* a2 = NULL);
             
             bool operator==(const AnimationPair &other) const;
-
-
         };
         
         struct HashAnimationPair : public SpineObject {

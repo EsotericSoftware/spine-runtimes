@@ -134,20 +134,20 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 			continue;
 		} else continue;
 
-		Uint8 r = static_cast<Uint8>(skeleton->getColor()._r * slot.getColor()._r * attachmentColor->_r * 255);
-		Uint8 g = static_cast<Uint8>(skeleton->getColor()._g * slot.getColor()._g * attachmentColor->_g * 255);
-		Uint8 b = static_cast<Uint8>(skeleton->getColor()._b * slot.getColor()._b * attachmentColor->_b * 255);
-		Uint8 a = static_cast<Uint8>(skeleton->getColor()._a * slot.getColor()._a * attachmentColor->_a * 255);
+		Uint8 r = static_cast<Uint8>(skeleton->getColor().r * slot.getColor().r * attachmentColor->r * 255);
+		Uint8 g = static_cast<Uint8>(skeleton->getColor().g * slot.getColor().g * attachmentColor->g * 255);
+		Uint8 b = static_cast<Uint8>(skeleton->getColor().b * slot.getColor().b * attachmentColor->b * 255);
+		Uint8 a = static_cast<Uint8>(skeleton->getColor().a * slot.getColor().a * attachmentColor->a * 255);
 		vertex.color.r = r;
 		vertex.color.g = g;
 		vertex.color.b = b;
 		vertex.color.a = a;
 
 		Color light;
-		light._r = r / 255.0f;
-		light._g = g / 255.0f;
-		light._b = b / 255.0f;
-		light._a = a / 255.0f;
+		light.r = r / 255.0f;
+		light.g = g / 255.0f;
+		light.b = b / 255.0f;
+		light.a = a / 255.0f;
 
 		sf::BlendMode blend;
 		if (!usePremultipliedAlpha) {
@@ -212,7 +212,7 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 			for (int i = 0; i < verticesCount; i++) {
 				Color vertexColor = light;
 				Color dark;
-				dark._r = dark._g = dark._b = dark._a = 0;
+				dark.r = dark.g = dark.b = dark.a = 0;
 				int index = i << 1;
 				float x = (*vertices)[index];
 				float y = (*vertices)[index + 1];
@@ -233,10 +233,10 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 				vertex.texCoords.x = (*uvs)[index] * size.x;
 				vertex.texCoords.y = (*uvs)[index + 1] * size.y;
 				Color vertexColor = tempColors[index >> 1];
-				vertex.color.r = static_cast<Uint8>(vertexColor._r * 255);
-				vertex.color.g = static_cast<Uint8>(vertexColor._g * 255);
-				vertex.color.b = static_cast<Uint8>(vertexColor._b * 255);
-				vertex.color.a = static_cast<Uint8>(vertexColor._a * 255);
+				vertex.color.r = static_cast<Uint8>(vertexColor.r * 255);
+				vertex.color.g = static_cast<Uint8>(vertexColor.g * 255);
+				vertex.color.b = static_cast<Uint8>(vertexColor.b * 255);
+				vertex.color.a = static_cast<Uint8>(vertexColor.a * 255);
 				vertexArray->append(vertex);
 			}
 		} else {

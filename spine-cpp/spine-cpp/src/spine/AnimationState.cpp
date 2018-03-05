@@ -42,7 +42,8 @@
 #include <spine/AttachmentTimeline.h>
 #include <spine/DrawOrderTimeline.h>
 
-namespace Spine {
+using namespace Spine;
+
 void dummyOnAnimationEventFunc(AnimationState *state, EventType type, TrackEntry *entry, Event *event = NULL) {
 }
 
@@ -633,7 +634,7 @@ AnimationStateData *AnimationState::getData() {
 	return _data;
 }
 
-Vector<TrackEntry *> AnimationState::getTracks() {
+Vector<TrackEntry *> &AnimationState::getTracks() {
 	return _tracks;
 }
 
@@ -979,6 +980,4 @@ void AnimationState::animationsChanged() {
 			entry->setTimelineData(NULL, _mixingTo, _propertyIDs);
 		}
 	}
-}
-
 }

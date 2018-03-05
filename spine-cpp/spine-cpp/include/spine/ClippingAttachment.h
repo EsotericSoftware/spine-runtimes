@@ -49,8 +49,6 @@ namespace Spine {
         
         SlotData* getEndSlot();
         void setEndSlot(SlotData* inValue);
-
-
         
     private:
         SlotData* _endSlot;

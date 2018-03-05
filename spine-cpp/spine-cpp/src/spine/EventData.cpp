@@ -32,7 +32,8 @@
 
 #include <assert.h>
 
-namespace Spine {
+using namespace Spine;
+
 EventData::EventData(const String &name) :
 		_name(name),
 		_intValue(0),
@@ -68,6 +69,4 @@ const String &EventData::getStringValue() {
 
 void EventData::setStringValue(const String &inValue) {
 	_stringValue = inValue;
-}
-
 }

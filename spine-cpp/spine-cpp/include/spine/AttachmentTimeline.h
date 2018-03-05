@@ -38,7 +38,6 @@
 #include <spine/MixDirection.h>
 #include <spine/String.h>
 
-
 namespace Spine {
     class Skeleton;
     class Event;
@@ -62,9 +61,7 @@ namespace Spine {
         int getSlotIndex();
         void setSlotIndex(int inValue);
         const Vector<float>& getFrames();
-        void setFrames(Vector<float>& inValue); // time, ...
         const Vector<String>& getAttachmentNames();
-        void setAttachmentNames(Vector<String>& inValue);
         int getFrameCount();
     private:
         int _slotIndex;

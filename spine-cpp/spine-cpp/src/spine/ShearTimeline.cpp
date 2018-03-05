@@ -38,7 +38,8 @@
 #include <spine/Bone.h>
 #include <spine/BoneData.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(ShearTimeline, TranslateTimeline);
 
 ShearTimeline::ShearTimeline(int frameCount) : TranslateTimeline(frameCount) {
@@ -94,5 +95,4 @@ void ShearTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 
 int ShearTimeline::getPropertyId() {
 	return ((int) TimelineType_Shear << 24) + _boneIndex;
-}
 }

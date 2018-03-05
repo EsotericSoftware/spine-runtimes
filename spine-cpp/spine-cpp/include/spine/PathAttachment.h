@@ -45,13 +45,10 @@ namespace Spine {
         
         /// The length in the setup pose from the start of the path to the end of each curve.
         Vector<float>& getLengths();
-        void setLengths(Vector<float>& inValue);
         bool isClosed();
         void setClosed(bool inValue);
         bool isConstantSpeed();
         void setConstantSpeed(bool inValue);
-
-
         
     private:
         Vector<float> _lengths;

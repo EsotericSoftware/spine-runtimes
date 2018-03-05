@@ -40,7 +40,8 @@
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(DeformTimeline, CurveTimeline);
 
 DeformTimeline::DeformTimeline(int frameCount) : CurveTimeline(frameCount), _slotIndex(0), _attachment(NULL) {
@@ -206,18 +207,8 @@ Vector<float> &DeformTimeline::getFrames() {
 	return _frames;
 }
 
-void DeformTimeline::setFrames(Vector<float> &inValue) {
-	_frames.clear();
-	_frames.addAll(inValue);
-}
-
 Vector<Vector<float> > &DeformTimeline::getVertices() {
 	return _frameVertices;
-}
-
-void DeformTimeline::setVertices(Vector<Vector<float> > &inValue) {
-	_frameVertices.clear();
-	_frameVertices.addAll(inValue);
 }
 
 VertexAttachment *DeformTimeline::getAttachment() {
@@ -226,5 +217,4 @@ VertexAttachment *DeformTimeline::getAttachment() {
 
 void DeformTimeline::setAttachment(VertexAttachment *inValue) {
 	_attachment = inValue;
-}
 }

@@ -111,8 +111,6 @@ public:
 	/// All skins, including the default skin.
 	Vector<Skin *> &getSkins();
 
-	void setSkins(Vector<Skin *> &inValue);
-
 	/// The skeleton's default skin.
 	/// By default this skin contains all attachments that were not in a skin in Spine.
 	///
@@ -123,23 +121,13 @@ public:
 
 	Vector<EventData *> &getEvents();
 
-	void setEvents(Vector<EventData *> &inValue);
-
 	Vector<Animation *> &getAnimations();
-
-	void setAnimations(Vector<Animation *> &inValue);
 
 	Vector<IkConstraintData *> &getIkConstraints();
 
-	void setIkConstraints(Vector<IkConstraintData *> &inValue);
-
 	Vector<TransformConstraintData *> &getTransformConstraints();
 
-	void setTransformConstraints(Vector<TransformConstraintData *> &inValue);
-
 	Vector<PathConstraintData *> &getPathConstraints();
-
-	void setPathConstraints(Vector<PathConstraintData *> &inValue);
 
 	float getWidth();
 
@@ -166,8 +154,6 @@ public:
 	float getFps();
 
 	void setFps(float inValue);
-
-
 
 private:
 	String _name;

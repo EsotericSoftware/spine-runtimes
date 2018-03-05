@@ -32,7 +32,8 @@
 
 #include <spine/MathUtil.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(CurveTimeline, Timeline);
 
 const float CurveTimeline::LINEAR = 0;
@@ -121,5 +122,4 @@ float CurveTimeline::getCurvePercent(int frameIndex, float percent) {
 
 float CurveTimeline::getCurveType(int frameIndex) {
 	return _curves[frameIndex * BEZIER_SIZE];
-}
 }

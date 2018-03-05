@@ -35,7 +35,8 @@
 #include <spine/Skeleton.h>
 #include <spine/Attachment.h>
 
-namespace Spine {
+using namespace Spine;
+
 Slot::Slot(SlotData &data, Bone &bone) :
 		_data(data),
 		_bone(bone),
@@ -112,10 +113,4 @@ void Slot::setAttachmentTime(float inValue) {
 
 Vector<float> &Slot::getAttachmentVertices() {
 	return _attachmentVertices;
-}
-
-void Slot::setAttachmentVertices(Vector<float> &inValue) {
-	_attachmentVertices.clearAndAddAll(inValue);
-}
-
 }

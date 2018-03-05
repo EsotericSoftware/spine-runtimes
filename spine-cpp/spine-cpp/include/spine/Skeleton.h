@@ -212,8 +212,6 @@ public:
 
 	void setFlipY(bool inValue);
 
-
-
 private:
 	SkeletonData *_data;
 	Vector<Bone *> _bones;

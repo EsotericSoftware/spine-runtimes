@@ -107,8 +107,6 @@ public:
 
 	void setTransformMode(TransformMode inValue);
 
-
-
 private:
 	const int _index;
 	const String _name;

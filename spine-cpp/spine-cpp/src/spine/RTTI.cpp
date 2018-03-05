@@ -31,7 +31,8 @@
 #include <spine/RTTI.h>
 #include <spine/String.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI::RTTI(const std::string &className) : _className(className), _pBaseRTTI(NULL) {
 }
 
@@ -58,6 +59,4 @@ bool RTTI::instanceOf(const RTTI &rtti) const {
 	}
 
 	return false;
-}
-
 }

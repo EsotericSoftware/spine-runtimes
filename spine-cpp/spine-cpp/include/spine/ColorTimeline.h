@@ -61,8 +61,6 @@ public:
 
 	Vector<float> &getFrames();
 
-	void setFrames(Vector<float> &inValue); // time, r, g, b, a, ...
-
 protected:
 	static const int PREV_TIME, PREV_R, PREV_G, PREV_B, PREV_A;
 	static const int R, G, B, A;

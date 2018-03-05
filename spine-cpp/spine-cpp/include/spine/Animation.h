@@ -93,9 +93,7 @@ public:
 
 	const String &getName();
 
-	Vector<Timeline *> getTimelines();
-
-	void setTimelines(Vector<Timeline *> &inValue);
+	Vector<Timeline *> &getTimelines();
 
 	float getDuration();
 

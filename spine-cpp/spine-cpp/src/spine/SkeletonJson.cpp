@@ -75,7 +75,8 @@
 #define strdup _strdup
 #endif
 
-namespace Spine {
+using namespace Spine;
+
 SkeletonJson::SkeletonJson(Atlas *atlas) : _attachmentLoader(new(__FILE__, __LINE__) AtlasAttachmentLoader(atlas)),
 										   _scale(1), _ownsLoader(true) {
 }
@@ -210,19 +211,19 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 			color = Json::getString(slotMap, "color", 0);
 			if (color) {
 				Color &c = data->getColor();
-				c._r = toColor(color, 0);
-				c._g = toColor(color, 1);
-				c._b = toColor(color, 2);
-				c._a = toColor(color, 3);
+				c.r = toColor(color, 0);
+				c.g = toColor(color, 1);
+				c.b = toColor(color, 2);
+				c.a = toColor(color, 3);
 			}
 
 			dark = Json::getString(slotMap, "dark", 0);
 			if (dark) {
 				Color &darkColor = data->getDarkColor();
-				darkColor._r = toColor(dark, 0);
-				darkColor._g = toColor(dark, 1);
-				darkColor._b = toColor(dark, 2);
-				darkColor._a = toColor(dark, 3);
+				darkColor.r = toColor(dark, 0);
+				darkColor.g = toColor(dark, 1);
+				darkColor.b = toColor(dark, 2);
+				darkColor.a = toColor(dark, 3);
 				data->setHasDarkColor(true);
 			}
 
@@ -487,10 +488,10 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 
 							color = Json::getString(attachmentMap, "color", 0);
 							if (color) {
-								region->getColor()._r = toColor(color, 0);
-								region->getColor()._g = toColor(color, 1);
-								region->getColor()._b = toColor(color, 2);
-								region->getColor()._a = toColor(color, 3);
+								region->getColor().r = toColor(color, 0);
+								region->getColor().g = toColor(color, 1);
+								region->getColor().b = toColor(color, 2);
+								region->getColor().a = toColor(color, 3);
 							}
 
 							region->updateOffset();
@@ -506,10 +507,10 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 
 							color = Json::getString(attachmentMap, "color", 0);
 							if (color) {
-								mesh->getColor()._r = toColor(color, 0);
-								mesh->getColor()._g = toColor(color, 1);
-								mesh->getColor()._b = toColor(color, 2);
-								mesh->getColor()._a = toColor(color, 3);
+								mesh->getColor().r = toColor(color, 0);
+								mesh->getColor().g = toColor(color, 1);
+								mesh->getColor().b = toColor(color, 2);
+								mesh->getColor().a = toColor(color, 3);
 							}
 
 							mesh->_width = Json::getFloat(attachmentMap, "width", 32) * _scale;
@@ -1185,7 +1186,7 @@ void SkeletonJson::readVertices(Json *attachmentMap, VertexAttachment *attachmen
 			}
 		}
 
-		attachment->setVertices(vertices);
+		attachment->getVertices().clearAndAddAll(vertices);
 		return;
 	}
 
@@ -1204,13 +1205,12 @@ void SkeletonJson::readVertices(Json *attachmentMap, VertexAttachment *attachmen
 		}
 	}
 
-	attachment->setVertices(bonesAndWeights._vertices);
-	attachment->setBones(bonesAndWeights._bones);
+	attachment->getVertices().clearAndAddAll(bonesAndWeights._vertices);
+	attachment->getBones().clearAndAddAll(bonesAndWeights._bones);
 }
 
 void SkeletonJson::setError(Json *root, const String &value1, const String &value2) {
 	_error = String(value1).append(value2);
 
 	delete root;
-}
 }

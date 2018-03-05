@@ -32,7 +32,8 @@
 
 #include <spine/BoneData.h>
 
-namespace Spine {
+using namespace Spine;
+
 IkConstraintData::IkConstraintData(const String &name) :
 		_name(name),
 		_order(0),
@@ -79,6 +80,4 @@ float IkConstraintData::getMix() {
 
 void IkConstraintData::setMix(float inValue) {
 	_mix = inValue;
-}
-
 }

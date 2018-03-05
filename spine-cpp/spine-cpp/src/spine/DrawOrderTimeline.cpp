@@ -38,7 +38,8 @@
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(DrawOrderTimeline, Timeline);
 
 DrawOrderTimeline::DrawOrderTimeline(int frameCount) : Timeline() {
@@ -112,21 +113,10 @@ Vector<float> &DrawOrderTimeline::getFrames() {
 	return _frames;
 }
 
-void DrawOrderTimeline::setFrames(Vector<float> &inValue) {
-	_frames.clear();
-	_frames.addAll(inValue);
-}
-
 Vector<Vector<int> > &DrawOrderTimeline::getDrawOrders() {
 	return _drawOrders;
 }
 
-void DrawOrderTimeline::setDrawOrders(Vector<Vector<int> > &inValue) {
-	_drawOrders.clear();
-	_drawOrders.addAll(inValue);
-}
-
 int DrawOrderTimeline::getFrameCount() {
 	return static_cast<int>(_frames.size());
-}
 }

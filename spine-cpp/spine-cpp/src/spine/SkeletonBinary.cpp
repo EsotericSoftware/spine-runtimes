@@ -71,7 +71,8 @@
 #include <spine/EventTimeline.h>
 #include <spine/Event.h>
 
-namespace Spine {
+using namespace Spine;
+
 const int SkeletonBinary::BONE_ROTATE = 0;
 const int SkeletonBinary::BONE_TRANSLATE = 1;
 const int SkeletonBinary::BONE_SCALE = 2;
@@ -401,10 +402,10 @@ int SkeletonBinary::readInt(DataInput *input) {
 }
 
 void SkeletonBinary::readColor(DataInput *input, Color &color) {
-	color._r = readByte(input) / 255.0f;
-	color._g = readByte(input) / 255.0f;
-	color._b = readByte(input) / 255.0f;
-	color._a = readByte(input) / 255.0f;
+	color.r = readByte(input) / 255.0f;
+	color.g = readByte(input) / 255.0f;
+	color.b = readByte(input) / 255.0f;
+	color.a = readByte(input) / 255.0f;
 }
 
 int SkeletonBinary::readVarint(DataInput *input, bool optimizePositive) {
@@ -1007,5 +1008,4 @@ void SkeletonBinary::readCurve(DataInput *input, int frameIndex, CurveTimeline *
 			break;
 		}
 	}
-}
 }

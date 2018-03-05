@@ -73,8 +73,6 @@ namespace Spine {
         
         float getShearMix();
         void setShearMix(float inValue);
-
-
         
     private:
         TransformConstraintData& _data;

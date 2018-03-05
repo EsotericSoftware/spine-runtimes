@@ -32,7 +32,7 @@
 
 #include <spine/MathUtil.h>
 
-namespace Spine {
+using namespace Spine;
 
 Triangulator::~Triangulator() {
 	ContainerUtil::cleanUpVectorOfPointers(_convexPolygons);
@@ -295,6 +295,4 @@ int Triangulator::winding(float p1x, float p1y, float p2x, float p2y, float p3x,
 	float px = p2x - p1x, py = p2y - p1y;
 
 	return p3x * py - p3y * px + px * p1y - p1x * py >= 0 ? 1 : -1;
-}
-
 }

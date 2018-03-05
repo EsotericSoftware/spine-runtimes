@@ -113,10 +113,6 @@ public:
 
 	Vector<float> &getAttachmentVertices();
 
-	void setAttachmentVertices(Vector<float> &inValue);
-
-
-
 private:
 	SlotData &_data;
 	Bone &_bone;

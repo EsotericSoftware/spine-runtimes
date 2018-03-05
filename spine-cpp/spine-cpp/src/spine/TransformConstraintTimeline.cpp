@@ -40,7 +40,8 @@
 #include <spine/TransformConstraint.h>
 #include <spine/TransformConstraintData.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(TransformConstraintTimeline, CurveTimeline);
 
 const int TransformConstraintTimeline::ENTRIES = 5;
@@ -136,5 +137,4 @@ TransformConstraintTimeline::setFrame(int frameIndex, float time, float rotateMi
 	_frames[frameIndex + TRANSLATE] = translateMix;
 	_frames[frameIndex + SCALE] = scaleMix;
 	_frames[frameIndex + SHEAR] = shearMix;
-}
 }

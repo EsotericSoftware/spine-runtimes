@@ -34,7 +34,8 @@
 
 #include <spine/ContainerUtil.h>
 
-namespace Spine {
+using namespace Spine;
+
 Atlas::Atlas(const String &path, TextureLoader *textureLoader) : _textureLoader(textureLoader) {
 	int dirLength;
 	char *dir;
@@ -347,6 +348,4 @@ int Atlas::equals(Str *str, const char *other) {
 
 int Atlas::toInt(Str *str) {
 	return (int) strtol(str->begin, (char **) &str->end, 10);
-}
-
 }

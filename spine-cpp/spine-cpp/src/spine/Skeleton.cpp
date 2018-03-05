@@ -50,7 +50,8 @@
 
 #include <spine/ContainerUtil.h>
 
-namespace Spine {
+using namespace Spine;
+
 Skeleton::Skeleton(SkeletonData *skeletonData) :
 		_data(skeletonData),
 		_skin(NULL),
@@ -643,5 +644,4 @@ void Skeleton::sortReset(Vector<Bone *> &bones) {
 		if (bone->_sorted) sortReset(bone->getChildren());
 		bone->_sorted = false;
 	}
-}
 }

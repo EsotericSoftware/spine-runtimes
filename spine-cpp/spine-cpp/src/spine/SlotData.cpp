@@ -32,7 +32,8 @@
 
 #include <assert.h>
 
-namespace Spine {
+using namespace Spine;
+
 SlotData::SlotData(int index, const String &name, BoneData &boneData) :
 		_index(index),
 		_name(name),
@@ -88,6 +89,4 @@ BlendMode SlotData::getBlendMode() {
 
 void SlotData::setBlendMode(BlendMode inValue) {
 	_blendMode = inValue;
-}
-
 }

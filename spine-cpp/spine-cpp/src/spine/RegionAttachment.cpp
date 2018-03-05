@@ -34,7 +34,8 @@
 
 #include <assert.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(RegionAttachment, Attachment);
 
 const int RegionAttachment::BLX = 0;
@@ -282,5 +283,4 @@ Vector<float> &RegionAttachment::getUVs() {
 
 Spine::Color &RegionAttachment::getColor() {
 	return _color;
-}
 }

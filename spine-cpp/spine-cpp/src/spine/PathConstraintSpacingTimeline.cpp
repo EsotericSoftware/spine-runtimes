@@ -40,7 +40,8 @@
 #include <spine/PathConstraint.h>
 #include <spine/PathConstraintData.h>
 
-namespace Spine {
+using namespace Spine;
+
 RTTI_IMPL(PathConstraintSpacingTimeline, PathConstraintPositionTimeline);
 
 PathConstraintSpacingTimeline::PathConstraintSpacingTimeline(int frameCount) : PathConstraintPositionTimeline(
@@ -89,5 +90,4 @@ void PathConstraintSpacingTimeline::apply(Skeleton &skeleton, float lastTime, fl
 
 int PathConstraintSpacingTimeline::getPropertyId() {
 	return ((int) TimelineType_PathConstraintSpacing << 24) + _pathConstraintIndex;
-}
 }
