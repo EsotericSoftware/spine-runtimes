@@ -84,7 +84,7 @@ void PathConstraint::update() {
 		return;
 	}
 
-	PathConstraintData data = _data;
+	PathConstraintData &data = _data;
 	SpacingMode spacingMode = data._spacingMode;
 	bool lengthSpacing = spacingMode == SpacingMode_Length;
 	RotateMode rotateMode = data._rotateMode;

@@ -81,7 +81,47 @@ public:
 	static float fmod(float a, float b);
 
 	static bool isNan(float v);
+
+	static float random();
+
+	static float randomTriangular(float min, float max);
+
+	static float randomTriangular(float min, float max, float mode);
+
+	static float pow(float a, float b);
 };
+
+struct Interpolation {
+	virtual float apply(float a) = 0;
+
+	virtual float interpolate(float start, float end, float a) {
+		return start + (end - start) * apply(a);
+	}
+};
+
+struct PowInterpolation: public Interpolation {
+	PowInterpolation(int power): power(power) {
+	}
+
+	float apply(float a) {
+		if (a <= 0.5f) return MathUtil::pow(a * 2, power) / 2;
+		return MathUtil::pow((a - 1) * 2, power) / (power % 2 == 0 ? -2 : 2) + 1;
+	}
+
+	int power;
+};
+
+struct PowOutInterpolation: public Interpolation {
+	PowOutInterpolation(int power): power(power) {
+	}
+
+	float apply(float a) {
+		return MathUtil::pow(a - 1, power) * (power % 2 == 0 ? -1 : 1) + 1;
+	}
+
+	int power;
+};
+
 }
 
 #endif /* Spine_MathUtil_h */

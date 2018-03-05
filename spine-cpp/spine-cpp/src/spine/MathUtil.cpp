@@ -31,7 +31,8 @@
 #include <spine/MathUtil.h>
 #include <math.h>
 
-namespace Spine {
+using namespace Spine;
+
 float MathUtil::abs(float v) {
 	return ((v) < 0 ? -(v) : (v));
 }
@@ -91,4 +92,22 @@ static bool _isNan(float value, float zero) {
 bool MathUtil::isNan(float v) {
 	return _isNan(v, 0);
 }
+
+float MathUtil::random() {
+	return ::rand() / (float)RAND_MAX;
+}
+
+float MathUtil::randomTriangular(float min, float max) {
+	return randomTriangular(min, max, (min + max) * 0.5f);
+}
+
+float MathUtil::randomTriangular(float min, float max, float mode) {
+	float u = random();
+	float d = max - min;
+	if (u <= (mode - min) / d) return min + sqrt(u * d * (mode - min));
+	return max - sqrt((1 - u) * d * (max - mode));
+}
+
+float MathUtil::pow(float a, float b) {
+	return ::pow(a, b);
 }

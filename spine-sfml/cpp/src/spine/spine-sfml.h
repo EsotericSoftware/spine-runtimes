@@ -47,6 +47,7 @@ public:
 	AnimationState *state;
 	float timeScale;
 	sf::VertexArray *vertexArray;
+	VertexEffect* vertexEffect;
 
 	SkeletonDrawable(SkeletonData *skeleton, AnimationStateData *stateData = 0);
 
@@ -64,6 +65,7 @@ private:
 	mutable Vector<float> worldVertices;
 	mutable Vector<float> tempUvs;
 	mutable Vector<Color> tempColors;
+	mutable Vector<unsigned short> quadIndices;
 	mutable SkeletonClipping clipper;
 	mutable bool usePremultipliedAlpha;
 };

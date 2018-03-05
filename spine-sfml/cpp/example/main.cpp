@@ -29,11 +29,9 @@
  *****************************************************************************/
 
 #include <iostream>
-#include <string.h>
 #include <spine/spine-sfml.h>
 #include <spine/Debug.h>
 #include <SFML/Graphics.hpp>
-#include <SFML/Window/Mouse.hpp>
 
 using namespace std;
 using namespace Spine;
@@ -205,9 +203,11 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 
-	// BOZO spSwirlVertexEffect* effect = spSwirlVertexEffect_create(400);
-	// effect->centerY = -200;
-	// drawable->vertexEffect = &effect->super;
+	PowInterpolation pow2(2);
+	PowOutInterpolation powOut2(2);
+	SwirlVertexEffect effect(400, powOut2);
+	effect.setCenterY(-200);
+	drawable->vertexEffect = &effect;
 
 	Skeleton* skeleton = drawable->skeleton;
 	skeleton->setPosition(320, 590);
@@ -231,7 +231,7 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 		swirlTime += delta;
 		float percent = MathUtil::fmod(swirlTime, 2);
 		if (percent > 1) percent = 1 - (percent - 1);
-		// BOZO effect->angle = _spMath_interpolate(_spMath_pow2_apply, -60, 60, percent);
+		effect.setAngle(pow2.interpolate(-60.0f, 60.0f, percent));
 
 		drawable->update(delta);
 
@@ -239,7 +239,6 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 		window.draw(*drawable);
 		window.display();
 	}
-	// BOZO spSwirlVertexEffect_dispose(effect);
 
 	delete drawable;
 }
@@ -452,6 +451,8 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 int main () {
 	DebugExtension dbgExtension;
 	SpineExtension::setInstance(&dbgExtension);
+
+	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor.atlas", 0.5f);
 	testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 1.0f);
 	testcase(spineboy, "data/spineboy-ess.json", "data/spineboy-ess.skel", "data/spineboy.atlas", 0.6f);
 	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl.atlas", 0.5f);

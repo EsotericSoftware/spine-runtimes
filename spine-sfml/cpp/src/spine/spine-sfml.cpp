@@ -53,7 +53,7 @@ namespace Spine {
 SkeletonDrawable::SkeletonDrawable(SkeletonData *skeletonData, AnimationStateData *stateData) :
 		timeScale(1),
 		vertexArray(new VertexArray(Triangles, skeletonData->getBones().size() * 4)),
-		worldVertices(), clipper() {
+		worldVertices(), clipper(), vertexEffect(NULL) {
 	Bone::setYDown(true);
 	worldVertices.ensureCapacity(SPINE_MESH_VERTEX_COUNT_MAX);
 	skeleton = new(__FILE__, __LINE__) Skeleton(skeletonData);
@@ -64,6 +64,13 @@ SkeletonDrawable::SkeletonDrawable(SkeletonData *skeletonData, AnimationStateDat
 	if (ownsAnimationStateData) stateData = new(__FILE__, __LINE__) AnimationStateData(skeletonData);
 
 	state = new(__FILE__, __LINE__) AnimationState(stateData);
+
+	quadIndices.add(0);
+	quadIndices.add(1);
+	quadIndices.add(2);
+	quadIndices.add(2);
+	quadIndices.add(3);
+	quadIndices.add(0);
 }
 
 SkeletonDrawable::~SkeletonDrawable() {
@@ -83,15 +90,8 @@ void SkeletonDrawable::update(float deltaTime) {
 void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 	vertexArray->clear();
 	states.texture = NULL;
-	Vector<unsigned short> quadIndices;
-	quadIndices.add(0);
-	quadIndices.add(1);
-	quadIndices.add(2);
-	quadIndices.add(2);
-	quadIndices.add(3);
-	quadIndices.add(0);
 
-	// BOZO if (vertexEffect != 0) vertexEffect->begin(vertexEffect, skeleton);
+	if (vertexEffect != NULL) vertexEffect->begin(*skeleton);
 
 	sf::Vertex vertex;
 	Texture *texture = NULL;
@@ -206,54 +206,55 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 
 		Vector2u size = texture->getSize();
 
-		/* BOZO if (vertexEffect != 0) {
-			spFloatArray_clear(tempUvs);
-			spColorArray_clear(tempColors);
+		if (vertexEffect != 0) {
+			tempUvs.clear();
+			tempColors.clear();
 			for (int i = 0; i < verticesCount; i++) {
-				spColor vertexColor = light;
-				spColor dark;
-				dark.r = dark.g = dark.b = dark.a = 0;
+				Color vertexColor = light;
+				Color dark;
+				dark._r = dark._g = dark._b = dark._a = 0;
 				int index = i << 1;
-				float x = vertices[index];
-				float y = vertices[index + 1];
-				float u = uvs[index];
-				float v = uvs[index + 1];
-				vertexEffect->transform(vertexEffect, &x, &y, &u, &v, &vertexColor, &dark);
-				vertices[index] = x;
-				vertices[index + 1] = y;
-				spFloatArray_add(tempUvs, u);
-				spFloatArray_add(tempUvs, v);
-				spColorArray_add(tempColors, vertexColor);
+				float x = (*vertices)[index];
+				float y = (*vertices)[index + 1];
+				float u = (*uvs)[index];
+				float v = (*uvs)[index + 1];
+				vertexEffect->transform(x, y, u, v, vertexColor, dark);
+				(*vertices)[index] = x;
+				(*vertices)[index + 1] = y;
+				tempUvs.add(u);
+				tempUvs.add(v);
+				tempColors.add(vertexColor);
 			}
 
 			for (int i = 0; i < indicesCount; ++i) {
-				int index = indices[i] << 1;
-				vertex.position.x = vertices[index];
-				vertex.position.y = vertices[index + 1];
-				vertex.texCoords.x = uvs[index] * size.x;
-				vertex.texCoords.y = uvs[index + 1] * size.y;
-				spColor vertexColor = tempColors->items[index >> 1];
-				vertex.color.r = static_cast<Uint8>(vertexColor.r * 255);
-				vertex.color.g = static_cast<Uint8>(vertexColor.g * 255);
-				vertex.color.b = static_cast<Uint8>(vertexColor.b * 255);
-				vertex.color.a = static_cast<Uint8>(vertexColor.a * 255);
+				int index = (*indices)[i] << 1;
+				vertex.position.x = (*vertices)[index];
+				vertex.position.y = (*vertices)[index + 1];
+				vertex.texCoords.x = (*uvs)[index] * size.x;
+				vertex.texCoords.y = (*uvs)[index + 1] * size.y;
+				Color vertexColor = tempColors[index >> 1];
+				vertex.color.r = static_cast<Uint8>(vertexColor._r * 255);
+				vertex.color.g = static_cast<Uint8>(vertexColor._g * 255);
+				vertex.color.b = static_cast<Uint8>(vertexColor._b * 255);
+				vertex.color.a = static_cast<Uint8>(vertexColor._a * 255);
 				vertexArray->append(vertex);
 			}
-		} else {*/
-		for (int ii = 0; ii < indicesCount; ++ii) {
-			int index = (*indices)[ii] << 1;
-			vertex.position.x = (*vertices)[index];
-			vertex.position.y = (*vertices)[index + 1];
-			vertex.texCoords.x = (*uvs)[index] * size.x;
-			vertex.texCoords.y = (*uvs)[index + 1] * size.y;
-			vertexArray->append(vertex);
+		} else {
+			for (int ii = 0; ii < indicesCount; ++ii) {
+				int index = (*indices)[ii] << 1;
+				vertex.position.x = (*vertices)[index];
+				vertex.position.y = (*vertices)[index + 1];
+				vertex.texCoords.x = (*uvs)[index] * size.x;
+				vertex.texCoords.y = (*uvs)[index + 1] * size.y;
+				vertexArray->append(vertex);
+			}
 		}
 		clipper.clipEnd(slot);
 	}
 	target.draw(*vertexArray, states);
 	clipper.clipEnd();
 
-	// BOZO if (vertexEffect != 0) vertexEffect->end(vertexEffect);
+	if (vertexEffect != 0) vertexEffect->end();
 }
 
 void SFMLTextureLoader::load(AtlasPage &page, const String &path) {
