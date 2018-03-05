@@ -212,7 +212,7 @@ public:
 
 	void setFlipY(bool inValue);
 
-	String toString() const;
+
 
 private:
 	SkeletonData *_data;

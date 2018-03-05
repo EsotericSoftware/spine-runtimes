@@ -51,7 +51,7 @@ namespace Spine {
         bool isConstantSpeed();
         void setConstantSpeed(bool inValue);
 
-        String toString() const;
+
         
     private:
         Vector<float> _lengths;

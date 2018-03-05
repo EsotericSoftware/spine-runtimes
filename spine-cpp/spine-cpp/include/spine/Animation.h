@@ -101,7 +101,7 @@ public:
 
 	void setDuration(float inValue);
 
-	String toString() const;
+
 
 private:
 	Vector<Timeline *> _timelines;

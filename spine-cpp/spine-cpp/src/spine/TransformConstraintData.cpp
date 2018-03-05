@@ -118,7 +118,4 @@ bool TransformConstraintData::isLocal() {
 	return _local;
 }
 
-String TransformConstraintData::toString() const {
-	return String("TransformConstraintData");
-}
 }

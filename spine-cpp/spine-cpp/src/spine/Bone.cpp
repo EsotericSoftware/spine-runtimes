@@ -545,11 +545,4 @@ void Bone::updateAppliedTransform() {
 	}
 }
 
-String Bone::toString() const {
-	String str;
-	str.append("Bone { name: ").appendString(_data.getName());
-	str.append(", a: ").append(_a).append(", b: ").append(_b).append(", c").append(_c).append(", d: ").append(_d);
-	str.append(", worldX: ").append(_worldX).append(", worldY: ").append(_worldY).append(" }");
-	return str;
-}
 }

@@ -196,18 +196,6 @@ public:
 		return _buffer;
 	}
 
-	String toString() const {
-		String str;
-		str.append("Vector { size: ").append((int) _size).append(", items: [\n");
-		for (size_t i = 0; i < _size; i++) {
-			str.append("   ").append(_buffer[i]);
-			if (i != _size - 1) str.append(",\n");
-			else str.append("\n");
-		}
-		str.append("] }");
-		return str;
-	}
-
 private:
 	size_t _size;
 	size_t _capacity;

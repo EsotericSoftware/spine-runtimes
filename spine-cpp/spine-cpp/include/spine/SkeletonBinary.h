@@ -81,14 +81,12 @@ namespace Spine {
 
         String& getError() { return _error; }
 
-        String toString() const;
+
         
     private:
         struct DataInput : public SpineObject {
             const unsigned char* cursor;
             const unsigned char* end;
-
-            String toString() const { return String("DataInput"); }
         };
         
         AttachmentLoader* _attachmentLoader;

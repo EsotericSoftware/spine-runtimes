@@ -69,7 +69,7 @@ public:
 
 	~Json();
 
-	String toString() const;
+
 
 private:
 	static const char *_error;

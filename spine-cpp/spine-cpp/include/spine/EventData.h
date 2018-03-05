@@ -61,7 +61,7 @@ public:
 
 	void setStringValue(const String &inValue);
 
-	String toString() const;
+
 
 private:
 	const String _name;

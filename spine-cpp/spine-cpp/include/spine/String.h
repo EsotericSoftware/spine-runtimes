@@ -149,7 +149,7 @@ public:
 		return *this;
 	}
 
-	String &appendString(const String &other) {
+	String &append(const String &other) {
 		size_t len = other.length();
 		size_t thisLen = _length;
 		_length = _length + len;
@@ -173,16 +173,6 @@ public:
 		return *this;
 	}
 
-	String &append(const SpineObject &object) {
-		appendString(object.toString());
-		return *this;
-	}
-
-	String &append(const SpineObject *object) {
-		appendString(object->toString());
-		return *this;
-	}
-
 	friend bool operator==(const String &a, const String &b) {
 		if (a._buffer == b._buffer) return true;
 		if (a._length != b._length) return false;
@@ -201,10 +191,6 @@ public:
 		if (_buffer) {
 			SpineExtension::free(_buffer, __FILE__, __LINE__);
 		}
-	}
-
-	String toString() const {
-		return *this;
 	}
 
 private:

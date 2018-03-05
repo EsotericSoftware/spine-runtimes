@@ -52,20 +52,17 @@ int SkeletonClipping::clipStart(Slot &slot, ClippingAttachment *clip) {
 	_clippingPolygon.setSize(n, 0);
 	clip->computeWorldVertices(slot, 0, n, _clippingPolygon, 0, 2);
 	makeClockwise(_clippingPolygon);
-	Vector<Vector<float> *> clippingPolygons = _triangulator.decompose(_clippingPolygon,
-																	   _triangulator.triangulate(_clippingPolygon));
+	_clippingPolygons = &_triangulator.decompose(_clippingPolygon, _triangulator.triangulate(_clippingPolygon));
 
-	_clippingPolygons.clearAndAddAll(clippingPolygons);
-
-	for (size_t i = 0; i < _clippingPolygons.size(); ++i) {
-		Vector<float> *polygonP = _clippingPolygons[i];
+	for (size_t i = 0; i < _clippingPolygons->size(); ++i) {
+		Vector<float> *polygonP = (*_clippingPolygons)[i];
 		Vector<float> &polygon = *polygonP;
 		makeClockwise(polygon);
 		polygon.add(polygon[0]);
 		polygon.add(polygon[1]);
 	}
 
-	return static_cast<int>(_clippingPolygons.size());
+	return static_cast<int>((*_clippingPolygons).size());
 }
 
 void SkeletonClipping::clipEnd(Slot &slot) {
@@ -80,8 +77,9 @@ void SkeletonClipping::clipEnd() {
 	}
 
 	_clipAttachment = NULL;
-	_clippingPolygons.clear();
+	_clippingPolygons = NULL;
 	_clippedVertices.clear();
+	_clippedUVs.clear();
 	_clippedTriangles.clear();
 	_clippingPolygon.clear();
 }
@@ -91,8 +89,8 @@ void SkeletonClipping::clipTriangles(Vector<float> &vertices, int verticesLength
 	Vector<float> &clipOutput = _clipOutput;
 	Vector<float> &clippedVertices = _clippedVertices;
 	Vector<unsigned short> &clippedTriangles = _clippedTriangles;
-	Vector<Vector<float> *> &polygons = _clippingPolygons;
-	int polygonsCount = static_cast<int>(_clippingPolygons.size());
+	Vector<Vector<float> *> &polygons = *_clippingPolygons;
+	int polygonsCount = static_cast<int>((*_clippingPolygons).size());
 
 	int index = 0;
 	clippedVertices.clear();
@@ -318,7 +316,4 @@ void SkeletonClipping::makeClockwise(Vector<float> &polygon) {
 	}
 }
 
-String SkeletonClipping::toString() const {
-	return String("SkeletonClipping");
-}
 }

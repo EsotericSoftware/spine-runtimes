@@ -538,7 +538,4 @@ int Json::json_strcasecmp(const char *s1, const char *s2) {
 	}
 }
 
-String Json::toString() const {
-	return String("Json");
-}
 }

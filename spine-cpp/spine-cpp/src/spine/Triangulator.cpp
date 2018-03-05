@@ -33,6 +33,12 @@
 #include <spine/MathUtil.h>
 
 namespace Spine {
+
+Triangulator::~Triangulator() {
+	ContainerUtil::cleanUpVectorOfPointers(_convexPolygons);
+	ContainerUtil::cleanUpVectorOfPointers(_convexPolygonsIndices);
+}
+
 Vector<int> &Triangulator::triangulate(Vector<float> &vertices) {
 	int vertexCount = static_cast<int>(vertices.size() >> 1);
 
@@ -123,14 +129,14 @@ Vector<int> &Triangulator::triangulate(Vector<float> &vertices) {
 	return triangles;
 }
 
-Vector<Vector<float> *> Triangulator::decompose(Vector<float> &vertices, Vector<int> &triangles) {
+Vector<Vector<float> *> &Triangulator::decompose(Vector<float> &vertices, Vector<int> &triangles) {
 	Vector<Vector<float> *> &convexPolygons = _convexPolygons;
 	for (size_t i = 0, n = convexPolygons.size(); i < n; ++i) {
 		_polygonPool.free(convexPolygons[i]);
 	}
 	convexPolygons.clear();
 
-	Vector<Vector<int> *> convexPolygonsIndices = _convexPolygonsIndices;
+	Vector<Vector<int> *> &convexPolygonsIndices = _convexPolygonsIndices;
 	for (size_t i = 0, n = convexPolygonsIndices.size(); i < n; ++i) {
 		_polygonIndicesPool.free(convexPolygonsIndices[i]);
 	}
@@ -291,7 +297,4 @@ int Triangulator::winding(float p1x, float p1y, float p2x, float p2y, float p3x,
 	return p3x * py - p3y * px + px * p1y - p1x * py >= 0 ? 1 : -1;
 }
 
-String Triangulator::toString() const {
-	return String("Triangulator");
-}
 }

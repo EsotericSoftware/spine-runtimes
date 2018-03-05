@@ -122,7 +122,7 @@ namespace Spine {
         float getHeight();
         void setHeight(float inValue);
 
-        String toString() const;
+
 
     private:
         float _regionOffsetX, _regionOffsetY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight;

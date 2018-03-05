@@ -547,9 +547,4 @@ void PathConstraint::addCurvePosition(float p, float x1, float y1, float cx1, fl
 	}
 }
 
-String PathConstraint::toString() const {
-	String str;
-	str.append("TransformConstraint { name: ").appendString(_data.getName()).append(" }");
-	return str;
-}
 }

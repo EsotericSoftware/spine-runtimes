@@ -74,21 +74,11 @@ void AnimationStateData::setDefaultMix(float inValue) {
 	_defaultMix = inValue;
 }
 
-String AnimationStateData::toString() const {
-	return String("AnimationStateData");
-}
-
 AnimationStateData::AnimationPair::AnimationPair(Animation *a1, Animation *a2) : _a1(a1), _a2(a2) {
 }
 
 bool AnimationStateData::AnimationPair::operator==(const AnimationPair &other) const {
 	return _a1->_name == other._a1->_name && _a2->_name == other._a2->_name;
-}
-
-String AnimationStateData::AnimationPair::toString() const {
-	String str;
-	str.append("AnimationPair { ").append(_a1->_name).append(" -> ").append(_a2->_name).append(" } ");
-	return str;
 }
 
 std::size_t

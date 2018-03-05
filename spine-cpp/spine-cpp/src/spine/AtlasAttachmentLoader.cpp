@@ -112,7 +112,4 @@ AtlasRegion *AtlasAttachmentLoader::findRegion(const String &name) {
 	return _atlas->findRegion(name);
 }
 
-String AtlasAttachmentLoader::toString() const {
-	return String("AtlasAttachmentLoader");
-}
 }

@@ -60,9 +60,4 @@ bool RTTI::instanceOf(const RTTI &rtti) const {
 	return false;
 }
 
-String RTTI::toString() const {
-	String str;
-	str.append("RTTI { name: ").append(_className.c_str()).append(" }");
-	return str;
-}
 }

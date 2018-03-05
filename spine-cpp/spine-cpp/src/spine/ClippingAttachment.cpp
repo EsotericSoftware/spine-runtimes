@@ -45,12 +45,4 @@ SlotData *ClippingAttachment::getEndSlot() {
 void ClippingAttachment::setEndSlot(SlotData *inValue) {
 	_endSlot = inValue;
 }
-
-String ClippingAttachment::toString() const {
-	String str;
-	str.append("Clipping { name: ").appendString(getName());
-	str.append(", worldVerticesLength: ").append(_worldVerticesLength);
-	str.append(", bones: ").append(_bones).append(", weights: ").append(_vertices).append(" }");
-	return str;
-}
 }

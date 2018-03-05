@@ -84,7 +84,7 @@ public:
 
 	void setMix(float inValue);
 
-	String toString() const;
+
 
 private:
 	IkConstraintData &_data;

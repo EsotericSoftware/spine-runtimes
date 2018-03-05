@@ -376,10 +376,4 @@ void TransformConstraint::applyRelativeLocal() {
 		bone.updateWorldTransform(x, y, rotation, scaleX, scaleY, bone._ashearX, shearY);
 	}
 }
-
-String TransformConstraint::toString() const {
-	String str;
-	str.append("TransformConstraint { name: ").appendString(_data.getName()).append(" }");
-	return str;
-}
 }

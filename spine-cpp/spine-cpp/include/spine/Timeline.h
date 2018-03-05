@@ -66,8 +66,6 @@ public:
 		  MixDirection direction) = 0;
 
 	virtual int getPropertyId() = 0;
-
-	virtual String toString() const;
 };
 }
 

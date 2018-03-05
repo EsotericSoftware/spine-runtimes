@@ -272,9 +272,4 @@ Spine::Color &MeshAttachment::getColor() {
 	return _color;
 }
 
-String MeshAttachment::toString() const {
-	String str;
-	str.append("RegionAttachment { name: ").appendString(getName()).append(", path: ").appendString(_path).append(" }");
-	return str;
-}
 }

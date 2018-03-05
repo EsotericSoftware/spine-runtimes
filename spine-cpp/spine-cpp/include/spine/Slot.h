@@ -115,7 +115,7 @@ public:
 
 	void setAttachmentVertices(Vector<float> &inValue);
 
-	String toString() const;
+
 
 private:
 	SlotData &_data;

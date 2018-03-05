@@ -51,6 +51,9 @@ class DebugExtension : public DefaultSpineExtension {
 	};
 
 public:
+	DebugExtension(): _allocations(0), _reallocations(0), _frees(0) {
+	}
+
 	void reportLeaks() {
 		for (std::vector<Allocation>::iterator it = _allocated.begin(); it != _allocated.end(); it++) {
 			printf("\"%s:%i (%zu bytes at %p)\n", it->fileName, it->line, it->size, it->address);

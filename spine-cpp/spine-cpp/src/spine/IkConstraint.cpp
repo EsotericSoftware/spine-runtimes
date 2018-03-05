@@ -258,10 +258,4 @@ void IkConstraint::setMix(float inValue) {
 	_mix = inValue;
 }
 
-String IkConstraint::toString() const {
-	String str;
-	str.append("IkConstraint { name: ").appendString(_data.getName());
-	str.append("}");
-	return str;
-}
 }

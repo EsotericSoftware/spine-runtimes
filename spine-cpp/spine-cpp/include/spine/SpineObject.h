@@ -45,8 +45,6 @@ public:
 	void operator delete(void *p);
 
 	virtual ~SpineObject();
-
-	virtual String toString() const = 0;
 };
 }
 

@@ -41,7 +41,7 @@ namespace Spine {
         
         explicit BoundingBoxAttachment(const String& name);
 
-        String toString() const;
+
     };
 }
 

@@ -197,6 +197,8 @@ void goblins (SkeletonData* skeletonData, Atlas* atlas) {
 		window.draw(*drawable);
 		window.display();
 	}
+
+	delete drawable;
 }
 
 void raptor (SkeletonData* skeletonData, Atlas* atlas) {
@@ -238,6 +240,8 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 		window.display();
 	}
 	// BOZO spSwirlVertexEffect_dispose(effect);
+
+	delete drawable;
 }
 
 void tank (SkeletonData* skeletonData, Atlas* atlas) {
@@ -266,6 +270,8 @@ void tank (SkeletonData* skeletonData, Atlas* atlas) {
 		window.draw(*drawable);
 		window.display();
 	}
+
+	delete drawable;
 }
 
 void vine (SkeletonData* skeletonData, Atlas* atlas) {
@@ -295,6 +301,8 @@ void vine (SkeletonData* skeletonData, Atlas* atlas) {
 		window.draw(*drawable);
 		window.display();
 	}
+
+	delete drawable;
 }
 
 void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
@@ -360,6 +368,8 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 		window.draw(*drawable);
 		window.display();
 	}
+
+	delete drawable;
 }
 
 void owl (SkeletonData* skeletonData, Atlas* atlas) {
@@ -413,6 +423,8 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
 		window.draw(*drawable);
 		window.display();
 	}
+
+	delete drawable;
 }
 
 /**
@@ -429,8 +441,6 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 		animState->update(d);
 		animState->apply(*skeleton);
 		skeleton->updateWorldTransform();
-		printf("%s\n", skeleton->toString().buffer());
-		printf("========================================\n");
 		d += 0.1f;
 	}
 
@@ -441,9 +451,8 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 
 int main () {
 	DebugExtension dbgExtension;
-	// SpineExtension::setInstance(&dbgExtension);
+	SpineExtension::setInstance(&dbgExtension);
 	testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 1.0f);
-	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin.atlas", 0.5f);
 	testcase(spineboy, "data/spineboy-ess.json", "data/spineboy-ess.skel", "data/spineboy.atlas", 0.6f);
 	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl.atlas", 0.5f);
 	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin.atlas", 0.5f);

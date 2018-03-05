@@ -64,7 +64,7 @@ namespace Spine {
         
         AtlasRegion* findRegion(const String& name);
 
-        String toString() const;
+
         
     private:
         Atlas* _atlas;

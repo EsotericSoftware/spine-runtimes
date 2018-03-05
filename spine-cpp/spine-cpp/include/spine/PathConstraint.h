@@ -79,7 +79,7 @@ namespace Spine {
         
         PathConstraintData& getData();
 
-        String toString() const;
+
         
     private:
         static const float EPSILON;

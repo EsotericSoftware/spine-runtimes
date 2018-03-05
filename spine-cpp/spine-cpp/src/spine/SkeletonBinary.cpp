@@ -1008,8 +1008,4 @@ void SkeletonBinary::readCurve(DataInput *input, int frameIndex, CurveTimeline *
 		}
 	}
 }
-
-String SkeletonBinary::toString() const {
-	return String("SkeletonBinary");
-}
 }

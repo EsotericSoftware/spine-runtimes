@@ -232,14 +232,5 @@ void SkeletonBounds::aabbCompute() {
 	_maxY = maxY;
 }
 
-String SkeletonBounds::toString() const {
-	return String("SkeletonBounds");
-}
-
-String Polygon::toString() const {
-	String str;
-	str.append("Polygon { count: ").append(_count).append(", vertices: ").append(_vertices).append(" }");
-	return str;
-}
 }
 

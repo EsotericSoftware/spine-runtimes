@@ -68,7 +68,7 @@ namespace Spine {
         ///
         float getMix(Animation* from, Animation* to);
 
-        String toString() const;
+
 
     private:
         class AnimationPair : public SpineObject {
@@ -80,7 +80,7 @@ namespace Spine {
             
             bool operator==(const AnimationPair &other) const;
 
-            String toString() const;
+
         };
         
         struct HashAnimationPair : public SpineObject {

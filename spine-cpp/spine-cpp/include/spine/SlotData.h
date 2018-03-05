@@ -98,7 +98,7 @@ public:
 
 	void setBlendMode(BlendMode inValue);
 
-	String toString() const;
+
 
 private:
 	const int _index;

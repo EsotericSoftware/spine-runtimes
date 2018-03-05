@@ -1213,8 +1213,4 @@ void SkeletonJson::setError(Json *root, const String &value1, const String &valu
 
 	delete root;
 }
-
-String SkeletonJson::toString() const {
-	return String("SkeletonJson");
-}
 }

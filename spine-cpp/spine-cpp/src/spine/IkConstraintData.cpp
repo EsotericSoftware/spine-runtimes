@@ -81,7 +81,4 @@ void IkConstraintData::setMix(float inValue) {
 	_mix = inValue;
 }
 
-String IkConstraintData::toString() const {
-	return String("IkConstraintData");
-}
 }

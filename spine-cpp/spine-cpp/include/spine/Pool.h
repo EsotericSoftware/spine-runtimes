@@ -67,12 +67,6 @@ public:
 		}
 	}
 
-	String toString() const {
-		String str;
-		str.append("Pool { size: ").append((int) _objects.size()).append(" }");
-		return str;
-	}
-
 private:
 	Vector<T *> _objects;
 };

@@ -42,9 +42,4 @@ Timeline::Timeline() {
 Timeline::~Timeline() {
 }
 
-String Timeline::toString() const {
-	String str;
-	str.appendString(getRTTI().toString());
-	return str;
-}
 }

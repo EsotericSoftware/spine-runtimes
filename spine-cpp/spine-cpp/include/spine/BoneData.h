@@ -107,7 +107,7 @@ public:
 
 	void setTransformMode(TransformMode inValue);
 
-	String toString() const;
+
 
 private:
 	const int _index;

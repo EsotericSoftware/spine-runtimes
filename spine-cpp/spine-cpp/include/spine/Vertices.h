@@ -38,10 +38,6 @@ class Vertices : public SpineObject {
 public:
 	Vector<int> _bones;
 	Vector<float> _vertices;
-
-	String toString() const {
-		return String("Vertices");
-	};
 };
 }
 

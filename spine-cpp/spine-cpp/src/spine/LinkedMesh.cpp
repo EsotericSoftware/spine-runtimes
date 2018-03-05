@@ -40,7 +40,4 @@ LinkedMesh::LinkedMesh(MeshAttachment *mesh, const String &skin, int slotIndex, 
 		_parent(parent) {
 }
 
-String LinkedMesh::toString() const {
-	return String("LinkedMesh");
-}
 }

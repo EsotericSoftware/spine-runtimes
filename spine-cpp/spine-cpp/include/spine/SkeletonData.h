@@ -167,7 +167,7 @@ public:
 
 	void setFps(float inValue);
 
-	String toString() const;
+
 
 private:
 	String _name;

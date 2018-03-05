@@ -48,7 +48,7 @@ public:
 
 	bool instanceOf(const RTTI &rtti) const;
 
-	String toString() const;
+
 
 private:
 	// Prevent copying

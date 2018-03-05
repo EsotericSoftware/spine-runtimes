@@ -70,7 +70,4 @@ void EventData::setStringValue(const String &inValue) {
 	_stringValue = inValue;
 }
 
-String EventData::toString() const {
-	return String("EventData");
-}
 }

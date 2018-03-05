@@ -70,7 +70,7 @@ public:
 
 	String &getError() { return _error; }
 
-	String toString() const;
+
 
 private:
 	AttachmentLoader *_attachmentLoader;

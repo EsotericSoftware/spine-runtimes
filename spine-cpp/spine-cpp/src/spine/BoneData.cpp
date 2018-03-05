@@ -134,7 +134,4 @@ void BoneData::setTransformMode(TransformMode inValue) {
 	_transformMode = inValue;
 }
 
-String BoneData::toString() const {
-	return String("BoneData");
-}
 }

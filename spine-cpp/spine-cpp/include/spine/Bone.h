@@ -221,7 +221,7 @@ public:
 	/// Returns the magnitide (always positive) of the world scale Y.
 	float getWorldScaleY();
 
-	String toString() const;
+
 
 private:
 	static bool yDown;

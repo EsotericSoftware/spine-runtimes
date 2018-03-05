@@ -349,7 +349,4 @@ int Atlas::toInt(Str *str) {
 	return (int) strtol(str->begin, (char **) &str->end, 10);
 }
 
-String Atlas::toString() const {
-	return String("Atlas");
-}
 }

@@ -77,9 +77,4 @@ void PointAttachment::setRotation(float inValue) {
 	_rotation = inValue;
 }
 
-String PointAttachment::toString() const {
-	String str;
-	str.append("PointAttachment { name: ").appendString(getName()).append(" }");
-	return str;
-}
 }

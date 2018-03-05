@@ -212,18 +212,10 @@ void TrackEntry::reset() {
 	_onAnimationEventFunc = dummyOnAnimationEventFunc;
 }
 
-String TrackEntry::toString() const {
-	return String("TrackEntry");
-}
-
 EventQueueEntry::EventQueueEntry(EventType eventType, TrackEntry *trackEntry, Event *event) :
 		_type(eventType),
 		_entry(trackEntry),
 		_event(event) {
-}
-
-String EventQueueEntry::toString() const {
-	return String("EventQueueEntry");
 }
 
 EventQueue *EventQueue::newEventQueue(AnimationState &state, Pool<TrackEntry> &trackEntryPool) {
@@ -311,10 +303,6 @@ void EventQueue::drain() {
 	_drainDisabled = false;
 }
 
-String EventQueue::toString() const {
-	return String("EventQueue");
-}
-
 const int AnimationState::Subsequent = 0;
 const int AnimationState::First = 1;
 const int AnimationState::Dip = 2;
@@ -330,6 +318,24 @@ AnimationState::AnimationState(AnimationStateData *data) :
 }
 
 AnimationState::~AnimationState() {
+	for (int i = 0; i < _tracks.size(); i++) {
+		TrackEntry* entry = _tracks[i];
+		if (entry) {
+			TrackEntry* from = entry->_mixingFrom;
+			while (from) {
+				TrackEntry* curr = from;
+				from = curr->_mixingFrom;
+				delete curr;
+			}
+			TrackEntry* next = entry->_next;
+			while (next) {
+				TrackEntry* curr = next;
+				next = curr->_next;
+				delete curr;
+			}
+			delete entry;
+		}
+	}
 	delete _queue;
 }
 
@@ -975,7 +981,4 @@ void AnimationState::animationsChanged() {
 	}
 }
 
-String AnimationState::toString() const {
-	return String("AnimationState");
-}
 }

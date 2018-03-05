@@ -644,16 +644,4 @@ void Skeleton::sortReset(Vector<Bone *> &bones) {
 		bone->_sorted = false;
 	}
 }
-
-String Skeleton::toString() const {
-	String str;
-
-	str.append("Skeleton {\n");
-	str.append("   bones: ").append(_bones);
-	str.append(",\n slots: ").append(_slots);
-	str.append(",\n drawOrder: ").append(_drawOrder);
-	str.append(",\n animations: ").append(_data->getAnimations());
-	str.append(" }");
-	return str;
-}
 }
