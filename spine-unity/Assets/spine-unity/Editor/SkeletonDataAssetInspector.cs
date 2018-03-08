@@ -274,6 +274,9 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.LabelField("spine-tk2d", EditorStyles.boldLabel);
 			EditorGUILayout.PropertyField(spriteCollection, true);
 			#endif
+
+			if (atlasAssets.arraySize == 0)
+				EditorGUILayout.HelpBox("AtlasAssets array is empty. Skeleton's attachments will load without being mapped to images.", MessageType.Info);
 		}
 
 		void HandleAtlasAssetsNulls () {
@@ -485,7 +488,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		void DrawWarningList () {
-			foreach (var line in warnings)
+			foreach (string line in warnings)
 				EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(line, Icons.warning));
 		}
 
@@ -525,25 +528,30 @@ namespace Spine.Unity.Editor {
 						if (detectedNullAtlasEntry) {
 							warnings.Add("AtlasAsset elements should not be null.");
 						} else {
-							var missingPaths = SpineEditorUtilities.GetRequiredAtlasRegions(AssetDatabase.GetAssetPath(skeletonJSON.objectReferenceValue));
+							List<string> missingPaths = null;
+							if (atlasAssets.arraySize > 0) {
+								missingPaths = SpineEditorUtilities.GetRequiredAtlasRegions(AssetDatabase.GetAssetPath(skeletonJSON.objectReferenceValue));
 
-							foreach (var atlas in atlasList) {
-								for (int i = 0; i < missingPaths.Count; i++) {
-									if (atlas.FindRegion(missingPaths[i]) != null) {
-										missingPaths.RemoveAt(i);
-										i--;
+								foreach (var atlas in atlasList) {
+									for (int i = 0; i < missingPaths.Count; i++) {
+										if (atlas.FindRegion(missingPaths[i]) != null) {
+											missingPaths.RemoveAt(i);
+											i--;
+										}
 									}
 								}
+
+								#if SPINE_TK2D
+								if (missingPaths.Count > 0)
+									warnings.Add("Missing regions. SkeletonDataAsset requires tk2DSpriteCollectionData or Spine AtlasAssets.");
+								#endif
 							}
 
-							#if SPINE_TK2D
-							if (missingPaths.Count > 0)
-								warnings.Add("Missing regions. SkeletonDataAsset requires tk2DSpriteCollectionData or Spine AtlasAssets.");
-							#endif
-
-							foreach (var str in missingPaths)
-								warnings.Add("Missing Region: '" + str + "'");
-
+							if (missingPaths != null) {
+								foreach (string str in missingPaths)
+									warnings.Add("Missing Region: '" + str + "'");
+							}
+							
 						}
 					}
 
@@ -629,7 +637,10 @@ namespace Spine.Unity.Editor {
 		PreviewRenderUtility previewRenderUtility;
 		Camera PreviewUtilityCamera {
 			get {
-				if (previewRenderUtility == null) return null;
+				if (previewRenderUtility == null) {
+
+					return null;
+				}
 
 				#if UNITY_2017_1_OR_NEWER
 				return previewRenderUtility.camera;
@@ -770,7 +781,7 @@ namespace Spine.Unity.Editor {
 					skeleton.SetToSetupPose();
 					animationState.SetAnimation(0, targetAnimation, loop);
 				} else {					
-					var sameAnimation = (currentTrack.Animation == targetAnimation);
+					bool sameAnimation = (currentTrack.Animation == targetAnimation);
 					if (sameAnimation) {
 						currentTrack.TimeScale = (currentTrack.TimeScale == 0) ? 1f : 0f; // pause/play
 					} else {
@@ -974,18 +985,19 @@ namespace Spine.Unity.Editor {
 
 				for (int i = 0; i < currentAnimationEvents.Count; i++) {
 					float fr = currentAnimationEventTimes[i];
-					var evRect = new Rect(barRect);
-					evRect.x = Mathf.Clamp(((fr / t.Animation.Duration) * width) - (Icons.userEvent.width / 2), barRect.x, float.MaxValue);
-					evRect.width = Icons.userEvent.width;
-					evRect.height = Icons.userEvent.height;
-					evRect.y += Icons.userEvent.height;
+					var evRect = new Rect(barRect) {
+						x = Mathf.Clamp(((fr / t.Animation.Duration) * width) - (Icons.userEvent.width / 2), barRect.x, float.MaxValue),
+						y = barRect.y + Icons.userEvent.height,
+						width = Icons.userEvent.width,
+						height = Icons.userEvent.height
+					};
 					GUI.DrawTexture(evRect, Icons.userEvent);
 
 					Event ev = Event.current;
 					if (ev.type == EventType.Repaint) {
 						if (evRect.Contains(ev.mousePosition)) {
-							Rect tooltipRect = new Rect(evRect);
 							GUIStyle tooltipStyle = EditorStyles.helpBox;
+							Rect tooltipRect = new Rect(evRect);
 							tooltipRect.width = tooltipStyle.CalcSize(new GUIContent(currentAnimationEvents[i].Data.Name)).x;
 							tooltipRect.y -= 4;
 							tooltipRect.x += 4;
