@@ -163,9 +163,7 @@ namespace Spine.Unity.Editor {
 		static readonly List<ScriptableObject> protectFromStackGarbageCollection = new List<ScriptableObject>();
 		static HashSet<string> assetsImportedInWrongState = new HashSet<string>();
 
-		static Dictionary<int, GameObject> skeletonRendererTable = new Dictionary<int, GameObject>();
-		static Dictionary<int, SkeletonUtilityBone> skeletonUtilityBoneTable = new Dictionary<int, SkeletonUtilityBone>();
-		static Dictionary<int, BoundingBoxFollower> boundingBoxFollowerTable = new Dictionary<int, BoundingBoxFollower>();
+
 
 		#if SPINE_TK2D
 		const float DEFAULT_DEFAULT_SCALE = 1f;
@@ -224,20 +222,19 @@ namespace Spine.Unity.Editor {
 			// Drag and Drop
 			SceneView.onSceneGUIDelegate -= SceneViewDragAndDrop;
 			SceneView.onSceneGUIDelegate += SceneViewDragAndDrop;
-			EditorApplication.hierarchyWindowItemOnGUI -= HierarchyDragAndDrop;
-			EditorApplication.hierarchyWindowItemOnGUI += HierarchyDragAndDrop;
+			EditorApplication.hierarchyWindowItemOnGUI -= SpineEditorHierarchyHandler.HierarchyDragAndDrop;
+			EditorApplication.hierarchyWindowItemOnGUI += SpineEditorHierarchyHandler.HierarchyDragAndDrop;
 
 			// Hierarchy Icons
 			#if UNITY_2017_2_OR_NEWER
-			EditorApplication.playModeStateChanged -= HierarchyIconsOnPlaymodeStateChanged;
-			EditorApplication.playModeStateChanged += HierarchyIconsOnPlaymodeStateChanged;
-			HierarchyIconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
+			EditorApplication.playModeStateChanged -= SpineEditorHierarchyHandler.HierarchyIconsOnPlaymodeStateChanged;
+			EditorApplication.playModeStateChanged += SpineEditorHierarchyHandler.HierarchyIconsOnPlaymodeStateChanged;
+			SpineEditorHierarchyHandler.HierarchyIconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
 			#else
-			EditorApplication.playmodeStateChanged -= HierarchyIconsOnPlaymodeStateChanged;
-			EditorApplication.playmodeStateChanged += HierarchyIconsOnPlaymodeStateChanged;
-			HierarchyIconsOnPlaymodeStateChanged();
+			EditorApplication.playmodeStateChanged -= SpineEditorHierarchyHandler.HierarchyIconsOnPlaymodeStateChanged;
+			EditorApplication.playmodeStateChanged += SpineEditorHierarchyHandler.HierarchyIconsOnPlaymodeStateChanged;
+			SpineEditorHierarchyHandler.HierarchyIconsOnPlaymodeStateChanged();
 			#endif
-
 
 			initialized = true;
 		}
@@ -261,9 +258,9 @@ namespace Spine.Unity.Editor {
 			if (EditorGUI.EndChangeCheck()) {
 				EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, showHierarchyIcons);
 				#if UNITY_2017_2_OR_NEWER
-				HierarchyIconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
+				SpineEditorHierarchyHandler.HierarchyIconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
 				#else
-				HierarchyIconsOnPlaymodeStateChanged();
+				SpineEditorHierarchyHandler.HierarchyIconsOnPlaymodeStateChanged();
 				#endif
 			}
 
@@ -319,10 +316,9 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Drag and Drop Instantiation
-
 		public delegate Component InstantiateDelegate (SkeletonDataAsset skeletonDataAsset);
 
-		struct SpawnMenuData {
+		public struct SpawnMenuData {
 			public Vector3 spawnPoint;
 			public SkeletonDataAsset skeletonDataAsset;
 			public InstantiateDelegate instantiateDelegate;
@@ -335,7 +331,7 @@ namespace Spine.Unity.Editor {
 			public bool isUI;
 		}
 
-		public static readonly List<SkeletonComponentSpawnType> additionalSpawnTypes = new List<SkeletonComponentSpawnType>();
+		internal static readonly List<SkeletonComponentSpawnType> additionalSpawnTypes = new List<SkeletonComponentSpawnType>();
 
 		static void SceneViewDragAndDrop (SceneView sceneview) {
 			var current = UnityEngine.Event.current;
@@ -372,45 +368,6 @@ namespace Spine.Unity.Editor {
 					}
 				}
 			}
-		}
-
-		static void HierarchyDragAndDrop (int instanceId, Rect selectionRect) {
-			// HACK: Uses EditorApplication.hierarchyWindowItemOnGUI.
-			// Only works when there is at least one item in the scene.
-			var current = UnityEngine.Event.current;
-			var eventType = current.type;
-			bool isDraggingEvent = eventType == EventType.DragUpdated;
-			bool isDropEvent = eventType == EventType.DragPerform;
-			if (isDraggingEvent || isDropEvent) {
-				var mouseOverWindow = EditorWindow.mouseOverWindow;
-				if (mouseOverWindow != null) {
-
-					// One, existing, valid SkeletonDataAsset
-					var references = DragAndDrop.objectReferences;
-					if (references.Length == 1) {
-						var skeletonDataAsset = references[0] as SkeletonDataAsset;
-						if (skeletonDataAsset != null && skeletonDataAsset.GetSkeletonData(true) != null) {
-							
-							// Allow drag-and-dropping anywhere in the Hierarchy Window.
-							// HACK: string-compare because we can't get its type via reflection.
-							const string HierarchyWindow = "UnityEditor.SceneHierarchyWindow";
-							if (HierarchyWindow.Equals(mouseOverWindow.GetType().ToString(), System.StringComparison.Ordinal)) {
-								if (isDraggingEvent) {
-									DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
-									current.Use();
-								} else if (isDropEvent) {
-									ShowInstantiateContextMenu(skeletonDataAsset, Vector3.zero);
-									DragAndDrop.AcceptDrag();
-									current.Use();
-									return;
-								}
-							}
-								
-						}
-					}
-				}
-			}
-
 		}
 
 		public static void ShowInstantiateContextMenu (SkeletonDataAsset skeletonDataAsset, Vector3 spawnPoint) {
@@ -450,8 +407,8 @@ namespace Spine.Unity.Editor {
 			menu.ShowAsContext();
 		}
 
-		public static void HandleSkeletonComponentDrop (object menuData) {
-			var data = (SpawnMenuData)menuData;
+		public static void HandleSkeletonComponentDrop (object spawnMenuData) {
+			var data = (SpawnMenuData)spawnMenuData;
 
 			if (data.skeletonDataAsset.GetSkeletonData(true) == null) {
 				EditorUtility.DisplayDialog("Invalid SkeletonDataAsset", "Unable to create Spine GameObject.\n\nPlease check your SkeletonDataAsset.", "Ok");
@@ -460,16 +417,15 @@ namespace Spine.Unity.Editor {
 
 			bool isUI = data.isUI;
 
-			GameObject newGameObject = null;
 			Component newSkeletonComponent = data.instantiateDelegate.Invoke(data.skeletonDataAsset);
-			newGameObject = newSkeletonComponent.gameObject;
-			var transform = newGameObject.transform;
+			GameObject newGameObject = newSkeletonComponent.gameObject;
+			Transform newTransform = newGameObject.transform;
 
 			var activeGameObject = Selection.activeGameObject;
 			if (isUI && activeGameObject != null)
-				transform.SetParent(activeGameObject.transform, false);
+				newTransform.SetParent(activeGameObject.transform, false);
 
-			newGameObject.transform.position = isUI ? data.spawnPoint : RoundVector(data.spawnPoint, 2);
+			newTransform.position = isUI ? data.spawnPoint : RoundVector(data.spawnPoint, 2);
 
 			if (isUI && (activeGameObject == null || activeGameObject.GetComponent<RectTransform>() == null))
 				Debug.Log("Created a UI Skeleton GameObject not under a RectTransform. It may not be visible until you parent it to a canvas.");
@@ -505,72 +461,117 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Hierarchy
-		#if UNITY_2017_2_OR_NEWER
-		static void HierarchyIconsOnPlaymodeStateChanged (PlayModeStateChange stateChange) {
-		#else
-		static void HierarchyIconsOnPlaymodeStateChanged () {
-		#endif
-			skeletonRendererTable.Clear();
-			skeletonUtilityBoneTable.Clear();
-			boundingBoxFollowerTable.Clear();
+		static class SpineEditorHierarchyHandler {
+			static Dictionary<int, GameObject> skeletonRendererTable = new Dictionary<int, GameObject>();
+			static Dictionary<int, SkeletonUtilityBone> skeletonUtilityBoneTable = new Dictionary<int, SkeletonUtilityBone>();
+			static Dictionary<int, BoundingBoxFollower> boundingBoxFollowerTable = new Dictionary<int, BoundingBoxFollower>();
 
-			EditorApplication.hierarchyWindowChanged -= HierarchyIconsOnChanged;
-			EditorApplication.hierarchyWindowItemOnGUI -= HierarchyIconsOnGUI;
+			#if UNITY_2017_2_OR_NEWER
+			internal static void HierarchyIconsOnPlaymodeStateChanged (PlayModeStateChange stateChange) {
+			#else
+			internal static void HierarchyIconsOnPlaymodeStateChanged () {
+			#endif
+				skeletonRendererTable.Clear();
+				skeletonUtilityBoneTable.Clear();
+				boundingBoxFollowerTable.Clear();
 
-			if (!Application.isPlaying && showHierarchyIcons) {
-				EditorApplication.hierarchyWindowChanged += HierarchyIconsOnChanged;
-				EditorApplication.hierarchyWindowItemOnGUI += HierarchyIconsOnGUI;
-				HierarchyIconsOnChanged();
+				EditorApplication.hierarchyWindowChanged -= HierarchyIconsOnChanged;
+				EditorApplication.hierarchyWindowItemOnGUI -= HierarchyIconsOnGUI;
+
+				if (!Application.isPlaying && showHierarchyIcons) {
+					EditorApplication.hierarchyWindowChanged += HierarchyIconsOnChanged;
+					EditorApplication.hierarchyWindowItemOnGUI += HierarchyIconsOnGUI;
+					HierarchyIconsOnChanged();
+				}
 			}
-		}
 
-		static void HierarchyIconsOnChanged () {
-			skeletonRendererTable.Clear();
-			skeletonUtilityBoneTable.Clear();
-			boundingBoxFollowerTable.Clear();
+			internal static void HierarchyIconsOnChanged () {
+				skeletonRendererTable.Clear();
+				skeletonUtilityBoneTable.Clear();
+				boundingBoxFollowerTable.Clear();
 
-			SkeletonRenderer[] arr = Object.FindObjectsOfType<SkeletonRenderer>();
-			foreach (SkeletonRenderer r in arr)
-				skeletonRendererTable[r.gameObject.GetInstanceID()] = r.gameObject;
+				SkeletonRenderer[] arr = Object.FindObjectsOfType<SkeletonRenderer>();
+				foreach (SkeletonRenderer r in arr)
+					skeletonRendererTable[r.gameObject.GetInstanceID()] = r.gameObject;
 
-			SkeletonUtilityBone[] boneArr = Object.FindObjectsOfType<SkeletonUtilityBone>();
-			foreach (SkeletonUtilityBone b in boneArr)
-				skeletonUtilityBoneTable[b.gameObject.GetInstanceID()] = b;
+				SkeletonUtilityBone[] boneArr = Object.FindObjectsOfType<SkeletonUtilityBone>();
+				foreach (SkeletonUtilityBone b in boneArr)
+					skeletonUtilityBoneTable[b.gameObject.GetInstanceID()] = b;
 
-			BoundingBoxFollower[] bbfArr = Object.FindObjectsOfType<BoundingBoxFollower>();
-			foreach (BoundingBoxFollower bbf in bbfArr)
-				boundingBoxFollowerTable[bbf.gameObject.GetInstanceID()] = bbf;
-		}
+				BoundingBoxFollower[] bbfArr = Object.FindObjectsOfType<BoundingBoxFollower>();
+				foreach (BoundingBoxFollower bbf in bbfArr)
+					boundingBoxFollowerTable[bbf.gameObject.GetInstanceID()] = bbf;
+			}
 
-		static void HierarchyIconsOnGUI (int instanceId, Rect selectionRect) {
-			Rect r = new Rect(selectionRect);
-			if (skeletonRendererTable.ContainsKey(instanceId)) {
-				r.x = r.width - 15;
-				r.width = 15;
-				GUI.Label(r, Icons.spine);
-			} else if (skeletonUtilityBoneTable.ContainsKey(instanceId)) {
-				r.x -= 26;
-				if (skeletonUtilityBoneTable[instanceId] != null) {
-					if (skeletonUtilityBoneTable[instanceId].transform.childCount == 0)
-						r.x += 13;
-					r.y += 2;
-					r.width = 13;
-					r.height = 13;
-					if (skeletonUtilityBoneTable[instanceId].mode == SkeletonUtilityBone.Mode.Follow)
-						GUI.DrawTexture(r, Icons.bone);
-					else
-						GUI.DrawTexture(r, Icons.poseBones);
+			internal static void HierarchyIconsOnGUI (int instanceId, Rect selectionRect) {
+				Rect r = new Rect(selectionRect);
+				if (skeletonRendererTable.ContainsKey(instanceId)) {
+					r.x = r.width - 15;
+					r.width = 15;
+					GUI.Label(r, Icons.spine);
+				} else if (skeletonUtilityBoneTable.ContainsKey(instanceId)) {
+					r.x -= 26;
+					if (skeletonUtilityBoneTable[instanceId] != null) {
+						if (skeletonUtilityBoneTable[instanceId].transform.childCount == 0)
+							r.x += 13;
+						r.y += 2;
+						r.width = 13;
+						r.height = 13;
+						if (skeletonUtilityBoneTable[instanceId].mode == SkeletonUtilityBone.Mode.Follow)
+							GUI.DrawTexture(r, Icons.bone);
+						else
+							GUI.DrawTexture(r, Icons.poseBones);
+					}
+				} else if (boundingBoxFollowerTable.ContainsKey(instanceId)) {
+					r.x -= 26;
+					if (boundingBoxFollowerTable[instanceId] != null) {
+						if (boundingBoxFollowerTable[instanceId].transform.childCount == 0)
+							r.x += 13;
+						r.y += 2;
+						r.width = 13;
+						r.height = 13;
+						GUI.DrawTexture(r, Icons.boundingBox);
+					}
 				}
-			} else if (boundingBoxFollowerTable.ContainsKey(instanceId)) {
-				r.x -= 26;
-				if (boundingBoxFollowerTable[instanceId] != null) {
-					if (boundingBoxFollowerTable[instanceId].transform.childCount == 0)
-						r.x += 13;
-					r.y += 2;
-					r.width = 13;
-					r.height = 13;
-					GUI.DrawTexture(r, Icons.boundingBox);
+			}
+
+			internal static void HierarchyDragAndDrop (int instanceId, Rect selectionRect) {
+				// HACK: Uses EditorApplication.hierarchyWindowItemOnGUI.
+				// Only works when there is at least one item in the scene.
+				var current = UnityEngine.Event.current;
+				var eventType = current.type;
+				bool isDraggingEvent = eventType == EventType.DragUpdated;
+				bool isDropEvent = eventType == EventType.DragPerform;
+				if (isDraggingEvent || isDropEvent) {
+					var mouseOverWindow = EditorWindow.mouseOverWindow;
+					if (mouseOverWindow != null) {
+
+						// One, existing, valid SkeletonDataAsset
+						var references = DragAndDrop.objectReferences;
+						if (references.Length == 1) {
+							var skeletonDataAsset = references[0] as SkeletonDataAsset;
+							if (skeletonDataAsset != null && skeletonDataAsset.GetSkeletonData(true) != null) {
+
+								// Allow drag-and-dropping anywhere in the Hierarchy Window.
+								// HACK: string-compare because we can't get its type via reflection.
+								const string HierarchyWindow = "UnityEditor.SceneHierarchyWindow";
+								if (HierarchyWindow.Equals(mouseOverWindow.GetType().ToString(), System.StringComparison.Ordinal)) {
+									if (isDraggingEvent) {
+										DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+										current.Use();
+									} else if (isDropEvent) {
+										ShowInstantiateContextMenu(skeletonDataAsset, Vector3.zero);
+										DragAndDrop.AcceptDrag();
+										current.Use();
+										return;
+									}
+								}
+
+							}
+						}
+					}
 				}
+
 			}
 		}
 		#endregion
@@ -665,7 +666,7 @@ namespace Spine.Unity.Editor {
 					bool resolved = false;
 					while (!resolved) {
 
-						var filename = Path.GetFileNameWithoutExtension(sp);
+						string filename = Path.GetFileNameWithoutExtension(sp);
 						int result = EditorUtility.DisplayDialogComplex(
 							string.Format("AtlasAsset for \"{0}\"", filename),
 							string.Format("Could not automatically set the AtlasAsset for \"{0}\". You may set it manually.", filename),
@@ -1653,11 +1654,12 @@ namespace Spine.Unity.Editor {
 		public static GUIStyle BoneNameStyle {
 			get {
 				if (_boneNameStyle == null) {
-					_boneNameStyle = new GUIStyle(EditorStyles.whiteMiniLabel);
-					_boneNameStyle.alignment = TextAnchor.MiddleCenter;
-					_boneNameStyle.stretchWidth = true;
-					_boneNameStyle.padding = new RectOffset(0, 0, 0, 0);
-					_boneNameStyle.contentOffset = new Vector2(-5f, 0f);
+					_boneNameStyle = new GUIStyle(EditorStyles.whiteMiniLabel) {
+						alignment = TextAnchor.MiddleCenter,
+						stretchWidth = true,
+						padding = new RectOffset(0, 0, 0, 0),
+						contentOffset = new Vector2(-5f, 0f)
+					};
 				}
 				return _boneNameStyle;
 			}
@@ -1979,7 +1981,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void DrawArrowhead (Matrix4x4 m) {
-			var s = SpineHandles.handleScale;
+			float s = SpineHandles.handleScale;
 			m.m00 *= s;
 			m.m01 *= s;
 			m.m02 *= s;
