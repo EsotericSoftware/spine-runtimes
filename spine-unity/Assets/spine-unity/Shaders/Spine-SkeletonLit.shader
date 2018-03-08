@@ -113,6 +113,7 @@ Shader "Spine/Skeleton Lit" {
 				float3 eyePos = UnityObjectToViewPos(float4(v.pos, 1)).xyz; //mul(UNITY_MATRIX_MV, float4(v.pos,1)).xyz;
 				half3 fixedNormal = half3(0,0,-1);
 				half3 eyeNormal = normalize(mul((float3x3)UNITY_MATRIX_IT_MV, fixedNormal));
+				//half3 eyeNormal = half3(0,0,1);
 				half3 viewDir = 0.0;
 
 				// Lights
