@@ -154,7 +154,7 @@ namespace Spine {
 		protected const float LINEAR = 0, STEPPED = 1, BEZIER = 2;
 		protected const int BEZIER_SIZE = 10 * 2 - 1;
 
-		private float[] curves; // type, x, y, ...
+		internal float[] curves; // type, x, y, ...
 		public int FrameCount { get { return curves.Length / BEZIER_SIZE + 1; } }
 
 		public CurveTimeline (int frameCount) {
@@ -607,17 +607,19 @@ namespace Spine {
 		protected const int PREV_R2 = -3, PREV_G2 = -2, PREV_B2 = -1;
 		protected const int R = 1, G = 2, B = 3, A = 4, R2 = 5, G2 = 6, B2 = 7;
 
-		internal float[] frames; // time, r, g, b, a, r2, g2, b2, ...
-		public float[] Frames { get { return frames; } }
-
 		internal int slotIndex;
+		internal float[] frames; // time, r, g, b, a, r2, g2, b2, ...
+
 		public int SlotIndex {
 			get { return slotIndex; }
 			set {
-				if (value < 0) throw new ArgumentOutOfRangeException("index must be >= 0.");
+				if (value < 0)
+					throw new ArgumentOutOfRangeException("index must be >= 0.");
 				slotIndex = value;
 			}
 		}
+		
+		public float[] Frames { get { return frames; } }
 
 		override public int PropertyId {
 			get { return ((int)TimelineType.TwoColor << 24) + slotIndex; }
@@ -745,11 +747,11 @@ namespace Spine {
 	public class AttachmentTimeline : Timeline {
 		internal int slotIndex;
 		internal float[] frames;
-		private String[] attachmentNames;
+		internal string[] attachmentNames;
 
 		public int SlotIndex { get { return slotIndex; } set { slotIndex = value; } }
 		public float[] Frames { get { return frames; } set { frames = value; } } // time, ...
-		public String[] AttachmentNames { get { return attachmentNames; } set { attachmentNames = value; } }
+		public string[] AttachmentNames { get { return attachmentNames; } set { attachmentNames = value; } }
 		public int FrameCount { get { return frames.Length; } }
 
 		public int PropertyId {
