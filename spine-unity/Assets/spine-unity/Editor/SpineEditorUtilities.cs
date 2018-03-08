@@ -1240,7 +1240,8 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Checking Methods
-		static int[][] compatibleVersions = { new[] {3, 6, 0}, new[] {3, 5, 0} };
+		static int[][] compatibleBinaryVersions = { new[] {3, 6, 0}, new[] {3, 5, 0} };
+		static int[][] compatibleJsonVersions = { new[] { 3, 6, 0 }, new[] { 3, 7, 0 }, new[] { 3, 5, 0 } };
 		//static bool isFixVersionRequired = false;
 
 		static bool CheckForValidSkeletonData (string skeletonJSONPath) {
@@ -1266,17 +1267,18 @@ namespace Spine.Unity.Editor {
 			bool isSpineData = false;
 			string rawVersion = null;
 
+			int[][] compatibleVersions;
 			if (asset.name.Contains(".skel")) {
 				try {
 					rawVersion = SkeletonBinary.GetVersionString(new MemoryStream(asset.bytes));
-					//Debug.Log(rawVersion);
 					isSpineData = !(string.IsNullOrEmpty(rawVersion));
+					compatibleVersions = compatibleBinaryVersions;
 				} catch (System.Exception e) {
 					Debug.LogErrorFormat("Failed to read '{0}'. It is likely not a binary Spine SkeletonData file.\n{1}", asset.name, e);
 					return false;
 				}
 			} else {
-				var obj = Json.Deserialize(new StringReader(asset.text));
+				object obj = Json.Deserialize(new StringReader(asset.text));
 				if (obj == null) {
 					Debug.LogErrorFormat("'{0}' is not valid JSON.", asset.name);
 					return false;
@@ -1295,14 +1297,16 @@ namespace Spine.Unity.Editor {
 					skeletonInfo.TryGetValue("spine", out jv);
 					rawVersion = jv as string;
 				}
+
+				compatibleVersions = compatibleJsonVersions;
 			}
 
 			// Version warning
 			if (isSpineData) {
-				string runtimeVersionDebugString = compatibleVersions[0][0] + "." + compatibleVersions[0][1];
+				string primaryRuntimeVersionDebugString = compatibleVersions[0][0] + "." + compatibleVersions[0][1];
 
 				if (string.IsNullOrEmpty(rawVersion)) {
-					Debug.LogWarningFormat("Skeleton '{0}' has no version information. It may be incompatible with your runtime version: spine-unity v{1}", asset.name, runtimeVersionDebugString);
+					Debug.LogWarningFormat("Skeleton '{0}' has no version information. It may be incompatible with your runtime version: spine-unity v{1}", asset.name, primaryRuntimeVersionDebugString);
 				} else {
 					string[] versionSplit = rawVersion.Split('.');
 					bool match = false;
@@ -1319,7 +1323,7 @@ namespace Spine.Unity.Editor {
 					}
 
 					if (!match)
-						Debug.LogWarningFormat("Skeleton '{0}' (exported with Spine {1}) may be incompatible with your runtime version: spine-unity v{2}", asset.name, rawVersion, runtimeVersionDebugString);
+						Debug.LogWarningFormat("Skeleton '{0}' (exported with Spine {1}) may be incompatible with your runtime version: spine-unity v{2}", asset.name, rawVersion, primaryRuntimeVersionDebugString);
 				}
 			}
 
