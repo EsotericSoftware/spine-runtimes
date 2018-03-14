@@ -86,13 +86,34 @@ namespace Spine.Unity.Editor {
 		#region SerializedProperty Helpers
 		public static SerializedProperty FindBaseOrSiblingProperty (this SerializedProperty property, string propertyName) {
 			if (string.IsNullOrEmpty(propertyName)) return null;
+
 			SerializedProperty relativeProperty = property.serializedObject.FindProperty(propertyName); // baseProperty
-			if (relativeProperty == null) { // If no baseProperty, find sibling property.
-				int nameLength = property.name.Length;
+
+			// If base property is not found, look for the sibling property.
+			if (relativeProperty == null) { 
 				string propertyPath = property.propertyPath;
-				propertyPath = propertyPath.Remove(propertyPath.Length - nameLength, nameLength) + propertyName;
+				int localPathLength = 0;
+
+				if (property.isArray) {
+					const int internalArrayPathLength = 14; // int arrayPathLength = ".Array.data[x]".Length;
+					int propertyPathLength = propertyPath.Length;
+					int n = propertyPathLength - internalArrayPathLength;
+					// Find the dot before the array property name and
+					// store the total length from the name of the array until the end of the propertyPath.
+					for (int i = internalArrayPathLength + 1; i < n; i++) {
+						if (propertyPath[propertyPathLength - i] == '.') {
+							localPathLength = i - 1;
+							break;
+						}
+					}
+				} else {
+					localPathLength = property.name.Length;
+				}
+
+				propertyPath = propertyPath.Remove(propertyPath.Length - localPathLength, localPathLength) + propertyName;
 				relativeProperty = property.serializedObject.FindProperty(propertyPath);
 			}
+
 			return relativeProperty;
 		}
 		#endregion
