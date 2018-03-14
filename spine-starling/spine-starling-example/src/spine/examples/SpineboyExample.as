@@ -29,6 +29,10 @@
  *****************************************************************************/
  
 package spine.examples {
+	import starling.display.Image;
+	import starling.textures.Texture;
+	import flash.display.BitmapData;
+	import spine.attachments.BoundingBoxAttachment;
 	import spine.*;
 	import spine.animation.AnimationStateData;
 	import spine.animation.TrackEntry;
@@ -54,7 +58,8 @@ package spine.examples {
 
 		[Embed(source = "/spineboy.png")]
 		static public const SpineboyAtlasTexture : Class;
-		private var skeleton : SkeletonAnimation;		
+		private var skeleton : SkeletonAnimation;
+		private var shape: Shape;	
 
 		public function SpineboyExample() {
 			var spineAtlas : Atlas = new Atlas(new SpineboyAtlas(), new StarlingTextureLoader(new SpineboyAtlasTexture()));
@@ -71,6 +76,7 @@ package spine.examples {
 			skeleton = new SkeletonAnimation(skeletonData, stateData);
 			skeleton.x = 400;
 			skeleton.y = 560;
+			skeleton.scale = 0.5;
 
 			skeleton.state.onStart.add(function(entry : TrackEntry) : void {
 				trace(entry.trackIndex + " start: " + entry.animation.name);
@@ -97,9 +103,28 @@ package spine.examples {
 			skeleton.state.addAnimationByName(0, "run", true, 0);
 
 			addChild(skeleton);
-			Starling.juggler.add(skeleton);
+			Starling.juggler.add(skeleton);				
+			
+			shape = new Shape();
+			shape.setVertices(new <Number>[0, 0, 400, 600, 800, 0]);
+			shape.setColor(1, 0, 0, 1);
+			addChild(shape);
+			Starling.juggler.add(shape);
 
+			addEventListener(starling.events.Event.ENTER_FRAME, onUpdate);
 			addEventListener(TouchEvent.TOUCH, onClick);
+		}
+		
+		private function onUpdate() : void {
+			var slot:Slot = skeleton.skeleton.findSlot("head-bb");
+			var bb:BoundingBoxAttachment = skeleton.skeleton.getAttachmentForSlotIndex(slot.data.index, "head") as BoundingBoxAttachment;
+			var worldVertices:Vector.<Number> = new Vector.<Number>(bb.worldVerticesLength);
+			bb.computeWorldVertices(slot, 0, bb.worldVerticesLength, worldVertices, 0, 2);
+			for (var i:int = 0; i < worldVertices.length; i+=2) {
+				worldVertices[i] = worldVertices[i] * skeleton.scale + skeleton.x;
+				worldVertices[i + 1] = worldVertices[i + 1] * skeleton.scale + skeleton.y;
+			}
+			shape.setVertices(worldVertices);
 		}
 
 		private function onClick(event : TouchEvent) : void {
