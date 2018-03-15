@@ -113,9 +113,6 @@ public:
 	virtual void setOpacityModifyRGB (bool value) override;
 	virtual bool isOpacityModifyRGB () const override;
 	
-	// Frees global memory used for temporay vertex transformations.
-	static void destroyScratchBuffers();
-
 CC_CONSTRUCTOR_ACCESS:
 	SkeletonRenderer ();
 	SkeletonRenderer(spSkeleton* skeleton, bool ownsSkeleton = false, bool ownsSkeletonData = false);
@@ -154,6 +151,7 @@ protected:
 	bool _debugMeshes;
 	spSkeletonClipping* _clipper;
 	spVertexEffect* _effect;
+    cocos2d::Rect _boundingRect;
 	
 	int _startSlotIndex;
 	int _endSlotIndex;
