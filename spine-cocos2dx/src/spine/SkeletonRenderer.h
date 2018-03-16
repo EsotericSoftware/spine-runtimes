@@ -54,7 +54,7 @@ public:
 	virtual void onEnter () override;
 	virtual void onExit () override;
 
-	spSkeleton* getSkeleton();
+	spSkeleton* getSkeleton() const;
 
 	void setTimeScale(float scale);
 	float getTimeScale() const;
@@ -68,6 +68,9 @@ public:
 	
 	void setDebugMeshesEnabled(bool enabled);
 	bool getDebugMeshesEnabled() const;
+ 
+    void setDebugBoundingRectEnabled(bool enabled);
+    bool getDebugBoundingRectEnabled() const;
 
 	// --- Convenience methods for common Skeleton_* functions.
 	void updateWorldTransform ();
@@ -149,6 +152,7 @@ protected:
 	bool _debugSlots;
 	bool _debugBones;
 	bool _debugMeshes;
+    bool _debugBoundingRect;
 	spSkeletonClipping* _clipper;
 	spVertexEffect* _effect;
     cocos2d::Rect _boundingRect;

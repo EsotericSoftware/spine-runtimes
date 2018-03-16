@@ -78,7 +78,14 @@ bool SkeletonRendererSeparatorExample::init () {
 	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
 	listener->onTouchBegan = [this] (Touch* touch, Event* event) -> bool {
 		if (!backNode->getDebugBonesEnabled())
+        {
 			backNode->setDebugBonesEnabled(true);
+            backNode->setDebugSlotsEnabled(true);
+            backNode->setDebugBoundingRectEnabled(true);
+            frontNode->setDebugBonesEnabled(true);
+            frontNode->setDebugSlotsEnabled(true);
+            frontNode->setDebugBoundingRectEnabled(true);
+        }
 		else if (backNode->getTimeScale() == 1)
 			backNode->setTimeScale(0.3f);
 		else
