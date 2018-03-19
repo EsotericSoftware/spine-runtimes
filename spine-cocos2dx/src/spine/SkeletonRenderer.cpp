@@ -50,6 +50,17 @@ void transformWorldVertices(float* dstCoord, int coordCount, const spSkeleton& s
 bool cullRectangle(const Mat4 &transform, const cocos2d::Rect& rect, const Camera& camera);
 Color4B spColorToColor4B(const spColor& color);
 bool slotIsOutRange(const spSlot& slot, int startSlotIndex, int endSlotIndex);
+   
+ 
+// C Variable length array
+#ifdef _MSC_VER
+    // VLA not supported, use _alloca
+    #define VLA(type, arr, count) \
+        type* arr = static_cast<type*>( _alloca(sizeof(type) * count) )
+#else
+    #define VLA(type, arr, count) \
+        type arr[count]
+#endif
     
 
 SkeletonRenderer* SkeletonRenderer::createWithSkeleton(spSkeleton* skeleton, bool ownsSkeleton, bool ownsSkeletonData) {
@@ -249,7 +260,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
     }
     assert(coordCount % 2 == 0);
     
-    float worldCoords[coordCount];
+    VLA(float, worldCoords, coordCount);
     transformWorldVertices(worldCoords, coordCount, *_skeleton, _startSlotIndex, _endSlotIndex);
  
 #if CC_USE_CULLING
@@ -267,13 +278,16 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	SkeletonTwoColorBatch* twoColorBatch = SkeletonTwoColorBatch::getInstance();
     const bool hasSingleTint = (isTwoColorTint() == false);
 	
-	if (_effect) _effect->begin(_effect, _skeleton);
+    if (_effect) {
+        _effect->begin(_effect, _skeleton);
+    }
 
+    const Color3B displayedColor = getDisplayedColor();
 	spColor nodeColor;
-	nodeColor.r = getDisplayedColor().r / (float)255;
-	nodeColor.g = getDisplayedColor().g / (float)255;
-	nodeColor.b = getDisplayedColor().b / (float)255;
-	nodeColor.a = getDisplayedOpacity() / (float)255;
+	nodeColor.r = displayedColor.r / 255.f;
+	nodeColor.g = displayedColor.g / 255.f;
+	nodeColor.b = displayedColor.b / 255.f;
+	nodeColor.a = getDisplayedOpacity() / 255.f;
 	
     spColor color;
 	spColor darkColor;
@@ -583,7 +597,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	
 	if (_effect) _effect->end(_effect);
 
-	if (_debugSlots || _debugBones || _debugMeshes) {
+	if (_debugBoundingRect || _debugSlots || _debugBones || _debugMeshes) {
         drawDebug(renderer, transform, transformFlags);
 	}
 }
@@ -662,7 +676,7 @@ void SkeletonRenderer::drawDebug (Renderer* renderer, const Mat4 &transform, uin
 			spSlot* slot = _skeleton->drawOrder[i];
 			if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_MESH) continue;
 			spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
-            float worldCoord[attachment->super.worldVerticesLength];
+            VLA(float, worldCoord, attachment->super.worldVerticesLength);
 			spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, attachment->super.worldVerticesLength, worldCoord, 0, 2);
             for (int t = 0; t < attachment->trianglesCount; t += 3) {
                 // Fetch triangle indices
@@ -921,7 +935,7 @@ bool SkeletonRenderer::isOpacityModifyRGB () const {
         assert(dstPtr == dstEnd);
     }
     
-    void interleaveCoordinates(float* __restrict__ dst, const float* __restrict__ src, int count, int dstStride)
+    void interleaveCoordinates(float* __restrict dst, const float* __restrict src, int count, int dstStride)
     {
         if (dstStride == 2)
         {

@@ -49,7 +49,6 @@ public:
 
 	virtual void update (float deltaTime) override;
 	virtual void draw (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags) override;
-	virtual void drawDebug (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags);
 	virtual cocos2d::Rect getBoundingBox () const override;
 	virtual void onEnter () override;
 	virtual void onExit () override;
@@ -139,6 +138,7 @@ protected:
 	virtual AttachmentVertices* getAttachmentVertices (spRegionAttachment* attachment) const;
 	virtual AttachmentVertices* getAttachmentVertices (spMeshAttachment* attachment) const;
 	void setupGLProgramState(bool twoColorTintEnabled);
+    virtual void drawDebug (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags);
 
 	bool _ownsSkeletonData;
 	bool _ownsSkeleton;
