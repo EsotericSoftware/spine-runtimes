@@ -1824,11 +1824,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void DrawDot (Vector3 position, float size) {
-			#if UNITY_5_6_OR_NEWER
-			Handles.DotHandleCap(0, position, Quaternion.identity, size * HandleUtility.GetHandleSize(position), EventType.Ignore);
-			#else
-			Handles.DotCap(0, position, Quaternion.identity, size * HandleUtility.GetHandleSize(position));
-			#endif
+			Handles.DotHandleCap(0, position, Quaternion.identity, size * HandleUtility.GetHandleSize(position), EventType.Ignore); //Handles.DotCap(0, position, Quaternion.identity, size * HandleUtility.GetHandleSize(position));			
 		}
 
 		public static void DrawBoundingBoxes (Transform transform, Skeleton skeleton) {
@@ -1839,9 +1835,9 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void DrawBoundingBox (Slot slot, BoundingBoxAttachment box, Transform t) {
-			if (box.Vertices.Length <= 0) return; // Handle cases where user creates a BoundingBoxAttachment but doesn't actually define it.
+			if (box.Vertices.Length <= 2) return; // Handle cases where user creates a BoundingBoxAttachment but doesn't actually define it.
 
-			var worldVerts = new float[box.Vertices.Length];
+			var worldVerts = new float[box.WorldVerticesLength];
 			box.ComputeWorldVertices(slot, worldVerts);
 
 			Handles.color = Color.green;
