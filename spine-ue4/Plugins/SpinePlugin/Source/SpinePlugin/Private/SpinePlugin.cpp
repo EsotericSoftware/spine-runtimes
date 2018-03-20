@@ -37,8 +37,26 @@ class FSpinePlugin : public SpinePlugin {
 
 IMPLEMENT_MODULE( FSpinePlugin, SpinePlugin )
 
-void FSpinePlugin::StartupModule() { }
+// These should be filled with UE4's specific allocator functions.
+extern "C" {
+    void _spSetMalloc( void* ( *_malloc ) ( size_t size ) );
+    void _spSetFree( void( *_free ) ( void* ptr ) );
+    void _spSetRealloc( void* ( *_realloc ) ( void* ptr, size_t size ) );
+}
 
+static void * SpineMalloc( size_t size ) {
+    return FMemory::Malloc( size );
+}
+
+static void * SpineRealloc( void* ptr, size_t size ) {
+    return FMemory::Realloc( ptr, size );
+}
+
+void FSpinePlugin::StartupModule() {
+    _spSetMalloc( &SpineMalloc );
+    _spSetRealloc( &SpineRealloc );
+    _spSetFree( FMemory::Free );
+}
 
 void FSpinePlugin::ShutdownModule() { }
 
