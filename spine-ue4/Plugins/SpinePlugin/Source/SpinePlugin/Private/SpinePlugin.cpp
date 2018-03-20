@@ -53,9 +53,11 @@ static void * SpineRealloc( void* ptr, size_t size ) {
 }
 
 void FSpinePlugin::StartupModule() {
+#if !UE_EDITOR
     _spSetMalloc( &SpineMalloc );
     _spSetRealloc( &SpineRealloc );
     _spSetFree( FMemory::Free );
+#endif
 }
 
 void FSpinePlugin::ShutdownModule() { }
