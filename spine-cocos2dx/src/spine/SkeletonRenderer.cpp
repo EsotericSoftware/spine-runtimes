@@ -311,77 +311,77 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		TwoColorTriangles trianglesTwoColor;
 		
 		switch (slot->attachment->type) {
-			case SP_ATTACHMENT_REGION: {
-				spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-				attachmentVertices = getAttachmentVertices(attachment);
-				
-				float* dstTriangleVertices = nullptr;
-				int dstStride = 0; // in floats
-				if (hasSingleTint) {
-					triangles.indices = attachmentVertices->_triangles->indices;
-					triangles.indexCount = attachmentVertices->_triangles->indexCount;
-					triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
-					triangles.vertCount = attachmentVertices->_triangles->vertCount;
-					assert(triangles.vertCount == 4);
-					std::memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
-					dstStride = sizeof(V3F_C4B_T2F) / sizeof(float);
-					dstTriangleVertices = reinterpret_cast<float*>(triangles.verts);
-				} else {
-					trianglesTwoColor.indices = attachmentVertices->_triangles->indices;
-					trianglesTwoColor.indexCount = attachmentVertices->_triangles->indexCount;
-					trianglesTwoColor.verts = twoColorBatch->allocateVertices(attachmentVertices->_triangles->vertCount);
-					trianglesTwoColor.vertCount = attachmentVertices->_triangles->vertCount;
-					assert(trianglesTwoColor.vertCount == 4);
-					for (int i = 0; i < trianglesTwoColor.vertCount; i++) {
-						trianglesTwoColor.verts[i].texCoords = attachmentVertices->_triangles->verts[i].texCoords;
-					}
-					dstTriangleVertices = reinterpret_cast<float*>(trianglesTwoColor.verts);
-					dstStride = sizeof(V3F_C4B_C4B_T2F) / sizeof(float);
+		case SP_ATTACHMENT_REGION: {
+			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
+			attachmentVertices = getAttachmentVertices(attachment);
+			
+			float* dstTriangleVertices = nullptr;
+			int dstStride = 0; // in floats
+			if (hasSingleTint) {
+				triangles.indices = attachmentVertices->_triangles->indices;
+				triangles.indexCount = attachmentVertices->_triangles->indexCount;
+				triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
+				triangles.vertCount = attachmentVertices->_triangles->vertCount;
+				assert(triangles.vertCount == 4);
+				std::memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
+				dstStride = sizeof(V3F_C4B_T2F) / sizeof(float);
+				dstTriangleVertices = reinterpret_cast<float*>(triangles.verts);
+			} else {
+				trianglesTwoColor.indices = attachmentVertices->_triangles->indices;
+				trianglesTwoColor.indexCount = attachmentVertices->_triangles->indexCount;
+				trianglesTwoColor.verts = twoColorBatch->allocateVertices(attachmentVertices->_triangles->vertCount);
+				trianglesTwoColor.vertCount = attachmentVertices->_triangles->vertCount;
+				assert(trianglesTwoColor.vertCount == 4);
+				for (int i = 0; i < trianglesTwoColor.vertCount; i++) {
+					trianglesTwoColor.verts[i].texCoords = attachmentVertices->_triangles->verts[i].texCoords;
 				}
-				// Copy world vertices to triangle vertices
-				interleaveCoordinates(dstTriangleVertices, worldCoordPtr, 4, dstStride);
-				worldCoordPtr += 8;
-				
-				color = attachment->color;
-				
-				break;
+				dstTriangleVertices = reinterpret_cast<float*>(trianglesTwoColor.verts);
+				dstStride = sizeof(V3F_C4B_C4B_T2F) / sizeof(float);
 			}
-			case SP_ATTACHMENT_MESH: {
-				spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
-				attachmentVertices = getAttachmentVertices(attachment);
-				
-				float* dstTriangleVertices = nullptr;
-				int dstStride = 0; // in floats
-				int dstVertexCount = 0;
-				if (hasSingleTint) {
-					triangles.indices = attachmentVertices->_triangles->indices;
-					triangles.indexCount = attachmentVertices->_triangles->indexCount;
-					triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
-					triangles.vertCount = attachmentVertices->_triangles->vertCount;
-					std::memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
-					dstTriangleVertices = (float*)triangles.verts;
-					dstStride = sizeof(V3F_C4B_T2F) / sizeof(float);
-					dstVertexCount = triangles.vertCount;
-				} else {
-					trianglesTwoColor.indices = attachmentVertices->_triangles->indices;
-					trianglesTwoColor.indexCount = attachmentVertices->_triangles->indexCount;
-					trianglesTwoColor.verts = twoColorBatch->allocateVertices(attachmentVertices->_triangles->vertCount);
-					trianglesTwoColor.vertCount = attachmentVertices->_triangles->vertCount;
-					for (int i = 0; i < trianglesTwoColor.vertCount; i++) {
-						trianglesTwoColor.verts[i].texCoords = attachmentVertices->_triangles->verts[i].texCoords;
-					}
-					dstTriangleVertices = (float*)trianglesTwoColor.verts;
-					dstStride = sizeof(V3F_C4B_C4B_T2F) / sizeof(float);
-					dstVertexCount = trianglesTwoColor.vertCount;
+			// Copy world vertices to triangle vertices
+			interleaveCoordinates(dstTriangleVertices, worldCoordPtr, 4, dstStride);
+			worldCoordPtr += 8;
+			
+			color = attachment->color;
+			
+			break;
+		}
+		case SP_ATTACHMENT_MESH: {
+			spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
+			attachmentVertices = getAttachmentVertices(attachment);
+			
+			float* dstTriangleVertices = nullptr;
+			int dstStride = 0; // in floats
+			int dstVertexCount = 0;
+			if (hasSingleTint) {
+				triangles.indices = attachmentVertices->_triangles->indices;
+				triangles.indexCount = attachmentVertices->_triangles->indexCount;
+				triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
+				triangles.vertCount = attachmentVertices->_triangles->vertCount;
+				std::memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
+				dstTriangleVertices = (float*)triangles.verts;
+				dstStride = sizeof(V3F_C4B_T2F) / sizeof(float);
+				dstVertexCount = triangles.vertCount;
+			} else {
+				trianglesTwoColor.indices = attachmentVertices->_triangles->indices;
+				trianglesTwoColor.indexCount = attachmentVertices->_triangles->indexCount;
+				trianglesTwoColor.verts = twoColorBatch->allocateVertices(attachmentVertices->_triangles->vertCount);
+				trianglesTwoColor.vertCount = attachmentVertices->_triangles->vertCount;
+				for (int i = 0; i < trianglesTwoColor.vertCount; i++) {
+					trianglesTwoColor.verts[i].texCoords = attachmentVertices->_triangles->verts[i].texCoords;
 				}
-				
-				// Copy world vertices to triangle vertices
-				assert(dstVertexCount * 2 == attachment->super.worldVerticesLength);
-				interleaveCoordinates(dstTriangleVertices, worldCoordPtr, dstVertexCount, dstStride);
-				worldCoordPtr += dstVertexCount * 2;
-				
-				color = attachment->color;
-				break;
+				dstTriangleVertices = (float*)trianglesTwoColor.verts;
+				dstStride = sizeof(V3F_C4B_C4B_T2F) / sizeof(float);
+				dstVertexCount = trianglesTwoColor.vertCount;
+			}
+			
+			// Copy world vertices to triangle vertices
+			assert(dstVertexCount * 2 == attachment->super.worldVerticesLength);
+			interleaveCoordinates(dstTriangleVertices, worldCoordPtr, dstVertexCount, dstStride);
+			worldCoordPtr += dstVertexCount * 2;
+			
+			color = attachment->color;
+			break;
 		}
 		case SP_ATTACHMENT_CLIPPING: {
 			spClippingAttachment* clip = (spClippingAttachment*)slot->attachment;
@@ -604,9 +604,9 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 
 void SkeletonRenderer::drawDebug (Renderer* renderer, const Mat4 &transform, uint32_t transformFlags) {
 
-	Director* director = Director::getInstance();
-	director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-	director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
+    Director* director = Director::getInstance();
+    director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+    director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
     
     DrawNode* drawNode = DrawNode::create();
     
@@ -695,8 +695,8 @@ void SkeletonRenderer::drawDebug (Renderer* renderer, const Mat4 &transform, uin
 		
 	}
 	
-	drawNode->draw(renderer, transform, transformFlags);
-	director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+    drawNode->draw(renderer, transform, transformFlags);
+    director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
 }
 
 AttachmentVertices* SkeletonRenderer::getAttachmentVertices (spRegionAttachment* attachment) const {
