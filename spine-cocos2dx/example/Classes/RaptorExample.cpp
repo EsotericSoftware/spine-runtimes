@@ -67,7 +67,7 @@ bool RaptorExample::init () {
 		if (!skeletonNode->getDebugBonesEnabled()) {
 			skeletonNode->setDebugBonesEnabled(true);
 			skeletonNode->setDebugMeshesEnabled(true);
-            skeletonNode->setDebugBoundingRectEnabled(true);
+			skeletonNode->setDebugBoundingRectEnabled(true);
 		} else if (skeletonNode->getTimeScale() == 1)
 			skeletonNode->setTimeScale(0.3f);
 		else

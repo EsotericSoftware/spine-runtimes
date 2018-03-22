@@ -68,8 +68,8 @@ public:
 	void setDebugMeshesEnabled(bool enabled);
 	bool getDebugMeshesEnabled() const;
  
-    void setDebugBoundingRectEnabled(bool enabled);
-    bool getDebugBoundingRectEnabled() const;
+	void setDebugBoundingRectEnabled(bool enabled);
+	bool getDebugBoundingRectEnabled() const;
 
 	// --- Convenience methods for common Skeleton_* functions.
 	void updateWorldTransform ();
@@ -138,7 +138,7 @@ protected:
 	virtual AttachmentVertices* getAttachmentVertices (spRegionAttachment* attachment) const;
 	virtual AttachmentVertices* getAttachmentVertices (spMeshAttachment* attachment) const;
 	void setupGLProgramState(bool twoColorTintEnabled);
-    virtual void drawDebug (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags);
+	virtual void drawDebug (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags);
 
 	bool _ownsSkeletonData;
 	bool _ownsSkeleton;
@@ -152,10 +152,10 @@ protected:
 	bool _debugSlots;
 	bool _debugBones;
 	bool _debugMeshes;
-    bool _debugBoundingRect;
+	bool _debugBoundingRect;
 	spSkeletonClipping* _clipper;
 	spVertexEffect* _effect;
-    cocos2d::Rect _boundingRect;
+	cocos2d::Rect _boundingRect;
 	
 	int _startSlotIndex;
 	int _endSlotIndex;

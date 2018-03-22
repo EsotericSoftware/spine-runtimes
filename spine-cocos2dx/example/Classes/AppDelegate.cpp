@@ -65,7 +65,7 @@ bool AppDelegate::applicationDidFinishLaunching () {
 	glview->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, ResolutionPolicy::NO_BORDER);
 #endif
 
-    cocos2d::Size frameSize = glview->getFrameSize();
+	cocos2d::Size frameSize = glview->getFrameSize();
 	
 	vector<string> searchPath;
 

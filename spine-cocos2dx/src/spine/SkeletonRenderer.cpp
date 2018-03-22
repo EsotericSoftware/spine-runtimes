@@ -134,7 +134,7 @@ void SkeletonRenderer::setSkeletonData (spSkeletonData *skeletonData, bool ownsS
 }
 
 SkeletonRenderer::SkeletonRenderer ()
-    : _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _debugBoundingRect(false), _timeScale(1), _effect(nullptr), _startSlotIndex(0), _endSlotIndex(std::numeric_limits<int>::max()) {
+	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _debugBoundingRect(false), _timeScale(1), _effect(nullptr), _startSlotIndex(0), _endSlotIndex(std::numeric_limits<int>::max()) {
 }
 	
 SkeletonRenderer::SkeletonRenderer(spSkeleton* skeleton, bool ownsSkeleton, bool ownsSkeletonData)
@@ -252,44 +252,44 @@ void SkeletonRenderer::update (float deltaTime) {
 }
 
 void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t transformFlags) {
-    assert(_skeleton);
-    const int coordCount = computeTotalCoordCount(*_skeleton, _startSlotIndex, _endSlotIndex);
-    if (coordCount == 0)
-    {
-        return;
-    }
-    assert(coordCount % 2 == 0);
-    
-    VLA(float, worldCoords, coordCount);
-    transformWorldVertices(worldCoords, coordCount, *_skeleton, _startSlotIndex, _endSlotIndex);
- 
-#if CC_USE_CULLING
-    const Camera* camera = Camera::getVisitingCamera();
-    const cocos2d::Rect brect = computeBoundingRect(worldCoords, coordCount / 2);
-    _boundingRect = brect;
-    if (camera && cullRectangle(transform, brect, *camera))
-    {
-        return;
-    }
-#endif
-    
-    const float* worldCoordPtr = worldCoords;
-    SkeletonBatch* batch = SkeletonBatch::getInstance();
-	SkeletonTwoColorBatch* twoColorBatch = SkeletonTwoColorBatch::getInstance();
-    const bool hasSingleTint = (isTwoColorTint() == false);
-	
-    if (_effect) {
-        _effect->begin(_effect, _skeleton);
-    }
+	assert(_skeleton);
+	const int coordCount = computeTotalCoordCount(*_skeleton, _startSlotIndex, _endSlotIndex);
+	if (coordCount == 0)
+	{
+		return;
+	}
+	assert(coordCount % 2 == 0);
 
-    const Color3B displayedColor = getDisplayedColor();
+	VLA(float, worldCoords, coordCount);
+	transformWorldVertices(worldCoords, coordCount, *_skeleton, _startSlotIndex, _endSlotIndex);
+
+	#if CC_USE_CULLING
+	const Camera* camera = Camera::getVisitingCamera();
+	const cocos2d::Rect brect = computeBoundingRect(worldCoords, coordCount / 2);
+	_boundingRect = brect;
+	if (camera && cullRectangle(transform, brect, *camera))
+	{
+		return;
+	}
+	#endif
+
+	const float* worldCoordPtr = worldCoords;
+	SkeletonBatch* batch = SkeletonBatch::getInstance();
+	SkeletonTwoColorBatch* twoColorBatch = SkeletonTwoColorBatch::getInstance();
+	const bool hasSingleTint = (isTwoColorTint() == false);
+
+	if (_effect) {
+		_effect->begin(_effect, _skeleton);
+	}
+
+	const Color3B displayedColor = getDisplayedColor();
 	spColor nodeColor;
 	nodeColor.r = displayedColor.r / 255.f;
 	nodeColor.g = displayedColor.g / 255.f;
 	nodeColor.b = displayedColor.b / 255.f;
 	nodeColor.a = getDisplayedOpacity() / 255.f;
 	
-    spColor color;
+	spColor color;
 	spColor darkColor;
 	const float darkPremultipliedAlpha = _premultipliedAlpha ? 1.f : 0;
 	AttachmentVertices* attachmentVertices = nullptr;
@@ -297,12 +297,12 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	for (int i = 0, n = _skeleton->slotsCount; i < n; ++i) {
 		spSlot* slot = _skeleton->drawOrder[i];
 		
-        if (!slot->attachment) {
-            spSkeletonClipping_clipEnd(_clipper, slot);
-            continue;
-        }
+		if (!slot->attachment) {
+			spSkeletonClipping_clipEnd(_clipper, slot);
+			continue;
+		}
 
-        if (slotIsOutRange(*slot, _startSlotIndex, _endSlotIndex)) {
+		if (slotIsOutRange(*slot, _startSlotIndex, _endSlotIndex)) {
 			spSkeletonClipping_clipEnd(_clipper, slot);
 			continue;
 		}
@@ -311,77 +311,77 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		TwoColorTriangles trianglesTwoColor;
 		
 		switch (slot->attachment->type) {
-            case SP_ATTACHMENT_REGION: {
-                spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-                attachmentVertices = getAttachmentVertices(attachment);
-                
-                float* dstTriangleVertices = nullptr;
-                int dstStride = 0; // in floats
-                if (hasSingleTint) {
-                    triangles.indices = attachmentVertices->_triangles->indices;
-                    triangles.indexCount = attachmentVertices->_triangles->indexCount;
-                    triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
-                    triangles.vertCount = attachmentVertices->_triangles->vertCount;
-                    assert(triangles.vertCount == 4);
-                    std::memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
-                    dstStride = sizeof(V3F_C4B_T2F) / sizeof(float);
-                    dstTriangleVertices = reinterpret_cast<float*>(triangles.verts);
-                } else {
-                    trianglesTwoColor.indices = attachmentVertices->_triangles->indices;
-                    trianglesTwoColor.indexCount = attachmentVertices->_triangles->indexCount;
-                    trianglesTwoColor.verts = twoColorBatch->allocateVertices(attachmentVertices->_triangles->vertCount);
-                    trianglesTwoColor.vertCount = attachmentVertices->_triangles->vertCount;
-                    assert(trianglesTwoColor.vertCount == 4);
-                    for (int i = 0; i < trianglesTwoColor.vertCount; i++) {
-                        trianglesTwoColor.verts[i].texCoords = attachmentVertices->_triangles->verts[i].texCoords;
-                    }
-                    dstTriangleVertices = reinterpret_cast<float*>(trianglesTwoColor.verts);
-                    dstStride = sizeof(V3F_C4B_C4B_T2F) / sizeof(float);
-                }
-                // Copy world vertices to triangle vertices
-                interleaveCoordinates(dstTriangleVertices, worldCoordPtr, 4, dstStride);
-                worldCoordPtr += 8;
-                
-                color = attachment->color;
-                
-                break;
-            }
-            case SP_ATTACHMENT_MESH: {
-                spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
-                attachmentVertices = getAttachmentVertices(attachment);
-                
-                float* dstTriangleVertices = nullptr;
-                int dstStride = 0; // in floats
-                int dstVertexCount = 0;
-                if (hasSingleTint) {
-                    triangles.indices = attachmentVertices->_triangles->indices;
-                    triangles.indexCount = attachmentVertices->_triangles->indexCount;
-                    triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
-                    triangles.vertCount = attachmentVertices->_triangles->vertCount;
-                    std::memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
-                    dstTriangleVertices = (float*)triangles.verts;
-                    dstStride = sizeof(V3F_C4B_T2F) / sizeof(float);
-                    dstVertexCount = triangles.vertCount;
-                } else {
-                    trianglesTwoColor.indices = attachmentVertices->_triangles->indices;
-                    trianglesTwoColor.indexCount = attachmentVertices->_triangles->indexCount;
-                    trianglesTwoColor.verts = twoColorBatch->allocateVertices(attachmentVertices->_triangles->vertCount);
-                    trianglesTwoColor.vertCount = attachmentVertices->_triangles->vertCount;
-                    for (int i = 0; i < trianglesTwoColor.vertCount; i++) {
-                        trianglesTwoColor.verts[i].texCoords = attachmentVertices->_triangles->verts[i].texCoords;
-                    }
-                    dstTriangleVertices = (float*)trianglesTwoColor.verts;
-                    dstStride = sizeof(V3F_C4B_C4B_T2F) / sizeof(float);
-                    dstVertexCount = trianglesTwoColor.vertCount;
-                }
-                
-                // Copy world vertices to triangle vertices
-                assert(dstVertexCount * 2 == attachment->super.worldVerticesLength);
-                interleaveCoordinates(dstTriangleVertices, worldCoordPtr, dstVertexCount, dstStride);
-                worldCoordPtr += dstVertexCount * 2;
-                
-                color = attachment->color;
-                break;
+			case SP_ATTACHMENT_REGION: {
+				spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
+				attachmentVertices = getAttachmentVertices(attachment);
+				
+				float* dstTriangleVertices = nullptr;
+				int dstStride = 0; // in floats
+				if (hasSingleTint) {
+					triangles.indices = attachmentVertices->_triangles->indices;
+					triangles.indexCount = attachmentVertices->_triangles->indexCount;
+					triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
+					triangles.vertCount = attachmentVertices->_triangles->vertCount;
+					assert(triangles.vertCount == 4);
+					std::memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
+					dstStride = sizeof(V3F_C4B_T2F) / sizeof(float);
+					dstTriangleVertices = reinterpret_cast<float*>(triangles.verts);
+				} else {
+					trianglesTwoColor.indices = attachmentVertices->_triangles->indices;
+					trianglesTwoColor.indexCount = attachmentVertices->_triangles->indexCount;
+					trianglesTwoColor.verts = twoColorBatch->allocateVertices(attachmentVertices->_triangles->vertCount);
+					trianglesTwoColor.vertCount = attachmentVertices->_triangles->vertCount;
+					assert(trianglesTwoColor.vertCount == 4);
+					for (int i = 0; i < trianglesTwoColor.vertCount; i++) {
+						trianglesTwoColor.verts[i].texCoords = attachmentVertices->_triangles->verts[i].texCoords;
+					}
+					dstTriangleVertices = reinterpret_cast<float*>(trianglesTwoColor.verts);
+					dstStride = sizeof(V3F_C4B_C4B_T2F) / sizeof(float);
+				}
+				// Copy world vertices to triangle vertices
+				interleaveCoordinates(dstTriangleVertices, worldCoordPtr, 4, dstStride);
+				worldCoordPtr += 8;
+				
+				color = attachment->color;
+				
+				break;
+			}
+			case SP_ATTACHMENT_MESH: {
+				spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
+				attachmentVertices = getAttachmentVertices(attachment);
+				
+				float* dstTriangleVertices = nullptr;
+				int dstStride = 0; // in floats
+				int dstVertexCount = 0;
+				if (hasSingleTint) {
+					triangles.indices = attachmentVertices->_triangles->indices;
+					triangles.indexCount = attachmentVertices->_triangles->indexCount;
+					triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
+					triangles.vertCount = attachmentVertices->_triangles->vertCount;
+					std::memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
+					dstTriangleVertices = (float*)triangles.verts;
+					dstStride = sizeof(V3F_C4B_T2F) / sizeof(float);
+					dstVertexCount = triangles.vertCount;
+				} else {
+					trianglesTwoColor.indices = attachmentVertices->_triangles->indices;
+					trianglesTwoColor.indexCount = attachmentVertices->_triangles->indexCount;
+					trianglesTwoColor.verts = twoColorBatch->allocateVertices(attachmentVertices->_triangles->vertCount);
+					trianglesTwoColor.vertCount = attachmentVertices->_triangles->vertCount;
+					for (int i = 0; i < trianglesTwoColor.vertCount; i++) {
+						trianglesTwoColor.verts[i].texCoords = attachmentVertices->_triangles->verts[i].texCoords;
+					}
+					dstTriangleVertices = (float*)trianglesTwoColor.verts;
+					dstStride = sizeof(V3F_C4B_C4B_T2F) / sizeof(float);
+					dstVertexCount = trianglesTwoColor.vertCount;
+				}
+				
+				// Copy world vertices to triangle vertices
+				assert(dstVertexCount * 2 == attachment->super.worldVerticesLength);
+				interleaveCoordinates(dstTriangleVertices, worldCoordPtr, dstVertexCount, dstStride);
+				worldCoordPtr += dstVertexCount * 2;
+				
+				color = attachment->color;
+				break;
 		}
 		case SP_ATTACHMENT_CLIPPING: {
 			spClippingAttachment* clip = (spClippingAttachment*)slot->attachment;
@@ -408,19 +408,19 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 			spSkeletonClipping_clipEnd(_clipper, slot);
 			continue;
 		}
-        color.r *= nodeColor.r * _skeleton->color.r * slot->color.r;
+		color.r *= nodeColor.r * _skeleton->color.r * slot->color.r;
 		color.g *= nodeColor.g * _skeleton->color.g * slot->color.g;
 		color.b *= nodeColor.b * _skeleton->color.b * slot->color.b;
-        if (_premultipliedAlpha)
-        {
-            color.r *= color.a;
-            color.g *= color.a;
-            color.b *= color.a;
-        }
+		if (_premultipliedAlpha)
+		{
+			color.r *= color.a;
+			color.g *= color.a;
+			color.b *= color.a;
+		}
 		
-        const cocos2d::Color4B color4B = spColorToColor4B(color);
-        const cocos2d::Color4B darkColor4B = spColorToColor4B(darkColor);
-        const BlendFunc blendFunc = makeBlendFunc(slot->data->blendMode, _premultipliedAlpha);
+		const cocos2d::Color4B color4B = spColorToColor4B(color);
+		const cocos2d::Color4B darkColor4B = spColorToColor4B(darkColor);
+		const BlendFunc blendFunc = makeBlendFunc(slot->data->blendMode, _premultipliedAlpha);
 
 		if (hasSingleTint) {
 			if (spSkeletonClipping_isClipping(_clipper)) {
@@ -604,9 +604,9 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 
 void SkeletonRenderer::drawDebug (Renderer* renderer, const Mat4 &transform, uint32_t transformFlags) {
 
-    Director* director = Director::getInstance();
-    director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-    director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
+	Director* director = Director::getInstance();
+	director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+	director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
     
     DrawNode* drawNode = DrawNode::create();
     
@@ -676,27 +676,27 @@ void SkeletonRenderer::drawDebug (Renderer* renderer, const Mat4 &transform, uin
 			spSlot* slot = _skeleton->drawOrder[i];
 			if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_MESH) continue;
 			spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
-            VLA(float, worldCoord, attachment->super.worldVerticesLength);
+			VLA(float, worldCoord, attachment->super.worldVerticesLength);
 			spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, attachment->super.worldVerticesLength, worldCoord, 0, 2);
-            for (int t = 0; t < attachment->trianglesCount; t += 3) {
-                // Fetch triangle indices
-                const int idx0 = attachment->triangles[t + 0];
-                const int idx1 = attachment->triangles[t + 1];
-                const int idx2 = attachment->triangles[t + 2];
-                const Vec2 v[3] =
-                {
-                    worldCoord + (idx0 * 2),
-                    worldCoord + (idx1 * 2),
-                    worldCoord + (idx2 * 2)
-                };
-                drawNode->drawPoly(v, 3, true, Color4F::YELLOW);
+			for (int t = 0; t < attachment->trianglesCount; t += 3) {
+				// Fetch triangle indices
+				const int idx0 = attachment->triangles[t + 0];
+				const int idx1 = attachment->triangles[t + 1];
+				const int idx2 = attachment->triangles[t + 2];
+				const Vec2 v[3] =
+				{
+					worldCoord + (idx0 * 2),
+					worldCoord + (idx1 * 2),
+					worldCoord + (idx2 * 2)
+				};
+				drawNode->drawPoly(v, 3, true, Color4F::YELLOW);
 			}
 		}
 		
 	}
-    
-    drawNode->draw(renderer, transform, transformFlags);
-    director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+	
+	drawNode->draw(renderer, transform, transformFlags);
+	director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
 }
 
 AttachmentVertices* SkeletonRenderer::getAttachmentVertices (spRegionAttachment* attachment) const {

@@ -86,8 +86,8 @@ bool SpineboyExample::init () {
 	listener->onTouchBegan = [this] (Touch* touch, Event* event) -> bool {
         if (!skeletonNode->getDebugBonesEnabled()) {
 			skeletonNode->setDebugBonesEnabled(true);
-            skeletonNode->setDebugBoundingRectEnabled(true);
-        }
+			skeletonNode->setDebugBoundingRectEnabled(true);
+		}
 		else if (skeletonNode->getTimeScale() == 1)
 			skeletonNode->setTimeScale(0.3f);
 		else

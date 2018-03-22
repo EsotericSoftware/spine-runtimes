@@ -67,7 +67,7 @@ bool BatchingExample::init () {
 
 	int xMin = _contentSize.width * 0.10f, xMax = _contentSize.width * 0.90f;
 	int yMin = 0, yMax = _contentSize.height * 0.7f;
-    for (int i = 0; i < NUM_SKELETONS; i++) {
+	for (int i = 0; i < NUM_SKELETONS; i++) {
 		// Each skeleton node shares the same atlas, skeleton data, and mix times.
 		SkeletonAnimation* skeletonNode = SkeletonAnimation::createWithData(_skeletonData, false);
 		skeletonNode->setAnimationStateData(_stateData);
