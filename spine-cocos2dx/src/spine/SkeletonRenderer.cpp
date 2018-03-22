@@ -436,16 +436,16 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				triangles.verts = batch->allocateVertices(triangles.vertCount);
 				triangles.indexCount = _clipper->clippedTriangles->size;
 				triangles.indices =
-                batch->allocateIndices(triangles.indexCount);
-                std::memcpy(triangles.indices, _clipper->clippedTriangles->items, sizeof(unsigned short) * _clipper->clippedTriangles->size);
+				batch->allocateIndices(triangles.indexCount);
+				std::memcpy(triangles.indices, _clipper->clippedTriangles->items, sizeof(unsigned short) * _clipper->clippedTriangles->size);
 				
 				cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, _glProgramState, blendFunc, triangles, transform, transformFlags);
 				
 				const float* verts = _clipper->clippedVertices->items;
 				const float* uvs = _clipper->clippedUVs->items;
 				if (_effect) {
-                    V3F_C4B_T2F* vertex = batchedTriangles->getTriangles().verts;
-                    spColor darkTmp;
+					V3F_C4B_T2F* vertex = batchedTriangles->getTriangles().verts;
+					spColor darkTmp;
 					for (int v = 0, vn = batchedTriangles->getTriangles().vertCount, vv = 0; v < vn; ++v, vv+=2, ++vertex) {
 						spColor lightCopy = color;
 						vertex->vertices.x = verts[vv];
@@ -456,39 +456,39 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 						vertex->colors = spColorToColor4B(lightCopy);
 					}
 				} else {
-                    const cocos2d::Color4B color4B = spColorToColor4B(color);
-                    V3F_C4B_T2F* vertex = batchedTriangles->getTriangles().verts;
+					const cocos2d::Color4B color4B = spColorToColor4B(color);
+					V3F_C4B_T2F* vertex = batchedTriangles->getTriangles().verts;
 					for (int v = 0, vn = batchedTriangles->getTriangles().vertCount, vv = 0; v < vn; ++v, vv+=2, ++vertex) {
 						vertex->vertices.x = verts[vv];
 						vertex->vertices.y = verts[vv + 1];
 						vertex->texCoords.u = uvs[vv];
 						vertex->texCoords.v = uvs[vv + 1];
-                        vertex->colors = color4B;
+						vertex->colors = color4B;
 					}
 				}
 			} else {
-                // Not clipping
-                
+				// Not clipping
+				
 				cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, _glProgramState, blendFunc, triangles, transform, transformFlags);
 				
 				if (_effect) {
-                    V3F_C4B_T2F* vertex = batchedTriangles->getTriangles().verts;
-                    spColor darkTmp;
+					V3F_C4B_T2F* vertex = batchedTriangles->getTriangles().verts;
+					spColor darkTmp;
 					for (int v = 0, vn = batchedTriangles->getTriangles().vertCount; v < vn; ++v, ++vertex) {
 						spColor lightCopy = color;
 						_effect->transform(_effect, &vertex->vertices.x, &vertex->vertices.y, &vertex->texCoords.u, &vertex->texCoords.v, &lightCopy, &darkTmp);
 						vertex->colors = spColorToColor4B(lightCopy);
 					}
 				} else {
-                    V3F_C4B_T2F* vertex = batchedTriangles->getTriangles().verts;
+					V3F_C4B_T2F* vertex = batchedTriangles->getTriangles().verts;
 					for (int v = 0, vn = batchedTriangles->getTriangles().vertCount; v < vn; ++v, ++vertex) {
-                        vertex->colors = color4B;
+						vertex->colors = color4B;
 					}
 				}
 			}
 		} else {
-            // Two tints
-            
+			// Two tints
+			
 			if (spSkeletonClipping_isClipping(_clipper)) {
 				spSkeletonClipping_clipTriangles(_clipper, (float*)&trianglesTwoColor.verts[0].position, trianglesTwoColor.vertCount * sizeof(V3F_C4B_C4B_T2F) / 4, trianglesTwoColor.indices, trianglesTwoColor.indexCount, (float*)&trianglesTwoColor.verts[0].texCoords, 7);
 				twoColorBatch->deallocateVertices(trianglesTwoColor.vertCount);
@@ -502,7 +502,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				trianglesTwoColor.verts = twoColorBatch->allocateVertices(trianglesTwoColor.vertCount);
 				trianglesTwoColor.indexCount = _clipper->clippedTriangles->size;
 				trianglesTwoColor.indices = twoColorBatch->allocateIndices(trianglesTwoColor.indexCount);
-                std::memcpy(trianglesTwoColor.indices, _clipper->clippedTriangles->items, sizeof(unsigned short) * _clipper->clippedTriangles->size);
+				std::memcpy(trianglesTwoColor.indices, _clipper->clippedTriangles->items, sizeof(unsigned short) * _clipper->clippedTriangles->size);
 				
 				TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture->getName(), _glProgramState, blendFunc, trianglesTwoColor, transform, transformFlags);
 				
@@ -510,7 +510,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				const float* uvs = _clipper->clippedUVs->items;
 				
 				if (_effect) {
-                    V3F_C4B_C4B_T2F* vertex = batchedTriangles->getTriangles().verts;
+					V3F_C4B_C4B_T2F* vertex = batchedTriangles->getTriangles().verts;
 					for (int v = 0, vn = batchedTriangles->getTriangles().vertCount, vv = 0; v < vn; ++v, vv += 2, ++vertex) {
 						spColor lightCopy = color;
 						spColor darkCopy = darkColor;
@@ -519,25 +519,25 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 						vertex->texCoords.u = uvs[vv];
 						vertex->texCoords.v = uvs[vv + 1];
 						_effect->transform(_effect, &vertex->position.x, &vertex->position.y, &vertex->texCoords.u, &vertex->texCoords.v, &lightCopy, &darkCopy);
-                        vertex->color = spColorToColor4B(lightCopy);
-                        vertex->color2 = spColorToColor4B(darkCopy);
+						vertex->color = spColorToColor4B(lightCopy);
+						vertex->color2 = spColorToColor4B(darkCopy);
 					}
 				} else {
-                    V3F_C4B_C4B_T2F* vertex = batchedTriangles->getTriangles().verts;
+					V3F_C4B_C4B_T2F* vertex = batchedTriangles->getTriangles().verts;
 					for (int v = 0, vn = batchedTriangles->getTriangles().vertCount, vv = 0; v < vn; ++v, vv += 2, ++vertex) {
 						vertex->position.x = verts[vv];
 						vertex->position.y = verts[vv + 1];
 						vertex->texCoords.u = uvs[vv];
 						vertex->texCoords.v = uvs[vv + 1];
-                        vertex->color = color4B;
-                        vertex->color2 = darkColor4B;
+						vertex->color = color4B;
+						vertex->color2 = darkColor4B;
 					}
 				}
 			} else {
 				TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture->getName(), _glProgramState, blendFunc, trianglesTwoColor, transform, transformFlags);
 				
 				if (_effect) {
-                    V3F_C4B_C4B_T2F* vertex = batchedTriangles->getTriangles().verts;
+					V3F_C4B_C4B_T2F* vertex = batchedTriangles->getTriangles().verts;
 					for (int v = 0, vn = batchedTriangles->getTriangles().vertCount; v < vn; ++v, ++vertex) {
 						spColor lightCopy = color;
 						spColor darkCopy = darkColor;
@@ -546,10 +546,10 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 						vertex->color2 = spColorToColor4B(darkCopy);
 					}
 				} else {
-                    V3F_C4B_C4B_T2F* vertex = batchedTriangles->getTriangles().verts;
-                    for (int v = 0, vn = batchedTriangles->getTriangles().vertCount; v < vn; ++v, ++vertex) {
-                        vertex->color = color4B;
-                        vertex->color2 = darkColor4B;
+					V3F_C4B_C4B_T2F* vertex = batchedTriangles->getTriangles().verts;
+					for (int v = 0, vn = batchedTriangles->getTriangles().vertCount; v < vn; ++v, ++vertex) {
+						vertex->color = color4B;
+						vertex->color2 = darkColor4B;
 					}
 				}
 			}

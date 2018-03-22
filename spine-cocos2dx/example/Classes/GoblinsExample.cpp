@@ -54,7 +54,7 @@ bool GoblinsExample::init () {
 	
 	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
 	listener->onTouchBegan = [this] (Touch* touch, Event* event) -> bool {
-        if (!skeletonNode->getDebugBonesEnabled()) {
+		if (!skeletonNode->getDebugBonesEnabled()) {
 			skeletonNode->setDebugBonesEnabled(true);
 			skeletonNode->setDebugBoundingRectEnabled(true);
 		}
