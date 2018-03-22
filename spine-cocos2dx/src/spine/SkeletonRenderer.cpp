@@ -765,8 +765,8 @@ void SkeletonRenderer::setVertexEffect(spVertexEffect *effect) {
 }
 	
 void SkeletonRenderer::setSlotsRange(int startSlotIndex, int endSlotIndex) {
-    this->_startSlotIndex = startSlotIndex == -1 ? 0 : startSlotIndex;
-    this->_endSlotIndex = endSlotIndex == -1 ? std::numeric_limits<int>::max() : endSlotIndex;
+	_startSlotIndex = startSlotIndex == -1 ? 0 : startSlotIndex;
+	_endSlotIndex = endSlotIndex == -1 ? std::numeric_limits<int>::max() : endSlotIndex;
 }
 
 spSkeleton* SkeletonRenderer::getSkeleton () const {
