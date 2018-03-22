@@ -62,6 +62,14 @@ public class SkeletonRenderer {
 	private final Color temp6 = new Color();
 
 	public void draw (Batch batch, Skeleton skeleton) {
+		if (batch instanceof PolygonSpriteBatch) {
+			draw((PolygonSpriteBatch)batch, skeleton);
+			return;
+		} else if (batch instanceof TwoColorPolygonBatch) {
+			draw((TwoColorPolygonBatch)batch, skeleton);
+			return;
+		}
+
 		VertexEffect vertexEffect = this.vertexEffect;
 		if (vertexEffect != null) vertexEffect.begin(skeleton);
 
