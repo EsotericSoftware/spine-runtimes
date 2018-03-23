@@ -41,6 +41,7 @@ namespace Spine.Unity.Modules {
 		public bool detachedShadow = false;
 		public Transform parent;
 		public bool hideShadow = true;
+		public PhysicsSystem physicsSystem = PhysicsSystem.Physics3D;
 		#endregion
 
 		GameObject shadowRoot;
@@ -48,6 +49,11 @@ namespace Spine.Unity.Modules {
 		struct TransformPair {
 			public Transform dest, src;
 		}
+
+		public enum PhysicsSystem {
+			Physics2D,
+			Physics3D
+		};
 
 		void Start () {
 			// Duplicate this gameObject as the "shadow" with a different parent.
@@ -84,9 +90,10 @@ namespace Spine.Unity.Modules {
 			foreach (var b in bones) {
 				if (b.gameObject == this.gameObject)
 					continue;
-				
+
+				System.Type checkType = (physicsSystem == PhysicsSystem.Physics2D) ? typeof(Rigidbody2D) : typeof(Rigidbody);
 				foreach (var sb in shadowBones) {
-					if (sb.GetComponent<Rigidbody>() != null && sb.boneName == b.boneName) {
+					if (sb.GetComponent(checkType) != null && sb.boneName == b.boneName) {
 						shadowTable.Add(new TransformPair {
 							dest = b.transform,
 							src = sb.transform
@@ -111,9 +118,15 @@ namespace Spine.Unity.Modules {
 		}
 
 		void FixedUpdate () {
-			var shadowRootRigidbody = shadowRoot.GetComponent<Rigidbody>();
-			shadowRootRigidbody.MovePosition(transform.position);
-			shadowRootRigidbody.MoveRotation(transform.rotation);
+			if (physicsSystem == PhysicsSystem.Physics2D) {
+				var shadowRootRigidbody = shadowRoot.GetComponent<Rigidbody2D>();
+				shadowRootRigidbody.MovePosition(transform.position);
+				shadowRootRigidbody.MoveRotation(transform.rotation.eulerAngles.z);
+			} else {
+				var shadowRootRigidbody = shadowRoot.GetComponent<Rigidbody>();
+				shadowRootRigidbody.MovePosition(transform.position);
+				shadowRootRigidbody.MoveRotation(transform.rotation);
+			}
 
 			for (int i = 0, n = shadowTable.Count; i < n; i++) {
 				var pair = shadowTable[i];
