@@ -50,13 +50,13 @@ namespace Spine.Unity {
 		}
 	}
 
-	/// <summary>Instructions for how to generate a mesh or submesh out of a range of slots in a given skeleton.</summary>
+	/// <summary>Instructions for how to generate a mesh or submesh: "Render this skeleton's slots: start slot, up to but not including endSlot, using this material."</summary>
 	public struct SubmeshInstruction {
 		public Skeleton skeleton;
 		public int startSlot;
 		public int endSlot;
-
 		public Material material;
+
 		public bool forceSeparate;
 		public int preActiveClippingSlotSource;
 
@@ -206,35 +206,35 @@ namespace Spine.Unity {
 			bool skeletonHasClipping = false;
 			var drawOrderItems = drawOrder.Items;
 			for (int i = 0; i < drawOrderCount; i++) {
-			Slot slot = drawOrderItems[i];
-			Attachment attachment = slot.attachment;
+				Slot slot = drawOrderItems[i];
+				Attachment attachment = slot.attachment;
 
-			workingAttachmentsItems[i] = attachment;
-			int attachmentTriangleCount;
-			int attachmentVertexCount;
+				workingAttachmentsItems[i] = attachment;
+				int attachmentTriangleCount;
+				int attachmentVertexCount;
 
-			var regionAttachment = attachment as RegionAttachment;
-			if (regionAttachment != null) {
-			attachmentVertexCount = 4;
-			attachmentTriangleCount = 6;
-			} else {
-			var meshAttachment = attachment as MeshAttachment;
-			if (meshAttachment != null) {
-			attachmentVertexCount = meshAttachment.worldVerticesLength >> 1;
-			attachmentTriangleCount = meshAttachment.triangles.Length;						
-			} else {
-			var clippingAttachment = attachment as ClippingAttachment;
-			if (clippingAttachment != null) {
-			current.hasClipping = true;
-			skeletonHasClipping = true;
-			}
-			attachmentVertexCount = 0;
-			attachmentTriangleCount = 0;
-			}
-			}
-			current.rawTriangleCount += attachmentTriangleCount;
-			current.rawVertexCount += attachmentVertexCount;
-			totalRawVertexCount += attachmentVertexCount;
+				var regionAttachment = attachment as RegionAttachment;
+				if (regionAttachment != null) {
+					attachmentVertexCount = 4;
+					attachmentTriangleCount = 6;
+				} else {
+					var meshAttachment = attachment as MeshAttachment;
+					if (meshAttachment != null) {
+						attachmentVertexCount = meshAttachment.worldVerticesLength >> 1;
+						attachmentTriangleCount = meshAttachment.triangles.Length;
+					} else {
+						var clippingAttachment = attachment as ClippingAttachment;
+						if (clippingAttachment != null) {
+							current.hasClipping = true;
+							skeletonHasClipping = true;
+						}
+						attachmentVertexCount = 0;
+						attachmentTriangleCount = 0;
+					}
+				}
+				current.rawTriangleCount += attachmentTriangleCount;
+				current.rawVertexCount += attachmentVertexCount;
+				totalRawVertexCount += attachmentVertexCount;
 
 			}
 
@@ -448,9 +448,9 @@ namespace Spine.Unity {
 				meshBoundsThickness = 0f;
 			}
 
-			submeshes.Count = 1;
-			submeshes.Items[0].Clear(false);
 			submeshIndex = 0;
+			submeshes.Count = 1;
+			//submeshes.Items[0].Clear(false);
 		}
 
 		public void AddSubmesh (SubmeshInstruction instruction, bool updateTriangles = true) {
@@ -500,7 +500,7 @@ namespace Spine.Unity {
 				int attachmentIndexCount;
 
 				Color c = default(Color);
-
+				
 				// Identify and prepare values.
 				var region = attachment as RegionAttachment;
 				if (region != null) {
@@ -1020,18 +1020,26 @@ namespace Spine.Unity {
 				if (settings.tintBlack) {
 					mesh.uv2 = this.uv2.Items;
 					mesh.uv3 = this.uv3.Items;
-				}
+				}				
+			}
+		}
 
-				if (settings.calculateTangents) {
-					MeshGenerator.SolveTangents2DEnsureSize(ref this.tangents, ref this.tempTanBuffer, vertexCount);
-					for (int i = 0; i < submeshCount; i++) {
-						var submesh = sbi[i].Items;
-						int triangleCount = sbi[i].Count;
-						MeshGenerator.SolveTangents2DTriangles(this.tempTanBuffer, submesh, triangleCount, vbi, ubi, vertexCount);
-					}
-					MeshGenerator.SolveTangents2DBuffer(this.tangents, this.tempTanBuffer, vertexCount);
-					mesh.tangents = this.tangents;
+		public void FillLateVertexData (Mesh mesh) {
+			if (settings.calculateTangents) {
+				int vertexCount = this.vertexBuffer.Count;
+				var sbi = submeshes.Items;
+				int submeshCount = submeshes.Count;
+				var vbi = vertexBuffer.Items;
+				var ubi = uvBuffer.Items;
+
+				MeshGenerator.SolveTangents2DEnsureSize(ref this.tangents, ref this.tempTanBuffer, vertexCount);
+				for (int i = 0; i < submeshCount; i++) {
+					var submesh = sbi[i].Items;
+					int triangleCount = sbi[i].Count;
+					MeshGenerator.SolveTangents2DTriangles(this.tempTanBuffer, submesh, triangleCount, vbi, ubi, vertexCount);
 				}
+				MeshGenerator.SolveTangents2DBuffer(this.tangents, this.tempTanBuffer, vertexCount);
+				mesh.tangents = this.tangents;
 			}
 		}
 
