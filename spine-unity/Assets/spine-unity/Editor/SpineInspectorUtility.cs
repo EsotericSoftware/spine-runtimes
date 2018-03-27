@@ -92,26 +92,30 @@ namespace Spine.Unity.Editor {
 			// If base property is not found, look for the sibling property.
 			if (relativeProperty == null) { 
 				string propertyPath = property.propertyPath;
-				int localPathLength = 0;
+				int localPathLength = property.name.Length;
 
-				if (property.isArray) {
-					const int internalArrayPathLength = 14; // int arrayPathLength = ".Array.data[x]".Length;
+				string newPropertyPath = propertyPath.Remove(propertyPath.Length - localPathLength, localPathLength) + propertyName;
+				relativeProperty = property.serializedObject.FindProperty(newPropertyPath);
+
+				// If a direct sibling property was not found, try to find the sibling of the array.
+				if (relativeProperty == null && property.isArray) {
 					int propertyPathLength = propertyPath.Length;
-					int n = propertyPathLength - internalArrayPathLength;
-					// Find the dot before the array property name and
-					// store the total length from the name of the array until the end of the propertyPath.
-					for (int i = internalArrayPathLength + 1; i < n; i++) {
+
+					int dotCount = 0;
+					const int siblingOfListDotCount = 3;
+					for (int i = 1; i < propertyPathLength; i++) {
 						if (propertyPath[propertyPathLength - i] == '.') {
-							localPathLength = i - 1;
-							break;
+							dotCount++;
+							if (dotCount >= siblingOfListDotCount) {
+								localPathLength = i - 1;
+								break;
+							}
 						}
 					}
-				} else {
-					localPathLength = property.name.Length;
-				}
 
-				propertyPath = propertyPath.Remove(propertyPath.Length - localPathLength, localPathLength) + propertyName;
-				relativeProperty = property.serializedObject.FindProperty(propertyPath);
+					newPropertyPath = propertyPath.Remove(propertyPath.Length - localPathLength, localPathLength) + propertyName;
+					relativeProperty = property.serializedObject.FindProperty(newPropertyPath);
+				}
 			}
 
 			return relativeProperty;
