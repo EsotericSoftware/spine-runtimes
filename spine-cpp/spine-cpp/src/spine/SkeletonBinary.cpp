@@ -176,7 +176,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 		unsigned char b = readByte(input);
 		unsigned char a = readByte(input);
 		if (!(r == 0xff && g == 0xff && b == 0xff && a == 0xff)) {
-			slotData->getDarkColor().set(r / 255.0f, g / 255.0f, b / 255.0f, 0);
+			slotData->getDarkColor().set(r / 255.0f, g / 255.0f, b / 255.0f, 1);
 			slotData->setHasDarkColor(true);
 		}
 		slotData->_attachmentName.own(readString(input));

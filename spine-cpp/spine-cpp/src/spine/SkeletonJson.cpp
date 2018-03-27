@@ -223,7 +223,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				darkColor.r = toColor(dark, 0);
 				darkColor.g = toColor(dark, 1);
 				darkColor.b = toColor(dark, 2);
-				darkColor.a = toColor(dark, 3);
+				darkColor.a = 1;
 				data->setHasDarkColor(true);
 			}
 
