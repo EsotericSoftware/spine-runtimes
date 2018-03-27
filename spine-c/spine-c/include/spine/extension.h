@@ -61,6 +61,8 @@
 #ifndef SPINE_EXTENSION_H_
 #define SPINE_EXTENSION_H_
 
+#include <spine/dll.h>
+
 /* All allocation uses these. */
 #define MALLOC(TYPE,COUNT) ((TYPE*)_spMalloc(sizeof(TYPE) * (COUNT), __FILE__, __LINE__))
 #define CALLOC(TYPE,COUNT) ((TYPE*)_spCalloc(COUNT, sizeof(TYPE), __FILE__, __LINE__))
@@ -170,11 +172,11 @@ void* _spRealloc(void* ptr, size_t size);
 void _spFree (void* ptr);
 float _spRandom ();
 
-void _spSetMalloc (void* (*_malloc) (size_t size));
-void _spSetDebugMalloc (void* (*_malloc) (size_t size, const char* file, int line));
-void _spSetRealloc(void* (*_realloc) (void* ptr, size_t size));
-void _spSetFree (void (*_free) (void* ptr));
-void _spSetRandom(float (*_random) ());
+SP_API void _spSetMalloc (void* (*_malloc) (size_t size));
+SP_API void _spSetDebugMalloc (void* (*_malloc) (size_t size, const char* file, int line));
+SP_API void _spSetRealloc(void* (*_realloc) (void* ptr, size_t size));
+SP_API void _spSetFree (void (*_free) (void* ptr));
+SP_API void _spSetRandom(float (*_random) ());
 
 char* _spReadFile (const char* path, int* length);
 

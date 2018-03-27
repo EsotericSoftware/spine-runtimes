@@ -1778,7 +1778,7 @@ void URuntimeMeshComponent::UpdateCollision()
 	BodySetup->BodySetupGuid = FGuid::NewGuid();
 
 
-#if WITH_RUNTIME_PHYSICS_COOKING || WITH_EDITOR
+#if WITH_RUNTIME_PHYSICS_COOKING || WITH_PHYSX || WITH_EDITOR
 	// Clear current mesh data
 	BodySetup->InvalidatePhysicsData();
 	// Create new mesh data
