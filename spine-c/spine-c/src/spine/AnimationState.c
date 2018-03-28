@@ -733,11 +733,11 @@ spTrackEntry* spAnimationState_addAnimation (spAnimationState* self, int trackIn
 				if (last->loop) {
 					delay += duration * (1 + (int) (last->trackTime / duration));
 				} else {
-					delay += duration;
+					delay += MAX(duration, last->trackTime);
 				}
 				delay -= spAnimationStateData_getMix(self->data, last->animation, animation);
 			} else
-				delay = 0;
+				delay = last->trackTime;
 		}
 	}
 

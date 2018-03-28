@@ -582,11 +582,11 @@ TrackEntry *AnimationState::addAnimation(int trackIndex, Animation *animation, b
 				if (last->_loop) {
 					delay += duration * (1 + (int) (last->_trackTime / duration));
 				} else {
-					delay += duration;
+					delay += MathUtil::max(duration, last->_trackTime);
 				}
 				delay -= _data->getMix(last->_animation, animation);
 			} else {
-				delay = 0;
+				delay = last->_trackTime;
 			}
 		}
 	}
