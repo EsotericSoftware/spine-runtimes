@@ -1654,11 +1654,11 @@ var spine;
 						if (last.loop)
 							delay += duration * (1 + ((last.trackTime / duration) | 0));
 						else
-							delay += duration;
+							delay += Math.max(duration, last.trackTime);
 						delay -= this.data.getMix(last.animation, animation);
 					}
 					else
-						delay = 0;
+						delay = last.trackTime;
 				}
 			}
 			entry.delay = delay;
