@@ -731,11 +731,11 @@ function AnimationState:addAnimation (trackIndex, animation, loop, delay)
 				if last.loop then
 					delay = delay + duration * (1 + math_floor(last.trackTime / duration))
 				else
-					delay = delay + duration
+					delay = delay + math_max(duration, last.trackTime)
 				end
         delay = delay - data:getMix(last.animation, animation)
       else
-        delay = 0
+        delay = last.trackTime
       end
     end
   end
