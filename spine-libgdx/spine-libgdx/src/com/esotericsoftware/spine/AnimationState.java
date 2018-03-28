@@ -544,12 +544,12 @@ public class AnimationState {
 				float duration = last.animationEnd - last.animationStart;
 				if (duration != 0) {
 					if (last.loop)
-						delay += duration * (1 + (int)(last.trackTime / duration));
+						delay += duration * (1 + (int)(last.trackTime / duration)); // Completion of next loop.
 					else
-						delay += duration;
+						delay += Math.max(duration, last.trackTime); // After duration, else next update.
 					delay -= data.getMix(last.animation, animation);
 				} else
-					delay = 0;
+					delay = last.trackTime; // Next update.
 			}
 		}
 
