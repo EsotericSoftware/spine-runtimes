@@ -48,6 +48,7 @@ enum Format {
 };
 
 enum TextureFilter {
+	TextureFilter_Unknown,
 	TextureFilter_Nearest,
 	TextureFilter_Linear,
 	TextureFilter_MipMap,
