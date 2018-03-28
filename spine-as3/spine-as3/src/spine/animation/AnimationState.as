@@ -478,9 +478,9 @@ package spine.animation {
 						if (last.loop)
 						    delay += duration * (1 + (int)(last.trackTime / duration));
 						else
-						    delay += duration;						
+						    delay += Math.max(duration, last.trackTime);						
 					} else
-						delay = 0;
+						delay = last.trackTime;
 				}
 			}
 

@@ -52,7 +52,7 @@ package spine.examples {
 			up = skeleton.state.setAnimationByName(4, "up", true);
 			down = skeleton.state.setAnimationByName(5, "down", true);
 			
-			left.alpha = right.alpha = up.alpha = down.alpha = 0;
+			left.alpha = right.alpha = up.alpha = down.alpha = 0;			
 			left.mixBlend = right.mixBlend = up.mixBlend = down.mixBlend = MixBlend.add;
 			
 			skeleton.state.timeScale = 0.5;
