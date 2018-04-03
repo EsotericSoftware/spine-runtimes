@@ -172,8 +172,11 @@ module spine {
 						let pose = timelineData[ii] >= AnimationState.FIRST ? MixPose.setup : currentPose;
 						if (timeline instanceof RotateTimeline) {
 							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, pose, timelinesRotation, ii << 1, firstFrame);
-						} else
+						} else {
+							// This fixes the iOS 10 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
+							Utils.uselessFunction(mix, pose);
 							timeline.apply(skeleton, animationLast, animationTime, events, mix, pose, MixDirection.in);
+						}
 					}
 				}
 				this.queueEvents(current, animationTime);
@@ -242,6 +245,8 @@ module spine {
 				if (timeline instanceof RotateTimeline)
 					this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, pose, timelinesRotation, i << 1, firstFrame);
 				else {
+					// This fixes the iOS 10 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
+					Utils.uselessFunction(alpha, pose);
 					timeline.apply(skeleton, animationLast, animationTime, events, alpha, pose, MixDirection.out);
 				}
 			}

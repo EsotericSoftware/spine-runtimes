@@ -259,6 +259,11 @@ module spine {
 		static toSinglePrecision (value: number) {
 			return Utils.SUPPORTS_TYPED_ARRAYS ? Math.fround(value) : value;
 		}
+
+		// This function is used to fix iOS 10 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
+		static uselessFunction (alpha: number, pose: MixPose) {
+
+		}
 	}
 
 	export class DebugUtils {
