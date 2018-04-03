@@ -173,8 +173,8 @@ module spine {
 						if (timeline instanceof RotateTimeline) {
 							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, pose, timelinesRotation, ii << 1, firstFrame);
 						} else {
-							// This fixes the iOS 10 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
-							Utils.uselessFunction(mix, pose);
+							// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
+							Utils.webkit602BugfixHelper(mix, pose);
 							timeline.apply(skeleton, animationLast, animationTime, events, mix, pose, MixDirection.in);
 						}
 					}
@@ -245,8 +245,8 @@ module spine {
 				if (timeline instanceof RotateTimeline)
 					this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, pose, timelinesRotation, i << 1, firstFrame);
 				else {
-					// This fixes the iOS 10 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
-					Utils.uselessFunction(alpha, pose);
+					// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
+					Utils.webkit602BugfixHelper(alpha, pose);
 					timeline.apply(skeleton, animationLast, animationTime, events, alpha, pose, MixDirection.out);
 				}
 			}

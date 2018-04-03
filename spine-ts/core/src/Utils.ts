@@ -260,8 +260,8 @@ module spine {
 			return Utils.SUPPORTS_TYPED_ARRAYS ? Math.fround(value) : value;
 		}
 
-		// This function is used to fix iOS 10 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
-		static uselessFunction (alpha: number, pose: MixPose) {
+		// This function is used to fix WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
+		static webkit602BugfixHelper (alpha: number, pose: MixPose) {
 
 		}
 	}
