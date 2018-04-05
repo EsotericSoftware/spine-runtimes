@@ -445,17 +445,17 @@ namespace Spine {
 			// Fail loud when skeleton.data is null.
 			Spine.Animation animation = skeleton.data.FindAnimation(animationName);
 			if (animation == null) return;
-			animation.Apply(skeleton, 0, time, loop, null, 1f, MixPose.Setup, MixDirection.In);
+			animation.Apply(skeleton, 0, time, loop, null, 1f, MixBlend.Setup, MixDirection.In);
 		}
 
 		/// <summary>Pose a skeleton according to a given time in an animation.</summary>
 		public static void PoseSkeleton (this Animation animation, Skeleton skeleton, float time, bool loop = false) {
-			animation.Apply(skeleton, 0, time, loop, null, 1f, MixPose.Setup, MixDirection.In);
+			animation.Apply(skeleton, 0, time, loop, null, 1f, MixBlend.Setup, MixDirection.In);
 		}
 
 		/// <summary>Resets Skeleton parts to Setup Pose according to a Spine.Animation's keyed items.</summary>
 		public static void SetKeyedItemsToSetupPose (this Animation animation, Skeleton skeleton) {
-			animation.Apply(skeleton, 0, 0, false, null, 0, MixPose.Setup, MixDirection.Out);
+			animation.Apply(skeleton, 0, 0, false, null, 0, MixBlend.Setup, MixDirection.Out);
 		}
 
 
