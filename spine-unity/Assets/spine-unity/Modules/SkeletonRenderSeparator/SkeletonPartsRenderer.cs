@@ -117,6 +117,7 @@ namespace Spine.Unity.Modules {
 					meshRenderer.sharedMaterials = buffers.GetUpdatedSharedMaterialsArray();
 				}
 			}
+			meshGenerator.FillLateVertexData(mesh);
 
 			meshFilter.sharedMesh = mesh;
 			smartMesh.instructionUsed.Set(currentInstructions);

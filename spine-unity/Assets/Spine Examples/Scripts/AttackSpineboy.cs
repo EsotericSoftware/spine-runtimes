@@ -35,6 +35,7 @@ namespace Spine.Unity.Examples {
 	public class AttackSpineboy : MonoBehaviour {
 
 		public SkeletonAnimation spineboy;
+		public SkeletonAnimation attackerSpineboy;
 		public SpineGauge gauge;
 		public Text healthText;
 
@@ -47,6 +48,9 @@ namespace Spine.Unity.Examples {
 			if (Input.GetKeyDown(KeyCode.Space)) {
 				currentHealth -= 10;
 				healthText.text = currentHealth + "/" + maxHealth;
+
+				attackerSpineboy.AnimationState.SetAnimation(1, "shoot", false);
+				attackerSpineboy.AnimationState.AddEmptyAnimation(1, 0.5f, 2f);
 
 				if (currentHealth > 0) {
 					spineboy.AnimationState.SetAnimation(0, "hit", false);

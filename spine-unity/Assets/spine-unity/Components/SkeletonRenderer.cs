@@ -317,6 +317,7 @@ namespace Spine.Unity {
 				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedSharedMaterialsArray();
 			}
 
+			meshGenerator.FillLateVertexData(currentMesh);
 
 			// STEP 4. The UnityEngine.Mesh is ready. Set it as the MeshFilter's mesh. Store the instructions used for that mesh. ===========
 			meshFilter.sharedMesh = currentMesh;

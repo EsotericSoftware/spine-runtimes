@@ -374,7 +374,7 @@ namespace Spine.Unity.Editor {
 
 										EditorGUI.BeginChangeCheck();
 										c.Mix = EditorGUILayout.Slider("Mix", c.Mix, MixMin, MixMax);
-										c.BendDirection = EditorGUILayout.Toggle("Bend Direction +", c.BendDirection > 0) ? 1 : -1;
+										c.BendDirection = EditorGUILayout.Toggle(SpineInspectorUtility.TempContent("Bend Clockwise", tooltip: "IkConstraint.BendDirection == 1 if clockwise; -1 if counterclockwise."), c.BendDirection > 0) ? 1 : -1;
 										if (EditorGUI.EndChangeCheck())	requireRepaint = true;
 
 										EditorGUILayout.Space();

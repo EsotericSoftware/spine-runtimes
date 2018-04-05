@@ -172,8 +172,11 @@ module spine {
 						let timelineBlend = timelineData[ii] == AnimationState.SUBSEQUENT ? blend : MixBlend.setup;
 						if (timeline instanceof RotateTimeline) {
 							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
-						} else
+						} else {
+							// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
+							Utils.webkit602BugfixHelper(mix, pose);
 							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineBlend, MixDirection.in);
+						}
 					}
 				}
 				this.queueEvents(current, animationTime);
@@ -247,6 +250,8 @@ module spine {
 					if (timeline instanceof RotateTimeline)
 						this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
 					else {
+						// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
+						Utils.webkit602BugfixHelper(alpha, pose);
 						timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, MixDirection.out);
 					}
 				}
