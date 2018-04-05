@@ -261,7 +261,7 @@ module spine {
 		}
 
 		// This function is used to fix WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
-		static webkit602BugfixHelper (alpha: number, pose: MixPose) {
+		static webkit602BugfixHelper (alpha: number, blend: MixBlend) {
 
 		}
 	}

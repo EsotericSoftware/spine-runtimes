@@ -174,7 +174,7 @@ module spine {
 							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
 						} else {
 							// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
-							Utils.webkit602BugfixHelper(mix, pose);
+							Utils.webkit602BugfixHelper(mix, blend);
 							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineBlend, MixDirection.in);
 						}
 					}
@@ -251,7 +251,7 @@ module spine {
 						this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
 					else {
 						// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
-						Utils.webkit602BugfixHelper(alpha, pose);
+						Utils.webkit602BugfixHelper(alpha, blend);
 						timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, MixDirection.out);
 					}
 				}
