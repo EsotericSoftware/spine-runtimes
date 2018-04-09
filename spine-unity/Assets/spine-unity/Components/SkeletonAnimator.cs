@@ -201,12 +201,12 @@ namespace Spine.Unity {
 						// Always use Mix instead of Applying the first non-zero weighted clip.
 						for (int c = 0; c < clipInfoCount; c++) {
 							var info = clipInfo[c];	float weight = info.weight * layerWeight; if (weight == 0) continue;
-							animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, weight, MixPose.Current, MixDirection.In);
+							animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, weight, MixBlend.Replace, MixDirection.In);
 						}
 						if (hasNext) {
 							for (int c = 0; c < nextClipInfoCount; c++) {
 								var info = nextClipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-								animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime , info.clip.length,nextStateInfo.speed < 0), nextStateInfo.loop, null, weight, MixPose.Current, MixDirection.In);
+								animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime , info.clip.length,nextStateInfo.speed < 0), nextStateInfo.loop, null, weight, MixBlend.Replace, MixDirection.In);
 							}
 						}
 					} else { // case MixNext || SpineStyle
@@ -214,13 +214,13 @@ namespace Spine.Unity {
 						int c = 0;
 						for (; c < clipInfoCount; c++) {
 							var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-							animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, 1f, MixPose.Current, MixDirection.In);
+							animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, 1f, MixBlend.Replace, MixDirection.In);
 							break;
 						}
 						// Mix the rest
 						for (; c < clipInfoCount; c++) {
 							var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-							animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, weight, MixPose.Current, MixDirection.In);
+							animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, weight, MixBlend.Replace, MixDirection.In);
 						}
 
 						c = 0;
@@ -229,14 +229,14 @@ namespace Spine.Unity {
 							if (mode == MixMode.SpineStyle) {
 								for (; c < nextClipInfoCount; c++) {
 									var info = nextClipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-									animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime , info.clip.length,nextStateInfo.speed < 0), nextStateInfo.loop, null, 1f, MixPose.Current, MixDirection.In);
+									animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime , info.clip.length,nextStateInfo.speed < 0), nextStateInfo.loop, null, 1f, MixBlend.Replace, MixDirection.In);
 									break;
 								}
 							}
 							// Mix the rest
 							for (; c < nextClipInfoCount; c++) {
 								var info = nextClipInfo[c];	float weight = info.weight * layerWeight; if (weight == 0) continue;
-								animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime , info.clip.length,nextStateInfo.speed < 0), nextStateInfo.loop, null, weight, MixPose.Current, MixDirection.In);
+								animationTable[NameHashCode(info.clip)].Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime , info.clip.length,nextStateInfo.speed < 0), nextStateInfo.loop, null, weight, MixBlend.Replace, MixDirection.In);
 							}
 						}
 					}
