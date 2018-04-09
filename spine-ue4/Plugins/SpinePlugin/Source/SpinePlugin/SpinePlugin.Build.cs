@@ -8,7 +8,7 @@ namespace UnrealBuildTool.Rules
 		{
 			PublicIncludePaths.AddRange(new string[] { "SpinePlugin/Public", "SpinePlugin/Public/spine-c/include" });
             PrivateIncludePaths.AddRange(new string[] { "SpinePlugin/Private", "SpinePlugin/Public/spine-c/include" });
-            PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "RHI", "RenderCore", "ShaderCore", "ProceduralMeshComponent", "RuntimeMeshComponent" });
+            PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "RHI", "RenderCore", "ShaderCore", "RuntimeMeshComponent", "UMG", "Slate", "SlateCore" });
             OptimizeCode = CodeOptimization.Never;
 		}
 	}
