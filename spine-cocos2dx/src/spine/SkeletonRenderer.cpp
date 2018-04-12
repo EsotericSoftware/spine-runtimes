@@ -101,6 +101,9 @@ void SkeletonRenderer::initialize () {
 	setOpacityModifyRGB(true);
 
 	setupGLProgramState(false);
+	
+	spSkeleton_setToSetupPose(_skeleton);
+	spSkeleton_updateWorldTransform(_skeleton);
 }
 	
 void SkeletonRenderer::setupGLProgramState (bool twoColorTintEnabled) {
