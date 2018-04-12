@@ -929,10 +929,10 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		spSlotData* slotData = spSlotData_create(i, slotName, boneData);
 		FREE(slotName);
 		readColor(input, &slotData->color.r, &slotData->color.g, &slotData->color.b, &slotData->color.a);
+		a = readByte(input);
 		r = readByte(input);
 		g = readByte(input);
 		b = readByte(input);
-		a = readByte(input);
 		if (!(r == 0xff && g == 0xff && b == 0xff && a == 0xff)) {
 			slotData->darkColor = spColor_create();
 			spColor_setFromFloats(slotData->darkColor, r / 255.0f, g / 255.0f, b / 255.0f, 1);
