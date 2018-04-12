@@ -158,6 +158,10 @@ package spine.starling {
 				}
 				
 				a = slot.color.a * attachmentColor.a;
+				if (a == 0) {
+				   clipper.clipEndWithSlot(slot);
+				   continue;
+				}
 				rgb = Color.rgb(r * slot.color.r * attachmentColor.r, g * slot.color.g * attachmentColor.g, b * slot.color.b * attachmentColor.b);
 				if (slot.darkColor == null) dark = Color.rgb(0, 0, 0);
 				else dark = Color.rgb(slot.darkColor.r * 255, slot.darkColor.g * 255, slot.darkColor.b * 255);	
