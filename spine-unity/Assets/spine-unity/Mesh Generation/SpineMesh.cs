@@ -1018,8 +1018,10 @@ namespace Spine.Unity {
 				}
 
 				if (settings.tintBlack) {
-					mesh.uv2 = this.uv2.Items;
-					mesh.uv3 = this.uv3.Items;
+					if (uv2 != null) {
+						mesh.uv2 = this.uv2.Items;
+						mesh.uv3 = this.uv3.Items;
+					}	
 				}				
 			}
 		}
