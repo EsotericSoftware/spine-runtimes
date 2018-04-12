@@ -56,7 +56,6 @@ cp -f ../tank/export/tank.png ../../spine-cocos2d-objc/Resources/
 echo "spine-cocos2dx"
 rm -f ../../spine-cocos2dx/example/Resources/common/*
 
-cp -f ../coin/export/coin-pro.json ../../spine-cocos2dx/example/Resources/common/
 cp -f ../coin/export/coin-pro.skel ../../spine-cocos2dx/example/Resources/common/
 cp -f ../coin/export/coin.atlas ../../spine-cocos2dx/example/Resources/common/
 cp -f ../coin/export/coin.png ../../spine-cocos2dx/example/Resources/common/
@@ -73,7 +72,7 @@ cp -f ../spineboy/export/spineboy-ess.json ../../spine-cocos2dx/example/Resource
 cp -f ../spineboy/export/spineboy.atlas ../../spine-cocos2dx/example/Resources/common/
 cp -f ../spineboy/export/spineboy.png ../../spine-cocos2dx/example/Resources/common/
 
-cp -f ../tank/export/tank-pro.json ../../spine-cocos2dx/example/Resources/common/
+cp -f ../tank/export/tank-pro.skel ../../spine-cocos2dx/example/Resources/common/
 cp -f ../tank/export/tank.atlas ../../spine-cocos2dx/example/Resources/common/
 cp -f ../tank/export/tank.png ../../spine-cocos2dx/example/Resources/common/
 
