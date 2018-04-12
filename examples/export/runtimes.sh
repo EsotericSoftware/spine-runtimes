@@ -20,7 +20,6 @@ cp -r ../spineboy/export/*.skel ../../spine-libgdx/spine-libgdx-tests/assets/spi
 cp -r ../spineboy/export/*-pma.* ../../spine-libgdx/spine-libgdx-tests/assets/spineboy/
 
 rm -rf ../../spine-libgdx/spine-libgdx-tests/assets/coin/*
-mkdir ../../spine-libgdx/spine-libgdx-tests/assets/coin/
 cp -f ../coin/export/*.json ../../spine-libgdx/spine-libgdx-tests/assets/coin/
 cp -f ../coin/export/*.skel ../../spine-libgdx/spine-libgdx-tests/assets/coin/
 cp -f ../coin/export/*-pma.* ../../spine-libgdx/spine-libgdx-tests/assets/coin/
@@ -141,47 +140,89 @@ cp -f ../stretchyman/export/stretchyman-pro.json ../../spine-love/data
 cp -f ../stretchyman/export/stretchyman.atlas ../../spine-love/data
 cp -f ../stretchyman/export/stretchyman.png ../../spine-love/data
 
-echo "spine-sfml"
+echo "spine-sfml-c"
 rm -f ../../spine-sfml/data/*
-cp -f ../coin/export/coin-pro.json ../../spine-sfml/data/
-cp -f ../coin/export/coin-pro.skel ../../spine-sfml/data/
-cp -f ../coin/export/coin.atlas ../../spine-sfml/data/
-cp -f ../coin/export/coin.png ../../spine-sfml/data/
+cp -f ../coin/export/coin-pro.json ../../spine-sfml/c/data/
+cp -f ../coin/export/coin-pro.skel ../../spine-sfml/c/data/
+cp -f ../coin/export/coin.atlas ../../spine-sfml/c/data/
+cp -f ../coin/export/coin.png ../../spine-sfml/c/data/
 
-cp -f ../goblins/export/goblins-pro.json ../../spine-sfml/data/
-cp -f ../goblins/export/goblins-pro.skel ../../spine-sfml/data/
-cp -f ../goblins/export/goblins.atlas ../../spine-sfml/data/
-cp -f ../goblins/export/goblins.png ../../spine-sfml/data/
+cp -f ../goblins/export/goblins-pro.json ../../spine-sfml/c/data/
+cp -f ../goblins/export/goblins-pro.skel ../../spine-sfml/c/data/
+cp -f ../goblins/export/goblins.atlas ../../spine-sfml/c/data/
+cp -f ../goblins/export/goblins.png ../../spine-sfml/c/data/
 
-cp -f ../raptor/export/raptor-pro.json ../../spine-sfml/data/
-cp -f ../raptor/export/raptor-pro.skel ../../spine-sfml/data/
-cp -f ../raptor/export/raptor.atlas ../../spine-sfml/data/
-cp -f ../raptor/export/raptor.png ../../spine-sfml/data/
+cp -f ../raptor/export/raptor-pro.json ../../spine-sfml/c/data/
+cp -f ../raptor/export/raptor-pro.skel ../../spine-sfml/c/data/
+cp -f ../raptor/export/raptor.atlas ../../spine-sfml/c/data/
+cp -f ../raptor/export/raptor.png ../../spine-sfml/c/data/
 
-cp -f ../spineboy/export/spineboy-ess.json ../../spine-sfml/data/
-cp -f ../spineboy/export/spineboy-ess.skel ../../spine-sfml/data/
-cp -f ../spineboy/export/spineboy.atlas ../../spine-sfml/data/
-cp -f ../spineboy/export/spineboy.png ../../spine-sfml/data/
+cp -f ../spineboy/export/spineboy-ess.json ../../spine-sfml/c/data/
+cp -f ../spineboy/export/spineboy-ess.skel ../../spine-sfml/c/data/
+cp -f ../spineboy/export/spineboy.atlas ../../spine-sfml/c/data/
+cp -f ../spineboy/export/spineboy.png ../../spine-sfml/c/data/
 
-cp -f ../tank/export/tank-pro.json ../../spine-sfml/data/
-cp -f ../tank/export/tank-pro.skel ../../spine-sfml/data/
-cp -f ../tank/export/tank.atlas ../../spine-sfml/data/
-cp -f ../tank/export/tank.png ../../spine-sfml/data/
+cp -f ../tank/export/tank-pro.json ../../spine-sfml/c/data/
+cp -f ../tank/export/tank-pro.skel ../../spine-sfml/c/data/
+cp -f ../tank/export/tank.atlas ../../spine-sfml/c/data/
+cp -f ../tank/export/tank.png ../../spine-sfml/c/data/
 
-cp -f ../vine/export/vine-pro.json ../../spine-sfml/data/
-cp -f ../vine/export/vine-pro.skel ../../spine-sfml/data/
-cp -f ../vine/export/vine.atlas ../../spine-sfml/data/
-cp -f ../vine/export/vine.png ../../spine-sfml/data/
+cp -f ../vine/export/vine-pro.json ../../spine-sfml/c/data/
+cp -f ../vine/export/vine-pro.skel ../../spine-sfml/c/data/
+cp -f ../vine/export/vine.atlas ../../spine-sfml/c/data/
+cp -f ../vine/export/vine.png ../../spine-sfml/c/data/
 
-cp -f ../stretchyman/export/stretchyman-pro.json ../../spine-sfml/data/
-cp -f ../stretchyman/export/stretchyman-pro.skel ../../spine-sfml/data/
-cp -f ../stretchyman/export/stretchyman.atlas ../../spine-sfml/data/
-cp -f ../stretchyman/export/stretchyman.png ../../spine-sfml/data/
+cp -f ../stretchyman/export/stretchyman-pro.json ../../spine-sfml/c/data/
+cp -f ../stretchyman/export/stretchyman-pro.skel ../../spine-sfml/c/data/
+cp -f ../stretchyman/export/stretchyman.atlas ../../spine-sfml/c/data/
+cp -f ../stretchyman/export/stretchyman.png ../../spine-sfml/c/data/
 
-cp -f ../owl/export/owl-pro.json ../../spine-sfml/data/
-cp -f ../owl/export/owl-pro.skel ../../spine-sfml/data/
-cp -f ../owl/export/owl.atlas ../../spine-sfml/data/
-cp -f ../owl/export/owl.png ../../spine-sfml/data/
+cp -f ../owl/export/owl-pro.json ../../spine-sfml/c/data/
+cp -f ../owl/export/owl-pro.skel ../../spine-sfml/c/data/
+cp -f ../owl/export/owl.atlas ../../spine-sfml/c/data/
+cp -f ../owl/export/owl.png ../../spine-sfml/c/data/
+
+echo "spine-sfml-cpp"
+rm -f ../../spine-sfml/cpp/data/*
+cp -f ../coin/export/coin-pro.json ../../spine-sfml/cpp/data/
+cp -f ../coin/export/coin-pro.skel ../../spine-sfml/cpp/data/
+cp -f ../coin/export/coin.atlas ../../spine-sfml/cpp/data/
+cp -f ../coin/export/coin.png ../../spine-sfml/cpp/data/
+
+cp -f ../goblins/export/goblins-pro.json ../../spine-sfml/cpp/data/
+cp -f ../goblins/export/goblins-pro.skel ../../spine-sfml/cpp/data/
+cp -f ../goblins/export/goblins.atlas ../../spine-sfml/cpp/data/
+cp -f ../goblins/export/goblins.png ../../spine-sfml/cpp/data/
+
+cp -f ../raptor/export/raptor-pro.json ../../spine-sfml/cpp/data/
+cp -f ../raptor/export/raptor-pro.skel ../../spine-sfml/cpp/data/
+cp -f ../raptor/export/raptor.atlas ../../spine-sfml/cpp/data/
+cp -f ../raptor/export/raptor.png ../../spine-sfml/cpp/data/
+
+cp -f ../spineboy/export/spineboy-ess.json ../../spine-sfml/cpp/data/
+cp -f ../spineboy/export/spineboy-ess.skel ../../spine-sfml/cpp/data/
+cp -f ../spineboy/export/spineboy.atlas ../../spine-sfml/cpp/data/
+cp -f ../spineboy/export/spineboy.png ../../spine-sfml/cpp/data/
+
+cp -f ../tank/export/tank-pro.json ../../spine-sfml/cpp/data/
+cp -f ../tank/export/tank-pro.skel ../../spine-sfml/cpp/data/
+cp -f ../tank/export/tank.atlas ../../spine-sfml/cpp/data/
+cp -f ../tank/export/tank.png ../../spine-sfml/cpp/data/
+
+cp -f ../vine/export/vine-pro.json ../../spine-sfml/cpp/data/
+cp -f ../vine/export/vine-pro.skel ../../spine-sfml/cpp/data/
+cp -f ../vine/export/vine.atlas ../../spine-sfml/cpp/data/
+cp -f ../vine/export/vine.png ../../spine-sfml/cpp/data/
+
+cp -f ../stretchyman/export/stretchyman-pro.json ../../spine-sfml/cpp/data/
+cp -f ../stretchyman/export/stretchyman-pro.skel ../../spine-sfml/cpp/data/
+cp -f ../stretchyman/export/stretchyman.atlas ../../spine-sfml/cpp/data/
+cp -f ../stretchyman/export/stretchyman.png ../../spine-sfml/cpp/data/
+
+cp -f ../owl/export/owl-pro.json ../../spine-sfml/cpp/data/
+cp -f ../owl/export/owl-pro.skel ../../spine-sfml/cpp/data/
+cp -f ../owl/export/owl.atlas ../../spine-sfml/cpp/data/
+cp -f ../owl/export/owl.png ../../spine-sfml/cpp/data/
 
 echo "spine-starling"
 # DO NOT DELETE EVERYTHING IN SOURCE, ESPECIALLY goblins-mesh-starling.png/.xml
