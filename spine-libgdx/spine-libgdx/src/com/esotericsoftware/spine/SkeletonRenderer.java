@@ -30,6 +30,14 @@
 
 package com.esotericsoftware.spine;
 
+import com.esotericsoftware.spine.attachments.Attachment;
+import com.esotericsoftware.spine.attachments.ClippingAttachment;
+import com.esotericsoftware.spine.attachments.MeshAttachment;
+import com.esotericsoftware.spine.attachments.RegionAttachment;
+import com.esotericsoftware.spine.attachments.SkeletonAttachment;
+import com.esotericsoftware.spine.utils.SkeletonClipping;
+import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -39,13 +47,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.ShortArray;
-import com.esotericsoftware.spine.attachments.Attachment;
-import com.esotericsoftware.spine.attachments.ClippingAttachment;
-import com.esotericsoftware.spine.attachments.MeshAttachment;
-import com.esotericsoftware.spine.attachments.RegionAttachment;
-import com.esotericsoftware.spine.attachments.SkeletonAttachment;
-import com.esotericsoftware.spine.utils.SkeletonClipping;
-import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
 public class SkeletonRenderer {
 	static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
@@ -61,6 +62,13 @@ public class SkeletonRenderer {
 	private final Color temp5 = new Color();
 	private final Color temp6 = new Color();
 
+	/** Renders the specified skeleton. If the batch is a PolygonSpriteBatch, {@link #draw(PolygonSpriteBatch, Skeleton)} is
+	 * called. If the batch is a TwoColorPolygonBatch, {@link #draw(TwoColorPolygonBatch, Skeleton)} is called. Otherwise the
+	 * skeleton is rendered without two color tinting and any mesh attachments will throw an exception.
+	 * <p>
+	 * This method may change the batch's {@link Batch#setBlendFunctionSeparate(int, int, int, int) blending function}. The
+	 * previous blend function is not restore, since that could result in unnecessary flushes, depending on what is rendered
+	 * next. */
 	public void draw (Batch batch, Skeleton skeleton) {
 		if (batch instanceof PolygonSpriteBatch) {
 			draw((PolygonSpriteBatch)batch, skeleton);
@@ -133,6 +141,11 @@ public class SkeletonRenderer {
 		if (vertexEffect != null) vertexEffect.end();
 	}
 
+	/** Renders the specified skeleton, including meshes, but without two color tinting.
+	 * <p>
+	 * This method may change the batch's {@link Batch#setBlendFunctionSeparate(int, int, int, int) blending function}. The
+	 * previous blend function is not restore, since that could result in unnecessary flushes, depending on what is rendered
+	 * next. */
 	@SuppressWarnings("null")
 	public void draw (PolygonSpriteBatch batch, Skeleton skeleton) {
 		Vector2 tempPos = this.temp;
@@ -250,6 +263,11 @@ public class SkeletonRenderer {
 		if (vertexEffect != null) vertexEffect.end();
 	}
 
+	/** Renders the specified skeleton, including meshes and two color tinting.
+	 * <p>
+	 * This method may change the batch's {@link Batch#setBlendFunctionSeparate(int, int, int, int) blending function}. The
+	 * previous blend function is not restore, since that could result in unnecessary flushes, depending on what is rendered
+	 * next. */
 	@SuppressWarnings("null")
 	public void draw (TwoColorPolygonBatch batch, Skeleton skeleton) {
 		Vector2 tempPos = this.temp;
