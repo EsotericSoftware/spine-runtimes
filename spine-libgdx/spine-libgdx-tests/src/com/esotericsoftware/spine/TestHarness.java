@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Interpolation;
-import com.esotericsoftware.spine.vertexeffects.JitterEffect;
 import com.esotericsoftware.spine.vertexeffects.SwirlEffect;
 
 public class TestHarness extends ApplicationAdapter {
