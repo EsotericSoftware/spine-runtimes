@@ -30,11 +30,12 @@
 
 package com.esotericsoftware.spine.utils;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable;
 import com.esotericsoftware.spine.AnimationState;
 import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.SkeletonRenderer;
+
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable;
 
 /** A scene2d drawable that draws a skeleton. The animation state and skeleton must be updated each frame, or
  * {@link #update(float)} called each frame. */
@@ -42,6 +43,7 @@ public class SkeletonDrawable extends BaseDrawable {
 	private SkeletonRenderer renderer;
 	private Skeleton skeleton;
 	AnimationState state;
+	private boolean resetBlendFunction = true;
 
 	/** Creates an uninitialized SkeletonDrawable. The renderer, skeleton, and animation state must be set before use. */
 	public SkeletonDrawable () {
@@ -59,9 +61,14 @@ public class SkeletonDrawable extends BaseDrawable {
 	}
 
 	public void draw (Batch batch, float x, float y, float width, float height) {
+		int blendSrc = batch.getBlendSrcFunc(), blendDst = batch.getBlendDstFunc();
+		int blendSrcAlpha = batch.getBlendSrcFuncAlpha(), blendDstAlpha = batch.getBlendDstFuncAlpha();
+
 		skeleton.setPosition(x, y);
 		skeleton.updateWorldTransform();
 		renderer.draw(batch, skeleton);
+
+		if (resetBlendFunction) batch.setBlendFunctionSeparate(blendSrc, blendDst, blendSrcAlpha, blendDstAlpha);
 	}
 
 	public SkeletonRenderer getRenderer () {
@@ -86,5 +93,15 @@ public class SkeletonDrawable extends BaseDrawable {
 
 	public void setAnimationState (AnimationState state) {
 		this.state = state;
+	}
+
+	public boolean getResetBlendFunction () {
+		return resetBlendFunction;
+	}
+
+	/** If false, the blend function will be left as whatever {@link SkeletonRenderer#draw(Batch, Skeleton)} set. This can reduce
+	 * batch flushes in some cases, but means other rendering may need to first set the blend function. Default is true. */
+	public void setResetBlendFunction (boolean resetBlendFunction) {
+		this.resetBlendFunction = resetBlendFunction;
 	}
 }
