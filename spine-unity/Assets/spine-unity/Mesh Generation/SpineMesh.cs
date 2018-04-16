@@ -41,7 +41,7 @@ namespace Spine.Unity {
 		internal const HideFlags MeshHideflags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
 
 		/// <summary>Factory method for creating a new mesh for use in Spine components. This can be called in field initializers.</summary>
-		public static Mesh NewMesh () {
+		public static Mesh NewSkeletonMesh () {
 			var m = new Mesh();
 			m.MarkDynamic();
 			m.name = "Skeleton Mesh";
@@ -108,7 +108,6 @@ namespace Spine.Unity {
 
 		[System.Serializable]
 		public struct Settings {
-			//public bool renderMeshes;
 			public bool useClipping;
 			[Space]
 			[Range(-0.1f, 0f)] public float zSpacing;
@@ -969,8 +968,8 @@ namespace Spine.Unity {
 			var vbi = vertexBuffer.Items;
 			var ubi = uvBuffer.Items;
 			var cbi = colorBuffer.Items;
-			var sbi = submeshes.Items;
-			int submeshCount = submeshes.Count;
+			//var sbi = submeshes.Items;
+			//int submeshCount = submeshes.Count;
 
 			// Zero the extra.
 			{
@@ -1224,7 +1223,7 @@ namespace Spine.Unity {
 
 		///<summary>This is a Mesh that also stores the instructions SkeletonRenderer generated for it.</summary>
 		public class SmartMesh : IDisposable {
-			public Mesh mesh = SpineMesh.NewMesh();
+			public Mesh mesh = SpineMesh.NewSkeletonMesh();
 			public SkeletonRendererInstruction instructionUsed = new SkeletonRendererInstruction();		
 
 			public void Dispose () {
