@@ -28,10 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-// Contributed by: Mitch Thompson and John Dy
-
 using UnityEngine;
-using Spine;
 
 namespace Spine.Unity {
 	public static class SkeletonExtensions {

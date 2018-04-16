@@ -102,11 +102,11 @@ namespace Spine.Unity.Editor {
 					int propertyPathLength = propertyPath.Length;
 
 					int dotCount = 0;
-					const int siblingOfListDotCount = 3;
+					const int SiblingOfListDotCount = 3;
 					for (int i = 1; i < propertyPathLength; i++) {
 						if (propertyPath[propertyPathLength - i] == '.') {
 							dotCount++;
-							if (dotCount >= siblingOfListDotCount) {
+							if (dotCount >= SiblingOfListDotCount) {
 								localPathLength = i - 1;
 								break;
 							}
@@ -157,7 +157,7 @@ namespace Spine.Unity.Editor {
 				get {
 					if (boxScopeStyle == null) {
 						boxScopeStyle = new GUIStyle(EditorStyles.helpBox);
-						var p = boxScopeStyle.padding;
+						RectOffset p = boxScopeStyle.padding; // RectOffset is a class
 						p.right += 6;
 						p.top += 1;
 						p.left += 3;
