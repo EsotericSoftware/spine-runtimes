@@ -53,7 +53,8 @@ static void * SpineRealloc( void* ptr, size_t size ) {
 }
 
 void FSpinePlugin::StartupModule() {
-#if !UE_EDITOR
+	// Needed for consoles, see https://github.com/EsotericSoftware/spine-runtimes/pull/1089
+#if !UE_EDITOR && !PLATFORM_WINDOWS && !PLATFORM_MAC && !PLATFORM_LINUX && !PLATFORM_IOS && !PLATFORM_ANDROID && !PLATFORM_HTML5
     _spSetMalloc( &SpineMalloc );
     _spSetRealloc( &SpineRealloc );
     _spSetFree( FMemory::Free );
