@@ -543,7 +543,7 @@ namespace Spine.Unity.Editor {
 			Vector3[] verts = ExtractVerts(floatVerts);
 
 			int[] triangles = attachment.Triangles;
-			Color color = new Color(attachment.R, attachment.G, attachment.B, attachment.A);
+			Color color = attachment.GetColor();
 
 			if (mesh == null)
 				mesh = new Mesh();
@@ -596,7 +596,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		internal static Mesh ExtractWeightedMeshAttachment (string name, MeshAttachment attachment, int slotIndex, SkeletonData skeletonData, List<Transform> boneList, Mesh mesh = null) {
-			if (attachment.Bones == null)
+			if (!attachment.IsWeighted())
 				throw new System.ArgumentException("Mesh is not weighted.", "attachment");
 
 			Skeleton skeleton = new Skeleton(skeletonData);

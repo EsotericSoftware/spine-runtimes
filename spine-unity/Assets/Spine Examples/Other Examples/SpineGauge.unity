@@ -395,7 +395,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fillPercent: 1
-  fillAnimationName: Fill
+  fillAnimation: {fileID: 11400000, guid: 416feb17a0d192844abb17619bf81153, type: 2}
 --- !u!114 &795271515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -520,6 +520,10 @@ MonoBehaviour:
   attackerSpineboy: {fileID: 282891644}
   gauge: {fileID: 795271514}
   healthText: {fileID: 1847717249}
+  shoot: {fileID: 11400000, guid: 6d4c548ed1818024bb6ed2ee16dbfc40, type: 2}
+  hit: {fileID: 11400000, guid: 83e1b716474ea9141983c4d570adf4f9, type: 2}
+  idle: {fileID: 11400000, guid: 8a71ad90c9e356d4fa476a420aeb259d, type: 2}
+  death: {fileID: 11400000, guid: 790b48b79d40d4e4c995da2991932ade, type: 2}
   onAttack:
     m_PersistentCalls:
       m_Calls:

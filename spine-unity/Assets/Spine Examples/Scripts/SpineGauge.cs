@@ -39,13 +39,10 @@ namespace Spine.Unity.Examples {
 		#region Inspector
 		[Range(0,1)]
 		public float fillPercent = 0;
-
-		[SpineAnimation]
-		public string fillAnimationName;
+		public AnimationReferenceAsset fillAnimation;
 		#endregion
 
 		SkeletonRenderer skeletonRenderer;
-		Spine.Animation fillAnimation;
 
 		void Awake () {
 			skeletonRenderer = GetComponent<SkeletonRenderer>();
@@ -59,13 +56,7 @@ namespace Spine.Unity.Examples {
 			if (skeletonRenderer == null) return;
 			var skeleton = skeletonRenderer.skeleton; if (skeleton == null) return;
 
-			// Make super-sure that fillAnimation isn't null.
-			if (fillAnimation == null) {
-				fillAnimation = skeleton.Data.FindAnimation(fillAnimationName);
-				if (fillAnimation == null) return;
-			}
-
-			fillAnimation.Apply(skeleton, 0, percent, false, null, 1f, MixPose.Setup, MixDirection.In);
+			fillAnimation.Animation.Apply(skeleton, 0, percent, false, null, 1f, MixPose.Setup, MixDirection.In);
 
 			skeleton.Update(Time.deltaTime);
 			skeleton.UpdateWorldTransform();

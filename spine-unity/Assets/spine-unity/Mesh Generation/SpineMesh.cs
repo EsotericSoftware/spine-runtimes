@@ -41,7 +41,7 @@ namespace Spine.Unity {
 		internal const HideFlags MeshHideflags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
 
 		/// <summary>Factory method for creating a new mesh for use in Spine components. This can be called in field initializers.</summary>
-		public static Mesh NewMesh () {
+		public static Mesh NewSkeletonMesh () {
 			var m = new Mesh();
 			m.MarkDynamic();
 			m.name = "Skeleton Mesh";
@@ -108,7 +108,6 @@ namespace Spine.Unity {
 
 		[System.Serializable]
 		public struct Settings {
-			//public bool renderMeshes;
 			public bool useClipping;
 			[Space]
 			[Range(-0.1f, 0f)] public float zSpacing;
@@ -969,6 +968,11 @@ namespace Spine.Unity {
 			var vbi = vertexBuffer.Items;
 			var ubi = uvBuffer.Items;
 			var cbi = colorBuffer.Items;
+<<<<<<< HEAD
+=======
+			//var sbi = submeshes.Items;
+			//int submeshCount = submeshes.Count;
+>>>>>>> 3.6
 
 			// Zero the extra.
 			{
@@ -1158,6 +1162,123 @@ namespace Spine.Unity {
 			}
 		}
 		#endregion
+
+		#region AttachmentRendering
+		static List<Vector3> AttachmentVerts = new List<Vector3>();
+		static List<Vector2> AttachmentUVs = new List<Vector2>();
+		static List<Color32> AttachmentColors32 = new List<Color32>();
+		static List<int> AttachmentIndices = new List<int>();
+
+		/// <summary>
+		/// Fills mesh vertex data to render a RegionAttachment.</summary>
+		public static void FillMeshLocal (Mesh mesh, RegionAttachment regionAttachment) {
+			if (mesh == null) return;
+			if (regionAttachment == null) return;
+
+			AttachmentVerts.Clear();
+			var offsets = regionAttachment.Offset;
+			AttachmentVerts.Add(new Vector3(offsets[RegionAttachment.BLX], offsets[RegionAttachment.BLY]));
+			AttachmentVerts.Add(new Vector3(offsets[RegionAttachment.ULX], offsets[RegionAttachment.ULY]));
+			AttachmentVerts.Add(new Vector3(offsets[RegionAttachment.URX], offsets[RegionAttachment.URY]));
+			AttachmentVerts.Add(new Vector3(offsets[RegionAttachment.BRX], offsets[RegionAttachment.BRY]));
+
+			AttachmentUVs.Clear();
+			var uvs = regionAttachment.UVs;
+			AttachmentUVs.Add(new Vector2(uvs[RegionAttachment.ULX], uvs[RegionAttachment.ULY]));
+			AttachmentUVs.Add(new Vector2(uvs[RegionAttachment.URX], uvs[RegionAttachment.URY]));
+			AttachmentUVs.Add(new Vector2(uvs[RegionAttachment.BRX], uvs[RegionAttachment.BRY]));
+			AttachmentUVs.Add(new Vector2(uvs[RegionAttachment.BLX], uvs[RegionAttachment.BLY]));
+
+			AttachmentColors32.Clear();
+			Color32 c = (Color32)(new Color(regionAttachment.r, regionAttachment.g, regionAttachment.b, regionAttachment.a));
+			for (int i = 0; i < 4; i++)
+				AttachmentColors32.Add(c);
+
+			AttachmentIndices.Clear();
+			AttachmentIndices.AddRange(new[] { 0, 2, 1, 0, 3, 2 });
+
+			mesh.Clear();
+			mesh.name = regionAttachment.Name;
+			mesh.SetVertices(AttachmentVerts);
+			mesh.SetUVs(0, AttachmentUVs);
+			mesh.SetColors(AttachmentColors32);
+			mesh.SetTriangles(AttachmentIndices, 0);
+			mesh.RecalculateBounds();
+
+			AttachmentVerts.Clear();
+			AttachmentUVs.Clear();
+			AttachmentColors32.Clear();
+			AttachmentIndices.Clear();
+		}
+
+		public static void FillMeshLocal (Mesh mesh, MeshAttachment meshAttachment, SkeletonData skeletonData) {
+			if (mesh == null) return;
+			if (meshAttachment == null) return;
+			int vertexCount = meshAttachment.WorldVerticesLength / 2;
+
+			AttachmentVerts.Clear();
+			if (meshAttachment.IsWeighted()) {
+				int count = meshAttachment.WorldVerticesLength;
+				int[] meshAttachmentBones = meshAttachment.bones;
+				int v = 0;
+
+				float[] vertices = meshAttachment.vertices;
+				for (int w = 0, b = 0; w < count; w += 2) {
+					float wx = 0, wy = 0;
+					int n = meshAttachmentBones[v++];
+					n += v;
+					for (; v < n; v++, b += 3) {
+						BoneMatrix bm = BoneMatrix.CalculateSetupWorld(skeletonData.bones.Items[meshAttachmentBones[v]]);
+						float vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
+						wx += (vx * bm.a + vy * bm.b + bm.x) * weight;
+						wy += (vx * bm.c + vy * bm.d + bm.y) * weight;
+					}
+					AttachmentVerts.Add(new Vector3(wx, wy));
+				}
+			} else {
+				var localVerts = meshAttachment.Vertices;
+				Vector3 pos = default(Vector3);
+				for (int i = 0; i < vertexCount; i++) {
+					int ii = i * 2;
+					pos.x = localVerts[ii];
+					pos.y = localVerts[ii + 1];
+					AttachmentVerts.Add(pos);
+				}
+			}
+
+			var uvs = meshAttachment.uvs;
+			Vector2 uv = default(Vector2);
+			Color32 c = (Color32)(new Color(meshAttachment.r, meshAttachment.g, meshAttachment.b, meshAttachment.a));
+			AttachmentUVs.Clear();
+			AttachmentColors32.Clear();
+			for (int i = 0; i < vertexCount; i++) {
+				int ii = i * 2;
+				uv.x = uvs[ii];
+				uv.y = uvs[ii + 1];
+				AttachmentUVs.Add(uv);
+
+				AttachmentColors32.Add(c);
+			}
+
+			AttachmentIndices.Clear();
+			AttachmentIndices.AddRange(meshAttachment.triangles);
+
+			mesh.Clear();
+			mesh.name = meshAttachment.Name;
+			mesh.SetVertices(AttachmentVerts);
+			mesh.SetUVs(0, AttachmentUVs);
+			mesh.SetColors(AttachmentColors32);
+			mesh.SetTriangles(AttachmentIndices, 0);
+			mesh.RecalculateBounds();
+
+			AttachmentVerts.Clear();
+			AttachmentUVs.Clear();
+			AttachmentColors32.Clear();
+			AttachmentIndices.Clear();
+		}
+
+		
+		#endregion
 	}
 
 	public class MeshRendererBuffers : IDisposable {
@@ -1222,7 +1343,7 @@ namespace Spine.Unity {
 
 		///<summary>This is a Mesh that also stores the instructions SkeletonRenderer generated for it.</summary>
 		public class SmartMesh : IDisposable {
-			public Mesh mesh = SpineMesh.NewMesh();
+			public Mesh mesh = SpineMesh.NewSkeletonMesh();
 			public SkeletonRendererInstruction instructionUsed = new SkeletonRendererInstruction();		
 
 			public void Dispose () {

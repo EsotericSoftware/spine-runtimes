@@ -44,17 +44,24 @@ namespace Spine.Unity.Editor {
 			EditorGUIUtility.wideMode = true;
 			EditorGUILayout.LabelField("Spine Skeleton Prefab Baking", EditorStyles.boldLabel);
 
-			const string BakingWarningMessage = "\nThe main use of Baking is to export Spine projects to be used without the Spine Runtime (ie: for sale on the Asset Store, or background objects that are animated only with a wind noise generator)" +
+			const string BakingWarningMessage = "\nSkeleton baking is not the primary use case for Spine skeletons." +
+				"\nUse baking if you have specialized uses, such as simplified skeletons with movement driven by physics." +
 
-				"\n\nBaking does not support the following:" +
-				"\n\tDisabled transform inheritance" +
-				"\n\tShear" +
+				"\n\nBaked Skeletons do not support the following:" +
+				"\n\tDisabled rotation or scale inheritance" +
+				"\n\tLocal Shear" +
+				"\n\tAll Constraint types" +
+				"\n\tWeighted mesh verts with more than 4 bound bones" +
+			
+				"\n\nBaked Animations do not support the following:" +
+				"\n\tMesh Deform Keys" +
 				"\n\tColor Keys" +
 				"\n\tDraw Order Keys" +
-				"\n\tAll Constraint types" +
 
-				"\n\nCurves are sampled at 60fps and are not realtime." +
-				"\nPlease read SkeletonBaker.cs comments for full details.\n";
+				"\n\nAnimation Curves are sampled at 60fps and are not realtime." +
+				"\nConstraint animations are also baked into animation curves." +
+				"\nSee SkeletonBaker.cs comments for full details.\n";
+
 			EditorGUILayout.HelpBox(BakingWarningMessage, MessageType.Info, true);
 
 			EditorGUI.BeginChangeCheck();
@@ -69,52 +76,69 @@ namespace Spine.Unity.Editor {
 			if (skeletonDataAsset == null) return;
 			var skeletonData = skeletonDataAsset.GetSkeletonData(false);
 			if (skeletonData == null) return;
+			bool hasExtraSkins = skeletonData.Skins.Count > 1;
 
 			using (new SpineInspectorUtility.BoxScope(false)) {
 				EditorGUILayout.LabelField(skeletonDataAsset.name, EditorStyles.boldLabel);
 				using (new SpineInspectorUtility.IndentScope()) {
 					EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Bones: " + skeletonData.Bones.Count, Icons.bone));
+					EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Slots: " + skeletonData.Slots.Count, Icons.slotRoot));
+
+					if (hasExtraSkins) {
+						EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Skins: " + skeletonData.Skins.Count, Icons.skinsRoot));
+						EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Current skin attachments: " + (bakeSkin == null ? 0 : bakeSkin.Attachments.Count), Icons.skinPlaceholder));
+					} else if (skeletonData.Skins.Count == 1) {
+						EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Skins: 1 (only default Skin)", Icons.skinsRoot));
+					}
 
 					int totalAttachments = 0;
-					foreach (var s in skeletonData.Skins) totalAttachments += s.Attachments.Count;
-
+					foreach (var s in skeletonData.Skins)
+						totalAttachments += s.Attachments.Count;
 					EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Total Attachments: " + totalAttachments, Icons.genericAttachment));
-					EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Current skin attachments: " + (bakeSkin == null ? 0 : bakeSkin.Attachments.Count), Icons.skinPlaceholder));
-					EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Animations: " + skeletonData.Animations.Count, Icons.animation));
 				}
 			}
 			using (new SpineInspectorUtility.BoxScope(false)) {
-				EditorGUILayout.LabelField("Settings", EditorStyles.boldLabel);
+				EditorGUILayout.LabelField("Animations", EditorStyles.boldLabel);
+				EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Animations: " + skeletonData.Animations.Count, Icons.animation));
+
 				using (new SpineInspectorUtility.IndentScope()) {
 					bakeAnimations = EditorGUILayout.Toggle(SpineInspectorUtility.TempContent("Bake Animations", Icons.animationRoot), bakeAnimations);
-					bakeIK = EditorGUILayout.Toggle(SpineInspectorUtility.TempContent("Bake IK", Icons.constraintIK), bakeIK);
-					bakeEventOptions = (SendMessageOptions)EditorGUILayout.EnumPopup(SpineInspectorUtility.TempContent("Event Options", Icons.userEvent), bakeEventOptions);
+					using (new EditorGUI.DisabledScope(!bakeAnimations)) {
+						using (new SpineInspectorUtility.IndentScope()) {
+							bakeIK = EditorGUILayout.Toggle(SpineInspectorUtility.TempContent("Bake IK", Icons.constraintIK), bakeIK);
+							bakeEventOptions = (SendMessageOptions)EditorGUILayout.EnumPopup(SpineInspectorUtility.TempContent("Event Options", Icons.userEvent), bakeEventOptions);
+						}
+					}
 				}
 			}
 			EditorGUILayout.Space();
-
-			EditorGUI.BeginChangeCheck();
-			EditorGUILayout.PropertyField(so.FindProperty("skinToBake"));
-			if (EditorGUI.EndChangeCheck()) {
-				so.ApplyModifiedProperties();
-				Repaint();
-			}
-
+			
 			if (!string.IsNullOrEmpty(skinToBake) && UnityEngine.Event.current.type == EventType.Repaint)
 				bakeSkin = skeletonData.FindSkin(skinToBake) ?? skeletonData.DefaultSkin;
 			
 			var prefabIcon = EditorGUIUtility.FindTexture("PrefabModel Icon");
 
-			if (SpineInspectorUtility.LargeCenteredButton(SpineInspectorUtility.TempContent(string.Format("Bake Skin ({0})", (bakeSkin == null ? "default" : bakeSkin.Name)), prefabIcon))) {
-				SkeletonBaker.BakeToPrefab(skeletonDataAsset, new ExposedList<Skin>(new [] { bakeSkin }), "", bakeAnimations, bakeIK, bakeEventOptions);
-			}
+			if (hasExtraSkins) {
+				EditorGUI.BeginChangeCheck();
+				EditorGUILayout.PropertyField(so.FindProperty("skinToBake"));
+				if (EditorGUI.EndChangeCheck()) {
+					so.ApplyModifiedProperties();
+					Repaint();
+				}
 
+				if (SpineInspectorUtility.LargeCenteredButton(SpineInspectorUtility.TempContent(string.Format("Bake Skeleton with Skin ({0})", (bakeSkin == null ? "default" : bakeSkin.Name)), prefabIcon))) {
+					SkeletonBaker.BakeToPrefab(skeletonDataAsset, new ExposedList<Skin>(new[] { bakeSkin }), "", bakeAnimations, bakeIK, bakeEventOptions);
+				}
 
-			if (skeletonData.Skins.Count > 1) {
 				if (SpineInspectorUtility.LargeCenteredButton(SpineInspectorUtility.TempContent(string.Format("Bake All ({0} skins)", skeletonData.Skins.Count), prefabIcon))) {
 					SkeletonBaker.BakeToPrefab(skeletonDataAsset, skeletonData.Skins, "", bakeAnimations, bakeIK, bakeEventOptions);
 				}
-			}
+			} else {
+				if (SpineInspectorUtility.LargeCenteredButton(SpineInspectorUtility.TempContent("Bake Skeleton", prefabIcon))) {
+					SkeletonBaker.BakeToPrefab(skeletonDataAsset, new ExposedList<Skin>(new[] { bakeSkin }), "", bakeAnimations, bakeIK, bakeEventOptions);
+				}
+				
+			}			
 
 		}
 	}
