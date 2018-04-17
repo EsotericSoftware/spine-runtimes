@@ -58,7 +58,6 @@ public class SkeletonActor extends Actor {
 	public void act (float delta) {
 		state.update(delta);
 		state.apply(skeleton);
-		skeleton.updateWorldTransform();
 		super.act(delta);
 	}
 
@@ -71,6 +70,7 @@ public class SkeletonActor extends Actor {
 		skeleton.getColor().a *= parentAlpha;
 
 		skeleton.setPosition(getX(), getY());
+		skeleton.updateWorldTransform();
 		renderer.draw(batch, skeleton);
 
 		if (resetBlendFunction) batch.setBlendFunctionSeparate(blendSrc, blendDst, blendSrcAlpha, blendDstAlpha);
