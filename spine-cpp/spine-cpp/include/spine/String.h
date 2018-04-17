@@ -100,11 +100,16 @@ public:
 
 		if (!chars) {
 			_length = 0;
-			_buffer = 0;
+			_buffer = NULL;
 		} else {
 			_length = strlen(chars);
 			_buffer = (char *) chars;
 		}
+	}
+
+	void unown() {
+		_length = 0;
+		_buffer = NULL;
 	}
 
 	String &operator=(const String &other) {

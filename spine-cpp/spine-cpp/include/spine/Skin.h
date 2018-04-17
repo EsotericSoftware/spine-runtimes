@@ -52,7 +52,10 @@ public:
 		int _slotIndex;
 		String _name;
 
-		explicit AttachmentKey(int slotIndex = 0, const String &name = "");
+		explicit AttachmentKey(int slotIndex = 0, const String &name = 0);
+
+		// Used in Skin::getAttachment to avoid allocation of temporary string
+		explicit AttachmentKey(int slotIndex, const char* name);
 
 		AttachmentKey(const AttachmentKey &other) {
 			this->_slotIndex = other._slotIndex;
@@ -60,6 +63,14 @@ public:
 		}
 
 		bool operator==(const AttachmentKey &other) const;
+
+		int getSlotIndex() {
+			return _slotIndex;
+		}
+
+		String& getName() {
+			return _name;
+		}
 	};
 
 	struct HashAttachmentKey : public SpineObject {

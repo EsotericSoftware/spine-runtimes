@@ -125,7 +125,7 @@ void PathConstraint::update() {
 		}
 	}
 
-	Vector<float> positions = computeWorldPositions(*attachment, spacesCount, tangents,
+	Vector<float>& positions = computeWorldPositions(*attachment, spacesCount, tangents,
 													data.getPositionMode() == PositionMode_Percent,
 													spacingMode == SpacingMode_Percent);
 	float boneX = positions[0];
@@ -254,7 +254,7 @@ PathConstraintData &PathConstraint::getData() {
 	return _data;
 }
 
-Vector<float>
+Vector<float>&
 PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, bool tangents, bool percentPosition,
 									  bool percentSpacing) {
 	Slot &target = *_target;

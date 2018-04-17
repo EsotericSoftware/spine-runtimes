@@ -676,7 +676,7 @@ void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleto
 	}
 
 	Bone *bone = skeleton._bones[rotateTimeline->_boneIndex];
-	Vector<float> frames = rotateTimeline->_frames;
+	Vector<float>& frames = rotateTimeline->_frames;
 	if (time < frames[0]) {
 		if (pose == MixPose_Setup) {
 			bone->_rotation = bone->_data._rotation;

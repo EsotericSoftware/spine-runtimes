@@ -39,6 +39,11 @@
 
 using namespace Spine;
 
+Skin::AttachmentKey::AttachmentKey(int slotIndex, const char* name) :
+		_slotIndex(slotIndex),
+		_name(name, true) {
+}
+
 Skin::AttachmentKey::AttachmentKey(int slotIndex, const String &name) :
 		_slotIndex(slotIndex),
 		_name(name) {
@@ -71,10 +76,13 @@ void Skin::addAttachment(int slotIndex, const String &name, Attachment *attachme
 }
 
 Attachment *Skin::getAttachment(int slotIndex, const String &name) {
-	AttachmentKey key(slotIndex, name);
+	AttachmentKey key(slotIndex, name.buffer());
 	if (_attachments.containsKey(key)) {
-		return _attachments[key];
+		Attachment *attachment = _attachments[key];
+		key.getName().unown();
+		return attachment;
 	} else {
+		key.getName().unown();
 		return NULL;
 	}
 }

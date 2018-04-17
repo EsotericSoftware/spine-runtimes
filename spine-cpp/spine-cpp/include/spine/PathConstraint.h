@@ -97,7 +97,7 @@ namespace Spine {
         Vector<float> _lengths;
         Vector<float> _segments;
         
-        Vector<float> computeWorldPositions(PathAttachment& path, int spacesCount, bool tangents, bool percentPosition, bool percentSpacing);
+        Vector<float>& computeWorldPositions(PathAttachment& path, int spacesCount, bool tangents, bool percentPosition, bool percentSpacing);
         
         static void addBeforePosition(float p, Vector<float>& temp, int i, Vector<float>& output, int o);
         
