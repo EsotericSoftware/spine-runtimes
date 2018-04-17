@@ -6,10 +6,8 @@ namespace Spine.Unity.Examples {
 	public class SpineboyFreeze : MonoBehaviour {
 
 		public SkeletonAnimation skeletonAnimation;
-		[SpineAnimation]
-		public string freeze;
-		[SpineAnimation]
-		public string idle;
+		public AnimationReferenceAsset freeze;
+		public AnimationReferenceAsset idle;
 
 		public Color freezeColor;
 		public Color freezeBlackColor;

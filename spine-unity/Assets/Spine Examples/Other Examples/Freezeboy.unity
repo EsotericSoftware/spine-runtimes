@@ -3549,8 +3549,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skeletonAnimation: {fileID: 1126206820}
-  freeze: frozen
-  idle: idle
+  freeze: {fileID: 11400000, guid: 9db45f1cea1a1d74f86992ad2f34f114, type: 2}
+  idle: {fileID: 11400000, guid: 8a71ad90c9e356d4fa476a420aeb259d, type: 2}
   freezeColor: {r: 0.71188366, g: 0.93390405, b: 0.97794116, a: 1}
   freezeBlackColor: {r: 0.020274673, g: 0.6587631, b: 0.9191176, a: 0}
   particles: {fileID: 772326264}

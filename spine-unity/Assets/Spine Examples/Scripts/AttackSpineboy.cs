@@ -42,6 +42,8 @@ namespace Spine.Unity.Examples {
 		int currentHealth = 100;
 		const int maxHealth = 100;
 
+		public AnimationReferenceAsset shoot, hit, idle, death;
+
 		public UnityEngine.Events.UnityEvent onAttack;
 
 		void Update () {
@@ -49,18 +51,18 @@ namespace Spine.Unity.Examples {
 				currentHealth -= 10;
 				healthText.text = currentHealth + "/" + maxHealth;
 
-				attackerSpineboy.AnimationState.SetAnimation(1, "shoot", false);
+				attackerSpineboy.AnimationState.SetAnimation(1, shoot, false);
 				attackerSpineboy.AnimationState.AddEmptyAnimation(1, 0.5f, 2f);
 
 				if (currentHealth > 0) {
-					spineboy.AnimationState.SetAnimation(0, "hit", false);
-					spineboy.AnimationState.AddAnimation(0, "idle", true, 0);
+					spineboy.AnimationState.SetAnimation(0, hit, false);
+					spineboy.AnimationState.AddAnimation(0, idle, true, 0);
 					gauge.fillPercent = (float)currentHealth/(float)maxHealth;
 					onAttack.Invoke();
 				} else {
 					if (currentHealth >= 0) {
 						gauge.fillPercent = 0;
-						spineboy.AnimationState.SetAnimation(0, "death", false).TrackEnd = float.PositiveInfinity;
+						spineboy.AnimationState.SetAnimation(0, death, false).TrackEnd = float.PositiveInfinity;
 					}
 				}
 			}
