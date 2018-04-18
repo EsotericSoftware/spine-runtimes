@@ -34,7 +34,6 @@
 #include <spine/Extension.h>
 #include <spine/Vector.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
 
 namespace Spine {
 template<typename K, typename V>

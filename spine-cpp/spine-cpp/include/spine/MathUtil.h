@@ -97,6 +97,8 @@ struct Interpolation {
 	virtual float interpolate(float start, float end, float a) {
 		return start + (end - start) * apply(a);
 	}
+
+	virtual ~Interpolation() {};
 };
 
 struct PowInterpolation: public Interpolation {

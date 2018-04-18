@@ -31,7 +31,6 @@
 #ifndef Spine_Skin_h
 #define Spine_Skin_h
 
-#include <spine/HashMap.h>
 #include <spine/Vector.h>
 #include <spine/String.h>
 
@@ -47,34 +46,70 @@ class Skin : public SpineObject {
 	friend class Skeleton;
 
 public:
-	class AttachmentKey : public SpineObject {
+	class AttachmentMap : public SpineObject {
+		friend class Skin;
+
 	public:
-		int _slotIndex;
-		String _name;
+		struct Entry {
+			int _slotIndex;
+			String _name;
+			Attachment *_attachment;
 
-		explicit AttachmentKey(int slotIndex = 0, const String &name = 0);
+			Entry(int slotIndex, const String &name, Attachment *attachment) :
+					_slotIndex(slotIndex),
+					_name(name),
+					_attachment(attachment) {
+			}
+		};
 
-		// Used in Skin::getAttachment to avoid allocation of temporary string
-		explicit AttachmentKey(int slotIndex, const char* name);
+		class Entries {
+			friend class AttachmentMap;
 
-		AttachmentKey(const AttachmentKey &other) {
-			this->_slotIndex = other._slotIndex;
-			this->_name = other._name;
-		}
+		public:
+			bool hasNext() {
+				while(true) {
+					if (_slotIndex >= (int) _buckets.size()) return false;
+					if (_bucketIndex >= (int) _buckets[_slotIndex].size()) {
+						_bucketIndex = 0;
+						++_slotIndex;
+						continue;
+					};
+					return true;
+				}
+			}
 
-		bool operator==(const AttachmentKey &other) const;
+			Entry &next() {
+				Entry &result = _buckets[_slotIndex][_bucketIndex];
+				++_bucketIndex;
+				return result;
+			}
 
-		int getSlotIndex() {
-			return _slotIndex;
-		}
+		protected:
+			Entries(Vector< Vector<Entry> > &buckets) : _buckets(buckets), _slotIndex(0), _bucketIndex(0) {
+			}
 
-		String& getName() {
-			return _name;
-		}
-	};
+		private:
+			Vector< Vector<Entry> > &_buckets;
+			int _slotIndex;
+			int _bucketIndex;
+		};
 
-	struct HashAttachmentKey : public SpineObject {
-		std::size_t operator()(const Spine::Skin::AttachmentKey &val) const;
+		void put(int slotIndex, const String &attachmentName, Attachment *attachment);
+
+		Attachment *get(int slotIndex, const String &attachmentName);
+
+		void remove(int slotIndex, const String &attachmentName);
+
+		Entries getEntries();
+
+	protected:
+		AttachmentMap();
+
+	private:
+
+		int findInBucket(Vector <Entry> &, const String &attachmentName);
+
+		Vector <Vector<Entry> > _buckets;
 	};
 
 	explicit Skin(const String &name);
@@ -100,11 +135,11 @@ public:
 
 	const String &getName();
 
-	HashMap<AttachmentKey, Attachment *> &getAttachments();
+	AttachmentMap::Entries getAttachments();
 
 private:
 	const String _name;
-	HashMap<AttachmentKey, Attachment *> _attachments;
+	AttachmentMap _attachments;
 
 	/// Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached.
 	void attachAll(Skeleton &skeleton, Skin &oldSkin);

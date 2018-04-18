@@ -602,13 +602,12 @@ void Skeleton::sortTransformConstraint(TransformConstraint *constraint) {
 }
 
 void Skeleton::sortPathConstraintAttachment(Skin *skin, int slotIndex, Bone &slotBone) {
-	HashMap<Skin::AttachmentKey, Attachment *> &attachments = skin->getAttachments();
+	Skin::AttachmentMap::Entries attachments = skin->getAttachments();
 
-	for (HashMap<Skin::AttachmentKey, Attachment *>::Entries entries = attachments.getEntries(); entries.hasNext();) {
-		HashMap<Skin::AttachmentKey, Attachment *>::Pair pair = entries.next();
-		Skin::AttachmentKey &key = pair.key;
-		if (key._slotIndex == slotIndex) {
-			Attachment *value = pair.value;
+	while (attachments.hasNext()) {
+		Skin::AttachmentMap::Entry entry = attachments.next();
+		if (entry._slotIndex == slotIndex) {
+			Attachment *value = entry._attachment;
 			sortPathConstraintAttachment(value, slotBone);
 		}
 	}

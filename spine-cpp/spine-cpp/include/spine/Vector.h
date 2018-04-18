@@ -225,7 +225,7 @@ private:
 		buffer->~T();
 	}
 
-	Vector &operator=(const Vector &inVector) {};
+	// Vector &operator=(const Vector &inVector) {};
 };
 }
 

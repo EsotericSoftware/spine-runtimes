@@ -42,11 +42,11 @@ public:
 		clamp();
 	}
 
-	inline Color &set(float r, float g, float b, float a) {
-		r = r;
-		g = g;
-		b = b;
-		a = a;
+	inline Color &set(float _r, float _g, float _b, float _a) {
+		this->r = _r;
+		this->g = _g;
+		this->b = _b;
+		this->a = _a;
 		clamp();
 		return *this;
 	}
@@ -60,11 +60,11 @@ public:
 		return *this;
 	}
 
-	inline Color &add(float r, float g, float b, float a) {
-		r += r;
-		g += g;
-		b += b;
-		a += a;
+	inline Color &add(float _r, float _g, float _b, float _a) {
+		this->r += _r;
+		this->g += _g;
+		this->b += _b;
+		this->a += _a;
 		clamp();
 		return *this;
 	}
