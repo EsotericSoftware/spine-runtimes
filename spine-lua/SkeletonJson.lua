@@ -60,7 +60,7 @@ function SkeletonJson.new (attachmentLoader)
 	}
 
 	function self:readSkeletonDataFile (fileName, base)
-		return self:readSkeletonData(spine.utils.readFile(fileName, base))
+		return self:readSkeletonData(utils.readFile(fileName, base))
 	end
 
 	local readAttachment
@@ -76,7 +76,7 @@ function SkeletonJson.new (attachmentLoader)
 	function self:readSkeletonData (jsonText)
 		local scale = self.scale
 		local skeletonData = SkeletonData.new(self.attachmentLoader)
-		local root = spine.utils.readJSON(jsonText)
+		local root = utils.readJSON(jsonText)
 		if not root then error("Invalid JSON: " .. jsonText, 2) end
 
 		-- Skeleton.

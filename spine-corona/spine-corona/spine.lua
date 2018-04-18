@@ -28,7 +28,7 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-spine = {}
+local spine = {}
 
 spine.utils = require "spine-lua.utils"
 spine.SkeletonJson = require "spine-lua.SkeletonJson"
@@ -88,7 +88,7 @@ local QUAD_TRIANGLES = { 1, 2, 3, 3, 4, 1 }
 spine.Skeleton.new_super = spine.Skeleton.new
 spine.Skeleton.updateWorldTransform_super = spine.Skeleton.updateWorldTransform
 spine.Skeleton.new = function(skeletonData, group)
-	self = spine.Skeleton.new_super(skeletonData)
+	local self = spine.Skeleton.new_super(skeletonData)
 	self.group = group or display.newGroup()
 	self.drawingGroup = nil
 	self.premultipliedAlpha = false
@@ -156,7 +156,7 @@ function spine.Skeleton:updateWorldTransform()
 		uvs = nil
 	}
 	
-	for i,slot in ipairs(drawOrder) do
+	for _, slot in ipairs(drawOrder) do
 		local attachment = slot.attachment
 		local vertices = nil
 		local uvs = nil
