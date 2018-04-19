@@ -290,7 +290,6 @@ namespace Spine.Unity.Editor {
 			setTextureImporterSettings = EditorGUILayout.Toggle(new GUIContent("Apply Atlas Texture Settings", "Apply the recommended settings for Texture Importers."), showHierarchyIcons);
 			if (EditorGUI.EndChangeCheck()) {
 				EditorPrefs.SetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, showHierarchyIcons);
-				SpineEditorHierarchyHandler.HierarchyIconsOnPlaymodeStateChanged();
 			}
 
 			EditorGUILayout.LabelField("Editor Instantiation", EditorStyles.boldLabel);

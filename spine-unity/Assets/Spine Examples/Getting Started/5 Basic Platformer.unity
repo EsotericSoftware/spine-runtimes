@@ -670,7 +670,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b238dfcde8209044b97d23f62bcaadf6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boneName: R_Ground
+  boneName: right-ground
   parentReference: {fileID: 0}
   mode: 0
   position: 1
@@ -685,7 +685,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 380101352}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.34059998, y: 0.002599962, z: 0}
+  m_LocalPosition: {x: 0.28119996, y: 0.002599962, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 985424158}
@@ -1389,7 +1389,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skeletonDataAsset: {fileID: 11400000, guid: a5967d74cd1f3c741ba7758da7511bcf, type: 2}
+  skeletonDataAsset: {fileID: 11400000, guid: 2f899e95232e6144786de8fb99678a8d, type: 2}
   initialSkinName: default
   initialFlipX: 0
   initialFlipY: 0
@@ -1421,7 +1421,7 @@ MeshRenderer:
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: b04b8c6e4c57e78449f243c27617a2cd, type: 2}
+  - {fileID: 2100000, guid: 9aa2023c2c91b254f9cb0a4fba19af00, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1929,7 +1929,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1018673310}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.3844, y: 0.002599962, z: 0}
+  m_LocalPosition: {x: -0.3129, y: 0.002599962, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 985424158}
@@ -1967,7 +1967,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b238dfcde8209044b97d23f62bcaadf6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boneName: L_Ground
+  boneName: left-ground
   parentReference: {fileID: 0}
   mode: 0
   position: 1
@@ -5535,6 +5535,7 @@ GameObject:
   - component: {fileID: 1204355831}
   - component: {fileID: 1204355832}
   - component: {fileID: 1204355833}
+  - component: {fileID: 1204355834}
   m_Layer: 9
   m_Name: Player
   m_TagString: Untagged
@@ -5592,22 +5593,40 @@ MonoBehaviour:
   runSpeed: 7
   gravityScale: 6.6
   jumpSpeed: 25
-  jumpDuration: 0.5
-  jumpInterruptFactor: 100
+  minimumJumpDuration: 0.5
+  jumpInterruptFactor: 0.5
   forceCrouchVelocity: 30
   forceCrouchDuration: 0.4
   skeletonAnimation: {fileID: 658011011}
-  walkName: Walk
-  runName: Run
-  idleName: Idle
-  jumpName: Jump
-  fallName: Fall
-  crouchName: Crouch
+  walk: {fileID: 11400000, guid: 096b05b71bb32cb409c1c8fd233b7ac3, type: 2}
+  run: {fileID: 11400000, guid: cc83238c61de380499565292bef7ada4, type: 2}
+  idle: {fileID: 11400000, guid: 8e32f0310bb5c02488c5c002dd41e7cb, type: 2}
+  jump: {fileID: 11400000, guid: 9fc9ad17b39175242a17dedc100251e5, type: 2}
+  fall: {fileID: 11400000, guid: 29c1381a00cfb2c4d996f2a02fcc4506, type: 2}
+  crouch: {fileID: 11400000, guid: 25961ff211f6f3947be85f8aab3f2630, type: 2}
+  runFromFall: {fileID: 11400000, guid: fcca5e996ae24ba43baaaadef1fb6ad9, type: 2}
   jumpAudioSource: {fileID: 1845666709}
   hardfallAudioSource: {fileID: 443343505}
-  footstepAudioSource: {fileID: 666622921}
   landParticles: {fileID: 1189703950}
-  footstepEventName: Footstep
+  footstepHandler: {fileID: 1204355834}
+--- !u!114 &1204355834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1204355830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d55a3bd6ac81af44b2f9a4447f2ae72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skeletonAnimation: {fileID: 658011011}
+  eventName: footstep
+  audioSource: {fileID: 666622921}
+  audioClip: {fileID: 8300000, guid: e885484e1bc99fb47a0ac3f6bfa586b1, type: 3}
+  basePitch: 1
+  randomPitchOffset: 0.2
+  logDebugMessage: 0
 --- !u!1 &1217440894
 GameObject:
   m_ObjectHideFlags: 0
@@ -6372,7 +6391,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1621947181}
   m_Layer: 0
-  m_Name: Graphics
+  m_Name: Visuals
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
