@@ -70,7 +70,7 @@ function AtlasAttachmentLoader:newMeshAttachment (skin, name, path)
 end
 
 function AtlasAttachmentLoader:newSkinningMeshAttachment (skin, name, path)
-	return SkinningMeshAttachment.new(name)
+	return nil --SkinningMeshAttachment.new(name)
 end
 
 function AtlasAttachmentLoader:newBoundingBoxAttachment (skin, name)

@@ -33,7 +33,7 @@ local Atlas = {}
 function Atlas.parse(atlasPath, atlasBase)
 	local function parseIntTuple4( l )
 		local a,b,c,d = string.match( l , " ? ?%a+: ([+-]?%d+), ?([+-]?%d+), ?([+-]?%d+), ?([+-]?%d+)" )
-		local a,b,c,d = tonumber( a ), tonumber( b ), tonumber( c ), tonumber( d )
+		a,b,c,d = tonumber( a ), tonumber( b ), tonumber( c ), tonumber( d )
 		return a and b and c and d and {a, b, c ,d}
 	end
 

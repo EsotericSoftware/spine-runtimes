@@ -66,7 +66,7 @@ function SkeletonClipping:clipStart(slot, clip)
 	clip:computeWorldVertices(slot, 0, n, vertices, 0, 2)
 	self:makeClockwise(self.clippingPolygon)
 	self.clippingPolygons = self.triangulator:decompose(self.clippingPolygon, self.triangulator:triangulate(self.clippingPolygon))
-	for i,polygon in ipairs(self.clippingPolygons) do
+	for _,polygon in ipairs(self.clippingPolygons) do
 		self:makeClockwise(polygon)
 		table_insert(polygon, polygon[1])
 		table_insert(polygon, polygon[2])		
@@ -274,7 +274,7 @@ function SkeletonClipping:clip(x1, y1, x2, y2, x3, y3, clippingArea, output)
 		end
 
 		if outputStart == #output then -- All edges outside.
-			for i, v in ipairs(originalOutput) do
+			for i, _ in ipairs(originalOutput) do
 				originalOutput[i] = nil
 			end
 			return true
@@ -286,7 +286,7 @@ function SkeletonClipping:clip(x1, y1, x2, y2, x3, y3, clippingArea, output)
 		if (i == clippingVerticesLast) then break end
 		local temp = output
 		output = input
-		for i, v in ipairs(output) do
+		for i, _ in ipairs(output) do
 			output[i] = nil
 		end
 		input = temp
@@ -294,7 +294,7 @@ function SkeletonClipping:clip(x1, y1, x2, y2, x3, y3, clippingArea, output)
 	end
 
 	if originalOutput ~= output then
-		for i, v in ipairs(originalOutput) do
+		for i, _ in ipairs(originalOutput) do
 			originalOutput[i] = nil
 		end
 		i = 1

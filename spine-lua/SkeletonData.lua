@@ -56,7 +56,7 @@ end
 
 function SkeletonData:findBone (boneName)
 	if not boneName then error("boneName cannot be nil.", 2) end
-	for i,bone in ipairs(self.bones) do
+	for _,bone in ipairs(self.bones) do
 		if bone.name == boneName then return bone end
 	end
 	return nil
@@ -72,7 +72,7 @@ end
 
 function SkeletonData:findSlot (slotName)
 	if not slotName then error("slotName cannot be nil.", 2) end
-	for i,slot in ipairs(self.slots) do
+	for _,slot in ipairs(self.slots) do
 		if slot.name == slotName then return slot end
 	end
 	return nil
@@ -85,7 +85,7 @@ end
 
 function SkeletonData:findSkin (skinName)
 	if not skinName then error("skinName cannot be nil.", 2) end
-	for i,skin in ipairs(self.skins) do
+	for _,skin in ipairs(self.skins) do
 		if skin.name == skinName then return skin end
 	end
 	return nil
@@ -93,7 +93,7 @@ end
 
 function SkeletonData:findEvent (eventName)
 	if not eventName then error("eventName cannot be nil.", 2) end
-	for i,event in ipairs(self.events) do
+	for _,event in ipairs(self.events) do
 		if event.name == eventName then return event end
 	end
 	return nil
@@ -101,7 +101,7 @@ end
 
 function SkeletonData:findAnimation (animationName)
 	if not animationName then error("animationName cannot be nil.", 2) end
-	for i,animation in ipairs(self.animations) do
+	for _,animation in ipairs(self.animations) do
 		if animation.name == animationName then return animation end
 	end
 	return nil
@@ -109,7 +109,7 @@ end
 
 function SkeletonData:findIkConstraint (constraintName)
 	if not constraintName then error("constraintName cannot be nil.", 2) end
-	for i,constraint in ipairs(self.ikConstraints) do
+	for _,constraint in ipairs(self.ikConstraints) do
 		if constraint.name == constraintName then return constraint end
 	end
 	return nil
@@ -117,7 +117,7 @@ end
 
 function SkeletonData:findTransformConstraint (constraintName)
 	if not constraintName then error("constraintName cannot be nil.", 2) end
-	for i,constraint in ipairs(self.transformConstraints) do
+	for _,constraint in ipairs(self.transformConstraints) do
 		if constraint.name == constraintName then return constraint end
 	end
 	return nil
@@ -125,7 +125,7 @@ end
 
 function SkeletonData:findPathConstraint (constraintName)
 	if not constraintName then error("constraintName cannot be nil.", 2) end
-	for i,constraint in ipairs(self.pathConstraints) do
+	for _,constraint in ipairs(self.pathConstraints) do
 		if constraint.name == constraintName then return constraint end
 	end
 	return nil
@@ -133,7 +133,7 @@ end
 
 function SkeletonData:findPathConstraintIndex (constraintName)
 	if not constraintName then error("constraintName cannot be nil.", 2) end
-	for i,constraint in ipairs(self.pathConstraints) do
+	for _,constraint in ipairs(self.pathConstraints) do
 		if constraint.name == constraintName then return i end
 	end
 	return -1

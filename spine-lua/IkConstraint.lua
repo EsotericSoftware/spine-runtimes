@@ -57,7 +57,7 @@ function IkConstraint.new (data, skeleton)
 	setmetatable(self, IkConstraint)
 
 	local self_bones = self.bones
-	for i,boneData in ipairs(data.bones) do
+	for _,boneData in ipairs(data.bones) do
 		table_insert(self_bones, skeleton:findBone(boneData.name))
 	end
 	self.target = skeleton:findBone(data.target.name)

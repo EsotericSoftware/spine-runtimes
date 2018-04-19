@@ -78,7 +78,7 @@ function PathConstraint.new (data, skeleton)
 	}
 	setmetatable(self, PathConstraint)
 
-	for i,boneData in ipairs(data.bones) do
+	for _,boneData in ipairs(data.bones) do
 		table_insert(self.bones, skeleton:findBone(boneData.name))
 	end
 
@@ -345,9 +345,9 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 	local ddfy = 0
 	local dfx = 0
 	local dfy = 0
-	i = 0
+	local j = 0
 	local w = 2
-	while i < curveCount do
+	while j < curveCount do
 		cx1 = world[w + 1]
 		cy1 = world[w + 2]
 		cx2 = world[w + 3]
@@ -374,10 +374,10 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 		dfx = dfx + ddfx + dddfx
 		dfy = dfy + ddfy + dddfy
 		pathLength = pathLength + math_sqrt(dfx * dfx + dfy * dfy)
-		curves[i + 1] = pathLength
+		curves[j + 1] = pathLength
 		x1 = x2
 		y1 = y2
-		i = i + 1
+		j = j + 1
 		w = w + 6
 	end
 	if percentPosition then position = position * pathLength end
