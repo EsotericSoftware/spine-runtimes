@@ -27,7 +27,7 @@ namespace Spine.Unity.Examples {
 
 			hipBone = skeleton.FindBone(hip);
 			headBone = skeleton.FindBone(head);
-			baseHeadRotation = headBone.rotation;
+			baseHeadRotation = headBone.Rotation;
 
 			skeletonAnimation.UpdateLocal += UpdateLocal;
 		}
@@ -35,8 +35,8 @@ namespace Spine.Unity.Examples {
 		private void UpdateLocal (ISkeletonAnimation animated) {
 			hipRotationTarget = planter.Balance * hipTiltScale;
 			hipRotationSmoothed = Mathf.MoveTowards(hipRotationSmoothed, hipRotationTarget, Time.deltaTime * hipRotationMoveScale * Mathf.Abs(2f * planter.Balance / planter.offBalanceThreshold));
-			hipBone.rotation = hipRotationSmoothed;
-			headBone.rotation = baseHeadRotation + (-hipRotationSmoothed * headTiltScale);
+			hipBone.Rotation = hipRotationSmoothed;
+			headBone.Rotation = baseHeadRotation + (-hipRotationSmoothed * headTiltScale);
 		}
 	}
 
