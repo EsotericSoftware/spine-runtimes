@@ -173,16 +173,12 @@ namespace Spine {
 				d = ld;
 				worldX = x + skeleton.x;
 				worldY = y + skeleton.y;
-//				worldSignX = Math.Sign(scaleX);
-//				worldSignY = Math.Sign(scaleY);
 				return;
 			}
 
 			float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 			worldX = pa * x + pb * y + parent.worldX;
 			worldY = pc * x + pd * y + parent.worldY;
-//			worldSignX = parent.worldSignX * Math.Sign(scaleX);
-//			worldSignY = parent.worldSignY * Math.Sign(scaleY);
 
 			switch (data.transformMode) {
 			case TransformMode.Normal: {

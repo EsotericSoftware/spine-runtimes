@@ -238,6 +238,12 @@ namespace Spine.Unity.Editor {
 					AssetDatabase.CreateAsset(newAsset, assetPath);
 				}
 			}
+
+			var folderObject = AssetDatabase.LoadAssetAtPath(dataPath, typeof(UnityEngine.Object));
+			if (folderObject != null) {
+				Selection.activeObject = folderObject;
+				EditorGUIUtility.PingObject(folderObject);
+			}
 		}
 
 		void OnInspectorGUIMulti () {
