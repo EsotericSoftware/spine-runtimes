@@ -47,16 +47,16 @@ namespace Spine {
 		public float DefaultMix { get { return defaultMix; } set { defaultMix = value; } }
 
 		public AnimationStateData (SkeletonData skeletonData) {
-			if (skeletonData == null) throw new ArgumentException ("skeletonData cannot be null.");
+			if (skeletonData == null) throw new ArgumentException("skeletonData cannot be null.", "skeletonData");
 			this.skeletonData = skeletonData;
 		}
 
 		/// <summary>Sets a mix duration by animation names.</summary>
 		public void SetMix (string fromName, string toName, float duration) {
 			Animation from = skeletonData.FindAnimation(fromName);
-			if (from == null) throw new ArgumentException("Animation not found: " + fromName);
+			if (from == null) throw new ArgumentException("Animation not found: " + fromName, "fromName");
 			Animation to = skeletonData.FindAnimation(toName);
-			if (to == null) throw new ArgumentException("Animation not found: " + toName);
+			if (to == null) throw new ArgumentException("Animation not found: " + toName, "toName");
 			SetMix(from, to, duration);
 		}
 
