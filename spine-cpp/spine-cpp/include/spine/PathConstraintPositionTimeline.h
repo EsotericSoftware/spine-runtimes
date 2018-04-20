@@ -47,7 +47,7 @@ namespace Spine {
 
         virtual ~PathConstraintPositionTimeline();
         
-        virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction);
+        virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixBlend blend, MixDirection direction);
         
         virtual int getPropertyId();
         

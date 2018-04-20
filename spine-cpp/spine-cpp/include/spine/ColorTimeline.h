@@ -47,7 +47,7 @@ public:
 	explicit ColorTimeline(int frameCount);
 
 	virtual void
-	apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha, MixPose pose,
+	apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha, MixBlend blend,
 		  MixDirection direction);
 
 	virtual int getPropertyId();

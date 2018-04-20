@@ -55,10 +55,10 @@ DrawOrderTimeline::DrawOrderTimeline(int frameCount) : Timeline() {
 }
 
 void DrawOrderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-							  MixPose pose, MixDirection direction) {
+							  MixBlend blend, MixDirection direction) {
 	Vector<Slot *> &drawOrder = skeleton._drawOrder;
 	Vector<Slot *> &slots = skeleton._slots;
-	if (direction == MixDirection_Out && pose == MixPose_Setup) {
+	if (direction == MixDirection_Out && blend == MixBlend_Setup) {
 		drawOrder.clear();
 		drawOrder.ensureCapacity(slots.size());
 		for (int i = 0, n = static_cast<int>(slots.size()); i < n; ++i) {
@@ -68,7 +68,7 @@ void DrawOrderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Ve
 	}
 
 	if (time < _frames[0]) {
-		if (pose == MixPose_Setup) {
+		if (blend == MixBlend_Setup) {
 			drawOrder.clear();
 			drawOrder.ensureCapacity(slots.size());
 			for (int i = 0, n = static_cast<int>(slots.size()); i < n; ++i) {

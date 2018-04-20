@@ -347,19 +347,22 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 	skeleton->updateWorldTransform();
 
 	drawable->state->setAnimation(0, "rotate", true);
-	drawable->update(0.1);
+	drawable->update(1);
 
-	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - vine");
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - coin");
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
 	float swirlTime = 0;
 	while (window.isOpen()) {
-		while (window.pollEvent(event))
+		float delta = 0;
+		while (window.pollEvent(event)) {
 			if (event.type == sf::Event::Closed) window.close();
+			if (event.type == sf::Event::MouseButtonPressed) delta += 0.1f;
+		}
 
-		float delta = deltaClock.getElapsedTime().asSeconds();
-		deltaClock.restart();
+		// float delta = deltaClock.getElapsedTime().asSeconds();
+		// deltaClock.restart();
 
 		drawable->update(delta);
 
@@ -387,13 +390,13 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
 	TrackEntry* down = drawable->state->setAnimation(5, "down", true);
 
 	left->setAlpha(0);
-	// BOZO left->setMixBlend(SP_MIX_BLEND_ADD);
+	left->setMixBlend(MixBlend_Add);
 	right->setAlpha(0);
-	// BOZO right->mixBlend = SP_MIX_BLEND_ADD;
+	right->setMixBlend(MixBlend_Add);
 	up->setAlpha(0);
-	// BOZO up->mixBlend = SP_MIX_BLEND_ADD;
+	up->setMixBlend(MixBlend_Add);
 	down->setAlpha(0);
-	// BOZO down->mixBlend = SP_MIX_BLEND_ADD;
+	down->setMixBlend(MixBlend_Add);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - owl");
 	window.setFramerateLimit(60);
@@ -452,10 +455,10 @@ int main () {
 	DebugExtension dbgExtension;
 	SpineExtension::setInstance(&dbgExtension);
 
-	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor.atlas", 0.5f);
-	testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 1.0f);
-	testcase(spineboy, "data/spineboy-ess.json", "data/spineboy-ess.skel", "data/spineboy.atlas", 0.6f);
-	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl.atlas", 0.5f);
+	// testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor.atlas", 0.5f);
+	// testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 1.0f);
+	// testcase(spineboy, "data/spineboy-ess.json", "data/spineboy-ess.skel", "data/spineboy.atlas", 0.6f);
+	// testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl.atlas", 0.5f);
 	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin.atlas", 0.5f);
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine.atlas", 0.5f);
 	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 0.2f);

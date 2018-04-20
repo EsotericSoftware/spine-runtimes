@@ -33,7 +33,7 @@
 
 #include <spine/Vector.h>
 #include <spine/Pool.h>
-#include <spine/MixPose.h>
+#include <spine/MixBlend.h>
 #include <spine/SpineObject.h>
 #include <spine/String.h>
 
@@ -196,6 +196,10 @@ namespace Spine {
         ///
         float getMixDuration();
         void setMixDuration(float inValue);
+
+
+        float getMixBlend();
+        void setMixBlend(MixBlend blend);
         
         ///
         /// The track entry for the previous animation when mixing from the previous animation to this animation, or NULL if no
@@ -227,6 +231,7 @@ namespace Spine {
         float _animationStart, _animationEnd, _animationLast, _nextAnimationLast;
         float _delay, _trackTime, _trackLast, _nextTrackLast, _trackEnd, _timeScale;
         float _alpha, _mixTime, _mixDuration, _interruptAlpha, _totalAlpha;
+        MixBlend _mixBlend;
         Vector<int> _timelineData;
         Vector<TrackEntry*> _timelineDipMix;
         Vector<float> _timelinesRotation;
@@ -400,12 +405,12 @@ namespace Spine {
 
         static Animation* getEmptyAnimation();
         
-        static void applyRotateTimeline(RotateTimeline* rotateTimeline, Skeleton& skeleton, float time, float alpha, MixPose pose, Vector<float>& timelinesRotation, int i, bool firstFrame);
+        static void applyRotateTimeline(RotateTimeline* rotateTimeline, Skeleton& skeleton, float time, float alpha, MixBlend pose, Vector<float>& timelinesRotation, int i, bool firstFrame);
         
         /// Returns true when all mixing from entries are complete.
         bool updateMixingFrom(TrackEntry* to, float delta);
         
-        float applyMixingFrom(TrackEntry* to, Skeleton& skeleton, MixPose currentPose);
+        float applyMixingFrom(TrackEntry* to, Skeleton& skeleton, MixBlend currentPose);
         
         void queueEvents(TrackEntry* entry, float animationTime);
         

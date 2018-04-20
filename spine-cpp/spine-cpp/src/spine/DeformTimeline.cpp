@@ -57,128 +57,194 @@ DeformTimeline::DeformTimeline(int frameCount) : CurveTimeline(frameCount), _slo
 }
 
 void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						   MixPose pose, MixDirection direction) {
+						   MixBlend blend, MixDirection direction) {
 	Slot *slotP = skeleton._slots[_slotIndex];
 	Slot &slot = *slotP;
 
-	if (slot._attachment == NULL || !slot._attachment->getRTTI().instanceOf(VertexAttachment::rtti)) {
+	Attachment *slotAttachment = slot._attachment;
+	if (slotAttachment == NULL || !slotAttachment->getRTTI().instanceOf(VertexAttachment::rtti)) {
 		return;
 	}
 
-	VertexAttachment *vertexAttachment = static_cast<VertexAttachment *>(slot._attachment);
+	VertexAttachment *vertexAttachment = static_cast<VertexAttachment *>(slotAttachment);
 	if (!vertexAttachment->applyDeform(_attachment)) {
 		return;
 	}
 
-	Vector<float> &vertices = slot._attachmentVertices;
-	if (vertices.size() == 0) {
-		alpha = 1;
+	Vector<float> &verticesArray = slot._attachmentVertices;
+	if (verticesArray.size() == 0) {
+		blend = MixBlend_Setup;
 	}
 
-	int vertexCount = static_cast<int>(_frameVertices[0].size());
+	Vector< Vector<float> > &frameVertices = _frameVertices;
+	int vertexCount = static_cast<int>(frameVertices[0].size());
 
+	Vector<float> &frames = _frames;
 	if (time < _frames[0]) {
-		switch (pose) {
-			case MixPose_Setup:
-				vertices.clear();
+		switch (blend) {
+		case MixBlend_Setup:
+			verticesArray.clear();
+			return;
+		case MixBlend_First:
+			if (alpha == 1) {
+				verticesArray.clear();
 				return;
-			case MixPose_Current:
-				if (alpha == 1) {
-					vertices.clear();
-					return;
-				}
-
-				// Ensure size and preemptively set count.
-				vertices.setSize(vertexCount, 0);
-
-				if (vertexAttachment->_bones.size() == 0) {
-					// Unweighted vertex positions.
-					Vector<float> &setupVertices = vertexAttachment->_vertices;
-					for (int i = 0; i < vertexCount; ++i) {
-						vertices[i] += (setupVertices[i] - vertices[i]) * alpha;
-					}
-				} else {
-					// Weighted deform offsets.
-					alpha = 1 - alpha;
-					for (int i = 0; i < vertexCount; ++i) {
-						vertices[i] *= alpha;
-					}
-				}
-				return;
-			default:
-				return;
+			}
+			verticesArray.setSize(vertexCount, 0);
+			Vector<float> &vertices = verticesArray;
+			if (vertexAttachment->getBones().size() == 0) {
+				// Unweighted vertex positions.
+				Vector<float> &setupVertices = vertexAttachment->getVertices();
+				for (int i = 0; i < vertexCount; i++)
+					vertices[i] += (setupVertices[i] - vertices[i]) * alpha;
+			} else {
+				// Weighted deform offsets.
+				alpha = 1 - alpha;
+				for (int i = 0; i < vertexCount; i++)
+					vertices[i] *= alpha;
+			}
 		}
+		return;
 	}
 
-	// Ensure size and preemptively set count.
-	vertices.setSize(vertexCount, 0);
+	verticesArray.setSize(vertexCount, 0);
+	Vector<float> &vertices = verticesArray;
 
-	if (time >= _frames[_frames.size() - 1]) {
-		// Time is after last frame.
-		Vector<float> &lastVertices = _frameVertices[_frames.size() - 1];
+	if (time >= frames[frames.size() - 1]) { // Time is after last frame.
+		Vector<float> &lastVertices = frameVertices[frames.size() - 1];
 		if (alpha == 1) {
-			// Vertex positions or deform offsets, no alpha.
-			vertices.clear();
-			for (int i = 0; i < vertexCount; ++i) {
-				float vertex = lastVertices[i];
-				vertices.add(vertex);
-			}
-		} else if (pose == MixPose_Setup) {
-			if (vertexAttachment->_bones.size() == 0) {
-				// Unweighted vertex positions, with alpha.
-				Vector<float> &setupVertices = vertexAttachment->_vertices;
-				for (int i = 0; i < vertexCount; i++) {
-					float setup = setupVertices[i];
-					vertices[i] = setup + (lastVertices[i] - setup) * alpha;
+			if (blend == MixBlend_Add) {
+				VertexAttachment *vertexAttachment = static_cast<VertexAttachment*>(slotAttachment);
+				if (vertexAttachment->getBones().size() == 0) {
+					// Unweighted vertex positions, no alpha.
+					Vector<float> &setupVertices = vertexAttachment->getVertices();
+					for (int i = 0; i < vertexCount; i++)
+						vertices[i] += lastVertices[i] - setupVertices[i];
+				} else {
+					// Weighted deform offsets, no alpha.
+					for (int i = 0; i < vertexCount; i++)
+						vertices[i] += lastVertices[i];
 				}
 			} else {
-				// Weighted deform offsets, with alpha.
-				for (int i = 0; i < vertexCount; ++i) {
-					vertices[i] = lastVertices[i] * alpha;
-				}
+				// Vertex positions or deform offsets, no alpha.
+				memcpy(vertices.buffer(), lastVertices.buffer(), vertexCount * sizeof(float));
 			}
 		} else {
-			// Vertex positions or deform offsets, with alpha.
-			for (int i = 0; i < vertexCount; ++i) {
-				vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
+			switch (blend) {
+				case MixBlend_Setup: {
+					VertexAttachment *vertexAttachment = static_cast<VertexAttachment *>(slotAttachment);
+					if (vertexAttachment->getBones().size() == 0) {
+						// Unweighted vertex positions, with alpha.
+						Vector<float> &setupVertices = vertexAttachment->getVertices();
+						for (int i = 0; i < vertexCount; i++) {
+							float setup = setupVertices[i];
+							vertices[i] = setup + (lastVertices[i] - setup) * alpha;
+						}
+					} else {
+						// Weighted deform offsets, with alpha.
+						for (int i = 0; i < vertexCount; i++)
+							vertices[i] = lastVertices[i] * alpha;
+					}
+					break;
+				}
+				case MixBlend_First:
+				case MixBlend_Replace:
+					// Vertex positions or deform offsets, with alpha.
+					for (int i = 0; i < vertexCount; i++)
+						vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
+					break;
+				case MixBlend_Add:
+					VertexAttachment *vertexAttachment = static_cast<VertexAttachment *>(slotAttachment);
+					if (vertexAttachment->getBones().size() == 0) {
+						// Unweighted vertex positions, no alpha.
+						Vector<float> &setupVertices = vertexAttachment->getVertices();
+						for (int i = 0; i < vertexCount; i++)
+							vertices[i] += (lastVertices[i] - setupVertices[i]) * alpha;
+					} else {
+						// Weighted deform offsets, alpha.
+						for (int i = 0; i < vertexCount; i++)
+							vertices[i] += lastVertices[i] * alpha;
+					}
 			}
 		}
 		return;
 	}
 
 	// Interpolate between the previous frame and the current frame.
-	int frame = Animation::binarySearch(_frames, time);
-	Vector<float> &prevVertices = _frameVertices[frame - 1];
-	Vector<float> &nextVertices = _frameVertices[frame];
-	float frameTime = _frames[frame];
-	float percent = getCurvePercent(frame - 1, 1 - (time - frameTime) / (_frames[frame - 1] - frameTime));
+	int frame = Animation::binarySearch(frames, time);
+	Vector<float>  &prevVertices = frameVertices[frame - 1];
+	Vector<float>  &nextVertices = frameVertices[frame];
+	float frameTime = frames[frame];
+	float percent = getCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime));
 
 	if (alpha == 1) {
-		// Vertex positions or deform offsets, no alpha.
-		for (int i = 0; i < vertexCount; ++i) {
-			float prev = prevVertices[i];
-			vertices[i] = prev + (nextVertices[i] - prev) * percent;
-		}
-	} else if (pose == MixPose_Setup) {
-		if (vertexAttachment->_bones.size() == 0) {
-			// Unweighted vertex positions, with alpha.
-			Vector<float> &setupVertices = vertexAttachment->_vertices;
-			for (int i = 0; i < vertexCount; ++i) {
-				float prev = prevVertices[i], setup = setupVertices[i];
-				vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+		if (blend == MixBlend_Add) {
+			VertexAttachment *vertexAttachment = static_cast<VertexAttachment *>(slotAttachment);
+			if (vertexAttachment->getBones().size() == 0) {
+				// Unweighted vertex positions, no alpha.
+				Vector<float> &setupVertices = vertexAttachment->getVertices();
+				for (int i = 0; i < vertexCount; i++) {
+					float prev = prevVertices[i];
+					vertices[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
+				}
+			} else {
+				// Weighted deform offsets, no alpha.
+				for (int i = 0; i < vertexCount; i++) {
+					float prev = prevVertices[i];
+					vertices[i] += prev + (nextVertices[i] - prev) * percent;
+				}
 			}
 		} else {
-			// Weighted deform offsets, with alpha.
-			for (int i = 0; i < vertexCount; ++i) {
+			// Vertex positions or deform offsets, no alpha.
+			for (int i = 0; i < vertexCount; i++) {
 				float prev = prevVertices[i];
-				vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
+				vertices[i] = prev + (nextVertices[i] - prev) * percent;
 			}
 		}
 	} else {
-		// Vertex positions or deform offsets, with alpha.
-		for (int i = 0; i < vertexCount; ++i) {
-			float prev = prevVertices[i];
-			vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+		switch (blend) {
+			case MixBlend_Setup: {
+				VertexAttachment *vertexAttachment = static_cast<VertexAttachment *>(slotAttachment);
+				if (vertexAttachment->getBones().size() == 0) {
+					// Unweighted vertex positions, with alpha.
+					Vector<float> &setupVertices = vertexAttachment->getVertices();
+					for (int i = 0; i < vertexCount; i++) {
+						float prev = prevVertices[i], setup = setupVertices[i];
+						vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+					}
+				} else {
+					// Weighted deform offsets, with alpha.
+					for (int i = 0; i < vertexCount; i++) {
+						float prev = prevVertices[i];
+						vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
+					}
+				}
+				break;
+			}
+			case MixBlend_First:
+			case MixBlend_Replace:
+				// Vertex positions or deform offsets, with alpha.
+				for (int i = 0; i < vertexCount; i++) {
+					float prev = prevVertices[i];
+					vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+				}
+				break;
+			case MixBlend_Add:
+				VertexAttachment *vertexAttachment = static_cast<VertexAttachment *>(slotAttachment);
+				if (vertexAttachment->getBones().size() == 0) {
+					// Unweighted vertex positions, with alpha.
+					Vector<float> &setupVertices = vertexAttachment->getVertices();
+					for (int i = 0; i < vertexCount; i++) {
+						float prev = prevVertices[i];
+						vertices[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
+					}
+				} else {
+					// Weighted deform offsets, with alpha.
+					for (int i = 0; i < vertexCount; i++) {
+						float prev = prevVertices[i];
+						vertices[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
+					}
+				}
 		}
 	}
 }

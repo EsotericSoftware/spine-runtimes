@@ -46,24 +46,22 @@ ScaleTimeline::ScaleTimeline(int frameCount) : TranslateTimeline(frameCount) {
 }
 
 void ScaleTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						  MixPose pose, MixDirection direction) {
+						  MixBlend blend, MixDirection direction) {
 	Bone *boneP = skeleton._bones[_boneIndex];
 	Bone &bone = *boneP;
 
 	if (time < _frames[0]) {
-		switch (pose) {
-			case MixPose_Setup:
+		switch (blend) {
+			case MixBlend_Setup:
 				bone._scaleX = bone._data._scaleX;
 				bone._scaleY = bone._data._scaleY;
 				return;
-			case MixPose_Current:
+			case MixBlend_First:
 				bone._scaleX += (bone._data._scaleX - bone._scaleX) * alpha;
 				bone._scaleY += (bone._data._scaleY - bone._scaleY) * alpha;
-				return;
-			case MixPose_CurrentLayered:
-			default:
-				return;
+			default: {}
 		}
+		return;
 	}
 
 	float x, y;
@@ -85,27 +83,59 @@ void ScaleTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 	}
 
 	if (alpha == 1) {
-		bone._scaleX = x;
-		bone._scaleY = y;
+		if (blend == MixBlend_Add) {
+			bone._scaleX += x - bone._data._scaleX;
+			bone._scaleY += y - bone._data._scaleY;
+		} else {
+			bone._scaleX = x;
+			bone._scaleY = y;
+		}
 	} else {
-		float bx, by;
-		if (pose == MixPose_Setup) {
-			bx = bone._data._scaleX;
-			by = bone._data._scaleY;
-		} else {
-			bx = bone._scaleX;
-			by = bone._scaleY;
-		}
 		// Mixing out uses sign of setup or current pose, else use sign of key.
+		float bx, by;
 		if (direction == MixDirection_Out) {
-			x = (x >= 0 ? x : -x) * (bx >= 0 ? 1 : -1);
-			y = (y >= 0 ? y : -y) * (by >= 0 ? 1 : -1);
+			switch (blend) {
+				case MixBlend_Setup:
+					bx = bone._data._scaleX;
+					by = bone._data._scaleY;
+					bone._scaleX = bx + (MathUtil::abs(x) * MathUtil::sign(bx) - bx) * alpha;
+					bone._scaleY = by + (MathUtil::abs(y) * MathUtil::sign(by) - by) * alpha;
+					break;
+				case MixBlend_First:
+				case MixBlend_Replace:
+					bx = bone._scaleX;
+					by = bone._scaleY;
+					bone._scaleX = bx + (MathUtil::abs(x) * MathUtil::sign(bx) - bx) * alpha;
+					bone._scaleY = by + (MathUtil::abs(y) * MathUtil::sign(by) - by) * alpha;
+					break;
+				case MixBlend_Add:
+					bx = bone._scaleX;
+					by = bone._scaleY;
+					bone._scaleX = bx + (MathUtil::abs(x) * MathUtil::sign(bx) - bone._data._scaleX) * alpha;
+					bone._scaleY = by + (MathUtil::abs(y) * MathUtil::sign(by) - bone._data._scaleY) * alpha;
+			}
 		} else {
-			bx = (bx >= 0 ? bx : -bx) * (x >= 0 ? 1 : -1);
-			by = (by >= 0 ? by : -by) * (y >= 0 ? 1 : -1);
+			switch (blend) {
+				case MixBlend_Setup:
+					bx = MathUtil::abs(bone._data._scaleX) * MathUtil::sign(x);
+					by = MathUtil::abs(bone._data._scaleY) * MathUtil::sign(y);
+					bone._scaleX = bx + (x - bx) * alpha;
+					bone._scaleY = by + (y - by) * alpha;
+					break;
+				case MixBlend_First:
+				case MixBlend_Replace:
+					bx = MathUtil::abs(bone._scaleX) * MathUtil::sign(x);
+					by = MathUtil::abs(bone._scaleY) * MathUtil::sign(y);
+					bone._scaleX = bx + (x - bx) * alpha;
+					bone._scaleY = by + (y - by) * alpha;
+					break;
+				case MixBlend_Add:
+					bx = MathUtil::sign(x);
+					by = MathUtil::sign(y);
+					bone._scaleX = MathUtil::abs(bone._scaleX) * bx + (x - MathUtil::abs(bone._data._scaleX) * bx) * alpha;
+					bone._scaleY = MathUtil::abs(bone._scaleY) * by + (y - MathUtil::abs(bone._data._scaleY) * by) * alpha;
+			}
 		}
-		bone._scaleX = bx + (x - bx) * alpha;
-		bone._scaleY = by + (y - by) * alpha;
 	}
 }
 

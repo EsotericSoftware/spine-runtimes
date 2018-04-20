@@ -56,20 +56,19 @@ IkConstraintTimeline::IkConstraintTimeline(int frameCount) : CurveTimeline(frame
 }
 
 void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-								 MixPose pose, MixDirection direction) {
+								 MixBlend blend, MixDirection direction) {
 	IkConstraint *constraintP = skeleton._ikConstraints[_ikConstraintIndex];
 	IkConstraint &constraint = *constraintP;
 	if (time < _frames[0]) {
-		switch (pose) {
-			case MixPose_Setup:
+		switch (blend) {
+			case MixBlend_Setup:
 				constraint._mix = constraint._data._mix;
 				constraint._bendDirection = constraint._data._bendDirection;
 				return;
-			case MixPose_Current:
+			case MixBlend_First:
 				constraint._mix += (constraint._data._mix - constraint._mix) * alpha;
 				constraint._bendDirection = constraint._data._bendDirection;
 				return;
-			case MixPose_CurrentLayered:
 			default:
 				return;
 		}
@@ -77,7 +76,7 @@ void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time,
 
 	if (time >= _frames[_frames.size() - ENTRIES]) {
 		// Time is after last frame.
-		if (pose == MixPose_Setup) {
+		if (blend == MixBlend_Setup) {
 			constraint._mix =
 					constraint._data._mix + (_frames[_frames.size() + PREV_MIX] - constraint._data._mix) * alpha;
 			constraint._bendDirection = direction == MixDirection_Out ? constraint._data._bendDirection
@@ -99,7 +98,7 @@ void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time,
 	float percent = getCurvePercent(frame / ENTRIES - 1,
 									1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
 
-	if (pose == MixPose_Setup) {
+	if (blend == MixBlend_Setup) {
 		constraint._mix =
 				constraint._data._mix + (mix + (_frames[frame + MIX] - mix) * percent - constraint._data._mix) * alpha;
 		constraint._bendDirection =

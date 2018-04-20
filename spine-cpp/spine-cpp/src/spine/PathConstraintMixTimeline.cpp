@@ -58,20 +58,19 @@ PathConstraintMixTimeline::PathConstraintMixTimeline(int frameCount) : CurveTime
 
 void
 PathConstraintMixTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-								 MixPose pose, MixDirection direction) {
+								 MixBlend blend, MixDirection direction) {
 	PathConstraint *constraintP = skeleton._pathConstraints[_pathConstraintIndex];
 	PathConstraint &constraint = *constraintP;
 	if (time < _frames[0]) {
-		switch (pose) {
-			case MixPose_Setup:
+		switch (blend) {
+			case MixBlend_Setup:
 				constraint._rotateMix = constraint._data._rotateMix;
 				constraint._translateMix = constraint._data._translateMix;
 				return;
-			case MixPose_Current:
+			case MixBlend_First:
 				constraint._rotateMix += (constraint._data._rotateMix - constraint._rotateMix) * alpha;
 				constraint._translateMix += (constraint._data._translateMix - constraint._translateMix) * alpha;
 				return;
-			case MixPose_CurrentLayered:
 			default:
 				return;
 		}
@@ -95,7 +94,7 @@ PathConstraintMixTimeline::apply(Skeleton &skeleton, float lastTime, float time,
 		translate += (_frames[frame + TRANSLATE] - translate) * percent;
 	}
 
-	if (pose == MixPose_Setup) {
+	if (blend == MixBlend_Setup) {
 		constraint._rotateMix = constraint._data._rotateMix + (rotate - constraint._data._rotateMix) * alpha;
 		constraint._translateMix =
 				constraint._data._translateMix + (translate - constraint._data._translateMix) * alpha;

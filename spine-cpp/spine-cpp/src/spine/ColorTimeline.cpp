@@ -58,27 +58,23 @@ ColorTimeline::ColorTimeline(int frameCount) : CurveTimeline(frameCount), _slotI
 }
 
 void ColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						  MixPose pose, MixDirection direction) {
+						  MixBlend blend, MixDirection direction) {
 	Slot *slotP = skeleton._slots[_slotIndex];
 	Slot &slot = *slotP;
 	if (time < _frames[0]) {
 		SlotData &slotData = slot._data;
-		switch (pose) {
-			case MixPose_Setup:
-				slot.getColor().set(slotData.getColor());
+		switch (blend) {
+			case MixBlend_Setup:
+				slot._color.set(slot._data._color);
 				return;
-			case MixPose_Current: {
-				Color &color = slot.getColor();
-				Color &setup = slot.getData().getColor();
-				color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha,
-						  (setup.b - color.b) * alpha,
+			case MixBlend_First: {
+				Color color = slot._color, setup = slot._data._color;
+				color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha,
 						  (setup.a - color.a) * alpha);
-				return;
 			}
-			case MixPose_CurrentLayered:
-			default:
-				return;
+			default: ;
 		}
+		return;
 	}
 
 	float r, g, b, a;
@@ -110,7 +106,7 @@ void ColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 		slot.getColor().set(r, g, b, a);
 	} else {
 		Color &color = slot.getColor();
-		if (pose == MixPose_Setup) color.set(slot.getData().getColor());
+		if (blend == MixBlend_Setup) color.set(slot.getData().getColor());
 		color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 	}
 }

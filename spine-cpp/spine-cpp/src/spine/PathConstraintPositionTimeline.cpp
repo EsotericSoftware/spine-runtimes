@@ -58,18 +58,17 @@ PathConstraintPositionTimeline::~PathConstraintPositionTimeline() {
 }
 
 void PathConstraintPositionTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents,
-										   float alpha, MixPose pose, MixDirection direction) {
+										   float alpha, MixBlend blend, MixDirection direction) {
 	PathConstraint *constraintP = skeleton._pathConstraints[_pathConstraintIndex];
 	PathConstraint &constraint = *constraintP;
 	if (time < _frames[0]) {
-		switch (pose) {
-			case MixPose_Setup:
+		switch (blend) {
+			case MixBlend_Setup:
 				constraint._position = constraint._data._position;
 				return;
-			case MixPose_Current:
+			case MixBlend_First:
 				constraint._position += (constraint._data._position - constraint._position) * alpha;
 				return;
-			case MixPose_CurrentLayered:
 			default:
 				return;
 		}
@@ -89,7 +88,7 @@ void PathConstraintPositionTimeline::apply(Skeleton &skeleton, float lastTime, f
 
 		position += (_frames[frame + VALUE] - position) * percent;
 	}
-	if (pose == MixPose_Setup) {
+	if (blend == MixBlend_Setup) {
 		constraint._position = constraint._data._position + (position - constraint._data._position) * alpha;
 	} else {
 		constraint._position += (position - constraint._position) * alpha;

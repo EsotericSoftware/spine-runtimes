@@ -61,25 +61,24 @@ TransformConstraintTimeline::TransformConstraintTimeline(int frameCount) : Curve
 }
 
 void TransformConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents,
-										float alpha, MixPose pose, MixDirection direction) {
+										float alpha, MixBlend blend, MixDirection direction) {
 	TransformConstraint *constraintP = skeleton._transformConstraints[_transformConstraintIndex];
 	TransformConstraint &constraint = *constraintP;
 
 	if (time < _frames[0]) {
-		switch (pose) {
-			case MixPose_Setup:
+		switch (blend) {
+			case MixBlend_Setup:
 				constraint._rotateMix = constraint._data._rotateMix;
 				constraint._translateMix = constraint._data._translateMix;
 				constraint._scaleMix = constraint._data._scaleMix;
 				constraint._shearMix = constraint._data._shearMix;
 				return;
-			case MixPose_Current:
+			case MixBlend_First:
 				constraint._rotateMix += (constraint._data._rotateMix - constraint._rotateMix) * alpha;
 				constraint._translateMix += (constraint._data._translateMix - constraint._translateMix) * alpha;
 				constraint._scaleMix += (constraint._data._scaleMix - constraint._scaleMix) * alpha;
 				constraint._shearMix += (constraint._data._shearMix - constraint._shearMix) * alpha;
 				return;
-			case MixPose_CurrentLayered:
 			default:
 				return;
 		}
@@ -110,7 +109,7 @@ void TransformConstraintTimeline::apply(Skeleton &skeleton, float lastTime, floa
 		shear += (_frames[frame + SHEAR] - shear) * percent;
 	}
 
-	if (pose == MixPose_Setup) {
+	if (blend == MixBlend_Setup) {
 		TransformConstraintData &data = constraint._data;
 		constraint._rotateMix = data._rotateMix + (rotate - data._rotateMix) * alpha;
 		constraint._translateMix = data._translateMix + (translate - data._translateMix) * alpha;

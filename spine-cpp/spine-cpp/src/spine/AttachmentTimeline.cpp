@@ -54,13 +54,13 @@ AttachmentTimeline::AttachmentTimeline(int frameCount) : Timeline(), _slotIndex(
 }
 
 void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-							   MixPose pose, MixDirection direction) {
+							   MixBlend blend, MixDirection direction) {
 	assert(_slotIndex < skeleton._slots.size());
 
 	String *attachmentName;
 	Slot *slotP = skeleton._slots[_slotIndex];
 	Slot &slot = *slotP;
-	if (direction == MixDirection_Out && pose == MixPose_Setup) {
+	if (direction == MixDirection_Out && blend == MixBlend_Setup) {
 		attachmentName = &slot._data._attachmentName;
 		slot._attachment = attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName);
 		return;
@@ -68,7 +68,7 @@ void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, V
 
 	if (time < _frames[0]) {
 		// Time is before first frame.
-		if (pose == MixPose_Setup) {
+		if (blend == MixBlend_Setup || blend == MixBlend_First) {
 			attachmentName = &slot._data._attachmentName;
 			slot._attachment =
 					attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName);

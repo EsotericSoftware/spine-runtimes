@@ -34,7 +34,7 @@
 #include <spine/Timeline.h>
 #include <spine/SpineObject.h>
 #include <spine/Vector.h>
-#include <spine/MixPose.h>
+#include <spine/MixBlend.h>
 #include <spine/MixDirection.h>
 #include <spine/String.h>
 
@@ -51,7 +51,7 @@ namespace Spine {
     public:
         explicit AttachmentTimeline(int frameCount);
         
-        virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction);
+        virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixBlend blend, MixDirection direction);
         
         virtual int getPropertyId();
         

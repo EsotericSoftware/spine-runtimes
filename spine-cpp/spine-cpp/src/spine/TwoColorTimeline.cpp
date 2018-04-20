@@ -65,18 +65,18 @@ TwoColorTimeline::TwoColorTimeline(int frameCount) : CurveTimeline(frameCount), 
 }
 
 void TwoColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-							 MixPose pose, MixDirection direction) {
+							 MixBlend blend, MixDirection direction) {
 	Slot *slotP = skeleton._slots[_slotIndex];
 	Slot &slot = *slotP;
 
 	if (time < _frames[0]) {
 		// Time is before first frame.
-		switch (pose) {
-			case MixPose_Setup:
+		switch (blend) {
+			case MixBlend_Setup:
 				slot.getColor().set(slot.getData().getColor());
 				slot.getDarkColor().set(slot.getData().getDarkColor());
 				return;
-			case MixPose_Current: {
+			case MixBlend_First: {
 				Color &color = slot.getColor();
 				color.r += (color.r - slot._data.getColor().r) * alpha;
 				color.g += (color.g - slot._data.getColor().g) * alpha;
@@ -89,7 +89,6 @@ void TwoColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vec
 				darkColor.b += (darkColor.b - slot._data.getDarkColor().b) * alpha;
 				return;
 			}
-			case MixPose_CurrentLayered:
 			default:
 				return;
 		}
@@ -131,48 +130,19 @@ void TwoColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vec
 
 	if (alpha == 1) {
 		Color &color = slot.getColor();
-		color.r = r;
-		color.g = g;
-		color.b = b;
-		color.a = a;
+		color.set(r, g, b, a);
 
 		Color &darkColor = slot.getDarkColor();
-		darkColor.r = r2;
-		darkColor.g = g2;
-		darkColor.b = b2;
+		darkColor.set(r2, g2, b2, 1);
 	} else {
-		float br, bg, bb, ba, br2, bg2, bb2;
-		if (pose == MixPose_Setup) {
-			br = slot._data.getColor().r;
-			bg = slot._data.getColor().g;
-			bb = slot._data.getColor().b;
-			ba = slot._data.getColor().a;
-			br2 = slot._data.getDarkColor().r;
-			bg2 = slot._data.getDarkColor().g;
-			bb2 = slot._data.getDarkColor().b;
-		} else {
-			Color &color = slot.getColor();
-			br = color.r;
-			bg = color.g;
-			bb = color.b;
-			ba = color.a;
-
-			Color &darkColor = slot.getDarkColor();
-			br2 = darkColor.r;
-			bg2 = darkColor.g;
-			bb2 = darkColor.b;
+		Color &light = slot._color;
+		Color &dark = slot._darkColor;
+		if (blend == MixBlend_Setup) {
+			light.set(slot._data._color);
+			dark.set(slot._data._darkColor);
 		}
-
-		Color &color = slot.getColor();
-		color.r = br + ((r - br) * alpha);
-		color.g = bg + ((g - bg) * alpha);
-		color.b = bb + ((b - bb) * alpha);
-		color.a = ba + ((a - ba) * alpha);
-
-		Color &darkColor = slot.getDarkColor();
-		darkColor.r = br2 + ((r2 - br2) * alpha);
-		darkColor.g = bg2 + ((g2 - bg2) * alpha);
-		darkColor.b = bb2 + ((b2 - bb2) * alpha);
+		light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
+		dark.add((r2 - dark.r) * alpha, (g2 - dark.g) * alpha, (b2 - dark.b) * alpha, 0);
 	}
 }
 

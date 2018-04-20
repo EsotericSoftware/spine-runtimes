@@ -65,7 +65,7 @@
 #include <spine/MathUtil.h>
 #include <spine/MeshAttachment.h>
 #include <spine/MixDirection.h>
-#include <spine/MixPose.h>
+#include <spine/MixBlend.h>
 #include <spine/PathAttachment.h>
 #include <spine/PathConstraint.h>
 #include <spine/PathConstraintData.h>

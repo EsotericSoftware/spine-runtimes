@@ -33,7 +33,7 @@
 
 #include <spine/RTTI.h>
 #include <spine/Vector.h>
-#include <spine/MixPose.h>
+#include <spine/MixBlend.h>
 #include <spine/MixDirection.h>
 #include <spine/SpineObject.h>
 
@@ -59,10 +59,10 @@ public:
 	///     value. Between 0 and 1 applies a value between the current or setup pose and the timeline value. By adjusting
 	///     alpha over time, an animation can be mixed in or out. alpha can also be useful to
 	///      apply animations on top of each other (layered).
-	/// @param pose Controls how mixing is applied when alpha is than 1.
+	/// @param blend Controls how mixing is applied when alpha is than 1.
 	/// @param direction Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions such as DrawOrderTimeline and AttachmentTimeline.
 	virtual void
-	apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha, MixPose pose,
+	apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha, MixBlend blend,
 		  MixDirection direction) = 0;
 
 	virtual int getPropertyId() = 0;

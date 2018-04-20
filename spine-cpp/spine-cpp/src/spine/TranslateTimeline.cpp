@@ -58,24 +58,22 @@ TranslateTimeline::~TranslateTimeline() {
 }
 
 void TranslateTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-							  MixPose pose, MixDirection direction) {
+							  MixBlend blend, MixDirection direction) {
 	Bone *boneP = skeleton._bones[_boneIndex];
 	Bone &bone = *boneP;
 
 	if (time < _frames[0]) {
-		switch (pose) {
-			case MixPose_Setup:
+		switch (blend) {
+			case MixBlend_Setup:
 				bone._x = bone._data._x;
 				bone._y = bone._data._y;
 				return;
-			case MixPose_Current:
+			case MixBlend_First:
 				bone._x += (bone._data._x - bone._x) * alpha;
 				bone._y += (bone._data._y - bone._y) * alpha;
-				return;
-			case MixPose_CurrentLayered:
-			default:
-				return;
+			default: {}
 		}
+		return;
 	}
 
 	float x, y;
@@ -96,12 +94,19 @@ void TranslateTimeline::apply(Skeleton &skeleton, float lastTime, float time, Ve
 		y += (_frames[frame + Y] - y) * percent;
 	}
 
-	if (pose == MixPose_Setup) {
-		bone._x = bone._data._x + x * alpha;
-		bone._y = bone._data._y + y * alpha;
-	} else {
-		bone._x += (bone._data._x + x - bone._x) * alpha;
-		bone._y += (bone._data._y + y - bone._y) * alpha;
+	switch (blend) {
+		case MixBlend_Setup:
+			bone._x = bone._data._x + x * alpha;
+			bone._y = bone._data._y + y * alpha;
+			break;
+		case MixBlend_First:
+		case MixBlend_Replace:
+			bone._x += (bone._data._x + x - bone._x) * alpha;
+			bone._y += (bone._data._y + y - bone._y) * alpha;
+			break;
+		case MixBlend_Add:
+			bone._x += x * alpha;
+			bone._y += y * alpha;
 	}
 }
 

@@ -46,24 +46,22 @@ ShearTimeline::ShearTimeline(int frameCount) : TranslateTimeline(frameCount) {
 }
 
 void ShearTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						  MixPose pose, MixDirection direction) {
+						  MixBlend blend, MixDirection direction) {
 	Bone *boneP = skeleton._bones[_boneIndex];
 	Bone &bone = *boneP;
 
 	if (time < _frames[0]) {
-		switch (pose) {
-			case MixPose_Setup:
+		switch (blend) {
+			case MixBlend_Setup:
 				bone._shearX = bone._data._shearX;
 				bone._shearY = bone._data._shearY;
 				return;
-			case MixPose_Current:
+			case MixBlend_First:
 				bone._shearX += (bone._data._shearX - bone._shearX) * alpha;
 				bone._shearY += (bone._data._shearY - bone._shearY) * alpha;
-				return;
-			case MixPose_CurrentLayered:
-			default:
-				return;
+			default: {}
 		}
+		return;
 	}
 
 	float x, y;
@@ -84,12 +82,19 @@ void ShearTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 		y = y + (_frames[frame + Y] - y) * percent;
 	}
 
-	if (pose == MixPose_Setup) {
-		bone._shearX = bone._data._shearX + x * alpha;
-		bone._shearY = bone._data._shearY + y * alpha;
-	} else {
-		bone._shearX += (bone._data._shearX + x - bone._shearX) * alpha;
-		bone._shearY += (bone._data._shearY + y - bone._shearY) * alpha;
+	switch (blend) {
+		case MixBlend_Setup:
+			bone._shearX = bone._data._shearX + x * alpha;
+			bone._shearY = bone._data._shearY + y * alpha;
+			break;
+		case MixBlend_First:
+		case MixBlend_Replace:
+			bone._shearX += (bone._data._shearX + x - bone._shearX) * alpha;
+			bone._shearY += (bone._data._shearY + y - bone._shearY) * alpha;
+			break;
+		case MixBlend_Add:
+			bone._shearX += x * alpha;
+			bone._shearY += y * alpha;
 	}
 }
 

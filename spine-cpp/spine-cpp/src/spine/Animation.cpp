@@ -50,7 +50,7 @@ Animation::~Animation() {
 }
 
 void Animation::apply(Skeleton &skeleton, float lastTime, float time, bool loop, Vector<Event *> *pEvents, float alpha,
-					  MixPose pose, MixDirection direction) {
+					  MixBlend blend, MixDirection direction) {
 	if (loop && _duration != 0) {
 		time = MathUtil::fmod(time, _duration);
 		if (lastTime > 0) {
@@ -59,7 +59,7 @@ void Animation::apply(Skeleton &skeleton, float lastTime, float time, bool loop,
 	}
 
 	for (int i = 0, n = static_cast<int>(_timelines.size()); i < n; ++i) {
-		_timelines[i]->apply(skeleton, lastTime, time, pEvents, alpha, pose, direction);
+		_timelines[i]->apply(skeleton, lastTime, time, pEvents, alpha, blend, direction);
 	}
 }
 

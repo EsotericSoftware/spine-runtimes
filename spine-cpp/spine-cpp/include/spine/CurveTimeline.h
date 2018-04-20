@@ -44,7 +44,7 @@ namespace Spine {
 
         virtual ~CurveTimeline();
         
-        virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixPose pose, MixDirection direction) = 0;
+        virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixBlend blend, MixDirection direction) = 0;
         
         virtual int getPropertyId() = 0;
         

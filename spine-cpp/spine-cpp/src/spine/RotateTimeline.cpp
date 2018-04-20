@@ -47,22 +47,21 @@ RotateTimeline::RotateTimeline(int frameCount) : CurveTimeline(frameCount), _bon
 }
 
 void RotateTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						   MixPose pose, MixDirection direction) {
+						   MixBlend blend, MixDirection direction) {
 	Bone *bone = skeleton.getBones()[_boneIndex];
 
 	if (time < _frames[0]) {
-		switch (pose) {
-			case MixPose_Setup: {
+		switch (blend) {
+			case MixBlend_Setup: {
 				bone->_rotation = bone->_data._rotation;
 				break;
 			}
-			case MixPose_Current: {
-				float rr = bone->_data._rotation - bone->_rotation;
-				rr -= (16384 - (int) (16384.499999999996 - rr / 360)) * 360;
-				bone->_rotation += rr * alpha;
+			case MixBlend_First: {
+				float r = bone->_data._rotation - bone->_rotation;
+				bone->_rotation += (r - (16384 - (int) (16384.499999999996 - r / 360)) * 360) * alpha;
 				break;
 			}
-			case MixPose_CurrentLayered: {
+			default: {
 				// TODO?
 				break;
 			}
@@ -72,15 +71,19 @@ void RotateTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 	}
 
 	if (time >= _frames[_frames.size() - ENTRIES]) {
-		// Time is after last frame.
-		if (pose == MixPose_Setup) {
-			bone->_rotation = bone->_data._rotation + _frames[_frames.size() + PREV_ROTATION] * alpha;
-		} else {
-			float rr = bone->_data._rotation + _frames[_frames.size() + PREV_ROTATION] - bone->_rotation;
-			rr -= (16384 - (int) (16384.499999999996 - rr / 360)) * 360; // Wrap within -180 and 180.
-			bone->_rotation += rr * alpha;
+		float r = _frames[_frames.size() + PREV_ROTATION];
+		switch (blend) {
+			case MixBlend_Setup:
+				bone->_rotation = bone->_data._rotation + r * alpha;
+				break;
+			case MixBlend_First:
+			case MixBlend_Replace:
+				r += bone->_data._rotation - bone->_rotation;
+				r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
+				// Fall through.
+			case MixBlend_Add:
+				bone->_rotation += r * alpha;
 		}
-
 		return;
 	}
 
@@ -90,18 +93,18 @@ void RotateTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 	float frameTime = _frames[frame];
 	float percent = getCurvePercent((frame >> 1) - 1,
 									1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
-
 	float r = _frames[frame + ROTATION] - prevRotation;
-	r -= (16384 - (int) (16384.499999999996 - r / 360)) * 360;
-	r = prevRotation + r * percent;
-
-	if (pose == MixPose_Setup) {
-		r -= (16384 - (int) (16384.499999999996 - r / 360)) * 360;
-		bone->_rotation = bone->_data._rotation + r * alpha;
-	} else {
-		r = bone->_data._rotation + r - bone->_rotation;
-		r -= (16384 - (int) (16384.499999999996 - r / 360)) * 360;
-		bone->_rotation += r * alpha;
+	r = prevRotation + (r - (16384 - (int)(16384.499999999996 - r / 360)) * 360) * percent;
+	switch (blend) {
+		case MixBlend_Setup:
+			bone->_rotation = bone->_data._rotation + (r - (16384 - (int)(16384.499999999996 - r / 360)) * 360) * alpha;
+			break;
+		case MixBlend_First:
+		case MixBlend_Replace:
+			r += bone->_data._rotation - bone->_rotation;
+			// Fall through.
+		case MixBlend_Add:
+			bone->_rotation += (r - (16384 - (int)(16384.499999999996 - r / 360)) * 360) * alpha;
 	}
 }
 
