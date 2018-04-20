@@ -61,6 +61,7 @@ namespace Spine.Unity.Editor {
 			public static Texture2D image;
 			public static Texture2D genericAttachment;
 			public static Texture2D boundingBox;
+			public static Texture2D point;
 			public static Texture2D mesh;
 			public static Texture2D weights;
 			public static Texture2D path;
@@ -102,6 +103,7 @@ namespace Spine.Unity.Editor {
 				genericAttachment = LoadIcon("icon-attachment.png");
 				image = LoadIcon("icon-image.png");
 				boundingBox = LoadIcon("icon-boundingBox.png");
+				point = LoadIcon("icon-point.png");
 				mesh = LoadIcon("icon-mesh.png");
 				weights = LoadIcon("icon-weights.png");
 				path = LoadIcon("icon-path.png");
@@ -140,6 +142,8 @@ namespace Spine.Unity.Editor {
 					return ((MeshAttachment)attachment).IsWeighted() ? Icons.weights : Icons.mesh;
 				else if (attachment is BoundingBoxAttachment)
 					return Icons.boundingBox;
+				else if (attachment is PointAttachment)
+					return Icons.point;
 				else if (attachment is PathAttachment)
 					return Icons.path;
 				else if (attachment is ClippingAttachment)
