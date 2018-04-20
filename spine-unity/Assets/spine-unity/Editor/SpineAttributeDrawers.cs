@@ -75,6 +75,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			SerializedProperty dataField = property.FindBaseOrSiblingProperty(TargetAttribute.dataField);
+
 			if (dataField != null) {
 				var objectReferenceValue = dataField.objectReferenceValue;
 				if (objectReferenceValue is SkeletonDataAsset) {

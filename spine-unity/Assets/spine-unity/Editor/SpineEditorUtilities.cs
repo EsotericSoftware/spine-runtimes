@@ -288,13 +288,14 @@ namespace Spine.Unity.Editor {
 			defaultShader = shader != null ? shader.name : DEFAULT_DEFAULT_SHADER;
 			if (EditorGUI.EndChangeCheck())
 				EditorPrefs.SetString(DEFAULT_SHADER_KEY, defaultShader);
-			EditorGUILayout.Space();
 
 			EditorGUI.BeginChangeCheck();
 			setTextureImporterSettings = EditorGUILayout.Toggle(new GUIContent("Apply Atlas Texture Settings", "Apply the recommended settings for Texture Importers."), showHierarchyIcons);
 			if (EditorGUI.EndChangeCheck()) {
 				EditorPrefs.SetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, showHierarchyIcons);
 			}
+
+			EditorGUILayout.Space();
 
 			EditorGUILayout.LabelField("Editor Instantiation", EditorStyles.boldLabel);
 			EditorGUI.BeginChangeCheck();
