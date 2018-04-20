@@ -48,11 +48,11 @@ namespace Spine.Unity.Examples {
 				shockTimer -= Time.deltaTime;
 
 			if (shockTimer > 0) {
-				eyeSlot.attachment = shockEye;
-				mouthSlot.attachment = shockMouth;
+				eyeSlot.Attachment = shockEye;
+				mouthSlot.Attachment = shockMouth;
 			} else {
-				eyeSlot.attachment = normalEye;
-				mouthSlot.attachment = normalMouth;
+				eyeSlot.Attachment = normalEye;
+				mouthSlot.Attachment = normalMouth;
 			}
 		}
 	}
