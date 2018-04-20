@@ -83,7 +83,7 @@ namespace Spine {
 			return defaultMix;
 		}
 
-		struct AnimationPair {
+		public struct AnimationPair {
 			public readonly Animation a1;
 			public readonly Animation a2;
 
@@ -98,8 +98,8 @@ namespace Spine {
 		}
 
 		// Avoids boxing in the dictionary.
-		class AnimationPairComparer : IEqualityComparer<AnimationPair> {
-			internal static readonly AnimationPairComparer Instance = new AnimationPairComparer();
+		public class AnimationPairComparer : IEqualityComparer<AnimationPair> {
+			public static readonly AnimationPairComparer Instance = new AnimationPairComparer();
 
 			bool IEqualityComparer<AnimationPair>.Equals (AnimationPair x, AnimationPair y) {
 				return ReferenceEquals(x.a1, y.a1) && ReferenceEquals(x.a2, y.a2);
