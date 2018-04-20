@@ -68,7 +68,7 @@ void DrawOrderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Ve
 	}
 
 	if (time < _frames[0]) {
-		if (blend == MixBlend_Setup) {
+		if (blend == MixBlend_Setup || blend == MixBlend_First) {
 			drawOrder.clear();
 			drawOrder.ensureCapacity(slots.size());
 			for (int i = 0, n = static_cast<int>(slots.size()); i < n; ++i) {

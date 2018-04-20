@@ -978,7 +978,7 @@ void AnimationState::animationsChanged() {
 
 	for (int i = 0, n = static_cast<int>(_tracks.size()); i < n; ++i) {
 		TrackEntry *entry = _tracks[i];
-		if (entry != NULL && entry->_mixBlend != MixBlend_Add) {
+		if (entry != NULL && (i == 0 ||entry->_mixBlend != MixBlend_Add)) {
 			entry->setTimelineData(NULL, _mixingTo, _propertyIDs);
 		}
 	}
