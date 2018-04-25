@@ -34,13 +34,15 @@ using UnityEngine;
 
 namespace Spine.Unity {
 	[CreateAssetMenu(menuName = "Spine/Animation Reference Asset")]
-	public class AnimationReferenceAsset : ScriptableObject {
+	public class AnimationReferenceAsset : ScriptableObject, IHasSkeletonDataAsset {
 		const bool QuietSkeletonData = true;
 
 		[SerializeField] protected SkeletonDataAsset skeletonDataAsset;
-		[SerializeField, SpineAnimation(dataField: "skeletonDataAsset")] protected string animationName;
-
+		[SerializeField, SpineAnimation] protected string animationName;
 		private Animation animation;
+
+		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } }
+
 		public Animation Animation {
 			get {
 				#if AUTOINIT_SPINEREFERENCE
@@ -51,7 +53,7 @@ namespace Spine.Unity {
 				return animation;
 			}
 		}
-
+		
 		public void Initialize () {
 			if (skeletonDataAsset == null) return;
 			this.animation = skeletonDataAsset.GetSkeletonData(AnimationReferenceAsset.QuietSkeletonData).FindAnimation(animationName);
