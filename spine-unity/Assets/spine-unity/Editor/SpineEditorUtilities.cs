@@ -1554,12 +1554,11 @@ namespace Spine.Unity.Editor {
 		}
 		#endregion
 
-		//public static string GetPathSafeRegionName (AtlasRegion region) {
-		//	return region.name.Replace("/", "_");
-		//}
-
 		public static string GetPathSafeName (string name) {
-			return name.Replace("/", "_");
+			foreach (char c in System.IO.Path.GetInvalidFileNameChars()) { // Doesn't handle more obscure file name limitations.
+				name = name.Replace(c, '_');
+			}
+			return name;
 		}
 	}
 
