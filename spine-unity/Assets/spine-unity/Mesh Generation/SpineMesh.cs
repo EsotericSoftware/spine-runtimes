@@ -968,11 +968,6 @@ namespace Spine.Unity {
 			var vbi = vertexBuffer.Items;
 			var ubi = uvBuffer.Items;
 			var cbi = colorBuffer.Items;
-<<<<<<< HEAD
-=======
-			//var sbi = submeshes.Items;
-			//int submeshCount = submeshes.Count;
->>>>>>> 3.6
 
 			// Zero the extra.
 			{
