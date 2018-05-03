@@ -82,21 +82,29 @@ namespace Spine {
 
 			PathConstraintData data = this.data;
 			SpacingMode spacingMode = data.spacingMode;
-			bool lengthSpacing = spacingMode == SpacingMode.Length;
+			bool percentSpacing = spacingMode == SpacingMode.Percent;
 			RotateMode rotateMode = data.rotateMode;
 			bool tangents = rotateMode == RotateMode.Tangent, scale = rotateMode == RotateMode.ChainScale;
 			int boneCount = this.bones.Count, spacesCount = tangents ? boneCount : boneCount + 1;
 			Bone[] bonesItems = this.bones.Items;
 			ExposedList<float> spaces = this.spaces.Resize(spacesCount), lengths = null;
 			float spacing = this.spacing;
-			if (scale || lengthSpacing) {
+			if (scale || !percentSpacing) {
 				if (scale) lengths = this.lengths.Resize(boneCount);
+				bool lengthSpacing = data.spacingMode == SpacingMode.Length;
 				for (int i = 0, n = spacesCount - 1; i < n;) {
 					Bone bone = bonesItems[i];
 					float setupLength = bone.data.length;
 					if (setupLength < PathConstraint.Epsilon) {
 						if (scale) lengths.Items[i] = 0;
 						spaces.Items[++i] = 0;
+					} else if (percentSpacing) {
+						if (scale) {
+							float x = setupLength * bone.a, y = setupLength * bone.c;
+							float length = (float)Math.Sqrt(x * x + y * y);
+							lengths.Items[i] = length;
+						}
+						spaces.Items[++i] = spacing;
 					} else {
 						float x = setupLength * bone.a, y = setupLength * bone.c;
 						float length = (float)Math.Sqrt(x * x + y * y);
@@ -110,7 +118,7 @@ namespace Spine {
 			}
 
 			float[] positions = ComputeWorldPositions(attachment, spacesCount, tangents,
-				data.positionMode == PositionMode.Percent, spacingMode == SpacingMode.Percent);
+				data.positionMode == PositionMode.Percent, percentSpacing);
 			float boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
 			bool tip;
 			if (offsetRotation == 0) {
@@ -291,7 +299,11 @@ namespace Spine {
 				x1 = x2;
 				y1 = y2;
 			}
-			if (percentPosition) position *= pathLength;
+			if (percentPosition)
+				position *= pathLength;
+			else
+				position *= pathLength / path.lengths[curveCount - 1];
+
 			if (percentSpacing) {
 				for (int i = 0; i < spacesCount; i++)
 					spacesItems[i] *= pathLength;
