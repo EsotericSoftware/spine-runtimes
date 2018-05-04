@@ -2863,17 +2863,17 @@ var spine;
 			if (!translate && !rotate)
 				return;
 			var data = this.data;
-			var spacingMode = data.spacingMode;
-			var lengthSpacing = spacingMode == spine.SpacingMode.Length;
+			var percentSpacing = data.spacingMode == spine.SpacingMode.Percent;
 			var rotateMode = data.rotateMode;
 			var tangents = rotateMode == spine.RotateMode.Tangent, scale = rotateMode == spine.RotateMode.ChainScale;
 			var boneCount = this.bones.length, spacesCount = tangents ? boneCount : boneCount + 1;
 			var bones = this.bones;
 			var spaces = spine.Utils.setArraySize(this.spaces, spacesCount), lengths = null;
 			var spacing = this.spacing;
-			if (scale || lengthSpacing) {
+			if (scale || !percentSpacing) {
 				if (scale)
 					lengths = spine.Utils.setArraySize(this.lengths, boneCount);
+				var lengthSpacing = data.spacingMode == spine.SpacingMode.Length;
 				for (var i = 0, n = spacesCount - 1; i < n;) {
 					var bone = bones[i];
 					var setupLength = bone.data.length;
@@ -2882,9 +2882,17 @@ var spine;
 							lengths[i] = 0;
 						spaces[++i] = 0;
 					}
+					else if (percentSpacing) {
+						if (scale) {
+							var x = setupLength * bone.a, y = setupLength * bone.c;
+							var length = Math.sqrt(x * x + y * y);
+							lengths[i] = length;
+						}
+						spaces[++i] = spacing;
+					}
 					else {
-						var x = setupLength * bone.a, y = setupLength * bone.c;
-						var length_1 = Math.sqrt(x * x + y * y);
+						var x_1 = setupLength * bone.a, y_1 = setupLength * bone.c;
+						var length_1 = Math.sqrt(x_1 * x_1 + y_1 * y_1);
 						if (scale)
 							lengths[i] = length_1;
 						spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length_1 / setupLength;
@@ -2895,7 +2903,7 @@ var spine;
 				for (var i = 1; i < spacesCount; i++)
 					spaces[i] = spacing;
 			}
-			var positions = this.computeWorldPositions(attachment, spacesCount, tangents, data.positionMode == spine.PositionMode.Percent, spacingMode == spine.SpacingMode.Percent);
+			var positions = this.computeWorldPositions(attachment, spacesCount, tangents, data.positionMode == spine.PositionMode.Percent, percentSpacing);
 			var boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
 			var tip = false;
 			if (offsetRotation == 0)
@@ -2909,7 +2917,7 @@ var spine;
 				var bone = bones[i];
 				bone.worldX += (boneX - bone.worldX) * translateMix;
 				bone.worldY += (boneY - bone.worldY) * translateMix;
-				var x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
+				var x_2 = positions[p], y_2 = positions[p + 1], dx = x_2 - boneX, dy = y_2 - boneY;
 				if (scale) {
 					var length_2 = lengths[i];
 					if (length_2 != 0) {
@@ -2918,8 +2926,8 @@ var spine;
 						bone.c *= s;
 					}
 				}
-				boneX = x;
-				boneY = y;
+				boneX = x_2;
+				boneY = y_2;
 				if (rotate) {
 					var a = bone.a, b = bone.b, c = bone.c, d = bone.d, r = 0, cos = 0, sin = 0;
 					if (tangents)
@@ -3073,6 +3081,8 @@ var spine;
 			}
 			if (percentPosition)
 				position *= pathLength;
+			else
+				position *= pathLength / path.lengths[curveCount - 1];
 			if (percentSpacing) {
 				for (var i = 0; i < spacesCount; i++)
 					spaces[i] *= pathLength;
