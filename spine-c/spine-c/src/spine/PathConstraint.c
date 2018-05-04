@@ -84,8 +84,7 @@ void spPathConstraint_apply (spPathConstraint* self) {
 	int/*bool*/ translate = translateMix > 0, rotate = rotateMix > 0;
 	spPathAttachment* attachment = (spPathAttachment*)self->target->attachment;
 	spPathConstraintData* data = self->data;
-	spSpacingMode spacingMode = data->spacingMode;
-	int lengthSpacing = spacingMode == SP_SPACING_MODE_LENGTH;
+	int percentSpacing = data->spacingMode == SP_SPACING_MODE_PERCENT;
 	spRotateMode rotateMode = data->rotateMode;
 	int tangents = rotateMode == SP_ROTATE_MODE_TANGENT, scale = rotateMode == SP_ROTATE_MODE_CHAIN_SCALE;
 	int boneCount = self->bonesCount, spacesCount = tangents ? boneCount : boneCount + 1;
@@ -104,7 +103,7 @@ void spPathConstraint_apply (spPathConstraint* self) {
 	spaces[0] = 0;
 	lengths = 0;
 	spacing = self->spacing;
-	if (scale || lengthSpacing) {
+	if (scale || !percentSpacing) {
 		if (scale) {
 			if (self->lengthsCount != boneCount) {
 				if (self->lengths) FREE(self->lengths);
@@ -113,12 +112,20 @@ void spPathConstraint_apply (spPathConstraint* self) {
 			}
 			lengths = self->lengths;
 		}
+		int lengthSpacing = data->spacingMode == SP_SPACING_MODE_LENGTH;
 		for (i = 0, n = spacesCount - 1; i < n;) {
 			spBone *bone = bones[i];
 			setupLength = bone->data->length;
 			if (setupLength < EPSILON) {
 				if (scale) lengths[i] = 0;
 				spaces[++i] = 0;
+			} else if (percentSpacing) {
+				if (scale) {
+					float x = setupLength * bone->a, y = setupLength * bone->c;
+					float length = SQRT(x * x + y * y);
+					lengths[i] = length;
+				}
+				spaces[++i] = spacing;
 			} else {
 				x = setupLength * bone->a, y = setupLength * bone->c;
 				length = SQRT(x * x + y * y);
@@ -133,7 +140,7 @@ void spPathConstraint_apply (spPathConstraint* self) {
 	}
 
 	positions = spPathConstraint_computeWorldPositions(self, attachment, spacesCount, tangents,
-		data->positionMode == SP_POSITION_MODE_PERCENT, spacingMode == SP_SPACING_MODE_PERCENT);
+		data->positionMode == SP_POSITION_MODE_PERCENT, percentSpacing);
 	boneX = positions[0], boneY = positions[1], offsetRotation = self->data->offsetRotation;
 	tip = 0;
 	if (offsetRotation == 0)
@@ -373,7 +380,10 @@ float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAtta
 		x1 = x2;
 		y1 = y2;
 	}
-	if (percentPosition) position *= pathLength;
+	if (percentPosition)
+		position *= pathLength;
+	else
+		position *= pathLength / path->lengths[curveCount - 1];
 	if (percentSpacing) {
 		for (i = 0; i < spacesCount; i++)
 			spaces[i] *= pathLength;

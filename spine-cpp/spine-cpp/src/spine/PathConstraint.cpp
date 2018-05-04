@@ -86,18 +86,18 @@ void PathConstraint::update() {
 	}
 
 	PathConstraintData &data = _data;
-	SpacingMode spacingMode = data._spacingMode;
-	bool lengthSpacing = spacingMode == SpacingMode_Length;
+	bool percentSpacing = data._spacingMode == SpacingMode_Percent;
 	RotateMode rotateMode = data._rotateMode;
 	bool tangents = rotateMode == RotateMode_Tangent, scale = rotateMode == RotateMode_ChainScale;
 	size_t boneCount = _bones.size();
 	int spacesCount = static_cast<int>(tangents ? boneCount : boneCount + 1);
 	_spaces.setSize(spacesCount, 0);
 	float spacing = _spacing;
-	if (scale || lengthSpacing) {
+	if (scale || !percentSpacing) {
 		if (scale) {
 			_lengths.setSize(boneCount, 0);
 		}
+		bool lengthSpacing = data._spacingMode == SpacingMode_Length;
 
 		for (int i = 0, n = spacesCount - 1; i < n;) {
 			Bone *boneP = _bones[i];
@@ -108,6 +108,13 @@ void PathConstraint::update() {
 					_lengths[i] = 0;
 				}
 				_spaces[++i] = 0;
+			} else if (percentSpacing) {
+				if (scale) {
+					float x = setupLength * bone._a, y = setupLength * bone._c;
+					float length = MathUtil::sqrt(x * x + y * y);
+					_lengths[i] = length;
+				}
+				_spaces[++i] = spacing;
 			} else {
 				float x = setupLength * bone._a;
 				float y = setupLength * bone._c;
@@ -127,7 +134,7 @@ void PathConstraint::update() {
 
 	Vector<float>& positions = computeWorldPositions(*attachment, spacesCount, tangents,
 													data.getPositionMode() == PositionMode_Percent,
-													spacingMode == SpacingMode_Percent);
+													percentSpacing);
 	float boneX = positions[0];
 	float boneY = positions[1];
 	float offsetRotation = data.getOffsetRotation();
@@ -399,6 +406,8 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 
 	if (percentPosition) {
 		position *= pathLength;
+	} else {
+		position *= pathLength / path.getLengths()[curveCount - 1];
 	}
 
 	if (percentSpacing) {
