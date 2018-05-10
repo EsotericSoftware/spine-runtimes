@@ -138,18 +138,13 @@ namespace Spine.Unity.Modules {
 			skeletonRenderer.GenerateMeshOverride += HandleRender;
 			#endif
 
-
-			#if UNITY_5_4_OR_NEWER
 			if (copyMeshRendererFlags) {
 				var lightProbeUsage = mainMeshRenderer.lightProbeUsage;
 				bool receiveShadows = mainMeshRenderer.receiveShadows;
-
-				#if UNITY_5_5_OR_NEWER
 				var reflectionProbeUsage = mainMeshRenderer.reflectionProbeUsage;
 				var shadowCastingMode = mainMeshRenderer.shadowCastingMode;
 				var motionVectorGenerationMode = mainMeshRenderer.motionVectorGenerationMode;
 				var probeAnchor = mainMeshRenderer.probeAnchor;
-				#endif
 
 				for (int i = 0; i < partsRenderers.Count; i++) {
 					var currentRenderer = partsRenderers[i];
@@ -158,31 +153,12 @@ namespace Spine.Unity.Modules {
 					var mr = currentRenderer.MeshRenderer;
 					mr.lightProbeUsage = lightProbeUsage;
 					mr.receiveShadows = receiveShadows;
-
-					#if UNITY_5_5_OR_NEWER
 					mr.reflectionProbeUsage = reflectionProbeUsage;
 					mr.shadowCastingMode = shadowCastingMode;
 					mr.motionVectorGenerationMode = motionVectorGenerationMode;
 					mr.probeAnchor = probeAnchor;
-					#endif
 				}
 			}
-			#else
-			if (copyMeshRendererFlags) {
-				var useLightProbes = mainMeshRenderer.useLightProbes;
-				bool receiveShadows = mainMeshRenderer.receiveShadows;
-
-				for (int i = 0; i < partsRenderers.Count; i++) {
-					var currentRenderer = partsRenderers[i];
-					if (currentRenderer == null) continue; // skip null items.
-
-					var mr = currentRenderer.MeshRenderer;
-					mr.useLightProbes = useLightProbes;
-					mr.receiveShadows = receiveShadows;
-				}
-			}
-			#endif
-
 		}
 
 		void OnDisable () {
