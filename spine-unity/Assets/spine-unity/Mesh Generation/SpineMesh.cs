@@ -1397,7 +1397,7 @@ namespace Spine.Unity {
 				var instruction = instructionsItems[startSubmesh + i];
 				submeshesItems[i] = instruction;
 				#if SPINE_TRIANGLECHECK
-				this.hasActiveClipping = instruction.hasClipping;
+				this.hasActiveClipping |= instruction.hasClipping;
 				submeshesItems[i].rawFirstVertexIndex = runningVertexCount; // Ensure current instructions have correct cached values.
 				runningVertexCount += instruction.rawVertexCount; // vertexCount will also be used for the rest of this method.
 				#endif
