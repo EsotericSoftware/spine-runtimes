@@ -115,7 +115,7 @@ namespace Spine.Unity {
 		public static SkeletonGraphic AddSkeletonGraphicComponent (GameObject gameObject, SkeletonDataAsset skeletonDataAsset) {
 			var c = gameObject.AddComponent<SkeletonGraphic>();
 			if (skeletonDataAsset != null) {
-				c.skeletonDataAsset = skeletonDataAsset;
+				c.skeletonDataAsset = skeletonDataAsset;				
 				c.Initialize(false);
 			}
 			return c;

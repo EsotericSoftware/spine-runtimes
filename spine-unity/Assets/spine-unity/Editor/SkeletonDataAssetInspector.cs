@@ -36,7 +36,6 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-
 using Spine;
 
 namespace Spine.Unity.Editor {
@@ -80,6 +79,12 @@ namespace Spine.Unity.Editor {
 
 		void OnDestroy () {
 			HandleOnDestroyPreview();
+			AppDomain.CurrentDomain.DomainUnload -= OnDomainUnload;
+			EditorApplication.update -= preview.HandleEditorUpdate;
+		}
+
+		private void OnDomainUnload (object sender, EventArgs e) {
+			OnDestroy();
 		}
 
 		void InitializeEditor () {
@@ -105,7 +110,11 @@ namespace Spine.Unity.Editor {
 			#else
 			// Analysis disable once ConvertIfToOrExpression
 			if (newAtlasAssets) atlasAssets.isExpanded = true;
-			#endif
+#endif
+
+			// This handles the case where the managed editor assembly is unloaded before recompilation when code changes.
+			AppDomain.CurrentDomain.DomainUnload -= OnDomainUnload;
+			AppDomain.CurrentDomain.DomainUnload += OnDomainUnload;
 
 			EditorApplication.update -= preview.HandleEditorUpdate;
 			EditorApplication.update += preview.HandleEditorUpdate;
@@ -678,21 +687,41 @@ namespace Spine.Unity.Editor {
 			set { if (IsValid) skeletonAnimation.timeScale = value; }
 		}
 
-		public bool IsPlayingAnimation {
-			get {
+		public bool IsPlayingAnimation { get {
 				if (!IsValid) return false;
 				var currentTrack = skeletonAnimation.AnimationState.GetCurrent(0);
 				return currentTrack != null && currentTrack.TimeScale > 0;
 			}
 		}
 
-		public TrackEntry ActiveTrack {
-			get { return IsValid ? skeletonAnimation.AnimationState.GetCurrent(0) : null; }
-		}
+		public TrackEntry ActiveTrack { get { return IsValid ? skeletonAnimation.AnimationState.GetCurrent(0) : null; } }
 
 		public Vector3 PreviewCameraPosition {
 			get { return PreviewUtilityCamera.transform.position; }
 			set { PreviewUtilityCamera.transform.position = value; }
+		}
+
+		public void HandleDrawSettings () {
+			const float SliderWidth = 150;
+			const float SliderSnap = 0.25f;
+			const float SliderMin = 0f;
+			const float SliderMax = 2f;
+
+			if (IsValid) {
+				float timeScale = GUILayout.HorizontalSlider(TimeScale, SliderMin, SliderMax, GUILayout.MaxWidth(SliderWidth));
+				timeScale = Mathf.RoundToInt(timeScale / SliderSnap) * SliderSnap;
+				TimeScale = timeScale;
+			}
+		}
+
+		public void HandleEditorUpdate () {
+			AdjustCamera();
+			if (IsPlayingAnimation) {
+				RefreshOnNextUpdate();
+				Repaint();
+			} else if (requiresRefresh) {
+				Repaint();
+			}
 		}
 
 		public void Initialize (Action repaintCallback, SkeletonDataAsset skeletonDataAsset, string skinName = "") {
@@ -715,7 +744,7 @@ namespace Spine.Unity.Editor {
 				previewRenderUtility = new PreviewRenderUtility(true);
 				animationLastTime = Time.realtimeSinceStartup;
 
-				const int PreviewLayer = 31;
+				const int PreviewLayer = 30;
 				const int PreviewCameraCullingMask = 1 << PreviewLayer;
 
 				{
@@ -743,49 +772,136 @@ namespace Spine.Unity.Editor {
 							previewGameObject.GetComponent<Renderer>().enabled = false;
 						}
 
-						AdjustCameraGoals(true);
+						if (this.ActiveTrack != null) cameraAdjustEndFrame = EditorApplication.timeSinceStartup + skeletonAnimation.AnimationState.GetCurrent(0).Alpha;
+						AdjustCameraGoals();
 					} catch {
 						DestroyPreviewGameObject();
 					}
 
+					RefreshOnNextUpdate();
 				}
 			}
 		}
 
-		public void HandleDrawSettings () {
-			const float SliderWidth = 150;
-			const float SliderSnap = 0.25f;
-			const float SliderMin = 0f;
-			const float SliderMax = 2f;
+		public void HandleInteractivePreviewGUI (Rect r, GUIStyle background) {
+			if (Event.current.type == EventType.Repaint) {
+				if (requiresRefresh) {
+					previewRenderUtility.BeginPreview(r, background);
+					DoRenderPreview(true);
+					previewTexture = previewRenderUtility.EndPreview();
+					requiresRefresh = false;
+				}
+				if (previewTexture != null)
+					GUI.DrawTexture(r, previewTexture, ScaleMode.StretchToFill, false);
+			}
 
-			if (IsValid) {
-				float timeScale = GUILayout.HorizontalSlider(TimeScale, SliderMin, SliderMax, GUILayout.MaxWidth(SliderWidth));
-				timeScale = Mathf.RoundToInt(timeScale / SliderSnap) * SliderSnap;
-				TimeScale = timeScale;
+			DrawSkinToolbar(r);
+			//DrawSetupPoseButton(r);
+			DrawTimeBar(r);
+			HandleMouseScroll(r);
+		}
+
+		public Texture2D GetStaticPreview (int width, int height) {
+			var c = this.PreviewUtilityCamera;
+			if (c == null)
+				return null;
+
+			RefreshOnNextUpdate();
+			AdjustCameraGoals();
+			c.orthographicSize = cameraOrthoGoal / 2;
+			c.transform.position = cameraPositionGoal;
+			previewRenderUtility.BeginStaticPreview(new Rect(0, 0, width, height));
+			DoRenderPreview(false);
+			var tex = previewRenderUtility.EndStaticPreview();
+			return tex;
+		}
+
+		public void DoRenderPreview (bool drawHandles) {
+			if (this.PreviewUtilityCamera.activeTexture == null || this.PreviewUtilityCamera.targetTexture == null)
+				return;
+
+			GameObject go = previewGameObject;
+			if (requiresRefresh && go != null) {
+				var renderer = go.GetComponent<Renderer>();
+				renderer.enabled = true;
+
+				if (!EditorApplication.isPlaying) {
+					skeletonAnimation.Update((Time.realtimeSinceStartup - animationLastTime));
+					skeletonAnimation.LateUpdate();
+					animationLastTime = Time.realtimeSinceStartup;
+				}
+				
+				var thisPreviewUtilityCamera = this.PreviewUtilityCamera;
+
+				if (drawHandles) {
+					Handles.SetCamera(thisPreviewUtilityCamera);
+					Handles.color = OriginColor;
+
+					// Draw Cross
+					float scale = skeletonDataAsset.scale;
+					float cl = 1000 * scale;
+					Handles.DrawLine(new Vector3(-cl, 0), new Vector3(cl, 0));
+					Handles.DrawLine(new Vector3(0, cl), new Vector3(0, -cl));
+				}
+
+				thisPreviewUtilityCamera.Render();
+
+				if (drawHandles) {
+					Handles.SetCamera(thisPreviewUtilityCamera);
+					SpineHandles.DrawBoundingBoxes(skeletonAnimation.transform, skeletonAnimation.skeleton);
+					if (SkeletonDataAssetInspector.showAttachments)
+						SpineHandles.DrawPaths(skeletonAnimation.transform, skeletonAnimation.skeleton);
+				}
+
+				renderer.enabled = false;
 			}
 		}
 
-		public void OnDestroy () {
-			DisposePreviewRenderUtility();
-			DestroyPreviewGameObject();
-		}
+		public void AdjustCamera () {
+			if (previewRenderUtility == null)
+				return;
 
-		public void Clear () {
-			DisposePreviewRenderUtility();
-			DestroyPreviewGameObject();
-		}
+			if (EditorApplication.timeSinceStartup < cameraAdjustEndFrame)
+				AdjustCameraGoals();
 
-		void DisposePreviewRenderUtility () {
-			if (previewRenderUtility != null) {
-				previewRenderUtility.Cleanup();
-				previewRenderUtility = null;
+			lastCameraPositionGoal = cameraPositionGoal;
+			lastCameraOrthoGoal = cameraOrthoGoal;
+
+			var c = this.PreviewUtilityCamera;
+			float orthoSet = Mathf.Lerp(c.orthographicSize, cameraOrthoGoal, 0.1f);
+
+			c.orthographicSize = orthoSet;
+
+			float dist = Vector3.Distance(c.transform.position, cameraPositionGoal);
+			if (dist > 0f) {
+				Vector3 pos = Vector3.Lerp(c.transform.position, cameraPositionGoal, 0.1f);
+				pos.x = 0;
+				c.transform.position = pos;
+				c.transform.rotation = Quaternion.identity;
+				RefreshOnNextUpdate();
 			}
 		}
 
-		void DestroyPreviewGameObject () {
-			if (previewGameObject != null) {
-				GameObject.DestroyImmediate(previewGameObject);
-				previewGameObject = null;
+		void AdjustCameraGoals () {
+			if (previewGameObject == null) return;
+
+			Bounds bounds = previewGameObject.GetComponent<Renderer>().bounds;
+			cameraOrthoGoal = bounds.size.y;
+			cameraPositionGoal = bounds.center + new Vector3(0, 0, -10f);
+		}
+
+		void HandleMouseScroll (Rect position) {
+			Event current = Event.current;
+			int controlID = GUIUtility.GetControlID(SliderHash, FocusType.Passive);
+			switch (current.GetTypeForControl(controlID)) {
+				case EventType.ScrollWheel:
+					if (position.Contains(current.mousePosition)) {
+						cameraOrthoGoal += current.delta.y * 0.06f;
+						cameraOrthoGoal = Mathf.Max(0.01f, cameraOrthoGoal);
+						GUIUtility.hotControl = controlID;
+						current.Use();
+					}
+					break;
 			}
 		}
 
@@ -820,7 +936,7 @@ namespace Spine.Unity.Editor {
 
 			var targetAnimation = skeletonData.FindAnimation(animationName);
 			if (targetAnimation != null) {
-				var currentTrack = skeletonAnimation.AnimationState.GetCurrent(0);
+				var currentTrack = this.ActiveTrack;
 				bool isEmpty = (currentTrack == null);
 				bool isNewAnimation = isEmpty || currentTrack.Animation != targetAnimation;
 
@@ -855,128 +971,6 @@ namespace Spine.Unity.Editor {
 				}
 			} else {
 				Debug.LogFormat("The Spine.Animation named '{0}' was not found for this Skeleton.", animationName);
-			}
-
-		}
-
-		public void HandleInteractivePreviewGUI (Rect r, GUIStyle background) {
-			if (Event.current.type == EventType.Repaint) {
-				if (requiresRefresh) {
-					previewRenderUtility.BeginPreview(r, background);
-					DoRenderPreview(true);
-					previewTexture = previewRenderUtility.EndPreview();
-					requiresRefresh = false;
-				}
-				if (previewTexture != null)
-					GUI.DrawTexture(r, previewTexture, ScaleMode.StretchToFill, false);
-			}
-
-			DrawSkinToolbar(r);
-			//DrawSetupPoseButton(r);
-			DrawTimeBar(r);
-			MouseScroll(r);
-		}
-
-		void AdjustCameraGoals (bool calculateMixTime = false) {
-			if (previewGameObject == null)
-				return;
-
-			if (calculateMixTime) {
-				if (skeletonAnimation.AnimationState.GetCurrent(0) != null)
-					cameraAdjustEndFrame = EditorApplication.timeSinceStartup + skeletonAnimation.AnimationState.GetCurrent(0).Alpha;
-			}
-
-			Bounds bounds = previewGameObject.GetComponent<Renderer>().bounds;
-			cameraOrthoGoal = bounds.size.y;
-			cameraPositionGoal = bounds.center + new Vector3(0, 0, -10f);
-		}
-
-		public void AdjustCamera () {
-			if (previewRenderUtility == null)
-				return;
-
-			if (EditorApplication.timeSinceStartup < cameraAdjustEndFrame)
-				AdjustCameraGoals();
-
-			lastCameraPositionGoal = cameraPositionGoal;
-			lastCameraOrthoGoal = cameraOrthoGoal;
-
-			var c = this.PreviewUtilityCamera;
-			float orthoSet = Mathf.Lerp(c.orthographicSize, cameraOrthoGoal, 0.1f);
-
-			c.orthographicSize = orthoSet;
-
-			float dist = Vector3.Distance(c.transform.position, cameraPositionGoal);
-			if (dist > 0f) {
-				Vector3 pos = Vector3.Lerp(c.transform.position, cameraPositionGoal, 0.1f);
-				pos.x = 0;
-				c.transform.position = pos;
-				c.transform.rotation = Quaternion.identity;
-				RefreshOnNextUpdate();
-			}
-		}
-
-		public Texture2D GetStaticPreview (int width, int height) {
-			var c = this.PreviewUtilityCamera;
-			if (c == null) return null;
-
-			RefreshOnNextUpdate();
-			AdjustCameraGoals();
-			c.orthographicSize = cameraOrthoGoal / 2;
-			c.transform.position = cameraPositionGoal;
-			previewRenderUtility.BeginStaticPreview(new Rect(0, 0, width, height));
-			DoRenderPreview(false);
-			var tex = previewRenderUtility.EndStaticPreview();
-			return tex;
-		}
-
-		public void HandleEditorUpdate () {
-			AdjustCamera();
-			if (IsPlayingAnimation) {
-				RefreshOnNextUpdate();
-				Repaint();
-			} else if (requiresRefresh) {
-				Repaint();
-			}
-		}
-
-		public void DoRenderPreview (bool drawHandles) {
-			if (this.PreviewUtilityCamera.activeTexture == null || this.PreviewUtilityCamera.targetTexture == null )
-				return;
-
-			GameObject go = previewGameObject;
-
-			if (requiresRefresh && go != null) {
-				go.GetComponent<Renderer>().enabled = true;
-
-				if (!EditorApplication.isPlaying)
-					skeletonAnimation.Update((Time.realtimeSinceStartup - animationLastTime));
-
-				animationLastTime = Time.realtimeSinceStartup;
-
-				if (!EditorApplication.isPlaying)
-					skeletonAnimation.LateUpdate();
-
-				var thisPreviewUtilityCamera = this.PreviewUtilityCamera;
-
-				if (drawHandles) {			
-					Handles.SetCamera(thisPreviewUtilityCamera);
-					Handles.color = OriginColor;
-
-					float scale = skeletonDataAsset.scale;
-					Handles.DrawLine(new Vector3(-1000 * scale, 0, 0), new Vector3(1000 * scale, 0, 0));
-					Handles.DrawLine(new Vector3(0, 1000 * scale, 0), new Vector3(0, -1000 * scale, 0));
-				}
-
-				thisPreviewUtilityCamera.Render();
-
-				if (drawHandles) {
-					Handles.SetCamera(thisPreviewUtilityCamera);
-					SpineHandles.DrawBoundingBoxes(skeletonAnimation.transform, skeletonAnimation.skeleton);
-					if (SkeletonDataAssetInspector.showAttachments) SpineHandles.DrawPaths(skeletonAnimation.transform, skeletonAnimation.skeleton);
-				}
-
-				go.GetComponent<Renderer>().enabled = false;
 			}
 
 		}
@@ -1053,7 +1047,7 @@ namespace Spine.Unity.Editor {
 			GUI.Box(barRect, "");
 
 			Rect lineRect = new Rect(barRect);
-			float width = lineRect.width;
+			float lineRectWidth = lineRect.width;
 			TrackEntry t = skeletonAnimation.AnimationState.GetCurrent(0);
 
 			if (t != null) {
@@ -1062,7 +1056,7 @@ namespace Spine.Unity.Editor {
 				float normalizedTime = currentTime / t.Animation.Duration;
 				float wrappedTime = normalizedTime % 1;
 
-				lineRect.x = barRect.x + (width * wrappedTime) - 0.5f;
+				lineRect.x = barRect.x + (lineRectWidth * wrappedTime) - 0.5f;
 				lineRect.width = 2;
 
 				GUI.color = Color.red;
@@ -1071,13 +1065,14 @@ namespace Spine.Unity.Editor {
 
 				for (int i = 0; i < currentAnimationEvents.Count; i++) {
 					float fr = currentAnimationEventTimes[i];
+					var userEventIcon = Icons.userEvent;
 					var evRect = new Rect(barRect) {
-						x = Mathf.Clamp(((fr / t.Animation.Duration) * width) - (Icons.userEvent.width / 2), barRect.x, float.MaxValue),
-						y = barRect.y + Icons.userEvent.height,
-						width = Icons.userEvent.width,
-						height = Icons.userEvent.height
+						x = Mathf.Clamp(((fr / t.Animation.Duration) * lineRectWidth) - (userEventIcon.width / 2), barRect.x, float.MaxValue),
+						y = barRect.y + userEventIcon.height,
+						width = userEventIcon.width,
+						height = userEventIcon.height
 					};
-					GUI.DrawTexture(evRect, Icons.userEvent);
+					GUI.DrawTexture(evRect, userEventIcon);
 
 					Event ev = Event.current;
 					if (ev.type == EventType.Repaint) {
@@ -1095,18 +1090,27 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		void MouseScroll (Rect position) {
-			Event current = Event.current;
-			int controlID = GUIUtility.GetControlID(SliderHash, FocusType.Passive);
-			switch (current.GetTypeForControl(controlID)) {
-			case EventType.ScrollWheel:
-				if (position.Contains(current.mousePosition)) {
-					cameraOrthoGoal += current.delta.y * 0.06f;
-					cameraOrthoGoal = Mathf.Max(0.01f, cameraOrthoGoal);
-					GUIUtility.hotControl = controlID;
-					current.Use();
-				}
-				break;
+		public void OnDestroy () {
+			DisposePreviewRenderUtility();
+			DestroyPreviewGameObject();
+		}
+
+		public void Clear () {
+			DisposePreviewRenderUtility();
+			DestroyPreviewGameObject();
+		}
+
+		void DisposePreviewRenderUtility () {
+			if (previewRenderUtility != null) {
+				previewRenderUtility.Cleanup();
+				previewRenderUtility = null;
+			}
+		}
+
+		void DestroyPreviewGameObject () {
+			if (previewGameObject != null) {
+				GameObject.DestroyImmediate(previewGameObject);
+				previewGameObject = null;
 			}
 		}
 	}

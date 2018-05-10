@@ -73,15 +73,14 @@ namespace Spine.Unity.Editor {
 		#region SkeletonAnimator's Mecanim Clips
 		#if SPINE_SKELETON_ANIMATOR
 		public static void GenerateMecanimAnimationClips (SkeletonDataAsset skeletonDataAsset) {
-			//skeletonDataAsset.Clear();
 			var data = skeletonDataAsset.GetSkeletonData(true);
 			if (data == null) {
-				Debug.LogError("SkeletonData failed!", skeletonDataAsset);
+				Debug.LogError("SkeletonData loading failed!", skeletonDataAsset);
 				return;
 			}
 
 			string dataPath = AssetDatabase.GetAssetPath(skeletonDataAsset);
-			string controllerPath = dataPath.Replace("_SkeletonData", "_Controller").Replace(".asset", ".controller");
+			string controllerPath = dataPath.Replace(SpineEditorUtilities.SkeletonDataSuffix, "_Controller").Replace(".asset", ".controller");
 			UnityEditor.Animations.AnimatorController controller;
 			if (skeletonDataAsset.controller != null) {
 				controller = (UnityEditor.Animations.AnimatorController)skeletonDataAsset.controller;
@@ -123,40 +122,35 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
-			foreach (var anim in data.Animations) {
-				string name = anim.Name;
-				spineAnimationTable.Add(name, anim);
+			foreach (var animations in data.Animations) {
+				string animationName = animations.Name; // Review for unsafe names. Requires runtime implementation too.
+				spineAnimationTable.Add(animationName, animations);
 
-				if (unityAnimationClipTable.ContainsKey(name) == false) {
-					//generate new dummy clip
-					AnimationClip newClip = new AnimationClip();
-					newClip.name = name;
+				if (unityAnimationClipTable.ContainsKey(animationName) == false) {
+					AnimationClip newClip = new AnimationClip {
+						name = animationName
+					};
+					//AssetDatabase.CreateAsset(newClip, Path.GetDirectoryName(dataPath) + "/" + animationName + ".asset");
 					AssetDatabase.AddObjectToAsset(newClip, controller);
-					unityAnimationClipTable.Add(name, newClip);
+					unityAnimationClipTable.Add(animationName, newClip);
 				}
 
-				AnimationClip clip = unityAnimationClipTable[name];
-
-				clip.SetCurve("", typeof(GameObject), "dummy", AnimationCurve.Linear(0, 0, anim.Duration, 0));
+				AnimationClip clip = unityAnimationClipTable[animationName];
+				clip.SetCurve("", typeof(GameObject), "dummy", AnimationCurve.Linear(0, 0, animations.Duration, 0));
 				var settings = AnimationUtility.GetAnimationClipSettings(clip);
-				settings.stopTime = anim.Duration;
-
+				settings.stopTime = animations.Duration;
 				SetAnimationSettings(clip, settings);
 
 				AnimationUtility.SetAnimationEvents(clip, new AnimationEvent[0]);
-
-				foreach (Timeline t in anim.Timelines) {
-					if (t is EventTimeline) {
+				foreach (Timeline t in animations.Timelines) {
+					if (t is EventTimeline)
 						ParseEventTimeline((EventTimeline)t, clip, SendMessageOptions.DontRequireReceiver);
-					}
 				}
 
 				EditorUtility.SetDirty(clip);
-
-				unityAnimationClipTable.Remove(name);
+				unityAnimationClipTable.Remove(animationName);
 			}
 
-			//clear no longer used animations
 			foreach (var clip in unityAnimationClipTable.Values) {
 				AnimationClip.DestroyImmediate(clip, true);
 			}

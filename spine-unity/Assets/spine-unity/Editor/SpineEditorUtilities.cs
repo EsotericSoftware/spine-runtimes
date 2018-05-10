@@ -1189,10 +1189,11 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Import SkeletonData (json or binary)
+		public const string SkeletonDataSuffix = "_SkeletonData";
 		static SkeletonDataAsset IngestSpineProject (TextAsset spineJson, params AtlasAsset[] atlasAssets) {
 			string primaryName = Path.GetFileNameWithoutExtension(spineJson.name);
 			string assetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(spineJson));
-			string filePath = assetPath + "/" + primaryName + "_SkeletonData.asset";
+			string filePath = assetPath + "/" + primaryName + SkeletonDataSuffix + ".asset";
 
 			#if SPINE_TK2D
 			if (spineJson != null) {
