@@ -375,7 +375,7 @@ function AnimationState:apply (skeleton)
 	for i,current in pairs(tracks) do
 		if not (current == nil or current.delay > 0) then
       applied = true
-			local currrentPose = MixPose.currentLayered
+			local currentPose = MixPose.currentLayered
 			if i == 0 then currentPose = MixPose.current end
 			
 			-- Apply mixing from entries first.
@@ -721,7 +721,12 @@ function AnimationState:addAnimation (trackIndex, animation, loop, delay)
     if delay <= 0 then
       local duration = last.animationEnd - last.animationStart
       if duration ~= 0 then
-        delay = delay + duration * (1 + math_floor(last.trackTime / duration)) - data:getMix(last.animation, animation)
+				if last.loop then
+					delay = delay + duration * (1 + math_floor(last.trackTime / duration))
+				else
+					delay = delay + duration
+				end
+        delay = delay - data:getMix(last.animation, animation)
       else
         delay = 0
       end

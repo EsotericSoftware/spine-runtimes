@@ -133,7 +133,7 @@ end
 
 function SkeletonData:findPathConstraintIndex (constraintName)
 	if not constraintName then error("constraintName cannot be nil.", 2) end
-	for _,constraint in ipairs(self.pathConstraints) do
+	for i,constraint in ipairs(self.pathConstraints) do
 		if constraint.name == constraintName then return i end
 	end
 	return -1
