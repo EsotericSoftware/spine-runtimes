@@ -487,11 +487,19 @@ namespace Spine.Unity.Editor {
 				skeletonUtilityBoneTable.Clear();
 				boundingBoxFollowerTable.Clear();
 
+				#if UNITY_2018
+				EditorApplication.hierarchyChanged -= HierarchyIconsOnChanged;
+				#else
 				EditorApplication.hierarchyWindowChanged -= HierarchyIconsOnChanged;
+				#endif
 				EditorApplication.hierarchyWindowItemOnGUI -= HierarchyIconsOnGUI;
 
 				if (!Application.isPlaying && showHierarchyIcons) {
+					#if UNITY_2018
+					EditorApplication.hierarchyChanged += HierarchyIconsOnChanged;
+					#else
 					EditorApplication.hierarchyWindowChanged += HierarchyIconsOnChanged;
+					#endif
 					EditorApplication.hierarchyWindowItemOnGUI += HierarchyIconsOnGUI;
 					HierarchyIconsOnChanged();
 				}
