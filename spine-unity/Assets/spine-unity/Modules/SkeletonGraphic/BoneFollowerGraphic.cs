@@ -66,8 +66,9 @@ namespace Spine.Unity {
 				bone = skeletonGraphic.Skeleton.FindBone(boneName);
 
 			#if UNITY_EDITOR
-			if (Application.isEditor)
+			if (Application.isEditor) {
 				LateUpdate();
+			}
 			#endif
 		}
 
@@ -91,7 +92,9 @@ namespace Spine.Unity {
 			var thisTransform = this.transform as RectTransform;
 			if (thisTransform == null) return;
 
-			float scale = skeletonGraphic.canvas.referencePixelsPerUnit;
+			var canvas = skeletonGraphic.canvas;
+			if (canvas == null) canvas = skeletonGraphic.GetComponentInParent<Canvas>();
+			float scale = canvas.referencePixelsPerUnit;
 
 			if (skeletonTransformIsParent) {
 				// Recommended setup: Use local transform properties if Spine GameObject is the immediate parent
@@ -113,12 +116,7 @@ namespace Spine.Unity {
 
 				if (followBoneRotation) {
 					Vector3 worldRotation = skeletonTransform.rotation.eulerAngles;
-					#if UNITY_5_6_OR_NEWER
 					thisTransform.SetPositionAndRotation(targetWorldPosition, Quaternion.Euler(worldRotation.x, worldRotation.y, skeletonTransform.rotation.eulerAngles.z + boneWorldRotation));
-					#else
-					thisTransform.position = targetWorldPosition;
-					thisTransform.rotation = Quaternion.Euler(worldRotation.x, worldRotation.y, skeletonTransform.rotation.eulerAngles.z + bone.WorldRotationX);
-					#endif
 				} else {
 					thisTransform.position = targetWorldPosition;
 				}

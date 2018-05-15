@@ -487,11 +487,19 @@ namespace Spine.Unity.Editor {
 				skeletonUtilityBoneTable.Clear();
 				boundingBoxFollowerTable.Clear();
 
+				#if UNITY_2018
+				EditorApplication.hierarchyChanged -= HierarchyIconsOnChanged;
+				#else
 				EditorApplication.hierarchyWindowChanged -= HierarchyIconsOnChanged;
+				#endif
 				EditorApplication.hierarchyWindowItemOnGUI -= HierarchyIconsOnGUI;
 
 				if (!Application.isPlaying && showHierarchyIcons) {
+					#if UNITY_2018
+					EditorApplication.hierarchyChanged += HierarchyIconsOnChanged;
+					#else
 					EditorApplication.hierarchyWindowChanged += HierarchyIconsOnChanged;
+					#endif
 					EditorApplication.hierarchyWindowItemOnGUI += HierarchyIconsOnGUI;
 					HierarchyIconsOnChanged();
 				}
@@ -1189,10 +1197,11 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Import SkeletonData (json or binary)
+		public const string SkeletonDataSuffix = "_SkeletonData";
 		static SkeletonDataAsset IngestSpineProject (TextAsset spineJson, params AtlasAsset[] atlasAssets) {
 			string primaryName = Path.GetFileNameWithoutExtension(spineJson.name);
 			string assetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(spineJson));
-			string filePath = assetPath + "/" + primaryName + "_SkeletonData.asset";
+			string filePath = assetPath + "/" + primaryName + SkeletonDataSuffix + ".asset";
 
 			#if SPINE_TK2D
 			if (spineJson != null) {
@@ -1554,12 +1563,11 @@ namespace Spine.Unity.Editor {
 		}
 		#endregion
 
-		//public static string GetPathSafeRegionName (AtlasRegion region) {
-		//	return region.name.Replace("/", "_");
-		//}
-
 		public static string GetPathSafeName (string name) {
-			return name.Replace("/", "_");
+			foreach (char c in System.IO.Path.GetInvalidFileNameChars()) { // Doesn't handle more obscure file name limitations.
+				name = name.Replace(c, '_');
+			}
+			return name;
 		}
 	}
 

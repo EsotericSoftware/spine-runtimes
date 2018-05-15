@@ -1,4 +1,4 @@
-﻿/******************************************************************************
+/******************************************************************************
  * Spine Runtimes Software License v2.5
  *
  * Copyright (c) 2013-2016, Esoteric Software
@@ -28,40 +28,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#define AUTOINIT_SPINEREFERENCE
-
+#if UNITY_2017 || UNITY_2018
+using System;
 using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.Timeline;
+using Spine;
+using Spine.Unity;
+using System.Collections.Generic;
 
-namespace Spine.Unity {
-	[CreateAssetMenu(menuName = "Spine/Animation Reference Asset")]
-	public class AnimationReferenceAsset : ScriptableObject, IHasSkeletonDataAsset {
-		const bool QuietSkeletonData = true;
+namespace Spine.Unity.Playables {
 
-		[SerializeField] protected SkeletonDataAsset skeletonDataAsset;
-		[SerializeField, SpineAnimation] protected string animationName;
-		private Animation animation;
+	using Animation = Spine.Animation;
 
-		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } }
+	[Serializable]
+	public class SpineAnimationStateBehaviour : PlayableBehaviour {
+		public AnimationReferenceAsset animationReference;
+		public bool loop;
 
-		public Animation Animation {
-			get {
-				#if AUTOINIT_SPINEREFERENCE
-				if (animation == null)
-					Initialize();
-				#endif
+		[Header("Mix Properties")]
+		public bool customDuration = false;
+		public float mixDuration = 0.1f;
 
-				return animation;
-			}
-		}
-		
-		public void Initialize () {
-			if (skeletonDataAsset == null) return;
-			this.animation = skeletonDataAsset.GetSkeletonData(AnimationReferenceAsset.QuietSkeletonData).FindAnimation(animationName);
-			if (this.animation == null) Debug.LogWarningFormat("Animation '{0}' not found in SkeletonData : {1}.", animationName, skeletonDataAsset.name);
-		}
-		
-		public static implicit operator Animation (AnimationReferenceAsset asset) {
-			return asset.Animation;
-		}
+		[Range(0, 1f)]
+		public float attachmentThreshold = 0.5f;
+
+		[Range(0, 1f)]
+		public float eventThreshold = 0.5f;
+
+		[Range(0, 1f)]
+		public float drawOrderThreshold = 0.5f;
 	}
+
 }
+#endif

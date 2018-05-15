@@ -89,9 +89,16 @@ namespace Spine.Unity.Editor {
 					return;
 				}
 
-			} else if (property.serializedObject.targetObject is Component) {
-				var component = (Component)property.serializedObject.targetObject;
-				var hasSkeletonDataAsset = component.GetComponentInChildren(typeof(IHasSkeletonDataAsset)) as IHasSkeletonDataAsset;
+			} else {
+				var targetObject = property.serializedObject.targetObject;
+
+				IHasSkeletonDataAsset hasSkeletonDataAsset = targetObject as IHasSkeletonDataAsset;
+				if (hasSkeletonDataAsset == null) {
+					var component = targetObject as Component;
+					if (component != null)
+						hasSkeletonDataAsset = component.GetComponentInChildren(typeof(IHasSkeletonDataAsset)) as IHasSkeletonDataAsset;
+				}
+
 				if (hasSkeletonDataAsset != null)
 					skeletonDataAsset = hasSkeletonDataAsset.SkeletonDataAsset;
 			}

@@ -1,4 +1,4 @@
-﻿/******************************************************************************
+/******************************************************************************
  * Spine Runtimes Software License v2.5
  *
  * Copyright (c) 2013-2016, Esoteric Software
@@ -28,40 +28,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#define AUTOINIT_SPINEREFERENCE
-
+#if UNITY_2017 || UNITY_2018
+using System;
 using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.Timeline;
 
-namespace Spine.Unity {
-	[CreateAssetMenu(menuName = "Spine/Animation Reference Asset")]
-	public class AnimationReferenceAsset : ScriptableObject, IHasSkeletonDataAsset {
-		const bool QuietSkeletonData = true;
+[Serializable]
+public class SpineSkeletonFlipClip : PlayableAsset, ITimelineClipAsset {
+	public SpineSkeletonFlipBehaviour template = new SpineSkeletonFlipBehaviour();
 
-		[SerializeField] protected SkeletonDataAsset skeletonDataAsset;
-		[SerializeField, SpineAnimation] protected string animationName;
-		private Animation animation;
+	public ClipCaps clipCaps {
+		get { return ClipCaps.None; }
+	}
 
-		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } }
-
-		public Animation Animation {
-			get {
-				#if AUTOINIT_SPINEREFERENCE
-				if (animation == null)
-					Initialize();
-				#endif
-
-				return animation;
-			}
-		}
-		
-		public void Initialize () {
-			if (skeletonDataAsset == null) return;
-			this.animation = skeletonDataAsset.GetSkeletonData(AnimationReferenceAsset.QuietSkeletonData).FindAnimation(animationName);
-			if (this.animation == null) Debug.LogWarningFormat("Animation '{0}' not found in SkeletonData : {1}.", animationName, skeletonDataAsset.name);
-		}
-		
-		public static implicit operator Animation (AnimationReferenceAsset asset) {
-			return asset.Animation;
-		}
+	public override Playable CreatePlayable (PlayableGraph graph, GameObject owner) {
+		var playable = ScriptPlayable<SpineSkeletonFlipBehaviour>.Create(graph, template);
+		return playable;
 	}
 }
+#endif

@@ -1,4 +1,4 @@
-﻿/******************************************************************************
+/******************************************************************************
  * Spine Runtimes Software License v2.5
  *
  * Copyright (c) 2013-2016, Esoteric Software
@@ -28,40 +28,41 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#define AUTOINIT_SPINEREFERENCE
+#if UNITY_2017 || UNITY_2018
+ using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.Timeline;
+using System.Collections.Generic;
 
-using UnityEngine;
+using Spine.Unity;
 
-namespace Spine.Unity {
-	[CreateAssetMenu(menuName = "Spine/Animation Reference Asset")]
-	public class AnimationReferenceAsset : ScriptableObject, IHasSkeletonDataAsset {
-		const bool QuietSkeletonData = true;
+namespace Spine.Unity.Playables {
+	
+	[TrackColor(0.855f, 0.8623f, 0.87f)]
+	[TrackClipType(typeof(SpineSkeletonFlipClip))]
+	[TrackBindingType(typeof(SpinePlayableHandleBase))]
+	public class SpineSkeletonFlipTrack : TrackAsset {
+		public override Playable CreateTrackMixer (PlayableGraph graph, GameObject go, int inputCount) {
+			return ScriptPlayable<SpineSkeletonFlipMixerBehaviour>.Create(graph, inputCount);
+		}
 
-		[SerializeField] protected SkeletonDataAsset skeletonDataAsset;
-		[SerializeField, SpineAnimation] protected string animationName;
-		private Animation animation;
+		public override void GatherProperties (PlayableDirector director, IPropertyCollector driver) {
+#if UNITY_EDITOR
+			SpinePlayableHandleBase trackBinding = director.GetGenericBinding(this) as SpinePlayableHandleBase;
+			if (trackBinding == null)
+				return;
 
-		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } }
+			var serializedObject = new UnityEditor.SerializedObject(trackBinding);
+			var iterator = serializedObject.GetIterator();
+			while (iterator.NextVisible(true)) {
+				if (iterator.hasVisibleChildren)
+					continue;
 
-		public Animation Animation {
-			get {
-				#if AUTOINIT_SPINEREFERENCE
-				if (animation == null)
-					Initialize();
-				#endif
-
-				return animation;
+				driver.AddFromName<SpinePlayableHandleBase>(trackBinding.gameObject, iterator.propertyPath);
 			}
-		}
-		
-		public void Initialize () {
-			if (skeletonDataAsset == null) return;
-			this.animation = skeletonDataAsset.GetSkeletonData(AnimationReferenceAsset.QuietSkeletonData).FindAnimation(animationName);
-			if (this.animation == null) Debug.LogWarningFormat("Animation '{0}' not found in SkeletonData : {1}.", animationName, skeletonDataAsset.name);
-		}
-		
-		public static implicit operator Animation (AnimationReferenceAsset asset) {
-			return asset.Animation;
+#endif
+			base.GatherProperties(director, driver);
 		}
 	}
 }
+#endif

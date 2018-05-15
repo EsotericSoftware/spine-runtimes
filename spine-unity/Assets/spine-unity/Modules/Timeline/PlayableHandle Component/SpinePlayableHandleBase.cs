@@ -28,40 +28,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#define AUTOINIT_SPINEREFERENCE
-
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace Spine.Unity {
-	[CreateAssetMenu(menuName = "Spine/Animation Reference Asset")]
-	public class AnimationReferenceAsset : ScriptableObject, IHasSkeletonDataAsset {
-		const bool QuietSkeletonData = true;
+//using UnityEngine.Playables;
 
-		[SerializeField] protected SkeletonDataAsset skeletonDataAsset;
-		[SerializeField, SpineAnimation] protected string animationName;
-		private Animation animation;
+namespace Spine.Unity.Playables {
 
-		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } }
+	public delegate void SpineEventDelegate (Spine.Event e);
 
-		public Animation Animation {
-			get {
-				#if AUTOINIT_SPINEREFERENCE
-				if (animation == null)
-					Initialize();
-				#endif
-
-				return animation;
-			}
-		}
+	/// <summary>Base class for Spine Playable Handle components, commonly for integrating with UnityEngine Timeline.</summary>
+	public abstract class SpinePlayableHandleBase : MonoBehaviour {
 		
-		public void Initialize () {
-			if (skeletonDataAsset == null) return;
-			this.animation = skeletonDataAsset.GetSkeletonData(AnimationReferenceAsset.QuietSkeletonData).FindAnimation(animationName);
-			if (this.animation == null) Debug.LogWarningFormat("Animation '{0}' not found in SkeletonData : {1}.", animationName, skeletonDataAsset.name);
+		/// <summary>Gets the SkeletonData of the targeted Spine component.</summary>
+		public abstract SkeletonData SkeletonData { get; }
+
+		public abstract Skeleton Skeleton { get; }
+
+		/// <summary>MixerBehaviour ProcessFrame method handler.</summary>
+		/// <returns>Returns true if a playable was applied previously</returns>
+		//public abstract void ProcessFrame (Playable playable, FrameData info, SpineAnimationMixerBehaviour mixer);
+
+		/// <summary>Subscribe to this to handle user events played by the Unity playable</summary>
+		public event SpineEventDelegate AnimationEvents;
+
+		public virtual void HandleEvents (ExposedList<Event> eventBuffer) {
+			if (eventBuffer == null || AnimationEvents == null) return;
+			for (int i = 0, n = eventBuffer.Count; i < n; i++)
+				AnimationEvents.Invoke(eventBuffer.Items[i]);
 		}
-		
-		public static implicit operator Animation (AnimationReferenceAsset asset) {
-			return asset.Animation;
-		}
+
 	}
 }
+
