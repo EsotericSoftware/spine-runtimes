@@ -226,6 +226,8 @@ package spine.starling {
 		}
 
 		override public function hitTest(localPoint : Point) : DisplayObject {
+			if (!this.visible || !this.touchable) return null;
+			
 			var minX : Number = Number.MAX_VALUE, minY : Number = Number.MAX_VALUE;
 			var maxX : Number = -Number.MAX_VALUE, maxY : Number = -Number.MAX_VALUE;
 			var slots : Vector.<Slot> = skeleton.slots;
