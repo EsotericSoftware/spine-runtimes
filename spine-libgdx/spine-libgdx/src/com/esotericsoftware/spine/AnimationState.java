@@ -386,10 +386,12 @@ public class AnimationState {
 		}
 
 		// Queue complete if completed a loop iteration or the animation.
-		if (entry.loop ? (trackLastWrapped > entry.trackTime % duration)
-			: (animationTime >= animationEnd && entry.animationLast < animationEnd)) {
-			queue.complete(entry);
-		}
+		boolean complete;
+		if (entry.loop)
+			complete = duration == 0 || trackLastWrapped > entry.trackTime % duration;
+		else
+			complete = animationTime >= animationEnd && entry.animationLast < animationEnd;
+		if (complete) queue.complete(entry);
 
 		// Queue events after complete.
 		for (; i < n; i++) {
