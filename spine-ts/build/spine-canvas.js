@@ -1548,10 +1548,13 @@ var spine;
 					continue;
 				this.queue.event(entry, event_1);
 			}
-			if (entry.loop ? (trackLastWrapped > entry.trackTime % duration)
-				: (animationTime >= animationEnd && entry.animationLast < animationEnd)) {
+			var complete = false;
+			if (entry.loop)
+				complete = duration == 0 || trackLastWrapped > entry.trackTime % duration;
+			else
+				complete = animationTime >= animationEnd && entry.animationLast < animationEnd;
+			if (complete)
 				this.queue.complete(entry);
-			}
 			for (; i < n; i++) {
 				var event_2 = events[i];
 				if (event_2.time < animationStart)

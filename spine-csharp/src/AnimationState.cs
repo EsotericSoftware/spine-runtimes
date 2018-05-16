@@ -378,10 +378,12 @@ namespace Spine {
 			}
 
 			// Queue complete if completed a loop iteration or the animation.
-			if (entry.loop ? (trackLastWrapped > entry.trackTime % duration)
-				: (animationTime >= animationEnd && entry.animationLast < animationEnd)) {
-				queue.Complete(entry);
-			}
+			var complete = false;
+			if (entry.loop)
+				complete = duration == 0 || (trackLastWrapped > entry.trackTime % duration);
+			else
+				complete = animationTime >= animationEnd && entry.animationLast < animationEnd;
+			if (complete) queue.Complete(entry);
 
 			// Queue events after complete.
 			for (; i < n; i++) {
