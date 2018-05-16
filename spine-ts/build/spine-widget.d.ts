@@ -589,9 +589,6 @@ declare module spine {
 		ChainScale = 2,
 	}
 }
-interface Math {
-	fround(n: number): number;
-}
 declare module spine {
 	class SharedAssetManager implements Disposable {
 		private pathPrefix;
@@ -1000,6 +997,7 @@ declare module spine {
 		static newShortArray(size: number): ArrayLike<number>;
 		static toFloatArray(array: Array<number>): number[] | Float32Array;
 		static toSinglePrecision(value: number): number;
+		static webkit602BugfixHelper(alpha: number, pose: MixPose): void;
 	}
 	class DebugUtils {
 		static logBones(skeleton: Skeleton): void;
@@ -1053,6 +1051,9 @@ declare module spine {
 		transform(position: Vector2, uv: Vector2, light: Color, dark: Color): void;
 		end(): void;
 	}
+}
+interface Math {
+	fround(n: number): number;
 }
 declare module spine {
 	abstract class Attachment {

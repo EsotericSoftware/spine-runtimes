@@ -341,10 +341,12 @@ module spine {
 			}
 
 			// Queue complete if completed a loop iteration or the animation.
-			if (entry.loop ? (trackLastWrapped > entry.trackTime % duration)
-				: (animationTime >= animationEnd && entry.animationLast < animationEnd)) {
-				this.queue.complete(entry);
-			}
+			var complete = false;
+			if (entry.loop)
+				complete = duration == 0 || trackLastWrapped > entry.trackTime % duration;
+			else
+				complete = animationTime >= animationEnd && entry.animationLast < animationEnd;
+			if (complete) this.queue.complete(entry);
 
 			// Queue events after complete.
 			for (; i < n; i++) {
