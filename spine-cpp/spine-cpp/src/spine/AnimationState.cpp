@@ -879,10 +879,12 @@ void AnimationState::queueEvents(TrackEntry *entry, float animationTime) {
 	}
 
 	// Queue complete if completed a loop iteration or the animation.
-	if (entry->_loop ? (trackLastWrapped > MathUtil::fmod(entry->_trackTime, duration)) : (
-			animationTime >= animationEnd && entry->_animationLast < animationEnd)) {
-		_queue->complete(entry);
-	}
+	bool complete = false;
+	if (entry->_loop)
+		complete = duration == 0 || (trackLastWrapped > MathUtil::fmod(entry->_trackTime, duration));
+	else
+		complete = animationTime >= animationEnd && entry->_animationLast < animationEnd;
+	if (complete) _queue->complete(entry);
 
 	// Queue events after complete.
 	for (; i < n; ++i) {
