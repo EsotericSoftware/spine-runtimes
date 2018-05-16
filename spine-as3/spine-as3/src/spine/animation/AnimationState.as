@@ -349,12 +349,15 @@ package spine.animation {
 				if (event.time < trackLastWrapped) break;
 				if (event.time > animationEnd) continue; // Discard events outside animation start/end.
 				queue.event(entry, event);
-			}
-
+			}			
+			
 			// Queue complete if completed a loop iteration or the animation.
-			if (entry.loop ? (trackLastWrapped > entry.trackTime % duration) : (animationTime >= animationEnd && entry.animationLast < animationEnd)) {
-				queue.complete(entry);
-			}
+			var complete:Boolean;
+			if (entry.loop)
+				complete = duration == 0 || trackLastWrapped > entry.trackTime % duration;
+			else
+				complete = animationTime >= animationEnd && entry.animationLast < animationEnd;
+			if (complete) queue.complete(entry);
 
 			// Queue events after complete.
 			for (; i < n; i++) {
