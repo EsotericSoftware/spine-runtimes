@@ -149,8 +149,8 @@ namespace Spine.Unity.Playables {
 					skeleton.SetToSetupPose();
 					float fauxFromAlpha = (1f - toClipTime/mixDuration);
 					fauxFromAlpha = fauxFromAlpha > 0.5f ? 1f : fauxFromAlpha * 2f;  // fake value, but reduce dip.
-					fromAnimation.Apply(skeleton, 0, fromClipTime, fromClipLoop, null, fauxFromAlpha, MixPose.Setup, MixDirection.Out); //fromAnimation.PoseSkeleton(skeleton, fromClipTime, fromClipLoop);
-					toAnimation.Apply(skeleton, 0, toClipTime, clipData.loop, null, toClipTime/mixDuration, MixPose.Current, MixDirection.In);
+					fromAnimation.Apply(skeleton, 0, fromClipTime, fromClipLoop, null, fauxFromAlpha, MixBlend.Setup, MixDirection.Out); //fromAnimation.PoseSkeleton(skeleton, fromClipTime, fromClipLoop);
+					toAnimation.Apply(skeleton, 0, toClipTime, clipData.loop, null, toClipTime/mixDuration, MixBlend.Replace, MixDirection.In);
 				} else {
 					skeleton.SetToSetupPose();
 					toAnimation.PoseSkeleton(skeleton, toClipTime, clipData.loop);
