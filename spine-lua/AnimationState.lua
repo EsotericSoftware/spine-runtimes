@@ -585,7 +585,7 @@ function AnimationState:queueEvents (entry, animationTime)
   -- Queue complete if completed a loop iteration or the animation.
   local queueComplete = false
   if entry.loop then 
-    queueComplete = (trackLastWrapped > entry.trackTime % duration)
+    queueComplete = duration == 0 or (trackLastWrapped > entry.trackTime % duration)
   else
     queueComplete = (animationTime >= animationEnd and entry.animationLast < animationEnd)
   end
