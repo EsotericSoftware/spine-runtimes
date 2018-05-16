@@ -576,7 +576,7 @@ void _spAnimationState_queueEvents (spAnimationState* self, spTrackEntry* entry,
 	spEvent** events;
 	spEvent* event;
 	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
-	int i, n;
+	int i, n, complete;
 	float animationStart = entry->animationStart, animationEnd = entry->animationEnd;
 	float duration = animationEnd - animationStart;
 	float trackLastWrapped = FMOD(entry->trackLast, duration);
@@ -591,10 +591,11 @@ void _spAnimationState_queueEvents (spAnimationState* self, spTrackEntry* entry,
 	}
 
 	/* Queue complete if completed a loop iteration or the animation. */
-	if (entry->loop ? (trackLastWrapped > FMOD(entry->trackTime, duration))
-				   : (animationTime >= animationEnd && entry->animationLast < animationEnd)) {
-		_spEventQueue_complete(internal->queue, entry);
-	}
+	if (entry->loop)
+		complete = duration == 0 || (trackLastWrapped > FMOD(entry->trackTime, duration));
+	else
+		complete = (animationTime >= animationEnd && entry->animationLast < animationEnd);
+	if (complete) _spEventQueue_complete(internal->queue, entry);
 
 	/* Queue events after complete. */
 	for (; i < n; i++) {
