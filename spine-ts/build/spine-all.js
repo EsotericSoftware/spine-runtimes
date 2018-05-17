@@ -6866,7 +6866,17 @@ var spine;
 						if (slotBlendMode != blendMode) {
 							blendMode = slotBlendMode;
 						}
+						var skeleton_2 = slot.bone.skeleton;
+						var skeletonColor = skeleton_2.color;
+						var slotColor = slot.color;
+						var attachmentColor = attachment.color;
+						var alpha = skeletonColor.a * slotColor.a * attachmentColor.a;
+						var color = this.tempColor;
+						color.set(skeletonColor.r * slotColor.r * attachmentColor.r, skeletonColor.g * slotColor.g * attachmentColor.g, skeletonColor.b * slotColor.b * attachmentColor.b, alpha);
 						var ctx = this.ctx;
+						if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
+							ctx.globalAlpha = color.a;
+						}
 						for (var j = 0; j < triangles.length; j += 3) {
 							var t1 = triangles[j] * 8, t2 = triangles[j + 1] * 8, t3 = triangles[j + 2] * 8;
 							var x0 = vertices[t1], y0 = vertices[t1 + 1], u0 = vertices[t1 + 6], v0 = vertices[t1 + 7];
@@ -6885,6 +6895,7 @@ var spine;
 						}
 					}
 				}
+				this.ctx.globalAlpha = 1;
 			};
 			SkeletonRenderer.prototype.drawTriangle = function (img, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2) {
 				var ctx = this.ctx;

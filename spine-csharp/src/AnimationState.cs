@@ -378,7 +378,7 @@ namespace Spine {
 			}
 
 			// Queue complete if completed a loop iteration or the animation.
-			var complete = false;
+			bool complete = false;
 			if (entry.loop)
 				complete = duration == 0 || (trackLastWrapped > entry.trackTime % duration);
 			else
