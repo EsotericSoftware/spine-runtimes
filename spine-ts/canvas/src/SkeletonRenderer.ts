@@ -146,7 +146,26 @@ module spine.canvas {
 						blendMode = slotBlendMode;
 					}
 
+					let skeleton = slot.bone.skeleton;
+					let skeletonColor = skeleton.color;
+					let slotColor = slot.color;
+					let attachmentColor = attachment.color;
+					let alpha = skeletonColor.a * slotColor.a * attachmentColor.a;
+					let color = this.tempColor;
+					color.set(skeletonColor.r * slotColor.r * attachmentColor.r,
+					skeletonColor.g * slotColor.g * attachmentColor.g,
+					skeletonColor.b * slotColor.b * attachmentColor.b,
+					alpha);
+
 					let ctx = this.ctx;
+
+					if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
+						ctx.globalAlpha = color.a;
+						// experimental tinting via compositing, doesn't work
+						// ctx.globalCompositeOperation = "source-atop";
+						// ctx.fillStyle = "rgba(" + (color.r * 255 | 0) + ", " + (color.g * 255 | 0)  + ", " + (color.b * 255 | 0) + ", " + color.a + ")";
+						// ctx.fillRect(0, 0, w, h);
+					}
 
 					for (var j = 0; j < triangles.length; j+=3) {
 						let t1 = triangles[j] * 8, t2 = triangles[j+1] * 8, t3 = triangles[j+2] * 8;
@@ -169,6 +188,8 @@ module spine.canvas {
 					}
 				}
 			}
+
+			this.ctx.globalAlpha = 1;
 		}
 
 		// Adapted from http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
