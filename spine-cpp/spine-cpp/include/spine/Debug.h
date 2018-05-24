@@ -33,7 +33,7 @@
 
 #include <spine/Extension.h>
 
-#include <vector>
+#include <map>
 
 namespace Spine {
 class DebugExtension : public DefaultSpineExtension {
@@ -55,58 +55,46 @@ public:
 	}
 
 	void reportLeaks() {
-		for (std::vector<Allocation>::iterator it = _allocated.begin(); it != _allocated.end(); it++) {
-			printf("\"%s:%i (%zu bytes at %p)\n", it->fileName, it->line, it->size, it->address);
+		for (auto it = _allocated.begin(); it != _allocated.end(); it++) {
+			printf("\"%s:%i (%zu bytes at %p)\n", it->second.fileName, it->second.line, it->second.size, it->second.address);
 		}
 		printf("allocations: %lu, reallocations: %lu, frees: %lu\n", _allocations, _reallocations, _frees);
 		if (_allocated.empty()) printf("No leaks detected");
 	}
 
 	void clearAllocations() {
-		_allocated.resize(0);
+		_allocated.clear();
 	}
 
 protected:
 	virtual void *_alloc(size_t size, const char *file, int line) {
 		void *result = DefaultSpineExtension::_alloc(size, file, line);
-		_allocated.push_back(Allocation(result, size, file, line));
+		_allocated[result] = Allocation(result, size, file, line);
 		_allocations++;
 		return result;
 	}
 
 	virtual void *_calloc(size_t size, const char *file, int line) {
 		void *result = DefaultSpineExtension::_calloc(size, file, line);
-		_allocated.push_back(Allocation(result, size, file, line));
+		_allocated[result] = Allocation(result, size, file, line);
 		_allocations++;
 		return result;
 	}
 
 	virtual void *_realloc(void *ptr, size_t size, const char *file, int line) {
+		_allocated.erase(ptr);
 		void *result = DefaultSpineExtension::_realloc(ptr, size, file, line);
 		_reallocations++;
-
-		for (std::vector<Allocation>::iterator it = _allocated.begin(); it != _allocated.end(); it++) {
-			if (it->address == ptr) {
-				it->address = result;
-				it->size = size;
-				it->fileName = file;
-				it->line = line;
-				return result;
-			}
-		}
-
-		_allocated.push_back(Allocation(result, size, file, line));
+		_allocated[result] = Allocation(result, size, file, line);
 		return result;
 	}
 
 	virtual void _free(void *mem, const char *file, int line) {
-		for (std::vector<Allocation>::iterator it = _allocated.begin(); it != _allocated.end(); it++) {
-			if (it->address == mem) {
-				DefaultSpineExtension::_free(mem, file, line);
-				_frees++;
-				_allocated.erase(it);
-				return;
-			}
+		if (_allocated.count(mem)) {
+			DefaultSpineExtension::_free(mem, file, line);
+			_frees++;
+			_allocated.erase(mem);
+			return;
 		}
 
 		printf("%s:%i (address %p): Double free or not allocated through SpineExtension\n", file, line, mem);
@@ -114,7 +102,7 @@ protected:
 	}
 
 private:
-	std::vector<Allocation> _allocated;
+	std::map<void*, Allocation> _allocated;
 	size_t _allocations;
 	size_t _reallocations;
 	size_t _frees;

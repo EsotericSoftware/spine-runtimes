@@ -54,26 +54,6 @@ public:
 		}
 	}
 
-	/*Vector& operator=(const Vector& inVector) {
-		if (this != &inVector) {
-			clear();
-			deallocate(_buffer);
-			_buffer = NULL;
-
-			_size = inVector._size;
-			_capacity = inVector._capacity;
-
-			if (_capacity > 0) {
-				_buffer = allocate(_capacity);
-				for (size_t i = 0; i < _size; ++i) {
-					construct(_buffer + i, inVector._buffer[i]);
-				}
-			}
-		}
-
-		return *this;
-	}*/
-
 	~Vector() {
 		clear();
 		deallocate(_buffer);
