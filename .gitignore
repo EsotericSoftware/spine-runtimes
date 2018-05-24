@@ -26,6 +26,7 @@ spine-sfml/Debug/*
 spine-sfml/SFML
 spine-sfml/c/dependencies
 spine-sfml/cpp/dependencies
+spine-sfml/cmake-build
 
 spine-libgdx/spine-libgdx/bin
 spine-libgdx/spine-libgdx-tests/bin
