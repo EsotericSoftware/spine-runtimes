@@ -641,7 +641,9 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 					AttachmentTimeline *timeline = new(__FILE__, __LINE__) AttachmentTimeline(frameCount);
 					timeline->_slotIndex = slotIndex;
 					for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-						timeline->setFrame(frameIndex, readFloat(input), String(readString(input), true));
+						float time = readFloat(input);
+						String attachmentName = String(readString(input), true);
+						timeline->setFrame(frameIndex, time, attachmentName);
 					}
 					timelines.add(timeline);
 					duration = MathUtil::max(duration, timeline->_frames[frameCount - 1]);
@@ -710,7 +712,9 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 					RotateTimeline *timeline = new(__FILE__, __LINE__) RotateTimeline(frameCount);
 					timeline->_boneIndex = boneIndex;
 					for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-						timeline->setFrame(frameIndex, readFloat(input), readFloat(input));
+						float time = readFloat(input);
+						float degrees = readFloat(input);
+						timeline->setFrame(frameIndex, time, degrees);
 						if (frameIndex < frameCount - 1) {
 							readCurve(input, frameIndex, timeline);
 						}
@@ -734,8 +738,10 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 					}
 					timeline->_boneIndex = boneIndex;
 					for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-						timeline->setFrame(frameIndex, readFloat(input), readFloat(input) * timelineScale,
-										   readFloat(input) * timelineScale);
+						float time = readFloat(input);
+						float x = readFloat(input) * timelineScale;
+						float y = readFloat(input) * timelineScale;
+						timeline->setFrame(frameIndex, time, x, y);
 						if (frameIndex < frameCount - 1) {
 							readCurve(input, frameIndex, timeline);
 						}
@@ -761,7 +767,10 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 		IkConstraintTimeline *timeline = new(__FILE__, __LINE__) IkConstraintTimeline(frameCount);
 		timeline->_ikConstraintIndex = index;
 		for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-			timeline->setFrame(frameIndex, readFloat(input), readFloat(input), readSByte(input));
+			float time = readFloat(input);
+			float mix = readFloat(input);
+			signed char bendDirection = readSByte(input);
+			timeline->setFrame(frameIndex, time, mix, bendDirection);
 			if (frameIndex < frameCount - 1) {
 				readCurve(input, frameIndex, timeline);
 			}
@@ -777,8 +786,12 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 		TransformConstraintTimeline *timeline = new(__FILE__, __LINE__) TransformConstraintTimeline(frameCount);
 		timeline->_transformConstraintIndex = index;
 		for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-			timeline->setFrame(frameIndex, readFloat(input), readFloat(input), readFloat(input), readFloat(input),
-							   readFloat(input));
+			float time = readFloat(input);
+			float rotateMix = readFloat(input);
+			float translateMix = readFloat(input);
+			float scaleMix = readFloat(input);
+			float shearMix = readFloat(input);
+			timeline->setFrame(frameIndex, time, rotateMix, translateMix, scaleMix, shearMix);
 			if (frameIndex < frameCount - 1) {
 				readCurve(input, frameIndex, timeline);
 			}
@@ -814,7 +827,9 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 					}
 					timeline->_pathConstraintIndex = index;
 					for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-						timeline->setFrame(frameIndex, readFloat(input), readFloat(input) * timelineScale);
+						float time = readFloat(input);
+						float value = readFloat(input) * timelineScale;
+						timeline->setFrame(frameIndex, time, value);
 						if (frameIndex < frameCount - 1) {
 							readCurve(input, frameIndex, timeline);
 						}
@@ -829,7 +844,10 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 
 					timeline->_pathConstraintIndex = index;
 					for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-						timeline->setFrame(frameIndex, readFloat(input), readFloat(input), readFloat(input));
+						float time = readFloat(input);
+						float rotateMix = readFloat(input);
+						float translateMix = readFloat(input);
+						timeline->setFrame(frameIndex, time, rotateMix, translateMix);
 						if (frameIndex < frameCount - 1) {
 							readCurve(input, frameIndex, timeline);
 						}

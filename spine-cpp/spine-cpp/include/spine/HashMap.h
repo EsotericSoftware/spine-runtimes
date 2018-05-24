@@ -85,8 +85,10 @@ public:
 	}
 
 	~HashMap() {
-		for (Entry *entry = _head; entry != NULL; entry = entry->next) {
+		for (Entry *entry = _head; entry != NULL;) {
+			Entry* next = entry->next;
 			delete entry;
+			entry = next;
 		}
 	}
 

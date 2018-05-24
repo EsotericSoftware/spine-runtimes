@@ -307,13 +307,13 @@ void MemoryTestFixture::skeletonClipper() {
 
 	spSkeletonClipping_clipTriangles(clipping, vertices->items, vertices->size, indices->items, indices->size, uvs->items, 2);
 
-	float expectedVertices[8] = { 83.333328, 50.000000, 76.666664, 70.000000, 23.333334, 70.000000, 16.666672, 50.000000 };
+	float expectedVertices[8] = { 83.333328f, 50.000000f, 76.666664f, 70.000000f, 23.333334f, 70.000000f, 16.666672f, 50.000000f };
 	ASSERT(clipping->clippedVertices->size == 8);
 	for (int i = 0; i < clipping->clippedVertices->size; i++) {
 		ASSERT(ABS(clipping->clippedVertices->items[i] - expectedVertices[i]) < 0.001);
 	}
 
-	float expectedUVs[8] = { 0.833333f, 0.333333, 0.766667, 0.466667, 0.233333, 0.466667, 0.166667, 0.333333 };
+	float expectedUVs[8] = { 0.833333f, 0.333333f, 0.766667f, 0.466667f, 0.233333f, 0.466667f, 0.166667f, 0.333333f };
 	ASSERT(clipping->clippedUVs->size == 8);
 	for (int i = 0; i < clipping->clippedUVs->size; i++) {
 		ASSERT(ABS(clipping->clippedUVs->items[i] - expectedUVs[i]) < 0.001);

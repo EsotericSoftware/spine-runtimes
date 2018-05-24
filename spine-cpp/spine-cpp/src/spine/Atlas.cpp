@@ -34,6 +34,8 @@
 
 #include <spine/ContainerUtil.h>
 
+#include <ctype.h>
+
 using namespace Spine;
 
 Atlas::Atlas(const String &path, TextureLoader *textureLoader) : _textureLoader(textureLoader) {

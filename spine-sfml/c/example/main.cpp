@@ -147,7 +147,7 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 
 		SkeletonBounds_update(bounds, skeleton, true);
 		sf::Vector2i position = sf::Mouse::getPosition(window);
-		if (SkeletonBounds_containsPoint(bounds, position.x, position.y)) {
+		if (SkeletonBounds_containsPoint(bounds, (float)position.x, (float)position.y)) {
 			headSlot->color.g = 0;
 			headSlot->color.b = 0;
 		} else {
@@ -230,7 +230,7 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 		deltaClock.restart();
 
 		swirlTime += delta;
-		float percent = fmod(swirlTime, 2);
+		float percent = (float)fmod(swirlTime, 2);
 		if (percent > 1) percent = 1 - (percent - 1);
 		effect->angle = _spMath_interpolate(_spMath_pow2_apply, -60, 60, percent);
 
@@ -401,11 +401,11 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
 			if (event.type == sf::Event::MouseMoved) {
 				float x = event.mouseMove.x / 640.0f;
 				left->alpha = (MAX(x, 0.5f) - 0.5f) * 2;
-				right->alpha = (0.5 - MIN(x, 0.5)) * 2;
+				right->alpha = (0.5f - MIN(x, 0.5f)) * 2;
 
 				float y = event.mouseMove.y / 640.0f;
 				down->alpha = (MAX(y, 0.5f) - 0.5f) * 2;
-				up->alpha = (0.5 - MIN(y, 0.5)) * 2;
+				up->alpha = (0.5f - MIN(y, 0.5f)) * 2;
 			}
 		}
 

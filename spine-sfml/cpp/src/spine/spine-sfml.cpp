@@ -95,7 +95,7 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 
 	sf::Vertex vertex;
 	Texture *texture = NULL;
-	for (int i = 0; i < skeleton->getSlots().size(); ++i) {
+	for (unsigned i = 0; i < skeleton->getSlots().size(); ++i) {
 		Slot &slot = *skeleton->getDrawOrder()[i];
 		Attachment *attachment = slot.getAttachment();
 		if (!attachment) continue;

@@ -32,6 +32,8 @@
 #include <spine/spine.h>
 #include <spine/Debug.h>
 
+#pragma warning ( disable : 4710 )
+
 using namespace Spine;
 
 void loadBinary(const String &binaryFile, const String &atlasFile, Atlas *&atlas, SkeletonData *&skeletonData,
@@ -92,16 +94,16 @@ struct TestData {
 
 void testLoading() {
 	Vector<TestData> testData;
-	/*testData.add(TestData("testdata/coin/coin-pro.json", "testdata/coin/coin-pro.skel", "testdata/coin/coin.atlas"));
-	testData.add(TestData("testdata/goblins/goblins-pro.json", "testdata/goblins/goblins-pro.skel",
+	testData.add(TestData("testdata/coin/coin-pro.json", "testdata/coin/coin-pro.skel", "testdata/coin/coin.atlas"));
+/*testData.add(TestData("testdata/goblins/goblins-pro.json", "testdata/goblins/goblins-pro.skel",
 						  "testdata/goblins/goblins.atlas"));
 	testData.add(TestData("testdata/raptor/raptor-pro.json", "testdata/raptor/raptor-pro.skel",
 						  "testdata/raptor/raptor.atlas"));
 	testData.add(TestData("testdata/spineboy/spineboy-pro.json", "testdata/spineboy/spineboy-pro.skel",
 						  "testdata/spineboy/spineboy.atlas"));
 	testData.add(TestData("testdata/stretchyman/stretchyman-pro.json", "testdata/stretchyman/stretchyman-pro.skel",
-						  "testdata/stretchyman/stretchyman.atlas"));*/
-	testData.add(TestData("testdata/tank/tank-pro.json", "testdata/tank/tank-pro.skel", "testdata/tank/tank.atlas"));
+						  "testdata/stretchyman/stretchyman.atlas"));
+	testData.add(TestData("testdata/tank/tank-pro.json", "testdata/tank/tank-pro.skel", "testdata/tank/tank.atlas"));*/
 
 	for (size_t i = 0; i < testData.size(); i++) {
 		TestData &data = testData[i];
