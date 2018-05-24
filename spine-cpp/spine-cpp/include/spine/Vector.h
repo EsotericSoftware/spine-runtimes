@@ -141,7 +141,7 @@ public:
 	inline int indexOf(const T &inValue) {
 		for (size_t i = 0; i < _size; ++i) {
 			if (_buffer[i] == inValue) {
-				return static_cast<int>(i);
+				return (int)i;
 			}
 		}
 
@@ -159,7 +159,7 @@ public:
 			return false;
 		}
 
-		for (int i = 0, n = static_cast<int>(lhs.size()); i < n; ++i) {
+		for (size_t i = 0, n = lhs.size(); i < n; ++i) {
 			if (lhs[i] != rhs[i]) {
 				return false;
 			}

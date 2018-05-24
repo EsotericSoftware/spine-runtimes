@@ -42,16 +42,16 @@ SkeletonBounds::SkeletonBounds() : _minX(0), _minY(0), _maxX(0), _maxY(0) {
 
 void SkeletonBounds::update(Skeleton &skeleton, bool updateAabb) {
 	Vector<Slot *> &slots = skeleton._slots;
-	int slotCount = static_cast<int>(slots.size());
+	size_t slotCount = slots.size();
 
 	_boundingBoxes.clear();
-	for (int i = 0, n = static_cast<int>(_polygons.size()); i < n; ++i) {
+	for (size_t i = 0, n = _polygons.size(); i < n; ++i) {
 		_polygonPool.add(_polygons[i]);
 	}
 
 	_polygons.clear();
 
-	for (int i = 0; i < slotCount; i++) {
+	for (size_t i = 0; i < slotCount; i++) {
 		Slot *slot = slots[i];
 		Attachment *attachment = slot->_attachment;
 		if (attachment == NULL || !attachment->getRTTI().instanceOf(BoundingBoxAttachment::rtti)) {
@@ -61,12 +61,12 @@ void SkeletonBounds::update(Skeleton &skeleton, bool updateAabb) {
 		_boundingBoxes.add(boundingBox);
 
 		Polygon *polygonP = NULL;
-		int poolCount = static_cast<int>(_polygonPool.size());
+		size_t poolCount = _polygonPool.size();
 		if (poolCount > 0) {
 			polygonP = _polygonPool[poolCount - 1];
 			_polygonPool.removeAt(poolCount - 1);
 		} else {
-			Polygon *polygonP = new(__FILE__, __LINE__) Polygon();
+			polygonP = new(__FILE__, __LINE__) Polygon();
 		}
 
 		_polygons.add(polygonP);
@@ -151,7 +151,7 @@ bool SkeletonBounds::containsPoint(Polygon *polygon, float x, float y) {
 }
 
 BoundingBoxAttachment *SkeletonBounds::containsPoint(float x, float y) {
-	for (int i = 0, n = static_cast<int>(_polygons.size()); i < n; ++i) {
+	for (size_t i = 0, n = _polygons.size(); i < n; ++i) {
 		if (containsPoint(_polygons[i], x, y)) {
 			return _boundingBoxes[i];
 		}
@@ -161,7 +161,7 @@ BoundingBoxAttachment *SkeletonBounds::containsPoint(float x, float y) {
 }
 
 BoundingBoxAttachment *SkeletonBounds::intersectsSegment(float x1, float y1, float x2, float y2) {
-	for (int i = 0, n = static_cast<int>(_polygons.size()); i < n; ++i) {
+	for (size_t i = 0, n = _polygons.size(); i < n; ++i) {
 		if (intersectsSegment(_polygons[i], x1, y1, x2, y2)) {
 			return _boundingBoxes[i];
 		}
@@ -171,12 +171,12 @@ BoundingBoxAttachment *SkeletonBounds::intersectsSegment(float x1, float y1, flo
 
 bool SkeletonBounds::intersectsSegment(Polygon *polygon, float x1, float y1, float x2, float y2) {
 	Vector<float> &vertices = polygon->_vertices;
-	int nn = polygon->_count;
+	size_t nn = polygon->_count;
 
 	float width12 = x1 - x2, height12 = y1 - y2;
 	float det1 = x1 * y2 - y1 * x2;
 	float x3 = vertices[nn - 2], y3 = vertices[nn - 1];
-	for (int ii = 0; ii < nn; ii += 2) {
+	for (size_t ii = 0; ii < nn; ii += 2) {
 		float x4 = vertices[ii], y4 = vertices[ii + 1];
 		float det2 = x3 * y4 - y3 * x4;
 		float width34 = x3 - x4, height34 = y3 - y4;

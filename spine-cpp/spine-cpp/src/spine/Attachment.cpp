@@ -34,7 +34,7 @@
 
 using namespace Spine;
 
-RTTI_IMPL_NOPARENT(Attachment);
+RTTI_IMPL_NOPARENT(Attachment)
 
 Attachment::Attachment(const String &name) : _name(name) {
 	assert(_name.length() > 0);

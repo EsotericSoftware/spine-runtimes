@@ -623,7 +623,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 	}
 
 	/* Linked meshes. */
-	for (int i = 0, n = static_cast<int>(_linkedMeshes.size()); i < n; ++i) {
+	for (int i = 0, n = _linkedMeshes.size(); i < n; ++i) {
 		LinkedMesh *linkedMesh = _linkedMeshes[i];
 		Skin *skin = linkedMesh->_skin.length() == 0 ? skeletonData->getDefaultSkin() : skeletonData->findSkin(
 				linkedMesh->_skin);
@@ -907,7 +907,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 		IkConstraintData *constraint = skeletonData->findIkConstraint(constraintMap->_name);
 		IkConstraintTimeline *timeline = new(__FILE__, __LINE__) IkConstraintTimeline(constraintMap->_size);
 
-		for (frameIndex = 0; frameIndex < static_cast<int>(skeletonData->_ikConstraints.size()); ++frameIndex) {
+		for (frameIndex = 0; frameIndex < skeletonData->_ikConstraints.size(); ++frameIndex) {
 			if (constraint == skeletonData->_ikConstraints[frameIndex]) {
 				timeline->_ikConstraintIndex = frameIndex;
 				break;
@@ -1036,7 +1036,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 
 				weighted = attachment->_bones.size() != 0;
 				Vector<float> &vertices = attachment->_vertices;
-				deformLength = weighted ? static_cast<int>(vertices.size()) / 3 * 2 : static_cast<int>(vertices.size());
+				deformLength = weighted ? vertices.size() / 3 * 2 : vertices.size();
 
 				timeline = new(__FILE__, __LINE__) DeformTimeline(timelineMap->_size);
 
@@ -1100,7 +1100,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 
 				drawOrder2.ensureCapacity(skeletonData->_slots.size());
 				drawOrder2.setSize(skeletonData->_slots.size(), 0);
-				for (ii = static_cast<int>(skeletonData->_slots.size()) - 1; ii >= 0; --ii) {
+				for (ii = (int)skeletonData->_slots.size() - 1; ii >= 0; --ii) {
 					drawOrder2[ii] = -1;
 				}
 
@@ -1112,7 +1112,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 						return NULL;
 					}
 					/* Collect unchanged items. */
-					while (originalIndex != slotIndex) {
+					while (originalIndex != (size_t)slotIndex) {
 						unchanged[unchangedIndex++] = originalIndex++;
 					}
 					/* Set changed items. */
@@ -1124,7 +1124,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 					unchanged[unchangedIndex++] = originalIndex++;
 				}
 				/* Fill in unchanged items. */
-				for (ii = static_cast<int>(skeletonData->_slots.size()) - 1; ii >= 0; ii--) {
+				for (ii = (int)skeletonData->_slots.size() - 1; ii >= 0; ii--) {
 					if (drawOrder2[ii] == -1) {
 						drawOrder2[ii] = unchanged[--unchangedIndex];
 					}
@@ -1166,7 +1166,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 
 void SkeletonJson::readVertices(Json *attachmentMap, VertexAttachment *attachment, size_t verticesLength) {
 	Json *entry;
-	int i, n, nn, entrySize;
+	size_t i, n, nn, entrySize;
 	Vector<float> vertices;
 
 	attachment->setWorldVerticesLength(verticesLength);

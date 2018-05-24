@@ -40,7 +40,7 @@
 
 using namespace Spine;
 
-RTTI_IMPL(TranslateTimeline, CurveTimeline);
+RTTI_IMPL(TranslateTimeline, CurveTimeline)
 
 const int TranslateTimeline::ENTRIES = 3;
 const int TranslateTimeline::PREV_TIME = -3;
@@ -59,6 +59,10 @@ TranslateTimeline::~TranslateTimeline() {
 
 void TranslateTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
 							  MixBlend blend, MixDirection direction) {
+	SP_UNUSED(lastTime);
+	SP_UNUSED(pEvents);
+	SP_UNUSED(direction);
+
 	Bone *boneP = skeleton._bones[_boneIndex];
 	Bone &bone = *boneP;
 

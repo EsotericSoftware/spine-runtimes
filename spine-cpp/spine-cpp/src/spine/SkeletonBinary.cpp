@@ -880,24 +880,24 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 
 				bool weighted = attachment->_bones.size() > 0;
 				Vector<float> &vertices = attachment->_vertices;
-				int deformLength = weighted ? static_cast<int>(vertices.size()) / 3 * 2
-											: static_cast<int>(vertices.size());
+				size_t deformLength = weighted ? vertices.size() / 3 * 2
+											: vertices.size();
 
-				int frameCount = readVarint(input, true);
+				size_t frameCount = (size_t)readVarint(input, true);
 
 				DeformTimeline *timeline = new(__FILE__, __LINE__) DeformTimeline(frameCount);
 
 				timeline->_slotIndex = slotIndex;
 				timeline->_attachment = attachment;
 
-				for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
+				for (size_t frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
 					float time = readFloat(input);
 					Vector<float> deform;
-					int end = readVarint(input, true);
+					size_t end = (size_t)readVarint(input, true);
 					if (end == 0) {
 						if (weighted) {
 							deform.setSize(deformLength, 0);
-							for (int i = 0; i < deformLength; ++i) {
+							for (size_t i = 0; i < deformLength; ++i) {
 								deform[i] = 0;
 							}
 						} else {
@@ -905,20 +905,20 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 						}
 					} else {
 						deform.setSize(deformLength, 0);
-						int start = readVarint(input, true);
+						size_t start = (size_t)readVarint(input, true);
 						end += start;
 						if (scale == 1) {
-							for (int v = start; v < end; ++v) {
+							for (size_t v = start; v < end; ++v) {
 								deform[v] = readFloat(input);
 							}
 						} else {
-							for (int v = start; v < end; ++v) {
+							for (size_t v = start; v < end; ++v) {
 								deform[v] = readFloat(input) * scale;
 							}
 						}
 
 						if (!weighted) {
-							for (int v = 0, vn = static_cast<int>(deform.size()); v < vn; ++v) {
+							for (size_t v = 0, vn = deform.size(); v < vn; ++v) {
 								deform[v] += vertices[v];
 							}
 						}
@@ -937,33 +937,33 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 	}
 
 	// Draw order timeline.
-	int drawOrderCount = readVarint(input, true);
+	size_t drawOrderCount = (size_t)readVarint(input, true);
 	if (drawOrderCount > 0) {
 		DrawOrderTimeline *timeline = new(__FILE__, __LINE__) DrawOrderTimeline(drawOrderCount);
 
-		int slotCount = static_cast<int>(skeletonData->_slots.size());
-		for (int i = 0; i < drawOrderCount; ++i) {
+		size_t slotCount = skeletonData->_slots.size();
+		for (size_t i = 0; i < drawOrderCount; ++i) {
 			float time = readFloat(input);
-			int offsetCount = readVarint(input, true);
+			size_t offsetCount = (size_t)readVarint(input, true);
 
 			Vector<int> drawOrder;
 			drawOrder.setSize(slotCount, 0);
-			for (int ii = slotCount - 1; ii >= 0; --ii) {
+			for (int ii = (int)slotCount - 1; ii >= 0; --ii) {
 				drawOrder[ii] = -1;
 			}
 
 			Vector<int> unchanged;
 			unchanged.setSize(slotCount - offsetCount, 0);
-			int originalIndex = 0, unchangedIndex = 0;
-			for (int ii = 0; ii < offsetCount; ++ii) {
-				int slotIndex = readVarint(input, true);
+			size_t originalIndex = 0, unchangedIndex = 0;
+			for (size_t ii = 0; ii < offsetCount; ++ii) {
+				size_t slotIndex = (size_t)readVarint(input, true);
 				// Collect unchanged items.
 				while (originalIndex != slotIndex) {
 					unchanged[unchangedIndex++] = originalIndex++;
 				}
 				// Set changed items.
-				int index = originalIndex;
-				drawOrder[index + readVarint(input, true)] = originalIndex++;
+				size_t index = originalIndex;
+				drawOrder[index + (size_t)readVarint(input, true)] = originalIndex++;
 			}
 
 			// Collect remaining unchanged items.
@@ -972,7 +972,7 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 			}
 
 			// Fill in unchanged items.
-			for (int ii = slotCount - 1; ii >= 0; --ii) {
+			for (int ii = (int)slotCount - 1; ii >= 0; --ii) {
 				if (drawOrder[ii] == -1) {
 					drawOrder[ii] = unchanged[--unchangedIndex];
 				}

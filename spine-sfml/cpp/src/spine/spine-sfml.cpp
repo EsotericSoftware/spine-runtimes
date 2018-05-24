@@ -53,7 +53,7 @@ namespace Spine {
 SkeletonDrawable::SkeletonDrawable(SkeletonData *skeletonData, AnimationStateData *stateData) :
 		timeScale(1),
 		vertexArray(new VertexArray(Triangles, skeletonData->getBones().size() * 4)),
-		worldVertices(), clipper(), vertexEffect(NULL) {
+		vertexEffect(NULL), worldVertices(), clipper() {
 	Bone::setYDown(true);
 	worldVertices.ensureCapacity(SPINE_MESH_VERTEX_COUNT_MAX);
 	skeleton = new(__FILE__, __LINE__) Skeleton(skeletonData);

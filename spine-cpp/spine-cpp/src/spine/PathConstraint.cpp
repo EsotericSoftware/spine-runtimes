@@ -41,7 +41,7 @@
 
 using namespace Spine;
 
-RTTI_IMPL(PathConstraint, Constraint);
+RTTI_IMPL(PathConstraint, Constraint)
 
 const float PathConstraint::EPSILON = 0.00001f;
 const int PathConstraint::NONE = -1;
@@ -90,7 +90,7 @@ void PathConstraint::update() {
 	RotateMode rotateMode = data._rotateMode;
 	bool tangents = rotateMode == RotateMode_Tangent, scale = rotateMode == RotateMode_ChainScale;
 	size_t boneCount = _bones.size();
-	int spacesCount = static_cast<int>(tangents ? boneCount : boneCount + 1);
+	size_t spacesCount = tangents ? boneCount : boneCount + 1;
 	_spaces.setSize(spacesCount, 0);
 	float spacing = _spacing;
 	if (scale || !percentSpacing) {
@@ -99,7 +99,7 @@ void PathConstraint::update() {
 		}
 		bool lengthSpacing = data._spacingMode == SpacingMode_Length;
 
-		for (int i = 0, n = spacesCount - 1; i < n;) {
+		for (size_t i = 0, n = spacesCount - 1; i < n;) {
 			Bone *boneP = _bones[i];
 			Bone &bone = *boneP;
 			float setupLength = bone._data.getLength();
@@ -127,7 +127,7 @@ void PathConstraint::update() {
 			}
 		}
 	} else {
-		for (int i = 1; i < spacesCount; ++i) {
+		for (size_t i = 1; i < spacesCount; ++i) {
 			_spaces[i] = spacing;
 		}
 	}

@@ -35,7 +35,7 @@
 
 using namespace Spine;
 
-RTTI_IMPL(Bone, Updatable);
+RTTI_IMPL(Bone, Updatable)
 
 bool Bone::yDown = false;
 
@@ -68,9 +68,9 @@ Bone::Bone(BoneData &data, Skeleton &skeleton, Bone *parent) : Updatable(),
 															   _appliedValid(false),
 															   _a(1),
 															   _b(0),
+															   _worldX(0),
 															   _c(0),
 															   _d(1),
-															   _worldX(0),
 															   _worldY(0),
 															   _sorted(false) {
 	setToSetupPose();

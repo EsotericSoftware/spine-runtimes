@@ -50,11 +50,11 @@ namespace Spine {
         virtual int getPropertyId();
         
         /// Sets the time and value of the specified keyframe.
-        void setFrame(int frameIndex, Event* event);
+        void setFrame(size_t frameIndex, Event* event);
         
         Vector<float> getFrames();
         Vector<Event*>& getEvents();
-        int getFrameCount();
+        size_t getFrameCount();
         
     private:
         Vector<float> _frames;

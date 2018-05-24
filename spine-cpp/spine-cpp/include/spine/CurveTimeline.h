@@ -48,20 +48,20 @@ namespace Spine {
         
         virtual int getPropertyId() = 0;
         
-        int getFrameCount();
+        size_t getFrameCount();
         
-        void setLinear(int frameIndex);
+        void setLinear(size_t frameIndex);
         
-        void setStepped(int frameIndex);
+        void setStepped(size_t frameIndex);
         
         /// Sets the control handle positions for an interpolation bezier curve used to transition from this keyframe to the next.
         /// cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
         /// the difference between the keyframe's values.
-        void setCurve(int frameIndex, float cx1, float cy1, float cx2, float cy2);
+        void setCurve(size_t frameIndex, float cx1, float cy1, float cx2, float cy2);
         
-        float getCurvePercent(int frameIndex, float percent);
+        float getCurvePercent(size_t frameIndex, float percent);
         
-        float getCurveType(int frameIndex);
+        float getCurveType(size_t frameIndex);
         
     protected:
         static const float LINEAR;

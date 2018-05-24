@@ -55,7 +55,7 @@ public:
 	}
 
 	void reportLeaks() {
-		for (auto it = _allocated.begin(); it != _allocated.end(); it++) {
+		for (std::map<void*, Allocation>::iterator it = _allocated.begin(); it != _allocated.end(); it++) {
 			printf("\"%s:%i (%zu bytes at %p)\n", it->second.fileName, it->second.line, it->second.size, it->second.address);
 		}
 		printf("allocations: %lu, reallocations: %lu, frees: %lu\n", _allocations, _reallocations, _frees);

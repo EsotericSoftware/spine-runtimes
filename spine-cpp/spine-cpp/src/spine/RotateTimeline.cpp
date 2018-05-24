@@ -40,7 +40,7 @@
 
 using namespace Spine;
 
-RTTI_IMPL(RotateTimeline, CurveTimeline);
+RTTI_IMPL(RotateTimeline, CurveTimeline)
 
 RotateTimeline::RotateTimeline(int frameCount) : CurveTimeline(frameCount), _boneIndex(0) {
 	_frames.setSize(frameCount << 1, 0);
@@ -48,6 +48,10 @@ RotateTimeline::RotateTimeline(int frameCount) : CurveTimeline(frameCount), _bon
 
 void RotateTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
 						   MixBlend blend, MixDirection direction) {
+	SP_UNUSED(lastTime);
+	SP_UNUSED(pEvents);
+	SP_UNUSED(direction);
+
 	Bone *bone = skeleton.getBones()[_boneIndex];
 
 	if (time < _frames[0]) {

@@ -42,7 +42,7 @@
 
 using namespace Spine;
 
-RTTI_IMPL(DeformTimeline, CurveTimeline);
+RTTI_IMPL(DeformTimeline, CurveTimeline)
 
 DeformTimeline::DeformTimeline(int frameCount) : CurveTimeline(frameCount), _slotIndex(0), _attachment(NULL) {
 	_frames.ensureCapacity(frameCount);
@@ -58,6 +58,10 @@ DeformTimeline::DeformTimeline(int frameCount) : CurveTimeline(frameCount), _slo
 
 void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
 						   MixBlend blend, MixDirection direction) {
+	SP_UNUSED(lastTime);
+	SP_UNUSED(pEvents);
+	SP_UNUSED(direction);
+
 	Slot *slotP = skeleton._slots[_slotIndex];
 	Slot &slot = *slotP;
 
@@ -77,7 +81,7 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 	}
 
 	Vector< Vector<float> > &frameVertices = _frameVertices;
-	int vertexCount = static_cast<int>(frameVertices[0].size());
+	size_t vertexCount = frameVertices[0].size();
 
 	Vector<float> &frames = _frames;
 	if (time < _frames[0]) {
@@ -85,7 +89,7 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 		case MixBlend_Setup:
 			verticesArray.clear();
 			return;
-		case MixBlend_First:
+		case MixBlend_First: {
 			if (alpha == 1) {
 				verticesArray.clear();
 				return;
@@ -95,16 +99,19 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 			if (vertexAttachment->getBones().size() == 0) {
 				// Unweighted vertex positions.
 				Vector<float> &setupVertices = vertexAttachment->getVertices();
-				for (int i = 0; i < vertexCount; i++)
+				for (size_t i = 0; i < vertexCount; i++)
 					vertices[i] += (setupVertices[i] - vertices[i]) * alpha;
 			} else {
 				// Weighted deform offsets.
 				alpha = 1 - alpha;
-				for (int i = 0; i < vertexCount; i++)
+				for (size_t i = 0; i < vertexCount; i++)
 					vertices[i] *= alpha;
 			}
 		}
-		return;
+		case MixBlend_Replace:
+		case MixBlend_Add:
+			return;
+		}
 	}
 
 	verticesArray.setSize(vertexCount, 0);
@@ -118,11 +125,11 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 				if (vertexAttachment->getBones().size() == 0) {
 					// Unweighted vertex positions, no alpha.
 					Vector<float> &setupVertices = vertexAttachment->getVertices();
-					for (int i = 0; i < vertexCount; i++)
+					for (size_t i = 0; i < vertexCount; i++)
 						vertices[i] += lastVertices[i] - setupVertices[i];
 				} else {
 					// Weighted deform offsets, no alpha.
-					for (int i = 0; i < vertexCount; i++)
+					for (size_t i = 0; i < vertexCount; i++)
 						vertices[i] += lastVertices[i];
 				}
 			} else {
@@ -136,13 +143,13 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 					if (vertexAttachment->getBones().size() == 0) {
 						// Unweighted vertex positions, with alpha.
 						Vector<float> &setupVertices = vertexAttachment->getVertices();
-						for (int i = 0; i < vertexCount; i++) {
+						for (size_t i = 0; i < vertexCount; i++) {
 							float setup = setupVertices[i];
 							vertices[i] = setup + (lastVertices[i] - setup) * alpha;
 						}
 					} else {
 						// Weighted deform offsets, with alpha.
-						for (int i = 0; i < vertexCount; i++)
+						for (size_t i = 0; i < vertexCount; i++)
 							vertices[i] = lastVertices[i] * alpha;
 					}
 					break;
@@ -150,7 +157,7 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 				case MixBlend_First:
 				case MixBlend_Replace:
 					// Vertex positions or deform offsets, with alpha.
-					for (int i = 0; i < vertexCount; i++)
+					for (size_t i = 0; i < vertexCount; i++)
 						vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
 					break;
 				case MixBlend_Add:
@@ -158,11 +165,11 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 					if (vertexAttachment->getBones().size() == 0) {
 						// Unweighted vertex positions, no alpha.
 						Vector<float> &setupVertices = vertexAttachment->getVertices();
-						for (int i = 0; i < vertexCount; i++)
+						for (size_t i = 0; i < vertexCount; i++)
 							vertices[i] += (lastVertices[i] - setupVertices[i]) * alpha;
 					} else {
 						// Weighted deform offsets, alpha.
-						for (int i = 0; i < vertexCount; i++)
+						for (size_t i = 0; i < vertexCount; i++)
 							vertices[i] += lastVertices[i] * alpha;
 					}
 			}
@@ -183,20 +190,20 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 			if (vertexAttachment->getBones().size() == 0) {
 				// Unweighted vertex positions, no alpha.
 				Vector<float> &setupVertices = vertexAttachment->getVertices();
-				for (int i = 0; i < vertexCount; i++) {
+				for (size_t i = 0; i < vertexCount; i++) {
 					float prev = prevVertices[i];
 					vertices[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
 				}
 			} else {
 				// Weighted deform offsets, no alpha.
-				for (int i = 0; i < vertexCount; i++) {
+				for (size_t i = 0; i < vertexCount; i++) {
 					float prev = prevVertices[i];
 					vertices[i] += prev + (nextVertices[i] - prev) * percent;
 				}
 			}
 		} else {
 			// Vertex positions or deform offsets, no alpha.
-			for (int i = 0; i < vertexCount; i++) {
+			for (size_t i = 0; i < vertexCount; i++) {
 				float prev = prevVertices[i];
 				vertices[i] = prev + (nextVertices[i] - prev) * percent;
 			}
@@ -208,13 +215,13 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 				if (vertexAttachment->getBones().size() == 0) {
 					// Unweighted vertex positions, with alpha.
 					Vector<float> &setupVertices = vertexAttachment->getVertices();
-					for (int i = 0; i < vertexCount; i++) {
+					for (size_t i = 0; i < vertexCount; i++) {
 						float prev = prevVertices[i], setup = setupVertices[i];
 						vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
 					}
 				} else {
 					// Weighted deform offsets, with alpha.
-					for (int i = 0; i < vertexCount; i++) {
+					for (size_t i = 0; i < vertexCount; i++) {
 						float prev = prevVertices[i];
 						vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
 					}
@@ -224,7 +231,7 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 			case MixBlend_First:
 			case MixBlend_Replace:
 				// Vertex positions or deform offsets, with alpha.
-				for (int i = 0; i < vertexCount; i++) {
+				for (size_t i = 0; i < vertexCount; i++) {
 					float prev = prevVertices[i];
 					vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
 				}
@@ -234,13 +241,13 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 				if (vertexAttachment->getBones().size() == 0) {
 					// Unweighted vertex positions, with alpha.
 					Vector<float> &setupVertices = vertexAttachment->getVertices();
-					for (int i = 0; i < vertexCount; i++) {
+					for (size_t i = 0; i < vertexCount; i++) {
 						float prev = prevVertices[i];
 						vertices[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
 					}
 				} else {
 					// Weighted deform offsets, with alpha.
-					for (int i = 0; i < vertexCount; i++) {
+					for (size_t i = 0; i < vertexCount; i++) {
 						float prev = prevVertices[i];
 						vertices[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
 					}

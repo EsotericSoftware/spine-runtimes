@@ -41,12 +41,14 @@
 #include <spine/Atlas.h>
 
 namespace Spine {
-RTTI_IMPL(AtlasAttachmentLoader, AttachmentLoader);
+RTTI_IMPL(AtlasAttachmentLoader, AttachmentLoader)
 
 AtlasAttachmentLoader::AtlasAttachmentLoader(Atlas *atlas) : AttachmentLoader(), _atlas(atlas) {
 }
 
 RegionAttachment *AtlasAttachmentLoader::newRegionAttachment(Skin &skin, const String &name, const String &path) {
+	SP_UNUSED(skin);
+
 	AtlasRegion *regionP = findRegion(path);
 	assert(regionP != NULL);
 
@@ -67,6 +69,8 @@ RegionAttachment *AtlasAttachmentLoader::newRegionAttachment(Skin &skin, const S
 }
 
 MeshAttachment *AtlasAttachmentLoader::newMeshAttachment(Skin &skin, const String &name, const String &path) {
+	SP_UNUSED(skin);
+
 	AtlasRegion *regionP = findRegion(path);
 	assert(regionP != NULL);
 
@@ -92,18 +96,22 @@ MeshAttachment *AtlasAttachmentLoader::newMeshAttachment(Skin &skin, const Strin
 }
 
 BoundingBoxAttachment *AtlasAttachmentLoader::newBoundingBoxAttachment(Skin &skin, const String &name) {
+	SP_UNUSED(skin);
 	return new(__FILE__, __LINE__)  BoundingBoxAttachment(name);
 }
 
 PathAttachment *AtlasAttachmentLoader::newPathAttachment(Skin &skin, const String &name) {
+	SP_UNUSED(skin);
 	return new(__FILE__, __LINE__) PathAttachment(name);
 }
 
 PointAttachment *AtlasAttachmentLoader::newPointAttachment(Skin &skin, const String &name) {
+	SP_UNUSED(skin);
 	return new(__FILE__, __LINE__) PointAttachment(name);
 }
 
 ClippingAttachment *AtlasAttachmentLoader::newClippingAttachment(Skin &skin, const String &name) {
+	SP_UNUSED(skin);
 	return new(__FILE__, __LINE__) ClippingAttachment(name);
 }
 

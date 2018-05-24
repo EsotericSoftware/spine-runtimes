@@ -32,7 +32,7 @@
 
 using namespace Spine;
 
-RTTI_IMPL(MeshAttachment, VertexAttachment);
+RTTI_IMPL(MeshAttachment, VertexAttachment)
 
 MeshAttachment::MeshAttachment(const String &name) : VertexAttachment(name),
 													 _regionOffsetX(0),

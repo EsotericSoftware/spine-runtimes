@@ -40,13 +40,17 @@
 
 using namespace Spine;
 
-RTTI_IMPL(ShearTimeline, TranslateTimeline);
+RTTI_IMPL(ShearTimeline, TranslateTimeline)
 
 ShearTimeline::ShearTimeline(int frameCount) : TranslateTimeline(frameCount) {
 }
 
 void ShearTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
 						  MixBlend blend, MixDirection direction) {
+	SP_UNUSED(lastTime);
+	SP_UNUSED(pEvents);
+	SP_UNUSED(direction);
+
 	Bone *boneP = skeleton._bones[_boneIndex];
 	Bone &bone = *boneP;
 

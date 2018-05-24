@@ -58,7 +58,7 @@ void Animation::apply(Skeleton &skeleton, float lastTime, float time, bool loop,
 		}
 	}
 
-	for (int i = 0, n = static_cast<int>(_timelines.size()); i < n; ++i) {
+	for (size_t i = 0, n = _timelines.size(); i < n; ++i) {
 		_timelines[i]->apply(skeleton, lastTime, time, pEvents, alpha, blend, direction);
 	}
 }
@@ -81,7 +81,7 @@ void Animation::setDuration(float inValue) {
 
 int Animation::binarySearch(Vector<float> &values, float target, int step) {
 	int low = 0;
-	int size = static_cast<int>(values.size());
+	int size = (int)values.size();
 	int high = size / step - 2;
 	if (high == 0) {
 		return step;
@@ -105,7 +105,7 @@ int Animation::binarySearch(Vector<float> &values, float target, int step) {
 
 int Animation::binarySearch(Vector<float> &values, float target) {
 	int low = 0;
-	int size = static_cast<int>(values.size());
+	int size = (int)values.size();
 	int high = size - 2;
 	if (high == 0) {
 		return 1;
@@ -128,7 +128,7 @@ int Animation::binarySearch(Vector<float> &values, float target) {
 }
 
 int Animation::linearSearch(Vector<float> &values, float target, int step) {
-	for (int i = 0, last = static_cast<int>(values.size()) - step; i <= last; i += step) {
+	for (int i = 0, last = (int)values.size() - step; i <= last; i += step) {
 		if (values[i] > target) {
 			return i;
 		}

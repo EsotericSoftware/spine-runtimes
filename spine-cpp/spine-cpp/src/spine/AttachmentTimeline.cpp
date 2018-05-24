@@ -40,7 +40,7 @@
 
 using namespace Spine;
 
-RTTI_IMPL(AttachmentTimeline, Timeline);
+RTTI_IMPL(AttachmentTimeline, Timeline)
 
 AttachmentTimeline::AttachmentTimeline(int frameCount) : Timeline(), _slotIndex(0) {
 	_frames.ensureCapacity(frameCount);
@@ -55,6 +55,10 @@ AttachmentTimeline::AttachmentTimeline(int frameCount) : Timeline(), _slotIndex(
 
 void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
 							   MixBlend blend, MixDirection direction) {
+	SP_UNUSED(lastTime);
+	SP_UNUSED(pEvents);
+	SP_UNUSED(alpha);
+
 	assert(_slotIndex < skeleton._slots.size());
 
 	String *attachmentName;
@@ -76,10 +80,10 @@ void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, V
 		return;
 	}
 
-	int frameIndex;
+	size_t frameIndex;
 	if (time >= _frames[_frames.size() - 1]) {
 		// Time is after last frame.
-		frameIndex = static_cast<int>(_frames.size()) - 1;
+		frameIndex = _frames.size() - 1;
 	} else {
 		frameIndex = Animation::binarySearch(_frames, time, 1) - 1;
 	}

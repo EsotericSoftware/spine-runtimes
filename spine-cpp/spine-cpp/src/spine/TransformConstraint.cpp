@@ -38,7 +38,7 @@
 
 using namespace Spine;
 
-RTTI_IMPL(TransformConstraint, Constraint);
+RTTI_IMPL(TransformConstraint, Constraint)
 
 TransformConstraint::TransformConstraint(TransformConstraintData &data, Skeleton &skeleton) : Constraint(),
 																							  _data(data),

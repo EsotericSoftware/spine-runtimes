@@ -40,7 +40,7 @@
 
 using namespace Spine;
 
-RTTI_IMPL(ColorTimeline, CurveTimeline);
+RTTI_IMPL(ColorTimeline, CurveTimeline)
 
 const int ColorTimeline::ENTRIES = 5;
 const int ColorTimeline::PREV_TIME = -5;
@@ -59,10 +59,13 @@ ColorTimeline::ColorTimeline(int frameCount) : CurveTimeline(frameCount), _slotI
 
 void ColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
 						  MixBlend blend, MixDirection direction) {
+	SP_UNUSED(lastTime);
+	SP_UNUSED(pEvents);
+	SP_UNUSED(direction);
+
 	Slot *slotP = skeleton._slots[_slotIndex];
 	Slot &slot = *slotP;
 	if (time < _frames[0]) {
-		SlotData &slotData = slot._data;
 		switch (blend) {
 			case MixBlend_Setup:
 				slot._color.set(slot._data._color);
@@ -80,14 +83,14 @@ void ColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 	float r, g, b, a;
 	if (time >= _frames[_frames.size() - ENTRIES]) {
 		// Time is after last frame.
-		int i = static_cast<int>(_frames.size());
+		size_t i = _frames.size();
 		r = _frames[i + PREV_R];
 		g = _frames[i + PREV_G];
 		b = _frames[i + PREV_B];
 		a = _frames[i + PREV_A];
 	} else {
 		// Interpolate between the previous frame and the current frame.
-		int frame = Animation::binarySearch(_frames, time, ENTRIES);
+		size_t frame = (size_t)Animation::binarySearch(_frames, time, ENTRIES);
 		r = _frames[frame + PREV_R];
 		g = _frames[frame + PREV_G];
 		b = _frames[frame + PREV_B];

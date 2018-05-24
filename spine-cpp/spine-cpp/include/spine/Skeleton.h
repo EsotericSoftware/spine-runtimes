@@ -234,7 +234,7 @@ private:
 
 	void sortTransformConstraint(TransformConstraint *constraint);
 
-	void sortPathConstraintAttachment(Skin *skin, int slotIndex, Bone &slotBone);
+	void sortPathConstraintAttachment(Skin *skin, size_t slotIndex, Bone &slotBone);
 
 	void sortPathConstraintAttachment(Attachment *attachment, Bone &slotBone);
 

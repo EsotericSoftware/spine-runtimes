@@ -46,11 +46,11 @@ const String &IkConstraintData::getName() {
 	return _name;
 }
 
-int IkConstraintData::getOrder() {
+size_t IkConstraintData::getOrder() {
 	return _order;
 }
 
-void IkConstraintData::setOrder(int inValue) {
+void IkConstraintData::setOrder(size_t inValue) {
 	_order = inValue;
 }
 

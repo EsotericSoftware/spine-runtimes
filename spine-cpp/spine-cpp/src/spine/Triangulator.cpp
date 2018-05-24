@@ -40,30 +40,30 @@ Triangulator::~Triangulator() {
 }
 
 Vector<int> &Triangulator::triangulate(Vector<float> &vertices) {
-	int vertexCount = static_cast<int>(vertices.size() >> 1);
+	size_t vertexCount = vertices.size() >> 1;
 
 	Vector<int> &indices = _indices;
 	indices.clear();
 	indices.ensureCapacity(vertexCount);
 	indices.setSize(vertexCount, 0);
-	for (int i = 0; i < vertexCount; ++i) {
+	for (size_t i = 0; i < vertexCount; ++i) {
 		indices[i] = i;
 	}
 
 	Vector<bool> &isConcaveArray = _isConcaveArray;
 	isConcaveArray.ensureCapacity(vertexCount);
 	isConcaveArray.setSize(vertexCount, 0);
-	for (int i = 0, n = vertexCount; i < n; ++i) {
+	for (size_t i = 0, n = vertexCount; i < n; ++i) {
 		isConcaveArray[i] = isConcave(i, vertexCount, vertices, indices);
 	}
 
 	Vector<int> &triangles = _triangles;
 	triangles.clear();
-	triangles.ensureCapacity(MathUtil::max(0, vertexCount - 2) << 2);
+	triangles.ensureCapacity(MathUtil::max((int)0, (int)vertexCount - 2) << 2);
 
 	while (vertexCount > 3) {
 		// Find ear tip.
-		int previous = vertexCount - 1, i = 0, next = 1;
+		size_t previous = vertexCount - 1, i = 0, next = 1;
 
 		// outer:
 		while (true) {
@@ -72,7 +72,7 @@ Vector<int> &Triangulator::triangulate(Vector<float> &vertices) {
 				float p1x = vertices[p1], p1y = vertices[p1 + 1];
 				float p2x = vertices[p2], p2y = vertices[p2 + 1];
 				float p3x = vertices[p3], p3y = vertices[p3 + 1];
-				for (int ii = (next + 1) % vertexCount; ii != previous; ii = (ii + 1) % vertexCount) {
+				for (size_t ii = (next + 1) % vertexCount; ii != previous; ii = (ii + 1) % vertexCount) {
 					if (!isConcaveArray[ii]) {
 						continue;
 					}
@@ -264,7 +264,7 @@ Vector<Vector<float> *> &Triangulator::decompose(Vector<float> &vertices, Vector
 	}
 
 	// Remove empty polygons that resulted from the merge step above.
-	for (int i = static_cast<int>(convexPolygons.size()) - 1; i >= 0; --i) {
+	for (int i = (int)convexPolygons.size() - 1; i >= 0; --i) {
 		polygon = convexPolygons[i];
 		if (polygon->size() == 0) {
 			convexPolygons.removeAt(i);

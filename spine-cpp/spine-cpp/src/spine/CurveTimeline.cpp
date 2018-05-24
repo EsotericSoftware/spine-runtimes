@@ -34,7 +34,7 @@
 
 using namespace Spine;
 
-RTTI_IMPL(CurveTimeline, Timeline);
+RTTI_IMPL(CurveTimeline, Timeline)
 
 const float CurveTimeline::LINEAR = 0;
 const float CurveTimeline::STEPPED = 1;
@@ -50,29 +50,29 @@ CurveTimeline::CurveTimeline(int frameCount) {
 CurveTimeline::~CurveTimeline() {
 }
 
-int CurveTimeline::getFrameCount() {
-	return static_cast<int>(_curves.size() / BEZIER_SIZE + 1);
+size_t CurveTimeline::getFrameCount() {
+	return _curves.size() / BEZIER_SIZE + 1;
 }
 
-void CurveTimeline::setLinear(int frameIndex) {
+void CurveTimeline::setLinear(size_t frameIndex) {
 	_curves[frameIndex * BEZIER_SIZE] = LINEAR;
 }
 
-void CurveTimeline::setStepped(int frameIndex) {
+void CurveTimeline::setStepped(size_t frameIndex) {
 	_curves[frameIndex * BEZIER_SIZE] = STEPPED;
 }
 
-void CurveTimeline::setCurve(int frameIndex, float cx1, float cy1, float cx2, float cy2) {
+void CurveTimeline::setCurve(size_t frameIndex, float cx1, float cy1, float cx2, float cy2) {
 	float tmpx = (-cx1 * 2 + cx2) * 0.03f, tmpy = (-cy1 * 2 + cy2) * 0.03f;
 	float dddfx = ((cx1 - cx2) * 3 + 1) * 0.006f, dddfy = ((cy1 - cy2) * 3 + 1) * 0.006f;
 	float ddfx = tmpx * 2 + dddfx, ddfy = tmpy * 2 + dddfy;
 	float dfx = cx1 * 0.3f + tmpx + dddfx * 0.16666667f, dfy = cy1 * 0.3f + tmpy + dddfy * 0.16666667f;
 
-	int i = frameIndex * BEZIER_SIZE;
+	size_t i = frameIndex * BEZIER_SIZE;
 	_curves[i++] = BEZIER;
 
 	float x = dfx, y = dfy;
-	for (int n = i + BEZIER_SIZE - 1; i < n; i += 2) {
+	for (size_t n = i + BEZIER_SIZE - 1; i < n; i += 2) {
 		_curves[i] = x;
 		_curves[i + 1] = y;
 		dfx += ddfx;
@@ -84,9 +84,9 @@ void CurveTimeline::setCurve(int frameIndex, float cx1, float cy1, float cx2, fl
 	}
 }
 
-float CurveTimeline::getCurvePercent(int frameIndex, float percent) {
+float CurveTimeline::getCurvePercent(size_t frameIndex, float percent) {
 	percent = MathUtil::clamp(percent, 0, 1);
-	int i = frameIndex * BEZIER_SIZE;
+	size_t i = frameIndex * BEZIER_SIZE;
 	float type = _curves[i];
 
 	if (type == LINEAR) {
@@ -99,7 +99,7 @@ float CurveTimeline::getCurvePercent(int frameIndex, float percent) {
 
 	i++;
 	float x = 0;
-	for (int start = i, n = i + BEZIER_SIZE - 1; i < n; i += 2) {
+	for (size_t start = i, n = i + BEZIER_SIZE - 1; i < n; i += 2) {
 		x = _curves[i];
 		if (x >= percent) {
 			float prevX, prevY;
@@ -120,6 +120,6 @@ float CurveTimeline::getCurvePercent(int frameIndex, float percent) {
 	return y + (1 - y) * (percent - x) / (1 - x); // Last point is 1,1.
 }
 
-float CurveTimeline::getCurveType(int frameIndex) {
+float CurveTimeline::getCurveType(size_t frameIndex) {
 	return _curves[frameIndex * BEZIER_SIZE];
 }

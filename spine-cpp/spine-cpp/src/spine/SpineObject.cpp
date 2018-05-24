@@ -38,6 +38,7 @@ void *SpineObject::operator new(size_t sz, const char *file, int line) {
 }
 
 void *SpineObject::operator new(size_t sz, void *ptr) {
+	SP_UNUSED(sz);
 	return ptr;
 }
 
@@ -46,6 +47,7 @@ void SpineObject::operator delete(void *p, const char *file, int line) {
 }
 
 void SpineObject::operator delete(void *p, void *mem) {
+	SP_UNUSED(mem);
 	SpineExtension::free(p, __FILE__, __LINE__);
 }
 

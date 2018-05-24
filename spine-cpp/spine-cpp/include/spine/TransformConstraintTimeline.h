@@ -49,7 +49,7 @@ namespace Spine {
         
         virtual int getPropertyId();
         
-        void setFrame(int frameIndex, float time, float rotateMix, float translateMix, float scaleMix, float shearMix);
+        void setFrame(size_t frameIndex, float time, float rotateMix, float translateMix, float scaleMix, float shearMix);
         
     private:
         static const int PREV_TIME, PREV_ROTATE, PREV_TRANSLATE, PREV_SCALE, PREV_SHEAR;

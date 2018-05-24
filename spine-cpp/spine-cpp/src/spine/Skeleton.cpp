@@ -131,20 +131,20 @@ void Skeleton::updateCache() {
 	_updateCache.clear();
 	_updateCacheReset.clear();
 
-	for (int i = 0, n = static_cast<int>(_bones.size()); i < n; ++i) {
+	for (size_t i = 0, n = _bones.size(); i < n; ++i) {
 		_bones[i]->_sorted = false;
 	}
 
-	int ikCount = static_cast<int>(_ikConstraints.size());
-	int transformCount = static_cast<int>(_transformConstraints.size());
-	int pathCount = static_cast<int>(_pathConstraints.size());
+	size_t ikCount = _ikConstraints.size();
+	size_t transformCount = _transformConstraints.size();
+	size_t pathCount = _pathConstraints.size();
 
-	int constraintCount = ikCount + transformCount + pathCount;
+	size_t constraintCount = ikCount + transformCount + pathCount;
 
-	int i = 0;
+	size_t i = 0;
 	continue_outer:
 	for (; i < constraintCount; ++i) {
-		for (int ii = 0; ii < ikCount; ++ii) {
+		for (size_t ii = 0; ii < ikCount; ++ii) {
 			IkConstraint *constraint = _ikConstraints[ii];
 			if (constraint->getData().getOrder() == i) {
 				sortIkConstraint(constraint);
@@ -153,18 +153,18 @@ void Skeleton::updateCache() {
 			}
 		}
 
-		for (int ii = 0; ii < transformCount; ++ii) {
+		for (size_t ii = 0; ii < transformCount; ++ii) {
 			TransformConstraint *constraint = _transformConstraints[ii];
-			if (constraint->getData().getOrder() == i) {
+			if (constraint->getData().getOrder() == (int)i) {
 				sortTransformConstraint(constraint);
 				i++;
 				goto continue_outer;
 			}
 		}
 
-		for (int ii = 0; ii < pathCount; ++ii) {
+		for (size_t ii = 0; ii < pathCount; ++ii) {
 			PathConstraint *constraint = _pathConstraints[ii];
-			if (constraint->getData().getOrder() == i) {
+			if (constraint->getData().getOrder() == (int)i) {
 				sortPathConstraint(constraint);
 				i++;
 				goto continue_outer;
@@ -172,7 +172,7 @@ void Skeleton::updateCache() {
 		}
 	}
 
-	for (int i = 0, n = static_cast<int>(_bones.size()); i < n; ++i) {
+	for (size_t i = 0, n = _bones.size(); i < n; ++i) {
 		sortBone(_bones[i]);
 	}
 }
@@ -193,7 +193,7 @@ void Skeleton::printUpdateCache() {
 }
 
 void Skeleton::updateWorldTransform() {
-	for (int i = 0, n = static_cast<int>(_updateCacheReset.size()); i < n; ++i) {
+	for (size_t i = 0, n = _updateCacheReset.size(); i < n; ++i) {
 		Bone *boneP = _updateCacheReset[i];
 		Bone &bone = *boneP;
 		bone._ax = bone._x;
@@ -206,7 +206,7 @@ void Skeleton::updateWorldTransform() {
 		bone._appliedValid = true;
 	}
 
-	for (int i = 0, n = static_cast<int>(_updateCache.size()); i < n; ++i) {
+	for (size_t i = 0, n = _updateCache.size(); i < n; ++i) {
 		_updateCache[i]->update();
 	}
 }
@@ -217,11 +217,11 @@ void Skeleton::setToSetupPose() {
 }
 
 void Skeleton::setBonesToSetupPose() {
-	for (int i = 0, n = static_cast<int>(_bones.size()); i < n; ++i) {
+	for (size_t i = 0, n = _bones.size(); i < n; ++i) {
 		_bones[i]->setToSetupPose();
 	}
 
-	for (int i = 0, n = static_cast<int>(_ikConstraints.size()); i < n; ++i) {
+	for (size_t i = 0, n = _ikConstraints.size(); i < n; ++i) {
 		IkConstraint *constraintP = _ikConstraints[i];
 		IkConstraint &constraint = *constraintP;
 
@@ -229,7 +229,7 @@ void Skeleton::setBonesToSetupPose() {
 		constraint._mix = constraint._data._mix;
 	}
 
-	for (int i = 0, n = static_cast<int>(_transformConstraints.size()); i < n; ++i) {
+	for (size_t i = 0, n = _transformConstraints.size(); i < n; ++i) {
 		TransformConstraint *constraintP = _transformConstraints[i];
 		TransformConstraint &constraint = *constraintP;
 		TransformConstraintData &constraintData = constraint._data;
@@ -240,7 +240,7 @@ void Skeleton::setBonesToSetupPose() {
 		constraint._shearMix = constraintData._shearMix;
 	}
 
-	for (int i = 0, n = static_cast<int>(_pathConstraints.size()); i < n; ++i) {
+	for (size_t i = 0, n = _pathConstraints.size(); i < n; ++i) {
 		PathConstraint *constraintP = _pathConstraints[i];
 		PathConstraint &constraint = *constraintP;
 		PathConstraintData &constraintData = constraint._data;
@@ -254,11 +254,11 @@ void Skeleton::setBonesToSetupPose() {
 
 void Skeleton::setSlotsToSetupPose() {
 	_drawOrder.clear();
-	for (int i = 0, n = static_cast<int>(_slots.size()); i < n; ++i) {
+	for (size_t i = 0, n = _slots.size(); i < n; ++i) {
 		_drawOrder.add(_slots[i]);
 	}
 
-	for (int i = 0, n = static_cast<int>(_slots.size()); i < n; ++i) {
+	for (size_t i = 0, n = _slots.size(); i < n; ++i) {
 		_slots[i]->setToSetupPose();
 	}
 }
@@ -293,7 +293,7 @@ void Skeleton::setSkin(Skin *newSkin) {
 			Skeleton &thisRef = *this;
 			newSkin->attachAll(thisRef, *_skin);
 		} else {
-			for (int i = 0, n = static_cast<int>(_slots.size()); i < n; ++i) {
+			for (size_t i = 0, n = _slots.size(); i < n; ++i) {
 				Slot *slotP = _slots[i];
 				Slot &slot = *slotP;
 				const String &name = slot._data.getAttachmentName();
@@ -330,7 +330,7 @@ Attachment *Skeleton::getAttachment(int slotIndex, const String &attachmentName)
 void Skeleton::setAttachment(const String &slotName, const String &attachmentName) {
 	assert(slotName.length() > 0);
 
-	for (int i = 0, n = static_cast<int>(_slots.size()); i < n; ++i) {
+	for (size_t i = 0, n = _slots.size(); i < n; ++i) {
 		Slot *slot = _slots[i];
 		if (slot->_data.getName() == slotName) {
 			Attachment *attachment = NULL;
@@ -354,7 +354,7 @@ void Skeleton::setAttachment(const String &slotName, const String &attachmentNam
 IkConstraint *Skeleton::findIkConstraint(const String &constraintName) {
 	assert(constraintName.length() > 0);
 
-	for (int i = 0, n = static_cast<int>(_ikConstraints.size()); i < n; ++i) {
+	for (size_t i = 0, n = _ikConstraints.size(); i < n; ++i) {
 		IkConstraint *ikConstraint = _ikConstraints[i];
 		if (ikConstraint->_data.getName() == constraintName) {
 			return ikConstraint;
@@ -366,7 +366,7 @@ IkConstraint *Skeleton::findIkConstraint(const String &constraintName) {
 TransformConstraint *Skeleton::findTransformConstraint(const String &constraintName) {
 	assert(constraintName.length() > 0);
 
-	for (int i = 0, n = static_cast<int>(_transformConstraints.size()); i < n; ++i) {
+	for (size_t i = 0, n = _transformConstraints.size(); i < n; ++i) {
 		TransformConstraint *transformConstraint = _transformConstraints[i];
 		if (transformConstraint->_data.getName() == constraintName) {
 			return transformConstraint;
@@ -379,7 +379,7 @@ TransformConstraint *Skeleton::findTransformConstraint(const String &constraintN
 PathConstraint *Skeleton::findPathConstraint(const String &constraintName) {
 	assert(constraintName.length() > 0);
 
-	for (int i = 0, n = static_cast<int>(_pathConstraints.size()); i < n; ++i) {
+	for (size_t i = 0, n = _pathConstraints.size(); i < n; ++i) {
 		PathConstraint *constraint = _pathConstraints[i];
 		if (constraint->_data.getName() == constraintName) {
 			return constraint;
@@ -601,7 +601,7 @@ void Skeleton::sortTransformConstraint(TransformConstraint *constraint) {
 		constrained[i]->_sorted = true;
 }
 
-void Skeleton::sortPathConstraintAttachment(Skin *skin, int slotIndex, Bone &slotBone) {
+void Skeleton::sortPathConstraintAttachment(Skin *skin, size_t slotIndex, Bone &slotBone) {
 	Skin::AttachmentMap::Entries attachments = skin->getAttachments();
 
 	while (attachments.hasNext()) {

@@ -40,7 +40,7 @@
 
 using namespace Spine;
 
-RTTI_IMPL(TwoColorTimeline, CurveTimeline);
+RTTI_IMPL(TwoColorTimeline, CurveTimeline)
 
 const int TwoColorTimeline::ENTRIES = 8;
 const int TwoColorTimeline::PREV_TIME = -8;
@@ -66,6 +66,10 @@ TwoColorTimeline::TwoColorTimeline(int frameCount) : CurveTimeline(frameCount), 
 
 void TwoColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
 							 MixBlend blend, MixDirection direction) {
+	SP_UNUSED(lastTime);
+	SP_UNUSED(pEvents);
+	SP_UNUSED(direction);
+
 	Slot *slotP = skeleton._slots[_slotIndex];
 	Slot &slot = *slotP;
 
@@ -97,7 +101,7 @@ void TwoColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vec
 	float r, g, b, a, r2, g2, b2;
 	if (time >= _frames[_frames.size() - ENTRIES]) {
 		// Time is after last frame.
-		int i = static_cast<int>(_frames.size());
+		size_t i = _frames.size();
 		r = _frames[i + PREV_R];
 		g = _frames[i + PREV_G];
 		b = _frames[i + PREV_B];
@@ -107,7 +111,7 @@ void TwoColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vec
 		b2 = _frames[i + PREV_B2];
 	} else {
 		// Interpolate between the previous frame and the current frame.
-		int frame = Animation::binarySearch(_frames, time, ENTRIES);
+		size_t frame = (size_t)Animation::binarySearch(_frames, time, ENTRIES);
 		r = _frames[frame + PREV_R];
 		g = _frames[frame + PREV_G];
 		b = _frames[frame + PREV_B];

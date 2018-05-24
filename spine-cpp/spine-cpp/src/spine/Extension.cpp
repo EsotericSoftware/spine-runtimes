@@ -60,6 +60,9 @@ DefaultSpineExtension::~DefaultSpineExtension() {
 }
 
 void *DefaultSpineExtension::_alloc(size_t size, const char *file, int line) {
+	SP_UNUSED(file);
+	SP_UNUSED(line);
+
 	if (size == 0)
 		return 0;
 	void *ptr = ::malloc(size);
@@ -67,6 +70,9 @@ void *DefaultSpineExtension::_alloc(size_t size, const char *file, int line) {
 }
 
 void *DefaultSpineExtension::_calloc(size_t size, const char *file, int line) {
+	SP_UNUSED(file);
+	SP_UNUSED(line);
+
 	if (size == 0)
 		return 0;
 
@@ -78,6 +84,9 @@ void *DefaultSpineExtension::_calloc(size_t size, const char *file, int line) {
 }
 
 void *DefaultSpineExtension::_realloc(void *ptr, size_t size, const char *file, int line) {
+	SP_UNUSED(file);
+	SP_UNUSED(line);
+
 	void *mem = NULL;
 	if (size == 0)
 		return 0;
@@ -89,6 +98,9 @@ void *DefaultSpineExtension::_realloc(void *ptr, size_t size, const char *file, 
 }
 
 void DefaultSpineExtension::_free(void *mem, const char *file, int line) {
+	SP_UNUSED(file);
+	SP_UNUSED(line);
+
 	::free(mem);
 }
 

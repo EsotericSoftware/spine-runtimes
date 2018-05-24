@@ -50,9 +50,9 @@ namespace Spine {
         
         /// The IK constraint's name, which is unique within the skeleton.
         const String& getName();
-        
-        int getOrder();
-        void setOrder(int inValue);
+
+        size_t getOrder();
+        void setOrder(size_t inValue);
         
         /// The bones that are constrained by this IK Constraint.
         Vector<BoneData*>& getBones();
@@ -70,7 +70,7 @@ namespace Spine {
 
     private:
         const String _name;
-        int _order;
+        size_t _order;
         Vector<BoneData*> _bones;
         BoneData* _target;
         int _bendDirection;

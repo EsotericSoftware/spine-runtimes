@@ -42,7 +42,7 @@
 
 using namespace Spine;
 
-RTTI_IMPL(TransformConstraintTimeline, CurveTimeline);
+RTTI_IMPL(TransformConstraintTimeline, CurveTimeline)
 
 const int TransformConstraintTimeline::ENTRIES = 5;
 const int TransformConstraintTimeline::PREV_TIME = -5;
@@ -62,6 +62,10 @@ TransformConstraintTimeline::TransformConstraintTimeline(int frameCount) : Curve
 
 void TransformConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents,
 										float alpha, MixBlend blend, MixDirection direction) {
+	SP_UNUSED(lastTime);
+	SP_UNUSED(pEvents);
+	SP_UNUSED(direction);
+
 	TransformConstraint *constraintP = skeleton._transformConstraints[_transformConstraintIndex];
 	TransformConstraint &constraint = *constraintP;
 
@@ -87,7 +91,7 @@ void TransformConstraintTimeline::apply(Skeleton &skeleton, float lastTime, floa
 	float rotate, translate, scale, shear;
 	if (time >= _frames[_frames.size() - ENTRIES]) {
 		// Time is after last frame.
-		int i = static_cast<int>(_frames.size());
+		size_t i = _frames.size();
 		rotate = _frames[i + PREV_ROTATE];
 		translate = _frames[i + PREV_TRANSLATE];
 		scale = _frames[i + PREV_SCALE];
@@ -128,7 +132,7 @@ int TransformConstraintTimeline::getPropertyId() {
 }
 
 void
-TransformConstraintTimeline::setFrame(int frameIndex, float time, float rotateMix, float translateMix, float scaleMix,
+TransformConstraintTimeline::setFrame(size_t frameIndex, float time, float rotateMix, float translateMix, float scaleMix,
 									  float shearMix) {
 	frameIndex *= ENTRIES;
 	_frames[frameIndex] = time;

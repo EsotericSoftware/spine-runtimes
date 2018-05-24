@@ -34,7 +34,7 @@
 #include <spine/Event.h>
 
 namespace Spine {
-RTTI_IMPL_NOPARENT(Timeline);
+RTTI_IMPL_NOPARENT(Timeline)
 
 Timeline::Timeline() {
 }

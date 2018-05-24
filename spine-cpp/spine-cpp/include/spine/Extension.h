@@ -33,6 +33,8 @@
 
 #include <stdlib.h>
 
+#define SP_UNUSED(x) (void)(x)
+
 namespace Spine {
 class String;
 

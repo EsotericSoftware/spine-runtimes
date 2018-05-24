@@ -42,7 +42,7 @@
 
 using namespace Spine;
 
-RTTI_IMPL(EventTimeline, Timeline);
+RTTI_IMPL(EventTimeline, Timeline)
 
 EventTimeline::EventTimeline(int frameCount) : Timeline() {
 	_frames.setSize(frameCount, 0);
@@ -65,7 +65,7 @@ void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 		return;
 	}
 
-	int frameCount = static_cast<int>(_frames.size());
+	size_t frameCount = _frames.size();
 
 	if (lastTime > time) {
 		// Fire events after last time for looped animations.
@@ -95,7 +95,7 @@ void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 		}
 	}
 
-	for (; frame < frameCount && time >= _frames[frame]; ++frame) {
+	for (; (size_t)frame < frameCount && time >= _frames[frame]; ++frame) {
 		events.add(_events[frame]);
 	}
 }
@@ -104,7 +104,7 @@ int EventTimeline::getPropertyId() {
 	return ((int) TimelineType_Event << 24);
 }
 
-void EventTimeline::setFrame(int frameIndex, Event *event) {
+void EventTimeline::setFrame(size_t frameIndex, Event *event) {
 	_frames[frameIndex] = event->getTime();
 	_events[frameIndex] = event;
 }
@@ -113,4 +113,4 @@ Vector<float> EventTimeline::getFrames() { return _frames; }
 
 Vector<Event *> &EventTimeline::getEvents() { return _events; }
 
-int EventTimeline::getFrameCount() { return static_cast<int>(_frames.size()); }
+size_t EventTimeline::getFrameCount() { return _frames.size(); }

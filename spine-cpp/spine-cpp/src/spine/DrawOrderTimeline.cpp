@@ -40,7 +40,7 @@
 
 using namespace Spine;
 
-RTTI_IMPL(DrawOrderTimeline, Timeline);
+RTTI_IMPL(DrawOrderTimeline, Timeline)
 
 DrawOrderTimeline::DrawOrderTimeline(int frameCount) : Timeline() {
 	_frames.ensureCapacity(frameCount);
@@ -56,12 +56,16 @@ DrawOrderTimeline::DrawOrderTimeline(int frameCount) : Timeline() {
 
 void DrawOrderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
 							  MixBlend blend, MixDirection direction) {
+	SP_UNUSED(lastTime);
+	SP_UNUSED(pEvents);
+	SP_UNUSED(alpha);
+
 	Vector<Slot *> &drawOrder = skeleton._drawOrder;
 	Vector<Slot *> &slots = skeleton._slots;
 	if (direction == MixDirection_Out && blend == MixBlend_Setup) {
 		drawOrder.clear();
 		drawOrder.ensureCapacity(slots.size());
-		for (int i = 0, n = static_cast<int>(slots.size()); i < n; ++i) {
+		for (size_t i = 0, n = slots.size(); i < n; ++i) {
 			drawOrder.add(slots[i]);
 		}
 		return;
@@ -71,29 +75,29 @@ void DrawOrderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Ve
 		if (blend == MixBlend_Setup || blend == MixBlend_First) {
 			drawOrder.clear();
 			drawOrder.ensureCapacity(slots.size());
-			for (int i = 0, n = static_cast<int>(slots.size()); i < n; ++i) {
+			for (size_t i = 0, n = slots.size(); i < n; ++i) {
 				drawOrder.add(slots[i]);
 			}
 		}
 		return;
 	}
 
-	int frame;
+	size_t frame;
 	if (time >= _frames[_frames.size() - 1]) {
 		// Time is after last frame.
-		frame = static_cast<int>(_frames.size()) - 1;
+		frame = _frames.size() - 1;
 	} else {
-		frame = Animation::binarySearch(_frames, time) - 1;
+		frame = (size_t)Animation::binarySearch(_frames, time) - 1;
 	}
 
 	Vector<int> &drawOrderToSetupIndex = _drawOrders[frame];
 	if (drawOrderToSetupIndex.size() == 0) {
 		drawOrder.clear();
-		for (int i = 0, n = static_cast<int>(slots.size()); i < n; ++i) {
+		for (size_t i = 0, n = slots.size(); i < n; ++i) {
 			drawOrder.add(slots[i]);
 		}
 	} else {
-		for (int i = 0, n = static_cast<int>(drawOrderToSetupIndex.size()); i < n; ++i) {
+		for (size_t i = 0, n = drawOrderToSetupIndex.size(); i < n; ++i) {
 			drawOrder[i] = slots[drawOrderToSetupIndex[i]];
 		}
 	}
@@ -103,7 +107,7 @@ int DrawOrderTimeline::getPropertyId() {
 	return ((int) TimelineType_DrawOrder << 24);
 }
 
-void DrawOrderTimeline::setFrame(int frameIndex, float time, Vector<int> &drawOrder) {
+void DrawOrderTimeline::setFrame(size_t frameIndex, float time, Vector<int> &drawOrder) {
 	_frames[frameIndex] = time;
 	_drawOrders[frameIndex].clear();
 	_drawOrders[frameIndex].addAll(drawOrder);
@@ -117,6 +121,6 @@ Vector<Vector<int> > &DrawOrderTimeline::getDrawOrders() {
 	return _drawOrders;
 }
 
-int DrawOrderTimeline::getFrameCount() {
-	return static_cast<int>(_frames.size());
+size_t DrawOrderTimeline::getFrameCount() {
+	return _frames.size();
 }

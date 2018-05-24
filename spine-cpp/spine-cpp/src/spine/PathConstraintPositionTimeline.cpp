@@ -42,7 +42,7 @@
 
 using namespace Spine;
 
-RTTI_IMPL(PathConstraintPositionTimeline, CurveTimeline);
+RTTI_IMPL(PathConstraintPositionTimeline, CurveTimeline)
 
 const int PathConstraintPositionTimeline::ENTRIES = 2;
 const int PathConstraintPositionTimeline::PREV_TIME = -2;
@@ -59,6 +59,10 @@ PathConstraintPositionTimeline::~PathConstraintPositionTimeline() {
 
 void PathConstraintPositionTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents,
 										   float alpha, MixBlend blend, MixDirection direction) {
+	SP_UNUSED(lastTime);
+	SP_UNUSED(pEvents);
+	SP_UNUSED(direction);
+
 	PathConstraint *constraintP = skeleton._pathConstraints[_pathConstraintIndex];
 	PathConstraint &constraint = *constraintP;
 	if (time < _frames[0]) {

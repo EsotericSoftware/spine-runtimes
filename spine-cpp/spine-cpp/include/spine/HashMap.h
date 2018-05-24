@@ -36,7 +36,9 @@
 #include <spine/SpineObject.h>
 
  // Required for new with line number and file name in  MSVC
+#ifdef _MSC_VER
 #pragma warning(disable:4291)
+#endif
 
 namespace Spine {
 template<typename K, typename V>

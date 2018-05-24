@@ -41,14 +41,14 @@ namespace Spine {
     class SkeletonClipping : public SpineObject {
     public:
         SkeletonClipping();
-        
-        int clipStart(Slot& slot, ClippingAttachment* clip);
+
+        size_t clipStart(Slot& slot, ClippingAttachment* clip);
         
         void clipEnd(Slot& slot);
         
         void clipEnd();
         
-        void clipTriangles(Vector<float>& vertices, int verticesLength, Vector<unsigned short>& triangles, int trianglesLength, Vector<float>& uvs);
+        void clipTriangles(Vector<float>& vertices, size_t verticesLength, Vector<unsigned short>& triangles, size_t trianglesLength, Vector<float>& uvs);
         
         bool isClipping();
         

@@ -40,13 +40,16 @@
 
 using namespace Spine;
 
-RTTI_IMPL(ScaleTimeline, TranslateTimeline);
+RTTI_IMPL(ScaleTimeline, TranslateTimeline)
 
 ScaleTimeline::ScaleTimeline(int frameCount) : TranslateTimeline(frameCount) {
 }
 
 void ScaleTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
 						  MixBlend blend, MixDirection direction) {
+	SP_UNUSED(lastTime);
+	SP_UNUSED(pEvents);
+
 	Bone *boneP = skeleton._bones[_boneIndex];
 	Bone &bone = *boneP;
 

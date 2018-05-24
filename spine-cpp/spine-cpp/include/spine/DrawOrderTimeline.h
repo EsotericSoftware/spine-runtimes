@@ -49,11 +49,11 @@ namespace Spine {
         
         /// Sets the time and value of the specified keyframe.
         /// @param drawOrder May be NULL to use bind pose draw order
-        void setFrame(int frameIndex, float time, Vector<int>& drawOrder);
+        void setFrame(size_t frameIndex, float time, Vector<int>& drawOrder);
         
         Vector<float>& getFrames();
         Vector< Vector<int> >& getDrawOrders();
-        int getFrameCount();
+        size_t getFrameCount();
     
     private:
         Vector<float> _frames;

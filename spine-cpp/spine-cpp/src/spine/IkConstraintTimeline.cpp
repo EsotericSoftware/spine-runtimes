@@ -42,7 +42,7 @@
 
 using namespace Spine;
 
-RTTI_IMPL(IkConstraintTimeline, CurveTimeline);
+RTTI_IMPL(IkConstraintTimeline, CurveTimeline)
 
 const int IkConstraintTimeline::ENTRIES = 3;
 const int IkConstraintTimeline::PREV_TIME = -3;
@@ -57,6 +57,9 @@ IkConstraintTimeline::IkConstraintTimeline(int frameCount) : CurveTimeline(frame
 
 void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
 								 MixBlend blend, MixDirection direction) {
+	SP_UNUSED(lastTime);
+	SP_UNUSED(pEvents);
+
 	IkConstraint *constraintP = skeleton._ikConstraints[_ikConstraintIndex];
 	IkConstraint &constraint = *constraintP;
 	if (time < _frames[0]) {
