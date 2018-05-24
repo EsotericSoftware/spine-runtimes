@@ -37,8 +37,8 @@ float MathUtil::abs(float v) {
 	return ((v) < 0 ? -(v) : (v));
 }
 
-int MathUtil::sign(float v) {
-	return ((v) < 0 ? -1 : (v) > 0 ? 1 : 0);
+float MathUtil::sign(float v) {
+	return ((v) < 0 ? -1.0f : (v) > 0 ? 1.0f : 0.0f);
 }
 
 float MathUtil::clamp(float x, float min, float max) {
@@ -46,41 +46,41 @@ float MathUtil::clamp(float x, float min, float max) {
 }
 
 float MathUtil::fmod(float a, float b) {
-	return ::fmod(a, b);
+	return (float)::fmod(a, b);
 }
 
 /// Returns atan2 in radians, faster but less accurate than Math.Atan2. Average error of 0.00231 radians (0.1323
 /// degrees), largest error of 0.00488 radians (0.2796 degrees).
 float MathUtil::atan2(float y, float x) {
-	return ::atan2(y, x);
+	return (float)::atan2(y, x);
 }
 
 /// Returns the cosine in radians from a lookup table.
 float MathUtil::cos(float radians) {
-	return ::cos(radians);
+	return (float)::cos(radians);
 }
 
 /// Returns the sine in radians from a lookup table.
 float MathUtil::sin(float radians) {
-	return ::sin(radians);
+	return (float)::sin(radians);
 }
 
 float MathUtil::sqrt(float v) {
-	return ::sqrt(v);
+	return (float)::sqrt(v);
 }
 
 float MathUtil::acos(float v) {
-	return ::acos(v);
+	return (float)::acos(v);
 }
 
 /// Returns the sine in radians from a lookup table.
 float MathUtil::sinDeg(float degrees) {
-	return ::sin(degrees * DEG_RAD);
+	return (float)::sin(degrees * DEG_RAD);
 }
 
 /// Returns the cosine in radians from a lookup table.
 float MathUtil::cosDeg(float degrees) {
-	return ::cos(degrees * DEG_RAD);
+	return (float)::cos(degrees * DEG_RAD);
 }
 
 /* Need to pass 0 as an argument, so VC++ doesn't error with C2124 */
@@ -109,5 +109,5 @@ float MathUtil::randomTriangular(float min, float max, float mode) {
 }
 
 float MathUtil::pow(float a, float b) {
-	return ::pow(a, b);
+	return (float)::pow(a, b);
 }

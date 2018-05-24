@@ -172,7 +172,7 @@ void Atlas::load(const char *begin, int length, const char *dir) {
 			region->name = String(mallocString(&str), true);
 
 			assert(readValue(&begin, end, &str));
-			region->rotate = equals(&str, "true");
+			region->rotate = equals(&str, "true") ? true : false;
 
 			assert(readTuple(&begin, end, tuple) == 2);
 			region->x = toInt(tuple);
@@ -222,8 +222,8 @@ void Atlas::load(const char *begin, int length, const char *dir) {
 			region->originalHeight = toInt(tuple + 1);
 
 			readTuple(&begin, end, tuple);
-			region->offsetX = toInt(tuple);
-			region->offsetY = toInt(tuple + 1);
+			region->offsetX = (float)toInt(tuple);
+			region->offsetY = (float)toInt(tuple + 1);
 
 			assert(readValue(&begin, end, &str));
 

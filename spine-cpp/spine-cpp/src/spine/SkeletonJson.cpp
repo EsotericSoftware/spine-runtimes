@@ -322,8 +322,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				return NULL;
 			}
 
-			data->_local = Json::getInt(constraintMap, "local", 0);
-			data->_relative = Json::getInt(constraintMap, "relative", 0);
+			data->_local = Json::getInt(constraintMap, "local", 0) ? true : false;
+			data->_relative = Json::getInt(constraintMap, "relative", 0) ? true : false;
 			data->_offsetRotation = Json::getFloat(constraintMap, "rotation", 0);
 			data->_offsetX = Json::getFloat(constraintMap, "x", 0) * _scale;
 			data->_offsetY = Json::getFloat(constraintMap, "y", 0) * _scale;
@@ -549,7 +549,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 									}
 								}
 							} else {
-								mesh->_inheritDeform = Json::getInt(attachmentMap, "deform", 1);
+								mesh->_inheritDeform = Json::getInt(attachmentMap, "deform", 1) ? true : false;
 								LinkedMesh *linkedMesh = new(__FILE__, __LINE__) LinkedMesh(mesh,
 																							String(Json::getString(
 																									attachmentMap,
@@ -575,8 +575,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 							PathAttachment *pathAttatchment = static_cast<PathAttachment *>(attachment);
 
 							int vertexCount = 0;
-							pathAttatchment->_closed = Json::getInt(attachmentMap, "closed", 0);
-							pathAttatchment->_constantSpeed = Json::getInt(attachmentMap, "constantSpeed", 1);
+							pathAttatchment->_closed = Json::getInt(attachmentMap, "closed", 0) ? true : false;
+							pathAttatchment->_constantSpeed = Json::getInt(attachmentMap, "constantSpeed", 1) ? true : false;
 							vertexCount = Json::getInt(attachmentMap, "vertexCount", 0);
 							readVertices(attachmentMap, pathAttatchment, vertexCount << 1);
 
@@ -684,7 +684,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 	return skeletonData;
 }
 
-float SkeletonJson::toColor(const char *value, int index) {
+float SkeletonJson::toColor(const char *value, size_t index) {
 	char digits[3];
 	char *error;
 	int color;
@@ -706,7 +706,7 @@ float SkeletonJson::toColor(const char *value, int index) {
 	return color / (float) 255;
 }
 
-void SkeletonJson::readCurve(Json *frame, CurveTimeline *timeline, int frameIndex) {
+void SkeletonJson::readCurve(Json *frame, CurveTimeline *timeline, size_t frameIndex) {
 	Json *curve = Json::getItem(frame, "curve");
 	if (!curve) {
 		return;
@@ -727,7 +727,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 	Vector<Timeline *> timelines;
 	float duration = 0;
 
-	int frameIndex;
+	size_t frameIndex;
 	Json *valueMap;
 	int timelinesCount = 0;
 
@@ -950,7 +950,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 
 	/** Path constraint timelines. */
 	for (constraintMap = paths ? paths->_child : 0; constraintMap; constraintMap = constraintMap->_next) {
-		int constraintIndex = 0, i;
+		size_t constraintIndex = 0, i;
 		Json *timelineMap;
 
 		PathConstraintData *data = skeletonData->findPathConstraint(constraintMap->_name);
@@ -1096,7 +1096,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 				Vector<int> unchanged;
 				unchanged.ensureCapacity(skeletonData->_slots.size() - offsets->_size);
 				unchanged.setSize(skeletonData->_slots.size() - offsets->_size, 0);
-				int originalIndex = 0, unchangedIndex = 0;
+				size_t originalIndex = 0, unchangedIndex = 0;
 
 				drawOrder2.ensureCapacity(skeletonData->_slots.size());
 				drawOrder2.setSize(skeletonData->_slots.size(), 0);
@@ -1164,7 +1164,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 	return new(__FILE__, __LINE__) Animation(String(root->_name), timelines, duration);
 }
 
-void SkeletonJson::readVertices(Json *attachmentMap, VertexAttachment *attachment, int verticesLength) {
+void SkeletonJson::readVertices(Json *attachmentMap, VertexAttachment *attachment, size_t verticesLength) {
 	Json *entry;
 	int i, n, nn, entrySize;
 	Vector<float> vertices;

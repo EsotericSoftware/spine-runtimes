@@ -97,11 +97,11 @@ void AttachmentTimeline::setFrame(int frameIndex, float time, const String &atta
 	_attachmentNames[frameIndex] = attachmentName;
 }
 
-int AttachmentTimeline::getSlotIndex() {
+size_t AttachmentTimeline::getSlotIndex() {
 	return _slotIndex;
 }
 
-void AttachmentTimeline::setSlotIndex(int inValue) {
+void AttachmentTimeline::setSlotIndex(size_t inValue) {
 	_slotIndex = inValue;
 }
 
@@ -113,6 +113,6 @@ const Vector<String> &AttachmentTimeline::getAttachmentNames() {
 	return _attachmentNames;
 }
 
-int AttachmentTimeline::getFrameCount() {
-	return static_cast<int>(_frames.size());
+size_t AttachmentTimeline::getFrameCount() {
+	return _frames.size();
 }

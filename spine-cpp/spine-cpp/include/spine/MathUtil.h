@@ -52,7 +52,7 @@ public:
 	template<typename T>
 	static inline T max(T a, T b) { return a > b ? a : b; }
 
-	static int sign(float val);
+	static float sign(float val);
 
 	static float clamp(float x, float lower, float upper);
 
@@ -106,8 +106,8 @@ struct PowInterpolation: public Interpolation {
 	}
 
 	float apply(float a) {
-		if (a <= 0.5f) return MathUtil::pow(a * 2, power) / 2;
-		return MathUtil::pow((a - 1) * 2, power) / (power % 2 == 0 ? -2 : 2) + 1;
+		if (a <= 0.5f) return MathUtil::pow(a * 2.0f, (float)power) / 2.0f;
+		return MathUtil::pow((a - 1.0f) * 2.0f, (float)power) / (power % 2 == 0 ? -2.0f : 2.0f) + 1.0f;
 	}
 
 	int power;
@@ -118,7 +118,7 @@ struct PowOutInterpolation: public Interpolation {
 	}
 
 	float apply(float a) {
-		return MathUtil::pow(a - 1, power) * (power % 2 == 0 ? -1 : 1) + 1;
+		return MathUtil::pow(a - 1, (float)power) * (power % 2 == 0 ? -1.0f : 1.0f) + 1.0f;
 	}
 
 	int power;

@@ -147,7 +147,7 @@ static const char* parse_number (Json *item, const char* num) {
 
 	if (ptr != num) {
 		/* Parse success, number found. */
-		item->valueFloat = result;
+		item->valueFloat = (float)result;
 		item->valueInt = (int)result;
 		item->type = Json_Number;
 		return ptr;

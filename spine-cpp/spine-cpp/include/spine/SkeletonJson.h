@@ -77,13 +77,13 @@ private:
 	const bool _ownsLoader;
 	String _error;
 
-	static float toColor(const char *value, int index);
+	static float toColor(const char *value, size_t index);
 
-	static void readCurve(Json *frame, CurveTimeline *timeline, int frameIndex);
+	static void readCurve(Json *frame, CurveTimeline *timeline, size_t frameIndex);
 
 	Animation *readAnimation(Json *root, SkeletonData *skeletonData);
 
-	void readVertices(Json *attachmentMap, VertexAttachment *attachment, int verticesLength);
+	void readVertices(Json *attachmentMap, VertexAttachment *attachment, size_t verticesLength);
 
 	void setError(Json *root, const String &value1, const String &value2);
 };

@@ -81,20 +81,3 @@ AnimationStateData::AnimationPair::AnimationPair(Animation *a1, Animation *a2) :
 bool AnimationStateData::AnimationPair::operator==(const AnimationPair &other) const {
 	return _a1->_name == other._a1->_name && _a2->_name == other._a2->_name;
 }
-
-std::size_t
-AnimationStateData::HashAnimationPair::operator()(const Spine::AnimationStateData::AnimationPair &val) const {
-	std::size_t h1 = 7;
-	size_t strlen = val._a1->_name.length();
-	for (int i = 0; i < strlen; ++i) {
-		h1 = h1 * 31 + val._a1->_name.buffer()[i];
-	}
-
-	std::size_t h2 = 7;
-	strlen = val._a2->_name.length();
-	for (int i = 0; i < strlen; ++i) {
-		h2 = h2 * 31 + val._a2->_name.buffer()[i];
-	}
-
-	return (((h1 << 5) + h1) ^ h2);
-}

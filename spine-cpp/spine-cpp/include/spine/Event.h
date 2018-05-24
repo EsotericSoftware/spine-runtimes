@@ -59,7 +59,7 @@ public:
 
 	float getFloatValue();
 
-	void setFloatValue(int inValue);
+	void setFloatValue(float inValue);
 
 	const String &getStringValue();
 

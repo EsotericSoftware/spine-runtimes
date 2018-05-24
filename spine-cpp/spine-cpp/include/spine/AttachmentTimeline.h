@@ -58,13 +58,13 @@ namespace Spine {
         /// Sets the time and value of the specified keyframe.
         void setFrame(int frameIndex, float time, const String& attachmentName);
         
-        int getSlotIndex();
-        void setSlotIndex(int inValue);
+		size_t getSlotIndex();
+        void setSlotIndex(size_t inValue);
         const Vector<float>& getFrames();
         const Vector<String>& getAttachmentNames();
-        int getFrameCount();
+		size_t getFrameCount();
     private:
-        int _slotIndex;
+        size_t _slotIndex;
         Vector<float> _frames;
         Vector<String> _attachmentNames;
     };

@@ -221,7 +221,7 @@ Vector<Vector<float> *> &Triangulator::decompose(Vector<float> &vertices, Vector
 		float secondX = p[2], secondY = p[3];
 		int winding0 = winding(prevPrevX, prevPrevY, prevX, prevY, firstX, firstY);
 
-		for (int ii = 0; ii < n; ++ii) {
+		for (size_t ii = 0; ii < n; ++ii) {
 			if (ii == i) {
 				continue;
 			}

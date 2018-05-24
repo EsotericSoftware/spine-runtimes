@@ -59,10 +59,10 @@ RegionAttachment *AtlasAttachmentLoader::newRegionAttachment(Skin &skin, const S
 	attachment.setUVs(region.u, region.v, region.u2, region.v2, region.rotate);
 	attachment._regionOffsetX = region.offsetX;
 	attachment._regionOffsetY = region.offsetY;
-	attachment._regionWidth = region.width;
-	attachment._regionHeight = region.height;
-	attachment._regionOriginalWidth = region.originalWidth;
-	attachment._regionOriginalHeight = region.originalHeight;
+	attachment._regionWidth = (float)region.width;
+	attachment._regionHeight = (float)region.height;
+	attachment._regionOriginalWidth = (float)region.originalWidth;
+	attachment._regionOriginalHeight = (float)region.originalHeight;
 	return attachmentP;
 }
 
@@ -83,10 +83,10 @@ MeshAttachment *AtlasAttachmentLoader::newMeshAttachment(Skin &skin, const Strin
 	attachment._regionRotate = region.rotate;
 	attachment._regionOffsetX = region.offsetX;
 	attachment._regionOffsetY = region.offsetY;
-	attachment._regionWidth = region.width;
-	attachment._regionHeight = region.height;
-	attachment._regionOriginalWidth = region.originalWidth;
-	attachment._regionOriginalHeight = region.originalHeight;
+	attachment._regionWidth = (float)region.width;
+	attachment._regionHeight = (float)region.height;
+	attachment._regionOriginalWidth = (float)region.originalWidth;
+	attachment._regionOriginalHeight = (float)region.originalHeight;
 
 	return attachmentP;
 }
@@ -108,7 +108,6 @@ ClippingAttachment *AtlasAttachmentLoader::newClippingAttachment(Skin &skin, con
 }
 
 AtlasRegion *AtlasAttachmentLoader::findRegion(const String &name) {
-	AtlasRegion *ret;
 	return _atlas->findRegion(name);
 }
 

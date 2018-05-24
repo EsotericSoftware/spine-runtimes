@@ -120,5 +120,5 @@ void IkConstraintTimeline::setFrame(int frameIndex, float time, float mix, int b
 	frameIndex *= ENTRIES;
 	_frames[frameIndex] = time;
 	_frames[frameIndex + MIX] = mix;
-	_frames[frameIndex + BEND_DIRECTION] = bendDirection;
+	_frames[frameIndex + BEND_DIRECTION] = (float)bendDirection;
 }

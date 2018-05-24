@@ -43,12 +43,12 @@ class LinkedMesh : public SpineObject {
 	friend class SkeletonJson;
 
 public:
-	LinkedMesh(MeshAttachment *mesh, const String &skin, int slotIndex, const String &parent);
+	LinkedMesh(MeshAttachment *mesh, const String &skin, size_t slotIndex, const String &parent);
 
 private:
 	MeshAttachment *_mesh;
 	String _skin;
-	int _slotIndex;
+	size_t _slotIndex;
 	String _parent;
 };
 }

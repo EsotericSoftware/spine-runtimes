@@ -401,7 +401,7 @@ void Skeleton::getBounds(float &outX, float &outY, float &outWidth, float &outHe
 
 	for (size_t i = 0; i < _drawOrder.size(); ++i) {
 		Slot *slot = _drawOrder[i];
-		int verticesLength = 0;
+		size_t verticesLength = 0;
 		Attachment *attachment = slot->getAttachment();
 
 		if (attachment != NULL && attachment->getRTTI().instanceOf(RegionAttachment::rtti)) {
@@ -423,7 +423,7 @@ void Skeleton::getBounds(float &outX, float &outY, float &outWidth, float &outHe
 			mesh->computeWorldVertices(*slot, 0, verticesLength, outVertexBuffer, 0);
 		}
 
-		for (int ii = 0; ii < verticesLength; ii += 2) {
+		for (size_t ii = 0; ii < verticesLength; ii += 2) {
 			float vx = outVertexBuffer[ii];
 			float vy = outVertexBuffer[ii + 1];
 
@@ -570,9 +570,9 @@ void Skeleton::sortPathConstraint(PathConstraint *constraint) {
 
 	_updateCache.add(constraint);
 
-	for (int i = 0; i < boneCount; i++)
+	for (size_t i = 0; i < boneCount; i++)
 		sortReset(constrained[i]->getChildren());
-	for (int i = 0; i < boneCount; i++)
+	for (size_t i = 0; i < boneCount; i++)
 		constrained[i]->_sorted = true;
 }
 
@@ -615,12 +615,12 @@ void Skeleton::sortPathConstraintAttachment(Skin *skin, int slotIndex, Bone &slo
 
 void Skeleton::sortPathConstraintAttachment(Attachment *attachment, Bone &slotBone) {
 	if (attachment == NULL || !attachment->getRTTI().instanceOf(PathAttachment::rtti)) return;
-	Vector<int> &pathBones = static_cast<PathAttachment *>(attachment)->getBones();
+	Vector<size_t> &pathBones = static_cast<PathAttachment *>(attachment)->getBones();
 	if (pathBones.size() == 0)
 		sortBone(&slotBone);
 	else {
 		for (size_t i = 0, n = pathBones.size(); i < n;) {
-			int nn = pathBones[i++];
+			size_t nn = pathBones[i++];
 			nn += i;
 			while (i < nn) {
 				sortBone(_bones[pathBones[i++]]);

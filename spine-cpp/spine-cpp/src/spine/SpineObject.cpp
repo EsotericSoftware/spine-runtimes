@@ -41,6 +41,14 @@ void *SpineObject::operator new(size_t sz, void *ptr) {
 	return ptr;
 }
 
+void SpineObject::operator delete(void *p, const char *file, int line) {
+	SpineExtension::free(p, file, line);
+}
+
+void SpineObject::operator delete(void *p, void *mem) {
+	SpineExtension::free(p, __FILE__, __LINE__);
+}
+
 void SpineObject::operator delete(void *p) {
 	SpineExtension::free(p, __FILE__, __LINE__);
 }

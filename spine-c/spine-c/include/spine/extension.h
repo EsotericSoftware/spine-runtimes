@@ -96,7 +96,7 @@
 #define RAD_DEG (180 / PI)
 
 #define ABS(A) ((A) < 0? -(A): (A))
-#define SIGNUM(A) ((A) < 0? -1: (A) > 0 ? 1 : 0)
+#define SIGNUM(A) ((A) < 0? -1.0f: (A) > 0 ? 1.0f : 0.0f)
 
 #ifdef __STDC_VERSION__
 #define FMOD(A,B) fmodf(A, B)

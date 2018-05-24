@@ -141,7 +141,7 @@ TrackEntry *TrackEntry::getMixingFrom() { return _mixingFrom; }
 
 void TrackEntry::setMixBlend(MixBlend blend) { _mixBlend = blend; }
 
-float TrackEntry::getMixBlend() { return _mixBlend; }
+MixBlend TrackEntry::getMixBlend() { return _mixBlend; }
 
 void TrackEntry::resetRotationDirections() {
 	_timelinesRotation.clear();
@@ -276,7 +276,7 @@ void EventQueue::drain() {
 	AnimationState &state = _state;
 
 	// Don't cache _eventQueueEntries.size() so callbacks can queue their own events (eg, call setAnimation in AnimationState_Complete).
-	for (int i = 0; i < _eventQueueEntries.size(); ++i) {
+	for (size_t i = 0; i < _eventQueueEntries.size(); ++i) {
 		EventQueueEntry *queueEntry = &_eventQueueEntries[i];
 		TrackEntry *trackEntry = queueEntry->_entry;
 
@@ -323,7 +323,7 @@ AnimationState::AnimationState(AnimationStateData *data) :
 }
 
 AnimationState::~AnimationState() {
-	for (int i = 0; i < _tracks.size(); i++) {
+	for (size_t i = 0; i < _tracks.size(); i++) {
 		TrackEntry* entry = _tracks[i];
 		if (entry) {
 			TrackEntry* from = entry->_mixingFrom;
@@ -492,7 +492,7 @@ void AnimationState::clearTracks() {
 	_queue->drain();
 }
 
-void AnimationState::clearTrack(int trackIndex) {
+void AnimationState::clearTrack(size_t trackIndex) {
 	if (trackIndex >= _tracks.size()) {
 		return;
 	}
@@ -523,14 +523,14 @@ void AnimationState::clearTrack(int trackIndex) {
 	_queue->drain();
 }
 
-TrackEntry *AnimationState::setAnimation(int trackIndex, const String &animationName, bool loop) {
+TrackEntry *AnimationState::setAnimation(size_t trackIndex, const String &animationName, bool loop) {
 	Animation *animation = _data->_skeletonData->findAnimation(animationName);
 	assert(animation != NULL);
 
 	return setAnimation(trackIndex, animation, loop);
 }
 
-TrackEntry *AnimationState::setAnimation(int trackIndex, Animation *animation, bool loop) {
+TrackEntry *AnimationState::setAnimation(size_t trackIndex, Animation *animation, bool loop) {
 	assert(animation != NULL);
 
 	bool interrupt = true;
@@ -556,14 +556,14 @@ TrackEntry *AnimationState::setAnimation(int trackIndex, Animation *animation, b
 	return entry;
 }
 
-TrackEntry *AnimationState::addAnimation(int trackIndex, const String &animationName, bool loop, float delay) {
+TrackEntry *AnimationState::addAnimation(size_t trackIndex, const String &animationName, bool loop, float delay) {
 	Animation *animation = _data->_skeletonData->findAnimation(animationName);
 	assert(animation != NULL);
 
 	return addAnimation(trackIndex, animation, loop, delay);
 }
 
-TrackEntry *AnimationState::addAnimation(int trackIndex, Animation *animation, bool loop, float delay) {
+TrackEntry *AnimationState::addAnimation(size_t trackIndex, Animation *animation, bool loop, float delay) {
 	assert(animation != NULL);
 
 	TrackEntry *last = expandToIndex(trackIndex);
@@ -599,14 +599,14 @@ TrackEntry *AnimationState::addAnimation(int trackIndex, Animation *animation, b
 	return entry;
 }
 
-TrackEntry *AnimationState::setEmptyAnimation(int trackIndex, float mixDuration) {
+TrackEntry *AnimationState::setEmptyAnimation(size_t trackIndex, float mixDuration) {
 	TrackEntry *entry = setAnimation(trackIndex, AnimationState::getEmptyAnimation(), false);
 	entry->_mixDuration = mixDuration;
 	entry->_trackEnd = mixDuration;
 	return entry;
 }
 
-TrackEntry *AnimationState::addEmptyAnimation(int trackIndex, float mixDuration, float delay) {
+TrackEntry *AnimationState::addEmptyAnimation(size_t trackIndex, float mixDuration, float delay) {
 	if (delay <= 0) {
 		delay -= mixDuration;
 	}
@@ -630,7 +630,7 @@ void AnimationState::setEmptyAnimations(float mixDuration) {
 	_queue->drain();
 }
 
-TrackEntry *AnimationState::getCurrent(int trackIndex) {
+TrackEntry *AnimationState::getCurrent(size_t trackIndex) {
 	return trackIndex >= _tracks.size() ? NULL : _tracks[trackIndex];
 }
 
@@ -669,7 +669,7 @@ Animation *AnimationState::getEmptyAnimation() {
 }
 
 void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleton &skeleton, float time, float alpha,
-										 MixBlend blend, Vector<float> &timelinesRotation, int i, bool firstFrame) {
+										 MixBlend blend, Vector<float> &timelinesRotation, size_t i, bool firstFrame) {
 	if (firstFrame) {
 		timelinesRotation[i] = 0;
 	}
@@ -897,7 +897,7 @@ void AnimationState::queueEvents(TrackEntry *entry, float animationTime) {
 	}
 }
 
-void AnimationState::setCurrent(int index, TrackEntry *current, bool interrupt) {
+void AnimationState::setCurrent(size_t index, TrackEntry *current, bool interrupt) {
 	TrackEntry *from = expandToIndex(index);
 	_tracks[index] = current;
 
@@ -920,7 +920,7 @@ void AnimationState::setCurrent(int index, TrackEntry *current, bool interrupt) 
 	_queue->start(current); // triggers animationsChanged
 }
 
-TrackEntry *AnimationState::expandToIndex(int index) {
+TrackEntry *AnimationState::expandToIndex(size_t index) {
 	if (index < _tracks.size()) {
 		return _tracks[index];
 	}
@@ -932,7 +932,7 @@ TrackEntry *AnimationState::expandToIndex(int index) {
 	return NULL;
 }
 
-TrackEntry *AnimationState::newTrackEntry(int trackIndex, Animation *animation, bool loop, TrackEntry *last) {
+TrackEntry *AnimationState::newTrackEntry(size_t trackIndex, Animation *animation, bool loop, TrackEntry *last) {
 	TrackEntry *entryP = _trackEntryPool.obtain(); // Pooling
 	TrackEntry &entry = *entryP;
 

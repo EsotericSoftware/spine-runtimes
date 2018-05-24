@@ -269,7 +269,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	}
 
 	/* Skins. */
-	for (int i = skeletonData->_defaultSkin ? 1 : 0; i < skeletonData->_skins.size(); ++i) {
+	for (size_t i = skeletonData->_defaultSkin ? 1 : 0; i < skeletonData->_skins.size(); ++i) {
 		String skinName(readString(input), true);
 		skeletonData->_skins[i] = readSkin(input, skinName, skeletonData, nonessential);
 	}
@@ -583,7 +583,7 @@ void SkeletonBinary::readVertices(DataInput *input, VertexAttachment *attachment
 	}
 
 	Vector<float> &vertices = attachment->getVertices();
-	Vector<int> &bones = attachment->getBones();
+	Vector<size_t> &bones = attachment->getBones();
 	vertices.ensureCapacity(verticesLength * 3 * 3);
 	bones.ensureCapacity(verticesLength * 3);
 

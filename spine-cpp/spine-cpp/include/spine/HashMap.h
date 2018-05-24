@@ -35,6 +35,9 @@
 #include <spine/Vector.h>
 #include <spine/SpineObject.h>
 
+ // Required for new with line number and file name in  MSVC
+#pragma warning(disable:4291)
+
 namespace Spine {
 template<typename K, typename V>
 class HashMap : public SpineObject {
@@ -143,8 +146,10 @@ public:
 	V operator[](const K &key) {
 		Entry *entry = find(key);
 		if (entry) return entry->_value;
-		else
+		else {
 			assert(false);
+			return 0;
+		}
 	}
 
 	Entries getEntries() const {

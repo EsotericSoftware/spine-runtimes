@@ -198,7 +198,7 @@ namespace Spine {
         void setMixDuration(float inValue);
 
 
-        float getMixBlend();
+        MixBlend getMixBlend();
         void setMixBlend(MixBlend blend);
         
         ///
@@ -319,10 +319,10 @@ namespace Spine {
         /// Removes all animations from the tracks, leaving skeletons in their previous pose.
         /// It may be desired to use AnimationState.setEmptyAnimations(float) to mix the skeletons back to the setup pose,
         /// rather than leaving them in their previous pose.
-        void clearTrack(int trackIndex);
+        void clearTrack(size_t trackIndex);
         
         /// Sets an animation by name. setAnimation(int, Animation, bool)
-        TrackEntry* setAnimation(int trackIndex, const String& animationName, bool loop);
+        TrackEntry* setAnimation(size_t trackIndex, const String& animationName, bool loop);
         
         /// Sets the current animation for a track, discarding any queued animations.
         /// @param loop If true, the animation will repeat.
@@ -331,11 +331,11 @@ namespace Spine {
         /// @return
         /// A track entry to allow further customization of animation playback. References to the track entry must not be kept
         /// after AnimationState.Dispose.
-        TrackEntry* setAnimation(int trackIndex, Animation* animation, bool loop);
+        TrackEntry* setAnimation(size_t trackIndex, Animation* animation, bool loop);
         
         /// Queues an animation by name.
         /// addAnimation(int, Animation, bool, float)
-        TrackEntry* addAnimation(int trackIndex, const String& animationName, bool loop, float delay);
+        TrackEntry* addAnimation(size_t trackIndex, const String& animationName, bool loop, float delay);
         
         /// Adds an animation to be played delay seconds after the current or last queued animation
         /// for a track. If the track is empty, it is equivalent to calling setAnimation.
@@ -345,11 +345,11 @@ namespace Spine {
         ///
         /// @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
         /// after AnimationState.Dispose
-        TrackEntry* addAnimation(int trackIndex, Animation* animation, bool loop, float delay);
+        TrackEntry* addAnimation(size_t trackIndex, Animation* animation, bool loop, float delay);
         
         ///
         /// Sets an empty animation for a track, discarding any queued animations, and mixes to it over the specified mix duration.
-        TrackEntry* setEmptyAnimation(int trackIndex, float mixDuration);
+        TrackEntry* setEmptyAnimation(size_t trackIndex, float mixDuration);
         
         ///
         /// Adds an empty animation to be played after the current or last queued animation for a track, and mixes to it over the
@@ -361,14 +361,14 @@ namespace Spine {
         /// @param mixDuration Mix duration.
         /// @param delay Seconds to begin this animation after the start of the previous animation. May be &lt;= 0 to use the animation
         /// duration of the previous track minus any mix duration plus the negative delay.
-        TrackEntry* addEmptyAnimation(int trackIndex, float mixDuration, float delay);
+        TrackEntry* addEmptyAnimation(size_t trackIndex, float mixDuration, float delay);
         
         ///
         /// Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix duration.
         void setEmptyAnimations(float mixDuration);
         
         /// @return The track entry for the animation currently playing on the track, or NULL if no animation is currently playing.
-        TrackEntry* getCurrent(int trackIndex);
+        TrackEntry* getCurrent(size_t trackIndex);
         
         AnimationStateData* getData();
         
@@ -405,7 +405,7 @@ namespace Spine {
 
         static Animation* getEmptyAnimation();
         
-        static void applyRotateTimeline(RotateTimeline* rotateTimeline, Skeleton& skeleton, float time, float alpha, MixBlend pose, Vector<float>& timelinesRotation, int i, bool firstFrame);
+        static void applyRotateTimeline(RotateTimeline* rotateTimeline, Skeleton& skeleton, float time, float alpha, MixBlend pose, Vector<float>& timelinesRotation, size_t i, bool firstFrame);
         
         /// Returns true when all mixing from entries are complete.
         bool updateMixingFrom(TrackEntry* to, float delta);
@@ -415,13 +415,13 @@ namespace Spine {
         void queueEvents(TrackEntry* entry, float animationTime);
         
         /// Sets the active TrackEntry for a given track number.
-        void setCurrent(int index, TrackEntry* current, bool interrupt);
+        void setCurrent(size_t index, TrackEntry* current, bool interrupt);
 
-        TrackEntry* expandToIndex(int index);
+        TrackEntry* expandToIndex(size_t index);
 
         /// Object-pooling version of new TrackEntry. Obtain an unused TrackEntry from the pool and clear/initialize its values.
         /// @param last May be NULL.
-        TrackEntry* newTrackEntry(int trackIndex, Animation* animation, bool loop, TrackEntry* last);
+        TrackEntry* newTrackEntry(size_t trackIndex, Animation* animation, bool loop, TrackEntry* last);
 
         /// Dispose all track entries queued after the given TrackEntry.
         void disposeNext(TrackEntry* entry);

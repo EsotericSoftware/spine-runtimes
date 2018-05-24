@@ -52,7 +52,7 @@ namespace Spine {
         virtual bool applyDeform(VertexAttachment* sourceAttachment);
         
         int getHullLength();
-        void setHullLength(float inValue);
+        void setHullLength(int inValue);
         
         Vector<float>& getRegionUVs();
         
@@ -81,7 +81,7 @@ namespace Spine {
         void setRegionV2(float inValue);
         
         bool getRegionRotate();
-        void setRegionRotate(float inValue);
+        void setRegionRotate(bool inValue);
         
         float getRegionOffsetX();
         void setRegionOffsetX(float inValue);

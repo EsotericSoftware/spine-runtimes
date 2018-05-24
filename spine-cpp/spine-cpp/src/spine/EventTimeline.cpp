@@ -69,7 +69,7 @@ void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 
 	if (lastTime > time) {
 		// Fire events after last time for looped animations.
-		apply(skeleton, lastTime, std::numeric_limits<int>::max(), pEvents, alpha, blend, direction);
+		apply(skeleton, lastTime, std::numeric_limits<float>::max(), pEvents, alpha, blend, direction);
 		lastTime = -1.0f;
 	} else if (lastTime >= _frames[frameCount - 1]) {
 		// Last time is after last frame.

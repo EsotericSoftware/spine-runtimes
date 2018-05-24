@@ -42,6 +42,10 @@ public:
 
 	void *operator new(size_t sz, void *ptr);
 
+	void operator delete(void *p, const char *file, int line);
+
+	void operator delete(void *p, void *mem);
+
 	void operator delete(void *p);
 
 	virtual ~SpineObject();

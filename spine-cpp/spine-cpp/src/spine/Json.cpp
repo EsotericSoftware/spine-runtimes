@@ -376,7 +376,7 @@ const char *Json::parseNumber(Json *item, const char *num) {
 
 	if (ptr != num) {
 		/* Parse success, number found. */
-		item->_valueFloat = result;
+		item->_valueFloat = (float)result;
 		item->_valueInt = static_cast<int>(result);
 		item->_type = JSON_NUMBER;
 		return ptr;

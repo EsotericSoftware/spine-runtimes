@@ -83,7 +83,7 @@ int MeshAttachment::getHullLength() {
 	return _hullLength;
 }
 
-void MeshAttachment::setHullLength(float inValue) {
+void MeshAttachment::setHullLength(int inValue) {
 	_hullLength = inValue;
 }
 
@@ -151,7 +151,7 @@ bool MeshAttachment::getRegionRotate() {
 	return _regionRotate;
 }
 
-void MeshAttachment::setRegionRotate(float inValue) {
+void MeshAttachment::setRegionRotate(bool inValue) {
 	_regionRotate = inValue;
 }
 

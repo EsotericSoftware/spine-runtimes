@@ -42,7 +42,7 @@ using namespace Spine;
 Skin::AttachmentMap::AttachmentMap() {
 }
 
-void Skin::AttachmentMap::put(int slotIndex, const String &attachmentName, Attachment *attachment) {
+void Skin::AttachmentMap::put(size_t slotIndex, const String &attachmentName, Attachment *attachment) {
 	if (slotIndex >= _buckets.size())
 		_buckets.setSize(slotIndex + 1, Vector<Entry>());
 	Vector<Entry> &bucket = _buckets[slotIndex];
@@ -54,13 +54,13 @@ void Skin::AttachmentMap::put(int slotIndex, const String &attachmentName, Attac
 	}
 }
 
-Attachment *Skin::AttachmentMap::get(int slotIndex, const String &attachmentName) {
+Attachment *Skin::AttachmentMap::get(size_t slotIndex, const String &attachmentName) {
 	if (slotIndex >= _buckets.size()) return NULL;
 	int existing = findInBucket(_buckets[slotIndex], attachmentName);
 	return existing >= 0 ? _buckets[slotIndex][existing]._attachment : NULL;
 }
 
-void Skin::AttachmentMap::remove(int slotIndex, const String &attachmentName) {
+void Skin::AttachmentMap::remove(size_t slotIndex, const String &attachmentName) {
 	if (slotIndex >= _buckets.size()) return;
 	int existing = findInBucket(_buckets[slotIndex], attachmentName);
 	if (existing >= 0) _buckets[slotIndex].removeAt(existing);
@@ -88,16 +88,16 @@ Skin::~Skin() {
 	}
 }
 
-void Skin::addAttachment(int slotIndex, const String &name, Attachment *attachment) {
+void Skin::addAttachment(size_t slotIndex, const String &name, Attachment *attachment) {
 	assert(attachment);
 	_attachments.put(slotIndex, name, attachment);
 }
 
-Attachment *Skin::getAttachment(int slotIndex, const String &name) {
+Attachment *Skin::getAttachment(size_t slotIndex, const String &name) {
 	return _attachments.get(slotIndex, name);
 }
 
-void Skin::findNamesForSlot(int slotIndex, Vector<String> &names) {
+void Skin::findNamesForSlot(size_t slotIndex, Vector<String> &names) {
 	Skin::AttachmentMap::Entries entries = _attachments.getEntries();
 	while (entries.hasNext()) {
 		Skin::AttachmentMap::Entry &entry = entries.next();
@@ -107,7 +107,7 @@ void Skin::findNamesForSlot(int slotIndex, Vector<String> &names) {
 	}
 }
 
-void Skin::findAttachmentsForSlot(int slotIndex, Vector<Attachment *> &attachments) {
+void Skin::findAttachmentsForSlot(size_t slotIndex, Vector<Attachment *> &attachments) {
 	Skin::AttachmentMap::Entries entries = _attachments.getEntries();
 	while (entries.hasNext()) {
 		Skin::AttachmentMap::Entry &entry = entries.next();

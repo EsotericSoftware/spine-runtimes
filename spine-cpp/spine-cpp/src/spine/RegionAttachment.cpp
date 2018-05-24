@@ -122,7 +122,7 @@ void RegionAttachment::setUVs(float u, float v, float u2, float v2, bool rotate)
 	}
 }
 
-void RegionAttachment::computeWorldVertices(Bone &bone, Vector<float> &worldVertices, int offset, int stride) {
+void RegionAttachment::computeWorldVertices(Bone &bone, Vector<float> &worldVertices, size_t offset, size_t stride) {
 	assert(worldVertices.size() >= (offset + 8));
 
 	float x = bone.getWorldX(), y = bone.getWorldY();

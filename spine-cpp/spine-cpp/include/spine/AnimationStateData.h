@@ -79,10 +79,6 @@ namespace Spine {
             bool operator==(const AnimationPair &other) const;
         };
         
-        struct HashAnimationPair : public SpineObject {
-            std::size_t operator()(const Spine::AnimationStateData::AnimationPair& val) const;
-        };
-        
         SkeletonData* _skeletonData;
         float _defaultMix;
         HashMap<AnimationPair, float> _animationToMixTime;

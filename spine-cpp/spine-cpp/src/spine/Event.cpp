@@ -62,7 +62,7 @@ float Event::getFloatValue() {
 	return _floatValue;
 }
 
-void Event::setFloatValue(int inValue) {
+void Event::setFloatValue(float inValue) {
 	_floatValue = inValue;
 }
 

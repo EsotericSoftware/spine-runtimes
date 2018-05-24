@@ -49,13 +49,13 @@ void VertexAttachment::computeWorldVertices(Slot &slot, Vector<float> &worldVert
 	computeWorldVertices(slot, 0, _worldVerticesLength, worldVertices, 0);
 }
 
-void VertexAttachment::computeWorldVertices(Slot &slot, int start, int count, Vector<float> &worldVertices, int offset,
-											int stride) {
+void VertexAttachment::computeWorldVertices(Slot &slot, size_t start, size_t count, Vector<float> &worldVertices, size_t offset,
+	size_t stride) {
 	count = offset + (count >> 1) * stride;
 	Skeleton &skeleton = slot._bone._skeleton;
 	Vector<float> *deformArray = &slot.getAttachmentVertices();
 	Vector<float> *vertices = &_vertices;
-	Vector<int> &bones = _bones;
+	Vector<size_t> &bones = _bones;
 	if (bones.size() == 0) {
 		if (deformArray->size() > 0) {
 			vertices = deformArray;
@@ -65,7 +65,7 @@ void VertexAttachment::computeWorldVertices(Slot &slot, int start, int count, Ve
 		float x = bone._worldX;
 		float y = bone._worldY;
 		float a = bone._a, b = bone._b, c = bone._c, d = bone._d;
-		for (int vv = start, w = offset; w < count; vv += 2, w += stride) {
+		for (size_t vv = start, w = offset; w < count; vv += 2, w += stride) {
 			float vx = (*vertices)[vv];
 			float vy = (*vertices)[vv + 1];
 			worldVertices[w] = vx * a + vy * b + x;
@@ -75,7 +75,7 @@ void VertexAttachment::computeWorldVertices(Slot &slot, int start, int count, Ve
 	}
 
 	int v = 0, skip = 0;
-	for (int i = 0; i < start; i += 2) {
+	for (size_t i = 0; i < start; i += 2) {
 		int n = bones[v];
 		v += n + 1;
 		skip += n;
@@ -83,7 +83,7 @@ void VertexAttachment::computeWorldVertices(Slot &slot, int start, int count, Ve
 
 	Vector<Bone *> &skeletonBones = skeleton.getBones();
 	if (deformArray->size() == 0) {
-		for (int w = offset, b = skip * 3; w < count; w += stride) {
+		for (size_t w = offset, b = skip * 3; w < count; w += stride) {
 			float wx = 0, wy = 0;
 			int n = bones[v++];
 			n += v;
@@ -100,7 +100,7 @@ void VertexAttachment::computeWorldVertices(Slot &slot, int start, int count, Ve
 			worldVertices[w + 1] = wy;
 		}
 	} else {
-		for (int w = offset, b = skip * 3, f = skip << 1; w < count; w += stride) {
+		for (size_t w = offset, b = skip * 3, f = skip << 1; w < count; w += stride) {
 			float wx = 0, wy = 0;
 			int n = bones[v++];
 			n += v;
@@ -127,7 +127,7 @@ int VertexAttachment::getId() {
 	return _id;
 }
 
-Vector<int> &VertexAttachment::getBones() {
+Vector<size_t> &VertexAttachment::getBones() {
 	return _bones;
 }
 
@@ -135,11 +135,11 @@ Vector<float> &VertexAttachment::getVertices() {
 	return _vertices;
 }
 
-int VertexAttachment::getWorldVerticesLength() {
+size_t VertexAttachment::getWorldVerticesLength() {
 	return _worldVerticesLength;
 }
 
-void VertexAttachment::setWorldVerticesLength(int inValue) {
+void VertexAttachment::setWorldVerticesLength(size_t inValue) {
 	_worldVerticesLength = inValue;
 }
 

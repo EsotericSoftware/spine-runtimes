@@ -453,10 +453,10 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 
 int main () {
 	DebugExtension dbgExtension;
-	// SpineExtension::setInstance(&dbgExtension);
+	SpineExtension::setInstance(&dbgExtension);
 
-	// testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor.atlas", 0.5f);
-	// testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 1.0f);
+	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor.atlas", 0.5f);
+	testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 1.0f);
 	testcase(spineboy, "data/spineboy-ess.json", "data/spineboy-ess.skel", "data/spineboy.atlas", 0.6f);
 	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl.atlas", 0.5f);
 	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin.atlas", 0.5f);
@@ -465,6 +465,6 @@ int main () {
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor.atlas", 0.5f);
 	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins.atlas", 1.4f);
 	testcase(stretchyman, "data/stretchyman-pro.json", "data/stretchyman-pro.skel", "data/stretchyman.atlas", 0.6f);
-	// dbgExtension.reportLeaks();
+	dbgExtension.reportLeaks();
 	return 0;
 }

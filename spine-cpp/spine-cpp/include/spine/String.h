@@ -37,6 +37,9 @@
 #include <string.h>
 #include <stdio.h>
 
+// Required for sprintf on MSVC
+#pragma warning(disable:4996)
+
 namespace Spine {
 class String : public SpineObject {
 public:

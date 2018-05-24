@@ -51,11 +51,11 @@ public:
 
 	public:
 		struct Entry {
-			int _slotIndex;
+			size_t _slotIndex;
 			String _name;
 			Attachment *_attachment;
 
-			Entry(int slotIndex, const String &name, Attachment *attachment) :
+			Entry(size_t slotIndex, const String &name, Attachment *attachment) :
 					_slotIndex(slotIndex),
 					_name(name),
 					_attachment(attachment) {
@@ -68,8 +68,8 @@ public:
 		public:
 			bool hasNext() {
 				while(true) {
-					if (_slotIndex >= (int) _buckets.size()) return false;
-					if (_bucketIndex >= (int) _buckets[_slotIndex].size()) {
+					if (_slotIndex >= _buckets.size()) return false;
+					if (_bucketIndex >= _buckets[_slotIndex].size()) {
 						_bucketIndex = 0;
 						++_slotIndex;
 						continue;
@@ -90,15 +90,15 @@ public:
 
 		private:
 			Vector< Vector<Entry> > &_buckets;
-			int _slotIndex;
-			int _bucketIndex;
+			size_t _slotIndex;
+			size_t _bucketIndex;
 		};
 
-		void put(int slotIndex, const String &attachmentName, Attachment *attachment);
+		void put(size_t slotIndex, const String &attachmentName, Attachment *attachment);
 
-		Attachment *get(int slotIndex, const String &attachmentName);
+		Attachment *get(size_t slotIndex, const String &attachmentName);
 
-		void remove(int slotIndex, const String &attachmentName);
+		void remove(size_t slotIndex, const String &attachmentName);
 
 		Entries getEntries();
 
@@ -118,20 +118,20 @@ public:
 
 	/// Adds an attachment to the skin for the specified slot index and name.
 	/// If the name already exists for the slot, the previous value is replaced.
-	void addAttachment(int slotIndex, const String &name, Attachment *attachment);
+	void addAttachment(size_t slotIndex, const String &name, Attachment *attachment);
 
 	/// Returns the attachment for the specified slot index and name, or NULL.
-	Attachment *getAttachment(int slotIndex, const String &name);
+	Attachment *getAttachment(size_t slotIndex, const String &name);
 
 	/// Finds the skin keys for a given slot. The results are added to the passed array of names.
 	/// @param slotIndex The target slotIndex. To find the slot index, use Skeleton::findSlotIndex or SkeletonData::findSlotIndex
 	/// @param names Found skin key names will be added to this array.
-	void findNamesForSlot(int slotIndex, Vector <String> &names);
+	void findNamesForSlot(size_t slotIndex, Vector <String> &names);
 
 	/// Finds the attachments for a given slot. The results are added to the passed array of Attachments.
 	/// @param slotIndex The target slotIndex. To find the slot index, use Skeleton::findSlotIndex or SkeletonData::findSlotIndex
 	/// @param attachments Found Attachments will be added to this array.
-	void findAttachmentsForSlot(int slotIndex, Vector<Attachment *> &attachments);
+	void findAttachmentsForSlot(size_t slotIndex, Vector<Attachment *> &attachments);
 
 	const String &getName();
 

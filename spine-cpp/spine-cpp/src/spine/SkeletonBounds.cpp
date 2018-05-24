@@ -73,7 +73,7 @@ void SkeletonBounds::update(Skeleton &skeleton, bool updateAabb) {
 
 		Polygon &polygon = *polygonP;
 
-		int count = boundingBox->getWorldVerticesLength();
+		size_t count = boundingBox->getWorldVerticesLength();
 		polygon._count = count;
 		if (polygon._vertices.size() < count) {
 			polygon._vertices.setSize(count, 0);
@@ -84,10 +84,10 @@ void SkeletonBounds::update(Skeleton &skeleton, bool updateAabb) {
 	if (updateAabb) {
 		aabbCompute();
 	} else {
-		_minX = std::numeric_limits<int>::min();
-		_minY = std::numeric_limits<int>::min();
-		_maxX = std::numeric_limits<int>::max();
-		_maxY = std::numeric_limits<int>::max();
+		_minX = std::numeric_limits<float>::min();
+		_minY = std::numeric_limits<float>::min();
+		_maxX = std::numeric_limits<float>::max();
+		_maxY = std::numeric_limits<float>::max();
 	}
 }
 
@@ -210,12 +210,12 @@ float SkeletonBounds::getHeight() {
 }
 
 void SkeletonBounds::aabbCompute() {
-	float minX = std::numeric_limits<int>::min();
-	float minY = std::numeric_limits<int>::min();
-	float maxX = std::numeric_limits<int>::max();
-	float maxY = std::numeric_limits<int>::max();
+	float minX = std::numeric_limits<float>::min();
+	float minY = std::numeric_limits<float>::min();
+	float maxX = std::numeric_limits<float>::max();
+	float maxY = std::numeric_limits<float>::max();
 
-	for (int i = 0, n = static_cast<int>(_polygons.size()); i < n; ++i) {
+	for (size_t i = 0, n = _polygons.size(); i < n; ++i) {
 		Polygon *polygon = _polygons[i];
 		Vector<float> &vertices = polygon->_vertices;
 		for (int ii = 0, nn = polygon->_count; ii < nn; ii += 2) {

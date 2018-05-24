@@ -147,7 +147,7 @@ void PathConstraint::update() {
 		offsetRotation *= p.getA() * p.getD() - p.getB() * p.getC() > 0 ? DEG_RAD : -DEG_RAD;
 	}
 
-	for (int i = 0, p = 3; i < boneCount; i++, p += 3) {
+	for (size_t i = 0, p = 3; i < boneCount; i++, p += 3) {
 		Bone *boneP = _bones[i];
 		Bone &bone = *boneP;
 		bone._worldX += (boneX - bone._worldX) * translateMix;
