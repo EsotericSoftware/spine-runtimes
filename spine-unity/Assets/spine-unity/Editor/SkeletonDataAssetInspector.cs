@@ -651,7 +651,12 @@ namespace Spine.Unity.Editor {
 		SkeletonAnimation skeletonAnimation;
 		GameObject previewGameObject;
 		internal bool requiresRefresh;
+
+		#if !(UNITY_2017_4 || UNITY_2018)
 		float animationLastTime;
+		#endif
+
+		static float CurrentTime { get { return (float)EditorApplication.timeSinceStartup; } }
 
 		Action Repaint;
 		public event Action<string> OnSkinChanged;
@@ -742,7 +747,9 @@ namespace Spine.Unity.Editor {
 
 			if (previewRenderUtility == null) {
 				previewRenderUtility = new PreviewRenderUtility(true);
-				animationLastTime = Time.realtimeSinceStartup;
+				#if !(UNITY_2017_4 || UNITY_2018)
+				animationLastTime = CurrentTime;
+				#endif
 
 				const int PreviewLayer = 30;
 				const int PreviewCameraCullingMask = 1 << PreviewLayer;
@@ -770,6 +777,10 @@ namespace Spine.Unity.Editor {
 							skeletonAnimation.initialSkinName = skinName;
 							skeletonAnimation.LateUpdate();
 							previewGameObject.GetComponent<Renderer>().enabled = false;
+
+							#if UNITY_2017_4 || UNITY_2018
+							previewRenderUtility.AddSingleGO(previewGameObject);
+							#endif
 						}
 
 						if (this.ActiveTrack != null) cameraAdjustEndFrame = EditorApplication.timeSinceStartup + skeletonAnimation.AnimationState.GetCurrent(0).Alpha;
@@ -813,6 +824,7 @@ namespace Spine.Unity.Editor {
 			previewRenderUtility.BeginStaticPreview(new Rect(0, 0, width, height));
 			DoRenderPreview(false);
 			var tex = previewRenderUtility.EndStaticPreview();
+
 			return tex;
 		}
 
@@ -825,12 +837,17 @@ namespace Spine.Unity.Editor {
 				var renderer = go.GetComponent<Renderer>();
 				renderer.enabled = true;
 
-				if (!EditorApplication.isPlaying) {
-					skeletonAnimation.Update((Time.realtimeSinceStartup - animationLastTime));
-					skeletonAnimation.LateUpdate();
-					animationLastTime = Time.realtimeSinceStartup;
-				}
 				
+				if (!EditorApplication.isPlaying) {
+					#if !(UNITY_2017_4 || UNITY_2018)
+					float current = CurrentTime;
+					float deltaTime = (current - animationLastTime);
+					skeletonAnimation.Update(deltaTime);
+					animationLastTime = current;
+					#endif
+					skeletonAnimation.LateUpdate();
+				}
+
 				var thisPreviewUtilityCamera = this.PreviewUtilityCamera;
 
 				if (drawHandles) {
@@ -861,7 +878,7 @@ namespace Spine.Unity.Editor {
 			if (previewRenderUtility == null)
 				return;
 
-			if (EditorApplication.timeSinceStartup < cameraAdjustEndFrame)
+			if (CurrentTime < cameraAdjustEndFrame)
 				AdjustCameraGoals();
 
 			lastCameraPositionGoal = cameraPositionGoal;
