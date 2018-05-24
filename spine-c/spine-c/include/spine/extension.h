@@ -63,6 +63,11 @@
 
 #include <spine/dll.h>
 
+// Required for sprintf and consorts on MSVC
+#ifdef _MSC_VER
+#pragma warning(disable:4996)
+#endif
+
 /* All allocation uses these. */
 #define MALLOC(TYPE,COUNT) ((TYPE*)_spMalloc(sizeof(TYPE) * (COUNT), __FILE__, __LINE__))
 #define CALLOC(TYPE,COUNT) ((TYPE*)_spCalloc(COUNT, sizeof(TYPE), __FILE__, __LINE__))

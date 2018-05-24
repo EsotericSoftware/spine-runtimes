@@ -145,9 +145,9 @@ void SkeletonClipping::clipTriangles(Vector<float> &vertices, size_t verticesLen
 				clippedTriangles.setSize(s + 3 * (clipOutputCount - 2), 0);
 				clipOutputCount--;
 				for (size_t ii = 1; ii < clipOutputCount; ii++) {
-					clippedTriangles[s] = index;
-					clippedTriangles[s + 1] = index + ii;
-					clippedTriangles[s + 2] = index + ii + 1;
+					clippedTriangles[s] = (unsigned short)(index);
+					clippedTriangles[s + 1] = (unsigned short)(index + ii);
+					clippedTriangles[s + 2] = (unsigned short)(index + ii + 1);
 					s += 3;
 				}
 				index += clipOutputCount + 1;
@@ -170,9 +170,9 @@ void SkeletonClipping::clipTriangles(Vector<float> &vertices, size_t verticesLen
 
 				s = clippedTriangles.size();
 				clippedTriangles.setSize(s + 3, 0);
-				clippedTriangles[s] = index;
-				clippedTriangles[s + 1] = index + 1;
-				clippedTriangles[s + 2] = index + 2;
+				clippedTriangles[s] = (unsigned short)index;
+				clippedTriangles[s + 1] = (unsigned short)(index + 1);
+				clippedTriangles[s + 2] = (unsigned short)(index + 2);
 				index += 3;
 				i += 3;
 				goto continue_outer;
