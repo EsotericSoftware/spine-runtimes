@@ -50,9 +50,9 @@ namespace Spine.Unity.Playables {
 			var state = spineComponent.AnimationState;
 
 			if (!Application.isPlaying) {
-#if SPINE_EDITMODEPOSE
+				#if SPINE_EDITMODEPOSE
 				PreviewEditModePose(playable, spineComponent);
-#endif
+				#endif
 				return;
 			}
 
@@ -81,7 +81,6 @@ namespace Spine.Unity.Playables {
 					if (clipData.animationReference == null) {
 						float mixDuration = clipData.customDuration ? clipData.mixDuration : state.Data.DefaultMix;
 						state.SetEmptyAnimation(0, mixDuration);
-						continue;
 					} else {
 						if (clipData.animationReference.Animation != null) {
 							Spine.TrackEntry trackEntry = state.SetAnimation(0, clipData.animationReference.Animation, clipData.loop);
@@ -96,11 +95,15 @@ namespace Spine.Unity.Playables {
 						}
 						//else Debug.LogWarningFormat("Animation named '{0}' not found", clipData.animationName);
 					}
+
+					// Ensure that the first frame ends with an updated mesh.
+					spineComponent.Update(0);
+					spineComponent.LateUpdate();
 				}
 			}
 		}
 
-#if SPINE_EDITMODEPOSE
+		#if SPINE_EDITMODEPOSE
 		public void PreviewEditModePose (Playable playable, SkeletonAnimation spineComponent) {
 			if (Application.isPlaying) return;
 			if (spineComponent == null) return;
@@ -160,7 +163,7 @@ namespace Spine.Unity.Playables {
 			// Do nothing outside of the first clip and the last clip.
 
 		}
-#endif
+		#endif
 
 	}
 
