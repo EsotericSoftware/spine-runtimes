@@ -152,9 +152,7 @@ namespace Spine.Unity {
 			}
 
 			if (skeletonAnimation == null) {
-				skeletonAnimation = GetComponent<SkeletonAnimation>();
-				if (skeletonAnimation == null)
-					skeletonAnimation = GetComponent<SkeletonAnimator>();
+				skeletonAnimation = GetComponent(typeof(ISkeletonAnimation)) as ISkeletonAnimation;
 			}
 
 			skeletonRenderer.OnRebuild -= HandleRendererReset;

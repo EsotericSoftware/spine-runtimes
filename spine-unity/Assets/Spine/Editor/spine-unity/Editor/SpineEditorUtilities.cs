@@ -32,7 +32,7 @@
 
 // Original contribution by: Mitch Thompson
 
-#define SPINE_SKELETONANIMATOR
+#define SPINE_SKELETONMECANIM
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -406,13 +406,13 @@ namespace Spine.Unity.Editor {
 					});
 			}
 
-			#if SPINE_SKELETONANIMATOR
+			#if SPINE_SKELETONMECANIM
 			menu.AddSeparator("");
-			// SkeletonAnimator
-			menu.AddItem(new GUIContent("SkeletonAnimator"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
+			// SkeletonMecanim
+			menu.AddItem(new GUIContent("SkeletonMecanim"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
 				skeletonDataAsset = skeletonDataAsset,
 				spawnPoint = spawnPoint,
-				instantiateDelegate = (data) => InstantiateSkeletonAnimator(data)
+				instantiateDelegate = (data) => InstantiateSkeletonMecanim(data)
 			});
 			#endif
 
@@ -773,7 +773,7 @@ namespace Spine.Unity.Editor {
 						SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
 						string currentHash = skeletonData != null ? skeletonData.Hash : null;
 
-						#if SPINE_SKELETONANIMATOR
+						#if SPINE_SKELETONMECANIM
 						if (currentHash == null || lastHash != currentHash)
 							UpdateMecanimClips(skeletonDataAsset);
 						#endif
@@ -1444,8 +1444,8 @@ namespace Spine.Unity.Editor {
 		}
 		#endregion
 
-		#region SkeletonAnimator
-		#if SPINE_SKELETONANIMATOR
+		#region SkeletonMecanim
+		#if SPINE_SKELETONMECANIM
 		static void UpdateMecanimClips (SkeletonDataAsset skeletonDataAsset) {
 			if (skeletonDataAsset.controller == null)
 				return;
@@ -1453,13 +1453,13 @@ namespace Spine.Unity.Editor {
 			SkeletonBaker.GenerateMecanimAnimationClips(skeletonDataAsset);
 		}
 
-		public static SkeletonAnimator InstantiateSkeletonAnimator (SkeletonDataAsset skeletonDataAsset, string skinName) {
-			return InstantiateSkeletonAnimator(skeletonDataAsset, skeletonDataAsset.GetSkeletonData(true).FindSkin(skinName));
+		public static SkeletonMecanim InstantiateSkeletonMecanim (SkeletonDataAsset skeletonDataAsset, string skinName) {
+			return InstantiateSkeletonMecanim(skeletonDataAsset, skeletonDataAsset.GetSkeletonData(true).FindSkin(skinName));
 		}
 
-		public static SkeletonAnimator InstantiateSkeletonAnimator (SkeletonDataAsset skeletonDataAsset, Skin skin = null) {
+		public static SkeletonMecanim InstantiateSkeletonMecanim (SkeletonDataAsset skeletonDataAsset, Skin skin = null) {
 			string spineGameObjectName = string.Format("Spine Mecanim GameObject ({0})", skeletonDataAsset.name.Replace("_SkeletonData", ""));
-			GameObject go = new GameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(Animator), typeof(SkeletonAnimator));
+			GameObject go = new GameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(Animator), typeof(SkeletonMecanim));
 
 			if (skeletonDataAsset.controller == null) {
 				SkeletonBaker.GenerateMecanimAnimationClips(skeletonDataAsset);
@@ -1468,7 +1468,7 @@ namespace Spine.Unity.Editor {
 
 			go.GetComponent<Animator>().runtimeAnimatorController = skeletonDataAsset.controller;
 
-			SkeletonAnimator anim = go.GetComponent<SkeletonAnimator>();
+			SkeletonMecanim anim = go.GetComponent<SkeletonMecanim>();
 			anim.skeletonDataAsset = skeletonDataAsset;
 			IngestAdvancedRenderSettings(anim);
 

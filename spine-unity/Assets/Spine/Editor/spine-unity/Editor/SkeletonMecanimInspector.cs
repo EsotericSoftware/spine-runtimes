@@ -33,9 +33,9 @@
 using UnityEditor;
 
 namespace Spine.Unity.Editor {
-	[CustomEditor(typeof(SkeletonAnimator))]
+	[CustomEditor(typeof(SkeletonMecanim))]
 	[CanEditMultipleObjects]
-	public class SkeletonAnimatorInspector : SkeletonRendererInspector {
+	public class SkeletonMecanimInspector : SkeletonRendererInspector {
 		protected SerializedProperty mecanimTranslator;
 
 		protected override void OnEnable () {
