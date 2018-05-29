@@ -1,0 +1,10 @@
+{
+    "name": "spine-unity-editor",
+    "references": [
+        "spine-unity"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}
