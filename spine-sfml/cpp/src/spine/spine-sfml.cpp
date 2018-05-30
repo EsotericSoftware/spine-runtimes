@@ -48,7 +48,7 @@ sf::BlendMode additivePma = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::One
 sf::BlendMode multiplyPma = sf::BlendMode(sf::BlendMode::DstColor, sf::BlendMode::OneMinusSrcAlpha);
 sf::BlendMode screenPma = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcColor);
 
-namespace Spine {
+namespace spine {
 
 SkeletonDrawable::SkeletonDrawable(SkeletonData *skeletonData, AnimationStateData *stateData) :
 		timeScale(1),
@@ -115,13 +115,13 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 			uvs = &regionAttachment->getUVs();
 			indices = &quadIndices;
 			indicesCount = 6;
-			texture = (Texture *) ((AtlasRegion *) regionAttachment->getRendererObject())->page->rendererObject;
+			texture = (Texture *) ((AtlasRegion *) regionAttachment->getRendererObject())->page->getRendererObject();
 			attachmentColor = &regionAttachment->getColor();
 
 		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 			MeshAttachment *mesh = (MeshAttachment *) attachment;
 			worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
-			texture = (Texture *) ((AtlasRegion *) mesh->getRendererObject())->page->rendererObject;
+			texture = (Texture *) ((AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
 			mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices, 0, 2);
 			verticesCount = mesh->getWorldVerticesLength() >> 1;
 			uvs = &mesh->getUVs();
@@ -196,7 +196,7 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 		}
 
 		if (clipper.isClipping()) {
-			clipper.clipTriangles(worldVertices, verticesCount << 1, *indices, indicesCount, *uvs);
+			clipper.clipTriangles(worldVertices, *indices, *uvs, 2);
 			vertices = &clipper.getClippedVertices();
 			verticesCount = clipper.getClippedVertices().size() >> 1;
 			uvs = &clipper.getClippedUVs();
@@ -257,6 +257,10 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 	if (vertexEffect != 0) vertexEffect->end();
 }
 
+void deleteTexture(void* texture) {
+	delete (Texture *) texture;
+}
+
 void SFMLTextureLoader::load(AtlasPage &page, const String &path) {
 	Texture *texture = new Texture();
 	if (!texture->loadFromFile(path.buffer())) return;
@@ -264,18 +268,17 @@ void SFMLTextureLoader::load(AtlasPage &page, const String &path) {
 	if (page.magFilter == TextureFilter_Linear) texture->setSmooth(true);
 	if (page.uWrap == TextureWrap_Repeat && page.vWrap == TextureWrap_Repeat) texture->setRepeated(true);
 
-	page.rendererObject = texture;
+	page.setRendererObject(texture, deleteTexture);
 	Vector2u size = texture->getSize();
 	page.width = size.x;
 	page.height = size.y;
 }
 
 void SFMLTextureLoader::unload(void *texture) {
-	delete (Texture *) texture;
+	deleteTexture(texture);
 }
 
-String SFMLTextureLoader::toString() const {
-	return String("SFMLTextureLoader");
+SpineExtension *getDefaultExtension() {
+	return new DefaultSpineExtension();
 }
-
 }

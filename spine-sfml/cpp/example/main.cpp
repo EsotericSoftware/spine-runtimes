@@ -34,7 +34,7 @@
 #include <SFML/Graphics.hpp>
 
 using namespace std;
-using namespace Spine;
+using namespace spine;
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -127,7 +127,7 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 
 	Slot* headSlot = skeleton->findSlot("head");
 
-	drawable->state->setOnAnimationEventFunc(callback);
+	drawable->state->setListener(callback);
 	drawable->state->addAnimation(0, "walk", true, 0);
 	drawable->state->addAnimation(0, "jump", false, 3);
 	drawable->state->addAnimation(0, "run", true, 0);
@@ -452,7 +452,7 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 int main () {
-	DebugExtension dbgExtension;
+	DebugExtension dbgExtension(SpineExtension::getInstance());
 	SpineExtension::setInstance(&dbgExtension);
 
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor.atlas", 0.5f);
