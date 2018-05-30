@@ -64,7 +64,7 @@ namespace Spine.Unity {
 					Clear();
 					Initialize(true);
 					startingAnimation = "";
-					if (skeletonDataAsset.atlasAssets.Length > 1 || skeletonDataAsset.atlasAssets[0].materials.Length > 1)
+					if (skeletonDataAsset.atlasAssets.Length > 1 || skeletonDataAsset.atlasAssets[0].MaterialCount > 1)
 						Debug.LogError("Unity UI does not support multiple textures per Renderer. Your skeleton will not be rendered correctly. Recommend using SkeletonAnimation instead. This requires the use of a Screen space camera canvas.");
 				} else {
 					if (freeze) return;
@@ -136,7 +136,7 @@ namespace Spine.Unity {
 			get { 
 				// Fail loudly when incorrectly set up.
 				if (overrideTexture != null) return overrideTexture;
-				return skeletonDataAsset == null ? null : skeletonDataAsset.atlasAssets[0].materials[0].mainTexture;
+				return skeletonDataAsset == null ? null : skeletonDataAsset.atlasAssets[0].PrimaryMaterial.mainTexture;
 			}
 		}
 
@@ -224,7 +224,7 @@ namespace Spine.Unity {
 			var skeletonData = this.skeletonDataAsset.GetSkeletonData(false);
 			if (skeletonData == null) return;
 
-			if (skeletonDataAsset.atlasAssets.Length <= 0 || skeletonDataAsset.atlasAssets[0].materials.Length <= 0) return;
+			if (skeletonDataAsset.atlasAssets.Length <= 0 || skeletonDataAsset.atlasAssets[0].MaterialCount <= 0) return;
 
 			this.state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
 			if (state == null) {

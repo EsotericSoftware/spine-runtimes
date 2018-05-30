@@ -35,31 +35,6 @@ using UnityEngine;
 
 namespace Spine.Unity.Editor {
 	public static class Menus {
-		[MenuItem("Assets/Create/Spine/Atlas Asset")]
-		static public void CreateAtlas () {
-			CreateAsset<AtlasAsset>("New Atlas");
-		}
-
-		[MenuItem("Assets/Create/Spine/SkeletonData Asset")]
-		static public void CreateSkeletonData () {
-			CreateAsset<SkeletonDataAsset>("New SkeletonData");
-		}
-
-		static void CreateAsset<T> (String name) where T : ScriptableObject {
-			var dir = "Assets/";
-			var selected = Selection.activeObject;
-			if (selected != null) {
-				var assetDir = AssetDatabase.GetAssetPath(selected.GetInstanceID());
-				if (assetDir.Length > 0 && Directory.Exists(assetDir))
-					dir = assetDir + "/";
-			}
-			ScriptableObject asset = ScriptableObject.CreateInstance<T>();
-			AssetDatabase.CreateAsset(asset, dir + name + ".asset");
-			AssetDatabase.SaveAssets();
-			EditorUtility.FocusProjectWindow();
-			Selection.activeObject = asset;
-		}
-
 		[MenuItem("GameObject/Spine/SkeletonRenderer", false, 10)]
 		static public void CreateSkeletonRendererGameObject () {
 			CreateSpineGameObject<SkeletonRenderer>("New SkeletonRenderer");

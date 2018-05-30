@@ -145,7 +145,7 @@ namespace Spine.Unity.Editor {
 						foreach (var c in targets) {
 							var component = c as SkeletonRenderer;
 							if (component.skeletonDataAsset != null) {
-								foreach (AtlasAsset aa in component.skeletonDataAsset.atlasAssets) {
+								foreach (AtlasAssetBase aa in component.skeletonDataAsset.atlasAssets) {
 									if (aa != null)
 										aa.Clear();
 								}
@@ -192,7 +192,7 @@ namespace Spine.Unity.Editor {
 					if (component.valid) {
 						if (GUILayout.Button(ReloadButtonLabel, reloadButtonStyle, reloadWidth)) {
 							if (component.skeletonDataAsset != null) {
-								foreach (AtlasAsset aa in component.skeletonDataAsset.atlasAssets) {
+								foreach (AtlasAssetBase aa in component.skeletonDataAsset.atlasAssets) {
 									if (aa != null)
 										aa.Clear();
 								}

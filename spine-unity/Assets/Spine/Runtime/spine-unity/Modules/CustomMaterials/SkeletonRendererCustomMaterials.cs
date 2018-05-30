@@ -51,14 +51,15 @@ namespace Spine.Unity.Modules {
 
 			// Populate atlas list 
 			if (skeletonRenderer != null && skeletonRenderer.skeletonDataAsset != null) {
-				AtlasAsset[] atlasAssets = skeletonRenderer.skeletonDataAsset.atlasAssets;
+				var atlasAssets = skeletonRenderer.skeletonDataAsset.atlasAssets;
 
 				var initialAtlasMaterialOverrides = new List<AtlasMaterialOverride>();
-				foreach (AtlasAsset atlasAsset in atlasAssets) {
-					foreach (Material atlasMaterial in atlasAsset.materials) {
-						var atlasMaterialOverride = new AtlasMaterialOverride();
-						atlasMaterialOverride.overrideDisabled = true;
-						atlasMaterialOverride.originalMaterial = atlasMaterial;
+				foreach (AtlasAssetBase atlasAsset in atlasAssets) {
+					foreach (Material atlasMaterial in atlasAsset.Materials) {
+						var atlasMaterialOverride = new AtlasMaterialOverride {
+							overrideDisabled = true,
+							originalMaterial = atlasMaterial
+						};
 
 						initialAtlasMaterialOverrides.Add(atlasMaterialOverride);
 					}

@@ -244,7 +244,7 @@ namespace Spine.Unity {
 
 			if (this.singleSubmesh) {
 				// STEP 1. Determine a SmartMesh.Instruction. Split up instructions into submeshes. =============================================
-				MeshGenerator.GenerateSingleSubmeshInstruction(currentInstructions, skeleton, skeletonDataAsset.atlasAssets[0].materials[0]);
+				MeshGenerator.GenerateSingleSubmeshInstruction(currentInstructions, skeleton, skeletonDataAsset.atlasAssets[0].PrimaryMaterial);
 
 				// STEP 1.9. Post-process workingInstructions. ==================================================================================
 				#if SPINE_OPTIONAL_MATERIALOVERRIDE

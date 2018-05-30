@@ -36,18 +36,23 @@ using Spine;
 
 namespace Spine.Unity {
 	/// <summary>Loads and stores a Spine atlas and list of materials.</summary>
-	public class AtlasAsset : ScriptableObject {
+	[CreateAssetMenu(fileName = "New Spine Atlas Asset", menuName = "Spine/Spine Atlas Asset")]
+	public class SpineAtlasAsset : AtlasAssetBase {
 		public TextAsset atlasFile;
 		public Material[] materials;
 		protected Atlas atlas;
 
-		public bool IsLoaded { get { return this.atlas != null; } }
+		public override bool IsLoaded { get { return this.atlas != null; } }
 
+		public override IEnumerable<Material> Materials { get { return materials; } }
+		public override int MaterialCount { get { return materials == null ? 0 : materials.Length; } }
+		public override Material PrimaryMaterial { get { return materials[0]; } }
+		
 		#region Runtime Instantiation
 		/// <summary>
 		/// Creates a runtime AtlasAsset</summary>
-		public static AtlasAsset CreateRuntimeInstance (TextAsset atlasText, Material[] materials, bool initialize) {
-			AtlasAsset atlasAsset = ScriptableObject.CreateInstance<AtlasAsset>();
+		public static SpineAtlasAsset CreateRuntimeInstance (TextAsset atlasText, Material[] materials, bool initialize) {
+			SpineAtlasAsset atlasAsset = ScriptableObject.CreateInstance<SpineAtlasAsset>();
 			atlasAsset.Reset();
 			atlasAsset.atlasFile = atlasText;
 			atlasAsset.materials = materials;
@@ -59,8 +64,8 @@ namespace Spine.Unity {
 		}
 
 		/// <summary>
-		/// Creates a runtime AtlasAsset. Only providing the textures is slower because it has to search for atlas page matches. <seealso cref="Spine.Unity.AtlasAsset.CreateRuntimeInstance(TextAsset, Material[], bool)"/></summary>
-		public static AtlasAsset CreateRuntimeInstance (TextAsset atlasText, Texture2D[] textures, Material materialPropertySource, bool initialize) {
+		/// Creates a runtime AtlasAsset. Only providing the textures is slower because it has to search for atlas page matches. <seealso cref="Spine.Unity.SpineAtlasAsset.CreateRuntimeInstance(TextAsset, Material[], bool)"/></summary>
+		public static SpineAtlasAsset CreateRuntimeInstance (TextAsset atlasText, Texture2D[] textures, Material materialPropertySource, bool initialize) {
 			// Get atlas page names.
 			string atlasString = atlasText.text;
 			atlasString = atlasString.Replace("\r", "");
@@ -98,8 +103,8 @@ namespace Spine.Unity {
 		}
 
 		/// <summary>
-		/// Creates a runtime AtlasAsset. Only providing the textures is slower because it has to search for atlas page matches. <seealso cref="Spine.Unity.AtlasAsset.CreateRuntimeInstance(TextAsset, Material[], bool)"/></summary>
-		public static AtlasAsset CreateRuntimeInstance (TextAsset atlasText, Texture2D[] textures, Shader shader, bool initialize) {
+		/// Creates a runtime AtlasAsset. Only providing the textures is slower because it has to search for atlas page matches. <seealso cref="Spine.Unity.AtlasAssetBase.CreateRuntimeInstance(TextAsset, Material[], bool)"/></summary>
+		public static SpineAtlasAsset CreateRuntimeInstance (TextAsset atlasText, Texture2D[] textures, Shader shader, bool initialize) {
 			if (shader == null)
 				shader = Shader.Find("Spine/Skeleton");
 
@@ -110,16 +115,18 @@ namespace Spine.Unity {
 		}
 		#endregion
 
+
+
 		void Reset () {
 			Clear();
 		}
 
-		public virtual void Clear () {
+		public override void Clear () {
 			atlas = null;
 		}
 
 		/// <returns>The atlas or null if it could not be loaded.</returns>
-		public virtual Atlas GetAtlas () {
+		public override Atlas GetAtlas () {
 			if (atlasFile == null) {
 				Debug.LogError("Atlas file not set for atlas asset: " + name, this);
 				Clear();
@@ -204,9 +211,9 @@ namespace Spine.Unity {
 	}
 
 	public class MaterialsTextureLoader : TextureLoader {
-		AtlasAsset atlasAsset;
+		SpineAtlasAsset atlasAsset;
 
-		public MaterialsTextureLoader (AtlasAsset atlasAsset) {
+		public MaterialsTextureLoader (SpineAtlasAsset atlasAsset) {
 			this.atlasAsset = atlasAsset;
 		}
 

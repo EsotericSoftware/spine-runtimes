@@ -34,9 +34,11 @@ using UnityEngine;
 using Spine;
 
 namespace Spine.Unity {
+
+	[CreateAssetMenu(fileName = "New SkeletonDataAsset", menuName = "Spine/SkeletonData Asset")]
 	public class SkeletonDataAsset : ScriptableObject {
 		#region Inspector
-		public AtlasAsset[] atlasAssets = new AtlasAsset[0];
+		public AtlasAssetBase[] atlasAssets = new AtlasAssetBase[0];
 		#if SPINE_TK2D
 		public tk2dSpriteCollectionData spriteCollection;
 		public float scale = 1f;
@@ -65,13 +67,13 @@ namespace Spine.Unity {
 		#region Runtime Instantiation
 		/// <summary>
 		/// Creates a runtime SkeletonDataAsset.</summary>
-		public static SkeletonDataAsset CreateRuntimeInstance (TextAsset skeletonDataFile, AtlasAsset atlasAsset, bool initialize, float scale = 0.01f) {
+		public static SkeletonDataAsset CreateRuntimeInstance (TextAsset skeletonDataFile, AtlasAssetBase atlasAsset, bool initialize, float scale = 0.01f) {
 			return CreateRuntimeInstance(skeletonDataFile, new [] {atlasAsset}, initialize, scale);
 		}
 
 		/// <summary>
 		/// Creates a runtime SkeletonDataAsset.</summary>
-		public static SkeletonDataAsset CreateRuntimeInstance (TextAsset skeletonDataFile, AtlasAsset[] atlasAssets, bool initialize, float scale = 0.01f) {
+		public static SkeletonDataAsset CreateRuntimeInstance (TextAsset skeletonDataFile, AtlasAssetBase[] atlasAssets, bool initialize, float scale = 0.01f) {
 			SkeletonDataAsset skeletonDataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
 			skeletonDataAsset.Clear();
 			skeletonDataAsset.skeletonJSON = skeletonDataFile;

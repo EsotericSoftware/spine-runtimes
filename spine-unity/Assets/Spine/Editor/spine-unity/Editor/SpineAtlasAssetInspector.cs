@@ -41,10 +41,10 @@ using Spine;
 namespace Spine.Unity.Editor {
 	using Event = UnityEngine.Event;
 
-	[CustomEditor(typeof(AtlasAsset)), CanEditMultipleObjects]
-	public class AtlasAssetInspector : UnityEditor.Editor {
+	[CustomEditor(typeof(SpineAtlasAsset)), CanEditMultipleObjects]
+	public class SpineAtlasAssetInspector : UnityEditor.Editor {
 		SerializedProperty atlasFile, materials;
-		AtlasAsset atlasAsset;
+		SpineAtlasAsset atlasAsset;
 
 		GUIContent spriteSlicesLabel;
 		GUIContent SpriteSlicesLabel {
@@ -72,7 +72,7 @@ namespace Spine.Unity.Editor {
 			atlasFile = serializedObject.FindProperty("atlasFile");
 			materials = serializedObject.FindProperty("materials");
 			materials.isExpanded = true;
-			atlasAsset = (AtlasAsset)target;
+			atlasAsset = (SpineAtlasAsset)target;
 			#if REGION_BAKING_MESH
 			UpdateBakedList();
 			#endif
@@ -109,7 +109,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			serializedObject.Update();
-			atlasAsset = atlasAsset ?? (AtlasAsset)target;
+			atlasAsset = atlasAsset ?? (SpineAtlasAsset)target;
 			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField(atlasFile);
 			EditorGUILayout.PropertyField(materials, true);
@@ -264,7 +264,7 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.LabelField("Atlas Regions", EditorStyles.boldLabel);
 				int baseIndent = EditorGUI.indentLevel;
 
-				var regions = AtlasAssetInspector.GetRegions(atlasAsset.GetAtlas());
+				var regions = SpineAtlasAssetInspector.GetRegions(atlasAsset.GetAtlas());
 				AtlasPage lastPage = null;
 				for (int i = 0; i < regions.Count; i++) {
 					if (lastPage != regions[i].page) {
@@ -302,7 +302,7 @@ namespace Spine.Unity.Editor {
 			var spriteSheet = t.spritesheet;
 			var sprites = new List<SpriteMetaData>(spriteSheet);
 
-			var regions = AtlasAssetInspector.GetRegions(atlas);
+			var regions = SpineAtlasAssetInspector.GetRegions(atlas);
 			char[] FilenameDelimiter = {'.'};
 			int updatedCount = 0;
 			int addedCount = 0;

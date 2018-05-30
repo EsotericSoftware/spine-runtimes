@@ -520,7 +520,7 @@ namespace Spine.Unity.Editor {
 			} else if (atlasProp.objectReferenceValue == null) {
 				EditorGUI.LabelField(position, "ERROR:", "Atlas variable must not be null!");
 				return;
-			} else if (atlasProp.objectReferenceValue.GetType() != typeof(AtlasAsset)) {
+			} else if (atlasProp.objectReferenceValue.GetType() != typeof(AtlasAssetBase)) {
 				EditorGUI.LabelField(position, "ERROR:", "Atlas variable must be of type AtlasAsset!");
 			}
 
@@ -533,7 +533,7 @@ namespace Spine.Unity.Editor {
 
 		void Selector (SerializedProperty property) {
 			GenericMenu menu = new GenericMenu();
-			AtlasAsset atlasAsset = (AtlasAsset)atlasProp.objectReferenceValue;
+			AtlasAssetBase atlasAsset = (AtlasAssetBase)atlasProp.objectReferenceValue;
 			Atlas atlas = atlasAsset.GetAtlas();
 			FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 			List<AtlasRegion> regions = (List<AtlasRegion>)field.GetValue(atlas);

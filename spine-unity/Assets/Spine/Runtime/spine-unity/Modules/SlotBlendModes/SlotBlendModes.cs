@@ -141,7 +141,7 @@ namespace Spine.Unity.Modules {
 				var sr = GetComponent<SkeletonRenderer>(); if (sr == null) return;
 				var sda = sr.skeletonDataAsset; if (sda == null) return;
 				var aa = sda.atlasAssets[0]; if (aa == null) return;
-				var am = aa.materials[0]; if (am == null) return;
+				var am = aa.PrimaryMaterial; if (am == null) return;
 				texture = am.mainTexture as Texture2D;
 			}
 		}

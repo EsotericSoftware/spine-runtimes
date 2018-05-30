@@ -332,7 +332,7 @@ namespace Spine.Unity.Editor {
 				else {
 					EditorGUILayout.HelpBox("Atlas array should not have null entries!", MessageType.Error);
 					if (SpineInspectorUtility.CenteredButton(SpineInspectorUtility.TempContent("Remove null entries"))) {
-						var trimmedAtlasAssets = new List<AtlasAsset>();
+						var trimmedAtlasAssets = new List<AtlasAssetBase>();
 						foreach (var a in targetSkeletonDataAsset.atlasAssets) {
 							if (a != null)
 								trimmedAtlasAssets.Add(a);
