@@ -122,6 +122,8 @@ module spine {
 					to.interruptAlpha = from.interruptAlpha;
 					this.queue.end(from);
 				}
+				from.animationLast = from.nextAnimationLast;
+				from.trackLast = from.nextTrackLast;
 				return finished;
 			}
 
