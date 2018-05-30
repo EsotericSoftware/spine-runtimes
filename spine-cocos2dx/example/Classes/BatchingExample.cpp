@@ -52,7 +52,7 @@ bool BatchingExample::init () {
 
 	// This attachment loader configures attachments with data needed for cocos2d-x rendering.
 	// Do not dispose the attachment loader until the skeleton data is disposed!
-	_attachmentLoader = new (__FILE__, __LINE__) AtlasAttachmentLoader(_atlas);
+	_attachmentLoader = new (__FILE__, __LINE__) Cocos2dAtlasAttachmentLoader(_atlas);
 
 	// Load the skeleton data.
 	SkeletonJson* json = new (__FILE__, __LINE__) SkeletonJson(_attachmentLoader);

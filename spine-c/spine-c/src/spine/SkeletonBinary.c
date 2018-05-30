@@ -779,6 +779,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 			}
 			if (nonessential) readInt(input); /* Skip color. */
 			if (freeName) FREE(name);
+			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 			return attachment;
 		}
 		case SP_ATTACHMENT_POINT: {
@@ -791,6 +792,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 			if (nonessential) {
 				readColor(input, &point->color.r, &point->color.g, &point->color.b, &point->color.a);
 			}
+			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 			return attachment;
 		}
 		case SP_ATTACHMENT_CLIPPING: {

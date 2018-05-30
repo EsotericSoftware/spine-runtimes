@@ -35,6 +35,48 @@
 USING_NS_CC;
 using namespace spine;
 
+static void deleteAttachmentVertices (void* vertices) {
+	delete (AttachmentVertices *) vertices;
+}
+
+static unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
+
+static void setAttachmentVertices(RegionAttachment* attachment) {
+	AtlasRegion* region = (AtlasRegion*)attachment->getRendererObject();
+	AttachmentVertices* attachmentVertices = new AttachmentVertices((Texture2D*)region->page->getRendererObject(), 4, quadTriangles, 6);
+	V3F_C4B_T2F* vertices = attachmentVertices->_triangles->verts;
+	for (int i = 0, ii = 0; i < 4; ++i, ii += 2) {
+		vertices[i].texCoords.u = attachment->getUVs()[ii];
+		vertices[i].texCoords.v = attachment->getUVs()[ii + 1];
+	}
+	attachment->setRendererObject(attachmentVertices, deleteAttachmentVertices);	
+}
+
+static void setAttachmentVertices(MeshAttachment* attachment) {
+	AtlasRegion* region = (AtlasRegion*)attachment->getRendererObject();
+	AttachmentVertices* attachmentVertices = new AttachmentVertices((Texture2D*)region->page->getRendererObject(),
+																	attachment->getWorldVerticesLength() >> 1, attachment->getTriangles().buffer(), attachment->getTriangles().size());
+	V3F_C4B_T2F* vertices = attachmentVertices->_triangles->verts;
+	for (int i = 0, ii = 0, nn = attachment->getWorldVerticesLength(); ii < nn; ++i, ii += 2) {
+		vertices[i].texCoords.u = attachment->getUVs()[ii];
+		vertices[i].texCoords.v = attachment->getUVs()[ii + 1];
+	}
+	attachment->setRendererObject(attachmentVertices, deleteAttachmentVertices);
+}
+
+Cocos2dAtlasAttachmentLoader::Cocos2dAtlasAttachmentLoader(Atlas* atlas): AtlasAttachmentLoader(atlas) {	
+}
+
+Cocos2dAtlasAttachmentLoader::~Cocos2dAtlasAttachmentLoader() { }
+
+void Cocos2dAtlasAttachmentLoader::configureAttachment(Attachment* attachment) {
+	if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
+		setAttachmentVertices((RegionAttachment*)attachment);
+	} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
+		setAttachmentVertices((MeshAttachment*)attachment);
+	}
+}
+
 GLuint wrap (TextureWrap wrap) {
 	return wrap ==  TextureWrap_ClampToEdge ? GL_CLAMP_TO_EDGE : GL_REPEAT;
 }

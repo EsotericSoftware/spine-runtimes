@@ -189,7 +189,7 @@ void SkeletonRenderer::initWithData (SkeletonData* skeletonData, bool ownsSkelet
 
 void SkeletonRenderer::initWithJsonFile (const std::string& skeletonDataFile, Atlas* atlas, float scale) {
     _atlas = atlas;
-	_attachmentLoader = new (__FILE__, __LINE__) AtlasAttachmentLoader(_atlas);
+	_attachmentLoader = new (__FILE__, __LINE__) Cocos2dAtlasAttachmentLoader(_atlas);
 
 	SkeletonJson* json = new (__FILE__, __LINE__) SkeletonJson(_attachmentLoader);
 	json->setScale(scale);
@@ -207,7 +207,7 @@ void SkeletonRenderer::initWithJsonFile (const std::string& skeletonDataFile, co
 	_atlas = new (__FILE__, __LINE__) Atlas(atlasFile.c_str(), &textureLoader);
 	CCASSERT(_atlas, "Error reading atlas file.");
 
-	_attachmentLoader = new (__FILE__, __LINE__) AtlasAttachmentLoader(_atlas);
+	_attachmentLoader = new (__FILE__, __LINE__) Cocos2dAtlasAttachmentLoader(_atlas);
 
 	SkeletonJson* json = new (__FILE__, __LINE__) SkeletonJson(_attachmentLoader);
 	json->setScale(scale);
@@ -224,7 +224,7 @@ void SkeletonRenderer::initWithJsonFile (const std::string& skeletonDataFile, co
     
 void SkeletonRenderer::initWithBinaryFile (const std::string& skeletonDataFile, Atlas* atlas, float scale) {
     _atlas = atlas;
-    _attachmentLoader = new (__FILE__, __LINE__) AtlasAttachmentLoader(_atlas);
+    _attachmentLoader = new (__FILE__, __LINE__) Cocos2dAtlasAttachmentLoader(_atlas);
     
 	SkeletonBinary* binary = new (__FILE__, __LINE__) SkeletonBinary(_attachmentLoader);
 	binary->setScale(scale);
@@ -241,7 +241,7 @@ void SkeletonRenderer::initWithBinaryFile (const std::string& skeletonDataFile, 
     _atlas = new (__FILE__, __LINE__) Atlas(atlasFile.c_str(), &textureLoader);
     CCASSERT(_atlas, "Error reading atlas file.");
     
-	_attachmentLoader = new (__FILE__, __LINE__) AtlasAttachmentLoader(_atlas);
+	_attachmentLoader = new (__FILE__, __LINE__) Cocos2dAtlasAttachmentLoader(_atlas);
 	
 	SkeletonBinary* binary = new (__FILE__, __LINE__) SkeletonBinary(_attachmentLoader);
 	binary->setScale(scale);
@@ -258,37 +258,6 @@ void SkeletonRenderer::initWithBinaryFile (const std::string& skeletonDataFile, 
 void SkeletonRenderer::update (float deltaTime) {
 	Node::update(deltaTime);
 	if (_ownsSkeleton) _skeleton->update(deltaTime * _timeScale);
-}
-	
-static void deleteAttachmentVertices (void* vertices) {
-	delete (AttachmentVertices *) vertices;
-}
-	
-static unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
-	
-static void setAttachmentVertices(RegionAttachment* attachment) {
-	if (!attachment->getRendererObject()) {
-		AtlasRegion* region = (AtlasRegion*)attachment->getRendererObject();
-		AttachmentVertices* attachmentVertices = new AttachmentVertices((Texture2D*)region->page->getRendererObject(), 4, quadTriangles, 6);
-		V3F_C4B_T2F* vertices = attachmentVertices->_triangles->verts;
-		for (int i = 0, ii = 0; i < 4; ++i, ii += 2) {
-			vertices[i].texCoords.u = attachment->getUVs()[ii];
-			vertices[i].texCoords.v = attachment->getUVs()[ii + 1];
-		}
-		attachment->setRendererObject(attachmentVertices, deleteAttachmentVertices);
-	}
-}
-
-static void setAttachmentVertices(MeshAttachment* attachment) {
-	AtlasRegion* region = (AtlasRegion*)attachment->getRendererObject();
-	AttachmentVertices* attachmentVertices = new AttachmentVertices((Texture2D*)region->page->getRendererObject(),
-																	attachment->getWorldVerticesLength() >> 1, attachment->getTriangles().buffer(), attachment->getTriangles().size());
-	V3F_C4B_T2F* vertices = attachmentVertices->_triangles->verts;
-	for (int i = 0, ii = 0, nn = attachment->getWorldVerticesLength(); ii < nn; ++i, ii += 2) {
-		vertices[i].texCoords.u = attachment->getUVs()[ii];
-		vertices[i].texCoords.v = attachment->getUVs()[ii + 1];
-	}
-	attachment->setRendererObject(attachmentVertices, deleteAttachmentVertices);
 }
 	
 void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t transformFlags) {
@@ -336,7 +305,6 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		
 		if (slot->getAttachment()->getRTTI().isExactly(RegionAttachment::rtti)) {
 			RegionAttachment* attachment = (RegionAttachment*)slot->getAttachment();
-			setAttachmentVertices(attachment);
 			attachmentVertices = (AttachmentVertices*)attachment->getRendererObject();
 			
 			if (!isTwoColorTint) {
@@ -363,8 +331,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 			color.a = attachment->getColor().a;
 		}
 		else if (slot->getAttachment()->getRTTI().isExactly(MeshAttachment::rtti)) {
-			MeshAttachment* attachment = (MeshAttachment*)slot->getAttachment();
-			setAttachmentVertices(attachment);
+			MeshAttachment* attachment = (MeshAttachment*)slot->getAttachment();			
 			attachmentVertices = (AttachmentVertices*)attachment->getRendererObject();
 			
 			if (!isTwoColorTint) {
@@ -373,7 +340,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
 				triangles.vertCount = attachmentVertices->_triangles->vertCount;
 				memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
-				attachment->computeWorldVertices(*slot, 0, triangles.vertCount * sizeof(cocos2d::V3F_C4B_T2F) / 4, (float*)triangles.verts, 0, 6);
+				attachment->computeWorldVertices(*slot, 0, attachment->getWorldVerticesLength(), (float*)triangles.verts, 0, 6);
 			} else {
 				trianglesTwoColor.indices = attachmentVertices->_triangles->indices;
 				trianglesTwoColor.indexCount = attachmentVertices->_triangles->indexCount;
@@ -382,7 +349,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				for (int i = 0; i < trianglesTwoColor.vertCount; i++) {
 					trianglesTwoColor.verts[i].texCoords = attachmentVertices->_triangles->verts[i].texCoords;
 				}
-				attachment->computeWorldVertices(*slot, 0, trianglesTwoColor.vertCount * sizeof(V3F_C4B_C4B_T2F) / 4, (float*)trianglesTwoColor.verts, 0, 7);
+				attachment->computeWorldVertices(*slot, 0,  attachment->getWorldVerticesLength(), (float*)trianglesTwoColor.verts, 0, 7);
 			}
 			
 			color.r = attachment->getColor().r;

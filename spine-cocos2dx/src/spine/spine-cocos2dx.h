@@ -39,6 +39,13 @@
 #include <spine/SkeletonBatch.h>
 
 namespace spine {
+	class Cocos2dAtlasAttachmentLoader: public AtlasAttachmentLoader {
+	public:
+		Cocos2dAtlasAttachmentLoader(Atlas* atlas);
+		virtual ~Cocos2dAtlasAttachmentLoader();
+		virtual void configureAttachment(Attachment* attachment);
+	};
+	
 	class Cocos2dTextureLoader: public TextureLoader {
 	public:
 		Cocos2dTextureLoader();

@@ -294,6 +294,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 		}
 		linkedMesh->_mesh->setParentMesh(static_cast<MeshAttachment *>(parent));
 		linkedMesh->_mesh->updateUVs();
+		_attachmentLoader->configureAttachment(linkedMesh->_mesh);
 	}
 	ContainerUtil::cleanUpVectorOfPointers(_linkedMeshes);
 	_linkedMeshes.clear();
@@ -469,6 +470,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			region->_height = readFloat(input) * _scale;
 			readColor(input, region->getColor());
 			region->updateOffset();
+			_attachmentLoader->configureAttachment(region);
 			return region;
 		}
 		case AttachmentType_Boundingbox: {
@@ -479,6 +481,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 				/* Skip color. */
 				readInt(input);
 			}
+			_attachmentLoader->configureAttachment(box);
 			return box;
 		}
 		case AttachmentType_Mesh: {
@@ -504,6 +507,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 				mesh->_width = 0;
 				mesh->_height = 0;
 			}
+			_attachmentLoader->configureAttachment(mesh);
 			return mesh;
 		}
 		case AttachmentType_Linkedmesh: {
@@ -541,6 +545,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 				/* Skip color. */
 				readInt(input);
 			}
+			_attachmentLoader->configureAttachment(path);
 			return path;
 		}
 		case AttachmentType_Point: {
@@ -553,7 +558,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 				/* Skip color. */
 				readInt(input);
 			}
-
+			_attachmentLoader->configureAttachment(point);
 			return point;
 		}
 		case AttachmentType_Clipping: {
@@ -566,6 +571,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 				/* Skip color. */
 				readInt(input);
 			}
+			_attachmentLoader->configureAttachment(clip);
 			return clip;
 		}
 	}
