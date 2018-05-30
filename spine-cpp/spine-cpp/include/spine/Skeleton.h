@@ -39,7 +39,7 @@
 
 #include <limits> // std::numeric_limits
 
-namespace Spine {
+namespace spine {
 class SkeletonData;
 
 class Bone;
@@ -170,7 +170,7 @@ public:
 
 	Bone *getRootBone();
 
-	const SkeletonData *getData();
+	SkeletonData *getData();
 
 	Vector<Bone *> &getBones();
 

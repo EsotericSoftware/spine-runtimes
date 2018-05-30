@@ -28,25 +28,32 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_ScaleTimeline_h
-#define Spine_ScaleTimeline_h
-
-#include <spine/TranslateTimeline.h>
+#ifndef Spine_HasRendererObject_h
+#define Spine_HasRendererObject_h
 
 namespace spine {
-    class ScaleTimeline : public TranslateTimeline {
-        friend class SkeletonBinary;
-        friend class SkeletonJson;
-        
-        RTTI_DECL
-        
-    public:
-        explicit ScaleTimeline(int frameCount);
-        
-        virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixBlend blend, MixDirection direction);
-        
-        virtual int getPropertyId();
-    };
+
+typedef void (*DisposeRendererObject) (void* rendererObject);
+
+class HasRendererObject {
+public:
+	explicit HasRendererObject() : _rendererObject(NULL) {};
+
+	virtual ~HasRendererObject() {
+		if (_dispose)
+			_dispose(_rendererObject);
+	}
+
+	void* getRendererObject() { return _rendererObject; }
+	void setRendererObject(void* rendererObject, DisposeRendererObject dispose = NULL) {
+		_rendererObject = rendererObject;
+		_dispose = dispose;
+	}
+private:
+	void *_rendererObject;
+	DisposeRendererObject _dispose;
+};
+
 }
 
-#endif /* Spine_ScaleTimeline_h */
+#endif

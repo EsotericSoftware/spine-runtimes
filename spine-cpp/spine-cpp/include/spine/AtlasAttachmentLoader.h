@@ -36,7 +36,7 @@
 #include <spine/String.h>
 
 
-namespace Spine {
+namespace spine {
     class Atlas;
     class AtlasRegion;
     
@@ -44,10 +44,10 @@ namespace Spine {
     /// An AttachmentLoader that configures attachments using texture regions from an Atlas.
     /// See http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data about Loading Skeleton Data in the Spine Runtimes Guide.
     ///
-    class AtlasAttachmentLoader : public AttachmentLoader {
-        RTTI_DECL
-        
+	class AtlasAttachmentLoader : public AttachmentLoader {
     public:
+		RTTI_DECL
+		
         explicit AtlasAttachmentLoader(Atlas* atlas);
         
         virtual RegionAttachment* newRegionAttachment(Skin& skin, const String& name, const String& path);

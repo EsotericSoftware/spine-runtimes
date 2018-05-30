@@ -33,7 +33,7 @@
 
 #include <spine/Attachment.h>
 
-namespace Spine {
+namespace spine {
     class Bone;
     
     /// 

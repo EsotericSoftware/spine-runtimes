@@ -32,7 +32,7 @@
 
 #include <spine/MathUtil.h>
 
-using namespace Spine;
+using namespace spine;
 
 Triangulator::~Triangulator() {
 	ContainerUtil::cleanUpVectorOfPointers(_convexPolygons);

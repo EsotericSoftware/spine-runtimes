@@ -37,7 +37,7 @@
 
 #include <assert.h>
 
-using namespace Spine;
+using namespace spine;
 
 Skin::AttachmentMap::AttachmentMap() {
 }

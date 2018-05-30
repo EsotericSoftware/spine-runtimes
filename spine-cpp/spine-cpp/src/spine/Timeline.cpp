@@ -33,7 +33,7 @@
 #include <spine/Skeleton.h>
 #include <spine/Event.h>
 
-namespace Spine {
+namespace spine {
 RTTI_IMPL_NOPARENT(Timeline)
 
 Timeline::Timeline() {

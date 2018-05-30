@@ -40,7 +40,7 @@
 
 #include <spine/Atlas.h>
 
-namespace Spine {
+namespace spine {
 RTTI_IMPL(AtlasAttachmentLoader, AttachmentLoader)
 
 AtlasAttachmentLoader::AtlasAttachmentLoader(Atlas *atlas) : AttachmentLoader(), _atlas(atlas) {
@@ -57,7 +57,7 @@ RegionAttachment *AtlasAttachmentLoader::newRegionAttachment(Skin &skin, const S
 	RegionAttachment *attachmentP = new(__FILE__, __LINE__) RegionAttachment(name);
 
 	RegionAttachment &attachment = *attachmentP;
-	attachment._rendererObject = regionP;
+	attachment.setRendererObject(regionP);
 	attachment.setUVs(region.u, region.v, region.u2, region.v2, region.rotate);
 	attachment._regionOffsetX = region.offsetX;
 	attachment._regionOffsetY = region.offsetY;
@@ -79,7 +79,7 @@ MeshAttachment *AtlasAttachmentLoader::newMeshAttachment(Skin &skin, const Strin
 	MeshAttachment *attachmentP = new(__FILE__, __LINE__) MeshAttachment(name);
 
 	MeshAttachment &attachment = *attachmentP;
-	attachment._rendererObject = regionP;
+	attachment.setRendererObject(regionP);
 	attachment._regionU = region.u;
 	attachment._regionV = region.v;
 	attachment._regionU2 = region.u2;

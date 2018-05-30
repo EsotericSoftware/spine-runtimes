@@ -32,7 +32,7 @@
 
 #include <assert.h>
 
-using namespace Spine;
+using namespace spine;
 
 EventData::EventData(const String &name) :
 		_name(name),

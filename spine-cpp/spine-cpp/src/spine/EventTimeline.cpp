@@ -40,7 +40,7 @@
 #include <spine/EventData.h>
 #include <spine/ContainerUtil.h>
 
-using namespace Spine;
+using namespace spine;
 
 RTTI_IMPL(EventTimeline, Timeline)
 

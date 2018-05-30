@@ -41,7 +41,7 @@
 
 #include <spine/ContainerUtil.h>
 
-using namespace Spine;
+using namespace spine;
 
 SkeletonData::SkeletonData() :
 		_name(),

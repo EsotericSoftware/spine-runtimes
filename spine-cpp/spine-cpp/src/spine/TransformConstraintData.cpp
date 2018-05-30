@@ -34,7 +34,7 @@
 
 #include <assert.h>
 
-using namespace Spine;
+using namespace spine;
 TransformConstraintData::TransformConstraintData(const String &name) :
 		_name(name),
 		_order(0),

@@ -32,7 +32,7 @@
 
 #include <spine/EventData.h>
 
-using namespace Spine;
+using namespace spine;
 
 Event::Event(float time, const EventData &data) :
 		_data(data),

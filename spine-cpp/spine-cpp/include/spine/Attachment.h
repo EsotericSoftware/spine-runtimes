@@ -35,7 +35,7 @@
 #include <spine/SpineObject.h>
 #include <spine/String.h>
 
-namespace Spine {
+namespace spine {
 class Attachment : public SpineObject {
 RTTI_DECL
 

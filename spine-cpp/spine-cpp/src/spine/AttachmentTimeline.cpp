@@ -38,7 +38,7 @@
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
 
-using namespace Spine;
+using namespace spine;
 
 RTTI_IMPL(AttachmentTimeline, Timeline)
 

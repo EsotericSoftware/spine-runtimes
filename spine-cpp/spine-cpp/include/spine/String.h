@@ -42,7 +42,7 @@
 #pragma warning(disable:4996)
 #endif
 
-namespace Spine {
+namespace spine {
 class String : public SpineObject {
 public:
 	String() : _length(0), _buffer(NULL) {

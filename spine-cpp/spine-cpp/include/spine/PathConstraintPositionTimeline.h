@@ -33,7 +33,7 @@
 
 #include <spine/CurveTimeline.h>
 
-namespace Spine {
+namespace spine {
     class PathConstraintPositionTimeline : public CurveTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;

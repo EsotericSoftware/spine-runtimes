@@ -33,7 +33,7 @@
 
 #include <spine/Updatable.h>
 
-namespace Spine {
+namespace spine {
 /// The interface for all constraints.
 class Constraint : public Updatable {
 RTTI_DECL

@@ -40,7 +40,7 @@
 #pragma warning(disable:4291)
 #endif
 
-namespace Spine {
+namespace spine {
 template<typename K, typename V>
 class HashMap : public SpineObject {
 private:

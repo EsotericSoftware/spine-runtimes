@@ -48,7 +48,7 @@ bool SkeletonRendererSeparatorExample::init () {
 	backNode = SkeletonAnimation::createWithJsonFile("spineboy-ess.json", "spineboy.atlas", 0.6f);
 	backNode->setMix("walk", "jump", 0.4);
 	backNode->setAnimation(0, "walk", true);
-	backNode->setSlotsRange(backNode->findSlot("rear-upper-arm")->data->index, backNode->findSlot("rear-shin")->data->index);
+	backNode->setSlotsRange(backNode->findSlot("rear-upper-arm")->getData().getIndex(), backNode->findSlot("rear-shin")->getData().getIndex());
 	backNode->setPosition(Vec2(_contentSize.width / 2, 20));
 	
 	// A simple rectangle to go between the front and back slots of Spineboy
@@ -65,7 +65,7 @@ bool SkeletonRendererSeparatorExample::init () {
 	// renders the back slots of Spineboy. The skeleton, animatio state and GPU resources
 	// are shared with the front node!
 	frontNode = SkeletonRenderer::createWithSkeleton(backNode->getSkeleton());
-	frontNode->setSlotsRange(frontNode->findSlot("neck")->data->index, -1);
+	frontNode->setSlotsRange(frontNode->findSlot("neck")->getData().getIndex(), -1);
 	frontNode->setPosition(Vec2(_contentSize.width / 2, 20));
 	
 	// Add the front, between and back node in the correct order to this scene
@@ -76,7 +76,7 @@ bool SkeletonRendererSeparatorExample::init () {
 	scheduleUpdate();
 	
 	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
-	listener->onTouchBegan = [this] (Touch* touch, Event* event) -> bool {
+	listener->onTouchBegan = [this] (Touch* touch, cocos2d::Event* event) -> bool {
 		if (!backNode->getDebugBonesEnabled())
 			backNode->setDebugBonesEnabled(true);
 		else if (backNode->getTimeScale() == 1)

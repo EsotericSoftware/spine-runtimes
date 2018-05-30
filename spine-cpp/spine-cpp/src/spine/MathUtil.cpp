@@ -31,7 +31,7 @@
 #include <spine/MathUtil.h>
 #include <math.h>
 
-using namespace Spine;
+using namespace spine;
 
 float MathUtil::abs(float v) {
 	return ((v) < 0 ? -(v) : (v));

@@ -31,7 +31,7 @@
 #ifndef Spine_TimelineType_h
 #define Spine_TimelineType_h
 
-namespace Spine {
+namespace spine {
 enum TimelineType {
 	TimelineType_Rotate = 0,
 	TimelineType_Translate,

@@ -34,7 +34,7 @@
 #include <spine/SpineObject.h>
 #include <spine/MathUtil.h>
 
-namespace Spine {
+namespace spine {
 
 class Skeleton;
 class Color;

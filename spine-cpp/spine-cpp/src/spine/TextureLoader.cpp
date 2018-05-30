@@ -30,7 +30,7 @@
 
 #include <spine/TextureLoader.h>
 
-namespace Spine {
+namespace spine {
 TextureLoader::TextureLoader() {
 }
 

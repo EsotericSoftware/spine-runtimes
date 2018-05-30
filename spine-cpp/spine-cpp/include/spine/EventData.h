@@ -34,7 +34,7 @@
 #include <spine/SpineObject.h>
 #include <spine/String.h>
 
-namespace Spine {
+namespace spine {
 /// Stores the setup pose values for an Event.
 class EventData : public SpineObject {
 	friend class SkeletonBinary;

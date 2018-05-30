@@ -34,6 +34,8 @@
 #include "cocos2d.h"
 #include <spine/spine-cocos2dx.h>
 
+using namespace spine;
+
 class BatchingExample : public cocos2d::LayerColor {
 public:
 	static cocos2d::Scene* scene ();
@@ -44,10 +46,10 @@ public:
 	virtual bool init ();
 
 protected:
-	spAtlas* _atlas;
-	spAttachmentLoader* _attachmentLoader;
-	spSkeletonData* _skeletonData;
-	spAnimationStateData* _stateData;
+	Atlas* _atlas;
+	AttachmentLoader* _attachmentLoader;
+	SkeletonData* _skeletonData;
+	AnimationStateData* _stateData;
 };
 
 #endif // _BATCHINGEXAMPLE_H_

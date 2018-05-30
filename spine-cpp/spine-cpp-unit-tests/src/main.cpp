@@ -34,7 +34,7 @@
 
 #pragma warning ( disable : 4710 )
 
-using namespace Spine;
+using namespace spine;
 
 void loadBinary(const String &binaryFile, const String &atlasFile, Atlas *&atlas, SkeletonData *&skeletonData,
 				AnimationStateData *&stateData, Skeleton *&skeleton, AnimationState *&state) {
@@ -123,11 +123,17 @@ void testLoading() {
 	}
 }
 
+namespace spine {
+	SpineExtension* getDefaultExtension() {
+		return new DefaultSpineExtension();
+	}
+}
+
 int main(int argc, char **argv) {
-	DebugExtension *ext = new DebugExtension();
-	SpineExtension::setInstance(ext);
+	DebugExtension debug(SpineExtension::getInstance());
+	SpineExtension::setInstance(&debug);
 
 	testLoading();
 
-	ext->reportLeaks();
+	debug.reportLeaks();
 }

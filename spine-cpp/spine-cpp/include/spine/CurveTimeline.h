@@ -34,7 +34,7 @@
 #include <spine/Timeline.h>
 #include <spine/Vector.h>
 
-namespace Spine {
+namespace spine {
     /// Base class for frames that use an interpolation bezier curve.
     class CurveTimeline : public Timeline {
         RTTI_DECL

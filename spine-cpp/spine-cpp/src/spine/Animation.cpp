@@ -36,7 +36,7 @@
 
 #include <spine/ContainerUtil.h>
 
-using namespace Spine;
+using namespace spine;
 
 Animation::Animation(const String &name, Vector<Timeline *> &timelines, float duration) :
 		_timelines(timelines),

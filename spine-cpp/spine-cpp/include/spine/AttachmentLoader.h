@@ -35,7 +35,7 @@
 #include <spine/SpineObject.h>
 #include <spine/String.h>
 
-namespace Spine {
+namespace spine {
     class Skin;
     class RegionAttachment;
     class MeshAttachment;
@@ -45,6 +45,7 @@ namespace Spine {
     class ClippingAttachment;
     
     class AttachmentLoader : public SpineObject {
+	public:
         RTTI_DECL
         
         AttachmentLoader();

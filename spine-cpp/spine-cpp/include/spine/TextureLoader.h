@@ -34,7 +34,7 @@
 #include <spine/SpineObject.h>
 #include <spine/String.h>
 
-namespace Spine {
+namespace spine {
     class AtlasPage;
     
     class TextureLoader : public SpineObject {

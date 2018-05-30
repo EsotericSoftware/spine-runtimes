@@ -30,7 +30,7 @@
 
 #include <spine/PathAttachment.h>
 
-using namespace Spine;
+using namespace spine;
 
 RTTI_IMPL(PathAttachment, VertexAttachment)
 

@@ -34,7 +34,7 @@
 
 #include <assert.h>
 
-using namespace Spine;
+using namespace spine;
 
 RTTI_IMPL(RegionAttachment, Attachment)
 
@@ -47,7 +47,7 @@ const int RegionAttachment::URY = 5;
 const int RegionAttachment::BRX = 6;
 const int RegionAttachment::BRY = 7;
 
-RegionAttachment::RegionAttachment(const String &name) : Attachment(name),
+RegionAttachment::RegionAttachment(const String &name) : Attachment(name), HasRendererObject(),
 														 _x(0),
 														 _y(0),
 														 _rotation(0),
@@ -61,7 +61,6 @@ RegionAttachment::RegionAttachment(const String &name) : Attachment(name),
 														 _regionHeight(0),
 														 _regionOriginalWidth(0),
 														 _regionOriginalHeight(0),
-														 _rendererObject(NULL),
 														 _path(),
 														 _regionU(0),
 														 _regionV(0),
@@ -124,7 +123,10 @@ void RegionAttachment::setUVs(float u, float v, float u2, float v2, bool rotate)
 
 void RegionAttachment::computeWorldVertices(Bone &bone, Vector<float> &worldVertices, size_t offset, size_t stride) {
 	assert(worldVertices.size() >= (offset + 8));
+	computeWorldVertices(bone, worldVertices.buffer(), offset, stride);
+}
 
+void RegionAttachment::computeWorldVertices(Bone &bone, float* worldVertices, size_t offset, size_t stride) {
 	float x = bone.getWorldX(), y = bone.getWorldY();
 	float a = bone.getA(), b = bone.getB(), c = bone.getC(), d = bone.getD();
 	float offsetX, offsetY;
@@ -217,14 +219,6 @@ void RegionAttachment::setPath(const String &inValue) {
 	_path = inValue;
 }
 
-void *RegionAttachment::getRendererObject() {
-	return _rendererObject;
-}
-
-void RegionAttachment::setRendererObject(void *inValue) {
-	_rendererObject = inValue;
-}
-
 float RegionAttachment::getRegionOffsetX() {
 	return _regionOffsetX;
 }
@@ -281,6 +275,6 @@ Vector<float> &RegionAttachment::getUVs() {
 	return _uvs;
 }
 
-Spine::Color &RegionAttachment::getColor() {
+spine::Color &RegionAttachment::getColor() {
 	return _color;
 }

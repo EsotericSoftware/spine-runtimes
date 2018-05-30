@@ -30,12 +30,14 @@
 
 #include "RaptorExample.h"
 #include "TankExample.h"
-#include <spine/extension.h>
+#include <spine/Extension.h>
 
 USING_NS_CC;
 using namespace spine;
 
-spSwirlVertexEffect* effect = spSwirlVertexEffect_create(400);
+PowInterpolation pow2(2);
+PowOutInterpolation powOut2(2);
+SwirlVertexEffect effect(400, powOut2);
 
 Scene* RaptorExample::scene () {
 	Scene *scene = Scene::create();
@@ -48,14 +50,13 @@ bool RaptorExample::init () {
 
 	skeletonNode = SkeletonAnimation::createWithJsonFile("raptor-pro.json", "raptor.atlas", 0.5f);
 	skeletonNode->setAnimation(0, "walk", true);
-	skeletonNode->setAnimation(1, "empty", false);
-	skeletonNode->addAnimation(1, "gungrab", false, 2);
+	skeletonNode->addAnimation(1, "gun-grab", false, 2);
 	skeletonNode->setTwoColorTint(true);
 	
-	effect->centerY = 200;
+	effect.setCenterY(200);
 	swirlTime = 0;
 	
-	skeletonNode->setVertexEffect(&effect->super);
+	skeletonNode->setVertexEffect(&effect);
 
 	skeletonNode->setPosition(Vec2(_contentSize.width / 2, 20));
 	addChild(skeletonNode);
@@ -63,7 +64,7 @@ bool RaptorExample::init () {
 	scheduleUpdate();
 	
 	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
-	listener->onTouchBegan = [this] (Touch* touch, Event* event) -> bool {
+	listener->onTouchBegan = [this] (Touch* touch, cocos2d::Event* event) -> bool {
 		if (!skeletonNode->getDebugBonesEnabled()) {
 			skeletonNode->setDebugBonesEnabled(true);
 			skeletonNode->setDebugMeshesEnabled(true);
@@ -80,7 +81,7 @@ bool RaptorExample::init () {
 
 void RaptorExample::update(float fDelta) {
 	swirlTime += fDelta;
-	float percent = fmod(swirlTime, 2);
+	float percent = spine::MathUtil::fmod(swirlTime, 2);
 	if (percent > 1) percent = 1 - (percent - 1);
-	effect->angle = _spMath_interpolate(_spMath_pow2_apply, -60, 60, percent);
+	effect.setAngle(pow2.interpolate(-60.0f, 60.0f, percent));
 }

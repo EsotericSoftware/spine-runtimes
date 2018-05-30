@@ -29,70 +29,71 @@
  *****************************************************************************/
 
 #include <spine/spine-cocos2dx.h>
-#include <spine/extension.h>
-
-namespace spine {
-	static CustomTextureLoader _customTextureLoader = nullptr;
-	void spAtlasPage_setCustomTextureLoader (CustomTextureLoader texLoader) {
-		_customTextureLoader = texLoader;
-	}
-}
+#include <spine/Extension.h>
+#include <spine/AttachmentVertices.h>
 
 USING_NS_CC;
+using namespace spine;
 
-GLuint wrap (spAtlasWrap wrap) {
-	return wrap == SP_ATLAS_CLAMPTOEDGE ? GL_CLAMP_TO_EDGE : GL_REPEAT;
+GLuint wrap (TextureWrap wrap) {
+	return wrap ==  TextureWrap_ClampToEdge ? GL_CLAMP_TO_EDGE : GL_REPEAT;
 }
 
-GLuint filter (spAtlasFilter filter) {
+GLuint filter (TextureFilter filter) {
 	switch (filter) {
-	case SP_ATLAS_UNKNOWN_FILTER:
+	case TextureFilter_Unknown:
 		break;
-	case SP_ATLAS_NEAREST:
+	case TextureFilter_Nearest:
 		return GL_NEAREST;
-	case SP_ATLAS_LINEAR:
+	case TextureFilter_Linear:
 		return GL_LINEAR;
-	case SP_ATLAS_MIPMAP:
+	case TextureFilter_MipMap:
 		return GL_LINEAR_MIPMAP_LINEAR;
-	case SP_ATLAS_MIPMAP_NEAREST_NEAREST:
+	case TextureFilter_MipMapNearestNearest:
 		return GL_NEAREST_MIPMAP_NEAREST;
-	case SP_ATLAS_MIPMAP_LINEAR_NEAREST:
+	case TextureFilter_MipMapLinearNearest:
 		return GL_LINEAR_MIPMAP_NEAREST;
-	case SP_ATLAS_MIPMAP_NEAREST_LINEAR:
+	case TextureFilter_MipMapNearestLinear:
 		return GL_NEAREST_MIPMAP_LINEAR;
-	case SP_ATLAS_MIPMAP_LINEAR_LINEAR:
+	case TextureFilter_MipMapLinearLinear:
 		return GL_LINEAR_MIPMAP_LINEAR;
 	}
 	return GL_LINEAR;
 }
 
-void _spAtlasPage_createTexture (spAtlasPage* self, const char* path) {
-	Texture2D* texture = nullptr;
-	if (spine::_customTextureLoader) {
-		texture = spine::_customTextureLoader(path);
-	}
-	if (!texture) {
-		texture = Director::getInstance()->getTextureCache()->addImage(path);
-	}
+Cocos2dTextureLoader::Cocos2dTextureLoader() : TextureLoader() { }
+Cocos2dTextureLoader::~Cocos2dTextureLoader() { }
+
+static void unloadTexture (void* texture) {
+	((Texture2D*)texture)->release();
+}
+
+void Cocos2dTextureLoader::load(AtlasPage& page, const String& path) {
+	Texture2D* texture = Director::getInstance()->getTextureCache()->addImage(path.buffer());
 	CCASSERT(texture != nullptr, "Invalid image");
 	texture->retain();
-
-	Texture2D::TexParams textureParams = {filter(self->minFilter), filter(self->magFilter), wrap(self->uWrap), wrap(self->vWrap)};
+	
+	Texture2D::TexParams textureParams = {filter(page.minFilter), filter(page.magFilter), wrap(page.uWrap), wrap(page.vWrap)};
 	texture->setTexParameters(textureParams);
-
-	self->rendererObject = texture;
-	self->width = texture->getPixelsWide();
-	self->height = texture->getPixelsHigh();
+	
+	page.setRendererObject(texture, unloadTexture);
+	page.width = texture->getPixelsWide();
+	page.height = texture->getPixelsHigh();
+}
+	
+void Cocos2dTextureLoader::unload(void* texture) {
+	unloadTexture(texture);
 }
 
-void _spAtlasPage_disposeTexture (spAtlasPage* self) {
-	((Texture2D*)self->rendererObject)->release();
-}
 
-char* _spUtil_readFile (const char* path, int* length) {
-	Data data = FileUtils::getInstance()->getDataFromFile(FileUtils::getInstance()->fullPathForFilename(path));
+Cocos2dExtension::Cocos2dExtension() : DefaultSpineExtension() { }
+	
+Cocos2dExtension::~Cocos2dExtension() { }
+
+char *Cocos2dExtension::_readFile(const String &path, int *length) {
+	Data data = FileUtils::getInstance()->getDataFromFile(FileUtils::getInstance()->fullPathForFilename(path.buffer()));
 	if (data.isNull()) return 0;
-
+	
 	// avoid buffer overflow (int is shorter than ssize_t in certain platforms)
 #if COCOS2D_VERSION >= 0x00031200
 	ssize_t tmpLen;
@@ -100,9 +101,14 @@ char* _spUtil_readFile (const char* path, int* length) {
 	*length = static_cast<int>(tmpLen);
 	return ret;
 #else
-    *length = static_cast<int>(data.getSize());
-    char* bytes = MALLOC(char, *length);
-    memcpy(bytes, data.getBytes(), *length);
-    return bytes;
+	*length = static_cast<int>(data.getSize());
+	char* bytes = MALLOC(char, *length);
+	memcpy(bytes, data.getBytes(), *length);
+	return bytes;
 #endif
 }
+
+SpineExtension *spine::getDefaultExtension () {
+	return new Cocos2dExtension();
+}
+

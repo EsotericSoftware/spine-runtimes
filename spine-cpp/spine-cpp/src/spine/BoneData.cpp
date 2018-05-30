@@ -32,7 +32,7 @@
 
 #include <assert.h>
 
-using namespace Spine;
+using namespace spine;
 
 BoneData::BoneData(int index, const String &name, BoneData *parent) :
 		_index(index),

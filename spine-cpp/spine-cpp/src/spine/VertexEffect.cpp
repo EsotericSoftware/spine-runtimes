@@ -32,7 +32,7 @@
 #include <spine/MathUtil.h>
 #include <spine/Skeleton.h>
 
-using namespace Spine;
+using namespace spine;
 
 JitterVertexEffect::JitterVertexEffect(float jitterX, float jitterY): _jitterX(jitterX), _jitterY(jitterY) {
 }
@@ -132,7 +132,7 @@ float SwirlVertexEffect::getRadius() {
 }
 
 void SwirlVertexEffect::setAngle(float angle) {
-	_angle = angle * Spine::DEG_RAD;
+	_angle = angle * spine::DEG_RAD;
 }
 
 float SwirlVertexEffect::getAngle() {

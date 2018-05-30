@@ -36,7 +36,7 @@
 #include <float.h>
 #include <string.h>
 
-namespace Spine {
+namespace spine {
 static const float PI = 3.1415926535897932385f;
 static const float PI_2 = PI * 2;
 static const float DEG_RAD = (PI / 180.0f);

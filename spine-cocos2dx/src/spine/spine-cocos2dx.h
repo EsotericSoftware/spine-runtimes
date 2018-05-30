@@ -33,15 +33,32 @@
 
 #include <spine/spine.h>
 #include "cocos2d.h"
-#include <spine/Cocos2dAttachmentLoader.h>
+
 #include <spine/SkeletonRenderer.h>
 #include <spine/SkeletonAnimation.h>
 #include <spine/SkeletonBatch.h>
 
 namespace spine {
-	typedef cocos2d::Texture2D* (*CustomTextureLoader)(const char* path);
-	// set custom texture loader for _spAtlasPage_createTexture
-	void spAtlasPage_setCustomTextureLoader(CustomTextureLoader texLoader);
+	class Cocos2dTextureLoader: public TextureLoader {
+	public:
+		Cocos2dTextureLoader();
+		
+		virtual ~Cocos2dTextureLoader();
+		
+		virtual void load(AtlasPage& page, const String& path);
+		
+		virtual void unload(void* texture);
+	};
+	
+	class Cocos2dExtension: public DefaultSpineExtension {
+	public:
+		Cocos2dExtension();
+		
+		virtual ~Cocos2dExtension();
+		
+	protected:
+		virtual char *_readFile(const String &path, int *length);
+	};
 }
 
 #endif /* SPINE_COCOS2DX_H_ */

@@ -35,8 +35,8 @@
 
 #include <map>
 
-namespace Spine {
-class DebugExtension : public DefaultSpineExtension {
+namespace spine {
+class DebugExtension : public SpineExtension {
 	struct Allocation {
 		void *address;
 		size_t size;
@@ -51,7 +51,7 @@ class DebugExtension : public DefaultSpineExtension {
 	};
 
 public:
-	DebugExtension(): _allocations(0), _reallocations(0), _frees(0) {
+	DebugExtension(SpineExtension* extension): _extension(extension), _allocations(0), _reallocations(0), _frees(0) {
 	}
 
 	void reportLeaks() {
@@ -66,16 +66,15 @@ public:
 		_allocated.clear();
 	}
 
-protected:
 	virtual void *_alloc(size_t size, const char *file, int line) {
-		void *result = DefaultSpineExtension::_alloc(size, file, line);
+		void *result = _extension->_alloc(size, file, line);
 		_allocated[result] = Allocation(result, size, file, line);
 		_allocations++;
 		return result;
 	}
 
 	virtual void *_calloc(size_t size, const char *file, int line) {
-		void *result = DefaultSpineExtension::_calloc(size, file, line);
+		void *result = _extension->_calloc(size, file, line);
 		_allocated[result] = Allocation(result, size, file, line);
 		_allocations++;
 		return result;
@@ -83,7 +82,7 @@ protected:
 
 	virtual void *_realloc(void *ptr, size_t size, const char *file, int line) {
 		_allocated.erase(ptr);
-		void *result = DefaultSpineExtension::_realloc(ptr, size, file, line);
+		void *result = _extension->_realloc(ptr, size, file, line);
 		_reallocations++;
 		_allocated[result] = Allocation(result, size, file, line);
 		return result;
@@ -91,17 +90,22 @@ protected:
 
 	virtual void _free(void *mem, const char *file, int line) {
 		if (_allocated.count(mem)) {
-			DefaultSpineExtension::_free(mem, file, line);
+			_extension->_free(mem, file, line);
 			_frees++;
 			_allocated.erase(mem);
 			return;
 		}
 
 		printf("%s:%i (address %p): Double free or not allocated through SpineExtension\n", file, line, mem);
-		DefaultSpineExtension::_free(mem, file, line);
+		_extension->_free(mem, file, line);
+	}
+
+	virtual char *_readFile(const String &path, int *length) {
+		return _extension->_readFile(path, length);
 	}
 
 private:
+	SpineExtension* _extension;
 	std::map<void*, Allocation> _allocated;
 	size_t _allocations;
 	size_t _reallocations;

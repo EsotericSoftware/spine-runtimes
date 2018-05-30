@@ -36,7 +36,7 @@
 #include <spine/Animation.h>
 #include <spine/TimelineType.h>
 
-namespace Spine {
+namespace spine {
     class TranslateTimeline : public CurveTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;

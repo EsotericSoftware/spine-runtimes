@@ -36,7 +36,7 @@
 #include <spine/ContainerUtil.h>
 #include <spine/SpineObject.h>
 
-namespace Spine {
+namespace spine {
 template<typename T>
 class Pool : public SpineObject {
 public:

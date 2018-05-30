@@ -29,7 +29,7 @@
  *****************************************************************************/
 
 #include <spine/SkeletonBatch.h>
-#include <spine/extension.h>
+#include <spine/Extension.h>
 #include <algorithm>
 
 USING_NS_CC;
@@ -58,8 +58,6 @@ SkeletonBatch::SkeletonBatch () {
 		_commandsPool.push_back(new TrianglesCommand());
 	}
 	
-	_indices = spUnsignedShortArray_create(8);
-	
 	reset ();
 		
 	// callback after drawing is finished so we can clear out the batch state
@@ -71,8 +69,6 @@ SkeletonBatch::SkeletonBatch () {
 
 SkeletonBatch::~SkeletonBatch () {
 	Director::getInstance()->getEventDispatcher()->removeCustomEventListeners(EVENT_AFTER_DRAW_RESET_POSITION);
-
-	spUnsignedShortArray_dispose(_indices);
 	
 	for (unsigned int i = 0; i < _commandsPool.size(); i++) {
 		delete _commandsPool[i];
@@ -107,11 +103,11 @@ void SkeletonBatch::deallocateVertices(uint32_t numVertices) {
 
 	
 unsigned short* SkeletonBatch::allocateIndices(uint32_t numIndices) {	
-	if (_indices->capacity - _indices->size < numIndices) {
-		unsigned short* oldData = _indices->items;
-		int oldSize = _indices->size;
-		spUnsignedShortArray_ensureCapacity(_indices, _indices->size + numIndices);
-		unsigned short* newData = _indices->items;
+	if (_indices.getCapacity() - _indices.size() < numIndices) {
+		unsigned short* oldData = _indices.buffer();
+		int oldSize = _indices.size();
+		_indices.setSize(_indices.size() + numIndices, 0);
+		unsigned short* newData = _indices.buffer();
 		for (uint32_t i = 0; i < this->_nextFreeCommand; i++) {
 			TrianglesCommand* command = _commandsPool[i];
 			cocos2d::TrianglesCommand::Triangles& triangles = (cocos2d::TrianglesCommand::Triangles&)command->getTriangles();
@@ -121,13 +117,12 @@ unsigned short* SkeletonBatch::allocateIndices(uint32_t numIndices) {
 		}
 	}
 	
-	unsigned short* indices = _indices->items + _indices->size;
-	_indices->size += numIndices;
+	unsigned short* indices = _indices.buffer() + _indices.size() - numIndices;
 	return indices;
 }
 
 void SkeletonBatch::deallocateIndices(uint32_t numIndices) {
-	_indices->size -= numIndices;
+	_indices.setSize(_indices.size() - numIndices, 0);
 }
 
 	
@@ -141,7 +136,7 @@ cocos2d::TrianglesCommand* SkeletonBatch::addCommand(cocos2d::Renderer* renderer
 void SkeletonBatch::reset() {
 	_nextFreeCommand = 0;
 	_numVertices = 0;
-	_indices->size = 0;
+	_indices.setSize(0, 0);
 }
 
 cocos2d::TrianglesCommand* SkeletonBatch::nextFreeCommand() {

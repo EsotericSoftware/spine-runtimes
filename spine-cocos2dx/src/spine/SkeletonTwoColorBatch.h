@@ -140,7 +140,7 @@ namespace spine {
 		uint32_t _numVertices;
 		
 		// pool of indices
-		spUnsignedShortArray* _indices;
+		Vector<unsigned short> _indices;
 		
 		// two color tint shader and state
 		cocos2d::GLProgram* _twoColorTintShader;

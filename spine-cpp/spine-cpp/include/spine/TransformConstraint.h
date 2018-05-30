@@ -35,7 +35,7 @@
 
 #include <spine/Vector.h>
 
-namespace Spine {
+namespace spine {
     class TransformConstraintData;
     class Skeleton;
     class Bone;

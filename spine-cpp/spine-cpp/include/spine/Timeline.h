@@ -37,7 +37,7 @@
 #include <spine/MixDirection.h>
 #include <spine/SpineObject.h>
 
-namespace Spine {
+namespace spine {
 class Skeleton;
 
 class Event;

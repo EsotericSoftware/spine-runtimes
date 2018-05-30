@@ -35,7 +35,7 @@
 #include <spine/SpineObject.h>
 #include <spine/Vector.h>
 
-namespace Spine {
+namespace spine {
 class BoneData;
 
 class Skeleton;

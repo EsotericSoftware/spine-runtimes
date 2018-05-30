@@ -31,7 +31,7 @@
 #include <spine/RTTI.h>
 #include <spine/String.h>
 
-using namespace Spine;
+using namespace spine;
 
 RTTI::RTTI(const std::string &className) : _className(className), _pBaseRTTI(NULL) {
 }

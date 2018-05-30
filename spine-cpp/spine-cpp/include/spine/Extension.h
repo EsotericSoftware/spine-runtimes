@@ -35,7 +35,7 @@
 
 #define SP_UNUSED(x) (void)(x)
 
-namespace Spine {
+namespace spine {
 class String;
 
 class SpineExtension {
@@ -70,7 +70,6 @@ public:
 
 	virtual ~SpineExtension();
 
-protected:
 	/// Implement this function to use your own memory allocator
 	virtual void *_alloc(size_t size, const char *file, int line) = 0;
 
@@ -83,6 +82,7 @@ protected:
 
 	virtual char *_readFile(const String &path, int *length) = 0;
 
+protected:
 	SpineExtension();
 
 private:
@@ -107,18 +107,11 @@ protected:
 	virtual char *_readFile(const String &path, int *length);
 };
 
-struct Allocation {
-	void *address;
-	size_t size;
-	const char *fileName;
-	int line;
-
-	Allocation() : address(NULL), size(0), fileName(NULL), line(0) {
-	}
-
-	Allocation(void *a, size_t s, const char *f, int l) : address(a), size(s), fileName(f), line(l) {
-	}
-};
+// This function is to be implemented by engine specific runtimes to provide
+// the default extension for that engine. It is called the first time
+// SpineExtension::getInstance() is called, when no instance has been set
+// yet.
+extern SpineExtension *getDefaultExtension();
 }
 
 #endif /* Spine_Extension_h */

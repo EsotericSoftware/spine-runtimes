@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 #include <spine/SkeletonTwoColorBatch.h>
-#include <spine/extension.h>
+#include <spine/Extension.h>
 #include <algorithm>
 
 USING_NS_CC;
@@ -168,15 +168,13 @@ SkeletonTwoColorBatch::SkeletonTwoColorBatch () {
 		_commandsPool.push_back(new TwoColorTrianglesCommand());
 	}
 	
-	_indices = spUnsignedShortArray_create(8);
-	
 	reset ();
 	
 	// callback after drawing is finished so we can clear out the batch state
 	// for the next frame
 	Director::getInstance()->getEventDispatcher()->addCustomEventListener(EVENT_AFTER_DRAW_RESET_POSITION, [this](EventCustom* eventCustom){
 		this->update(0);
-	});;
+	});
 	
 	_twoColorTintShader = cocos2d::GLProgram::createWithByteArrays(TWO_COLOR_TINT_VERTEX_SHADER, TWO_COLOR_TINT_FRAGMENT_SHADER);
 	_twoColorTintShaderState = GLProgramState::getOrCreateWithGLProgram(_twoColorTintShader);
@@ -194,8 +192,6 @@ SkeletonTwoColorBatch::SkeletonTwoColorBatch () {
 
 SkeletonTwoColorBatch::~SkeletonTwoColorBatch () {
 	Director::getInstance()->getEventDispatcher()->removeCustomEventListeners(EVENT_AFTER_DRAW_RESET_POSITION);
-	
-	spUnsignedShortArray_dispose(_indices);
 	
 	for (unsigned int i = 0; i < _commandsPool.size(); i++) {
 		delete _commandsPool[i];
@@ -234,11 +230,11 @@ void SkeletonTwoColorBatch::deallocateVertices(uint32_t numVertices) {
 
 
 unsigned short* SkeletonTwoColorBatch::allocateIndices(uint32_t numIndices) {
-	if (_indices->capacity - _indices->size < numIndices) {
-		unsigned short* oldData = _indices->items;
-		int oldSize =_indices->size;
-		spUnsignedShortArray_ensureCapacity(_indices, _indices->size + numIndices);
-		unsigned short* newData = _indices->items;
+	if (_indices.getCapacity() - _indices.size() < numIndices) {
+		unsigned short* oldData = _indices.buffer();
+		int oldSize =_indices.size();
+		_indices.setSize(_indices.size() + numIndices, 0);
+		unsigned short* newData = _indices.buffer();
 		for (uint32_t i = 0; i < this->_nextFreeCommand; i++) {
 			TwoColorTrianglesCommand* command = _commandsPool[i];
 			TwoColorTriangles& triangles = (TwoColorTriangles&)command->getTriangles();
@@ -248,13 +244,12 @@ unsigned short* SkeletonTwoColorBatch::allocateIndices(uint32_t numIndices) {
 		}
 	}
 	
-	unsigned short* indices = _indices->items + _indices->size;
-	_indices->size += numIndices;
+	unsigned short* indices = _indices.buffer() + _indices.size() - numIndices;
 	return indices;
 }
 
 void SkeletonTwoColorBatch::deallocateIndices(uint32_t numIndices) {
-	_indices->size -= numIndices;
+	_indices.setSize(_indices.size() - numIndices, 0);
 }
 
 TwoColorTrianglesCommand* SkeletonTwoColorBatch::addCommand(cocos2d::Renderer* renderer, float globalOrder, GLuint textureID, cocos2d::GLProgramState* glProgramState, cocos2d::BlendFunc blendType, const TwoColorTriangles& triangles, const cocos2d::Mat4& mv, uint32_t flags) {
@@ -330,7 +325,7 @@ void SkeletonTwoColorBatch::flush (TwoColorTrianglesCommand* materialCommand) {
 void SkeletonTwoColorBatch::reset() {
 	_nextFreeCommand = 0;
 	_numVertices = 0;
-	_indices->size = 0;
+	_indices.setSize(0, 0);
 	_numVerticesBuffer = 0;
 	_numIndicesBuffer = 0;
 	_lastCommand = nullptr;

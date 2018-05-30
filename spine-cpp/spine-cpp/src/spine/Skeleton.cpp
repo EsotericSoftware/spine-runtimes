@@ -50,7 +50,7 @@
 
 #include <spine/ContainerUtil.h>
 
-using namespace Spine;
+using namespace spine;
 
 Skeleton::Skeleton(SkeletonData *skeletonData) :
 		_data(skeletonData),
@@ -444,7 +444,7 @@ Bone *Skeleton::getRootBone() {
 	return _bones.size() == 0 ? NULL : _bones[0];
 }
 
-const SkeletonData *Skeleton::getData() {
+SkeletonData *Skeleton::getData() {
 	return _data;
 }
 

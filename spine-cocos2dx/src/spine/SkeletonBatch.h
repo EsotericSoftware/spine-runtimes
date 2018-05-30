@@ -68,7 +68,7 @@ namespace spine {
 		uint32_t _numVertices;
 		
 		// pool of indices
-		spUnsignedShortArray* _indices;
+		Vector<unsigned short> _indices;
     };
 	
 }

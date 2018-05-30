@@ -37,15 +37,19 @@
 #include "BatchingExample.h"
 #include "CoinExample.h"
 #include "SkeletonRendererSeparatorExample.h"
+#include <spine/Debug.h>
 #include "AppMacros.h"
 
 USING_NS_CC;
 using namespace std;
 
+DebugExtension debugExtension(SpineExtension::getInstance());
+
 AppDelegate::AppDelegate () {
 }
 
 AppDelegate::~AppDelegate () {
+	debugExtension.reportLeaks();
 }
 
 bool AppDelegate::applicationDidFinishLaunching () {
@@ -98,6 +102,9 @@ bool AppDelegate::applicationDidFinishLaunching () {
 	// set FPS. the default value is 1.0/60 if you don't call this
 	director->setAnimationInterval(1.0f / 60);
 
+	// Set the Debug wrapper extension so we know about memory leaks.
+	SpineExtension::setInstance(&debugExtension);
+	
 	// create a scene. it's an autorelease object
 	//auto scene = RaptorExample::scene();
 	auto scene = SkeletonRendererSeparatorExample::scene();

@@ -36,8 +36,9 @@
 #include <spine/MixBlend.h>
 #include <spine/SpineObject.h>
 #include <spine/String.h>
+#include <spine/HasRendererObject.h>
 
-namespace Spine {
+namespace spine {
     enum EventType {
         EventType_Start,
         EventType_Interrupt,
@@ -56,15 +57,17 @@ namespace Spine {
     class Skeleton;
     class RotateTimeline;
     
-    typedef void (*OnAnimationEventFunc) (AnimationState* state, EventType type, TrackEntry* entry, Event* event);
+    typedef void (*AnimationStateListener) (AnimationState* state, EventType type, TrackEntry* entry, Event* event);
     
     /// State for the playback of an animation
-    class TrackEntry : public SpineObject {
+    class TrackEntry : public SpineObject, public HasRendererObject {
         friend class EventQueue;
         friend class AnimationState;
         
     public:
         TrackEntry();
+
+        virtual ~TrackEntry();
         
         /// The index of the track where this entry is either current or queued.
         int getTrackIndex();
@@ -216,8 +219,7 @@ namespace Spine {
         /// TrackEntry chooses the short way the first time it is applied and remembers that direction.
         void resetRotationDirections();
         
-        void setOnAnimationEventFunc(OnAnimationEventFunc inValue);
-
+        void setListener(AnimationStateListener listener);
 
     private:
         Animation* _animation;
@@ -235,7 +237,7 @@ namespace Spine {
         Vector<int> _timelineData;
         Vector<TrackEntry*> _timelineDipMix;
         Vector<float> _timelinesRotation;
-        OnAnimationEventFunc _onAnimationEventFunc;
+        AnimationStateListener _listener;
         
         /// Sets the timeline data.
         /// @param to May be NULL.
@@ -290,7 +292,7 @@ namespace Spine {
         void drain();
     };
     
-    class AnimationState : public SpineObject {
+    class AnimationState : public SpineObject, public HasRendererObject {
         friend class TrackEntry;
         friend class EventQueue;
         
@@ -378,10 +380,7 @@ namespace Spine {
         float getTimeScale();
         void setTimeScale(float inValue);
 
-        void setOnAnimationEventFunc(OnAnimationEventFunc inValue);
-
-        void setRendererObject(void* inValue);
-        void* getRendererObject();
+        void setListener(AnimationStateListener listener);
         
     private:
         static const int Subsequent, First, Dip, DipMix;
@@ -396,10 +395,8 @@ namespace Spine {
         Vector<int> _propertyIDs;
         Vector<TrackEntry*> _mixingTo;
         bool _animationsChanged;
-        
-        void* _rendererObject;
 
-        OnAnimationEventFunc _onAnimationEventFunc;
+        AnimationStateListener _listener;
         
         float _timeScale;
 

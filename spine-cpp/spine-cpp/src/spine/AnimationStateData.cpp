@@ -33,7 +33,7 @@
 #include <spine/SkeletonData.h>
 #include <spine/Animation.h>
 
-using namespace Spine;
+using namespace spine;
 
 AnimationStateData::AnimationStateData(SkeletonData *skeletonData) : _skeletonData(skeletonData), _defaultMix(0) {
 }

@@ -33,7 +33,7 @@
 
 #include <spine/VertexAttachment.h>
 
-namespace Spine {
+namespace spine {
     class PathAttachment : public VertexAttachment {
         friend class SkeletonBinary;
         friend class SkeletonJson;

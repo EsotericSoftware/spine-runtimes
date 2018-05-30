@@ -71,7 +71,7 @@
 #include <spine/EventTimeline.h>
 #include <spine/Event.h>
 
-using namespace Spine;
+using namespace spine;
 
 const int SkeletonBinary::BONE_ROTATE = 0;
 const int SkeletonBinary::BONE_TRANSLATE = 1;

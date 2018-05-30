@@ -37,7 +37,7 @@
 
 #include <assert.h>
 
-namespace Spine {
+namespace spine {
     class SkeletonData;
     class Animation;
     
@@ -46,14 +46,14 @@ namespace Spine {
         friend class AnimationState;
         
     public:
+		explicit AnimationStateData(SkeletonData* skeletonData);
+		
         /// The SkeletonData to look up animations when they are specified by name.
         SkeletonData* getSkeletonData();
         
         /// The mix duration to use when no mix duration has been specifically defined between two animations.
         float getDefaultMix();
         void setDefaultMix(float inValue);
-
-        explicit AnimationStateData(SkeletonData* skeletonData);
         
         /// Sets a mix duration by animation names.
         void setMix(const String& fromName, const String& toName, float duration);

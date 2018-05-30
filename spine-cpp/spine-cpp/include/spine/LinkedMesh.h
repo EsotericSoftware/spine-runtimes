@@ -34,7 +34,7 @@
 #include <spine/SpineObject.h>
 #include <spine/String.h>
 
-namespace Spine {
+namespace spine {
 class MeshAttachment;
 
 class LinkedMesh : public SpineObject {

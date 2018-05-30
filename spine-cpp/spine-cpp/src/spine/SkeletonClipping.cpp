@@ -33,7 +33,7 @@
 #include <spine/Slot.h>
 #include <spine/ClippingAttachment.h>
 
-using namespace Spine;
+using namespace spine;
 
 SkeletonClipping::SkeletonClipping() : _clipAttachment(NULL) {
 	_clipOutput.ensureCapacity(128);
@@ -85,10 +85,12 @@ void SkeletonClipping::clipEnd() {
 	_clippingPolygon.clear();
 }
 
-void SkeletonClipping::clipTriangles(Vector<float> &vertices, size_t verticesLength, Vector<unsigned short> &triangles,
-									 size_t trianglesLength, Vector<float> &uvs) {
-	SP_UNUSED(verticesLength);
+void SkeletonClipping::clipTriangles(Vector<float> &vertices, Vector<unsigned short> &triangles, Vector<float> &uvs, size_t stride) {
+	clipTriangles(vertices.buffer(), triangles.buffer(), triangles.size(), uvs.buffer(), stride);
+}
 
+void SkeletonClipping::clipTriangles(float *vertices, unsigned short *triangles,
+									 size_t trianglesLength, float *uvs, size_t stride) {
 	Vector<float> &clipOutput = _clipOutput;
 	Vector<float> &clippedVertices = _clippedVertices;
 	Vector<unsigned short> &clippedTriangles = _clippedTriangles;

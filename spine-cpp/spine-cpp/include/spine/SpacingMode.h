@@ -31,7 +31,7 @@
 #ifndef Spine_SpacingMode_h
 #define Spine_SpacingMode_h
 
-namespace Spine {
+namespace spine {
 enum SpacingMode {
 	SpacingMode_Length = 0,
 	SpacingMode_Fixed,

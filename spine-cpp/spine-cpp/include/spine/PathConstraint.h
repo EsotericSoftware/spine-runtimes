@@ -35,7 +35,7 @@
 
 #include <spine/Vector.h>
 
-namespace Spine {
+namespace spine {
     class PathConstraintData;
     class Skeleton;
     class PathAttachment;

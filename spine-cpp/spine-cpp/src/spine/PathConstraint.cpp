@@ -39,7 +39,7 @@
 #include <spine/SlotData.h>
 #include <spine/BoneData.h>
 
-using namespace Spine;
+using namespace spine;
 
 RTTI_IMPL(PathConstraint, Constraint)
 

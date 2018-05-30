@@ -34,7 +34,7 @@
 #include <spine/Vector.h>
 #include <spine/String.h>
 
-namespace Spine {
+namespace spine {
 class Attachment;
 
 class Skeleton;

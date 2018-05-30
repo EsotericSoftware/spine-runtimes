@@ -39,7 +39,7 @@
 
 #include <assert.h>
 
-namespace Spine {
+namespace spine {
     class ContainerUtil : public SpineObject {
     public:
         /// Finds an item by comparing each item's name.

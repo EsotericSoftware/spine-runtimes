@@ -32,7 +32,7 @@
 
 #include <spine/MathUtil.h>
 
-namespace Spine {
+namespace spine {
 class Color : public SpineObject {
 public:
 	Color() : r(0), g(0), b(0), a(0) {

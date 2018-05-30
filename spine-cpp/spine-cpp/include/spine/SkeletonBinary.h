@@ -37,7 +37,7 @@
 #include <spine/String.h>
 #include <spine/Color.h>
 
-namespace Spine {
+namespace spine {
     class SkeletonData;
     class Atlas;
     class AttachmentLoader;

@@ -33,7 +33,7 @@
 
 #include <spine/CurveTimeline.h>
 
-namespace Spine {
+namespace spine {
 class ColorTimeline : public CurveTimeline {
 	friend class SkeletonBinary;
 

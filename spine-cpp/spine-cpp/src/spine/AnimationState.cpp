@@ -42,7 +42,7 @@
 #include <spine/AttachmentTimeline.h>
 #include <spine/DrawOrderTimeline.h>
 
-using namespace Spine;
+using namespace spine;
 
 void dummyOnAnimationEventFunc(AnimationState *state, EventType type, TrackEntry *entry, Event *event = NULL) {
 	SP_UNUSED(state);
@@ -56,8 +56,10 @@ TrackEntry::TrackEntry() : _animation(NULL), _next(NULL), _mixingFrom(NULL), _tr
 						   _animationEnd(0), _animationLast(0), _nextAnimationLast(0), _delay(0), _trackTime(0),
 						   _trackLast(0), _nextTrackLast(0), _trackEnd(0), _timeScale(1.0f), _alpha(0), _mixTime(0),
 						   _mixDuration(0), _interruptAlpha(0), _totalAlpha(0), _mixBlend(MixBlend_Replace),
-						   _onAnimationEventFunc(dummyOnAnimationEventFunc) {
+						   _listener(dummyOnAnimationEventFunc) {
 }
+
+TrackEntry::~TrackEntry() { }
 
 int TrackEntry::getTrackIndex() { return _trackIndex; }
 
@@ -151,8 +153,8 @@ void TrackEntry::resetRotationDirections() {
 	_timelinesRotation.clear();
 }
 
-void TrackEntry::setOnAnimationEventFunc(OnAnimationEventFunc inValue) {
-	_onAnimationEventFunc = inValue;
+void TrackEntry::setListener(AnimationStateListener inValue) {
+	_listener = inValue;
 }
 
 TrackEntry *TrackEntry::setTimelineData(TrackEntry *to, Vector<TrackEntry *> &mixingToArray, Vector<int> &propertyIDs) {
@@ -218,7 +220,7 @@ void TrackEntry::reset() {
 	_timelineDipMix.clear();
 	_timelinesRotation.clear();
 
-	_onAnimationEventFunc = dummyOnAnimationEventFunc;
+	_listener = dummyOnAnimationEventFunc;
 }
 
 EventQueueEntry::EventQueueEntry(EventType eventType, TrackEntry *trackEntry, Event *event) :
@@ -288,22 +290,22 @@ void EventQueue::drain() {
 			case EventType_Start:
 			case EventType_Interrupt:
 			case EventType_Complete:
-				trackEntry->_onAnimationEventFunc(&state, queueEntry->_type, trackEntry, NULL);
-				state._onAnimationEventFunc(&state, queueEntry->_type, trackEntry, NULL);
+				trackEntry->_listener(&state, queueEntry->_type, trackEntry, NULL);
+				state._listener(&state, queueEntry->_type, trackEntry, NULL);
 				break;
 			case EventType_End:
-				trackEntry->_onAnimationEventFunc(&state, queueEntry->_type, trackEntry, NULL);
-				state._onAnimationEventFunc(&state, queueEntry->_type, trackEntry, NULL);
+				trackEntry->_listener(&state, queueEntry->_type, trackEntry, NULL);
+				state._listener(&state, queueEntry->_type, trackEntry, NULL);
 				/* Yes, we want to fall through here */
 			case EventType_Dispose:
-				trackEntry->_onAnimationEventFunc(&state, EventType_Dispose, trackEntry, NULL);
-				state._onAnimationEventFunc(&state, EventType_Dispose, trackEntry, NULL);
+				trackEntry->_listener(&state, EventType_Dispose, trackEntry, NULL);
+				state._listener(&state, EventType_Dispose, trackEntry, NULL);
 				trackEntry->reset();
 				_trackEntryPool.free(trackEntry);
 				break;
 			case EventType_Event:
-				trackEntry->_onAnimationEventFunc(&state, queueEntry->_type, trackEntry, queueEntry->_event);
-				state._onAnimationEventFunc(&state, queueEntry->_type, trackEntry, queueEntry->_event);
+				trackEntry->_listener(&state, queueEntry->_type, trackEntry, queueEntry->_event);
+				state._listener(&state, queueEntry->_type, trackEntry, queueEntry->_event);
 				break;
 		}
 	}
@@ -321,8 +323,7 @@ AnimationState::AnimationState(AnimationStateData *data) :
 		_data(data),
 		_queue(EventQueue::newEventQueue(*this, _trackEntryPool)),
 		_animationsChanged(false),
-		_rendererObject(NULL),
-		_onAnimationEventFunc(dummyOnAnimationEventFunc),
+		_listener(dummyOnAnimationEventFunc),
 		_timeScale(1) {
 }
 
@@ -654,16 +655,8 @@ void AnimationState::setTimeScale(float inValue) {
 	_timeScale = inValue;
 }
 
-void AnimationState::setOnAnimationEventFunc(OnAnimationEventFunc inValue) {
-	_onAnimationEventFunc = inValue;
-}
-
-void AnimationState::setRendererObject(void *inValue) {
-	_rendererObject = inValue;
-}
-
-void *AnimationState::getRendererObject() {
-	return _rendererObject;
+void AnimationState::setListener(AnimationStateListener inValue) {
+	_listener = inValue;
 }
 
 Animation *AnimationState::getEmptyAnimation() {

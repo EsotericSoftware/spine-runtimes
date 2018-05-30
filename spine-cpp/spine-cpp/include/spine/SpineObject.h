@@ -33,7 +33,7 @@
 
 #include <new>
 
-namespace Spine {
+namespace spine {
 class String;
 
 class SpineObject {

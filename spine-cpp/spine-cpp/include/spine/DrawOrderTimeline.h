@@ -33,7 +33,7 @@
 
 #include <spine/Timeline.h>
 
-namespace Spine {
+namespace spine {
     class DrawOrderTimeline : public Timeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;

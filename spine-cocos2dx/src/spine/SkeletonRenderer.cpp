@@ -28,12 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#include <spine/spine-cocos2dx.h>
 #include <spine/SkeletonRenderer.h>
-#include <spine/extension.h>
+#include <spine/Extension.h>
 #include <spine/SkeletonBatch.h>
 #include <spine/SkeletonTwoColorBatch.h>
 #include <spine/AttachmentVertices.h>
-#include <spine/Cocos2dAttachmentLoader.h>
 #include <algorithm>
 
 #define INITIAL_WORLD_VERTICES_LENGTH 1000
@@ -56,6 +56,8 @@ using std::min;
 using std::max;
 
 namespace spine {
+	
+static Cocos2dTextureLoader textureLoader;
 
 void SkeletonRenderer::destroyScratchBuffers() {
 	if (worldVertices) {
@@ -65,19 +67,19 @@ void SkeletonRenderer::destroyScratchBuffers() {
 	}
 }
 
-SkeletonRenderer* SkeletonRenderer::createWithSkeleton(spSkeleton* skeleton, bool ownsSkeleton, bool ownsSkeletonData) {
+SkeletonRenderer* SkeletonRenderer::createWithSkeleton(Skeleton* skeleton, bool ownsSkeleton, bool ownsSkeletonData) {
 	SkeletonRenderer* node = new SkeletonRenderer(skeleton, ownsSkeleton, ownsSkeletonData);
 	node->autorelease();
 	return node;
 }
 	
-SkeletonRenderer* SkeletonRenderer::createWithData (spSkeletonData* skeletonData, bool ownsSkeletonData) {
+SkeletonRenderer* SkeletonRenderer::createWithData (SkeletonData* skeletonData, bool ownsSkeletonData) {
 	SkeletonRenderer* node = new SkeletonRenderer(skeletonData, ownsSkeletonData);
 	node->autorelease();
 	return node;
 }
 
-SkeletonRenderer* SkeletonRenderer::createWithFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale) {
+SkeletonRenderer* SkeletonRenderer::createWithFile (const std::string& skeletonDataFile, Atlas* atlas, float scale) {
 	SkeletonRenderer* node = new SkeletonRenderer(skeletonDataFile, atlas, scale);
 	node->autorelease();
 	return node;
@@ -95,15 +97,15 @@ void SkeletonRenderer::initialize () {
 		worldVerticesLength = INITIAL_WORLD_VERTICES_LENGTH;
 	}
 	
-	_clipper = spSkeletonClipping_create();
+	_clipper = new (__FILE__, __LINE__) SkeletonClipping();
 
 	_blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
 	setOpacityModifyRGB(true);
 
 	setupGLProgramState(false);
 	
-	spSkeleton_setToSetupPose(_skeleton);
-	spSkeleton_updateWorldTransform(_skeleton);
+	_skeleton->setToSetupPose();
+	_skeleton->updateWorldTransform();
 }
 	
 void SkeletonRenderer::setupGLProgramState (bool twoColorTintEnabled) {
@@ -113,22 +115,17 @@ void SkeletonRenderer::setupGLProgramState (bool twoColorTintEnabled) {
 	}
 	
 	Texture2D *texture = nullptr;
-	for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
-		spSlot* slot = _skeleton->drawOrder[i];
-		if (!slot->attachment) continue;
-		switch (slot->attachment->type) {
-			case SP_ATTACHMENT_REGION: {
-				spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-				texture = static_cast<AttachmentVertices*>(attachment->rendererObject)->_texture;
-				break;
-			}
-			case SP_ATTACHMENT_MESH: {
-				spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
-				texture = static_cast<AttachmentVertices*>(attachment->rendererObject)->_texture;
-				break;
-			}
-			default:
-				continue;
+	for (int i = 0, n = _skeleton->getSlots().size(); i < n; i++) {
+		Slot* slot = _skeleton->getDrawOrder()[i];
+		if (!slot->getAttachment()) continue;
+		if (slot->getAttachment()->getRTTI().isExactly(RegionAttachment::rtti)) {
+			RegionAttachment* attachment = (RegionAttachment*)slot->getAttachment();
+			texture = static_cast<AttachmentVertices*>(attachment->getRendererObject())->_texture;
+		} else if (slot->getAttachment()->getRTTI().isExactly(RegionAttachment::rtti)) {
+			MeshAttachment* attachment = (MeshAttachment*)slot->getAttachment();
+			texture = static_cast<AttachmentVertices*>(attachment->getRendererObject())->_texture;
+		} else {
+			continue;
 		}
 		
 		if (texture != nullptr) {
@@ -138,8 +135,8 @@ void SkeletonRenderer::setupGLProgramState (bool twoColorTintEnabled) {
 	setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP, texture));
 }
 
-void SkeletonRenderer::setSkeletonData (spSkeletonData *skeletonData, bool ownsSkeletonData) {
-	_skeleton = spSkeleton_create(skeletonData);
+void SkeletonRenderer::setSkeletonData (SkeletonData *skeletonData, bool ownsSkeletonData) {
+	_skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
 	_ownsSkeletonData = ownsSkeletonData;
 }
 
@@ -147,17 +144,17 @@ SkeletonRenderer::SkeletonRenderer ()
 	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _timeScale(1), _effect(nullptr), _startSlotIndex(-1), _endSlotIndex(-1) {
 }
 	
-SkeletonRenderer::SkeletonRenderer(spSkeleton* skeleton, bool ownsSkeleton, bool ownsSkeletonData)
+SkeletonRenderer::SkeletonRenderer(Skeleton* skeleton, bool ownsSkeleton, bool ownsSkeletonData, bool ownsAtlas)
 	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _timeScale(1), _effect(nullptr), _startSlotIndex(-1), _endSlotIndex(-1) {
-	initWithSkeleton(skeleton, ownsSkeleton, ownsSkeletonData);
+	initWithSkeleton(skeleton, ownsSkeleton, ownsSkeletonData, ownsAtlas);
 }
 
-SkeletonRenderer::SkeletonRenderer (spSkeletonData *skeletonData, bool ownsSkeletonData)
+SkeletonRenderer::SkeletonRenderer (SkeletonData *skeletonData, bool ownsSkeletonData)
 	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _timeScale(1), _effect(nullptr), _startSlotIndex(-1), _endSlotIndex(-1) {
 	initWithData(skeletonData, ownsSkeletonData);
 }
 
-SkeletonRenderer::SkeletonRenderer (const std::string& skeletonDataFile, spAtlas* atlas, float scale)
+SkeletonRenderer::SkeletonRenderer (const std::string& skeletonDataFile, Atlas* atlas, float scale)
 	: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _timeScale(1), _effect(nullptr), _startSlotIndex(-1), _endSlotIndex(-1) {
 	initWithJsonFile(skeletonDataFile, atlas, scale);
 }
@@ -168,36 +165,37 @@ SkeletonRenderer::SkeletonRenderer (const std::string& skeletonDataFile, const s
 }
 
 SkeletonRenderer::~SkeletonRenderer () {
-	if (_ownsSkeletonData) spSkeletonData_dispose(_skeleton->data);
-	if (_ownsSkeleton) spSkeleton_dispose(_skeleton);
-	if (_atlas) spAtlas_dispose(_atlas);
-	if (_attachmentLoader) spAttachmentLoader_dispose(_attachmentLoader);	
-	spSkeletonClipping_dispose(_clipper);
+	if (_ownsSkeletonData) delete _skeleton->getData();
+	if (_ownsSkeleton) delete _skeleton;
+	if (_ownsAtlas && _atlas) delete _atlas;
+	if (_attachmentLoader) delete _attachmentLoader;
+	delete _clipper;
 }
 
-void SkeletonRenderer::initWithSkeleton(spSkeleton* skeleton, bool ownsSkeleton, bool ownsSkeletonData) {
+void SkeletonRenderer::initWithSkeleton(Skeleton* skeleton, bool ownsSkeleton, bool ownsSkeletonData, bool ownsAtlas) {
 	_skeleton = skeleton;
 	_ownsSkeleton = ownsSkeleton;
 	_ownsSkeletonData = ownsSkeletonData;
+	_ownsAtlas = ownsAtlas;
 	
 	initialize();
 }
 	
-void SkeletonRenderer::initWithData (spSkeletonData* skeletonData, bool ownsSkeletonData) {
+void SkeletonRenderer::initWithData (SkeletonData* skeletonData, bool ownsSkeletonData) {
 	_ownsSkeleton = true;
 	setSkeletonData(skeletonData, ownsSkeletonData);
 	initialize();
 }
 
-void SkeletonRenderer::initWithJsonFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale) {
+void SkeletonRenderer::initWithJsonFile (const std::string& skeletonDataFile, Atlas* atlas, float scale) {
     _atlas = atlas;
-	_attachmentLoader = SUPER(Cocos2dAttachmentLoader_create(_atlas));
+	_attachmentLoader = new (__FILE__, __LINE__) AtlasAttachmentLoader(_atlas);
 
-	spSkeletonJson* json = spSkeletonJson_createWithLoader(_attachmentLoader);
-	json->scale = scale;
-	spSkeletonData* skeletonData = spSkeletonJson_readSkeletonDataFile(json, skeletonDataFile.c_str());
-	CCASSERT(skeletonData, json->error ? json->error : "Error reading skeleton data.");
-	spSkeletonJson_dispose(json);
+	SkeletonJson* json = new (__FILE__, __LINE__) SkeletonJson(_attachmentLoader);
+	json->setScale(scale);
+	SkeletonData* skeletonData = json->readSkeletonDataFile(skeletonDataFile.c_str());
+	CCASSERT(skeletonData, !json->getError().isEmpty() ? json->getError().buffer() : "Error reading skeleton data.");
+	delete json;
 
 	_ownsSkeleton = true;
 	setSkeletonData(skeletonData, true);
@@ -206,32 +204,33 @@ void SkeletonRenderer::initWithJsonFile (const std::string& skeletonDataFile, sp
 }
 
 void SkeletonRenderer::initWithJsonFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale) {
-	_atlas = spAtlas_createFromFile(atlasFile.c_str(), 0);
+	_atlas = new (__FILE__, __LINE__) Atlas(atlasFile.c_str(), &textureLoader);
 	CCASSERT(_atlas, "Error reading atlas file.");
 
-	_attachmentLoader = SUPER(Cocos2dAttachmentLoader_create(_atlas));
+	_attachmentLoader = new (__FILE__, __LINE__) AtlasAttachmentLoader(_atlas);
 
-	spSkeletonJson* json = spSkeletonJson_createWithLoader(_attachmentLoader);
-	json->scale = scale;
-	spSkeletonData* skeletonData = spSkeletonJson_readSkeletonDataFile(json, skeletonDataFile.c_str());
-	CCASSERT(skeletonData, json->error ? json->error : "Error reading skeleton data file.");
-	spSkeletonJson_dispose(json);
+	SkeletonJson* json = new (__FILE__, __LINE__) SkeletonJson(_attachmentLoader);
+	json->setScale(scale);
+	SkeletonData* skeletonData = json->readSkeletonDataFile(skeletonDataFile.c_str());
+	CCASSERT(skeletonData, !json->getError().isEmpty() ? json->getError().buffer() : "Error reading skeleton data.");
+	delete json;
 
 	_ownsSkeleton = true;
+	_ownsAtlas = true;
 	setSkeletonData(skeletonData, true);
 
 	initialize();
 }
     
-void SkeletonRenderer::initWithBinaryFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale) {
+void SkeletonRenderer::initWithBinaryFile (const std::string& skeletonDataFile, Atlas* atlas, float scale) {
     _atlas = atlas;
-    _attachmentLoader = SUPER(Cocos2dAttachmentLoader_create(_atlas));
+    _attachmentLoader = new (__FILE__, __LINE__) AtlasAttachmentLoader(_atlas);
     
-    spSkeletonBinary* binary = spSkeletonBinary_createWithLoader(_attachmentLoader);
-    binary->scale = scale;
-    spSkeletonData* skeletonData = spSkeletonBinary_readSkeletonDataFile(binary, skeletonDataFile.c_str());
-    CCASSERT(skeletonData, binary->error ? binary->error : "Error reading skeleton data file.");
-    spSkeletonBinary_dispose(binary);
+	SkeletonBinary* binary = new (__FILE__, __LINE__) SkeletonBinary(_attachmentLoader);
+	binary->setScale(scale);
+	SkeletonData* skeletonData = binary->readSkeletonDataFile(skeletonDataFile.c_str());
+	CCASSERT(skeletonData, !binary->getError().isEmpty() ? binary->getError().buffer() : "Error reading skeleton data.");
+	delete binary;
     _ownsSkeleton = true;
     setSkeletonData(skeletonData, true);
     
@@ -239,34 +238,65 @@ void SkeletonRenderer::initWithBinaryFile (const std::string& skeletonDataFile, 
 }
 
 void SkeletonRenderer::initWithBinaryFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale) {
-    _atlas = spAtlas_createFromFile(atlasFile.c_str(), 0);
+    _atlas = new (__FILE__, __LINE__) Atlas(atlasFile.c_str(), &textureLoader);
     CCASSERT(_atlas, "Error reading atlas file.");
     
-    _attachmentLoader = SUPER(Cocos2dAttachmentLoader_create(_atlas));
-    
-    spSkeletonBinary* binary = spSkeletonBinary_createWithLoader(_attachmentLoader);
-    binary->scale = scale;
-    spSkeletonData* skeletonData = spSkeletonBinary_readSkeletonDataFile(binary, skeletonDataFile.c_str());
-    CCASSERT(skeletonData, binary->error ? binary->error : "Error reading skeleton data file.");
-    spSkeletonBinary_dispose(binary);
-    _ownsSkeleton = true;
+	_attachmentLoader = new (__FILE__, __LINE__) AtlasAttachmentLoader(_atlas);
+	
+	SkeletonBinary* binary = new (__FILE__, __LINE__) SkeletonBinary(_attachmentLoader);
+	binary->setScale(scale);
+	SkeletonData* skeletonData = binary->readSkeletonDataFile(skeletonDataFile.c_str());
+	CCASSERT(skeletonData, !binary->getError().isEmpty() ? binary->getError().buffer() : "Error reading skeleton data.");
+	delete binary;
+	_ownsSkeleton = true;
+    _ownsAtlas = true;
     setSkeletonData(skeletonData, true);
     
     initialize();
 }
 
-
 void SkeletonRenderer::update (float deltaTime) {
 	Node::update(deltaTime);
-	if (_ownsSkeleton) spSkeleton_update(_skeleton, deltaTime * _timeScale);
+	if (_ownsSkeleton) _skeleton->update(deltaTime * _timeScale);
+}
+	
+static void deleteAttachmentVertices (void* vertices) {
+	delete (AttachmentVertices *) vertices;
+}
+	
+static unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
+	
+static void setAttachmentVertices(RegionAttachment* attachment) {
+	if (!attachment->getRendererObject()) {
+		AtlasRegion* region = (AtlasRegion*)attachment->getRendererObject();
+		AttachmentVertices* attachmentVertices = new AttachmentVertices((Texture2D*)region->page->getRendererObject(), 4, quadTriangles, 6);
+		V3F_C4B_T2F* vertices = attachmentVertices->_triangles->verts;
+		for (int i = 0, ii = 0; i < 4; ++i, ii += 2) {
+			vertices[i].texCoords.u = attachment->getUVs()[ii];
+			vertices[i].texCoords.v = attachment->getUVs()[ii + 1];
+		}
+		attachment->setRendererObject(attachmentVertices, deleteAttachmentVertices);
+	}
 }
 
+static void setAttachmentVertices(MeshAttachment* attachment) {
+	AtlasRegion* region = (AtlasRegion*)attachment->getRendererObject();
+	AttachmentVertices* attachmentVertices = new AttachmentVertices((Texture2D*)region->page->getRendererObject(),
+																	attachment->getWorldVerticesLength() >> 1, attachment->getTriangles().buffer(), attachment->getTriangles().size());
+	V3F_C4B_T2F* vertices = attachmentVertices->_triangles->verts;
+	for (int i = 0, ii = 0, nn = attachment->getWorldVerticesLength(); ii < nn; ++i, ii += 2) {
+		vertices[i].texCoords.u = attachment->getUVs()[ii];
+		vertices[i].texCoords.v = attachment->getUVs()[ii + 1];
+	}
+	attachment->setRendererObject(attachmentVertices, deleteAttachmentVertices);
+}
+	
 void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t transformFlags) {
 	SkeletonBatch* batch = SkeletonBatch::getInstance();
 	SkeletonTwoColorBatch* twoColorBatch = SkeletonTwoColorBatch::getInstance();
 	bool isTwoColorTint = this->isTwoColorTint();
 	
-	if (_effect) _effect->begin(_effect, _skeleton);
+	if (_effect) _effect->begin(*_skeleton);
 
 	Color4F nodeColor;
 	nodeColor.r = getDisplayedColor().r / (float)255;
@@ -280,34 +310,34 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	AttachmentVertices* attachmentVertices = nullptr;
 	TwoColorTrianglesCommand* lastTwoColorTrianglesCommand = nullptr;
 	bool inRange = _startSlotIndex != -1 || _endSlotIndex != -1 ? false : true;
-	for (int i = 0, n = _skeleton->slotsCount; i < n; ++i) {		
-		spSlot* slot = _skeleton->drawOrder[i];
+	for (int i = 0, n = _skeleton->getSlots().size(); i < n; ++i) {
+		Slot* slot = _skeleton->getDrawOrder()[i];
 		
-		if (_startSlotIndex >= 0 && _startSlotIndex == slot->data->index) {
+		if (_startSlotIndex >= 0 && _startSlotIndex == slot->getData().getIndex()) {
 			inRange = true;
 		}
 		
 		if (!inRange) {
-			spSkeletonClipping_clipEnd(_clipper, slot);
+			_clipper->clipEnd(*slot);
 			continue;
 		}
 		
-		if (_endSlotIndex >= 0 && _endSlotIndex == slot->data->index) {
+		if (_endSlotIndex >= 0 && _endSlotIndex == slot->getData().getIndex()) {
 			inRange = false;
 		}
 		
-		if (!slot->attachment) {
-			spSkeletonClipping_clipEnd(_clipper, slot);
+		if (!slot->getAttachment()) {
+			_clipper->clipEnd(*slot);
 			continue;
 		}
 		
 		cocos2d::TrianglesCommand::Triangles triangles;
 		TwoColorTriangles trianglesTwoColor;
 		
-		switch (slot->attachment->type) {
-		case SP_ATTACHMENT_REGION: {
-			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			attachmentVertices = getAttachmentVertices(attachment);
+		if (slot->getAttachment()->getRTTI().isExactly(RegionAttachment::rtti)) {
+			RegionAttachment* attachment = (RegionAttachment*)slot->getAttachment();
+			setAttachmentVertices(attachment);
+			attachmentVertices = (AttachmentVertices*)attachment->getRendererObject();
 			
 			if (!isTwoColorTint) {
 				triangles.indices = attachmentVertices->_triangles->indices;
@@ -315,7 +345,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
 				triangles.vertCount = attachmentVertices->_triangles->vertCount;
 				memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
-				spRegionAttachment_computeWorldVertices(attachment, slot->bone, (float*)triangles.verts, 0, 6);
+				attachment->computeWorldVertices(slot->getBone(), (float*)triangles.verts, 0, 6);
 			} else {
 				trianglesTwoColor.indices = attachmentVertices->_triangles->indices;
 				trianglesTwoColor.indexCount = attachmentVertices->_triangles->indexCount;
@@ -324,19 +354,18 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				for (int i = 0; i < trianglesTwoColor.vertCount; i++) {
 					trianglesTwoColor.verts[i].texCoords = attachmentVertices->_triangles->verts[i].texCoords;
 				}
-				spRegionAttachment_computeWorldVertices(attachment, slot->bone, (float*)trianglesTwoColor.verts, 0, 7);
+				attachment->computeWorldVertices(slot->getBone(), (float*)trianglesTwoColor.verts, 0, 7);
 			}
 			
-            color.r = attachment->color.r;
-			color.g = attachment->color.g;
-			color.b = attachment->color.b;
-			color.a = attachment->color.a;
-			
-			break;
+            color.r = attachment->getColor().r;
+			color.g = attachment->getColor().g;
+			color.b = attachment->getColor().b;
+			color.a = attachment->getColor().a;
 		}
-		case SP_ATTACHMENT_MESH: {
-			spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
-			attachmentVertices = getAttachmentVertices(attachment);
+		else if (slot->getAttachment()->getRTTI().isExactly(MeshAttachment::rtti)) {
+			MeshAttachment* attachment = (MeshAttachment*)slot->getAttachment();
+			setAttachmentVertices(attachment);
+			attachmentVertices = (AttachmentVertices*)attachment->getRendererObject();
 			
 			if (!isTwoColorTint) {
 				triangles.indices = attachmentVertices->_triangles->indices;
@@ -344,7 +373,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
 				triangles.vertCount = attachmentVertices->_triangles->vertCount;
 				memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
-				spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, triangles.vertCount * sizeof(cocos2d::V3F_C4B_T2F) / 4, (float*)triangles.verts, 0, 6);
+				attachment->computeWorldVertices(*slot, 0, triangles.vertCount * sizeof(cocos2d::V3F_C4B_T2F) / 4, (float*)triangles.verts, 0, 6);
 			} else {
 				trianglesTwoColor.indices = attachmentVertices->_triangles->indices;
 				trianglesTwoColor.indexCount = attachmentVertices->_triangles->indexCount;
@@ -353,30 +382,27 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				for (int i = 0; i < trianglesTwoColor.vertCount; i++) {
 					trianglesTwoColor.verts[i].texCoords = attachmentVertices->_triangles->verts[i].texCoords;
 				}
-				spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, trianglesTwoColor.vertCount * sizeof(V3F_C4B_C4B_T2F) / 4, (float*)trianglesTwoColor.verts, 0, 7);
+				attachment->computeWorldVertices(*slot, 0, trianglesTwoColor.vertCount * sizeof(V3F_C4B_C4B_T2F) / 4, (float*)trianglesTwoColor.verts, 0, 7);
 			}
 			
-			color.r = attachment->color.r;
-			color.g = attachment->color.g;
-			color.b = attachment->color.b;
-			color.a = attachment->color.a;
-			
-			break;
+			color.r = attachment->getColor().r;
+			color.g = attachment->getColor().g;
+			color.b = attachment->getColor().b;
+			color.a = attachment->getColor().a;
 		}
-		case SP_ATTACHMENT_CLIPPING: {
-			spClippingAttachment* clip = (spClippingAttachment*)slot->attachment;
-			spSkeletonClipping_clipStart(_clipper, slot, clip);
+		else if (slot->getAttachment()->getRTTI().isExactly(ClippingAttachment::rtti)) {
+			ClippingAttachment* clip = (ClippingAttachment*)slot->getAttachment();
+			_clipper->clipStart(*slot, clip);
 			continue;
-		}
-		default:
-			spSkeletonClipping_clipEnd(_clipper, slot);
+		} else {
+			_clipper->clipEnd(*slot);
 			continue;
 		}
 		
-		if (slot->darkColor) {
-			darkColor.r = slot->darkColor->r * 255;
-			darkColor.g = slot->darkColor->g * 255;
-			darkColor.b = slot->darkColor->b * 255;
+		if (slot->hasDarkColor()) {
+			darkColor.r = slot->getDarkColor().r * 255;
+			darkColor.g = slot->getDarkColor().g * 255;
+			darkColor.b = slot->getDarkColor().b * 255;
 		} else {
 			darkColor.r = 0;
 			darkColor.g = 0;
@@ -384,28 +410,28 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		}
 		darkColor.a = darkPremultipliedAlpha;
 		
-		color.a *= nodeColor.a * _skeleton->color.a * slot->color.a * 255;
+		color.a *= nodeColor.a * _skeleton->getColor().a * slot->getColor().a * 255;
 		// skip rendering if the color of this attachment is 0
 		if (color.a == 0){
-			spSkeletonClipping_clipEnd(_clipper, slot);
+			_clipper->clipEnd(*slot);
 			continue;
 		}
 		float multiplier = _premultipliedAlpha ? color.a : 255;
-		color.r *= nodeColor.r * _skeleton->color.r * slot->color.r * multiplier;
-		color.g *= nodeColor.g * _skeleton->color.g * slot->color.g * multiplier;
-		color.b *= nodeColor.b * _skeleton->color.b * slot->color.b * multiplier;
+		color.r *= nodeColor.r * _skeleton->getColor().r * slot->getColor().r * multiplier;
+		color.g *= nodeColor.g * _skeleton->getColor().g * slot->getColor().g * multiplier;
+		color.b *= nodeColor.b * _skeleton->getColor().b * slot->getColor().b * multiplier;
 		
 		BlendFunc blendFunc;
-		switch (slot->data->blendMode) {
-			case SP_BLEND_MODE_ADDITIVE:
+		switch (slot->getData().getBlendMode()) {
+			case BlendMode_Additive:
 				blendFunc.src = _premultipliedAlpha ? GL_ONE : GL_SRC_ALPHA;
 				blendFunc.dst = GL_ONE;
 				break;
-			case SP_BLEND_MODE_MULTIPLY:
+			case BlendMode_Multiply:
 				blendFunc.src = GL_DST_COLOR;
 				blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
 				break;
-			case SP_BLEND_MODE_SCREEN:
+			case BlendMode_Screen:
 				blendFunc.src = GL_ONE;
 				blendFunc.dst = GL_ONE_MINUS_SRC_COLOR;
 				break;
@@ -415,28 +441,28 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		}
 		
 		if (!isTwoColorTint) {
-			if (spSkeletonClipping_isClipping(_clipper)) {
-				spSkeletonClipping_clipTriangles(_clipper, (float*)&triangles.verts[0].vertices, triangles.vertCount * sizeof(cocos2d::V3F_C4B_T2F) / 4, triangles.indices, triangles.indexCount, (float*)&triangles.verts[0].texCoords, 6);
+			if (_clipper->isClipping()) {
+				_clipper->clipTriangles((float*)&triangles.verts[0].vertices, triangles.indices, triangles.indexCount, (float*)&triangles.verts[0].texCoords, triangles.vertCount * sizeof(cocos2d::V3F_C4B_T2F) / 4);
 				batch->deallocateVertices(triangles.vertCount);
 				
-				if (_clipper->clippedTriangles->size == 0){
-					spSkeletonClipping_clipEnd(_clipper, slot);
+				if (_clipper->getClippedTriangles().size() == 0){
+					_clipper->clipEnd(*slot);
 					continue;
 				}
 				
-				triangles.vertCount = _clipper->clippedVertices->size >> 1;
+				triangles.vertCount = _clipper->getClippedVertices().size() >> 1;
 				triangles.verts = batch->allocateVertices(triangles.vertCount);
-				triangles.indexCount = _clipper->clippedTriangles->size;
+				triangles.indexCount = _clipper->getClippedTriangles().size();
 				triangles.indices = batch->allocateIndices(triangles.indexCount);
-				memcpy(triangles.indices, _clipper->clippedTriangles->items, sizeof(unsigned short) * _clipper->clippedTriangles->size);
+				memcpy(triangles.indices, _clipper->getClippedTriangles().buffer(), sizeof(unsigned short) * _clipper->getClippedTriangles().size());
 				
 				cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, _glProgramState, blendFunc, triangles, transform, transformFlags);
 				
-				float* verts = _clipper->clippedVertices->items;
-				float* uvs = _clipper->clippedUVs->items;
+				float* verts = _clipper->getClippedVertices().buffer();
+				float* uvs = _clipper->getClippedUVs().buffer();
 				if (_effect) {
-					spColor light;
-					spColor dark;
+					Color light;
+					Color dark;
 					light.r = color.r / 255.0f;
 					light.g = color.g / 255.0f;
 					light.b = color.b / 255.0f;
@@ -444,13 +470,13 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 					dark.r = dark.g = dark.b = dark.a = 0;
 					for (int v = 0, vn = batchedTriangles->getTriangles().vertCount, vv = 0; v < vn; ++v, vv+=2) {
 						V3F_C4B_T2F* vertex = batchedTriangles->getTriangles().verts + v;
-						spColor lightCopy = light;
-						spColor darkCopy = dark;
+						Color lightCopy = light;
+						Color darkCopy = dark;
 						vertex->vertices.x = verts[vv];
 						vertex->vertices.y = verts[vv + 1];
 						vertex->texCoords.u = uvs[vv];
 						vertex->texCoords.v = uvs[vv + 1];
-						_effect->transform(_effect, &vertex->vertices.x, &vertex->vertices.y, &vertex->texCoords.u, &vertex->texCoords.v, &lightCopy, &darkCopy);
+						_effect->transform(vertex->vertices.x, vertex->vertices.y, vertex->texCoords.u, vertex->texCoords.v, lightCopy, darkCopy);
 						vertex->colors.r = (GLubyte)(lightCopy.r * 255);
 						vertex->colors.g = (GLubyte)(lightCopy.g * 255);
 						vertex->colors.b = (GLubyte)(lightCopy.b * 255);
@@ -473,8 +499,8 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, _glProgramState, blendFunc, triangles, transform, transformFlags);
 				
 				if (_effect) {
-					spColor light;
-					spColor dark;
+					Color light;
+					Color dark;
 					light.r = color.r / 255.0f;
 					light.g = color.g / 255.0f;
 					light.b = color.b / 255.0f;
@@ -482,9 +508,9 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 					dark.r = dark.g = dark.b = dark.a = 0;
 					for (int v = 0, vn = batchedTriangles->getTriangles().vertCount; v < vn; ++v) {
 						V3F_C4B_T2F* vertex = batchedTriangles->getTriangles().verts + v;
-						spColor lightCopy = light;
-						spColor darkCopy = dark;
-						_effect->transform(_effect, &vertex->vertices.x, &vertex->vertices.y, &vertex->texCoords.u, &vertex->texCoords.v, &lightCopy, &darkCopy);
+						Color lightCopy = light;
+						Color darkCopy = dark;
+						_effect->transform(vertex->vertices.x, vertex->vertices.y, vertex->texCoords.u, vertex->texCoords.v, lightCopy,  darkCopy);
 						vertex->colors.r = (GLubyte)(lightCopy.r * 255);
 						vertex->colors.g = (GLubyte)(lightCopy.g * 255);
 						vertex->colors.b = (GLubyte)(lightCopy.b * 255);
@@ -501,29 +527,29 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				}
 			}
 		} else {
-			if (spSkeletonClipping_isClipping(_clipper)) {
-				spSkeletonClipping_clipTriangles(_clipper, (float*)&trianglesTwoColor.verts[0].position, trianglesTwoColor.vertCount * sizeof(V3F_C4B_C4B_T2F) / 4, trianglesTwoColor.indices, trianglesTwoColor.indexCount, (float*)&trianglesTwoColor.verts[0].texCoords, 7);
+			if (_clipper->isClipping()) {
+				_clipper->clipTriangles((float*)&trianglesTwoColor.verts[0].position, trianglesTwoColor.indices, trianglesTwoColor.indexCount, (float*)&trianglesTwoColor.verts[0].texCoords, trianglesTwoColor.vertCount * sizeof(V3F_C4B_C4B_T2F) / 4);
 				twoColorBatch->deallocateVertices(trianglesTwoColor.vertCount);
 				
-				if (_clipper->clippedTriangles->size == 0){
-					spSkeletonClipping_clipEnd(_clipper, slot);
+				if (_clipper->getClippedTriangles().size() == 0){
+					_clipper->clipEnd(*slot);
 					continue;
 				}
 				
-				trianglesTwoColor.vertCount = _clipper->clippedVertices->size >> 1;
+				trianglesTwoColor.vertCount = _clipper->getClippedVertices().size() >> 1;
 				trianglesTwoColor.verts = twoColorBatch->allocateVertices(trianglesTwoColor.vertCount);
-				trianglesTwoColor.indexCount = _clipper->clippedTriangles->size;
+				trianglesTwoColor.indexCount = _clipper->getClippedTriangles().size();
 				trianglesTwoColor.indices = twoColorBatch->allocateIndices(trianglesTwoColor.indexCount);
-				memcpy(trianglesTwoColor.indices, _clipper->clippedTriangles->items, sizeof(unsigned short) * _clipper->clippedTriangles->size);
+				memcpy(trianglesTwoColor.indices, _clipper->getClippedTriangles().buffer(), sizeof(unsigned short) * _clipper->getClippedTriangles().size());
 				
 				TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture->getName(), _glProgramState, blendFunc, trianglesTwoColor, transform, transformFlags);
 				
-				float* verts = _clipper->clippedVertices->items;
-				float* uvs = _clipper->clippedUVs->items;
+				float* verts = _clipper->getClippedVertices().buffer();
+				float* uvs = _clipper->getClippedUVs().buffer();
 				
 				if (_effect) {
-					spColor light;
-					spColor dark;
+					Color light;
+					Color dark;
 					light.r = color.r / 255.0f;
 					light.g = color.g / 255.0f;
 					light.b = color.b / 255.0f;
@@ -534,13 +560,13 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 					dark.a = darkColor.a / 255.0f;
 					for (int v = 0, vn = batchedTriangles->getTriangles().vertCount, vv = 0; v < vn; ++v, vv += 2) {
 						V3F_C4B_C4B_T2F* vertex = batchedTriangles->getTriangles().verts + v;
-						spColor lightCopy = light;
-						spColor darkCopy = dark;
+						Color lightCopy = light;
+						Color darkCopy = dark;
 						vertex->position.x = verts[vv];
 						vertex->position.y = verts[vv + 1];
 						vertex->texCoords.u = uvs[vv];
 						vertex->texCoords.v = uvs[vv + 1];
-						_effect->transform(_effect, &vertex->position.x, &vertex->position.y, &vertex->texCoords.u, &vertex->texCoords.v, &lightCopy, &darkCopy);
+						_effect->transform(vertex->position.x, vertex->position.y, vertex->texCoords.u, vertex->texCoords.v, lightCopy, darkCopy);
 						vertex->color.r = (GLubyte)(lightCopy.r * 255);
 						vertex->color.g = (GLubyte)(lightCopy.g * 255);
 						vertex->color.b = (GLubyte)(lightCopy.b * 255);
@@ -571,8 +597,8 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture->getName(), _glProgramState, blendFunc, trianglesTwoColor, transform, transformFlags);
 				
 				if (_effect) {
-					spColor light;
-					spColor dark;
+					Color light;
+					Color dark;
 					light.r = color.r / 255.0f;
 					light.g = color.g / 255.0f;
 					light.b = color.b / 255.0f;
@@ -584,9 +610,9 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 					
 					for (int v = 0, vn = batchedTriangles->getTriangles().vertCount; v < vn; ++v) {
 						V3F_C4B_C4B_T2F* vertex = batchedTriangles->getTriangles().verts + v;
-						spColor lightCopy = light;
-						spColor darkCopy = dark;
-						_effect->transform(_effect, &vertex->position.x, &vertex->position.y, &vertex->texCoords.u, &vertex->texCoords.v, &lightCopy, &darkCopy);
+						Color lightCopy = light;
+						Color darkCopy = dark;
+						_effect->transform(vertex->position.x, vertex->position.y, vertex->texCoords.u, vertex->texCoords.v, lightCopy, darkCopy);
 						vertex->color.r = (GLubyte)(lightCopy.r * 255);
 						vertex->color.g = (GLubyte)(lightCopy.g * 255);
 						vertex->color.b = (GLubyte)(lightCopy.b * 255);
@@ -611,9 +637,9 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				}
 			}
 		}
-		spSkeletonClipping_clipEnd(_clipper, slot);
+		_clipper->clipEnd(*slot);
 	}
-	spSkeletonClipping_clipEnd2(_clipper);
+	_clipper->clipEnd();
 	
 	if (lastTwoColorTrianglesCommand) {
 		Node* parent = this->getParent();
@@ -628,7 +654,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		if (!parent || parent->getChildrenCount() > 100 || getChildrenCount() != 0) {
 			lastTwoColorTrianglesCommand->setForceFlush(true);
 		} else {
-			Vector<Node*>& children = parent->getChildren();
+			cocos2d::Vector<Node*>& children = parent->getChildren();
 			Node* sibling = nullptr;
 			for (ssize_t i = 0; i < children.size(); i++) {
 				if (children.at(i) == this) {
@@ -652,7 +678,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		}
 	}
 	
-	if (_effect) _effect->end(_effect);
+	if (_effect) _effect->end();
 
 	if (_debugSlots || _debugBones || _debugMeshes) {
         drawDebug(renderer, transform, transformFlags);
@@ -673,11 +699,11 @@ void SkeletonRenderer::drawDebug (Renderer* renderer, const Mat4 &transform, uin
         glLineWidth(1);
         Vec2 points[4];
         V3F_C4B_T2F_Quad quad;
-        for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
-            spSlot* slot = _skeleton->drawOrder[i];
-            if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
-            spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-            spRegionAttachment_computeWorldVertices(attachment, slot->bone, worldVertices, 0, 2);
+        for (int i = 0, n = _skeleton->getSlots().size(); i < n; i++) {
+            Slot* slot = _skeleton->getDrawOrder()[i];
+            if (!slot->getAttachment() || !slot->getAttachment()->getRTTI().isExactly(RegionAttachment::rtti)) continue;
+            RegionAttachment* attachment = (RegionAttachment*)slot->getAttachment();
+            attachment->computeWorldVertices(slot->getBone(), worldVertices, 0, 2);
             points[0] = Vec2(worldVertices[0], worldVertices[1]);
             points[1] = Vec2(worldVertices[2], worldVertices[3]);
             points[2] = Vec2(worldVertices[4], worldVertices[5]);
@@ -688,17 +714,17 @@ void SkeletonRenderer::drawDebug (Renderer* renderer, const Mat4 &transform, uin
     if (_debugBones) {
         // Bone lengths.
         glLineWidth(2);
-        for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
-            spBone *bone = _skeleton->bones[i];
-            float x = bone->data->length * bone->a + bone->worldX;
-            float y = bone->data->length * bone->c + bone->worldY;
-            drawNode->drawLine(Vec2(bone->worldX, bone->worldY), Vec2(x, y), Color4F::RED);
+        for (int i = 0, n = _skeleton->getBones().size(); i < n; i++) {
+            Bone *bone = _skeleton->getBones()[i];
+            float x = bone->getData().getLength() * bone->getA() + bone->getWorldX();
+            float y = bone->getData().getLength() * bone->getC() + bone->getWorldY();
+            drawNode->drawLine(Vec2(bone->getWorldX(), bone->getWorldY()), Vec2(x, y), Color4F::RED);
         }
         // Bone origins.
         auto color = Color4F::BLUE; // Root bone is blue.
-        for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
-            spBone *bone = _skeleton->bones[i];
-            drawNode->drawPoint(Vec2(bone->worldX, bone->worldY), 4, color);
+        for (int i = 0, n = _skeleton->getBones().size(); i < n; i++) {
+            Bone *bone = _skeleton->getBones()[i];
+            drawNode->drawPoint(Vec2(bone->getWorldX(), bone->getWorldY()), 4, color);
             if (i == 0) color = Color4F::GREEN;
         }
     }
@@ -706,16 +732,16 @@ void SkeletonRenderer::drawDebug (Renderer* renderer, const Mat4 &transform, uin
 	if (_debugMeshes) {
 		// Meshes.
 		glLineWidth(1);
-		for (int i = 0, n = _skeleton->slotsCount; i < n; ++i) {
-			spSlot* slot = _skeleton->drawOrder[i];
-			if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_MESH) continue;
-			spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
-			ensureWorldVerticesCapacity(attachment->super.worldVerticesLength);
-			spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, attachment->super.worldVerticesLength, worldVertices, 0, 2);
-			for (int ii = 0; ii < attachment->trianglesCount;) {
-				Vec2 v1(worldVertices + (attachment->triangles[ii++] * 2));
-				Vec2 v2(worldVertices + (attachment->triangles[ii++] * 2));
-				Vec2 v3(worldVertices + (attachment->triangles[ii++] * 2));
+		for (int i = 0, n = _skeleton->getSlots().size(); i < n; ++i) {
+			Slot* slot = _skeleton->getDrawOrder()[i];
+			if (!slot->getAttachment() || !slot->getAttachment()->getRTTI().isExactly(MeshAttachment::rtti)) continue;
+			MeshAttachment* attachment = (MeshAttachment*)slot->getAttachment();
+			ensureWorldVerticesCapacity(attachment->getWorldVerticesLength());
+			attachment->computeWorldVertices(*slot, 0, attachment->getWorldVerticesLength(), worldVertices, 0, 2);
+			for (int ii = 0; ii < attachment->getTriangles().size();) {
+				Vec2 v1(worldVertices + (attachment->getTriangles()[ii++] * 2));
+				Vec2 v2(worldVertices + (attachment->getTriangles()[ii++] * 2));
+				Vec2 v3(worldVertices + (attachment->getTriangles()[ii++] * 2));
 				drawNode->drawLine(v1, v2, Color4F::YELLOW);
 				drawNode->drawLine(v2, v3, Color4F::YELLOW);
 				drawNode->drawLine(v3, v1, Color4F::YELLOW);
@@ -727,31 +753,23 @@ void SkeletonRenderer::drawDebug (Renderer* renderer, const Mat4 &transform, uin
     drawNode->draw(renderer, transform, transformFlags);
     director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
 }
-
-AttachmentVertices* SkeletonRenderer::getAttachmentVertices (spRegionAttachment* attachment) const {
-	return (AttachmentVertices*)attachment->rendererObject;
-}
-
-AttachmentVertices* SkeletonRenderer::getAttachmentVertices (spMeshAttachment* attachment) const {
-	return (AttachmentVertices*)attachment->rendererObject;
-}
-
+	
 Rect SkeletonRenderer::getBoundingBox () const {
 	float minX = FLT_MAX, minY = FLT_MAX, maxX = -FLT_MAX, maxY = -FLT_MAX;
 	float scaleX = getScaleX(), scaleY = getScaleY();
-	for (int i = 0; i < _skeleton->slotsCount; ++i) {
-		spSlot* slot = _skeleton->slots[i];
-		if (!slot->attachment) continue;
+	for (int i = 0; i < _skeleton->getSlots().size(); ++i) {
+		Slot* slot = _skeleton->getSlots()[i];
+		if (!slot->getAttachment()) continue;
 		int verticesCount;
-		if (slot->attachment->type == SP_ATTACHMENT_REGION) {
-			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->bone, worldVertices, 0, 2);
+		if (slot->getAttachment()->getRTTI().isExactly(RegionAttachment::rtti)) {
+			RegionAttachment* attachment = (RegionAttachment*)slot->getAttachment();
+			attachment->computeWorldVertices(slot->getBone(), worldVertices, 0, 2);
 			verticesCount = 8;
-		} else if (slot->attachment->type == SP_ATTACHMENT_MESH) {
-			spMeshAttachment* mesh = (spMeshAttachment*)slot->attachment;
-			ensureWorldVerticesCapacity(mesh->super.worldVerticesLength);
-			spVertexAttachment_computeWorldVertices(SUPER(mesh), slot, 0, mesh->super.worldVerticesLength, worldVertices, 0, 2);
-			verticesCount = mesh->super.worldVerticesLength;
+		} else if (slot->getAttachment()->getRTTI().isExactly(MeshAttachment::rtti)) {
+			MeshAttachment* mesh = (MeshAttachment*)slot->getAttachment();
+			ensureWorldVerticesCapacity(mesh->getWorldVerticesLength());
+			mesh->computeWorldVertices(*slot, 0, mesh->getWorldVerticesLength(), worldVertices, 0, 2);
+			verticesCount = mesh->getWorldVerticesLength();
 		} else
 			continue;
 		for (int ii = 0; ii < verticesCount; ii += 2) {
@@ -770,42 +788,42 @@ Rect SkeletonRenderer::getBoundingBox () const {
 // --- Convenience methods for Skeleton_* functions.
 
 void SkeletonRenderer::updateWorldTransform () {
-	spSkeleton_updateWorldTransform(_skeleton);
+	_skeleton->updateWorldTransform();
 }
 
 void SkeletonRenderer::setToSetupPose () {
-	spSkeleton_setToSetupPose(_skeleton);
+	_skeleton->setToSetupPose();
 }
 void SkeletonRenderer::setBonesToSetupPose () {
-	spSkeleton_setBonesToSetupPose(_skeleton);
+	_skeleton->setBonesToSetupPose();
 }
 void SkeletonRenderer::setSlotsToSetupPose () {
-	spSkeleton_setSlotsToSetupPose(_skeleton);
+	_skeleton->setSlotsToSetupPose();
 }
 
-spBone* SkeletonRenderer::findBone (const std::string& boneName) const {
-	return spSkeleton_findBone(_skeleton, boneName.c_str());
+Bone* SkeletonRenderer::findBone (const std::string& boneName) const {
+	return _skeleton->findBone(boneName.c_str());
 }
 
-spSlot* SkeletonRenderer::findSlot (const std::string& slotName) const {
-	return spSkeleton_findSlot(_skeleton, slotName.c_str());
+Slot* SkeletonRenderer::findSlot (const std::string& slotName) const {
+	return _skeleton->findSlot(slotName.c_str());
 }
 
-bool SkeletonRenderer::setSkin (const std::string& skinName) {
-	return spSkeleton_setSkinByName(_skeleton, skinName.empty() ? 0 : skinName.c_str()) ? true : false;
+void SkeletonRenderer::setSkin (const std::string& skinName) {
+	_skeleton->setSkin(skinName.empty() ? 0 : skinName.c_str());
 }
-bool SkeletonRenderer::setSkin (const char* skinName) {
-	return spSkeleton_setSkinByName(_skeleton, skinName) ? true : false;
+void SkeletonRenderer::setSkin (const char* skinName) {
+	_skeleton->setSkin(skinName);
 }
 
-spAttachment* SkeletonRenderer::getAttachment (const std::string& slotName, const std::string& attachmentName) const {
-	return spSkeleton_getAttachmentForSlotName(_skeleton, slotName.c_str(), attachmentName.c_str());
+Attachment* SkeletonRenderer::getAttachment (const std::string& slotName, const std::string& attachmentName) const {
+	return _skeleton->getAttachment(slotName.c_str(), attachmentName.c_str());
 }
 bool SkeletonRenderer::setAttachment (const std::string& slotName, const std::string& attachmentName) {
-	return spSkeleton_setAttachment(_skeleton, slotName.c_str(), attachmentName.empty() ? 0 : attachmentName.c_str()) ? true : false;
+	return _skeleton->getAttachment(slotName.c_str(), attachmentName.empty() ? 0 : attachmentName.c_str()) ? true : false;
 }
 bool SkeletonRenderer::setAttachment (const std::string& slotName, const char* attachmentName) {
-	return spSkeleton_setAttachment(_skeleton, slotName.c_str(), attachmentName) ? true : false;
+	return _skeleton->getAttachment(slotName.c_str(), attachmentName) ? true : false;
 }
 	
 void SkeletonRenderer::setTwoColorTint(bool enabled) {
@@ -816,7 +834,7 @@ bool SkeletonRenderer::isTwoColorTint() {
 	return getGLProgramState() == SkeletonTwoColorBatch::getInstance()->getTwoColorTintProgramState();
 }
 	
-void SkeletonRenderer::setVertexEffect(spVertexEffect *effect) {
+void SkeletonRenderer::setVertexEffect(VertexEffect *effect) {
 	this->_effect = effect;
 }
 	
@@ -825,7 +843,7 @@ void SkeletonRenderer::setSlotsRange(int startSlotIndex, int endSlotIndex) {
 	this->_endSlotIndex = endSlotIndex;
 }
 
-spSkeleton* SkeletonRenderer::getSkeleton () {
+Skeleton* SkeletonRenderer::getSkeleton () {
 	return _skeleton;
 }
 

@@ -36,7 +36,7 @@
 #include <spine/String.h>
 #include <spine/Color.h>
 
-namespace Spine {
+namespace spine {
 class BoneData;
 
 class SlotData : public SpineObject {

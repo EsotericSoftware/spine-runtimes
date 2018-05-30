@@ -33,7 +33,7 @@
 #include <spine/BoneData.h>
 #include <spine/Skeleton.h>
 
-using namespace Spine;
+using namespace spine;
 
 RTTI_IMPL(Bone, Updatable)
 
