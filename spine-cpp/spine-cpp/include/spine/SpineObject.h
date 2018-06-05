@@ -32,6 +32,7 @@
 #define Spine_Object_h
 
 #include <new>
+#include <cstddef>
 
 namespace spine {
 class String;

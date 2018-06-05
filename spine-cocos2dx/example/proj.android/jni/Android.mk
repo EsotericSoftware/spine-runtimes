@@ -12,64 +12,84 @@ LOCAL_MODULE := MyGame_shared
 LOCAL_MODULE_FILENAME := libMyGame
 
 LOCAL_SRC_FILES := hellocpp/main.cpp \
-				   ../../Classes/AppDelegate.cpp \
-				   ../../Classes/BatchingExample.cpp \
-				   ../../Classes/GoblinsExample.cpp \
-				   ../../Classes/RaptorExample.cpp \
-				   ../../Classes/SimpleCommand.cpp \
-				   ../../Classes/SpineboyExample.cpp \
-				   ../../Classes/CoinExample.cpp \
-				   ../../Classes/TankExample.cpp \
-				   ../../../src/spine/AttachmentVertices.cpp \
-				   ../../../src/spine/Cocos2dAttachmentLoader.cpp \
-				   ../../../src/spine/SkeletonAnimation.cpp \
-				   ../../../src/spine/SkeletonBatch.cpp \
-				   ../../../src/spine/SkeletonTwoColorBatch.cpp \
-				   ../../../src/spine/SkeletonRenderer.cpp \
-				   ../../../src/spine/spine-cocos2dx.cpp \
-				   ../../../../spine-c/spine-c/src/spine/Animation.c \
-				   ../../../../spine-c/spine-c/src/spine/ClippingAttachment.c \
-				   ../../../../spine-c/spine-c/src/spine/SkeletonClipping.c \
-				   ../../../../spine-c/spine-c/src/spine/Triangulator.c \
-				   ../../../../spine-c/spine-c/src/spine/Array.c \
-				   ../../../../spine-c/spine-c/src/spine/AnimationState.c \
-				   ../../../../spine-c/spine-c/src/spine/AnimationStateData.c \
-				   ../../../../spine-c/spine-c/src/spine/Atlas.c \
-				   ../../../../spine-c/spine-c/src/spine/AtlasAttachmentLoader.c \
-				   ../../../../spine-c/spine-c/src/spine/Attachment.c \
-				   ../../../../spine-c/spine-c/src/spine/AttachmentLoader.c \
-				   ../../../../spine-c/spine-c/src/spine/Bone.c \
-				   ../../../../spine-c/spine-c/src/spine/BoneData.c \
-				   ../../../../spine-c/spine-c/src/spine/BoundingBoxAttachment.c \
-				   ../../../../spine-c/spine-c/src/spine/Color.c \
-				   ../../../../spine-c/spine-c/src/spine/Event.c \
-				   ../../../../spine-c/spine-c/src/spine/EventData.c \
-				   ../../../../spine-c/spine-c/src/spine/IkConstraint.c \
-				   ../../../../spine-c/spine-c/src/spine/IkConstraintData.c \
-				   ../../../../spine-c/spine-c/src/spine/Json.c \
-				   ../../../../spine-c/spine-c/src/spine/MeshAttachment.c \
-				   ../../../../spine-c/spine-c/src/spine/PathAttachment.c \
-				   ../../../../spine-c/spine-c/src/spine/PointAttachment.c \
-				   ../../../../spine-c/spine-c/src/spine/PathConstraint.c \
-				   ../../../../spine-c/spine-c/src/spine/PathConstraintData.c \
-				   ../../../../spine-c/spine-c/src/spine/RegionAttachment.c \
-				   ../../../../spine-c/spine-c/src/spine/Skeleton.c \
-				   ../../../../spine-c/spine-c/src/spine/SkeletonBinary.c \
-				   ../../../../spine-c/spine-c/src/spine/SkeletonBounds.c \
-				   ../../../../spine-c/spine-c/src/spine/SkeletonData.c \
-				   ../../../../spine-c/spine-c/src/spine/SkeletonJson.c \
-				   ../../../../spine-c/spine-c/src/spine/Skin.c \
-				   ../../../../spine-c/spine-c/src/spine/Slot.c \
-				   ../../../../spine-c/spine-c/src/spine/SlotData.c \
-				   ../../../../spine-c/spine-c/src/spine/TransformConstraint.c \
-				   ../../../../spine-c/spine-c/src/spine/TransformConstraintData.c \
-				   ../../../../spine-c/spine-c/src/spine/VertexAttachment.c \
-				   ../../../../spine-c/spine-c/src/spine/VertexEffect.c \
-				   ../../../../spine-c/spine-c/src/spine/extension.c
-
+../../Classes//AppDelegate.cpp \
+../../Classes//BatchingExample.cpp \
+../../Classes//CoinExample.cpp \
+../../Classes//GoblinsExample.cpp \
+../../Classes//RaptorExample.cpp \
+../../Classes//SkeletonRendererSeparatorExample.cpp \
+../../Classes//SpineboyExample.cpp \
+../../Classes//TankExample.cpp \
+../../../src/spine/AttachmentVertices.cpp \
+../../../src/spine/SkeletonAnimation.cpp \
+../../../src/spine/SkeletonBatch.cpp \
+../../../src/spine/SkeletonRenderer.cpp \
+../../../src/spine/SkeletonTwoColorBatch.cpp \
+../../../src/spine/spine-cocos2dx.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/Animation.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/AnimationState.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/AnimationStateData.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/Atlas.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/AtlasAttachmentLoader.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/Attachment.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/AttachmentLoader.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/AttachmentTimeline.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/Bone.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/BoneData.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/BoundingBoxAttachment.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/ClippingAttachment.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/ColorTimeline.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/Constraint.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/CurveTimeline.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/DeformTimeline.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/DrawOrderTimeline.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/Event.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/EventData.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/EventTimeline.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/Extension.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/IkConstraint.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/IkConstraintData.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/IkConstraintTimeline.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/Json.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/LinkedMesh.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/MathUtil.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/MeshAttachment.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/PathAttachment.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/PathConstraint.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/PathConstraintData.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/PathConstraintMixTimeline.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/PathConstraintPositionTimeline.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/PathConstraintSpacingTimeline.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/PointAttachment.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/RegionAttachment.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/RotateTimeline.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/RTTI.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/ScaleTimeline.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/ShearTimeline.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/Skeleton.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/SkeletonBinary.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/SkeletonBounds.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/SkeletonClipping.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/SkeletonData.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/SkeletonJson.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/Skin.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/Slot.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/SlotData.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/SpineObject.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/TextureLoader.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/Timeline.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/TransformConstraint.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/TransformConstraintData.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/TransformConstraintTimeline.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/TranslateTimeline.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/Triangulator.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/TwoColorTimeline.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/Updatable.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/VertexAttachment.cpp \
+../../../../spine-cpp/spine-cpp//src/spine/VertexEffect.cpp \
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \
-				   $(LOCAL_PATH)/../../../../spine-c/spine-c/include \
+				   $(LOCAL_PATH)/../../../../spine-cpp/spine-cpp/include \
 				   $(LOCAL_PATH)/../../../../spine-cocos2dx/src
 
 # _COCOS_HEADER_ANDROID_BEGIN
