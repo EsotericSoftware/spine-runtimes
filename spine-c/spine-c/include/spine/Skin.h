@@ -64,7 +64,6 @@ struct _Entry {
 
 typedef struct _SkinHashTableEntry _SkinHashTableEntry;
 struct _SkinHashTableEntry {
-	unsigned int hashValue;
 	_Entry* entry;
 	_SkinHashTableEntry* next;  /* list for elements with same hashes */
 };
