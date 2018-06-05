@@ -163,7 +163,7 @@ void SkeletonTwoColorBatch::destroyInstance () {
 	}
 }
 
-SkeletonTwoColorBatch::SkeletonTwoColorBatch () {
+SkeletonTwoColorBatch::SkeletonTwoColorBatch () : _vertexBuffer(0), _indexBuffer(0) {
 	for (unsigned int i = 0; i < INITIAL_SIZE; i++) {
 		_commandsPool.push_back(new TwoColorTrianglesCommand());
 	}
@@ -198,8 +198,8 @@ SkeletonTwoColorBatch::~SkeletonTwoColorBatch () {
 		_commandsPool[i] = nullptr;
 	}
 	_twoColorTintShader->release();
-	delete _vertexBuffer;
-	delete _indexBuffer;
+	delete[] _vertexBuffer;
+	delete[] _indexBuffer;
 }
 
 void SkeletonTwoColorBatch::update (float delta) {	
@@ -233,7 +233,7 @@ unsigned short* SkeletonTwoColorBatch::allocateIndices(uint32_t numIndices) {
 	if (_indices.getCapacity() - _indices.size() < numIndices) {
 		unsigned short* oldData = _indices.buffer();
 		int oldSize =_indices.size();
-		_indices.setSize(_indices.size() + numIndices, 0);
+		_indices.ensureCapacity(_indices.size() + numIndices);
 		unsigned short* newData = _indices.buffer();
 		for (uint32_t i = 0; i < this->_nextFreeCommand; i++) {
 			TwoColorTrianglesCommand* command = _commandsPool[i];
@@ -244,7 +244,8 @@ unsigned short* SkeletonTwoColorBatch::allocateIndices(uint32_t numIndices) {
 		}
 	}
 	
-	unsigned short* indices = _indices.buffer() + _indices.size() - numIndices;
+	unsigned short* indices = _indices.buffer() + _indices.size();
+	_indices.setSize(_indices.size() + numIndices, 0);
 	return indices;
 }
 

@@ -31,7 +31,7 @@
 #include <spine/MathUtil.h>
 #include <math.h>
 #include <random>
-#include <cstdlib>
+#include <stdlib.h>
 
 using namespace spine;
 

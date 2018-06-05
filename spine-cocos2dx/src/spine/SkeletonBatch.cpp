@@ -106,7 +106,7 @@ unsigned short* SkeletonBatch::allocateIndices(uint32_t numIndices) {
 	if (_indices.getCapacity() - _indices.size() < numIndices) {
 		unsigned short* oldData = _indices.buffer();
 		int oldSize = _indices.size();
-		_indices.setSize(_indices.size() + numIndices, 0);
+		_indices.ensureCapacity(_indices.size() + numIndices);
 		unsigned short* newData = _indices.buffer();
 		for (uint32_t i = 0; i < this->_nextFreeCommand; i++) {
 			TrianglesCommand* command = _commandsPool[i];
@@ -117,7 +117,8 @@ unsigned short* SkeletonBatch::allocateIndices(uint32_t numIndices) {
 		}
 	}
 	
-	unsigned short* indices = _indices.buffer() + _indices.size() - numIndices;
+	unsigned short* indices = _indices.buffer() + _indices.size();
+	_indices.setSize(_indices.size() + numIndices, 0);
 	return indices;
 }
 

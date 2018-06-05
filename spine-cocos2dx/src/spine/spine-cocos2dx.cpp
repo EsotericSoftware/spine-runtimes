@@ -110,7 +110,7 @@ static void unloadTexture (void* texture) {
 	((Texture2D*)texture)->release();
 }
 
-void Cocos2dTextureLoader::load(AtlasPage& page, const String& path) {
+void Cocos2dTextureLoader::load(AtlasPage& page, const spine::String& path) {
 	Texture2D* texture = Director::getInstance()->getTextureCache()->addImage(path.buffer());
 	CCASSERT(texture != nullptr, "Invalid image");
 	texture->retain();
@@ -132,7 +132,7 @@ Cocos2dExtension::Cocos2dExtension() : DefaultSpineExtension() { }
 	
 Cocos2dExtension::~Cocos2dExtension() { }
 
-char *Cocos2dExtension::_readFile(const String &path, int *length) {
+char *Cocos2dExtension::_readFile(const spine::String &path, int *length) {
 	Data data = FileUtils::getInstance()->getDataFromFile(FileUtils::getInstance()->fullPathForFilename(path.buffer()));
 	if (data.isNull()) return 0;
 	
