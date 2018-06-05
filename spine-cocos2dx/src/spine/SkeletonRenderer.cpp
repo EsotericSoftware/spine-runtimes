@@ -409,7 +409,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		
 		if (!isTwoColorTint) {
 			if (_clipper->isClipping()) {
-				_clipper->clipTriangles((float*)&triangles.verts[0].vertices, triangles.indices, triangles.indexCount, (float*)&triangles.verts[0].texCoords, triangles.vertCount * sizeof(cocos2d::V3F_C4B_T2F) / 4);
+				_clipper->clipTriangles((float*)&triangles.verts[0].vertices, triangles.indices, triangles.indexCount, (float*)&triangles.verts[0].texCoords, sizeof(cocos2d::V3F_C4B_T2F) / 4);
 				batch->deallocateVertices(triangles.vertCount);
 				
 				if (_clipper->getClippedTriangles().size() == 0){
@@ -495,7 +495,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 			}
 		} else {
 			if (_clipper->isClipping()) {
-				_clipper->clipTriangles((float*)&trianglesTwoColor.verts[0].position, trianglesTwoColor.indices, trianglesTwoColor.indexCount, (float*)&trianglesTwoColor.verts[0].texCoords, trianglesTwoColor.vertCount * sizeof(V3F_C4B_C4B_T2F) / 4);
+				_clipper->clipTriangles((float*)&trianglesTwoColor.verts[0].position, trianglesTwoColor.indices, trianglesTwoColor.indexCount, (float*)&trianglesTwoColor.verts[0].texCoords, sizeof(V3F_C4B_C4B_T2F) / 4);
 				twoColorBatch->deallocateVertices(trianglesTwoColor.vertCount);
 				
 				if (_clipper->getClippedTriangles().size() == 0){

@@ -44,8 +44,9 @@ bool CoinExample::init () {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
 	skeletonNode = SkeletonAnimation::createWithBinaryFile("coin-pro.skel", "coin.atlas", 1);
-	skeletonNode->setAnimation(0, "rotate", true);	
-
+	skeletonNode->setAnimation(0, "rotate", true);
+	skeletonNode->setTwoColorTint(true);
+	
 	skeletonNode->setPosition(Vec2(_contentSize.width / 2, 100));
 	addChild(skeletonNode);
 

@@ -107,7 +107,7 @@ bool AppDelegate::applicationDidFinishLaunching () {
 	
 	// create a scene. it's an autorelease object
 	//auto scene = RaptorExample::scene();
-	auto scene = SkeletonRendererSeparatorExample::scene();
+	auto scene = CoinExample::scene();
 
 	// run
 	director->runWithScene(scene);
