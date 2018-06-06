@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 #include "SpinePluginPrivatePCH.h"
+#include "spine/Extension.h"
 
 class FSpinePlugin : public SpinePlugin {
 	virtual void StartupModule() override;
@@ -41,6 +42,10 @@ void FSpinePlugin::StartupModule() {
 }
 
 void FSpinePlugin::ShutdownModule() { }
+
+spine::SpineExtension* spine::getDefaultExtension() {
+	return new spine::DefaultSpineExtension();
+}
 
 
 
