@@ -1079,7 +1079,8 @@ namespace Spine.Unity.Editor {
 				GUI.color = Color.red;
 				GUI.DrawTexture(lineRect, EditorGUIUtility.whiteTexture);
 				GUI.color = Color.white;
-
+                //draw tip(s) after all events checked. otherwise a tip may overlap by event logo
+                List<AnimationEventTooltip> tips = new List<AnimationEventTooltip>();
 				for (int i = 0; i < currentAnimationEvents.Count; i++) {
 					float fr = currentAnimationEventTimes[i];
 					var userEventIcon = Icons.userEvent;
@@ -1098,12 +1099,27 @@ namespace Spine.Unity.Editor {
 							Rect tooltipRect = new Rect(evRect);
 							tooltipRect.width = tooltipStyle.CalcSize(new GUIContent(currentAnimationEvents[i].Data.Name)).x;
 							tooltipRect.y -= 4;
+                            tooltipRect.y -= tooltipRect.height * tips.Count; //to avoid several tips overlap
 							tooltipRect.x += 4;
-							GUI.Label(tooltipRect,  currentAnimationEvents[i].Data.Name, tooltipStyle);
-							GUI.tooltip = currentAnimationEvents[i].Data.Name;
+                            //to avoid tip is too wide and part of it out of barrect
+                            var tmp = tooltipRect.x + tooltipRect.width - (barRect.x + barRect.width);
+                            if(tmp > 0) {
+                                tooltipRect.x -= tmp;
+                            }
+                            AnimationEventTooltip tip;
+                            tip.rect = tooltipRect;
+                            tip.strToShow = currentAnimationEvents[i].Data.Name;
+                            tip.style = tooltipStyle;
+                            tips.Add(tip);
 						}
 					}
 				}
+                
+                //draw tip(s)
+                for(int i = 0; i < tips.Count; i++) {
+                    GUI.Label(tips[i].rect, tips[i].strToShow, tips[i].style);
+                    GUI.tooltip = tips[i].strToShow;
+                }
 			}
 		}
 
@@ -1130,6 +1146,13 @@ namespace Spine.Unity.Editor {
 				previewGameObject = null;
 			}
 		}
+
+        public struct AnimationEventTooltip
+        {
+            public Rect rect;
+            public string strToShow;
+            public GUIStyle style;
+        }
 	}
 
 
