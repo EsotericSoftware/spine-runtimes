@@ -138,8 +138,8 @@ void Skin::attachAll(Skeleton &skeleton, Skin &oldSkin) {
 		Slot *slot = slots[slotIndex];
 
 		if (slot->getAttachment() == entry._attachment) {
-			Attachment *attachment = NULL;
-			if ((attachment = getAttachment(slotIndex, entry._name))) {
+			Attachment *attachment = getAttachment(slotIndex, entry._name);
+			if (attachment) {
 				slot->setAttachment(attachment);
 			}
 		}

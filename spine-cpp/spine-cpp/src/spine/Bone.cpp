@@ -164,11 +164,11 @@ Bone::updateWorldTransform(float x, float y, float rotation, float scaleX, float
 				s = MathUtil::abs(pa * pd - pb * pc) / s;
 				pb = pc * s;
 				pd = pa * s;
-				prx = MathUtil::atan2(pc, pa) * RAD_DEG;
+				prx = MathUtil::atan2(pc, pa) * MathUtil::Rad_Deg;
 			} else {
 				pa = 0;
 				pc = 0;
-				prx = 90 - MathUtil::atan2(pd, pb) * RAD_DEG;
+				prx = 90 - MathUtil::atan2(pd, pb) * MathUtil::Rad_Deg;
 			}
 			rx = rotation + shearX - prx;
 			ry = rotation + shearY - prx + 90;
@@ -195,7 +195,7 @@ Bone::updateWorldTransform(float x, float y, float rotation, float scaleX, float
 			za *= s;
 			zc *= s;
 			s = MathUtil::sqrt(za * za + zc * zc);
-			r = PI / 2 + MathUtil::atan2(zc, za);
+			r = MathUtil::Pi / 2 + MathUtil::atan2(zc, za);
 			zb = MathUtil::cos(r) * s;
 			zd = MathUtil::sin(r) * s;
 			la = MathUtil::cosDeg(shearX) * scaleX;
@@ -258,14 +258,14 @@ float Bone::worldToLocalRotation(float worldRotation) {
 	float sin = MathUtil::sinDeg(worldRotation);
 	float cos = MathUtil::cosDeg(worldRotation);
 
-	return MathUtil::atan2(_a * sin - _c * cos, _d * cos - _b * sin) * RAD_DEG;
+	return MathUtil::atan2(_a * sin - _c * cos, _d * cos - _b * sin) * MathUtil::Rad_Deg;
 }
 
 float Bone::localToWorldRotation(float localRotation) {
 	float sin = MathUtil::sinDeg(localRotation);
 	float cos = MathUtil::cosDeg(localRotation);
 
-	return MathUtil::atan2(cos * _c + sin * _d, cos * _a + sin * _b) * RAD_DEG;
+	return MathUtil::atan2(cos * _c + sin * _d, cos * _a + sin * _b) * MathUtil::Rad_Deg;
 }
 
 void Bone::rotateWorld(float degrees) {
@@ -298,7 +298,7 @@ float Bone::getWorldToLocalRotationX() {
 	float a = _a;
 	float c = _c;
 
-	return MathUtil::atan2(pa * c - pc * a, pd * a - pb * c) * RAD_DEG;
+	return MathUtil::atan2(pa * c - pc * a, pd * a - pb * c) * MathUtil::Rad_Deg;
 }
 
 float Bone::getWorldToLocalRotationY() {
@@ -314,7 +314,7 @@ float Bone::getWorldToLocalRotationY() {
 	float b = _b;
 	float d = _d;
 
-	return MathUtil::atan2(pa * d - pc * b, pd * b - pb * d) * RAD_DEG;
+	return MathUtil::atan2(pa * d - pc * b, pd * b - pb * d) * MathUtil::Rad_Deg;
 }
 
 BoneData &Bone::getData() {
@@ -494,11 +494,11 @@ void Bone::setWorldY(float inValue) {
 }
 
 float Bone::getWorldRotationX() {
-	return MathUtil::atan2(_c, _a) * RAD_DEG;
+	return MathUtil::atan2(_c, _a) * MathUtil::MathUtil::Rad_Deg;
 }
 
 float Bone::getWorldRotationY() {
-	return MathUtil::atan2(_d, _b) * RAD_DEG;
+	return MathUtil::atan2(_d, _b) * MathUtil::Rad_Deg;
 }
 
 float Bone::getWorldScaleX() {
@@ -522,11 +522,11 @@ void Bone::updateAppliedTransform() {
 	if (!parent) {
 		_ax = _worldX;
 		_ay = _worldY;
-		_arotation = MathUtil::atan2(_c, _a) * RAD_DEG;
+		_arotation = MathUtil::atan2(_c, _a) * MathUtil::Rad_Deg;
 		_ascaleX = MathUtil::sqrt(_a * _a + _c * _c);
 		_ascaleY = MathUtil::sqrt(_b * _b + _d * _d);
 		_ashearX = 0;
-		_ashearY = MathUtil::atan2(_a * _b + _c * _d, _a * _d - _b * _c) * RAD_DEG;
+		_ashearY = MathUtil::atan2(_a * _b + _c * _d, _a * _d - _b * _c) * MathUtil::Rad_Deg;
 	} else {
 		float pa = parent->_a, pb = parent->_b, pc = parent->_c, pd = parent->_d;
 		float pid = 1 / (pa * pd - pb * pc);
@@ -546,13 +546,13 @@ void Bone::updateAppliedTransform() {
 		if (_ascaleX > 0.0001f) {
 			float det = ra * rd - rb * rc;
 			_ascaleY = det / _ascaleX;
-			_ashearY = MathUtil::atan2(ra * rb + rc * rd, det) * RAD_DEG;
-			_arotation = MathUtil::atan2(rc, ra) * RAD_DEG;
+			_ashearY = MathUtil::atan2(ra * rb + rc * rd, det) * MathUtil::Rad_Deg;
+			_arotation = MathUtil::atan2(rc, ra) * MathUtil::Rad_Deg;
 		} else {
 			_ascaleX = 0;
 			_ascaleY = MathUtil::sqrt(rb * rb + rd * rd);
 			_ashearY = 0;
-			_arotation = 90 - MathUtil::atan2(rd, rb) * RAD_DEG;
+			_arotation = 90 - MathUtil::atan2(rd, rb) * MathUtil::Rad_Deg;
 		}
 	}
 }

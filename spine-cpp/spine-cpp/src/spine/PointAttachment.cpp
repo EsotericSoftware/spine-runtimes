@@ -55,7 +55,7 @@ float PointAttachment::computeWorldRotation(Bone &bone) {
 	float ix = cos * bone._a + sin * bone._b;
 	float iy = cos * bone._c + sin * bone._d;
 
-	return MathUtil::atan2(iy, ix) * RAD_DEG;
+	return MathUtil::atan2(iy, ix) * MathUtil::Rad_Deg;
 }
 
 float PointAttachment::getX() {

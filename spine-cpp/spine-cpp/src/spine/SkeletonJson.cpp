@@ -443,7 +443,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				Json *attachmentMap;
 
 				for (attachmentMap = attachmentsMap->_child; attachmentMap; attachmentMap = attachmentMap->_next) {
-					Attachment *attachment;
+					Attachment *attachment = NULL;
 					const char *skinAttachmentName = attachmentMap->_name;
 					const char *attachmentName = Json::getString(attachmentMap, "name", skinAttachmentName);
 					const char *attachmentPath = Json::getString(attachmentMap, "path", attachmentName);

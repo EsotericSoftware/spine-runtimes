@@ -136,7 +136,7 @@ float SwirlVertexEffect::getRadius() {
 }
 
 void SwirlVertexEffect::setAngle(float angle) {
-	_angle = angle * spine::DEG_RAD;
+	_angle = angle * MathUtil::Deg_Rad;
 }
 
 float SwirlVertexEffect::getAngle() {
