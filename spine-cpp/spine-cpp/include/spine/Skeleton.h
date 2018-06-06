@@ -34,7 +34,7 @@
 #include <spine/Vector.h>
 #include <spine/MathUtil.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 #include <spine/Color.h>
 
 #include <limits> // std::numeric_limits

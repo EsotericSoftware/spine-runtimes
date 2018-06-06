@@ -36,7 +36,7 @@
 #include <spine/RotateMode.h>
 #include <spine/Vector.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
 namespace spine {
     class BoneData;

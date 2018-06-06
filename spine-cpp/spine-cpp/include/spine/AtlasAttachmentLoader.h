@@ -33,7 +33,7 @@
 
 #include <spine/AttachmentLoader.h>
 #include <spine/Vector.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
 
 namespace spine {

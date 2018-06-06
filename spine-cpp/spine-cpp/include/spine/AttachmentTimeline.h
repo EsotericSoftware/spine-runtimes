@@ -36,7 +36,7 @@
 #include <spine/Vector.h>
 #include <spine/MixBlend.h>
 #include <spine/MixDirection.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
 namespace spine {
     class Skeleton;

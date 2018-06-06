@@ -35,7 +35,7 @@
 #include <spine/MixBlend.h>
 #include <spine/MixDirection.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
 namespace spine {
 class Timeline;

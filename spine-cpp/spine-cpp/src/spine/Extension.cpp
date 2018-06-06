@@ -28,8 +28,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/Extension.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
 #include <assert.h>
 

@@ -28,45 +28,47 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/EventData.h>
 
 #include <assert.h>
 
-using namespace spine;
-
-EventData::EventData(const String &name) :
+spine::EventData::EventData(const spine::String &name) :
 		_name(name),
-		_intValue(0),
-		_floatValue(0),
-		_stringValue() {
+		_intValue((int)0),
+		_floatValue(0.0f)
+		 {
 	assert(_name.length() > 0);
 }
 
 /// The name of the event, which is unique within the skeleton.
-const String &EventData::getName() const {
+const spine::String &spine::EventData::getName() const {
 	return _name;
 }
 
-int EventData::getIntValue() {
+int spine::EventData::getIntValue() {
 	return _intValue;
 }
 
-void EventData::setIntValue(int inValue) {
+void spine::EventData::setIntValue(int inValue) {
 	_intValue = inValue;
 }
 
-float EventData::getFloatValue() {
+float spine::EventData::getFloatValue() {
 	return _floatValue;
 }
 
-void EventData::setFloatValue(float inValue) {
+void spine::EventData::setFloatValue(float inValue) {
 	_floatValue = inValue;
 }
 
-const String &EventData::getStringValue() {
+const spine::String &spine::EventData::getStringValue() {
 	return _stringValue;
 }
 
-void EventData::setStringValue(const String &inValue) {
-	_stringValue = inValue;
+void spine::EventData::setStringValue(const spine::String &inValue) {
+	this->_stringValue = inValue;
 }

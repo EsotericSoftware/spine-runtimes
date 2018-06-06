@@ -28,14 +28,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <spine/AnimationState.h>
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
 
+#include <spine/AnimationState.h>
 #include <spine/Animation.h>
 #include <spine/Event.h>
 #include <spine/AnimationStateData.h>
 #include <spine/Skeleton.h>
 #include <spine/RotateTimeline.h>
-
 #include <spine/SkeletonData.h>
 #include <spine/Bone.h>
 #include <spine/BoneData.h>
@@ -657,6 +659,13 @@ void AnimationState::setTimeScale(float inValue) {
 
 void AnimationState::setListener(AnimationStateListener inValue) {
 	_listener = inValue;
+}
+
+void AnimationState::disableQueue() {
+	_queue->_drainDisabled = true;
+}
+void AnimationState::enableQueue() {
+	_queue->_drainDisabled = false;
 }
 
 Animation *AnimationState::getEmptyAnimation() {

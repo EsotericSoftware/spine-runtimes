@@ -30,7 +30,11 @@
 
 #include "SpinePluginPrivatePCH.h"
 
+#include "spine/spine.h"
+
 #define LOCTEXT_NAMESPACE "Spine"
+
+using namespace spine;
 
 USpineSkeletonComponent::USpineSkeletonComponent () {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -40,22 +44,31 @@ USpineSkeletonComponent::USpineSkeletonComponent () {
 
 bool USpineSkeletonComponent::SetSkin(const FString& skinName) {
 	CheckState();
-	if (skeleton) return spSkeleton_setSkinByName(skeleton, TCHAR_TO_UTF8(*skinName)) != 0;
+	if (skeleton) {
+		Skin* skin = skeleton->getData()->findSkin(TCHAR_TO_UTF8(*skinName));
+		if (!skin) return false;
+		skeleton->setSkin(skin);
+		return true;
+	}
 	else return false;
 }
 
 bool USpineSkeletonComponent::SetAttachment (const FString& slotName, const FString& attachmentName) {
 	CheckState();
-	if (skeleton) return spSkeleton_setAttachment(skeleton, TCHAR_TO_UTF8(*slotName), TCHAR_TO_UTF8(*attachmentName)) != 0;
+	if (skeleton) {
+		if (!skeleton->getAttachment(TCHAR_TO_UTF8(*slotName), TCHAR_TO_UTF8(*attachmentName))) return false;
+		skeleton->setAttachment(TCHAR_TO_UTF8(*slotName), TCHAR_TO_UTF8(*attachmentName));
+		return true;
+	}
 	return false;
 }
 
 FTransform USpineSkeletonComponent::GetBoneWorldTransform (const FString& BoneName) {
 	CheckState();
 	if (skeleton) {
-		spBone* bone = spSkeleton_findBone(skeleton, TCHAR_TO_UTF8(*BoneName));		
+		Bone* bone = skeleton->findBone(TCHAR_TO_UTF8(*BoneName));		
 		if (!bone) return FTransform();
-		if (!bone->appliedValid) this->InternalTick(0, false);		
+		if (!bone->isAppliedValid()) this->InternalTick(0, false);		
 
 		// Need to fetch the renderer component to get world transform of actor plus
 		// offset by renderer component and its parent component(s). If no renderer
@@ -68,12 +81,12 @@ FTransform USpineSkeletonComponent::GetBoneWorldTransform (const FString& BoneNa
 			else baseTransform = owner->GetActorTransform();
 		}
 
-		FVector position(bone->worldX, 0, bone->worldY);
+		FVector position(bone->getWorldX(), 0, bone->getWorldY());
 		FMatrix localTransform;
 		localTransform.SetIdentity();
-		localTransform.SetAxis(2, FVector(bone->a, 0, bone->c));
-		localTransform.SetAxis(0, FVector(bone->b, 0, bone->d));
-		localTransform.SetOrigin(FVector(bone->worldX, 0, bone->worldY));				
+		localTransform.SetAxis(2, FVector(bone->getA(), 0, bone->getC()));
+		localTransform.SetAxis(0, FVector(bone->getB(), 0, bone->getD()));
+		localTransform.SetOrigin(FVector(bone->getWorldX(), 0, bone->getWorldY()));				
 		localTransform = localTransform * baseTransform.ToMatrixWithScale();
 
 		FTransform result;
@@ -86,9 +99,9 @@ FTransform USpineSkeletonComponent::GetBoneWorldTransform (const FString& BoneNa
 void USpineSkeletonComponent::SetBoneWorldPosition (const FString& BoneName, const FVector& position) {
 	CheckState();
 	if (skeleton) {
-		spBone* bone = spSkeleton_findBone(skeleton, TCHAR_TO_UTF8(*BoneName));
+		Bone* bone = skeleton->findBone(TCHAR_TO_UTF8(*BoneName));
 		if (!bone) return;
-		if (!bone->appliedValid) this->InternalTick(0, false);
+		if (!bone->isAppliedValid()) this->InternalTick(0, false);
 
 		// Need to fetch the renderer component to get world transform of actor plus
 		// offset by renderer component and its parent component(s). If no renderer
@@ -104,57 +117,57 @@ void USpineSkeletonComponent::SetBoneWorldPosition (const FString& BoneName, con
 		baseTransform = baseTransform.Inverse();
 		FVector localPosition = baseTransform.TransformPosition(position);
 		float localX = 0, localY = 0;
-		if (bone->parent) {
-			spBone_worldToLocal(bone->parent, localPosition.X, localPosition.Z, &localX, &localY);
+		if (bone->getParent()) {
+			bone->getParent()->worldToLocal(localPosition.X, localPosition.Z, localX, localY);
 		} else {
-			spBone_worldToLocal(bone, localPosition.X, localPosition.Z, &localX, &localY);
+			bone->worldToLocal(localPosition.X, localPosition.Z, localX, localY);
 		}
-		bone->x = localX;
-		bone->y = localY;
+		bone->setX(localX);
+		bone->setY(localY);
 	}
 }
 
 void USpineSkeletonComponent::UpdateWorldTransform() {
 	CheckState();
 	if (skeleton) {
-		spSkeleton_updateWorldTransform(skeleton);
+		skeleton->updateWorldTransform();
 	}
 }
 
 void USpineSkeletonComponent::SetToSetupPose () {
 	CheckState();
-	if (skeleton) spSkeleton_setToSetupPose(skeleton);
+	if (skeleton) skeleton->setToSetupPose();
 }
 
 void USpineSkeletonComponent::SetBonesToSetupPose () {
 	CheckState();
-	if (skeleton) spSkeleton_setBonesToSetupPose(skeleton);
+	if (skeleton) skeleton->setBonesToSetupPose();
 }
 
 void USpineSkeletonComponent::SetSlotsToSetupPose () {
 	CheckState();
-	if (skeleton) spSkeleton_setSlotsToSetupPose(skeleton);
+	if (skeleton) skeleton->setSlotsToSetupPose();
 }
 
 void USpineSkeletonComponent::SetFlipX (bool flipX) {
 	CheckState();
-	if (skeleton) skeleton->flipX = flipX ? 1 : 0;
+	if (skeleton) skeleton->setFlipX(flipX);
 }
 
 bool USpineSkeletonComponent::GetFlipX() {
 	CheckState();
-	if (skeleton) return skeleton->flipX != 0;
+	if (skeleton) return skeleton->getFlipX();
 	return false;
 }
 
 void USpineSkeletonComponent::SetFlipY(bool flipY) {
 	CheckState();
-	if (skeleton) skeleton->flipY = flipY ? 1 : 0;
+	if (skeleton) skeleton->setFlipY(flipY);
 }
 
 bool USpineSkeletonComponent::GetFlipY() {
 	CheckState();
-	if (skeleton) return skeleton->flipY != 0;
+	if (skeleton) return skeleton->getFlipY();
 	return false;
 }
 
@@ -172,7 +185,7 @@ void USpineSkeletonComponent::InternalTick(float DeltaTime, bool CallDelegates) 
 
 	if (skeleton) {
 		if (CallDelegates) BeforeUpdateWorldTransform.Broadcast(this);
-		spSkeleton_updateWorldTransform(skeleton);
+		skeleton->updateWorldTransform();
 		if (CallDelegates) AfterUpdateWorldTransform.Broadcast(this);
 	}
 }
@@ -182,8 +195,8 @@ void USpineSkeletonComponent::CheckState () {
 		DisposeState();
 		
 		if (Atlas && SkeletonData) {
-			spSkeletonData* data = SkeletonData->GetSkeletonData(Atlas->GetAtlas(false), false);
-			skeleton = spSkeleton_create(data);
+			spine::SkeletonData* data = SkeletonData->GetSkeletonData(Atlas->GetAtlas(false), false);
+			skeleton = new (__FILE__, __LINE__) Skeleton(data);
 		}
 		
 		lastAtlas = Atlas;
@@ -193,7 +206,7 @@ void USpineSkeletonComponent::CheckState () {
 
 void USpineSkeletonComponent::DisposeState () {
 	if (skeleton) {
-		spSkeleton_dispose(skeleton);
+		delete skeleton;
 		skeleton = nullptr;
 	}
 }

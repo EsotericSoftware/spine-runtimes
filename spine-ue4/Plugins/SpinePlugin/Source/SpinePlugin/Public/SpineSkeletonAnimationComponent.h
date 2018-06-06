@@ -40,14 +40,14 @@ struct SPINEPLUGIN_API FSpineEvent {
 	GENERATED_BODY();
 
 public:
-	void SetEvent(spEvent* event) {
-		Name = FString(UTF8_TO_TCHAR(event->data->name));
-		if (event->stringValue) {			
-			StringValue = FString(UTF8_TO_TCHAR(event->stringValue));
+	void SetEvent(spine::Event* event) {
+		Name = FString(UTF8_TO_TCHAR(event->getData().getName().buffer()));
+		if (!event->getStringValue().isEmpty()) {			
+			StringValue = FString(UTF8_TO_TCHAR(event->getStringValue().buffer()));
 		}
-		this->IntValue = event->intValue;
-		this->FloatValue = event->floatValue;
-		this->Time = event->time;
+		this->IntValue = event->getIntValue();
+		this->FloatValue = event->getFloatValue();
+		this->Time = event->getTime();
 	}
 
 	UPROPERTY(BlueprintReadonly)
@@ -81,101 +81,81 @@ public:
 	
 	UTrackEntry () { }		
 
-	void SetTrackEntry (spTrackEntry* entry);
-	spTrackEntry* GetTrackEntry() { return entry; }
+	void SetTrackEntry (spine::TrackEntry* entry);
+	spine::TrackEntry* GetTrackEntry() { return entry; }
 	
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	int GetTrackIndex () { return entry ? entry->trackIndex : 0; }
+	int GetTrackIndex () { return entry ? entry->getTrackIndex() : 0; }
 
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	bool GetLoop () { return entry ? entry->loop != 0 : false; }
+	bool GetLoop () { return entry ? entry->getLoop() : false; }
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetLoop (bool loop) { if (entry) entry->loop = loop ? 1 : 0; }
+		void SetLoop(bool loop) { if (entry) entry->setLoop(loop); }
 	
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	float GetEventThreshold () { return entry ? entry->eventThreshold : 0; }
+	float GetEventThreshold () { return entry ? entry->getEventThreshold() : 0; }
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetEventThreshold(float eventThreshold) { if (entry) entry->eventThreshold = eventThreshold; }
+	void SetEventThreshold(float eventThreshold) { if (entry) entry->setEventThreshold(eventThreshold); }
 
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	float GetAttachmentThreshold() { return entry ? entry->attachmentThreshold : 0; }
+	float GetAttachmentThreshold() { return entry ? entry->getAttachmentThreshold() : 0; }
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetAttachmentThreshold(float attachmentThreshold) { if (entry) entry->attachmentThreshold = attachmentThreshold; }
+	void SetAttachmentThreshold(float attachmentThreshold) { if (entry) entry->setAttachmentThreshold(attachmentThreshold); }
 
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	float GetDrawOrderThreshold() { return entry ? entry->drawOrderThreshold : 0; }
+	float GetDrawOrderThreshold() { return entry ? entry->getDrawOrderThreshold() : 0; }
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetDrawOrderThreshold(float drawOrderThreshold) { if (entry) entry->drawOrderThreshold = drawOrderThreshold; }
+	void SetDrawOrderThreshold(float drawOrderThreshold) { if (entry) entry->setDrawOrderThreshold(drawOrderThreshold); }
 
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	float GetAnimationStart() { return entry ? entry->animationStart : 0; }
+	float GetAnimationStart() { return entry ? entry->getAnimationStart() : 0; }
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetAnimationStart(float animationStart) { if (entry) entry->animationStart = animationStart; }
+	void SetAnimationStart(float animationStart) { if (entry) entry->setAnimationStart(animationStart); }
 
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	float GetAnimationEnd() { return entry ? entry->animationEnd : 0; }
+	float GetAnimationEnd() { return entry ? entry->getAnimationEnd() : 0; }
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetAnimationEnd(float animationEnd) { if (entry) entry->animationEnd = animationEnd; }
+	void SetAnimationEnd(float animationEnd) { if (entry) entry->setAnimationEnd(animationEnd); }
 
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	float GetAnimationLast() { return entry ? entry->animationLast : 0; }
+	float GetAnimationLast() { return entry ? entry->getAnimationLast() : 0; }
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetAnimationLast(float animationLast) { if (entry) entry->animationLast = animationLast; }
+	void SetAnimationLast(float animationLast) { if (entry) entry->setAnimationLast(animationLast); }
 
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	float GetNextAnimationLast() { return entry ? entry->nextAnimationLast : 0; }
+	float GetDelay() { return entry ? entry->getDelay() : 0; }
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetNextAnimationLast(float nextAnimationLast) { if (entry) entry->nextAnimationLast = nextAnimationLast; }
+	void SetDelay(float delay) { if (entry) entry->setDelay(delay); }
 
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	float GetDelay() { return entry ? entry->delay : 0; }
+	float GetTrackTime() { return entry ? entry->getTrackTime() : 0; }
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetDelay(float delay) { if (entry) entry->delay = delay; }
+	void SetTrackTime(float trackTime) { if (entry) entry->setTrackTime(trackTime); }
 
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	float GetTrackTime() { return entry ? entry->trackTime : 0; }
+	float GetTrackEnd() { return entry ? entry->getTrackEnd() : 0; }
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetTrackTime(float trackTime) { if (entry) entry->trackTime = trackTime; }
+	void SetTrackEnd(float trackEnd) { if (entry) entry->setTrackEnd(trackEnd); }
 
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	float GetTrackLast() { return entry ? entry->trackLast : 0; }
+	float GetTimeScale() { return entry ? entry->getTimeScale() : 0; }
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetTrackLast(float trackLast) { if (entry) entry->trackLast = trackLast; }
+	void SetTimeScale(float timeScale) { if (entry) entry->setTimeScale(timeScale); }
 
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	float GetNextTrackLast() { return entry ? entry->nextTrackLast : 0; }
+	float GetAlpha() { return entry ? entry->getAlpha() : 0; }
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetNextTrackLast(float nextTrackLast) { if (entry) entry->nextTrackLast = nextTrackLast; }
+	void SetAlpha(float alpha) { if (entry) entry->setAlpha(alpha); }
 
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	float GetTrackEnd() { return entry ? entry->trackEnd : 0; }
+	float GetMixTime() { return entry ? entry->getMixTime() : 0; }
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetTrackEnd(float trackEnd) { if (entry) entry->trackEnd = trackEnd; }
+	void SetMixTime(float mixTime) { if (entry) entry->setMixTime(mixTime); }
 
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	float GetTimeScale() { return entry ? entry->timeScale : 0; }
+	float GetMixDuration() { return entry ? entry->getMixDuration() : 0; }
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetTimeScale(float timeScale) { if (entry) entry->timeScale = timeScale; }
-
-	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	float GetAlpha() { return entry ? entry->alpha : 0; }
-	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetAlpha(float alpha) { if (entry) entry->alpha = alpha; }
-
-	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	float GetMixTime() { return entry ? entry->mixTime : 0; }
-	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetMixTime(float mixTime) { if (entry) entry->mixTime = mixTime; }
-
-	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	float GetMixDuration() { return entry ? entry->mixDuration : 0; }
-	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetMixDuration(float mixDuration) { if (entry) entry->mixDuration = mixDuration; }
-
-	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	float GetInterruptAlpha() { return entry ? entry->interruptAlpha : 0; }
-	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-	void SetInterruptAlpha(float interruptAlpha) { if (entry) entry->interruptAlpha = interruptAlpha; }
+	void SetMixDuration(float mixDuration) { if (entry) entry->setMixDuration(mixDuration); }
 
 	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|TrackEntry")
 	FSpineAnimationStartDelegate AnimationStart;
@@ -196,7 +176,7 @@ public:
 	FSpineAnimationDisposeDelegate AnimationDispose;
 
 protected:
-	spTrackEntry* entry = nullptr;
+	spine::TrackEntry* entry = nullptr;
 };
 
 class USpineAtlasAsset;
@@ -205,7 +185,7 @@ class SPINEPLUGIN_API USpineSkeletonAnimationComponent: public USpineSkeletonCom
 	GENERATED_BODY()
 
 public:
-	spAnimationState* GetAnimationState () { return state; };
+	spine::AnimationState* GetAnimationState () { return state; };
 		
 	USpineSkeletonAnimationComponent ();
 	
@@ -269,7 +249,7 @@ protected:
 	virtual void InternalTick(float DeltaTime, bool CallDelegates = true) override;
 	virtual void DisposeState () override;
 	
-	spAnimationState* state;
+	spine::AnimationState* state;
 
 	// keep track of track entries so they won't get GCed while
 	// in transit within a blueprint

@@ -28,8 +28,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 ******************************************************S**********************/
 
-#include <spine/AtlasAttachmentLoader.h>
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
 
+#include <spine/AtlasAttachmentLoader.h>
 #include <spine/Skin.h>
 #include <spine/RegionAttachment.h>
 #include <spine/MeshAttachment.h>

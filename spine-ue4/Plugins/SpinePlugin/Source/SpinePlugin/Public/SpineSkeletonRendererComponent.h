@@ -71,27 +71,27 @@ public:
 	virtual void FinishDestroy() override;
 	
 protected:
-	void UpdateMesh (spSkeleton* Skeleton);
+	void UpdateMesh (spine::Skeleton* Skeleton);
 
 	void Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector> &Colors2, UMaterialInstanceDynamic* Material);
 	
 	// Need to hold on to the dynamic instances, or the GC will kill us while updating them
 	UPROPERTY()
 	TArray<UMaterialInstanceDynamic*> atlasNormalBlendMaterials;
-	TMap<spAtlasPage*, UMaterialInstanceDynamic*> pageToNormalBlendMaterial;
+	TMap<spine::AtlasPage*, UMaterialInstanceDynamic*> pageToNormalBlendMaterial;
 	
 	UPROPERTY()
 	TArray<UMaterialInstanceDynamic*> atlasAdditiveBlendMaterials;
-	TMap<spAtlasPage*, UMaterialInstanceDynamic*> pageToAdditiveBlendMaterial;
+	TMap<spine::AtlasPage*, UMaterialInstanceDynamic*> pageToAdditiveBlendMaterial;
 	
 	UPROPERTY()
 	TArray<UMaterialInstanceDynamic*> atlasMultiplyBlendMaterials;
-	TMap<spAtlasPage*, UMaterialInstanceDynamic*> pageToMultiplyBlendMaterial;
+	TMap<spine::AtlasPage*, UMaterialInstanceDynamic*> pageToMultiplyBlendMaterial;
 	
 	UPROPERTY()
 	TArray<UMaterialInstanceDynamic*> atlasScreenBlendMaterials;
-	TMap<spAtlasPage*, UMaterialInstanceDynamic*> pageToScreenBlendMaterial;
+	TMap<spine::AtlasPage*, UMaterialInstanceDynamic*> pageToScreenBlendMaterial;
 
-	spFloatArray* worldVertices;
-	spSkeletonClipping* clipper;
+	spine::Vector<float> worldVertices;
+	spine::SkeletonClipping clipper;
 };

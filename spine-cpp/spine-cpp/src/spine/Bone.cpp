@@ -28,6 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/Bone.h>
 
 #include <spine/BoneData.h>
@@ -503,6 +507,13 @@ float Bone::getWorldScaleX() {
 
 float Bone::getWorldScaleY() {
 	return MathUtil::sqrt(_b * _b + _d * _d);
+}
+
+bool Bone::isAppliedValid() {
+	return _appliedValid;
+}
+void Bone::setAppliedValid(bool valid) {
+	_appliedValid = valid;
 }
 
 void Bone::updateAppliedTransform() {

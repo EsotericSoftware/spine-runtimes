@@ -28,13 +28,15 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/Event.h>
 
 #include <spine/EventData.h>
 
-using namespace spine;
-
-Event::Event(float time, const EventData &data) :
+spine::Event::Event(float time, const spine::EventData &data) :
 		_data(data),
 		_time(time),
 		_intValue(0),
@@ -42,34 +44,34 @@ Event::Event(float time, const EventData &data) :
 		_stringValue() {
 }
 
-const EventData &Event::getData() {
+const spine::EventData &spine::Event::getData() {
 	return _data;
 }
 
-float Event::getTime() {
+float spine::Event::getTime() {
 	return _time;
 }
 
-int Event::getIntValue() {
+int spine::Event::getIntValue() {
 	return _intValue;
 }
 
-void Event::setIntValue(int inValue) {
+void spine::Event::setIntValue(int inValue) {
 	_intValue = inValue;
 }
 
-float Event::getFloatValue() {
+float spine::Event::getFloatValue() {
 	return _floatValue;
 }
 
-void Event::setFloatValue(float inValue) {
+void spine::Event::setFloatValue(float inValue) {
 	_floatValue = inValue;
 }
 
-const String &Event::getStringValue() {
+const spine::String &spine::Event::getStringValue() {
 	return _stringValue;
 }
 
-void Event::setStringValue(const String &inValue) {
+void spine::Event::setStringValue(const spine::String &inValue) {
 	_stringValue = inValue;
 }

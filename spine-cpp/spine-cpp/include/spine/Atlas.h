@@ -34,7 +34,7 @@
 #include <spine/Vector.h>
 #include <spine/Extension.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 #include <spine/HasRendererObject.h>
 
 namespace spine {
@@ -113,6 +113,8 @@ public:
 	/// should be cached rather than calling this method multiple times.
 	/// @return The region, or NULL.
 	AtlasRegion *findRegion(const String &name);
+
+	Vector<AtlasPage*> &getPages();
 
 private:
 	Vector<AtlasPage *> _pages;

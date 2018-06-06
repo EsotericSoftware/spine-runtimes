@@ -36,6 +36,8 @@
 
 #define LOCTEXT_NAMESPACE "Spine"
 
+using namespace spine;
+
 FString USpineAtlasAsset::GetRawData () const {
 	return rawData;
 }
@@ -87,27 +89,26 @@ void USpineAtlasAsset::Serialize (FArchive& Ar) {
 
 void USpineAtlasAsset::BeginDestroy () {
 	if (atlas) {
-		spAtlas_dispose(atlas);
+		delete atlas;
 		atlas = nullptr;
 	}
 	Super::BeginDestroy();
 }
 
-spAtlas* USpineAtlasAsset::GetAtlas (bool ForceReload) {
+Atlas* USpineAtlasAsset::GetAtlas (bool ForceReload) {
 	if (!atlas || ForceReload) {
 		if (atlas) {
-			spAtlas_dispose(atlas);
+			delete atlas;
 			atlas = nullptr;
 		}
 		std::string t = TCHAR_TO_UTF8(*rawData);
-		atlas = spAtlas_create(t.c_str(), strlen(t.c_str()), "", nullptr);
-		spAtlasPage* page = atlas->pages;
-		int i = 0;
-		while (page) {
-			int num = atlasPages.Num();
+
+		atlas = new (__FILE__, __LINE__) Atlas(t.c_str(), strlen(t.c_str()), "", nullptr);
+		Vector<AtlasPage*> &pages = atlas->getPages();
+		for (size_t i = 0, n = pages.size(), j = 0; i < n; i++) {
+			AtlasPage* page = pages[i];
 			if (atlasPages.Num() > 0 && atlasPages.Num() > i)
-				page->rendererObject = atlasPages[i++];
-			page = page->next;
+				page->setRendererObject(atlasPages[j++]);
 		}
 	}
 	return this->atlas;

@@ -43,6 +43,8 @@
 
 #define LOCTEXT_NAMESPACE "Spine"
 
+using namespace spine;
+
 USpineAtlasAssetFactory::USpineAtlasAssetFactory (const FObjectInitializer& objectInitializer): Super(objectInitializer) {
 	bCreateNew = false;
 	bEditAfterNew = true;
@@ -128,16 +130,16 @@ UTexture2D* resolveTexture (USpineAtlasAsset* Asset, const FString& PageFileName
 }
 
 void USpineAtlasAssetFactory::LoadAtlas (USpineAtlasAsset* Asset, const FString& CurrentSourcePath, const FString& LongPackagePath) {
-	spAtlas* atlas = Asset->GetAtlas(true);
+	Atlas* atlas = Asset->GetAtlas(true);
 	Asset->atlasPages.Empty();
 	
 	const FString targetTexturePath = LongPackagePath / TEXT("Textures");
 	
-	spAtlasPage* page = atlas->pages;
-	while (page) {
-		const FString sourceTextureFilename = FPaths::Combine(*CurrentSourcePath, UTF8_TO_TCHAR(page->name));
+	Vector<AtlasPage*> &pages = atlas->getPages();
+	for (size_t i = 0, n = pages.size(); i < n; i++) {
+		AtlasPage* page = pages[i];
+		const FString sourceTextureFilename = FPaths::Combine(*CurrentSourcePath, UTF8_TO_TCHAR(page->name.buffer()));
 		UTexture2D* texture = resolveTexture(Asset, sourceTextureFilename, targetTexturePath);
-		page = page->next;
 		Asset->atlasPages.Add(texture);
 	}
 }

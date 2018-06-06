@@ -28,10 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/Atlas.h>
-
 #include <spine/TextureLoader.h>
-
 #include <spine/ContainerUtil.h>
 
 #include <ctype.h>
@@ -90,6 +92,10 @@ AtlasRegion *Atlas::findRegion(const String &name) {
 	}
 
 	return NULL;
+}
+
+Vector<AtlasPage*> &Atlas::getPages() {
+	return _pages;
 }
 
 void Atlas::load(const char *begin, int length, const char *dir) {

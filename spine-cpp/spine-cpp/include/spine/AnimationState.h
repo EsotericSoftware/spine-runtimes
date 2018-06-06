@@ -35,7 +35,7 @@
 #include <spine/Pool.h>
 #include <spine/MixBlend.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 #include <spine/HasRendererObject.h>
 
 namespace spine {
@@ -381,6 +381,9 @@ namespace spine {
         void setTimeScale(float inValue);
 
         void setListener(AnimationStateListener listener);
+
+		void disableQueue();
+		void enableQueue();
         
     private:
         static const int Subsequent, First, Dip, DipMix;

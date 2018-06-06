@@ -37,15 +37,16 @@
 #include <string.h>
 
 namespace spine {
-static const float PI = 3.1415926535897932385f;
-static const float PI_2 = PI * 2;
-static const float DEG_RAD = (PI / 180.0f);
-static const float RAD_DEG = (180.0f / PI);
+float PI = 3.1415926535897932385f;
+float PI_2 = PI * 2;
+float DEG_RAD = (PI / 180.0f);
+float RAD_DEG = (180.0f / PI);
 
 class MathUtil : public SpineObject {
-public:
+private:
 	MathUtil();
 
+public:
 	template<typename T>
 	static inline T min(T a, T b) { return a < b ? a : b; }
 

@@ -28,8 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/RTTI.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
 using namespace spine;
 

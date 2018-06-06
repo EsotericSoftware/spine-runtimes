@@ -54,9 +54,9 @@ class SPINEPLUGIN_API USpineSkeletonDataAsset: public UObject {
 	GENERATED_BODY()
 	
 public:
-	spSkeletonData* GetSkeletonData(spAtlas* Atlas, bool ForceReload = false);
+	spine::SkeletonData* GetSkeletonData(spine::Atlas* Atlas, bool ForceReload = false);
 
-	spAnimationStateData* GetAnimationStateData(spAtlas* atlas);
+	spine::AnimationStateData* GetAnimationStateData(spine::Atlas* atlas);
 	void SetMix(const FString& from, const FString& to, float mix);
 	float GetMix(const FString& from, const FString& to);
 	
@@ -78,9 +78,9 @@ protected:
 	UPROPERTY()
 	FName skeletonDataFileName;
 
-	spSkeletonData* skeletonData;
-	spAnimationStateData* animationStateData;
-	spAtlas* lastAtlas;
+	spine::SkeletonData* skeletonData;
+	spine::AnimationStateData* animationStateData;
+	spine::Atlas* lastAtlas;
 	
 #if WITH_EDITORONLY_DATA
 public:

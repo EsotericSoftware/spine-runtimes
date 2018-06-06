@@ -33,7 +33,7 @@
 
 #include <spine/RTTI.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
 namespace spine {
 class Attachment : public SpineObject {

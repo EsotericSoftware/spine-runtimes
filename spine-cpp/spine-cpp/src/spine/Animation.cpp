@@ -28,8 +28,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <spine/Animation.h>
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
 
+#include <spine/Animation.h>
 #include <spine/Timeline.h>
 #include <spine/Skeleton.h>
 #include <spine/Event.h>

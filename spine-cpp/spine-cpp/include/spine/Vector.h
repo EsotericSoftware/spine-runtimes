@@ -33,7 +33,7 @@
 
 #include <spine/Extension.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 #include <stdlib.h>
 #include <memory>
 #include <assert.h>

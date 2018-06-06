@@ -52,7 +52,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
 	USpineSkeletonDataAsset* SkeletonData;
 	
-	spSkeleton* GetSkeleton () { return skeleton; };
+	spine::Skeleton* GetSkeleton () { return skeleton; };
 	
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	bool SetSkin (const FString& SkinName);
@@ -109,7 +109,7 @@ protected:
 	virtual void InternalTick(float DeltaTime, bool CallDelegates = true);
 	virtual void DisposeState ();
 
-	spSkeleton* skeleton;
+	spine::Skeleton* skeleton;
 	USpineAtlasAsset* lastAtlas = nullptr;
 	USpineSkeletonDataAsset* lastData = nullptr;	
 };

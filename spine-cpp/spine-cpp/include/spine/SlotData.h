@@ -33,7 +33,7 @@
 
 #include <spine/BlendMode.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 #include <spine/Color.h>
 
 namespace spine {

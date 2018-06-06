@@ -37,39 +37,10 @@ class FSpinePlugin : public SpinePlugin {
 
 IMPLEMENT_MODULE( FSpinePlugin, SpinePlugin )
 
-// These should be filled with UE4's specific allocator functions.
-extern "C" {
-    void _spSetMalloc( void* ( *_malloc ) ( size_t size ) );
-    void _spSetFree( void( *_free ) ( void* ptr ) );
-    void _spSetRealloc( void* ( *_realloc ) ( void* ptr, size_t size ) );
-}
-
-static void * SpineMalloc( size_t size ) {
-    return FMemory::Malloc( size );
-}
-
-static void * SpineRealloc( void* ptr, size_t size ) {
-    return FMemory::Realloc( ptr, size );
-}
-
 void FSpinePlugin::StartupModule() {
-	// Needed for consoles, see https://github.com/EsotericSoftware/spine-runtimes/pull/1089
-#if !UE_EDITOR && !PLATFORM_WINDOWS && !PLATFORM_MAC && !PLATFORM_LINUX && !PLATFORM_IOS && !PLATFORM_ANDROID && !PLATFORM_HTML5
-    _spSetMalloc( &SpineMalloc );
-    _spSetRealloc( &SpineRealloc );
-    _spSetFree( FMemory::Free );
-#endif
 }
 
 void FSpinePlugin::ShutdownModule() { }
-
-// These are not used in the Spine UE4 plugin, see SpineAtlasAsset on how atlas page textures
-// are loaded, See SpineSkeletonRendererComponent on how these textures are used for rendering.
-extern "C" {
-	void _spAtlasPage_createTexture (spAtlasPage* self, const char* path) { }
-	void _spAtlasPage_disposeTexture (spAtlasPage* self) { }
-	char* _spUtil_readFile (const char* path, int* length) { return 0; }
-}
 
 
 

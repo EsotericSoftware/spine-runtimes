@@ -221,6 +221,9 @@ public:
 	/// Returns the magnitide (always positive) of the world scale Y.
 	float getWorldScaleY();
 
+	bool isAppliedValid();
+	void setAppliedValid(bool valid);
+
 private:
 	static bool yDown;
 
