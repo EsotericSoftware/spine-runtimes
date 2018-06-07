@@ -59,7 +59,7 @@ function SkeletonBounds:update (skeleton, updateAabb)
 	self.polygons = polygons
 	local slots = skeleton.slots
 
-	for i,slot in ipairs(skeleton.slots) do
+	for _,slot in ipairs(slots) do
 		local attachment = slot.attachment
 		if attachment and attachment.type == AttachmentType.boundingbox then
 			local boundingBox = attachment
@@ -85,7 +85,7 @@ end
 function SkeletonBounds:aabbCompute ()
 	local minX, minY, maxX, maxY = 9999999, 9999999, -9999999, -9999999
 	local polygons = self.polygons
-	for i,vertices in ipairs(polygons) do
+	for _,vertices in ipairs(polygons) do
 		local count = #vertices
 		for ii = 1, count, 2 do
 			local x = vertices[ii]
@@ -179,7 +179,7 @@ function SkeletonBounds:polygonIntersectsSegment (polygon, x1, y1, x2, y2)
 end
 
 function SkeletonBounds:getPolygon (attachment)
-	local index = spine.utils.indexOf(self.boundingBoxes, attachment)
+	local index = utils.indexOf(self.boundingBoxes, attachment)
 	if index == -1 then
 		return nil
 	else

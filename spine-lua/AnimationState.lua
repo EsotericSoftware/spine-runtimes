@@ -197,6 +197,7 @@ function TrackEntry:setTimelineData(to, mixingToArray, propertyIDs)
 	local timelineDipMix = self.timelineDipMix
 
 	local i = 1
+	local skip
 	while i <= timelinesCount do
 		local id = "" .. timelines[i]:getPropertyId()
 		if not (propertyIDs[id] == nil) then
@@ -374,7 +375,7 @@ function AnimationState:apply (skeleton)
 	for i,current in pairs(tracks) do
 		if not (current == nil or current.delay > 0) then
       applied = true
-			local currrentPose = MixPose.currentLayered
+			local currentPose = MixPose.currentLayered
 			if i == 0 then currentPose = MixPose.current end
 			
 			-- Apply mixing from entries first.

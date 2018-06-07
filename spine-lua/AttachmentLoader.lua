@@ -49,7 +49,7 @@ function AttachmentLoader.new ()
 	end
 
 	function self:newSkinningMeshAttachment (skin, name, path)
-		return SkinningMeshAttachment.new(name)
+		return nil --SkinningMeshAttachment.new(name)
 	end
 
 	function self:newBoundingBoxAttachment (skin, name)
