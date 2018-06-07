@@ -1284,7 +1284,13 @@ namespace Spine.Unity {
 		internal Material[] sharedMaterials = new Material[0];
 
 		public void Initialize () {
-			doubleBufferedMesh = new DoubleBuffered<SmartMesh>();
+			if (doubleBufferedMesh != null) {
+				doubleBufferedMesh.GetNext().Clear();
+				doubleBufferedMesh.GetNext().Clear();
+				submeshMaterials.Clear();
+			} else {
+				doubleBufferedMesh = new DoubleBuffered<SmartMesh>();
+			}
 		}
 
 		public Material[] GetUpdatedSharedMaterialsArray () {
@@ -1342,6 +1348,11 @@ namespace Spine.Unity {
 		public class SmartMesh : IDisposable {
 			public Mesh mesh = SpineMesh.NewSkeletonMesh();
 			public SkeletonRendererInstruction instructionUsed = new SkeletonRendererInstruction();		
+
+			public void Clear () {
+				mesh.Clear();
+				instructionUsed.Clear();
+			}
 
 			public void Dispose () {
 				if (mesh != null) {
