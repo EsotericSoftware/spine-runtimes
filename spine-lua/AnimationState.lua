@@ -345,6 +345,9 @@ function AnimationState:updateMixingFrom (to, delta)
 
  	local finished = self:updateMixingFrom(from, delta)
 	
+	from.animationLast = from.nextAnimationLast
+	from.trackLast = from.nextTrackLast
+	
 	-- Require mixTime > 0 to ensure the mixing from entry was applied at least once.
 	if (to.mixTime > 0 and (to.mixTime >= to.mixDuration or to.timeScale == 0)) then
 		-- Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame).
@@ -355,9 +358,7 @@ function AnimationState:updateMixingFrom (to, delta)
 		end
 		return finished
 	end
-
-	from.animationLast = from.nextAnimationLast
-	from.trackLast = from.nextTrackLast
+	
 	from.trackTime = from.trackTime + delta * from.timeScale
 	to.mixTime = to.mixTime + delta * to.timeScale
 	return false;
