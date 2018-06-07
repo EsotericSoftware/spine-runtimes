@@ -43,8 +43,33 @@ void FSpinePlugin::StartupModule() {
 
 void FSpinePlugin::ShutdownModule() { }
 
+class Ue4Extension : public spine::DefaultSpineExtension {
+public:
+	Ue4Extension() : spine::DefaultSpineExtension() { }
+
+	virtual ~Ue4Extension() { }
+
+	virtual void *_alloc(size_t size, const char *file, int line) {
+		return FMemory::Malloc(size);
+	}
+
+	virtual void *_calloc(size_t size, const char *file, int line) {
+		void * result = FMemory::Malloc(size);
+		FMemory::Memset(result, 0, size);
+		return result;
+	}
+
+	virtual void *_realloc(void *ptr, size_t size, const char *file, int line) {
+		return FMemory::Realloc(ptr, size);
+	}
+
+	virtual void _free(void *mem, const char *file, int line) {
+		FMemory::Free(mem);
+	}
+};
+
 spine::SpineExtension* spine::getDefaultExtension() {
-	return new spine::DefaultSpineExtension();
+	return new Ue4Extension();
 }
 
 

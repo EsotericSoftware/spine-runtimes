@@ -34,6 +34,7 @@
 #include "SpineSkeletonComponent.h"
 #include "SpineSkeletonAnimationComponent.h"
 #include "SpineSkeletonRendererComponent.h"
+#include "SpineSkeletonRendererComponentPMC.h"
 #include "SpineBoneFollowerComponent.h"
 #include "SpineBoneDriverComponent.h"
 #include "SpineWidget.h"
