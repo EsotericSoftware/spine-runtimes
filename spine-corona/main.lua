@@ -34,7 +34,7 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 
 	-- create an animation state object to apply animations to the skeleton
 	local animationStateData = spine.AnimationStateData.new(skeletonData)
-	animationStateData.defaultMix = 0.2
+	animationStateData.defaultMix = 0.5
 	local animationState = spine.AnimationState.new(animationStateData)
 
 	-- set the skeleton invisible

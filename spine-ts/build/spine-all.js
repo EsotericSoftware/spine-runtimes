@@ -1331,6 +1331,8 @@ var spine;
 			if (from == null)
 				return true;
 			var finished = this.updateMixingFrom(from, delta);
+			from.animationLast = from.nextAnimationLast;
+			from.trackLast = from.nextTrackLast;
 			if (to.mixTime > 0 && (to.mixTime >= to.mixDuration || to.timeScale == 0)) {
 				if (from.totalAlpha == 0 || to.mixDuration == 0) {
 					to.mixingFrom = from.mixingFrom;
@@ -1339,8 +1341,6 @@ var spine;
 				}
 				return finished;
 			}
-			from.animationLast = from.nextAnimationLast;
-			from.trackLast = from.nextTrackLast;
 			from.trackTime += delta * from.timeScale;
 			to.mixTime += delta * to.timeScale;
 			return false;
@@ -10047,7 +10047,7 @@ var spine;
 			else {
 				for (var i = 0; i < config.atlasPages.length; i++) {
 					if (config.atlasPagesContent && config.atlasPagesContent[i]) {
-						assets.loadTextureData(config.atlasPages[i], config.atlasPagesContent[0]);
+						assets.loadTextureData(config.atlasPages[i], config.atlasPagesContent[i]);
 					}
 					else {
 						assets.loadTexture(config.atlasPages[i]);

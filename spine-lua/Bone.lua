@@ -240,7 +240,7 @@ function Bone:getWorldScaleY ()
 	return math_sqrt(self.b * self.b + self.d * self.d)
 end
 
-function updateAppliedTransform ()
+function Bone:updateAppliedTransform ()
 	local parent = self.parent
 	if parent == nil then
 		self.ax = self.worldX

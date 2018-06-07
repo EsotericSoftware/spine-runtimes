@@ -198,6 +198,7 @@ function TrackEntry:setTimelineData(to, mixingToArray, propertyIDs)
 	local timelineDipMix = self.timelineDipMix
 
 	local i = 1
+	local skip
 	while i <= timelinesCount do
 		local id = "" .. timelines[i]:getPropertyId()
 		if not (propertyIDs[id] == nil) then
@@ -208,7 +209,7 @@ function TrackEntry:setTimelineData(to, mixingToArray, propertyIDs)
 			local ii = mixingToLast
 			while ii > 0 do
 				local entry = mixingTo[ii]
-				local skip = false
+				skip = false
 				if not entry:hasTimeline(id) then
 					if entry.mixDuration > 0 then 
 						timelineData[i] = DIP_MIX
@@ -343,7 +344,7 @@ function AnimationState:updateMixingFrom (to, delta)
 	local from = to.mixingFrom
 	if from == nil then return true end
 
- 	local finished = self:updateMixingFrom(from, delta)
+ 	local finished = self:updateMixingFrom(from, delta)	
 	
 	-- Require mixTime > 0 to ensure the mixing from entry was applied at least once.
 	if (to.mixTime > 0 and (to.mixTime >= to.mixDuration or to.timeScale == 0)) then
@@ -355,7 +356,7 @@ function AnimationState:updateMixingFrom (to, delta)
 		end
 		return finished
 	end
-
+	
 	from.animationLast = from.nextAnimationLast
 	from.trackLast = from.nextTrackLast
 	from.trackTime = from.trackTime + delta * from.timeScale

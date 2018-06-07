@@ -78,7 +78,7 @@ function PathConstraint.new (data, skeleton)
 	}
 	setmetatable(self, PathConstraint)
 
-	for i,boneData in ipairs(data.bones) do
+	for _,boneData in ipairs(data.bones) do
 		table_insert(self.bones, skeleton:findBone(boneData.name))
 	end
 
@@ -244,6 +244,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 	local verticesLength = path.worldVerticesLength
 	local curveCount = verticesLength / 6
 	local prevCurve = PathConstraint.NONE
+	local i = 0
 
 	if not path.constantSpeed then
 		local lengths = path.lengths
@@ -251,14 +252,14 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 		local pathLength = lengths[curveCount + 1];
 		if percentPosition then position = position * pathLength end
 		if percentSpacing then
-			local i = 0
+			i = 0
 			while i < spacesCount do
 				spaces[i + 1] = spaces[i + 1] * pathLength
 				i = i + 1
 			end
 		end
 		world = utils.setArraySize(self.world, 8);
-		local i = 0
+		i = 0
 		local o = 0
 		local curve = 0
 		while i < spacesCount do
@@ -354,7 +355,6 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 	local ddfy = 0
 	local dfx = 0
 	local dfy = 0
-	i = 0
 	local w = 2
 	while i < curveCount do
 		cx1 = world[w + 1]
@@ -395,7 +395,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 		position = position * pathLength / path.lengths[curveCount];
 	end
 	if percentSpacing then
-		local i = 0
+		i = 0
 		while i < spacesCount do
 			spaces[i + 1] = spaces[i + 1] * pathLength
 			i = i + 1
@@ -404,7 +404,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 
 	local segments = self.segments
 	local curveLength = 0
-	local i = 0
+	i = 0
 	local o = 0
 	local curve = 0
 	local segment = 0
