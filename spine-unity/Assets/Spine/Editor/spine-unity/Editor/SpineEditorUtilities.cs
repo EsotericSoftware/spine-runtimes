@@ -1258,8 +1258,8 @@ namespace Spine.Unity.Editor {
 
 		#region SkeletonDataFileValidator
 		internal static class SkeletonDataFileValidator {
-			static int[][] compatibleBinaryVersions = { new[] { 3, 6, 0 }, new[] { 3, 5, 0 } };
-			static int[][] compatibleJsonVersions = { new[] { 3, 6, 0 }, new[] { 3, 7, 0 }, new[] { 3, 5, 0 } };
+			static readonly int[][] compatibleBinaryVersions = { new[] { 3, 7, 0 } };
+			static readonly int[][] compatibleJsonVersions = { new[] { 3, 7, 0 }, new[] { 3, 6, 0 }, new[] { 3, 5, 0 } };
 			//static bool isFixVersionRequired = false;
 
 			public static bool CheckForValidSkeletonData (string skeletonJSONPath) {
