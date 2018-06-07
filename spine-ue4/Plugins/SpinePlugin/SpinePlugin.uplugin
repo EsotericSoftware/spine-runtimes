@@ -29,10 +29,6 @@
     {
       "Name": "ProceduralMeshComponent",
       "Enabled": true
-    },
-    {
-      "Name": "RuntimeMeshComponent",
-      "Enabled":  true
     }
   ]
 }

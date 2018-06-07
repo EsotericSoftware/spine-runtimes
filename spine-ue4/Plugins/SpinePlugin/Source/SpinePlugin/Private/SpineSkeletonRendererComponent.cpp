@@ -38,21 +38,21 @@
 using namespace spine;
 
 USpineSkeletonRendererComponent::USpineSkeletonRendererComponent (const FObjectInitializer& ObjectInitializer) 
-: URuntimeMeshComponent(ObjectInitializer) {
+: UProceduralMeshComponent(ObjectInitializer) {
 	PrimaryComponentTick.bCanEverTick = true;
 	bTickInEditor = true;
 	bAutoActivate = true;
 
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> NormalMaterialRef(TEXT("/SpinePlugin/SpineUnlitNormalMaterial"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> NormalMaterialRef(TEXT("/SpinePlugin/SpineUnlitNormalMaterialPMC"));
 	NormalBlendMaterial = NormalMaterialRef.Object;
 	
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> AdditiveMaterialRef(TEXT("/SpinePlugin/SpineUnlitAdditiveMaterial"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> AdditiveMaterialRef(TEXT("/SpinePlugin/SpineUnlitAdditiveMaterialPMC"));
 	AdditiveBlendMaterial = AdditiveMaterialRef.Object;
 	
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MultiplyMaterialRef(TEXT("/SpinePlugin/SpineUnlitMultiplyMaterial"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MultiplyMaterialRef(TEXT("/SpinePlugin/SpineUnlitMultiplyMaterialPMC"));
 	MultiplyBlendMaterial = MultiplyMaterialRef.Object;
 	
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> ScreenMaterialRef(TEXT("/SpinePlugin/SpineUnlitScreenMaterial"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> ScreenMaterialRef(TEXT("/SpinePlugin/SpineUnlitScreenMaterialPMC"));
 	ScreenBlendMaterial = ScreenMaterialRef.Object;
 	
 	TextureParameterName = FName(TEXT("SpriteTexture"));
@@ -169,14 +169,8 @@ void USpineSkeletonRendererComponent::Flush (int &Idx, TArray<FVector> &Vertices
 	if (Vertices.Num() == 0) return;
 	SetMaterial(Idx, Material);
 
-	TArray<FRuntimeMeshVertexTripleUV> verts;
-	for (int32 i = 0; i < Vertices.Num(); i++) {
-		verts.Add(FRuntimeMeshVertexTripleUV(Vertices[i], FVector(), FVector(), Colors[i], Uvs[i], FVector2D(Colors2[i].X, Colors2[i].Y), FVector2D(Colors2[i].Z, 0)));
-	}
+	CreateMeshSection(Idx, Vertices, Indices, TArray<FVector>(), Uvs, Colors, TArray<FProcMeshTangent>(), true);
 
-	CreateMeshSection(Idx, verts, Indices, true);
-
-	// CreateMeshSection(Idx, Vertices, Indices, TArray<FVector>(), Uvs, darkRG, Colors, TArray<FRuntimeMeshTangent>(), false);
 	Vertices.SetNum(0);
 	Indices.SetNum(0);
 	Uvs.SetNum(0);
