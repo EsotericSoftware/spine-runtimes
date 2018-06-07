@@ -102,7 +102,7 @@ module spine {
 			} else {
 				for (let i = 0; i < config.atlasPages.length; i++) {
 					if (config.atlasPagesContent && config.atlasPagesContent[i]) {
-						assets.loadTextureData(config.atlasPages[i], config.atlasPagesContent[0]);
+						assets.loadTextureData(config.atlasPages[i], config.atlasPagesContent[i]);
 					} else {
 						assets.loadTexture(config.atlasPages[i]);
 					}
