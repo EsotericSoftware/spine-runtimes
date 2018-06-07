@@ -32,6 +32,7 @@ using UnityEngine;
 using Spine.Unity;
 
 namespace Spine.Unity.Examples {
+
 	[RequireComponent(typeof(CharacterController))]
 	public class BasicPlatformerController : MonoBehaviour {
 
@@ -56,6 +57,7 @@ namespace Spine.Unity.Examples {
 		public SkeletonAnimation skeletonAnimation;
 
 		[Header("Animation")]
+		public TransitionDictionaryExample transitions;
 		public AnimationReferenceAsset walk;
 		public AnimationReferenceAsset run;
 		public AnimationReferenceAsset idle;
@@ -149,6 +151,7 @@ namespace Spine.Unity.Examples {
 			controller.Move(velocity * dt);
 
 			// Animation
+			// Determine target animation.
 			if (isGrounded) {
 				if (doCrouch) {
 					targetAnimation = crouch;
@@ -162,17 +165,23 @@ namespace Spine.Unity.Examples {
 				targetAnimation = velocity.y > 0 ? jump : fall;
 			}
 
-
+			// Handle change in target animation.
 			if (previousTargetAnimation != targetAnimation) {
-				if (targetAnimation == run && previousTargetAnimation == fall) {
-					skeletonAnimation.AnimationState.SetAnimation(0, runFromFall, false);
-					skeletonAnimation.AnimationState.AddAnimation(0, run, true, 0f);
+				Animation transition = null;
+				if (transitions != null && previousTargetAnimation != null) {
+					transition = transitions.GetTransition(previousTargetAnimation, targetAnimation);
+				}
+
+				if (transition != null) {
+					skeletonAnimation.AnimationState.SetAnimation(0, transition, false).MixDuration = 0.05f;
+					skeletonAnimation.AnimationState.AddAnimation(0, targetAnimation, true, 0f);
 				} else {
 					skeletonAnimation.AnimationState.SetAnimation(0, targetAnimation, true);
 				}
 			}
 			previousTargetAnimation = targetAnimation;
 
+			// Face intended direction.
 			if (input.x != 0)
 				skeletonAnimation.Skeleton.FlipX = input.x < 0;
 

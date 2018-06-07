@@ -5536,6 +5536,7 @@ GameObject:
   - component: {fileID: 1204355832}
   - component: {fileID: 1204355833}
   - component: {fileID: 1204355834}
+  - component: {fileID: 1204355835}
   m_Layer: 9
   m_Name: Player
   m_TagString: Untagged
@@ -5598,6 +5599,7 @@ MonoBehaviour:
   forceCrouchVelocity: 30
   forceCrouchDuration: 0.4
   skeletonAnimation: {fileID: 658011011}
+  transitions: {fileID: 1204355835}
   walk: {fileID: 11400000, guid: 096b05b71bb32cb409c1c8fd233b7ac3, type: 2}
   run: {fileID: 11400000, guid: cc83238c61de380499565292bef7ada4, type: 2}
   idle: {fileID: 11400000, guid: 8e32f0310bb5c02488c5c002dd41e7cb, type: 2}
@@ -5627,6 +5629,27 @@ MonoBehaviour:
   basePitch: 1
   randomPitchOffset: 0.2
   logDebugMessage: 0
+--- !u!114 &1204355835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1204355830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69a52bf79b7e78e4cb1dfd2d2e698c2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  transitions:
+  - from: {fileID: 11400000, guid: 29c1381a00cfb2c4d996f2a02fcc4506, type: 2}
+    to: {fileID: 11400000, guid: cc83238c61de380499565292bef7ada4, type: 2}
+    transition: {fileID: 11400000, guid: fcca5e996ae24ba43baaaadef1fb6ad9, type: 2}
+  - from: {fileID: 11400000, guid: 29c1381a00cfb2c4d996f2a02fcc4506, type: 2}
+    to: {fileID: 11400000, guid: 8e32f0310bb5c02488c5c002dd41e7cb, type: 2}
+    transition: {fileID: 11400000, guid: 714e39dce7285c145bdf142c38ef9a9b, type: 2}
+  - from: {fileID: 11400000, guid: 29c1381a00cfb2c4d996f2a02fcc4506, type: 2}
+    to: {fileID: 11400000, guid: 25961ff211f6f3947be85f8aab3f2630, type: 2}
+    transition: {fileID: 11400000, guid: 6c587772a6f7df94b934b353291c008c, type: 2}
 --- !u!1 &1217440894
 GameObject:
   m_ObjectHideFlags: 0

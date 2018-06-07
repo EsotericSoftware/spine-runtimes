@@ -44,7 +44,7 @@ namespace Spine.Unity.Modules {
 			[SpineAtlasRegion] public string region;
 		}
 
-		[SerializeField] protected AtlasAsset atlasAsset;
+		[SerializeField] protected SpineAtlasAsset atlasAsset;
 		[SerializeField] protected bool inheritProperties = true;
 		[SerializeField] protected List<SlotRegionPair> attachments = new List<SlotRegionPair>();
 
