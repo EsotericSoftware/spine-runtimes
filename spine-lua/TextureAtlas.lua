@@ -235,14 +235,14 @@ function TextureAtlas:parse (atlasContent, imageLoader)
 end
 
 function TextureAtlas:findRegion(name)
-	for i, region in ipairs(self.regions) do
+	for _, region in ipairs(self.regions) do
 		if region.name == name then return region end
 	end
 	return nil
 end
 
 function TextureAtlas:dispose()
-	for i, page in ipairs(self.pairs) do
+	for _, page in ipairs(self.pairs) do
 		-- FIXME implement disposing of pages
 		-- love2d doesn't support manual disposing
 	end

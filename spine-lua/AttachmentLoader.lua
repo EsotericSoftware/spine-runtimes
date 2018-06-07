@@ -48,10 +48,6 @@ function AttachmentLoader.new ()
 		return MeshAttachment.new(name)
 	end
 
-	function self:newSkinningMeshAttachment (skin, name, path)
-		return SkinningMeshAttachment.new(name)
-	end
-
 	function self:newBoundingBoxAttachment (skin, name)
 		return BoundingBoxAttachment.new(name)
 	end
