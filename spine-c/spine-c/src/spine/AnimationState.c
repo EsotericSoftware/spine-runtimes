@@ -325,6 +325,9 @@ int /*boolean*/ _spAnimationState_updateMixingFrom (spAnimationState* self, spTr
 
 	finished = _spAnimationState_updateMixingFrom(self, from, delta);
 
+	from->animationLast = from->nextAnimationLast;
+	from->trackLast = from->nextTrackLast;
+
 	/* Require mixTime > 0 to ensure the mixing from entry was applied at least once. */
 	if (to->mixTime > 0 && (to->mixTime >= to->mixDuration || to->timeScale == 0)) {
 		/* Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame). */
@@ -336,8 +339,6 @@ int /*boolean*/ _spAnimationState_updateMixingFrom (spAnimationState* self, spTr
 		return finished;
 	}
 
-	from->animationLast = from->nextAnimationLast;
-	from->trackLast = from->nextTrackLast;
 	from->trackTime += delta * from->timeScale;
 	to->mixTime += delta * to->timeScale;
 	return 0;

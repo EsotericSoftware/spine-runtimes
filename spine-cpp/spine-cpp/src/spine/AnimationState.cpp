@@ -756,6 +756,9 @@ bool AnimationState::updateMixingFrom(TrackEntry *to, float delta) {
 
 	bool finished = updateMixingFrom(from, delta);
 
+	from->_animationLast = from->_nextAnimationLast;
+	from->_trackLast = from->_nextTrackLast;
+
 	// Require mixTime > 0 to ensure the mixing from entry was applied at least once.
 	if (to->_mixTime > 0 && (to->_mixTime >= to->_mixDuration || to->_timeScale == 0)) {
 		// Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame).
@@ -767,8 +770,6 @@ bool AnimationState::updateMixingFrom(TrackEntry *to, float delta) {
 		return finished;
 	}
 
-	from->_animationLast = from->_nextAnimationLast;
-	from->_trackLast = from->_nextTrackLast;
 	from->_trackTime += delta * from->_timeScale;
 	to->_mixTime += delta * to->_timeScale;
 
