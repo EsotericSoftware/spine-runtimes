@@ -129,6 +129,9 @@ package spine.animation {
 			if (from == null) return true;
 
 			var finished : Boolean = updateMixingFrom(from, delta);
+			
+			from.animationLast = from.nextAnimationLast;
+			from.trackLast = from.nextTrackLast;
 
 			// Require mixTime > 0 to ensure the mixing from entry was applied at least once.
 			if (to.mixTime > 0 && (to.mixTime >= to.mixDuration || to.timeScale == 0)) {
@@ -140,9 +143,7 @@ package spine.animation {
 				}
 				return finished;
 			}
-	
-			from.animationLast = from.nextAnimationLast;
-			from.trackLast = from.nextTrackLast;
+				
 			from.trackTime += delta * from.timeScale;
 			to.mixTime += delta * to.timeScale;
 			return false;

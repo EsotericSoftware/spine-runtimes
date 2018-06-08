@@ -209,9 +209,9 @@ function TrackEntry:setTimelineData(to, mixingToArray, propertyIDs)
 				local entry = mixingTo[ii]
 				local skip = false
 				if not entry:hasTimeline(id) then
-					if entry.mixDuration > 0 then 
+					if entry.mixDuration > 0 then
 						timelineData[i] = DIP_MIX
-						timelineDipMix[i] = entry 
+						timelineDipMix[i] = entry
 						skip = true
 						break
 					end
@@ -291,7 +291,7 @@ function AnimationState:update (delta)
 					current.delay = 0
 				end
 			end
-			
+
 			if not skip then
 				local _next = current.next
 				if _next then
@@ -328,7 +328,7 @@ function AnimationState:update (delta)
 							from = from.mixingFrom
 						end
 					end
-					
+
           current.trackTime = current.trackTime + currentDelta
         end
 			end
@@ -342,8 +342,11 @@ function AnimationState:updateMixingFrom (to, delta)
 	local from = to.mixingFrom
 	if from == nil then return true end
 
- 	local finished = self:updateMixingFrom(from, delta)
-	
+	local finished = self:updateMixingFrom(from, delta)
+
+	from.animationLast = from.nextAnimationLast
+	from.trackLast = from.nextTrackLast
+
 	-- Require mixTime > 0 to ensure the mixing from entry was applied at least once.
 	if (to.mixTime > 0 and (to.mixTime >= to.mixDuration or to.timeScale == 0)) then
 		-- Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame).
@@ -355,8 +358,6 @@ function AnimationState:updateMixingFrom (to, delta)
 		return finished
 	end
 
-	from.animationLast = from.nextAnimationLast
-	from.trackLast = from.nextTrackLast
 	from.trackTime = from.trackTime + delta * from.timeScale
 	to.mixTime = to.mixTime + delta * to.timeScale
 	return false;
@@ -376,10 +377,10 @@ function AnimationState:apply (skeleton)
       applied = true
 			local currrentPose = MixPose.currentLayered
 			if i == 0 then currentPose = MixPose.current end
-			
+
 			-- Apply mixing from entries first.
 			local mix = current.alpha
-			if current.mixingFrom then 
+			if current.mixingFrom then
 				mix = mix * self:applyMixingFrom(current, skeleton, currentPose)
 			elseif current.trackTime >= current.trackEnd and current.next == nil then
 				mix = 0
@@ -401,7 +402,7 @@ function AnimationState:apply (skeleton)
 				for i,timeline in ipairs(timelines) do
 					local pose = MixPose.currentPose
 					if timelineData[i] >= FIRST then pose = MixPose.setup end
-					
+
 					if timeline.type == Animation.TimelineType.rotate then
 						self:applyRotateTimeline(timeline, skeleton, animationTime, mix, pose, timelinesRotation, i * 2,
 							firstFrame) -- FIXME passing ii * 2, indexing correct?
@@ -472,7 +473,7 @@ function AnimationState:applyMixingFrom (to, skeleton, currentPose)
 			local dipMix = timelineDipMix[i]
 			alpha = alpha * math_max(0, 1 - dipMix.mixtime / dipMix.mixDuration)
 		end
-		
+
 		if not skipSubsequent then
 			from.totalAlpha = from.totalAlpha + alpha
 			if timeline.type == Animation.TimelineType.rotate then
@@ -492,11 +493,11 @@ function AnimationState:applyMixingFrom (to, skeleton, currentPose)
 end
 
 function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, pose, timelinesRotation, i, firstFrame)
-	if firstFrame then 
+	if firstFrame then
 		timelinesRotation[i] = 0
 		timelinesRotation[i+1] = 0
 	end
-	
+
   if alpha == 1 then
     timeline:apply(skeleton, 0, time, nil, 1, pose, MixDirection._in)
     return
@@ -584,7 +585,7 @@ function AnimationState:queueEvents (entry, animationTime)
 
   -- Queue complete if completed a loop iteration or the animation.
   local queueComplete = false
-  if entry.loop then 
+  if entry.loop then
     queueComplete = duration == 0 or (trackLastWrapped > entry.trackTime % duration)
   else
     queueComplete = (animationTime >= animationEnd and entry.animationLast < animationEnd)
@@ -650,11 +651,11 @@ function AnimationState:setCurrent (index, current, interrupt)
     if interrupt then queue:interrupt(from) end
     current.mixingFrom = from
     current.mixTime = 0
-		
+
 		if from.mixingFrom and from.mixDuration > 0 then
 			current.interruptAlpha = current.interruptAlpha * math_min(1, from.mixTime / from.mixDuration)
 		end
-		
+
 		from.timelinesRotation = {};
   end
 
@@ -711,7 +712,7 @@ function AnimationState:addAnimation (trackIndex, animation, loop, delay)
   local entry = self:trackEntry(trackIndex, animation, loop, last)
   local queue = self.queue
   local data = self.data
-  
+
   if not last then
     self:setCurrent(trackIndex, entry, true)
     queue:drain()
@@ -786,7 +787,7 @@ function AnimationState:trackEntry (trackIndex, animation, loop, last)
   entry.trackTime = 0
   entry.trackLast = -1
   entry.nextTrackLast = -1
-  entry.trackEnd = 999999999  
+  entry.trackEnd = 999999999
   entry.timeScale = 1
 
   entry.alpha = 1
@@ -807,7 +808,7 @@ function AnimationState:disposeNext (entry)
     queue:dispose(_next)
     _next = _next.next
   end
-  entry.next = nil 
+  entry.next = nil
 end
 
 function AnimationState:_animationsChanged ()
@@ -816,10 +817,10 @@ function AnimationState:_animationsChanged ()
 	self.propertyIDs = {}
 	local propertyIDs = self.propertyIDs
 	local mixingTo = self.mixingTo
-	  
+
 	for i, entry in pairs(self.tracks) do
 		if entry then
-			entry:setTimelineData(nil, mixingTo, propertyIDs)			
+			entry:setTimelineData(nil, mixingTo, propertyIDs)
 		end
 	end
 end

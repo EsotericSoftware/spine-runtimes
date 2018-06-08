@@ -166,6 +166,9 @@ public class AnimationState {
 
 		boolean finished = updateMixingFrom(from, delta);
 
+		from.animationLast = from.nextAnimationLast;
+		from.trackLast = from.nextTrackLast;
+
 		// Require mixTime > 0 to ensure the mixing from entry was applied at least once.
 		if (to.mixTime > 0 && (to.mixTime >= to.mixDuration || to.timeScale == 0)) {
 			// Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame).
@@ -177,8 +180,6 @@ public class AnimationState {
 			return finished;
 		}
 
-		from.animationLast = from.nextAnimationLast;
-		from.trackLast = from.nextTrackLast;
 		from.trackTime += delta * from.timeScale;
 		to.mixTime += delta * to.timeScale;
 		return false;
@@ -535,7 +536,7 @@ public class AnimationState {
 					    delay += duration * (1 + (int)(last.trackTime / duration));
 					else
 					    delay += duration;
-					delay -= data.getMix(last.animation, animation);				
+					delay -= data.getMix(last.animation, animation);
 				}	else
 					delay = 0;
 			}
