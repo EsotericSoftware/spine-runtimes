@@ -1,6 +1,6 @@
 # spine-sfml
 
-The spine-sfml runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [SFML](http://www.sfml-dev.org/). spine-sfml is based on [spine-c](../spine-c).
+The spine-sfml runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [SFML](http://www.sfml-dev.org/). spine-sfml is based on [spine-c](../../spine-cpp).
 
 ## Licensing
 
@@ -10,17 +10,15 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-sfml works with data exported from Spine 3.6.xx.
+spine-sfml works with data exported from Spine 3.7.xx.
 
-spine-sfml supports all Spine features.
-
-spine-sfml does not yet support loading the binary format.
+spine-sfml supports all Spine features except two color tinting.
 
 ## Usage
 1. Create a new SFML project. See the [SFML documentation](http://www.sfml-dev.org/tutorials/2.1/) or have a look at the example in this repository.
 2. Download the Spine Runtimes source using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
-3. Add the sources from `spine-c/spine-c/src/spine` and `spine-sfml/src/spine` to your project
-4. Add the folder `spine-c/spine-c/include` to your header search path. Note that includes are specified as `#inclue <spine/file.h>`, so the `spine` directory cannot be omitted when copying the source files.
+3. Add the sources from `spine-cpp/spine-cpp/src/spine` and `spine-sfml/src/spine` to your project
+4. Add the folder `spine-cpp/spine-cpp/include` to your header search path. Note that includes are specified as `#inclue <spine/file.h>`, so the `spine` directory cannot be omitted when copying the source files.
 
 See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documentation#runtimesTitle) on how to use the APIs or check out the Spine SFML example.
 
@@ -41,7 +39,7 @@ The Spine SFML example works on Windows, Linux and Mac OS X.
 11. Select `Debugging` in the left-hand list, then set `Working Directory` to `$(OutputPath)`
 12. Click `Local Windows Debugger` to run the example
 
-The entire example code is contained in [main.cpp](example/main.cpp#L61)
+The entire example code is contained in [main.cpp](example/main.cpp)
 
 ### Linux
 1. Install the SFML dependencies, e.g. on Ubuntu/Debian via `sudo apt install libsfml-dev`

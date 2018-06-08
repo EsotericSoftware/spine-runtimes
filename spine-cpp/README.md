@@ -10,30 +10,38 @@ The spine Runtimes are developed with the intent to be used with data exported f
 
 ## spine version
 
-spine-cpp works with data exported from spine 3.6.xx.
+spine-cpp works with data exported from spine 3.7.xx.
 
 spine-cpp supports all spine features.
 
 ## Setup
 
 1. Download the spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it as a zip via the download button above.
-2. Create a new project and import the source.
-
-Alternatively, the contents of the `spine-cpp/spine-cpp/src` and `spine-cpp/spine-cpp/include` directories can be copied into your project. Be sure your header search is configured to find the contents of the `spine-cpp/spine-cpp/include` directory. Note that the includes use `spine/Xxx.h`, so the `spine` directory cannot be omitted when copying the files.
+2. Copy the contents of the `spine-cpp/spine-cpp/src` and `spine-cpp/spine-cpp/include` directories into your project. Be sure your header search is configured to find the contents of the `spine-cpp/spine-cpp/include` directory. Note that the includes use `spine/Xxx.h`, so the `spine` directory cannot be omitted when copying the files.
 
 ## Extension
 
-Extending spine-cpp requires implementing both the SpineExtension class (which has a handy default instance) and the TextureLoader class:
+Extending spine-cpp requires implementing both the `SpineExtension` class and the TextureLoader class:
 
-spine::SpineExtension::setInstance(spine::DefaultSpineExtension::getInstance());
+```
+#include <spine/Extension.h>
+void spine::SpineExtension *spine::getDefaultExtension() {
+  return new spine::DefaultExtension();
+}
 
-class MyTextureLoader : public TextureLoader
+class MyTextureLoader : public spine::TextureLoader
 {
-  virtual void load(AtlasPage& page, const String& path) { // TODO }
+  virtual void load(spine::AtlasPage& page, const spine::String& path) {
+    void* texture = ... load the texture based on path ...
+    page->setRendererObject(texture); // use the texture later in your rendering code
+  }
 
   virtual void unload(void* texture) { // TODO }
 };
+```
 
 ## Runtimes extending spine-cpp
 
-- Coming Soon!
+- [spine-sfml](../spine-sfml/cpp)
+- [spine-cocos2dx](../spine-cocos2dx)
+- [spine-ue4](../spine-ue4)
