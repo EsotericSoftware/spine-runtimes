@@ -44,7 +44,7 @@ namespace Spine.Unity.Examples {
 			collectedSkin.Append(equipsSkin);
 
 			// 2. Create a repacked skin.
-			var repackedSkin = collectedSkin.GetRepackedSkin("Repacked skin", skeletonAnimation.SkeletonDataAsset.atlasAssets[0].materials[0], out runtimeMaterial, out runtimeAtlas);
+			var repackedSkin = collectedSkin.GetRepackedSkin("Repacked skin", skeletonAnimation.SkeletonDataAsset.atlasAssets[0].PrimaryMaterial, out runtimeMaterial, out runtimeAtlas);
 			collectedSkin.Clear();
 
 			// 3. Use the repacked skin.

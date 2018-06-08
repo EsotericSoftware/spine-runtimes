@@ -66,7 +66,7 @@ namespace Spine.Unity.Examples {
 			if (sourceMaterial == null) {
 				var skeletonGraphic = GetComponent<SkeletonGraphic>();
 				if (skeletonGraphic != null)
-					sourceMaterial = skeletonGraphic.SkeletonDataAsset.atlasAssets[0].materials[0];
+					sourceMaterial = skeletonGraphic.SkeletonDataAsset.atlasAssets[0].PrimaryMaterial;
 			}
 		}
 

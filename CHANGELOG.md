@@ -1,14 +1,151 @@
 # 3.7
 
+## AS3
+* **Breaking changes**
+  * The completion event will fire for looped 0 duration animations every frame.
+  * `MixPose` is now called `MixBlend`
+* **Additions**
+  * Added additive animation blending. When playing back multiple animations on different tracks, where each animation modifies the same skeleton property, the results of tracks with lower indices are discarded, and only the result from the track with the highest index is used. With animation blending, the results of all tracks are mixed together. This allows effects like mixing multiple facial expressions (angry, happy, sad) with percentage mixes. By default the old behaviour is retained (results from lower tracks are discarded). To enable additive blending across animation tracks, call `TrackEntry#setMixBlend(MixBlend.add)` on each track. To specify the blend percentage, set `TrackEntry#alpha`. See http://esotericsoftware.com/forum/morph-target-track-animation-mix-mode-9459 for a discussion.
+
+### Starling
+* Added support for vertex effects. See `RaptorExample.as`
+* Added 'getTexture()' method to 'StarlingTextureAtlasAttachmentLoader'
+* Breaking change: if a skeleton requires two color tinting, you have to enable it via `SkeletonSprite.twoColorTint = true`. In this case the skeleton will use the `TwoColorMeshStyle`, which internally uses a different vertex layout and shader. This means that skeletons with two color tinting enabled will break batching and hence increase the number of draw calls in your app.
+* Added `VertexEffect` and implementations `JitterEffect` and `SwirlEffect`. Allows you to modify vertices before they are submitted for drawing. See Starling changes.
+* Fix issues with StarlingAtlasAttachmentLoader, see https://github.com/EsotericSoftware/spine-runtimes/issues/939
+* Fix issues with region trimming support, see https://github.com/EsotericSoftware/spine-runtimes/commit/262bc26c64d4111002d80e201cb1a3345e6727df
+* Added support for overriding `StarlingAtlasAttachmentLoader#getTexture()`, see https://github.com/EsotericSoftware/spine-runtimes/commit/ea7dbecb98edc74e439aa9ef90dcf6eed865f718
+* Texture atlas operations are no longer handled in `Starling#newRegionAttachment` and `Starling#newMeshAttachment` but delegated to the atlas.
+* Added sample for additive animation blending, see https://github.com/EsotericSoftware/spine-runtimes/blob/6a556de01429878df47bb276a97959a8bdbbe32f/spine-starling/spine-starling-example/src/spine/examples/OwlExample.as
+* Added sample on how to use bounding box attachment vertices https://github.com/EsotericSoftware/spine-runtimes/commit/e20428b02699226164fa73ba4b12f7d029ae6f4d
+* Fully transparent meshes are not submitted for rendering.
+* No hit-tests are performed when a skeleton is invisible.
+
 ## C
+* **Breaking changes**
+  * Listeners on `spAnimationState` and `spTrackEntry` will now also be called if a track entry gets disposed as part of disposing an animation state.
+  * The completion event will fire for looped 0 duration animations every frame.
+* **Additions**
+  * Added support for local and relative transform constraint calculation, including additional fields in `spTransformConstraintData`.
+  * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
+  * Added `spVertexEffect` and corresponding implementations `spJitterVertexEffect` and `spSwirlVertexEffect`. Create/dispose through the corresponding `spXXXVertexEffect_create()/dispose()` functions. Set on framework/engine specific renderer.
+  * Functions in `extension.h` are not prefixed with `_sp` instead of just `_` to avoid interference with other libraries.
+  * Introduced `SP_API` macro. Every spine-c function is prefixed with this macro. By default, it is an empty string. Can be used to markup spine-c functions with e.g. ``__declspec` when compiling to a dll or linking to that dll.
+  * Added `void *userData` to `spAnimationState`to be consumed in callbacks.
+  * Added additive animation blending. When playing back multiple animations on different tracks, where each animation modifies the same skeleton property, the results of tracks with lower indices are discarded, and only the result from the track with the highest index is used. With animation blending, the results of all tracks are mixed together. This allows effects like mixing multiple facial expressions (angry, happy, sad) with percentage mixes. By default the old behaviour is retained (results from lower tracks are discarded). To enable additive blending across animation tracks, call `spTrackEntry->mixBlend = SP_MIXBLEND_ADD)` on each track. To specify the blend percentage, set `spTrackEntry->alpha`. See http://esotericsoftware.com/forum/morph-target-track-animation-mix-mode-9459 for a discussion.
+  * Optimized attachment lookup to give a 40x speed-up. See https://github.com/EsotericSoftware/spine-runtimes/commit/cab81276263890b65d07fa2329ace16db1e365ff
+
+### Cocos2d-x
+* Added ETC1 alpha support, thanks @halx99! Does not work when two color tint is enabled.
+* Added `spAtlasPage_setCustomTextureLoader()` which let's you do texture loading manually. Thanks @jareguo.
+* Added `SkeletonRenderer:setSlotsRange()` and `SkeletonRenderer::createWithSkeleton()`. This allows you to split rendering of a skeleton up into multiple parts, and render other nodes in between. See `SkeletonRendererSeparatorExample.cpp` for an example.
+* Fully transparent attachments will not be rendered, improving rendering performance.
+* Added improved tint-black shader.
+* Updated to cocos2d-x 3.16
+* The skeleton setup pose and world transform are now calculated on initialization to avoid flickering on start-up.
+
+### Cocos2d-Objc
+* Added vertex effect support to modify vertices of skeletons on the CPU. See `RaptorExample.m`.
+* Explanation how to handle ARC, see https://github.com/EsotericSoftware/spine-runtimes/commit/a4f122b08c5e2a51d6aad6fc5a947f7ec31f2eb8
+* The super class `::update()` method of `SkeletonRenderer` is now called, see https://github.com/EsotericSoftware/spine-runtimes/commit/f7bb98185236a6d8f35bfefc70afe4f31e9ec9d2
+* Added improved tint-black shader.
+
 ### SFML
 * `spine-sfml.h` no longer defines `SPINE_SHORT_NAMES` to avoid collisions with other APIs. See #1058.
+* Added support for vertex effects. See raptor example.
+* Added premultiplied alpha support to `SkeletonDrawable`. Use `SkeletonDrawable::setUsePremultipliedAlpha()`, see https://github.com/EsotericSoftware/spine-runtimes/commit/34086c1f41415309b2ecce86055f6656fcba2950
+* Added additive animation blending sample, see https://github.com/EsotericSoftware/spine-runtimes/blob/b7e712d3ca1d6be3ebcfe3254dc2cea9c44dda71/spine-sfml/example/main.cpp#L369
 
+### UE4
+ * spine-c is now exposed from the plugin shared library on Windows via __declspec.
+ * Updated to Unreal Engine 4.18
+ * Added C++ example, see https://github.com/EsotericSoftware/spine-runtimes/commit/15011e81b7061495dba45e28b4d3f4efb10d7f40
+ * `SkeletonRendererComponent` generates collision meshes by default.
+ * Disabled generation of collision meshes by `SkeletonRendererComponent`. Both `ProceduralMeshComponent` and `RuntimeMeshComponent` have a bug that generates a new PhysiX file every frame per component. Users are advised to add a separate collision shape to the root scene component of an actor instead.
+ * Using UE4 `FMemory` allocator by default.
+
+## C# ##
+* **Breaking changes**
+  * The completion event will fire for looped 0 duration animations every frame.
+* **Additions**
+  * Added additive animation blending. When playing back multiple animations on different tracks, where each animation modifies the same skeleton property, the results of tracks with lower indices are discarded, and only the result from the track with the highest index is used. With animation blending, the results of all tracks are mixed together. This allows effects like mixing multiple facial expressions (angry, happy, sad) with percentage mixes. By default the old behaviour is retained (results from lower tracks are discarded). To enable additive blending across animation tracks, call `TrackEntry#MixBlend = MixBlend.add` on each track. To specify the blend percentage, set `TrackEntry#Alpha`. See http://esotericsoftware.com/forum/morph-target-track-animation-mix-mode-9459 for a discussion.
+
+### Unity
+* **Runtime and Editor, and Assembly Definition** Files and folders have been reorganized into "Runtime" and "Editor". Each of these have an `.asmdef` file that defines these separately as their own assembly in Unity. For projects not using assembly definition, you may delete the `.asmdef` files. These assembly definitions will be ignored by older versions of Unity that don't support it.
+	* In this scheme, the entirety of the base spine-csharp runtime is inside the "Runtime" folder, to be compiled in the same assembly as spine-unity so they can continue to share internal members.
+* **SkeletonAnimator is now SkeletonMecanim** The Spine-Unity Mecanim-driven component `SkeletonAnimator` has been renamed `SkeletonMecanim` to make it more autocomplete-friendly and more obvious at human-glance. The .meta files and guids should remain intact so existing projects and prefabs should not break. However, user code needs to be updated to use `SkeletonMecanim`.
+*  **SpineAtlasAsset** The existing `AtlasAsset` type has been renamed to `SpineAtlasAsset` to signify that it specifically uses a Spine/libGDX atlas as its source. Serialization should be intact but user code will need to be updated to refer to existing atlases as `SpineAtlasAsset`.
+	* **AtlasAssetBase** `SpineAtlasAsset` now has an abstract base class called `SpineAtlasAsset`. This is the base class to derive when using alternate atlas sources. Existing SkeletonDataAsset field "atlasAssets" now have the "AtlasAssetBase" type. Serialization should be intact, but user code will need to be updated to refer to the atlas assets accordingly.
+	* This change is in preparation for alternate atlas options such as Unity's SpriteAtlas.
+
+### XNA/MonoGame
+* Added support for any `Effect` to be used by `SkeletonRenderer`
+* Added support for `IVertexEffect` to modify vertices of skeletons on the CPU. `IVertexEffect` instances can be set on the `SkeletonRenderer`. See example project.
+* Added `SkeletonDebugRenderer`
+* Made `MeshBatcher` of SkeletonRenderer accessible via a getter. Allows user to batch their own geometry together with skeleton meshes for maximum batching instead of using XNA SpriteBatcher.
+
+## Java
+* **Breaking changes**
+  * Skeleton attachments: Moved update of attached skeleton out of libGDX `SkeletonRenderer`, added overloaded method `Skeleton#updateWorldTransform(Bone)`, used for `SkeletonAttachment`. You now MUST call this new method with the bone of the parent skeleton to which the child skeleton is attached. See `SkeletonAttachmentTest` for and example.
+  * The completion event will fire for looped 0 duration animations every frame.
+  * `MixPose` is now called `MixBlend`.
+* **Additions**
+  * Added `EventData#audioPath` field. This field contains the file name of the audio file used for the event.
+  * Added convenience method to add all attachments from one skin to another, see https://github.com/EsotericSoftware/spine-runtimes/commit/a0b7bb6c445efdfac12b0cdee2057afa3eff3ead
+  * Added additive animation blending. When playing back multiple animations on different tracks, where each animation modifies the same skeleton property, the results of tracks with lower indices are discarded, and only the result from the track with the highest index is used. With animation blending, the results of all tracks are mixed together. This allows effects like mixing multiple facial expressions (angry, happy, sad) with percentage mixes. By default the old behaviour is retained (results from lower tracks are discarded). To enable additive blending across animation tracks, call `TrackEntry#setMixBlend(MixBlend.add)` on each track. To specify the blend percentage, set `TrackEntry#alpha`. See http://esotericsoftware.com/forum/morph-target-track-animation-mix-mode-9459 for a discussion.
+
+### libGDX
+* Added `VertexEffect` interface, instances of which can be set on `SkeletonRenderer`. Allows to modify vertices before submitting them to GPU. See `SwirlEffect`, `JitterEffect` and `VertexEffectTest`.
+* Added improved tint-black shader.
+* Improved performance by avoiding batch flush when not switching between normal and additive rendering with PMA
+* Improvements to skeleton viewer.
+* `TwoColorPolygonBatch` implements the `Batch` interface, allowing to the be used with other libGDX classes that require a batcher for drawing, potentially improving performance. See https://github.com/EsotericSoftware/spine-runtimes/commit/a46b3d1d0c135d51f9bef9ca17a5f8e5dda69927
+* Added `SkeletonDrawable` to render skeletons in scene2d UI https://github.com/EsotericSoftware/spine-runtimes/commit/b93686c185e2c9d5466969a8e07eee573ebe4b97
+
+## Lua
+* **Breaking changes**
+  * The completion event will fire for looped 0 duration animations every frame.
+* **Additions**
+  * Added `JitterEffect` and `SwirlEffect` and support for vertex effects in Corona and Love
+  * Added additive animation blending. When playing back multiple animations on different tracks, where each animation modifies the same skeleton property, the results of tracks with lower indices are discarded, and only the result from the track with the highest index is used. With animation blending, the results of all tracks are mixed together. This allows effects like mixing multiple facial expressions (angry, happy, sad) with percentage mixes. By default the old behaviour is retained (results from lower tracks are discarded). To enable additive blending across animation tracks, call `TrackEntry:setMixBlend(MixBlend.add)` on each track. To specify the blend percentage, set `TrackEntry.alpha`. See http://esotericsoftware.com/forum/morph-target-track-animation-mix-mode-9459 for a discussion.
+
+### Love2D
+* Added support for vertex effects. Set an implementation like "JitterEffect" on `Skeleton.vertexEffect`. See `main.lua` for an example.
+
+### Corona
+* Added support for vertex effects. Set an implementation like "JitterEffect" on `SkeletonRenderer.vertexEffect`. See `main.lua` for an example
+
+## Typescript/Javascript
+* **Breaking changes**
+  * The completion event will fire for looped 0 duration animations every frame.
+* **Additions**
+  * Added `AssetManager.loadTextureAtlas`. Instead of loading the `.atlas` and corresponding image files manually, you can simply specify the location of the `.atlas` file and AssetManager will load the atlas and all its images automatically. `AssetManager.get("atlasname.atlas")` will then return an instance of `spine.TextureAtlas`.
+  * Added additive animation blending. When playing back multiple animations on different tracks, where each animation modifies the same skeleton property, the results of tracks with lower indices are discarded, and only the result from the track with the highest index is used. With animation blending, the results of all tracks are mixed together. This allows effects like mixing multiple facial expressions (angry, happy, sad) with percentage mixes. By default the old behaviour is retained (results from lower tracks are discarded). To enable additive blending across animation tracks, call `TrackEntry#setMixBlend(MixBlend.add)` on each track. To specify the blend percentage, set `TrackEntry#alpha`. See http://esotericsoftware.com/forum/morph-target-track-animation-mix-mode-9459 for a discussion. See https://github.com/EsotericSoftware/spine-runtimes/blob/f045d221836fa56191ccda73dd42ae884d4731b8/spine-ts/webgl/tests/test-additive-animation-blending.html for an example.
+  * Added work-around for iOS WebKit JIT bug, see https://github.com/EsotericSoftware/spine-runtimes/commit/c28bbebf804980f55cdd773fed9ff145e0e7e76c
+
+### WebGL backend
+* Added `VertexEffect` interface, instances of which can be set on `SkeletonRenderer`. Allows to modify vertices before submitting them to GPU. See `SwirlEffect`, `JitterEffect`, and the example which allows to set effects.
+* Added `slotRangeStart` and `slotRangeEnd` parameters to `SkeletonRenderer#draw` and `SceneRenderer#drawSkeleton`. This allows you to render only a range of slots in the draw order. See `spine-ts/webgl/tests/test-slot-range.html` for an example.
+* Added improved tint-black shader.
+* Added `SceneRenderer#drawTextureUV()`, allowing to draw a texture with manually specified texture coordinates.
+* Exposed all renderers in `SceneRenderer`.
+
+### Canvas backend
+* Added support for shearing and non-uniform scaling inherited from parent bones.
+* Added support for alpha tinting.
+
+### Three.js backend
+* Added `VertexEffect` interface, instances of which can be set on `SkeletonMesh`. Allows to modify vertices before submitting them to GPU. See `SwirlEffect`, `JitterEffect`.
+* Added support for multi-page atlases
+
+### Widget backend
+ * Added fields `atlasContent`, `atlasPagesContent`, and `jsonContent` to `WidgetConfiguration` allowing you to directly pass the contents of the `.atlas`, atlas page `.png` files, and the `.json` file without having to do a request. See `README.md` and the example for details.
+ * `SpineWidget.setAnimation()` now takes an additional optional parameter for callbacks when animations are completed/interrupted/etc.
 
 # 3.6
 
 ## AS3
- * **Breaking changes**
+* **Breaking changes**
   * Removed `Bone.worldToLocalRotationX` and `Bone.worldToLocalRotationY`. Replaced by `Bone.worldToLocalRotation` (rotation given relative to x-axis, counter-clockwise, in degrees).
   * Made `Bone` fields `_a`, `_b`, `_c`, `_d`, `_worldX` and `_worldY` public, removed underscore prefix.
   * Removed `VertexAttachment.computeWorldVertices` overload, changed `VertexAttachment.computeWorldVertices2` to `VertexAttachment.computeWorldVertices`, added `stride` parameter.
@@ -17,7 +154,7 @@
   * Replaced `r`, `g`, `b`, `a` fields with instances of new `Color` class in `RegionAttachment`, `MeshAttachment`, `Skeleton`, `SkeletonData`, `Slot` and `SlotData`.
   * The completion event will fire for looped 0 duration animations every frame.
 
- * **Additions**
+* **Additions**
   * Added `Skeleton.getBounds` from reference implementation.
   * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
   * Added `Bone.localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).
@@ -38,7 +175,7 @@
  * Breaking change: if a skeleton requires two color tinting, you have to enable it via `SkeletonSprite.twoColorTint = true`. In this case the skeleton will use the `TwoColorMeshStyle`, which internally uses a different vertex layout and shader. This means that skeletons with two color tinting enabled will break batching and hence increase the number of draw calls in your app.
 
 ## C
- * **Breaking changes**
+* **Breaking changes**
   * `spVertexAttachment_computeWorldVertices` and `spRegionAttachment_computeWorldVerticeS` now take new parameters to make it possible to directly output the calculated vertex positions to a vertex buffer. Removes the need for additional copies in the backends' respective renderers.
   * Removed `spBoundingBoxAttachment_computeWorldVertices`, superseded by `spVertexAttachment_computeWorldVertices`.
   * Removed `spPathAttachment_computeWorldVertices` and `spPathAttachment_computeWorldVertices1`, superseded by `spVertexAttachment_computeWorldVertices`.
@@ -48,7 +185,7 @@
   * Removed `spVertexIndex`from public API.
   * Listeners on `spAnimationState` or `spTrackEntry` will now be also called in case a track entry is disposed as part of dispoing the `spAnimationState`.
   * The completion event will fire for looped 0 duration animations every frame.
- * **Additions**
+* **Additions**
   * Added support for local and relative transform constraint calculation, including additional fields in `spTransformConstraintData`.
   * Added `spPointAttachment`, additional method `spAtlasAttachmentLoadeR_newPointAttachment`.
   * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
@@ -167,7 +304,7 @@
  * Made `MeshBatcher` of SkeletonRenderer accessible via a getter. Allows user to batch their own geometry together with skeleton meshes for maximum batching instead of using XNA SpriteBatcher.
 
 ## Java
- * **Breaking changes**
+* **Breaking changes**
   * `Skeleton.getBounds` takes a scratch array as input so it doesn't have to allocate a new array on each invocation itself. Reduces GC activity.
   * Removed `Bone.worldToLocalRotationX` and `Bone.worldToLocalRotationY`. Replaced by `Bone.worldToLocalRotation` (rotation given relative to x-axis, counter-clockwise, in degrees).
   * Added `stride` parameter to `VertexAttachment.computeWorldVertices`.
@@ -177,7 +314,7 @@
   with the bone of the parent skeleton to which the child skeleton is attached. See `SkeletonAttachmentTest` for and example.
   * The completion event will fire for looped 0 duration animations every frame.
 
- * **Additions**
+* **Additions**
   * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
   * Added `Bone.localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).
   * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.
@@ -194,7 +331,7 @@
  * Added `VertexEffect` interface, instances of which can be set on `SkeletonRenderer`. Allows to modify vertices before submitting them to GPU. See `SwirlEffect`, `JitterEffect` and `VertexEffectTest`.
 
 ## Lua
- * **Breaking changes**
+* **Breaking changes**
   * Removed `Bone:worldToLocalRotationX` and `Bone:worldToLocalRotationY`. Replaced by `Bone:worldToLocalRotation` (rotation given relative to x-axis, counter-clockwise, in degrees).
   * `VertexAttachment:computeWorldVertices` now takes offsets and stride to allow compositing vertices directly in a vertex buffer to be send to the GPU. The compositing is now performed in the backends' respective renderers. This also affects the subclasses `MeshAttachment`, `BoundingBoxAttachment` and `PathAttachment`.
   * Removed `RegionAttachment:updateWorldVertices`, added `RegionAttachment:computeWorldVertices`, which takes offsets and stride to allow compositing vertices directly in a vertex buffer to be send to the GPU. The compositing is now performed in the backends' respective renderers.
@@ -224,7 +361,7 @@
   * Added support for vertex effects. Set an implementation like "JitterEffect" on `SkeletonRenderer.vertexEffect`. See `main.lua` for an example
 
 ## Typescript/Javascript
- * **Breaking changes**
+* **Breaking changes**
   * `Skeleton.getBounds` takes a scratch array as input so it doesn't have to allocate a new array on each invocation itself. Reduces GC activity.
   * Removed `Bone.worldToLocalRotationX` and `Bone.worldToLocalRotationY`. Replaced by `Bone.worldToLocalRotation` (rotation given relative to x-axis, counter-clockwise, in degrees).
   * Removed `VertexAttachment.computeWorldVertices` overload, changed `VertexAttachment.computeWorldVerticesWith` to `VertexAttachment.computeWorldVertices`, added `stride` parameter.
@@ -232,7 +369,7 @@
   * Removed `RegionAttachment.updateWorldVertices`, added `RegionAttachment.computeWorldVertices`. The new method now computes the x/y positions of the 4 vertices of the corner and places them in the provided `worldVertices` array, starting at `offset`, then moving by `stride` array elements when advancing to the next vertex. This allows to directly compose the vertex buffer and avoids a copy. The computation of the full vertices, including vertex colors and texture coordinates, is now done by the backend's respective renderer.
   * The completion event will fire for looped 0 duration animations every frame.
 
- * **Additions**
+* **Additions**
   * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
   * Added `Bone.localToWorldRotation`(rotation given relative to x-axis, counter-clockwise, in degrees).
   * Added two color tinting support, including `TwoColorTimeline` and additional fields on `Slot` and `SlotData`.

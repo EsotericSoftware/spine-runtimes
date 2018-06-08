@@ -67,7 +67,7 @@ namespace Spine.Unity.Examples {
 			if (sourceMaterial == null) {
 				var skeletonAnimation = GetComponent<SkeletonAnimation>();
 				if (skeletonAnimation != null)
-					sourceMaterial = skeletonAnimation.SkeletonDataAsset.atlasAssets[0].materials[0];
+					sourceMaterial = skeletonAnimation.SkeletonDataAsset.atlasAssets[0].PrimaryMaterial;
 			}
 		}
 
