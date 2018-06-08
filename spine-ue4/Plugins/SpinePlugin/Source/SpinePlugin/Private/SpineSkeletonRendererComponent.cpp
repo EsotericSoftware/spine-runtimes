@@ -43,16 +43,16 @@ USpineSkeletonRendererComponent::USpineSkeletonRendererComponent (const FObjectI
 	bTickInEditor = true;
 	bAutoActivate = true;
 
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> NormalMaterialRef(TEXT("/SpinePlugin/SpineUnlitNormalMaterialPMC"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> NormalMaterialRef(TEXT("/SpinePlugin/SpineUnlitNormalMaterial"));
 	NormalBlendMaterial = NormalMaterialRef.Object;
 	
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> AdditiveMaterialRef(TEXT("/SpinePlugin/SpineUnlitAdditiveMaterialPMC"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> AdditiveMaterialRef(TEXT("/SpinePlugin/SpineUnlitAdditiveMaterial"));
 	AdditiveBlendMaterial = AdditiveMaterialRef.Object;
 	
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MultiplyMaterialRef(TEXT("/SpinePlugin/SpineUnlitMultiplyMaterialPMC"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MultiplyMaterialRef(TEXT("/SpinePlugin/SpineUnlitMultiplyMaterial"));
 	MultiplyBlendMaterial = MultiplyMaterialRef.Object;
 	
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> ScreenMaterialRef(TEXT("/SpinePlugin/SpineUnlitScreenMaterialPMC"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> ScreenMaterialRef(TEXT("/SpinePlugin/SpineUnlitScreenMaterial"));
 	ScreenBlendMaterial = ScreenMaterialRef.Object;
 	
 	TextureParameterName = FName(TEXT("SpriteTexture"));
