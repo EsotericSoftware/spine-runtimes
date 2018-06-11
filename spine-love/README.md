@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-love works with data exported from Spine 3.6.x.
+spine-love works with data exported from Spine 3.7.x.
 
 spine-love supports all Spine features except for blending modes other than normal.
 
@@ -26,7 +26,7 @@ Alternatively, the `spine-lua` and `spine-love/spine-love` directories can be co
 
 ## Notes
 
- * Two enable two color tinting, pass `true` to `SkeletonRenderer.new()`.
+ * To enable two color tinting, pass `true` to `SkeletonRenderer.new()`.
 
 ## Examples
 

@@ -1,6 +1,6 @@
 # spine-sfml
 
-The spine-sfml runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [SFML](http://www.sfml-dev.org/). spine-sfml is based on [spine-c](../spine-c).
+The spine-sfml runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [SFML](http://www.sfml-dev.org/). spine-sfml is based on [spine-c](../../spine-c).
 
 ## Licensing
 
@@ -10,11 +10,9 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-sfml works with data exported from Spine 3.6.xx.
+spine-sfml works with data exported from Spine 3.7.xx.
 
-spine-sfml supports all Spine features.
-
-spine-sfml does not yet support loading the binary format.
+spine-sfml supports all Spine features except two color tinting.
 
 ## Usage
 1. Create a new SFML project. See the [SFML documentation](http://www.sfml-dev.org/tutorials/2.1/) or have a look at the example in this repository.

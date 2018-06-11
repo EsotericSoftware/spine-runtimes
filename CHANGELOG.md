@@ -25,6 +25,7 @@
 * **Breaking changes**
   * Listeners on `spAnimationState` and `spTrackEntry` will now also be called if a track entry gets disposed as part of disposing an animation state.
   * The completion event will fire for looped 0 duration animations every frame.
+  * The spine-cocos2dx and spine-ue4 runtimes are now based on spine-cpp. See below for changes.
 * **Additions**
   * Added support for local and relative transform constraint calculation, including additional fields in `spTransformConstraintData`.
   * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
@@ -34,15 +35,6 @@
   * Added `void *userData` to `spAnimationState`to be consumed in callbacks.
   * Added additive animation blending. When playing back multiple animations on different tracks, where each animation modifies the same skeleton property, the results of tracks with lower indices are discarded, and only the result from the track with the highest index is used. With animation blending, the results of all tracks are mixed together. This allows effects like mixing multiple facial expressions (angry, happy, sad) with percentage mixes. By default the old behaviour is retained (results from lower tracks are discarded). To enable additive blending across animation tracks, call `spTrackEntry->mixBlend = SP_MIXBLEND_ADD)` on each track. To specify the blend percentage, set `spTrackEntry->alpha`. See http://esotericsoftware.com/forum/morph-target-track-animation-mix-mode-9459 for a discussion.
   * Optimized attachment lookup to give a 40x speed-up. See https://github.com/EsotericSoftware/spine-runtimes/commit/cab81276263890b65d07fa2329ace16db1e365ff
-
-### Cocos2d-x
-* Added ETC1 alpha support, thanks @halx99! Does not work when two color tint is enabled.
-* Added `spAtlasPage_setCustomTextureLoader()` which let's you do texture loading manually. Thanks @jareguo.
-* Added `SkeletonRenderer:setSlotsRange()` and `SkeletonRenderer::createWithSkeleton()`. This allows you to split rendering of a skeleton up into multiple parts, and render other nodes in between. See `SkeletonRendererSeparatorExample.cpp` for an example.
-* Fully transparent attachments will not be rendered, improving rendering performance.
-* Added improved tint-black shader.
-* Updated to cocos2d-x 3.16
-* The skeleton setup pose and world transform are now calculated on initialization to avoid flickering on start-up.
 
 ### Cocos2d-Objc
 * Added vertex effect support to modify vertices of skeletons on the CPU. See `RaptorExample.m`.
@@ -56,13 +48,41 @@
 * Added premultiplied alpha support to `SkeletonDrawable`. Use `SkeletonDrawable::setUsePremultipliedAlpha()`, see https://github.com/EsotericSoftware/spine-runtimes/commit/34086c1f41415309b2ecce86055f6656fcba2950
 * Added additive animation blending sample, see https://github.com/EsotericSoftware/spine-runtimes/blob/b7e712d3ca1d6be3ebcfe3254dc2cea9c44dda71/spine-sfml/example/main.cpp#L369
 
+## C++
+* ** Additions **
+  * Added C++ Spine runtime. See the [spine-cpp Runtime Guide](https://esotericsoftware.com/spine-cpp) for more information on spine-cpp.
+
+### Cocos2d-x
+* Added ETC1 alpha support, thanks @halx99! Does not work when two color tint is enabled.
+* Added `spAtlasPage_setCustomTextureLoader()` which let's you do texture loading manually. Thanks @jareguo.
+* Added `SkeletonRenderer:setSlotsRange()` and `SkeletonRenderer::createWithSkeleton()`. This allows you to split rendering of a skeleton up into multiple parts, and render other nodes in between. See `SkeletonRendererSeparatorExample.cpp` for an example.
+* Fully transparent attachments will not be rendered, improving rendering performance.
+* Added improved tint-black shader.
+* Updated to cocos2d-x 3.16
+* The skeleton setup pose and world transform are now calculated on initialization to avoid flickering on start-up.
+* **Breaking change**: Switched from [spine-c](spine-c) to [spine-cpp](spine-cpp) as the underlying Spine runtime. See the [spine-cpp Runtime Guide](https://esotericsoftware.com/spine-cpp) for more information on spine-cpp.
+  * Added `Cocos2dAttachmentLoader` to be used when constructing an `Atlas`. Used by default by `SkeletonAnimation` and `SkeletonRenderer` when creating instances via the `createXXX` methods.
+  * All C structs and enums `spXXX` have been replaced with their C++ equivalents `spine::XXX` in all public interfaces.
+  * All instantiations via `new` of C++ classes from spine-cpp must contain `(__FILE__, __LINE__)`. This allows the tracking of instantations and detection of memory leaks via the `spine::DebugExtension`.
+
+### SFML
+* Create a second SFML backend using [spine-cpp](spine-cpp/). See the [spine-cpp Runtime Guide](https://esotericsoftware.com/spine-cpp) for more information on spine-cpp.
+* Added support for vertex effects. See raptor example.
+* Added premultiplied alpha support to `SkeletonDrawable`. Use `SkeletonDrawable::setUsePremultipliedAlpha()`, see https://github.com/EsotericSoftware/spine-runtimes/commit/34086c1f41415309b2ecce86055f6656fcba2950
+* Added additive animation blending sample, see https://github.com/EsotericSoftware/spine-runtimes/blob/b7e712d3ca1d6be3ebcfe3254dc2cea9c44dda71/spine-sfml/example/main.cpp#L369
+
 ### UE4
  * spine-c is now exposed from the plugin shared library on Windows via __declspec.
  * Updated to Unreal Engine 4.18
  * Added C++ example, see https://github.com/EsotericSoftware/spine-runtimes/commit/15011e81b7061495dba45e28b4d3f4efb10d7f40
  * `SkeletonRendererComponent` generates collision meshes by default.
  * Disabled generation of collision meshes by `SkeletonRendererComponent`. Both `ProceduralMeshComponent` and `RuntimeMeshComponent` have a bug that generates a new PhysiX file every frame per component. Users are advised to add a separate collision shape to the root scene component of an actor instead.
- * Using UE4 `FMemory` allocator by default.
+ * Using UE4 `FMemory` allocator by default. This should fix issues on some consoles.
+ * **Breaking change** moved away from `RuntimeMeshComponent`, as its maintainance has seized, back to `ProceduralMeshComponent`. Existing projects should just work. However, if you run into issues, you may have to remove the old `SpineSkeletonRendererComponent` and add a new one to your existing actors.
+ * **Breaking change** due to the removal of `RuntimeMeshComponent` and reversal to `ProceduralMeshComponent`, two color tinting is currently not supported. `ProceduralMeshComponent` does not support enough vertex attributes for us to encode the second color in the vertex stream. You can remove the `RuntimeMeshComponent/` directory from your plugins directory and remove the component from any `build.cs` files that may reference it.
+ * **Breaking change**: Switched from [spine-c](spine-c) to [spine-cpp](spine-cpp) as the underlying Spine runtime. See the [spine-cpp Runtime Guide](https://esotericsoftware.com/spine-cpp) for more information on spine-cpp.
+  * All C structs and enums `spXXX` have been replaced with their C++ equivalents `spine::XXX` in all public interfaces.
+  * All instantiations via `new` of C++ classes from spine-cpp must contain `(__FILE__, __LINE__)`. This allows the tracking of instantations and detection of memory leaks via the `spine::DebugExtension`.
 
 ## C# ##
 * **Breaking changes**

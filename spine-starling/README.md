@@ -1,6 +1,6 @@
 # spine-starling
 
-The spine-starling runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Starling 2.0](http://gamua.com/starling/). spine-starling is based on [spine-as3](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-as3).
+The spine-starling runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Starling 2.0](http://gamua.com/starling/). spine-starling is based on [spine-as3](../spine-as3).
 
 ## Licensing
 
@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-starling works with data exported from Spine 3.6.xx.
+spine-starling works with data exported from Spine 3.7.xx.
 
 spine-starling supports all Spine features.
 
@@ -41,6 +41,6 @@ The Spine AS3 example works on Windows, Linux and Mac OS X. This guide assumes y
 
 ## Examples
 
-[Spine atlas example](spine-starling-example/src/AtlasExample.as#L21)
-[Starling atlas example](spine-starling-example/src/StarlingAtlasExample.as#L18)
-[Skin example](spine-starling-example/src/GoblinsExample.as#L21)
+- [Spine atlas example](spine-starling-example/src/AtlasExample.as#L21)
+- [Starling atlas example](spine-starling-example/src/StarlingAtlasExample.as#L18)
+- [Skin example](spine-starling-example/src/GoblinsExample.as#L21)

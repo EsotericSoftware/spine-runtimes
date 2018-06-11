@@ -1,6 +1,6 @@
 # spine-xna
 
-The spine-xna runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [XNA](http://msdn.microsoft.com/xna/). spine-xna is based on [spine-csharp](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-csharp).
+The spine-xna runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [XNA](http://msdn.microsoft.com/xna/). spine-xna is based on [spine-csharp](../spine-csharp).
 
 ## Licensing
 
@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-xna works with data exported from Spine 3.6.xx.
+spine-xna works with data exported from Spine 3.7.xx.
 
 spine-xna supports all Spine features.
 

@@ -8,9 +8,10 @@ namespace UnrealBuildTool.Rules
 		{
 			PublicIncludePaths.AddRange(new string[] { "SpinePlugin/Public", "SpinePlugin/Public/spine-cpp/include" });
             PrivateIncludePaths.AddRange(new string[] { "SpinePlugin/Private", "SpinePlugin/Public/spine-cpp/include" });
-            PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "RHI", "RenderCore", "ShaderCore", "ProceduralMeshComponent", "UMG", "Slate", "SlateCore" });
-            OptimizeCode = CodeOptimization.Never;
-			PublicDefinitions.Add("SPINE_UE4");
+            PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "RHI", "RenderCore", "ShaderCore", "ProceduralMeshComponent", "UMG", "Slate", "SlateCore" });		
+			Definitions.Add("SPINE_UE4");
+			// In Unreal 4.20, comment the above line, uncomment the below line
+			// PublicDefinitions.Add("SPINE_UE4");
 		}
 	}
 }
