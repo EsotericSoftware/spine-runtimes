@@ -682,6 +682,7 @@ namespace Spine.Unity.Editor {
 
 		List<Spine.Event> currentAnimationEvents = new List<Spine.Event>();
 		List<float> currentAnimationEventTimes = new List<float>();
+		List<SpineEventTooltip> currentAnimationEventTooltips = new List<SpineEventTooltip>();
 
 		public bool IsValid { get { return skeletonAnimation != null && skeletonAnimation.valid; } }
 
@@ -1071,7 +1072,7 @@ namespace Spine.Unity.Editor {
 				int loopCount = (int)(t.TrackTime / t.TrackEnd);
 				float currentTime = t.TrackTime - (t.TrackEnd * loopCount);
 				float normalizedTime = currentTime / t.Animation.Duration;
-				float wrappedTime = normalizedTime % 1;
+				float wrappedTime = normalizedTime % 1f;
 
 				lineRect.x = barRect.x + (lineRectWidth * wrappedTime) - 0.5f;
 				lineRect.width = 2;
@@ -1079,13 +1080,14 @@ namespace Spine.Unity.Editor {
 				GUI.color = Color.red;
 				GUI.DrawTexture(lineRect, EditorGUIUtility.whiteTexture);
 				GUI.color = Color.white;
-                //draw tip(s) after all events checked. otherwise a tip may overlap by event logo
-                List<AnimationEventTooltip> tips = new List<AnimationEventTooltip>();
+
+				currentAnimationEventTooltips = currentAnimationEventTooltips ?? new List<SpineEventTooltip>();
+				currentAnimationEventTooltips.Clear();
 				for (int i = 0; i < currentAnimationEvents.Count; i++) {
-					float fr = currentAnimationEventTimes[i];
+					float eventTime = currentAnimationEventTimes[i];
 					var userEventIcon = Icons.userEvent;
 					var evRect = new Rect(barRect) {
-						x = Mathf.Clamp(((fr / t.Animation.Duration) * lineRectWidth) - (userEventIcon.width / 2), barRect.x, float.MaxValue),
+						x = Mathf.Max(((eventTime / t.Animation.Duration) * lineRectWidth) - (userEventIcon.width / 2), barRect.x),
 						y = barRect.y + userEventIcon.height,
 						width = userEventIcon.width,
 						height = userEventIcon.height
@@ -1095,31 +1097,29 @@ namespace Spine.Unity.Editor {
 					Event ev = Event.current;
 					if (ev.type == EventType.Repaint) {
 						if (evRect.Contains(ev.mousePosition)) {
-							GUIStyle tooltipStyle = EditorStyles.helpBox;
-							Rect tooltipRect = new Rect(evRect);
-							tooltipRect.width = tooltipStyle.CalcSize(new GUIContent(currentAnimationEvents[i].Data.Name)).x;
+							string eventName = currentAnimationEvents[i].Data.Name;
+							Rect tooltipRect = new Rect(evRect) {
+								width = EditorStyles.helpBox.CalcSize(new GUIContent(eventName)).x
+							};
 							tooltipRect.y -= 4;
-                            tooltipRect.y -= tooltipRect.height * tips.Count; //to avoid several tips overlap
+							tooltipRect.y -= tooltipRect.height * currentAnimationEventTooltips.Count; // Avoid several overlapping tooltips.
 							tooltipRect.x += 4;
-                            //to avoid tip is too wide and part of it out of barrect
-                            var tmp = tooltipRect.x + tooltipRect.width - (barRect.x + barRect.width);
-                            if(tmp > 0) {
-                                tooltipRect.x -= tmp;
-                            }
-                            AnimationEventTooltip tip;
-                            tip.rect = tooltipRect;
-                            tip.strToShow = currentAnimationEvents[i].Data.Name;
-                            tip.style = tooltipStyle;
-                            tips.Add(tip);
+
+							// Handle tooltip overflowing to the right.
+							float rightEdgeOverflow = (tooltipRect.x + tooltipRect.width) - (barRect.x + barRect.width);
+							if (rightEdgeOverflow > 0)
+								tooltipRect.x -= rightEdgeOverflow;
+
+							currentAnimationEventTooltips.Add(new SpineEventTooltip { rect = tooltipRect, text = eventName });
 						}
 					}
 				}
-                
-                //draw tip(s)
-                for(int i = 0; i < tips.Count; i++) {
-                    GUI.Label(tips[i].rect, tips[i].strToShow, tips[i].style);
-                    GUI.tooltip = tips[i].strToShow;
-                }
+
+				// Draw tooltips.
+				for (int i = 0; i < currentAnimationEventTooltips.Count; i++) {
+					GUI.Label(currentAnimationEventTooltips[i].rect, currentAnimationEventTooltips[i].text, EditorStyles.helpBox);
+					GUI.tooltip = currentAnimationEventTooltips[i].text;
+				}
 			}
 		}
 
@@ -1147,13 +1147,10 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-        public struct AnimationEventTooltip
-        {
-            public Rect rect;
-            public string strToShow;
-            public GUIStyle style;
-        }
+		internal struct SpineEventTooltip {
+			public Rect rect;
+			public string text;
+		}
 	}
-
 
 }
