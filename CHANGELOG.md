@@ -63,7 +63,7 @@
 * **Breaking change**: Switched from [spine-c](spine-c) to [spine-cpp](spine-cpp) as the underlying Spine runtime. See the [spine-cpp Runtime Guide](https://esotericsoftware.com/spine-cpp) for more information on spine-cpp.
   * Added `Cocos2dAttachmentLoader` to be used when constructing an `Atlas`. Used by default by `SkeletonAnimation` and `SkeletonRenderer` when creating instances via the `createXXX` methods.
   * All C structs and enums `spXXX` have been replaced with their C++ equivalents `spine::XXX` in all public interfaces.
-  * All instantiations via `new` of C++ classes from spine-cpp must contain `(__FILE__, __LINE__)`. This allows the tracking of instantations and detection of memory leaks via the `spine::DebugExtension`.
+  * All instantiations via `new` of C++ classes from spine-cpp should contain `(__FILE__, __LINE__)`. This allows the tracking of instantations and detection of memory leaks via the `spine::DebugExtension`.
 
 ### SFML
 * Create a second SFML backend using [spine-cpp](spine-cpp/). See the [spine-cpp Runtime Guide](https://esotericsoftware.com/spine-cpp) for more information on spine-cpp.
@@ -82,7 +82,7 @@
  * **Breaking change** due to the removal of `RuntimeMeshComponent` and reversal to `ProceduralMeshComponent`, two color tinting is currently not supported. `ProceduralMeshComponent` does not support enough vertex attributes for us to encode the second color in the vertex stream. You can remove the `RuntimeMeshComponent/` directory from your plugins directory and remove the component from any `build.cs` files that may reference it.
  * **Breaking change**: Switched from [spine-c](spine-c) to [spine-cpp](spine-cpp) as the underlying Spine runtime. See the [spine-cpp Runtime Guide](https://esotericsoftware.com/spine-cpp) for more information on spine-cpp.
   * All C structs and enums `spXXX` have been replaced with their C++ equivalents `spine::XXX` in all public interfaces.
-  * All instantiations via `new` of C++ classes from spine-cpp must contain `(__FILE__, __LINE__)`. This allows the tracking of instantations and detection of memory leaks via the `spine::DebugExtension`.
+  * All instantiations via `new` of C++ classes from spine-cpp should contain `(__FILE__, __LINE__)`. This allows the tracking of instantations and detection of memory leaks via the `spine::DebugExtension`.
 
 ## C# ##
 * **Breaking changes**
