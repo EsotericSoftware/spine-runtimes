@@ -66,14 +66,13 @@ void callback (AnimationState* state, EventType type, TrackEntry* entry, Event* 
 }
 
 SkeletonData* readSkeletonJsonData (const String& filename, Atlas* atlas, float scale) {
-	SkeletonJson* json = new (__FILE__, __LINE__) SkeletonJson(atlas);
-	json->setScale(scale);
-	SkeletonData* skeletonData = json->readSkeletonDataFile(filename);
+	SkeletonJson json(atlas);
+	json.setScale(scale);
+	SkeletonData* skeletonData = json.readSkeletonDataFile(filename);
 	if (!skeletonData) {
-		printf("%s\n", json->getError().buffer());
+		printf("%s\n", json.getError().buffer());
 		exit(0);
 	}
-	delete json;
 	return skeletonData;
 }
 
@@ -83,6 +82,7 @@ SkeletonData* readSkeletonBinaryData (const char* filename, Atlas* atlas, float 
 	SkeletonData *skeletonData = binary->readSkeletonDataFile(filename);
 	if (!skeletonData) {
 		printf("%s\n", binary->getError().buffer());
+		delete binary;
 		exit(0);
 	}
 	delete binary;

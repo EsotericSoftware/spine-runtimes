@@ -278,7 +278,7 @@ void SFMLTextureLoader::unload(void *texture) {
 	deleteTexture(texture);
 }
 
-SpineExtension *getDefaultExtension() {
+/*SpineExtension *getDefaultExtension() {
 	return new DefaultSpineExtension();
-}
+}*/
 }
