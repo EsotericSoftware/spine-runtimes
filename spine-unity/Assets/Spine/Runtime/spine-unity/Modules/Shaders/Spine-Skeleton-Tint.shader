@@ -1,7 +1,7 @@
 // Spine/Skeleton Tint
 // - Two color tint
 // - unlit
-// - Premultiplied alpha blending
+// - Premultiplied alpha blending (Optional straight alpha input)
 // - No depth, no backface culling, no fog.
 
 Shader "Spine/Skeleton Tint" {
@@ -9,6 +9,7 @@ Shader "Spine/Skeleton Tint" {
 		_Color ("Tint Color", Color) = (1,1,1,1)
 		_Black ("Black Point", Color) = (0,0,0,0)
 		[NoScaleOffset] _MainTex ("MainTex", 2D) = "black" {}
+		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
 	}
 
@@ -23,6 +24,7 @@ Shader "Spine/Skeleton Tint" {
 
 		Pass {
 			CGPROGRAM
+			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
 			#pragma vertex vert
 			#pragma fragment frag
 			#include "UnityCG.cginc"
@@ -44,7 +46,7 @@ Shader "Spine/Skeleton Tint" {
 
 			VertexOutput vert (VertexInput v) {
 				VertexOutput o;
-				o.pos = UnityObjectToClipPos(v.vertex); // replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+				o.pos = UnityObjectToClipPos(v.vertex);
 				o.uv = v.uv;
 				o.vertexColor = v.vertexColor * float4(_Color.rgb * _Color.a, _Color.a); // Combine a PMA version of _Color with vertexColor.
 				return o;
@@ -52,6 +54,11 @@ Shader "Spine/Skeleton Tint" {
 
 			float4 frag (VertexOutput i) : COLOR {
 				float4 texColor = tex2D(_MainTex, i.uv);
+
+				#if defined(_STRAIGHT_ALPHA_INPUT)
+				texColor.rgb *= texColor.a;
+				#endif
+
 				return (texColor * i.vertexColor) + float4(((1-texColor.rgb) * _Black.rgb * texColor.a*_Color.a*i.vertexColor.a), 0);
 			}
 			ENDCG
