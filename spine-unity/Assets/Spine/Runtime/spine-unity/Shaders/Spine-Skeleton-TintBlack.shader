@@ -3,7 +3,7 @@
 // - UV2 and UV3 as Black Tint color.
 // - Final black tint is (UV black data and _Black/"Black Point")
 // - unlit
-// - Premultiplied alpha blending
+// - Premultiplied alpha blending (optional straight alpha input)
 // - No depth, no backface culling, no fog.
 
 Shader "Spine/Skeleton Tint Black" {
@@ -11,6 +11,7 @@ Shader "Spine/Skeleton Tint Black" {
 		_Color ("Tint Color", Color) = (1,1,1,1)
 		_Black ("Black Point", Color) = (0,0,0,0)
 		[NoScaleOffset] _MainTex ("MainTex", 2D) = "black" {}
+		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
 	}
 
@@ -26,6 +27,7 @@ Shader "Spine/Skeleton Tint Black" {
 
 		Pass {
 			CGPROGRAM
+			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
 			#pragma vertex vert
 			#pragma fragment frag
 			#include "UnityCG.cginc"
@@ -61,6 +63,11 @@ Shader "Spine/Skeleton Tint Black" {
 
 			float4 frag (VertexOutput i) : COLOR {
 				float4 texColor = tex2D(_MainTex, i.uv);
+				
+				#if defined(_STRAIGHT_ALPHA_INPUT)
+				texColor.rgb *= texColor.a;
+				#endif
+
 				return (texColor * i.vertexColor) + float4(((1-texColor.rgb) * (_Black.rgb + float3(i.uv1.r, i.uv1.g, i.uv2.r)) * texColor.a*_Color.a*i.vertexColor.a), 0);
 			}
 			ENDCG

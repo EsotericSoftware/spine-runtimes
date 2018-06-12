@@ -1,10 +1,12 @@
 // This is a premultiply-alpha adaptation of the built-in Unity shader "UI/Default" to allow Unity UI stencil masking.
 
-Shader "Spine/SkeletonGraphic Tint Black (Premultiply Alpha)"
+Shader "Spine/SkeletonGraphic Tint Black"
 {
 	Properties
 	{
 		[PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
+		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
+
 		_Color ("Tint", Color) = (1,1,1,1)
 		_Black ("Black Point", Color) = (0,0,0,0)
 
@@ -50,6 +52,7 @@ Shader "Spine/SkeletonGraphic Tint Black (Premultiply Alpha)"
 		Pass
 		{
 		CGPROGRAM
+			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
 			#pragma vertex vert
 			#pragma fragment frag
 
@@ -103,6 +106,10 @@ Shader "Spine/SkeletonGraphic Tint Black (Premultiply Alpha)"
 			fixed4 frag (VertexOutput IN) : SV_Target
 			{
 				half4 texColor = (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd);
+
+				#if defined(_STRAIGHT_ALPHA_INPUT)
+				texColor.rgb *= texColor.a;
+				#endif
 
 				texColor.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
 

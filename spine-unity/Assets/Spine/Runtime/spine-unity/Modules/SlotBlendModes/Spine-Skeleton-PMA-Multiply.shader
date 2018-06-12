@@ -11,6 +11,7 @@ Shader "Spine/Skeleton PMA Multiply" {
 	Properties {
 		_Color ("Tint Color", Color) = (1,1,1,1)
 		[NoScaleOffset] _MainTex ("MainTex", 2D) = "black" {}
+		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
 	}
 
@@ -26,6 +27,7 @@ Shader "Spine/Skeleton PMA Multiply" {
 
 		Pass {
 			CGPROGRAM
+			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
 			#pragma vertex vert
 			#pragma fragment frag
 			#include "UnityCG.cginc"
@@ -54,6 +56,11 @@ Shader "Spine/Skeleton PMA Multiply" {
 
 			float4 frag (VertexOutput i) : COLOR {
 				float4 texColor = tex2D(_MainTex, i.uv);
+				
+				#if defined(_STRAIGHT_ALPHA_INPUT)
+				texColor.rgb *= texColor.a;
+				#endif
+
 				return (texColor * i.vertexColor);
 			}
 			ENDCG

@@ -1,11 +1,12 @@
 ﻿// - Vertex Lit + ShadowCaster
-// - Premultiplied Alpha Blending (One OneMinusSrcAlpha)
+// - Premultiplied Alpha Blending (Optional straight alpha input)
 // - Double-sided, no depth
 
 Shader "Spine/Skeleton Lit" {
 	Properties {
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
 		[NoScaleOffset] _MainTex ("Main Texture", 2D) = "black" {}
+		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
 	}
 
 	SubShader {
@@ -38,6 +39,7 @@ Shader "Spine/Skeleton Lit" {
 			Blend One OneMinusSrcAlpha
 
 			CGPROGRAM
+			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma target 2.0
@@ -135,7 +137,13 @@ Shader "Spine/Skeleton Lit" {
 				fixed4 tex = tex2D(_MainTex, i.uv0);
 
 				fixed4 col;
+
+				#if defined(_STRAIGHT_ALPHA_INPUT)
+				col.rgb = tex * i.color * tex.a;
+				#else
 				col.rgb = tex * i.color;
+				#endif
+				
 				col *= 2;
 				col.a = tex.a * i.color.a;
 				return col;
