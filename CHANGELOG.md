@@ -77,7 +77,7 @@
 *  **SpineAtlasAsset** The existing `AtlasAsset` type has been renamed to `SpineAtlasAsset` to signify that it specifically uses a Spine/libGDX atlas as its source. Serialization should be intact but user code will need to be updated to refer to existing atlases as `SpineAtlasAsset`.
 	* **AtlasAssetBase** `SpineAtlasAsset` now has an abstract base class called `SpineAtlasAsset`. This is the base class to derive when using alternate atlas sources. Existing SkeletonDataAsset field "atlasAssets" now have the "AtlasAssetBase" type. Serialization should be intact, but user code will need to be updated to refer to the atlas assets accordingly.
 	* This change is in preparation for alternate atlas options such as Unity's SpriteAtlas.
-* **Optional Straight Alpha for shaders** Spine-Unitys's included Unity shaders now have a `_STRAIGHT_ALPHA_INPUT` variant, settable as a checkbox in your Material's inspector, which allows it to use a non-premultiplied alpha/straight alpha input texture.
+* **Optional Straight Alpha for shaders** Spine-Unity's included Unity shaders now have a `_STRAIGHT_ALPHA_INPUT` shader_feature, toggled as a checkbox in the Material's inspector. This allows the Material to use a non-premultiplied alpha/straight alpha input texture.
 	* The following shaders now have the "Straight Alpha Texture" checkbox when used on a material:
 		* `Spine/Skeleton`
 		* `Spine/Skeleton Tint Black`
