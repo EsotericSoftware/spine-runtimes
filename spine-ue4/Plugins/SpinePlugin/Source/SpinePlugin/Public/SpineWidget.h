@@ -50,11 +50,68 @@ public:
 	virtual const FText GetPaletteCategory() override;
 #endif
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
+	USpineAtlasAsset* Atlas;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
+	USpineSkeletonDataAsset* SkeletonData;
+
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
+	UMaterialInterface* NormalBlendMaterial;
+
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
+	UMaterialInterface* AdditiveBlendMaterial;
+
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
+	UMaterialInterface* MultiplyBlendMaterial;
+
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
+	UMaterialInterface* ScreenBlendMaterial;
+
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
+	FName TextureParameterName;
+
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
+	float DepthOffset = 0.1f;
+
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
+	FLinearColor Color = FLinearColor(1, 1, 1, 1);
+
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
 	FSlateBrush Brush;
 
+	virtual void FinishDestroy() override;
+
 protected:
+	friend class SSpineWidget;
+
 	virtual TSharedRef<SWidget> RebuildWidget() override;
+	virtual void CheckState();
+	virtual void InternalTick(float DeltaTime);
+	virtual void DisposeState();
 
 	TSharedPtr<SSpineWidget> slateWidget;
+	spine::Skeleton* skeleton;
+	USpineAtlasAsset* lastAtlas = nullptr;
+	USpineSkeletonDataAsset* lastData = nullptr;
+
+	// Need to hold on to the dynamic instances, or the GC will kill us while updating them
+	UPROPERTY()
+	TArray<UMaterialInstanceDynamic*> atlasNormalBlendMaterials;
+	TMap<spine::AtlasPage*, UMaterialInstanceDynamic*> pageToNormalBlendMaterial;
+
+	UPROPERTY()
+	TArray<UMaterialInstanceDynamic*> atlasAdditiveBlendMaterials;
+	TMap<spine::AtlasPage*, UMaterialInstanceDynamic*> pageToAdditiveBlendMaterial;
+
+	UPROPERTY()
+	TArray<UMaterialInstanceDynamic*> atlasMultiplyBlendMaterials;
+	TMap<spine::AtlasPage*, UMaterialInstanceDynamic*> pageToMultiplyBlendMaterial;
+
+	UPROPERTY()
+	TArray<UMaterialInstanceDynamic*> atlasScreenBlendMaterials;
+	TMap<spine::AtlasPage*, UMaterialInstanceDynamic*> pageToScreenBlendMaterial;
+
+	spine::Vector<float> worldVertices;
+	spine::SkeletonClipping clipper;
 };

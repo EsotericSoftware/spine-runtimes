@@ -31,17 +31,39 @@
 #include "SpinePluginPrivatePCH.h"
 #include "SpineWidget.h"
 #include "SSpineWidget.h"
+#include "Engine.h"
 
 #define LOCTEXT_NAMESPACE "Spine"
 
 USpineWidget::USpineWidget(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer) {
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> NormalMaterialRef(TEXT("/SpinePlugin/SpineUnlitNormalMaterial"));
+	NormalBlendMaterial = NormalMaterialRef.Object;
+
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> AdditiveMaterialRef(TEXT("/SpinePlugin/SpineUnlitAdditiveMaterial"));
+	AdditiveBlendMaterial = AdditiveMaterialRef.Object;
+
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MultiplyMaterialRef(TEXT("/SpinePlugin/SpineUnlitMultiplyMaterial"));
+	MultiplyBlendMaterial = MultiplyMaterialRef.Object;
+
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> ScreenMaterialRef(TEXT("/SpinePlugin/SpineUnlitScreenMaterial"));
+	ScreenBlendMaterial = ScreenMaterialRef.Object;
+
+	TextureParameterName = FName(TEXT("SpriteTexture"));
+
+	worldVertices.ensureCapacity(1024 * 2);
 }
 
 void USpineWidget::SynchronizeProperties() {
 	Super::SynchronizeProperties();
 
 	if (slateWidget.IsValid()) {
-		slateWidget->SetBrush(&Brush);
+		CheckState();
+		if (skeleton) {
+			InternalTick(0);			
+			slateWidget->SetData(this);
+		} else {
+			slateWidget->SetData(nullptr);		
+		}
 	}
 }
 
@@ -60,3 +82,37 @@ const FText USpineWidget::GetPaletteCategory() {
 	return LOCTEXT("Spine", "Spine");
 }
 #endif
+
+void USpineWidget::InternalTick(float DeltaTime) {
+	CheckState();
+
+	if (skeleton) {
+		skeleton->updateWorldTransform();
+	}
+}
+
+void USpineWidget::CheckState() {
+	if (lastAtlas != Atlas || lastData != SkeletonData) {
+		DisposeState();
+
+		if (Atlas && SkeletonData) {
+			spine::SkeletonData* data = SkeletonData->GetSkeletonData(Atlas->GetAtlas(false), false);
+			skeleton = new (__FILE__, __LINE__) spine::Skeleton(data);
+		}
+
+		lastAtlas = Atlas;
+		lastData = SkeletonData;
+	}
+}
+
+void USpineWidget::DisposeState() {
+	if (skeleton) {
+		delete skeleton;
+		skeleton = nullptr;
+	}
+}
+
+void USpineWidget::FinishDestroy() {
+	DisposeState();
+	Super::FinishDestroy();
+}
