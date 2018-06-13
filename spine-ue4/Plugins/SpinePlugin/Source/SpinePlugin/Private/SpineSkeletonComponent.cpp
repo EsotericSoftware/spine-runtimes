@@ -171,6 +171,15 @@ bool USpineSkeletonComponent::GetFlipY() {
 	return false;
 }
 
+void USpineSkeletonComponent::GetBones(TArray<FString> &Bones) {
+	CheckState();
+	if (skeleton) {
+		for (size_t i = 0, n = skeleton->getBones().size(); i < n; i++) {
+			Bones.Add(skeleton->getBones()[i]->getData().getName().buffer());
+		}
+	}
+}
+
 void USpineSkeletonComponent::BeginPlay() {
 	Super::BeginPlay();
 }

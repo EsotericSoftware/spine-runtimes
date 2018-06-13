@@ -89,6 +89,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	bool GetFlipY();
+
+	UFUNCTION(BlueprintPure, Category = "Components|Spine|Skeleton")
+	void GetBones(TArray<FString> &Bones);
 	
 	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|Skeleton")
 	FSpineBeforeUpdateWorldTransformDelegate BeforeUpdateWorldTransform;
