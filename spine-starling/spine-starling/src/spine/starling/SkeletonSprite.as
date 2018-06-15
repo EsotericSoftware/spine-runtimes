@@ -29,6 +29,7 @@
  *****************************************************************************/
  
 package spine.starling {
+	import starling.styles.MeshStyle;
 	import spine.attachments.ClippingAttachment;
 	import spine.SkeletonClipping;
 	import spine.Bone;
@@ -170,9 +171,9 @@ package spine.starling {
 				if (clipper.isClipping()) {
 					clipper.clipTriangles(worldVertices, indices, indices.length, uvs);
 					
-					// Need to create a new mesh here, see https://github.com/EsotericSoftware/spine-runtimes/issues/1125
+					// Need to create a new mesh here, see https://github.com/EsotericSoftware/spine-runtimes/issues/1125					
 					mesh = new SkeletonMesh(mesh.texture);
-					if (_twoColorTint) mesh.setStyle(mesh.style);
+					if (_twoColorTint) mesh.setStyle(new TwoColorMeshStyle());	
 					indexData = mesh.getIndexData();
 
 					verticesCount = clipper.clippedVertices.length >> 1;
@@ -223,7 +224,6 @@ package spine.starling {
 				if (indexData.numIndices > 0 && vertexData.numVertices > 0) {
 					painter.state.blendMode = blendModes[slot.data.blendMode.ordinal];
 					painter.batchMesh(mesh);
-					painter.finishMeshBatch();
 				}
 				
 				clipper.clipEndWithSlot(slot);
