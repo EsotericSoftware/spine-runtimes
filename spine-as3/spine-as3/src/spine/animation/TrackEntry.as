@@ -99,7 +99,7 @@ package spine.animation {
 				var id : String = intId.toString();
 				var contained: Object = propertyIDs[id];
 				propertyIDs[id] = true;
-				if (contained != undefined) {					
+				if (contained != null) {
 					timelineData[i] = AnimationState.SUBSEQUENT;
 				} else if (to == null || !to.hasTimeline(intId)) {				
 					timelineData[i] = AnimationState.FIRST;
