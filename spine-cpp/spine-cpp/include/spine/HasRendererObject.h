@@ -40,7 +40,7 @@ public:
 	explicit HasRendererObject() : _rendererObject(NULL) {};
 
 	virtual ~HasRendererObject() {
-		if (_dispose)
+		if (_dispose && _rendererObject)
 			_dispose(_rendererObject);
 	}
 
