@@ -38,8 +38,8 @@ using namespace spine;
 #include <memory>
 
 template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args) {
-	return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+unique_ptr<T> make_unique(Args&&... args) {
+	return unique_ptr<T>(new T(forward<Args>(args)...));
 }
 
 void callback (AnimationState* state, EventType type, TrackEntry* entry, Event* event) {
@@ -69,26 +69,26 @@ void callback (AnimationState* state, EventType type, TrackEntry* entry, Event* 
 	fflush(stdout);
 }
 
-SkeletonData* readSkeletonJsonData (const String& filename, Atlas* atlas, float scale) {
+shared_ptr<SkeletonData> readSkeletonJsonData (const String& filename, Atlas* atlas, float scale) {
 	SkeletonJson json(atlas);
 	json.setScale(scale);
-	SkeletonData* skeletonData = json.readSkeletonDataFile(filename);
+	auto skeletonData = json.readSkeletonDataFile(filename);
 	if (!skeletonData) {
 		printf("%s\n", json.getError().buffer());
 		exit(0);
 	}
-	return skeletonData;
+	return shared_ptr<SkeletonData>(skeletonData);
 }
 
-SkeletonData* readSkeletonBinaryData (const char* filename, Atlas* atlas, float scale) {
+shared_ptr<SkeletonData> readSkeletonBinaryData (const char* filename, Atlas* atlas, float scale) {
 	SkeletonBinary binary(atlas);
 	binary.setScale(scale);
-	SkeletonData *skeletonData = binary.readSkeletonDataFile(filename);
+	auto skeletonData = binary.readSkeletonDataFile(filename);
 	if (!skeletonData) {
 		printf("%s\n", binary.getError().buffer());
 		exit(0);
 	}
-	return skeletonData;
+	return shared_ptr<SkeletonData>(skeletonData);
 }
 
 void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
@@ -97,10 +97,10 @@ void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
 	SFMLTextureLoader textureLoader;
 	auto atlas = make_unique<Atlas>(atlasName, &textureLoader);
 
-	auto skeletonData = unique_ptr<SkeletonData>(readSkeletonJsonData(jsonName, atlas.get(), scale));
+	auto skeletonData = readSkeletonJsonData(jsonName, atlas.get(), scale);
 	func(skeletonData.get(), atlas.get());
 
-	skeletonData = unique_ptr<SkeletonData>(readSkeletonBinaryData(binaryName, atlas.get(), scale));
+	skeletonData = readSkeletonBinaryData(binaryName, atlas.get(), scale);
 	func(skeletonData.get(), atlas.get());
 }
 
