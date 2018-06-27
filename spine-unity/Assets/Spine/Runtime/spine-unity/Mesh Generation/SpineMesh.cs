@@ -680,8 +680,8 @@ namespace Spine.Unity {
 
 			int vertexIndex = 0;
 			var tempVerts = this.tempVerts;
-			Vector3 bmin = this.meshBoundsMin;
-			Vector3 bmax = this.meshBoundsMax;
+			Vector2 bmin = this.meshBoundsMin;
+			Vector2 bmax = this.meshBoundsMax;
 
 			var vbi = vertexBuffer.Items;
 			var ubi = uvBuffer.Items;
@@ -988,10 +988,11 @@ namespace Spine.Unity {
 					mesh.bounds = new Bounds();
 				} else {
 					//mesh.bounds = ArraysMeshGenerator.ToBounds(meshBoundsMin, meshBoundsMax);
-					Vector2 halfSize = (meshBoundsMax - meshBoundsMin) * 0.5f;
+					float halfWidth = (meshBoundsMax.x - meshBoundsMin.x) * 0.5f;
+					float halfHeight = (meshBoundsMax.y - meshBoundsMin.y) * 0.5f;
 					mesh.bounds = new Bounds {
-						center = (Vector3)(meshBoundsMin + halfSize),
-						extents = new Vector3(halfSize.x, halfSize.y, meshBoundsThickness * 0.5f)
+						center = new Vector3(meshBoundsMin.x + halfWidth, meshBoundsMin.y + halfHeight),
+						extents = new Vector3(halfWidth, halfHeight, meshBoundsThickness * 0.5f)
 					};
 				}
 			}
