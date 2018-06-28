@@ -12,6 +12,7 @@
 	<packaging>jar</packaging>
 	<version>3.7.0.1-SNAPSHOT</version>
 
+
 	<name>spine-libgdx</name>
 	<description>Spine Runtime for libGDX</description>
 	<url>http://github.com/esotericsoftware/spine-runtimes</url>
