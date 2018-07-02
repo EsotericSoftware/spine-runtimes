@@ -30,13 +30,12 @@
 
 package com.esotericsoftware.spine;
 
-import static com.esotericsoftware.spine.utils.SpineUtils.*;
 import static com.badlogic.gdx.math.Matrix3.*;
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
 
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.esotericsoftware.spine.BoneData.TransformMode;
 
 /** Stores a bone's current pose.
  * <p>
@@ -111,28 +110,14 @@ public class Bone implements Updatable {
 
 		Bone parent = this.parent;
 		if (parent == null) { // Root bone.
-			float rotationY = rotation + 90 + shearY;
-			float la = cosDeg(rotation + shearX) * scaleX;
-			float lb = cosDeg(rotationY) * scaleY;
-			float lc = sinDeg(rotation + shearX) * scaleX;
-			float ld = sinDeg(rotationY) * scaleY;
 			Skeleton skeleton = this.skeleton;
-			if (skeleton.flipX) {
-				x = -x;
-				la = -la;
-				lb = -lb;
-			}
-			if (skeleton.flipY) {
-				y = -y;
-				lc = -lc;
-				ld = -ld;
-			}
-			a = la;
-			b = lb;
-			c = lc;
-			d = ld;
-			worldX = x + skeleton.x;
-			worldY = y + skeleton.y;
+			float rotationY = rotation + 90 + shearY, sx = skeleton.scaleX, sy = skeleton.scaleY;
+			a = cosDeg(rotation + shearX) * scaleX * sx;
+			b = cosDeg(rotationY) * scaleY * sy;
+			c = sinDeg(rotation + shearX) * scaleX * sx;
+			d = sinDeg(rotationY) * scaleY * sy;
+			worldX = x * sx + skeleton.x;
+			worldY = y * sy + skeleton.y;
 			return;
 		}
 
@@ -188,8 +173,8 @@ public class Bone implements Updatable {
 		case noScale:
 		case noScaleOrReflection: {
 			float cos = cosDeg(rotation), sin = sinDeg(rotation);
-			float za = pa * cos + pb * sin;
-			float zc = pc * cos + pd * sin;
+			float za = (pa * cos + pb * sin) / skeleton.scaleX;
+			float zc = (pc * cos + pd * sin) / skeleton.scaleY;
 			float s = (float)Math.sqrt(za * za + zc * zc);
 			if (s > 0.00001f) s = 1 / s;
 			za *= s;
@@ -201,26 +186,18 @@ public class Bone implements Updatable {
 			float la = cosDeg(shearX) * scaleX;
 			float lb = cosDeg(90 + shearY) * scaleY;
 			float lc = sinDeg(shearX) * scaleX;
-			float ld = sinDeg(90 + shearY) * scaleY;			
-			if (data.transformMode != TransformMode.noScaleOrReflection ? pa * pd - pb * pc < 0 : skeleton.flipX != skeleton.flipY) {
-			    zb = -zb;
-			    zd = -zd;
-			}			
+			float ld = sinDeg(90 + shearY) * scaleY;
 			a = za * la + zb * lc;
 			b = za * lb + zb * ld;
 			c = zc * la + zd * lc;
 			d = zc * lb + zd * ld;
-			return;
+			break;
 		}
 		}
-		if (skeleton.flipX) {
-			a = -a;
-			b = -b;
-		}
-		if (skeleton.flipY) {
-			c = -c;
-			d = -d;
-		}
+		a *= skeleton.scaleX;
+		b *= skeleton.scaleX;
+		c *= skeleton.scaleY;
+		d *= skeleton.scaleY;
 	}
 
 	/** Sets this bone's local transform to the setup pose. */
