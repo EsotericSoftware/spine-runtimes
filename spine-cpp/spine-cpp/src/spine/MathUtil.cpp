@@ -37,6 +37,11 @@
 #include <random>
 #include <stdlib.h>
 
+// Required for division by 0 in _isNaN on MSVC
+#ifdef _MSC_VER
+#pragma warning(disable:4723)
+#endif
+
 using namespace spine;
 
 const float MathUtil::Pi = 3.1415926535897932385f;
