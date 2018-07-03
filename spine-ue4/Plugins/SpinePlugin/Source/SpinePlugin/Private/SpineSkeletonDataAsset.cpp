@@ -33,6 +33,7 @@
 #include <string.h>
 #include <string>
 #include <stdlib.h>
+#include "Runtime/Core/Public/Misc/MessageDialog.h"
 
 #define LOCTEXT_NAMESPACE "Spine"
 
@@ -105,10 +106,22 @@ SkeletonData* USpineSkeletonDataAsset::GetSkeletonData (Atlas* Atlas, bool Force
 		if (skeletonDataFileName.GetPlainNameString().Contains(TEXT(".json"))) {
 			SkeletonJson* json = new (__FILE__, __LINE__) SkeletonJson(Atlas);
 			this->skeletonData = json->readSkeletonData((const char*)rawData.GetData());
+			if (!skeletonData) {
+#if WITH_EDITORONLY_DATA
+				FMessageDialog::Debugf(FText::FromString(UTF8_TO_TCHAR(json->getError().buffer())));
+#endif
+				UE_LOG(SpineLog, Error, TEXT("Couldn't load skeleton data and atlas: %s"), UTF8_TO_TCHAR(json->getError().buffer()));
+			}
 			delete json;
 		} else {
 			SkeletonBinary* binary = new (__FILE__, __LINE__) SkeletonBinary(Atlas);
 			this->skeletonData = binary->readSkeletonData((const unsigned char*)rawData.GetData(), (int)rawData.Num());
+			if (!skeletonData) {
+#if WITH_EDITORONLY_DATA
+				FMessageDialog::Debugf(FText::FromString(UTF8_TO_TCHAR(binary->getError().buffer())));
+#endif
+				UE_LOG(SpineLog, Error, TEXT("Couldn't load skeleton data and atlas: %s"), UTF8_TO_TCHAR(binary->getError().buffer()));
+			}
 			delete binary;
 		}
 		if (animationStateData) {

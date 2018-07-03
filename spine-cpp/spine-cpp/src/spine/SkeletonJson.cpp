@@ -506,6 +506,12 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 						case AttachmentType_Linkedmesh: {
 							attachment = _attachmentLoader->newMeshAttachment(*skin, attachmentName, attachmentPath);
 
+							if (!attachment) {
+								delete skeletonData;
+								setError(root, "Error reading attachment: ", skinAttachmentName);
+								return NULL;
+							}
+
 							MeshAttachment *mesh = static_cast<MeshAttachment *>(attachment);
 							mesh->_path = attachmentPath;
 

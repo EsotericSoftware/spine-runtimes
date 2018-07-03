@@ -109,12 +109,14 @@ void USpineSkeletonAnimationComponent::CheckState () {
 		
 		if (Atlas && SkeletonData) {
 			spine::SkeletonData *data = SkeletonData->GetSkeletonData(Atlas->GetAtlas(false), false);
-			skeleton = new (__FILE__, __LINE__) Skeleton(data);
-			AnimationStateData* stateData = SkeletonData->GetAnimationStateData(Atlas->GetAtlas(false));
-			state = new (__FILE__, __LINE__) AnimationState(stateData);
-			state->setRendererObject((void*)this);
-			state->setListener(callback);
-			trackEntries.Empty();
+			if (data) {
+				skeleton = new (__FILE__, __LINE__) Skeleton(data);
+				AnimationStateData* stateData = SkeletonData->GetAnimationStateData(Atlas->GetAtlas(false));
+				state = new (__FILE__, __LINE__) AnimationState(stateData);
+				state->setRendererObject((void*)this);
+				state->setListener(callback);
+				trackEntries.Empty();
+			}
 		}
 		
 		lastAtlas = Atlas;
