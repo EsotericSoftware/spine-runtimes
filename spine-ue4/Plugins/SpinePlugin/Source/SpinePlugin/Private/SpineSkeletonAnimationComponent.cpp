@@ -107,12 +107,14 @@ void USpineSkeletonAnimationComponent::CheckState () {
 		
 		if (Atlas && SkeletonData) {
 			spSkeletonData* data = SkeletonData->GetSkeletonData(Atlas->GetAtlas(false), false);
-			skeleton = spSkeleton_create(data);
-			spAnimationStateData* stateData = SkeletonData->GetAnimationStateData(Atlas->GetAtlas(false));
-			state = spAnimationState_create(stateData);
-			state->rendererObject = (void*)this;
-			state->listener = callback;
-			trackEntries.Empty();
+			if (data) {
+				skeleton = spSkeleton_create(data);
+				spAnimationStateData* stateData = SkeletonData->GetAnimationStateData(Atlas->GetAtlas(false));
+				state = spAnimationState_create(stateData);
+				state->rendererObject = (void*)this;
+				state->listener = callback;
+				trackEntries.Empty();
+			}
 		}
 		
 		lastAtlas = Atlas;
