@@ -32,6 +32,8 @@
 
 #include "ModuleManager.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(SpineLog, Log, All);
+
 class SPINEPLUGIN_API SpinePlugin : public IModuleInterface {
 
 public:

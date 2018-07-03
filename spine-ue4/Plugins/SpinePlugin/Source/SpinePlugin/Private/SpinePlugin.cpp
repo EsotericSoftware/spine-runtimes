@@ -30,6 +30,8 @@
 
 #include "SpinePluginPrivatePCH.h"
 
+DEFINE_LOG_CATEGORY(SpineLog);
+
 class FSpinePlugin : public SpinePlugin {
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
