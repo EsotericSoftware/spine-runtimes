@@ -116,6 +116,7 @@ module spine {
 			if (!config.json && !config.jsonContent) throw new Error("Please specify config.json or config.jsonContent");
 			if (!config.animation) throw new Error("Please specify config.animationName");
 
+			if (!config.speed) config.speed = 1.0;
 			if (!config.scale) config.scale = 1.0;
 			if (!config.skin) config.skin = "default";
 			if (config.loop === undefined) config.loop = true;
@@ -193,7 +194,7 @@ module spine {
 
 		private render () {
 			var now = Date.now() / 1000;
-			var delta = now - this.lastFrameTime;
+			var delta = (now - this.lastFrameTime) * this.config.speed;
 			if (delta > 0.1) delta = 0;
 			this.lastFrameTime = now;
 
@@ -351,6 +352,7 @@ module spine {
 		atlasPagesContent: string[];
 		skin = "default";
 		loop = true;
+		speed = 1.0;
 		scale = 1.0;
 		x = 0;
 		y = 0;
