@@ -37,6 +37,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
+
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
 
@@ -1294,11 +1295,12 @@ public class Animation {
 		}
 	}
 
-	/** Changes an IK constraint's {@link IkConstraint#getMix()} and {@link IkConstraint#getBendDirection()}. */
+	/** Changes an IK constraint's {@link IkConstraint#getMix()}, {@link IkConstraint#getBendDirection()}, and
+	 * {@link IkConstraint#getStretch()}. */
 	static public class IkConstraintTimeline extends CurveTimeline {
-		static public final int ENTRIES = 3;
-		static private final int PREV_TIME = -3, PREV_MIX = -2, PREV_BEND_DIRECTION = -1;
-		static private final int MIX = 1, BEND_DIRECTION = 2;
+		static public final int ENTRIES = 4;
+		static private final int PREV_TIME = -4, PREV_MIX = -3, PREV_BEND_DIRECTION = -2, PREV_STRETCH = -1;
+		static private final int MIX = 1, BEND_DIRECTION = 2, STRETCH = 3;
 
 		int ikConstraintIndex;
 		private final float[] frames; // time, mix, bendDirection, ...
@@ -1328,11 +1330,12 @@ public class Animation {
 		}
 
 		/** Sets the time in seconds, mix, and bend direction for the specified key frame. */
-		public void setFrame (int frameIndex, float time, float mix, int bendDirection) {
+		public void setFrame (int frameIndex, float time, float mix, int bendDirection, boolean stretch) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;
 			frames[frameIndex + MIX] = mix;
 			frames[frameIndex + BEND_DIRECTION] = bendDirection;
+			frames[frameIndex + STRETCH] = stretch ? 1 : 0;
 		}
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, MixBlend blend,
@@ -1345,10 +1348,12 @@ public class Animation {
 				case setup:
 					constraint.mix = constraint.data.mix;
 					constraint.bendDirection = constraint.data.bendDirection;
+					constraint.stretch = constraint.data.stretch;
 					return;
 				case first:
 					constraint.mix += (constraint.data.mix - constraint.mix) * alpha;
 					constraint.bendDirection = constraint.data.bendDirection;
+					constraint.stretch = constraint.data.stretch;
 				}
 				return;
 			}
@@ -1356,11 +1361,19 @@ public class Animation {
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
 				if (blend == setup) {
 					constraint.mix = constraint.data.mix + (frames[frames.length + PREV_MIX] - constraint.data.mix) * alpha;
-					constraint.bendDirection = direction == out ? constraint.data.bendDirection
-						: (int)frames[frames.length + PREV_BEND_DIRECTION];
+					if (direction == out) {
+						constraint.bendDirection = constraint.data.bendDirection;
+						constraint.stretch = constraint.data.stretch;
+					} else {
+						constraint.bendDirection = (int)frames[frames.length + PREV_BEND_DIRECTION];
+						constraint.stretch = frames[frames.length + PREV_STRETCH] != 0;
+					}
 				} else {
 					constraint.mix += (frames[frames.length + PREV_MIX] - constraint.mix) * alpha;
-					if (direction == in) constraint.bendDirection = (int)frames[frames.length + PREV_BEND_DIRECTION];
+					if (direction == in) {
+						constraint.bendDirection = (int)frames[frames.length + PREV_BEND_DIRECTION];
+						constraint.stretch = frames[frames.length + PREV_STRETCH] != 0;
+					}
 				}
 				return;
 			}
@@ -1373,11 +1386,19 @@ public class Animation {
 
 			if (blend == setup) {
 				constraint.mix = constraint.data.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.data.mix) * alpha;
-				constraint.bendDirection = direction == out ? constraint.data.bendDirection
-					: (int)frames[frame + PREV_BEND_DIRECTION];
+				if (direction == out) {
+					constraint.bendDirection = constraint.data.bendDirection;
+					constraint.stretch = constraint.data.stretch;
+				} else {
+					constraint.bendDirection = (int)frames[frame + PREV_BEND_DIRECTION];
+					constraint.stretch = frames[frame + PREV_STRETCH] != 0;
+				}
 			} else {
 				constraint.mix += (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
-				if (direction == in) constraint.bendDirection = (int)frames[frame + PREV_BEND_DIRECTION];
+				if (direction == in) {
+					constraint.bendDirection = (int)frames[frame + PREV_BEND_DIRECTION];
+					constraint.stretch = frames[frame + PREV_STRETCH] != 0;
+				}
 			}
 		}
 	}
