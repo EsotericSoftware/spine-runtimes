@@ -161,8 +161,8 @@ public class IkConstraint implements Constraint {
 		else if (rotationIK < -180) rotationIK += 360;
 		float sx = bone.ascaleX;
 		if (stretch) {
-			float dd = (float)Math.sqrt(tx * tx + ty * ty);
-			if (dd > bone.data.length * sx) sx *= (dd / (bone.data.length * sx) - 1) * alpha + 1;
+			float b = bone.data.length * sx, dd = (float)Math.sqrt(tx * tx + ty * ty);
+			if (dd > b && b > 0.0001f) sx *= (dd / b - 1) * alpha + 1;
 		}
 		bone.updateWorldTransform(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, bone.ascaleY, bone.ashearX,
 			bone.ashearY);
@@ -226,7 +226,7 @@ public class IkConstraint implements Constraint {
 				cos = -1;
 			else if (cos > 1) {
 				cos = 1;
-				if (stretch) sx *= ((float)Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+				if (stretch && l1 + l2 > 0.0001f) sx *= ((float)Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
 			}
 			a2 = (float)Math.acos(cos) * bendDir;
 			a = l1 + l2 * cos;
