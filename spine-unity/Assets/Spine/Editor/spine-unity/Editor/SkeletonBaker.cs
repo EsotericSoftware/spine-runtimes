@@ -80,7 +80,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			string dataPath = AssetDatabase.GetAssetPath(skeletonDataAsset);
-			string controllerPath = dataPath.Replace(SpineEditorUtilities.SkeletonDataSuffix, "_Controller").Replace(".asset", ".controller");
+			string controllerPath = dataPath.Replace(SpineEditorUtilities.AssetUtility.SkeletonDataSuffix, "_Controller").Replace(".asset", ".controller");
 			UnityEditor.Animations.AnimatorController controller;
 			if (skeletonDataAsset.controller != null) {
 				controller = (UnityEditor.Animations.AnimatorController)skeletonDataAsset.controller;
@@ -1404,6 +1404,53 @@ namespace Spine.Unity.Editor {
 			return angle;
 		}
 		#endregion
+		#endregion
+
+		#region Region Baking
+		public static GameObject BakeRegion (SpineAtlasAsset atlasAsset, AtlasRegion region, bool autoSave = true) {
+			atlasAsset.GetAtlas(); // Initializes atlasAsset.
+
+			string atlasAssetPath = AssetDatabase.GetAssetPath(atlasAsset);
+			string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath);
+			string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
+			string bakedPrefabPath = Path.Combine(bakedDirPath, SpineEditorUtilities.GetPathSafeName(region.name) + ".prefab").Replace("\\", "/");
+
+			GameObject prefab = (GameObject)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(GameObject));
+			GameObject root;
+			Mesh mesh;
+			bool isNewPrefab = false;
+
+			if (!Directory.Exists(bakedDirPath))
+				Directory.CreateDirectory(bakedDirPath);
+
+			if (prefab == null) {
+				root = new GameObject("temp", typeof(MeshFilter), typeof(MeshRenderer));
+				prefab = PrefabUtility.CreatePrefab(bakedPrefabPath, root);
+				isNewPrefab = true;
+				Object.DestroyImmediate(root);
+			}
+
+			mesh = (Mesh)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(Mesh));
+
+			Material mat = null;
+			mesh = atlasAsset.GenerateMesh(region.name, mesh, out mat);
+			if (isNewPrefab) {
+				AssetDatabase.AddObjectToAsset(mesh, prefab);
+				prefab.GetComponent<MeshFilter>().sharedMesh = mesh;
+			}
+
+			EditorUtility.SetDirty(mesh);
+			EditorUtility.SetDirty(prefab);
+
+			if (autoSave) {
+				AssetDatabase.SaveAssets();
+				AssetDatabase.Refresh();
+			}
+
+			prefab.GetComponent<MeshRenderer>().sharedMaterial = mat;
+
+			return prefab;
+		}
 		#endregion
 
 		static string GetPath (BoneData b) {

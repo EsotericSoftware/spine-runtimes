@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#define SPINE_SKELETON_ANIMATOR
+#define SPINE_SKELETON_MECANIM
 
 using System;
 using System.Reflection;
@@ -55,7 +55,7 @@ namespace Spine.Unity.Editor {
 		SerializedProperty spriteCollection;
 		#endif
 
-		#if SPINE_SKELETON_ANIMATOR
+		#if SPINE_SKELETON_MECANIM
 		static bool isMecanimExpanded = false;
 		SerializedProperty controller;
 		#endif
@@ -100,7 +100,7 @@ namespace Spine.Unity.Editor {
 			duration = serializedObject.FindProperty("duration");
 			defaultMix = serializedObject.FindProperty("defaultMix");
 
-			#if SPINE_SKELETON_ANIMATOR
+			#if SPINE_SKELETON_MECANIM
 			controller = serializedObject.FindProperty("controller");
 			#endif
 
@@ -494,7 +494,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		void DrawUnityTools () {
-			#if SPINE_SKELETON_ANIMATOR
+			#if SPINE_SKELETON_MECANIM
 			using (new SpineInspectorUtility.BoxScope()) {
 				isMecanimExpanded = EditorGUILayout.Foldout(isMecanimExpanded, SpineInspectorUtility.TempContent("SkeletonAnimator", SpineInspectorUtility.UnityIcon<SceneAsset>()));
 				if (isMecanimExpanded) {
@@ -569,7 +569,7 @@ namespace Spine.Unity.Editor {
 						} else {
 							List<string> missingPaths = null;
 							if (atlasAssets.arraySize > 0) {
-								missingPaths = SpineEditorUtilities.GetRequiredAtlasRegions(AssetDatabase.GetAssetPath(skeletonJSON.objectReferenceValue));
+								missingPaths = SpineEditorUtilities.AssetUtility.GetRequiredAtlasRegions(AssetDatabase.GetAssetPath(skeletonJSON.objectReferenceValue));
 
 								foreach (var atlas in atlasList) {
 									for (int i = 0; i < missingPaths.Count; i++) {
@@ -587,8 +587,8 @@ namespace Spine.Unity.Editor {
 							}
 
 							if (missingPaths != null) {
-								foreach (string str in missingPaths)
-									warnings.Add("Missing Region: '" + str + "'");
+								foreach (string missingRegion in missingPaths)
+									warnings.Add(string.Format("Missing Region: '{0}'", missingRegion));
 							}
 							
 						}
@@ -599,7 +599,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		void DoReimport () {
-			SpineEditorUtilities.ImportSpineContent(new [] { AssetDatabase.GetAssetPath(skeletonJSON.objectReferenceValue) }, true);
+			SpineEditorUtilities.AssetUtility.ImportSpineContent(new [] { AssetDatabase.GetAssetPath(skeletonJSON.objectReferenceValue) }, true);
 			preview.Clear();
 			InitializeEditor();
 			EditorUtility.SetDirty(targetSkeletonDataAsset);
