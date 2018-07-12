@@ -629,17 +629,11 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		public static class AssetUtility {
+			public const string SkeletonDataSuffix = "_SkeletonData";
+			public const string AtlasSuffix = "_Atlas";
 
 			#region Match SkeletonData with Atlases
 			static readonly AttachmentType[] AtlasTypes = { AttachmentType.Region, AttachmentType.Linkedmesh, AttachmentType.Mesh };
-
-			static void AddRequiredAtlasRegionsFromBinary (string skeletonDataPath, List<string> requiredPaths) {
-				SkeletonBinary binary = new SkeletonBinary(new AtlasRequirementLoader(requiredPaths));
-				TextAsset data = (TextAsset)AssetDatabase.LoadAssetAtPath(skeletonDataPath, typeof(TextAsset));
-				MemoryStream input = new MemoryStream(data.bytes);
-				binary.ReadSkeletonData(input);
-				binary = null;
-			}
 
 			public static List<string> GetRequiredAtlasRegions (string skeletonDataPath) {
 				List<string> requiredPaths = new List<string>();
@@ -684,12 +678,20 @@ namespace Spine.Unity.Editor {
 							else if (data.ContainsKey("name"))
 								requiredPaths.Add((string)data["name"]);
 							//else
-							//	requiredPaths.Add(attachmentEntry.Key);
+							//	requiredPaths.Add(attachment.Key);
 						}
 					}
 				}
 
 				return requiredPaths;
+			}
+
+			static void AddRequiredAtlasRegionsFromBinary (string skeletonDataPath, List<string> requiredPaths) {
+				SkeletonBinary binary = new SkeletonBinary(new AtlasRequirementLoader(requiredPaths));
+				TextAsset data = (TextAsset)AssetDatabase.LoadAssetAtPath(skeletonDataPath, typeof(TextAsset));
+				MemoryStream input = new MemoryStream(data.bytes);
+				binary.ReadSkeletonData(input);
+				binary = null;
 			}
 
 			static AtlasAssetBase GetMatchingAtlas (List<string> requiredPaths, List<AtlasAssetBase> atlasAssets) {
@@ -789,56 +791,57 @@ namespace Spine.Unity.Editor {
 
 				// Import skeletons and match them with atlases.
 				bool abortSkeletonImport = false;
-				foreach (string sp in skeletonPaths) {
-					if (!reimport && SkeletonDataFileValidator.CheckForValidSkeletonData(sp)) {
-						ReloadSkeletonData(sp);
+				foreach (string skeletonPath in skeletonPaths) {
+					if (!reimport && SkeletonDataFileValidator.CheckForValidSkeletonData(skeletonPath)) {
+						ReloadSkeletonData(skeletonPath);
 						continue;
 					}
 
-					string dir = Path.GetDirectoryName(sp);
+					string dir = Path.GetDirectoryName(skeletonPath);
 
 					#if SPINE_TK2D
 					IngestSpineProject(AssetDatabase.LoadAssetAtPath(sp, typeof(TextAsset)) as TextAsset, null);
 					#else
 					var localAtlases = FindAtlasesAtPath(dir);
-					var requiredPaths = GetRequiredAtlasRegions(sp);
+					var requiredPaths = GetRequiredAtlasRegions(skeletonPath);
 					var atlasMatch = GetMatchingAtlas(requiredPaths, localAtlases);
 					if (atlasMatch != null || requiredPaths.Count == 0) {
-						IngestSpineProject(AssetDatabase.LoadAssetAtPath(sp, typeof(TextAsset)) as TextAsset, atlasMatch);
+						IngestSpineProject(AssetDatabase.LoadAssetAtPath(skeletonPath, typeof(TextAsset)) as TextAsset, atlasMatch);
 					} else {
 						bool resolved = false;
 						while (!resolved) {
 
-							string filename = Path.GetFileNameWithoutExtension(sp);
+							string filename = Path.GetFileNameWithoutExtension(skeletonPath);
 							int result = EditorUtility.DisplayDialogComplex(
 								string.Format("AtlasAsset for \"{0}\"", filename),
-								string.Format("Could not automatically set the AtlasAsset for \"{0}\". You may set it manually.", filename),
-								"Choose AtlasAssets...", "Skip this", "Stop importing all"
+								string.Format("Could not automatically set the AtlasAsset for \"{0}\".\n\n (You may resolve this manually later.)", filename),
+								"Resolve atlases...", "Import without atlases", "Stop importing"
 							);
 
 							switch (result) {
 								case -1:
 									//Debug.Log("Select Atlas");
-									AtlasAssetBase selectedAtlas = AssetEditorGUI.GetAtlasDialog(Path.GetDirectoryName(sp));
+									AtlasAssetBase selectedAtlas = AssetEditorGUI.BrowseAtlasDialog(Path.GetDirectoryName(skeletonPath));
 									if (selectedAtlas != null) {
 										localAtlases.Clear();
 										localAtlases.Add(selectedAtlas);
 										atlasMatch = GetMatchingAtlas(requiredPaths, localAtlases);
 										if (atlasMatch != null) {
 											resolved = true;
-											IngestSpineProject(AssetDatabase.LoadAssetAtPath(sp, typeof(TextAsset)) as TextAsset, atlasMatch);
+											IngestSpineProject(AssetDatabase.LoadAssetAtPath(skeletonPath, typeof(TextAsset)) as TextAsset, atlasMatch);
 										}
 									}
 									break;
-								case 0: // Choose AtlasAssets...
-									var atlasList = AssetEditorGUI.MultiAtlasDialog(requiredPaths, Path.GetDirectoryName(sp), Path.GetFileNameWithoutExtension(sp));
+								case 0: // Resolve AtlasAssets...
+									var atlasList = AssetEditorGUI.MultiAtlasDialog(requiredPaths, Path.GetDirectoryName(skeletonPath), Path.GetFileNameWithoutExtension(skeletonPath));
 									if (atlasList != null)
-										IngestSpineProject(AssetDatabase.LoadAssetAtPath(sp, typeof(TextAsset)) as TextAsset, atlasList.ToArray());
+										IngestSpineProject(AssetDatabase.LoadAssetAtPath(skeletonPath, typeof(TextAsset)) as TextAsset, atlasList.ToArray());
 
 									resolved = true;
 									break;
-								case 1: // Skip
-									Debug.Log("Skipped importing: " + Path.GetFileName(sp));
+								case 1: // Import without atlas
+									Debug.LogWarning("Imported with missing atlases. Skeleton will not render: " + Path.GetFileName(skeletonPath));
+									IngestSpineProject(AssetDatabase.LoadAssetAtPath(skeletonPath, typeof(TextAsset)) as TextAsset, new AtlasAssetBase[] {} );
 									resolved = true;
 									break;
 								case 2: // Stop importing all
@@ -937,7 +940,7 @@ namespace Spine.Unity.Editor {
 				string primaryName = Path.GetFileNameWithoutExtension(atlasText.name).Replace(".atlas", "");
 				string assetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(atlasText));
 
-				string atlasPath = assetPath + "/" + primaryName + "_Atlas.asset";
+				string atlasPath = assetPath + "/" + primaryName + AtlasSuffix + ".asset";
 
 				SpineAtlasAsset atlasAsset = (SpineAtlasAsset)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(SpineAtlasAsset));
 
@@ -1026,9 +1029,9 @@ namespace Spine.Unity.Editor {
 				AssetDatabase.SaveAssets();
 
 				if (pageFiles.Count != atlasAsset.materials.Length)
-					Debug.LogWarning(string.Format("{0} ::: Not all atlas pages were imported. If you rename your image files, please make sure you also edit the filenames specified in the atlas file.", atlasAsset.name));
+					Debug.LogWarning(string.Format("{0} :: Not all atlas pages were imported. If you rename your image files, please make sure you also edit the filenames specified in the atlas file.", atlasAsset.name));
 				else
-					Debug.Log(string.Format("{0} ::: Imported with {1} material", atlasAsset.name, atlasAsset.materials.Length));
+					Debug.Log(string.Format("{0} :: Imported with {1} material", atlasAsset.name, atlasAsset.materials.Length));
 
 				// Iterate regions and bake marked.
 				Atlas atlas = atlasAsset.GetAtlas();
@@ -1060,7 +1063,6 @@ namespace Spine.Unity.Editor {
 			#endregion
 
 			#region Import SkeletonData (json or binary)
-			public const string SkeletonDataSuffix = "_SkeletonData";
 			static SkeletonDataAsset IngestSpineProject (TextAsset spineJson, params AtlasAssetBase[] atlasAssets) {
 				string primaryName = Path.GetFileNameWithoutExtension(spineJson.name);
 				string assetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(spineJson));
@@ -1162,7 +1164,7 @@ namespace Spine.Unity.Editor {
 
 						const int MaxListLength = 15;
 						for (int i = 0; (i < n && i < MaxListLength); i++)
-							dialogText.AppendLine("\t" + missingRegions[i]);
+							dialogText.AppendLine(string.Format("\t {0}", missingRegions[i]));
 
 						if (n > MaxListLength)
 							dialogText.AppendLine(string.Format("\t... {0} more...", n - MaxListLength));
@@ -1172,22 +1174,24 @@ namespace Spine.Unity.Editor {
 					int result = EditorUtility.DisplayDialogComplex(
 						"SkeletonDataAsset has missing Atlas.",
 						dialogText.ToString(),
-						"Browse...", "Import anyway", "Cancel"
+						"Browse Atlas...", "Import anyway", "Cancel import"
 					);
 
 					switch (result) {
 						case 0: // Browse...
-							AtlasAssetBase selectedAtlasAsset = GetAtlasDialog(lastAtlasPath);
+							AtlasAssetBase selectedAtlasAsset = BrowseAtlasDialog(lastAtlasPath);
 							if (selectedAtlasAsset != null) {
-								var atlas = selectedAtlasAsset.GetAtlas();
-								bool hasValidRegion = false;
-								foreach (string str in missingRegions) {
-									if (atlas.FindRegion(str) != null) {
-										hasValidRegion = true;
-										break;
+								if (!atlasAssets.Contains(selectedAtlasAsset)) {
+									var atlas = selectedAtlasAsset.GetAtlas();
+									bool hasValidRegion = false;
+									foreach (string str in missingRegions) {
+										if (atlas.FindRegion(str) != null) {
+											hasValidRegion = true;
+											break;
+										}
 									}
+									atlasAssets.Add(selectedAtlasAsset);
 								}
-								atlasAssets.Add(selectedAtlasAsset);
 							}
 							break;
 						case 1: // Import anyway
@@ -1203,7 +1207,7 @@ namespace Spine.Unity.Editor {
 				return atlasAssets;
 			}
 
-			public static AtlasAssetBase GetAtlasDialog (string dirPath) {
+			public static AtlasAssetBase BrowseAtlasDialog (string dirPath) {
 				string path = EditorUtility.OpenFilePanel("Select AtlasAsset...", dirPath, "asset");
 				if (path == "")
 					return null; // Canceled or closed by user.
@@ -1211,10 +1215,11 @@ namespace Spine.Unity.Editor {
 				int subLen = Application.dataPath.Length - 6;
 				string assetRelativePath = path.Substring(subLen, path.Length - subLen).Replace("\\", "/");
 
-				Object obj = AssetDatabase.LoadAssetAtPath(assetRelativePath, typeof(AtlasAssetBase));
-
-				if (obj == null || obj.GetType() != typeof(AtlasAssetBase))
+				var obj = AssetDatabase.LoadAssetAtPath(assetRelativePath, typeof(AtlasAssetBase));
+				if (obj == null || !(obj is AtlasAssetBase)) {
+					Debug.Log("Chosen asset was not of type AtlasAssetBase");
 					return null;
+				}
 
 				return (AtlasAssetBase)obj;
 			}

@@ -285,7 +285,16 @@ namespace Spine.Unity.Editor {
 						}
 					}
 
-					EditorGUILayout.LabelField(new GUIContent(regions[i].name, SpineEditorUtilities.Icons.image));
+					string regionName = regions[i].name;
+					Texture2D icon = SpineEditorUtilities.Icons.image;
+					if (regionName.EndsWith(" ")) {
+						regionName = string.Format("'{0}'", regions[i].name);
+						icon = SpineEditorUtilities.Icons.warning;
+						EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(regionName, icon, "Region name ends with whitespace. This may cause errors. Please check your source image filenames."));
+					} else {
+						EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(regionName, icon));
+					}
+					
 				}
 				EditorGUI.indentLevel = baseIndent;
 			}
