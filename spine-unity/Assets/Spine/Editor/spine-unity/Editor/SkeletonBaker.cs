@@ -30,7 +30,7 @@
 
 // Contributed by: Mitch Thompson
 
-#define SPINE_SKELETON_ANIMATOR
+#define SPINE_SKELETONMECANIM
 
 using UnityEngine;
 using UnityEditor;
@@ -71,7 +71,14 @@ namespace Spine.Unity.Editor {
 	public static class SkeletonBaker {
 
 		#region SkeletonAnimator's Mecanim Clips
-		#if SPINE_SKELETON_ANIMATOR
+		#if SPINE_SKELETONMECANIM
+		public static void UpdateMecanimClips (SkeletonDataAsset skeletonDataAsset) {
+			if (skeletonDataAsset.controller == null)
+				return;
+
+			SkeletonBaker.GenerateMecanimAnimationClips(skeletonDataAsset);
+		}
+
 		public static void GenerateMecanimAnimationClips (SkeletonDataAsset skeletonDataAsset) {
 			var data = skeletonDataAsset.GetSkeletonData(true);
 			if (data == null) {
@@ -1413,7 +1420,7 @@ namespace Spine.Unity.Editor {
 			string atlasAssetPath = AssetDatabase.GetAssetPath(atlasAsset);
 			string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath);
 			string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
-			string bakedPrefabPath = Path.Combine(bakedDirPath, SpineEditorUtilities.GetPathSafeName(region.name) + ".prefab").Replace("\\", "/");
+			string bakedPrefabPath = Path.Combine(bakedDirPath, SpineEditorUtilities.AssetUtility.GetPathSafeName(region.name) + ".prefab").Replace("\\", "/");
 
 			GameObject prefab = (GameObject)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(GameObject));
 			GameObject root;

@@ -93,7 +93,7 @@ namespace Spine.Unity.Editor {
 				string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
 				for (int i = 0; i < regions.Count; i++) {
 					AtlasRegion region = regions[i];
-					string bakedPrefabPath = Path.Combine(bakedDirPath, SpineEditorUtilities.GetPathSafeRegionName(region) + ".prefab").Replace("\\", "/");
+					string bakedPrefabPath = Path.Combine(bakedDirPath, SpineEditorUtilities.AssetUtility.GetPathSafeRegionName(region) + ".prefab").Replace("\\", "/");
 					GameObject prefab = (GameObject)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(GameObject));
 					baked.Add(prefab != null);
 					bakedObjects.Add(prefab);
@@ -134,12 +134,12 @@ namespace Spine.Unity.Editor {
 			}
 
 			EditorGUILayout.Space();
-			if (SpineInspectorUtility.LargeCenteredButton(SpineInspectorUtility.TempContent("Set Mipmap Bias to " + SpineEditorUtilities.DEFAULT_MIPMAPBIAS))) {
+			if (SpineInspectorUtility.LargeCenteredButton(SpineInspectorUtility.TempContent("Set Mipmap Bias to " + SpineEditorUtilities.Preferences.DEFAULT_MIPMAPBIAS))) {
 				foreach (var m in atlasAsset.materials) {
 					var texture = m.mainTexture;
-					texture.mipMapBias = SpineEditorUtilities.DEFAULT_MIPMAPBIAS;
+					texture.mipMapBias = SpineEditorUtilities.Preferences.DEFAULT_MIPMAPBIAS;
 				}
-				Debug.Log("Texture mipmap bias set to " + SpineEditorUtilities.DEFAULT_MIPMAPBIAS);
+				Debug.Log("Texture mipmap bias set to " + SpineEditorUtilities.Preferences.DEFAULT_MIPMAPBIAS);
 			}
 
 			EditorGUILayout.Space();

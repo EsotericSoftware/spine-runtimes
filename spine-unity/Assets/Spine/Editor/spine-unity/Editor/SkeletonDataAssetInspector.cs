@@ -238,7 +238,7 @@ namespace Spine.Unity.Editor {
 			FieldInfo nameField = typeof(AnimationReferenceAsset).GetField("animationName", BindingFlags.NonPublic | BindingFlags.Instance);
 			FieldInfo skeletonDataAssetField = typeof(AnimationReferenceAsset).GetField("skeletonDataAsset", BindingFlags.NonPublic | BindingFlags.Instance);
 			foreach (var animation in targetSkeletonData.Animations) {
-				string assetPath = string.Format("{0}/{1}.asset", dataPath, SpineEditorUtilities.GetPathSafeName(animation.Name));
+				string assetPath = string.Format("{0}/{1}.asset", dataPath, SpineEditorUtilities.AssetUtility.GetPathSafeName(animation.Name));
 				AnimationReferenceAsset existingAsset = AssetDatabase.LoadAssetAtPath<AnimationReferenceAsset>(assetPath);
 				if (existingAsset == null) {
 					AnimationReferenceAsset newAsset = ScriptableObject.CreateInstance<AnimationReferenceAsset>();
@@ -538,8 +538,8 @@ namespace Spine.Unity.Editor {
 				warnings.Add("Missing Skeleton JSON");
 			} else {
 				var fieldValue = (TextAsset)skeletonJSON.objectReferenceValue;
-				if (!SpineEditorUtilities.SkeletonDataFileValidator.IsSpineData(fieldValue)) {
-					warnings.Add("Skeleton data file is not a valid JSON or binary file.");
+				if (!SpineEditorUtilities.AssetUtility.IsSpineData(fieldValue)) {
+					warnings.Add("Skeleton data file is not a valid Spine JSON or binary file.");
 				} else {
 					#if SPINE_TK2D
 					bool searchForSpineAtlasAssets = true;
@@ -769,7 +769,7 @@ namespace Spine.Unity.Editor {
 
 				if (previewGameObject == null) {
 					try {
-						previewGameObject = SpineEditorUtilities.InstantiateSkeletonAnimation(skeletonDataAsset, skinName).gameObject;
+						previewGameObject = SpineEditorUtilities.EditorInstantiation.InstantiateSkeletonAnimation(skeletonDataAsset, skinName).gameObject;
 
 						if (previewGameObject != null) {
 							previewGameObject.hideFlags = HideFlags.HideAndDontSave;
