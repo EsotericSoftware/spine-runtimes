@@ -183,7 +183,7 @@ namespace Spine.Unity.Examples {
 
 			// Face intended direction.
 			if (input.x != 0)
-				skeletonAnimation.Skeleton.FlipX = input.x < 0;
+				skeletonAnimation.Skeleton.ScaleX = Mathf.Sign(input.x);
 
 
 			// Effects
