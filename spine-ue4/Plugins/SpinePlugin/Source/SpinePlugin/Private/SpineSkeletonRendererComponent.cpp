@@ -195,7 +195,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 	float depthOffset = 0;
 	unsigned short quadIndices[] = { 0, 1, 2, 0, 2, 3 };
 
-	for (int i = 0; i < Skeleton->getSlots().size(); ++i) {
+	for (size_t i = 0; i < Skeleton->getSlots().size(); ++i) {
 		Vector<float> &attachmentVertices = worldVertices;
 		unsigned short* attachmentIndices = nullptr;
 		int numVertices;

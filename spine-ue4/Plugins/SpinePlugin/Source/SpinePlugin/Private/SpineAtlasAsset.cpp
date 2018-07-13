@@ -107,7 +107,7 @@ Atlas* USpineAtlasAsset::GetAtlas (bool ForceReload) {
 		Vector<AtlasPage*> &pages = atlas->getPages();
 		for (size_t i = 0, n = pages.size(), j = 0; i < n; i++) {
 			AtlasPage* page = pages[i];
-			if (atlasPages.Num() > 0 && atlasPages.Num() > i)
+			if (atlasPages.Num() > 0 && atlasPages.Num() > (int32)i)
 				page->setRendererObject(atlasPages[j++]);
 		}
 	}

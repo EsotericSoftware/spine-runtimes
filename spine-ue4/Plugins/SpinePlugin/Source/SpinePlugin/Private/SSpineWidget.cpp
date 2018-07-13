@@ -206,7 +206,7 @@ void SSpineWidget::Flush(int32 LayerId, FSlateWindowElementList& OutDrawElements
 	float width = AllottedGeometry.GetAbsoluteSize().X;
 	float height = AllottedGeometry.GetAbsoluteSize().Y;
 
-	for (size_t i = 0; i < Vertices.Num(); i++) {
+	for (size_t i = 0; i < (size_t)Vertices.Num(); i++) {
 		setVertex(&vertexData[i], Vertices[i].X, Vertices[i].Y, Uvs[i].X, Uvs[i].Y, Colors[i], offset);
 	}
 
@@ -245,7 +245,7 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList& OutDrawEle
 	float depthOffset = 0;
 	unsigned short quadIndices[] = { 0, 1, 2, 0, 2, 3 };
 
-	for (int i = 0; i < Skeleton->getSlots().size(); ++i) {
+	for (int i = 0; i < (int)Skeleton->getSlots().size(); ++i) {
 		Vector<float> &attachmentVertices = worldVertices;
 		unsigned short* attachmentIndices = nullptr;
 		int numVertices;
