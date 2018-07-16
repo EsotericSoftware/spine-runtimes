@@ -67,7 +67,7 @@ public class SkeletonRenderer {
 	 * skeleton is rendered without two color tinting and any mesh attachments will throw an exception.
 	 * <p>
 	 * This method may change the batch's {@link Batch#setBlendFunctionSeparate(int, int, int, int) blending function}. The
-	 * previous blend function is not restore, since that could result in unnecessary flushes, depending on what is rendered
+	 * previous blend function is not restored, since that could result in unnecessary flushes, depending on what is rendered
 	 * next. */
 	public void draw (Batch batch, Skeleton skeleton) {
 		if (batch instanceof PolygonSpriteBatch) {
@@ -144,7 +144,7 @@ public class SkeletonRenderer {
 	/** Renders the specified skeleton, including meshes, but without two color tinting.
 	 * <p>
 	 * This method may change the batch's {@link Batch#setBlendFunctionSeparate(int, int, int, int) blending function}. The
-	 * previous blend function is not restore, since that could result in unnecessary flushes, depending on what is rendered
+	 * previous blend function is not restored, since that could result in unnecessary flushes, depending on what is rendered
 	 * next. */
 	@SuppressWarnings("null")
 	public void draw (PolygonSpriteBatch batch, Skeleton skeleton) {
@@ -266,7 +266,7 @@ public class SkeletonRenderer {
 	/** Renders the specified skeleton, including meshes and two color tinting.
 	 * <p>
 	 * This method may change the batch's {@link Batch#setBlendFunctionSeparate(int, int, int, int) blending function}. The
-	 * previous blend function is not restore, since that could result in unnecessary flushes, depending on what is rendered
+	 * previous blend function is not restored, since that could result in unnecessary flushes, depending on what is rendered
 	 * next. */
 	@SuppressWarnings("null")
 	public void draw (TwoColorPolygonBatch batch, Skeleton skeleton) {
