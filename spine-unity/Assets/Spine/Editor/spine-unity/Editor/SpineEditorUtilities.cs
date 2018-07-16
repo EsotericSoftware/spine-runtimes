@@ -269,7 +269,7 @@ namespace Spine.Unity.Editor {
 				if (EditorGUI.EndChangeCheck()) {
 					EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, showHierarchyIcons);
 					#if UNITY_2017_2_OR_NEWER
-					SpineEditorHierarchyHandler.HierarchyIconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
+					HierarchyHandler.IconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
 					#else
 					HierarchyHandler.IconsOnPlaymodeStateChanged();
 					#endif
