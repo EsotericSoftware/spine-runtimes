@@ -119,7 +119,7 @@ namespace Spine.Unity {
 			}
 
 			var thisTransform = cachedTransform;
-			float skeletonFlipRotation = (skeleton.flipX ^ skeleton.flipY) ? -1f : 1f;
+			float skeletonFlipRotation = Mathf.Sign(skeleton.scaleX * skeleton.scaleY);
 			if (mode == Mode.Follow) {
 				switch (phase) {
 					case UpdatePhase.Local:

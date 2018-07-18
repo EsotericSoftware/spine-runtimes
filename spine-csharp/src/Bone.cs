@@ -53,10 +53,6 @@ namespace Spine {
 		internal float a, b, worldX;
 		internal float c, d, worldY;
 
-//		internal float worldSignX, worldSignY;
-//		public float WorldSignX { get { return worldSignX; } }
-//		public float WorldSignY { get { return worldSignY; } }
-
 		internal bool sorted;
 
 		public BoneData Data { get { return data; } }
@@ -152,27 +148,13 @@ namespace Spine {
 
 			Bone parent = this.parent;
 			if (parent == null) { // Root bone.
-				float rotationY = rotation + 90 + shearY;
-				float la = MathUtils.CosDeg(rotation + shearX) * scaleX;
-				float lb = MathUtils.CosDeg(rotationY) * scaleY;
-				float lc = MathUtils.SinDeg(rotation + shearX) * scaleX;
-				float ld = MathUtils.SinDeg(rotationY) * scaleY;
-				if (skeleton.flipX) {
-					x = -x;
-					la = -la;
-					lb = -lb;
-				}
-				if (skeleton.flipY != yDown) {
-					y = -y;
-					lc = -lc;
-					ld = -ld;
-				}
-				a = la;
-				b = lb;
-				c = lc;
-				d = ld;
-				worldX = x + skeleton.x;
-				worldY = y + skeleton.y;
+				float rotationY = rotation + 90 + shearY, sx = skeleton.scaleX, sy = skeleton.scaleY;
+				a = MathUtils.CosDeg(rotation + shearX) * scaleX * sx;
+				b = MathUtils.CosDeg(rotationY) * scaleY * sy;
+				c = MathUtils.SinDeg(rotation + shearX) * scaleX * sx;
+				d = MathUtils.SinDeg(rotationY) * scaleY * sy;
+				worldX = x * sx + skeleton.x;
+				worldY = y * sy + skeleton.y;
 				return;
 			}
 
@@ -228,8 +210,8 @@ namespace Spine {
 			case TransformMode.NoScale:
 			case TransformMode.NoScaleOrReflection: {
 					float cos = MathUtils.CosDeg(rotation), sin = MathUtils.SinDeg(rotation);
-					float za = pa * cos + pb * sin;
-					float zc = pc * cos + pd * sin;
+					float za = (pa * cos + pb * sin) / skeleton.scaleX;
+					float zc = (pc * cos + pd * sin) / skeleton.scaleY;
 					float s = (float)Math.Sqrt(za * za + zc * zc);
 					if (s > 0.00001f) s = 1 / s;
 					za *= s;
@@ -242,26 +224,18 @@ namespace Spine {
 					float lb = MathUtils.CosDeg(90 + shearY) * scaleY;
 					float lc = MathUtils.SinDeg(shearX) * scaleX;
 					float ld = MathUtils.SinDeg(90 + shearY) * scaleY;
-					if (data.transformMode != TransformMode.NoScaleOrReflection? pa * pd - pb* pc< 0 : skeleton.flipX != skeleton.flipY) {
-						zb = -zb;
-						zd = -zd;
-					}
 					a = za * la + zb * lc;
 					b = za * lb + zb * ld;
 					c = zc * la + zd * lc;
-					d = zc * lb + zd * ld;					
-					return;
+					d = zc * lb + zd * ld;
+					break;
 				}
 			}
 
-			if (skeleton.flipX) {
-				a = -a;
-				b = -b;
-			}
-			if (skeleton.flipY != Bone.yDown) {
-				c = -c;
-				d = -d;
-			}
+			a *= skeleton.scaleX;
+			b *= skeleton.scaleX;
+			c *= skeleton.scaleY;
+			d *= skeleton.scaleY;
 		}
 
 		public void SetToSetupPose () {

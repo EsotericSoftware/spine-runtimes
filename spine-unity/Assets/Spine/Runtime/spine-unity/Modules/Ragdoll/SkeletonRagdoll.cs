@@ -313,8 +313,8 @@ namespace Spine.Unity.Modules {
 		}
 
 		void UpdateSpineSkeleton (ISkeletonAnimation skeletonRenderer) {
-			bool flipX = skeleton.flipX;
-			bool flipY = skeleton.flipY;
+			bool flipX = skeleton.ScaleX < 0;
+			bool flipY = skeleton.ScaleY < 0;
 			bool flipXOR = flipX ^ flipY;
 			bool flipOR = flipX || flipY;
 

@@ -40,6 +40,7 @@ namespace Spine.Unity.Playables {
 	public class SpineAnimationStateMixerBehaviour : PlayableBehaviour {
 
 		float[] lastInputWeights;
+		public int trackIndex;
 
 		// NOTE: This function is called at runtime and edit time. Keep that in mind when setting the values of properties.
 		public override void ProcessFrame (Playable playable, FrameData info, object playerData) {
@@ -80,10 +81,10 @@ namespace Spine.Unity.Playables {
 
 					if (clipData.animationReference == null) {
 						float mixDuration = clipData.customDuration ? clipData.mixDuration : state.Data.DefaultMix;
-						state.SetEmptyAnimation(0, mixDuration);
+						state.SetEmptyAnimation(trackIndex, mixDuration);
 					} else {
 						if (clipData.animationReference.Animation != null) {
-							Spine.TrackEntry trackEntry = state.SetAnimation(0, clipData.animationReference.Animation, clipData.loop);
+							Spine.TrackEntry trackEntry = state.SetAnimation(trackIndex, clipData.animationReference.Animation, clipData.loop);
 
 							//trackEntry.TrackTime = (float)inputPlayable.GetTime(); // More accurate time-start?
 							trackEntry.EventThreshold = clipData.eventThreshold;

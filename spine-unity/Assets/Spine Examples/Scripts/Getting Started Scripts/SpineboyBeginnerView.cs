@@ -69,7 +69,7 @@ namespace Spine.Unity.Examples {
 			if (skeletonAnimation == null) return;
 			if (model == null) return;
 
-			if (skeletonAnimation.skeleton.FlipX != model.facingLeft) {	// Detect changes in model.facingLeft
+			if ((skeletonAnimation.skeleton.ScaleX < 0) != model.facingLeft) {	// Detect changes in model.facingLeft
 				Turn(model.facingLeft);
 			}
 
@@ -134,7 +134,7 @@ namespace Spine.Unity.Examples {
 		}
 
 		public void Turn (bool facingLeft) {
-			skeletonAnimation.Skeleton.FlipX = facingLeft;
+			skeletonAnimation.Skeleton.ScaleX = facingLeft ? -1f : 1f;
 			// Maybe play a transient turning animation too, then call ChangeStableAnimation.
 		}
 		#endregion

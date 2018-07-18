@@ -41,6 +41,7 @@ public class IkConstraintData {
 	final Array<BoneData> bones = new Array();
 	BoneData target;
 	int bendDirection = 1;
+	boolean stretch;
 	float mix = 1;
 
 	public IkConstraintData (String name) {
@@ -84,6 +85,16 @@ public class IkConstraintData {
 
 	public void setBendDirection (int bendDirection) {
 		this.bendDirection = bendDirection;
+	}
+
+	/** When true, if the target is out of range, the parent bone is scaled on the X axis to reach it. If the parent bone has local
+	 * nonuniform scale, stretching is not applied. */
+	public boolean getStretch () {
+		return stretch;
+	}
+
+	public void setStretch (boolean stretch) {
+		this.stretch = stretch;
 	}
 
 	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotations. */

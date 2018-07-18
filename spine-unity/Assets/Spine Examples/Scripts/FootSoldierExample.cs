@@ -80,11 +80,11 @@ namespace Spine.Unity.Examples {
 			} else {
 				if (Input.GetKey(rightKey)) {
 					skeletonAnimation.AnimationName = moveAnimation;
-					skeletonAnimation.Skeleton.FlipX = false;
+					skeletonAnimation.Skeleton.ScaleX = 1;
 					transform.Translate(moveSpeed * Time.deltaTime, 0, 0);
 				} else if(Input.GetKey(leftKey)) {
 					skeletonAnimation.AnimationName = moveAnimation;
-					skeletonAnimation.Skeleton.FlipX = true;
+					skeletonAnimation.Skeleton.ScaleX = -1;
 					transform.Translate(-moveSpeed * Time.deltaTime, 0, 0);
 				} else {
 					skeletonAnimation.AnimationName = idleAnimation;

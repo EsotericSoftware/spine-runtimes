@@ -193,7 +193,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			skin = skin ?? data.DefaultSkin ?? data.Skins.Items[0];
-			graphic.MeshGenerator.settings.zSpacing = SpineEditorUtilities.defaultZSpacing;
+			graphic.MeshGenerator.settings.zSpacing = SpineEditorUtilities.Preferences.defaultZSpacing;
 
 			graphic.Initialize(false);
 			if (skin != null) graphic.Skeleton.SetSkin(skin);

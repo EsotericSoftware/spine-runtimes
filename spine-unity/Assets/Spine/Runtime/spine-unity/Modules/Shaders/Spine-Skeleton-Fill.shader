@@ -1,4 +1,4 @@
-// - Unlit + no shadow
+// - Unlit
 // - Premultiplied Alpha Blending (Optional straight alpha input)
 // - Double-sided, no depth
 
@@ -7,6 +7,7 @@ Shader "Spine/Skeleton Fill" {
 		_FillColor ("FillColor", Color) = (1,1,1,1)
 		_FillPhase ("FillPhase", Range(0, 1)) = 0
 		[NoScaleOffset] _MainTex ("MainTex", 2D) = "white" {}
+		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
 	}
 	SubShader {
@@ -56,6 +57,46 @@ Shader "Spine/Skeleton Fill" {
 
 				float3 finalColor = lerp((rawColor.rgb * i.vertexColor.rgb), (_FillColor.rgb * finalAlpha), _FillPhase); // make sure to PMA _FillColor.
 				return fixed4(finalColor, finalAlpha);
+			}
+			ENDCG
+		}
+
+		Pass {
+			Name "Caster"
+			Tags { "LightMode"="ShadowCaster" }
+			Offset 1, 1
+			ZWrite On
+			ZTest LEqual
+
+			Fog { Mode Off }
+			Cull Off
+			Lighting Off
+
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag
+			#pragma multi_compile_shadowcaster
+			#pragma fragmentoption ARB_precision_hint_fastest
+			#include "UnityCG.cginc"
+			sampler2D _MainTex;
+			fixed _Cutoff;
+
+			struct VertexOutput { 
+				V2F_SHADOW_CASTER;
+				float2 uv : TEXCOORD1;
+			};
+
+			VertexOutput vert (appdata_base v) {
+				VertexOutput o;
+				o.uv = v.texcoord;
+				TRANSFER_SHADOW_CASTER(o)
+				return o;
+			}
+
+			float4 frag (VertexOutput i) : COLOR {
+				fixed4 texcol = tex2D(_MainTex, i.uv);
+				clip(texcol.a - _Cutoff);
+				SHADOW_CASTER_FRAGMENT(i)
 			}
 			ENDCG
 		}
