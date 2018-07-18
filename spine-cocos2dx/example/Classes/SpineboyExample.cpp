@@ -29,7 +29,7 @@
  *****************************************************************************/
 
 #include "SpineboyExample.h"
-#include "GoblinsExample.h"
+#include "SkeletonRendererSeparatorExample.h"
 
 USING_NS_CC;
 using namespace spine;
@@ -89,7 +89,7 @@ bool SpineboyExample::init () {
 		else if (skeletonNode->getTimeScale() == 1)
 			skeletonNode->setTimeScale(0.3f);
 		else
-			Director::getInstance()->replaceScene(GoblinsExample::scene());
+			Director::getInstance()->replaceScene(SkeletonRendererSeparatorExample::scene());
 		return true;
 	};
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);

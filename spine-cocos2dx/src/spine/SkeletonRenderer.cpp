@@ -266,11 +266,11 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	bool isTwoColorTint = this->isTwoColorTint();
 
 	// Early exit if the skeleton is invisible
-	if (getDisplayedOpacity() == 0 || _skeleton->color.a == 0){
+	if (getDisplayedOpacity() == 0 || _skeleton->getColor().a == 0){
 		return;
 	}
 
-	if (_effect) _effect->begin(_effect, _skeleton);
+	if (_effect) _effect->begin(*_skeleton);
 
 	Color4F nodeColor;
 	nodeColor.r = getDisplayedColor().r / (float)255;
@@ -306,8 +306,8 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		}
 
 		// Early exit if slot is invisible
-		if (slot->color.a == 0) {
-			spSkeletonClipping_clipEnd(_clipper, slot);
+		if (slot->getColor().a == 0) {
+			_clipper->clipEnd(*slot);
 			continue;
 		}
 
@@ -319,8 +319,8 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 			attachmentVertices = (AttachmentVertices*)attachment->getRendererObject();
 
 			// Early exit if attachment is invisible
-			if (attachment->color.a == 0) {
-				spSkeletonClipping_clipEnd(_clipper, slot);
+			if (attachment->getColor().a == 0) {
+				_clipper->clipEnd(*slot);
 				continue;
 			}
 
@@ -352,8 +352,8 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 			attachmentVertices = (AttachmentVertices*)attachment->getRendererObject();
 
 			// Early exit if attachment is invisible
-			if (attachment->color.a == 0) {
-				spSkeletonClipping_clipEnd(_clipper, slot);
+			if (attachment->getColor().a == 0) {
+				_clipper->clipEnd(*slot);
 				continue;
 			}
 

@@ -91,7 +91,7 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 	vertexArray->clear();
 	states.texture = NULL;
 
-	// Early out if the skeleton alpha is 0
+	// Early out if skeleton is invisible
 	if (skeleton->getColor().a == 0) return;
 
 	if (vertexEffect != NULL) vertexEffect->begin(*skeleton);
@@ -120,7 +120,7 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 			RegionAttachment *regionAttachment = (RegionAttachment *) attachment;
 			attachmentColor = &regionAttachment->getColor();
 
-			// Early out if the attachment color is 0
+			// Early out if the slot color is 0
 			if (attachmentColor->a == 0) {
 				clipper.clipEnd(slot);
 				continue;
@@ -132,13 +132,13 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 			uvs = &regionAttachment->getUVs();
 			indices = &quadIndices;
 			indicesCount = 6;
-			texture = (Texture *) ((AtlasRegion *) regionAttachment->getRendererObject())->page->rendererObject;
+			texture = (Texture *) ((AtlasRegion *) regionAttachment->getRendererObject())->page->getRendererObject();
 
 		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 			MeshAttachment *mesh = (MeshAttachment *) attachment;
 			attachmentColor = &mesh->getColor();
 
-			// Early out if the attachment color is 0
+			// Early out if the slot color is 0
 			if (attachmentColor->a == 0) {
 				clipper.clipEnd(slot);
 				continue;
@@ -151,6 +151,7 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 			uvs = &mesh->getUVs();
 			indices = &mesh->getTriangles();
 			indicesCount = mesh->getTriangles().size();
+
 		} else if (attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
 			ClippingAttachment *clip = (ClippingAttachment *) slot.getAttachment();
 			clipper.clipStart(slot, clip);
