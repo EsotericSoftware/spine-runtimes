@@ -311,8 +311,8 @@ namespace Spine.Unity.Modules {
 
 		/// <summary>Performed every skeleton animation update to translate Unity Transforms positions into Spine bone transforms.</summary>
 		void UpdateSpineSkeleton (ISkeletonAnimation animatedSkeleton) {
-			bool flipX = skeleton.flipX;
-			bool flipY = skeleton.flipY;
+			bool flipX = skeleton.ScaleX < 0;
+			bool flipY = skeleton.ScaleY < 0;
 			bool flipXOR = flipX ^ flipY;
 			bool flipOR = flipX || flipY;
 			var startingBone = this.StartingBone;

@@ -194,9 +194,8 @@ namespace Spine.Unity {
 		public static Material GetMaterial (this Attachment a) {
 			object rendererObject = null;
 			var renderableAttachment = a as IHasRendererObject;
-			if (renderableAttachment != null) {
-				rendererObject = renderableAttachment.RendererObject;
-			}
+			if (renderableAttachment != null)
+				rendererObject = renderableAttachment.RendererObject;		
 			
 			if (rendererObject == null)
 				return null;

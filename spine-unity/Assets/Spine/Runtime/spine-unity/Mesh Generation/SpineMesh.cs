@@ -308,10 +308,10 @@ namespace Spine.Unity {
 						#if SPINE_TRIANGLECHECK
 						var clippingAttachment = attachment as ClippingAttachment;
 						if (clippingAttachment != null) {
-						clippingEndSlot = clippingAttachment.endSlot;
-						clippingAttachmentSource = i;
-						current.hasClipping = true;
-						skeletonHasClipping = true;
+							clippingEndSlot = clippingAttachment.endSlot;
+							clippingAttachmentSource = i;
+							current.hasClipping = true;
+							skeletonHasClipping = true;
 						}
 						#endif
 						noRender = true;

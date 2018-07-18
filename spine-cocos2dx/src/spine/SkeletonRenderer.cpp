@@ -266,6 +266,11 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	SkeletonTwoColorBatch* twoColorBatch = SkeletonTwoColorBatch::getInstance();
 	bool isTwoColorTint = this->isTwoColorTint();
 	
+	// Early exit if the skeleton is invisible
+	if (getDisplayedOpacity() == 0 || _skeleton->color.a == 0){
+		return;
+	}
+	
 	if (_effect) _effect->begin(_effect, _skeleton);
 
 	Color4F nodeColor;
@@ -301,6 +306,12 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 			continue;
 		}
 		
+		// Early exit if slot is invisible
+		if (slot->color.a == 0) {
+			spSkeletonClipping_clipEnd(_clipper, slot);
+			continue;
+		}
+		
 		cocos2d::TrianglesCommand::Triangles triangles;
 		TwoColorTriangles trianglesTwoColor;
 		
@@ -308,6 +319,12 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		case SP_ATTACHMENT_REGION: {
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
 			attachmentVertices = getAttachmentVertices(attachment);
+			
+			// Early exit if attachment is invisible
+			if (attachment->color.a == 0) {
+				spSkeletonClipping_clipEnd(_clipper, slot);
+				continue;
+			}
 			
 			if (!isTwoColorTint) {
 				triangles.indices = attachmentVertices->_triangles->indices;
@@ -337,6 +354,12 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		case SP_ATTACHMENT_MESH: {
 			spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
 			attachmentVertices = getAttachmentVertices(attachment);
+			
+			// Early exit if attachment is invisible
+			if (attachment->color.a == 0) {
+				spSkeletonClipping_clipEnd(_clipper, slot);
+				continue;
+			}
 			
 			if (!isTwoColorTint) {
 				triangles.indices = attachmentVertices->_triangles->indices;
