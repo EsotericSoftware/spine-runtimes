@@ -82,8 +82,8 @@ namespace Spine.Unity {
 
 					// Only provide visual feedback to inspector changes in Unity Editor Edit mode.
 					if (!Application.isPlaying) {
-						skeleton.flipX = this.initialFlipX;
-						skeleton.flipY = this.initialFlipY;
+						skeleton.scaleX = this.initialFlipX ? -1 : 1;
+						skeleton.scaleY = this.initialFlipY ? -1 : 1;
 
 						skeleton.SetToSetupPose();
 						if (!string.IsNullOrEmpty(startingAnimation))
@@ -233,8 +233,8 @@ namespace Spine.Unity {
 			}
 
 			this.skeleton = new Skeleton(skeletonData) {
-				flipX = this.initialFlipX,
-				flipY = this.initialFlipY
+				scaleX = this.initialFlipX ? -1 : 1,
+				scaleY = this.initialFlipY ? -1 : 1
 			};
 
 			meshBuffers = new DoubleBuffered<MeshRendererBuffers.SmartMesh>();

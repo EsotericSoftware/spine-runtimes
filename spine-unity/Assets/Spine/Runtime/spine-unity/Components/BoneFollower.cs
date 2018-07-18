@@ -164,19 +164,14 @@ namespace Spine.Unity {
 				if (followBoneRotation) {
 					Vector3 worldRotation = skeletonTransform.rotation.eulerAngles;
 					if (followLocalScale && bone.scaleX < 0) boneWorldRotation += 180f;
-					#if UNITY_5_6_OR_NEWER
 					thisTransform.SetPositionAndRotation(targetWorldPosition, Quaternion.Euler(worldRotation.x, worldRotation.y, worldRotation.z + boneWorldRotation));
-					#else
-					thisTransform.position = targetWorldPosition;
-					thisTransform.rotation = Quaternion.Euler(worldRotation.x, worldRotation.y, worldRotation.z + bone.WorldRotationX);
-					#endif
 				} else {
 					thisTransform.position = targetWorldPosition;
 				}
 			}
 
 			Vector3 localScale = followLocalScale ? new Vector3(bone.scaleX, bone.scaleY, 1f) : new Vector3(1f, 1f, 1f);
-			if (followSkeletonFlip) localScale.y *= bone.skeleton.flipX ^ bone.skeleton.flipY ? -1f : 1f;
+			if (followSkeletonFlip) localScale.y *= Mathf.Sign(bone.skeleton.scaleX * bone.skeleton.scaleY);
 			thisTransform.localScale = localScale;
 		}
 	}

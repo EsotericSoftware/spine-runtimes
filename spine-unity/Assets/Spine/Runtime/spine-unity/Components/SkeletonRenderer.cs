@@ -207,8 +207,8 @@ namespace Spine.Unity {
 			rendererBuffers.Initialize();
 
 			skeleton = new Skeleton(skeletonData) {
-				flipX = initialFlipX,
-				flipY = initialFlipY
+				scaleX = initialFlipX ? -1 : 1,
+				scaleY = initialFlipY ? -1 : 1
 			};
 
 			if (!string.IsNullOrEmpty(initialSkinName) && !string.Equals(initialSkinName, "default", System.StringComparison.Ordinal))

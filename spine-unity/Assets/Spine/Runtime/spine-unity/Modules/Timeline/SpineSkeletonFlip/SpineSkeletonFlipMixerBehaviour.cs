@@ -52,8 +52,8 @@ namespace Spine.Unity.Playables {
 			var skeleton = playableHandle.Skeleton;
 
 			if (!m_FirstFrameHappened) {
-				defaultFlipX = skeleton.flipX;
-				defaultFlipY = skeleton.flipY;
+				defaultFlipX = skeleton.FlipX;
+				defaultFlipY = skeleton.FlipY;
 				m_FirstFrameHappened = true;
 			}
 
@@ -71,8 +71,8 @@ namespace Spine.Unity.Playables {
 				totalWeight += inputWeight;
 
 				if (inputWeight > greatestWeight) {
-					skeleton.flipX = input.flipX;
-					skeleton.flipY = input.flipY;
+					skeleton.FlipX = input.flipX;
+					skeleton.FlipY = input.flipY;
 					greatestWeight = inputWeight;
 				}
 
@@ -81,8 +81,8 @@ namespace Spine.Unity.Playables {
 			}
 
 			if (currentInputs != 1 && 1f - totalWeight > greatestWeight) {
-				skeleton.flipX = defaultFlipX;
-				skeleton.flipY = defaultFlipY;
+				skeleton.FlipX = defaultFlipX;
+				skeleton.FlipY = defaultFlipY;
 			}
 		}
 
@@ -93,8 +93,8 @@ namespace Spine.Unity.Playables {
 				return;
 
 			var skeleton = playableHandle.Skeleton;
-			skeleton.flipX = defaultFlipX;
-			skeleton.flipY = defaultFlipY;
+			skeleton.FlipX = defaultFlipX;
+			skeleton.FlipY = defaultFlipY;
 		}
 	}
 

@@ -42,8 +42,9 @@ public class IkConstraint implements Constraint {
 	final IkConstraintData data;
 	final Array<Bone> bones;
 	Bone target;
-	float mix = 1;
 	int bendDirection;
+	boolean stretch;
+	float mix = 1;
 
 	public IkConstraint (IkConstraintData data, Skeleton skeleton) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -51,6 +52,7 @@ public class IkConstraint implements Constraint {
 		this.data = data;
 		mix = data.mix;
 		bendDirection = data.bendDirection;
+		stretch = data.stretch;
 
 		bones = new Array(data.bones.size);
 		for (BoneData boneData : data.bones)
@@ -69,6 +71,7 @@ public class IkConstraint implements Constraint {
 		target = skeleton.bones.get(constraint.target.data.index);
 		mix = constraint.mix;
 		bendDirection = constraint.bendDirection;
+		stretch = constraint.stretch;
 	}
 
 	/** Applies the constraint to the constrained bones. */
@@ -81,10 +84,10 @@ public class IkConstraint implements Constraint {
 		Array<Bone> bones = this.bones;
 		switch (bones.size) {
 		case 1:
-			apply(bones.first(), target.worldX, target.worldY, mix);
+			apply(bones.first(), target.worldX, target.worldY, stretch, mix);
 			break;
 		case 2:
-			apply(bones.first(), bones.get(1), target.worldX, target.worldY, bendDirection, mix);
+			apply(bones.first(), bones.get(1), target.worldX, target.worldY, bendDirection, stretch, mix);
 			break;
 		}
 	}
@@ -125,6 +128,16 @@ public class IkConstraint implements Constraint {
 		this.bendDirection = bendDirection;
 	}
 
+	/** When true, if the target is out of range, the parent bone is scaled on the X axis to reach it. If the parent bone has local
+	 * nonuniform scale, stretching is not applied. */
+	public boolean getStretch () {
+		return stretch;
+	}
+
+	public void setStretch (boolean stretch) {
+		this.stretch = stretch;
+	}
+
 	/** The IK constraint's setup pose data. */
 	public IkConstraintData getData () {
 		return data;
@@ -135,7 +148,7 @@ public class IkConstraint implements Constraint {
 	}
 
 	/** Applies 1 bone IK. The target is specified in the world coordinate system. */
-	static public void apply (Bone bone, float targetX, float targetY, float alpha) {
+	static public void apply (Bone bone, float targetX, float targetY, boolean stretch, float alpha) {
 		if (!bone.appliedValid) bone.updateAppliedTransform();
 		Bone p = bone.parent;
 		float id = 1 / (p.a * p.d - p.b * p.c);
@@ -146,20 +159,25 @@ public class IkConstraint implements Constraint {
 		if (rotationIK > 180)
 			rotationIK -= 360;
 		else if (rotationIK < -180) rotationIK += 360;
-		bone.updateWorldTransform(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, bone.ascaleX, bone.ascaleY, bone.ashearX,
+		float sx = bone.ascaleX;
+		if (stretch) {
+			float b = bone.data.length * sx, dd = (float)Math.sqrt(tx * tx + ty * ty);
+			if (dd > b && b > 0.0001f) sx *= (dd / b - 1) * alpha + 1;
+		}
+		bone.updateWorldTransform(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, bone.ascaleY, bone.ashearX,
 			bone.ashearY);
 	}
 
 	/** Applies 2 bone IK. The target is specified in the world coordinate system.
 	 * @param child A direct descendant of the parent bone. */
-	static public void apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, float alpha) {
+	static public void apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, boolean stretch, float alpha) {
 		if (alpha == 0) {
 			child.updateWorldTransform();
 			return;
 		}
 		if (!parent.appliedValid) parent.updateAppliedTransform();
 		if (!child.appliedValid) child.updateAppliedTransform();
-		float px = parent.ax, py = parent.ay, psx = parent.ascaleX, psy = parent.ascaleY, csx = child.ascaleX;
+		float px = parent.ax, py = parent.ay, psx = parent.ascaleX, sx = psx, psy = parent.ascaleY, csx = child.ascaleX;
 		int os1, os2, s2;
 		if (psx < 0) {
 			psx = -psx;
@@ -195,7 +213,7 @@ public class IkConstraint implements Constraint {
 		c = pp.c;
 		d = pp.d;
 		float id = 1 / (a * d - b * c), x = targetX - pp.worldX, y = targetY - pp.worldY;
-		float tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py;
+		float tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py, dd = tx * tx + ty * ty;
 		x = cwx - pp.worldX;
 		y = cwy - pp.worldY;
 		float dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
@@ -203,10 +221,13 @@ public class IkConstraint implements Constraint {
 		outer:
 		if (u) {
 			l2 *= psx;
-			float cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
+			float cos = (dd - l1 * l1 - l2 * l2) / (2 * l1 * l2);
 			if (cos < -1)
 				cos = -1;
-			else if (cos > 1) cos = 1;
+			else if (cos > 1) {
+				cos = 1;
+				if (stretch && l1 + l2 > 0.0001f) sx *= ((float)Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+			}
 			a2 = (float)Math.acos(cos) * bendDir;
 			a = l1 + l2 * cos;
 			b = l2 * sin(a2);
@@ -214,7 +235,7 @@ public class IkConstraint implements Constraint {
 		} else {
 			a = psx * l2;
 			b = psy * l2;
-			float aa = a * a, bb = b * b, dd = tx * tx + ty * ty, ta = atan2(ty, tx);
+			float aa = a * a, bb = b * b, ta = atan2(ty, tx);
 			c = bb * l1 * l1 + aa * dd - aa * bb;
 			float c1 = -2 * bb * l1, c2 = bb - aa;
 			d = c1 * c1 - 4 * c2 * c;
@@ -266,7 +287,7 @@ public class IkConstraint implements Constraint {
 		if (a1 > 180)
 			a1 -= 360;
 		else if (a1 < -180) a1 += 360;
-		parent.updateWorldTransform(px, py, rotation + a1 * alpha, parent.ascaleX, parent.ascaleY, 0, 0);
+		parent.updateWorldTransform(px, py, rotation + a1 * alpha, sx, parent.ascaleY, 0, 0);
 		rotation = child.arotation;
 		a2 = ((a2 + os) * radDeg - child.ashearX) * s2 + os2 - rotation;
 		if (a2 > 180)

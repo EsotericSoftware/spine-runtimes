@@ -38,8 +38,13 @@ namespace Spine.Unity.Playables {
 	[TrackClipType(typeof(SpineAnimationStateClip))]
 	[TrackBindingType(typeof(SkeletonAnimation))]
 	public class SpineAnimationStateTrack : TrackAsset {
+		public int trackIndex = 0;
+
 		public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount) {
-			return ScriptPlayable<SpineAnimationStateMixerBehaviour>.Create (graph, inputCount);
+			var scriptPlayable = ScriptPlayable<SpineAnimationStateMixerBehaviour>.Create(graph, inputCount);
+			var mixerBehaviour = scriptPlayable.GetBehaviour();
+			mixerBehaviour.trackIndex = this.trackIndex;
+			return scriptPlayable;
 		}
 	}
 }

@@ -50,7 +50,7 @@ public class TestHarness extends ApplicationAdapter {
 		
 		skeleton = new Skeleton(skeletonData);		
 		skeleton.setPosition(320, 590);
-		skeleton.flipY = true;
+		skeleton.setScaleY(-1);
 
 		AnimationStateData stateData = new AnimationStateData(skeletonData);		
 		state = new AnimationState(stateData);		
