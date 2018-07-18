@@ -69,6 +69,11 @@ Atlas::Atlas(const char *data, int length, const char *dir, TextureLoader *textu
 }
 
 Atlas::~Atlas() {
+	if (_textureLoader) {
+		for (size_t i = 0, n = _pages.size(); i < n; ++i) {
+			_textureLoader->unload(_pages[i]->rendererObject);
+		}
+	}
 	ContainerUtil::cleanUpVectorOfPointers(_pages);
 	ContainerUtil::cleanUpVectorOfPointers(_regions);
 }
@@ -90,13 +95,6 @@ AtlasRegion *Atlas::findRegion(const String &name) {
 	}
 
 	return NULL;
-}
-
-void Atlas::dispose() {
-	if (!_textureLoader) return;
-	for (size_t i = 0, n = _pages.size(); i < n; ++i) {
-		_textureLoader->unload(_pages[i]->rendererObject);
-	}
 }
 
 void Atlas::load(const char *begin, int length, const char *dir) {

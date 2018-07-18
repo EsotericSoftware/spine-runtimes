@@ -112,10 +112,6 @@ public:
 	/// @return The region, or NULL.
 	AtlasRegion *findRegion(const String &name);
 
-	void dispose();
-
-
-
 private:
 	Vector<AtlasPage *> _pages;
 	Vector<AtlasRegion *> _regions;
