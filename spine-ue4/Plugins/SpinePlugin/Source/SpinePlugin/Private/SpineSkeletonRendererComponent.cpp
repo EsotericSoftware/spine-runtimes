@@ -192,6 +192,9 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 
 	ClearAllMeshSections();
 
+	// Early out if skeleton is invisible
+	if (Skeleton->getColor().a == 0) return;
+
 	float depthOffset = 0;
 	unsigned short quadIndices[] = { 0, 1, 2, 0, 2, 3 };
 
@@ -207,11 +210,24 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 
 		Slot* slot = Skeleton->getDrawOrder()[i];
 		Attachment* attachment = slot->getAttachment();
+
+		if (slot->getColor().a == 0) {
+			clipper.clipEnd(*slot);
+			continue;
+		}
+
 		if (!attachment) continue;
 		if (!attachment->getRTTI().isExactly(RegionAttachment::rtti) && !attachment->getRTTI().isExactly(MeshAttachment::rtti) && !attachment->getRTTI().isExactly(ClippingAttachment::rtti)) continue;		
 		
 		if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
 			RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
+
+			// Early out if region is invisible
+			if (regionAttachment->getColor().a == 0) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
+
 			attachmentColor.set(regionAttachment->getColor());
 			attachmentAtlasRegion = (AtlasRegion*)regionAttachment->getRendererObject();
 			regionAttachment->computeWorldVertices(slot->getBone(), attachmentVertices, 0, 2);
@@ -221,6 +237,13 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 			numIndices = 6;
 		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 			MeshAttachment* mesh = (MeshAttachment*)attachment;
+
+			// Early out if region is invisible
+			if (mesh->getColor().a == 0) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
+
 			attachmentColor.set(mesh->getColor());
 			attachmentAtlasRegion = (AtlasRegion*)mesh->getRendererObject();			
 			mesh->computeWorldVertices(*slot, 0, mesh->getWorldVerticesLength(), attachmentVertices, 0, 2);
