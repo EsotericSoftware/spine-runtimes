@@ -116,6 +116,9 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 	states.texture = 0;
 	unsigned short quadIndices[6] = { 0, 1, 2, 2, 3, 0 };
 
+	// Early out if skeleton is invisible
+	if (skeleton->color.a == 0) return;
+
 	if (vertexEffect != 0) vertexEffect->begin(vertexEffect, skeleton);
 
 	sf::Vertex vertex;
@@ -124,6 +127,12 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		Slot* slot = skeleton->drawOrder[i];
 		Attachment* attachment = slot->attachment;
 		if (!attachment) continue;
+
+		// Early out if slot is invisible
+		if (slot->color.a == 0) {
+			spSkeletonClipping_clipEnd(clipper, slot);
+			continue;
+		}
 
 		float* vertices = worldVertices;
 		int verticesCount = 0;
@@ -134,16 +143,31 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 
 		if (attachment->type == ATTACHMENT_REGION) {
 			RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
+			attachmentColor = &regionAttachment->color;
+
+			// Early out if slot is invisible
+			if (attachmentColor->a == 0) {
+				spSkeletonClipping_clipEnd(clipper, slot);
+				continue;
+			}
+
 			spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, vertices, 0, 2);
 			verticesCount = 4;
 			uvs = regionAttachment->uvs;
 			indices = quadIndices;
 			indicesCount = 6;
 			texture = (Texture*)((AtlasRegion*)regionAttachment->rendererObject)->page->rendererObject;
-			attachmentColor = &regionAttachment->color;
 
 		} else if (attachment->type == ATTACHMENT_MESH) {
 			MeshAttachment* mesh = (MeshAttachment*)attachment;
+			attachmentColor = &mesh->color;
+
+			// Early out if slot is invisible
+			if (attachmentColor->a == 0) {
+				spSkeletonClipping_clipEnd(clipper, slot);
+				continue;
+			}
+
 			if (mesh->super.worldVerticesLength > SPINE_MESH_VERTEX_COUNT_MAX) continue;
 			texture = (Texture*)((AtlasRegion*)mesh->rendererObject)->page->rendererObject;
 			spVertexAttachment_computeWorldVertices(SUPER(mesh), slot, 0, mesh->super.worldVerticesLength, worldVertices, 0, 2);
@@ -151,7 +175,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 			uvs = mesh->uvs;
 			indices = mesh->triangles;
 			indicesCount = mesh->trianglesCount;
-			attachmentColor = &mesh->color;
+
 		} else if (attachment->type == SP_ATTACHMENT_CLIPPING) {
 			spClippingAttachment* clip = (spClippingAttachment*)slot->attachment;
 			spSkeletonClipping_clipStart(clipper, slot, clip);

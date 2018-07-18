@@ -91,6 +91,9 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 	vertexArray->clear();
 	states.texture = NULL;
 
+	// Early out if the skeleton alpha is 0
+	if (skeleton->getColor().a == 0) return;
+
 	if (vertexEffect != NULL) vertexEffect->begin(*skeleton);
 
 	sf::Vertex vertex;
@@ -99,6 +102,12 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 		Slot &slot = *skeleton->getDrawOrder()[i];
 		Attachment *attachment = slot.getAttachment();
 		if (!attachment) continue;
+
+		// Early out if the slot color is 0
+		if (slot.getColor().a == 0) {
+			clipper.clipEnd(slot);
+			continue;
+		}
 
 		Vector<float> *vertices = &worldVertices;
 		int verticesCount = 0;
@@ -109,6 +118,14 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 
 		if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
 			RegionAttachment *regionAttachment = (RegionAttachment *) attachment;
+			attachmentColor = &regionAttachment->getColor();
+
+			// Early out if the attachment color is 0
+			if (attachmentColor->a == 0) {
+				clipper.clipEnd(slot);
+				continue;
+			}
+
 			worldVertices.setSize(8, 0);
 			regionAttachment->computeWorldVertices(slot.getBone(), worldVertices, 0, 2);
 			verticesCount = 4;
@@ -116,10 +133,17 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 			indices = &quadIndices;
 			indicesCount = 6;
 			texture = (Texture *) ((AtlasRegion *) regionAttachment->getRendererObject())->page->rendererObject;
-			attachmentColor = &regionAttachment->getColor();
 
 		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 			MeshAttachment *mesh = (MeshAttachment *) attachment;
+			attachmentColor = &mesh->getColor();
+
+			// Early out if the attachment color is 0
+			if (attachmentColor->a == 0) {
+				clipper.clipEnd(slot);
+				continue;
+			}
+
 			worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
 			texture = (Texture *) ((AtlasRegion *) mesh->getRendererObject())->page->rendererObject;
 			mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices, 0, 2);
@@ -127,7 +151,6 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 			uvs = &mesh->getUVs();
 			indices = &mesh->getTriangles();
 			indicesCount = mesh->getTriangles().size();
-			attachmentColor = &mesh->getColor();
 		} else if (attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
 			ClippingAttachment *clip = (ClippingAttachment *) slot.getAttachment();
 			clipper.clipStart(slot, clip);
