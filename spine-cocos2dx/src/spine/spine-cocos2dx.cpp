@@ -106,10 +106,6 @@ GLuint filter (TextureFilter filter) {
 Cocos2dTextureLoader::Cocos2dTextureLoader() : TextureLoader() { }
 Cocos2dTextureLoader::~Cocos2dTextureLoader() { }
 
-static void unloadTexture (void* texture) {
-	((Texture2D*)texture)->release();
-}
-
 void Cocos2dTextureLoader::load(AtlasPage& page, const spine::String& path) {
 	Texture2D* texture = Director::getInstance()->getTextureCache()->addImage(path.buffer());
 	CCASSERT(texture != nullptr, "Invalid image");
@@ -118,13 +114,13 @@ void Cocos2dTextureLoader::load(AtlasPage& page, const spine::String& path) {
 	Texture2D::TexParams textureParams = {filter(page.minFilter), filter(page.magFilter), wrap(page.uWrap), wrap(page.vWrap)};
 	texture->setTexParameters(textureParams);
 	
-	page.setRendererObject(texture, unloadTexture);
+	page.setRendererObject(texture);
 	page.width = texture->getPixelsWide();
 	page.height = texture->getPixelsHigh();
 }
 	
 void Cocos2dTextureLoader::unload(void* texture) {
-	unloadTexture(texture);
+	((Texture2D*)texture)->release();
 }
 
 

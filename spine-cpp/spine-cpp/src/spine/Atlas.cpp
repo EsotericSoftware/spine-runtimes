@@ -71,6 +71,11 @@ Atlas::Atlas(const char *data, int length, const char *dir, TextureLoader *textu
 }
 
 Atlas::~Atlas() {
+	if (_textureLoader) {
+		for (size_t i = 0, n = _pages.size(); i < n; ++i) {
+			_textureLoader->unload(_pages[i]->getRendererObject());
+		}
+	}
 	ContainerUtil::cleanUpVectorOfPointers(_pages);
 	ContainerUtil::cleanUpVectorOfPointers(_regions);
 }

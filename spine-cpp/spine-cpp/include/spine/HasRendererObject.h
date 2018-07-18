@@ -37,7 +37,7 @@ typedef void (*DisposeRendererObject) (void* rendererObject);
 
 class HasRendererObject {
 public:
-	explicit HasRendererObject() : _rendererObject(NULL) {};
+	explicit HasRendererObject() : _rendererObject(NULL), _dispose(NULL) {};
 
 	virtual ~HasRendererObject() {
 		if (_dispose && _rendererObject)

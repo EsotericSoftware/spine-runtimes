@@ -281,10 +281,6 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 	if (vertexEffect != 0) vertexEffect->end();
 }
 
-void deleteTexture(void* texture) {
-	delete (Texture *) texture;
-}
-
 void SFMLTextureLoader::load(AtlasPage &page, const String &path) {
 	Texture *texture = new Texture();
 	if (!texture->loadFromFile(path.buffer())) return;
@@ -292,14 +288,14 @@ void SFMLTextureLoader::load(AtlasPage &page, const String &path) {
 	if (page.magFilter == TextureFilter_Linear) texture->setSmooth(true);
 	if (page.uWrap == TextureWrap_Repeat && page.vWrap == TextureWrap_Repeat) texture->setRepeated(true);
 
-	page.setRendererObject(texture, deleteTexture);
+	page.setRendererObject(texture);
 	Vector2u size = texture->getSize();
 	page.width = size.x;
 	page.height = size.y;
 }
 
 void SFMLTextureLoader::unload(void *texture) {
-	deleteTexture(texture);
+	delete (Texture *) texture;
 }
 
 SpineExtension *getDefaultExtension() {

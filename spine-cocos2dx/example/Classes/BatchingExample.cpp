@@ -36,6 +36,8 @@ using namespace spine;
 
 #define NUM_SKELETONS 50
 
+Cocos2dTextureLoader textureLoader;
+
 Scene* BatchingExample::scene () {
 	Scene *scene = Scene::create();
 	scene->addChild(BatchingExample::create());
@@ -45,8 +47,8 @@ Scene* BatchingExample::scene () {
 bool BatchingExample::init () {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
-	// Load the texture atlas.
-	Cocos2dTextureLoader textureLoader;
+	// Load the texture atlas. Note that the texture loader has to live
+	// as long as the Atlas, as the Atlas destructor will call TextureLoader::unload.
 	_atlas = new (__FILE__, __LINE__) Atlas("spineboy.atlas", &textureLoader);
 	CCASSERT(_atlas, "Error reading atlas file.");
 
