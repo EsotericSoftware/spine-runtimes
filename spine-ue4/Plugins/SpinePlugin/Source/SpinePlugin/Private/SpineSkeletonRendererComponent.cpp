@@ -202,6 +202,9 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 
 	ClearAllMeshSections();
 
+	// Early out if skeleton is invisible
+	if (Skeleton->color.a == 0) return;
+
 	float depthOffset = 0;
 	unsigned short quadIndices[] = { 0, 1, 2, 0, 2, 3 };
 
@@ -216,12 +219,25 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 		float* attachmentUvs = nullptr;
 
 		spSlot* slot = Skeleton->drawOrder[i];
+
+		if (Skeleton->color.a == 0) {
+			spSkeletonClipping_clipEnd(clipper, slot);
+			continue;
+		}
+
 		spAttachment* attachment = slot->attachment;
 		if (!attachment) continue;
 		if (attachment->type != SP_ATTACHMENT_REGION && attachment->type != SP_ATTACHMENT_MESH && attachment->type != SP_ATTACHMENT_CLIPPING) continue;
 		
 		if (attachment->type == SP_ATTACHMENT_REGION) {
 			spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
+
+			// Early out if region is invisible
+			if (regionAttachment->color.a == 0) {
+				spSkeletonClipping_clipEnd(clipper, slot);
+				continue;
+			}
+
 			spColor_setFromColor(&attachmentColor, &regionAttachment->color);
 			attachmentAtlasRegion = (spAtlasRegion*)regionAttachment->rendererObject;
 			spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, attachmentVertices, 0, 2);
@@ -231,6 +247,13 @@ void USpineSkeletonRendererComponent::UpdateMesh(spSkeleton* Skeleton) {
 			numIndices = 6;
 		} else if (attachment->type == SP_ATTACHMENT_MESH) {
 			spMeshAttachment* mesh = (spMeshAttachment*)attachment;
+
+			// Early out if region is invisible
+			if (mesh->color.a == 0) {
+				spSkeletonClipping_clipEnd(clipper, slot);
+				continue;
+			}
+
 			spColor_setFromColor(&attachmentColor, &mesh->color);
 			attachmentAtlasRegion = (spAtlasRegion*)mesh->rendererObject;			
 			if (mesh->super.worldVerticesLength > worldVertices->size) spFloatArray_setSize(worldVertices, mesh->super.worldVerticesLength);

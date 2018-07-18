@@ -1,5 +1,5 @@
 # spine-ue4
-The spine-ue4 runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Unreal Engine 4.15+](https://www.unrealengine.com/). spine-ue4 is based on [spine-c](../spine-c).
+The spine-ue4 runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Unreal Engine 4.15+](https://www.unrealengine.com/). spine-ue4 is based on [spine-c](../spine-c). Note: the last supported Unreal Engine version of this runtime is 4.18. For UE4 versions higher than 4.18, please use the runtime in the 3.7-beta-cpp branch.
 
 ## Licensing
 
