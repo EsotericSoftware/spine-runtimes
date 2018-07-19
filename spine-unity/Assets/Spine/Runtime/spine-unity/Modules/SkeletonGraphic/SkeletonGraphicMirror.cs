@@ -1,4 +1,4 @@
-﻿/******************************************************************************
+/******************************************************************************
  * Spine Runtimes Software License v2.5
  *
  * Copyright (c) 2013-2016, Esoteric Software
@@ -60,14 +60,17 @@ namespace Spine.Unity.Modules {
 			if (restoreOnDisable) RestoreIndependentSkeleton();
 		}
 
+		/// <summary>Freeze the SkeletonGraphic on this GameObject, and use the source as the Skeleton to be rendered by the SkeletonGraphic.</summary>
 		public void StartMirroring () {
 			if (source == null) return;
 			if (skeletonGraphic == null) return;
 
 			skeletonGraphic.startingAnimation = string.Empty;
 
-			originalSkeleton = skeletonGraphic.Skeleton;
-			originalFreeze = skeletonGraphic.freeze;
+			if (originalSkeleton == null) {
+				originalSkeleton = skeletonGraphic.Skeleton;
+				originalFreeze = skeletonGraphic.freeze;
+			}
 
 			skeletonGraphic.Skeleton = source.skeleton;
 			skeletonGraphic.freeze = true;
@@ -75,16 +78,23 @@ namespace Spine.Unity.Modules {
 				skeletonGraphic.OverrideTexture = overrideTexture;
 		}
 
+		/// <summary>Use a new texture for the SkeletonGraphic. Use this if your source skeleton uses a repacked atlas. </summary>
 		public void UpdateTexture (Texture2D newOverrideTexture) {
 			overrideTexture = newOverrideTexture;
 			if (newOverrideTexture != null)
 				skeletonGraphic.OverrideTexture = overrideTexture;
 		}
 
+		/// <summary>Stops mirroring the source SkeletonRenderer and allows the SkeletonGraphic to become an independent Skeleton component again.</summary>
 		public void RestoreIndependentSkeleton () {
+			if (originalSkeleton == null)
+				return;
+
 			skeletonGraphic.Skeleton = originalSkeleton;
 			skeletonGraphic.freeze = originalFreeze;
 			skeletonGraphic.OverrideTexture = null;
+
+			originalSkeleton = null;
 		}
 	}
 
