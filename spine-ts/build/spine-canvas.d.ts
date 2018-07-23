@@ -16,11 +16,11 @@ declare module spine {
 		setup = 0,
 		first = 1,
 		replace = 2,
-		add = 3,
+		add = 3
 	}
 	enum MixDirection {
 		in = 0,
-		out = 1,
+		out = 1
 	}
 	enum TimelineType {
 		rotate = 0,
@@ -37,7 +37,7 @@ declare module spine {
 		pathConstraintPosition = 11,
 		pathConstraintSpacing = 12,
 		pathConstraintMix = 13,
-		twoColor = 14,
+		twoColor = 14
 	}
 	abstract class CurveTimeline implements Timeline {
 		static LINEAR: number;
@@ -336,7 +336,7 @@ declare module spine {
 		end = 2,
 		dispose = 3,
 		complete = 4,
-		event = 5,
+		event = 5
 	}
 	interface AnimationStateListener2 {
 		start(entry: TrackEntry): void;
@@ -375,8 +375,8 @@ declare module spine {
 		private toLoad;
 		private loaded;
 		constructor(textureLoader: (image: HTMLImageElement) => any, pathPrefix?: string);
-		private static downloadText(url, success, error);
-		private static downloadBinary(url, success, error);
+		private static downloadText;
+		private static downloadBinary;
 		loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, error: string) => void): void;
 		loadTexture(path: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
 		loadTextureData(path: string, data: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
@@ -409,7 +409,7 @@ declare module spine {
 		Normal = 0,
 		Additive = 1,
 		Multiply = 2,
-		Screen = 3,
+		Screen = 3
 	}
 }
 declare module spine {
@@ -478,7 +478,7 @@ declare module spine {
 		OnlyTranslation = 1,
 		NoRotationOrReflection = 2,
 		NoScale = 3,
-		NoScaleOrReflection = 4,
+		NoScaleOrReflection = 4
 	}
 }
 declare module spine {
@@ -578,17 +578,17 @@ declare module spine {
 	}
 	enum PositionMode {
 		Fixed = 0,
-		Percent = 1,
+		Percent = 1
 	}
 	enum SpacingMode {
 		Length = 0,
 		Fixed = 1,
-		Percent = 2,
+		Percent = 2
 	}
 	enum RotateMode {
 		Tangent = 0,
 		Chain = 1,
-		ChainScale = 2,
+		ChainScale = 2
 	}
 }
 declare module spine {
@@ -599,12 +599,12 @@ declare module spine {
 		private rawAssets;
 		private errors;
 		constructor(pathPrefix?: string);
-		private queueAsset(clientId, textureLoader, path);
+		private queueAsset;
 		loadText(clientId: string, path: string): void;
 		loadJson(clientId: string, path: string): void;
 		loadTexture(clientId: string, textureLoader: (image: HTMLImageElement) => any, path: string): void;
 		get(clientId: string, path: string): any;
-		private updateClientAssets(clientAssets);
+		private updateClientAssets;
 		isLoadingComplete(clientId: string): boolean;
 		dispose(): void;
 		hasErrors(): boolean;
@@ -625,8 +625,8 @@ declare module spine {
 		skin: Skin;
 		color: Color;
 		time: number;
-		flipX: boolean;
-		flipY: boolean;
+		scaleX: number;
+		scaleY: number;
 		x: number;
 		y: number;
 		constructor(data: SkeletonData);
@@ -808,12 +808,12 @@ declare module spine {
 		MipMapNearestNearest = 9984,
 		MipMapLinearNearest = 9985,
 		MipMapNearestLinear = 9986,
-		MipMapLinearLinear = 9987,
+		MipMapLinearLinear = 9987
 	}
 	enum TextureWrap {
 		MirroredRepeat = 33648,
 		ClampToEdge = 33071,
-		Repeat = 10497,
+		Repeat = 10497
 	}
 	class TextureRegion {
 		renderObject: any;
@@ -840,7 +840,7 @@ declare module spine {
 		pages: TextureAtlasPage[];
 		regions: TextureAtlasRegion[];
 		constructor(atlasText: string, textureLoader: (path: string) => any);
-		private load(atlasText, textureLoader);
+		private load;
 		findRegion(name: string): TextureAtlasRegion;
 		dispose(): void;
 	}
@@ -916,9 +916,9 @@ declare module spine {
 		private polygonIndicesPool;
 		triangulate(verticesArray: ArrayLike<number>): Array<number>;
 		decompose(verticesArray: Array<number>, triangles: Array<number>): Array<Array<number>>;
-		private static isConcave(index, vertexCount, vertices, indices);
-		private static positiveArea(p1x, p1y, p2x, p2y, p3x, p3y);
-		private static winding(p1x, p1y, p2x, p2y, p3x, p3y);
+		private static isConcave;
+		private static positiveArea;
+		private static winding;
 	}
 }
 declare module spine {
@@ -1090,7 +1090,7 @@ declare module spine {
 		Mesh = 2,
 		LinkedMesh = 3,
 		Path = 4,
-		Point = 5,
+		Point = 5
 	}
 }
 declare module spine {
@@ -1256,10 +1256,10 @@ declare module spine.canvas {
 		private tempColor;
 		constructor(context: CanvasRenderingContext2D);
 		draw(skeleton: Skeleton): void;
-		private drawImages(skeleton);
-		private drawTriangles(skeleton);
-		private drawTriangle(img, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
-		private computeRegionVertices(slot, region, pma);
-		private computeMeshVertices(slot, mesh, pma);
+		private drawImages;
+		private drawTriangles;
+		private drawTriangle;
+		private computeRegionVertices;
+		private computeMeshVertices;
 	}
 }

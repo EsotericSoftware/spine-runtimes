@@ -42,7 +42,7 @@ module spine {
 		skin: Skin;
 		color: Color;
 		time = 0;
-		flipX = false; flipY = false;
+		scaleX = 1; scaleY = 1;
 		x = 0; y = 0;
 
 		constructor (data: SkeletonData) {
