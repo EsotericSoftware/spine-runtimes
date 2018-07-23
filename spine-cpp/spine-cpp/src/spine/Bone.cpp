@@ -101,26 +101,14 @@ Bone::updateWorldTransform(float x, float y, float rotation, float scaleX, float
 
 	if (!parent) { /* Root bone. */
 		float rotationY = rotation + 90 + shearY;
-		float la = MathUtil::cosDeg(rotation + shearX) * scaleX;
-		float lb = MathUtil::cosDeg(rotationY) * scaleY;
-		float lc = MathUtil::sinDeg(rotation + shearX) * scaleX;
-		float ld = MathUtil::sinDeg(rotationY) * scaleY;
-		if (_skeleton.getFlipX()) {
-			x = -x;
-			la = -la;
-			lb = -lb;
-		}
-		if (_skeleton.getFlipY() != yDown) {
-			y = -y;
-			lc = -lc;
-			ld = -ld;
-		}
-		_a = la;
-		_b = lb;
-		_c = lc;
-		_d = ld;
-		_worldX = x + _skeleton.getX();
-		_worldY = y + _skeleton.getY();
+		float sx = _skeleton.getScaleX();
+		float sy = _skeleton.getScaleY();
+		_a = MathUtil::cosDeg(rotation + shearX) * scaleX * sx;
+		_b = MathUtil::cosDeg(rotationY) * scaleY * sy;
+		_c = MathUtil::sinDeg(rotation + shearX) * scaleX * sx;
+		_d = MathUtil::sinDeg(rotationY) * scaleY * sy;
+		_worldX = x * sx + _skeleton.getX();
+		_worldY = y * sy + _skeleton.getY();
 		return;
 	}
 
@@ -184,8 +172,8 @@ Bone::updateWorldTransform(float x, float y, float rotation, float scaleX, float
 			float r, zb, zd, la, lb, lc, ld;
 			cosine = MathUtil::cosDeg(rotation);
 			sine = MathUtil::sinDeg(rotation);
-			za = pa * cosine + pb * sine;
-			zc = pc * cosine + pd * sine;
+			za = (pa * cosine + pb * sine) / _skeleton.getScaleX();
+			zc = (pc * cosine + pd * sine) / _skeleton.getScaleY();
 			s = MathUtil::sqrt(za * za + zc * zc);
 			if (s > 0.00001f) s = 1 / s;
 			za *= s;
@@ -198,26 +186,17 @@ Bone::updateWorldTransform(float x, float y, float rotation, float scaleX, float
 			lb = MathUtil::cosDeg(90 + shearY) * scaleY;
 			lc = MathUtil::sinDeg(shearX) * scaleX;
 			ld = MathUtil::sinDeg(90 + shearY) * scaleY;
-			if (getData().getTransformMode() != TransformMode_NoScaleOrReflection ? pa * pd - pb * pc < 0 :
-				_skeleton.getFlipX() != _skeleton.getFlipY()) {
-				zb = -zb;
-				zd = -zd;
-			}
 			_a = za * la + zb * lc;
 			_b = za * lb + zb * ld;
 			_c = zc * la + zd * lc;
 			_d = zc * lb + zd * ld;
-			return;
+			break;
 		}
 	}
-	if (_skeleton.getFlipX()) {
-		_a = -_a;
-		_b = -_b;
-	}
-	if (_skeleton.getFlipY() != yDown) {
-		_c = -_c;
-		_d = -_d;
-	}
+	_a *= _skeleton.getScaleX();
+	_b *= _skeleton.getScaleX();
+	_c *= _skeleton.getScaleY();
+	_d *= _skeleton.getScaleY();
 }
 
 void Bone::setToSetupPose() {

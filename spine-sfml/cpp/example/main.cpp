@@ -118,8 +118,6 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 	drawable->timeScale = 1;
 
 	Skeleton* skeleton = drawable->skeleton;
-	skeleton->setFlipX(false);
-	skeleton->setFlipY(false);
 	skeleton->setToSetupPose();
 
 	skeleton->setPosition(320, 590);
@@ -168,8 +166,6 @@ void goblins (SkeletonData* skeletonData, Atlas* atlas) {
 	drawable->timeScale = 1;
 
 	Skeleton* skeleton = drawable->skeleton;
-	skeleton->setFlipX(false);
-	skeleton->setFlipY(false);
 	skeleton->setSkin("goblin");
 	skeleton->setSlotsToSetupPose();
 
@@ -309,8 +305,6 @@ void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
 	drawable->timeScale = 1;
 
 	Skeleton* skeleton = drawable->skeleton;
-	skeleton->setFlipX(false);
-	skeleton->setFlipY(false);
 
 	skeleton->setPosition(100, 590);
 	skeleton->updateWorldTransform();
