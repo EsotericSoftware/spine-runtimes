@@ -29,7 +29,7 @@ See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documen
 ## Example
 ### [Please see the spine-ue4 guide for full documentation](http://esotericsoftware.com/spine-ue4)
 
-The Spine UE4 example works on all platforms supported by Unreal Engine.
+The Spine UE4 example works on all platforms supported by Unreal Engine. The samples require Unreal Engine 4.18.
 
 1. Copy the `spine-c` folder from this repositories root directory to your `Plugins/SpinePlugin/Sources/SpinePlugin/Public/` directory.
 2. Open the SpineUE4.uproject file with Unreal Editor
