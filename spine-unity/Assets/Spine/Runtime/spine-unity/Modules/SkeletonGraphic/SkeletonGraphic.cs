@@ -188,7 +188,7 @@ namespace Spine.Unity {
 
 		#region API
 		protected Skeleton skeleton;
-		public Skeleton Skeleton { get { return skeleton; } }
+		public Skeleton Skeleton { get { return skeleton; } internal set { skeleton = value; } }
 		public SkeletonData SkeletonData { get { return skeleton == null ? null : skeleton.data; } }
 		public bool IsValid { get { return skeleton != null; } }
 

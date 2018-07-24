@@ -204,13 +204,13 @@ public:
 
 	void setY(float inValue);
 
-	bool getFlipX();
+	float getScaleX();
 
-	void setFlipX(bool inValue);
+	void setScaleX(float inValue);
 
-	bool getFlipY();
+	float getScaleY();
 
-	void setFlipY(bool inValue);
+	void setScaleY(float inValue);
 
 private:
 	SkeletonData *_data;
@@ -225,7 +225,7 @@ private:
 	Skin *_skin;
 	Color _color;
 	float _time;
-	bool _flipX, _flipY;
+	float _scaleX, _scaleY;
 	float _x, _y;
 
 	void sortIkConstraint(IkConstraint *constraint);

@@ -2358,28 +2358,16 @@ var spine;
 			this.appliedValid = true;
 			var parent = this.parent;
 			if (parent == null) {
-				var rotationY = rotation + 90 + shearY;
-				var la = spine.MathUtils.cosDeg(rotation + shearX) * scaleX;
-				var lb = spine.MathUtils.cosDeg(rotationY) * scaleY;
-				var lc = spine.MathUtils.sinDeg(rotation + shearX) * scaleX;
-				var ld = spine.MathUtils.sinDeg(rotationY) * scaleY;
 				var skeleton = this.skeleton;
-				if (skeleton.flipX) {
-					x = -x;
-					la = -la;
-					lb = -lb;
-				}
-				if (skeleton.flipY) {
-					y = -y;
-					lc = -lc;
-					ld = -ld;
-				}
-				this.a = la;
-				this.b = lb;
-				this.c = lc;
-				this.d = ld;
-				this.worldX = x + skeleton.x;
-				this.worldY = y + skeleton.y;
+				var rotationY = rotation + 90 + shearY;
+				var sx = skeleton.scaleX;
+				var sy = skeleton.scaleY;
+				this.a = spine.MathUtils.cosDeg(rotation + shearX) * scaleX * sx;
+				this.b = spine.MathUtils.cosDeg(rotationY) * scaleY * sy;
+				this.c = spine.MathUtils.sinDeg(rotation + shearX) * scaleX * sx;
+				this.d = spine.MathUtils.sinDeg(rotationY) * scaleY * sy;
+				this.worldX = x * sx + skeleton.x;
+				this.worldY = y * sy + skeleton.y;
 				return;
 			}
 			var pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
@@ -2436,8 +2424,8 @@ var spine;
 				case spine.TransformMode.NoScaleOrReflection: {
 					var cos = spine.MathUtils.cosDeg(rotation);
 					var sin = spine.MathUtils.sinDeg(rotation);
-					var za = pa * cos + pb * sin;
-					var zc = pc * cos + pd * sin;
+					var za = (pa * cos + pb * sin) / this.skeleton.scaleX;
+					var zc = (pc * cos + pd * sin) / this.skeleton.scaleY;
 					var s = Math.sqrt(za * za + zc * zc);
 					if (s > 0.00001)
 						s = 1 / s;
@@ -2451,25 +2439,17 @@ var spine;
 					var lb = spine.MathUtils.cosDeg(90 + shearY) * scaleY;
 					var lc = spine.MathUtils.sinDeg(shearX) * scaleX;
 					var ld = spine.MathUtils.sinDeg(90 + shearY) * scaleY;
-					if (this.data.transformMode != spine.TransformMode.NoScaleOrReflection ? pa * pd - pb * pc < 0 : this.skeleton.flipX != this.skeleton.flipY) {
-						zb = -zb;
-						zd = -zd;
-					}
 					this.a = za * la + zb * lc;
 					this.b = za * lb + zb * ld;
 					this.c = zc * la + zd * lc;
 					this.d = zc * lb + zd * ld;
-					return;
+					break;
 				}
 			}
-			if (this.skeleton.flipX) {
-				this.a = -this.a;
-				this.b = -this.b;
-			}
-			if (this.skeleton.flipY) {
-				this.c = -this.c;
-				this.d = -this.d;
-			}
+			this.a *= this.skeleton.scaleX;
+			this.b *= this.skeleton.scaleX;
+			this.c *= this.skeleton.scaleY;
+			this.d *= this.skeleton.scaleY;
 		};
 		Bone.prototype.setToSetupPose = function () {
 			var data = this.data;
@@ -3386,8 +3366,8 @@ var spine;
 			this._updateCache = new Array();
 			this.updateCacheReset = new Array();
 			this.time = 0;
-			this.flipX = false;
-			this.flipY = false;
+			this.scaleX = 1;
+			this.scaleY = 1;
 			this.x = 0;
 			this.y = 0;
 			if (data == null)

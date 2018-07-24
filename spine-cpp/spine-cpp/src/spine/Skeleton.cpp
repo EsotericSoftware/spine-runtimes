@@ -61,8 +61,8 @@ Skeleton::Skeleton(SkeletonData *skeletonData) :
 		_skin(NULL),
 		_color(1, 1, 1, 1),
 		_time(0),
-		_flipX(false),
-		_flipY(false),
+		_scaleX(1),
+		_scaleY(1),
 		_x(0),
 		_y(0) {
 	_bones.ensureCapacity(_data->getBones().size());
@@ -517,20 +517,20 @@ void Skeleton::setY(float inValue) {
 	_y = inValue;
 }
 
-bool Skeleton::getFlipX() {
-	return _flipX;
+float Skeleton::getScaleX() {
+	return _scaleX;
 }
 
-void Skeleton::setFlipX(bool inValue) {
-	_flipX = inValue;
+void Skeleton::setScaleX(float inValue) {
+	_scaleX = inValue;
 }
 
-bool Skeleton::getFlipY() {
-	return _flipY;
+float Skeleton::getScaleY() {
+	return _scaleY * (Bone::isYDown() ? -1 : 1);
 }
 
-void Skeleton::setFlipY(bool inValue) {
-	_flipY = inValue;
+void Skeleton::setScaleY(float inValue) {
+	_scaleY = inValue;
 }
 
 void Skeleton::sortIkConstraint(IkConstraint *constraint) {
