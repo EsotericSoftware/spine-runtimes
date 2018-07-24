@@ -50,7 +50,7 @@ package spine {
 		private var _skin : Skin;
 		public var color : Color = new Color(1, 1, 1, 1);
 		public var time : Number = 0;
-		public var flipX : Boolean, flipY : Boolean;
+		public var scaleX : Number = 1, scaleY : Number = 1;
 		public var x : Number = 0, y : Number = 0;
 
 		public function Skeleton(data : SkeletonData) {
