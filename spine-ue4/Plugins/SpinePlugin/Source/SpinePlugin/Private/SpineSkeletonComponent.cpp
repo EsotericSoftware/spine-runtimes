@@ -149,26 +149,26 @@ void USpineSkeletonComponent::SetSlotsToSetupPose () {
 	if (skeleton) skeleton->setSlotsToSetupPose();
 }
 
-void USpineSkeletonComponent::SetFlipX (bool flipX) {
+void USpineSkeletonComponent::SetScaleX (float scaleX) {
 	CheckState();
-	if (skeleton) skeleton->setFlipX(flipX);
+	if (skeleton) skeleton->setScaleX(scaleX);
 }
 
-bool USpineSkeletonComponent::GetFlipX() {
+float USpineSkeletonComponent::GetScaleX() {
 	CheckState();
-	if (skeleton) return skeleton->getFlipX();
-	return false;
+	if (skeleton) return skeleton->getScaleX();
+	return 1;
 }
 
-void USpineSkeletonComponent::SetFlipY(bool flipY) {
+void USpineSkeletonComponent::SetScaleY(float scaleY) {
 	CheckState();
-	if (skeleton) skeleton->setFlipY(flipY);
+	if (skeleton) skeleton->setScaleY(scaleY);
 }
 
-bool USpineSkeletonComponent::GetFlipY() {
+float USpineSkeletonComponent::GetScaleY() {
 	CheckState();
-	if (skeleton) return skeleton->getFlipY();
-	return false;
+	if (skeleton) return skeleton->getScaleY();
+	return 1;
 }
 
 void USpineSkeletonComponent::GetBones(TArray<FString> &Bones) {
