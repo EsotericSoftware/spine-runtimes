@@ -65,10 +65,6 @@ void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 
 	Vector<Event *> &events = *pEvents;
 
-	if (events.size() == 0) {
-		return;
-	}
-
 	size_t frameCount = _frames.size();
 
 	if (lastTime > time) {
