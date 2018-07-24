@@ -66,7 +66,7 @@ typedef struct spSkeleton {
 	spSkin* const skin;
 	spColor color;
 	float time;
-	int/*bool*/flipX, flipY;
+	float scaleX, scaleY;
 	float x, y;
 
 #ifdef __cplusplus
@@ -88,8 +88,8 @@ typedef struct spSkeleton {
 		skin(0),
 		color(),
 		time(0),
-		flipX(0),
-		flipY(0),
+		scaleX(1),
+		scaleY(1),
 		x(0), y(0) {
 	}
 #endif

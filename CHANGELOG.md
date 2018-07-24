@@ -4,6 +4,7 @@
 * **Breaking changes**
   * The completion event will fire for looped 0 duration animations every frame.
   * `MixPose` is now called `MixBlend`
+  * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
 * **Additions**
   * Added additive animation blending. When playing back multiple animations on different tracks, where each animation modifies the same skeleton property, the results of tracks with lower indices are discarded, and only the result from the track with the highest index is used. With animation blending, the results of all tracks are mixed together. This allows effects like mixing multiple facial expressions (angry, happy, sad) with percentage mixes. By default the old behaviour is retained (results from lower tracks are discarded). To enable additive blending across animation tracks, call `TrackEntry#setMixBlend(MixBlend.add)` on each track. To specify the blend percentage, set `TrackEntry#alpha`. See http://esotericsoftware.com/forum/morph-target-track-animation-mix-mode-9459 for a discussion.
 
@@ -25,6 +26,7 @@
 * **Breaking changes**
   * Listeners on `spAnimationState` and `spTrackEntry` will now also be called if a track entry gets disposed as part of disposing an animation state.
   * The completion event will fire for looped 0 duration animations every frame.
+  * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
 * **Additions**
   * Added support for local and relative transform constraint calculation, including additional fields in `spTransformConstraintData`.
   * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
@@ -67,8 +69,10 @@
 ## C# ##
 * **Breaking changes**
   * The completion event will fire for looped 0 duration animations every frame.
+  * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
 * **Additions**
   * Added additive animation blending. When playing back multiple animations on different tracks, where each animation modifies the same skeleton property, the results of tracks with lower indices are discarded, and only the result from the track with the highest index is used. With animation blending, the results of all tracks are mixed together. This allows effects like mixing multiple facial expressions (angry, happy, sad) with percentage mixes. By default the old behaviour is retained (results from lower tracks are discarded). To enable additive blending across animation tracks, call `TrackEntry#MixBlend = MixBlend.add` on each track. To specify the blend percentage, set `TrackEntry#Alpha`. See http://esotericsoftware.com/forum/morph-target-track-animation-mix-mode-9459 for a discussion.
+  * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
 
 ### Unity
 * **Runtime and Editor, and Assembly Definition** Files and folders have been reorganized into "Runtime" and "Editor". Each of these have an `.asmdef` file that defines these separately as their own assembly in Unity. For projects not using assembly definition, you may delete the `.asmdef` files. These assembly definitions will be ignored by older versions of Unity that don't support it.
@@ -82,7 +86,7 @@
 		* `Spine/Skeleton`
 		* `Spine/Skeleton Tint Black`
 		* `Spine/Skeleton Lit`
-		* `Spine/Skeleton Tint`	
+		* `Spine/Skeleton Tint`
 		* `Spine/Skeleton Fill`
 		* `Spine/SkeletonGraphic (Premultiply Alpha)` was renamed to `Spine/SkeletonGraphic`
 		* `Spine/SkeletonGraphic Tint Black (Premultiply Alpha)` was renamed to `Spine/SkeletonGraphic Tint Black`
@@ -103,6 +107,7 @@
   * Skeleton attachments: Moved update of attached skeleton out of libGDX `SkeletonRenderer`, added overloaded method `Skeleton#updateWorldTransform(Bone)`, used for `SkeletonAttachment`. You now MUST call this new method with the bone of the parent skeleton to which the child skeleton is attached. See `SkeletonAttachmentTest` for and example.
   * The completion event will fire for looped 0 duration animations every frame.
   * `MixPose` is now called `MixBlend`.
+  * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
 * **Additions**
   * Added `EventData#audioPath` field. This field contains the file name of the audio file used for the event.
   * Added convenience method to add all attachments from one skin to another, see https://github.com/EsotericSoftware/spine-runtimes/commit/a0b7bb6c445efdfac12b0cdee2057afa3eff3ead
@@ -119,6 +124,7 @@
 ## Lua
 * **Breaking changes**
   * The completion event will fire for looped 0 duration animations every frame.
+  * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
 * **Additions**
   * Added `JitterEffect` and `SwirlEffect` and support for vertex effects in Corona and Love
   * Added additive animation blending. When playing back multiple animations on different tracks, where each animation modifies the same skeleton property, the results of tracks with lower indices are discarded, and only the result from the track with the highest index is used. With animation blending, the results of all tracks are mixed together. This allows effects like mixing multiple facial expressions (angry, happy, sad) with percentage mixes. By default the old behaviour is retained (results from lower tracks are discarded). To enable additive blending across animation tracks, call `TrackEntry:setMixBlend(MixBlend.add)` on each track. To specify the blend percentage, set `TrackEntry.alpha`. See http://esotericsoftware.com/forum/morph-target-track-animation-mix-mode-9459 for a discussion.
@@ -132,6 +138,7 @@
 ## Typescript/Javascript
 * **Breaking changes**
   * The completion event will fire for looped 0 duration animations every frame.
+  * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
 * **Additions**
   * Added `AssetManager.loadTextureAtlas`. Instead of loading the `.atlas` and corresponding image files manually, you can simply specify the location of the `.atlas` file and AssetManager will load the atlas and all its images automatically. `AssetManager.get("atlasname.atlas")` will then return an instance of `spine.TextureAtlas`.
   * Added additive animation blending. When playing back multiple animations on different tracks, where each animation modifies the same skeleton property, the results of tracks with lower indices are discarded, and only the result from the track with the highest index is used. With animation blending, the results of all tracks are mixed together. This allows effects like mixing multiple facial expressions (angry, happy, sad) with percentage mixes. By default the old behaviour is retained (results from lower tracks are discarded). To enable additive blending across animation tracks, call `TrackEntry#setMixBlend(MixBlend.add)` on each track. To specify the blend percentage, set `TrackEntry#alpha`. See http://esotericsoftware.com/forum/morph-target-track-animation-mix-mode-9459 for a discussion. See https://github.com/EsotericSoftware/spine-runtimes/blob/f045d221836fa56191ccda73dd42ae884d4731b8/spine-ts/webgl/tests/test-additive-animation-blending.html for an example.
