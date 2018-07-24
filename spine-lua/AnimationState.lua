@@ -377,7 +377,7 @@ function AnimationState:apply (skeleton)
 	for i,current in pairs(tracks) do
 		if not (current == nil or current.delay > 0) then
       applied = true
-<<<<<<< HEAD
+
 			local blend = current.mixBlend
 			if i == 0 then blend = MixBlend.first end
 
@@ -385,15 +385,6 @@ function AnimationState:apply (skeleton)
 			local mix = current.alpha
 			if current.mixingFrom then
 				mix = mix * self:applyMixingFrom(current, skeleton, blend)
-=======
-			local currrentPose = MixPose.currentLayered
-			if i == 0 then currentPose = MixPose.current end
-
-			-- Apply mixing from entries first.
-			local mix = current.alpha
-			if current.mixingFrom then
-				mix = mix * self:applyMixingFrom(current, skeleton, currentPose)
->>>>>>> 3.6
 			elseif current.trackTime >= current.trackEnd and current.next == nil then
 				mix = 0
 			end
@@ -411,19 +402,13 @@ function AnimationState:apply (skeleton)
 				local firstFrame = #current.timelinesRotation == 0
 				local timelinesRotation = current.timelinesRotation
 
-				for i,timeline in ipairs(timelines) do
-<<<<<<< HEAD
+				for ii,timeline in ipairs(timelines) do
 					local timelineBlend = MixBlend.setup
-					if timelineData[i] == SUBSEQUENT then timelineBlend = blend end
+					if timelineData[ii] == SUBSEQUENT then timelineBlend = blend end
 
-=======
-					local pose = MixPose.currentPose
-					if timelineData[i] >= FIRST then pose = MixPose.setup end
-
->>>>>>> 3.6
 					if timeline.type == Animation.TimelineType.rotate then
-						self:applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, i * 2,
-							firstFrame) -- FIXME passing ii * 2, indexing correct?
+						self:applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii * 2,
+							firstFrame)
 					else
 						timeline:apply(skeleton, animationLast, animationTime, events, mix, timelineBlend, MixDirection._in)
 					end
@@ -468,7 +453,6 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 		for i,timeline in ipairs(timelines) do
 			timeline:apply(skeleton, animationLast, animationTime, events, alphaMix, blend, MixDirection.out)
 		end
-<<<<<<< HEAD
 	else
 		local timelineData = from.timelineData
 		local timelineDipMix = from.timelineDipMix
@@ -493,13 +477,6 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 			elseif timelineData[i] == DIP then
 				timelineBlend = MixBlend.setup
 				alpha = alphaDip
-=======
-
-		if not skipSubsequent then
-			from.totalAlpha = from.totalAlpha + alpha
-			if timeline.type == Animation.TimelineType.rotate then
-				self:applyRotateTimeline(timeline, skeleton, animationTime, alpha, pose, timelinesRotation, i * 2, firstFrame)
->>>>>>> 3.6
 			else
 				timelineBlend = MixBlend.setup
 				local dipMix = timelineDipMix[i]
@@ -525,13 +502,8 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 	return mix
 end
 
-<<<<<<< HEAD
 function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, blend, timelinesRotation, i, firstFrame)
 	if firstFrame then
-=======
-function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, pose, timelinesRotation, i, firstFrame)
-	if firstFrame then
->>>>>>> 3.6
 		timelinesRotation[i] = 0
 		timelinesRotation[i+1] = 0
 	end
@@ -858,13 +830,8 @@ function AnimationState:_animationsChanged ()
 	local mixingTo = self.mixingTo
 
 	for i, entry in pairs(self.tracks) do
-<<<<<<< HEAD
 		if entry and (i == 0 or entry.mixBlend ~= MixBlend.add) then
 			entry:setTimelineData(nil, mixingTo, propertyIDs)
-=======
-		if entry then
-			entry:setTimelineData(nil, mixingTo, propertyIDs)
->>>>>>> 3.6
 		end
 	end
 end

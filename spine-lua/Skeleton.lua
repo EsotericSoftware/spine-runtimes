@@ -63,7 +63,7 @@ function Skeleton.new (data)
 		skin = nil,
 		color = Color.newWith(1, 1, 1, 1),
 		time = 0,
-		flipX = false, flipY = false,
+		scaleX = 1, scaleY = 1,
 		x = 0, y = 0
 	}
 	setmetatable(self, Skeleton)

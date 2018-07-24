@@ -25,7 +25,7 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 	json.scale = scale
 	local skeletonData = json:readSkeletonDataFile("data/" .. jsonFile)
 	local skeleton = spine.Skeleton.new(skeletonData)
-	skeleton.flipY = true -- Corona's coordinate system has its y-axis point downwards
+	skeleton.scaleY = -1 -- Corona's coordinate system has its y-axis point downwards
 	skeleton.group.x = x
 	skeleton.group.y = y
 
