@@ -13,7 +13,6 @@ target
 *.user
 .DS_Store
 
-
 .idea/
 build/
 
