@@ -15,7 +15,6 @@ target
 
 .idea/
 build/
-
 cmake-build-debug/
 
 spine-as3/spine-as3/.settings/com.powerflasher.fdt.core.metaDataTags.prefs
