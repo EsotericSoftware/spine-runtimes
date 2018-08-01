@@ -273,7 +273,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 				material.CopyPropertiesFromMaterial(materialPropertySource);
 				material.shaderKeywords = materialPropertySource.shaderKeywords;
 			}
-			var newTexture = t.GetClone(false, textureFormat, mipmaps);
+			var newTexture = t.GetClone(textureFormat, mipmaps);
 			newTexture.ApplyPMA(true);
 
 			newTexture.name = t.name + "-pma-";
@@ -331,7 +331,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 				material.shaderKeywords = materialPropertySource.shaderKeywords;
 			}
 
-			var tex = s.ToTexture(false, textureFormat, mipmaps);
+			var tex = s.ToTexture(textureFormat, mipmaps);
 			tex.ApplyPMA(true);
 
 			tex.name = s.name + "-pma-";
@@ -586,7 +586,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 		/// <summary>Creates a new Texture2D object based on an AtlasRegion.
 		/// If applyImmediately is true, Texture2D.Apply is called immediately after the Texture2D is filled with data.</summary>
-		public static Texture2D ToTexture (this AtlasRegion ar, bool applyImmediately = true, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
+		public static Texture2D ToTexture (this AtlasRegion ar, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
 			Texture2D output;
 
 			CachedRegionTextures.TryGetValue(ar, out output);
@@ -599,33 +599,22 @@ namespace Spine.Unity.Modules.AttachmentTools {
 				AtlasUtilities.CopyTexture(sourceTexture, r, output);
 				CachedRegionTextures.Add(ar, output);
 				CachedRegionTexturesList.Add(output);
-
-				if (applyImmediately)
-					output.Apply();
 			}
 
 			return output;
 		}
 
-		static Texture2D ToTexture (this Sprite s, bool applyImmediately = true, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
+		static Texture2D ToTexture (this Sprite s, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
 			var spriteTexture = s.texture;
 			var r = s.textureRect;
 			var newTexture = new Texture2D((int)r.width, (int)r.height, textureFormat, mipmaps);
 			AtlasUtilities.CopyTexture(spriteTexture, r, newTexture);
-
-			if (applyImmediately)
-				newTexture.Apply();
-
 			return newTexture;
 		}
 
-		static Texture2D GetClone (this Texture2D t, bool applyImmediately = true, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
+		static Texture2D GetClone (this Texture2D t, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
 			var newTexture = new Texture2D((int)t.width, (int)t.height, textureFormat, mipmaps);
 			AtlasUtilities.CopyTexture(t, new Rect(0, 0, t.width, t.height), newTexture);
-
-			if (applyImmediately)
-				newTexture.Apply();
-
 			return newTexture;
 		}
 
