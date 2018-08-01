@@ -595,10 +595,8 @@ namespace Spine.Unity.Modules.AttachmentTools {
 				Rect r = ar.GetUnityRect(sourceTexture.height);
 				int width = (int)r.width;
 				int height = (int)r.height;
-				output = new Texture2D(width, height, textureFormat, mipmaps);
-				output.name = ar.name;
-				Color[] pixelBuffer = sourceTexture.GetPixels((int)r.x, (int)r.y, width, height);
-				output.SetPixels(pixelBuffer);
+				output = new Texture2D(width, height, textureFormat, mipmaps) { name = ar.name };
+				AtlasUtilities.CopyTexture(sourceTexture, r, output);
 				CachedRegionTextures.Add(ar, output);
 				CachedRegionTexturesList.Add(output);
 
@@ -612,9 +610,8 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		static Texture2D ToTexture (this Sprite s, bool applyImmediately = true, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
 			var spriteTexture = s.texture;
 			var r = s.textureRect;
-			var spritePixels = spriteTexture.GetPixels((int)r.x, (int)r.y, (int)r.width, (int)r.height);
 			var newTexture = new Texture2D((int)r.width, (int)r.height, textureFormat, mipmaps);
-			newTexture.SetPixels(spritePixels);
+			AtlasUtilities.CopyTexture(spriteTexture, r, newTexture);
 
 			if (applyImmediately)
 				newTexture.Apply();
@@ -623,14 +620,17 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		}
 
 		static Texture2D GetClone (this Texture2D t, bool applyImmediately = true, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
-			var spritePixels = t.GetPixels(0, 0, (int)t.width, (int)t.height);
 			var newTexture = new Texture2D((int)t.width, (int)t.height, textureFormat, mipmaps);
-			newTexture.SetPixels(spritePixels);
+			AtlasUtilities.CopyTexture(t, new Rect(0, 0, t.width, t.height), newTexture);
 
 			if (applyImmediately)
 				newTexture.Apply();
 
 			return newTexture;
+		}
+
+		static void CopyTexture (Texture2D source, Rect sourceRect, Texture2D destination) {
+			Graphics.CopyTexture(source, 0, 0, (int)sourceRect.x, (int)sourceRect.y, (int)sourceRect.width, (int)sourceRect.height, destination, 0, 0, 0, 0);
 		}
 
 		static bool IsRenderable (Attachment a) {
