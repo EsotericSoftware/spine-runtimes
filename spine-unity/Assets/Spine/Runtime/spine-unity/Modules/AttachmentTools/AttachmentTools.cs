@@ -619,7 +619,14 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		}
 
 		static void CopyTexture (Texture2D source, Rect sourceRect, Texture2D destination) {
-			Graphics.CopyTexture(source, 0, 0, (int)sourceRect.x, (int)sourceRect.y, (int)sourceRect.width, (int)sourceRect.height, destination, 0, 0, 0, 0);
+			if (SystemInfo.copyTextureSupport == UnityEngine.Rendering.CopyTextureSupport.None) {
+				// GetPixels fallback for old devices.
+				Color[] pixelBuffer = source.GetPixels((int)sourceRect.x, (int)sourceRect.y, (int)sourceRect.width, (int)sourceRect.height);
+				destination.SetPixels(pixelBuffer);
+				destination.Apply();
+			} else {
+				Graphics.CopyTexture(source, 0, 0, (int)sourceRect.x, (int)sourceRect.y, (int)sourceRect.width, (int)sourceRect.height, destination, 0, 0, 0, 0);
+			}
 		}
 
 		static bool IsRenderable (Attachment a) {
