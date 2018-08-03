@@ -1,18 +1,27 @@
 {
-"skeleton": {
-	"hash": "0DoQUqP6ATLL322RHY3r98lgFr8",
-	"spine": "3.7.08-beta",
-	"width": 470.72,
-	"height": 731.57,
-	"images": "./images/",
-	"audio": ""
-},
+"skeleton": { "hash": "0DoQUqP6ATLL322RHY3r98lgFr8", "spine": "3.7.19-beta", "width": 470.72, "height": 731.57, "images": "./images/", "audio": "" },
 "bones": [
 	{ "name": "root" },
 	{ "name": "dust", "parent": "root", "x": -303.6, "y": 32.64, "scaleX": 1.457 },
 	{ "name": "hip", "parent": "root", "y": 247.47 },
-	{ "name": "torso", "parent": "hip", "length": 127.56, "rotation": 103.82, "x": -1.62, "y": 4.9, "color": "e0da19ff" },
-	{ "name": "front-upper-arm", "parent": "torso", "length": 69.45, "rotation": 168.38, "x": 103.76, "y": 19.33, "color": "00ff04ff" },
+	{
+		"name": "torso",
+		"parent": "hip",
+		"length": 127.56,
+		"rotation": 103.82,
+		"x": -1.62,
+		"y": 4.9,
+		"color": "e0da19ff"
+	},
+	{
+		"name": "front-upper-arm",
+		"parent": "torso",
+		"length": 69.45,
+		"rotation": 168.38,
+		"x": 103.76,
+		"y": 19.33,
+		"color": "00ff04ff"
+	},
 	{
 		"name": "front-bracer",
 		"parent": "front-upper-arm",
@@ -22,19 +31,107 @@
 		"y": -0.68,
 		"color": "00ff04ff"
 	},
-	{ "name": "front-fist", "parent": "front-bracer", "length": 65.39, "rotation": 12.43, "x": 40.57, "y": 0.2, "color": "00ff04ff" },
-	{ "name": "front-thigh", "parent": "hip", "length": 74.81, "rotation": -95.51, "x": -17.46, "y": -11.64, "color": "00ff04ff" },
-	{ "name": "front-shin", "parent": "front-thigh", "length": 128.77, "rotation": -2.21, "x": 78.69, "y": 1.6, "color": "00ff04ff" },
-	{ "name": "front-foot", "parent": "front-shin", "length": 91.34, "rotation": 77.91, "x": 128.76, "y": -0.34, "color": "00ff04ff" },
-	{ "name": "rear-upper-arm", "parent": "torso", "length": 51.94, "rotation": -169.56, "x": 92.36, "y": -19.22, "color": "ff000dff" },
+	{
+		"name": "front-fist",
+		"parent": "front-bracer",
+		"length": 65.39,
+		"rotation": 12.43,
+		"x": 40.57,
+		"y": 0.2,
+		"color": "00ff04ff"
+	},
+	{
+		"name": "front-thigh",
+		"parent": "hip",
+		"length": 74.81,
+		"rotation": -95.51,
+		"x": -17.46,
+		"y": -11.64,
+		"color": "00ff04ff"
+	},
+	{
+		"name": "front-shin",
+		"parent": "front-thigh",
+		"length": 128.77,
+		"rotation": -2.21,
+		"x": 78.69,
+		"y": 1.6,
+		"color": "00ff04ff"
+	},
+	{
+		"name": "front-foot",
+		"parent": "front-shin",
+		"length": 91.34,
+		"rotation": 77.91,
+		"x": 128.76,
+		"y": -0.34,
+		"color": "00ff04ff"
+	},
+	{
+		"name": "rear-upper-arm",
+		"parent": "torso",
+		"length": 51.94,
+		"rotation": -169.56,
+		"x": 92.36,
+		"y": -19.22,
+		"color": "ff000dff"
+	},
 	{ "name": "rear-bracer", "parent": "rear-upper-arm", "length": 34.56, "rotation": 23.15, "x": 51.36, "color": "ff000dff" },
-	{ "name": "gun", "parent": "rear-bracer", "length": 43.11, "rotation": 5.35, "x": 34.42, "y": -0.45, "color": "ff000dff" },
+	{
+		"name": "gun",
+		"parent": "rear-bracer",
+		"length": 43.11,
+		"rotation": 5.35,
+		"x": 34.42,
+		"y": -0.45,
+		"color": "ff000dff"
+	},
 	{ "name": "gun-tip", "parent": "gun", "rotation": 6.83, "x": 201.05, "y": 52.14, "color": "ff000dff" },
-	{ "name": "neck", "parent": "torso", "length": 25.45, "rotation": -31.54, "x": 127.5, "y": -0.31, "color": "e0da19ff" },
-	{ "name": "head", "parent": "neck", "length": 263.58, "rotation": 23.18, "x": 27.66, "y": -0.26, "color": "e0da19ff" },
-	{ "name": "rear-thigh", "parent": "hip", "length": 85.72, "rotation": -72.54, "x": 8.91, "y": -5.63, "color": "ff000dff" },
-	{ "name": "rear-shin", "parent": "rear-thigh", "length": 121.88, "rotation": -19.83, "x": 86.1, "y": -1.33, "color": "ff000dff" },
-	{ "name": "rear-foot", "parent": "rear-shin", "length": 82.57, "rotation": 69.3, "x": 121.46, "y": -0.76, "color": "ff000dff" }
+	{
+		"name": "neck",
+		"parent": "torso",
+		"length": 25.45,
+		"rotation": -31.54,
+		"x": 127.5,
+		"y": -0.31,
+		"color": "e0da19ff"
+	},
+	{
+		"name": "head",
+		"parent": "neck",
+		"length": 263.58,
+		"rotation": 23.18,
+		"x": 27.66,
+		"y": -0.26,
+		"color": "e0da19ff"
+	},
+	{
+		"name": "rear-thigh",
+		"parent": "hip",
+		"length": 85.72,
+		"rotation": -72.54,
+		"x": 8.91,
+		"y": -5.63,
+		"color": "ff000dff"
+	},
+	{
+		"name": "rear-shin",
+		"parent": "rear-thigh",
+		"length": 121.88,
+		"rotation": -19.83,
+		"x": 86.1,
+		"y": -1.33,
+		"color": "ff000dff"
+	},
+	{
+		"name": "rear-foot",
+		"parent": "rear-shin",
+		"length": 82.57,
+		"rotation": 69.3,
+		"x": 121.46,
+		"y": -0.76,
+		"color": "ff000dff"
+	}
 ],
 "slots": [
 	{ "name": "rear-upper-arm", "bone": "rear-upper-arm", "attachment": "rear-upper-arm" },

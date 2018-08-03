@@ -1,28 +1,125 @@
 {
-"skeleton": {
-	"hash": "XMSifyRDWIo7mCMhHJDVKSi+XxE",
-	"spine": "3.7.08-beta",
-	"width": 227.33,
-	"height": 841.07,
-	"images": "./images/",
-	"audio": ""
-},
+"skeleton": { "hash": "XMSifyRDWIo7mCMhHJDVKSi+XxE", "spine": "3.7.19-beta", "width": 227.33, "height": 841.07, "images": "./images/", "audio": "" },
 "bones": [
 	{ "name": "root" },
-	{ "name": "vine1", "parent": "root", "length": 74, "rotation": 90, "x": 339.1, "y": -467.15, "color": "f700ffff" },
+	{
+		"name": "vine1",
+		"parent": "root",
+		"length": 74,
+		"rotation": 90,
+		"x": 339.1,
+		"y": -467.15,
+		"color": "f700ffff"
+	},
 	{ "name": "vine2", "parent": "vine1", "length": 74, "x": 74, "color": "f700ffff" },
-	{ "name": "vine3", "parent": "vine1", "length": 74, "rotation": 38.95, "x": 137.97, "y": 47.51, "color": "f700ffff" },
-	{ "name": "vine4", "parent": "vine1", "length": 74, "rotation": 16.68, "x": 214.29, "y": 68.52, "color": "f700ffff" },
-	{ "name": "vine5", "parent": "vine1", "length": 74, "rotation": -21.74, "x": 289.61, "y": 40.93, "color": "f700ffff" },
-	{ "name": "vine6", "parent": "vine1", "length": 74, "rotation": -50.04, "x": 341.13, "y": -15.58, "color": "f700ffff" },
-	{ "name": "vine7", "parent": "vine1", "length": 74, "rotation": -39.26, "x": 402.7, "y": -61.82, "color": "f700ffff" },
-	{ "name": "vine8", "parent": "vine1", "length": 74, "rotation": -6.18, "x": 483.27, "y": -69.84, "color": "f700ffff" },
-	{ "name": "vine9", "parent": "vine1", "length": 74, "rotation": 27.11, "x": 554.26, "y": -36.44, "color": "f700ffff" },
-	{ "name": "vine10", "parent": "vine1", "length": 74, "rotation": 48, "x": 608.63, "y": 19.06, "color": "f700ffff" },
-	{ "name": "vine11", "parent": "vine1", "length": 74, "rotation": 39.71, "x": 670.66, "y": 66.4, "color": "f700ffff" },
-	{ "name": "vine12", "parent": "vine1", "length": 74, "rotation": 10.73, "x": 750.1, "y": 80.23, "color": "f700ffff" },
-	{ "name": "vine13", "parent": "vine1", "length": 74, "rotation": -18.44, "x": 826.07, "y": 56.95, "color": "f700ffff" },
-	{ "name": "vine-control1", "parent": "root", "length": 296.68, "rotation": 88.65, "x": -2.51, "y": 2.55, "color": "ff0004ff" },
+	{
+		"name": "vine3",
+		"parent": "vine1",
+		"length": 74,
+		"rotation": 38.95,
+		"x": 137.97,
+		"y": 47.51,
+		"color": "f700ffff"
+	},
+	{
+		"name": "vine4",
+		"parent": "vine1",
+		"length": 74,
+		"rotation": 16.68,
+		"x": 214.29,
+		"y": 68.52,
+		"color": "f700ffff"
+	},
+	{
+		"name": "vine5",
+		"parent": "vine1",
+		"length": 74,
+		"rotation": -21.74,
+		"x": 289.61,
+		"y": 40.93,
+		"color": "f700ffff"
+	},
+	{
+		"name": "vine6",
+		"parent": "vine1",
+		"length": 74,
+		"rotation": -50.04,
+		"x": 341.13,
+		"y": -15.58,
+		"color": "f700ffff"
+	},
+	{
+		"name": "vine7",
+		"parent": "vine1",
+		"length": 74,
+		"rotation": -39.26,
+		"x": 402.7,
+		"y": -61.82,
+		"color": "f700ffff"
+	},
+	{
+		"name": "vine8",
+		"parent": "vine1",
+		"length": 74,
+		"rotation": -6.18,
+		"x": 483.27,
+		"y": -69.84,
+		"color": "f700ffff"
+	},
+	{
+		"name": "vine9",
+		"parent": "vine1",
+		"length": 74,
+		"rotation": 27.11,
+		"x": 554.26,
+		"y": -36.44,
+		"color": "f700ffff"
+	},
+	{
+		"name": "vine10",
+		"parent": "vine1",
+		"length": 74,
+		"rotation": 48,
+		"x": 608.63,
+		"y": 19.06,
+		"color": "f700ffff"
+	},
+	{
+		"name": "vine11",
+		"parent": "vine1",
+		"length": 74,
+		"rotation": 39.71,
+		"x": 670.66,
+		"y": 66.4,
+		"color": "f700ffff"
+	},
+	{
+		"name": "vine12",
+		"parent": "vine1",
+		"length": 74,
+		"rotation": 10.73,
+		"x": 750.1,
+		"y": 80.23,
+		"color": "f700ffff"
+	},
+	{
+		"name": "vine13",
+		"parent": "vine1",
+		"length": 74,
+		"rotation": -18.44,
+		"x": 826.07,
+		"y": 56.95,
+		"color": "f700ffff"
+	},
+	{
+		"name": "vine-control1",
+		"parent": "root",
+		"length": 296.68,
+		"rotation": 88.65,
+		"x": -2.51,
+		"y": 2.55,
+		"color": "ff0004ff"
+	},
 	{ "name": "vine-control2", "parent": "vine-control1", "length": 292.6, "rotation": 0.96, "x": 296.68, "color": "ff0004ff" },
 	{ "name": "vine-control3", "parent": "vine-control2", "length": 247.5, "rotation": 0.16, "x": 292.6, "color": "ff0004ff" },
 	{ "name": "vine-control4", "parent": "vine-control3", "length": 212.43, "rotation": 0.5, "x": 247.5, "color": "ff0004ff" }

@@ -1,21 +1,62 @@
 {
-"skeleton": {
-	"hash": "2ZytXk25WMQh7xfYd6gBJKXviEA",
-	"spine": "3.7.08-beta",
-	"width": 234.03,
-	"height": 354.91,
-	"images": "./images/",
-	"audio": ""
-},
+"skeleton": { "hash": "2ZytXk25WMQh7xfYd6gBJKXviEA", "spine": "3.7.19-beta", "width": 234.03, "height": 354.91, "images": "./images/", "audio": "" },
 "bones": [
 	{ "name": "root" },
 	{ "name": "hip", "parent": "root", "x": 0.65, "y": 114.41, "color": "ffd300ff" },
-	{ "name": "torso", "parent": "hip", "length": 85.83, "rotation": 93.93, "x": -6.42, "y": 1.98, "color": "ffd300ff" },
-	{ "name": "neck", "parent": "torso", "length": 18.38, "rotation": -1.52, "x": 81.68, "y": -6.35, "color": "ffd300ff" },
-	{ "name": "head", "parent": "neck", "length": 68.29, "rotation": -13.92, "x": 20.94, "y": 11.59, "color": "ffd300ff" },
-	{ "name": "left-shoulder", "parent": "torso", "length": 35.43, "rotation": -156.96, "x": 74.05, "y": -20.39, "color": "ff0000ff" },
-	{ "name": "left-arm", "parent": "left-shoulder", "length": 35.62, "rotation": 28.17, "x": 37.86, "y": -2.35, "color": "ff0000ff" },
-	{ "name": "left-upper-leg", "parent": "hip", "length": 50.4, "rotation": -89.1, "x": 14.45, "y": 2.81, "color": "ff0000ff" },
+	{
+		"name": "torso",
+		"parent": "hip",
+		"length": 85.83,
+		"rotation": 93.93,
+		"x": -6.42,
+		"y": 1.98,
+		"color": "ffd300ff"
+	},
+	{
+		"name": "neck",
+		"parent": "torso",
+		"length": 18.38,
+		"rotation": -1.52,
+		"x": 81.68,
+		"y": -6.35,
+		"color": "ffd300ff"
+	},
+	{
+		"name": "head",
+		"parent": "neck",
+		"length": 68.29,
+		"rotation": -13.92,
+		"x": 20.94,
+		"y": 11.59,
+		"color": "ffd300ff"
+	},
+	{
+		"name": "left-shoulder",
+		"parent": "torso",
+		"length": 35.43,
+		"rotation": -156.96,
+		"x": 74.05,
+		"y": -20.39,
+		"color": "ff0000ff"
+	},
+	{
+		"name": "left-arm",
+		"parent": "left-shoulder",
+		"length": 35.62,
+		"rotation": 28.17,
+		"x": 37.86,
+		"y": -2.35,
+		"color": "ff0000ff"
+	},
+	{
+		"name": "left-upper-leg",
+		"parent": "hip",
+		"length": 50.4,
+		"rotation": -89.1,
+		"x": 14.45,
+		"y": 2.81,
+		"color": "ff0000ff"
+	},
 	{
 		"name": "left-lower-leg",
 		"parent": "left-upper-leg",
@@ -34,11 +75,43 @@
 		"y": -7.61,
 		"color": "ff0000ff"
 	},
-	{ "name": "left-hand", "parent": "left-arm", "length": 11.52, "rotation": 2.7, "x": 35.62, "y": 0.08, "color": "ff0000ff" },
+	{
+		"name": "left-hand",
+		"parent": "left-arm",
+		"length": 11.52,
+		"rotation": 2.7,
+		"x": 35.62,
+		"y": 0.08,
+		"color": "ff0000ff"
+	},
 	{ "name": "pelvis", "parent": "hip", "x": 1.41, "y": -6.58, "color": "ffd300ff" },
-	{ "name": "right-shoulder", "parent": "torso", "length": 37.25, "rotation": 133.89, "x": 76.02, "y": 18.15, "color": "54ff00ff" },
-	{ "name": "right-arm", "parent": "right-shoulder", "length": 36.75, "rotation": 36.33, "x": 37.61, "y": 0.31, "color": "54ff00ff" },
-	{ "name": "right-upper-leg", "parent": "hip", "length": 42.46, "rotation": -97.5, "x": -20.08, "y": -6.84, "color": "54ff00ff" },
+	{
+		"name": "right-shoulder",
+		"parent": "torso",
+		"length": 37.25,
+		"rotation": 133.89,
+		"x": 76.02,
+		"y": 18.15,
+		"color": "54ff00ff"
+	},
+	{
+		"name": "right-arm",
+		"parent": "right-shoulder",
+		"length": 36.75,
+		"rotation": 36.33,
+		"x": 37.61,
+		"y": 0.31,
+		"color": "54ff00ff"
+	},
+	{
+		"name": "right-upper-leg",
+		"parent": "hip",
+		"length": 42.46,
+		"rotation": -97.5,
+		"x": -20.08,
+		"y": -6.84,
+		"color": "54ff00ff"
+	},
 	{
 		"name": "right-lower-leg",
 		"parent": "right-upper-leg",
@@ -57,7 +130,15 @@
 		"y": 0.04,
 		"color": "54ff00ff"
 	},
-	{ "name": "right-hand", "parent": "right-arm", "length": 15.32, "rotation": 2.36, "x": 36.9, "y": 0.35, "color": "54ff00ff" }
+	{
+		"name": "right-hand",
+		"parent": "right-arm",
+		"length": 15.32,
+		"rotation": 2.36,
+		"x": 36.9,
+		"y": 0.35,
+		"color": "54ff00ff"
+	}
 ],
 "slots": [
 	{ "name": "left-shoulder", "bone": "left-shoulder", "attachment": "left-shoulder" },
