@@ -34,8 +34,9 @@ package spine {
 		public var order : Number;
 		public var bones : Vector.<BoneData> = new Vector.<BoneData>();
 		public var target : BoneData;
-		public var bendDirection : int = 1;
 		public var mix : Number = 1;
+		public var bendDirection : int = 1;
+		public var stretch : Boolean = false;
 
 		public function IkConstraintData(name : String) {
 			if (name == null) throw new ArgumentError("name cannot be null.");

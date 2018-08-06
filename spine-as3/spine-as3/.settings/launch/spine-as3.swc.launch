@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="com.powerflasher.fdt.ui.CompcGroup">
 <booleanAttribute key="ADVANCED_TELEMTRY" value="false"/>
-<stringAttribute key="ARGUMENTS" value=" -target-player={playerVersion}"/>
+<stringAttribute key="ARGUMENTS" value=" -target-player=30.0"/>
 <listAttribute key="COMPILER_CONSTANTS"/>
 <stringAttribute key="COMPILER_TECHNOLOGY" value="Flex SDK"/>
 <booleanAttribute key="FORCE_FRESH_COMPILATION" value="false"/>
+<booleanAttribute key="INCLUDE_TEST_RESOURCES" value="false"/>
 <stringAttribute key="LAUNCHER_DEPENDENCIES" value="[Self]"/>
 <stringAttribute key="MAIN_CLASS" value=""/>
 <stringAttribute key="OUTPUT" value="../spine-as3-example/lib/spine-as3.swc"/>

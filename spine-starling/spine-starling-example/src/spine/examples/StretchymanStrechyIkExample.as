@@ -45,8 +45,8 @@ package spine.examples {
 	import starling.core.Starling;
 	import starling.display.Sprite;
 
-	public class StretchymanExample extends Sprite {
-		[Embed(source = "/stretchyman-pro.json", mimeType = "application/octet-stream")]
+	public class StretchymanStrechyIkExample extends Sprite {
+		[Embed(source = "/stretchyman-stretchy-ik.json", mimeType = "application/octet-stream")]
 		static public const StretchymanJson : Class;
 
 		[Embed(source = "/stretchyman.atlas", mimeType = "application/octet-stream")]
@@ -56,7 +56,7 @@ package spine.examples {
 		static public const StretchymanAtlasTexture : Class;
 		private var skeleton : SkeletonAnimation;
 
-		public function StretchymanExample() {
+		public function StretchymanStrechyIkExample() {
 			var spineAtlas : Atlas = new Atlas(new StretchymanAtlas(), new StarlingTextureLoader(new StretchymanAtlasTexture()));
 			var attachmentLoader : AttachmentLoader = new AtlasAttachmentLoader(spineAtlas);
 			var json : SkeletonJson = new SkeletonJson(attachmentLoader);
@@ -104,7 +104,7 @@ package spine.examples {
 			if (touch && touch.phase == TouchPhase.BEGAN) {
 				var parent: DisplayObjectContainer = this.parent;
 				this.removeFromParent(true);			
-				parent.addChild(new StretchymanStrechyIkExample());				
+				parent.addChild(new CoinExample());				
 			}
 		}
 	}
