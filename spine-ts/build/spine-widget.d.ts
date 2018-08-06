@@ -176,13 +176,15 @@ declare module spine {
 		static PREV_TIME: number;
 		static PREV_MIX: number;
 		static PREV_BEND_DIRECTION: number;
+		static PREV_STRETCH: number;
 		static MIX: number;
 		static BEND_DIRECTION: number;
+		static STRETCH: number;
 		ikConstraintIndex: number;
 		frames: ArrayLike<number>;
 		constructor(frameCount: number);
 		getPropertyId(): number;
-		setFrame(frameIndex: number, time: number, mix: number, bendDirection: number): void;
+		setFrame(frameIndex: number, time: number, mix: number, bendDirection: number, stretch: boolean): void;
 		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection): void;
 	}
 	class TransformConstraintTimeline extends CurveTimeline {
@@ -510,14 +512,15 @@ declare module spine {
 		data: IkConstraintData;
 		bones: Array<Bone>;
 		target: Bone;
-		mix: number;
 		bendDirection: number;
+		stretch: boolean;
+		mix: number;
 		constructor(data: IkConstraintData, skeleton: Skeleton);
 		getOrder(): number;
 		apply(): void;
 		update(): void;
-		apply1(bone: Bone, targetX: number, targetY: number, alpha: number): void;
-		apply2(parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, alpha: number): void;
+		apply1(bone: Bone, targetX: number, targetY: number, stretch: boolean, alpha: number): void;
+		apply2(parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, stretch: boolean, alpha: number): void;
 	}
 }
 declare module spine {
@@ -527,6 +530,7 @@ declare module spine {
 		bones: BoneData[];
 		target: BoneData;
 		bendDirection: number;
+		stretch: boolean;
 		mix: number;
 		constructor(name: string);
 	}

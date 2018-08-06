@@ -106,6 +106,8 @@ cp -f ../stretchyman/export/stretchyman-pro.json ../../spine-corona/data
 cp -f ../stretchyman/export/stretchyman.atlas ../../spine-corona/data
 cp -f ../stretchyman/export/stretchyman.png ../../spine-corona/data
 
+cp -f ../stretchyman-stretchy-ik/export/stretchyman-stretchy-ik.json ../../spine-corona/data
+
 cp -f ../owl/export/owl-pro.json ../../spine-corona/data
 cp -f ../owl/export/owl.atlas ../../spine-corona/data
 cp -f ../owl/export/owl.png ../../spine-corona/data
@@ -139,6 +141,8 @@ cp -f ../vine/export/vine.png ../../spine-love/data
 cp -f ../stretchyman/export/stretchyman-pro.json ../../spine-love/data
 cp -f ../stretchyman/export/stretchyman.atlas ../../spine-love/data
 cp -f ../stretchyman/export/stretchyman.png ../../spine-love/data
+
+cp -f ../stretchyman-stretchy-ik/export/stretchyman-stretchy-ik.json ../../spine-love/data
 
 echo "spine-sfml-c"
 rm -f ../../spine-sfml/data/*
@@ -176,6 +180,9 @@ cp -f ../stretchyman/export/stretchyman-pro.json ../../spine-sfml/c/data/
 cp -f ../stretchyman/export/stretchyman-pro.skel ../../spine-sfml/c/data/
 cp -f ../stretchyman/export/stretchyman.atlas ../../spine-sfml/c/data/
 cp -f ../stretchyman/export/stretchyman.png ../../spine-sfml/c/data/
+
+cp -f ../stretchyman-stretchy-ik/export/stretchyman-stretchy-ik.json ../../spine-sfml/c/data
+cp -f ../stretchyman-stretchy-ik/export/stretchyman-stretchy-ik.skel ../../spine-sfml/c/data
 
 cp -f ../owl/export/owl-pro.json ../../spine-sfml/c/data/
 cp -f ../owl/export/owl-pro.skel ../../spine-sfml/c/data/
@@ -219,6 +226,9 @@ cp -f ../stretchyman/export/stretchyman-pro.skel ../../spine-sfml/cpp/data/
 cp -f ../stretchyman/export/stretchyman.atlas ../../spine-sfml/cpp/data/
 cp -f ../stretchyman/export/stretchyman.png ../../spine-sfml/cpp/data/
 
+cp -f ../stretchyman-stretchy-ik/export/stretchyman-stretchy-ik.json ../../spine-sfml/cpp/data
+cp -f ../stretchyman-stretchy-ik/export/stretchyman-stretchy-ik.skel ../../spine-sfml/cpp/data
+
 cp -f ../owl/export/owl-pro.json ../../spine-sfml/cpp/data/
 cp -f ../owl/export/owl-pro.skel ../../spine-sfml/cpp/data/
 cp -f ../owl/export/owl.atlas ../../spine-sfml/cpp/data/
@@ -253,6 +263,8 @@ cp -f ../vine/export/vine.png ../../spine-starling/spine-starling-example/src/
 cp -f ../stretchyman/export/stretchyman-pro.json ../../spine-starling/spine-starling-example/src/
 cp -f ../stretchyman/export/stretchyman.atlas ../../spine-starling/spine-starling-example/src/
 cp -f ../stretchyman/export/stretchyman.png ../../spine-starling/spine-starling-example/src/
+
+cp -f ../stretchyman-stretchy-ik/export/stretchyman-stretchy-ik.json ../../spine-starling/spine-starling-example/src/
 
 cp -f ../owl/export/owl-pro.json ../../spine-starling/spine-starling-example/src/
 cp -f ../owl/export/owl.atlas ../../spine-starling/spine-starling-example/src/
@@ -292,6 +304,8 @@ cp -f ../owl/export/owl.png ../../spine-ts/webgl/example/assets/
 cp -f ../stretchyman/export/stretchyman-pro.json ../../spine-ts/webgl/example/assets/
 cp -f ../stretchyman/export/stretchyman.atlas ../../spine-ts/webgl/example/assets/
 cp -f ../stretchyman/export/stretchyman.png ../../spine-ts/webgl/example/assets/
+
+cp -f ../stretchyman-stretchy-ik/export/stretchyman-stretchy-ik.json ../../spine-ts/webgl/example/assets/
 
 rm -f ../../spine-ts/canvas/example/assets/*
 cp -f ../spineboy/export/spineboy-ess.json ../../spine-ts/canvas/example/assets/

@@ -35,6 +35,7 @@ module spine {
 		bones = new Array<BoneData>();
 		target: BoneData;
 		bendDirection = 1;
+		stretch = false;
 		mix = 1;
 
 		constructor (name: string) {

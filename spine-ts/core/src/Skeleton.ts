@@ -287,6 +287,7 @@ module spine {
 			for (let i = 0, n = ikConstraints.length; i < n; i++) {
 				let constraint = ikConstraints[i];
 				constraint.bendDirection = constraint.data.bendDirection;
+				constraint.stretch = constraint.data.stretch;
 				constraint.mix = constraint.data.mix;
 			}
 
