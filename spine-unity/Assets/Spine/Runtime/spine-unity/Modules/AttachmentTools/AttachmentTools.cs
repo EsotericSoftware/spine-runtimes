@@ -273,7 +273,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 				material.CopyPropertiesFromMaterial(materialPropertySource);
 				material.shaderKeywords = materialPropertySource.shaderKeywords;
 			}
-			var newTexture = t.GetClone(false, textureFormat, mipmaps);
+			var newTexture = t.GetClone(textureFormat, mipmaps);
 			newTexture.ApplyPMA(true);
 
 			newTexture.name = t.name + "-pma-";
@@ -331,7 +331,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 				material.shaderKeywords = materialPropertySource.shaderKeywords;
 			}
 
-			var tex = s.ToTexture(false, textureFormat, mipmaps);
+			var tex = s.ToTexture(textureFormat, mipmaps);
 			tex.ApplyPMA(true);
 
 			tex.name = s.name + "-pma-";
@@ -586,7 +586,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 		/// <summary>Creates a new Texture2D object based on an AtlasRegion.
 		/// If applyImmediately is true, Texture2D.Apply is called immediately after the Texture2D is filled with data.</summary>
-		public static Texture2D ToTexture (this AtlasRegion ar, bool applyImmediately = true, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
+		public static Texture2D ToTexture (this AtlasRegion ar, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
 			Texture2D output;
 
 			CachedRegionTextures.TryGetValue(ar, out output);
@@ -595,42 +595,38 @@ namespace Spine.Unity.Modules.AttachmentTools {
 				Rect r = ar.GetUnityRect(sourceTexture.height);
 				int width = (int)r.width;
 				int height = (int)r.height;
-				output = new Texture2D(width, height, textureFormat, mipmaps);
-				output.name = ar.name;
-				Color[] pixelBuffer = sourceTexture.GetPixels((int)r.x, (int)r.y, width, height);
-				output.SetPixels(pixelBuffer);
+				output = new Texture2D(width, height, textureFormat, mipmaps) { name = ar.name };
+				AtlasUtilities.CopyTexture(sourceTexture, r, output);
 				CachedRegionTextures.Add(ar, output);
 				CachedRegionTexturesList.Add(output);
-
-				if (applyImmediately)
-					output.Apply();
 			}
 
 			return output;
 		}
 
-		static Texture2D ToTexture (this Sprite s, bool applyImmediately = true, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
+		static Texture2D ToTexture (this Sprite s, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
 			var spriteTexture = s.texture;
 			var r = s.textureRect;
-			var spritePixels = spriteTexture.GetPixels((int)r.x, (int)r.y, (int)r.width, (int)r.height);
 			var newTexture = new Texture2D((int)r.width, (int)r.height, textureFormat, mipmaps);
-			newTexture.SetPixels(spritePixels);
-
-			if (applyImmediately)
-				newTexture.Apply();
-
+			AtlasUtilities.CopyTexture(spriteTexture, r, newTexture);
 			return newTexture;
 		}
 
-		static Texture2D GetClone (this Texture2D t, bool applyImmediately = true, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
-			var spritePixels = t.GetPixels(0, 0, (int)t.width, (int)t.height);
+		static Texture2D GetClone (this Texture2D t, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
 			var newTexture = new Texture2D((int)t.width, (int)t.height, textureFormat, mipmaps);
-			newTexture.SetPixels(spritePixels);
-
-			if (applyImmediately)
-				newTexture.Apply();
-
+			AtlasUtilities.CopyTexture(t, new Rect(0, 0, t.width, t.height), newTexture);
 			return newTexture;
+		}
+
+		static void CopyTexture (Texture2D source, Rect sourceRect, Texture2D destination) {
+			if (SystemInfo.copyTextureSupport == UnityEngine.Rendering.CopyTextureSupport.None) {
+				// GetPixels fallback for old devices.
+				Color[] pixelBuffer = source.GetPixels((int)sourceRect.x, (int)sourceRect.y, (int)sourceRect.width, (int)sourceRect.height);
+				destination.SetPixels(pixelBuffer);
+				destination.Apply();
+			} else {
+				Graphics.CopyTexture(source, 0, 0, (int)sourceRect.x, (int)sourceRect.y, (int)sourceRect.width, (int)sourceRect.height, destination, 0, 0, 0, 0);
+			}
 		}
 
 		static bool IsRenderable (Attachment a) {

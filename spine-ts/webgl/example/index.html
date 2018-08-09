@@ -78,6 +78,7 @@ function init () {
 	assetManager.loadTextureAtlas("assets/vine.atlas");
 	assetManager.loadText("assets/stretchyman-pro.json");
 	assetManager.loadTextureAtlas("assets/stretchyman.atlas");
+	assetManager.loadText("assets/stretchyman-stretchy-ik.json");
 	assetManager.loadText("assets/coin-pro.json");
 	assetManager.loadTextureAtlas("assets/coin.atlas");
 	requestAnimationFrame(load);
@@ -92,6 +93,7 @@ function load () {
 		skeletons["goblins"] = loadSkeleton("goblins-pro", "walk", false, "goblin");
 		skeletons["vine"] = loadSkeleton("vine-pro", "grow", false);
 		skeletons["stretchyman"] = loadSkeleton("stretchyman-pro", "sneak", false);
+		skeletons["stretchyman-stretchy-ik"] = loadSkeleton("stretchyman-stretchy-ik", "sneak", false);
 		skeletons["coin"] = loadSkeleton("coin-pro", "rotate", false);
 		setupUI();
 		requestAnimationFrame(render);
@@ -104,7 +106,7 @@ function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 	if (skin === undefined) skin = "default";
 
 	// Load the texture atlas using name.atlas from the AssetManager.
-	atlas = assetManager.get("assets/" + name.replace("-ess", "").replace("-pro", "") + ".atlas");
+	atlas = assetManager.get("assets/" + name.replace("-ess", "").replace("-pro", "").replace("-stretchy-ik", "") + ".atlas");
 
 	// Create a AtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
 	atlasLoader = new spine.AtlasAttachmentLoader(atlas);

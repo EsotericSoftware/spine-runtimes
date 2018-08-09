@@ -1,6 +1,9 @@
 eclipse.preferences.version=1
+encoding//src/spine/IkConstraint.as=UTF-8
+encoding//src/spine/IkConstraintData.as=UTF-8
 encoding//src/spine/Interpolation.as=UTF-8
 encoding//src/spine/MathUtils.as=UTF-8
+encoding//src/spine/Skeleton.as=UTF-8
 encoding//src/spine/SkeletonClipping.as=UTF-8
 encoding//src/spine/SkeletonJson.as=UTF-8
 encoding//src/spine/Triangulator.as=UTF-8

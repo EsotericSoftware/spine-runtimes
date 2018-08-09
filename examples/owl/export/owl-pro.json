@@ -1,22 +1,31 @@
 {
-"skeleton": {
-	"hash": "TbihQmOjHQadWT+cp2p48Xive5U",
-	"spine": "3.7.08-beta",
-	"width": 1350.84,
-	"height": 909.41,
-	"images": "./images/",
-	"audio": ""
-},
+"skeleton": { "hash": "TbihQmOjHQadWT+cp2p48Xive5U", "spine": "3.7.19-beta", "width": 1350.84, "height": 909.41, "images": "./images/", "audio": "" },
 "bones": [
 	{ "name": "root" },
-	{ "name": "branch-1", "parent": "root", "length": 487.04, "rotation": 27.67, "x": -579.3, "y": -239.11, "color": "1a8600ff" },
+	{
+		"name": "branch-1",
+		"parent": "root",
+		"length": 487.04,
+		"rotation": 27.67,
+		"x": -579.3,
+		"y": -239.11,
+		"color": "1a8600ff"
+	},
 	{ "name": "branch-2", "parent": "branch-1", "length": 391.45, "rotation": -30.2, "x": 487.04, "color": "1a8600ff" },
 	{ "name": "owl-base", "parent": "branch-2", "x": 139.77, "y": 56.43, "color": "1697ffff" },
 	{ "name": "body-top-control", "parent": "owl-base", "rotation": 92.53, "x": -3.85, "y": 227.57, "color": "1697ffff" },
 	{ "name": "branch-3", "parent": "branch-2", "length": 231.51, "rotation": 30.15, "x": 391.45, "color": "1a8600ff" },
 	{ "name": "branch-4", "parent": "branch-3", "length": 158.83, "rotation": 38.9, "x": 231.51, "color": "1a8600ff" },
 	{ "name": "branch-5", "parent": "branch-4", "length": 82.96, "rotation": -26.21, "x": 158.83, "color": "1a8600ff" },
-	{ "name": "branch-6", "parent": "branch-5", "length": 105.49, "rotation": 68.78, "x": -79.95, "y": -20.15, "color": "1a8600ff" },
+	{
+		"name": "branch-6",
+		"parent": "branch-5",
+		"length": 105.49,
+		"rotation": 68.78,
+		"x": -79.95,
+		"y": -20.15,
+		"color": "1a8600ff"
+	},
 	{
 		"name": "butt-feathers",
 		"parent": "owl-base",
@@ -29,13 +38,53 @@
 	{ "name": "head", "parent": "body-top-control", "rotation": -90, "x": 51, "y": 0.33, "color": "1697ffff" },
 	{ "name": "control", "parent": "head", "y": 126.66, "color": "1697ffff" },
 	{ "name": "control-back", "parent": "head", "x": 1.74, "y": 75.81, "color": "b500afff" },
-	{ "name": "leaf-1", "parent": "branch-1", "length": 170.88, "rotation": 59.11, "x": 81.78, "y": 61.01, "color": "c61616ff" },
-	{ "name": "leaf-2", "parent": "branch-4", "length": 177.54, "rotation": -74.38, "x": 116.86, "y": -14.04, "color": "c61616ff" },
-	{ "name": "leaf-3", "parent": "branch-3", "length": 206.74, "rotation": -60.2, "x": -15.26, "y": 6.37, "color": "c61616ff" },
-	{ "name": "leaf-4", "parent": "branch-6", "length": 152.22, "rotation": 76.69, "x": 110.99, "y": 4.18, "color": "c61616ff" },
+	{
+		"name": "leaf-1",
+		"parent": "branch-1",
+		"length": 170.88,
+		"rotation": 59.11,
+		"x": 81.78,
+		"y": 61.01,
+		"color": "c61616ff"
+	},
+	{
+		"name": "leaf-2",
+		"parent": "branch-4",
+		"length": 177.54,
+		"rotation": -74.38,
+		"x": 116.86,
+		"y": -14.04,
+		"color": "c61616ff"
+	},
+	{
+		"name": "leaf-3",
+		"parent": "branch-3",
+		"length": 206.74,
+		"rotation": -60.2,
+		"x": -15.26,
+		"y": 6.37,
+		"color": "c61616ff"
+	},
+	{
+		"name": "leaf-4",
+		"parent": "branch-6",
+		"length": 152.22,
+		"rotation": 76.69,
+		"x": 110.99,
+		"y": 4.18,
+		"color": "c61616ff"
+	},
 	{ "name": "leaf-5", "parent": "branch-5", "length": 186.26, "rotation": 40.81, "x": 82.96, "color": "c61616ff" },
 	{ "name": "leaf-6", "parent": "branch-6", "length": 201.94, "rotation": 0.89, "x": 105.49, "color": "c61616ff" },
-	{ "name": "leaf-7", "parent": "branch-1", "length": 155.86, "rotation": 30.39, "x": 214.62, "y": 12.99, "color": "c61616ff" }
+	{
+		"name": "leaf-7",
+		"parent": "branch-1",
+		"length": 155.86,
+		"rotation": 30.39,
+		"x": 214.62,
+		"y": 12.99,
+		"color": "c61616ff"
+	}
 ],
 "slots": [
 	{ "name": "feather-3", "bone": "butt-feathers", "attachment": "feather-3" },

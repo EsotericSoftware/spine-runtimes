@@ -1,26 +1,91 @@
 {
-"skeleton": {
-	"hash": "1WH+BPDx5fIR5Td0X/LQY1L6yi8",
-	"spine": "3.7.08-beta",
-	"width": 365.79,
-	"height": 391.51,
-	"images": "./images/",
-	"audio": ""
-},
+"skeleton": { "hash": "1WH+BPDx5fIR5Td0X/LQY1L6yi8", "spine": "3.7.19-beta", "width": 365.79, "height": 391.51, "images": "./images/", "audio": "" },
 "bones": [
 	{ "name": "root" },
 	{ "name": "hip", "parent": "root", "x": -8.17, "y": 73.5, "color": "fff200ff" },
-	{ "name": "back-thigh", "parent": "hip", "length": 44.3, "rotation": -54.08, "x": -2.82, "y": -2.64, "color": "ff0008ff" },
-	{ "name": "back-shin", "parent": "back-thigh", "length": 31.17, "rotation": -50.15, "x": 44.3, "y": 0.06, "color": "ff0008ff" },
-	{ "name": "back-foot", "parent": "back-shin", "length": 11.75, "rotation": 91.8, "x": 31.17, "y": 0.09, "color": "ff0008ff" },
-	{ "name": "body", "parent": "hip", "length": 116.25, "rotation": 99.84, "x": -34.28, "y": 4.2, "color": "fff200ff" },
-	{ "name": "head", "parent": "body", "length": 213.84, "rotation": -36.37, "x": 116.32, "y": 1.79, "color": "fff200ff" },
+	{
+		"name": "back-thigh",
+		"parent": "hip",
+		"length": 44.3,
+		"rotation": -54.08,
+		"x": -2.82,
+		"y": -2.64,
+		"color": "ff0008ff"
+	},
+	{
+		"name": "back-shin",
+		"parent": "back-thigh",
+		"length": 31.17,
+		"rotation": -50.15,
+		"x": 44.3,
+		"y": 0.06,
+		"color": "ff0008ff"
+	},
+	{
+		"name": "back-foot",
+		"parent": "back-shin",
+		"length": 11.75,
+		"rotation": 91.8,
+		"x": 31.17,
+		"y": 0.09,
+		"color": "ff0008ff"
+	},
+	{
+		"name": "body",
+		"parent": "hip",
+		"length": 116.25,
+		"rotation": 99.84,
+		"x": -34.28,
+		"y": 4.2,
+		"color": "fff200ff"
+	},
+	{
+		"name": "head",
+		"parent": "body",
+		"length": 213.84,
+		"rotation": -36.37,
+		"x": 116.32,
+		"y": 1.79,
+		"color": "fff200ff"
+	},
 	{ "name": "blown-up-neck", "parent": "head", "x": -6.12, "y": -25.01, "color": "fff200ff" },
 	{ "name": "eye", "parent": "head", "x": 96.48, "y": -75.52, "color": "fff200ff" },
-	{ "name": "front-thigh", "parent": "hip", "length": 52.72, "rotation": -55.89, "x": -42.79, "y": 4.11, "color": "04ff00ff" },
-	{ "name": "front-shin", "parent": "front-thigh", "length": 34.38, "rotation": -45.22, "x": 52.73, "y": 0.06, "color": "04ff00ff" },
-	{ "name": "front-foot", "parent": "front-shin", "length": 13.58, "rotation": 86.84, "x": 34.36, "y": -0.12, "color": "04ff00ff" },
-	{ "name": "front-upper-arm", "parent": "body", "length": 47.09, "rotation": 121.33, "x": 90.9, "y": 42.96, "color": "04ff00ff" },
+	{
+		"name": "front-thigh",
+		"parent": "hip",
+		"length": 52.72,
+		"rotation": -55.89,
+		"x": -42.79,
+		"y": 4.11,
+		"color": "04ff00ff"
+	},
+	{
+		"name": "front-shin",
+		"parent": "front-thigh",
+		"length": 34.38,
+		"rotation": -45.22,
+		"x": 52.73,
+		"y": 0.06,
+		"color": "04ff00ff"
+	},
+	{
+		"name": "front-foot",
+		"parent": "front-shin",
+		"length": 13.58,
+		"rotation": 86.84,
+		"x": 34.36,
+		"y": -0.12,
+		"color": "04ff00ff"
+	},
+	{
+		"name": "front-upper-arm",
+		"parent": "body",
+		"length": 47.09,
+		"rotation": 121.33,
+		"x": 90.9,
+		"y": 42.96,
+		"color": "04ff00ff"
+	},
 	{
 		"name": "front-lower-arm",
 		"parent": "front-upper-arm",
@@ -30,8 +95,24 @@
 		"y": -0.29,
 		"color": "04ff00ff"
 	},
-	{ "name": "highlight", "parent": "eye", "x": 9.42, "y": -12.36, "scaleX": 0.471, "scaleY": 0.471, "color": "fff200ff" },
-	{ "name": "upper-back-arm", "parent": "body", "length": 50.28, "rotation": 172.11, "x": 50.4, "y": -84.36, "color": "ff0008ff" },
+	{
+		"name": "highlight",
+		"parent": "eye",
+		"x": 9.42,
+		"y": -12.36,
+		"scaleX": 0.471,
+		"scaleY": 0.471,
+		"color": "fff200ff"
+	},
+	{
+		"name": "upper-back-arm",
+		"parent": "body",
+		"length": 50.28,
+		"rotation": 172.11,
+		"x": 50.4,
+		"y": -84.36,
+		"color": "ff0008ff"
+	},
 	{
 		"name": "lower-back-arm",
 		"parent": "upper-back-arm",
@@ -41,7 +122,15 @@
 		"y": -0.11,
 		"color": "ff0008ff"
 	},
-	{ "name": "metaljaw", "parent": "root", "length": 75.82, "rotation": -74.86, "x": -37.1, "y": 230.8, "color": "fff200ff" },
+	{
+		"name": "metaljaw",
+		"parent": "root",
+		"length": 75.82,
+		"rotation": -74.86,
+		"x": -37.1,
+		"y": 230.8,
+		"color": "fff200ff"
+	},
 	{ "name": "pupil", "parent": "eye", "color": "fff200ff" },
 	{ "name": "splat", "parent": "root", "x": -11.57, "y": 253.52 }
 ],

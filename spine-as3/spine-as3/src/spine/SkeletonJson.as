@@ -158,6 +158,7 @@ package spine {
 				if (!ikConstraintData.target) throw new Error("Target bone not found: " + constraintMap["target"]);
 
 				ikConstraintData.bendDirection = (!constraintMap.hasOwnProperty("bendPositive") || constraintMap["bendPositive"]) ? 1 : -1;
+				ikConstraintData.stretch = (!constraintMap.hasOwnProperty("stretch") || constraintMap["stretch"]);
 				ikConstraintData.mix = constraintMap.hasOwnProperty("mix") ? constraintMap["mix"] : 1;
 
 				skeletonData.ikConstraints.push(ikConstraintData);
@@ -531,7 +532,8 @@ package spine {
 				for each (valueMap in values) {
 					var mix : Number = valueMap.hasOwnProperty("mix") ? valueMap["mix"] : 1;
 					var bendDirection : int = (!valueMap.hasOwnProperty("bendPositive") || valueMap["bendPositive"]) ? 1 : -1;
-					ikTimeline.setFrame(frameIndex, valueMap["time"], mix, bendDirection);
+					var stretch : Boolean = (!valueMap.hasOwnProperty("stretch") || valueMap["stretch"]);
+					ikTimeline.setFrame(frameIndex, valueMap["time"], mix, bendDirection, stretch);
 					readCurve(valueMap, ikTimeline, frameIndex);
 					frameIndex++;
 				}

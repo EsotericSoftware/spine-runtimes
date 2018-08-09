@@ -1,12 +1,5 @@
 {
-"skeleton": {
-	"hash": "lfmnIwRt8cjfHaBQWvT0v4odYdY",
-	"spine": "3.7.08-beta",
-	"width": 260,
-	"height": 359.92,
-	"images": "./images/",
-	"audio": ""
-},
+"skeleton": { "hash": "lfmnIwRt8cjfHaBQWvT0v4odYdY", "spine": "3.7.19-beta", "width": 260, "height": 359.92, "images": "./images/", "audio": "" },
 "bones": [
 	{ "name": "root" },
 	{ "name": "coin-root", "parent": "root", "y": 300, "color": "ff0000ff" },

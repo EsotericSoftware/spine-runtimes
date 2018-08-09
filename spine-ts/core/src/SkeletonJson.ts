@@ -124,6 +124,7 @@ module spine {
 					if (data.target == null) throw new Error("IK target bone not found: " + targetName);
 
 					data.bendDirection = this.getValue(constraintMap, "bendPositive", true) ? 1 : -1;
+					data.stretch = this.getValue(constraintMap, "stretch", false);
 					data.mix = this.getValue(constraintMap, "mix", 1);
 
 					skeletonData.ikConstraints.push(data);
@@ -520,7 +521,7 @@ module spine {
 					for (let i = 0; i < constraintMap.length; i++) {
 						let valueMap = constraintMap[i];
 						timeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, "mix", 1),
-							this.getValue(valueMap, "bendPositive", true) ? 1 : -1);
+							this.getValue(valueMap, "bendPositive", true) ? 1 : -1, this.getValue(valueMap, "stretch", false));
 						this.readCurve(valueMap, timeline, frameIndex);
 						frameIndex++;
 					}
