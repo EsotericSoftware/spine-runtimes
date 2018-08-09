@@ -367,7 +367,8 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				triangles.verts = batch->allocateVertices(attachmentVertices->_triangles->vertCount);
 				triangles.vertCount = attachmentVertices->_triangles->vertCount;
 				memcpy(triangles.verts, attachmentVertices->_triangles->verts, sizeof(cocos2d::V3F_C4B_T2F) * attachmentVertices->_triangles->vertCount);
-				spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, triangles.vertCount * sizeof(cocos2d::V3F_C4B_T2F) / 4, (float*)triangles.verts, 0, 6);
+				int vertexSizeInFloats = sizeof(cocos2d::V3F_C4B_T2F) / sizeof(float);
+				spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, triangles.vertCount * vertexSizeInFloats, (float*)triangles.verts, 0, vertexSizeInFloats);
 			} else {
 				trianglesTwoColor.indices = attachmentVertices->_triangles->indices;
 				trianglesTwoColor.indexCount = attachmentVertices->_triangles->indexCount;
@@ -376,7 +377,8 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 				for (int i = 0; i < trianglesTwoColor.vertCount; i++) {
 					trianglesTwoColor.verts[i].texCoords = attachmentVertices->_triangles->verts[i].texCoords;
 				}
-				spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, trianglesTwoColor.vertCount * sizeof(V3F_C4B_C4B_T2F) / 4, (float*)trianglesTwoColor.verts, 0, 7);
+				int vertexSizeInFloats = sizeof(V3F_C4B_C4B_T2F) / sizeof(float);
+				spVertexAttachment_computeWorldVertices(SUPER(attachment), slot, 0, trianglesTwoColor.vertCount * vertexSizeInFloats, (float*)trianglesTwoColor.verts, 0, vertexSizeInFloats);
 			}
 			
 			color.r = attachment->color.r;
