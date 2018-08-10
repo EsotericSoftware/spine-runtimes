@@ -41,14 +41,21 @@ namespace Spine.Unity.Modules {
 		const HideFlags GhostHideFlags = HideFlags.HideInHierarchy;
 		const string GhostingShaderName = "Spine/Special/SkeletonGhost";
 
+		[Header("Animation")]
 		public bool ghostingEnabled = true;
-		public float spawnRate = 0.05f;
+		[Tooltip("The time between invididual ghost pieces being spawned.")]
+		[UnityEngine.Serialization.FormerlySerializedAs("spawnRate")]
+		public float spawnInterval = 0.05f;
+		[Tooltip("Maximum number of ghosts that can exist at a time. If the fade speed is not fast enough, the oldest ghost will immediately disappear to enforce the maximum number.")]
+		public int maximumGhosts = 10;
+		[Tooltip("Fadespeed 1 means it will take 1 second for a piece to fade out. 2 means it will take 1/2 second. 10 means it will take 1/10 of a second.")]
+		public float fadeSpeed = 10;
+
+		[Header("Rendering")]
+		public Shader ghostShader;
 		public Color32 color = new Color32(0xFF, 0xFF, 0xFF, 0x00); // default for additive.
 		[Tooltip("Remember to set color alpha to 0 if Additive is true")]
 		public bool additive = true;
-		public int maximumGhosts = 10;
-		public float fadeSpeed = 10;
-		public Shader ghostShader;
 		[Tooltip("0 is Color and Alpha, 1 is Alpha only.")]
 		[Range(0, 1)]
 		public float textureFade = 1;
@@ -67,23 +74,30 @@ namespace Spine.Unity.Modules {
 		readonly Dictionary<Material, Material> materialTable = new Dictionary<Material, Material>();
 
 		void Start () {
-			if (ghostShader == null)
-				ghostShader = Shader.Find(GhostingShaderName);
+			Initialize(false);
+		}
 
-			skeletonRenderer = GetComponent<SkeletonRenderer>();
-			meshFilter = GetComponent<MeshFilter>();
-			meshRenderer = GetComponent<MeshRenderer>();
-			nextSpawnTime = Time.time + spawnRate;
-			pool = new SkeletonGhostRenderer[maximumGhosts];
-			for (int i = 0; i < maximumGhosts; i++) {
-				GameObject go = new GameObject(gameObject.name + " Ghost", typeof(SkeletonGhostRenderer));
-				pool[i] = go.GetComponent<SkeletonGhostRenderer>();
-				go.SetActive(false);
-				go.hideFlags = GhostHideFlags;
+		public void Initialize (bool overwrite) {
+			if (pool == null || overwrite) {
+				if (ghostShader == null)
+					ghostShader = Shader.Find(GhostingShaderName);
+
+				skeletonRenderer = GetComponent<SkeletonRenderer>();
+				meshFilter = GetComponent<MeshFilter>();
+				meshRenderer = GetComponent<MeshRenderer>();
+				nextSpawnTime = Time.time + spawnInterval;
+				pool = new SkeletonGhostRenderer[maximumGhosts];
+				for (int i = 0; i < maximumGhosts; i++) {
+					GameObject go = new GameObject(gameObject.name + " Ghost", typeof(SkeletonGhostRenderer));
+					pool[i] = go.GetComponent<SkeletonGhostRenderer>();
+					go.SetActive(false);
+					go.hideFlags = GhostHideFlags;
+				}
+
+				var skeletonAnimation = skeletonRenderer as Spine.Unity.IAnimationStateComponent;
+				if (skeletonAnimation != null)
+					skeletonAnimation.AnimationState.Event += OnEvent;
 			}
-
-			var skeletonAnimation = skeletonRenderer as Spine.Unity.IAnimationStateComponent;
-			if (skeletonAnimation != null) skeletonAnimation.AnimationState.Event += OnEvent;
 		}
 
 		//SkeletonAnimation
@@ -96,7 +110,7 @@ namespace Spine.Unity.Modules {
 			if (e.Data.Name.Equals("Ghosting", System.StringComparison.Ordinal)) {
 				ghostingEnabled = e.Int > 0;
 				if (e.Float > 0)
-					spawnRate = e.Float;
+					spawnInterval = e.Float;
 				
 				if (!string.IsNullOrEmpty(e.stringValue))
 					this.color = HexToColor(e.String);
@@ -121,11 +135,14 @@ namespace Spine.Unity.Modules {
 					var originalMat = materials[i];
 					Material ghostMat;
 					if (!materialTable.ContainsKey(originalMat)) {
-						ghostMat = new Material(originalMat);
-						ghostMat.shader = ghostShader;
-						ghostMat.color = Color.white;
+						ghostMat = new Material(originalMat) {
+							shader = ghostShader,
+							color = Color.white
+						};
+
 						if (ghostMat.HasProperty("_TextureFade"))
 							ghostMat.SetFloat("_TextureFade", textureFade);
+
 						materialTable.Add(originalMat, ghostMat);
 					} else {
 						ghostMat = materialTable[originalMat];
@@ -150,7 +167,7 @@ namespace Spine.Unity.Modules {
 				if (poolIndex == pool.Length)
 					poolIndex = 0;
 
-				nextSpawnTime = Time.time + spawnRate;
+				nextSpawnTime = Time.time + spawnInterval;
 			}
 		}
 
@@ -166,16 +183,18 @@ namespace Spine.Unity.Modules {
 
 		//based on UnifyWiki  http://wiki.unity3d.com/index.php?title=HexConverter
 		static Color32 HexToColor (string hex) {
+			const System.Globalization.NumberStyles HexNumber = System.Globalization.NumberStyles.HexNumber;
+
 			if (hex.Length < 6)
 				return Color.magenta;
 
 			hex = hex.Replace("#", "");
-			byte r = byte.Parse(hex.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
-			byte g = byte.Parse(hex.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
-			byte b = byte.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+			byte r = byte.Parse(hex.Substring(0, 2), HexNumber);
+			byte g = byte.Parse(hex.Substring(2, 2), HexNumber);
+			byte b = byte.Parse(hex.Substring(4, 2), HexNumber);
 			byte a = 0xFF;
 			if (hex.Length == 8)
-				a = byte.Parse(hex.Substring(6, 2), System.Globalization.NumberStyles.HexNumber);
+				a = byte.Parse(hex.Substring(6, 2), HexNumber);
 
 			return new Color32(r, g, b, a);
 		}
