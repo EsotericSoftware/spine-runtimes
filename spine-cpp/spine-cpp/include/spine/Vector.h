@@ -95,11 +95,18 @@ public:
 
 	inline void add(const T &inValue) {
 		if (_size == _capacity) {
+			// inValue might reference an element in this buffer
+			// When we reallocate, the reference becomes invalid.
+			// We thus need to create a defensive copy before
+			// reallocating.
+			T valueCopy = inValue;
 			_capacity = (int) (_size * 1.75f);
 			if (_capacity < 8) _capacity = 8;
-			_buffer = Spine::SpineExtension::realloc<T>(_buffer, _capacity, __FILE__, __LINE__);
+			_buffer = spine::SpineExtension::realloc<T>(_buffer, _capacity, __FILE__, __LINE__);
+			construct(_buffer + _size++, valueCopy);
+		} else {
+			construct(_buffer + _size++, inValue);
 		}
-		construct(_buffer + _size++, inValue);
 	}
 
 	inline void addAll(Vector<T> &inValue) {
