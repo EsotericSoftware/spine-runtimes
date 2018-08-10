@@ -543,6 +543,16 @@ namespace Spine {
 			System.Array.Copy(slotsItems, drawOrder.Items, n);
 		}
 
+		/// <summary>Resets all the slots on the skeleton to their Setup Pose attachments but does not reset slot colors.</summary>
+		public static void SetSlotAttachmentsToSetupPose (this Skeleton skeleton) {
+			var slotsItems = skeleton.slots.Items;
+			for (int i = 0; i < skeleton.slots.Count; i++) {
+				Slot slot = slotsItems[i];
+				string attachmentName = slot.data.attachmentName;
+				slot.Attachment = string.IsNullOrEmpty(attachmentName) ? null : skeleton.GetAttachment(i, attachmentName);
+			}
+		}
+
 		/// <summary>Resets the color of a slot to Setup Pose value.</summary>
 		public static void SetColorToSetupPose (this Slot slot) {
 			slot.r = slot.data.r;
@@ -563,7 +573,7 @@ namespace Spine {
 		/// <summary>Resets the attachment of slot at a given slotIndex to setup pose. This is faster than Slot.SetAttachmentToSetupPose.</summary>
 		public static void SetSlotAttachmentToSetupPose (this Skeleton skeleton, int slotIndex) {
 			var slot = skeleton.slots.Items[slotIndex];
-			var attachmentName = slot.data.attachmentName;
+			string attachmentName = slot.data.attachmentName;
 			if (string.IsNullOrEmpty(attachmentName)) {
 				slot.Attachment = null;
 			} else {
