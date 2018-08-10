@@ -56,6 +56,7 @@ namespace Spine.Unity.Editor {
 		bool changeNextFrame = false;
 		SerializedProperty animationNameProperty;
 		SkeletonDataAsset lastSkeletonDataAsset;
+		SkeletonData lastSkeletonData;
 
 		void OnEnable () { HandleOnEnablePreview(); }
 		void OnDestroy () { HandleOnDestroyPreview(); }
@@ -76,7 +77,7 @@ namespace Spine.Unity.Editor {
 			if (changeNextFrame) {
 				changeNextFrame = false;
 				
-				if (ThisSkeletonDataAsset != lastSkeletonDataAsset) {
+				if (ThisSkeletonDataAsset != lastSkeletonDataAsset || ThisSkeletonDataAsset.GetSkeletonData(true) != lastSkeletonData) {
 					preview.Clear();
 					preview.Initialize(Repaint, ThisSkeletonDataAsset, LastSkinName);
 
@@ -91,7 +92,9 @@ namespace Spine.Unity.Editor {
 				if (!string.IsNullOrEmpty(animationNameProperty.stringValue))
 					preview.PlayPauseAnimation(animationNameProperty.stringValue, true);
 			}
+
 			lastSkeletonDataAsset = ThisSkeletonDataAsset;
+			lastSkeletonData = ThisSkeletonDataAsset.GetSkeletonData(true);
 
 			//EditorGUILayout.HelpBox(AnimationReferenceAssetEditor.InspectorHelpText, MessageType.Info, true);
 			EditorGUILayout.Space();

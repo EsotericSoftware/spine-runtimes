@@ -355,27 +355,35 @@ namespace Spine.Unity.Editor {
 				using (new SpineInspectorUtility.IndentScope())
 					SpineInspectorUtility.PropertyFieldWideLabel(defaultMix, DefaultMixLabel, 160);
 
-				// Do not use EditorGUIUtility.indentLevel. It will add spaces on every field.
-				for (int i = 0; i < fromAnimation.arraySize; i++) {
-					SerializedProperty from = fromAnimation.GetArrayElementAtIndex(i);
-					SerializedProperty to = toAnimation.GetArrayElementAtIndex(i);
-					SerializedProperty durationProp = duration.GetArrayElementAtIndex(i);
-					using (new EditorGUILayout.HorizontalScope()) {
-						GUILayout.Space(16f);
-						EditorGUILayout.PropertyField(from, GUIContent.none);
-						EditorGUILayout.PropertyField(to, GUIContent.none);
-						durationProp.floatValue = EditorGUILayout.FloatField(durationProp.floatValue, GUILayout.MinWidth(25f), GUILayout.MaxWidth(60f));
-						if (GUILayout.Button("Delete", EditorStyles.miniButton)) {
-							duration.DeleteArrayElementAtIndex(i);
-							toAnimation.DeleteArrayElementAtIndex(i);
-							fromAnimation.DeleteArrayElementAtIndex(i);
+				
+				if (fromAnimation.arraySize > 0) {
+					using (new SpineInspectorUtility.IndentScope()) {
+						EditorGUILayout.LabelField("Custom Mix Durations", EditorStyles.boldLabel);
+					}
+
+					for (int i = 0; i < fromAnimation.arraySize; i++) {
+						SerializedProperty from = fromAnimation.GetArrayElementAtIndex(i);
+						SerializedProperty to = toAnimation.GetArrayElementAtIndex(i);
+						SerializedProperty durationProp = duration.GetArrayElementAtIndex(i);
+						using (new EditorGUILayout.HorizontalScope()) {
+							GUILayout.Space(16f); // Space instead of EditorGUIUtility.indentLevel. indentLevel will add the space on every field.
+							EditorGUILayout.PropertyField(from, GUIContent.none);
+							//EditorGUILayout.LabelField(">", EditorStyles.miniLabel, GUILayout.Width(9f));
+							EditorGUILayout.PropertyField(to, GUIContent.none);
+							//GUILayout.Space(5f);
+							durationProp.floatValue = EditorGUILayout.FloatField(durationProp.floatValue, GUILayout.MinWidth(25f), GUILayout.MaxWidth(60f));
+							if (GUILayout.Button("Delete", EditorStyles.miniButton)) {
+								duration.DeleteArrayElementAtIndex(i);
+								toAnimation.DeleteArrayElementAtIndex(i);
+								fromAnimation.DeleteArrayElementAtIndex(i);
+							}
 						}
 					}
-				}
+				}				
 
 				using (new EditorGUILayout.HorizontalScope()) {
 					EditorGUILayout.Space();
-					if (GUILayout.Button("Add Mix")) {
+					if (GUILayout.Button("Add Custom Mix")) {
 						duration.arraySize++;
 						toAnimation.arraySize++;
 						fromAnimation.arraySize++;
@@ -438,59 +446,75 @@ namespace Spine.Unity.Editor {
 			if (!showSlotList) return;
 			if (!preview.IsValid) return;
 
-			EditorGUI.indentLevel++;
-			showAttachments = EditorGUILayout.ToggleLeft("Show Attachments", showAttachments);
-			var slotAttachments = new List<Attachment>();
-			var slotAttachmentNames = new List<string>();
-			var defaultSkinAttachmentNames = new List<string>();
-			var defaultSkin = targetSkeletonData.Skins.Items[0];
+			var defaultSkin = targetSkeletonData.DefaultSkin;
 			Skin skin = preview.Skeleton.Skin ?? defaultSkin;
-			var slotsItems = preview.Skeleton.Slots.Items;
 
-			for (int i = preview.Skeleton.Slots.Count - 1; i >= 0; i--) {
-				Slot slot = slotsItems[i];
-				EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(slot.Data.Name, Icons.slot));
-				if (showAttachments) {
-					
-					EditorGUI.indentLevel++;
-					slotAttachments.Clear();
-					slotAttachmentNames.Clear();
-					defaultSkinAttachmentNames.Clear();
+			using (new SpineInspectorUtility.IndentScope()) {
 
-					skin.FindNamesForSlot(i, slotAttachmentNames);
-					skin.FindAttachmentsForSlot(i, slotAttachments);
-
-					if (skin != defaultSkin) {
-						defaultSkin.FindNamesForSlot(i, defaultSkinAttachmentNames);
-						defaultSkin.FindNamesForSlot(i, slotAttachmentNames);
-						defaultSkin.FindAttachmentsForSlot(i, slotAttachments);
-					} else {
-						defaultSkin.FindNamesForSlot(i, defaultSkinAttachmentNames);
+				using (new EditorGUILayout.HorizontalScope()) {
+					showAttachments = EditorGUILayout.ToggleLeft("Show Attachments", showAttachments, GUILayout.MaxWidth(150f));
+					if (showAttachments) {
+						if (skin != null && skin != defaultSkin)
+							EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(skin.Name, Icons.skin));
 					}
+				}
 
-					for (int a = 0; a < slotAttachments.Count; a++) {
-						Attachment attachment = slotAttachments[a];
-						string attachmentName = slotAttachmentNames[a];
-						Texture2D icon = Icons.GetAttachmentIcon(attachment);
-						bool initialState = slot.Attachment == attachment;
-						bool toggled = EditorGUILayout.ToggleLeft(SpineInspectorUtility.TempContent(attachmentName, icon), slot.Attachment == attachment);
+				var slotAttachments = new List<Attachment>();
+				var slotAttachmentNames = new List<string>();
+				var defaultSkinAttachmentNames = new List<string>();
+				var slotsItems = preview.Skeleton.Slots.Items;
+				for (int i = preview.Skeleton.Slots.Count - 1; i >= 0; i--) {
+					Slot slot = slotsItems[i];
+					EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(slot.Data.Name, Icons.slot));
+					if (showAttachments) {
+						slotAttachments.Clear();
+						slotAttachmentNames.Clear();
+						defaultSkinAttachmentNames.Clear();
 
-						if (!defaultSkinAttachmentNames.Contains(attachmentName)) {
-							Rect skinPlaceHolderIconRect = GUILayoutUtility.GetLastRect();
-							skinPlaceHolderIconRect.width = Icons.skinPlaceholder.width;
-							skinPlaceHolderIconRect.height = Icons.skinPlaceholder.height;
-							GUI.DrawTexture(skinPlaceHolderIconRect, Icons.skinPlaceholder);
+						using (new SpineInspectorUtility.IndentScope()) {
+							{
+								skin.FindNamesForSlot(i, slotAttachmentNames);
+								skin.FindAttachmentsForSlot(i, slotAttachments);
+
+								if (skin != defaultSkin) {
+									defaultSkin.FindNamesForSlot(i, defaultSkinAttachmentNames);
+									defaultSkin.FindNamesForSlot(i, slotAttachmentNames);
+									defaultSkin.FindAttachmentsForSlot(i, slotAttachments);
+								} else {
+									defaultSkin.FindNamesForSlot(i, defaultSkinAttachmentNames);
+								}
+							}
+
+							for (int a = 0; a < slotAttachments.Count; a++) {
+								Attachment attachment = slotAttachments[a];
+								string attachmentName = slotAttachmentNames[a];
+								bool attachmentIsFromSkin = !defaultSkinAttachmentNames.Contains(attachmentName);
+
+								Texture2D attachmentTypeIcon = Icons.GetAttachmentIcon(attachment);
+								bool initialState = slot.Attachment == attachment;
+
+								Texture2D iconToUse = attachmentIsFromSkin ? Icons.skinPlaceholder : attachmentTypeIcon;
+								bool toggled = EditorGUILayout.ToggleLeft(SpineInspectorUtility.TempContent(attachmentName, iconToUse), slot.Attachment == attachment, GUILayout.MinWidth(150f));
+								
+								if (attachmentIsFromSkin) {
+									Rect extraIconRect = GUILayoutUtility.GetLastRect();
+									extraIconRect.x += extraIconRect.width - (attachmentTypeIcon.width * 2f);
+									extraIconRect.width = attachmentTypeIcon.width;
+									extraIconRect.height = attachmentTypeIcon.height;
+									GUI.DrawTexture(extraIconRect, attachmentTypeIcon);
+								}
+
+								if (toggled != initialState) {
+									slot.Attachment = toggled ? attachment : null;
+									preview.RefreshOnNextUpdate();
+								}
+							}
 						}
 
-						if (toggled != initialState) {
-							slot.Attachment = toggled ? attachment : null;
-							preview.RefreshOnNextUpdate();
-						}
 					}
-					EditorGUI.indentLevel--;
 				}
 			}
-			EditorGUI.indentLevel--;
+			
 		}
 
 		void DrawUnityTools () {
@@ -498,29 +522,29 @@ namespace Spine.Unity.Editor {
 			using (new SpineInspectorUtility.BoxScope()) {
 				isMecanimExpanded = EditorGUILayout.Foldout(isMecanimExpanded, SpineInspectorUtility.TempContent("SkeletonAnimator", SpineInspectorUtility.UnityIcon<SceneAsset>()));
 				if (isMecanimExpanded) {
-					EditorGUI.indentLevel++;
-					EditorGUILayout.PropertyField(controller, SpineInspectorUtility.TempContent("Controller", SpineInspectorUtility.UnityIcon<Animator>()));		
-					if (controller.objectReferenceValue == null) {
+					using (new SpineInspectorUtility.IndentScope()) {
+						EditorGUILayout.PropertyField(controller, SpineInspectorUtility.TempContent("Controller", SpineInspectorUtility.UnityIcon<Animator>()));
+						if (controller.objectReferenceValue == null) {
 
-						// Generate Mecanim Controller Button
-						using (new GUILayout.HorizontalScope()) {
-							GUILayout.Space(EditorGUIUtility.labelWidth);
-							if (GUILayout.Button(SpineInspectorUtility.TempContent("Generate Mecanim Controller"), GUILayout.Height(20)))
-								SkeletonBaker.GenerateMecanimAnimationClips(targetSkeletonDataAsset);						
+							// Generate Mecanim Controller Button
+							using (new GUILayout.HorizontalScope()) {
+								GUILayout.Space(EditorGUIUtility.labelWidth);
+								if (GUILayout.Button(SpineInspectorUtility.TempContent("Generate Mecanim Controller"), GUILayout.Height(20)))
+									SkeletonBaker.GenerateMecanimAnimationClips(targetSkeletonDataAsset);
+							}
+							EditorGUILayout.HelpBox("SkeletonAnimator is the Mecanim alternative to SkeletonAnimation.\nIt is not required.", MessageType.Info);
+
+						} else {
+
+							// Update AnimationClips button.
+							using (new GUILayout.HorizontalScope()) {
+								GUILayout.Space(EditorGUIUtility.labelWidth);
+								if (GUILayout.Button(SpineInspectorUtility.TempContent("Force Update AnimationClips"), GUILayout.Height(20)))
+									SkeletonBaker.GenerateMecanimAnimationClips(targetSkeletonDataAsset);
+							}
+
 						}
-						EditorGUILayout.HelpBox("SkeletonAnimator is the Mecanim alternative to SkeletonAnimation.\nIt is not required.", MessageType.Info);
-
-					} else {
-
-						// Update AnimationClips button.
-						using (new GUILayout.HorizontalScope()) {
-							GUILayout.Space(EditorGUIUtility.labelWidth);
-							if (GUILayout.Button(SpineInspectorUtility.TempContent("Force Update AnimationClips"), GUILayout.Height(20)))
-								SkeletonBaker.GenerateMecanimAnimationClips(targetSkeletonDataAsset);				
-						}
-
 					}
-					EditorGUI.indentLevel--;
 				}
 			}
 			#endif
