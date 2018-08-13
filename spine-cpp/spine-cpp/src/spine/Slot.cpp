@@ -47,7 +47,7 @@ Slot::Slot(SlotData &data, Bone &bone) :
 		_skeleton(bone.getSkeleton()),
 		_color(1, 1, 1, 1),
 		_darkColor(0, 0, 0, 0),
-		_hasDarkColor(false),
+		_hasDarkColor(data.hasDarkColor()),
 		_attachment(NULL),
 		_attachmentTime(0) {
 	setToSetupPose();
@@ -87,10 +87,6 @@ Color &Slot::getDarkColor() {
 
 bool Slot::hasDarkColor() {
 	return _hasDarkColor;
-}
-
-void Slot::setHasDarkColor(bool inValue) {
-	_hasDarkColor = inValue;
 }
 
 Attachment *Slot::getAttachment() {

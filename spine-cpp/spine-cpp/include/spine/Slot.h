@@ -100,8 +100,6 @@ public:
 
 	bool hasDarkColor();
 
-	void setHasDarkColor(bool inValue);
-
 	/// May be NULL.
 	Attachment *getAttachment();
 

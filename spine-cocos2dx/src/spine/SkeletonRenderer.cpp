@@ -391,7 +391,7 @@ namespace spine {
 			
 			float alpha = nodeColor.a * _skeleton->getColor().a * slot->getColor().a * color.a * 255;
 			// skip rendering if the color of this attachment is 0
-			if (color.a == 0){
+			if (alpha == 0){
 				_clipper->clipEnd(*slot);
 				continue;
 			}
@@ -414,7 +414,7 @@ namespace spine {
 				darkColor.g = 0;
 				darkColor.b = 0;
 			}
-			darkColor.a = _premultipliedAlpha ? 255 : 0;
+			darkColor.a = darkPremultipliedAlpha;
 			
 			BlendFunc blendFunc;
 			switch (slot->getData().getBlendMode()) {
