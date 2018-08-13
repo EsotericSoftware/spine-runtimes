@@ -389,27 +389,32 @@ namespace spine {
 				continue;
 			}
 			
-			if (slot->hasDarkColor()) {
-				darkColor.r = slot->getDarkColor().r * 255;
-				darkColor.g = slot->getDarkColor().g * 255;
-				darkColor.b = slot->getDarkColor().b * 255;
-			} else {
-				darkColor.r = 0;
-				darkColor.g = 0;
-				darkColor.b = 0;
-			}
-			darkColor.a = darkPremultipliedAlpha;
-			
-			color.a *= nodeColor.a * _skeleton->getColor().a * slot->getColor().a * 255;
+			float alpha = nodeColor.a * _skeleton->getColor().a * slot->getColor().a * color.a * 255;
 			// skip rendering if the color of this attachment is 0
 			if (color.a == 0){
 				_clipper->clipEnd(*slot);
 				continue;
 			}
-			float multiplier = _premultipliedAlpha ? color.a : 255;
-			color.r *= nodeColor.r * _skeleton->getColor().r * slot->getColor().r * multiplier;
-			color.g *= nodeColor.g * _skeleton->getColor().g * slot->getColor().g * multiplier;
-			color.b *= nodeColor.b * _skeleton->getColor().b * slot->getColor().b * multiplier;
+			float multiplier = _premultipliedAlpha ? alpha : 255;
+			float red = nodeColor.r * _skeleton->getColor().r * slot->getColor().r * multiplier;
+			float green = nodeColor.g * _skeleton->getColor().g * slot->getColor().g * multiplier;
+			float blue = nodeColor.b * _skeleton->getColor().b * slot->getColor().b * multiplier;
+			
+			color.r = red * color.r;
+			color.g = green * color.g;
+			color.b = blue * color.b;
+			color.a = alpha;
+			
+			if (slot->hasDarkColor()) {
+				darkColor.r = red * slot->getDarkColor().r;
+				darkColor.g = green * slot->getDarkColor().g;
+				darkColor.b = blue * slot->getDarkColor().b;
+			} else {
+				darkColor.r = 0;
+				darkColor.g = 0;
+				darkColor.b = 0;
+			}
+			darkColor.a = _premultipliedAlpha ? 255 : 0;
 			
 			BlendFunc blendFunc;
 			switch (slot->getData().getBlendMode()) {

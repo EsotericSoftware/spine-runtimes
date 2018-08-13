@@ -60,6 +60,8 @@ bool AppDelegate::applicationDidFinishLaunching () {
 	auto director = Director::getInstance();
 	auto glview = director->getOpenGLView();
 	if (!glview) {
+		GLContextAttrs attrs = { 8, 8, 8, 8, 0, 0 };
+		GLView::setGLContextAttrs(attrs);
 		glview = GLViewImpl::create("Spine Example");
 		director->setOpenGLView(glview);
 	}
