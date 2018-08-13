@@ -83,6 +83,10 @@ namespace Spine.Unity.Editor {
 			return EditorGUIUtility.ObjectContent(null, type).image as Texture2D;
 		}
 
+		public static FieldInfo GetNonPublicField (System.Type type, string fieldName) {
+			return type.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
+		}
+
 		#region SerializedProperty Helpers
 		public static SerializedProperty FindBaseOrSiblingProperty (this SerializedProperty property, string propertyName) {
 			if (string.IsNullOrEmpty(propertyName)) return null;

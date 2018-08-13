@@ -33,6 +33,7 @@
 using UnityEditor;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Reflection;
 
 namespace Spine.Unity.Editor {
 	using Event = UnityEngine.Event;
@@ -42,6 +43,8 @@ namespace Spine.Unity.Editor {
 	[CanEditMultipleObjects]
 	public class SkeletonRendererInspector : UnityEditor.Editor {
 		public static bool advancedFoldout;
+
+		const string SeparatorSlotNamesFieldName = "separatorSlotNames";
 
 		protected SerializedProperty skeletonDataAsset, initialSkinName;
 		protected SerializedProperty initialFlipX, initialFlipY;
@@ -110,24 +113,6 @@ namespace Spine.Unity.Editor {
 
 			SerializedObject rso = SpineInspectorUtility.GetRenderersSerializedObject(serializedObject);
 			sortingProperties = new SpineInspectorUtility.SerializedSortingProperties(rso);
-		}
-
-		public static void ReapplySeparatorSlotNames (SkeletonRenderer skeletonRenderer) {
-			if (!skeletonRenderer.valid) return;
-
-			var separatorSlots = skeletonRenderer.separatorSlots;
-			var separatorSlotNames = skeletonRenderer.separatorSlotNames;
-			var skeleton = skeletonRenderer.skeleton;
-
-			separatorSlots.Clear();
-			for (int i = 0, n = separatorSlotNames.Length; i < n; i++) {
-				var slot = skeleton.FindSlot(separatorSlotNames[i]);
-				if (slot != null) {
-					separatorSlots.Add(slot);
-				} else {
-					Debug.LogWarning(separatorSlotNames[i] + " is not a slot in " + skeletonRenderer.skeletonDataAsset.skeletonJSON.name);				
-				}
-			}
 		}
 
 		GUIContent[] skins;
@@ -331,6 +316,11 @@ namespace Spine.Unity.Editor {
 				if (EditorGUI.EndChangeCheck())
 					SceneView.RepaintAll();
 			}
+		}
+
+		public static string[] GetSeparatorSlotMember (SkeletonRenderer skeletonRenderer) {
+			var field = SpineInspectorUtility.GetNonPublicField(typeof(SkeletonRenderer), SeparatorSlotNamesFieldName);
+			return field.GetValue(skeletonRenderer) as string[];
 		}
 
 		public static void SeparatorsField (SerializedProperty separatorSlotNames) {

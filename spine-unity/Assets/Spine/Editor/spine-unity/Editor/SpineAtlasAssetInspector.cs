@@ -63,7 +63,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		static List<AtlasRegion> GetRegions (Atlas atlas) {
-			FieldInfo regionsField = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.NonPublic);
+			FieldInfo regionsField = SpineInspectorUtility.GetNonPublicField(typeof(Atlas), "regions");
 			return (List<AtlasRegion>)regionsField.GetValue(atlas);
 		}
 

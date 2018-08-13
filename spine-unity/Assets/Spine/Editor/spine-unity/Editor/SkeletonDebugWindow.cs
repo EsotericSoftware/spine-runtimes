@@ -446,6 +446,9 @@ namespace Spine.Unity.Editor {
 				}
 
 				showDrawOrderTree.target = EditorGUILayout.Foldout(showDrawOrderTree.target, SpineInspectorUtility.TempContent("Draw Order and Separators", Icons.slotRoot), BoldFoldoutStyle);
+
+				//var separatorSlotNamesField = 
+				//SpineInspectorUtility.ge
 				if (showDrawOrderTree.faded > 0) {
 					using (new SpineInspectorUtility.IndentScope()) {
 						using (new EditorGUILayout.FadeGroupScope(showDrawOrderTree.faded)) {
@@ -459,7 +462,7 @@ namespace Spine.Unity.Editor {
 								}
 							} else {
 								foreach (var slot in skeleton.DrawOrder) {
-									var slotNames = skeletonRenderer.separatorSlotNames;
+									var slotNames = SkeletonRendererInspector.GetSeparatorSlotMember(skeletonRenderer);
 									for (int i = 0, n = slotNames.Length; i < n; i++) {
 										if (string.Equals(slotNames[i], slot.Data.Name, System.StringComparison.Ordinal)) {
 											EditorGUILayout.LabelField(SeparatorString);

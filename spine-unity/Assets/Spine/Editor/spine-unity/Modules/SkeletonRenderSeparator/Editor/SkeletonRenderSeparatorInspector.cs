@@ -211,7 +211,7 @@ namespace Spine.Unity.Modules {
 			serializedObject.ApplyModifiedProperties();
 
 			if (slotsReapplyRequired && UnityEngine.Event.current.type == EventType.Repaint) {
-				SkeletonRendererInspector.ReapplySeparatorSlotNames(component.SkeletonRenderer);
+				component.SkeletonRenderer.ReapplySeparatorSlotNames();
 				component.SkeletonRenderer.LateUpdate();
 				SceneView.RepaintAll();
 				slotsReapplyRequired = false;

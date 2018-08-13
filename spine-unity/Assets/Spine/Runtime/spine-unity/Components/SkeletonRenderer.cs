@@ -53,7 +53,7 @@ namespace Spine.Unity {
 
 		#region Advanced
 		// Submesh Separation
-		[UnityEngine.Serialization.FormerlySerializedAs("submeshSeparators")] [SpineSlot] public string[] separatorSlotNames = new string[0];
+		[UnityEngine.Serialization.FormerlySerializedAs("submeshSeparators")][SerializeField][SpineSlot] protected string[] separatorSlotNames = new string[0];
 		[System.NonSerialized] public readonly List<Slot> separatorSlots = new List<Slot>();
 
 		[Range(-0.1f, 0f)] public float zSpacing;
@@ -61,7 +61,7 @@ namespace Spine.Unity {
 		public bool useClipping = true;
 		public bool immutableTriangles = false;
 		public bool pmaVertexColors = true;
-		/// <summary>Clears the state when this component or its GameObject is disabled. This prevents previous state from being retained when it is enabled again. When pooling your skeleton, setting this to true can be helpful.</summary>
+		/// <summary>Clears the state of the render and skeleton when this component or its GameObject is disabled. This prevents previous state from being retained when it is enabled again. When pooling your skeleton, setting this to true can be helpful.</summary>
 		public bool clearStateOnDisable = false;
 		public bool tintBlack = false;
 		public bool singleSubmesh = false;
@@ -323,5 +323,25 @@ namespace Spine.Unity {
 			meshFilter.sharedMesh = currentMesh;
 			currentSmartMesh.instructionUsed.Set(currentInstructions);
 		}
+
+		public void ReapplySeparatorSlotNames () {
+			if (!valid)
+				return;
+
+			separatorSlots.Clear();
+			for (int i = 0, n = separatorSlotNames.Length; i < n; i++) {
+				var slot = skeleton.FindSlot(separatorSlotNames[i]);
+				if (slot != null) {
+					separatorSlots.Add(slot);
+				}
+				#if UNITY_EDITOR
+				else
+				{
+					Debug.LogWarning(separatorSlotNames[i] + " is not a slot in " + skeletonDataAsset.skeletonJSON.name);
+				}
+				#endif
+			}
+		}
+
 	}
 }
