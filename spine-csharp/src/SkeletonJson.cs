@@ -182,6 +182,7 @@ namespace Spine {
 					if (data.target == null) throw new Exception("Target bone not found: " + targetName);
 
 					data.bendDirection = GetBoolean(constraintMap, "bendPositive", true) ? 1 : -1;
+					data.stretch = GetBoolean(constraintMap, "stretch", false);
 					data.mix = GetFloat(constraintMap, "mix", 1);
 
 					skeletonData.ikConstraints.Add(data);
@@ -597,7 +598,8 @@ namespace Spine {
 						float time = (float)valueMap["time"];
 						float mix = GetFloat(valueMap, "mix", 1);
 						bool bendPositive = GetBoolean(valueMap, "bendPositive", true);
-						timeline.SetFrame(frameIndex, time, mix, bendPositive ? 1 : -1);
+						bool stretch = GetBoolean(valueMap, "stretch", false);
+						timeline.SetFrame(frameIndex, time, mix, bendPositive ? 1 : -1, stretch);
 						ReadCurve(valueMap, timeline, frameIndex);
 						frameIndex++;
 					}

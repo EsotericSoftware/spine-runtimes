@@ -39,6 +39,7 @@ namespace Spine {
 		internal List<BoneData> bones = new List<BoneData>();
 		internal BoneData target;
 		internal int bendDirection = 1;
+		internal bool stretch;
 		internal float mix = 1;
 
 		/// <summary>The IK constraint's name, which is unique within the skeleton.</summary>
@@ -66,6 +67,14 @@ namespace Spine {
 		public int BendDirection {
 			get { return bendDirection; }
 			set { bendDirection = value; }
+		}
+
+		/// <summary>
+		/// When true, if the target is out of range, the parent bone is scaled on the X axis to reach it. 
+		/// If the bone has local nonuniform scale, stretching is not applied.</summary>
+		public bool Stretch {
+			get { return stretch; }
+			set { stretch = value; }
 		}
 
 		public float Mix { get { return mix; } set { mix = value; } }

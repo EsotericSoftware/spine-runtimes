@@ -35,14 +35,24 @@ namespace Spine {
 		internal IkConstraintData data;
 		internal ExposedList<Bone> bones = new ExposedList<Bone>();
 		internal Bone target;
-		internal float mix;
 		internal int bendDirection;
+		internal bool stretch;
+		internal float mix;
 
 		public IkConstraintData Data { get { return data; } }
 		public int Order { get { return data.order; } }
 		public ExposedList<Bone> Bones { get { return bones; } }
 		public Bone Target { get { return target; } set { target = value; } }
 		public int BendDirection { get { return bendDirection; } set { bendDirection = value; } }
+
+		/// <summary>
+		/// When true, if the target is out of range, the parent bone is scaled on the X axis to reach it.
+		/// IF the parent bone has nonuniform scale, stretching is not applied.</summary>
+		public bool Stretch {
+			get { return stretch; }
+			set { stretch = value; }
+		}
+
 		public float Mix { get { return mix; } set { mix = value; } }
 
 		public IkConstraint (IkConstraintData data, Skeleton skeleton) {
@@ -51,6 +61,7 @@ namespace Spine {
 			this.data = data;
 			mix = data.mix;
 			bendDirection = data.bendDirection;
+			stretch = data.stretch;
 
 			bones = new ExposedList<Bone>(data.bones.Count);
 			foreach (BoneData boneData in data.bones)
@@ -68,10 +79,10 @@ namespace Spine {
 			ExposedList<Bone> bones = this.bones;
 			switch (bones.Count) {
 			case 1:
-				Apply(bones.Items[0], target.worldX, target.worldY, mix);
+				Apply(bones.Items[0], target.worldX, target.worldY, stretch, mix);
 				break;
 			case 2:
-				Apply(bones.Items[0], bones.Items[1], target.worldX, target.worldY, bendDirection, mix);
+				Apply(bones.Items[0], bones.Items[1], target.worldX, target.worldY, bendDirection, stretch, mix);
 				break;
 			}
 		}
@@ -82,7 +93,7 @@ namespace Spine {
 
 		/// <summary>Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified
 		/// in the world coordinate system.</summary>
-		static public void Apply (Bone bone, float targetX, float targetY, float alpha) {
+		static public void Apply (Bone bone, float targetX, float targetY, bool stretch, float alpha) {
 			if (!bone.appliedValid) bone.UpdateAppliedTransform();
 			Bone p = bone.parent;
 			float id = 1 / (p.a * p.d - p.b * p.c);
@@ -93,14 +104,21 @@ namespace Spine {
 			if (rotationIK > 180)
 				rotationIK -= 360;
 			else if (rotationIK < -180) rotationIK += 360;
-			bone.UpdateWorldTransform(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, bone.ascaleX, bone.ascaleY, bone.ashearX,
+
+			float sx = bone.ascaleX;
+			if (stretch) {
+				float b = bone.data.length * sx, dd = (float)Math.Sqrt(tx * tx + ty * ty);
+				if (dd > b && b > 0.0001f) sx *= (dd / b - 1) * alpha + 1;
+			}
+
+			bone.UpdateWorldTransform(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, bone.ascaleY, bone.ashearX,
 				bone.ashearY);
 		}
 
 		/// <summary>Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as
 		/// possible. The target is specified in the world coordinate system.</summary>
 		/// <param name="child">A direct descendant of the parent bone.</param>
-		static public void Apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, float alpha) {
+		static public void Apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, bool stretch, float alpha) {
 			if (alpha == 0) {
 				child.UpdateWorldTransform ();
 				return;
@@ -108,7 +126,7 @@ namespace Spine {
 			//float px = parent.x, py = parent.y, psx = parent.scaleX, psy = parent.scaleY, csx = child.scaleX;
 			if (!parent.appliedValid) parent.UpdateAppliedTransform();
 			if (!child.appliedValid) child.UpdateAppliedTransform();
-			float px = parent.ax, py = parent.ay, psx = parent.ascaleX, psy = parent.ascaleY, csx = child.ascaleX;
+			float px = parent.ax, py = parent.ay, psx = parent.ascaleX, sx = psx, psy = parent.ascaleY, csx = child.ascaleX;
 			int os1, os2, s2;
 			if (psx < 0) {
 				psx = -psx;
@@ -144,17 +162,20 @@ namespace Spine {
 			c = pp.c;
 			d = pp.d;
 			float id = 1 / (a * d - b * c), x = targetX - pp.worldX, y = targetY - pp.worldY;
-			float tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py;
+			float tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py, dd = tx * tx + ty * ty;
 			x = cwx - pp.worldX;
 			y = cwy - pp.worldY;
 			float dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
 			float l1 = (float)Math.Sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1, a2;
 			if (u) {
 				l2 *= psx;
-				float cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
+				float cos = (dd - l1 * l1 - l2 * l2) / (2 * l1 * l2);
 				if (cos < -1)
 					cos = -1;
-				else if (cos > 1) cos = 1;
+				else if (cos > 1) {
+					cos = 1;
+					if (stretch && l1 + l2 > 0.0001f) sx *= ((float)Math.Sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+				}
 				a2 = (float)Math.Acos(cos) * bendDir;
 				a = l1 + l2 * cos;
 				b = l2 * (float)Math.Sin(a2);
@@ -162,7 +183,7 @@ namespace Spine {
 			} else {
 				a = psx * l2;
 				b = psy * l2;
-				float aa = a * a, bb = b * b, dd = tx * tx + ty * ty, ta = (float)Math.Atan2(ty, tx);
+				float aa = a * a, bb = b * b, ta = (float)Math.Atan2(ty, tx);
 				c = bb * l1 * l1 + aa * dd - aa * bb;
 				float c1 = -2 * bb * l1, c2 = bb - aa;
 				d = c1 * c1 - 4 * c2 * c;
@@ -215,7 +236,7 @@ namespace Spine {
 			if (a1 > 180)
 				a1 -= 360;
 			else if (a1 < -180) a1 += 360;
-			parent.UpdateWorldTransform(px, py, rotation + a1 * alpha, parent.scaleX, parent.ascaleY, 0, 0);
+			parent.UpdateWorldTransform(px, py, rotation + a1 * alpha, sx, parent.ascaleY, 0, 0);
 			rotation = child.arotation;
 			a2 = ((a2 + os) * MathUtils.RadDeg - child.ashearX) * s2 + os2 - rotation;
 			if (a2 > 180)
