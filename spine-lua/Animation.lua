@@ -1169,14 +1169,16 @@ function Animation.DrawOrderTimeline.new (frameCount)
 end
 
 Animation.IkConstraintTimeline = {}
-Animation.IkConstraintTimeline.ENTRIES = 3
+Animation.IkConstraintTimeline.ENTRIES = 4
 function Animation.IkConstraintTimeline.new (frameCount)
 	local ENTRIES = Animation.IkConstraintTimeline.ENTRIES
-	local PREV_TIME = -3
-	local PREV_MIX = -2
-	local PREV_BEND_DIRECTION = -1
+	local PREV_TIME = -4
+	local PREV_MIX = -3
+	local PREV_BEND_DIRECTION = -2
+	local PREV_STRETCH = -1
 	local MIX = 1
 	local BEND_DIRECTION = 2
+	local STRETCH = 1
 
 	local self = Animation.CurveTimeline.new(frameCount)
 	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES) -- time, mix, bendDirection, ...
@@ -1187,11 +1189,16 @@ function Animation.IkConstraintTimeline.new (frameCount)
 		return TimelineType.ikConstraint * SHL_24 + self.ikConstraintIndex
 	end
 
-	function self:setFrame (frameIndex, time, mix, bendDirection)
+	function self:setFrame (frameIndex, time, mix, bendDirection, stretch)
 		frameIndex = frameIndex * ENTRIES
 		self.frames[frameIndex] = time
 		self.frames[frameIndex + MIX] = mix
 		self.frames[frameIndex + BEND_DIRECTION] = bendDirection
+		if (stretch) then
+			self.frames[frameIndex + STRETCH] = 1
+		else
+			self.frames[frameIndex + STRETCH] = 0
+		end
 	end
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
@@ -1202,9 +1209,11 @@ function Animation.IkConstraintTimeline.new (frameCount)
 			if blend == MixBlend.setup then
 				constraint.mix = constraint.data.mix
 				constraint.bendDirection = constraint.data.bendDirection
+				constraint.stretch = constraint.data.stretch
 			elseif blend == MixBlend.first then
 				constraint.mix = constraint.mix + (constraint.data.mix - constraint.mix) * alpha
 				constraint.bendDirection = constraint.data.bendDirection
+				constraint.stretch = constraint.data.stretch
 			end
 			return
 		end
@@ -1214,12 +1223,17 @@ function Animation.IkConstraintTimeline.new (frameCount)
 				constraint.mix = constraint.data.mix + (frames[zlen(frames) + PREV_MIX] - constraint.data.mix) * alpha
 				if direction == MixDirection.out then 
 					constraint.bendDirection = constraint.data.bendDirection
+					constraint.stretch = constraint.data.stretch
 				else
 					constraint.bendDirection = math_floor(frames[zlen(frames) + PREV_BEND_DIRECTION]);
+					if (math_floor(frames[zlen(frames) + PREV_STRETCH]) == 1) then constraint.stretch = true else constraint.stretch = false end
 				end
 			else
 				constraint.mix = constraint.mix + (frames[frames.length + PREV_MIX] - constraint.mix) * alpha;
-				if direction == MixDirection._in then constraint.bendDirection = math_floor(frames[zlen(frames) + PREV_BEND_DIRECTION]) end
+				if direction == MixDirection._in then 
+					constraint.bendDirection = math_floor(frames[zlen(frames) + PREV_BEND_DIRECTION])
+					if (math_floor(frames[zlen(frames) + PREV_STRETCH]) == 1) then constraint.stretch = true else constraint.stretch = false end
+				end
 			end
 			return
 		end
@@ -1235,12 +1249,17 @@ function Animation.IkConstraintTimeline.new (frameCount)
 			constraint.mix = constraint.data.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.data.mix) * alpha
 			if direction == MixDirection.out then
 				constraint.bendDirection = constraint.data.bendDirection
+				constraint.stretch = constraint.data.stretch
 			else
 				constraint.bendDirection = math_floor(frames[frame + PREV_BEND_DIRECTION])
+				if (math_floor(frames[frame + PREV_STRETCH]) == 1) then constraint.stretch = true else constraint.stretch = false end
 			end
 		else
 			constraint.mix = constraint.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
-			if direction == MixDirection._in then constraint.bendDirection = math_floor(frames[frame + PREV_BEND_DIRECTION]) end
+			if direction == MixDirection._in then 
+				constraint.bendDirection = math_floor(frames[frame + PREV_BEND_DIRECTION])
+				if (math_floor(frames[frame + PREV_STRETCH]) == 1) then constraint.stretch = true else constraint.stretch = false end
+			end
 		end
 	end
 
