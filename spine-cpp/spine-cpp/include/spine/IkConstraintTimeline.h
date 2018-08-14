@@ -50,11 +50,11 @@ namespace Spine {
         virtual int getPropertyId();
         
         /// Sets the time, mix and bend direction of the specified keyframe.
-        void setFrame (int frameIndex, float time, float mix, int bendDirection);
+        void setFrame (int frameIndex, float time, float mix, int bendDirection, bool stretch);
         
     private:
-        static const int PREV_TIME, PREV_MIX, PREV_BEND_DIRECTION;
-        static const int MIX, BEND_DIRECTION;
+        static const int PREV_TIME, PREV_MIX, PREV_BEND_DIRECTION, PREV_STRETCH;
+        static const int MIX, BEND_DIRECTION, STRETCH;
         
         Vector<float> _frames;
         int _ikConstraintIndex;

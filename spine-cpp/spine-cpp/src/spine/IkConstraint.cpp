@@ -40,7 +40,7 @@ using namespace Spine;
 
 RTTI_IMPL(IkConstraint, Constraint)
 
-void IkConstraint::apply(Bone &bone, float targetX, float targetY, float alpha) {
+void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool stretch, float alpha) {
 	Bone *p = bone.getParent();
 	float id, x, y, tx, ty, rotationIK;
 	if (!bone._appliedValid) bone.updateAppliedTransform();
@@ -52,16 +52,21 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, float alpha) 
 	if (bone._ascaleX < 0) rotationIK += 180;
 	if (rotationIK > 180) rotationIK -= 360;
 	else if (rotationIK < -180) rotationIK += 360;
-	bone.updateWorldTransform(bone._ax, bone._ay, bone._arotation + rotationIK * alpha, bone._ascaleX,
+	float sx = bone._ascaleX;
+	if (stretch) {
+		float dd = MathUtil::sqrt(tx * tx + ty * ty);
+		if (dd > bone._data.getLength() * sx) sx *= (dd / (bone._data.getLength() * sx) - 1) * alpha + 1;
+	}
+	bone.updateWorldTransform(bone._ax, bone._ay, bone._arotation + rotationIK * alpha, sx,
 							  bone._ascaleY, bone._ashearX, bone._ashearY);
 }
 
-void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int bendDir, float alpha) {
-	float px, py, psx, psy;
+void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int bendDir, bool stretch, float alpha) {
+	float px, py, psx, sx, psy;
 	float cx, cy, csx, cwx, cwy;
 	int o1, o2, s2, u;
 	Bone *pp = parent.getParent();
-	float tx, ty, dx, dy, l1, l2, a1, a2, r;
+	float tx, ty, dx, dy, dd, l1, l2, a1, a2, r;
 	float id, x, y;
 	if (alpha == 0) {
 		child.updateWorldTransform();
@@ -72,6 +77,7 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 	px = parent._ax;
 	py = parent._ay;
 	psx = parent._ascaleX;
+	sx = psx;
 	psy = parent._ascaleY;
 	csx = child._ascaleX;
 	if (psx < 0) {
@@ -108,6 +114,7 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 	y = targetY - pp->_worldY;
 	tx = (x * pp->_d - y * pp->_b) * id - px;
 	ty = (y * pp->_a - x * pp->_c) * id - py;
+	dd = tx * tx + ty * ty;
 	x = cwx - pp->_worldX;
 	y = cwy - pp->_worldY;
 	dx = (x * pp->_d - y * pp->_b) * id - px;
@@ -117,16 +124,19 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 	if (u) {
 		float cosine, a, b;
 		l2 *= psx;
-		cosine = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
+		cosine = (dd - l1 * l1 - l2 * l2) / (2 * l1 * l2);
 		if (cosine < -1) cosine = -1;
-		else if (cosine > 1) cosine = 1;
+		else if (cosine > 1) {
+			cosine = 1;
+			if (stretch) sx *= (MathUtil::sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+		}
 		a2 = MathUtil::acos(cosine) * bendDir;
 		a = l1 + l2 * cosine;
 		b = l2 * MathUtil::sin(a2);
 		a1 = MathUtil::atan2(ty * a - tx * b, tx * a + ty * b);
 	} else {
 		float a = psx * l2, b = psy * l2;
-		float aa = a * a, bb = b * b, ll = l1 * l1, dd = tx * tx + ty * ty, ta = MathUtil::atan2(ty, tx);
+		float aa = a * a, bb = b * b, ll = l1 * l1, ta = MathUtil::atan2(ty, tx);
 		float c0 = bb * ll + aa * dd - aa * bb, c1 = -2 * bb * l1, c2 = bb - aa;
 		float d = c1 * c1 - 4 * c2 * c0;
 		if (d >= 0) {
@@ -180,7 +190,7 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 		a1 = (a1 - os) * RAD_DEG + o1 - parent._arotation;
 		if (a1 > 180) a1 -= 360;
 		else if (a1 < -180) a1 += 360;
-		parent.updateWorldTransform(px, py, parent._rotation + a1 * alpha, parent._ascaleX, parent._ascaleY, 0, 0);
+		parent.updateWorldTransform(px, py, parent._rotation + a1 * alpha, sx, parent._ascaleY, 0, 0);
 		a2 = ((a2 + os) * RAD_DEG - child._ashearX) * s2 + o2 - child._arotation;
 		if (a2 > 180) a2 -= 360;
 		else if (a2 < -180) a2 += 360;
@@ -191,8 +201,9 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 
 IkConstraint::IkConstraint(IkConstraintData &data, Skeleton &skeleton) : Constraint(),
 																		 _data(data),
-																		 _mix(data.getMix()),
 																		 _bendDirection(data.getBendDirection()),
+																		 _stretch(data.getStretch()),
+																		 _mix(data.getMix()),
 																		 _target(skeleton.findBone(
 																				 data.getTarget()->getName())) {
 	_bones.ensureCapacity(_data.getBones().size());
@@ -211,13 +222,13 @@ void IkConstraint::update() {
 	switch (_bones.size()) {
 		case 1: {
 			Bone *bone0 = _bones[0];
-			apply(*bone0, _target->getWorldX(), _target->getWorldY(), _mix);
+			apply(*bone0, _target->getWorldX(), _target->getWorldY(), _stretch, _mix);
 		}
 			break;
 		case 2: {
 			Bone *bone0 = _bones[0];
 			Bone *bone1 = _bones[1];
-			apply(*bone0, *bone1, _target->getWorldX(), _target->getWorldY(), _bendDirection, _mix);
+			apply(*bone0, *bone1, _target->getWorldX(), _target->getWorldY(), _bendDirection, _stretch, _mix);
 		}
 			break;
 	}
@@ -257,4 +268,12 @@ float IkConstraint::getMix() {
 
 void IkConstraint::setMix(float inValue) {
 	_mix = inValue;
+}
+
+bool IkConstraint::getStretch() {
+	return _stretch;
+}
+
+void IkConstraint::setStretch(bool inValue) {
+	_stretch = inValue;
 }

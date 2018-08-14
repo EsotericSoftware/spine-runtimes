@@ -44,12 +44,14 @@ using namespace Spine;
 
 RTTI_IMPL(IkConstraintTimeline, CurveTimeline)
 
-const int IkConstraintTimeline::ENTRIES = 3;
-const int IkConstraintTimeline::PREV_TIME = -3;
-const int IkConstraintTimeline::PREV_MIX = -2;
-const int IkConstraintTimeline::PREV_BEND_DIRECTION = -1;
+const int IkConstraintTimeline::ENTRIES = 4;
+const int IkConstraintTimeline::PREV_TIME = -4;
+const int IkConstraintTimeline::PREV_MIX = -3;
+const int IkConstraintTimeline::PREV_BEND_DIRECTION = -2;
+const int IkConstraintTimeline::PREV_STRETCH = -1;
 const int IkConstraintTimeline::MIX = 1;
 const int IkConstraintTimeline::BEND_DIRECTION = 2;
+const int IkConstraintTimeline::STRETCH = 3;
 
 IkConstraintTimeline::IkConstraintTimeline(int frameCount) : CurveTimeline(frameCount), _ikConstraintIndex(0) {
 	_frames.setSize(frameCount * ENTRIES, 0);
@@ -67,10 +69,12 @@ void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time,
 			case MixBlend_Setup:
 				constraint._mix = constraint._data._mix;
 				constraint._bendDirection = constraint._data._bendDirection;
+				constraint._stretch = constraint._data._stretch;
 				return;
 			case MixBlend_First:
 				constraint._mix += (constraint._data._mix - constraint._mix) * alpha;
 				constraint._bendDirection = constraint._data._bendDirection;
+				constraint._stretch = constraint._data._stretch;
 				return;
 			default:
 				return;
@@ -82,13 +86,18 @@ void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time,
 		if (blend == MixBlend_Setup) {
 			constraint._mix =
 					constraint._data._mix + (_frames[_frames.size() + PREV_MIX] - constraint._data._mix) * alpha;
-			constraint._bendDirection = direction == MixDirection_Out ? constraint._data._bendDirection
-																	  : (int) _frames[_frames.size() +
-																					  PREV_BEND_DIRECTION];
+			if (direction == MixDirection_Out) {
+				constraint._bendDirection = constraint._data._bendDirection;
+				constraint._stretch = constraint._data._stretch;
+			} else {
+				constraint._bendDirection = (int) _frames[_frames.size() + PREV_BEND_DIRECTION];
+				constraint._stretch = _frames[_frames.size() + PREV_STRETCH] != 0;
+			}
 		} else {
 			constraint._mix += (_frames[_frames.size() + PREV_MIX] - constraint._mix) * alpha;
 			if (direction == MixDirection_In) {
 				constraint._bendDirection = (int) _frames[_frames.size() + PREV_BEND_DIRECTION];
+				constraint._stretch = _frames[_frames.size() + PREV_STRETCH] != 0;
 			}
 		}
 		return;
@@ -104,13 +113,18 @@ void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time,
 	if (blend == MixBlend_Setup) {
 		constraint._mix =
 				constraint._data._mix + (mix + (_frames[frame + MIX] - mix) * percent - constraint._data._mix) * alpha;
-		constraint._bendDirection =
-				direction == MixDirection_Out ? constraint._data._bendDirection : (int) _frames[frame +
-																								PREV_BEND_DIRECTION];
+		if (direction == MixDirection_Out) {
+			constraint._bendDirection = constraint._data._bendDirection;
+			constraint._stretch = constraint._data._stretch;
+		} else {
+			constraint._bendDirection = (int) _frames[_frames.size() + PREV_BEND_DIRECTION];
+			constraint._stretch = _frames[_frames.size() + PREV_STRETCH] != 0;
+		}
 	} else {
 		constraint._mix += (mix + (_frames[frame + MIX] - mix) * percent - constraint._mix) * alpha;
 		if (direction == MixDirection_In) {
 			constraint._bendDirection = (int) _frames[frame + PREV_BEND_DIRECTION];
+			constraint._stretch = _frames[frame + PREV_STRETCH] != 0;
 		}
 	}
 }
@@ -119,9 +133,10 @@ int IkConstraintTimeline::getPropertyId() {
 	return ((int) TimelineType_IkConstraint << 24) + _ikConstraintIndex;
 }
 
-void IkConstraintTimeline::setFrame(int frameIndex, float time, float mix, int bendDirection) {
+void IkConstraintTimeline::setFrame(int frameIndex, float time, float mix, int bendDirection, bool stretch) {
 	frameIndex *= ENTRIES;
 	_frames[frameIndex] = time;
 	_frames[frameIndex + MIX] = mix;
 	_frames[frameIndex + BEND_DIRECTION] = (float)bendDirection;
+	_frames[frameIndex + STRETCH] = stretch ? 1 : 0;
 }

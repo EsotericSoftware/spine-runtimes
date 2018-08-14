@@ -332,6 +332,38 @@ void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
 	delete drawable;
 }
 
+void stretchymanStrechyIk (SkeletonData* skeletonData, Atlas* atlas) {
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+
+	Skeleton* skeleton = drawable->skeleton;
+
+	skeleton->setPosition(100, 590);
+	skeleton->updateWorldTransform();
+
+	drawable->state->setAnimation(0, "sneak", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - Streatchyman Stretchy IK");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable->update(delta);
+
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+
+	delete drawable;
+}
+
 void coin (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
@@ -450,6 +482,7 @@ int main () {
 	SpineExtension::setInstance(&dbgExtension);
 
 	testcase(spineboy, "data/spineboy-ess.json", "data/spineboy-ess.skel", "data/spineboy.atlas", 0.6f);
+	testcase(stretchymanStrechyIk, "data/stretchyman-stretchy-ik.json", "data/stretchyman-stretchy-ik.skel", "data/stretchyman.atlas", 0.6f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor.atlas", 0.5f);
 	testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 1.0f);
 	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl.atlas", 0.5f);
@@ -459,6 +492,7 @@ int main () {
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor.atlas", 0.5f);
 	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins.atlas", 1.4f);
 	testcase(stretchyman, "data/stretchyman-pro.json", "data/stretchyman-pro.skel", "data/stretchyman.atlas", 0.6f);
+
 	dbgExtension.reportLeaks();
 	return 0;
 }

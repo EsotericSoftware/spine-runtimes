@@ -39,6 +39,7 @@ IkConstraintData::IkConstraintData(const String &name) :
 		_order(0),
 		_target(NULL),
 		_bendDirection(1),
+		_stretch(false),
 		_mix(1) {
 }
 
@@ -80,4 +81,12 @@ float IkConstraintData::getMix() {
 
 void IkConstraintData::setMix(float inValue) {
 	_mix = inValue;
+}
+
+bool IkConstraintData::getStretch() {
+	return _stretch;
+}
+
+void IkConstraintData::setStretch(bool inValue) {
+	_stretch = inValue;
 }

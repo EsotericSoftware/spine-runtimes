@@ -102,7 +102,7 @@ public:
 			T valueCopy = inValue;
 			_capacity = (int) (_size * 1.75f);
 			if (_capacity < 8) _capacity = 8;
-			_buffer = spine::SpineExtension::realloc<T>(_buffer, _capacity, __FILE__, __LINE__);
+			_buffer = Spine::SpineExtension::realloc<T>(_buffer, _capacity, __FILE__, __LINE__);
 			construct(_buffer + _size++, valueCopy);
 		} else {
 			construct(_buffer + _size++, inValue);

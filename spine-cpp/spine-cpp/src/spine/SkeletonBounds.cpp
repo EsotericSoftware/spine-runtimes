@@ -195,7 +195,7 @@ bool SkeletonBounds::intersectsSegment(Polygon *polygon, float x1, float y1, flo
 	return false;
 }
 
-spine::Polygon *SkeletonBounds::getPolygon(BoundingBoxAttachment *attachment) {
+Spine::Polygon *SkeletonBounds::getPolygon(BoundingBoxAttachment *attachment) {
 	int index = _boundingBoxes.indexOf(attachment);
 
 	return index == -1 ? NULL : _polygons[index];

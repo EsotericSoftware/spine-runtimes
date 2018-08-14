@@ -64,6 +64,9 @@ namespace Spine {
         /// Controls the bend direction of the IK bones, either 1 or -1.
         int getBendDirection();
         void setBendDirection(int inValue);
+
+        bool getStretch();
+        void setStretch(bool inValue);
         
         float getMix();
         void setMix(float inValue);
@@ -74,6 +77,7 @@ namespace Spine {
         Vector<BoneData*> _bones;
         BoneData* _target;
         int _bendDirection;
+        bool _stretch;
         float _mix;
     };
 }
