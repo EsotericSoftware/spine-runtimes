@@ -41,9 +41,23 @@ namespace Spine {
 
 		public IkConstraintData Data { get { return data; } }
 		public int Order { get { return data.order; } }
-		public ExposedList<Bone> Bones { get { return bones; } }
-		public Bone Target { get { return target; } set { target = value; } }
-		public int BendDirection { get { return bendDirection; } set { bendDirection = value; } }
+
+		/// <summary>The bones that will be modified by this IK constraint.</summary>
+		public ExposedList<Bone> Bones {
+			get { return bones; }
+		}
+
+		/// <summary>The bone that is the IK target.</summary>
+		public Bone Target {
+			get { return target; }
+			set { target = value; }
+		}
+
+		/// <summary>Controls the bend direction of the IK bones, either 1 or -1.</summary>
+		public int BendDirection {
+			get { return bendDirection; }
+			set { bendDirection = value; }
+		}
 
 		/// <summary>
 		/// When true, if the target is out of range, the parent bone is scaled on the X axis to reach it.
@@ -53,7 +67,11 @@ namespace Spine {
 			set { stretch = value; }
 		}
 
-		public float Mix { get { return mix; } set { mix = value; } }
+		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained rotations.</summary>
+		public float Mix {
+			get { return mix; }
+			set { mix = value; }
+		}
 
 		public IkConstraint (IkConstraintData data, Skeleton skeleton) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
@@ -103,14 +121,13 @@ namespace Spine {
 			if (bone.ascaleX < 0) rotationIK += 180;
 			if (rotationIK > 180)
 				rotationIK -= 360;
-			else if (rotationIK < -180) rotationIK += 360;
-
+			else if (rotationIK < -180)
+				rotationIK += 360;
 			float sx = bone.ascaleX;
 			if (stretch) {
 				float b = bone.data.length * sx, dd = (float)Math.Sqrt(tx * tx + ty * ty);
 				if (dd > b && b > 0.0001f) sx *= (dd / b - 1) * alpha + 1;
 			}
-
 			bone.UpdateWorldTransform(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, bone.ascaleY, bone.ashearX,
 				bone.ashearY);
 		}
