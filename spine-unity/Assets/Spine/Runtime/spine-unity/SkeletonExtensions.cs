@@ -503,6 +503,7 @@ namespace Spine {
 				ikc = skeleton.ikConstraints.Items[i];
 				ikc.mix = ikc.data.mix;
 				ikc.bendDirection = ikc.data.bendDirection;
+				ikc.stretch = ikc.data.stretch;
 				break;
 
 			// TransformConstraint

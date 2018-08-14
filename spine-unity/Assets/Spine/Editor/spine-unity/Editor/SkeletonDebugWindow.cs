@@ -375,6 +375,7 @@ namespace Spine.Unity.Editor {
 										EditorGUI.BeginChangeCheck();
 										c.Mix = EditorGUILayout.Slider("Mix", c.Mix, MixMin, MixMax);
 										c.BendDirection = EditorGUILayout.Toggle(SpineInspectorUtility.TempContent("Bend Clockwise", tooltip: "IkConstraint.BendDirection == 1 if clockwise; -1 if counterclockwise."), c.BendDirection > 0) ? 1 : -1;
+										c.Stretch = EditorGUILayout.Toggle(SpineInspectorUtility.TempContent("Stretch", tooltip: "Stretch the parent bone when the target is out of range. Not applied when parent bone has nonuniform scale."), c.Stretch);
 										if (EditorGUI.EndChangeCheck())	requireRepaint = true;
 
 										EditorGUILayout.Space();
