@@ -226,6 +226,7 @@ void Skeleton::setBonesToSetupPose() {
 		IkConstraint &constraint = *constraintP;
 
 		constraint._bendDirection = constraint._data._bendDirection;
+		constraint._stretch = constraint._data._stretch;
 		constraint._mix = constraint._data._mix;
 	}
 

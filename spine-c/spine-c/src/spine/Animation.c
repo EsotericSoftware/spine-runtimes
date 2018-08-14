@@ -243,7 +243,6 @@ void _spRotateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 	spBone *bone;
 	int frame;
 	float prevRotation, frameTime, percent, r;
-
 	spRotateTimeline* self = SUB_CAST(spRotateTimeline, timeline);
 
 	bone = skeleton->bones[self->boneIndex];
@@ -301,6 +300,7 @@ void _spRotateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 	UNUSED(lastTime);
 	UNUSED(firedEvents);
 	UNUSED(eventsCount);
+	UNUSED(direction);
 }
 
 int _spRotateTimeline_getPropertyId (const spTimeline* timeline) {
@@ -385,6 +385,7 @@ void _spTranslateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleto
 	UNUSED(lastTime);
 	UNUSED(firedEvents);
 	UNUSED(eventsCount);
+	UNUSED(direction);
 }
 
 int _spTranslateTimeline_getPropertyId (const spTimeline* self) {
@@ -584,6 +585,7 @@ void _spShearTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 	UNUSED(lastTime);
 	UNUSED(firedEvents);
 	UNUSED(eventsCount);
+	UNUSED(direction);
 }
 
 int _spShearTimeline_getPropertyId (const spTimeline* timeline) {
@@ -667,6 +669,7 @@ void _spColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 	UNUSED(lastTime);
 	UNUSED(firedEvents);
 	UNUSED(eventsCount);
+	UNUSED(direction);
 }
 
 int _spColorTimeline_getPropertyId (const spTimeline* timeline) {
@@ -776,6 +779,7 @@ void _spTwoColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton
 	UNUSED(lastTime);
 	UNUSED(firedEvents);
 	UNUSED(eventsCount);
+	UNUSED(direction);
 }
 
 int _spTwoColorTimeline_getPropertyId (const spTimeline* timeline) {
@@ -1083,6 +1087,7 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 	UNUSED(lastTime);
 	UNUSED(firedEvents);
 	UNUSED(eventsCount);
+	UNUSED(direction);
 }
 
 int _spDeformTimeline_getPropertyId (const spTimeline* timeline) {
@@ -1156,10 +1161,12 @@ void _spEventTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 		firedEvents[*eventsCount] = self->events[frame];
 		(*eventsCount)++;
 	}
+	UNUSED(direction);
 }
 
 int _spEventTimeline_getPropertyId (const spTimeline* timeline) {
 	return SP_TIMELINE_EVENT << 24;
+	UNUSED(timeline);
 }
 
 void _spEventTimeline_dispose (spTimeline* timeline) {
@@ -1233,6 +1240,7 @@ void _spDrawOrderTimeline_apply (const spTimeline* timeline, spSkeleton* skeleto
 
 int _spDrawOrderTimeline_getPropertyId (const spTimeline* timeline) {
 	return SP_TIMELINE_DRAWORDER << 24;
+	UNUSED(timeline);
 }
 
 void _spDrawOrderTimeline_dispose (spTimeline* timeline) {
@@ -1274,8 +1282,8 @@ void spDrawOrderTimeline_setFrame (spDrawOrderTimeline* self, int frameIndex, fl
 
 /**/
 
-static const int IKCONSTRAINT_PREV_TIME = -3, IKCONSTRAINT_PREV_MIX = -2, IKCONSTRAINT_PREV_BEND_DIRECTION = -1;
-static const int IKCONSTRAINT_MIX = 1, IKCONSTRAINT_BEND_DIRECTION = 2;
+static const int IKCONSTRAINT_PREV_TIME = -4, IKCONSTRAINT_PREV_MIX = -3, IKCONSTRAINT_PREV_BEND_DIRECTION = -2, IKCONSTRAINT_PREV_STRETCH = -1;
+static const int IKCONSTRAINT_MIX = 1, IKCONSTRAINT_BEND_DIRECTION = 2, IKCONSTRAINT_STRETCH = 3;
 
 void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time,
 		spEvent** firedEvents, int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction) {
@@ -1293,10 +1301,12 @@ void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skel
 			case SP_MIX_BLEND_SETUP:
 				constraint->mix = constraint->data->mix;
 				constraint->bendDirection = constraint->data->bendDirection;
+				constraint->stretch = constraint->data->stretch;
 				return;
 			case SP_MIX_BLEND_FIRST:
 				constraint->mix += (constraint->data->mix - constraint->mix) * alpha;
 				constraint->bendDirection = constraint->data->bendDirection;
+				constraint->stretch = constraint->data->stretch;
 			case SP_MIX_BLEND_REPLACE:
 			case SP_MIX_BLEND_ADD:
 				; /* to appease compiler */
@@ -1309,11 +1319,19 @@ void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skel
 	if (time >= frames[framesCount - IKCONSTRAINT_ENTRIES]) { /* Time is after last frame. */
 		if (blend == SP_MIX_BLEND_SETUP) {
 			constraint->mix = constraint->data->mix + (frames[framesCount + IKCONSTRAINT_PREV_MIX] - constraint->data->mix) * alpha;
-			constraint->bendDirection = direction == SP_MIX_DIRECTION_OUT ? constraint->data->bendDirection
-												 : (int)frames[framesCount + IKCONSTRAINT_PREV_BEND_DIRECTION];
+			if (direction == SP_MIX_DIRECTION_OUT) {
+				constraint->bendDirection = constraint->data->bendDirection;
+				constraint->stretch = constraint->data->stretch;
+			} else {
+				constraint->bendDirection = (int)frames[framesCount + IKCONSTRAINT_PREV_BEND_DIRECTION];
+				constraint->stretch = frames[framesCount + IKCONSTRAINT_PREV_STRETCH] ? 1 : 0;
+			}
 		} else {
 			constraint->mix += (frames[framesCount + IKCONSTRAINT_PREV_MIX] - constraint->mix) * alpha;
-			if (direction == SP_MIX_DIRECTION_IN) constraint->bendDirection = (int)frames[framesCount + IKCONSTRAINT_PREV_BEND_DIRECTION];
+			if (direction == SP_MIX_DIRECTION_IN) {
+				constraint->bendDirection = (int)frames[framesCount + IKCONSTRAINT_PREV_BEND_DIRECTION];
+				constraint->stretch = frames[framesCount + IKCONSTRAINT_PREV_STRETCH] ? 1 : 0;
+			}
 		}
 		return;
 	}
@@ -1326,10 +1344,19 @@ void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skel
 
 	if (blend == SP_MIX_BLEND_SETUP) {
 		constraint->mix = constraint->data->mix + (mix + (frames[frame + IKCONSTRAINT_MIX] - mix) * percent - constraint->data->mix) * alpha;
-		constraint->bendDirection = direction == SP_MIX_DIRECTION_OUT ? constraint->data->bendDirection : (int)frames[frame + IKCONSTRAINT_PREV_BEND_DIRECTION];
+		if (direction == SP_MIX_DIRECTION_OUT) {
+			constraint->bendDirection = constraint->data->bendDirection;
+			constraint->stretch = constraint->data->stretch;
+		} else {
+			constraint->bendDirection = (int)frames[frame + IKCONSTRAINT_PREV_BEND_DIRECTION];
+			constraint->stretch = frames[frame + IKCONSTRAINT_PREV_STRETCH] ? 1 : 0;
+		}
 	} else {
 		constraint->mix += (mix + (frames[frame + IKCONSTRAINT_MIX] - mix) * percent - constraint->mix) * alpha;
-		if (direction == SP_MIX_DIRECTION_IN) constraint->bendDirection = (int)frames[frame + IKCONSTRAINT_PREV_BEND_DIRECTION];
+		if (direction == SP_MIX_DIRECTION_IN) {
+			constraint->bendDirection = (int)frames[frame + IKCONSTRAINT_PREV_BEND_DIRECTION];
+			constraint->stretch = frames[frame + IKCONSTRAINT_PREV_STRETCH] ? 1 : 0;
+		}
 	}
 
 	UNUSED(lastTime);
@@ -1345,11 +1372,12 @@ spIkConstraintTimeline* spIkConstraintTimeline_create (int framesCount) {
 	return (spIkConstraintTimeline*)_spBaseTimeline_create(framesCount, SP_TIMELINE_IKCONSTRAINT, IKCONSTRAINT_ENTRIES, _spIkConstraintTimeline_apply, _spIkConstraintTimeline_getPropertyId);
 }
 
-void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int frameIndex, float time, float mix, int bendDirection) {
+void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int frameIndex, float time, float mix, int bendDirection, int /*boolean*/ stretch) {
 	frameIndex *= IKCONSTRAINT_ENTRIES;
 	self->frames[frameIndex] = time;
 	self->frames[frameIndex + IKCONSTRAINT_MIX] = mix;
 	self->frames[frameIndex + IKCONSTRAINT_BEND_DIRECTION] = (float)bendDirection;
+	self->frames[frameIndex + IKCONSTRAINT_STRETCH] = stretch ? 1 : 0;
 }
 
 /**/
@@ -1435,6 +1463,7 @@ void _spTransformConstraintTimeline_apply (const spTimeline* timeline, spSkeleto
 	UNUSED(lastTime);
 	UNUSED(firedEvents);
 	UNUSED(eventsCount);
+	UNUSED(direction);
 }
 
 int _spTransformConstraintTimeline_getPropertyId (const spTimeline* timeline) {
@@ -1506,6 +1535,7 @@ void _spPathConstraintPositionTimeline_apply(const spTimeline* timeline, spSkele
 	UNUSED(lastTime);
 	UNUSED(firedEvents);
 	UNUSED(eventsCount);
+	UNUSED(direction);
 }
 
 int _spPathConstraintPositionTimeline_getPropertyId (const spTimeline* timeline) {
@@ -1574,6 +1604,7 @@ void _spPathConstraintSpacingTimeline_apply(const spTimeline* timeline, spSkelet
 	UNUSED(lastTime);
 	UNUSED(firedEvents);
 	UNUSED(eventsCount);
+	UNUSED(direction);
 }
 
 int _spPathConstraintSpacingTimeline_getPropertyId (const spTimeline* timeline) {
@@ -1653,6 +1684,7 @@ void _spPathConstraintMixTimeline_apply(const spTimeline* timeline, spSkeleton* 
 	UNUSED(lastTime);
 	UNUSED(firedEvents);
 	UNUSED(eventsCount);
+	UNUSED(direction);
 }
 
 int _spPathConstraintMixTimeline_getPropertyId (const spTimeline* timeline) {
