@@ -432,7 +432,7 @@ typedef spDeformTimeline DeformTimeline;
 
 /**/
 
-static const int IKCONSTRAINT_ENTRIES = 3;
+static const int IKCONSTRAINT_ENTRIES = 4;
 
 typedef struct spIkConstraintTimeline {
 	spCurveTimeline super;
@@ -452,7 +452,7 @@ typedef struct spIkConstraintTimeline {
 
 SP_API spIkConstraintTimeline* spIkConstraintTimeline_create (int framesCount);
 
-SP_API void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int frameIndex, float time, float mix, int bendDirection);
+SP_API void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int frameIndex, float time, float mix, int bendDirection, int /**boolean**/ stretch);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spIkConstraintTimeline IkConstraintTimeline;

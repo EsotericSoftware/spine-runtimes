@@ -46,6 +46,7 @@ typedef struct spIkConstraintData {
 
 	spBoneData* target;
 	int bendDirection;
+	int /*boolean*/ stretch;
 	float mix;
 
 #ifdef __cplusplus
@@ -55,6 +56,7 @@ typedef struct spIkConstraintData {
 		bones(0),
 		target(0),
 		bendDirection(0),
+		stretch(0),
 		mix(0) {
 	}
 #endif

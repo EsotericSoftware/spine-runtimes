@@ -82,6 +82,7 @@ void spPathConstraint_apply (spPathConstraint* self) {
 	int/*bool*/tip;
 	float rotateMix = self->rotateMix, translateMix = self->translateMix;
 	int/*bool*/ translate = translateMix > 0, rotate = rotateMix > 0;
+	int lengthSpacing;
 	spPathAttachment* attachment = (spPathAttachment*)self->target->attachment;
 	spPathConstraintData* data = self->data;
 	int percentSpacing = data->spacingMode == SP_SPACING_MODE_PERCENT;
@@ -112,7 +113,7 @@ void spPathConstraint_apply (spPathConstraint* self) {
 			}
 			lengths = self->lengths;
 		}
-		int lengthSpacing = data->spacingMode == SP_SPACING_MODE_LENGTH;
+		lengthSpacing = data->spacingMode == SP_SPACING_MODE_LENGTH;
 		for (i = 0, n = spacesCount - 1; i < n;) {
 			spBone *bone = bones[i];
 			setupLength = bone->data->length;

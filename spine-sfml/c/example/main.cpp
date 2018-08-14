@@ -442,6 +442,7 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 
 int main () {
 	testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 1.0f);
+	testcase(stretchyman, "data/stretchyman-stretchy-ik.json", "data/stretchyman-stretchy-ik.skel", "data/stretchyman.atlas", 0.6f);
 	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl.atlas", 0.5f);
 	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin.atlas", 0.5f);
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine.atlas", 0.5f);

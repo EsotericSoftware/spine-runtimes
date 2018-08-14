@@ -516,6 +516,7 @@ void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* 
 	float percent;
 	float total, diff;
 	int /*boolean*/ current, dir;
+	UNUSED(self);
 
 	if (firstFrame) timelinesRotation[i] = 0;
 

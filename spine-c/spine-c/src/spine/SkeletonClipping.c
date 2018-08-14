@@ -310,4 +310,5 @@ void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices,
 			}
 		}
 	}
+	UNUSED(verticesLength);
 }
