@@ -54,8 +54,8 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool stretch,
 	else if (rotationIK < -180) rotationIK += 360;
 	float sx = bone._ascaleX;
 	if (stretch) {
-		float dd = MathUtil::sqrt(tx * tx + ty * ty);
-		if (dd > bone._data.getLength() * sx) sx *= (dd / (bone._data.getLength() * sx) - 1) * alpha + 1;
+		float b = bone._data.getLength() * sx, dd = MathUtil::sqrt(tx * tx + ty * ty);
+		if (dd > b && b > 0.0001f) sx *= (dd / b - 1) * alpha + 1;
 	}
 	bone.updateWorldTransform(bone._ax, bone._ay, bone._arotation + rotationIK * alpha, sx,
 							  bone._ascaleY, bone._ashearX, bone._ashearY);
@@ -128,7 +128,7 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 		if (cosine < -1) cosine = -1;
 		else if (cosine > 1) {
 			cosine = 1;
-			if (stretch) sx *= (MathUtil::sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+			if (stretch && l1 + l2 > 0.0001f) sx *= (MathUtil::sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
 		}
 		a2 = MathUtil::acos(cosine) * bendDir;
 		a = l1 + l2 * cosine;
