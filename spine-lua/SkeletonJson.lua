@@ -165,6 +165,7 @@ function SkeletonJson.new (attachmentLoader)
 				if not data.target then error("Target bone not found: " .. targetName) end
 
 				if constraintMap["bendPositive"] == false then data.bendDirection = -1 else data.bendDirection = 1 end
+				if constraintMap["stretch"] == false then data.stretch = false else data.stretch = true end
 				data.mix = getValue(constraintMap, "mix", 1)
 
 				table_insert(skeletonData.ikConstraints, data)
@@ -612,7 +613,9 @@ function SkeletonJson.new (attachmentLoader)
 					if valueMap["mix"] ~= nil then mix = valueMap["mix"] end
 					local bendPositive = 1
 					if valueMap["bendPositive"] == false then bendPositive = -1 end
-					timeline:setFrame(frameIndex, valueMap["time"], mix, bendPositive)
+					local stretch = true
+					if valueMap["stretch"] == false then stretch = false end
+					timeline:setFrame(frameIndex, valueMap["time"], mix, bendPositive, stretch)
 					readCurve(valueMap, timeline, frameIndex)
 					frameIndex = frameIndex + 1
 				end
