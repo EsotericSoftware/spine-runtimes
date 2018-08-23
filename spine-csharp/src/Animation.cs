@@ -1210,15 +1210,15 @@ namespace Spine {
 	}
 
 	public class IkConstraintTimeline : CurveTimeline {
-		public const int ENTRIES = 4;
-		private const int PREV_TIME = -4, PREV_MIX = -3, PREV_BEND_DIRECTION = -2, PREV_STRETCH = -1;
-		private const int MIX = 1, BEND_DIRECTION = 2, STRETCH = 3;
+		public const int ENTRIES = 5;
+		private const int PREV_TIME = -5, PREV_MIX = -4, PREV_BEND_DIRECTION = -3, PREV_COMPRESS = -2, PREV_STRETCH = -1;
+		private const int MIX = 1, BEND_DIRECTION = 2, COMPRESS = 3, STRETCH = 4;
 
 		internal int ikConstraintIndex;
 		internal float[] frames;
 
 		public int IkConstraintIndex { get { return ikConstraintIndex; } set { ikConstraintIndex = value; } }
-		public float[] Frames { get { return frames; } set { frames = value; } } // time, mix, bendDirection, ...
+		public float[] Frames { get { return frames; } set { frames = value; } } // time, mix, bendDirection, compress, stretch ...
 
 		override public int PropertyId {
 			get { return ((int)TimelineType.IkConstraint << 24) + ikConstraintIndex; }
@@ -1229,12 +1229,13 @@ namespace Spine {
 			frames = new float[frameCount * ENTRIES];
 		}
 			
-		/// <summary>Sets the time, mix and bend direction of the specified keyframe.</summary>
-		public void SetFrame (int frameIndex, float time, float mix, int bendDirection, bool stretch) {
+		/// <summary>Sets the time, mix, bend direction, compress and stretch of the specified keyframe.</summary>
+		public void SetFrame (int frameIndex, float time, float mix, int bendDirection, bool compress, bool stretch) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;
 			frames[frameIndex + MIX] = mix;
 			frames[frameIndex + BEND_DIRECTION] = bendDirection;
+			frames[frameIndex + COMPRESS] = compress ? 1 : 0;
 			frames[frameIndex + STRETCH] = stretch ? 1 : 0;
 		}
 
@@ -1246,11 +1247,13 @@ namespace Spine {
 				case MixBlend.Setup:
 					constraint.mix = constraint.data.mix;
 					constraint.bendDirection = constraint.data.bendDirection;
+					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
 					return;
 				case MixBlend.First:
 					constraint.mix += (constraint.data.mix - constraint.mix) * alpha;
 					constraint.bendDirection = constraint.data.bendDirection;
+					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
 					return;
 				}
@@ -1262,15 +1265,18 @@ namespace Spine {
 					constraint.mix = constraint.data.mix + (frames[frames.Length + PREV_MIX] - constraint.data.mix) * alpha;
 					if (direction == MixDirection.Out) {
 						constraint.bendDirection = constraint.data.bendDirection;
+						constraint.compress = constraint.data.compress;
 						constraint.stretch = constraint.data.stretch;
 					} else {
 						constraint.bendDirection = (int)frames[frames.Length + PREV_BEND_DIRECTION];
+						constraint.compress = frames[frames.Length + PREV_COMPRESS] != 0;
 						constraint.stretch = frames[frames.Length + PREV_STRETCH] != 0;
 					}
 				} else {
 					constraint.mix += (frames[frames.Length + PREV_MIX] - constraint.mix) * alpha;
 					if (direction == MixDirection.In) {
 						constraint.bendDirection = (int)frames[frames.Length + PREV_BEND_DIRECTION];
+						constraint.compress = frames[frames.Length + PREV_COMPRESS] != 0;
 						constraint.stretch = frames[frames.Length + PREV_STRETCH] != 0;
 					}
 				}
@@ -1285,10 +1291,22 @@ namespace Spine {
 
 			if (blend == MixBlend.Setup) {
 				constraint.mix = constraint.data.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.data.mix) * alpha;
-				constraint.bendDirection = direction == MixDirection.Out ? constraint.data.bendDirection : (int)frames[frame + PREV_BEND_DIRECTION];
+				if (direction == MixDirection.Out) {
+					constraint.bendDirection = constraint.data.bendDirection;
+					constraint.compress = constraint.data.compress;
+					constraint.stretch = constraint.data.stretch;
+				} else {
+					constraint.bendDirection = (int)frames[frame + PREV_BEND_DIRECTION];
+					constraint.compress = frames[frame + PREV_COMPRESS] != 0;
+					constraint.stretch = frames[frame + PREV_STRETCH] != 0;
+				}
 			} else {
 				constraint.mix += (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
-				if (direction == MixDirection.In) constraint.bendDirection = (int)frames[frame + PREV_BEND_DIRECTION];
+				if (direction == MixDirection.In) {
+					constraint.bendDirection = (int)frames[frame + PREV_BEND_DIRECTION];
+					constraint.compress = frames[frame + PREV_COMPRESS] != 0;
+					constraint.stretch = frames[frame + PREV_STRETCH] != 0;
+				}
 			}
 		}
 	}

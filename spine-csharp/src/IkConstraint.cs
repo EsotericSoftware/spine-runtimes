@@ -36,7 +36,7 @@ namespace Spine {
 		internal ExposedList<Bone> bones = new ExposedList<Bone>();
 		internal Bone target;
 		internal int bendDirection;
-		internal bool stretch;
+		internal bool compress, stretch;
 		internal float mix;
 
 		public IkConstraintData Data { get { return data; } }
@@ -60,8 +60,16 @@ namespace Spine {
 		}
 
 		/// <summary>
+		/// When true and only a single bone is being constrained, 
+		/// if the target is too close, the bone is scaled to reach it.</summary>
+		public bool Compress {
+			get { return compress; }
+			set { compress = value; }
+		}
+
+		/// <summary>
 		/// When true, if the target is out of range, the parent bone is scaled on the X axis to reach it.
-		/// IF the parent bone has nonuniform scale, stretching is not applied.</summary>
+		/// If the parent bone has nonuniform scale, stretching is not applied.</summary>
 		public bool Stretch {
 			get { return stretch; }
 			set { stretch = value; }
@@ -79,6 +87,7 @@ namespace Spine {
 			this.data = data;
 			mix = data.mix;
 			bendDirection = data.bendDirection;
+			compress = data.compress;
 			stretch = data.stretch;
 
 			bones = new ExposedList<Bone>(data.bones.Count);
@@ -97,7 +106,7 @@ namespace Spine {
 			ExposedList<Bone> bones = this.bones;
 			switch (bones.Count) {
 			case 1:
-				Apply(bones.Items[0], target.worldX, target.worldY, stretch, mix);
+				Apply(bones.Items[0], target.worldX, target.worldY, compress, stretch, data.uniform, mix);
 				break;
 			case 2:
 				Apply(bones.Items[0], bones.Items[1], target.worldX, target.worldY, bendDirection, stretch, mix);
@@ -109,9 +118,8 @@ namespace Spine {
 			return data.name;
 		}
 
-		/// <summary>Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified
-		/// in the world coordinate system.</summary>
-		static public void Apply (Bone bone, float targetX, float targetY, bool stretch, float alpha) {
+		/// <summary>Applies 1 bone IK. The target is specified in the world coordinate system.</summary>
+		static public void Apply (Bone bone, float targetX, float targetY, bool compress, bool stretch, bool uniform, float alpha) {
 			if (!bone.appliedValid) bone.UpdateAppliedTransform();
 			Bone p = bone.parent;
 			float id = 1 / (p.a * p.d - p.b * p.c);
@@ -121,14 +129,18 @@ namespace Spine {
 			if (bone.ascaleX < 0) rotationIK += 180;
 			if (rotationIK > 180)
 				rotationIK -= 360;
-			else if (rotationIK < -180)
+			else if (rotationIK < -180) //
 				rotationIK += 360;
-			float sx = bone.ascaleX;
-			if (stretch) {
+			float sx = bone.ascaleX, sy = bone.ascaleY;
+			if (compress || stretch) {
 				float b = bone.data.length * sx, dd = (float)Math.Sqrt(tx * tx + ty * ty);
-				if (dd > b && b > 0.0001f) sx *= (dd / b - 1) * alpha + 1;
+				if ((compress && dd < b) || (stretch && dd > b) && b > 0.0001f) {
+					float s = (dd / b - 1) * alpha + 1;
+					sx *= s;
+					if (uniform) sy *= s;
+				}
 			}
-			bone.UpdateWorldTransform(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, bone.ascaleY, bone.ashearX,
+			bone.UpdateWorldTransform(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX,
 				bone.ashearY);
 		}
 
