@@ -436,6 +436,7 @@ void spSkeleton_setBonesToSetupPose (const spSkeleton* self) {
 	for (i = 0; i < self->ikConstraintsCount; ++i) {
 		spIkConstraint* ikConstraint = self->ikConstraints[i];
 		ikConstraint->bendDirection = ikConstraint->data->bendDirection;
+		ikConstraint->compress = ikConstraint->data->compress;
 		ikConstraint->stretch = ikConstraint->data->stretch;
 		ikConstraint->mix = ikConstraint->data->mix;
 	}

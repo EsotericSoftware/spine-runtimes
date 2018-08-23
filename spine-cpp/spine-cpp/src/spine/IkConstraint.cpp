@@ -40,7 +40,7 @@ using namespace Spine;
 
 RTTI_IMPL(IkConstraint, Constraint)
 
-void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool stretch, float alpha) {
+void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress, bool stretch, bool uniform, float alpha) {
 	Bone *p = bone.getParent();
 	float id, x, y, tx, ty, rotationIK;
 	if (!bone._appliedValid) bone.updateAppliedTransform();
@@ -53,12 +53,17 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool stretch,
 	if (rotationIK > 180) rotationIK -= 360;
 	else if (rotationIK < -180) rotationIK += 360;
 	float sx = bone._ascaleX;
-	if (stretch) {
+	float sy = bone._ascaleY;
+	if (compress || stretch) {
 		float b = bone._data.getLength() * sx, dd = MathUtil::sqrt(tx * tx + ty * ty);
-		if (dd > b && b > 0.0001f) sx *= (dd / b - 1) * alpha + 1;
+		if ((compress && dd < b) || (stretch && dd > b) && b > 0.0001f) {
+			float s = (dd / b - 1) * alpha + 1;
+			sx *= s;
+			if (uniform) sy *= s;
+		}
 	}
 	bone.updateWorldTransform(bone._ax, bone._ay, bone._arotation + rotationIK * alpha, sx,
-							  bone._ascaleY, bone._ashearX, bone._ashearY);
+							  sy, bone._ashearX, bone._ashearY);
 }
 
 void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int bendDir, bool stretch, float alpha) {
@@ -202,6 +207,7 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 IkConstraint::IkConstraint(IkConstraintData &data, Skeleton &skeleton) : Constraint(),
 																		 _data(data),
 																		 _bendDirection(data.getBendDirection()),
+																		 _compress(data.getCompress()),
 																		 _stretch(data.getStretch()),
 																		 _mix(data.getMix()),
 																		 _target(skeleton.findBone(
@@ -222,7 +228,7 @@ void IkConstraint::update() {
 	switch (_bones.size()) {
 		case 1: {
 			Bone *bone0 = _bones[0];
-			apply(*bone0, _target->getWorldX(), _target->getWorldY(), _stretch, _mix);
+			apply(*bone0, _target->getWorldX(), _target->getWorldY(), _compress, _stretch, _data._uniform, _mix);
 		}
 			break;
 		case 2: {
@@ -276,4 +282,12 @@ bool IkConstraint::getStretch() {
 
 void IkConstraint::setStretch(bool inValue) {
 	_stretch = inValue;
+}
+
+bool IkConstraint::getCompress() {
+	return _compress;
+}
+
+void IkConstraint::setCompress(bool inValue) {
+	_compress = inValue;
 }

@@ -554,11 +554,11 @@ void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* 
 	/* Mix between rotations using the direction of the shortest route on the first frame while detecting crosses. */
 	r1 = blend == SP_MIX_BLEND_SETUP ? bone->data->rotation : bone->rotation;
 	diff = r2 - r1;
+	diff -= (16384 - (int)(16384.499999999996 - diff / 360)) * 360;
 	if (diff == 0) {
 		total = timelinesRotation[i];
 	} else {
 		float lastTotal, lastDiff;
-		diff -= (16384 - (int)(16384.499999999996 - diff / 360)) * 360;
 		if (firstFrame) {
 			lastTotal = 0;
 			lastDiff = diff;

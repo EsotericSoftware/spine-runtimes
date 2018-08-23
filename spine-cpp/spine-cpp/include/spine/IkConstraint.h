@@ -52,7 +52,7 @@ RTTI_DECL
 public:
 	/// Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified
 	/// in the world coordinate system.
-	static void apply(Bone &bone, float targetX, float targetY, bool stretch, float alpha);
+	static void apply(Bone &bone, float targetX, float targetY, bool compress, bool stretch, bool uniform, float alpha);
 
 	/// Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as
 	/// possible. The target is specified in the world coordinate system.
@@ -80,6 +80,10 @@ public:
 
 	void setBendDirection(int inValue);
 
+	bool getCompress();
+
+	void setCompress(bool inValue);
+
 	bool getStretch();
 
 	void setStretch(bool inValue);
@@ -92,6 +96,7 @@ private:
 	IkConstraintData &_data;
 	Vector<Bone *> _bones;
 	int _bendDirection;
+	bool _compress;
 	bool _stretch;
 	float _mix;
 	Bone *_target;

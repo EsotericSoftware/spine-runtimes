@@ -39,7 +39,9 @@ IkConstraintData::IkConstraintData(const String &name) :
 		_order(0),
 		_target(NULL),
 		_bendDirection(1),
+		_compress(false),
 		_stretch(false),
+		_uniform(false),
 		_mix(1) {
 }
 
@@ -89,4 +91,21 @@ bool IkConstraintData::getStretch() {
 
 void IkConstraintData::setStretch(bool inValue) {
 	_stretch = inValue;
+}
+
+bool IkConstraintData::getCompress() {
+	return _compress;
+}
+
+void IkConstraintData::setCompress(bool inValue) {
+	_compress = inValue;
+}
+
+
+bool IkConstraintData::getUniform() {
+	return _uniform;
+}
+
+void IkConstraintData::setUniform(bool inValue) {
+	_uniform = inValue;
 }
