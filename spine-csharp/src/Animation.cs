@@ -1210,9 +1210,9 @@ namespace Spine {
 	}
 
 	public class IkConstraintTimeline : CurveTimeline {
-		public const int ENTRIES = 3;
-		private const int PREV_TIME = -3, PREV_MIX = -2, PREV_BEND_DIRECTION = -1;
-		private const int MIX = 1, BEND_DIRECTION = 2;
+		public const int ENTRIES = 4;
+		private const int PREV_TIME = -4, PREV_MIX = -3, PREV_BEND_DIRECTION = -2, PREV_STRETCH = -1;
+		private const int MIX = 1, BEND_DIRECTION = 2, STRETCH = 3;
 
 		internal int ikConstraintIndex;
 		internal float[] frames;
@@ -1230,11 +1230,12 @@ namespace Spine {
 		}
 			
 		/// <summary>Sets the time, mix and bend direction of the specified keyframe.</summary>
-		public void SetFrame (int frameIndex, float time, float mix, int bendDirection) {
+		public void SetFrame (int frameIndex, float time, float mix, int bendDirection, bool stretch) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;
 			frames[frameIndex + MIX] = mix;
 			frames[frameIndex + BEND_DIRECTION] = bendDirection;
+			frames[frameIndex + STRETCH] = stretch ? 1 : 0;
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend, MixDirection direction) {
@@ -1245,10 +1246,12 @@ namespace Spine {
 				case MixBlend.Setup:
 					constraint.mix = constraint.data.mix;
 					constraint.bendDirection = constraint.data.bendDirection;
+					constraint.stretch = constraint.data.stretch;
 					return;
 				case MixBlend.First:
 					constraint.mix += (constraint.data.mix - constraint.mix) * alpha;
 					constraint.bendDirection = constraint.data.bendDirection;
+					constraint.stretch = constraint.data.stretch;
 					return;
 				}
 				return;
@@ -1257,11 +1260,19 @@ namespace Spine {
 			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
 				if (blend == MixBlend.Setup) {
 					constraint.mix = constraint.data.mix + (frames[frames.Length + PREV_MIX] - constraint.data.mix) * alpha;
-					constraint.bendDirection = direction == MixDirection.Out ? constraint.data.bendDirection
-						: (int)frames[frames.Length + PREV_BEND_DIRECTION];
+					if (direction == MixDirection.Out) {
+						constraint.bendDirection = constraint.data.bendDirection;
+						constraint.stretch = constraint.data.stretch;
+					} else {
+						constraint.bendDirection = (int)frames[frames.Length + PREV_BEND_DIRECTION];
+						constraint.stretch = frames[frames.Length + PREV_STRETCH] != 0;
+					}
 				} else {
 					constraint.mix += (frames[frames.Length + PREV_MIX] - constraint.mix) * alpha;
-					if (direction == MixDirection.In) constraint.bendDirection = (int)frames[frames.Length + PREV_BEND_DIRECTION];
+					if (direction == MixDirection.In) {
+						constraint.bendDirection = (int)frames[frames.Length + PREV_BEND_DIRECTION];
+						constraint.stretch = frames[frames.Length + PREV_STRETCH] != 0;
+					}
 				}
 				return;
 			}

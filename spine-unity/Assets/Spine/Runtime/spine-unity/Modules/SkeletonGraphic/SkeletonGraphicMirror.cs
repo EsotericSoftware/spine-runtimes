@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
  * Spine Runtimes Software License v2.5
  *
  * Copyright (c) 2013-2016, Esoteric Software
@@ -49,7 +49,8 @@ namespace Spine.Unity.Modules {
 		}
 
 		void Start () {
-			if (mirrorOnStart) StartMirroring();
+			if (mirrorOnStart)
+				StartMirroring();
 		}
 
 		void LateUpdate () {
@@ -57,13 +58,16 @@ namespace Spine.Unity.Modules {
 		}
 
 		void OnDisable () {
-			if (restoreOnDisable) RestoreIndependentSkeleton();
+			if (restoreOnDisable)
+				RestoreIndependentSkeleton();
 		}
 
 		/// <summary>Freeze the SkeletonGraphic on this GameObject, and use the source as the Skeleton to be rendered by the SkeletonGraphic.</summary>
 		public void StartMirroring () {
-			if (source == null) return;
-			if (skeletonGraphic == null) return;
+			if (source == null)
+				return;
+			if (skeletonGraphic == null)
+				return;
 
 			skeletonGraphic.startingAnimation = string.Empty;
 

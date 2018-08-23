@@ -35,17 +35,23 @@ using System.Collections;
 
 namespace Spine.Unity.Modules {
 	public class SkeletonGhostRenderer : MonoBehaviour {
+		static readonly Color32 TransparentBlack = new Color32(0, 0, 0, 0);
+		const string colorPropertyName = "_Color";
 
-		public float fadeSpeed = 10;
-
-		Color32[] colors;
-		Color32 black = new Color32(0, 0, 0, 0);
+		float fadeSpeed = 10;
+		Color32 startColor;
 		MeshFilter meshFilter;
 		MeshRenderer meshRenderer;
+
+		MaterialPropertyBlock mpb;
+		int colorId;
 
 		void Awake () {
 			meshRenderer = gameObject.AddComponent<MeshRenderer>();
 			meshFilter = gameObject.AddComponent<MeshFilter>();
+
+			colorId = Shader.PropertyToID(colorPropertyName);
+			mpb = new MaterialPropertyBlock();
 		}
 
 		public void Initialize (Mesh mesh, Material[] materials, Color32 color, bool additive, float speed, int sortingLayerID, int sortingOrder) {
@@ -56,12 +62,9 @@ namespace Spine.Unity.Modules {
 			meshRenderer.sortingLayerID = sortingLayerID;
 			meshRenderer.sortingOrder = sortingOrder;
 			meshFilter.sharedMesh = Instantiate(mesh);
-			colors = meshFilter.sharedMesh.colors32;
-
-			if ((color.a + color.r + color.g + color.b) > 0) {
-				for (int i = 0; i < colors.Length; i++)
-					colors[i] = color;
-			}
+			startColor = color;
+			mpb.SetColor(colorId, color);
+			meshRenderer.SetPropertyBlock(mpb);
 
 			fadeSpeed = speed;
 
@@ -72,19 +75,17 @@ namespace Spine.Unity.Modules {
 		}
 
 		IEnumerator Fade () {
-			Color32 c;
-			for (int t = 0; t < 500; t++) {
-				bool breakout = true;
-				for (int i = 0; i < colors.Length; i++) {
-					c = colors[i];
-					if (c.a > 0)
-						breakout = false;
+			Color32 c = startColor;
+			Color32 black = SkeletonGhostRenderer.TransparentBlack;
 
-					colors[i] = Color32.Lerp(c, black, Time.deltaTime * fadeSpeed);
-				}
-				meshFilter.sharedMesh.colors32 = colors;
+			float t = 1f;
+			for (float hardTimeLimit = 5f; hardTimeLimit > 0; hardTimeLimit -= Time.deltaTime) {
+				c = Color32.Lerp(black, startColor, t);
+				mpb.SetColor(colorId, c);
+				meshRenderer.SetPropertyBlock(mpb);
 
-				if (breakout)
+				t = Mathf.Lerp(t, 0, Time.deltaTime * fadeSpeed);
+				if (t <= 0)
 					break;
 				
 				yield return null;
@@ -95,25 +96,20 @@ namespace Spine.Unity.Modules {
 		}
 
 		IEnumerator FadeAdditive () {
-			Color32 c;
-			Color32 black = this.black;
+			Color32 c = startColor;
+			Color32 black = SkeletonGhostRenderer.TransparentBlack;
 
-			for (int t = 0; t < 500; t++) {
+			float t = 1f;
+			
+			for (float hardTimeLimit = 5f; hardTimeLimit > 0; hardTimeLimit -= Time.deltaTime) {
+				c = Color32.Lerp(black, startColor, t);
+				mpb.SetColor(colorId, c);
+				meshRenderer.SetPropertyBlock(mpb);
 
-				bool breakout = true;
-				for (int i = 0; i < colors.Length; i++) {
-					c = colors[i];
-					black.a = c.a;
-					if (c.r > 0 || c.g > 0 || c.b > 0)
-						breakout = false;
-
-					colors[i] = Color32.Lerp(c, black, Time.deltaTime * fadeSpeed);
-				}
-
-				meshFilter.sharedMesh.colors32 = colors;
-
-				if (breakout)
+				t = Mathf.Lerp(t, 0, Time.deltaTime * fadeSpeed);
+				if (t <= 0)
 					break;
+
 				yield return null;
 			}
 

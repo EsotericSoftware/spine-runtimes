@@ -334,10 +334,10 @@ namespace Spine {
 			// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
 			float r1 = pose == MixBlend.Setup ? bone.data.rotation : bone.rotation;
 			float total, diff = r2 - r1;
+			diff -= (16384 - (int)(16384.499999999996 - diff / 360)) * 360;
 			if (diff == 0) {
 				total = timelinesRotation[i];
 			} else {
-				diff -= (16384 - (int)(16384.499999999996 - diff / 360)) * 360;
 				float lastTotal, lastDiff;
 				if (firstFrame) {
 					lastTotal = 0;

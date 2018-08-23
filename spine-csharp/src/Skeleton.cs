@@ -309,6 +309,7 @@ namespace Spine {
 			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
 				IkConstraint constraint = ikConstraintsItems[i];
 				constraint.bendDirection = constraint.data.bendDirection;
+				constraint.stretch = constraint.data.stretch;
 				constraint.mix = constraint.data.mix;
 			}
 

@@ -45,10 +45,9 @@ namespace Spine.Unity.Modules {
 		public bool ghostingEnabled = true;
 		[Tooltip("The time between invididual ghost pieces being spawned.")]
 		[UnityEngine.Serialization.FormerlySerializedAs("spawnRate")]
-		public float spawnInterval = 0.05f;
+		public float spawnInterval = 1f/30f;
 		[Tooltip("Maximum number of ghosts that can exist at a time. If the fade speed is not fast enough, the oldest ghost will immediately disappear to enforce the maximum number.")]
 		public int maximumGhosts = 10;
-		[Tooltip("Fadespeed 1 means it will take 1 second for a piece to fade out. 2 means it will take 1/2 second. 10 means it will take 1/10 of a second.")]
 		public float fadeSpeed = 10;
 
 		[Header("Rendering")]

@@ -43,7 +43,7 @@ public class IkConstraint implements Constraint {
 	final Array<Bone> bones;
 	Bone target;
 	int bendDirection;
-	boolean stretch;
+	boolean compress, stretch;
 	float mix = 1;
 
 	public IkConstraint (IkConstraintData data, Skeleton skeleton) {
@@ -52,6 +52,7 @@ public class IkConstraint implements Constraint {
 		this.data = data;
 		mix = data.mix;
 		bendDirection = data.bendDirection;
+		compress = data.compress;
 		stretch = data.stretch;
 
 		bones = new Array(data.bones.size);
@@ -71,6 +72,7 @@ public class IkConstraint implements Constraint {
 		target = skeleton.bones.get(constraint.target.data.index);
 		mix = constraint.mix;
 		bendDirection = constraint.bendDirection;
+		compress = constraint.compress;
 		stretch = constraint.stretch;
 	}
 
@@ -84,7 +86,7 @@ public class IkConstraint implements Constraint {
 		Array<Bone> bones = this.bones;
 		switch (bones.size) {
 		case 1:
-			apply(bones.first(), target.worldX, target.worldY, stretch, mix);
+			apply(bones.first(), target.worldX, target.worldY, compress, stretch, data.uniform, mix);
 			break;
 		case 2:
 			apply(bones.first(), bones.get(1), target.worldX, target.worldY, bendDirection, stretch, mix);
@@ -128,8 +130,17 @@ public class IkConstraint implements Constraint {
 		this.bendDirection = bendDirection;
 	}
 
-	/** When true, if the target is out of range, the parent bone is scaled on the X axis to reach it. If the parent bone has local
-	 * nonuniform scale, stretching is not applied. */
+	/** When true and only a single bone is being constrained, if the target is too close, the bone is scaled to reach it. */
+	public boolean getCompress () {
+		return compress;
+	}
+
+	public void setCompress (boolean compress) {
+		this.compress = compress;
+	}
+
+	/** When true, if the target is out of range, the parent bone is scaled to reach it. If more than one bone is being constrained
+	 * and the parent bone has local nonuniform scale, stretch is not applied. */
 	public boolean getStretch () {
 		return stretch;
 	}
@@ -148,7 +159,8 @@ public class IkConstraint implements Constraint {
 	}
 
 	/** Applies 1 bone IK. The target is specified in the world coordinate system. */
-	static public void apply (Bone bone, float targetX, float targetY, boolean stretch, float alpha) {
+	static public void apply (Bone bone, float targetX, float targetY, boolean compress, boolean stretch, boolean uniform,
+		float alpha) {
 		if (!bone.appliedValid) bone.updateAppliedTransform();
 		Bone p = bone.parent;
 		float id = 1 / (p.a * p.d - p.b * p.c);
@@ -158,14 +170,18 @@ public class IkConstraint implements Constraint {
 		if (bone.ascaleX < 0) rotationIK += 180;
 		if (rotationIK > 180)
 			rotationIK -= 360;
-		else if (rotationIK < -180) rotationIK += 360;
-		float sx = bone.ascaleX;
-		if (stretch) {
+		else if (rotationIK < -180) //
+			rotationIK += 360;
+		float sx = bone.ascaleX, sy = bone.ascaleY;
+		if (compress || stretch) {
 			float b = bone.data.length * sx, dd = (float)Math.sqrt(tx * tx + ty * ty);
-			if (dd > b && b > 0.0001f) sx *= (dd / b - 1) * alpha + 1;
+			if ((compress && dd < b) || (stretch && dd > b) && b > 0.0001f) {
+				float s = (dd / b - 1) * alpha + 1;
+				sx *= s;
+				if (uniform) sy *= s;
+			}
 		}
-		bone.updateWorldTransform(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, bone.ascaleY, bone.ashearX,
-			bone.ashearY);
+		bone.updateWorldTransform(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX, bone.ashearY);
 	}
 
 	/** Applies 2 bone IK. The target is specified in the world coordinate system.

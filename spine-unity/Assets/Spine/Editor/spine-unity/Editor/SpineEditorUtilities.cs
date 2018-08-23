@@ -905,7 +905,7 @@ namespace Spine.Unity.Editor {
 						}
 
 						if (!match)
-							Debug.LogWarningFormat("Skeleton '{0}' (exported with Spine {1}) may be incompatible with your runtime version: spine-unity v{2}", asset.name, rawVersion, primaryRuntimeVersionDebugString);
+							Debug.LogWarningFormat("Skeleton '{0}' (exported with Spine {1}) may be incompatible with your runtime version: spine-csharp v{2}", asset.name, rawVersion, primaryRuntimeVersionDebugString);
 					}
 				}
 

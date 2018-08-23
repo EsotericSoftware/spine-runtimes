@@ -210,6 +210,7 @@ namespace Spine {
 				data.target = skeletonData.bones.Items[ReadVarint(input, true)];
 				data.mix = ReadFloat(input);
 				data.bendDirection = ReadSByte(input);
+				data.stretch = ReadBoolean(input);
 				skeletonData.ikConstraints.Add(data);
 			}
 
@@ -648,7 +649,7 @@ namespace Spine {
 				IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount);
 				timeline.ikConstraintIndex = index;
 				for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-					timeline.SetFrame(frameIndex, ReadFloat(input), ReadFloat(input), ReadSByte(input));
+					timeline.SetFrame(frameIndex, ReadFloat(input), ReadFloat(input), ReadSByte(input), ReadBoolean(input));
 					if (frameIndex < frameCount - 1) ReadCurve(input, frameIndex, timeline);
 				}
 				timelines.Add(timeline);
