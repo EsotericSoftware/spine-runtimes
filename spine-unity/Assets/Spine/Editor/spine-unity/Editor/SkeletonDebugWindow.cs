@@ -371,12 +371,16 @@ namespace Spine.Unity.Editor {
 									foreach (var c in skeleton.IkConstraints) {
 										EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(c.Data.Name, Icons.constraintIK));
 										FalseDropDown("Goal", c.Data.Target.Name, Icons.bone, true);
+										using (new EditorGUI.DisabledGroupScope(true)) {
+											EditorGUILayout.Toggle(SpineInspectorUtility.TempContent("Data.Uniform", tooltip: "Uniformly scales a bone when Ik stretches or compresses."), c.Data.Uniform);
+										}
 
 										EditorGUI.BeginChangeCheck();
 										c.Mix = EditorGUILayout.Slider("Mix", c.Mix, MixMin, MixMax);
 										c.BendDirection = EditorGUILayout.Toggle(SpineInspectorUtility.TempContent("Bend Clockwise", tooltip: "IkConstraint.BendDirection == 1 if clockwise; -1 if counterclockwise."), c.BendDirection > 0) ? 1 : -1;
+										c.Compress = EditorGUILayout.Toggle(SpineInspectorUtility.TempContent("Compress", tooltip: "Compress single bone IK when the target too close. Not applied when parent bone has nonuniform scale."), c.Compress);
 										c.Stretch = EditorGUILayout.Toggle(SpineInspectorUtility.TempContent("Stretch", tooltip: "Stretch the parent bone when the target is out of range. Not applied when parent bone has nonuniform scale."), c.Stretch);
-										if (EditorGUI.EndChangeCheck())	requireRepaint = true;
+										if (EditorGUI.EndChangeCheck()) requireRepaint = true;
 
 										EditorGUILayout.Space();
 									}
