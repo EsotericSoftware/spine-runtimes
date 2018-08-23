@@ -164,9 +164,11 @@ function SkeletonJson.new (attachmentLoader)
 				data.target = skeletonData:findBone(targetName)
 				if not data.target then error("Target bone not found: " .. targetName) end
 
-				if constraintMap["bendPositive"] == false then data.bendDirection = -1 else data.bendDirection = 1 end
-				if constraintMap["stretch"] == false then data.stretch = false else data.stretch = true end
 				data.mix = getValue(constraintMap, "mix", 1)
+				if constraintMap["bendPositive"] == nil or constraintMap["bendPositive"] == false then data.bendDirection = -1 else data.bendDirection = 1 end
+				if constraintMap["compress"] == nil or constraintMap["compress"] == false then data.compress = false else data.compress = true end
+				if constraintMap["stretch"] == nil  or constraintMap["stretch"] == false then data.stretch = false else data.stretch = true end
+				if constraintMap["uniform"] == nil or  constraintMap["uniform"] == false then data.uniform = false else data.uniform = true end
 
 				table_insert(skeletonData.ikConstraints, data)
 			end
@@ -613,9 +615,11 @@ function SkeletonJson.new (attachmentLoader)
 					if valueMap["mix"] ~= nil then mix = valueMap["mix"] end
 					local bendPositive = 1
 					if valueMap["bendPositive"] == false then bendPositive = -1 end
-					local stretch = true
-					if valueMap["stretch"] == false then stretch = false end
-					timeline:setFrame(frameIndex, valueMap["time"], mix, bendPositive, stretch)
+					local stretch = false
+					if valueMap["stretch"] ~= nil then stretch = valueMap["stretch"] end
+					local compress = false
+					if valueMap["compress"] ~= nil then compress = valueMap["compress"] end
+					timeline:setFrame(frameIndex, valueMap["time"], mix, bendPositive, compress, stretch)
 					readCurve(valueMap, timeline, frameIndex)
 					frameIndex = frameIndex + 1
 				end
