@@ -394,9 +394,10 @@ public class Skeleton {
 		Array<IkConstraint> ikConstraints = this.ikConstraints;
 		for (int i = 0, n = ikConstraints.size; i < n; i++) {
 			IkConstraint constraint = ikConstraints.get(i);
-			constraint.bendDirection = constraint.data.bendDirection;
-			constraint.stretch = constraint.data.stretch;
 			constraint.mix = constraint.data.mix;
+			constraint.bendDirection = constraint.data.bendDirection;
+			constraint.compress = constraint.data.compress;
+			constraint.stretch = constraint.data.stretch;
 		}
 
 		Array<TransformConstraint> transformConstraints = this.transformConstraints;

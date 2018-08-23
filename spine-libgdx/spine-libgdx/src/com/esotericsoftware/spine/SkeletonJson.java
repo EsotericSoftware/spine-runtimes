@@ -185,9 +185,11 @@ public class SkeletonJson {
 			data.target = skeletonData.findBone(targetName);
 			if (data.target == null) throw new SerializationException("IK target bone not found: " + targetName);
 
-			data.bendDirection = constraintMap.getBoolean("bendPositive", true) ? 1 : -1;
-			data.stretch = constraintMap.getBoolean("stretch", false);
 			data.mix = constraintMap.getFloat("mix", 1);
+			data.bendDirection = constraintMap.getBoolean("bendPositive", true) ? 1 : -1;
+			data.compress = constraintMap.getBoolean("compress", false);
+			data.stretch = constraintMap.getBoolean("stretch", false);
+			data.uniform = constraintMap.getBoolean("uniform", false);
 
 			skeletonData.ikConstraints.add(data);
 		}
@@ -569,7 +571,8 @@ public class SkeletonJson {
 			int frameIndex = 0;
 			for (JsonValue valueMap = constraintMap.child; valueMap != null; valueMap = valueMap.next) {
 				timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getFloat("mix", 1),
-					valueMap.getBoolean("bendPositive", true) ? 1 : -1, valueMap.getBoolean("stretch", false));
+					valueMap.getBoolean("bendPositive", true) ? 1 : -1, valueMap.getBoolean("compress", false),
+					valueMap.getBoolean("stretch", false));
 				readCurve(valueMap, timeline, frameIndex);
 				frameIndex++;
 			}
