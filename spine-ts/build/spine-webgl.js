@@ -981,11 +981,13 @@ var spine;
                     case MixBlend.setup:
                         constraint.mix = constraint.data.mix;
                         constraint.bendDirection = constraint.data.bendDirection;
+                        constraint.compress = constraint.data.compress;
                         constraint.stretch = constraint.data.stretch;
                         return;
                     case MixBlend.first:
                         constraint.mix += (constraint.data.mix - constraint.mix) * alpha;
                         constraint.bendDirection = constraint.data.bendDirection;
+                        constraint.compress = constraint.data.compress;
                         constraint.stretch = constraint.data.stretch;
                 }
                 return;
@@ -995,10 +997,12 @@ var spine;
                     constraint.mix = constraint.data.mix + (frames[frames.length + IkConstraintTimeline.PREV_MIX] - constraint.data.mix) * alpha;
                     if (direction == MixDirection.out) {
                         constraint.bendDirection = constraint.data.bendDirection;
+                        constraint.compress = constraint.data.compress;
                         constraint.stretch = constraint.data.stretch;
                     }
                     else {
                         constraint.bendDirection = frames[frames.length + IkConstraintTimeline.PREV_BEND_DIRECTION];
+                        constraint.compress = frames[frames.length + IkConstraintTimeline.PREV_COMPRESS] != 0;
                         constraint.stretch = frames[frames.length + IkConstraintTimeline.PREV_STRETCH] != 0;
                     }
                 }
@@ -1006,6 +1010,7 @@ var spine;
                     constraint.mix += (frames[frames.length + IkConstraintTimeline.PREV_MIX] - constraint.mix) * alpha;
                     if (direction == MixDirection["in"]) {
                         constraint.bendDirection = frames[frames.length + IkConstraintTimeline.PREV_BEND_DIRECTION];
+                        constraint.compress = frames[frames.length + IkConstraintTimeline.PREV_COMPRESS] != 0;
                         constraint.stretch = frames[frames.length + IkConstraintTimeline.PREV_STRETCH] != 0;
                     }
                 }
@@ -1019,10 +1024,12 @@ var spine;
                 constraint.mix = constraint.data.mix + (mix + (frames[frame + IkConstraintTimeline.MIX] - mix) * percent - constraint.data.mix) * alpha;
                 if (direction == MixDirection.out) {
                     constraint.bendDirection = constraint.data.bendDirection;
+                    constraint.compress = constraint.data.compress;
                     constraint.stretch = constraint.data.stretch;
                 }
                 else {
                     constraint.bendDirection = frames[frame + IkConstraintTimeline.PREV_BEND_DIRECTION];
+                    constraint.compress = frames[frame + IkConstraintTimeline.PREV_COMPRESS] != 0;
                     constraint.stretch = frames[frame + IkConstraintTimeline.PREV_STRETCH] != 0;
                 }
             }
@@ -1030,6 +1037,7 @@ var spine;
                 constraint.mix += (mix + (frames[frame + IkConstraintTimeline.MIX] - mix) * percent - constraint.mix) * alpha;
                 if (direction == MixDirection["in"]) {
                     constraint.bendDirection = frames[frame + IkConstraintTimeline.PREV_BEND_DIRECTION];
+                    constraint.compress = frames[frame + IkConstraintTimeline.PREV_COMPRESS] != 0;
                     constraint.stretch = frames[frame + IkConstraintTimeline.PREV_STRETCH] != 0;
                 }
             }
