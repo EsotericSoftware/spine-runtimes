@@ -39,6 +39,7 @@ spIkConstraint *spIkConstraint_create(spIkConstraintData *data, const spSkeleton
 	spIkConstraint *self = NEW(spIkConstraint);
 	CONST_CAST(spIkConstraintData*, self->data) = data;
 	self->bendDirection = data->bendDirection;
+	self->compress = data->compress;
 	self->stretch = data->stretch;
 	self->mix = data->mix;
 
@@ -59,7 +60,7 @@ void spIkConstraint_dispose(spIkConstraint *self) {
 void spIkConstraint_apply(spIkConstraint *self) {
 	switch (self->bonesCount) {
 		case 1:
-			spIkConstraint_apply1(self->bones[0], self->target->worldX, self->target->worldY, self->stretch, self->mix);
+			spIkConstraint_apply1(self->bones[0], self->target->worldX, self->target->worldY, self->compress, self->stretch, self->data->uniform, self->mix);
 			break;
 		case 2:
 			spIkConstraint_apply2(self->bones[0], self->bones[1], self->target->worldX, self->target->worldY, self->bendDirection, self->stretch, self->mix);
@@ -67,9 +68,9 @@ void spIkConstraint_apply(spIkConstraint *self) {
 	}
 }
 
-void spIkConstraint_apply1 (spBone* bone, float targetX, float targetY, int /*boolean*/ stretch, float alpha) {
+void spIkConstraint_apply1 (spBone* bone, float targetX, float targetY, int /*boolean*/ compress, int /*boolean*/ stretch, int /*boolean*/ uniform, float alpha) {
 	spBone* p = bone->parent;
-	float id, x, y, tx, ty, rotationIK, sx;
+	float id, x, y, tx, ty, rotationIK, sx, sy, s;
 	if (!bone->appliedValid) spBone_updateAppliedTransform(bone);
 	id = 1 / (p->a * p->d - p->b * p->c);
 	x = targetX - p->worldX, y = targetY - p->worldY;
@@ -79,12 +80,17 @@ void spIkConstraint_apply1 (spBone* bone, float targetX, float targetY, int /*bo
 	if (rotationIK > 180) rotationIK -= 360;
 	else if (rotationIK < -180) rotationIK += 360;
 	sx = bone->ascaleX;
-	if (stretch) {
+	sy = bone->ascaleY;
+	if (compress || stretch) {
 		float b = bone->data->length * sx, dd = SQRT(tx * tx + ty * ty);
-		if (dd > b && b > 0.0001f) sx *= (dd / b - 1) * alpha - 1;
+		if ((compress && dd < b) || (stretch && dd > b) && (b > 0.0001f)) {
+			s = (dd / b - 1) * alpha + 1;
+			sx *= s;
+			if (uniform) sy *= s;
+		}
 	}
 	spBone_updateWorldTransformWith(bone, bone->ax, bone->ay, bone->arotation + rotationIK * alpha, sx,
-		bone->ascaleY, bone->ashearX, bone->ashearY);
+		sy, bone->ashearX, bone->ashearY);
 }
 
 void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float targetY, int bendDir, int /*boolean*/ stretch, float alpha) {

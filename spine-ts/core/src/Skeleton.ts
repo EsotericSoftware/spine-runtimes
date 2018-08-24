@@ -286,9 +286,10 @@ module spine {
 			let ikConstraints = this.ikConstraints;
 			for (let i = 0, n = ikConstraints.length; i < n; i++) {
 				let constraint = ikConstraints[i];
-				constraint.bendDirection = constraint.data.bendDirection;
-				constraint.stretch = constraint.data.stretch;
 				constraint.mix = constraint.data.mix;
+				constraint.bendDirection = constraint.data.bendDirection;
+				constraint.compress = constraint.data.compress;
+				constraint.stretch = constraint.data.stretch;
 			}
 
 			let transformConstraints = this.transformConstraints;

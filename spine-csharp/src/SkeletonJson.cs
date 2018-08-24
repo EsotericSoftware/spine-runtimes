@@ -180,10 +180,11 @@ namespace Spine {
 					string targetName = (string)constraintMap["target"];
 					data.target = skeletonData.FindBone(targetName);
 					if (data.target == null) throw new Exception("Target bone not found: " + targetName);
-
-					data.bendDirection = GetBoolean(constraintMap, "bendPositive", true) ? 1 : -1;
-					data.stretch = GetBoolean(constraintMap, "stretch", false);
 					data.mix = GetFloat(constraintMap, "mix", 1);
+					data.bendDirection = GetBoolean(constraintMap, "bendPositive", true) ? 1 : -1;
+					data.compress = GetBoolean(constraintMap, "compress", false);
+					data.stretch = GetBoolean(constraintMap, "stretch", false);
+					data.uniform = GetBoolean(constraintMap, "uniform", false);
 
 					skeletonData.ikConstraints.Add(data);
 				}
@@ -595,11 +596,14 @@ namespace Spine {
 					timeline.ikConstraintIndex = skeletonData.ikConstraints.IndexOf(constraint);
 					int frameIndex = 0;
 					foreach (Dictionary<string, Object> valueMap in values) {
-						float time = (float)valueMap["time"];
-						float mix = GetFloat(valueMap, "mix", 1);
-						bool bendPositive = GetBoolean(valueMap, "bendPositive", true);
-						bool stretch = GetBoolean(valueMap, "stretch", false);
-						timeline.SetFrame(frameIndex, time, mix, bendPositive ? 1 : -1, stretch);
+						timeline.SetFrame(
+							frameIndex,
+							(float)valueMap["time"],
+							GetFloat(valueMap, "mix", 1),
+							GetBoolean(valueMap, "bendPositive", true) ? 1 : -1,
+							GetBoolean(valueMap, "compress", true),
+							GetBoolean(valueMap, "stretch", false)
+						);
 						ReadCurve(valueMap, timeline, frameIndex);
 						frameIndex++;
 					}

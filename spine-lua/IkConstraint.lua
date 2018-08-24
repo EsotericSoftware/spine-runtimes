@@ -52,6 +52,7 @@ function IkConstraint.new (data, skeleton)
 		bones = {},
 		target = nil,
 		mix = data.mix,
+		compress = data.compress,
 		stretch = data.stretch,
 		bendDirection = data.bendDirection,
 	}
@@ -75,13 +76,13 @@ function IkConstraint:update ()
 	local bones = self.bones
 	local boneCount = #bones
 	if boneCount == 1 then
-		self:apply1(bones[1], target.worldX, target.worldY, self.stretch, self.mix)
+		self:apply1(bones[1], target.worldX, target.worldY, self.compress, self.stretch, self.data.uniform, self.mix)
 	elseif boneCount == 2 then
 		self:apply2(bones[1], bones[2], target.worldX, target.worldY, self.bendDirection, self.stretch, self.mix)
 	end
 end
 
-function IkConstraint:apply1 (bone, targetX, targetY, stretch, alpha)
+function IkConstraint:apply1 (bone, targetX, targetY, compress, stretch, uniform, alpha)
 	if not bone.appliedValid then bone:updateAppliedTransform() end
 	local p = bone.parent
 	local id = 1 / (p.a * p.d - p.b * p.c)
@@ -97,11 +98,17 @@ function IkConstraint:apply1 (bone, targetX, targetY, stretch, alpha)
 		rotationIK = rotationIK + 360
 	end
 	local sx = bone.ascaleX
-	if stretch then
+	local sy = bone.ascaleY
+	if compress or stretch then
+		local b = bone.data.length * sx
 		local dd = math_sqrt(tx * tx + ty * ty)
-		if dd > bone.data.length * sx then sx = sx * ((dd / (bone.data.length * sx) - 1) * alpha + 1) end
+		if (compress and dd < b) or (stretch and dd > b) and b > 0.0001 then
+			local s = (dd / b - 1) * alpha + 1
+			sx = sx * s
+			if uniform then sy = sy * s end
+		end
 	end
-	bone:updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, bone.ascaleY, bone.ashearX, bone.ashearY)
+	bone:updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX, bone.ashearY)
 end
 
 function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch, alpha)

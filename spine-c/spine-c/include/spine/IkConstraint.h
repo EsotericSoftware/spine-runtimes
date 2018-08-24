@@ -49,6 +49,7 @@ typedef struct spIkConstraint {
 
 	spBone* target;
 	int bendDirection;
+	int /*boolean*/ compress;
 	int /*boolean*/ stretch;
 	float mix;
 
@@ -70,7 +71,7 @@ SP_API void spIkConstraint_dispose (spIkConstraint* self);
 
 SP_API void spIkConstraint_apply (spIkConstraint* self);
 
-SP_API void spIkConstraint_apply1 (spBone* bone, float targetX, float targetY, int /*boolean*/ stretch, float alpha);
+SP_API void spIkConstraint_apply1 (spBone* bone, float targetX, float targetY, int /*boolean*/ compress, int /*boolean*/ stretch, int /*boolean*/ uniform, float alpha);
 SP_API void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float targetY, int bendDirection, int /*boolean*/ stretch, float alpha);
 
 #ifdef SPINE_SHORT_NAMES

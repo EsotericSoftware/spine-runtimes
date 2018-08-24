@@ -543,10 +543,10 @@ function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, bl
   if blend == MixBlend.setup then r1 = bone.data.rotation end
   local total = 0
   local diff = r2 - r1
+	diff = diff - (16384 - math_floor(16384.499999999996 - diff / 360)) * 360
   if diff == 0 then
     total = timelinesRotation[i]
   else
-    diff = diff - (16384 - math_floor(16384.499999999996 - diff / 360)) * 360
     local lastTotal = 0
     local lastDiff = 0
     if firstFrame then

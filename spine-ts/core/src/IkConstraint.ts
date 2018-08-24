@@ -34,6 +34,7 @@ module spine {
 		bones: Array<Bone>;
 		target: Bone;
 		bendDirection = 0;
+		compress = false;
 		stretch = false;
 		mix = 1;
 
@@ -43,6 +44,7 @@ module spine {
 			this.data = data;
 			this.mix = data.mix;
 			this.bendDirection = data.bendDirection;
+			this.compress = data.compress;
 			this.stretch = data.stretch;
 
 			this.bones = new Array<Bone>();
@@ -64,7 +66,7 @@ module spine {
 			let bones = this.bones;
 			switch (bones.length) {
 			case 1:
-				this.apply1(bones[0], target.worldX, target.worldY, this.stretch, this.mix);
+				this.apply1(bones[0], target.worldX, target.worldY, this.compress, this.stretch, this.data.uniform, this.mix);
 				break;
 			case 2:
 				this.apply2(bones[0], bones[1], target.worldX, target.worldY, this.bendDirection, this.stretch, this.mix);
@@ -74,7 +76,7 @@ module spine {
 
 		/** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
 		 * coordinate system. */
-		apply1 (bone: Bone, targetX: number, targetY: number, stretch: boolean, alpha: number) {
+		apply1 (bone: Bone, targetX: number, targetY: number, compress: boolean, stretch: boolean, uniform: boolean, alpha: number) {
 			if (!bone.appliedValid) bone.updateAppliedTransform();
 			let p = bone.parent;
 			let id = 1 / (p.a * p.d - p.b * p.c);
@@ -85,12 +87,16 @@ module spine {
 			if (rotationIK > 180)
 				rotationIK -= 360;
 			else if (rotationIK < -180) rotationIK += 360;
-			let sx = bone.ascaleX;
-			if (stretch) {
+			let sx = bone.ascaleX, sy = bone.ascaleY;
+			if (compress || stretch) {
 				let b = bone.data.length * sx, dd = Math.sqrt(tx * tx + ty * ty);
-				if (dd > b && b > 0.0001) sx *= (dd / b - 1) * alpha + 1;
+				if ((compress && dd < b) || (stretch && dd > b) && b > 0.0001) {
+					let s = (dd / b - 1) * alpha + 1;
+					sx *= s;
+					if (uniform) sy *= s;
+				}
 			}
-			bone.updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, bone.ascaleY, bone.ashearX,
+			bone.updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX,
 				bone.ashearY);
 		}
 

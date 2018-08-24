@@ -1037,12 +1037,12 @@ module spine {
 	}
 
 	export class IkConstraintTimeline extends CurveTimeline {
-		static ENTRIES = 4;
-		static PREV_TIME = -4; static PREV_MIX = -3; static PREV_BEND_DIRECTION = -2; static PREV_STRETCH = -1;
-		static MIX = 1; static BEND_DIRECTION = 2; static STRETCH = 3;
+		static ENTRIES = 5;
+		static PREV_TIME = -5; static PREV_MIX = -4; static PREV_BEND_DIRECTION = -3; static PREV_COMPRESS = -2; static PREV_STRETCH = -1;
+		static MIX = 1; static BEND_DIRECTION = 2; static COMPRESS = 3; static STRETCH = 4;
 
 		ikConstraintIndex: number;
-		frames: ArrayLike<number>; // time, mix, bendDirection, ...
+		frames: ArrayLike<number>; // time, mix, bendDirection, compress, stretch, ...
 
 		constructor (frameCount: number) {
 			super(frameCount);
@@ -1054,11 +1054,12 @@ module spine {
 		}
 
 		/** Sets the time, mix and bend direction of the specified keyframe. */
-		setFrame (frameIndex: number, time: number, mix: number, bendDirection: number, stretch: boolean) {
+		setFrame (frameIndex: number, time: number, mix: number, bendDirection: number, compress: boolean, stretch: boolean) {
 			frameIndex *= IkConstraintTimeline.ENTRIES;
 			this.frames[frameIndex] = time;
 			this.frames[frameIndex + IkConstraintTimeline.MIX] = mix;
 			this.frames[frameIndex + IkConstraintTimeline.BEND_DIRECTION] = bendDirection;
+			this.frames[frameIndex + IkConstraintTimeline.COMPRESS] = compress ? 1 : 0;
 			this.frames[frameIndex + IkConstraintTimeline.STRETCH] = stretch ? 1 : 0;
 		}
 
@@ -1070,11 +1071,13 @@ module spine {
 				case MixBlend.setup:
 					constraint.mix = constraint.data.mix;
 					constraint.bendDirection = constraint.data.bendDirection;
+					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
 					return;
 				case MixBlend.first:
 					constraint.mix += (constraint.data.mix - constraint.mix) * alpha;
 					constraint.bendDirection = constraint.data.bendDirection;
+					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
 				}
 				return;
@@ -1085,15 +1088,18 @@ module spine {
 					constraint.mix = constraint.data.mix + (frames[frames.length + IkConstraintTimeline.PREV_MIX] - constraint.data.mix) * alpha;
 					if (direction == MixDirection.out) {
 						constraint.bendDirection = constraint.data.bendDirection;
+						constraint.compress = constraint.data.compress;
 						constraint.stretch = constraint.data.stretch;
 					} else {
 						constraint.bendDirection = frames[frames.length + IkConstraintTimeline.PREV_BEND_DIRECTION]
+						constraint.compress = frames[frames.length + IkConstraintTimeline.PREV_COMPRESS] != 0;
 						constraint.stretch = frames[frames.length + IkConstraintTimeline.PREV_STRETCH] != 0;
 					}
 				} else {
 					constraint.mix += (frames[frames.length + IkConstraintTimeline.PREV_MIX] - constraint.mix) * alpha;
 					if (direction == MixDirection.in) {
 						constraint.bendDirection = frames[frames.length + IkConstraintTimeline.PREV_BEND_DIRECTION];
+						constraint.compress = frames[frames.length + IkConstraintTimeline.PREV_COMPRESS] != 0;
 						constraint.stretch = frames[frames.length + IkConstraintTimeline.PREV_STRETCH] != 0;
 					}
 				}
@@ -1111,15 +1117,18 @@ module spine {
 				constraint.mix = constraint.data.mix + (mix + (frames[frame + IkConstraintTimeline.MIX] - mix) * percent - constraint.data.mix) * alpha;
 				if (direction == MixDirection.out) {
 					constraint.bendDirection = constraint.data.bendDirection;
+					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
 				} else {
 					constraint.bendDirection = frames[frame + IkConstraintTimeline.PREV_BEND_DIRECTION];
+					constraint.compress = frames[frame + IkConstraintTimeline.PREV_COMPRESS] != 0;
 					constraint.stretch = frames[frame + IkConstraintTimeline.PREV_STRETCH] != 0;
 				}
 			} else {
 				constraint.mix += (mix + (frames[frame + IkConstraintTimeline.MIX] - mix) * percent - constraint.mix) * alpha;
 				if (direction == MixDirection.in) {
 					constraint.bendDirection = frames[frame + IkConstraintTimeline.PREV_BEND_DIRECTION];
+					constraint.compress = frames[frame + IkConstraintTimeline.PREV_COMPRESS] != 0;
 					constraint.stretch = frames[frame + IkConstraintTimeline.PREV_STRETCH] != 0;
 				}
 			}

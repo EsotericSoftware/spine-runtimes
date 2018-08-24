@@ -65,8 +65,14 @@ namespace spine {
         int getBendDirection();
         void setBendDirection(int inValue);
 
+        bool getCompress();
+        void setCompress(bool inValue);
+
         bool getStretch();
         void setStretch(bool inValue);
+
+        bool getUniform();
+        void setUniform(bool inValue);
         
         float getMix();
         void setMix(float inValue);
@@ -77,7 +83,9 @@ namespace spine {
         Vector<BoneData*> _bones;
         BoneData* _target;
         int _bendDirection;
+        bool _compress;
         bool _stretch;
+        bool _uniform;
         float _mix;
     };
 }

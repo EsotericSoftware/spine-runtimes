@@ -1169,19 +1169,21 @@ function Animation.DrawOrderTimeline.new (frameCount)
 end
 
 Animation.IkConstraintTimeline = {}
-Animation.IkConstraintTimeline.ENTRIES = 4
+Animation.IkConstraintTimeline.ENTRIES = 5
 function Animation.IkConstraintTimeline.new (frameCount)
 	local ENTRIES = Animation.IkConstraintTimeline.ENTRIES
-	local PREV_TIME = -4
-	local PREV_MIX = -3
-	local PREV_BEND_DIRECTION = -2
+	local PREV_TIME = -5
+	local PREV_MIX = -4
+	local PREV_BEND_DIRECTION = -3
+	local PREV_COMPRESS = -2
 	local PREV_STRETCH = -1
 	local MIX = 1
 	local BEND_DIRECTION = 2
+	local COMPRESS = 3
 	local STRETCH = 1
 
 	local self = Animation.CurveTimeline.new(frameCount)
-	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES) -- time, mix, bendDirection, ...
+	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES) -- time, mix, bendDirection, compress, stretch, ...
 	self.ikConstraintIndex = -1
 	self.type = TimelineType.ikConstraint
 	
@@ -1189,11 +1191,16 @@ function Animation.IkConstraintTimeline.new (frameCount)
 		return TimelineType.ikConstraint * SHL_24 + self.ikConstraintIndex
 	end
 
-	function self:setFrame (frameIndex, time, mix, bendDirection, stretch)
+	function self:setFrame (frameIndex, time, mix, bendDirection, compress, stretch)
 		frameIndex = frameIndex * ENTRIES
 		self.frames[frameIndex] = time
 		self.frames[frameIndex + MIX] = mix
 		self.frames[frameIndex + BEND_DIRECTION] = bendDirection
+		if (compress) then
+			self.frames[frameIndex + COMPRESS] = 1
+		else
+			self.frames[frameIndex + COMPRESS] = 0
+		end
 		if (stretch) then
 			self.frames[frameIndex + STRETCH] = 1
 		else
@@ -1209,10 +1216,12 @@ function Animation.IkConstraintTimeline.new (frameCount)
 			if blend == MixBlend.setup then
 				constraint.mix = constraint.data.mix
 				constraint.bendDirection = constraint.data.bendDirection
+				constraint.compress = constraint.data.compress
 				constraint.stretch = constraint.data.stretch
 			elseif blend == MixBlend.first then
 				constraint.mix = constraint.mix + (constraint.data.mix - constraint.mix) * alpha
 				constraint.bendDirection = constraint.data.bendDirection
+				constraint.compress = constraint.data.compress
 				constraint.stretch = constraint.data.stretch
 			end
 			return
@@ -1223,15 +1232,18 @@ function Animation.IkConstraintTimeline.new (frameCount)
 				constraint.mix = constraint.data.mix + (frames[zlen(frames) + PREV_MIX] - constraint.data.mix) * alpha
 				if direction == MixDirection.out then 
 					constraint.bendDirection = constraint.data.bendDirection
+					constraint.compress = constraint.data.compress
 					constraint.stretch = constraint.data.stretch
 				else
 					constraint.bendDirection = math_floor(frames[zlen(frames) + PREV_BEND_DIRECTION]);
+					if (math_floor(frames[zlen(frames) + PREV_COMPRESS]) == 1) then constraint.compress = true else constraint.compress = false end
 					if (math_floor(frames[zlen(frames) + PREV_STRETCH]) == 1) then constraint.stretch = true else constraint.stretch = false end
 				end
 			else
 				constraint.mix = constraint.mix + (frames[frames.length + PREV_MIX] - constraint.mix) * alpha;
 				if direction == MixDirection._in then 
 					constraint.bendDirection = math_floor(frames[zlen(frames) + PREV_BEND_DIRECTION])
+					if (math_floor(frames[zlen(frames) + PREV_COMPRES]) == 1) then constraint.compress = true else constraint.compress = false end
 					if (math_floor(frames[zlen(frames) + PREV_STRETCH]) == 1) then constraint.stretch = true else constraint.stretch = false end
 				end
 			end
@@ -1249,15 +1261,18 @@ function Animation.IkConstraintTimeline.new (frameCount)
 			constraint.mix = constraint.data.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.data.mix) * alpha
 			if direction == MixDirection.out then
 				constraint.bendDirection = constraint.data.bendDirection
+				constraint.compress = constraint.data.compress
 				constraint.stretch = constraint.data.stretch
 			else
 				constraint.bendDirection = math_floor(frames[frame + PREV_BEND_DIRECTION])
+				if (math_floor(frames[frame + PREV_COMPRESS]) == 1) then constraint.compress = true else constraint.compress = false end
 				if (math_floor(frames[frame + PREV_STRETCH]) == 1) then constraint.stretch = true else constraint.stretch = false end
 			end
 		else
 			constraint.mix = constraint.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
 			if direction == MixDirection._in then 
 				constraint.bendDirection = math_floor(frames[frame + PREV_BEND_DIRECTION])
+				if (math_floor(frames[frame + PREV_COMPRESS]) == 1) then constraint.compress = true else constraint.compress = false end
 				if (math_floor(frames[frame + PREV_STRETCH]) == 1) then constraint.stretch = true else constraint.stretch = false end
 			end
 		end

@@ -285,9 +285,11 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				return NULL;
 			}
 
-			data->_bendDirection = Json::getInt(constraintMap, "bendPositive", 1) ? 1 : -1;
-			data->_stretch = Json::getInt(constraintMap, "stretch", 0) ? true: false;
 			data->_mix = Json::getFloat(constraintMap, "mix", 1);
+			data->_bendDirection = Json::getInt(constraintMap, "bendPositive", 1) ? 1 : -1;
+			data->_compress = Json::getInt(constraintMap, "compress", 0) ? true: false;
+			data->_stretch = Json::getInt(constraintMap, "stretch", 0) ? true: false;
+			data->_uniform = Json::getInt(constraintMap, "uniform", 0) ? true: false;
 
 			skeletonData->_ikConstraints[i] = data;
 		}
@@ -932,7 +934,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 		}
 		for (valueMap = constraintMap->_child, frameIndex = 0; valueMap; valueMap = valueMap->_next, ++frameIndex) {
 			timeline->setFrame(frameIndex, Json::getFloat(valueMap, "time", 0), Json::getFloat(valueMap, "mix", 1),
-							   Json::getInt(valueMap, "bendPositive", 1) ? 1 : -1, Json::getInt(valueMap, "stretch", 0) ? true : false);
+							   Json::getInt(valueMap, "bendPositive", 1) ? 1 : -1, Json::getInt(valueMap, "compress", 0) ? true : false, Json::getInt(valueMap, "stretch", 0) ? true : false);
 			readCurve(valueMap, timeline, frameIndex);
 		}
 		timelines.add(timeline);
