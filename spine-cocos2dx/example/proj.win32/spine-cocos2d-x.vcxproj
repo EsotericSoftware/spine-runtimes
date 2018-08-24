@@ -148,6 +148,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Animation.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\AnimationState.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\AnimationStateData.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Array.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Atlas.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\AtlasAttachmentLoader.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Attachment.c" />
@@ -155,6 +156,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Bone.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\BoneData.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\BoundingBoxAttachment.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\ClippingAttachment.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Color.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Event.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\EventData.c" />
@@ -171,6 +173,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Skeleton.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\SkeletonBinary.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\SkeletonBounds.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\SkeletonClipping.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\SkeletonData.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\SkeletonJson.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Skin.c" />
@@ -178,6 +181,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\SlotData.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\TransformConstraint.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\TransformConstraintData.c" />
+    <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Triangulator.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\VertexAttachment.c" />
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\VertexEffect.c" />
     <ClCompile Include="..\..\src\spine\AttachmentVertices.cpp" />
@@ -189,9 +193,10 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\..\src\spine\spine-cocos2dx.cpp" />
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
     <ClCompile Include="..\Classes\BatchingExample.cpp" />
+    <ClCompile Include="..\Classes\CoinExample.cpp" />
     <ClCompile Include="..\Classes\GoblinsExample.cpp" />
     <ClCompile Include="..\Classes\RaptorExample.cpp" />
-    <ClCompile Include="..\Classes\SimpleCommand.cpp" />
+    <ClCompile Include="..\Classes\SkeletonRendererSeparatorExample.cpp" />
     <ClCompile Include="..\Classes\SpineboyExample.cpp" />
     <ClCompile Include="..\Classes\TankExample.cpp" />
     <ClCompile Include="main.cpp" />
@@ -204,13 +209,15 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\..\src\spine\SkeletonAnimation.h" />
     <ClInclude Include="..\..\src\spine\SkeletonBatch.h" />
     <ClInclude Include="..\..\src\spine\SkeletonRenderer.h" />
+    <ClInclude Include="..\..\src\spine\SkeletonTwoColorBatch.h" />
     <ClInclude Include="..\..\src\spine\spine-cocos2dx.h" />
     <ClInclude Include="..\Classes\AppDelegate.h" />
     <ClInclude Include="..\Classes\AppMacros.h" />
     <ClInclude Include="..\Classes\BatchingExample.h" />
+    <ClInclude Include="..\Classes\CoinExample.h" />
     <ClInclude Include="..\Classes\GoblinsExample.h" />
     <ClInclude Include="..\Classes\RaptorExample.h" />
-    <ClInclude Include="..\Classes\SimpleCommand.h" />
+    <ClInclude Include="..\Classes\SkeletonRendererSeparatorExample.h" />
     <ClInclude Include="..\Classes\SpineboyExample.h" />
     <ClInclude Include="..\Classes\TankExample.h" />
     <ClInclude Include="main.h" />
