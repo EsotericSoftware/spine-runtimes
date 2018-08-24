@@ -203,7 +203,6 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\spine-c\spine-c\src\spine\Json.h" />
-    <ClInclude Include="..\..\..\spine-c\spine-c\src\spine\kvec.h" />
     <ClInclude Include="..\..\src\spine\AttachmentVertices.h" />
     <ClInclude Include="..\..\src\spine\Cocos2dAttachmentLoader.h" />
     <ClInclude Include="..\..\src\spine\SkeletonAnimation.h" />

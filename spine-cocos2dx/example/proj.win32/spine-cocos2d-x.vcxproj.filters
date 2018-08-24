@@ -22,6 +22,51 @@
       <Filter>win32</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\VertexEffect.c" />
+    <ClCompile Include="..\Classes\AppDelegate.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\BatchingExample.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\CoinExample.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GoblinsExample.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\RaptorExample.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\SkeletonRendererSeparatorExample.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\SpineboyExample.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\TankExample.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\AttachmentVertices.cpp">
+      <Filter>spine-cocos2dx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\Cocos2dAttachmentLoader.cpp">
+      <Filter>spine-cocos2dx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\SkeletonAnimation.cpp">
+      <Filter>spine-cocos2dx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\SkeletonBatch.cpp">
+      <Filter>spine-cocos2dx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\SkeletonRenderer.cpp">
+      <Filter>spine-cocos2dx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\SkeletonTwoColorBatch.cpp">
+      <Filter>spine-cocos2dx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\spine-cocos2dx.cpp">
+      <Filter>spine-cocos2dx</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\Animation.c">
       <Filter>spine</Filter>
     </ClCompile>
@@ -136,82 +181,10 @@
     <ClCompile Include="..\..\..\spine-c\spine-c\src\spine\VertexAttachment.c">
       <Filter>spine</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\spine\AttachmentVertices.cpp">
-      <Filter>spine-cocos2dx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\spine\Cocos2dAttachmentLoader.cpp">
-      <Filter>spine-cocos2dx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\spine\SkeletonAnimation.cpp">
-      <Filter>spine-cocos2dx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\spine\SkeletonBatch.cpp">
-      <Filter>spine-cocos2dx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\spine\SkeletonRenderer.cpp">
-      <Filter>spine-cocos2dx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\spine\SkeletonTwoColorBatch.cpp">
-      <Filter>spine-cocos2dx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\spine\spine-cocos2dx.cpp">
-      <Filter>spine-cocos2dx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\AppDelegate.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\BatchingExample.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\CoinExample.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\GoblinsExample.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\RaptorExample.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\SkeletonRendererSeparatorExample.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\SpineboyExample.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\TankExample.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
       <Filter>win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\spine-c\spine-c\src\spine\Json.h">
-      <Filter>spine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\spine-c\spine-c\src\spine\kvec.h">
-      <Filter>spine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\spine\AttachmentVertices.h">
-      <Filter>spine-cocos2dx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\spine\Cocos2dAttachmentLoader.h">
-      <Filter>spine-cocos2dx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\spine\SkeletonAnimation.h">
-      <Filter>spine-cocos2dx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\spine\SkeletonBatch.h">
-      <Filter>spine-cocos2dx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\spine\SkeletonRenderer.h">
-      <Filter>spine-cocos2dx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\spine\SkeletonTwoColorBatch.h">
-      <Filter>spine-cocos2dx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\spine\spine-cocos2dx.h">
-      <Filter>spine-cocos2dx</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\AppDelegate.h">
       <Filter>src</Filter>
@@ -239,6 +212,30 @@
     </ClInclude>
     <ClInclude Include="..\Classes\TankExample.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spine\AttachmentVertices.h">
+      <Filter>spine-cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spine\Cocos2dAttachmentLoader.h">
+      <Filter>spine-cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spine\SkeletonAnimation.h">
+      <Filter>spine-cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spine\SkeletonBatch.h">
+      <Filter>spine-cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spine\SkeletonRenderer.h">
+      <Filter>spine-cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spine\SkeletonTwoColorBatch.h">
+      <Filter>spine-cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spine\spine-cocos2dx.h">
+      <Filter>spine-cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-c\spine-c\src\spine\Json.h">
+      <Filter>spine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
