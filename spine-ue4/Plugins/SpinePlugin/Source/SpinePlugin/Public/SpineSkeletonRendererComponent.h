@@ -68,6 +68,10 @@ public:
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	FLinearColor Color = FLinearColor(1, 1, 1, 1);
 
+    /** Whether to generate collision geometry for the skeleton, or not. */
+    UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
+    bool bCreateCollision;
+
 	virtual void FinishDestroy() override;
 	
 protected:
