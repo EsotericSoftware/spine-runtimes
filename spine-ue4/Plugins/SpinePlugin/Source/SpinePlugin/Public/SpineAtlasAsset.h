@@ -34,7 +34,7 @@
 #include "spine/spine.h"
 #include "SpineAtlasAsset.generated.h"
 
-UCLASS(ClassGroup=(Spine))
+UCLASS(BlueprintType, ClassGroup=(Spine))
 class SPINEPLUGIN_API USpineAtlasAsset: public UObject {
 	GENERATED_BODY()
 	

@@ -49,7 +49,7 @@ public:
 		float Mix = 0;
 };
 
-UCLASS(ClassGroup=(Spine))
+UCLASS(BlueprintType, ClassGroup=(Spine))
 class SPINEPLUGIN_API USpineSkeletonDataAsset: public UObject {
 	GENERATED_BODY()
 	
