@@ -169,7 +169,7 @@ void USpineSkeletonRendererComponent::Flush (int &Idx, TArray<FVector> &Vertices
 	if (Vertices.Num() == 0) return;
 	SetMaterial(Idx, Material);
 
-	CreateMeshSection(Idx, Vertices, Indices, TArray<FVector>(), Uvs, Colors, TArray<FProcMeshTangent>(), false);
+	CreateMeshSection(Idx, Vertices, Indices, TArray<FVector>(), Uvs, Colors, TArray<FProcMeshTangent>(), bCreateCollision);
 
 	Vertices.SetNum(0);
 	Indices.SetNum(0);
