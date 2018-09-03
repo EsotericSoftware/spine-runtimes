@@ -34,11 +34,11 @@ package spine.animation {
 	import spine.Skeleton;
 
 	public class IkConstraintTimeline extends CurveTimeline {
-		static public const ENTRIES : int = 4;
-		static internal const PREV_TIME : int = -4, PREV_MIX : int = -3, PREV_BEND_DIRECTION : int = -2, PREV_STRETCH : int = -1;
-		static internal const MIX : int = 1, BEND_DIRECTION : int = 2, STRETCH : int = 3;
+		static public const ENTRIES : int = 5;
+		static internal const PREV_TIME : int = -5, PREV_MIX : int = -4, PREV_BEND_DIRECTION : int = -3, PREV_COMPRESS : int = -2, PREV_STRETCH : int = -1;
+		static internal const MIX : int = 1, BEND_DIRECTION : int = 2, COMPRESS : int = 3, STRETCH : int = 4;
 		public var ikConstraintIndex : int;
-		public var frames : Vector.<Number>; // time, mix, bendDirection, ...
+		public var frames : Vector.<Number>; // time, mix, bendDirection, compress, stretch, ...
 
 		public function IkConstraintTimeline(frameCount : int) {
 			super(frameCount);
@@ -50,11 +50,12 @@ package spine.animation {
 		}
 
 		/** Sets the time, mix and bend direction of the specified keyframe. */
-		public function setFrame(frameIndex : int, time : Number, mix : Number, bendDirection : int, stretch: Boolean) : void {
+		public function setFrame(frameIndex : int, time : Number, mix : Number, bendDirection : int, compress: Boolean, stretch: Boolean) : void {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;
 			frames[int(frameIndex + MIX)] = mix;
 			frames[int(frameIndex + BEND_DIRECTION)] = bendDirection;
+			frames[int(frameIndex + COMPRESS)] = compress ? 1 : 0;
 			frames[int(frameIndex + STRETCH)] = stretch ? 1 : 0;
 		}
 
@@ -65,11 +66,13 @@ package spine.animation {
 				case MixBlend.setup:
 					constraint.mix = constraint.data.mix;
 					constraint.bendDirection = constraint.data.bendDirection;
+					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
 					return;
 				case MixBlend.first:
 					constraint.mix += (constraint.data.mix - constraint.mix) * alpha;
 					constraint.bendDirection = constraint.data.bendDirection;
+					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
 				}
 				return;
@@ -81,15 +84,18 @@ package spine.animation {
 					
 					if (direction == MixDirection.Out) {
 						constraint.bendDirection = constraint.data.bendDirection;
+						constraint.compress = constraint.data.compress;
 						constraint.stretch = constraint.data.stretch;
 					} else {
 						constraint.bendDirection = int(frames[frames.length + PREV_BEND_DIRECTION]);
+						constraint.compress = int(frames[frames.length + PREV_COMPRESS]) != 0;
 						constraint.stretch = int(frames[frames.length + PREV_STRETCH]) != 0;
 					}					
 				} else {
 					constraint.mix += (frames[frames.length + PREV_MIX] - constraint.mix) * alpha;
 					if (direction == MixDirection.In) {
 						constraint.bendDirection = int(frames[frames.length + PREV_BEND_DIRECTION]);
+						constraint.compress = int(frames[frames.length + PREV_COMPRESS]) != 0;
 						constraint.stretch = int(frames[frames.length + PREV_STRETCH]) != 0;
 					}
 				}
@@ -106,15 +112,18 @@ package spine.animation {
 				constraint.mix = constraint.data.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.data.mix) * alpha;
 				if (direction == MixDirection.Out) {
 					constraint.bendDirection = constraint.data.bendDirection;
+					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;	
 				} else {
 					constraint.bendDirection = int(frames[frame + PREV_BEND_DIRECTION]);
+					constraint.compress = int(frames[frame + PREV_COMPRESS]) != 0;
 					constraint.stretch = int(frames[frame + PREV_STRETCH]) != 0;
 				}				
 			} else {
 				constraint.mix += (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
 				if (direction == MixDirection.In) {
 					constraint.bendDirection = int(frames[frame + PREV_BEND_DIRECTION]);
+					constraint.compress = int(frames[frame + PREV_COMPRESS]) != 0;
 					constraint.stretch = int(frames[frame + PREV_STRETCH]) != 0;
 				}
 			}
