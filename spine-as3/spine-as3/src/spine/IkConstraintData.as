@@ -36,7 +36,9 @@ package spine {
 		public var target : BoneData;
 		public var mix : Number = 1;
 		public var bendDirection : int = 1;
+		public var compress : Boolean = false;
 		public var stretch : Boolean = false;
+		public var uniform : Boolean = false;
 
 		public function IkConstraintData(name : String) {
 			if (name == null) throw new ArgumentError("name cannot be null.");

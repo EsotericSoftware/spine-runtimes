@@ -290,9 +290,10 @@ package spine {
 				bone.setToSetupPose();
 
 			for each (var ikConstraint : IkConstraint in ikConstraints) {
-				ikConstraint.bendDirection = ikConstraint._data.bendDirection;
-				ikConstraint.stretch = ikConstraint._data.stretch;
 				ikConstraint.mix = ikConstraint._data.mix;
+				ikConstraint.bendDirection = ikConstraint._data.bendDirection;				
+				ikConstraint.compress = ikConstraint._data.compress;
+				ikConstraint.stretch = ikConstraint._data.stretch;				
 			}
 
 			for each (var transformConstraint : TransformConstraint in transformConstraints) {

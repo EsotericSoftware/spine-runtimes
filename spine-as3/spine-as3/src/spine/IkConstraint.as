@@ -34,6 +34,7 @@ package spine {
 		public var bones : Vector.<Bone>;
 		public var target : Bone;
 		public var bendDirection : int;
+		public var compress: Boolean;
 		public var stretch: Boolean;
 		public var mix : Number;
 
@@ -43,6 +44,7 @@ package spine {
 			_data = data;
 			mix = data.mix;
 			bendDirection = data.bendDirection;
+			compress = data.compress;
 			stretch = data.stretch;
 
 			bones = new Vector.<Bone>();
@@ -58,7 +60,7 @@ package spine {
 		public function update() : void {
 			switch (bones.length) {
 				case 1:
-					apply1(bones[0], target.worldX, target.worldY, stretch, mix);
+					apply1(bones[0], target.worldX, target.worldY, compress, stretch, _data.uniform, mix);
 					break;
 				case 2:
 					apply2(bones[0], bones[1], target.worldX, target.worldY, bendDirection, stretch, mix);
@@ -80,7 +82,7 @@ package spine {
 
 		/** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
 		 * coordinate system. */
-		static public function apply1(bone : Bone, targetX : Number, targetY : Number, stretch : Boolean, alpha : Number) : void {
+		static public function apply1(bone : Bone, targetX : Number, targetY : Number, compress: Boolean, stretch : Boolean, uniform: Boolean, alpha : Number) : void {
 			if (!bone.appliedValid) bone.updateAppliedTransform();
 			var p : Bone = bone.parent;
 			var id : Number = 1 / (p.a * p.d - p.b * p.c);
@@ -92,11 +94,16 @@ package spine {
 				rotationIK -= 360;
 			else if (rotationIK < -180) rotationIK += 360;
 			var sx : Number = bone.ascaleX;
+			var sy : Number = bone.ascaleY;
 			if (stretch) {
 				var b : Number = bone.data.length * sx, dd : Number = Math.sqrt(tx * tx + ty * ty);
-				if (dd > b && b > 0.0001) sx *= (dd / b - 1) * alpha + 1;
+				if ((compress && dd < b) || (stretch && dd > b) && b > 0.0001) {
+					var s : Number = (dd / b - 1) * alpha + 1;
+					sx *= s;
+					if (uniform) sy *= s;
+				}				
 			}
-			bone.updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, bone.ascaleY, bone.ashearX, bone.ashearY);
+			bone.updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX, bone.ashearY);
 		}
 
 		/** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
