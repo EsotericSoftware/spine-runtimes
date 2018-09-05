@@ -193,7 +193,14 @@ namespace Spine.Unity {
 		public bool IsValid { get { return skeleton != null; } }
 
 		protected Spine.AnimationState state;
-		public Spine.AnimationState AnimationState { get { return state; } }
+		public Spine.AnimationState AnimationState {
+		       	get {
+				if (state == null) {
+				    Initialize(false);
+				}
+			       	return state; 
+			} 
+		}
 
 		[SerializeField] protected Spine.Unity.MeshGenerator meshGenerator = new MeshGenerator();
 		public Spine.Unity.MeshGenerator MeshGenerator { get { return this.meshGenerator; } }
