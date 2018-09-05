@@ -69,7 +69,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 		/// <summary>Sets the region (image) of a RegionAttachment</summary>
 		public static void SetRegion (this RegionAttachment attachment, AtlasRegion region, bool updateOffset = true) {
-			if (region == null) throw new System.ArgumentNullException("region"); 
+			if (region == null) throw new System.ArgumentNullException("region");
 
 			// (AtlasAttachmentLoader.cs)
 			attachment.RendererObject = region;
@@ -86,7 +86,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 		/// <summary>Sets the region (image) of a MeshAttachment</summary>
 		public static void SetRegion (this MeshAttachment attachment, AtlasRegion region, bool updateUVs = true) {
-			if (region == null) throw new System.ArgumentNullException("region"); 
+			if (region == null) throw new System.ArgumentNullException("region");
 
 			// (AtlasAttachmentLoader.cs)
 			attachment.RendererObject = region;
@@ -395,7 +395,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		/// Fills the outputAttachments list with new attachment objects based on the attachments in sourceAttachments, but mapped to a new single texture using the same material.</summary>
 		/// <param name="sourceAttachments">The list of attachments to be repacked.</param>
 		/// <param name = "outputAttachments">The List(Attachment) to populate with the newly created Attachment objects.</param>
-		/// 
+		///
 		/// <param name="materialPropertySource">May be null. If no Material property source is provided, no special </param>
 		public static void GetRepackedAttachments (List<Attachment> sourceAttachments, List<Attachment> outputAttachments, Material materialPropertySource, out Material outputMaterial, out Texture2D outputTexture, int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps, string newAssetName = "Repacked Attachments", bool clearCache = false, bool useOriginalNonrenderables = true) {
 			if (sourceAttachments == null) throw new System.ArgumentNullException("sourceAttachments");
@@ -413,7 +413,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			int newRegionIndex = 0;
 			for (int i = 0, n = sourceAttachments.Count; i < n; i++) {
 				var originalAttachment = sourceAttachments[i];
-				
+
 				if (IsRenderable(originalAttachment)) {
 					var newAttachment = originalAttachment.GetClone(true);
 					var region = newAttachment.GetRegion();
@@ -524,7 +524,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 					newSkin.AddAttachment(originalKey.slotIndex, originalKey.name, newAttachment);
 				} else {
 					newSkin.AddAttachment(originalKey.slotIndex, originalKey.name, useOriginalNonrenderables ? originalAttachment : originalAttachment.GetClone(true));
-				}	
+				}
 			}
 
 			// Fill a new texture with the collected attachment textures.
@@ -657,7 +657,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		/// Returns a Rect of the AtlasRegion according to Spine texture coordinates. (x-right, y-down)</summary>
 		static Rect GetSpineAtlasRect (this AtlasRegion region, bool includeRotate = true) {
 			if (includeRotate && region.rotate)
-				return new Rect(region.x, region.y, region.height, region.width);				
+				return new Rect(region.x, region.y, region.height, region.width);
 			else
 				return new Rect(region.x, region.y, region.width, region.height);
 		}
@@ -684,7 +684,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 		/// <summary>
 		/// Creates a new Spine AtlasRegion according to a Unity UV Rect (x-right, y-up, uv-normalized).</summary>
-		static AtlasRegion UVRectToAtlasRegion (Rect uvRect, string name, AtlasPage page, float offsetX, float offsetY, bool rotate) {			
+		static AtlasRegion UVRectToAtlasRegion (Rect uvRect, string name, AtlasPage page, float offsetX, float offsetY, bool rotate) {
 			var tr  = UVRectToTextureRect(uvRect, page.width, page.height);
 			var rr = tr.SpineUnityFlipRect(page.height);
 
@@ -875,7 +875,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		public static Attachment GetClone (this Attachment o, bool cloneMeshesAsLinked) {
 			var regionAttachment = o as RegionAttachment;
 			if (regionAttachment != null)
-				return regionAttachment.GetClone();			
+				return regionAttachment.GetClone();
 
 			var meshAttachment = o as MeshAttachment;
 			if (meshAttachment != null)
