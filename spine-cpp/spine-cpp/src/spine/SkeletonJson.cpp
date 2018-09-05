@@ -463,7 +463,9 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 						type = AttachmentType_Path;
 					} else if (strcmp(typeString, "clipping") == 0) {
 						type = AttachmentType_Clipping;
-					} else {
+					} else if (strcmp(typeString, "point") == 0) {
+						type = AttachmentType_Point;
+					}else {
 						delete skeletonData;
 						setError(root, "Unknown attachment type: ", typeString);
 						return NULL;
