@@ -310,6 +310,10 @@ public class SkeletonBinary {
 				data.floatValue = input.readFloat();
 				data.stringValue = input.readString();
 				data.audioPath = input.readString();
+				if (data.audioPath != null) {
+					data.volume = input.readFloat();
+					data.balance = input.readFloat();
+				}
 				skeletonData.events.add(data);
 			}
 
@@ -821,6 +825,10 @@ public class SkeletonBinary {
 					event.intValue = input.readInt(false);
 					event.floatValue = input.readFloat();
 					event.stringValue = input.readBoolean() ? input.readString() : eventData.stringValue;
+					if (event.getData().audioPath != null) {
+						event.volume = input.readFloat();
+						event.balance = input.readFloat();
+					}
 					timeline.setFrame(i, event);
 				}
 				timelines.add(timeline);
