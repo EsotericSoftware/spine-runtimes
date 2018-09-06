@@ -1,10 +1,7 @@
 var __extends = (this && this.__extends) || (function () {
-	var extendStatics = function (d, b) {
-		extendStatics = Object.setPrototypeOf ||
-			({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-			function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-		return extendStatics(d, b);
-	}
+	var extendStatics = Object.setPrototypeOf ||
+		({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+		function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
 	return function (d, b) {
 		extendStatics(d, b);
 		function __() { this.constructor = d; }
@@ -968,11 +965,12 @@ var spine;
 		IkConstraintTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.ikConstraint << 24) + this.ikConstraintIndex;
 		};
-		IkConstraintTimeline.prototype.setFrame = function (frameIndex, time, mix, bendDirection, stretch) {
+		IkConstraintTimeline.prototype.setFrame = function (frameIndex, time, mix, bendDirection, compress, stretch) {
 			frameIndex *= IkConstraintTimeline.ENTRIES;
 			this.frames[frameIndex] = time;
 			this.frames[frameIndex + IkConstraintTimeline.MIX] = mix;
 			this.frames[frameIndex + IkConstraintTimeline.BEND_DIRECTION] = bendDirection;
+			this.frames[frameIndex + IkConstraintTimeline.COMPRESS] = compress ? 1 : 0;
 			this.frames[frameIndex + IkConstraintTimeline.STRETCH] = stretch ? 1 : 0;
 		};
 		IkConstraintTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha, blend, direction) {
@@ -983,11 +981,13 @@ var spine;
 					case MixBlend.setup:
 						constraint.mix = constraint.data.mix;
 						constraint.bendDirection = constraint.data.bendDirection;
+						constraint.compress = constraint.data.compress;
 						constraint.stretch = constraint.data.stretch;
 						return;
 					case MixBlend.first:
 						constraint.mix += (constraint.data.mix - constraint.mix) * alpha;
 						constraint.bendDirection = constraint.data.bendDirection;
+						constraint.compress = constraint.data.compress;
 						constraint.stretch = constraint.data.stretch;
 				}
 				return;
@@ -997,10 +997,12 @@ var spine;
 					constraint.mix = constraint.data.mix + (frames[frames.length + IkConstraintTimeline.PREV_MIX] - constraint.data.mix) * alpha;
 					if (direction == MixDirection.out) {
 						constraint.bendDirection = constraint.data.bendDirection;
+						constraint.compress = constraint.data.compress;
 						constraint.stretch = constraint.data.stretch;
 					}
 					else {
 						constraint.bendDirection = frames[frames.length + IkConstraintTimeline.PREV_BEND_DIRECTION];
+						constraint.compress = frames[frames.length + IkConstraintTimeline.PREV_COMPRESS] != 0;
 						constraint.stretch = frames[frames.length + IkConstraintTimeline.PREV_STRETCH] != 0;
 					}
 				}
@@ -1008,6 +1010,7 @@ var spine;
 					constraint.mix += (frames[frames.length + IkConstraintTimeline.PREV_MIX] - constraint.mix) * alpha;
 					if (direction == MixDirection["in"]) {
 						constraint.bendDirection = frames[frames.length + IkConstraintTimeline.PREV_BEND_DIRECTION];
+						constraint.compress = frames[frames.length + IkConstraintTimeline.PREV_COMPRESS] != 0;
 						constraint.stretch = frames[frames.length + IkConstraintTimeline.PREV_STRETCH] != 0;
 					}
 				}
@@ -1021,10 +1024,12 @@ var spine;
 				constraint.mix = constraint.data.mix + (mix + (frames[frame + IkConstraintTimeline.MIX] - mix) * percent - constraint.data.mix) * alpha;
 				if (direction == MixDirection.out) {
 					constraint.bendDirection = constraint.data.bendDirection;
+					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
 				}
 				else {
 					constraint.bendDirection = frames[frame + IkConstraintTimeline.PREV_BEND_DIRECTION];
+					constraint.compress = frames[frame + IkConstraintTimeline.PREV_COMPRESS] != 0;
 					constraint.stretch = frames[frame + IkConstraintTimeline.PREV_STRETCH] != 0;
 				}
 			}
@@ -1032,18 +1037,21 @@ var spine;
 				constraint.mix += (mix + (frames[frame + IkConstraintTimeline.MIX] - mix) * percent - constraint.mix) * alpha;
 				if (direction == MixDirection["in"]) {
 					constraint.bendDirection = frames[frame + IkConstraintTimeline.PREV_BEND_DIRECTION];
+					constraint.compress = frames[frame + IkConstraintTimeline.PREV_COMPRESS] != 0;
 					constraint.stretch = frames[frame + IkConstraintTimeline.PREV_STRETCH] != 0;
 				}
 			}
 		};
-		IkConstraintTimeline.ENTRIES = 4;
-		IkConstraintTimeline.PREV_TIME = -4;
-		IkConstraintTimeline.PREV_MIX = -3;
-		IkConstraintTimeline.PREV_BEND_DIRECTION = -2;
+		IkConstraintTimeline.ENTRIES = 5;
+		IkConstraintTimeline.PREV_TIME = -5;
+		IkConstraintTimeline.PREV_MIX = -4;
+		IkConstraintTimeline.PREV_BEND_DIRECTION = -3;
+		IkConstraintTimeline.PREV_COMPRESS = -2;
 		IkConstraintTimeline.PREV_STRETCH = -1;
 		IkConstraintTimeline.MIX = 1;
 		IkConstraintTimeline.BEND_DIRECTION = 2;
-		IkConstraintTimeline.STRETCH = 3;
+		IkConstraintTimeline.COMPRESS = 3;
+		IkConstraintTimeline.STRETCH = 4;
 		return IkConstraintTimeline;
 	}(CurveTimeline));
 	spine.IkConstraintTimeline = IkConstraintTimeline;
@@ -1530,11 +1538,11 @@ var spine;
 			}
 			var r1 = blend == spine.MixBlend.setup ? bone.data.rotation : bone.rotation;
 			var total = 0, diff = r2 - r1;
+			diff -= (16384 - ((16384.499999999996 - diff / 360) | 0)) * 360;
 			if (diff == 0) {
 				total = timelinesRotation[i];
 			}
 			else {
-				diff -= (16384 - ((16384.499999999996 - diff / 360) | 0)) * 360;
 				var lastTotal = 0, lastDiff = 0;
 				if (firstFrame) {
 					lastTotal = 0;
@@ -2634,6 +2642,7 @@ var spine;
 	var IkConstraint = (function () {
 		function IkConstraint(data, skeleton) {
 			this.bendDirection = 0;
+			this.compress = false;
 			this.stretch = false;
 			this.mix = 1;
 			if (data == null)
@@ -2643,6 +2652,7 @@ var spine;
 			this.data = data;
 			this.mix = data.mix;
 			this.bendDirection = data.bendDirection;
+			this.compress = data.compress;
 			this.stretch = data.stretch;
 			this.bones = new Array();
 			for (var i = 0; i < data.bones.length; i++)
@@ -2660,14 +2670,14 @@ var spine;
 			var bones = this.bones;
 			switch (bones.length) {
 				case 1:
-					this.apply1(bones[0], target.worldX, target.worldY, this.stretch, this.mix);
+					this.apply1(bones[0], target.worldX, target.worldY, this.compress, this.stretch, this.data.uniform, this.mix);
 					break;
 				case 2:
 					this.apply2(bones[0], bones[1], target.worldX, target.worldY, this.bendDirection, this.stretch, this.mix);
 					break;
 			}
 		};
-		IkConstraint.prototype.apply1 = function (bone, targetX, targetY, stretch, alpha) {
+		IkConstraint.prototype.apply1 = function (bone, targetX, targetY, compress, stretch, uniform, alpha) {
 			if (!bone.appliedValid)
 				bone.updateAppliedTransform();
 			var p = bone.parent;
@@ -2681,13 +2691,17 @@ var spine;
 				rotationIK -= 360;
 			else if (rotationIK < -180)
 				rotationIK += 360;
-			var sx = bone.ascaleX;
-			if (stretch) {
+			var sx = bone.ascaleX, sy = bone.ascaleY;
+			if (compress || stretch) {
 				var b = bone.data.length * sx, dd = Math.sqrt(tx * tx + ty * ty);
-				if (dd > b && b > 0.0001)
-					sx *= (dd / b - 1) * alpha + 1;
+				if ((compress && dd < b) || (stretch && dd > b) && b > 0.0001) {
+					var s = (dd / b - 1) * alpha + 1;
+					sx *= s;
+					if (uniform)
+						sy *= s;
+				}
 			}
-			bone.updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, bone.ascaleY, bone.ashearX, bone.ashearY);
+			bone.updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX, bone.ashearY);
 		};
 		IkConstraint.prototype.apply2 = function (parent, child, targetX, targetY, bendDir, stretch, alpha) {
 			if (alpha == 0) {
@@ -2835,7 +2849,9 @@ var spine;
 			this.order = 0;
 			this.bones = new Array();
 			this.bendDirection = 1;
+			this.compress = false;
 			this.stretch = false;
+			this.uniform = false;
 			this.mix = 1;
 			this.name = name;
 		}
@@ -3620,9 +3636,10 @@ var spine;
 			var ikConstraints = this.ikConstraints;
 			for (var i = 0, n = ikConstraints.length; i < n; i++) {
 				var constraint = ikConstraints[i];
-				constraint.bendDirection = constraint.data.bendDirection;
-				constraint.stretch = constraint.data.stretch;
 				constraint.mix = constraint.data.mix;
+				constraint.bendDirection = constraint.data.bendDirection;
+				constraint.compress = constraint.data.compress;
+				constraint.stretch = constraint.data.stretch;
 			}
 			var transformConstraints = this.transformConstraints;
 			for (var i = 0, n = transformConstraints.length; i < n; i++) {
@@ -4490,9 +4507,11 @@ var spine;
 					data.target = skeletonData.findBone(targetName);
 					if (data.target == null)
 						throw new Error("IK target bone not found: " + targetName);
-					data.bendDirection = this.getValue(constraintMap, "bendPositive", true) ? 1 : -1;
-					data.stretch = this.getValue(constraintMap, "stretch", false);
 					data.mix = this.getValue(constraintMap, "mix", 1);
+					data.bendDirection = this.getValue(constraintMap, "bendPositive", true) ? 1 : -1;
+					data.compress = this.getValue(constraintMap, "compress", false);
+					data.stretch = this.getValue(constraintMap, "stretch", false);
+					data.uniform = this.getValue(constraintMap, "uniform", false);
 					skeletonData.ikConstraints.push(data);
 				}
 			}
@@ -4597,6 +4616,11 @@ var spine;
 					data.intValue = this.getValue(eventMap, "int", 0);
 					data.floatValue = this.getValue(eventMap, "float", 0);
 					data.stringValue = this.getValue(eventMap, "string", "");
+					data.audioPath = this.getValue(eventMap, "audio", null);
+					if (data.audioPath != null) {
+						data.volume = this.getValue(eventMap, "volume", 1);
+						data.balance = this.getValue(eventMap, "balance", 0);
+					}
 					skeletonData.events.push(data);
 				}
 			}
@@ -4862,7 +4886,7 @@ var spine;
 					var frameIndex = 0;
 					for (var i = 0; i < constraintMap.length; i++) {
 						var valueMap = constraintMap[i];
-						timeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, "mix", 1), this.getValue(valueMap, "bendPositive", true) ? 1 : -1, this.getValue(valueMap, "stretch", false));
+						timeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, "mix", 1), this.getValue(valueMap, "bendPositive", true) ? 1 : -1, this.getValue(valueMap, "compress", false), this.getValue(valueMap, "stretch", false));
 						this.readCurve(valueMap, timeline, frameIndex);
 						frameIndex++;
 					}
@@ -5035,6 +5059,10 @@ var spine;
 					event_5.intValue = this.getValue(eventMap, "int", eventData.intValue);
 					event_5.floatValue = this.getValue(eventMap, "float", eventData.floatValue);
 					event_5.stringValue = this.getValue(eventMap, "string", eventData.stringValue);
+					if (event_5.data.audioPath != null) {
+						event_5.volume = this.getValue(eventMap, "volume", 1);
+						event_5.balance = this.getValue(eventMap, "balance", 0);
+					}
 					timeline.setFrame(frameIndex++, event_5);
 				}
 				timelines.push(timeline);

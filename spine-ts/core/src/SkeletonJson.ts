@@ -241,6 +241,11 @@ module spine {
 					data.intValue = this.getValue(eventMap, "int", 0);
 					data.floatValue = this.getValue(eventMap, "float", 0);
 					data.stringValue = this.getValue(eventMap, "string", "");
+					data.audioPath = this.getValue(eventMap, "audio", null);
+					if (data.audioPath != null) {
+						data.volume = this.getValue(eventMap, "volume", 1);
+						data.balance = this.getValue(eventMap, "balance", 0);
+					}
 					skeletonData.events.push(data);
 				}
 			}
@@ -706,6 +711,10 @@ module spine {
 					event.intValue = this.getValue(eventMap, "int", eventData.intValue);
 					event.floatValue = this.getValue(eventMap, "float", eventData.floatValue);
 					event.stringValue = this.getValue(eventMap, "string", eventData.stringValue);
+					if (event.data.audioPath != null) {
+						event.volume = this.getValue(eventMap, "volume", 1);
+						event.balance = this.getValue(eventMap, "balance", 0);
+					}
 					timeline.setFrame(frameIndex++, event);
 				}
 				timelines.push(timeline);
