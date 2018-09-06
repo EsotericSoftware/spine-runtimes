@@ -60,7 +60,7 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 		print(entry.trackIndex.." dispose: "..entry.animation.name)
 	end
 	animationState.onEvent = function (entry, event)
-		print(entry.trackIndex.." event: "..entry.animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'")
+		print(entry.trackIndex.." event: "..entry.animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'" .. ", " .. event.volume .. ", " .. event.balance)
 	end
 	
   if atlasFile == "spineboy.atlas" then
@@ -81,9 +81,9 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 	return { skeleton = skeleton, state = animationState }
 end
 
+table.insert(skeletons, loadSkeleton("spineboy.atlas", "spineboy-pro.json", 240, 300, 0.4, "walk"))
 table.insert(skeletons, loadSkeleton("stretchyman.atlas", "stretchyman-stretchy-ik.json", 40, 300, 0.5, "sneak"))
 table.insert(skeletons, loadSkeleton("coin.atlas", "coin-pro.json", 240, 300, 0.4, "rotate"))
-table.insert(skeletons, loadSkeleton("spineboy.atlas", "spineboy-ess.json", 240, 300, 0.4, "walk"))
 table.insert(skeletons, loadSkeleton("raptor.atlas", "raptor-pro.json", 200, 300, 0.25, "walk"))
 table.insert(skeletons, loadSkeleton("goblins.atlas", "goblins-pro.json", 240, 300, 0.8, "walk", "goblin"))
 table.insert(skeletons, loadSkeleton("stretchyman.atlas", "stretchyman-pro.json", 40, 300, 0.5, "sneak"))

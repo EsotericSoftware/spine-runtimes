@@ -90,7 +90,7 @@ cp -f ../raptor/export/raptor-pro.json ../../spine-corona/data
 cp -f ../raptor/export/raptor.atlas ../../spine-corona/data
 cp -f ../raptor/export/raptor.png ../../spine-corona/data
 
-cp -f ../spineboy/export/spineboy-ess.json ../../spine-corona/data
+cp -f ../spineboy/export/spineboy-pro.json ../../spine-corona/data
 cp -f ../spineboy/export/spineboy.atlas ../../spine-corona/data
 cp -f ../spineboy/export/spineboy.png ../../spine-corona/data
 
@@ -126,7 +126,7 @@ cp -f ../raptor/export/raptor-pro.json ../../spine-love/data
 cp -f ../raptor/export/raptor.atlas ../../spine-love/data
 cp -f ../raptor/export/raptor.png ../../spine-love/data
 
-cp -f ../spineboy/export/spineboy-ess.json ../../spine-love/data
+cp -f ../spineboy/export/spineboy-pro.json ../../spine-love/data
 cp -f ../spineboy/export/spineboy.atlas ../../spine-love/data
 cp -f ../spineboy/export/spineboy.png ../../spine-love/data
 

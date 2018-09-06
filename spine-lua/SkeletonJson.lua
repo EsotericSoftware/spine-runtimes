@@ -274,6 +274,11 @@ function SkeletonJson.new (attachmentLoader)
 				data.intValue = getValue(eventMap, "int", 0)
 				data.floatValue = getValue(eventMap, "float", 0)
 				data.stringValue = getValue(eventMap, "string", "")
+				data.audioPath = getValue(eventMap, "audio", nil)
+				if data.audioPath ~= nil then
+					data.volume = getValue(eventMap, "volume", 1)
+					data.balance = getValue(eventMap, "balance", 0)
+				end
 				table_insert(skeletonData.events, data)
 			end
 		end
@@ -825,6 +830,10 @@ function SkeletonJson.new (attachmentLoader)
 					event.stringValue = eventMap["string"]
 				else
 					event.stringValue = eventData.stringValue
+				end
+				if eventData.audioPath ~= nil then
+					event.volume = getValue(eventMap, "volume", 1)
+					event.balance = getValue(eventMap, "balance", 0)
 				end
 				timeline:setFrame(frameIndex, event)
 				frameIndex = frameIndex + 1
