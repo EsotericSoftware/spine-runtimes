@@ -79,18 +79,18 @@ void spine::Event::setStringValue(const spine::String &inValue) {
 }
 
 
-float Event::getVolume() {
+float spine::Event::getVolume() {
 	return _volume;
 }
 
-void Event::setVolume(float inValue) {
+void spine::Event::setVolume(float inValue) {
 	_volume = inValue;
 }
 
-float Event::getBalance() {
+float spine::Event::getBalance() {
 	return _balance;
 }
 
-void Event::setBalance(float inValue) {
+void spine::Event::setBalance(float inValue) {
 	_balance = inValue;
 }

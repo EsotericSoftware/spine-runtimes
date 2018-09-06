@@ -76,27 +76,27 @@ void spine::EventData::setStringValue(const spine::String &inValue) {
 	this->_stringValue = inValue;
 }
 
-const String &EventData::getAudioPath() {
+const spine::String &spine::EventData::getAudioPath() {
 	return _audioPath;
 }
 
-void EventData::setAudioPath(const String &inValue) {
+void spine::EventData::setAudioPath(const spine::String &inValue) {
 	_audioPath = inValue;
 }
 
 
-float EventData::getVolume() {
+float spine::EventData::getVolume() {
 	return _volume;
 }
 
-void EventData::setVolume(float inValue) {
+void spine::EventData::setVolume(float inValue) {
 	_volume = inValue;
 }
 
-float EventData::getBalance() {
+float spine::EventData::getBalance() {
 	return _balance;
 }
 
-void EventData::setBalance(float inValue) {
+void spine::EventData::setBalance(float inValue) {
 	_balance = inValue;
 }
