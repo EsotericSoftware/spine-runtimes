@@ -38,7 +38,10 @@ EventData::EventData(const String &name) :
 		_name(name),
 		_intValue(0),
 		_floatValue(0),
-		_stringValue() {
+		_stringValue(),
+		_audioPath(),
+		_volume(1),
+		_balance(0) {
 	assert(_name.length() > 0);
 }
 
@@ -69,4 +72,29 @@ const String &EventData::getStringValue() {
 
 void EventData::setStringValue(const String &inValue) {
 	_stringValue = inValue;
+}
+
+const String &EventData::getAudioPath() {
+	return _audioPath;
+}
+
+void EventData::setAudioPath(const String &inValue) {
+	_audioPath = inValue;
+}
+
+
+float EventData::getVolume() {
+	return _volume;
+}
+
+void EventData::setVolume(float inValue) {
+	_volume = inValue;
+}
+
+float EventData::getBalance() {
+	return _balance;
+}
+
+void EventData::setBalance(float inValue) {
+	_balance = inValue;
 }

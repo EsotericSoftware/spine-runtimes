@@ -58,8 +58,8 @@ void callback (AnimationState* state, EventType type, TrackEntry* entry, Event* 
 		printf("%d dispose: %s\n", entry->getTrackIndex(), animationName.buffer());
 		break;
 	case EventType_Event:
-		printf("%d event: %s, %s: %d, %f, %s\n", entry->getTrackIndex(), animationName.buffer(), event->getData().getName().buffer(), event->getIntValue(), event->getFloatValue(),
-				event->getStringValue().buffer());
+		printf("%d event: %s, %s: %d, %f, %s %f %f\n", entry->getTrackIndex(), animationName.buffer(), event->getData().getName().buffer(), event->getIntValue(), event->getFloatValue(),
+				event->getStringValue().buffer(), event->getVolume(), event->getBalance());
 		break;
 	}
 	fflush(stdout);
@@ -481,7 +481,7 @@ int main () {
 	DebugExtension dbgExtension;
 	SpineExtension::setInstance(&dbgExtension);
 
-	testcase(spineboy, "data/spineboy-ess.json", "data/spineboy-ess.skel", "data/spineboy.atlas", 0.6f);
+	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy.atlas", 0.6f);
 	testcase(stretchymanStrechyIk, "data/stretchyman-stretchy-ik.json", "data/stretchyman-stretchy-ik.skel", "data/stretchyman.atlas", 0.6f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor.atlas", 0.5f);
 	testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank.atlas", 1.0f);

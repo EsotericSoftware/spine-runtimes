@@ -39,7 +39,9 @@ Event::Event(float time, const EventData &data) :
 		_time(time),
 		_intValue(0),
 		_floatValue(0),
-		_stringValue() {
+		_stringValue(),
+		_volume(1),
+		_balance(0) {
 }
 
 const EventData &Event::getData() {
@@ -72,4 +74,21 @@ const String &Event::getStringValue() {
 
 void Event::setStringValue(const String &inValue) {
 	_stringValue = inValue;
+}
+
+
+float Event::getVolume() {
+	return _volume;
+}
+
+void Event::setVolume(float inValue) {
+	_volume = inValue;
+}
+
+float Event::getBalance() {
+	return _balance;
+}
+
+void Event::setBalance(float inValue) {
+	_balance = inValue;
 }

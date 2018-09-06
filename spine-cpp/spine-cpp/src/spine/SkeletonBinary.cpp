@@ -310,7 +310,11 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 		eventData->_intValue = readVarint(input, false);
 		eventData->_floatValue = readFloat(input);
 		eventData->_stringValue.own(readString(input));
-		String(readString(input), true); // skip audio path
+		eventData->_audioPath.own(readString(input)); // skip audio path
+		if (!eventData->_audioPath.isEmpty()) {
+			eventData->_volume = readFloat(input);
+			eventData->_balance = readFloat(input);
+		}
 		skeletonData->_events[i] = eventData;
 	}
 
@@ -1005,6 +1009,11 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 			event->_stringValue = String(event_stringValue);
 			if (freeString) {
 				SpineExtension::free(event_stringValue, __FILE__, __LINE__);
+			}
+
+			if (!eventData->_audioPath.isEmpty()) {
+				event->_volume = readFloat(input);
+				event->_balance = readFloat(input);
 			}
 			timeline->setFrame(i, event);
 		}
