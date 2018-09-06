@@ -248,7 +248,7 @@ cp -f ../raptor/export/raptor-pro.json ../../spine-starling/spine-starling-examp
 cp -f ../raptor/export/raptor.atlas ../../spine-starling/spine-starling-example/src/
 cp -f ../raptor/export/raptor.png ../../spine-starling/spine-starling-example/src/
 
-cp -f ../spineboy/export/spineboy-ess.json ../../spine-starling/spine-starling-example/src/
+cp -f ../spineboy/export/spineboy-pro.json ../../spine-starling/spine-starling-example/src/
 cp -f ../spineboy/export/spineboy.atlas ../../spine-starling/spine-starling-example/src/
 cp -f ../spineboy/export/spineboy.png ../../spine-starling/spine-starling-example/src/
 
