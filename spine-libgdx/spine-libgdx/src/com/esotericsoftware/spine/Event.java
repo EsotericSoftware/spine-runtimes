@@ -44,6 +44,7 @@ public class Event {
 	int intValue;
 	float floatValue;
 	String stringValue;
+	float volume, balance;
 	final float time;
 
 	public Event (float time, EventData data) {
@@ -74,6 +75,22 @@ public class Event {
 
 	public void setString (String stringValue) {
 		this.stringValue = stringValue;
+	}
+
+	public float getVolume () {
+		return volume;
+	}
+
+	public void setVolume (float volume) {
+		this.volume = volume;
+	}
+
+	public float getBalance () {
+		return balance;
+	}
+
+	public void setBalance (float balance) {
+		this.balance = balance;
 	}
 
 	/** The animation time this event was keyed. */

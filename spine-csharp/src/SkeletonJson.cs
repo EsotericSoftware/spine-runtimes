@@ -296,7 +296,11 @@ namespace Spine {
 					data.Int = GetInt(entryMap, "int", 0);
 					data.Float = GetFloat(entryMap, "float", 0);
 					data.String = GetString(entryMap, "string", string.Empty);
-					data.AudioPath = GetString(entryMap, "audio", string.Empty);
+					data.AudioPath = GetString(entryMap, "audio", null);
+					if (data.AudioPath != null) {
+						data.Volume = GetFloat(entryMap, "volume", 1);
+						data.Balance = GetFloat(entryMap, "balance", 0);
+					}
 					skeletonData.events.Add(data);
 				}
 			}
@@ -779,10 +783,15 @@ namespace Spine {
 				foreach (Dictionary<string, Object> eventMap in eventsMap) {
 					EventData eventData = skeletonData.FindEvent((string)eventMap["name"]);
 					if (eventData == null) throw new Exception("Event not found: " + eventMap["name"]);
-					var e = new Event((float)eventMap["time"], eventData);
-					e.Int = GetInt(eventMap, "int", eventData.Int);
-					e.Float = GetFloat(eventMap, "float", eventData.Float);
-					e.String = GetString(eventMap, "string", eventData.String);
+					var e = new Event((float)eventMap["time"], eventData) {
+						intValue = GetInt(eventMap, "int", eventData.Int),
+						floatValue = GetFloat(eventMap, "float", eventData.Float),
+						stringValue = GetString(eventMap, "string", eventData.String)
+					};
+					if (e.data.AudioPath != null) {
+						e.volume = GetFloat(eventMap, "volume", eventData.Volume);
+						e.balance = GetFloat(eventMap, "balance", eventData.Balance);
+					}
 					timeline.SetFrame(frameIndex++, e);
 				}
 				timelines.Add(timeline);

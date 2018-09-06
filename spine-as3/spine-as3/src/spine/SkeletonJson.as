@@ -266,6 +266,11 @@ package spine {
 					eventData.intValue = eventMap["int"] || 0;
 					eventData.floatValue = eventMap["float"] || 0;
 					eventData.stringValue = eventMap["string"] || "";
+					eventData.audioPath = eventMap["audio"] || null;
+					if (eventData.audioPath != null) {
+						eventData.volume = eventMap["volume"] || 1;
+						eventData.balance = eventMap["balance"] || 0;
+					}
 					skeletonData.events.push(eventData);
 				}
 			}
@@ -714,6 +719,10 @@ package spine {
 					event.intValue = eventMap.hasOwnProperty("int") ? eventMap["int"] : eventData.intValue;
 					event.floatValue = eventMap.hasOwnProperty("float") ? eventMap["float"] : eventData.floatValue;
 					event.stringValue = eventMap.hasOwnProperty("string") ? eventMap["string"] : eventData.stringValue;
+					if (eventData.audioPath != null) {
+						event.volume = eventMap.hasOwnProperty("volume") ? eventMap["volume"] : 1;
+						event.balance = eventMap.hasOwnProperty("balance") ? eventMap["balance"] : 0;
+					}
 					eventTimeline.setFrame(frameIndex++, event);
 				}
 				timelines[timelines.length] = eventTimeline;

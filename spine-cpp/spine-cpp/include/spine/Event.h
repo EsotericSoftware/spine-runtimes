@@ -65,12 +65,22 @@ public:
 
 	void setStringValue(const String &inValue);
 
+	float getVolume();
+
+	void setVolume(float inValue);
+
+	float getBalance();
+
+	void setBalance(float inValue);
+
 private:
 	const EventData &_data;
 	const float _time;
 	int _intValue;
 	float _floatValue;
 	String _stringValue;
+	float _volume;
+	float _balance;
 };
 }
 

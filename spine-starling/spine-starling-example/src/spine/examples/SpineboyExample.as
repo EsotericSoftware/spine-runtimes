@@ -50,7 +50,7 @@ package spine.examples {
 	import starling.events.TouchPhase;
 
 	public class SpineboyExample extends Sprite {
-		[Embed(source = "/spineboy-ess.json", mimeType = "application/octet-stream")]
+		[Embed(source = "/spineboy-pro.json", mimeType = "application/octet-stream")]
 		static public const SpineboyJson : Class;
 
 		[Embed(source = "/spineboy.atlas", mimeType = "application/octet-stream")]
@@ -94,11 +94,12 @@ package spine.examples {
 				trace(entry.trackIndex + " dispose: " + entry.animation.name);
 			});
 			skeleton.state.onEvent.add(function(entry : TrackEntry, event : Event) : void {
-				trace(entry.trackIndex + " event: " + entry.animation.name + ", " + event.data.name + ": " + event.intValue + ", " + event.floatValue + ", " + event.stringValue);
+				trace(entry.trackIndex + " event: " + entry.animation.name + ", " + event.data.name + ": " + event.intValue + ", " + event.floatValue + ", " + event.stringValue + ", " + event.volume + ", " + event.balance);
 			});
 
 			skeleton.skeleton.setToSetupPose();
-			skeleton.state.setAnimationByName(0, "run", true);
+			skeleton.state.setAnimationByName(0, "walk", true);
+			skeleton.state.addAnimationByName(0, "run", true, 2);
 			skeleton.state.addAnimationByName(0, "jump", false, 3);
 			skeleton.state.addAnimationByName(0, "run", true, 0);
 

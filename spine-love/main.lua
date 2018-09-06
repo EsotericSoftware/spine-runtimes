@@ -84,7 +84,7 @@ function loadSkeleton (jsonFile, atlasFile, animation, skin, scale, x, y)
 		print(entry.trackIndex.." dispose: "..entry.animation.name)
 	end
 	state.onEvent = function (entry, event)
-		print(entry.trackIndex.." event: "..entry.animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'")
+		print(entry.trackIndex.." event: "..entry.animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'" .. ", " .. event.volume .. ", " .. event.balance)
 	end
 	
 	state:update(0.5)
@@ -96,9 +96,9 @@ end
 function love.load(arg)
 	if arg[#arg] == "-debug" then require("mobdebug").start() end
 	skeletonRenderer = spine.SkeletonRenderer.new(true)
+	table.insert(skeletons, loadSkeleton("spineboy-pro", "spineboy", "walk", nil, 0.5, 400, 500))
 	table.insert(skeletons, loadSkeleton("stretchyman-pro", "stretchyman", "sneak", nil, 0.3, 200, 500))
 	table.insert(skeletons, loadSkeleton("coin-pro", "coin", "rotate", nil, 0.5, 400, 500))
-	table.insert(skeletons, loadSkeleton("spineboy-ess", "spineboy", "walk", nil, 0.5, 400, 500))
 	table.insert(skeletons, loadSkeleton("raptor-pro", "raptor", "walk", nil, 0.3, 400, 500))
 	table.insert(skeletons, loadSkeleton("goblins-pro", "goblins", "walk", "goblin", 1, 400, 500))
 	table.insert(skeletons, loadSkeleton("tank-pro", "tank", "drive", nil, 0.2, 600, 500))

@@ -43,6 +43,8 @@ typedef struct spEventData {
 	float floatValue;
 	const char* stringValue;
 	const char* audioPath;
+	float volume;
+	float balance;
 
 #ifdef __cplusplus
 	spEventData() :
@@ -50,7 +52,9 @@ typedef struct spEventData {
 		intValue(0),
 		floatValue(0),
 		stringValue(0),
-		audioPath(0) {
+		audioPath(0),
+		volume(0),
+		balance(0) {
 	}
 #endif
 } spEventData;

@@ -38,9 +38,12 @@
 
 spine::EventData::EventData(const spine::String &name) :
 		_name(name),
-		_intValue((int)0),
-		_floatValue(0.0f)
-		 {
+		_intValue(0),
+		_floatValue(0),
+		_stringValue(),
+		_audioPath(),
+		_volume(1),
+		_balance(0) {
 	assert(_name.length() > 0);
 }
 
@@ -71,4 +74,29 @@ const spine::String &spine::EventData::getStringValue() {
 
 void spine::EventData::setStringValue(const spine::String &inValue) {
 	this->_stringValue = inValue;
+}
+
+const String &EventData::getAudioPath() {
+	return _audioPath;
+}
+
+void EventData::setAudioPath(const String &inValue) {
+	_audioPath = inValue;
+}
+
+
+float EventData::getVolume() {
+	return _volume;
+}
+
+void EventData::setVolume(float inValue) {
+	_volume = inValue;
+}
+
+float EventData::getBalance() {
+	return _balance;
+}
+
+void EventData::setBalance(float inValue) {
+	_balance = inValue;
 }

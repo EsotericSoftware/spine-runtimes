@@ -36,7 +36,10 @@ function EventData.new (name)
 		name = name,
 		intValue = 0,
 		floatValue = 0,
-		stringValue = nil
+		stringValue = nil,
+		audioPath = nil,
+		volume = 1,
+		balance = 0
 	}
 
 	return self

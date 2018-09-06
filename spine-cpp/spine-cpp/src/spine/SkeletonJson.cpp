@@ -678,6 +678,12 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 			eventData->_floatValue = Json::getFloat(eventMap, "float", 0);
 			const char *stringValue = Json::getString(eventMap, "string", 0);
 			eventData->_stringValue = stringValue;
+			const char *audioPath = Json::getString(eventMap, "audio", 0);
+			eventData->_audioPath = audioPath;
+			if (audioPath) {
+				eventData->_volume = Json::getFloat(eventMap, "volume", 1);
+				eventData->_balance = Json::getFloat(eventMap, "balance", 0);
+			}
 			skeletonData->_events[i] = eventData;
 		}
 	}
@@ -1175,6 +1181,10 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 			event->_intValue = Json::getInt(valueMap, "int", eventData->_intValue);
 			event->_floatValue = Json::getFloat(valueMap, "float", eventData->_floatValue);
 			event->_stringValue = Json::getString(valueMap, "string", eventData->_stringValue.buffer());
+			if (!eventData->_audioPath.isEmpty()) {
+				event->_volume = Json::getFloat(valueMap, "volume", 1);
+				event->_balance = Json::getFloat(valueMap, "balance", 0);
+			}
 			timeline->setFrame(frameIndex, event);
 		}
 		timelines.add(timeline);

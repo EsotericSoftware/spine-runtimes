@@ -61,11 +61,26 @@ public:
 
 	void setStringValue(const String &inValue);
 
+	const String &getAudioPath();
+
+	void setAudioPath(const String &inValue);
+
+	float getVolume();
+
+	void setVolume(float inValue);
+
+	float getBalance();
+
+	void setBalance(float inValue);
+
 private:
 	const String _name;
 	int _intValue;
 	float _floatValue;
 	String _stringValue;
+	String _audioPath;
+	float _volume;
+	float _balance;
 };
 }
 

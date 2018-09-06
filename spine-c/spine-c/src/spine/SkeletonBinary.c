@@ -592,6 +592,10 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 				event->stringValue = readString(input);
 			else
 				MALLOC_STR(event->stringValue, eventData->stringValue);
+			if (eventData->audioPath) {
+				event->volume = readFloat(input);
+				event->balance = readFloat(input);
+			}
 			spEventTimeline_setFrame(timeline, i, event);
 		}
 		spTimelineArray_add(timelines, (spTimeline*)timeline);
@@ -1077,6 +1081,10 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		eventData->floatValue = readFloat(input);
 		eventData->stringValue = readString(input);
 		eventData->audioPath = readString(input);
+		if (eventData->audioPath) {
+			eventData->volume = readFloat(input);
+			eventData->balance = readFloat(input);
+		}
 		skeletonData->events[i] = eventData;
 	}
 

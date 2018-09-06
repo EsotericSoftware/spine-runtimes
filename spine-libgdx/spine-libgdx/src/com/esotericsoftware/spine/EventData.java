@@ -38,6 +38,7 @@ public class EventData {
 	int intValue;
 	float floatValue;
 	String stringValue, audioPath;
+	float volume, balance;
 
 	public EventData (String name) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
@@ -74,6 +75,22 @@ public class EventData {
 
 	public void setAudioPath (String audioPath) {
 		this.audioPath = audioPath;
+	}
+
+	public float getVolume () {
+		return volume;
+	}
+
+	public void setVolume (float volume) {
+		this.volume = volume;
+	}
+
+	public float getBalance () {
+		return balance;
+	}
+
+	public void setBalance (float balance) {
+		this.balance = balance;
 	}
 
 	/** The name of the event, which is unique within the skeleton. */

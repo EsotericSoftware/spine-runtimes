@@ -41,7 +41,9 @@ spine::Event::Event(float time, const spine::EventData &data) :
 		_time(time),
 		_intValue(0),
 		_floatValue(0),
-		_stringValue() {
+		_stringValue(),
+		_volume(1),
+		_balance(0) {
 }
 
 const spine::EventData &spine::Event::getData() {
@@ -74,4 +76,21 @@ const spine::String &spine::Event::getStringValue() {
 
 void spine::Event::setStringValue(const spine::String &inValue) {
 	_stringValue = inValue;
+}
+
+
+float Event::getVolume() {
+	return _volume;
+}
+
+void Event::setVolume(float inValue) {
+	_volume = inValue;
+}
+
+float Event::getBalance() {
+	return _balance;
+}
+
+void Event::setBalance(float inValue) {
+	_balance = inValue;
 }

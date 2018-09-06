@@ -90,7 +90,7 @@ cp -f ../raptor/export/raptor-pro.json ../../spine-corona/data
 cp -f ../raptor/export/raptor.atlas ../../spine-corona/data
 cp -f ../raptor/export/raptor.png ../../spine-corona/data
 
-cp -f ../spineboy/export/spineboy-ess.json ../../spine-corona/data
+cp -f ../spineboy/export/spineboy-pro.json ../../spine-corona/data
 cp -f ../spineboy/export/spineboy.atlas ../../spine-corona/data
 cp -f ../spineboy/export/spineboy.png ../../spine-corona/data
 
@@ -126,7 +126,7 @@ cp -f ../raptor/export/raptor-pro.json ../../spine-love/data
 cp -f ../raptor/export/raptor.atlas ../../spine-love/data
 cp -f ../raptor/export/raptor.png ../../spine-love/data
 
-cp -f ../spineboy/export/spineboy-ess.json ../../spine-love/data
+cp -f ../spineboy/export/spineboy-pro.json ../../spine-love/data
 cp -f ../spineboy/export/spineboy.atlas ../../spine-love/data
 cp -f ../spineboy/export/spineboy.png ../../spine-love/data
 
@@ -161,8 +161,8 @@ cp -f ../raptor/export/raptor-pro.skel ../../spine-sfml/c/data/
 cp -f ../raptor/export/raptor.atlas ../../spine-sfml/c/data/
 cp -f ../raptor/export/raptor.png ../../spine-sfml/c/data/
 
-cp -f ../spineboy/export/spineboy-ess.json ../../spine-sfml/c/data/
-cp -f ../spineboy/export/spineboy-ess.skel ../../spine-sfml/c/data/
+cp -f ../spineboy/export/spineboy-pro.json ../../spine-sfml/c/data/
+cp -f ../spineboy/export/spineboy-pro.skel ../../spine-sfml/c/data/
 cp -f ../spineboy/export/spineboy.atlas ../../spine-sfml/c/data/
 cp -f ../spineboy/export/spineboy.png ../../spine-sfml/c/data/
 
@@ -206,8 +206,8 @@ cp -f ../raptor/export/raptor-pro.skel ../../spine-sfml/cpp/data/
 cp -f ../raptor/export/raptor.atlas ../../spine-sfml/cpp/data/
 cp -f ../raptor/export/raptor.png ../../spine-sfml/cpp/data/
 
-cp -f ../spineboy/export/spineboy-ess.json ../../spine-sfml/cpp/data/
-cp -f ../spineboy/export/spineboy-ess.skel ../../spine-sfml/cpp/data/
+cp -f ../spineboy/export/spineboy-pro.json ../../spine-sfml/cpp/data/
+cp -f ../spineboy/export/spineboy-pro.skel ../../spine-sfml/cpp/data/
 cp -f ../spineboy/export/spineboy.atlas ../../spine-sfml/cpp/data/
 cp -f ../spineboy/export/spineboy.png ../../spine-sfml/cpp/data/
 
@@ -248,7 +248,7 @@ cp -f ../raptor/export/raptor-pro.json ../../spine-starling/spine-starling-examp
 cp -f ../raptor/export/raptor.atlas ../../spine-starling/spine-starling-example/src/
 cp -f ../raptor/export/raptor.png ../../spine-starling/spine-starling-example/src/
 
-cp -f ../spineboy/export/spineboy-ess.json ../../spine-starling/spine-starling-example/src/
+cp -f ../spineboy/export/spineboy-pro.json ../../spine-starling/spine-starling-example/src/
 cp -f ../spineboy/export/spineboy.atlas ../../spine-starling/spine-starling-example/src/
 cp -f ../spineboy/export/spineboy.png ../../spine-starling/spine-starling-example/src/
 

@@ -1240,10 +1240,10 @@ function Animation.IkConstraintTimeline.new (frameCount)
 					if (math_floor(frames[zlen(frames) + PREV_STRETCH]) == 1) then constraint.stretch = true else constraint.stretch = false end
 				end
 			else
-				constraint.mix = constraint.mix + (frames[frames.length + PREV_MIX] - constraint.mix) * alpha;
+				constraint.mix = constraint.mix + (frames[zlen(frames) + PREV_MIX] - constraint.mix) * alpha;
 				if direction == MixDirection._in then 
 					constraint.bendDirection = math_floor(frames[zlen(frames) + PREV_BEND_DIRECTION])
-					if (math_floor(frames[zlen(frames) + PREV_COMPRES]) == 1) then constraint.compress = true else constraint.compress = false end
+					if (math_floor(frames[zlen(frames) + PREV_COMPRESS]) == 1) then constraint.compress = true else constraint.compress = false end
 					if (math_floor(frames[zlen(frames) + PREV_STRETCH]) == 1) then constraint.stretch = true else constraint.stretch = false end
 				end
 			end
