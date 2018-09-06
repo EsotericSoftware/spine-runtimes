@@ -666,7 +666,6 @@ public class AnimationState {
 	private void animationsChanged () {
 		animationsChanged = false;
 
-		IntSet propertyIDs = this.propertyIDs;
 		propertyIDs.clear(2048);
 
 		for (int i = 0, n = tracks.size; i < n; i++) {
