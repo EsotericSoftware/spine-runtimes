@@ -288,6 +288,10 @@ namespace Spine {
 				data.Float = ReadFloat(input);
 				data.String = ReadString(input);
 				data.AudioPath = ReadString(input);
+				if (data.AudioPath != null) {
+					data.Volume = ReadFloat(input);
+					data.Balance = ReadFloat(input);
+				}
 				skeletonData.events.Add(data);
 			}
 
@@ -804,10 +808,15 @@ namespace Spine {
 				for (int i = 0; i < eventCount; i++) {
 					float time = ReadFloat(input);
 					EventData eventData = skeletonData.events.Items[ReadVarint(input, true)];
-					Event e = new Event(time, eventData);
-					e.Int = ReadVarint(input, false);
-					e.Float = ReadFloat(input);
-					e.String = ReadBoolean(input) ? ReadString(input) : eventData.String;
+					Event e = new Event(time, eventData) {
+						Int = ReadVarint(input, false),
+						Float = ReadFloat(input),
+						String = ReadBoolean(input) ? ReadString(input) : eventData.String
+					};
+					if (e.data.AudioPath != null) {
+						e.volume = ReadFloat(input);
+						e.balance = ReadFloat(input);
+					}
 					timeline.SetFrame(i, e);
 				}
 				timelines.Add(timeline);
