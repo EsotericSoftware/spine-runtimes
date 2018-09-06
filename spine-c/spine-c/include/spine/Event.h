@@ -44,6 +44,8 @@ typedef struct spEvent {
 	int intValue;
 	float floatValue;
 	const char* stringValue;
+	float volume;
+	float balance;
 
 #ifdef __cplusplus
 	spEvent() :
@@ -51,7 +53,9 @@ typedef struct spEvent {
 		time(0),
 		intValue(0),
 		floatValue(0),
-		stringValue(0) {
+		stringValue(0),
+		volume(0),
+		balance(0) {
 	}
 #endif
 } spEvent;

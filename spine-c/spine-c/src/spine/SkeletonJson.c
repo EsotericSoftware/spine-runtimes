@@ -502,6 +502,10 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 			event->floatValue = Json_getFloat(valueMap, "float", eventData->floatValue);
 			stringValue = Json_getString(valueMap, "string", eventData->stringValue);
 			if (stringValue) MALLOC_STR(event->stringValue, stringValue);
+			if (eventData->audioPath) {
+				event->volume = Json_getFloat(valueMap, "volume", 1);
+				event->balance = Json_getFloat(valueMap, "volume", 0);
+			}
 			spEventTimeline_setFrame(timeline, frameIndex, event);
 		}
 		animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
@@ -1081,6 +1085,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	if (events) {
 		Json *eventMap;
 		const char* stringValue;
+		const char* audioPath;
 		skeletonData->eventsCount = events->size;
 		skeletonData->events = MALLOC(spEventData*, events->size);
 		for (eventMap = events->child, i = 0; eventMap; eventMap = eventMap->next, ++i) {
@@ -1089,6 +1094,12 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			eventData->floatValue = Json_getFloat(eventMap, "float", 0);
 			stringValue = Json_getString(eventMap, "string", 0);
 			if (stringValue) MALLOC_STR(eventData->stringValue, stringValue);
+			audioPath = Json_getString(eventMap, "audio", 0);
+			if (audioPath) {
+				MALLOC_STR(eventData->audioPath, audioPath);
+				eventData->volume = Json_getFloat(eventMap, "volume", 1);
+				eventData->balance = Json_getFloat(eventMap, "balance", 0);
+			}
 			skeletonData->events[i] = eventData;
 		}
 	}

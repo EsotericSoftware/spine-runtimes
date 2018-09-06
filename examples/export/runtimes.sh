@@ -161,8 +161,8 @@ cp -f ../raptor/export/raptor-pro.skel ../../spine-sfml/c/data/
 cp -f ../raptor/export/raptor.atlas ../../spine-sfml/c/data/
 cp -f ../raptor/export/raptor.png ../../spine-sfml/c/data/
 
-cp -f ../spineboy/export/spineboy-ess.json ../../spine-sfml/c/data/
-cp -f ../spineboy/export/spineboy-ess.skel ../../spine-sfml/c/data/
+cp -f ../spineboy/export/spineboy-pro.json ../../spine-sfml/c/data/
+cp -f ../spineboy/export/spineboy-pro.skel ../../spine-sfml/c/data/
 cp -f ../spineboy/export/spineboy.atlas ../../spine-sfml/c/data/
 cp -f ../spineboy/export/spineboy.png ../../spine-sfml/c/data/
 
@@ -206,8 +206,8 @@ cp -f ../raptor/export/raptor-pro.skel ../../spine-sfml/cpp/data/
 cp -f ../raptor/export/raptor.atlas ../../spine-sfml/cpp/data/
 cp -f ../raptor/export/raptor.png ../../spine-sfml/cpp/data/
 
-cp -f ../spineboy/export/spineboy-ess.json ../../spine-sfml/cpp/data/
-cp -f ../spineboy/export/spineboy-ess.skel ../../spine-sfml/cpp/data/
+cp -f ../spineboy/export/spineboy-pro.json ../../spine-sfml/cpp/data/
+cp -f ../spineboy/export/spineboy-pro.skel ../../spine-sfml/cpp/data/
 cp -f ../spineboy/export/spineboy.atlas ../../spine-sfml/cpp/data/
 cp -f ../spineboy/export/spineboy.png ../../spine-sfml/cpp/data/
 
