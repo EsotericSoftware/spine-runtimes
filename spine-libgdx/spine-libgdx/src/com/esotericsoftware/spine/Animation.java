@@ -202,6 +202,20 @@ public class Animation {
 		twoColor
 	}
 
+	static public interface BoneTimeline extends Timeline {
+		public void setBoneIndex (int index);
+
+		/** The index of the slot in {@link Skeleton#getSlots()} that will be changed. */
+		public int getBoneIndex ();
+	}
+
+	static public interface SlotTimeline extends Timeline {
+		public void setSlotIndex (int index);
+
+		/** The index of the slot in {@link Skeleton#getSlots()} that will be changed. */
+		public int getSlotIndex ();
+	}
+
 	/** The base class for timelines that use interpolation between key frame values. */
 	abstract static public class CurveTimeline implements Timeline {
 		static public final float LINEAR = 0, STEPPED = 1, BEZIER = 2;
@@ -290,7 +304,7 @@ public class Animation {
 	}
 
 	/** Changes a bone's local {@link Bone#getRotation()}. */
-	static public class RotateTimeline extends CurveTimeline {
+	static public class RotateTimeline extends CurveTimeline implements BoneTimeline {
 		static public final int ENTRIES = 2;
 		static final int PREV_TIME = -2, PREV_ROTATION = -1;
 		static final int ROTATION = 1;
@@ -386,7 +400,7 @@ public class Animation {
 	}
 
 	/** Changes a bone's local {@link Bone#getX()} and {@link Bone#getY()}. */
-	static public class TranslateTimeline extends CurveTimeline {
+	static public class TranslateTimeline extends CurveTimeline implements BoneTimeline {
 		static public final int ENTRIES = 3;
 		static final int PREV_TIME = -3, PREV_X = -2, PREV_Y = -1;
 		static final int X = 1, Y = 2;
@@ -641,7 +655,7 @@ public class Animation {
 	}
 
 	/** Changes a slot's {@link Slot#getColor()}. */
-	static public class ColorTimeline extends CurveTimeline {
+	static public class ColorTimeline extends CurveTimeline implements SlotTimeline {
 		static public final int ENTRIES = 5;
 		static private final int PREV_TIME = -5, PREV_R = -4, PREV_G = -3, PREV_B = -2, PREV_A = -1;
 		static private final int R = 1, G = 2, B = 3, A = 4;
@@ -735,7 +749,7 @@ public class Animation {
 	}
 
 	/** Changes a slot's {@link Slot#getColor()} and {@link Slot#getDarkColor()} for two color tinting. */
-	static public class TwoColorTimeline extends CurveTimeline {
+	static public class TwoColorTimeline extends CurveTimeline implements SlotTimeline {
 		static public final int ENTRIES = 8;
 		static private final int PREV_TIME = -8, PREV_R = -7, PREV_G = -6, PREV_B = -5, PREV_A = -4;
 		static private final int PREV_R2 = -3, PREV_G2 = -2, PREV_B2 = -1;
@@ -849,7 +863,7 @@ public class Animation {
 	}
 
 	/** Changes a slot's {@link Slot#getAttachment()}. */
-	static public class AttachmentTimeline implements Timeline {
+	static public class AttachmentTimeline implements SlotTimeline {
 		int slotIndex;
 		final float[] frames; // time, ...
 		final String[] attachmentNames;
@@ -925,7 +939,7 @@ public class Animation {
 	}
 
 	/** Changes a slot's {@link Slot#getAttachmentVertices()} to deform a {@link VertexAttachment}. */
-	static public class DeformTimeline extends CurveTimeline {
+	static public class DeformTimeline extends CurveTimeline implements SlotTimeline {
 		int slotIndex;
 		VertexAttachment attachment;
 		private final float[] frames; // time, ...
