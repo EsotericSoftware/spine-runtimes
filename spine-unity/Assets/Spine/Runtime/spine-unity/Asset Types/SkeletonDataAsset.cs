@@ -31,6 +31,7 @@
 using System;
 using System.IO;
 using UnityEngine;
+
 using Spine;
 
 namespace Spine.Unity {
@@ -39,6 +40,8 @@ namespace Spine.Unity {
 	public class SkeletonDataAsset : ScriptableObject {
 		#region Inspector
 		public AtlasAssetBase[] atlasAssets = new AtlasAssetBase[0];
+		public BlendModeMaterialsAsset blendModeMaterials;
+
 		#if SPINE_TK2D
 		public tk2dSpriteCollectionData spriteCollection;
 		public float scale = 1f;
@@ -87,6 +90,7 @@ namespace Spine.Unity {
 		}
 		#endregion
 
+		/// <summary>Clears the loaded SkeletonData and AnimationStateData. Use this to force a reload for the next time GetSkeletonData is called.</summary>
 		public void Clear () {
 			skeletonData = null;
 			stateData = null;
@@ -161,6 +165,9 @@ namespace Spine.Unity {
 
 			}
 
+			if (blendModeMaterials != null)
+				blendModeMaterials.Apply(loadedSkeletonData);
+
 			this.InitializeWithData(loadedSkeletonData);
 
 			return skeletonData;
@@ -218,6 +225,7 @@ namespace Spine.Unity {
 			GetSkeletonData(false);
 			return stateData;
 		}
+
 	}
 
 }

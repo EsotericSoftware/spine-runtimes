@@ -51,6 +51,7 @@ namespace Spine.Unity.Editor {
 		internal static bool showAttachments = false;
 
 		SerializedProperty atlasAssets, skeletonJSON, scale, fromAnimation, toAnimation, duration, defaultMix;
+		SerializedProperty blendModeMaterials;
 		#if SPINE_TK2D
 		SerializedProperty spriteCollection;
 		#endif
@@ -99,6 +100,8 @@ namespace Spine.Unity.Editor {
 			toAnimation = serializedObject.FindProperty("toAnimation");
 			duration = serializedObject.FindProperty("duration");
 			defaultMix = serializedObject.FindProperty("defaultMix");
+
+			blendModeMaterials = serializedObject.FindProperty("blendModeMaterials");
 
 			#if SPINE_SKELETON_MECANIM
 			controller = serializedObject.FindProperty("controller");
@@ -315,6 +318,8 @@ namespace Spine.Unity.Editor {
 
 			if (atlasAssets.arraySize == 0)
 				EditorGUILayout.HelpBox("AtlasAssets array is empty. Skeleton's attachments will load without being mapped to images.", MessageType.Info);
+
+			EditorGUILayout.PropertyField(blendModeMaterials);
 		}
 
 		void HandleAtlasAssetsNulls () {

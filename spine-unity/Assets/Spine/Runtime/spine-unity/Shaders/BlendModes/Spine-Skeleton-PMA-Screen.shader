@@ -1,11 +1,11 @@
-﻿// Spine/Skeleton PMA Multiply
+﻿// Spine/Skeleton PMA Screen
 // - single color multiply tint
 // - unlit
 // - Premultiplied alpha Multiply blending
 // - No depth, no backface culling, no fog.
 // - ShadowCaster pass
 
-Shader "Spine/Skeleton PMA Screen" {
+Shader "Spine/Blend Modes/Skeleton PMA Screen" {
 	Properties {
 		_Color ("Tint Color", Color) = (1,1,1,1)
 		[NoScaleOffset] _MainTex ("MainTex", 2D) = "black" {}
