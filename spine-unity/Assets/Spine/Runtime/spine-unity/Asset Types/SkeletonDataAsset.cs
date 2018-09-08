@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -40,7 +41,6 @@ namespace Spine.Unity {
 	public class SkeletonDataAsset : ScriptableObject {
 		#region Inspector
 		public AtlasAssetBase[] atlasAssets = new AtlasAssetBase[0];
-		public BlendModeMaterialsAsset blendModeMaterials;
 
 		#if SPINE_TK2D
 		public tk2dSpriteCollectionData spriteCollection;
@@ -49,6 +49,10 @@ namespace Spine.Unity {
 		public float scale = 0.01f;
 		#endif
 		public TextAsset skeletonJSON;
+
+		[Tooltip("Use SkeletonDataModifierAssets to apply changes to the SkeletonData after being loaded, such as apply blend mode Materials to Attachments under slots with special blend modes.")]
+		public List<SkeletonDataModifierAsset> skeletonDataModifiers = new List<SkeletonDataModifierAsset>();
+
 		[SpineAnimation(includeNone: false)]
 		public string[] fromAnimation = new string[0];
 		[SpineAnimation(includeNone: false)]
@@ -165,8 +169,11 @@ namespace Spine.Unity {
 
 			}
 
-			if (blendModeMaterials != null)
-				blendModeMaterials.Apply(loadedSkeletonData);
+			if (skeletonDataModifiers != null) {
+				foreach (var m in skeletonDataModifiers) {
+					if (m != null) m.Apply(loadedSkeletonData);
+				}
+			}
 
 			this.InitializeWithData(loadedSkeletonData);
 

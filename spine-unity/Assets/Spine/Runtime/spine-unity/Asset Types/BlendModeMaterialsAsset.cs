@@ -38,14 +38,14 @@ using Spine.Unity;
 
 namespace Spine.Unity {
 	[CreateAssetMenu(menuName = "Spine/Blend Mode Materials Asset", order = 200)]
-	public class BlendModeMaterialsAsset : ScriptableObject {
+	public class BlendModeMaterialsAsset : SkeletonDataModifierAsset {
 		public Material multiplyMaterialTemplate;
 		public Material screenMaterialTemplate;
 		public Material additiveMaterialTemplate;
 
 		public bool applyAdditiveMaterial;
 
-		public void Apply (SkeletonData skeletonData) {
+		public override void Apply (SkeletonData skeletonData) {
 			ApplyMaterials(skeletonData, multiplyMaterialTemplate, screenMaterialTemplate, additiveMaterialTemplate, applyAdditiveMaterial);
 		}
 
