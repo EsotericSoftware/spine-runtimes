@@ -98,6 +98,27 @@ namespace Spine.Unity {
 		}
 		#endregion
 
+		#region Skeleton
+		/// <summary>Sets the Skeleton's local scale using a UnityEngine.Vector2. If only individual components need to be set, set Skeleton.ScaleX or Skeleton.ScaleY.</summary>
+		public static void SetLocalScale (this Skeleton skeleton, Vector2 scale) {
+			skeleton.scaleX = scale.x;
+			skeleton.scaleY = scale.y;
+		}
+
+		/// <summary>Gets the internal bone matrix as a Unity bonespace-to-skeletonspace transformation matrix.</summary>
+		public static Matrix4x4 GetMatrix4x4 (this Bone bone) {
+			return new Matrix4x4 {
+				m00 = bone.a,
+				m01 = bone.b,
+				m03 = bone.worldX,
+				m10 = bone.c,
+				m11 = bone.d,
+				m13 = bone.worldY,
+				m33 = 1
+			};
+		}
+		#endregion
+
 		#region Bone
 		/// <summary>Sets the bone's (local) X and Y according to a Vector2</summary>
 		public static void SetPosition (this Bone bone, Vector2 position) {
@@ -149,13 +170,9 @@ namespace Spine.Unity {
 			return new Quaternion(0, 0, Mathf.Sin(halfRotation), Mathf.Cos(halfRotation));
 		}
 
-		/// <summary>Gets the internal bone matrix as a Unity bonespace-to-skeletonspace transformation matrix.</summary>
-		public static Matrix4x4 GetMatrix4x4 (this Bone bone) {
-			return new Matrix4x4 {
-				m00 = bone.a, m01 = bone.b, m03 = bone.worldX,
-				m10 = bone.c, m11 = bone.d, m13 = bone.worldY,
-				m33 = 1
-			};
+		/// <summary>Returns the Skeleton's local scale as a UnityEngine.Vector2. If only individual components are needed, use Skeleton.ScaleX or Skeleton.ScaleY.</summary>
+		public static Vector2 GetLocalScale (this Skeleton skeleton) {
+			return new Vector2(skeleton.scaleX, skeleton.scaleY);
 		}
 
 		/// <summary>Calculates a 2x2 Transformation Matrix that can convert a skeleton-space position to a bone-local position.</summary>
