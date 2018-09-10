@@ -665,6 +665,7 @@ module spine {
 		reset () {
 			this.next = null;
 			this.mixingFrom = null;
+			this.mixingTo = null;
 			this.animation = null;
 			this.listener = null;
 			this.timelineMode.length = 0;
