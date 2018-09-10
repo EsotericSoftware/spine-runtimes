@@ -69,6 +69,7 @@ package spine.examples {
 			var skeletonData : SkeletonData = json.readSkeletonData(new SpineboyJson());
 
 			var stateData : AnimationStateData = new AnimationStateData(skeletonData);
+			stateData.setMixByName("walk", "run", 0.4);
 			stateData.setMixByName("run", "jump", 0.4);
 			stateData.setMixByName("jump", "run", 0.4);
 			stateData.setMixByName("jump", "jump", 0.4);
