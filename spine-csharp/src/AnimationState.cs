@@ -36,7 +36,7 @@ namespace Spine {
 		static readonly Animation EmptyAnimation = new Animation("<empty>", new ExposedList<Timeline>(), 0);
 		internal const int Subsequent = 0, First = 1, Hold = 2, HoldMix = 3;
 
-		private AnimationStateData data;
+		protected AnimationStateData data;
 
 		private readonly Pool<TrackEntry> trackEntryPool = new Pool<TrackEntry>();
 		private readonly ExposedList<TrackEntry> tracks = new ExposedList<TrackEntry>();
@@ -49,6 +49,7 @@ namespace Spine {
 		private float timeScale = 1;
 
 		public AnimationStateData Data { get { return data; } }
+
 		/// <summary>A list of tracks that have animations, which may contain nulls.</summary>
 		public ExposedList<TrackEntry> Tracks { get { return tracks; } }
 		public float TimeScale { get { return timeScale; } set { timeScale = value; } }
@@ -70,7 +71,7 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Increments the track entry times, setting queued animations as current if needed</summary>
+		/// Increments the track entry trackTimes, setting queued animations as current if needed</summary>
 		/// <param name="delta">delta time</param>
 		public void Update (float delta) {
 			delta *= timeScale;
@@ -109,7 +110,6 @@ namespace Spine {
 				} else if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
 					// Clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom.
 					tracksItems[i] = null;
-
 					queue.End(current);
 					DisposeNext(current);
 					continue;
@@ -166,7 +166,6 @@ namespace Spine {
 			if (animationsChanged) AnimationsChanged();
 
 			var events = this.events;
-
 			bool applied = false;
 			var tracksItems = tracks.Items;
 			for (int i = 0, m = tracks.Count; i < m; i++) {
@@ -174,6 +173,7 @@ namespace Spine {
 				if (current == null || current.delay > 0) continue;
 				applied = true;
 
+				// Track 0 animations aren't for layering, so do not show the previously applied animations before the first key.
 				MixBlend blend = i == 0 ? MixBlend.First : current.mixBlend;
 
 				// Apply mixing from entries first.
@@ -242,7 +242,7 @@ namespace Spine {
 
 			if (blend == MixBlend.Add) {
 				for (int i = 0; i < timelineCount; i++)
-					(timelinesItems[i]).Apply(skeleton, animationLast, animationTime, eventBuffer, alphaMix, blend, MixDirection.Out);
+					timelinesItems[i].Apply(skeleton, animationLast, animationTime, eventBuffer, alphaMix, blend, MixDirection.Out);
 			} else {
 				var timelineMode = from.timelineMode.Items;
 				var timelineHoldMix = from.timelineHoldMix.Items;
@@ -258,10 +258,8 @@ namespace Spine {
 					float alpha;
 					switch (timelineMode[i]) {
 						case AnimationState.Subsequent:
-							if (!attachments && timeline is AttachmentTimeline)
-								continue;
-							if (!drawOrder && timeline is DrawOrderTimeline)
-								continue;
+							if (!attachments && timeline is AttachmentTimeline) continue;
+							if (!drawOrder && timeline is DrawOrderTimeline) continue;
 							timelineBlend = blend;
 							alpha = alphaMix;
 							break;
@@ -446,7 +444,7 @@ namespace Spine {
 			if (from != null) {
 				if (interrupt) queue.Interrupt(from);
 				current.mixingFrom = from;
-				current.mixingTo = current;
+				from.mixingTo = current;
 				current.mixTime = 0;
 
 				// Store interrupted mix percentage.
@@ -640,7 +638,7 @@ namespace Spine {
 		private void AnimationsChanged () {
 			animationsChanged = false;
 
-			this.propertyIDs.Clear();
+			propertyIDs.Clear();
 
 			var tracksItems = tracks.Items;
 			for (int i = 0, n = tracks.Count; i < n; i++) {
@@ -659,7 +657,7 @@ namespace Spine {
 		}
 
 		private void SetTimelineModes (TrackEntry entry) {
-			var to = entry.mixingTo;
+			TrackEntry to = entry.mixingTo;
 			var timelines = entry.animation.timelines.Items;
 			int timelinesCount = entry.animation.timelines.Count;
 			var timelineMode = entry.timelineMode.Resize(timelinesCount).Items; //timelineMode.setSize(timelinesCount);
@@ -694,7 +692,7 @@ namespace Spine {
 					}
 					timelineMode[i] = AnimationState.Hold;
 				}
-				continue_outer:	{}
+				continue_outer: {}
 			}
 		}
 
@@ -750,6 +748,7 @@ namespace Spine {
 		public void Reset () {
 			next = null;
 			mixingFrom = null;
+			mixingTo = null;
 			animation = null;
 			timelineMode.Clear();
 			timelineHoldMix.Clear();
@@ -761,13 +760,6 @@ namespace Spine {
 			Dispose = null;
 			Complete = null;
 			Event = null;
-		}
-
-		bool HasTimeline (int id) {
-			var timelines = animation.timelines.Items;
-			for (int i = 0, n = animation.timelines.Count; i < n; i++)
-				if (timelines[i].PropertyId == id) return true;
-			return false;
 		}
 
 		/// <summary>The index of the track where this entry is either current or queued.</summary>

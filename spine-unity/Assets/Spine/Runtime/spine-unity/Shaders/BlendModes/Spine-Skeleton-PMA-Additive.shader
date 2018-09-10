@@ -1,13 +1,11 @@
-﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-// Spine/Skeleton PMA Multiply
+﻿// Spine/Skeleton PMA Screen
 // - single color multiply tint
 // - unlit
 // - Premultiplied alpha Multiply blending
 // - No depth, no backface culling, no fog.
 // - ShadowCaster pass
 
-Shader "Spine/Skeleton PMA Multiply" {
+Shader "Spine/Blend Modes/Skeleton PMA Additive" {
 	Properties {
 		_Color ("Tint Color", Color) = (1,1,1,1)
 		[NoScaleOffset] _MainTex ("MainTex", 2D) = "black" {}
@@ -22,7 +20,7 @@ Shader "Spine/Skeleton PMA Multiply" {
 		Fog { Mode Off }
 		Cull Off
 		ZWrite Off
-		Blend DstColor OneMinusSrcAlpha
+		Blend One One
 		Lighting Off
 
 		Pass {
@@ -56,7 +54,7 @@ Shader "Spine/Skeleton PMA Multiply" {
 
 			float4 frag (VertexOutput i) : COLOR {
 				float4 texColor = tex2D(_MainTex, i.uv);
-				
+
 				#if defined(_STRAIGHT_ALPHA_INPUT)
 				texColor.rgb *= texColor.a;
 				#endif

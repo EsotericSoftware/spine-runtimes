@@ -26,6 +26,7 @@ function load () {
         var skeletonJson = new spine.SkeletonJson(new spine.AtlasAttachmentLoader(atlas));
         var skeletonData = skeletonJson.readSkeletonData(assetManager.get("spineboy-ess.json"));
         var animationStateData = new spine.AnimationStateData(skeletonData);
+        animationStateData.defaultMix = 0.3;
 
         skeleton = new spine.Skeleton(skeletonData);
         animationState = new spine.AnimationState(animationStateData);
@@ -38,6 +39,8 @@ function load () {
         renderer.camera.zoom = size.x > size.y ? size.x / canvas.width : size.y / canvas.height;
 
         animationState.setAnimation(0, "walk", true);
+        animationState.addAnimation(0, "run", true, 1);
+        animationState.addAnimation(0, "jump", true, 3);
 
         requestAnimationFrame(render);
     } else {

@@ -1303,7 +1303,6 @@ var spine;
 			this.listeners = new Array();
 			this.queue = new EventQueue(this);
 			this.propertyIDs = new spine.IntSet();
-			this.mixingTo = new Array();
 			this.animationsChanged = false;
 			this.timeScale = 1;
 			this.trackEntryPool = new spine.Pool(function () { return new TrackEntry(); });
@@ -1350,6 +1349,8 @@ var spine;
 				if (current.mixingFrom != null && this.updateMixingFrom(current, delta)) {
 					var from = current.mixingFrom;
 					current.mixingFrom = null;
+					if (from != null)
+						from.mixingTo = null;
 					while (from != null) {
 						this.queue.end(from);
 						from = from.mixingFrom;
@@ -1369,6 +1370,8 @@ var spine;
 			if (to.mixTime > 0 && (to.mixTime >= to.mixDuration || to.timeScale == 0)) {
 				if (from.totalAlpha == 0 || to.mixDuration == 0) {
 					to.mixingFrom = from.mixingFrom;
+					if (from.mixingFrom != null)
+						from.mixingFrom.mixingTo = to;
 					to.interruptAlpha = from.interruptAlpha;
 					this.queue.end(from);
 				}
@@ -1400,19 +1403,19 @@ var spine;
 				var animationLast = current.animationLast, animationTime = current.getAnimationTime();
 				var timelineCount = current.animation.timelines.length;
 				var timelines = current.animation.timelines;
-				if (mix == 1 || blend == spine.MixBlend.add) {
+				if (i == 0 && (mix == 1 || blend == spine.MixBlend.add)) {
 					for (var ii = 0; ii < timelineCount; ii++)
 						timelines[ii].apply(skeleton, animationLast, animationTime, events, mix, blend, spine.MixDirection["in"]);
 				}
 				else {
-					var timelineData = current.timelineData;
+					var timelineMode = current.timelineMode;
 					var firstFrame = current.timelinesRotation.length == 0;
 					if (firstFrame)
 						spine.Utils.setArraySize(current.timelinesRotation, timelineCount << 1, null);
 					var timelinesRotation = current.timelinesRotation;
 					for (var ii = 0; ii < timelineCount; ii++) {
 						var timeline = timelines[ii];
-						var timelineBlend = timelineData[ii] == AnimationState.SUBSEQUENT ? blend : spine.MixBlend.setup;
+						var timelineBlend = timelineMode[ii] == AnimationState.SUBSEQUENT ? blend : spine.MixBlend.setup;
 						if (timeline instanceof spine.RotateTimeline) {
 							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
 						}
@@ -1452,14 +1455,14 @@ var spine;
 			var animationLast = from.animationLast, animationTime = from.getAnimationTime();
 			var timelineCount = from.animation.timelines.length;
 			var timelines = from.animation.timelines;
-			var alphaDip = from.alpha * to.interruptAlpha, alphaMix = alphaDip * (1 - mix);
+			var alphaHold = from.alpha * to.interruptAlpha, alphaMix = alphaHold * (1 - mix);
 			if (blend == spine.MixBlend.add) {
 				for (var i = 0; i < timelineCount; i++)
 					timelines[i].apply(skeleton, animationLast, animationTime, events, alphaMix, blend, spine.MixDirection.out);
 			}
 			else {
-				var timelineData = from.timelineData;
-				var timelineDipMix = from.timelineDipMix;
+				var timelineMode = from.timelineMode;
+				var timelineHoldMix = from.timelineHoldMix;
 				var firstFrame = from.timelinesRotation.length == 0;
 				if (firstFrame)
 					spine.Utils.setArraySize(from.timelinesRotation, timelineCount << 1, null);
@@ -1469,7 +1472,7 @@ var spine;
 					var timeline = timelines[i];
 					var timelineBlend;
 					var alpha = 0;
-					switch (timelineData[i]) {
+					switch (timelineMode[i]) {
 						case AnimationState.SUBSEQUENT:
 							if (!attachments && timeline instanceof spine.AttachmentTimeline)
 								continue;
@@ -1482,14 +1485,14 @@ var spine;
 							timelineBlend = spine.MixBlend.setup;
 							alpha = alphaMix;
 							break;
-						case AnimationState.DIP:
+						case AnimationState.HOLD:
 							timelineBlend = spine.MixBlend.setup;
-							alpha = alphaDip;
+							alpha = alphaHold;
 							break;
 						default:
 							timelineBlend = spine.MixBlend.setup;
-							var dipMix = timelineDipMix[i];
-							alpha = alphaDip * Math.max(0, 1 - dipMix.mixTime / dipMix.mixDuration);
+							var holdMix = timelineHoldMix[i];
+							alpha = alphaHold * Math.max(0, 1 - holdMix.mixTime / holdMix.mixDuration);
 							break;
 					}
 					from.totalAlpha += alpha;
@@ -1619,6 +1622,7 @@ var spine;
 					break;
 				this.queue.end(from);
 				entry.mixingFrom = null;
+				entry.mixingTo = null;
 				entry = from;
 			}
 			this.tracks[current.trackIndex] = null;
@@ -1631,6 +1635,7 @@ var spine;
 				if (interrupt)
 					this.queue.interrupt(from);
 				current.mixingFrom = from;
+				from.mixingTo = current;
 				current.mixTime = 0;
 				if (from.mixingFrom != null && from.mixDuration > 0)
 					current.interruptAlpha *= Math.min(1, from.mixTime / from.mixDuration);
@@ -1740,6 +1745,7 @@ var spine;
 			entry.trackIndex = trackIndex;
 			entry.animation = animation;
 			entry.loop = loop;
+			entry.holdPrevious = false;
 			entry.eventThreshold = 0;
 			entry.attachmentThreshold = 0;
 			entry.drawOrderThreshold = 0;
@@ -1769,14 +1775,62 @@ var spine;
 		};
 		AnimationState.prototype._animationsChanged = function () {
 			this.animationsChanged = false;
-			var propertyIDs = this.propertyIDs;
-			propertyIDs.clear();
-			var mixingTo = this.mixingTo;
+			this.propertyIDs.clear();
 			for (var i = 0, n = this.tracks.length; i < n; i++) {
 				var entry = this.tracks[i];
-				if (entry != null && (i == 0 || entry.mixBlend != spine.MixBlend.add))
-					entry.setTimelineData(null, mixingTo, propertyIDs);
+				if (entry == null)
+					continue;
+				while (entry.mixingFrom != null)
+					entry = entry.mixingFrom;
+				do {
+					if (entry.mixingFrom == null || entry.mixBlend != spine.MixBlend.add)
+						this.setTimelineModes(entry);
+					entry = entry.mixingTo;
+				} while (entry != null);
 			}
+		};
+		AnimationState.prototype.setTimelineModes = function (entry) {
+			var to = entry.mixingTo;
+			var timelines = entry.animation.timelines;
+			var timelinesCount = entry.animation.timelines.length;
+			var timelineMode = spine.Utils.setArraySize(entry.timelineMode, timelinesCount);
+			entry.timelineHoldMix.length = 0;
+			var timelineDipMix = spine.Utils.setArraySize(entry.timelineHoldMix, timelinesCount);
+			var propertyIDs = this.propertyIDs;
+			if (to != null && to.holdPrevious) {
+				for (var i_16 = 0; i_16 < timelinesCount; i_16++) {
+					propertyIDs.add(timelines[i_16].getPropertyId());
+					timelineMode[i_16] = AnimationState.HOLD;
+				}
+				return;
+			}
+			outer: for (var i = 0; i < timelinesCount; i++) {
+				var id = timelines[i].getPropertyId();
+				if (!propertyIDs.add(id))
+					timelineMode[i] = AnimationState.SUBSEQUENT;
+				else if (to == null || !this.hasTimeline(to, id))
+					timelineMode[i] = AnimationState.FIRST;
+				else {
+					for (var next = to.mixingTo; next != null; next = next.mixingTo) {
+						if (this.hasTimeline(next, id))
+							continue;
+						if (entry.mixDuration > 0) {
+							timelineMode[i] = AnimationState.HOLD_MIX;
+							timelineDipMix[i] = next;
+							continue outer;
+						}
+						break;
+					}
+					timelineMode[i] = AnimationState.HOLD;
+				}
+			}
+		};
+		AnimationState.prototype.hasTimeline = function (entry, id) {
+			var timelines = entry.animation.timelines;
+			for (var i = 0, n = timelines.length; i < n; i++)
+				if (timelines[i].getPropertyId() == id)
+					return true;
+			return false;
 		};
 		AnimationState.prototype.getCurrent = function (trackIndex) {
 			if (trackIndex >= this.tracks.length)
@@ -1802,68 +1856,27 @@ var spine;
 		AnimationState.emptyAnimation = new spine.Animation("<empty>", [], 0);
 		AnimationState.SUBSEQUENT = 0;
 		AnimationState.FIRST = 1;
-		AnimationState.DIP = 2;
-		AnimationState.DIP_MIX = 3;
+		AnimationState.HOLD = 2;
+		AnimationState.HOLD_MIX = 3;
 		return AnimationState;
 	}());
 	spine.AnimationState = AnimationState;
 	var TrackEntry = (function () {
 		function TrackEntry() {
 			this.mixBlend = spine.MixBlend.replace;
-			this.timelineData = new Array();
-			this.timelineDipMix = new Array();
+			this.timelineMode = new Array();
+			this.timelineHoldMix = new Array();
 			this.timelinesRotation = new Array();
 		}
 		TrackEntry.prototype.reset = function () {
 			this.next = null;
 			this.mixingFrom = null;
+			this.mixingTo = null;
 			this.animation = null;
 			this.listener = null;
-			this.timelineData.length = 0;
-			this.timelineDipMix.length = 0;
+			this.timelineMode.length = 0;
+			this.timelineHoldMix.length = 0;
 			this.timelinesRotation.length = 0;
-		};
-		TrackEntry.prototype.setTimelineData = function (to, mixingToArray, propertyIDs) {
-			if (to != null)
-				mixingToArray.push(to);
-			var lastEntry = this.mixingFrom != null ? this.mixingFrom.setTimelineData(this, mixingToArray, propertyIDs) : this;
-			if (to != null)
-				mixingToArray.pop();
-			var mixingTo = mixingToArray;
-			var mixingToLast = mixingToArray.length - 1;
-			var timelines = this.animation.timelines;
-			var timelinesCount = this.animation.timelines.length;
-			var timelineData = spine.Utils.setArraySize(this.timelineData, timelinesCount);
-			this.timelineDipMix.length = 0;
-			var timelineDipMix = spine.Utils.setArraySize(this.timelineDipMix, timelinesCount);
-			outer: for (var i = 0; i < timelinesCount; i++) {
-				var id = timelines[i].getPropertyId();
-				if (!propertyIDs.add(id))
-					timelineData[i] = AnimationState.SUBSEQUENT;
-				else if (to == null || !to.hasTimeline(id))
-					timelineData[i] = AnimationState.FIRST;
-				else {
-					for (var ii = mixingToLast; ii >= 0; ii--) {
-						var entry = mixingTo[ii];
-						if (!entry.hasTimeline(id)) {
-							if (entry.mixDuration > 0) {
-								timelineData[i] = AnimationState.DIP_MIX;
-								timelineDipMix[i] = entry;
-								continue outer;
-							}
-						}
-					}
-					timelineData[i] = AnimationState.DIP;
-				}
-			}
-			return lastEntry;
-		};
-		TrackEntry.prototype.hasTimeline = function (id) {
-			var timelines = this.animation.timelines;
-			for (var i = 0, n = timelines.length; i < n; i++)
-				if (timelines[i].getPropertyId() == id)
-					return true;
-			return false;
 		};
 		TrackEntry.prototype.getAnimationTime = function () {
 			if (this.loop) {
@@ -7266,8 +7279,8 @@ var spine;
 						break;
 					}
 					var listeners = _this.listeners;
-					for (var i_16 = 0; i_16 < listeners.length; i_16++) {
-						listeners[i_16].down(_this.currTouch.x, _this.currTouch.y);
+					for (var i_17 = 0; i_17 < listeners.length; i_17++) {
+						listeners[i_17].down(_this.currTouch.x, _this.currTouch.y);
 					}
 					console.log("Start " + _this.currTouch.x + ", " + _this.currTouch.y);
 					_this.lastX = _this.currTouch.x;
@@ -7276,29 +7289,6 @@ var spine;
 					ev.preventDefault();
 				}, false);
 				element.addEventListener("touchend", function (ev) {
-					var touches = ev.changedTouches;
-					for (var i = 0; i < touches.length; i++) {
-						var touch = touches[i];
-						if (_this.currTouch.identifier === touch.identifier) {
-							var rect = element.getBoundingClientRect();
-							var x = _this.currTouch.x = touch.clientX - rect.left;
-							var y = _this.currTouch.y = touch.clientY - rect.top;
-							_this.touchesPool.free(_this.currTouch);
-							var listeners = _this.listeners;
-							for (var i_17 = 0; i_17 < listeners.length; i_17++) {
-								listeners[i_17].up(x, y);
-							}
-							console.log("End " + x + ", " + y);
-							_this.lastX = x;
-							_this.lastY = y;
-							_this.buttonDown = false;
-							_this.currTouch = null;
-							break;
-						}
-					}
-					ev.preventDefault();
-				}, false);
-				element.addEventListener("touchcancel", function (ev) {
 					var touches = ev.changedTouches;
 					for (var i = 0; i < touches.length; i++) {
 						var touch = touches[i];
@@ -7321,6 +7311,29 @@ var spine;
 					}
 					ev.preventDefault();
 				}, false);
+				element.addEventListener("touchcancel", function (ev) {
+					var touches = ev.changedTouches;
+					for (var i = 0; i < touches.length; i++) {
+						var touch = touches[i];
+						if (_this.currTouch.identifier === touch.identifier) {
+							var rect = element.getBoundingClientRect();
+							var x = _this.currTouch.x = touch.clientX - rect.left;
+							var y = _this.currTouch.y = touch.clientY - rect.top;
+							_this.touchesPool.free(_this.currTouch);
+							var listeners = _this.listeners;
+							for (var i_19 = 0; i_19 < listeners.length; i_19++) {
+								listeners[i_19].up(x, y);
+							}
+							console.log("End " + x + ", " + y);
+							_this.lastX = x;
+							_this.lastY = y;
+							_this.buttonDown = false;
+							_this.currTouch = null;
+							break;
+						}
+					}
+					ev.preventDefault();
+				}, false);
 				element.addEventListener("touchmove", function (ev) {
 					if (_this.currTouch == null)
 						return;
@@ -7332,8 +7345,8 @@ var spine;
 							var x = touch.clientX - rect.left;
 							var y = touch.clientY - rect.top;
 							var listeners = _this.listeners;
-							for (var i_19 = 0; i_19 < listeners.length; i_19++) {
-								listeners[i_19].dragged(x, y);
+							for (var i_20 = 0; i_20 < listeners.length; i_20++) {
+								listeners[i_20].dragged(x, y);
 							}
 							console.log("Drag " + x + ", " + y);
 							_this.lastX = _this.currTouch.x = x;
@@ -9183,11 +9196,11 @@ var spine;
 						var nn = clip.worldVerticesLength;
 						var world = this.temp = spine.Utils.setArraySize(this.temp, nn, 0);
 						clip.computeWorldVertices(slot, 0, nn, world, 0, 2);
-						for (var i_20 = 0, n_2 = world.length; i_20 < n_2; i_20 += 2) {
-							var x = world[i_20];
-							var y = world[i_20 + 1];
-							var x2 = world[(i_20 + 2) % world.length];
-							var y2 = world[(i_20 + 3) % world.length];
+						for (var i_21 = 0, n_2 = world.length; i_21 < n_2; i_21 += 2) {
+							var x = world[i_21];
+							var y = world[i_21 + 1];
+							var x2 = world[(i_21 + 2) % world.length];
+							var y2 = world[(i_21 + 3) % world.length];
 							shapes.line(x, y, x2, y2);
 						}
 					}

@@ -29,8 +29,10 @@
  *****************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+
 using Spine;
 
 namespace Spine.Unity {
@@ -39,6 +41,7 @@ namespace Spine.Unity {
 	public class SkeletonDataAsset : ScriptableObject {
 		#region Inspector
 		public AtlasAssetBase[] atlasAssets = new AtlasAssetBase[0];
+
 		#if SPINE_TK2D
 		public tk2dSpriteCollectionData spriteCollection;
 		public float scale = 1f;
@@ -46,6 +49,10 @@ namespace Spine.Unity {
 		public float scale = 0.01f;
 		#endif
 		public TextAsset skeletonJSON;
+
+		[Tooltip("Use SkeletonDataModifierAssets to apply changes to the SkeletonData after being loaded, such as apply blend mode Materials to Attachments under slots with special blend modes.")]
+		public List<SkeletonDataModifierAsset> skeletonDataModifiers = new List<SkeletonDataModifierAsset>();
+
 		[SpineAnimation(includeNone: false)]
 		public string[] fromAnimation = new string[0];
 		[SpineAnimation(includeNone: false)]
@@ -87,6 +94,7 @@ namespace Spine.Unity {
 		}
 		#endregion
 
+		/// <summary>Clears the loaded SkeletonData and AnimationStateData. Use this to force a reload for the next time GetSkeletonData is called.</summary>
 		public void Clear () {
 			skeletonData = null;
 			stateData = null;
@@ -161,6 +169,12 @@ namespace Spine.Unity {
 
 			}
 
+			if (skeletonDataModifiers != null) {
+				foreach (var m in skeletonDataModifiers) {
+					if (m != null) m.Apply(loadedSkeletonData);
+				}
+			}
+
 			this.InitializeWithData(loadedSkeletonData);
 
 			return skeletonData;
@@ -218,6 +232,7 @@ namespace Spine.Unity {
 			GetSkeletonData(false);
 			return stateData;
 		}
+
 	}
 
 }

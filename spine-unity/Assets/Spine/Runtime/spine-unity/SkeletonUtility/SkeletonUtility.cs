@@ -103,6 +103,7 @@ namespace Spine.Unity {
 			int floatCount = floats.Length;
 
 			Bounds bounds = new Bounds();
+
 			bounds.center = new Vector3(floats[0], floats[1], 0);
 			for (int i = 2; i < floatCount; i += 2)
 				bounds.Encapsulate(new Vector3(floats[i], floats[i + 1], 0));
@@ -122,14 +123,7 @@ namespace Spine.Unity {
 		void Update () {
 			var skeleton = skeletonRenderer.skeleton;
 			if (boneRoot != null && skeleton != null) {
-				Vector3 flipScale = Vector3.one;
-				if (skeleton.scaleX < 0)
-					flipScale.x = -1;
-
-				if (skeleton.scaleY < 0)
-					flipScale.y = -1;
-
-				boneRoot.localScale = flipScale;
+				boneRoot.localScale = new Vector3(skeleton.scaleX, skeleton.scaleY, 1f);
 			}
 		}
 

@@ -283,8 +283,12 @@ namespace Spine {
 		public TextureFilter magFilter;
 		public TextureWrap uWrap;
 		public TextureWrap vWrap;
-		public Object rendererObject;
+		public object rendererObject;
 		public int width, height;
+
+		public AtlasPage Clone () {
+			return MemberwiseClone() as AtlasPage;
+		}
 	}
 
 	public class AtlasRegion {
@@ -298,6 +302,10 @@ namespace Spine {
 		public bool rotate;
 		public int[] splits;
 		public int[] pads;
+
+		public AtlasRegion Clone () {
+			return MemberwiseClone() as AtlasRegion;
+		}
 	}
 
 	public interface TextureLoader {

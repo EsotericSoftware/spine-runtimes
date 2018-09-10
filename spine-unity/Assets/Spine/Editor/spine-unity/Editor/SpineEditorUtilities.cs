@@ -179,7 +179,7 @@ namespace Spine.Unity.Editor {
 		static void Initialize () {
 			Preferences.Load();
 
-			DirectoryInfo rootDir = new DirectoryInfo(Application.dataPath);
+			var rootDir = new DirectoryInfo(Application.dataPath);
 			FileInfo[] files = rootDir.GetFiles("SpineEditorUtilities.cs", SearchOption.AllDirectories);
 			editorPath = Path.GetDirectoryName(files[0].FullName.Replace("\\", "/").Replace(Application.dataPath, "Assets"));
 			editorGUIPath = editorPath + "/GUI";
@@ -194,15 +194,27 @@ namespace Spine.Unity.Editor {
 			EditorApplication.hierarchyWindowItemOnGUI += HierarchyHandler.HandleDragAndDrop;
 
 			// Hierarchy Icons
-			#if UNITY_2017_2_OR_NEWER
+#if UNITY_2017_2_OR_NEWER
 			EditorApplication.playModeStateChanged -= HierarchyHandler.IconsOnPlaymodeStateChanged;
 			EditorApplication.playModeStateChanged += HierarchyHandler.IconsOnPlaymodeStateChanged;
 			HierarchyHandler.IconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
-			#else
+#else
 			EditorApplication.playmodeStateChanged -= HierarchyHandler.IconsOnPlaymodeStateChanged;
 			EditorApplication.playmodeStateChanged += HierarchyHandler.IconsOnPlaymodeStateChanged;
 			HierarchyHandler.IconsOnPlaymodeStateChanged();
-			#endif
+#endif
+
+			// Data Refresh Edit Mode.
+			// This prevents deserialized SkeletonData from persisting from play mode to edit mode.
+#if UNITY_2017_2_OR_NEWER
+			EditorApplication.playModeStateChanged -= DataReloadHandler.OnPlaymodeStateChanged;
+			EditorApplication.playModeStateChanged += DataReloadHandler.OnPlaymodeStateChanged;
+			DataReloadHandler.OnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
+#else
+			EditorApplication.playmodeStateChanged -= DataReloadHandler.OnPlaymodeStateChanged;
+			EditorApplication.playmodeStateChanged += DataReloadHandler.OnPlaymodeStateChanged;
+			DataReloadHandler.OnPlaymodeStateChanged();
+#endif
 
 			initialized = true;
 		}
@@ -214,11 +226,11 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		public static class Preferences {
-			#if SPINE_TK2D
+#if SPINE_TK2D
 			const float DEFAULT_DEFAULT_SCALE = 1f;
-			#else
+#else
 			const float DEFAULT_DEFAULT_SCALE = 0.01f;
-			#endif
+#endif
 			const string DEFAULT_SCALE_KEY = "SPINE_DEFAULT_SCALE";
 			public static float defaultScale = DEFAULT_DEFAULT_SCALE;
 
@@ -268,11 +280,11 @@ namespace Spine.Unity.Editor {
 				showHierarchyIcons = EditorGUILayout.Toggle(new GUIContent("Show Hierarchy Icons", "Show relevant icons on GameObjects with Spine Components on them. Disable this if you have large, complex scenes."), showHierarchyIcons);
 				if (EditorGUI.EndChangeCheck()) {
 					EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, showHierarchyIcons);
-					#if UNITY_2017_2_OR_NEWER
+#if UNITY_2017_2_OR_NEWER
 					HierarchyHandler.IconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
-					#else
+#else
 					HierarchyHandler.IconsOnPlaymodeStateChanged();
-					#endif
+#endif
 				}
 
 				EditorGUILayout.Separator();
@@ -330,6 +342,38 @@ namespace Spine.Unity.Editor {
 					if (GUILayout.Button("Disable", GUILayout.Width(64)))
 						SpineTK2DEditorUtility.DisableTK2D();
 				}
+			}
+		}
+
+		public static class DataReloadHandler {
+#if UNITY_2017_2_OR_NEWER
+			internal static void OnPlaymodeStateChanged (PlayModeStateChange stateChange) {
+#else
+			internal static void OnPlaymodeStateChanged () {
+#endif
+				ReloadAllActiveSkeletons();
+			}
+
+			static void ReloadAllActiveSkeletons () {
+				var skeletonDataAssetsToReload = new HashSet<SkeletonDataAsset>();
+
+				var activeSkeletonRenderers = GameObject.FindObjectsOfType<SkeletonRenderer>();
+				foreach (var sr in activeSkeletonRenderers) {
+					var skeletonDataAsset = sr.skeletonDataAsset;
+					if (skeletonDataAsset != null) skeletonDataAssetsToReload.Add(skeletonDataAsset);
+				}
+
+				var activeSkeletonGraphics = GameObject.FindObjectsOfType<SkeletonGraphic>();
+				foreach (var sg in activeSkeletonGraphics) {
+					var skeletonDataAsset = sg.skeletonDataAsset;
+					if (skeletonDataAsset != null) skeletonDataAssetsToReload.Add(skeletonDataAsset);
+				}
+
+				foreach (var sda in skeletonDataAssetsToReload)
+					sda.Clear();
+
+				foreach (var sr in activeSkeletonRenderers)	sr.Initialize(true);
+				foreach (var sg in activeSkeletonGraphics) sg.Initialize(true);
 			}
 		}
 
