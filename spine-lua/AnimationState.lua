@@ -820,16 +820,16 @@ function AnimationState:setTimelineModes(entry)
 	local skip
 	while i <= timelinesCount do
 		local id = "" .. timelines[i]:getPropertyId()
-		if not (propertyIDs[id] == nil) then
+		if propertyIDs[id] then
 			timelineMode[i] = SUBSEQUENT
 		else
 			propertyIDs[id] = id
-			if (to == nil or not self:hasTimeline(to, id)) then
+			if to == nil or not self:hasTimeline(to, id) then
 				timelineMode[i] = FIRST
 			else
 				local next = to.mixingTo
+				skip = false
 				while next do
-					skip = false
 					if not self:hasTimeline(id) then
 						if entry.mixDuration > 0 then
 							timelineMode[i] = HOLD_MIX
