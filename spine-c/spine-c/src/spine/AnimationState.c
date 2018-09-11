@@ -34,8 +34,8 @@
 
 #define SUBSEQUENT 0
 #define FIRST 1
-#define DIP 2
-#define DIP_MIX 3
+#define HOLD 2
+#define HOLD_MIX 3
 
 _SP_ARRAY_IMPLEMENT_TYPE(spTrackEntryArray, spTrackEntry*)
 
@@ -62,7 +62,7 @@ float* _spAnimationState_resizeTimelinesRotation(spTrackEntry* entry, int newSiz
 int* _spAnimationState_resizeTimelinesFirst(spTrackEntry* entry, int newSize);
 void _spAnimationState_ensureCapacityPropertyIDs(spAnimationState* self, int capacity);
 int _spAnimationState_addPropertyID(spAnimationState* self, int id);
-spTrackEntry* _spTrackEntry_setTimelineData(spTrackEntry* self, spTrackEntry* to, spTrackEntryArray* mixingToArray, spAnimationState* state);
+void _spTrackEntry_setTimelineData(spTrackEntry* self, spAnimationState* state);
 
 
 _spEventQueue* _spEventQueue_create (_spAnimationState* state) {
@@ -192,8 +192,8 @@ void _spAnimationState_disableQueue(spAnimationState* self) {
 }
 
 void _spAnimationState_disposeTrackEntry (spTrackEntry* entry) {
-	spIntArray_dispose(entry->timelineData);
-	spTrackEntryArray_dispose(entry->timelineDipMix);
+	spIntArray_dispose(entry->timelineMode);
+	spTrackEntryArray_dispose(entry->timelineHoldMix);
 	FREE(entry->timelinesRotation);
 	FREE(entry);
 }
@@ -237,8 +237,6 @@ spAnimationState* spAnimationState_create (spAnimationStateData* data) {
 	internal->propertyIDs = CALLOC(int, 128);
 	internal->propertyIDsCapacity = 128;
 
-	self->mixingTo = spTrackEntryArray_create(16);
-
 	return self;
 }
 
@@ -251,7 +249,6 @@ void spAnimationState_dispose (spAnimationState* self) {
 	_spEventQueue_free(internal->queue);
 	FREE(internal->events);
 	FREE(internal->propertyIDs);
-	spTrackEntryArray_dispose(self->mixingTo);
     FREE(internal);
 }
 
@@ -305,6 +302,7 @@ void spAnimationState_update (spAnimationState* self, float delta) {
 			/* End mixing from entries once all have completed. */
 			spTrackEntry* from = current->mixingFrom;
 			current->mixingFrom = 0;
+			if (from != 0) from->mixingTo = 0;
 			while (from != 0) {
 				_spEventQueue_end(internal->queue, from);
 				from = from->mixingFrom;
@@ -333,6 +331,7 @@ int /*boolean*/ _spAnimationState_updateMixingFrom (spAnimationState* self, spTr
 		/* Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame). */
 		if (from->totalAlpha == 0 || to->mixDuration == 0) {
 			to->mixingFrom = from->mixingFrom;
+			if (from->mixingFrom != 0) from->mixingFrom->mixingTo = to;
 			to->interruptAlpha = from->interruptAlpha;
 			_spEventQueue_end(internal->queue, from);
 		}
@@ -378,11 +377,11 @@ int spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 		animationLast = current->animationLast; animationTime = spTrackEntry_getAnimationTime(current);
 		timelineCount = current->animation->timelinesCount;
 		timelines = current->animation->timelines;
-		if (mix == 1 || blend == SP_MIX_BLEND_ADD) {
+		if (i == 0 && (mix == 1 || blend == SP_MIX_BLEND_ADD)) {
 			for (ii = 0; ii < timelineCount; ii++)
 				spTimeline_apply(timelines[ii], skeleton, animationLast, animationTime, internal->events, &internal->eventsCount, mix, blend, SP_MIX_DIRECTION_IN);
 		} else {
-			spIntArray* timelineData = current->timelineData;
+			spIntArray* timelineMode = current->timelineMode;
 
 			firstFrame = current->timelinesRotationCount == 0;
 			if (firstFrame) _spAnimationState_resizeTimelinesRotation(current, timelineCount << 1);
@@ -390,7 +389,7 @@ int spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 
 			for (ii = 0; ii < timelineCount; ii++) {
 				timeline = timelines[ii];
-				timelineBlend = timelineData->items[ii] == SUBSEQUENT ? blend : SP_MIX_BLEND_SETUP;
+				timelineBlend = timelineMode->items[ii] == SUBSEQUENT ? blend : SP_MIX_BLEND_SETUP;
 				if (timeline->type == SP_TIMELINE_ROTATE)
 					_spAnimationState_applyRotateTimeline(self, timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
 				else
@@ -417,16 +416,16 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* t
 	float animationTime;
 	int timelineCount;
 	spTimeline** timelines;
-	spIntArray* timelineData;
-	spTrackEntryArray* timelineDipMix;
+	spIntArray* timelineMode;
+	spTrackEntryArray* timelineHoldMix;
 	spMixBlend timelineBlend;
-	float alphaDip;
+	float alphaHold;
 	float alphaMix;
 	float alpha;
 	int /*boolean*/ firstFrame;
 	float* timelinesRotation;
 	int i;
-	spTrackEntry* dipMix;
+	spTrackEntry* holdMix;
 
 	spTrackEntry* from = to->mixingFrom;
 	if (from->mixingFrom) _spAnimationState_applyMixingFrom(self, from, skeleton, blend);
@@ -447,15 +446,15 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* t
 	animationTime = spTrackEntry_getAnimationTime(from);
 	timelineCount = from->animation->timelinesCount;
 	timelines = from->animation->timelines;
-	alphaDip = from->alpha * to->interruptAlpha; alphaMix = alphaDip * (1 - mix);
+	alphaHold = from->alpha * to->interruptAlpha; alphaMix = alphaHold * (1 - mix);
 	if (blend == SP_MIX_BLEND_ADD) {
 		for (i = 0; i < timelineCount; i++) {
 			spTimeline *timeline = timelines[i];
 			spTimeline_apply(timeline, skeleton, animationLast, animationTime, events, &internal->eventsCount, alphaMix, blend, SP_MIX_DIRECTION_OUT);
 		}
 	} else {
-		timelineData = from->timelineData;
-		timelineDipMix = from->timelineDipMix;
+		timelineMode = from->timelineMode;
+		timelineHoldMix = from->timelineHoldMix;
 
 		firstFrame = from->timelinesRotationCount == 0;
 		if (firstFrame) _spAnimationState_resizeTimelinesRotation(from, timelineCount << 1);
@@ -464,7 +463,7 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* t
 		from->totalAlpha = 0;
 		for (i = 0; i < timelineCount; i++) {
 			spTimeline *timeline = timelines[i];
-			switch (timelineData->items[i]) {
+			switch (timelineMode->items[i]) {
 				case SUBSEQUENT:
 					if (!attachments && timeline->type == SP_TIMELINE_ATTACHMENT) continue;
 					if (!drawOrder && timeline->type == SP_TIMELINE_DRAWORDER) continue;
@@ -475,14 +474,14 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* t
 					timelineBlend = SP_MIX_BLEND_SETUP;
 					alpha = alphaMix;
 					break;
-				case DIP:
+				case HOLD:
 					timelineBlend = SP_MIX_BLEND_SETUP;
-					alpha = alphaDip;
+					alpha = alphaHold;
 					break;
 				default:
 					timelineBlend = SP_MIX_BLEND_SETUP;
-					dipMix = timelineDipMix->items[i];
-					alpha = alphaDip * MAX(0, 1 - dipMix->mixTime / dipMix->mixDuration);
+					holdMix = timelineHoldMix->items[i];
+					alpha = alphaHold * MAX(0, 1 - holdMix->mixTime / holdMix->mixDuration);
 					break;
 			}
 			from->totalAlpha += alpha;
@@ -648,6 +647,7 @@ void spAnimationState_clearTrack (spAnimationState* self, int trackIndex) {
 		if (!from) break;
 		_spEventQueue_end(internal->queue, from);
 		entry->mixingFrom = 0;
+		entry->mixingTo = 0;
 		entry = from;
 	}
 
@@ -663,6 +663,7 @@ void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEnt
 	if (from) {
 		if (interrupt) _spEventQueue_interrupt(internal->queue, from);
 		current->mixingFrom = from;
+		from->mixingTo = current;
 		current->mixTime = 0;
 
 		/* Store the interrupted mix percentage. */
@@ -794,6 +795,7 @@ spTrackEntry* _spAnimationState_trackEntry (spAnimationState* self, int trackInd
 	entry->trackIndex = trackIndex;
 	entry->animation = animation;
 	entry->loop = loop;
+	entry->holdPrevious = 0;
 
 	entry->eventThreshold = 0;
 	entry->attachmentThreshold = 0;
@@ -817,8 +819,9 @@ spTrackEntry* _spAnimationState_trackEntry (spAnimationState* self, int trackInd
 	entry->mixDuration = !last ? 0 : spAnimationStateData_getMix(self->data, last->animation, animation);
 	entry->mixBlend = SP_MIX_BLEND_REPLACE;
 
-	entry->timelineData = spIntArray_create(16);
-	entry->timelineDipMix = spTrackEntryArray_create(16);
+	entry->timelineMode = spIntArray_create(16);
+	entry->timelineHoldMix = spTrackEntryArray_create(16);
+
 	return entry;
 }
 
@@ -836,17 +839,19 @@ void _spAnimationState_animationsChanged (spAnimationState* self) {
 	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
 	int i, n;
 	spTrackEntry* entry;
-	spTrackEntryArray* mixingTo;
 	internal->animationsChanged = 0;
 
 	internal->propertyIDsCount = 0;
 	i = 0; n = self->tracksCount;
 
-	mixingTo = self->mixingTo;
-
 	for (;i < n; i++) {
 		entry = self->tracks[i];
-		if (entry != 0 && entry->mixBlend != SP_MIX_BLEND_ADD) _spTrackEntry_setTimelineData(entry, 0, mixingTo, self);
+		while (entry->mixingFrom != 0)
+			entry = entry->mixingFrom;
+		do {
+			if (entry->mixingTo == 0 || entry->mixBlend != SP_MIX_BLEND_ADD) _spTrackEntry_setTimelineData(entry, self);
+			entry = entry->mixingTo;
+		} while (entry != 0);
 	}
 }
 
@@ -912,51 +917,51 @@ int /*boolean*/ _spTrackEntry_hasTimeline(spTrackEntry* self, int id) {
 	return 0;
 }
 
-spTrackEntry* _spTrackEntry_setTimelineData(spTrackEntry* self, spTrackEntry* to, spTrackEntryArray* mixingToArray, spAnimationState* state) {
-	spTrackEntry* lastEntry;
-	spTrackEntry** mixingTo;
-	int mixingToLast;
+void _spTrackEntry_setTimelineData(spTrackEntry* entry, spAnimationState* state) {
+	spTrackEntry* to;
 	spTimeline** timelines;
 	int timelinesCount;
-	int* timelineData;
-	spTrackEntry** timelineDipMix;
-	int i, ii;
+	int* timelineMode;
+	spTrackEntry** timelineHoldMix;
+	spTrackEntry* next;
+	int i;
 
-	if (to != 0) spTrackEntryArray_add(mixingToArray, to);
-	lastEntry = self->mixingFrom != 0 ? _spTrackEntry_setTimelineData(self->mixingFrom, self, mixingToArray, state) : self;
-	if (to != 0) spTrackEntryArray_pop(mixingToArray);
+	to = entry->mixingTo;
+	timelines = entry->animation->timelines;
+	timelinesCount = entry->animation->timelinesCount;
+	timelineMode = spIntArray_setSize(entry->timelineMode, timelinesCount)->items;
+	spTrackEntryArray_clear(entry->timelineHoldMix);
+	timelineHoldMix = spTrackEntryArray_setSize(entry->timelineHoldMix, timelinesCount)->items;
 
-	mixingTo = mixingToArray->items;
-	mixingToLast = mixingToArray->size - 1;
-	timelines = self->animation->timelines;
-	timelinesCount = self->animation->timelinesCount;
-	timelineData = spIntArray_setSize(self->timelineData, timelinesCount)->items;
-	spTrackEntryArray_clear(self->timelineDipMix);
-	timelineDipMix = spTrackEntryArray_setSize(self->timelineDipMix, timelinesCount)->items;
+	if (to != 0 && to->holdPrevious) {
+		for (i = 0; i < timelinesCount; i++) {
+			int id = spTimeline_getPropertyId(timelines[i]);
+			_spAnimationState_addPropertyID(state, id);
+			timelineMode[i] = HOLD;
+		}
+		return;
+	}
 
 	i = 0;
 	continue_outer:
 	for (; i < timelinesCount; i++) {
 		int id = spTimeline_getPropertyId(timelines[i]);
 		if (!_spAnimationState_addPropertyID(state, id))
-			timelineData[i] = SUBSEQUENT;
+			timelineMode[i] = SUBSEQUENT;
 		else if (to == 0 || !_spTrackEntry_hasTimeline(to, id))
-			timelineData[i] = FIRST;
+			timelineMode[i] = FIRST;
 		else {
-			for (ii = mixingToLast; ii >= 0; ii--) {
-				spTrackEntry* entry = mixingTo[ii];
-				if (!_spTrackEntry_hasTimeline(entry, id)) {
-					if (entry->mixDuration > 0) {
-						timelineData[i] = DIP_MIX;
-						timelineDipMix[i] = entry;
-						i++;
-						goto continue_outer;
-					}
+			for (next = to->mixingTo; next != 0; next = next->mixingTo) {
+				if (_spTrackEntry_hasTimeline(next, id)) continue;
+				if (next->mixDuration > 0) {
+					timelineMode[i] = HOLD_MIX;
+					timelineHoldMix[i] = next;
+					i++;
+					goto continue_outer;
 				}
 				break;
 			}
-			timelineData[i] = DIP;
+			timelineMode[i] = HOLD;
 		}
 	}
-	return lastEntry;
 }

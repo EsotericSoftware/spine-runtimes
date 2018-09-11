@@ -79,6 +79,21 @@ namespace spine {
         /// If true, the animation will repeat. If false, it will not, instead its last frame is applied if played beyond its duration.
         bool getLoop();
         void setLoop(bool inValue);
+
+        ///
+        /// If true, when mixing from the previous animation to this animation, the previous animation is applied as normal instead
+        /// of being mixed out.
+        ///
+        /// When mixing between animations that key the same property, if a lower track also keys that property then the value will
+        /// briefly dip toward the lower track value during the mix. This happens because the first animation mixes from 100% to 0%
+        /// while the second animation mixes from 0% to 100%. Setting holdPrevious to true applies the first animation
+        /// at 100% during the mix so the lower track value is overwritten. Such dipping does not occur on the lowest track which
+        /// keys the property, only when a higher track also keys the property.
+        ///
+        /// Snapping will occur if holdPrevious is true and this animation does not key all the same properties as the
+        /// previous animation.
+        bool getHoldPrevious();
+        void setHoldPrevious(bool inValue);
         
         ///
         /// Seconds to postpone playing the animation. When a track entry is the current track entry, delay postpones incrementing
@@ -206,8 +221,13 @@ namespace spine {
         
         ///
         /// The track entry for the previous animation when mixing from the previous animation to this animation, or NULL if no
-        /// mixing is currently occuring. When mixing from multiple animations, MixingFrom makes up a linked list.
+        /// mixing is currently occuring. When mixing from multiple animations, MixingFrom makes up a double linked list with MixingTo.
         TrackEntry* getMixingFrom();
+
+        ///
+        /// The track entry for the next animation when mixing from this animation, or NULL if no mixing is currently occuring.
+        /// When mixing from multiple animations, MixingTo makes up a double linked list with MixingFrom.
+        TrackEntry* getMixingTo();
         
         ///
         /// Resets the rotation directions for mixing this entry's rotate timelines. This can be useful to avoid bones rotating the
@@ -226,24 +246,19 @@ namespace spine {
         
         TrackEntry* _next;
         TrackEntry* _mixingFrom;
+        TrackEntry* _mixingTo;
         int _trackIndex;
 
-        bool _loop;
+        bool _loop, _holdPrevious;
         float _eventThreshold, _attachmentThreshold, _drawOrderThreshold;
         float _animationStart, _animationEnd, _animationLast, _nextAnimationLast;
         float _delay, _trackTime, _trackLast, _nextTrackLast, _trackEnd, _timeScale;
         float _alpha, _mixTime, _mixDuration, _interruptAlpha, _totalAlpha;
         MixBlend _mixBlend;
-        Vector<int> _timelineData;
-        Vector<TrackEntry*> _timelineDipMix;
+        Vector<int> _timelineMode;
+        Vector<TrackEntry*> _timelineHoldMix;
         Vector<float> _timelinesRotation;
         AnimationStateListener _listener;
-        
-        /// Sets the timeline data.
-        /// @param to May be NULL.
-        TrackEntry* setTimelineData(TrackEntry* to, Vector<TrackEntry*>& mixingToArray, Vector<int>& propertyIDs);
-        
-        bool hasTimeline(int inId);
         
         void reset();
     };
@@ -386,7 +401,7 @@ namespace spine {
 		void enableQueue();
         
     private:
-        static const int Subsequent, First, Dip, DipMix;
+        static const int Subsequent, First, Hold, HoldMix;
         
         AnimationStateData* _data;
 
@@ -396,7 +411,6 @@ namespace spine {
         EventQueue* _queue;
 
         Vector<int> _propertyIDs;
-        Vector<TrackEntry*> _mixingTo;
         bool _animationsChanged;
 
         AnimationStateListener _listener;
@@ -427,6 +441,10 @@ namespace spine {
         void disposeNext(TrackEntry* entry);
 
         void animationsChanged();
+
+        void setTimelineModes(TrackEntry* entry);
+
+        bool hasTimeline(TrackEntry* entry, int inId);
     };
 }
 
