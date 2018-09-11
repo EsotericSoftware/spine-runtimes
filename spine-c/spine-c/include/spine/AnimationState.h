@@ -56,16 +56,18 @@ struct spTrackEntry {
 	spAnimation* animation;
 	spTrackEntry* next;
 	spTrackEntry* mixingFrom;
+	spTrackEntry* mixingTo;
 	spAnimationStateListener listener;
 	int trackIndex;
 	int /*boolean*/ loop;
+	int /*boolean*/ holdPrevious;
 	float eventThreshold, attachmentThreshold, drawOrderThreshold;
 	float animationStart, animationEnd, animationLast, nextAnimationLast;
 	float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
 	float alpha, mixTime, mixDuration, interruptAlpha, totalAlpha;
 	spMixBlend mixBlend;
-	spIntArray* timelineData;
-	spTrackEntryArray* timelineDipMix;
+	spIntArray* timelineMode;
+	spTrackEntryArray* timelineHoldMix;
 	float* timelinesRotation;
 	int timelinesRotationCount;
 	void* rendererObject;
@@ -74,17 +76,18 @@ struct spTrackEntry {
 #ifdef __cplusplus
 	spTrackEntry() :
 		animation(0),
-		next(0), mixingFrom(0),
+		next(0), mixingFrom(0), mixingTo(0),
 		listener(0),
 		trackIndex(0),
 		loop(0),
+		holdPrevious(0),
 		eventThreshold(0), attachmentThreshold(0), drawOrderThreshold(0),
 		animationStart(0), animationEnd(0), animationLast(0), nextAnimationLast(0),
 		delay(0), trackTime(0), trackLast(0), nextTrackLast(0), trackEnd(0), timeScale(0),
 		alpha(0), mixTime(0), mixDuration(0), interruptAlpha(0), totalAlpha(0),
 		mixBlend(SP_MIX_BLEND_REPLACE),
-		timelineData(0),
-		timelineDipMix(0),
+		timelineMode(0),
+		timelineHoldMix(0),
 		timelinesRotation(0),
 		timelinesRotationCount(0),
 		rendererObject(0), userData(0) {
@@ -102,8 +105,6 @@ struct spAnimationState {
 
 	float timeScale;
 
-	spTrackEntryArray* mixingTo;
-
 	void* rendererObject;
 	void* userData;
 
@@ -114,7 +115,6 @@ struct spAnimationState {
 		tracks(0),
 		listener(0),
 		timeScale(0),
-		mixingTo(0),
 		rendererObject(0),
 		userData(0) {
 	}
