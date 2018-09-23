@@ -169,6 +169,14 @@ namespace Spine {
 		TwoColor
 	}
 
+	public interface IBoneTimeline {
+		int BoneIndex { get; }
+	}
+
+	public interface ISlotTimeline {
+		int SlotIndex { get; }
+	}
+
 	/// <summary>Base class for frames that use an interpolation bezier curve.</summary>
 	abstract public class CurveTimeline : Timeline {
 		protected const float LINEAR = 0, STEPPED = 1, BEZIER = 2;
@@ -251,7 +259,7 @@ namespace Spine {
 		}
 	}
 
-	public class RotateTimeline : CurveTimeline {
+	public class RotateTimeline : CurveTimeline, IBoneTimeline {
 		public const int ENTRIES = 2;
 		internal const int PREV_TIME = -2, PREV_ROTATION = -1;
 		internal const int ROTATION = 1;
@@ -339,7 +347,7 @@ namespace Spine {
 		}
 	}
 
-	public class TranslateTimeline : CurveTimeline {
+	public class TranslateTimeline : CurveTimeline, IBoneTimeline {
 		public const int ENTRIES = 3;
 		protected const int PREV_TIME = -3, PREV_X = -2, PREV_Y = -1;
 		protected const int X = 1, Y = 2;
@@ -419,7 +427,7 @@ namespace Spine {
 		}
 	}
 
-	public class ScaleTimeline : TranslateTimeline {
+	public class ScaleTimeline : TranslateTimeline, IBoneTimeline {
 		override public int PropertyId {
 			get { return ((int)TimelineType.Scale << 24) + boneIndex; }
 		}
@@ -522,7 +530,7 @@ namespace Spine {
 		}
 	}
 
-	public class ShearTimeline : TranslateTimeline {
+	public class ShearTimeline : TranslateTimeline, IBoneTimeline {
 		override public int PropertyId {
 			get { return ((int)TimelineType.Shear << 24) + boneIndex; }
 		}
@@ -582,7 +590,7 @@ namespace Spine {
 		}
 	}
 
-	public class ColorTimeline : CurveTimeline {
+	public class ColorTimeline : CurveTimeline, ISlotTimeline {
 		public const int ENTRIES = 5;
 		protected const int PREV_TIME = -5, PREV_R = -4, PREV_G = -3, PREV_B = -2, PREV_A = -1;
 		protected const int R = 1, G = 2, B = 3, A = 4;
@@ -683,7 +691,7 @@ namespace Spine {
 		}
 	}
 
-	public class TwoColorTimeline : CurveTimeline {
+	public class TwoColorTimeline : CurveTimeline, ISlotTimeline {
 		public const int ENTRIES = 8;
 		protected const int PREV_TIME = -8, PREV_R = -7, PREV_G = -6, PREV_B = -5, PREV_A = -4;
 		protected const int PREV_R2 = -3, PREV_G2 = -2, PREV_B2 = -1;
@@ -826,7 +834,7 @@ namespace Spine {
 
 	}
 
-	public class AttachmentTimeline : Timeline {
+	public class AttachmentTimeline : Timeline, ISlotTimeline {
 		internal int slotIndex;
 		internal float[] frames;
 		internal string[] attachmentNames;
@@ -880,7 +888,7 @@ namespace Spine {
 		}
 	}
 
-	public class DeformTimeline : CurveTimeline {
+	public class DeformTimeline : CurveTimeline, ISlotTimeline {
 		internal int slotIndex;
 		internal float[] frames;
 		internal float[][] frameVertices;
