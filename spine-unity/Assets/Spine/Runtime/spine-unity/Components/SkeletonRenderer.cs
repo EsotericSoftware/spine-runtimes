@@ -166,7 +166,8 @@ namespace Spine.Unity {
 		/// <summary>
 		/// Clears the previously generated mesh and resets the skeleton's pose.</summary>
 		public virtual void ClearState () {
-			meshFilter.sharedMesh = null;
+			var meshFilter = GetComponent<MeshFilter>();
+			if (meshFilter != null) meshFilter.sharedMesh = null;
 			currentInstructions.Clear();
 			if (skeleton != null) skeleton.SetToSetupPose();
 		}
@@ -193,7 +194,7 @@ namespace Spine.Unity {
 				valid = false;
 			}
 
-			if (!skeletonDataAsset) {
+			if (skeletonDataAsset == null) {
 				if (logErrors) Debug.LogError("Missing SkeletonData asset.", this);
 				return;
 			}

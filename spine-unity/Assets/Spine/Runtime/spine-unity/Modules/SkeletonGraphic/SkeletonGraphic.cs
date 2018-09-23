@@ -244,24 +244,24 @@ namespace Spine.Unity {
 			if (!string.IsNullOrEmpty(initialSkinName))
 				skeleton.SetSkin(initialSkinName);
 
-			#if UNITY_EDITOR
 			if (!string.IsNullOrEmpty(startingAnimation)) {
-				if (Application.isPlaying) {
-					state.SetAnimation(0, startingAnimation, startingLoop);
-				} else {
-					// Assume SkeletonAnimation is valid for skeletonData and skeleton. Checked above.
-					var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(startingAnimation);
-					if (animationObject != null)
-						animationObject.PoseSkeleton(skeleton, 0);
+				var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(startingAnimation);
+				if (animationObject != null) {
+					animationObject.PoseSkeleton(skeleton, 0f);
+					skeleton.UpdateWorldTransform();
+
+					#if UNITY_EDITOR
+					if (Application.isPlaying) {
+					#endif
+
+						// Make this block not run in Unity Editor edit mode.
+						state.SetAnimation(0, animationObject, startingLoop);
+
+					#if UNITY_EDITOR
+					}
+					#endif
 				}
-				Update(0);
 			}
-			#else
-			if (!string.IsNullOrEmpty(startingAnimation)) {
-				state.SetAnimation(0, startingAnimation, startingLoop);
-				Update(0);
-			}
-			#endif
 		}
 
 		public void UpdateMesh () {
