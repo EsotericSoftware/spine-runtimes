@@ -99,9 +99,9 @@ namespace Spine.Unity.Editor {
 				EditorGUI.PrefixLabel(rect, SpineInspectorUtility.TempContent("Initial Flip"));
 				rect.x += EditorGUIUtility.labelWidth;
 				rect.width = 30f;
-				initialFlipX.boolValue = EditorGUI.ToggleLeft(rect, SpineInspectorUtility.TempContent("X", tooltip:"initialFlipX"), initialFlipX.boolValue);
+				SpineInspectorUtility.ToggleLeft(rect, initialFlipX, SpineInspectorUtility.TempContent("X", tooltip: "initialFlipX"));
 				rect.x += 35f;
-				initialFlipY.boolValue = EditorGUI.ToggleLeft(rect, SpineInspectorUtility.TempContent("Y", tooltip:"initialFlipY"), initialFlipY.boolValue);
+				SpineInspectorUtility.ToggleLeft(rect, initialFlipY, SpineInspectorUtility.TempContent("Y", tooltip: "initialFlipY"));
 			}
 
 			EditorGUILayout.Space();

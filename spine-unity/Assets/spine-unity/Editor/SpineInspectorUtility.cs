@@ -71,6 +71,40 @@ namespace Spine.Unity.Editor {
 			PropertyFieldWideLabel(property, label, width);
 		}
 
+		/// <summary>Multi-edit-compatible version of EditorGUILayout.ToggleLeft(SerializedProperty)</summary>
+		public static void ToggleLeftLayout (SerializedProperty property, GUIContent label = null, float width = 120f) {
+			if (label == null) label = SpineInspectorUtility.TempContent(property.displayName, tooltip: property.tooltip);
+
+			if (property.hasMultipleDifferentValues) {
+				bool previousShowMixedValue = EditorGUI.showMixedValue;
+				EditorGUI.showMixedValue = true;
+
+				bool clicked = EditorGUILayout.ToggleLeft(label, property.boolValue, GUILayout.Width(width));
+				if (clicked) property.boolValue = true; // Set all values to true when clicked.
+
+				EditorGUI.showMixedValue = previousShowMixedValue;
+			} else {
+				property.boolValue = EditorGUILayout.ToggleLeft(label, property.boolValue, GUILayout.Width(width));
+			}
+		}
+
+		/// <summary>Multi-edit-compatible version of EditorGUILayout.ToggleLeft(SerializedProperty)</summary>
+		public static void ToggleLeft (Rect rect, SerializedProperty property, GUIContent label = null) {
+			if (label == null) label = SpineInspectorUtility.TempContent(property.displayName, tooltip: property.tooltip);
+
+			if (property.hasMultipleDifferentValues) {
+				bool previousShowMixedValue = EditorGUI.showMixedValue;
+				EditorGUI.showMixedValue = true;
+
+				bool clicked = EditorGUI.ToggleLeft(rect, label, property.boolValue);
+				if (clicked) property.boolValue = true; // Set all values to true when clicked.
+
+				EditorGUI.showMixedValue = previousShowMixedValue;
+			} else {
+				property.boolValue = EditorGUI.ToggleLeft(rect, label, property.boolValue);
+			}
+		}
+
 		public static bool UndoRedoPerformed (UnityEngine.Event current) {
 			return current.type == EventType.ValidateCommand && current.commandName == "UndoRedoPerformed";
 		}
