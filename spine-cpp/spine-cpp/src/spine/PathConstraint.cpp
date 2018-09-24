@@ -271,6 +271,8 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 	Slot &target = *_target;
 	float position = _position;
 	_positions.setSize(spacesCount * 3 + 2, 0);
+	Vector<float> &out = _positions;
+	Vector<float> &world = _world;
 	bool closed = path.isClosed();
 	int verticesLength = path.getWorldVerticesLength();
 	int curveCount = verticesLength / 6;
@@ -291,7 +293,7 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 			}
 		}
 
-		_world.setSize(8, 0);
+		world.setSize(8, 0);
 		for (int i = 0, o = 0, curve = 0; i < spacesCount; i++, o += 3) {
 			float space = _spaces[i];
 			position += space;
@@ -307,19 +309,19 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 			} else if (p < 0) {
 				if (prevCurve != BEFORE) {
 					prevCurve = BEFORE;
-					path.computeWorldVertices(target, 2, 4, _world, 0);
+					path.computeWorldVertices(target, 2, 4, world, 0);
 				}
 
-				addBeforePosition(p, _world, 0, _positions, o);
+				addBeforePosition(p, world, 0, out, o);
 
 				continue;
 			} else if (p > pathLength) {
 				if (prevCurve != AFTER) {
 					prevCurve = AFTER;
-					path.computeWorldVertices(target, verticesLength - 6, 4, _world, 0);
+					path.computeWorldVertices(target, verticesLength - 6, 4, world, 0);
 				}
 
-				addAfterPosition(p - pathLength, _world, 0, _positions, o);
+				addAfterPosition(p - pathLength, world, 0, out, o);
 
 				continue;
 			}
@@ -343,46 +345,46 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 			if (curve != prevCurve) {
 				prevCurve = curve;
 				if (closed && curve == curveCount) {
-					path.computeWorldVertices(target, verticesLength - 4, 4, _world, 0);
-					path.computeWorldVertices(target, 0, 4, _world, 4);
+					path.computeWorldVertices(target, verticesLength - 4, 4, world, 0);
+					path.computeWorldVertices(target, 0, 4, world, 4);
 				} else {
-					path.computeWorldVertices(target, curve * 6 + 2, 8, _world, 0);
+					path.computeWorldVertices(target, curve * 6 + 2, 8, world, 0);
 				}
 			}
 
-			addCurvePosition(p, _world[0], _world[1], _world[2], _world[3], _world[4], _world[5], _world[6], _world[7],
-							 _positions, o, tangents || (i > 0 && space < EPSILON));
+			addCurvePosition(p, world[0], world[1], world[2], world[3], world[4], world[5], world[6], world[7],
+							 out, o, tangents || (i > 0 && space < EPSILON));
 		}
-		return _world;
+		return out;
 	}
 
 	// World vertices.
 	if (closed) {
 		verticesLength += 2;
-		_world.setSize(verticesLength, 0);
-		path.computeWorldVertices(target, 2, verticesLength - 4, _world, 0);
-		path.computeWorldVertices(target, 0, 2, _world, verticesLength - 4);
-		_world[verticesLength - 2] = _world[0];
-		_world[verticesLength - 1] = _world[1];
+		world.setSize(verticesLength, 0);
+		path.computeWorldVertices(target, 2, verticesLength - 4, world, 0);
+		path.computeWorldVertices(target, 0, 2, world, verticesLength - 4);
+		world[verticesLength - 2] = world[0];
+		world[verticesLength - 1] = world[1];
 	} else {
 		curveCount--;
 		verticesLength -= 4;
-		_world.setSize(verticesLength, 0);
-		path.computeWorldVertices(target, 2, verticesLength, _world, 0);
+		world.setSize(verticesLength, 0);
+		path.computeWorldVertices(target, 2, verticesLength, world, 0);
 	}
 
 	// Curve lengths.
 	_curves.setSize(curveCount, 0);
 	pathLength = 0;
-	float x1 = _world[0], y1 = _world[1], cx1 = 0, cy1 = 0, cx2 = 0, cy2 = 0, x2 = 0, y2 = 0;
+	float x1 = world[0], y1 = world[1], cx1 = 0, cy1 = 0, cx2 = 0, cy2 = 0, x2 = 0, y2 = 0;
 	float tmpx, tmpy, dddfx, dddfy, ddfx, ddfy, dfx, dfy;
 	for (int i = 0, w = 2; i < curveCount; i++, w += 6) {
-		cx1 = _world[w];
-		cy1 = _world[w + 1];
-		cx2 = _world[w + 2];
-		cy2 = _world[w + 3];
-		x2 = _world[w + 4];
-		y2 = _world[w + 5];
+		cx1 = world[w];
+		cy1 = world[w + 1];
+		cx2 = world[w + 2];
+		cy2 = world[w + 3];
+		x2 = world[w + 4];
+		y2 = world[w + 5];
 		tmpx = (x1 - cx1 * 2 + cx2) * 0.1875f;
 		tmpy = (y1 - cy1 * 2 + cy2) * 0.1875f;
 		dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.09375f;
@@ -434,10 +436,10 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 			}
 			curve = 0;
 		} else if (p < 0) {
-			addBeforePosition(p, _world, 0, _positions, o);
+			addBeforePosition(p, world, 0, out, o);
 			continue;
 		} else if (p > pathLength) {
-			addAfterPosition(p - pathLength, _world, verticesLength - 4, _positions, o);
+			addAfterPosition(p - pathLength, world, verticesLength - 4, out, o);
 			continue;
 		}
 
@@ -461,14 +463,14 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 		if (curve != prevCurve) {
 			prevCurve = curve;
 			int ii = curve * 6;
-			x1 = _world[ii];
-			y1 = _world[ii + 1];
-			cx1 = _world[ii + 2];
-			cy1 = _world[ii + 3];
-			cx2 = _world[ii + 4];
-			cy2 = _world[ii + 5];
-			x2 = _world[ii + 6];
-			y2 = _world[ii + 7];
+			x1 = world[ii];
+			y1 = world[ii + 1];
+			cx1 = world[ii + 2];
+			cy1 = world[ii + 3];
+			cx2 = world[ii + 4];
+			cy2 = world[ii + 5];
+			x2 = world[ii + 6];
+			y2 = world[ii + 7];
 			tmpx = (x1 - cx1 * 2 + cx2) * 0.03f;
 			tmpy = (y1 - cy1 * 2 + cy2) * 0.03f;
 			dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.006f;
@@ -514,11 +516,11 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 			}
 			break;
 		}
-		addCurvePosition(p * 0.1f, x1, y1, cx1, cy1, cx2, cy2, x2, y2, _positions, o,
+		addCurvePosition(p * 0.1f, x1, y1, cx1, cy1, cx2, cy2, x2, y2, out, o,
 						 tangents || (i > 0 && space < EPSILON));
 	}
 
-	return _positions;
+	return out;
 }
 
 void PathConstraint::addBeforePosition(float p, Vector<float> &temp, int i, Vector<float> &output, int o) {

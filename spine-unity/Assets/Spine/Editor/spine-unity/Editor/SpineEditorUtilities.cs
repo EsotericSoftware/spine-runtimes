@@ -206,15 +206,15 @@ namespace Spine.Unity.Editor {
 
 			// Data Refresh Edit Mode.
 			// This prevents deserialized SkeletonData from persisting from play mode to edit mode.
-#if UNITY_2017_2_OR_NEWER
-			EditorApplication.playModeStateChanged -= DataReloadHandler.OnPlaymodeStateChanged;
-			EditorApplication.playModeStateChanged += DataReloadHandler.OnPlaymodeStateChanged;
-			DataReloadHandler.OnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
-#else
-			EditorApplication.playmodeStateChanged -= DataReloadHandler.OnPlaymodeStateChanged;
-			EditorApplication.playmodeStateChanged += DataReloadHandler.OnPlaymodeStateChanged;
-			DataReloadHandler.OnPlaymodeStateChanged();
-#endif
+//#if UNITY_2017_2_OR_NEWER
+//			EditorApplication.playModeStateChanged -= DataReloadHandler.OnPlaymodeStateChanged;
+//			EditorApplication.playModeStateChanged += DataReloadHandler.OnPlaymodeStateChanged;
+//			DataReloadHandler.OnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
+//#else
+//			EditorApplication.playmodeStateChanged -= DataReloadHandler.OnPlaymodeStateChanged;
+//			EditorApplication.playmodeStateChanged += DataReloadHandler.OnPlaymodeStateChanged;
+//			DataReloadHandler.OnPlaymodeStateChanged();
+//#endif
 
 			initialized = true;
 		}
@@ -351,10 +351,15 @@ namespace Spine.Unity.Editor {
 #else
 			internal static void OnPlaymodeStateChanged () {
 #endif
-				ReloadAllActiveSkeletons();
+				ReloadAllActiveSkeletonsEditMode();
 			}
 
-			static void ReloadAllActiveSkeletons () {
+			static void ReloadAllActiveSkeletonsEditMode () {
+				if (EditorApplication.isPaused) return;
+				if (EditorApplication.isPlaying) return;
+				if (EditorApplication.isCompiling) return;
+				if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+
 				var skeletonDataAssetsToReload = new HashSet<SkeletonDataAsset>();
 
 				var activeSkeletonRenderers = GameObject.FindObjectsOfType<SkeletonRenderer>();
@@ -369,11 +374,18 @@ namespace Spine.Unity.Editor {
 					if (skeletonDataAsset != null) skeletonDataAssetsToReload.Add(skeletonDataAsset);
 				}
 
-				foreach (var sda in skeletonDataAssetsToReload)
+				foreach (var sda in skeletonDataAssetsToReload) {
 					sda.Clear();
+					sda.GetSkeletonData(true);
+				}
 
-				foreach (var sr in activeSkeletonRenderers)	sr.Initialize(true);
-				foreach (var sg in activeSkeletonGraphics) sg.Initialize(true);
+				foreach (var sr in activeSkeletonRenderers) {
+					sr.Initialize(true);
+				}
+
+				foreach (var sg in activeSkeletonGraphics) {
+					sg.Initialize(true);
+				}
 			}
 		}
 

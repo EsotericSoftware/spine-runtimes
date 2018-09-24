@@ -901,7 +901,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		}
 
 		public static RegionAttachment GetClone (this RegionAttachment o) {
-			return new RegionAttachment(o.Name + "clone") {
+			return new RegionAttachment(o.Name) {
 				x = o.x,
 				y = o.y,
 				rotation = o.rotation,
