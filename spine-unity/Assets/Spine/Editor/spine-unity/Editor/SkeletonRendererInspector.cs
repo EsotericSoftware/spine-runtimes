@@ -253,8 +253,8 @@ namespace Spine.Unity.Editor {
 					
 					using (new SpineInspectorUtility.IndentScope()) {
 						using (new EditorGUILayout.HorizontalScope()) {
-							initialFlipX.boolValue = EditorGUILayout.ToggleLeft(initialFlipX.displayName, initialFlipX.boolValue, GUILayout.Width(120f));
-							initialFlipY.boolValue = EditorGUILayout.ToggleLeft(initialFlipY.displayName, initialFlipY.boolValue, GUILayout.Width(120f));
+							SpineInspectorUtility.ToggleLeftLayout(initialFlipX);
+							SpineInspectorUtility.ToggleLeftLayout(initialFlipY);							
 							EditorGUILayout.Space();
 						}
 
@@ -370,7 +370,6 @@ namespace Spine.Unity.Editor {
 		}
 
 		override public void OnInspectorGUI () {
-			//serializedObject.Update();
 			bool multi = serializedObject.isEditingMultipleObjects;
 			DrawInspectorGUI(multi);
 			if (serializedObject.ApplyModifiedProperties() || SpineInspectorUtility.UndoRedoPerformed(Event.current)) {

@@ -97,17 +97,11 @@ namespace Spine.Unity {
 				if (string.IsNullOrEmpty(value)) {
 					state.ClearTrack(0);
 				} else {
-					TrySetAnimation(value, loop);
+					var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(value);
+					if (animationObject != null)
+						state.SetAnimation(0, animationObject, loop);
 				}
 			}
-		}
-
-		TrackEntry TrySetAnimation (string animationName, bool animationLoop) {
-			var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(animationName);
-			if (animationObject != null)
-				return state.SetAnimation(0, animationObject, animationLoop);
-
-			return null;
 		}
 
 		/// <summary>Whether or not <see cref="AnimationName"/> should loop. This only applies to the initial animation specified in the inspector, or any subsequent Animations played through .AnimationName. Animations set through state.SetAnimation are unaffected.</summary>
@@ -153,27 +147,25 @@ namespace Spine.Unity {
 				return;
 
 			state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
-
-			#if UNITY_EDITOR
+		
 			if (!string.IsNullOrEmpty(_animationName)) {
-				if (Application.isPlaying) {
-					TrackEntry startingTrack = TrySetAnimation(_animationName, loop);
-					if (startingTrack != null)
-						Update(0);
-				} else {
-					// Assume SkeletonAnimation is valid for skeletonData and skeleton. Checked above.
-					var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(_animationName);
-					if (animationObject != null)
-						animationObject.PoseSkeleton(skeleton, 0f);
+				var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(_animationName);
+				if (animationObject != null) {
+					animationObject.PoseSkeleton(skeleton, 0f);
+					skeleton.UpdateWorldTransform();
+
+					#if UNITY_EDITOR
+					if (Application.isPlaying) {
+					#endif
+
+						// Make this block not run in Unity Editor edit mode.
+						state.SetAnimation(0, animationObject, loop);
+
+					#if UNITY_EDITOR
+					}
+					#endif
 				}
 			}
-			#else
-			if (!string.IsNullOrEmpty(_animationName)) {
-				TrackEntry startingTrack = TrySetAnimation(_animationName, loop);
-				if (startingTrack != null)
-					Update(0);
-			}
-			#endif
 		}
 
 		void Update () {

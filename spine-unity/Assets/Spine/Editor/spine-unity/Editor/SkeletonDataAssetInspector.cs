@@ -30,6 +30,11 @@
 
 #define SPINE_SKELETON_MECANIM
 
+ #if (UNITY_2017_4 || UNITY_2018)
+ #define SPINE_UNITY_2018_PREVIEW_API
+ #endif
+
+
 using System;
 using System.Reflection;
 using System.Collections.Generic;
@@ -51,7 +56,7 @@ namespace Spine.Unity.Editor {
 		internal static bool showAttachments = false;
 
 		SerializedProperty atlasAssets, skeletonJSON, scale, fromAnimation, toAnimation, duration, defaultMix;
-		SerializedProperty blendModeMaterials;
+		SerializedProperty skeletonDataModifiers;
 		#if SPINE_TK2D
 		SerializedProperty spriteCollection;
 		#endif
@@ -101,7 +106,7 @@ namespace Spine.Unity.Editor {
 			duration = serializedObject.FindProperty("duration");
 			defaultMix = serializedObject.FindProperty("defaultMix");
 
-			blendModeMaterials = serializedObject.FindProperty("blendModeMaterials");
+			skeletonDataModifiers = serializedObject.FindProperty("skeletonDataModifiers");
 
 			#if SPINE_SKELETON_MECANIM
 			controller = serializedObject.FindProperty("controller");
@@ -302,6 +307,8 @@ namespace Spine.Unity.Editor {
 			}
 			EditorGUILayout.PropertyField(skeletonJSON, SpineInspectorUtility.TempContent(skeletonJSON.displayName, Icons.spine));
 			EditorGUILayout.PropertyField(scale);
+			EditorGUILayout.Space();
+			EditorGUILayout.PropertyField(skeletonDataModifiers, true);
 		}
 
 		void DrawAtlasAssetsFields () {
@@ -318,8 +325,6 @@ namespace Spine.Unity.Editor {
 
 			if (atlasAssets.arraySize == 0)
 				EditorGUILayout.HelpBox("AtlasAssets array is empty. Skeleton's attachments will load without being mapped to images.", MessageType.Info);
-
-			EditorGUILayout.PropertyField(blendModeMaterials);
 		}
 
 		void HandleAtlasAssetsNulls () {
@@ -681,7 +686,7 @@ namespace Spine.Unity.Editor {
 		GameObject previewGameObject;
 		internal bool requiresRefresh;
 
-		#if !(UNITY_2017_4 || UNITY_2018)
+		#if !SPINE_UNITY_2018_PREVIEW_API
 		float animationLastTime;
 		#endif
 
@@ -777,7 +782,7 @@ namespace Spine.Unity.Editor {
 
 			if (previewRenderUtility == null) {
 				previewRenderUtility = new PreviewRenderUtility(true);
-				#if !(UNITY_2017_4 || UNITY_2018)
+				#if !SPINE_UNITY_2018_PREVIEW_API
 				animationLastTime = CurrentTime;
 				#endif
 
@@ -808,7 +813,7 @@ namespace Spine.Unity.Editor {
 							skeletonAnimation.LateUpdate();
 							previewGameObject.GetComponent<Renderer>().enabled = false;
 
-							#if UNITY_2017_4 || UNITY_2018
+							#if SPINE_UNITY_2018_PREVIEW_API
 							previewRenderUtility.AddSingleGO(previewGameObject);
 							#endif
 						}
@@ -869,7 +874,7 @@ namespace Spine.Unity.Editor {
 
 				
 				if (!EditorApplication.isPlaying) {
-					#if !(UNITY_2017_4 || UNITY_2018)
+					#if !SPINE_UNITY_2018_PREVIEW_API
 					float current = CurrentTime;
 					float deltaTime = (current - animationLastTime);
 					skeletonAnimation.Update(deltaTime);
