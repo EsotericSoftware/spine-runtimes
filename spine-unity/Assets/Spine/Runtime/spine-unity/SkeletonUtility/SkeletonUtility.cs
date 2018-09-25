@@ -73,18 +73,8 @@ namespace Spine.Unity {
 			return AddBoundingBoxAsComponent(box, slot, go, isTrigger);
 		}
 
-		public static PolygonCollider2D AddBoundingBoxAsComponent (BoundingBoxAttachment box, Slot slot, GameObject gameObject, bool isTrigger = true, bool isKinematic = true, float gravityScale = 0f) {
+		public static PolygonCollider2D AddBoundingBoxAsComponent (BoundingBoxAttachment box, Slot slot, GameObject gameObject, bool isTrigger = true) {
 			if (box == null) return null;
-
-			if (slot.bone != slot.Skeleton.RootBone) {
-				var rb = gameObject.GetComponent<Rigidbody2D>();
-				if (rb == null) {
-					rb = gameObject.AddComponent<Rigidbody2D>();
-					rb.isKinematic = isKinematic;
-					rb.gravityScale = gravityScale;
-				}
-			}
-
 			var collider = gameObject.AddComponent<PolygonCollider2D>();
 			collider.isTrigger = isTrigger;
 			SetColliderPointsLocal(collider, slot, box);
@@ -113,6 +103,16 @@ namespace Spine.Unity {
 			bounds.size = size;
 
 			return bounds;
+		}
+
+		public static Rigidbody2D AddBoneRigidbody2D (GameObject gameObject, bool isKinematic = true, float gravityScale = 0f) {
+			var rb = gameObject.GetComponent<Rigidbody2D>();
+			if (rb == null) {
+				rb = gameObject.AddComponent<Rigidbody2D>();
+				rb.isKinematic = isKinematic;
+				rb.gravityScale = gravityScale;
+			}
+			return rb;
 		}
 		#endregion
 

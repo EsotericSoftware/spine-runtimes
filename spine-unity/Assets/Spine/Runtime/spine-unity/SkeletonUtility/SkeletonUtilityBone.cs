@@ -222,6 +222,7 @@ namespace Spine.Unity {
 		}
 
 		public void AddBoundingBox (string skinName, string slotName, string attachmentName) {
+			SkeletonUtility.AddBoneRigidbody2D(transform.gameObject);
 			SkeletonUtility.AddBoundingBoxGameObject(bone.skeleton, skinName, slotName, attachmentName, transform);
 		}
 
