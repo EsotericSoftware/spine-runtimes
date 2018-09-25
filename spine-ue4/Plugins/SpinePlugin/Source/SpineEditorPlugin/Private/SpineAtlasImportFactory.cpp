@@ -51,7 +51,7 @@ USpineAtlasAssetFactory::USpineAtlasAssetFactory (const FObjectInitializer& obje
 	bEditorImport = true;
 	SupportedClass = USpineAtlasAsset::StaticClass();
 	
-	Formats.Add(TEXT("atlas;Spine atlas file"));
+	Formats.Add(TEXT("atlas;Spine Atlas file"));
 }
 
 FText USpineAtlasAssetFactory::GetToolTip () const {

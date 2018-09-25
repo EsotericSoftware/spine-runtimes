@@ -6,9 +6,11 @@ namespace UnrealBuildTool.Rules
 	{
 		public SpineEditorPlugin(ReadOnlyTargetRules Target) : base(Target)
 		{
-			PublicIncludePaths.AddRange(new string[] { "SpineEditorPlugin/Public", "SpinePlugin/Public/spine-cpp/include" });
-            
-            PrivateIncludePaths.AddRange(new string[] { "SpineEditorPlugin/Private", "SpinePlugin/Public/spine-cpp/include" });
+            PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
+			PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "../SpinePlugin/Public/spine-cpp/include"));
+
+			PrivateIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
+			PrivateIncludePaths.Add(Path.Combine(ModuleDirectory, "../SpinePlugin/Public/spine-cpp/include"));
 
             PublicDependencyModuleNames.AddRange(new string[] {
                 "Core",
@@ -17,12 +19,12 @@ namespace UnrealBuildTool.Rules
                 "UnrealEd",
                 "SpinePlugin"
             });
-            
+
             PublicIncludePathModuleNames.AddRange(new string[] {
                "AssetTools",
                "AssetRegistry"
             });
-            
+
             DynamicallyLoadedModuleNames.AddRange(new string[] {
                "AssetTools",
                "AssetRegistry"

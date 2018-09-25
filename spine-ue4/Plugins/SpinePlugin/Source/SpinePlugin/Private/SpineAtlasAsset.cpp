@@ -111,7 +111,7 @@ Atlas* USpineAtlasAsset::GetAtlas (bool ForceReload) {
 				page->setRendererObject(atlasPages[j++]);
 		}
 	}
-	return this->atlas;
+	return this->atlas;	
 }
 
 #undef LOCTEXT_NAMESPACE

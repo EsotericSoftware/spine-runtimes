@@ -104,11 +104,27 @@ void USpineSkeletonAnimationComponent::InternalTick(float DeltaTime, bool CallDe
 }
 
 void USpineSkeletonAnimationComponent::CheckState () {
-	if (lastAtlas != Atlas || lastData != SkeletonData) {
+	bool needsUpdate = lastAtlas != Atlas || lastData != SkeletonData;
+
+	if (!needsUpdate) {
+		// Are we doing a re-import? Then check if the underlying spine-cpp data
+		// has changed.
+		if (lastAtlas && lastAtlas == Atlas && lastData && lastData == SkeletonData) {
+			spine::Atlas* atlas = Atlas->GetAtlas(false);
+			if (lastSpineAtlas != atlas) {
+				needsUpdate = true;
+			}
+			if (skeleton && skeleton->getData() != SkeletonData->GetSkeletonData(atlas)) {
+				needsUpdate = true;
+			}
+		}
+	}
+
+	if (needsUpdate) {
 		DisposeState();
 		
 		if (Atlas && SkeletonData) {
-			spine::SkeletonData *data = SkeletonData->GetSkeletonData(Atlas->GetAtlas(false), false);
+			spine::SkeletonData *data = SkeletonData->GetSkeletonData(Atlas->GetAtlas(false), true);
 			if (data) {
 				skeleton = new (__FILE__, __LINE__) Skeleton(data);
 				AnimationStateData* stateData = SkeletonData->GetAnimationStateData(Atlas->GetAtlas(false));
@@ -120,6 +136,7 @@ void USpineSkeletonAnimationComponent::CheckState () {
 		}
 		
 		lastAtlas = Atlas;
+		lastSpineAtlas = Atlas ? Atlas->GetAtlas(false) : nullptr;
 		lastData = SkeletonData;
 	}
 }

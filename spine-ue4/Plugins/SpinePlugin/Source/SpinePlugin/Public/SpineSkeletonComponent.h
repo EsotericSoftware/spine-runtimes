@@ -114,5 +114,6 @@ protected:
 
 	spine::Skeleton* skeleton;
 	USpineAtlasAsset* lastAtlas = nullptr;
+	spine::Atlas* lastSpineAtlas = nullptr;
 	USpineSkeletonDataAsset* lastData = nullptr;	
 };

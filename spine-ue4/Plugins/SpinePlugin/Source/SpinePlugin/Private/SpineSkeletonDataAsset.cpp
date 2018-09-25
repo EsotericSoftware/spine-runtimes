@@ -97,7 +97,7 @@ void USpineSkeletonDataAsset::BeginDestroy () {
 }
 
 SkeletonData* USpineSkeletonDataAsset::GetSkeletonData (Atlas* Atlas, bool ForceReload) {
-	if (!skeletonData || ForceReload) {
+	if (!skeletonData || lastAtlas != Atlas || ForceReload) {
 		if (skeletonData) {
 			delete skeletonData;
 			skeletonData = nullptr;
@@ -126,6 +126,7 @@ SkeletonData* USpineSkeletonDataAsset::GetSkeletonData (Atlas* Atlas, bool Force
 		}
 		if (animationStateData) {
 			delete animationStateData;
+			animationStateData = nullptr;
 			GetAnimationStateData(Atlas);
 		}
 		lastAtlas = Atlas;
