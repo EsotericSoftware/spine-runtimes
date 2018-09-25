@@ -48,14 +48,14 @@ const std::string &RTTI::getClassName() const {
 }
 
 bool RTTI::isExactly(const RTTI &rtti) const {
-	return (this == &rtti);
+	return (this->_className == rtti._className);
 }
 
 bool RTTI::instanceOf(const RTTI &rtti) const {
 	const RTTI *pCompare = this;
 
 	while (pCompare) {
-		if (pCompare == &rtti) {
+		if (pCompare->_className == rtti._className) {
 			return true;
 		}
 
