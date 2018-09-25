@@ -614,7 +614,7 @@ namespace Spine {
 			animation.Apply(skeleton, 0, time, loop, null, 1f, MixBlend.Setup, MixDirection.In);
 		}
 
-		/// <summary>Pose a skeleton according to a given time in an animation.</summary>
+		/// <summary>Pose a skeleton according to a given time in an animation. This is the simplified version of Animation.Apply(skeleton).</summary>
 		public static void PoseSkeleton (this Animation animation, Skeleton skeleton, float time, bool loop = false) {
 			animation.Apply(skeleton, 0, time, loop, null, 1f, MixBlend.Setup, MixDirection.In);
 		}
