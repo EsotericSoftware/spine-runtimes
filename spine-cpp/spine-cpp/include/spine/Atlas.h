@@ -65,11 +65,7 @@ enum TextureWrap {
 	TextureWrap_Repeat
 };
 
-class 
-#ifdef SPINE_UE4
-	SPINEPLUGIN_API
-#endif	
-AtlasPage : public SpineObject, public HasRendererObject {
+class AtlasPage : public SpineObject, public HasRendererObject {
 public:
 	String name;
 	Format format;
@@ -87,11 +83,7 @@ public:
 	virtual ~AtlasPage() { }
 };
 
-class 
-#ifdef SPINE_UE4
-	SPINEPLUGIN_API
-#endif	
-AtlasRegion : public SpineObject {
+class AtlasRegion : public SpineObject {
 public:
 	AtlasPage *page;
 	String name;
@@ -107,11 +99,7 @@ public:
 
 class TextureLoader;
 
-class 
-#ifdef SPINE_UE4
-	SPINEPLUGIN_API
-#endif
-Atlas : public SpineObject {
+class Atlas : public SpineObject {
 public:
 	Atlas(const String &path, TextureLoader *textureLoader);
 
