@@ -32,13 +32,14 @@
 #define Spine_Extension_h
 
 #include <stdlib.h>
+#include <spine/dll.h>
 
 #define SP_UNUSED(x) (void)(x)
 
 namespace spine {
 class String;
 
-class SpineExtension {
+class SP_API SpineExtension {
 public:
 	template<typename T>
 	static T *alloc(size_t num, const char *file, int line) {
@@ -89,7 +90,7 @@ private:
 	static SpineExtension *_instance;
 };
 
-class DefaultSpineExtension : public SpineExtension {
+class SP_API DefaultSpineExtension : public SpineExtension {
 public:
 	DefaultSpineExtension();
 

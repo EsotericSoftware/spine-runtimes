@@ -54,7 +54,7 @@ class LinkedMesh;
 
 class String;
 
-class SkeletonJson : public SpineObject {
+class SP_API SkeletonJson : public SpineObject {
 public:
 	explicit SkeletonJson(Atlas *atlas);
 

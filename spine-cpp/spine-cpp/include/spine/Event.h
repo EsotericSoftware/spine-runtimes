@@ -38,7 +38,7 @@ namespace spine {
 class EventData;
 
 /// Stores the current pose values for an Event.
-class Event : public SpineObject {
+class SP_API Event : public SpineObject {
 	friend class SkeletonBinary;
 
 	friend class SkeletonJson;

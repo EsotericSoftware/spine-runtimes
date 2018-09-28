@@ -46,7 +46,7 @@ class Skeleton;
 
 class Attachment;
 
-class Slot : public SpineObject {
+class SP_API Slot : public SpineObject {
 	friend class VertexAttachment;
 
 	friend class Skeleton;

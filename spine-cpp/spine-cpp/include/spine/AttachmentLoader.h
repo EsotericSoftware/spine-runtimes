@@ -45,7 +45,7 @@ namespace spine {
     class PointAttachment;
     class ClippingAttachment;
     
-    class AttachmentLoader : public SpineObject {
+    class SP_API AttachmentLoader : public SpineObject {
 	public:
         RTTI_DECL
         

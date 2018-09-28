@@ -36,7 +36,7 @@
 #include <spine/SpineString.h>
 
 namespace spine {
-class BoneData : public SpineObject {
+class SP_API BoneData : public SpineObject {
 	friend class SkeletonBinary;
 
 	friend class SkeletonJson;

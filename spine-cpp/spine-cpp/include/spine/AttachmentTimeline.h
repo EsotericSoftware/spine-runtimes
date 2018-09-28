@@ -39,10 +39,11 @@
 #include <spine/SpineString.h>
 
 namespace spine {
+
     class Skeleton;
     class Event;
     
-    class AttachmentTimeline : public Timeline {
+    class SP_API AttachmentTimeline : public Timeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

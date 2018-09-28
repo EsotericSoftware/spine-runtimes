@@ -40,7 +40,7 @@
 
 namespace spine {
 template<typename T>
-class Vector : public SpineObject {
+class SP_API Vector : public SpineObject {
 public:
 	Vector() : _size(0), _capacity(0), _buffer(NULL) {
 	}

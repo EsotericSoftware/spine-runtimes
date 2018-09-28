@@ -44,7 +44,7 @@ class Skeleton;
 
 class Event;
 
-class Animation : public SpineObject {
+class SP_API Animation : public SpineObject {
 	friend class AnimationState;
 
 	friend class TrackEntry;

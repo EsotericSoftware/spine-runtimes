@@ -42,7 +42,7 @@ class Skeleton;
 
 class Event;
 
-class Timeline : public SpineObject {
+class SP_API Timeline : public SpineObject {
 RTTI_DECL
 
 public:

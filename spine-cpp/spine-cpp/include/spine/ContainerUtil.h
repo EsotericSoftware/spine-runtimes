@@ -40,7 +40,7 @@
 #include <assert.h>
 
 namespace spine {
-    class ContainerUtil : public SpineObject {
+    class SP_API ContainerUtil : public SpineObject {
     public:
         /// Finds an item by comparing each item's name.
         /// It is more efficient to cache the results of this method than to call it multiple times.

@@ -48,7 +48,7 @@ namespace spine {
     class Animation;
     class CurveTimeline;
     
-    class SkeletonBinary : public SpineObject {
+    class SP_API SkeletonBinary : public SpineObject {
     public:
         static const int BONE_ROTATE;
         static const int BONE_TRANSLATE;

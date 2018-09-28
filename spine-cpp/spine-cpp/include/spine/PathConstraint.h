@@ -42,7 +42,7 @@ namespace spine {
     class Bone;
     class Slot;
     
-    class PathConstraint : public Constraint {
+    class SP_API PathConstraint : public Constraint {
         friend class Skeleton;
         friend class PathConstraintMixTimeline;
         friend class PathConstraintPositionTimeline;

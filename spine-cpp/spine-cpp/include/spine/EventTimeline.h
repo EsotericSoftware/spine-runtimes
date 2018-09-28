@@ -34,7 +34,7 @@
 #include <spine/Timeline.h>
 
 namespace spine {
-    class EventTimeline : public Timeline {
+    class SP_API EventTimeline : public Timeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

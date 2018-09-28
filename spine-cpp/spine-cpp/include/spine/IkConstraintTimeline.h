@@ -34,7 +34,8 @@
 #include <spine/CurveTimeline.h>
 
 namespace spine {
-    class IkConstraintTimeline : public CurveTimeline {
+
+    class SP_API IkConstraintTimeline : public CurveTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         
@@ -53,9 +54,16 @@ namespace spine {
         void setFrame (int frameIndex, float time, float mix, int bendDirection, bool compress, bool stretch);
         
     private:
-        static const int PREV_TIME, PREV_MIX, PREV_BEND_DIRECTION, PREV_COMPRESS, PREV_STRETCH;
-        static const int MIX, BEND_DIRECTION, COMPRESS, STRETCH;
-        
+		static const int PREV_TIME;
+		static const int PREV_MIX;
+		static const int PREV_BEND_DIRECTION;
+		static const int PREV_COMPRESS;
+		static const int PREV_STRETCH;
+		static const int MIX;
+		static const int BEND_DIRECTION;
+		static const int COMPRESS;
+		static const int STRETCH;
+
         Vector<float> _frames;
         int _ikConstraintIndex;
     };

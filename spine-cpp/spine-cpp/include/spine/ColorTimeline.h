@@ -34,7 +34,7 @@
 #include <spine/CurveTimeline.h>
 
 namespace spine {
-class ColorTimeline : public CurveTimeline {
+class SP_API ColorTimeline : public CurveTimeline {
 	friend class SkeletonBinary;
 
 	friend class SkeletonJson;
@@ -62,8 +62,15 @@ public:
 	Vector<float> &getFrames();
 
 protected:
-	static const int PREV_TIME, PREV_R, PREV_G, PREV_B, PREV_A;
-	static const int R, G, B, A;
+	static const int PREV_TIME;
+	static const int PREV_R;
+	static const int PREV_G;
+	static const int PREV_B;
+	static const int PREV_A;
+	static const int R;
+	static const int G;
+	static const int B;
+	static const int A;
 
 private:
 	int _slotIndex;

@@ -34,7 +34,7 @@
 #include <spine/CurveTimeline.h>
 
 namespace spine {
-    class RotateTimeline : public CurveTimeline {
+    class SP_API RotateTimeline : public CurveTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         friend class AnimationState;

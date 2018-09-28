@@ -37,7 +37,8 @@
 #include <spine/TimelineType.h>
 
 namespace spine {
-    class TranslateTimeline : public CurveTimeline {
+
+    class SP_API TranslateTimeline : public CurveTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         
@@ -58,8 +59,11 @@ namespace spine {
         void setFrame(int frameIndex, float time, float x, float y);
         
     protected:
-        static const int PREV_TIME, PREV_X, PREV_Y;
-        static const int X, Y;
+		static const int PREV_TIME;
+		static const int PREV_X;
+		static const int PREV_Y;
+		static const int X;
+		static const int Y;
         
         Vector<float> _frames;
         int _boneIndex;

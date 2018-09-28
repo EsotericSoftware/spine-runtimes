@@ -42,7 +42,7 @@ namespace spine {
     class BoneData;
     class SlotData;
     
-    class PathConstraintData : public SpineObject {
+    class SP_API PathConstraintData : public SpineObject {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

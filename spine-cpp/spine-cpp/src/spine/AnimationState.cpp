@@ -269,10 +269,10 @@ void EventQueue::drain() {
 	_drainDisabled = false;
 }
 
-const int AnimationState::Subsequent = 0;
-const int AnimationState::First = 1;
-const int AnimationState::Hold = 2;
-const int AnimationState::HoldMix = 3;
+const int Subsequent = 0;
+const int First = 1;
+const int Hold = 2;
+const int HoldMix = 3;
 
 AnimationState::AnimationState(AnimationStateData *data) :
 		_data(data),
@@ -416,7 +416,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 				Timeline *timeline = timelines[ii];
 				assert(timeline);
 
-				MixBlend timelineBlend = timelineMode[ii] == AnimationState::Subsequent ? blend : MixBlend_Setup;
+				MixBlend timelineBlend = timelineMode[ii] == Subsequent ? blend : MixBlend_Setup;
 
 				RotateTimeline *rotateTimeline = NULL;
 				if (timeline->getRTTI().isExactly(RotateTimeline::rtti)) {
@@ -780,17 +780,17 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 			MixBlend timelineBlend;
 			float alpha;
 			switch (timelineMode[i]) {
-				case AnimationState::Subsequent:
+				case Subsequent:
 					if (!attachments && (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))) continue;
 					if (!drawOrder && (timeline->getRTTI().isExactly(DrawOrderTimeline::rtti))) continue;
 					timelineBlend = blend;
 					alpha = alphaMix;
 					break;
-				case AnimationState::First:
+				case First:
 					timelineBlend = MixBlend_Setup;
 					alpha = alphaMix;
 					break;
-				case AnimationState::Hold:
+				case Hold:
 					timelineBlend = MixBlend_Setup;
 					alpha = alphaHold;
 					break;
@@ -969,7 +969,7 @@ void AnimationState::setTimelineModes(TrackEntry *entry) {
 		for (size_t i = 0; i < timelinesCount; i++) {
 			int id = timelines[i]->getPropertyId();
 			if (!_propertyIDs.contains(id)) _propertyIDs.add(id);
-			timelineMode[i] = AnimationState::Hold;
+			timelineMode[i] = Hold;
 		}
 		return;
 	}
@@ -980,24 +980,24 @@ void AnimationState::setTimelineModes(TrackEntry *entry) {
 	for (; i < timelinesCount; ++i) {
 		int id = timelines[i]->getPropertyId();
 		if (_propertyIDs.contains(id)) {
-			timelineMode[i] = AnimationState::Subsequent;
+			timelineMode[i] = Subsequent;
 		} else {
 			_propertyIDs.add(id);
 
 			if (to == NULL || !hasTimeline(to, id)) {
-				timelineMode[i] = AnimationState::First;
+				timelineMode[i] = First;
 			} else {
 				for (TrackEntry *next = to->_mixingTo; next != NULL; next = next->_mixingTo) {
 					if (hasTimeline(next, id)) continue;
 					if (entry->_mixDuration > 0) {
-						timelineMode[i] = AnimationState::HoldMix;
+						timelineMode[i] = HoldMix;
 						timelineHoldMix[i] = entry;
 						i++;
 						goto continue_outer; // continue outer;
 					}
 					break;
 				}
-				timelineMode[i] = AnimationState::Hold;
+				timelineMode[i] = Hold;
 			}
 		}
 	}

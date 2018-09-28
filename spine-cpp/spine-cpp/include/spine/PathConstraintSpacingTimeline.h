@@ -34,7 +34,7 @@
 #include <spine/PathConstraintPositionTimeline.h>
 
 namespace spine {
-    class PathConstraintSpacingTimeline : public PathConstraintPositionTimeline {
+    class SP_API PathConstraintSpacingTimeline : public PathConstraintPositionTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

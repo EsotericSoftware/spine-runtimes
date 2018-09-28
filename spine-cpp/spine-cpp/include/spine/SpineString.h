@@ -43,7 +43,7 @@
 #endif
 
 namespace spine {
-class String : public SpineObject {
+class SP_API String : public SpineObject {
 public:
 	String() : _length(0), _buffer(NULL) {
 	}

@@ -42,7 +42,7 @@ class Skeleton;
 
 class Bone;
 
-class IkConstraint : public Constraint {
+class SP_API IkConstraint : public Constraint {
 	friend class Skeleton;
 
 	friend class IkConstraintTimeline;

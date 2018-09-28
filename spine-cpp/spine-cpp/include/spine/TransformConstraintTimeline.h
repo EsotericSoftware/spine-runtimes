@@ -34,7 +34,8 @@
 #include <spine/CurveTimeline.h>
 
 namespace spine {
-    class TransformConstraintTimeline : public CurveTimeline {
+
+    class SP_API TransformConstraintTimeline : public CurveTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         
@@ -52,8 +53,15 @@ namespace spine {
         void setFrame(size_t frameIndex, float time, float rotateMix, float translateMix, float scaleMix, float shearMix);
         
     private:
-        static const int PREV_TIME, PREV_ROTATE, PREV_TRANSLATE, PREV_SCALE, PREV_SHEAR;
-        static const int ROTATE, TRANSLATE, SCALE, SHEAR;
+		static const int PREV_TIME;
+		static const int PREV_ROTATE;
+		static const int PREV_TRANSLATE;
+		static const int PREV_SCALE;
+		static const int PREV_SHEAR;
+		static const int ROTATE;
+		static const int TRANSLATE;
+		static const int SCALE;
+		static const int SHEAR;
         
         Vector<float> _frames;
         int _transformConstraintIndex;

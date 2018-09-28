@@ -36,7 +36,7 @@
 #include <string>
 
 namespace spine {
-class RTTI : public SpineObject {
+class SP_API RTTI : public SpineObject {
 public:
 	explicit RTTI(const std::string &className);
 

@@ -52,7 +52,7 @@ class TransformConstraintData;
 class PathConstraintData;
 
 /// Stores the setup pose and all of the stateless data for a skeleton.
-class SkeletonData : public SpineObject {
+class SP_API SkeletonData : public SpineObject {
 	friend class SkeletonBinary;
 
 	friend class SkeletonJson;

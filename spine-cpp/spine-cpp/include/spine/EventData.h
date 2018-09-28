@@ -36,7 +36,7 @@
 
 namespace spine {
 /// Stores the setup pose values for an Event.
-class EventData : public SpineObject {
+class SP_API EventData : public SpineObject {
 	friend class SkeletonBinary;
 
 	friend class SkeletonJson;

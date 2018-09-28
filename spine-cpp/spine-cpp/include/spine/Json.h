@@ -39,7 +39,7 @@
 #endif
 
 namespace spine {
-class Json : public SpineObject {
+class SP_API Json : public SpineObject {
 	friend class SkeletonJson;
 
 public:

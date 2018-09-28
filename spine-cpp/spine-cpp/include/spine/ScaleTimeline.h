@@ -34,7 +34,7 @@
 #include <spine/TranslateTimeline.h>
 
 namespace spine {
-    class ScaleTimeline : public TranslateTimeline {
+    class SP_API ScaleTimeline : public TranslateTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

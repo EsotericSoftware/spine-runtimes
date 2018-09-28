@@ -37,7 +37,7 @@
 
 namespace spine {
 
-class MathUtil : public SpineObject {
+class SP_API MathUtil : public SpineObject {
 private:
 	MathUtil();
 
@@ -92,7 +92,7 @@ public:
 	static float pow(float a, float b);
 };
 
-struct Interpolation {
+struct SP_API Interpolation {
 	virtual float apply(float a) = 0;
 
 	virtual float interpolate(float start, float end, float a) {
@@ -102,7 +102,7 @@ struct Interpolation {
 	virtual ~Interpolation() {};
 };
 
-struct PowInterpolation: public Interpolation {
+struct SP_API PowInterpolation: public Interpolation {
 	PowInterpolation(int power): power(power) {
 	}
 
@@ -114,7 +114,7 @@ struct PowInterpolation: public Interpolation {
 	int power;
 };
 
-struct PowOutInterpolation: public Interpolation {
+struct SP_API PowOutInterpolation: public Interpolation {
 	PowOutInterpolation(int power): power(power) {
 	}
 

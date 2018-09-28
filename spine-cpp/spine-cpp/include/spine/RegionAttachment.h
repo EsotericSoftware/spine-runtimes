@@ -44,7 +44,7 @@ namespace spine {
     class Bone;
     
     /// Attachment that displays a texture region.
-    class RegionAttachment : public Attachment, public HasRendererObject {
+    class SP_API RegionAttachment : public Attachment, public HasRendererObject {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         friend class AtlasAttachmentLoader;

@@ -37,7 +37,7 @@
 namespace spine {
     class AtlasPage;
     
-    class TextureLoader : public SpineObject {
+    class SP_API TextureLoader : public SpineObject {
     public:
         TextureLoader();
         

@@ -35,7 +35,7 @@ namespace spine {
 
 typedef void (*DisposeRendererObject) (void* rendererObject);
 
-class HasRendererObject {
+class SP_API HasRendererObject {
 public:
 	explicit HasRendererObject() : _rendererObject(NULL), _dispose(NULL) {};
 

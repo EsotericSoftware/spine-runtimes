@@ -44,7 +44,7 @@ namespace spine {
     /// An AttachmentLoader that configures attachments using texture regions from an Atlas.
     /// See http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data about Loading Skeleton Data in the Spine Runtimes Guide.
     ///
-	class AtlasAttachmentLoader : public AttachmentLoader {
+	class SP_API AtlasAttachmentLoader : public AttachmentLoader {
     public:
 		RTTI_DECL
 		

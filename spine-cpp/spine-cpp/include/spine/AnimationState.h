@@ -60,7 +60,7 @@ namespace spine {
     typedef void (*AnimationStateListener) (AnimationState* state, EventType type, TrackEntry* entry, Event* event);
     
     /// State for the playback of an animation
-    class TrackEntry : public SpineObject, public HasRendererObject {
+    class SP_API TrackEntry : public SpineObject, public HasRendererObject {
         friend class EventQueue;
         friend class AnimationState;
         
@@ -263,7 +263,7 @@ namespace spine {
         void reset();
     };
     
-    class EventQueueEntry : public SpineObject {
+    class SP_API EventQueueEntry : public SpineObject {
         friend class EventQueue;
         
     public:
@@ -274,7 +274,7 @@ namespace spine {
         EventQueueEntry(EventType eventType, TrackEntry* trackEntry, Event* event = NULL);
     };
     
-    class EventQueue : public SpineObject {
+    class SP_API EventQueue : public SpineObject {
         friend class AnimationState;
         
     private:
@@ -307,7 +307,7 @@ namespace spine {
         void drain();
     };
     
-    class AnimationState : public SpineObject, public HasRendererObject {
+    class SP_API AnimationState : public SpineObject, public HasRendererObject {
         friend class TrackEntry;
         friend class EventQueue;
         
@@ -401,7 +401,6 @@ namespace spine {
 		void enableQueue();
         
     private:
-        static const int Subsequent, First, Hold, HoldMix;
         
         AnimationStateData* _data;
 

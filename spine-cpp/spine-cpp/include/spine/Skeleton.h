@@ -58,7 +58,7 @@ class Skin;
 
 class Attachment;
 
-class Skeleton : public SpineObject {
+class SP_API Skeleton : public SpineObject {
 	friend class AnimationState;
 
 	friend class SkeletonBounds;
