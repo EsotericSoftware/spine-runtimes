@@ -67,9 +67,13 @@ public class TwoColorPolygonBatch implements Batch {
 	private int blendDstFuncAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
 	private boolean premultipliedAlpha;
 
-	private float light = Color.WHITE.toFloatBits();
-	private float dark = Color.BLACK.toFloatBits();
-	private Color tempColor = new Color(1, 1, 1, 1);
+	private final Color light = new Color(1, 1, 1, 1);
+	private final Color dark = new Color(0, 0, 0, 1);
+	private float lightPacked = Color.WHITE.toFloatBits();
+	private float darkPacked = Color.BLACK.toFloatBits();
+
+	/** Number of rendering calls, ever. Will not be reset unless set manually. **/
+	public int totalRenderCalls = 0;
 
 	public TwoColorPolygonBatch () {
 		this(2000);
@@ -122,61 +126,53 @@ public class TwoColorPolygonBatch implements Batch {
 
 	@Override
 	public void setColor (Color tint) {
-		light = tint.toFloatBits();
+		light.set(tint);
+		lightPacked = tint.toFloatBits();
 	}
 
 	@Override
 	public void setColor (float r, float g, float b, float a) {
-		int intBits = (int)(255 * a) << 24 | (int)(255 * b) << 16 | (int)(255 * g) << 8 | (int)(255 * r);
-		light = NumberUtils.intToFloatColor(intBits);
+		light.set(r, g, b, a);
+		lightPacked = light.toFloatBits();
 	}
 
 	@Override
-	public void setColor (float color) {
-		this.light = color;
+	public void setPackedColor (float packedColor) {
+		Color.rgba8888ToColor(light, NumberUtils.floatToIntColor(packedColor));
+		lightPacked = packedColor;
 	}
 
 	@Override
 	public Color getColor () {
-		int intBits = NumberUtils.floatToIntColor(light);
-		Color color = this.tempColor;
-		color.r = (intBits & 0xff) / 255f;
-		color.g = ((intBits >>> 8) & 0xff) / 255f;
-		color.b = ((intBits >>> 16) & 0xff) / 255f;
-		color.a = ((intBits >>> 24) & 0xff) / 255f;
-		return color;
+		return light;
 	}
 
 	@Override
 	public float getPackedColor () {
-		return light;
+		return lightPacked;
 	}
 
 	public void setDarkColor (Color tint) {
-		dark = tint.toFloatBits();
+		dark.set(tint);
+		darkPacked = tint.toFloatBits();
 	}
 
 	public void setDarkColor (float r, float g, float b, float a) {
-		int intBits = (int)(255 * a) << 24 | (int)(255 * b) << 16 | (int)(255 * g) << 8 | (int)(255 * r);
-		dark = NumberUtils.intToFloatColor(intBits);
+		dark.set(r, g, b, a);
+		darkPacked = dark.toFloatBits();
 	}
 
-	public void setDarkColor (float color) {
-		this.dark = color;
+	public void setPackedDarkColor (float packedColor) {
+		Color.rgba8888ToColor(dark, NumberUtils.floatToIntColor(packedColor));
+		this.darkPacked = packedColor;
 	}
 
 	public Color getDarkColor () {
-		int intBits = NumberUtils.floatToIntColor(dark);
-		Color color = this.tempColor;
-		color.r = (intBits & 0xff) / 255f;
-		color.g = ((intBits >>> 8) & 0xff) / 255f;
-		color.b = ((intBits >>> 16) & 0xff) / 255f;
-		color.a = ((intBits >>> 24) & 0xff) / 255f;
-		return color;
+		return dark;
 	}
 
 	public float getPackedDarkColor () {
-		return dark;
+		return darkPacked;
 	}
 
 	/** Draws a polygon region with the bottom left corner at x,y having the width and height of the region. */
@@ -193,7 +189,7 @@ public class TwoColorPolygonBatch implements Batch {
 		if (texture != lastTexture)
 			switchTexture(texture);
 		else if (triangleIndex + regionTrianglesLength > triangles.length
-				|| vertexIndex + regionVerticesLength * VERTEX_SIZE / 2 > vertices.length) flush();
+			|| vertexIndex + regionVerticesLength * VERTEX_SIZE / 2 > vertices.length) flush();
 
 		int triangleIndex = this.triangleIndex;
 		int vertexIndex = this.vertexIndex;
@@ -204,8 +200,8 @@ public class TwoColorPolygonBatch implements Batch {
 		this.triangleIndex = triangleIndex;
 
 		final float[] vertices = this.vertices;
-		final float light = this.light;
-		final float dark = this.dark;
+		final float light = this.lightPacked;
+		final float dark = this.darkPacked;
 		final float[] textureCoords = region.getTextureCoords();
 
 		for (int i = 0; i < regionVerticesLength; i += 2) {
@@ -234,7 +230,7 @@ public class TwoColorPolygonBatch implements Batch {
 		if (texture != lastTexture)
 			switchTexture(texture);
 		else if (triangleIndex + regionTrianglesLength > triangles.length
-				|| vertexIndex + regionVerticesLength * VERTEX_SIZE / 2 > vertices.length) flush();
+			|| vertexIndex + regionVerticesLength * VERTEX_SIZE / 2 > vertices.length) flush();
 
 		int triangleIndex = this.triangleIndex;
 		int vertexIndex = this.vertexIndex;
@@ -245,8 +241,8 @@ public class TwoColorPolygonBatch implements Batch {
 		this.triangleIndex = triangleIndex;
 
 		final float[] vertices = this.vertices;
-		final float light = this.light;
-		final float dark = this.dark;
+		final float light = this.lightPacked;
+		final float dark = this.darkPacked;
 		final float[] textureCoords = region.getTextureCoords();
 		final float sX = width / textureRegion.getRegionWidth();
 		final float sY = height / textureRegion.getRegionHeight();
@@ -267,7 +263,7 @@ public class TwoColorPolygonBatch implements Batch {
 	 * polygon region should be scaled around originX, originY. Rotation specifies the angle of counter clockwise rotation of the
 	 * rectangle around originX, originY. */
 	public void draw (PolygonRegion region, float x, float y, float originX, float originY, float width, float height,
-					  float scaleX, float scaleY, float rotation) {
+		float scaleX, float scaleY, float rotation) {
 		if (!drawing) throw new IllegalStateException("begin must be called before draw.");
 
 		final short[] triangles = this.triangles;
@@ -281,7 +277,7 @@ public class TwoColorPolygonBatch implements Batch {
 		if (texture != lastTexture)
 			switchTexture(texture);
 		else if (triangleIndex + regionTrianglesLength > triangles.length
-				|| vertexIndex + regionVerticesLength * VERTEX_SIZE / 2 > vertices.length) flush();
+			|| vertexIndex + regionVerticesLength * VERTEX_SIZE / 2 > vertices.length) flush();
 
 		int triangleIndex = this.triangleIndex;
 		int vertexIndex = this.vertexIndex;
@@ -292,8 +288,8 @@ public class TwoColorPolygonBatch implements Batch {
 		this.triangleIndex = triangleIndex;
 
 		final float[] vertices = this.vertices;
-		final float light = this.light;
-		final float dark = this.dark;
+		final float light = this.lightPacked;
+		final float dark = this.darkPacked;
 		final float[] textureCoords = region.getTextureCoords();
 
 		final float worldOriginX = x + originX;
@@ -343,7 +339,7 @@ public class TwoColorPolygonBatch implements Batch {
 
 	@Override
 	public void draw (Texture texture, float x, float y, float originX, float originY, float width, float height, float scaleX,
-					  float scaleY, float rotation, int srcX, int srcY, int srcWidth, int srcHeight, boolean flipX, boolean flipY) {
+		float scaleY, float rotation, int srcX, int srcY, int srcWidth, int srcHeight, boolean flipX, boolean flipY) {
 		if (!drawing) throw new IllegalStateException("begin must be called before draw.");
 
 		final short[] triangles = this.triangles;
@@ -455,8 +451,8 @@ public class TwoColorPolygonBatch implements Batch {
 			v2 = tmp;
 		}
 
-		float light = this.light;
-		float dark = this.dark;
+		float light = this.lightPacked;
+		float dark = this.darkPacked;
 		int idx = this.vertexIndex;
 		vertices[idx++] = x1;
 		vertices[idx++] = y1;
@@ -490,7 +486,7 @@ public class TwoColorPolygonBatch implements Batch {
 
 	@Override
 	public void draw (Texture texture, float x, float y, float width, float height, int srcX, int srcY, int srcWidth,
-					  int srcHeight, boolean flipX, boolean flipY) {
+		int srcHeight, boolean flipX, boolean flipY) {
 		if (!drawing) throw new IllegalStateException("begin must be called before draw.");
 
 		final short[] triangles = this.triangles;
@@ -530,8 +526,8 @@ public class TwoColorPolygonBatch implements Batch {
 			v2 = tmp;
 		}
 
-		float light = this.light;
-		float dark = this.dark;
+		float light = this.lightPacked;
+		float dark = this.darkPacked;
 		int idx = this.vertexIndex;
 		vertices[idx++] = x;
 		vertices[idx++] = y;
@@ -592,8 +588,8 @@ public class TwoColorPolygonBatch implements Batch {
 		final float fx2 = x + srcWidth;
 		final float fy2 = y + srcHeight;
 
-		float light = this.light;
-		float dark = this.dark;
+		float light = this.lightPacked;
+		float dark = this.darkPacked;
 		int idx = this.vertexIndex;
 		vertices[idx++] = x;
 		vertices[idx++] = y;
@@ -650,8 +646,8 @@ public class TwoColorPolygonBatch implements Batch {
 		final float fx2 = x + width;
 		final float fy2 = y + height;
 
-		float light = this.light;
-		float dark = this.dark;
+		float light = this.lightPacked;
+		float dark = this.darkPacked;
 		int idx = this.vertexIndex;
 		vertices[idx++] = x;
 		vertices[idx++] = y;
@@ -717,8 +713,8 @@ public class TwoColorPolygonBatch implements Batch {
 		final float u2 = 1;
 		final float v2 = 0;
 
-		float light = this.light;
-		float dark = this.dark;
+		float light = this.lightPacked;
+		float dark = this.darkPacked;
 		int idx = this.vertexIndex;
 		vertices[idx++] = x;
 		vertices[idx++] = y;
@@ -750,8 +746,9 @@ public class TwoColorPolygonBatch implements Batch {
 		this.vertexIndex = idx;
 	}
 
-	/** Draws a rectangle using the given vertices. There must be 4 vertices, each made up of 6 elements in this order: x, y, lightColor, darkColor,
-	 * u, v. The {@link #getColor()} and {@link #getDarkColor()} from the TwoColorPolygonBatch is not applied. */
+	/** Draws a rectangle using the given vertices. There must be 4 vertices, each made up of 6 elements in this order: x, y,
+	 * lightColor, darkColor, u, v. The {@link #getColor()} and {@link #getDarkColor()} from the TwoColorPolygonBatch is not
+	 * applied. */
 	@Override
 	public void draw (Texture texture, float[] spriteVertices, int offset, int count) {
 		if (!drawing) throw new IllegalStateException("begin must be called before draw.");
@@ -832,8 +829,8 @@ public class TwoColorPolygonBatch implements Batch {
 		final float u2 = region.getU2();
 		final float v2 = region.getV();
 
-		float light = this.light;
-		float dark = this.dark;
+		float light = this.lightPacked;
+		float dark = this.darkPacked;
 		int idx = this.vertexIndex;
 		vertices[idx++] = x;
 		vertices[idx++] = y;
@@ -867,7 +864,7 @@ public class TwoColorPolygonBatch implements Batch {
 
 	@Override
 	public void draw (TextureRegion region, float x, float y, float originX, float originY, float width, float height,
-					  float scaleX, float scaleY, float rotation) {
+		float scaleX, float scaleY, float rotation) {
 		if (!drawing) throw new IllegalStateException("begin must be called before draw.");
 
 		final short[] triangles = this.triangles;
@@ -968,8 +965,8 @@ public class TwoColorPolygonBatch implements Batch {
 		final float u2 = region.getU2();
 		final float v2 = region.getV();
 
-		float light = this.light;
-		float dark = this.dark;
+		float light = this.lightPacked;
+		float dark = this.darkPacked;
 		int idx = this.vertexIndex;
 		vertices[idx++] = x1;
 		vertices[idx++] = y1;
@@ -1003,7 +1000,7 @@ public class TwoColorPolygonBatch implements Batch {
 
 	@Override
 	public void draw (TextureRegion region, float x, float y, float originX, float originY, float width, float height,
-					  float scaleX, float scaleY, float rotation, boolean clockwise) {
+		float scaleX, float scaleY, float rotation, boolean clockwise) {
 		if (!drawing) throw new IllegalStateException("begin must be called before draw.");
 
 		final short[] triangles = this.triangles;
@@ -1120,8 +1117,8 @@ public class TwoColorPolygonBatch implements Batch {
 			v4 = region.getV2();
 		}
 
-		float light = this.light;
-		float dark = this.dark;
+		float light = this.lightPacked;
+		float dark = this.darkPacked;
 		int idx = this.vertexIndex;
 		vertices[idx++] = x1;
 		vertices[idx++] = y1;
@@ -1191,8 +1188,8 @@ public class TwoColorPolygonBatch implements Batch {
 		final float u2 = region.getU2();
 		final float v2 = region.getV();
 
-		float light = this.light;
-		float dark = this.dark;
+		float light = this.lightPacked;
+		float dark = this.darkPacked;
 		int idx = vertexIndex;
 		vertices[idx++] = x1;
 		vertices[idx++] = y1;
@@ -1228,6 +1225,8 @@ public class TwoColorPolygonBatch implements Batch {
 	public void flush () {
 		if (vertexIndex == 0) return;
 
+		totalRenderCalls++;
+
 		lastTexture.bind();
 		Mesh mesh = this.mesh;
 		mesh.setVertices(vertices, 0, vertexIndex);
@@ -1241,13 +1240,13 @@ public class TwoColorPolygonBatch implements Batch {
 	}
 
 	@Override
-	public void disableBlending() {
+	public void disableBlending () {
 		flush();
 		blendingDisabled = true;
 	}
 
 	@Override
-	public void enableBlending() {
+	public void enableBlending () {
 		flush();
 		blendingDisabled = false;
 	}
@@ -1323,7 +1322,7 @@ public class TwoColorPolygonBatch implements Batch {
 	}
 
 	@Override
-	public ShaderProgram getShader() {
+	public ShaderProgram getShader () {
 		return shader;
 	}
 
@@ -1366,12 +1365,12 @@ public class TwoColorPolygonBatch implements Batch {
 	}
 
 	@Override
-	public int getBlendSrcFuncAlpha() {
+	public int getBlendSrcFuncAlpha () {
 		return blendSrcFuncAlpha;
 	}
 
 	@Override
-	public int getBlendDstFuncAlpha() {
+	public int getBlendDstFuncAlpha () {
 		return blendDstFuncAlpha;
 	}
 
