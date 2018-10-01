@@ -946,6 +946,8 @@ void AnimationState::animationsChanged() {
 	for (size_t i = 0, n = _tracks.size(); i < n; ++i) {
 		TrackEntry *entry = _tracks[i];
 
+		if (!entry) continue;
+
 		while (entry->_mixingFrom != NULL)
 			entry = entry->_mixingFrom;
 
