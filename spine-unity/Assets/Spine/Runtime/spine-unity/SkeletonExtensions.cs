@@ -624,6 +624,9 @@ namespace Spine {
 			animation.Apply(skeleton, 0, 0, false, null, 0, MixBlend.Setup, MixDirection.Out);
 		}
 
+		public static void AllowImmediateQueue (this TrackEntry trackEntry) {
+			if (trackEntry.nextTrackLast < 0) trackEntry.nextTrackLast = 0;
+		}
 
 		#endregion
 
