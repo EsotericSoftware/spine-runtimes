@@ -100,6 +100,7 @@ namespace Spine.Unity {
 			stateData = null;
 		}
 
+		/// <summary>Loads, caches and returns the SkeletonData from the skeleton data file. Returns the cached SkeletonData after the first time it is called. Pass false to prevent direct errors from being logged.</summary>
 		public SkeletonData GetSkeletonData (bool quiet) {
 			if (skeletonJSON == null) {
 				if (!quiet)
