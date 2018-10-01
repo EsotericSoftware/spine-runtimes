@@ -37,23 +37,12 @@ namespace Spine.Unity.Editor {
 	public static class Menus {
 		[MenuItem("GameObject/Spine/SkeletonRenderer", false, 10)]
 		static public void CreateSkeletonRendererGameObject () {
-			CreateSpineGameObject<SkeletonRenderer>("New SkeletonRenderer");
+			SpineEditorUtilities.EditorInstantiation.InstantiateEmptySpineGameObject<SkeletonRenderer>("New SkeletonRenderer");
 		}
 
 		[MenuItem("GameObject/Spine/SkeletonAnimation", false, 10)]
 		static public void CreateSkeletonAnimationGameObject () {
-			CreateSpineGameObject<SkeletonAnimation>("New SkeletonAnimation");
-		}
-
-		static void CreateSpineGameObject<T> (string name) where T : MonoBehaviour {
-			var parentGameObject = Selection.activeObject as GameObject;
-			var parentTransform = parentGameObject == null ? null : parentGameObject.transform;
-
-			var gameObject = new GameObject(name, typeof(T));
-			gameObject.transform.SetParent(parentTransform, false);
-			EditorUtility.FocusProjectWindow();
-			Selection.activeObject = gameObject;
-			EditorGUIUtility.PingObject(Selection.activeObject);
+			SpineEditorUtilities.EditorInstantiation.InstantiateEmptySpineGameObject<SkeletonAnimation>("New SkeletonAnimation");
 		}
 	}
 }
