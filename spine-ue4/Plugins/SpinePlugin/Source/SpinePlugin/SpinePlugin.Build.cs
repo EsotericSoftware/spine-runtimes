@@ -12,7 +12,7 @@ namespace UnrealBuildTool.Rules
 			PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
 			PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public/spine-cpp/include"));
 
-			PrivateIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
+			PrivateIncludePaths.Add(Path.Combine(ModuleDirectory, "Private"));
 			PrivateIncludePaths.Add(Path.Combine(ModuleDirectory, "Public/spine-cpp/include"));
 
             PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "RHI", "RenderCore", "ShaderCore", "ProceduralMeshComponent", "UMG", "Slate", "SlateCore" });
