@@ -93,6 +93,7 @@
   * All C structs and enums `spXXX` have been replaced with their C++ equivalents `spine::XXX` in all public interfaces.
   * All instantiations via `new` of C++ classes from spine-cpp should contain `(__FILE__, __LINE__)`. This allows the tracking of instantations and detection of memory leaks via the `spine::DebugExtension`.
 * Updated to Unreal Engine 4.20 (samples require 4.17+), see the `spine-ue4/Plugins/SpinePlugin/Source/SpinePlugin/SpinePlugin.build.cs` file on how to compile in 4.20 with the latest UBT API changes.
+* **Breaking change**: `UBoneDriverComponent` and `UBoneFollowerComponent` are now `USceneComponent` instead of `UActorComponent`. They either update only themselves, or also the owning `UActor`, depending on whether the new flag `UseComponentTransform` is set. See https://github.com/EsotericSoftware/spine-runtimes/pull/1175
 
 ## C# ##
 * **Breaking changes**
