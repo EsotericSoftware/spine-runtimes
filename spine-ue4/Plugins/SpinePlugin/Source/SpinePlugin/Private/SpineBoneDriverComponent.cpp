@@ -41,9 +41,14 @@ void USpineBoneDriverComponent::BeginPlay () {
 }
 
 void USpineBoneDriverComponent::BeforeUpdateWorldTransform(USpineSkeletonComponent* skeleton) {	
-	AActor* owner = GetOwner();
-	if (owner && skeleton == lastBoundComponent) {		
-		skeleton->SetBoneWorldPosition(BoneName, owner->GetActorLocation() );
+	if (skeleton == lastBoundComponent) {		
+		if (UseComponentTransform) {
+			skeleton->SetBoneWorldPosition(BoneName, GetComponentLocation());
+		}
+		else {
+			AActor* owner = GetOwner();
+			if (owner) skeleton->SetBoneWorldPosition(BoneName, owner->GetActorLocation());
+		}
 	}
 }
 
