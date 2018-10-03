@@ -1165,13 +1165,13 @@ namespace Spine.Unity.Editor {
 			var boneData = skeleton.Data.Bones.Items[timeline.BoneIndex];
 			var bone = skeleton.Bones.Items[timeline.BoneIndex];
 
-			AnimationCurve curve = new AnimationCurve();
+			var curve = new AnimationCurve();
 
 			float endTime = timeline.Frames[(timeline.FrameCount * 2) - 2];
 
 			float currentTime = timeline.Frames[0];
 
-			List<Keyframe> keys = new List<Keyframe>();
+			var keys = new List<Keyframe>();
 
 			float rotation = timeline.Frames[1] + boneData.Rotation;
 
@@ -1296,35 +1296,27 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void ParseEventTimeline (EventTimeline timeline, AnimationClip clip, SendMessageOptions eventOptions) {
-
 			float[] frames = timeline.Frames;
 			var events = timeline.Events;
 
-			List<AnimationEvent> animEvents = new List<AnimationEvent>();
-			for (int i = 0; i < frames.Length; i++) {
-				var ev = events[i];
+			var animEvents = new List<AnimationEvent>();
+			for (int i = 0, n = frames.Length; i < n; i++) {
+				var spineEvent = events[i];
+				var unityAnimationEvent = new AnimationEvent {
+					time = frames[i],
+					functionName = spineEvent.Data.Name,
+					messageOptions = eventOptions
+				};
 
-				AnimationEvent ae = new AnimationEvent();
-				//MITCH: left todo:  Deal with Mecanim's zero-time missed event
-				ae.time = frames[i];
-				ae.functionName = ev.Data.Name;
-				ae.messageOptions = eventOptions;
+				if (!string.IsNullOrEmpty(spineEvent.String)) {
+					unityAnimationEvent.stringParameter = spineEvent.String;
+				} else if (spineEvent.Int != 0) {
+					unityAnimationEvent.intParameter = spineEvent.Int;
+				} else if (spineEvent.Float != 0) {
+					unityAnimationEvent.floatParameter = spineEvent.Float;
+				} // else, paramless function/Action.
 
-				if (!string.IsNullOrEmpty(ev.String)) {
-					ae.stringParameter = ev.String;
-				} else {
-					if (ev.Int == 0 && ev.Float == 0) {
-						//do nothing, raw function
-					} else {
-						if (ev.Int != 0)
-							ae.floatParameter = (float)ev.Int;
-						else
-							ae.floatParameter = ev.Float;
-					}
-
-				}
-
-				animEvents.Add(ae);
+				animEvents.Add(unityAnimationEvent);
 			}
 
 			AnimationUtility.SetAnimationEvents(clip, animEvents.ToArray());

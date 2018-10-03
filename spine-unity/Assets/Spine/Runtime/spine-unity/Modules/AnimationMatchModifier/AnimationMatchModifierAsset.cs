@@ -206,7 +206,6 @@ namespace Spine.Unity.Modules {
 				var t = new DeformTimeline(1);
 				t.slotIndex = timeline.slotIndex;
 				t.attachment = timeline.attachment;
-				var slotData = skeletonData.slots.Items[t.slotIndex];
 
 				if (t.attachment.IsWeighted()) {
 					t.SetFrame(0, 0, new float[t.attachment.vertices.Length]);

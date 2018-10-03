@@ -362,19 +362,25 @@ namespace Spine.Unity.Modules {
 			var skin = skeleton.Skin ?? skeleton.Data.DefaultSkin;
 
 			var attachments = new List<Attachment>();
-			foreach (Slot s in skeleton.Slots) {
-				if (s.bone == b) {
-					skin.FindAttachmentsForSlot(skeleton.Slots.IndexOf(s), attachments);
+			foreach (Slot slot in skeleton.Slots) {
+				if (slot.bone == b) {
+					skin.FindAttachmentsForSlot(skeleton.Slots.IndexOf(slot), attachments);
+
+					bool bbAttachmentAdded = false;
 					foreach (var a in attachments) {
 						var bbAttachment = a as BoundingBoxAttachment;
 						if (bbAttachment != null) {
 							if (!a.Name.ToLower().Contains(AttachmentNameMarker))
 								continue;
 
-							var bbCollider = SkeletonUtility.AddBoundingBoxAsComponent(bbAttachment, s, go, isTrigger: false, isKinematic: false, gravityScale: gravityScale);
+							bbAttachmentAdded = true;
+							var bbCollider = SkeletonUtility.AddBoundingBoxAsComponent(bbAttachment, slot, go, isTrigger: false);
 							colliders.Add(bbCollider);
 						}
 					}
+
+					if (bbAttachmentAdded)
+						SkeletonUtility.AddBoneRigidbody2D(go, isKinematic: false, gravityScale: gravityScale);
 				}
 			}
 

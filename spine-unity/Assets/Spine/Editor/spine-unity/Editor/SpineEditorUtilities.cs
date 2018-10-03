@@ -84,7 +84,6 @@ namespace Spine.Unity.Editor {
 			public static Texture2D skeletonDataAssetIcon;
 			public static Texture2D info;
 			public static Texture2D unity;
-//			public static Texture2D controllerIcon;
 
 			static Texture2D LoadIcon (string filename) {
 				return (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/" + filename);
@@ -131,7 +130,6 @@ namespace Spine.Unity.Editor {
 
 				info = EditorGUIUtility.FindTexture("console.infoicon.sml");
 				unity = EditorGUIUtility.FindTexture("SceneAsset Icon");
-//				controllerIcon = EditorGUIUtility.FindTexture("AnimatorController Icon");
 			}
 
 			public static Texture2D GetAttachmentIcon (Attachment attachment) {
@@ -381,6 +379,8 @@ namespace Spine.Unity.Editor {
 
 				foreach (var sr in activeSkeletonRenderers) {
 					sr.Initialize(true);
+					//Debug.Log(sr.name);
+					//Debug.Log(sr.valid);
 				}
 
 				foreach (var sg in activeSkeletonGraphics) {
@@ -1225,6 +1225,17 @@ namespace Spine.Unity.Editor {
 				newSkeletonAnimation.skeleton.UpdateWorldTransform();
 
 				return newSkeletonAnimation;
+			}
+
+			public static void InstantiateEmptySpineGameObject<T> (string name) where T : MonoBehaviour {
+				var parentGameObject = Selection.activeObject as GameObject;
+				var parentTransform = parentGameObject == null ? null : parentGameObject.transform;
+
+				var gameObject = new GameObject(name, typeof(T));
+				gameObject.transform.SetParent(parentTransform, false);
+				EditorUtility.FocusProjectWindow();
+				Selection.activeObject = gameObject;
+				EditorGUIUtility.PingObject(Selection.activeObject);
 			}
 
 			#region SkeletonMecanim

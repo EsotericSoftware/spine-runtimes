@@ -952,7 +952,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		}
 
 		public static MeshAttachment GetLinkedClone (this MeshAttachment o, bool inheritDeform = true) {
-			return o.GetLinkedMesh(o.Name, o.RendererObject as AtlasRegion, inheritDeform);
+			return o.GetLinkedMesh(o.Name, o.RendererObject as AtlasRegion, inheritDeform, copyOriginalProperties: true);
 		}
 
 		/// <summary>
@@ -1026,7 +1026,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		#region Runtime Linked MeshAttachments
 		/// <summary>
 		/// Returns a new linked mesh linked to this MeshAttachment. It will be mapped to the AtlasRegion provided.</summary>
-		public static MeshAttachment GetLinkedMesh (this MeshAttachment o, string newLinkedMeshName, AtlasRegion region, bool inheritDeform = true) {
+		public static MeshAttachment GetLinkedMesh (this MeshAttachment o, string newLinkedMeshName, AtlasRegion region, bool inheritDeform = true, bool copyOriginalProperties = false) {
 			//if (string.IsNullOrEmpty(attachmentName)) throw new System.ArgumentException("attachmentName cannot be null or empty", "attachmentName");
 			if (region == null) throw new System.ArgumentNullException("region");
 
@@ -1040,10 +1040,18 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 			// 2. (SkeletonJson.cs::ReadAttachment. case: LinkedMesh)
 			mesh.Path = newLinkedMeshName;
-			mesh.r = 1f;
-			mesh.g = 1f;
-			mesh.b = 1f;
-			mesh.a = 1f;
+			if (copyOriginalProperties) {
+				mesh.r = o.r;
+				mesh.g = o.g;
+				mesh.b = o.b;
+				mesh.a = o.a;
+			} else {
+				mesh.r = 1f;
+				mesh.g = 1f;
+				mesh.b = 1f;
+				mesh.a = 1f;
+			}
+			
 			//mesh.ParentMesh property call below sets mesh.Width and mesh.Height
 
 			// 3. Link mesh with parent. (SkeletonJson.cs)
