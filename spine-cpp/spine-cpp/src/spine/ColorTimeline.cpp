@@ -75,7 +75,7 @@ void ColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 				slot._color.set(slot._data._color);
 				return;
 			case MixBlend_First: {
-				Color color = slot._color, setup = slot._data._color;
+				Color &color = slot._color, setup = slot._data._color;
 				color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha,
 						  (setup.a - color.a) * alpha);
 			}
