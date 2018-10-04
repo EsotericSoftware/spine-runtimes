@@ -204,15 +204,15 @@ namespace Spine.Unity.Editor {
 
 			// Data Refresh Edit Mode.
 			// This prevents deserialized SkeletonData from persisting from play mode to edit mode.
-//#if UNITY_2017_2_OR_NEWER
-//			EditorApplication.playModeStateChanged -= DataReloadHandler.OnPlaymodeStateChanged;
-//			EditorApplication.playModeStateChanged += DataReloadHandler.OnPlaymodeStateChanged;
-//			DataReloadHandler.OnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
-//#else
-//			EditorApplication.playmodeStateChanged -= DataReloadHandler.OnPlaymodeStateChanged;
-//			EditorApplication.playmodeStateChanged += DataReloadHandler.OnPlaymodeStateChanged;
-//			DataReloadHandler.OnPlaymodeStateChanged();
-//#endif
+#if UNITY_2017_2_OR_NEWER
+			EditorApplication.playModeStateChanged -= DataReloadHandler.OnPlaymodeStateChanged;
+			EditorApplication.playModeStateChanged += DataReloadHandler.OnPlaymodeStateChanged;
+			DataReloadHandler.OnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
+#else
+			EditorApplication.playmodeStateChanged -= DataReloadHandler.OnPlaymodeStateChanged;
+			EditorApplication.playmodeStateChanged += DataReloadHandler.OnPlaymodeStateChanged;
+			DataReloadHandler.OnPlaymodeStateChanged();
+#endif
 
 			initialized = true;
 		}
@@ -257,6 +257,10 @@ namespace Spine.Unity.Editor {
 			public const float DEFAULT_SCENE_ICONS_SCALE = 1f;
 			public const string SCENE_ICONS_SCALE_KEY = "SPINE_SCENE_ICONS_SCALE";
 
+			const bool DEFAULT_AUTO_RELOAD_SCENESKELETONS = true;
+			const string AUTO_RELOAD_SCENESKELETONS_KEY = "SPINE_AUTO_RELOAD_SCENESKELETONS";
+			public static bool autoReloadSceneSkeletons = DEFAULT_AUTO_RELOAD_SCENESKELETONS;
+
 			static bool preferencesLoaded = false;
 
 			public static void Load () {
@@ -266,6 +270,8 @@ namespace Spine.Unity.Editor {
 				defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, DEFAULT_DEFAULT_SHADER);
 				showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, DEFAULT_SHOW_HIERARCHY_ICONS);
 				setTextureImporterSettings = EditorPrefs.GetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, DEFAULT_SET_TEXTUREIMPORTER_SETTINGS);
+				autoReloadSceneSkeletons = EditorPrefs.GetBool(AUTO_RELOAD_SCENESKELETONS_KEY, DEFAULT_AUTO_RELOAD_SCENESKELETONS);
+
 				SpineHandles.handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, DEFAULT_SCENE_ICONS_SCALE);
 				preferencesLoaded = true;
 			}
@@ -284,6 +290,8 @@ namespace Spine.Unity.Editor {
 					HierarchyHandler.IconsOnPlaymodeStateChanged();
 #endif
 				}
+				autoReloadSceneSkeletons = EditorGUILayout.Toggle(new GUIContent("Auto-reload scene components", "Reloads Skeleton components in the scene whenever their SkeletonDataAsset is modified. This makes it so changes in the SkeletonDataAsset inspector are immediately reflected. This may be slow when your scenes have large numbers of SkeletonRenderers or SkeletonGraphic."), autoReloadSceneSkeletons);
+
 
 				EditorGUILayout.Separator();
 
@@ -319,7 +327,6 @@ namespace Spine.Unity.Editor {
 				if (EditorGUI.EndChangeCheck())
 					EditorPrefs.SetFloat(DEFAULT_ZSPACING_KEY, defaultZSpacing);
 
-
 				EditorGUILayout.Space();
 				EditorGUILayout.LabelField("Handles and Gizmos", EditorStyles.boldLabel);
 				EditorGUI.BeginChangeCheck();
@@ -352,7 +359,7 @@ namespace Spine.Unity.Editor {
 				ReloadAllActiveSkeletonsEditMode();
 			}
 
-			static void ReloadAllActiveSkeletonsEditMode () {
+			public static void ReloadAllActiveSkeletonsEditMode () {
 				if (EditorApplication.isPaused) return;
 				if (EditorApplication.isPlaying) return;
 				if (EditorApplication.isCompiling) return;
@@ -378,13 +385,36 @@ namespace Spine.Unity.Editor {
 				}
 
 				foreach (var sr in activeSkeletonRenderers) {
-					sr.Initialize(true);
-					//Debug.Log(sr.name);
-					//Debug.Log(sr.valid);
+					var meshRenderer = sr.GetComponent<MeshRenderer>();
+					var sharedMaterials = meshRenderer.sharedMaterials;
+					foreach (var m in sharedMaterials) {
+						if (m == null) {
+							sr.Initialize(true);
+							break;
+						}
+					}
 				}
 
 				foreach (var sg in activeSkeletonGraphics) {
-					sg.Initialize(true);
+					if (sg.mainTexture == null)
+						sg.Initialize(true);
+				}
+			}
+
+			public static void ReloadSceneSkeletonComponents (SkeletonDataAsset skeletonDataAsset) {
+				if (EditorApplication.isPaused) return;
+				if (EditorApplication.isPlaying) return;
+				if (EditorApplication.isCompiling) return;
+				if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+
+				var activeSkeletonRenderers = GameObject.FindObjectsOfType<SkeletonRenderer>();
+				foreach (var sr in activeSkeletonRenderers) {
+					if (sr.isActiveAndEnabled && sr.skeletonDataAsset == skeletonDataAsset) sr.Initialize(true);
+				}
+
+				var activeSkeletonGraphics = GameObject.FindObjectsOfType<SkeletonGraphic>();
+				foreach (var sg in activeSkeletonGraphics) {
+					if (sg.isActiveAndEnabled && sg.skeletonDataAsset == skeletonDataAsset) sg.Initialize(true);
 				}
 			}
 		}
