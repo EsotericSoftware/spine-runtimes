@@ -134,7 +134,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			EditorGUILayout.Space();
-			if (SpineInspectorUtility.LargeCenteredButton(SpineInspectorUtility.TempContent("Set Mipmap Bias to " + SpineEditorUtilities.Preferences.DEFAULT_MIPMAPBIAS))) {
+			if (SpineInspectorUtility.LargeCenteredButton(SpineInspectorUtility.TempContent("Set Mipmap Bias to " + SpineEditorUtilities.Preferences.DEFAULT_MIPMAPBIAS, tooltip: "This may help textures with mipmaps be less blurry when used for 2D sprites."))) {
 				foreach (var m in atlasAsset.materials) {
 					var texture = m.mainTexture;
 					texture.mipMapBias = SpineEditorUtilities.Preferences.DEFAULT_MIPMAPBIAS;
@@ -261,12 +261,18 @@ namespace Spine.Unity.Editor {
 			}
 			#else
 			if (atlasFile.objectReferenceValue != null) {
-				EditorGUILayout.LabelField("Atlas Regions", EditorStyles.boldLabel);
+				
+				
 				int baseIndent = EditorGUI.indentLevel;
 
 				var regions = SpineAtlasAssetInspector.GetRegions(atlasAsset.GetAtlas());
+				int regionsCount = regions.Count;
+				using (new EditorGUILayout.HorizontalScope()) {
+					EditorGUILayout.LabelField("Atlas Regions", EditorStyles.boldLabel);
+					EditorGUILayout.LabelField(string.Format("{0} regions total", regionsCount));
+				}
 				AtlasPage lastPage = null;
-				for (int i = 0; i < regions.Count; i++) {
+				for (int i = 0; i < regionsCount; i++) {
 					if (lastPage != regions[i].page) {
 						if (lastPage != null) {
 							EditorGUILayout.Separator();

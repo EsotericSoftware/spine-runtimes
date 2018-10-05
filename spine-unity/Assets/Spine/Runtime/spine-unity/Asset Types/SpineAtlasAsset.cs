@@ -115,8 +115,6 @@ namespace Spine.Unity {
 		}
 		#endregion
 
-
-
 		void Reset () {
 			Clear();
 		}
