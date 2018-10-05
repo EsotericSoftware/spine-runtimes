@@ -184,6 +184,10 @@ namespace Spine.Unity.Editor {
 					if (serializedObject.ApplyModifiedProperties()) {
 						this.Clear();
 						this.InitializeEditor();
+
+						if (SpineEditorUtilities.Preferences.autoReloadSceneSkeletons)
+							SpineEditorUtilities.DataReloadHandler.ReloadSceneSkeletonComponents(targetSkeletonDataAsset);
+
 						return;
 					}
 				}
@@ -269,7 +273,9 @@ namespace Spine.Unity.Editor {
 			using (new SpineInspectorUtility.BoxScope()) {
 				EditorGUILayout.LabelField("SkeletonData", EditorStyles.boldLabel);
 				EditorGUILayout.PropertyField(skeletonJSON, SpineInspectorUtility.TempContent(skeletonJSON.displayName, Icons.spine));
-				EditorGUILayout.PropertyField(scale);
+				EditorGUILayout.DelayedFloatField(scale); //EditorGUILayout.PropertyField(scale);
+				EditorGUILayout.Space();
+				EditorGUILayout.PropertyField(skeletonDataModifiers, true);
 			}
 
 			// Texture source field.
@@ -306,7 +312,7 @@ namespace Spine.Unity.Editor {
 				}
 			}
 			EditorGUILayout.PropertyField(skeletonJSON, SpineInspectorUtility.TempContent(skeletonJSON.displayName, Icons.spine));
-			EditorGUILayout.PropertyField(scale);
+			EditorGUILayout.DelayedFloatField(scale); //EditorGUILayout.PropertyField(scale);
 			EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(skeletonDataModifiers, true);
 		}
@@ -464,8 +470,11 @@ namespace Spine.Unity.Editor {
 				using (new EditorGUILayout.HorizontalScope()) {
 					showAttachments = EditorGUILayout.ToggleLeft("Show Attachments", showAttachments, GUILayout.MaxWidth(150f));
 					if (showAttachments) {
-						if (skin != null && skin != defaultSkin)
-							EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(skin.Name, Icons.skin));
+						if (skin != null) {
+							int attachmentCount = skin.Attachments.Count;
+							EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(string.Format("{0} ({1} attachment{2})", skin.Name, attachmentCount, SpineInspectorUtility.PluralThenS(attachmentCount)), Icons.skin));
+						}
+							
 					}
 				}
 
