@@ -1,0 +1,35 @@
+<html>
+<script src="../../build/spine-widget.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<style>
+	#widget {
+		width: 512px;
+		height: 512px;
+		background: red;
+	}
+</style>
+<body>
+	<div id="spine-widget"></div>
+	<script>
+		spineWidget = new spine.SpineWidget("spine-widget", {
+            json: "assets/spineboy-ess.json",
+            atlas: "assets/spineboy.atlas",
+            animation: "death",
+            backgroundColor: "#00000000",
+			debug: false,
+
+            success: function (widget) {
+				widget.state.data.defaultMix = 0.2;
+				widget.state.data.setMix("jump", "run", 1)
+
+                var animIndex = 0;
+                widget.canvas.onclick = function () {
+                    animIndex++;
+                    var animations = widget.skeleton.data.animations;
+                    if (animIndex >= animations.length) animIndex = 0;
+                    widget.setAnimation(animations[animIndex].name);
+                }
+            }
+        });
+	</script>
+</body>
