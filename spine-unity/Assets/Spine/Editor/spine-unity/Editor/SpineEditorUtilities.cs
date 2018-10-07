@@ -1202,7 +1202,7 @@ namespace Spine.Unity.Editor {
 				var data = skeletonDataAsset.GetSkeletonData(false);
 				bool noSkins = data.DefaultSkin == null && (data.Skins == null || data.Skins.Count == 0); // Support attachmentless/skinless SkeletonData.
 				skin = skin ?? data.DefaultSkin ?? (noSkins ? null : data.Skins.Items[0]);
-				if (skin != null) {
+				if (skin != null && skin != data.DefaultSkin) {
 					skeletonRenderer.initialSkinName = skin.Name;
 				}
 			}

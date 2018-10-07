@@ -165,8 +165,9 @@ namespace Spine.Unity.Editor {
 		public static GUIStyle GrayMiniLabel {
 			get {
 				if (grayMiniLabel == null) {
-					grayMiniLabel = new GUIStyle(EditorStyles.centeredGreyMiniLabel);
-					grayMiniLabel.alignment = TextAnchor.UpperLeft;
+					grayMiniLabel = new GUIStyle(EditorStyles.centeredGreyMiniLabel) {
+						alignment = TextAnchor.UpperLeft
+					};
 				}
 				return grayMiniLabel;
 			}

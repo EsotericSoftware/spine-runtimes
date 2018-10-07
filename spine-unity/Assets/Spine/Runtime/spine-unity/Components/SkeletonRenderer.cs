@@ -48,6 +48,7 @@ namespace Spine.Unity {
 
 		public SkeletonDataAsset skeletonDataAsset;
 		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } } // ISkeletonComponent
+		[SpineSkin(defaultAsEmptyString:true)]
 		public string initialSkinName;
 		public bool initialFlipX, initialFlipY;
 

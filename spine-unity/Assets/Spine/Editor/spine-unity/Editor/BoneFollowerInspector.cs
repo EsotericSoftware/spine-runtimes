@@ -46,7 +46,7 @@ namespace Spine.Unity.Editor {
 		[MenuItem ("CONTEXT/SkeletonRenderer/Add BoneFollower GameObject")]
 		static void AddBoneFollowerGameObject (MenuCommand cmd) {
 			var skeletonRenderer = cmd.context as SkeletonRenderer;
-			var go = new GameObject("BoneFollower");
+			var go = new GameObject("New BoneFollower");
 			var t = go.transform;
 			t.SetParent(skeletonRenderer.transform);
 			t.localPosition = Vector3.zero;
@@ -65,7 +65,19 @@ namespace Spine.Unity.Editor {
 			var skeletonRenderer = cmd.context as SkeletonRenderer;
 			return skeletonRenderer.valid;
 		}
+
+		[MenuItem("CONTEXT/BoneFollower/Rename BoneFollower GameObject")]
+		static void RenameGameObject (MenuCommand cmd) {
+			AutonameGameObject(cmd.context as BoneFollower);
+		}
 		#endregion
+
+		static void AutonameGameObject (BoneFollower boneFollower) {
+			if (boneFollower == null) return;
+
+			string boneName = boneFollower.boneName;
+			boneFollower.gameObject.name = string.IsNullOrEmpty(boneName) ? "BoneFollower" : string.Format("{0} (BoneFollower)", boneName);
+		}
 
 		void OnEnable () {
 			skeletonRenderer = serializedObject.FindProperty("skeletonRenderer");
@@ -195,7 +207,7 @@ namespace Spine.Unity.Editor {
 			bool missingRigidBody = (hasCollider2D && component.GetComponent<Rigidbody2D>() == null) || (hasCollider3D && component.GetComponent<Rigidbody>() == null);
 			if (missingRigidBody) {
 				using (new SpineInspectorUtility.BoxScope()) {
-					EditorGUILayout.HelpBox("Collider detected. Unity recommends adding a Rigidbody to the parent Transforms of any colliders that are intended to be dynamically repositioned and rotated.", MessageType.Warning);
+					EditorGUILayout.HelpBox("Collider detected. Unity recommends adding a Rigidbody to the Transforms of any colliders that are intended to be dynamically repositioned and rotated.", MessageType.Warning);
 					var rbType = hasCollider2D ? typeof(Rigidbody2D) : typeof(Rigidbody);
 					string rbLabel = string.Format("Add {0}", rbType.Name);
 					var rbContent = SpineInspectorUtility.TempContent(rbLabel, SpineInspectorUtility.UnityIcon(rbType), "Add a rigidbody to this GameObject to be the Physics body parent of the attached collider.");
