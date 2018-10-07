@@ -805,6 +805,12 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			skin.AddAttachment(slotIndex, keyName, attachment);
 		}
 
+		/// <summary>Adds skin items from another skin. For items that already exist, the previous values are replaced.</summary>
+		public static void AddAttachments (this Skin skin, Skin otherSkin) {
+			if (otherSkin == null) return;
+			otherSkin.CopyTo(skin, true, false);
+		}
+
 		/// <summary>Gets an attachment from the skin for the specified slot index and name.</summary>
 		public static Attachment GetAttachment (this Skin skin, string slotName, string keyName, Skeleton skeleton) {
 			int slotIndex = skeleton.FindSlotIndex(slotName);
@@ -835,6 +841,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			skin.Attachments.Clear();
 		}
 
+		//[System.Obsolete]
 		public static void Append (this Skin destination, Skin source) {
 			source.CopyTo(destination, true, false);
 		}

@@ -58,7 +58,6 @@ namespace Spine.Unity {
 		[System.NonSerialized] public readonly List<Slot> separatorSlots = new List<Slot>();
 
 		[Range(-0.1f, 0f)] public float zSpacing;
-		//public bool renderMeshes = true;
 		public bool useClipping = true;
 		public bool immutableTriangles = false;
 		public bool pmaVertexColors = true;
@@ -311,7 +310,9 @@ namespace Spine.Unity {
 			// STEP 3. Move the mesh data into a UnityEngine.Mesh ===========================================================================
 			var currentMesh = currentSmartMesh.mesh;
 			meshGenerator.FillVertexData(currentMesh);
+
 			rendererBuffers.UpdateSharedMaterials(workingSubmeshInstructions);
+
 			if (updateTriangles) { // Check if the triangles should also be updated.
 				meshGenerator.FillTriangles(currentMesh);
 				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedSharedMaterialsArray();

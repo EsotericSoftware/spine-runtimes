@@ -105,8 +105,8 @@ namespace Spine.Unity.Modules {
 			v.y = Mathf.Clamp(v.y, Mathf.Min(lastHitY, hitY), float.MaxValue);
 			transform.position = v;
 
-			utilBone.bone.X = transform.localPosition.x;
-			utilBone.bone.Y = transform.localPosition.y;
+			bone.bone.X = transform.localPosition.x;
+			bone.bone.Y = transform.localPosition.y;
 
 			lastHitY = hitY;
 		}

@@ -65,10 +65,8 @@ namespace Spine.Unity {
 		#endregion
 
 		[NonSerialized] public bool valid;
-		/// <summary>
-		/// The bone.
-		/// </summary>
 		[NonSerialized] public Bone bone;
+
 		Transform skeletonTransform;
 		bool skeletonTransformIsParent;
 

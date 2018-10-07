@@ -53,7 +53,6 @@ namespace Spine.Unity.Editor {
 		bool canCreateHingeChain = false;
 
 		Dictionary<Slot, List<BoundingBoxAttachment>> boundingBoxTable = new Dictionary<Slot, List<BoundingBoxAttachment>>();
-		//string currentSkinName = "";
 
 		void OnEnable () {
 			mode = this.serializedObject.FindProperty("mode");
@@ -81,7 +80,6 @@ namespace Spine.Unity.Editor {
 			if (skeleton.Skin == null)
 				skin = skeleton.Data.DefaultSkin;
 
-			//currentSkinName = skin.Name;
 			for(int i = 0; i < slotCount; i++){
 				Slot slot = skeletonUtility.skeletonRenderer.skeleton.Slots.Items[i];
 				if (slot.Bone == utilityBone.bone) {
@@ -103,7 +101,7 @@ namespace Spine.Unity.Editor {
 
 		void EvaluateFlags () {
 			utilityBone = (SkeletonUtilityBone)target;
-			skeletonUtility = utilityBone.skeletonUtility;
+			skeletonUtility = utilityBone.hierarchy;
 
 			if (Selection.objects.Length == 1) {
 				containsFollows = utilityBone.mode == SkeletonUtilityBone.Mode.Follow;
@@ -146,7 +144,7 @@ namespace Spine.Unity.Editor {
 				using (new GUILayout.HorizontalScope()) {
 					EditorGUILayout.PrefixLabel("Bone");
 					if (GUILayout.Button(str, EditorStyles.popup)) {
-						BoneSelectorContextMenu(str, ((SkeletonUtilityBone)target).skeletonUtility.skeletonRenderer.skeleton.Bones, "<None>", TargetBoneSelected);
+						BoneSelectorContextMenu(str, ((SkeletonUtilityBone)target).hierarchy.skeletonRenderer.skeleton.Bones, "<None>", TargetBoneSelected);
 					}
 				}
 			}
@@ -166,7 +164,7 @@ namespace Spine.Unity.Editor {
 			using (new GUILayout.HorizontalScope()) {
 				EditorGUILayout.Space();
 				using (new EditorGUI.DisabledGroupScope(multiObject || !utilityBone.valid || utilityBone.bone == null || utilityBone.bone.Children.Count == 0)) {
-					if (GUILayout.Button(SpineInspectorUtility.TempContent("Add Child", Icons.bone), GUILayout.MinWidth(120), GUILayout.Height(24)))
+					if (GUILayout.Button(SpineInspectorUtility.TempContent("Add Child Bone", Icons.bone), GUILayout.MinWidth(120), GUILayout.Height(24)))
 						BoneSelectorContextMenu("", utilityBone.bone.Children, "<Recursively>", SpawnChildBoneSelected);
 				}
 				using (new EditorGUI.DisabledGroupScope(multiObject || !utilityBone.valid || utilityBone.bone == null || containsOverrides)) {
@@ -260,12 +258,12 @@ namespace Spine.Unity.Editor {
 					GameObject go = skeletonUtility.SpawnBoneRecursively(bone, utilityBone.transform, utilityBone.mode, utilityBone.position, utilityBone.rotation, utilityBone.scale);
 					SkeletonUtilityBone[] newUtilityBones = go.GetComponentsInChildren<SkeletonUtilityBone>();
 					foreach (SkeletonUtilityBone utilBone in newUtilityBones)
-						SkeletonUtilityInspector.AttachIcon(utilBone);
+						SkeletonGameObjectsInspector.AttachIcon(utilBone);
 				}
 			} else {
 				var bone = (Bone)obj;
 				GameObject go = skeletonUtility.SpawnBone(bone, utilityBone.transform, utilityBone.mode, utilityBone.position, utilityBone.rotation, utilityBone.scale);
-				SkeletonUtilityInspector.AttachIcon(go.GetComponent<SkeletonUtilityBone>());
+				SkeletonGameObjectsInspector.AttachIcon(go.GetComponent<SkeletonUtilityBone>());
 				Selection.activeGameObject = go;
 				EditorGUIUtility.PingObject(go);
 			}
@@ -274,7 +272,7 @@ namespace Spine.Unity.Editor {
 		void SpawnOverride () {
 			GameObject go = skeletonUtility.SpawnBone(utilityBone.bone, utilityBone.transform.parent, SkeletonUtilityBone.Mode.Override, utilityBone.position, utilityBone.rotation, utilityBone.scale);
 			go.name = go.name + " [Override]";
-			SkeletonUtilityInspector.AttachIcon(go.GetComponent<SkeletonUtilityBone>());
+			SkeletonGameObjectsInspector.AttachIcon(go.GetComponent<SkeletonUtilityBone>());
 			Selection.activeGameObject = go;
 			EditorGUIUtility.PingObject(go);
 		}
