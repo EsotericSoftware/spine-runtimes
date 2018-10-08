@@ -119,6 +119,8 @@ namespace Spine {
 			state = new AnimationState(stateData);
 
 			if (name == "spineboy-ess") {
+				skeleton.SetAttachment("head-bb", "head");
+
 				stateData.SetMix("run", "jump", 0.2f);
 				stateData.SetMix("jump", "run", 0.4f);
 
