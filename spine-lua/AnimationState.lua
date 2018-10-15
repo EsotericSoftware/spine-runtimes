@@ -299,7 +299,7 @@ function AnimationState:updateMixingFrom (to, delta)
 	from.trackLast = from.nextTrackLast
 
 	-- Require mixTime > 0 to ensure the mixing from entry was applied at least once.
-	if (to.mixTime > 0 and (to.mixTime >= to.mixDuration or to.timeScale == 0)) then
+	if (to.mixTime > 0 and to.mixTime >= to.mixDuration) then
 		-- Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame).
 		if (from.totalAlpha == 0 or to.mixDuration == 0) then
 			to.mixingFrom = from.mixingFrom
@@ -308,6 +308,13 @@ function AnimationState:updateMixingFrom (to, delta)
 			self.queue:_end(from)
 		end
 		return finished
+	end
+
+	-- If to has 0 timeScale and is not the first entry, remove the mix and apply it one more time to return to the setup pose.
+	if to.timeScale == 0 and to.mixingTo then
+		to.timeScale = 1
+		to.mixTime = 0
+		to.mixDuration = 0
 	end
 
 	from.trackTime = from.trackTime + delta * from.timeScale
@@ -781,30 +788,30 @@ function AnimationState:_animationsChanged ()
 
 	self.propertyIDs = {}
 
-	for i, entry in pairs(self.tracks) do				
+	for i, entry in pairs(self.tracks) do
 		if entry then
-			while entry.mixingFrom do 
+			while entry.mixingFrom do
 				entry = entry.mixingFrom
 			end
-			
+
 			repeat
 				if (entry.mixingTo == nil or entry.mixBlend ~= MixBlend.add) then
 					self:setTimelineModes(entry)
 				end
 				entry = entry.mixingTo
-			until (entry == nil)						
+			until (entry == nil)
 		end
 	end
 end
 
-function AnimationState:setTimelineModes(entry)	
-	local to = entry.mixingTo	
+function AnimationState:setTimelineModes(entry)
+	local to = entry.mixingTo
 	local timelines = entry.animation.timelines
 	local timelinesCount = #entry.animation.timelines
 	local timelineMode = entry.timelineMode
 	local timelineHoldMix = entry.timelineHoldMix
 	local propertyIDs = self.propertyIDs
-	
+
 	if (to and to.holdPrevious) then
 		local i = 1
 		while i <= timelinesCount do
