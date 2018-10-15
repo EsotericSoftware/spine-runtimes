@@ -70,7 +70,7 @@ void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, V
 	Slot &slot = *slotP;
 	if (direction == MixDirection_Out && blend == MixBlend_Setup) {
 		attachmentName = &slot._data._attachmentName;
-		slot._attachment = attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName);
+		slot.setAttachment(attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName));
 		return;
 	}
 
@@ -78,8 +78,7 @@ void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, V
 		// Time is before first frame.
 		if (blend == MixBlend_Setup || blend == MixBlend_First) {
 			attachmentName = &slot._data._attachmentName;
-			slot._attachment =
-					attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName);
+			slot.setAttachment(attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName));
 		}
 		return;
 	}
@@ -93,7 +92,7 @@ void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, V
 	}
 
 	attachmentName = &_attachmentNames[frameIndex];
-	slot._attachment = attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName);
+	slot.setAttachment(attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName));
 }
 
 int AttachmentTimeline::getPropertyId() {

@@ -57,7 +57,7 @@ void SkeletonBounds::update(Skeleton &skeleton, bool updateAabb) {
 
 	for (size_t i = 0; i < slotCount; i++) {
 		Slot *slot = slots[i];
-		Attachment *attachment = slot->_attachment;
+		Attachment *attachment = slot->getAttachment();
 		if (attachment == NULL || !attachment->getRTTI().instanceOf(BoundingBoxAttachment::rtti)) {
 			continue;
 		}

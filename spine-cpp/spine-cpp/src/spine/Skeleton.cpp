@@ -564,7 +564,7 @@ void Skeleton::sortPathConstraint(PathConstraint *constraint) {
 	for (size_t ii = 0, nn = _data->_skins.size(); ii < nn; ii++)
 		sortPathConstraintAttachment(_data->_skins[ii], slotIndex, slotBone);
 
-	Attachment *attachment = slot->_attachment;
+	Attachment *attachment = slot->getAttachment();
 	if (attachment != NULL && attachment->getRTTI().instanceOf(PathAttachment::rtti))
 		sortPathConstraintAttachment(attachment, slotBone);
 

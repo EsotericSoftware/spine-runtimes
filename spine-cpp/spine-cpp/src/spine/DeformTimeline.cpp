@@ -69,7 +69,7 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 	Slot *slotP = skeleton._slots[_slotIndex];
 	Slot &slot = *slotP;
 
-	Attachment *slotAttachment = slot._attachment;
+	Attachment *slotAttachment = slot.getAttachment();
 	if (slotAttachment == NULL || !slotAttachment->getRTTI().instanceOf(VertexAttachment::rtti)) {
 		return;
 	}
