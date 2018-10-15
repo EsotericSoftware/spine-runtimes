@@ -33,8 +33,10 @@
 
 #include <spine/CurveTimeline.h>
 
-namespace Spine {
-    class PathConstraintMixTimeline : public CurveTimeline {
+namespace spine {
+#define SP_PATHCONSTRAINTMIXTIMELINE_ENTRIES 5
+
+    class SP_API PathConstraintMixTimeline : public CurveTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         
@@ -50,8 +52,11 @@ namespace Spine {
         virtual int getPropertyId();
         
     private:
-        static const int PREV_TIME, PREV_ROTATE, PREV_TRANSLATE;
-        static const int ROTATE, TRANSLATE;
+		static const int PREV_TIME;
+		static const int PREV_ROTATE;
+		static const int PREV_TRANSLATE;
+		static const int ROTATE;
+		static const int TRANSLATE;
         
         Vector<float> _frames;
         int _pathConstraintIndex;

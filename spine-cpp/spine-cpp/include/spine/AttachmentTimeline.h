@@ -36,13 +36,14 @@
 #include <spine/Vector.h>
 #include <spine/MixBlend.h>
 #include <spine/MixDirection.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
-namespace Spine {
+namespace spine {
+
     class Skeleton;
     class Event;
     
-    class AttachmentTimeline : public Timeline {
+    class SP_API AttachmentTimeline : public Timeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

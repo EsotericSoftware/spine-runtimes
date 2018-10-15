@@ -28,11 +28,15 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/SlotData.h>
 
 #include <assert.h>
 
-using namespace Spine;
+using namespace spine;
 
 SlotData::SlotData(int index, const String &name, BoneData &boneData) :
 		_index(index),

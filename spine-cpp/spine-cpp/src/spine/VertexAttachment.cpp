@@ -28,6 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/VertexAttachment.h>
 
 #include <spine/Slot.h>
@@ -35,7 +39,7 @@
 #include <spine/Bone.h>
 #include <spine/Skeleton.h>
 
-using namespace Spine;
+using namespace spine;
 
 RTTI_IMPL(VertexAttachment, Attachment)
 
@@ -49,7 +53,16 @@ void VertexAttachment::computeWorldVertices(Slot &slot, Vector<float> &worldVert
 	computeWorldVertices(slot, 0, _worldVerticesLength, worldVertices, 0);
 }
 
+void VertexAttachment::computeWorldVertices(Slot &slot, float *worldVertices) {
+	computeWorldVertices(slot, 0, _worldVerticesLength, worldVertices, 0);
+}
+
 void VertexAttachment::computeWorldVertices(Slot &slot, size_t start, size_t count, Vector<float> &worldVertices, size_t offset,
+											size_t stride) {
+	computeWorldVertices(slot, start, count, worldVertices.buffer(), offset, stride);
+}
+
+void VertexAttachment::computeWorldVertices(Slot &slot, size_t start, size_t count, float *worldVertices, size_t offset,
 	size_t stride) {
 	count = offset + (count >> 1) * stride;
 	Skeleton &skeleton = slot._bone._skeleton;

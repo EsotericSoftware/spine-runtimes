@@ -33,8 +33,9 @@
 
 #include <spine/CurveTimeline.h>
 
-namespace Spine {
-    class TwoColorTimeline : public CurveTimeline {
+namespace spine {
+
+    class SP_API TwoColorTimeline : public CurveTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         
@@ -56,9 +57,21 @@ namespace Spine {
         void setSlotIndex(int inValue);
         
     private:
-        static const int PREV_TIME, PREV_R, PREV_G, PREV_B, PREV_A;
-        static const int PREV_R2, PREV_G2, PREV_B2;
-        static const int R, G, B, A, R2, G2, B2;
+		static const int PREV_TIME;
+		static const int PREV_R;
+		static const int PREV_G;
+		static const int PREV_B;
+		static const int PREV_A;
+		static const int PREV_R2;
+		static const int PREV_G2;
+		static const int PREV_B2;
+		static const int R;
+		static const int G;
+		static const int B;
+		static const int A;
+		static const int R2;
+		static const int G2;
+		static const int B2;
         
         Vector<float> _frames; // time, r, g, b, a, r2, g2, b2, ...
         int _slotIndex;

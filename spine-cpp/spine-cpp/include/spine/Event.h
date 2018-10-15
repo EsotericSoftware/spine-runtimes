@@ -32,13 +32,13 @@
 #define Spine_Event_h
 
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
-namespace Spine {
+namespace spine {
 class EventData;
 
 /// Stores the current pose values for an Event.
-class Event : public SpineObject {
+class SP_API Event : public SpineObject {
 	friend class SkeletonBinary;
 
 	friend class SkeletonJson;

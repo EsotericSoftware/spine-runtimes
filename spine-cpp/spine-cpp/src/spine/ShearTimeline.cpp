@@ -28,6 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/ShearTimeline.h>
 
 #include <spine/Skeleton.h>
@@ -38,7 +42,7 @@
 #include <spine/Bone.h>
 #include <spine/BoneData.h>
 
-using namespace Spine;
+using namespace spine;
 
 RTTI_IMPL(ShearTimeline, TranslateTimeline)
 

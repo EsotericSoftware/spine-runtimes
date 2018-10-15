@@ -32,12 +32,17 @@
 #define Spine_Object_h
 
 #include <new>
+#include <stddef.h>
 
-namespace Spine {
+#include <spine/dll.h>
+
+namespace spine {
 class String;
 
-class SpineObject {
+class SP_API SpineObject {
 public:
+	void *operator new(size_t sz);
+
 	void *operator new(size_t sz, const char *file, int line);
 
 	void *operator new(size_t sz, void *ptr);

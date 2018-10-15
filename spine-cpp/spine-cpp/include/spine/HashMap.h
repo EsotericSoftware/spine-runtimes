@@ -40,14 +40,14 @@
 #pragma warning(disable:4291)
 #endif
 
-namespace Spine {
+namespace spine {
 template<typename K, typename V>
-class HashMap : public SpineObject {
+class SP_API HashMap : public SpineObject {
 private:
 	class Entry;
 
 public:
-	class Pair {
+	class SP_API Pair {
 	public:
 		explicit Pair(K &k, V &v) : key(k), value(v) {}
 
@@ -55,7 +55,7 @@ public:
 		V &value;
 	};
 
-	class Entries {
+	class SP_API Entries {
 	public:
 		friend class HashMap;
 
@@ -167,7 +167,7 @@ private:
 		return NULL;
 	}
 
-	class Entry : public SpineObject {
+	class SP_API Entry : public SpineObject {
 	public:
 		K _key;
 		V _value;

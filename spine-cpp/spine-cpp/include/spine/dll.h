@@ -28,88 +28,25 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
+#ifndef SPINE_SHAREDLIB_H
+#define SPINE_SHAREDLIB_H
+
+#ifdef _WIN32
+#define DLLIMPORT __declspec(dllimport)
+#define DLLEXPORT __declspec(dllexport)
+#else
+#ifndef DLLIMPORT
+#define DLLIMPORT
+#endif
+#ifndef DLLEXPORT
+#define DLLEXPORT
+#endif
 #endif
 
-#include <spine/IkConstraintData.h>
+#ifdef SPINEPLUGIN_API
+#define SP_API SPINEPLUGIN_API
+#else
+#define SP_API
+#endif
 
-#include <spine/BoneData.h>
-
-using namespace spine;
-
-IkConstraintData::IkConstraintData(const String &name) :
-		_name(name),
-		_order(0),
-		_target(NULL),
-		_bendDirection(1),
-		_compress(false),
-		_stretch(false),
-		_uniform(false),
-		_mix(1) {
-}
-
-const String &IkConstraintData::getName() {
-	return _name;
-}
-
-size_t IkConstraintData::getOrder() {
-	return _order;
-}
-
-void IkConstraintData::setOrder(size_t inValue) {
-	_order = inValue;
-}
-
-Vector<BoneData *> &IkConstraintData::getBones() {
-	return _bones;
-}
-
-BoneData *IkConstraintData::getTarget() {
-	return _target;
-}
-
-void IkConstraintData::setTarget(BoneData *inValue) {
-	_target = inValue;
-}
-
-int IkConstraintData::getBendDirection() {
-	return _bendDirection;
-}
-
-void IkConstraintData::setBendDirection(int inValue) {
-	_bendDirection = inValue;
-}
-
-float IkConstraintData::getMix() {
-	return _mix;
-}
-
-void IkConstraintData::setMix(float inValue) {
-	_mix = inValue;
-}
-
-bool IkConstraintData::getStretch() {
-	return _stretch;
-}
-
-void IkConstraintData::setStretch(bool inValue) {
-	_stretch = inValue;
-}
-
-bool IkConstraintData::getCompress() {
-	return _compress;
-}
-
-void IkConstraintData::setCompress(bool inValue) {
-	_compress = inValue;
-}
-
-
-bool IkConstraintData::getUniform() {
-	return _uniform;
-}
-
-void IkConstraintData::setUniform(bool inValue) {
-	_uniform = inValue;
-}
+#endif /* SPINE_SHAREDLIB_H */

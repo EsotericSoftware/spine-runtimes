@@ -33,10 +33,11 @@
 
 #include <spine/RTTI.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
-namespace Spine {
+namespace spine {
     class Skin;
+    class Attachment;
     class RegionAttachment;
     class MeshAttachment;
     class BoundingBoxAttachment;
@@ -44,7 +45,8 @@ namespace Spine {
     class PointAttachment;
     class ClippingAttachment;
     
-    class AttachmentLoader : public SpineObject {
+    class SP_API AttachmentLoader : public SpineObject {
+	public:
         RTTI_DECL
         
         AttachmentLoader();
@@ -66,6 +68,8 @@ namespace Spine {
         virtual PointAttachment* newPointAttachment(Skin& skin, const String& name) = 0;
         
         virtual ClippingAttachment* newClippingAttachment(Skin& skin, const String& name) = 0;
+
+        virtual void configureAttachment(Attachment* attachment) = 0;
     };
 }
 

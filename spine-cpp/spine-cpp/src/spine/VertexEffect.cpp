@@ -28,11 +28,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/VertexEffect.h>
 #include <spine/MathUtil.h>
 #include <spine/Skeleton.h>
 
-using namespace Spine;
+using namespace spine;
 
 JitterVertexEffect::JitterVertexEffect(float jitterX, float jitterY): _jitterX(jitterX), _jitterY(jitterY) {
 }
@@ -132,7 +136,7 @@ float SwirlVertexEffect::getRadius() {
 }
 
 void SwirlVertexEffect::setAngle(float angle) {
-	_angle = angle * Spine::DEG_RAD;
+	_angle = angle * MathUtil::Deg_Rad;
 }
 
 float SwirlVertexEffect::getAngle() {

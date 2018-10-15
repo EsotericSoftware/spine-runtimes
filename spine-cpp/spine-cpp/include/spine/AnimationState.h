@@ -35,9 +35,10 @@
 #include <spine/Pool.h>
 #include <spine/MixBlend.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
+#include <spine/HasRendererObject.h>
 
-namespace Spine {
+namespace spine {
     enum EventType {
         EventType_Start,
         EventType_Interrupt,
@@ -56,15 +57,17 @@ namespace Spine {
     class Skeleton;
     class RotateTimeline;
     
-    typedef void (*OnAnimationEventFunc) (AnimationState* state, EventType type, TrackEntry* entry, Event* event);
+    typedef void (*AnimationStateListener) (AnimationState* state, EventType type, TrackEntry* entry, Event* event);
     
     /// State for the playback of an animation
-    class TrackEntry : public SpineObject {
+    class SP_API TrackEntry : public SpineObject, public HasRendererObject {
         friend class EventQueue;
         friend class AnimationState;
         
     public:
         TrackEntry();
+
+        virtual ~TrackEntry();
         
         /// The index of the track where this entry is either current or queued.
         int getTrackIndex();
@@ -236,8 +239,7 @@ namespace Spine {
         /// TrackEntry chooses the short way the first time it is applied and remembers that direction.
         void resetRotationDirections();
         
-        void setOnAnimationEventFunc(OnAnimationEventFunc inValue);
-
+        void setListener(AnimationStateListener listener);
 
     private:
         Animation* _animation;
@@ -256,12 +258,12 @@ namespace Spine {
         Vector<int> _timelineMode;
         Vector<TrackEntry*> _timelineHoldMix;
         Vector<float> _timelinesRotation;
-        OnAnimationEventFunc _onAnimationEventFunc;
+        AnimationStateListener _listener;
         
         void reset();
     };
     
-    class EventQueueEntry : public SpineObject {
+    class SP_API EventQueueEntry : public SpineObject {
         friend class EventQueue;
         
     public:
@@ -272,7 +274,7 @@ namespace Spine {
         EventQueueEntry(EventType eventType, TrackEntry* trackEntry, Event* event = NULL);
     };
     
-    class EventQueue : public SpineObject {
+    class SP_API EventQueue : public SpineObject {
         friend class AnimationState;
         
     private:
@@ -305,7 +307,7 @@ namespace Spine {
         void drain();
     };
     
-    class AnimationState : public SpineObject {
+    class SP_API AnimationState : public SpineObject, public HasRendererObject {
         friend class TrackEntry;
         friend class EventQueue;
         
@@ -393,13 +395,12 @@ namespace Spine {
         float getTimeScale();
         void setTimeScale(float inValue);
 
-        void setOnAnimationEventFunc(OnAnimationEventFunc inValue);
+        void setListener(AnimationStateListener listener);
 
-        void setRendererObject(void* inValue);
-        void* getRendererObject();
+		void disableQueue();
+		void enableQueue();
         
     private:
-        static const int Subsequent, First, Hold, HoldMix;
         
         AnimationStateData* _data;
 
@@ -410,10 +411,8 @@ namespace Spine {
 
         Vector<int> _propertyIDs;
         bool _animationsChanged;
-        
-        void* _rendererObject;
 
-        OnAnimationEventFunc _onAnimationEventFunc;
+        AnimationStateListener _listener;
         
         float _timeScale;
 

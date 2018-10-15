@@ -39,7 +39,7 @@
 #include <SFML/Graphics/RenderStates.hpp>
 
 
-namespace Spine {
+namespace spine {
 
 class SkeletonDrawable : public sf::Drawable {
 public:

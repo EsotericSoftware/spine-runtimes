@@ -28,6 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/IkConstraint.h>
 
 #include <spine/IkConstraintData.h>
@@ -36,7 +40,7 @@
 
 #include <spine/BoneData.h>
 
-using namespace Spine;
+using namespace spine;
 
 RTTI_IMPL(IkConstraint, Constraint)
 
@@ -48,7 +52,7 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress
 	x = targetX - p->_worldX, y = targetY - p->_worldY;
 	tx = (x * p->_d - y * p->_b) * id - bone._ax;
 	ty = (y * p->_a - x * p->_c) * id - bone._ay;
-	rotationIK = MathUtil::atan2(ty, tx) * RAD_DEG - bone._ashearX - bone._arotation;
+	rotationIK = MathUtil::atan2(ty, tx) * MathUtil::Rad_Deg - bone._ashearX - bone._arotation;
 	if (bone._ascaleX < 0) rotationIK += 180;
 	if (rotationIK > 180) rotationIK -= 360;
 	else if (rotationIK < -180) rotationIK += 360;
@@ -159,7 +163,7 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 			}
 		}
 		{
-			float minAngle = PI, minX = l1 - a, minDist = minX * minX, minY = 0;
+			float minAngle = MathUtil::Pi, minX = l1 - a, minDist = minX * minX, minY = 0;
 			float maxAngle = 0, maxX = l1 + a, maxDist = maxX * maxX, maxY = 0;
 			c0 = -a * l1 / (aa - bb);
 			if (c0 >= -1 && c0 <= 1) {
@@ -192,11 +196,11 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 	break_outer:
 	{
 		float os = MathUtil::atan2(cy, cx) * s2;
-		a1 = (a1 - os) * RAD_DEG + o1 - parent._arotation;
+		a1 = (a1 - os) * MathUtil::Rad_Deg + o1 - parent._arotation;
 		if (a1 > 180) a1 -= 360;
 		else if (a1 < -180) a1 += 360;
 		parent.updateWorldTransform(px, py, parent._rotation + a1 * alpha, sx, parent._ascaleY, 0, 0);
-		a2 = ((a2 + os) * RAD_DEG - child._ashearX) * s2 + o2 - child._arotation;
+		a2 = ((a2 + os) * MathUtil::Rad_Deg - child._ashearX) * s2 + o2 - child._arotation;
 		if (a2 > 180) a2 -= 360;
 		else if (a2 < -180) a2 += 360;
 		child.updateWorldTransform(cx, cy, child._arotation + a2 * alpha, child._ascaleX, child._ascaleY,

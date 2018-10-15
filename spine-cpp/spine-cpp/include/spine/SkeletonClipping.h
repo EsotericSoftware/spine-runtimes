@@ -34,11 +34,11 @@
 #include <spine/Vector.h>
 #include <spine/Triangulator.h>
 
-namespace Spine {
+namespace spine {
     class Slot;
     class ClippingAttachment;
     
-    class SkeletonClipping : public SpineObject {
+    class SP_API SkeletonClipping : public SpineObject {
     public:
         SkeletonClipping();
 
@@ -47,8 +47,10 @@ namespace Spine {
         void clipEnd(Slot& slot);
         
         void clipEnd();
-        
-        void clipTriangles(Vector<float>& vertices, size_t verticesLength, Vector<unsigned short>& triangles, size_t trianglesLength, Vector<float>& uvs);
+		
+		void clipTriangles(float* vertices, unsigned short* triangles, size_t trianglesLength, float* uvs, size_t stride);
+		
+        void clipTriangles(Vector<float>& vertices, Vector<unsigned short>& triangles, Vector<float>& uvs, size_t stride);
         
         bool isClipping();
         

@@ -28,48 +28,32 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Pool_h
-#define Spine_Pool_h
-
-#include <spine/Extension.h>
-#include <spine/Vector.h>
-#include <spine/ContainerUtil.h>
-#include <spine/SpineObject.h>
+#ifndef Spine_HasRendererObject_h
+#define Spine_HasRendererObject_h
 
 namespace spine {
-template<typename T>
-class SP_API Pool : public SpineObject {
+
+typedef void (*DisposeRendererObject) (void* rendererObject);
+
+class SP_API HasRendererObject {
 public:
-	Pool() {
+	explicit HasRendererObject() : _rendererObject(NULL), _dispose(NULL) {};
+
+	virtual ~HasRendererObject() {
+		if (_dispose && _rendererObject)
+			_dispose(_rendererObject);
 	}
 
-	~Pool() {
-		ContainerUtil::cleanUpVectorOfPointers(_objects);
+	void* getRendererObject() { return _rendererObject; }
+	void setRendererObject(void* rendererObject, DisposeRendererObject dispose = NULL) {
+		_rendererObject = rendererObject;
+		_dispose = dispose;
 	}
-
-	T *obtain() {
-		if (_objects.size() > 0) {
-			T **object = &_objects[_objects.size() - 1];
-			T *ret = *object;
-			_objects.removeAt(_objects.size() - 1);
-
-			return ret;
-		} else {
-			T *ret = new(__FILE__, __LINE__)  T();
-
-			return ret;
-		}
-	}
-
-	void free(T *object) {
-		if (!_objects.contains(object)) {
-			_objects.add(object);
-		}
-	}
-
 private:
-	Vector<T *> _objects;
+	void *_rendererObject;
+	DisposeRendererObject _dispose;
 };
+
 }
 
-#endif /* Spine_Pool_h */
+#endif

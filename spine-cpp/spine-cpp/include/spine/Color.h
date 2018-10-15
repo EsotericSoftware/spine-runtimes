@@ -32,8 +32,8 @@
 
 #include <spine/MathUtil.h>
 
-namespace Spine {
-class Color : public SpineObject {
+namespace spine {
+class SP_API Color : public SpineObject {
 public:
 	Color() : r(0), g(0), b(0), a(0) {
 	}

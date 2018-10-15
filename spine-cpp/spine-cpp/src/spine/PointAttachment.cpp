@@ -28,13 +28,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/PointAttachment.h>
 
 #include <spine/Bone.h>
 
 #include <spine/MathUtil.h>
 
-using namespace Spine;
+using namespace spine;
 
 RTTI_IMPL(PointAttachment, Attachment)
 
@@ -51,7 +55,7 @@ float PointAttachment::computeWorldRotation(Bone &bone) {
 	float ix = cos * bone._a + sin * bone._b;
 	float iy = cos * bone._c + sin * bone._d;
 
-	return MathUtil::atan2(iy, ix) * RAD_DEG;
+	return MathUtil::atan2(iy, ix) * MathUtil::Rad_Deg;
 }
 
 float PointAttachment::getX() {

@@ -37,7 +37,7 @@
 
 #include <string>
 
-namespace Spine {
+namespace spine {
 class SlotData;
 
 class Bone;
@@ -46,7 +46,7 @@ class Skeleton;
 
 class Attachment;
 
-class Slot : public SpineObject {
+class SP_API Slot : public SpineObject {
 	friend class VertexAttachment;
 
 	friend class Skeleton;
@@ -99,8 +99,6 @@ public:
 	Color &getDarkColor();
 
 	bool hasDarkColor();
-
-	void setHasDarkColor(bool inValue);
 
 	/// May be NULL.
 	Attachment *getAttachment();

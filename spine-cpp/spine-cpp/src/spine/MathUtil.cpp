@@ -28,10 +28,26 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/MathUtil.h>
 #include <math.h>
+#include <random>
+#include <stdlib.h>
 
-using namespace Spine;
+// Required for division by 0 in _isNaN on MSVC
+#ifdef _MSC_VER
+#pragma warning(disable:4723)
+#endif
+
+using namespace spine;
+
+const float MathUtil::Pi = 3.1415926535897932385f;
+const float MathUtil::Pi_2 = 3.1415926535897932385f * 2;
+const float MathUtil::Deg_Rad = (3.1415926535897932385f / 180.0f);
+const float MathUtil::Rad_Deg = (180.0f / 3.1415926535897932385f);
 
 float MathUtil::abs(float v) {
 	return ((v) < 0 ? -(v) : (v));
@@ -75,12 +91,12 @@ float MathUtil::acos(float v) {
 
 /// Returns the sine in radians from a lookup table.
 float MathUtil::sinDeg(float degrees) {
-	return (float)::sin(degrees * DEG_RAD);
+	return (float)::sin(degrees * MathUtil::Deg_Rad);
 }
 
 /// Returns the cosine in radians from a lookup table.
 float MathUtil::cosDeg(float degrees) {
-	return (float)::cos(degrees * DEG_RAD);
+	return (float)::cos(degrees * MathUtil::Deg_Rad);
 }
 
 /* Need to pass 0 as an argument, so VC++ doesn't error with C2124 */

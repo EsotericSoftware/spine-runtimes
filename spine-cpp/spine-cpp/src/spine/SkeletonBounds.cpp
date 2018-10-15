@@ -28,6 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/SkeletonBounds.h>
 
 #include <spine/Skeleton.h>
@@ -35,7 +39,7 @@
 
 #include <spine/Slot.h>
 
-using namespace Spine;
+using namespace spine;
 
 SkeletonBounds::SkeletonBounds() : _minX(0), _minY(0), _maxX(0), _maxY(0) {
 }
@@ -195,7 +199,7 @@ bool SkeletonBounds::intersectsSegment(Polygon *polygon, float x1, float y1, flo
 	return false;
 }
 
-Spine::Polygon *SkeletonBounds::getPolygon(BoundingBoxAttachment *attachment) {
+spine::Polygon *SkeletonBounds::getPolygon(BoundingBoxAttachment *attachment) {
 	int index = _boundingBoxes.indexOf(attachment);
 
 	return index == -1 ? NULL : _polygons[index];

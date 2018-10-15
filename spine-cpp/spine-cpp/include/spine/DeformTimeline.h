@@ -33,10 +33,10 @@
 
 #include <spine/CurveTimeline.h>
 
-namespace Spine {
+namespace spine {
     class VertexAttachment;
     
-    class DeformTimeline : public CurveTimeline {
+    class SP_API DeformTimeline : public CurveTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

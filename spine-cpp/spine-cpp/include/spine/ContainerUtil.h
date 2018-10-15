@@ -35,12 +35,12 @@
 #include <spine/Vector.h>
 #include <spine/HashMap.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
 #include <assert.h>
 
-namespace Spine {
-    class ContainerUtil : public SpineObject {
+namespace spine {
+    class SP_API ContainerUtil : public SpineObject {
     public:
         /// Finds an item by comparing each item's name.
         /// It is more efficient to cache the results of this method than to call it multiple times.

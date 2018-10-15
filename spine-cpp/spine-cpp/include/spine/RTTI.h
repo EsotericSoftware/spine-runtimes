@@ -35,8 +35,8 @@
 
 #include <string>
 
-namespace Spine {
-class RTTI : public SpineObject {
+namespace spine {
+class SP_API RTTI : public SpineObject {
 public:
 	explicit RTTI(const std::string &className);
 
@@ -61,16 +61,16 @@ private:
 
 #define RTTI_DECL \
 public: \
-static const Spine::RTTI rtti; \
-virtual const Spine::RTTI& getRTTI() const;
+static const spine::RTTI rtti; \
+virtual const spine::RTTI& getRTTI() const;
 
 #define RTTI_IMPL_NOPARENT(name) \
-const Spine::RTTI name::rtti(#name); \
-const Spine::RTTI& name::getRTTI() const { return rtti; }
+const spine::RTTI name::rtti(#name); \
+const spine::RTTI& name::getRTTI() const { return rtti; }
 
 #define RTTI_IMPL(name, parent) \
-const Spine::RTTI name::rtti(#name, parent::rtti); \
-const Spine::RTTI& name::getRTTI() const { return rtti; }
+const spine::RTTI name::rtti(#name, parent::rtti); \
+const spine::RTTI& name::getRTTI() const { return rtti; }
 
 #endif /* Spine_RTTI_h */
 

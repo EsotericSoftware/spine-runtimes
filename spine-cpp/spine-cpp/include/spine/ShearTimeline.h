@@ -33,8 +33,8 @@
 
 #include <spine/TranslateTimeline.h>
 
-namespace Spine {
-    class ShearTimeline : public TranslateTimeline {
+namespace spine {
+    class SP_API ShearTimeline : public TranslateTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

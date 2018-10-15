@@ -50,6 +50,7 @@
 #include <spine/Constraint.h>
 #include <spine/ContainerUtil.h>
 #include <spine/CurveTimeline.h>
+#include <spine/Debug.h>
 #include <spine/DeformTimeline.h>
 #include <spine/DrawOrderTimeline.h>
 #include <spine/Event.h>
@@ -57,6 +58,7 @@
 #include <spine/EventTimeline.h>
 #include <spine/Extension.h>
 #include <spine/HashMap.h>
+#include <spine/HasRendererObject.h>
 #include <spine/IkConstraint.h>
 #include <spine/IkConstraintData.h>
 #include <spine/IkConstraintTimeline.h>
@@ -64,8 +66,8 @@
 #include <spine/LinkedMesh.h>
 #include <spine/MathUtil.h>
 #include <spine/MeshAttachment.h>
-#include <spine/MixDirection.h>
 #include <spine/MixBlend.h>
+#include <spine/MixDirection.h>
 #include <spine/PathAttachment.h>
 #include <spine/PathConstraint.h>
 #include <spine/PathConstraintData.h>
@@ -90,8 +92,9 @@
 #include <spine/Skin.h>
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
+#include <spine/SpacingMode.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 #include <spine/TextureLoader.h>
 #include <spine/Timeline.h>
 #include <spine/TimelineType.h>

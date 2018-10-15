@@ -34,12 +34,12 @@
 #include <spine/Vector.h>
 #include <spine/MathUtil.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 #include <spine/Color.h>
 
 #include <limits> // std::numeric_limits
 
-namespace Spine {
+namespace spine {
 class SkeletonData;
 
 class Bone;
@@ -58,7 +58,7 @@ class Skin;
 
 class Attachment;
 
-class Skeleton : public SpineObject {
+class SP_API Skeleton : public SpineObject {
 	friend class AnimationState;
 
 	friend class SkeletonBounds;
@@ -170,7 +170,7 @@ public:
 
 	Bone *getRootBone();
 
-	const SkeletonData *getData();
+	SkeletonData *getData();
 
 	Vector<Bone *> &getBones();
 

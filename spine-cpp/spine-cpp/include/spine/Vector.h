@@ -33,14 +33,14 @@
 
 #include <spine/Extension.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 #include <stdlib.h>
 #include <memory>
 #include <assert.h>
 
-namespace Spine {
+namespace spine {
 template<typename T>
-class Vector : public SpineObject {
+class SP_API Vector : public SpineObject {
 public:
 	Vector() : _size(0), _capacity(0), _buffer(NULL) {
 	}
@@ -67,6 +67,10 @@ public:
 		_size = 0;
 	}
 
+	inline size_t getCapacity() const {
+		return _capacity;
+	}
+
 	inline size_t size() const {
 		return _size;
 	}
@@ -78,7 +82,7 @@ public:
 		if (_capacity < newSize) {
 			_capacity = (int) (_size * 1.75f);
 			if (_capacity < 8) _capacity = 8;
-			_buffer = Spine::SpineExtension::realloc<T>(_buffer, _capacity, __FILE__, __LINE__);
+			_buffer = spine::SpineExtension::realloc<T>(_buffer, _capacity, __FILE__, __LINE__);
 		}
 		if (oldSize < _size) {
 			for (size_t i = oldSize; i < _size; i++) {
@@ -102,7 +106,7 @@ public:
 			T valueCopy = inValue;
 			_capacity = (int) (_size * 1.75f);
 			if (_capacity < 8) _capacity = 8;
-			_buffer = Spine::SpineExtension::realloc<T>(_buffer, _capacity, __FILE__, __LINE__);
+			_buffer = spine::SpineExtension::realloc<T>(_buffer, _capacity, __FILE__, __LINE__);
 			construct(_buffer + _size++, valueCopy);
 		} else {
 			construct(_buffer + _size++, inValue);

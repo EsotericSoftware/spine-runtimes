@@ -35,11 +35,11 @@
 
 #include <spine/Vector.h>
 
-namespace Spine {
+namespace spine {
     class Slot;
     
     /// An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's vertices.
-    class VertexAttachment : public Attachment {
+    class SP_API VertexAttachment : public Attachment {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         friend class DeformTimeline;
@@ -50,7 +50,8 @@ namespace Spine {
         explicit VertexAttachment(const String& name);
 
         virtual ~VertexAttachment();
-        
+		
+		void computeWorldVertices(Slot& slot, float* worldVertices);
         void computeWorldVertices(Slot& slot, Vector<float>& worldVertices);
         
         /// Transforms local vertices to world coordinates.
@@ -59,6 +60,7 @@ namespace Spine {
         /// @param worldVertices The output world vertices. Must have a length greater than or equal to offset + count.
         /// @param offset The worldVertices index to begin writing values.
         /// @param stride The number of worldVertices entries between the value pairs written.
+		void computeWorldVertices(Slot& slot, size_t start, size_t count, float* worldVertices, size_t offset, size_t stride = 2);
         void computeWorldVertices(Slot& slot, size_t start, size_t count, Vector<float>& worldVertices, size_t offset, size_t stride = 2);
         
         /// @return true if a deform originally applied to the specified attachment should be applied to this attachment.

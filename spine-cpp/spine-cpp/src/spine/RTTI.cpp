@@ -28,10 +28,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/RTTI.h>
-#include <spine/String.h>
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
 
-using namespace Spine;
+#include <spine/RTTI.h>
+#include <spine/SpineString.h>
+
+using namespace spine;
 
 RTTI::RTTI(const std::string &className) : _className(className), _pBaseRTTI(NULL) {
 }
@@ -44,14 +48,14 @@ const std::string &RTTI::getClassName() const {
 }
 
 bool RTTI::isExactly(const RTTI &rtti) const {
-	return (this == &rtti);
+	return (this->_className == rtti._className);
 }
 
 bool RTTI::instanceOf(const RTTI &rtti) const {
 	const RTTI *pCompare = this;
 
 	while (pCompare) {
-		if (pCompare == &rtti) {
+		if (pCompare->_className == rtti._className) {
 			return true;
 		}
 

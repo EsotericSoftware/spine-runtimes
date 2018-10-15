@@ -33,9 +33,9 @@
 
 #include <spine/Vector.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
-namespace Spine {
+namespace spine {
 class CurveTimeline;
 
 class VertexAttachment;
@@ -54,7 +54,7 @@ class LinkedMesh;
 
 class String;
 
-class SkeletonJson : public SpineObject {
+class SP_API SkeletonJson : public SpineObject {
 public:
 	explicit SkeletonJson(Atlas *atlas);
 

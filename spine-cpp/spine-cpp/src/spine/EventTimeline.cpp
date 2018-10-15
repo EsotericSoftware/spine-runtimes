@@ -28,6 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/EventTimeline.h>
 
 #include <spine/Skeleton.h>
@@ -40,7 +44,7 @@
 #include <spine/EventData.h>
 #include <spine/ContainerUtil.h>
 
-using namespace Spine;
+using namespace spine;
 
 RTTI_IMPL(EventTimeline, Timeline)
 

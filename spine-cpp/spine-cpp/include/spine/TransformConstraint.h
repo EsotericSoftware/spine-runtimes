@@ -35,12 +35,12 @@
 
 #include <spine/Vector.h>
 
-namespace Spine {
+namespace spine {
     class TransformConstraintData;
     class Skeleton;
     class Bone;
     
-    class TransformConstraint : public Constraint {
+    class SP_API TransformConstraint : public Constraint {
         friend class Skeleton;
         friend class TransformConstraintTimeline;
         

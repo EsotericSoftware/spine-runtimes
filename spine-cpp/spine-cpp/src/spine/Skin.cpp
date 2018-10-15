@@ -28,6 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/Skin.h>
 
 #include <spine/Attachment.h>
@@ -37,7 +41,7 @@
 
 #include <assert.h>
 
-using namespace Spine;
+using namespace spine;
 
 Skin::AttachmentMap::AttachmentMap() {
 }
@@ -134,8 +138,8 @@ void Skin::attachAll(Skeleton &skeleton, Skin &oldSkin) {
 		Slot *slot = slots[slotIndex];
 
 		if (slot->getAttachment() == entry._attachment) {
-			Attachment *attachment = NULL;
-			if ((attachment = getAttachment(slotIndex, entry._name))) {
+			Attachment *attachment = getAttachment(slotIndex, entry._name);
+			if (attachment) {
 				slot->setAttachment(attachment);
 			}
 		}

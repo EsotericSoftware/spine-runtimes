@@ -28,6 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/PathConstraint.h>
 
 #include <spine/PathConstraintData.h>
@@ -39,7 +43,7 @@
 #include <spine/SlotData.h>
 #include <spine/BoneData.h>
 
-using namespace Spine;
+using namespace spine;
 
 RTTI_IMPL(PathConstraint, Constraint)
 
@@ -144,7 +148,7 @@ void PathConstraint::update() {
 	} else {
 		tip = false;
 		Bone &p = _target->getBone();
-		offsetRotation *= p.getA() * p.getD() - p.getB() * p.getC() > 0 ? DEG_RAD : -DEG_RAD;
+		offsetRotation *= p.getA() * p.getD() - p.getB() * p.getC() > 0 ? MathUtil::Deg_Rad : -MathUtil::Deg_Rad;
 	}
 
 	for (size_t i = 0, p = 3; i < boneCount; i++, p += 3) {
@@ -190,10 +194,10 @@ void PathConstraint::update() {
 				r += offsetRotation;
 			}
 
-			if (r > PI) {
-				r -= PI_2;
-			} else if (r < -PI) {
-				r += PI_2;
+			if (r > MathUtil::Pi) {
+				r -= MathUtil::Pi_2;
+			} else if (r < -MathUtil::Pi) {
+				r += MathUtil::Pi_2;
 			}
 
 			r *= rotateMix;

@@ -35,7 +35,7 @@
 #include <spine/SpineObject.h>
 #include <spine/Vector.h>
 
-namespace Spine {
+namespace spine {
 class BoneData;
 
 class Skeleton;
@@ -45,7 +45,7 @@ class Skeleton;
 /// A bone has a local transform which is used to compute its world transform. A bone also has an applied transform, which is a
 /// local transform that can be applied to compute the world transform. The local transform and applied transform may differ if a
 /// constraint or application code modifies the world transform after it was computed from the local transform.
-class Bone : public Updatable {
+class SP_API Bone : public Updatable {
 	friend class AnimationState;
 
 	friend class RotateTimeline;
@@ -220,6 +220,9 @@ public:
 
 	/// Returns the magnitide (always positive) of the world scale Y.
 	float getWorldScaleY();
+
+	bool isAppliedValid();
+	void setAppliedValid(bool valid);
 
 private:
 	static bool yDown;

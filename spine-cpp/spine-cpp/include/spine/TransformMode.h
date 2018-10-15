@@ -31,7 +31,7 @@
 #ifndef Spine_TransformMode_h
 #define Spine_TransformMode_h
 
-namespace Spine {
+namespace spine {
     enum TransformMode {
         TransformMode_Normal = 0,
         TransformMode_OnlyTranslation,

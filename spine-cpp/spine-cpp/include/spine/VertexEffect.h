@@ -34,19 +34,19 @@
 #include <spine/SpineObject.h>
 #include <spine/MathUtil.h>
 
-namespace Spine {
+namespace spine {
 
 class Skeleton;
 class Color;
 
-class VertexEffect: public SpineObject {
+class SP_API VertexEffect: public SpineObject {
 public:
 	virtual void begin(Skeleton& skeleton) = 0;
 	virtual void transform(float& x, float& y, float &u, float &v, Color &light, Color &dark) = 0;
 	virtual void end() = 0;
 };
 
-class JitterVertexEffect: public VertexEffect {
+class SP_API JitterVertexEffect: public VertexEffect {
 public:
 	JitterVertexEffect(float jitterX, float jitterY);
 
@@ -65,7 +65,7 @@ protected:
 	float _jitterY;
 };
 
-class SwirlVertexEffect: public VertexEffect {
+class SP_API SwirlVertexEffect: public VertexEffect {
 public:
 	SwirlVertexEffect(float radius, Interpolation &interpolation);
 

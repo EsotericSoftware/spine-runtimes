@@ -28,6 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/DeformTimeline.h>
 
 #include <spine/Skeleton.h>
@@ -40,7 +44,7 @@
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
 
-using namespace Spine;
+using namespace spine;
 
 RTTI_IMPL(DeformTimeline, CurveTimeline)
 

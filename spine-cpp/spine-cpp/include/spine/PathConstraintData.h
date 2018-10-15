@@ -36,13 +36,13 @@
 #include <spine/RotateMode.h>
 #include <spine/Vector.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
-namespace Spine {
+namespace spine {
     class BoneData;
     class SlotData;
     
-    class PathConstraintData : public SpineObject {
+    class SP_API PathConstraintData : public SpineObject {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

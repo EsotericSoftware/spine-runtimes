@@ -42,8 +42,8 @@
 #pragma warning(disable:4996)
 #endif
 
-namespace Spine {
-class String : public SpineObject {
+namespace spine {
+class SP_API String : public SpineObject {
 public:
 	String() : _length(0), _buffer(NULL) {
 	}

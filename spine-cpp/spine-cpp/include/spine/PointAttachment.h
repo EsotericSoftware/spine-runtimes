@@ -33,7 +33,7 @@
 
 #include <spine/Attachment.h>
 
-namespace Spine {
+namespace spine {
     class Bone;
     
     /// 
@@ -43,7 +43,7 @@ namespace Spine {
     ///
     /// See http://esotericsoftware.com/spine-point-attachments for Point Attachments in the Spine User Guide.
     /// 
-    class PointAttachment : public Attachment {
+    class SP_API PointAttachment : public Attachment {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         

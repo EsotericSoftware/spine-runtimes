@@ -33,18 +33,19 @@
 
 #include <spine/SpineObject.h>
 
-#include <float.h>
 #include <string.h>
 
-namespace Spine {
-static const float PI = 3.1415926535897932385f;
-static const float PI_2 = PI * 2;
-static const float DEG_RAD = (PI / 180.0f);
-static const float RAD_DEG = (180.0f / PI);
+namespace spine {
 
-class MathUtil : public SpineObject {
-public:
+class SP_API MathUtil : public SpineObject {
+private:
 	MathUtil();
+
+public:
+	static const float Pi;
+	static const float Pi_2;
+	static const float Deg_Rad;
+	static const float Rad_Deg;
 
 	template<typename T>
 	static inline T min(T a, T b) { return a < b ? a : b; }
@@ -91,7 +92,7 @@ public:
 	static float pow(float a, float b);
 };
 
-struct Interpolation {
+struct SP_API Interpolation {
 	virtual float apply(float a) = 0;
 
 	virtual float interpolate(float start, float end, float a) {
@@ -101,7 +102,7 @@ struct Interpolation {
 	virtual ~Interpolation() {};
 };
 
-struct PowInterpolation: public Interpolation {
+struct SP_API PowInterpolation: public Interpolation {
 	PowInterpolation(int power): power(power) {
 	}
 
@@ -113,7 +114,7 @@ struct PowInterpolation: public Interpolation {
 	int power;
 };
 
-struct PowOutInterpolation: public Interpolation {
+struct SP_API PowOutInterpolation: public Interpolation {
 	PowOutInterpolation(int power): power(power) {
 	}
 

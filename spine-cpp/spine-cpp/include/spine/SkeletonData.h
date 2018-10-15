@@ -32,9 +32,9 @@
 #define Spine_SkeletonData_h
 
 #include <spine/Vector.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
-namespace Spine {
+namespace spine {
 class BoneData;
 
 class SlotData;
@@ -52,7 +52,7 @@ class TransformConstraintData;
 class PathConstraintData;
 
 /// Stores the setup pose and all of the stateless data for a skeleton.
-class SkeletonData : public SpineObject {
+class SP_API SkeletonData : public SpineObject {
 	friend class SkeletonBinary;
 
 	friend class SkeletonJson;
@@ -82,7 +82,7 @@ public:
 	Skin *findSkin(const String &skinName);
 
 	/// @return May be NULL.
-	EventData *findEvent(const String &eventDataName);
+	spine::EventData *findEvent(const String &eventDataName);
 
 	/// @return May be NULL.
 	Animation *findAnimation(const String &animationName);
@@ -119,7 +119,7 @@ public:
 
 	void setDefaultSkin(Skin *inValue);
 
-	Vector<EventData *> &getEvents();
+	Vector<spine::EventData *> &getEvents();
 
 	Vector<Animation *> &getAnimations();
 

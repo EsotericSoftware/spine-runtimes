@@ -28,6 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 /* Json */
 /* JSON parser in CPP, shamelessly ripped from json.c in the spine-c runtime */
 
@@ -43,12 +47,12 @@
 
 #include <spine/Json.h>
 #include <spine/Extension.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
 #include <assert.h>
 #include <math.h>
 
-using namespace Spine;
+using namespace spine;
 
 const int Json::JSON_FALSE = 0;
 const int Json::JSON_TRUE = 1;
@@ -140,7 +144,7 @@ const char *Json::skip(const char *inValue) {
 const char *Json::parseValue(Json *item, const char *value) {
 	/* Referenced by constructor, parseArray(), and parseObject(). */
 	/* Always called with the result of skip(). */
-#if SPINE_JSON_DEBUG /* Checked at entry to graph, constructor, and after every parse call. */
+#ifdef SPINE_JSON_DEBUG /* Checked at entry to graph, constructor, and after every parse call. */
 	if (!value) {
 		/* Fail on null. */
 		return NULL;
@@ -390,7 +394,7 @@ const char *Json::parseNumber(Json *item, const char *num) {
 const char *Json::parseArray(Json *item, const char *value) {
 	Json *child;
 
-#if SPINE_JSON_DEBUG /* unnecessary, only callsite (parse_value) verifies this */
+#ifdef SPINE_JSON_DEBUG /* unnecessary, only callsite (parse_value) verifies this */
 	if (*value != '[') {
 		ep = value;
 		return 0;
@@ -446,7 +450,7 @@ const char *Json::parseArray(Json *item, const char *value) {
 const char *Json::parseObject(Json *item, const char *value) {
 	Json *child;
 
-#if SPINE_JSON_DEBUG /* unnecessary, only callsite (parse_value) verifies this */
+#ifdef SPINE_JSON_DEBUG /* unnecessary, only callsite (parse_value) verifies this */
 	if (*value != '{') {
 		ep = value;
 		return 0;

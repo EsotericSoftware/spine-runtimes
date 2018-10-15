@@ -34,8 +34,8 @@
 #include <spine/RTTI.h>
 #include <spine/SpineObject.h>
 
-namespace Spine {
-class Updatable : public SpineObject {
+namespace spine {
+class SP_API Updatable : public SpineObject {
 RTTI_DECL
 
 public:

@@ -35,14 +35,14 @@
 
 #include <spine/Vector.h>
 
-namespace Spine {
+namespace spine {
     class PathConstraintData;
     class Skeleton;
     class PathAttachment;
     class Bone;
     class Slot;
     
-    class PathConstraint : public Constraint {
+    class SP_API PathConstraint : public Constraint {
         friend class Skeleton;
         friend class PathConstraintMixTimeline;
         friend class PathConstraintPositionTimeline;

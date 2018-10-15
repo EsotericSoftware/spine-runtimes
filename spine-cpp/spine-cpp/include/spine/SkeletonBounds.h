@@ -34,7 +34,7 @@
 #include <spine/Vector.h>
 #include <spine/SpineObject.h>
 
-namespace Spine {
+namespace spine {
     class Skeleton;
     class BoundingBoxAttachment;
     class Polygon;
@@ -43,7 +43,7 @@ namespace Spine {
     /// Collects each BoundingBoxAttachment that is visible and computes the world vertices for its polygon.
     /// The polygon vertices are provided along with convenience methods for doing hit detection.
     ///
-    class SkeletonBounds : public SpineObject {
+    class SP_API SkeletonBounds : public SpineObject {
     public:
         SkeletonBounds();
         

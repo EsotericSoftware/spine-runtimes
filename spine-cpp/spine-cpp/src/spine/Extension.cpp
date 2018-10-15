@@ -28,15 +28,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/Extension.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
 #include <assert.h>
 
-using namespace Spine;
+using namespace spine;
 
-DefaultSpineExtension _defaultExtension;
-SpineExtension *SpineExtension::_instance = &_defaultExtension;
+SpineExtension *SpineExtension::_instance = NULL;
 
 void SpineExtension::setInstance(SpineExtension *inValue) {
 	assert(inValue);
@@ -45,6 +48,7 @@ void SpineExtension::setInstance(SpineExtension *inValue) {
 }
 
 SpineExtension *SpineExtension::getInstance() {
+	if (!_instance) _instance = spine::getDefaultExtension();
 	assert(_instance);
 
 	return _instance;

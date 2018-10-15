@@ -32,12 +32,12 @@
 #define Spine_TextureLoader_h
 
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
-namespace Spine {
+namespace spine {
     class AtlasPage;
     
-    class TextureLoader : public SpineObject {
+    class SP_API TextureLoader : public SpineObject {
     public:
         TextureLoader();
         

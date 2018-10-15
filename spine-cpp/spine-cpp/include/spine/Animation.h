@@ -35,16 +35,16 @@
 #include <spine/MixBlend.h>
 #include <spine/MixDirection.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
-namespace Spine {
+namespace spine {
 class Timeline;
 
 class Skeleton;
 
 class Event;
 
-class Animation : public SpineObject {
+class SP_API Animation : public SpineObject {
 	friend class AnimationState;
 
 	friend class TrackEntry;

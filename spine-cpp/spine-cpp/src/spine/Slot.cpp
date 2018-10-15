@@ -28,6 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/Slot.h>
 
 #include <spine/SlotData.h>
@@ -35,7 +39,7 @@
 #include <spine/Skeleton.h>
 #include <spine/Attachment.h>
 
-using namespace Spine;
+using namespace spine;
 
 Slot::Slot(SlotData &data, Bone &bone) :
 		_data(data),
@@ -43,7 +47,7 @@ Slot::Slot(SlotData &data, Bone &bone) :
 		_skeleton(bone.getSkeleton()),
 		_color(1, 1, 1, 1),
 		_darkColor(0, 0, 0, 0),
-		_hasDarkColor(false),
+		_hasDarkColor(data.hasDarkColor()),
 		_attachment(NULL),
 		_attachmentTime(0) {
 	setToSetupPose();
@@ -83,10 +87,6 @@ Color &Slot::getDarkColor() {
 
 bool Slot::hasDarkColor() {
 	return _hasDarkColor;
-}
-
-void Slot::setHasDarkColor(bool inValue) {
-	_hasDarkColor = inValue;
 }
 
 Attachment *Slot::getAttachment() {

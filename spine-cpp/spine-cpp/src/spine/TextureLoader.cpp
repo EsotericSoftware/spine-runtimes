@@ -28,9 +28,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/TextureLoader.h>
 
-namespace Spine {
+namespace spine {
 TextureLoader::TextureLoader() {
 }
 

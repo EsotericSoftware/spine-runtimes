@@ -34,9 +34,10 @@
 #include <spine/Vector.h>
 #include <spine/Extension.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
+#include <spine/HasRendererObject.h>
 
-namespace Spine {
+namespace spine {
 enum Format {
 	Format_Alpha,
 	Format_Intensity,
@@ -64,7 +65,7 @@ enum TextureWrap {
 	TextureWrap_Repeat
 };
 
-class AtlasPage : public SpineObject {
+class SP_API AtlasPage : public SpineObject, public HasRendererObject {
 public:
 	String name;
 	Format format;
@@ -72,16 +73,17 @@ public:
 	TextureFilter magFilter;
 	TextureWrap uWrap;
 	TextureWrap vWrap;
-	void *rendererObject;
 	int width, height;
 
 	explicit AtlasPage(const String &inName) : name(inName), format(Format_RGBA8888), minFilter(TextureFilter_Nearest),
 											   magFilter(TextureFilter_Nearest), uWrap(TextureWrap_ClampToEdge),
 											   vWrap(TextureWrap_ClampToEdge) {
 	}
+
+	virtual ~AtlasPage() { }
 };
 
-class AtlasRegion : public SpineObject {
+class SP_API AtlasRegion : public SpineObject {
 public:
 	AtlasPage *page;
 	String name;
@@ -97,7 +99,7 @@ public:
 
 class TextureLoader;
 
-class Atlas : public SpineObject {
+class SP_API Atlas : public SpineObject {
 public:
 	Atlas(const String &path, TextureLoader *textureLoader);
 
@@ -111,6 +113,8 @@ public:
 	/// should be cached rather than calling this method multiple times.
 	/// @return The region, or NULL.
 	AtlasRegion *findRegion(const String &name);
+
+	Vector<AtlasPage*> &getPages();
 
 private:
 	Vector<AtlasPage *> _pages;

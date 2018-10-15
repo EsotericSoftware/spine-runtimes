@@ -28,12 +28,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/SkeletonClipping.h>
 
 #include <spine/Slot.h>
 #include <spine/ClippingAttachment.h>
 
-using namespace Spine;
+using namespace spine;
 
 SkeletonClipping::SkeletonClipping() : _clipAttachment(NULL) {
 	_clipOutput.ensureCapacity(128);
@@ -85,10 +89,12 @@ void SkeletonClipping::clipEnd() {
 	_clippingPolygon.clear();
 }
 
-void SkeletonClipping::clipTriangles(Vector<float> &vertices, size_t verticesLength, Vector<unsigned short> &triangles,
-									 size_t trianglesLength, Vector<float> &uvs) {
-	SP_UNUSED(verticesLength);
+void SkeletonClipping::clipTriangles(Vector<float> &vertices, Vector<unsigned short> &triangles, Vector<float> &uvs, size_t stride) {
+	clipTriangles(vertices.buffer(), triangles.buffer(), triangles.size(), uvs.buffer(), stride);
+}
 
+void SkeletonClipping::clipTriangles(float *vertices, unsigned short *triangles,
+									 size_t trianglesLength, float *uvs, size_t stride) {
 	Vector<float> &clipOutput = _clipOutput;
 	Vector<float> &clippedVertices = _clippedVertices;
 	Vector<unsigned short> &clippedTriangles = _clippedTriangles;
@@ -103,15 +109,15 @@ void SkeletonClipping::clipTriangles(Vector<float> &vertices, size_t verticesLen
 	size_t i = 0;
 	continue_outer:
 	for (; i < trianglesLength; i += 3) {
-		int vertexOffset = triangles[i] << 1;
+		int vertexOffset = triangles[i] * stride;
 		float x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
 		float u1 = uvs[vertexOffset], v1 = uvs[vertexOffset + 1];
 
-		vertexOffset = triangles[i + 1] << 1;
+		vertexOffset = triangles[i + 1] * stride;
 		float x2 = vertices[vertexOffset], y2 = vertices[vertexOffset + 1];
 		float u2 = uvs[vertexOffset], v2 = uvs[vertexOffset + 1];
 
-		vertexOffset = triangles[i + 2] << 1;
+		vertexOffset = triangles[i + 2] * stride;
 		float x3 = vertices[vertexOffset], y3 = vertices[vertexOffset + 1];
 		float u3 = uvs[vertexOffset], v3 = uvs[vertexOffset + 1];
 

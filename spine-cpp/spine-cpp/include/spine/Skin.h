@@ -32,9 +32,9 @@
 #define Spine_Skin_h
 
 #include <spine/Vector.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
-namespace Spine {
+namespace spine {
 class Attachment;
 
 class Skeleton;
@@ -42,15 +42,15 @@ class Skeleton;
 /// Stores attachments by slot index and attachment name.
 /// See SkeletonData::getDefaultSkin, Skeleton::getSkin, and
 /// http://esotericsoftware.com/spine-runtime-skins in the Spine Runtimes Guide.
-class Skin : public SpineObject {
+class SP_API Skin : public SpineObject {
 	friend class Skeleton;
 
 public:
-	class AttachmentMap : public SpineObject {
+	class SP_API AttachmentMap : public SpineObject {
 		friend class Skin;
 
 	public:
-		struct Entry {
+		struct SP_API Entry {
 			size_t _slotIndex;
 			String _name;
 			Attachment *_attachment;
@@ -62,7 +62,7 @@ public:
 			}
 		};
 
-		class Entries {
+		class SP_API Entries {
 			friend class AttachmentMap;
 
 		public:

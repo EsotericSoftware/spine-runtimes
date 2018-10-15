@@ -34,10 +34,11 @@
 #include <spine/VertexAttachment.h>
 #include <spine/Vector.h>
 #include <spine/Color.h>
+#include <spine/HasRendererObject.h>
 
-namespace Spine {
+namespace spine {
     /// Attachment that displays a texture region using a mesh.
-    class MeshAttachment : public VertexAttachment {
+    class SP_API MeshAttachment : public VertexAttachment, public HasRendererObject {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         friend class AtlasAttachmentLoader;
@@ -46,6 +47,8 @@ namespace Spine {
         
     public:
         explicit MeshAttachment(const String& name);
+
+        virtual ~MeshAttachment();
 
         void updateUVs();
 
@@ -65,8 +68,6 @@ namespace Spine {
         
         const String& getPath();
         void setPath(const String& inValue);
-        void* getRendererObject();
-        void setRendererObject(void* inValue);
         
         float getRegionU();
         void setRegionU(float inValue);
@@ -124,7 +125,6 @@ namespace Spine {
         Vector<float> _regionUVs;
         Vector<unsigned short> _triangles;
         Vector<unsigned short> _edges;
-        void* _rendererObject;
         String _path;
         float _regionU;
         float _regionV;

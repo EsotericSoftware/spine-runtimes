@@ -48,7 +48,7 @@ sf::BlendMode additivePma = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::One
 sf::BlendMode multiplyPma = sf::BlendMode(sf::BlendMode::DstColor, sf::BlendMode::OneMinusSrcAlpha);
 sf::BlendMode screenPma = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcColor);
 
-namespace Spine {
+namespace spine {
 
 SkeletonDrawable::SkeletonDrawable(SkeletonData *skeletonData, AnimationStateData *stateData) :
 		timeScale(1),
@@ -91,7 +91,7 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 	vertexArray->clear();
 	states.texture = NULL;
 
-	// Early out if the skeleton alpha is 0
+	// Early out if skeleton is invisible
 	if (skeleton->getColor().a == 0) return;
 
 	if (vertexEffect != NULL) vertexEffect->begin(*skeleton);
@@ -120,7 +120,7 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 			RegionAttachment *regionAttachment = (RegionAttachment *) attachment;
 			attachmentColor = &regionAttachment->getColor();
 
-			// Early out if the attachment color is 0
+			// Early out if the slot color is 0
 			if (attachmentColor->a == 0) {
 				clipper.clipEnd(slot);
 				continue;
@@ -132,25 +132,26 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 			uvs = &regionAttachment->getUVs();
 			indices = &quadIndices;
 			indicesCount = 6;
-			texture = (Texture *) ((AtlasRegion *) regionAttachment->getRendererObject())->page->rendererObject;
+			texture = (Texture *) ((AtlasRegion *) regionAttachment->getRendererObject())->page->getRendererObject();
 
 		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 			MeshAttachment *mesh = (MeshAttachment *) attachment;
 			attachmentColor = &mesh->getColor();
 
-			// Early out if the attachment color is 0
+			// Early out if the slot color is 0
 			if (attachmentColor->a == 0) {
 				clipper.clipEnd(slot);
 				continue;
 			}
 
 			worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
-			texture = (Texture *) ((AtlasRegion *) mesh->getRendererObject())->page->rendererObject;
+			texture = (Texture *) ((AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
 			mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices, 0, 2);
 			verticesCount = mesh->getWorldVerticesLength() >> 1;
 			uvs = &mesh->getUVs();
 			indices = &mesh->getTriangles();
 			indicesCount = mesh->getTriangles().size();
+
 		} else if (attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
 			ClippingAttachment *clip = (ClippingAttachment *) slot.getAttachment();
 			clipper.clipStart(slot, clip);
@@ -219,7 +220,7 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 		}
 
 		if (clipper.isClipping()) {
-			clipper.clipTriangles(worldVertices, verticesCount << 1, *indices, indicesCount, *uvs);
+			clipper.clipTriangles(worldVertices, *indices, *uvs, 2);
 			vertices = &clipper.getClippedVertices();
 			verticesCount = clipper.getClippedVertices().size() >> 1;
 			uvs = &clipper.getClippedUVs();
@@ -287,7 +288,7 @@ void SFMLTextureLoader::load(AtlasPage &page, const String &path) {
 	if (page.magFilter == TextureFilter_Linear) texture->setSmooth(true);
 	if (page.uWrap == TextureWrap_Repeat && page.vWrap == TextureWrap_Repeat) texture->setRepeated(true);
 
-	page.rendererObject = texture;
+	page.setRendererObject(texture);
 	Vector2u size = texture->getSize();
 	page.width = size.x;
 	page.height = size.y;
@@ -297,8 +298,7 @@ void SFMLTextureLoader::unload(void *texture) {
 	delete (Texture *) texture;
 }
 
-String SFMLTextureLoader::toString() const {
-	return String("SFMLTextureLoader");
+SpineExtension *getDefaultExtension() {
+	return new DefaultSpineExtension();
 }
-
 }

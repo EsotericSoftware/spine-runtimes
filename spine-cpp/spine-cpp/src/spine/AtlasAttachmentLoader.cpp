@@ -28,8 +28,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 ******************************************************S**********************/
 
-#include <spine/AtlasAttachmentLoader.h>
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
 
+#include <spine/AtlasAttachmentLoader.h>
 #include <spine/Skin.h>
 #include <spine/RegionAttachment.h>
 #include <spine/MeshAttachment.h>
@@ -40,7 +43,7 @@
 
 #include <spine/Atlas.h>
 
-namespace Spine {
+namespace spine {
 RTTI_IMPL(AtlasAttachmentLoader, AttachmentLoader)
 
 AtlasAttachmentLoader::AtlasAttachmentLoader(Atlas *atlas) : AttachmentLoader(), _atlas(atlas) {
@@ -50,14 +53,14 @@ RegionAttachment *AtlasAttachmentLoader::newRegionAttachment(Skin &skin, const S
 	SP_UNUSED(skin);
 
 	AtlasRegion *regionP = findRegion(path);
-	assert(regionP != NULL);
+	if (!regionP) return NULL;
 
 	AtlasRegion &region = *regionP;
 
 	RegionAttachment *attachmentP = new(__FILE__, __LINE__) RegionAttachment(name);
 
 	RegionAttachment &attachment = *attachmentP;
-	attachment._rendererObject = regionP;
+	attachment.setRendererObject(regionP);
 	attachment.setUVs(region.u, region.v, region.u2, region.v2, region.rotate);
 	attachment._regionOffsetX = region.offsetX;
 	attachment._regionOffsetY = region.offsetY;
@@ -72,14 +75,14 @@ MeshAttachment *AtlasAttachmentLoader::newMeshAttachment(Skin &skin, const Strin
 	SP_UNUSED(skin);
 
 	AtlasRegion *regionP = findRegion(path);
-	assert(regionP != NULL);
+	if (!regionP) return NULL;
 
 	AtlasRegion &region = *regionP;
 
 	MeshAttachment *attachmentP = new(__FILE__, __LINE__) MeshAttachment(name);
 
 	MeshAttachment &attachment = *attachmentP;
-	attachment._rendererObject = regionP;
+	attachment.setRendererObject(regionP);
 	attachment._regionU = region.u;
 	attachment._regionV = region.v;
 	attachment._regionU2 = region.u2;
@@ -113,6 +116,10 @@ PointAttachment *AtlasAttachmentLoader::newPointAttachment(Skin &skin, const Str
 ClippingAttachment *AtlasAttachmentLoader::newClippingAttachment(Skin &skin, const String &name) {
 	SP_UNUSED(skin);
 	return new(__FILE__, __LINE__) ClippingAttachment(name);
+}
+
+void AtlasAttachmentLoader::configureAttachment(Attachment* attachment) {
+	SP_UNUSED(attachment);
 }
 
 AtlasRegion *AtlasAttachmentLoader::findRegion(const String &name) {

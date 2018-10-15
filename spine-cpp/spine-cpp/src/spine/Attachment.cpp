@@ -28,11 +28,15 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/Attachment.h>
 
 #include <assert.h>
 
-using namespace Spine;
+using namespace spine;
 
 RTTI_IMPL_NOPARENT(Attachment)
 

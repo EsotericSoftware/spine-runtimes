@@ -34,10 +34,10 @@
 #include <spine/TransformMode.h>
 #include <spine/Vector.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 #include <spine/Color.h>
 
-namespace Spine {
+namespace spine {
     class SkeletonData;
     class Atlas;
     class AttachmentLoader;
@@ -48,7 +48,7 @@ namespace Spine {
     class Animation;
     class CurveTimeline;
     
-    class SkeletonBinary : public SpineObject {
+    class SP_API SkeletonBinary : public SpineObject {
     public:
         static const int BONE_ROTATE;
         static const int BONE_TRANSLATE;

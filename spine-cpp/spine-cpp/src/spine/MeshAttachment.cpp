@@ -28,13 +28,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <spine/MeshAttachment.h>
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
 
-using namespace Spine;
+#include <spine/MeshAttachment.h>
+#include <spine/HasRendererObject.h>
+
+using namespace spine;
 
 RTTI_IMPL(MeshAttachment, VertexAttachment)
 
-MeshAttachment::MeshAttachment(const String &name) : VertexAttachment(name),
+MeshAttachment::MeshAttachment(const String &name) : VertexAttachment(name), HasRendererObject(),
 													 _regionOffsetX(0),
 													 _regionOffsetY(0),
 													 _regionWidth(0),
@@ -42,7 +47,6 @@ MeshAttachment::MeshAttachment(const String &name) : VertexAttachment(name),
 													 _regionOriginalWidth(0),
 													 _regionOriginalHeight(0),
 													 _parentMesh(NULL),
-													 _rendererObject(NULL),
 													 _path(),
 													 _regionU(0),
 													 _regionV(0),
@@ -55,6 +59,8 @@ MeshAttachment::MeshAttachment(const String &name) : VertexAttachment(name),
 													 _inheritDeform(false),
 													 _regionRotate(false) {
 }
+
+MeshAttachment::~MeshAttachment() {}
 
 void MeshAttachment::updateUVs() {
 	float u = _regionU, v = _regionV, width = _regionU2 - _regionU, height = _regionV2 - _regionV;
@@ -105,14 +111,6 @@ const String &MeshAttachment::getPath() {
 
 void MeshAttachment::setPath(const String &inValue) {
 	_path = inValue;
-}
-
-void *MeshAttachment::getRendererObject() {
-	return _rendererObject;
-}
-
-void MeshAttachment::setRendererObject(void *inValue) {
-	_rendererObject = inValue;
 }
 
 float MeshAttachment::getRegionU() {
@@ -250,6 +248,6 @@ void MeshAttachment::setHeight(float inValue) {
 	_height = inValue;
 }
 
-Spine::Color &MeshAttachment::getColor() {
+spine::Color &MeshAttachment::getColor() {
 	return _color;
 }

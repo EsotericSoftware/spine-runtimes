@@ -28,12 +28,15 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <spine/AnimationStateData.h>
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
 
+#include <spine/AnimationStateData.h>
 #include <spine/SkeletonData.h>
 #include <spine/Animation.h>
 
-using namespace Spine;
+using namespace spine;
 
 AnimationStateData::AnimationStateData(SkeletonData *skeletonData) : _skeletonData(skeletonData), _defaultMix(0) {
 }

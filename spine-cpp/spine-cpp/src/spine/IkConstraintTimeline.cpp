@@ -28,6 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/IkConstraintTimeline.h>
 
 #include <spine/Skeleton.h>
@@ -40,7 +44,7 @@
 #include <spine/IkConstraint.h>
 #include <spine/IkConstraintData.h>
 
-using namespace Spine;
+using namespace spine;
 
 RTTI_IMPL(IkConstraintTimeline, CurveTimeline)
 

@@ -33,8 +33,9 @@
 
 #include <spine/CurveTimeline.h>
 
-namespace Spine {
-    class PathConstraintPositionTimeline : public CurveTimeline {
+namespace spine {
+
+    class SP_API PathConstraintPositionTimeline : public CurveTimeline {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         
@@ -55,7 +56,8 @@ namespace Spine {
         void setFrame(int frameIndex, float time, float value);
         
     protected:
-        static const int PREV_TIME, PREV_VALUE;
+		static const int PREV_TIME;
+		static const int PREV_VALUE;
         static const int VALUE;
         
         Vector<float> _frames;

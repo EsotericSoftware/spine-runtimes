@@ -28,13 +28,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/TransformConstraintData.h>
 
 #include <spine/BoneData.h>
 
 #include <assert.h>
 
-using namespace Spine;
+using namespace spine;
 TransformConstraintData::TransformConstraintData(const String &name) :
 		_name(name),
 		_order(0),

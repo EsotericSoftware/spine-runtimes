@@ -28,15 +28,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/Atlas.h>
-
 #include <spine/TextureLoader.h>
-
 #include <spine/ContainerUtil.h>
 
 #include <ctype.h>
 
-using namespace Spine;
+using namespace spine;
 
 Atlas::Atlas(const String &path, TextureLoader *textureLoader) : _textureLoader(textureLoader) {
 	int dirLength;
@@ -71,7 +73,7 @@ Atlas::Atlas(const char *data, int length, const char *dir, TextureLoader *textu
 Atlas::~Atlas() {
 	if (_textureLoader) {
 		for (size_t i = 0, n = _pages.size(); i < n; ++i) {
-			_textureLoader->unload(_pages[i]->rendererObject);
+			_textureLoader->unload(_pages[i]->getRendererObject());
 		}
 	}
 	ContainerUtil::cleanUpVectorOfPointers(_pages);
@@ -95,6 +97,10 @@ AtlasRegion *Atlas::findRegion(const String &name) {
 	}
 
 	return NULL;
+}
+
+Vector<AtlasPage*> &Atlas::getPages() {
+	return _pages;
 }
 
 void Atlas::load(const char *begin, int length, const char *dir) {
@@ -133,15 +139,15 @@ void Atlas::load(const char *begin, int length, const char *dir) {
 			/* size is only optional for an atlas packed with an old TexturePacker. */
 			page->width = toInt(tuple);
 			page->height = toInt(tuple + 1);
-			assert(readTuple(&begin, end, tuple));
+			readTuple(&begin, end, tuple);
 
 			page->format = (Format) indexOf(formatNames, 8, tuple);
 
-			assert(readTuple(&begin, end, tuple));
+			readTuple(&begin, end, tuple);
 			page->minFilter = (TextureFilter) indexOf(textureFilterNames, 8, tuple);
 			page->magFilter = (TextureFilter) indexOf(textureFilterNames, 8, tuple + 1);
 
-			assert(readValue(&begin, end, &str));
+			readValue(&begin, end, &str);
 
 			page->uWrap = TextureWrap_ClampToEdge;
 			page->vWrap = TextureWrap_ClampToEdge;
@@ -169,14 +175,14 @@ void Atlas::load(const char *begin, int length, const char *dir) {
 			region->page = page;
 			region->name = String(mallocString(&str), true);
 
-			assert(readValue(&begin, end, &str));
+			readValue(&begin, end, &str);
 			region->rotate = equals(&str, "true") ? true : false;
 
-			assert(readTuple(&begin, end, tuple) == 2);
+			readTuple(&begin, end, tuple);
 			region->x = toInt(tuple);
 			region->y = toInt(tuple + 1);
 
-			assert(readTuple(&begin, end, tuple) == 2);
+			readTuple(&begin, end, tuple);
 			region->width = toInt(tuple);
 			region->height = toInt(tuple + 1);
 
@@ -212,7 +218,7 @@ void Atlas::load(const char *begin, int length, const char *dir) {
 					region->pads[2] = toInt(tuple + 2);
 					region->pads[3] = toInt(tuple + 3);
 
-					assert(readTuple(&begin, end, tuple));
+					readTuple(&begin, end, tuple);
 				}
 			}
 
@@ -223,7 +229,7 @@ void Atlas::load(const char *begin, int length, const char *dir) {
 			region->offsetX = (float)toInt(tuple);
 			region->offsetY = (float)toInt(tuple + 1);
 
-			assert(readValue(&begin, end, &str));
+			readValue(&begin, end, &str);
 
 			region->index = toInt(&str);
 

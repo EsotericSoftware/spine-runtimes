@@ -33,9 +33,9 @@
 
 #include <spine/Updatable.h>
 
-namespace Spine {
+namespace spine {
 /// The interface for all constraints.
-class Constraint : public Updatable {
+class SP_API Constraint : public Updatable {
 RTTI_DECL
 
 public:

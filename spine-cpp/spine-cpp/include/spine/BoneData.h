@@ -33,10 +33,10 @@
 
 #include <spine/TransformMode.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
-namespace Spine {
-class BoneData : public SpineObject {
+namespace spine {
+class SP_API BoneData : public SpineObject {
 	friend class SkeletonBinary;
 
 	friend class SkeletonJson;

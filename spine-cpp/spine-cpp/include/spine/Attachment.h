@@ -33,10 +33,10 @@
 
 #include <spine/RTTI.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
-namespace Spine {
-class Attachment : public SpineObject {
+namespace spine {
+class SP_API Attachment : public SpineObject {
 RTTI_DECL
 
 public:

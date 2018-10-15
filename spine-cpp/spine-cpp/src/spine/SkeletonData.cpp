@@ -28,6 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/SkeletonData.h>
 
 #include <spine/BoneData.h>
@@ -41,7 +45,7 @@
 
 #include <spine/ContainerUtil.h>
 
-using namespace Spine;
+using namespace spine;
 
 SkeletonData::SkeletonData() :
 		_name(),
@@ -88,7 +92,7 @@ Skin *SkeletonData::findSkin(const String &skinName) {
 	return ContainerUtil::findWithName(_skins, skinName);
 }
 
-EventData *SkeletonData::findEvent(const String &eventDataName) {
+spine::EventData *SkeletonData::findEvent(const String &eventDataName) {
 	return ContainerUtil::findWithName(_events, eventDataName);
 }
 
@@ -140,7 +144,7 @@ void SkeletonData::setDefaultSkin(Skin *inValue) {
 	_defaultSkin = inValue;
 }
 
-Vector<EventData *> &SkeletonData::getEvents() {
+Vector<spine::EventData *> &SkeletonData::getEvents() {
 	return _events;
 }
 

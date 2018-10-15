@@ -28,10 +28,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/SpineObject.h>
 #include <spine/Extension.h>
 
-using namespace Spine;
+using namespace spine;
+
+void *SpineObject::operator new(size_t sz) {
+	return SpineExtension::calloc<SpineObject>(sz, __FILE__, __LINE__);
+}
 
 void *SpineObject::operator new(size_t sz, const char *file, int line) {
 	return SpineExtension::calloc<SpineObject>(sz, file, line);

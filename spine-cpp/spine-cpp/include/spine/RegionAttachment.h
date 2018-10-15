@@ -36,14 +36,15 @@
 #include <spine/Color.h>
 
 #include <string>
+#include <spine/HasRendererObject.h>
 
 #define NUM_UVS 8
 
-namespace Spine {
+namespace spine {
     class Bone;
     
     /// Attachment that displays a texture region.
-    class RegionAttachment : public Attachment {
+    class SP_API RegionAttachment : public Attachment, public HasRendererObject {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         friend class AtlasAttachmentLoader;
@@ -62,6 +63,7 @@ namespace Spine {
         /// @param worldVertices The output world vertices. Must have a length greater than or equal to offset + 8.
         /// @param offset The worldVertices index to begin writing values.
         /// @param stride The number of worldVertices entries between the value pairs written.
+		void computeWorldVertices(Bone& bone, float *worldVertices, size_t offset, size_t stride = 2);
         void computeWorldVertices(Bone& bone, Vector<float>& worldVertices, size_t offset, size_t stride = 2);
         
         float getX();
@@ -83,24 +85,22 @@ namespace Spine {
 
         const String& getPath();
         void setPath(const String& inValue);
-        void* getRendererObject();
-        void setRendererObject(void* inValue);
+
         float getRegionOffsetX();
         void setRegionOffsetX(float inValue);
-        
-        // Pixels stripped from the bottom left, unrotated.
+
         float getRegionOffsetY();
         void setRegionOffsetY(float inValue);
+
         float getRegionWidth();
         void setRegionWidth(float inValue);
-        
-        // Unrotated, stripped size.
+
         float getRegionHeight();
         void setRegionHeight(float inValue);
+
         float getRegionOriginalWidth();
         void setRegionOriginalWidth(float inValue);
-        
-        // Unrotated, unstripped size.
+
         float getRegionOriginalHeight();
         void setRegionOriginalHeight(float inValue);
         
@@ -121,7 +121,6 @@ namespace Spine {
         float _regionOffsetX, _regionOffsetY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight;
         Vector<float> _vertexOffset;
         Vector<float> _uvs;
-        void* _rendererObject;
         String _path;
         float _regionU;
         float _regionV;

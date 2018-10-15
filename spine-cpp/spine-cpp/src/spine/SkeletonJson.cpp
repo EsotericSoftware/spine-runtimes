@@ -28,6 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/SkeletonJson.h>
 
 #include <spine/CurveTimeline.h>
@@ -75,7 +79,7 @@
 #define strdup _strdup
 #endif
 
-using namespace Spine;
+using namespace spine;
 
 SkeletonJson::SkeletonJson(Atlas *atlas) : _attachmentLoader(new(__FILE__, __LINE__) AtlasAttachmentLoader(atlas)),
 										   _scale(1), _ownsLoader(true) {
@@ -442,7 +446,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				Json *attachmentMap;
 
 				for (attachmentMap = attachmentsMap->_child; attachmentMap; attachmentMap = attachmentMap->_next) {
-					Attachment *attachment;
+					Attachment *attachment = NULL;
 					const char *skinAttachmentName = attachmentMap->_name;
 					const char *attachmentName = Json::getString(attachmentMap, "name", skinAttachmentName);
 					const char *attachmentPath = Json::getString(attachmentMap, "path", attachmentName);
@@ -500,12 +504,18 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 							}
 
 							region->updateOffset();
-
+							_attachmentLoader->configureAttachment(region);
 							break;
 						}
 						case AttachmentType_Mesh:
 						case AttachmentType_Linkedmesh: {
 							attachment = _attachmentLoader->newMeshAttachment(*skin, attachmentName, attachmentPath);
+
+							if (!attachment) {
+								delete skeletonData;
+								setError(root, "Error reading attachment: ", skinAttachmentName);
+								return NULL;
+							}
 
 							MeshAttachment *mesh = static_cast<MeshAttachment *>(attachment);
 							mesh->_path = attachmentPath;
@@ -553,6 +563,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 										mesh->_edges[ii] = entry->_valueInt;
 									}
 								}
+								_attachmentLoader->configureAttachment(mesh);
 							} else {
 								mesh->_inheritDeform = Json::getInt(attachmentMap, "deform", 1) ? true : false;
 								LinkedMesh *linkedMesh = new(__FILE__, __LINE__) LinkedMesh(mesh,
@@ -572,6 +583,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 
 							int vertexCount = Json::getInt(attachmentMap, "vertexCount", 0) << 1;
 							readVertices(attachmentMap, box, vertexCount);
+							_attachmentLoader->configureAttachment(attachment);
 							break;
 						}
 						case AttachmentType_Path: {
@@ -592,6 +604,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 							for (curves = curves->_child, ii = 0; curves; curves = curves->_next, ++ii) {
 								pathAttatchment->_lengths[ii] = curves->_valueFloat * _scale;
 							}
+							_attachmentLoader->configureAttachment(attachment);
 							break;
 						}
 						case AttachmentType_Point: {
@@ -602,6 +615,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 							point->_x = Json::getFloat(attachmentMap, "x", 0) * _scale;
 							point->_y = Json::getFloat(attachmentMap, "y", 0) * _scale;
 							point->_rotation = Json::getFloat(attachmentMap, "rotation", 0);
+							_attachmentLoader->configureAttachment(attachment);
 							break;
 						}
 						case AttachmentType_Clipping: {
@@ -617,6 +631,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 							}
 							vertexCount = Json::getInt(attachmentMap, "vertexCount", 0) << 1;
 							readVertices(attachmentMap, clip, vertexCount);
+							_attachmentLoader->configureAttachment(attachment);
 							break;
 						}
 					}
@@ -645,6 +660,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 		}
 		linkedMesh->_mesh->setParentMesh(static_cast<MeshAttachment *>(parent));
 		linkedMesh->_mesh->updateUVs();
+		_attachmentLoader->configureAttachment(linkedMesh->_mesh);
 	}
 	ContainerUtil::cleanUpVectorOfPointers(_linkedMeshes);
 	_linkedMeshes.clear();

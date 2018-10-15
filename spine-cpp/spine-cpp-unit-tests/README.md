@@ -1,6 +1,6 @@
 # spine-cpp-unit-tests
 
-The spine-cpp-unit-tests project is to test the [Spine](http://esotericsoftware.com) skeletal animation system. It does not perform rendering.  It is primarily used for regression testing and leak detection.  It is designed to be run from a Continuous Integration server and to passively verify changes automatically on check-in.
+The spine-cpp-unit-tests project is to test the [spine](http://esotericsoftware.com) skeletal animation system. It does not perform rendering.  It is primarily used for regression testing and leak detection.  It is designed to be run from a Continuous Integration server and to passively verify changes automatically on check-in.
 
 ## Mini CPP Unit Testing
 [MiniCppUnit](https://sourceforge.net/p/minicppunit/wiki/Home/) is a minimal unit testing framework similar to JUnit.  It is used here to avoid large dependancies.
@@ -42,9 +42,9 @@ msbuild spine_unit_test.sln /t:spine_unit_test /p:Configuration="Debug" /p:Platf
 
 
 ## Licensing
-This Spine Runtime may only be used for personal or internal use, typically to evaluate Spine before purchasing. If you would like to incorporate a Spine Runtime into your applications, distribute software containing a Spine Runtime, or modify a Spine Runtime, then you will need a valid [Spine license](https://esotericsoftware.com/spine-purchase). Please see the [Spine Runtimes Software License](https://github.com/EsotericSoftware/spine-runtimes/blob/master/LICENSE) for detailed information.
+This spine Runtime may only be used for personal or internal use, typically to evaluate spine before purchasing. If you would like to incorporate a spine Runtime into your applications, distribute software containing a spine Runtime, or modify a spine Runtime, then you will need a valid [spine license](https://esotericsoftware.com/spine-purchase). Please see the [spine Runtimes Software License](https://github.com/EsotericSoftware/spine-runtimes/blob/master/LICENSE) for detailed information.
 
-The Spine Runtimes are developed with the intent to be used with data exported from Spine. By purchasing Spine, `Section 2` of the [Spine Software License](https://esotericsoftware.com/files/license.txt) grants the right to create and distribute derivative works of the Spine Runtimes.
+The spine Runtimes are developed with the intent to be used with data exported from spine. By purchasing spine, `Section 2` of the [spine Software License](https://esotericsoftware.com/files/license.txt) grants the right to create and distribute derivative works of the spine Runtimes.
 
 original "walk"": 330
 second "walk": 0d0

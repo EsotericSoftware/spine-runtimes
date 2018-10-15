@@ -33,27 +33,27 @@
 
 #include <spine/HashMap.h>
 #include <spine/SpineObject.h>
-#include <spine/String.h>
+#include <spine/SpineString.h>
 
 #include <assert.h>
 
-namespace Spine {
+namespace spine {
     class SkeletonData;
     class Animation;
     
     /// Stores mix (crossfade) durations to be applied when AnimationState animations are changed.
-    class AnimationStateData : public SpineObject {
+    class SP_API AnimationStateData : public SpineObject {
         friend class AnimationState;
         
     public:
+		explicit AnimationStateData(SkeletonData* skeletonData);
+		
         /// The SkeletonData to look up animations when they are specified by name.
         SkeletonData* getSkeletonData();
         
         /// The mix duration to use when no mix duration has been specifically defined between two animations.
         float getDefaultMix();
         void setDefaultMix(float inValue);
-
-        explicit AnimationStateData(SkeletonData* skeletonData);
         
         /// Sets a mix duration by animation names.
         void setMix(const String& fromName, const String& toName, float duration);

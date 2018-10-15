@@ -28,15 +28,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <spine/Animation.h>
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
 
+#include <spine/Animation.h>
 #include <spine/Timeline.h>
 #include <spine/Skeleton.h>
 #include <spine/Event.h>
 
 #include <spine/ContainerUtil.h>
 
-using namespace Spine;
+using namespace spine;
 
 Animation::Animation(const String &name, Vector<Timeline *> &timelines, float duration) :
 		_timelines(timelines),

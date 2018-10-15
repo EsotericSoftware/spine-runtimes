@@ -28,6 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#ifdef SPINE_UE4
+#include "SpinePluginPrivatePCH.h"
+#endif
+
 #include <spine/PathConstraintData.h>
 
 #include <spine/BoneData.h>
@@ -35,7 +39,7 @@
 
 #include <assert.h>
 
-using namespace Spine;
+using namespace spine;
 
 PathConstraintData::PathConstraintData(const String &name) :
 		_name(name),
