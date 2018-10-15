@@ -46,25 +46,25 @@ void callback (AnimationState* state, EventType type, TrackEntry* entry, Event* 
 	const String& animationName = (entry && entry->getAnimation()) ? entry->getAnimation()->getName() : String("");
 
 	switch (type) {
-	case EventType_Start:
-		printf("%d start: %s\n", entry->getTrackIndex(), animationName.buffer());
-		break;
-	case EventType_Interrupt:
-		printf("%d interrupt: %s\n", entry->getTrackIndex(), animationName.buffer());
-		break;
-	case EventType_End:
-		printf("%d end: %s\n", entry->getTrackIndex(), animationName.buffer());
-		break;
-	case EventType_Complete:
-		printf("%d complete: %s\n", entry->getTrackIndex(), animationName.buffer());
-		break;
-	case EventType_Dispose:
-		printf("%d dispose: %s\n", entry->getTrackIndex(), animationName.buffer());
-		break;
-	case EventType_Event:
-		printf("%d event: %s, %s: %d, %f, %s %f %f\n", entry->getTrackIndex(), animationName.buffer(), event->getData().getName().buffer(), event->getIntValue(), event->getFloatValue(),
-				event->getStringValue().buffer(), event->getVolume(), event->getBalance());
-		break;
+		case EventType_Start:
+			printf("%d start: %s\n", entry->getTrackIndex(), animationName.buffer());
+			break;
+		case EventType_Interrupt:
+			printf("%d interrupt: %s\n", entry->getTrackIndex(), animationName.buffer());
+			break;
+		case EventType_End:
+			printf("%d end: %s\n", entry->getTrackIndex(), animationName.buffer());
+			break;
+		case EventType_Complete:
+			printf("%d complete: %s\n", entry->getTrackIndex(), animationName.buffer());
+			break;
+		case EventType_Dispose:
+			printf("%d dispose: %s\n", entry->getTrackIndex(), animationName.buffer());
+			break;
+		case EventType_Event:
+			printf("%d event: %s, %s: %d, %f, %s %f %f\n", entry->getTrackIndex(), animationName.buffer(), event->getData().getName().buffer(), event->getIntValue(), event->getFloatValue(),
+				   event->getStringValue().buffer(), event->getVolume(), event->getBalance());
+			break;
 	}
 	fflush(stdout);
 }
@@ -92,8 +92,8 @@ shared_ptr<SkeletonData> readSkeletonBinaryData (const char* filename, Atlas* at
 }
 
 void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
-		const char* jsonName, const char* binaryName, const char* atlasName,
-		float scale) {
+			   const char* jsonName, const char* binaryName, const char* atlasName,
+			   float scale) {
 	SFMLTextureLoader textureLoader;
 	auto atlas = make_unique<Atlas>(atlasName, &textureLoader);
 
