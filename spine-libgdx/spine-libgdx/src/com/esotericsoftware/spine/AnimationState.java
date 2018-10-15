@@ -1073,6 +1073,12 @@ public class AnimationState {
 			return mixingFrom;
 		}
 
+		/** The track entry for the next animation when mixing from this animation to the next animation, or null if no mixing is
+		 * currently occuring. When mixing to multiple animations, <code>mixingTo</code> makes up a linked list. */
+		public TrackEntry getMixingTo () {
+			return mixingTo;
+		}
+
 		public void setHoldPrevious (boolean holdPrevious) {
 			this.holdPrevious = holdPrevious;
 		}
