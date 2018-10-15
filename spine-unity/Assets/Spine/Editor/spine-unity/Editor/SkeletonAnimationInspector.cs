@@ -56,16 +56,12 @@ namespace Spine.Unity.Editor {
 			bool sameData = SpineInspectorUtility.TargetsUseSameData(serializedObject);
 
 			if (multi) {
-				foreach (var o in targets)		
-					TrySetAnimation(o, multi);
+				foreach (var o in targets)
+					TrySetAnimation(o as SkeletonAnimation, multi);
 				
 				EditorGUILayout.Space();
 				if (!sameData) {
-					#if UNITY_5_3_OR_NEWER
 					EditorGUILayout.DelayedTextField(animationName);
-					#else
-					animationName.stringValue = EditorGUILayout.TextField(animationName.displayName, animationName.stringValue);
-					#endif
 				} else {
 					EditorGUI.BeginChangeCheck();
 					EditorGUILayout.PropertyField(animationName);
@@ -78,7 +74,7 @@ namespace Spine.Unity.Editor {
 					component.timeScale = Mathf.Max(component.timeScale, 0);
 				}
 			} else {
-				TrySetAnimation(target, multi);
+				TrySetAnimation(target as SkeletonAnimation, multi);
 
 				EditorGUILayout.Space();
 				EditorGUI.BeginChangeCheck();
@@ -99,31 +95,33 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		protected void TrySetAnimation (Object o, bool multi) {
-			var skeletonAnimation = o as SkeletonAnimation;
+		protected void TrySetAnimation (SkeletonAnimation skeletonAnimation, bool multi) {
 			if (skeletonAnimation == null) return;
 			if (!skeletonAnimation.valid)
 				return;
 
 			if (!isInspectingPrefab) {
 				if (wasAnimationNameChanged) {
+					var skeleton = skeletonAnimation.Skeleton;
+					var state = skeletonAnimation.AnimationState;
+
 					if (!Application.isPlaying) {
-						if (skeletonAnimation.state != null) skeletonAnimation.state.ClearTrack(0);
-						skeletonAnimation.skeleton.SetToSetupPose();
+						if (state != null) state.ClearTrack(0);
+						skeleton.SetToSetupPose();
 					}
 
-					Spine.Animation animationToUse = skeletonAnimation.skeleton.Data.FindAnimation(animationName.stringValue);
+					Spine.Animation animationToUse = skeleton.Data.FindAnimation(animationName.stringValue);
 
 					if (!Application.isPlaying) {
-						if (animationToUse != null) animationToUse.PoseSkeleton(skeletonAnimation.Skeleton, 0f);
-						skeletonAnimation.Update(0);
+						if (animationToUse != null) animationToUse.PoseSkeleton(skeleton, 0f);
+						skeleton.UpdateWorldTransform();
 						skeletonAnimation.LateUpdate();
 						requireRepaint = true;
 					} else {
 						if (animationToUse != null)
-							skeletonAnimation.state.SetAnimation(0, animationToUse, loop.boolValue);
+							state.SetAnimation(0, animationToUse, loop.boolValue);
 						else
-							skeletonAnimation.state.ClearTrack(0);
+							state.ClearTrack(0);
 					}
 
 					wasAnimationNameChanged = false;
@@ -131,7 +129,7 @@ namespace Spine.Unity.Editor {
 
 				// Reflect animationName serialized property in the inspector even if SetAnimation API was used.
 				if (!multi && Application.isPlaying) {
-					TrackEntry current = skeletonAnimation.state.GetCurrent(0);
+					TrackEntry current = skeletonAnimation.AnimationState.GetCurrent(0);
 					if (current != null) {
 						if (skeletonAnimation.AnimationName != animationName.stringValue)
 							animationName.stringValue = current.Animation.Name;

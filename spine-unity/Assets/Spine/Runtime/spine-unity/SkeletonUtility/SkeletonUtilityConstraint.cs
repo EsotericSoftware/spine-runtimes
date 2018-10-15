@@ -28,25 +28,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-// Contributed by: Mitch Thompson
-
 using UnityEngine;
 
 namespace Spine.Unity {
 	[RequireComponent(typeof(SkeletonUtilityBone)), ExecuteInEditMode]
 	public abstract class SkeletonUtilityConstraint : MonoBehaviour {
 
-		protected SkeletonUtilityBone utilBone;
-		protected SkeletonUtility skeletonUtility;
+		protected SkeletonUtilityBone bone;
+		protected SkeletonUtility hierarchy;
 
 		protected virtual void OnEnable () {
-			utilBone = GetComponent<SkeletonUtilityBone>();
-			skeletonUtility = transform.GetComponentInParent<SkeletonUtility>();
-			skeletonUtility.RegisterConstraint(this);
+			bone = GetComponent<SkeletonUtilityBone>();
+			hierarchy = transform.GetComponentInParent<SkeletonUtility>();
+			hierarchy.RegisterConstraint(this);
 		}
 
 		protected virtual void OnDisable () {
-			skeletonUtility.UnregisterConstraint(this);
+			hierarchy.UnregisterConstraint(this);
 		}
 
 		public abstract void DoUpdate ();

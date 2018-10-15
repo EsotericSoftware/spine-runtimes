@@ -42,9 +42,7 @@ namespace Spine.Unity.Modules {
 		Vector3 centerPoint;
 
 		protected override void OnEnable () {
-			if (!Application.isPlaying)
-				return;
-
+			if (!Application.isPlaying) return;
 			base.OnEnable();
 
 			Bounds centerBounds = new Bounds(eyes[0].localPosition, Vector3.zero);
@@ -58,19 +56,14 @@ namespace Spine.Unity.Modules {
 		}
 
 		protected override void OnDisable () {
-			if (!Application.isPlaying)
-				return;
-
+			if (!Application.isPlaying) return;
 			base.OnDisable();
 		}
 
 		public override void DoUpdate () {
-
-			if (target != null)
-				targetPosition = target.position;
+			if (target != null) targetPosition = target.position;
 
 			Vector3 goal = targetPosition;
-
 			Vector3 center = transform.TransformPoint(centerPoint);
 			Vector3 dir = goal - center;
 

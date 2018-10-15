@@ -28,15 +28,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-// Contributed by: Mitch Thompson
-
 using UnityEngine;
 using Spine;
 
 namespace Spine.Unity {
 	/// <summary>Sets a GameObject's transform to match a bone on a Spine skeleton.</summary>
 	[ExecuteInEditMode]
-	[AddComponentMenu("Spine/SkeletonUtilityBone")]
+	[AddComponentMenu("Spine/SkeletonGameObjectsBone")]
 	public class SkeletonUtilityBone : MonoBehaviour {
 		public enum Mode {
 			Follow,
@@ -59,7 +57,7 @@ namespace Spine.Unity {
 		public float overrideAlpha = 1;
 		#endregion
 
-		[System.NonSerialized] public SkeletonUtility skeletonUtility;
+		[System.NonSerialized] public SkeletonUtility hierarchy;
 		[System.NonSerialized] public Bone bone;
 		[System.NonSerialized] public bool transformLerpComplete;
 		[System.NonSerialized] public bool valid;
@@ -71,23 +69,21 @@ namespace Spine.Unity {
 		public void Reset () {
 			bone = null;
 			cachedTransform = transform;
-			valid = skeletonUtility != null && skeletonUtility.skeletonRenderer != null && skeletonUtility.skeletonRenderer.valid;
+			valid = hierarchy != null && hierarchy.skeletonRenderer != null && hierarchy.skeletonRenderer.valid;
 			if (!valid)
 				return;
-			skeletonTransform = skeletonUtility.transform;
-			skeletonUtility.OnReset -= HandleOnReset;
-			skeletonUtility.OnReset += HandleOnReset;
+			skeletonTransform = hierarchy.transform;
+			hierarchy.OnReset -= HandleOnReset;
+			hierarchy.OnReset += HandleOnReset;
 			DoUpdate(UpdatePhase.Local);
 		}
 
 		void OnEnable () {
-			skeletonUtility = transform.GetComponentInParent<SkeletonUtility>();
+			hierarchy = transform.GetComponentInParent<SkeletonUtility>();
+			if (hierarchy == null) return;
 
-			if (skeletonUtility == null)
-				return;
-
-			skeletonUtility.RegisterBone(this);
-			skeletonUtility.OnReset += HandleOnReset;
+			hierarchy.RegisterBone(this);
+			hierarchy.OnReset += HandleOnReset;
 		}
 
 		void HandleOnReset () {
@@ -95,9 +91,9 @@ namespace Spine.Unity {
 		}
 
 		void OnDisable () {
-			if (skeletonUtility != null) {
-				skeletonUtility.OnReset -= HandleOnReset;
-				skeletonUtility.UnregisterBone(this);
+			if (hierarchy != null) {
+				hierarchy.OnReset -= HandleOnReset;
+				hierarchy.UnregisterBone(this);
 			}
 		}
 
@@ -107,7 +103,7 @@ namespace Spine.Unity {
 				return;
 			}
 
-			var skeleton = skeletonUtility.skeletonRenderer.skeleton;
+			var skeleton = hierarchy.skeletonRenderer.skeleton;
 
 			if (bone == null) {
 				if (string.IsNullOrEmpty(boneName)) return;

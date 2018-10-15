@@ -38,7 +38,8 @@ using Spine.Unity;
 
 namespace Spine.Unity.Playables {
 	public class SpineSkeletonFlipMixerBehaviour : PlayableBehaviour {
-		bool defaultFlipX, defaultFlipY;
+		float originalScaleX, originalScaleY;
+		float baseScaleX, baseScaleY;
 
 		SpinePlayableHandleBase playableHandle;
 		bool m_FirstFrameHappened;
@@ -52,8 +53,10 @@ namespace Spine.Unity.Playables {
 			var skeleton = playableHandle.Skeleton;
 
 			if (!m_FirstFrameHappened) {
-				defaultFlipX = skeleton.FlipX;
-				defaultFlipY = skeleton.FlipY;
+				originalScaleX = skeleton.ScaleX;
+				originalScaleY = skeleton.ScaleY;
+				baseScaleX = Mathf.Abs(originalScaleX);
+				baseScaleY = Mathf.Abs(originalScaleY);
 				m_FirstFrameHappened = true;
 			}
 
@@ -71,8 +74,7 @@ namespace Spine.Unity.Playables {
 				totalWeight += inputWeight;
 
 				if (inputWeight > greatestWeight) {
-					skeleton.FlipX = input.flipX;
-					skeleton.FlipY = input.flipY;
+					SetSkeletonScaleFromFlip(skeleton, input.flipX, input.flipY);
 					greatestWeight = inputWeight;
 				}
 
@@ -81,9 +83,14 @@ namespace Spine.Unity.Playables {
 			}
 
 			if (currentInputs != 1 && 1f - totalWeight > greatestWeight) {
-				skeleton.FlipX = defaultFlipX;
-				skeleton.FlipY = defaultFlipY;
+				skeleton.scaleX = originalScaleX;
+				skeleton.scaleY = originalScaleY;
 			}
+		}
+
+		public void SetSkeletonScaleFromFlip (Skeleton skeleton, bool flipX, bool flipY) {
+			skeleton.scaleX = flipX ? -baseScaleX : baseScaleX;
+			skeleton.scaleY = flipY ? -baseScaleY : baseScaleY;
 		}
 
 		public override void OnGraphStop (Playable playable) {
@@ -93,8 +100,8 @@ namespace Spine.Unity.Playables {
 				return;
 
 			var skeleton = playableHandle.Skeleton;
-			skeleton.FlipX = defaultFlipX;
-			skeleton.FlipY = defaultFlipY;
+			skeleton.scaleX = originalScaleX;
+			skeleton.scaleY = originalScaleY;
 		}
 	}
 

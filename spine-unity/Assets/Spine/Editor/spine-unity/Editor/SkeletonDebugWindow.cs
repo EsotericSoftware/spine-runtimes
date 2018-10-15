@@ -228,11 +228,11 @@ namespace Spine.Unity.Editor {
 							EditorGUI.EndDisabledGroup();
 
 							// Flip
-							EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(160f));
-							EditorGUILayout.LabelField("Scale", GUILayout.MaxWidth(EditorGUIUtility.labelWidth - 20f));
-							skeleton.ScaleX = EditorGUILayout.DelayedFloatField(".ScaleX", skeleton.ScaleX, GUILayout.MaxWidth(70f));
-							skeleton.ScaleY = EditorGUILayout.DelayedFloatField(".ScaleY", skeleton.ScaleY, GUILayout.MaxWidth(70f));
-							GUILayout.EndHorizontal();
+							skeleton.ScaleX = EditorGUILayout.DelayedFloatField(".ScaleX", skeleton.ScaleX);
+							skeleton.ScaleY = EditorGUILayout.DelayedFloatField(".ScaleY", skeleton.ScaleY);
+							//EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(160f));
+							////EditorGUILayout.LabelField("Scale", GUILayout.Width(EditorGUIUtility.labelWidth - 20f));
+							//GUILayout.EndHorizontal();
 
 							// Color
 							skeleton.SetColor(EditorGUILayout.ColorField(".R .G .B .A", skeleton.GetColor()));

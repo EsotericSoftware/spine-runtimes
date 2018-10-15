@@ -1165,15 +1165,13 @@ namespace Spine.Unity.Editor {
 
 			internal static readonly List<SkeletonComponentSpawnType> additionalSpawnTypes = new List<SkeletonComponentSpawnType>();
 
-			public static void IngestAdvancedRenderSettings (SkeletonRenderer skeletonRenderer) {
+			public static void TryInitializeSkeletonRendererSettings (SkeletonRenderer skeletonRenderer, Skin skin = null) {
 				const string PMAShaderQuery = "Spine/Skeleton";
 				const string TintBlackShaderQuery = "Tint Black";
 
-				if (skeletonRenderer == null)
-					return;
+				if (skeletonRenderer == null) return;
 				var skeletonDataAsset = skeletonRenderer.skeletonDataAsset;
-				if (skeletonDataAsset == null)
-					return;
+				if (skeletonDataAsset == null) return;
 
 				bool pmaVertexColors = false;
 				bool tintBlack = false;
@@ -1199,6 +1197,14 @@ namespace Spine.Unity.Editor {
 
 				skeletonRenderer.pmaVertexColors = pmaVertexColors;
 				skeletonRenderer.tintBlack = tintBlack;
+				skeletonRenderer.zSpacing = SpineEditorUtilities.Preferences.defaultZSpacing;
+
+				var data = skeletonDataAsset.GetSkeletonData(false);
+				bool noSkins = data.DefaultSkin == null && (data.Skins == null || data.Skins.Count == 0); // Support attachmentless/skinless SkeletonData.
+				skin = skin ?? data.DefaultSkin ?? (noSkins ? null : data.Skins.Items[0]);
+				if (skin != null && skin != data.DefaultSkin) {
+					skeletonRenderer.initialSkinName = skin.Name;
+				}
 			}
 
 			public static SkeletonAnimation InstantiateSkeletonAnimation (SkeletonDataAsset skeletonDataAsset, string skinName, bool destroyInvalid = true) {
@@ -1227,8 +1233,9 @@ namespace Spine.Unity.Editor {
 				GameObject go = new GameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(SkeletonAnimation));
 				SkeletonAnimation newSkeletonAnimation = go.GetComponent<SkeletonAnimation>();
 				newSkeletonAnimation.skeletonDataAsset = skeletonDataAsset;
-				IngestAdvancedRenderSettings(newSkeletonAnimation);
+				TryInitializeSkeletonRendererSettings(newSkeletonAnimation, skin);
 
+				// Initialize
 				try {
 					newSkeletonAnimation.Initialize(false);
 				} catch (System.Exception e) {
@@ -1238,16 +1245,6 @@ namespace Spine.Unity.Editor {
 					}
 					throw e;
 				}
-
-				// Set Defaults
-				bool noSkins = data.DefaultSkin == null && (data.Skins == null || data.Skins.Count == 0); // Support attachmentless/skinless SkeletonData.
-				skin = skin ?? data.DefaultSkin ?? (noSkins ? null : data.Skins.Items[0]);
-				if (skin != null) {
-					newSkeletonAnimation.initialSkinName = skin.Name;
-					newSkeletonAnimation.skeleton.SetSkin(skin);
-				}
-
-				newSkeletonAnimation.zSpacing = SpineEditorUtilities.Preferences.defaultZSpacing;
 
 				newSkeletonAnimation.skeleton.Update(0);
 				newSkeletonAnimation.state.Update(0);
@@ -1274,7 +1271,22 @@ namespace Spine.Unity.Editor {
 				return InstantiateSkeletonMecanim(skeletonDataAsset, skeletonDataAsset.GetSkeletonData(true).FindSkin(skinName));
 			}
 
-			public static SkeletonMecanim InstantiateSkeletonMecanim (SkeletonDataAsset skeletonDataAsset, Skin skin = null) {
+			public static SkeletonMecanim InstantiateSkeletonMecanim (SkeletonDataAsset skeletonDataAsset, Skin skin = null, bool destroyInvalid = true) {
+				SkeletonData data = skeletonDataAsset.GetSkeletonData(true);
+
+				if (data == null) {
+					for (int i = 0; i < skeletonDataAsset.atlasAssets.Length; i++) {
+						string reloadAtlasPath = AssetDatabase.GetAssetPath(skeletonDataAsset.atlasAssets[i]);
+						skeletonDataAsset.atlasAssets[i] = (AtlasAssetBase)AssetDatabase.LoadAssetAtPath(reloadAtlasPath, typeof(AtlasAssetBase));
+					}
+					data = skeletonDataAsset.GetSkeletonData(false);
+				}
+
+				if (data == null) {
+					Debug.LogWarning("InstantiateSkeletonMecanim tried to instantiate a skeleton from an invalid SkeletonDataAsset.");
+					return null;
+				}
+
 				string spineGameObjectName = string.Format("Spine Mecanim GameObject ({0})", skeletonDataAsset.name.Replace("_SkeletonData", ""));
 				GameObject go = new GameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(Animator), typeof(SkeletonMecanim));
 
@@ -1285,32 +1297,26 @@ namespace Spine.Unity.Editor {
 
 				go.GetComponent<Animator>().runtimeAnimatorController = skeletonDataAsset.controller;
 
-				SkeletonMecanim anim = go.GetComponent<SkeletonMecanim>();
-				anim.skeletonDataAsset = skeletonDataAsset;
-				IngestAdvancedRenderSettings(anim);
+				SkeletonMecanim newSkeletonMecanim = go.GetComponent<SkeletonMecanim>();
+				newSkeletonMecanim.skeletonDataAsset = skeletonDataAsset;
+				TryInitializeSkeletonRendererSettings(newSkeletonMecanim, skin);
 
-				SkeletonData data = skeletonDataAsset.GetSkeletonData(true);
-				if (data == null) {
-					for (int i = 0; i < skeletonDataAsset.atlasAssets.Length; i++) {
-						string reloadAtlasPath = AssetDatabase.GetAssetPath(skeletonDataAsset.atlasAssets[i]);
-						skeletonDataAsset.atlasAssets[i] = (AtlasAssetBase)AssetDatabase.LoadAssetAtPath(reloadAtlasPath, typeof(AtlasAssetBase));
+				// Initialize
+				try {
+					newSkeletonMecanim.Initialize(false);
+				} catch (System.Exception e) {
+					if (destroyInvalid) {
+						Debug.LogWarning("Editor-instantiated SkeletonAnimation threw an Exception. Destroying GameObject to prevent orphaned GameObject.");
+						GameObject.DestroyImmediate(go);
 					}
-					data = skeletonDataAsset.GetSkeletonData(true);
+					throw e;
 				}
 
-				// Set defaults
-				skin = skin ?? data.DefaultSkin ?? data.Skins.Items[0];
-				anim.zSpacing = SpineEditorUtilities.Preferences.defaultZSpacing;
+				newSkeletonMecanim.skeleton.Update(0);
+				newSkeletonMecanim.skeleton.UpdateWorldTransform();
+				newSkeletonMecanim.LateUpdate();
 
-				anim.Initialize(false);
-				anim.skeleton.SetSkin(skin);
-				anim.initialSkinName = skin.Name;
-
-				anim.skeleton.Update(0);
-				anim.skeleton.UpdateWorldTransform();
-				anim.LateUpdate();
-
-				return anim;
+				return newSkeletonMecanim;
 			}
 			#endif
 			#endregion

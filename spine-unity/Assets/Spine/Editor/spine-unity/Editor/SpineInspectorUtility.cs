@@ -165,8 +165,9 @@ namespace Spine.Unity.Editor {
 		public static GUIStyle GrayMiniLabel {
 			get {
 				if (grayMiniLabel == null) {
-					grayMiniLabel = new GUIStyle(EditorStyles.centeredGreyMiniLabel);
-					grayMiniLabel.alignment = TextAnchor.UpperLeft;
+					grayMiniLabel = new GUIStyle(EditorStyles.centeredGreyMiniLabel) {
+						alignment = TextAnchor.UpperLeft
+					};
 				}
 				return grayMiniLabel;
 			}
@@ -340,12 +341,6 @@ namespace Spine.Unity.Editor {
 			public SerializedSortingProperties (Renderer r) : this(new SerializedObject(r)) {}
 			public SerializedSortingProperties (Object[] renderers) : this(new SerializedObject(renderers)) {}
 
-			/// <summary>
-			/// Initializes a new instance of the
-			/// <see cref="Spine.Unity.Editor.SpineInspectorUtility.SerializedSortingProperties"/> struct.
-			/// </summary>
-			/// <param name="rendererSerializedObject">SerializedObject of the renderer. Use 
-			/// <see cref="Spine.Unity.Editor.SpineInspectorUtility.GetRenderersSerializedObject"/> to easily generate this.</param>
 			public SerializedSortingProperties (SerializedObject rendererSerializedObject) {
 				renderer = rendererSerializedObject;
 				sortingLayerID = renderer.FindProperty("m_SortingLayerID");

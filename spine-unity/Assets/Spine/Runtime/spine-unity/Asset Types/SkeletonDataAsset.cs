@@ -100,6 +100,13 @@ namespace Spine.Unity {
 			stateData = null;
 		}
 
+		public AnimationStateData GetAnimationStateData () {
+			if (stateData != null)
+				return stateData;
+			GetSkeletonData(false);
+			return stateData;
+		}
+
 		/// <summary>Loads, caches and returns the SkeletonData from the skeleton data file. Returns the cached SkeletonData after the first time it is called. Pass false to prevent direct errors from being logged.</summary>
 		public SkeletonData GetSkeletonData (bool quiet) {
 			if (skeletonJSON == null) {
@@ -187,6 +194,18 @@ namespace Spine.Unity {
 			FillStateData();
 		}
 
+		public void FillStateData () {
+			if (stateData != null) {
+				stateData.defaultMix = defaultMix;
+
+				for (int i = 0, n = fromAnimation.Length; i < n; i++) {
+					if (fromAnimation[i].Length == 0 || toAnimation[i].Length == 0)
+						continue;
+					stateData.SetMix(fromAnimation[i], toAnimation[i], duration[i]);
+				}
+			}
+		}
+
 		internal Atlas[] GetAtlasArray () {
 			var returnList = new System.Collections.Generic.List<Atlas>(atlasAssets.Length);
 			for (int i = 0; i < atlasAssets.Length; i++) {
@@ -213,25 +232,6 @@ namespace Spine.Unity {
 				Scale = scale
 			};
 			return json.ReadSkeletonData(input);
-		}
-
-		public void FillStateData () {
-			if (stateData != null) {
-				stateData.defaultMix = defaultMix;
-
-				for (int i = 0, n = fromAnimation.Length; i < n; i++) {
-					if (fromAnimation[i].Length == 0 || toAnimation[i].Length == 0)
-						continue;
-					stateData.SetMix(fromAnimation[i], toAnimation[i], duration[i]);
-				}
-			}
-		}
-
-		public AnimationStateData GetAnimationStateData () {
-			if (stateData != null)
-				return stateData;
-			GetSkeletonData(false);
-			return stateData;
 		}
 
 	}

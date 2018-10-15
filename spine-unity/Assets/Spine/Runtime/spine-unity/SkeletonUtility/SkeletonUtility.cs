@@ -37,7 +37,7 @@ using Spine;
 namespace Spine.Unity {
 	[RequireComponent(typeof(ISkeletonAnimation))]
 	[ExecuteInEditMode]
-	public class SkeletonUtility : MonoBehaviour {
+	public sealed class SkeletonUtility : MonoBehaviour {
 
 		#region BoundingBoxAttachment
 		public static PolygonCollider2D AddBoundingBoxGameObject (Skeleton skeleton, string skinName, string slotName, string attachmentName, Transform parent, bool isTrigger = true) {
@@ -122,23 +122,19 @@ namespace Spine.Unity {
 
 		void Update () {
 			var skeleton = skeletonRenderer.skeleton;
-			if (boneRoot != null && skeleton != null) {
+			if (skeleton != null && boneRoot != null) {
 				boneRoot.localScale = new Vector3(skeleton.scaleX, skeleton.scaleY, 1f);
 			}
 		}
 
-		[HideInInspector]
-		public SkeletonRenderer skeletonRenderer;
-		[HideInInspector]
-		public ISkeletonAnimation skeletonAnimation;
-		[System.NonSerialized]
-		public List<SkeletonUtilityBone> utilityBones = new List<SkeletonUtilityBone>();
-		[System.NonSerialized]
-		public List<SkeletonUtilityConstraint> utilityConstraints = new List<SkeletonUtilityConstraint>();
+		[HideInInspector] public SkeletonRenderer skeletonRenderer;
+		[HideInInspector] public ISkeletonAnimation skeletonAnimation;
+		[System.NonSerialized] public List<SkeletonUtilityBone> boneComponents = new List<SkeletonUtilityBone>();
+		[System.NonSerialized] public List<SkeletonUtilityConstraint> constraintComponents = new List<SkeletonUtilityConstraint>();
 
-		protected bool hasTransformBones;
-		protected bool hasUtilityConstraints;
-		protected bool needToReprocessBones;
+		bool hasOverrideBones;
+		bool hasConstraints;
+		bool needToReprocessBones;
 
 		void OnEnable () {
 			if (skeletonRenderer == null) {
@@ -176,36 +172,34 @@ namespace Spine.Unity {
 		}
 
 		void HandleRendererReset (SkeletonRenderer r) {
-			if (OnReset != null)
-				OnReset();
-
+			if (OnReset != null) OnReset();
 			CollectBones();
 		}
 
 		public void RegisterBone (SkeletonUtilityBone bone) {
-			if (utilityBones.Contains(bone))
+			if (boneComponents.Contains(bone)) {
 				return;
-			else {
-				utilityBones.Add(bone);
+			} else {
+				boneComponents.Add(bone);
 				needToReprocessBones = true;
 			}
 		}
 
 		public void UnregisterBone (SkeletonUtilityBone bone) {
-			utilityBones.Remove(bone);
+			boneComponents.Remove(bone);
 		}
 
 		public void RegisterConstraint (SkeletonUtilityConstraint constraint) {
-			if (utilityConstraints.Contains(constraint))
+			if (constraintComponents.Contains(constraint))
 				return;
 			else {
-				utilityConstraints.Add(constraint);
+				constraintComponents.Add(constraint);
 				needToReprocessBones = true;
 			}
 		}
 
 		public void UnregisterConstraint (SkeletonUtilityConstraint constraint) {
-			utilityConstraints.Remove(constraint);
+			constraintComponents.Remove(constraint);
 		}
 
 		public void CollectBones () {
@@ -222,31 +216,31 @@ namespace Spine.Unity {
 				for (int i = 0, n = transformConstraints.Count; i < n; i++)
 					constraintTargets.Add(transformConstraints.Items[i].target);
 
-				var utilityBones = this.utilityBones;
-				for (int i = 0, n = utilityBones.Count; i < n; i++) {
-					var b = utilityBones[i];
+				var boneComponents = this.boneComponents;
+				for (int i = 0, n = boneComponents.Count; i < n; i++) {
+					var b = boneComponents[i];
 					if (b.bone == null) continue;
-					hasTransformBones |= (b.mode == SkeletonUtilityBone.Mode.Override);
-					hasUtilityConstraints |= constraintTargets.Contains(b.bone);
+					hasOverrideBones |= (b.mode == SkeletonUtilityBone.Mode.Override);
+					hasConstraints |= constraintTargets.Contains(b.bone);
 				}
 
-				hasUtilityConstraints |= utilityConstraints.Count > 0;
+				hasConstraints |= constraintComponents.Count > 0;
 
 				if (skeletonAnimation != null) {
 					skeletonAnimation.UpdateWorld -= UpdateWorld;
 					skeletonAnimation.UpdateComplete -= UpdateComplete;
 
-					if (hasTransformBones || hasUtilityConstraints)
+					if (hasOverrideBones || hasConstraints)
 						skeletonAnimation.UpdateWorld += UpdateWorld;
 
-					if (hasUtilityConstraints)
+					if (hasConstraints)
 						skeletonAnimation.UpdateComplete += UpdateComplete;
 				}
 
 				needToReprocessBones = false;
 			} else {
-				utilityBones.Clear();
-				utilityConstraints.Clear();
+				boneComponents.Clear();
+				constraintComponents.Clear();
 			}
 		}
 
@@ -254,18 +248,18 @@ namespace Spine.Unity {
 			if (needToReprocessBones)
 				CollectBones();
 
-			var utilityBones = this.utilityBones;
-			if (utilityBones == null) return;
-			for (int i = 0, n = utilityBones.Count; i < n; i++)
-				utilityBones[i].transformLerpComplete = false;
+			var boneComponents = this.boneComponents;
+			if (boneComponents == null) return;
+			for (int i = 0, n = boneComponents.Count; i < n; i++)
+				boneComponents[i].transformLerpComplete = false;
 
 			UpdateAllBones(SkeletonUtilityBone.UpdatePhase.Local);
 		}
 
 		void UpdateWorld (ISkeletonAnimation anim) {
 			UpdateAllBones(SkeletonUtilityBone.UpdatePhase.World);
-			for (int i = 0, n = utilityConstraints.Count; i < n; i++)
-				utilityConstraints[i].DoUpdate();
+			for (int i = 0, n = constraintComponents.Count; i < n; i++)
+				constraintComponents[i].DoUpdate();
 		}
 
 		void UpdateComplete (ISkeletonAnimation anim) {
@@ -276,17 +270,17 @@ namespace Spine.Unity {
 			if (boneRoot == null)
 				CollectBones();
 
-			var utilityBones = this.utilityBones;
-			if (utilityBones == null) return;
-			for (int i = 0, n = utilityBones.Count; i < n; i++)
-				utilityBones[i].DoUpdate(phase);
+			var boneComponents = this.boneComponents;
+			if (boneComponents == null) return;
+			for (int i = 0, n = boneComponents.Count; i < n; i++)
+				boneComponents[i].DoUpdate(phase);
 		}
 
 		public Transform GetBoneRoot () {
 			if (boneRoot != null)
 				return boneRoot;
 
-			boneRoot = new GameObject("SkeletonUtility-Root").transform;
+			boneRoot = new GameObject("SkeletonUtility-SkeletonRoot").transform;
 			boneRoot.parent = transform;
 			boneRoot.localPosition = Vector3.zero;
 			boneRoot.localRotation = Quaternion.identity;
@@ -326,10 +320,11 @@ namespace Spine.Unity {
 
 		public GameObject SpawnBone (Bone bone, Transform parent, SkeletonUtilityBone.Mode mode, bool pos, bool rot, bool sca) {
 			GameObject go = new GameObject(bone.Data.Name);
-			go.transform.parent = parent;
+			var goTransform = go.transform;
+			goTransform.parent = parent;
 
 			SkeletonUtilityBone b = go.AddComponent<SkeletonUtilityBone>();
-			b.skeletonUtility = this;
+			b.hierarchy = this;
 			b.position = pos;
 			b.rotation = rot;
 			b.scale = sca;
@@ -341,13 +336,9 @@ namespace Spine.Unity {
 			b.valid = true;
 
 			if (mode == SkeletonUtilityBone.Mode.Override) {
-				if (rot)
-					go.transform.localRotation = Quaternion.Euler(0, 0, b.bone.AppliedRotation);
-
-				if (pos)
-					go.transform.localPosition = new Vector3(b.bone.X, b.bone.Y, 0);
-
-				go.transform.localScale = new Vector3(b.bone.scaleX, b.bone.scaleY, 0);
+				if (rot) goTransform.localRotation = Quaternion.Euler(0, 0, b.bone.AppliedRotation);
+				if (pos) goTransform.localPosition = new Vector3(b.bone.X, b.bone.Y, 0);
+				goTransform.localScale = new Vector3(b.bone.scaleX, b.bone.scaleY, 0);
 			}
 
 			return go;

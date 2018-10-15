@@ -149,17 +149,23 @@ namespace Spine.Unity {
 		/// <param name="startsWith">Filters popup results to elements that begin with supplied string.</param>
 		/// <param name = "includeNone">If true, the dropdown list will include a "none" option which stored as an empty string.</param>
 		/// <param name = "fallbackToTextField">If true, and an animation list source can't be found, the field will fall back to a normal text field. If false, it will show an error.</param>
+		/// <param name = "defaultAsEmptyString">If true, the default choice will be serialized as an empty string.</param>
 		/// <param name="dataField">If specified, a locally scoped field with the name supplied by in dataField will be used to fill the popup results.
 		/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives)
 		/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
 		/// </param>
-		public SpineSkin (string startsWith = "", string dataField = "", bool includeNone = true, bool fallbackToTextField = false) {
+
+		public bool defaultAsEmptyString = false;
+
+		public SpineSkin (string startsWith = "", string dataField = "", bool includeNone = true, bool fallbackToTextField = false, bool defaultAsEmptyString = false) {
 			this.startsWith = startsWith;
 			this.dataField = dataField;
 			this.includeNone = includeNone;
 			this.fallbackToTextField = fallbackToTextField;
+			this.defaultAsEmptyString = defaultAsEmptyString;
 		}
 	}
+
 	public class SpineAnimation : SpineAttributeBase {
 		/// <summary>
 		/// Smart popup menu for Spine Animations

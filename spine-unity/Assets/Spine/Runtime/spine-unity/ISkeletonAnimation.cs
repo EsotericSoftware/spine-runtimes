@@ -36,8 +36,6 @@ namespace Spine.Unity {
 		event UpdateBonesDelegate UpdateLocal;
 		event UpdateBonesDelegate UpdateWorld;
 		event UpdateBonesDelegate UpdateComplete;
-
-		//void LateUpdate ();
 		Skeleton Skeleton { get; }
 	}
 

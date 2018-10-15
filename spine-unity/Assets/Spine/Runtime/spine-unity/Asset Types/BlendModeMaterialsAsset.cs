@@ -52,67 +52,77 @@ namespace Spine.Unity {
 		public static void ApplyMaterials (SkeletonData skeletonData, Material multiplyTemplate, Material screenTemplate, Material additiveTemplate, bool includeAdditiveSlots) {
 			if (skeletonData == null) throw new ArgumentNullException("skeletonData");
 
-			var atlasPageMaterialCache = new Dictionary<KeyValuePair<AtlasPage, Material>, AtlasPage>();
-			var attachmentBuffer = new List<Attachment>();
-			var slotsItems = skeletonData.Slots.Items;
-			for (int i = 0, slotCount = skeletonData.Slots.Count; i < slotCount; i++) {
-				var slot = slotsItems[i];
-				if (slot.blendMode == BlendMode.Normal) continue;
-				if (!includeAdditiveSlots && slot.blendMode == BlendMode.Additive) continue;
+			using (var materialCache = new AtlasMaterialCache()) {
+				var attachmentBuffer = new List<Attachment>();
+				var slotsItems = skeletonData.Slots.Items;
+				for (int i = 0, slotCount = skeletonData.Slots.Count; i < slotCount; i++) {
+					var slot = slotsItems[i];
+					if (slot.blendMode == BlendMode.Normal) continue;
+					if (!includeAdditiveSlots && slot.blendMode == BlendMode.Additive) continue;
 
-				attachmentBuffer.Clear();
-				foreach (var skin in skeletonData.Skins)
-					skin.FindAttachmentsForSlot(i, attachmentBuffer);
+					attachmentBuffer.Clear();
+					foreach (var skin in skeletonData.Skins)
+						skin.FindAttachmentsForSlot(i, attachmentBuffer);
 
-				Material templateMaterial = null;
-				switch (slot.blendMode) {
-					case BlendMode.Multiply:
-						templateMaterial = multiplyTemplate;
-						break;
-					case BlendMode.Screen:
-						templateMaterial = screenTemplate;
-						break;
-					case BlendMode.Additive:
-						templateMaterial = additiveTemplate;
-						break;
-				}
-				if (templateMaterial == null) continue;
+					Material templateMaterial = null;
+					switch (slot.blendMode) {
+						case BlendMode.Multiply:
+							templateMaterial = multiplyTemplate;
+							break;
+						case BlendMode.Screen:
+							templateMaterial = screenTemplate;
+							break;
+						case BlendMode.Additive:
+							templateMaterial = additiveTemplate;
+							break;
+					}
+					if (templateMaterial == null) continue;
 
-				foreach (var attachment in attachmentBuffer) {
-					var renderableAttachment = attachment as IHasRendererObject;
-					if (renderableAttachment != null) {
-						renderableAttachment.RendererObject = AtlasRegionCloneWithMaterial((AtlasRegion)renderableAttachment.RendererObject, templateMaterial, atlasPageMaterialCache);
+					foreach (var attachment in attachmentBuffer) {
+						var renderableAttachment = attachment as IHasRendererObject;
+						if (renderableAttachment != null) {
+							renderableAttachment.RendererObject = materialCache.CloneAtlasRegionWithMaterial((AtlasRegion)renderableAttachment.RendererObject, templateMaterial);
+						}
 					}
 				}
+
 			}
-			//atlasPageMaterialCache.Clear();
 			//attachmentBuffer.Clear();
 		}
 
-		static AtlasRegion AtlasRegionCloneWithMaterial (AtlasRegion originalRegion, Material materialTemplate, Dictionary<KeyValuePair<AtlasPage, Material>, AtlasPage> cache) {
-			var newRegion = originalRegion.Clone();
-			newRegion.page = GetAtlasPageWithMaterial(originalRegion.page, materialTemplate, cache);
-			return newRegion;
-		}
+		class AtlasMaterialCache : IDisposable {
+			readonly Dictionary<KeyValuePair<AtlasPage, Material>, AtlasPage> cache = new Dictionary<KeyValuePair<AtlasPage, Material>, AtlasPage>();
 
-		static AtlasPage GetAtlasPageWithMaterial (AtlasPage originalPage, Material materialTemplate, Dictionary<KeyValuePair<AtlasPage, Material>, AtlasPage> cache) {
-			if (originalPage == null) throw new ArgumentNullException("originalPage");
-
-			AtlasPage newPage = null;
-			var key = new KeyValuePair<AtlasPage, Material>(originalPage, materialTemplate);
-			cache.TryGetValue(key, out newPage);
-
-			if (newPage == null) {
-				newPage = originalPage.Clone();
-				var originalMaterial = originalPage.rendererObject as Material;
-				newPage.rendererObject = new Material(materialTemplate) {
-					name = originalMaterial.name + " " + materialTemplate.name,
-					mainTexture = originalMaterial.mainTexture
-				};
-				cache.Add(key, newPage);
+			/// <summary>Creates a clone of an AtlasRegion that uses different Material settings, while retaining the original texture.</summary>
+			public AtlasRegion CloneAtlasRegionWithMaterial (AtlasRegion originalRegion, Material materialTemplate) {
+				var newRegion = originalRegion.Clone();
+				newRegion.page = GetAtlasPageWithMaterial(originalRegion.page, materialTemplate);
+				return newRegion;
 			}
 
-			return newPage;
+			AtlasPage GetAtlasPageWithMaterial (AtlasPage originalPage, Material materialTemplate) {
+				if (originalPage == null) throw new ArgumentNullException("originalPage");
+
+				AtlasPage newPage = null;
+				var key = new KeyValuePair<AtlasPage, Material>(originalPage, materialTemplate);
+				cache.TryGetValue(key, out newPage);
+
+				if (newPage == null) {
+					newPage = originalPage.Clone();
+					var originalMaterial = originalPage.rendererObject as Material;
+					newPage.rendererObject = new Material(materialTemplate) {
+						name = originalMaterial.name + " " + materialTemplate.name,
+						mainTexture = originalMaterial.mainTexture
+					};
+					cache.Add(key, newPage);
+				}
+
+				return newPage;
+			}
+
+			public void Dispose () {
+				cache.Clear();
+			}
 		}
 	
 	}

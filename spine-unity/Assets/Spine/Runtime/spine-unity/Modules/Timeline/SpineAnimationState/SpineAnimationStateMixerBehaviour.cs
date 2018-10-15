@@ -105,6 +105,9 @@ namespace Spine.Unity.Playables {
 		}
 
 		#if SPINE_EDITMODEPOSE
+
+		AnimationState dummyAnimationState;
+
 		public void PreviewEditModePose (Playable playable, SkeletonAnimation spineComponent) {
 			if (Application.isPlaying) return;
 			if (spineComponent == null) return;
@@ -150,11 +153,28 @@ namespace Spine.Unity.Playables {
 
 				// Approximate what AnimationState might do at runtime.
 				if (fromAnimation != null && mixDuration > 0 && toClipTime < mixDuration) {
+					dummyAnimationState = dummyAnimationState ?? new AnimationState(spineComponent.skeletonDataAsset.GetAnimationStateData());
+
+					var toTrack = dummyAnimationState.GetCurrent(0);
+					var fromTrack = toTrack != null ? toTrack.mixingFrom : null;
+					bool isAnimationTransitionMatch = (toTrack != null && toTrack.animation == toAnimation && fromTrack != null && fromTrack.animation == fromAnimation);
+					
+					if (!isAnimationTransitionMatch) {
+						dummyAnimationState.ClearTracks();
+						fromTrack = dummyAnimationState.SetAnimation(0, fromAnimation, fromClipLoop);
+						fromTrack.AllowImmediateQueue();
+						toTrack = dummyAnimationState.SetAnimation(0, toAnimation, clipData.loop);
+					}
+
+					// Update track times.
+					fromTrack.trackTime = fromClipTime;
+					toTrack.trackTime = toClipTime;
+					toTrack.mixTime = toClipTime;
+					
+					// Apply Pose
 					skeleton.SetToSetupPose();
-					float fauxFromAlpha = (1f - toClipTime/mixDuration);
-					fauxFromAlpha = fauxFromAlpha > 0.5f ? 1f : fauxFromAlpha * 2f;  // fake value, but reduce dip.
-					fromAnimation.Apply(skeleton, 0, fromClipTime, fromClipLoop, null, fauxFromAlpha, MixBlend.Setup, MixDirection.Out); //fromAnimation.PoseSkeleton(skeleton, fromClipTime, fromClipLoop);
-					toAnimation.Apply(skeleton, 0, toClipTime, clipData.loop, null, toClipTime/mixDuration, MixBlend.Replace, MixDirection.In);
+					dummyAnimationState.Update(0);
+					dummyAnimationState.Apply(skeleton);
 				} else {
 					skeleton.SetToSetupPose();
 					toAnimation.PoseSkeleton(skeleton, toClipTime, clipData.loop);
