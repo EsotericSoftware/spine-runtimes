@@ -171,7 +171,7 @@ public class AnimationState {
 		from.trackLast = from.nextTrackLast;
 
 		// Require mixTime > 0 to ensure the mixing from entry was applied at least once.
-		if (to.mixTime > 0 && (to.mixTime >= to.mixDuration || to.timeScale == 0)) {
+		if (to.mixTime > 0 && to.mixTime >= to.mixDuration) {
 			// Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame).
 			if (from.totalAlpha == 0 || to.mixDuration == 0) {
 				to.mixingFrom = from.mixingFrom;
@@ -180,6 +180,13 @@ public class AnimationState {
 				queue.end(from);
 			}
 			return finished;
+		}
+
+		// If to has 0 timeScale and is not the first entry, remove the mix and apply it one more time to return to the setup pose.
+		if (to.timeScale == 0 && to.mixingTo != null) {
+			to.timeScale = 1;
+			to.mixTime = 0;
+			to.mixDuration = 0;
 		}
 
 		from.trackTime += delta * from.timeScale;
