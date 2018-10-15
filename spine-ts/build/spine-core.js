@@ -1367,7 +1367,7 @@ var spine;
 			var finished = this.updateMixingFrom(from, delta);
 			from.animationLast = from.nextAnimationLast;
 			from.trackLast = from.nextTrackLast;
-			if (to.mixTime > 0 && (to.mixTime >= to.mixDuration || to.timeScale == 0)) {
+			if (to.mixTime > 0 && to.mixTime >= to.mixDuration) {
 				if (from.totalAlpha == 0 || to.mixDuration == 0) {
 					to.mixingFrom = from.mixingFrom;
 					if (from.mixingFrom != null)
@@ -1376,6 +1376,11 @@ var spine;
 					this.queue.end(from);
 				}
 				return finished;
+			}
+			if (to.timeScale == 0 && to.mixingTo != null) {
+				to.timeScale = 1;
+				to.mixTime = 0;
+				to.mixDuration = 0;
 			}
 			from.trackTime += delta * from.timeScale;
 			to.mixTime += delta * to.timeScale;
