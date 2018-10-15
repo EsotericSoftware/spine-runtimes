@@ -495,7 +495,8 @@ public class AnimationState {
 		return setAnimation(trackIndex, animation, loop);
 	}
 
-	/** Sets the current animation for a track, discarding any queued animations.
+	/** Sets the current animation for a track, discarding any queued animations. If the formerly current track entry was never
+	 * applied to a skeleton, it is replaced (not mixed from).
 	 * @param loop If true, the animation will repeat. If false it will not, instead its last frame is applied if played beyond its
 	 *           duration. In either case {@link TrackEntry#getTrackEnd()} determines when the track is cleared.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
@@ -816,6 +817,7 @@ public class AnimationState {
 		float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
 		float alpha, mixTime, mixDuration, interruptAlpha, totalAlpha;
 		MixBlend mixBlend = MixBlend.replace;
+
 		final IntArray timelineMode = new IntArray();
 		final Array<TrackEntry> timelineHoldMix = new Array();
 		final FloatArray timelinesRotation = new FloatArray();
