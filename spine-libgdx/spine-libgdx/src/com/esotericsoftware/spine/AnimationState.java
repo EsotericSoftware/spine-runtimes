@@ -171,7 +171,7 @@ public class AnimationState {
 		from.trackLast = from.nextTrackLast;
 
 		// Require mixTime > 0 to ensure the mixing from entry was applied at least once.
-		if (to.mixTime > 0 && (to.mixTime >= to.mixDuration || to.timeScale == 0)) {
+		if (to.mixTime > 0 && to.mixTime >= to.mixDuration) {
 			// Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame).
 			if (from.totalAlpha == 0 || to.mixDuration == 0) {
 				to.mixingFrom = from.mixingFrom;
@@ -180,6 +180,13 @@ public class AnimationState {
 				queue.end(from);
 			}
 			return finished;
+		}
+
+		// If to has 0 timeScale and is not the first entry, remove the mix and apply it one more time to return to the setup pose.
+		if (to.timeScale == 0 && to.mixingTo != null) {
+			to.timeScale = 1;
+			to.mixTime = 0;
+			to.mixDuration = 0;
 		}
 
 		from.trackTime += delta * from.timeScale;
@@ -488,7 +495,8 @@ public class AnimationState {
 		return setAnimation(trackIndex, animation, loop);
 	}
 
-	/** Sets the current animation for a track, discarding any queued animations.
+	/** Sets the current animation for a track, discarding any queued animations. If the formerly current track entry was never
+	 * applied to a skeleton, it is replaced (not mixed from).
 	 * @param loop If true, the animation will repeat. If false it will not, instead its last frame is applied if played beyond its
 	 *           duration. In either case {@link TrackEntry#getTrackEnd()} determines when the track is cleared.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
@@ -809,6 +817,7 @@ public class AnimationState {
 		float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
 		float alpha, mixTime, mixDuration, interruptAlpha, totalAlpha;
 		MixBlend mixBlend = MixBlend.replace;
+
 		final IntArray timelineMode = new IntArray();
 		final Array<TrackEntry> timelineHoldMix = new Array();
 		final FloatArray timelinesRotation = new FloatArray();
@@ -1064,6 +1073,12 @@ public class AnimationState {
 		 * mixing is currently occuring. When mixing from multiple animations, <code>mixingFrom</code> makes up a linked list. */
 		public TrackEntry getMixingFrom () {
 			return mixingFrom;
+		}
+
+		/** The track entry for the next animation when mixing from this animation to the next animation, or null if no mixing is
+		 * currently occuring. When mixing to multiple animations, <code>mixingTo</code> makes up a linked list. */
+		public TrackEntry getMixingTo () {
+			return mixingTo;
 		}
 
 		public void setHoldPrevious (boolean holdPrevious) {
