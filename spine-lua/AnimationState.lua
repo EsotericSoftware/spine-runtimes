@@ -413,6 +413,7 @@ function AnimationState:apply (skeleton)
 			end
 			self:queueEvents(current, animationTime)
 			self.events = {};
+			events = self.events;
 			current.nextAnimationLast = animationTime
 			current.nextTrackLast = current.trackTime
 		end
