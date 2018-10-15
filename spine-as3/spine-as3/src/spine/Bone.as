@@ -92,31 +92,19 @@ package spine {
 			var rotationY : Number = 0, la : Number = 0, lb : Number = 0, lc : Number = 0, ld : Number = 0;
 			var sin : Number = 0, cos : Number = 0;
 			var s : Number = 0;
+			var sx : Number = _skeleton.scaleX;
+			var sy : Number = _skeleton.scaleY * (yDown ? -1 : 1);
 
 			var parent : Bone = _parent;
 			if (!parent) { // Root bone.
-				rotationY = rotation + 90 + shearY;
-				la = MathUtils.cosDeg(rotation + shearX) * scaleX;
-				lb = MathUtils.cosDeg(rotationY) * scaleY;
-				lc = MathUtils.sinDeg(rotation + shearX) * scaleX;
-				ld = MathUtils.sinDeg(rotationY) * scaleY;
-				var skeleton : Skeleton = _skeleton;
-				if (skeleton.flipX) {
-					x = -x;
-					la = -la;
-					lb = -lb;
-				}
-				if (skeleton.flipY != yDown) {
-					y = -y;
-					lc = -lc;
-					ld = -ld;
-				}
-				this.a = la;
-				this.b = lb;
-				this.c = lc;
-				this.d = ld;
-				worldX = x + skeleton.x;
-				worldY = y + skeleton.y;
+				rotationY = rotation + 90 + shearY;				
+				var skeleton : Skeleton = _skeleton;								
+				this.a = MathUtils.cosDeg(rotation + shearX) * scaleX * sx;
+				this.b = MathUtils.cosDeg(rotationY) * scaleY * sy;
+				this.c = MathUtils.sinDeg(rotation + shearX) * scaleX * sx;
+				this.d = MathUtils.sinDeg(rotationY) * scaleY * sy;
+				worldX = x * sx + skeleton.x;
+				worldY = y * sy + skeleton.y;
 				return;
 			}
 
@@ -174,8 +162,8 @@ package spine {
 				case TransformMode.noScaleOrReflection: {
 					cos = MathUtils.cosDeg(rotation);
 					sin = MathUtils.sinDeg(rotation);
-					var za : Number = pa * cos + pb * sin;
-					var zc : Number = pc * cos + pd * sin;
+					var za : Number = (pa * cos + pb * sin) / sx;
+					var zc : Number = (pc * cos + pd * sin) / sy;
 					s = Math.sqrt(za * za + zc * zc);
 					if (s > 0.00001) s = 1 / s;
 					za *= s;
@@ -187,26 +175,18 @@ package spine {
 					la = MathUtils.cosDeg(shearX) * scaleX;
 					lb = MathUtils.cosDeg(90 + shearY) * scaleY;
 					lc = MathUtils.sinDeg(shearX) * scaleX;
-					ld = MathUtils.sinDeg(90 + shearY) * scaleY;
-					if (this.data.transformMode != TransformMode.noScaleOrReflection ? pa * pd - pb * pc < 0 : this.skeleton.flipX != this.skeleton.flipY) {
-						zb = -zb;
-						zd = -zd;
-					}
+					ld = MathUtils.sinDeg(90 + shearY) * scaleY;					
 					this.a = za * la + zb * lc;
 					this.b = za * lb + zb * ld;
 					this.c = zc * la + zd * lc;
 					this.d = zc * lb + zd * ld;					
-					return;
+					break;
 				}
 			}
-			if (_skeleton.flipX) {
-				this.a = -this.a;
-				this.b = -this.b;
-			}
-			if (_skeleton.flipY != yDown) {
-				this.c = -this.c;
-				this.d = -this.d;
-			}
+			this.a *= sx;
+			this.b *= sx;
+			this.c *= sy;
+			this.d *= sy;
 		}
 
 		public function setToSetupPose() : void {

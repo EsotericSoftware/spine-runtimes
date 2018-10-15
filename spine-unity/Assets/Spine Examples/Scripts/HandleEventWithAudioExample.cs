@@ -70,10 +70,14 @@ namespace Spine.Unity.Examples {
 			//bool eventMatch = string.Equals(e.Data.Name, eventName, System.StringComparison.Ordinal); // Testing recommendation: String compare.
 			bool eventMatch = (eventData == e.Data); // Performance recommendation: Match cached reference instead of string.
 			if (eventMatch) {
-				audioSource.pitch = basePitch + Random.Range(-randomPitchOffset, randomPitchOffset);
-				audioSource.clip = audioClip;
-				audioSource.Play();
+				Play();
 			}
+		}
+
+		public void Play () {
+			audioSource.pitch = basePitch + Random.Range(-randomPitchOffset, randomPitchOffset);
+			audioSource.clip = audioClip;
+			audioSource.Play();
 		}
 	}
 

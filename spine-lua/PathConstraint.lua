@@ -78,7 +78,7 @@ function PathConstraint.new (data, skeleton)
 	}
 	setmetatable(self, PathConstraint)
 
-	for i,boneData in ipairs(data.bones) do
+	for _,boneData in ipairs(data.bones) do
 		table_insert(self.bones, skeleton:findBone(boneData.name))
 	end
 
@@ -99,9 +99,8 @@ function PathConstraint:update ()
 	local rotate = rotateMix > 0
 	if not translate and not rotate then return end
 
-	local data = self.data;
-	local spacingMode = data.spacingMode
-	local lengthSpacing = spacingMode == PathConstraintData.SpacingMode.length
+	local data = self.data;	
+	local percentSpacing = data.spacingMode == PathConstraintData.SpacingMode.percent
 	local rotateMode = data.rotateMode
 	local tangents = rotateMode == PathConstraintData.RotateMode.tangent
 	local scale = rotateMode == PathConstraintData.RotateMode.chainscale
@@ -112,8 +111,9 @@ function PathConstraint:update ()
 	local spaces = utils.setArraySize(self.spaces, spacesCount)
 	local lengths = nil
 	local spacing = self.spacing
-	if scale or lengthSpacing then
+	if scale or not percentSpacing then
 		if scale then lengths = utils.setArraySize(self.lengths, boneCount) end
+		local lengthSpacing = data.spacingMode == PathConstraintData.SpacingMode.length
 		local i = 0
 		local n = spacesCount - 1
 		while i < n do
@@ -123,6 +123,15 @@ function PathConstraint:update ()
         if scale then lengths[i + 1] = 0 end
         i = i + 1
         spaces[i + 1] = 0
+			elseif percentSpacing then
+				if scale then
+					local x = setupLength * bone.a
+					local y = setupLength * bone.c
+					local length = math_sqrt(x * x + y * y)
+					lengths[i + 1] = length
+				end
+				i = i + 1
+				spaces[i + 1] = spacing
       else
    			local x = setupLength * bone.a
         local y = setupLength * bone.c
@@ -144,7 +153,7 @@ function PathConstraint:update ()
 		end
 	end
 
-	local positions = self:computeWorldPositions(attachment, spacesCount, tangents, data.positionMode == PathConstraintData.PositionMode.percent, spacingMode == PathConstraintData.SpacingMode.percent)
+	local positions = self:computeWorldPositions(attachment, spacesCount, tangents, data.positionMode == PathConstraintData.PositionMode.percent, percentSpacing)
 	local boneX = positions[1]
 	local boneY = positions[2]
 	local offsetRotation = data.offsetRotation
@@ -235,6 +244,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 	local verticesLength = path.worldVerticesLength
 	local curveCount = verticesLength / 6
 	local prevCurve = PathConstraint.NONE
+	local i = 0
 
 	if not path.constantSpeed then
 		local lengths = path.lengths
@@ -242,14 +252,14 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 		local pathLength = lengths[curveCount + 1];
 		if percentPosition then position = position * pathLength end
 		if percentSpacing then
-			local i = 0
+			i = 0
 			while i < spacesCount do
 				spaces[i + 1] = spaces[i + 1] * pathLength
 				i = i + 1
 			end
 		end
 		world = utils.setArraySize(self.world, 8);
-		local i = 0
+		i = 0
 		local o = 0
 		local curve = 0
 		while i < spacesCount do
@@ -345,7 +355,6 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 	local ddfy = 0
 	local dfx = 0
 	local dfy = 0
-	i = 0
 	local w = 2
 	while i < curveCount do
 		cx1 = world[w + 1]
@@ -380,9 +389,13 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 		i = i + 1
 		w = w + 6
 	end
-	if percentPosition then position = position * pathLength end
+	if percentPosition then 
+		position = position * pathLength
+	else
+		position = position * pathLength / path.lengths[curveCount];
+	end
 	if percentSpacing then
-		local i = 0
+		i = 0
 		while i < spacesCount do
 			spaces[i + 1] = spaces[i + 1] * pathLength
 			i = i + 1
@@ -391,7 +404,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 
 	local segments = self.segments
 	local curveLength = 0
-	local i = 0
+	i = 0
 	local o = 0
 	local curve = 0
 	local segment = 0

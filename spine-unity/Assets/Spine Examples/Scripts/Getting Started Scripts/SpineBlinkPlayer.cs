@@ -36,8 +36,7 @@ namespace Spine.Unity.Examples {
 	public class SpineBlinkPlayer : MonoBehaviour {
 		const int BlinkTrack = 1;
 
-		[SpineAnimation]
-		public string blinkAnimation;
+		public AnimationReferenceAsset blinkAnimation;
 		public float minimumDelay = 0.15f;
 		public float maximumDelay = 3f;
 

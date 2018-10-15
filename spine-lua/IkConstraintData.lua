@@ -38,6 +38,9 @@ function IkConstraintData.new (name)
 		bones = {},
 		target = nil,
 		bendDirection = 1,
+		compress = false,
+		stretch = false,
+		uniform = false,
 		mix = 1
 	}
 

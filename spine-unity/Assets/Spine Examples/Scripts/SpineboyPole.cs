@@ -40,10 +40,8 @@ namespace Spine.Unity.Examples {
 		public SkeletonRenderSeparator separator;
 
 		[Space(18)]
-		[SpineAnimation]
-		public string run;
-		[SpineAnimation]
-		public string pole;
+		public AnimationReferenceAsset run;
+		public AnimationReferenceAsset pole;
 		public float startX;
 		public float endX;
 

@@ -25,7 +25,7 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 	json.scale = scale
 	local skeletonData = json:readSkeletonDataFile("data/" .. jsonFile)
 	local skeleton = spine.Skeleton.new(skeletonData)
-	skeleton.flipY = true -- Corona's coordinate system has its y-axis point downwards
+	skeleton.scaleY = -1 -- Corona's coordinate system has its y-axis point downwards
 	skeleton.group.x = x
 	skeleton.group.y = y
 
@@ -34,7 +34,7 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 
 	-- create an animation state object to apply animations to the skeleton
 	local animationStateData = spine.AnimationStateData.new(skeletonData)
-	animationStateData.defaultMix = 0.2
+	animationStateData.defaultMix = 0.5
 	local animationState = spine.AnimationState.new(animationStateData)
 
 	-- set the skeleton invisible
@@ -60,7 +60,7 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 		print(entry.trackIndex.." dispose: "..entry.animation.name)
 	end
 	animationState.onEvent = function (entry, event)
-		print(entry.trackIndex.." event: "..entry.animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'")
+		print(entry.trackIndex.." event: "..entry.animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'" .. ", " .. event.volume .. ", " .. event.balance)
 	end
 	
   if atlasFile == "spineboy.atlas" then
@@ -81,12 +81,13 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 	return { skeleton = skeleton, state = animationState }
 end
 
--- table.insert(skeletons, loadSkeleton("coin.atlas", "coin-pro.json", 240, 300, 0.4, "rotate"))
--- table.insert(skeletons, loadSkeleton("spineboy.atlas", "spineboy-ess.json", 240, 300, 0.4, "walk"))
+table.insert(skeletons, loadSkeleton("spineboy.atlas", "spineboy-pro.json", 240, 300, 0.4, "walk"))
+table.insert(skeletons, loadSkeleton("stretchyman.atlas", "stretchyman-stretchy-ik.json", 40, 300, 0.5, "sneak"))
+table.insert(skeletons, loadSkeleton("coin.atlas", "coin-pro.json", 240, 300, 0.4, "rotate"))
 table.insert(skeletons, loadSkeleton("raptor.atlas", "raptor-pro.json", 200, 300, 0.25, "walk"))
--- table.insert(skeletons, loadSkeleton("goblins.atlas", "goblins-pro.json", 240, 300, 0.8, "walk", "goblin"))
+table.insert(skeletons, loadSkeleton("goblins.atlas", "goblins-pro.json", 240, 300, 0.8, "walk", "goblin"))
 table.insert(skeletons, loadSkeleton("stretchyman.atlas", "stretchyman-pro.json", 40, 300, 0.5, "sneak"))
--- table.insert(skeletons, loadSkeleton("tank.atlas", "tank-pro.json", 400, 300, 0.2, "drive"))
+table.insert(skeletons, loadSkeleton("tank.atlas", "tank-pro.json", 400, 300, 0.2, "drive"))
 table.insert(skeletons, loadSkeleton("vine.atlas", "vine-pro.json", 240, 300, 0.3, "grow"))
 
 local triangulator = spine.Triangulator.new()

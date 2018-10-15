@@ -34,7 +34,7 @@ package spine.animation {
 
 	public interface Timeline {
 		/** Sets the value(s) for the specified time. */
-		function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void;
+		function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void;
 
 		function getPropertyId() : int;
 	}

@@ -52,12 +52,14 @@ function IkConstraint.new (data, skeleton)
 		bones = {},
 		target = nil,
 		mix = data.mix,
+		compress = data.compress,
+		stretch = data.stretch,
 		bendDirection = data.bendDirection,
 	}
 	setmetatable(self, IkConstraint)
 
 	local self_bones = self.bones
-	for i,boneData in ipairs(data.bones) do
+	for _,boneData in ipairs(data.bones) do
 		table_insert(self_bones, skeleton:findBone(boneData.name))
 	end
 	self.target = skeleton:findBone(data.target.name)
@@ -74,13 +76,13 @@ function IkConstraint:update ()
 	local bones = self.bones
 	local boneCount = #bones
 	if boneCount == 1 then
-		self:apply1(bones[1], target.worldX, target.worldY, self.mix)
+		self:apply1(bones[1], target.worldX, target.worldY, self.compress, self.stretch, self.data.uniform, self.mix)
 	elseif boneCount == 2 then
-		self:apply2(bones[1], bones[2], target.worldX, target.worldY, self.bendDirection, self.mix)
+		self:apply2(bones[1], bones[2], target.worldX, target.worldY, self.bendDirection, self.stretch, self.mix)
 	end
 end
 
-function IkConstraint:apply1 (bone, targetX, targetY, alpha)
+function IkConstraint:apply1 (bone, targetX, targetY, compress, stretch, uniform, alpha)
 	if not bone.appliedValid then bone:updateAppliedTransform() end
 	local p = bone.parent
 	local id = 1 / (p.a * p.d - p.b * p.c)
@@ -95,10 +97,21 @@ function IkConstraint:apply1 (bone, targetX, targetY, alpha)
 	elseif (rotationIK < -180) then
 		rotationIK = rotationIK + 360
 	end
-	bone:updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, bone.ascaleX, bone.ascaleY, bone.ashearX, bone.ashearY)
+	local sx = bone.ascaleX
+	local sy = bone.ascaleY
+	if compress or stretch then
+		local b = bone.data.length * sx
+		local dd = math_sqrt(tx * tx + ty * ty)
+		if (compress and dd < b) or (stretch and dd > b) and b > 0.0001 then
+			local s = (dd / b - 1) * alpha + 1
+			sx = sx * s
+			if uniform then sy = sy * s end
+		end
+	end
+	bone:updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX, bone.ashearY)
 end
 
-function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
+function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch, alpha)
 	if alpha == 0 then
 		child:updateWorldTransform()
 		return
@@ -108,6 +121,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
 	local px = parent.ax
 	local py = parent.ay
 	local psx = parent.ascaleX
+	local sx = psx
 	local psy = parent.ascaleY
 	local csx = child.ascaleX
 	local os1 = 0
@@ -159,6 +173,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
 	local y = targetY - pp.worldY
 	local tx = (x * d - y * b) * id - px
 	local ty = (y * a - x * c) * id - py
+	local dd = tx * tx + ty * ty
 	x = cwx - pp.worldX
 	y = cwy - pp.worldY
 	local dx = (x * d - y * b) * id - px
@@ -170,11 +185,12 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
 
 	if u then
 		l2 = l2 * psx
-		local cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2)
+		local cos = (dd - l1 * l1 - l2 * l2) / (2 * l1 * l2)
 		if cos < -1 then
 			cos = -1
 		elseif cos > 1 then
 			cos = 1
+			if stretch then sx = sx * ((math_sqrt(dd) / (l1 + l2) - 1) * alpha + 1) end
 		end
 		a2 = math_acos(cos) * bendDir
 		a = l1 + l2 * cos
@@ -186,7 +202,6 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
 		b = psy * l2
 		local aa = a * a
 		local bb = b * b
-		local dd = tx * tx + ty * ty
 		local ta = math_atan2(ty, tx);
 		c = bb * l1 * l1 + aa * dd - aa * bb
 		local c1 = -2 * bb * l1
@@ -252,7 +267,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
 	elseif a1 < -180 then
 		a1 = a1 + 360
 	end
-	parent:updateWorldTransformWith(px, py, rotation + a1 * alpha, parent.ascaleX, parent.ascaleY, 0, 0)
+	parent:updateWorldTransformWith(px, py, rotation + a1 * alpha, sx, parent.ascaleY, 0, 0)
 	rotation = child.rotation
 	a2 = (math_deg(a2 + os) - child.ashearX) * s2 + os2 - rotation
 	if a2 > 180 then

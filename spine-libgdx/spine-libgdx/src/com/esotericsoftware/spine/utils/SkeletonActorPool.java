@@ -70,7 +70,7 @@ public class SkeletonActorPool extends Pool<SkeletonActor> {
 
 			protected void reset (Skeleton skeleton) {
 				skeleton.setColor(Color.WHITE);
-				skeleton.setFlip(false, false);
+				skeleton.setScale(1, 1);
 				skeleton.setSkin((Skin)null);
 				skeleton.setSkin(SkeletonActorPool.this.skeletonData.getDefaultSkin());
 				skeleton.setToSetupPose();

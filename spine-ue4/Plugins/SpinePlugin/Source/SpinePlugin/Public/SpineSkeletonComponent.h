@@ -79,16 +79,16 @@ public:
 	void SetSlotsToSetupPose();
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
-	void SetFlipX(bool flipX);
+	void SetScaleX(float scaleX);
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
-	bool GetFlipX();
+	float GetScaleX();
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
-	void SetFlipY(bool flipY);
+	void SetScaleY(float scaleY);
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
-	bool GetFlipY();
+	float GetScaleY();
 	
 	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|Skeleton")
 	FSpineBeforeUpdateWorldTransformDelegate BeforeUpdateWorldTransform;

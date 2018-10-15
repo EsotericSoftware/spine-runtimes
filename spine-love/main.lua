@@ -45,8 +45,7 @@ function loadSkeleton (jsonFile, atlasFile, animation, skin, scale, x, y)
 	local skeleton = spine.Skeleton.new(skeletonData)
 	skeleton.x = x
 	skeleton.y = y
-	skeleton.flipX = false
-	skeleton.flipY = true
+	skeleton.scaleY = -1
 	if skin then
 		skeleton:setSkin(skin)
 	end
@@ -85,7 +84,7 @@ function loadSkeleton (jsonFile, atlasFile, animation, skin, scale, x, y)
 		print(entry.trackIndex.." dispose: "..entry.animation.name)
 	end
 	state.onEvent = function (entry, event)
-		print(entry.trackIndex.." event: "..entry.animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'")
+		print(entry.trackIndex.." event: "..entry.animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'" .. ", " .. event.volume .. ", " .. event.balance)
 	end
 	
 	state:update(0.5)
@@ -97,13 +96,13 @@ end
 function love.load(arg)
 	if arg[#arg] == "-debug" then require("mobdebug").start() end
 	skeletonRenderer = spine.SkeletonRenderer.new(true)
+	table.insert(skeletons, loadSkeleton("spineboy-pro", "spineboy", "walk", nil, 0.5, 400, 500))
+	table.insert(skeletons, loadSkeleton("stretchyman-pro", "stretchyman", "sneak", nil, 0.3, 200, 500))
 	table.insert(skeletons, loadSkeleton("coin-pro", "coin", "rotate", nil, 0.5, 400, 500))
-	table.insert(skeletons, loadSkeleton("spineboy-ess", "spineboy", "walk", nil, 0.5, 400, 500))
 	table.insert(skeletons, loadSkeleton("raptor-pro", "raptor", "walk", nil, 0.3, 400, 500))
 	table.insert(skeletons, loadSkeleton("goblins-pro", "goblins", "walk", "goblin", 1, 400, 500))
 	table.insert(skeletons, loadSkeleton("tank-pro", "tank", "drive", nil, 0.2, 600, 500))
 	table.insert(skeletons, loadSkeleton("vine-pro", "vine", "grow", nil, 0.3, 400, 500))
-	table.insert(skeletons, loadSkeleton("stretchyman-pro", "stretchyman", "sneak", nil, 0.3, 200, 500))
 end
 
 function love.update (delta)
@@ -128,7 +127,7 @@ function love.update (delta)
 end
 
 function love.draw ()
-	love.graphics.setBackgroundColor(128, 128, 128, 255)
+	love.graphics.setBackgroundColor(0, 0, 0, 255)
 	love.graphics.setColor(255, 255, 255)
 	local skeleton = skeletons[activeSkeleton].skeleton
 	

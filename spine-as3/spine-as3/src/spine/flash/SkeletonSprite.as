@@ -146,14 +146,14 @@ package spine.flash {
 				wrapper.transform.colorTransform = colorTransform;
 
 				var bone : Bone = slot.bone;
-				var flipX : int = skeleton.flipX ? -1 : 1;
-				var flipY : int = skeleton.flipY ? -1 : 1;
+				var scaleX : Number = skeleton.scaleX;
+				var scaleY : Number = skeleton.scaleY;
 
 				wrapper.x = bone.worldX;
 				wrapper.y = bone.worldY;
-				wrapper.rotation = bone.worldRotationX * flipX * flipY;
-				wrapper.scaleX = bone.worldScaleX * flipX;
-				wrapper.scaleY = bone.worldScaleY * flipY;
+				wrapper.rotation = bone.worldRotationX * scaleX * scaleX;
+				wrapper.scaleX = bone.worldScaleX * scaleX;
+				wrapper.scaleY = bone.worldScaleY * scaleY;
 				addChild(wrapper);
 			}
 		}

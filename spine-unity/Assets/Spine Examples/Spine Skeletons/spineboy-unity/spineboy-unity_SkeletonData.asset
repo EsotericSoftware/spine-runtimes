@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1b3b4b945939a54ea0b23d3396115fb, type: 3}
+  m_Name: spineboy-unity_SkeletonData
+  m_EditorClassIdentifier: 
+  atlasAssets:
+  - {fileID: 11400000, guid: b4b8457d6cb8fec49a40be5b71d79e51, type: 2}
+  scale: 0.01
+  skeletonJSON: {fileID: 4900000, guid: e3b64d7eaf0de4e45a00b7065166554d, type: 3}
+  fromAnimation:
+  - run
+  - pole
+  - idle
+  - hit
+  toAnimation:
+  - pole
+  - run
+  - hit
+  - idle
+  duration:
+  - 0
+  - 0
+  - 0.05
+  - 0.05
+  defaultMix: 0
+  controller: {fileID: 0}

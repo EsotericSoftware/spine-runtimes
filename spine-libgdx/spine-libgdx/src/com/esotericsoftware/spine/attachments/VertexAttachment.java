@@ -30,19 +30,18 @@
 
 package com.esotericsoftware.spine.attachments;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import com.badlogic.gdx.utils.FloatArray;
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.Slot;
 
+import com.badlogic.gdx.utils.FloatArray;
+
 /** Base class for an attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
  * {@link Slot#getAttachmentVertices()}. */
 public class VertexAttachment extends Attachment {
-	static private final AtomicInteger nextID = new AtomicInteger();
+	static private int nextID;
 
-	private final int id = (nextID.getAndIncrement() & 65535) << 11;
+	private final int id = (nextID() & 65535) << 11;
 	int[] bones;
 	float[] vertices;
 	int worldVerticesLength;
@@ -161,5 +160,9 @@ public class VertexAttachment extends Attachment {
 	/** Returns a unique ID for this attachment. */
 	public int getId () {
 		return id;
+	}
+
+	static private synchronized int nextID () {
+		return nextID++;
 	}
 }

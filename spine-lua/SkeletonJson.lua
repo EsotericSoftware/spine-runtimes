@@ -60,7 +60,7 @@ function SkeletonJson.new (attachmentLoader)
 	}
 
 	function self:readSkeletonDataFile (fileName, base)
-		return self:readSkeletonData(spine.utils.readFile(fileName, base))
+		return self:readSkeletonData(utils.readFile(fileName, base))
 	end
 
 	local readAttachment
@@ -76,7 +76,7 @@ function SkeletonJson.new (attachmentLoader)
 	function self:readSkeletonData (jsonText)
 		local scale = self.scale
 		local skeletonData = SkeletonData.new(self.attachmentLoader)
-		local root = spine.utils.readJSON(jsonText)
+		local root = utils.readJSON(jsonText)
 		if not root then error("Invalid JSON: " .. jsonText, 2) end
 
 		-- Skeleton.
@@ -117,7 +117,6 @@ function SkeletonJson.new (attachmentLoader)
 		-- Slots.
 		if root["slots"] then
 			for i,slotMap in ipairs(root["slots"]) do
-				local index = i
 				local slotName = slotMap["name"]
 				local boneName = slotMap["bone"]
 				local boneData = skeletonData:findBone(boneName)
@@ -151,11 +150,11 @@ function SkeletonJson.new (attachmentLoader)
 
 		-- IK constraints.
 		if root["ik"] then
-			for i,constraintMap in ipairs(root["ik"]) do
+			for _,constraintMap in ipairs(root["ik"]) do
 				local data = IkConstraintData.new(constraintMap["name"])
 				data.order = getValue(constraintMap, "order", 0)
 
-				for i,boneName in ipairs(constraintMap["bones"]) do
+				for _,boneName in ipairs(constraintMap["bones"]) do
 					local bone = skeletonData:findBone(boneName)
 					if not bone then error("IK bone not found: " .. boneName) end
 					table_insert(data.bones, bone)
@@ -165,8 +164,11 @@ function SkeletonJson.new (attachmentLoader)
 				data.target = skeletonData:findBone(targetName)
 				if not data.target then error("Target bone not found: " .. targetName) end
 
-				if constraintMap["bendPositive"] == false then data.bendDirection = -1 else data.bendDirection = 1 end
 				data.mix = getValue(constraintMap, "mix", 1)
+				if constraintMap["bendPositive"] == nil or constraintMap["bendPositive"] == false then data.bendDirection = -1 else data.bendDirection = 1 end
+				if constraintMap["compress"] == nil or constraintMap["compress"] == false then data.compress = false else data.compress = true end
+				if constraintMap["stretch"] == nil  or constraintMap["stretch"] == false then data.stretch = false else data.stretch = true end
+				if constraintMap["uniform"] == nil or  constraintMap["uniform"] == false then data.uniform = false else data.uniform = true end
 
 				table_insert(skeletonData.ikConstraints, data)
 			end
@@ -174,11 +176,11 @@ function SkeletonJson.new (attachmentLoader)
 
 		-- Transform constraints
 		if root["transform"] then
-			for i,constraintMap in ipairs(root["transform"]) do
-				data = TransformConstraintData.new(constraintMap.name)
+			for _,constraintMap in ipairs(root["transform"]) do
+				local data = TransformConstraintData.new(constraintMap.name)
 				data.order = getValue(constraintMap, "order", 0)
 
-				for i,boneName in ipairs(constraintMap.bones) do
+				for _,boneName in ipairs(constraintMap.bones) do
 					local bone = skeletonData:findBone(boneName)
 					if not bone then error("Transform constraint bone not found: " .. boneName, 2) end
 					table_insert(data.bones, bone)
@@ -186,7 +188,7 @@ function SkeletonJson.new (attachmentLoader)
 
 				local targetName = constraintMap.target
 				data.target = skeletonData:findBone(targetName)
-				if not data.target then error("Transform constraint target bone not found: " .. boneName, 2) end
+				if not data.target then error("Transform constraint target bone not found: " .. (targetName or "none"), 2) end
 
 				data.offsetRotation = getValue(constraintMap, "rotation", 0);
 				data.offsetX = getValue(constraintMap, "x", 0) * scale;
@@ -206,11 +208,11 @@ function SkeletonJson.new (attachmentLoader)
 
 		-- Path constraints
 		if root["path"] then
-			for i,constraintMap in ipairs(root.path) do
+			for _,constraintMap in ipairs(root.path) do
 				local data = PathConstraintData.new(constraintMap.name);
 				data.order = getValue(constraintMap, "order", 0)
 
-				for i,boneName in ipairs(constraintMap.bones) do
+				for _,boneName in ipairs(constraintMap.bones) do
 					local bone = skeletonData:findBone(boneName)
 					if not bone then error("Path constraint bone not found: " .. boneName, 2) end
 					table_insert(data.bones, bone)
@@ -254,7 +256,7 @@ function SkeletonJson.new (attachmentLoader)
 		end
 
 		-- Linked meshes
-		for i, linkedMesh in ipairs(self.linkedMeshes) do
+		for _, linkedMesh in ipairs(self.linkedMeshes) do
 			local skin = skeletonData.defaultSkin
 			if linkedMesh.skin then skin = skeletonData:findSkin(linkedMesh.skin) end
 			if not skin then error("Skin not found: " .. linkedMesh.skin) end
@@ -272,6 +274,11 @@ function SkeletonJson.new (attachmentLoader)
 				data.intValue = getValue(eventMap, "int", 0)
 				data.floatValue = getValue(eventMap, "float", 0)
 				data.stringValue = getValue(eventMap, "string", "")
+				data.audioPath = getValue(eventMap, "audio", nil)
+				if data.audioPath ~= nil then
+					data.volume = getValue(eventMap, "volume", 1)
+					data.balance = getValue(eventMap, "balance", 0)
+				end
 				table_insert(skeletonData.events, data)
 			end
 		end
@@ -331,7 +338,7 @@ function SkeletonJson.new (attachmentLoader)
 
 		elseif type == AttachmentType.mesh or type == AttachmentType.linkedmesh then
 			local mesh = attachmentLoader:newMeshAttachment(skin, name, path)
-			if not mesh then return null end
+			if not mesh then return nil end
 			mesh.path = path
 
 			local color = map.color
@@ -487,7 +494,7 @@ function SkeletonJson.new (attachmentLoader)
 						timeline.slotIndex = slotIndex
 
 						local frameIndex = 0
-						for i,valueMap in ipairs(values) do
+						for _,valueMap in ipairs(values) do
 							local color = valueMap["color"]
 							timeline:setFrame(
 								frameIndex, valueMap["time"],
@@ -506,7 +513,7 @@ function SkeletonJson.new (attachmentLoader)
 						timeline.slotIndex = slotIndex
 
 						local frameIndex = 0
-						for i,valueMap in ipairs(values) do
+						for _,valueMap in ipairs(values) do
 							local light = valueMap["light"]
 							local dark = valueMap["dark"]
 							timeline:setFrame(
@@ -529,7 +536,7 @@ function SkeletonJson.new (attachmentLoader)
 						timeline.slotIndex = slotIndex
 
 						local frameIndex = 0
-						for i,valueMap in ipairs(values) do
+						for _,valueMap in ipairs(values) do
 							local attachmentName = valueMap["name"]
 							timeline:setFrame(frameIndex, valueMap["time"], attachmentName)
 							frameIndex = frameIndex + 1
@@ -557,7 +564,7 @@ function SkeletonJson.new (attachmentLoader)
 						timeline.boneIndex = boneIndex
 
 						local frameIndex = 0
-						for i,valueMap in ipairs(values) do
+						for _,valueMap in ipairs(values) do
 							timeline:setFrame(frameIndex, valueMap["time"], valueMap["angle"])
 							readCurve(valueMap, timeline, frameIndex)
 							frameIndex = frameIndex + 1
@@ -579,7 +586,7 @@ function SkeletonJson.new (attachmentLoader)
 						timeline.boneIndex = boneIndex
 
 						local frameIndex = 0
-						for i,valueMap in ipairs(values) do
+						for _,valueMap in ipairs(values) do
 							local x = (valueMap["x"] or 0) * timelineScale
 							local y = (valueMap["y"] or 0) * timelineScale
 							timeline:setFrame(frameIndex, valueMap["time"], x, y)
@@ -608,12 +615,16 @@ function SkeletonJson.new (attachmentLoader)
 					end
 				end
 				local frameIndex = 0
-				for i,valueMap in ipairs(values) do
+				for _,valueMap in ipairs(values) do
 					local mix = 1
 					if valueMap["mix"] ~= nil then mix = valueMap["mix"] end
 					local bendPositive = 1
 					if valueMap["bendPositive"] == false then bendPositive = -1 end
-					timeline:setFrame(frameIndex, valueMap["time"], mix, bendPositive)
+					local stretch = false
+					if valueMap["stretch"] ~= nil then stretch = valueMap["stretch"] end
+					local compress = false
+					if valueMap["compress"] ~= nil then compress = valueMap["compress"] end
+					timeline:setFrame(frameIndex, valueMap["time"], mix, bendPositive, compress, stretch)
 					readCurve(valueMap, timeline, frameIndex)
 					frameIndex = frameIndex + 1
 				end
@@ -635,7 +646,7 @@ function SkeletonJson.new (attachmentLoader)
 					end
 				end
 				local frameIndex = 0
-				for i,valueMap in ipairs(values) do
+				for _,valueMap in ipairs(values) do
 					timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, "rotateMix", 1), getValue(valueMap, "translateMix", 1), getValue(valueMap, "scaleMix", 1), getValue(valueMap, "shearMix", 1))
 					readCurve(valueMap, timeline, frameIndex)
 					frameIndex = frameIndex + 1
@@ -664,7 +675,7 @@ function SkeletonJson.new (attachmentLoader)
 						end
 						timeline.pathConstraintIndex = index
 						local frameIndex = 0
-						for i,valueMap in ipairs(timelineMap) do
+						for _,valueMap in ipairs(timelineMap) do
 							timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, timelineName, 0) * timelineScale)
 							readCurve(valueMap, timeline, frameIndex)
 							frameIndex = frameIndex + 1
@@ -675,7 +686,7 @@ function SkeletonJson.new (attachmentLoader)
 						local timeline = Animation.PathConstraintMixTimeline.new(#timelineMap)
 						timeline.pathConstraintIndex = index
 						local frameIndex = 0
-						for i,valueMap in ipairs(timelineMap) do
+						for _,valueMap in ipairs(timelineMap) do
 							timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, "rotateMix", 1), getValue(valueMap, "translateMix", 1))
 							readCurve(valueMap, timeline, frameIndex)
 							frameIndex = frameIndex + 1
@@ -708,7 +719,7 @@ function SkeletonJson.new (attachmentLoader)
 						timeline.attachment = attachment
 
 						local frameIndex = 0
-						for i,valueMap in ipairs(timelineMap) do
+						for _,valueMap in ipairs(timelineMap) do
 							local deform = nil
 							local verticesValue = getValue(valueMap, "vertices", nil)
 							if verticesValue == nil then
@@ -754,7 +765,7 @@ function SkeletonJson.new (attachmentLoader)
 			local timeline = Animation.DrawOrderTimeline.new(#drawOrderValues)
 			local slotCount = #skeletonData.slots
 			local frameIndex = 0
-			for i,drawOrderMap in ipairs(drawOrderValues) do
+			for _,drawOrderMap in ipairs(drawOrderValues) do
 				local drawOrder = nil
 				local offsets = drawOrderMap["offsets"]
 				if offsets then
@@ -762,7 +773,7 @@ function SkeletonJson.new (attachmentLoader)
 					local unchanged = {}
 					local originalIndex = 1
 					local unchangedIndex = 1
-					for ii,offsetMap in ipairs(offsets) do
+					for _,offsetMap in ipairs(offsets) do
 						local slotIndex = skeletonData:findSlotIndex(offsetMap["slot"])
 						if slotIndex == -1 then error("Slot not found: " .. offsetMap["slot"]) end
 						-- Collect unchanged items.
@@ -801,7 +812,7 @@ function SkeletonJson.new (attachmentLoader)
 		if events then
 			local timeline = Animation.EventTimeline.new(#events)
 			local frameIndex = 0
-			for i,eventMap in ipairs(events) do
+			for _,eventMap in ipairs(events) do
 				local eventData = skeletonData:findEvent(eventMap["name"])
 				if not eventData then error("Event not found: " .. eventMap["name"]) end
 				local event = Event.new(eventMap["time"], eventData)
@@ -819,6 +830,10 @@ function SkeletonJson.new (attachmentLoader)
 					event.stringValue = eventMap["string"]
 				else
 					event.stringValue = eventData.stringValue
+				end
+				if eventData.audioPath ~= nil then
+					event.volume = getValue(eventMap, "volume", 1)
+					event.balance = getValue(eventMap, "balance", 0)
 				end
 				timeline:setFrame(frameIndex, event)
 				frameIndex = frameIndex + 1

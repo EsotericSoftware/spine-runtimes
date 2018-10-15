@@ -8,6 +8,8 @@
 
 #include "KMemory.h" // last include
 
+#pragma warning(disable:4996)
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 //	KANJI_DUMP_LEAKED_MEM will print out the memory block that was leaked.

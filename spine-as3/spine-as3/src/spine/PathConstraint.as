@@ -72,8 +72,7 @@ package spine {
 			if (!translate && !rotate) return;
 
 			var data : PathConstraintData = this._data;
-			var spacingMode : SpacingMode = data.spacingMode;
-			var lengthSpacing : Boolean = spacingMode == SpacingMode.length;
+			var percentSpacing : Boolean = data.spacingMode == SpacingMode.percent;			
 			var rotateMode : RotateMode = data.rotateMode;
 			var tangents : Boolean = rotateMode == RotateMode.tangent, scale : Boolean = rotateMode == RotateMode.chainScale;
 			var boneCount : int = this._bones.length, spacesCount : int = tangents ? boneCount : boneCount + 1;
@@ -81,17 +80,26 @@ package spine {
 			this._spaces.length = spacesCount;
 			var spaces : Vector.<Number> = this._spaces, lengths : Vector.<Number> = null;
 			var spacing : Number = this.spacing;
-			if (scale || lengthSpacing) {
+			if (scale || !percentSpacing) {
 				if (scale) {
 					this._lengths.length = boneCount;
 					lengths = this._lengths;
 				}
+				var lengthSpacing : Boolean = data.spacingMode == SpacingMode.length;
 				for (var i : int = 0, n : int = spacesCount - 1; i < n;) {
 					var bone : Bone = bones[i];
 					var setupLength : Number = bone.data.length;
 					if (setupLength < epsilon) {
 						if (scale) lengths[i] = 0;
 						spaces[++i] = 0;
+					} else if (percentSpacing) {
+						if (scale) {
+							var x_l : Number = setupLength * bone.a;
+							var y_l : Number = setupLength * bone.c;
+							var length_l : Number = Math.sqrt(x_l * x_l + y_l * y_l);
+							lengths[i] = length_l;
+						}
+						spaces[++i] = spacing;
 					} else {
 						var x : Number = setupLength * bone.a, y : Number = setupLength * bone.c;
 						var length : Number = Math.sqrt(x * x + y * y);
@@ -104,7 +112,7 @@ package spine {
 					spaces[i] = spacing;
 			}
 
-			var positions : Vector.<Number> = computeWorldPositions(attachment, spacesCount, tangents, data.positionMode == PositionMode.percent, spacingMode == SpacingMode.percent);
+			var positions : Vector.<Number> = computeWorldPositions(attachment, spacesCount, tangents, data.positionMode == PositionMode.percent, percentSpacing);
 			var boneX : Number = positions[0], boneY : Number = positions[1], offsetRotation : Number = data.offsetRotation;
 			var tip : Boolean = false;
 			if (offsetRotation == 0)
@@ -292,7 +300,10 @@ package spine {
 				x1 = x2;
 				y1 = y2;
 			}
-			if (percentPosition) position *= pathLength;
+			if (percentPosition)
+				position *= pathLength;
+			else
+				position *= pathLength / path.lengths[curveCount - 1];
 			if (percentSpacing) {
 				for (i = 0; i < spacesCount; i++)
 					spaces[i] *= pathLength;

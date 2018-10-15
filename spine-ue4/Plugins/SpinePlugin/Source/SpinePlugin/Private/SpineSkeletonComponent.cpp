@@ -136,26 +136,26 @@ void USpineSkeletonComponent::SetSlotsToSetupPose () {
 	if (skeleton) spSkeleton_setSlotsToSetupPose(skeleton);
 }
 
-void USpineSkeletonComponent::SetFlipX (bool flipX) {
+void USpineSkeletonComponent::SetScaleX (float scaleX) {
 	CheckState();
-	if (skeleton) skeleton->flipX = flipX ? 1 : 0;
+	if (skeleton) skeleton->scaleX = scaleX;
 }
 
-bool USpineSkeletonComponent::GetFlipX() {
+float USpineSkeletonComponent::GetScaleX() {
 	CheckState();
-	if (skeleton) return skeleton->flipX != 0;
-	return false;
+	if (skeleton) return skeleton->scaleX;
+	return 1;
 }
 
-void USpineSkeletonComponent::SetFlipY(bool flipY) {
+void USpineSkeletonComponent::SetScaleY(float scaleY) {
 	CheckState();
-	if (skeleton) skeleton->flipY = flipY ? 1 : 0;
+	if (skeleton) skeleton->scaleY = scaleY;
 }
 
-bool USpineSkeletonComponent::GetFlipY() {
+float USpineSkeletonComponent::GetScaleY() {
 	CheckState();
-	if (skeleton) return skeleton->flipY != 0;
-	return false;
+	if (skeleton) return skeleton->scaleY;
+	return 1;
 }
 
 void USpineSkeletonComponent::BeginPlay() {

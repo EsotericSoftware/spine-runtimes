@@ -151,8 +151,12 @@ namespace Spine {
 
 			if (nonessential) {
 				skeletonData.fps = ReadFloat(input);
+
 				skeletonData.imagesPath = ReadString(input);
-				if (skeletonData.imagesPath.Length == 0) skeletonData.imagesPath = null;
+				if (string.IsNullOrEmpty(skeletonData.imagesPath)) skeletonData.imagesPath = null;
+
+				skeletonData.audioPath = ReadString(input);
+				if (string.IsNullOrEmpty(skeletonData.audioPath)) skeletonData.audioPath = null;
 			}
 
 			// Bones.
@@ -206,6 +210,9 @@ namespace Spine {
 				data.target = skeletonData.bones.Items[ReadVarint(input, true)];
 				data.mix = ReadFloat(input);
 				data.bendDirection = ReadSByte(input);
+				data.compress = ReadBoolean(input);
+				data.stretch = ReadBoolean(input);
+				data.uniform = ReadBoolean(input);
 				skeletonData.ikConstraints.Add(data);
 			}
 
@@ -280,6 +287,11 @@ namespace Spine {
 				data.Int = ReadVarint(input, false);
 				data.Float = ReadFloat(input);
 				data.String = ReadString(input);
+				data.AudioPath = ReadString(input);
+				if (data.AudioPath != null) {
+					data.Volume = ReadFloat(input);
+					data.Balance = ReadFloat(input);
+				}
 				skeletonData.events.Add(data);
 			}
 
@@ -640,10 +652,11 @@ namespace Spine {
 			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {				
 				int index = ReadVarint(input, true);
 				int frameCount = ReadVarint(input, true);
-				IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount);
-				timeline.ikConstraintIndex = index;
+				IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount) {
+					ikConstraintIndex = index
+				};
 				for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-					timeline.SetFrame(frameIndex, ReadFloat(input), ReadFloat(input), ReadSByte(input));
+					timeline.SetFrame(frameIndex, ReadFloat(input), ReadFloat(input), ReadSByte(input), ReadBoolean(input), ReadBoolean(input));
 					if (frameIndex < frameCount - 1) ReadCurve(input, frameIndex, timeline);
 				}
 				timelines.Add(timeline);
@@ -795,10 +808,15 @@ namespace Spine {
 				for (int i = 0; i < eventCount; i++) {
 					float time = ReadFloat(input);
 					EventData eventData = skeletonData.events.Items[ReadVarint(input, true)];
-					Event e = new Event(time, eventData);
-					e.Int = ReadVarint(input, false);
-					e.Float = ReadFloat(input);
-					e.String = ReadBoolean(input) ? ReadString(input) : eventData.String;
+					Event e = new Event(time, eventData) {
+						Int = ReadVarint(input, false),
+						Float = ReadFloat(input),
+						String = ReadBoolean(input) ? ReadString(input) : eventData.String
+					};
+					if (e.data.AudioPath != null) {
+						e.volume = ReadFloat(input);
+						e.balance = ReadFloat(input);
+					}
 					timeline.SetFrame(i, e);
 				}
 				timelines.Add(timeline);

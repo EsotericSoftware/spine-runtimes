@@ -41,6 +41,7 @@ local table_insert = table.insert
 local math_deg = math.deg
 local math_rad = math.rad
 local math_abs = math.abs
+local math_floor = math.floor
 
 local TransformConstraint = {}
 TransformConstraint.__index = TransformConstraint
@@ -58,7 +59,7 @@ function TransformConstraint.new (data, skeleton)
 	}
 	setmetatable(self, TransformConstraint)
 
-	for i,bone in ipairs(data.bones) do
+	for _,bone in ipairs(data.bones) do
 		table_insert(self.bones, skeleton:findBone(bone.name))
 	end
 	self.target = skeleton:findBone(data.target.name)
@@ -101,7 +102,7 @@ function TransformConstraint:applyAbsoluteWorld ()
 	local offsetRotation = self.data.offsetRotation * degRadReflect
 	local offsetShearY = self.data.offsetShearY * degRadReflect
 	local bones = self.bones
-	for i, bone in ipairs(bones) do
+	for _, bone in ipairs(bones) do
 		local modified = false
 		if rotateMix ~= 0 then
 			local a = bone.a
@@ -188,7 +189,7 @@ function TransformConstraint:applyRelativeWorld ()
 	local offsetRotation = self.data.offsetRotation * degRadReflect
 	local offsetShearY = self.data.offsetShearY * degRadReflect
 	local bones = self.bones
-	for i, bone in ipairs(bones) do
+	for _, bone in ipairs(bones) do
 		local modified = false
 		
 		if rotateMix ~= 0 then
@@ -226,7 +227,7 @@ function TransformConstraint:applyRelativeWorld ()
 			local s = (math_sqrt(ta * ta + tc * tc) - 1 + self.data.offsetScaleX) * scaleMix + 1
 			bone.a = bone.a * s
 			bone.c = bone.c * s
-			local s = (math_sqrt(tb * tb + td * td) - 1 + self.data.offsetScaleY) * scaleMix + 1
+			s = (math_sqrt(tb * tb + td * td) - 1 + self.data.offsetScaleY) * scaleMix + 1
 			bone.b = bone.b * s
 			bone.d = bone.d * s
 			modified = true
@@ -260,7 +261,7 @@ function TransformConstraint:applyAbsoluteLocal ()
 	local target = self.target
 	if not target.appliedValid then target:updatedAppliedTransform() end
 	local bones = self.bones
-	for i, bone in ipairs(bones) do
+	for _, bone in ipairs(bones) do
 		local modified = false
 		if not bone.appliedValid then bone:updateAppliedTransform() end
 		
@@ -308,7 +309,7 @@ function TransformConstraint:applyRelativeLocal ()
 	local target = self.target
 	if not target.appliedValid then target:updateAppliedTransform() end
 	local bones = self.bones
-	for i, bone in ipairs(bones) do
+	for _, bone in ipairs(bones) do
 		if not bone.appliedValid then bone:updateAppliedTransform() end
 
 		local rotation = bone.arotation
@@ -328,7 +329,7 @@ function TransformConstraint:applyRelativeLocal ()
 				scaleX = scaleX * (((target.ascaleX - 1 + self.data.offsetScaleX) * scaleMix) + 1)
 			end
 			if scaleY > 0.00001 then
-				scaleY = scaleY * (((target.ascaleY - 1 + this.data.offsetScaleY) * scaleMix) + 1)
+				scaleY = scaleY * (((target.ascaleY - 1 + self.data.offsetScaleY) * scaleMix) + 1)
 			end
 		end
 

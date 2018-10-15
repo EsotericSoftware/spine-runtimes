@@ -39,6 +39,7 @@ namespace Spine {
 		internal List<BoneData> bones = new List<BoneData>();
 		internal BoneData target;
 		internal int bendDirection = 1;
+		internal bool compress, stretch, uniform;
 		internal float mix = 1;
 
 		/// <summary>The IK constraint's name, which is unique within the skeleton.</summary>
@@ -62,13 +63,42 @@ namespace Spine {
 			set { target = value; }
 		}
 
+		/// <summary>
+		/// A percentage (0-1) that controls the mix between the constraint and unconstrained rotations.</summary>
+		public float Mix {
+			get { return mix; }
+			set { mix = value; }
+		}
+
 		/// <summary>Controls the bend direction of the IK bones, either 1 or -1.</summary>
 		public int BendDirection {
 			get { return bendDirection; }
 			set { bendDirection = value; }
 		}
 
-		public float Mix { get { return mix; } set { mix = value; } }
+		/// <summary>
+		/// When true, and only a single bone is being constrained, 
+		/// if the target is too close, the bone is scaled to reach it. </summary>
+		public bool Compress {
+			get { return compress; }
+			set { compress = value; }
+		}
+
+		/// <summary>
+		/// When true, if the target is out of range, the parent bone is scaled on the X axis to reach it. 
+		/// If the bone has local nonuniform scale, stretching is not applied.</summary>
+		public bool Stretch {
+			get { return stretch; }
+			set { stretch = value; }
+		}
+
+		/// <summary>
+		/// When true, only a single bone is being constrained and Compress or Stretch is used, 
+		/// the bone is scaled both on the X and Y axes.</summary>
+		public bool Uniform {
+			get { return uniform; }
+			set { uniform = value; }
+		}
 
 		public IkConstraintData (string name) {
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");

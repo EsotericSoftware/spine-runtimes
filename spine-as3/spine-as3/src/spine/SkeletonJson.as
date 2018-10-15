@@ -158,6 +158,9 @@ package spine {
 				if (!ikConstraintData.target) throw new Error("Target bone not found: " + constraintMap["target"]);
 
 				ikConstraintData.bendDirection = (!constraintMap.hasOwnProperty("bendPositive") || constraintMap["bendPositive"]) ? 1 : -1;
+				ikConstraintData.compress = (constraintMap.hasOwnProperty("compress") && constraintMap["compress"]);
+				ikConstraintData.stretch = (constraintMap.hasOwnProperty("stretch") && constraintMap["stretch"]);
+				ikConstraintData.uniform = (constraintMap.hasOwnProperty("uniform") && constraintMap["uniform"]);
 				ikConstraintData.mix = constraintMap.hasOwnProperty("mix") ? constraintMap["mix"] : 1;
 
 				skeletonData.ikConstraints.push(ikConstraintData);
@@ -263,6 +266,11 @@ package spine {
 					eventData.intValue = eventMap["int"] || 0;
 					eventData.floatValue = eventMap["float"] || 0;
 					eventData.stringValue = eventMap["string"] || "";
+					eventData.audioPath = eventMap["audio"] || null;
+					if (eventData.audioPath != null) {
+						eventData.volume = eventMap["volume"] || 1;
+						eventData.balance = eventMap["balance"] || 0;
+					}
 					skeletonData.events.push(eventData);
 				}
 			}
@@ -531,7 +539,9 @@ package spine {
 				for each (valueMap in values) {
 					var mix : Number = valueMap.hasOwnProperty("mix") ? valueMap["mix"] : 1;
 					var bendDirection : int = (!valueMap.hasOwnProperty("bendPositive") || valueMap["bendPositive"]) ? 1 : -1;
-					ikTimeline.setFrame(frameIndex, valueMap["time"], mix, bendDirection);
+					var compress : Boolean = (valueMap.hasOwnProperty("compress") && valueMap["compress"]);
+					var stretch : Boolean = (valueMap.hasOwnProperty("stretch") && valueMap["stretch"]);
+					ikTimeline.setFrame(frameIndex, valueMap["time"], mix, bendDirection, compress, stretch);
 					readCurve(valueMap, ikTimeline, frameIndex);
 					frameIndex++;
 				}
@@ -709,6 +719,10 @@ package spine {
 					event.intValue = eventMap.hasOwnProperty("int") ? eventMap["int"] : eventData.intValue;
 					event.floatValue = eventMap.hasOwnProperty("float") ? eventMap["float"] : eventData.floatValue;
 					event.stringValue = eventMap.hasOwnProperty("string") ? eventMap["string"] : eventData.stringValue;
+					if (eventData.audioPath != null) {
+						event.volume = eventMap.hasOwnProperty("volume") ? eventMap["volume"] : 1;
+						event.balance = eventMap.hasOwnProperty("balance") ? eventMap["balance"] : 0;
+					}
 					eventTimeline.setFrame(frameIndex++, event);
 				}
 				timelines[timelines.length] = eventTimeline;

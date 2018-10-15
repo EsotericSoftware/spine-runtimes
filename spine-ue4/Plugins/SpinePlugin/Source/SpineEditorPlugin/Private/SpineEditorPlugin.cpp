@@ -39,11 +39,11 @@ class FSpineEditorPlugin: public ISpineEditorPlugin {
 
 IMPLEMENT_MODULE(FSpineEditorPlugin, ISpineEditorPlugin)
 
+void FSpineEditorPlugin::StartupModule () {
+}
 
-
-void FSpineEditorPlugin::StartupModule () { }
-
-void FSpineEditorPlugin::ShutdownModule () { }
+void FSpineEditorPlugin::ShutdownModule () {
+}
 
 
 

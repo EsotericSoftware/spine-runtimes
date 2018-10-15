@@ -37,7 +37,6 @@
 #include "Developer/AssetTools/Public/IAssetTools.h"
 #include "Developer/DesktopPlatform/Public/IDesktopPlatform.h"
 #include "Developer/DesktopPlatform/Public/DesktopPlatformModule.h"
-#include "spine/spine.h"
 #include <string>
 #include <string.h>
 #include <stdlib.h>

@@ -220,7 +220,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a5ef44bf3e0d864794c0da71c84363d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blinkAnimation: blink
+  blinkAnimation: {fileID: 11400000, guid: abea4790b61cd194eab5977fc16e095d, type: 2}
   minimumDelay: 0.15
   maximumDelay: 3
 --- !u!1 &199409354

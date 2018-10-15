@@ -35,6 +35,8 @@ package spine {
 		public var intValue : int;
 		public var floatValue : Number;
 		public var stringValue : String;
+		public var volume: Number = 1;
+		public var balance: Number = 0;
 
 		public function Event(time : Number, data : EventData) {
 			if (data == null) throw new ArgumentError("data cannot be null.");

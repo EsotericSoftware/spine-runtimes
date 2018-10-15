@@ -32,6 +32,8 @@
 #include <spine/extension.h>
 
 void _spJitterVertexEffect_begin(spVertexEffect* self, spSkeleton* skeleton) {
+	UNUSED(self);
+	UNUSED(skeleton);
 }
 
 void _spJitterVertexEffect_transform(spVertexEffect* self, float* x, float* y, float* u, float* v, spColor* light, spColor* dark) {
@@ -40,9 +42,14 @@ void _spJitterVertexEffect_transform(spVertexEffect* self, float* x, float* y, f
 	float jitterY = internal->jitterY;
 	(*x) += _spMath_randomTriangular(-jitterX, jitterY);
 	(*y) += _spMath_randomTriangular(-jitterX, jitterY);
+	UNUSED(u);
+	UNUSED(v);
+	UNUSED(light);
+	UNUSED(dark);
 }
 
 void _spJitterVertexEffect_end(spVertexEffect* self) {
+	UNUSED(self);
 }
 
 spJitterVertexEffect* spJitterVertexEffect_create(float jitterX, float jitterY) {
@@ -78,6 +85,11 @@ void _spSwirlVertexEffect_transform(spVertexEffect* self, float* positionX, floa
 		(*positionX) = cosine * x - sine * y + internal->worldX;
 		(*positionY) = sine * x + cosine * y + internal->worldY;
 	}
+	UNUSED(self);
+	UNUSED(u);
+	UNUSED(v);
+	UNUSED(light);
+	UNUSED(dark);
 }
 
 void _spSwirlVertexEffect_end(spVertexEffect* self) {

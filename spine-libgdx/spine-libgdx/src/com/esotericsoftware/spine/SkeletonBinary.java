@@ -182,8 +182,12 @@ public class SkeletonBinary {
 
 			if (nonessential) {
 				skeletonData.fps = input.readFloat();
+
 				skeletonData.imagesPath = input.readString();
 				if (skeletonData.imagesPath.isEmpty()) skeletonData.imagesPath = null;
+
+				skeletonData.audioPath = input.readString();
+				if (skeletonData.audioPath.isEmpty()) skeletonData.audioPath = null;
 			}
 
 			// Bones.
@@ -228,6 +232,9 @@ public class SkeletonBinary {
 				data.target = skeletonData.bones.get(input.readInt(true));
 				data.mix = input.readFloat();
 				data.bendDirection = input.readByte();
+				data.compress = input.readBoolean();
+				data.stretch = input.readBoolean();
+				data.uniform = input.readBoolean();
 				skeletonData.ikConstraints.add(data);
 			}
 
@@ -302,6 +309,11 @@ public class SkeletonBinary {
 				data.intValue = input.readInt(false);
 				data.floatValue = input.readFloat();
 				data.stringValue = input.readString();
+				data.audioPath = input.readString();
+				if (data.audioPath != null) {
+					data.volume = input.readFloat();
+					data.balance = input.readFloat();
+				}
 				skeletonData.events.add(data);
 			}
 
@@ -655,7 +667,8 @@ public class SkeletonBinary {
 				IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount);
 				timeline.ikConstraintIndex = index;
 				for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readByte());
+					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readByte(), input.readBoolean(),
+						input.readBoolean());
 					if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
 				}
 				timelines.add(timeline);
@@ -812,6 +825,10 @@ public class SkeletonBinary {
 					event.intValue = input.readInt(false);
 					event.floatValue = input.readFloat();
 					event.stringValue = input.readBoolean() ? input.readString() : eventData.stringValue;
+					if (event.getData().audioPath != null) {
+						event.volume = input.readFloat();
+						event.balance = input.readFloat();
+					}
 					timeline.setFrame(i, event);
 				}
 				timelines.add(timeline);

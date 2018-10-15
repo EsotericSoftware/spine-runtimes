@@ -30,6 +30,7 @@
 
 package com.esotericsoftware.spine;
 
+import java.lang.reflect.Field;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.badlogic.gdx.Files.FileType;
@@ -803,7 +804,8 @@ public class AnimationStateTests {
 		expected.addAll(expectedArray);
 		stateData = new AnimationStateData(skeletonData);
 		state = new AnimationState(stateData);
-		state.trackEntryPool = new Pool<TrackEntry>() {
+
+		Pool trackEntryPool = new Pool<TrackEntry>() {
 			public TrackEntry obtain () {
 				TrackEntry entry = super.obtain();
 				entryCount++;
@@ -821,6 +823,14 @@ public class AnimationStateTests {
 				super.free(entry);
 			}
 		};
+		try {
+			Field field = state.getClass().getDeclaredField("trackEntryPool");
+			field.setAccessible(true);
+			field.set(state, trackEntryPool);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+
 		time = 0;
 		fail = false;
 		log(test + ": " + description);

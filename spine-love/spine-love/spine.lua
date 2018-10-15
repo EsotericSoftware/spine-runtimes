@@ -355,7 +355,7 @@ function SkeletonRenderer:draw (skeleton)
 					elseif slotBlendMode == spine.BlendMode.additive then
  						love.graphics.setBlendMode("add")
 					elseif slotBlendMode == spine.BlendMode.multiply then
-						love.graphics.setBlendMode("multiply")
+						love.graphics.setBlendMode("multiply", "premultiplied")
 					elseif slotBlendMode == spine.BlendMode.screen then
 						love.graphics.setBlendMode("screen")
 					end

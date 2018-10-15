@@ -56,32 +56,36 @@ package spine.animation {
 			frames[int(frameIndex + ROTATION)] = degrees;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, pose : MixPose, direction : MixDirection) : void {
+		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			var frames : Vector.<Number> = this.frames;
 
 			var bone : Bone = skeleton.bones[boneIndex];
 			var r : Number;
 			if (time < frames[0]) {
-				switch (pose) {
-				case MixPose.setup:
+				switch (blend) {
+				case MixBlend.setup:
 					bone.rotation = bone.data.rotation;
 					return;
-				case MixPose.current:
+				case MixBlend.first:
 					r = bone.data.rotation - bone.rotation;
-					r -= (16384 - int((16384.499999999996 - r / 360))) * 360;
-					bone.rotation += r * alpha;
+					bone.rotation += (r - (16384 - int((16384.499999999996 - r / 360))) * 360) * alpha;
 				}
 				return;
 			}
 
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
-				if (pose == MixPose.setup)
-					bone.rotation = bone.data.rotation + frames[frames.length + PREV_ROTATION] * alpha;
-				else {
-					r = bone.data.rotation + frames[frames.length + PREV_ROTATION] - bone.rotation;
-					r -= (16384 - int((16384.499999999996 - r / 360))) * 360; // Wrap within -180 and 180.
-					bone.rotation += r * alpha;
-				}
+				r = frames[frames.length + PREV_ROTATION];
+				switch (blend) {
+					case MixBlend.setup:
+						bone.rotation = bone.data.rotation + r * alpha;
+						break;
+					case MixBlend.first:
+					case MixBlend.replace:
+						r += bone.data.rotation - bone.rotation;
+						r -= (16384 - int((16384.499999999996 - r / 360))) * 360; // Wrap within -180 and 180.
+					case MixBlend.add:
+						bone.rotation += r * alpha;
+				}				
 				return;
 			}
 
@@ -92,15 +96,16 @@ package spine.animation {
 			var percent : Number = getCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
 			r = frames[frame + ROTATION] - prevRotation;
-			r -= (16384 - int((16384.499999999996 - r / 360))) * 360;
-			r = prevRotation + r * percent;
-			if (pose == MixPose.setup) {
-				r -= (16384 - int((16384.499999999996 - r / 360))) * 360;
-				bone.rotation = bone.data.rotation + r * alpha;
-			} else {
-				r = bone.data.rotation + r - bone.rotation;
-				r -= (16384 - int((16384.499999999996 - r / 360))) * 360;
-				bone.rotation += r * alpha;
+			r = prevRotation + (r - (16384 - int((16384.499999999996 - r / 360))) * 360) * percent;			
+			switch (blend) {
+				case MixBlend.setup:					
+					bone.rotation = bone.data.rotation + (r - (16384 - int((16384.499999999996 - r / 360))) * 360) * alpha;
+					break;
+				case MixBlend.first:
+				case MixBlend.replace:
+					r += bone.data.rotation - bone.rotation;					
+				case MixBlend.add:
+					bone.rotation += (r - (16384 - int((16384.499999999996 - r / 360))) * 360) * alpha;	
 			}
 		}
 	}

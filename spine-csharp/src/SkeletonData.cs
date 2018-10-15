@@ -49,7 +49,7 @@ namespace Spine {
 
 		// Nonessential.
 		internal float fps;
-		internal string imagesPath;
+		internal string imagesPath, audioPath;
 
 		public string Name { get { return name; } set { name = value; } }
 
@@ -79,7 +79,12 @@ namespace Spine {
 		/// <summary>The Spine version used to export this data, or null.</summary>
 		public string Version { get { return version; } set { version = value; } }
 		public string Hash { get { return hash; } set { hash = value; } }
+
+		/// <summary>The path to the images directory as defined in Spine. Available only when nonessential data was exported. May be null</summary>
 		public string ImagesPath { get { return imagesPath; } set { imagesPath = value; } }
+		
+		/// <summary>The path to the audio directory defined in Spine. Available only when nonessential data was exported. May be null.</summary>
+		public string AudioPath { get { return audioPath; } set { audioPath = value; } }
 
 		/// <summary>
 		/// The dopesheet FPS in Spine. Available only when nonessential data was exported.</summary>

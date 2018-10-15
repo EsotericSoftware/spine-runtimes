@@ -45,6 +45,6 @@ namespace Spine {
 	}
 
 	public interface IHasRendererObject {
-		object RendererObject { get; }
+		object RendererObject { get; set; }
 	}
 }

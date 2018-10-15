@@ -119,6 +119,9 @@ spSkeleton* spSkeleton_create (spSkeletonData* data) {
 
 	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
 
+	self->scaleX = 1;
+	self->scaleY = 1;
+
 	spSkeleton_updateCache(self);
 
 	FREE(childrenCounts);
@@ -433,6 +436,8 @@ void spSkeleton_setBonesToSetupPose (const spSkeleton* self) {
 	for (i = 0; i < self->ikConstraintsCount; ++i) {
 		spIkConstraint* ikConstraint = self->ikConstraints[i];
 		ikConstraint->bendDirection = ikConstraint->data->bendDirection;
+		ikConstraint->compress = ikConstraint->data->compress;
+		ikConstraint->stretch = ikConstraint->data->stretch;
 		ikConstraint->mix = ikConstraint->data->mix;
 	}
 

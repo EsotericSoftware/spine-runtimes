@@ -83,6 +83,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.esotericsoftware.spine.Animation.MixBlend;
 import com.esotericsoftware.spine.AnimationState.AnimationStateAdapter;
 import com.esotericsoftware.spine.AnimationState.TrackEntry;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
@@ -191,11 +192,11 @@ public class SkeletonViewer extends ApplicationAdapter {
 			String extension = skeletonFile.extension();
 			if (extension.equalsIgnoreCase("json") || extension.equalsIgnoreCase("txt")) {
 				SkeletonJson json = new SkeletonJson(atlas);
-				json.setScale(ui.scaleSlider.getValue());
+				json.setScale(ui.loadScaleSlider.getValue());
 				skeletonData = json.readSkeletonData(skeletonFile);
 			} else {
 				SkeletonBinary binary = new SkeletonBinary(atlas);
-				binary.setScale(ui.scaleSlider.getValue());
+				binary.setScale(ui.loadScaleSlider.getValue());
 				skeletonData = binary.readSkeletonData(skeletonFile);
 				if (skeletonData.getBones().size == 0) throw new Exception("No bones in skeleton data.");
 			}
@@ -207,6 +208,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 		}
 
 		skeleton = new Skeleton(skeletonData);
+		skeleton.updateWorldTransform();
 		skeleton.setToSetupPose();
 		skeleton = new Skeleton(skeleton); // Tests copy constructors.
 		skeleton.updateWorldTransform();
@@ -264,6 +266,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 		} else {
 			entry = state.setAnimation(track, ui.animationList.getSelected(), ui.loopCheckbox.isChecked());
 		}
+		entry.setMixBlend(ui.addCheckbox.isChecked() ? MixBlend.add : MixBlend.replace);
 		entry.setAlpha(ui.alphaSlider.getValue());
 	}
 
@@ -308,7 +311,10 @@ public class SkeletonViewer extends ApplicationAdapter {
 			renderer.setPremultipliedAlpha(ui.premultipliedCheckbox.isChecked());
 			batch.setPremultipliedAlpha(ui.premultipliedCheckbox.isChecked());
 
-			skeleton.setFlip(ui.flipXCheckbox.isChecked(), ui.flipYCheckbox.isChecked());
+			float scaleX = ui.xScaleSlider.getValue(), scaleY = ui.yScaleSlider.getValue();
+			if (skeleton.scaleX == 0) skeleton.scaleX = 0.01f;
+			if (skeleton.scaleY == 0) skeleton.scaleY = 0.01f;
+			skeleton.setScale(scaleX, scaleY);
 
 			delta = Math.min(delta, 0.032f) * ui.speedSlider.getValue();
 			skeleton.update(delta);
@@ -409,16 +415,21 @@ public class SkeletonViewer extends ApplicationAdapter {
 		TextButton openButton = new TextButton("Open", skin);
 		TextButton minimizeButton = new TextButton("-", skin);
 
-		Slider scaleSlider = new Slider(0.1f, 3, 0.01f, false, skin);
-		Label scaleLabel = new Label("1.0", skin);
-		TextButton scaleResetButton = new TextButton("Reset", skin);
+		Slider loadScaleSlider = new Slider(0.1f, 3, 0.01f, false, skin);
+		Label loadScaleLabel = new Label("100%", skin);
+		TextButton loadScaleResetButton = new TextButton("Reset", skin);
 
 		Slider zoomSlider = new Slider(0.01f, 10, 0.01f, false, skin);
-		Label zoomLabel = new Label("1.0", skin);
+		Label zoomLabel = new Label("100%", skin);
 		TextButton zoomResetButton = new TextButton("Reset", skin);
 
-		CheckBox flipXCheckbox = new CheckBox("X", skin);
-		CheckBox flipYCheckbox = new CheckBox("Y", skin);
+		Slider xScaleSlider = new Slider(-2, 2, 0.01f, false, skin);
+		Label xScaleLabel = new Label("100%", skin);
+		TextButton xScaleResetButton = new TextButton("Reset", skin);
+
+		Slider yScaleSlider = new Slider(-2, 2, 0.01f, false, skin);
+		Label yScaleLabel = new Label("100%", skin);
+		TextButton yScaleResetButton = new TextButton("Reset", skin);
 
 		CheckBox debugBonesCheckbox = new CheckBox("Bones", skin);
 		CheckBox debugRegionsCheckbox = new CheckBox("Regions", skin);
@@ -442,19 +453,20 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		ButtonGroup<TextButton> trackButtons = new ButtonGroup();
 		CheckBox loopCheckbox = new CheckBox("Loop", skin);
+		CheckBox addCheckbox = new CheckBox("Add", skin);
 
 		Slider alphaSlider = new Slider(0, 1, 0.01f, false, skin);
-		Label alphaLabel = new Label("1.0", skin);
+		Label alphaLabel = new Label("100%", skin);
 
 		List<String> animationList = new List(skin);
 		ScrollPane animationScroll = new ScrollPane(animationList, skin, "bg");
 
 		Slider speedSlider = new Slider(0, 3, 0.01f, false, skin);
-		Label speedLabel = new Label("1.0", skin);
+		Label speedLabel = new Label("1.0x", skin);
 		TextButton speedResetButton = new TextButton("Reset", skin);
 
 		Slider mixSlider = new Slider(0, 4, 0.01f, false, skin);
-		Label mixLabel = new Label("0.3", skin);
+		Label mixLabel = new Label("0.3s", skin);
 
 		Label statusLabel = new Label("", skin);
 		WidgetGroup toasts = new WidgetGroup();
@@ -479,20 +491,28 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 			loopCheckbox.setChecked(true);
 
-			scaleSlider.setValue(1);
-			scaleSlider.setSnapToValues(new float[] {0.5f, 1, 1.5f, 2, 2.5f, 3, 3.5f}, 0.01f);
+			loadScaleSlider.setValue(1);
+			loadScaleSlider.setSnapToValues(new float[] {0.5f, 1, 1.5f, 2, 2.5f}, 0.09f);
 
 			zoomSlider.setValue(1);
-			zoomSlider.setSnapToValues(new float[] {0.5f, 1, 1.5f, 2, 2.5f, 3, 3.5f}, 0.01f);
+			zoomSlider.setSnapToValues(new float[] {1, 2}, 0.30f);
+
+			xScaleSlider.setValue(1);
+			xScaleSlider.setSnapToValues(new float[] {-1.5f, -1, -0.5f, 0.5f, 1, 1.5f}, 0.12f);
+
+			yScaleSlider.setValue(1);
+			yScaleSlider.setSnapToValues(new float[] {-1.5f, -1, -0.5f, 0.5f, 1, 1.5f}, 0.12f);
 
 			mixSlider.setValue(0.3f);
-			mixSlider.setSnapToValues(new float[] {1, 1.5f, 2, 2.5f, 3, 3.5f}, 0.1f);
+			mixSlider.setSnapToValues(new float[] {1, 1.5f, 2, 2.5f, 3, 3.5f}, 0.12f);
 
 			speedSlider.setValue(1);
-			speedSlider.setSnapToValues(new float[] {0.5f, 0.75f, 1, 1.25f, 1.5f, 2, 2.5f}, 0.01f);
+			speedSlider.setSnapToValues(new float[] {0.5f, 0.75f, 1, 1.25f, 1.5f, 2, 2.5f}, 0.09f);
 
 			alphaSlider.setValue(1);
 			alphaSlider.setDisabled(true);
+
+			addCheckbox.setDisabled(true);
 
 			window.setMovable(false);
 			window.setResizable(false);
@@ -513,12 +533,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 			root.defaults().space(6);
 			root.columnDefaults(0).top().right().padTop(3);
 			root.columnDefaults(1).left();
-			root.add("Scale:");
+			root.add("Load scale:");
 			{
 				Table table = table();
-				table.add(scaleLabel).width(29);
-				table.add(scaleSlider).growX();
-				table.add(scaleResetButton);
+				table.add(loadScaleLabel).width(29);
+				table.add(loadScaleSlider).growX();
+				table.add(loadScaleResetButton);
 				root.add(table).fill().row();
 			}
 			root.add("Zoom:");
@@ -529,8 +549,22 @@ public class SkeletonViewer extends ApplicationAdapter {
 				table.add(zoomResetButton);
 				root.add(table).fill().row();
 			}
-			root.add("Flip:");
-			root.add(table(flipXCheckbox, flipYCheckbox)).row();
+			root.add("Scale X:");
+			{
+				Table table = table();
+				table.add(xScaleLabel).width(29);
+				table.add(xScaleSlider).growX();
+				table.add(xScaleResetButton).row();
+				root.add(table).fill().row();
+			}
+			root.add("Scale Y:");
+			{
+				Table table = table();
+				table.add(yScaleLabel).width(29);
+				table.add(yScaleSlider).growX();
+				table.add(yScaleResetButton);
+				root.add(table).fill().row();
+			}
 			root.add("Debug:");
 			root.add(table(debugBonesCheckbox, debugRegionsCheckbox, debugBoundingBoxesCheckbox)).row();
 			root.add();
@@ -562,6 +596,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				for (TextButton button : trackButtons.getButtons())
 					table.add(button);
 				table.add(loopCheckbox);
+				table.add(addCheckbox);
 				root.add(table).row();
 			}
 			root.add("Entry alpha:");
@@ -670,25 +705,25 @@ public class SkeletonViewer extends ApplicationAdapter {
 				}
 			});
 
-			scaleSlider.addListener(new ChangeListener() {
+			loadScaleSlider.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
-					scaleLabel.setText(Float.toString((int)(scaleSlider.getValue() * 100) / 100f));
-					if (!scaleSlider.isDragging()) loadSkeleton(skeletonFile);
+					loadScaleLabel.setText(Integer.toString((int)(loadScaleSlider.getValue() * 100)) + "%");
+					if (!loadScaleSlider.isDragging()) loadSkeleton(skeletonFile);
 				}
 			});
-			scaleResetButton.addListener(new ChangeListener() {
+			loadScaleResetButton.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
 					resetCameraPosition();
-					if (scaleSlider.getValue() == 1)
+					if (loadScaleSlider.getValue() == 1)
 						loadSkeleton(skeletonFile);
 					else
-						scaleSlider.setValue(1);
+						loadScaleSlider.setValue(1);
 				}
 			});
 
 			zoomSlider.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
-					zoomLabel.setText(Float.toString((int)(zoomSlider.getValue() * 100) / 100f));
+					zoomLabel.setText(Integer.toString((int)(zoomSlider.getValue() * 100)) + "%");
 					float newZoom = 1 / zoomSlider.getValue();
 					camera.position.x -= window.getWidth() / 2 * (newZoom - camera.zoom);
 					camera.zoom = newZoom;
@@ -703,9 +738,33 @@ public class SkeletonViewer extends ApplicationAdapter {
 				}
 			});
 
+			xScaleSlider.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					if (xScaleSlider.getValue() == 0) xScaleSlider.setValue(0.01f);
+					xScaleLabel.setText(Integer.toString((int)(xScaleSlider.getValue() * 100)) + "%");
+				}
+			});
+			xScaleResetButton.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					xScaleSlider.setValue(1);
+				}
+			});
+
+			yScaleSlider.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					if (yScaleSlider.getValue() == 0) yScaleSlider.setValue(0.01f);
+					yScaleLabel.setText(Integer.toString((int)(yScaleSlider.getValue() * 100)) + "%");
+				}
+			});
+			yScaleResetButton.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					yScaleSlider.setValue(1);
+				}
+			});
+
 			speedSlider.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
-					speedLabel.setText(Float.toString((int)(speedSlider.getValue() * 100) / 100f));
+					speedLabel.setText(Float.toString((int)(speedSlider.getValue() * 100) / 100f) + "x");
 				}
 			});
 			speedResetButton.addListener(new ChangeListener() {
@@ -716,7 +775,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 			alphaSlider.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
-					alphaLabel.setText(Float.toString((int)(alphaSlider.getValue() * 100) / 100f));
+					alphaLabel.setText(Integer.toString((int)(alphaSlider.getValue() * 100)) + "%");
 					int track = trackButtons.getCheckedIndex();
 					if (track > 0) {
 						TrackEntry current = state.getCurrent(track);
@@ -730,7 +789,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 			mixSlider.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
-					mixLabel.setText(Float.toString((int)(mixSlider.getValue() * 100) / 100f));
+					mixLabel.setText(Float.toString((int)(mixSlider.getValue() * 100) / 100f) + "s");
 					if (state != null) state.getData().setDefaultMix(mixSlider.getValue());
 				}
 			});
@@ -759,6 +818,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 			animationScroll.addListener(scrollFocusListener);
 
 			loopCheckbox.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					setAnimation();
+				}
+			});
+
+			addCheckbox.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
 					setAnimation();
 				}
@@ -799,7 +864,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 					alphaSlider.setDisabled(track == 0);
 					alphaSlider.setValue(current == null ? 1 : current.alpha);
 
-					if (current != null) loopCheckbox.setChecked(current.getLoop());
+					addCheckbox.setDisabled(track == 0);
+
+					if (current != null) {
+						loopCheckbox.setChecked(current.getLoop());
+						addCheckbox.setChecked(current.getMixBlend() == MixBlend.add);
+					}
 				}
 			};
 			for (TextButton button : trackButtons.getButtons())
@@ -856,11 +926,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 			debugClippingCheckbox.addListener(savePrefsListener);
 			premultipliedCheckbox.addListener(savePrefsListener);
 			loopCheckbox.addListener(savePrefsListener);
+			addCheckbox.addListener(savePrefsListener);
 			speedSlider.addListener(savePrefsListener);
 			speedResetButton.addListener(savePrefsListener);
 			mixSlider.addListener(savePrefsListener);
-			scaleSlider.addListener(savePrefsListener);
-			scaleResetButton.addListener(savePrefsListener);
+			loadScaleSlider.addListener(savePrefsListener);
+			loadScaleResetButton.addListener(savePrefsListener);
 			zoomSlider.addListener(savePrefsListener);
 			zoomResetButton.addListener(savePrefsListener);
 			animationList.addListener(savePrefsListener);
@@ -920,9 +991,10 @@ public class SkeletonViewer extends ApplicationAdapter {
 			prefs.putBoolean("debugClipping", debugClippingCheckbox.isChecked());
 			prefs.putBoolean("premultiplied", premultipliedCheckbox.isChecked());
 			prefs.putBoolean("loop", loopCheckbox.isChecked());
+			prefs.putBoolean("add", addCheckbox.isChecked());
 			prefs.putFloat("speed", speedSlider.getValue());
 			prefs.putFloat("mix", mixSlider.getValue());
-			prefs.putFloat("scale", scaleSlider.getValue());
+			prefs.putFloat("scale", loadScaleSlider.getValue());
 			prefs.putFloat("zoom", zoomSlider.getValue());
 			prefs.putFloat("x", camera.position.x);
 			prefs.putFloat("y", camera.position.y);
@@ -948,7 +1020,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 				debugPointsCheckbox.setChecked(prefs.getBoolean("debugPoints", true));
 				debugClippingCheckbox.setChecked(prefs.getBoolean("debugClipping", true));
 				premultipliedCheckbox.setChecked(prefs.getBoolean("premultiplied", true));
-				loopCheckbox.setChecked(prefs.getBoolean("loop", false));
+				loopCheckbox.setChecked(prefs.getBoolean("loop", true));
+				addCheckbox.setChecked(prefs.getBoolean("add", false));
 				speedSlider.setValue(prefs.getFloat("speed", 0.3f));
 				mixSlider.setValue(prefs.getFloat("mix", 0.3f));
 
@@ -957,7 +1030,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				camera.position.x = prefs.getFloat("x", 0);
 				camera.position.y = prefs.getFloat("y", 0);
 
-				scaleSlider.setValue(prefs.getFloat("scale", 1));
+				loadScaleSlider.setValue(prefs.getFloat("scale", 1));
 				animationList.setSelected(prefs.getString("animationName", null));
 				skinList.setSelected(prefs.getString("skinName", null));
 			} catch (Exception ex) {
@@ -983,6 +1056,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 		config.height = (int)(600 * uiScale);
 		config.title = "Skeleton Viewer";
 		config.allowSoftwareMode = true;
+		config.samples = 2;
 		new LwjglApplication(new SkeletonViewer(), config);
 	}
 }

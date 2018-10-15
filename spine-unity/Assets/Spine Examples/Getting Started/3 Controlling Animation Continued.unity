@@ -178,6 +178,12 @@ TextMesh:
   m_Text: 'The Raptor script shows how you can play animations simultaneously.
 
 
+    This also shows how to use AnimationReferenceAssets as
+
+    an alternative to using animation name strings.
+
+
+
     Here, the "walk" animation is looping.
 
     At the same time, and in its own timeframe,
@@ -360,9 +366,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b0d38dc0b91fb443a41838d475ae49b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walk: walk
-  gungrab: gungrab
-  gunkeep: gunkeep
+  walk: {fileID: 11400000, guid: ac5036612c87200419da1450c17b1482, type: 2}
+  gungrab: {fileID: 11400000, guid: f8a357da5599fa342beda596bc86bc35, type: 2}
+  gunkeep: {fileID: 11400000, guid: d1426f136e8d57343a64e6be7454418b, type: 2}
 --- !u!1 &1382792502
 GameObject:
   m_ObjectHideFlags: 0

@@ -123,8 +123,11 @@ module spine {
 					data.target = skeletonData.findBone(targetName);
 					if (data.target == null) throw new Error("IK target bone not found: " + targetName);
 
-					data.bendDirection = this.getValue(constraintMap, "bendPositive", true) ? 1 : -1;
 					data.mix = this.getValue(constraintMap, "mix", 1);
+					data.bendDirection = this.getValue(constraintMap, "bendPositive", true) ? 1 : -1;
+					data.compress = this.getValue(constraintMap, "compress", false);
+					data.stretch = this.getValue(constraintMap, "stretch", false);
+					data.uniform = this.getValue(constraintMap, "uniform", false);
 
 					skeletonData.ikConstraints.push(data);
 				}
@@ -238,6 +241,11 @@ module spine {
 					data.intValue = this.getValue(eventMap, "int", 0);
 					data.floatValue = this.getValue(eventMap, "float", 0);
 					data.stringValue = this.getValue(eventMap, "string", "");
+					data.audioPath = this.getValue(eventMap, "audio", null);
+					if (data.audioPath != null) {
+						data.volume = this.getValue(eventMap, "volume", 1);
+						data.balance = this.getValue(eventMap, "balance", 0);
+					}
 					skeletonData.events.push(data);
 				}
 			}
@@ -520,7 +528,7 @@ module spine {
 					for (let i = 0; i < constraintMap.length; i++) {
 						let valueMap = constraintMap[i];
 						timeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, "mix", 1),
-							this.getValue(valueMap, "bendPositive", true) ? 1 : -1);
+							this.getValue(valueMap, "bendPositive", true) ? 1 : -1, this.getValue(valueMap, "compress", false), this.getValue(valueMap, "stretch", false));
 						this.readCurve(valueMap, timeline, frameIndex);
 						frameIndex++;
 					}
@@ -703,6 +711,10 @@ module spine {
 					event.intValue = this.getValue(eventMap, "int", eventData.intValue);
 					event.floatValue = this.getValue(eventMap, "float", eventData.floatValue);
 					event.stringValue = this.getValue(eventMap, "string", eventData.stringValue);
+					if (event.data.audioPath != null) {
+						event.volume = this.getValue(eventMap, "volume", 1);
+						event.balance = this.getValue(eventMap, "balance", 0);
+					}
 					timeline.setFrame(frameIndex++, event);
 				}
 				timelines.push(timeline);

@@ -1,0 +1,6 @@
+AnimationMatchModifierAsset
+===========================
+
+This is a SkeletonDataModifierAsset. Add it to a SkeletonDataAsset to apply its effects when its SkeletonData is loaded.
+
+AnimationMatchModifierAsset processes animations so that their timelines match. This allows them to function with naive Animation Apply systems such as SkeletonMecanim without the need for autoreset functionality.

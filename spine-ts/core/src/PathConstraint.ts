@@ -69,28 +69,35 @@ module spine {
 			if (!translate && !rotate) return;
 
 			let data = this.data;
-			let spacingMode = data.spacingMode;
-			let lengthSpacing = spacingMode == SpacingMode.Length;
+			let percentSpacing = data.spacingMode == SpacingMode.Percent;
 			let rotateMode = data.rotateMode;
 			let tangents = rotateMode == RotateMode.Tangent, scale = rotateMode == RotateMode.ChainScale;
 			let boneCount = this.bones.length, spacesCount = tangents ? boneCount : boneCount + 1;
 			let bones = this.bones;
 			let spaces = Utils.setArraySize(this.spaces, spacesCount), lengths: Array<number> = null;
 			let spacing = this.spacing;
-			if (scale || lengthSpacing) {
+			if (scale || !percentSpacing) {
 				if (scale) lengths = Utils.setArraySize(this.lengths, boneCount);
+				var lengthSpacing = data.spacingMode == SpacingMode.Length;
 				for (let i = 0, n = spacesCount - 1; i < n;) {
 					let bone = bones[i];
 					let setupLength = bone.data.length;
 					if (setupLength < PathConstraint.epsilon) {
 						if (scale) lengths[i] = 0;
 						spaces[++i] = 0;
+					} else if (percentSpacing) {
+						if (scale) {
+							var x = setupLength * bone.a, y = setupLength * bone.c;
+							var length = Math.sqrt(x * x + y * y);
+							lengths[i] = length;
+						}
+						spaces[++i] = spacing;
 					} else {
 						let x = setupLength * bone.a, y = setupLength * bone.c;
 						let length = Math.sqrt(x * x + y * y);
 						if (scale) lengths[i] = length;
 						spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
-					}										
+					}
 				}
 			} else {
 				for (let i = 1; i < spacesCount; i++)
@@ -98,7 +105,7 @@ module spine {
 			}
 
 			let positions = this.computeWorldPositions(<PathAttachment>attachment, spacesCount, tangents,
-				data.positionMode == PositionMode.Percent, spacingMode == SpacingMode.Percent);
+				data.positionMode == PositionMode.Percent, percentSpacing);
 			let boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
 			let tip = false;
 			if (offsetRotation == 0)
@@ -277,7 +284,10 @@ module spine {
 				x1 = x2;
 				y1 = y2;
 			}
-			if (percentPosition) position *= pathLength;
+			if (percentPosition)
+				position *= pathLength;
+			else
+				position *= pathLength / path.lengths[curveCount - 1];
 			if (percentSpacing) {
 				for (let i = 0; i < spacesCount; i++)
 					spaces[i] *= pathLength;

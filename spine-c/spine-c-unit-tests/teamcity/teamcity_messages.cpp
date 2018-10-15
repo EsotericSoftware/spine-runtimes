@@ -20,6 +20,8 @@
 
 #include "teamcity_messages.h"
 
+#pragma warning(disable:4996)
+
 using namespace std;
 
 namespace JetBrains {

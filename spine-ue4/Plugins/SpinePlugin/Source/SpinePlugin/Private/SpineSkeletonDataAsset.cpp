@@ -33,6 +33,7 @@
 #include <string.h>
 #include <string>
 #include <stdlib.h>
+#include "Runtime/Core/Public/Misc/MessageDialog.h"
 
 #define LOCTEXT_NAMESPACE "Spine"
 
@@ -103,10 +104,22 @@ spSkeletonData* USpineSkeletonDataAsset::GetSkeletonData (spAtlas* Atlas, bool F
 		if (skeletonDataFileName.GetPlainNameString().Contains(TEXT(".json"))) {
 			spSkeletonJson* json = spSkeletonJson_create(Atlas);
 			this->skeletonData = spSkeletonJson_readSkeletonData(json, (const char*)rawData.GetData());
+			if (!skeletonData) {
+#if WITH_EDITORONLY_DATA
+				FMessageDialog::Debugf(FText::FromString(UTF8_TO_TCHAR(json->error)));
+#endif
+				UE_LOG(SpineLog, Error, TEXT("Couldn't load skeleton data and atlas: %s"), UTF8_TO_TCHAR(json->error));
+			}
 			spSkeletonJson_dispose(json);
 		} else {
 			spSkeletonBinary* binary = spSkeletonBinary_create(Atlas);
 			this->skeletonData = spSkeletonBinary_readSkeletonData(binary, (const unsigned char*)rawData.GetData(), (int)rawData.Num());
+			if (!skeletonData) {
+#if WITH_EDITORONLY_DATA
+				FMessageDialog::Debugf(FText::FromString(UTF8_TO_TCHAR(binary->error)));
+#endif
+				UE_LOG(SpineLog, Error, TEXT("Couldn't load skeleton data and atlas: %s"), UTF8_TO_TCHAR(binary->error));
+			}
 			spSkeletonBinary_dispose(binary);
 		}
 		if (animationStateData) {

@@ -51,7 +51,7 @@ void spVertexAttachment_computeWorldVertices (spVertexAttachment* self, spSlot* 
 	float* vertices;
 	int* bones;
 
-	count += offset;
+	count = offset + (count >> 1) * stride;
 	skeleton = slot->bone->skeleton;
 	deformLength = slot->attachmentVerticesCount;
 	deform = slot->attachmentVertices;

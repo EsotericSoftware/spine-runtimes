@@ -10,7 +10,7 @@ namespace Spine.Unity.Examples {
 		public Texture2D[] textures;
 		public Material materialPropertySource;
 
-		AtlasAsset runtimeAtlasAsset;
+		SpineAtlasAsset runtimeAtlasAsset;
 		SkeletonDataAsset runtimeSkeletonDataAsset;
 		SkeletonAnimation runtimeSkeletonAnimation;
 
@@ -19,7 +19,7 @@ namespace Spine.Unity.Examples {
 			// 2. Create SkeletonDataAsset (needs json or binary asset file, and an AtlasAsset)
 			// 3. Create SkeletonAnimation (needs a valid SkeletonDataAsset)
 
-			runtimeAtlasAsset = AtlasAsset.CreateRuntimeInstance(atlasText, textures, materialPropertySource, true);
+			runtimeAtlasAsset = SpineAtlasAsset.CreateRuntimeInstance(atlasText, textures, materialPropertySource, true);
 			runtimeSkeletonDataAsset = SkeletonDataAsset.CreateRuntimeInstance(skeletonJson, runtimeAtlasAsset, true);
 		}
 

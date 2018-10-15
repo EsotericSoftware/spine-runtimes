@@ -282,7 +282,7 @@ MeshRenderer:
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 1455e88fdb81ccc45bdeaedd657bad4d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1012,7 +1012,7 @@ ParticleSystem:
     boxY: 1
     boxZ: 1
     radius:
-      value: 0.46
+      value: 0.16
       mode: 0
       spread: 0
       speed:
@@ -1119,7 +1119,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 50
+      scalar: 40
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -3787,6 +3787,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
 --- !u!4 &774732877
 Transform:
   m_ObjectHideFlags: 0
@@ -3869,6 +3870,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
 --- !u!1 &1406277772
 GameObject:
   m_ObjectHideFlags: 0
@@ -3938,6 +3940,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
 --- !u!1 &1498924765
 GameObject:
   m_ObjectHideFlags: 0
@@ -4461,7 +4464,7 @@ MeshRenderer:
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 1455e88fdb81ccc45bdeaedd657bad4d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4515,8 +4518,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skeletonAnimation: {fileID: 1918225116}
   separator: {fileID: 1918225115}
-  run: run
-  pole: pole
+  run: {fileID: 11400000, guid: 2d841d20c203ff24a859b8c73f9c3817, type: 2}
+  pole: {fileID: 11400000, guid: dff7c26e6e007e748b47240522cff0c8, type: 2}
   startX: -11.5
   endX: 2.8
 --- !u!1 &2142418130

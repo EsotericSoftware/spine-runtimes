@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: f1b3b4b945939a54ea0b23d3396115fb
+timeCreated: 1536403985
+licenseType: Pro
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - multiplyMaterialTemplate: {fileID: 2100000, guid: 53bf0ab317d032d418cf1252d68f51df,
+      type: 2}
+  - screenMaterialTemplate: {fileID: 2100000, guid: 73f0f46d3177c614baf0fa48d646a9be,
+      type: 2}
+  - additiveMaterialTemplate: {fileID: 2100000, guid: 4deba332d47209e4780b3c5fcf0e3745,
+      type: 2}
+  - skeletonJSON: {instanceID: 0}
+  - controller: {instanceID: 0}
+  executionOrder: 0
+  icon: {fileID: 2800000, guid: 68defdbc95b30a74a9ad396bfc9a2277, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

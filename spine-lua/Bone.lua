@@ -95,33 +95,22 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 	self.ashearX = shearX
 	self.ashearY = shearY
 	self.appliedValid = true
+	
+	local sx = self.skeleton.scaleX;
+	local sy = self.skeleton.scaleY;
 
 	local parent = self.parent
 	if parent == nil then
 		local rotationY = rotation + 90 + shearY
 		local rotationRad = math_rad(rotation + shearX)
-		local rotationYRad = math_rad(rotationY)
-		local la = math_cos(rotationRad) * scaleX
-		local lb = math_cos(rotationYRad) * scaleY
-		local lc = math_sin(rotationRad) * scaleX
-		local ld = math_sin(rotationYRad) * scaleY
+		local rotationYRad = math_rad(rotationY)		
 		local skeleton = self.skeleton
-		if skeleton.flipX then
-			x = -x
-			la = -la
-			lb = -lb
-		end
-		if skeleton.flipY then
-			y = -y
-			lc = -lc
-			ld = -ld
-		end
-		self.a = la
-		self.b = lb
-		self.c = lc
-		self.d = ld
-		self.worldX = x + skeleton.x
-		self.worldY = y + skeleton.y
+		self.a = math_cos(rotationRad) * scaleX * sx
+		self.b = math_cos(rotationYRad) * scaleY * sy
+		self.c = math_sin(rotationRad) * scaleX * sx
+		self.d = math_sin(rotationYRad) * scaleY * sy
+		self.worldX = x * sx + skeleton.x
+		self.worldY = y * sy + skeleton.y
 		return
 	end
 
@@ -176,8 +165,8 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 	elseif transformMode == TransformMode.noScale or transformMode == TransformMode.noScaleOrReflection then
 		local cos = math_cos(math_rad(rotation))
 		local sin = math_sin(math_rad(rotation))
-		local za = pa * cos + pb * sin
-		local zc = pc * cos + pd * sin
+		local za = (pa * cos + pb * sin) / sx
+		local zc = (pc * cos + pd * sin) / sy
 		local s = math_sqrt(za * za + zc * zc)
 		if s > 0.00001 then s = 1 / s end
 		za = za * s
@@ -190,27 +179,16 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		local lb = math_cos(math_rad(90 + shearY)) * scaleY;
 		local lc = math_sin(math_rad(shearX)) * scaleX;
 		local ld = math_sin(math_rad(90 + shearY)) * scaleY;
-		local flip = self.skeleton.flipX ~= self.skeleton.flipY
-		if transformMode ~= TransformMode.noScaleOrReflection then flip = pa * pd - pb * pc < 0 end
-		if flip then
-			zb = -zb
-			zd = -zd
-		end
 		self.a = za * la + zb * lc
 		self.b = za * lb + zb * ld
 		self.c = zc * la + zd * lc
 		self.d = zc * lb + zd * ld		
-		return
 	end
 	
-	if self.skeleton.flipX then
-		self.a = -self.a
-		self.b = -self.b
-	end
-	if self.skeleton.flipY then
-		self.c = -self.c
-		self.d = -self.d
-	end
+	self.a = self.a * sx
+	self.b = self.b * sx
+	self.c = self.c * sy
+	self.d = self.d * sy
 end
 
 function Bone:setToSetupPose ()
@@ -240,7 +218,7 @@ function Bone:getWorldScaleY ()
 	return math_sqrt(self.b * self.b + self.d * self.d)
 end
 
-function updateAppliedTransform ()
+function Bone:updateAppliedTransform ()
 	local parent = self.parent
 	if parent == nil then
 		self.ax = self.worldX

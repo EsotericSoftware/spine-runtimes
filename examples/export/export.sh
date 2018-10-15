@@ -2,9 +2,12 @@
 set -e
 
 SPINE_EXE="C:/Program Files (x86)/Spine/Spine.com"
-PLATFORM=`uname`
-echo $PLATFORM
-if [[ $PLATFORM == "Darwin" ]]; then
+
+if [ ! -f "$SPINE_EXE" ]; then
+   SPINE_EXE="/mnt/c/Program Files (x86)/Spine/Spine.com"
+fi
+
+if [ ! -f "$SPINE_EXE" ]; then
 	SPINE_EXE="/Applications/Spine/Spine.app/Contents/MacOS/Spine"
 fi
 echo "Spine exe: $SPINE_EXE"
@@ -23,6 +26,7 @@ rm -rf ../stretchyman/export/*
 rm -rf ../raptor/export/*
 rm -rf ../tank/export/*
 rm -rf ../vine/export/*
+rm -rf ../owl/export/*
 
 echo ""
 echo "Exporting..."
@@ -90,6 +94,9 @@ echo "Exporting..."
 -i ../stretchyman/images -o ../stretchyman/export -n stretchyman -p atlas-1.0.json \
 -i ../stretchyman/images -o ../stretchyman/export -n stretchyman-pma -p atlas-1.0-pma.json \
 \
+-i ../stretchyman-stretchy-ik/stretchyman-stretchy-ik.spine -o ../stretchyman-stretchy-ik/export -e json.json \
+-i ../stretchyman-stretchy-ik/stretchyman-stretchy-ik.spine -o ../stretchyman-stretchy-ik/export -e binary.json \
+\
 -i ../tank/tank-pro.spine -o ../tank/export -e json.json \
 -i ../tank/tank-pro.spine -o ../tank/export -e binary.json \
 -i ../tank/images -o ../tank/export -n tank -p atlas-0.5.json \
@@ -98,4 +105,9 @@ echo "Exporting..."
 -i ../vine/vine-pro.spine -o ../vine/export -e json.json \
 -i ../vine/vine-pro.spine -o ../vine/export -e binary.json \
 -i ../vine/images -o ../vine/export -n vine -p atlas-1.0.json \
--i ../vine/images -o ../vine/export -n vine-pma -p atlas-1.0-pma.json
+-i ../vine/images -o ../vine/export -n vine-pma -p atlas-1.0-pma.json \
+\
+-i ../owl/owl-pro.spine -o ../owl/export -e json.json \
+-i ../owl/owl-pro.spine -o ../owl/export -e binary.json \
+-i ../owl/images -o ../owl/export -n owl -p atlas-0.5.json \
+-i ../owl/images -o ../owl/export -n owl-pma -p atlas-0.5-pma.json

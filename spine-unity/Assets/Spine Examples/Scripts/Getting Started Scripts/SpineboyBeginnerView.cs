@@ -40,8 +40,8 @@ namespace Spine.Unity.Examples {
 		public SpineboyBeginnerModel model;
 		public SkeletonAnimation skeletonAnimation;
 
-		[SpineAnimation] public string run, idle, shoot, jump;
-		[SpineEvent] public string footstepEventName;
+		public AnimationReferenceAsset run, idle, shoot, jump;
+		public EventDataReferenceAsset footstepEvent;
 
 		[Header("Audio")]
 		public float footstepPitchOffset = 0.2f;
@@ -61,7 +61,7 @@ namespace Spine.Unity.Examples {
 		}
 
 		void HandleEvent (Spine.TrackEntry trackEntry, Spine.Event e) {
-			if (e.Data.Name == footstepEventName)
+			if (e.Data == footstepEvent.EventData)
 				PlayFootstepSound();
 		}
 
@@ -69,7 +69,7 @@ namespace Spine.Unity.Examples {
 			if (skeletonAnimation == null) return;
 			if (model == null) return;
 
-			if (skeletonAnimation.skeleton.FlipX != model.facingLeft) {	// Detect changes in model.facingLeft
+			if ((skeletonAnimation.skeleton.ScaleX < 0) != model.facingLeft) {	// Detect changes in model.facingLeft
 				Turn(model.facingLeft);
 			}
 
@@ -85,7 +85,7 @@ namespace Spine.Unity.Examples {
 
 		void PlayNewStableAnimation () {
 			var newModelState = model.state;
-			string nextAnimation;
+			Animation nextAnimation;
 
 			// Add conditionals to not interrupt transient animations.
 
@@ -134,7 +134,7 @@ namespace Spine.Unity.Examples {
 		}
 
 		public void Turn (bool facingLeft) {
-			skeletonAnimation.Skeleton.FlipX = facingLeft;
+			skeletonAnimation.Skeleton.ScaleX = facingLeft ? -1f : 1f;
 			// Maybe play a transient turning animation too, then call ChangeStableAnimation.
 		}
 		#endregion

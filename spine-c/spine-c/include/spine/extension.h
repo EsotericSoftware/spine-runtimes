@@ -61,6 +61,13 @@
 #ifndef SPINE_EXTENSION_H_
 #define SPINE_EXTENSION_H_
 
+#include <spine/dll.h>
+
+/* Required for sprintf and consorts on MSVC */
+#ifdef _MSC_VER
+#pragma warning(disable:4996)
+#endif
+
 /* All allocation uses these. */
 #define MALLOC(TYPE,COUNT) ((TYPE*)_spMalloc(sizeof(TYPE) * (COUNT), __FILE__, __LINE__))
 #define CALLOC(TYPE,COUNT) ((TYPE*)_spCalloc(COUNT, sizeof(TYPE), __FILE__, __LINE__))
@@ -94,7 +101,7 @@
 #define RAD_DEG (180 / PI)
 
 #define ABS(A) ((A) < 0? -(A): (A))
-#define SIGNUM(A) ((A) < 0? -1: (A) > 0 ? 1 : 0)
+#define SIGNUM(A) ((A) < 0? -1.0f: (A) > 0 ? 1.0f : 0.0f)
 
 #ifdef __STDC_VERSION__
 #define FMOD(A,B) fmodf(A, B)
@@ -170,11 +177,11 @@ void* _spRealloc(void* ptr, size_t size);
 void _spFree (void* ptr);
 float _spRandom ();
 
-void _spSetMalloc (void* (*_malloc) (size_t size));
-void _spSetDebugMalloc (void* (*_malloc) (size_t size, const char* file, int line));
-void _spSetRealloc(void* (*_realloc) (void* ptr, size_t size));
-void _spSetFree (void (*_free) (void* ptr));
-void _spSetRandom(float (*_random) ());
+SP_API void _spSetMalloc (void* (*_malloc) (size_t size));
+SP_API void _spSetDebugMalloc (void* (*_malloc) (size_t size, const char* file, int line));
+SP_API void _spSetRealloc(void* (*_realloc) (void* ptr, size_t size));
+SP_API void _spSetFree (void (*_free) (void* ptr));
+SP_API void _spSetRandom(float (*_random) ());
 
 char* _spReadFile (const char* path, int* length);
 
@@ -287,7 +294,7 @@ void _spVertexAttachment_deinit (spVertexAttachment* self);
 void _spTimeline_init (spTimeline* self, spTimelineType type,
 	void (*dispose) (spTimeline* self),
 	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
-		int* eventsCount, float alpha, spMixPose pose, spMixDirection direction),
+		int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction),
 	int (*getPropertyId) (const spTimeline* self));
 void _spTimeline_deinit (spTimeline* self);
 
@@ -300,7 +307,7 @@ void _spTimeline_deinit (spTimeline* self);
 
 void _spCurveTimeline_init (spCurveTimeline* self, spTimelineType type, int framesCount,
 	void (*dispose) (spTimeline* self),
-	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents, int* eventsCount, float alpha, spMixPose pose, spMixDirection direction),
+	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents, int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction),
 	int (*getPropertyId) (const spTimeline* self));
 void _spCurveTimeline_deinit (spCurveTimeline* self);
 int _spCurveTimeline_binarySearch (float *values, int valuesLength, float target, int step);

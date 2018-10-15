@@ -28,12 +28,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-// Contributed by: Mitch Thompson
-
 using UnityEngine;
 using Spine.Unity;
 
 namespace Spine.Unity.Examples {
+
 	[RequireComponent(typeof(CharacterController))]
 	public class BasicPlatformerController : MonoBehaviour {
 
@@ -49,99 +48,99 @@ namespace Spine.Unity.Examples {
 
 		[Header("Jumping")]
 		public float jumpSpeed = 25;
-		public float jumpDuration = 0.5f;
-		public float jumpInterruptFactor = 100;
+		public float minimumJumpDuration = 0.5f;
+		public float jumpInterruptFactor = 0.5f;
 		public float forceCrouchVelocity = 25;
 		public float forceCrouchDuration = 0.5f;
 
-		[Header("Graphics")]
+		[Header("Visuals")]
 		public SkeletonAnimation skeletonAnimation;
 
 		[Header("Animation")]
-		[SpineAnimation(dataField: "skeletonAnimation")]
-		public string walkName = "Walk";
-		[SpineAnimation(dataField: "skeletonAnimation")]
-		public string runName = "Run";
-		[SpineAnimation(dataField: "skeletonAnimation")]
-		public string idleName = "Idle";
-		[SpineAnimation(dataField: "skeletonAnimation")]
-		public string jumpName = "Jump";
-		[SpineAnimation(dataField: "skeletonAnimation")]
-		public string fallName = "Fall";
-		[SpineAnimation(dataField: "skeletonAnimation")]
-		public string crouchName = "Crouch";
+		public TransitionDictionaryExample transitions;
+		public AnimationReferenceAsset walk;
+		public AnimationReferenceAsset run;
+		public AnimationReferenceAsset idle;
+		public AnimationReferenceAsset jump;
+		public AnimationReferenceAsset fall;
+		public AnimationReferenceAsset crouch;
+		public AnimationReferenceAsset runFromFall;
 
 		[Header("Effects")]
 		public AudioSource jumpAudioSource;
 		public AudioSource hardfallAudioSource;
-		public AudioSource footstepAudioSource;
 		public ParticleSystem landParticles;
-		[SpineEvent]
-		public string footstepEventName = "Footstep";
+		public HandleEventWithAudioExample footstepHandler;
+
 		CharacterController controller;
+		Vector2 input = default(Vector2);
 		Vector3 velocity = default(Vector3);
-		float jumpEndTime = 0;
-		bool jumpInterrupt = false;
+		float minimumJumpEndTime = 0;
 		float forceCrouchEndTime;
-		Vector2 input;
 		bool wasGrounded = false;
+
+		AnimationReferenceAsset targetAnimation;
+		AnimationReferenceAsset previousTargetAnimation;
 
 		void Awake () {
 			controller = GetComponent<CharacterController>();
 		}
 
-		void Start () {
-			skeletonAnimation.AnimationState.Event += HandleEvent;
-		}
-
-		void HandleEvent (Spine.TrackEntry trackEntry, Spine.Event e) {
-			if (e.Data.Name == footstepEventName) {
-				footstepAudioSource.Stop();
-				footstepAudioSource.pitch = GetRandomPitch(0.2f);
-				footstepAudioSource.Play();
-			}
-		}
-
-		static float GetRandomPitch (float maxOffset) {
-			return 1f + Random.Range(-maxOffset, maxOffset);
-		}
-
 		void Update () {
+			float dt = Time.deltaTime;
+			bool isGrounded = controller.isGrounded;
+			bool landed = !wasGrounded && isGrounded;
+
+			// Dummy input.
 			input.x = Input.GetAxis(XAxis);
 			input.y = Input.GetAxis(YAxis);
-			bool crouching = (controller.isGrounded && input.y < -0.5f) || (forceCrouchEndTime > Time.time);
-			velocity.x = 0;
-			float dt = Time.deltaTime;
+			bool inputJumpStop = Input.GetButtonUp(JumpButton);
+			bool inputJumpStart = Input.GetButtonDown(JumpButton);			
+			bool doCrouch = (isGrounded && input.y < -0.5f) || (forceCrouchEndTime > Time.time);
+			bool doJumpInterrupt = false;
+			bool doJump = false;
+			bool hardLand = false;
 
-			if (!crouching) { 
-				if (Input.GetButtonDown(JumpButton) && controller.isGrounded) {					
-					jumpAudioSource.Stop();
-					jumpAudioSource.Play();
-					velocity.y = jumpSpeed;
-					jumpEndTime = Time.time + jumpDuration;
-				} else {
-					jumpInterrupt |= Time.time < jumpEndTime && Input.GetButtonUp(JumpButton);
+			if (landed) {
+				if (-velocity.y > forceCrouchVelocity) {
+					hardLand = true;
+					doCrouch = true;
+					forceCrouchEndTime = Time.time + forceCrouchDuration;
 				}
+			}
 
+			if (!doCrouch) {
+				if (isGrounded) {
+					if (inputJumpStart) {
+						doJump = true;
+					}
+				} else {
+					doJumpInterrupt = inputJumpStop && Time.time < minimumJumpEndTime;
+				}
+			}
+
+			// Dummy physics and controller using UnityEngine.CharacterController.
+			Vector3 gravityDeltaVelocity = Physics.gravity * gravityScale * dt;
+			
+
+			if (doJump) {
+				velocity.y = jumpSpeed;
+				minimumJumpEndTime = Time.time + minimumJumpDuration;
+			} else if (doJumpInterrupt) {
+				if (velocity.y > 0)
+					velocity.y *= jumpInterruptFactor;
+			}
+
+			velocity.x = 0;
+			if (!doCrouch) {
 				if (input.x != 0) {
 					velocity.x = Mathf.Abs(input.x) > 0.6f ? runSpeed : walkSpeed;
 					velocity.x *= Mathf.Sign(input.x);
 				}
-
-				if (jumpInterrupt) {
-					if (velocity.y > 0) {
-						velocity.y = Mathf.MoveTowards(velocity.y, 0, dt * jumpInterruptFactor);
-					} else { 
-						jumpInterrupt = false;
-					}
-				}
 			}
-
-			var gravityDeltaVelocity = Physics.gravity * gravityScale * dt;
-
-			if (controller.isGrounded) {
-				jumpInterrupt = false;
-			} else {
+			
+			
+			if (!isGrounded) {
 				if (wasGrounded) {
 					if (velocity.y < 0)
 						velocity.y = 0;
@@ -149,38 +148,62 @@ namespace Spine.Unity.Examples {
 					velocity += gravityDeltaVelocity;
 				}
 			}
-
-			wasGrounded = controller.isGrounded;
-
 			controller.Move(velocity * dt);
 
-			if (!wasGrounded && controller.isGrounded) {
-				if (-velocity.y > forceCrouchVelocity) {
-					forceCrouchEndTime = Time.time + forceCrouchDuration;
+			// Animation
+			// Determine target animation.
+			if (isGrounded) {
+				if (doCrouch) {
+					targetAnimation = crouch;
+				} else {
+					if (input.x == 0)
+						targetAnimation = idle;
+					else
+						targetAnimation = Mathf.Abs(input.x) > 0.6f ? run : walk;
+				}
+			} else {
+				targetAnimation = velocity.y > 0 ? jump : fall;
+			}
+
+			// Handle change in target animation.
+			if (previousTargetAnimation != targetAnimation) {
+				Animation transition = null;
+				if (transitions != null && previousTargetAnimation != null) {
+					transition = transitions.GetTransition(previousTargetAnimation, targetAnimation);
+				}
+
+				if (transition != null) {
+					skeletonAnimation.AnimationState.SetAnimation(0, transition, false).MixDuration = 0.05f;
+					skeletonAnimation.AnimationState.AddAnimation(0, targetAnimation, true, 0f);
+				} else {
+					skeletonAnimation.AnimationState.SetAnimation(0, targetAnimation, true);
+				}
+			}
+			previousTargetAnimation = targetAnimation;
+
+			// Face intended direction.
+			if (input.x != 0)
+				skeletonAnimation.Skeleton.ScaleX = Mathf.Sign(input.x);
+
+
+			// Effects
+			if (doJump) {
+				jumpAudioSource.Stop();
+				jumpAudioSource.Play();
+			}
+
+			if (landed) {
+				if (hardLand) {
 					hardfallAudioSource.Play();
 				} else {
-					footstepAudioSource.Play();
+					footstepHandler.Play();
 				}
-					
+
 				landParticles.Emit((int)(velocity.y / -9f) + 2);
 			}
 
-			if (controller.isGrounded) {
-				if (crouching) {
-					skeletonAnimation.AnimationName = crouchName;
-				} else {
-					if (input.x == 0)
-						skeletonAnimation.AnimationName = idleName;
-					else
-						skeletonAnimation.AnimationName = Mathf.Abs(input.x) > 0.6f ? runName : walkName;
-				}
-			} else {
-				skeletonAnimation.AnimationName = velocity.y > 0 ? jumpName : fallName;
-			}
-
-			if (input.x != 0)
-				skeletonAnimation.Skeleton.FlipX = input.x < 0;
-			
+			wasGrounded = isGrounded;
 		}
+
 	}
 }

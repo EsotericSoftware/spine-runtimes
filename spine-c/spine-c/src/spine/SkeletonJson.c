@@ -93,7 +93,7 @@ static float toColor (const char* value, int index) {
 	char *error;
 	int color;
 
-	if (index >= strlen(value) / 2)
+	if ((size_t)index >= strlen(value) / 2)
 		return -1;
 	value += index * 2;
 
@@ -299,7 +299,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 		}
 		for (valueMap = constraintMap->child, frameIndex = 0; valueMap; valueMap = valueMap->next, ++frameIndex) {
 			spIkConstraintTimeline_setFrame(timeline, frameIndex, Json_getFloat(valueMap, "time", 0), Json_getFloat(valueMap, "mix", 1),
-					Json_getInt(valueMap, "bendPositive", 1) ? 1 : -1);
+					Json_getInt(valueMap, "bendPositive", 1) ? 1 : -1, Json_getInt(valueMap, "compress", 0) ? 1 : 0, Json_getInt(valueMap, "stretch", 0) ? 1 : 0);
 			readCurve(valueMap, SUPER(timeline), frameIndex);
 		}
 		animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
@@ -502,6 +502,10 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 			event->floatValue = Json_getFloat(valueMap, "float", eventData->floatValue);
 			stringValue = Json_getString(valueMap, "string", eventData->stringValue);
 			if (stringValue) MALLOC_STR(event->stringValue, stringValue);
+			if (eventData->audioPath) {
+				event->volume = Json_getFloat(valueMap, "volume", 1);
+				event->balance = Json_getFloat(valueMap, "volume", 0);
+			}
 			spEventTimeline_setFrame(timeline, frameIndex, event);
 		}
 		animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
@@ -737,6 +741,9 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			}
 
 			data->bendDirection = Json_getInt(constraintMap, "bendPositive", 1) ? 1 : -1;
+			data->compress = Json_getInt(constraintMap, "compress", 0) ? 1 : 0;
+			data->stretch = Json_getInt(constraintMap, "stretch", 0) ? 1 : 0;
+			data->uniform = Json_getInt(constraintMap, "uniform", 0) ? 1 : 0;
 			data->mix = Json_getFloat(constraintMap, "mix", 1);
 
 			skeletonData->ikConstraints[i] = data;
@@ -891,6 +898,8 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						type = SP_ATTACHMENT_PATH;
 					else if	(strcmp(typeString, "clipping") == 0)
 						type = SP_ATTACHMENT_CLIPPING;
+					else if	(strcmp(typeString, "point") == 0)
+						type = SP_ATTACHMENT_POINT;
 					else {
 						spSkeletonData_dispose(skeletonData);
 						_spSkeletonJson_setError(self, root, "Unknown attachment type: ", typeString);
@@ -1076,6 +1085,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	if (events) {
 		Json *eventMap;
 		const char* stringValue;
+		const char* audioPath;
 		skeletonData->eventsCount = events->size;
 		skeletonData->events = MALLOC(spEventData*, events->size);
 		for (eventMap = events->child, i = 0; eventMap; eventMap = eventMap->next, ++i) {
@@ -1084,6 +1094,12 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			eventData->floatValue = Json_getFloat(eventMap, "float", 0);
 			stringValue = Json_getString(eventMap, "string", 0);
 			if (stringValue) MALLOC_STR(eventData->stringValue, stringValue);
+			audioPath = Json_getString(eventMap, "audio", 0);
+			if (audioPath) {
+				MALLOC_STR(eventData->audioPath, audioPath);
+				eventData->volume = Json_getFloat(eventMap, "volume", 1);
+				eventData->balance = Json_getFloat(eventMap, "balance", 0);
+			}
 			skeletonData->events[i] = eventData;
 		}
 	}

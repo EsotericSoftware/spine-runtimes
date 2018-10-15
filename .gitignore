@@ -1,4 +1,5 @@
-
+.metadata/
+RemoteSystemsTempFiles/
 target
 *Debug.win32
 *.sdf
@@ -12,9 +13,11 @@ target
 *.user
 .DS_Store
 
-
 .idea/
 build/
+cmake-build-debug/
+
+spine-as3/spine-as3/.settings/com.powerflasher.fdt.core.metaDataTags.prefs
 
 spine-c/Debug/*
 
@@ -22,7 +25,9 @@ spine-cpp/Debug/*
 
 spine-sfml/Debug/*
 spine-sfml/SFML
-spine-sfml/dependencies
+spine-sfml/c/dependencies
+spine-sfml/cpp/dependencies
+spine-sfml/cmake-build
 
 spine-libgdx/spine-libgdx/bin
 spine-libgdx/spine-libgdx-tests/bin

@@ -100,22 +100,29 @@ public class PathConstraint implements Constraint {
 		if (!translate && !rotate) return;
 
 		PathConstraintData data = this.data;
-		SpacingMode spacingMode = data.spacingMode;
-		boolean lengthSpacing = spacingMode == SpacingMode.length;
+		boolean percentSpacing = data.spacingMode == SpacingMode.percent;
 		RotateMode rotateMode = data.rotateMode;
 		boolean tangents = rotateMode == RotateMode.tangent, scale = rotateMode == RotateMode.chainScale;
 		int boneCount = this.bones.size, spacesCount = tangents ? boneCount : boneCount + 1;
 		Object[] bones = this.bones.items;
 		float[] spaces = this.spaces.setSize(spacesCount), lengths = null;
 		float spacing = this.spacing;
-		if (scale || lengthSpacing) {
+		if (scale || !percentSpacing) {
 			if (scale) lengths = this.lengths.setSize(boneCount);
+			boolean lengthSpacing = data.spacingMode == SpacingMode.length;
 			for (int i = 0, n = spacesCount - 1; i < n;) {
 				Bone bone = (Bone)bones[i];
 				float setupLength = bone.data.length;
 				if (setupLength < epsilon) {
 					if (scale) lengths[i] = 0;
 					spaces[++i] = 0;
+				} else if (percentSpacing) {
+					if (scale) {
+						float x = setupLength * bone.a, y = setupLength * bone.c;
+						float length = (float)Math.sqrt(x * x + y * y);
+						lengths[i] = length;
+					}
+					spaces[++i] = spacing;
 				} else {
 					float x = setupLength * bone.a, y = setupLength * bone.c;
 					float length = (float)Math.sqrt(x * x + y * y);
@@ -129,7 +136,7 @@ public class PathConstraint implements Constraint {
 		}
 
 		float[] positions = computeWorldPositions((PathAttachment)attachment, spacesCount, tangents,
-			data.positionMode == PositionMode.percent, spacingMode == SpacingMode.percent);
+			data.positionMode == PositionMode.percent, percentSpacing);
 		float boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
 		boolean tip;
 		if (offsetRotation == 0)
@@ -307,7 +314,10 @@ public class PathConstraint implements Constraint {
 			x1 = x2;
 			y1 = y2;
 		}
-		if (percentPosition) position *= pathLength;
+		if (percentPosition)
+			position *= pathLength;
+		else
+			position *= pathLength / path.getLengths()[curveCount - 1];
 		if (percentSpacing) {
 			for (int i = 0; i < spacesCount; i++)
 				spaces[i] *= pathLength;
