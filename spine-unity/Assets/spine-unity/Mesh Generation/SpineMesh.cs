@@ -245,8 +245,8 @@ namespace Spine.Unity {
 		}
 
 		public static void GenerateSkeletonRendererInstruction (SkeletonRendererInstruction instructionOutput, Skeleton skeleton, Dictionary<Slot, Material> customSlotMaterials, List<Slot> separatorSlots, bool generateMeshOverride, bool immutableTriangles = false) {
-			//			if (skeleton == null) throw new ArgumentNullException("skeleton");
-			//			if (instructionOutput == null) throw new ArgumentNullException("instructionOutput");
+//			if (skeleton == null) throw new ArgumentNullException("skeleton");
+//			if (instructionOutput == null) throw new ArgumentNullException("instructionOutput");
 
 			ExposedList<Slot> drawOrder = skeleton.drawOrder;
 			int drawOrderCount = drawOrder.Count;
@@ -308,10 +308,10 @@ namespace Spine.Unity {
 						#if SPINE_TRIANGLECHECK
 						var clippingAttachment = attachment as ClippingAttachment;
 						if (clippingAttachment != null) {
-						clippingEndSlot = clippingAttachment.endSlot;
-						clippingAttachmentSource = i;
-						current.hasClipping = true;
-						skeletonHasClipping = true;
+							clippingEndSlot = clippingAttachment.endSlot;
+							clippingAttachmentSource = i;
+							current.hasClipping = true;
+							skeletonHasClipping = true;
 						}
 						#endif
 						noRender = true;
@@ -682,8 +682,8 @@ namespace Spine.Unity {
 
 			int vertexIndex = 0;
 			var tempVerts = this.tempVerts;
-			Vector2 bmin = this.meshBoundsMin;
-			Vector2 bmax = this.meshBoundsMax;
+			Vector3 bmin = this.meshBoundsMin;
+			Vector3 bmax = this.meshBoundsMax;
 
 			var vbi = vertexBuffer.Items;
 			var ubi = uvBuffer.Items;
@@ -990,11 +990,10 @@ namespace Spine.Unity {
 					mesh.bounds = new Bounds();
 				} else {
 					//mesh.bounds = ArraysMeshGenerator.ToBounds(meshBoundsMin, meshBoundsMax);
-					float halfWidth = (meshBoundsMax.x - meshBoundsMin.x) * 0.5f;
-					float halfHeight = (meshBoundsMax.y - meshBoundsMin.y) * 0.5f;
+					Vector2 halfSize = (meshBoundsMax - meshBoundsMin) * 0.5f;
 					mesh.bounds = new Bounds {
-						center = new Vector3(meshBoundsMin.x + halfWidth, meshBoundsMin.y + halfHeight),
-						extents = new Vector3(halfWidth, halfHeight, meshBoundsThickness * 0.5f)
+						center = (Vector3)(meshBoundsMin + halfSize),
+						extents = new Vector3(halfSize.x, halfSize.y, meshBoundsThickness * 0.5f)
 					};
 				}
 			}
