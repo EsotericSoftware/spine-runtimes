@@ -424,10 +424,10 @@ public class AnimationState {
 		}
 	}
 
-	/** Removes all animations from all tracks, leaving skeletons in their previous pose.
+	/** Removes all animations from all tracks, leaving skeletons in their current pose.
 	 * <p>
 	 * It may be desired to use {@link AnimationState#setEmptyAnimations(float)} to mix the skeletons back to the setup pose,
-	 * rather than leaving them in their previous pose. */
+	 * rather than leaving them in their current pose. */
 	public void clearTracks () {
 		boolean oldDrainDisabled = queue.drainDisabled;
 		queue.drainDisabled = true;
@@ -438,10 +438,10 @@ public class AnimationState {
 		queue.drain();
 	}
 
-	/** Removes all animations from the track, leaving skeletons in their previous pose.
+	/** Removes all animations from the track, leaving skeletons in their current pose.
 	 * <p>
 	 * It may be desired to use {@link AnimationState#setEmptyAnimation(int, float)} to mix the skeletons back to the setup pose,
-	 * rather than leaving them in their previous pose. */
+	 * rather than leaving them in their current pose. */
 	public void clearTrack (int trackIndex) {
 		if (trackIndex >= tracks.size) return;
 		TrackEntry current = tracks.get(trackIndex);
@@ -973,11 +973,11 @@ public class AnimationState {
 			this.listener = listener;
 		}
 
-		/** Values < 1 mix this animation with the setup pose or the skeleton's previous pose. Defaults to 1, which overwrites the
-		 * skeleton's previous pose with this animation.
+		/** Values < 1 mix this animation with the skeleton's current pose (usually the pose resulting from lower tracks). Defaults
+		 * to 1, which overwrites the skeleton's current pose with this animation.
 		 * <p>
-		 * Typically track 0 is used to completely pose the skeleton, then alpha can be used on higher tracks. It doesn't make sense
-		 * to use alpha on track 0 if the skeleton pose is from the last frame render. */
+		 * Typically track 0 is used to completely pose the skeleton, then alpha is used on higher tracks. It doesn't make sense to
+		 * use alpha on track 0 if the skeleton pose is from the last frame render. */
 		public float getAlpha () {
 			return alpha;
 		}
@@ -987,7 +987,7 @@ public class AnimationState {
 		}
 
 		/** When the mix percentage ({@link #getMixTime()} / {@link #getMixDuration()}) is less than the
-		 * <code>eventThreshold</code>, event timelines for the animation being mixed out will be applied. Defaults to 0, so event
+		 * <code>eventThreshold</code>, event timelines are applied while this animation is being mixed out. Defaults to 0, so event
 		 * timelines are not applied for an animation being mixed out. */
 		public float getEventThreshold () {
 			return eventThreshold;
@@ -998,8 +998,8 @@ public class AnimationState {
 		}
 
 		/** When the mix percentage ({@link #getMixTime()} / {@link #getMixDuration()}) is less than the
-		 * <code>attachmentThreshold</code>, attachment timelines for the animation being mixed out will be applied. Defaults to 0,
-		 * so attachment timelines are not applied for an animation being mixed out. */
+		 * <code>attachmentThreshold</code>, attachment timelines are applied while this animation is being mixed out. Defaults to
+		 * 0, so attachment timelines are not applied for an animation being mixed out. */
 		public float getAttachmentThreshold () {
 			return attachmentThreshold;
 		}
@@ -1009,7 +1009,7 @@ public class AnimationState {
 		}
 
 		/** When the mix percentage ({@link #getMixTime()} / {@link #getMixDuration()}) is less than the
-		 * <code>drawOrderThreshold</code>, draw order timelines for the animation being mixed out will be applied. Defaults to 0,
+		 * <code>drawOrderThreshold</code>, draw order timelines are applied while this animation is being mixed out. Defaults to 0,
 		 * so draw order timelines are not applied for an animation being mixed out. */
 		public float getDrawOrderThreshold () {
 			return drawOrderThreshold;
