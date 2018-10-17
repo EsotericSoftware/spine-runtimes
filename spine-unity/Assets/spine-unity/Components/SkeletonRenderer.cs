@@ -171,6 +171,10 @@ namespace Spine.Unity {
 			if (skeleton != null) skeleton.SetToSetupPose();
 		}
 
+		public void EnsureMeshGeneratorCapacity (int minimumVertexCount) {
+			meshGenerator.EnsureVertexCapacity(minimumVertexCount);
+		}
+
 		/// <summary>
 		/// Initialize this component. Attempts to load the SkeletonData and creates the internal Skeleton object and buffers.</summary>
 		/// <param name="overwrite">If set to <c>true</c>, it will overwrite internal objects if they were already generated. Otherwise, the initialized component will ignore subsequent calls to initialize.</param>
