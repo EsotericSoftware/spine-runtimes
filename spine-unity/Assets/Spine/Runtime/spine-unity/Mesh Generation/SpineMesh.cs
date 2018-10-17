@@ -1057,6 +1057,38 @@ namespace Spine.Unity {
 		}
 		#endregion
 
+		public void EnsureVertexCapacity (int minimumVertexCount, bool inlcudeTintBlack = false, bool includeTangents = false, bool includeNormals = false) {
+			if (minimumVertexCount > vertexBuffer.Items.Length) {
+				Array.Resize(ref vertexBuffer.Items, minimumVertexCount);
+				Array.Resize(ref uvBuffer.Items, minimumVertexCount);
+				Array.Resize(ref colorBuffer.Items, minimumVertexCount);
+
+				if (inlcudeTintBlack) {
+					if (uv2 == null) {
+						uv2 = new ExposedList<Vector2>(minimumVertexCount);
+						uv3 = new ExposedList<Vector2>(minimumVertexCount);
+					}
+					uv2.Resize(minimumVertexCount);
+					uv3.Resize(minimumVertexCount);
+				}
+
+				if (includeNormals) {
+					if (normals == null)
+						normals = new Vector3[minimumVertexCount];
+					else
+						Array.Resize(ref normals, minimumVertexCount);
+
+				}
+
+				if (includeTangents) {
+					if (tangents == null)
+						tangents = new Vector4[minimumVertexCount];
+					else
+						Array.Resize(ref tangents, minimumVertexCount);
+				}
+			}
+		}
+
 		public void TrimExcess () {
 			vertexBuffer.TrimExcess();
 			uvBuffer.TrimExcess();
