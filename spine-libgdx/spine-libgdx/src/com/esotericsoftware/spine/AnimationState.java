@@ -127,11 +127,11 @@ public class AnimationState {
 				float nextTime = current.trackLast - next.delay;
 				if (nextTime >= 0) {
 					next.delay = 0;
-					next.trackTime = nextTime + delta * next.timeScale;
+					next.trackTime = (nextTime / current.timeScale + delta) * next.timeScale;
 					current.trackTime += currentDelta;
 					setCurrent(i, next, true);
 					while (next.mixingFrom != null) {
-						next.mixTime += currentDelta;
+						next.mixTime += delta;
 						next = next.mixingFrom;
 					}
 					continue;
@@ -172,12 +172,6 @@ public class AnimationState {
 
 		// Require mixTime > 0 to ensure the mixing from entry was applied at least once.
 		if (to.mixTime > 0 && to.mixTime >= to.mixDuration) {
-			if (from.timeScale == 0) {
-				// from has 0 timeScale and has been mixed out, remove its mix and apply it one more time to return to the setup pose.
-				from.timeScale = 1;
-				from.mixTime = 0;
-				from.mixDuration = 0;
-			}
 			// Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame).
 			if (from.totalAlpha == 0 || to.mixDuration == 0) {
 				to.mixingFrom = from.mixingFrom;
@@ -189,7 +183,7 @@ public class AnimationState {
 		}
 
 		from.trackTime += delta * from.timeScale;
-		to.mixTime += delta * to.timeScale;
+		to.mixTime += delta;
 		return false;
 	}
 
@@ -534,9 +528,9 @@ public class AnimationState {
 	/** Adds an animation to be played after the current or last queued animation for a track. If the track is empty, it is
 	 * equivalent to calling {@link #setAnimation(int, Animation, boolean)}.
 	 * @param delay If > 0, sets {@link TrackEntry#getDelay()}. If <= 0, the delay set is the duration of the previous track entry
-	 *           minus any mix duration plus the specified <code>delay</code> (ie the mix ends at (<code>delay</code> = 0) or
-	 *           before (<code>delay</code> < 0) the previous track entry duration). If the previous entry is looping, its next
-	 *           loop completion is used instead of its duration.
+	 *           minus any mix duration (from the {@link AnimationStateData}) plus the specified <code>delay</code> (ie the mix
+	 *           ends at (<code>delay</code> = 0) or before (<code>delay</code> < 0) the previous track entry duration). If the
+	 *           previous entry is looping, its next loop completion is used instead of its duration.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
 	 *         after the {@link AnimationStateListener#dispose(TrackEntry)} event occurs. */
 	public TrackEntry addAnimation (int trackIndex, Animation animation, boolean loop, float delay) {
@@ -765,8 +759,8 @@ public class AnimationState {
 		queue.clear();
 	}
 
-	/** Multiplier for the delta time when the animation state is updated, causing time for all animations to play slower or
-	 * faster. Defaults to 1.
+	/** Multiplier for the delta time when the animation state is updated, causing time for all animations and mixes to play slower
+	 * or faster. Defaults to 1.
 	 * <p>
 	 * See TrackEntry {@link TrackEntry#getTimeScale()} for affecting a single animation. */
 	public float getTimeScale () {
@@ -863,7 +857,9 @@ public class AnimationState {
 		/** Seconds to postpone playing the animation. When this track entry is the current track entry, <code>delay</code>
 		 * postpones incrementing the {@link #getTrackTime()}. When this track entry is queued, <code>delay</code> is the time from
 		 * the start of the previous animation to when this track entry will become the current track entry (ie when the previous
-		 * track entry {@link TrackEntry#getTrackTime()} >= this track entry's <code>delay</code>). */
+		 * track entry {@link TrackEntry#getTrackTime()} >= this track entry's <code>delay</code>).
+		 * <p>
+		 * {@link #getTimeScale()} affects the delay. */
 		public float getDelay () {
 			return delay;
 		}
@@ -945,10 +941,15 @@ public class AnimationState {
 			return Math.min(trackTime + animationStart, animationEnd);
 		}
 
-		/** Multiplier for the delta time when the animation state is updated, causing time for this animation to pass slower or
+		/** Multiplier for the delta time when this track entry is updated, causing time for this animation to pass slower or
 		 * faster. Defaults to 1.
 		 * <p>
-		 * If <code>timeScale</code> is 0, any {@link #getMixDuration()} will be ignored.
+		 * {@link #getMixTime()} is not affected by track entry time scale, so {@link #getMixDuration()} may need to be adjusted to
+		 * match the animation speed.
+		 * <p>
+		 * When using {@link AnimationState#addAnimation(int, Animation, boolean, float)} with a <code>delay</code> <= 0, note the
+		 * {@link #getDelay()} is set using the mix duration from the {@link AnimationStateData}, assuming time scale to be 1. If
+		 * the time scale is not 1, the delay may need to be adjusted.
 		 * <p>
 		 * See AnimationState {@link AnimationState#getTimeScale()} for affecting all animations. */
 		public float getTimeScale () {
@@ -1048,7 +1049,8 @@ public class AnimationState {
 		 * track entry only before {@link AnimationState#update(float)} is first called.
 		 * <p>
 		 * When using {@link AnimationState#addAnimation(int, Animation, boolean, float)} with a <code>delay</code> <= 0, note the
-		 * {@link #getDelay()} is set using the mix duration from the {@link AnimationStateData}. */
+		 * {@link #getDelay()} is set using the mix duration from the {@link AnimationStateData}, not a mix duration set
+		 * afterward. */
 		public float getMixDuration () {
 			return mixDuration;
 		}
