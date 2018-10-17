@@ -457,10 +457,12 @@ namespace Spine.Unity {
 
 			if (submeshes.Count - 1 < submeshIndex) {
 				submeshes.Resize(submeshIndex + 1);
-				if (submeshes.Items[submeshIndex] == null)
-					submeshes.Items[submeshIndex] = new ExposedList<int>();
 			}
+
 			var submesh = submeshes.Items[submeshIndex];
+			if (submesh == null)
+				submeshes.Items[submeshIndex] = submesh = new ExposedList<int>();
+
 			submesh.Clear(false);
 
 			var skeleton = instruction.skeleton;
