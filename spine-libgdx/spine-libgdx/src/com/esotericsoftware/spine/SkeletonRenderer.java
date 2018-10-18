@@ -70,11 +70,11 @@ public class SkeletonRenderer {
 	 * previous blend function is not restored, since that could result in unnecessary flushes, depending on what is rendered
 	 * next. */
 	public void draw (Batch batch, Skeleton skeleton) {
-		if (batch instanceof PolygonSpriteBatch) {
-			draw((PolygonSpriteBatch)batch, skeleton);
-			return;
-		} else if (batch instanceof TwoColorPolygonBatch) {
+		if (batch instanceof TwoColorPolygonBatch) {
 			draw((TwoColorPolygonBatch)batch, skeleton);
+			return;
+		} else if (batch instanceof PolygonSpriteBatch) {
+			draw((PolygonSpriteBatch)batch, skeleton);
 			return;
 		}
 
@@ -357,7 +357,7 @@ public class SkeletonRenderer {
 					FloatArray clippedVertices = clipper.getClippedVertices();
 					ShortArray clippedTriangles = clipper.getClippedTriangles();
 					if (vertexEffect != null) applyVertexEffect(clippedVertices.items, clippedVertices.size, 6, light, dark);
-					batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,
+					batch.drawTwoColor(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,
 						clippedTriangles.size);
 				} else {
 					if (vertexEffect != null) {
@@ -386,7 +386,7 @@ public class SkeletonRenderer {
 							vertices[v + 3] = uvs[u + 1];
 						}
 					}
-					batch.draw(texture, vertices, 0, verticesLength, triangles, 0, triangles.length);
+					batch.drawTwoColor(texture, vertices, 0, verticesLength, triangles, 0, triangles.length);
 				}
 			}
 
