@@ -455,10 +455,10 @@ namespace Spine.Unity {
 		public void AddSubmesh (SubmeshInstruction instruction, bool updateTriangles = true) {
 			var settings = this.settings;
 
-			if (submeshes.Items.Length - 1 < submeshIndex) {
-				submeshes.Resize(submeshIndex + 1);
-			}
-
+			int newCount = submeshIndex + 1;
+			if (submeshes.Items.Length < newCount)
+				submeshes.Resize(newCount);
+			submeshes.Count = newCount;
 			var submesh = submeshes.Items[submeshIndex];
 			if (submesh == null)
 				submeshes.Items[submeshIndex] = submesh = new ExposedList<int>();
