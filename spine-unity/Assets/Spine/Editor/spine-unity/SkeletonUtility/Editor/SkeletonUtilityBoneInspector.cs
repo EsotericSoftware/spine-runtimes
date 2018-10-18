@@ -258,12 +258,12 @@ namespace Spine.Unity.Editor {
 					GameObject go = skeletonUtility.SpawnBoneRecursively(bone, utilityBone.transform, utilityBone.mode, utilityBone.position, utilityBone.rotation, utilityBone.scale);
 					SkeletonUtilityBone[] newUtilityBones = go.GetComponentsInChildren<SkeletonUtilityBone>();
 					foreach (SkeletonUtilityBone utilBone in newUtilityBones)
-						SkeletonGameObjectsInspector.AttachIcon(utilBone);
+						SkeletonUtilityInspector.AttachIcon(utilBone);
 				}
 			} else {
 				var bone = (Bone)obj;
 				GameObject go = skeletonUtility.SpawnBone(bone, utilityBone.transform, utilityBone.mode, utilityBone.position, utilityBone.rotation, utilityBone.scale);
-				SkeletonGameObjectsInspector.AttachIcon(go.GetComponent<SkeletonUtilityBone>());
+				SkeletonUtilityInspector.AttachIcon(go.GetComponent<SkeletonUtilityBone>());
 				Selection.activeGameObject = go;
 				EditorGUIUtility.PingObject(go);
 			}
@@ -272,7 +272,7 @@ namespace Spine.Unity.Editor {
 		void SpawnOverride () {
 			GameObject go = skeletonUtility.SpawnBone(utilityBone.bone, utilityBone.transform.parent, SkeletonUtilityBone.Mode.Override, utilityBone.position, utilityBone.rotation, utilityBone.scale);
 			go.name = go.name + " [Override]";
-			SkeletonGameObjectsInspector.AttachIcon(go.GetComponent<SkeletonUtilityBone>());
+			SkeletonUtilityInspector.AttachIcon(go.GetComponent<SkeletonUtilityBone>());
 			Selection.activeGameObject = go;
 			EditorGUIUtility.PingObject(go);
 		}
