@@ -455,7 +455,7 @@ namespace Spine.Unity {
 		public void AddSubmesh (SubmeshInstruction instruction, bool updateTriangles = true) {
 			var settings = this.settings;
 
-			if (submeshes.Count - 1 < submeshIndex) {
+			if (submeshes.Items.Length - 1 < submeshIndex) {
 				submeshes.Resize(submeshIndex + 1);
 			}
 
