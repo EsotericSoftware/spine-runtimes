@@ -570,10 +570,13 @@ namespace Spine.Unity {
 					// Add data to vertex buffers
 					{
 						int newVertexCount = ovc + attachmentVertexCount;
-						if (newVertexCount > vertexBuffer.Items.Length) { // Manual ExposedList.Resize()
-							Array.Resize(ref vertexBuffer.Items, newVertexCount);
-							Array.Resize(ref uvBuffer.Items, newVertexCount);
-							Array.Resize(ref colorBuffer.Items, newVertexCount);
+						int oldArraySize = vertexBuffer.Items.Length;
+						if (newVertexCount > oldArraySize) {
+							int newArraySize = (int)(oldArraySize * 1.3f);
+							if (newArraySize < newVertexCount) newArraySize = newVertexCount;
+							Array.Resize(ref vertexBuffer.Items, newArraySize);
+							Array.Resize(ref uvBuffer.Items, newArraySize);
+							Array.Resize(ref colorBuffer.Items, newArraySize);
 						}
 						vertexBuffer.Count = uvBuffer.Count = colorBuffer.Count = newVertexCount;
 					}
