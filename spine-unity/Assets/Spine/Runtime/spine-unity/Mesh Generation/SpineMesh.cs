@@ -1469,13 +1469,13 @@ namespace Spine.Unity {
 			this.hasActiveClipping = other.hasActiveClipping;
 			this.rawVertexCount = other.rawVertexCount;
 			this.attachments.Clear(false);
-			this.attachments.GrowIfNeeded(other.attachments.Capacity);
+			this.attachments.EnsureCapacity(other.attachments.Capacity);
 			this.attachments.Count = other.attachments.Count;
 			other.attachments.CopyTo(this.attachments.Items);
 			#endif
 
 			this.submeshInstructions.Clear(false);
-			this.submeshInstructions.GrowIfNeeded(other.submeshInstructions.Capacity);
+			this.submeshInstructions.EnsureCapacity(other.submeshInstructions.Capacity);
 			this.submeshInstructions.Count = other.submeshInstructions.Count;
 			other.submeshInstructions.CopyTo(this.submeshInstructions.Items);
 		}
