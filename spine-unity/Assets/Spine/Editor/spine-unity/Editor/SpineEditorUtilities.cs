@@ -244,6 +244,10 @@ namespace Spine.Unity.Editor {
 			const string DEFAULT_ZSPACING_KEY = "SPINE_DEFAULT_ZSPACING";
 			public static float defaultZSpacing = DEFAULT_DEFAULT_ZSPACING;
 
+			const bool DEFAULT_DEFAULT_INSTANTIATE_LOOP = true;
+			const string DEFAULT_INSTANTIATE_LOOP_KEY = "SPINE_DEFAULT_INSTANTIATE_LOOP";
+			public static bool defaultInstantiateLoop = DEFAULT_DEFAULT_INSTANTIATE_LOOP;
+
 			const bool DEFAULT_SHOW_HIERARCHY_ICONS = true;
 			const string SHOW_HIERARCHY_ICONS_KEY = "SPINE_SHOW_HIERARCHY_ICONS";
 			public static bool showHierarchyIcons = DEFAULT_SHOW_HIERARCHY_ICONS;
@@ -326,6 +330,11 @@ namespace Spine.Unity.Editor {
 				defaultZSpacing = EditorGUILayout.Slider("Default Slot Z-Spacing", defaultZSpacing, -0.1f, 0f);
 				if (EditorGUI.EndChangeCheck())
 					EditorPrefs.SetFloat(DEFAULT_ZSPACING_KEY, defaultZSpacing);
+
+				EditorGUI.BeginChangeCheck();
+				defaultInstantiateLoop = EditorGUILayout.Toggle(new GUIContent("Default Loop", "Spawn Spine GameObjects with loop enabled."), defaultInstantiateLoop);
+				if (EditorGUI.EndChangeCheck())
+					EditorPrefs.SetBool(DEFAULT_INSTANTIATE_LOOP_KEY, defaultInstantiateLoop);
 
 				EditorGUILayout.Space();
 				EditorGUILayout.LabelField("Handles and Gizmos", EditorStyles.boldLabel);
@@ -1246,6 +1255,7 @@ namespace Spine.Unity.Editor {
 					throw e;
 				}
 
+				newSkeletonAnimation.loop = SpineEditorUtilities.Preferences.defaultInstantiateLoop;
 				newSkeletonAnimation.skeleton.Update(0);
 				newSkeletonAnimation.state.Update(0);
 				newSkeletonAnimation.state.Apply(newSkeletonAnimation.skeleton);

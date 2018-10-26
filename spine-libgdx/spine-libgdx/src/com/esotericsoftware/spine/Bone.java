@@ -547,11 +547,12 @@ public class Bone implements Updatable {
 	/** Transforms a world rotation to a local rotation. */
 	public float worldToLocalRotation (float worldRotation) {
 		float sin = sinDeg(worldRotation), cos = cosDeg(worldRotation);
-		return atan2(a * sin - c * cos, d * cos - b * sin) * radDeg;
+		return atan2(a * sin - c * cos, d * cos - b * sin) * radDeg + rotation - shearX;
 	}
 
 	/** Transforms a local rotation to a world rotation. */
 	public float localToWorldRotation (float localRotation) {
+		localRotation -= rotation - shearX;
 		float sin = sinDeg(localRotation), cos = cosDeg(localRotation);
 		return atan2(cos * c + sin * d, cos * a + sin * b) * radDeg;
 	}

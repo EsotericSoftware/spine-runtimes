@@ -195,6 +195,7 @@ namespace Spine.Unity.Editor {
 			skin = skin ?? data.DefaultSkin ?? data.Skins.Items[0];
 			graphic.MeshGenerator.settings.zSpacing = SpineEditorUtilities.Preferences.defaultZSpacing;
 
+			graphic.startingLoop = SpineEditorUtilities.Preferences.defaultInstantiateLoop;
 			graphic.Initialize(false);
 			if (skin != null) graphic.Skeleton.SetSkin(skin);
 			graphic.initialSkinName = skin.Name;

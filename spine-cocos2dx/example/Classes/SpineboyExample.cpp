@@ -68,7 +68,7 @@ bool SpineboyExample::init () {
 	skeletonNode->setMix("jump", "run", 0.4);
 	skeletonNode->setAnimation(0, "walk", true);
 	TrackEntry* jumpEntry = skeletonNode->addAnimation(0, "jump", false, 1);
-	skeletonNode->addAnimation(0, "run", true);    
+	skeletonNode->addAnimation(0, "run", true);
 
 	skeletonNode->setTrackStartListener(jumpEntry, [] (TrackEntry* entry) {
 		log("jumped!");
@@ -81,7 +81,7 @@ bool SpineboyExample::init () {
 	addChild(skeletonNode);
 
 	scheduleUpdate();
-	
+
 	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
 	listener->onTouchBegan = [this] (Touch* touch, cocos2d::Event* event) -> bool {
 		if (!skeletonNode->getDebugBonesEnabled())

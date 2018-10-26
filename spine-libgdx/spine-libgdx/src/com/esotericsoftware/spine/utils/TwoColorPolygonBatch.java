@@ -31,10 +31,15 @@
 package com.esotericsoftware.spine.utils;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.Mesh.VertexDataType;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -43,13 +48,18 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.NumberUtils;
 
-public class TwoColorPolygonBatch implements Batch {
+/** A batch that renders polygons and performs tinting using a light and dark color.
+ * <p>
+ * Because an additional vertex attribute is used, the {@link Batch} and {@link PolygonBatch} methods that accept float[] vertex
+ * data do not perform two color tinting. {@link #drawTwoColor(Texture, float[], int, int)} and
+ * {@link #drawTwoColor(Texture, float[], int, int, short[], int, int)} are provided to accept float[] vertex data that contains
+ * two colors per vertex. */
+public class TwoColorPolygonBatch implements PolygonBatch {
 	static final int VERTEX_SIZE = 2 + 1 + 1 + 2;
 	static final int SPRITE_SIZE = 4 * VERTEX_SIZE;
 
 	private final Mesh mesh;
 	private final float[] vertices;
-	private final float[] tempSpriteVertices = new float[SPRITE_SIZE];
 	private final short[] triangles;
 	private final Matrix4 transformMatrix = new Matrix4();
 	private final Matrix4 projectionMatrix = new Matrix4();
@@ -311,30 +321,6 @@ public class TwoColorPolygonBatch implements Batch {
 			vertices[vertexIndex++] = textureCoords[i + 1];
 		}
 		this.vertexIndex = vertexIndex;
-	}
-
-	public void draw (Texture texture, float[] polygonVertices, int verticesOffset, int verticesCount, short[] polygonTriangles,
-		int trianglesOffset, int trianglesCount) {
-		if (!drawing) throw new IllegalStateException("begin must be called before draw.");
-
-		final short[] triangles = this.triangles;
-		final float[] vertices = this.vertices;
-
-		if (texture != lastTexture) {
-			switchTexture(texture);
-		} else if (triangleIndex + trianglesCount > triangles.length || vertexIndex + verticesCount > vertices.length) //
-			flush();
-
-		int triangleIndex = this.triangleIndex;
-		final int vertexIndex = this.vertexIndex;
-		final int startVertex = vertexIndex / 6;
-
-		for (int i = trianglesOffset, n = i + trianglesCount; i < n; i++)
-			triangles[triangleIndex++] = (short)(polygonTriangles[i] + startVertex);
-		this.triangleIndex = triangleIndex;
-
-		System.arraycopy(polygonVertices, verticesOffset, vertices, vertexIndex, verticesCount);
-		this.vertexIndex += verticesCount;
 	}
 
 	@Override
@@ -746,28 +732,74 @@ public class TwoColorPolygonBatch implements Batch {
 		this.vertexIndex = idx;
 	}
 
-	/** Draws a rectangle using the given vertices. There must be 4 vertices, each made up of 6 elements in this order: x, y,
-	 * lightColor, darkColor, u, v. The {@link #getColor()} and {@link #getDarkColor()} from the TwoColorPolygonBatch is not
+	/** Draws polygons using the given vertices and triangles. There must be 4 vertices, each made up of 6 elements in this order:
+	 * x, y, lightColor, darkColor, u, v. The {@link #getColor()} and {@link #getDarkColor()} from the TwoColorPolygonBatch is not
 	 * applied. */
-	@Override
-	public void draw (Texture texture, float[] spriteVertices, int offset, int count) {
+	public void drawTwoColor (Texture texture, float[] polygonVertices, int verticesOffset, int verticesCount,
+		short[] polygonTriangles, int trianglesOffset, int trianglesCount) {
 		if (!drawing) throw new IllegalStateException("begin must be called before draw.");
 
-		// odds are this is a sprite, we meed to convert it
-		if (spriteVertices.length == 20 && offset == 0 && count == 20) {
-			final float[] vertices = tempSpriteVertices;
-			int idx = 0;
-			for (int i = 0; i < 20; i += 5) {
-				vertices[idx++] = spriteVertices[i];
-				vertices[idx++] = spriteVertices[i + 1];
-				vertices[idx++] = spriteVertices[i + 2];
-				vertices[idx++] = 0; // dark
-				vertices[idx++] = spriteVertices[i + 3];
-				vertices[idx++] = spriteVertices[i + 4];
-			}
-			spriteVertices = vertices;
-			count = SPRITE_SIZE;
+		final short[] triangles = this.triangles;
+		final float[] vertices = this.vertices;
+
+		if (texture != lastTexture) {
+			switchTexture(texture);
+		} else if (triangleIndex + trianglesCount > triangles.length || vertexIndex + verticesCount > vertices.length) //
+			flush();
+
+		int triangleIndex = this.triangleIndex;
+		final int vertexIndex = this.vertexIndex;
+		final int startVertex = vertexIndex / 6;
+
+		for (int i = trianglesOffset, n = i + trianglesCount; i < n; i++)
+			triangles[triangleIndex++] = (short)(polygonTriangles[i] + startVertex);
+		this.triangleIndex = triangleIndex;
+
+		System.arraycopy(polygonVertices, verticesOffset, vertices, vertexIndex, verticesCount);
+		this.vertexIndex += verticesCount;
+	}
+
+	/** Draws polygons using the given vertices and triangles in the {@link PolygonBatch} format. There must be 4 vertices, each
+	 * made up of 5 elements in this order: x, y, color, u, v. The {@link #getColor()} and {@link #getDarkColor()} from the
+	 * TwoColorPolygonBatch is not applied. */
+	public void draw (Texture texture, float[] polygonVertices, int verticesOffset, int verticesCount, short[] polygonTriangles,
+		int trianglesOffset, int trianglesCount) {
+		if (!drawing) throw new IllegalStateException("begin must be called before draw.");
+
+		final short[] triangles = this.triangles;
+		final float[] vertices = this.vertices;
+
+		if (texture != lastTexture) {
+			switchTexture(texture);
+		} else if (triangleIndex + trianglesCount > triangles.length || vertexIndex + verticesCount / 5 * 6 > vertices.length) //
+			flush();
+
+		int triangleIndex = this.triangleIndex;
+		final int vertexIndex = this.vertexIndex;
+		final int startVertex = vertexIndex / 6;
+
+		for (int i = trianglesOffset, n = i + trianglesCount; i < n; i++)
+			triangles[triangleIndex++] = (short)(polygonTriangles[i] + startVertex);
+		this.triangleIndex = triangleIndex;
+
+		int idx = this.vertexIndex;
+		for (int i = verticesOffset, n = verticesOffset + verticesCount; i < n; i += 5) {
+			vertices[idx++] = polygonVertices[i];
+			vertices[idx++] = polygonVertices[i + 1];
+			vertices[idx++] = polygonVertices[i + 2];
+			vertices[idx++] = 0; // dark
+			vertices[idx++] = polygonVertices[i + 3];
+			vertices[idx++] = polygonVertices[i + 4];
 		}
+		this.vertexIndex = idx;
+	}
+
+	/** Draws rectangles using the given vertices. There must be 4 vertices, each made up of 6 elements in this order: x, y,
+	 * lightColor, darkColor, u, v. The {@link #getColor()} and {@link #getDarkColor()} from the TwoColorPolygonBatch is not
+	 * applied. */
+	public void drawTwoColor (Texture texture, float[] spriteVertices, int offset, int count) {
+		if (!drawing) throw new IllegalStateException("begin must be called before draw.");
+
 		final short[] triangles = this.triangles;
 		final float[] vertices = this.vertices;
 
@@ -792,6 +824,47 @@ public class TwoColorPolygonBatch implements Batch {
 
 		System.arraycopy(spriteVertices, offset, vertices, vertexIndex, count);
 		this.vertexIndex += count;
+	}
+
+	/** Draws rectangles using the given vertices in the {@link Batch} format. There must be 4 vertices, each made up of 5 elements
+	 * in this order: x, y, color, u, v. The {@link #getColor()} and {@link #getDarkColor()} from the TwoColorPolygonBatch is not
+	 * applied. */
+	@Override
+	public void draw (Texture texture, float[] spriteVertices, int offset, int count) {
+		if (!drawing) throw new IllegalStateException("begin must be called before draw.");
+
+		final short[] triangles = this.triangles;
+		final float[] vertices = this.vertices;
+
+		final int triangleCount = count / 20 * 6;
+		if (texture != lastTexture)
+			switchTexture(texture);
+		else if (triangleIndex + triangleCount > triangles.length || vertexIndex + count / 5 * 6 > vertices.length) //
+			flush();
+
+		final int vertexIndex = this.vertexIndex;
+		int triangleIndex = this.triangleIndex;
+		short vertex = (short)(vertexIndex / VERTEX_SIZE);
+		for (int n = triangleIndex + triangleCount; triangleIndex < n; triangleIndex += 6, vertex += 4) {
+			triangles[triangleIndex] = vertex;
+			triangles[triangleIndex + 1] = (short)(vertex + 1);
+			triangles[triangleIndex + 2] = (short)(vertex + 2);
+			triangles[triangleIndex + 3] = (short)(vertex + 2);
+			triangles[triangleIndex + 4] = (short)(vertex + 3);
+			triangles[triangleIndex + 5] = vertex;
+		}
+		this.triangleIndex = triangleIndex;
+
+		int idx = this.vertexIndex;
+		for (int i = offset, n = offset + count; i < n; i += 5) {
+			vertices[idx++] = spriteVertices[i];
+			vertices[idx++] = spriteVertices[i + 1];
+			vertices[idx++] = spriteVertices[i + 2];
+			vertices[idx++] = 0; // dark
+			vertices[idx++] = spriteVertices[i + 3];
+			vertices[idx++] = spriteVertices[i + 4];
+		}
+		this.vertexIndex = idx;
 	}
 
 	@Override

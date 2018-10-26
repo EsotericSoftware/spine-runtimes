@@ -41,17 +41,17 @@ namespace Spine.Unity.Editor {
 	using Icons = SpineEditorUtilities.Icons;
 
 	[CustomEditor(typeof(SkeletonUtility))]
-	public class SkeletonGameObjectsInspector : UnityEditor.Editor {
+	public class SkeletonUtilityInspector : UnityEditor.Editor {
 
-		SkeletonUtility skeletonGameObjects;
+		SkeletonUtility skeletonUtility;
 		Skeleton skeleton;
 		SkeletonRenderer skeletonRenderer;
 		bool isPrefab;
 		readonly GUIContent SpawnHierarchyButtonLabel = new GUIContent("Spawn Hierarchy", Icons.skeleton);
 
 		void OnEnable () {
-			skeletonGameObjects = (SkeletonUtility)target;
-			skeletonRenderer = skeletonGameObjects.GetComponent<SkeletonRenderer>();
+			skeletonUtility = (SkeletonUtility)target;
+			skeletonRenderer = skeletonUtility.GetComponent<SkeletonRenderer>();
 			skeleton = skeletonRenderer.Skeleton;
 
 			if (skeleton == null) {
@@ -78,7 +78,7 @@ namespace Spine.Unity.Editor {
 
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("boneRoot"), SpineInspectorUtility.TempContent("Skeleton Root"));
 
-			bool hasRootBone = skeletonGameObjects.boneRoot != null;
+			bool hasRootBone = skeletonUtility.boneRoot != null;
 
 			if (!hasRootBone)
 				EditorGUILayout.HelpBox("No hierarchy found. Use Spawn Hierarchy to generate GameObjects for bones.", MessageType.Info);
@@ -90,9 +90,9 @@ namespace Spine.Unity.Editor {
 
 			if (hasRootBone) {
 				if (SpineInspectorUtility.CenteredButton(new GUIContent("Remove Hierarchy"))) {
-					Undo.RegisterCompleteObjectUndo(skeletonGameObjects, "Remove Hierarchy");
-					Undo.DestroyObjectImmediate(skeletonGameObjects.boneRoot.gameObject);
-					skeletonGameObjects.boneRoot = null;
+					Undo.RegisterCompleteObjectUndo(skeletonUtility, "Remove Hierarchy");
+					Undo.DestroyObjectImmediate(skeletonUtility.boneRoot.gameObject);
+					skeletonUtility.boneRoot = null;
 				}
 			}
 		}
@@ -134,23 +134,23 @@ namespace Spine.Unity.Editor {
 		}
 
 		void SpawnFollowHierarchy () {
-			Selection.activeGameObject = skeletonGameObjects.SpawnHierarchy(SkeletonUtilityBone.Mode.Follow, true, true, true);
-			AttachIconsToChildren(skeletonGameObjects.boneRoot);
+			Selection.activeGameObject = skeletonUtility.SpawnHierarchy(SkeletonUtilityBone.Mode.Follow, true, true, true);
+			AttachIconsToChildren(skeletonUtility.boneRoot);
 		}
 
 		void SpawnFollowHierarchyRootOnly () {
-			Selection.activeGameObject = skeletonGameObjects.SpawnRoot(SkeletonUtilityBone.Mode.Follow, true, true, true);
-			AttachIconsToChildren(skeletonGameObjects.boneRoot);
+			Selection.activeGameObject = skeletonUtility.SpawnRoot(SkeletonUtilityBone.Mode.Follow, true, true, true);
+			AttachIconsToChildren(skeletonUtility.boneRoot);
 		}
 
 		void SpawnOverrideHierarchy () {
-			Selection.activeGameObject = skeletonGameObjects.SpawnHierarchy(SkeletonUtilityBone.Mode.Override, true, true, true);
-			AttachIconsToChildren(skeletonGameObjects.boneRoot);
+			Selection.activeGameObject = skeletonUtility.SpawnHierarchy(SkeletonUtilityBone.Mode.Override, true, true, true);
+			AttachIconsToChildren(skeletonUtility.boneRoot);
 		}
 
 		void SpawnOverrideHierarchyRootOnly () {
-			Selection.activeGameObject = skeletonGameObjects.SpawnRoot(SkeletonUtilityBone.Mode.Override, true, true, true);
-			AttachIconsToChildren(skeletonGameObjects.boneRoot);
+			Selection.activeGameObject = skeletonUtility.SpawnRoot(SkeletonUtilityBone.Mode.Override, true, true, true);
+			AttachIconsToChildren(skeletonUtility.boneRoot);
 		}
 	}
 

@@ -455,12 +455,13 @@ namespace Spine.Unity {
 		public void AddSubmesh (SubmeshInstruction instruction, bool updateTriangles = true) {
 			var settings = this.settings;
 
-			if (submeshes.Count - 1 < submeshIndex) {
-				submeshes.Resize(submeshIndex + 1);
-				if (submeshes.Items[submeshIndex] == null)
-					submeshes.Items[submeshIndex] = new ExposedList<int>();
-			}
+			int newSubmeshCount = submeshIndex + 1;
+			if (submeshes.Items.Length < newSubmeshCount)
+				submeshes.Resize(newSubmeshCount);
+			submeshes.Count = newSubmeshCount;
 			var submesh = submeshes.Items[submeshIndex];
+			if (submesh == null)
+				submeshes.Items[submeshIndex] = submesh = new ExposedList<int>();
 			submesh.Clear(false);
 
 			var skeleton = instruction.skeleton;
@@ -570,10 +571,13 @@ namespace Spine.Unity {
 					// Add data to vertex buffers
 					{
 						int newVertexCount = ovc + attachmentVertexCount;
-						if (newVertexCount > vertexBuffer.Items.Length) { // Manual ExposedList.Resize()
-							Array.Resize(ref vertexBuffer.Items, newVertexCount);
-							Array.Resize(ref uvBuffer.Items, newVertexCount);
-							Array.Resize(ref colorBuffer.Items, newVertexCount);
+						int oldArraySize = vertexBuffer.Items.Length;
+						if (newVertexCount > oldArraySize) {
+							int newArraySize = (int)(oldArraySize * 1.3f);
+							if (newArraySize < newVertexCount) newArraySize = newVertexCount;
+							Array.Resize(ref vertexBuffer.Items, newArraySize);
+							Array.Resize(ref uvBuffer.Items, newArraySize);
+							Array.Resize(ref colorBuffer.Items, newArraySize);
 						}
 						vertexBuffer.Count = uvBuffer.Count = colorBuffer.Count = newVertexCount;
 					}
@@ -1057,6 +1061,38 @@ namespace Spine.Unity {
 		}
 		#endregion
 
+		public void EnsureVertexCapacity (int minimumVertexCount, bool inlcudeTintBlack = false, bool includeTangents = false, bool includeNormals = false) {
+			if (minimumVertexCount > vertexBuffer.Items.Length) {
+				Array.Resize(ref vertexBuffer.Items, minimumVertexCount);
+				Array.Resize(ref uvBuffer.Items, minimumVertexCount);
+				Array.Resize(ref colorBuffer.Items, minimumVertexCount);
+
+				if (inlcudeTintBlack) {
+					if (uv2 == null) {
+						uv2 = new ExposedList<Vector2>(minimumVertexCount);
+						uv3 = new ExposedList<Vector2>(minimumVertexCount);
+					}
+					uv2.Resize(minimumVertexCount);
+					uv3.Resize(minimumVertexCount);
+				}
+
+				if (includeNormals) {
+					if (normals == null)
+						normals = new Vector3[minimumVertexCount];
+					else
+						Array.Resize(ref normals, minimumVertexCount);
+
+				}
+
+				if (includeTangents) {
+					if (tangents == null)
+						tangents = new Vector4[minimumVertexCount];
+					else
+						Array.Resize(ref tangents, minimumVertexCount);
+				}
+			}
+		}
+
 		public void TrimExcess () {
 			vertexBuffer.TrimExcess();
 			uvBuffer.TrimExcess();
@@ -1437,13 +1473,13 @@ namespace Spine.Unity {
 			this.hasActiveClipping = other.hasActiveClipping;
 			this.rawVertexCount = other.rawVertexCount;
 			this.attachments.Clear(false);
-			this.attachments.GrowIfNeeded(other.attachments.Capacity);
+			this.attachments.EnsureCapacity(other.attachments.Capacity);
 			this.attachments.Count = other.attachments.Count;
 			other.attachments.CopyTo(this.attachments.Items);
 			#endif
 
 			this.submeshInstructions.Clear(false);
-			this.submeshInstructions.GrowIfNeeded(other.submeshInstructions.Capacity);
+			this.submeshInstructions.EnsureCapacity(other.submeshInstructions.Capacity);
 			this.submeshInstructions.Count = other.submeshInstructions.Count;
 			other.submeshInstructions.CopyTo(this.submeshInstructions.Items);
 		}

@@ -557,7 +557,8 @@ namespace Spine {
 
 			var drawOrder = skeleton.drawOrder;
 			drawOrder.Clear(false);
-			drawOrder.GrowIfNeeded(n);
+			drawOrder.EnsureCapacity(n);
+			drawOrder.Count = n;
 			System.Array.Copy(slotsItems, drawOrder.Items, n);
 		}
 

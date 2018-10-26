@@ -50,7 +50,7 @@ bool TankExample::init () {
 	addChild(skeletonNode);
 
 	scheduleUpdate();
-	
+
 	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
 	listener->onTouchBegan = [this] (Touch* touch, cocos2d::Event* event) -> bool {
 		if (!skeletonNode->getDebugBonesEnabled())
