@@ -16,11 +16,11 @@ declare module spine {
 		setup = 0,
 		first = 1,
 		replace = 2,
-		add = 3,
+		add = 3
 	}
 	enum MixDirection {
 		in = 0,
-		out = 1,
+		out = 1
 	}
 	enum TimelineType {
 		rotate = 0,
@@ -37,7 +37,7 @@ declare module spine {
 		pathConstraintPosition = 11,
 		pathConstraintSpacing = 12,
 		pathConstraintMix = 13,
-		twoColor = 14,
+		twoColor = 14
 	}
 	abstract class CurveTimeline implements Timeline {
 		static LINEAR: number;
@@ -341,7 +341,7 @@ declare module spine {
 		end = 2,
 		dispose = 3,
 		complete = 4,
-		event = 5,
+		event = 5
 	}
 	interface AnimationStateListener2 {
 		start(entry: TrackEntry): void;
@@ -380,8 +380,8 @@ declare module spine {
 		private toLoad;
 		private loaded;
 		constructor(textureLoader: (image: HTMLImageElement) => any, pathPrefix?: string);
-		private static downloadText(url, success, error);
-		private static downloadBinary(url, success, error);
+		private static downloadText;
+		private static downloadBinary;
 		loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, error: string) => void): void;
 		loadTexture(path: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
 		loadTextureData(path: string, data: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
@@ -414,7 +414,7 @@ declare module spine {
 		Normal = 0,
 		Additive = 1,
 		Multiply = 2,
-		Screen = 3,
+		Screen = 3
 	}
 }
 declare module spine {
@@ -483,7 +483,7 @@ declare module spine {
 		OnlyTranslation = 1,
 		NoRotationOrReflection = 2,
 		NoScale = 3,
-		NoScaleOrReflection = 4,
+		NoScaleOrReflection = 4
 	}
 }
 declare module spine {
@@ -593,17 +593,17 @@ declare module spine {
 	}
 	enum PositionMode {
 		Fixed = 0,
-		Percent = 1,
+		Percent = 1
 	}
 	enum SpacingMode {
 		Length = 0,
 		Fixed = 1,
-		Percent = 2,
+		Percent = 2
 	}
 	enum RotateMode {
 		Tangent = 0,
 		Chain = 1,
-		ChainScale = 2,
+		ChainScale = 2
 	}
 }
 declare module spine {
@@ -614,12 +614,12 @@ declare module spine {
 		private rawAssets;
 		private errors;
 		constructor(pathPrefix?: string);
-		private queueAsset(clientId, textureLoader, path);
+		private queueAsset;
 		loadText(clientId: string, path: string): void;
 		loadJson(clientId: string, path: string): void;
 		loadTexture(clientId: string, textureLoader: (image: HTMLImageElement) => any, path: string): void;
 		get(clientId: string, path: string): any;
-		private updateClientAssets(clientAssets);
+		private updateClientAssets;
 		isLoadingComplete(clientId: string): boolean;
 		dispose(): void;
 		hasErrors(): boolean;
@@ -823,12 +823,12 @@ declare module spine {
 		MipMapNearestNearest = 9984,
 		MipMapLinearNearest = 9985,
 		MipMapNearestLinear = 9986,
-		MipMapLinearLinear = 9987,
+		MipMapLinearLinear = 9987
 	}
 	enum TextureWrap {
 		MirroredRepeat = 33648,
 		ClampToEdge = 33071,
-		Repeat = 10497,
+		Repeat = 10497
 	}
 	class TextureRegion {
 		renderObject: any;
@@ -855,7 +855,7 @@ declare module spine {
 		pages: TextureAtlasPage[];
 		regions: TextureAtlasRegion[];
 		constructor(atlasText: string, textureLoader: (path: string) => any);
-		private load(atlasText, textureLoader);
+		private load;
 		findRegion(name: string): TextureAtlasRegion;
 		dispose(): void;
 	}
@@ -931,9 +931,9 @@ declare module spine {
 		private polygonIndicesPool;
 		triangulate(verticesArray: ArrayLike<number>): Array<number>;
 		decompose(verticesArray: Array<number>, triangles: Array<number>): Array<Array<number>>;
-		private static isConcave(index, vertexCount, vertices, indices);
-		private static positiveArea(p1x, p1y, p2x, p2y, p3x, p3y);
-		private static winding(p1x, p1y, p2x, p2y, p3x, p3y);
+		private static isConcave;
+		private static positiveArea;
+		private static winding;
 	}
 }
 declare module spine {
@@ -1105,7 +1105,7 @@ declare module spine {
 		Mesh = 2,
 		LinkedMesh = 3,
 		Path = 4,
-		Point = 5,
+		Point = 5
 	}
 }
 declare module spine {
@@ -1271,11 +1271,11 @@ declare module spine.canvas {
 		private tempColor;
 		constructor(context: CanvasRenderingContext2D);
 		draw(skeleton: Skeleton): void;
-		private drawImages(skeleton);
-		private drawTriangles(skeleton);
-		private drawTriangle(img, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
-		private computeRegionVertices(slot, region, pma);
-		private computeMeshVertices(slot, mesh, pma);
+		private drawImages;
+		private drawTriangles;
+		private drawTriangle;
+		private computeRegionVertices;
+		private computeMeshVertices;
 	}
 }
 declare module spine.webgl {
@@ -1330,7 +1330,7 @@ declare module spine.webgl {
 		touchesPool: Pool<Touch>;
 		private listeners;
 		constructor(element: HTMLElement);
-		private setupCallbacks(element);
+		private setupCallbacks;
 		addListener(listener: InputListener): void;
 		removeListener(listener: InputListener): void;
 	}
@@ -1439,7 +1439,7 @@ declare module spine.webgl {
 		drawWithOffset(shader: Shader, primitiveType: number, offset: number, count: number): void;
 		bind(shader: Shader): void;
 		unbind(shader: Shader): void;
-		private update();
+		private update;
 		restore(): void;
 		dispose(): void;
 	}
@@ -1465,7 +1465,7 @@ declare module spine.webgl {
 		constructor();
 	}
 	enum VertexAttributeType {
-		Float = 0,
+		Float = 0
 	}
 }
 declare module spine.webgl {
@@ -1484,7 +1484,7 @@ declare module spine.webgl {
 		begin(shader: Shader): void;
 		setBlendMode(srcBlend: number, dstBlend: number): void;
 		draw(texture: GLTexture, vertices: ArrayLike<number>, indices: Array<number>): void;
-		private flush();
+		private flush;
 		end(): void;
 		getDrawCalls(): number;
 		dispose(): void;
@@ -1524,13 +1524,13 @@ declare module spine.webgl {
 		curve(x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, segments: number, color?: Color): void;
 		end(): void;
 		resize(resizeMode: ResizeMode): void;
-		private enableRenderer(renderer);
+		private enableRenderer;
 		dispose(): void;
 	}
 	enum ResizeMode {
 		Stretch = 0,
 		Expand = 1,
-		Fit = 2,
+		Fit = 2
 	}
 }
 declare module spine.webgl {
@@ -1558,9 +1558,9 @@ declare module spine.webgl {
 		getVertexShaderSource(): string;
 		getFragmentSource(): string;
 		constructor(context: ManagedWebGLRenderingContext | WebGLRenderingContext, vertexShader: string, fragmentShader: string);
-		private compile();
-		private compileShader(type, source);
-		private compileProgram(vs, fs);
+		private compile;
+		private compileShader;
+		private compileProgram;
 		restore(): void;
 		bind(): void;
 		unbind(): void;
@@ -1607,16 +1607,16 @@ declare module spine.webgl {
 		polygon(polygonVertices: ArrayLike<number>, offset: number, count: number, color?: Color): void;
 		circle(filled: boolean, x: number, y: number, radius: number, color?: Color, segments?: number): void;
 		curve(x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, segments: number, color?: Color): void;
-		private vertex(x, y, color);
+		private vertex;
 		end(): void;
-		private flush();
-		private check(shapeType, numVertices);
+		private flush;
+		private check;
 		dispose(): void;
 	}
 	enum ShapeType {
 		Point = 0,
 		Line = 1,
-		Filled = 4,
+		Filled = 4
 	}
 }
 declare module spine.webgl {
@@ -1756,9 +1756,9 @@ declare module spine.threejs {
 		private tempColor;
 		constructor(skeletonData: SkeletonData);
 		update(deltaTime: number): void;
-		private clearBatches();
-		private nextBatch();
-		private updateGeometry();
+		private clearBatches;
+		private nextBatch;
+		private updateGeometry;
 	}
 }
 declare module spine.threejs {
@@ -1793,10 +1793,10 @@ declare module spine {
 		private loaded;
 		private bounds;
 		constructor(element: HTMLElement | string, config: SpineWidgetConfig);
-		private validateConfig(config);
-		private load();
-		private render();
-		private resize();
+		private validateConfig;
+		private load;
+		private render;
+		private resize;
 		pause(): void;
 		play(): void;
 		isPlaying(): boolean;
@@ -1804,7 +1804,7 @@ declare module spine {
 		static loadWidgets(): void;
 		static loadWidget(widget: HTMLElement): void;
 		static pageLoaded: boolean;
-		private static ready();
+		private static ready;
 		static setupDOMListener(): void;
 	}
 	class SpineWidgetConfig {

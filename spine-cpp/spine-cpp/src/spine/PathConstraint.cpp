@@ -549,7 +549,10 @@ void PathConstraint::addAfterPosition(float p, Vector<float> &temp, int i, Vecto
 void PathConstraint::addCurvePosition(float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2,
 									  float y2, Vector<float> &output, int o, bool tangents) {
 	if (p < EPSILON || MathUtil::isNan(p)) {
-		p = EPSILON;
+		output[o] = x1;
+		output[o + 1] = y1;
+		output[o + 2] = MathUtil::atan2(cy1 - y1, cx1 - x1);
+		return;
 	}
 
 	float tt = p * p, ttt = tt * p, u = 1 - p, uu = u * u, uuu = uu * u;
@@ -558,7 +561,11 @@ void PathConstraint::addCurvePosition(float p, float x1, float y1, float cx1, fl
 	output[o] = x;
 	output[o + 1] = y;
 	if (tangents) {
-		output[o + 2] = MathUtil::atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt),
-										x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+		if (p < 0.001) {
+			output[o + 2] = MathUtil::atan2(cy1 - y1, cx1 - x1);
+		} else {
+			output[o + 2] = MathUtil::atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt),
+											x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+		}
 	}
 }

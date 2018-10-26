@@ -532,7 +532,12 @@ function PathConstraint:addAfterPosition(p, temp, i, out, o)
 end
 
 function PathConstraint:addCurvePosition(p, x1, y1, cx1, cy1, cx2, cy2, x2, y2, out, o, tangents)
-	if p == 0 or (p ~= p) then p = 0.0001 end
+	if p == 0 or (p ~= p) then
+    out[o + 1] = x1
+		out[o + 2] = y1
+		out[o + 3] = math_atan2(cy1 - y1, cx1 - x1)
+		return;
+  end
 	local tt = p * p
 	local ttt = tt * p
 	local u = 1 - p
@@ -546,7 +551,13 @@ function PathConstraint:addCurvePosition(p, x1, y1, cx1, cy1, cx2, cy2, x2, y2, 
 	local y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt
 	out[o + 1] = x
 	out[o + 2] = y
-	if tangents then out[o + 3] = math_atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt)) end
+	if tangents then 
+    if p < 0.001 then
+      out[o + 3] = math_atan2(cy1 - y1, cx1 - x1)
+    else
+      out[o + 3] = math_atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt))
+    end
+  end
 end
 
 return PathConstraint

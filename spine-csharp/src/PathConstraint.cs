@@ -71,7 +71,7 @@ namespace Spine {
 		public void Apply () {
 			Update();
 		}
-			
+
 		public void Update () {
 			PathAttachment attachment = target.Attachment as PathAttachment;
 			if (attachment == null) return;
@@ -416,14 +416,23 @@ namespace Spine {
 
 		static void AddCurvePosition (float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2,
 			float[] output, int o, bool tangents) {
-			if (p < PathConstraint.Epsilon || float.IsNaN(p)) p = PathConstraint.Epsilon;
+			if (p < PathConstraint.Epsilon || float.IsNaN(p)) {
+				out[o] = x1;
+				out[o + 1] = y1;
+				out[o + 2] = (float)Math.Atan2(cy1 - y1, cx1 - x1);
+				return;
+			}
 			float tt = p * p, ttt = tt * p, u = 1 - p, uu = u * u, uuu = uu * u;
 			float ut = u * p, ut3 = ut * 3, uut3 = u * ut3, utt3 = ut3 * p;
 			float x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
 			output[o] = x;
 			output[o + 1] = y;
-			if (tangents)
-				output[o + 2] = (float)Math.Atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+			if (tangents) {
+				if (p < 0.001f)
+					out[o + 2] = (float)Math.Atan2(cy1 - y1, cx1 - x1);
+				else
+					out[o + 2] = (float)Math.Atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+			}
 		}
 	}
 }
