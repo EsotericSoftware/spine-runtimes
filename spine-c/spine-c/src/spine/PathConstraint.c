@@ -224,13 +224,24 @@ static void _addCurvePosition (float p, float x1, float y1, float cx1, float cy1
 	float tt, ttt, u, uu, uuu;
 	float ut, ut3, uut3, utt3;
 	float x, y;
-	if (p == 0 || _isNan(p, 0)) p = 0.0001f;
+	if (p == 0 || _isNan(p, 0)) {
+		out[o] = x1;
+		out[o + 1] = y1;
+		out[o + 2] = ATAN2(cy1 - y1, cx1 - x1);
+		return;
+	}
 	tt = p * p, ttt = tt * p, u = 1 - p, uu = u * u, uuu = uu * u;
 	ut = u * p, ut3 = ut * 3, uut3 = u * ut3, utt3 = ut3 * p;
 	x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
 	out[o] = x;
 	out[o + 1] = y;
-	if (tangents) out[o + 2] = ATAN2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+	if (tangents) {
+		if (p < 0.001) {
+			out[o + 2] = ATAN2(cy1 - y1, cx1 - x1);
+		} else {
+			out[o + 2] = ATAN2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+		}
+	}
 }
 
 float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAttachment* path, int spacesCount, int/*bool*/ tangents, int/*bool*/percentPosition, int/**/percentSpacing) {
