@@ -1,7 +1,10 @@
 var __extends = (this && this.__extends) || (function () {
-	var extendStatics = Object.setPrototypeOf ||
-		({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-		function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	var extendStatics = function (d, b) {
+		extendStatics = Object.setPrototypeOf ||
+			({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+			function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+		return extendStatics(d, b);
+	}
 	return function (d, b) {
 		extendStatics(d, b);
 		function __() { this.constructor = d; }
@@ -3242,15 +3245,23 @@ var spine;
 			out[o + 2] = r;
 		};
 		PathConstraint.prototype.addCurvePosition = function (p, x1, y1, cx1, cy1, cx2, cy2, x2, y2, out, o, tangents) {
-			if (p == 0 || isNaN(p))
-				p = 0.0001;
+			if (p == 0 || isNaN(p)) {
+				out[o] = x1;
+				out[o + 1] = y1;
+				out[o + 2] = Math.atan2(cy1 - y1, cx1 - x1);
+				return;
+			}
 			var tt = p * p, ttt = tt * p, u = 1 - p, uu = u * u, uuu = uu * u;
 			var ut = u * p, ut3 = ut * 3, uut3 = u * ut3, utt3 = ut3 * p;
 			var x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
 			out[o] = x;
 			out[o + 1] = y;
-			if (tangents)
-				out[o + 2] = Math.atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+			if (tangents) {
+				if (p < 0.001)
+					out[o + 2] = Math.atan2(cy1 - y1, cx1 - x1);
+				else
+					out[o + 2] = Math.atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+			}
 		};
 		PathConstraint.prototype.getOrder = function () {
 			return this.data.order;
