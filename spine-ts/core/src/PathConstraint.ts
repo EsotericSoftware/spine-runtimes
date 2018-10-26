@@ -400,13 +400,23 @@ module spine {
 
 		addCurvePosition (p: number, x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number,
 			out: Array<number>, o: number, tangents: boolean) {
-			if (p == 0 || isNaN(p)) p = 0.0001;
+			if (p == 0 || isNaN(p)) {
+				out[o] = x1;
+				out[o + 1] = y1;
+				out[o + 2] = Math.atan2(cy1 - y1, cx1 - x1);
+				return;
+			}
 			let tt = p * p, ttt = tt * p, u = 1 - p, uu = u * u, uuu = uu * u;
 			let ut = u * p, ut3 = ut * 3, uut3 = u * ut3, utt3 = ut3 * p;
 			let x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
 			out[o] = x;
 			out[o + 1] = y;
-			if (tangents) out[o + 2] = Math.atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+			if (tangents) {
+				if (p < 0.001)
+					out[o + 2] = Math.atan2(cy1 - y1, cx1 - x1);
+				else
+					out[o + 2] = Math.atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+			}
 		}
 
 		getOrder () {
