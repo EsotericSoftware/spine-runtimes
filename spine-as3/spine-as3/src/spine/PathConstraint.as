@@ -416,13 +416,23 @@ package spine {
 		}
 
 		private function addCurvePosition(p : Number, x1 : Number, y1 : Number, cx1 : Number, cy1 : Number, cx2 : Number, cy2 : Number, x2 : Number, y2 : Number, out : Vector.<Number>, o : int, tangents : Boolean) : void {
-			if (p == 0 || isNaN(p)) p = 0.0001;
+			if (p == 0 || isNaN(p)) {
+				out[o] = x1;
+				out[o + 1] = y1;
+				out[o + 2] = Math.atan2(cy1 - y1, cx1 - x1);
+				return;
+			}
 			var tt : Number = p * p, ttt : Number = tt * p, u : Number = 1 - p, uu : Number = u * u, uuu : Number = uu * u;
 			var ut : Number = u * p, ut3 : Number = ut * 3, uut3 : Number = u * ut3, utt3 : Number = ut3 * p;
 			var x : Number = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y : Number = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
 			out[o] = x;
 			out[o + 1] = y;
-			if (tangents) out[o + 2] = Math.atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+			if (tangents) {
+				if (p < 0.001)
+					out[o + 2] = Math.atan2(cy1 - y1, cx1 - x1);
+				else
+					out[o + 2] = Math.atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+			}
 		}
 
 		public function get bones() : Vector.<Bone> {
