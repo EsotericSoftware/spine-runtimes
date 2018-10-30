@@ -249,11 +249,11 @@ function AnimationState:update (delta)
 					local nextTime = current.trackLast - _next.delay
 					if nextTime >= 0 then
 						_next.delay = 0
-						_next.trackTime = nextTime + delta * _next.timeScale
+						_next.trackTime = (nextTime / current.timeScale + delta) * _next.timeScale
 						current.trackTime = current.trackTime + currentDelta
 						self:setCurrent(i, _next, true)
 						while _next.mixingFrom do
-							_next.mixTime = _next.mixTime + currentDelta
+							_next.mixTime = _next.mixTime + delta
 							_next = _next.mixingFrom
 						end
 						skip = true
@@ -310,15 +310,8 @@ function AnimationState:updateMixingFrom (to, delta)
 		return finished
 	end
 
-	-- If to has 0 timeScale and is not the first entry, remove the mix and apply it one more time to return to the setup pose.
-	if to.timeScale == 0 and to.mixingTo then
-		to.timeScale = 1
-		to.mixTime = 0
-		to.mixDuration = 0
-	end
-
 	from.trackTime = from.trackTime + delta * from.timeScale
-	to.mixTime = to.mixTime + delta * to.timeScale
+	to.mixTime = to.mixTime + delta
 	return false;
 end
 
