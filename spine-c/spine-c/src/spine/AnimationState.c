@@ -280,11 +280,11 @@ void spAnimationState_update (spAnimationState* self, float delta) {
 			float nextTime = current->trackLast - next->delay;
 			if (nextTime >= 0) {
 				next->delay = 0;
-				next->trackTime = nextTime + delta * next->timeScale;
+				next->trackTime = (nextTime / current->timeScale + delta) * next->timeScale;
 				current->trackTime += currentDelta;
 				_spAnimationState_setCurrent(self, i, next, 1);
 				while (next->mixingFrom) {
-					next->mixTime += currentDelta;
+					next->mixTime += delta;
 					next = next->mixingFrom;
 				}
 				continue;
@@ -338,14 +338,8 @@ int /*boolean*/ _spAnimationState_updateMixingFrom (spAnimationState* self, spTr
 		return finished;
 	}
 
-	if (to->timeScale == 0 && to->mixingTo) {
-		to->timeScale = 1;
-		to->mixTime = 0;
-		to->mixDuration = 0;
-	}
-
 	from->trackTime += delta * from->timeScale;
-	to->mixTime += delta * to->timeScale;
+	to->mixTime += delta;
 	return 0;
 }
 
