@@ -1,10 +1,7 @@
 var __extends = (this && this.__extends) || (function () {
-	var extendStatics = function (d, b) {
-		extendStatics = Object.setPrototypeOf ||
-			({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-			function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-		return extendStatics(d, b);
-	}
+	var extendStatics = Object.setPrototypeOf ||
+		({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+		function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
 	return function (d, b) {
 		extendStatics(d, b);
 		function __() { this.constructor = d; }
@@ -1333,11 +1330,11 @@ var spine;
 					var nextTime = current.trackLast - next.delay;
 					if (nextTime >= 0) {
 						next.delay = 0;
-						next.trackTime = nextTime + delta * next.timeScale;
+						next.trackTime = (nextTime / current.timeScale + delta) * next.timeScale;
 						current.trackTime += currentDelta;
 						this.setCurrent(i, next, true);
 						while (next.mixingFrom != null) {
-							next.mixTime += currentDelta;
+							next.mixTime += delta;
 							next = next.mixingFrom;
 						}
 						continue;
@@ -1380,13 +1377,8 @@ var spine;
 				}
 				return finished;
 			}
-			if (to.timeScale == 0 && to.mixingTo != null) {
-				to.timeScale = 1;
-				to.mixTime = 0;
-				to.mixDuration = 0;
-			}
 			from.trackTime += delta * from.timeScale;
-			to.mixTime += delta * to.timeScale;
+			to.mixTime += delta;
 			return false;
 		};
 		AnimationState.prototype.apply = function (skeleton) {
