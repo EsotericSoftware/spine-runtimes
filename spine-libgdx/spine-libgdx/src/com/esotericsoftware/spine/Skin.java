@@ -94,7 +94,7 @@ public class Skin {
 	public void clear () {
 		for (Key key : attachments.keys())
 			keyPool.free(key);
-		attachments.clear();
+		attachments.clear(1024);
 	}
 
 	/** The skin's name, which is unique within the skeleton. */

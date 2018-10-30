@@ -98,11 +98,11 @@ namespace Spine {
 					float nextTime = current.trackLast - next.delay;
 					if (nextTime >= 0) {
 						next.delay = 0;
-						next.trackTime = nextTime + (delta * next.timeScale);
+						next.trackTime = (nextTime / current.timeScale + delta) * next.timeScale;
 						current.trackTime += currentDelta;
 						SetCurrent(i, next, true);
 						while (next.mixingFrom != null) {
-							next.mixTime += currentDelta;
+							next.mixTime += delta;
 							next = next.mixingFrom;
 						}
 						continue;
@@ -153,15 +153,8 @@ namespace Spine {
 				return finished;
 			}
 
-			// If to has 0 timeScale and is not the first entry, remove the mix and apply it one more time to return to the setup pose.
-			if (to.timeScale == 0 && to.mixingTo != null) {
-				to.timeScale = 1;
-				to.mixTime = 0;
-				to.mixDuration = 0;
-			}
-
 			from.trackTime += delta * from.timeScale;
-			to.mixTime += delta * to.timeScale;
+			to.mixTime += delta;
 			return false;
 		}
 
@@ -514,8 +507,10 @@ namespace Spine {
 		/// for a track. If the track is empty, it is equivalent to calling <see cref="SetAnimation"/>.</summary>
 		/// <param name="delay">
 		/// delay Seconds to begin this animation after the start of the previous animation. If  &lt;= 0, uses the duration of the
-		/// previous track entry minus any mix duration plus the specified<code>delay</code>.If the previous entry is
-		/// looping, its next loop completion is used instead of the duration.
+		/// previous track entry minus any mix duration (from the <see cref="AnimationStateData"/>) plus the
+		/// specified<code>delay</code> (ie the mix ends at (<code>delay</code> = 0) or before (<code>delay</code> < 0) the previous
+		/// track entry duration). If the previous entry is looping, its next loop completion is used
+		/// instead of the duration.
 		/// </param>
 		/// <returns>A track entry to allow further customization of animation playback. References to the track entry must not be kept
 		/// after <see cref="AnimationState.Dispose"/></returns>
@@ -782,7 +777,7 @@ namespace Spine {
 		///<summary>
 		/// Seconds to postpone playing the animation. When a track entry is the current track entry, delay postpones incrementing
 		/// the track time. When a track entry is queued, delay is the time from the start of the previous animation to when the
-		/// track entry will become the current track entry.</summary>
+		/// track entry will become the current track entry. <see cref="TrackEntry.TimeScale"/> affects the delay.</summary>
 		public float Delay { get { return delay; } set { delay = value; } }
 
 		/// <summary>
@@ -842,8 +837,15 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Multiplier for the delta time when the animation state is updated, causing time for this animation to play slower or
+		/// Multiplier for the delta time when the animation state is updated, causing time for all animations and mixes to play slower or
 		/// faster. Defaults to 1.
+		///
+		/// <see cref="TrackEntry.MixTime"/> is not affected by track entry time scale, so <see cref="TrackEntry.MixDuration"/> may need to
+		// be adjusted to match the animation speed.
+		///
+		/// When using <see cref="AnimationState.AddAnimation(int, Animation, boolean, float)"> with a <code>delay</code> <= 0, note the
+		/// {<see cref="TrackEntry.Delay"/> is set using the mix duration from the <see cref="AnimationStateData"/>, assuming time scale to be 1. If
+		/// the time scale is not 1, the delay may need to be adjusted.
 		/// </summary>
 		public float TimeScale { get { return timeScale; } set { timeScale = value; } }
 
@@ -897,7 +899,8 @@ namespace Spine {
 		/// In that case, the mixDuration must be set before <see cref="AnimationState.Update(float)"/> is next called.
 		/// <para>
 		/// When using <seealso cref="AnimationState.AddAnimation(int, Animation, bool, float)"/> with a
-		/// <code>delay</code> less than or equal to 0, note the <seealso cref="Delay"/> is set using the mix duration from the <see cref=" AnimationStateData"/>
+		/// <code>delay</code> less than or equal to 0, note the <seealso cref="Delay"/> is set using the mix duration from the <see cref=" AnimationStateData"/>,
+		/// not a mix duration set afterward.
 		/// </para>
 		///
 		/// </summary>

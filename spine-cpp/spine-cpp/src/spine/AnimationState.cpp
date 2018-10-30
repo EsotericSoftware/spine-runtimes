@@ -334,11 +334,11 @@ void AnimationState::update(float delta) {
 			float nextTime = current._trackLast - next->_delay;
 			if (nextTime >= 0) {
 				next->_delay = 0;
-				next->_trackTime = nextTime + (delta * next->_timeScale);
+				next->_trackTime = (nextTime / current._timeScale + delta) * next->_timeScale;
 				current._trackTime += currentDelta;
 				setCurrent(i, next, true);
 				while (next->_mixingFrom != NULL) {
-					next->_mixTime += currentDelta;
+					next->_mixTime += delta;
 					next = next->_mixingFrom;
 				}
 				continue;
@@ -728,14 +728,8 @@ bool AnimationState::updateMixingFrom(TrackEntry *to, float delta) {
 		return finished;
 	}
 
-	if (to->_timeScale == 0 && to->_mixingTo) {
-		to->_timeScale = 1;
-		to->_mixTime = 0;
-		to->_mixDuration = 0;
-	}
-
 	from->_trackTime += delta * from->_timeScale;
-	to->_mixTime += delta * to->_timeScale;
+	to->_mixTime += delta;
 
 	return false;
 }

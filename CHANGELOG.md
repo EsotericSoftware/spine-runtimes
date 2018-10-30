@@ -5,6 +5,7 @@
   * The completion event will fire for looped 0 duration animations every frame.
   * `MixPose` is now called `MixBlend`
   * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
+  * Mix time is no longer affected by `TrackEntry#timeScale`. See https://github.com/EsotericSoftware/spine-runtimes/issues/1194
 * **Additions**
   * Added additive animation blending. When playing back multiple animations on different tracks, where each animation modifies the same skeleton property, the results of tracks with lower indices are discarded, and only the result from the track with the highest index is used. With animation blending, the results of all tracks are mixed together. This allows effects like mixing multiple facial expressions (angry, happy, sad) with percentage mixes. By default the old behaviour is retained (results from lower tracks are discarded). To enable additive blending across animation tracks, call `TrackEntry#setMixBlend(MixBlend.add)` on each track. To specify the blend percentage, set `TrackEntry#alpha`. See http://esotericsoftware.com/forum/morph-target-track-animation-mix-mode-9459 for a discussion.
   * Support for stretchy IK
@@ -31,7 +32,7 @@
   * The completion event will fire for looped 0 duration animations every frame.
   * The spine-cocos2dx and spine-ue4 runtimes are now based on spine-cpp. See below for changes.
   * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
-
+  * Mix time is no longer affected by `TrackEntry#timeScale`. See https://github.com/EsotericSoftware/spine-runtimes/issues/1194
 * **Additions**
   * Added support for local and relative transform constraint calculation, including additional fields in `spTransformConstraintData`.
   * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
@@ -99,6 +100,7 @@
 * **Breaking changes**
   * The completion event will fire for looped 0 duration animations every frame.
   * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
+  * Mix time is no longer affected by `TrackEntry#timeScale`. See https://github.com/EsotericSoftware/spine-runtimes/issues/1194
 * **Additions**
   * Added additive animation blending. When playing back multiple animations on different tracks, where each animation modifies the same skeleton property, the results of tracks with lower indices are discarded, and only the result from the track with the highest index is used. With animation blending, the results of all tracks are mixed together. This allows effects like mixing multiple facial expressions (angry, happy, sad) with percentage mixes. By default the old behaviour is retained (results from lower tracks are discarded). To enable additive blending across animation tracks, call `TrackEntry#MixBlend = MixBlend.add` on each track. To specify the blend percentage, set `TrackEntry#Alpha`. See http://esotericsoftware.com/forum/morph-target-track-animation-mix-mode-9459 for a discussion.
   * Support for stretchy IK
@@ -139,6 +141,7 @@
   * The completion event will fire for looped 0 duration animations every frame.
   * `MixPose` is now called `MixBlend`.
   * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
+  * Mix time is no longer affected by `TrackEntry#timeScale`. See https://github.com/EsotericSoftware/spine-runtimes/issues/1194
 * **Additions**
   * Added `EventData#audioPath` field. This field contains the file name of the audio file used for the event.
   * Added convenience method to add all attachments from one skin to another, see https://github.com/EsotericSoftware/spine-runtimes/commit/a0b7bb6c445efdfac12b0cdee2057afa3eff3ead
@@ -159,6 +162,7 @@
 * **Breaking changes**
   * The completion event will fire for looped 0 duration animations every frame.
   * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
+  * Mix time is no longer affected by `TrackEntry#timeScale`. See https://github.com/EsotericSoftware/spine-runtimes/issues/1194
 * **Additions**
   * Added `JitterEffect` and `SwirlEffect` and support for vertex effects in Corona and Love
   * Added additive animation blending. When playing back multiple animations on different tracks, where each animation modifies the same skeleton property, the results of tracks with lower indices are discarded, and only the result from the track with the highest index is used. With animation blending, the results of all tracks are mixed together. This allows effects like mixing multiple facial expressions (angry, happy, sad) with percentage mixes. By default the old behaviour is retained (results from lower tracks are discarded). To enable additive blending across animation tracks, call `TrackEntry:setMixBlend(MixBlend.add)` on each track. To specify the blend percentage, set `TrackEntry.alpha`. See http://esotericsoftware.com/forum/morph-target-track-animation-mix-mode-9459 for a discussion.
@@ -176,6 +180,7 @@
 * **Breaking changes**
   * The completion event will fire for looped 0 duration animations every frame.
   * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
+  * Mix time is no longer affected by `TrackEntry#timeScale`. See https://github.com/EsotericSoftware/spine-runtimes/issues/1194
 * **Additions**
   * Added `AssetManager.loadTextureAtlas`. Instead of loading the `.atlas` and corresponding image files manually, you can simply specify the location of the `.atlas` file and AssetManager will load the atlas and all its images automatically. `AssetManager.get("atlasname.atlas")` will then return an instance of `spine.TextureAtlas`.
   * Added additive animation blending. When playing back multiple animations on different tracks, where each animation modifies the same skeleton property, the results of tracks with lower indices are discarded, and only the result from the track with the highest index is used. With animation blending, the results of all tracks are mixed together. This allows effects like mixing multiple facial expressions (angry, happy, sad) with percentage mixes. By default the old behaviour is retained (results from lower tracks are discarded). To enable additive blending across animation tracks, call `TrackEntry#setMixBlend(MixBlend.add)` on each track. To specify the blend percentage, set `TrackEntry#alpha`. See http://esotericsoftware.com/forum/morph-target-track-animation-mix-mode-9459 for a discussion. See https://github.com/EsotericSoftware/spine-runtimes/blob/f045d221836fa56191ccda73dd42ae884d4731b8/spine-ts/webgl/tests/test-additive-animation-blending.html for an example.
