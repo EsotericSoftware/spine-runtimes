@@ -2576,9 +2576,10 @@ var spine;
 		};
 		Bone.prototype.worldToLocalRotation = function (worldRotation) {
 			var sin = spine.MathUtils.sinDeg(worldRotation), cos = spine.MathUtils.cosDeg(worldRotation);
-			return Math.atan2(this.a * sin - this.c * cos, this.d * cos - this.b * sin) * spine.MathUtils.radDeg;
+			return Math.atan2(this.a * sin - this.c * cos, this.d * cos - this.b * sin) * spine.MathUtils.radDeg + this.rotation - this.shearX;
 		};
 		Bone.prototype.localToWorldRotation = function (localRotation) {
+			localRotation -= this.rotation - this.shearX;
 			var sin = spine.MathUtils.sinDeg(localRotation), cos = spine.MathUtils.cosDeg(localRotation);
 			return Math.atan2(cos * this.c + sin * this.d, cos * this.a + sin * this.b) * spine.MathUtils.radDeg;
 		};
