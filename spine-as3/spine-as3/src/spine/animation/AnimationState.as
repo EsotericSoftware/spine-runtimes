@@ -90,11 +90,11 @@ package spine.animation {
 					var nextTime : Number = current.trackLast - next.delay;
 					if (nextTime >= 0) {
 						next.delay = 0;
-						next.trackTime = nextTime + delta * next.timeScale;
+						next.trackTime = (nextTime / current.timeScale + delta) * next.timeScale;
 						current.trackTime += currentDelta;
 						setCurrent(i, next, true);
 						while (next.mixingFrom != null) {
-							next.mixTime += currentDelta;
+							next.mixTime += delta;
 							next = next.mixingFrom;
 						}
 						continue;
@@ -145,16 +145,9 @@ package spine.animation {
 				}
 				return finished;
 			}
-			
-			// If to has 0 timeScale and is not the first entry, remove the mix and apply it one more time to return to the setup pose.
-			if (to.timeScale == 0 && to.mixingTo != null) {
-				to.timeScale = 1;
-				to.mixTime = 0;
-				to.mixDuration = 0;
-			}
 				
 			from.trackTime += delta * from.timeScale;
-			to.mixTime += delta * to.timeScale;
+			to.mixTime += delta;
 			return false;
 		}
 

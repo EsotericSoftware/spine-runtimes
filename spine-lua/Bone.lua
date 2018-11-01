@@ -286,10 +286,11 @@ end
 function Bone:worldToLocalRotation (worldRotation)
 	local sin = math_sin(math_rad(worldRotation))
 	local cos = math_cos(math_rad(worldRotation))
-	return math_deg(math_atan2(self.a * sin - self.c * cos, self.d * cos - self.b * sin))
+	return math_deg(math_atan2(self.a * sin - self.c * cos, self.d * cos - self.b * sin)) + self.rotation - self.shearX
 end
 
 function Bone:localToWorldRotation (localRotation)
+	localRotation = localRotation - (self.rotation - self.shearX)
 	local sin = math_sin(math_rad(localRotation))
 	local cos = math_cos(math_rad(localRotation))
 	return math_deg(math_atan2(cos * self.c + sin * self.d, cos * self.a + sin * self.b))

@@ -264,11 +264,12 @@ float spBone_worldToLocalRotation (spBone* self, float worldRotation) {
 	float sine, cosine;
 	sine = SIN_DEG(worldRotation);
 	cosine = COS_DEG(worldRotation);
-	return ATAN2(self->a * sine - self->c * cosine, self->d * cosine - self->b * sine) * RAD_DEG;
+	return ATAN2(self->a * sine - self->c * cosine, self->d * cosine - self->b * sine) * RAD_DEG + self->rotation - self->shearX;
 }
 
 float spBone_localToWorldRotation (spBone* self, float localRotation) {
 	float sine, cosine;
+	localRotation -= self->rotation - self->shearX;
 	sine = SIN_DEG(localRotation);
 	cosine = COS_DEG(localRotation);
 	return ATAN2(cosine * self->c + sine * self->d, cosine * self->a + sine * self->b) * RAD_DEG;

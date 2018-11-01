@@ -237,10 +237,11 @@ float Bone::worldToLocalRotation(float worldRotation) {
 	float sin = MathUtil::sinDeg(worldRotation);
 	float cos = MathUtil::cosDeg(worldRotation);
 
-	return MathUtil::atan2(_a * sin - _c * cos, _d * cos - _b * sin) * MathUtil::Rad_Deg;
+	return MathUtil::atan2(_a * sin - _c * cos, _d * cos - _b * sin) * MathUtil::Rad_Deg + this->_rotation - this->_shearX;
 }
 
 float Bone::localToWorldRotation(float localRotation) {
+	localRotation -= this->_rotation - this->_shearX;
 	float sin = MathUtil::sinDeg(localRotation);
 	float cos = MathUtil::cosDeg(localRotation);
 

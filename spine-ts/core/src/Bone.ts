@@ -260,10 +260,11 @@ module spine {
 
 		worldToLocalRotation (worldRotation: number) {
 			let sin = MathUtils.sinDeg(worldRotation), cos = MathUtils.cosDeg(worldRotation);
-			return Math.atan2(this.a * sin - this.c * cos, this.d * cos - this.b * sin) * MathUtils.radDeg;
+			return Math.atan2(this.a * sin - this.c * cos, this.d * cos - this.b * sin) * MathUtils.radDeg + this.rotation - this.shearX;
 		}
 
 		localToWorldRotation (localRotation: number) {
+			localRotation -= this.rotation - this.shearX;
 			let sin = MathUtils.sinDeg(localRotation), cos = MathUtils.cosDeg(localRotation);
 			return Math.atan2(cos * this.c + sin * this.d, cos * this.a + sin * this.b) * MathUtils.radDeg;
 		}

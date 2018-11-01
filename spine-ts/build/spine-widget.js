@@ -1333,11 +1333,11 @@ var spine;
                     var nextTime = current.trackLast - next.delay;
                     if (nextTime >= 0) {
                         next.delay = 0;
-                        next.trackTime = nextTime + delta * next.timeScale;
+                        next.trackTime = (nextTime / current.timeScale + delta) * next.timeScale;
                         current.trackTime += currentDelta;
                         this.setCurrent(i, next, true);
                         while (next.mixingFrom != null) {
-                            next.mixTime += currentDelta;
+                            next.mixTime += delta;
                             next = next.mixingFrom;
                         }
                         continue;
@@ -1380,13 +1380,8 @@ var spine;
                 }
                 return finished;
             }
-            if (to.timeScale == 0 && to.mixingTo != null) {
-                to.timeScale = 1;
-                to.mixTime = 0;
-                to.mixDuration = 0;
-            }
             from.trackTime += delta * from.timeScale;
-            to.mixTime += delta * to.timeScale;
+            to.mixTime += delta;
             return false;
         };
         AnimationState.prototype.apply = function (skeleton) {
@@ -2584,9 +2579,10 @@ var spine;
         };
         Bone.prototype.worldToLocalRotation = function (worldRotation) {
             var sin = spine.MathUtils.sinDeg(worldRotation), cos = spine.MathUtils.cosDeg(worldRotation);
-            return Math.atan2(this.a * sin - this.c * cos, this.d * cos - this.b * sin) * spine.MathUtils.radDeg;
+            return Math.atan2(this.a * sin - this.c * cos, this.d * cos - this.b * sin) * spine.MathUtils.radDeg + this.rotation - this.shearX;
         };
         Bone.prototype.localToWorldRotation = function (localRotation) {
+            localRotation -= this.rotation - this.shearX;
             var sin = spine.MathUtils.sinDeg(localRotation), cos = spine.MathUtils.cosDeg(localRotation);
             return Math.atan2(cos * this.c + sin * this.d, cos * this.a + sin * this.b) * spine.MathUtils.radDeg;
         };
