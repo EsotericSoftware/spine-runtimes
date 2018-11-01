@@ -1,0 +1,98 @@
+<html>
+<script src="../../build/spine-widget.js"></script>
+
+<style>
+
+body {
+	background: gray;
+}
+
+.spine-player {
+	width: 100%;
+	height: 100%;
+	background: red;
+	position: relative;
+}
+
+.spine-player canvas {
+	width: 100%;
+	height: 100%;
+}
+
+.spine-player .spine-player-controls {
+	display: flex;
+	flex-direction: column;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	opacity: 1;
+}
+
+.spine-player:hover .spine-player-controls {
+	opacity: 1;
+}
+
+.spine-player .spine-player-timeline {
+	width: 100%;
+	background: green;
+	position: relative;
+	background: rgba(0, 0, 0, 0.7);
+	cursor: pointer;
+}
+
+.spine-player .spine-player-timeline-slider {
+	width: 50%;
+	height: 8px;
+	background: #62B0EE;
+	cursor: pointer;
+}
+
+.spine-player .spine-player-buttons {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	background: rgba(0, 0, 0, 0.6);
+}
+
+.spine-player .spine-player-button {
+	background: none;
+	outline: 0;
+	border: none;
+	height: 32px;
+	cursor: pointer;
+	color: white;
+}
+
+.spine-player .spine-player-button-spacer {
+	flex: 1;
+}
+
+.spine-player .spine-player-button-icon-play {
+	width: 32px;
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cdefs%3E%3Cstyle%3E.icon-canvas-transparent,.icon-vs-out{fill:%23252526}.icon-canvas-transparent{opacity:0}.icon-vs-action-green{fill:%2389d185}%3C/style%3E%3C/defs%3E%3Ctitle%3Econtinue%3C/title%3E%3Cpath class='icon-canvas-transparent' d='M16 0v16H0V0z' id='canvas'/%3E%3Cpath class='icon-vs-action-green' d='M4 1.5v13L12.667 8 4 1.5z' id='iconBg'/%3E%3C/svg%3E");
+	fill: white;
+}
+
+.spine-player .spine-player-button-icon-pause {
+	width: 32px;
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cdefs%3E%3Cstyle%3E.icon-canvas-transparent,.icon-vs-out{fill:%23252526}.icon-canvas-transparent{opacity:0}.icon-vs-action-blue{fill:%2375beff}%3C/style%3E%3C/defs%3E%3Ctitle%3Epause%3C/title%3E%3Cpath class='icon-canvas-transparent' d='M16 0v16H0V0z' id='canvas'/%3E%3Cpath class='icon-vs-action-blue' d='M4 3h2.5v10H4zm5.5 0v10H12V3z' id='iconBg'/%3E%3C/svg%3E");
+}
+
+</style>
+
+<body>
+	<div id="container" style="width: 100%; height: 100%;"></div>
+</body>
+<script>
+	new spine.SpinePlayer(document.getElementById("container"), {
+		jsonUrl: "assets/spineboy-ess.json",
+		atlasUrl: "assets/spineboy.atlas",
+		backgroundColor: "#cccccc",
+		scale: 0.5,
+		x: 0,
+		y: 0
+	});
+</script>
+</body>
+</html>
