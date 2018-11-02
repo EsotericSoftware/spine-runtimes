@@ -9630,6 +9630,30 @@ var spine;
                 justClicked = true;
                 window.onclick = dismissDropdown;
             };
+            fullscreenButton.onclick = function () {
+                var doc = document;
+                if (doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement) {
+                    if (doc.exitFullscreen)
+                        doc.exitFullscreen();
+                    else if (doc.mozCancelFullScreen)
+                        doc.mozCancelFullScreen();
+                    else if (doc.webkitExitFullscreen)
+                        doc.webkitExitFullscreen();
+                    else if (doc.msExitFullscreen)
+                        doc.msExitFullscreen();
+                }
+                else {
+                    var player = findWithClass(parent, "spine-player")[0];
+                    if (player.requestFullscreen)
+                        player.requestFullscreen();
+                    else if (player.webkitRequestFullScreen)
+                        player.webkitRequestFullScreen();
+                    else if (player.mozRequestFullScreen)
+                        player.mozRequestFullScreen();
+                    else if (player.msRequestFullscreen)
+                        player.msRequestFullscreen();
+                }
+            };
             window.onresize = function () {
                 _this.drawFrame(false);
             };

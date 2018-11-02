@@ -350,6 +350,22 @@
 				window.onclick = dismissDropdown;
 			}
 
+			fullscreenButton.onclick = () => {
+				let doc = document as any;
+				if(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement) {
+					if (doc.exitFullscreen) doc.exitFullscreen();
+					else if (doc.mozCancelFullScreen) doc.mozCancelFullScreen();
+					else if (doc.webkitExitFullscreen) doc.webkitExitFullscreen()
+					else if (doc.msExitFullscreen) doc.msExitFullscreen();
+				} else {
+					let player = findWithClass(parent, "spine-player")[0] as any;
+					if (player.requestFullscreen) player.requestFullscreen();
+					else if (player.webkitRequestFullScreen) player.webkitRequestFullScreen();
+					else if (player.mozRequestFullScreen) player.mozRequestFullScreen();
+					else if (player.msRequestFullscreen) player.msRequestFullscreen();
+				}
+			};
+
 			// Register a global resize handler to redraw and avoid flicker
 			window.onresize = () => {
 				this.drawFrame(false);
