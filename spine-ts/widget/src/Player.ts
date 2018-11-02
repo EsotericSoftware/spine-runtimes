@@ -38,11 +38,58 @@
 		x: number;
 		y: number;
 		alpha: boolean;
-		fitToCanvas: boolean;
 		backgroundColor: string;
 		premultipliedAlpha: boolean;
 		success: (widget: SpineWidget) => void;
 		error: (widget: SpineWidget, msg: string) => void;
+	}
+
+	class Slider {
+		private slider: HTMLElement;
+		private value: HTMLElement;
+		public change: (percentage: number) => void;
+
+		constructor(parent: HTMLElement) {
+			parent.innerHTML = /*html*/`
+				<div class="spine-player-slider">
+					<div class="spine-player-slider-value"></div>
+				</div>
+			`;
+			this.slider = findWithClass(parent, "spine-player-slider")[0];
+			this.value = findWithClass(parent, "spine-player-slider-value")[0];
+			this.setValue(0);
+
+			let input = new spine.webgl.Input(this.slider);
+			var dragging = false;
+			input.addListener({
+				down: (x, y) => {
+					dragging = true;
+				},
+				up: (x, y) => {
+					dragging = false;
+					let percentage = x / this.slider.clientWidth;
+					this.setValue(x / this.slider.clientWidth);
+					if (this.change) this.change(percentage);
+				},
+				moved: (x, y) => {
+					if (dragging) {
+						let percentage = x / this.slider.clientWidth;
+						this.setValue(x / this.slider.clientWidth);
+						if (this.change) this.change(percentage);
+					}
+				},
+				dragged: (x, y) => {
+					let percentage = x / this.slider.clientWidth;
+					this.setValue(x / this.slider.clientWidth);
+					if (this.change) this.change(percentage);
+				}
+			});
+		}
+
+		setValue(percentage: number) {
+			percentage = Math.max(0, Math.min(1, percentage));
+			this.value.style.width = "" + (percentage * 100) + "%";
+		}
 	}
 
 	export class SpinePlayer {
@@ -51,9 +98,14 @@
 		private context: spine.webgl.ManagedWebGLRenderingContext;
 		private loadingScreen: spine.webgl.LoadingScreen;
 		private assetManager: spine.webgl.AssetManager;
+		private timelineSlider: Slider;
 		private loaded: boolean;
 		private skeleton: Skeleton;
 		private animationState: AnimationState;
+		private time = new TimeKeeper();
+
+		private paused = true;
+		private currentAnimation: string;
 
 		constructor(parent: HTMLElement, private config: SpinePlayerConfig) {
 			this.validateConfig(config);
@@ -68,7 +120,6 @@
 			if (!config.x) config.x = 0;
 			if (!config.y) config.y = 0;
 			if (!config.alpha) config.alpha = false;
-			if (!config.fitToCanvas) config.fitToCanvas = true;
 			if (!config.backgroundColor) config.backgroundColor = "#000000";
 			if (!config.premultipliedAlpha) config.premultipliedAlpha = false;
 			if (!config.success) config.success = (widget) => {};
@@ -82,7 +133,6 @@
 					<canvas class="spine-player-canvas"></canvas>
 					<div class="spine-player-controls">
 						<div class="spine-player-timeline">
-							<div class="spine-player-timeline-slider"></div>
 						</div>
 						<div class="spine-player-buttons">
 							<button id="spine-player-button-play-pause" class="spine-player-button spine-player-button-icon-play"></button>
@@ -107,16 +157,8 @@
 				</div>
 			`;
 
-			this.canvas = findWithClass(parent, "spine-player-canvas")[0] as HTMLCanvasElement;
-			let slider = findWithClass(parent, "spine-player-timeline-slider")[0];
-			let playButton = findWithId(parent, "spine-player-button-play-pause")[0];
-			let animationButton = findWithId(parent, "spine-player-button-animation")[0];
-			let skinButton = findWithId(parent, "spine-player-button-skin")[0];
-			let settingsButton = findWithId(parent, "spine-player-button-settings")[0];
-			let fullscreenButton = findWithId(parent, "spine-player-button-fullscreen")[0];
-
-
 			// Setup the scene renderer and OpenGL context
+			this.canvas = findWithClass(parent, "spine-player-canvas")[0] as HTMLCanvasElement;
 			var webglConfig = { alpha: config.alpha };
 			this.context = new spine.webgl.ManagedWebGLRenderingContext(this.canvas, webglConfig);
 
@@ -131,12 +173,22 @@
 
 			// Setup rendering loop
 			requestAnimationFrame(() => this.drawFrame());
+
+			// Setup the event listeners for UI elements
+			let timeline = findWithClass(parent, "spine-player-timeline")[0];
+			this.timelineSlider = new Slider(timeline);
+			let playButton = findWithId(parent, "spine-player-button-play-pause")[0];
+			let animationButton = findWithId(parent, "spine-player-button-animation")[0];
+			let skinButton = findWithId(parent, "spine-player-button-skin")[0];
+			let settingsButton = findWithId(parent, "spine-player-button-settings")[0];
+			let fullscreenButton = findWithId(parent, "spine-player-button-fullscreen")[0];
 		}
 
 		drawFrame () {
 			requestAnimationFrame(() => this.drawFrame());
 			let ctx = this.context;
 			let gl = ctx.gl;
+			this.time.update();
 
 			// Clear the viewport
 			let bg = new Color().setFromString(this.config.backgroundColor);
@@ -157,7 +209,16 @@
 				this.skeleton.x = this.config.x;
 				this.skeleton.y = this.config.y;
 				this.skeleton.scaleX = this.skeleton.scaleY = this.config.scale;
-				this.skeleton.updateWorldTransform();
+
+				if (!this.paused && this.currentAnimation) {
+					this.animationState.update(this.time.delta);
+					this.animationState.apply(this.skeleton);
+					this.skeleton.updateWorldTransform();
+					let animation = this.skeleton.data.findAnimation(this.currentAnimation);
+					let animationTime = this.animationState.getCurrent(0).trackTime % animation.duration;
+					let percentage = animationTime / animation.duration;
+					this.timelineSlider.setValue(percentage);
+				}
 
 				this.sceneRenderer.camera.position.x = 0;
 				this.sceneRenderer.camera.position.y = 0;
@@ -171,12 +232,29 @@
 
 		loadSkeleton () {
 			if (this.loaded) return;
-			let atlas = this.assetManager.get(this.config.atlasUrl);
 
+			let atlas = this.assetManager.get(this.config.atlasUrl);
 			let jsonText = this.assetManager.get(this.config.jsonUrl);
 			let json = new SkeletonJson(new AtlasAttachmentLoader(atlas));
 			let skeletonData = json.readSkeletonData(jsonText);
 			this.skeleton = new Skeleton(skeletonData);
+			this.animationState = new AnimationState(new AnimationStateData(skeletonData));
+
+			// Setup the first animation
+			if (this.config.animation) {
+				this.currentAnimation = this.config.animation;
+			} else {
+				if (skeletonData.animations.length > 0) {
+					this.currentAnimation = skeletonData.animations[0].name;
+				}
+			}
+			if(this.currentAnimation) {
+				this.animationState.setAnimation(0, this.currentAnimation, true);
+				this.paused = false;
+				this.timelineSlider.change = (percentage) => {
+					this.paused = true;
+				}
+			}
 
 			this.loaded = true;
 		}

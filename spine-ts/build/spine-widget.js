@@ -9396,9 +9396,53 @@ var spine;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
+    var Slider = (function () {
+        function Slider(parent) {
+            var _this = this;
+            parent.innerHTML = "\n\t\t\t\t<div class=\"spine-player-slider\">\n\t\t\t\t\t<div class=\"spine-player-slider-value\"></div>\n\t\t\t\t</div>\n\t\t\t";
+            this.slider = findWithClass(parent, "spine-player-slider")[0];
+            this.value = findWithClass(parent, "spine-player-slider-value")[0];
+            this.setValue(0);
+            var input = new spine.webgl.Input(this.slider);
+            var dragging = false;
+            input.addListener({
+                down: function (x, y) {
+                    dragging = true;
+                },
+                up: function (x, y) {
+                    dragging = false;
+                    var percentage = x / _this.slider.clientWidth;
+                    _this.setValue(x / _this.slider.clientWidth);
+                    if (_this.change)
+                        _this.change(percentage);
+                },
+                moved: function (x, y) {
+                    if (dragging) {
+                        var percentage = x / _this.slider.clientWidth;
+                        _this.setValue(x / _this.slider.clientWidth);
+                        if (_this.change)
+                            _this.change(percentage);
+                    }
+                },
+                dragged: function (x, y) {
+                    var percentage = x / _this.slider.clientWidth;
+                    _this.setValue(x / _this.slider.clientWidth);
+                    if (_this.change)
+                        _this.change(percentage);
+                }
+            });
+        }
+        Slider.prototype.setValue = function (percentage) {
+            percentage = Math.max(0, Math.min(1, percentage));
+            this.value.style.width = "" + (percentage * 100) + "%";
+        };
+        return Slider;
+    }());
     var SpinePlayer = (function () {
         function SpinePlayer(parent, config) {
             this.config = config;
+            this.time = new spine.TimeKeeper();
+            this.paused = true;
             this.validateConfig(config);
             this.render(parent, config);
         }
@@ -9417,8 +9461,6 @@ var spine;
                 config.y = 0;
             if (!config.alpha)
                 config.alpha = false;
-            if (!config.fitToCanvas)
-                config.fitToCanvas = true;
             if (!config.backgroundColor)
                 config.backgroundColor = "#000000";
             if (!config.premultipliedAlpha)
@@ -9431,14 +9473,8 @@ var spine;
         };
         SpinePlayer.prototype.render = function (parent, config) {
             var _this = this;
-            parent.innerHTML = "\n\t\t\t\t<div class=\"spine-player\">\n\t\t\t\t\t<canvas class=\"spine-player-canvas\"></canvas>\n\t\t\t\t\t<div class=\"spine-player-controls\">\n\t\t\t\t\t\t<div class=\"spine-player-timeline\">\n\t\t\t\t\t\t\t<div class=\"spine-player-timeline-slider\"></div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"spine-player-buttons\">\n\t\t\t\t\t\t\t<button id=\"spine-player-button-play-pause\" class=\"spine-player-button spine-player-button-icon-play\"></button>\n\t\t\t\t\t\t\t<div class=\"spine-player-button-spacer\"></div>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-speed\" class=\"spine-player-button\">\n\t\t\t\t\t\t\t\tSpeed\n\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-animation\" class=\"spine-player-button\">\n\t\t\t\t\t\t\t\tAnimation\n\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-skin\" class=\"spine-player-button\">\n\t\t\t\t\t\t\t\tSkin\n\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-settings\" class=\"spine-player-button\">\n\t\t\t\t\t\t\t\tSettings\n\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-fullscreen\" class=\"spine-player-button\">\n\t\t\t\t\t\t\t\tFullscreen\n\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t";
+            parent.innerHTML = "\n\t\t\t\t<div class=\"spine-player\">\n\t\t\t\t\t<canvas class=\"spine-player-canvas\"></canvas>\n\t\t\t\t\t<div class=\"spine-player-controls\">\n\t\t\t\t\t\t<div class=\"spine-player-timeline\">\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"spine-player-buttons\">\n\t\t\t\t\t\t\t<button id=\"spine-player-button-play-pause\" class=\"spine-player-button spine-player-button-icon-play\"></button>\n\t\t\t\t\t\t\t<div class=\"spine-player-button-spacer\"></div>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-speed\" class=\"spine-player-button\">\n\t\t\t\t\t\t\t\tSpeed\n\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-animation\" class=\"spine-player-button\">\n\t\t\t\t\t\t\t\tAnimation\n\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-skin\" class=\"spine-player-button\">\n\t\t\t\t\t\t\t\tSkin\n\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-settings\" class=\"spine-player-button\">\n\t\t\t\t\t\t\t\tSettings\n\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-fullscreen\" class=\"spine-player-button\">\n\t\t\t\t\t\t\t\tFullscreen\n\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t";
             this.canvas = findWithClass(parent, "spine-player-canvas")[0];
-            var slider = findWithClass(parent, "spine-player-timeline-slider")[0];
-            var playButton = findWithId(parent, "spine-player-button-play-pause")[0];
-            var animationButton = findWithId(parent, "spine-player-button-animation")[0];
-            var skinButton = findWithId(parent, "spine-player-button-skin")[0];
-            var settingsButton = findWithId(parent, "spine-player-button-settings")[0];
-            var fullscreenButton = findWithId(parent, "spine-player-button-fullscreen")[0];
             var webglConfig = { alpha: config.alpha };
             this.context = new spine.webgl.ManagedWebGLRenderingContext(this.canvas, webglConfig);
             this.sceneRenderer = new spine.webgl.SceneRenderer(this.canvas, this.context, true);
@@ -9447,12 +9483,20 @@ var spine;
             this.assetManager.loadText(config.jsonUrl);
             this.assetManager.loadTextureAtlas(config.atlasUrl);
             requestAnimationFrame(function () { return _this.drawFrame(); });
+            var timeline = findWithClass(parent, "spine-player-timeline")[0];
+            this.timelineSlider = new Slider(timeline);
+            var playButton = findWithId(parent, "spine-player-button-play-pause")[0];
+            var animationButton = findWithId(parent, "spine-player-button-animation")[0];
+            var skinButton = findWithId(parent, "spine-player-button-skin")[0];
+            var settingsButton = findWithId(parent, "spine-player-button-settings")[0];
+            var fullscreenButton = findWithId(parent, "spine-player-button-fullscreen")[0];
         };
         SpinePlayer.prototype.drawFrame = function () {
             var _this = this;
             requestAnimationFrame(function () { return _this.drawFrame(); });
             var ctx = this.context;
             var gl = ctx.gl;
+            this.time.update();
             var bg = new spine.Color().setFromString(this.config.backgroundColor);
             gl.clearColor(bg.r, bg.g, bg.b, bg.a);
             gl.clear(gl.COLOR_BUFFER_BIT);
@@ -9464,7 +9508,15 @@ var spine;
                 this.skeleton.x = this.config.x;
                 this.skeleton.y = this.config.y;
                 this.skeleton.scaleX = this.skeleton.scaleY = this.config.scale;
-                this.skeleton.updateWorldTransform();
+                if (!this.paused && this.currentAnimation) {
+                    this.animationState.update(this.time.delta);
+                    this.animationState.apply(this.skeleton);
+                    this.skeleton.updateWorldTransform();
+                    var animation = this.skeleton.data.findAnimation(this.currentAnimation);
+                    var animationTime = this.animationState.getCurrent(0).trackTime % animation.duration;
+                    var percentage = animationTime / animation.duration;
+                    this.timelineSlider.setValue(percentage);
+                }
                 this.sceneRenderer.camera.position.x = 0;
                 this.sceneRenderer.camera.position.y = 0;
                 this.sceneRenderer.begin();
@@ -9475,6 +9527,7 @@ var spine;
             }
         };
         SpinePlayer.prototype.loadSkeleton = function () {
+            var _this = this;
             if (this.loaded)
                 return;
             var atlas = this.assetManager.get(this.config.atlasUrl);
@@ -9482,6 +9535,22 @@ var spine;
             var json = new spine.SkeletonJson(new spine.AtlasAttachmentLoader(atlas));
             var skeletonData = json.readSkeletonData(jsonText);
             this.skeleton = new spine.Skeleton(skeletonData);
+            this.animationState = new spine.AnimationState(new spine.AnimationStateData(skeletonData));
+            if (this.config.animation) {
+                this.currentAnimation = this.config.animation;
+            }
+            else {
+                if (skeletonData.animations.length > 0) {
+                    this.currentAnimation = skeletonData.animations[0].name;
+                }
+            }
+            if (this.currentAnimation) {
+                this.animationState.setAnimation(0, this.currentAnimation, true);
+                this.paused = false;
+                this.timelineSlider.change = function (percentage) {
+                    _this.paused = true;
+                };
+            }
             this.loaded = true;
         };
         SpinePlayer.prototype.resize = function () {

@@ -1692,7 +1692,6 @@ declare module spine {
         x: number;
         y: number;
         alpha: boolean;
-        fitToCanvas: boolean;
         backgroundColor: string;
         premultipliedAlpha: boolean;
         success: (widget: SpineWidget) => void;
@@ -1705,9 +1704,13 @@ declare module spine {
         private context;
         private loadingScreen;
         private assetManager;
+        private timelineSlider;
         private loaded;
         private skeleton;
         private animationState;
+        private time;
+        private paused;
+        private currentAnimation;
         constructor(parent: HTMLElement, config: SpinePlayerConfig);
         validateConfig(config: SpinePlayerConfig): SpinePlayerConfig;
         render(parent: HTMLElement, config: SpinePlayerConfig): void;
