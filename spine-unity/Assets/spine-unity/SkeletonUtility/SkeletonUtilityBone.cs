@@ -143,24 +143,24 @@ namespace Spine.Unity {
 					case UpdatePhase.World:
 					case UpdatePhase.Complete:
 						// Use Applied transform values (ax, ay, AppliedRotation, ascale) if world values were modified by constraints.
-						if (!bone.appliedValid) {
+						if (!bone.appliedValid)
 							bone.UpdateAppliedTransform();
-							if (position)
-								thisTransform.localPosition = new Vector3(bone.ax, bone.ay, 0);
 
-							if (rotation) {
-								if (bone.data.transformMode.InheritsRotation()) {
-									thisTransform.localRotation = Quaternion.Euler(0, 0, bone.AppliedRotation);
-								} else {
-									Vector3 euler = skeletonTransform.rotation.eulerAngles;
-									thisTransform.rotation = Quaternion.Euler(euler.x, euler.y, euler.z + (bone.WorldRotationX * skeletonFlipRotation));
-								}
-							}
+						if (position)
+							thisTransform.localPosition = new Vector3(bone.ax, bone.ay, 0);
 
-							if (scale) {
-								thisTransform.localScale = new Vector3(bone.ascaleX, bone.ascaleY, 1f);
-								incompatibleTransformMode = BoneTransformModeIncompatible(bone);
+						if (rotation) {
+							if (bone.data.transformMode.InheritsRotation()) {
+								thisTransform.localRotation = Quaternion.Euler(0, 0, bone.AppliedRotation);
+							} else {
+								Vector3 euler = skeletonTransform.rotation.eulerAngles;
+								thisTransform.rotation = Quaternion.Euler(euler.x, euler.y, euler.z + (bone.WorldRotationX * skeletonFlipRotation));
 							}
+						}
+
+						if (scale) {
+							thisTransform.localScale = new Vector3(bone.ascaleX, bone.ascaleY, 1f);
+							incompatibleTransformMode = BoneTransformModeIncompatible(bone);
 						}
 						break;
 				}
