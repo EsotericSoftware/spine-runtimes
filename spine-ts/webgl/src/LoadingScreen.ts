@@ -86,11 +86,12 @@ module spine.webgl {
 			let canvas = renderer.canvas;
 			let gl = renderer.context.gl;
 
+			renderer.resize(ResizeMode.Stretch);
+
 			let oldX = renderer.camera.position.x, oldY = renderer.camera.position.y;
 			renderer.camera.position.set(canvas.width / 2, canvas.height / 2, 0);
 			renderer.camera.viewportWidth = canvas.width;
 			renderer.camera.viewportHeight = canvas.height;
-			renderer.resize(ResizeMode.Stretch);
 
 			if (!complete) {
 				gl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);

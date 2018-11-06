@@ -44,6 +44,7 @@ void spColor_setFromFloats(spColor* self, float r, float g, float b, float a) {
 	self->g = g;
 	self->b = b;
 	self->a = a;
+	spColor_clamp(self);
 }
 
 void spColor_setFromColor(spColor* self, spColor* otherColor) {

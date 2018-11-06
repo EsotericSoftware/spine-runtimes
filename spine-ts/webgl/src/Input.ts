@@ -46,7 +46,7 @@ module spine.webgl {
 		}
 
 		private setupCallbacks(element: HTMLElement) {
-			element.addEventListener("mousedown", (ev: UIEvent) => {
+			let mouseDown = (ev: UIEvent) => {
 				if (ev instanceof MouseEvent) {
 					let rect = element.getBoundingClientRect();
 					let x = ev.clientX - rect.left;
@@ -60,9 +60,13 @@ module spine.webgl {
 					this.lastX = x;
 					this.lastY = y;
 					this.buttonDown = true;
+
+					document.addEventListener("mousemove", mouseMove);
+					document.addEventListener("mouseup", mouseUp);
 				}
-			}, true);
-			element.addEventListener("mousemove", (ev: UIEvent) => {
+			}
+
+			let mouseMove = (ev: UIEvent) => {
 				if (ev instanceof MouseEvent) {
 					let rect = element.getBoundingClientRect();
 					let x = ev.clientX - rect.left;
@@ -80,8 +84,9 @@ module spine.webgl {
 					this.lastX = x;
 					this.lastY = y;
 				}
-			}, true);
-			element.addEventListener("mouseup", (ev: UIEvent) => {
+			};
+
+			let mouseUp = (ev: UIEvent) => {
 				if (ev instanceof MouseEvent) {
 					let rect = element.getBoundingClientRect();
 					let x = ev.clientX - rect.left;
@@ -95,8 +100,16 @@ module spine.webgl {
 					this.lastX = x;
 					this.lastY = y;
 					this.buttonDown = false;
+					document.removeEventListener("mousemove", mouseMove);
+					document.removeEventListener("mouseup", mouseUp);
 				}
-			}, true);
+			}
+
+
+
+			element.addEventListener("mousedown", mouseDown, true);
+			element.addEventListener("mousemove", mouseMove, true);
+			element.addEventListener("mouseup", mouseUp, true);
 			element.addEventListener("touchstart", (ev: TouchEvent) => {
 				if (this.currTouch != null) return;
 

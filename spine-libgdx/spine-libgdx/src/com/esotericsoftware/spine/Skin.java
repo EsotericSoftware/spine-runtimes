@@ -127,7 +127,7 @@ public class Skin {
 			if (name == null) throw new IllegalArgumentException("name cannot be null.");
 			this.slotIndex = slotIndex;
 			this.name = name;
-			hashCode = 31 * (31 + name.hashCode()) + slotIndex;
+			hashCode = name.hashCode() + slotIndex * 37;
 		}
 
 		public int hashCode () {

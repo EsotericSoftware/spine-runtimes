@@ -470,7 +470,7 @@ module spine {
 		 * @param offset The distance from the skeleton origin to the bottom left corner of the AABB.
 		 * @param size The width and height of the AABB.
 		 * @param temp Working memory */
-		getBounds (offset: Vector2, size: Vector2, temp: Array<number>) {
+		getBounds (offset: Vector2, size: Vector2, temp: Array<number> = new Array<number>(2)) {
 			if (offset == null) throw new Error("offset cannot be null.");
 			if (size == null) throw new Error("size cannot be null.");
 			let drawOrder = this.drawOrder;
