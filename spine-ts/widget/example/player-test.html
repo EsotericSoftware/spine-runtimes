@@ -30,14 +30,18 @@ body {
 	display: inline-block;
 }
 
+.spine-player .spine-player-dropdown-title {
+	text-align: center;
+}
+
 .spine-player .spine-player-dropdown-content {
     position: absolute;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.75);
     z-index: 1;
 	right: 2px;
     bottom: 42px;
-	padding: 16px;
-	border-radius: 8px;
+	padding: 4px 0px;
+	border-radius: 4px;
 }
 
 .spine-player canvas {
@@ -64,7 +68,7 @@ body {
 	width: 100%;
 	background: green;
 	position: relative;
-	background: rgba(0, 0, 0, 0.7);
+	background: rgba(0, 0, 0, 0.75);
 	cursor: pointer;
 }
 
@@ -78,7 +82,7 @@ body {
 	display: flex;
 	flex-direction: row;
 	width: 100%;
-	background: rgba(0, 0, 0, 0.6);
+	background: rgba(0, 0, 0, 0.75);
 	border-bottom-left-radius: 8px;
 	border-bottom-right-radius: 8px;
 	padding: 0 8px;
@@ -166,17 +170,31 @@ body {
 	flex-direction: row;
 }
 
+.spine-player-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
 .spine-player-list-item {
 	padding: 0 4px;
 	cursor: pointer;
 }
 
-.spine-player-list-item-selected {
-	background: rgba(101, 176, 238, 0.605);
+.spine-player-list-item-selected:before {
+	content: "";
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: #fff;
+	display: inline-block;
+	position: relative;
+	top: -1px; /* vertical position of dot*/
+	margin-right: 5px;
 }
 
 .spine-player-list-item:hover {
-	background: #62B0EE;
+	background: #979696b9;
 }
 
 .spine-player-speed-slider {

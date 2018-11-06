@@ -258,15 +258,15 @@
 				if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
 				dropdown.classList.remove("spine-player-hidden");
 				dropdown.innerHTML = /*html*/`
-					<div>Animations</div>
+					<div class="spine-player-dropdown-title">Animations</div>
 					<hr>
-					<div class="spine-player-list" style="user-select: none; align-items: center; max-height: 90px; overflow: auto;">
-					</div>
+					<ul class="spine-player-list">
+					</ul>
 				`;
 
 				let rows = findWithClass(dropdown, "spine-player-list")[0];
 				this.skeleton.data.animations.forEach((animation) => {
-					let row = document.createElement("div");
+					let row = document.createElement("li");
 					row.classList.add("spine-player-list-item");
 					if (animation.name == this.config.animation) row.classList.add("spine-player-list-item-selected");
 					row.innerText = animation.name;
@@ -288,15 +288,15 @@
 				if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
 				dropdown.classList.remove("spine-player-hidden");
 				dropdown.innerHTML = /*html*/`
-					<div>Skins</div>
+					<div class="spine-player-dropdown-title">Skins</div>
 					<hr>
-					<div class="spine-player-list" style="user-select: none; align-items: center; max-height: 90px; overflow: auto;">
-					</div>
+					<ul class="spine-player-list">
+					</ul>
 				`;
 
 				let rows = findWithClass(dropdown, "spine-player-list")[0];
 				this.skeleton.data.skins.forEach((skin) => {
-					let row = document.createElement("div");
+					let row = document.createElement("li");
 					row.classList.add("spine-player-list-item");
 					if (skin.name == this.config.skin) row.classList.add("spine-player-list-item-selected");
 					row.innerText = skin.name;
@@ -318,7 +318,7 @@
 				if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
 				dropdown.classList.remove("spine-player-hidden");
 				dropdown.innerHTML = /*html*/`
-					<div>Debug</div>
+					<div class="spine-player-dropdown-title">Debug</div>
 					<hr>
 					<div class="spine-player-list" style="user-select: none; align-items: center; max-height: 90px; overflow: auto;">
 					</div>

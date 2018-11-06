@@ -1,7 +1,10 @@
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -9556,10 +9559,10 @@ var spine;
                 if (!_this.skeleton || _this.skeleton.data.animations.length == 0)
                     return;
                 dropdown.classList.remove("spine-player-hidden");
-                dropdown.innerHTML = "\n\t\t\t\t\t<div>Animations</div>\n\t\t\t\t\t<hr>\n\t\t\t\t\t<div class=\"spine-player-list\" style=\"user-select: none; align-items: center; max-height: 90px; overflow: auto;\">\n\t\t\t\t\t</div>\n\t\t\t\t";
+                dropdown.innerHTML = "\n\t\t\t\t\t<div class=\"spine-player-dropdown-title\">Animations</div>\n\t\t\t\t\t<hr>\n\t\t\t\t\t<ul class=\"spine-player-list\">\n\t\t\t\t\t</ul>\n\t\t\t\t";
                 var rows = findWithClass(dropdown, "spine-player-list")[0];
                 _this.skeleton.data.animations.forEach(function (animation) {
-                    var row = document.createElement("div");
+                    var row = document.createElement("li");
                     row.classList.add("spine-player-list-item");
                     if (animation.name == _this.config.animation)
                         row.classList.add("spine-player-list-item-selected");
@@ -9580,10 +9583,10 @@ var spine;
                 if (!_this.skeleton || _this.skeleton.data.animations.length == 0)
                     return;
                 dropdown.classList.remove("spine-player-hidden");
-                dropdown.innerHTML = "\n\t\t\t\t\t<div>Skins</div>\n\t\t\t\t\t<hr>\n\t\t\t\t\t<div class=\"spine-player-list\" style=\"user-select: none; align-items: center; max-height: 90px; overflow: auto;\">\n\t\t\t\t\t</div>\n\t\t\t\t";
+                dropdown.innerHTML = "\n\t\t\t\t\t<div class=\"spine-player-dropdown-title\">Skins</div>\n\t\t\t\t\t<hr>\n\t\t\t\t\t<ul class=\"spine-player-list\">\n\t\t\t\t\t</ul>\n\t\t\t\t";
                 var rows = findWithClass(dropdown, "spine-player-list")[0];
                 _this.skeleton.data.skins.forEach(function (skin) {
-                    var row = document.createElement("div");
+                    var row = document.createElement("li");
                     row.classList.add("spine-player-list-item");
                     if (skin.name == _this.config.skin)
                         row.classList.add("spine-player-list-item-selected");
@@ -9604,7 +9607,7 @@ var spine;
                 if (!_this.skeleton || _this.skeleton.data.animations.length == 0)
                     return;
                 dropdown.classList.remove("spine-player-hidden");
-                dropdown.innerHTML = "\n\t\t\t\t\t<div>Debug</div>\n\t\t\t\t\t<hr>\n\t\t\t\t\t<div class=\"spine-player-list\" style=\"user-select: none; align-items: center; max-height: 90px; overflow: auto;\">\n\t\t\t\t\t</div>\n\t\t\t\t";
+                dropdown.innerHTML = "\n\t\t\t\t\t<div class=\"spine-player-dropdown-title\">Debug</div>\n\t\t\t\t\t<hr>\n\t\t\t\t\t<div class=\"spine-player-list\" style=\"user-select: none; align-items: center; max-height: 90px; overflow: auto;\">\n\t\t\t\t\t</div>\n\t\t\t\t";
                 var rows = findWithClass(dropdown, "spine-player-list")[0];
                 var makeItem = function (name) {
                     var row = document.createElement("div");
