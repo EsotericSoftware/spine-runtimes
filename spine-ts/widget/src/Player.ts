@@ -30,31 +30,103 @@
 
  module spine {
 	export interface SpinePlayerConfig {
-		jsonUrl: string;
-		atlasUrl: string;
-		animation: string;
-		skin: string;
+		jsonUrl: string
+		atlasUrl: string
+		animation: string
+		animations: string[]
+		skin: string
+		skins: string[]
 		debug: {
-			bones: boolean;
-			regions: boolean;
-			bounds: boolean;
-			paths: boolean;
-			points: boolean;
-			clipping: boolean;
-			meshHull: boolean;
-			triangles: boolean;
+			bones: boolean
+			regions: boolean
+			meshes: boolean
+			bounds: boolean
+			paths: boolean
+			clipping: boolean
+			points: boolean
+			hulls: boolean;
 		},
 		viewport: {
-			x: number,
-			y: number,
-			width: number,
+			x: number
+			y: number
+			width: number
 			height: number
 		}
-		alpha: boolean;
-		backgroundColor: string;
-		premultipliedAlpha: boolean;
-		success: (widget: SpineWidget) => void;
-		error: (widget: SpineWidget, msg: string) => void;
+		alpha: boolean
+		backgroundColor: string
+		backgroundImage: {
+			url: string
+			x: number
+			y: number
+			width: number
+			height: number
+		}
+		premultipliedAlpha: boolean
+		success: (widget: SpineWidget) => void
+		error: (widget: SpineWidget, msg: string) => void
+	}
+
+	class Popup {
+		public dom: HTMLElement;
+
+		constructor(parent: HTMLElement, htmlContent: string) {
+			this.dom = createElement(/*html*/`
+				<div class="spine-player-popup spine-player-hidden">
+				</div>
+			`);
+			this.dom.innerHTML = htmlContent;
+			parent.appendChild(this.dom);
+		}
+
+		show () {
+			this.dom.classList.remove("spine-player-hidden");
+			var justClicked = true;
+			let windowClickListener = (event: any) => {
+				if (justClicked) {
+					justClicked = false;
+					return;
+				}
+				if (!isContained(this.dom, event.target)) {
+					this.dom.parentNode.removeChild(this.dom);
+					window.removeEventListener("click", windowClickListener);
+				}
+			}
+			window.addEventListener("click", windowClickListener);
+		}
+	}
+
+	class Switch {
+		private switch: HTMLElement;
+		private enabled = false;
+		public change: (value: boolean) => void;
+
+		constructor(private text: string) {}
+
+		render(): HTMLElement {
+			this.switch = createElement(/*html*/`
+				<div class="spine-player-switch">
+					<span class="spine-player-switch-text">${this.text}</span>
+					<div class="spine-player-switch-knob-area">
+						<div class="spine-player-switch-knob"></div>
+					</div>
+				</div>
+			`);
+			this.switch.addEventListener("click", () => {
+				this.setEnabled(!this.enabled);
+				if (this.change) this.change(this.enabled);
+			})
+			return this.switch;
+		}
+
+		setEnabled(enabled: boolean) {
+			if (enabled) this.switch.classList.add("active");
+			else this.switch.classList.remove("active");
+			this.enabled = enabled;
+		}
+
+		isEnabled(): boolean {
+			return this.enabled;
+		}
 	}
 
 	class Slider {
@@ -62,14 +134,13 @@
 		private value: HTMLElement;
 		public change: (percentage: number) => void;
 
-		constructor(parent: HTMLElement) {
-			parent.innerHTML = /*html*/`
+		render(): HTMLElement {
+			this.slider = createElement(/*html*/`
 				<div class="spine-player-slider">
 					<div class="spine-player-slider-value"></div>
 				</div>
-			`;
-			this.slider = findWithClass(parent, "spine-player-slider")[0];
-			this.value = findWithClass(parent, "spine-player-slider-value")[0];
+			`);
+			this.value = findWithClass(this.slider, "spine-player-slider-value")[0];
 			this.setValue(0);
 
 			let input = new spine.webgl.Input(this.slider);
@@ -100,6 +171,7 @@
 					if (this.change) this.change(percentage);
 				}
 			});
+			return this.slider;
 		}
 
 		setValue(percentage: number) {
@@ -110,24 +182,27 @@
 
 	export class SpinePlayer {
 		private sceneRenderer: spine.webgl.SceneRenderer;
+		private dom: HTMLElement;
+		private playerControls: HTMLElement;
 		private canvas: HTMLCanvasElement;
+		private timelineSlider: Slider;
+		private playButton: HTMLElement;
+
 		private context: spine.webgl.ManagedWebGLRenderingContext;
 		private loadingScreen: spine.webgl.LoadingScreen;
 		private assetManager: spine.webgl.AssetManager;
-		private timelineSlider: Slider;
-		private playButton: HTMLElement;
+
 		private loaded: boolean;
 		private skeleton: Skeleton;
 		private animationState: AnimationState;
 		private time = new TimeKeeper();
-
 		private paused = true;
 		private playTime = 0;
 		private speed = 1;
 
 		constructor(parent: HTMLElement, private config: SpinePlayerConfig) {
-			this.validateConfig(config);
-			this.render(parent, config);
+			this.config = this.validateConfig(config);
+			parent.appendChild(this.render());
 		}
 
 		validateConfig(config: SpinePlayerConfig): SpinePlayerConfig {
@@ -141,30 +216,40 @@
 			if (!config.error) config.error = (widget, msg) => {};
 			if (!config.debug) config.debug = {
 				bones: false,
+				regions: false,
+				meshes: false,
 				bounds: false,
 				clipping: false,
-				meshHull: false,
 				paths: false,
 				points: false,
-				regions: false,
-				triangles: false
+				hulls: false
 			}
 			if (!config.debug.bones) config.debug.bones = false;
 			if (!config.debug.bounds) config.debug.bounds = false;
 			if (!config.debug.clipping) config.debug.clipping = false;
-			if (!config.debug.meshHull) config.debug.meshHull = false;
+			if (!config.debug.hulls) config.debug.hulls = false;
 			if (!config.debug.paths) config.debug.paths = false;
 			if (!config.debug.points) config.debug.points = false;
 			if (!config.debug.regions) config.debug.regions = false;
-			if (!config.debug.triangles) config.debug.triangles = false;
+			if (!config.debug.meshes) config.debug.meshes = false;
+
+			if (config.animations && config.animation) {
+				if  (config.animations.indexOf(config.animation) < 0) throw new Error("Default animation " +  config.animation + " is not contained in the list of selectable animations.");
+			}
+
+			if (config.skins && config.skin) {
+				if  (config.skins.indexOf(config.skin) < 0) throw new Error("Default skin " +  config.skin + " is not contained in the list of selectable skins.");
+			}
+
 			return config;
 		}
 
-		render(parent: HTMLElement, config: SpinePlayerConfig) {
-			parent.innerHTML = /*html*/`
+		render(): HTMLElement {
+			let config = this.config;
+			let dom = this.dom = createElement(/*html*/`
 				<div class="spine-player">
 					<canvas class="spine-player-canvas"></canvas>
-					<div class="spine-player-controls spine-player-dropdown">
+					<div class="spine-player-controls spine-player-popup-parent">
 						<div class="spine-player-timeline">
 						</div>
 						<div class="spine-player-buttons">
@@ -176,15 +261,12 @@
 							<button id="spine-player-button-settings" class="spine-player-button spine-player-button-icon-settings"></button>
 							<button id="spine-player-button-fullscreen" class="spine-player-button spine-player-button-icon-fullscreen"></button>
 						</div>
-
-						<div class="spine-player-dropdown-content spine-player-hidden">
-						</div>
 					</div>
 				</div>
-			`;
+			`)
 
 			// Setup the scene renderer and OpenGL context
-			this.canvas = findWithClass(parent, "spine-player-canvas")[0] as HTMLCanvasElement;
+			this.canvas = findWithClass(dom, "spine-player-canvas")[0] as HTMLCanvasElement;
 			var webglConfig = { alpha: config.alpha };
 			this.context = new spine.webgl.ManagedWebGLRenderingContext(this.canvas, webglConfig);
 
@@ -196,33 +278,23 @@
 			this.assetManager = new spine.webgl.AssetManager(this.context);
 			this.assetManager.loadText(config.jsonUrl);
 			this.assetManager.loadTextureAtlas(config.atlasUrl);
+			if (config.backgroundImage && config.backgroundImage.url)
+				this.assetManager.loadTexture(config.backgroundImage.url);
 
 			// Setup rendering loop
 			requestAnimationFrame(() => this.drawFrame());
 
 			// Setup the event listeners for UI elements
-			let timeline = findWithClass(parent, "spine-player-timeline")[0];
-			this.timelineSlider = new Slider(timeline);
-			this.playButton = findWithId(parent, "spine-player-button-play-pause")[0];
-			let speedButton = findWithId(parent, "spine-player-button-speed")[0];
-			let animationButton = findWithId(parent, "spine-player-button-animation")[0];
-			let skinButton = findWithId(parent, "spine-player-button-skin")[0];
-			let settingsButton = findWithId(parent, "spine-player-button-settings")[0];
-			let fullscreenButton = findWithId(parent, "spine-player-button-fullscreen")[0];
-
-			let dropdown = findWithClass(parent, "spine-player-dropdown-content")[0];
-
-			var justClicked = false;
-			let dismissDropdown = function (event: any) {
-				if (justClicked) {
-					justClicked = false;
-					return;
-				}
-				if (!isContained(dropdown, event.target)) {
-					dropdown.classList.add("spine-player-hidden");
-					window.onclick = null;
-				}
-			}
+			this.playerControls = findWithClass(dom, "spine-player-controls")[0];
+			let timeline = findWithClass(dom, "spine-player-timeline")[0];
+			this.timelineSlider = new Slider();
+			timeline.appendChild(this.timelineSlider.render());
+			this.playButton = findWithId(dom, "spine-player-button-play-pause")[0];
+			let speedButton = findWithId(dom, "spine-player-button-speed")[0];
+			let animationButton = findWithId(dom, "spine-player-button-animation")[0];
+			let skinButton = findWithId(dom, "spine-player-button-skin")[0];
+			let settingsButton = findWithId(dom, "spine-player-button-settings")[0];
+			let fullscreenButton = findWithId(dom, "spine-player-button-fullscreen")[0];
 
 			this.playButton.onclick = () => {
 				if (this.paused) this.play()
@@ -230,124 +302,19 @@
 			}
 
 			speedButton.onclick = () => {
-				dropdown.classList.remove("spine-player-hidden");
-				dropdown.innerHTML = /*html*/`
-					<div class="spine-player-row" style="user-select: none; align-items: center;">
-						<div style="margin-right: 16px;">Speed</div>
-						<div class="spine-player-column">
-							<div class="spine-player-speed-slider" style="margin-bottom: 4px;"></div>
-							<div class="spine-player-row" style="justify-content: space-between;">
-								<div>0.1x</div>
-								<div>1x</div>
-								<div>2x</div>
-							</div>
-						</div>
-					</div>
-				`;
-				let sliderParent = findWithClass(dropdown, "spine-player-speed-slider")[0];
-				let slider = new Slider(sliderParent);
-				slider.setValue(this.speed / 2);
-				slider.change = (percentage) => {
-					this.speed = percentage * 2;
-				}
-				justClicked = true;
-				window.onclick = dismissDropdown;
+				this.showSpeedDialog();
 			}
 
 			animationButton.onclick = () => {
-				if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
-				dropdown.classList.remove("spine-player-hidden");
-				dropdown.innerHTML = /*html*/`
-					<div>Animations</div>
-					<hr>
-					<div class="spine-player-list" style="user-select: none; align-items: center; max-height: 90px; overflow: auto;">
-					</div>
-				`;
-
-				let rows = findWithClass(dropdown, "spine-player-list")[0];
-				this.skeleton.data.animations.forEach((animation) => {
-					let row = document.createElement("div");
-					row.classList.add("spine-player-list-item");
-					if (animation.name == this.config.animation) row.classList.add("spine-player-list-item-selected");
-					row.innerText = animation.name;
-					rows.appendChild(row);
-					row.onclick = () => {
-						removeClass(rows.children, "spine-player-list-item-selected");
-						row.classList.add("spine-player-list-item-selected");
-						this.config.animation = animation.name;
-						this.playTime = 0;
-						this.animationState.setAnimation(0, this.config.animation, true);
-					}
-				});
-
-				justClicked = true;
-				window.onclick = dismissDropdown;
+				this.showAnimationsDialog();
 			}
 
 			skinButton.onclick = () => {
-				if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
-				dropdown.classList.remove("spine-player-hidden");
-				dropdown.innerHTML = /*html*/`
-					<div>Skins</div>
-					<hr>
-					<div class="spine-player-list" style="user-select: none; align-items: center; max-height: 90px; overflow: auto;">
-					</div>
-				`;
-
-				let rows = findWithClass(dropdown, "spine-player-list")[0];
-				this.skeleton.data.skins.forEach((skin) => {
-					let row = document.createElement("div");
-					row.classList.add("spine-player-list-item");
-					if (skin.name == this.config.skin) row.classList.add("spine-player-list-item-selected");
-					row.innerText = skin.name;
-					rows.appendChild(row);
-					row.onclick = () => {
-						removeClass(rows.children, "spine-player-list-item-selected");
-						row.classList.add("spine-player-list-item-selected");
-						this.config.skin = skin.name;
-						this.skeleton.setSkinByName(this.config.skin);
-						this.skeleton.setSlotsToSetupPose();
-					}
-				});
-
-				justClicked = true;
-				window.onclick = dismissDropdown;
+				this.showSkinsDialog();
 			}
 
 			settingsButton.onclick = () => {
-				if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
-				dropdown.classList.remove("spine-player-hidden");
-				dropdown.innerHTML = /*html*/`
-					<div>Debug</div>
-					<hr>
-					<div class="spine-player-list" style="user-select: none; align-items: center; max-height: 90px; overflow: auto;">
-					</div>
-				`;
-
-				let rows = findWithClass(dropdown, "spine-player-list")[0];
-				let makeItem = (name: string) => {
-					let row = document.createElement("div");
-					row.classList.add("spine-player-list-item");
-					if ((this.config.debug as any)[name] == true) row.classList.add("spine-player-list-item-selected");
-					row.innerText = name
-					rows.appendChild(row);
-					row.onclick = () => {
-						if ((this.config.debug as any)[name]) {
-							(this.config.debug as any)[name] = false;
-							row.classList.remove("spine-player-list-item-selected");
-						} else {
-							(this.config.debug as any)[name] = true;
-							row.classList.add("spine-player-list-item-selected");
-						}
-					}
-				};
-
-				Object.keys(this.config.debug).forEach((name) => {
-					makeItem(name);
-				});
-
-				justClicked = true;
-				window.onclick = dismissDropdown;
+				this.showSettingsDialog();
 			}
 
 			fullscreenButton.onclick = () => {
@@ -358,7 +325,7 @@
 					else if (doc.webkitExitFullscreen) doc.webkitExitFullscreen()
 					else if (doc.msExitFullscreen) doc.msExitFullscreen();
 				} else {
-					let player = findWithClass(parent, "spine-player")[0] as any;
+					let player = dom as any;
 					if (player.requestFullscreen) player.requestFullscreen();
 					else if (player.webkitRequestFullScreen) player.webkitRequestFullScreen();
 					else if (player.mozRequestFullScreen) player.mozRequestFullScreen();
@@ -370,6 +337,143 @@
 			window.onresize = () => {
 				this.drawFrame(false);
 			}
+
+			return dom;
+		}
+
+		showSpeedDialog () {
+			let popup = new Popup(this.playerControls, /*html*/`
+				<div class="spine-player-row" style="user-select: none; align-items: center; padding: 8px;">
+					<div style="margin-right: 16px;">Speed</div>
+					<div class="spine-player-column">
+						<div class="spine-player-speed-slider" style="margin-bottom: 4px;"></div>
+						<div class="spine-player-row" style="justify-content: space-between;">
+							<div>0.1x</div>
+							<div>1x</div>
+							<div>2x</div>
+						</div>
+					</div>
+				</div>
+			`);
+			let sliderParent = findWithClass(popup.dom, "spine-player-speed-slider")[0];
+			let slider = new Slider();
+			sliderParent.appendChild(slider.render());
+			slider.setValue(this.speed / 2);
+			slider.change = (percentage) => {
+				this.speed = percentage * 2;
+			}
+			popup.show();
+		}
+
+		showAnimationsDialog () {
+			if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
+
+			let popup = new Popup(this.playerControls, /*html*/`
+				<div class="spine-player-popup-title">Animations</div>
+				<hr>
+				<ul class="spine-player-list"></ul>
+			`);
+
+			let rows = findWithClass(popup.dom, "spine-player-list")[0];
+			this.skeleton.data.animations.forEach((animation) => {
+				// skip animations not whitelisted if a whitelist is given
+				if (this.config.animations && this.config.animations.indexOf(animation.name) < 0) {
+					return;
+				}
+
+				let row = createElement(/*html*/`
+					<li class="spine-player-list-item selectable">
+						<div class="selectable-circle">
+						</div>
+						<div class="selectable-text">
+						</div>
+					</li>
+				`);
+				if (animation.name == this.config.animation) row.classList.add("selected");
+				findWithClass(row, "selectable-text")[0].innerText = animation.name;
+				rows.appendChild(row);
+				row.onclick = () => {
+					removeClass(rows.children, "selected");
+					row.classList.add("selected");
+					this.config.animation = animation.name;
+					this.playTime = 0;
+					this.animationState.setAnimation(0, this.config.animation, true);
+				}
+			});
+			popup.show();
+		}
+
+		showSkinsDialog () {
+			if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
+
+			let popup = new Popup(this.playerControls, /*html*/`
+				<div class="spine-player-popup-title">Skins</div>
+				<hr>
+				<ul class="spine-player-list"></ul>
+			`);
+
+			let rows = findWithClass(popup.dom, "spine-player-list")[0];
+			this.skeleton.data.skins.forEach((skin) => {
+				// skip animations not whitelisted if a whitelist is given
+				if (this.config.skins && this.config.skins.indexOf(skin.name) < 0) {
+					return;
+				}
+
+				let row = createElement(/*html*/`
+					<li class="spine-player-list-item selectable">
+						<div class="selectable-circle">
+						</div>
+						<div class="selectable-text">
+						</div>
+					</li>
+				`);
+				if (skin.name == this.config.skin) row.classList.add("selected");
+				findWithClass(row, "selectable-text")[0].innerText = skin.name;
+				rows.appendChild(row);
+				row.onclick = () => {
+					removeClass(rows.children, "selected");
+					row.classList.add("selected");
+					this.config.skin = skin.name;
+					this.skeleton.setSkinByName(this.config.skin);
+					this.skeleton.setSlotsToSetupPose();
+				}
+			});
+
+			popup.show();
+		}
+
+		showSettingsDialog () {
+			if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
+
+			let popup = new Popup(this.playerControls, /*html*/`
+				<div class="spine-player-popup-title">Debug</div>
+				<hr>
+				<ul class="spine-player-list">
+				</li>
+			`);
+
+			let rows = findWithClass(popup.dom, "spine-player-list")[0];
+			let makeItem = (label: string, name: string) => {
+				let row = createElement(/*html*/`<li class="spine-player-list-item"></li>`);
+				let s = new Switch(label);
+				row.appendChild(s.render());
+				s.setEnabled((this.config.debug as any)[name]);
+				s.change = (value) => {
+					(this.config.debug as any)[name] = value;
+				}
+				rows.appendChild(row);
+			};
+
+			makeItem("Show bones", "bones");
+			makeItem("Show regions", "regions");
+			makeItem("Show meshes", "meshes");
+			makeItem("Show bounds", "bounds");
+			makeItem("Show paths", "paths");
+			makeItem("Show clipping", "clipping");
+			makeItem("Show points", "points");
+			makeItem("Show hulls", "hulls");
+
+			popup.show();
 		}
 
 		drawFrame (requestNextFrame = true) {
@@ -393,6 +497,7 @@
 
 			// Update and draw the skeleton
 			if (this.loaded) {
+				// Update animation and skeleton based on user selections
 				if (!this.paused && this.config.animation) {
 					this.time.update();
 					let delta = this.time.delta * this.speed;
@@ -417,15 +522,28 @@
 				this.sceneRenderer.camera.position.y = this.config.viewport.y + this.config.viewport.height / 2;
 
 				this.sceneRenderer.begin();
+
+				// Draw background image if given
+				if (this.config.backgroundImage && this.config.backgroundImage.url) {
+					let bgImage = this.assetManager.get(this.config.backgroundImage.url);
+					if (!this.config.backgroundImage.x) {
+						this.sceneRenderer.drawTexture(bgImage, this.config.viewport.x, this.config.viewport.y, this.config.viewport.width, this.config.viewport.height);
+					} else {
+						this.sceneRenderer.drawTexture(bgImage, this.config.backgroundImage.x, this.config.backgroundImage.y, this.config.backgroundImage.width, this.config.backgroundImage.height);
+					}
+				}
+
+				// Draw skeleton and debug output
 				this.sceneRenderer.drawSkeleton(this.skeleton, this.config.premultipliedAlpha);
 				this.sceneRenderer.skeletonDebugRenderer.drawBones = this.config.debug.bones;
 				this.sceneRenderer.skeletonDebugRenderer.drawBoundingBoxes = this.config.debug.bounds;
 				this.sceneRenderer.skeletonDebugRenderer.drawClipping = this.config.debug.clipping;
-				this.sceneRenderer.skeletonDebugRenderer.drawMeshHull = this.config.debug.meshHull;
+				this.sceneRenderer.skeletonDebugRenderer.drawMeshHull = this.config.debug.hulls;
 				this.sceneRenderer.skeletonDebugRenderer.drawPaths = this.config.debug.paths;
 				this.sceneRenderer.skeletonDebugRenderer.drawRegionAttachments = this.config.debug.regions;
-				this.sceneRenderer.skeletonDebugRenderer.drawMeshTriangles = this.config.debug.triangles;
+				this.sceneRenderer.skeletonDebugRenderer.drawMeshTriangles = this.config.debug.meshes;
 				this.sceneRenderer.drawSkeletonDebug(this.skeleton, this.config.premultipliedAlpha);
+
 				this.sceneRenderer.end();
 
 				this.sceneRenderer.camera.zoom = 0;
@@ -576,6 +694,12 @@
 		};
 		findRecursive(dom, className, found);
 		return found;
+	}
+
+	function createElement(html: string): HTMLElement {
+		let dom = document.createElement("div");
+		dom.innerHTML = html;
+		return dom.children[0] as HTMLElement;
 	}
 
 	function removeClass(elements: HTMLCollection, clazz: string) {

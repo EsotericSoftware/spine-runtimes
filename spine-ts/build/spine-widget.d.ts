@@ -1687,16 +1687,18 @@ declare module spine {
         jsonUrl: string;
         atlasUrl: string;
         animation: string;
+        animations: string[];
         skin: string;
+        skins: string[];
         debug: {
             bones: boolean;
             regions: boolean;
+            meshes: boolean;
             bounds: boolean;
             paths: boolean;
-            points: boolean;
             clipping: boolean;
-            meshHull: boolean;
-            triangles: boolean;
+            points: boolean;
+            hulls: boolean;
         };
         viewport: {
             x: number;
@@ -1706,6 +1708,13 @@ declare module spine {
         };
         alpha: boolean;
         backgroundColor: string;
+        backgroundImage: {
+            url: string;
+            x: number;
+            y: number;
+            width: number;
+            height: number;
+        };
         premultipliedAlpha: boolean;
         success: (widget: SpineWidget) => void;
         error: (widget: SpineWidget, msg: string) => void;
@@ -1713,12 +1722,14 @@ declare module spine {
     class SpinePlayer {
         private config;
         private sceneRenderer;
+        private dom;
+        private playerControls;
         private canvas;
+        private timelineSlider;
+        private playButton;
         private context;
         private loadingScreen;
         private assetManager;
-        private timelineSlider;
-        private playButton;
         private loaded;
         private skeleton;
         private animationState;
@@ -1728,7 +1739,11 @@ declare module spine {
         private speed;
         constructor(parent: HTMLElement, config: SpinePlayerConfig);
         validateConfig(config: SpinePlayerConfig): SpinePlayerConfig;
-        render(parent: HTMLElement, config: SpinePlayerConfig): void;
+        render(): HTMLElement;
+        showSpeedDialog(): void;
+        showAnimationsDialog(): void;
+        showSkinsDialog(): void;
+        showSettingsDialog(): void;
         drawFrame(requestNextFrame?: boolean): void;
         scale(sourceWidth: number, sourceHeight: number, targetWidth: number, targetHeight: number): Vector2;
         loadSkeleton(): void;
