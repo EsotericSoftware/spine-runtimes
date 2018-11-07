@@ -3826,6 +3826,7 @@ var spine;
 			return null;
 		};
 		Skeleton.prototype.getBounds = function (offset, size, temp) {
+			if (temp === void 0) { temp = new Array(2); }
 			if (offset == null)
 				throw new Error("offset cannot be null.");
 			if (size == null)
@@ -7226,7 +7227,7 @@ var spine;
 			}
 			Input.prototype.setupCallbacks = function (element) {
 				var _this = this;
-				element.addEventListener("mousedown", function (ev) {
+				var mouseDown = function (ev) {
 					if (ev instanceof MouseEvent) {
 						var rect = element.getBoundingClientRect();
 						var x = ev.clientX - rect.left;
@@ -7238,9 +7239,11 @@ var spine;
 						_this.lastX = x;
 						_this.lastY = y;
 						_this.buttonDown = true;
+						document.addEventListener("mousemove", mouseMove);
+						document.addEventListener("mouseup", mouseUp);
 					}
-				}, true);
-				element.addEventListener("mousemove", function (ev) {
+				};
+				var mouseMove = function (ev) {
 					if (ev instanceof MouseEvent) {
 						var rect = element.getBoundingClientRect();
 						var x = ev.clientX - rect.left;
@@ -7257,8 +7260,8 @@ var spine;
 						_this.lastX = x;
 						_this.lastY = y;
 					}
-				}, true);
-				element.addEventListener("mouseup", function (ev) {
+				};
+				var mouseUp = function (ev) {
 					if (ev instanceof MouseEvent) {
 						var rect = element.getBoundingClientRect();
 						var x = ev.clientX - rect.left;
@@ -7270,8 +7273,13 @@ var spine;
 						_this.lastX = x;
 						_this.lastY = y;
 						_this.buttonDown = false;
+						document.removeEventListener("mousemove", mouseMove);
+						document.removeEventListener("mouseup", mouseUp);
 					}
-				}, true);
+				};
+				element.addEventListener("mousedown", mouseDown, true);
+				element.addEventListener("mousemove", mouseMove, true);
+				element.addEventListener("mouseup", mouseUp, true);
 				element.addEventListener("touchstart", function (ev) {
 					if (_this.currTouch != null)
 						return;
@@ -7433,11 +7441,11 @@ var spine;
 				var renderer = this.renderer;
 				var canvas = renderer.canvas;
 				var gl = renderer.context.gl;
+				renderer.resize(webgl.ResizeMode.Stretch);
 				var oldX = renderer.camera.position.x, oldY = renderer.camera.position.y;
 				renderer.camera.position.set(canvas.width / 2, canvas.height / 2, 0);
 				renderer.camera.viewportWidth = canvas.width;
 				renderer.camera.viewportHeight = canvas.height;
-				renderer.resize(webgl.ResizeMode.Stretch);
 				if (!complete) {
 					gl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
 					gl.clear(gl.COLOR_BUFFER_BIT);
@@ -10053,6 +10061,533 @@ var spine;
 		}(spine.Texture));
 		threejs.ThreeJsTexture = ThreeJsTexture;
 	})(threejs = spine.threejs || (spine.threejs = {}));
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var Popup = (function () {
+		function Popup(parent, htmlContent) {
+			this.dom = createElement("\n\t\t\t\t<div class=\"spine-player-popup spine-player-hidden\">\n\t\t\t\t</div>\n\t\t\t");
+			this.dom.innerHTML = htmlContent;
+			parent.appendChild(this.dom);
+		}
+		Popup.prototype.show = function () {
+			var _this = this;
+			this.dom.classList.remove("spine-player-hidden");
+			var justClicked = true;
+			var windowClickListener = function (event) {
+				if (justClicked) {
+					justClicked = false;
+					return;
+				}
+				if (!isContained(_this.dom, event.target)) {
+					_this.dom.parentNode.removeChild(_this.dom);
+					window.removeEventListener("click", windowClickListener);
+				}
+			};
+			window.addEventListener("click", windowClickListener);
+		};
+		return Popup;
+	}());
+	var Switch = (function () {
+		function Switch(text) {
+			this.text = text;
+			this.enabled = false;
+		}
+		Switch.prototype.render = function () {
+			var _this = this;
+			this["switch"] = createElement("\n\t\t\t\t<div class=\"spine-player-switch\">\n\t\t\t\t\t<span class=\"spine-player-switch-text\">" + this.text + "</span>\n\t\t\t\t\t<div class=\"spine-player-switch-knob-area\">\n\t\t\t\t\t\t<div class=\"spine-player-switch-knob\"></div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t");
+			this["switch"].addEventListener("click", function () {
+				_this.setEnabled(!_this.enabled);
+				if (_this.change)
+					_this.change(_this.enabled);
+			});
+			return this["switch"];
+		};
+		Switch.prototype.setEnabled = function (enabled) {
+			if (enabled)
+				this["switch"].classList.add("active");
+			else
+				this["switch"].classList.remove("active");
+			this.enabled = enabled;
+		};
+		Switch.prototype.isEnabled = function () {
+			return this.enabled;
+		};
+		return Switch;
+	}());
+	var Slider = (function () {
+		function Slider() {
+		}
+		Slider.prototype.render = function () {
+			var _this = this;
+			this.slider = createElement("\n\t\t\t\t<div class=\"spine-player-slider\">\n\t\t\t\t\t<div class=\"spine-player-slider-value\"></div>\n\t\t\t\t</div>\n\t\t\t");
+			this.value = findWithClass(this.slider, "spine-player-slider-value")[0];
+			this.setValue(0);
+			var input = new spine.webgl.Input(this.slider);
+			var dragging = false;
+			input.addListener({
+				down: function (x, y) {
+					dragging = true;
+				},
+				up: function (x, y) {
+					dragging = false;
+					var percentage = x / _this.slider.clientWidth;
+					percentage = Math.max(0, Math.min(percentage, 1));
+					_this.setValue(x / _this.slider.clientWidth);
+					if (_this.change)
+						_this.change(percentage);
+				},
+				moved: function (x, y) {
+					if (dragging) {
+						var percentage = x / _this.slider.clientWidth;
+						percentage = Math.max(0, Math.min(percentage, 1));
+						_this.setValue(x / _this.slider.clientWidth);
+						if (_this.change)
+							_this.change(percentage);
+					}
+				},
+				dragged: function (x, y) {
+					var percentage = x / _this.slider.clientWidth;
+					percentage = Math.max(0, Math.min(percentage, 1));
+					_this.setValue(x / _this.slider.clientWidth);
+					if (_this.change)
+						_this.change(percentage);
+				}
+			});
+			return this.slider;
+		};
+		Slider.prototype.setValue = function (percentage) {
+			percentage = Math.max(0, Math.min(1, percentage));
+			this.value.style.width = "" + (percentage * 100) + "%";
+		};
+		return Slider;
+	}());
+	var SpinePlayer = (function () {
+		function SpinePlayer(parent, config) {
+			this.config = config;
+			this.time = new spine.TimeKeeper();
+			this.paused = true;
+			this.playTime = 0;
+			this.speed = 1;
+			this.config = this.validateConfig(config);
+			parent.appendChild(this.render());
+		}
+		SpinePlayer.prototype.validateConfig = function (config) {
+			if (!config)
+				throw new Error("Please pass a configuration to new.spine.SpinePlayer().");
+			if (!config.jsonUrl)
+				throw new Error("Please specify the URL of the skeleton JSON file.");
+			if (!config.atlasUrl)
+				throw new Error("Please specify the URL of the atlas file.");
+			if (!config.alpha)
+				config.alpha = false;
+			if (!config.backgroundColor)
+				config.backgroundColor = "#000000";
+			if (!config.premultipliedAlpha)
+				config.premultipliedAlpha = false;
+			if (!config.success)
+				config.success = function (widget) { };
+			if (!config.error)
+				config.error = function (widget, msg) { };
+			if (!config.debug)
+				config.debug = {
+					bones: false,
+					regions: false,
+					meshes: false,
+					bounds: false,
+					clipping: false,
+					paths: false,
+					points: false,
+					hulls: false
+				};
+			if (!config.debug.bones)
+				config.debug.bones = false;
+			if (!config.debug.bounds)
+				config.debug.bounds = false;
+			if (!config.debug.clipping)
+				config.debug.clipping = false;
+			if (!config.debug.hulls)
+				config.debug.hulls = false;
+			if (!config.debug.paths)
+				config.debug.paths = false;
+			if (!config.debug.points)
+				config.debug.points = false;
+			if (!config.debug.regions)
+				config.debug.regions = false;
+			if (!config.debug.meshes)
+				config.debug.meshes = false;
+			if (config.animations && config.animation) {
+				if (config.animations.indexOf(config.animation) < 0)
+					throw new Error("Default animation " + config.animation + " is not contained in the list of selectable animations.");
+			}
+			if (config.skins && config.skin) {
+				if (config.skins.indexOf(config.skin) < 0)
+					throw new Error("Default skin " + config.skin + " is not contained in the list of selectable skins.");
+			}
+			return config;
+		};
+		SpinePlayer.prototype.render = function () {
+			var _this = this;
+			var config = this.config;
+			var dom = this.dom = createElement("\n\t\t\t\t<div class=\"spine-player\">\n\t\t\t\t\t<canvas class=\"spine-player-canvas\"></canvas>\n\t\t\t\t\t<div class=\"spine-player-controls spine-player-popup-parent\">\n\t\t\t\t\t\t<div class=\"spine-player-timeline\">\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"spine-player-buttons\">\n\t\t\t\t\t\t\t<button id=\"spine-player-button-play-pause\" class=\"spine-player-button spine-player-button-icon-pause\"></button>\n\t\t\t\t\t\t\t<div class=\"spine-player-button-spacer\"></div>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-speed\" class=\"spine-player-button spine-player-button-icon-speed\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-animation\" class=\"spine-player-button spine-player-button-icon-animations\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-skin\" class=\"spine-player-button spine-player-button-icon-skins\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-settings\" class=\"spine-player-button spine-player-button-icon-settings\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-fullscreen\" class=\"spine-player-button spine-player-button-icon-fullscreen\"></button>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t");
+			this.canvas = findWithClass(dom, "spine-player-canvas")[0];
+			var webglConfig = { alpha: config.alpha };
+			this.context = new spine.webgl.ManagedWebGLRenderingContext(this.canvas, webglConfig);
+			this.sceneRenderer = new spine.webgl.SceneRenderer(this.canvas, this.context, true);
+			this.loadingScreen = new spine.webgl.LoadingScreen(this.sceneRenderer);
+			this.assetManager = new spine.webgl.AssetManager(this.context);
+			this.assetManager.loadText(config.jsonUrl);
+			this.assetManager.loadTextureAtlas(config.atlasUrl);
+			if (config.backgroundImage && config.backgroundImage.url)
+				this.assetManager.loadTexture(config.backgroundImage.url);
+			requestAnimationFrame(function () { return _this.drawFrame(); });
+			this.playerControls = findWithClass(dom, "spine-player-controls")[0];
+			var timeline = findWithClass(dom, "spine-player-timeline")[0];
+			this.timelineSlider = new Slider();
+			timeline.appendChild(this.timelineSlider.render());
+			this.playButton = findWithId(dom, "spine-player-button-play-pause")[0];
+			var speedButton = findWithId(dom, "spine-player-button-speed")[0];
+			var animationButton = findWithId(dom, "spine-player-button-animation")[0];
+			var skinButton = findWithId(dom, "spine-player-button-skin")[0];
+			var settingsButton = findWithId(dom, "spine-player-button-settings")[0];
+			var fullscreenButton = findWithId(dom, "spine-player-button-fullscreen")[0];
+			this.playButton.onclick = function () {
+				if (_this.paused)
+					_this.play();
+				else
+					_this.pause();
+			};
+			speedButton.onclick = function () {
+				_this.showSpeedDialog();
+			};
+			animationButton.onclick = function () {
+				_this.showAnimationsDialog();
+			};
+			skinButton.onclick = function () {
+				_this.showSkinsDialog();
+			};
+			settingsButton.onclick = function () {
+				_this.showSettingsDialog();
+			};
+			fullscreenButton.onclick = function () {
+				var doc = document;
+				if (doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement) {
+					if (doc.exitFullscreen)
+						doc.exitFullscreen();
+					else if (doc.mozCancelFullScreen)
+						doc.mozCancelFullScreen();
+					else if (doc.webkitExitFullscreen)
+						doc.webkitExitFullscreen();
+					else if (doc.msExitFullscreen)
+						doc.msExitFullscreen();
+				}
+				else {
+					var player = dom;
+					if (player.requestFullscreen)
+						player.requestFullscreen();
+					else if (player.webkitRequestFullScreen)
+						player.webkitRequestFullScreen();
+					else if (player.mozRequestFullScreen)
+						player.mozRequestFullScreen();
+					else if (player.msRequestFullscreen)
+						player.msRequestFullscreen();
+				}
+			};
+			window.onresize = function () {
+				_this.drawFrame(false);
+			};
+			return dom;
+		};
+		SpinePlayer.prototype.showSpeedDialog = function () {
+			var _this = this;
+			var popup = new Popup(this.playerControls, "\n\t\t\t\t<div class=\"spine-player-row\" style=\"user-select: none; align-items: center; padding: 8px;\">\n\t\t\t\t\t<div style=\"margin-right: 16px;\">Speed</div>\n\t\t\t\t\t<div class=\"spine-player-column\">\n\t\t\t\t\t\t<div class=\"spine-player-speed-slider\" style=\"margin-bottom: 4px;\"></div>\n\t\t\t\t\t\t<div class=\"spine-player-row\" style=\"justify-content: space-between;\">\n\t\t\t\t\t\t\t<div>0.1x</div>\n\t\t\t\t\t\t\t<div>1x</div>\n\t\t\t\t\t\t\t<div>2x</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t");
+			var sliderParent = findWithClass(popup.dom, "spine-player-speed-slider")[0];
+			var slider = new Slider();
+			sliderParent.appendChild(slider.render());
+			slider.setValue(this.speed / 2);
+			slider.change = function (percentage) {
+				_this.speed = percentage * 2;
+			};
+			popup.show();
+		};
+		SpinePlayer.prototype.showAnimationsDialog = function () {
+			var _this = this;
+			if (!this.skeleton || this.skeleton.data.animations.length == 0)
+				return;
+			var popup = new Popup(this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Animations</div>\n\t\t\t\t<hr>\n\t\t\t\t<ul class=\"spine-player-list\"></ul>\n\t\t\t");
+			var rows = findWithClass(popup.dom, "spine-player-list")[0];
+			this.skeleton.data.animations.forEach(function (animation) {
+				if (_this.config.animations && _this.config.animations.indexOf(animation.name) < 0) {
+					return;
+				}
+				var row = createElement("\n\t\t\t\t\t<li class=\"spine-player-list-item selectable\">\n\t\t\t\t\t\t<div class=\"selectable-circle\">\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"selectable-text\">\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</li>\n\t\t\t\t");
+				if (animation.name == _this.config.animation)
+					row.classList.add("selected");
+				findWithClass(row, "selectable-text")[0].innerText = animation.name;
+				rows.appendChild(row);
+				row.onclick = function () {
+					removeClass(rows.children, "selected");
+					row.classList.add("selected");
+					_this.config.animation = animation.name;
+					_this.playTime = 0;
+					_this.animationState.setAnimation(0, _this.config.animation, true);
+				};
+			});
+			popup.show();
+		};
+		SpinePlayer.prototype.showSkinsDialog = function () {
+			var _this = this;
+			if (!this.skeleton || this.skeleton.data.animations.length == 0)
+				return;
+			var popup = new Popup(this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Skins</div>\n\t\t\t\t<hr>\n\t\t\t\t<ul class=\"spine-player-list\"></ul>\n\t\t\t");
+			var rows = findWithClass(popup.dom, "spine-player-list")[0];
+			this.skeleton.data.skins.forEach(function (skin) {
+				if (_this.config.skins && _this.config.skins.indexOf(skin.name) < 0) {
+					return;
+				}
+				var row = createElement("\n\t\t\t\t\t<li class=\"spine-player-list-item selectable\">\n\t\t\t\t\t\t<div class=\"selectable-circle\">\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"selectable-text\">\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</li>\n\t\t\t\t");
+				if (skin.name == _this.config.skin)
+					row.classList.add("selected");
+				findWithClass(row, "selectable-text")[0].innerText = skin.name;
+				rows.appendChild(row);
+				row.onclick = function () {
+					removeClass(rows.children, "selected");
+					row.classList.add("selected");
+					_this.config.skin = skin.name;
+					_this.skeleton.setSkinByName(_this.config.skin);
+					_this.skeleton.setSlotsToSetupPose();
+				};
+			});
+			popup.show();
+		};
+		SpinePlayer.prototype.showSettingsDialog = function () {
+			var _this = this;
+			if (!this.skeleton || this.skeleton.data.animations.length == 0)
+				return;
+			var popup = new Popup(this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Debug</div>\n\t\t\t\t<hr>\n\t\t\t\t<ul class=\"spine-player-list\">\n\t\t\t\t</li>\n\t\t\t");
+			var rows = findWithClass(popup.dom, "spine-player-list")[0];
+			var makeItem = function (label, name) {
+				var row = createElement("<li class=\"spine-player-list-item\"></li>");
+				var s = new Switch(label);
+				row.appendChild(s.render());
+				s.setEnabled(_this.config.debug[name]);
+				s.change = function (value) {
+					_this.config.debug[name] = value;
+				};
+				rows.appendChild(row);
+			};
+			makeItem("Show bones", "bones");
+			makeItem("Show regions", "regions");
+			makeItem("Show meshes", "meshes");
+			makeItem("Show bounds", "bounds");
+			makeItem("Show paths", "paths");
+			makeItem("Show clipping", "clipping");
+			makeItem("Show points", "points");
+			makeItem("Show hulls", "hulls");
+			popup.show();
+		};
+		SpinePlayer.prototype.drawFrame = function (requestNextFrame) {
+			var _this = this;
+			if (requestNextFrame === void 0) { requestNextFrame = true; }
+			if (requestNextFrame)
+				requestAnimationFrame(function () { return _this.drawFrame(); });
+			var ctx = this.context;
+			var gl = ctx.gl;
+			var bg = new spine.Color().setFromString(this.config.backgroundColor);
+			gl.clearColor(bg.r, bg.g, bg.b, bg.a);
+			gl.clear(gl.COLOR_BUFFER_BIT);
+			this.loadingScreen.draw(this.assetManager.isLoadingComplete());
+			if (this.assetManager.isLoadingComplete() && this.skeleton == null)
+				this.loadSkeleton();
+			this.sceneRenderer.resize(spine.webgl.ResizeMode.Expand);
+			if (this.loaded) {
+				if (!this.paused && this.config.animation) {
+					this.time.update();
+					var delta = this.time.delta * this.speed;
+					var animationDuration = this.animationState.getCurrent(0).animation.duration;
+					this.playTime += delta;
+					while (this.playTime >= animationDuration) {
+						this.playTime -= animationDuration;
+					}
+					this.playTime = Math.max(0, Math.min(this.playTime, animationDuration));
+					this.timelineSlider.setValue(this.playTime / animationDuration);
+					this.animationState.update(delta);
+					this.animationState.apply(this.skeleton);
+					this.skeleton.updateWorldTransform();
+				}
+				var viewportSize = this.scale(this.config.viewport.width, this.config.viewport.height, this.canvas.width, this.canvas.height);
+				this.sceneRenderer.camera.zoom = this.config.viewport.width / viewportSize.x;
+				this.sceneRenderer.camera.position.x = this.config.viewport.x + this.config.viewport.width / 2;
+				this.sceneRenderer.camera.position.y = this.config.viewport.y + this.config.viewport.height / 2;
+				this.sceneRenderer.begin();
+				if (this.config.backgroundImage && this.config.backgroundImage.url) {
+					var bgImage = this.assetManager.get(this.config.backgroundImage.url);
+					if (!this.config.backgroundImage.x) {
+						this.sceneRenderer.drawTexture(bgImage, this.config.viewport.x, this.config.viewport.y, this.config.viewport.width, this.config.viewport.height);
+					}
+					else {
+						this.sceneRenderer.drawTexture(bgImage, this.config.backgroundImage.x, this.config.backgroundImage.y, this.config.backgroundImage.width, this.config.backgroundImage.height);
+					}
+				}
+				this.sceneRenderer.drawSkeleton(this.skeleton, this.config.premultipliedAlpha);
+				this.sceneRenderer.skeletonDebugRenderer.drawBones = this.config.debug.bones;
+				this.sceneRenderer.skeletonDebugRenderer.drawBoundingBoxes = this.config.debug.bounds;
+				this.sceneRenderer.skeletonDebugRenderer.drawClipping = this.config.debug.clipping;
+				this.sceneRenderer.skeletonDebugRenderer.drawMeshHull = this.config.debug.hulls;
+				this.sceneRenderer.skeletonDebugRenderer.drawPaths = this.config.debug.paths;
+				this.sceneRenderer.skeletonDebugRenderer.drawRegionAttachments = this.config.debug.regions;
+				this.sceneRenderer.skeletonDebugRenderer.drawMeshTriangles = this.config.debug.meshes;
+				this.sceneRenderer.drawSkeletonDebug(this.skeleton, this.config.premultipliedAlpha);
+				this.sceneRenderer.end();
+				this.sceneRenderer.camera.zoom = 0;
+			}
+		};
+		SpinePlayer.prototype.scale = function (sourceWidth, sourceHeight, targetWidth, targetHeight) {
+			var targetRatio = targetHeight / targetWidth;
+			var sourceRatio = sourceHeight / sourceWidth;
+			var scale = targetRatio > sourceRatio ? targetWidth / sourceWidth : targetHeight / sourceHeight;
+			var temp = new spine.Vector2();
+			temp.x = sourceWidth * scale;
+			temp.y = sourceHeight * scale;
+			return temp;
+		};
+		SpinePlayer.prototype.loadSkeleton = function () {
+			var _this = this;
+			if (this.loaded)
+				return;
+			var atlas = this.assetManager.get(this.config.atlasUrl);
+			var jsonText = this.assetManager.get(this.config.jsonUrl);
+			var json = new spine.SkeletonJson(new spine.AtlasAttachmentLoader(atlas));
+			var skeletonData = json.readSkeletonData(jsonText);
+			this.skeleton = new spine.Skeleton(skeletonData);
+			var stateData = new spine.AnimationStateData(skeletonData);
+			stateData.defaultMix = 0.2;
+			this.animationState = new spine.AnimationState(stateData);
+			if (!this.config.skin) {
+				if (skeletonData.skins.length > 0) {
+					this.config.skin = skeletonData.skins[0].name;
+				}
+			}
+			if (this.config.skin) {
+				this.skeleton.setSkinByName(this.config.skin);
+				this.skeleton.setSlotsToSetupPose();
+			}
+			if (!this.config.viewport || !this.config.viewport.x || !this.config.viewport.y || !this.config.viewport.width || !this.config.viewport.height) {
+				this.config.viewport = {
+					x: 0,
+					y: 0,
+					width: 0,
+					height: 0
+				};
+				this.skeleton.updateWorldTransform();
+				var offset = new spine.Vector2();
+				var size = new spine.Vector2();
+				this.skeleton.getBounds(offset, size);
+				this.config.viewport.x = offset.x + size.x / 2 - size.x / 2 * 1.2;
+				this.config.viewport.y = offset.y + size.y / 2 - size.y / 2 * 1.2;
+				this.config.viewport.width = size.x * 1.2;
+				this.config.viewport.height = size.y * 1.2;
+			}
+			if (!this.config.animation) {
+				if (skeletonData.animations.length > 0) {
+					this.config.animation = skeletonData.animations[0].name;
+				}
+			}
+			if (this.config.animation) {
+				this.play();
+				this.timelineSlider.change = function (percentage) {
+					_this.pause();
+					var animationDuration = _this.animationState.getCurrent(0).animation.duration;
+					var time = animationDuration * percentage;
+					_this.animationState.update(time - _this.playTime);
+					_this.animationState.apply(_this.skeleton);
+					_this.skeleton.updateWorldTransform();
+					_this.playTime = time;
+				};
+			}
+			this.loaded = true;
+		};
+		SpinePlayer.prototype.play = function () {
+			this.paused = false;
+			this.playButton.classList.remove("spine-player-button-icon-play");
+			this.playButton.classList.add("spine-player-button-icon-pause");
+			if (this.config.animation) {
+				if (!this.animationState.getCurrent(0)) {
+					this.animationState.setAnimation(0, this.config.animation, true);
+				}
+			}
+		};
+		SpinePlayer.prototype.pause = function () {
+			this.paused = true;
+			this.playButton.classList.remove("spine-player-button-icon-pause");
+			this.playButton.classList.add("spine-player-button-icon-play");
+		};
+		SpinePlayer.prototype.resize = function () {
+			var canvas = this.canvas;
+			var w = canvas.clientWidth;
+			var h = canvas.clientHeight;
+			var devicePixelRatio = window.devicePixelRatio || 1;
+			if (canvas.width != Math.floor(w * devicePixelRatio) || canvas.height != Math.floor(h * devicePixelRatio)) {
+				canvas.width = Math.floor(w * devicePixelRatio);
+				canvas.height = Math.floor(h * devicePixelRatio);
+			}
+			this.context.gl.viewport(0, 0, canvas.width, canvas.height);
+			this.sceneRenderer.camera.setViewport(canvas.width, canvas.height);
+		};
+		return SpinePlayer;
+	}());
+	spine.SpinePlayer = SpinePlayer;
+	function isContained(dom, needle) {
+		if (dom === needle)
+			return true;
+		var findRecursive = function (dom, needle) {
+			for (var i = 0; i < dom.children.length; i++) {
+				var child = dom.children[i];
+				if (child === needle)
+					return true;
+				if (findRecursive(child, needle))
+					return true;
+			}
+			return false;
+		};
+		return findRecursive(dom, needle);
+	}
+	function findWithId(dom, id) {
+		var found = new Array();
+		var findRecursive = function (dom, id, found) {
+			for (var i = 0; i < dom.children.length; i++) {
+				var child = dom.children[i];
+				if (child.id === id)
+					found.push(child);
+				findRecursive(child, id, found);
+			}
+		};
+		findRecursive(dom, id, found);
+		return found;
+	}
+	function findWithClass(dom, className) {
+		var found = new Array();
+		var findRecursive = function (dom, className, found) {
+			for (var i = 0; i < dom.children.length; i++) {
+				var child = dom.children[i];
+				if (child.classList.contains(className))
+					found.push(child);
+				findRecursive(child, className, found);
+			}
+		};
+		findRecursive(dom, className, found);
+		return found;
+	}
+	function createElement(html) {
+		var dom = document.createElement("div");
+		dom.innerHTML = html;
+		return dom.children[0];
+	}
+	function removeClass(elements, clazz) {
+		for (var i = 0; i < elements.length; i++) {
+			elements[i].classList.remove(clazz);
+		}
+	}
 })(spine || (spine = {}));
 var spine;
 (function (spine) {

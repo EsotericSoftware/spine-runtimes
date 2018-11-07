@@ -670,7 +670,7 @@ declare module spine {
 		findIkConstraint(constraintName: string): IkConstraint;
 		findTransformConstraint(constraintName: string): TransformConstraint;
 		findPathConstraint(constraintName: string): PathConstraint;
-		getBounds(offset: Vector2, size: Vector2, temp: Array<number>): void;
+		getBounds(offset: Vector2, size: Vector2, temp?: Array<number>): void;
 		update(delta: number): void;
 	}
 }

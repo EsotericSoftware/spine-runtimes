@@ -3826,6 +3826,7 @@ var spine;
 			return null;
 		};
 		Skeleton.prototype.getBounds = function (offset, size, temp) {
+			if (temp === void 0) { temp = new Array(2); }
 			if (offset == null)
 				throw new Error("offset cannot be null.");
 			if (size == null)
