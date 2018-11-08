@@ -30,12 +30,34 @@
 
  module spine {
 	export interface SpinePlayerConfig {
+		/* the URL of the skeleton .json file */
 		jsonUrl: string
+
+		/* the URL of the skeleton .atlas file. Atlas page images are automatically resolved. */
 		atlasUrl: string
+
+		/* Optional: the name of the animation to be played. Default: first animation in the skeleton. */
 		animation: string
+
+		/* Optional: list of animation names from which the user can choose. */
 		animations: string[]
+
+		/* Optional: the name of the skin to be set. Default: the default skin. */
 		skin: string
+
+		/* Optional: list of skin names from which the user can choose. */
 		skins: string[]
+
+		/* Optional: list of bone names that the user can control by dragging. */
+		controlBones: string[]
+
+		/* Optional: whether the skeleton uses premultiplied alpha. Default: false. */
+		premultipliedAlpha: boolean
+
+		/* Optional: whether to show the player controls. Default: true. */
+		showControls: boolean
+
+		/* Optional: which debugging visualizations should be one. Default: none. */
 		debug: {
 			bones: boolean
 			regions: boolean
@@ -46,24 +68,37 @@
 			points: boolean
 			hulls: boolean;
 		},
+
+		/* Optional: the position and size of the viewport in world coordinates of the skeleton. Default: the setup pose bounding box. */
 		viewport: {
 			x: number
 			y: number
 			width: number
 			height: number
 		}
+
+		/* Optional: whether the canvas should be transparent. Default: false. */
 		alpha: boolean
+
+		/* Optional: the background color. Must be given in the format #rrggbbaa. Default: #000000ff. */
 		backgroundColor: string
+
+		/* Optional: the background image. Default: none. */
 		backgroundImage: {
+			/* The URL of the background image */
 			url: string
+
+			/* Optional: the position and size of the background image in world coordinates. Default: viewport. */
 			x: number
 			y: number
 			width: number
 			height: number
 		}
-		premultipliedAlpha: boolean
-		controlBones: string[]
+
+		/* Optional: callback when the widget and its assets have been successfully loaded. */
 		success: (widget: SpineWidget) => void
+
+		/* Optional: callbacl when the widget could not be loaded. */
 		error: (widget: SpineWidget, msg: string) => void
 	}
 
@@ -209,7 +244,6 @@
 		private selectedBones: Bone[];
 
 		constructor(parent: HTMLElement, private config: SpinePlayerConfig) {
-			this.config = this.validateConfig(config);
 			parent.appendChild(this.render());
 		}
 
@@ -242,15 +276,24 @@
 			if (!config.debug.meshes) config.debug.meshes = false;
 
 			if (config.animations && config.animation) {
-				if  (config.animations.indexOf(config.animation) < 0) throw new Error("Default animation " +  config.animation + " is not contained in the list of selectable animations.");
+				if  (config.animations.indexOf(config.animation) < 0) throw new Error("Default animation '" +  config.animation + "' is not contained in the list of selectable animations " + escapeHtml(JSON.stringify(this.config.animations)) + ".");
 			}
 
 			if (config.skins && config.skin) {
-				if  (config.skins.indexOf(config.skin) < 0) throw new Error("Default skin " +  config.skin + " is not contained in the list of selectable skins.");
+				if  (config.skins.indexOf(config.skin) < 0) throw new Error("Default skin '" +  config.skin + "' is not contained in the list of selectable skins " + escapeHtml(JSON.stringify(this.config.skins)) + ".");
 			}
 
 			if (!config.controlBones) config.controlBones = [];
+
+			if (!config.showControls) config.showControls = true;
+
 			return config;
+		}
+
+		showError(error: string) {
+			let errorDom = findWithClass(this.dom, "spine-player-error")[0];
+			errorDom.classList.remove("spine-player-hidden");
+			errorDom.innerHTML = `<p style="text-align: center; align-self: center;">${error}</p>`;
 		}
 
 		render(): HTMLElement {
@@ -258,6 +301,7 @@
 			let dom = this.dom = createElement(/*html*/`
 				<div class="spine-player">
 					<canvas class="spine-player-canvas"></canvas>
+					<div class="spine-player-error spine-player-hidden"></div>
 					<div class="spine-player-controls spine-player-popup-parent">
 						<div class="spine-player-timeline">
 						</div>
@@ -274,14 +318,26 @@
 				</div>
 			`)
 
-			// Setup the scene renderer and OpenGL context
-			this.canvas = findWithClass(dom, "spine-player-canvas")[0] as HTMLCanvasElement;
-			var webglConfig = { alpha: config.alpha };
-			this.context = new spine.webgl.ManagedWebGLRenderingContext(this.canvas, webglConfig);
+			try {
+				// Validate the configuration
+				this.config = this.validateConfig(config);
+			}  catch (e) {
+				this.showError(e);
+				return dom
+			}
 
-			// Setup the scene renderer and loading screen
-			this.sceneRenderer = new spine.webgl.SceneRenderer(this.canvas, this.context, true);
-			this.loadingScreen = new spine.webgl.LoadingScreen(this.sceneRenderer);
+			try {
+				// Setup the scene renderer and OpenGL context
+				this.canvas = findWithClass(dom, "spine-player-canvas")[0] as HTMLCanvasElement;
+				var webglConfig = { alpha: config.alpha };
+				this.context = new spine.webgl.ManagedWebGLRenderingContext(this.canvas, webglConfig);
+				// Setup the scene renderer and loading screen
+				this.sceneRenderer = new spine.webgl.SceneRenderer(this.canvas, this.context, true);
+				this.loadingScreen = new spine.webgl.LoadingScreen(this.sceneRenderer);
+			} catch (e) {
+				this.showError("Sorry, your browser does not support WebGL.<br><br>Please use the latest version of Firefox, Chrome, Edge, or Safari.");
+				return dom;
+			}
 
 			// Load the assets
 			this.assetManager = new spine.webgl.AssetManager(this.context);
@@ -347,7 +403,7 @@
 				this.drawFrame(false);
 			}
 
-			// Setup input handler for control bones and pan/zoom
+			if (!config.showControls) findWithClass(dom, "spine-player-controls ")[0].classList.add("spine-player-hidden");
 
 			return dom;
 		}
@@ -425,7 +481,7 @@
 
 			let rows = findWithClass(popup.dom, "spine-player-list")[0];
 			this.skeleton.data.skins.forEach((skin) => {
-				// skip animations not whitelisted if a whitelist is given
+				// skip skins not whitelisted if a whitelist is given
 				if (this.config.skins && this.config.skins.indexOf(skin.name) < 0) {
 					return;
 				}
@@ -589,14 +645,34 @@
 		loadSkeleton () {
 			if (this.loaded) return;
 
+			if (this.assetManager.hasErrors()) {
+				this.showError("Error: assets could not be loaded.<br><br>" + escapeHtml(JSON.stringify(this.assetManager.getErrors())));
+				return;
+			}
+
 			let atlas = this.assetManager.get(this.config.atlasUrl);
 			let jsonText = this.assetManager.get(this.config.jsonUrl);
 			let json = new SkeletonJson(new AtlasAttachmentLoader(atlas));
-			let skeletonData = json.readSkeletonData(jsonText);
+			let skeletonData: SkeletonData;
+			try {
+				skeletonData = json.readSkeletonData(jsonText);
+			} catch (e) {
+				this.showError("Error: could not load skeleton .json.<br><br>" + escapeHtml(JSON.stringify(e)));
+				return;
+			}
 			this.skeleton = new Skeleton(skeletonData);
 			let stateData = new AnimationStateData(skeletonData);
 			stateData.defaultMix = 0.2;
 			this.animationState = new AnimationState(stateData);
+
+			// Check if all controllable bones are in the skeleton
+			if (this.config.controlBones) {
+				this.config.controlBones.forEach(bone => {
+					if (!skeletonData.findBone(bone)) {
+						this.showError(`Error: control bone '${bone}' does not exist in skeleton.`);
+					}
+				})
+			}
 
 			// Setup skin
 			if (!this.config.skin) {
@@ -604,12 +680,26 @@
 					this.config.skin = skeletonData.skins[0].name;
 				}
 			}
+
+			if (this.config.skins && this.config.skin.length > 0) {
+				this.config.skins.forEach(skin => {
+					if (!this.skeleton.data.findSkin(skin)) {
+						this.showError(`Error: skin '${skin}' in selectable skin list does not exist in skeleton.`);
+						return;
+					}
+				});
+			}
+
 			if (this.config.skin) {
+				if (!this.skeleton.data.findSkin(this.config.skin)) {
+					this.showError(`Error: skin '${this.config.skin}' does not exist in skeleton.`);
+					return;
+				}
 				this.skeleton.setSkinByName(this.config.skin);
 				this.skeleton.setSlotsToSetupPose();
 			}
 
-			// Setup viewport
+			// Setup viewport after skin is set
 			if (!this.config.viewport || !this.config.viewport.x || !this.config.viewport.y || !this.config.viewport.width || !this.config.viewport.height) {
 				this.config.viewport = {
 					x: 0,
@@ -628,14 +718,27 @@
 				this.config.viewport.height = size.y * 1.2;
 			}
 
-			// Setup the first animation
+			// Setup the animations after viewport, so default bounds don't get messed up.
 			if (!this.config.animation) {
 				if (skeletonData.animations.length > 0) {
 					this.config.animation = skeletonData.animations[0].name;
 				}
 			}
 
+			if (this.config.animations && this.config.animations.length > 0) {
+				this.config.animations.forEach(animation => {
+					if (!this.skeleton.data.findAnimation(animation)) {
+						this.showError(`Error: animation '${animation}' in selectable animation list does not exist in skeleton.`);
+						return;
+					}
+				});
+			}
+
 			if(this.config.animation) {
+				if (!skeletonData.findAnimation(this.config.animation)) {
+					this.showError(`Error: animation '${this.config.animation}' does not exist in skeleton.`);
+					return;
+				}
 				this.play()
 				this.timelineSlider.change = (percentage) => {
 					this.pause();
@@ -776,4 +879,14 @@
 			elements[i].classList.remove(clazz);
 		}
 	}
+
+	function escapeHtml(str: string) {
+		if (!str) return "";
+		return str
+			 .replace(/&/g, "&amp;")
+			 .replace(/</g, "&lt;")
+			 .replace(/>/g, "&gt;")
+			 .replace(/"/g, "&#34;")
+			 .replace(/'/g, "&#39;");
+	 }
  }

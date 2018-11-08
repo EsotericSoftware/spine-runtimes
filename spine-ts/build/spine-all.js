@@ -1,7 +1,10 @@
 var __extends = (this && this.__extends) || (function () {
-	var extendStatics = Object.setPrototypeOf ||
-		({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-		function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	var extendStatics = function (d, b) {
+		extendStatics = Object.setPrototypeOf ||
+			({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+			function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+		return extendStatics(d, b);
+	}
 	return function (d, b) {
 		extendStatics(d, b);
 		function __() { this.constructor = d; }
@@ -10169,7 +10172,6 @@ var spine;
 			this.paused = true;
 			this.playTime = 0;
 			this.speed = 1;
-			this.config = this.validateConfig(config);
 			parent.appendChild(this.render());
 		}
 		SpinePlayer.prototype.validateConfig = function (config) {
@@ -10218,23 +10220,45 @@ var spine;
 				config.debug.meshes = false;
 			if (config.animations && config.animation) {
 				if (config.animations.indexOf(config.animation) < 0)
-					throw new Error("Default animation " + config.animation + " is not contained in the list of selectable animations.");
+					throw new Error("Default animation '" + config.animation + "' is not contained in the list of selectable animations " + escapeHtml(JSON.stringify(this.config.animations)) + ".");
 			}
 			if (config.skins && config.skin) {
 				if (config.skins.indexOf(config.skin) < 0)
-					throw new Error("Default skin " + config.skin + " is not contained in the list of selectable skins.");
+					throw new Error("Default skin '" + config.skin + "' is not contained in the list of selectable skins " + escapeHtml(JSON.stringify(this.config.skins)) + ".");
 			}
+			if (!config.controlBones)
+				config.controlBones = [];
+			if (!config.showControls)
+				config.showControls = true;
 			return config;
+		};
+		SpinePlayer.prototype.showError = function (error) {
+			var errorDom = findWithClass(this.dom, "spine-player-error")[0];
+			errorDom.classList.remove("spine-player-hidden");
+			errorDom.innerHTML = "<p style=\"text-align: center; align-self: center;\">" + error + "</p>";
 		};
 		SpinePlayer.prototype.render = function () {
 			var _this = this;
 			var config = this.config;
-			var dom = this.dom = createElement("\n\t\t\t\t<div class=\"spine-player\">\n\t\t\t\t\t<canvas class=\"spine-player-canvas\"></canvas>\n\t\t\t\t\t<div class=\"spine-player-controls spine-player-popup-parent\">\n\t\t\t\t\t\t<div class=\"spine-player-timeline\">\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"spine-player-buttons\">\n\t\t\t\t\t\t\t<button id=\"spine-player-button-play-pause\" class=\"spine-player-button spine-player-button-icon-pause\"></button>\n\t\t\t\t\t\t\t<div class=\"spine-player-button-spacer\"></div>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-speed\" class=\"spine-player-button spine-player-button-icon-speed\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-animation\" class=\"spine-player-button spine-player-button-icon-animations\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-skin\" class=\"spine-player-button spine-player-button-icon-skins\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-settings\" class=\"spine-player-button spine-player-button-icon-settings\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-fullscreen\" class=\"spine-player-button spine-player-button-icon-fullscreen\"></button>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t");
-			this.canvas = findWithClass(dom, "spine-player-canvas")[0];
-			var webglConfig = { alpha: config.alpha };
-			this.context = new spine.webgl.ManagedWebGLRenderingContext(this.canvas, webglConfig);
-			this.sceneRenderer = new spine.webgl.SceneRenderer(this.canvas, this.context, true);
-			this.loadingScreen = new spine.webgl.LoadingScreen(this.sceneRenderer);
+			var dom = this.dom = createElement("\n\t\t\t\t<div class=\"spine-player\">\n\t\t\t\t\t<canvas class=\"spine-player-canvas\"></canvas>\n\t\t\t\t\t<div class=\"spine-player-error spine-player-hidden\"></div>\n\t\t\t\t\t<div class=\"spine-player-controls spine-player-popup-parent\">\n\t\t\t\t\t\t<div class=\"spine-player-timeline\">\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"spine-player-buttons\">\n\t\t\t\t\t\t\t<button id=\"spine-player-button-play-pause\" class=\"spine-player-button spine-player-button-icon-pause\"></button>\n\t\t\t\t\t\t\t<div class=\"spine-player-button-spacer\"></div>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-speed\" class=\"spine-player-button spine-player-button-icon-speed\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-animation\" class=\"spine-player-button spine-player-button-icon-animations\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-skin\" class=\"spine-player-button spine-player-button-icon-skins\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-settings\" class=\"spine-player-button spine-player-button-icon-settings\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-fullscreen\" class=\"spine-player-button spine-player-button-icon-fullscreen\"></button>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t");
+			try {
+				this.config = this.validateConfig(config);
+			}
+			catch (e) {
+				this.showError(e);
+				return dom;
+			}
+			try {
+				this.canvas = findWithClass(dom, "spine-player-canvas")[0];
+				var webglConfig = { alpha: config.alpha };
+				this.context = new spine.webgl.ManagedWebGLRenderingContext(this.canvas, webglConfig);
+				this.sceneRenderer = new spine.webgl.SceneRenderer(this.canvas, this.context, true);
+				this.loadingScreen = new spine.webgl.LoadingScreen(this.sceneRenderer);
+			}
+			catch (e) {
+				this.showError("Sorry, your browser does not support WebGL.<br><br>Please use the latest version of Firefox, Chrome, Edge, or Safari.");
+				return dom;
+			}
 			this.assetManager = new spine.webgl.AssetManager(this.context);
 			this.assetManager.loadText(config.jsonUrl);
 			this.assetManager.loadTextureAtlas(config.atlasUrl);
@@ -10296,6 +10320,8 @@ var spine;
 			window.onresize = function () {
 				_this.drawFrame(false);
 			};
+			if (!config.showControls)
+				findWithClass(dom, "spine-player-controls ")[0].classList.add("spine-player-hidden");
 			return dom;
 		};
 		SpinePlayer.prototype.showSpeedDialog = function () {
@@ -10406,7 +10432,7 @@ var spine;
 					var delta = this.time.delta * this.speed;
 					var animationDuration = this.animationState.getCurrent(0).animation.duration;
 					this.playTime += delta;
-					while (this.playTime >= animationDuration) {
+					while (this.playTime >= animationDuration && animationDuration != 0) {
 						this.playTime -= animationDuration;
 					}
 					this.playTime = Math.max(0, Math.min(this.playTime, animationDuration));
@@ -10438,6 +10464,20 @@ var spine;
 				this.sceneRenderer.skeletonDebugRenderer.drawRegionAttachments = this.config.debug.regions;
 				this.sceneRenderer.skeletonDebugRenderer.drawMeshTriangles = this.config.debug.meshes;
 				this.sceneRenderer.drawSkeletonDebug(this.skeleton, this.config.premultipliedAlpha);
+				var controlBones = this.config.controlBones;
+				var selectedBones = this.selectedBones;
+				var skeleton = this.skeleton;
+				gl.lineWidth(2);
+				for (var i = 0; i < controlBones.length; i++) {
+					var bone = skeleton.findBone(controlBones[i]);
+					if (!bone)
+						continue;
+					var colorInner = selectedBones[i] !== null ? SpinePlayer.HOVER_COLOR_INNER : SpinePlayer.NON_HOVER_COLOR_INNER;
+					var colorOuter = selectedBones[i] !== null ? SpinePlayer.HOVER_COLOR_OUTER : SpinePlayer.NON_HOVER_COLOR_OUTER;
+					this.sceneRenderer.circle(true, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorInner);
+					this.sceneRenderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);
+				}
+				gl.lineWidth(1);
 				this.sceneRenderer.end();
 				this.sceneRenderer.camera.zoom = 0;
 			}
@@ -10455,20 +10495,50 @@ var spine;
 			var _this = this;
 			if (this.loaded)
 				return;
+			if (this.assetManager.hasErrors()) {
+				this.showError("Error: assets could not be loaded.<br><br>" + escapeHtml(JSON.stringify(this.assetManager.getErrors())));
+				return;
+			}
 			var atlas = this.assetManager.get(this.config.atlasUrl);
 			var jsonText = this.assetManager.get(this.config.jsonUrl);
 			var json = new spine.SkeletonJson(new spine.AtlasAttachmentLoader(atlas));
-			var skeletonData = json.readSkeletonData(jsonText);
+			var skeletonData;
+			try {
+				skeletonData = json.readSkeletonData(jsonText);
+			}
+			catch (e) {
+				this.showError("Error: could not load skeleton .json.<br><br>" + escapeHtml(JSON.stringify(e)));
+				return;
+			}
 			this.skeleton = new spine.Skeleton(skeletonData);
 			var stateData = new spine.AnimationStateData(skeletonData);
 			stateData.defaultMix = 0.2;
 			this.animationState = new spine.AnimationState(stateData);
+			if (this.config.controlBones) {
+				this.config.controlBones.forEach(function (bone) {
+					if (!skeletonData.findBone(bone)) {
+						_this.showError("Error: control bone '" + bone + "' does not exist in skeleton.");
+					}
+				});
+			}
 			if (!this.config.skin) {
 				if (skeletonData.skins.length > 0) {
 					this.config.skin = skeletonData.skins[0].name;
 				}
 			}
+			if (this.config.skins && this.config.skin.length > 0) {
+				this.config.skins.forEach(function (skin) {
+					if (!_this.skeleton.data.findSkin(skin)) {
+						_this.showError("Error: skin '" + skin + "' in selectable skin list does not exist in skeleton.");
+						return;
+					}
+				});
+			}
 			if (this.config.skin) {
+				if (!this.skeleton.data.findSkin(this.config.skin)) {
+					this.showError("Error: skin '" + this.config.skin + "' does not exist in skeleton.");
+					return;
+				}
 				this.skeleton.setSkinByName(this.config.skin);
 				this.skeleton.setSlotsToSetupPose();
 			}
@@ -10493,7 +10563,19 @@ var spine;
 					this.config.animation = skeletonData.animations[0].name;
 				}
 			}
+			if (this.config.animations && this.config.animations.length > 0) {
+				this.config.animations.forEach(function (animation) {
+					if (!_this.skeleton.data.findAnimation(animation)) {
+						_this.showError("Error: animation '" + animation + "' in selectable animation list does not exist in skeleton.");
+						return;
+					}
+				});
+			}
 			if (this.config.animation) {
+				if (!skeletonData.findAnimation(this.config.animation)) {
+					this.showError("Error: animation '" + this.config.animation + "' does not exist in skeleton.");
+					return;
+				}
 				this.play();
 				this.timelineSlider.change = function (percentage) {
 					_this.pause();
@@ -10505,7 +10587,64 @@ var spine;
 					_this.playTime = time;
 				};
 			}
+			this.setupInput();
 			this.loaded = true;
+		};
+		SpinePlayer.prototype.setupInput = function () {
+			var controlBones = this.config.controlBones;
+			var selectedBones = this.selectedBones = new Array(this.config.controlBones.length);
+			var canvas = this.canvas;
+			var input = new spine.webgl.Input(canvas);
+			var target = null;
+			var coords = new spine.webgl.Vector3();
+			var temp = new spine.webgl.Vector3();
+			var temp2 = new spine.Vector2();
+			var skeleton = this.skeleton;
+			var renderer = this.sceneRenderer;
+			input.addListener({
+				down: function (x, y) {
+					for (var i = 0; i < controlBones.length; i++) {
+						var bone = skeleton.findBone(controlBones[i]);
+						if (!bone)
+							continue;
+						renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
+						if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
+							target = bone;
+						}
+					}
+				},
+				up: function (x, y) {
+					target = null;
+				},
+				dragged: function (x, y) {
+					if (target != null) {
+						renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
+						if (target.parent !== null) {
+							target.parent.worldToLocal(temp2.set(coords.x - skeleton.x, coords.y - skeleton.y));
+							target.x = temp2.x;
+							target.y = temp2.y;
+						}
+						else {
+							target.x = coords.x - skeleton.x;
+							target.y = coords.y - skeleton.y;
+						}
+					}
+				},
+				moved: function (x, y) {
+					for (var i = 0; i < controlBones.length; i++) {
+						var bone = skeleton.findBone(controlBones[i]);
+						if (!bone)
+							continue;
+						renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
+						if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
+							selectedBones[i] = bone;
+						}
+						else {
+							selectedBones[i] = null;
+						}
+					}
+				}
+			});
 		};
 		SpinePlayer.prototype.play = function () {
 			this.paused = false;
@@ -10522,18 +10661,10 @@ var spine;
 			this.playButton.classList.remove("spine-player-button-icon-pause");
 			this.playButton.classList.add("spine-player-button-icon-play");
 		};
-		SpinePlayer.prototype.resize = function () {
-			var canvas = this.canvas;
-			var w = canvas.clientWidth;
-			var h = canvas.clientHeight;
-			var devicePixelRatio = window.devicePixelRatio || 1;
-			if (canvas.width != Math.floor(w * devicePixelRatio) || canvas.height != Math.floor(h * devicePixelRatio)) {
-				canvas.width = Math.floor(w * devicePixelRatio);
-				canvas.height = Math.floor(h * devicePixelRatio);
-			}
-			this.context.gl.viewport(0, 0, canvas.width, canvas.height);
-			this.sceneRenderer.camera.setViewport(canvas.width, canvas.height);
-		};
+		SpinePlayer.HOVER_COLOR_INNER = new spine.Color(0.478, 0, 0, 0.25);
+		SpinePlayer.HOVER_COLOR_OUTER = new spine.Color(1, 1, 1, 1);
+		SpinePlayer.NON_HOVER_COLOR_INNER = new spine.Color(0.478, 0, 0, 0.5);
+		SpinePlayer.NON_HOVER_COLOR_OUTER = new spine.Color(1, 0, 0, 0.8);
 		return SpinePlayer;
 	}());
 	spine.SpinePlayer = SpinePlayer;
@@ -10587,6 +10718,16 @@ var spine;
 		for (var i = 0; i < elements.length; i++) {
 			elements[i].classList.remove(clazz);
 		}
+	}
+	function escapeHtml(str) {
+		if (!str)
+			return "";
+		return str
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&#34;")
+			.replace(/'/g, "&#39;");
 	}
 })(spine || (spine = {}));
 var spine;
