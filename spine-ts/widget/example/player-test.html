@@ -277,25 +277,10 @@ body {
 </body>
 <script>
 	new spine.SpinePlayer(document.getElementById("container"), {
-		jsonUrl: "assets/raptor-pro.json",
-		atlasUrl: "assets/raptor.atlas",
-		animation: "walk",
-		animations: ["walk", "roar", "jump"],
-		skin: "default",
-		skins: ["default"],
-		backgroundColor: "#ff00ff",
-		backgroundImage: {
-			url: "assets/spineboy.png",
-			x: 0,
-			y: 0,
-			width: 300,
-			height: 200
-		},
-		debug: {
-			bones: true,
-			regions: true,
-			meshes: true,
-		}
+		jsonUrl: "assets/spineboy-pro.json",
+		atlasUrl: "assets/spineboy.atlas",
+		controlBones: ["root"],
+		backgroundColor: "#cccccc"
 	});
 </script>
 </body>

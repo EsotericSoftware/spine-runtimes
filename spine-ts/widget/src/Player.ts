@@ -62,6 +62,7 @@
 			height: number
 		}
 		premultipliedAlpha: boolean
+		controlBones: string[]
 		success: (widget: SpineWidget) => void
 		error: (widget: SpineWidget, msg: string) => void
 	}
@@ -181,6 +182,11 @@
 	}
 
 	export class SpinePlayer {
+		static HOVER_COLOR_INNER = new spine.Color(0.478, 0, 0, 0.25);
+		static HOVER_COLOR_OUTER = new spine.Color(1, 1, 1, 1);
+		static NON_HOVER_COLOR_INNER = new spine.Color(0.478, 0, 0, 0.5);
+		static NON_HOVER_COLOR_OUTER = new spine.Color(1, 0, 0, 0.8);
+
 		private sceneRenderer: spine.webgl.SceneRenderer;
 		private dom: HTMLElement;
 		private playerControls: HTMLElement;
@@ -199,6 +205,8 @@
 		private paused = true;
 		private playTime = 0;
 		private speed = 1;
+
+		private selectedBones: Bone[];
 
 		constructor(parent: HTMLElement, private config: SpinePlayerConfig) {
 			this.config = this.validateConfig(config);
@@ -241,6 +249,7 @@
 				if  (config.skins.indexOf(config.skin) < 0) throw new Error("Default skin " +  config.skin + " is not contained in the list of selectable skins.");
 			}
 
+			if (!config.controlBones) config.controlBones = [];
 			return config;
 		}
 
@@ -337,6 +346,8 @@
 			window.onresize = () => {
 				this.drawFrame(false);
 			}
+
+			// Setup input handler for control bones and pan/zoom
 
 			return dom;
 		}
@@ -504,7 +515,7 @@
 
 					let animationDuration = this.animationState.getCurrent(0).animation.duration;
 					this.playTime += delta;
-					while (this.playTime >= animationDuration) {
+					while (this.playTime >= animationDuration && animationDuration != 0) {
 						this.playTime -= animationDuration;
 					}
 					this.playTime = Math.max(0, Math.min(this.playTime, animationDuration));
@@ -543,6 +554,21 @@
 				this.sceneRenderer.skeletonDebugRenderer.drawRegionAttachments = this.config.debug.regions;
 				this.sceneRenderer.skeletonDebugRenderer.drawMeshTriangles = this.config.debug.meshes;
 				this.sceneRenderer.drawSkeletonDebug(this.skeleton, this.config.premultipliedAlpha);
+
+				// Render the selected bones
+				let controlBones = this.config.controlBones;
+				let selectedBones = this.selectedBones;
+				let skeleton = this.skeleton;
+				gl.lineWidth(2);
+				for (var i = 0; i < controlBones.length; i++) {
+					var bone = skeleton.findBone(controlBones[i]);
+					if (!bone) continue;
+					var colorInner = selectedBones[i] !== null ? SpinePlayer.HOVER_COLOR_INNER : SpinePlayer.NON_HOVER_COLOR_INNER;
+					var colorOuter = selectedBones[i] !== null ? SpinePlayer.HOVER_COLOR_OUTER : SpinePlayer.NON_HOVER_COLOR_OUTER;
+					this.sceneRenderer.circle(true, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorInner);
+					this.sceneRenderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);
+				}
+				gl.lineWidth(1);
 
 				this.sceneRenderer.end();
 
@@ -608,6 +634,7 @@
 					this.config.animation = skeletonData.animations[0].name;
 				}
 			}
+
 			if(this.config.animation) {
 				this.play()
 				this.timelineSlider.change = (percentage) => {
@@ -621,7 +648,63 @@
 				}
 			}
 
+			// Setup the input processor and controllable bones
+			this.setupInput();
+
 			this.loaded = true;
+		}
+
+		setupInput () {
+			let controlBones = this.config.controlBones;
+			let selectedBones = this.selectedBones = new Array<Bone>(this.config.controlBones.length);
+			let canvas = this.canvas;
+			let input = new spine.webgl.Input(canvas);
+			var target:Bone = null;
+			let coords = new spine.webgl.Vector3();
+			let temp = new spine.webgl.Vector3();
+			let temp2 = new spine.Vector2();
+			let skeleton = this.skeleton
+			let renderer = this.sceneRenderer;
+			input.addListener({
+				down: (x, y) => {
+					for (var i = 0; i < controlBones.length; i++) {
+						var bone = skeleton.findBone(controlBones[i]);
+						if (!bone) continue;
+						renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
+						if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
+							target = bone;
+						}
+					}
+				},
+				up: (x, y) => {
+					target = null;
+				},
+				dragged: (x, y) => {
+					if (target != null) {
+						renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
+						if (target.parent !== null) {
+							target.parent.worldToLocal(temp2.set(coords.x - skeleton.x, coords.y - skeleton.y));
+							target.x = temp2.x;
+							target.y = temp2.y;
+						} else {
+							target.x = coords.x - skeleton.x;
+							target.y = coords.y - skeleton.y;
+						}
+					}
+				},
+				moved: (x, y) => {
+					for (var i = 0; i < controlBones.length; i++) {
+						var bone = skeleton.findBone(controlBones[i]);
+						if (!bone) continue;
+						renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
+						if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
+							selectedBones[i] = bone;
+						} else {
+							selectedBones[i] = null;
+						}
+					}
+				}
+			});
 		}
 
 		private play () {
@@ -640,20 +723,6 @@
 			this.paused = true;
 			this.playButton.classList.remove("spine-player-button-icon-pause");
 			this.playButton.classList.add("spine-player-button-icon-play");
-		}
-
-		private resize () {
-			let canvas = this.canvas;
-			let w = canvas.clientWidth;
-			let h = canvas.clientHeight;
-
-			var devicePixelRatio = window.devicePixelRatio || 1;
-			if (canvas.width != Math.floor(w * devicePixelRatio) || canvas.height != Math.floor(h * devicePixelRatio)) {
-				canvas.width = Math.floor(w * devicePixelRatio);
-				canvas.height = Math.floor(h * devicePixelRatio);
-			}
-			this.context.gl.viewport(0, 0, canvas.width, canvas.height);
-			this.sceneRenderer.camera.setViewport(canvas.width, canvas.height);
 		}
 	}
 
