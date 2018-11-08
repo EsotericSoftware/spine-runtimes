@@ -96,10 +96,10 @@
 		}
 
 		/* Optional: callback when the widget and its assets have been successfully loaded. */
-		success: (widget: SpineWidget) => void
+		success: (widget: SpinePlayer) => void
 
-		/* Optional: callbacl when the widget could not be loaded. */
-		error: (widget: SpineWidget, msg: string) => void
+		/* Optional: callback when the widget could not be loaded. */
+		error: (widget: SpinePlayer, msg: string) => void
 	}
 
 	class Popup {
@@ -294,6 +294,7 @@
 			let errorDom = findWithClass(this.dom, "spine-player-error")[0];
 			errorDom.classList.remove("spine-player-hidden");
 			errorDom.innerHTML = `<p style="text-align: center; align-self: center;">${error}</p>`;
+			this.config.error(this, error);
 		}
 
 		render(): HTMLElement {
@@ -754,6 +755,7 @@
 			// Setup the input processor and controllable bones
 			this.setupInput();
 
+			this.config.success(this);
 			this.loaded = true;
 		}
 
