@@ -106,16 +106,21 @@ namespace Spine.Unity {
 		#endregion
 
 		#region Runtime Instantiation
-		public static SkeletonGraphic NewSkeletonGraphicGameObject (SkeletonDataAsset skeletonDataAsset, Transform parent) {
-			SkeletonGraphic sg = SkeletonGraphic.AddSkeletonGraphicComponent(new GameObject("New Spine GameObject"), skeletonDataAsset);
+		/// <summary>Create a new GameObject with a SkeletonGraphic component.</summary>
+		/// <param name="material">Material for the canvas renderer to use. Usually, the default SkeletonGraphic material will work.</param>
+		public static SkeletonGraphic NewSkeletonGraphicGameObject (SkeletonDataAsset skeletonDataAsset, Transform parent, Material material) {
+			var sg = SkeletonGraphic.AddSkeletonGraphicComponent(new GameObject("New Spine GameObject"), skeletonDataAsset, material);
 			if (parent != null) sg.transform.SetParent(parent, false);
 			return sg;
 		}
 
-		public static SkeletonGraphic AddSkeletonGraphicComponent (GameObject gameObject, SkeletonDataAsset skeletonDataAsset) {
+		/// <summary>Add a SkeletonGraphic component to a GameObject.</summary>
+		/// <param name="material">Material for the canvas renderer to use. Usually, the default SkeletonGraphic material will work.</param>
+		public static SkeletonGraphic AddSkeletonGraphicComponent (GameObject gameObject, SkeletonDataAsset skeletonDataAsset, Material material) {
 			var c = gameObject.AddComponent<SkeletonGraphic>();
 			if (skeletonDataAsset != null) {
-				c.skeletonDataAsset = skeletonDataAsset;				
+				c.material = material;
+				c.skeletonDataAsset = skeletonDataAsset;
 				c.Initialize(false);
 			}
 			return c;
