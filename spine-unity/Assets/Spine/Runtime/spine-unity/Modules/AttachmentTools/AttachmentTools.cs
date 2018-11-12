@@ -823,18 +823,12 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		public static void SetAttachment (this Skin skin, int slotIndex, string keyName, Attachment attachment) {
 			skin.AddAttachment(slotIndex, keyName, attachment);
 		}
-
-		/// <summary>Removes the attachment. Returns true if the element is successfully found and removed; otherwise, false.</summary>
-		public static bool RemoveAttachment (this Skin skin, string slotName, string keyName, Skeleton skeleton) {
-			int slotIndex = skeleton.FindSlotIndex(slotName);
-			if (skeleton == null) throw new System.ArgumentNullException("skeleton", "skeleton cannot be null.");
+		
+		public static void RemoveAttachment (this Skin skin, string slotName, string keyName, SkeletonData skeletonData) {
+			int slotIndex = skeletonData.FindSlotIndex(slotName);
+			if (skeletonData == null) throw new System.ArgumentNullException("skeletonData", "skeletonData cannot be null.");
 			if (slotIndex == -1) throw new System.ArgumentException(string.Format("Slot '{0}' does not exist in skeleton.", slotName), "slotName");
-			return skin.RemoveAttachment(slotIndex, keyName);
-		}
-
-		/// <summary>Removes the attachment. Returns true if the element is successfully found and removed; otherwise, false.</summary>
-		public static bool RemoveAttachment (this Skin skin, int slotIndex, string keyName) {
-			return skin.Attachments.Remove(new Skin.AttachmentKeyTuple(slotIndex, keyName));
+			skin.RemoveAttachment(slotIndex, keyName);
 		}
 
 		public static void Clear (this Skin skin) {
