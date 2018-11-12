@@ -37,7 +37,7 @@ using Spine.Unity;
 namespace Spine.Unity.Modules {
 	
 	[ExecuteInEditMode]
-	[HelpURL("https://github.com/pharan/spine-unity-docs/blob/master/SkeletonRenderSeparator.md")]
+	[HelpURL("http://esotericsoftware.com/spine-unity-skeletonrenderseparator")]
 	public class SkeletonRenderSeparator : MonoBehaviour {
 		public const int DefaultSortingOrderIncrement = 5;
 
@@ -53,7 +53,8 @@ namespace Spine.Unity.Modules {
 				#endif
 				
 				skeletonRenderer = value;
-				this.enabled = false; // Disable if nulled.
+				if (value == null)
+					this.enabled = false;
 			}
 		}
 
@@ -167,9 +168,7 @@ namespace Spine.Unity.Modules {
 			skeletonRenderer.GenerateMeshOverride -= HandleRender;
 			#endif
 
-			#if UNITY_EDITOR
 			skeletonRenderer.LateUpdate();
-			#endif
 
 			foreach (var s in partsRenderers)
 				s.ClearMesh();		
@@ -189,7 +188,6 @@ namespace Spine.Unity.Modules {
 				calculateTangents = skeletonRenderer.calculateTangents,
 				immutableTriangles = false, // parts cannot do immutable triangles.
 				pmaVertexColors = skeletonRenderer.pmaVertexColors,
-				//renderMeshes = skeletonRenderer.renderMeshes,
 				tintBlack = skeletonRenderer.tintBlack,
 				useClipping = true,
 				zSpacing = skeletonRenderer.zSpacing
