@@ -106,6 +106,15 @@ namespace Spine.Unity.Modules {
 				componentRenderers.Add(spr);
 			}
 
+			#if UNITY_EDITOR
+			// Make sure editor updates properly in edit mode.
+			if (!Application.isPlaying) {
+				skeletonRenderer.enabled = false;
+				skeletonRenderer.enabled = true;
+				skeletonRenderer.LateUpdate();
+			}
+			#endif
+
 			return srs;
 		}
 
