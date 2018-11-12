@@ -136,6 +136,11 @@ namespace Spine.Unity {
 		bool hasConstraints;
 		bool needToReprocessBones;
 
+		public void ResubscribeEvents () {
+			OnDisable();
+			OnEnable();
+		}
+		
 		void OnEnable () {
 			if (skeletonRenderer == null) {
 				skeletonRenderer = GetComponent<SkeletonRenderer>();
