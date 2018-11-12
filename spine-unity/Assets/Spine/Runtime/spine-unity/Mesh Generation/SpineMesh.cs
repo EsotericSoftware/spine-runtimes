@@ -84,7 +84,6 @@ namespace Spine.Unity {
 	}
 
 	public delegate void MeshGeneratorDelegate (MeshGeneratorBuffers buffers);
-
 	public struct MeshGeneratorBuffers {
 		/// <summary>The vertex count that will actually be used for the mesh. The Lengths of the buffer arrays may be larger than this number.</summary>
 		public int vertexCount;
@@ -102,6 +101,7 @@ namespace Spine.Unity {
 		public MeshGenerator meshGenerator;
 	}
 
+	/// <summary>Holds several methods to prepare and generate a UnityEngine mesh based on a skeleton. Contains buffers needed to perform the operation, and serializes settings for mesh generation.</summary>
 	[System.Serializable]
 	public class MeshGenerator {
 		public Settings settings = Settings.Default;
@@ -152,6 +152,7 @@ namespace Spine.Unity {
 		[NonSerialized] int[] regionTriangles = { 0, 1, 2, 2, 3, 0 };
 
 		#region Optional Buffers
+		// These optional buffers are lazy-instantiated when the feature is used.
 		[NonSerialized] Vector3[] normals;
 		[NonSerialized] Vector4[] tangents;
 		[NonSerialized] Vector2[] tempTanBuffer;
@@ -161,6 +162,7 @@ namespace Spine.Unity {
 
 		public int VertexCount { get { return vertexBuffer.Count; } }
 
+		/// <summary>A set of mesh arrays whose values are modifiable by the user. Modify these values before they are passed to the UnityEngine mesh object in order to see the effect.</summary>
 		public MeshGeneratorBuffers Buffers {
 			get {
 				return new MeshGeneratorBuffers {
@@ -1093,6 +1095,7 @@ namespace Spine.Unity {
 			}
 		}
 
+		/// <summary>Trims internal buffers to reduce the resulting mesh data stream size.</summary>
 		public void TrimExcess () {
 			vertexBuffer.TrimExcess();
 			uvBuffer.TrimExcess();
@@ -1201,8 +1204,7 @@ namespace Spine.Unity {
 		static List<Color32> AttachmentColors32 = new List<Color32>();
 		static List<int> AttachmentIndices = new List<int>();
 
-		/// <summary>
-		/// Fills mesh vertex data to render a RegionAttachment.</summary>
+		/// <summary>Fills mesh vertex data to render a RegionAttachment.</summary>
 		public static void FillMeshLocal (Mesh mesh, RegionAttachment regionAttachment) {
 			if (mesh == null) return;
 			if (regionAttachment == null) return;
@@ -1308,11 +1310,10 @@ namespace Spine.Unity {
 			AttachmentColors32.Clear();
 			AttachmentIndices.Clear();
 		}
-
-		
 		#endregion
 	}
 
+	/// <summary>A double-buffered Mesh, and a shared material array, bundled for use by Spine components that need to push a Mesh and materials to a Unity MeshRenderer and MeshFilter.</summary>
 	public class MeshRendererBuffers : IDisposable {
 		DoubleBuffered<SmartMesh> doubleBufferedMesh;
 		internal readonly ExposedList<Material> submeshMaterials = new ExposedList<Material>();
@@ -1328,6 +1329,8 @@ namespace Spine.Unity {
 			}
 		}
 
+		/// <summary>Returns a sharedMaterials array for use on a MeshRenderer.</summary>
+		/// <returns></returns>
 		public Material[] GetUpdatedSharedMaterialsArray () {
 			if (submeshMaterials.Count == sharedMaterials.Length)
 				submeshMaterials.CopyTo(sharedMaterials);
@@ -1337,6 +1340,7 @@ namespace Spine.Unity {
 			return sharedMaterials;
 		}
 
+		/// <summary>Returns true if the materials were modified since the buffers were last updated.</summary>
 		public bool MaterialsChangedInLastUpdate () {
 			int newSubmeshMaterials = submeshMaterials.Count;
 			var sharedMaterials = this.sharedMaterials;
@@ -1349,6 +1353,7 @@ namespace Spine.Unity {
 			return false;
 		}
 
+		/// <summary>Updates the internal shared materials array with the given instruction list.</summary>
 		public void UpdateSharedMaterials (ExposedList<SubmeshInstruction> instructions) {
 			int newSize = instructions.Count;
 			{ //submeshMaterials.Resize(instructions.Count);
@@ -1405,10 +1410,11 @@ namespace Spine.Unity {
 		}
 	}
 
+	/// <summary>Instructions used by a SkeletonRenderer to render a mesh.</summary>
 	public class SkeletonRendererInstruction {
-		public bool immutableTriangles;
 		public readonly ExposedList<SubmeshInstruction> submeshInstructions = new ExposedList<SubmeshInstruction>();
 
+		public bool immutableTriangles;
 		#if SPINE_TRIANGLECHECK
 		public bool hasActiveClipping;
 		public int rawVertexCount = -1;
@@ -1539,5 +1545,6 @@ namespace Spine.Unity {
 			#endif
 		}
 	}
+
 
 }
