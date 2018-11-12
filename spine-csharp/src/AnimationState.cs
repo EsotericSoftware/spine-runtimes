@@ -250,7 +250,7 @@ namespace Spine {
 				bool firstFrame = from.timelinesRotation.Count == 0;
 				if (firstFrame)	from.timelinesRotation.Resize(timelines.Count << 1); // from.timelinesRotation.setSize
 				var timelinesRotation = from.timelinesRotation.Items;
-				
+
 				from.totalAlpha = 0;
 				for (int i = 0; i < timelineCount; i++) {
 					Timeline timeline = timelinesItems[i];
@@ -507,8 +507,10 @@ namespace Spine {
 		/// for a track. If the track is empty, it is equivalent to calling <see cref="SetAnimation"/>.</summary>
 		/// <param name="delay">
 		/// delay Seconds to begin this animation after the start of the previous animation. If  &lt;= 0, uses the duration of the
-		/// previous track entry minus any mix duration plus the specified<code>delay</code>.If the previous entry is 
-		/// looping, its next loop completion is used instead of the duration.
+		/// previous track entry minus any mix duration (from the <see cref="AnimationStateData"/>) plus the
+		/// specified<code>delay</code> (ie the mix ends at (<code>delay</code> = 0) or before (<code>delay</code> < 0) the previous
+		/// track entry duration). If the previous entry is looping, its next loop completion is used
+		/// instead of the duration.
 		/// </param>
 		/// <returns>A track entry to allow further customization of animation playback. References to the track entry must not be kept
 		/// after <see cref="AnimationState.Dispose"/></returns>
@@ -775,7 +777,7 @@ namespace Spine {
 		///<summary>
 		/// Seconds to postpone playing the animation. When a track entry is the current track entry, delay postpones incrementing
 		/// the track time. When a track entry is queued, delay is the time from the start of the previous animation to when the
-		/// track entry will become the current track entry.</summary>
+		/// track entry will become the current track entry. <see cref="TrackEntry.TimeScale"/> affects the delay.</summary>
 		public float Delay { get { return delay; } set { delay = value; } }
 
 		/// <summary>
@@ -835,8 +837,15 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Multiplier for the delta time when the animation state is updated, causing time for this animation to play slower or
+		/// Multiplier for the delta time when the animation state is updated, causing time for all animations and mixes to play slower or
 		/// faster. Defaults to 1.
+		///
+		/// <see cref="TrackEntry.MixTime"/> is not affected by track entry time scale, so <see cref="TrackEntry.MixDuration"/> may need to
+		// be adjusted to match the animation speed.
+		///
+		/// When using <see cref="AnimationState.AddAnimation(int, Animation, boolean, float)"> with a <code>delay</code> <= 0, note the
+		/// {<see cref="TrackEntry.Delay"/> is set using the mix duration from the <see cref="AnimationStateData"/>, assuming time scale to be 1. If
+		/// the time scale is not 1, the delay may need to be adjusted.
 		/// </summary>
 		public float TimeScale { get { return timeScale; } set { timeScale = value; } }
 
@@ -890,14 +899,15 @@ namespace Spine {
 		/// In that case, the mixDuration must be set before <see cref="AnimationState.Update(float)"/> is next called.
 		/// <para>
 		/// When using <seealso cref="AnimationState.AddAnimation(int, Animation, bool, float)"/> with a
-		/// <code>delay</code> less than or equal to 0, note the <seealso cref="Delay"/> is set using the mix duration from the <see cref=" AnimationStateData"/>
+		/// <code>delay</code> less than or equal to 0, note the <seealso cref="Delay"/> is set using the mix duration from the <see cref=" AnimationStateData"/>,
+		/// not a mix duration set afterward.
 		/// </para>
 		///
 		/// </summary>
 		public float MixDuration { get { return mixDuration; } set { mixDuration = value; } }
 
 		/// <summary>
-		/// Controls how properties keyed in the animation are mixed with lower tracks. Defaults to {@link MixBlend#replace}, which 
+		/// Controls how properties keyed in the animation are mixed with lower tracks. Defaults to {@link MixBlend#replace}, which
 		/// replaces the values from the lower tracks with the animation values. {@link MixBlend#add} adds the animation values to
 		/// the values from the lower tracks.
 		/// <para>
@@ -914,9 +924,9 @@ namespace Spine {
 
 		/// <summary>
 		/// If true, when mixing from the previous animation to this animation, the previous animation is applied as normal instead of being mixed out.
-		/// 
+		///
 		/// When mixing between animations that key the same property, if a lower track also keys that property then the value will briefly dip toward the lower track value during the mix. This happens because the first animation mixes from 100% to 0% while the second animation mixes from 0% to 100%. Setting HoldPrevious to true applies the first animation at 100% during the mix so the lower track value is overwritten. Such dipping does not occur on the lowest track which keys the property, only when a higher track also keys the property.
-		/// 
+		///
 		/// Snapping will occur if HoldPrevious is true and this animation does not key all the same properties as the previous animation.
 		/// </summary>
 		public bool HoldPrevious { get { return holdPrevious; } set { holdPrevious = value; } }
