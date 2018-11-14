@@ -1,10 +1,7 @@
 var __extends = (this && this.__extends) || (function () {
-	var extendStatics = function (d, b) {
-		extendStatics = Object.setPrototypeOf ||
-			({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-			function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-		return extendStatics(d, b);
-	}
+	var extendStatics = Object.setPrototypeOf ||
+		({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+		function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
 	return function (d, b) {
 		extendStatics(d, b);
 		function __() { this.constructor = d; }
@@ -10119,7 +10116,11 @@ var spine;
 		return Switch;
 	}());
 	var Slider = (function () {
-		function Slider() {
+		function Slider(snaps, snapPercentage) {
+			if (snaps === void 0) { snaps = 0; }
+			if (snapPercentage === void 0) { snapPercentage = 0.1; }
+			this.snaps = snaps;
+			this.snapPercentage = snapPercentage;
 		}
 		Slider.prototype.render = function () {
 			var _this = this;
@@ -10135,7 +10136,7 @@ var spine;
 				up: function (x, y) {
 					dragging = false;
 					var percentage = x / _this.slider.clientWidth;
-					percentage = Math.max(0, Math.min(percentage, 1));
+					percentage = percentage = Math.max(0, Math.min(percentage, 1));
 					_this.setValue(x / _this.slider.clientWidth);
 					if (_this.change)
 						_this.change(percentage);
@@ -10144,7 +10145,7 @@ var spine;
 					if (dragging) {
 						var percentage = x / _this.slider.clientWidth;
 						percentage = Math.max(0, Math.min(percentage, 1));
-						_this.setValue(x / _this.slider.clientWidth);
+						percentage = _this.setValue(x / _this.slider.clientWidth);
 						if (_this.change)
 							_this.change(percentage);
 					}
@@ -10152,7 +10153,7 @@ var spine;
 				dragged: function (x, y) {
 					var percentage = x / _this.slider.clientWidth;
 					percentage = Math.max(0, Math.min(percentage, 1));
-					_this.setValue(x / _this.slider.clientWidth);
+					percentage = _this.setValue(x / _this.slider.clientWidth);
 					if (_this.change)
 						_this.change(percentage);
 				}
@@ -10161,7 +10162,18 @@ var spine;
 		};
 		Slider.prototype.setValue = function (percentage) {
 			percentage = Math.max(0, Math.min(1, percentage));
+			if (this.snaps > 0) {
+				var modulo = percentage % (1 / this.snaps);
+				if (modulo < (1 / this.snaps) * this.snapPercentage) {
+					percentage = percentage - modulo;
+				}
+				else if (modulo > (1 / this.snaps) - (1 / this.snaps) * this.snapPercentage) {
+					percentage = percentage - modulo + (1 / this.snaps);
+				}
+				percentage = Math.max(0, Math.min(1, percentage));
+			}
 			this.value.style.width = "" + (percentage * 100) + "%";
+			return percentage;
 		};
 		return Slider;
 	}());
@@ -10236,11 +10248,12 @@ var spine;
 			var errorDom = findWithClass(this.dom, "spine-player-error")[0];
 			errorDom.classList.remove("spine-player-hidden");
 			errorDom.innerHTML = "<p style=\"text-align: center; align-self: center;\">" + error + "</p>";
+			this.config.error(this, error);
 		};
 		SpinePlayer.prototype.render = function () {
 			var _this = this;
 			var config = this.config;
-			var dom = this.dom = createElement("\n\t\t\t\t<div class=\"spine-player\">\n\t\t\t\t\t<canvas class=\"spine-player-canvas\"></canvas>\n\t\t\t\t\t<div class=\"spine-player-error spine-player-hidden\"></div>\n\t\t\t\t\t<div class=\"spine-player-controls spine-player-popup-parent\">\n\t\t\t\t\t\t<div class=\"spine-player-timeline\">\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"spine-player-buttons\">\n\t\t\t\t\t\t\t<button id=\"spine-player-button-play-pause\" class=\"spine-player-button spine-player-button-icon-pause\"></button>\n\t\t\t\t\t\t\t<div class=\"spine-player-button-spacer\"></div>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-speed\" class=\"spine-player-button spine-player-button-icon-speed\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-animation\" class=\"spine-player-button spine-player-button-icon-animations\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-skin\" class=\"spine-player-button spine-player-button-icon-skins\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-settings\" class=\"spine-player-button spine-player-button-icon-settings\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-fullscreen\" class=\"spine-player-button spine-player-button-icon-fullscreen\"></button>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t");
+			var dom = this.dom = createElement("\n\t\t\t\t<div class=\"spine-player\">\n\t\t\t\t\t<canvas class=\"spine-player-canvas\"></canvas>\n\t\t\t\t\t<div class=\"spine-player-error spine-player-hidden\"></div>\n\t\t\t\t\t<div class=\"spine-player-controls spine-player-popup-parent hidden\">\n\t\t\t\t\t\t<div class=\"spine-player-timeline\">\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"spine-player-buttons\">\n\t\t\t\t\t\t\t<button id=\"spine-player-button-play-pause\" class=\"spine-player-button spine-player-button-icon-pause\"></button>\n\t\t\t\t\t\t\t<div class=\"spine-player-button-spacer\"></div>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-speed\" class=\"spine-player-button spine-player-button-icon-speed\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-animation\" class=\"spine-player-button spine-player-button-icon-animations\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-skin\" class=\"spine-player-button spine-player-button-icon-skins\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-settings\" class=\"spine-player-button spine-player-button-icon-settings\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-fullscreen\" class=\"spine-player-button spine-player-button-icon-fullscreen\"></button>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t");
 			try {
 				this.config = this.validateConfig(config);
 			}
@@ -10271,8 +10284,8 @@ var spine;
 			timeline.appendChild(this.timelineSlider.render());
 			this.playButton = findWithId(dom, "spine-player-button-play-pause")[0];
 			var speedButton = findWithId(dom, "spine-player-button-speed")[0];
-			var animationButton = findWithId(dom, "spine-player-button-animation")[0];
-			var skinButton = findWithId(dom, "spine-player-button-skin")[0];
+			this.animationButton = findWithId(dom, "spine-player-button-animation")[0];
+			this.skinButton = findWithId(dom, "spine-player-button-skin")[0];
 			var settingsButton = findWithId(dom, "spine-player-button-settings")[0];
 			var fullscreenButton = findWithId(dom, "spine-player-button-fullscreen")[0];
 			this.playButton.onclick = function () {
@@ -10284,10 +10297,10 @@ var spine;
 			speedButton.onclick = function () {
 				_this.showSpeedDialog();
 			};
-			animationButton.onclick = function () {
+			this.animationButton.onclick = function () {
 				_this.showAnimationsDialog();
 			};
-			skinButton.onclick = function () {
+			this.skinButton.onclick = function () {
 				_this.showSkinsDialog();
 			};
 			settingsButton.onclick = function () {
@@ -10320,15 +10333,13 @@ var spine;
 			window.onresize = function () {
 				_this.drawFrame(false);
 			};
-			if (!config.showControls)
-				findWithClass(dom, "spine-player-controls ")[0].classList.add("spine-player-hidden");
 			return dom;
 		};
 		SpinePlayer.prototype.showSpeedDialog = function () {
 			var _this = this;
 			var popup = new Popup(this.playerControls, "\n\t\t\t\t<div class=\"spine-player-row\" style=\"user-select: none; align-items: center; padding: 8px;\">\n\t\t\t\t\t<div style=\"margin-right: 16px;\">Speed</div>\n\t\t\t\t\t<div class=\"spine-player-column\">\n\t\t\t\t\t\t<div class=\"spine-player-speed-slider\" style=\"margin-bottom: 4px;\"></div>\n\t\t\t\t\t\t<div class=\"spine-player-row\" style=\"justify-content: space-between;\">\n\t\t\t\t\t\t\t<div>0.1x</div>\n\t\t\t\t\t\t\t<div>1x</div>\n\t\t\t\t\t\t\t<div>2x</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t");
 			var sliderParent = findWithClass(popup.dom, "spine-player-speed-slider")[0];
-			var slider = new Slider();
+			var slider = new Slider(2);
 			sliderParent.appendChild(slider.render());
 			slider.setValue(this.speed / 2);
 			slider.change = function (percentage) {
@@ -10402,14 +10413,14 @@ var spine;
 				};
 				rows.appendChild(row);
 			};
-			makeItem("Show bones", "bones");
-			makeItem("Show regions", "regions");
-			makeItem("Show meshes", "meshes");
-			makeItem("Show bounds", "bounds");
-			makeItem("Show paths", "paths");
-			makeItem("Show clipping", "clipping");
-			makeItem("Show points", "points");
-			makeItem("Show hulls", "hulls");
+			makeItem("Bones", "bones");
+			makeItem("Regions", "regions");
+			makeItem("Meshes", "meshes");
+			makeItem("Bounds", "bounds");
+			makeItem("Paths", "paths");
+			makeItem("Clipping", "clipping");
+			makeItem("Points", "points");
+			makeItem("Hulls", "hulls");
 			popup.show();
 		};
 		SpinePlayer.prototype.drawFrame = function (requestNextFrame) {
@@ -10439,8 +10450,8 @@ var spine;
 					this.timelineSlider.setValue(this.playTime / animationDuration);
 					this.animationState.update(delta);
 					this.animationState.apply(this.skeleton);
-					this.skeleton.updateWorldTransform();
 				}
+				this.skeleton.updateWorldTransform();
 				var viewportSize = this.scale(this.config.viewport.width, this.config.viewport.height, this.canvas.width, this.canvas.height);
 				this.sceneRenderer.camera.zoom = this.config.viewport.width / viewportSize.x;
 				this.sceneRenderer.camera.position.x = this.config.viewport.x + this.config.viewport.width / 2;
@@ -10558,11 +10569,6 @@ var spine;
 				this.config.viewport.width = size.x * 1.2;
 				this.config.viewport.height = size.y * 1.2;
 			}
-			if (!this.config.animation) {
-				if (skeletonData.animations.length > 0) {
-					this.config.animation = skeletonData.animations[0].name;
-				}
-			}
 			if (this.config.animations && this.config.animations.length > 0) {
 				this.config.animations.forEach(function (animation) {
 					if (!_this.skeleton.data.findAnimation(animation)) {
@@ -10570,6 +10576,14 @@ var spine;
 						return;
 					}
 				});
+				if (!this.config.animation) {
+					this.config.animation = this.config.animations[0];
+				}
+			}
+			if (!this.config.animation) {
+				if (skeletonData.animations.length > 0) {
+					this.config.animation = skeletonData.animations[0].name;
+				}
 			}
 			if (this.config.animation) {
 				if (!skeletonData.findAnimation(this.config.animation)) {
@@ -10588,9 +10602,15 @@ var spine;
 				};
 			}
 			this.setupInput();
+			if (skeletonData.skins.length == 1)
+				this.skinButton.classList.add("spine-player-hidden");
+			if (skeletonData.animations.length == 1)
+				this.animationButton.classList.add("spine-player-hidden");
+			this.config.success(this);
 			this.loaded = true;
 		};
 		SpinePlayer.prototype.setupInput = function () {
+			var _this = this;
 			var controlBones = this.config.controlBones;
 			var selectedBones = this.selectedBones = new Array(this.config.controlBones.length);
 			var canvas = this.canvas;
@@ -10612,9 +10632,11 @@ var spine;
 							target = bone;
 						}
 					}
+					handleHover();
 				},
 				up: function (x, y) {
 					target = null;
+					handleHover();
 				},
 				dragged: function (x, y) {
 					if (target != null) {
@@ -10629,6 +10651,7 @@ var spine;
 							target.y = coords.y - skeleton.y;
 						}
 					}
+					handleHover();
 				},
 				moved: function (x, y) {
 					for (var i = 0; i < controlBones.length; i++) {
@@ -10643,8 +10666,40 @@ var spine;
 							selectedBones[i] = null;
 						}
 					}
+					handleHover();
 				}
 			});
+			var mouseOverChildren = false;
+			canvas.onmouseover = function (ev) {
+				mouseOverChildren = false;
+			};
+			canvas.onmouseout = function (ev) {
+				if (ev.relatedTarget == null) {
+					mouseOverChildren = false;
+				}
+				else {
+					mouseOverChildren = isContained(_this.dom, ev.relatedTarget);
+				}
+			};
+			var cancelId = 0;
+			var handleHover = function () {
+				if (!_this.config.showControls)
+					return;
+				clearTimeout(cancelId);
+				_this.playerControls.classList.remove("hidden");
+				_this.playerControls.classList.add("visible");
+				var remove = function () {
+					var popup = findWithClass(_this.dom, "spine-player-popup");
+					if (popup.length == 0 && !mouseOverChildren) {
+						_this.playerControls.classList.remove("visible");
+						_this.playerControls.classList.add("hidden");
+					}
+					else {
+						cancelId = setTimeout(remove, 1000);
+					}
+				};
+				cancelId = setTimeout(remove, 1000);
+			};
 		};
 		SpinePlayer.prototype.play = function () {
 			this.paused = false;
