@@ -152,6 +152,8 @@
 	right: 2px;
     bottom: 42px;
 	border-radius: 4px;
+	max-height: 400%;
+	overflow: auto;
 }
 
 .spine-player-popup-title {
@@ -180,13 +182,17 @@
 	bottom: 0;
 	left: 0;
 	width: 100%;
-	opacity: 0;
-	transition: opacity 0.2s;
 }
 
-.spine-player:hover .spine-player-controls {
+.spine-player-controls.hidden {
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 0.4s;
+}
+
+.spine-player-controls.visible {
 	opacity: 1;
-	transition: opacity 0.2s;
+	transition: opacity 0.4s;
 }
 
 /** Player buttons **/
@@ -208,7 +214,7 @@
 	height: 32px;
 	background-size: 20px;
     background-repeat: no-repeat;
-    background-position: 6;
+    background-position: center;
 	cursor: pointer;
 }
 

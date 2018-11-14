@@ -170,6 +170,8 @@
 		private value: HTMLElement;
 		public change: (percentage: number) => void;
 
+		constructor(public snaps = 0, public snapPercentage = 0.1) { }
+
 		render(): HTMLElement {
 			this.slider = createElement(/*html*/`
 				<div class="spine-player-slider">
@@ -188,7 +190,7 @@
 				up: (x, y) => {
 					dragging = false;
 					let percentage = x / this.slider.clientWidth;
-					percentage = Math.max(0, Math.min(percentage, 1));
+					percentage = percentage = Math.max(0, Math.min(percentage, 1));
 					this.setValue(x / this.slider.clientWidth);
 					if (this.change) this.change(percentage);
 				},
@@ -196,23 +198,34 @@
 					if (dragging) {
 						let percentage = x / this.slider.clientWidth;
 						percentage = Math.max(0, Math.min(percentage, 1));
-						this.setValue(x / this.slider.clientWidth);
+						percentage = this.setValue(x / this.slider.clientWidth);
 						if (this.change) this.change(percentage);
 					}
 				},
 				dragged: (x, y) => {
 					let percentage = x / this.slider.clientWidth;
 					percentage = Math.max(0, Math.min(percentage, 1));
-					this.setValue(x / this.slider.clientWidth);
+					percentage = this.setValue(x / this.slider.clientWidth);
 					if (this.change) this.change(percentage);
 				}
 			});
 			return this.slider;
 		}
 
-		setValue(percentage: number) {
+		setValue(percentage: number): number {
 			percentage = Math.max(0, Math.min(1, percentage));
+			if (this.snaps > 0) {
+				let modulo = percentage % (1 / this.snaps);
+				// floor
+				if (modulo < (1 / this.snaps) * this.snapPercentage) {
+					percentage = percentage - modulo;
+				} else if (modulo > (1 / this.snaps) - (1 / this.snaps) * this.snapPercentage) {
+					percentage = percentage - modulo + (1 / this.snaps);
+				}
+				percentage = Math.max(0, Math.min(1, percentage));
+			}
 			this.value.style.width = "" + (percentage * 100) + "%";
+			return percentage;
 		}
 	}
 
@@ -228,6 +241,8 @@
 		private canvas: HTMLCanvasElement;
 		private timelineSlider: Slider;
 		private playButton: HTMLElement;
+		private skinButton: HTMLElement;
+		private animationButton: HTMLElement;
 
 		private context: spine.webgl.ManagedWebGLRenderingContext;
 		private loadingScreen: spine.webgl.LoadingScreen;
@@ -303,7 +318,7 @@
 				<div class="spine-player">
 					<canvas class="spine-player-canvas"></canvas>
 					<div class="spine-player-error spine-player-hidden"></div>
-					<div class="spine-player-controls spine-player-popup-parent">
+					<div class="spine-player-controls spine-player-popup-parent hidden">
 						<div class="spine-player-timeline">
 						</div>
 						<div class="spine-player-buttons">
@@ -357,8 +372,8 @@
 			timeline.appendChild(this.timelineSlider.render());
 			this.playButton = findWithId(dom, "spine-player-button-play-pause")[0];
 			let speedButton = findWithId(dom, "spine-player-button-speed")[0];
-			let animationButton = findWithId(dom, "spine-player-button-animation")[0];
-			let skinButton = findWithId(dom, "spine-player-button-skin")[0];
+			this.animationButton = findWithId(dom, "spine-player-button-animation")[0];
+			this.skinButton = findWithId(dom, "spine-player-button-skin")[0];
 			let settingsButton = findWithId(dom, "spine-player-button-settings")[0];
 			let fullscreenButton = findWithId(dom, "spine-player-button-fullscreen")[0];
 
@@ -371,11 +386,11 @@
 				this.showSpeedDialog();
 			}
 
-			animationButton.onclick = () => {
+			this.animationButton.onclick = () => {
 				this.showAnimationsDialog();
 			}
 
-			skinButton.onclick = () => {
+			this.skinButton.onclick = () => {
 				this.showSkinsDialog();
 			}
 
@@ -404,8 +419,6 @@
 				this.drawFrame(false);
 			}
 
-			if (!config.showControls) findWithClass(dom, "spine-player-controls ")[0].classList.add("spine-player-hidden");
-
 			return dom;
 		}
 
@@ -424,7 +437,7 @@
 				</div>
 			`);
 			let sliderParent = findWithClass(popup.dom, "spine-player-speed-slider")[0];
-			let slider = new Slider();
+			let slider = new Slider(2);
 			sliderParent.appendChild(slider.render());
 			slider.setValue(this.speed / 2);
 			slider.change = (percentage) => {
@@ -532,14 +545,14 @@
 				rows.appendChild(row);
 			};
 
-			makeItem("Show bones", "bones");
-			makeItem("Show regions", "regions");
-			makeItem("Show meshes", "meshes");
-			makeItem("Show bounds", "bounds");
-			makeItem("Show paths", "paths");
-			makeItem("Show clipping", "clipping");
-			makeItem("Show points", "points");
-			makeItem("Show hulls", "hulls");
+			makeItem("Bones", "bones");
+			makeItem("Regions", "regions");
+			makeItem("Meshes", "meshes");
+			makeItem("Bounds", "bounds");
+			makeItem("Paths", "paths");
+			makeItem("Clipping", "clipping");
+			makeItem("Points", "points");
+			makeItem("Hulls", "hulls");
 
 			popup.show();
 		}
@@ -580,8 +593,9 @@
 
 					this.animationState.update(delta);
 					this.animationState.apply(this.skeleton);
-					this.skeleton.updateWorldTransform();
 				}
+
+				this.skeleton.updateWorldTransform();
 
 				let viewportSize = this.scale(this.config.viewport.width, this.config.viewport.height, this.canvas.width, this.canvas.height);
 
@@ -720,12 +734,6 @@
 			}
 
 			// Setup the animations after viewport, so default bounds don't get messed up.
-			if (!this.config.animation) {
-				if (skeletonData.animations.length > 0) {
-					this.config.animation = skeletonData.animations[0].name;
-				}
-			}
-
 			if (this.config.animations && this.config.animations.length > 0) {
 				this.config.animations.forEach(animation => {
 					if (!this.skeleton.data.findAnimation(animation)) {
@@ -733,6 +741,16 @@
 						return;
 					}
 				});
+
+				if (!this.config.animation) {
+					this.config.animation = this.config.animations[0];
+				}
+			}
+
+			if (!this.config.animation) {
+				if (skeletonData.animations.length > 0) {
+					this.config.animation = skeletonData.animations[0].name;
+				}
 			}
 
 			if(this.config.animation) {
@@ -754,6 +772,10 @@
 
 			// Setup the input processor and controllable bones
 			this.setupInput();
+
+			// Hide skin and animation if there's only the default skin / no animation
+			if (skeletonData.skins.length == 1) this.skinButton.classList.add("spine-player-hidden");
+			if (skeletonData.animations.length == 1) this.animationButton.classList.add("spine-player-hidden");
 
 			this.config.success(this);
 			this.loaded = true;
@@ -780,9 +802,11 @@
 							target = bone;
 						}
 					}
+					handleHover();
 				},
 				up: (x, y) => {
 					target = null;
+					handleHover();
 				},
 				dragged: (x, y) => {
 					if (target != null) {
@@ -796,6 +820,7 @@
 							target.y = coords.y - skeleton.y;
 						}
 					}
+					handleHover();
 				},
 				moved: (x, y) => {
 					for (var i = 0; i < controlBones.length; i++) {
@@ -808,8 +833,42 @@
 							selectedBones[i] = null;
 						}
 					}
+					handleHover();
 				}
 			});
+
+			// For the manual hover to work, we need to disable
+			// hidding the controls if the mouse/touch entered
+			// the clickable area of a child of the controls
+			let mouseOverChildren = false;
+			canvas.onmouseover = (ev) => {
+				mouseOverChildren = false;
+			}
+			canvas.onmouseout = (ev) => {
+				if (ev.relatedTarget == null) {
+					mouseOverChildren = false;
+				} else {
+					mouseOverChildren = isContained(this.dom, (ev.relatedTarget as any));
+				}
+			}
+
+			let cancelId = 0;
+			let handleHover = () => {
+				if (!this.config.showControls) return;
+				clearTimeout(cancelId);
+				this.playerControls.classList.remove("hidden");
+				this.playerControls.classList.add("visible");
+				let remove = () => {
+					let popup = findWithClass(this.dom, "spine-player-popup");
+					if (popup.length == 0 && !mouseOverChildren) {
+						this.playerControls.classList.remove("visible");
+						this.playerControls.classList.add("hidden");
+					} else {
+						cancelId = setTimeout(remove, 1000);
+					}
+				};
+				cancelId = setTimeout(remove, 1000);
+			}
 		}
 
 		private play () {
