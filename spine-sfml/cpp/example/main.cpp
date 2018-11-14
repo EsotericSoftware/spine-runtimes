@@ -444,7 +444,7 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 	Skeleton skeleton(skeletonData);
 	AnimationStateData animationStateData(skeletonData);
 	AnimationState animationState(&animationStateData);
-	animationState.setAnimation(0, "drive", true);
+	animationState.setAnimation(0, "idle", true);
 
 	float d = 3;
 	for (int i = 0; i < 1; i++) {
@@ -459,6 +459,7 @@ int main () {
 	DebugExtension dbgExtension(SpineExtension::getInstance());
 	SpineExtension::setInstance(&dbgExtension);
 
+	testcase(test, "data/yellow_god.json", "data/yellow_god.skel", "data/yellow_god.atlas", 0.6f);
 	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy.atlas", 0.6f);
 	testcase(stretchymanStrechyIk, "data/stretchyman-stretchy-ik.json", "data/stretchyman-stretchy-ik.skel", "data/stretchyman.atlas", 0.6f);
 	testcase(spineboy, "data/spineboy-ess.json", "data/spineboy-ess.skel", "data/spineboy.atlas", 0.6f);

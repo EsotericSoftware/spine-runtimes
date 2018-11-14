@@ -35,12 +35,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Spine.Unity {
-	/// <summary>Renders a skeleton.</summary>
+	/// <summary>Base class of animated Spine skeleton components. This component manages and renders a skeleton.</summary>
 	[ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer)), DisallowMultipleComponent]
-	[HelpURL("http://esotericsoftware.com/spine-unity-documentation#Rendering")]
+	[HelpURL("http://esotericsoftware.com/spine-unity-rendering")]
 	public class SkeletonRenderer : MonoBehaviour, ISkeletonComponent, IHasSkeletonDataAsset {
 
+		public bool logErrors = false;
+
 		public delegate void SkeletonRendererDelegate (SkeletonRenderer skeletonRenderer);
+
+		/// <summary>OnRebuild is raised after the Skeleton is successfully initialized.</summary>
 		public event SkeletonRendererDelegate OnRebuild;
 
 		/// <summary> Occurs after the vertex data is populated every frame, before the vertices are pushed into the mesh.</summary>
@@ -48,34 +52,59 @@ namespace Spine.Unity {
 
 		public SkeletonDataAsset skeletonDataAsset;
 		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } } // ISkeletonComponent
-		[SpineSkin(defaultAsEmptyString:true)]
-		public string initialSkinName;
-		public bool initialFlipX, initialFlipY;
 
-		#region Advanced
+		#region Initialization settings
+		/// <summary>Skin name to use when the Skeleton is initialized.</summary>
+		[SpineSkin(defaultAsEmptyString:true)] public string initialSkinName;
+
+		/// <summary>Flip X and Y to use when the Skeleton is initialized.</summary>
+		public bool initialFlipX, initialFlipY;
+		#endregion
+
+		#region Advanced Render Settings
 		// Submesh Separation
+		/// <summary>Slot names used to populate separatorSlots list when the Skeleton is initialized. Changing this after initialization does nothing.</summary>
 		[UnityEngine.Serialization.FormerlySerializedAs("submeshSeparators")][SerializeField][SpineSlot] protected string[] separatorSlotNames = new string[0];
+
+		/// <summary>Slots that determine where the render is split. This is used by components such as SkeletonRenderSeparator so that the skeleton can be rendered by two separate renderers on different GameObjects.</summary>
 		[System.NonSerialized] public readonly List<Slot> separatorSlots = new List<Slot>();
 
+		// Render Settings
 		[Range(-0.1f, 0f)] public float zSpacing;
+		/// <summary>Use Spine's clipping feature. If false, ClippingAttachments will be ignored.</summary>
 		public bool useClipping = true;
+
+		/// <summary>If true, triangles will not be updated. Enable this as an optimization if the skeleton does not make use of attachment swapping or hiding, or draw order keys. Otherwise, setting this to false may cause errors in rendering.</summary>
 		public bool immutableTriangles = false;
+
+		/// <summary>Multiply vertex color RGB with vertex color alpha. Set this to true if the shader used for rendering is a premultiplied alpha shader. Setting this to false disables single-batch additive slots.</summary>
 		public bool pmaVertexColors = true;
+
 		/// <summary>Clears the state of the render and skeleton when this component or its GameObject is disabled. This prevents previous state from being retained when it is enabled again. When pooling your skeleton, setting this to true can be helpful.</summary>
 		public bool clearStateOnDisable = false;
+
+		/// <summary>If true, second colors on slots will be added to the output Mesh as UV2 and UV3. A special "tint black" shader that interprets UV2 and UV3 as black point colors is required to render this properly.</summary>
 		public bool tintBlack = false;
+
+		/// <summary>If true, the renderer assumes the skeleton only requires one Material and one submesh to render. This allows the MeshGenerator to skip checking for changes in Materials. Enable this as an optimization if the skeleton only uses one Material.</summary>
+		/// <remarks>This disables SkeletonRenderSeparator functionality.</remarks>
 		public bool singleSubmesh = false;
 
-		[UnityEngine.Serialization.FormerlySerializedAs("calculateNormals")]
-		public bool addNormals = false;
+		/// <summary>If true, the mesh generator adds normals to the output mesh. For better performance and reduced memory requirements, use a shader that assumes the desired normal.</summary>
+		[UnityEngine.Serialization.FormerlySerializedAs("calculateNormals")] public bool addNormals = false;
+
+		/// <summary>If true, tangents are calculated every frame and added to the Mesh. Enable this when using a shader that uses lighting that requires tangents.</summary>
 		public bool calculateTangents = false;
+		#endregion
 
-		public bool logErrors = false;
-
+		#region Overrides
 		#if SPINE_OPTIONAL_RENDEROVERRIDE
+		// These are API for anything that wants to take over rendering for a SkeletonRenderer.
 		public bool disableRenderingOnOverride = true;
 		public delegate void InstructionDelegate (SkeletonRendererInstruction instruction);
 		event InstructionDelegate generateMeshOverride;
+
+		/// <summary>Allows separate code to take over rendering for this SkeletonRenderer component. The subscriber is passed a SkeletonRendererInstruction argument to determine how to render a skeleton.</summary>
 		public event InstructionDelegate GenerateMeshOverride {
 			add {
 				generateMeshOverride += value;
@@ -96,17 +125,27 @@ namespace Spine.Unity {
 
 		#if SPINE_OPTIONAL_MATERIALOVERRIDE
 		[System.NonSerialized] readonly Dictionary<Material, Material> customMaterialOverride = new Dictionary<Material, Material>();
+		/// <summary>Use this Dictionary to override a Material with a different Material.</summary>
 		public Dictionary<Material, Material> CustomMaterialOverride { get { return customMaterialOverride; } }
 		#endif
 
-		// Custom Slot Material
 		[System.NonSerialized] readonly Dictionary<Slot, Material> customSlotMaterials = new Dictionary<Slot, Material>();
+		/// <summary>Use this Dictionary to use a different Material to render specific Slots.</summary>
 		public Dictionary<Slot, Material> CustomSlotMaterials { get { return customSlotMaterials; } }
 		#endregion
 
+		#region Mesh Generator
+		[System.NonSerialized] readonly SkeletonRendererInstruction currentInstructions = new SkeletonRendererInstruction();
+		readonly MeshGenerator meshGenerator = new MeshGenerator();
+		[System.NonSerialized] readonly MeshRendererBuffers rendererBuffers = new MeshRendererBuffers();
+		#endregion
+
+		#region Cached component references
 		MeshRenderer meshRenderer;
 		MeshFilter meshFilter;
+		#endregion
 
+		#region Skeleton
 		[System.NonSerialized] public bool valid;
 		[System.NonSerialized] public Skeleton skeleton;
 		public Skeleton Skeleton {
@@ -115,10 +154,7 @@ namespace Spine.Unity {
 				return skeleton;
 			}
 		}
-			
-		[System.NonSerialized] readonly SkeletonRendererInstruction currentInstructions = new SkeletonRendererInstruction();
-		readonly MeshGenerator meshGenerator = new MeshGenerator();
-		[System.NonSerialized] readonly MeshRendererBuffers rendererBuffers = new MeshRendererBuffers();
+		#endregion
 
 		#region Runtime Instantiation
 		public static T NewSpineGameObject<T> (SkeletonDataAsset skeletonDataAsset) where T : SkeletonRenderer {

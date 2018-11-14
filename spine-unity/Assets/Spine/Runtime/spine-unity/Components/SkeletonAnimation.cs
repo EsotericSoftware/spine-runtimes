@@ -34,7 +34,6 @@ namespace Spine.Unity {
 	
 	[ExecuteInEditMode]
 	[AddComponentMenu("Spine/SkeletonAnimation")]
-	[HelpURL("http://esotericsoftware.com/spine-unity-documentation#Controlling-Animation")]
 	public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation, IAnimationStateComponent {
 
 		#region IAnimationStateComponent
@@ -158,7 +157,7 @@ namespace Spine.Unity {
 					if (Application.isPlaying) {
 					#endif
 
-						// Make this block not run in Unity Editor edit mode.
+						// In Unity Editor edit mode, make this block not run.
 						state.SetAnimation(0, animationObject, loop);
 
 					#if UNITY_EDITOR

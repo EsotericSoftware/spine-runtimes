@@ -1,7 +1,10 @@
 var __extends = (this && this.__extends) || (function () {
-	var extendStatics = Object.setPrototypeOf ||
-		({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-		function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	var extendStatics = function (d, b) {
+		extendStatics = Object.setPrototypeOf ||
+			({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+			function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+		return extendStatics(d, b);
+	}
 	return function (d, b) {
 		extendStatics(d, b);
 		function __() { this.constructor = d; }
@@ -3826,6 +3829,7 @@ var spine;
 			return null;
 		};
 		Skeleton.prototype.getBounds = function (offset, size, temp) {
+			if (temp === void 0) { temp = new Array(2); }
 			if (offset == null)
 				throw new Error("offset cannot be null.");
 			if (size == null)
@@ -6960,7 +6964,7 @@ var spine;
 			}
 			Input.prototype.setupCallbacks = function (element) {
 				var _this = this;
-				element.addEventListener("mousedown", function (ev) {
+				var mouseDown = function (ev) {
 					if (ev instanceof MouseEvent) {
 						var rect = element.getBoundingClientRect();
 						var x = ev.clientX - rect.left;
@@ -6972,9 +6976,11 @@ var spine;
 						_this.lastX = x;
 						_this.lastY = y;
 						_this.buttonDown = true;
+						document.addEventListener("mousemove", mouseMove);
+						document.addEventListener("mouseup", mouseUp);
 					}
-				}, true);
-				element.addEventListener("mousemove", function (ev) {
+				};
+				var mouseMove = function (ev) {
 					if (ev instanceof MouseEvent) {
 						var rect = element.getBoundingClientRect();
 						var x = ev.clientX - rect.left;
@@ -6991,8 +6997,8 @@ var spine;
 						_this.lastX = x;
 						_this.lastY = y;
 					}
-				}, true);
-				element.addEventListener("mouseup", function (ev) {
+				};
+				var mouseUp = function (ev) {
 					if (ev instanceof MouseEvent) {
 						var rect = element.getBoundingClientRect();
 						var x = ev.clientX - rect.left;
@@ -7004,8 +7010,13 @@ var spine;
 						_this.lastX = x;
 						_this.lastY = y;
 						_this.buttonDown = false;
+						document.removeEventListener("mousemove", mouseMove);
+						document.removeEventListener("mouseup", mouseUp);
 					}
-				}, true);
+				};
+				element.addEventListener("mousedown", mouseDown, true);
+				element.addEventListener("mousemove", mouseMove, true);
+				element.addEventListener("mouseup", mouseUp, true);
 				element.addEventListener("touchstart", function (ev) {
 					if (_this.currTouch != null)
 						return;
@@ -7167,11 +7178,11 @@ var spine;
 				var renderer = this.renderer;
 				var canvas = renderer.canvas;
 				var gl = renderer.context.gl;
+				renderer.resize(webgl.ResizeMode.Stretch);
 				var oldX = renderer.camera.position.x, oldY = renderer.camera.position.y;
 				renderer.camera.position.set(canvas.width / 2, canvas.height / 2, 0);
 				renderer.camera.viewportWidth = canvas.width;
 				renderer.camera.viewportHeight = canvas.height;
-				renderer.resize(webgl.ResizeMode.Stretch);
 				if (!complete) {
 					gl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
 					gl.clear(gl.COLOR_BUFFER_BIT);
