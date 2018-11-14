@@ -177,9 +177,9 @@ namespace Spine.Unity.Editor {
 		static void Initialize () {
 			Preferences.Load();
 
-			var rootDir = new DirectoryInfo(Application.dataPath);
-			FileInfo[] files = rootDir.GetFiles("SpineEditorUtilities.cs", SearchOption.AllDirectories);
-			editorPath = Path.GetDirectoryName(files[0].FullName.Replace("\\", "/").Replace(Application.dataPath, "Assets"));
+			var assets = AssetDatabase.FindAssets("t:script SpineEditorUtilities");
+			var assetPath = AssetDatabase.GUIDToAssetPath(assets[0]);
+			editorPath = Path.GetDirectoryName(assetPath).Replace("\\", "/");
 			editorGUIPath = editorPath + "/GUI";
 
 			Icons.Initialize();
