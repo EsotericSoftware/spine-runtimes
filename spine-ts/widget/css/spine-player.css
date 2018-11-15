@@ -60,8 +60,8 @@
 /** List **/
 .spine-player-list {
 	list-style: none;
-	padding: 0;
-	margin: 0;
+	padding: 0 !important;
+	margin: 0 !important;
 }
 
 .spine-player-list li {
@@ -72,8 +72,8 @@
 .spine-player-list .selectable {
 	display: flex;
 	flex-direction: row;
-	margin: 0;
-	padding: 4px 10px 4px 0;
+	margin: 0 !important;
+	padding: 4px 10px 4px 0 !important;
 }
 
 .spine-player-list li.selectable:hover {
