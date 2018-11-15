@@ -398,6 +398,8 @@
 				this.showSettingsDialog();
 			}
 
+			let oldCanvasWidth = 0;
+			let oldCanvasHeight = 0;
 			fullscreenButton.onclick = () => {
 				let doc = document as any;
 				if(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement) {
@@ -405,12 +407,15 @@
 					else if (doc.mozCancelFullScreen) doc.mozCancelFullScreen();
 					else if (doc.webkitExitFullscreen) doc.webkitExitFullscreen()
 					else if (doc.msExitFullscreen) doc.msExitFullscreen();
+
 				} else {
 					let player = dom as any;
 					if (player.requestFullscreen) player.requestFullscreen();
 					else if (player.webkitRequestFullScreen) player.webkitRequestFullScreen();
 					else if (player.mozRequestFullScreen) player.mozRequestFullScreen();
 					else if (player.msRequestFullscreen) player.msRequestFullscreen();
+					oldCanvasWidth = this.canvas.width;
+					oldCanvasHeight = this.canvas.height;
 				}
 			};
 
@@ -568,6 +573,7 @@
 			gl.clear(gl.COLOR_BUFFER_BIT);
 
 			// Display loading screen
+			this.loadingScreen.backgroundColor.setFromColor(bg);
 			this.loadingScreen.draw(this.assetManager.isLoadingComplete());
 
 			// Have we finished loading the asset? Then set things up
@@ -839,18 +845,19 @@
 
 			// For the manual hover to work, we need to disable
 			// hidding the controls if the mouse/touch entered
-			// the clickable area of a child of the controls
-			let mouseOverChildren = false;
-			canvas.onmouseover = (ev) => {
-				mouseOverChildren = false;
-			}
-			canvas.onmouseout = (ev) => {
-				if (ev.relatedTarget == null) {
-					mouseOverChildren = false;
-				} else {
-					mouseOverChildren = isContained(this.dom, (ev.relatedTarget as any));
+			// the clickable area of a child of the controls.
+			// For this we need to register a mouse handler on
+			// the document and see if we are within the canvas
+			// area :/
+			var mouseOverChildren = true;
+			document.addEventListener("mousemove", (ev: UIEvent) => {
+				if (ev instanceof MouseEvent) {
+					let rect = this.playerControls.getBoundingClientRect();
+					let x = ev.clientX - rect.left;
+					let y = ev.clientY - rect.top;
+					mouseOverChildren = x >= 0 && x <= this.playerControls.clientWidth && y >= 0 && y <= this.playerControls.clientHeight;
 				}
-			}
+			});
 
 			let cancelId = 0;
 			let handleHover = () => {
