@@ -1808,6 +1808,7 @@ declare module spine {
 			width: number;
 			height: number;
 		};
+		fullScreenBackgroundColor: string;
 		success: (widget: SpinePlayer) => void;
 		error: (widget: SpinePlayer, msg: string) => void;
 	}

@@ -25,6 +25,7 @@
 	background: black;
 	z-index: 10;
 	border-radius: 4px;
+	overflow: auto;
 }
 
 .spine-player-hidden {

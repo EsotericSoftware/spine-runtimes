@@ -95,6 +95,9 @@
 			height: number
 		}
 
+		/* Optional: the background color used in fullscreen mode. Must be given in the format #rrggbbaa. Default: backgroundColor. */
+		fullScreenBackgroundColor: string
+
 		/* Optional: callback when the widget and its assets have been successfully loaded. */
 		success: (widget: SpinePlayer) => void
 
@@ -268,6 +271,7 @@
 			if (!config.atlasUrl) throw new Error("Please specify the URL of the atlas file.");
 			if (!config.alpha) config.alpha = false;
 			if (!config.backgroundColor) config.backgroundColor = "#000000";
+			if (!config.fullScreenBackgroundColor) config.fullScreenBackgroundColor = config.backgroundColor;
 			if (!config.premultipliedAlpha) config.premultipliedAlpha = false;
 			if (!config.success) config.success = (widget) => {};
 			if (!config.error) config.error = (widget, msg) => {};
@@ -398,8 +402,6 @@
 				this.showSettingsDialog();
 			}
 
-			let oldCanvasWidth = 0;
-			let oldCanvasHeight = 0;
 			fullscreenButton.onclick = () => {
 				let doc = document as any;
 				if(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement) {
@@ -407,15 +409,12 @@
 					else if (doc.mozCancelFullScreen) doc.mozCancelFullScreen();
 					else if (doc.webkitExitFullscreen) doc.webkitExitFullscreen()
 					else if (doc.msExitFullscreen) doc.msExitFullscreen();
-
 				} else {
 					let player = dom as any;
 					if (player.requestFullscreen) player.requestFullscreen();
 					else if (player.webkitRequestFullScreen) player.webkitRequestFullScreen();
 					else if (player.mozRequestFullScreen) player.mozRequestFullScreen();
 					else if (player.msRequestFullscreen) player.msRequestFullscreen();
-					oldCanvasWidth = this.canvas.width;
-					oldCanvasHeight = this.canvas.height;
 				}
 			};
 
@@ -568,7 +567,9 @@
 			let gl = ctx.gl;
 
 			// Clear the viewport
-			let bg = new Color().setFromString(this.config.backgroundColor);
+			var doc = document as any;
+			var isFullscreen = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
+			let bg = new Color().setFromString(isFullscreen ? this.config.fullScreenBackgroundColor : this.config.backgroundColor);
 			gl.clearColor(bg.r, bg.g, bg.b, bg.a);
 			gl.clear(gl.COLOR_BUFFER_BIT);
 
