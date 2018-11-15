@@ -175,6 +175,10 @@ namespace Spine.Unity {
 			}
 		}
 
+		public MeshGenerator () {
+			submeshes.TrimExcess();
+		}
+
 		#region Step 1 : Generate Instructions
 		public static void GenerateSingleSubmeshInstruction (SkeletonRendererInstruction instructionOutput, Skeleton skeleton, Material material) {
 			ExposedList<Slot> drawOrder = skeleton.drawOrder;
