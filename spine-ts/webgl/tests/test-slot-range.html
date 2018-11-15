@@ -21,11 +21,11 @@ var loadingScreen = new spine.webgl.LoadingScreen(new spine.webgl.SceneRenderer(
 var spineBoy;
 var vine;
 
-assetManager.loadText("spineboy-ess.json");
-assetManager.loadTextureAtlas("spineboy.atlas");
+assetManager.loadText("spineboy-pro.json");
+assetManager.loadTextureAtlas("spineboy-pma.atlas");
 
 assetManager.loadText("vine-pro.json");
-assetManager.loadTextureAtlas("vine.atlas");
+assetManager.loadTextureAtlas("vine-pma.atlas");
 
 requestAnimationFrame(load);
 
@@ -44,8 +44,8 @@ function loadSkeleton(json, atlas, scale) {
 
 function load () {
     if (assetManager.isLoadingComplete()) {
-		spineBoy = loadSkeleton("spineboy-ess.json", "spineboy.atlas", 1);
-		vine = loadSkeleton("vine-pro.json", "vine.atlas", 0.3);
+		spineBoy = loadSkeleton("spineboy-pro.json", "spineboy-pma.atlas", 1);
+		vine = loadSkeleton("vine-pro.json", "vine-pma.atlas", 0.3);
 
 
         var offset = new spine.Vector2();

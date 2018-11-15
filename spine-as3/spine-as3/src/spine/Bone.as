@@ -292,8 +292,7 @@ package spine {
 		}
 
 		public function worldToLocalRotation(worldRotation : Number) : Number {
-			var sin : Number = MathUtils.sinDeg(worldRotation), cos : Number = MathUtils.cosDeg(worldRotation);
-			return Math.atan2(this.a * sin - this.c * cos, this.d * cos - this.b * sin) * MathUtils.radDeg + rotation - shearX;
+			var sin : Number = MathUtils.sinDeg(worldRotation), cos : Number = MathUtils.cosDeg(worldRotation);			return Math.atan2(this.a * sin - this.c * cos, this.d * cos - this.b * sin) * MathUtils.radDeg + rotation - shearX;
 		}
 
 		public function localToWorldRotation(localRotation : Number) : Number {

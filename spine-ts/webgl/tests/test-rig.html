@@ -12,7 +12,7 @@
 </body>
 <script>
 
-var FILE = "spineboy-ess";
+var FILE = "spineboy-pro";
 var ANIMATION = "idle";
 var SCALE = 0.5;
 
@@ -33,7 +33,7 @@ function init() {
 	assetManager = new spine.webgl.AssetManager(context, "../example/assets/");
 	input = new spine.webgl.Input(canvas);
 
-	assetManager.loadTextureAtlas(FILE.replace("-pro", "").replace("-ess", "") + ".atlas");
+	assetManager.loadTextureAtlas(FILE.replace("-pro", "").replace("-ess", "") + "-pma.atlas");
 	assetManager.loadText(FILE + ".json");
 
 	timeKeeper = new spine.TimeKeeper();
@@ -54,7 +54,7 @@ function switchAnimation() {
 function load() {
 	timeKeeper.update();
 	if (assetManager.isLoadingComplete()) {
-		var atlas = assetManager.get(FILE.replace("-pro", "").replace("-ess", "") + ".atlas");
+		var atlas = assetManager.get(FILE.replace("-pro", "").replace("-ess", "") + "-pma.atlas");
 		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
 		skeletonJson.scale = SCALE;
@@ -98,7 +98,7 @@ function render() {
 	renderer.begin();
 	for (var i = 0; i < skeletons.length; i++) {
 		var skeleton = skeletons[i].skeleton;
-		renderer.drawSkeleton(skeleton, false);
+		renderer.drawSkeleton(skeleton, true);
 	}
 	renderer.end();
 

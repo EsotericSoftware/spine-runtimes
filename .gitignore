@@ -25,6 +25,7 @@ spine-cpp/Debug/*
 
 spine-sfml/Debug/*
 spine-sfml/SFML
+spine-sfml/dependencies/
 spine-sfml/c/dependencies
 spine-sfml/cpp/dependencies
 spine-sfml/cmake-build
@@ -51,6 +52,7 @@ spine-csharp/src/*.meta
 spine-csharp/src/*.cs.meta
 spine-csharp/src/Attachments/*.cs.meta
 
+spine-monogame/.vs/
 spine-monogame/example/bin
 spine-monogame/example/obj
 spine-monogame/example/Content/bin/

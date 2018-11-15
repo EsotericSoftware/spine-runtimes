@@ -45,7 +45,7 @@ bool SkeletonRendererSeparatorExample::init () {
 
 	// Spineboy's back, which will manage the animation and GPU resources
 	// will render only the front slots of Spineboy
-	backNode = SkeletonAnimation::createWithJsonFile("spineboy-ess.json", "spineboy.atlas", 0.6f);
+	backNode = SkeletonAnimation::createWithJsonFile("spineboy-pro.json", "spineboy.atlas", 0.6f);
 	backNode->setMix("walk", "jump", 0.4);
 	backNode->setAnimation(0, "walk", true);
 	backNode->setSlotsRange(backNode->findSlot("rear-upper-arm")->data->index, backNode->findSlot("rear-shin")->data->index);

@@ -19,8 +19,9 @@ body {
 </body>
 <script>
 	new spine.SpinePlayer(document.getElementById("container"), {
-		jsonUrl: "assets/spineboy-ess.json",
-		atlasUrl: "assets/spineboy.atlas",
+		jsonUrl: "assets/spineboy-pro.json",
+		atlasUrl: "assets/spineboy-pma.atlas",
+		premultipliedAlpha: true,
 		animations: ["walk", "jump"],
 		controlBones: ["root"],
 		backgroundColor: "#cccccc",
