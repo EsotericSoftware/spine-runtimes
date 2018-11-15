@@ -159,6 +159,10 @@ namespace Spine.Unity {
 		[NonSerialized] ExposedList<Vector2> uv3;
 		#endregion
 
+		public MeshGenerator () {
+			submeshes.TrimExcess();
+		}
+
 		public int VertexCount { get { return vertexBuffer.Count; } }
 
 		public MeshGeneratorBuffers Buffers {
