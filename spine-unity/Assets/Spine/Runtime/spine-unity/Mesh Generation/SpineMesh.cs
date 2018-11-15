@@ -866,12 +866,13 @@ namespace Spine.Unity {
 			this.meshBoundsMax = bmax;
 			this.meshBoundsThickness = lastSlotIndex * settings.zSpacing;
 
+			int submeshInstructionCount = instruction.submeshInstructions.Count;
+			submeshes.Count = submeshInstructionCount;
+
 			// Add triangles
 			if (updateTriangles) {
-				int submeshInstructionCount = instruction.submeshInstructions.Count;
-
 				// Match submesh buffers count with submeshInstruction count.
-				if (this.submeshes.Count < submeshInstructionCount) {
+				if (this.submeshes.Items.Length < submeshInstructionCount) {
 					this.submeshes.Resize(submeshInstructionCount);
 					for (int i = 0, n = submeshInstructionCount; i < n; i++) {
 						var submeshBuffer = this.submeshes.Items[i];
