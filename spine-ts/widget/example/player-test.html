@@ -15,15 +15,17 @@ body {
 </style>
 
 <body>
-	<div id="container" style="width: 100%; height: 100vh;"></div>
+	<div id="container" style="width: 480px; height: 320px;"></div>
 </body>
 <script>
 	new spine.SpinePlayer(document.getElementById("container"), {
-		jsonUrl: "assets/spineboy-ess.json",
-		atlasUrl: "assets/spineboy.atlas",
+		jsonUrl: "assets/spineboy-pro.json",
+		atlasUrl: "assets/spineboy-pma.atlas",
+		premultipliedAlpha: true,
 		animations: ["walk", "jump"],
 		controlBones: ["root"],
 		backgroundColor: "#cccccc",
+		fullScreenBackgroundColor: "#cc0000",
 		showControls: false,
 	});
 </script>

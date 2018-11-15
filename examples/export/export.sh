@@ -1,18 +1,18 @@
 #!/bin/sh
 set -e
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+cd $SCRIPT_DIR
 
 SPINE_EXE="C:/Program Files (x86)/Spine/Spine.com"
-
 if [ ! -f "$SPINE_EXE" ]; then
    SPINE_EXE="/mnt/c/Program Files (x86)/Spine/Spine.com"
 fi
-
 if [ ! -f "$SPINE_EXE" ]; then
 	SPINE_EXE="/Applications/Spine/Spine.app/Contents/MacOS/Spine"
 fi
 echo "Spine exe: $SPINE_EXE"
 
-echo "Cleaning..."
+echo "Cleaning export directories ..."
 rm -rf ../alien/export/*
 rm -rf ../coin/export/*
 rm -rf ../dragon/export/*
@@ -94,8 +94,8 @@ echo "Exporting..."
 -i ../stretchyman/images -o ../stretchyman/export -n stretchyman -p atlas-1.0.json \
 -i ../stretchyman/images -o ../stretchyman/export -n stretchyman-pma -p atlas-1.0-pma.json \
 \
--i ../stretchyman-stretchy-ik/stretchyman-stretchy-ik.spine -o ../stretchyman-stretchy-ik/export -e json.json \
--i ../stretchyman-stretchy-ik/stretchyman-stretchy-ik.spine -o ../stretchyman-stretchy-ik/export -e binary.json \
+-i ../stretchyman/stretchyman-stretchy-ik-pro.spine -o ../stretchyman/export -e json.json \
+-i ../stretchyman/stretchyman-stretchy-ik-pro.spine -o ../stretchyman/export -e binary.json \
 \
 -i ../tank/tank-pro.spine -o ../tank/export -e json.json \
 -i ../tank/tank-pro.spine -o ../tank/export -e binary.json \
@@ -110,4 +110,9 @@ echo "Exporting..."
 -i ../owl/owl-pro.spine -o ../owl/export -e json.json \
 -i ../owl/owl-pro.spine -o ../owl/export -e binary.json \
 -i ../owl/images -o ../owl/export -n owl -p atlas-0.5.json \
--i ../owl/images -o ../owl/export -n owl-pma -p atlas-0.5-pma.json
+-i ../owl/images -o ../owl/export -n owl-pma -p atlas-0.5-pma.json \
+\
+-i ../windmill/windmill-ess.spine -o ../windmill/export -e json.json \
+-i ../windmill/windmill-ess.spine -o ../windmill/export -e binary.json \
+-i ../windmill/images -o ../windmill/export -n windmill -p atlas-0.5.json \
+-i ../windmill/images -o ../windmill/export -n windmill-pma -p atlas-0.5-pma.json

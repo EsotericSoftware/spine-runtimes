@@ -46,7 +46,7 @@ package spine.examples {
 	import starling.display.Sprite;
 
 	public class StretchymanStrechyIkExample extends Sprite {
-		[Embed(source = "/stretchyman-stretchy-ik.json", mimeType = "application/octet-stream")]
+		[Embed(source = "/stretchyman-stretchy-ik-pro.json", mimeType = "application/octet-stream")]
 		static public const StretchymanJson : Class;
 
 		[Embed(source = "/stretchyman.atlas", mimeType = "application/octet-stream")]

@@ -52,6 +52,7 @@ spine-csharp/src/*.meta
 spine-csharp/src/*.cs.meta
 spine-csharp/src/Attachments/*.cs.meta
 
+spine-monogame/.vs/
 spine-monogame/example/bin
 spine-monogame/example/obj
 spine-monogame/example/Content/bin/

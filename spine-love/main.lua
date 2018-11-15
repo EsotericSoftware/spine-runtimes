@@ -103,6 +103,7 @@ function love.load(arg)
 	table.insert(skeletons, loadSkeleton("goblins-pro", "goblins", "walk", "goblin", 1, 400, 500))
 	table.insert(skeletons, loadSkeleton("tank-pro", "tank", "drive", nil, 0.2, 600, 500))
 	table.insert(skeletons, loadSkeleton("vine-pro", "vine", "grow", nil, 0.3, 400, 500))
+	table.insert(skeletons, loadSkeleton("stretchyman-stretchy-ik-pro", "stretchyman", "sneak", nil, 0.3, 200, 500))
 end
 
 function love.update (delta)

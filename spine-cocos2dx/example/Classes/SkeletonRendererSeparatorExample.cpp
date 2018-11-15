@@ -60,7 +60,6 @@ bool SkeletonRendererSeparatorExample::init () {
 	rect[3] = Vec2(0, 200);
 	betweenNode->drawPolygon(rect, 4, Color4F(1, 0, 0, 1), 1, Color4F(1, 0, 0, 1));
 	betweenNode->setPosition(Vec2(_contentSize.width / 2 + 30, 20));
-
 	// Spineboy's front, doesn't manage any skeleton, animation or GPU resources, but simply
 	// renders the back slots of Spineboy. The skeleton, animatio state and GPU resources
 	// are shared with the front node!

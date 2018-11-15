@@ -78,7 +78,7 @@ bool BatchingExample::init () {
 		skeletonNode->setAnimation(0, "walk", true);
 		skeletonNode->addAnimation(0, "jump", true, RandomHelper::random_int(0, 300) / 100.0f);
 		skeletonNode->addAnimation(0, "run", true);
-		
+
 		// alternative setting two color tint for groups of 10 skeletons
 		// should end up with #skeletons / 10 batches
 		// if (j++ < 10)
@@ -108,7 +108,7 @@ bool BatchingExample::init () {
 BatchingExample::~BatchingExample () {
 	// SkeletonAnimation instances are cocos2d-x nodes and are disposed of automatically as normal, but the data created
 	// manually to be shared across multiple SkeletonAnimations needs to be disposed of manually.
-	
+
 	delete _skeletonData;
 	delete _stateData;
 	delete _attachmentLoader;

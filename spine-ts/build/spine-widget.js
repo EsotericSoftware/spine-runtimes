@@ -9534,6 +9534,8 @@ var spine;
 				config.alpha = false;
 			if (!config.backgroundColor)
 				config.backgroundColor = "#000000";
+			if (!config.fullScreenBackgroundColor)
+				config.fullScreenBackgroundColor = config.backgroundColor;
 			if (!config.premultipliedAlpha)
 				config.premultipliedAlpha = false;
 			if (!config.success)
@@ -9767,9 +9769,12 @@ var spine;
 				requestAnimationFrame(function () { return _this.drawFrame(); });
 			var ctx = this.context;
 			var gl = ctx.gl;
-			var bg = new spine.Color().setFromString(this.config.backgroundColor);
+			var doc = document;
+			var isFullscreen = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
+			var bg = new spine.Color().setFromString(isFullscreen ? this.config.fullScreenBackgroundColor : this.config.backgroundColor);
 			gl.clearColor(bg.r, bg.g, bg.b, bg.a);
 			gl.clear(gl.COLOR_BUFFER_BIT);
+			this.loadingScreen.backgroundColor.setFromColor(bg);
 			this.loadingScreen.draw(this.assetManager.isLoadingComplete());
 			if (this.assetManager.isLoadingComplete() && this.skeleton == null)
 				this.loadSkeleton();
@@ -10006,18 +10011,15 @@ var spine;
 					handleHover();
 				}
 			});
-			var mouseOverChildren = false;
-			canvas.onmouseover = function (ev) {
-				mouseOverChildren = false;
-			};
-			canvas.onmouseout = function (ev) {
-				if (ev.relatedTarget == null) {
-					mouseOverChildren = false;
+			var mouseOverChildren = true;
+			document.addEventListener("mousemove", function (ev) {
+				if (ev instanceof MouseEvent) {
+					var rect = _this.playerControls.getBoundingClientRect();
+					var x = ev.clientX - rect.left;
+					var y = ev.clientY - rect.top;
+					mouseOverChildren = x >= 0 && x <= _this.playerControls.clientWidth && y >= 0 && y <= _this.playerControls.clientHeight;
 				}
-				else {
-					mouseOverChildren = isContained(_this.dom, ev.relatedTarget);
-				}
-			};
+			});
 			var cancelId = 0;
 			var handleHover = function () {
 				if (!_this.config.showControls)

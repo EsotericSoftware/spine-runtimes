@@ -39,13 +39,13 @@
 		var skeleton, animationState;
 		var upEntry, downEntry, leftEntry, rightEntry;
 
-		assetManager.loadTexture("owl.png");
-		assetManager.loadText("owl.atlas");
+		assetManager.loadTexture("owl-pma.png");
+		assetManager.loadText("owl-pma.atlas");
 		assetManager.loadText("owl-pro.json");
 
 		function load () {
 			if (assetManager.isLoadingComplete()) {
-				var atlas = new spine.TextureAtlas(assetManager.get("owl.atlas"), function(path) {
+				var atlas = new spine.TextureAtlas(assetManager.get("owl-pma.atlas"), function(path) {
 					return assetManager.get(path);
 				});
 				var atlasLoader = new spine.AtlasAttachmentLoader(atlas);

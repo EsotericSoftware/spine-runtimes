@@ -95,6 +95,9 @@
 			height: number
 		}
 
+		/* Optional: the background color used in fullscreen mode. Must be given in the format #rrggbbaa. Default: backgroundColor. */
+		fullScreenBackgroundColor: string
+
 		/* Optional: callback when the widget and its assets have been successfully loaded. */
 		success: (widget: SpinePlayer) => void
 
@@ -268,6 +271,7 @@
 			if (!config.atlasUrl) throw new Error("Please specify the URL of the atlas file.");
 			if (!config.alpha) config.alpha = false;
 			if (!config.backgroundColor) config.backgroundColor = "#000000";
+			if (!config.fullScreenBackgroundColor) config.fullScreenBackgroundColor = config.backgroundColor;
 			if (!config.premultipliedAlpha) config.premultipliedAlpha = false;
 			if (!config.success) config.success = (widget) => {};
 			if (!config.error) config.error = (widget, msg) => {};
@@ -563,11 +567,14 @@
 			let gl = ctx.gl;
 
 			// Clear the viewport
-			let bg = new Color().setFromString(this.config.backgroundColor);
+			var doc = document as any;
+			var isFullscreen = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
+			let bg = new Color().setFromString(isFullscreen ? this.config.fullScreenBackgroundColor : this.config.backgroundColor);
 			gl.clearColor(bg.r, bg.g, bg.b, bg.a);
 			gl.clear(gl.COLOR_BUFFER_BIT);
 
 			// Display loading screen
+			this.loadingScreen.backgroundColor.setFromColor(bg);
 			this.loadingScreen.draw(this.assetManager.isLoadingComplete());
 
 			// Have we finished loading the asset? Then set things up
@@ -839,18 +846,19 @@
 
 			// For the manual hover to work, we need to disable
 			// hidding the controls if the mouse/touch entered
-			// the clickable area of a child of the controls
-			let mouseOverChildren = false;
-			canvas.onmouseover = (ev) => {
-				mouseOverChildren = false;
-			}
-			canvas.onmouseout = (ev) => {
-				if (ev.relatedTarget == null) {
-					mouseOverChildren = false;
-				} else {
-					mouseOverChildren = isContained(this.dom, (ev.relatedTarget as any));
+			// the clickable area of a child of the controls.
+			// For this we need to register a mouse handler on
+			// the document and see if we are within the canvas
+			// area :/
+			var mouseOverChildren = true;
+			document.addEventListener("mousemove", (ev: UIEvent) => {
+				if (ev instanceof MouseEvent) {
+					let rect = this.playerControls.getBoundingClientRect();
+					let x = ev.clientX - rect.left;
+					let y = ev.clientY - rect.top;
+					mouseOverChildren = x >= 0 && x <= this.playerControls.clientWidth && y >= 0 && y <= this.playerControls.clientHeight;
 				}
-			}
+			});
 
 			let cancelId = 0;
 			let handleHover = () => {
