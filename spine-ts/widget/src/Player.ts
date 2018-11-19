@@ -304,7 +304,8 @@
 
 			if (!config.controlBones) config.controlBones = [];
 
-			if (!config.showControls) config.showControls = true;
+			if (typeof config.showControls === "undefined")
+				config.showControls = true;
 
 			return config;
 		}
