@@ -9453,15 +9453,17 @@ var spine;
         return Switch;
     }());
     var Slider = (function () {
-        function Slider(snaps, snapPercentage) {
+        function Slider(snaps, snapPercentage, big) {
             if (snaps === void 0) { snaps = 0; }
             if (snapPercentage === void 0) { snapPercentage = 0.1; }
+            if (big === void 0) { big = false; }
             this.snaps = snaps;
             this.snapPercentage = snapPercentage;
+            this.big = big;
         }
         Slider.prototype.render = function () {
             var _this = this;
-            this.slider = createElement("\n\t\t\t\t<div class=\"spine-player-slider\">\n\t\t\t\t\t<div class=\"spine-player-slider-value\"></div>\n\t\t\t\t</div>\n\t\t\t");
+            this.slider = createElement("\n\t\t\t\t<div class=\"spine-player-slider " + (this.big ? "big" : "") + "\">\n\t\t\t\t\t<div class=\"spine-player-slider-value\"></div>\n\t\t\t\t\t<!--<div class=\"spine-player-slider-knob\"></div>-->\n\t\t\t\t</div>\n\t\t\t");
             this.value = findWithClass(this.slider, "spine-player-slider-value")[0];
             this.setValue(0);
             var input = new spine.webgl.Input(this.slider);
@@ -9678,7 +9680,7 @@ var spine;
             var _this = this;
             var popup = new Popup(this.playerControls, "\n\t\t\t\t<div class=\"spine-player-row\" style=\"user-select: none; align-items: center; padding: 8px;\">\n\t\t\t\t\t<div style=\"margin-right: 16px;\">Speed</div>\n\t\t\t\t\t<div class=\"spine-player-column\">\n\t\t\t\t\t\t<div class=\"spine-player-speed-slider\" style=\"margin-bottom: 4px;\"></div>\n\t\t\t\t\t\t<div class=\"spine-player-row\" style=\"justify-content: space-between;\">\n\t\t\t\t\t\t\t<div>0.1x</div>\n\t\t\t\t\t\t\t<div>1x</div>\n\t\t\t\t\t\t\t<div>2x</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t");
             var sliderParent = findWithClass(popup.dom, "spine-player-speed-slider")[0];
-            var slider = new Slider(2);
+            var slider = new Slider(2, 0.1, true);
             sliderParent.appendChild(slider.render());
             slider.setValue(this.speed / 2);
             slider.change = function (percentage) {

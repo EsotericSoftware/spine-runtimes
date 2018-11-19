@@ -171,17 +171,20 @@
 	class Slider {
 		private slider: HTMLElement;
 		private value: HTMLElement;
+		private knob: HTMLElement;
 		public change: (percentage: number) => void;
 
-		constructor(public snaps = 0, public snapPercentage = 0.1) { }
+		constructor(public snaps = 0, public snapPercentage = 0.1, public big = false) { }
 
 		render(): HTMLElement {
 			this.slider = createElement(/*html*/`
-				<div class="spine-player-slider">
+				<div class="spine-player-slider ${this.big ? "big": ""}">
 					<div class="spine-player-slider-value"></div>
+					<!--<div class="spine-player-slider-knob"></div>-->
 				</div>
 			`);
 			this.value = findWithClass(this.slider, "spine-player-slider-value")[0];
+			// this.knob = findWithClass(this.slider, "spine-player-slider-knob")[0];
 			this.setValue(0);
 
 			let input = new spine.webgl.Input(this.slider);
@@ -228,6 +231,7 @@
 				percentage = Math.max(0, Math.min(1, percentage));
 			}
 			this.value.style.width = "" + (percentage * 100) + "%";
+			// this.knob.style.left = "" + (-8 + percentage * this.slider.clientWidth) + "px";
 			return percentage;
 		}
 	}
@@ -442,7 +446,7 @@
 				</div>
 			`);
 			let sliderParent = findWithClass(popup.dom, "spine-player-speed-slider")[0];
-			let slider = new Slider(2);
+			let slider = new Slider(2, 0.1, true);
 			sliderParent.appendChild(slider.render());
 			slider.setValue(this.speed / 2);
 			slider.change = (percentage) => {
