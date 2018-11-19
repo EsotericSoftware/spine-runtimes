@@ -12,6 +12,9 @@ if [ ! -f "$SPINE_EXE" ]; then
 fi
 echo "Spine exe: $SPINE_EXE"
 
+echo "Please enter the Spine editor version to use to clean the examples (e.g. 3.7.58-beta)"
+read version
+
 echo "Cleaning export directories ..."
 rm -rf ../alien/export/*
 rm -rf ../coin/export/*
@@ -31,6 +34,7 @@ rm -rf ../owl/export/*
 echo ""
 echo "Exporting..."
 "$SPINE_EXE" \
+-u $version -f \
 -i ../alien/alien-ess.spine -o ../alien/export -e json.json \
 -i ../alien/alien-ess.spine -o ../alien/export -e binary.json \
 -i ../alien/alien-pro.spine -o ../alien/export -e json.json \
