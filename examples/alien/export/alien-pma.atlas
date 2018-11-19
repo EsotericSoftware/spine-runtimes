@@ -6,21 +6,21 @@ filter: Linear,Linear
 repeat: none
 back-foot
   rotate: false
-  xy: 735, 857
+  xy: 2, 2
   size: 8, 6
   orig: 8, 6
   offset: 0, 0
   index: -1
 back-shin
   rotate: false
-  xy: 681, 680
+  xy: 231, 203
   size: 21, 24
   orig: 21, 24
   offset: 0, 0
   index: -1
 back-thigh
   rotate: false
-  xy: 343, 553
+  xy: 971, 877
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -30,6 +30,13 @@ backarmor
   xy: 261, 325
   size: 81, 91
   orig: 81, 91
+  offset: 0, 0
+  index: -1
+blown-up-neck
+  rotate: false
+  xy: 571, 652
+  size: 77, 52
+  orig: 77, 52
   offset: 0, 0
   index: -1
 body
@@ -76,14 +83,14 @@ eye
   index: -1
 eye-highlight
   rotate: false
-  xy: 231, 205
+  xy: 261, 256
   size: 22, 22
   orig: 22, 22
   offset: 0, 0
   index: -1
 eye-pupil
   rotate: false
-  xy: 963, 883
+  xy: 293, 305
   size: 18, 18
   orig: 18, 18
   offset: 0, 0
@@ -97,14 +104,14 @@ eye-stalk
   index: -1
 front-foot
   rotate: false
-  xy: 2, 2
+  xy: 343, 542
   size: 10, 6
   orig: 10, 6
   offset: 0, 0
   index: -1
 front-lower-arm
-  rotate: false
-  xy: 571, 641
+  rotate: true
+  xy: 650, 649
   size: 55, 63
   orig: 55, 63
   offset: 0, 0
@@ -118,7 +125,7 @@ front-shin
   index: -1
 front-thigh
   rotate: false
-  xy: 261, 296
+  xy: 343, 550
   size: 27, 27
   orig: 27, 27
   offset: 0, 0
@@ -139,7 +146,7 @@ head
   index: -1
 lower-back-arm
   rotate: false
-  xy: 628, 658
+  xy: 918, 855
   size: 51, 46
   orig: 51, 46
   offset: 0, 0
@@ -180,8 +187,8 @@ splat03
   offset: 0, 0
   index: -1
 upper-back-arm
-  rotate: true
-  xy: 918, 871
+  rotate: false
+  xy: 261, 280
   size: 30, 43
   orig: 30, 43
   offset: 0, 0

@@ -323,7 +323,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			foreach (var a in animations) {
-				var animationName = a.Name;
+				string animationName = a.Name;
 				eventNames.Add(animationName);
 				menuItems.Add(new GUIContent(animationName, SpineEditorUtilities.Icons.userEvent));
 			}
@@ -336,9 +336,14 @@ namespace Spine.Unity.Editor {
 				menu.AddItem(new GUIContent(NoneString), !property.hasMultipleDifferentValues && string.IsNullOrEmpty(property.stringValue), HandleSelect, new SpineDrawerValuePair(string.Empty, property));
 
 			for (int i = 0; i < events.Count; i++) {
-				string name = events.Items[i].Name;
-				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal))
-					menu.AddItem(new GUIContent(name), !property.hasMultipleDifferentValues && name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
+				var eventObject = events.Items[i];
+				string name = eventObject.Name;
+				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal)) {
+					if (!TargetAttribute.audioOnly || !string.IsNullOrEmpty(eventObject.AudioPath)) {
+						menu.AddItem(new GUIContent(name), !property.hasMultipleDifferentValues && name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
+					}
+				}
+					
 			}
 		}
 
