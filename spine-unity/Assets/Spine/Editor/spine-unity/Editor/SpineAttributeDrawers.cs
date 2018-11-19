@@ -158,7 +158,7 @@ namespace Spine.Unity.Editor {
 		protected virtual void HandleSelect (object menuItemObject) {
 			var clickedItem = (SpineDrawerValuePair)menuItemObject;
 			var serializedProperty = clickedItem.property;
-			if (serializedProperty.serializedObject.isEditingMultipleObjects) serializedProperty.stringValue = "oaifnoiasfÂ°Ã±123526"; // HACK: to trigger change on multi-editing.
+			if (serializedProperty.serializedObject.isEditingMultipleObjects) serializedProperty.stringValue = "oaifnoiasf°ñ123526"; // HACK: to trigger change on multi-editing.
 			serializedProperty.stringValue = clickedItem.stringValue;
 			serializedProperty.serializedObject.ApplyModifiedProperties();
 		}
@@ -336,9 +336,14 @@ namespace Spine.Unity.Editor {
 				menu.AddItem(new GUIContent(NoneString), !property.hasMultipleDifferentValues && string.IsNullOrEmpty(property.stringValue), HandleSelect, new SpineDrawerValuePair(string.Empty, property));
 
 			for (int i = 0; i < events.Count; i++) {
-				string name = events.Items[i].Name;
-				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal))
-					menu.AddItem(new GUIContent(name), !property.hasMultipleDifferentValues && name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
+				var eventObject = events.Items[i];
+				string name = eventObject.Name;
+				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal)) {
+					if (!TargetAttribute.audioOnly || !string.IsNullOrEmpty(eventObject.AudioPath)) {
+						menu.AddItem(new GUIContent(name), !property.hasMultipleDifferentValues && name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
+					}
+				}
+					
 			}
 		}
 

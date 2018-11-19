@@ -123,11 +123,15 @@ namespace Spine.Unity {
 		/// If left empty and the script the attribute is applied to is derived from Component, GetComponent(SkeletonRenderer)() will be called as a fallback.
 		/// </param>
 		/// <param name="fallbackToTextField">If true, and an animation list source can't be found, the field will fall back to a normal text field. If false, it will show an error.</param>
-		public SpineEvent (string startsWith = "", string dataField = "", bool includeNone = true, bool fallbackToTextField = false) {
+
+		public bool audioOnly = false;
+
+		public SpineEvent (string startsWith = "", string dataField = "", bool includeNone = true, bool fallbackToTextField = false, bool audioOnly = false) {
 			this.startsWith = startsWith;
 			this.dataField = dataField;
 			this.includeNone = includeNone;
 			this.fallbackToTextField = fallbackToTextField;
+			this.audioOnly = audioOnly;
 		}
 	}
 
