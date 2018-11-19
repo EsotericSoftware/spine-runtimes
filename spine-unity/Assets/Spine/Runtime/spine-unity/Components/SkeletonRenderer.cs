@@ -39,26 +39,14 @@ namespace Spine.Unity {
 	[ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer)), DisallowMultipleComponent]
 	[HelpURL("http://esotericsoftware.com/spine-unity-rendering")]
 	public class SkeletonRenderer : MonoBehaviour, ISkeletonComponent, IHasSkeletonDataAsset {
-
-		public bool logErrors = false;
-
-		public delegate void SkeletonRendererDelegate (SkeletonRenderer skeletonRenderer);
-
-		/// <summary>OnRebuild is raised after the Skeleton is successfully initialized.</summary>
-		public event SkeletonRendererDelegate OnRebuild;
-
-		/// <summary> Occurs after the vertex data is populated every frame, before the vertices are pushed into the mesh.</summary>
-		public event Spine.Unity.MeshGeneratorDelegate OnPostProcessVertices;
-
-		public SkeletonDataAsset skeletonDataAsset;
-		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } } // ISkeletonComponent
+		[SerializeField] public SkeletonDataAsset skeletonDataAsset;
 
 		#region Initialization settings
 		/// <summary>Skin name to use when the Skeleton is initialized.</summary>
-		[SpineSkin(defaultAsEmptyString:true)] public string initialSkinName;
+		[SerializeField] [SpineSkin(defaultAsEmptyString:true)] public string initialSkinName;
 
 		/// <summary>Flip X and Y to use when the Skeleton is initialized.</summary>
-		public bool initialFlipX, initialFlipY;
+		[SerializeField] public bool initialFlipX, initialFlipY;
 		#endregion
 
 		#region Advanced Render Settings
@@ -121,6 +109,9 @@ namespace Spine.Unity {
 				}
 			}
 		}
+
+		/// <summary> Occurs after the vertex data is populated every frame, before the vertices are pushed into the mesh.</summary>
+		public event Spine.Unity.MeshGeneratorDelegate OnPostProcessVertices;
 		#endif
 
 		#if SPINE_OPTIONAL_MATERIALOVERRIDE
@@ -156,6 +147,13 @@ namespace Spine.Unity {
 		}
 		#endregion
 
+		public delegate void SkeletonRendererDelegate (SkeletonRenderer skeletonRenderer);
+
+		/// <summary>OnRebuild is raised after the Skeleton is successfully initialized.</summary>
+		public event SkeletonRendererDelegate OnRebuild;
+
+		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } } // ISkeletonComponent
+
 		#region Runtime Instantiation
 		public static T NewSpineGameObject<T> (SkeletonDataAsset skeletonDataAsset) where T : SkeletonRenderer {
 			return SkeletonRenderer.AddSpineComponent<T>(new GameObject("New Spine GameObject"), skeletonDataAsset);
@@ -184,6 +182,7 @@ namespace Spine.Unity {
 			this.meshGenerator.settings = settings;
 		}
 		#endregion
+
 
 		public virtual void Awake () {
 			Initialize(false);
@@ -237,10 +236,8 @@ namespace Spine.Unity {
 				valid = false;
 			}
 
-			if (skeletonDataAsset == null) {
-				if (logErrors) Debug.LogError("Missing SkeletonData asset.", this);
+			if (skeletonDataAsset == null)
 				return;
-			}
 
 			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
 			if (skeletonData == null) return;
