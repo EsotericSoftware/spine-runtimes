@@ -200,7 +200,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				skeletonData = binary.readSkeletonData(skeletonFile);
 				if (skeletonData.getBones().size == 0) throw new Exception("No bones in skeleton data.");
 			}
-		} catch (Exception ex) {
+		} catch (Throwable ex) {
 			ex.printStackTrace();
 			ui.toast("Error loading skeleton: " + skeletonFile.name());
 			lastModifiedCheck = 5;
@@ -1033,7 +1033,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				loadScaleSlider.setValue(prefs.getFloat("scale", 1));
 				animationList.setSelected(prefs.getString("animationName", null));
 				skinList.setSelected(prefs.getString("skinName", null));
-			} catch (Exception ex) {
+			} catch (Throwable ex) {
 				System.out.println("Unable to read preferences:");
 				ex.printStackTrace();
 			}
