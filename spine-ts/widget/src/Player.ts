@@ -117,7 +117,7 @@
 			parent.appendChild(this.dom);
 		}
 
-		show () {
+		show (dismissedListener = () => {}) {
 			this.dom.classList.remove("spine-player-hidden");
 			var justClicked = true;
 			let windowClickListener = (event: any) => {
@@ -128,6 +128,7 @@
 				if (!isContained(this.dom, event.target)) {
 					this.dom.parentNode.removeChild(this.dom);
 					window.removeEventListener("click", windowClickListener);
+					dismissedListener();
 				}
 			}
 			window.addEventListener("click", windowClickListener);
@@ -396,21 +397,23 @@
 			}
 
 			speedButton.onclick = () => {
-				this.showSpeedDialog();
+				this.showSpeedDialog(speedButton);
 			}
 
 			this.animationButton.onclick = () => {
-				this.showAnimationsDialog();
+				this.showAnimationsDialog(this.animationButton);
 			}
 
 			this.skinButton.onclick = () => {
-				this.showSkinsDialog();
+				this.showSkinsDialog(this.skinButton);
 			}
 
 			settingsButton.onclick = () => {
-				this.showSettingsDialog();
+				this.showSettingsDialog(settingsButton);
 			}
 
+			let oldWidth = this.canvas.clientWidth;
+			let oldHeight = this.canvas.clientHeight;
 			fullscreenButton.onclick = () => {
 				let doc = document as any;
 				if(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement) {
@@ -418,7 +421,18 @@
 					else if (doc.mozCancelFullScreen) doc.mozCancelFullScreen();
 					else if (doc.webkitExitFullscreen) doc.webkitExitFullscreen()
 					else if (doc.msExitFullscreen) doc.msExitFullscreen();
+					let oldStyleWidth = this.canvas.style.width;
+					let oldStyleHeight = this.canvas.style.height;
+					this.canvas.style.width = "" + oldWidth + "px";
+					this.canvas.style.height = "" + oldHeight + "px";
+					this.drawFrame(false);
+					requestAnimationFrame(() => {
+						this.canvas.style.width = oldStyleWidth;
+						this.canvas.style.height = oldStyleHeight;
+					});
 				} else {
+					oldWidth = this.canvas.clientWidth;
+					oldHeight = this.canvas.clientHeight;
 					let player = dom as any;
 					if (player.requestFullscreen) player.requestFullscreen();
 					else if (player.webkitRequestFullScreen) player.webkitRequestFullScreen();
@@ -428,7 +442,7 @@
 			};
 
 			logoButton.onclick = () => {
-				(window.location as any)= "http://esotericsoftware.com";
+				window.open("http://esotericsoftware.com");
 			};
 
 			// Register a global resize handler to redraw and avoid flicker
@@ -439,10 +453,11 @@
 			return dom;
 		}
 
-		showSpeedDialog () {
+		showSpeedDialog (speedButton: HTMLElement) {
 			let popup = new Popup(this.playerControls, /*html*/`
+				<div class="spine-player-popup-title">Speed</div>
+				<hr>
 				<div class="spine-player-row" style="user-select: none; align-items: center; padding: 8px;">
-					<div style="margin-right: 16px;">Speed</div>
 					<div class="spine-player-column">
 						<div class="spine-player-speed-slider" style="margin-bottom: 4px;"></div>
 						<div class="spine-player-row" style="justify-content: space-between;">
@@ -460,10 +475,13 @@
 			slider.change = (percentage) => {
 				this.speed = percentage * 2;
 			}
-			popup.show();
+			speedButton.classList.add("spine-player-button-icon-speed-selected")
+			popup.show(() => {
+				speedButton.classList.remove("spine-player-button-icon-speed-selected")
+			});
 		}
 
-		showAnimationsDialog () {
+		showAnimationsDialog (animationsButton: HTMLElement) {
 			if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
 
 			let popup = new Popup(this.playerControls, /*html*/`
@@ -498,10 +516,13 @@
 					this.animationState.setAnimation(0, this.config.animation, true);
 				}
 			});
-			popup.show();
+			animationsButton.classList.add("spine-player-button-icon-animations-selected")
+			popup.show(() => {
+				animationsButton.classList.remove("spine-player-button-icon-animations-selected")
+			});
 		}
 
-		showSkinsDialog () {
+		showSkinsDialog (skinButton: HTMLElement) {
 			if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
 
 			let popup = new Popup(this.playerControls, /*html*/`
@@ -537,10 +558,13 @@
 				}
 			});
 
-			popup.show();
+			skinButton.classList.add("spine-player-button-icon-skins-selected")
+			popup.show(() => {
+				skinButton.classList.remove("spine-player-button-icon-skins-selected")
+			});
 		}
 
-		showSettingsDialog () {
+		showSettingsDialog (settingsButton: HTMLElement) {
 			if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
 
 			let popup = new Popup(this.playerControls, /*html*/`
@@ -571,7 +595,10 @@
 			makeItem("Points", "points");
 			makeItem("Hulls", "hulls");
 
-			popup.show();
+			settingsButton.classList.add("spine-player-button-icon-settings-selected")
+			popup.show(() => {
+				settingsButton.classList.remove("spine-player-button-icon-settings-selected")
+			});
 		}
 
 		drawFrame (requestNextFrame = true) {

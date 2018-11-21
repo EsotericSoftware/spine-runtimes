@@ -1841,10 +1841,10 @@ declare module spine {
 		validateConfig(config: SpinePlayerConfig): SpinePlayerConfig;
 		showError(error: string): void;
 		render(): HTMLElement;
-		showSpeedDialog(): void;
-		showAnimationsDialog(): void;
-		showSkinsDialog(): void;
-		showSettingsDialog(): void;
+		showSpeedDialog(speedButton: HTMLElement): void;
+		showAnimationsDialog(animationsButton: HTMLElement): void;
+		showSkinsDialog(skinButton: HTMLElement): void;
+		showSettingsDialog(settingsButton: HTMLElement): void;
 		drawFrame(requestNextFrame?: boolean): void;
 		scale(sourceWidth: number, sourceHeight: number, targetWidth: number, targetHeight: number): Vector2;
 		loadSkeleton(): void;
