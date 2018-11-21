@@ -268,7 +268,7 @@ public class SkeletonJson {
 					try {
 						Attachment attachment = readAttachment(entry, skin, slot.index, entry.name, skeletonData);
 						if (attachment != null) skin.addAttachment(slot.index, entry.name, attachment);
-					} catch (Exception ex) {
+					} catch (Throwable ex) {
 						throw new SerializationException("Error reading attachment: " + entry.name + ", skin: " + skin, ex);
 					}
 				}
@@ -307,7 +307,7 @@ public class SkeletonJson {
 		for (JsonValue animationMap = root.getChild("animations"); animationMap != null; animationMap = animationMap.next) {
 			try {
 				readAnimation(animationMap, animationMap.name, skeletonData);
-			} catch (Exception ex) {
+			} catch (Throwable ex) {
 				throw new SerializationException("Error reading animation: " + animationMap.name, ex);
 			}
 		}
