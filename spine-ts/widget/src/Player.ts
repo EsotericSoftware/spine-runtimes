@@ -431,25 +431,39 @@
 
 			let oldWidth = this.canvas.clientWidth;
 			let oldHeight = this.canvas.clientHeight;
+			let oldStyleWidth = this.canvas.style.width;
+			let oldStyleHeight = this.canvas.style.height;
+			var isFullscreen = false;
 			fullscreenButton.onclick = () => {
+				let fullscreenChanged = () => {
+					isFullscreen = !isFullscreen;
+					if (!isFullscreen) {
+						this.canvas.style.width = "" + oldWidth + "px";
+						this.canvas.style.height = "" + oldHeight + "px";
+						this.drawFrame(false);
+						// Got to reset the style to whatever the user set
+						// after the next layouting.
+						requestAnimationFrame(() => {
+							this.canvas.style.width = oldStyleWidth;
+							this.canvas.style.height = oldStyleHeight;
+						});
+					}
+				};
+
 				let doc = document as any;
+				(dom as any).onfullscreenchange = fullscreenChanged;
+				dom.onwebkitfullscreenchange = fullscreenChanged;
+
 				if(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement) {
 					if (doc.exitFullscreen) doc.exitFullscreen();
 					else if (doc.mozCancelFullScreen) doc.mozCancelFullScreen();
 					else if (doc.webkitExitFullscreen) doc.webkitExitFullscreen()
 					else if (doc.msExitFullscreen) doc.msExitFullscreen();
-					let oldStyleWidth = this.canvas.style.width;
-					let oldStyleHeight = this.canvas.style.height;
-					this.canvas.style.width = "" + oldWidth + "px";
-					this.canvas.style.height = "" + oldHeight + "px";
-					this.drawFrame(false);
-					requestAnimationFrame(() => {
-						this.canvas.style.width = oldStyleWidth;
-						this.canvas.style.height = oldStyleHeight;
-					});
 				} else {
 					oldWidth = this.canvas.clientWidth;
 					oldHeight = this.canvas.clientHeight;
+					oldStyleWidth = this.canvas.style.width;
+					oldStyleHeight = this.canvas.style.height;
 					let player = dom as any;
 					if (player.requestFullscreen) player.requestFullscreen();
 					else if (player.webkitRequestFullScreen) player.webkitRequestFullScreen();

@@ -9666,8 +9666,25 @@ var spine;
             };
             var oldWidth = this.canvas.clientWidth;
             var oldHeight = this.canvas.clientHeight;
+            var oldStyleWidth = this.canvas.style.width;
+            var oldStyleHeight = this.canvas.style.height;
+            var isFullscreen = false;
             fullscreenButton.onclick = function () {
+                var fullscreenChanged = function () {
+                    isFullscreen = !isFullscreen;
+                    if (!isFullscreen) {
+                        _this.canvas.style.width = "" + oldWidth + "px";
+                        _this.canvas.style.height = "" + oldHeight + "px";
+                        _this.drawFrame(false);
+                        requestAnimationFrame(function () {
+                            _this.canvas.style.width = oldStyleWidth;
+                            _this.canvas.style.height = oldStyleHeight;
+                        });
+                    }
+                };
                 var doc = document;
+                dom.onfullscreenchange = fullscreenChanged;
+                dom.onwebkitfullscreenchange = fullscreenChanged;
                 if (doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement) {
                     if (doc.exitFullscreen)
                         doc.exitFullscreen();
@@ -9677,19 +9694,12 @@ var spine;
                         doc.webkitExitFullscreen();
                     else if (doc.msExitFullscreen)
                         doc.msExitFullscreen();
-                    var oldStyleWidth_1 = _this.canvas.style.width;
-                    var oldStyleHeight_1 = _this.canvas.style.height;
-                    _this.canvas.style.width = "" + oldWidth + "px";
-                    _this.canvas.style.height = "" + oldHeight + "px";
-                    _this.drawFrame(false);
-                    requestAnimationFrame(function () {
-                        _this.canvas.style.width = oldStyleWidth_1;
-                        _this.canvas.style.height = oldStyleHeight_1;
-                    });
                 }
                 else {
                     oldWidth = _this.canvas.clientWidth;
                     oldHeight = _this.canvas.clientHeight;
+                    oldStyleWidth = _this.canvas.style.width;
+                    oldStyleHeight = _this.canvas.style.height;
                     var player = dom;
                     if (player.requestFullscreen)
                         player.requestFullscreen();
