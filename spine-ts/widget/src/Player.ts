@@ -108,7 +108,7 @@
 	class Popup {
 		public dom: HTMLElement;
 
-		constructor(parent: HTMLElement, htmlContent: string) {
+		constructor(private player: HTMLElement, parent: HTMLElement, htmlContent: string) {
 			this.dom = createElement(/*html*/`
 				<div class="spine-player-popup spine-player-hidden">
 				</div>
@@ -119,6 +119,20 @@
 
 		show (dismissedListener = () => {}) {
 			this.dom.classList.remove("spine-player-hidden");
+
+			// Make sure the popup isn't bigger than the player.
+			var dismissed = false;
+			let resize = () => {
+				if (!dismissed) requestAnimationFrame(resize);
+				let bottomOffset = Math.abs(this.dom.getBoundingClientRect().bottom - this.player.getBoundingClientRect().bottom);
+				let rightOffset = Math.abs(this.dom.getBoundingClientRect().right - this.player.getBoundingClientRect().right);
+				let maxHeight = this.player.clientHeight - bottomOffset - rightOffset;
+				this.dom.style.maxHeight = maxHeight + "px";
+			}
+			requestAnimationFrame(resize);
+
+			// Dismiss when clicking somewhere else outside
+			// the popup
 			var justClicked = true;
 			let windowClickListener = (event: any) => {
 				if (justClicked) {
@@ -129,6 +143,7 @@
 					this.dom.parentNode.removeChild(this.dom);
 					window.removeEventListener("click", windowClickListener);
 					dismissedListener();
+					dismissed = true;
 				}
 			}
 			window.addEventListener("click", windowClickListener);
@@ -218,6 +233,8 @@
 					if (this.change) this.change(percentage);
 				}
 			});
+
+
 			return this.slider;
 		}
 
@@ -454,7 +471,7 @@
 		}
 
 		showSpeedDialog (speedButton: HTMLElement) {
-			let popup = new Popup(this.playerControls, /*html*/`
+			let popup = new Popup(this.dom, this.playerControls, /*html*/`
 				<div class="spine-player-popup-title">Speed</div>
 				<hr>
 				<div class="spine-player-row" style="user-select: none; align-items: center; padding: 8px;">
@@ -484,7 +501,7 @@
 		showAnimationsDialog (animationsButton: HTMLElement) {
 			if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
 
-			let popup = new Popup(this.playerControls, /*html*/`
+			let popup = new Popup(this.dom, this.playerControls, /*html*/`
 				<div class="spine-player-popup-title">Animations</div>
 				<hr>
 				<ul class="spine-player-list"></ul>
@@ -525,7 +542,7 @@
 		showSkinsDialog (skinButton: HTMLElement) {
 			if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
 
-			let popup = new Popup(this.playerControls, /*html*/`
+			let popup = new Popup(this.dom, this.playerControls, /*html*/`
 				<div class="spine-player-popup-title">Skins</div>
 				<hr>
 				<ul class="spine-player-list"></ul>
@@ -567,7 +584,7 @@
 		showSettingsDialog (settingsButton: HTMLElement) {
 			if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
 
-			let popup = new Popup(this.playerControls, /*html*/`
+			let popup = new Popup(this.dom, this.playerControls, /*html*/`
 				<div class="spine-player-popup-title">Debug</div>
 				<hr>
 				<ul class="spine-player-list">
