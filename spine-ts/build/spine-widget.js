@@ -9539,6 +9539,9 @@ var spine;
             this.paused = true;
             this.playTime = 0;
             this.speed = 1;
+            this.animationViewports = {};
+            this.currentViewport = null;
+            this.previousViewport = null;
             parent.appendChild(this.render());
         }
         SpinePlayer.prototype.validateConfig = function (config) {
@@ -9754,7 +9757,7 @@ var spine;
                     row.classList.add("selected");
                     _this.config.animation = animation.name;
                     _this.playTime = 0;
-                    _this.animationState.setAnimation(0, _this.config.animation, true);
+                    _this.setAnimation(animation.name);
                 };
             });
             animationsButton.classList.add("spine-player-button-icon-animations-selected");
@@ -9851,15 +9854,16 @@ var spine;
                     this.animationState.apply(this.skeleton);
                 }
                 this.skeleton.updateWorldTransform();
-                var viewportSize = this.scale(this.config.viewport.width, this.config.viewport.height, this.canvas.width, this.canvas.height);
-                this.sceneRenderer.camera.zoom = this.config.viewport.width / viewportSize.x;
-                this.sceneRenderer.camera.position.x = this.config.viewport.x + this.config.viewport.width / 2;
-                this.sceneRenderer.camera.position.y = this.config.viewport.y + this.config.viewport.height / 2;
+                var viewport = this.currentViewport;
+                var viewportSize = this.scale(viewport.width, viewport.height, this.canvas.width, this.canvas.height);
+                this.sceneRenderer.camera.zoom = viewport.width / viewportSize.x;
+                this.sceneRenderer.camera.position.x = viewport.x + viewport.width / 2;
+                this.sceneRenderer.camera.position.y = viewport.y + viewport.height / 2;
                 this.sceneRenderer.begin();
                 if (this.config.backgroundImage && this.config.backgroundImage.url) {
                     var bgImage = this.assetManager.get(this.config.backgroundImage.url);
                     if (!this.config.backgroundImage.x) {
-                        this.sceneRenderer.drawTexture(bgImage, this.config.viewport.x, this.config.viewport.y, this.config.viewport.width, this.config.viewport.height);
+                        this.sceneRenderer.drawTexture(bgImage, viewport.x, viewport.y, viewport.width, viewport.height);
                     }
                     else {
                         this.sceneRenderer.drawTexture(bgImage, this.config.backgroundImage.x, this.config.backgroundImage.y, this.config.backgroundImage.width, this.config.backgroundImage.height);
@@ -9952,22 +9956,6 @@ var spine;
                 this.skeleton.setSkinByName(this.config.skin);
                 this.skeleton.setSlotsToSetupPose();
             }
-            if (!this.config.viewport || !this.config.viewport.x || !this.config.viewport.y || !this.config.viewport.width || !this.config.viewport.height) {
-                this.config.viewport = {
-                    x: 0,
-                    y: 0,
-                    width: 0,
-                    height: 0
-                };
-                this.skeleton.updateWorldTransform();
-                var offset = new spine.Vector2();
-                var size = new spine.Vector2();
-                this.skeleton.getBounds(offset, size);
-                this.config.viewport.x = offset.x + size.x / 2 - size.x / 2 * 1.2;
-                this.config.viewport.y = offset.y + size.y / 2 - size.y / 2 * 1.2;
-                this.config.viewport.width = size.x * 1.2;
-                this.config.viewport.height = size.y * 1.2;
-            }
             if (this.config.animations && this.config.animations.length > 0) {
                 this.config.animations.forEach(function (animation) {
                     if (!_this.skeleton.data.findAnimation(animation)) {
@@ -9998,6 +9986,18 @@ var spine;
                     _this.animationState.apply(_this.skeleton);
                     _this.skeleton.updateWorldTransform();
                     _this.playTime = time;
+                };
+            }
+            if (!this.config.viewport || !this.config.viewport.x || !this.config.viewport.y || !this.config.viewport.width || !this.config.viewport.height) {
+                this.config.viewport = {
+                    x: 0,
+                    y: 0,
+                    width: 0,
+                    height: 0,
+                    padLeft: "0",
+                    padRight: "0",
+                    padTop: "0",
+                    padBottom: "0"
                 };
             }
             this.setupInput();
@@ -10101,7 +10101,7 @@ var spine;
             this.playButton.classList.add("spine-player-button-icon-pause");
             if (this.config.animation) {
                 if (!this.animationState.getCurrent(0)) {
-                    this.animationState.setAnimation(0, this.config.animation, true);
+                    this.setAnimation(this.config.animation);
                 }
             }
         };
@@ -10109,6 +10109,47 @@ var spine;
             this.paused = true;
             this.playButton.classList.remove("spine-player-button-icon-pause");
             this.playButton.classList.add("spine-player-button-icon-play");
+        };
+        SpinePlayer.prototype.setAnimation = function (animation) {
+            this.previousViewport = this.currentViewport;
+            this.currentViewport = this.calculateAnimationViewport(animation);
+            this.animationState.clearTracks();
+            this.skeleton.setToSetupPose();
+            this.animationState.setAnimation(0, this.config.animation, true);
+        };
+        SpinePlayer.prototype.calculateAnimationViewport = function (animationName) {
+            var animation = this.skeleton.data.findAnimation(animationName);
+            this.animationState.clearTracks();
+            this.skeleton.setToSetupPose();
+            this.animationState.setAnimationWith(0, animation, true);
+            var steps = 100;
+            var stepTime = animation.duration > 0 ? animation.duration / steps : 0;
+            var minX = 100000000;
+            var maxX = -100000000;
+            var minY = 100000000;
+            var maxY = -100000000;
+            var offset = new spine.Vector2();
+            var size = new spine.Vector2();
+            for (var i = 0; i < steps; i++) {
+                this.animationState.update(stepTime);
+                this.animationState.apply(this.skeleton);
+                this.skeleton.updateWorldTransform();
+                this.skeleton.getBounds(offset, size);
+                minX = Math.min(offset.x, minX);
+                maxX = Math.max(offset.x + size.x, maxX);
+                minY = Math.min(offset.y, minY);
+                maxY = Math.max(offset.y + size.y, maxY);
+            }
+            offset.x = minX;
+            offset.y = minY;
+            size.x = maxX - minX;
+            size.y = maxY - minY;
+            return {
+                x: offset.x + size.x / 2 - size.x / 2 * 1.2,
+                y: offset.y + size.y / 2 - size.y / 2 * 1.2,
+                width: size.x * 1.2,
+                height: size.y * 1.2
+            };
         };
         SpinePlayer.HOVER_COLOR_INNER = new spine.Color(0.478, 0, 0, 0.25);
         SpinePlayer.HOVER_COLOR_OUTER = new spine.Color(1, 1, 1, 1);

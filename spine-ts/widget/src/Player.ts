@@ -75,6 +75,10 @@
 			y: number
 			width: number
 			height: number
+			padLeft: string
+			padRight: string
+			padTop: string
+			padBottom: string
 		}
 
 		/* Optional: whether the canvas should be transparent. Default: false. */
@@ -256,6 +260,13 @@
 		}
 	}
 
+	interface Viewport {
+		x: number
+		y: number
+		width: number
+		height: number
+	}
+
 	export class SpinePlayer {
 		static HOVER_COLOR_INNER = new spine.Color(0.478, 0, 0, 0.25);
 		static HOVER_COLOR_OUTER = new spine.Color(1, 1, 1, 1);
@@ -282,6 +293,10 @@
 		private paused = true;
 		private playTime = 0;
 		private speed = 1;
+
+		private animationViewports: Map<Viewport> = {}
+		private currentViewport: Viewport = null;
+		private previousViewport: Viewport = null;
 
 		private selectedBones: Bone[];
 
@@ -544,7 +559,7 @@
 					row.classList.add("selected");
 					this.config.animation = animation.name;
 					this.playTime = 0;
-					this.animationState.setAnimation(0, this.config.animation, true);
+					this.setAnimation(animation.name);
 				}
 			});
 			animationsButton.classList.add("spine-player-button-icon-animations-selected")
@@ -675,11 +690,12 @@
 
 				this.skeleton.updateWorldTransform();
 
-				let viewportSize = this.scale(this.config.viewport.width, this.config.viewport.height, this.canvas.width, this.canvas.height);
+				let viewport = this.currentViewport;
+				let viewportSize = this.scale(viewport.width, viewport.height, this.canvas.width, this.canvas.height);
 
-				this.sceneRenderer.camera.zoom = this.config.viewport.width / viewportSize.x;
-				this.sceneRenderer.camera.position.x = this.config.viewport.x + this.config.viewport.width / 2;
-				this.sceneRenderer.camera.position.y = this.config.viewport.y + this.config.viewport.height / 2;
+				this.sceneRenderer.camera.zoom = viewport.width / viewportSize.x;
+				this.sceneRenderer.camera.position.x = viewport.x + viewport.width / 2;
+				this.sceneRenderer.camera.position.y = viewport.y + viewport.height / 2;
 
 				this.sceneRenderer.begin();
 
@@ -687,7 +703,7 @@
 				if (this.config.backgroundImage && this.config.backgroundImage.url) {
 					let bgImage = this.assetManager.get(this.config.backgroundImage.url);
 					if (!this.config.backgroundImage.x) {
-						this.sceneRenderer.drawTexture(bgImage, this.config.viewport.x, this.config.viewport.y, this.config.viewport.width, this.config.viewport.height);
+						this.sceneRenderer.drawTexture(bgImage, viewport.x, viewport.y, viewport.width, viewport.height);
 					} else {
 						this.sceneRenderer.drawTexture(bgImage, this.config.backgroundImage.x, this.config.backgroundImage.y, this.config.backgroundImage.width, this.config.backgroundImage.height);
 					}
@@ -792,25 +808,6 @@
 				this.skeleton.setSlotsToSetupPose();
 			}
 
-			// Setup viewport after skin is set
-			if (!this.config.viewport || !this.config.viewport.x || !this.config.viewport.y || !this.config.viewport.width || !this.config.viewport.height) {
-				this.config.viewport = {
-					x: 0,
-					y: 0,
-					width: 0,
-					height: 0
-				}
-
-				this.skeleton.updateWorldTransform();
-				let offset = new spine.Vector2();
-				let size = new spine.Vector2();
-				this.skeleton.getBounds(offset, size);
-				this.config.viewport.x = offset.x + size.x / 2 - size.x / 2 * 1.2;
-				this.config.viewport.y = offset.y + size.y / 2 - size.y / 2 * 1.2;
-				this.config.viewport.width = size.x * 1.2;
-				this.config.viewport.height = size.y * 1.2;
-			}
-
 			// Setup the animations after viewport, so default bounds don't get messed up.
 			if (this.config.animations && this.config.animations.length > 0) {
 				this.config.animations.forEach(animation => {
@@ -845,6 +842,20 @@
 					this.animationState.apply(this.skeleton);
 					this.skeleton.updateWorldTransform();
 					this.playTime = time;
+				}
+			}
+
+			// Setup viewport after skin is set
+			if (!this.config.viewport || !this.config.viewport.x || !this.config.viewport.y || !this.config.viewport.width || !this.config.viewport.height) {
+				this.config.viewport = {
+					x: 0,
+					y: 0,
+					width: 0,
+					height: 0,
+					padLeft: "0",
+					padRight: "0",
+					padTop: "0",
+					padBottom: "0"
 				}
 			}
 
@@ -955,7 +966,7 @@
 
 			if (this.config.animation) {
 				if (!this.animationState.getCurrent(0)) {
-					this.animationState.setAnimation(0, this.config.animation, true);
+					this.setAnimation(this.config.animation);
 				}
 			}
 		}
@@ -964,6 +975,54 @@
 			this.paused = true;
 			this.playButton.classList.remove("spine-player-button-icon-pause");
 			this.playButton.classList.add("spine-player-button-icon-play");
+		}
+
+		private setAnimation (animation: string) {
+			this.previousViewport = this.currentViewport;
+			this.currentViewport = this.calculateAnimationViewport(animation);
+			this.animationState.clearTracks();
+			this.skeleton.setToSetupPose();
+			this.animationState.setAnimation(0, this.config.animation, true);
+		}
+
+		private calculateAnimationViewport (animationName: string): Viewport {
+			let animation = this.skeleton.data.findAnimation(animationName);
+			this.animationState.clearTracks();
+			this.skeleton.setToSetupPose()
+			this.animationState.setAnimationWith(0, animation, true);
+
+			let steps = 100;
+			let stepTime = animation.duration > 0 ? animation.duration / steps : 0;
+			let minX =  100000000;
+			let maxX = -100000000;
+			let minY = 100000000;
+			let maxY = -100000000;
+			let offset = new spine.Vector2();
+			let size = new spine.Vector2();
+
+			for (var i = 0; i < steps; i++) {
+				this.animationState.update(stepTime);
+				this.animationState.apply(this.skeleton);
+				this.skeleton.updateWorldTransform();
+				this.skeleton.getBounds(offset, size);
+
+				minX = Math.min(offset.x, minX);
+				maxX = Math.max(offset.x + size.x, maxX);
+				minY = Math.min(offset.y, minY);
+				maxY = Math.max(offset.y + size.y, maxY);
+			}
+
+			offset.x = minX;
+			offset.y = minY;
+			size.x = maxX - minX;
+			size.y = maxY - minY;
+
+			return {
+				x: offset.x + size.x / 2 - size.x / 2 * 1.2,
+				y: offset.y + size.y / 2 - size.y / 2 * 1.2,
+				width: size.x * 1.2,
+				height: size.y * 1.2
+			};
 		}
 	}
 

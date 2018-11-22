@@ -1708,6 +1708,10 @@ declare module spine {
             y: number;
             width: number;
             height: number;
+            padLeft: string;
+            padRight: string;
+            padTop: string;
+            padBottom: string;
         };
         alpha: boolean;
         backgroundColor: string;
@@ -1746,6 +1750,9 @@ declare module spine {
         private paused;
         private playTime;
         private speed;
+        private animationViewports;
+        private currentViewport;
+        private previousViewport;
         private selectedBones;
         constructor(parent: HTMLElement, config: SpinePlayerConfig);
         validateConfig(config: SpinePlayerConfig): SpinePlayerConfig;
@@ -1761,6 +1768,8 @@ declare module spine {
         setupInput(): void;
         private play();
         private pause();
+        private setAnimation(animation);
+        private calculateAnimationViewport(animationName);
     }
 }
 declare module spine {
