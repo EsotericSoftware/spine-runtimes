@@ -1712,6 +1712,16 @@ declare module spine {
             padRight: string;
             padTop: string;
             padBottom: string;
+            animations: Map<{
+                x: number;
+                y: number;
+                width: number;
+                height: number;
+                padLeft: string;
+                padRight: string;
+                padTop: string;
+                padBottom: string;
+            }>;
         };
         alpha: boolean;
         backgroundColor: string;

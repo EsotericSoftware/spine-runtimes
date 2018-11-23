@@ -79,6 +79,16 @@
 			padRight: string
 			padTop: string
 			padBottom: string
+			animations: Map<{
+				x: number,
+				y: number,
+				width: number,
+				height: number,
+				padLeft: string,
+				padRight: string,
+				padTop: string,
+				padBottom: string,
+			}>
 		}
 
 		/* Optional: whether the canvas should be transparent. Default: false. */
