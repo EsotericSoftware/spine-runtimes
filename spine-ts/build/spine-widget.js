@@ -9854,7 +9854,12 @@ var spine;
                     this.animationState.apply(this.skeleton);
                 }
                 this.skeleton.updateWorldTransform();
-                var viewport = this.currentViewport;
+                var viewport = {
+                    x: this.currentViewport.x - this.currentViewport.padLeft,
+                    y: this.currentViewport.y - this.currentViewport.padBottom,
+                    width: this.currentViewport.width + this.currentViewport.padLeft + this.currentViewport.padRight,
+                    height: this.currentViewport.height + this.currentViewport.padBottom + this.currentViewport.padTop
+                };
                 var viewportSize = this.scale(viewport.width, viewport.height, this.canvas.width, this.canvas.height);
                 this.sceneRenderer.camera.zoom = viewport.width / viewportSize.x;
                 this.sceneRenderer.camera.position.x = viewport.x + viewport.width / 2;
@@ -9892,6 +9897,10 @@ var spine;
                     this.sceneRenderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);
                 }
                 gl.lineWidth(1);
+                if (this.config.viewport.debugRender) {
+                    this.sceneRenderer.rect(false, this.currentViewport.x, this.currentViewport.y, this.currentViewport.width, this.currentViewport.height, spine.Color.GREEN);
+                    this.sceneRenderer.rect(false, viewport.x, viewport.y, viewport.width, viewport.height, spine.Color.RED);
+                }
                 this.sceneRenderer.end();
                 this.sceneRenderer.camera.zoom = 0;
             }
@@ -9956,6 +9965,25 @@ var spine;
                 this.skeleton.setSkinByName(this.config.skin);
                 this.skeleton.setSlotsToSetupPose();
             }
+            if (!this.config.viewport) {
+                this.config.viewport = {
+                    animations: {},
+                    debugRender: false
+                };
+            }
+            if (typeof this.config.viewport.debugRender === "undefined")
+                this.config.viewport.debugRender = false;
+            if (!this.config.viewport.animations) {
+                this.config.viewport.animations = {};
+            }
+            else {
+                Object.getOwnPropertyNames(this.config.viewport.animations).forEach(function (animation) {
+                    if (!skeletonData.findAnimation(animation)) {
+                        _this.showError("Error: animation '" + animation + "' for which a viewport was specified does not exist in skeleton.");
+                        return;
+                    }
+                });
+            }
             if (this.config.animations && this.config.animations.length > 0) {
                 this.config.animations.forEach(function (animation) {
                     if (!_this.skeleton.data.findAnimation(animation)) {
@@ -9986,18 +10014,6 @@ var spine;
                     _this.animationState.apply(_this.skeleton);
                     _this.skeleton.updateWorldTransform();
                     _this.playTime = time;
-                };
-            }
-            if (!this.config.viewport || !this.config.viewport.x || !this.config.viewport.y || !this.config.viewport.width || !this.config.viewport.height) {
-                this.config.viewport = {
-                    x: 0,
-                    y: 0,
-                    width: 0,
-                    height: 0,
-                    padLeft: "0",
-                    padRight: "0",
-                    padTop: "0",
-                    padBottom: "0"
                 };
             }
             this.setupInput();
@@ -10112,10 +10128,65 @@ var spine;
         };
         SpinePlayer.prototype.setAnimation = function (animation) {
             this.previousViewport = this.currentViewport;
-            this.currentViewport = this.calculateAnimationViewport(animation);
+            var animViewport = this.calculateAnimationViewport(animation);
+            var viewport = {
+                x: animViewport.x,
+                y: animViewport.y,
+                width: animViewport.width,
+                height: animViewport.height,
+                padLeft: "10%",
+                padRight: "10%",
+                padTop: "10%",
+                padBottom: "10%"
+            };
+            var globalViewport = this.config.viewport;
+            if (typeof globalViewport.x !== "undefined" && typeof globalViewport.y !== "undefined" && typeof globalViewport.width !== "undefined" && typeof globalViewport.height !== "undefined") {
+                viewport.x = globalViewport.x;
+                viewport.y = globalViewport.y;
+                viewport.width = globalViewport.width;
+                viewport.height = globalViewport.height;
+            }
+            if (typeof globalViewport.padLeft !== "undefined")
+                viewport.padLeft = globalViewport.padLeft;
+            if (typeof globalViewport.padRight !== "undefined")
+                viewport.padRight = globalViewport.padRight;
+            if (typeof globalViewport.padTop !== "undefined")
+                viewport.padTop = globalViewport.padTop;
+            if (typeof globalViewport.padBottom !== "undefined")
+                viewport.padBottom = globalViewport.padBottom;
+            var userAnimViewport = this.config.viewport.animations[animation];
+            if (userAnimViewport) {
+                if (typeof userAnimViewport.x !== "undefined" && typeof userAnimViewport.y !== "undefined" && typeof userAnimViewport.width !== "undefined" && typeof userAnimViewport.height !== "undefined") {
+                    viewport.x = userAnimViewport.x;
+                    viewport.y = userAnimViewport.y;
+                    viewport.width = userAnimViewport.width;
+                    viewport.height = userAnimViewport.height;
+                }
+                if (typeof userAnimViewport.padLeft !== "undefined")
+                    viewport.padLeft = userAnimViewport.padLeft;
+                if (typeof userAnimViewport.padRight !== "undefined")
+                    viewport.padRight = userAnimViewport.padRight;
+                if (typeof userAnimViewport.padTop !== "undefined")
+                    viewport.padTop = userAnimViewport.padTop;
+                if (typeof userAnimViewport.padBottom !== "undefined")
+                    viewport.padBottom = userAnimViewport.padBottom;
+            }
+            viewport.padLeft = this.percentageToWorldUnit(viewport.width, viewport.padLeft);
+            viewport.padRight = this.percentageToWorldUnit(viewport.width, viewport.padRight);
+            viewport.padBottom = this.percentageToWorldUnit(viewport.height, viewport.padBottom);
+            viewport.padTop = this.percentageToWorldUnit(viewport.height, viewport.padTop);
+            this.currentViewport = viewport;
             this.animationState.clearTracks();
             this.skeleton.setToSetupPose();
             this.animationState.setAnimation(0, this.config.animation, true);
+        };
+        SpinePlayer.prototype.percentageToWorldUnit = function (size, percentageOrAbsolute) {
+            if (typeof percentageOrAbsolute === "string") {
+                return size * parseFloat(percentageOrAbsolute.substr(0, percentageOrAbsolute.length - 1)) / 100;
+            }
+            else {
+                return percentageOrAbsolute;
+            }
         };
         SpinePlayer.prototype.calculateAnimationViewport = function (animationName) {
             var animation = this.skeleton.data.findAnimation(animationName);
@@ -10145,10 +10216,10 @@ var spine;
             size.x = maxX - minX;
             size.y = maxY - minY;
             return {
-                x: offset.x + size.x / 2 - size.x / 2 * 1.2,
-                y: offset.y + size.y / 2 - size.y / 2 * 1.2,
-                width: size.x * 1.2,
-                height: size.y * 1.2
+                x: offset.x,
+                y: offset.y,
+                width: size.x,
+                height: size.y
             };
         };
         SpinePlayer.HOVER_COLOR_INNER = new spine.Color(0.478, 0, 0, 0.25);

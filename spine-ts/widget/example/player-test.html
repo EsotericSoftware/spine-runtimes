@@ -22,10 +22,19 @@ body {
 		jsonUrl: "assets/spineboy-pro.json",
 		atlasUrl: "assets/spineboy-pma.atlas",
 		premultipliedAlpha: true,
-		animations: ["walk", "jump"],
-		controlBones: ["root"],
 		backgroundColor: "#cccccc",
-		fullScreenBackgroundColor: "#cc0000",
+		viewport: {
+			padLeft: "10%",
+			padRight: "10%",
+			padTop: "10%",
+			padBottom: "10%",
+			debugRender: true,
+			animations: {
+				"jump": {
+					padTop: "-20%"
+				}
+			}
+		}
 	});
 </script>
 </body>

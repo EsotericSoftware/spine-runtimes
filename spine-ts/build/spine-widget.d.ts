@@ -1683,6 +1683,16 @@ declare module spine.webgl {
     }
 }
 declare module spine {
+    interface Viewport {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        padLeft: string | number;
+        padRight: string | number;
+        padTop: string | number;
+        padBottom: string | number;
+    }
     interface SpinePlayerConfig {
         jsonUrl: string;
         atlasUrl: string;
@@ -1708,20 +1718,12 @@ declare module spine {
             y: number;
             width: number;
             height: number;
-            padLeft: string;
-            padRight: string;
-            padTop: string;
-            padBottom: string;
-            animations: Map<{
-                x: number;
-                y: number;
-                width: number;
-                height: number;
-                padLeft: string;
-                padRight: string;
-                padTop: string;
-                padBottom: string;
-            }>;
+            padLeft: string | number;
+            padRight: string | number;
+            padTop: string | number;
+            padBottom: string | number;
+            animations: Map<Viewport>;
+            debugRender: boolean;
         };
         alpha: boolean;
         backgroundColor: string;
@@ -1779,6 +1781,7 @@ declare module spine {
         private play();
         private pause();
         private setAnimation(animation);
+        private percentageToWorldUnit(size, percentageOrAbsolute);
         private calculateAnimationViewport(animationName);
     }
 }

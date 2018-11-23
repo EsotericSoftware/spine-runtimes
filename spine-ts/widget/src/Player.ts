@@ -29,6 +29,17 @@
  *****************************************************************************/
 
  module spine {
+	export interface Viewport {
+		x: number,
+		y: number,
+		width: number,
+		height: number,
+		padLeft: string | number
+		padRight: string | number
+		padTop: string | number
+		padBottom: string | number
+	}
+
 	export interface SpinePlayerConfig {
 		/* the URL of the skeleton .json file */
 		jsonUrl: string
@@ -75,20 +86,12 @@
 			y: number
 			width: number
 			height: number
-			padLeft: string
-			padRight: string
-			padTop: string
-			padBottom: string
-			animations: Map<{
-				x: number,
-				y: number,
-				width: number,
-				height: number,
-				padLeft: string,
-				padRight: string,
-				padTop: string,
-				padBottom: string,
-			}>
+			padLeft: string | number
+			padRight: string | number
+			padTop: string | number
+			padBottom: string | number
+			animations: Map<Viewport>
+			debugRender: boolean
 		}
 
 		/* Optional: whether the canvas should be transparent. Default: false. */
@@ -268,13 +271,6 @@
 			// this.knob.style.left = "" + (-8 + percentage * this.slider.clientWidth) + "px";
 			return percentage;
 		}
-	}
-
-	interface Viewport {
-		x: number
-		y: number
-		width: number
-		height: number
 	}
 
 	export class SpinePlayer {
@@ -700,7 +696,13 @@
 
 				this.skeleton.updateWorldTransform();
 
-				let viewport = this.currentViewport;
+				let viewport = {
+					x: this.currentViewport.x - (this.currentViewport.padLeft as number),
+					y: this.currentViewport.y - (this.currentViewport.padBottom as number),
+					width: this.currentViewport.width + (this.currentViewport.padLeft as number) + (this.currentViewport.padRight as number),
+					height: this.currentViewport.height + (this.currentViewport.padBottom as number) + (this.currentViewport.padTop as number)
+				}
+
 				let viewportSize = this.scale(viewport.width, viewport.height, this.canvas.width, this.canvas.height);
 
 				this.sceneRenderer.camera.zoom = viewport.width / viewportSize.x;
@@ -744,6 +746,12 @@
 					this.sceneRenderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);
 				}
 				gl.lineWidth(1);
+
+				// Render the viewport bounds
+				if (this.config.viewport.debugRender) {
+					this.sceneRenderer.rect(false, this.currentViewport.x, this.currentViewport.y, this.currentViewport.width, this.currentViewport.height, Color.GREEN);
+					this.sceneRenderer.rect(false, viewport.x, viewport.y, viewport.width, viewport.height, Color.RED);
+				}
 
 				this.sceneRenderer.end();
 
@@ -818,6 +826,27 @@
 				this.skeleton.setSlotsToSetupPose();
 			}
 
+			// Setup empty viewport if none is given and check
+			// if all animations for which viewports where given
+			// exist.
+			if (!this.config.viewport) {
+				(this.config.viewport as any) = {
+					animations: {},
+					debugRender: false
+				}
+			}
+			if (typeof this.config.viewport.debugRender === "undefined") this.config.viewport.debugRender = false;
+			if (!this.config.viewport.animations) {
+				this.config.viewport.animations = {};
+			} else {
+				Object.getOwnPropertyNames(this.config.viewport.animations).forEach((animation: string) => {
+					if (!skeletonData.findAnimation(animation)) {
+						this.showError(`Error: animation '${animation}' for which a viewport was specified does not exist in skeleton.`);
+						return;
+					}
+				});
+			}
+
 			// Setup the animations after viewport, so default bounds don't get messed up.
 			if (this.config.animations && this.config.animations.length > 0) {
 				this.config.animations.forEach(animation => {
@@ -852,20 +881,6 @@
 					this.animationState.apply(this.skeleton);
 					this.skeleton.updateWorldTransform();
 					this.playTime = time;
-				}
-			}
-
-			// Setup viewport after skin is set
-			if (!this.config.viewport || !this.config.viewport.x || !this.config.viewport.y || !this.config.viewport.width || !this.config.viewport.height) {
-				this.config.viewport = {
-					x: 0,
-					y: 0,
-					width: 0,
-					height: 0,
-					padLeft: "0",
-					padRight: "0",
-					padTop: "0",
-					padBottom: "0"
 				}
 			}
 
@@ -988,14 +1003,73 @@
 		}
 
 		private setAnimation (animation: string) {
+			// Determine viewport
 			this.previousViewport = this.currentViewport;
-			this.currentViewport = this.calculateAnimationViewport(animation);
+			let animViewport = this.calculateAnimationViewport(animation);
+
+			// The calculated animation viewport is the base
+			let viewport: Viewport = {
+				x: animViewport.x,
+				y: animViewport.y,
+				width: animViewport.width,
+				height: animViewport.height,
+				padLeft: "10%",
+				padRight: "10%",
+				padTop: "10%",
+				padBottom: "10%"
+			}
+
+			// Override with global viewport settings if they exist
+			let globalViewport = this.config.viewport;
+			if (typeof globalViewport.x !== "undefined" && typeof globalViewport.y !== "undefined" && typeof globalViewport.width !== "undefined" && typeof globalViewport.height !== "undefined") {
+				viewport.x = globalViewport.x;
+				viewport.y = globalViewport.y;
+				viewport.width = globalViewport.width;
+				viewport.height = globalViewport.height;
+			}
+			if (typeof globalViewport.padLeft !== "undefined") viewport.padLeft = globalViewport.padLeft;
+			if (typeof globalViewport.padRight !== "undefined") viewport.padRight = globalViewport.padRight;
+			if (typeof globalViewport.padTop !== "undefined") viewport.padTop = globalViewport.padTop;
+			if (typeof globalViewport.padBottom !== "undefined") viewport.padBottom = globalViewport.padBottom;
+
+			// Override with animation viewport settings given by user for final result.
+			let userAnimViewport = this.config.viewport.animations[animation];
+			if (userAnimViewport) {
+				if (typeof userAnimViewport.x !== "undefined" && typeof userAnimViewport.y !== "undefined" && typeof userAnimViewport.width !== "undefined" && typeof userAnimViewport.height !== "undefined") {
+					viewport.x = userAnimViewport.x;
+					viewport.y = userAnimViewport.y;
+					viewport.width = userAnimViewport.width;
+					viewport.height = userAnimViewport.height;
+				}
+				if (typeof userAnimViewport.padLeft !== "undefined") viewport.padLeft = userAnimViewport.padLeft;
+				if (typeof userAnimViewport.padRight !== "undefined") viewport.padRight = userAnimViewport.padRight;
+				if (typeof userAnimViewport.padTop !== "undefined") viewport.padTop = userAnimViewport.padTop;
+				if (typeof userAnimViewport.padBottom !== "undefined") viewport.padBottom = userAnimViewport.padBottom;
+			}
+
+			// Translate percentage paddings to world units
+			viewport.padLeft = this.percentageToWorldUnit(viewport.width, viewport.padLeft);
+			viewport.padRight = this.percentageToWorldUnit(viewport.width, viewport.padRight);
+			viewport.padBottom = this.percentageToWorldUnit(viewport.height, viewport.padBottom);
+			viewport.padTop = this.percentageToWorldUnit(viewport.height, viewport.padTop);
+
+			// Adjust x, y, width, and height by padding.
+			this.currentViewport = viewport;
+
 			this.animationState.clearTracks();
 			this.skeleton.setToSetupPose();
 			this.animationState.setAnimation(0, this.config.animation, true);
 		}
 
-		private calculateAnimationViewport (animationName: string): Viewport {
+		private percentageToWorldUnit(size: number, percentageOrAbsolute: string | number): number {
+			if (typeof percentageOrAbsolute === "string") {
+				return size * parseFloat(percentageOrAbsolute.substr(0, percentageOrAbsolute.length - 1)) / 100;
+			} else {
+				return percentageOrAbsolute;
+			}
+		}
+
+		private calculateAnimationViewport (animationName: string) {
 			let animation = this.skeleton.data.findAnimation(animationName);
 			this.animationState.clearTracks();
 			this.skeleton.setToSetupPose()
@@ -1028,10 +1102,10 @@
 			size.y = maxY - minY;
 
 			return {
-				x: offset.x + size.x / 2 - size.x / 2 * 1.2,
-				y: offset.y + size.y / 2 - size.y / 2 * 1.2,
-				width: size.x * 1.2,
-				height: size.y * 1.2
+				x: offset.x,
+				y: offset.y,
+				width: size.x,
+				height: size.y
 			};
 		}
 	}
