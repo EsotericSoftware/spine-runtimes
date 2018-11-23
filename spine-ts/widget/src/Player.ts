@@ -29,6 +29,17 @@
  *****************************************************************************/
 
  module spine {
+	export interface Viewport {
+		x: number,
+		y: number,
+		width: number,
+		height: number,
+		padLeft: string | number
+		padRight: string | number
+		padTop: string | number
+		padBottom: string | number
+	}
+
 	export interface SpinePlayerConfig {
 		/* the URL of the skeleton .json file */
 		jsonUrl: string
@@ -75,6 +86,13 @@
 			y: number
 			width: number
 			height: number
+			padLeft: string | number
+			padRight: string | number
+			padTop: string | number
+			padBottom: string | number
+			animations: Map<Viewport>
+			debugRender: boolean,
+			transitionTime: number
 		}
 
 		/* Optional: whether the canvas should be transparent. Default: false. */
@@ -108,7 +126,7 @@
 	class Popup {
 		public dom: HTMLElement;
 
-		constructor(parent: HTMLElement, htmlContent: string) {
+		constructor(private player: HTMLElement, parent: HTMLElement, htmlContent: string) {
 			this.dom = createElement(/*html*/`
 				<div class="spine-player-popup spine-player-hidden">
 				</div>
@@ -117,8 +135,22 @@
 			parent.appendChild(this.dom);
 		}
 
-		show () {
+		show (dismissedListener = () => {}) {
 			this.dom.classList.remove("spine-player-hidden");
+
+			// Make sure the popup isn't bigger than the player.
+			var dismissed = false;
+			let resize = () => {
+				if (!dismissed) requestAnimationFrame(resize);
+				let bottomOffset = Math.abs(this.dom.getBoundingClientRect().bottom - this.player.getBoundingClientRect().bottom);
+				let rightOffset = Math.abs(this.dom.getBoundingClientRect().right - this.player.getBoundingClientRect().right);
+				let maxHeight = this.player.clientHeight - bottomOffset - rightOffset;
+				this.dom.style.maxHeight = maxHeight + "px";
+			}
+			requestAnimationFrame(resize);
+
+			// Dismiss when clicking somewhere else outside
+			// the popup
 			var justClicked = true;
 			let windowClickListener = (event: any) => {
 				if (justClicked) {
@@ -128,6 +160,8 @@
 				if (!isContained(this.dom, event.target)) {
 					this.dom.parentNode.removeChild(this.dom);
 					window.removeEventListener("click", windowClickListener);
+					dismissedListener();
+					dismissed = true;
 				}
 			}
 			window.addEventListener("click", windowClickListener);
@@ -217,6 +251,8 @@
 					if (this.change) this.change(percentage);
 				}
 			});
+
+
 			return this.slider;
 		}
 
@@ -264,6 +300,11 @@
 		private paused = true;
 		private playTime = 0;
 		private speed = 1;
+
+		private animationViewports: Map<Viewport> = {}
+		private currentViewport: Viewport = null;
+		private previousViewport: Viewport = null;
+		private viewportTransitionStart = 0;
 
 		private selectedBones: Bone[];
 
@@ -396,29 +437,56 @@
 			}
 
 			speedButton.onclick = () => {
-				this.showSpeedDialog();
+				this.showSpeedDialog(speedButton);
 			}
 
 			this.animationButton.onclick = () => {
-				this.showAnimationsDialog();
+				this.showAnimationsDialog(this.animationButton);
 			}
 
 			this.skinButton.onclick = () => {
-				this.showSkinsDialog();
+				this.showSkinsDialog(this.skinButton);
 			}
 
 			settingsButton.onclick = () => {
-				this.showSettingsDialog();
+				this.showSettingsDialog(settingsButton);
 			}
 
+			let oldWidth = this.canvas.clientWidth;
+			let oldHeight = this.canvas.clientHeight;
+			let oldStyleWidth = this.canvas.style.width;
+			let oldStyleHeight = this.canvas.style.height;
+			var isFullscreen = false;
 			fullscreenButton.onclick = () => {
+				let fullscreenChanged = () => {
+					isFullscreen = !isFullscreen;
+					if (!isFullscreen) {
+						this.canvas.style.width = "" + oldWidth + "px";
+						this.canvas.style.height = "" + oldHeight + "px";
+						this.drawFrame(false);
+						// Got to reset the style to whatever the user set
+						// after the next layouting.
+						requestAnimationFrame(() => {
+							this.canvas.style.width = oldStyleWidth;
+							this.canvas.style.height = oldStyleHeight;
+						});
+					}
+				};
+
 				let doc = document as any;
+				(dom as any).onfullscreenchange = fullscreenChanged;
+				dom.onwebkitfullscreenchange = fullscreenChanged;
+
 				if(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement) {
 					if (doc.exitFullscreen) doc.exitFullscreen();
 					else if (doc.mozCancelFullScreen) doc.mozCancelFullScreen();
 					else if (doc.webkitExitFullscreen) doc.webkitExitFullscreen()
 					else if (doc.msExitFullscreen) doc.msExitFullscreen();
 				} else {
+					oldWidth = this.canvas.clientWidth;
+					oldHeight = this.canvas.clientHeight;
+					oldStyleWidth = this.canvas.style.width;
+					oldStyleHeight = this.canvas.style.height;
 					let player = dom as any;
 					if (player.requestFullscreen) player.requestFullscreen();
 					else if (player.webkitRequestFullScreen) player.webkitRequestFullScreen();
@@ -428,7 +496,7 @@
 			};
 
 			logoButton.onclick = () => {
-				(window.location as any)= "http://esotericsoftware.com";
+				window.open("http://esotericsoftware.com");
 			};
 
 			// Register a global resize handler to redraw and avoid flicker
@@ -439,10 +507,11 @@
 			return dom;
 		}
 
-		showSpeedDialog () {
-			let popup = new Popup(this.playerControls, /*html*/`
+		showSpeedDialog (speedButton: HTMLElement) {
+			let popup = new Popup(this.dom, this.playerControls, /*html*/`
+				<div class="spine-player-popup-title">Speed</div>
+				<hr>
 				<div class="spine-player-row" style="user-select: none; align-items: center; padding: 8px;">
-					<div style="margin-right: 16px;">Speed</div>
 					<div class="spine-player-column">
 						<div class="spine-player-speed-slider" style="margin-bottom: 4px;"></div>
 						<div class="spine-player-row" style="justify-content: space-between;">
@@ -460,13 +529,16 @@
 			slider.change = (percentage) => {
 				this.speed = percentage * 2;
 			}
-			popup.show();
+			speedButton.classList.add("spine-player-button-icon-speed-selected")
+			popup.show(() => {
+				speedButton.classList.remove("spine-player-button-icon-speed-selected")
+			});
 		}
 
-		showAnimationsDialog () {
+		showAnimationsDialog (animationsButton: HTMLElement) {
 			if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
 
-			let popup = new Popup(this.playerControls, /*html*/`
+			let popup = new Popup(this.dom, this.playerControls, /*html*/`
 				<div class="spine-player-popup-title">Animations</div>
 				<hr>
 				<ul class="spine-player-list"></ul>
@@ -495,16 +567,19 @@
 					row.classList.add("selected");
 					this.config.animation = animation.name;
 					this.playTime = 0;
-					this.animationState.setAnimation(0, this.config.animation, true);
+					this.setAnimation(animation.name);
 				}
 			});
-			popup.show();
+			animationsButton.classList.add("spine-player-button-icon-animations-selected")
+			popup.show(() => {
+				animationsButton.classList.remove("spine-player-button-icon-animations-selected")
+			});
 		}
 
-		showSkinsDialog () {
+		showSkinsDialog (skinButton: HTMLElement) {
 			if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
 
-			let popup = new Popup(this.playerControls, /*html*/`
+			let popup = new Popup(this.dom, this.playerControls, /*html*/`
 				<div class="spine-player-popup-title">Skins</div>
 				<hr>
 				<ul class="spine-player-list"></ul>
@@ -537,13 +612,16 @@
 				}
 			});
 
-			popup.show();
+			skinButton.classList.add("spine-player-button-icon-skins-selected")
+			popup.show(() => {
+				skinButton.classList.remove("spine-player-button-icon-skins-selected")
+			});
 		}
 
-		showSettingsDialog () {
+		showSettingsDialog (settingsButton: HTMLElement) {
 			if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
 
-			let popup = new Popup(this.playerControls, /*html*/`
+			let popup = new Popup(this.dom, this.playerControls, /*html*/`
 				<div class="spine-player-popup-title">Debug</div>
 				<hr>
 				<ul class="spine-player-list">
@@ -571,7 +649,10 @@
 			makeItem("Points", "points");
 			makeItem("Hulls", "hulls");
 
-			popup.show();
+			settingsButton.classList.add("spine-player-button-icon-settings-selected")
+			popup.show(() => {
+				settingsButton.classList.remove("spine-player-button-icon-settings-selected")
+			});
 		}
 
 		drawFrame (requestNextFrame = true) {
@@ -617,11 +698,35 @@
 
 				this.skeleton.updateWorldTransform();
 
-				let viewportSize = this.scale(this.config.viewport.width, this.config.viewport.height, this.canvas.width, this.canvas.height);
+				let viewport = {
+					x: this.currentViewport.x - (this.currentViewport.padLeft as number),
+					y: this.currentViewport.y - (this.currentViewport.padBottom as number),
+					width: this.currentViewport.width + (this.currentViewport.padLeft as number) + (this.currentViewport.padRight as number),
+					height: this.currentViewport.height + (this.currentViewport.padBottom as number) + (this.currentViewport.padTop as number)
+				}
 
-				this.sceneRenderer.camera.zoom = this.config.viewport.width / viewportSize.x;
-				this.sceneRenderer.camera.position.x = this.config.viewport.x + this.config.viewport.width / 2;
-				this.sceneRenderer.camera.position.y = this.config.viewport.y + this.config.viewport.height / 2;
+				let transitionAlpha = ((performance.now() - this.viewportTransitionStart) / 1000) / this.config.viewport.transitionTime;
+				if (this.previousViewport &&  transitionAlpha < 1) {
+					let oldViewport = {
+						x: this.previousViewport.x - (this.previousViewport.padLeft as number),
+						y: this.previousViewport.y - (this.previousViewport.padBottom as number),
+						width: this.previousViewport.width + (this.previousViewport.padLeft as number) + (this.previousViewport.padRight as number),
+						height: this.previousViewport.height + (this.previousViewport.padBottom as number) + (this.previousViewport.padTop as number)
+					}
+
+					viewport = {
+						x: oldViewport.x + (viewport.x - oldViewport.x) * transitionAlpha,
+						y: oldViewport.y + (viewport.y - oldViewport.y) * transitionAlpha,
+						width: oldViewport.width + (viewport.width - oldViewport.width) * transitionAlpha,
+						height: oldViewport.height + (viewport.height - oldViewport.height) * transitionAlpha
+					}
+				}
+
+				let viewportSize = this.scale(viewport.width, viewport.height, this.canvas.width, this.canvas.height);
+
+				this.sceneRenderer.camera.zoom = viewport.width / viewportSize.x;
+				this.sceneRenderer.camera.position.x = viewport.x + viewport.width / 2;
+				this.sceneRenderer.camera.position.y = viewport.y + viewport.height / 2;
 
 				this.sceneRenderer.begin();
 
@@ -629,7 +734,7 @@
 				if (this.config.backgroundImage && this.config.backgroundImage.url) {
 					let bgImage = this.assetManager.get(this.config.backgroundImage.url);
 					if (!this.config.backgroundImage.x) {
-						this.sceneRenderer.drawTexture(bgImage, this.config.viewport.x, this.config.viewport.y, this.config.viewport.width, this.config.viewport.height);
+						this.sceneRenderer.drawTexture(bgImage, viewport.x, viewport.y, viewport.width, viewport.height);
 					} else {
 						this.sceneRenderer.drawTexture(bgImage, this.config.backgroundImage.x, this.config.backgroundImage.y, this.config.backgroundImage.width, this.config.backgroundImage.height);
 					}
@@ -660,6 +765,12 @@
 					this.sceneRenderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);
 				}
 				gl.lineWidth(1);
+
+				// Render the viewport bounds
+				if (this.config.viewport.debugRender) {
+					this.sceneRenderer.rect(false, this.currentViewport.x, this.currentViewport.y, this.currentViewport.width, this.currentViewport.height, Color.GREEN);
+					this.sceneRenderer.rect(false, viewport.x, viewport.y, viewport.width, viewport.height, Color.RED);
+				}
 
 				this.sceneRenderer.end();
 
@@ -734,23 +845,27 @@
 				this.skeleton.setSlotsToSetupPose();
 			}
 
-			// Setup viewport after skin is set
-			if (!this.config.viewport || !this.config.viewport.x || !this.config.viewport.y || !this.config.viewport.width || !this.config.viewport.height) {
-				this.config.viewport = {
-					x: 0,
-					y: 0,
-					width: 0,
-					height: 0
+			// Setup empty viewport if none is given and check
+			// if all animations for which viewports where given
+			// exist.
+			if (!this.config.viewport) {
+				(this.config.viewport as any) = {
+					animations: {},
+					debugRender: false,
+					transitionTime: 0.2
 				}
-
-				this.skeleton.updateWorldTransform();
-				let offset = new spine.Vector2();
-				let size = new spine.Vector2();
-				this.skeleton.getBounds(offset, size);
-				this.config.viewport.x = offset.x + size.x / 2 - size.x / 2 * 1.2;
-				this.config.viewport.y = offset.y + size.y / 2 - size.y / 2 * 1.2;
-				this.config.viewport.width = size.x * 1.2;
-				this.config.viewport.height = size.y * 1.2;
+			}
+			if (typeof this.config.viewport.debugRender === "undefined") this.config.viewport.debugRender = false;
+			if (typeof this.config.viewport.transitionTime === "undefined") this.config.viewport.transitionTime = 0.2;
+			if (!this.config.viewport.animations) {
+				this.config.viewport.animations = {};
+			} else {
+				Object.getOwnPropertyNames(this.config.viewport.animations).forEach((animation: string) => {
+					if (!skeletonData.findAnimation(animation)) {
+						this.showError(`Error: animation '${animation}' for which a viewport was specified does not exist in skeleton.`);
+						return;
+					}
+				});
 			}
 
 			// Setup the animations after viewport, so default bounds don't get messed up.
@@ -897,7 +1012,7 @@
 
 			if (this.config.animation) {
 				if (!this.animationState.getCurrent(0)) {
-					this.animationState.setAnimation(0, this.config.animation, true);
+					this.setAnimation(this.config.animation);
 				}
 			}
 		}
@@ -906,6 +1021,114 @@
 			this.paused = true;
 			this.playButton.classList.remove("spine-player-button-icon-pause");
 			this.playButton.classList.add("spine-player-button-icon-play");
+		}
+
+		private setAnimation (animation: string) {
+			// Determine viewport
+			this.previousViewport = this.currentViewport;
+			let animViewport = this.calculateAnimationViewport(animation);
+
+			// The calculated animation viewport is the base
+			let viewport: Viewport = {
+				x: animViewport.x,
+				y: animViewport.y,
+				width: animViewport.width,
+				height: animViewport.height,
+				padLeft: "10%",
+				padRight: "10%",
+				padTop: "10%",
+				padBottom: "10%"
+			}
+
+			// Override with global viewport settings if they exist
+			let globalViewport = this.config.viewport;
+			if (typeof globalViewport.x !== "undefined" && typeof globalViewport.y !== "undefined" && typeof globalViewport.width !== "undefined" && typeof globalViewport.height !== "undefined") {
+				viewport.x = globalViewport.x;
+				viewport.y = globalViewport.y;
+				viewport.width = globalViewport.width;
+				viewport.height = globalViewport.height;
+			}
+			if (typeof globalViewport.padLeft !== "undefined") viewport.padLeft = globalViewport.padLeft;
+			if (typeof globalViewport.padRight !== "undefined") viewport.padRight = globalViewport.padRight;
+			if (typeof globalViewport.padTop !== "undefined") viewport.padTop = globalViewport.padTop;
+			if (typeof globalViewport.padBottom !== "undefined") viewport.padBottom = globalViewport.padBottom;
+
+			// Override with animation viewport settings given by user for final result.
+			let userAnimViewport = this.config.viewport.animations[animation];
+			if (userAnimViewport) {
+				if (typeof userAnimViewport.x !== "undefined" && typeof userAnimViewport.y !== "undefined" && typeof userAnimViewport.width !== "undefined" && typeof userAnimViewport.height !== "undefined") {
+					viewport.x = userAnimViewport.x;
+					viewport.y = userAnimViewport.y;
+					viewport.width = userAnimViewport.width;
+					viewport.height = userAnimViewport.height;
+				}
+				if (typeof userAnimViewport.padLeft !== "undefined") viewport.padLeft = userAnimViewport.padLeft;
+				if (typeof userAnimViewport.padRight !== "undefined") viewport.padRight = userAnimViewport.padRight;
+				if (typeof userAnimViewport.padTop !== "undefined") viewport.padTop = userAnimViewport.padTop;
+				if (typeof userAnimViewport.padBottom !== "undefined") viewport.padBottom = userAnimViewport.padBottom;
+			}
+
+			// Translate percentage paddings to world units
+			viewport.padLeft = this.percentageToWorldUnit(viewport.width, viewport.padLeft);
+			viewport.padRight = this.percentageToWorldUnit(viewport.width, viewport.padRight);
+			viewport.padBottom = this.percentageToWorldUnit(viewport.height, viewport.padBottom);
+			viewport.padTop = this.percentageToWorldUnit(viewport.height, viewport.padTop);
+
+			// Adjust x, y, width, and height by padding.
+			this.currentViewport = viewport;
+			this.viewportTransitionStart = performance.now();
+
+			this.animationState.clearTracks();
+			this.skeleton.setToSetupPose();
+			this.animationState.setAnimation(0, this.config.animation, true);
+		}
+
+		private percentageToWorldUnit(size: number, percentageOrAbsolute: string | number): number {
+			if (typeof percentageOrAbsolute === "string") {
+				return size * parseFloat(percentageOrAbsolute.substr(0, percentageOrAbsolute.length - 1)) / 100;
+			} else {
+				return percentageOrAbsolute;
+			}
+		}
+
+		private calculateAnimationViewport (animationName: string) {
+			let animation = this.skeleton.data.findAnimation(animationName);
+			this.animationState.clearTracks();
+			this.skeleton.setToSetupPose()
+			this.animationState.setAnimationWith(0, animation, true);
+
+			let steps = 100;
+			let stepTime = animation.duration > 0 ? animation.duration / steps : 0;
+			let minX =  100000000;
+			let maxX = -100000000;
+			let minY = 100000000;
+			let maxY = -100000000;
+			let offset = new spine.Vector2();
+			let size = new spine.Vector2();
+
+			for (var i = 0; i < steps; i++) {
+				this.animationState.update(stepTime);
+				this.animationState.apply(this.skeleton);
+				this.skeleton.updateWorldTransform();
+				this.skeleton.getBounds(offset, size);
+
+				minX = Math.min(offset.x, minX);
+				maxX = Math.max(offset.x + size.x, maxX);
+				minY = Math.min(offset.y, minY);
+				maxY = Math.max(offset.y + size.y, maxY);
+			}
+
+			offset.x = minX;
+			offset.y = minY;
+			size.x = maxX - minX;
+			size.y = maxY - minY;
+
+			return {
+				x: offset.x,
+				y: offset.y,
+				width: size.x,
+				height: size.y
+			};
 		}
 	}
 

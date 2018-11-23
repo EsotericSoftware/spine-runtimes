@@ -1683,6 +1683,16 @@ declare module spine.webgl {
     }
 }
 declare module spine {
+    interface Viewport {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        padLeft: string | number;
+        padRight: string | number;
+        padTop: string | number;
+        padBottom: string | number;
+    }
     interface SpinePlayerConfig {
         jsonUrl: string;
         atlasUrl: string;
@@ -1708,6 +1718,13 @@ declare module spine {
             y: number;
             width: number;
             height: number;
+            padLeft: string | number;
+            padRight: string | number;
+            padTop: string | number;
+            padBottom: string | number;
+            animations: Map<Viewport>;
+            debugRender: boolean;
+            transitionTime: number;
         };
         alpha: boolean;
         backgroundColor: string;
@@ -1746,21 +1763,28 @@ declare module spine {
         private paused;
         private playTime;
         private speed;
+        private animationViewports;
+        private currentViewport;
+        private previousViewport;
+        private viewportTransitionStart;
         private selectedBones;
         constructor(parent: HTMLElement, config: SpinePlayerConfig);
         validateConfig(config: SpinePlayerConfig): SpinePlayerConfig;
         showError(error: string): void;
         render(): HTMLElement;
-        showSpeedDialog(): void;
-        showAnimationsDialog(): void;
-        showSkinsDialog(): void;
-        showSettingsDialog(): void;
+        showSpeedDialog(speedButton: HTMLElement): void;
+        showAnimationsDialog(animationsButton: HTMLElement): void;
+        showSkinsDialog(skinButton: HTMLElement): void;
+        showSettingsDialog(settingsButton: HTMLElement): void;
         drawFrame(requestNextFrame?: boolean): void;
         scale(sourceWidth: number, sourceHeight: number, targetWidth: number, targetHeight: number): Vector2;
         loadSkeleton(): void;
         setupInput(): void;
         private play();
         private pause();
+        private setAnimation(animation);
+        private percentageToWorldUnit(size, percentageOrAbsolute);
+        private calculateAnimationViewport(animationName);
     }
 }
 declare module spine {
