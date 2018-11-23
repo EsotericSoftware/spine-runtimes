@@ -91,7 +91,8 @@
 			padTop: string | number
 			padBottom: string | number
 			animations: Map<Viewport>
-			debugRender: boolean
+			debugRender: boolean,
+			transitionTime: number
 		}
 
 		/* Optional: whether the canvas should be transparent. Default: false. */
@@ -303,6 +304,7 @@
 		private animationViewports: Map<Viewport> = {}
 		private currentViewport: Viewport = null;
 		private previousViewport: Viewport = null;
+		private viewportTransitionStart = 0;
 
 		private selectedBones: Bone[];
 
@@ -703,6 +705,23 @@
 					height: this.currentViewport.height + (this.currentViewport.padBottom as number) + (this.currentViewport.padTop as number)
 				}
 
+				let transitionAlpha = ((performance.now() - this.viewportTransitionStart) / 1000) / this.config.viewport.transitionTime;
+				if (this.previousViewport &&  transitionAlpha < 1) {
+					let oldViewport = {
+						x: this.previousViewport.x - (this.previousViewport.padLeft as number),
+						y: this.previousViewport.y - (this.previousViewport.padBottom as number),
+						width: this.previousViewport.width + (this.previousViewport.padLeft as number) + (this.previousViewport.padRight as number),
+						height: this.previousViewport.height + (this.previousViewport.padBottom as number) + (this.previousViewport.padTop as number)
+					}
+
+					viewport = {
+						x: oldViewport.x + (viewport.x - oldViewport.x) * transitionAlpha,
+						y: oldViewport.y + (viewport.y - oldViewport.y) * transitionAlpha,
+						width: oldViewport.width + (viewport.width - oldViewport.width) * transitionAlpha,
+						height: oldViewport.height + (viewport.height - oldViewport.height) * transitionAlpha
+					}
+				}
+
 				let viewportSize = this.scale(viewport.width, viewport.height, this.canvas.width, this.canvas.height);
 
 				this.sceneRenderer.camera.zoom = viewport.width / viewportSize.x;
@@ -832,10 +851,12 @@
 			if (!this.config.viewport) {
 				(this.config.viewport as any) = {
 					animations: {},
-					debugRender: false
+					debugRender: false,
+					transitionTime: 0.2
 				}
 			}
 			if (typeof this.config.viewport.debugRender === "undefined") this.config.viewport.debugRender = false;
+			if (typeof this.config.viewport.transitionTime === "undefined") this.config.viewport.transitionTime = 0.2;
 			if (!this.config.viewport.animations) {
 				this.config.viewport.animations = {};
 			} else {
@@ -1055,6 +1076,7 @@
 
 			// Adjust x, y, width, and height by padding.
 			this.currentViewport = viewport;
+			this.viewportTransitionStart = performance.now();
 
 			this.animationState.clearTracks();
 			this.skeleton.setToSetupPose();

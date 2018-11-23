@@ -1724,6 +1724,7 @@ declare module spine {
             padBottom: string | number;
             animations: Map<Viewport>;
             debugRender: boolean;
+            transitionTime: number;
         };
         alpha: boolean;
         backgroundColor: string;
@@ -1765,6 +1766,7 @@ declare module spine {
         private animationViewports;
         private currentViewport;
         private previousViewport;
+        private viewportTransitionStart;
         private selectedBones;
         constructor(parent: HTMLElement, config: SpinePlayerConfig);
         validateConfig(config: SpinePlayerConfig): SpinePlayerConfig;

@@ -9542,6 +9542,7 @@ var spine;
             this.animationViewports = {};
             this.currentViewport = null;
             this.previousViewport = null;
+            this.viewportTransitionStart = 0;
             parent.appendChild(this.render());
         }
         SpinePlayer.prototype.validateConfig = function (config) {
@@ -9860,6 +9861,21 @@ var spine;
                     width: this.currentViewport.width + this.currentViewport.padLeft + this.currentViewport.padRight,
                     height: this.currentViewport.height + this.currentViewport.padBottom + this.currentViewport.padTop
                 };
+                var transitionAlpha = ((performance.now() - this.viewportTransitionStart) / 1000) / this.config.viewport.transitionTime;
+                if (this.previousViewport && transitionAlpha < 1) {
+                    var oldViewport = {
+                        x: this.previousViewport.x - this.previousViewport.padLeft,
+                        y: this.previousViewport.y - this.previousViewport.padBottom,
+                        width: this.previousViewport.width + this.previousViewport.padLeft + this.previousViewport.padRight,
+                        height: this.previousViewport.height + this.previousViewport.padBottom + this.previousViewport.padTop
+                    };
+                    viewport = {
+                        x: oldViewport.x + (viewport.x - oldViewport.x) * transitionAlpha,
+                        y: oldViewport.y + (viewport.y - oldViewport.y) * transitionAlpha,
+                        width: oldViewport.width + (viewport.width - oldViewport.width) * transitionAlpha,
+                        height: oldViewport.height + (viewport.height - oldViewport.height) * transitionAlpha
+                    };
+                }
                 var viewportSize = this.scale(viewport.width, viewport.height, this.canvas.width, this.canvas.height);
                 this.sceneRenderer.camera.zoom = viewport.width / viewportSize.x;
                 this.sceneRenderer.camera.position.x = viewport.x + viewport.width / 2;
@@ -9968,11 +9984,14 @@ var spine;
             if (!this.config.viewport) {
                 this.config.viewport = {
                     animations: {},
-                    debugRender: false
+                    debugRender: false,
+                    transitionTime: 0.2
                 };
             }
             if (typeof this.config.viewport.debugRender === "undefined")
                 this.config.viewport.debugRender = false;
+            if (typeof this.config.viewport.transitionTime === "undefined")
+                this.config.viewport.transitionTime = 0.2;
             if (!this.config.viewport.animations) {
                 this.config.viewport.animations = {};
             }
@@ -10176,6 +10195,7 @@ var spine;
             viewport.padBottom = this.percentageToWorldUnit(viewport.height, viewport.padBottom);
             viewport.padTop = this.percentageToWorldUnit(viewport.height, viewport.padTop);
             this.currentViewport = viewport;
+            this.viewportTransitionStart = performance.now();
             this.animationState.clearTracks();
             this.skeleton.setToSetupPose();
             this.animationState.setAnimation(0, this.config.animation, true);
