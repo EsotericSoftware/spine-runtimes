@@ -249,9 +249,9 @@ void Atlas::trim(Str *str) {
 
 	str->end--;
 
-	while (isspace((unsigned char) *str->end) && str->end >= str->begin) {
+	/*while (isspace((unsigned char) *str->end) && str->end >= str->begin) {
 		str->end--;
-	}
+	}*/
 
 	str->end++;
 }
