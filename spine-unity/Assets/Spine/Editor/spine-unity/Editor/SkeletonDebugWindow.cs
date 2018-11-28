@@ -30,6 +30,12 @@
 
 // With contributions from: Mitch Thompson
 
+#if UNITY_2018_3 || UNITY_2019
+#define NEW_PREFAB_SYSTEM
+#else
+#define NO_PREFAB_MESH
+#endif
+
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -122,7 +128,11 @@ namespace Spine.Unity.Editor {
 					skeletonRenderer.Initialize(false);
 					skeletonRenderer.LateUpdate();
 					skeleton = skeletonRenderer.skeleton;
+#if NEW_PREFAB_SYSTEM
+					isPrefab = false;
+#else
 					isPrefab |= PrefabUtility.GetPrefabType(selectedObject) == PrefabType.Prefab;
+#endif
 					UpdateAttachments();
 				}
 			} 

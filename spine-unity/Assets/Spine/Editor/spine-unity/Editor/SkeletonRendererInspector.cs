@@ -28,7 +28,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_2018_3 || UNITY_2019
+#define NEW_PREFAB_SYSTEM
+#else
 #define NO_PREFAB_MESH
+#endif
 
 using UnityEditor;
 using System.Collections.Generic;
@@ -81,7 +85,11 @@ namespace Spine.Unity.Editor {
 		}
 
 		protected virtual void OnEnable () {
+#if NEW_PREFAB_SYSTEM
+			isInspectingPrefab = false;
+#else
 			isInspectingPrefab = (PrefabUtility.GetPrefabType(target) == PrefabType.Prefab);
+#endif
 
 			SpineEditorUtilities.ConfirmInitialization();
 

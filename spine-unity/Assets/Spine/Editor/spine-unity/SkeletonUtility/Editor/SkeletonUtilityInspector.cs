@@ -28,7 +28,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-// Contributed by: Mitch Thompson
+#if UNITY_2018_3 || UNITY_2019
+#define NEW_PREFAB_SYSTEM
+#endif
 
 using UnityEngine;
 using UnityEditor;
@@ -46,7 +48,11 @@ namespace Spine.Unity.Editor {
 		SkeletonUtility skeletonUtility;
 		Skeleton skeleton;
 		SkeletonRenderer skeletonRenderer;
+		
+		#if !NEW_PREFAB_SYSTEM
 		bool isPrefab;
+		#endif
+
 		readonly GUIContent SpawnHierarchyButtonLabel = new GUIContent("Spawn Hierarchy", Icons.skeleton);
 
 		void OnEnable () {
@@ -62,14 +68,18 @@ namespace Spine.Unity.Editor {
 
 			if (!skeletonRenderer.valid) return;
 
+			#if !NEW_PREFAB_SYSTEM
 			isPrefab |= PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab;
+			#endif
 		}
 			
 		public override void OnInspectorGUI () {
+			#if !NEW_PREFAB_SYSTEM
 			if (isPrefab) {
 				GUILayout.Label(new GUIContent("Cannot edit Prefabs", Icons.warning));
 				return;
 			}
+			#endif
 
 			if (!skeletonRenderer.valid) {
 				GUILayout.Label(new GUIContent("Spine Component invalid. Check Skeleton Data Asset.", Icons.warning));
