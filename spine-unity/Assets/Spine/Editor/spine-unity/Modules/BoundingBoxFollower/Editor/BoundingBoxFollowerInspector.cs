@@ -28,6 +28,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_2018_3 || UNITY_2019
+#define NEW_PREFAB_SYSTEM
+#endif
+
 using UnityEngine;
 using UnityEditor;
 
@@ -61,7 +65,11 @@ namespace Spine.Unity.Editor {
 		}
 
 		public override void OnInspectorGUI () {
+			#if !NEW_PREFAB_SYSTEM
 			bool isInspectingPrefab = (PrefabUtility.GetPrefabType(target) == PrefabType.Prefab);
+			#else
+			bool isInspectingPrefab = false;
+			#endif
 
 			// Try to auto-assign SkeletonRenderer field.
 			if (skeletonRenderer.objectReferenceValue == null) {
@@ -94,8 +102,10 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.PropertyField(slotName, new GUIContent("Slot"));
 			if (EditorGUI.EndChangeCheck()) {
 				serializedObject.ApplyModifiedProperties();
+				#if !NEW_PREFAB_SYSTEM
 				if (!isInspectingPrefab)
 					rebuildRequired = true;
+				#endif
 			}
 
 			using (new SpineInspectorUtility.LabelWidthScope(150f)) {

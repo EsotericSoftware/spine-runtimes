@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<style>
+iframe {
+	border: none;
+}
+</style>
+
+<body>
+	<!--<iframe id="player" src="http://esotericsoftware.com/spine-player/3.7/iframe.html" width="600" height="480"></iframe>-->
+	<iframe id="player" src="http://localhost:8000/widget/example/iframe-local.html" width="600" height="480"></iframe>
+</body>
+<script>
+	var player = document.getElementById("player");
+	var playerConfig = {
+		atlasUrl: "http://esotericsoftware.com/files/examples/spineboy/export/spineboy-pma.atlas",
+		jsonUrl: "http://esotericsoftware.com/files/examples/spineboy/export/spineboy-pro.json",
+		premultipliedAlpha: true
+	};
+	player.addEventListener("load", function () {
+		player.contentWindow.postMessage(playerConfig, "*");
+	});
+</script>
+</html>

@@ -633,10 +633,10 @@ namespace Spine {
 					slot.a = slotData.a;
 					return;
 				case MixBlend.First:
-					slot.r += (slot.r - slotData.r) * alpha;
-					slot.g += (slot.g - slotData.g) * alpha;
-					slot.b += (slot.b - slotData.b) * alpha;
-					slot.a += (slot.a - slotData.a) * alpha;
+					slot.r += (slotData.r - slot.r) * alpha;
+					slot.g += (slotData.g - slot.g) * alpha;
+					slot.b += (slotData.b - slot.b) * alpha;
+					slot.a += (slotData.a - slot.a) * alpha;
 					return;
 				}
 				return;
