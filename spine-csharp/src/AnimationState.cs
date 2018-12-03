@@ -254,6 +254,7 @@ namespace Spine {
 				from.totalAlpha = 0;
 				for (int i = 0; i < timelineCount; i++) {
 					Timeline timeline = timelinesItems[i];
+					MixDirection direction = MixDirection.Out;
 					MixBlend timelineBlend;
 					float alpha;
 					switch (timelineMode[i]) {
@@ -283,7 +284,17 @@ namespace Spine {
 					if (rotateTimeline != null) {
 						ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
 					} else {
-						timeline.Apply(skeleton, animationLast, animationTime, eventBuffer, alpha, timelineBlend, MixDirection.Out);
+						if (timelineBlend == MixBlend.Setup) {
+							if (timeline is AttachmentTimeline) {
+								if (attachments) direction = MixDirection.In;
+							} else if (timeline is DrawOrderTimeline) {
+								if (drawOrder) {
+									direction = MixDirection.In;
+								}
+							}
+						}
+
+						timeline.Apply(skeleton, animationLast, animationTime, eventBuffer, alpha, timelineBlend, direction);
 					}
 				}
 			}
