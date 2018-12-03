@@ -114,13 +114,30 @@ namespace Spine.Unity {
 			readonly Dictionary<int, Spine.Animation> animationTable = new Dictionary<int, Spine.Animation>(IntEqualityComparer.Instance);
 			readonly Dictionary<AnimationClip, int> clipNameHashCodeTable = new Dictionary<AnimationClip, int>(AnimationClipEqualityComparer.Instance);
 			readonly List<Animation> previousAnimations = new List<Animation>();
-			readonly List<AnimatorClipInfo> clipInfoCache = new List<AnimatorClipInfo>();
-			readonly List<AnimatorClipInfo> nextClipInfoCache = new List<AnimatorClipInfo>();
+
+			protected class ClipInfos {
+				public bool isInterruptionActive = false;
+				public bool isLastFrameOfInterruption = false;
+
+				public int clipInfoCount = 0;
+				public int nextClipInfoCount = 0;
+				public int interruptingClipInfoCount = 0;
+				public readonly List<AnimatorClipInfo> clipInfos = new List<AnimatorClipInfo>();
+				public readonly List<AnimatorClipInfo> nextClipInfos = new List<AnimatorClipInfo>();
+				public readonly List<AnimatorClipInfo> interruptingClipInfos = new List<AnimatorClipInfo>();
+
+				public AnimatorStateInfo stateInfo;
+				public AnimatorStateInfo nextStateInfo;
+				public AnimatorStateInfo interruptingStateInfo;
+
+				public float interruptingClipTimeAddition = 0;
+			}
+			protected ClipInfos[] layerClipInfos = new ClipInfos[0];
 
 			Animator animator;
 			public Animator Animator { get { return this.animator; } }
 
-			public void Initialize (Animator animator, SkeletonDataAsset skeletonDataAsset) {
+			public void Initialize(Animator animator, SkeletonDataAsset skeletonDataAsset) {
 				this.animator = animator;
 
 				previousAnimations.Clear();
@@ -131,13 +148,17 @@ namespace Spine.Unity {
 					animationTable.Add(a.Name.GetHashCode(), a);
 
 				clipNameHashCodeTable.Clear();
-				clipInfoCache.Clear();
-				nextClipInfoCache.Clear();
+				ClearClipInfosForLayers();
 			}
 
-			public void Apply (Skeleton skeleton) {
+			public void Apply(Skeleton skeleton) {
 				if (layerMixModes.Length < animator.layerCount)
 					System.Array.Resize<MixMode>(ref layerMixModes, animator.layerCount);
+
+				InitClipInfosForLayers();
+				for (int layer = 0, n = animator.layerCount; layer < n; layer++) {
+					GetStateUpdatesFromAnimator(layer);
+				}
 
 				//skeleton.Update(Time.deltaTime); // Doesn't actually do anything, currently. (Spine 3.6).
 
@@ -156,10 +177,12 @@ namespace Spine.Unity {
 
 						bool hasNext = nextStateInfo.fullPathHash != 0;
 
-						int clipInfoCount, nextClipInfoCount;
-						IList<AnimatorClipInfo> clipInfo, nextClipInfo;
-						GetAnimatorClipInfos(layer, out clipInfoCount, out nextClipInfoCount, out clipInfo, out nextClipInfo);
-
+						int clipInfoCount, nextClipInfoCount, interruptingClipInfoCount;
+						IList<AnimatorClipInfo> clipInfo, nextClipInfo, interruptingClipInfo;
+						bool isInterruptionActive, shallInterpolateWeightTo1;
+						GetAnimatorClipInfos(layer, out isInterruptionActive, out clipInfoCount, out nextClipInfoCount, out interruptingClipInfoCount,
+											out clipInfo, out nextClipInfo, out interruptingClipInfo, out shallInterpolateWeightTo1);
+						
 						for (int c = 0; c < clipInfoCount; c++) {
 							var info = clipInfo[c];
 							float weight = info.weight * layerWeight; if (weight == 0) continue;
@@ -173,36 +196,63 @@ namespace Spine.Unity {
 								previousAnimations.Add(GetAnimation(info.clip));
 							}
 						}
+
+						if (isInterruptionActive) {
+							for (int c = 0; c < interruptingClipInfoCount; c++)
+							{
+								var info = interruptingClipInfo[c];
+								float clipWeight = shallInterpolateWeightTo1 ? (info.weight + 1.0f) * 0.5f : info.weight;
+								float weight = clipWeight * layerWeight; if (weight == 0) continue;
+								previousAnimations.Add(GetAnimation(info.clip));
+							}
+						}
 					}
 				}
 
 				// Apply
 				for (int layer = 0, n = animator.layerCount; layer < n; layer++) {
 					float layerWeight = (layer == 0) ? 1 : animator.GetLayerWeight(layer); // Animator.GetLayerWeight always returns 0 on the first layer. Should be interpreted as 1.
-					AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(layer);
-					AnimatorStateInfo nextStateInfo = animator.GetNextAnimatorStateInfo(layer);
 
+					bool isInterruptionActive;
+					AnimatorStateInfo stateInfo;
+					AnimatorStateInfo nextStateInfo;
+					AnimatorStateInfo interruptingStateInfo;
+					float interruptingClipTimeAddition;
+					GetAnimatorStateInfos(layer, out isInterruptionActive, out stateInfo, out nextStateInfo, out interruptingStateInfo, out interruptingClipTimeAddition);
+					
 					bool hasNext = nextStateInfo.fullPathHash != 0;
-
-					int clipInfoCount, nextClipInfoCount;
-					IList<AnimatorClipInfo> clipInfo, nextClipInfo;
-					GetAnimatorClipInfos(layer, out clipInfoCount, out nextClipInfoCount, out clipInfo, out nextClipInfo);
+					
+					int clipInfoCount, nextClipInfoCount, interruptingClipInfoCount;
+					IList<AnimatorClipInfo> clipInfo, nextClipInfo, interruptingClipInfo;
+					bool shallInterpolateWeightTo1;
+					GetAnimatorClipInfos(layer, out isInterruptionActive, out clipInfoCount, out nextClipInfoCount, out interruptingClipInfoCount,
+										out clipInfo, out nextClipInfo, out interruptingClipInfo, out shallInterpolateWeightTo1);
 
 					MixMode mode = layerMixModes[layer];
 					if (mode == MixMode.AlwaysMix) {
 						// Always use Mix instead of Applying the first non-zero weighted clip.
 						for (int c = 0; c < clipInfoCount; c++) {
-							var info = clipInfo[c];	float weight = info.weight * layerWeight; if (weight == 0) continue;
+							var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
 							GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, weight, MixPose.Current, MixDirection.In);
 						}
 						if (hasNext) {
 							for (int c = 0; c < nextClipInfoCount; c++) {
 								var info = nextClipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-								GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime , info.clip.length, nextStateInfo.speed < 0), nextStateInfo.loop, null, weight, MixPose.Current, MixDirection.In);
+								GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime, info.clip.length, nextStateInfo.speed < 0), nextStateInfo.loop, null, weight, MixPose.Current, MixDirection.In);
+							}
+						}
+						if (isInterruptionActive) {
+							for (int c = 0; c < interruptingClipInfoCount; c++)
+							{
+								var info = interruptingClipInfo[c];
+								float clipWeight = shallInterpolateWeightTo1 ? (info.weight + 1.0f) * 0.5f : info.weight;
+								float weight = clipWeight * layerWeight; if (weight == 0) continue;
+								GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(interruptingStateInfo.normalizedTime + interruptingClipTimeAddition, info.clip.length, interruptingStateInfo.speed < 0),
+																interruptingStateInfo.loop, null, weight, MixPose.Current, MixDirection.In);
 							}
 						}
 					} else { // case MixNext || SpineStyle
-						// Apply first non-zero weighted clip
+							 // Apply first non-zero weighted clip
 						int c = 0;
 						for (; c < clipInfoCount; c++) {
 							var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
@@ -231,41 +281,158 @@ namespace Spine.Unity {
 								GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime , info.clip.length, nextStateInfo.speed < 0), nextStateInfo.loop, null, weight, MixPose.Current, MixDirection.In);
 							}
 						}
+
+						c = 0;
+						if (isInterruptionActive) {
+							// Apply next clip directly instead of mixing (ie: no crossfade, ignores mecanim transition weights)
+							if (mode == MixMode.SpineStyle) {
+								for (; c < interruptingClipInfoCount; c++) {
+									var info = interruptingClipInfo[c]; float clipWeight = shallInterpolateWeightTo1 ? (info.weight + 1.0f) * 0.5f : info.weight;
+									float weight = clipWeight * layerWeight; if (weight == 0) continue;
+									GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(interruptingStateInfo.normalizedTime + interruptingClipTimeAddition, info.clip.length, interruptingStateInfo.speed < 0), interruptingStateInfo.loop, null, 1f, MixPose.Current, MixDirection.In);
+									break;
+								}
+							}
+							// Mix the rest
+							for (; c < interruptingClipInfoCount; c++) {
+								var info = interruptingClipInfo[c]; float clipWeight = shallInterpolateWeightTo1 ? (info.weight + 1.0f) * 0.5f : info.weight;
+								float weight = clipWeight * layerWeight; if (weight == 0) continue;
+								GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(interruptingStateInfo.normalizedTime + interruptingClipTimeAddition, info.clip.length, interruptingStateInfo.speed < 0), interruptingStateInfo.loop, null, weight, MixPose.Current, MixDirection.In);
+							}
+						}
 					}
 				}
 			}
 
-			static float AnimationTime (float normalizedTime, float clipLength, bool loop, bool reversed) {
+			static float AnimationTime(float normalizedTime, float clipLength, bool loop, bool reversed) {
 				if (reversed)
-					normalizedTime = (1-normalizedTime + (int)normalizedTime) + (int)normalizedTime;
+					normalizedTime = (1 - normalizedTime + (int)normalizedTime) + (int)normalizedTime;
 				float time = normalizedTime * clipLength;
 				if (loop) return time;
-				const float EndSnapEpsilon = 1f/30f; // Workaround for end-duration keys not being applied.
+				const float EndSnapEpsilon = 1f / 30f; // Workaround for end-duration keys not being applied.
 				return (clipLength - time < EndSnapEpsilon) ? clipLength : time; // return a time snapped to clipLength;
 			}
 
-			static float AnimationTime (float normalizedTime, float clipLength, bool reversed) {
+			static float AnimationTime(float normalizedTime, float clipLength, bool reversed) {
 				if (reversed)
-					normalizedTime = (1-normalizedTime + (int)normalizedTime) + (int)normalizedTime;
+					normalizedTime = (1 - normalizedTime + (int)normalizedTime) + (int)normalizedTime;
 
 				return normalizedTime * clipLength;
 			}
 
+			void InitClipInfosForLayers() {
+				if (layerClipInfos.Length < animator.layerCount) {
+					System.Array.Resize<ClipInfos>(ref layerClipInfos, animator.layerCount);
+					for (int layer = 0, n = animator.layerCount; layer < n; ++layer) {
+						if (layerClipInfos[layer] == null)
+							layerClipInfos[layer] = new ClipInfos();
+					}
+				}
+			}
+
+			void ClearClipInfosForLayers() {
+				for (int layer = 0, n = layerClipInfos.Length; layer < n; ++layer) {
+					if (layerClipInfos[layer] == null)
+						layerClipInfos[layer] = new ClipInfos();
+					else {
+						layerClipInfos[layer].isInterruptionActive = false;
+						layerClipInfos[layer].isLastFrameOfInterruption = false;
+						layerClipInfos[layer].clipInfos.Clear();
+						layerClipInfos[layer].nextClipInfos.Clear();
+						layerClipInfos[layer].interruptingClipInfos.Clear();
+					}
+				}
+			}
+
+			void GetStateUpdatesFromAnimator(int layer) {
+				
+				var layerInfos = layerClipInfos[layer];
+				int clipInfoCount = animator.GetCurrentAnimatorClipInfoCount(layer);
+				int nextClipInfoCount = animator.GetNextAnimatorClipInfoCount(layer);
+				
+				var clipInfos = layerInfos.clipInfos;
+				var nextClipInfos = layerInfos.nextClipInfos;
+				var interruptingClipInfos = layerInfos.interruptingClipInfos;
+
+				layerInfos.isInterruptionActive = (clipInfoCount == 0 && nextClipInfoCount == 0);
+
+				// Note: during interruption, GetCurrentAnimatorClipInfoCount and GetNextAnimatorClipInfoCount
+				// are returning 0 in calls above. Therefore we keep previous clipInfos and nextClipInfos
+				// until the interruption is over.
+				if (layerInfos.isInterruptionActive) {
+
+					// Note: The last frame of a transition interruption
+					// will have fullPathHash set to 0, therefore we have to use previous
+					// frame's infos about interruption clips and correct some values
+					// accordingly (normalizedTime and weight).
+					var interruptingStateInfo = animator.GetNextAnimatorStateInfo(layer);
+					layerInfos.isLastFrameOfInterruption = interruptingStateInfo.fullPathHash == 0;
+					if (!layerInfos.isLastFrameOfInterruption) {
+						layerInfos.interruptingClipInfoCount = interruptingClipInfos.Count;
+
+						animator.GetNextAnimatorClipInfo(layer, interruptingClipInfos);
+						float oldTime = layerInfos.interruptingStateInfo.normalizedTime;
+						float newTime = interruptingStateInfo.normalizedTime;
+						layerInfos.interruptingClipTimeAddition = newTime - oldTime;
+						layerInfos.interruptingStateInfo = interruptingStateInfo;
+					}
+				}
+				else {
+					layerInfos.clipInfoCount = clipInfoCount;
+					layerInfos.nextClipInfoCount = nextClipInfoCount;
+					layerInfos.interruptingClipInfoCount = 0;
+					layerInfos.isLastFrameOfInterruption = false;
+
+					if (clipInfos.Capacity < clipInfoCount) clipInfos.Capacity = clipInfoCount;
+					if (nextClipInfos.Capacity < nextClipInfoCount) nextClipInfos.Capacity = nextClipInfoCount;
+
+					animator.GetCurrentAnimatorClipInfo(layer, clipInfos);
+					animator.GetNextAnimatorClipInfo(layer, nextClipInfos);
+
+					layerInfos.stateInfo = animator.GetCurrentAnimatorStateInfo(layer);
+					layerInfos.nextStateInfo = animator.GetNextAnimatorStateInfo(layer);
+				}
+			}
+
 			void GetAnimatorClipInfos (
 				int layer,
+				out bool isInterruptionActive,
 				out int clipInfoCount,
 				out int nextClipInfoCount,
+				out int interruptingClipInfoCount,
 				out IList<AnimatorClipInfo> clipInfo,
-				out IList<AnimatorClipInfo> nextClipInfo) {
-				clipInfoCount = animator.GetCurrentAnimatorClipInfoCount(layer);
-				nextClipInfoCount = animator.GetNextAnimatorClipInfoCount(layer);
-				if (clipInfoCache.Capacity < clipInfoCount) clipInfoCache.Capacity = clipInfoCount;
-				if (nextClipInfoCache.Capacity < nextClipInfoCount) nextClipInfoCache.Capacity = nextClipInfoCount;
-				animator.GetCurrentAnimatorClipInfo(layer, clipInfoCache);
-				animator.GetNextAnimatorClipInfo(layer, nextClipInfoCache);
+				out IList<AnimatorClipInfo> nextClipInfo,
+				out IList<AnimatorClipInfo> interruptingClipInfo,
+				out bool shallInterpolateWeightTo1) {
 
-				clipInfo = clipInfoCache;
-				nextClipInfo = nextClipInfoCache;
+				var layerInfos = layerClipInfos[layer];
+				isInterruptionActive = layerInfos.isInterruptionActive;
+
+				clipInfoCount = layerInfos.clipInfoCount;
+				nextClipInfoCount = layerInfos.nextClipInfoCount;
+				interruptingClipInfoCount = layerInfos.interruptingClipInfoCount;
+
+				clipInfo = layerInfos.clipInfos;
+				nextClipInfo = layerInfos.nextClipInfos;
+				interruptingClipInfo = isInterruptionActive ? layerInfos.interruptingClipInfos : null;
+				shallInterpolateWeightTo1 = layerInfos.isLastFrameOfInterruption;
+			}
+
+			void GetAnimatorStateInfos(
+				int layer,
+				out bool isInterruptionActive,
+				out AnimatorStateInfo stateInfo,
+				out AnimatorStateInfo nextStateInfo,
+				out AnimatorStateInfo interruptingStateInfo,
+				out float interruptingClipTimeAddition) {
+
+				var layerInfos = layerClipInfos[layer];
+				isInterruptionActive = layerInfos.isInterruptionActive;
+
+				stateInfo = layerInfos.stateInfo;
+				nextStateInfo = layerInfos.nextStateInfo;
+				interruptingStateInfo = layerInfos.interruptingStateInfo;
+				interruptingClipTimeAddition = layerInfos.isLastFrameOfInterruption ? layerInfos.interruptingClipTimeAddition : 0;
 			}
 
 			Spine.Animation GetAnimation (AnimationClip clip) {
