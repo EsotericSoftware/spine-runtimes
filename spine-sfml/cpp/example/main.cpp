@@ -363,11 +363,10 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 	drawable.setUsePremultipliedAlpha(true);
 
 	Skeleton* skeleton = drawable.skeleton;
-	skeleton->setPosition(320, 590);
+	skeleton->setPosition(320, 320);
 	skeleton->updateWorldTransform();
 
-	drawable.state->setAnimation(0, "rotate", true);
-	drawable.update(1);
+	drawable.state->setAnimation(0, "animation", true);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - coin");
 	window.setFramerateLimit(60);
@@ -375,14 +374,12 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 	sf::Clock deltaClock;
 	float swirlTime = 0;
 	while (window.isOpen()) {
-		float delta = 0;
 		while (window.pollEvent(event)) {
 			if (event.type == sf::Event::Closed) window.close();
-			if (event.type == sf::Event::MouseButtonPressed) delta += 0.1f;
 		}
 
-		// float delta = deltaClock.getElapsedTime().asSeconds();
-		// deltaClock.restart();
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
 
 		drawable.update(delta);
 
