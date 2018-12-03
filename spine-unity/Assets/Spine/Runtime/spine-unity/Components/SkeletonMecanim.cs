@@ -151,7 +151,7 @@ namespace Spine.Unity {
 				ClearClipInfosForLayers();
 			}
 
-			public void Apply(Skeleton skeleton) {
+			public void Apply (Skeleton skeleton) {
 				if (layerMixModes.Length < animator.layerCount)
 					System.Array.Resize<MixMode>(ref layerMixModes, animator.layerCount);
 
@@ -306,7 +306,7 @@ namespace Spine.Unity {
 				}
 			}
 
-			static float AnimationTime(float normalizedTime, float clipLength, bool loop, bool reversed) {
+			static float AnimationTime (float normalizedTime, float clipLength, bool loop, bool reversed) {
 				if (reversed)
 					normalizedTime = (1 - normalizedTime + (int)normalizedTime) + (int)normalizedTime;
 				float time = normalizedTime * clipLength;
@@ -315,14 +315,14 @@ namespace Spine.Unity {
 				return (clipLength - time < EndSnapEpsilon) ? clipLength : time; // return a time snapped to clipLength;
 			}
 
-			static float AnimationTime(float normalizedTime, float clipLength, bool reversed) {
+			static float AnimationTime (float normalizedTime, float clipLength, bool reversed) {
 				if (reversed)
 					normalizedTime = (1 - normalizedTime + (int)normalizedTime) + (int)normalizedTime;
 
 				return normalizedTime * clipLength;
 			}
 
-			void InitClipInfosForLayers() {
+			void InitClipInfosForLayers () {
 				if (layerClipInfos.Length < animator.layerCount) {
 					System.Array.Resize<ClipInfos>(ref layerClipInfos, animator.layerCount);
 					for (int layer = 0, n = animator.layerCount; layer < n; ++layer) {
@@ -332,7 +332,7 @@ namespace Spine.Unity {
 				}
 			}
 
-			void ClearClipInfosForLayers() {
+			void ClearClipInfosForLayers () {
 				for (int layer = 0, n = layerClipInfos.Length; layer < n; ++layer) {
 					if (layerClipInfos[layer] == null)
 						layerClipInfos[layer] = new ClipInfos();
@@ -346,7 +346,7 @@ namespace Spine.Unity {
 				}
 			}
 
-			void GetStateUpdatesFromAnimator(int layer) {
+			void GetStateUpdatesFromAnimator (int layer) {
 				
 				var layerInfos = layerClipInfos[layer];
 				int clipInfoCount = animator.GetCurrentAnimatorClipInfoCount(layer);
@@ -378,8 +378,7 @@ namespace Spine.Unity {
 						layerInfos.interruptingClipTimeAddition = newTime - oldTime;
 						layerInfos.interruptingStateInfo = interruptingStateInfo;
 					}
-				}
-				else {
+				} else {
 					layerInfos.clipInfoCount = clipInfoCount;
 					layerInfos.nextClipInfoCount = nextClipInfoCount;
 					layerInfos.interruptingClipInfoCount = 0;
@@ -420,7 +419,7 @@ namespace Spine.Unity {
 				shallInterpolateWeightTo1 = layerInfos.isLastFrameOfInterruption;
 			}
 
-			void GetAnimatorStateInfos(
+			void GetAnimatorStateInfos (
 				int layer,
 				out bool isInterruptionActive,
 				out AnimatorStateInfo stateInfo,

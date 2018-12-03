@@ -340,7 +340,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 		if (state != null) {
 			// AnimationState status.
 			status.setLength(0);
-			for (int i = 0, n = state.getTracks().size; i < n; i++) {
+			for (int i = state.getTracks().size - 1; i >= 0; i--) {
 				TrackEntry entry = state.getTracks().get(i);
 				if (entry == null) continue;
 				status.append(i);

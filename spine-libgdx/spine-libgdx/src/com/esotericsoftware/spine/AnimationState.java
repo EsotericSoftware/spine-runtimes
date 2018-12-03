@@ -280,6 +280,7 @@ public class AnimationState {
 			from.totalAlpha = 0;
 			for (int i = 0; i < timelineCount; i++) {
 				Timeline timeline = (Timeline)timelines[i];
+				MixDirection direction = MixDirection.out;
 				MixBlend timelineBlend;
 				float alpha;
 				switch (timelineMode[i]) {
@@ -307,8 +308,16 @@ public class AnimationState {
 				if (timeline instanceof RotateTimeline) {
 					applyRotateTimeline(timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1,
 						firstFrame);
-				} else
-					timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, MixDirection.out);
+				} else {
+					if (timelineBlend == MixBlend.setup) {
+						if (timeline instanceof AttachmentTimeline) {
+							if (attachments) direction = MixDirection.in;
+						} else if (timeline instanceof DrawOrderTimeline) {
+							if (drawOrder) direction = MixDirection.in;
+						}
+					}
+					timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, direction);
+				}
 			}
 		}
 
