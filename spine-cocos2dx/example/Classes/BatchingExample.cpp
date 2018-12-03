@@ -59,7 +59,7 @@ bool BatchingExample::init () {
 	// Load the skeleton data.
 	SkeletonJson* json = new (__FILE__, __LINE__) SkeletonJson(_attachmentLoader);
 	json->setScale(0.6f); // Resizes skeleton data to 60% of the size it was in Spine.
-	_skeletonData = json->readSkeletonDataFile("spineboy-ess.json");
+	_skeletonData = json->readSkeletonDataFile("spineboy-pro.json");
 	CCASSERT(_skeletonData, json->getError().isEmpty() ? json->getError().buffer() : "Error reading skeleton data file.");
 	delete json;
 

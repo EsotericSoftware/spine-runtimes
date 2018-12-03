@@ -74,7 +74,7 @@ namespace Spine {
 			// Two color tint effect, comment line 80 to disable
 			var spineEffect = Content.Load<Effect>("spine-xna-example-content\\SpineEffect");
 			spineEffect.Parameters["World"].SetValue(Matrix.Identity);
-			spineEffect.Parameters["View"].SetValue(Matrix.CreateLookAt(new Vector3(0.0f, 0.0f, 1.0f), Vector3.Zero, Vector3.Up));			
+			spineEffect.Parameters["View"].SetValue(Matrix.CreateLookAt(new Vector3(0.0f, 0.0f, 1.0f), Vector3.Zero, Vector3.Up));
 
 			skeletonRenderer = new SkeletonRenderer(GraphicsDevice);
 			skeletonRenderer.PremultipliedAlpha = false;
@@ -93,7 +93,7 @@ namespace Spine {
 			if (name == "goblins-pro") atlasName = "goblins-mesh";
 			bool binaryData = false;
 
-			Atlas atlas = new Atlas(assetsFolder + atlasName + ".atlas", new XnaTextureLoader(GraphicsDevice));			
+			Atlas atlas = new Atlas(assetsFolder + atlasName + ".atlas", new XnaTextureLoader(GraphicsDevice));
 
 			float scale = 1;
 			if (name == "spineboy-ess") scale = 0.6f;
@@ -140,12 +140,12 @@ namespace Spine {
 				state.AddAnimation(1, "gun-grab", false, 2);
 			}
 			else if (name == "coin-pro") {
-				state.SetAnimation(0, "rotate", true);
+				state.SetAnimation(0, "animation", true);
 			}
 			else if (name == "tank-pro") {
 				skeleton.X += 300;
 				state.SetAnimation(0, "drive", true);
-			}	
+			}
 			else {
 				state.SetAnimation(0, "walk", true);
 			}
@@ -163,7 +163,7 @@ namespace Spine {
 
 		protected override void Update (GameTime gameTime) {
 			// TODO: Add your update logic here
-#if (!WINDOWS_STOREAPP || WINDOWS_PHONE81) && !IOS	
+#if (!WINDOWS_STOREAPP || WINDOWS_PHONE81) && !IOS
 			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
 					this.Exit();
 #endif
@@ -174,13 +174,13 @@ namespace Spine {
 			GraphicsDevice.Clear(Color.Black);
 
 			state.Update(gameTime.ElapsedGameTime.Milliseconds / 1000f);
-			state.Apply(skeleton);			
+			state.Apply(skeleton);
 			skeleton.UpdateWorldTransform();
 			if (skeletonRenderer.Effect is BasicEffect) {
 				((BasicEffect)skeletonRenderer.Effect).Projection = Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 0, 1, 0);
 			} else {
 				skeletonRenderer.Effect.Parameters["Projection"].SetValue(Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 0, 1, 0));
-			}			
+			}
 			skeletonRenderer.Begin();
 			skeletonRenderer.Draw(skeleton);
 			skeletonRenderer.End();
@@ -214,19 +214,19 @@ namespace Spine {
 		}
 
 		public void End (TrackEntry entry) {
-#if !WINDOWS_STOREAPP	
+#if !WINDOWS_STOREAPP
 			Console.WriteLine(entry + ": end");
 #endif
 		}
 
 		public void Complete (TrackEntry entry) {
-#if !WINDOWS_STOREAPP	
+#if !WINDOWS_STOREAPP
 			Console.WriteLine(entry + ": complete ");
 #endif
 		}
 
 		public void Event (TrackEntry entry, Event e) {
-#if !WINDOWS_STOREAPP	
+#if !WINDOWS_STOREAPP
 			Console.WriteLine(entry + ": event " + e);
 #endif
 		}

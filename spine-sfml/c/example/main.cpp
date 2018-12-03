@@ -341,10 +341,10 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 
 	Skeleton* skeleton = drawable->skeleton;
 	skeleton->x = 320;
-	skeleton->y = 590;
+	skeleton->y = 320;
 	Skeleton_updateWorldTransform(skeleton);
 
-	AnimationState_setAnimationByName(drawable->state, 0, "rotate", true);
+	AnimationState_setAnimationByName(drawable->state, 0, "animation", true);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - vine");
 	window.setFramerateLimit(60);
