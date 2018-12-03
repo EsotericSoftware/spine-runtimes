@@ -1205,9 +1205,7 @@ namespace Spine {
 			
 			int[] drawOrderToSetupIndex = drawOrders[frame];
 			if (drawOrderToSetupIndex == null) {
-				drawOrder.Clear();
-				for (int i = 0, n = slots.Count; i < n; i++)
-					drawOrder.Add(slots.Items[i]);
+				Array.Copy(slots.Items, 0, drawOrder.Items, 0, slots.Count);
 			} else {
 				var drawOrderItems = drawOrder.Items;
 				var slotsItems = slots.Items;
