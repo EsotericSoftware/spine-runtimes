@@ -997,7 +997,7 @@ public class AnimationState {
 
 		/** When the mix percentage ({@link #getMixTime()} / {@link #getMixDuration()}) is less than the
 		 * <code>eventThreshold</code>, event timelines are applied while this animation is being mixed out. Defaults to 0, so event
-		 * timelines are not applied for an animation being mixed out. */
+		 * timelines are not applied while this animation is being mixed out. */
 		public float getEventThreshold () {
 			return eventThreshold;
 		}
@@ -1008,7 +1008,7 @@ public class AnimationState {
 
 		/** When the mix percentage ({@link #getMixTime()} / {@link #getMixDuration()}) is less than the
 		 * <code>attachmentThreshold</code>, attachment timelines are applied while this animation is being mixed out. Defaults to
-		 * 0, so attachment timelines are not applied for an animation being mixed out. */
+		 * 0, so attachment timelines are not applied while this animation is being mixed out. */
 		public float getAttachmentThreshold () {
 			return attachmentThreshold;
 		}
@@ -1019,7 +1019,7 @@ public class AnimationState {
 
 		/** When the mix percentage ({@link #getMixTime()} / {@link #getMixDuration()}) is less than the
 		 * <code>drawOrderThreshold</code>, draw order timelines are applied while this animation is being mixed out. Defaults to 0,
-		 * so draw order timelines are not applied for an animation being mixed out. */
+		 * so draw order timelines are not applied while this animation is being mixed out. */
 		public float getDrawOrderThreshold () {
 			return drawOrderThreshold;
 		}
