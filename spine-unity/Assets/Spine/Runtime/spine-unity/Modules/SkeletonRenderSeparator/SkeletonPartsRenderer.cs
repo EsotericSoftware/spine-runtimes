@@ -128,10 +128,11 @@ namespace Spine.Unity.Modules {
 			meshRenderer.SetPropertyBlock(block);
 		}
 
-		public static SkeletonPartsRenderer NewPartsRendererGameObject (Transform parent, string name) {
+		public static SkeletonPartsRenderer NewPartsRendererGameObject (Transform parent, string name, int sortingOrder = 0) {
 			var go = new GameObject(name, typeof(MeshFilter), typeof(MeshRenderer));
 			go.transform.SetParent(parent, false);
 			var returnComponent = go.AddComponent<SkeletonPartsRenderer>();
+			returnComponent.MeshRenderer.sortingOrder = sortingOrder;
 
 			return returnComponent;
 		}

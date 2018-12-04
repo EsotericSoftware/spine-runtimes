@@ -112,6 +112,8 @@ void SkeletonAnimation::initialize () {
 	_state = new (__FILE__, __LINE__) AnimationState(new (__FILE__, __LINE__) AnimationStateData(_skeleton->getData()));
 	_state->setRendererObject(this);
 	_state->setListener(animationCallback);
+
+	_firstDraw = true;
 }
 
 SkeletonAnimation::SkeletonAnimation ()
@@ -130,6 +132,14 @@ void SkeletonAnimation::update (float deltaTime) {
 	_state->update(deltaTime);
 	_state->apply(*_skeleton);
 	_skeleton->updateWorldTransform();
+}
+
+void SkeletonAnimation::draw(cocos2d::Renderer *renderer, const cocos2d::Mat4 &transform, uint32_t transformFlags) {
+	if (_firstDraw) {
+		_firstDraw = false;
+		update(0);
+	}
+	super::draw(renderer, transform, transformFlags);
 }
 
 void SkeletonAnimation::setAnimationStateData (AnimationStateData* stateData) {

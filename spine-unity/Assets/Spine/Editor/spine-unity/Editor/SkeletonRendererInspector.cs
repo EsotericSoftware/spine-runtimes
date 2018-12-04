@@ -341,7 +341,12 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		public static string[] GetSeparatorSlotMember (SkeletonRenderer skeletonRenderer) {
+		public static void SetSeparatorSlotNames (SkeletonRenderer skeletonRenderer, string[] newSlotNames) {
+			var field = SpineInspectorUtility.GetNonPublicField(typeof(SkeletonRenderer), SeparatorSlotNamesFieldName);
+			field.SetValue(skeletonRenderer, newSlotNames);
+		}
+
+		public static string[] GetSeparatorSlotNames (SkeletonRenderer skeletonRenderer) {
 			var field = SpineInspectorUtility.GetNonPublicField(typeof(SkeletonRenderer), SeparatorSlotNamesFieldName);
 			return field.GetValue(skeletonRenderer) as string[];
 		}
