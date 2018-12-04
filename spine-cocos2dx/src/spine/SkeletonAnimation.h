@@ -67,6 +67,7 @@ public:
 	}
 
 	virtual void update (float deltaTime) override;
+	virtual void draw (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags) override;
 
 	void setAnimationStateData (spAnimationStateData* stateData);
 	void setMix (const std::string& fromAnimation, const std::string& toAnimation, float duration);
@@ -109,6 +110,7 @@ protected:
 	spAnimationState* _state;
 
 	bool _ownsAnimationStateData;
+	bool _firstDraw;
 
 	StartListener _startListener;
     InterruptListener _interruptListener;
