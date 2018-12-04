@@ -106,6 +106,8 @@ namespace Spine.Unity.Modules {
 				componentRenderers.Add(spr);
 			}
 
+			srs.OnEnable();
+
 			#if UNITY_EDITOR
 			// Make sure editor updates properly in edit mode.
 			if (!Application.isPlaying) {
@@ -119,7 +121,7 @@ namespace Spine.Unity.Modules {
 		}
 
 		/// <summary>Add a child SkeletonPartsRenderer GameObject to this SkeletonRenderSeparator.</summary>
-		public void AddPartsRenderer (int sortingOrderIncrement = DefaultSortingOrderIncrement) {
+		public SkeletonPartsRenderer AddPartsRenderer (int sortingOrderIncrement = DefaultSortingOrderIncrement, string name = null) {
 			int sortingLayerID = 0;
 			int sortingOrder = 0;
 			if (partsRenderers.Count > 0) {
@@ -128,13 +130,18 @@ namespace Spine.Unity.Modules {
 				sortingLayerID = previousMeshRenderer.sortingLayerID;
 				sortingOrder = previousMeshRenderer.sortingOrder + sortingOrderIncrement;
 			}
-				
-			var spr = SkeletonPartsRenderer.NewPartsRendererGameObject(skeletonRenderer.transform, partsRenderers.Count.ToString());
+
+			if (string.IsNullOrEmpty(name))
+				name = partsRenderers.Count.ToString();
+
+			var spr = SkeletonPartsRenderer.NewPartsRendererGameObject(skeletonRenderer.transform, name);
 			partsRenderers.Add(spr);
 
 			var mr = spr.MeshRenderer;
 			mr.sortingLayerID = sortingLayerID;
 			mr.sortingOrder = sortingOrder;
+
+			return spr;
 		}
 		#endregion
 

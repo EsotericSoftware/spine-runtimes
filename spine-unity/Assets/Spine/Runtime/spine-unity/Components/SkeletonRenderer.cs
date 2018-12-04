@@ -367,6 +367,47 @@ namespace Spine.Unity {
 			currentSmartMesh.instructionUsed.Set(currentInstructions);
 		}
 
+		public void FindAndApplySeparatorSlots (string startsWith, bool clearExistingSeparators = true, bool updateStringArray = false) {
+			if (string.IsNullOrEmpty(startsWith)) return;
+
+			FindAndApplySeparatorSlots(
+				(slotName) => slotName.StartsWith(startsWith),
+				clearExistingSeparators,
+				updateStringArray
+				);
+		}
+
+		public void FindAndApplySeparatorSlots (System.Func<string, bool> slotNamePredicate, bool clearExistingSeparators = true, bool updateStringArray = false) {
+			if (slotNamePredicate == null) return;
+			if (!valid) return;
+
+			if (clearExistingSeparators)
+				separatorSlots.Clear();
+
+			var slots = skeleton.slots;
+			foreach (var slot in slots) {
+				if (slotNamePredicate.Invoke(slot.data.name))
+					separatorSlots.Add(slot);
+			}
+
+			if (updateStringArray) {
+				var detectedSeparatorNames = new List<string>();
+				foreach (var slot in skeleton.slots) {
+					string slotName = slot.data.name;
+					if (slotNamePredicate.Invoke(slotName))
+						detectedSeparatorNames.Add(slotName);
+				}
+				if (!clearExistingSeparators) {
+					string[] originalNames = this.separatorSlotNames;
+					foreach (string originalName in originalNames)
+						detectedSeparatorNames.Add(originalName);
+				}
+
+				this.separatorSlotNames = detectedSeparatorNames.ToArray();
+			}
+
+		}
+
 		public void ReapplySeparatorSlotNames () {
 			if (!valid)
 				return;

@@ -477,7 +477,7 @@ namespace Spine.Unity.Editor {
 								}
 							} else {
 								foreach (var slot in skeleton.DrawOrder) {
-									var slotNames = SkeletonRendererInspector.GetSeparatorSlotMember(skeletonRenderer);
+									var slotNames = SkeletonRendererInspector.GetSeparatorSlotNames(skeletonRenderer);
 									for (int i = 0, n = slotNames.Length; i < n; i++) {
 										if (string.Equals(slotNames[i], slot.Data.Name, System.StringComparison.Ordinal)) {
 											EditorGUILayout.LabelField(SeparatorString);
