@@ -462,7 +462,9 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* t
 
 		from->totalAlpha = 0;
 		for (i = 0; i < timelineCount; i++) {
+			spMixDirection direction = SP_MIX_DIRECTION_OUT;
 			spTimeline *timeline = timelines[i];
+
 			switch (timelineMode->items[i]) {
 				case SUBSEQUENT:
 					if (!attachments && timeline->type == SP_TIMELINE_ATTACHMENT) continue;
@@ -489,8 +491,16 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* t
 				_spAnimationState_applyRotateTimeline(self, timeline, skeleton, animationTime, alpha, timelineBlend,
 													  timelinesRotation, i << 1, firstFrame);
 			else {
+				if (timelineBlend == SP_MIX_BLEND_SETUP) {
+					if (timeline->type == SP_TIMELINE_ATTACHMENT) {
+						if (attachments) direction = SP_MIX_DIRECTION_IN;
+					} else if (timeline->type == SP_TIMELINE_DRAWORDER) {
+						if (drawOrder) direction = SP_MIX_DIRECTION_IN;
+					}
+				}
+
 				spTimeline_apply(timeline, skeleton, animationLast, animationTime, events, &internal->eventsCount,
-								 alpha, timelineBlend, SP_MIX_DIRECTION_OUT);
+								 alpha, timelineBlend, direction);
 			}
 		}
 	}

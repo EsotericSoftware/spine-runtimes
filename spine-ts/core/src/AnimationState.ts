@@ -225,6 +225,7 @@ module spine {
 				from.totalAlpha = 0;
 				for (var i = 0; i < timelineCount; i++) {
 					let timeline = timelines[i];
+					var direction = MixDirection.out;
 					var timelineBlend: MixBlend;
 					var alpha = 0;
 					switch (timelineMode[i]) {
@@ -254,7 +255,14 @@ module spine {
 					else {
 						// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
 						Utils.webkit602BugfixHelper(alpha, blend);
-						timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, MixDirection.out);
+						if (timelineBlend = MixBlend.setup) {
+							if (timeline instanceof AttachmentTimeline) {
+								if (attachments) direction = MixDirection.out;
+							} else if (timeline instanceof DrawOrderTimeline) {
+								if (drawOrder) direction = MixDirection.out;
+							}
+						}
+						timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, direction);
 					}
 				}
 			}

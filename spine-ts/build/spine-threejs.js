@@ -1,7 +1,10 @@
 var __extends = (this && this.__extends) || (function () {
-	var extendStatics = Object.setPrototypeOf ||
-		({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-		function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	var extendStatics = function (d, b) {
+		extendStatics = Object.setPrototypeOf ||
+			({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+			function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+		return extendStatics(d, b);
+	}
 	return function (d, b) {
 		extendStatics(d, b);
 		function __() { this.constructor = d; }
@@ -1470,6 +1473,7 @@ var spine;
 				from.totalAlpha = 0;
 				for (var i = 0; i < timelineCount; i++) {
 					var timeline = timelines[i];
+					var direction = spine.MixDirection.out;
 					var timelineBlend;
 					var alpha = 0;
 					switch (timelineMode[i]) {
@@ -1500,7 +1504,17 @@ var spine;
 						this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
 					else {
 						spine.Utils.webkit602BugfixHelper(alpha, blend);
-						timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, spine.MixDirection.out);
+						if (timelineBlend = spine.MixBlend.setup) {
+							if (timeline instanceof spine.AttachmentTimeline) {
+								if (attachments)
+									direction = spine.MixDirection.out;
+							}
+							else if (timeline instanceof spine.DrawOrderTimeline) {
+								if (drawOrder)
+									direction = spine.MixDirection.out;
+							}
+						}
+						timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, direction);
 					}
 				}
 			}

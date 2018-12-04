@@ -777,6 +777,7 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 		from->_totalAlpha = 0;
 		for (size_t i = 0; i < timelineCount; i++) {
 			Timeline *timeline = timelines[i];
+			MixDirection direction = MixDirection_Out;
 			MixBlend timelineBlend;
 			float alpha;
 			switch (timelineMode[i]) {
@@ -805,8 +806,15 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 				applyRotateTimeline((RotateTimeline*)timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1,
 									firstFrame);
 			} else {
+				if (timelineBlend == MixBlend_Setup) {
+					if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti)) {
+						if (attachments) direction = MixDirection_In;
+					} else if (timeline->getRTTI().isExactly(DrawOrderTimeline::rtti)) {
+						if (drawOrder) direction = MixDirection_In;
+					}
+				}
 				timeline->apply(skeleton, animationLast, animationTime, eventBuffer, alpha, timelineBlend,
-								MixDirection_Out);
+								direction);
 			}
 		}
 	}
