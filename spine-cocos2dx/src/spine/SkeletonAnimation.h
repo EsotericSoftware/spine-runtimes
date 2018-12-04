@@ -109,6 +109,7 @@ protected:
 	spAnimationState* _state;
 
 	bool _ownsAnimationStateData;
+	bool _firstDraw;
 
 	StartListener _startListener;
     InterruptListener _interruptListener;
