@@ -78,12 +78,12 @@ namespace Spine {
 			clippedTriangles.Clear();
 			clippingPolygon.Clear();
 		}
-			
+
 		public void ClipTriangles (float[] vertices, int verticesLength, int[] triangles, int trianglesLength, float[] uvs) {
 			ExposedList<float> clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
 			var clippedTriangles = this.clippedTriangles;
 			var polygons = clippingPolygons.Items;
-			int polygonsCount = clippingPolygons.Count;			
+			int polygonsCount = clippingPolygons.Count;
 
 			int index = 0;
 			clippedVertices.Clear();
@@ -118,7 +118,7 @@ namespace Spine {
 						for (int ii = 0; ii < clipOutputLength; ii += 2) {
 							float x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
 							clippedVerticesItems[s] = x;
-							clippedVerticesItems[s + 1] = y;							
+							clippedVerticesItems[s + 1] = y;
 							float c0 = x - x3, c1 = y - y3;
 							float a = (d0 * c0 + d1 * c1) * d;
 							float b = (d4 * c0 + d2 * c1) * d;
@@ -216,15 +216,27 @@ namespace Spine {
 						}
 						// v1 inside, v2 outside
 						float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
-						output.Add(edgeX + (edgeX2 - edgeX) * ua);
-						output.Add(edgeY + (edgeY2 - edgeY) * ua);
+						float s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
+						if (Math.Abs(s) > 0.000001f) {
+							float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
+							output.Add(edgeX + (edgeX2 - edgeX) * ua);
+							output.Add(edgeY + (edgeY2 - edgeY) * ua);
+						} else {
+							output.Add(edgeX);
+							output.Add(edgeY);
+						}
 					}
 					else if (side2) { // v1 outside, v2 inside
 						float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
-						output.Add(edgeX + (edgeX2 - edgeX) * ua);
-						output.Add(edgeY + (edgeY2 - edgeY) * ua);
+						float s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
+						if (Math.Abs(s) > 0.000001f) {
+							float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
+							output.Add(edgeX + (edgeX2 - edgeX) * ua);
+							output.Add(edgeY + (edgeY2 - edgeY) * ua);
+						} else {
+							output.Add(edgeX);
+							output.Add(edgeY);
+						}
 						output.Add(inputX2);
 						output.Add(inputY2);
 					}

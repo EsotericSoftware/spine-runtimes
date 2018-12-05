@@ -212,7 +212,7 @@ package spine {
 
 			var clippingVertices : Vector.<Number> = clippingArea;
 			var clippingVerticesLast : int = clippingArea.length - 4;
-			var c0 : Number, c2 : Number, ua : Number;
+			var c0 : Number, c2 : Number, s : Number, ua : Number;
 			var i : int, n : int;
 			for (i = 0;; i += 2) {
 				var edgeX : Number = clippingVertices[i], edgeY : Number = clippingVertices[i + 1];
@@ -233,14 +233,26 @@ package spine {
 						}
 						// v1 inside, v2 outside
 						c0 = inputY2 - inputY; c2 = inputX2 - inputX;
-						ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
-						output.push(edgeX + (edgeX2 - edgeX) * ua);
-						output.push(edgeY + (edgeY2 - edgeY) * ua);
+						s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
+						if (Math.abs(s) > 0.000001) {
+							ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
+							output.push(edgeX + (edgeX2 - edgeX) * ua);
+							output.push(edgeY + (edgeY2 - edgeY) * ua);
+						} else {
+							output.push(edgeX);
+							output.push(edgeY);
+						}
 					} else if (side2) { // v1 outside, v2 inside
 						c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-						ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
-						output.push(edgeX + (edgeX2 - edgeX) * ua);
-						output.push(edgeY + (edgeY2 - edgeY) * ua);
+						s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
+						if (Math.abs(s) > 0.000001) {
+							ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
+							output.push(edgeX + (edgeX2 - edgeX) * ua);
+							output.push(edgeY + (edgeY2 - edgeY) * ua);
+						} else {
+							output.push(edgeX);
+							output.push(edgeY);
+						}
 						output.push(inputX2);
 						output.push(inputY2);
 					}
