@@ -415,6 +415,7 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 
 		for i,timeline in ipairs(timelines) do
 			local skipSubsequent = false;
+      local direction = MixDirection.out;
 			local timelineBlend = MixBlend.setup
 			local alpha = 0
 			if timelineMode[i] == SUBSEQUENT then
@@ -439,7 +440,14 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 				if timeline.type == Animation.TimelineType.rotate then
 					self:applyRotateTimeline(timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i * 2, firstFrame)
 				else
-					timeline:apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, MixDirection.out)
+          if timelineBlend == MixBlend.setup then
+            if timeline.type == Animation.TimelineType.attachment then
+              if attachments then direction = MixDirection._in end
+            elseif timeline.type == Animation.TimelineType.drawOrder then
+              if drawOrder then direction = MixDirection._in end
+            end
+          end
+					timeline:apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, direction)
 				end
 			end
 		end

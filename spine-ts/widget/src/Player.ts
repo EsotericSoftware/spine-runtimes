@@ -475,7 +475,7 @@
 
 				let doc = document as any;
 				(dom as any).onfullscreenchange = fullscreenChanged;
-				dom.onwebkitfullscreenchange = fullscreenChanged;
+				(dom as any).onwebkitfullscreenchange = fullscreenChanged;
 
 				if(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement) {
 					if (doc.exitFullscreen) doc.exitFullscreen();

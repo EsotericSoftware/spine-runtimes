@@ -241,6 +241,7 @@ package spine.animation {
 				from.totalAlpha = 0;
 				for (i = 0; i < timelineCount; i++) {
 					var timeline : Timeline = timelines[i];
+					var direction : MixDirection = MixDirection.Out;
 					var timelineBlend: MixBlend;
 					var alpha : Number = 0;
 					switch (timelineMode[i]) {
@@ -267,8 +268,15 @@ package spine.animation {
 					from.totalAlpha += alpha;
 					if (timeline is RotateTimeline)
 						applyRotateTimeline(timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
-					else {					
-						timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, MixDirection.Out);
+					else {	
+						if (timelineBlend == MixBlend.setup) {
+							if (timeline is AttachmentTimeline) {
+								if (attachments) direction = MixDirection.In;				
+							} else if (timeline is DrawOrderTimeline) {
+								if (drawOrder) direction = MixDirection.In;
+							}
+						}
+						timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, direction);
 					}
 				}	
 			}			

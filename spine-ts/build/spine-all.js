@@ -1,7 +1,10 @@
 var __extends = (this && this.__extends) || (function () {
-	var extendStatics = Object.setPrototypeOf ||
-		({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-		function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	var extendStatics = function (d, b) {
+		extendStatics = Object.setPrototypeOf ||
+			({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+			function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+		return extendStatics(d, b);
+	}
 	return function (d, b) {
 		extendStatics(d, b);
 		function __() { this.constructor = d; }
@@ -1470,6 +1473,7 @@ var spine;
 				from.totalAlpha = 0;
 				for (var i = 0; i < timelineCount; i++) {
 					var timeline = timelines[i];
+					var direction = spine.MixDirection.out;
 					var timelineBlend;
 					var alpha = 0;
 					switch (timelineMode[i]) {
@@ -1500,7 +1504,17 @@ var spine;
 						this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
 					else {
 						spine.Utils.webkit602BugfixHelper(alpha, blend);
-						timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, spine.MixDirection.out);
+						if (timelineBlend = spine.MixBlend.setup) {
+							if (timeline instanceof spine.AttachmentTimeline) {
+								if (attachments)
+									direction = spine.MixDirection.out;
+							}
+							else if (timeline instanceof spine.DrawOrderTimeline) {
+								if (drawOrder)
+									direction = spine.MixDirection.out;
+							}
+						}
+						timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, direction);
 					}
 				}
 			}
@@ -10065,7 +10079,8 @@ var spine;
 var spine;
 (function (spine) {
 	var Popup = (function () {
-		function Popup(parent, htmlContent) {
+		function Popup(player, parent, htmlContent) {
+			this.player = player;
 			this.dom = createElement("\n\t\t\t\t<div class=\"spine-player-popup spine-player-hidden\">\n\t\t\t\t</div>\n\t\t\t");
 			this.dom.innerHTML = htmlContent;
 			parent.appendChild(this.dom);
@@ -10074,6 +10089,16 @@ var spine;
 			var _this = this;
 			if (dismissedListener === void 0) { dismissedListener = function () { }; }
 			this.dom.classList.remove("spine-player-hidden");
+			var dismissed = false;
+			var resize = function () {
+				if (!dismissed)
+					requestAnimationFrame(resize);
+				var bottomOffset = Math.abs(_this.dom.getBoundingClientRect().bottom - _this.player.getBoundingClientRect().bottom);
+				var rightOffset = Math.abs(_this.dom.getBoundingClientRect().right - _this.player.getBoundingClientRect().right);
+				var maxHeight = _this.player.clientHeight - bottomOffset - rightOffset;
+				_this.dom.style.maxHeight = maxHeight + "px";
+			};
+			requestAnimationFrame(resize);
 			var justClicked = true;
 			var windowClickListener = function (event) {
 				if (justClicked) {
@@ -10084,6 +10109,7 @@ var spine;
 					_this.dom.parentNode.removeChild(_this.dom);
 					window.removeEventListener("click", windowClickListener);
 					dismissedListener();
+					dismissed = true;
 				}
 			};
 			window.addEventListener("click", windowClickListener);
@@ -10190,6 +10216,10 @@ var spine;
 			this.paused = true;
 			this.playTime = 0;
 			this.speed = 1;
+			this.animationViewports = {};
+			this.currentViewport = null;
+			this.previousViewport = null;
+			this.viewportTransitionStart = 0;
 			parent.appendChild(this.render());
 		}
 		SpinePlayer.prototype.validateConfig = function (config) {
@@ -10317,8 +10347,25 @@ var spine;
 			};
 			var oldWidth = this.canvas.clientWidth;
 			var oldHeight = this.canvas.clientHeight;
+			var oldStyleWidth = this.canvas.style.width;
+			var oldStyleHeight = this.canvas.style.height;
+			var isFullscreen = false;
 			fullscreenButton.onclick = function () {
+				var fullscreenChanged = function () {
+					isFullscreen = !isFullscreen;
+					if (!isFullscreen) {
+						_this.canvas.style.width = "" + oldWidth + "px";
+						_this.canvas.style.height = "" + oldHeight + "px";
+						_this.drawFrame(false);
+						requestAnimationFrame(function () {
+							_this.canvas.style.width = oldStyleWidth;
+							_this.canvas.style.height = oldStyleHeight;
+						});
+					}
+				};
 				var doc = document;
+				dom.onfullscreenchange = fullscreenChanged;
+				dom.onwebkitfullscreenchange = fullscreenChanged;
 				if (doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement) {
 					if (doc.exitFullscreen)
 						doc.exitFullscreen();
@@ -10328,19 +10375,12 @@ var spine;
 						doc.webkitExitFullscreen();
 					else if (doc.msExitFullscreen)
 						doc.msExitFullscreen();
-					var oldStyleWidth_1 = _this.canvas.style.width;
-					var oldStyleHeight_1 = _this.canvas.style.height;
-					_this.canvas.style.width = "" + oldWidth + "px";
-					_this.canvas.style.height = "" + oldHeight + "px";
-					_this.drawFrame(false);
-					requestAnimationFrame(function () {
-						_this.canvas.style.width = oldStyleWidth_1;
-						_this.canvas.style.height = oldStyleHeight_1;
-					});
 				}
 				else {
 					oldWidth = _this.canvas.clientWidth;
 					oldHeight = _this.canvas.clientHeight;
+					oldStyleWidth = _this.canvas.style.width;
+					oldStyleHeight = _this.canvas.style.height;
 					var player = dom;
 					if (player.requestFullscreen)
 						player.requestFullscreen();
@@ -10362,7 +10402,7 @@ var spine;
 		};
 		SpinePlayer.prototype.showSpeedDialog = function (speedButton) {
 			var _this = this;
-			var popup = new Popup(this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Speed</div>\n\t\t\t\t<hr>\n\t\t\t\t<div class=\"spine-player-row\" style=\"user-select: none; align-items: center; padding: 8px;\">\n\t\t\t\t\t<div class=\"spine-player-column\">\n\t\t\t\t\t\t<div class=\"spine-player-speed-slider\" style=\"margin-bottom: 4px;\"></div>\n\t\t\t\t\t\t<div class=\"spine-player-row\" style=\"justify-content: space-between;\">\n\t\t\t\t\t\t\t<div>0.1x</div>\n\t\t\t\t\t\t\t<div>1x</div>\n\t\t\t\t\t\t\t<div>2x</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t");
+			var popup = new Popup(this.dom, this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Speed</div>\n\t\t\t\t<hr>\n\t\t\t\t<div class=\"spine-player-row\" style=\"user-select: none; align-items: center; padding: 8px;\">\n\t\t\t\t\t<div class=\"spine-player-column\">\n\t\t\t\t\t\t<div class=\"spine-player-speed-slider\" style=\"margin-bottom: 4px;\"></div>\n\t\t\t\t\t\t<div class=\"spine-player-row\" style=\"justify-content: space-between;\">\n\t\t\t\t\t\t\t<div>0.1x</div>\n\t\t\t\t\t\t\t<div>1x</div>\n\t\t\t\t\t\t\t<div>2x</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t");
 			var sliderParent = findWithClass(popup.dom, "spine-player-speed-slider")[0];
 			var slider = new Slider(2, 0.1, true);
 			sliderParent.appendChild(slider.render());
@@ -10379,7 +10419,7 @@ var spine;
 			var _this = this;
 			if (!this.skeleton || this.skeleton.data.animations.length == 0)
 				return;
-			var popup = new Popup(this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Animations</div>\n\t\t\t\t<hr>\n\t\t\t\t<ul class=\"spine-player-list\"></ul>\n\t\t\t");
+			var popup = new Popup(this.dom, this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Animations</div>\n\t\t\t\t<hr>\n\t\t\t\t<ul class=\"spine-player-list\"></ul>\n\t\t\t");
 			var rows = findWithClass(popup.dom, "spine-player-list")[0];
 			this.skeleton.data.animations.forEach(function (animation) {
 				if (_this.config.animations && _this.config.animations.indexOf(animation.name) < 0) {
@@ -10395,7 +10435,7 @@ var spine;
 					row.classList.add("selected");
 					_this.config.animation = animation.name;
 					_this.playTime = 0;
-					_this.animationState.setAnimation(0, _this.config.animation, true);
+					_this.setAnimation(animation.name);
 				};
 			});
 			animationsButton.classList.add("spine-player-button-icon-animations-selected");
@@ -10407,7 +10447,7 @@ var spine;
 			var _this = this;
 			if (!this.skeleton || this.skeleton.data.animations.length == 0)
 				return;
-			var popup = new Popup(this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Skins</div>\n\t\t\t\t<hr>\n\t\t\t\t<ul class=\"spine-player-list\"></ul>\n\t\t\t");
+			var popup = new Popup(this.dom, this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Skins</div>\n\t\t\t\t<hr>\n\t\t\t\t<ul class=\"spine-player-list\"></ul>\n\t\t\t");
 			var rows = findWithClass(popup.dom, "spine-player-list")[0];
 			this.skeleton.data.skins.forEach(function (skin) {
 				if (_this.config.skins && _this.config.skins.indexOf(skin.name) < 0) {
@@ -10435,7 +10475,7 @@ var spine;
 			var _this = this;
 			if (!this.skeleton || this.skeleton.data.animations.length == 0)
 				return;
-			var popup = new Popup(this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Debug</div>\n\t\t\t\t<hr>\n\t\t\t\t<ul class=\"spine-player-list\">\n\t\t\t\t</li>\n\t\t\t");
+			var popup = new Popup(this.dom, this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Debug</div>\n\t\t\t\t<hr>\n\t\t\t\t<ul class=\"spine-player-list\">\n\t\t\t\t</li>\n\t\t\t");
 			var rows = findWithClass(popup.dom, "spine-player-list")[0];
 			var makeItem = function (label, name) {
 				var row = createElement("<li class=\"spine-player-list-item\"></li>");
@@ -10492,15 +10532,36 @@ var spine;
 					this.animationState.apply(this.skeleton);
 				}
 				this.skeleton.updateWorldTransform();
-				var viewportSize = this.scale(this.config.viewport.width, this.config.viewport.height, this.canvas.width, this.canvas.height);
-				this.sceneRenderer.camera.zoom = this.config.viewport.width / viewportSize.x;
-				this.sceneRenderer.camera.position.x = this.config.viewport.x + this.config.viewport.width / 2;
-				this.sceneRenderer.camera.position.y = this.config.viewport.y + this.config.viewport.height / 2;
+				var viewport = {
+					x: this.currentViewport.x - this.currentViewport.padLeft,
+					y: this.currentViewport.y - this.currentViewport.padBottom,
+					width: this.currentViewport.width + this.currentViewport.padLeft + this.currentViewport.padRight,
+					height: this.currentViewport.height + this.currentViewport.padBottom + this.currentViewport.padTop
+				};
+				var transitionAlpha = ((performance.now() - this.viewportTransitionStart) / 1000) / this.config.viewport.transitionTime;
+				if (this.previousViewport && transitionAlpha < 1) {
+					var oldViewport = {
+						x: this.previousViewport.x - this.previousViewport.padLeft,
+						y: this.previousViewport.y - this.previousViewport.padBottom,
+						width: this.previousViewport.width + this.previousViewport.padLeft + this.previousViewport.padRight,
+						height: this.previousViewport.height + this.previousViewport.padBottom + this.previousViewport.padTop
+					};
+					viewport = {
+						x: oldViewport.x + (viewport.x - oldViewport.x) * transitionAlpha,
+						y: oldViewport.y + (viewport.y - oldViewport.y) * transitionAlpha,
+						width: oldViewport.width + (viewport.width - oldViewport.width) * transitionAlpha,
+						height: oldViewport.height + (viewport.height - oldViewport.height) * transitionAlpha
+					};
+				}
+				var viewportSize = this.scale(viewport.width, viewport.height, this.canvas.width, this.canvas.height);
+				this.sceneRenderer.camera.zoom = viewport.width / viewportSize.x;
+				this.sceneRenderer.camera.position.x = viewport.x + viewport.width / 2;
+				this.sceneRenderer.camera.position.y = viewport.y + viewport.height / 2;
 				this.sceneRenderer.begin();
 				if (this.config.backgroundImage && this.config.backgroundImage.url) {
 					var bgImage = this.assetManager.get(this.config.backgroundImage.url);
 					if (!this.config.backgroundImage.x) {
-						this.sceneRenderer.drawTexture(bgImage, this.config.viewport.x, this.config.viewport.y, this.config.viewport.width, this.config.viewport.height);
+						this.sceneRenderer.drawTexture(bgImage, viewport.x, viewport.y, viewport.width, viewport.height);
 					}
 					else {
 						this.sceneRenderer.drawTexture(bgImage, this.config.backgroundImage.x, this.config.backgroundImage.y, this.config.backgroundImage.width, this.config.backgroundImage.height);
@@ -10529,6 +10590,10 @@ var spine;
 					this.sceneRenderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);
 				}
 				gl.lineWidth(1);
+				if (this.config.viewport.debugRender) {
+					this.sceneRenderer.rect(false, this.currentViewport.x, this.currentViewport.y, this.currentViewport.width, this.currentViewport.height, spine.Color.GREEN);
+					this.sceneRenderer.rect(false, viewport.x, viewport.y, viewport.width, viewport.height, spine.Color.RED);
+				}
 				this.sceneRenderer.end();
 				this.sceneRenderer.camera.zoom = 0;
 			}
@@ -10593,21 +10658,27 @@ var spine;
 				this.skeleton.setSkinByName(this.config.skin);
 				this.skeleton.setSlotsToSetupPose();
 			}
-			if (!this.config.viewport || !this.config.viewport.x || !this.config.viewport.y || !this.config.viewport.width || !this.config.viewport.height) {
+			if (!this.config.viewport) {
 				this.config.viewport = {
-					x: 0,
-					y: 0,
-					width: 0,
-					height: 0
+					animations: {},
+					debugRender: false,
+					transitionTime: 0.2
 				};
-				this.skeleton.updateWorldTransform();
-				var offset = new spine.Vector2();
-				var size = new spine.Vector2();
-				this.skeleton.getBounds(offset, size);
-				this.config.viewport.x = offset.x + size.x / 2 - size.x / 2 * 1.2;
-				this.config.viewport.y = offset.y + size.y / 2 - size.y / 2 * 1.2;
-				this.config.viewport.width = size.x * 1.2;
-				this.config.viewport.height = size.y * 1.2;
+			}
+			if (typeof this.config.viewport.debugRender === "undefined")
+				this.config.viewport.debugRender = false;
+			if (typeof this.config.viewport.transitionTime === "undefined")
+				this.config.viewport.transitionTime = 0.2;
+			if (!this.config.viewport.animations) {
+				this.config.viewport.animations = {};
+			}
+			else {
+				Object.getOwnPropertyNames(this.config.viewport.animations).forEach(function (animation) {
+					if (!skeletonData.findAnimation(animation)) {
+						_this.showError("Error: animation '" + animation + "' for which a viewport was specified does not exist in skeleton.");
+						return;
+					}
+				});
 			}
 			if (this.config.animations && this.config.animations.length > 0) {
 				this.config.animations.forEach(function (animation) {
@@ -10742,7 +10813,7 @@ var spine;
 			this.playButton.classList.add("spine-player-button-icon-pause");
 			if (this.config.animation) {
 				if (!this.animationState.getCurrent(0)) {
-					this.animationState.setAnimation(0, this.config.animation, true);
+					this.setAnimation(this.config.animation);
 				}
 			}
 		};
@@ -10750,6 +10821,103 @@ var spine;
 			this.paused = true;
 			this.playButton.classList.remove("spine-player-button-icon-pause");
 			this.playButton.classList.add("spine-player-button-icon-play");
+		};
+		SpinePlayer.prototype.setAnimation = function (animation) {
+			this.previousViewport = this.currentViewport;
+			var animViewport = this.calculateAnimationViewport(animation);
+			var viewport = {
+				x: animViewport.x,
+				y: animViewport.y,
+				width: animViewport.width,
+				height: animViewport.height,
+				padLeft: "10%",
+				padRight: "10%",
+				padTop: "10%",
+				padBottom: "10%"
+			};
+			var globalViewport = this.config.viewport;
+			if (typeof globalViewport.x !== "undefined" && typeof globalViewport.y !== "undefined" && typeof globalViewport.width !== "undefined" && typeof globalViewport.height !== "undefined") {
+				viewport.x = globalViewport.x;
+				viewport.y = globalViewport.y;
+				viewport.width = globalViewport.width;
+				viewport.height = globalViewport.height;
+			}
+			if (typeof globalViewport.padLeft !== "undefined")
+				viewport.padLeft = globalViewport.padLeft;
+			if (typeof globalViewport.padRight !== "undefined")
+				viewport.padRight = globalViewport.padRight;
+			if (typeof globalViewport.padTop !== "undefined")
+				viewport.padTop = globalViewport.padTop;
+			if (typeof globalViewport.padBottom !== "undefined")
+				viewport.padBottom = globalViewport.padBottom;
+			var userAnimViewport = this.config.viewport.animations[animation];
+			if (userAnimViewport) {
+				if (typeof userAnimViewport.x !== "undefined" && typeof userAnimViewport.y !== "undefined" && typeof userAnimViewport.width !== "undefined" && typeof userAnimViewport.height !== "undefined") {
+					viewport.x = userAnimViewport.x;
+					viewport.y = userAnimViewport.y;
+					viewport.width = userAnimViewport.width;
+					viewport.height = userAnimViewport.height;
+				}
+				if (typeof userAnimViewport.padLeft !== "undefined")
+					viewport.padLeft = userAnimViewport.padLeft;
+				if (typeof userAnimViewport.padRight !== "undefined")
+					viewport.padRight = userAnimViewport.padRight;
+				if (typeof userAnimViewport.padTop !== "undefined")
+					viewport.padTop = userAnimViewport.padTop;
+				if (typeof userAnimViewport.padBottom !== "undefined")
+					viewport.padBottom = userAnimViewport.padBottom;
+			}
+			viewport.padLeft = this.percentageToWorldUnit(viewport.width, viewport.padLeft);
+			viewport.padRight = this.percentageToWorldUnit(viewport.width, viewport.padRight);
+			viewport.padBottom = this.percentageToWorldUnit(viewport.height, viewport.padBottom);
+			viewport.padTop = this.percentageToWorldUnit(viewport.height, viewport.padTop);
+			this.currentViewport = viewport;
+			this.viewportTransitionStart = performance.now();
+			this.animationState.clearTracks();
+			this.skeleton.setToSetupPose();
+			this.animationState.setAnimation(0, this.config.animation, true);
+		};
+		SpinePlayer.prototype.percentageToWorldUnit = function (size, percentageOrAbsolute) {
+			if (typeof percentageOrAbsolute === "string") {
+				return size * parseFloat(percentageOrAbsolute.substr(0, percentageOrAbsolute.length - 1)) / 100;
+			}
+			else {
+				return percentageOrAbsolute;
+			}
+		};
+		SpinePlayer.prototype.calculateAnimationViewport = function (animationName) {
+			var animation = this.skeleton.data.findAnimation(animationName);
+			this.animationState.clearTracks();
+			this.skeleton.setToSetupPose();
+			this.animationState.setAnimationWith(0, animation, true);
+			var steps = 100;
+			var stepTime = animation.duration > 0 ? animation.duration / steps : 0;
+			var minX = 100000000;
+			var maxX = -100000000;
+			var minY = 100000000;
+			var maxY = -100000000;
+			var offset = new spine.Vector2();
+			var size = new spine.Vector2();
+			for (var i = 0; i < steps; i++) {
+				this.animationState.update(stepTime);
+				this.animationState.apply(this.skeleton);
+				this.skeleton.updateWorldTransform();
+				this.skeleton.getBounds(offset, size);
+				minX = Math.min(offset.x, minX);
+				maxX = Math.max(offset.x + size.x, maxX);
+				minY = Math.min(offset.y, minY);
+				maxY = Math.max(offset.y + size.y, maxY);
+			}
+			offset.x = minX;
+			offset.y = minY;
+			size.x = maxX - minX;
+			size.y = maxY - minY;
+			return {
+				x: offset.x,
+				y: offset.y,
+				width: size.x,
+				height: size.y
+			};
 		};
 		SpinePlayer.HOVER_COLOR_INNER = new spine.Color(0.478, 0, 0, 0.25);
 		SpinePlayer.HOVER_COLOR_OUTER = new spine.Color(1, 1, 1, 1);
