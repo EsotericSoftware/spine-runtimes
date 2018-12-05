@@ -213,15 +213,15 @@ namespace Spine.Unity.Editor {
 
 			// Data Refresh Edit Mode.
 			// This prevents deserialized SkeletonData from persisting from play mode to edit mode.
-#if NEWPLAYMODECALLBACKS
+			#if NEWPLAYMODECALLBACKS
 			EditorApplication.playModeStateChanged -= DataReloadHandler.OnPlaymodeStateChanged;
 			EditorApplication.playModeStateChanged += DataReloadHandler.OnPlaymodeStateChanged;
 			DataReloadHandler.OnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
-#else
+			#else
 			EditorApplication.playmodeStateChanged -= DataReloadHandler.OnPlaymodeStateChanged;
 			EditorApplication.playmodeStateChanged += DataReloadHandler.OnPlaymodeStateChanged;
 			DataReloadHandler.OnPlaymodeStateChanged();
-#endif
+			#endif
 
 			initialized = true;
 		}
@@ -233,11 +233,11 @@ namespace Spine.Unity.Editor {
 #endregion
 
 		public static class Preferences {
-#if SPINE_TK2D
+			#if SPINE_TK2D
 			const float DEFAULT_DEFAULT_SCALE = 1f;
-#else
+			#else
 			const float DEFAULT_DEFAULT_SCALE = 0.01f;
-#endif
+			#endif
 			const string DEFAULT_SCALE_KEY = "SPINE_DEFAULT_SCALE";
 			public static float defaultScale = DEFAULT_DEFAULT_SCALE;
 
@@ -302,11 +302,11 @@ namespace Spine.Unity.Editor {
 				showHierarchyIcons = EditorGUILayout.Toggle(new GUIContent("Show Hierarchy Icons", "Show relevant icons on GameObjects with Spine Components on them. Disable this if you have large, complex scenes."), showHierarchyIcons);
 				if (EditorGUI.EndChangeCheck()) {
 					EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, showHierarchyIcons);
-#if NEWPLAYMODECALLBACKS
+					#if NEWPLAYMODECALLBACKS
 					HierarchyHandler.IconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
-#else
+					#else
 					HierarchyHandler.IconsOnPlaymodeStateChanged();
-#endif
+					#endif
 				}
 
 				BoolPrefsField(ref autoReloadSceneSkeletons, AUTO_RELOAD_SCENESKELETONS_KEY, new GUIContent("Auto-reload scene components", "Reloads Skeleton components in the scene whenever their SkeletonDataAsset is modified. This makes it so changes in the SkeletonDataAsset inspector are immediately reflected. This may be slow when your scenes have large numbers of SkeletonRenderers or SkeletonGraphic."));
@@ -491,7 +491,7 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
-			#region Match SkeletonData with Atlases
+#region Match SkeletonData with Atlases
 			static readonly AttachmentType[] AtlasTypes = { AttachmentType.Region, AttachmentType.Linkedmesh, AttachmentType.Mesh };
 
 			public static List<string> GetRequiredAtlasRegions (string skeletonDataPath) {
@@ -608,7 +608,7 @@ namespace Spine.Unity.Editor {
 					return new ClippingAttachment(name);
 				}
 			}
-			#endregion
+#endregion
 
 			public static void ImportSpineContent (string[] imported, bool reimport = false) {
 				var atlasPaths = new List<string>();
@@ -663,9 +663,9 @@ namespace Spine.Unity.Editor {
 
 					string dir = Path.GetDirectoryName(skeletonPath);
 
-					#if SPINE_TK2D
+#if SPINE_TK2D
 					IngestSpineProject(AssetDatabase.LoadAssetAtPath(sp, typeof(TextAsset)) as TextAsset, null);
-					#else
+#else
 					var localAtlases = FindAtlasesAtPath(dir);
 					var requiredPaths = GetRequiredAtlasRegions(skeletonPath);
 					var atlasMatch = GetMatchingAtlas(requiredPaths, localAtlases);
@@ -677,7 +677,7 @@ namespace Spine.Unity.Editor {
 
 					if (abortSkeletonImport)
 						break;
-					#endif
+#endif
 				}
 				// Any post processing of images
 			}
@@ -722,10 +722,10 @@ namespace Spine.Unity.Editor {
 							SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
 							string currentHash = skeletonData != null ? skeletonData.Hash : null;
 
-							#if SPINE_SKELETONMECANIM
+#if SPINE_SKELETONMECANIM
 							if (currentHash == null || lastHash != currentHash)
 								SkeletonBaker.UpdateMecanimClips(skeletonDataAsset);
-							#endif
+#endif
 
 							// if (currentHash == null || lastHash != currentHash)
 							// Do any upkeep on synchronized assets
@@ -737,7 +737,7 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
-			#region Import Atlases
+#region Import Atlases
 			static List<AtlasAssetBase> FindAtlasesAtPath (string path) {
 				List<AtlasAssetBase> arr = new List<AtlasAssetBase>();
 				DirectoryInfo dir = new DirectoryInfo(path);
@@ -883,15 +883,15 @@ namespace Spine.Unity.Editor {
 				protectFromStackGarbageCollection.Remove(atlasAsset);
 				return (AtlasAssetBase)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(AtlasAssetBase));
 			}
-			#endregion
+#endregion
 
-			#region Import SkeletonData (json or binary)
+#region Import SkeletonData (json or binary)
 			internal static SkeletonDataAsset IngestSpineProject (TextAsset spineJson, params AtlasAssetBase[] atlasAssets) {
 				string primaryName = Path.GetFileNameWithoutExtension(spineJson.name);
 				string assetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(spineJson));
 				string filePath = assetPath + "/" + primaryName + SkeletonDataSuffix + ".asset";
 
-				#if SPINE_TK2D
+#if SPINE_TK2D
 				if (spineJson != null) {
 					SkeletonDataAsset skeletonDataAsset = (SkeletonDataAsset)AssetDatabase.LoadAssetAtPath(filePath, typeof(SkeletonDataAsset));
 					if (skeletonDataAsset == null) {
@@ -916,7 +916,7 @@ namespace Spine.Unity.Editor {
 					return null;
 				}
 
-				#else
+#else
 				if (spineJson != null && atlasAssets != null) {
 					SkeletonDataAsset skeletonDataAsset = (SkeletonDataAsset)AssetDatabase.LoadAssetAtPath(filePath, typeof(SkeletonDataAsset));
 					if (skeletonDataAsset == null) {
@@ -941,11 +941,11 @@ namespace Spine.Unity.Editor {
 					EditorUtility.DisplayDialog("Error!", "Must specify both Spine JSON and AtlasAsset array", "OK");
 					return null;
 				}
-				#endif
+#endif
 			}
-			#endregion
+#endregion
 
-			#region Spine Skeleton Data File Validation
+#region Spine Skeleton Data File Validation
 			public static bool CheckForValidSkeletonData (string skeletonJSONPath) {
 				string dir = Path.GetDirectoryName(skeletonJSONPath);
 				TextAsset textAsset = (TextAsset)AssetDatabase.LoadAssetAtPath(skeletonJSONPath, typeof(TextAsset));
@@ -1032,9 +1032,9 @@ namespace Spine.Unity.Editor {
 
 				return isSpineData;
 			}
-			#endregion
+#endregion
 
-			#region Dialogs
+#region Dialogs
 			public static void SkeletonImportDialog (string skeletonPath, List<AtlasAssetBase> localAtlases, List<string> requiredPaths, ref bool abortSkeletonImport) {
 				bool resolved = false;
 				while (!resolved) {
@@ -1179,7 +1179,7 @@ namespace Spine.Unity.Editor {
 
 				return (AtlasAssetBase)obj;
 			}
-			#endregion
+#endregion
 
 			public static string GetPathSafeName (string name) {
 				foreach (char c in System.IO.Path.GetInvalidFileNameChars()) { // Doesn't handle more obscure file name limitations.
@@ -1301,8 +1301,8 @@ namespace Spine.Unity.Editor {
 				EditorGUIUtility.PingObject(Selection.activeObject);
 			}
 
-			#region SkeletonMecanim
-			#if SPINE_SKELETONMECANIM
+#region SkeletonMecanim
+#if SPINE_SKELETONMECANIM
 			public static SkeletonMecanim InstantiateSkeletonMecanim (SkeletonDataAsset skeletonDataAsset, string skinName) {
 				return InstantiateSkeletonMecanim(skeletonDataAsset, skeletonDataAsset.GetSkeletonData(true).FindSkin(skinName));
 			}
@@ -1354,8 +1354,8 @@ namespace Spine.Unity.Editor {
 
 				return newSkeletonMecanim;
 			}
-			#endif
-			#endregion
+#endif
+#endregion
 		}
 
 		public static class DragAndDropInstantiation {
@@ -1428,7 +1428,7 @@ namespace Spine.Unity.Editor {
 						});
 				}
 
-				#if SPINE_SKELETONMECANIM
+#if SPINE_SKELETONMECANIM
 				menu.AddSeparator("");
 				// SkeletonMecanim
 				menu.AddItem(new GUIContent("SkeletonMecanim"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
@@ -1436,7 +1436,7 @@ namespace Spine.Unity.Editor {
 					spawnPoint = spawnPoint,
 					instantiateDelegate = (data) => EditorInstantiation.InstantiateSkeletonMecanim(data)
 				});
-				#endif
+#endif
 
 				menu.ShowAsContext();
 			}
