@@ -265,6 +265,10 @@ namespace Spine.Unity.Editor {
 			const string SET_TEXTUREIMPORTER_SETTINGS_KEY = "SPINE_SET_TEXTUREIMPORTER_SETTINGS";
 			public static bool setTextureImporterSettings = DEFAULT_SET_TEXTUREIMPORTER_SETTINGS;
 
+			const bool DEFAULT_ATLASTXT_WARNING = true;
+			const string ATLASTXT_WARNING_KEY = "SPINE_ATLASTXT_WARNING";
+			public static bool atlasTxtImportWarning = DEFAULT_SET_TEXTUREIMPORTER_SETTINGS;
+
 			internal const float DEFAULT_MIPMAPBIAS = -0.5f;
 
 			public const float DEFAULT_SCENE_ICONS_SCALE = 1f;
@@ -284,6 +288,7 @@ namespace Spine.Unity.Editor {
 				showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, DEFAULT_SHOW_HIERARCHY_ICONS);
 				setTextureImporterSettings = EditorPrefs.GetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, DEFAULT_SET_TEXTUREIMPORTER_SETTINGS);
 				autoReloadSceneSkeletons = EditorPrefs.GetBool(AUTO_RELOAD_SCENESKELETONS_KEY, DEFAULT_AUTO_RELOAD_SCENESKELETONS);
+				atlasTxtImportWarning = EditorPrefs.GetBool(ATLASTXT_WARNING_KEY, DEFAULT_ATLASTXT_WARNING);
 
 				SpineHandles.handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, DEFAULT_SCENE_ICONS_SCALE);
 				preferencesLoaded = true;
@@ -303,57 +308,48 @@ namespace Spine.Unity.Editor {
 					HierarchyHandler.IconsOnPlaymodeStateChanged();
 #endif
 				}
-				autoReloadSceneSkeletons = EditorGUILayout.Toggle(new GUIContent("Auto-reload scene components", "Reloads Skeleton components in the scene whenever their SkeletonDataAsset is modified. This makes it so changes in the SkeletonDataAsset inspector are immediately reflected. This may be slow when your scenes have large numbers of SkeletonRenderers or SkeletonGraphic."), autoReloadSceneSkeletons);
 
+				BoolPrefsField(ref autoReloadSceneSkeletons, AUTO_RELOAD_SCENESKELETONS_KEY, new GUIContent("Auto-reload scene components", "Reloads Skeleton components in the scene whenever their SkeletonDataAsset is modified. This makes it so changes in the SkeletonDataAsset inspector are immediately reflected. This may be slow when your scenes have large numbers of SkeletonRenderers or SkeletonGraphic."));
 
 				EditorGUILayout.Separator();
-
 				EditorGUILayout.LabelField("Auto-Import Settings", EditorStyles.boldLabel);
+				{
+					SpineEditorUtilities.FloatPrefsField(ref defaultMix, DEFAULT_MIX_KEY, new GUIContent("Default Mix", "The Default Mix Duration for newly imported SkeletonDataAssets."));
+					SpineEditorUtilities.FloatPrefsField(ref defaultScale, DEFAULT_SCALE_KEY, new GUIContent("Default SkeletonData Scale", "The Default skeleton import scale for newly imported SkeletonDataAssets."));
 
-				EditorGUI.BeginChangeCheck();
-				defaultMix = EditorGUILayout.FloatField("Default Mix", defaultMix);
-				if (EditorGUI.EndChangeCheck())
-					EditorPrefs.SetFloat(DEFAULT_MIX_KEY, defaultMix);
+					EditorGUI.BeginChangeCheck();
+					var shader = (EditorGUILayout.ObjectField("Default Shader", Shader.Find(defaultShader), typeof(Shader), false) as Shader);
+					defaultShader = shader != null ? shader.name : DEFAULT_DEFAULT_SHADER;
+					if (EditorGUI.EndChangeCheck())
+						EditorPrefs.SetString(DEFAULT_SHADER_KEY, defaultShader);
 
-				EditorGUI.BeginChangeCheck();
-				defaultScale = EditorGUILayout.FloatField("Default SkeletonData Scale", defaultScale);
-				if (EditorGUI.EndChangeCheck())
-					EditorPrefs.SetFloat(DEFAULT_SCALE_KEY, defaultScale);
-
-				EditorGUI.BeginChangeCheck();
-				var shader = (EditorGUILayout.ObjectField("Default Shader", Shader.Find(defaultShader), typeof(Shader), false) as Shader);
-				defaultShader = shader != null ? shader.name : DEFAULT_DEFAULT_SHADER;
-				if (EditorGUI.EndChangeCheck())
-					EditorPrefs.SetString(DEFAULT_SHADER_KEY, defaultShader);
-
-				EditorGUI.BeginChangeCheck();
-				setTextureImporterSettings = EditorGUILayout.Toggle(new GUIContent("Apply Atlas Texture Settings", "Apply the recommended settings for Texture Importers."), showHierarchyIcons);
-				if (EditorGUI.EndChangeCheck()) {
-					EditorPrefs.SetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, showHierarchyIcons);
+					SpineEditorUtilities.BoolPrefsField(ref setTextureImporterSettings, SET_TEXTUREIMPORTER_SETTINGS_KEY, new GUIContent("Apply Atlas Texture Settings", "Apply the recommended settings for Texture Importers."));
+					SpineEditorUtilities.BoolPrefsField(ref atlasTxtImportWarning, ATLASTXT_WARNING_KEY, new GUIContent("Atlas Extension Warning", "Log a warning and recommendation whenever a `.atlas` file is found."));
 				}
 
 				EditorGUILayout.Space();
-
 				EditorGUILayout.LabelField("Editor Instantiation", EditorStyles.boldLabel);
-				EditorGUI.BeginChangeCheck();
-				defaultZSpacing = EditorGUILayout.Slider("Default Slot Z-Spacing", defaultZSpacing, -0.1f, 0f);
-				if (EditorGUI.EndChangeCheck())
-					EditorPrefs.SetFloat(DEFAULT_ZSPACING_KEY, defaultZSpacing);
+				{
+					EditorGUI.BeginChangeCheck();
+					defaultZSpacing = EditorGUILayout.Slider("Default Slot Z-Spacing", defaultZSpacing, -0.1f, 0f);
+					if (EditorGUI.EndChangeCheck())
+						EditorPrefs.SetFloat(DEFAULT_ZSPACING_KEY, defaultZSpacing);
 
-				EditorGUI.BeginChangeCheck();
-				defaultInstantiateLoop = EditorGUILayout.Toggle(new GUIContent("Default Loop", "Spawn Spine GameObjects with loop enabled."), defaultInstantiateLoop);
-				if (EditorGUI.EndChangeCheck())
-					EditorPrefs.SetBool(DEFAULT_INSTANTIATE_LOOP_KEY, defaultInstantiateLoop);
+					SpineEditorUtilities.BoolPrefsField(ref defaultInstantiateLoop, DEFAULT_INSTANTIATE_LOOP_KEY, new GUIContent("Default Loop", "Spawn Spine GameObjects with loop enabled."));
+				}
 
 				EditorGUILayout.Space();
 				EditorGUILayout.LabelField("Handles and Gizmos", EditorStyles.boldLabel);
-				EditorGUI.BeginChangeCheck();
-				SpineHandles.handleScale = EditorGUILayout.Slider("Editor Bone Scale", SpineHandles.handleScale, 0.01f, 2f);
-				SpineHandles.handleScale = Mathf.Max(0.01f, SpineHandles.handleScale);
-				if (EditorGUI.EndChangeCheck()) {
-					EditorPrefs.SetFloat(SCENE_ICONS_SCALE_KEY, SpineHandles.handleScale);
-					SceneView.RepaintAll();
+				{
+					EditorGUI.BeginChangeCheck();
+					SpineHandles.handleScale = EditorGUILayout.Slider("Editor Bone Scale", SpineHandles.handleScale, 0.01f, 2f);
+					SpineHandles.handleScale = Mathf.Max(0.01f, SpineHandles.handleScale);
+					if (EditorGUI.EndChangeCheck()) {
+						EditorPrefs.SetFloat(SCENE_ICONS_SCALE_KEY, SpineHandles.handleScale);
+						SceneView.RepaintAll();
+					}
 				}
+				
 
 
 				GUILayout.Space(20);
@@ -367,6 +363,22 @@ namespace Spine.Unity.Editor {
 				}
 			}
 		}
+
+		static void BoolPrefsField (ref bool currentValue, string editorPrefsKey, GUIContent label) {
+			EditorGUI.BeginChangeCheck();
+			currentValue = EditorGUILayout.Toggle(label, currentValue);
+			if (EditorGUI.EndChangeCheck())
+				EditorPrefs.SetBool(editorPrefsKey, currentValue);
+		}
+
+		static void FloatPrefsField (ref float currentValue, string editorPrefsKey, GUIContent label) {
+			EditorGUI.BeginChangeCheck();
+			currentValue = EditorGUILayout.DelayedFloatField(label, currentValue);
+			if (EditorGUI.EndChangeCheck())
+				EditorPrefs.SetFloat(editorPrefsKey, currentValue);
+		}
+
+
 
 		public static class DataReloadHandler {
 #if NEWPLAYMODECALLBACKS
@@ -606,6 +618,11 @@ namespace Spine.Unity.Editor {
 				foreach (string str in imported) {
 					string extension = Path.GetExtension(str).ToLower();
 					switch (extension) {
+						case ".atlas":
+							if (SpineEditorUtilities.Preferences.atlasTxtImportWarning) {
+								Debug.LogWarningFormat("`{0}` : If this file is a Spine atlas, please change its extension to `.atlas.txt`. This is to allow Unity to recognize it and avoid filename collisions. You can also set this file extension when exporting from the Spine editor.", str);
+							}
+							break;
 						case ".txt":
 							if (str.EndsWith(".atlas.txt", System.StringComparison.Ordinal))
 								atlasPaths.Add(str);
