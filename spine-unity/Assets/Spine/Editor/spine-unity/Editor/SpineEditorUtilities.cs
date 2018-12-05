@@ -314,8 +314,8 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.Separator();
 				EditorGUILayout.LabelField("Auto-Import Settings", EditorStyles.boldLabel);
 				{
-					SpineEditorUtilities.FloatPrefsField(ref defaultMix, DEFAULT_MIX_KEY, new GUIContent("Default Mix", "The Default Mix Duration for newly imported SkeletonDataAssets."));
-					SpineEditorUtilities.FloatPrefsField(ref defaultScale, DEFAULT_SCALE_KEY, new GUIContent("Default SkeletonData Scale", "The Default skeleton import scale for newly imported SkeletonDataAssets."));
+					SpineEditorUtilities.FloatPrefsField(ref defaultMix, DEFAULT_MIX_KEY, new GUIContent("Default Mix", "The Default Mix Duration for newly imported SkeletonDataAssets."), min: 0);
+					SpineEditorUtilities.FloatPrefsField(ref defaultScale, DEFAULT_SCALE_KEY, new GUIContent("Default SkeletonData Scale", "The Default skeleton import scale for newly imported SkeletonDataAssets."), min: 0.0000001f);
 
 					EditorGUI.BeginChangeCheck();
 					var shader = (EditorGUILayout.ObjectField("Default Shader", Shader.Find(defaultShader), typeof(Shader), false) as Shader);
@@ -371,11 +371,13 @@ namespace Spine.Unity.Editor {
 				EditorPrefs.SetBool(editorPrefsKey, currentValue);
 		}
 
-		static void FloatPrefsField (ref float currentValue, string editorPrefsKey, GUIContent label) {
+		static void FloatPrefsField (ref float currentValue, string editorPrefsKey, GUIContent label, float min = float.NegativeInfinity, float max = float.PositiveInfinity) {
 			EditorGUI.BeginChangeCheck();
 			currentValue = EditorGUILayout.DelayedFloatField(label, currentValue);
-			if (EditorGUI.EndChangeCheck())
+			if (EditorGUI.EndChangeCheck()) {
+				currentValue = Mathf.Clamp(currentValue, min, max);
 				EditorPrefs.SetFloat(editorPrefsKey, currentValue);
+			}
 		}
 
 
