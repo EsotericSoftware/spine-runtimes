@@ -1482,28 +1482,28 @@ namespace Spine.Unity.Editor {
 			static Dictionary<int, SkeletonUtilityBone> skeletonUtilityBoneTable = new Dictionary<int, SkeletonUtilityBone>();
 			static Dictionary<int, BoundingBoxFollower> boundingBoxFollowerTable = new Dictionary<int, BoundingBoxFollower>();
 
-			#if UNITY_2017_2_OR_NEWER
+#if NEWPLAYMODECALLBACKS
 			internal static void IconsOnPlaymodeStateChanged (PlayModeStateChange stateChange) {
-			#else
+#else
 			internal static void IconsOnPlaymodeStateChanged () {
-			#endif
+#endif
 				skeletonRendererTable.Clear();
 				skeletonUtilityBoneTable.Clear();
 				boundingBoxFollowerTable.Clear();
 
-				#if UNITY_2018
+#if NEWHIERARCHYWINDOWCALLBACKS
 				EditorApplication.hierarchyChanged -= IconsOnChanged;
-				#else
+#else
 				EditorApplication.hierarchyWindowChanged -= IconsOnChanged;
-				#endif
+#endif
 				EditorApplication.hierarchyWindowItemOnGUI -= IconsOnGUI;
 
 				if (!Application.isPlaying && Preferences.showHierarchyIcons) {
-					#if UNITY_2018
+#if NEWHIERARCHYWINDOWCALLBACKS
 					EditorApplication.hierarchyChanged += IconsOnChanged;
-					#else
+#else
 					EditorApplication.hierarchyWindowChanged += IconsOnChanged;
-					#endif
+#endif
 					EditorApplication.hierarchyWindowItemOnGUI += IconsOnGUI;
 					IconsOnChanged();
 				}
