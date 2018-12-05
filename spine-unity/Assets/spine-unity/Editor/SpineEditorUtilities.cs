@@ -290,9 +290,9 @@ namespace Spine.Unity.Editor {
 				EditorPrefs.SetString(DEFAULT_SHADER_KEY, defaultShader);
 
 			EditorGUI.BeginChangeCheck();
-			setTextureImporterSettings = EditorGUILayout.Toggle(new GUIContent("Apply Atlas Texture Settings", "Apply the recommended settings for Texture Importers."), showHierarchyIcons);
+			setTextureImporterSettings = EditorGUILayout.Toggle(new GUIContent("Apply Atlas Texture Settings", "Apply the recommended settings for Texture Importers."), setTextureImporterSettings);
 			if (EditorGUI.EndChangeCheck()) {
-				EditorPrefs.SetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, showHierarchyIcons);
+				EditorPrefs.SetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, setTextureImporterSettings);
 			}
 
 			EditorGUILayout.Space();
@@ -1422,7 +1422,7 @@ namespace Spine.Unity.Editor {
 					Debug.LogWarning("Editor-instantiated SkeletonAnimation threw an Exception. Destroying GameObject to prevent orphaned GameObject.");
 					GameObject.DestroyImmediate(go);
 				}
-				throw e;
+				Debug.Log(e);
 			}
 
 			// Set Defaults
