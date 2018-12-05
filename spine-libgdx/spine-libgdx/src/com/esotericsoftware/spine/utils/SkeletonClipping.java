@@ -248,14 +248,26 @@ public class SkeletonClipping {
 					}
 					// v1 inside, v2 outside
 					float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-					float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
-					output.add(edgeX + (edgeX2 - edgeX) * ua);
-					output.add(edgeY + (edgeY2 - edgeY) * ua);
+					float s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
+					if (Math.abs(s) > 0.000001f) {
+						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
+						output.add(edgeX + (edgeX2 - edgeX) * ua);
+						output.add(edgeY + (edgeY2 - edgeY) * ua);
+					} else {
+						output.add(edgeX);
+						output.add(edgeY);
+					}
 				} else if (side2) { // v1 outside, v2 inside
 					float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-					float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
-					output.add(edgeX + (edgeX2 - edgeX) * ua);
-					output.add(edgeY + (edgeY2 - edgeY) * ua);
+					float s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
+					if (Math.abs(s) > 0.000001f) {
+						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
+						output.add(edgeX + (edgeX2 - edgeX) * ua);
+						output.add(edgeY + (edgeY2 - edgeY) * ua);
+					} else {
+						output.add(edgeX);
+						output.add(edgeY);
+					}
 					output.add(inputX2);
 					output.add(inputY2);
 				}
