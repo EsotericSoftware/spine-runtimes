@@ -248,7 +248,7 @@ public class SkeletonClipping {
 					}
 					// v1 inside, v2 outside
 					float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-					float s = (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
+					float s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
 					if (Math.abs(s) > 0.000001f) {
 						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
 						output.add(edgeX + (edgeX2 - edgeX) * ua);
@@ -259,7 +259,7 @@ public class SkeletonClipping {
 					}
 				} else if (side2) { // v1 outside, v2 inside
 					float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-					float s = (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
+					float s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
 					if (Math.abs(s) > 0.000001f) {
 						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
 						output.add(edgeX + (edgeX2 - edgeX) * ua);
