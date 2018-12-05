@@ -33,6 +33,15 @@
 // Original contribution by: Mitch Thompson
 
 #define SPINE_SKELETONMECANIM
+
+#if UNITY_2017_2_OR_NEWER
+#define NEWPLAYMODECALLBACKS
+#endif
+
+#if UNITY_2018 || UNITY_2019
+#define NEWHIERARCHYWINDOWCALLBACKS
+#endif
+
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -169,7 +178,7 @@ namespace Spine.Unity.Editor {
 			AssetUtility.HandleOnPostprocessAllAssets(imported);
 		}
 
-		#region Initialization
+#region Initialization
 		static SpineEditorUtilities () {
 			Initialize();
 		}
@@ -192,7 +201,7 @@ namespace Spine.Unity.Editor {
 			EditorApplication.hierarchyWindowItemOnGUI += HierarchyHandler.HandleDragAndDrop;
 
 			// Hierarchy Icons
-#if UNITY_2017_2_OR_NEWER
+#if NEWPLAYMODECALLBACKS
 			EditorApplication.playModeStateChanged -= HierarchyHandler.IconsOnPlaymodeStateChanged;
 			EditorApplication.playModeStateChanged += HierarchyHandler.IconsOnPlaymodeStateChanged;
 			HierarchyHandler.IconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
@@ -204,7 +213,7 @@ namespace Spine.Unity.Editor {
 
 			// Data Refresh Edit Mode.
 			// This prevents deserialized SkeletonData from persisting from play mode to edit mode.
-#if UNITY_2017_2_OR_NEWER
+#if NEWPLAYMODECALLBACKS
 			EditorApplication.playModeStateChanged -= DataReloadHandler.OnPlaymodeStateChanged;
 			EditorApplication.playModeStateChanged += DataReloadHandler.OnPlaymodeStateChanged;
 			DataReloadHandler.OnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
@@ -221,7 +230,7 @@ namespace Spine.Unity.Editor {
 			if (!initialized || Icons.skeleton == null)
 				Initialize();
 		}
-		#endregion
+#endregion
 
 		public static class Preferences {
 #if SPINE_TK2D
@@ -288,7 +297,7 @@ namespace Spine.Unity.Editor {
 				showHierarchyIcons = EditorGUILayout.Toggle(new GUIContent("Show Hierarchy Icons", "Show relevant icons on GameObjects with Spine Components on them. Disable this if you have large, complex scenes."), showHierarchyIcons);
 				if (EditorGUI.EndChangeCheck()) {
 					EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, showHierarchyIcons);
-#if UNITY_2017_2_OR_NEWER
+#if NEWPLAYMODECALLBACKS
 					HierarchyHandler.IconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
 #else
 					HierarchyHandler.IconsOnPlaymodeStateChanged();
@@ -360,7 +369,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static class DataReloadHandler {
-#if UNITY_2017_2_OR_NEWER
+#if NEWPLAYMODECALLBACKS
 			internal static void OnPlaymodeStateChanged (PlayModeStateChange stateChange) {
 #else
 			internal static void OnPlaymodeStateChanged () {
