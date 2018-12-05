@@ -66,9 +66,9 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
   if atlasFile == "spineboy.atlas" then
     animationStateData:setMix("walk", "jump", 0.4)		
 		animationStateData:setMix("jump", "run", 0.4);
-		animationState:setAnimationByName(0, "walk", true)
-		local jumpEntry = animationState:addAnimationByName(0, "jump", false, 3)
-		animationState:addAnimationByName(0, "run", true, 0)
+		animationState:setAnimationByName(0, "portal", true)
+		-- local jumpEntry = animationState:addAnimationByName(0, "jump", false, 3)
+		-- animationState:addAnimationByName(0, "run", true, 0)
   elseif atlasFile == "raptor.atlas" then
 		--skeleton.vertexEffect = spine.JitterEffect.new(5, 5)
 		skeleton.vertexEffect = swirl
@@ -81,7 +81,7 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 	return { skeleton = skeleton, state = animationState }
 end
 
-table.insert(skeletons, loadSkeleton("spineboy.atlas", "spineboy-pro.json", 240, 300, 0.4, "walk"))
+table.insert(skeletons, loadSkeleton("spineboy.atlas", "spineboy-pro.json", 240, 300, 0.4, "portal"))
 table.insert(skeletons, loadSkeleton("stretchyman.atlas", "stretchyman-stretchy-ik-pro.json", 40, 300, 0.5, "sneak"))
 table.insert(skeletons, loadSkeleton("coin.atlas", "coin-pro.json", 240, 160, 0.4, "animation"))
 table.insert(skeletons, loadSkeleton("raptor.atlas", "raptor-pro.json", 200, 300, 0.25, "walk"))
