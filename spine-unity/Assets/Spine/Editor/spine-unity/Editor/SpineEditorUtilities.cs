@@ -860,26 +860,28 @@ namespace Spine.Unity.Editor {
 
 				// Iterate regions and bake marked.
 				Atlas atlas = atlasAsset.GetAtlas();
-				FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
-				List<AtlasRegion> regions = (List<AtlasRegion>)field.GetValue(atlas);
-				string atlasAssetPath = AssetDatabase.GetAssetPath(atlasAsset);
-				string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath);
-				string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
+				if (atlas != null) {
+					FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
+					var regions = (List<AtlasRegion>)field.GetValue(atlas);
+					string atlasAssetPath = AssetDatabase.GetAssetPath(atlasAsset);
+					string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath);
+					string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
 
-				bool hasBakedRegions = false;
-				for (int i = 0; i < regions.Count; i++) {
-					AtlasRegion region = regions[i];
-					string bakedPrefabPath = Path.Combine(bakedDirPath, SpineEditorUtilities.AssetUtility.GetPathSafeName(region.name) + ".prefab").Replace("\\", "/");
-					GameObject prefab = (GameObject)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(GameObject));
-					if (prefab != null) {
-						SkeletonBaker.BakeRegion(atlasAsset, region, false);
-						hasBakedRegions = true;
+					bool hasBakedRegions = false;
+					for (int i = 0; i < regions.Count; i++) {
+						AtlasRegion region = regions[i];
+						string bakedPrefabPath = Path.Combine(bakedDirPath, SpineEditorUtilities.AssetUtility.GetPathSafeName(region.name) + ".prefab").Replace("\\", "/");
+						GameObject prefab = (GameObject)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(GameObject));
+						if (prefab != null) {
+							SkeletonBaker.BakeRegion(atlasAsset, region, false);
+							hasBakedRegions = true;
+						}
 					}
-				}
 
-				if (hasBakedRegions) {
-					AssetDatabase.SaveAssets();
-					AssetDatabase.Refresh();
+					if (hasBakedRegions) {
+						AssetDatabase.SaveAssets();
+						AssetDatabase.Refresh();
+					}
 				}
 
 				protectFromStackGarbageCollection.Remove(atlasAsset);
