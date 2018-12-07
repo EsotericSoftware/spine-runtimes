@@ -1,11 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
-
 #if UNITY_2018_3 || UNITY_2019
 #define NEW_PREFAB_SYSTEM
 #endif
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEditor;
 
 
 namespace Spine.Unity.Editor {
