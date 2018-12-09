@@ -7,29 +7,52 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: spineboy_Material
-  m_Shader: {fileID: 4800000, guid: 522f03282fd79be47b306e2ef4b593fd, type: 3}
-  m_ShaderKeywords: 
+  m_Shader: {fileID: 4800000, guid: 1e8a610c9e01c3648bac42585e5fc676, type: 3}
+  m_ShaderKeywords: _ALPHAPREMULTIPLY_ON
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
+  stringTagMap:
+    AlphaDepth: False
+    IGNOREPROJECTOR: true
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _AlphaTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BlendTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 2800000, guid: 49bb65eefe08e424bbf7a38bc98ec638, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - PixelSnap: 0
+    - _BlendAmount: 0
+    - _Brightness: 1
     - _CloakPhase: 0
-    - _Cutoff: 0.1
+    - _Cull: 0
+    - _CustomRenderQueue: 0
+    - _Cutoff: 0.103
+    - _DstBlend: 10
+    - _EnableExternalAlpha: 0
     - _FillPhase: 0
+    - _Hue: 0
     - _RefractionStrength: 0.01
+    - _RenderQueue: 0
+    - _Saturation: 1
+    - _ShadowAlphaCutoff: 0.1
+    - _SrcBlend: 1
+    - _ZWrite: 1
     - _node_3476: 0
     m_Colors:
     - _Black: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _FillColor: {r: 1, g: 1, b: 1, a: 1}
+    - _OverlayColor: {r: 0, g: 0, b: 0, a: 0}
