@@ -17,6 +17,15 @@ namespace Spine.Unity.Examples {
 		public bool useOverrideMixDuration;
 		public float overrideMixDuration = 0.2f;
 
+		public bool useOverrideAttachmentThreshold = true;
+
+		[Range(0f,1f)]
+		public float attachmentThreshold = 0.5f;
+
+		public bool useOverrideDrawOrderThreshold;
+		[Range(0f, 1f)]
+		public float drawOrderThreshold = 0.5f;
+
 		[System.Serializable]
 		public struct AnimationControl {
 			[SpineAnimation]
@@ -94,14 +103,24 @@ namespace Spine.Unity.Examples {
 
 					// Check each control, and play the appropriate animation.
 					if (Input.GetKeyDown(control.key)) {
+						TrackEntry trackEntry;
 						if (!string.IsNullOrEmpty(control.animationName)) {
-							var trackEntry = animationState.SetAnimation(trackIndex, control.animationName, control.loop);
+							trackEntry = animationState.SetAnimation(trackIndex, control.animationName, control.loop);
+							
+						} else {
+							float mix = control.useCustomMixDuration ? control.mixDuration : animationState.Data.DefaultMix;
+							trackEntry = animationState.SetEmptyAnimation(trackIndex, mix);
+						}
+
+						if (trackEntry != null) {
 							if (control.useCustomMixDuration)
 								trackEntry.MixDuration = control.mixDuration;
 
-						} else {
-							float mix = control.useCustomMixDuration ? control.mixDuration : animationState.Data.DefaultMix;
-							animationState.SetEmptyAnimation(trackIndex, mix);
+							if (useOverrideAttachmentThreshold)
+								trackEntry.AttachmentThreshold = attachmentThreshold;
+
+							if (useOverrideDrawOrderThreshold)
+								trackEntry.DrawOrderThreshold = drawOrderThreshold;
 						}
 
 						// Don't parse more than one animation per track.

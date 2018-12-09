@@ -3,7 +3,7 @@ using UnityEngine;
 using Spine;
 using Spine.Unity;
 
-namespace Spine.Unity.Examples {
+namespace Spine.Unity.Prototyping {
 	/// <summary>
 	/// Stores and serializes initial settings for a Spine Skeleton component. The settings only get applied on Start at runtime.</summary>
 	public class SkeletonColorInitialize : MonoBehaviour {

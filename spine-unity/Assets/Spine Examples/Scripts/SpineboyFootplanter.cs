@@ -184,8 +184,8 @@ namespace Spine.Unity.Examples {
 			nearFoot.UpdateStepProgress(deltaTime, stepSpeed, shuffleDistance, forward, backward);
 			farFoot.UpdateStepProgress(deltaTime, stepSpeed, shuffleDistance, forward, backward);
 
-			nearFootBone.SetPosition(thisTransform.InverseTransformPoint(nearFoot.worldPos));
-			farFootBone.SetPosition(thisTransform.InverseTransformPoint(farFoot.worldPos));
+			nearFootBone.SetLocalPosition(thisTransform.InverseTransformPoint(nearFoot.worldPos));
+			farFootBone.SetLocalPosition(thisTransform.InverseTransformPoint(farFoot.worldPos));
 		}
 
 

@@ -118,8 +118,8 @@ namespace Spine.Unity.Examples {
 			//				Under the hood, this relies on 
 			if (repack)	{
 				var repackedSkin = new Skin("repacked skin");
-				repackedSkin.Append(skeleton.Data.DefaultSkin); // Include the "default" skin. (everything outside of skin placeholders)
-				repackedSkin.Append(customSkin); // Include your new custom skin.
+				repackedSkin.AddAttachments(skeleton.Data.DefaultSkin); // Include the "default" skin. (everything outside of skin placeholders)
+				repackedSkin.AddAttachments(customSkin); // Include your new custom skin.
 				repackedSkin = repackedSkin.GetRepackedSkin("repacked skin", sourceMaterial, out runtimeMaterial, out runtimeAtlas); // Pack all the items in the skin.
 				skeleton.SetSkin(repackedSkin); // Assign the repacked skin to your Skeleton.
 				if (bbFollower != null) bbFollower.Initialize(true);

@@ -1,0 +1,58 @@
+{
+"skeleton": { "hash": "4EjYsXrRSJ3nIgaF9KU0KeSvFQA", "spine": "3.7.42-beta", "width": 456.69, "height": 360.67, "images": "", "audio": "" },
+"bones": [
+	{ "name": "root" },
+	{ "name": "_rotation", "parent": "root", "color": "abe323ff" },
+	{ "name": "additive", "parent": "root", "x": -37.18, "y": -104.42 },
+	{ "name": "multiply", "parent": "root", "x": 75.86 },
+	{ "name": "normal", "parent": "root" },
+	{ "name": "screen", "parent": "root", "x": -124.58 }
+],
+"slots": [
+	{ "name": "normal", "bone": "normal", "color": "ff9100ff", "attachment": "whirly" },
+	{ "name": "multiply", "bone": "multiply", "color": "905e9eff", "attachment": "whirly", "blend": "multiply" },
+	{ "name": "screen", "bone": "screen", "color": "0670c6ff", "attachment": "whirly", "blend": "screen" },
+	{ "name": "additive", "bone": "additive", "color": "0670c6ff", "attachment": "whirly", "blend": "additive" }
+],
+"transform": [
+	{
+		"name": "rotation",
+		"order": 0,
+		"bones": [ "additive", "multiply", "normal", "screen" ],
+		"target": "_rotation",
+		"translateMix": 0,
+		"scaleMix": 0,
+		"shearMix": 0
+	}
+],
+"skins": {
+	"default": {
+		"additive": {
+			"whirly": { "rotation": -0.06, "width": 256, "height": 256 }
+		},
+		"multiply": {
+			"whirly": { "rotation": -0.06, "width": 256, "height": 256 }
+		},
+		"normal": {
+			"whirly": { "rotation": -0.06, "width": 256, "height": 256 }
+		},
+		"screen": {
+			"whirly": { "rotation": -0.06, "width": 256, "height": 256 }
+		}
+	}
+},
+"animations": {
+	"animation": {
+		"bones": {
+			"_rotation": {
+				"rotate": [
+					{ "time": 0, "angle": 0 },
+					{ "time": 0.3333, "angle": -120 },
+					{ "time": 0.6667, "angle": 120 },
+					{ "time": 1, "angle": 0 }
+				]
+			}
+		}
+	}
+}
+}
