@@ -184,6 +184,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void Initialize () {
+			if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+			
 			Preferences.Load();
 
 			var rootDir = new DirectoryInfo(Application.dataPath);
@@ -201,15 +203,15 @@ namespace Spine.Unity.Editor {
 			EditorApplication.hierarchyWindowItemOnGUI += HierarchyHandler.HandleDragAndDrop;
 
 			// Hierarchy Icons
-#if NEWPLAYMODECALLBACKS
+			#if NEWPLAYMODECALLBACKS
 			EditorApplication.playModeStateChanged -= HierarchyHandler.IconsOnPlaymodeStateChanged;
 			EditorApplication.playModeStateChanged += HierarchyHandler.IconsOnPlaymodeStateChanged;
 			HierarchyHandler.IconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
-#else
+			#else
 			EditorApplication.playmodeStateChanged -= HierarchyHandler.IconsOnPlaymodeStateChanged;
 			EditorApplication.playmodeStateChanged += HierarchyHandler.IconsOnPlaymodeStateChanged;
 			HierarchyHandler.IconsOnPlaymodeStateChanged();
-#endif
+			#endif
 
 			// Data Refresh Edit Mode.
 			// This prevents deserialized SkeletonData from persisting from play mode to edit mode.
@@ -281,6 +283,9 @@ namespace Spine.Unity.Editor {
 			static bool preferencesLoaded = false;
 
 			public static void Load () {
+				if (preferencesLoaded)
+					return;
+
 				defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, DEFAULT_DEFAULT_MIX);
 				defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, DEFAULT_DEFAULT_SCALE);
 				defaultZSpacing = EditorPrefs.GetFloat(DEFAULT_ZSPACING_KEY, DEFAULT_DEFAULT_ZSPACING);
