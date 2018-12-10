@@ -154,6 +154,8 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 			za *= s;
 			zc *= s;
 			s = SQRT(za * za + zc * zc);
+			if (self->data->transformMode == SP_TRANSFORMMODE_NOSCALE && (pa * pd - pb * pc < 0) != (sx < 0 != sy < 0))
+				s = -s;
 			r = PI / 2 + ATAN2(zc, za);
 			zb = COS(r) * s;
 			zd = SIN(r) * s;
