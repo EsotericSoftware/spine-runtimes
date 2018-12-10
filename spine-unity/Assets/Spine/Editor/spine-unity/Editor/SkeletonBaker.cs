@@ -28,7 +28,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-// Contributed by: Mitch Thompson
+#if UNITY_2018_3 || UNITY_2019
+#define NEW_PREFAB_SYSTEM
+#endif
 
 #define SPINE_SKELETONMECANIM
 
@@ -184,6 +186,8 @@ namespace Spine.Unity.Editor {
 				return;
 			}
 
+			#if !NEW_PREFAB_SYSTEM
+
 			if (outputPath == "") {
 				outputPath = System.IO.Path.GetDirectoryName(AssetDatabase.GetAssetPath(skeletonDataAsset)) + "/Baked";
 				System.IO.Directory.CreateDirectory(outputPath);
@@ -275,8 +279,8 @@ namespace Spine.Unity.Editor {
 
 				string prefabPath = outputPath + "/" + skeletonDataAsset.skeletonJSON.name + " (" + skin.Name + ").prefab";
 
-
 				Object prefab = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject));
+				
 				if (prefab == null) {
 					prefab = PrefabUtility.CreateEmptyPrefab(prefabPath);
 					newPrefab = true;
@@ -430,7 +434,6 @@ namespace Spine.Unity.Editor {
 					EditorGUIUtility.PingObject(controller);
 				}
 
-
 				if (newPrefab) {
 					PrefabUtility.ReplacePrefab(prefabRoot, prefab, ReplacePrefabOptions.ConnectToPrefab);
 				} else {
@@ -441,6 +444,7 @@ namespace Spine.Unity.Editor {
 
 					PrefabUtility.ReplacePrefab(prefabRoot, prefab, ReplacePrefabOptions.ReplaceNameBased);
 				}
+				
 
 				EditorGUIUtility.PingObject(prefab);
 
@@ -448,7 +452,9 @@ namespace Spine.Unity.Editor {
 				AssetDatabase.SaveAssets();
 
 				GameObject.DestroyImmediate(prefabRoot);
+			
 			}
+			#endif
 
 		}
 
@@ -731,9 +737,9 @@ namespace Spine.Unity.Editor {
 
 			return arr;
 		}
-		#endregion
+#endregion
 
-		#region Animation Baking
+#region Animation Baking
 		static AnimationClip ExtractAnimation (string name, SkeletonData skeletonData, Dictionary<int, List<string>> slotLookup, bool bakeIK, SendMessageOptions eventOptions, AnimationClip clip = null) {
 			var animation = skeletonData.FindAnimation(name);
 
@@ -1402,10 +1408,10 @@ namespace Spine.Unity.Editor {
 
 			return angle;
 		}
-		#endregion
-		#endregion
+#endregion
+#endregion
 
-		#region Region Baking
+#region Region Baking
 		public static GameObject BakeRegion (SpineAtlasAsset atlasAsset, AtlasRegion region, bool autoSave = true) {
 			atlasAsset.GetAtlas(); // Initializes atlasAsset.
 
@@ -1424,7 +1430,12 @@ namespace Spine.Unity.Editor {
 
 			if (prefab == null) {
 				root = new GameObject("temp", typeof(MeshFilter), typeof(MeshRenderer));
+				#if NEW_PREFAB_SYSTEM
+				prefab = PrefabUtility.SaveAsPrefabAsset(root, bakedPrefabPath);
+				#else
 				prefab = PrefabUtility.CreatePrefab(bakedPrefabPath, root);
+				#endif
+
 				isNewPrefab = true;
 				Object.DestroyImmediate(root);
 			}
@@ -1450,7 +1461,7 @@ namespace Spine.Unity.Editor {
 
 			return prefab;
 		}
-		#endregion
+#endregion
 
 		static string GetPath (BoneData b) {
 			return GetPathRecurse(b).Substring(1);
