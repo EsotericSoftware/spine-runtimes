@@ -2489,6 +2489,9 @@ var spine;
 					za *= s;
 					zc *= s;
 					s = Math.sqrt(za * za + zc * zc);
+					if (this.data.transformMode == spine.TransformMode.NoScale
+						&& (pa * pd - pb * pc < 0) != (this.skeleton.scaleX < 0 != this.skeleton.scaleY < 0))
+						s = -s;
 					var r = Math.PI / 2 + Math.atan2(zc, za);
 					var zb = Math.cos(r) * s;
 					var zd = Math.sin(r) * s;
