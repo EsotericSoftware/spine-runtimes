@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -27,7 +27,7 @@ namespace Spine.Unity.Examples {
 		[Header("Debug")]
 		[SerializeField] float balance;
 		[SerializeField] float distanceBetweenFeet;
-		[SerializeField] Foot nearFoot, farFoot;
+		[SerializeField] protected Foot nearFoot, farFoot;
 
 		Skeleton skeleton;
 		Bone nearFootBone, farFootBone;
