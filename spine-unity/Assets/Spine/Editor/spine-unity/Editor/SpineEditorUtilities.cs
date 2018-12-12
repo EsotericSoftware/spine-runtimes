@@ -188,8 +188,8 @@ namespace Spine.Unity.Editor {
 			
 			Preferences.Load();
 
-			var assets = AssetDatabase.FindAssets("t:script SpineEditorUtilities");
-			var assetPath = AssetDatabase.GUIDToAssetPath(assets[0]);
+			string[] assets = AssetDatabase.FindAssets("t:script SpineEditorUtilities");
+			string assetPath = AssetDatabase.GUIDToAssetPath(assets[0]);
 			editorPath = Path.GetDirectoryName(assetPath).Replace("\\", "/");
 			editorGUIPath = editorPath + "/GUI";
 
@@ -2121,7 +2121,7 @@ namespace Spine.Unity.Editor {
 			float firstScale = 0.08f * scale;
 			Handles.DrawSolidDisc(pos, normal, firstScale);
 			const float Thickness = 0.03f;
-			float secondScale = firstScale - (Thickness  * SpineHandles.handleScale * scale);
+			float secondScale = firstScale - (Thickness * SpineHandles.handleScale * scale);
 
 			if (secondScale > 0f) {
 				Handles.color = new Color(0.3f, 0.3f, 0.3f, 0.5f);
