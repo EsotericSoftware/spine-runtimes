@@ -133,7 +133,7 @@ namespace Spine {
 			var ikConstraints = this.ikConstraints;
 			var transformConstraints = this.transformConstraints;
 			var pathConstraints = this.pathConstraints;
-			int ikCount = IkConstraints.Count, transformCount = transformConstraints.Count, pathCount = pathConstraints.Count;
+			int ikCount = ikConstraints.Count, transformCount = transformConstraints.Count, pathCount = pathConstraints.Count;
 			int constraintCount = ikCount + transformCount + pathCount;
 			//outer:
 			for (int i = 0; i < constraintCount; i++) {

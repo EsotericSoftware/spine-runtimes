@@ -81,8 +81,7 @@ namespace Spine {
 			if (!translate && !rotate) return;
 
 			PathConstraintData data = this.data;
-			SpacingMode spacingMode = data.spacingMode;
-			bool percentSpacing = spacingMode == SpacingMode.Percent;
+			bool percentSpacing = data.spacingMode == SpacingMode.Percent;
 			RotateMode rotateMode = data.rotateMode;
 			bool tangents = rotateMode == RotateMode.Tangent, scale = rotateMode == RotateMode.ChainScale;
 			int boneCount = this.bones.Count, spacesCount = tangents ? boneCount : boneCount + 1;
@@ -158,9 +157,8 @@ namespace Spine {
 						float length = bone.data.length;
 						boneX += (length * (cos * a - sin * c) - dx) * rotateMix;
 						boneY += (length * (sin * a + cos * c) - dy) * rotateMix;
-					} else {
+					} else
 						r += offsetRotation;
-					}
 					if (r > MathUtils.PI)
 						r -= MathUtils.PI2;
 					else if (r < -MathUtils.PI) //
@@ -186,11 +184,10 @@ namespace Spine {
 			bool closed = path.Closed;
 			int verticesLength = path.WorldVerticesLength, curveCount = verticesLength / 6, prevCurve = NONE;
 
-			float pathLength;
 			if (!path.ConstantSpeed) {
 				float[] lengths = path.Lengths;
 				curveCount -= closed ? 1 : 2;
-				pathLength = lengths[curveCount];
+				float pathLength = lengths[curveCount];
 				if (percentPosition) position *= pathLength;
 				if (percentSpacing) {
 					for (int i = 0; i < spacesCount; i++)
@@ -265,7 +262,7 @@ namespace Spine {
 
 			// Curve lengths.
 			float[] curves = this.curves.Resize(curveCount).Items;
-			pathLength = 0;
+			float pathLength = 0;
 			float x1 = world[0], y1 = world[1], cx1 = 0, cy1 = 0, cx2 = 0, cy2 = 0, x2 = 0, y2 = 0;
 			float tmpx, tmpy, dddfx, dddfy, ddfx, ddfy, dfx, dfy;
 			for (int i = 0, w = 2; i < curveCount; i++, w += 6) {
