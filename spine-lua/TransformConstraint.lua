@@ -281,7 +281,7 @@ function TransformConstraint:applyAbsoluteLocal ()
 
 		local scaleX = bone.ascaleX
 		local scaleY = bone.ascaleY
-		if scaleMix > 0 then
+		if scaleMix ~= 0 then
 			if scaleX > 0.00001 then
 				scaleX = (scaleX + (target.ascaleX - scaleX + self.data.offsetScaleX) * scaleMix) / scaleX
 			end
@@ -291,7 +291,7 @@ function TransformConstraint:applyAbsoluteLocal ()
 		end
 
 		local shearY = bone.ashearY
-		if shearMix > 0 then
+		if shearMix ~= 0 then
 			local r = target.ashearY - shearY + self.data.offsetShearY
 			r = r - (16384 - math_floor(16384.499999999996 - r / 360)) * 360
 			bone.shearY = bone.shearY + r * shearMix
@@ -324,7 +324,7 @@ function TransformConstraint:applyRelativeLocal ()
 
 		local scaleX = bone.ascaleX
 		local scaleY = bone.ascaleY
-		if scaleMix > 0 then
+		if scaleMix ~= 0 then
 			if scaleX > 0.00001 then
 				scaleX = scaleX * (((target.ascaleX - 1 + self.data.offsetScaleX) * scaleMix) + 1)
 			end
@@ -334,7 +334,7 @@ function TransformConstraint:applyRelativeLocal ()
 		end
 
 		local shearY = bone.ashearY
-		if shearMix > 0 then shearY = shearY + (target.ashearY + self.data.offsetShearY) * shearMix end
+		if shearMix ~= 0 then shearY = shearY + (target.ashearY + self.data.offsetShearY) * shearMix end
 
 		bone:updateWorldTransformWith(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY)
 	end
