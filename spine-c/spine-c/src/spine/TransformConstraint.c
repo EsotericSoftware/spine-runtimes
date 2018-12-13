@@ -205,13 +205,13 @@ void _spTransformConstraint_applyAbsoluteLocal (spTransformConstraint* self) {
 		}
 
 		scaleX = bone->ascaleX, scaleY = bone->ascaleY;
-		if (scaleMix > 0) {
+		if (scaleMix != 0) {
 			if (scaleX > 0.00001) scaleX = (scaleX + (target->ascaleX - scaleX + self->data->offsetScaleX) * scaleMix) / scaleX;
 			if (scaleY > 0.00001) scaleY = (scaleY + (target->ascaleY - scaleY + self->data->offsetScaleY) * scaleMix) / scaleY;
 		}
 
 		shearY = bone->ashearY;
-		if (shearMix > 0) {
+		if (shearMix != 0) {
 			r = target->ashearY - shearY + self->data->offsetShearY;
 			r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
 			bone->shearY += r * shearMix;
@@ -245,13 +245,13 @@ void _spTransformConstraint_applyRelativeLocal (spTransformConstraint* self) {
 
 		scaleX = bone->ascaleX;
 		scaleY = bone->ascaleY;
-		if (scaleMix > 0) {
+		if (scaleMix != 0) {
 			if (scaleX > 0.00001f) scaleX *= ((target->ascaleX - 1 + self->data->offsetScaleX) * scaleMix) + 1;
 			if (scaleY > 0.00001f) scaleY *= ((target->ascaleY - 1 + self->data->offsetScaleY) * scaleMix) + 1;
 		}
 
 		shearY = bone->ashearY;
-		if (shearMix > 0) shearY += (target->ashearY + self->data->offsetShearY) * shearMix;
+		if (shearMix != 0) shearY += (target->ashearY + self->data->offsetShearY) * shearMix;
 
 		spBone_updateWorldTransformWith(bone, x, y, rotation, scaleX, scaleY, bone->ashearX, shearY);
 	}
