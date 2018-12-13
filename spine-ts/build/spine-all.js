@@ -5734,14 +5734,14 @@ var spine;
 					y += (target.ay - y + this.data.offsetY) * translateMix;
 				}
 				var scaleX = bone.ascaleX, scaleY = bone.ascaleY;
-				if (scaleMix > 0) {
+				if (scaleMix != 0) {
 					if (scaleX > 0.00001)
 						scaleX = (scaleX + (target.ascaleX - scaleX + this.data.offsetScaleX) * scaleMix) / scaleX;
 					if (scaleY > 0.00001)
 						scaleY = (scaleY + (target.ascaleY - scaleY + this.data.offsetScaleY) * scaleMix) / scaleY;
 				}
 				var shearY = bone.ashearY;
-				if (shearMix > 0) {
+				if (shearMix != 0) {
 					var r = target.ashearY - shearY + this.data.offsetShearY;
 					r -= (16384 - ((16384.499999999996 - r / 360) | 0)) * 360;
 					bone.shearY += r * shearMix;
@@ -5768,14 +5768,14 @@ var spine;
 					y += (target.ay + this.data.offsetY) * translateMix;
 				}
 				var scaleX = bone.ascaleX, scaleY = bone.ascaleY;
-				if (scaleMix > 0) {
+				if (scaleMix != 0) {
 					if (scaleX > 0.00001)
 						scaleX *= ((target.ascaleX - 1 + this.data.offsetScaleX) * scaleMix) + 1;
 					if (scaleY > 0.00001)
 						scaleY *= ((target.ascaleY - 1 + this.data.offsetScaleY) * scaleMix) + 1;
 				}
 				var shearY = bone.ashearY;
-				if (shearMix > 0)
+				if (shearMix != 0)
 					shearY += (target.ashearY + this.data.offsetShearY) * shearMix;
 				bone.updateWorldTransformWith(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY);
 			}
@@ -10120,7 +10120,7 @@ var spine;
 					return;
 				}
 				if (!isContained(_this.dom, event.target)) {
-					_this.dom.parentNode.removeChild(_this.dom);
+					_this.dom.remove();
 					window.removeEventListener("click", windowClickListener);
 					dismissedListener();
 					dismissed = true;
@@ -10294,6 +10294,8 @@ var spine;
 				config.controlBones = [];
 			if (typeof config.showControls === "undefined")
 				config.showControls = true;
+			if (typeof config.defaultMix === "undefined")
+				config.defaultMix = 0.25;
 			return config;
 		};
 		SpinePlayer.prototype.showError = function (error) {
@@ -10416,6 +10418,13 @@ var spine;
 		};
 		SpinePlayer.prototype.showSpeedDialog = function (speedButton) {
 			var _this = this;
+			if (this.lastPopup)
+				this.lastPopup.dom.remove();
+			if (this.lastPopup && findWithClass(this.lastPopup.dom, "spine-player-popup-title")[0].textContent == "Speed") {
+				this.lastPopup = null;
+				speedButton.classList.remove("spine-player-button-icon-speed-selected");
+				return;
+			}
 			var popup = new Popup(this.dom, this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Speed</div>\n\t\t\t\t<hr>\n\t\t\t\t<div class=\"spine-player-row\" style=\"user-select: none; align-items: center; padding: 8px;\">\n\t\t\t\t\t<div class=\"spine-player-column\">\n\t\t\t\t\t\t<div class=\"spine-player-speed-slider\" style=\"margin-bottom: 4px;\"></div>\n\t\t\t\t\t\t<div class=\"spine-player-row\" style=\"justify-content: space-between;\">\n\t\t\t\t\t\t\t<div>0.1x</div>\n\t\t\t\t\t\t\t<div>1x</div>\n\t\t\t\t\t\t\t<div>2x</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t");
 			var sliderParent = findWithClass(popup.dom, "spine-player-speed-slider")[0];
 			var slider = new Slider(2, 0.1, true);
@@ -10428,9 +10437,17 @@ var spine;
 			popup.show(function () {
 				speedButton.classList.remove("spine-player-button-icon-speed-selected");
 			});
+			this.lastPopup = popup;
 		};
 		SpinePlayer.prototype.showAnimationsDialog = function (animationsButton) {
 			var _this = this;
+			if (this.lastPopup)
+				this.lastPopup.dom.remove();
+			if (this.lastPopup && findWithClass(this.lastPopup.dom, "spine-player-popup-title")[0].textContent == "Animations") {
+				this.lastPopup = null;
+				animationsButton.classList.remove("spine-player-button-icon-animations-selected");
+				return;
+			}
 			if (!this.skeleton || this.skeleton.data.animations.length == 0)
 				return;
 			var popup = new Popup(this.dom, this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Animations</div>\n\t\t\t\t<hr>\n\t\t\t\t<ul class=\"spine-player-list\"></ul>\n\t\t\t");
@@ -10456,9 +10473,17 @@ var spine;
 			popup.show(function () {
 				animationsButton.classList.remove("spine-player-button-icon-animations-selected");
 			});
+			this.lastPopup = popup;
 		};
 		SpinePlayer.prototype.showSkinsDialog = function (skinButton) {
 			var _this = this;
+			if (this.lastPopup)
+				this.lastPopup.dom.remove();
+			if (this.lastPopup && findWithClass(this.lastPopup.dom, "spine-player-popup-title")[0].textContent == "Skins") {
+				this.lastPopup = null;
+				skinButton.classList.remove("spine-player-button-icon-skins-selected");
+				return;
+			}
 			if (!this.skeleton || this.skeleton.data.animations.length == 0)
 				return;
 			var popup = new Popup(this.dom, this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Skins</div>\n\t\t\t\t<hr>\n\t\t\t\t<ul class=\"spine-player-list\"></ul>\n\t\t\t");
@@ -10484,9 +10509,17 @@ var spine;
 			popup.show(function () {
 				skinButton.classList.remove("spine-player-button-icon-skins-selected");
 			});
+			this.lastPopup = popup;
 		};
 		SpinePlayer.prototype.showSettingsDialog = function (settingsButton) {
 			var _this = this;
+			if (this.lastPopup)
+				this.lastPopup.dom.remove();
+			if (this.lastPopup && findWithClass(this.lastPopup.dom, "spine-player-popup-title")[0].textContent == "Debug") {
+				this.lastPopup = null;
+				settingsButton.classList.remove("spine-player-button-icon-settings-selected");
+				return;
+			}
 			if (!this.skeleton || this.skeleton.data.animations.length == 0)
 				return;
 			var popup = new Popup(this.dom, this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Debug</div>\n\t\t\t\t<hr>\n\t\t\t\t<ul class=\"spine-player-list\">\n\t\t\t\t</li>\n\t\t\t");
@@ -10513,6 +10546,7 @@ var spine;
 			popup.show(function () {
 				settingsButton.classList.remove("spine-player-button-icon-settings-selected");
 			});
+			this.lastPopup = popup;
 		};
 		SpinePlayer.prototype.drawFrame = function (requestNextFrame) {
 			var _this = this;
@@ -10642,7 +10676,7 @@ var spine;
 			}
 			this.skeleton = new spine.Skeleton(skeletonData);
 			var stateData = new spine.AnimationStateData(skeletonData);
-			stateData.defaultMix = 0.2;
+			stateData.defaultMix = this.config.defaultMix;
 			this.animationState = new spine.AnimationState(stateData);
 			if (this.config.controlBones) {
 				this.config.controlBones.forEach(function (bone) {

@@ -1788,6 +1788,7 @@ declare module spine {
 		atlasUrl: string;
 		animation: string;
 		animations: string[];
+		defaultMix: number;
 		skin: string;
 		skins: string[];
 		controlBones: string[];
@@ -1862,6 +1863,7 @@ declare module spine {
 		validateConfig(config: SpinePlayerConfig): SpinePlayerConfig;
 		showError(error: string): void;
 		render(): HTMLElement;
+		private lastPopup;
 		showSpeedDialog(speedButton: HTMLElement): void;
 		showAnimationsDialog(animationsButton: HTMLElement): void;
 		showSkinsDialog(skinButton: HTMLElement): void;
