@@ -228,13 +228,13 @@ package spine {
 				}
 
 				var scaleX : Number = bone.ascaleX, scaleY : Number = bone.ascaleY;
-				if (scaleMix > 0) {
+				if (scaleMix != 0) {
 					if (scaleX > 0.00001) scaleX = (scaleX + (target.ascaleX - scaleX + this.data.offsetScaleX) * scaleMix) / scaleX;
 					if (scaleY > 0.00001) scaleY = (scaleY + (target.ascaleY - scaleY + this.data.offsetScaleY) * scaleMix) / scaleY;
 				}
 
 				var shearY : Number = bone.ashearY;
-				if (shearMix > 0) {
+				if (shearMix != 0) {
 					r = target.ashearY - shearY + this.data.offsetShearY;
 					r -= (16384 - ((16384.499999999996 - r / 360) | 0)) * 360;
 					bone.shearY += r * shearMix;
@@ -263,13 +263,13 @@ package spine {
 				}
 
 				var scaleX : Number = bone.ascaleX, scaleY : Number = bone.ascaleY;
-				if (scaleMix > 0) {
+				if (scaleMix != 0) {
 					if (scaleX > 0.00001) scaleX *= ((target.ascaleX - 1 + this.data.offsetScaleX) * scaleMix) + 1;
 					if (scaleY > 0.00001) scaleY *= ((target.ascaleY - 1 + this.data.offsetScaleY) * scaleMix) + 1;
 				}
 
 				var shearY : Number = bone.ashearY;
-				if (shearMix > 0) shearY += (target.ashearY + this.data.offsetShearY) * shearMix;
+				if (shearMix != 0) shearY += (target.ashearY + this.data.offsetShearY) * shearMix;
 
 				bone.updateWorldTransformWith(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY);
 			}

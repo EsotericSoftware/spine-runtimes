@@ -59,7 +59,8 @@ namespace Spine.Unity {
 			if (this.IsValid) {
 				if (skeletonDataAsset == null) {
 					Clear();
-					startingAnimation = "";
+				} else if (skeletonDataAsset.skeletonJSON == null) {
+					Clear();
 				} else if (skeletonDataAsset.GetSkeletonData(true) != skeleton.data) {
 					Clear();
 					Initialize(true);

@@ -53,6 +53,9 @@
 		/* Optional: list of animation names from which the user can choose. */
 		animations: string[]
 
+		/* Optional: the default mix time used to switch between two animations. */
+		defaultMix: number
+
 		/* Optional: the name of the skin to be set. Default: the default skin. */
 		skin: string
 
@@ -158,7 +161,7 @@
 					return;
 				}
 				if (!isContained(this.dom, event.target)) {
-					this.dom.parentNode.removeChild(this.dom);
+					this.dom.remove();
 					window.removeEventListener("click", windowClickListener);
 					dismissedListener();
 					dismissed = true;
@@ -354,6 +357,9 @@
 			if (typeof config.showControls === "undefined")
 				config.showControls = true;
 
+			if (typeof config.defaultMix === "undefined")
+				config.defaultMix = 0.25;
+
 			return config;
 		}
 
@@ -507,7 +513,14 @@
 			return dom;
 		}
 
+		private lastPopup: Popup;
 		showSpeedDialog (speedButton: HTMLElement) {
+			if (this.lastPopup) this.lastPopup.dom.remove()
+			if (this.lastPopup && findWithClass(this.lastPopup.dom, "spine-player-popup-title")[0].textContent == "Speed") {
+				this.lastPopup = null;
+				speedButton.classList.remove("spine-player-button-icon-speed-selected")
+				return;
+			}
 			let popup = new Popup(this.dom, this.playerControls, /*html*/`
 				<div class="spine-player-popup-title">Speed</div>
 				<hr>
@@ -533,9 +546,16 @@
 			popup.show(() => {
 				speedButton.classList.remove("spine-player-button-icon-speed-selected")
 			});
+			this.lastPopup = popup;
 		}
 
 		showAnimationsDialog (animationsButton: HTMLElement) {
+			if (this.lastPopup) this.lastPopup.dom.remove()
+			if (this.lastPopup && findWithClass(this.lastPopup.dom, "spine-player-popup-title")[0].textContent == "Animations") {
+				this.lastPopup = null;
+				animationsButton.classList.remove("spine-player-button-icon-animations-selected")
+				return;
+			}
 			if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
 
 			let popup = new Popup(this.dom, this.playerControls, /*html*/`
@@ -574,9 +594,16 @@
 			popup.show(() => {
 				animationsButton.classList.remove("spine-player-button-icon-animations-selected")
 			});
+			this.lastPopup = popup;
 		}
 
 		showSkinsDialog (skinButton: HTMLElement) {
+			if (this.lastPopup) this.lastPopup.dom.remove()
+			if (this.lastPopup && findWithClass(this.lastPopup.dom, "spine-player-popup-title")[0].textContent == "Skins") {
+				this.lastPopup = null;
+				skinButton.classList.remove("spine-player-button-icon-skins-selected")
+				return;
+			}
 			if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
 
 			let popup = new Popup(this.dom, this.playerControls, /*html*/`
@@ -616,9 +643,16 @@
 			popup.show(() => {
 				skinButton.classList.remove("spine-player-button-icon-skins-selected")
 			});
+			this.lastPopup = popup;
 		}
 
 		showSettingsDialog (settingsButton: HTMLElement) {
+			if (this.lastPopup) this.lastPopup.dom.remove()
+			if (this.lastPopup && findWithClass(this.lastPopup.dom, "spine-player-popup-title")[0].textContent == "Debug") {
+				this.lastPopup = null;
+				settingsButton.classList.remove("spine-player-button-icon-settings-selected")
+				return;
+			}
 			if (!this.skeleton || this.skeleton.data.animations.length == 0) return;
 
 			let popup = new Popup(this.dom, this.playerControls, /*html*/`
@@ -653,6 +687,7 @@
 			popup.show(() => {
 				settingsButton.classList.remove("spine-player-button-icon-settings-selected")
 			});
+			this.lastPopup = popup;
 		}
 
 		drawFrame (requestNextFrame = true) {
@@ -808,7 +843,7 @@
 			}
 			this.skeleton = new Skeleton(skeletonData);
 			let stateData = new AnimationStateData(skeletonData);
-			stateData.defaultMix = 0.2;
+			stateData.defaultMix = this.config.defaultMix;
 			this.animationState = new AnimationState(stateData);
 
 			// Check if all controllable bones are in the skeleton

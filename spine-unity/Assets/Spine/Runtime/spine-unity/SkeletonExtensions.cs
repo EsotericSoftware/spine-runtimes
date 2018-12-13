@@ -121,13 +121,13 @@ namespace Spine.Unity {
 
 		#region Bone
 		/// <summary>Sets the bone's (local) X and Y according to a Vector2</summary>
-		public static void SetPosition (this Bone bone, Vector2 position) {
+		public static void SetLocalPosition (this Bone bone, Vector2 position) {
 			bone.X = position.x;
 			bone.Y = position.y;
 		}
 
 		/// <summary>Sets the bone's (local) X and Y according to a Vector3. The z component is ignored.</summary>
-		public static void SetPosition (this Bone bone, Vector3 position) {
+		public static void SetLocalPosition (this Bone bone, Vector3 position) {
 			bone.X = position.x;
 			bone.Y = position.y;
 		}
@@ -196,12 +196,12 @@ namespace Spine.Unity {
 		/// <returns>The local position in its parent bone space, or in skeleton space if it is the root bone.</returns>
 		public static Vector2 SetPositionSkeletonSpace (this Bone bone, Vector2 skeletonSpacePosition) {
 			if (bone.parent == null) { // root bone
-				bone.SetPosition(skeletonSpacePosition);
+				bone.SetLocalPosition(skeletonSpacePosition);
 				return skeletonSpacePosition;
 			} else {
 				var parent = bone.parent;
 				Vector2 parentLocal = parent.WorldToLocal(skeletonSpacePosition);
-				bone.SetPosition(parentLocal);
+				bone.SetLocalPosition(parentLocal);
 				return parentLocal;
 			}
 		}

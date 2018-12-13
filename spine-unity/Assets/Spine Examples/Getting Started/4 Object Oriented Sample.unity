@@ -372,7 +372,6 @@ MonoBehaviour:
   singleSubmesh: 0
   addNormals: 0
   calculateTangents: 0
-  logErrors: 0
   disableRenderingOnOverride: 1
   _animationName: idle
   loop: 1

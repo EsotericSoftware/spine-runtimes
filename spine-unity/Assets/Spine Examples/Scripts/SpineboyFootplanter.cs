@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -27,7 +27,7 @@ namespace Spine.Unity.Examples {
 		[Header("Debug")]
 		[SerializeField] float balance;
 		[SerializeField] float distanceBetweenFeet;
-		[SerializeField] Foot nearFoot, farFoot;
+		[SerializeField] protected Foot nearFoot, farFoot;
 
 		Skeleton skeleton;
 		Bone nearFootBone, farFootBone;
@@ -184,8 +184,8 @@ namespace Spine.Unity.Examples {
 			nearFoot.UpdateStepProgress(deltaTime, stepSpeed, shuffleDistance, forward, backward);
 			farFoot.UpdateStepProgress(deltaTime, stepSpeed, shuffleDistance, forward, backward);
 
-			nearFootBone.SetPosition(thisTransform.InverseTransformPoint(nearFoot.worldPos));
-			farFootBone.SetPosition(thisTransform.InverseTransformPoint(farFoot.worldPos));
+			nearFootBone.SetLocalPosition(thisTransform.InverseTransformPoint(nearFoot.worldPos));
+			farFootBone.SetLocalPosition(thisTransform.InverseTransformPoint(farFoot.worldPos));
 		}
 
 

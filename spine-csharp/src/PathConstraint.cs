@@ -81,8 +81,7 @@ namespace Spine {
 			if (!translate && !rotate) return;
 
 			PathConstraintData data = this.data;
-			SpacingMode spacingMode = data.spacingMode;
-			bool percentSpacing = spacingMode == SpacingMode.Percent;
+			bool percentSpacing = data.spacingMode == SpacingMode.Percent;
 			RotateMode rotateMode = data.rotateMode;
 			bool tangents = rotateMode == RotateMode.Tangent, scale = rotateMode == RotateMode.ChainScale;
 			int boneCount = this.bones.Count, spacesCount = tangents ? boneCount : boneCount + 1;
@@ -158,9 +157,8 @@ namespace Spine {
 						float length = bone.data.length;
 						boneX += (length * (cos * a - sin * c) - dx) * rotateMix;
 						boneY += (length * (sin * a + cos * c) - dy) * rotateMix;
-					} else {
+					} else
 						r += offsetRotation;
-					}
 					if (r > MathUtils.PI)
 						r -= MathUtils.PI2;
 					else if (r < -MathUtils.PI) //
@@ -185,8 +183,8 @@ namespace Spine {
 			float[] spacesItems = this.spaces.Items, output = this.positions.Resize(spacesCount * 3 + 2).Items, world;
 			bool closed = path.Closed;
 			int verticesLength = path.WorldVerticesLength, curveCount = verticesLength / 6, prevCurve = NONE;
+            float pathLength = 0;
 
-			float pathLength;
 			if (!path.ConstantSpeed) {
 				float[] lengths = path.Lengths;
 				curveCount -= closed ? 1 : 2;

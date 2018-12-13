@@ -217,6 +217,9 @@ namespace Spine {
 					za *= s;
 					zc *= s;
 					s = (float)Math.Sqrt(za * za + zc * zc);
+					if (data.transformMode == TransformMode.NoScale
+						&& (pa * pd - pb * pc < 0) != (skeleton.scaleX < 0 != skeleton.scaleY < 0)) s = -s;
+
 					float r = MathUtils.PI / 2 + MathUtils.Atan2(zc, za);
 					float zb = MathUtils.Cos(r) * s;
 					float zd = MathUtils.Sin(r) * s;

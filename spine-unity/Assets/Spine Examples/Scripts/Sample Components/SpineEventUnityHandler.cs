@@ -32,7 +32,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Spine.Unity.Modules {
+namespace Spine.Unity.Prototyping {
 
 	public class SpineEventUnityHandler : MonoBehaviour {
 

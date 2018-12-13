@@ -15,6 +15,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2bedc3c43dd49f346a4c9e8a87e2fed7, type: 2}
   scale: 0.01
   skeletonJSON: {fileID: 4900000, guid: 8160b67e4c41bd041b948b5e5a86e242, type: 3}
+  skeletonDataModifiers: []
   fromAnimation:
   - idle
   - run

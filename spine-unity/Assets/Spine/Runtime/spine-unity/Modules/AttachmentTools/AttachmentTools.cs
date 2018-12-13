@@ -438,8 +438,11 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			// Fill a new texture with the collected attachment textures.
 			var newTexture = new Texture2D(maxAtlasSize, maxAtlasSize, textureFormat, mipmaps);
 			newTexture.mipMapBias = AtlasUtilities.DefaultMipmapBias;
-			newTexture.anisoLevel = texturesToPack[0].anisoLevel;
 			newTexture.name = newAssetName;
+			// Copy settings
+			if (texturesToPack.Count > 0) {
+				newTexture.anisoLevel = texturesToPack[0].anisoLevel;
+			}
 			var rects = newTexture.PackTextures(texturesToPack.ToArray(), padding, maxAtlasSize);
 
 			// Rehydrate the repacked textures as a Material, Spine atlas and Spine.AtlasAttachments

@@ -2489,6 +2489,9 @@ var spine;
 					za *= s;
 					zc *= s;
 					s = Math.sqrt(za * za + zc * zc);
+					if (this.data.transformMode == spine.TransformMode.NoScale
+						&& (pa * pd - pb * pc < 0) != (this.skeleton.scaleX < 0 != this.skeleton.scaleY < 0))
+						s = -s;
 					var r = Math.PI / 2 + Math.atan2(zc, za);
 					var zb = Math.cos(r) * s;
 					var zd = Math.sin(r) * s;
@@ -5731,14 +5734,14 @@ var spine;
 					y += (target.ay - y + this.data.offsetY) * translateMix;
 				}
 				var scaleX = bone.ascaleX, scaleY = bone.ascaleY;
-				if (scaleMix > 0) {
+				if (scaleMix != 0) {
 					if (scaleX > 0.00001)
 						scaleX = (scaleX + (target.ascaleX - scaleX + this.data.offsetScaleX) * scaleMix) / scaleX;
 					if (scaleY > 0.00001)
 						scaleY = (scaleY + (target.ascaleY - scaleY + this.data.offsetScaleY) * scaleMix) / scaleY;
 				}
 				var shearY = bone.ashearY;
-				if (shearMix > 0) {
+				if (shearMix != 0) {
 					var r = target.ashearY - shearY + this.data.offsetShearY;
 					r -= (16384 - ((16384.499999999996 - r / 360) | 0)) * 360;
 					bone.shearY += r * shearMix;
@@ -5765,14 +5768,14 @@ var spine;
 					y += (target.ay + this.data.offsetY) * translateMix;
 				}
 				var scaleX = bone.ascaleX, scaleY = bone.ascaleY;
-				if (scaleMix > 0) {
+				if (scaleMix != 0) {
 					if (scaleX > 0.00001)
 						scaleX *= ((target.ascaleX - 1 + this.data.offsetScaleX) * scaleMix) + 1;
 					if (scaleY > 0.00001)
 						scaleY *= ((target.ascaleY - 1 + this.data.offsetScaleY) * scaleMix) + 1;
 				}
 				var shearY = bone.ashearY;
-				if (shearMix > 0)
+				if (shearMix != 0)
 					shearY += (target.ashearY + this.data.offsetShearY) * shearMix;
 				bone.updateWorldTransformWith(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY);
 			}

@@ -37,6 +37,8 @@ import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+import com.esotericsoftware.spine.BoneData.TransformMode;
+
 /** Stores a bone's current pose.
  * <p>
  * A bone has a local transform which is used to compute its world transform. A bone also has an applied transform, which is a
@@ -180,6 +182,8 @@ public class Bone implements Updatable {
 			za *= s;
 			zc *= s;
 			s = (float)Math.sqrt(za * za + zc * zc);
+			if (data.transformMode == TransformMode.noScale
+				&& (pa * pd - pb * pc < 0) != (skeleton.scaleX < 0 != skeleton.scaleY < 0)) s = -s;
 			float r = PI / 2 + atan2(zc, za);
 			float zb = cos(r) * s;
 			float zd = sin(r) * s;

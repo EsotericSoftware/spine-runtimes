@@ -184,11 +184,13 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void Initialize () {
+			if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+			
 			Preferences.Load();
 
-			var rootDir = new DirectoryInfo(Application.dataPath);
-			FileInfo[] files = rootDir.GetFiles("SpineEditorUtilities.cs", SearchOption.AllDirectories);
-			editorPath = Path.GetDirectoryName(files[0].FullName.Replace("\\", "/").Replace(Application.dataPath, "Assets"));
+			string[] assets = AssetDatabase.FindAssets("t:script SpineEditorUtilities");
+			string assetPath = AssetDatabase.GUIDToAssetPath(assets[0]);
+			editorPath = Path.GetDirectoryName(assetPath).Replace("\\", "/");
 			editorGUIPath = editorPath + "/GUI";
 
 			Icons.Initialize();
@@ -201,15 +203,15 @@ namespace Spine.Unity.Editor {
 			EditorApplication.hierarchyWindowItemOnGUI += HierarchyHandler.HandleDragAndDrop;
 
 			// Hierarchy Icons
-#if NEWPLAYMODECALLBACKS
+			#if NEWPLAYMODECALLBACKS
 			EditorApplication.playModeStateChanged -= HierarchyHandler.IconsOnPlaymodeStateChanged;
 			EditorApplication.playModeStateChanged += HierarchyHandler.IconsOnPlaymodeStateChanged;
 			HierarchyHandler.IconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
-#else
+			#else
 			EditorApplication.playmodeStateChanged -= HierarchyHandler.IconsOnPlaymodeStateChanged;
 			EditorApplication.playmodeStateChanged += HierarchyHandler.IconsOnPlaymodeStateChanged;
 			HierarchyHandler.IconsOnPlaymodeStateChanged();
-#endif
+			#endif
 
 			// Data Refresh Edit Mode.
 			// This prevents deserialized SkeletonData from persisting from play mode to edit mode.
@@ -281,6 +283,9 @@ namespace Spine.Unity.Editor {
 			static bool preferencesLoaded = false;
 
 			public static void Load () {
+				if (preferencesLoaded)
+					return;
+
 				defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, DEFAULT_DEFAULT_MIX);
 				defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, DEFAULT_DEFAULT_SCALE);
 				defaultZSpacing = EditorPrefs.GetFloat(DEFAULT_ZSPACING_KEY, DEFAULT_DEFAULT_ZSPACING);
@@ -860,26 +865,28 @@ namespace Spine.Unity.Editor {
 
 				// Iterate regions and bake marked.
 				Atlas atlas = atlasAsset.GetAtlas();
-				FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
-				List<AtlasRegion> regions = (List<AtlasRegion>)field.GetValue(atlas);
-				string atlasAssetPath = AssetDatabase.GetAssetPath(atlasAsset);
-				string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath);
-				string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
+				if (atlas != null) {
+					FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
+					var regions = (List<AtlasRegion>)field.GetValue(atlas);
+					string atlasAssetPath = AssetDatabase.GetAssetPath(atlasAsset);
+					string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath);
+					string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
 
-				bool hasBakedRegions = false;
-				for (int i = 0; i < regions.Count; i++) {
-					AtlasRegion region = regions[i];
-					string bakedPrefabPath = Path.Combine(bakedDirPath, SpineEditorUtilities.AssetUtility.GetPathSafeName(region.name) + ".prefab").Replace("\\", "/");
-					GameObject prefab = (GameObject)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(GameObject));
-					if (prefab != null) {
-						SkeletonBaker.BakeRegion(atlasAsset, region, false);
-						hasBakedRegions = true;
+					bool hasBakedRegions = false;
+					for (int i = 0; i < regions.Count; i++) {
+						AtlasRegion region = regions[i];
+						string bakedPrefabPath = Path.Combine(bakedDirPath, SpineEditorUtilities.AssetUtility.GetPathSafeName(region.name) + ".prefab").Replace("\\", "/");
+						GameObject prefab = (GameObject)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(GameObject));
+						if (prefab != null) {
+							SkeletonBaker.BakeRegion(atlasAsset, region, false);
+							hasBakedRegions = true;
+						}
 					}
-				}
 
-				if (hasBakedRegions) {
-					AssetDatabase.SaveAssets();
-					AssetDatabase.Refresh();
+					if (hasBakedRegions) {
+						AssetDatabase.SaveAssets();
+						AssetDatabase.Refresh();
+					}
 				}
 
 				protectFromStackGarbageCollection.Remove(atlasAsset);
@@ -2114,7 +2121,7 @@ namespace Spine.Unity.Editor {
 			float firstScale = 0.08f * scale;
 			Handles.DrawSolidDisc(pos, normal, firstScale);
 			const float Thickness = 0.03f;
-			float secondScale = firstScale - (Thickness  * SpineHandles.handleScale * scale);
+			float secondScale = firstScale - (Thickness * SpineHandles.handleScale * scale);
 
 			if (secondScale > 0f) {
 				Handles.color = new Color(0.3f, 0.3f, 0.3f, 0.5f);

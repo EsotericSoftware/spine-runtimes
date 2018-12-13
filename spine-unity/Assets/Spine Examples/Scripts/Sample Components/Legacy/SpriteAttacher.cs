@@ -34,7 +34,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Spine.Unity.Modules.AttachmentTools;
 
-namespace Spine.Unity.Modules {
+namespace Spine.Unity.Examples {
 	public class SpriteAttacher : MonoBehaviour {
 		public const string DefaultPMAShader = "Spine/Skeleton";
 		public const string DefaultStraightAlphaShader = "Sprites/Default";
@@ -50,16 +50,16 @@ namespace Spine.Unity.Modules {
 		void OnValidate () {
 			var skeletonComponent = GetComponent<ISkeletonComponent>();
 			var skeletonRenderer = skeletonComponent as SkeletonRenderer;
-			bool apma;
+			bool applyPMA;
 
 			if (skeletonRenderer != null) {
-				apma = skeletonRenderer.pmaVertexColors;
+				applyPMA = skeletonRenderer.pmaVertexColors;
 			} else {
 				var skeletonGraphic = skeletonComponent as SkeletonGraphic;
-				apma = skeletonGraphic != null && skeletonGraphic.MeshGenerator.settings.pmaVertexColors;
+				applyPMA = skeletonGraphic != null && skeletonGraphic.MeshGenerator.settings.pmaVertexColors;
 			}
 
-			if (apma) {
+			if (applyPMA) {
 				try {
 					sprite.texture.GetPixel(0, 0);
 				} catch (UnityException e) {

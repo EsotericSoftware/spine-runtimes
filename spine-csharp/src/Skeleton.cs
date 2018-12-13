@@ -122,18 +122,18 @@ namespace Spine {
 		/// <summary>Caches information about bones and constraints. Must be called if bones, constraints or weighted path attachments are added
 		/// or removed.</summary>
 		public void UpdateCache () {
-			ExposedList<IUpdatable> updateCache = this.updateCache;
+			var updateCache = this.updateCache;
 			updateCache.Clear();
 			this.updateCacheReset.Clear();
 
-			ExposedList<Bone> bones = this.bones;
+			var bones = this.bones;
 			for (int i = 0, n = bones.Count; i < n; i++)
 				bones.Items[i].sorted = false;
 
-			ExposedList<IkConstraint> ikConstraints = this.ikConstraints;
+			var ikConstraints = this.ikConstraints;
 			var transformConstraints = this.transformConstraints;
 			var pathConstraints = this.pathConstraints;
-			int ikCount = IkConstraints.Count, transformCount = transformConstraints.Count, pathCount = pathConstraints.Count;
+			int ikCount = ikConstraints.Count, transformCount = transformConstraints.Count, pathCount = pathConstraints.Count;
 			int constraintCount = ikCount + transformCount + pathCount;
 			//outer:
 			for (int i = 0; i < constraintCount; i++) {
@@ -293,6 +293,54 @@ namespace Spine {
 				updateItems[i].Update();
 		}
 
+		/// <summary>
+		/// Updates the world transform for each bone and applies all constraints. The root bone will be temporarily parented to the specified bone.
+	 	/// </summary>
+		public void UpdateWorldTransform (Bone parent) {
+			// This partial update avoids computing the world transform for constrained bones when 1) the bone is not updated
+			// before the constraint, 2) the constraint only needs to access the applied local transform, and 3) the constraint calls
+			// updateWorldTransform.
+			var updateCacheReset = this.updateCacheReset;
+			var updateCacheResetItems = updateCacheReset.Items;
+			for (int i = 0, n = updateCacheReset.Count; i < n; i++) {
+				Bone bone = updateCacheResetItems[i];
+				bone.ax = bone.x;
+				bone.ay = bone.y;
+				bone.arotation = bone.rotation;
+				bone.ascaleX = bone.scaleX;
+				bone.ascaleY = bone.scaleY;
+				bone.ashearX = bone.shearX;
+				bone.ashearY = bone.shearY;
+				bone.appliedValid = true;
+			}
+
+			// Apply the parent bone transform to the root bone. The root bone
+			// always inherits scale, rotation and reflection.
+			Bone rootBone = this.RootBone;
+			float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
+			rootBone.worldX = pa * x + pb * y + parent.worldX;
+			rootBone.worldY = pc * x + pd * y + parent.worldY;
+
+			float rotationY = rootBone.rotation + 90 + rootBone.shearY;
+			float la = MathUtils.CosDeg(rootBone.rotation + rootBone.shearX) * rootBone.scaleX;
+			float lb = MathUtils.CosDeg(rotationY) * rootBone.scaleY;
+			float lc = MathUtils.SinDeg(rootBone.rotation + rootBone.shearX) * rootBone.scaleX;
+			float ld = MathUtils.SinDeg(rotationY) * rootBone.scaleY;
+			rootBone.a = (pa * la + pb * lc) * scaleX;
+			rootBone.b = (pa * lb + pb * ld) * scaleX;
+			rootBone.c = (pc * la + pd * lc) * scaleY;
+			rootBone.d = (pc * lb + pd * ld) * scaleY;
+
+			// Update everything except root bone.
+			var updateCache = this.updateCache;
+			var updateCacheItems = updateCache.Items;
+			for (int i = 0, n = updateCache.Count; i < n; i++) {
+				var updatable = updateCacheItems[i];
+				if (updatable != rootBone)
+					updatable.Update();
+			}
+		}
+
 		/// <summary>Sets the bones, constraints, and slots to their setup pose values.</summary>
 		public void SetToSetupPose () {
 			SetBonesToSetupPose();
@@ -425,11 +473,13 @@ namespace Spine {
 			skin = newSkin;
 		}
 
+		/// <summary>Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot name and attachment name.</summary>
 		/// <returns>May be null.</returns>
 		public Attachment GetAttachment (string slotName, string attachmentName) {
 			return GetAttachment(data.FindSlotIndex(slotName), attachmentName);
 		}
 
+		/// <summary>Finds an attachment by looking in the skin and skeletonData.defaultSkin using the slot index and attachment name.First the skin is checked and if the attachment was not found, the default skin is checked.</summary>
 		/// <returns>May be null.</returns>
 		public Attachment GetAttachment (int slotIndex, string attachmentName) {
 			if (attachmentName == null) throw new ArgumentNullException("attachmentName", "attachmentName cannot be null.");
@@ -440,6 +490,7 @@ namespace Spine {
 			return data.defaultSkin != null ? data.defaultSkin.GetAttachment(slotIndex, attachmentName) : null;
 		}
 
+		/// <summary>A convenience method to set an attachment by finding the slot with FindSlot, finding the attachment with GetAttachment, then setting the slot's slot.Attachment.</summary>
 		/// <param name="attachmentName">May be null.</param>
 		public void SetAttachment (string slotName, string attachmentName) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");

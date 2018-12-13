@@ -169,6 +169,8 @@ package spine {
 					za *= s;
 					zc *= s;
 					s = Math.sqrt(za * za + zc * zc);
+					if (data.transformMode == TransformMode.noScale
+						&& (pa * pd - pb * pc < 0) != (sx < 0 != sy < 0)) s = -s;
 					var r : Number = Math.PI / 2 + Math.atan2(zc, za);
 					var zb : Number = Math.cos(r) * s;
 					var zd : Number = Math.sin(r) * s;

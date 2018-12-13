@@ -315,7 +315,7 @@ void TransformConstraint::applyAbsoluteLocal() {
 		}
 
 		float scaleX = bone._ascaleX, scaleY = bone._ascaleY;
-		if (scaleMix > 0) {
+		if (scaleMix != 0) {
 			if (scaleX > 0.00001f) {
 				scaleX = (scaleX + (target._ascaleX - scaleX + _data._offsetScaleX) * scaleMix) / scaleX;
 			}
@@ -326,7 +326,7 @@ void TransformConstraint::applyAbsoluteLocal() {
 		}
 
 		float shearY = bone._ashearY;
-		if (shearMix > 0) {
+		if (shearMix != 0) {
 			float r = target._ashearY - shearY + _data._offsetShearY;
 			r -= (16384 - (int) (16384.499999999996 - r / 360)) * 360;
 			bone._shearY += r * shearMix;
@@ -363,7 +363,7 @@ void TransformConstraint::applyRelativeLocal() {
 		}
 
 		float scaleX = bone._ascaleX, scaleY = bone._ascaleY;
-		if (scaleMix > 0) {
+		if (scaleMix != 0) {
 			if (scaleX > 0.00001f) {
 				scaleX *= ((target._ascaleX - 1 + _data._offsetScaleX) * scaleMix) + 1;
 			}
@@ -374,7 +374,7 @@ void TransformConstraint::applyRelativeLocal() {
 		}
 
 		float shearY = bone._ashearY;
-		if (shearMix > 0) {
+		if (shearMix != 0) {
 			shearY += (target._ashearY + _data._offsetShearY) * shearMix;
 		}
 

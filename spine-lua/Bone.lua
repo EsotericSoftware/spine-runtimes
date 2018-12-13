@@ -172,6 +172,9 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		za = za * s
 		zc = zc * s
 		s = math_sqrt(za * za + zc * zc)
+		if transformMode == TransformMode.noScale and pa * pd - pb * pc < 0 ~= (sx < 0) ~= (sy < 0) then
+			s = -s
+		end
 		local r = math_pi / 2 + math_atan2(zc, za)
 		local zb = math_cos(r) * s
 		local zd = math_sin(r) * s
