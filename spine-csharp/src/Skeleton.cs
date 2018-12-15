@@ -45,7 +45,7 @@ namespace Spine {
 		internal Skin skin;
 		internal float r = 1, g = 1, b = 1, a = 1;
 		internal float time;
-		internal float scaleX, scaleY;
+		internal float scaleX = 1, scaleY = 1;
 		internal float x, y;
 
 		public SkeletonData Data { get { return data; } }
