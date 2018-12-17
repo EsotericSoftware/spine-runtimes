@@ -252,7 +252,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 		local pathLength = lengths[curveCount + 1];
 		if percentPosition then position = position * pathLength end
 		if percentSpacing then
-			i = 0
+			i = 1
 			while i < spacesCount do
 				spaces[i + 1] = spaces[i + 1] * pathLength
 				i = i + 1
@@ -395,7 +395,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 		position = position * pathLength / path.lengths[curveCount];
 	end
 	if percentSpacing then
-		i = 0
+		i = 1
 		while i < spacesCount do
 			spaces[i + 1] = spaces[i + 1] * pathLength
 			i = i + 1
