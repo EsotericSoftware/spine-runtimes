@@ -396,13 +396,13 @@ namespace spine {
 				continue;
 			}
 			float multiplier = _premultipliedAlpha ? alpha : 255;
-			float red = nodeColor.r * _skeleton->getColor().r * slot->getColor().r * multiplier;
-			float green = nodeColor.g * _skeleton->getColor().g * slot->getColor().g * multiplier;
-			float blue = nodeColor.b * _skeleton->getColor().b * slot->getColor().b * multiplier;
+			float red = nodeColor.r * _skeleton->getColor().r * color.r * multiplier;
+			float green = nodeColor.g * _skeleton->getColor().g * color.g * multiplier;
+			float blue = nodeColor.b * _skeleton->getColor().b * color.b * multiplier;
 			
-			color.r = red * color.r;
-			color.g = green * color.g;
-			color.b = blue * color.b;
+			color.r = red * slot->getColor().r;
+			color.g = green * slot->getColor().g;
+			color.b = blue * slot->getColor().b;
 			color.a = alpha;
 			
 			if (slot->hasDarkColor()) {
