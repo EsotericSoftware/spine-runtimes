@@ -1038,7 +1038,7 @@
 						let remove = () => {
 							if (!this.paused) this.playerControls.classList.add("spine-player-controls-hidden");
 						};
-						this.cancelId = setTimeout(remove, 500);
+						this.cancelId = setTimeout(remove, 1000);
 					}
 				}
 			});
@@ -1055,7 +1055,7 @@
 			let remove = () => {
 				if (!this.paused) this.playerControls.classList.add("spine-player-controls-hidden");
 			};
-			this.cancelId = setTimeout(remove, 500);
+			this.cancelId = setTimeout(remove, 1000);
 			this.playButton.classList.remove("spine-player-button-icon-play");
 			this.playButton.classList.add("spine-player-button-icon-pause");
 
