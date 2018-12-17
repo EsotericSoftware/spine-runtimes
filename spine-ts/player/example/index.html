@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<script src="../../build/spine-player.js"></script>
+	<link rel="stylesheet" href="../css/spine-player.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<style>
+body {
+	background: gray;
+	margin: 0px;
+}
+</style>
+
+<body>
+	<div id="container" style="width: 640px; height: 380px;"></div>
+	<div id="container-raptor" style="width: 640px; height: 380px;"></div>
+</body>
+<script>
+	// Creates a new spine player. The debugRender option enables
+	// rendering of viewports and padding for debugging purposes.
+	new spine.SpinePlayer(document.getElementById("container"), {
+		jsonUrl: "assets/spineboy-pro.json",
+		atlasUrl: "assets/spineboy-pma.atlas",
+		animation: "run",
+		premultipliedAlpha: true,
+		backgroundColor: "#cccccc",
+		viewport: {
+			debugRender: true,
+		}
+	});
+
+	// Creates a new spine player with a transparent background,
+	// so content from the website shines through. Hides the controls.
+	new spine.SpinePlayer(document.getElementById("container-raptor"), {
+		jsonUrl: "assets/raptor-pro.json",
+		atlasUrl: "assets/raptor-pma.atlas",
+		animation: "walk",
+		showControls: false,
+		premultipliedAlpha: true,
+		backgroundColor: "#00000000",
+		alpha: true
+	});
+</script>
+</body>
+</html>

@@ -4,18 +4,18 @@
 		"noImplicitAny": true,
 		"removeComments": true,
 		"preserveConstEnums": true,
-		"outFile": "build/spine-widget.js",
+		"outFile": "build/spine-player.js",
 		"sourceMap": true,
 		"declaration": true
 	},
 	"include": [
 		"core/src/**/*",
 		"webgl/src/**/*",
-		"widget/src/**/*"
+		"player/src/**/*"
 	],
 	"exclude": [
 		"canvas",
 		"threejs",
-		"build"	 
+		"build"
 	]
 }
