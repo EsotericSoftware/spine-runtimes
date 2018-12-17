@@ -13,9 +13,9 @@
 		"canvas/src/**/*",
 		"webgl/src/**/*",
 		"threejs/src/**/*",
-		"widget/src/**/*"
+		"player/src/**/*"
 	],
-	"exclude": [		
-		"build"				 
+	"exclude": [
+		"build"
 	]
 }

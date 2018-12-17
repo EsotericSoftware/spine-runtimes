@@ -1033,10 +1033,10 @@
 					if (popup.length == 0 && !mouseOverChildren && !this.paused) {
 						this.playerControls.classList.add("spine-player-controls-hidden");
 					} else {
-						cancelId = setTimeout(remove, 1000);
+						cancelId = setTimeout(remove, 100);
 					}
 				};
-				cancelId = setTimeout(remove, 1000);
+				cancelId = setTimeout(remove, 100);
 			}
 		}
 
