@@ -412,6 +412,7 @@
   * Removed `RegionAttachment.vertices` field. The vertices array is provided to `RegionAttachment.computeWorldVertices` by the API user now.
   * Removed `RegionAttachment.updateWorldVertices`, added `RegionAttachment.computeWorldVertices`. The new method now computes the x/y positions of the 4 vertices of the corner and places them in the provided `worldVertices` array, starting at `offset`, then moving by `stride` array elements when advancing to the next vertex. This allows to directly compose the vertex buffer and avoids a copy. The computation of the full vertices, including vertex colors and texture coordinates, is now done by the backend's respective renderer.
   * The completion event will fire for looped 0 duration animations every frame.
+  * Removed the Spine Widget in favor of [Spine Web Player](https://esotericsoftware.com/spine-player).
 
 * **Additions**
   * Added support for local and relative transform constraint calculation, including additional fields in `TransformConstraintData`
@@ -423,6 +424,7 @@
   * `AnimationState#apply` returns boolean indicating if any timeline was applied or not.
   * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
   * Added `AssetManager.loadTextureAtlas`. Instead of loading the `.atlas` and corresponding image files manually, you can simply specify the location of the `.atlas` file and AssetManager will load the atlas and all its images automatically. `AssetManager.get("atlasname.atlas")` will then return an instance of `spine.TextureAtlas`.
+  * Added the [Spine Web Player](https://esotericsoftware.com/spine-player)
 
 
 ### WebGL backend
