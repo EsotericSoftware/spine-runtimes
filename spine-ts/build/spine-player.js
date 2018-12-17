@@ -9574,6 +9574,8 @@ var spine;
             this.cancelId = 0;
             if (typeof parent === "string")
                 this.parent = document.getElementById(parent);
+            else
+                this.parent = parent;
             this.parent.appendChild(this.render());
         }
         SpinePlayer.prototype.validateConfig = function (config) {

@@ -314,6 +314,7 @@
 
 		constructor(parent: HTMLElement | string, private config: SpinePlayerConfig) {
 			if (typeof parent === "string") this.parent = document.getElementById(parent);
+			else this.parent = parent;
 			this.parent.appendChild(this.render());
 		}
 
