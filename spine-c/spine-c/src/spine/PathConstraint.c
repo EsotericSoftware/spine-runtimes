@@ -267,7 +267,7 @@ float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAtta
 		pathLength = lengths[curveCount];
 		if (percentPosition) position *= pathLength;
 		if (percentSpacing) {
-			for (i = 0; i < spacesCount; i++)
+			for (i = 1; i < spacesCount; i++)
 				spaces[i] *= pathLength;
 		}
 		if (self->worldCount != 8) {
@@ -397,7 +397,7 @@ float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAtta
 	else
 		position *= pathLength / path->lengths[curveCount - 1];
 	if (percentSpacing) {
-		for (i = 0; i < spacesCount; i++)
+		for (i = 1; i < spacesCount; i++)
 			spaces[i] *= pathLength;
 	}
 
