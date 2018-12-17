@@ -10225,6 +10225,7 @@ var spine;
 	}());
 	var SpinePlayer = (function () {
 		function SpinePlayer(parent, config) {
+			this.parent = parent;
 			this.config = config;
 			this.time = new spine.TimeKeeper();
 			this.paused = true;
@@ -10234,6 +10235,8 @@ var spine;
 			this.currentViewport = null;
 			this.previousViewport = null;
 			this.viewportTransitionStart = 0;
+			if (typeof parent === "string")
+				parent = document.getElementById(parent);
 			parent.appendChild(this.render());
 		}
 		SpinePlayer.prototype.validateConfig = function (config) {
@@ -10791,11 +10794,9 @@ var spine;
 							target = bone;
 						}
 					}
-					handleHover();
 				},
 				up: function (x, y) {
 					target = null;
-					handleHover();
 				},
 				dragged: function (x, y) {
 					if (target != null) {
@@ -10810,7 +10811,6 @@ var spine;
 							target.y = coords.y - skeleton.y;
 						}
 					}
-					handleHover();
 				},
 				moved: function (x, y) {
 					for (var i = 0; i < controlBones.length; i++) {
@@ -10825,34 +10825,41 @@ var spine;
 							selectedBones[i] = null;
 						}
 					}
-					handleHover();
 				}
 			});
-			var mouseOverChildren = true;
-			document.addEventListener("mousemove", function (ev) {
-				if (ev instanceof MouseEvent) {
-					var rect = _this.playerControls.getBoundingClientRect();
-					var x = ev.clientX - rect.left;
-					var y = ev.clientY - rect.top;
-					mouseOverChildren = x >= 0 && x <= _this.playerControls.clientWidth && y >= 0 && y <= _this.playerControls.clientHeight;
-				}
-			});
+			var mouseOverControls = true;
+			var mouseOverCanvas = false;
 			var cancelId = 0;
-			var handleHover = function () {
-				if (!_this.config.showControls)
-					return;
-				clearTimeout(cancelId);
-				_this.playerControls.classList.remove("spine-player-controls-hidden");
-				var remove = function () {
+			parent.addEventListener("mousemove", function (ev) {
+				if (ev instanceof MouseEvent) {
+					if (!_this.config.showControls)
+						return;
 					var popup = findWithClass(_this.dom, "spine-player-popup");
-					if (popup.length == 0 && !mouseOverChildren && !_this.paused) {
+					mouseOverControls = overlap(ev, _this.playerControls.getBoundingClientRect());
+					mouseOverCanvas = overlap(ev, _this.canvas.getBoundingClientRect());
+					clearTimeout(cancelId);
+					var hide = popup.length == 0 && !mouseOverControls && !mouseOverCanvas && !_this.paused;
+					if (hide) {
+						console.log("hidding");
 						_this.playerControls.classList.add("spine-player-controls-hidden");
 					}
 					else {
-						cancelId = setTimeout(remove, 100);
+						console.log("showing");
+						_this.playerControls.classList.remove("spine-player-controls-hidden");
 					}
-				};
-				cancelId = setTimeout(remove, 100);
+					if (!mouseOverControls && popup.length == 0 && !_this.paused) {
+						var remove = function () {
+							console.log("hidding timeout");
+							_this.playerControls.classList.add("spine-player-controls-hidden");
+						};
+						cancelId = setTimeout(remove, 500);
+					}
+				}
+			});
+			var overlap = function (ev, rect) {
+				var x = ev.clientX - rect.left;
+				var y = ev.clientY - rect.top;
+				return x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
 			};
 		};
 		SpinePlayer.prototype.play = function () {

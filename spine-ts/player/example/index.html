@@ -21,7 +21,7 @@ body {
 <script>
 	// Creates a new spine player. The debugRender option enables
 	// rendering of viewports and padding for debugging purposes.
-	new spine.SpinePlayer(document.getElementById("container"), {
+	new spine.SpinePlayer("container", {
 		jsonUrl: "assets/spineboy-pro.json",
 		atlasUrl: "assets/spineboy-pma.atlas",
 		animation: "run",
@@ -32,9 +32,9 @@ body {
 		}
 	});
 
-	// Creates a new spine player with a transparent background,
+	/*// Creates a new spine player with a transparent background,
 	// so content from the website shines through. Hides the controls.
-	new spine.SpinePlayer(document.getElementById("container-raptor"), {
+	new spine.SpinePlayer("container-raptor", {
 		jsonUrl: "assets/raptor-pro.json",
 		atlasUrl: "assets/raptor-pma.atlas",
 		animation: "walk",
@@ -42,7 +42,7 @@ body {
 		premultipliedAlpha: true,
 		backgroundColor: "#00000000",
 		alpha: true
-	});
+	});*/
 </script>
 </body>
 </html>

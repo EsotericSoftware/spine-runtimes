@@ -311,7 +311,8 @@
 
 		private selectedBones: Bone[];
 
-		constructor(parent: HTMLElement, private config: SpinePlayerConfig) {
+		constructor(public parent: HTMLElement | string, private config: SpinePlayerConfig) {
+			if (typeof parent === "string") parent = document.getElementById(parent);
 			parent.appendChild(this.render());
 		}
 
@@ -972,11 +973,9 @@
 							target = bone;
 						}
 					}
-					handleHover();
 				},
 				up: (x, y) => {
 					target = null;
-					handleHover();
 				},
 				dragged: (x, y) => {
 					if (target != null) {
@@ -990,7 +989,6 @@
 							target.y = coords.y - skeleton.y;
 						}
 					}
-					handleHover();
 				},
 				moved: (x, y) => {
 					for (var i = 0; i < controlBones.length; i++) {
@@ -1003,7 +1001,6 @@
 							selectedBones[i] = null;
 						}
 					}
-					handleHover();
 				}
 			});
 
@@ -1013,30 +1010,39 @@
 			// For this we need to register a mouse handler on
 			// the document and see if we are within the canvas
 			// area :/
-			var mouseOverChildren = true;
-			document.addEventListener("mousemove", (ev: UIEvent) => {
+			var mouseOverControls = true;
+			var mouseOverCanvas = false;
+			let cancelId = 0;
+			parent.addEventListener("mousemove", (ev: UIEvent) => {
 				if (ev instanceof MouseEvent) {
-					let rect = this.playerControls.getBoundingClientRect();
-					let x = ev.clientX - rect.left;
-					let y = ev.clientY - rect.top;
-					mouseOverChildren = x >= 0 && x <= this.playerControls.clientWidth && y >= 0 && y <= this.playerControls.clientHeight;
+					if (!this.config.showControls) return;
+
+					let popup = findWithClass(this.dom, "spine-player-popup");
+					mouseOverControls = overlap(ev, this.playerControls.getBoundingClientRect());
+					mouseOverCanvas = overlap(ev, this.canvas.getBoundingClientRect());
+					clearTimeout(cancelId);
+					let hide = popup.length == 0 && !mouseOverControls && !mouseOverCanvas && !this.paused;
+					if (hide) {
+						console.log("hidding");
+						this.playerControls.classList.add("spine-player-controls-hidden");
+					} else {
+						console.log("showing");
+						this.playerControls.classList.remove("spine-player-controls-hidden");
+					}
+					if (!mouseOverControls && popup.length == 0 && !this.paused) {
+						let remove = () => {
+							console.log("hidding timeout");
+							this.playerControls.classList.add("spine-player-controls-hidden");
+						};
+						cancelId = setTimeout(remove, 500);
+					}
 				}
 			});
 
-			let cancelId = 0;
-			let handleHover = () => {
-				if (!this.config.showControls) return;
-				clearTimeout(cancelId);
-				this.playerControls.classList.remove("spine-player-controls-hidden");
-				let remove = () => {
-					let popup = findWithClass(this.dom, "spine-player-popup");
-					if (popup.length == 0 && !mouseOverChildren && !this.paused) {
-						this.playerControls.classList.add("spine-player-controls-hidden");
-					} else {
-						cancelId = setTimeout(remove, 100);
-					}
-				};
-				cancelId = setTimeout(remove, 100);
+			let overlap = (ev: MouseEvent, rect: DOMRect | ClientRect): boolean => {
+					let x = ev.clientX - rect.left;
+					let y = ev.clientY - rect.top;
+					return x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
 			}
 		}
 
