@@ -331,14 +331,14 @@ cp -f ../raptor/export/raptor-pro.json "$RUNTIME_DIR/spine-ts/threejs/example/as
 cp -f ../raptor/export/raptor.atlas "$RUNTIME_DIR/spine-ts/threejs/example/assets/"
 cp -f ../raptor/export/raptor.png "$RUNTIME_DIR/spine-ts/threejs/example/assets/"
 
-rm "$RUNTIME_DIR/spine-ts/widget/example/assets/"*
-cp -f ../raptor/export/raptor-pro.json "$RUNTIME_DIR/spine-ts/widget/example/assets/"
-cp -f ../raptor/export/raptor-pma.atlas "$RUNTIME_DIR/spine-ts/widget/example/assets/"
-cp -f ../raptor/export/raptor-pma.png "$RUNTIME_DIR/spine-ts/widget/example/assets/"
+rm "$RUNTIME_DIR/spine-ts/player/example/assets/"*
+cp -f ../raptor/export/raptor-pro.json "$RUNTIME_DIR/spine-ts/player/example/assets/"
+cp -f ../raptor/export/raptor-pma.atlas "$RUNTIME_DIR/spine-ts/player/example/assets/"
+cp -f ../raptor/export/raptor-pma.png "$RUNTIME_DIR/spine-ts/player/example/assets/"
 
-cp -f ../spineboy/export/spineboy-pro.json "$RUNTIME_DIR/spine-ts/widget/example/assets/"
-cp -f ../spineboy/export/spineboy-pma.atlas "$RUNTIME_DIR/spine-ts/widget/example/assets/"
-cp -f ../spineboy/export/spineboy-pma.png "$RUNTIME_DIR/spine-ts/widget/example/assets/"
+cp -f ../spineboy/export/spineboy-pro.json "$RUNTIME_DIR/spine-ts/player/example/assets/"
+cp -f ../spineboy/export/spineboy-pma.atlas "$RUNTIME_DIR/spine-ts/player/example/assets/"
+cp -f ../spineboy/export/spineboy-pma.png "$RUNTIME_DIR/spine-ts/player/example/assets/"
 
 echo "spine-xna"
 rm "$RUNTIME_DIR/spine-xna/example/data/"*
