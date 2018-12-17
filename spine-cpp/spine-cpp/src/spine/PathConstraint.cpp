@@ -288,7 +288,7 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 		}
 
 		if (percentSpacing) {
-			for (int i = 0; i < spacesCount; ++i) {
+			for (int i = 1; i < spacesCount; ++i) {
 				_spaces[i] *= pathLength;
 			}
 		}
@@ -417,7 +417,7 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 	}
 
 	if (percentSpacing) {
-		for (int i = 0; i < spacesCount; ++i) {
+		for (int i = 1; i < spacesCount; ++i) {
 			_spaces[i] *= pathLength;
 		}
 	}

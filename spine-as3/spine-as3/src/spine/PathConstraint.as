@@ -189,7 +189,7 @@ package spine {
 				var pathLength : Number = lengths[curveCount];
 				if (percentPosition) position *= pathLength;
 				if (percentSpacing) {
-					for (var i : int = 0; i < spacesCount; i++)
+					for (var i : int = 1; i < spacesCount; i++)
 						spaces[i] *= pathLength;
 				}
 				this._world.length = 8;
@@ -305,7 +305,7 @@ package spine {
 			else
 				position *= pathLength / path.lengths[curveCount - 1];
 			if (percentSpacing) {
-				for (i = 0; i < spacesCount; i++)
+				for (i = 1; i < spacesCount; i++)
 					spaces[i] *= pathLength;
 			}
 

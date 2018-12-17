@@ -178,7 +178,7 @@ module spine {
 				let pathLength = lengths[curveCount];
 				if (percentPosition) position *= pathLength;
 				if (percentSpacing) {
-					for (let i = 0; i < spacesCount; i++)
+					for (let i = 1; i < spacesCount; i++)
 						spaces[i] *= pathLength;
 				}
 				world = Utils.setArraySize(this.world, 8);
@@ -289,7 +289,7 @@ module spine {
 			else
 				position *= pathLength / path.lengths[curveCount - 1];
 			if (percentSpacing) {
-				for (let i = 0; i < spacesCount; i++)
+				for (let i = 1; i < spacesCount; i++)
 					spaces[i] *= pathLength;
 			}
 
