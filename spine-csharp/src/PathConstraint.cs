@@ -191,7 +191,7 @@ namespace Spine {
 				pathLength = lengths[curveCount];
 				if (percentPosition) position *= pathLength;
 				if (percentSpacing) {
-					for (int i = 0; i < spacesCount; i++)
+					for (int i = 1; i < spacesCount; i++)
 						spacesItems[i] *= pathLength;
 				}
 				world = this.world.Resize(8).Items;
@@ -303,7 +303,7 @@ namespace Spine {
 				position *= pathLength / path.lengths[curveCount - 1];
 
 			if (percentSpacing) {
-				for (int i = 0; i < spacesCount; i++)
+				for (int i = 1; i < spacesCount; i++)
 					spacesItems[i] *= pathLength;
 			}
 

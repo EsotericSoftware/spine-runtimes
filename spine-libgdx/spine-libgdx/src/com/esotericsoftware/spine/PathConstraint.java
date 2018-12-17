@@ -208,7 +208,7 @@ public class PathConstraint implements Constraint {
 			float pathLength = lengths[curveCount];
 			if (percentPosition) position *= pathLength;
 			if (percentSpacing) {
-				for (int i = 0; i < spacesCount; i++)
+				for (int i = 1; i < spacesCount; i++)
 					spaces[i] *= pathLength;
 			}
 			world = this.world.setSize(8);
@@ -319,7 +319,7 @@ public class PathConstraint implements Constraint {
 		else
 			position *= pathLength / path.getLengths()[curveCount - 1];
 		if (percentSpacing) {
-			for (int i = 0; i < spacesCount; i++)
+			for (int i = 1; i < spacesCount; i++)
 				spaces[i] *= pathLength;
 		}
 

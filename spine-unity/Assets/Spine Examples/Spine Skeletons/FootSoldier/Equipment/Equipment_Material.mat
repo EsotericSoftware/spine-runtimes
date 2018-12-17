@@ -24,4 +24,5 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _Cutoff: 0.1
+    - _StraightAlphaInput: 0
     m_Colors: []
