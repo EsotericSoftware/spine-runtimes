@@ -9438,7 +9438,6 @@ var spine;
         }
         Popup.prototype.show = function (dismissedListener) {
             var _this = this;
-            if (dismissedListener === void 0) { dismissedListener = function () { }; }
             this.dom.classList.remove("spine-player-hidden");
             var dismissed = false;
             var resize = function () {
@@ -9778,6 +9777,8 @@ var spine;
             speedButton.classList.add("spine-player-button-icon-speed-selected");
             popup.show(function () {
                 speedButton.classList.remove("spine-player-button-icon-speed-selected");
+                popup.dom.remove();
+                _this.lastPopup = null;
             });
             this.lastPopup = popup;
         };
@@ -9814,6 +9815,8 @@ var spine;
             animationsButton.classList.add("spine-player-button-icon-animations-selected");
             popup.show(function () {
                 animationsButton.classList.remove("spine-player-button-icon-animations-selected");
+                popup.dom.remove();
+                _this.lastPopup = null;
             });
             this.lastPopup = popup;
         };
@@ -9850,6 +9853,8 @@ var spine;
             skinButton.classList.add("spine-player-button-icon-skins-selected");
             popup.show(function () {
                 skinButton.classList.remove("spine-player-button-icon-skins-selected");
+                popup.dom.remove();
+                _this.lastPopup = null;
             });
             this.lastPopup = popup;
         };
@@ -9887,6 +9892,8 @@ var spine;
             settingsButton.classList.add("spine-player-button-icon-settings-selected");
             popup.show(function () {
                 settingsButton.classList.remove("spine-player-button-icon-settings-selected");
+                popup.dom.remove();
+                _this.lastPopup = null;
             });
             this.lastPopup = popup;
         };

@@ -138,7 +138,7 @@
 			parent.appendChild(this.dom);
 		}
 
-		show (dismissedListener = () => {}) {
+		show (dismissedListener: () => void) {
 			this.dom.classList.remove("spine-player-hidden");
 
 			// Make sure the popup isn't bigger than the player.
@@ -548,6 +548,8 @@
 			speedButton.classList.add("spine-player-button-icon-speed-selected")
 			popup.show(() => {
 				speedButton.classList.remove("spine-player-button-icon-speed-selected")
+				popup.dom.remove();
+				this.lastPopup = null;
 			});
 			this.lastPopup = popup;
 		}
@@ -596,6 +598,8 @@
 			animationsButton.classList.add("spine-player-button-icon-animations-selected")
 			popup.show(() => {
 				animationsButton.classList.remove("spine-player-button-icon-animations-selected")
+				popup.dom.remove();
+				this.lastPopup = null;
 			});
 			this.lastPopup = popup;
 		}
@@ -645,6 +649,8 @@
 			skinButton.classList.add("spine-player-button-icon-skins-selected")
 			popup.show(() => {
 				skinButton.classList.remove("spine-player-button-icon-skins-selected")
+				popup.dom.remove();
+				this.lastPopup = null;
 			});
 			this.lastPopup = popup;
 		}
@@ -689,6 +695,8 @@
 			settingsButton.classList.add("spine-player-button-icon-settings-selected")
 			popup.show(() => {
 				settingsButton.classList.remove("spine-player-button-icon-settings-selected")
+				popup.dom.remove();
+				this.lastPopup = null;
 			});
 			this.lastPopup = popup;
 		}
