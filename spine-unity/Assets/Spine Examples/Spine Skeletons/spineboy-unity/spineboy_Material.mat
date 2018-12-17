@@ -28,6 +28,7 @@ Material:
     - _Cutoff: 0.1
     - _FillPhase: 0
     - _RefractionStrength: 0.01
+    - _StraightAlphaInput: 0
     - _node_3476: 0
     m_Colors:
     - _Black: {r: 0, g: 0, b: 0, a: 0}
