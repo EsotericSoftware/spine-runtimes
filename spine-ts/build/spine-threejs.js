@@ -3039,7 +3039,7 @@ var spine;
 				if (percentPosition)
 					position *= pathLength_1;
 				if (percentSpacing) {
-					for (var i = 0; i < spacesCount; i++)
+					for (var i = 1; i < spacesCount; i++)
 						spaces[i] *= pathLength_1;
 				}
 				world = spine.Utils.setArraySize(this.world, 8);
@@ -3148,7 +3148,7 @@ var spine;
 			else
 				position *= pathLength / path.lengths[curveCount - 1];
 			if (percentSpacing) {
-				for (var i = 0; i < spacesCount; i++)
+				for (var i = 1; i < spacesCount; i++)
 					spaces[i] *= pathLength;
 			}
 			var segments = this.segments;
