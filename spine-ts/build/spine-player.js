@@ -9562,7 +9562,6 @@ var spine;
     }());
     var SpinePlayer = (function () {
         function SpinePlayer(parent, config) {
-            this.parent = parent;
             this.config = config;
             this.time = new spine.TimeKeeper();
             this.paused = true;
@@ -9574,8 +9573,8 @@ var spine;
             this.viewportTransitionStart = 0;
             this.cancelId = 0;
             if (typeof parent === "string")
-                parent = document.getElementById(parent);
-            parent.appendChild(this.render());
+                this.parent = document.getElementById(parent);
+            this.parent.appendChild(this.render());
         }
         SpinePlayer.prototype.validateConfig = function (config) {
             if (!config)
@@ -10175,33 +10174,45 @@ var spine;
             });
             var mouseOverControls = true;
             var mouseOverCanvas = false;
-            parent.addEventListener("mousemove", function (ev) {
+            document.addEventListener("mousemove", function (ev) {
                 if (ev instanceof MouseEvent) {
-                    if (!_this.config.showControls)
-                        return;
-                    var popup = findWithClass(_this.dom, "spine-player-popup");
-                    mouseOverControls = overlap(ev, _this.playerControls.getBoundingClientRect());
-                    mouseOverCanvas = overlap(ev, _this.canvas.getBoundingClientRect());
-                    clearTimeout(_this.cancelId);
-                    var hide = popup.length == 0 && !mouseOverControls && !mouseOverCanvas && !_this.paused;
-                    if (hide) {
-                        _this.playerControls.classList.add("spine-player-controls-hidden");
-                    }
-                    else {
-                        _this.playerControls.classList.remove("spine-player-controls-hidden");
-                    }
-                    if (!mouseOverControls && popup.length == 0 && !_this.paused) {
-                        var remove = function () {
-                            if (!_this.paused)
-                                _this.playerControls.classList.add("spine-player-controls-hidden");
-                        };
-                        _this.cancelId = setTimeout(remove, 1000);
+                    handleHover(ev.clientX, ev.clientY);
+                }
+            });
+            document.addEventListener("touchmove", function (ev) {
+                if (ev instanceof TouchEvent) {
+                    var touches = ev.changedTouches;
+                    if (touches.length > 0) {
+                        var touch = touches[0];
+                        handleHover(touch.clientX, touch.clientY);
                     }
                 }
             });
-            var overlap = function (ev, rect) {
-                var x = ev.clientX - rect.left;
-                var y = ev.clientY - rect.top;
+            var handleHover = function (mouseX, mouseY) {
+                if (!_this.config.showControls)
+                    return;
+                var popup = findWithClass(_this.dom, "spine-player-popup");
+                mouseOverControls = overlap(mouseX, mouseY, _this.playerControls.getBoundingClientRect());
+                mouseOverCanvas = overlap(mouseX, mouseY, _this.canvas.getBoundingClientRect());
+                clearTimeout(_this.cancelId);
+                var hide = popup.length == 0 && !mouseOverControls && !mouseOverCanvas && !_this.paused;
+                if (hide) {
+                    _this.playerControls.classList.add("spine-player-controls-hidden");
+                }
+                else {
+                    _this.playerControls.classList.remove("spine-player-controls-hidden");
+                }
+                if (!mouseOverControls && popup.length == 0 && !_this.paused) {
+                    var remove = function () {
+                        if (!_this.paused)
+                            _this.playerControls.classList.add("spine-player-controls-hidden");
+                    };
+                    _this.cancelId = setTimeout(remove, 1000);
+                }
+            };
+            var overlap = function (mouseX, mouseY, rect) {
+                var x = mouseX - rect.left;
+                var y = mouseY - rect.top;
                 return x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
             };
         };

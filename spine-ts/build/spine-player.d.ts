@@ -1741,7 +1741,6 @@ declare module spine {
         error: (widget: SpinePlayer, msg: string) => void;
     }
     class SpinePlayer {
-        parent: HTMLElement | string;
         private config;
         static HOVER_COLOR_INNER: Color;
         static HOVER_COLOR_OUTER: Color;
@@ -1770,6 +1769,7 @@ declare module spine {
         private previousViewport;
         private viewportTransitionStart;
         private selectedBones;
+        private parent;
         constructor(parent: HTMLElement | string, config: SpinePlayerConfig);
         validateConfig(config: SpinePlayerConfig): SpinePlayerConfig;
         showError(error: string): void;

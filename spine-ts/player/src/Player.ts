@@ -310,10 +310,11 @@
 		private viewportTransitionStart = 0;
 
 		private selectedBones: Bone[];
+		private parent: HTMLElement;
 
-		constructor(public parent: HTMLElement | string, private config: SpinePlayerConfig) {
-			if (typeof parent === "string") parent = document.getElementById(parent);
-			parent.appendChild(this.render());
+		constructor(parent: HTMLElement | string, private config: SpinePlayerConfig) {
+			if (typeof parent === "string") this.parent = document.getElementById(parent);
+			this.parent.appendChild(this.render());
 		}
 
 		validateConfig(config: SpinePlayerConfig): SpinePlayerConfig {
@@ -1020,13 +1021,27 @@
 			// area :/
 			var mouseOverControls = true;
 			var mouseOverCanvas = false;
-			parent.addEventListener("mousemove", (ev: UIEvent) => {
+			document.addEventListener("mousemove", (ev: UIEvent) => {
 				if (ev instanceof MouseEvent) {
-					if (!this.config.showControls) return;
+					handleHover(ev.clientX, ev.clientY);
+				}
+			});
+			document.addEventListener("touchmove", (ev: UIEvent) => {
+				if (ev instanceof TouchEvent) {
+					var touches = ev.changedTouches;
+					if (touches.length > 0) {
+						var touch = touches[0];
+						handleHover(touch.clientX, touch.clientY);
+					}
+				}
+			});
+
+			let handleHover = (mouseX: number, mouseY: number) => {
+				if (!this.config.showControls) return;
 
 					let popup = findWithClass(this.dom, "spine-player-popup");
-					mouseOverControls = overlap(ev, this.playerControls.getBoundingClientRect());
-					mouseOverCanvas = overlap(ev, this.canvas.getBoundingClientRect());
+					mouseOverControls = overlap(mouseX, mouseY, this.playerControls.getBoundingClientRect());
+					mouseOverCanvas = overlap(mouseX, mouseY, this.canvas.getBoundingClientRect());
 					clearTimeout(this.cancelId);
 					let hide = popup.length == 0 && !mouseOverControls && !mouseOverCanvas && !this.paused;
 					if (hide) {
@@ -1040,12 +1055,11 @@
 						};
 						this.cancelId = setTimeout(remove, 1000);
 					}
-				}
-			});
+			}
 
-			let overlap = (ev: MouseEvent, rect: DOMRect | ClientRect): boolean => {
-					let x = ev.clientX - rect.left;
-					let y = ev.clientY - rect.top;
+			let overlap = (mouseX: number, mouseY: number, rect: DOMRect | ClientRect): boolean => {
+					let x = mouseX - rect.left;
+					let y = mouseY - rect.top;
 					return x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
 			}
 		}
