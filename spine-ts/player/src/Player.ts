@@ -952,6 +952,7 @@
 			this.loaded = true;
 		}
 
+		private cancelId = 0;
 		setupInput () {
 			let controlBones = this.config.controlBones;
 			let selectedBones = this.selectedBones = new Array<Bone>(this.config.controlBones.length);
@@ -975,7 +976,14 @@
 					}
 				},
 				up: (x, y) => {
-					target = null;
+					if (target) {
+						target = null;
+					} else {
+						if (this.paused)
+							this.play()
+						else
+							this.pause();
+					}
 				},
 				dragged: (x, y) => {
 					if (target != null) {
@@ -1012,7 +1020,6 @@
 			// area :/
 			var mouseOverControls = true;
 			var mouseOverCanvas = false;
-			let cancelId = 0;
 			parent.addEventListener("mousemove", (ev: UIEvent) => {
 				if (ev instanceof MouseEvent) {
 					if (!this.config.showControls) return;
@@ -1020,21 +1027,18 @@
 					let popup = findWithClass(this.dom, "spine-player-popup");
 					mouseOverControls = overlap(ev, this.playerControls.getBoundingClientRect());
 					mouseOverCanvas = overlap(ev, this.canvas.getBoundingClientRect());
-					clearTimeout(cancelId);
+					clearTimeout(this.cancelId);
 					let hide = popup.length == 0 && !mouseOverControls && !mouseOverCanvas && !this.paused;
 					if (hide) {
-						console.log("hidding");
 						this.playerControls.classList.add("spine-player-controls-hidden");
 					} else {
-						console.log("showing");
 						this.playerControls.classList.remove("spine-player-controls-hidden");
 					}
 					if (!mouseOverControls && popup.length == 0 && !this.paused) {
 						let remove = () => {
-							console.log("hidding timeout");
-							this.playerControls.classList.add("spine-player-controls-hidden");
+							if (!this.paused) this.playerControls.classList.add("spine-player-controls-hidden");
 						};
-						cancelId = setTimeout(remove, 500);
+						this.cancelId = setTimeout(remove, 500);
 					}
 				}
 			});
@@ -1048,6 +1052,10 @@
 
 		private play () {
 			this.paused = false;
+			let remove = () => {
+				if (!this.paused) this.playerControls.classList.add("spine-player-controls-hidden");
+			};
+			this.cancelId = setTimeout(remove, 500);
 			this.playButton.classList.remove("spine-player-button-icon-play");
 			this.playButton.classList.add("spine-player-button-icon-pause");
 
@@ -1060,6 +1068,9 @@
 
 		private pause () {
 			this.paused = true;
+			this.playerControls.classList.remove("spine-player-controls-hidden");
+			clearTimeout(this.cancelId);
+
 			this.playButton.classList.remove("spine-player-button-icon-pause");
 			this.playButton.classList.add("spine-player-button-icon-play");
 		}

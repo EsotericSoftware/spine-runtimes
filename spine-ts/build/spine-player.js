@@ -9572,6 +9572,7 @@ var spine;
 			this.currentViewport = null;
 			this.previousViewport = null;
 			this.viewportTransitionStart = 0;
+			this.cancelId = 0;
 			if (typeof parent === "string")
 				parent = document.getElementById(parent);
 			parent.appendChild(this.render());
@@ -10133,7 +10134,15 @@ var spine;
 					}
 				},
 				up: function (x, y) {
-					target = null;
+					if (target) {
+						target = null;
+					}
+					else {
+						if (_this.paused)
+							_this.play();
+						else
+							_this.pause();
+					}
 				},
 				dragged: function (x, y) {
 					if (target != null) {
@@ -10166,7 +10175,6 @@ var spine;
 			});
 			var mouseOverControls = true;
 			var mouseOverCanvas = false;
-			var cancelId = 0;
 			parent.addEventListener("mousemove", function (ev) {
 				if (ev instanceof MouseEvent) {
 					if (!_this.config.showControls)
@@ -10174,22 +10182,20 @@ var spine;
 					var popup = findWithClass(_this.dom, "spine-player-popup");
 					mouseOverControls = overlap(ev, _this.playerControls.getBoundingClientRect());
 					mouseOverCanvas = overlap(ev, _this.canvas.getBoundingClientRect());
-					clearTimeout(cancelId);
+					clearTimeout(_this.cancelId);
 					var hide = popup.length == 0 && !mouseOverControls && !mouseOverCanvas && !_this.paused;
 					if (hide) {
-						console.log("hidding");
 						_this.playerControls.classList.add("spine-player-controls-hidden");
 					}
 					else {
-						console.log("showing");
 						_this.playerControls.classList.remove("spine-player-controls-hidden");
 					}
 					if (!mouseOverControls && popup.length == 0 && !_this.paused) {
 						var remove = function () {
-							console.log("hidding timeout");
-							_this.playerControls.classList.add("spine-player-controls-hidden");
+							if (!_this.paused)
+								_this.playerControls.classList.add("spine-player-controls-hidden");
 						};
-						cancelId = setTimeout(remove, 500);
+						_this.cancelId = setTimeout(remove, 500);
 					}
 				}
 			});
@@ -10200,7 +10206,13 @@ var spine;
 			};
 		};
 		SpinePlayer.prototype.play = function () {
+			var _this = this;
 			this.paused = false;
+			var remove = function () {
+				if (!_this.paused)
+					_this.playerControls.classList.add("spine-player-controls-hidden");
+			};
+			this.cancelId = setTimeout(remove, 500);
 			this.playButton.classList.remove("spine-player-button-icon-play");
 			this.playButton.classList.add("spine-player-button-icon-pause");
 			if (this.config.animation) {
@@ -10211,6 +10223,8 @@ var spine;
 		};
 		SpinePlayer.prototype.pause = function () {
 			this.paused = true;
+			this.playerControls.classList.remove("spine-player-controls-hidden");
+			clearTimeout(this.cancelId);
 			this.playButton.classList.remove("spine-player-button-icon-pause");
 			this.playButton.classList.add("spine-player-button-icon-play");
 		};

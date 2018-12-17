@@ -1872,6 +1872,7 @@ declare module spine {
 		drawFrame(requestNextFrame?: boolean): void;
 		scale(sourceWidth: number, sourceHeight: number, targetWidth: number, targetHeight: number): Vector2;
 		loadSkeleton(): void;
+		private cancelId;
 		setupInput(): void;
 		private play();
 		private pause();
