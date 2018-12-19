@@ -70,14 +70,12 @@ public class RegionAttachment extends Attachment {
 		float localY = -localY2;
 		if (region instanceof AtlasRegion) {
 			AtlasRegion region = (AtlasRegion)this.region;
+			localX += region.offsetX / region.originalWidth * width;
+			localY += region.offsetY / region.originalHeight * height;
 			if (region.rotate) {
-				localX += region.offsetX / region.originalWidth * width;
-				localY += region.offsetY / region.originalHeight * height;
 				localX2 -= (region.originalWidth - region.offsetX - region.packedHeight) / region.originalWidth * width;
 				localY2 -= (region.originalHeight - region.offsetY - region.packedWidth) / region.originalHeight * height;
 			} else {
-				localX += region.offsetX / region.originalWidth * width;
-				localY += region.offsetY / region.originalHeight * height;
 				localX2 -= (region.originalWidth - region.offsetX - region.packedWidth) / region.originalWidth * width;
 				localY2 -= (region.originalHeight - region.offsetY - region.packedHeight) / region.originalHeight * height;
 			}
