@@ -62,9 +62,6 @@
 		/* Optional: list of skin names from which the user can choose. */
 		skins: string[]
 
-		/* Optional: list of bone names that the user can control by dragging. */
-		controlBones: string[]
-
 		/* Optional: whether the skeleton uses premultiplied alpha. Default: false. */
 		premultipliedAlpha: boolean
 
@@ -118,6 +115,9 @@
 
 		/* Optional: the background color used in fullscreen mode. Must be given in the format #rrggbbaa. Default: backgroundColor. */
 		fullScreenBackgroundColor: string
+
+		/* Optional: list of bone names that the user can control by dragging. */
+		controlBones: string[]
 
 		/* Optional: callback when the widget and its assets have been successfully loaded. */
 		success: (widget: SpinePlayer) => void

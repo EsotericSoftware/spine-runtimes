@@ -10414,4 +10414,52 @@ var spine;
             .replace(/'/g, "&#39;");
     }
 })(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var SpinePlayerEditor = (function () {
+        function SpinePlayerEditor(parent) {
+            this.prefix = "<html>\n<body>".trim();
+            this.postfix = "</body>";
+            this.render(parent);
+        }
+        SpinePlayerEditor.prototype.render = function (parent) {
+            var _this = this;
+            var dom = "\n\t\t\t\t<div class=\"spine-player-editor-container\">\n\t\t\t\t\t<div class=\"spine-player-editor-code\"></div>\n\t\t\t\t\t<iframe class=\"spine-player-editor-player\"></iframe>\n\t\t\t\t</div>\n\t\t\t";
+            parent.innerHTML = dom;
+            var codeElement = parent.getElementsByClassName("spine-player-editor-code")[0];
+            this.player = parent.getElementsByClassName("spine-player-editor-player")[0];
+            requestAnimationFrame(function () {
+                _this.code = CodeMirror(codeElement, {
+                    lineNumbers: true,
+                    tabSize: 3,
+                    indentUnit: 3,
+                    indentWithTabs: true,
+                    scrollBarStyle: "native",
+                    mode: "htmlmixed",
+                    theme: "monokai"
+                });
+                _this.code.on("change", function () {
+                    _this.startPlayer();
+                });
+                _this.setCode(SpinePlayerEditor.DEFAULT_CODE);
+            });
+        };
+        SpinePlayerEditor.prototype.setPreAndPostfix = function (prefix, postfix) {
+            this.prefix = prefix;
+            this.postfix = postfix;
+            this.startPlayer();
+        };
+        SpinePlayerEditor.prototype.setCode = function (code) {
+            this.code.setValue(code);
+            this.startPlayer();
+        };
+        SpinePlayerEditor.prototype.startPlayer = function () {
+            var code = this.code.getDoc().getValue();
+            this.player.src = "data:text/html;charset=utf-8," + this.prefix + code + this.postfix;
+        };
+        SpinePlayerEditor.DEFAULT_CODE = "\n<script src=\"https://esotericsoftware.com/files/spine-player/3.7/spine-player.js\"></script>\n<link rel=\"stylesheet\" href=\"https://esotericsoftware.com/files/spine-player/3.7/spine-player.css\">\n\n<div id=\"player-container\" style=\"width: 100%; height: 100vh;\"></div>\n\n<script>\nnew spine.SpinePlayer(\"player-container\", {\n\tjsonUrl: \"https://esotericsoftware.com/files/examples/spineboy/export/spineboy-pro.json\",\n\tatlasUrl: \"https://esotericsoftware.com/files/examples/spineboy/export/spineboy-pma.atlas\"\n});\n</script>\n\t\t".trim();
+        return SpinePlayerEditor;
+    }());
+    spine.SpinePlayerEditor = SpinePlayerEditor;
+})(spine || (spine = {}));
 //# sourceMappingURL=spine-player.js.map

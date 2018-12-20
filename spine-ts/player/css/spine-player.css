@@ -382,3 +382,26 @@
 .spine-player-speed-slider {
 	width: 150px;
 }
+
+/** Player editor **/
+.spine-player-editor-container {
+	display: flex;
+	flex-direction: row;
+	height: 100%;
+	width: 100%;
+}
+
+.spine-player-editor-code {
+	flex: 1;
+	overflow: auto;
+}
+
+.CodeMirror {
+	height: 100%;
+}
+
+.spine-player-editor-player {
+	flex: 1;
+	border: none;
+	background: black;
+}
