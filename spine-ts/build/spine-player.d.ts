@@ -1803,6 +1803,7 @@ declare module spine {
         private render(parent);
         setPreAndPostfix(prefix: string, postfix: string): void;
         setCode(code: string): void;
+        private timerId;
         startPlayer(): void;
     }
 }

@@ -10420,6 +10420,7 @@ var spine;
         function SpinePlayerEditor(parent) {
             this.prefix = "<html>\n<head>\n<style>\nbody {\n\tmargin: 0px;\n}\n</style>\n</head>\n<body>".trim();
             this.postfix = "</body>";
+            this.timerId = 0;
             this.render(parent);
         }
         SpinePlayerEditor.prototype.render = function (parent) {
@@ -10454,8 +10455,15 @@ var spine;
             this.startPlayer();
         };
         SpinePlayerEditor.prototype.startPlayer = function () {
-            var code = this.code.getDoc().getValue();
-            this.player.src = "data:text/html;charset=utf-8," + this.prefix + code + this.postfix;
+            var _this = this;
+            clearTimeout(this.timerId);
+            this.timerId = setTimeout(function () {
+                var code = _this.code.getDoc().getValue();
+                code = _this.prefix + code + _this.postfix;
+                code = window.btoa(code);
+                _this.player.src = "";
+                _this.player.src = "data:text/html;base64," + code;
+            }, 500);
         };
         SpinePlayerEditor.DEFAULT_CODE = "\n<script src=\"https://esotericsoftware.com/files/spine-player/3.7/spine-player.js\"></script>\n<link rel=\"stylesheet\" href=\"https://esotericsoftware.com/files/spine-player/3.7/spine-player.css\">\n\n<div id=\"player-container\" style=\"width: 100%; height: 100vh;\"></div>\n\n<script>\nnew spine.SpinePlayer(\"player-container\", {\n\tjsonUrl: \"https://esotericsoftware.com/files/examples/spineboy/export/spineboy-pro.json\",\n\tatlasUrl: \"https://esotericsoftware.com/files/examples/spineboy/export/spineboy-pma.atlas\"\n});\n</script>\n\t\t".trim();
         return SpinePlayerEditor;

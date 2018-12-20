@@ -75,9 +75,16 @@ body {
 			this.startPlayer();
 		}
 
+		private timerId = 0;
 		startPlayer() {
-			let code = this.code.getDoc().getValue();
-			this.player.src = "data:text/html;charset=utf-8," + this.prefix + code + this.postfix;
+			clearTimeout(this.timerId);
+			this.timerId = setTimeout( () => {
+				let code = this.code.getDoc().getValue();
+				code = this.prefix + code + this.postfix;
+				code = window.btoa(code);
+				this.player.src = "";
+				this.player.src = "data:text/html;base64," + code;
+			}, 500);
 		}
 	}
 }
