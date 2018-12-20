@@ -391,12 +391,6 @@
 	width: 100%;
 }
 
-@media only screen and (max-width: 600px) {
-	.spine-player-editor-container {
-		flex-direction: column;
-	}
-  }
-
 .spine-player-editor-code {
 	flex: 1;
 	overflow: auto;
