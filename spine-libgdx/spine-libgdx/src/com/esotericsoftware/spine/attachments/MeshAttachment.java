@@ -78,19 +78,21 @@ public class MeshAttachment extends VertexAttachment {
 		if (region instanceof AtlasRegion) {
 			AtlasRegion region = (AtlasRegion)this.region;
 			float textureWidth = region.getTexture().getWidth(), textureHeight = region.getTexture().getHeight();
-			width = region.originalWidth / textureWidth;
-			height = region.originalHeight / textureHeight;
 			if (region.rotate) {
 				u = region.getU() - (region.originalHeight - region.offsetY - region.packedWidth) / textureWidth;
 				v = region.getV() - (region.originalWidth - region.offsetX - region.packedHeight) / textureHeight;
+				width = region.originalHeight / textureWidth;
+				height = region.originalWidth / textureHeight;
 				for (int i = 0, n = uvs.length; i < n; i += 2) {
-					uvs[i] = u + regionUVs[i + 1] * height;
-					uvs[i + 1] = v + width - regionUVs[i] * width;
+					uvs[i] = u + regionUVs[i + 1] * width;
+					uvs[i + 1] = v + height - regionUVs[i] * height;
 				}
 				return;
 			}
 			u = region.getU() - region.offsetX / textureWidth;
 			v = region.getV() - (region.originalHeight - region.offsetY - region.packedHeight) / textureHeight;
+			width = region.originalWidth / textureWidth;
+			height = region.originalHeight / textureHeight;
 		} else if (region == null) {
 			u = v = 0;
 			width = height = 1;
