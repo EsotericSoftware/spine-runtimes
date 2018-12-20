@@ -10418,7 +10418,7 @@ var spine;
 (function (spine) {
     var SpinePlayerEditor = (function () {
         function SpinePlayerEditor(parent) {
-            this.prefix = "<html>\n<body>".trim();
+            this.prefix = "<html>\n<head>\n<style>\nbody {\n\tmargin: 0px;\n}\n</style>\n</head>\n<body>".trim();
             this.postfix = "</body>";
             this.render(parent);
         }

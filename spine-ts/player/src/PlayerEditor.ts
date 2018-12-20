@@ -19,6 +19,13 @@ new spine.SpinePlayer("player-container", {
 
 		private prefix: string =
 `<html>
+<head>
+<style>
+body {
+	margin: 0px;
+}
+</style>
+</head>
 <body>`.trim()
 		private postfix: string = `</body>`;
 		private code: any;
