@@ -979,13 +979,13 @@ namespace Spine.Unity {
 			var vbi = vertexBuffer.Items;
 			var ubi = uvBuffer.Items;
 			var cbi = colorBuffer.Items;
+			int vbiLength = vbi.Length;
 
 			// Zero the extra.
 			{
 				int listCount = vertexBuffer.Count;
-				int arrayLength = vertexBuffer.Items.Length;
 				var vector3zero = Vector3.zero;
-				for (int i = listCount; i < arrayLength; i++)
+				for (int i = listCount; i < vbiLength; i++)
 					vbi[i] = vector3zero;
 			}
 
@@ -1028,6 +1028,12 @@ namespace Spine.Unity {
 
 				if (settings.tintBlack) {
 					if (uv2 != null) {
+						// Sometimes, the vertex buffer becomes smaller. We need to trim the size of the tint black buffers to match.
+						if (vbiLength > uv2.Items.Length) {
+							Array.Resize(ref uv2.Items, vbiLength);
+							Array.Resize(ref uv3.Items, vbiLength);
+							uv2.Count = uv3.Count = vbiLength;
+						}
 						mesh.uv2 = this.uv2.Items;
 						mesh.uv3 = this.uv3.Items;
 					}	
