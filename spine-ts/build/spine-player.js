@@ -9591,7 +9591,7 @@ var spine;
             if (!config.fullScreenBackgroundColor)
                 config.fullScreenBackgroundColor = config.backgroundColor;
             if (!config.premultipliedAlpha)
-                config.premultipliedAlpha = false;
+                config.premultipliedAlpha = true;
             if (!config.success)
                 config.success = function (widget) { };
             if (!config.error)

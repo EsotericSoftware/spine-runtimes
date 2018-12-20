@@ -62,7 +62,7 @@
 		/* Optional: list of skin names from which the user can choose. */
 		skins: string[]
 
-		/* Optional: whether the skeleton uses premultiplied alpha. Default: false. */
+		/* Optional: whether the skeleton uses premultiplied alpha. Default: true. */
 		premultipliedAlpha: boolean
 
 		/* Optional: whether to show the player controls. Default: true. */
@@ -325,7 +325,7 @@
 			if (!config.alpha) config.alpha = false;
 			if (!config.backgroundColor) config.backgroundColor = "#000000";
 			if (!config.fullScreenBackgroundColor) config.fullScreenBackgroundColor = config.backgroundColor;
-			if (!config.premultipliedAlpha) config.premultipliedAlpha = false;
+			if (!config.premultipliedAlpha) config.premultipliedAlpha = true;
 			if (!config.success) config.success = (widget) => {};
 			if (!config.error) config.error = (widget, msg) => {};
 			if (!config.debug) config.debug = {
