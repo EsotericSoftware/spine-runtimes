@@ -80,7 +80,7 @@ module spine.webgl {
 
 			this.timeKeeper.update();
 			let a = Math.abs(Math.sin(this.timeKeeper.totalTime + 0.75));
-			this.angle -= this.timeKeeper.delta * 360 * (1 + 1.5 * Math.pow(a, 5));
+			this.angle -= this.timeKeeper.delta / 1.4 * 360 * (1 + 1.5 * Math.pow(a, 5));
 
 			let renderer = this.renderer;
 			let canvas = renderer.canvas;

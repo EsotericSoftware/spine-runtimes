@@ -62,10 +62,7 @@
 		/* Optional: list of skin names from which the user can choose. */
 		skins: string[]
 
-		/* Optional: list of bone names that the user can control by dragging. */
-		controlBones: string[]
-
-		/* Optional: whether the skeleton uses premultiplied alpha. Default: false. */
+		/* Optional: whether the skeleton uses premultiplied alpha. Default: true. */
 		premultipliedAlpha: boolean
 
 		/* Optional: whether to show the player controls. Default: true. */
@@ -119,6 +116,9 @@
 		/* Optional: the background color used in fullscreen mode. Must be given in the format #rrggbbaa. Default: backgroundColor. */
 		fullScreenBackgroundColor: string
 
+		/* Optional: list of bone names that the user can control by dragging. */
+		controlBones: string[]
+
 		/* Optional: callback when the widget and its assets have been successfully loaded. */
 		success: (widget: SpinePlayer) => void
 
@@ -138,7 +138,7 @@
 			parent.appendChild(this.dom);
 		}
 
-		show (dismissedListener = () => {}) {
+		show (dismissedListener: () => void) {
 			this.dom.classList.remove("spine-player-hidden");
 
 			// Make sure the popup isn't bigger than the player.
@@ -310,9 +310,12 @@
 		private viewportTransitionStart = 0;
 
 		private selectedBones: Bone[];
+		private parent: HTMLElement;
 
-		constructor(parent: HTMLElement, private config: SpinePlayerConfig) {
-			parent.appendChild(this.render());
+		constructor(parent: HTMLElement | string, private config: SpinePlayerConfig) {
+			if (typeof parent === "string") this.parent = document.getElementById(parent);
+			else this.parent = parent;
+			this.parent.appendChild(this.render());
 		}
 
 		validateConfig(config: SpinePlayerConfig): SpinePlayerConfig {
@@ -322,7 +325,7 @@
 			if (!config.alpha) config.alpha = false;
 			if (!config.backgroundColor) config.backgroundColor = "#000000";
 			if (!config.fullScreenBackgroundColor) config.fullScreenBackgroundColor = config.backgroundColor;
-			if (!config.premultipliedAlpha) config.premultipliedAlpha = false;
+			if (!config.premultipliedAlpha) config.premultipliedAlpha = true;
 			if (!config.success) config.success = (widget) => {};
 			if (!config.error) config.error = (widget, msg) => {};
 			if (!config.debug) config.debug = {
@@ -545,6 +548,8 @@
 			speedButton.classList.add("spine-player-button-icon-speed-selected")
 			popup.show(() => {
 				speedButton.classList.remove("spine-player-button-icon-speed-selected")
+				popup.dom.remove();
+				this.lastPopup = null;
 			});
 			this.lastPopup = popup;
 		}
@@ -593,6 +598,8 @@
 			animationsButton.classList.add("spine-player-button-icon-animations-selected")
 			popup.show(() => {
 				animationsButton.classList.remove("spine-player-button-icon-animations-selected")
+				popup.dom.remove();
+				this.lastPopup = null;
 			});
 			this.lastPopup = popup;
 		}
@@ -642,6 +649,8 @@
 			skinButton.classList.add("spine-player-button-icon-skins-selected")
 			popup.show(() => {
 				skinButton.classList.remove("spine-player-button-icon-skins-selected")
+				popup.dom.remove();
+				this.lastPopup = null;
 			});
 			this.lastPopup = popup;
 		}
@@ -686,6 +695,8 @@
 			settingsButton.classList.add("spine-player-button-icon-settings-selected")
 			popup.show(() => {
 				settingsButton.classList.remove("spine-player-button-icon-settings-selected")
+				popup.dom.remove();
+				this.lastPopup = null;
 			});
 			this.lastPopup = popup;
 		}
@@ -951,6 +962,7 @@
 			this.loaded = true;
 		}
 
+		private cancelId = 0;
 		setupInput () {
 			let controlBones = this.config.controlBones;
 			let selectedBones = this.selectedBones = new Array<Bone>(this.config.controlBones.length);
@@ -972,11 +984,16 @@
 							target = bone;
 						}
 					}
-					handleHover();
 				},
 				up: (x, y) => {
-					target = null;
-					handleHover();
+					if (target) {
+						target = null;
+					} else {
+						if (this.paused)
+							this.play()
+						else
+							this.pause();
+					}
 				},
 				dragged: (x, y) => {
 					if (target != null) {
@@ -990,7 +1007,6 @@
 							target.y = coords.y - skeleton.y;
 						}
 					}
-					handleHover();
 				},
 				moved: (x, y) => {
 					for (var i = 0; i < controlBones.length; i++) {
@@ -1003,7 +1019,6 @@
 							selectedBones[i] = null;
 						}
 					}
-					handleHover();
 				}
 			});
 
@@ -1013,35 +1028,57 @@
 			// For this we need to register a mouse handler on
 			// the document and see if we are within the canvas
 			// area :/
-			var mouseOverChildren = true;
+			var mouseOverControls = true;
+			var mouseOverCanvas = false;
 			document.addEventListener("mousemove", (ev: UIEvent) => {
 				if (ev instanceof MouseEvent) {
-					let rect = this.playerControls.getBoundingClientRect();
-					let x = ev.clientX - rect.left;
-					let y = ev.clientY - rect.top;
-					mouseOverChildren = x >= 0 && x <= this.playerControls.clientWidth && y >= 0 && y <= this.playerControls.clientHeight;
+					handleHover(ev.clientX, ev.clientY);
+				}
+			});
+			document.addEventListener("touchmove", (ev: UIEvent) => {
+				if (ev instanceof TouchEvent) {
+					var touches = ev.changedTouches;
+					if (touches.length > 0) {
+						var touch = touches[0];
+						handleHover(touch.clientX, touch.clientY);
+					}
 				}
 			});
 
-			let cancelId = 0;
-			let handleHover = () => {
+			let handleHover = (mouseX: number, mouseY: number) => {
 				if (!this.config.showControls) return;
-				clearTimeout(cancelId);
-				this.playerControls.classList.remove("spine-player-controls-hidden");
-				let remove = () => {
+
 					let popup = findWithClass(this.dom, "spine-player-popup");
-					if (popup.length == 0 && !mouseOverChildren && !this.paused) {
+					mouseOverControls = overlap(mouseX, mouseY, this.playerControls.getBoundingClientRect());
+					mouseOverCanvas = overlap(mouseX, mouseY, this.canvas.getBoundingClientRect());
+					clearTimeout(this.cancelId);
+					let hide = popup.length == 0 && !mouseOverControls && !mouseOverCanvas && !this.paused;
+					if (hide) {
 						this.playerControls.classList.add("spine-player-controls-hidden");
 					} else {
-						cancelId = setTimeout(remove, 1000);
+						this.playerControls.classList.remove("spine-player-controls-hidden");
 					}
-				};
-				cancelId = setTimeout(remove, 1000);
+					if (!mouseOverControls && popup.length == 0 && !this.paused) {
+						let remove = () => {
+							if (!this.paused) this.playerControls.classList.add("spine-player-controls-hidden");
+						};
+						this.cancelId = setTimeout(remove, 1000);
+					}
+			}
+
+			let overlap = (mouseX: number, mouseY: number, rect: DOMRect | ClientRect): boolean => {
+					let x = mouseX - rect.left;
+					let y = mouseY - rect.top;
+					return x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
 			}
 		}
 
 		private play () {
 			this.paused = false;
+			let remove = () => {
+				if (!this.paused) this.playerControls.classList.add("spine-player-controls-hidden");
+			};
+			this.cancelId = setTimeout(remove, 1000);
 			this.playButton.classList.remove("spine-player-button-icon-play");
 			this.playButton.classList.add("spine-player-button-icon-pause");
 
@@ -1054,6 +1091,9 @@
 
 		private pause () {
 			this.paused = true;
+			this.playerControls.classList.remove("spine-player-controls-hidden");
+			clearTimeout(this.cancelId);
+
 			this.playButton.classList.remove("spine-player-button-icon-pause");
 			this.playButton.classList.add("spine-player-button-icon-play");
 		}

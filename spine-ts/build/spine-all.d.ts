@@ -1772,3 +1772,112 @@ declare module spine.threejs {
 		static toThreeJsTextureWrap(wrap: TextureWrap): THREE.Wrapping;
 	}
 }
+declare module spine {
+	interface Viewport {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+		padLeft: string | number;
+		padRight: string | number;
+		padTop: string | number;
+		padBottom: string | number;
+	}
+	interface SpinePlayerConfig {
+		jsonUrl: string;
+		atlasUrl: string;
+		animation: string;
+		animations: string[];
+		defaultMix: number;
+		skin: string;
+		skins: string[];
+		controlBones: string[];
+		premultipliedAlpha: boolean;
+		showControls: boolean;
+		debug: {
+			bones: boolean;
+			regions: boolean;
+			meshes: boolean;
+			bounds: boolean;
+			paths: boolean;
+			clipping: boolean;
+			points: boolean;
+			hulls: boolean;
+		};
+		viewport: {
+			x: number;
+			y: number;
+			width: number;
+			height: number;
+			padLeft: string | number;
+			padRight: string | number;
+			padTop: string | number;
+			padBottom: string | number;
+			animations: Map<Viewport>;
+			debugRender: boolean;
+			transitionTime: number;
+		};
+		alpha: boolean;
+		backgroundColor: string;
+		backgroundImage: {
+			url: string;
+			x: number;
+			y: number;
+			width: number;
+			height: number;
+		};
+		fullScreenBackgroundColor: string;
+		success: (widget: SpinePlayer) => void;
+		error: (widget: SpinePlayer, msg: string) => void;
+	}
+	class SpinePlayer {
+		parent: HTMLElement | string;
+		private config;
+		static HOVER_COLOR_INNER: Color;
+		static HOVER_COLOR_OUTER: Color;
+		static NON_HOVER_COLOR_INNER: Color;
+		static NON_HOVER_COLOR_OUTER: Color;
+		private sceneRenderer;
+		private dom;
+		private playerControls;
+		private canvas;
+		private timelineSlider;
+		private playButton;
+		private skinButton;
+		private animationButton;
+		private context;
+		private loadingScreen;
+		private assetManager;
+		private loaded;
+		private skeleton;
+		private animationState;
+		private time;
+		private paused;
+		private playTime;
+		private speed;
+		private animationViewports;
+		private currentViewport;
+		private previousViewport;
+		private viewportTransitionStart;
+		private selectedBones;
+		constructor(parent: HTMLElement | string, config: SpinePlayerConfig);
+		validateConfig(config: SpinePlayerConfig): SpinePlayerConfig;
+		showError(error: string): void;
+		render(): HTMLElement;
+		private lastPopup;
+		showSpeedDialog(speedButton: HTMLElement): void;
+		showAnimationsDialog(animationsButton: HTMLElement): void;
+		showSkinsDialog(skinButton: HTMLElement): void;
+		showSettingsDialog(settingsButton: HTMLElement): void;
+		drawFrame(requestNextFrame?: boolean): void;
+		scale(sourceWidth: number, sourceHeight: number, targetWidth: number, targetHeight: number): Vector2;
+		loadSkeleton(): void;
+		private cancelId;
+		setupInput(): void;
+		private play();
+		private pause();
+		private setAnimation(animation);
+		private percentageToWorldUnit(size, percentageOrAbsolute);
+		private calculateAnimationViewport(animationName);
+	}
+}

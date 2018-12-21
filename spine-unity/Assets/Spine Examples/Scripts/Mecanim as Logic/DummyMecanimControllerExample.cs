@@ -2,14 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Spine;
-using Spine.Unity;
-
 namespace Spine.Unity.Examples {
-	public class AnimationStateWithMecanimExample : MonoBehaviour {
+	public class DummyMecanimControllerExample : MonoBehaviour {
 
-		SkeletonAnimation skeletonAnimation;
-		Animator logicAnimator;
+		public Animator logicAnimator;
+		public SkeletonAnimationHandleExample animationHandle; 
 		
 		[Header("Controls")]
 		public KeyCode walkButton = KeyCode.LeftShift;
@@ -26,9 +23,6 @@ namespace Spine.Unity.Examples {
 		public bool isGrounded;
 
 		void Awake () {
-			skeletonAnimation = GetComponent<SkeletonAnimation>();
-			logicAnimator = GetComponent<Animator>();
-
 			isGrounded = true;
 		}
 
@@ -42,7 +36,7 @@ namespace Spine.Unity.Examples {
 
 			// Flip skeleton.
 			if (x != 0) {
-				skeletonAnimation.Skeleton.ScaleX = x > 0 ? 1f : -1f;
+				animationHandle.SetFlip(x);
 			}
 
 			if (Input.GetKeyDown(jumpButton)) {
@@ -53,7 +47,6 @@ namespace Spine.Unity.Examples {
 			logicAnimator.SetFloat(horizontalSpeedProperty, Mathf.Abs(speed.x));
 			logicAnimator.SetFloat(verticalSpeedProperty, speed.y);
 			logicAnimator.SetBool(groundedProperty, isGrounded);
-			
 		}
 
 		IEnumerator FakeJump () {
