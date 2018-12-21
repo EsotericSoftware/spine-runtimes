@@ -7199,7 +7199,7 @@ var spine;
                     return;
                 this.timeKeeper.update();
                 var a = Math.abs(Math.sin(this.timeKeeper.totalTime + 0.75));
-                this.angle -= this.timeKeeper.delta * 360 * (1 + 1.5 * Math.pow(a, 5));
+                this.angle -= this.timeKeeper.delta / 1.4 * 360 * (1 + 1.5 * Math.pow(a, 5));
                 var renderer = this.renderer;
                 var canvas = renderer.canvas;
                 var gl = renderer.context.gl;
