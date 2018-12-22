@@ -1791,7 +1791,6 @@ declare module spine {
 		defaultMix: number;
 		skin: string;
 		skins: string[];
-		controlBones: string[];
 		premultipliedAlpha: boolean;
 		showControls: boolean;
 		debug: {
@@ -1827,11 +1826,11 @@ declare module spine {
 			height: number;
 		};
 		fullScreenBackgroundColor: string;
+		controlBones: string[];
 		success: (widget: SpinePlayer) => void;
 		error: (widget: SpinePlayer, msg: string) => void;
 	}
 	class SpinePlayer {
-		parent: HTMLElement | string;
 		private config;
 		static HOVER_COLOR_INNER: Color;
 		static HOVER_COLOR_OUTER: Color;
@@ -1860,6 +1859,7 @@ declare module spine {
 		private previousViewport;
 		private viewportTransitionStart;
 		private selectedBones;
+		private parent;
 		constructor(parent: HTMLElement | string, config: SpinePlayerConfig);
 		validateConfig(config: SpinePlayerConfig): SpinePlayerConfig;
 		showError(error: string): void;
@@ -1879,5 +1879,21 @@ declare module spine {
 		private setAnimation(animation);
 		private percentageToWorldUnit(size, percentageOrAbsolute);
 		private calculateAnimationViewport(animationName);
+	}
+}
+declare function CodeMirror(el: Element, config: any): void;
+declare module spine {
+	class SpinePlayerEditor {
+		private static DEFAULT_CODE;
+		private prefix;
+		private postfix;
+		private code;
+		private player;
+		constructor(parent: HTMLElement);
+		private render(parent);
+		setPreAndPostfix(prefix: string, postfix: string): void;
+		setCode(code: string): void;
+		private timerId;
+		startPlayer(): void;
 	}
 }

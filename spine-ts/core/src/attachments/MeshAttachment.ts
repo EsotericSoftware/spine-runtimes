@@ -45,6 +45,45 @@ module spine {
 		}
 
 		updateUVs () {
+			let regionUVs = this.regionUVs;
+			if (this.uvs == null || this.uvs.length != regionUVs.length) this.uvs = Utils.newFloatArray(regionUVs.length);
+			let uvs = this.uvs;
+			let u = 0, v = 0, width = 0, height = 0;
+			if (this.region instanceof TextureAtlasRegion) {
+				let region = this.region;
+				let textureWidth = region.texture.getImage().width, textureHeight = region.texture.getImage().height;
+				if (region.rotate) {
+					u = region.u - (region.originalHeight - region.offsetY - region.height) / textureWidth;
+					v = region.v - (region.originalWidth - region.offsetX - region.width) / textureHeight;
+					width = region.originalHeight / textureWidth;
+					height = region.originalWidth / textureHeight;
+					for (let i = 0, n = uvs.length; i < n; i += 2) {
+						uvs[i] = u + regionUVs[i + 1] * width;
+						uvs[i + 1] = v + height - regionUVs[i] * height;
+					}
+					return;
+				}
+				u = region.u - region.offsetX / textureWidth;
+				v = region.v - (region.originalHeight - region.offsetY - region.height) / textureHeight;
+				width = region.originalWidth / textureWidth;
+				height = region.originalHeight / textureHeight;
+			} else if (this.region == null) {
+				u = v = 0;
+				width = height = 1;
+			} else {
+				u = this.region.u;
+				v = this.region.v;
+				width = this.region.u2 - u;
+				height = this.region.v2 - v;
+			}
+
+			for (let i = 0, n = uvs.length; i < n; i += 2) {
+				uvs[i] = u + regionUVs[i] * width;
+				uvs[i + 1] = v + regionUVs[i + 1] * height;
+			}
+		}
+
+		/*updateUVs () {
 			let u = 0, v = 0, width = 0, height = 0;
 			if (this.region == null) {
 				u = v = 0;
@@ -69,7 +108,7 @@ module spine {
 					uvs[i + 1] = v + regionUVs[i + 1] * height;
 				}
 			}
-		}
+		}*/
 
 		applyDeform (sourceAttachment: VertexAttachment): boolean {
 			return this == sourceAttachment || (this.inheritDeform && this.parentMesh == sourceAttachment);

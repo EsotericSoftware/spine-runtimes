@@ -6543,8 +6543,31 @@ var spine;
 			return _this;
 		}
 		MeshAttachment.prototype.updateUVs = function () {
+			var regionUVs = this.regionUVs;
+			if (this.uvs == null || this.uvs.length != regionUVs.length)
+				this.uvs = spine.Utils.newFloatArray(regionUVs.length);
+			var uvs = this.uvs;
 			var u = 0, v = 0, width = 0, height = 0;
-			if (this.region == null) {
+			if (this.region instanceof spine.TextureAtlasRegion) {
+				var region = this.region;
+				var textureWidth = region.texture.getImage().width, textureHeight = region.texture.getImage().height;
+				if (region.rotate) {
+					u = region.u - (region.originalHeight - region.offsetY - region.height) / textureWidth;
+					v = region.v - (region.originalWidth - region.offsetX - region.width) / textureHeight;
+					width = region.originalHeight / textureWidth;
+					height = region.originalWidth / textureHeight;
+					for (var i = 0, n = uvs.length; i < n; i += 2) {
+						uvs[i] = u + regionUVs[i + 1] * width;
+						uvs[i + 1] = v + height - regionUVs[i] * height;
+					}
+					return;
+				}
+				u = region.u - region.offsetX / textureWidth;
+				v = region.v - (region.originalHeight - region.offsetY - region.height) / textureHeight;
+				width = region.originalWidth / textureWidth;
+				height = region.originalHeight / textureHeight;
+			}
+			else if (this.region == null) {
 				u = v = 0;
 				width = height = 1;
 			}
@@ -6554,21 +6577,9 @@ var spine;
 				width = this.region.u2 - u;
 				height = this.region.v2 - v;
 			}
-			var regionUVs = this.regionUVs;
-			if (this.uvs == null || this.uvs.length != regionUVs.length)
-				this.uvs = spine.Utils.newFloatArray(regionUVs.length);
-			var uvs = this.uvs;
-			if (this.region.rotate) {
-				for (var i = 0, n = uvs.length; i < n; i += 2) {
-					uvs[i] = u + regionUVs[i + 1] * width;
-					uvs[i + 1] = v + height - regionUVs[i] * height;
-				}
-			}
-			else {
-				for (var i = 0, n = uvs.length; i < n; i += 2) {
-					uvs[i] = u + regionUVs[i] * width;
-					uvs[i + 1] = v + regionUVs[i + 1] * height;
-				}
+			for (var i = 0, n = uvs.length; i < n; i += 2) {
+				uvs[i] = u + regionUVs[i] * width;
+				uvs[i + 1] = v + regionUVs[i + 1] * height;
 			}
 		};
 		MeshAttachment.prototype.applyDeform = function (sourceAttachment) {
@@ -7465,7 +7476,7 @@ var spine;
 					return;
 				this.timeKeeper.update();
 				var a = Math.abs(Math.sin(this.timeKeeper.totalTime + 0.75));
-				this.angle -= this.timeKeeper.delta * 360 * (1 + 1.5 * Math.pow(a, 5));
+				this.angle -= this.timeKeeper.delta / 1.4 * 360 * (1 + 1.5 * Math.pow(a, 5));
 				var renderer = this.renderer;
 				var canvas = renderer.canvas;
 				var gl = renderer.context.gl;
@@ -10101,7 +10112,6 @@ var spine;
 		}
 		Popup.prototype.show = function (dismissedListener) {
 			var _this = this;
-			if (dismissedListener === void 0) { dismissedListener = function () { }; }
 			this.dom.classList.remove("spine-player-hidden");
 			var dismissed = false;
 			var resize = function () {
@@ -10225,7 +10235,6 @@ var spine;
 	}());
 	var SpinePlayer = (function () {
 		function SpinePlayer(parent, config) {
-			this.parent = parent;
 			this.config = config;
 			this.time = new spine.TimeKeeper();
 			this.paused = true;
@@ -10237,8 +10246,10 @@ var spine;
 			this.viewportTransitionStart = 0;
 			this.cancelId = 0;
 			if (typeof parent === "string")
-				parent = document.getElementById(parent);
-			parent.appendChild(this.render());
+				this.parent = document.getElementById(parent);
+			else
+				this.parent = parent;
+			this.parent.appendChild(this.render());
 		}
 		SpinePlayer.prototype.validateConfig = function (config) {
 			if (!config)
@@ -10253,8 +10264,8 @@ var spine;
 				config.backgroundColor = "#000000";
 			if (!config.fullScreenBackgroundColor)
 				config.fullScreenBackgroundColor = config.backgroundColor;
-			if (!config.premultipliedAlpha)
-				config.premultipliedAlpha = false;
+			if (typeof config.premultipliedAlpha === "undefined")
+				config.premultipliedAlpha = true;
 			if (!config.success)
 				config.success = function (widget) { };
 			if (!config.error)
@@ -10270,21 +10281,21 @@ var spine;
 					points: false,
 					hulls: false
 				};
-			if (!config.debug.bones)
+			if (typeof config.debug.bones === "undefined")
 				config.debug.bones = false;
-			if (!config.debug.bounds)
+			if (typeof config.debug.bounds === "undefined")
 				config.debug.bounds = false;
-			if (!config.debug.clipping)
+			if (typeof config.debug.clipping === "undefined")
 				config.debug.clipping = false;
-			if (!config.debug.hulls)
+			if (typeof config.debug.hulls === "undefined")
 				config.debug.hulls = false;
-			if (!config.debug.paths)
+			if (typeof config.debug.paths === "undefined")
 				config.debug.paths = false;
-			if (!config.debug.points)
+			if (typeof config.debug.points === "undefined")
 				config.debug.points = false;
-			if (!config.debug.regions)
+			if (typeof config.debug.regions === "undefined")
 				config.debug.regions = false;
-			if (!config.debug.meshes)
+			if (typeof config.debug.meshes === "undefined")
 				config.debug.meshes = false;
 			if (config.animations && config.animation) {
 				if (config.animations.indexOf(config.animation) < 0)
@@ -10440,6 +10451,8 @@ var spine;
 			speedButton.classList.add("spine-player-button-icon-speed-selected");
 			popup.show(function () {
 				speedButton.classList.remove("spine-player-button-icon-speed-selected");
+				popup.dom.remove();
+				_this.lastPopup = null;
 			});
 			this.lastPopup = popup;
 		};
@@ -10476,6 +10489,8 @@ var spine;
 			animationsButton.classList.add("spine-player-button-icon-animations-selected");
 			popup.show(function () {
 				animationsButton.classList.remove("spine-player-button-icon-animations-selected");
+				popup.dom.remove();
+				_this.lastPopup = null;
 			});
 			this.lastPopup = popup;
 		};
@@ -10512,6 +10527,8 @@ var spine;
 			skinButton.classList.add("spine-player-button-icon-skins-selected");
 			popup.show(function () {
 				skinButton.classList.remove("spine-player-button-icon-skins-selected");
+				popup.dom.remove();
+				_this.lastPopup = null;
 			});
 			this.lastPopup = popup;
 		};
@@ -10549,6 +10566,8 @@ var spine;
 			settingsButton.classList.add("spine-player-button-icon-settings-selected");
 			popup.show(function () {
 				settingsButton.classList.remove("spine-player-button-icon-settings-selected");
+				popup.dom.remove();
+				_this.lastPopup = null;
 			});
 			this.lastPopup = popup;
 		};
@@ -10838,33 +10857,45 @@ var spine;
 			});
 			var mouseOverControls = true;
 			var mouseOverCanvas = false;
-			parent.addEventListener("mousemove", function (ev) {
+			document.addEventListener("mousemove", function (ev) {
 				if (ev instanceof MouseEvent) {
-					if (!_this.config.showControls)
-						return;
-					var popup = findWithClass(_this.dom, "spine-player-popup");
-					mouseOverControls = overlap(ev, _this.playerControls.getBoundingClientRect());
-					mouseOverCanvas = overlap(ev, _this.canvas.getBoundingClientRect());
-					clearTimeout(_this.cancelId);
-					var hide = popup.length == 0 && !mouseOverControls && !mouseOverCanvas && !_this.paused;
-					if (hide) {
-						_this.playerControls.classList.add("spine-player-controls-hidden");
-					}
-					else {
-						_this.playerControls.classList.remove("spine-player-controls-hidden");
-					}
-					if (!mouseOverControls && popup.length == 0 && !_this.paused) {
-						var remove = function () {
-							if (!_this.paused)
-								_this.playerControls.classList.add("spine-player-controls-hidden");
-						};
-						_this.cancelId = setTimeout(remove, 500);
+					handleHover(ev.clientX, ev.clientY);
+				}
+			});
+			document.addEventListener("touchmove", function (ev) {
+				if (ev instanceof TouchEvent) {
+					var touches = ev.changedTouches;
+					if (touches.length > 0) {
+						var touch = touches[0];
+						handleHover(touch.clientX, touch.clientY);
 					}
 				}
 			});
-			var overlap = function (ev, rect) {
-				var x = ev.clientX - rect.left;
-				var y = ev.clientY - rect.top;
+			var handleHover = function (mouseX, mouseY) {
+				if (!_this.config.showControls)
+					return;
+				var popup = findWithClass(_this.dom, "spine-player-popup");
+				mouseOverControls = overlap(mouseX, mouseY, _this.playerControls.getBoundingClientRect());
+				mouseOverCanvas = overlap(mouseX, mouseY, _this.canvas.getBoundingClientRect());
+				clearTimeout(_this.cancelId);
+				var hide = popup.length == 0 && !mouseOverControls && !mouseOverCanvas && !_this.paused;
+				if (hide) {
+					_this.playerControls.classList.add("spine-player-controls-hidden");
+				}
+				else {
+					_this.playerControls.classList.remove("spine-player-controls-hidden");
+				}
+				if (!mouseOverControls && popup.length == 0 && !_this.paused) {
+					var remove = function () {
+						if (!_this.paused)
+							_this.playerControls.classList.add("spine-player-controls-hidden");
+					};
+					_this.cancelId = setTimeout(remove, 1000);
+				}
+			};
+			var overlap = function (mouseX, mouseY, rect) {
+				var x = mouseX - rect.left;
+				var y = mouseY - rect.top;
 				return x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
 			};
 		};
@@ -10875,7 +10906,7 @@ var spine;
 				if (!_this.paused)
 					_this.playerControls.classList.add("spine-player-controls-hidden");
 			};
-			this.cancelId = setTimeout(remove, 500);
+			this.cancelId = setTimeout(remove, 1000);
 			this.playButton.classList.remove("spine-player-button-icon-play");
 			this.playButton.classList.add("spine-player-button-icon-pause");
 			if (this.config.animation) {
@@ -11056,5 +11087,61 @@ var spine;
 			.replace(/"/g, "&#34;")
 			.replace(/'/g, "&#39;");
 	}
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+	var SpinePlayerEditor = (function () {
+		function SpinePlayerEditor(parent) {
+			this.prefix = "<html>\n<head>\n<style>\nbody {\n\tmargin: 0px;\n}\n</style>\n</head>\n<body>".trim();
+			this.postfix = "</body>";
+			this.timerId = 0;
+			this.render(parent);
+		}
+		SpinePlayerEditor.prototype.render = function (parent) {
+			var _this = this;
+			var dom = "\n\t\t\t\t<div class=\"spine-player-editor-container\">\n\t\t\t\t\t<div class=\"spine-player-editor-code\"></div>\n\t\t\t\t\t<iframe class=\"spine-player-editor-player\"></iframe>\n\t\t\t\t</div>\n\t\t\t";
+			parent.innerHTML = dom;
+			var codeElement = parent.getElementsByClassName("spine-player-editor-code")[0];
+			this.player = parent.getElementsByClassName("spine-player-editor-player")[0];
+			requestAnimationFrame(function () {
+				_this.code = CodeMirror(codeElement, {
+					lineNumbers: true,
+					tabSize: 3,
+					indentUnit: 3,
+					indentWithTabs: true,
+					scrollBarStyle: "native",
+					mode: "htmlmixed",
+					theme: "monokai"
+				});
+				_this.code.on("change", function () {
+					_this.startPlayer();
+				});
+				_this.setCode(SpinePlayerEditor.DEFAULT_CODE);
+			});
+		};
+		SpinePlayerEditor.prototype.setPreAndPostfix = function (prefix, postfix) {
+			this.prefix = prefix;
+			this.postfix = postfix;
+			this.startPlayer();
+		};
+		SpinePlayerEditor.prototype.setCode = function (code) {
+			this.code.setValue(code);
+			this.startPlayer();
+		};
+		SpinePlayerEditor.prototype.startPlayer = function () {
+			var _this = this;
+			clearTimeout(this.timerId);
+			this.timerId = setTimeout(function () {
+				var code = _this.code.getDoc().getValue();
+				code = _this.prefix + code + _this.postfix;
+				code = window.btoa(code);
+				_this.player.src = "";
+				_this.player.src = "data:text/html;base64," + code;
+			}, 500);
+		};
+		SpinePlayerEditor.DEFAULT_CODE = "\n<script src=\"https://esotericsoftware.com/files/spine-player/3.7/spine-player.js\"></script>\n<link rel=\"stylesheet\" href=\"https://esotericsoftware.com/files/spine-player/3.7/spine-player.css\">\n\n<div id=\"player-container\" style=\"width: 100%; height: 100vh;\"></div>\n\n<script>\nnew spine.SpinePlayer(\"player-container\", {\n\tjsonUrl: \"https://esotericsoftware.com/files/examples/spineboy/export/spineboy-pro.json\",\n\tatlasUrl: \"https://esotericsoftware.com/files/examples/spineboy/export/spineboy-pma.atlas\"\n});\n</script>\n\t\t".trim();
+		return SpinePlayerEditor;
+	}());
+	spine.SpinePlayerEditor = SpinePlayerEditor;
 })(spine || (spine = {}));
 //# sourceMappingURL=spine-all.js.map
