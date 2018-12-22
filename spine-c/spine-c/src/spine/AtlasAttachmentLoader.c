@@ -74,8 +74,6 @@ spAttachment* _spAtlasAttachmentLoader_createAttachment (spAttachmentLoader* loa
 		attachment->regionHeight = region->height;
 		attachment->regionOriginalWidth = region->originalWidth;
 		attachment->regionOriginalHeight = region->originalHeight;
-		attachment->regionTextureWidth = region->page->width;
-		attachment->regionTextureHeight = region->page->height;
 		return SUPER(SUPER(attachment));
 	}
 	case SP_ATTACHMENT_BOUNDING_BOX:

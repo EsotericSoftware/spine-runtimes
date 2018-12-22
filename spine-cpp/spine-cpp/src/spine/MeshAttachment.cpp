@@ -46,8 +46,6 @@ MeshAttachment::MeshAttachment(const String &name) : VertexAttachment(name), Has
 													 _regionHeight(0),
 													 _regionOriginalWidth(0),
 													 _regionOriginalHeight(0),
-													 _regionTextureWidth(0),
-													 _regionTextureHeight(0),
 													 _parentMesh(NULL),
 													 _path(),
 													 _regionU(0),
@@ -70,19 +68,23 @@ void MeshAttachment::updateUVs() {
 	}
 
 	if (_regionRotate) {
-		float u = _regionU - (_regionOriginalHeight - _regionOffsetY - _regionHeight) / _regionTextureWidth;
-		float v = _regionV - (_regionOriginalWidth - _regionOffsetX - _regionWidth) / _regionTextureHeight;
-		float width = _regionOriginalHeight / _regionTextureWidth;
-		float height = _regionOriginalWidth / _regionTextureHeight;
+		float textureHeight = _regionWidth / (_regionV2 - _regionV);
+		float textureWidth = _regionHeight / (_regionU2 - _regionU);
+		float u = _regionU - (_regionOriginalHeight - _regionOffsetY - _regionHeight) / textureWidth;
+		float v = _regionV - (_regionOriginalWidth - _regionOffsetX - _regionWidth) / textureHeight;
+		float width = _regionOriginalHeight / textureWidth;
+		float height = _regionOriginalWidth / textureHeight;
 		for (size_t i = 0, n = _uvs.size(); i < n; i += 2) {
 			_uvs[i] = u + _regionUVs[i + 1] * width;
 			_uvs[i + 1] = v + height - _regionUVs[i] * height;
 		}
 	} else {
-		float u = _regionU - _regionOffsetX / _regionTextureWidth;
-		float v = _regionV - (_regionOriginalHeight - _regionOffsetY - _regionHeight) / _regionTextureHeight;
-		float width = _regionOriginalWidth / _regionTextureWidth;
-		float height = _regionOriginalHeight / _regionTextureHeight;
+		float textureWidth = _regionWidth / (_regionU2 - _regionU);
+		float textureHeight = _regionHeight / (_regionV2 - _regionV);
+		float u = _regionU - _regionOffsetX / textureWidth;
+		float v = _regionV - (_regionOriginalHeight - _regionOffsetY - _regionHeight) / textureHeight;
+		float width = _regionOriginalWidth / textureWidth;
+		float height = _regionOriginalHeight / textureHeight;
 		for (size_t i = 0, n = _uvs.size(); i < n; i += 2) {
 			_uvs[i] = u + _regionUVs[i] * width;
 			_uvs[i + 1] = v + _regionUVs[i + 1] * height;
