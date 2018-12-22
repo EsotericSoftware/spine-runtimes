@@ -67,14 +67,26 @@ function MeshAttachment:updateUVs ()
 		width = 1
 		height = 1
 	else
-		u = self.region.u;
-		v = self.region.v;
-		width = self.region.u2 - u;
-		height = self.region.v2 - v;
+		local region = self.region
+		local textureWidth = region.page.width
+		local textureHeight = region.page.height
+		if region.rotate then
+			u = region.u - (region.originalHeight - region.offsetY - region.height) / textureWidth
+			v = region.v - (region.originalWidth - region.offsetX - region.width) / textureHeight
+				width = region.originalHeight / textureWidth
+				height = region.originalWidth / textureHeight
+		else
+			u = region.u - region.offsetX / textureWidth;
+			v = region.v - (region.originalHeight - region.offsetY - region.height) / textureHeight;
+			width = region.originalWidth / textureWidth;
+			height = region.originalHeight / textureHeight;
+		end
 	end
+	
 	local regionUVs = self.regionUVs
 	if not self.uvs or (#self.uvs ~= #regionUVs) then self.uvs = utils.newNumberArray(#regionUVs) end
 	local uvs = self.uvs
+	
 	if self.region and self.region.rotate then
 		local i = 0
 		local n = #uvs
