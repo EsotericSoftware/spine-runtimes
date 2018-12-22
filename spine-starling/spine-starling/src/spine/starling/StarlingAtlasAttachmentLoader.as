@@ -123,6 +123,8 @@ package spine.starling {
 			attachment.regionHeight = texture.height;
 			attachment.regionOriginalWidth = frame ? frame.width : texture.width;
 			attachment.regionOriginalHeight = frame ? frame.height : texture.height;
+			attachment.regionTextureWidth = atlas.texture.width;
+			attachment.regionTextureHeight = atlas.texture.height;
 			if (rotated) {
 				var tmp : Number = attachment.regionOriginalWidth;
 				attachment.regionOriginalWidth = attachment.regionOriginalHeight;

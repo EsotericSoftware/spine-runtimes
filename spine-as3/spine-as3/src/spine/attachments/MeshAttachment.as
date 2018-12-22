@@ -52,6 +52,8 @@ package spine.attachments {
 		public var regionHeight : Number;
 		public var regionOriginalWidth : Number; // Unrotated, unstripped size.
 		public var regionOriginalHeight : Number;
+		public var regionTextureWidth: Number;
+		public var regionTextureHeight: Number;
 		// Nonessential.
 		public var edges : Vector.<int>;
 		public var width : Number;
@@ -61,19 +63,35 @@ package spine.attachments {
 			super(name);
 		}
 
-		public function updateUVs() : void {
-			var width : Number = regionU2 - regionU, height : Number = regionV2 - regionV;
+		public function updateUVs() : void {			
 			var i : int, n : int = regionUVs.length;
+			var u: Number, v: Number, width: Number, height: Number;
+			var widthO : Number = regionU2 - regionU, heightO : Number = regionV2 - regionV;
+			var uO = regionU, vO = regionV;
 			if (!uvs || uvs.length != n) uvs = new Vector.<Number>(n, true);
 			if (regionRotate) {
+				u = regionU - (regionOriginalHeight - regionOffsetY - regionHeight) / regionTextureWidth;
+				v = regionV - (regionOriginalWidth - regionOffsetX - regionWidth) / regionTextureHeight;
+				width = regionOriginalHeight / regionTextureWidth;
+				height = regionOriginalWidth / regionTextureHeight;
+				if (u != uO || v != vO || width != widthO || heightO != height) {
+					trace("fah");
+				}
 				for (i = 0; i < n; i += 2) {
-					uvs[i] = regionU + regionUVs[int(i + 1)] * width;
-					uvs[int(i + 1)] = regionV + height - regionUVs[i] * height;
+					uvs[i] = u + regionUVs[int(i + 1)] * width;
+					uvs[int(i + 1)] = v + height - regionUVs[i] * height;
 				}
 			} else {
+				u = regionU - regionOffsetX / regionTextureWidth;
+				v = regionV - (regionOriginalHeight - regionOffsetY - regionHeight) / regionTextureHeight;
+				width = regionOriginalWidth / regionTextureWidth;
+				height = regionOriginalHeight / regionTextureHeight;				
+				if (u != uO || v != vO || width != widthO || heightO != height) {
+					trace("fah");
+				}
 				for (i = 0; i < n; i += 2) {
-					uvs[i] = regionU + regionUVs[i] * width;
-					uvs[int(i + 1)] = regionV + regionUVs[int(i + 1)] * height;
+					uvs[i] = u + regionUVs[i] * width;
+					uvs[int(i + 1)] = v + regionUVs[int(i + 1)] * height;
 				}
 			}
 		}
