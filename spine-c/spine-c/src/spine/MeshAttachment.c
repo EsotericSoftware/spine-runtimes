@@ -60,9 +60,9 @@ void spMeshAttachment_updateUVs (spMeshAttachment* self) {
 	FREE(self->uvs);
 	self->uvs = MALLOC(float, verticesLength);
 
-	float textureWidth = self->regionTextureWidth;
-	float textureHeight = self->regionTextureHeight;
 	if (self->regionRotate) {
+		float textureWidth = self->regionHeight / (self->regionU2 - self->regionU);
+		float textureHeight = self->regionWidth / (self->regionV2 - self->regionV);
 		float u = self->regionU - (self->regionOriginalHeight - self->regionOffsetY - self->regionHeight) / textureWidth;
 		float v = self->regionV - (self->regionOriginalWidth - self->regionOffsetX - self->regionWidth) / textureHeight;
 		width = self->regionOriginalHeight / textureWidth;
@@ -73,6 +73,8 @@ void spMeshAttachment_updateUVs (spMeshAttachment* self) {
 		}
 		return;
 	} else {
+		float textureWidth = self->regionWidth / (self->regionU2 - self->regionU);
+		float textureHeight = self->regionHeight / (self->regionV2 - self->regionV);
 		float u = self->regionU - self->regionOffsetX / textureWidth;
 		float v = self->regionV - (self->regionOriginalHeight - self->regionOffsetY - self->regionHeight) / textureHeight;
 		width = self->regionOriginalWidth / textureWidth;
