@@ -54,20 +54,32 @@ spMeshAttachment* spMeshAttachment_create (const char* name) {
 }
 
 void spMeshAttachment_updateUVs (spMeshAttachment* self) {
-	int i;
-	float width = self->regionU2 - self->regionU, height = self->regionV2 - self->regionV;
+	int i, n;
+	float width, height;
 	int verticesLength = SUPER(self)->worldVerticesLength;
 	FREE(self->uvs);
 	self->uvs = MALLOC(float, verticesLength);
+
+	float textureWidth = self->regionTextureWidth;
+	float textureHeight = self->regionTextureHeight;
 	if (self->regionRotate) {
-		for (i = 0; i < verticesLength; i += 2) {
-			self->uvs[i] = self->regionU + self->regionUVs[i + 1] * width;
-			self->uvs[i + 1] = self->regionV + height - self->regionUVs[i] * height;
+		float u = self->regionU - (self->regionOriginalHeight - self->regionOffsetY - self->regionHeight) / textureWidth;
+		float v = self->regionV - (self->regionOriginalWidth - self->regionOffsetX - self->regionWidth) / textureHeight;
+		width = self->regionOriginalHeight / textureWidth;
+		height = self->regionOriginalWidth / textureHeight;
+		for (i = 0, n = verticesLength; i < n; i += 2) {
+			self->uvs[i] = u + self->regionUVs[i + 1] * width;
+			self->uvs[i + 1] = v + height - self->regionUVs[i] * height;
 		}
+		return;
 	} else {
-		for (i = 0; i < verticesLength; i += 2) {
-			self->uvs[i] = self->regionU + self->regionUVs[i] * width;
-			self->uvs[i + 1] = self->regionV + self->regionUVs[i + 1] * height;
+		float u = self->regionU - self->regionOffsetX / textureWidth;
+		float v = self->regionV - (self->regionOriginalHeight - self->regionOffsetY - self->regionHeight) / textureHeight;
+		width = self->regionOriginalWidth / textureWidth;
+		height = self->regionOriginalHeight / textureHeight;
+		for (i = 0, n = verticesLength; i < n; i += 2) {
+			self->uvs[i] = u + self->regionUVs[i] * width;
+			self->uvs[i + 1] = v + self->regionUVs[i + 1] * height;
 		}
 	}
 }

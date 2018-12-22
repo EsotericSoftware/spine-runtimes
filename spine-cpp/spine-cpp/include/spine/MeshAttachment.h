@@ -119,7 +119,7 @@ namespace spine {
         void setHeight(float inValue);
 
     private:
-        float _regionOffsetX, _regionOffsetY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight;
+        float _regionOffsetX, _regionOffsetY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight, _regionTextureWidth, _regionTextureHeight;
         MeshAttachment* _parentMesh;
         Vector<float> _uvs;
         Vector<float> _regionUVs;
