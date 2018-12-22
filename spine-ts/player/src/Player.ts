@@ -325,7 +325,7 @@
 			if (!config.alpha) config.alpha = false;
 			if (!config.backgroundColor) config.backgroundColor = "#000000";
 			if (!config.fullScreenBackgroundColor) config.fullScreenBackgroundColor = config.backgroundColor;
-			if (!config.premultipliedAlpha) config.premultipliedAlpha = true;
+			if (typeof config.premultipliedAlpha  === "undefined") config.premultipliedAlpha = true;
 			if (!config.success) config.success = (widget) => {};
 			if (!config.error) config.error = (widget, msg) => {};
 			if (!config.debug) config.debug = {
@@ -338,14 +338,14 @@
 				points: false,
 				hulls: false
 			}
-			if (!config.debug.bones) config.debug.bones = false;
-			if (!config.debug.bounds) config.debug.bounds = false;
-			if (!config.debug.clipping) config.debug.clipping = false;
-			if (!config.debug.hulls) config.debug.hulls = false;
-			if (!config.debug.paths) config.debug.paths = false;
-			if (!config.debug.points) config.debug.points = false;
-			if (!config.debug.regions) config.debug.regions = false;
-			if (!config.debug.meshes) config.debug.meshes = false;
+			if (typeof config.debug.bones === "undefined") config.debug.bones = false;
+			if (typeof config.debug.bounds === "undefined") config.debug.bounds = false;
+			if (typeof config.debug.clipping === "undefined") config.debug.clipping = false;
+			if (typeof config.debug.hulls === "undefined") config.debug.hulls = false;
+			if (typeof config.debug.paths === "undefined") config.debug.paths = false;
+			if (typeof config.debug.points === "undefined") config.debug.points = false;
+			if (typeof config.debug.regions === "undefined") config.debug.regions = false;
+			if (typeof config.debug.meshes === "undefined") config.debug.meshes = false;
 
 			if (config.animations && config.animation) {
 				if  (config.animations.indexOf(config.animation) < 0) throw new Error("Default animation '" +  config.animation + "' is not contained in the list of selectable animations " + escapeHtml(JSON.stringify(this.config.animations)) + ".");

@@ -94,6 +94,8 @@ MeshAttachment *AtlasAttachmentLoader::newMeshAttachment(Skin &skin, const Strin
 	attachment._regionHeight = (float)region.height;
 	attachment._regionOriginalWidth = (float)region.originalWidth;
 	attachment._regionOriginalHeight = (float)region.originalHeight;
+	attachment._regionTextureWidth = (float)region.page->width;
+	attachment._regionTextureHeight = (float)region.page->height;
 
 	return attachmentP;
 }

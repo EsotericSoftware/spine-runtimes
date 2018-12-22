@@ -6543,8 +6543,31 @@ var spine;
 			return _this;
 		}
 		MeshAttachment.prototype.updateUVs = function () {
+			var regionUVs = this.regionUVs;
+			if (this.uvs == null || this.uvs.length != regionUVs.length)
+				this.uvs = spine.Utils.newFloatArray(regionUVs.length);
+			var uvs = this.uvs;
 			var u = 0, v = 0, width = 0, height = 0;
-			if (this.region == null) {
+			if (this.region instanceof spine.TextureAtlasRegion) {
+				var region = this.region;
+				var textureWidth = region.texture.getImage().width, textureHeight = region.texture.getImage().height;
+				if (region.rotate) {
+					u = region.u - (region.originalHeight - region.offsetY - region.height) / textureWidth;
+					v = region.v - (region.originalWidth - region.offsetX - region.width) / textureHeight;
+					width = region.originalHeight / textureWidth;
+					height = region.originalWidth / textureHeight;
+					for (var i = 0, n = uvs.length; i < n; i += 2) {
+						uvs[i] = u + regionUVs[i + 1] * width;
+						uvs[i + 1] = v + height - regionUVs[i] * height;
+					}
+					return;
+				}
+				u = region.u - region.offsetX / textureWidth;
+				v = region.v - (region.originalHeight - region.offsetY - region.height) / textureHeight;
+				width = region.originalWidth / textureWidth;
+				height = region.originalHeight / textureHeight;
+			}
+			else if (this.region == null) {
 				u = v = 0;
 				width = height = 1;
 			}
@@ -6554,21 +6577,9 @@ var spine;
 				width = this.region.u2 - u;
 				height = this.region.v2 - v;
 			}
-			var regionUVs = this.regionUVs;
-			if (this.uvs == null || this.uvs.length != regionUVs.length)
-				this.uvs = spine.Utils.newFloatArray(regionUVs.length);
-			var uvs = this.uvs;
-			if (this.region.rotate) {
-				for (var i = 0, n = uvs.length; i < n; i += 2) {
-					uvs[i] = u + regionUVs[i + 1] * width;
-					uvs[i + 1] = v + height - regionUVs[i] * height;
-				}
-			}
-			else {
-				for (var i = 0, n = uvs.length; i < n; i += 2) {
-					uvs[i] = u + regionUVs[i] * width;
-					uvs[i + 1] = v + regionUVs[i + 1] * height;
-				}
+			for (var i = 0, n = uvs.length; i < n; i += 2) {
+				uvs[i] = u + regionUVs[i] * width;
+				uvs[i + 1] = v + regionUVs[i + 1] * height;
 			}
 		};
 		MeshAttachment.prototype.applyDeform = function (sourceAttachment) {
@@ -7199,7 +7210,7 @@ var spine;
 					return;
 				this.timeKeeper.update();
 				var a = Math.abs(Math.sin(this.timeKeeper.totalTime + 0.75));
-				this.angle -= this.timeKeeper.delta * 360 * (1 + 1.5 * Math.pow(a, 5));
+				this.angle -= this.timeKeeper.delta / 1.4 * 360 * (1 + 1.5 * Math.pow(a, 5));
 				var renderer = this.renderer;
 				var canvas = renderer.canvas;
 				var gl = renderer.context.gl;
