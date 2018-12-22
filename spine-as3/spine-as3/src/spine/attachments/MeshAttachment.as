@@ -51,9 +51,7 @@ package spine.attachments {
 		public var regionWidth : Number; // Unrotated, stripped size.
 		public var regionHeight : Number;
 		public var regionOriginalWidth : Number; // Unrotated, unstripped size.
-		public var regionOriginalHeight : Number;
-		public var regionTextureWidth: Number;
-		public var regionTextureHeight: Number;
+		public var regionOriginalHeight : Number;		
 		// Nonessential.
 		public var edges : Vector.<int>;
 		public var width : Number;
@@ -66,29 +64,26 @@ package spine.attachments {
 		public function updateUVs() : void {			
 			var i : int, n : int = regionUVs.length;
 			var u: Number, v: Number, width: Number, height: Number;
-			var widthO : Number = regionU2 - regionU, heightO : Number = regionV2 - regionV;
-			var uO = regionU, vO = regionV;
+			var textureWidth: Number, textureHeight: Number;
 			if (!uvs || uvs.length != n) uvs = new Vector.<Number>(n, true);
 			if (regionRotate) {
-				u = regionU - (regionOriginalHeight - regionOffsetY - regionHeight) / regionTextureWidth;
-				v = regionV - (regionOriginalWidth - regionOffsetX - regionWidth) / regionTextureHeight;
-				width = regionOriginalHeight / regionTextureWidth;
-				height = regionOriginalWidth / regionTextureHeight;
-				if (u != uO || v != vO || width != widthO || heightO != height) {
-					trace("fah");
-				}
+				textureHeight = regionWidth / (regionV2 - regionV);
+				textureWidth = regionHeight / (regionU2 - regionU);
+				u = regionU - (regionOriginalHeight - regionOffsetY - regionHeight) / textureWidth;
+				v = regionV - (regionOriginalWidth - regionOffsetX - regionWidth) / textureHeight;
+				width = regionOriginalHeight / textureWidth;
+				height = regionOriginalWidth / textureHeight;
 				for (i = 0; i < n; i += 2) {
 					uvs[i] = u + regionUVs[int(i + 1)] * width;
 					uvs[int(i + 1)] = v + height - regionUVs[i] * height;
 				}
 			} else {
-				u = regionU - regionOffsetX / regionTextureWidth;
-				v = regionV - (regionOriginalHeight - regionOffsetY - regionHeight) / regionTextureHeight;
-				width = regionOriginalWidth / regionTextureWidth;
-				height = regionOriginalHeight / regionTextureHeight;				
-				if (u != uO || v != vO || width != widthO || heightO != height) {
-					trace("fah");
-				}
+				textureWidth = regionWidth / (regionU2 - regionU);
+				textureHeight = regionHeight / (regionV2 - regionV);
+				u = regionU - regionOffsetX / textureWidth;
+				v = regionV - (regionOriginalHeight - regionOffsetY - regionHeight) / textureHeight;
+				width = regionOriginalWidth / textureWidth;
+				height = regionOriginalHeight / textureHeight;				
 				for (i = 0; i < n; i += 2) {
 					uvs[i] = u + regionUVs[i] * width;
 					uvs[int(i + 1)] = v + regionUVs[int(i + 1)] * height;

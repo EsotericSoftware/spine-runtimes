@@ -78,9 +78,7 @@ package spine.attachments {
 			attachment.regionWidth = region.width;
 			attachment.regionHeight = region.height;
 			attachment.regionOriginalWidth = region.originalWidth;
-			attachment.regionOriginalHeight = region.originalHeight;
-			attachment.regionTextureWidth = region.page.width;
-			attachment.regionTextureHeight = region.page.height;
+			attachment.regionOriginalHeight = region.originalHeight;			
 			return attachment;
 		}
 
