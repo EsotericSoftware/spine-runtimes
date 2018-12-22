@@ -32,6 +32,7 @@
   * The completion event will fire for looped 0 duration animations every frame.
   * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
   * Mix time is no longer affected by `TrackEntry#timeScale`. See https://github.com/EsotericSoftware/spine-runtimes/issues/1194
+  * `spMeshAttachment` has two new fields `regionTextureWith` and `regionTextureHeight`. These must be set in custom attachment loader. See `AtlasAttachmentLoader`.
 * **Additions**
   * Added support for local and relative transform constraint calculation, including additional fields in `spTransformConstraintData`.
   * `Animation#apply` and `Timeline#apply`` now take enums `MixPose` and `MixDirection` instead of booleans
