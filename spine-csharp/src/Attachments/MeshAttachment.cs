@@ -96,16 +96,30 @@ namespace Spine {
 		}
 
 		public void UpdateUVs () {
-			float u = RegionU, v = RegionV, width = RegionU2 - RegionU, height = RegionV2 - RegionV;
 			float[] regionUVs = this.regionUVs;
 			if (this.uvs == null || this.uvs.Length != regionUVs.Length) this.uvs = new float[regionUVs.Length];
 			float[] uvs = this.uvs;
+
 			if (RegionRotate) {
+				float textureHeight = this.regionWidth / (RegionV2 - RegionV);
+				float textureWidth = this.regionHeight / (RegionU2 - RegionU);
+				float u = RegionU - (RegionOriginalHeight - RegionOffsetY - RegionHeight) / textureWidth;
+				float v = RegionV - (RegionOriginalWidth - RegionOffsetX - RegionWidth) / textureHeight;
+				float width = RegionOriginalHeight / textureWidth;
+				float height = RegionOriginalWidth / textureHeight;
+
 				for (int i = 0, n = uvs.Length; i < n; i += 2) {
 					uvs[i] = u + regionUVs[i + 1] * width;
 					uvs[i + 1] = v + height - regionUVs[i] * height;
 				}
 			} else {
+				float textureWidth = this.regionWidth / (RegionU2 - RegionU);
+				float textureHeight = this.regionHeight / (RegionV2 - RegionV);
+				float u = RegionU - RegionOffsetX / textureWidth;
+				float v = RegionV - (RegionOriginalHeight - RegionOffsetY - RegionHeight) / textureHeight;
+				float width = RegionOriginalWidth / textureWidth;
+				float height = RegionOriginalHeight / textureHeight;
+
 				for (int i = 0, n = uvs.Length; i < n; i += 2) {
 					uvs[i] = u + regionUVs[i] * width;
 					uvs[i + 1] = v + regionUVs[i + 1] * height;
