@@ -3,8 +3,6 @@
 # Set in case people don't have core.autocrlf set.
 * text=auto
 
-# We explicitly declare text files that shell be normalized on commit and
-# converted to native line endings on checkout.
 *.sh         text eol=lf
 
 # Unity specific
