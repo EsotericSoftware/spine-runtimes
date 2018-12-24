@@ -5,66 +5,7 @@
 
 # We explicitly declare text files that shell be normalized on commit and
 # converted to native line endings on checkout.
-*.c    diff=cpp    text
-*.cc   diff=cpp    text
-*.cpp  diff=cpp    text
-*.cxx  diff=cpp    text
-*.c++  diff=cpp    text
-*.hpp  diff=cpp    text
-*.h    diff=cpp    text
-*.h++  diff=cpp    text
-*.hh   diff=cpp    text
-
-*.lua              text
-*.cs   diff=csharp text
-*.java diff=java   text
-*.py   diff=python text
-*.sh               text eol=lf
-
-*.df               text
-*.htm              text
-*.html             text
-*.jsp              text
-*.jspf             text
-*.jspx             text
-*.properties       text
-*.tld              text
-*.tag              text
-*.tagx             text
-*.yml              text
-
-*.json             text
-*.xml              text
-*.txt              text
-
-*.js               text
-*.php     diff=php text
-*.html             text
-*.css              text
-
-
-*.cginc            text
-*.shader           text
-*.glsl             text
-*.hlsl             text
-
-# Visual Studio specific
-*.sln        text
-*.csproj     text
-*.vbproj     text
-*.vcxproj    text
-*.vcproj     text
-*.dbproj     text
-*.fsproj     text
-*.lsproj     text
-*.wixproj    text
-*.modelproj  text
-*.sqlproj    text
-*.wmaproj    text
-*.xproj      text
-*.props      text
-*.filters    text
-*.vcxitems text
+*.sh         text eol=lf
 
 # Unity specific
 *.mat               merge=unityyamlmerge text
@@ -76,13 +17,3 @@
 *.asset             merge=unityyamlmerge text
 *.meta              merge=unityyamlmerge text
 *.controller        merge=unityyamlmerge text
-
-# Denote all files that are truly binary and should not be modified.
-*.bmp             binary
-*.png             binary
-*.jpg             binary
-*.jpeg            binary
-*.tga             binary
-*.gif             binary
-*.ps              binary
-*.ico             binary
