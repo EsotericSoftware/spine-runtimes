@@ -6,12 +6,12 @@
 *.sh         text eol=lf
 
 # Unity specific
-*.mat               merge=unityyamlmerge text
-*.anim              merge=unityyamlmerge text
-*.unity             merge=unityyamlmerge text
-*.prefab            merge=unityyamlmerge text
-*.physicsMaterial2D merge=unityyamlmerge text
-*.physicsMaterial   merge=unityyamlmerge text
-*.asset             merge=unityyamlmerge text
-*.meta              merge=unityyamlmerge text
-*.controller        merge=unityyamlmerge text
+*.mat               merge=unityyamlmerge text eol=lf
+*.anim              merge=unityyamlmerge text eol=lf
+*.unity             merge=unityyamlmerge text eol=lf
+*.prefab            merge=unityyamlmerge text eol=lf
+*.physicsMaterial2D merge=unityyamlmerge text eol=lf
+*.physicsMaterial   merge=unityyamlmerge text eol=lf
+*.asset             merge=unityyamlmerge text eol=lf
+*.meta              merge=unityyamlmerge text eol=lf
+*.controller        merge=unityyamlmerge text eol=lf
