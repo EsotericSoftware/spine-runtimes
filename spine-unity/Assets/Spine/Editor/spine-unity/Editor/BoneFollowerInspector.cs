@@ -46,7 +46,11 @@ namespace Spine.Unity.Editor {
 		[MenuItem ("CONTEXT/SkeletonRenderer/Add BoneFollower GameObject")]
 		static void AddBoneFollowerGameObject (MenuCommand cmd) {
 			var skeletonRenderer = cmd.context as SkeletonRenderer;
-			var go = new GameObject("New BoneFollower");
+            #if UNITY_2018_3_OR_NEWER
+            var go = ObjectFactory.CreateGameObject("New BoneFollower");
+            #else
+            var go = new GameObject("New BoneFollower");
+            #endif
 			var t = go.transform;
 			t.SetParent(skeletonRenderer.transform);
 			t.localPosition = Vector3.zero;

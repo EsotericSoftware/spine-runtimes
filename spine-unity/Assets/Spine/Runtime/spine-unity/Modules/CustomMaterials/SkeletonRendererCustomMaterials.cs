@@ -37,8 +37,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Spine.Unity.Modules {
-	[ExecuteInEditMode]
-	public class SkeletonRendererCustomMaterials : MonoBehaviour {
+#if UNITY_2018_3_OR_NEWER
+    [ExecuteAlways]
+#else
+    [ExecuteInEditMode]
+#endif
+    public class SkeletonRendererCustomMaterials : MonoBehaviour {
 
 		#region Inspector
 		public SkeletonRenderer skeletonRenderer;

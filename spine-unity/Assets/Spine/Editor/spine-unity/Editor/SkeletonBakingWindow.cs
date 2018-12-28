@@ -29,7 +29,7 @@
  *****************************************************************************/
 
 #if UNITY_2018_3 || UNITY_2019
-#define NEW_PREFAB_SYSTEM
+#define UNITY_2018_3_OR_NEWER
 #endif
 
 using System.Collections;
@@ -45,7 +45,7 @@ namespace Spine.Unity.Editor {
 	public class SkeletonBakingWindow : EditorWindow {
 		const bool IsUtilityWindow = true;
 
-		#if !NEW_PREFAB_SYSTEM
+		#if !UNITY_2018_3_OR_NEWER
 		[MenuItem("CONTEXT/SkeletonDataAsset/Skeleton Baking", false, 5000)]
 		public static void Init (MenuCommand command) {
 			var window = EditorWindow.GetWindow<SkeletonBakingWindow>(IsUtilityWindow);

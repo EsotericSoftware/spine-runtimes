@@ -34,8 +34,12 @@ using UnityEngine;
 
 namespace Spine.Unity {
 
-	[ExecuteInEditMode]
-	[AddComponentMenu("Spine/Point Follower")]
+#if UNITY_2018_3_OR_NEWER
+    [ExecuteAlways]
+#else
+    [ExecuteInEditMode]
+#endif
+    [AddComponentMenu("Spine/Point Follower")]
 	public class PointFollower : MonoBehaviour, IHasSkeletonRenderer, IHasSkeletonComponent {
 
 		[SerializeField] public SkeletonRenderer skeletonRenderer;

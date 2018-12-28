@@ -28,10 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#if UNITY_2018_3 || UNITY_2019
-#define NEW_PREFAB_SYSTEM
-#endif
-
 #define SPINE_SKELETONMECANIM
 
 using UnityEngine;
@@ -186,7 +182,7 @@ namespace Spine.Unity.Editor {
 				return;
 			}
 
-			#if !NEW_PREFAB_SYSTEM
+			#if !UNITY_2018_3_OR_NEWER
 
 			if (outputPath == "") {
 				outputPath = System.IO.Path.GetDirectoryName(AssetDatabase.GetAssetPath(skeletonDataAsset)) + "/Baked";
@@ -296,7 +292,11 @@ namespace Spine.Unity.Editor {
 					}
 				}
 
-				GameObject prefabRoot = new GameObject("root");
+                #if UNITY_2018_3_OR_NEWER
+                GameObject prefabRoot = ObjectFactory.CreateGameObject("root");
+                #else
+                GameObject prefabRoot = new GameObject("root");
+                #endif
 
 				Dictionary<string, Transform> slotTable = new Dictionary<string, Transform>();
 				Dictionary<string, Transform> boneTable = new Dictionary<string, Transform>();
@@ -305,8 +305,12 @@ namespace Spine.Unity.Editor {
 				//create bones
 				for (int i = 0; i < skeletonData.Bones.Count; i++) {
 					var boneData = skeletonData.Bones.Items[i];
-					Transform boneTransform = new GameObject(boneData.Name).transform;
-					boneTransform.parent = prefabRoot.transform;
+                    #if UNITY_2018_3_OR_NEWER
+                    Transform boneTransform = ObjectFactory.CreateGameObject(boneData.Name).transform;
+                    #else
+                    Transform boneTransform = new GameObject(boneData.Name).transform;
+                    #endif
+                    boneTransform.parent = prefabRoot.transform;
 					boneTable.Add(boneTransform.name, boneTransform);
 					boneList.Add(boneTransform);
 				}
@@ -336,8 +340,12 @@ namespace Spine.Unity.Editor {
 				//create slots and attachments
 				for (int i = 0; i < skeletonData.Slots.Count; i++) {
 					var slotData = skeletonData.Slots.Items[i];
-					Transform slotTransform = new GameObject(slotData.Name).transform;
-					slotTransform.parent = prefabRoot.transform;
+                    #if UNITY_2018_3_OR_NEWER
+                    Transform slotTransform = ObjectFactory.CreateGameObject(slotData.Name).transform;
+                    #else
+                    Transform slotTransform = new GameObject(slotData.Name).transform;
+                    #endif
+                    slotTransform.parent = prefabRoot.transform;
 					slotTable.Add(slotData.Name, slotTransform);
 
 					List<Attachment> attachments = new List<Attachment>();
@@ -392,8 +400,11 @@ namespace Spine.Unity.Editor {
 						} else
 							continue;
 
-						Transform attachmentTransform = new GameObject(attachmentName).transform;
-
+                        #if UNITY_2018_3_OR_NEWER
+                        Transform attachmentTransform = ObjectFactory.CreateGameObject(attachmentName).transform;
+                        #else
+                        Transform attachmentTransform = new GameObject(attachmentName).transform;
+                        #endif
 						attachmentTransform.parent = slotTransform;
 						attachmentTransform.localPosition = offset;
 						attachmentTransform.localRotation = Quaternion.Euler(0, 0, rotation);
@@ -1429,14 +1440,14 @@ namespace Spine.Unity.Editor {
 				Directory.CreateDirectory(bakedDirPath);
 
 			if (prefab == null) {
-				root = new GameObject("temp", typeof(MeshFilter), typeof(MeshRenderer));
-				#if NEW_PREFAB_SYSTEM
+                #if UNITY_2018_3_OR_NEWER
+                root = ObjectFactory.CreateGameObject("temp", typeof(MeshFilter), typeof(MeshRenderer));
 				prefab = PrefabUtility.SaveAsPrefabAsset(root, bakedPrefabPath);
-				#else
+                #else
+                root = new GameObject("temp", typeof(MeshFilter), typeof(MeshRenderer));
 				prefab = PrefabUtility.CreatePrefab(bakedPrefabPath, root);
-				#endif
-
-				isNewPrefab = true;
+                #endif
+                isNewPrefab = true;
 				Object.DestroyImmediate(root);
 			}
 

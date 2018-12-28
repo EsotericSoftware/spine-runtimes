@@ -33,8 +33,12 @@ using System.Collections.Generic;
 
 namespace Spine.Unity {
 
-	[ExecuteInEditMode]
-	public class BoundingBoxFollower : MonoBehaviour {
+#if UNITY_2018_3_OR_NEWER
+    [ExecuteAlways]
+#else
+    [ExecuteInEditMode]
+#endif
+    public class BoundingBoxFollower : MonoBehaviour {
 		internal static bool DebugMessages = true;
 
 		#region Inspector

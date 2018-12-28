@@ -31,7 +31,12 @@
 using UnityEngine;
 
 namespace Spine.Unity {
-	[RequireComponent(typeof(SkeletonUtilityBone)), ExecuteInEditMode]
+#if UNITY_2018_3_OR_NEWER
+    [ExecuteAlways]
+#else
+    [ExecuteInEditMode]
+#endif
+    [RequireComponent(typeof(SkeletonUtilityBone))]
 	public abstract class SkeletonUtilityConstraint : MonoBehaviour {
 
 		protected SkeletonUtilityBone bone;

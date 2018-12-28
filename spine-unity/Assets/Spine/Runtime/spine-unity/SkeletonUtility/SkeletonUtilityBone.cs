@@ -32,9 +32,13 @@ using UnityEngine;
 using Spine;
 
 namespace Spine.Unity {
-	/// <summary>Sets a GameObject's transform to match a bone on a Spine skeleton.</summary>
-	[ExecuteInEditMode]
-	[AddComponentMenu("Spine/SkeletonGameObjectsBone")]
+    /// <summary>Sets a GameObject's transform to match a bone on a Spine skeleton.</summary>
+#if UNITY_2018_3_OR_NEWER
+    [ExecuteAlways]
+#else
+    [ExecuteInEditMode]
+#endif
+    [AddComponentMenu("Spine/SkeletonGameObjectsBone")]
 	public class SkeletonUtilityBone : MonoBehaviour {
 		public enum Mode {
 			Follow,

@@ -1274,8 +1274,12 @@ namespace Spine.Unity.Editor {
 				}
 
 				string spineGameObjectName = string.Format("Spine GameObject ({0})", skeletonDataAsset.name.Replace("_SkeletonData", ""));
-				GameObject go = new GameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(SkeletonAnimation));
-				SkeletonAnimation newSkeletonAnimation = go.GetComponent<SkeletonAnimation>();
+                #if UNITY_2018_3_OR_NEWER
+				GameObject go = ObjectFactory.CreateGameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(SkeletonAnimation));
+                #else
+                GameObject go = new GameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(SkeletonAnimation));
+                #endif
+                SkeletonAnimation newSkeletonAnimation = go.GetComponent<SkeletonAnimation>();
 				newSkeletonAnimation.skeletonDataAsset = skeletonDataAsset;
 				TryInitializeSkeletonRendererSettings(newSkeletonAnimation, skin);
 
@@ -1303,8 +1307,12 @@ namespace Spine.Unity.Editor {
 				var parentGameObject = Selection.activeObject as GameObject;
 				var parentTransform = parentGameObject == null ? null : parentGameObject.transform;
 
-				var gameObject = new GameObject(name, typeof(T));
-				gameObject.transform.SetParent(parentTransform, false);
+                #if UNITY_2018_3_OR_NEWER
+                var gameObject = ObjectFactory.CreateGameObject(name, typeof(T));
+                #else
+                var gameObject = new GameObject(name, typeof(T));
+                #endif
+                gameObject.transform.SetParent(parentTransform, false);
 				EditorUtility.FocusProjectWindow();
 				Selection.activeObject = gameObject;
 				EditorGUIUtility.PingObject(Selection.activeObject);
@@ -1333,9 +1341,12 @@ namespace Spine.Unity.Editor {
 				}
 
 				string spineGameObjectName = string.Format("Spine Mecanim GameObject ({0})", skeletonDataAsset.name.Replace("_SkeletonData", ""));
-				GameObject go = new GameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(Animator), typeof(SkeletonMecanim));
-
-				if (skeletonDataAsset.controller == null) {
+#if UNITY_2018_3_OR_NEWER
+                GameObject go = ObjectFactory.CreateGameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(Animator), typeof(SkeletonMecanim));
+#else
+                GameObject go = new GameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(Animator), typeof(SkeletonMecanim));
+#endif
+                if (skeletonDataAsset.controller == null) {
 					SkeletonBaker.GenerateMecanimAnimationClips(skeletonDataAsset);
 					Debug.Log(string.Format("Mecanim controller was automatically generated and assigned for {0}", skeletonDataAsset.name));
 				}
@@ -1365,9 +1376,9 @@ namespace Spine.Unity.Editor {
 			}
 #endif
 #endregion
-		}
+            }
 
-		public static class DragAndDropInstantiation {
+            public static class DragAndDropInstantiation {
 			public struct SpawnMenuData {
 				public Vector3 spawnPoint;
 				public SkeletonDataAsset skeletonDataAsset;

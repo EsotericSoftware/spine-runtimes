@@ -31,7 +31,12 @@
 using UnityEngine;
 
 namespace Spine.Unity.Modules {
-	[RequireComponent(typeof(SkeletonUtilityBone)), ExecuteInEditMode]
+#if UNITY_2018_3_OR_NEWER
+    [ExecuteAlways]
+#else
+    [ExecuteInEditMode]
+#endif
+    [RequireComponent(typeof(SkeletonUtilityBone))]
 	public class SkeletonUtilityGroundConstraint : SkeletonUtilityConstraint {
 
 		[Tooltip("LayerMask for what objects to raycast against")]

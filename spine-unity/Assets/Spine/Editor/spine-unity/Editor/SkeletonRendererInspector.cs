@@ -29,7 +29,7 @@
  *****************************************************************************/
 
 #if UNITY_2018_3 || UNITY_2019
-#define NEW_PREFAB_SYSTEM
+#define UNITY_2018_3_OR_NEWER
 #else
 #define NO_PREFAB_MESH
 #endif
@@ -85,7 +85,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		protected virtual void OnEnable () {
-#if NEW_PREFAB_SYSTEM
+#if UNITY_2018_3_OR_NEWER
 			isInspectingPrefab = false;
 #else
 			isInspectingPrefab = (PrefabUtility.GetPrefabType(target) == PrefabType.Prefab);

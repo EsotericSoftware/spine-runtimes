@@ -32,8 +32,12 @@ using UnityEngine;
 using Spine.Unity;
 
 namespace Spine.Unity.Examples {
-	[ExecuteInEditMode]
-	[RequireComponent(typeof(SkeletonRenderer))]
+#if UNITY_2018_3_OR_NEWER
+    [ExecuteAlways]
+#else
+    [ExecuteInEditMode]
+#endif
+    [RequireComponent(typeof(SkeletonRenderer))]
 	public class SpineGauge : MonoBehaviour {
 
 		#region Inspector

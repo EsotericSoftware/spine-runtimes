@@ -36,8 +36,12 @@ using Spine;
 
 namespace Spine.Unity {
 	[RequireComponent(typeof(ISkeletonAnimation))]
-	[ExecuteInEditMode]
-	public sealed class SkeletonUtility : MonoBehaviour {
+#if UNITY_2018_3_OR_NEWER
+    [ExecuteAlways]
+#else
+    [ExecuteInEditMode]
+#endif
+    public sealed class SkeletonUtility : MonoBehaviour {
 
 		#region BoundingBoxAttachment
 		public static PolygonCollider2D AddBoundingBoxGameObject (Skeleton skeleton, string skinName, string slotName, string attachmentName, Transform parent, bool isTrigger = true) {

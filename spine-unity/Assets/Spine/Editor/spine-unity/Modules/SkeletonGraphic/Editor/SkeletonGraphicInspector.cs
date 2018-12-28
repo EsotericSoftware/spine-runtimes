@@ -206,8 +206,12 @@ namespace Spine.Unity.Editor {
 		}
 
 		static GameObject NewSkeletonGraphicGameObject (string gameObjectName) {
-			var go = new GameObject(gameObjectName, typeof(RectTransform), typeof(CanvasRenderer), typeof(SkeletonGraphic));
-			var graphic = go.GetComponent<SkeletonGraphic>();
+#if UNITY_2018_3_OR_NEWER
+            var go = ObjectFactory.CreateGameObject(gameObjectName, typeof(RectTransform), typeof(CanvasRenderer), typeof(SkeletonGraphic));
+#else
+            var go = new GameObject(gameObjectName, typeof(RectTransform), typeof(CanvasRenderer), typeof(SkeletonGraphic));
+#endif
+            var graphic = go.GetComponent<SkeletonGraphic>();
 			graphic.material = SkeletonGraphicInspector.DefaultSkeletonGraphicMaterial;
 			return go;
 		}

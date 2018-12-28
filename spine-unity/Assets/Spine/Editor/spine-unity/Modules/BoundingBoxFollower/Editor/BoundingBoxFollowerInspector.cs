@@ -29,7 +29,7 @@
  *****************************************************************************/
 
 #if UNITY_2018_3 || UNITY_2019
-#define NEW_PREFAB_SYSTEM
+#define UNITY_2018_3_OR_NEWER
 #endif
 
 using UnityEngine;
@@ -65,7 +65,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		public override void OnInspectorGUI () {
-			#if !NEW_PREFAB_SYSTEM
+			#if !UNITY_2018_3_OR_NEWER
 			bool isInspectingPrefab = (PrefabUtility.GetPrefabType(target) == PrefabType.Prefab);
 			#else
 			bool isInspectingPrefab = false;
@@ -102,7 +102,7 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.PropertyField(slotName, new GUIContent("Slot"));
 			if (EditorGUI.EndChangeCheck()) {
 				serializedObject.ApplyModifiedProperties();
-				#if !NEW_PREFAB_SYSTEM
+				#if !UNITY_2018_3_OR_NEWER
 				if (!isInspectingPrefab)
 					rebuildRequired = true;
 				#endif
@@ -192,8 +192,12 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		static GameObject AddBoundingBoxFollowerChild (SkeletonRenderer sr, BoundingBoxFollower original = null) {
-			var go = new GameObject("BoundingBoxFollower");
-			go.transform.SetParent(sr.transform, false);
+            #if UNITY_2018_3_OR_NEWER
+            var go = ObjectFactory.CreateGameObject("BoundingBoxFollower");
+            #else
+            var go = new GameObject("BoundingBoxFollower");
+            #endif
+            go.transform.SetParent(sr.transform, false);
 			var newFollower = go.AddComponent<BoundingBoxFollower>();
 
 			if (original != null) {

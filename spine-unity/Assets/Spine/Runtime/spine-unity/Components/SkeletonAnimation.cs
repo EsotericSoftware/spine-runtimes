@@ -31,9 +31,13 @@
 using UnityEngine;
 
 namespace Spine.Unity {
-	
-	[ExecuteInEditMode]
-	[AddComponentMenu("Spine/SkeletonAnimation")]
+
+#if UNITY_2018_3_OR_NEWER
+    [ExecuteAlways]
+#else
+    [ExecuteInEditMode]
+#endif
+    [AddComponentMenu("Spine/SkeletonAnimation")]
 	public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation, IAnimationStateComponent {
 
 		#region IAnimationStateComponent

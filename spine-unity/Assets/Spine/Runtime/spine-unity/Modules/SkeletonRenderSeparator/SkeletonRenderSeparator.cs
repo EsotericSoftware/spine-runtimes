@@ -35,9 +35,13 @@ using System.Collections.Generic;
 using Spine.Unity;
 
 namespace Spine.Unity.Modules {
-	
-	[ExecuteInEditMode]
-	[HelpURL("http://esotericsoftware.com/spine-unity-skeletonrenderseparator")]
+
+#if UNITY_2018_3_OR_NEWER
+    [ExecuteAlways]
+#else
+    [ExecuteInEditMode]
+#endif
+    [HelpURL("http://esotericsoftware.com/spine-unity-skeletonrenderseparator")]
 	public class SkeletonRenderSeparator : MonoBehaviour {
 		public const int DefaultSortingOrderIncrement = 5;
 

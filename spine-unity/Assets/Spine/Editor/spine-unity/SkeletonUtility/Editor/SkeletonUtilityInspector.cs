@@ -29,7 +29,7 @@
  *****************************************************************************/
 
 #if UNITY_2018_3 || UNITY_2019
-#define NEW_PREFAB_SYSTEM
+#define UNITY_2018_3_OR_NEWER
 #endif
 
 using UnityEngine;
@@ -49,7 +49,7 @@ namespace Spine.Unity.Editor {
 		Skeleton skeleton;
 		SkeletonRenderer skeletonRenderer;
 		
-		#if !NEW_PREFAB_SYSTEM
+		#if !UNITY_2018_3_OR_NEWER
 		bool isPrefab;
 		#endif
 
@@ -68,13 +68,13 @@ namespace Spine.Unity.Editor {
 
 			if (!skeletonRenderer.valid) return;
 
-			#if !NEW_PREFAB_SYSTEM
+			#if !UNITY_2018_3_OR_NEWER
 			isPrefab |= PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab;
 			#endif
 		}
 			
 		public override void OnInspectorGUI () {
-			#if !NEW_PREFAB_SYSTEM
+			#if !UNITY_2018_3_OR_NEWER
 			if (isPrefab) {
 				GUILayout.Label(new GUIContent("Cannot edit Prefabs", Icons.warning));
 				return;

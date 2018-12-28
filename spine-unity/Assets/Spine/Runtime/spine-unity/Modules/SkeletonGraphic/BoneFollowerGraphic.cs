@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Spine.Unity {
-	[ExecuteInEditMode]
-	[DisallowMultipleComponent]
+#if UNITY_2018_3_OR_NEWER
+    [ExecuteAlways]
+#else
+    [ExecuteInEditMode]
+#endif
+    [DisallowMultipleComponent]
 	[AddComponentMenu("Spine/UI/BoneFollowerGraphic")]
 	public class BoneFollowerGraphic : MonoBehaviour {
 		public SkeletonGraphic skeletonGraphic;

@@ -35,8 +35,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Spine.Unity {
-	/// <summary>Base class of animated Spine skeleton components. This component manages and renders a skeleton.</summary>
-	[ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer)), DisallowMultipleComponent]
+    /// <summary>Base class of animated Spine skeleton components. This component manages and renders a skeleton.</summary>
+#if UNITY_2018_3_OR_NEWER
+    [ExecuteAlways]
+#else
+    [ExecuteInEditMode]
+#endif
+    [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer)), DisallowMultipleComponent]
 	[HelpURL("http://esotericsoftware.com/spine-unity-rendering")]
 	public class SkeletonRenderer : MonoBehaviour, ISkeletonComponent, IHasSkeletonDataAsset {
 		[SerializeField] public SkeletonDataAsset skeletonDataAsset;
