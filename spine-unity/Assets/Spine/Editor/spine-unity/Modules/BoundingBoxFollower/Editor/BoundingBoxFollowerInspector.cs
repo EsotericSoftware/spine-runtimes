@@ -192,7 +192,7 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		static GameObject AddBoundingBoxFollowerChild (SkeletonRenderer sr, BoundingBoxFollower original = null) {
-			var go = new GameObject("BoundingBoxFollower");
+			var go = SpineEditorUtilities.EditorInstantiation.NewGameObject("BoundingBoxFollower");
 			go.transform.SetParent(sr.transform, false);
 			var newFollower = go.AddComponent<BoundingBoxFollower>();
 
