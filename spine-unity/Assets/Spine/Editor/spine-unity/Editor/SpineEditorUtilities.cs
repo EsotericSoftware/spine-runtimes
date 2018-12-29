@@ -38,11 +38,11 @@
 #define NEWPLAYMODECALLBACKS
 #endif
 
-#if UNITY_2018_3 || UNITY_2019
+#if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
 #define NEW_PREFAB_SYSTEM
 #endif
 
-#if UNITY_2018 || UNITY_2019
+#if UNITY_2018 || UNITY_2019 || UNITY_2018_3_OR_NEWER
 #define NEWHIERARCHYWINDOWCALLBACKS
 #endif
 
@@ -53,7 +53,6 @@ using System.IO;
 using System.Text;
 using System.Linq;
 using System.Reflection;
-using Spine;
 
 namespace Spine.Unity.Editor {
 	using EventType = UnityEngine.EventType;
@@ -1306,7 +1305,7 @@ namespace Spine.Unity.Editor {
 			/// <summary>Handles creating a new GameObject in the Unity Editor. This uses the new ObjectFactory API where applicable.</summary>
 			public static GameObject NewGameObject (string name) {
 				#if NEW_PREFAB_SYSTEM
-				return ObjectFactory.CreateGameObject(gameObjectName);
+				return ObjectFactory.CreateGameObject(name);
 				#else
 				return new GameObject(name);
 				#endif
@@ -1315,7 +1314,7 @@ namespace Spine.Unity.Editor {
 			/// <summary>Handles creating a new GameObject in the Unity Editor. This uses the new ObjectFactory API where applicable.</summary>
 			public static GameObject NewGameObject (string name, params System.Type[] components) {
 				#if NEW_PREFAB_SYSTEM
-				return ObjectFactory.CreateGameObject(gameObjectName, components);
+				return ObjectFactory.CreateGameObject(name, components);
 				#else
 				return new GameObject(name, components);
 				#endif
