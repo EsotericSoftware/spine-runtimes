@@ -27,14 +27,20 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
- 
-using System.Collections;
-using System.Collections.Generic;
+
+#if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
+#define NEW_PREFAB_SYSTEM
+#endif
+
 using UnityEngine;
 
 namespace Spine.Unity {
 
+	#if NEW_PREFAB_SYSTEM
+	[ExecuteAlways]
+	#else
 	[ExecuteInEditMode]
+	#endif
 	[AddComponentMenu("Spine/Point Follower")]
 	public class PointFollower : MonoBehaviour, IHasSkeletonRenderer, IHasSkeletonComponent {
 

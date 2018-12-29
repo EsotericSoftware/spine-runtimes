@@ -28,15 +28,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
+#define NEW_PREFAB_SYSTEM
+#endif
 #define SPINE_OPTIONAL_RENDEROVERRIDE
 
 using UnityEngine;
 using System.Collections.Generic;
-using Spine.Unity;
 
 namespace Spine.Unity.Modules {
-	
+
+	#if NEW_PREFAB_SYSTEM
+	[ExecuteAlways]
+	#else
 	[ExecuteInEditMode]
+	#endif
 	[HelpURL("http://esotericsoftware.com/spine-unity-skeletonrenderseparator")]
 	public class SkeletonRenderSeparator : MonoBehaviour {
 		public const int DefaultSortingOrderIncrement = 5;

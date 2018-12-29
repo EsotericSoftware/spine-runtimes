@@ -28,10 +28,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
+#define NEW_PREFAB_SYSTEM
+#endif
+
 using UnityEngine;
 
 namespace Spine.Unity {
-	[RequireComponent(typeof(SkeletonUtilityBone)), ExecuteInEditMode]
+
+	#if NEW_PREFAB_SYSTEM
+	[ExecuteAlways]
+	#else
+	[ExecuteInEditMode]
+	#endif
+	[RequireComponent(typeof(SkeletonUtilityBone))]
 	public abstract class SkeletonUtilityConstraint : MonoBehaviour {
 
 		protected SkeletonUtilityBone bone;

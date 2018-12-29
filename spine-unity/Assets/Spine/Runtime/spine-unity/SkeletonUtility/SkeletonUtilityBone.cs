@@ -28,12 +28,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
+#define NEW_PREFAB_SYSTEM
+#endif
+
 using UnityEngine;
-using Spine;
 
 namespace Spine.Unity {
 	/// <summary>Sets a GameObject's transform to match a bone on a Spine skeleton.</summary>
+	#if NEW_PREFAB_SYSTEM
+	[ExecuteAlways]
+	#else
 	[ExecuteInEditMode]
+	#endif
 	[AddComponentMenu("Spine/SkeletonGameObjectsBone")]
 	public class SkeletonUtilityBone : MonoBehaviour {
 		public enum Mode {

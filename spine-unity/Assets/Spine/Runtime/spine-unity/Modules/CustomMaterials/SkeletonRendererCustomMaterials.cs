@@ -28,6 +28,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
+#define NEW_PREFAB_SYSTEM
+#endif
 #define SPINE_OPTIONAL_MATERIALOVERRIDE
 
 // Contributed by: Lost Polygon
@@ -37,7 +40,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Spine.Unity.Modules {
+	#if NEW_PREFAB_SYSTEM
+	[ExecuteAlways]
+	#else
 	[ExecuteInEditMode]
+	#endif
 	public class SkeletonRendererCustomMaterials : MonoBehaviour {
 
 		#region Inspector

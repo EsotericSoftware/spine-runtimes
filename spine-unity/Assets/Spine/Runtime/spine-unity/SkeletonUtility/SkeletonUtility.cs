@@ -28,15 +28,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-// Contributed by: Mitch Thompson
+#if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
+#define NEW_PREFAB_SYSTEM
+#endif
 
 using UnityEngine;
 using System.Collections.Generic;
-using Spine;
 
 namespace Spine.Unity {
-	[RequireComponent(typeof(ISkeletonAnimation))]
+
+	#if NEW_PREFAB_SYSTEM
+	[ExecuteAlways]
+	#else
 	[ExecuteInEditMode]
+	#endif
+	[RequireComponent(typeof(ISkeletonAnimation))]
 	public sealed class SkeletonUtility : MonoBehaviour {
 
 		#region BoundingBoxAttachment
