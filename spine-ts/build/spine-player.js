@@ -10157,6 +10157,8 @@ var spine;
 						target = null;
 					}
 					else {
+						if (!_this.config.showControls)
+							return;
 						if (_this.paused)
 							_this.play();
 						else
