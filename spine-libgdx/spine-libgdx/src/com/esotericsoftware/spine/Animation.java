@@ -70,7 +70,8 @@ public class Animation {
 
 	/** Applies all the animation's timelines to the specified skeleton.
 	 * <p>
-	 * See Timeline {@link Timeline#apply(Skeleton, float, float, Array, float, MixBlend, MixDirection)}. */
+	 * See Timeline {@link Timeline#apply(Skeleton, float, float, Array, float, MixBlend, MixDirection)}.
+	 * @param loop If true, the animation repeats after {@link #getDuration()}. */
 	public void apply (Skeleton skeleton, float lastTime, float time, boolean loop, Array<Event> events, float alpha,
 		MixBlend blend, MixDirection direction) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
@@ -202,13 +203,15 @@ public class Animation {
 		twoColor
 	}
 
+	/** An interface for timelines which change the property of a bone. */
 	static public interface BoneTimeline extends Timeline {
 		public void setBoneIndex (int index);
 
-		/** The index of the slot in {@link Skeleton#getSlots()} that will be changed. */
+		/** The index of the bone in {@link Skeleton#getBones()} that will be changed. */
 		public int getBoneIndex ();
 	}
 
+	/** An interface for timelines which change the property of a slot. */
 	static public interface SlotTimeline extends Timeline {
 		public void setSlotIndex (int index);
 
