@@ -103,6 +103,10 @@ public class SkeletonJson {
 		this.scale = scale;
 	}
 
+	protected JsonValue parse (FileHandle file) {
+		return new JsonReader().parse(file);
+	}
+
 	public SkeletonData readSkeletonData (FileHandle file) {
 		if (file == null) throw new IllegalArgumentException("file cannot be null.");
 
@@ -111,7 +115,7 @@ public class SkeletonJson {
 		SkeletonData skeletonData = new SkeletonData();
 		skeletonData.name = file.nameWithoutExtension();
 
-		JsonValue root = new JsonReader().parse(file);
+		JsonValue root = parse(file);
 
 		// Skeleton.
 		JsonValue skeletonMap = root.get("skeleton");
