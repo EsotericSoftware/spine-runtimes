@@ -31,5 +31,5 @@ MonoBehaviour:
   - 0
   - 0.05
   - 0.05
-  defaultMix: 0
+  defaultMix: 0.05
   controller: {fileID: 0}

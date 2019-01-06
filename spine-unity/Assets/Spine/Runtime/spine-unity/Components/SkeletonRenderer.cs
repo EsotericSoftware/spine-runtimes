@@ -28,6 +28,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
+#define NEW_PREFAB_SYSTEM
+#endif
 #define SPINE_OPTIONAL_RENDEROVERRIDE
 #define SPINE_OPTIONAL_MATERIALOVERRIDE
 
@@ -36,7 +39,12 @@ using UnityEngine;
 
 namespace Spine.Unity {
 	/// <summary>Base class of animated Spine skeleton components. This component manages and renders a skeleton.</summary>
-	[ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer)), DisallowMultipleComponent]
+	#if NEW_PREFAB_SYSTEM
+	[ExecuteAlways]
+	#else
+	[ExecuteInEditMode]
+	#endif
+	[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer)), DisallowMultipleComponent]
 	[HelpURL("http://esotericsoftware.com/spine-unity-rendering")]
 	public class SkeletonRenderer : MonoBehaviour, ISkeletonComponent, IHasSkeletonDataAsset {
 		[SerializeField] public SkeletonDataAsset skeletonDataAsset;

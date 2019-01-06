@@ -29,12 +29,27 @@
  *****************************************************************************/
 
 using UnityEngine;
+using UnityEngine.Events;
 using Spine.Unity;
 
 namespace Spine.Unity.Examples {
 
 	[RequireComponent(typeof(CharacterController))]
 	public class BasicPlatformerController : MonoBehaviour {
+
+		public enum CharacterState {
+			None,
+			Idle,
+			Walk,
+			Run,
+			Crouch,
+			Rise,
+			Fall,
+			Attack
+		}
+
+		[Header("Components")]
+		public CharacterController controller;
 
 		[Header("Controls")]
 		public string XAxis = "Horizontal";
@@ -53,38 +68,19 @@ namespace Spine.Unity.Examples {
 		public float forceCrouchVelocity = 25;
 		public float forceCrouchDuration = 0.5f;
 
-		[Header("Visuals")]
-		public SkeletonAnimation skeletonAnimation;
-
 		[Header("Animation")]
-		public TransitionDictionaryExample transitions;
-		public AnimationReferenceAsset walk;
-		public AnimationReferenceAsset run;
-		public AnimationReferenceAsset idle;
-		public AnimationReferenceAsset jump;
-		public AnimationReferenceAsset fall;
-		public AnimationReferenceAsset crouch;
-		public AnimationReferenceAsset runFromFall;
+		public SkeletonAnimationHandleExample animationHandle;
 
-		[Header("Effects")]
-		public AudioSource jumpAudioSource;
-		public AudioSource hardfallAudioSource;
-		public ParticleSystem landParticles;
-		public HandleEventWithAudioExample footstepHandler;
+		// Events
+		public event UnityAction OnJump, OnLand, OnHardLand;
 
-		CharacterController controller;
 		Vector2 input = default(Vector2);
 		Vector3 velocity = default(Vector3);
 		float minimumJumpEndTime = 0;
 		float forceCrouchEndTime;
 		bool wasGrounded = false;
 
-		AnimationReferenceAsset targetAnimation;
-		AnimationReferenceAsset previousTargetAnimation;
-
-		void Awake () {
-			controller = GetComponent<CharacterController>();
-		}
+		CharacterState previousState, currentState;
 
 		void Update () {
 			float dt = Time.deltaTime;
@@ -122,7 +118,6 @@ namespace Spine.Unity.Examples {
 			// Dummy physics and controller using UnityEngine.CharacterController.
 			Vector3 gravityDeltaVelocity = Physics.gravity * gravityScale * dt;
 			
-
 			if (doJump) {
 				velocity.y = jumpSpeed;
 				minimumJumpEndTime = Time.time + minimumJumpDuration;
@@ -149,60 +144,77 @@ namespace Spine.Unity.Examples {
 				}
 			}
 			controller.Move(velocity * dt);
-
-			// Animation
-			// Determine target animation.
+			wasGrounded = isGrounded;
+			
+			// Determine and store character state
 			if (isGrounded) {
 				if (doCrouch) {
-					targetAnimation = crouch;
+					currentState = CharacterState.Crouch;
 				} else {
 					if (input.x == 0)
-						targetAnimation = idle;
+						currentState = CharacterState.Idle;
 					else
-						targetAnimation = Mathf.Abs(input.x) > 0.6f ? run : walk;
+						currentState = Mathf.Abs(input.x) > 0.6f ? CharacterState.Run : CharacterState.Walk;
 				}
 			} else {
-				targetAnimation = velocity.y > 0 ? jump : fall;
+				currentState = velocity.y > 0 ? CharacterState.Rise : CharacterState.Fall;
 			}
 
-			// Handle change in target animation.
-			if (previousTargetAnimation != targetAnimation) {
-				Animation transition = null;
-				if (transitions != null && previousTargetAnimation != null) {
-					transition = transitions.GetTransition(previousTargetAnimation, targetAnimation);
-				}
+			bool stateChanged = previousState != currentState;
+			previousState = currentState;
 
-				if (transition != null) {
-					skeletonAnimation.AnimationState.SetAnimation(0, transition, false).MixDuration = 0.05f;
-					skeletonAnimation.AnimationState.AddAnimation(0, targetAnimation, true, 0f);
-				} else {
-					skeletonAnimation.AnimationState.SetAnimation(0, targetAnimation, true);
-				}
-			}
-			previousTargetAnimation = targetAnimation;
+			// Animation
+			// Do not modify character parameters or state in this phase. Just read them.
+			// Detect changes in state, and communicate with animation handle if it changes.
+			if (stateChanged)
+				HandleStateChanged();
 
-			// Face intended direction.
 			if (input.x != 0)
-				skeletonAnimation.Skeleton.ScaleX = Mathf.Sign(input.x);
+				animationHandle.SetFlip(input.x);
 
-
-			// Effects
+			// Fire events.
 			if (doJump) {
-				jumpAudioSource.Stop();
-				jumpAudioSource.Play();
+				OnJump.Invoke();
 			}
-
 			if (landed) {
 				if (hardLand) {
-					hardfallAudioSource.Play();
+					OnHardLand.Invoke();
 				} else {
-					footstepHandler.Play();
+					OnLand.Invoke();
 				}
+			}
+		}
 
-				landParticles.Emit((int)(velocity.y / -9f) + 2);
+		void HandleStateChanged () {
+			// When the state changes, notify the animation handle of the new state.
+			string stateName = null;
+			switch (currentState) {
+				case CharacterState.Idle:
+					stateName = "idle";
+					break;
+				case CharacterState.Walk:
+					stateName = "walk";
+					break;
+				case CharacterState.Run:
+					stateName = "run";
+					break;
+				case CharacterState.Crouch:
+					stateName = "crouch";
+					break;
+				case CharacterState.Rise:
+					stateName = "rise";
+					break;
+				case CharacterState.Fall:
+					stateName = "fall";
+					break;
+				case CharacterState.Attack:
+					stateName = "attack";
+					break;
+				default:
+					break;
 			}
 
-			wasGrounded = isGrounded;
+			animationHandle.PlayAnimationForState(stateName, 0);
 		}
 
 	}

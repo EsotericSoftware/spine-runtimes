@@ -989,6 +989,7 @@
 					if (target) {
 						target = null;
 					} else {
+						if (!this.config.showControls) return;
 						if (this.paused)
 							this.play()
 						else
@@ -1048,22 +1049,22 @@
 			let handleHover = (mouseX: number, mouseY: number) => {
 				if (!this.config.showControls) return;
 
-					let popup = findWithClass(this.dom, "spine-player-popup");
-					mouseOverControls = overlap(mouseX, mouseY, this.playerControls.getBoundingClientRect());
-					mouseOverCanvas = overlap(mouseX, mouseY, this.canvas.getBoundingClientRect());
-					clearTimeout(this.cancelId);
-					let hide = popup.length == 0 && !mouseOverControls && !mouseOverCanvas && !this.paused;
-					if (hide) {
-						this.playerControls.classList.add("spine-player-controls-hidden");
-					} else {
-						this.playerControls.classList.remove("spine-player-controls-hidden");
-					}
-					if (!mouseOverControls && popup.length == 0 && !this.paused) {
-						let remove = () => {
-							if (!this.paused) this.playerControls.classList.add("spine-player-controls-hidden");
-						};
-						this.cancelId = setTimeout(remove, 1000);
-					}
+				let popup = findWithClass(this.dom, "spine-player-popup");
+				mouseOverControls = overlap(mouseX, mouseY, this.playerControls.getBoundingClientRect());
+				mouseOverCanvas = overlap(mouseX, mouseY, this.canvas.getBoundingClientRect());
+				clearTimeout(this.cancelId);
+				let hide = popup.length == 0 && !mouseOverControls && !mouseOverCanvas && !this.paused;
+				if (hide) {
+					this.playerControls.classList.add("spine-player-controls-hidden");
+				} else {
+					this.playerControls.classList.remove("spine-player-controls-hidden");
+				}
+				if (!mouseOverControls && popup.length == 0 && !this.paused) {
+					let remove = () => {
+						if (!this.paused) this.playerControls.classList.add("spine-player-controls-hidden");
+					};
+					this.cancelId = setTimeout(remove, 1000);
+				}
 			}
 
 			let overlap = (mouseX: number, mouseY: number, rect: DOMRect | ClientRect): boolean => {

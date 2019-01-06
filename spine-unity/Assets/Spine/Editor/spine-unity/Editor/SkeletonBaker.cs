@@ -296,7 +296,7 @@ namespace Spine.Unity.Editor {
 					}
 				}
 
-				GameObject prefabRoot = new GameObject("root");
+				GameObject prefabRoot = SpineEditorUtilities.EditorInstantiation.NewGameObject("root");
 
 				Dictionary<string, Transform> slotTable = new Dictionary<string, Transform>();
 				Dictionary<string, Transform> boneTable = new Dictionary<string, Transform>();
@@ -305,7 +305,7 @@ namespace Spine.Unity.Editor {
 				//create bones
 				for (int i = 0; i < skeletonData.Bones.Count; i++) {
 					var boneData = skeletonData.Bones.Items[i];
-					Transform boneTransform = new GameObject(boneData.Name).transform;
+					Transform boneTransform = SpineEditorUtilities.EditorInstantiation.NewGameObject(boneData.Name).transform;
 					boneTransform.parent = prefabRoot.transform;
 					boneTable.Add(boneTransform.name, boneTransform);
 					boneList.Add(boneTransform);
@@ -336,7 +336,7 @@ namespace Spine.Unity.Editor {
 				//create slots and attachments
 				for (int i = 0; i < skeletonData.Slots.Count; i++) {
 					var slotData = skeletonData.Slots.Items[i];
-					Transform slotTransform = new GameObject(slotData.Name).transform;
+					Transform slotTransform = SpineEditorUtilities.EditorInstantiation.NewGameObject(slotData.Name).transform;
 					slotTransform.parent = prefabRoot.transform;
 					slotTable.Add(slotData.Name, slotTransform);
 
@@ -392,7 +392,7 @@ namespace Spine.Unity.Editor {
 						} else
 							continue;
 
-						Transform attachmentTransform = new GameObject(attachmentName).transform;
+						Transform attachmentTransform = SpineEditorUtilities.EditorInstantiation.NewGameObject(attachmentName).transform;
 
 						attachmentTransform.parent = slotTransform;
 						attachmentTransform.localPosition = offset;
@@ -1429,7 +1429,7 @@ namespace Spine.Unity.Editor {
 				Directory.CreateDirectory(bakedDirPath);
 
 			if (prefab == null) {
-				root = new GameObject("temp", typeof(MeshFilter), typeof(MeshRenderer));
+				root = SpineEditorUtilities.EditorInstantiation.NewGameObject("temp", typeof(MeshFilter), typeof(MeshRenderer));
 				#if NEW_PREFAB_SYSTEM
 				prefab = PrefabUtility.SaveAsPrefabAsset(root, bakedPrefabPath);
 				#else

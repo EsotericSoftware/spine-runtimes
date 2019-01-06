@@ -1,0 +1,17 @@
+# When text is set to "auto", the path is marked for automatic end-of-line normalization.
+# If git decides that the content is text, its line endings are normalized to LF on checkin.
+# Set in case people don't have core.autocrlf set.
+* text=auto
+
+*.sh         text eol=lf
+
+# Unity specific
+*.mat               merge=unityyamlmerge text eol=lf
+*.anim              merge=unityyamlmerge text eol=lf
+*.unity             merge=unityyamlmerge text eol=lf
+*.prefab            merge=unityyamlmerge text eol=lf
+*.physicsMaterial2D merge=unityyamlmerge text eol=lf
+*.physicsMaterial   merge=unityyamlmerge text eol=lf
+*.asset             merge=unityyamlmerge text eol=lf
+*.meta              merge=unityyamlmerge text eol=lf
+*.controller        merge=unityyamlmerge text eol=lf

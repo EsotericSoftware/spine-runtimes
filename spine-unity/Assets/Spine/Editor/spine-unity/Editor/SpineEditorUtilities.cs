@@ -38,7 +38,11 @@
 #define NEWPLAYMODECALLBACKS
 #endif
 
-#if UNITY_2018 || UNITY_2019
+#if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
+#define NEW_PREFAB_SYSTEM
+#endif
+
+#if UNITY_2018 || UNITY_2019 || UNITY_2018_3_OR_NEWER
 #define NEWHIERARCHYWINDOWCALLBACKS
 #endif
 
@@ -49,7 +53,6 @@ using System.IO;
 using System.Text;
 using System.Linq;
 using System.Reflection;
-using Spine;
 
 namespace Spine.Unity.Editor {
 	using EventType = UnityEngine.EventType;
@@ -1274,7 +1277,7 @@ namespace Spine.Unity.Editor {
 				}
 
 				string spineGameObjectName = string.Format("Spine GameObject ({0})", skeletonDataAsset.name.Replace("_SkeletonData", ""));
-				GameObject go = new GameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(SkeletonAnimation));
+				GameObject go = EditorInstantiation.NewGameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(SkeletonAnimation));
 				SkeletonAnimation newSkeletonAnimation = go.GetComponent<SkeletonAnimation>();
 				newSkeletonAnimation.skeletonDataAsset = skeletonDataAsset;
 				TryInitializeSkeletonRendererSettings(newSkeletonAnimation, skin);
@@ -1298,12 +1301,30 @@ namespace Spine.Unity.Editor {
 
 				return newSkeletonAnimation;
 			}
+			
+			/// <summary>Handles creating a new GameObject in the Unity Editor. This uses the new ObjectFactory API where applicable.</summary>
+			public static GameObject NewGameObject (string name) {
+				#if NEW_PREFAB_SYSTEM
+				return ObjectFactory.CreateGameObject(name);
+				#else
+				return new GameObject(name);
+				#endif
+			}
+
+			/// <summary>Handles creating a new GameObject in the Unity Editor. This uses the new ObjectFactory API where applicable.</summary>
+			public static GameObject NewGameObject (string name, params System.Type[] components) {
+				#if NEW_PREFAB_SYSTEM
+				return ObjectFactory.CreateGameObject(name, components);
+				#else
+				return new GameObject(name, components);
+				#endif
+			}
 
 			public static void InstantiateEmptySpineGameObject<T> (string name) where T : MonoBehaviour {
 				var parentGameObject = Selection.activeObject as GameObject;
 				var parentTransform = parentGameObject == null ? null : parentGameObject.transform;
 
-				var gameObject = new GameObject(name, typeof(T));
+				var gameObject = EditorInstantiation.NewGameObject(name, typeof(T));
 				gameObject.transform.SetParent(parentTransform, false);
 				EditorUtility.FocusProjectWindow();
 				Selection.activeObject = gameObject;
@@ -1333,7 +1354,7 @@ namespace Spine.Unity.Editor {
 				}
 
 				string spineGameObjectName = string.Format("Spine Mecanim GameObject ({0})", skeletonDataAsset.name.Replace("_SkeletonData", ""));
-				GameObject go = new GameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(Animator), typeof(SkeletonMecanim));
+				GameObject go = EditorInstantiation.NewGameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(Animator), typeof(SkeletonMecanim));
 
 				if (skeletonDataAsset.controller == null) {
 					SkeletonBaker.GenerateMecanimAnimationClips(skeletonDataAsset);

@@ -69,8 +69,8 @@ namespace Spine.Unity {
 				sa.initialFlipX = this.initialFlipX;
 				sa.initialFlipY = this.initialFlipY;
 				var skeleton = sa.skeleton;
-				skeleton.ScaleX = this.initialFlipX ? 1 : -1;
-				skeleton.ScaleY = this.initialFlipY ? 1 : -1;
+				skeleton.ScaleX = this.initialFlipX ? -1 : 1;
+				skeleton.ScaleY = this.initialFlipY ? -1 : 1;
 
 				sa.Initialize(false);
 				skeletonAnimations.Add(sa);

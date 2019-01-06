@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
  * Spine Runtimes Software License v2.5
  *
  * Copyright (c) 2013-2016, Esoteric Software
@@ -28,30 +28,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using System;
+using UnityEngine;
+using UnityEngine.Events;
 
-namespace Spine {
-	/// <summary>Stores the setup pose values for an Event.</summary>
-	public class EventData {
-		internal string name;
+namespace Spine.Unity.Examples {
+	public class HeroEffectsHandlerExample : MonoBehaviour {
+		public BasicPlatformerController eventSource;
+		public UnityEvent OnJump, OnLand, OnHardLand;
 
-		/// <summary>The name of the event, which is unique within the skeleton.</summary>
-		public string Name { get { return name; } }
-		public int Int { get; set; }
-		public float Float { get; set; }
-		public string @String { get; set; }
+		public void Awake () {
+			if (eventSource == null)
+				return;
 
-		public string AudioPath { get; set; }
-		public float Volume { get; set; }
-		public float Balance { get; set; }
-
-		public EventData (string name) {
-			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
-			this.name = name;
-		}
-
-		override public string ToString () {
-			return Name;
+			eventSource.OnLand += OnLand.Invoke;
+			eventSource.OnJump += OnJump.Invoke;
+			eventSource.OnHardLand += OnHardLand.Invoke;
 		}
 	}
 }
