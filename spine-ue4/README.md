@@ -9,11 +9,11 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-ue4 works with data exported from Spine 3.6.xx.
+spine-ue4 works with data exported from Spine 3.7.xx.
 
 spine-ue4 supports all Spine features.
 
-spine-ue4 does not support multiply and screen blending. spine-ue4 does not support pre-multiplied alpha atlases.
+spine-ue4 does not support multiply and screen blending. spine-ue4 does not support pre-multiplied alpha atlases. spine-ue4 does not support two color tinting.
 
 ## Usage
 ### [Please see the spine-ue4 guide for full documentation](http://esotericsoftware.com/spine-ue4)
