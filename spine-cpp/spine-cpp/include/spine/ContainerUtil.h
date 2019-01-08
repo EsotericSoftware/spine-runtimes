@@ -108,13 +108,12 @@ namespace spine {
         
         template<typename T>
         static void cleanUpVectorOfPointers(Vector<T*>& items) {
-            for (size_t i = 0; i < items.size(); ) {
+            for (size_t i = 0; i < items.size(); ++i) {
                 T* item = items[i];
-                
-                delete item;
 
-                items.removeAt(i);
+                delete item;
             }
+			items.clear();
         }
         
     private:
