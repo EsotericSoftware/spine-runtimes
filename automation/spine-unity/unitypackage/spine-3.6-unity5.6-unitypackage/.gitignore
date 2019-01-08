@@ -1,0 +1,6 @@
+Library/
+Temp/
+sparse_checkout/
+*.sln
+*.csproj
+
