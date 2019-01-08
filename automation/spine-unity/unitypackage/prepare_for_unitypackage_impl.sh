@@ -83,6 +83,7 @@ if [ $spine_version == "3.6" ]; then
     dst_spine_csharp_subdir="Assets/Spine/spine-csharp"
     dst_spine_unity_subdir="Assets/Spine/spine-unity"
     lf_handling="conservative"
+    git_track_package_changes=true
 else
     
     src_spine_unity_subdir="spine-unity/Assets/Spine"
@@ -144,7 +145,7 @@ main() {
     echo ----------------------------------------------------------------------
     # prepare target dir to track changes or not (via .gitignore ignore directory)
     if [ $git_track_package_changes == true ]; then
-        rm "${dst_assets_base_dir}/.gitignore"
+        rm -f "${dst_assets_base_dir}/.gitignore"
     else
         echo '*' > "${dst_assets_base_dir}/.gitignore"
     fi
@@ -154,6 +155,15 @@ main() {
         # in spine 3.6 we want to be more conservative and keep existing meta files
         # (they come from a previously extracted reference 3.6 unitypackage).
         # so in spine-csharp and dst_spine_unity dirs, we don't want to delete meta files.
+        
+        if [ ! -d "$dst_spine_csharp/" ]; then
+            echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            echo "!!! ERROR $dst_spine_csharp/ does not exist!"
+            echo '!!! Please unpack the last valid unitypackage to Assets/ for reference purposes (to preserve lf vs crlf)'
+            echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            exit -1
+        fi
+
         find "$dst_spine_csharp/" -type f -not -name '*.meta' -delete
         find "$dst_spine_csharp/" -type d -empty -delete
         find "$dst_spine_unity/" -type f -not -name '*.meta' -delete
@@ -202,7 +212,7 @@ main() {
         git diff -U0 -w --no-color --binary ${unityproject_base} | git apply --cached --ignore-whitespace --unidiff-zero - && git checkout -- ${unityproject_base}  && git reset
     fi
 
-    if [ "$lf_handling" == "conservative" ] && [ $git_track_package_changes == true]; then
+    if [ "$lf_handling" == "conservative" ] && [ $git_track_package_changes == true ]; then
         git add "$dst_spine_csharp/"
         git add "$dst_spine_unity/"
         git add "$dst_spine_examples/"
