@@ -543,7 +543,8 @@ namespace Spine.Unity.Editor {
 			} else if (atlasProp.objectReferenceValue == null) {
 				EditorGUI.LabelField(position, "ERROR:", "Atlas variable must not be null!");
 				return;
-			} else if (atlasProp.objectReferenceValue.GetType() != typeof(AtlasAssetBase)) {
+			} else if (!atlasProp.objectReferenceValue.GetType().IsSubclassOf(typeof(AtlasAssetBase)) &&
+						atlasProp.objectReferenceValue.GetType() != typeof(AtlasAssetBase)) {
 				EditorGUI.LabelField(position, "ERROR:", "Atlas variable must be of type AtlasAsset!");
 			}
 
