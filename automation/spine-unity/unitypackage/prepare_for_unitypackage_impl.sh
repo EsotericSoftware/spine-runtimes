@@ -248,6 +248,11 @@ main() {
             git commit -m "[unity][auto] ${package_filename}: integrated changes of main repository up to commit ${out_commit_hash1}${optional_excluding_whitespace_message}."
         fi
     fi
+
+    echo ----------------------------------------------------------------------
+    echo Removing Library dir to be on the safe side with a clean start
+    echo ----------------------------------------------------------------------
+    rm -rf "Library"
     
     echo ----------------------------------------------------------------------
     echo Finished successfully
