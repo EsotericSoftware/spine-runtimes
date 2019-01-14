@@ -68,99 +68,122 @@ void USpineSkeletonRendererComponent::BeginPlay () {
 	Super::BeginPlay();
 }
 
+USpineSkeletonComponent* USpineSkeletonRendererComponent::GetSkeleton() const
+{
+	return CachedSkeleton.IsValid() ? CachedSkeleton.Get() : nullptr;
+}
+
+void USpineSkeletonRendererComponent::SetSkeleton(USpineSkeletonComponent* InSkeleton)
+{
+	CachedSkeleton = InSkeleton;
+}
+
 void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
-	AActor* owner = GetOwner();
-	if (owner) {
-		UClass* skeletonClass = USpineSkeletonComponent::StaticClass();
-		USpineSkeletonComponent* skeleton = Cast<USpineSkeletonComponent>(owner->GetComponentByClass(skeletonClass));
-		
-		if (skeleton && !skeleton->IsBeingDestroyed() && skeleton->GetSkeleton() && skeleton->Atlas) {
-			skeleton->GetSkeleton()->getColor().set(Color.R, Color.G, Color.B, Color.A);
 
-			if (atlasNormalBlendMaterials.Num() != skeleton->Atlas->atlasPages.Num()) {
-				atlasNormalBlendMaterials.SetNum(0);
-				pageToNormalBlendMaterial.Empty();
-				atlasAdditiveBlendMaterials.SetNum(0);
-				pageToAdditiveBlendMaterial.Empty();
-				atlasMultiplyBlendMaterials.SetNum(0);
-				pageToMultiplyBlendMaterial.Empty();
-				atlasScreenBlendMaterials.SetNum(0);
-				pageToScreenBlendMaterial.Empty();
-								
-				for (int i = 0; i < skeleton->Atlas->atlasPages.Num(); i++) {
-					AtlasPage* currPage = skeleton->Atlas->GetAtlas(false)->getPages()[i];
-					
-					UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(NormalBlendMaterial, owner);
-					material->SetTextureParameterValue(TextureParameterName, skeleton->Atlas->atlasPages[i]);
-					atlasNormalBlendMaterials.Add(material);
-					pageToNormalBlendMaterial.Add(currPage, material);
-					
-					material = UMaterialInstanceDynamic::Create(AdditiveBlendMaterial, owner);
-					material->SetTextureParameterValue(TextureParameterName, skeleton->Atlas->atlasPages[i]);
-					atlasAdditiveBlendMaterials.Add(material);
-					pageToAdditiveBlendMaterial.Add(currPage, material);
-					
-					material = UMaterialInstanceDynamic::Create(MultiplyBlendMaterial, owner);
-					material->SetTextureParameterValue(TextureParameterName, skeleton->Atlas->atlasPages[i]);
-					atlasMultiplyBlendMaterials.Add(material);
-					pageToMultiplyBlendMaterial.Add(currPage, material);
-					
-					material = UMaterialInstanceDynamic::Create(ScreenBlendMaterial, owner);
-					material->SetTextureParameterValue(TextureParameterName, skeleton->Atlas->atlasPages[i]);
-					atlasScreenBlendMaterials.Add(material);
-					pageToScreenBlendMaterial.Add(currPage, material);					
-				}
-			} else {
-				pageToNormalBlendMaterial.Empty();
-				pageToAdditiveBlendMaterial.Empty();
-				pageToMultiplyBlendMaterial.Empty();
-				pageToScreenBlendMaterial.Empty();
-								
-				for (int i = 0; i < skeleton->Atlas->atlasPages.Num(); i++) {
-					AtlasPage* currPage = skeleton->Atlas->GetAtlas(false)->getPages()[i];
-
-					UTexture2D* texture = skeleton->Atlas->atlasPages[i];
-					UTexture* oldTexture = nullptr;
-					
-					UMaterialInstanceDynamic* current = atlasNormalBlendMaterials[i];
-					if(!current || !current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
-						UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(NormalBlendMaterial, owner);
-						material->SetTextureParameterValue(TextureParameterName, texture);
-						atlasNormalBlendMaterials[i] = material;
-					}
-					pageToNormalBlendMaterial.Add(currPage, atlasNormalBlendMaterials[i]);
-					
-					current = atlasAdditiveBlendMaterials[i];
-					if(!current || !current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
-						UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(AdditiveBlendMaterial, owner);
-						material->SetTextureParameterValue(TextureParameterName, texture);
-						atlasAdditiveBlendMaterials[i] = material;
-					}
-					pageToAdditiveBlendMaterial.Add(currPage, atlasAdditiveBlendMaterials[i]);
-					
-					current = atlasMultiplyBlendMaterials[i];
-					if(!current || !current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
-						UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(MultiplyBlendMaterial, owner);
-						material->SetTextureParameterValue(TextureParameterName, texture);
-						atlasMultiplyBlendMaterials[i] = material;
-					}
-					pageToMultiplyBlendMaterial.Add(currPage, atlasMultiplyBlendMaterials[i]);
-					
-					current = atlasScreenBlendMaterials[i];
-					if(!current || !current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
-						UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(ScreenBlendMaterial, owner);
-						material->SetTextureParameterValue(TextureParameterName, texture);
-						atlasScreenBlendMaterials[i] = material;
-					}
-					pageToScreenBlendMaterial.Add(currPage, atlasScreenBlendMaterials[i]);
-				}
-			}
-			UpdateMesh(skeleton->GetSkeleton());
-		} else {
-			ClearAllMeshSections();
+	//Check if we need to initialize the skeleton cache, this will help us to avoid excessive Find functions when ticking, thus improving performance
+	if (!GetSkeleton())
+	{
+		USpineSkeletonComponent* FoundSkeletonComponent = GetOwner()->FindComponentByClass<USpineSkeletonComponent>();
+		if (FoundSkeletonComponent)
+		{
+			SetSkeleton(FoundSkeletonComponent);
 		}
+	}
+	
+	//Make sure we update the renderer
+	UpdateRenderer();
+}
+
+void USpineSkeletonRendererComponent::UpdateRenderer()
+{
+	USpineSkeletonComponent* skeleton = GetSkeleton();
+	if (skeleton && !skeleton->IsBeingDestroyed() && skeleton->GetSkeleton() && skeleton->Atlas) {
+		skeleton->GetSkeleton()->getColor().set(Color.R, Color.G, Color.B, Color.A);
+
+		if (atlasNormalBlendMaterials.Num() != skeleton->Atlas->atlasPages.Num()) {
+			atlasNormalBlendMaterials.SetNum(0);
+			pageToNormalBlendMaterial.Empty();
+			atlasAdditiveBlendMaterials.SetNum(0);
+			pageToAdditiveBlendMaterial.Empty();
+			atlasMultiplyBlendMaterials.SetNum(0);
+			pageToMultiplyBlendMaterial.Empty();
+			atlasScreenBlendMaterials.SetNum(0);
+			pageToScreenBlendMaterial.Empty();
+
+			for (int i = 0; i < skeleton->Atlas->atlasPages.Num(); i++) {
+				AtlasPage* currPage = skeleton->Atlas->GetAtlas(false)->getPages()[i];
+
+				UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(NormalBlendMaterial, this);
+				material->SetTextureParameterValue(TextureParameterName, skeleton->Atlas->atlasPages[i]);
+				atlasNormalBlendMaterials.Add(material);
+				pageToNormalBlendMaterial.Add(currPage, material);
+
+				material = UMaterialInstanceDynamic::Create(AdditiveBlendMaterial, this);
+				material->SetTextureParameterValue(TextureParameterName, skeleton->Atlas->atlasPages[i]);
+				atlasAdditiveBlendMaterials.Add(material);
+				pageToAdditiveBlendMaterial.Add(currPage, material);
+
+				material = UMaterialInstanceDynamic::Create(MultiplyBlendMaterial, this);
+				material->SetTextureParameterValue(TextureParameterName, skeleton->Atlas->atlasPages[i]);
+				atlasMultiplyBlendMaterials.Add(material);
+				pageToMultiplyBlendMaterial.Add(currPage, material);
+
+				material = UMaterialInstanceDynamic::Create(ScreenBlendMaterial, this);
+				material->SetTextureParameterValue(TextureParameterName, skeleton->Atlas->atlasPages[i]);
+				atlasScreenBlendMaterials.Add(material);
+				pageToScreenBlendMaterial.Add(currPage, material);
+			}
+		}
+		else {
+			pageToNormalBlendMaterial.Empty();
+			pageToAdditiveBlendMaterial.Empty();
+			pageToMultiplyBlendMaterial.Empty();
+			pageToScreenBlendMaterial.Empty();
+
+			for (int i = 0; i < skeleton->Atlas->atlasPages.Num(); i++) {
+				AtlasPage* currPage = skeleton->Atlas->GetAtlas(false)->getPages()[i];
+
+				UTexture2D* texture = skeleton->Atlas->atlasPages[i];
+				UTexture* oldTexture = nullptr;
+
+				UMaterialInstanceDynamic* current = atlasNormalBlendMaterials[i];
+				if (!current || !current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
+					UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(NormalBlendMaterial, this);
+					material->SetTextureParameterValue(TextureParameterName, texture);
+					atlasNormalBlendMaterials[i] = material;
+				}
+				pageToNormalBlendMaterial.Add(currPage, atlasNormalBlendMaterials[i]);
+
+				current = atlasAdditiveBlendMaterials[i];
+				if (!current || !current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
+					UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(AdditiveBlendMaterial, this);
+					material->SetTextureParameterValue(TextureParameterName, texture);
+					atlasAdditiveBlendMaterials[i] = material;
+				}
+				pageToAdditiveBlendMaterial.Add(currPage, atlasAdditiveBlendMaterials[i]);
+
+				current = atlasMultiplyBlendMaterials[i];
+				if (!current || !current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
+					UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(MultiplyBlendMaterial, this);
+					material->SetTextureParameterValue(TextureParameterName, texture);
+					atlasMultiplyBlendMaterials[i] = material;
+				}
+				pageToMultiplyBlendMaterial.Add(currPage, atlasMultiplyBlendMaterials[i]);
+
+				current = atlasScreenBlendMaterials[i];
+				if (!current || !current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
+					UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(ScreenBlendMaterial, this);
+					material->SetTextureParameterValue(TextureParameterName, texture);
+					atlasScreenBlendMaterials[i] = material;
+				}
+				pageToScreenBlendMaterial.Add(currPage, atlasScreenBlendMaterials[i]);
+			}
+		}
+		UpdateMesh(skeleton->GetSkeleton());
+	}
+	else {
+		ClearAllMeshSections();
 	}
 }
 

@@ -194,6 +194,16 @@ public:
 	virtual void TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	virtual void FinishDestroy () override;
+
+	//Added functions for manual configuration
+
+	/* Manages if this skeleton should update automatically or is paused. */
+	UFUNCTION(BlueprintCallable, Category="Components|Spine|Animation")
+	void SetAutoPlay(bool bInAutoPlays);
+
+	/* Directly set the time of the current animation, will clamp to animation range. */
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
+	void SetPlaybackTime(float InPlaybackTime, bool bCallDelegates = true);
 	
 	// Blueprint functions
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|Animation")
@@ -255,4 +265,9 @@ protected:
 	// in transit within a blueprint
 	UPROPERTY()
 	TSet<UTrackEntry*> trackEntries;
+
+private:
+	/* If the animation should update automatically. */
+	UPROPERTY()
+	bool bAutoPlaying;
 };

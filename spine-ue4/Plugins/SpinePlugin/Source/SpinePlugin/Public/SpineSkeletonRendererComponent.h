@@ -86,10 +86,20 @@ public:
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	FLinearColor Color = FLinearColor(1, 1, 1, 1);
 
-    	/** Whether to generate collision geometry for the skeleton, or not. */
-    	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
-    	bool bCreateCollision;
+    /** Whether to generate collision geometry for the skeleton, or not. */
+    UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
+    bool bCreateCollision;
 
+	/* Updates this renderer with the lastest skeleton info. */
+	void UpdateRenderer();
+
+	/* Obtains the cached SkeletonComponent */
+	USpineSkeletonComponent* GetSkeleton() const;
+
+	/* Sets the cached SkeletonComponent */
+	void SetSkeleton(USpineSkeletonComponent* InSkeleton);
+
+	/* Called when the component is destroyed */
 	virtual void FinishDestroy() override;
 	
 protected:
@@ -99,4 +109,8 @@ protected:
 	
 	spine::Vector<float> worldVertices;
 	spine::SkeletonClipping clipper;
+
+private:
+	/* Cached skeleton to use to avoid Find functions on TICK */
+	TWeakObjectPtr<USpineSkeletonComponent> CachedSkeleton;
 };
