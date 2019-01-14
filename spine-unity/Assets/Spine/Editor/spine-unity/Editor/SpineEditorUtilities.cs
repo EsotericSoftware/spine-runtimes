@@ -512,9 +512,16 @@ namespace Spine.Unity.Editor {
 					return requiredPaths;
 				}
 
-				TextAsset spineJson = (TextAsset)AssetDatabase.LoadAssetAtPath(skeletonDataPath, typeof(TextAsset));
-
-				StringReader reader = new StringReader(spineJson.text);
+				TextReader reader = null;
+				TextAsset spineJson = AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonDataPath);
+				if (spineJson != null) {
+					reader = new StringReader(spineJson.text);
+				}
+				else {
+					// On a "Reimport All" the order of imports can be wrong, thus LoadAssetAtPath() above could return null.
+					// as a workaround, we provide a fallback reader.
+					reader = new StreamReader(skeletonDataPath);
+				}
 				var root = Json.Deserialize(reader) as Dictionary<string, object>;
 
 				if (!root.ContainsKey("skins"))
@@ -557,8 +564,16 @@ namespace Spine.Unity.Editor {
 
 			internal static void AddRequiredAtlasRegionsFromBinary (string skeletonDataPath, List<string> requiredPaths) {
 				SkeletonBinary binary = new SkeletonBinary(new AtlasRequirementLoader(requiredPaths));
-				TextAsset data = (TextAsset)AssetDatabase.LoadAssetAtPath(skeletonDataPath, typeof(TextAsset));
-				MemoryStream input = new MemoryStream(data.bytes);
+				Stream input = null;
+				TextAsset data = AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonDataPath);
+				if (data != null) {
+					// On a "Reimport All" the order of imports can be wrong, thus LoadAssetAtPath() above could return null.
+					// as a workaround, we provide a fallback reader.
+					input = File.Open(skeletonDataPath, FileMode.Open);
+				}
+				else {
+					input = new MemoryStream(data.bytes);
+				}
 				binary.ReadSkeletonData(input);
 				binary = null;
 			}
@@ -642,13 +657,13 @@ namespace Spine.Unity.Editor {
 							imagePaths.Add(str);
 							break;
 						case ".json":
-							var jsonAsset = (TextAsset)AssetDatabase.LoadAssetAtPath(str, typeof(TextAsset));
+							var jsonAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(str);
 							if (jsonAsset != null && IsSpineData(jsonAsset))
 								skeletonPaths.Add(str);
 							break;
 						case ".bytes":
 							if (str.ToLower().EndsWith(".skel.bytes", System.StringComparison.Ordinal)) {
-								if (IsSpineData((TextAsset)AssetDatabase.LoadAssetAtPath(str, typeof(TextAsset))))
+								if (IsSpineData(AssetDatabase.LoadAssetAtPath<TextAsset>(str)))
 									skeletonPaths.Add(str);
 							}
 							break;
@@ -658,7 +673,7 @@ namespace Spine.Unity.Editor {
 				// Import atlases first.
 				var atlases = new List<AtlasAssetBase>();
 				foreach (string ap in atlasPaths) {
-					TextAsset atlasText = (TextAsset)AssetDatabase.LoadAssetAtPath(ap, typeof(TextAsset));
+					TextAsset atlasText = AssetDatabase.LoadAssetAtPath<TextAsset>(ap);
 					AtlasAssetBase atlas = IngestSpineAtlas(atlasText);
 					atlases.Add(atlas);
 				}
@@ -674,13 +689,13 @@ namespace Spine.Unity.Editor {
 					string dir = Path.GetDirectoryName(skeletonPath);
 
 #if SPINE_TK2D
-					IngestSpineProject(AssetDatabase.LoadAssetAtPath(sp, typeof(TextAsset)) as TextAsset, null);
+					IngestSpineProject(AssetDatabase.LoadAssetAtPath<TextAsset>(sp), null);
 #else
 					var localAtlases = FindAtlasesAtPath(dir);
 					var requiredPaths = GetRequiredAtlasRegions(skeletonPath);
 					var atlasMatch = GetMatchingAtlas(requiredPaths, localAtlases);
 					if (atlasMatch != null || requiredPaths.Count == 0) {
-						IngestSpineProject(AssetDatabase.LoadAssetAtPath(skeletonPath, typeof(TextAsset)) as TextAsset, atlasMatch);
+						IngestSpineProject(AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonPath), atlasMatch);
 					} else {
 						SkeletonImportDialog(skeletonPath, localAtlases, requiredPaths, ref abortSkeletonImport);
 					}
@@ -694,7 +709,7 @@ namespace Spine.Unity.Editor {
 
 			static void ReloadSkeletonData (string skeletonJSONPath) {
 				string dir = Path.GetDirectoryName(skeletonJSONPath);
-				TextAsset textAsset = (TextAsset)AssetDatabase.LoadAssetAtPath(skeletonJSONPath, typeof(TextAsset));
+				TextAsset textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonJSONPath);
 				DirectoryInfo dirInfo = new DirectoryInfo(dir);
 				FileInfo[] files = dirInfo.GetFiles("*.asset");
 
@@ -960,7 +975,7 @@ namespace Spine.Unity.Editor {
 #region Spine Skeleton Data File Validation
 			public static bool CheckForValidSkeletonData (string skeletonJSONPath) {
 				string dir = Path.GetDirectoryName(skeletonJSONPath);
-				TextAsset textAsset = (TextAsset)AssetDatabase.LoadAssetAtPath(skeletonJSONPath, typeof(TextAsset));
+				TextAsset textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonJSONPath);
 				DirectoryInfo dirInfo = new DirectoryInfo(dir);
 				FileInfo[] files = dirInfo.GetFiles("*.asset");
 
@@ -1068,20 +1083,20 @@ namespace Spine.Unity.Editor {
 								var atlasMatch = AssetUtility.GetMatchingAtlas(requiredPaths, localAtlases);
 								if (atlasMatch != null) {
 									resolved = true;
-									AssetUtility.IngestSpineProject(AssetDatabase.LoadAssetAtPath(skeletonPath, typeof(TextAsset)) as TextAsset, atlasMatch);
+									AssetUtility.IngestSpineProject(AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonPath), atlasMatch);
 								}
 							}
 							break;
 						case 0: // Resolve AtlasAssets...
 							var atlasList = MultiAtlasDialog(requiredPaths, Path.GetDirectoryName(skeletonPath), Path.GetFileNameWithoutExtension(skeletonPath));
 							if (atlasList != null)
-								AssetUtility.IngestSpineProject(AssetDatabase.LoadAssetAtPath(skeletonPath, typeof(TextAsset)) as TextAsset, atlasList.ToArray());
+								AssetUtility.IngestSpineProject(AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonPath), atlasList.ToArray());
 
 							resolved = true;
 							break;
 						case 1: // Import without atlas
 							Debug.LogWarning("Imported with missing atlases. Skeleton will not render: " + Path.GetFileName(skeletonPath));
-							AssetUtility.IngestSpineProject(AssetDatabase.LoadAssetAtPath(skeletonPath, typeof(TextAsset)) as TextAsset, new AtlasAssetBase[] { });
+							AssetUtility.IngestSpineProject(AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonPath), new AtlasAssetBase[] { });
 							resolved = true;
 							break;
 						case 2: // Stop importing all
