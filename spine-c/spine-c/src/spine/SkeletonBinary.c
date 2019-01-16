@@ -649,6 +649,8 @@ static void _readVertices(spSkeletonBinary* self, _dataInput* input, spVertexAtt
 		attachment->vertices = _readFloatArray(input, verticesLength, self->scale);
 		attachment->bonesCount = 0;
 		attachment->bones = 0;
+		spFloatArray_dispose(weights);
+		spFloatArray_dispose(bones);
 		return;
 	}
 
