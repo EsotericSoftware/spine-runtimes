@@ -34,8 +34,8 @@
 
 using namespace spine;
 
-void UTrackEntry::SetTrackEntry(TrackEntry* entry) {
-	this->entry = entry;
+void UTrackEntry::SetTrackEntry(TrackEntry* trackEntry) {
+	this->entry = trackEntry;
 	if (entry) entry->setRendererObject((void*)this);
 }
 

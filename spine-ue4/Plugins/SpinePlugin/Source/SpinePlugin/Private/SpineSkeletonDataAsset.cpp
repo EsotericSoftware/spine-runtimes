@@ -136,8 +136,8 @@ SkeletonData* USpineSkeletonDataAsset::GetSkeletonData (Atlas* Atlas, bool Force
 
 AnimationStateData* USpineSkeletonDataAsset::GetAnimationStateData(Atlas* atlas) {
 	if (!animationStateData) {
-		SkeletonData* skeletonData = GetSkeletonData(atlas, false);
-		animationStateData = new (__FILE__, __LINE__) AnimationStateData(skeletonData);
+		SkeletonData* data = GetSkeletonData(atlas, false);
+		animationStateData = new (__FILE__, __LINE__) AnimationStateData(data);
 	}
 	for (auto& data : MixData) {
 		if (!data.From.IsEmpty() && !data.To.IsEmpty()) {
