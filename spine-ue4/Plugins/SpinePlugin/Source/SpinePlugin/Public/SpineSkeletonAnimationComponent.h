@@ -81,7 +81,7 @@ public:
 	
 	UTrackEntry () { }		
 
-	void SetTrackEntry (spine::TrackEntry* entry);
+	void SetTrackEntry (spine::TrackEntry* trackEntry);
 	spine::TrackEntry* GetTrackEntry() { return entry; }
 	
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")

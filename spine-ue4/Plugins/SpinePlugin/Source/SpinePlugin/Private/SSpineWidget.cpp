@@ -210,7 +210,7 @@ void SSpineWidget::Flush(int32 LayerId, FSlateWindowElementList& OutDrawElements
 		setVertex(&vertexData[i], Vertices[i].X, Vertices[i].Y, Uvs[i].X, Uvs[i].Y, Colors[i], offset);
 	}
 
-	FSlateBrush brush;
+	/*FSlateBrush brush;
 	brush.SetResourceObject(Material);
 	brush = widget->Brush;
 
@@ -218,7 +218,7 @@ void SSpineWidget::Flush(int32 LayerId, FSlateWindowElementList& OutDrawElements
 	if (shaderResource) {
 		FSlateResourceHandle resourceHandle = FSlateApplication::Get().GetRenderer()->GetResourceHandle(brush);
 		FSlateDrawElement::MakeCustomVerts(OutDrawElements, LayerId, resourceHandle, renderData.VertexData, renderData.IndexData, nullptr, 0, 0);
-	}
+	}*/
 
 	Vertices.SetNum(0);
 	Indices.SetNum(0);

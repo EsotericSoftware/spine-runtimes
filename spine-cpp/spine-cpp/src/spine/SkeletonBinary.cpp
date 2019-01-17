@@ -144,9 +144,9 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	}
 
 	/* Bones. */
-	int bonesCount = readVarint(input, true);
-	skeletonData->_bones.setSize(bonesCount, 0);
-	for (int i = 0; i < bonesCount; ++i) {
+	int numBones = readVarint(input, true);
+	skeletonData->_bones.setSize(numBones, 0);
+	for (int i = 0; i < numBones; ++i) {
 		const char *name = readString(input);
 		BoneData *parent = i == 0 ? 0 : skeletonData->_bones[readVarint(input, true)];
 		BoneData *data = new(__FILE__, __LINE__) BoneData(i, String(name, true), parent);
@@ -916,8 +916,8 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 					if (end == 0) {
 						if (weighted) {
 							deform.setSize(deformLength, 0);
-							for (size_t i = 0; i < deformLength; ++i) {
-								deform[i] = 0;
+							for (size_t iiii = 0; iiii < deformLength; ++iiii) {
+								deform[iiii] = 0;
 							}
 						} else {
 							deform.clearAndAddAll(vertices);

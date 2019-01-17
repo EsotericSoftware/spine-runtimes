@@ -233,11 +233,11 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 		if (vertexEffect != 0) {
 			tempUvs.clear();
 			tempColors.clear();
-			for (int i = 0; i < verticesCount; i++) {
+			for (int ii = 0; ii < verticesCount; ii++) {
 				Color vertexColor = light;
 				Color dark;
 				dark.r = dark.g = dark.b = dark.a = 0;
-				int index = i << 1;
+				int index = ii << 1;
 				float x = (*vertices)[index];
 				float y = (*vertices)[index + 1];
 				float u = (*uvs)[index];
@@ -250,8 +250,8 @@ void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {
 				tempColors.add(vertexColor);
 			}
 
-			for (int i = 0; i < indicesCount; ++i) {
-				int index = (*indices)[i] << 1;
+			for (int ii = 0; ii < indicesCount; ++ii) {
+				int index = (*indices)[ii] << 1;
 				vertex.position.x = (*vertices)[index];
 				vertex.position.y = (*vertices)[index + 1];
 				vertex.texCoords.x = (*uvs)[index] * size.x;
