@@ -566,10 +566,10 @@ namespace Spine.Unity.Editor {
 				SkeletonBinary binary = new SkeletonBinary(new AtlasRequirementLoader(requiredPaths));
 				Stream input = null;
 				TextAsset data = AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonDataPath);
-				if (data != null) {
+				if (data == null) {
 					// On a "Reimport All" the order of imports can be wrong, thus LoadAssetAtPath() above could return null.
 					// as a workaround, we provide a fallback reader.
-					input = File.Open(skeletonDataPath, FileMode.Open);
+					input = File.Open(skeletonDataPath, FileMode.Open, FileAccess.Read);
 				}
 				else {
 					input = new MemoryStream(data.bytes);
