@@ -54,14 +54,14 @@ class SPINEPLUGIN_API USpineSkeletonDataAsset: public UObject {
 	GENERATED_BODY()
 	
 public:
-	spine::SkeletonData* GetSkeletonData(spine::Atlas* Atlas, bool ForceReload = false);
+	spine::SkeletonData* GetSkeletonData(spine::Atlas* Atlas);
 
 	spine::AnimationStateData* GetAnimationStateData(spine::Atlas* atlas);
 	void SetMix(const FString& from, const FString& to, float mix);
 	float GetMix(const FString& from, const FString& to);
 	
 	FName GetSkeletonDataFileName () const;
-	TArray<uint8>& GetRawData ();
+	void SetRawData (TArray<uint8> &Data);
 	
 	virtual void BeginDestroy () override;
 

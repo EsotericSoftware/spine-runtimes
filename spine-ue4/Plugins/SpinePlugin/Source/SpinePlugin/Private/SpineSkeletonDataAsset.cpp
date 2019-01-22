@@ -50,10 +50,6 @@ FName USpineSkeletonDataAsset::GetSkeletonDataFileName () const {
 #endif
 }
 
-TArray<uint8>& USpineSkeletonDataAsset::GetRawData () {
-	return this->rawData;
-}
-
 #if WITH_EDITORONLY_DATA
 
 void USpineSkeletonDataAsset::SetSkeletonDataFileName (const FName &SkeletonDataFileName) {
@@ -96,8 +92,17 @@ void USpineSkeletonDataAsset::BeginDestroy () {
 	Super::BeginDestroy();
 }
 
-SkeletonData* USpineSkeletonDataAsset::GetSkeletonData (Atlas* Atlas, bool ForceReload) {
-	if (!skeletonData || lastAtlas != Atlas || ForceReload) {
+void USpineSkeletonDataAsset::SetRawData(TArray<uint8> &Data) {
+	this->rawData.Empty();
+	this->rawData.Append(Data);
+	if (skeletonData) {
+		delete skeletonData;
+		skeletonData = nullptr;
+	}
+}
+
+SkeletonData* USpineSkeletonDataAsset::GetSkeletonData (Atlas* Atlas) {
+	if (!skeletonData || lastAtlas != Atlas) {
 		if (skeletonData) {
 			delete skeletonData;
 			skeletonData = nullptr;
@@ -136,7 +141,7 @@ SkeletonData* USpineSkeletonDataAsset::GetSkeletonData (Atlas* Atlas, bool Force
 
 AnimationStateData* USpineSkeletonDataAsset::GetAnimationStateData(Atlas* atlas) {
 	if (!animationStateData) {
-		SkeletonData* data = GetSkeletonData(atlas, false);
+		SkeletonData* data = GetSkeletonData(atlas);
 		animationStateData = new (__FILE__, __LINE__) AnimationStateData(data);
 	}
 	for (auto& data : MixData) {

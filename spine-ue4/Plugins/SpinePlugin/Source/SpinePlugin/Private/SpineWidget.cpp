@@ -96,7 +96,7 @@ void USpineWidget::CheckState() {
 		DisposeState();
 
 		if (Atlas && SkeletonData) {
-			spine::SkeletonData* data = SkeletonData->GetSkeletonData(Atlas->GetAtlas(false), false);
+			spine::SkeletonData* data = SkeletonData->GetSkeletonData(Atlas->GetAtlas());
 			skeleton = new (__FILE__, __LINE__) spine::Skeleton(data);
 		}
 

@@ -206,7 +206,7 @@ void USpineSkeletonComponent::CheckState () {
 		// Are we doing a re-import? Then check if the underlying spine-cpp data
 		// has changed.
 		if (lastAtlas && lastAtlas == Atlas && lastData && lastData == SkeletonData) {
-			spine::Atlas* atlas = Atlas->GetAtlas(false);
+			spine::Atlas* atlas = Atlas->GetAtlas();
 			if (lastSpineAtlas != atlas) {
 				needsUpdate = true;
 			}
@@ -220,12 +220,12 @@ void USpineSkeletonComponent::CheckState () {
 		DisposeState();
 		
 		if (Atlas && SkeletonData) {
-			spine::SkeletonData* data = SkeletonData->GetSkeletonData(Atlas->GetAtlas(false), false);
+			spine::SkeletonData* data = SkeletonData->GetSkeletonData(Atlas->GetAtlas());
 			skeleton = new (__FILE__, __LINE__) Skeleton(data);
 		}
 		
 		lastAtlas = Atlas;
-		lastSpineAtlas = Atlas ? Atlas->GetAtlas(false) : nullptr;
+		lastSpineAtlas = Atlas ? Atlas->GetAtlas() : nullptr;
 		lastData = SkeletonData;
 	}
 }
