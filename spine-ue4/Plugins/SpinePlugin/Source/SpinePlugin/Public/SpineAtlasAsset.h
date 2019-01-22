@@ -39,12 +39,12 @@ class SPINEPLUGIN_API USpineAtlasAsset: public UObject {
 	GENERATED_BODY()
 	
 public:
-	spine::Atlas* GetAtlas (bool ForceReload = false);
+	spine::Atlas* GetAtlas ();
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<UTexture2D*> atlasPages;
 	
-	FString GetRawData () const;
+	void SetRawData(const FString &RawData);
 	
 	FName GetAtlasFileName () const;
 	
@@ -62,7 +62,6 @@ protected:
 #if WITH_EDITORONLY_DATA
 
 public:
-	void SetRawData (const FString &RawData);
 	void SetAtlasFileName (const FName &AtlasFileName);
 	
 protected:

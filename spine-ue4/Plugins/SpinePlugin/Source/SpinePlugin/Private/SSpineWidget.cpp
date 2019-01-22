@@ -86,7 +86,7 @@ int32 SSpineWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 			widget->pageToScreenBlendMaterial.Empty();
 
 			for (int i = 0; i < widget->Atlas->atlasPages.Num(); i++) {
-				AtlasPage* currPage = widget->Atlas->GetAtlas(false)->getPages()[i];
+				AtlasPage* currPage = widget->Atlas->GetAtlas()->getPages()[i];
 
 				UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(widget->NormalBlendMaterial, widget);
 				material->SetTextureParameterValue(widget->TextureParameterName, widget->Atlas->atlasPages[i]);
@@ -115,7 +115,7 @@ int32 SSpineWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 			widget->pageToScreenBlendMaterial.Empty();
 
 			for (int i = 0; i < widget->Atlas->atlasPages.Num(); i++) {
-				AtlasPage* currPage = widget->Atlas->GetAtlas(false)->getPages()[i];
+				AtlasPage* currPage = widget->Atlas->GetAtlas()->getPages()[i];
 
 				UTexture2D* texture = widget->Atlas->atlasPages[i];
 				UTexture* oldTexture = nullptr;

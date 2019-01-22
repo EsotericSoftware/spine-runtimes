@@ -38,26 +38,7 @@
 
 using namespace spine;
 
-FString USpineAtlasAsset::GetRawData () const {
-	return rawData;
-}
-
-FName USpineAtlasAsset::GetAtlasFileName () const {
 #if WITH_EDITORONLY_DATA
-	TArray<FString> files;
-	if (importData) importData->ExtractFilenames(files);
-	if (files.Num() > 0) return FName(*files[0]);
-	else return atlasFileName;
-#else
-	return atlasFileName;
-#endif
-}
-
-#if WITH_EDITORONLY_DATA
-
-void USpineAtlasAsset::SetRawData (const FString &RawData) {
-	this->rawData = RawData;
-}
 
 void USpineAtlasAsset::SetAtlasFileName (const FName &AtlasFileName) {
 	importData->UpdateFilenameOnly(AtlasFileName.ToString());
@@ -87,6 +68,25 @@ void USpineAtlasAsset::Serialize (FArchive& Ar) {
 
 #endif
 
+FName USpineAtlasAsset::GetAtlasFileName() const {
+#if WITH_EDITORONLY_DATA
+	TArray<FString> files;
+	if (importData) importData->ExtractFilenames(files);
+	if (files.Num() > 0) return FName(*files[0]);
+	else return atlasFileName;
+#else
+	return atlasFileName;
+#endif
+}
+
+void USpineAtlasAsset::SetRawData(const FString &RawData) {
+	this->rawData = RawData;
+	if (atlas) {
+		delete atlas;
+		atlas = nullptr;
+	}
+}
+
 void USpineAtlasAsset::BeginDestroy () {
 	if (atlas) {
 		delete atlas;
@@ -95,8 +95,8 @@ void USpineAtlasAsset::BeginDestroy () {
 	Super::BeginDestroy();
 }
 
-Atlas* USpineAtlasAsset::GetAtlas (bool ForceReload) {
-	if (!atlas || ForceReload) {
+Atlas* USpineAtlasAsset::GetAtlas () {
+	if (!atlas) {
 		if (atlas) {
 			delete atlas;
 			atlas = nullptr;
@@ -111,7 +111,7 @@ Atlas* USpineAtlasAsset::GetAtlas (bool ForceReload) {
 				page->setRendererObject(atlasPages[j++]);
 		}
 	}
-	return this->atlas;	
+	return this->atlas;
 }
 
 #undef LOCTEXT_NAMESPACE

@@ -130,7 +130,7 @@ UTexture2D* resolveTexture (USpineAtlasAsset* Asset, const FString& PageFileName
 }
 
 void USpineAtlasAssetFactory::LoadAtlas (USpineAtlasAsset* Asset, const FString& CurrentSourcePath, const FString& LongPackagePath) {
-	Atlas* atlas = Asset->GetAtlas(true);
+	Atlas* atlas = Asset->GetAtlas();
 	Asset->atlasPages.Empty();
 	
 	const FString targetTexturePath = LongPackagePath / TEXT("Textures");

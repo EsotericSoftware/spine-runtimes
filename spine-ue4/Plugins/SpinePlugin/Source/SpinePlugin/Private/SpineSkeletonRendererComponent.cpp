@@ -90,7 +90,7 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 				pageToScreenBlendMaterial.Empty();
 								
 				for (int i = 0; i < skeleton->Atlas->atlasPages.Num(); i++) {
-					AtlasPage* currPage = skeleton->Atlas->GetAtlas(false)->getPages()[i];
+					AtlasPage* currPage = skeleton->Atlas->GetAtlas()->getPages()[i];
 					
 					UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(NormalBlendMaterial, owner);
 					material->SetTextureParameterValue(TextureParameterName, skeleton->Atlas->atlasPages[i]);
@@ -119,7 +119,7 @@ void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick
 				pageToScreenBlendMaterial.Empty();
 								
 				for (int i = 0; i < skeleton->Atlas->atlasPages.Num(); i++) {
-					AtlasPage* currPage = skeleton->Atlas->GetAtlas(false)->getPages()[i];
+					AtlasPage* currPage = skeleton->Atlas->GetAtlas()->getPages()[i];
 
 					UTexture2D* texture = skeleton->Atlas->atlasPages[i];
 					UTexture* oldTexture = nullptr;

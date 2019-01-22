@@ -77,9 +77,11 @@ UObject* USpineSkeletonAssetFactory::FactoryCreateFile (UClass * InClass, UObjec
 	name.Append("-data");
 	
 	USpineSkeletonDataAsset* asset = NewObject<USpineSkeletonDataAsset>(InParent, InClass, FName(*name), Flags);
-	if (!FFileHelper::LoadFileToArray(asset->GetRawData(), *Filename, 0)) {
+	TArray<uint8> rawData;
+	if (!FFileHelper::LoadFileToArray(rawData, *Filename, 0)) {
 		return nullptr;
 	}
+	asset->SetRawData(rawData);
 	
 	asset->SetSkeletonDataFileName(FName(*Filename));
 	const FString longPackagePath = FPackageName::GetLongPackagePath(asset->GetOutermost()->GetPathName());
@@ -107,7 +109,9 @@ void USpineSkeletonAssetFactory::SetReimportPaths (UObject* Obj, const TArray<FS
 
 EReimportResult::Type USpineSkeletonAssetFactory::Reimport (UObject* Obj) {
 	USpineSkeletonDataAsset* asset = Cast<USpineSkeletonDataAsset>(Obj);
-	if (!FFileHelper::LoadFileToArray(asset->GetRawData(), *asset->GetSkeletonDataFileName().ToString(), 0)) return EReimportResult::Failed;
+	TArray<uint8> rawData;
+	if (!FFileHelper::LoadFileToArray(rawData, *asset->GetSkeletonDataFileName().ToString(), 0)) return EReimportResult::Failed;
+	asset->SetRawData(rawData);
 	
 	const FString longPackagePath = FPackageName::GetLongPackagePath(asset->GetOutermost()->GetPathName());
 	LoadAtlas(*asset->GetSkeletonDataFileName().ToString(), longPackagePath);
