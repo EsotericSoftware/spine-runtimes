@@ -514,17 +514,24 @@ namespace Spine.Unity.Editor {
 
 				TextReader reader = null;
 				TextAsset spineJson = AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonDataPath);
-				if (spineJson != null) {
-					reader = new StringReader(spineJson.text);
+				Dictionary<string, object> root = null;
+				try {
+					if (spineJson != null) {
+						reader = new StringReader(spineJson.text);
+					}
+					else {
+						// On a "Reimport All" the order of imports can be wrong, thus LoadAssetAtPath() above could return null.
+						// as a workaround, we provide a fallback reader.
+						reader = new StreamReader(skeletonDataPath);
+					}
+					root = Json.Deserialize(reader) as Dictionary<string, object>;
 				}
-				else {
-					// On a "Reimport All" the order of imports can be wrong, thus LoadAssetAtPath() above could return null.
-					// as a workaround, we provide a fallback reader.
-					reader = new StreamReader(skeletonDataPath);
+				finally {
+					if (reader != null)
+						reader.Dispose();
 				}
-				var root = Json.Deserialize(reader) as Dictionary<string, object>;
 
-				if (!root.ContainsKey("skins"))
+				if (root == null || !root.ContainsKey("skins"))
 					return requiredPaths;
 
 				foreach (var skin in (Dictionary<string, object>)root["skins"]) {
@@ -566,15 +573,21 @@ namespace Spine.Unity.Editor {
 				SkeletonBinary binary = new SkeletonBinary(new AtlasRequirementLoader(requiredPaths));
 				Stream input = null;
 				TextAsset data = AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonDataPath);
-				if (data == null) {
-					// On a "Reimport All" the order of imports can be wrong, thus LoadAssetAtPath() above could return null.
-					// as a workaround, we provide a fallback reader.
-					input = File.Open(skeletonDataPath, FileMode.Open, FileAccess.Read);
+				try {
+					if (data != null) {
+						input = new MemoryStream(data.bytes);
+					}
+					else {
+						// On a "Reimport All" the order of imports can be wrong, thus LoadAssetAtPath() above could return null.
+						// as a workaround, we provide a fallback reader.
+						input = File.Open(skeletonDataPath, FileMode.Open, FileAccess.Read);
+					}
+					binary.ReadSkeletonData(input);
 				}
-				else {
-					input = new MemoryStream(data.bytes);
+				finally {
+					if (input != null)
+						input.Dispose();
 				}
-				binary.ReadSkeletonData(input);
 				binary = null;
 			}
 
@@ -1000,7 +1013,9 @@ namespace Spine.Unity.Editor {
 				int[][] compatibleVersions;
 				if (asset.name.Contains(".skel")) {
 					try {
-						rawVersion = SkeletonBinary.GetVersionString(new MemoryStream(asset.bytes));
+						using (var memStream = new MemoryStream(asset.bytes)) {
+							rawVersion = SkeletonBinary.GetVersionString(memStream);
+						}
 						isSpineData = !(string.IsNullOrEmpty(rawVersion));
 						compatibleVersions = compatibleBinaryVersions;
 					} catch (System.Exception e) {
