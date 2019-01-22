@@ -90,7 +90,7 @@ namespace Spine.Unity {
 			bone = null;
 			point = null;
 			if (!string.IsNullOrEmpty(pointAttachmentName)) {
-				var skeleton = skeletonRenderer.skeleton;
+				var skeleton = skeletonRenderer.Skeleton;
 
 				int slotIndex = skeleton.FindSlotIndex(slotName);
 				if (slotIndex >= 0) {
