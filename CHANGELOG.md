@@ -1,70 +1,3 @@
-# 3.8
-
-## AS3
-* **Breaking changes**
-
-* **Additions**
-
-### Starling
-
-## C
-* **Breaking changes**
-
-* **Additions**
-
-### Cocos2d-Objc
-
-### SFML
-
-## C++
-* ** Additions **
-
-* **Breaking changes**
-
-### Cocos2d-x
-### SFML
-
-### UE4
-
-## C# ##
-* **Breaking changes**
-
-* **Additions**
-
-### Unity
-
-### XNA/MonoGame
-
-## Java
-* **Breaking changes**
-
-* **Additions**
-
-### libGDX
-
-## Lua
-* **Breaking changes**
-*
-* **Additions**
-
-### Love2D
-
-### Corona
-
-## Typescript/Javascript
-* **Breaking changes**
-
-* **Additions**
-
-### WebGL backend
-
-### Canvas backend
-
-### Three.js backend
-
-### Player
-
-
 # 3.7
 
 ## AS3
@@ -138,6 +71,7 @@
 * Added improved tint-black shader.
 * Updated to cocos2d-x 3.16
 * The skeleton setup pose and world transform are now calculated on initialization to avoid flickering on start-up.
+* Updated to cocos2d-x 3.17.1
 * **Breaking change**: Switched from [spine-c](spine-c) to [spine-cpp](spine-cpp) as the underlying Spine runtime. See the [spine-cpp Runtime Guide](https://esotericsoftware.com/spine-cpp) for more information on spine-cpp.
   * Added `Cocos2dAttachmentLoader` to be used when constructing an `Atlas`. Used by default by `SkeletonAnimation` and `SkeletonRenderer` when creating instances via the `createXXX` methods.
   * All C structs and enums `spXXX` have been replaced with their C++ equivalents `spine::XXX` in all public interfaces.
