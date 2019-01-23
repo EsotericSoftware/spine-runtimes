@@ -78,6 +78,7 @@ USpineSkeletonAnimationComponent::USpineSkeletonAnimationComponent () {
 	PrimaryComponentTick.bCanEverTick = true;
 	bTickInEditor = true;
 	bAutoActivate = true;
+	bAutoPlaying = true;
 }
 
 void USpineSkeletonAnimationComponent::BeginPlay() {
@@ -94,7 +95,7 @@ void USpineSkeletonAnimationComponent::TickComponent(float DeltaTime, ELevelTick
 void USpineSkeletonAnimationComponent::InternalTick(float DeltaTime, bool CallDelegates) {
 	CheckState();
 
-	if (state) {
+	if (state && bAutoPlaying) {
 		state->update(DeltaTime);
 		state->apply(*skeleton);
 		if (CallDelegates) BeforeUpdateWorldTransform.Broadcast(this);
@@ -158,6 +159,36 @@ void USpineSkeletonAnimationComponent::DisposeState () {
 void USpineSkeletonAnimationComponent::FinishDestroy () {
 	DisposeState();
 	Super::FinishDestroy();
+}
+
+void USpineSkeletonAnimationComponent::SetAutoPlay(bool bInAutoPlays)
+{
+	bAutoPlaying = bInAutoPlays;
+}
+
+void USpineSkeletonAnimationComponent::SetPlaybackTime(float InPlaybackTime, bool bCallDelegates)
+{
+	CheckState();
+
+	if (state && state->getCurrent(0)) {
+		spine::Animation* CurrentAnimation = state->getCurrent(0)->getAnimation();
+		const float CurrentTime = state->getCurrent(0)->getTrackTime();
+		InPlaybackTime = FMath::Clamp(InPlaybackTime, 0.0f, CurrentAnimation->getDuration());
+		const float DeltaTime = InPlaybackTime - CurrentTime;
+		state->update(DeltaTime);
+		state->apply(*skeleton);
+
+		//Call delegates and perform the world transform
+		if (bCallDelegates)
+		{
+			BeforeUpdateWorldTransform.Broadcast(this);
+		}
+		skeleton->updateWorldTransform();
+		if (bCallDelegates)
+		{
+			AfterUpdateWorldTransform.Broadcast(this);
+		}
+	}
 }
 
 void USpineSkeletonAnimationComponent::SetTimeScale(float timeScale) {
