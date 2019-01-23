@@ -1,3 +1,70 @@
+# 3.8
+
+## AS3
+* **Breaking changes**
+
+* **Additions**
+
+### Starling
+
+## C
+* **Breaking changes**
+
+* **Additions**
+
+### Cocos2d-Objc
+
+### SFML
+
+## C++
+* ** Additions **
+
+* **Breaking changes**
+
+### Cocos2d-x
+### SFML
+
+### UE4
+
+## C# ##
+* **Breaking changes**
+
+* **Additions**
+
+### Unity
+
+### XNA/MonoGame
+
+## Java
+* **Breaking changes**
+
+* **Additions**
+
+### libGDX
+
+## Lua
+* **Breaking changes**
+*
+* **Additions**
+
+### Love2D
+
+### Corona
+
+## Typescript/Javascript
+* **Breaking changes**
+
+* **Additions**
+
+### WebGL backend
+
+### Canvas backend
+
+### Three.js backend
+
+### Player
+
+
 # 3.7
 
 ## AS3
