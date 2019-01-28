@@ -72,7 +72,6 @@ namespace Spine.Unity {
 				} else if (skeletonDataAsset.GetSkeletonData(true) != skeleton.data) {
 					Clear();
 					Initialize(true);
-					startingAnimation = "";
 					if (skeletonDataAsset.atlasAssets.Length > 1 || skeletonDataAsset.atlasAssets[0].MaterialCount > 1)
 						Debug.LogError("Unity UI does not support multiple textures per Renderer. Your skeleton will not be rendered correctly. Recommend using SkeletonAnimation instead. This requires the use of a Screen space camera canvas.");
 				} else {
@@ -274,6 +273,9 @@ namespace Spine.Unity {
 					#if UNITY_EDITOR
 					}
 					#endif
+				}
+				else {
+					startingAnimation = string.Empty;
 				}
 			}
 		}
