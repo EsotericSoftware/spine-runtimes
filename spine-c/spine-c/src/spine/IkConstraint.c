@@ -83,7 +83,7 @@ void spIkConstraint_apply1 (spBone* bone, float targetX, float targetY, int /*bo
 	sy = bone->ascaleY;
 	if (compress || stretch) {
 		float b = bone->data->length * sx, dd = SQRT(tx * tx + ty * ty);
-		if ((compress && dd < b) || (stretch && dd > b) && (b > 0.0001f)) {
+		if ((compress && dd < b) || ((stretch && dd > b) && (b > 0.0001f))) {
 			s = (dd / b - 1) * alpha + 1;
 			sx *= s;
 			if (uniform) sy *= s;

@@ -308,9 +308,8 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 					break;
 				}
 				default: {
-					int i;
-					for (i = 0; i < timelines->size; ++i)
-						spTimeline_dispose(timelines->items[i]);
+					for (iii = 0; iii < timelines->size; ++iii)
+						spTimeline_dispose(timelines->items[iii]);
 					spTimelineArray_dispose(timelines);
 					_spSkeletonBinary_setError(self, "Invalid timeline type for a slot: ", skeletonData->slots[slotIndex]->name);
 					return 0;
@@ -371,9 +370,8 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 					break;
 				}
 				default: {
-					int i;
-					for (i = 0; i < timelines->size; ++i)
-						spTimeline_dispose(timelines->items[i]);
+					for (iii = 0; iii < timelines->size; ++iii)
+						spTimeline_dispose(timelines->items[iii]);
 					spTimelineArray_dispose(timelines);
 					_spSkeletonBinary_setError(self, "Invalid timeline type for a bone: ", skeletonData->bones[boneIndex]->name);
 					return 0;
@@ -650,7 +648,7 @@ static void _readVertices(spSkeletonBinary* self, _dataInput* input, spVertexAtt
 		attachment->bonesCount = 0;
 		attachment->bones = 0;
 		spFloatArray_dispose(weights);
-		spFloatArray_dispose(bones);
+		spIntArray_dispose(bones);
 		return;
 	}
 
