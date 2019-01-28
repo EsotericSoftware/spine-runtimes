@@ -1801,8 +1801,10 @@ namespace Spine.Unity.Editor {
 					if (path.EndsWith(".png.meta", System.StringComparison.Ordinal) ||
 						path.EndsWith(".jpg.meta", System.StringComparison.Ordinal)) {
 
-						string texturePath = System.IO.Path.ChangeExtension(path, null);
-						SpineEditorUtilities.IssueWarningsForUnrecommendedTextureSettings(texturePath);
+						string texturePath = System.IO.Path.ChangeExtension(path, null); // .meta removed
+						string atlasPath = System.IO.Path.ChangeExtension(texturePath, "atlas.txt");
+						if (System.IO.File.Exists(atlasPath))
+							SpineEditorUtilities.IssueWarningsForUnrecommendedTextureSettings(texturePath);
 					}
 				}
 			}
