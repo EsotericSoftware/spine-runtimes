@@ -122,8 +122,8 @@ void spPathConstraint_apply (spPathConstraint* self) {
 				spaces[++i] = 0;
 			} else if (percentSpacing) {
 				if (scale) {
-					float x = setupLength * bone->a, y = setupLength * bone->c;
-					float length = SQRT(x * x + y * y);
+					x = setupLength * bone->a, y = setupLength * bone->c;
+					length = SQRT(x * x + y * y);
 					lengths[i] = length;
 				}
 				spaces[++i] = spacing;
