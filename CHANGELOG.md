@@ -198,6 +198,10 @@
 	* Dedicated straight alpha shaders were removed from the runtime.
 		* `Spine/Straight Alpha/Skeleton Fill`
 		* `Spine/Straight Alpha/Skeleton Tint`
+* **Detection of incorrect Texture Settings** Especially when atlas textures are exported with setting `Premultiply alpha` enabled, it is important to configure Unity's texture import settings correctly. By default you will now receive warnings where texture settings are expected to cause incorrect rendering. The following rules apply:
+    * `sRGB (Color Texture)` must be disabled when `Generate Mip Maps` is enabled, otherwise you will receive white border outlines.
+    * `Alpha Is Transparency` must be disabled on `Premultiply alpha` textures, otherwise you will receive light ghosting artifacts in transparent areas.
+    These warnings can be disabled in `Edit - Preferences - Spine`.
 
 ### XNA/MonoGame
 * Added support for any `Effect` to be used by `SkeletonRenderer`
