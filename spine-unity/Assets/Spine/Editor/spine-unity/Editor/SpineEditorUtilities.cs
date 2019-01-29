@@ -228,6 +228,10 @@ namespace Spine.Unity.Editor {
 			DataReloadHandler.OnPlaymodeStateChanged();
 			#endif
 
+			if (SpineEditorUtilities.Preferences.textureImporterWarning) {
+				IssueWarningsForUnrecommendedTextureSettings();
+			}
+
 			initialized = true;
 		}
 
@@ -235,7 +239,40 @@ namespace Spine.Unity.Editor {
 			if (!initialized || Icons.skeleton == null)
 				Initialize();
 		}
-#endregion
+
+		public static void IssueWarningsForUnrecommendedTextureSettings() {
+
+			string[] atlasDescriptionGUIDs = AssetDatabase.FindAssets("t:textasset .atlas"); // Note: finds .atlas.txt files
+			for (int i = 0; i < atlasDescriptionGUIDs.Length; ++i) {
+				string atlasDescriptionPath = AssetDatabase.GUIDToAssetPath(atlasDescriptionGUIDs[i]);
+				string texturePath = atlasDescriptionPath.Replace(".atlas.txt", ".png");
+
+				bool textureExists = IssueWarningsForUnrecommendedTextureSettings(texturePath);
+				if (!textureExists) {
+					texturePath = texturePath.Replace(".png", ".jpg");
+					textureExists = IssueWarningsForUnrecommendedTextureSettings(texturePath);
+				}
+				if (!textureExists) {
+					continue;
+				}
+			}
+		}
+
+		public static bool IssueWarningsForUnrecommendedTextureSettings(string texturePath)
+		{
+			TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(texturePath);
+			if (texImporter == null) {
+				return false;
+			}
+			
+			// 'sRGBTexture = true' generates incorrectly weighted mipmaps at PMA textures,
+			// causing white borders due to undesired custom weighting.
+			if (texImporter.sRGBTexture && texImporter.mipmapEnabled) {
+				Debug.LogWarningFormat("`{0}` : Incorrect Texture Settings found: When enabling `Generate Mip Maps`, it is strongly recommended to disable `sRGB (Color Texture)`. Otherwise you will receive white border artifacts on an atlas exported with default `Premultiply alpha` settings.\n(You can disable this warning in `Edit - Preferences - Spine`)", texturePath);
+			}
+			return true;
+		}
+		#endregion
 
 		public static class Preferences {
 			#if SPINE_TK2D
@@ -272,7 +309,11 @@ namespace Spine.Unity.Editor {
 
 			const bool DEFAULT_ATLASTXT_WARNING = true;
 			const string ATLASTXT_WARNING_KEY = "SPINE_ATLASTXT_WARNING";
-			public static bool atlasTxtImportWarning = DEFAULT_SET_TEXTUREIMPORTER_SETTINGS;
+			public static bool atlasTxtImportWarning = DEFAULT_ATLASTXT_WARNING;
+
+			const bool DEFAULT_TEXTUREIMPORTER_WARNING = true;
+			const string TEXTUREIMPORTER_WARNING_KEY = "SPINE_TEXTUREIMPORTER_WARNING";
+			public static bool textureImporterWarning = DEFAULT_TEXTUREIMPORTER_WARNING;
 
 			internal const float DEFAULT_MIPMAPBIAS = -0.5f;
 
@@ -297,6 +338,7 @@ namespace Spine.Unity.Editor {
 				setTextureImporterSettings = EditorPrefs.GetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, DEFAULT_SET_TEXTUREIMPORTER_SETTINGS);
 				autoReloadSceneSkeletons = EditorPrefs.GetBool(AUTO_RELOAD_SCENESKELETONS_KEY, DEFAULT_AUTO_RELOAD_SCENESKELETONS);
 				atlasTxtImportWarning = EditorPrefs.GetBool(ATLASTXT_WARNING_KEY, DEFAULT_ATLASTXT_WARNING);
+				textureImporterWarning = EditorPrefs.GetBool(TEXTUREIMPORTER_WARNING_KEY, DEFAULT_TEXTUREIMPORTER_WARNING);
 
 				SpineHandles.handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, DEFAULT_SCENE_ICONS_SCALE);
 				preferencesLoaded = true;
@@ -332,7 +374,13 @@ namespace Spine.Unity.Editor {
 						EditorPrefs.SetString(DEFAULT_SHADER_KEY, defaultShader);
 
 					SpineEditorUtilities.BoolPrefsField(ref setTextureImporterSettings, SET_TEXTUREIMPORTER_SETTINGS_KEY, new GUIContent("Apply Atlas Texture Settings", "Apply the recommended settings for Texture Importers."));
+				}
+
+				EditorGUILayout.Space();
+				EditorGUILayout.LabelField("Warnings", EditorStyles.boldLabel);
+				{
 					SpineEditorUtilities.BoolPrefsField(ref atlasTxtImportWarning, ATLASTXT_WARNING_KEY, new GUIContent("Atlas Extension Warning", "Log a warning and recommendation whenever a `.atlas` file is found."));
+					SpineEditorUtilities.BoolPrefsField(ref textureImporterWarning, TEXTUREIMPORTER_WARNING_KEY, new GUIContent("Texture Settings Warning", "Log a warning and recommendation whenever Texture Import Settings are detected that could lead to undesired effects, e.g. white border artifacts."));
 				}
 
 				EditorGUILayout.Space();
@@ -841,6 +889,10 @@ namespace Spine.Unity.Editor {
 							continue;
 						}
 
+						// Note: 'sRGBTexture = false' below might seem counter-intuitive, but prevents mipmaps from being
+						// generated incorrectly (causing white borders due to undesired custom weighting) for PMA textures
+						// when mipmaps are enabled later.
+						texImporter.sRGBTexture = false;
 						texImporter.textureCompression = TextureImporterCompression.Uncompressed;
 						texImporter.alphaSource = TextureImporterAlphaSource.FromInput;
 						texImporter.mipmapEnabled = false;
@@ -1737,6 +1789,26 @@ namespace Spine.Unity.Editor {
 					Debug.LogWarning("Already Removed Scripting Define Symbol " + SPINE_TK2D_DEFINE);
 				}
 			}
+		}
+	}
+
+	public class TextureModificationWarningProcessor : UnityEditor.AssetModificationProcessor
+	{
+		static string[] OnWillSaveAssets(string[] paths)
+		{
+			if (SpineEditorUtilities.Preferences.textureImporterWarning) {
+				foreach (string path in paths) {
+					if (path.EndsWith(".png.meta", System.StringComparison.Ordinal) ||
+						path.EndsWith(".jpg.meta", System.StringComparison.Ordinal)) {
+
+						string texturePath = System.IO.Path.ChangeExtension(path, null); // .meta removed
+						string atlasPath = System.IO.Path.ChangeExtension(texturePath, "atlas.txt");
+						if (System.IO.File.Exists(atlasPath))
+							SpineEditorUtilities.IssueWarningsForUnrecommendedTextureSettings(texturePath);
+					}
+				}
+			}
+			return paths;
 		}
 	}
 
