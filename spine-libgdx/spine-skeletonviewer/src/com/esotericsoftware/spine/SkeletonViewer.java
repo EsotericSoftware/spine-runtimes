@@ -30,8 +30,14 @@
 
 package com.esotericsoftware.spine;
 
-import static com.badlogic.gdx.math.Interpolation.*;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
+import static com.badlogic.gdx.math.Interpolation.linear;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.delay;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveBy;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.removeActor;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 import java.awt.FileDialog;
 import java.awt.Frame;
@@ -93,6 +99,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 	static final float reloadDelay = 1;
 	static float uiScale = 1;
 	static String[] atlasSuffixes = {".atlas", ".atlas.txt", "-pro.atlas", "-pro.atlas.txt", "-ess.atlas", "-ess.atlas.txt"};
+	static String[] args;
 
 	UI ui;
 
@@ -127,8 +134,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 		resetCameraPosition();
 		ui.loadPrefs();
 
-		loadSkeleton(
-			Gdx.files.internal(Gdx.app.getPreferences("spine-skeletonviewer").getString("lastFile", "spineboy/spineboy.json")));
+		if (args.length == 0) {
+			loadSkeleton(
+				Gdx.files.internal(Gdx.app.getPreferences("spine-skeletonviewer").getString("lastFile", "spineboy/spineboy.json")));
+		} else {
+			loadSkeleton(Gdx.files.internal(args[0]));
+		}
 
 		ui.loadPrefs();
 		ui.prefsLoaded = true;
@@ -1041,6 +1052,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 	}
 
 	static public void main (String[] args) throws Exception {
+		SkeletonViewer.args = args;
+
 		String os = System.getProperty("os.name");
 		float dpiScale = 1;
 		if (os.contains("Windows")) dpiScale = Toolkit.getDefaultToolkit().getScreenResolution() / 96f;
