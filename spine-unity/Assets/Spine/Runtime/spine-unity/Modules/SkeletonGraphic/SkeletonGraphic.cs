@@ -64,7 +64,7 @@ namespace Spine.Unity {
 		protected override void OnValidate () {
 			// This handles Scene View preview.
 			base.OnValidate ();
-			if (this.IsValid) {
+			if (this.IsValid) { 
 				if (skeletonDataAsset == null) {
 					Clear();
 				} else if (skeletonDataAsset.skeletonJSON == null) {
@@ -100,12 +100,16 @@ namespace Spine.Unity {
 
 				}
 			} else {
-				if (skeletonDataAsset != null)
+				// Under some circumstances (e.g. sometimes on the first import) OnValidate is called
+				// before SpineEditorUtilities.ImportSpineContent, causing an unnecessary exception.
+				// The (skeletonDataAsset.skeletonJSON != null) condition serves to prevent this exception.
+				if (skeletonDataAsset != null && skeletonDataAsset.skeletonJSON != null)
 					Initialize(true);
-			}				
+			}
 		}
 
 		protected override void Reset () {
+
 			base.Reset();
 			if (material == null || material.shader != Shader.Find("Spine/SkeletonGraphic (Premultiply Alpha)"))
 				Debug.LogWarning("SkeletonGraphic works best with the SkeletonGraphic material.");			
@@ -154,8 +158,17 @@ namespace Spine.Unity {
 		}
 
 		protected override void Awake () {
+
 			base.Awake ();
 			if (!this.IsValid) {
+#if UNITY_EDITOR
+				// workaround for special import case of open scene where OnValidate and Awake are
+				// called in wrong order, before setup of Spine assets.
+				if (!Application.isPlaying) {
+					if (this.skeletonDataAsset != null && this.skeletonDataAsset.skeletonJSON == null)
+						return;
+				}
+#endif
 				Initialize(false);
 				Rebuild(CanvasUpdate.PreRender);
 			}
@@ -311,5 +324,5 @@ namespace Spine.Unity {
 			//this.UpdateMaterial(); // TODO: This allocates memory.
 		}
 		#endregion
-	}
+	} 
 }

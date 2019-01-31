@@ -453,6 +453,9 @@ namespace Spine.Unity.Editor {
 
 
 		public static class DataReloadHandler {
+
+			internal static Dictionary<int, string> savedSkeletonDataAssetAtSKeletonGraphicID = new Dictionary<int, string>();
+
 #if NEWPLAYMODECALLBACKS
 			internal static void OnPlaymodeStateChanged (PlayModeStateChange stateChange) {
 #else
@@ -462,6 +465,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			public static void ReloadAllActiveSkeletonsEditMode () {
+
 				if (EditorApplication.isPaused) return;
 				if (EditorApplication.isPlaying) return;
 				if (EditorApplication.isCompiling) return;
@@ -475,10 +479,20 @@ namespace Spine.Unity.Editor {
 					if (skeletonDataAsset != null) skeletonDataAssetsToReload.Add(skeletonDataAsset);
 				}
 
+				// Under some circumstances (e.g. on first import) SkeletonGraphic objects 
+				// have their skeletonGraphic.skeletonDataAsset reference corrupted
+				// by the instance of the ScriptableObject being destroyed but still assigned.
+				// Here we save the skeletonGraphic.skeletonDataAsset asset path in order
+				// to restore it later.
 				var activeSkeletonGraphics = GameObject.FindObjectsOfType<SkeletonGraphic>();
 				foreach (var sg in activeSkeletonGraphics) {
 					var skeletonDataAsset = sg.skeletonDataAsset;
-					if (skeletonDataAsset != null) skeletonDataAssetsToReload.Add(skeletonDataAsset);
+					if (skeletonDataAsset != null) {
+						var assetPath = AssetDatabase.GetAssetPath(skeletonDataAsset);
+						var sgID = sg.GetInstanceID();
+						savedSkeletonDataAssetAtSKeletonGraphicID[sgID] = assetPath;
+						skeletonDataAssetsToReload.Add(skeletonDataAsset);
+					}
 				}
 
 				foreach (var sda in skeletonDataAssetsToReload) {
@@ -780,6 +794,22 @@ namespace Spine.Unity.Editor {
 #endif
 				}
 				// Any post processing of images
+
+				// Under some circumstances (e.g. on first import) SkeletonGraphic objects 
+				// have their skeletonGraphic.skeletonDataAsset reference corrupted
+				// by the instance of the ScriptableObject being destroyed but still assigned.
+				// Here we restore broken skeletonGraphic.skeletonDataAsset references.
+				var skeletonGraphicObjects = Resources.FindObjectsOfTypeAll(typeof(SkeletonGraphic)) as SkeletonGraphic[];
+				foreach (var skeletonGraphic in skeletonGraphicObjects) {
+					
+					if (skeletonGraphic.skeletonDataAsset == null) {
+						var skeletonGraphicID = skeletonGraphic.GetInstanceID();
+						if (DataReloadHandler.savedSkeletonDataAssetAtSKeletonGraphicID.ContainsKey(skeletonGraphicID)) {
+							string assetPath = DataReloadHandler.savedSkeletonDataAssetAtSKeletonGraphicID[skeletonGraphicID];
+							skeletonGraphic.skeletonDataAsset = (SkeletonDataAsset)AssetDatabase.LoadAssetAtPath<SkeletonDataAsset>(assetPath);
+						}
+					}
+				}
 			}
 
 			static void ReloadSkeletonData (string skeletonJSONPath) {
