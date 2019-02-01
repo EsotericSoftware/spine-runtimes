@@ -132,6 +132,9 @@ namespace Spine.Unity.Editor {
 		string LastSkinName { get { return EditorPrefs.GetString(LastSkinKey, ""); } }
 
 		void HandleOnEnablePreview () {
+			if (ThisSkeletonDataAsset != null && ThisSkeletonDataAsset.skeletonJSON == null)
+				return;
+
 			preview.Initialize(this.Repaint, ThisSkeletonDataAsset, LastSkinName);
 			preview.PlayPauseAnimation(ThisAnimationName, true);
 			preview.OnSkinChanged -= HandleOnSkinChanged;
