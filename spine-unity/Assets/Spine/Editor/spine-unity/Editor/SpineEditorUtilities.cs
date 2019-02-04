@@ -778,7 +778,7 @@ namespace Spine.Unity.Editor {
 					string dir = Path.GetDirectoryName(skeletonPath);
 
 #if SPINE_TK2D
-					IngestSpineProject(AssetDatabase.LoadAssetAtPath<TextAsset>(sp), null);
+					IngestSpineProject(AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonPath), null);
 #else
 					var localAtlases = FindAtlasesAtPath(dir);
 					var requiredPaths = GetRequiredAtlasRegions(skeletonPath);
@@ -1036,8 +1036,8 @@ namespace Spine.Unity.Editor {
 						skeletonDataAsset.fromAnimation = new string[0];
 						skeletonDataAsset.toAnimation = new string[0];
 						skeletonDataAsset.duration = new float[0];
-						skeletonDataAsset.defaultMix = defaultMix;
-						skeletonDataAsset.scale = defaultScale;
+						skeletonDataAsset.defaultMix = SpineEditorUtilities.Preferences.defaultMix;
+						skeletonDataAsset.scale = SpineEditorUtilities.Preferences.defaultScale;
 
 						AssetDatabase.CreateAsset(skeletonDataAsset, filePath);
 						AssetDatabase.SaveAssets();
