@@ -65,26 +65,26 @@ public class JsonRollback {
 		rename(root, "ffd", "animations", "*", "deform");
 
 		// In 3.3 mesh is now a single type, previously they were skinnedmesh if they had weights.
-		for (JsonValue value : find(root, new Array(), 0, "skins", "*", "*", "*", "type", "mesh"))
+		for (JsonValue value : find(root, new Array<JsonValue>(), 0, "skins", "*", "*", "*", "type", "mesh"))
 			if (value.parent.get("uvs").size != value.parent.get("vertices").size) value.set("skinnedmesh");
 
 		// In 3.3 linkedmesh is now a single type, previously they were linkedweightedmesh if they had weights.
-		for (JsonValue value : find(root, new Array(), 0, "skins", "*", "*", "*", "type", "linkedmesh")) {
+		for (JsonValue value : find(root, new Array<JsonValue>(), 0, "skins", "*", "*", "*", "type", "linkedmesh")) {
 			String slot = value.parent.parent.name.replaceAll("", "");
 			String skinName = value.parent.getString("skin", "default");
 			String parentName = value.parent.getString("parent");
-			if (find(root, new Array(), 0,
+			if (find(root, new Array<JsonValue>(), 0,
 				("skins~~" + skinName + "~~" + slot + "~~" + parentName + "~~type~~skinnedmesh").split("~~")).size > 0)
 				value.set("weightedlinkedmesh");
 		}
 
 		// In 3.3 bounding boxes can be weighted.
-		for (JsonValue value : find(root, new Array(), 0, "skins", "*", "*", "*", "type", "boundingbox"))
+		for (JsonValue value : find(root, new Array<JsonValue>(), 0, "skins", "*", "*", "*", "type", "boundingbox"))
 			if (value.parent.getInt("vertexCount") * 2 != value.parent.get("vertices").size)
 				value.parent.parent.remove(value.parent.name);
 
 		// In 3.3 paths were added.
-		for (JsonValue value : find(root, new Array(), 0, "skins", "*", "*", "*", "type", "path")) {
+		for (JsonValue value : find(root, new Array<JsonValue>(), 0, "skins", "*", "*", "*", "type", "path")) {
 			String attachment = value.parent.name;
 			value.parent.parent.remove(attachment);
 			String slot = value.parent.parent.name;
@@ -93,7 +93,7 @@ public class JsonRollback {
 		}
 
 		// In 3.3 IK constraint timelines no longer require bendPositive.
-		for (JsonValue value : find(root, new Array(), 0, "animations", "*", "ik", "*"))
+		for (JsonValue value : find(root, new Array<JsonValue>(), 0, "animations", "*", "ik", "*"))
 			for (JsonValue child = value.child; child != null; child = child.next)
 				if (!child.has("bendPositive")) child.addChild("bendPositive", new JsonValue(true));
 
@@ -110,17 +110,17 @@ public class JsonRollback {
 	}
 
 	static void setValue (JsonValue root, String newValue, String... path) {
-		for (JsonValue value : find(root, new Array(), 0, path))
+		for (JsonValue value : find(root, new Array<JsonValue>(), 0, path))
 			value.set(newValue);
 	}
 
 	static void rename (JsonValue root, String newName, String... path) {
-		for (JsonValue value : find(root, new Array(), 0, path))
+		for (JsonValue value : find(root, new Array<JsonValue>(), 0, path))
 			value.name = newName;
 	}
 
 	static void delete (JsonValue root, String... path) {
-		for (JsonValue value : find(root, new Array(), 0, path))
+		for (JsonValue value : find(root, new Array<JsonValue>(), 0, path))
 			value.parent.remove(value.name);
 	}
 

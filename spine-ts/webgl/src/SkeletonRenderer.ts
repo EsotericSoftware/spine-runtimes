@@ -123,7 +123,10 @@ module spine.webgl {
 					let clip = <ClippingAttachment>(attachment);
 					clipper.clipStart(slot, clip);
 					continue;
-				} else continue;
+				} else {
+					clipper.clipEndWithSlot(slot);
+					continue;
+				}
 
 				if (texture != null) {
 					let slotColor = slot.color;
