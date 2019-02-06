@@ -1009,19 +1009,18 @@ namespace Spine.Unity {
 			}
 
 			{
-				int vertexCount = this.vertexBuffer.Count;
 				if (settings.addNormals) {
 					int oldLength = 0;
 
 					if (normals == null)
-						normals = new Vector3[vertexCount];	
+						normals = new Vector3[vbiLength];
 					else
 						oldLength = normals.Length;
 
-					if (oldLength < vertexCount) {
-						Array.Resize(ref this.normals, vertexCount);
+					if (oldLength != vbiLength) {
+						Array.Resize(ref this.normals, vbiLength);
 						var localNormals = this.normals;
-						for (int i = oldLength; i < vertexCount; i++) localNormals[i] = Vector3.back;
+						for (int i = oldLength; i < vbiLength; i++) localNormals[i] = Vector3.back;
 					}
 					mesh.normals = this.normals;
 				}
@@ -1029,7 +1028,7 @@ namespace Spine.Unity {
 				if (settings.tintBlack) {
 					if (uv2 != null) {
 						// Sometimes, the vertex buffer becomes smaller. We need to trim the size of the tint black buffers to match.
-						if (vbiLength > uv2.Items.Length) {
+						if (vbiLength != uv2.Items.Length) {
 							Array.Resize(ref uv2.Items, vbiLength);
 							Array.Resize(ref uv3.Items, vbiLength);
 							uv2.Count = uv3.Count = vbiLength;
@@ -1049,7 +1048,7 @@ namespace Spine.Unity {
 				var vbi = vertexBuffer.Items;
 				var ubi = uvBuffer.Items;
 
-				MeshGenerator.SolveTangents2DEnsureSize(ref this.tangents, ref this.tempTanBuffer, vertexCount);
+				MeshGenerator.SolveTangents2DEnsureSize(ref this.tangents, ref this.tempTanBuffer, vertexCount, vbi.Length);
 				for (int i = 0; i < submeshCount; i++) {
 					var submesh = sbi[i].Items;
 					int triangleCount = sbi[i].Count;
@@ -1115,9 +1114,9 @@ namespace Spine.Unity {
 			if (uv2 != null) uv2.TrimExcess();
 			if (uv3 != null) uv3.TrimExcess();
 
-			int count = vertexBuffer.Count;
-			if (normals != null) Array.Resize(ref normals, count);
-			if (tangents != null) Array.Resize(ref tangents, count);
+			int vbiLength = vertexBuffer.Items.Length;
+			if (normals != null) Array.Resize(ref normals, vbiLength);
+			if (tangents != null) Array.Resize(ref tangents, vbiLength);
 		}
 
 		#region TangentSolver2D
@@ -1127,9 +1126,9 @@ namespace Spine.Unity {
 		/// <param name="tangentBuffer">Eventual Vector4[] tangent buffer to assign to Mesh.tangents.</param>
 		/// <param name="tempTanBuffer">Temporary Vector2 buffer for calculating directions.</param>
 		/// <param name="vertexCount">Number of vertices that require tangents (or the size of the vertex array)</param>
-		internal static void SolveTangents2DEnsureSize (ref Vector4[] tangentBuffer, ref Vector2[] tempTanBuffer, int vertexCount) {
-			if (tangentBuffer == null || tangentBuffer.Length < vertexCount)
-				tangentBuffer = new Vector4[vertexCount];
+		internal static void SolveTangents2DEnsureSize (ref Vector4[] tangentBuffer, ref Vector2[] tempTanBuffer, int vertexCount, int vertexBufferLength) {
+			if (tangentBuffer == null || tangentBuffer.Length != vertexBufferLength)
+				tangentBuffer = new Vector4[vertexBufferLength];
 
 			if (tempTanBuffer == null || tempTanBuffer.Length < vertexCount * 2)
 				tempTanBuffer = new Vector2[vertexCount * 2]; // two arrays in one.

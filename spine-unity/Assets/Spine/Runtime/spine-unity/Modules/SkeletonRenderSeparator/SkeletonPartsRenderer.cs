@@ -116,8 +116,8 @@ namespace Spine.Unity.Modules {
 				} else if (buffers.MaterialsChangedInLastUpdate()) {
 					meshRenderer.sharedMaterials = buffers.GetUpdatedSharedMaterialsArray();
 				}
+				meshGenerator.FillLateVertexData(mesh);
 			}
-			meshGenerator.FillLateVertexData(mesh);
 
 			meshFilter.sharedMesh = mesh;
 			smartMesh.instructionUsed.Set(currentInstructions);
