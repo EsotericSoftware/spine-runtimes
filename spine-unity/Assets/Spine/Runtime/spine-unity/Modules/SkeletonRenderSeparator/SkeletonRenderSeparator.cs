@@ -151,7 +151,7 @@ namespace Spine.Unity.Modules {
 		}
 		#endregion
 
-		void OnEnable () {
+		public void OnEnable () {
 			if (skeletonRenderer == null) return;
 			if (copiedBlock == null) copiedBlock = new MaterialPropertyBlock();	
 			mainMeshRenderer = skeletonRenderer.GetComponent<MeshRenderer>();
@@ -184,7 +184,7 @@ namespace Spine.Unity.Modules {
 			}
 		}
 
-		void OnDisable () {
+		public void OnDisable () {
 			if (skeletonRenderer == null) return;
 			#if SPINE_OPTIONAL_RENDEROVERRIDE
 			skeletonRenderer.GenerateMeshOverride -= HandleRender;

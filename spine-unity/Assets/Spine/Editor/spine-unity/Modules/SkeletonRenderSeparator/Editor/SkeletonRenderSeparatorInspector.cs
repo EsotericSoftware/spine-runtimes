@@ -51,6 +51,7 @@ namespace Spine.Unity.Modules {
 		SerializedProperty separatorNamesProp;
 		static bool skeletonRendererExpanded = true;
 		bool slotsReapplyRequired = false;
+		bool partsRendererInitRequired = false;
 
 		void OnEnable () {
 			if (component == null)
@@ -78,6 +79,14 @@ namespace Spine.Unity.Modules {
 		}
 
 		public override void OnInspectorGUI () {
+
+			// Restore mesh part for undo logic after undo of "Add Parts Renderer".
+			// Triggers regeneration and assignment of the mesh filter's mesh.
+			if (component.GetComponent<MeshFilter>() && component.GetComponent<MeshFilter>().sharedMesh == null) {
+				component.OnDisable();
+				component.OnEnable();
+			}
+
 			var componentRenderers = component.partsRenderers;
 			int totalParts;
 
@@ -177,6 +186,7 @@ namespace Spine.Unity.Modules {
 						if (GUILayout.Button(addMissingLabel, GUILayout.Height(40f))) {
 							AddPartsRenderer(extraRenderersNeeded);
 							DetectOrphanedPartsRenderers(component);
+							partsRendererInitRequired = true;
 						}
 					}
 				}
@@ -202,13 +212,21 @@ namespace Spine.Unity.Modules {
 						}
 
 						// (Button) Add Part Renderer button
-						if (GUILayout.Button("Add Parts Renderer"))
-							AddPartsRenderer(1);				
+						if (GUILayout.Button("Add Parts Renderer")) {
+							AddPartsRenderer(1);
+							partsRendererInitRequired = true;
+						}
 					}
 				}
 			}
 
 			serializedObject.ApplyModifiedProperties();
+
+			if (partsRendererInitRequired) {
+				Undo.RegisterCompleteObjectUndo(component.GetComponent<MeshRenderer>(), "Add Parts Renderers");
+				component.OnEnable();
+				partsRendererInitRequired = false;
+			}
 
 			if (slotsReapplyRequired && UnityEngine.Event.current.type == EventType.Repaint) {
 				component.SkeletonRenderer.ReapplySeparatorSlotNames();
