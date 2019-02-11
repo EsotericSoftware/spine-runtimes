@@ -307,42 +307,51 @@ namespace Spine {
 			return mix;
 		}
 
-		static private void ApplyRotateTimeline (RotateTimeline rotateTimeline, Skeleton skeleton, float time, float alpha, MixBlend pose,
+		static private void ApplyRotateTimeline (RotateTimeline rotateTimeline, Skeleton skeleton, float time, float alpha, MixBlend blend,
 			float[] timelinesRotation, int i, bool firstFrame) {
 
 			if (firstFrame) timelinesRotation[i] = 0;
 
 			if (alpha == 1) {
-				rotateTimeline.Apply(skeleton, 0, time, null, 1, pose, MixDirection.In);
+				rotateTimeline.Apply(skeleton, 0, time, null, 1, blend, MixDirection.In);
 				return;
 			}
 
 			Bone bone = skeleton.bones.Items[rotateTimeline.boneIndex];
 			float[] frames = rotateTimeline.frames;
-			if (time < frames[0]) {
-				if (pose == MixBlend.Setup) bone.rotation = bone.data.rotation;
-				return;
-			}
+			float r1, r2;
+			if (time < frames[0]) { // Time is before first frame.
+				switch (blend) {
+					case MixBlend.Setup:
+						bone.rotation = bone.data.rotation;
+						return;
+					default:
+						return;
+					case MixBlend.First:
+						r1 = bone.rotation;
+						r2 = bone.data.rotation;
+						break;
+				}
+			} else {
+				r1 = blend == MixBlend.Setup ? bone.data.rotation : bone.rotation;
+				if (time >= frames[frames.Length - RotateTimeline.ENTRIES]) // Time is after last frame.
+					r2 = bone.data.rotation + frames[frames.Length + RotateTimeline.PREV_ROTATION];
+				else {
+					// Interpolate between the previous frame and the current frame.
+					int frame = Animation.BinarySearch(frames, time, RotateTimeline.ENTRIES);
+					float prevRotation = frames[frame + RotateTimeline.PREV_ROTATION];
+					float frameTime = frames[frame];
+					float percent = rotateTimeline.GetCurvePercent((frame >> 1) - 1,
+						1 - (time - frameTime) / (frames[frame + RotateTimeline.PREV_TIME] - frameTime));
 
-			float r2;
-			if (time >= frames[frames.Length - RotateTimeline.ENTRIES]) // Time is after last frame.
-				r2 = bone.data.rotation + frames[frames.Length + RotateTimeline.PREV_ROTATION];
-			else {
-				// Interpolate between the previous frame and the current frame.
-				int frame = Animation.BinarySearch(frames, time, RotateTimeline.ENTRIES);
-				float prevRotation = frames[frame + RotateTimeline.PREV_ROTATION];
-				float frameTime = frames[frame];
-				float percent = rotateTimeline.GetCurvePercent((frame >> 1) - 1,
-					1 - (time - frameTime) / (frames[frame + RotateTimeline.PREV_TIME] - frameTime));
-
-				r2 = frames[frame + RotateTimeline.ROTATION] - prevRotation;
-				r2 -= (16384 - (int)(16384.499999999996 - r2 / 360)) * 360;
-				r2 = prevRotation + r2 * percent + bone.data.rotation;
-				r2 -= (16384 - (int)(16384.499999999996 - r2 / 360)) * 360;
+					r2 = frames[frame + RotateTimeline.ROTATION] - prevRotation;
+					r2 -= (16384 - (int)(16384.499999999996 - r2 / 360)) * 360;
+					r2 = prevRotation + r2 * percent + bone.data.rotation;
+					r2 -= (16384 - (int)(16384.499999999996 - r2 / 360)) * 360;
+				}
 			}
 
 			// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
-			float r1 = pose == MixBlend.Setup ? bone.data.rotation : bone.rotation;
 			float total, diff = r2 - r1;
 			diff -= (16384 - (int)(16384.499999999996 - diff / 360)) * 360;
 			if (diff == 0) {
