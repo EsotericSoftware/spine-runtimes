@@ -138,16 +138,16 @@ namespace Spine.Unity.Playables {
 				if (lastOneWeight != 0 && inputCount > 1) {
 					var fromClip = (ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(lastOneWeight - 1);
 					var fromClipData = fromClip.GetBehaviour();
-					fromAnimation = fromClipData.animationReference.Animation;
+					fromAnimation = fromClipData.animationReference != null ? fromClipData.animationReference.Animation : null;
 					fromClipTime = (float)fromClip.GetTime();
 					fromClipLoop = fromClipData.loop;
 				}
 
-				Animation toAnimation = clipData.animationReference.Animation;
+				Animation toAnimation = clipData.animationReference != null ? clipData.animationReference.Animation : null;
 				float toClipTime = (float)inputPlayableClip.GetTime();
 				float mixDuration = clipData.mixDuration;
 
-				if (!clipData.customDuration && fromAnimation != null) {
+				if (!clipData.customDuration && fromAnimation != null && toAnimation != null) {
 					mixDuration = spineComponent.AnimationState.Data.GetMix(fromAnimation, toAnimation);
 				}
 
@@ -163,21 +163,25 @@ namespace Spine.Unity.Playables {
 						dummyAnimationState.ClearTracks();
 						fromTrack = dummyAnimationState.SetAnimation(0, fromAnimation, fromClipLoop);
 						fromTrack.AllowImmediateQueue();
-						toTrack = dummyAnimationState.SetAnimation(0, toAnimation, clipData.loop);
+						if (toAnimation != null)
+							toTrack = dummyAnimationState.SetAnimation(0, toAnimation, clipData.loop);
 					}
 
 					// Update track times.
 					fromTrack.trackTime = fromClipTime;
-					toTrack.trackTime = toClipTime;
-					toTrack.mixTime = toClipTime;
-					
+					if (toTrack != null) {
+						toTrack.trackTime = toClipTime;
+						toTrack.mixTime = toClipTime;
+					}
+
 					// Apply Pose
 					skeleton.SetToSetupPose();
 					dummyAnimationState.Update(0);
 					dummyAnimationState.Apply(skeleton);
 				} else {
 					skeleton.SetToSetupPose();
-					toAnimation.PoseSkeleton(skeleton, toClipTime, clipData.loop);
+					if (toAnimation != null)
+						toAnimation.PoseSkeleton(skeleton, toClipTime, clipData.loop);
 				}
 
 			}
