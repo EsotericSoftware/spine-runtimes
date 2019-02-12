@@ -300,29 +300,36 @@ package spine.animation {
 			var rotateTimeline : RotateTimeline = RotateTimeline(timeline);
 			var frames : Vector.<Number> = rotateTimeline.frames;
 			var bone : Bone = skeleton.bones[rotateTimeline.boneIndex];
+			var r1 : Number, r2 : Number;
 			if (time < frames[0]) {
-				if (blend == MixBlend.setup) bone.rotation = bone.data.rotation;
-				return;
+				switch (blend) {
+					case MixBlend.setup:
+						bone.rotation = bone.data.rotation;
+					default:
+						return;
+					case MixBlend.first:
+						r1 = bone.rotation;
+						r2 = bone.data.rotation;
+				}				
+			} else {			
+				r1 = blend == MixBlend.setup ? bone.data.rotation : bone.rotation;
+				if (time >= frames[frames.length - RotateTimeline.ENTRIES]) // Time is after last frame.
+					r2 = bone.data.rotation + frames[frames.length + RotateTimeline.PREV_ROTATION];
+				else {
+					// Interpolate between the previous frame and the current frame.
+					var frame : int = Animation.binarySearch(frames, time, RotateTimeline.ENTRIES);
+					var prevRotation : Number = frames[frame + RotateTimeline.PREV_ROTATION];
+					var frameTime : Number = frames[frame];
+					var percent : Number = rotateTimeline.getCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + RotateTimeline.PREV_TIME] - frameTime));
+	
+					r2 = frames[frame + RotateTimeline.ROTATION] - prevRotation;
+					r2 -= (16384 - int((16384.499999999996 - r2 / 360))) * 360;
+					r2 = prevRotation + r2 * percent + bone.data.rotation;
+					r2 -= (16384 - int((16384.499999999996 - r2 / 360))) * 360;
+				}
 			}
 
-			var r2 : Number;
-			if (time >= frames[frames.length - RotateTimeline.ENTRIES]) // Time is after last frame.
-				r2 = bone.data.rotation + frames[frames.length + RotateTimeline.PREV_ROTATION];
-			else {
-				// Interpolate between the previous frame and the current frame.
-				var frame : int = Animation.binarySearch(frames, time, RotateTimeline.ENTRIES);
-				var prevRotation : Number = frames[frame + RotateTimeline.PREV_ROTATION];
-				var frameTime : Number = frames[frame];
-				var percent : Number = rotateTimeline.getCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + RotateTimeline.PREV_TIME] - frameTime));
-
-				r2 = frames[frame + RotateTimeline.ROTATION] - prevRotation;
-				r2 -= (16384 - int((16384.499999999996 - r2 / 360))) * 360;
-				r2 = prevRotation + r2 * percent + bone.data.rotation;
-				r2 -= (16384 - int((16384.499999999996 - r2 / 360))) * 360;
-			}
-
-			// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
-			var r1 : Number = blend == MixBlend.setup ? bone.data.rotation : bone.rotation;
+			// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.			
 			var total : Number, diff : Number = r2 - r1;
 			diff -= (16384 - int((16384.499999999996 - diff / 360))) * 360;
 			if (diff == 0) {

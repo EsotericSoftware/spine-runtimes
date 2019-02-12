@@ -342,30 +342,38 @@ public class AnimationState {
 		RotateTimeline rotateTimeline = (RotateTimeline)timeline;
 		Bone bone = skeleton.bones.get(rotateTimeline.boneIndex);
 		float[] frames = rotateTimeline.frames;
+		float r1, r2;
 		if (time < frames[0]) { // Time is before first frame.
-			if (blend == MixBlend.setup) bone.rotation = bone.data.rotation;
-			return;
-		}
+			switch (blend) {
+			case setup:
+				bone.rotation = bone.data.rotation;
+				// Fall through.
+			default:
+				return;
+			case first:
+				r1 = bone.rotation;
+				r2 = bone.data.rotation;
+			}
+		} else {
+			r1 = blend == MixBlend.setup ? bone.data.rotation : bone.rotation;
+			if (time >= frames[frames.length - ENTRIES]) // Time is after last frame.
+				r2 = bone.data.rotation + frames[frames.length + PREV_ROTATION];
+			else {
+				// Interpolate between the previous frame and the current frame.
+				int frame = Animation.binarySearch(frames, time, ENTRIES);
+				float prevRotation = frames[frame + PREV_ROTATION];
+				float frameTime = frames[frame];
+				float percent = rotateTimeline.getCurvePercent((frame >> 1) - 1,
+					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-		float r2;
-		if (time >= frames[frames.length - ENTRIES]) // Time is after last frame.
-			r2 = bone.data.rotation + frames[frames.length + PREV_ROTATION];
-		else {
-			// Interpolate between the previous frame and the current frame.
-			int frame = Animation.binarySearch(frames, time, ENTRIES);
-			float prevRotation = frames[frame + PREV_ROTATION];
-			float frameTime = frames[frame];
-			float percent = rotateTimeline.getCurvePercent((frame >> 1) - 1,
-				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-			r2 = frames[frame + ROTATION] - prevRotation;
-			r2 -= (16384 - (int)(16384.499999999996 - r2 / 360)) * 360;
-			r2 = prevRotation + r2 * percent + bone.data.rotation;
-			r2 -= (16384 - (int)(16384.499999999996 - r2 / 360)) * 360;
+				r2 = frames[frame + ROTATION] - prevRotation;
+				r2 -= (16384 - (int)(16384.499999999996 - r2 / 360)) * 360;
+				r2 = prevRotation + r2 * percent + bone.data.rotation;
+				r2 -= (16384 - (int)(16384.499999999996 - r2 / 360)) * 360;
+			}
 		}
 
 		// Mix between rotations using the direction of the shortest route on the first frame.
-		float r1 = blend == MixBlend.setup ? bone.data.rotation : bone.rotation;
 		float total, diff = r2 - r1;
 		diff -= (16384 - (int)(16384.499999999996 - diff / 360)) * 360;
 		if (diff == 0)

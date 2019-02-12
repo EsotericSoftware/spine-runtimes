@@ -475,31 +475,42 @@ function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, bl
   local rotateTimeline = timeline
   local frames = rotateTimeline.frames
   local bone = skeleton.bones[rotateTimeline.boneIndex]
+	local r1 = 0
+	local r2 = 0
   if time < frames[0] then
-		if blend == MixBlend.setup then bone.rotation = bone.data.rotation end
-		return
+		if blend == MixBlend.setup then
+			bone.rotation = bone.data.rotation
+			return
+		elseif blend == MixBlend.first then
+			r1 = bone.rotation
+			r2 = bone.data.rotation
+		else
+			return
+		end
+	else
+		if blend == MixBlend.setup then
+			r1 = bone.data.rotation
+		else
+			r1 = bone.rotation
+		end
+		if time >= frames[zlen(frames) - Animation.RotateTimeline.ENTRIES] then -- Time is after last frame.
+			r2 = bone.data.rotation + frames[zlen(frames) + Animation.RotateTimeline.PREV_ROTATION]
+		else
+			-- Interpolate between the previous frame and the current frame.
+			local frame = Animation.binarySearch(frames, time, Animation.RotateTimeline.ENTRIES)
+			local prevRotation = frames[frame + Animation.RotateTimeline.PREV_ROTATION]
+			local frameTime = frames[frame]
+			local percent = rotateTimeline:getCurvePercent(math_floor(frame / 2) - 1,
+				1 - (time - frameTime) / (frames[frame + Animation.RotateTimeline.PREV_TIME] - frameTime))
+
+			r2 = frames[frame + Animation.RotateTimeline.ROTATION] - prevRotation
+			r2 = r2 - (16384 - math_floor(16384.499999999996 - r2 / 360)) * 360
+			r2 = prevRotation + r2 * percent + bone.data.rotation
+			r2 = r2 - (16384 - math_floor(16384.499999999996 - r2 / 360)) * 360
+		end
 	end
 
-  local r2 = 0
-  if time >= frames[zlen(frames) - Animation.RotateTimeline.ENTRIES] then -- Time is after last frame.
-    r2 = bone.data.rotation + frames[zlen(frames) + Animation.RotateTimeline.PREV_ROTATION]
-  else
-    -- Interpolate between the previous frame and the current frame.
-    local frame = Animation.binarySearch(frames, time, Animation.RotateTimeline.ENTRIES)
-    local prevRotation = frames[frame + Animation.RotateTimeline.PREV_ROTATION]
-    local frameTime = frames[frame]
-    local percent = rotateTimeline:getCurvePercent(math_floor(frame / 2) - 1,
-      1 - (time - frameTime) / (frames[frame + Animation.RotateTimeline.PREV_TIME] - frameTime))
-
-    r2 = frames[frame + Animation.RotateTimeline.ROTATION] - prevRotation
-    r2 = r2 - (16384 - math_floor(16384.499999999996 - r2 / 360)) * 360
-    r2 = prevRotation + r2 * percent + bone.data.rotation
-    r2 = r2 - (16384 - math_floor(16384.499999999996 - r2 / 360)) * 360
-  end
-
   -- Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
-  local r1 = bone.rotation
-  if blend == MixBlend.setup then r1 = bone.data.rotation end
   local total = 0
   local diff = r2 - r1
 	diff = diff - (16384 - math_floor(16384.499999999996 - diff / 360)) * 360
