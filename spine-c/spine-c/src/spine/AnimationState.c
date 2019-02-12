@@ -538,30 +538,36 @@ void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* 
 	frames = rotateTimeline->frames;
 	bone = skeleton->bones[rotateTimeline->boneIndex];
 	if (time < frames[0]) {
-		if (blend == SP_MIX_BLEND_SETUP) {
-			bone->rotation = bone->data->rotation;
+		switch (blend) {
+			case SP_MIX_BLEND_SETUP:
+				bone->rotation = bone->data->rotation;
+			default:
+				return;
+			case SP_MIX_BLEND_FIRST:
+				r1 = bone->rotation;
+				r2 = bone->data->rotation;
 		}
-		return; /* Time is before first frame. */
-	}
+	} else {
+		r1 = blend == SP_MIX_BLEND_SETUP ? bone->data->rotation : bone->rotation;
+		if (time >= frames[rotateTimeline->framesCount - ROTATE_ENTRIES]) /* Time is after last frame. */
+			r2 = bone->data->rotation + frames[rotateTimeline->framesCount + ROTATE_PREV_ROTATION];
+		else {
+			/* Interpolate between the previous frame and the current frame. */
+			frame = _spCurveTimeline_binarySearch(frames, rotateTimeline->framesCount, time, ROTATE_ENTRIES);
+			prevRotation = frames[frame + ROTATE_PREV_ROTATION];
+			frameTime = frames[frame];
+			percent = spCurveTimeline_getCurvePercent(SUPER(rotateTimeline), (frame >> 1) - 1,
+													  1 - (time - frameTime) /
+														  (frames[frame + ROTATE_PREV_TIME] - frameTime));
 
-	if (time >= frames[rotateTimeline->framesCount - ROTATE_ENTRIES]) /* Time is after last frame. */
-		r2 = bone->data->rotation + frames[rotateTimeline->framesCount + ROTATE_PREV_ROTATION];
-	else {
-		/* Interpolate between the previous frame and the current frame. */
-		frame = _spCurveTimeline_binarySearch(frames, rotateTimeline->framesCount, time, ROTATE_ENTRIES);
-		prevRotation = frames[frame + ROTATE_PREV_ROTATION];
-		frameTime = frames[frame];
-		percent = spCurveTimeline_getCurvePercent(SUPER(rotateTimeline), (frame >> 1) - 1,
-													   1 - (time - frameTime) / (frames[frame + ROTATE_PREV_TIME] - frameTime));
-
-		r2 = frames[frame + ROTATE_ROTATION] - prevRotation;
-		r2 -= (16384 - (int)(16384.499999999996 - r2 / 360)) * 360;
-		r2 = prevRotation + r2 * percent + bone->data->rotation;
-		r2 -= (16384 - (int)(16384.499999999996 - r2 / 360)) * 360;
+			r2 = frames[frame + ROTATE_ROTATION] - prevRotation;
+			r2 -= (16384 - (int) (16384.499999999996 - r2 / 360)) * 360;
+			r2 = prevRotation + r2 * percent + bone->data->rotation;
+			r2 -= (16384 - (int) (16384.499999999996 - r2 / 360)) * 360;
+		}
 	}
 
 	/* Mix between rotations using the direction of the shortest route on the first frame while detecting crosses. */
-	r1 = blend == SP_MIX_BLEND_SETUP ? bone->data->rotation : bone->rotation;
 	diff = r2 - r1;
 	diff -= (16384 - (int)(16384.499999999996 - diff / 360)) * 360;
 	if (diff == 0) {
