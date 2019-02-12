@@ -1532,25 +1532,33 @@ var spine;
 			var rotateTimeline = timeline;
 			var frames = rotateTimeline.frames;
 			var bone = skeleton.bones[rotateTimeline.boneIndex];
+			var r1 = 0, r2 = 0;
 			if (time < frames[0]) {
-				if (blend == spine.MixBlend.setup)
-					bone.rotation = bone.data.rotation;
-				return;
+				switch (blend) {
+					case spine.MixBlend.setup:
+						bone.rotation = bone.data.rotation;
+					default:
+						return;
+					case spine.MixBlend.first:
+						r1 = bone.rotation;
+						r2 = bone.data.rotation;
+				}
 			}
-			var r2 = 0;
-			if (time >= frames[frames.length - spine.RotateTimeline.ENTRIES])
-				r2 = bone.data.rotation + frames[frames.length + spine.RotateTimeline.PREV_ROTATION];
 			else {
-				var frame = spine.Animation.binarySearch(frames, time, spine.RotateTimeline.ENTRIES);
-				var prevRotation = frames[frame + spine.RotateTimeline.PREV_ROTATION];
-				var frameTime = frames[frame];
-				var percent = rotateTimeline.getCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + spine.RotateTimeline.PREV_TIME] - frameTime));
-				r2 = frames[frame + spine.RotateTimeline.ROTATION] - prevRotation;
-				r2 -= (16384 - ((16384.499999999996 - r2 / 360) | 0)) * 360;
-				r2 = prevRotation + r2 * percent + bone.data.rotation;
-				r2 -= (16384 - ((16384.499999999996 - r2 / 360) | 0)) * 360;
+				r1 = blend == spine.MixBlend.setup ? bone.data.rotation : bone.rotation;
+				if (time >= frames[frames.length - spine.RotateTimeline.ENTRIES])
+					r2 = bone.data.rotation + frames[frames.length + spine.RotateTimeline.PREV_ROTATION];
+				else {
+					var frame = spine.Animation.binarySearch(frames, time, spine.RotateTimeline.ENTRIES);
+					var prevRotation = frames[frame + spine.RotateTimeline.PREV_ROTATION];
+					var frameTime = frames[frame];
+					var percent = rotateTimeline.getCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + spine.RotateTimeline.PREV_TIME] - frameTime));
+					r2 = frames[frame + spine.RotateTimeline.ROTATION] - prevRotation;
+					r2 -= (16384 - ((16384.499999999996 - r2 / 360) | 0)) * 360;
+					r2 = prevRotation + r2 * percent + bone.data.rotation;
+					r2 -= (16384 - ((16384.499999999996 - r2 / 360) | 0)) * 360;
+				}
 			}
-			var r1 = blend == spine.MixBlend.setup ? bone.data.rotation : bone.rotation;
 			var total = 0, diff = r2 - r1;
 			diff -= (16384 - ((16384.499999999996 - diff / 360) | 0)) * 360;
 			if (diff == 0) {
