@@ -111,11 +111,13 @@ namespace Spine.Unity.Examples {
 			// To prevent fallback from happening, make sure the key is not defined in the default skin.
 
 			// STEP 3: APPLY AND CLEAN UP.
-			// Recommended: REPACK THE CUSTOM SKIN TO MINIMIZE DRAW CALLS
+			// Recommended, preferably at level-load-time: REPACK THE CUSTOM SKIN TO MINIMIZE DRAW CALLS
+			// 				IMPORTANT NOTE: the GetRepackedSkin() operation is expensive - if multiple characters
+			// 				need to call it every few seconds the overhead will outweigh the draw call benefits.
+			//
 			// 				Repacking requires that you set all source textures/sprites/atlases to be Read/Write enabled in the inspector.
 			// 				Combine all the attachment sources into one skin. Usually this means the default skin and the custom skin.
 			// 				call Skin.GetRepackedSkin to get a cloned skin with cloned attachments that all use one texture.
-			//				Under the hood, this relies on 
 			if (repack)	{
 				var repackedSkin = new Skin("repacked skin");
 				repackedSkin.AddAttachments(skeleton.Data.DefaultSkin); // Include the "default" skin. (everything outside of skin placeholders)
