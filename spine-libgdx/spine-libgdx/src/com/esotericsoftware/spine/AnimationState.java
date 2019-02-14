@@ -1232,7 +1232,8 @@ public class AnimationState {
 		start, interrupt, end, dispose, complete, event
 	}
 
-	/** The interface to implement for receiving TrackEntry events.
+	/** The interface to implement for receiving TrackEntry events. It is always safe to call AnimationState methods when receiving
+	 * events.
 	 * <p>
 	 * See TrackEntry {@link TrackEntry#setListener(AnimationStateListener)} and AnimationState
 	 * {@link AnimationState#addListener(AnimationStateListener)}. */
@@ -1251,10 +1252,14 @@ public class AnimationState {
 		 * References to the entry should not be kept after <code>dispose</code> is called, as it may be destroyed or reused. */
 		public void dispose (TrackEntry entry);
 
-		/** Invoked every time this entry's animation completes a loop. */
+		/** Invoked every time this entry's animation completes a loop. Because this event is trigged in
+		 * {@link AnimationState#apply(Skeleton)}, any animations set in response to the event won't be applied until the next time
+		 * the AnimationState is applied. */
 		public void complete (TrackEntry entry);
 
-		/** Invoked when this entry's animation triggers an event. */
+		/** Invoked when this entry's animation triggers an event. Because this event is trigged in
+		 * {@link AnimationState#apply(Skeleton)}, any animations set in response to the event won't be applied until the next time
+		 * the AnimationState is applied. */
 		public void event (TrackEntry entry, Event event);
 	}
 
