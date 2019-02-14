@@ -1099,7 +1099,7 @@
 			this.playButton.classList.add("spine-player-button-icon-play");
 		}
 
-		private setAnimation (animation: string) {
+		public setAnimation (animation: string) {
 			// Determine viewport
 			this.previousViewport = this.currentViewport;
 			let animViewport = this.calculateAnimationViewport(animation);
@@ -1156,7 +1156,7 @@
 
 			this.animationState.clearTracks();
 			this.skeleton.setToSetupPose();
-			this.animationState.setAnimation(0, this.config.animation, true);
+			this.animationState.setAnimation(0, animation, true);
 		}
 
 		private percentageToWorldUnit(size: number, percentageOrAbsolute: string | number): number {
