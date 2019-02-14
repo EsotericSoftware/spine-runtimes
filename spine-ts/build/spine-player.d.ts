@@ -1786,7 +1786,7 @@ declare module spine {
 		setupInput(): void;
 		private play();
 		private pause();
-		private setAnimation(animation);
+		setAnimation(animation: string): void;
 		private percentageToWorldUnit(size, percentageOrAbsolute);
 		private calculateAnimationViewport(animationName);
 	}
