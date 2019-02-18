@@ -1785,6 +1785,9 @@ namespace Spine.Unity.Editor {
 
 			internal static void EnableTK2D () {
 				bool added = false;
+
+				DisableSpineAsmdefFiles();
+
 				foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
 					if (IsInvalidGroup(group))
 						continue;
@@ -1811,6 +1814,9 @@ namespace Spine.Unity.Editor {
 
 			internal static void DisableTK2D () {
 				bool removed = false;
+
+				EnableSpineAsmdefFiles();
+
 				foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
 					if (IsInvalidGroup(group))
 						continue;
@@ -1831,6 +1837,31 @@ namespace Spine.Unity.Editor {
 					Debug.LogWarning("Removing Scripting Define Symbol " + SPINE_TK2D_DEFINE);
 				} else {
 					Debug.LogWarning("Already Removed Scripting Define Symbol " + SPINE_TK2D_DEFINE);
+				}
+			}
+
+			internal static void DisableSpineAsmdefFiles() {
+				SetAsmdefFileActive("spine-unity-editor", false);
+				SetAsmdefFileActive("spine-unity", false);
+			}
+
+			internal static void EnableSpineAsmdefFiles() {
+				SetAsmdefFileActive("spine-unity-editor", true);
+				SetAsmdefFileActive("spine-unity", true);
+			}
+
+			internal static void SetAsmdefFileActive(string filename, bool setActive) {
+
+				string typeSearchString = setActive ? " t:textasset" : " t:asmdef";
+				string[] guids = AssetDatabase.FindAssets(filename + typeSearchString);
+				foreach (string guid in guids) {
+					string currentPath = AssetDatabase.GUIDToAssetPath(guid);
+					string targetPath = System.IO.Path.ChangeExtension(currentPath, setActive ? "asmdef" : "txt");
+					if (System.IO.File.Exists(currentPath)) {
+						System.IO.File.Copy(currentPath, targetPath);
+						System.IO.File.Copy(currentPath + ".meta", targetPath + ".meta");
+					}
+					AssetDatabase.DeleteAsset(currentPath);
 				}
 			}
 		}
