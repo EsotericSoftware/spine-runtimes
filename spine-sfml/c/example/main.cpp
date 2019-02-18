@@ -44,25 +44,25 @@ void callback (AnimationState* state, EventType type, TrackEntry* entry, Event* 
 	const char* animationName = (entry && entry->animation) ? entry->animation->name : 0;
 
 	switch (type) {
-	case ANIMATION_START:
-		printf("%d start: %s\n", entry->trackIndex, animationName);
-		break;
-	case ANIMATION_INTERRUPT:
-		printf("%d interrupt: %s\n", entry->trackIndex, animationName);
-		break;
-	case ANIMATION_END:
-		printf("%d end: %s\n", entry->trackIndex, animationName);
-		break;
-	case ANIMATION_COMPLETE:
-		printf("%d complete: %s\n", entry->trackIndex, animationName);
-		break;
-	case ANIMATION_DISPOSE:
-		printf("%d dispose: %s\n", entry->trackIndex, animationName);
-		break;
-	case ANIMATION_EVENT:
-		printf("%d event: %s, %s: %d, %f, %s %f %f\n", entry->trackIndex, animationName, event->data->name, event->intValue, event->floatValue,
-				event->stringValue, event->volume, event->balance);
-		break;
+		case ANIMATION_START:
+			printf("%d start: %s\n", entry->trackIndex, animationName);
+			break;
+		case ANIMATION_INTERRUPT:
+			printf("%d interrupt: %s\n", entry->trackIndex, animationName);
+			break;
+		case ANIMATION_END:
+			printf("%d end: %s\n", entry->trackIndex, animationName);
+			break;
+		case ANIMATION_COMPLETE:
+			printf("%d complete: %s\n", entry->trackIndex, animationName);
+			break;
+		case ANIMATION_DISPOSE:
+			printf("%d dispose: %s\n", entry->trackIndex, animationName);
+			break;
+		case ANIMATION_EVENT:
+			printf("%d event: %s, %s: %d, %f, %s %f %f\n", entry->trackIndex, animationName, event->data->name, event->intValue, event->floatValue,
+				   event->stringValue, event->volume, event->balance);
+			break;
 	}
 	fflush(stdout);
 }
@@ -92,17 +92,19 @@ SkeletonData* readSkeletonBinaryData (const char* filename, Atlas* atlas, float 
 }
 
 void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
-		const char* jsonName, const char* binaryName, const char* atlasName,
-		float scale) {
+			   const char* jsonName, const char* binaryName, const char* atlasName,
+			   float scale) {
 	Atlas* atlas = Atlas_createFromFile(atlasName, 0);
 
 	SkeletonData* skeletonData = readSkeletonJsonData(jsonName, atlas, scale);
 	func(skeletonData, atlas);
 	SkeletonData_dispose(skeletonData);
 
+	/*
 	skeletonData = readSkeletonBinaryData(binaryName, atlas, scale);
 	func(skeletonData, atlas);
 	SkeletonData_dispose(skeletonData);
+	*/
 
 	Atlas_dispose(atlas);
 }
@@ -421,6 +423,221 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
 	}
 }
 
+/*
+ test code
+*/
+void animationchanged_nullpointertest(SkeletonData* skeletonData, Atlas* atlas) {
+	SkeletonBounds* bounds = SkeletonBounds_create();
+
+	// Configure mixing.
+	AnimationStateData* stateData = AnimationStateData_create(skeletonData);
+	AnimationStateData_setMixByName(stateData, "walk", "jump", 0.2f);
+	AnimationStateData_setMixByName(stateData, "jump", "run", 0.2f);
+
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData, stateData);
+	drawable->timeScale = 1;
+	drawable->setUsePremultipliedAlpha(true);
+
+	Skeleton* skeleton = drawable->skeleton;
+	Skeleton_setToSetupPose(skeleton);
+
+	skeleton->x = 320;
+	skeleton->y = 590;
+	Skeleton_updateWorldTransform(skeleton);
+
+	drawable->state->listener = callback;
+	AnimationState_addAnimationByName(drawable->state, 0, "walk", true, 0);
+	AnimationState_addEmptyAnimation(drawable->state, 0, 1.0f, 0.0f);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - spineboy");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable->update(delta);
+
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+
+	SkeletonBounds_dispose(bounds);
+	delete drawable;
+}
+
+void multitrack_animationmixtest(SkeletonData* skeletonData, Atlas* atlas) {
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+	drawable->setUsePremultipliedAlpha(false);
+
+	// setup mixing
+	drawable->state->data->defaultMix = 0.5f;
+
+	Skeleton* skeleton = drawable->skeleton;
+	skeleton->x = 320;
+	skeleton->y = 400;
+	skeleton->scaleX = 1.0f;
+	skeleton->scaleY = 1.0f;
+	Skeleton_updateWorldTransform(skeleton);
+
+
+	// track[0] = base ... none animation
+	// track[1] = anim1 -> anim2 -> anim1 -> ...
+	AnimationState_setAnimationByName(drawable->state, 0, "base", true);
+	AnimationState_setAnimationByName(drawable->state, 1, "anim1", false);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - animation mixing test on track[1]");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+
+	float sumtime = 999.0f;
+	int animationindex = 0;
+
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		// motion switch
+		sumtime += delta;
+		if (sumtime > 3.0f) {
+			if (animationindex == 0)
+				AnimationState_setAnimationByName(drawable->state, 1, "anim1", false);
+			else
+				AnimationState_setAnimationByName(drawable->state, 1, "anim2", false);
+			sumtime = 0.0f;
+			animationindex = (animationindex + 1) & 1;
+		}
+
+		// draw
+		drawable->update(delta);
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+
+	delete drawable;
+}
+
+void multitrack_addmixtest(SkeletonData* skeletonData, Atlas* atlas) {
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+
+	drawable->timeScale = 1;
+	drawable->setUsePremultipliedAlpha(false);
+
+	// use track index
+	int usetrackindex = 1;	// 1 or 0
+
+	// setup mixing
+	drawable->state->data->defaultMix = 0.5f;
+	{
+		Skeleton* skeleton = drawable->skeleton;
+		skeleton->x = 320;
+		skeleton->y = 400;
+		skeleton->scaleX = 1.0f;
+		skeleton->scaleY = 1.0f;
+		Skeleton_updateWorldTransform(skeleton);
+	}
+
+	// track[0](replace) = base ... none animation
+	// track[1](add)     = anim1 -> anim2 -> anim1 -> ...
+	spTrackEntry* track;
+
+	AnimationState_setAnimationByName(drawable->state, 0, "base", true);
+	track = AnimationState_setAnimationByName(drawable->state, usetrackindex, "anim1", false);
+	track->mixBlend = SP_MIX_BLEND_ADD;		// mixAdd
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - mixAdd animation mixing test on track[1]");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+
+	float sumtime = 999.0f;
+	int animationindex = 0;
+
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		// motion switch
+		sumtime += delta;
+		if (sumtime > 3.0f) {
+			std::string name;
+			if (animationindex == 0)
+				track = AnimationState_setAnimationByName(drawable->state, usetrackindex, "anim1", false);
+			else
+				track = AnimationState_setAnimationByName(drawable->state, usetrackindex, "anim2", false);
+
+			track->mixBlend = SP_MIX_BLEND_ADD;
+
+			sumtime = 0.0f;
+			animationindex = (animationindex + 1) & 1;
+		}
+
+		// draw
+		drawable->update(delta);
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+
+	delete drawable;
+}
+
+void skeleton_scaletest(SkeletonData* skeletonData, Atlas* atlas) {
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+	drawable->setUsePremultipliedAlpha(false);
+
+	// setup mixing
+	drawable->state->data->defaultMix = 0.5f;
+
+	Skeleton* skeleton = drawable->skeleton;
+	skeleton->x = 320;
+	skeleton->y = 400;
+	skeleton->scaleX = 0.6f;
+	skeleton->scaleY = 0.6f;
+	Skeleton_updateWorldTransform(skeleton);
+
+
+	// track[0] = base ... none animation
+	// track[1] = anim1 -> anim2 -> anim1 -> ...
+	AnimationState_setAnimationByName(drawable->state, 0, "base", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - skeleton scale test");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		// draw
+		drawable->update(delta);
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+
+	delete drawable;
+}
+
 /**
  * Used for debugging purposes during runtime development
  */
@@ -449,6 +666,11 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 int main () {
+	// testcase(multitrack_animationmixtest, "data/testmodel/skeleton.json", "data/testmodel/skeleton.skel", "data/testmodel/skeleton.atlas", 0.6f);
+	// testcase(multitrack_addmixtest, "data/testmodel/skeleton.json", "data/testmodel/skeleton.skel", "data/testmodel/skeleton.atlas", 0.6f);
+	// testcase(skeleton_scaletest, "data/testmodel/skeleton.json", "data/testmodel/skeleton.skel", "data/testmodel/skeleton.atlas", 0.6f);
+	testcase(animationchanged_nullpointertest, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
+	/*
 	testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 1.0f);
 	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(stretchyman, "data/stretchyman-stretchy-ik-pro.json", "data/stretchyman-stretchy-ik-pro.skel", "data/stretchyman-pma.atlas", 0.6f);
@@ -459,5 +681,6 @@ int main () {
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
 	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
 	testcase(stretchyman, "data/stretchyman-pro.json", "data/stretchyman-pro.skel", "data/stretchyman-pma.atlas", 0.6f);
+	*/
 	return 0;
 }
