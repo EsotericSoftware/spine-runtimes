@@ -862,7 +862,6 @@ void _spAnimationState_animationsChanged (spAnimationState* self) {
 
 	for (;i < n; i++) {
 		entry = self->tracks[i];
-		if (!entry) continue;
 		while (entry->mixingFrom != 0)
 			entry = entry->mixingFrom;
 		do {

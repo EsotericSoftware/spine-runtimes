@@ -176,11 +176,11 @@ typedef spAnimationState AnimationState;
 #define AnimationState_setAnimation(...) spAnimationState_setAnimation(__VA_ARGS__)
 #define AnimationState_addAnimationByName(...) spAnimationState_addAnimationByName(__VA_ARGS__)
 #define AnimationState_addAnimation(...) spAnimationState_addAnimation(__VA_ARGS__)
-#define AnimationState_setEmptyAnimation(...) spAnimationState_setEmptyAnimation(__VA_ARGS__)
-#define AnimationState_addEmptyAnimation(...) spAnimationState_addEmptyAnimation(__VA_ARGS__)
-#define AnimationState_setEmptyAnimations(...) spAnimationState_setEmptyAnimations(__VA_ARGS__)
+#define AnimationState_setEmptyAnimation(...) spAnimatinState_setEmptyAnimation(__VA_ARGS__)
+#define AnimationState_addEmptyAnimation(...) spAnimatinState_addEmptyAnimation(__VA_ARGS__)
+#define AnimationState_setEmptyAnimations(...) spAnimatinState_setEmptyAnimations(__VA_ARGS__)
 #define AnimationState_getCurrent(...) spAnimationState_getCurrent(__VA_ARGS__)
-#define AnimationState_clearListenerNotifications(...) spAnimationState_clearListenerNotifications(__VA_ARGS__)
+#define AnimationState_clearListenerNotifications(...) spAnimatinState_clearListenerNotifications(__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

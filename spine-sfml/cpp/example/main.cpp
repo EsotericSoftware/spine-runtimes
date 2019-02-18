@@ -126,9 +126,8 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 
 	drawable.state->setListener(callback);
 	drawable.state->addAnimation(0, "walk", true, 0);
-	//drawable.state->addAnimation(0, "jump", false, 3);
-	//drawable.state->addAnimation(0, "run", true, 0);
-	drawable.state->addEmptyAnimation(0, 1, 0);
+	drawable.state->addAnimation(0, "jump", false, 3);
+	drawable.state->addAnimation(0, "run", true, 0);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - spineboy");
 	window.setFramerateLimit(60);
