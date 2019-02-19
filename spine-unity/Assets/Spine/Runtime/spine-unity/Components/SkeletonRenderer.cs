@@ -31,6 +31,11 @@
 #if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
 #define NEW_PREFAB_SYSTEM
 #endif
+
+#if UNITY_2017_OR_NEWER
+#define BUILT_IN_SPRITE_MASK_COMPONENT
+#endif
+
 #define SPINE_OPTIONAL_RENDEROVERRIDE
 #define SPINE_OPTIONAL_MATERIALOVERRIDE
 
@@ -92,6 +97,7 @@ namespace Spine.Unity {
 		/// <summary>If true, tangents are calculated every frame and added to the Mesh. Enable this when using a shader that uses lighting that requires tangents.</summary>
 		public bool calculateTangents = false;
 
+		#if BUILT_IN_SPRITE_MASK_COMPONENT
 		/// <summary>This enum controls the mode under which the sprite will interact with the masking system.</summary>
 		/// <remarks>Interaction modes with <see cref="UnityEngine.SpriteMask"/> components are identical to Unity's <see cref="UnityEngine.SpriteRenderer"/>,
 		/// see https://docs.unity3d.com/ScriptReference/SpriteMaskInteraction.html. </remarks>
@@ -117,6 +123,7 @@ namespace Spine.Unity {
 		public const UnityEngine.Rendering.CompareFunction STENCIL_COMP_MASKINTERACTION_VISIBLE_INSIDE = UnityEngine.Rendering.CompareFunction.LessEqual;
 		/// <summary>Shader property value used as Stencil comparison function for <see cref="SpriteMaskInteraction.VisibleOutsideMask"/>.</summary>
 		public const UnityEngine.Rendering.CompareFunction STENCIL_COMP_MASKINTERACTION_VISIBLE_OUTSIDE = UnityEngine.Rendering.CompareFunction.Greater;
+		#endif // #if BUILT_IN_SPRITE_MASK_COMPONENT
 		#endregion
 
 		#region Overrides
@@ -400,9 +407,11 @@ namespace Spine.Unity {
 			meshFilter.sharedMesh = currentMesh;
 			currentSmartMesh.instructionUsed.Set(currentInstructions);
 
+			#if BUILT_IN_SPRITE_MASK_COMPONENT
 			if (meshRenderer != null) {
 				AssignSpriteMaskMaterials();
 			}
+			#endif
 		}
 
 		public void FindAndApplySeparatorSlots (string startsWith, bool clearExistingSeparators = true, bool updateStringArray = false) {
@@ -465,6 +474,7 @@ namespace Spine.Unity {
 			}
 		}
 
+		#if BUILT_IN_SPRITE_MASK_COMPONENT
 		private void AssignSpriteMaskMaterials()
 		{
 			if (maskMaterials.materialsMaskDisabled.Length > 0 && maskMaterials.materialsMaskDisabled[0] != null &&
@@ -514,5 +524,6 @@ namespace Spine.Unity {
 			}
 			return true;
 		}
+		#endif //#if BUILT_IN_SPRITE_MASK_COMPONENT
 	}
 }

@@ -44,6 +44,12 @@
 #define NEWHIERARCHYWINDOWCALLBACKS
 #endif
 
+#if UNITY_2017_OR_NEWER
+#define BUILT_IN_SPRITE_MASK_COMPONENT
+#endif
+
+#if BUILT_IN_SPRITE_MASK_COMPONENT
+
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -241,3 +247,4 @@ namespace Spine.Unity.Editor {
 		}
 	}
 }
+#endif // BUILT_IN_SPRITE_MASK_COMPONENT
