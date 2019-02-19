@@ -91,6 +91,32 @@ namespace Spine.Unity {
 
 		/// <summary>If true, tangents are calculated every frame and added to the Mesh. Enable this when using a shader that uses lighting that requires tangents.</summary>
 		public bool calculateTangents = false;
+
+		/// <summary>This enum controls the mode under which the sprite will interact with the masking system.</summary>
+		/// <remarks>Interaction modes with <see cref="UnityEngine.SpriteMask"/> components are identical to Unity's <see cref="UnityEngine.SpriteRenderer"/>,
+		/// see https://docs.unity3d.com/ScriptReference/SpriteMaskInteraction.html. </remarks>
+		public SpriteMaskInteraction maskInteraction = SpriteMaskInteraction.None;
+		
+		[System.Serializable]
+		public class SpriteMaskInteractionMaterials {
+			/// <summary>Material references for switching material sets at runtime when <see cref="SkeletonRenderer.maskInteraction"/> changes to <see cref="SpriteMaskInteraction.None"/>.</summary>
+			public Material[] materialsMaskDisabled = new Material[0];
+			/// <summary>Material references for switching material sets at runtime when <see cref="SkeletonRenderer.maskInteraction"/> changes to <see cref="SpriteMaskInteraction.VisibleInsideMask"/>.</summary>
+			public Material[] materialsInsideMask = new Material[0];
+			/// <summary>Material references for switching material sets at runtime when <see cref="SkeletonRenderer.maskInteraction"/> changes to <see cref="SpriteMaskInteraction.VisibleOutsideMask"/>.</summary>
+			public Material[] materialsOutsideMask = new Material[0];
+		}
+		/// <summary>Material references for switching material sets at runtime when <see cref="SkeletonRenderer.maskInteraction"/> changes.</summary>
+		public SpriteMaskInteractionMaterials maskMaterials = new SpriteMaskInteractionMaterials();
+		
+		/// <summary>Shader property ID used for the Stencil comparison function.</summary>
+		public static readonly int STENCIL_COMP_PARAM_ID = Shader.PropertyToID("_StencilComp");
+		/// <summary>Shader property value used as Stencil comparison function for <see cref="SpriteMaskInteraction.None"/>.</summary>
+		public const UnityEngine.Rendering.CompareFunction STENCIL_COMP_MASKINTERACTION_NONE = UnityEngine.Rendering.CompareFunction.Disabled;
+		/// <summary>Shader property value used as Stencil comparison function for <see cref="SpriteMaskInteraction.VisibleInsideMask"/>.</summary>
+		public const UnityEngine.Rendering.CompareFunction STENCIL_COMP_MASKINTERACTION_VISIBLE_INSIDE = UnityEngine.Rendering.CompareFunction.LessEqual;
+		/// <summary>Shader property value used as Stencil comparison function for <see cref="SpriteMaskInteraction.VisibleOutsideMask"/>.</summary>
+		public const UnityEngine.Rendering.CompareFunction STENCIL_COMP_MASKINTERACTION_VISIBLE_OUTSIDE = UnityEngine.Rendering.CompareFunction.Greater;
 		#endregion
 
 		#region Overrides
@@ -373,6 +399,10 @@ namespace Spine.Unity {
 			// STEP 4. The UnityEngine.Mesh is ready. Set it as the MeshFilter's mesh. Store the instructions used for that mesh. ===========
 			meshFilter.sharedMesh = currentMesh;
 			currentSmartMesh.instructionUsed.Set(currentInstructions);
+
+			if (meshRenderer != null) {
+				AssignSpriteMaskMaterials();
+			}
 		}
 
 		public void FindAndApplySeparatorSlots (string startsWith, bool clearExistingSeparators = true, bool updateStringArray = false) {
@@ -435,5 +465,54 @@ namespace Spine.Unity {
 			}
 		}
 
+		private void AssignSpriteMaskMaterials()
+		{
+			if (maskMaterials.materialsMaskDisabled.Length > 0 && maskMaterials.materialsMaskDisabled[0] != null &&
+				maskInteraction == SpriteMaskInteraction.None) {
+				this.meshRenderer.materials = maskMaterials.materialsMaskDisabled;
+			}
+			else if (maskInteraction == SpriteMaskInteraction.VisibleInsideMask) {
+				if (maskMaterials.materialsInsideMask.Length == 0 || maskMaterials.materialsInsideMask[0] == null) {
+					if (!InitSpriteMaskMaterialsInsideMask())
+						return;
+				}
+				this.meshRenderer.materials = maskMaterials.materialsInsideMask;
+			}
+			else if (maskInteraction == SpriteMaskInteraction.VisibleOutsideMask) {
+				if (maskMaterials.materialsOutsideMask.Length == 0 || maskMaterials.materialsOutsideMask[0] == null) {
+					if (!InitSpriteMaskMaterialsOutsideMask())
+						return;
+				}	
+				this.meshRenderer.materials = maskMaterials.materialsOutsideMask;
+			}
+		}
+
+		private bool InitSpriteMaskMaterialsInsideMask()
+		{
+			return InitSpriteMaskMaterialsForMaskType(STENCIL_COMP_MASKINTERACTION_VISIBLE_INSIDE, ref maskMaterials.materialsInsideMask);
+		}
+
+		private bool InitSpriteMaskMaterialsOutsideMask()
+		{
+			return InitSpriteMaskMaterialsForMaskType(STENCIL_COMP_MASKINTERACTION_VISIBLE_OUTSIDE, ref maskMaterials.materialsOutsideMask);
+		}
+
+		private bool InitSpriteMaskMaterialsForMaskType(UnityEngine.Rendering.CompareFunction maskFunction, ref Material[] materialsToFill)
+		{
+			#if UNITY_EDITOR
+			if (!Application.isPlaying) {
+				return false;
+			}
+			#endif
+
+			var originalMaterials = maskMaterials.materialsMaskDisabled;
+			materialsToFill = new Material[originalMaterials.Length];
+			for (int i = 0; i < originalMaterials.Length; i++) {
+				Material newMaterial = new Material(originalMaterials[i]);
+				newMaterial.SetFloat(STENCIL_COMP_PARAM_ID, (int)maskFunction);
+				materialsToFill[i] = newMaterial;
+			}
+			return true;
+		}
 	}
 }

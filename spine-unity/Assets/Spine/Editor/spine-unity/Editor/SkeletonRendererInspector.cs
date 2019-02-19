@@ -54,14 +54,23 @@ namespace Spine.Unity.Editor {
 		protected SerializedProperty initialFlipX, initialFlipY;
 		protected SerializedProperty singleSubmesh, separatorSlotNames, clearStateOnDisable, immutableTriangles;
 		protected SerializedProperty normals, tangents, zSpacing, pmaVertexColors, tintBlack; // MeshGenerator settings
+		protected SerializedProperty maskInteraction;
+		protected SerializedProperty maskMaterialsNone, maskMaterialsInside, maskMaterialsOutside;
 		protected SpineInspectorUtility.SerializedSortingProperties sortingProperties;
 
 		protected bool isInspectingPrefab;
 		protected bool forceReloadQueued = false;
+		protected bool setMaskNoneMaterialsQueued = false;
+		protected bool setInsideMaskMaterialsQueued = false;
+		protected bool setOutsideMaskMaterialsQueued = false;
+		protected bool deleteInsideMaskMaterialsQueued = false;
+		protected bool deleteOutsideMaskMaterialsQueued = false;
 
 		protected GUIContent SkeletonDataAssetLabel, SkeletonUtilityButtonContent;
 		protected GUIContent PMAVertexColorsLabel, ClearStateOnDisableLabel, ZSpacingLabel, ImmubleTrianglesLabel, TintBlackLabel, SingleSubmeshLabel;
-		protected GUIContent NormalsLabel, TangentsLabel;
+		protected GUIContent NormalsLabel, TangentsLabel, MaskInteractionLabel;
+		protected GUIContent MaskMaterialsHeadingLabel, MaskMaterialsNoneLabel, MaskMaterialsInsideLabel, MaskMaterialsOutsideLabel;
+		protected GUIContent SetMaterialButtonLabel, ClearMaterialButtonLabel, DeleteMaterialButtonLabel;
 		
 		const string ReloadButtonString = "Reload";
 		static GUILayoutOption reloadButtonWidth;
@@ -104,6 +113,14 @@ namespace Spine.Unity.Editor {
 			TangentsLabel = new GUIContent("Solve Tangents", "Calculates the tangents per frame. Use this if you are using lit shaders (usually with normal maps) that require vertex tangents.");
 			TintBlackLabel = new GUIContent("Tint Black (!)", "Adds black tint vertex data to the mesh as UV2 and UV3. Black tinting requires that the shader interpret UV2 and UV3 as black tint colors for this effect to work. You may also use the default [Spine/Skeleton Tint Black] shader.\n\nIf you only need to tint the whole skeleton and not individual parts, the [Spine/Skeleton Tint] shader is recommended for better efficiency and changing/animating the _Black material property via MaterialPropertyBlock.");
 			SingleSubmeshLabel = new GUIContent("Use Single Submesh", "Simplifies submesh generation by assuming you are only using one Material and need only one submesh. This is will disable multiple materials, render separation, and custom slot materials.");
+			MaskInteractionLabel = new GUIContent("Mask Interaction", "SkeletonRenderer's interaction with a Sprite Mask.");
+			MaskMaterialsHeadingLabel = new GUIContent("Mask Interaction Materials", "Materials used for different interaction with sprite masks.");
+			MaskMaterialsNoneLabel = new GUIContent("Normal Materials", "Normal materials used when Mask Interaction is set to None.");
+			MaskMaterialsInsideLabel = new GUIContent("Inside Mask", "Materials used when Mask Interaction is set to Inside Mask.");
+			MaskMaterialsOutsideLabel = new GUIContent("Outside Mask", "Materials used when Mask Interaction is set to Outside Mask.");
+			SetMaterialButtonLabel = new GUIContent("Set", "Prepares material references for switching to the corresponding Mask Interaction mode at runtime. Creates the required materials if they do not exist.");
+			ClearMaterialButtonLabel = new GUIContent("Clear", "Clears unused material references. Note: when switching to the corresponding Mask Interaction mode at runtime, a new material is generated on the fly.");
+			DeleteMaterialButtonLabel = new GUIContent("Delete", "Clears unused material references and deletes the corresponding assets.  Note: when switching to the corresponding Mask Interaction mode at runtime, a new material is generated on the fly.");
 
 			var so = this.serializedObject;
 			skeletonDataAsset = so.FindProperty("skeletonDataAsset");
@@ -117,6 +134,10 @@ namespace Spine.Unity.Editor {
 			clearStateOnDisable = so.FindProperty("clearStateOnDisable");
 			tintBlack = so.FindProperty("tintBlack");
 			singleSubmesh = so.FindProperty("singleSubmesh");
+			maskInteraction = so.FindProperty("maskInteraction");
+			maskMaterialsNone = so.FindProperty("maskMaterials.materialsMaskDisabled");
+			maskMaterialsInside = so.FindProperty("maskMaterials.materialsInsideMask");
+			maskMaterialsOutside = so.FindProperty("maskMaterials.materialsOutsideMask");
 
 			separatorSlotNames = so.FindProperty("separatorSlotNames");
 			separatorSlotNames.isExpanded = true;
@@ -139,7 +160,8 @@ namespace Spine.Unity.Editor {
 		override public void OnInspectorGUI () {
 			bool multi = serializedObject.isEditingMultipleObjects;
 			DrawInspectorGUI(multi);
-			if (serializedObject.ApplyModifiedProperties() || SpineInspectorUtility.UndoRedoPerformed(Event.current)) {
+			if (serializedObject.ApplyModifiedProperties() || SpineInspectorUtility.UndoRedoPerformed(Event.current) ||
+				AreAnyMaskMaterialsMissing()) {
 				if (!Application.isPlaying) {
 					if (multi) {
 						foreach (var o in targets) EditorForceInitializeComponent((SkeletonRenderer)o);
@@ -191,6 +213,33 @@ namespace Spine.Unity.Editor {
 						if (!component.valid)
 							EditorForceInitializeComponent(component);
 					}
+				}
+
+				if (setMaskNoneMaterialsQueued) {
+					setMaskNoneMaterialsQueued = false;
+					foreach (var c in targets)
+						EditorSetMaskMaterials(c as SkeletonRenderer, SpriteMaskInteraction.None);
+				}
+				if (setInsideMaskMaterialsQueued) {
+					setInsideMaskMaterialsQueued = false;
+					foreach (var c in targets)
+						EditorSetMaskMaterials(c as SkeletonRenderer, SpriteMaskInteraction.VisibleInsideMask);
+				}
+				if (setOutsideMaskMaterialsQueued) {
+					setOutsideMaskMaterialsQueued = false;
+					foreach (var c in targets)
+						EditorSetMaskMaterials(c as SkeletonRenderer, SpriteMaskInteraction.VisibleOutsideMask);
+				}
+
+				if (deleteInsideMaskMaterialsQueued) {
+					deleteInsideMaskMaterialsQueued = false;
+					foreach (var c in targets)
+						EditorDeleteMaskMaterials(c as SkeletonRenderer, SpriteMaskInteraction.VisibleInsideMask);
+				}
+				if (deleteOutsideMaskMaterialsQueued) {
+					deleteOutsideMaskMaterialsQueued = false;
+					foreach (var c in targets)
+						EditorDeleteMaskMaterials(c as SkeletonRenderer, SpriteMaskInteraction.VisibleOutsideMask);
 				}
 
 				#if NO_PREFAB_MESH
@@ -255,6 +304,8 @@ namespace Spine.Unity.Editor {
 			// Sorting Layers
 			SpineInspectorUtility.SortingPropertyFields(sortingProperties, applyModifiedProperties: true);
 
+			if (maskInteraction != null) EditorGUILayout.PropertyField(maskInteraction, MaskInteractionLabel);
+
 			if (!valid)
 				return;
 
@@ -311,6 +362,21 @@ namespace Spine.Unity.Editor {
 							if (tangents != null) EditorGUILayout.PropertyField(tangents, TangentsLabel);
 						}
 
+						EditorGUILayout.Space();
+						if (maskMaterialsNone.arraySize > 0 || maskMaterialsInside.arraySize > 0 || maskMaterialsOutside.arraySize > 0) {
+							EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Mask Interaction Materials", SpineInspectorUtility.UnityIcon<SpriteMask>()), EditorStyles.boldLabel);
+							bool differentMaskModesSelected = maskInteraction.hasMultipleDifferentValues;
+							int activeMaskInteractionValue = differentMaskModesSelected ? -1 : maskInteraction.intValue;
+
+							bool ignoredParam = true;
+							MaskMaterialsEditingField(ref setMaskNoneMaterialsQueued, ref ignoredParam, maskMaterialsNone, MaskMaterialsNoneLabel,
+														differentMaskModesSelected, allowDelete : false, isActiveMaterial : activeMaskInteractionValue == (int)SpriteMaskInteraction.None);
+							MaskMaterialsEditingField(ref setInsideMaskMaterialsQueued, ref deleteInsideMaskMaterialsQueued, maskMaterialsInside, MaskMaterialsInsideLabel,
+														differentMaskModesSelected, allowDelete: true, isActiveMaterial: activeMaskInteractionValue == (int)SpriteMaskInteraction.VisibleInsideMask);
+							MaskMaterialsEditingField(ref setOutsideMaskMaterialsQueued, ref deleteOutsideMaskMaterialsQueued, maskMaterialsOutside, MaskMaterialsOutsideLabel,
+														differentMaskModesSelected, allowDelete : true, isActiveMaterial: activeMaskInteractionValue == (int)SpriteMaskInteraction.VisibleOutsideMask);
+						}
+						
 						EditorGUILayout.Space();
 
 						if (valid && !isInspectingPrefab) {
@@ -388,6 +454,38 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
+		public void MaskMaterialsEditingField(ref bool wasSetRequested, ref bool wasDeleteRequested,
+													SerializedProperty maskMaterials, GUIContent label,
+													bool differentMaskModesSelected, bool allowDelete, bool isActiveMaterial) {
+			using (new EditorGUILayout.HorizontalScope()) {
+
+				EditorGUILayout.LabelField(label, isActiveMaterial ? EditorStyles.boldLabel : EditorStyles.label, GUILayout.MinWidth(80f), GUILayout.MaxWidth(140));
+				EditorGUILayout.LabelField(maskMaterials.hasMultipleDifferentValues ? "-" : maskMaterials.arraySize.ToString(), EditorStyles.miniLabel, GUILayout.Width(42f));
+
+				bool enableSetButton = differentMaskModesSelected || maskMaterials.arraySize == 0;
+				bool enableClearButtons = differentMaskModesSelected || (maskMaterials.arraySize != 0 && !isActiveMaterial);
+
+				EditorGUI.BeginDisabledGroup(!enableSetButton);
+				if (GUILayout.Button(SetMaterialButtonLabel, EditorStyles.miniButtonLeft, GUILayout.Width(46f))) {
+					wasSetRequested = true;
+				}
+				EditorGUI.EndDisabledGroup();
+
+				EditorGUI.BeginDisabledGroup(!enableClearButtons);
+				{
+					if (GUILayout.Button(ClearMaterialButtonLabel, allowDelete ? EditorStyles.miniButtonMid : EditorStyles.miniButtonRight, GUILayout.Width(46f))) {
+						maskMaterials.ClearArray();
+					}
+					else if (allowDelete && GUILayout.Button(DeleteMaterialButtonLabel, EditorStyles.miniButtonRight, GUILayout.Width(46f))) {
+						wasDeleteRequested = true;
+					}
+					if (!allowDelete)
+						GUILayout.Space(46f);
+				}
+				EditorGUI.EndDisabledGroup();
+			}
+		}
+
 		static bool UpdateIfSkinMismatch (SkeletonRenderer skeletonRenderer) {
 			if (!skeletonRenderer.valid) return false;
 
@@ -427,12 +525,36 @@ namespace Spine.Unity.Editor {
 			if (component == null) return;
 			if (!SkeletonDataAssetIsValid(component.SkeletonDataAsset)) return;
 			component.Initialize(true);
+			SpineMaskUtilities.EditorAssignSpriteMaskMaterials(component);
 			component.LateUpdate();
+		}
+
+		bool AreAnyMaskMaterialsMissing() {
+			foreach (var o in targets) {
+				var component = (SkeletonRenderer)o;
+				if (!component.valid)
+					continue;
+				if (SpineMaskUtilities.AreMaskMaterialsMissing(component))
+					return true;
+			}
+			return false;
 		}
 
 		static bool SkeletonDataAssetIsValid (SkeletonDataAsset asset) {
 			return asset != null && asset.GetSkeletonData(quiet: true) != null;
 		}
 
+		static void EditorSetMaskMaterials(SkeletonRenderer component, SpriteMaskInteraction maskType)
+		{
+			if (component == null) return;
+			if (!SkeletonDataAssetIsValid(component.SkeletonDataAsset)) return;
+			SpineMaskUtilities.EditorInitMaskMaterials(component, component.maskMaterials, maskType);
+		}
+
+		static void EditorDeleteMaskMaterials(SkeletonRenderer component, SpriteMaskInteraction maskType) {
+			if (component == null) return;
+			if (!SkeletonDataAssetIsValid(component.SkeletonDataAsset)) return;
+			SpineMaskUtilities.EditorDeleteMaskMaterials(component.maskMaterials, maskType);
+		}
 	}
 }
