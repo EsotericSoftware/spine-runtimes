@@ -34,6 +34,10 @@
 #define NO_PREFAB_MESH
 #endif
 
+#if UNITY_2017_OR_NEWER
+#define BUILT_IN_SPRITE_MASK_COMPONENT
+#endif
+
 using UnityEditor;
 using System.Collections.Generic;
 using UnityEngine;
@@ -215,6 +219,7 @@ namespace Spine.Unity.Editor {
 					}
 				}
 
+				#if BUILT_IN_SPRITE_MASK_COMPONENT
 				if (setMaskNoneMaterialsQueued) {
 					setMaskNoneMaterialsQueued = false;
 					foreach (var c in targets)
@@ -241,8 +246,9 @@ namespace Spine.Unity.Editor {
 					foreach (var c in targets)
 						EditorDeleteMaskMaterials(c as SkeletonRenderer, SpriteMaskInteraction.VisibleOutsideMask);
 				}
+				#endif
 
-				#if NO_PREFAB_MESH
+#if NO_PREFAB_MESH
 				if (isInspectingPrefab) {
 					if (multi) {
 						foreach (var c in targets) {
@@ -258,7 +264,7 @@ namespace Spine.Unity.Editor {
 							meshFilter.sharedMesh = null;
 					}
 				}
-				#endif
+#endif
 			}
 
 			bool valid = TargetIsValid;
@@ -362,6 +368,7 @@ namespace Spine.Unity.Editor {
 							if (tangents != null) EditorGUILayout.PropertyField(tangents, TangentsLabel);
 						}
 
+						#if BUILT_IN_SPRITE_MASK_COMPONENT
 						EditorGUILayout.Space();
 						if (maskMaterialsNone.arraySize > 0 || maskMaterialsInside.arraySize > 0 || maskMaterialsOutside.arraySize > 0) {
 							EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Mask Interaction Materials", SpineInspectorUtility.UnityIcon<SpriteMask>()), EditorStyles.boldLabel);
@@ -376,6 +383,7 @@ namespace Spine.Unity.Editor {
 							MaskMaterialsEditingField(ref setOutsideMaskMaterialsQueued, ref deleteOutsideMaskMaterialsQueued, maskMaterialsOutside, MaskMaterialsOutsideLabel,
 														differentMaskModesSelected, allowDelete : true, isActiveMaterial: activeMaskInteractionValue == (int)SpriteMaskInteraction.VisibleOutsideMask);
 						}
+						#endif
 						
 						EditorGUILayout.Space();
 
@@ -525,11 +533,20 @@ namespace Spine.Unity.Editor {
 			if (component == null) return;
 			if (!SkeletonDataAssetIsValid(component.SkeletonDataAsset)) return;
 			component.Initialize(true);
+
+			#if BUILT_IN_SPRITE_MASK_COMPONENT
 			SpineMaskUtilities.EditorAssignSpriteMaskMaterials(component);
+			#endif
+
 			component.LateUpdate();
 		}
 
+		static bool SkeletonDataAssetIsValid (SkeletonDataAsset asset) {
+			return asset != null && asset.GetSkeletonData(quiet: true) != null;
+		}
+		
 		bool AreAnyMaskMaterialsMissing() {
+			#if BUILT_IN_SPRITE_MASK_COMPONENT
 			foreach (var o in targets) {
 				var component = (SkeletonRenderer)o;
 				if (!component.valid)
@@ -537,13 +554,11 @@ namespace Spine.Unity.Editor {
 				if (SpineMaskUtilities.AreMaskMaterialsMissing(component))
 					return true;
 			}
+			#endif
 			return false;
 		}
 
-		static bool SkeletonDataAssetIsValid (SkeletonDataAsset asset) {
-			return asset != null && asset.GetSkeletonData(quiet: true) != null;
-		}
-
+		#if BUILT_IN_SPRITE_MASK_COMPONENT
 		static void EditorSetMaskMaterials(SkeletonRenderer component, SpriteMaskInteraction maskType)
 		{
 			if (component == null) return;
@@ -556,5 +571,6 @@ namespace Spine.Unity.Editor {
 			if (!SkeletonDataAssetIsValid(component.SkeletonDataAsset)) return;
 			SpineMaskUtilities.EditorDeleteMaskMaterials(component.maskMaterials, maskType);
 		}
+		#endif
 	}
 }
