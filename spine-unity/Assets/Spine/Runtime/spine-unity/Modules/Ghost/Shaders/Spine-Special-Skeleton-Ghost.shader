@@ -7,6 +7,8 @@ Shader "Spine/Special/SkeletonGhost" {
 		_Color ("Main Color", Color) = (1,1,1,1)
 		[NoScaleOffset] _MainTex ("Base (RGB) Alpha (A)", 2D) = "white" {}
 		_TextureFade ("Texture Fade Out", Range(0,1)) = 0
+		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
+		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Compare", Float) = 0.0 // Disabled stencil test by default
     }
     SubShader {
 		Tags {
@@ -18,6 +20,12 @@ Shader "Spine/Special/SkeletonGhost" {
 		Blend One OneMinusSrcAlpha
 		ZWrite Off
 		Cull Off
+
+		Stencil {
+			Ref[_StencilRef]
+			Comp[_StencilComp]
+			Pass Keep
+		}
       
 		Pass {
 			CGPROGRAM

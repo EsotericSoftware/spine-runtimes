@@ -44,12 +44,20 @@ Shader "Spine/Sprite/Vertex Lit"
 		[HideInInspector] _DstBlend ("__dst", Float) = 0.0
 		[HideInInspector] _RenderQueue ("__queue", Float) = 0.0
 		[HideInInspector] _Cull ("__cull", Float) = 0.0
+		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
+		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Compare", Float) = 0.0 // Disabled stencil test by default
 	}
 	
 	SubShader
 	{
 		Tags { "Queue"="Transparent" "RenderType"="Sprite" "AlphaDepth"="False" "CanUseSpriteAtlas"="True" "IgnoreProjector"="True" }
 		LOD 150
+
+		Stencil {
+			Ref[_StencilRef]
+			Comp[_StencilComp]
+			Pass Keep
+		}
 		
 		Pass
 		{

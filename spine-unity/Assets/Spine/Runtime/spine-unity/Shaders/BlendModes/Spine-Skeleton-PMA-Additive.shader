@@ -11,6 +11,8 @@ Shader "Spine/Blend Modes/Skeleton PMA Additive" {
 		[NoScaleOffset] _MainTex ("MainTex", 2D) = "black" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
+		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
+		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Compare", Float) = 0.0 // Disabled stencil test by default
 	}
 
 	SubShader {
@@ -22,6 +24,12 @@ Shader "Spine/Blend Modes/Skeleton PMA Additive" {
 		ZWrite Off
 		Blend One One
 		Lighting Off
+
+		Stencil {
+			Ref[_StencilRef]
+			Comp[_StencilComp]
+			Pass Keep
+		}
 
 		Pass {
 			CGPROGRAM
