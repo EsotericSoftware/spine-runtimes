@@ -34,7 +34,7 @@
 #define NO_PREFAB_MESH
 #endif
 
-#if UNITY_2017_OR_NEWER
+#if UNITY_2017_1_OR_NEWER
 #define BUILT_IN_SPRITE_MASK_COMPONENT
 #endif
 
