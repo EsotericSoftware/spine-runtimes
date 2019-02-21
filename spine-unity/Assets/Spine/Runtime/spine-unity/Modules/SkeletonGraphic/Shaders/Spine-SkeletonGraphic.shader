@@ -109,7 +109,7 @@ Shader "Spine/SkeletonGraphic"
 
 				half4 color = (texColor + _TextureSampleAdd) * IN.color;
 
-				color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
+				color *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
 
 				#ifdef UNITY_UI_ALPHACLIP
 				clip (color.a - 0.001);
