@@ -151,6 +151,7 @@
     * `CompareFunction.Disabled` for `Mask Interaction - None`
     * `CompareFunction.LessEqual` for `Mask Interaction - Visible Inside Mask`
     * `CompareFunction.Greater` for `Mask Interaction - Visible Outside Mask`
+* **RectMask2D Support for SkeletonGraphic** Both `SkeletonGraphic` shaders '`Spine/SkeletonGraphic`' and '`Spine/SkeletonGraphic Tint Black`' now respect masking areas defined via Unity's `RectMask2D` component.
 
 ### XNA/MonoGame
 * Added support for any `Effect` to be used by `SkeletonRenderer`
