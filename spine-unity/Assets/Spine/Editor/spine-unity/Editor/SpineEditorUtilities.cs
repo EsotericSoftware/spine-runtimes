@@ -1852,12 +1852,12 @@ namespace Spine.Unity.Editor {
 
 			internal static void SetAsmdefFileActive(string filename, bool setActive) {
 
-				string typeSearchString = setActive ? " t:textasset" : " t:asmdef";
+				string typeSearchString = setActive ? " t:TextAsset" : " t:AssemblyDefinitionAsset";
 				string[] guids = AssetDatabase.FindAssets(filename + typeSearchString);
 				foreach (string guid in guids) {
 					string currentPath = AssetDatabase.GUIDToAssetPath(guid);
 					string targetPath = System.IO.Path.ChangeExtension(currentPath, setActive ? "asmdef" : "txt");
-					if (System.IO.File.Exists(currentPath)) {
+					if (System.IO.File.Exists(currentPath) && !System.IO.File.Exists(targetPath)) {
 						System.IO.File.Copy(currentPath, targetPath);
 						System.IO.File.Copy(currentPath + ".meta", targetPath + ".meta");
 					}
