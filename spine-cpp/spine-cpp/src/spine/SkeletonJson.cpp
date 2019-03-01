@@ -137,6 +137,9 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 		skeletonData->_version = Json::getString(skeleton, "spine", 0);
 		skeletonData->_width = Json::getFloat(skeleton, "width", 0);
 		skeletonData->_height = Json::getFloat(skeleton, "height", 0);
+		skeletonData->_fps = Json::getFloat(skeleton, "fps", 30);
+		skeletonData->_audioPath = Json::getString(skeleton, "audio", 0);
+		skeletonData->_imagesPath = Json::getString(skeleton, "images", 0);
 	}
 
 	/* Bones. */

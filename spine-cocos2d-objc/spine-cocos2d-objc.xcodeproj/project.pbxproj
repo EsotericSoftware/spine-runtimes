@@ -716,6 +716,7 @@
 					"\"cocos2d/external/ObjectAL\"/**",
 				);
 				INFOPLIST_FILE = "Resources-ios/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -744,6 +745,7 @@
 					"\"cocos2d/external/ObjectAL\"/**",
 				);
 				INFOPLIST_FILE = "Resources-ios/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (

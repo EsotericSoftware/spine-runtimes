@@ -138,9 +138,9 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 
 	if (nonessential) {
 		/* Skip images path, audio path & fps */
-		readFloat(input);
-		String(readString(input), true);
-		String(readString(input), true);
+		skeletonData->_fps = readFloat(input);
+		skeletonData->_imagesPath.own(readString(input));
+		skeletonData->_audioPath.own(readString(input));
 	}
 
 	/* Bones. */

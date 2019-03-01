@@ -129,6 +129,7 @@
 ## C++
 * ** Additions **
   * Added C++ Spine runtime. See the [spine-cpp Runtime Guide](https://esotericsoftware.com/spine-cpp) for more information on spine-cpp.
+  * Added parsing of non-essential data (fps, images path, audio path) to for `.json`/`.skel` parsers.
 
 ### Cocos2d-x
 * Added ETC1 alpha support, thanks @halx99! Does not work when two color tint is enabled.
