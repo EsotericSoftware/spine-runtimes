@@ -30,7 +30,10 @@
 
 package com.esotericsoftware.spine;
 
-import static com.esotericsoftware.spine.Animation.RotateTimeline.*;
+import static com.esotericsoftware.spine.Animation.RotateTimeline.ENTRIES;
+import static com.esotericsoftware.spine.Animation.RotateTimeline.PREV_ROTATION;
+import static com.esotericsoftware.spine.Animation.RotateTimeline.PREV_TIME;
+import static com.esotericsoftware.spine.Animation.RotateTimeline.ROTATION;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
@@ -38,7 +41,6 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
-
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.MixBlend;
@@ -127,7 +129,7 @@ public class AnimationState {
 				float nextTime = current.trackLast - next.delay;
 				if (nextTime >= 0) {
 					next.delay = 0;
-					next.trackTime = (nextTime / current.timeScale + delta) * next.timeScale;
+					next.trackTime = current.timeScale == 0 ? 0 : (nextTime / current.timeScale + delta) * next.timeScale;
 					current.trackTime += currentDelta;
 					setCurrent(i, next, true);
 					while (next.mixingFrom != null) {
