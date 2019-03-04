@@ -268,7 +268,7 @@ namespace Spine.Unity {
 					meshFilter.sharedMesh = null;
 
 				meshRenderer = GetComponent<MeshRenderer>();
-				if (meshRenderer != null) meshRenderer.sharedMaterial = null;
+				if (meshRenderer != null && meshRenderer.enabled) meshRenderer.sharedMaterial = null;
 
 				currentInstructions.Clear();
 				rendererBuffers.Clear();
