@@ -249,7 +249,11 @@ function AnimationState:update (delta)
 					local nextTime = current.trackLast - _next.delay
 					if nextTime >= 0 then
 						_next.delay = 0
-						_next.trackTime = (nextTime / current.timeScale + delta) * _next.timeScale
+						if current.timeScale == 0 then
+							_next.trackTime = 0
+						else
+							_next.trackTime = (nextTime / current.timeScale + delta) * _next.timeScale
+						end
 						current.trackTime = current.trackTime + currentDelta
 						self:setCurrent(i, _next, true)
 						while _next.mixingFrom do
