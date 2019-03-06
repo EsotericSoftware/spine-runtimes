@@ -259,6 +259,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="Components|Spine|Animation")
 	FSpineAnimationDisposeDelegate AnimationDispose;
+
+	UPROPERTY(Transient, EditAnywhere)
+	FString PreviewAnimation;
+
+	UPROPERTY(Transient, EditAnywhere)
+	FString PreviewSkin;
 	
 	// used in C event callback. Needs to be public as we can't call
 	// protected methods from plain old C function.
@@ -279,4 +285,7 @@ private:
 	/* If the animation should update automatically. */
 	UPROPERTY()
 	bool bAutoPlaying;
+
+	FString lastPreviewAnimation;
+	FString lastPreviewSkin;
 };

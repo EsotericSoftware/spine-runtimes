@@ -128,6 +128,7 @@ public:
 void USpineSkeletonDataAsset::LoadInfo() {
 #if WITH_EDITORONLY_DATA
 	int dataLen = rawData.Num();
+	if (dataLen == 0) return;
 	NullAttachmentLoader loader;
 	SkeletonData* skeletonData = nullptr;
 	if (skeletonDataFileName.GetPlainNameString().Contains(TEXT(".json"))) {

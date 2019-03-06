@@ -96,6 +96,17 @@ void USpineSkeletonAnimationComponent::InternalTick(float DeltaTime, bool CallDe
 	CheckState();
 
 	if (state && bAutoPlaying) {
+		if (lastPreviewAnimation != PreviewAnimation) {
+			if (PreviewAnimation != "") SetAnimation(0, TCHAR_TO_UTF8(*PreviewAnimation), true);
+			else SetEmptyAnimation(0, 0);
+			lastPreviewAnimation = PreviewAnimation;
+		}
+
+		if (lastPreviewSkin != PreviewSkin) {
+			if (PreviewSkin != "") SetSkin(TCHAR_TO_UTF8(*PreviewSkin));
+			else SetSkin("default");
+			lastPreviewSkin = PreviewSkin;
+		}
 		state->update(DeltaTime);
 		state->apply(*skeleton);
 		if (CallDelegates) BeforeUpdateWorldTransform.Broadcast(this);
