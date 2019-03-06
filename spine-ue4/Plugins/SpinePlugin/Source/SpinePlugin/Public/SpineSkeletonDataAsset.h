@@ -46,7 +46,7 @@ public:
 	FString To;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float Mix = 0;
+	float Mix = 0;
 };
 
 UCLASS(BlueprintType, ClassGroup=(Spine))
