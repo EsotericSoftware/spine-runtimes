@@ -100,6 +100,7 @@
 * Updated to Unreal Engine 4.21 (samples require 4.21).
 * **Breaking change**: `UBoneDriverComponent` and `UBoneFollowerComponent` are now `USceneComponent` instead of `UActorComponent`. They either update only themselves, or also the owning `UActor`, depending on whether the new flag `UseComponentTransform` is set. See https://github.com/EsotericSoftware/spine-runtimes/pull/1175
 * Added query methods for slots, bones, skins and animations to `SpineSkeletonComponent` and `UTrackEntry`. These allow you to query these objects by name in both C++ and blueprints.
+* Added `Preview Animation` and `Preview Skin` properties to `SpineSkeletonAnimationComponent`. Enter an animation or skin name to live-preview it in the editor. Enter an empty string to reset the animation or skin.
 
 ## C# ##
 * **Breaking changes**
