@@ -1,70 +1,3 @@
-# 3.8
-
-## AS3
-* **Breaking changes**
-
-* **Additions**
-
-### Starling
-
-## C
-* **Breaking changes**
-
-* **Additions**
-
-### Cocos2d-Objc
-
-### SFML
-
-## C++
-* ** Additions **
-
-* **Breaking changes**
-
-### Cocos2d-x
-### SFML
-
-### UE4
-
-## C# ##
-* **Breaking changes**
-
-* **Additions**
-
-### Unity
-
-### XNA/MonoGame
-
-## Java
-* **Breaking changes**
-
-* **Additions**
-
-### libGDX
-
-## Lua
-* **Breaking changes**
-*
-* **Additions**
-
-### Love2D
-
-### Corona
-
-## Typescript/Javascript
-* **Breaking changes**
-
-* **Additions**
-
-### WebGL backend
-
-### Canvas backend
-
-### Three.js backend
-
-### Player
-
-
 # 3.7
 
 ## AS3
@@ -166,6 +99,7 @@
 * Updated to Unreal Engine 4.20 (samples require 4.17+), see the `spine-ue4/Plugins/SpinePlugin/Source/SpinePlugin/SpinePlugin.build.cs` file on how to compile in 4.20 with the latest UBT API changes.
 * Updated to Unreal Engine 4.21 (samples require 4.21).
 * **Breaking change**: `UBoneDriverComponent` and `UBoneFollowerComponent` are now `USceneComponent` instead of `UActorComponent`. They either update only themselves, or also the owning `UActor`, depending on whether the new flag `UseComponentTransform` is set. See https://github.com/EsotericSoftware/spine-runtimes/pull/1175
+* Added query methods for slots, bones, skins and animations to `SpineSkeletonComponent` and `UTrackEntry`. These allow you to query these objects by name in both C++ and blueprints.
 
 ## C# ##
 * **Breaking changes**
