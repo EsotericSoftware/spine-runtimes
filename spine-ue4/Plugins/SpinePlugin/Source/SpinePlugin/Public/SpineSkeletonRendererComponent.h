@@ -47,6 +47,9 @@ public:
 		
 	virtual void TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	/* Updates this skeleton renderer using the provided skeleton animation component. */
+	void UpdateRenderer(USpineSkeletonComponent* Skeleton);
+
 	// Material Instance parents
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
 	UMaterialInterface* NormalBlendMaterial;
