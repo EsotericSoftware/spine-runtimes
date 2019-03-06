@@ -53,12 +53,18 @@ public:
 	USpineSkeletonDataAsset* SkeletonData;
 	
 	spine::Skeleton* GetSkeleton () { return skeleton; };
+
+	UFUNCTION(BlueprintPure, Category = "Components|Spine|Skeleton")
+	void GetSkins(TArray<FString> &Skins);
 	
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
-	bool SetSkin (const FString& SkinName);
+	bool SetSkin (const FString SkinName);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	bool HasSkin(const FString SkinName);
 	
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
-	bool SetAttachment (const FString& slotName, const FString& attachmentName);
+	bool SetAttachment (const FString slotName, const FString attachmentName);
 	
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	FTransform GetBoneWorldTransform (const FString& BoneName);
@@ -92,6 +98,24 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Components|Spine|Skeleton")
 	void GetBones(TArray<FString> &Bones);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	bool HasBone(const FString BoneName);
+
+	UFUNCTION(BlueprintPure, Category = "Components|Spine|Skeleton")
+	void GetSlots(TArray<FString> &Slots);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	bool HasSlot(const FString SlotName);
+
+	UFUNCTION(BlueprintPure, Category = "Components|Spine|Skeleton")
+	void GetAnimations(TArray<FString> &Animations);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	bool HasAnimation(FString AnimationName);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	float GetAnimationDuration(FString AnimationName);
 	
 	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|Skeleton")
 	FSpineBeforeUpdateWorldTransformDelegate BeforeUpdateWorldTransform;

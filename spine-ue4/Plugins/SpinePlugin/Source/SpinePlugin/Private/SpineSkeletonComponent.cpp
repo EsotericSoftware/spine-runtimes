@@ -42,7 +42,7 @@ USpineSkeletonComponent::USpineSkeletonComponent () {
 	bAutoActivate = true;
 }
 
-bool USpineSkeletonComponent::SetSkin(const FString& skinName) {
+bool USpineSkeletonComponent::SetSkin (const FString skinName) {
 	CheckState();
 	if (skeleton) {
 		Skin* skin = skeleton->getData()->findSkin(TCHAR_TO_UTF8(*skinName));
@@ -53,7 +53,24 @@ bool USpineSkeletonComponent::SetSkin(const FString& skinName) {
 	else return false;
 }
 
-bool USpineSkeletonComponent::SetAttachment (const FString& slotName, const FString& attachmentName) {
+void USpineSkeletonComponent::GetSkins (TArray<FString> &Skins) {
+	CheckState();
+	if (skeleton) {
+		for (size_t i = 0, n = skeleton->getData()->getSkins().size(); i < n; i++) {
+			Skins.Add(skeleton->getData()->getSkins()[i]->getName().buffer());
+		}
+	}
+}
+
+bool USpineSkeletonComponent::HasSkin (const FString skinName) {
+	CheckState();
+	if (skeleton) {
+		return skeleton->getData()->findAnimation(TCHAR_TO_UTF8(*skinName)) != nullptr;
+	}
+	return false;
+}
+
+bool USpineSkeletonComponent::SetAttachment (const FString slotName, const FString attachmentName) {
 	CheckState();
 	if (skeleton) {
 		if (!skeleton->getAttachment(TCHAR_TO_UTF8(*slotName), TCHAR_TO_UTF8(*attachmentName))) return false;
@@ -127,7 +144,7 @@ void USpineSkeletonComponent::SetBoneWorldPosition (const FString& BoneName, con
 	}
 }
 
-void USpineSkeletonComponent::UpdateWorldTransform() {
+void USpineSkeletonComponent::UpdateWorldTransform () {
 	CheckState();
 	if (skeleton) {
 		skeleton->updateWorldTransform();
@@ -154,30 +171,82 @@ void USpineSkeletonComponent::SetScaleX (float scaleX) {
 	if (skeleton) skeleton->setScaleX(scaleX);
 }
 
-float USpineSkeletonComponent::GetScaleX() {
+float USpineSkeletonComponent::GetScaleX () {
 	CheckState();
 	if (skeleton) return skeleton->getScaleX();
 	return 1;
 }
 
-void USpineSkeletonComponent::SetScaleY(float scaleY) {
+void USpineSkeletonComponent::SetScaleY (float scaleY) {
 	CheckState();
 	if (skeleton) skeleton->setScaleY(scaleY);
 }
 
-float USpineSkeletonComponent::GetScaleY() {
+float USpineSkeletonComponent::GetScaleY () {
 	CheckState();
 	if (skeleton) return skeleton->getScaleY();
 	return 1;
 }
 
-void USpineSkeletonComponent::GetBones(TArray<FString> &Bones) {
+void USpineSkeletonComponent::GetBones (TArray<FString> &Bones) {
 	CheckState();
 	if (skeleton) {
 		for (size_t i = 0, n = skeleton->getBones().size(); i < n; i++) {
 			Bones.Add(skeleton->getBones()[i]->getData().getName().buffer());
 		}
 	}
+}
+
+bool USpineSkeletonComponent::HasBone (const FString BoneName) {
+	CheckState();
+	if (skeleton) {
+		return skeleton->getData()->findBone(TCHAR_TO_UTF8(*BoneName)) != nullptr;
+	}
+	return false;
+}
+
+void USpineSkeletonComponent::GetSlots (TArray<FString> &Slots) {
+	CheckState();
+	if (skeleton) {
+		for (size_t i = 0, n = skeleton->getSlots().size(); i < n; i++) {
+			Slots.Add(skeleton->getSlots()[i]->getData().getName().buffer());
+		}
+	}
+}
+
+bool USpineSkeletonComponent::HasSlot (const FString SlotName) {
+	CheckState();
+	if (skeleton) {
+		return skeleton->getData()->findSlot(TCHAR_TO_UTF8(*SlotName)) != nullptr;
+	}
+	return false;
+}
+
+void USpineSkeletonComponent::GetAnimations(TArray<FString> &Animations) {
+	CheckState();
+	if (skeleton) {
+		for (size_t i = 0, n = skeleton->getData()->getAnimations().size(); i < n; i++) {
+			Animations.Add(skeleton->getData()->getAnimations()[i]->getName().buffer());
+		}
+	}
+}
+
+bool USpineSkeletonComponent::HasAnimation(FString AnimationName) {
+	CheckState();
+	if (skeleton) {
+		return skeleton->getData()->findAnimation(TCHAR_TO_UTF8(*AnimationName)) != nullptr;
+	}
+	return false;
+}
+
+float USpineSkeletonComponent::GetAnimationDuration(FString AnimationName) {
+	CheckState();
+	if (skeleton) {
+		Animation *animation = skeleton->getData()->findAnimation(TCHAR_TO_UTF8(*AnimationName));
+		if (animation == nullptr) return 0;
+		else return animation->getDuration();
+	}
+	return 0;
 }
 
 void USpineSkeletonComponent::BeginPlay() {
