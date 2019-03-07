@@ -81,9 +81,9 @@ UObject* USpineSkeletonAssetFactory::FactoryCreateFile (UClass * InClass, UObjec
 	if (!FFileHelper::LoadFileToArray(rawData, *Filename, 0)) {
 		return nullptr;
 	}
+	asset->SetSkeletonDataFileName(FName(*Filename));
 	asset->SetRawData(rawData);
 	
-	asset->SetSkeletonDataFileName(FName(*Filename));
 	const FString longPackagePath = FPackageName::GetLongPackagePath(asset->GetOutermost()->GetPathName());
 	LoadAtlas(Filename, longPackagePath);
 	return asset;

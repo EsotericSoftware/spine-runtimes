@@ -97,13 +97,13 @@ void USpineSkeletonAnimationComponent::InternalTick(float DeltaTime, bool CallDe
 
 	if (state && bAutoPlaying) {
 		if (lastPreviewAnimation != PreviewAnimation) {
-			if (PreviewAnimation != "") SetAnimation(0, TCHAR_TO_UTF8(*PreviewAnimation), true);
+			if (PreviewAnimation != "") SetAnimation(0, PreviewAnimation, true);
 			else SetEmptyAnimation(0, 0);
 			lastPreviewAnimation = PreviewAnimation;
 		}
 
 		if (lastPreviewSkin != PreviewSkin) {
-			if (PreviewSkin != "") SetSkin(TCHAR_TO_UTF8(*PreviewSkin));
+			if (PreviewSkin != "") SetSkin(PreviewSkin);
 			else SetSkin("default");
 			lastPreviewSkin = PreviewSkin;
 		}
