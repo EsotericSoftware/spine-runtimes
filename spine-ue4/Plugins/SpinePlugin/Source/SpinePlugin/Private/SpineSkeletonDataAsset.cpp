@@ -155,9 +155,15 @@ void USpineSkeletonDataAsset::LoadInfo() {
 		Skins.Empty();
 		for (int i = 0; i < skeletonData->getSkins().size(); i++)
 			Skins.Add(skeletonData->getSkins()[i]->getName().buffer());
+		Slots.Empty();
+		for (int i = 0; i < skeletonData->getSlots().size(); i++)
+			Slots.Add(skeletonData->getSlots()[i]->getName().buffer());
 		Animations.Empty();
 		for (int i = 0; i < skeletonData->getAnimations().size(); i++)
 			Animations.Add(skeletonData->getAnimations()[i]->getName().buffer());
+		Events.Empty();
+		for (int i = 0; i < skeletonData->getEvents().size(); i++)
+			Events.Add(skeletonData->getEvents()[i]->getName().buffer());
 		delete skeletonData;
 	}
 #endif

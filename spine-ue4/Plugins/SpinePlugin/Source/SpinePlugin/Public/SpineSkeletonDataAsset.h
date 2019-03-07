@@ -82,6 +82,9 @@ public:
 
 	UPROPERTY(Transient, VisibleAnywhere)
 	TArray<FString> Animations;
+
+	UPROPERTY(Transient, VisibleAnywhere)
+	TArray<FString> Events;
 	
 protected:
 	UPROPERTY()
