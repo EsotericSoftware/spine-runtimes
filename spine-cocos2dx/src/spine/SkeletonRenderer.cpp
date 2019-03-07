@@ -44,7 +44,7 @@ static size_t worldVerticesLength = 0;
 void ensureWorldVerticesCapacity(size_t capacity) {
 	if (worldVerticesLength < capacity) {
 		float* newWorldVertices = new float[capacity];
-		memcpy(newWorldVertices, worldVertices, capacity * sizeof(float));
+		memcpy(newWorldVertices, worldVertices, worldVerticesLength * sizeof(float));
 		delete[] worldVertices;
 		worldVertices = newWorldVertices;
 		worldVerticesLength = capacity;
