@@ -151,19 +151,19 @@ void USpineSkeletonDataAsset::LoadInfo() {
 	if (skeletonData) {
 		Bones.Empty();
 		for (int i = 0; i < skeletonData->getBones().size(); i++)
-			Bones.Add(skeletonData->getBones()[i]->getName().buffer());
+			Bones.Add(UTF8_TO_TCHAR(skeletonData->getBones()[i]->getName().buffer()));
 		Skins.Empty();
 		for (int i = 0; i < skeletonData->getSkins().size(); i++)
-			Skins.Add(skeletonData->getSkins()[i]->getName().buffer());
+			Skins.Add(UTF8_TO_TCHAR(skeletonData->getSkins()[i]->getName().buffer()));
 		Slots.Empty();
 		for (int i = 0; i < skeletonData->getSlots().size(); i++)
-			Slots.Add(skeletonData->getSlots()[i]->getName().buffer());
+			Slots.Add(UTF8_TO_TCHAR(skeletonData->getSlots()[i]->getName().buffer()));
 		Animations.Empty();
 		for (int i = 0; i < skeletonData->getAnimations().size(); i++)
-			Animations.Add(skeletonData->getAnimations()[i]->getName().buffer());
+			Animations.Add(UTF8_TO_TCHAR(skeletonData->getAnimations()[i]->getName().buffer()));
 		Events.Empty();
 		for (int i = 0; i < skeletonData->getEvents().size(); i++)
-			Events.Add(skeletonData->getEvents()[i]->getName().buffer());
+			Events.Add(UTF8_TO_TCHAR(skeletonData->getEvents()[i]->getName().buffer()));
 		delete skeletonData;
 	}
 #endif
