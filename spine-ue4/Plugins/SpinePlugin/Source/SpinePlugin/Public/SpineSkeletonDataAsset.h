@@ -46,7 +46,7 @@ public:
 	FString To;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float Mix = 0;
+	float Mix = 0;
 };
 
 UCLASS(BlueprintType, ClassGroup=(Spine))
@@ -70,6 +70,21 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FSpineAnimationStateMixData> MixData;
+
+	UPROPERTY(Transient, VisibleAnywhere)
+	TArray<FString> Bones;
+
+	UPROPERTY(Transient, VisibleAnywhere)
+	TArray<FString> Slots;
+
+	UPROPERTY(Transient, VisibleAnywhere)
+	TArray<FString> Skins;
+
+	UPROPERTY(Transient, VisibleAnywhere)
+	TArray<FString> Animations;
+
+	UPROPERTY(Transient, VisibleAnywhere)
+	TArray<FString> Events;
 	
 protected:
 	UPROPERTY()
@@ -94,4 +109,6 @@ protected:
 	virtual void GetAssetRegistryTags(TArray<FAssetRegistryTag>& OutTags) const override;
 	virtual void Serialize (FArchive& Ar) override;
 #endif
+
+	void LoadInfo();
 };

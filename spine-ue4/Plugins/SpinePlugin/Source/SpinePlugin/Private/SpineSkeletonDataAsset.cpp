@@ -76,6 +76,7 @@ void USpineSkeletonDataAsset::Serialize (FArchive& Ar) {
 	Super::Serialize(Ar);
 	if (Ar.IsLoading() && Ar.UE4Ver() < VER_UE4_ASSET_IMPORT_DATA_AS_JSON && !importData)
 		importData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
+	LoadInfo();
 }
 
 #endif
@@ -92,13 +93,92 @@ void USpineSkeletonDataAsset::BeginDestroy () {
 	Super::BeginDestroy();
 }
 
+class SP_API NullAttachmentLoader : public AttachmentLoader {
+public:
+
+	virtual RegionAttachment* newRegionAttachment(Skin& skin, const String& name, const String& path) {
+		return new(__FILE__, __LINE__) RegionAttachment(name);
+	}
+
+	virtual MeshAttachment* newMeshAttachment(Skin& skin, const String& name, const String& path) {
+		return new(__FILE__, __LINE__) MeshAttachment(name);
+	}
+
+	virtual BoundingBoxAttachment* newBoundingBoxAttachment(Skin& skin, const String& name) {
+		return new(__FILE__, __LINE__) BoundingBoxAttachment(name);
+	}
+
+	virtual PathAttachment* newPathAttachment(Skin& skin, const String& name) {
+		return new(__FILE__, __LINE__) PathAttachment(name);
+	}
+
+	virtual PointAttachment* newPointAttachment(Skin& skin, const String& name) {
+		return new(__FILE__, __LINE__) PointAttachment(name);
+	}
+
+	virtual ClippingAttachment* newClippingAttachment(Skin& skin, const String& name) {
+		return new(__FILE__, __LINE__) ClippingAttachment(name);
+	}
+
+	virtual void configureAttachment(Attachment* attachment) {
+
+	}
+};
+
+void USpineSkeletonDataAsset::LoadInfo() {
+#if WITH_EDITORONLY_DATA
+	int dataLen = rawData.Num();
+	if (dataLen == 0) return;
+	NullAttachmentLoader loader;
+	SkeletonData* skeletonData = nullptr;
+	if (skeletonDataFileName.GetPlainNameString().Contains(TEXT(".json"))) {
+		SkeletonJson* json = new (__FILE__, __LINE__) SkeletonJson(&loader);
+		skeletonData = json->readSkeletonData((const char*)rawData.GetData());
+		if (!skeletonData) {
+			FMessageDialog::Debugf(FText::FromString(UTF8_TO_TCHAR(json->getError().buffer())));
+			UE_LOG(SpineLog, Error, TEXT("Couldn't load skeleton data and atlas: %s"), UTF8_TO_TCHAR(json->getError().buffer()));
+		}
+		delete json;
+	} else {
+		SkeletonBinary* binary = new (__FILE__, __LINE__) SkeletonBinary(&loader);
+		skeletonData = binary->readSkeletonData((const unsigned char*)rawData.GetData(), (int)rawData.Num());
+		if (!skeletonData) {
+			FMessageDialog::Debugf(FText::FromString(UTF8_TO_TCHAR(binary->getError().buffer())));
+			UE_LOG(SpineLog, Error, TEXT("Couldn't load skeleton data and atlas: %s"), UTF8_TO_TCHAR(binary->getError().buffer()));
+		}
+		delete binary;
+	}
+	if (skeletonData) {
+		Bones.Empty();
+		for (int i = 0; i < skeletonData->getBones().size(); i++)
+			Bones.Add(UTF8_TO_TCHAR(skeletonData->getBones()[i]->getName().buffer()));
+		Skins.Empty();
+		for (int i = 0; i < skeletonData->getSkins().size(); i++)
+			Skins.Add(UTF8_TO_TCHAR(skeletonData->getSkins()[i]->getName().buffer()));
+		Slots.Empty();
+		for (int i = 0; i < skeletonData->getSlots().size(); i++)
+			Slots.Add(UTF8_TO_TCHAR(skeletonData->getSlots()[i]->getName().buffer()));
+		Animations.Empty();
+		for (int i = 0; i < skeletonData->getAnimations().size(); i++)
+			Animations.Add(UTF8_TO_TCHAR(skeletonData->getAnimations()[i]->getName().buffer()));
+		Events.Empty();
+		for (int i = 0; i < skeletonData->getEvents().size(); i++)
+			Events.Add(UTF8_TO_TCHAR(skeletonData->getEvents()[i]->getName().buffer()));
+		delete skeletonData;
+	}
+#endif
+}
+
 void USpineSkeletonDataAsset::SetRawData(TArray<uint8> &Data) {
 	this->rawData.Empty();
 	this->rawData.Append(Data);
+
 	if (skeletonData) {
 		delete skeletonData;
 		skeletonData = nullptr;
 	}
+
+	LoadInfo();
 }
 
 SkeletonData* USpineSkeletonDataAsset::GetSkeletonData (Atlas* Atlas) {

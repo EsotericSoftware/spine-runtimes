@@ -171,6 +171,8 @@ void TrackEntry::reset() {
 	_mixingFrom = NULL;
 	_mixingTo = NULL;
 
+	setRendererObject(NULL);
+
 	_timelineMode.clear();
 	_timelineHoldMix.clear();
 	_timelinesRotation.clear();

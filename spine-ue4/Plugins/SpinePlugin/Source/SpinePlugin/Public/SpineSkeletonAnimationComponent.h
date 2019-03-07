@@ -90,7 +90,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	bool GetLoop () { return entry ? entry->getLoop() : false; }
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
-		void SetLoop(bool loop) { if (entry) entry->setLoop(loop); }
+	void SetLoop(bool loop) { if (entry) entry->setLoop(loop); }
 	
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	float GetEventThreshold () { return entry ? entry->getEventThreshold() : 0; }
@@ -156,6 +156,15 @@ public:
 	float GetMixDuration() { return entry ? entry->getMixDuration() : 0; }
 	UFUNCTION(BlueprintCallable, Category="Components|Spine|TrackEntry")
 	void SetMixDuration(float mixDuration) { if (entry) entry->setMixDuration(mixDuration); }
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
+	FString getAnimationName() { return entry ? entry->getAnimation()->getName().buffer() : ""; }
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
+	float getAnimationDuration() { return entry ? entry->getAnimation()->getDuration(): 0; }
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
+	float isValidAnimation() { return entry != nullptr; }
 
 	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|TrackEntry")
 	FSpineAnimationStartDelegate AnimationStart;
@@ -250,6 +259,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="Components|Spine|Animation")
 	FSpineAnimationDisposeDelegate AnimationDispose;
+
+	UPROPERTY(Transient, EditAnywhere, Category=Spine)
+	FString PreviewAnimation;
+
+	UPROPERTY(Transient, EditAnywhere, Category=Spine)
+	FString PreviewSkin;
 	
 	// used in C event callback. Needs to be public as we can't call
 	// protected methods from plain old C function.
@@ -270,4 +285,7 @@ private:
 	/* If the animation should update automatically. */
 	UPROPERTY()
 	bool bAutoPlaying;
+
+	FString lastPreviewAnimation;
+	FString lastPreviewSkin;
 };
