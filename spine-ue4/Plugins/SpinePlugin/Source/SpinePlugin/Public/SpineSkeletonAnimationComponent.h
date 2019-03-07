@@ -260,10 +260,10 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="Components|Spine|Animation")
 	FSpineAnimationDisposeDelegate AnimationDispose;
 
-	UPROPERTY(Transient, EditAnywhere)
+	UPROPERTY(Transient, EditAnywhere, Category=Spine)
 	FString PreviewAnimation;
 
-	UPROPERTY(Transient, EditAnywhere)
+	UPROPERTY(Transient, EditAnywhere, Category=Spine)
 	FString PreviewSkin;
 	
 	// used in C event callback. Needs to be public as we can't call
