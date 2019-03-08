@@ -30,14 +30,14 @@
 
 package com.esotericsoftware.spine.attachments;
 
+import com.badlogic.gdx.utils.FloatArray;
+
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.Slot;
 
-import com.badlogic.gdx.utils.FloatArray;
-
 /** Base class for an attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
- * {@link Slot#getAttachmentVertices()}. */
+ * {@link Slot#getDeform()}. */
 public class VertexAttachment extends Attachment {
 	static private int nextID;
 
@@ -50,8 +50,8 @@ public class VertexAttachment extends Attachment {
 		super(name);
 	}
 
-	/** Transforms the attachment's local {@link #getVertices()} to world coordinates. If the slot has
-	 * {@link Slot#getAttachmentVertices()}, they are used to deform the vertices.
+	/** Transforms the attachment's local {@link #getVertices()} to world coordinates. If the slot has {@link Slot#getDeform()},
+	 * they are used to deform the vertices.
 	 * <p>
 	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide.
@@ -64,7 +64,7 @@ public class VertexAttachment extends Attachment {
 	public void computeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset, int stride) {
 		count = offset + (count >> 1) * stride;
 		Skeleton skeleton = slot.getSkeleton();
-		FloatArray deformArray = slot.getAttachmentVertices();
+		FloatArray deformArray = slot.getDeform();
 		float[] vertices = this.vertices;
 		int[] bones = this.bones;
 		if (bones == null) {

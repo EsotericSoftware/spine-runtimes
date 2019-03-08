@@ -941,7 +941,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a slot's {@link Slot#getAttachmentVertices()} to deform a {@link VertexAttachment}. */
+	/** Changes a slot's {@link Slot#getDeform()} to deform a {@link VertexAttachment}. */
 	static public class DeformTimeline extends CurveTimeline implements SlotTimeline {
 		int slotIndex;
 		VertexAttachment attachment;
@@ -1001,8 +1001,8 @@ public class Animation {
 			Attachment slotAttachment = slot.attachment;
 			if (!(slotAttachment instanceof VertexAttachment) || !((VertexAttachment)slotAttachment).applyDeform(attachment)) return;
 
-			FloatArray verticesArray = slot.getAttachmentVertices();
-			if (verticesArray.size == 0) blend = setup;
+			FloatArray deformArray = slot.getDeform();
+			if (deformArray.size == 0) blend = setup;
 
 			float[][] frameVertices = this.frameVertices;
 			int vertexCount = frameVertices[0].length;
@@ -1012,30 +1012,30 @@ public class Animation {
 				VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
 				switch (blend) {
 				case setup:
-					verticesArray.clear();
+					deformArray.clear();
 					return;
 				case first:
 					if (alpha == 1) {
-						verticesArray.clear();
+						deformArray.clear();
 						return;
 					}
-					float[] vertices = verticesArray.setSize(vertexCount);
+					float[] deform = deformArray.setSize(vertexCount);
 					if (vertexAttachment.getBones() == null) {
 						// Unweighted vertex positions.
 						float[] setupVertices = vertexAttachment.getVertices();
 						for (int i = 0; i < vertexCount; i++)
-							vertices[i] += (setupVertices[i] - vertices[i]) * alpha;
+							deform[i] += (setupVertices[i] - deform[i]) * alpha;
 					} else {
 						// Weighted deform offsets.
 						alpha = 1 - alpha;
 						for (int i = 0; i < vertexCount; i++)
-							vertices[i] *= alpha;
+							deform[i] *= alpha;
 					}
 				}
 				return;
 			}
 
-			float[] vertices = verticesArray.setSize(vertexCount);
+			float[] deform = deformArray.setSize(vertexCount);
 
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.
 				float[] lastVertices = frameVertices[frames.length - 1];
@@ -1046,15 +1046,15 @@ public class Animation {
 							// Unweighted vertex positions, no alpha.
 							float[] setupVertices = vertexAttachment.getVertices();
 							for (int i = 0; i < vertexCount; i++)
-								vertices[i] += lastVertices[i] - setupVertices[i];
+								deform[i] += lastVertices[i] - setupVertices[i];
 						} else {
 							// Weighted deform offsets, no alpha.
 							for (int i = 0; i < vertexCount; i++)
-								vertices[i] += lastVertices[i];
+								deform[i] += lastVertices[i];
 						}
 					} else {
 						// Vertex positions or deform offsets, no alpha.
-						System.arraycopy(lastVertices, 0, vertices, 0, vertexCount);
+						System.arraycopy(lastVertices, 0, deform, 0, vertexCount);
 					}
 				} else {
 					switch (blend) {
@@ -1065,12 +1065,12 @@ public class Animation {
 							float[] setupVertices = vertexAttachment.getVertices();
 							for (int i = 0; i < vertexCount; i++) {
 								float setup = setupVertices[i];
-								vertices[i] = setup + (lastVertices[i] - setup) * alpha;
+								deform[i] = setup + (lastVertices[i] - setup) * alpha;
 							}
 						} else {
 							// Weighted deform offsets, with alpha.
 							for (int i = 0; i < vertexCount; i++)
-								vertices[i] = lastVertices[i] * alpha;
+								deform[i] = lastVertices[i] * alpha;
 						}
 						break;
 					}
@@ -1078,7 +1078,7 @@ public class Animation {
 					case replace:
 						// Vertex positions or deform offsets, with alpha.
 						for (int i = 0; i < vertexCount; i++)
-							vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
+							deform[i] += (lastVertices[i] - deform[i]) * alpha;
 						break;
 					case add:
 						VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
@@ -1086,11 +1086,11 @@ public class Animation {
 							// Unweighted vertex positions, no alpha.
 							float[] setupVertices = vertexAttachment.getVertices();
 							for (int i = 0; i < vertexCount; i++)
-								vertices[i] += (lastVertices[i] - setupVertices[i]) * alpha;
+								deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
 						} else {
 							// Weighted deform offsets, alpha.
 							for (int i = 0; i < vertexCount; i++)
-								vertices[i] += lastVertices[i] * alpha;
+								deform[i] += lastVertices[i] * alpha;
 						}
 					}
 				}
@@ -1112,20 +1112,20 @@ public class Animation {
 						float[] setupVertices = vertexAttachment.getVertices();
 						for (int i = 0; i < vertexCount; i++) {
 							float prev = prevVertices[i];
-							vertices[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
+							deform[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
 						}
 					} else {
 						// Weighted deform offsets, no alpha.
 						for (int i = 0; i < vertexCount; i++) {
 							float prev = prevVertices[i];
-							vertices[i] += prev + (nextVertices[i] - prev) * percent;
+							deform[i] += prev + (nextVertices[i] - prev) * percent;
 						}
 					}
 				} else {
 					// Vertex positions or deform offsets, no alpha.
 					for (int i = 0; i < vertexCount; i++) {
 						float prev = prevVertices[i];
-						vertices[i] = prev + (nextVertices[i] - prev) * percent;
+						deform[i] = prev + (nextVertices[i] - prev) * percent;
 					}
 				}
 			} else {
@@ -1137,13 +1137,13 @@ public class Animation {
 						float[] setupVertices = vertexAttachment.getVertices();
 						for (int i = 0; i < vertexCount; i++) {
 							float prev = prevVertices[i], setup = setupVertices[i];
-							vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+							deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
 						}
 					} else {
 						// Weighted deform offsets, with alpha.
 						for (int i = 0; i < vertexCount; i++) {
 							float prev = prevVertices[i];
-							vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
+							deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
 						}
 					}
 					break;
@@ -1153,7 +1153,7 @@ public class Animation {
 					// Vertex positions or deform offsets, with alpha.
 					for (int i = 0; i < vertexCount; i++) {
 						float prev = prevVertices[i];
-						vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+						deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
 					}
 					break;
 				case add:
@@ -1163,13 +1163,13 @@ public class Animation {
 						float[] setupVertices = vertexAttachment.getVertices();
 						for (int i = 0; i < vertexCount; i++) {
 							float prev = prevVertices[i];
-							vertices[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
+							deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
 						}
 					} else {
 						// Weighted deform offsets, with alpha.
 						for (int i = 0; i < vertexCount; i++) {
 							float prev = prevVertices[i];
-							vertices[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
+							deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
 						}
 					}
 				}
