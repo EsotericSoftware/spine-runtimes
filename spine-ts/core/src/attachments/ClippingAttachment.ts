@@ -33,7 +33,7 @@ module spine {
 		endSlot: SlotData;
 
 		// Nonessential.
-		color = new spine.Color(0.2275, 0.2275, 0.8078, 1); // ce3a3aff
+		color = new Color(0.2275, 0.2275, 0.8078, 1); // ce3a3aff
 
 		constructor (name: string) {
 			super(name);

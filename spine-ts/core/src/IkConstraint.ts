@@ -185,7 +185,7 @@ module spine {
 						break outer;
 					}
 				}
-				let minAngle = spine.MathUtils.PI, minX = l1 - a, minDist = minX * minX, minY = 0;
+				let minAngle = MathUtils.PI, minX = l1 - a, minDist = minX * minX, minY = 0;
 				let maxAngle = 0, maxX = l1 + a, maxDist = maxX * maxX, maxY = 0;
 				c = -a * l1 / (aa - bb);
 				if (c >= -1 && c <= 1) {
