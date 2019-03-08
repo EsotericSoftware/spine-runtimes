@@ -40,8 +40,8 @@ module spine {
 		}
 
 		loaded() {
-			var i = 0;
-			for (var v in this.assets) i++;
+			let i = 0;
+			for (let v in this.assets) i++;
 			return i;
 		}
 	}
@@ -58,7 +58,7 @@ module spine {
 		}
 
 		private queueAsset(clientId: string, textureLoader: (image: HTMLImageElement) => any, path: string): boolean {
-			var clientAssets = this.clientAssets[clientId];
+			let clientAssets = this.clientAssets[clientId];
 			if (clientAssets === null || clientAssets === undefined) {
 				clientAssets = new Assets(clientId);
 				this.clientAssets[clientId] = clientAssets;
@@ -127,17 +127,17 @@ module spine {
 
 		get (clientId: string, path: string) {
 			path = this.pathPrefix + path;
-			var clientAssets = this.clientAssets[clientId];
+			let clientAssets = this.clientAssets[clientId];
 			if (clientAssets === null || clientAssets === undefined) return true;
 			return clientAssets.assets[path];
 		}
 
 		private updateClientAssets(clientAssets: Assets): void {
-			for (var i = 0; i < clientAssets.toLoad.length; i++) {
-				var path = clientAssets.toLoad[i];
-				var asset = clientAssets.assets[path];
+			for (let i = 0; i < clientAssets.toLoad.length; i++) {
+				let path = clientAssets.toLoad[i];
+				let asset = clientAssets.assets[path];
 				if (asset === null || asset === undefined) {
-					var rawAsset = this.rawAssets[path];
+					let rawAsset = this.rawAssets[path];
 					if (rawAsset === null || rawAsset === undefined) continue;
 					if (rawAsset instanceof HTMLImageElement) {
 						clientAssets.assets[path] = clientAssets.textureLoader(<HTMLImageElement>rawAsset);
@@ -149,7 +149,7 @@ module spine {
 		}
 
 		isLoadingComplete (clientId: string): boolean {
-			var clientAssets = this.clientAssets[clientId];
+			let clientAssets = this.clientAssets[clientId];
 			if (clientAssets === null || clientAssets === undefined) return true;
 			this.updateClientAssets(clientAssets);
 			return clientAssets.toLoad.length == clientAssets.loaded();

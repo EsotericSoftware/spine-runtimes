@@ -155,7 +155,7 @@ module spine {
 		}
 
 		static cbrt (x: number) {
-			var y = Math.pow(Math.abs(x), 1/3);
+			let y = Math.pow(Math.abs(x), 1/3);
 			return x < 0 ? -y : y;
 		}
 
@@ -341,7 +341,7 @@ module spine {
 		private frameTime = 0;
 
 		update () {
-			var now = Date.now() / 1000;
+			let now = Date.now() / 1000;
 			this.delta = now - this.lastTime;
 			this.frameTime += this.delta;
 			this.totalTime += this.delta;

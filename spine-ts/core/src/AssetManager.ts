@@ -147,8 +147,8 @@ module spine {
 			this.toLoad++;
 
 			AssetManager.downloadText(path, (atlasData: string): void => {
-				var pagesLoaded: any = { count: 0 };
-				var atlasPages = new Array<string>();
+				let pagesLoaded: any = { count: 0 };
+				let atlasPages = new Array<string>();
 				try {
 					let atlas = new TextureAtlas(atlasData, (path: string) => {
 						atlasPages.push(parent + "/" + path);

@@ -233,7 +233,7 @@ module spine {
 			}
 
 			if (time >= frames[frames.length - RotateTimeline.ENTRIES]) { // Time is after last frame.
-				var r = frames[frames.length + RotateTimeline.PREV_ROTATION];
+				let r = frames[frames.length + RotateTimeline.PREV_ROTATION];
 				switch (blend) {
 				case MixBlend.setup:
 					bone.rotation = bone.data.rotation + r * alpha;
@@ -255,7 +255,7 @@ module spine {
 			let percent = this.getCurvePercent((frame >> 1) - 1,
 				1 - (time - frameTime) / (frames[frame + RotateTimeline.PREV_TIME] - frameTime));
 
-			r = frames[frame + RotateTimeline.ROTATION] - prevRotation;
+			let r = frames[frame + RotateTimeline.ROTATION] - prevRotation;
 			r = prevRotation + (r - (16384 - ((16384.499999999996 - r / 360) | 0)) * 360) * percent;
 			switch (blend) {
 			case MixBlend.setup:
@@ -728,7 +728,7 @@ module spine {
 		}
 	}
 
-	var zeros : ArrayLike<number> = null;
+	let zeros : ArrayLike<number> = null;
 
 	export class DeformTimeline extends CurveTimeline {
 		slotIndex: number;
@@ -779,7 +779,7 @@ module spine {
 					let vertices: Array<number> = Utils.setArraySize(verticesArray, vertexCount);
 					if (vertexAttachment.bones == null) {
 						// Unweighted vertex positions.
-						var setupVertices = vertexAttachment.vertices;
+						let setupVertices = vertexAttachment.vertices;
 						for (var i = 0; i < vertexCount; i++)
 							vertices[i] += (setupVertices[i] - vertices[i]) * alpha;
 					} else {
