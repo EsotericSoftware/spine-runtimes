@@ -89,23 +89,25 @@ void USpineSkeletonAnimationComponent::BeginPlay() {
 void USpineSkeletonAnimationComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
 	Super::Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	InternalTick(DeltaTime);
+	InternalTick(DeltaTime, true, TickType == LEVELTICK_ViewportsOnly);
 }
 
-void USpineSkeletonAnimationComponent::InternalTick(float DeltaTime, bool CallDelegates) {
+void USpineSkeletonAnimationComponent::InternalTick(float DeltaTime, bool CallDelegates, bool Preview) {
 	CheckState();
 
 	if (state && bAutoPlaying) {
-		if (lastPreviewAnimation != PreviewAnimation) {
-			if (PreviewAnimation != "") SetAnimation(0, PreviewAnimation, true);
-			else SetEmptyAnimation(0, 0);
-			lastPreviewAnimation = PreviewAnimation;
-		}
+		if (Preview) {
+			if (lastPreviewAnimation != PreviewAnimation) {
+				if (PreviewAnimation != "") SetAnimation(0, PreviewAnimation, true);
+				else SetEmptyAnimation(0, 0);
+				lastPreviewAnimation = PreviewAnimation;
+			}
 
-		if (lastPreviewSkin != PreviewSkin) {
-			if (PreviewSkin != "") SetSkin(PreviewSkin);
-			else SetSkin("default");
-			lastPreviewSkin = PreviewSkin;
+			if (lastPreviewSkin != PreviewSkin) {
+				if (PreviewSkin != "") SetSkin(PreviewSkin);
+				else SetSkin("default");
+				lastPreviewSkin = PreviewSkin;
+			}
 		}
 		state->update(DeltaTime);
 		state->apply(*skeleton);
