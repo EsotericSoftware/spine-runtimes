@@ -255,7 +255,7 @@ module spine {
 					else {
 						// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
 						Utils.webkit602BugfixHelper(alpha, blend);
-						if (timelineBlend = MixBlend.setup) {
+						if (timelineBlend == MixBlend.setup) {
 							if (timeline instanceof AttachmentTimeline) {
 								if (attachments) direction = MixDirection.out;
 							} else if (timeline instanceof DrawOrderTimeline) {
