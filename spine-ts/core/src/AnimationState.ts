@@ -212,7 +212,7 @@ module spine {
 			let timelines = from.animation.timelines;
 			let alphaHold = from.alpha * to.interruptAlpha, alphaMix = alphaHold * (1 - mix);
 			if (blend == MixBlend.add) {
-				for (var i = 0; i < timelineCount; i++)
+				for (let i = 0; i < timelineCount; i++)
 					timelines[i].apply(skeleton, animationLast, animationTime, events, alphaMix, blend, MixDirection.out);
 			} else {
 				let timelineMode = from.timelineMode;
@@ -223,11 +223,11 @@ module spine {
 				let timelinesRotation = from.timelinesRotation;
 
 				from.totalAlpha = 0;
-				for (var i = 0; i < timelineCount; i++) {
+				for (let i = 0; i < timelineCount; i++) {
 					let timeline = timelines[i];
-					var direction = MixDirection.out;
-					var timelineBlend: MixBlend;
-					var alpha = 0;
+					let direction = MixDirection.out;
+					let timelineBlend: MixBlend;
+					let alpha = 0;
 					switch (timelineMode[i]) {
 					case AnimationState.SUBSEQUENT:
 						if (!attachments && timeline instanceof AttachmentTimeline) continue;
@@ -364,7 +364,7 @@ module spine {
 			}
 
 			// Queue complete if completed a loop iteration or the animation.
-			var complete = false;
+			let complete = false;
 			if (entry.loop)
 				complete = duration == 0 || trackLastWrapped > entry.trackTime % duration;
 			else
@@ -577,7 +577,7 @@ module spine {
 
 			this.propertyIDs.clear();
 
-			for (var i = 0, n = this.tracks.length; i < n; i++) {
+			for (let i = 0, n = this.tracks.length; i < n; i++) {
 				let entry = this.tracks[i];
 				if (entry == null) continue;
 				while (entry.mixingFrom != null)
@@ -608,7 +608,7 @@ module spine {
 			}
 
 			outer:
-			for (var i = 0; i < timelinesCount; i++) {
+			for (let i = 0; i < timelinesCount; i++) {
 				let id = timelines[i].getPropertyId();
 				if (!propertyIDs.add(id))
 					timelineMode[i] = AnimationState.SUBSEQUENT;
@@ -631,7 +631,7 @@ module spine {
 
 		hasTimeline (entry: TrackEntry, id: number) : boolean {
 			let timelines = entry.animation.timelines;
-			for (var i = 0, n = timelines.length; i < n; i++)
+			for (let i = 0, n = timelines.length; i < n; i++)
 				if (timelines[i].getPropertyId() == id) return true;
 			return false;
 		}

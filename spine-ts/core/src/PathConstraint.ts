@@ -78,7 +78,7 @@ module spine {
 			let spacing = this.spacing;
 			if (scale || !percentSpacing) {
 				if (scale) lengths = Utils.setArraySize(this.lengths, boneCount);
-				var lengthSpacing = data.spacingMode == SpacingMode.Length;
+				let lengthSpacing = data.spacingMode == SpacingMode.Length;
 				for (let i = 0, n = spacesCount - 1; i < n;) {
 					let bone = bones[i];
 					let setupLength = bone.data.length;
@@ -87,8 +87,8 @@ module spine {
 						spaces[++i] = 0;
 					} else if (percentSpacing) {
 						if (scale) {
-							var x = setupLength * bone.a, y = setupLength * bone.c;
-							var length = Math.sqrt(x * x + y * y);
+							let x = setupLength * bone.a, y = setupLength * bone.c;
+							let length = Math.sqrt(x * x + y * y);
 							lengths[i] = length;
 						}
 						spaces[++i] = spacing;
