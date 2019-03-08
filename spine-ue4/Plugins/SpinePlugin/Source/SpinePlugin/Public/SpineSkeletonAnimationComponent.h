@@ -260,10 +260,10 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="Components|Spine|Animation")
 	FSpineAnimationDisposeDelegate AnimationDispose;
 
-	UPROPERTY(Transient, EditAnywhere, Category=Spine)
+	UPROPERTY(EditAnywhere, Category=Spine)
 	FString PreviewAnimation;
 
-	UPROPERTY(Transient, EditAnywhere, Category=Spine)
+	UPROPERTY(EditAnywhere, Category=Spine)
 	FString PreviewSkin;
 	
 	// used in C event callback. Needs to be public as we can't call
@@ -271,7 +271,7 @@ public:
 	void GCTrackEntry(UTrackEntry* entry) { trackEntries.Remove(entry); }
 protected:
 	virtual void CheckState () override;
-	virtual void InternalTick(float DeltaTime, bool CallDelegates = true) override;
+	virtual void InternalTick(float DeltaTime, bool CallDelegates = true, bool Preview = false) override;
 	virtual void DisposeState () override;
 	
 	spine::AnimationState* state;

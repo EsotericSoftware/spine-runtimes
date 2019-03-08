@@ -200,17 +200,17 @@ var spine;
 				return;
 			}
 			if (time >= frames[frames.length - RotateTimeline.ENTRIES]) {
-				var r = frames[frames.length + RotateTimeline.PREV_ROTATION];
+				var r_2 = frames[frames.length + RotateTimeline.PREV_ROTATION];
 				switch (blend) {
 					case MixBlend.setup:
-						bone.rotation = bone.data.rotation + r * alpha;
+						bone.rotation = bone.data.rotation + r_2 * alpha;
 						break;
 					case MixBlend.first:
 					case MixBlend.replace:
-						r += bone.data.rotation - bone.rotation;
-						r -= (16384 - ((16384.499999999996 - r / 360) | 0)) * 360;
+						r_2 += bone.data.rotation - bone.rotation;
+						r_2 -= (16384 - ((16384.499999999996 - r_2 / 360) | 0)) * 360;
 					case MixBlend.add:
-						bone.rotation += r * alpha;
+						bone.rotation += r_2 * alpha;
 				}
 				return;
 			}
@@ -218,7 +218,7 @@ var spine;
 			var prevRotation = frames[frame + RotateTimeline.PREV_ROTATION];
 			var frameTime = frames[frame];
 			var percent = this.getCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + RotateTimeline.PREV_TIME] - frameTime));
-			r = frames[frame + RotateTimeline.ROTATION] - prevRotation;
+			var r = frames[frame + RotateTimeline.ROTATION] - prevRotation;
 			r = prevRotation + (r - (16384 - ((16384.499999999996 - r / 360) | 0)) * 360) * percent;
 			switch (blend) {
 				case MixBlend.setup:
@@ -738,9 +738,9 @@ var spine;
 					if (blend == MixBlend.add) {
 						var vertexAttachment = slotAttachment;
 						if (vertexAttachment.bones == null) {
-							var setupVertices_1 = vertexAttachment.vertices;
+							var setupVertices = vertexAttachment.vertices;
 							for (var i_1 = 0; i_1 < vertexCount; i_1++) {
-								vertices[i_1] += lastVertices[i_1] - setupVertices_1[i_1];
+								vertices[i_1] += lastVertices[i_1] - setupVertices[i_1];
 							}
 						}
 						else {
@@ -757,9 +757,9 @@ var spine;
 						case MixBlend.setup: {
 							var vertexAttachment_1 = slotAttachment;
 							if (vertexAttachment_1.bones == null) {
-								var setupVertices_2 = vertexAttachment_1.vertices;
+								var setupVertices = vertexAttachment_1.vertices;
 								for (var i_3 = 0; i_3 < vertexCount; i_3++) {
-									var setup = setupVertices_2[i_3];
+									var setup = setupVertices[i_3];
 									vertices[i_3] = setup + (lastVertices[i_3] - setup) * alpha;
 								}
 							}
@@ -776,9 +776,9 @@ var spine;
 						case MixBlend.add:
 							var vertexAttachment = slotAttachment;
 							if (vertexAttachment.bones == null) {
-								var setupVertices_3 = vertexAttachment.vertices;
+								var setupVertices = vertexAttachment.vertices;
 								for (var i_6 = 0; i_6 < vertexCount; i_6++) {
-									vertices[i_6] += (lastVertices[i_6] - setupVertices_3[i_6]) * alpha;
+									vertices[i_6] += (lastVertices[i_6] - setupVertices[i_6]) * alpha;
 								}
 							}
 							else {
@@ -798,10 +798,10 @@ var spine;
 				if (blend == MixBlend.add) {
 					var vertexAttachment = slotAttachment;
 					if (vertexAttachment.bones == null) {
-						var setupVertices_4 = vertexAttachment.vertices;
+						var setupVertices = vertexAttachment.vertices;
 						for (var i_8 = 0; i_8 < vertexCount; i_8++) {
 							var prev = prevVertices[i_8];
-							vertices[i_8] += prev + (nextVertices[i_8] - prev) * percent - setupVertices_4[i_8];
+							vertices[i_8] += prev + (nextVertices[i_8] - prev) * percent - setupVertices[i_8];
 						}
 					}
 					else {
@@ -823,9 +823,9 @@ var spine;
 					case MixBlend.setup: {
 						var vertexAttachment_2 = slotAttachment;
 						if (vertexAttachment_2.bones == null) {
-							var setupVertices_5 = vertexAttachment_2.vertices;
+							var setupVertices = vertexAttachment_2.vertices;
 							for (var i_11 = 0; i_11 < vertexCount; i_11++) {
-								var prev = prevVertices[i_11], setup = setupVertices_5[i_11];
+								var prev = prevVertices[i_11], setup = setupVertices[i_11];
 								vertices[i_11] = setup + (prev + (nextVertices[i_11] - prev) * percent - setup) * alpha;
 							}
 						}
@@ -847,10 +847,10 @@ var spine;
 					case MixBlend.add:
 						var vertexAttachment = slotAttachment;
 						if (vertexAttachment.bones == null) {
-							var setupVertices_6 = vertexAttachment.vertices;
+							var setupVertices = vertexAttachment.vertices;
 							for (var i_14 = 0; i_14 < vertexCount; i_14++) {
 								var prev = prevVertices[i_14];
-								vertices[i_14] += (prev + (nextVertices[i_14] - prev) * percent - setupVertices_6[i_14]) * alpha;
+								vertices[i_14] += (prev + (nextVertices[i_14] - prev) * percent - setupVertices[i_14]) * alpha;
 							}
 						}
 						else {
@@ -1471,7 +1471,7 @@ var spine;
 				for (var i = 0; i < timelineCount; i++) {
 					var timeline = timelines[i];
 					var direction = spine.MixDirection.out;
-					var timelineBlend;
+					var timelineBlend = void 0;
 					var alpha = 0;
 					switch (timelineMode[i]) {
 						case AnimationState.SUBSEQUENT:
@@ -1817,9 +1817,9 @@ var spine;
 			var timelineDipMix = spine.Utils.setArraySize(entry.timelineHoldMix, timelinesCount);
 			var propertyIDs = this.propertyIDs;
 			if (to != null && to.holdPrevious) {
-				for (var i_16 = 0; i_16 < timelinesCount; i_16++) {
-					propertyIDs.add(timelines[i_16].getPropertyId());
-					timelineMode[i_16] = AnimationState.HOLD;
+				for (var i = 0; i < timelinesCount; i++) {
+					propertyIDs.add(timelines[i].getPropertyId());
+					timelineMode[i] = AnimationState.HOLD;
 				}
 				return;
 			}
@@ -2957,17 +2957,17 @@ var spine;
 					else if (percentSpacing) {
 						if (scale) {
 							var x = setupLength * bone.a, y = setupLength * bone.c;
-							var length = Math.sqrt(x * x + y * y);
-							lengths[i] = length;
+							var length_1 = Math.sqrt(x * x + y * y);
+							lengths[i] = length_1;
 						}
 						spaces[++i] = spacing;
 					}
 					else {
-						var x_1 = setupLength * bone.a, y_1 = setupLength * bone.c;
-						var length_1 = Math.sqrt(x_1 * x_1 + y_1 * y_1);
+						var x = setupLength * bone.a, y = setupLength * bone.c;
+						var length_2 = Math.sqrt(x * x + y * y);
 						if (scale)
-							lengths[i] = length_1;
-						spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length_1 / setupLength;
+							lengths[i] = length_2;
+						spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length_2 / setupLength;
 					}
 				}
 			}
@@ -2989,17 +2989,17 @@ var spine;
 				var bone = bones[i];
 				bone.worldX += (boneX - bone.worldX) * translateMix;
 				bone.worldY += (boneY - bone.worldY) * translateMix;
-				var x_2 = positions[p], y_2 = positions[p + 1], dx = x_2 - boneX, dy = y_2 - boneY;
+				var x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
 				if (scale) {
-					var length_2 = lengths[i];
-					if (length_2 != 0) {
-						var s = (Math.sqrt(dx * dx + dy * dy) / length_2 - 1) * rotateMix + 1;
+					var length_3 = lengths[i];
+					if (length_3 != 0) {
+						var s = (Math.sqrt(dx * dx + dy * dy) / length_3 - 1) * rotateMix + 1;
 						bone.a *= s;
 						bone.c *= s;
 					}
 				}
-				boneX = x_2;
-				boneY = y_2;
+				boneX = x;
+				boneY = y;
 				if (rotate) {
 					var a = bone.a, b = bone.b, c = bone.c, d = bone.d, r = 0, cos = 0, sin = 0;
 					if (tangents)
@@ -3012,9 +3012,9 @@ var spine;
 					if (tip) {
 						cos = Math.cos(r);
 						sin = Math.sin(r);
-						var length_3 = bone.data.length;
-						boneX += (length_3 * (cos * a - sin * c) - dx) * rotateMix;
-						boneY += (length_3 * (sin * a + cos * c) - dy) * rotateMix;
+						var length_4 = bone.data.length;
+						boneX += (length_4 * (cos * a - sin * c) - dx) * rotateMix;
+						boneY += (length_4 * (sin * a + cos * c) - dy) * rotateMix;
 					}
 					else {
 						r += offsetRotation;
@@ -3078,14 +3078,14 @@ var spine;
 						continue;
 					}
 					for (;; curve++) {
-						var length_4 = lengths[curve];
-						if (p > length_4)
+						var length_5 = lengths[curve];
+						if (p > length_5)
 							continue;
 						if (curve == 0)
-							p /= length_4;
+							p /= length_5;
 						else {
 							var prev = lengths[curve - 1];
-							p = (p - prev) / (length_4 - prev);
+							p = (p - prev) / (length_5 - prev);
 						}
 						break;
 					}
@@ -3180,14 +3180,14 @@ var spine;
 					continue;
 				}
 				for (;; curve++) {
-					var length_5 = curves[curve];
-					if (p > length_5)
+					var length_6 = curves[curve];
+					if (p > length_6)
 						continue;
 					if (curve == 0)
-						p /= length_5;
+						p /= length_6;
 					else {
 						var prev = curves[curve - 1];
-						p = (p - prev) / (length_5 - prev);
+						p = (p - prev) / (length_6 - prev);
 					}
 					break;
 				}
@@ -3232,14 +3232,14 @@ var spine;
 				}
 				p *= curveLength;
 				for (;; segment++) {
-					var length_6 = segments[segment];
-					if (p > length_6)
+					var length_7 = segments[segment];
+					if (p > length_7)
 						continue;
 					if (segment == 0)
-						p /= length_6;
+						p /= length_7;
 					else {
 						var prev = segments[segment - 1];
-						p = segment + (p - prev) / (length_6 - prev);
+						p = segment + (p - prev) / (length_7 - prev);
 					}
 					break;
 				}
@@ -5398,7 +5398,7 @@ var spine;
 		FakeTexture.prototype.setWraps = function (uWrap, vWrap) { };
 		FakeTexture.prototype.dispose = function () { };
 		return FakeTexture;
-	}(spine.Texture));
+	}(Texture));
 	spine.FakeTexture = FakeTexture;
 })(spine || (spine = {}));
 var spine;
@@ -7077,8 +7077,8 @@ var spine;
 						break;
 					}
 					var listeners = _this.listeners;
-					for (var i_17 = 0; i_17 < listeners.length; i_17++) {
-						listeners[i_17].down(_this.currTouch.x, _this.currTouch.y);
+					for (var i_16 = 0; i_16 < listeners.length; i_16++) {
+						listeners[i_16].down(_this.currTouch.x, _this.currTouch.y);
 					}
 					console.log("Start " + _this.currTouch.x + ", " + _this.currTouch.y);
 					_this.lastX = _this.currTouch.x;
@@ -7087,6 +7087,29 @@ var spine;
 					ev.preventDefault();
 				}, false);
 				element.addEventListener("touchend", function (ev) {
+					var touches = ev.changedTouches;
+					for (var i = 0; i < touches.length; i++) {
+						var touch = touches[i];
+						if (_this.currTouch.identifier === touch.identifier) {
+							var rect = element.getBoundingClientRect();
+							var x = _this.currTouch.x = touch.clientX - rect.left;
+							var y = _this.currTouch.y = touch.clientY - rect.top;
+							_this.touchesPool.free(_this.currTouch);
+							var listeners = _this.listeners;
+							for (var i_17 = 0; i_17 < listeners.length; i_17++) {
+								listeners[i_17].up(x, y);
+							}
+							console.log("End " + x + ", " + y);
+							_this.lastX = x;
+							_this.lastY = y;
+							_this.buttonDown = false;
+							_this.currTouch = null;
+							break;
+						}
+					}
+					ev.preventDefault();
+				}, false);
+				element.addEventListener("touchcancel", function (ev) {
 					var touches = ev.changedTouches;
 					for (var i = 0; i < touches.length; i++) {
 						var touch = touches[i];
@@ -7109,29 +7132,6 @@ var spine;
 					}
 					ev.preventDefault();
 				}, false);
-				element.addEventListener("touchcancel", function (ev) {
-					var touches = ev.changedTouches;
-					for (var i = 0; i < touches.length; i++) {
-						var touch = touches[i];
-						if (_this.currTouch.identifier === touch.identifier) {
-							var rect = element.getBoundingClientRect();
-							var x = _this.currTouch.x = touch.clientX - rect.left;
-							var y = _this.currTouch.y = touch.clientY - rect.top;
-							_this.touchesPool.free(_this.currTouch);
-							var listeners = _this.listeners;
-							for (var i_19 = 0; i_19 < listeners.length; i_19++) {
-								listeners[i_19].up(x, y);
-							}
-							console.log("End " + x + ", " + y);
-							_this.lastX = x;
-							_this.lastY = y;
-							_this.buttonDown = false;
-							_this.currTouch = null;
-							break;
-						}
-					}
-					ev.preventDefault();
-				}, false);
 				element.addEventListener("touchmove", function (ev) {
 					if (_this.currTouch == null)
 						return;
@@ -7143,8 +7143,8 @@ var spine;
 							var x = touch.clientX - rect.left;
 							var y = touch.clientY - rect.top;
 							var listeners = _this.listeners;
-							for (var i_20 = 0; i_20 < listeners.length; i_20++) {
-								listeners[i_20].dragged(x, y);
+							for (var i_19 = 0; i_19 < listeners.length; i_19++) {
+								listeners[i_19].dragged(x, y);
 							}
 							console.log("Drag " + x + ", " + y);
 							_this.lastX = _this.currTouch.x = x;
@@ -8994,11 +8994,11 @@ var spine;
 						var nn = clip.worldVerticesLength;
 						var world = this.temp = spine.Utils.setArraySize(this.temp, nn, 0);
 						clip.computeWorldVertices(slot, 0, nn, world, 0, 2);
-						for (var i_21 = 0, n_2 = world.length; i_21 < n_2; i_21 += 2) {
-							var x = world[i_21];
-							var y = world[i_21 + 1];
-							var x2 = world[(i_21 + 2) % world.length];
-							var y2 = world[(i_21 + 3) % world.length];
+						for (var i_20 = 0, n_2 = world.length; i_20 < n_2; i_20 += 2) {
+							var x = world[i_20];
+							var y = world[i_20 + 1];
+							var x2 = world[(i_20 + 2) % world.length];
+							var y2 = world[(i_20 + 3) % world.length];
 							shapes.line(x, y, x2, y2);
 						}
 					}

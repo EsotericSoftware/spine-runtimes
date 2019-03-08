@@ -147,15 +147,15 @@ module spine {
 			this.toLoad++;
 
 			AssetManager.downloadText(path, (atlasData: string): void => {
-				var pagesLoaded: any = { count: 0 };
-				var atlasPages = new Array<string>();
+				let pagesLoaded: any = { count: 0 };
+				let atlasPages = new Array<string>();
 				try {
-					let atlas = new spine.TextureAtlas(atlasData, (path: string) => {
+					let atlas = new TextureAtlas(atlasData, (path: string) => {
 						atlasPages.push(parent + "/" + path);
 						let image = document.createElement("img") as HTMLImageElement;
 						image.width = 16;
 						image.height = 16;
-						return new spine.FakeTexture(image);
+						return new FakeTexture(image);
 					});
 				} catch (e) {
 					let ex = e as Error;
@@ -174,7 +174,7 @@ module spine {
 						if (pagesLoaded.count == atlasPages.length) {
 							if (!pageLoadError) {
 								try {
-									let atlas = new spine.TextureAtlas(atlasData, (path: string) => {
+									let atlas = new TextureAtlas(atlasData, (path: string) => {
 										return this.get(parent + "/" + path);
 									});
 									this.assets[path] = atlas;

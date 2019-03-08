@@ -844,9 +844,9 @@ declare module spine {
 		originalWidth: number;
 		originalHeight: number;
 	}
-	class FakeTexture extends spine.Texture {
-		setFilters(minFilter: spine.TextureFilter, magFilter: spine.TextureFilter): void;
-		setWraps(uWrap: spine.TextureWrap, vWrap: spine.TextureWrap): void;
+	class FakeTexture extends Texture {
+		setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
+		setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
 		dispose(): void;
 	}
 }

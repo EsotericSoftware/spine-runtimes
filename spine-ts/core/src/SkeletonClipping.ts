@@ -45,7 +45,7 @@ module spine {
 			this.clipAttachment = clip;
 
 			let n = clip.worldVerticesLength;
-			let vertices = spine.Utils.setArraySize(this.clippingPolygon, n);
+			let vertices = Utils.setArraySize(this.clippingPolygon, n);
 			clip.computeWorldVertices(slot, 0, n, vertices, 0, 2);
 			let clippingPolygon = this.clippingPolygon;
 			SkeletonClipping.makeClockwise(clippingPolygon);
@@ -113,7 +113,7 @@ module spine {
 
 						let clipOutputCount = clipOutputLength >> 1;
 						let clipOutputItems = this.clipOutput;
-						let clippedVerticesItems = spine.Utils.setArraySize(clippedVertices, s + clipOutputCount * vertexSize);
+						let clippedVerticesItems = Utils.setArraySize(clippedVertices, s + clipOutputCount * vertexSize);
 						for (let ii = 0; ii < clipOutputLength; ii += 2) {
 							let x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
 							clippedVerticesItems[s] = x;
@@ -138,7 +138,7 @@ module spine {
 						}
 
 						s = clippedTriangles.length;
-						let clippedTrianglesItems = spine.Utils.setArraySize(clippedTriangles, s + 3 * (clipOutputCount - 2));
+						let clippedTrianglesItems = Utils.setArraySize(clippedTriangles, s + 3 * (clipOutputCount - 2));
 						clipOutputCount--;
 						for (let ii = 1; ii < clipOutputCount; ii++) {
 							clippedTrianglesItems[s] = index;
@@ -149,7 +149,7 @@ module spine {
 						index += clipOutputCount + 1;
 
 					} else {
-						let clippedVerticesItems = spine.Utils.setArraySize(clippedVertices, s + 3 * vertexSize);
+						let clippedVerticesItems = Utils.setArraySize(clippedVertices, s + 3 * vertexSize);
 						clippedVerticesItems[s] = x1;
 						clippedVerticesItems[s + 1] = y1;
 						clippedVerticesItems[s + 2] = light.r;
@@ -213,7 +213,7 @@ module spine {
 						}
 
 						s = clippedTriangles.length;
-						let clippedTrianglesItems = spine.Utils.setArraySize(clippedTriangles, s + 3);
+						let clippedTrianglesItems = Utils.setArraySize(clippedTriangles, s + 3);
 						clippedTrianglesItems[s] = index;
 						clippedTrianglesItems[s + 1] = (index + 1);
 						clippedTrianglesItems[s + 2] = (index + 2);

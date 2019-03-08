@@ -93,9 +93,9 @@ module spine {
 		originalWidth = 0; originalHeight = 0;
 	}
 
-	export class FakeTexture extends spine.Texture {
-		setFilters(minFilter: spine.TextureFilter, magFilter: spine.TextureFilter) { }
-		setWraps(uWrap: spine.TextureWrap, vWrap: spine.TextureWrap) { }
+	export class FakeTexture extends Texture {
+		setFilters(minFilter: TextureFilter, magFilter: TextureFilter) { }
+		setWraps(uWrap: TextureWrap, vWrap: TextureWrap) { }
 		dispose() { }
 	}
 }
