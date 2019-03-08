@@ -133,7 +133,7 @@ public:
 	
 protected:
 	virtual void CheckState ();
-	virtual void InternalTick(float DeltaTime, bool CallDelegates = true);
+	virtual void InternalTick(float DeltaTime, bool CallDelegates = true, bool Preview = false);
 	virtual void DisposeState ();
 
 	spine::Skeleton* skeleton;

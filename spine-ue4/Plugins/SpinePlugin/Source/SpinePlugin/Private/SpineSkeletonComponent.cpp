@@ -258,7 +258,7 @@ void USpineSkeletonComponent::TickComponent (float DeltaTime, ELevelTick TickTyp
 	InternalTick(DeltaTime);
 }
 
-void USpineSkeletonComponent::InternalTick(float DeltaTime, bool CallDelegates) {
+void USpineSkeletonComponent::InternalTick(float DeltaTime, bool CallDelegates, bool Preview) {
 	CheckState();
 
 	if (skeleton) {
