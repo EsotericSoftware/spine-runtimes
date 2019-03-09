@@ -712,10 +712,10 @@ public class AnimationState {
 		propertyIDs.clear(2048);
 		for (int i = tracks.size - 1; i >= 0; i--) {
 			TrackEntry entry = tracks.get(i);
-			do {
+			while (entry != null) {
 				computeNotLast(entry);
 				entry = entry.mixingFrom;
-			} while (entry != null);
+			}
 		}
 	}
 

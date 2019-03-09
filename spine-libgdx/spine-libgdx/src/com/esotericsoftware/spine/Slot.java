@@ -102,8 +102,7 @@ public class Slot {
 		return attachment;
 	}
 
-	/** Sets the slot's attachment and, if the attachment changed, resets {@link #attachmentTime} and clears
-	 * {@link #attachmentVertices}.
+	/** Sets the slot's attachment and, if the attachment changed, resets {@link #attachmentTime} and clears {@link #deform}.
 	 * @param attachment May be null. */
 	public void setAttachment (Attachment attachment) {
 		if (this.attachment == attachment) return;

@@ -50,8 +50,8 @@ public class VertexAttachment extends Attachment {
 		super(name);
 	}
 
-	/** Transforms the attachment's local {@link #getVertices()} to world coordinates. If the slot has {@link Slot#getDeform()},
-	 * they are used to deform the vertices.
+	/** Transforms the attachment's local {@link #getVertices()} to world coordinates. If the slot's {@link Slot#getDeform()} is
+	 * not empty, it is used to deform the vertices.
 	 * <p>
 	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide.
