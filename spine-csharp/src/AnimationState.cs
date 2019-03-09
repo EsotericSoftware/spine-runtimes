@@ -54,11 +54,15 @@ namespace Spine {
 		public ExposedList<TrackEntry> Tracks { get { return tracks; } }
 		public float TimeScale { get { return timeScale; } set { timeScale = value; } }
 
-		public delegate void TrackEntryDelegate(TrackEntry trackEntry);
-		public event TrackEntryDelegate Start, Interrupt, End, Dispose, Complete;
+		public delegate void TrackEntryDelegate (TrackEntry trackEntry);
+		public TrackEntryDelegate Start { get; set; }
+		public TrackEntryDelegate Interrupt { get; set; }
+		public TrackEntryDelegate End { get; set; }
+		public TrackEntryDelegate Dispose { get; set; }
+		public TrackEntryDelegate Complete { get; set; }
 
-		public delegate void TrackEntryEventDelegate(TrackEntry trackEntry, Event e);
-		public event TrackEntryEventDelegate Event;
+		public delegate void TrackEntryEventDelegate (TrackEntry trackEntry, Event e);
+		public TrackEntryEventDelegate Event { get; set; }
 
 		public AnimationState(AnimationStateData data) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
