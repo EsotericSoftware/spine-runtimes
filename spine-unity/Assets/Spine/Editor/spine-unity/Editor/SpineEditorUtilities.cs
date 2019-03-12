@@ -277,10 +277,12 @@ namespace Spine.Unity.Editor {
 				string materialPath = texturePath.Substring(0, extensionPos) + "_Material.mat";
 				Material material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
 				if (material != null) {
-					int straightAlphaValue = material.GetInt(STRAIGHT_ALPHA_PARAM_ID);
-					if (straightAlphaValue == 0) {
-						string materialName = System.IO.Path.GetFileName(materialPath);
-						Debug.LogWarningFormat("`{0}` and material `{1}` : Incorrect Texture / Material Settings found: It is strongly recommended to disable `Alpha Is Transparency` on `Premultiply alpha` textures.\nAssuming `Premultiply alpha` texture because `Straight Alpha Texture` is disabled at material). (You can disable this warning in `Edit - Preferences - Spine`)", texturePath, materialName);
+					if (material.HasProperty(STRAIGHT_ALPHA_PARAM_ID)) {
+						int straightAlphaValue = material.GetInt(STRAIGHT_ALPHA_PARAM_ID);
+						if (straightAlphaValue == 0) {
+							string materialName = System.IO.Path.GetFileName(materialPath);
+							Debug.LogWarningFormat("`{0}` and material `{1}` : Incorrect Texture / Material Settings found: It is strongly recommended to disable `Alpha Is Transparency` on `Premultiply alpha` textures.\nAssuming `Premultiply alpha` texture because `Straight Alpha Texture` is disabled at material). (You can disable this warning in `Edit - Preferences - Spine`)", texturePath, materialName);
+						}
 					}
 				}
 			}
