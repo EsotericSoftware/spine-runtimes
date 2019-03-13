@@ -58,7 +58,7 @@ TrackEntry::TrackEntry() : _animation(NULL), _next(NULL), _mixingFrom(NULL), _mi
 						   _animationEnd(0), _animationLast(0), _nextAnimationLast(0), _delay(0), _trackTime(0),
 						   _trackLast(0), _nextTrackLast(0), _trackEnd(0), _timeScale(1.0f), _alpha(0), _mixTime(0),
 						   _mixDuration(0), _interruptAlpha(0), _totalAlpha(0), _mixBlend(MixBlend_Replace),
-						   _listener(dummyOnAnimationEventFunc) {
+						   _listener(dummyOnAnimationEventFunc), _listenerObj(NULL) {
 }
 
 TrackEntry::~TrackEntry() { }
@@ -165,17 +165,24 @@ void TrackEntry::setListener(AnimationStateListener inValue) {
 	_listener = inValue;
 }
 
+void TrackEntry::setListener(AnimationStateListenerClass* inValue) {
+	_listenerObj = inValue;
+}
+
 void TrackEntry::reset() {
 	_animation = NULL;
 	_next = NULL;
 	_mixingFrom = NULL;
 	_mixingTo = NULL;
 
+	setRendererObject(NULL);
+
 	_timelineMode.clear();
 	_timelineHoldMix.clear();
 	_timelinesRotation.clear();
 
 	_listener = dummyOnAnimationEventFunc;
+	_listenerObj = NULL;
 }
 
 EventQueueEntry::EventQueueEntry(EventType eventType, TrackEntry *trackEntry, Event *event) :
@@ -245,22 +252,48 @@ void EventQueue::drain() {
 			case EventType_Start:
 			case EventType_Interrupt:
 			case EventType_Complete:
-				trackEntry->_listener(&state, queueEntry->_type, trackEntry, NULL);
-				state._listener(&state, queueEntry->_type, trackEntry, NULL);
+				if (NULL == trackEntry->_listener)
+					trackEntry->_listener(&state, queueEntry->_type, trackEntry, NULL);
+				else
+					trackEntry->_listenerObj->callback(&state, queueEntry->_type, trackEntry, NULL);
+				if (NULL == state._listenerObj)
+					state._listener(&state, queueEntry->_type, trackEntry, NULL);
+				else
+					state._listenerObj->callback(&state, queueEntry->_type, trackEntry, NULL);
 				break;
 			case EventType_End:
-				trackEntry->_listener(&state, queueEntry->_type, trackEntry, NULL);
-				state._listener(&state, queueEntry->_type, trackEntry, NULL);
+				if (NULL == trackEntry->_listener)
+					trackEntry->_listener(&state, queueEntry->_type, trackEntry, NULL);
+				else
+					trackEntry->_listenerObj->callback(&state, queueEntry->_type, trackEntry, NULL);
+				if (NULL == state._listenerObj)
+					state._listener(&state, queueEntry->_type, trackEntry, NULL);
+				else
+					state._listenerObj->callback(&state, queueEntry->_type, trackEntry, NULL);
 				/* Yes, we want to fall through here */
 			case EventType_Dispose:
-				trackEntry->_listener(&state, EventType_Dispose, trackEntry, NULL);
-				state._listener(&state, EventType_Dispose, trackEntry, NULL);
+
+				if (NULL == trackEntry->_listener)
+					trackEntry->_listener(&state, EventType_Dispose, trackEntry, NULL);
+				else
+					trackEntry->_listenerObj->callback(&state, EventType_Dispose, trackEntry, NULL);
+				if (NULL == state._listenerObj)
+					state._listener(&state, EventType_Dispose, trackEntry, NULL);
+				else
+					state._listenerObj->callback(&state, EventType_Dispose, trackEntry, NULL);
+
 				trackEntry->reset();
 				_trackEntryPool.free(trackEntry);
 				break;
 			case EventType_Event:
-				trackEntry->_listener(&state, queueEntry->_type, trackEntry, queueEntry->_event);
-				state._listener(&state, queueEntry->_type, trackEntry, queueEntry->_event);
+				if (NULL == trackEntry->_listener)
+					trackEntry->_listener(&state, queueEntry->_type, trackEntry, queueEntry->_event);
+				else
+					trackEntry->_listenerObj->callback(&state, queueEntry->_type, trackEntry, queueEntry->_event);
+				if (NULL == state._listenerObj)
+					state._listener(&state, queueEntry->_type, trackEntry, queueEntry->_event);
+				else
+					state._listenerObj->callback(&state, queueEntry->_type, trackEntry, queueEntry->_event);
 				break;
 		}
 	}
@@ -279,6 +312,7 @@ AnimationState::AnimationState(AnimationStateData *data) :
 		_queue(EventQueue::newEventQueue(*this, _trackEntryPool)),
 		_animationsChanged(false),
 		_listener(dummyOnAnimationEventFunc),
+		_listenerObj(NULL),
 		_timeScale(1) {
 }
 
@@ -614,6 +648,10 @@ void AnimationState::setTimeScale(float inValue) {
 
 void AnimationState::setListener(AnimationStateListener inValue) {
 	_listener = inValue;
+}
+
+void AnimationState::setListener(AnimationStateListenerClass* inValue) {
+	_listenerObj = inValue;
 }
 
 void AnimationState::disableQueue() {
