@@ -31,55 +31,20 @@
 using System;
 
 namespace Spine {
+	/// <summary>
+	/// <para>
+	/// Stores the current pose for an IK constraint. An IK constraint adjusts the rotation of 1 or 2 constrained bones so the tip of
+	/// the last bone is as close to the target bone as possible.</para>
+	/// <para>
+	/// See <a href="http://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide.</para>
+	/// </summary>
 	public class IkConstraint : IConstraint {
 		internal IkConstraintData data;
 		internal ExposedList<Bone> bones = new ExposedList<Bone>();
 		internal Bone target;
 		internal int bendDirection;
 		internal bool compress, stretch;
-		internal float mix;
-
-		public IkConstraintData Data { get { return data; } }
-		public int Order { get { return data.order; } }
-
-		/// <summary>The bones that will be modified by this IK constraint.</summary>
-		public ExposedList<Bone> Bones {
-			get { return bones; }
-		}
-
-		/// <summary>The bone that is the IK target.</summary>
-		public Bone Target {
-			get { return target; }
-			set { target = value; }
-		}
-
-		/// <summary>Controls the bend direction of the IK bones, either 1 or -1.</summary>
-		public int BendDirection {
-			get { return bendDirection; }
-			set { bendDirection = value; }
-		}
-
-		/// <summary>
-		/// When true and only a single bone is being constrained, 
-		/// if the target is too close, the bone is scaled to reach it.</summary>
-		public bool Compress {
-			get { return compress; }
-			set { compress = value; }
-		}
-
-		/// <summary>
-		/// When true, if the target is out of range, the parent bone is scaled on the X axis to reach it.
-		/// If the parent bone has nonuniform scale, stretching is not applied.</summary>
-		public bool Stretch {
-			get { return stretch; }
-			set { stretch = value; }
-		}
-
-		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained rotations.</summary>
-		public float Mix {
-			get { return mix; }
-			set { mix = value; }
-		}
+		internal float mix = 1;
 
 		public IkConstraint (IkConstraintData data, Skeleton skeleton) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
@@ -94,6 +59,21 @@ namespace Spine {
 			foreach (BoneData boneData in data.bones)
 				bones.Add(skeleton.FindBone(boneData.name));
 			target = skeleton.FindBone(data.target.name);
+		}
+
+		/// <summary>Copy constructor.</summary>
+		public IkConstraint (IkConstraint constraint, Skeleton skeleton) {
+			if (constraint == null) throw new ArgumentNullException("constraint cannot be null.");
+			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
+			data = constraint.data;
+			bones = new ExposedList<Bone>(constraint.Bones.Count);
+			foreach (Bone bone in constraint.Bones)
+				bones.Add(skeleton.Bones.Items[bone.data.index]);
+			target = skeleton.Bones.Items[constraint.target.data.index];
+			mix = constraint.mix;
+			bendDirection = constraint.bendDirection;
+			compress = constraint.compress;
+			stretch = constraint.stretch;
 		}
 
 		/// <summary>Applies the constraint to the constrained bones.</summary>
@@ -114,12 +94,61 @@ namespace Spine {
 			}
 		}
 
+
+		public int Order {
+			get { return data.order; }
+		}
+
+		/// <summary>The bones that will be modified by this IK constraint.</summary>
+		public ExposedList<Bone> Bones {
+			get { return bones; }
+		}
+
+		/// <summary>The bone that is the IK target.</summary>
+		public Bone Target {
+			get { return target; }
+			set { target = value; }
+		}
+
+		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained rotations.</summary>
+		public float Mix {
+			get { return mix; }
+			set { mix = value; }
+		}
+
+		/// <summary>Controls the bend direction of the IK bones, either 1 or -1.</summary>
+		public int BendDirection {
+			get { return bendDirection; }
+			set { bendDirection = value; }
+		}
+
+		/// <summary>
+		/// When true and only a single bone is being constrained, if the target is too close, the bone is scaled to reach it.</summary>
+		public bool Compress {
+			get { return compress; }
+			set { compress = value; }
+		}
+
+		/// <summary>
+		///  When true, if the target is out of range, the parent bone is scaled to reach it. If more than one bone is being constrained
+		///  and the parent bone has local nonuniform scale, stretch is not applied.</summary>
+		public bool Stretch {
+			get { return stretch; }
+			set { stretch = value; }
+		}
+
+		/// <summary>The IK constraint's setup pose data.</summary>
+		public IkConstraintData Data {
+			get { return data; }
+		}
+
 		override public string ToString () {
 			return data.name;
 		}
 
 		/// <summary>Applies 1 bone IK. The target is specified in the world coordinate system.</summary>
-		static public void Apply (Bone bone, float targetX, float targetY, bool compress, bool stretch, bool uniform, float alpha) {
+		static public void Apply (Bone bone, float targetX, float targetY, bool compress, bool stretch, bool uniform,
+								float alpha) {
 			if (!bone.appliedValid) bone.UpdateAppliedTransform();
 			Bone p = bone.parent;
 			float id = 1 / (p.a * p.d - p.b * p.c);
@@ -140,16 +169,14 @@ namespace Spine {
 					if (uniform) sy *= s;
 				}
 			}
-			bone.UpdateWorldTransform(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX,
-				bone.ashearY);
+			bone.UpdateWorldTransform(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX, bone.ashearY);
 		}
 
-		/// <summary>Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as
-		/// possible. The target is specified in the world coordinate system.</summary>
+		/// <summary>Applies 2 bone IK. The target is specified in the world coordinate system.</summary>
 		/// <param name="child">A direct descendant of the parent bone.</param>
 		static public void Apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, bool stretch, float alpha) {
 			if (alpha == 0) {
-				child.UpdateWorldTransform ();
+				child.UpdateWorldTransform();
 				return;
 			}
 			if (!parent.appliedValid) parent.UpdateAppliedTransform();

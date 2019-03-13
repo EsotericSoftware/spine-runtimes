@@ -31,6 +31,14 @@
 using System;
 
 namespace Spine {
+
+	/// <summary>
+	/// <para>
+	/// Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the
+	/// constrained bones so they follow a {@link PathAttachment}.</para>
+	/// <para>
+	/// See <a href="http://esotericsoftware.com/spine-path-constraints">Path constraints</a> in the Spine User Guide.</para>
+	/// </summary>
 	public class PathConstraint : IConstraint {
 		const int NONE = -1, BEFORE = -2, AFTER = -3;
 		const float Epsilon = 0.00001f;
@@ -43,15 +51,6 @@ namespace Spine {
 		internal ExposedList<float> spaces = new ExposedList<float>(), positions = new ExposedList<float>();
 		internal ExposedList<float> world = new ExposedList<float>(), curves = new ExposedList<float>(), lengths = new ExposedList<float>();
 		internal float[] segments = new float[10];
-
-		public int Order { get { return data.order; } }
-		public float Position { get { return position; } set { position = value; } }
-		public float Spacing { get { return spacing; } set { spacing = value; } }
-		public float RotateMix { get { return rotateMix; } set { rotateMix = value; } }
-		public float TranslateMix { get { return translateMix; } set { translateMix = value; } }
-		public ExposedList<Bone> Bones { get { return bones; } }
-		public Slot Target { get { return target; } set { target = value; } }
-		public PathConstraintData Data { get { return data; } }
 
 		public PathConstraint (PathConstraintData data, Skeleton skeleton) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
@@ -67,11 +66,26 @@ namespace Spine {
 			translateMix = data.translateMix;
 		}
 
+		/// <summary>Copy constructor.</summary>
+		public PathConstraint (PathConstraint constraint, Skeleton skeleton) {
+			if (constraint == null) throw new ArgumentNullException("constraint cannot be null.");
+			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
+			data = constraint.data;
+			bones = new ExposedList<Bone>(constraint.Bones.Count);
+			foreach (Bone bone in constraint.Bones)
+				bones.Add(skeleton.Bones.Items[bone.data.index]);
+			target = skeleton.slots.Items[constraint.target.data.index];
+			position = constraint.position;
+			spacing = constraint.spacing;
+			rotateMix = constraint.rotateMix;
+			translateMix = constraint.translateMix;
+		}
+
 		/// <summary>Applies the constraint to the constrained bones.</summary>
 		public void Apply () {
 			Update();
 		}
-			
+		
 		public void Update () {
 			PathAttachment attachment = target.Attachment as PathAttachment;
 			if (attachment == null) return;
@@ -183,7 +197,7 @@ namespace Spine {
 			float[] spacesItems = this.spaces.Items, output = this.positions.Resize(spacesCount * 3 + 2).Items, world;
 			bool closed = path.Closed;
 			int verticesLength = path.WorldVerticesLength, curveCount = verticesLength / 6, prevCurve = NONE;
-            float pathLength = 0;
+			float pathLength = 0;
 
 			if (!path.ConstantSpeed) {
 				float[] lengths = path.Lengths;
@@ -207,14 +221,14 @@ namespace Spine {
 					} else if (p < 0) {
 						if (prevCurve != BEFORE) {
 							prevCurve = BEFORE;
-							path.ComputeWorldVertices(target, 2, 4, world, 0);
+							path.ComputeWorldVertices(target, 2, 4, world, 0, 2);
 						}
 						AddBeforePosition(p, world, 0, output, o);
 						continue;
 					} else if (p > pathLength) {
 						if (prevCurve != AFTER) {
 							prevCurve = AFTER;
-							path.ComputeWorldVertices(target, verticesLength - 6, 4, world, 0);
+							path.ComputeWorldVertices(target, verticesLength - 6, 4, world, 0, 2);
 						}
 						AddAfterPosition(p - pathLength, world, 0, output, o);
 						continue;
@@ -235,10 +249,10 @@ namespace Spine {
 					if (curve != prevCurve) {
 						prevCurve = curve;
 						if (closed && curve == curveCount) {
-							path.ComputeWorldVertices(target, verticesLength - 4, 4, world, 0);
-							path.ComputeWorldVertices(target, 0, 4, world, 4);
+							path.ComputeWorldVertices(target, verticesLength - 4, 4, world, 0, 2);
+							path.ComputeWorldVertices(target, 0, 4, world, 4, 2);
 						} else
-							path.ComputeWorldVertices(target, curve * 6 + 2, 8, world, 0);
+							path.ComputeWorldVertices(target, curve * 6 + 2, 8, world, 0, 2);
 					}
 					AddCurvePosition(p, world[0], world[1], world[2], world[3], world[4], world[5], world[6], world[7], output, o,
 						tangents || (i > 0 && space < PathConstraint.Epsilon));
@@ -250,15 +264,15 @@ namespace Spine {
 			if (closed) {
 				verticesLength += 2;
 				world = this.world.Resize(verticesLength).Items;
-				path.ComputeWorldVertices(target, 2, verticesLength - 4, world, 0);
-				path.ComputeWorldVertices(target, 0, 2, world, verticesLength - 4);
+				path.ComputeWorldVertices(target, 2, verticesLength - 4, world, 0, 2);
+				path.ComputeWorldVertices(target, 0, 2, world, verticesLength - 4, 2);
 				world[verticesLength - 2] = world[0];
 				world[verticesLength - 1] = world[1];
 			} else {
 				curveCount--;
 				verticesLength -= 4;
 				world = this.world.Resize(verticesLength).Items;
-				path.ComputeWorldVertices(target, 2, verticesLength, world, 0);
+				path.ComputeWorldVertices(target, 2, verticesLength, world, 0, 2);
 			}
 
 			// Curve lengths.
@@ -431,6 +445,26 @@ namespace Spine {
 				else
 					output[o + 2] = (float)Math.Atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
 			}
+		}
+		
+		public int Order { get { return data.order; } }
+		/// <summary>The position along the path.</summary>
+		public float Position { get { return position; } set { position = value; } }
+		/// <summary>The spacing between bones.</summary>
+		public float Spacing { get { return spacing; } set { spacing = value; } }
+		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained rotations.</summary>
+		public float RotateMix { get { return rotateMix; } set { rotateMix = value; } }
+		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained translations.</summary>
+		public float TranslateMix { get { return translateMix; } set { translateMix = value; } }
+		/// <summary>The bones that will be modified by this path constraint.</summary>
+		public ExposedList<Bone> Bones { get { return bones; } }
+		/// <summary>The slot whose path attachment will be used to constrained the bones.</summary>
+		public Slot Target { get { return target; } set { target = value; } }
+		/// <summary>The path constraint's setup pose data.</summary>
+		public PathConstraintData Data { get { return data; } }
+
+		override public string ToString () {
+			return data.name;
 		}
 	}
 }
