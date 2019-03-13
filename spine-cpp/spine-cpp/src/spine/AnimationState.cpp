@@ -252,7 +252,7 @@ void EventQueue::drain() {
 			case EventType_Start:
 			case EventType_Interrupt:
 			case EventType_Complete:
-				if (NULL == trackEntry->_listener)
+				if (NULL == trackEntry->_listenerObj)
 					trackEntry->_listener(&state, queueEntry->_type, trackEntry, NULL);
 				else
 					trackEntry->_listenerObj->callback(&state, queueEntry->_type, trackEntry, NULL);
@@ -262,7 +262,7 @@ void EventQueue::drain() {
 					state._listenerObj->callback(&state, queueEntry->_type, trackEntry, NULL);
 				break;
 			case EventType_End:
-				if (NULL == trackEntry->_listener)
+				if (NULL == trackEntry->_listenerObj)
 					trackEntry->_listener(&state, queueEntry->_type, trackEntry, NULL);
 				else
 					trackEntry->_listenerObj->callback(&state, queueEntry->_type, trackEntry, NULL);
@@ -273,7 +273,7 @@ void EventQueue::drain() {
 				/* Yes, we want to fall through here */
 			case EventType_Dispose:
 
-				if (NULL == trackEntry->_listener)
+				if (NULL == trackEntry->_listenerObj)
 					trackEntry->_listener(&state, EventType_Dispose, trackEntry, NULL);
 				else
 					trackEntry->_listenerObj->callback(&state, EventType_Dispose, trackEntry, NULL);
@@ -286,7 +286,7 @@ void EventQueue::drain() {
 				_trackEntryPool.free(trackEntry);
 				break;
 			case EventType_Event:
-				if (NULL == trackEntry->_listener)
+				if (NULL == trackEntry->_listenerObj)
 					trackEntry->_listener(&state, queueEntry->_type, trackEntry, queueEntry->_event);
 				else
 					trackEntry->_listenerObj->callback(&state, queueEntry->_type, trackEntry, queueEntry->_event);
