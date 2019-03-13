@@ -266,6 +266,13 @@ namespace Spine.Unity.Editor {
 			if (texImporter == null) {
 				return false;
 			}
+
+			int extensionPos = texturePath.LastIndexOf('.');
+			string materialPath = texturePath.Substring(0, extensionPos) + "_Material.mat";
+			Material material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+			if (material == null || !material.HasProperty(STRAIGHT_ALPHA_PARAM_ID)) {
+				return true; // non-Spine shader used on material
+			}
 			
 			// 'sRGBTexture = true' generates incorrectly weighted mipmaps at PMA textures,
 			// causing white borders due to undesired custom weighting.
@@ -273,15 +280,10 @@ namespace Spine.Unity.Editor {
 				Debug.LogWarningFormat("`{0}` : Incorrect Texture Settings found: When enabling `Generate Mip Maps`, it is strongly recommended to disable `sRGB (Color Texture)`. Otherwise you will receive white border artifacts on an atlas exported with default `Premultiply alpha` settings.\n(You can disable this warning in `Edit - Preferences - Spine`)", texturePath);
 			}
 			if (texImporter.alphaIsTransparency) {
-				int extensionPos = texturePath.LastIndexOf('.');
-				string materialPath = texturePath.Substring(0, extensionPos) + "_Material.mat";
-				Material material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
-				if (material != null) {
-					int straightAlphaValue = material.GetInt(STRAIGHT_ALPHA_PARAM_ID);
-					if (straightAlphaValue == 0) {
-						string materialName = System.IO.Path.GetFileName(materialPath);
-						Debug.LogWarningFormat("`{0}` and material `{1}` : Incorrect Texture / Material Settings found: It is strongly recommended to disable `Alpha Is Transparency` on `Premultiply alpha` textures.\nAssuming `Premultiply alpha` texture because `Straight Alpha Texture` is disabled at material). (You can disable this warning in `Edit - Preferences - Spine`)", texturePath, materialName);
-					}
+				int straightAlphaValue = material.GetInt(STRAIGHT_ALPHA_PARAM_ID);
+				if (straightAlphaValue == 0) {
+					string materialName = System.IO.Path.GetFileName(materialPath);
+					Debug.LogWarningFormat("`{0}` and material `{1}` : Incorrect Texture / Material Settings found: It is strongly recommended to disable `Alpha Is Transparency` on `Premultiply alpha` textures.\nAssuming `Premultiply alpha` texture because `Straight Alpha Texture` is disabled at material). (You can disable this warning in `Edit - Preferences - Spine`)", texturePath, materialName);
 				}
 			}
 			return true;
