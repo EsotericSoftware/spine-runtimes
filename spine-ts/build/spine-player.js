@@ -1501,7 +1501,7 @@ var spine;
 						this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
 					else {
 						spine.Utils.webkit602BugfixHelper(alpha, blend);
-						if (timelineBlend = spine.MixBlend.setup) {
+						if (timelineBlend == spine.MixBlend.setup) {
 							if (timeline instanceof spine.AttachmentTimeline) {
 								if (attachments)
 									direction = spine.MixDirection.out;
