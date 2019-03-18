@@ -264,7 +264,7 @@ namespace Spine {
 			} else {
 				mix = to.mixTime / to.mixDuration;
 				if (mix > 1) mix = 1;
-				if (blend != MixBlend.First) blend = from.mixBlend; // Track 0 ignores frack mix blend.
+				if (blend != MixBlend.First) blend = from.mixBlend; // Track 0 ignores track mix blend.
 			}
 
 			var eventBuffer = mix < from.eventThreshold ? this.events : null;
