@@ -64,12 +64,12 @@ package spine.animation {
 			var slotAttachment : Attachment = slot.attachment;
 			if (!(slotAttachment is VertexAttachment) || !(VertexAttachment(slotAttachment)).applyDeform(attachment)) return;
 			
-			var verticesArray : Vector.<Number> = slot.attachmentVertices;
-			if (verticesArray.length == 0) blend = MixBlend.setup;
+			var deformArray : Vector.<Number> = slot.deform;
+			if (deformArray.length == 0) blend = MixBlend.setup;
 			
 			var frameVertices : Vector.<Vector.<Number>> = this.frameVertices;
 			var vertexCount : int = frameVertices[0].length;
-			var vertices : Vector.<Number>;		
+			var deform : Vector.<Number>;
 
 			var frames : Vector.<Number> = this.frames;
 			var i : int;			
@@ -77,32 +77,32 @@ package spine.animation {
 				vertexAttachment = VertexAttachment(slotAttachment);
 				switch (blend) {
 				case MixBlend.setup:
-					verticesArray.length = 0;
+					deformArray.length = 0;
 					return;
 				case MixBlend.first:
 					if (alpha == 1) {
-						verticesArray.length = 0;
+						deformArray.length = 0;
 						return;
 					}
-					verticesArray.length = vertexCount;
-					vertices = verticesArray;
+					deformArray.length = vertexCount;
+					deform = deformArray;
 					if (vertexAttachment.bones == null) {
 						// Unweighted vertex positions.
 						setupVertices = vertexAttachment.vertices;
 						for (i = 0; i < vertexCount; i++)
-							vertices[i] += (setupVertices[i] - vertices[i]) * alpha;
+							deform[i] += (setupVertices[i] - deform[i]) * alpha;
 					} else {
 						// Weighted deform offsets.
 						alpha = 1 - alpha;
 						for (i = 0; i < vertexCount; i++)
-							vertices[i] *= alpha;
+							deform[i] *= alpha;
 					}
 				}
 				return;
 			}						
 
-			verticesArray.length = vertexCount;
-			vertices = verticesArray;
+			deformArray.length = vertexCount;
+			deform = deformArray;
 			var n : int;			
 			var setup : Number, prev : Number;
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.
@@ -113,15 +113,15 @@ package spine.animation {
 						if (vertexAttachment.bones == null) {							
 							setupVertices = vertexAttachment.vertices;
 							for (i = 0; i < vertexCount; i++) {								
-								vertices[i] += lastVertices[i] - setupVertices[i];
+								deform[i] += lastVertices[i] - setupVertices[i];
 							}
 						} else {							
 							for (i = 0; i < vertexCount; i++)
-								vertices[i] += lastVertices[i];
+								deform[i] += lastVertices[i];
 						}
 					} else {						
 						for (i = 0, n = vertexCount; i < n; i++)
-							vertices[i] = lastVertices[i];
+							deform[i] = lastVertices[i];
 					}
 				} else {
 					switch (blend) {
@@ -132,28 +132,28 @@ package spine.animation {
 								setupVertices = vertexAttachment.vertices;
 								for (i = 0; i < vertexCount; i++) {
 									setup = setupVertices[i];
-									vertices[i] = setup + (lastVertices[i] - setup) * alpha;
+									deform[i] = setup + (lastVertices[i] - setup) * alpha;
 								}
 							} else {
 								// Weighted deform offsets, with alpha.
 								for (i = 0; i < vertexCount; i++)
-									vertices[i] = lastVertices[i] * alpha;
+									deform[i] = lastVertices[i] * alpha;
 							}
 							break;
 						case MixBlend.first:
 						case MixBlend.replace:
 							for (i = 0; i < vertexCount; i++)
-								vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
+								deform[i] += (lastVertices[i] - deform[i]) * alpha;
 						case MixBlend.add:
 							vertexAttachment = VertexAttachment(slotAttachment);
 							if (vertexAttachment.bones == null) {								
 								setupVertices = vertexAttachment.vertices;
 								for (i = 0; i < vertexCount; i++) {									
-									vertices[i] += (lastVertices[i] - setupVertices[i]) * alpha;
+									deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
 								}
 							} else {
 								for (i = 0; i < vertexCount; i++)
-									vertices[i] += lastVertices[i] * alpha;
+									deform[i] += lastVertices[i] * alpha;
 							}							
 					}					
 				}
@@ -174,18 +174,18 @@ package spine.animation {
 						setupVertices = vertexAttachment.vertices;
 						for (i = 0; i < vertexCount; i++) {
 							prev = prevVertices[i];
-							vertices[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
+							deform[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
 						}
 					} else {						
 						for (i = 0; i < vertexCount; i++) {
 							prev = prevVertices[i];					
-							vertices[i] += prev + (nextVertices[i] - prev) * percent;
+							deform[i] += prev + (nextVertices[i] - prev) * percent;
 						}
 					}
 				} else {					
 					for (i = 0; i < vertexCount; i++) {						
 						prev = prevVertices[i];
-						vertices[i] = prev + (nextVertices[i] - prev) * percent;
+						deform[i] = prev + (nextVertices[i] - prev) * percent;
 					}
 				}
 			} else {
@@ -197,13 +197,13 @@ package spine.animation {
 							setupVertices = vertexAttachment.vertices;
 							for (i = 0; i < vertexCount; i++) {
 								prev = prevVertices[i], setup = setupVertices[i];
-								vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+								deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
 							}
 						} else {
 							// Weighted deform offsets, with alpha.
 							for (i = 0; i < vertexCount; i++) {
 								prev = prevVertices[i];
-								vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
+								deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
 							}
 						}
 						break;
@@ -211,7 +211,7 @@ package spine.animation {
 					case MixBlend.replace:
 						for (i = 0; i < vertexCount; i++) {
 							prev = prevVertices[i];
-							vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+							deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
 						}
 						break;
 					case MixBlend.add:
@@ -220,12 +220,12 @@ package spine.animation {
 							setupVertices = vertexAttachment.vertices;
 							for (i = 0; i < vertexCount; i++) {
 								prev = prevVertices[i], setup = setupVertices[i];
-								vertices[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
+								deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
 							}
 						} else {							
 							for (i = 0; i < vertexCount; i++) {
 								prev = prevVertices[i];
-								vertices[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
+								deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
 							}
 						}
 				}				

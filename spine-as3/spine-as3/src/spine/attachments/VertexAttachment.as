@@ -53,7 +53,7 @@ package spine.attachments {
 		public function computeWorldVertices(slot : Slot, start : int, count : int, worldVertices : Vector.<Number>, offset : int, stride : int) : void {
 			count = offset + (count >> 1) * stride;
 			var skeleton : Skeleton = slot.skeleton;
-			var deformArray : Vector.<Number> = slot.attachmentVertices;
+			var deformArray : Vector.<Number> = slot.deform;
 			var vertices : Vector.<Number> = this.vertices;
 			var bones : Vector.<int> = this.bones;
 			var deform : Vector.<Number>;

@@ -40,6 +40,7 @@ package spine.animation {
 		public static var FIRST : int = 1;
 		public static var HOLD : int = 2;
 		public static var HOLD_MIX : int = 3;
+		public static var NOT_LAST : int = 4;
 		internal static var emptyAnimation : Animation = new Animation("<empty>", new Vector.<Timeline>(), 0);
 		public var data : AnimationStateData;
 		public var tracks : Vector.<TrackEntry> = new Vector.<TrackEntry>();
@@ -188,7 +189,7 @@ package spine.animation {
 					
 					for (ii = 0; ii < timelineCount; ii++) {
 						var timeline : Timeline = timelines[ii];
-						var timelineBlend : MixBlend = timelineMode[ii] == AnimationState.SUBSEQUENT ? blend : MixBlend.setup;
+						var timelineBlend : MixBlend = (timelineMode[ii] & (NOT_LAST - 1)) == SUBSEQUENT ? blend : MixBlend.setup;
 						if (timeline is RotateTimeline) {
 							applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
 						} else
@@ -244,7 +245,7 @@ package spine.animation {
 					var direction : MixDirection = MixDirection.Out;
 					var timelineBlend: MixBlend;
 					var alpha : Number = 0;
-					switch (timelineMode[i]) {
+					switch (timelineMode[i] & (NOT_LAST - 1)) {
 					case SUBSEQUENT:
 						if (!attachments && timeline is AttachmentTimeline) continue;
 						if (!drawOrder && timeline is DrawOrderTimeline) continue;
@@ -271,7 +272,7 @@ package spine.animation {
 					else {	
 						if (timelineBlend == MixBlend.setup) {
 							if (timeline is AttachmentTimeline) {
-								if (attachments) direction = MixDirection.In;				
+								if (attachments || ((timelineMode[i] & NOT_LAST) == NOT_LAST)) direction = MixDirection.In;
 							} else if (timeline is DrawOrderTimeline) {
 								if (drawOrder) direction = MixDirection.In;
 							}
@@ -586,20 +587,51 @@ package spine.animation {
 			animationsChanged = false;
 
 			propertyIDs = new Dictionary();					
-				
-			for (var i : int = 0, n : int = tracks.length; i < n; i++) {
-				var entry : TrackEntry = tracks[i];
+			var i : int = 0;
+			var n: int = 0;
+			var entry : TrackEntry = null;
+			for (i = 0, n = tracks.length; i < n; i++) {
+				entry = tracks[i];
 				if (entry == null) continue;
 				while (entry.mixingFrom != null)
 					entry = entry.mixingFrom;
 				do {
-					if (entry.mixingTo == null || entry.mixBlend != MixBlend.add) setTimelineModes(entry);
+					if (entry.mixingTo == null || entry.mixBlend != MixBlend.add) computeHold(entry);
 					entry = entry.mixingTo;			
 				} while (entry != null);
 			}
+
+			propertyIDs = new Dictionary();
+			for (i = tracks.length - 1; i >= 0; i--) {
+				entry = tracks[i];
+				while (entry != null) {
+					computeNotLast(entry);
+					entry = entry.mixingFrom;
+				}
+			}
 		}
 		
-		private function setTimelineModes (entry: TrackEntry) {
+		private function computeNotLast (entry: TrackEntry) : void {
+			var timelines : Vector.<Timeline> = entry.animation.timelines;
+			var timelinesCount : int = entry.animation.timelines.length;
+			var timelineMode : Vector.<int> = entry.timelineMode;
+			var propertyIDs : Dictionary = this.propertyIDs;
+
+			for (var i : int = 0; i < timelinesCount; i++) {
+				if (timelines[i] is AttachmentTimeline) {
+					var timeline : AttachmentTimeline = AttachmentTimeline(timelines[i]);
+					var intId : int = timeline.slotIndex;
+					var id : String = intId.toString();
+					var contained : Object = propertyIDs[id];
+					propertyIDs[id] = true;
+					if (contained != null) {
+						timelineMode[i] |= NOT_LAST;
+					}
+				}
+			}
+		}
+
+		private function computeHold (entry: TrackEntry) : void {
 			var to: TrackEntry = entry.mixingTo;			
 			var timelines : Vector.<Timeline> = entry.animation.timelines;
 			var timelinesCount : int = entry.animation.timelines.length;
@@ -609,8 +641,9 @@ package spine.animation {
 			timelineHoldMix.length = 0;
 			var propertyIDs: Dictionary = this.propertyIDs;
 			
+			var i : int = 0;
 			if (to != null && to.holdPrevious) {
-				for (var i : int = 0; i < timelinesCount; i++) {										
+				for (i = 0; i < timelinesCount; i++) {
 					propertyIDs[timelines[i].getPropertyId().toString()] = true;			
 					timelineMode[i] = HOLD;
 				}
@@ -618,14 +651,16 @@ package spine.animation {
 			}
 
 			outer:
-			for (var i : int = 0; i < timelinesCount; i++) {
-				var intId : int = timelines[i].getPropertyId();
+			for (i = 0; i < timelinesCount; i++) {
+				var timeline : Timeline = Timeline(timelines[i]);
+				var intId : int = timeline.getPropertyId();
 				var id : String = intId.toString();			
 				var contained: Object = propertyIDs[id];
 				propertyIDs[id] = true;
 				if (contained != null) {
 					timelineMode[i] = AnimationState.SUBSEQUENT;
-				} else if (to == null || !hasTimeline(to, intId)) {				
+				} else if (to == null || timeline is AttachmentTimeline || timeline is DrawOrderTimeline
+					|| timeline is EventTimeline || !hasTimeline(to, intId)) {
 					timelineMode[i] = AnimationState.FIRST;
 				} else {					
 					for (var next : TrackEntry = to.mixingTo; next != null; next = next.mixingTo) {
