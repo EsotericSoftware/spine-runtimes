@@ -45,7 +45,7 @@ namespace Spine {
 		internal bool hasSecondColor;
 		internal Attachment attachment;
 		internal float attachmentTime;
-		internal ExposedList<float> attachmentVertices  = new ExposedList<float>();
+		internal ExposedList<float> deform = new ExposedList<float>();
 
 		public Slot (SlotData data, Bone bone) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
@@ -84,6 +84,7 @@ namespace Spine {
 
 			attachment = slot.attachment;
 			attachmentTime = slot.attachmentTime;
+			deform.AddRange(slot.deform);
 		}
 
 		/// <summary>The slot's setup pose data.</summary>
@@ -128,7 +129,7 @@ namespace Spine {
 				if (attachment == value) return;
 				attachment = value;
 				attachmentTime = bone.skeleton.time;
-				attachmentVertices .Clear(false);
+				deform.Clear(false);
 			}
 		}
 
@@ -139,17 +140,17 @@ namespace Spine {
 			set { attachmentTime = bone.skeleton.time - value; }
 		}
 
-		/// <summary> Vertices to deform the slot's attachment. For an unweighted mesh, the entries are local positions for each vertex. For a
+		/// <summary> Values to deform the slot's attachment. For an unweighted mesh, the entries are local positions for each vertex. For a
 		/// weighted mesh, the entries are an offset for each vertex which will be added to the mesh's local vertex positions.
 		/// <para />
 		/// See <see cref="VertexAttachment.ComputeWorldVertices(Slot, int, int, float[], int, int)"/> and <see cref="DeformTimeline"/>.</summary>
-		public ExposedList<float> AttachmentVertices {
+		public ExposedList<float> Deform {
 			get {
-				return attachmentVertices ;
+				return deform;
 			}
 			set {
-				if (attachmentVertices == null) throw new ArgumentNullException("attachmentVertices", "attachmentVertices cannot be null.");
-				attachmentVertices  = value;
+				if (deform == null) throw new ArgumentNullException("deform", "deform cannot be null.");
+				deform = value;
 			}
 		}
 

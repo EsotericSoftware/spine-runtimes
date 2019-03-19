@@ -987,7 +987,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a slot's <see cref="Slot.AttachmentVertices"/> to deform a <see cref="VertexAttachment"/>.</summary>
+	/// <summary>Changes a slot's <see cref="Slot.Deform"/> to deform a <see cref="VertexAttachment"/>.</summary>
 	public class DeformTimeline : CurveTimeline, ISlotTimeline {
 		internal int slotIndex;
 		internal VertexAttachment attachment;
@@ -1037,41 +1037,41 @@ namespace Spine {
 			VertexAttachment vertexAttachment = slot.attachment as VertexAttachment;
 			if (vertexAttachment == null || !vertexAttachment.ApplyDeform(attachment)) return;
 
-			var verticesArray = slot.attachmentVertices;
-			if (verticesArray.Count == 0) blend = MixBlend.Setup;
+			var deformArray = slot.Deform;
+			if (deformArray.Count == 0) blend = MixBlend.Setup;
 
 			float[][] frameVertices = this.frameVertices;
 			int vertexCount = frameVertices[0].Length;
 			float[] frames = this.frames;
-			float[] vertices;
+			float[] deform;
 
 			if (time < frames[0]) {  // Time is before first frame.
 				
 				switch (blend) {
 				case MixBlend.Setup:
-					verticesArray.Clear();
+					deformArray.Clear();
 					return;
 				case MixBlend.Replace:
 					if (alpha == 1) {
-						verticesArray.Clear();
+						deformArray.Clear();
 						return;
 					}
 
-					// verticesArray.SetSize(vertexCount) // Ensure size and preemptively set count.
-					if (verticesArray.Capacity < vertexCount) verticesArray.Capacity = vertexCount;	
-					verticesArray.Count = vertexCount;
-					vertices = verticesArray.Items;
+					// deformArray.SetSize(vertexCount) // Ensure size and preemptively set count.
+					if (deformArray.Capacity < vertexCount) deformArray.Capacity = vertexCount;
+					deformArray.Count = vertexCount;
+					deform = deformArray.Items;
 
 					if (vertexAttachment.bones == null) {
 						// Unweighted vertex positions.
 						float[] setupVertices = vertexAttachment.vertices;
 						for (int i = 0; i < vertexCount; i++)
-							vertices[i] += (setupVertices[i] - vertices[i]) * alpha;
+							deform[i] += (setupVertices[i] - deform[i]) * alpha;
 					} else {
 						// Weighted deform offsets.
 						alpha = 1 - alpha;
 						for (int i = 0; i < vertexCount; i++)
-							vertices[i] *= alpha;
+							deform[i] *= alpha;
 					}
 					return;
 				default:
@@ -1080,10 +1080,10 @@ namespace Spine {
 
 			}
 
-			// verticesArray.SetSize(vertexCount) // Ensure size and preemptively set count.
-			if (verticesArray.Capacity < vertexCount) verticesArray.Capacity = vertexCount;	
-			verticesArray.Count = vertexCount;
-			vertices = verticesArray.Items;
+			// deformArray.SetSize(vertexCount) // Ensure size and preemptively set count.
+			if (deformArray.Capacity < vertexCount) deformArray.Capacity = vertexCount;
+			deformArray.Count = vertexCount;
+			deform = deformArray.Items;
 
 			if (time >= frames[frames.Length - 1]) { // Time is after last frame.
 
@@ -1094,15 +1094,15 @@ namespace Spine {
 							// Unweighted vertex positions, no alpha.
 							float[] setupVertices = vertexAttachment.vertices;
 							for (int i = 0; i < vertexCount; i++)
-								vertices[i] += lastVertices[i] - setupVertices[i];
+								deform[i] += lastVertices[i] - setupVertices[i];
 						} else {
 							// Weighted deform offsets, no alpha.
 							for (int i = 0; i < vertexCount; i++)
-								vertices[i] += lastVertices[i];
+								deform[i] += lastVertices[i];
 						}
 					} else {
 						// Vertex positions or deform offsets, no alpha.
-						Array.Copy(lastVertices, 0, vertices, 0, vertexCount);
+						Array.Copy(lastVertices, 0, deform, 0, vertexCount);
 					}
 				} else {
 					switch (blend) {
@@ -1112,12 +1112,12 @@ namespace Spine {
 								float[] setupVertices = vertexAttachment.vertices;
 								for (int i = 0; i < vertexCount; i++) {
 									float setup = setupVertices[i];
-									vertices[i] = setup + (lastVertices[i] - setup) * alpha;
+									deform[i] = setup + (lastVertices[i] - setup) * alpha;
 								}
 							} else {
 								// Weighted deform offsets, with alpha.
 								for (int i = 0; i < vertexCount; i++)
-									vertices[i] = lastVertices[i] * alpha;
+									deform[i] = lastVertices[i] * alpha;
 							}
 							break;
 						}
@@ -1125,18 +1125,18 @@ namespace Spine {
 						case MixBlend.Replace:
 							// Vertex positions or deform offsets, with alpha.
 							for (int i = 0; i < vertexCount; i++)
-								vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
+								deform[i] += (lastVertices[i] - deform[i]) * alpha;
 							break;
 						case MixBlend.Add:
 							if (vertexAttachment.bones == null) {
 								// Unweighted vertex positions, no alpha.
 								float[] setupVertices = vertexAttachment.vertices;
 								for (int i = 0; i < vertexCount; i++)
-									vertices[i] += (lastVertices[i] - setupVertices[i]) * alpha;
+									deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
 							} else {
 								// Weighted deform offsets, alpha.
 								for (int i = 0; i < vertexCount; i++)
-									vertices[i] += lastVertices[i] * alpha;
+									deform[i] += lastVertices[i] * alpha;
 							}
 							break;
 					}
@@ -1158,20 +1158,20 @@ namespace Spine {
 						float[] setupVertices = vertexAttachment.vertices;
 						for (int i = 0; i < vertexCount; i++) {
 							float prev = prevVertices[i];
-							vertices[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
+							deform[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
 						}
 					} else {
 						// Weighted deform offsets, no alpha.
 						for (int i = 0; i < vertexCount; i++) {
 							float prev = prevVertices[i];
-							vertices[i] += prev + (nextVertices[i] - prev) * percent;
+							deform[i] += prev + (nextVertices[i] - prev) * percent;
 						}
 					}
 				} else {
 					// Vertex positions or deform offsets, no alpha.
 					for (int i = 0; i < vertexCount; i++) {
 						float prev = prevVertices[i];
-						vertices[i] = prev + (nextVertices[i] - prev) * percent;
+						deform[i] = prev + (nextVertices[i] - prev) * percent;
 					}
 				}
 			} else {
@@ -1182,13 +1182,13 @@ namespace Spine {
 							float[] setupVertices = vertexAttachment.vertices;
 							for (int i = 0; i < vertexCount; i++) {
 								float prev = prevVertices[i], setup = setupVertices[i];
-								vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+								deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
 							}
 						} else {
 							// Weighted deform offsets, with alpha.
 							for (int i = 0; i < vertexCount; i++) {
 								float prev = prevVertices[i];
-								vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
+								deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
 							}
 						}
 						break;
@@ -1198,7 +1198,7 @@ namespace Spine {
 						// Vertex positions or deform offsets, with alpha.
 						for (int i = 0; i < vertexCount; i++) {
 							float prev = prevVertices[i];
-							vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+							deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
 						}
 						break;
 					}
@@ -1208,13 +1208,13 @@ namespace Spine {
 							float[] setupVertices = vertexAttachment.vertices;
 							for (int i = 0; i < vertexCount; i++) {
 								float prev = prevVertices[i];
-								vertices[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
+								deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
 							}
 						} else {
 							// Weighted deform offsets, with alpha.
 							for (int i = 0; i < vertexCount; i++) {
 								float prev = prevVertices[i];
-								vertices[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
+								deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
 							}
 						}
 						break;

@@ -31,7 +31,8 @@
 using System;
 
 namespace Spine {
-	/// <summary>>An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's vertices.</summary> 
+	/// <summary>>An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
+	/// <see cref="Slot.Deform"/>.</summary> 
 	public class VertexAttachment : Attachment {
 		static int nextID = 0;
 		static readonly Object nextIdLock = new Object();
@@ -59,7 +60,13 @@ namespace Spine {
 			ComputeWorldVertices(slot, 0, worldVerticesLength, worldVertices, 0);
 		}
 
-		/// <summary>Transforms local vertices to world coordinates.</summary>
+		/// <summary>
+		/// Transforms the attachment's local <see cref="Vertices"/> to world coordinates. If the slot has <see cref="Slot.Deform"/>,
+		/// they are used to deform the vertices.
+		/// <para />
+		/// See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
+		/// Runtimes Guide.
+		/// </summary>
 		/// <param name="start">The index of the first <see cref="Vertices"/> value to transform. Each vertex has 2 values, x and y.</param>
 		/// <param name="count">The number of world vertex values to output. Must be less than or equal to <see cref="WorldVerticesLength"/> - start.</param>
 		/// <param name="worldVertices">The output world vertices. Must have a length greater than or equal to <paramref name="offset"/> + <paramref name="count"/>.</param>
@@ -68,7 +75,7 @@ namespace Spine {
 		public void ComputeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset, int stride = 2) {
 			count = offset + (count >> 1) * stride;
 			Skeleton skeleton = slot.bone.skeleton;
-			var deformArray = slot.attachmentVertices;
+			var deformArray = slot.deform;
 			float[] vertices = this.vertices;
 			int[] bones = this.bones;
 			if (bones == null) {
