@@ -122,8 +122,8 @@ namespace Spine {
 			/// <summary>The current attachment for the slot, or null if the slot has no attachment.</summary>
 			get { return attachment; }
 			/// <summary>
-			/// Sets the slot's attachment and, if the attachment changed, resets <see cref="AttachmentTime"/> and clears
-			/// <see cref="AttachmentVertices">.</summary>
+			/// Sets the slot's attachment and, if the attachment changed, resets <see cref="AttachmentTime"/> and clears <see cref="Deform">.
+			/// </summary>
 			/// <param name="value">May be null.</param>
 			set {
 				if (attachment == value) return;

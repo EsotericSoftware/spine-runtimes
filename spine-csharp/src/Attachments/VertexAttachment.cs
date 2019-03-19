@@ -61,8 +61,8 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Transforms the attachment's local <see cref="Vertices"/> to world coordinates. If the slot has <see cref="Slot.Deform"/>,
-		/// they are used to deform the vertices.
+		/// Transforms the attachment's local <see cref="Vertices"/> to world coordinates. If the slot's <see cref="Slot.Deform"/> is
+		/// not empty, it is used to deform the vertices.
 		/// <para />
 		/// See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 		/// Runtimes Guide.

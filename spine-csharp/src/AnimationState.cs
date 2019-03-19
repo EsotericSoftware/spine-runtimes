@@ -742,10 +742,10 @@ namespace Spine {
 			propertyIDs.Clear();
 			for (int i = tracks.Count - 1; i >= 0; i--) {
 				TrackEntry entry = tracksItems[i];
-				do {
+				while (entry != null) {
 					ComputeNotLast(entry);
 					entry = entry.mixingFrom;
-				} while (entry != null);
+				}
 			}
 		}
 
