@@ -35,6 +35,7 @@ module spine {
 		static FIRST = 1;
 		static HOLD = 2;
 		static HOLD_MIX = 3;
+		static NOT_LAST = 4;
 
 		data: AnimationStateData;
 		tracks = new Array<TrackEntry>();
@@ -171,7 +172,7 @@ module spine {
 
 					for (let ii = 0; ii < timelineCount; ii++) {
 						let timeline = timelines[ii];
-						let timelineBlend = timelineMode[ii] == AnimationState.SUBSEQUENT ? blend : MixBlend.setup;
+						let timelineBlend = (timelineMode[ii] & (AnimationState.NOT_LAST - 1)) == AnimationState.SUBSEQUENT ? blend : MixBlend.setup;
 						if (timeline instanceof RotateTimeline) {
 							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
 						} else {
@@ -228,7 +229,7 @@ module spine {
 					let direction = MixDirection.out;
 					let timelineBlend: MixBlend;
 					let alpha = 0;
-					switch (timelineMode[i]) {
+					switch (timelineMode[i] & (AnimationState.NOT_LAST - 1)) {
 					case AnimationState.SUBSEQUENT:
 						if (!attachments && timeline instanceof AttachmentTimeline) continue;
 						if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
@@ -257,9 +258,9 @@ module spine {
 						Utils.webkit602BugfixHelper(alpha, blend);
 						if (timelineBlend == MixBlend.setup) {
 							if (timeline instanceof AttachmentTimeline) {
-								if (attachments) direction = MixDirection.out;
+								if (attachments || (timelineMode[i] & AnimationState.NOT_LAST) == AnimationState.NOT_LAST) direction = MixDirection.in;
 							} else if (timeline instanceof DrawOrderTimeline) {
-								if (drawOrder) direction = MixDirection.out;
+								if (drawOrder) direction = MixDirection.in;
 							}
 						}
 						timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, direction);
@@ -584,13 +585,22 @@ module spine {
 					entry = entry.mixingFrom;
 
 				do {
-					if (entry.mixingFrom == null || entry.mixBlend != MixBlend.add) this.setTimelineModes(entry);
+					if (entry.mixingFrom == null || entry.mixBlend != MixBlend.add) this.computeHold(entry);
 					entry = entry.mixingTo;
 				} while (entry != null)
 			}
+
+			this.propertyIDs.clear();
+			for (let i = this.tracks.length - 1; i >= 0; i--) {
+				let entry = this.tracks[i];
+				while (entry != null) {
+					this.computeNotLast(entry);
+					entry = entry.mixingFrom;
+				}
+			}
 		}
 
-		setTimelineModes (entry: TrackEntry) {
+		computeHold (entry: TrackEntry) {
 			let to = entry.mixingTo;
 			let timelines = entry.animation.timelines;
 			let timelinesCount = entry.animation.timelines.length;
@@ -609,12 +619,14 @@ module spine {
 
 			outer:
 			for (let i = 0; i < timelinesCount; i++) {
-				let id = timelines[i].getPropertyId();
+				let timeline = timelines[i];
+				let id = timeline.getPropertyId();
 				if (!propertyIDs.add(id))
 					timelineMode[i] = AnimationState.SUBSEQUENT;
-				else if (to == null || !this.hasTimeline(to, id))
+				else if (to == null || timeline instanceof AttachmentTimeline || timeline instanceof DrawOrderTimeline
+					|| timeline instanceof EventTimeline || !this.hasTimeline(to, id)) {
 					timelineMode[i] = AnimationState.FIRST;
-				else {
+				} else {
 					for (let next = to.mixingTo; next != null; next = next.mixingTo) {
 						if (this.hasTimeline(next, id)) continue;
 						if (entry.mixDuration > 0) {
@@ -625,6 +637,20 @@ module spine {
 						break;
 					}
 					timelineMode[i] = AnimationState.HOLD;
+				}
+			}
+		}
+
+		computeNotLast (entry: TrackEntry) {
+			let timelines = entry.animation.timelines;
+			let timelinesCount = entry.animation.timelines.length;
+			let timelineMode = entry.timelineMode;
+			let propertyIDs = this.propertyIDs;
+
+			for (let i = 0; i < timelinesCount; i++) {
+				if (timelines[i] instanceof AttachmentTimeline) {
+					let timeline = timelines[i] as AttachmentTimeline;
+					if (!propertyIDs.add(timeline.slotIndex)) timelineMode[i] |= AnimationState.NOT_LAST;
 				}
 			}
 		}

@@ -58,7 +58,7 @@ module spine {
 		computeWorldVertices (slot: Slot, start: number, count: number, worldVertices: ArrayLike<number>, offset: number, stride: number) {
 			count = offset + (count >> 1) * stride;
 			let skeleton = slot.bone.skeleton;
-			let deformArray = slot.attachmentVertices;
+			let deformArray = slot.deform;
 			let vertices = this.vertices;
 			let bones = this.bones;
 			if (bones == null) {

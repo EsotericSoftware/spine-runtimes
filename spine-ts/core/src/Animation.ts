@@ -758,8 +758,8 @@ module spine {
 			let slotAttachment: Attachment = slot.getAttachment();
 			if (!(slotAttachment instanceof VertexAttachment) || !(<VertexAttachment>slotAttachment).applyDeform(this.attachment)) return;
 
-			let verticesArray: Array<number> = slot.attachmentVertices;
-			if (verticesArray.length == 0) blend = MixBlend.setup;
+			let deformArray: Array<number> = slot.deform;
+			if (deformArray.length == 0) blend = MixBlend.setup;
 
 			let frameVertices = this.frameVertices;
 			let vertexCount = frameVertices[0].length;
@@ -769,30 +769,30 @@ module spine {
 				let vertexAttachment = <VertexAttachment>slotAttachment;
 				switch (blend) {
 				case MixBlend.setup:
-					verticesArray.length = 0;
+					deformArray.length = 0;
 					return;
 				case MixBlend.first:
 					if (alpha == 1) {
-						verticesArray.length = 0;
+						deformArray.length = 0;
 						break;
 					}
-					let vertices: Array<number> = Utils.setArraySize(verticesArray, vertexCount);
+					let deform: Array<number> = Utils.setArraySize(deformArray, vertexCount);
 					if (vertexAttachment.bones == null) {
 						// Unweighted vertex positions.
 						let setupVertices = vertexAttachment.vertices;
 						for (var i = 0; i < vertexCount; i++)
-							vertices[i] += (setupVertices[i] - vertices[i]) * alpha;
+							deform[i] += (setupVertices[i] - deform[i]) * alpha;
 					} else {
 						// Weighted deform offsets.
 						alpha = 1 - alpha;
 						for (var i = 0; i < vertexCount; i++)
-							vertices[i] *= alpha;
+							deform[i] *= alpha;
 					}
 				}
 				return;
 			}
 
-			let vertices: Array<number> = Utils.setArraySize(verticesArray, vertexCount);
+			let deform: Array<number> = Utils.setArraySize(deformArray, vertexCount);
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.
 				let lastVertices = frameVertices[frames.length - 1];
 				if (alpha == 1) {
@@ -802,15 +802,15 @@ module spine {
 							// Unweighted vertex positions, with alpha.
 							let setupVertices = vertexAttachment.vertices;
 							for (let i = 0; i < vertexCount; i++) {
-								vertices[i] += lastVertices[i] - setupVertices[i];
+								deform[i] += lastVertices[i] - setupVertices[i];
 							}
 						} else {
 							// Weighted deform offsets, with alpha.
 							for (let i = 0; i < vertexCount; i++)
-								vertices[i] += lastVertices[i];
+								deform[i] += lastVertices[i];
 						}
 					} else {
-						Utils.arrayCopy(lastVertices, 0, vertices, 0, vertexCount);
+						Utils.arrayCopy(lastVertices, 0, deform, 0, vertexCount);
 					}
 				} else {
 					switch (blend) {
@@ -821,31 +821,31 @@ module spine {
 							let setupVertices = vertexAttachment.vertices;
 							for (let i = 0; i < vertexCount; i++) {
 								let setup = setupVertices[i];
-								vertices[i] = setup + (lastVertices[i] - setup) * alpha;
+								deform[i] = setup + (lastVertices[i] - setup) * alpha;
 							}
 						} else {
 							// Weighted deform offsets, with alpha.
 							for (let i = 0; i < vertexCount; i++)
-								vertices[i] = lastVertices[i] * alpha;
+								deform[i] = lastVertices[i] * alpha;
 						}
 						break;
 					}
 					case MixBlend.first:
 					case MixBlend.replace:
 						for (let i = 0; i < vertexCount; i++)
-							vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
+							deform[i] += (lastVertices[i] - deform[i]) * alpha;
 					case MixBlend.add:
 						let vertexAttachment = slotAttachment as VertexAttachment;
 						if (vertexAttachment.bones == null) {
 							// Unweighted vertex positions, with alpha.
 							let setupVertices = vertexAttachment.vertices;
 							for (let i = 0; i < vertexCount; i++) {
-								vertices[i] += (lastVertices[i] - setupVertices[i]) * alpha;
+								deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
 							}
 						} else {
 							// Weighted deform offsets, with alpha.
 							for (let i = 0; i < vertexCount; i++)
-								vertices[i] += lastVertices[i] * alpha;
+								deform[i] += lastVertices[i] * alpha;
 						}
 					}
 				}
@@ -867,19 +867,19 @@ module spine {
 						let setupVertices = vertexAttachment.vertices;
 						for (let i = 0; i < vertexCount; i++) {
 							let prev = prevVertices[i];
-							vertices[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
+							deform[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
 						}
 					} else {
 						// Weighted deform offsets, with alpha.
 						for (let i = 0; i < vertexCount; i++) {
 							let prev = prevVertices[i];
-							vertices[i] += prev + (nextVertices[i] - prev) * percent;
+							deform[i] += prev + (nextVertices[i] - prev) * percent;
 						}
 					}
 				} else {
 					for (let i = 0; i < vertexCount; i++) {
 						let prev = prevVertices[i];
-						vertices[i] = prev + (nextVertices[i] - prev) * percent;
+						deform[i] = prev + (nextVertices[i] - prev) * percent;
 					}
 				}
 			} else {
@@ -891,13 +891,13 @@ module spine {
 						let setupVertices = vertexAttachment.vertices;
 						for (let i = 0; i < vertexCount; i++) {
 							let prev = prevVertices[i], setup = setupVertices[i];
-							vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+							deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
 						}
 					} else {
 						// Weighted deform offsets, with alpha.
 						for (let i = 0; i < vertexCount; i++) {
 							let prev = prevVertices[i];
-							vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
+							deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
 						}
 					}
 					break;
@@ -906,7 +906,7 @@ module spine {
 				case MixBlend.replace:
 					for (let i = 0; i < vertexCount; i++) {
 						let prev = prevVertices[i];
-						vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+						deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
 					}
 					break;
 				case MixBlend.add:
@@ -916,13 +916,13 @@ module spine {
 						let setupVertices = vertexAttachment.vertices;
 						for (let i = 0; i < vertexCount; i++) {
 							let prev = prevVertices[i];
-							vertices[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
+							deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
 						}
 					} else {
 						// Weighted deform offsets, with alpha.
 						for (let i = 0; i < vertexCount; i++) {
 							let prev = prevVertices[i];
-							vertices[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
+							deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
 						}
 					}
 				}

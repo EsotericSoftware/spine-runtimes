@@ -246,6 +246,7 @@ declare module spine {
 		static FIRST: number;
 		static HOLD: number;
 		static HOLD_MIX: number;
+		static NOT_LAST: number;
 		data: AnimationStateData;
 		tracks: TrackEntry[];
 		events: Event[];
@@ -276,7 +277,8 @@ declare module spine {
 		trackEntry(trackIndex: number, animation: Animation, loop: boolean, last: TrackEntry): TrackEntry;
 		disposeNext(entry: TrackEntry): void;
 		_animationsChanged(): void;
-		setTimelineModes(entry: TrackEntry): void;
+		computeHold(entry: TrackEntry): void;
+		computeNotLast(entry: TrackEntry): void;
 		hasTimeline(entry: TrackEntry, id: number): boolean;
 		getCurrent(trackIndex: number): TrackEntry;
 		addListener(listener: AnimationStateListener2): void;
@@ -784,7 +786,7 @@ declare module spine {
 		darkColor: Color;
 		private attachment;
 		private attachmentTime;
-		attachmentVertices: number[];
+		deform: number[];
 		constructor(data: SlotData, bone: Bone);
 		getAttachment(): Attachment;
 		setAttachment(attachment: Attachment): void;
