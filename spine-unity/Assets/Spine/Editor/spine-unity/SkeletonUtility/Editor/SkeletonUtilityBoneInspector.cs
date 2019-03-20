@@ -28,9 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-//#define HINGECHAIN2D
 // Contributed by: Mitch Thompson
-
 
 using UnityEngine;
 using UnityEditor;
@@ -177,8 +175,10 @@ namespace Spine.Unity.Editor {
 			using (new GUILayout.HorizontalScope()) {
 				EditorGUILayout.Space();
 				using (new EditorGUI.DisabledGroupScope(multiObject || !utilityBone.valid || !canCreateHingeChain)) {
-					if (GUILayout.Button(SpineInspectorUtility.TempContent("Create Hinge Chain", Icons.hingeChain), GUILayout.Width(150), GUILayout.Height(24)))
+					if (GUILayout.Button(SpineInspectorUtility.TempContent("Create 3D Hinge Chain", Icons.hingeChain), GUILayout.MinWidth(120), GUILayout.Height(24)))
 						CreateHingeChain();
+					if (GUILayout.Button(SpineInspectorUtility.TempContent("Create 2D Hinge Chain", Icons.hingeChain), GUILayout.MinWidth(120), GUILayout.Height(24)))
+						CreateHingeChain2D();
 				}
 				EditorGUILayout.Space();
 			}
@@ -277,17 +277,20 @@ namespace Spine.Unity.Editor {
 			EditorGUIUtility.PingObject(go);
 		}
 
-
-#if HINGECHAIN2D
 		bool CanCreateHingeChain () {
-			if (utilityBone == null) return false;
-			if (utilityBone.GetComponent<Rigidbody2D>() != null) return false;
-			if (utilityBone.bone != null && utilityBone.bone.Children.Count == 0) return false;
-			var rigidbodies = utilityBone.GetComponentsInChildren<Rigidbody2D>();
-			return rigidbodies.Length <= 0;
+			if (utilityBone == null)
+				return false;
+			if (utilityBone.GetComponent<Rigidbody>() != null || utilityBone.GetComponent<Rigidbody2D>() != null)
+				return false;
+			if (utilityBone.bone != null && utilityBone.bone.Children.Count == 0)
+				return false;
+
+			var rigidbodies = utilityBone.GetComponentsInChildren<Rigidbody>();
+			var rigidbodies2D = utilityBone.GetComponentsInChildren<Rigidbody2D>();
+			return rigidbodies.Length <= 0 && rigidbodies2D.Length <= 0;
 		}
 
-		void CreateHingeChain () {
+		void CreateHingeChain2D () {
 			var utilBoneArr = utilityBone.GetComponentsInChildren<SkeletonUtilityBone>();
 
 			foreach (var utilBone in utilBoneArr) {
@@ -323,19 +326,6 @@ namespace Spine.Unity.Editor {
 				};
 				utilBone.GetComponent<Rigidbody2D>().mass = utilBone.transform.parent.GetComponent<Rigidbody2D>().mass * 0.75f;
 			}
-		}
-#else
-		bool CanCreateHingeChain () {
-			if (utilityBone == null)
-				return false;
-			if (utilityBone.GetComponent<Rigidbody>() != null)
-				return false;
-			if (utilityBone.bone != null && utilityBone.bone.Children.Count == 0)
-				return false;
-
-			var rigidbodies = utilityBone.GetComponentsInChildren<Rigidbody>();
-
-			return rigidbodies.Length <= 0;
 		}
 
 		void CreateHingeChain () {
@@ -380,7 +370,6 @@ namespace Spine.Unity.Editor {
 
 			utilBone.gameObject.AddComponent<Rigidbody>();
 		}
-#endif
 	}
 
 }
