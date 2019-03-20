@@ -507,7 +507,7 @@ namespace Spine {
 				skeleton.slots.Items[i].SetColorToSetupPose();
 				break;
 			case TimelineType.Deform:
-				skeleton.slots.Items[i].attachmentVertices.Clear();
+				skeleton.slots.Items[i].Deform.Clear();
 				break;
 			
 			// Skeleton
