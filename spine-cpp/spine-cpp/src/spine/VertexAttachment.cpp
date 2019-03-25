@@ -66,7 +66,7 @@ void VertexAttachment::computeWorldVertices(Slot &slot, size_t start, size_t cou
 	size_t stride) {
 	count = offset + (count >> 1) * stride;
 	Skeleton &skeleton = slot._bone._skeleton;
-	Vector<float> *deformArray = &slot.getAttachmentVertices();
+	Vector<float> *deformArray = &slot.getDeform();
 	Vector<float> *vertices = &_vertices;
 	Vector<size_t> &bones = _bones;
 	if (bones.size() == 0) {

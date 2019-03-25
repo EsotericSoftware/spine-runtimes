@@ -428,22 +428,24 @@ namespace spine {
         void queueEvents(TrackEntry* entry, float animationTime);
         
         /// Sets the active TrackEntry for a given track number.
-        void setCurrent(size_t index, TrackEntry* current, bool interrupt);
+        void setCurrent(size_t index, TrackEntry *current, bool interrupt);
 
         TrackEntry* expandToIndex(size_t index);
 
         /// Object-pooling version of new TrackEntry. Obtain an unused TrackEntry from the pool and clear/initialize its values.
         /// @param last May be NULL.
-        TrackEntry* newTrackEntry(size_t trackIndex, Animation* animation, bool loop, TrackEntry* last);
+        TrackEntry* newTrackEntry(size_t trackIndex, Animation *animation, bool loop, TrackEntry *last);
 
         /// Dispose all track entries queued after the given TrackEntry.
         void disposeNext(TrackEntry* entry);
 
         void animationsChanged();
 
-        void setTimelineModes(TrackEntry* entry);
+        void computeHold(TrackEntry *entry);
 
-        bool hasTimeline(TrackEntry* entry, int inId);
+        void computeNotLast(TrackEntry *entry);
+
+        bool hasTimeline(TrackEntry *entry, int inId);
     };
 }
 

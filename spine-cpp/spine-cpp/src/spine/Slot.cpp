@@ -100,7 +100,7 @@ void Slot::setAttachment(Attachment *inValue) {
 
 	_attachment = inValue;
 	_attachmentTime = _skeleton.getTime();
-	_attachmentVertices.clear();
+	_deform.clear();
 }
 
 float Slot::getAttachmentTime() {
@@ -111,6 +111,6 @@ void Slot::setAttachmentTime(float inValue) {
 	_attachmentTime = _skeleton.getTime() - inValue;
 }
 
-Vector<float> &Slot::getAttachmentVertices() {
-	return _attachmentVertices;
+Vector<float> &Slot::getDeform() {
+	return _deform;
 }

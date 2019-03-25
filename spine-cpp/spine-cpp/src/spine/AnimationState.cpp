@@ -43,6 +43,7 @@
 #include <spine/BoneData.h>
 #include <spine/AttachmentTimeline.h>
 #include <spine/DrawOrderTimeline.h>
+#include <spine/EventTimeline.h>
 
 using namespace spine;
 
@@ -275,6 +276,7 @@ const int Subsequent = 0;
 const int First = 1;
 const int Hold = 2;
 const int HoldMix = 3;
+const int NotLast = 4;
 
 AnimationState::AnimationState(AnimationStateData *data) :
 		_data(data),
@@ -418,7 +420,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 				Timeline *timeline = timelines[ii];
 				assert(timeline);
 
-				MixBlend timelineBlend = timelineMode[ii] == Subsequent ? blend : MixBlend_Setup;
+				MixBlend timelineBlend = (timelineMode[ii] & (NotLast - 1)) == Subsequent ? blend : MixBlend_Setup;
 
 				RotateTimeline *rotateTimeline = NULL;
 				if (timeline->getRTTI().isExactly(RotateTimeline::rtti)) {
@@ -787,7 +789,7 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 			MixDirection direction = MixDirection_Out;
 			MixBlend timelineBlend;
 			float alpha;
-			switch (timelineMode[i]) {
+			switch (timelineMode[i] & (NotLast - 1)) {
 				case Subsequent:
 					if (!attachments && (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))) continue;
 					if (!drawOrder && (timeline->getRTTI().isExactly(DrawOrderTimeline::rtti))) continue;
@@ -815,7 +817,7 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 			} else {
 				if (timelineBlend == MixBlend_Setup) {
 					if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti)) {
-						if (attachments) direction = MixDirection_In;
+						if (attachments || (timelineMode[i] & NotLast) == NotLast) direction = MixDirection_In;
 					} else if (timeline->getRTTI().isExactly(DrawOrderTimeline::rtti)) {
 						if (drawOrder) direction = MixDirection_In;
 					}
@@ -967,13 +969,22 @@ void AnimationState::animationsChanged() {
 			entry = entry->_mixingFrom;
 
 		do {
-			if (entry->_mixingTo == NULL || entry->_mixBlend != MixBlend_Add) setTimelineModes(entry);
+			if (entry->_mixingTo == NULL || entry->_mixBlend != MixBlend_Add) computeHold(entry);
 			entry = entry->_mixingTo;
 		} while (entry != NULL);
 	}
+
+	_propertyIDs.clear();
+	for (int i = (int)_tracks.size() - 1; i >= 0; i--) {
+		TrackEntry *entry = _tracks[i];
+		while (entry) {
+			computeNotLast(entry);
+			entry = entry->_mixingFrom;
+		}
+	}
 }
 
-void AnimationState::setTimelineModes(TrackEntry *entry) {
+void AnimationState::computeHold(TrackEntry *entry) {
 	TrackEntry* to = entry->_mixingTo;
 	Vector<Timeline *> &timelines = entry->_animation->_timelines;
 	size_t timelinesCount = timelines.size();
@@ -995,13 +1006,16 @@ void AnimationState::setTimelineModes(TrackEntry *entry) {
 	size_t i = 0;
 	continue_outer:
 	for (; i < timelinesCount; ++i) {
-		int id = timelines[i]->getPropertyId();
+		Timeline *timeline = timelines[i];
+		int id = timeline->getPropertyId();
 		if (_propertyIDs.contains(id)) {
 			timelineMode[i] = Subsequent;
 		} else {
 			_propertyIDs.add(id);
 
-			if (to == NULL || !hasTimeline(to, id)) {
+			if (to == NULL || timeline->getRTTI().isExactly(AttachmentTimeline::rtti) ||
+					timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) ||
+					timeline->getRTTI().isExactly(EventTimeline::rtti) || !hasTimeline(to, id)) {
 				timelineMode[i] = First;
 			} else {
 				for (TrackEntry *next = to->_mixingTo; next != NULL; next = next->_mixingTo) {
@@ -1015,6 +1029,22 @@ void AnimationState::setTimelineModes(TrackEntry *entry) {
 					break;
 				}
 				timelineMode[i] = Hold;
+			}
+		}
+	}
+}
+
+void AnimationState::computeNotLast(TrackEntry *entry) {
+	Vector<Timeline *> &timelines = entry->_animation->_timelines;
+	size_t timelinesCount = timelines.size();
+	Vector<int> &timelineMode = entry->_timelineMode;
+
+	for (size_t i = 0; i < timelinesCount; i++) {
+		if (timelines[i]->getRTTI().isExactly(AttachmentTimeline::rtti)) {
+			AttachmentTimeline *timeline = static_cast<AttachmentTimeline *>(timelines[i]);
+			if (!_propertyIDs.contains(timeline->getSlotIndex())) {
+				_propertyIDs.add(timeline->getSlotIndex());
+				timelineMode[i] |= NotLast;
 			}
 		}
 	}
