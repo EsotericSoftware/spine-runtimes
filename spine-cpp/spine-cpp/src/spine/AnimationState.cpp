@@ -163,9 +163,11 @@ void TrackEntry::resetRotationDirections() {
 
 void TrackEntry::setListener(AnimationStateListener inValue) {
 	_listener = inValue;
+	_listenerObj = NULL;
 }
 
 void TrackEntry::setListener(AnimationStateListenerClass* inValue) {
+	_listener = dummyOnAnimationEventFunc;
 	_listenerObj = inValue;
 }
 
@@ -648,9 +650,11 @@ void AnimationState::setTimeScale(float inValue) {
 
 void AnimationState::setListener(AnimationStateListener inValue) {
 	_listener = inValue;
+	_listenerObj = NULL;
 }
 
 void AnimationState::setListener(AnimationStateListenerClass* inValue) {
+	_listener = dummyOnAnimationEventFunc;
 	_listenerObj = inValue;
 }
 
