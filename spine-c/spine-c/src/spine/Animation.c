@@ -890,7 +890,7 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 	float* frames;
 	int framesCount;
 	const float** frameVertices;
-	float* vertices;
+	float* deformArray;
 	spDeformTimeline* self = (spDeformTimeline*)timeline;
 
 	spSlot *slot = skeleton->slots[self->slotIndex];
@@ -911,39 +911,39 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 	frames = self->frames;
 	framesCount = self->framesCount;
 	vertexCount = self->frameVerticesCount;
-	if (slot->attachmentVerticesCount < vertexCount) {
-		if (slot->attachmentVerticesCapacity < vertexCount) {
-			FREE(slot->attachmentVertices);
-			slot->attachmentVertices = MALLOC(float, vertexCount);
-			slot->attachmentVerticesCapacity = vertexCount;
+	if (slot->deformCount < vertexCount) {
+		if (slot->deformCapacity < vertexCount) {
+			FREE(slot->deform);
+			slot->deform = MALLOC(float, vertexCount);
+			slot->deformCapacity = vertexCount;
 		}
 	}
-	if (slot->attachmentVerticesCount == 0) blend = SP_MIX_BLEND_SETUP;
+	if (slot->deformCount == 0) blend = SP_MIX_BLEND_SETUP;
 
 	frameVertices = self->frameVertices;
-	vertices = slot->attachmentVertices;
+	deformArray = slot->deform;
 
 	if (time < frames[0]) { /* Time is before first frame. */
 		spVertexAttachment* vertexAttachment = SUB_CAST(spVertexAttachment, slot->attachment);
 		switch (blend) {
 			case SP_MIX_BLEND_SETUP:
-				slot->attachmentVerticesCount = 0;
+				slot->deformCount = 0;
 				return;
 			case SP_MIX_BLEND_FIRST:
 				if (alpha == 1) {
-					slot->attachmentVerticesCount = 0;
+					slot->deformCount = 0;
 					return;
 				}
-				slot->attachmentVerticesCount = vertexCount;
+				slot->deformCount = vertexCount;
 				if (!vertexAttachment->bones) {
 					float* setupVertices = vertexAttachment->vertices;
 					for (i = 0; i < vertexCount; i++) {
-						vertices[i] += (setupVertices[i] - vertices[i]) * alpha;
+						deformArray[i] += (setupVertices[i] - deformArray[i]) * alpha;
 					}
 				} else {
 					alpha = 1 - alpha;
 					for (i = 0; i < vertexCount; i++) {
-						vertices[i] *= alpha;
+						deformArray[i] *= alpha;
 					}
 				}
 			case SP_MIX_BLEND_REPLACE:
@@ -953,7 +953,7 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 		return;
 	}
 
-	slot->attachmentVerticesCount = vertexCount;
+	slot->deformCount = vertexCount;
 	if (time >= frames[framesCount - 1]) { /* Time is after last frame. */
 		const float* lastVertices = self->frameVertices[framesCount - 1];
 		if (alpha == 1) {
@@ -963,16 +963,16 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 					/* Unweighted vertex positions, with alpha. */
 					float* setupVertices = vertexAttachment->vertices;
 					for (i = 0; i < vertexCount; i++) {
-						vertices[i] += lastVertices[i] - setupVertices[i];
+						deformArray[i] += lastVertices[i] - setupVertices[i];
 					}
 				} else {
 					/* Weighted deform offsets, with alpha. */
 					for (i = 0; i < vertexCount; i++)
-						vertices[i] += lastVertices[i];
+						deformArray[i] += lastVertices[i];
 				}
 			} else {
 				/* Vertex positions or deform offsets, no alpha. */
-				memcpy(vertices, lastVertices, vertexCount * sizeof(float));
+				memcpy(deformArray, lastVertices, vertexCount * sizeof(float));
 			}
 		} else {
 			spVertexAttachment* vertexAttachment;
@@ -984,30 +984,30 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 						float* setupVertices = vertexAttachment->vertices;
 						for (i = 0; i < vertexCount; i++) {
 							float setup = setupVertices[i];
-							vertices[i] = setup + (lastVertices[i] - setup) * alpha;
+							deformArray[i] = setup + (lastVertices[i] - setup) * alpha;
 						}
 					} else {
 						/* Weighted deform offsets, with alpha. */
 						for (i = 0; i < vertexCount; i++)
-							vertices[i] = lastVertices[i] * alpha;
+							deformArray[i] = lastVertices[i] * alpha;
 					}
 					break;
 				case SP_MIX_BLEND_FIRST:
 				case SP_MIX_BLEND_REPLACE:
 					/* Vertex positions or deform offsets, with alpha. */
 					for (i = 0; i < vertexCount; i++)
-						vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
+						deformArray[i] += (lastVertices[i] - deformArray[i]) * alpha;
 				case SP_MIX_BLEND_ADD:
 					vertexAttachment = SUB_CAST(spVertexAttachment, slot->attachment);
 					if (!vertexAttachment->bones) {
 						/* Unweighted vertex positions, with alpha. */
 						float* setupVertices = vertexAttachment->vertices;
 						for (i = 0; i < vertexCount; i++) {
-							vertices[i] += (lastVertices[i] - setupVertices[i]) * alpha;
+							deformArray[i] += (lastVertices[i] - setupVertices[i]) * alpha;
 						}
 					} else {
 						for (i = 0; i < vertexCount; i++)
-							vertices[i] += lastVertices[i] * alpha;
+							deformArray[i] += lastVertices[i] * alpha;
 					}
 			}
 		}
@@ -1028,18 +1028,18 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 				float* setupVertices = vertexAttachment->vertices;
 				for (i = 0; i < vertexCount; i++) {
 					float prev = prevVertices[i];
-					vertices[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
+					deformArray[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
 				}
 			} else {
 				for (i = 0; i < vertexCount; i++) {
 					float prev = prevVertices[i];
-					vertices[i] += prev + (nextVertices[i] - prev) * percent;
+					deformArray[i] += prev + (nextVertices[i] - prev) * percent;
 				}
 			}
 		} else {
 			for (i = 0; i < vertexCount; i++) {
 				float prev = prevVertices[i];
-				vertices[i] = prev + (nextVertices[i] - prev) * percent;
+				deformArray[i] = prev + (nextVertices[i] - prev) * percent;
 			}
 		}
 	} else {
@@ -1051,12 +1051,12 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 					float *setupVertices = vertexAttachment->vertices;
 					for (i = 0; i < vertexCount; i++) {
 						float prev = prevVertices[i], setup = setupVertices[i];
-						vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+						deformArray[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
 					}
 				} else {
 					for (i = 0; i < vertexCount; i++) {
 						float prev = prevVertices[i];
-						vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
+						deformArray[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
 					}
 				}
 				break;
@@ -1064,7 +1064,7 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 			case SP_MIX_BLEND_REPLACE:
 				for (i = 0; i < vertexCount; i++) {
 					float prev = prevVertices[i];
-					vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+					deformArray[i] += (prev + (nextVertices[i] - prev) * percent - deformArray[i]) * alpha;
 				}
 				break;
 			case SP_MIX_BLEND_ADD:
@@ -1073,12 +1073,12 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 					float *setupVertices = vertexAttachment->vertices;
 					for (i = 0; i < vertexCount; i++) {
 						float prev = prevVertices[i];
-						vertices[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
+						deformArray[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
 					}
 				} else {
 					for (i = 0; i < vertexCount; i++) {
 						float prev = prevVertices[i];
-						vertices[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
+						deformArray[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
 					}
 				}
 		}

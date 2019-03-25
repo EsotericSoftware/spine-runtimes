@@ -47,9 +47,9 @@ typedef struct spSlot {
 	spColor* darkColor;
 	spAttachment* const attachment;
 
-	int attachmentVerticesCapacity;
-	int attachmentVerticesCount;
-	float* attachmentVertices;
+	int deformCapacity;
+	int deformCount;
+	float* deform;
 
 #ifdef __cplusplus
 	spSlot() :
@@ -58,9 +58,9 @@ typedef struct spSlot {
 		color(),
 		darkColor(0),
 		attachment(0),
-		attachmentVerticesCapacity(0),
-		attachmentVerticesCount(0),
-		attachmentVertices(0) {
+		deformCapacity(0),
+		deformCount(0),
+		deform(0) {
 	}
 #endif
 } spSlot;

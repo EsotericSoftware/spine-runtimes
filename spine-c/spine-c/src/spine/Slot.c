@@ -47,7 +47,7 @@ spSlot* spSlot_create (spSlotData* data, spBone* bone) {
 }
 
 void spSlot_dispose (spSlot* self) {
-	FREE(self->attachmentVertices);
+	FREE(self->deform);
 	FREE(self->darkColor);
 	FREE(self);
 }
@@ -56,7 +56,7 @@ void spSlot_setAttachment (spSlot* self, spAttachment* attachment) {
 	if (attachment == self->attachment) return;
 	CONST_CAST(spAttachment*, self->attachment) = attachment;
 	SUB_CAST(_spSlot, self)->attachmentTime = self->bone->skeleton->time;
-	self->attachmentVerticesCount = 0;
+	self->deformCount = 0;
 }
 
 void spSlot_setAttachmentTime (spSlot* self, float time) {
