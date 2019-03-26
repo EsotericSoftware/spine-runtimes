@@ -638,8 +638,8 @@ namespace Spine.Unity.Editor {
 								requiredPaths.Add((string)data["path"]);
 							else if (data.ContainsKey("name"))
 								requiredPaths.Add((string)data["name"]);
-							//else
-							//	requiredPaths.Add(attachment.Key);
+							else
+								requiredPaths.Add(attachment.Key);
 						}
 					}
 				}
