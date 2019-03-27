@@ -71,7 +71,7 @@ function loadSkeleton (name, initialAnimation, skin) {
 	// Set the scale to apply during parsing, parse the file, and create a new skeleton.
 	var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/" + name + ".json"));
 	var skeleton = new spine.Skeleton(skeletonData);
-	skeleton.flipY = true;
+	skeleton.scaleY = -1;
 	var bounds = calculateBounds(skeleton);
 	skeleton.setSkinByName(skin);
 
