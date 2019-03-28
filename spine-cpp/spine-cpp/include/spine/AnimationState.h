@@ -60,11 +60,10 @@ namespace spine {
     typedef void (*AnimationStateListener) (AnimationState* state, EventType type, TrackEntry* entry, Event* event);
 
 	/// Abstract class to inherit from to create a callback object
-	class SP_API AnimationStateListenerClass
-	{
+	class SP_API AnimationStateListenerObject {
 	public:
-		AnimationStateListenerClass() = default;
-		virtual ~AnimationStateListenerClass() = default;
+		AnimationStateListenerObject() = default;
+		virtual ~AnimationStateListenerObject() = default;
 	public:
 		/// The callback function to be called
 		virtual void callback(AnimationState* state, EventType type, TrackEntry* entry, Event* event) = 0;
@@ -252,7 +251,7 @@ namespace spine {
         
         void setListener(AnimationStateListener listener);
 
-		void setListener(AnimationStateListenerClass* listener);
+		void setListener(AnimationStateListenerObject* listener);
 
     private:
         Animation* _animation;
@@ -272,7 +271,7 @@ namespace spine {
         Vector<TrackEntry*> _timelineHoldMix;
         Vector<float> _timelinesRotation;
         AnimationStateListener _listener;
-		AnimationStateListenerClass* _listenerObj;
+		AnimationStateListenerObject* _listenerObject;
         
         void reset();
     };
@@ -410,7 +409,7 @@ namespace spine {
         void setTimeScale(float inValue);
 
         void setListener(AnimationStateListener listener);
-        void setListener(AnimationStateListenerClass* listener);
+		void setListener(AnimationStateListenerObject* listener);
 
 		void disableQueue();
 		void enableQueue();
@@ -428,7 +427,7 @@ namespace spine {
         bool _animationsChanged;
 
         AnimationStateListener _listener;
-        AnimationStateListenerClass* _listenerObj;
+		AnimationStateListenerObject* _listenerObject;
         
         float _timeScale;
 

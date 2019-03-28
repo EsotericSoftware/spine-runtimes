@@ -18,6 +18,7 @@
 
 ## C++
 * ** Additions **
+* `AnimationState` and `TrackEntry` now also accept a subclass of `AnimationStateListenerObject` as a listener for animation events in the overloaded `setListener()` method.
 
 * **Breaking changes**
 
