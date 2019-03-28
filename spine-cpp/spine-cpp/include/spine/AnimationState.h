@@ -58,6 +58,17 @@ namespace spine {
     class RotateTimeline;
     
     typedef void (*AnimationStateListener) (AnimationState* state, EventType type, TrackEntry* entry, Event* event);
+
+	/// Abstract class to inherit from to create a callback object
+	class SP_API AnimationStateListenerClass
+	{
+	public:
+		AnimationStateListenerClass() = default;
+		virtual ~AnimationStateListenerClass() = default;
+	public:
+		/// The callback function to be called
+		virtual void callback(AnimationState* state, EventType type, TrackEntry* entry, Event* event) = 0;
+	};
     
     /// State for the playback of an animation
     class SP_API TrackEntry : public SpineObject, public HasRendererObject {
@@ -241,6 +252,8 @@ namespace spine {
         
         void setListener(AnimationStateListener listener);
 
+		void setListener(AnimationStateListenerClass* listener);
+
     private:
         Animation* _animation;
         
@@ -259,6 +272,7 @@ namespace spine {
         Vector<TrackEntry*> _timelineHoldMix;
         Vector<float> _timelinesRotation;
         AnimationStateListener _listener;
+		AnimationStateListenerClass* _listenerObj;
         
         void reset();
     };
@@ -396,6 +410,7 @@ namespace spine {
         void setTimeScale(float inValue);
 
         void setListener(AnimationStateListener listener);
+        void setListener(AnimationStateListenerClass* listener);
 
 		void disableQueue();
 		void enableQueue();
@@ -413,6 +428,7 @@ namespace spine {
         bool _animationsChanged;
 
         AnimationStateListener _listener;
+        AnimationStateListenerClass* _listenerObj;
         
         float _timeScale;
 
