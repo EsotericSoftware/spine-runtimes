@@ -39,6 +39,9 @@
 
 class SSpineWidget;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpineWidgetBeforeUpdateWorldTransformDelegate, USpineWidget*, skeleton);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpineWidgetAfterUpdateWorldTransformDelegate, USpineWidget*, skeleton);
+
 UCLASS(ClassGroup = (Spine), meta = (BlueprintSpawnableComponent))
 class SPINEPLUGIN_API USpineWidget: public UWidget {
 	GENERATED_UCLASS_BODY()
@@ -80,6 +83,69 @@ public:
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
 	FSlateBrush Brush;
 
+	UFUNCTION(BlueprintPure, Category = "Components|Spine|Skeleton")
+	void GetSkins(TArray<FString> &Skins);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	bool SetSkin(const FString SkinName);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	bool HasSkin(const FString SkinName);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	bool SetAttachment(const FString slotName, const FString attachmentName);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	void UpdateWorldTransform();
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	void SetToSetupPose();
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	void SetBonesToSetupPose();
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	void SetSlotsToSetupPose();
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	void SetScaleX(float scaleX);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	float GetScaleX();
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	void SetScaleY(float scaleY);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	float GetScaleY();
+
+	UFUNCTION(BlueprintPure, Category = "Components|Spine|Skeleton")
+	void GetBones(TArray<FString> &Bones);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	bool HasBone(const FString BoneName);
+
+	UFUNCTION(BlueprintPure, Category = "Components|Spine|Skeleton")
+	void GetSlots(TArray<FString> &Slots);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	bool HasSlot(const FString SlotName);
+
+	UFUNCTION(BlueprintPure, Category = "Components|Spine|Skeleton")
+	void GetAnimations(TArray<FString> &Animations);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	bool HasAnimation(FString AnimationName);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	float GetAnimationDuration(FString AnimationName);
+
+	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|Skeleton")
+	FSpineWidgetBeforeUpdateWorldTransformDelegate BeforeUpdateWorldTransform;
+
+	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|Skeleton")
+	FSpineWidgetAfterUpdateWorldTransformDelegate AfterUpdateWorldTransform;
+
 	virtual void FinishDestroy() override;
 
 protected:
@@ -87,12 +153,14 @@ protected:
 
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 	virtual void CheckState();
-	virtual void InternalTick(float DeltaTime);
+	virtual void InternalTick(float DeltaTime, bool CallDelegates = true, bool Preview = false);
 	virtual void DisposeState();
 
-	TSharedPtr<SSpineWidget> slateWidget;
+	TSharedPtr<SSpineWidget> slateWidget;	
+
 	spine::Skeleton* skeleton;
 	USpineAtlasAsset* lastAtlas = nullptr;
+	spine::Atlas* lastSpineAtlas = nullptr;
 	USpineSkeletonDataAsset* lastData = nullptr;
 
 	// Need to hold on to the dynamic instances, or the GC will kill us while updating them
