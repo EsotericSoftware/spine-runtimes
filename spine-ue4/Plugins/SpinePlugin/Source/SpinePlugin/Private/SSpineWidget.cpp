@@ -157,11 +157,6 @@ int32 SSpineWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 		self->UpdateMesh(LayerId, OutDrawElements, AllottedGeometry, widget->skeleton);
 	}
 
-	/*if (renderData.VertexData.Num() > 0 && renderData.IndexData.Num() > 0 && renderData.RenderingResourceHandle.IsValid()) {
-			FSlateDrawElement::MakeCustomVerts(OutDrawElements, LayerId, renderData.RenderingResourceHandle, renderData.VertexData,
-											   renderData.IndexData, nullptr, 0, 0);
-	}*/
-
 	return LayerId;
 }
 

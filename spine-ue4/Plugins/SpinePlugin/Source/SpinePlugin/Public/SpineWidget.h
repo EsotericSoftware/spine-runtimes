@@ -146,19 +146,79 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|Skeleton")
 	FSpineWidgetAfterUpdateWorldTransformDelegate AfterUpdateWorldTransform;
 
+	/* Manages if this skeleton should update automatically or is paused. */
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
+		void SetAutoPlay(bool bInAutoPlays);
+
+	/* Directly set the time of the current animation, will clamp to animation range. */
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
+	void SetPlaybackTime(float InPlaybackTime, bool bCallDelegates = true);
+
+	// Blueprint functions
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
+	void SetTimeScale(float timeScale);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
+	float GetTimeScale();
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
+	UTrackEntry* SetAnimation(int trackIndex, FString animationName, bool loop);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
+	UTrackEntry* AddAnimation(int trackIndex, FString animationName, bool loop, float delay);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
+	UTrackEntry* SetEmptyAnimation(int trackIndex, float mixDuration);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
+	UTrackEntry* AddEmptyAnimation(int trackIndex, float mixDuration, float delay);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
+	UTrackEntry* GetCurrent(int trackIndex);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
+	void ClearTracks();
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
+	void ClearTrack(int trackIndex);
+
+	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|Animation")
+	FSpineAnimationStartDelegate AnimationStart;
+
+	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|Animation")
+	FSpineAnimationInterruptDelegate AnimationInterrupt;
+
+	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|Animation")
+	FSpineAnimationEventDelegate AnimationEvent;
+
+	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|Animation")
+	FSpineAnimationCompleteDelegate AnimationComplete;
+
+	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|Animation")
+	FSpineAnimationEndDelegate AnimationEnd;
+
+	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|Animation")
+	FSpineAnimationDisposeDelegate AnimationDispose;
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
+	void Tick(float DeltaTime, bool CallDelegates = true);
+
 	virtual void FinishDestroy() override;
 
+	// used in C event callback. Needs to be public as we can't call
+	// protected methods from plain old C function.
+	void GCTrackEntry(UTrackEntry* entry) { trackEntries.Remove(entry); }
 protected:
 	friend class SSpineWidget;
 
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 	virtual void CheckState();
-	virtual void InternalTick(float DeltaTime, bool CallDelegates = true, bool Preview = false);
 	virtual void DisposeState();
 
 	TSharedPtr<SSpineWidget> slateWidget;	
 
 	spine::Skeleton* skeleton;
+	spine::AnimationState* state;
 	USpineAtlasAsset* lastAtlas = nullptr;
 	spine::Atlas* lastSpineAtlas = nullptr;
 	USpineSkeletonDataAsset* lastData = nullptr;
@@ -182,4 +242,14 @@ protected:
 
 	spine::Vector<float> worldVertices;
 	spine::SkeletonClipping clipper;
+
+	// keep track of track entries so they won't get GCed while
+	// in transit within a blueprint
+	UPROPERTY()
+	TSet<UTrackEntry*> trackEntries;
+
+private:
+	/* If the animation should update automatically. */
+	UPROPERTY()
+	bool bAutoPlaying;
 };

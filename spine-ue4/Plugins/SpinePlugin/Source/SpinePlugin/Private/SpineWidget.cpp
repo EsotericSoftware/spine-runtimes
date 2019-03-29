@@ -36,6 +36,10 @@
 
 #define LOCTEXT_NAMESPACE "Spine"
 
+using namespace spine;
+
+void callback(AnimationState* state, spine::EventType type, TrackEntry* entry, Event* event);
+
 USpineWidget::USpineWidget(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer) {
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> NormalMaterialRef(TEXT("/SpinePlugin/UI_SpineUnlitNormalMaterial"));
 	NormalBlendMaterial = NormalMaterialRef.Object;
@@ -52,6 +56,8 @@ USpineWidget::USpineWidget(const FObjectInitializer& ObjectInitializer): Super(O
 	TextureParameterName = FName(TEXT("SpriteTexture"));
 
 	worldVertices.ensureCapacity(1024 * 2);
+
+	bAutoPlaying = true;
 }
 
 void USpineWidget::SynchronizeProperties() {
@@ -60,11 +66,12 @@ void USpineWidget::SynchronizeProperties() {
 	if (slateWidget.IsValid()) {
 		CheckState();
 		if (skeleton) {
-			InternalTick(0);			
+			Tick(0, false);			
 			slateWidget->SetData(this);
 		} else {
 			slateWidget->SetData(nullptr);		
 		}
+		trackEntries.Empty();
 	}
 }
 
@@ -84,10 +91,12 @@ const FText USpineWidget::GetPaletteCategory() {
 }
 #endif
 
-void USpineWidget::InternalTick(float DeltaTime, bool CallDelegates, bool Preview) {
+void USpineWidget::Tick(float DeltaTime, bool CallDelegates) {
 	CheckState();
 
-	if (skeleton) {
+	if (state && bAutoPlaying) {
+		state->update(DeltaTime);
+		state->apply(*skeleton);
 		if (CallDelegates) BeforeUpdateWorldTransform.Broadcast(this);
 		skeleton->updateWorldTransform();
 		if (CallDelegates) AfterUpdateWorldTransform.Broadcast(this);
@@ -115,8 +124,15 @@ void USpineWidget::CheckState() {
 		DisposeState();
 
 		if (Atlas && SkeletonData) {
-			spine::SkeletonData* data = SkeletonData->GetSkeletonData(Atlas->GetAtlas());
-			if (data) skeleton = new (__FILE__, __LINE__) spine::Skeleton(data);
+			spine::SkeletonData *data = SkeletonData->GetSkeletonData(Atlas->GetAtlas());
+			if (data) {
+				skeleton = new (__FILE__, __LINE__) Skeleton(data);
+				AnimationStateData* stateData = SkeletonData->GetAnimationStateData(Atlas->GetAtlas());
+				state = new (__FILE__, __LINE__) AnimationState(stateData);
+				state->setRendererObject((void*)this);
+				state->setListener(callback);
+				trackEntries.Empty();
+			}
 		}
 
 		lastAtlas = Atlas;
@@ -126,10 +142,17 @@ void USpineWidget::CheckState() {
 }
 
 void USpineWidget::DisposeState() {
+	if (state) {
+		delete state;
+		state = nullptr;
+	}
+
 	if (skeleton) {
 		delete skeleton;
 		skeleton = nullptr;
 	}
+
+	trackEntries.Empty();
 }
 
 void USpineWidget::FinishDestroy() {
@@ -278,4 +301,129 @@ float USpineWidget::GetAnimationDuration(FString AnimationName) {
 		else return animation->getDuration();
 	}
 	return 0;
+}
+
+void USpineWidget::SetAutoPlay(bool bInAutoPlays)
+{
+	bAutoPlaying = bInAutoPlays;
+}
+
+void USpineWidget::SetPlaybackTime(float InPlaybackTime, bool bCallDelegates)
+{
+	CheckState();
+
+	if (state && state->getCurrent(0)) {
+		spine::Animation* CurrentAnimation = state->getCurrent(0)->getAnimation();
+		const float CurrentTime = state->getCurrent(0)->getTrackTime();
+		InPlaybackTime = FMath::Clamp(InPlaybackTime, 0.0f, CurrentAnimation->getDuration());
+		const float DeltaTime = InPlaybackTime - CurrentTime;
+		state->update(DeltaTime);
+		state->apply(*skeleton);
+
+		//Call delegates and perform the world transform
+		if (bCallDelegates)
+		{
+			BeforeUpdateWorldTransform.Broadcast(this);
+		}
+		skeleton->updateWorldTransform();
+		if (bCallDelegates)
+		{
+			AfterUpdateWorldTransform.Broadcast(this);
+		}
+	}
+}
+
+void USpineWidget::SetTimeScale(float timeScale) {
+	CheckState();
+	if (state) state->setTimeScale(timeScale);
+}
+
+float USpineWidget::GetTimeScale() {
+	CheckState();
+	if (state) return state->getTimeScale();
+	return 1;
+}
+
+UTrackEntry* USpineWidget::SetAnimation(int trackIndex, FString animationName, bool loop) {
+	CheckState();
+	if (state && skeleton->getData()->findAnimation(TCHAR_TO_UTF8(*animationName))) {
+		state->disableQueue();
+		TrackEntry* entry = state->setAnimation(trackIndex, TCHAR_TO_UTF8(*animationName), loop);
+		state->enableQueue();
+		UTrackEntry* uEntry = NewObject<UTrackEntry>();
+		uEntry->SetTrackEntry(entry);
+		trackEntries.Add(uEntry);
+		return uEntry;
+	}
+	else return NewObject<UTrackEntry>();
+
+}
+
+UTrackEntry* USpineWidget::AddAnimation(int trackIndex, FString animationName, bool loop, float delay) {
+	CheckState();
+	if (state && skeleton->getData()->findAnimation(TCHAR_TO_UTF8(*animationName))) {
+		state->disableQueue();
+		TrackEntry* entry = state->addAnimation(trackIndex, TCHAR_TO_UTF8(*animationName), loop, delay);
+		state->enableQueue();
+		UTrackEntry* uEntry = NewObject<UTrackEntry>();
+		uEntry->SetTrackEntry(entry);
+		trackEntries.Add(uEntry);
+		return uEntry;
+	}
+	else return NewObject<UTrackEntry>();
+}
+
+UTrackEntry* USpineWidget::SetEmptyAnimation(int trackIndex, float mixDuration) {
+	CheckState();
+	if (state) {
+		TrackEntry* entry = state->setEmptyAnimation(trackIndex, mixDuration);
+		UTrackEntry* uEntry = NewObject<UTrackEntry>();
+		uEntry->SetTrackEntry(entry);
+		trackEntries.Add(uEntry);
+		return uEntry;
+	}
+	else return NewObject<UTrackEntry>();
+}
+
+UTrackEntry* USpineWidget::AddEmptyAnimation(int trackIndex, float mixDuration, float delay) {
+	CheckState();
+	if (state) {
+		TrackEntry* entry = state->addEmptyAnimation(trackIndex, mixDuration, delay);
+		UTrackEntry* uEntry = NewObject<UTrackEntry>();
+		uEntry->SetTrackEntry(entry);
+		trackEntries.Add(uEntry);
+		return uEntry;
+	}
+	else return NewObject<UTrackEntry>();
+}
+
+UTrackEntry* USpineWidget::GetCurrent(int trackIndex) {
+	CheckState();
+	if (state) {
+		TrackEntry* entry = state->getCurrent(trackIndex);
+		if (entry->getRendererObject()) {
+			return (UTrackEntry*)entry->getRendererObject();
+		}
+		else {
+			UTrackEntry* uEntry = NewObject<UTrackEntry>();
+			uEntry->SetTrackEntry(entry);
+			trackEntries.Add(uEntry);
+			return uEntry;
+		}
+	}
+	else return NewObject<UTrackEntry>();
+}
+
+void USpineWidget::ClearTracks() {
+	CheckState();
+	if (state) {
+		state->clearTracks();
+	}
+}
+
+void USpineWidget::ClearTrack(int trackIndex) {
+	CheckState();
+	if (state) {
+		state->clearTrack(trackIndex);
+	}
 }
