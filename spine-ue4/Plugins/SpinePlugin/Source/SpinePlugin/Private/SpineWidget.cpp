@@ -36,16 +36,16 @@
 #define LOCTEXT_NAMESPACE "Spine"
 
 USpineWidget::USpineWidget(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer) {
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> NormalMaterialRef(TEXT("/SpinePlugin/SpineUnlitNormalMaterial"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> NormalMaterialRef(TEXT("/SpinePlugin/UI_SpineUnlitNormalMaterial"));
 	NormalBlendMaterial = NormalMaterialRef.Object;
 
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> AdditiveMaterialRef(TEXT("/SpinePlugin/SpineUnlitAdditiveMaterial"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> AdditiveMaterialRef(TEXT("/SpinePlugin/UI_SpineUnlitAdditiveMaterial"));
 	AdditiveBlendMaterial = AdditiveMaterialRef.Object;
 
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MultiplyMaterialRef(TEXT("/SpinePlugin/SpineUnlitMultiplyMaterial"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MultiplyMaterialRef(TEXT("/SpinePlugin/UI_SpineUnlitMultiplyMaterial"));
 	MultiplyBlendMaterial = MultiplyMaterialRef.Object;
 
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> ScreenMaterialRef(TEXT("/SpinePlugin/SpineUnlitScreenMaterial"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> ScreenMaterialRef(TEXT("/SpinePlugin/UI_SpineUnlitScreenMaterial"));
 	ScreenBlendMaterial = ScreenMaterialRef.Object;
 
 	TextureParameterName = FName(TEXT("SpriteTexture"));
