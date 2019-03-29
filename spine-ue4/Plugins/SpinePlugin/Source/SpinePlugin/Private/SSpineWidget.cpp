@@ -71,10 +71,7 @@ int32 SSpineWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 							   int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const {
 
 	SSpineWidget* self = (SSpineWidget*)this;
-
-	//Begin Change
 	UMaterialInstanceDynamic* MatNow = nullptr;
-	// End Change
 
 	if (widget && widget->skeleton && widget->Atlas) {		
 		widget->skeleton->getColor().set(widget->Color.R, widget->Color.G, widget->Color.B, widget->Color.A);
@@ -160,40 +157,10 @@ int32 SSpineWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 		self->UpdateMesh(LayerId, OutDrawElements, AllottedGeometry, widget->skeleton);
 	}
 
-	/*
-	self->renderData.IndexData.SetNumUninitialized(6);
-	uint32* indexData = (uint32*)renderData.IndexData.GetData();
-	indexData[0] = 0;
-	indexData[1] = 1;
-	indexData[2] = 2;
-	indexData[3] = 2;
-	indexData[4] = 3;
-	indexData[5] = 0;
-
-	self->renderData.VertexData.SetNumUninitialized(4);
-	FSlateVertex* vertexData = (FSlateVertex*)renderData.VertexData.GetData();
-	FVector2D offset = AllottedGeometry.AbsolutePosition;
-	FColor white = FColor(0xffffffff);
-
-	float width = AllottedGeometry.GetAbsoluteSize().X;
-	float height = AllottedGeometry.GetAbsoluteSize().Y;
-
-	setVertex(&vertexData[0], 0, 0, 0, 0, white, offset);
-	setVertex(&vertexData[1], width, 0, 1, 0, white, offset);
-	setVertex(&vertexData[2], width, height, 1, 1, white, offset);
-	setVertex(&vertexData[3], 0, height, 0, 1, white, offset);
-	*/
-	if (renderData.VertexData.Num() > 0 && renderData.IndexData.Num() > 0) {
-		/*
-		FSlateShaderResourceProxy* shaderResource = FSlateDataPayload::ResourceManager->GetShaderResource(widget->Brush);
-		FSlateResourceHandle resourceHandle = FSlateApplication::Get().GetRenderer()->GetResourceHandle(widget->Brush);
-		*/
-		//renderData.Brush = MakeShareable(new FSlateMaterialBrush(*MaterialFromMesh, FVector2D(64,64)));
-		
-		if (renderData.RenderingResourceHandle.IsValid())
+	/*if (renderData.VertexData.Num() > 0 && renderData.IndexData.Num() > 0 && renderData.RenderingResourceHandle.IsValid()) {
 			FSlateDrawElement::MakeCustomVerts(OutDrawElements, LayerId, renderData.RenderingResourceHandle, renderData.VertexData,
 											   renderData.IndexData, nullptr, 0, 0);
-	}
+	}*/
 
 	return LayerId;
 }
@@ -217,36 +184,16 @@ void SSpineWidget::Flush(int32 LayerId, FSlateWindowElementList& OutDrawElements
 	for (size_t i = 0; i < (size_t)Vertices.Num(); i++) {
 		setVertex(&vertexData[i], Vertices[i].X, Vertices[i].Y, Uvs[i].X, Uvs[i].Y, Colors[i], offset);
 	}
-	/*
-	
-	*/
+
 	brush = &widget->Brush;
-	//Begin change
-	if (Material)
-	{
+	if (Material) {
 		renderData.Brush = MakeShareable(new FSlateMaterialBrush(*Material, FVector2D(64, 64)));
 		renderData.RenderingResourceHandle = FSlateApplication::Get().GetRenderer()->GetResourceHandle(*renderData.Brush);
-		//renderData.Brush = MakeShareable(&widget->Brush);
-		
-		//renderData.Brush = MakeShareable(new FSlateMaterialBrush(*Material, widget->Brush));
-		//renderData.RenderingResourceHandle = FSlateApplication::Get().GetRenderer()->GetResourceHandle(*brush);
 	}
-	// End change
 
 	if (renderData.RenderingResourceHandle.IsValid()) {
 		FSlateDrawElement::MakeCustomVerts(OutDrawElements, LayerId, renderData.RenderingResourceHandle, renderData.VertexData, renderData.IndexData, nullptr, 0, 0);
 	}
-
-
-	/*FSlateBrush brush;
-	brush.SetResourceObject(Material);
-	brush = widget->Brush;
-
-	FSlateShaderResourceProxy* shaderResource = FSlateDataPayload::ResourceManager->GetShaderResource(brush);	
-	if (shaderResource) {
-		FSlateResourceHandle resourceHandle = FSlateApplication::Get().GetRenderer()->GetResourceHandle(brush);
-		FSlateDrawElement::MakeCustomVerts(OutDrawElements, LayerId, resourceHandle, renderData.VertexData, renderData.IndexData, nullptr, 0, 0);
-	}*/
 
 	Vertices.SetNum(0);
 	Indices.SetNum(0);
@@ -351,7 +298,19 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList& OutDrawEle
 		}
 
 		if (lastMaterial != material) {
-			
+			FBox VerticeBounds = FBox();
+			for (int i = 0; i < vertices.Num(); i++) {
+				VerticeBounds += vertices[i];
+			}
+			const FVector2D DrawSize = AllottedGeometry.GetDrawSize();
+			const FVector BoundMin = VerticeBounds.Min;
+			const FVector BoundSize = VerticeBounds.GetSize();
+			const float Scale = (DrawSize / FVector2D(BoundSize.X, BoundSize.Y)).GetMin();
+
+			for (int i = 0; i < vertices.Num(); i++) {
+				vertices[i] = (vertices[i] - BoundMin) * Scale;
+			}
+			Flush(LayerId, OutDrawElements, AllottedGeometry, meshSection, vertices, indices, uvs, colors, darkColors, lastMaterial);
 			lastMaterial = material;
 			idx = 0;
 		}
@@ -368,7 +327,6 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList& OutDrawEle
 		for (int j = 0; j < numVertices << 1; j += 2) {
 			colors.Add(FColor(r, g, b, a));
 			darkColors.Add(FVector(dr, dg, db));
-			//vertices.Add(FVector(attachmentVertices[j], depthOffset, attachmentVertices[j + 1]));
 			vertices.Add(FVector(attachmentVertices[j], -attachmentVertices[j + 1], depthOffset));
 			uvs.Add(FVector2D(attachmentUvs[j], attachmentUvs[j + 1]));
 		}
@@ -380,9 +338,7 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList& OutDrawEle
 		idx += numVertices;
 		depthOffset += widget->DepthOffset;
 
-		clipper.clipEnd(*slot);
-
-		//Flush(LayerId, OutDrawElements, AllottedGeometry, meshSection, vertices, indices, uvs, colors, darkColors, lastMaterial);
+		clipper.clipEnd(*slot);		
 	}
 
 	FBox VerticeBounds = FBox();
