@@ -74,10 +74,13 @@ namespace Spine.Unity {
 			if (!valid) return;
 
 			#if UNITY_EDITOR
+			var translatorAnimator = translator.Animator;
+			if (translatorAnimator != null && !translatorAnimator.isInitialized)
+				translatorAnimator.Rebind();
+
 			if (Application.isPlaying) {
 				translator.Apply(skeleton);
 			} else {
-				var translatorAnimator = translator.Animator;
 				if (translatorAnimator != null && translatorAnimator.isInitialized)
 					translator.Apply(skeleton);
 			}
@@ -107,6 +110,7 @@ namespace Spine.Unity {
 			#region Inspector
 			public bool autoReset = true;
 			public MixMode[] layerMixModes = new MixMode[0];
+			public MixBlend[] layerBlendModes = new MixBlend[0];
 			#endregion
 
 			public enum MixMode { AlwaysMix, MixNext, SpineStyle }
@@ -155,6 +159,11 @@ namespace Spine.Unity {
 				if (layerMixModes.Length < animator.layerCount)
 					System.Array.Resize<MixMode>(ref layerMixModes, animator.layerCount);
 
+			#if UNITY_EDITOR
+				if (!Application.isPlaying) {
+					GetLayerBlendModes();
+				}
+			#endif
 				InitClipInfosForLayers();
 				for (int layer = 0, n = animator.layerCount; layer < n; layer++) {
 					GetStateUpdatesFromAnimator(layer);
@@ -229,16 +238,17 @@ namespace Spine.Unity {
 										out clipInfo, out nextClipInfo, out interruptingClipInfo, out shallInterpolateWeightTo1);
 
 					MixMode mode = layerMixModes[layer];
+					MixBlend layerBlendMode = (layer < layerBlendModes.Length) ? layerBlendModes[layer] : MixBlend.Replace;
 					if (mode == MixMode.AlwaysMix) {
 						// Always use Mix instead of Applying the first non-zero weighted clip.
 						for (int c = 0; c < clipInfoCount; c++) {
 							var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-							GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, weight, MixBlend.Replace, MixDirection.In);
+							GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, weight, layerBlendMode, MixDirection.In);
 						}
 						if (hasNext) {
 							for (int c = 0; c < nextClipInfoCount; c++) {
 								var info = nextClipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-								GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime, info.clip.length, nextStateInfo.speed < 0), nextStateInfo.loop, null, weight, MixBlend.Replace, MixDirection.In);
+								GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime, info.clip.length, nextStateInfo.speed < 0), nextStateInfo.loop, null, weight, layerBlendMode, MixDirection.In);
 							}
 						}
 						if (isInterruptionActive) {
@@ -248,7 +258,7 @@ namespace Spine.Unity {
 								float clipWeight = shallInterpolateWeightTo1 ? (info.weight + 1.0f) * 0.5f : info.weight;
 								float weight = clipWeight * layerWeight; if (weight == 0) continue;
 								GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(interruptingStateInfo.normalizedTime + interruptingClipTimeAddition, info.clip.length, interruptingStateInfo.speed < 0),
-																interruptingStateInfo.loop, null, weight, MixBlend.Replace, MixDirection.In);
+																interruptingStateInfo.loop, null, weight, layerBlendMode, MixDirection.In);
 							}
 						}
 					} else { // case MixNext || SpineStyle
@@ -256,13 +266,13 @@ namespace Spine.Unity {
 						int c = 0;
 						for (; c < clipInfoCount; c++) {
 							var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-							GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, 1f, MixBlend.Replace, MixDirection.In);
+							GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, 1f, layerBlendMode, MixDirection.In);
 							break;
 						}
 						// Mix the rest
 						for (; c < clipInfoCount; c++) {
 							var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-							GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, weight, MixBlend.Replace, MixDirection.In);
+							GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, weight, layerBlendMode, MixDirection.In);
 						}
 
 						c = 0;
@@ -271,14 +281,14 @@ namespace Spine.Unity {
 							if (mode == MixMode.SpineStyle) {
 								for (; c < nextClipInfoCount; c++) {
 									var info = nextClipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-									GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime, info.clip.length, nextStateInfo.speed < 0), nextStateInfo.loop, null, 1f, MixBlend.Replace, MixDirection.In);
+									GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime, info.clip.length, nextStateInfo.speed < 0), nextStateInfo.loop, null, 1f, layerBlendMode, MixDirection.In);
 									break;
 								}
 							}
 							// Mix the rest
 							for (; c < nextClipInfoCount; c++) {
 								var info = nextClipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
-								GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime, info.clip.length, nextStateInfo.speed < 0), nextStateInfo.loop, null, weight, MixBlend.Replace, MixDirection.In);
+								GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime, info.clip.length, nextStateInfo.speed < 0), nextStateInfo.loop, null, weight, layerBlendMode, MixDirection.In);
 							}
 						}
 
@@ -290,7 +300,7 @@ namespace Spine.Unity {
 									var info = interruptingClipInfo[c];
 									float clipWeight = shallInterpolateWeightTo1 ? (info.weight + 1.0f) * 0.5f : info.weight;
 									float weight = clipWeight * layerWeight; if (weight == 0) continue;
-									GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(interruptingStateInfo.normalizedTime + interruptingClipTimeAddition, info.clip.length, interruptingStateInfo.speed < 0), interruptingStateInfo.loop, null, 1f, MixBlend.Replace, MixDirection.In);
+									GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(interruptingStateInfo.normalizedTime + interruptingClipTimeAddition, info.clip.length, interruptingStateInfo.speed < 0), interruptingStateInfo.loop, null, 1f, layerBlendMode, MixDirection.In);
 									break;
 								}
 							}
@@ -299,7 +309,7 @@ namespace Spine.Unity {
 								var info = interruptingClipInfo[c];
 								float clipWeight = shallInterpolateWeightTo1 ? (info.weight + 1.0f) * 0.5f : info.weight;
 								float weight = clipWeight * layerWeight; if (weight == 0) continue;
-								GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(interruptingStateInfo.normalizedTime + interruptingClipTimeAddition, info.clip.length, interruptingStateInfo.speed < 0), interruptingStateInfo.loop, null, weight, MixBlend.Replace, MixDirection.In);
+								GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(interruptingStateInfo.normalizedTime + interruptingClipTimeAddition, info.clip.length, interruptingStateInfo.speed < 0), interruptingStateInfo.loop, null, weight, layerBlendMode, MixDirection.In);
 							}
 						}
 					}
@@ -345,6 +355,24 @@ namespace Spine.Unity {
 					}
 				}
 			}
+
+		#if UNITY_EDITOR
+			void GetLayerBlendModes() {
+				if (layerBlendModes.Length < animator.layerCount) {
+					System.Array.Resize<MixBlend>(ref layerBlendModes, animator.layerCount);
+				}
+				for (int layer = 0, n = animator.layerCount; layer < n; ++layer) {
+					var controller = animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController;
+					if (controller != null) {
+						layerBlendModes[layer] = MixBlend.Replace;
+						if (layer > 0) {
+							layerBlendModes[layer] = controller.layers[layer].blendingMode == UnityEditor.Animations.AnimatorLayerBlendingMode.Additive ?
+								MixBlend.Add : MixBlend.Replace;
+						}
+					}
+				}
+			}
+		#endif
 
 			void GetStateUpdatesFromAnimator (int layer) {
 				
