@@ -231,8 +231,8 @@ public class AnimationState {
 					Timeline timeline = (Timeline)timelines[ii];
 					MixBlend timelineBlend = timelineMode[ii] == SUBSEQUENT ? blend : MixBlend.setup;
 					if (timeline instanceof RotateTimeline) {
-						applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1,
-							firstFrame);
+						applyRotateTimeline((RotateTimeline)timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation,
+							ii << 1, firstFrame);
 					} else
 						timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineBlend, MixDirection.in);
 				}
@@ -308,8 +308,8 @@ public class AnimationState {
 				}
 				from.totalAlpha += alpha;
 				if (timeline instanceof RotateTimeline) {
-					applyRotateTimeline(timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1,
-						firstFrame);
+					applyRotateTimeline((RotateTimeline)timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation,
+						i << 1, firstFrame);
 				} else {
 					if (timelineBlend == MixBlend.setup) {
 						if (timeline instanceof AttachmentTimeline) {
@@ -331,7 +331,7 @@ public class AnimationState {
 		return mix;
 	}
 
-	private void applyRotateTimeline (Timeline timeline, Skeleton skeleton, float time, float alpha, MixBlend blend,
+	private void applyRotateTimeline (RotateTimeline timeline, Skeleton skeleton, float time, float alpha, MixBlend blend,
 		float[] timelinesRotation, int i, boolean firstFrame) {
 
 		if (firstFrame) timelinesRotation[i] = 0;
@@ -341,9 +341,8 @@ public class AnimationState {
 			return;
 		}
 
-		RotateTimeline rotateTimeline = (RotateTimeline)timeline;
-		Bone bone = skeleton.bones.get(rotateTimeline.boneIndex);
-		float[] frames = rotateTimeline.frames;
+		Bone bone = skeleton.bones.get(timeline.boneIndex);
+		float[] frames = timeline.frames;
 		float r1, r2;
 		if (time < frames[0]) { // Time is before first frame.
 			switch (blend) {
@@ -365,7 +364,7 @@ public class AnimationState {
 				int frame = Animation.binarySearch(frames, time, ENTRIES);
 				float prevRotation = frames[frame + PREV_ROTATION];
 				float frameTime = frames[frame];
-				float percent = rotateTimeline.getCurvePercent((frame >> 1) - 1,
+				float percent = timeline.getCurvePercent((frame >> 1) - 1,
 					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
 				r2 = frames[frame + ROTATION] - prevRotation;
