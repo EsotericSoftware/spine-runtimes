@@ -217,7 +217,7 @@ public class AnimationState {
 			float animationLast = current.animationLast, animationTime = current.getAnimationTime();
 			int timelineCount = current.animation.timelines.size;
 			Object[] timelines = current.animation.timelines.items;
-			if (i == 0 && (mix == 1 || blend == MixBlend.add)) {
+			if ((i == 0 && mix == 1) || blend == MixBlend.add) {
 				for (int ii = 0; ii < timelineCount; ii++)
 					((Timeline)timelines[ii]).apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection.in);
 			} else {
