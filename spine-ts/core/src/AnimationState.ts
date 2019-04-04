@@ -159,7 +159,7 @@ module spine {
 				let animationLast = current.animationLast, animationTime = current.getAnimationTime();
 				let timelineCount = current.animation.timelines.length;
 				let timelines = current.animation.timelines;
-				if (i == 0 && (mix == 1 || blend == MixBlend.add)) {
+				if ((i == 0 && mix == 1) || blend == MixBlend.add) {
 					for (let ii = 0; ii < timelineCount; ii++)
 						timelines[ii].apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection.in);
 				} else {

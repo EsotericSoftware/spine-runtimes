@@ -1403,7 +1403,7 @@ var spine;
 				var animationLast = current.animationLast, animationTime = current.getAnimationTime();
 				var timelineCount = current.animation.timelines.length;
 				var timelines = current.animation.timelines;
-				if (i == 0 && (mix == 1 || blend == spine.MixBlend.add)) {
+				if ((i == 0 && mix == 1) || blend == spine.MixBlend.add) {
 					for (var ii = 0; ii < timelineCount; ii++)
 						timelines[ii].apply(skeleton, animationLast, animationTime, events, mix, blend, spine.MixDirection["in"]);
 				}
