@@ -400,7 +400,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 		float animationLast = current._animationLast, animationTime = current.getAnimationTime();
 		size_t timelineCount = current._animation->_timelines.size();
 		Vector<Timeline *> &timelines = current._animation->_timelines;
-		if (i == 0 && (mix == 1 || blend == MixBlend_Add)) {
+		if ((i == 0 && mix == 1) || blend == MixBlend_Add) {
 			for (size_t ii = 0; ii < timelineCount; ++ii) {
 				timelines[ii]->apply(skeleton, animationLast, animationTime, &_events, mix, blend,
 									 MixDirection_In);

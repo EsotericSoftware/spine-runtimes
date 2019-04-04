@@ -398,21 +398,21 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
 	skeleton->setPosition(320, 400);
 	skeleton->updateWorldTransform();
 
-	drawable.state->setAnimation(0, "idle", true);
-	drawable.state->setAnimation(1, "blink", true);
-	TrackEntry* left = drawable.state->setAnimation(2, "left", true);
-	TrackEntry* right = drawable.state->setAnimation(3, "right", true);
-	TrackEntry* up = drawable.state->setAnimation(4, "up", true);
-	TrackEntry* down = drawable.state->setAnimation(5, "down", true);
+	TrackEntry* left = drawable.state->setAnimation(0, "left", true);
+	TrackEntry* right = drawable.state->setAnimation(1, "right", true);
+	TrackEntry* up = drawable.state->setAnimation(2, "up", true);
+	TrackEntry* down = drawable.state->setAnimation(3, "down", true);
 
 	left->setAlpha(0);
-	left->setMixBlend(MixBlend_Add);
 	right->setAlpha(0);
 	right->setMixBlend(MixBlend_Add);
 	up->setAlpha(0);
 	up->setMixBlend(MixBlend_Add);
 	down->setAlpha(0);
 	down->setMixBlend(MixBlend_Add);
+
+	drawable.state->setAnimation(4, "idle", true);
+	drawable.state->setAnimation(5, "blink", true);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - owl");
 	window.setFramerateLimit(60);
@@ -465,12 +465,11 @@ int main () {
 	DebugExtension dbgExtension(SpineExtension::getInstance());
 	SpineExtension::setInstance(&dbgExtension);
 
+	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);
 	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(stretchymanStrechyIk, "data/stretchyman-stretchy-ik-pro.json", "data/stretchyman-stretchy-ik-pro.skel", "data/stretchyman-pma.atlas", 0.6f);
-	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
 	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin-pma.atlas", 0.5f);
-	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
 	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 0.2f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
