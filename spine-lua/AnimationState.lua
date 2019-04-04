@@ -347,7 +347,7 @@ function AnimationState:apply (skeleton)
 			local animationLast = current.animationLast
 			local animationTime = current:getAnimationTime()
 			local timelines = current.animation.timelines
-			if i == 0 and (mix == 1 or blend == MixBlend.add) then
+			if (i == 0 and mix == 1) or blend == MixBlend.add then
 				for i,timeline in ipairs(timelines) do
 					timeline:apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection._in)
 				end

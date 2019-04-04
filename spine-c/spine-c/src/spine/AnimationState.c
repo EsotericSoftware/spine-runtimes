@@ -379,7 +379,7 @@ int spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 		animationLast = current->animationLast; animationTime = spTrackEntry_getAnimationTime(current);
 		timelineCount = current->animation->timelinesCount;
 		timelines = current->animation->timelines;
-		if (i == 0 && (mix == 1 || blend == SP_MIX_BLEND_ADD)) {
+		if ((i == 0 && mix == 1) || blend == SP_MIX_BLEND_ADD) {
 			for (ii = 0; ii < timelineCount; ii++)
 				spTimeline_apply(timelines[ii], skeleton, animationLast, animationTime, internal->events, &internal->eventsCount, mix, blend, SP_MIX_DIRECTION_IN);
 		} else {

@@ -101,6 +101,12 @@ public class Skin {
 			if (entry.key.slotIndex == slotIndex) attachments.add(entry.value);
 	}
 
+	public void getAttachments (Array<Attachment> attachments) {
+		if (attachments == null) throw new IllegalArgumentException("attachments cannot be null.");
+		for (Attachment attachment : this.attachments.values())
+			attachments.add(attachment);
+	}
+
 	public void clear () {
 		for (Key key : attachments.keys())
 			keyPool.free(key);

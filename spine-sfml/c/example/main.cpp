@@ -384,7 +384,6 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
 	spTrackEntry* down = AnimationState_setAnimationByName(drawable->state, 5, "down", true);
 
 	left->alpha = 0;
-	left->mixBlend = SP_MIX_BLEND_ADD;
 	right->alpha = 0;
 	right->mixBlend = SP_MIX_BLEND_ADD;
 	up->alpha = 0;
