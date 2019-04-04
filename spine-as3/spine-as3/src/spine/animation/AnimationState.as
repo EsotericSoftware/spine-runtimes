@@ -176,7 +176,7 @@ package spine.animation {
 				var timelineCount : int = current.animation.timelines.length;
 				var timelines : Vector.<Timeline> = current.animation.timelines;
 				var ii : int = 0;
-				if (i == 0 && (mix == 1 || blend == MixBlend.add)) {
+				if ((i == 0 && mix == 1) || blend == MixBlend.add) {
 					for (ii = 0; ii < timelineCount; ii++)
 						Timeline(timelines[ii]).apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection.In);
 				} else {
