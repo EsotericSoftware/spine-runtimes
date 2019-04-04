@@ -398,12 +398,15 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
 	skeleton->setPosition(320, 400);
 	skeleton->updateWorldTransform();
 
-	TrackEntry* left = drawable.state->setAnimation(0, "left", true);
-	TrackEntry* right = drawable.state->setAnimation(1, "right", true);
-	TrackEntry* up = drawable.state->setAnimation(2, "up", true);
-	TrackEntry* down = drawable.state->setAnimation(3, "down", true);
+	drawable.state->setAnimation(0, "idle", true);
+
+	TrackEntry* left = drawable.state->setAnimation(1, "left", true);
+	TrackEntry* right = drawable.state->setAnimation(2, "right", true);
+	TrackEntry* up = drawable.state->setAnimation(3, "up", true);
+	TrackEntry* down = drawable.state->setAnimation(4, "down", true);
 
 	left->setAlpha(0);
+	left->setMixBlend(MixBlend_Add);
 	right->setAlpha(0);
 	right->setMixBlend(MixBlend_Add);
 	up->setAlpha(0);
@@ -411,8 +414,7 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
 	down->setAlpha(0);
 	down->setMixBlend(MixBlend_Add);
 
-	drawable.state->setAnimation(4, "idle", true);
-	drawable.state->setAnimation(5, "blink", true);
+	// drawable.state->setAnimation(5, "blink", true);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - owl");
 	window.setFramerateLimit(60);
