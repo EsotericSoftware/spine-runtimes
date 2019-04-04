@@ -71,7 +71,7 @@ namespace Spine {
 		protected AnimationStateData data;
 		private readonly ExposedList<TrackEntry> tracks = new ExposedList<TrackEntry>();
 		private readonly ExposedList<Event> events = new ExposedList<Event>();
-		
+
 		// difference to libgdx reference: delegates are used for event callbacks instead of 'Array<AnimationStateListener> listeners'.
 		internal void OnStart (TrackEntry entry) { if (Start != null) Start(entry); }
 		internal void OnInterrupt (TrackEntry entry) { if (Interrupt != null) Interrupt(entry); }
@@ -222,7 +222,7 @@ namespace Spine {
 				int timelineCount = current.animation.timelines.Count;
 				var timelines = current.animation.timelines;
 				var timelinesItems = timelines.Items;
-				if (i == 0 && (mix == 1 || blend == MixBlend.Add)) {
+				if ((i == 0 && mix == 1) || blend == MixBlend.Add) {
 					for (int ii = 0; ii < timelineCount; ii++)
 						timelinesItems[ii].Apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection.In);
 				} else {
