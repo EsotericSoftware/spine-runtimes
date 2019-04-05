@@ -379,12 +379,13 @@ namespace Spine.Unity {
 				var layerInfos = layerClipInfos[layer];
 				int clipInfoCount = animator.GetCurrentAnimatorClipInfoCount(layer);
 				int nextClipInfoCount = animator.GetNextAnimatorClipInfoCount(layer);
-				
+
 				var clipInfos = layerInfos.clipInfos;
 				var nextClipInfos = layerInfos.nextClipInfos;
 				var interruptingClipInfos = layerInfos.interruptingClipInfos;
 
-				layerInfos.isInterruptionActive = (clipInfoCount == 0 && nextClipInfoCount == 0);
+				layerInfos.isInterruptionActive = (clipInfoCount == 0 && clipInfos.Count != 0 &&
+													nextClipInfoCount == 0 && nextClipInfos.Count != 0);
 
 				// Note: during interruption, GetCurrentAnimatorClipInfoCount and GetNextAnimatorClipInfoCount
 				// are returning 0 in calls above. Therefore we keep previous clipInfos and nextClipInfos
