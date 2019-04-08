@@ -37,7 +37,7 @@ class FSpineEditorPlugin: public ISpineEditorPlugin {
 	virtual void ShutdownModule() override;
 };
 
-IMPLEMENT_MODULE(FSpineEditorPlugin, ISpineEditorPlugin)
+IMPLEMENT_MODULE(FSpineEditorPlugin, SpineEditorPlugin)
 
 void FSpineEditorPlugin::StartupModule () {
 }
