@@ -42,6 +42,15 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\spine-xna\src\ShapeRenderer.cs">
+      <Link>spine-xna\ShapeRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-xna\src\SkeletonDebugRenderer.cs">
+      <Link>spine-xna\SkeletonDebugRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-xna\src\VertexEffect.cs">
+      <Link>spine-xna\VertexEffect.cs</Link>
+    </Compile>    
     <Compile Include="..\..\spine-xna\src\MeshBatcher.cs">
       <Link>spine-xna\MeshBatcher.cs</Link>
     </Compile>
