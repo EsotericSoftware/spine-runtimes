@@ -65,9 +65,9 @@ namespace Spine {
 
 			// String name = "spineboy-ess";
 			// String name = "goblins-pro";
-			// String name = "raptor-pro";
+			String name = "raptor-pro";
 			// String name = "tank-pro";
-			String name = "coin-pro";
+			// String name = "coin-pro";
 			String atlasName = name.Replace("-pro", "").Replace("-ess", "");
 			bool binaryData = false;
 
@@ -109,17 +109,17 @@ namespace Spine {
 				state.Complete += Complete;
 				state.Event += Event;
 
-				state.SetAnimation(0, "test", false);
+				state.SetAnimation(0, "run", false);
 				TrackEntry entry = state.AddAnimation(0, "jump", false, 0);
 				entry.End += End; // Event handling for queued animations.
 				state.AddAnimation(0, "run", true, 0);
 			}
 			else if (name == "raptor-pro") {
 				state.SetAnimation(0, "walk", true);
-				state.AddAnimation(1, "gungrab", false, 2);
+				state.AddAnimation(1, "gun-grab", false, 2);
 			}
 			else if (name == "coin-pro") {
-				state.SetAnimation(0, "rotate", true);
+				state.SetAnimation(0, "animation", true);
 			}
 			else if (name == "tank-pro") {
 				state.SetAnimation(0, "drive", true);
@@ -127,9 +127,10 @@ namespace Spine {
 			else {
 				state.SetAnimation(0, "walk", true);
 			}
-
+           
 			skeleton.X = 400 + (name == "tank-pro" ? 300 : 0);
 			skeleton.Y = GraphicsDevice.Viewport.Height;
+            skeleton.ScaleY = -1;
 			skeleton.UpdateWorldTransform();
 
 			headSlot = skeleton.FindSlot("head");
