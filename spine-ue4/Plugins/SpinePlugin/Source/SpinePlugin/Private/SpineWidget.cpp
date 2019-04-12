@@ -38,7 +38,41 @@
 
 using namespace spine;
 
-void callback(AnimationState* state, spine::EventType type, TrackEntry* entry, Event* event);
+void callbackWidget(AnimationState* state, spine::EventType type, TrackEntry* entry, Event* event) {
+	USpineWidget* component = (USpineWidget*)state->getRendererObject();
+
+	if (entry->getRendererObject()) {
+		UTrackEntry* uEntry = (UTrackEntry*)entry->getRendererObject();
+		if (type == EventType_Start) {
+			component->AnimationStart.Broadcast(uEntry);
+			uEntry->AnimationStart.Broadcast(uEntry);
+		}
+		else if (type == EventType_Interrupt) {
+			component->AnimationInterrupt.Broadcast(uEntry);
+			uEntry->AnimationInterrupt.Broadcast(uEntry);
+		}
+		else if (type == EventType_Event) {
+			FSpineEvent evt;
+			evt.SetEvent(event);
+			component->AnimationEvent.Broadcast(uEntry, evt);
+			uEntry->AnimationEvent.Broadcast(uEntry, evt);
+		}
+		else if (type == EventType_Complete) {
+			component->AnimationComplete.Broadcast(uEntry);
+			uEntry->AnimationComplete.Broadcast(uEntry);
+		}
+		else if (type == EventType_End) {
+			component->AnimationEnd.Broadcast(uEntry);
+			uEntry->AnimationEnd.Broadcast(uEntry);
+		}
+		else if (type == EventType_Dispose) {
+			component->AnimationDispose.Broadcast(uEntry);
+			uEntry->AnimationDispose.Broadcast(uEntry);
+			uEntry->SetTrackEntry(nullptr);
+			component->GCTrackEntry(uEntry);
+		}
+	}
+}
 
 USpineWidget::USpineWidget(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer) {
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> NormalMaterialRef(TEXT("/SpinePlugin/UI_SpineUnlitNormalMaterial"));
@@ -130,7 +164,7 @@ void USpineWidget::CheckState() {
 				AnimationStateData* stateData = SkeletonData->GetAnimationStateData(Atlas->GetAtlas());
 				state = new (__FILE__, __LINE__) AnimationState(stateData);
 				state->setRendererObject((void*)this);
-				state->setListener(callback);
+				state->setListener(callbackWidget);
 				trackEntries.Empty();
 			}
 		}
@@ -355,7 +389,8 @@ UTrackEntry* USpineWidget::SetAnimation(int trackIndex, FString animationName, b
 		trackEntries.Add(uEntry);
 		return uEntry;
 	}
-	else return NewObject<UTrackEntry>();
+	else
+		return NewObject<UTrackEntry>();
 
 }
 
@@ -370,7 +405,8 @@ UTrackEntry* USpineWidget::AddAnimation(int trackIndex, FString animationName, b
 		trackEntries.Add(uEntry);
 		return uEntry;
 	}
-	else return NewObject<UTrackEntry>();
+	else
+		return NewObject<UTrackEntry>();
 }
 
 UTrackEntry* USpineWidget::SetEmptyAnimation(int trackIndex, float mixDuration) {
@@ -382,7 +418,8 @@ UTrackEntry* USpineWidget::SetEmptyAnimation(int trackIndex, float mixDuration) 
 		trackEntries.Add(uEntry);
 		return uEntry;
 	}
-	else return NewObject<UTrackEntry>();
+	else
+		return NewObject<UTrackEntry>();
 }
 
 UTrackEntry* USpineWidget::AddEmptyAnimation(int trackIndex, float mixDuration, float delay) {
@@ -394,7 +431,8 @@ UTrackEntry* USpineWidget::AddEmptyAnimation(int trackIndex, float mixDuration, 
 		trackEntries.Add(uEntry);
 		return uEntry;
 	}
-	else return NewObject<UTrackEntry>();
+	else
+		return NewObject<UTrackEntry>();
 }
 
 UTrackEntry* USpineWidget::GetCurrent(int trackIndex) {
@@ -411,7 +449,8 @@ UTrackEntry* USpineWidget::GetCurrent(int trackIndex) {
 			return uEntry;
 		}
 	}
-	else return NewObject<UTrackEntry>();
+	else
+		return NewObject<UTrackEntry>();
 }
 
 void USpineWidget::ClearTracks() {
