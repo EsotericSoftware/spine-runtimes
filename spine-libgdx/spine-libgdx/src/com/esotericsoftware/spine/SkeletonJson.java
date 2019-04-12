@@ -122,6 +122,8 @@ public class SkeletonJson {
 		if (skeletonMap != null) {
 			skeletonData.hash = skeletonMap.getString("hash", null);
 			skeletonData.version = skeletonMap.getString("spine", null);
+			skeletonData.x = skeletonMap.getFloat("x", 0);
+			skeletonData.y = skeletonMap.getFloat("y", 0);
 			skeletonData.width = skeletonMap.getFloat("width", 0);
 			skeletonData.height = skeletonMap.getFloat("height", 0);
 			skeletonData.fps = skeletonMap.getFloat("fps", 30);
