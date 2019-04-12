@@ -52,6 +52,8 @@ public:
 #if WITH_EDITOR
 	virtual const FText GetPaletteCategory() override;
 #endif
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
+	float Scale = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
 	USpineAtlasAsset* Atlas;
