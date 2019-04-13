@@ -223,7 +223,7 @@ public class AnimationState {
 			} else {
 				int[] timelineMode = current.timelineMode.items;
 
-				boolean firstFrame = current.timelinesRotation.size == 0;
+				boolean firstFrame = current.timelinesRotation.size != timelineCount << 1;
 				if (firstFrame) current.timelinesRotation.setSize(timelineCount << 1);
 				float[] timelinesRotation = current.timelinesRotation.items;
 
@@ -275,7 +275,7 @@ public class AnimationState {
 			int[] timelineMode = from.timelineMode.items;
 			Object[] timelineHoldMix = from.timelineHoldMix.items;
 
-			boolean firstFrame = from.timelinesRotation.size == 0;
+			boolean firstFrame = from.timelinesRotation.size != timelineCount << 1;
 			if (firstFrame) from.timelinesRotation.setSize(timelineCount << 1);
 			float[] timelinesRotation = from.timelinesRotation.items;
 
