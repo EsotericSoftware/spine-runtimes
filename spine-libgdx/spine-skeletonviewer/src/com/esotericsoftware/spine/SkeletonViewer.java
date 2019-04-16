@@ -428,7 +428,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		Slider loadScaleSlider = new Slider(0.1f, 3, 0.01f, false, skin);
 		Label loadScaleLabel = new Label("100%", skin);
-		TextButton loadScaleResetButton = new TextButton("Reset", skin);
+		TextButton loadScaleResetButton = new TextButton("Reload", skin);
 
 		Slider zoomSlider = new Slider(0.01f, 10, 0.01f, false, skin);
 		Label zoomLabel = new Label("100%", skin);
@@ -541,6 +541,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 		}
 
 		void layout () {
+			float resetWidth = loadScaleResetButton.getPrefWidth();
+
 			root.defaults().space(6);
 			root.columnDefaults(0).top().right().padTop(3);
 			root.columnDefaults(1).left();
@@ -549,7 +551,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				Table table = table();
 				table.add(loadScaleLabel).width(29);
 				table.add(loadScaleSlider).growX();
-				table.add(loadScaleResetButton);
+				table.add(loadScaleResetButton).width(resetWidth);
 				root.add(table).fill().row();
 			}
 			root.add("Zoom:");
@@ -557,7 +559,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				Table table = table();
 				table.add(zoomLabel).width(29);
 				table.add(zoomSlider).growX();
-				table.add(zoomResetButton);
+				table.add(zoomResetButton).width(resetWidth);
 				root.add(table).fill().row();
 			}
 			root.add("Scale X:");
@@ -565,7 +567,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				Table table = table();
 				table.add(xScaleLabel).width(29);
 				table.add(xScaleSlider).growX();
-				table.add(xScaleResetButton).row();
+				table.add(xScaleResetButton).width(resetWidth);
 				root.add(table).fill().row();
 			}
 			root.add("Scale Y:");
@@ -573,7 +575,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				Table table = table();
 				table.add(yScaleLabel).width(29);
 				table.add(yScaleSlider).growX();
-				table.add(yScaleResetButton);
+				table.add(yScaleResetButton).width(resetWidth);
 				root.add(table).fill().row();
 			}
 			root.add("Debug:");
@@ -678,6 +680,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 					String dir = fileDialog.getDirectory();
 					if (name == null || dir == null) return;
 					loadSkeleton(new FileHandle(new File(dir, name).getAbsolutePath()));
+					ui.toast("Loaded.");
 				}
 			});
 
@@ -719,16 +722,22 @@ public class SkeletonViewer extends ApplicationAdapter {
 			loadScaleSlider.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
 					loadScaleLabel.setText(Integer.toString((int)(loadScaleSlider.getValue() * 100)) + "%");
-					if (!loadScaleSlider.isDragging()) loadSkeleton(skeletonFile);
+					if (!loadScaleSlider.isDragging()) {
+						loadSkeleton(skeletonFile);
+						ui.toast("Reloaded.");
+					}
+					loadScaleResetButton.setText(loadScaleSlider.getValue() == 1 ? "Reload" : "Reset");
 				}
 			});
 			loadScaleResetButton.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
 					resetCameraPosition();
-					if (loadScaleSlider.getValue() == 1)
+					if (loadScaleSlider.getValue() == 1) {
 						loadSkeleton(skeletonFile);
-					else
+						ui.toast("Reloaded.");
+					} else
 						loadScaleSlider.setValue(1);
+					loadScaleResetButton.setText("Reload");
 				}
 			});
 
