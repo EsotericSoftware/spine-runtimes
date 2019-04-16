@@ -730,6 +730,8 @@ declare module spine {
 		ikConstraints: IkConstraintData[];
 		transformConstraints: TransformConstraintData[];
 		pathConstraints: PathConstraintData[];
+		x: number;
+		y: number;
 		width: number;
 		height: number;
 		version: string;
