@@ -144,7 +144,9 @@ namespace Spine {
 			if (skeletonData.hash.Length == 0) skeletonData.hash = null;
 			skeletonData.version = ReadString(input);
 			if (skeletonData.version.Length == 0) skeletonData.version = null;
-			skeletonData.width = ReadFloat(input);
+            skeletonData.x = ReadFloat(input);
+            skeletonData.y = ReadFloat(input);
+            skeletonData.width = ReadFloat(input);
 			skeletonData.height = ReadFloat(input);
 
 			bool nonessential = ReadBoolean(input);

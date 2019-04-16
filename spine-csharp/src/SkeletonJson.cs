@@ -100,7 +100,9 @@ namespace Spine {
 				var skeletonMap = (Dictionary<string, Object>)root["skeleton"];
 				skeletonData.hash = (string)skeletonMap["hash"];
 				skeletonData.version = (string)skeletonMap["spine"];
-				skeletonData.width = GetFloat(skeletonMap, "width", 0);
+                skeletonData.x = GetFloat(skeletonMap, "x", 0);
+                skeletonData.y = GetFloat(skeletonMap, "y", 0);
+                skeletonData.width = GetFloat(skeletonMap, "width", 0);
 				skeletonData.height = GetFloat(skeletonMap, "height", 0);
 				skeletonData.fps = GetFloat(skeletonMap, "fps", 0);
 				skeletonData.imagesPath = GetString(skeletonMap, "images", null);
