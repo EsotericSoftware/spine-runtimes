@@ -261,7 +261,7 @@ public class Bone implements Updatable {
 		this.y = y;
 	}
 
-	/** The local rotation. */
+	/** The local rotation in degrees, counter clockwise. */
 	public float getRotation () {
 		return rotation;
 	}
@@ -336,7 +336,7 @@ public class Bone implements Updatable {
 		this.ay = ay;
 	}
 
-	/** The applied local rotation. */
+	/** The applied local rotation in degrees, counter clockwise. */
 	public float getARotation () {
 		return arotation;
 	}
