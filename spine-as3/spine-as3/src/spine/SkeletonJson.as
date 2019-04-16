@@ -92,6 +92,8 @@ package spine {
 			if (skeletonMap) {
 				skeletonData.hash = skeletonMap["hash"];
 				skeletonData.version = skeletonMap["spine"];
+				skeletonData.x = skeletonMap["x"] || 0;
+				skeletonData.y = skeletonMap["y"] || 0;
 				skeletonData.width = skeletonMap["width"] || 0;
 				skeletonData.height = skeletonMap["height"] || 0;
 				skeletonData.fps = skeletonMap["fps"] || 0;

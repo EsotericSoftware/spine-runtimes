@@ -43,7 +43,7 @@ package spine {
 		public var ikConstraints : Vector.<IkConstraintData> = new Vector.<IkConstraintData>();
 		public var transformConstraints : Vector.<TransformConstraintData> = new Vector.<TransformConstraintData>();
 		public var pathConstraints : Vector.<PathConstraintData> = new Vector.<PathConstraintData>();
-		public var width : Number, height : Number;
+		public var x : Number, y : Number, width : Number, height : Number;
 		public var version : String, hash : String;
 		public var fps : Number;
 		public var imagesPath : String;
