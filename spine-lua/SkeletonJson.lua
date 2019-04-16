@@ -84,6 +84,8 @@ function SkeletonJson.new (attachmentLoader)
 		if skeletonMap then
 			skeletonData.hash = skeletonMap["hash"]
 			skeletonData.version = skeletonMap["spine"]
+			skeletonData.x = skeletonMap["x"]
+			skeletonData.y = skeletonMap["y"]
 			skeletonData.width = skeletonMap["width"]
 			skeletonData.height = skeletonMap["height"]
 			skeletonData.fps = skeletonMap["fps"]

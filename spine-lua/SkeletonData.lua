@@ -45,7 +45,7 @@ function SkeletonData.new ()
 		ikConstraints = {},
 		transformConstraints = {},
 		pathConstraints = {},
-		width, height,
+		x, y, width, height,
 		version, hash, imagesPath,
 		slotNameIndices = {}
 	}
