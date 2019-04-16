@@ -51,6 +51,13 @@ void SSpineWidget::Construct(const FArguments& args) {
 
 void SSpineWidget::SetData(USpineWidget* Widget) {
 	this->widget = Widget;
+	if (widget && widget->skeleton && widget->Atlas) {
+		Skeleton *skeleton = widget->skeleton;
+		skeleton->setToSetupPose();
+		skeleton->updateWorldTransform();
+		Vector<float> scratchBuffer;
+		skeleton->getBounds(this->boundsMin.X, this->boundsMin.Y, this->boundsSize.X, this->boundsSize.Y, scratchBuffer);
+	}
 }
 
 static void setVertex(FSlateVertex* vertex, float x, float y, float u, float v, const FColor& color, const FVector2D& offset) {
@@ -163,6 +170,12 @@ int32 SSpineWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 void SSpineWidget::Flush(int32 LayerId, FSlateWindowElementList& OutDrawElements, const FGeometry& AllottedGeometry, int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector>& Colors2, UMaterialInstanceDynamic* Material) {
 	if (Vertices.Num() == 0) return;
 	SSpineWidget* self = (SSpineWidget*)this;
+
+	const FVector2D widgetSize = AllottedGeometry.GetDrawSize();
+	const float setupScale = (widgetSize / FVector2D(boundsSize.X, boundsSize.Y)).GetMin();
+	for (int i = 0; i < Vertices.Num(); i++) {
+		Vertices[i] = (Vertices[i] - FVector(boundsMin.X, -(boundsMin.Y + boundsSize.Y), 0)) * setupScale * widget->Scale;
+	}
 	
 	self->renderData.IndexData.SetNumUninitialized(Indices.Num());
 	uint32* indexData = (uint32*)renderData.IndexData.GetData();
@@ -293,18 +306,6 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList& OutDrawEle
 		}
 
 		if (lastMaterial != material) {
-			FBox VerticeBounds = FBox();
-			for (int i = 0; i < vertices.Num(); i++) {
-				VerticeBounds += vertices[i];
-			}
-			const FVector2D DrawSize = AllottedGeometry.GetDrawSize();
-			const FVector BoundMin = VerticeBounds.Min;
-			const FVector BoundSize = VerticeBounds.GetSize();
-			const float Scale = (DrawSize / FVector2D(BoundSize.X, BoundSize.Y)).GetMin();
-
-			for (int i = 0; i < vertices.Num(); i++) {
-				vertices[i] = (vertices[i] - BoundMin) * Scale;
-			}
 			Flush(LayerId, OutDrawElements, AllottedGeometry, meshSection, vertices, indices, uvs, colors, darkColors, lastMaterial);
 			lastMaterial = material;
 			idx = 0;
@@ -335,22 +336,7 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList& OutDrawEle
 
 		clipper.clipEnd(*slot);		
 	}
-
-	FBox VerticeBounds = FBox();
-	for (int i = 0; i < vertices.Num(); i++)
-	{
-		VerticeBounds += vertices[i];
-	}
-	const FVector2D DrawSize = AllottedGeometry.GetDrawSize();
-	const FVector BoundMin = VerticeBounds.Min;
-	const FVector BoundSize = VerticeBounds.GetSize();
-	const float Scale = (DrawSize / FVector2D(BoundSize.X, BoundSize.Y)).GetMin();
-
-	for (int i = 0; i < vertices.Num(); i++)
-	{
-		vertices[i] = (vertices[i] - BoundMin)*Scale;
-	}
-
+	
 	Flush(LayerId, OutDrawElements, AllottedGeometry, meshSection, vertices, indices, uvs, colors, darkColors, lastMaterial);
 	clipper.clipEnd();
 }

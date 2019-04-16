@@ -175,6 +175,8 @@ public class SkeletonBinary {
 			if (skeletonData.hash.isEmpty()) skeletonData.hash = null;
 			skeletonData.version = input.readString();
 			if (skeletonData.version.isEmpty()) skeletonData.version = null;
+			skeletonData.x = input.readFloat();
+			skeletonData.y = input.readFloat();
 			skeletonData.width = input.readFloat();
 			skeletonData.height = input.readFloat();
 
