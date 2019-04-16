@@ -880,6 +880,8 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		skeletonData->version = 0;
 	}
 
+	skeletonData->x = readFloat(input);
+	skeletonData->y = readFloat(input);
 	skeletonData->width = readFloat(input);
 	skeletonData->height = readFloat(input);
 

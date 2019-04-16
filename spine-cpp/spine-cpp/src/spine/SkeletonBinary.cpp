@@ -131,6 +131,8 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	char *skeletonData_version = readString(input);
 	skeletonData->_version.own(skeletonData_version);
 
+	skeletonData->_x = readFloat(input);
+	skeletonData->_y = readFloat(input);
 	skeletonData->_width = readFloat(input);
 	skeletonData->_height = readFloat(input);
 

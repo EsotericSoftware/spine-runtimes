@@ -1,5 +1,14 @@
 {
-"skeleton": { "hash": "z8H9R54u1auVyWlNHuov1bIMUiQ", "spine": "3.7.90", "width": 264.5, "height": 573.31, "images": "./images/", "audio": "" },
+"skeleton": {
+	"hash": "z8H9R54u1auVyWlNHuov1bIMUiQ",
+	"spine": "3.8.05-beta",
+	"x": -104.34,
+	"y": -9.21,
+	"width": 264.5,
+	"height": 573.31,
+	"images": "./images/",
+	"audio": ""
+},
 "bones": [
 	{ "name": "root" },
 	{ "name": "back-arm-ik-target", "parent": "root", "x": 103.52, "y": 345.27, "color": "ff3f00ff" },

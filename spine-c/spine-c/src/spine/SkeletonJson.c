@@ -602,6 +602,8 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	if (skeleton) {
 		MALLOC_STR(skeletonData->hash, Json_getString(skeleton, "hash", 0));
 		MALLOC_STR(skeletonData->version, Json_getString(skeleton, "spine", 0));
+		skeletonData->x = Json_getFloat(skeleton, "x", 0);
+		skeletonData->y = Json_getFloat(skeleton, "y", 0);
 		skeletonData->width = Json_getFloat(skeleton, "width", 0);
 		skeletonData->height = Json_getFloat(skeleton, "height", 0);
 	}

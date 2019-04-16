@@ -1,5 +1,14 @@
 {
-"skeleton": { "hash": "lv0LmUZo/75fufw/LnAEx8+6j2Y", "spine": "3.7.90", "width": 660.39, "height": 604.09, "images": "./images/", "audio": "" },
+"skeleton": {
+	"hash": "lv0LmUZo/75fufw/LnAEx8+6j2Y",
+	"spine": "3.8.05-beta",
+	"x": -366.31,
+	"y": -286.62,
+	"width": 660.39,
+	"height": 604.09,
+	"images": "./images/",
+	"audio": ""
+},
 "bones": [
 	{ "name": "root", "y": -176.12 },
 	{ "name": "center", "parent": "root", "y": 176.12, "color": "ffe300ff" },

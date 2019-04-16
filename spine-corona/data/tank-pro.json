@@ -1,5 +1,14 @@
 {
-"skeleton": { "hash": "CNGmfU5lE4sb2RjvjcTWfY136TI", "spine": "3.7.90", "width": 7202.61, "height": 1298.88, "images": "./images/", "audio": "" },
+"skeleton": {
+	"hash": "CNGmfU5lE4sb2RjvjcTWfY136TI",
+	"spine": "3.8.05-beta",
+	"x": -5852.65,
+	"y": -348.5,
+	"width": 7202.61,
+	"height": 1298.88,
+	"images": "./images/",
+	"audio": ""
+},
 "bones": [
 	{ "name": "root" },
 	{ "name": "tank-root", "parent": "root", "y": 146.79 },

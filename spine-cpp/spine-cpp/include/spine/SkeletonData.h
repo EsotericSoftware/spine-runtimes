@@ -170,7 +170,7 @@ private:
 	Vector<IkConstraintData *> _ikConstraints;
 	Vector<TransformConstraintData *> _transformConstraints;
 	Vector<PathConstraintData *> _pathConstraints;
-	float _width, _height;
+	float _x, _y, _width, _height;
 	String _version;
 	String _hash;
 

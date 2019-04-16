@@ -135,6 +135,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 	if (skeleton) {
 		skeletonData->_hash = Json::getString(skeleton, "hash", 0);
 		skeletonData->_version = Json::getString(skeleton, "spine", 0);
+		skeletonData->_x = Json::getFloat(skeleton, "x", 0);
+		skeletonData->_y = Json::getFloat(skeleton, "y", 0);
 		skeletonData->_width = Json::getFloat(skeleton, "width", 0);
 		skeletonData->_height = Json::getFloat(skeleton, "height", 0);
 		skeletonData->_fps = Json::getFloat(skeleton, "fps", 30);

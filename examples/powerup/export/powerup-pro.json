@@ -1,5 +1,14 @@
 {
-"skeleton": { "hash": "Wl1sVJl86N1At8S6pj+IzFFUmFg", "spine": "3.7.90", "width": 414.65, "height": 195.19, "images": "./images/", "audio": "" },
+"skeleton": {
+	"hash": "Wl1sVJl86N1At8S6pj+IzFFUmFg",
+	"spine": "3.8.05-beta",
+	"x": -208.76,
+	"y": 119.41,
+	"width": 414.65,
+	"height": 195.19,
+	"images": "./images/",
+	"audio": ""
+},
 "bones": [
 	{ "name": "root" },
 	{ "name": "powerup", "parent": "root", "x": 1.48, "y": 134.02 },

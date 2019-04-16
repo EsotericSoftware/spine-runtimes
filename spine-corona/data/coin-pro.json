@@ -1,5 +1,14 @@
 {
-"skeleton": { "hash": "MYibQXspGhD4XDqbsmKCI3XfquU", "spine": "3.7.90", "width": 305, "height": 302, "images": "./images/", "audio": "C:/Program Files (x86)/Spine/examples/coin-new" },
+"skeleton": {
+	"hash": "MYibQXspGhD4XDqbsmKCI3XfquU",
+	"spine": "3.8.05-beta",
+	"x": -152.5,
+	"y": -151,
+	"width": 305,
+	"height": 302,
+	"images": "./images/",
+	"audio": "C:/Program Files (x86)/Spine/examples/coin-new"
+},
 "bones": [
 	{ "name": "root" },
 	{ "name": "coin-front", "parent": "root" },

@@ -1,5 +1,14 @@
 {
-"skeleton": { "hash": "k0XfaXcR65L+gkogkxzhOWL/mtc", "spine": "3.7.90", "width": 318.76, "height": 333.69, "images": "./images/", "audio": "" },
+"skeleton": {
+	"hash": "k0XfaXcR65L+gkogkxzhOWL/mtc",
+	"spine": "3.8.05-beta",
+	"x": -87.3,
+	"y": -0.03,
+	"width": 318.76,
+	"height": 333.69,
+	"images": "./images/",
+	"audio": ""
+},
 "bones": [
 	{ "name": "root" },
 	{ "name": "hip", "parent": "root", "y": 94.89 },
