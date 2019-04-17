@@ -201,8 +201,13 @@ namespace Spine.Unity.Editor {
 			Icons.Initialize();
 
 			// Drag and Drop
+		#if UNITY_2019_1_OR_NEWER
+			SceneView.duringSceneGui -= DragAndDropInstantiation.SceneViewDragAndDrop;
+			SceneView.duringSceneGui += DragAndDropInstantiation.SceneViewDragAndDrop;
+		#else
 			SceneView.onSceneGUIDelegate -= DragAndDropInstantiation.SceneViewDragAndDrop;
 			SceneView.onSceneGUIDelegate += DragAndDropInstantiation.SceneViewDragAndDrop;
+		#endif
 
 			EditorApplication.hierarchyWindowItemOnGUI -= HierarchyHandler.HandleDragAndDrop;
 			EditorApplication.hierarchyWindowItemOnGUI += HierarchyHandler.HandleDragAndDrop;
