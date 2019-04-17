@@ -87,7 +87,15 @@ module spine {
 					region.name = line;
 					region.page = page;
 
-					region.rotate = reader.readValue() == "true";
+					let rotateValue = reader.readValue();
+					if (rotateValue.toLocaleLowerCase() == "true") {
+						region.degrees = 90;
+					} else if (rotateValue.toLocaleLowerCase() == "false") {
+						region.degrees = 0;
+					} else {
+						region.degrees = parseFloat(rotateValue);
+					}
+					region.rotate = region.degrees == 90;
 
 					reader.readTuple(tuple);
 					let x = parseInt(tuple[0]);
@@ -207,6 +215,7 @@ module spine {
 		y: number;
 		index: number;
 		rotate: boolean;
+		degrees: number;
 		texture: Texture;
 	}
 }
