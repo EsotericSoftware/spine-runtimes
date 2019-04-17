@@ -57,7 +57,8 @@ MeshAttachment::MeshAttachment(const String &name) : VertexAttachment(name), Has
 													 _color(1, 1, 1, 1),
 													 _hullLength(0),
 													 _inheritDeform(false),
-													 _regionRotate(false) {
+													 _regionRotate(false),
+													 _regionDegrees(0) {
 }
 
 MeshAttachment::~MeshAttachment() {}
@@ -67,27 +68,61 @@ void MeshAttachment::updateUVs() {
 		_uvs.setSize(_regionUVs.size(), 0);
 	}
 
-	if (_regionRotate) {
-		float textureHeight = _regionWidth / (_regionV2 - _regionV);
-		float textureWidth = _regionHeight / (_regionU2 - _regionU);
-		float u = _regionU - (_regionOriginalHeight - _regionOffsetY - _regionHeight) / textureWidth;
-		float v = _regionV - (_regionOriginalWidth - _regionOffsetX - _regionWidth) / textureHeight;
-		float width = _regionOriginalHeight / textureWidth;
-		float height = _regionOriginalWidth / textureHeight;
-		for (size_t i = 0, n = _uvs.size(); i < n; i += 2) {
-			_uvs[i] = u + _regionUVs[i + 1] * width;
-			_uvs[i + 1] = v + height - _regionUVs[i] * height;
+	int i = 0, n = _regionUVs.size();
+	float u = _regionU, v = _regionV;
+	float width = 0, height = 0;
+
+	switch (_regionDegrees) {
+		case 90: {
+			float textureWidth = _regionHeight / (_regionU2 - _regionU);
+			float textureHeight = _regionWidth / (_regionV2 - _regionV);
+			u -= (_regionOriginalHeight - _regionOffsetY - _regionHeight) / textureWidth;
+			v -= (_regionOriginalWidth - _regionOffsetX - _regionWidth) / textureHeight;
+			width = _regionOriginalHeight / textureWidth;
+			height = _regionOriginalWidth / textureHeight;
+			for (i = 0; i < n; i += 2) {
+				_uvs[i] = u + _regionUVs[i + 1] * width;
+				_uvs[i + 1] = v + (1 - _regionUVs[i]) * height;
+			}
+			return;
 		}
-	} else {
-		float textureWidth = _regionWidth / (_regionU2 - _regionU);
-		float textureHeight = _regionHeight / (_regionV2 - _regionV);
-		float u = _regionU - _regionOffsetX / textureWidth;
-		float v = _regionV - (_regionOriginalHeight - _regionOffsetY - _regionHeight) / textureHeight;
-		float width = _regionOriginalWidth / textureWidth;
-		float height = _regionOriginalHeight / textureHeight;
-		for (size_t i = 0, n = _uvs.size(); i < n; i += 2) {
-			_uvs[i] = u + _regionUVs[i] * width;
-			_uvs[i + 1] = v + _regionUVs[i + 1] * height;
+		case 180: {
+			float textureWidth = _regionWidth / (_regionU2 - _regionU);
+			float textureHeight = _regionHeight / (_regionV2 - _regionV);
+			u -= (_regionOriginalWidth - _regionOffsetX - _regionWidth) / textureWidth;
+			v -= _regionOffsetY / textureHeight;
+			width = _regionOriginalWidth / textureWidth;
+			height = _regionOriginalHeight / textureHeight;
+			for (i = 0; i < n; i += 2) {
+				_uvs[i] = u + (1 - _regionUVs[i]) * width;
+				_uvs[i + 1] = v + (1 - _regionUVs[i + 1]) * height;
+			}
+			return;
+		}
+		case 270: {
+			float textureHeight = _regionHeight / (_regionV2 - _regionV);
+			float textureWidth = _regionWidth / (_regionU2 - _regionU);
+			u -= _regionOffsetY / textureWidth;
+			v -= _regionOffsetX / textureHeight;
+			width = _regionOriginalHeight / textureWidth;
+			height = _regionOriginalWidth / textureHeight;
+			for (i = 0; i < n; i += 2) {
+				_uvs[i] = u + (1 - _regionUVs[i + 1]) * width;
+				_uvs[i + 1] = v + _regionUVs[i] * height;
+			}
+			return;
+		}
+		default: {
+			float textureWidth = _regionWidth / (_regionU2 - _regionU);
+			float textureHeight = _regionHeight / (_regionV2 - _regionV);
+			u -= _regionOffsetX / textureWidth;
+			v -= (_regionOriginalHeight - _regionOffsetY - _regionHeight) / textureHeight;
+			width = _regionOriginalWidth / textureWidth;
+			height = _regionOriginalHeight / textureHeight;
+			for (i = 0; i < n; i += 2) {
+				_uvs[i] = u + _regionUVs[i] * width;
+				_uvs[i + 1] = v + _regionUVs[i + 1] * height;
+			}
 		}
 	}
 }

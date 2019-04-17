@@ -176,7 +176,14 @@ void Atlas::load(const char *begin, int length, const char *dir) {
 			region->name = String(mallocString(&str), true);
 
 			readValue(&begin, end, &str);
-			region->rotate = equals(&str, "true") ? true : false;
+			if (equals(&str, "true")) {
+				region->degrees = 90;
+			} else if (equals(&str, "false")) {
+				region->degrees = 0;
+			} else {
+				region->degrees = toInt(&str);
+			}
+			region->rotate = region->degrees == 90;
 
 			readTuple(&begin, end, tuple);
 			region->x = toInt(tuple);

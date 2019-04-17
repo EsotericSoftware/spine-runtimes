@@ -136,6 +136,7 @@ namespace spine {
         int _hullLength;
         bool _inheritDeform;
         bool _regionRotate;
+        int _regionDegrees;
     };
 }
 

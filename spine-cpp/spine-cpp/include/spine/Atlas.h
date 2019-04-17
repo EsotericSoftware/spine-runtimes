@@ -93,6 +93,7 @@ public:
 	int originalWidth, originalHeight;
 	int index;
 	bool rotate;
+	int degrees;
 	Vector<int> splits;
 	Vector<int> pads;
 };
