@@ -5480,7 +5480,17 @@ var spine;
 					var region = new TextureAtlasRegion();
 					region.name = line;
 					region.page = page;
-					region.rotate = reader.readValue() == "true";
+					var rotateValue = reader.readValue();
+					if (rotateValue.toLocaleLowerCase() == "true") {
+						region.degrees = 90;
+					}
+					else if (rotateValue.toLocaleLowerCase() == "false") {
+						region.degrees = 0;
+					}
+					else {
+						region.degrees = parseFloat(rotateValue);
+					}
+					region.rotate = region.degrees == 90;
 					reader.readTuple(tuple);
 					var x = parseInt(tuple[0]);
 					var y = parseInt(tuple[1]);
@@ -6582,23 +6592,45 @@ var spine;
 			if (this.uvs == null || this.uvs.length != regionUVs.length)
 				this.uvs = spine.Utils.newFloatArray(regionUVs.length);
 			var uvs = this.uvs;
-			var u = 0, v = 0, width = 0, height = 0;
+			var n = this.uvs.length;
+			var u = this.region.u, v = this.region.v, width = 0, height = 0;
 			if (this.region instanceof spine.TextureAtlasRegion) {
 				var region = this.region;
 				var textureWidth = region.texture.getImage().width, textureHeight = region.texture.getImage().height;
-				if (region.rotate) {
-					u = region.u - (region.originalHeight - region.offsetY - region.height) / textureWidth;
-					v = region.v - (region.originalWidth - region.offsetX - region.width) / textureHeight;
-					width = region.originalHeight / textureWidth;
-					height = region.originalWidth / textureHeight;
-					for (var i = 0, n = uvs.length; i < n; i += 2) {
-						uvs[i] = u + regionUVs[i + 1] * width;
-						uvs[i + 1] = v + height - regionUVs[i] * height;
-					}
-					return;
+				switch (region.degrees) {
+					case 90:
+						u -= (region.originalHeight - region.offsetY - region.height) / textureWidth;
+						v -= (region.originalWidth - region.offsetX - region.width) / textureHeight;
+						width = region.originalHeight / textureWidth;
+						height = region.originalWidth / textureHeight;
+						for (var i = 0; i < n; i += 2) {
+							uvs[i] = u + regionUVs[i + 1] * width;
+							uvs[i + 1] = v + (1 - regionUVs[i]) * height;
+						}
+						return;
+					case 180:
+						u -= (region.originalWidth - region.offsetX - region.width) / textureWidth;
+						v -= region.offsetY / textureHeight;
+						width = region.originalWidth / textureWidth;
+						height = region.originalHeight / textureHeight;
+						for (var i = 0; i < n; i += 2) {
+							uvs[i] = u + (1 - regionUVs[i]) * width;
+							uvs[i + 1] = v + (1 - regionUVs[i + 1]) * height;
+						}
+						return;
+					case 270:
+						u -= region.offsetY / textureWidth;
+						v -= region.offsetX / textureHeight;
+						width = region.originalHeight / textureWidth;
+						height = region.originalWidth / textureHeight;
+						for (var i = 0; i < n; i += 2) {
+							uvs[i] = u + (1 - regionUVs[i + 1]) * width;
+							uvs[i + 1] = v + regionUVs[i] * height;
+						}
+						return;
 				}
-				u = region.u - region.offsetX / textureWidth;
-				v = region.v - (region.originalHeight - region.offsetY - region.height) / textureHeight;
+				u -= region.offsetX / textureWidth;
+				v -= (region.originalHeight - region.offsetY - region.height) / textureHeight;
 				width = region.originalWidth / textureWidth;
 				height = region.originalHeight / textureHeight;
 			}
@@ -6607,12 +6639,10 @@ var spine;
 				width = height = 1;
 			}
 			else {
-				u = this.region.u;
-				v = this.region.v;
 				width = this.region.u2 - u;
 				height = this.region.v2 - v;
 			}
-			for (var i = 0, n = uvs.length; i < n; i += 2) {
+			for (var i = 0; i < n; i += 2) {
 				uvs[i] = u + regionUVs[i] * width;
 				uvs[i + 1] = v + regionUVs[i + 1] * height;
 			}

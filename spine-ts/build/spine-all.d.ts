@@ -880,6 +880,7 @@ declare module spine {
 		y: number;
 		index: number;
 		rotate: boolean;
+		degrees: number;
 		texture: Texture;
 	}
 }
