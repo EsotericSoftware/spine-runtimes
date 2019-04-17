@@ -51,6 +51,7 @@ struct spMeshAttachment {
 	int regionOriginalWidth, regionOriginalHeight; /* Unrotated, unstripped pixel size. */
 	float regionU, regionV, regionU2, regionV2;
 	int/*bool*/regionRotate;
+	int regionDegrees;
 
 	const char* path;
 

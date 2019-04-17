@@ -246,7 +246,14 @@ spAtlas* spAtlas_create(const char* begin, int length, const char* dir, void* re
 			region->name = mallocString(&str);
 
 			if (!readValue(&begin, end, &str)) return abortAtlas(self);
-			region->rotate = equals(&str, "true");
+			if (equals(&str, "true")) {
+				region->degrees = 90;
+			} else if (equals(&str, "false")) {
+				region->degrees = 0;
+			} else {
+				region->degrees = toInt(&str);
+			}
+			region->rotate = region->degrees == 90;
 
 			if (readTuple(&begin, end, tuple) != 2) return abortAtlas(self);
 			region->x = toInt(tuple);

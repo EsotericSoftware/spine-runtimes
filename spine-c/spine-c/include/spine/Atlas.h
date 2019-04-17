@@ -123,6 +123,7 @@ struct spAtlasRegion {
 	int originalWidth, originalHeight;
 	int index;
 	int/*bool*/rotate;
+	int degrees;
 	int/*bool*/flip;
 	int* splits;
 	int* pads;

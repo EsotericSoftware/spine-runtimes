@@ -55,34 +55,65 @@ spMeshAttachment* spMeshAttachment_create (const char* name) {
 
 void spMeshAttachment_updateUVs (spMeshAttachment* self) {
 	int i, n;
-	float width, height;
 	int verticesLength = SUPER(self)->worldVerticesLength;
 	FREE(self->uvs);
-	self->uvs = MALLOC(float, verticesLength);
+	float* uvs = self->uvs = MALLOC(float, verticesLength);
+	n = verticesLength;
+	float u = self->regionU, v = self->regionV;
+	float width = 0, height = 0;
 
-	if (self->regionRotate) {
+	switch (self->regionDegrees) {
+	case 90: {
 		float textureWidth = self->regionHeight / (self->regionU2 - self->regionU);
 		float textureHeight = self->regionWidth / (self->regionV2 - self->regionV);
-		float u = self->regionU - (self->regionOriginalHeight - self->regionOffsetY - self->regionHeight) / textureWidth;
-		float v = self->regionV - (self->regionOriginalWidth - self->regionOffsetX - self->regionWidth) / textureHeight;
+		u -= (self->regionOriginalHeight - self->regionOffsetY - self->regionHeight) / textureWidth;
+		v -= (self->regionOriginalWidth - self->regionOffsetX - self->regionWidth) / textureHeight;
 		width = self->regionOriginalHeight / textureWidth;
 		height = self->regionOriginalWidth / textureHeight;
-		for (i = 0, n = verticesLength; i < n; i += 2) {
-			self->uvs[i] = u + self->regionUVs[i + 1] * width;
-			self->uvs[i + 1] = v + height - self->regionUVs[i] * height;
+		for (i = 0; i < n; i += 2) {
+			uvs[i] = u + self->regionUVs[i + 1] * width;
+			uvs[i + 1] = v + (1 - self->regionUVs[i]) * height;
 		}
 		return;
-	} else {
+	}
+	case 180: {
 		float textureWidth = self->regionWidth / (self->regionU2 - self->regionU);
 		float textureHeight = self->regionHeight / (self->regionV2 - self->regionV);
-		float u = self->regionU - self->regionOffsetX / textureWidth;
-		float v = self->regionV - (self->regionOriginalHeight - self->regionOffsetY - self->regionHeight) / textureHeight;
+		u -= (self->regionOriginalWidth - self->regionOffsetX - self->regionWidth) / textureWidth;
+		v -= self->regionOffsetY / textureHeight;
 		width = self->regionOriginalWidth / textureWidth;
 		height = self->regionOriginalHeight / textureHeight;
-		for (i = 0, n = verticesLength; i < n; i += 2) {
-			self->uvs[i] = u + self->regionUVs[i] * width;
-			self->uvs[i + 1] = v + self->regionUVs[i + 1] * height;
+		for (i = 0; i < n; i += 2) {
+			uvs[i] = u + (1 - self->regionUVs[i]) * width;
+			uvs[i + 1] = v + (1 - self->regionUVs[i + 1]) * height;
 		}
+		return;
+	}
+	case 270: {
+		float textureHeight = self->regionHeight / (self->regionV2 - self->regionV);
+		float textureWidth = self->regionWidth / (self->regionU2 - self->regionU);
+		u -= self->regionOffsetY / textureWidth;
+		v -= self->regionOffsetX / textureHeight;
+		width = self->regionOriginalHeight / textureWidth;
+		height = self->regionOriginalWidth / textureHeight;
+		for (i = 0; i < n; i += 2) {
+			uvs[i] = u + (1 - self->regionUVs[i + 1]) * width;
+			uvs[i + 1] = v + self->regionUVs[i] * height;
+		}
+		return;
+	}
+	default: {
+		float textureWidth = self->regionWidth / (self->regionU2 - self->regionU);
+		float textureHeight = self->regionHeight / (self->regionV2 - self->regionV);
+		u -= self->regionOffsetX / textureWidth;
+		v -= (self->regionOriginalHeight - self->regionOffsetY - self->regionHeight) / textureHeight;
+		width = self->regionOriginalWidth / textureWidth;
+		height = self->regionOriginalHeight / textureHeight;
+		for (i = 0; i < n; i += 2) {
+			uvs[i] = u + self->regionUVs[i] * width;
+			uvs[i + 1] = v + self->regionUVs[i + 1] * height;
+		}
+	}
 	}
 }
 
