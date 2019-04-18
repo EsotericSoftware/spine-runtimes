@@ -49,8 +49,8 @@ namespace Spine.Unity {
 		public SkeletonDataAsset skeletonDataAsset;
 		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } }
 
-		[SpineSkin(dataField:"skeletonDataAsset")]
-		public string initialSkinName = "default";
+		[SpineSkin(dataField:"skeletonDataAsset", defaultAsEmptyString:true)]
+		public string initialSkinName;
 		public bool initialFlipX, initialFlipY;
 
 		[SpineAnimation(dataField:"skeletonDataAsset")]
@@ -111,7 +111,7 @@ namespace Spine.Unity {
 		protected override void Reset () {
 
 			base.Reset();
-			if (material == null || material.shader != Shader.Find("Spine/SkeletonGraphic (Premultiply Alpha)"))
+			if (material == null || material.shader != Shader.Find("Spine/SkeletonGraphic"))
 				Debug.LogWarning("SkeletonGraphic works best with the SkeletonGraphic material.");			
 		}
 		#endif

@@ -106,8 +106,13 @@ namespace Spine.Unity.Editor {
 		}
 
 		void OnSelectionChange () {
+		#if UNITY_2019_1_OR_NEWER
+			SceneView.duringSceneGui -= this.OnSceneGUI;
+			SceneView.duringSceneGui += this.OnSceneGUI;
+		#else
 			SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
 			SceneView.onSceneGUIDelegate += this.OnSceneGUI;
+		#endif
 
 			bool noSkeletonRenderer = false;
 
@@ -148,7 +153,11 @@ namespace Spine.Unity.Editor {
 			isPrefab = false;
 			boneName = string.Empty;
 			bone = null;
+		#if UNITY_2019_1_OR_NEWER
+			SceneView.duringSceneGui -= this.OnSceneGUI;
+		#else
 			SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
+		#endif
 		}
 
 		void OnDestroy () {
