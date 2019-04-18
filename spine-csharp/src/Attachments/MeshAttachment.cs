@@ -59,6 +59,7 @@ namespace Spine {
 		public float RegionU2 { get; set; }
 		public float RegionV2 { get; set; }
 		public bool RegionRotate { get; set; }
+		public int RegionDegrees { get; set; }
 		public float RegionOffsetX { get { return regionOffsetX; } set { regionOffsetX = value; } }
 		public float RegionOffsetY { get { return regionOffsetY; } set { regionOffsetY = value; } } // Pixels stripped from the bottom left, unrotated.
 		public float RegionWidth { get { return regionWidth; } set { regionWidth = value; } }
@@ -99,26 +100,51 @@ namespace Spine {
 			float[] regionUVs = this.regionUVs;
 			if (this.uvs == null || this.uvs.Length != regionUVs.Length) this.uvs = new float[regionUVs.Length];
 			float[] uvs = this.uvs;
+            float u = RegionU, v = RegionV, width = 0, height = 0;
 
-			if (RegionRotate) {
+			if (RegionDegrees == 90) {
 				float textureHeight = this.regionWidth / (RegionV2 - RegionV);
 				float textureWidth = this.regionHeight / (RegionU2 - RegionU);
-				float u = RegionU - (RegionOriginalHeight - RegionOffsetY - RegionHeight) / textureWidth;
-				float v = RegionV - (RegionOriginalWidth - RegionOffsetX - RegionWidth) / textureHeight;
-				float width = RegionOriginalHeight / textureWidth;
-				float height = RegionOriginalWidth / textureHeight;
+				u -= (RegionOriginalHeight - RegionOffsetY - RegionHeight) / textureWidth;
+				v -= (RegionOriginalWidth - RegionOffsetX - RegionWidth) / textureHeight;
+				width = RegionOriginalHeight / textureWidth;
+				height = RegionOriginalWidth / textureHeight;
 
 				for (int i = 0, n = uvs.Length; i < n; i += 2) {
 					uvs[i] = u + regionUVs[i + 1] * width;
-					uvs[i + 1] = v + height - regionUVs[i] * height;
+					uvs[i + 1] = v + (1 - regionUVs[i]) * height;
+				}
+			} else if (RegionDegrees == 180) {
+				float textureWidth = this.regionWidth / (RegionU2 - RegionU);
+				float textureHeight = this.regionHeight / (RegionV2 - RegionV);
+				u -= (RegionOriginalWidth - RegionOffsetX - RegionWidth) / textureWidth;
+				v -= RegionOffsetY / textureHeight;
+				width = RegionOriginalWidth / textureWidth;
+				height = RegionOriginalHeight / textureHeight;
+
+				for (int i = 0, n = uvs.Length; i < n; i += 2) {
+					uvs[i] = u + (1 - regionUVs[i]) * width;
+					uvs[i + 1] = v + (1 - regionUVs[i + 1]) * height;
+				}
+			} else if (RegionDegrees == 270) {
+				float textureWidth = this.regionWidth / (RegionU2 - RegionU);
+				float textureHeight = this.regionHeight / (RegionV2 - RegionV);
+				u -= RegionOffsetY / textureWidth;
+				v -= RegionOffsetX / textureHeight;
+				width = RegionOriginalHeight / textureWidth;
+				height = RegionOriginalWidth / textureHeight;
+
+				for (int i = 0, n = uvs.Length; i<n; i += 2) {
+					uvs[i] = u + (1 - regionUVs[i + 1]) * width;
+					uvs[i + 1] = v + regionUVs[i] * height;
 				}
 			} else {
 				float textureWidth = this.regionWidth / (RegionU2 - RegionU);
 				float textureHeight = this.regionHeight / (RegionV2 - RegionV);
-				float u = RegionU - RegionOffsetX / textureWidth;
-				float v = RegionV - (RegionOriginalHeight - RegionOffsetY - RegionHeight) / textureHeight;
-				float width = RegionOriginalWidth / textureWidth;
-				float height = RegionOriginalHeight / textureHeight;
+				u -= RegionOffsetX / textureWidth;
+				v -= (RegionOriginalHeight - RegionOffsetY - RegionHeight) / textureHeight;
+				width = RegionOriginalWidth / textureWidth;
+				height = RegionOriginalHeight / textureHeight;
 
 				for (int i = 0, n = uvs.Length; i < n; i += 2) {
 					uvs[i] = u + regionUVs[i] * width;
