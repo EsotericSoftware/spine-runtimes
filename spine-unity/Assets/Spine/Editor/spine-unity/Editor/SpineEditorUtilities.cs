@@ -800,6 +800,12 @@ namespace Spine.Unity.Editor {
 						break;
 #endif
 				}
+
+				SkeletonDataAssetInspector[] skeletonDataInspectors = Resources.FindObjectsOfTypeAll<SkeletonDataAssetInspector>();
+				foreach (var inspector in skeletonDataInspectors) {
+					inspector.UpdateSkeletonData();
+				}
+				
 				// Any post processing of images
 
 				// Under some circumstances (e.g. on first import) SkeletonGraphic objects 
@@ -818,7 +824,7 @@ namespace Spine.Unity.Editor {
 					}
 				}
 			}
-
+			
 			static void ReloadSkeletonData (string skeletonJSONPath) {
 				string dir = Path.GetDirectoryName(skeletonJSONPath);
 				TextAsset textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonJSONPath);
@@ -870,6 +876,7 @@ namespace Spine.Unity.Editor {
 							if (currentHash != null)
 								EditorPrefs.SetString(guid + "_hash", currentHash);
 						}
+						DataReloadHandler.ReloadSceneSkeletonComponents(skeletonDataAsset);
 					}
 				}
 			}
