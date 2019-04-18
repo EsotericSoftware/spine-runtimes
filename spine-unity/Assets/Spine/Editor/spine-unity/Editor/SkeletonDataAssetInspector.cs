@@ -78,7 +78,7 @@ namespace Spine.Unity.Editor {
 		string TargetAssetGUID { get { return AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(targetSkeletonDataAsset)); } }
 		string LastSkinKey { get { return TargetAssetGUID + "_lastSkin"; } }
 		string LastSkinName { get { return EditorPrefs.GetString(LastSkinKey, ""); } }
-
+		
 		void OnEnable () {
 			InitializeEditor();
 		}
@@ -91,6 +91,12 @@ namespace Spine.Unity.Editor {
 
 		private void OnDomainUnload (object sender, EventArgs e) {
 			OnDestroy();
+		}
+
+		public void UpdateSkeletonData () {
+			preview.Clear();
+			InitializeEditor();
+			EditorUtility.SetDirty(targetSkeletonDataAsset);
 		}
 
 		void InitializeEditor () {
