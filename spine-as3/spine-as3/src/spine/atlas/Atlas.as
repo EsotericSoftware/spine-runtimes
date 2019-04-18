@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 package spine.atlas {
+	import flash.trace.Trace;
 	import flash.utils.ByteArray;
 
 	public class Atlas {
@@ -97,7 +98,15 @@ package spine.atlas {
 					region.name = line;
 					region.page = page;
 
-					region.rotate = reader.readValue() == "true";
+					var rotateValue : String = reader.readValue();
+					if (rotateValue == "true") {
+						region.degrees = 90;
+					} else if (rotateValue == "false") {
+						region.degrees = 0;
+					} else {
+						region.degrees = parseInt(rotateValue);
+					}
+					region.rotate = region.degrees == 90;
 
 					reader.readTuple(tuple);
 					var x : int = parseInt(tuple[0]);

@@ -46,6 +46,7 @@ package spine.atlas {
 		public var originalHeight : int;
 		public var index : int;
 		public var rotate : Boolean;
+		public var degrees : int;
 		public var splits : Vector.<int>;
 		public var pads : Vector.<int>;
 		public var rendererObject : Object;

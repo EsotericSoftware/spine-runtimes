@@ -46,6 +46,7 @@ package spine.attachments {
 		public var regionU2 : Number;
 		public var regionV2 : Number;
 		public var regionRotate : Boolean;
+		public var regionDegrees : int;
 		public var regionOffsetX : Number; // Pixels stripped from the bottom left, unrotated.
 		public var regionOffsetY : Number;
 		public var regionWidth : Number; // Unrotated, stripped size.
@@ -62,7 +63,67 @@ package spine.attachments {
 		}
 
 		public function updateUVs() : void {			
-			var i : int, n : int = regionUVs.length;
+			var i : int = 0, n : int = regionUVs.length;
+			var u : Number = regionU, v : Number = regionV;
+			var width : Number = 0, height : Number = 0;
+			var textureWidth : Number, textureHeight : Number;
+			if (!uvs || uvs.length != n) uvs = new Vector.<Number>(n, true);
+		
+			switch (regionDegrees) {
+				case 90: {
+					textureWidth = regionHeight / (regionU2 - regionU);
+					textureHeight = regionWidth / (regionV2 - regionV);
+					u -= (regionOriginalHeight - regionOffsetY - regionHeight) / textureWidth;
+					v -= (regionOriginalWidth - regionOffsetX - regionWidth) / textureHeight;
+					width = regionOriginalHeight / textureWidth;
+					height = regionOriginalWidth / textureHeight;
+					for (i = 0; i < n; i += 2) {
+						uvs[i] = u + regionUVs[i + 1] * width;
+						uvs[i + 1] = v + (1 - regionUVs[i]) * height;
+					}
+					return;
+				}
+				case 180: {
+					textureWidth = regionWidth / (regionU2 - regionU);
+					textureHeight  = regionHeight / (regionV2 - regionV);
+					u -= (regionOriginalWidth - regionOffsetX - regionWidth) / textureWidth;
+					v -= regionOffsetY / textureHeight;
+					width = regionOriginalWidth / textureWidth;
+					height = regionOriginalHeight / textureHeight;
+					for (i = 0; i < n; i += 2) {
+						uvs[i] = u + (1 - regionUVs[i]) * width;
+						uvs[i + 1] = v + (1 - regionUVs[i + 1]) * height;
+					}
+					return;
+				}
+				case 270: {					
+					textureWidth = regionWidth / (regionU2 - regionU);
+					textureHeight = regionHeight / (regionV2 - regionV);
+					u -= regionOffsetY / textureWidth;
+					v -= regionOffsetX / textureHeight;
+					width = regionOriginalHeight / textureWidth;
+					height = regionOriginalWidth / textureHeight;
+					for (i = 0; i < n; i += 2) {
+						uvs[i] = u + (1 - regionUVs[i + 1]) * width;
+						uvs[i + 1] = v + regionUVs[i] * height;
+					}
+					return;
+				}
+				default: {
+					textureWidth = regionWidth / (regionU2 - regionU);
+					textureHeight  = regionHeight / (regionV2 - regionV);
+					u -= regionOffsetX / textureWidth;
+					v -= (regionOriginalHeight - regionOffsetY - regionHeight) / textureHeight;
+					width = regionOriginalWidth / textureWidth;
+					height = regionOriginalHeight / textureHeight;
+					for (i = 0; i < n; i += 2) {
+						uvs[i] = u + regionUVs[i] * width;
+						uvs[i + 1] = v + regionUVs[i + 1] * height;
+					}
+				}
+			}
+			
+			/*var i : int, n : int = regionUVs.length;
 			var u: Number, v: Number, width: Number, height: Number;
 			var textureWidth: Number, textureHeight: Number;
 			if (!uvs || uvs.length != n) uvs = new Vector.<Number>(n, true);
@@ -88,7 +149,7 @@ package spine.attachments {
 					uvs[i] = u + regionUVs[i] * width;
 					uvs[int(i + 1)] = v + regionUVs[int(i + 1)] * height;
 				}
-			}
+			}*/
 		}
 
 		override public function applyDeform(sourceAttachment : VertexAttachment) : Boolean {
