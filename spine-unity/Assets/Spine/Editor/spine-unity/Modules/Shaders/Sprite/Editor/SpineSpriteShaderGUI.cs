@@ -681,7 +681,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 		if (emission && !mixedValue) {
 			EditorGUI.BeginChangeCheck();
 
-#if UNITY_2018
+#if UNITY_2018_1_OR_NEWER
 			_materialEditor.TexturePropertyWithHDRColor(_emissionText, _emissionMap, _emissionColor, true);
 #else
 			_materialEditor.TexturePropertyWithHDRColor(_emissionText, _emissionMap, _emissionColor, new ColorPickerHDRConfig(0, 1, 0.01010101f, 3), true);
