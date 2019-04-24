@@ -19,8 +19,8 @@ declare module spine {
 		add = 3,
 	}
 	enum MixDirection {
-		in = 0,
-		out = 1,
+		mixIn = 0,
+		mixOut = 1,
 	}
 	enum TimelineType {
 		rotate = 0,

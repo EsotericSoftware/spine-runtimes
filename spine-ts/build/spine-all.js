@@ -67,8 +67,8 @@ var spine;
 	})(MixBlend = spine.MixBlend || (spine.MixBlend = {}));
 	var MixDirection;
 	(function (MixDirection) {
-		MixDirection[MixDirection["in"] = 0] = "in";
-		MixDirection[MixDirection["out"] = 1] = "out";
+		MixDirection[MixDirection["mixIn"] = 0] = "mixIn";
+		MixDirection[MixDirection["mixOut"] = 1] = "mixOut";
 	})(MixDirection = spine.MixDirection || (spine.MixDirection = {}));
 	var TimelineType;
 	(function (TimelineType) {
@@ -356,7 +356,7 @@ var spine;
 			}
 			else {
 				var bx = 0, by = 0;
-				if (direction == MixDirection.out) {
+				if (direction == MixDirection.mixOut) {
 					switch (blend) {
 						case MixBlend.setup:
 							bx = bone.data.scaleX;
@@ -652,7 +652,7 @@ var spine;
 		};
 		AttachmentTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha, blend, direction) {
 			var slot = skeleton.slots[this.slotIndex];
-			if (direction == MixDirection.out && blend == MixBlend.setup) {
+			if (direction == MixDirection.mixOut && blend == MixBlend.setup) {
 				var attachmentName_1 = slot.data.attachmentName;
 				slot.setAttachment(attachmentName_1 == null ? null : skeleton.getAttachment(this.slotIndex, attachmentName_1));
 				return;
@@ -929,7 +929,7 @@ var spine;
 		DrawOrderTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha, blend, direction) {
 			var drawOrder = skeleton.drawOrder;
 			var slots = skeleton.slots;
-			if (direction == MixDirection.out && blend == MixBlend.setup) {
+			if (direction == MixDirection.mixOut && blend == MixBlend.setup) {
 				spine.Utils.arrayCopy(skeleton.slots, 0, skeleton.drawOrder, 0, skeleton.slots.length);
 				return;
 			}
@@ -995,7 +995,7 @@ var spine;
 			if (time >= frames[frames.length - IkConstraintTimeline.ENTRIES]) {
 				if (blend == MixBlend.setup) {
 					constraint.mix = constraint.data.mix + (frames[frames.length + IkConstraintTimeline.PREV_MIX] - constraint.data.mix) * alpha;
-					if (direction == MixDirection.out) {
+					if (direction == MixDirection.mixOut) {
 						constraint.bendDirection = constraint.data.bendDirection;
 						constraint.compress = constraint.data.compress;
 						constraint.stretch = constraint.data.stretch;
@@ -1008,7 +1008,7 @@ var spine;
 				}
 				else {
 					constraint.mix += (frames[frames.length + IkConstraintTimeline.PREV_MIX] - constraint.mix) * alpha;
-					if (direction == MixDirection["in"]) {
+					if (direction == MixDirection.mixIn) {
 						constraint.bendDirection = frames[frames.length + IkConstraintTimeline.PREV_BEND_DIRECTION];
 						constraint.compress = frames[frames.length + IkConstraintTimeline.PREV_COMPRESS] != 0;
 						constraint.stretch = frames[frames.length + IkConstraintTimeline.PREV_STRETCH] != 0;
@@ -1022,7 +1022,7 @@ var spine;
 			var percent = this.getCurvePercent(frame / IkConstraintTimeline.ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + IkConstraintTimeline.PREV_TIME] - frameTime));
 			if (blend == MixBlend.setup) {
 				constraint.mix = constraint.data.mix + (mix + (frames[frame + IkConstraintTimeline.MIX] - mix) * percent - constraint.data.mix) * alpha;
-				if (direction == MixDirection.out) {
+				if (direction == MixDirection.mixOut) {
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
@@ -1035,7 +1035,7 @@ var spine;
 			}
 			else {
 				constraint.mix += (mix + (frames[frame + IkConstraintTimeline.MIX] - mix) * percent - constraint.mix) * alpha;
-				if (direction == MixDirection["in"]) {
+				if (direction == MixDirection.mixIn) {
 					constraint.bendDirection = frames[frame + IkConstraintTimeline.PREV_BEND_DIRECTION];
 					constraint.compress = frames[frame + IkConstraintTimeline.PREV_COMPRESS] != 0;
 					constraint.stretch = frames[frame + IkConstraintTimeline.PREV_STRETCH] != 0;
@@ -1405,7 +1405,7 @@ var spine;
 				var timelines = current.animation.timelines;
 				if ((i == 0 && mix == 1) || blend == spine.MixBlend.add) {
 					for (var ii = 0; ii < timelineCount; ii++)
-						timelines[ii].apply(skeleton, animationLast, animationTime, events, mix, blend, spine.MixDirection["in"]);
+						timelines[ii].apply(skeleton, animationLast, animationTime, events, mix, blend, spine.MixDirection.mixIn);
 				}
 				else {
 					var timelineMode = current.timelineMode;
@@ -1421,7 +1421,7 @@ var spine;
 						}
 						else {
 							spine.Utils.webkit602BugfixHelper(mix, blend);
-							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineBlend, spine.MixDirection["in"]);
+							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineBlend, spine.MixDirection.mixIn);
 						}
 					}
 				}
@@ -1458,7 +1458,7 @@ var spine;
 			var alphaHold = from.alpha * to.interruptAlpha, alphaMix = alphaHold * (1 - mix);
 			if (blend == spine.MixBlend.add) {
 				for (var i = 0; i < timelineCount; i++)
-					timelines[i].apply(skeleton, animationLast, animationTime, events, alphaMix, blend, spine.MixDirection.out);
+					timelines[i].apply(skeleton, animationLast, animationTime, events, alphaMix, blend, spine.MixDirection.mixOut);
 			}
 			else {
 				var timelineMode = from.timelineMode;
@@ -1470,7 +1470,7 @@ var spine;
 				from.totalAlpha = 0;
 				for (var i = 0; i < timelineCount; i++) {
 					var timeline = timelines[i];
-					var direction = spine.MixDirection.out;
+					var direction = spine.MixDirection.mixOut;
 					var timelineBlend = void 0;
 					var alpha = 0;
 					switch (timelineMode[i] & (AnimationState.NOT_LAST - 1)) {
@@ -1504,11 +1504,11 @@ var spine;
 						if (timelineBlend == spine.MixBlend.setup) {
 							if (timeline instanceof spine.AttachmentTimeline) {
 								if (attachments || (timelineMode[i] & AnimationState.NOT_LAST) == AnimationState.NOT_LAST)
-									direction = spine.MixDirection["in"];
+									direction = spine.MixDirection.mixIn;
 							}
 							else if (timeline instanceof spine.DrawOrderTimeline) {
 								if (drawOrder)
-									direction = spine.MixDirection["in"];
+									direction = spine.MixDirection.mixIn;
 							}
 						}
 						timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, direction);
@@ -1526,7 +1526,7 @@ var spine;
 			if (firstFrame)
 				timelinesRotation[i] = 0;
 			if (alpha == 1) {
-				timeline.apply(skeleton, 0, time, null, 1, blend, spine.MixDirection["in"]);
+				timeline.apply(skeleton, 0, time, null, 1, blend, spine.MixDirection.mixIn);
 				return;
 			}
 			var rotateTimeline = timeline;
@@ -7338,7 +7338,8 @@ var spine;
 						var y = ev.clientY - rect.top;
 						var listeners = _this.listeners;
 						for (var i = 0; i < listeners.length; i++) {
-							listeners[i].down(x, y);
+							if (listeners[i].down)
+								listeners[i].down(x, y);
 						}
 						_this.lastX = x;
 						_this.lastY = y;
@@ -7355,10 +7356,12 @@ var spine;
 						var listeners = _this.listeners;
 						for (var i = 0; i < listeners.length; i++) {
 							if (_this.buttonDown) {
-								listeners[i].dragged(x, y);
+								if (listeners[i].dragged)
+									listeners[i].dragged(x, y);
 							}
 							else {
-								listeners[i].moved(x, y);
+								if (listeners[i].moved)
+									listeners[i].moved(x, y);
 							}
 						}
 						_this.lastX = x;
@@ -7372,7 +7375,8 @@ var spine;
 						var y = ev.clientY - rect.top;
 						var listeners = _this.listeners;
 						for (var i = 0; i < listeners.length; i++) {
-							listeners[i].up(x, y);
+							if (listeners[i].up)
+								listeners[i].up(x, y);
 						}
 						_this.lastX = x;
 						_this.lastY = y;
@@ -7401,9 +7405,9 @@ var spine;
 					}
 					var listeners = _this.listeners;
 					for (var i_16 = 0; i_16 < listeners.length; i_16++) {
-						listeners[i_16].down(_this.currTouch.x, _this.currTouch.y);
+						if (listeners[i_16].down)
+							listeners[i_16].down(_this.currTouch.x, _this.currTouch.y);
 					}
-					console.log("Start " + _this.currTouch.x + ", " + _this.currTouch.y);
 					_this.lastX = _this.currTouch.x;
 					_this.lastY = _this.currTouch.y;
 					_this.buttonDown = true;
@@ -7420,9 +7424,9 @@ var spine;
 							_this.touchesPool.free(_this.currTouch);
 							var listeners = _this.listeners;
 							for (var i_17 = 0; i_17 < listeners.length; i_17++) {
-								listeners[i_17].up(x, y);
+								if (listeners[i_17].up)
+									listeners[i_17].up(x, y);
 							}
-							console.log("End " + x + ", " + y);
 							_this.lastX = x;
 							_this.lastY = y;
 							_this.buttonDown = false;
@@ -7443,9 +7447,9 @@ var spine;
 							_this.touchesPool.free(_this.currTouch);
 							var listeners = _this.listeners;
 							for (var i_18 = 0; i_18 < listeners.length; i_18++) {
-								listeners[i_18].up(x, y);
+								if (listeners[i_18].up)
+									listeners[i_18].up(x, y);
 							}
-							console.log("End " + x + ", " + y);
 							_this.lastX = x;
 							_this.lastY = y;
 							_this.buttonDown = false;
@@ -7467,9 +7471,9 @@ var spine;
 							var y = touch.clientY - rect.top;
 							var listeners = _this.listeners;
 							for (var i_19 = 0; i_19 < listeners.length; i_19++) {
-								listeners[i_19].dragged(x, y);
+								if (listeners[i_19].dragged)
+									listeners[i_19].dragged(x, y);
 							}
-							console.log("Drag " + x + ", " + y);
 							_this.lastX = _this.currTouch.x = x;
 							_this.lastY = _this.currTouch.y = y;
 							break;

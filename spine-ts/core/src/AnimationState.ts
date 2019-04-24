@@ -162,7 +162,7 @@ module spine {
 				let timelines = current.animation.timelines;
 				if ((i == 0 && mix == 1) || blend == MixBlend.add) {
 					for (let ii = 0; ii < timelineCount; ii++)
-						timelines[ii].apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection.in);
+						timelines[ii].apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection.mixIn);
 				} else {
 					let timelineMode = current.timelineMode;
 
@@ -178,7 +178,7 @@ module spine {
 						} else {
 							// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
 							Utils.webkit602BugfixHelper(mix, blend);
-							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineBlend, MixDirection.in);
+							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineBlend, MixDirection.mixIn);
 						}
 					}
 				}
@@ -214,7 +214,7 @@ module spine {
 			let alphaHold = from.alpha * to.interruptAlpha, alphaMix = alphaHold * (1 - mix);
 			if (blend == MixBlend.add) {
 				for (let i = 0; i < timelineCount; i++)
-					timelines[i].apply(skeleton, animationLast, animationTime, events, alphaMix, blend, MixDirection.out);
+					timelines[i].apply(skeleton, animationLast, animationTime, events, alphaMix, blend, MixDirection.mixOut);
 			} else {
 				let timelineMode = from.timelineMode;
 				let timelineHoldMix = from.timelineHoldMix;
@@ -226,7 +226,7 @@ module spine {
 				from.totalAlpha = 0;
 				for (let i = 0; i < timelineCount; i++) {
 					let timeline = timelines[i];
-					let direction = MixDirection.out;
+					let direction = MixDirection.mixOut;
 					let timelineBlend: MixBlend;
 					let alpha = 0;
 					switch (timelineMode[i] & (AnimationState.NOT_LAST - 1)) {
@@ -258,9 +258,9 @@ module spine {
 						Utils.webkit602BugfixHelper(alpha, blend);
 						if (timelineBlend == MixBlend.setup) {
 							if (timeline instanceof AttachmentTimeline) {
-								if (attachments || (timelineMode[i] & AnimationState.NOT_LAST) == AnimationState.NOT_LAST) direction = MixDirection.in;
+								if (attachments || (timelineMode[i] & AnimationState.NOT_LAST) == AnimationState.NOT_LAST) direction = MixDirection.mixIn;
 							} else if (timeline instanceof DrawOrderTimeline) {
-								if (drawOrder) direction = MixDirection.in;
+								if (drawOrder) direction = MixDirection.mixIn;
 							}
 						}
 						timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, direction);
@@ -282,7 +282,7 @@ module spine {
 			if (firstFrame) timelinesRotation[i] = 0;
 
 			if (alpha == 1) {
-				timeline.apply(skeleton, 0, time, null, 1, blend, MixDirection.in);
+				timeline.apply(skeleton, 0, time, null, 1, blend, MixDirection.mixIn);
 				return;
 			}
 

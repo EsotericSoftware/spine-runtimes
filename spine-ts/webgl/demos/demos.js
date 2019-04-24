@@ -20,6 +20,7 @@ $(function () {
 		stretchymanDemo,
 		tankDemo,
 		transformsDemo,
+		additiveBlendingDemo
 	];
 
 	var placeholders = document.getElementsByClassName("aspect");

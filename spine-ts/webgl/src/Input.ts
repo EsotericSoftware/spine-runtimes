@@ -54,7 +54,7 @@ module spine.webgl {
 
 					let listeners = this.listeners;
 					for (let i = 0; i < listeners.length; i++) {
-						listeners[i].down(x, y);
+						if (listeners[i].down) listeners[i].down(x, y);
 					}
 
 					this.lastX = x;
@@ -75,9 +75,9 @@ module spine.webgl {
 					let listeners = this.listeners;
 					for (let i = 0; i < listeners.length; i++) {
 						if (this.buttonDown) {
-							listeners[i].dragged(x, y);
+							if (listeners[i].dragged) listeners[i].dragged(x, y);
 						} else {
-							listeners[i].moved(x, y);
+							if (listeners[i].moved) listeners[i].moved(x, y);
 						}
 					}
 
@@ -94,7 +94,7 @@ module spine.webgl {
 
 					let listeners = this.listeners;
 					for (let i = 0; i < listeners.length; i++) {
-						listeners[i].up(x, y);
+						if (listeners[i].up) listeners[i].up(x, y);
 					}
 
 					this.lastX = x;
@@ -128,9 +128,9 @@ module spine.webgl {
 
 				let listeners = this.listeners;
 				for (let i = 0; i < listeners.length; i++) {
-					listeners[i].down(this.currTouch.x, this.currTouch.y);
+					if (listeners[i].down) listeners[i].down(this.currTouch.x, this.currTouch.y);
 				}
-				console.log("Start " + this.currTouch.x + ", " + this.currTouch.y);
+
 				this.lastX = this.currTouch.x;
 				this.lastY = this.currTouch.y;
 				this.buttonDown = true;
@@ -147,9 +147,9 @@ module spine.webgl {
 						this.touchesPool.free(this.currTouch);
 						let listeners = this.listeners;
 						for (let i = 0; i < listeners.length; i++) {
-							listeners[i].up(x, y);
+							if (listeners[i].up) listeners[i].up(x, y);
 						}
-						console.log("End " + x + ", " + y);
+
 						this.lastX = x;
 						this.lastY = y;
 						this.buttonDown = false;
@@ -170,9 +170,9 @@ module spine.webgl {
 						this.touchesPool.free(this.currTouch);
 						let listeners = this.listeners;
 						for (let i = 0; i < listeners.length; i++) {
-							listeners[i].up(x, y);
+							if (listeners[i].up) listeners[i].up(x, y);
 						}
-						console.log("End " + x + ", " + y);
+
 						this.lastX = x;
 						this.lastY = y;
 						this.buttonDown = false;
@@ -195,9 +195,9 @@ module spine.webgl {
 
 						let listeners = this.listeners;
 						for (let i = 0; i < listeners.length; i++) {
-							listeners[i].dragged(x, y);
+							if (listeners[i].dragged) listeners[i].dragged(x, y);
 						}
-						console.log("Drag " + x + ", " + y);
+
 						this.lastX = this.currTouch.x = x;
 						this.lastY = this.currTouch.y = y;
 						break;

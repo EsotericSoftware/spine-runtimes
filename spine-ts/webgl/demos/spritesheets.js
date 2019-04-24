@@ -122,7 +122,7 @@ var spritesheetsDemo = function(canvas, bgColor) {
 		walkLastTimePrecise += delta;
 		while (walkLastTimePrecise - walkLastTime > 1 / FPS) {
 			var newWalkTime = walkLastTime + 1 / FPS;
-			walkAnim.apply(skeletonSeq, walkLastTime, newWalkTime, true, null, 1, spine.MixBlend.setup, spine.MixDirection.in);
+			walkAnim.apply(skeletonSeq, walkLastTime, newWalkTime, true, null, 1, spine.MixBlend.setup, spine.MixDirection.mixIn);
 			walkLastTime = newWalkTime;
 		}
 		skeletonSeq.updateWorldTransform();
