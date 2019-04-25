@@ -181,7 +181,7 @@ namespace Spine.Unity.Playables {
 				} else {
 					skeleton.SetToSetupPose();
 					if (toAnimation != null)
-						toAnimation.PoseSkeleton(skeleton, toClipTime, clipData.loop);
+						toAnimation.Apply(skeleton, 0, toClipTime, clipData.loop, null, 1f, MixBlend.Setup, MixDirection.In);
 				}
 
 			}

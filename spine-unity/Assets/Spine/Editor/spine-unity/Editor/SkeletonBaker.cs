@@ -831,7 +831,7 @@ namespace Spine.Unity.Editor {
 			Skeleton skeleton = bone.Skeleton;
 			bool inheritRotation = bone.Data.TransformMode.InheritsRotation();
 
-			animation.PoseSkeleton(skeleton, 0);
+			animation.Apply(skeleton, 0, 0, false, null, 1f, MixBlend.Setup, MixDirection.In);
 			skeleton.UpdateWorldTransform();
 			float duration = animation.Duration;
 
@@ -859,7 +859,7 @@ namespace Spine.Unity.Editor {
 				if (i == steps)
 					currentTime = duration;
 
-				animation.PoseSkeleton(skeleton, currentTime, true);
+				animation.Apply(skeleton, 0, currentTime, true, null, 1f, MixBlend.Setup, MixDirection.In);
 				skeleton.UpdateWorldTransform();
 
 				int pIndex = listIndex - 1;

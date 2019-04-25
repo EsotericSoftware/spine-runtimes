@@ -601,25 +601,6 @@ namespace Spine {
 			}
 		}
 
-		/// <summary>
-		/// Shortcut for posing a skeleton at a specific time. Time is in seconds. (frameNumber / 30f) will give you seconds.
-		/// If you need to do this often, you should get the Animation object yourself using skeleton.data.FindAnimation. and call Apply on that.</summary>
-		/// <param name = "skeleton">The skeleton to pose.</param>
-		/// <param name="animationName">The name of the animation to use.</param>
-		/// <param name = "time">The time of the pose within the animation.</param>
-		/// <param name = "loop">Wraps the time around if it is longer than the duration of the animation.</param>
-		public static void PoseWithAnimation (this Skeleton skeleton, string animationName, float time, bool loop = false) {
-			// Fail loud when skeleton.data is null.
-			Spine.Animation animation = skeleton.data.FindAnimation(animationName);
-			if (animation == null) return;
-			animation.Apply(skeleton, 0, time, loop, null, 1f, MixBlend.Setup, MixDirection.In);
-		}
-
-		/// <summary>Pose a skeleton according to a given time in an animation. This is the simplified version of Animation.Apply(skeleton).</summary>
-		public static void PoseSkeleton (this Animation animation, Skeleton skeleton, float time, bool loop = false) {
-			animation.Apply(skeleton, 0, time, loop, null, 1f, MixBlend.Setup, MixDirection.In);
-		}
-
 		/// <summary>Resets Skeleton parts to Setup Pose according to a Spine.Animation's keyed items.</summary>
 		public static void SetKeyedItemsToSetupPose (this Animation animation, Skeleton skeleton) {
 			animation.Apply(skeleton, 0, 0, false, null, 0, MixBlend.Setup, MixDirection.Out);

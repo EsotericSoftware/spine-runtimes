@@ -92,12 +92,14 @@ namespace Spine.Unity {
 					if (!Application.isPlaying) {
 						skeleton.scaleX = this.initialFlipX ? -1 : 1;
 						skeleton.scaleY = this.initialFlipY ? -1 : 1;
-
+						
+						state.ClearTrack(0);
 						skeleton.SetToSetupPose();
-						if (!string.IsNullOrEmpty(startingAnimation))
-							skeleton.PoseWithAnimation(startingAnimation, 0f, false);
+						if (!string.IsNullOrEmpty(startingAnimation)) {
+							state.SetAnimation(0, startingAnimation, startingLoop);
+							Update(0f);
+						}
 					}
-
 				}
 			} else {
 				// Under some circumstances (e.g. sometimes on the first import) OnValidate is called
@@ -181,6 +183,13 @@ namespace Spine.Unity {
 		}
 
 		public virtual void Update () {
+			#if UNITY_EDITOR
+			if (!Application.isPlaying) {
+				Update(0f);
+				return;
+			}
+			#endif
+
 			if (freeze) return;
 			Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
 		}
@@ -273,22 +282,11 @@ namespace Spine.Unity {
 			if (!string.IsNullOrEmpty(startingAnimation)) {
 				var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(startingAnimation);
 				if (animationObject != null) {
-					animationObject.PoseSkeleton(skeleton, 0f);
-					skeleton.UpdateWorldTransform();
-
+					state.SetAnimation(0, animationObject, startingLoop);
 					#if UNITY_EDITOR
-					if (Application.isPlaying) {
+					if (!Application.isPlaying)
+						Update(0f);
 					#endif
-
-						// Make this block not run in Unity Editor edit mode.
-						state.SetAnimation(0, animationObject, startingLoop);
-
-					#if UNITY_EDITOR
-					}
-					#endif
-				}
-				else {
-					startingAnimation = string.Empty;
 				}
 			}
 		}
