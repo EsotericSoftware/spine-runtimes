@@ -90,10 +90,7 @@ namespace Spine.Unity.Editor {
 			var maskMaterials = skeleton.maskMaterials;
 			var maskInteraction = skeleton.maskInteraction;
 
-			if (maskInteraction == SpriteMaskInteraction.None) {
-				return (maskMaterials.materialsMaskDisabled.Length == 0 || maskMaterials.materialsMaskDisabled[0] == null);
-			}
-			else if (maskInteraction == SpriteMaskInteraction.VisibleInsideMask) {
+			if (maskInteraction == SpriteMaskInteraction.VisibleInsideMask) {
 				return (maskMaterials.materialsInsideMask.Length == 0 || maskMaterials.materialsInsideMask[0] == null);
 			}
 			else if (maskInteraction == SpriteMaskInteraction.VisibleOutsideMask) {
