@@ -395,7 +395,21 @@ namespace Spine.Unity.Editor {
 				preferencesLoaded = true;
 			}
 
-		#if !NEW_PREFERENCES_SETTINGS_PROVIDER
+		#if NEW_PREFERENCES_SETTINGS_PROVIDER
+			public static void CopyOldToNewPreferences(ref SpinePreferences newPreferences) {
+				newPreferences.defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, SpinePreferences.DEFAULT_DEFAULT_MIX);
+				newPreferences.defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, SpinePreferences.DEFAULT_DEFAULT_SCALE);
+				newPreferences.defaultZSpacing = EditorPrefs.GetFloat(DEFAULT_ZSPACING_KEY, SpinePreferences.DEFAULT_DEFAULT_ZSPACING);
+				newPreferences.defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, SpinePreferences.DEFAULT_DEFAULT_SHADER);
+				newPreferences.showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, SpinePreferences.DEFAULT_SHOW_HIERARCHY_ICONS);
+				newPreferences.setTextureImporterSettings = EditorPrefs.GetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, SpinePreferences.DEFAULT_SET_TEXTUREIMPORTER_SETTINGS);
+				newPreferences.autoReloadSceneSkeletons = EditorPrefs.GetBool(AUTO_RELOAD_SCENESKELETONS_KEY, SpinePreferences.DEFAULT_AUTO_RELOAD_SCENESKELETONS);
+				newPreferences.atlasTxtImportWarning = EditorPrefs.GetBool(ATLASTXT_WARNING_KEY, SpinePreferences.DEFAULT_ATLASTXT_WARNING);
+				newPreferences.textureImporterWarning = EditorPrefs.GetBool(TEXTUREIMPORTER_WARNING_KEY, SpinePreferences.DEFAULT_TEXTUREIMPORTER_WARNING);
+			}
+		#endif
+
+#if !NEW_PREFERENCES_SETTINGS_PROVIDER
 			public static void HandlePreferencesGUI () {
 				if (!preferencesLoaded)
 					Load();
@@ -404,11 +418,11 @@ namespace Spine.Unity.Editor {
 				showHierarchyIcons = EditorGUILayout.Toggle(new GUIContent("Show Hierarchy Icons", "Show relevant icons on GameObjects with Spine Components on them. Disable this if you have large, complex scenes."), showHierarchyIcons);
 				if (EditorGUI.EndChangeCheck()) {
 					EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, showHierarchyIcons);
-					#if NEWPLAYMODECALLBACKS
+#if NEWPLAYMODECALLBACKS
 					HierarchyHandler.IconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
-					#else
+#else
 					HierarchyHandler.IconsOnPlaymodeStateChanged();
-					#endif
+#endif
 				}
 
 				BoolPrefsField(ref autoReloadSceneSkeletons, AUTO_RELOAD_SCENESKELETONS_KEY, new GUIContent("Auto-reload scene components", "Reloads Skeleton components in the scene whenever their SkeletonDataAsset is modified. This makes it so changes in the SkeletonDataAsset inspector are immediately reflected. This may be slow when your scenes have large numbers of SkeletonRenderers or SkeletonGraphic."));
@@ -470,7 +484,7 @@ namespace Spine.Unity.Editor {
 						SpineTK2DEditorUtility.DisableTK2D();
 				}
 			}
-		#endif // !NEW_PREFERENCES_SETTINGS_PROVIDER
+#endif // !NEW_PREFERENCES_SETTINGS_PROVIDER
 		}
 
 		static void BoolPrefsField (ref bool currentValue, string editorPrefsKey, GUIContent label) {

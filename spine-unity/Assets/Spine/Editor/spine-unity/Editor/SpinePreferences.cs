@@ -95,6 +95,7 @@ namespace Spine.Unity.Editor {
 			if (settings == null)
 			{
 				settings = ScriptableObject.CreateInstance<SpinePreferences>();
+				SpineEditorUtilities.OldPreferences.CopyOldToNewPreferences(ref settings);
 				if (!AssetDatabase.IsValidFolder("Assets/Editor"))
 					AssetDatabase.CreateFolder("Assets", "Editor");
 				AssetDatabase.CreateAsset(settings, SPINE_SETTINGS_ASSET_PATH);
