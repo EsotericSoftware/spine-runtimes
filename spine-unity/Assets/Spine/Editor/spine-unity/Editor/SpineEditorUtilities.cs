@@ -46,6 +46,10 @@
 #define NEWHIERARCHYWINDOWCALLBACKS
 #endif
 
+#if UNITY_2018_3_OR_NEWER
+#define NEW_PREFERENCES_SETTINGS_PROVIDER
+#endif
+
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -169,11 +173,35 @@ namespace Spine.Unity.Editor {
 
 		static int STRAIGHT_ALPHA_PARAM_ID = Shader.PropertyToID("_StraightAlphaInput");
 
+	#if NEW_PREFERENCES_SETTINGS_PROVIDER
+		static class SpineSettingsProviderRegistration
+		{
+			[SettingsProvider]
+			public static SettingsProvider CreateSpineSettingsProvider()
+			{
+				var provider = new SettingsProvider("Spine", SettingsScope.User)
+				{
+					label = "Spine",
+					guiHandler = (searchContext) =>
+					{
+						var settings = SpinePreferences.GetSerializedSettings();
+						SpinePreferences.HandlePreferencesGUI(settings);
+						settings.ApplyModifiedProperties();
+					},
+
+					// Populate the search keywords to enable smart search filtering and label highlighting:
+					keywords = new HashSet<string>(new[] { "Spine", "Preferences", "Skeleton", "Default", "Mix", "Duration" })
+				};
+				return provider;
+			}
+		}
+	#else
 		// Preferences entry point
 		[PreferenceItem("Spine")]
 		static void PreferencesGUI () {
 			Preferences.HandlePreferencesGUI();
 		}
+	#endif
 
 		// Auto-import entry point
 		static void OnPostprocessAllAssets (string[] imported, string[] deleted, string[] moved, string[] movedFromAssetPaths) {
@@ -191,7 +219,11 @@ namespace Spine.Unity.Editor {
 		static void Initialize () {
 			if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 			
+			#if !NEW_PREFERENCES_SETTINGS_PROVIDER
 			Preferences.Load();
+			#else
+			SpinePreferences.Load();
+			#endif
 
 			string[] assets = AssetDatabase.FindAssets("t:script SpineEditorUtilities");
 			string assetPath = AssetDatabase.GUIDToAssetPath(assets[0]);
@@ -295,55 +327,53 @@ namespace Spine.Unity.Editor {
 		}
 		#endregion
 
+	#if NEW_PREFERENCES_SETTINGS_PROVIDER
+		public static SpinePreferences Preferences {
+			get {
+				return SpinePreferences.GetOrCreateSettings();
+			}
+		}
+	#endif
+
+	#if NEW_PREFERENCES_SETTINGS_PROVIDER
+		public static class OldPreferences {
+	#else
 		public static class Preferences {
-			#if SPINE_TK2D
-			const float DEFAULT_DEFAULT_SCALE = 1f;
-			#else
-			const float DEFAULT_DEFAULT_SCALE = 0.01f;
-			#endif
+	#endif
 			const string DEFAULT_SCALE_KEY = "SPINE_DEFAULT_SCALE";
-			public static float defaultScale = DEFAULT_DEFAULT_SCALE;
+			public static float defaultScale = SpinePreferences.DEFAULT_DEFAULT_SCALE;
 
-			const float DEFAULT_DEFAULT_MIX = 0.2f;
 			const string DEFAULT_MIX_KEY = "SPINE_DEFAULT_MIX";
-			public static float defaultMix = DEFAULT_DEFAULT_MIX;
+			public static float defaultMix = SpinePreferences.DEFAULT_DEFAULT_MIX;
 
-			const string DEFAULT_DEFAULT_SHADER = "Spine/Skeleton";
 			const string DEFAULT_SHADER_KEY = "SPINE_DEFAULT_SHADER";
-			public static string defaultShader = DEFAULT_DEFAULT_SHADER;
+			public static string defaultShader = SpinePreferences.DEFAULT_DEFAULT_SHADER;
 
-			const float DEFAULT_DEFAULT_ZSPACING = 0f;
 			const string DEFAULT_ZSPACING_KEY = "SPINE_DEFAULT_ZSPACING";
-			public static float defaultZSpacing = DEFAULT_DEFAULT_ZSPACING;
+			public static float defaultZSpacing = SpinePreferences.DEFAULT_DEFAULT_ZSPACING;
 
-			const bool DEFAULT_DEFAULT_INSTANTIATE_LOOP = true;
 			const string DEFAULT_INSTANTIATE_LOOP_KEY = "SPINE_DEFAULT_INSTANTIATE_LOOP";
-			public static bool defaultInstantiateLoop = DEFAULT_DEFAULT_INSTANTIATE_LOOP;
+			public static bool defaultInstantiateLoop = SpinePreferences.DEFAULT_DEFAULT_INSTANTIATE_LOOP;
 
-			const bool DEFAULT_SHOW_HIERARCHY_ICONS = true;
 			const string SHOW_HIERARCHY_ICONS_KEY = "SPINE_SHOW_HIERARCHY_ICONS";
-			public static bool showHierarchyIcons = DEFAULT_SHOW_HIERARCHY_ICONS;
+			public static bool showHierarchyIcons = SpinePreferences.DEFAULT_SHOW_HIERARCHY_ICONS;
 
-			const bool DEFAULT_SET_TEXTUREIMPORTER_SETTINGS = true;
 			const string SET_TEXTUREIMPORTER_SETTINGS_KEY = "SPINE_SET_TEXTUREIMPORTER_SETTINGS";
-			public static bool setTextureImporterSettings = DEFAULT_SET_TEXTUREIMPORTER_SETTINGS;
+			public static bool setTextureImporterSettings = SpinePreferences.DEFAULT_SET_TEXTUREIMPORTER_SETTINGS;
 
-			const bool DEFAULT_ATLASTXT_WARNING = true;
 			const string ATLASTXT_WARNING_KEY = "SPINE_ATLASTXT_WARNING";
-			public static bool atlasTxtImportWarning = DEFAULT_ATLASTXT_WARNING;
+			public static bool atlasTxtImportWarning = SpinePreferences.DEFAULT_ATLASTXT_WARNING;
 
-			const bool DEFAULT_TEXTUREIMPORTER_WARNING = true;
 			const string TEXTUREIMPORTER_WARNING_KEY = "SPINE_TEXTUREIMPORTER_WARNING";
-			public static bool textureImporterWarning = DEFAULT_TEXTUREIMPORTER_WARNING;
+			public static bool textureImporterWarning = SpinePreferences.DEFAULT_TEXTUREIMPORTER_WARNING;
 
-			internal const float DEFAULT_MIPMAPBIAS = -0.5f;
+			public const float DEFAULT_MIPMAPBIAS = SpinePreferences.DEFAULT_MIPMAPBIAS;
 
-			public const float DEFAULT_SCENE_ICONS_SCALE = 1f;
-			public const string SCENE_ICONS_SCALE_KEY = "SPINE_SCENE_ICONS_SCALE";
+			public const float DEFAULT_SCENE_ICONS_SCALE = SpinePreferences.DEFAULT_SCENE_ICONS_SCALE;
+			public const string SCENE_ICONS_SCALE_KEY = SpinePreferences.SCENE_ICONS_SCALE_KEY;
 
-			const bool DEFAULT_AUTO_RELOAD_SCENESKELETONS = true;
 			const string AUTO_RELOAD_SCENESKELETONS_KEY = "SPINE_AUTO_RELOAD_SCENESKELETONS";
-			public static bool autoReloadSceneSkeletons = DEFAULT_AUTO_RELOAD_SCENESKELETONS;
+			public static bool autoReloadSceneSkeletons = SpinePreferences.DEFAULT_AUTO_RELOAD_SCENESKELETONS;
 
 			static bool preferencesLoaded = false;
 
@@ -351,20 +381,21 @@ namespace Spine.Unity.Editor {
 				if (preferencesLoaded)
 					return;
 
-				defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, DEFAULT_DEFAULT_MIX);
-				defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, DEFAULT_DEFAULT_SCALE);
-				defaultZSpacing = EditorPrefs.GetFloat(DEFAULT_ZSPACING_KEY, DEFAULT_DEFAULT_ZSPACING);
-				defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, DEFAULT_DEFAULT_SHADER);
-				showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, DEFAULT_SHOW_HIERARCHY_ICONS);
-				setTextureImporterSettings = EditorPrefs.GetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, DEFAULT_SET_TEXTUREIMPORTER_SETTINGS);
-				autoReloadSceneSkeletons = EditorPrefs.GetBool(AUTO_RELOAD_SCENESKELETONS_KEY, DEFAULT_AUTO_RELOAD_SCENESKELETONS);
-				atlasTxtImportWarning = EditorPrefs.GetBool(ATLASTXT_WARNING_KEY, DEFAULT_ATLASTXT_WARNING);
-				textureImporterWarning = EditorPrefs.GetBool(TEXTUREIMPORTER_WARNING_KEY, DEFAULT_TEXTUREIMPORTER_WARNING);
+				defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, SpinePreferences.DEFAULT_DEFAULT_MIX);
+				defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, SpinePreferences.DEFAULT_DEFAULT_SCALE);
+				defaultZSpacing = EditorPrefs.GetFloat(DEFAULT_ZSPACING_KEY, SpinePreferences.DEFAULT_DEFAULT_ZSPACING);
+				defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, SpinePreferences.DEFAULT_DEFAULT_SHADER);
+				showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, SpinePreferences.DEFAULT_SHOW_HIERARCHY_ICONS);
+				setTextureImporterSettings = EditorPrefs.GetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, SpinePreferences.DEFAULT_SET_TEXTUREIMPORTER_SETTINGS);
+				autoReloadSceneSkeletons = EditorPrefs.GetBool(AUTO_RELOAD_SCENESKELETONS_KEY, SpinePreferences.DEFAULT_AUTO_RELOAD_SCENESKELETONS);
+				atlasTxtImportWarning = EditorPrefs.GetBool(ATLASTXT_WARNING_KEY, SpinePreferences.DEFAULT_ATLASTXT_WARNING);
+				textureImporterWarning = EditorPrefs.GetBool(TEXTUREIMPORTER_WARNING_KEY, SpinePreferences.DEFAULT_TEXTUREIMPORTER_WARNING);
 
 				SpineHandles.handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, DEFAULT_SCENE_ICONS_SCALE);
 				preferencesLoaded = true;
 			}
 
+		#if !NEW_PREFERENCES_SETTINGS_PROVIDER
 			public static void HandlePreferencesGUI () {
 				if (!preferencesLoaded)
 					Load();
@@ -390,7 +421,7 @@ namespace Spine.Unity.Editor {
 
 					EditorGUI.BeginChangeCheck();
 					var shader = (EditorGUILayout.ObjectField("Default Shader", Shader.Find(defaultShader), typeof(Shader), false) as Shader);
-					defaultShader = shader != null ? shader.name : DEFAULT_DEFAULT_SHADER;
+					defaultShader = shader != null ? shader.name : SpinePreferences.DEFAULT_DEFAULT_SHADER;
 					if (EditorGUI.EndChangeCheck())
 						EditorPrefs.SetString(DEFAULT_SHADER_KEY, defaultShader);
 
@@ -439,6 +470,7 @@ namespace Spine.Unity.Editor {
 						SpineTK2DEditorUtility.DisableTK2D();
 				}
 			}
+		#endif // !NEW_PREFERENCES_SETTINGS_PROVIDER
 		}
 
 		static void BoolPrefsField (ref bool currentValue, string editorPrefsKey, GUIContent label) {
@@ -457,7 +489,18 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
+		public static void FloatPropertyField(SerializedProperty property, GUIContent label, float min = float.NegativeInfinity, float max = float.PositiveInfinity) {
+			EditorGUI.BeginChangeCheck();
+			property.floatValue = EditorGUILayout.DelayedFloatField(label, property.floatValue);
+			if (EditorGUI.EndChangeCheck()) {
+				property.floatValue = Mathf.Clamp(property.floatValue, min, max);
+			}
+		}
 
+		public static void ShaderPropertyField(SerializedProperty property, GUIContent label, string fallbackShaderName) {
+			var shader = (EditorGUILayout.ObjectField(label, Shader.Find(property.stringValue), typeof(Shader), false) as Shader);
+			property.stringValue = shader != null ? shader.name : fallbackShaderName;
+		}
 
 		public static class DataReloadHandler {
 
@@ -1664,7 +1707,7 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		static class HierarchyHandler {
+		public static class HierarchyHandler {
 			static Dictionary<int, GameObject> skeletonRendererTable = new Dictionary<int, GameObject>();
 			static Dictionary<int, SkeletonUtilityBone> skeletonUtilityBoneTable = new Dictionary<int, SkeletonUtilityBone>();
 			static Dictionary<int, BoundingBoxFollower> boundingBoxFollowerTable = new Dictionary<int, BoundingBoxFollower>();
@@ -1786,7 +1829,7 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		internal static class SpineTK2DEditorUtility {
+		public static class SpineTK2DEditorUtility {
 			const string SPINE_TK2D_DEFINE = "SPINE_TK2D";
 
 			static bool IsInvalidGroup (BuildTargetGroup group) {
