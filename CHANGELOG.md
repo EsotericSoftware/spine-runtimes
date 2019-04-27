@@ -222,6 +222,8 @@
     * `CompareFunction.LessEqual` for `Mask Interaction - Visible Inside Mask`
     * `CompareFunction.Greater` for `Mask Interaction - Visible Outside Mask`
 * **RectMask2D Support for SkeletonGraphic** Both `SkeletonGraphic` shaders '`Spine/SkeletonGraphic`' and '`Spine/SkeletonGraphic Tint Black`' now respect masking areas defined via Unity's `RectMask2D` component.
+* **Removed PoseSkeleton() and PoseWithAnimation()** extension methods to prevent issues where animations are not mixed out. Problem was that these methods did not set AnimationState, leaving incorrect state at e.g. attachments enabled at slots when starting subsequent animations. As a replacement you can use `AnimationState.ClearTrack(0);` followed by `var entry = AnimationState.SetAnimation(0, animation, loop); entry.TrackTime = time` to achieve similar behaviour.
+* **Spine Preferences stored in Assets/Editor/SpineSettings.asset** Now Spine uses the new `SettingsProvider` API, storing settings in a SpineSettings.asset file which can be shared with team members. Your old preferences are automatically migrated to the new system.
 
 ### XNA/MonoGame
 * Added support for any `Effect` to be used by `SkeletonRenderer`
