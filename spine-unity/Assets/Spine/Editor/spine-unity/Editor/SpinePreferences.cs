@@ -104,10 +104,6 @@ namespace Spine.Unity.Editor {
 			return settings;
 		}
 
-		internal static SerializedObject GetSerializedSettings () {
-			return new SerializedObject(GetOrCreateSettings());
-		}
-
 		public static void HandlePreferencesGUI (SerializedObject settings) {
 			
 			float prevLabelWidth = EditorGUIUtility.labelWidth;

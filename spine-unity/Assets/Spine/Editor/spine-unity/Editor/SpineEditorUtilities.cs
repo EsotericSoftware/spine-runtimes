@@ -184,9 +184,11 @@ namespace Spine.Unity.Editor {
 					label = "Spine",
 					guiHandler = (searchContext) =>
 					{
-						var settings = SpinePreferences.GetSerializedSettings();
-						SpinePreferences.HandlePreferencesGUI(settings);
-						settings.ApplyModifiedProperties();
+						var settings = SpinePreferences.GetOrCreateSettings();
+						var serializedSettings = new SerializedObject(settings);
+						SpinePreferences.HandlePreferencesGUI(serializedSettings);
+						if (serializedSettings.ApplyModifiedProperties())
+							OldPreferences.SaveToEditorPrefs(settings);
 					},
 
 					// Populate the search keywords to enable smart search filtering and label highlighting:
@@ -407,9 +409,21 @@ namespace Spine.Unity.Editor {
 				newPreferences.atlasTxtImportWarning = EditorPrefs.GetBool(ATLASTXT_WARNING_KEY, SpinePreferences.DEFAULT_ATLASTXT_WARNING);
 				newPreferences.textureImporterWarning = EditorPrefs.GetBool(TEXTUREIMPORTER_WARNING_KEY, SpinePreferences.DEFAULT_TEXTUREIMPORTER_WARNING);
 			}
+
+			public static void SaveToEditorPrefs(SpinePreferences preferences) {
+				EditorPrefs.SetFloat(DEFAULT_MIX_KEY, preferences.defaultMix);
+				EditorPrefs.SetFloat(DEFAULT_SCALE_KEY, preferences.defaultScale);
+				EditorPrefs.SetFloat(DEFAULT_ZSPACING_KEY, preferences.defaultZSpacing);
+				EditorPrefs.SetString(DEFAULT_SHADER_KEY, preferences.defaultShader);
+				EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, preferences.showHierarchyIcons);
+				EditorPrefs.SetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, preferences.setTextureImporterSettings);
+				EditorPrefs.SetBool(AUTO_RELOAD_SCENESKELETONS_KEY, preferences.autoReloadSceneSkeletons);
+				EditorPrefs.SetBool(ATLASTXT_WARNING_KEY, preferences.atlasTxtImportWarning);
+				EditorPrefs.SetBool(TEXTUREIMPORTER_WARNING_KEY, preferences.textureImporterWarning);
+			}
 		#endif
 
-#if !NEW_PREFERENCES_SETTINGS_PROVIDER
+		#if !NEW_PREFERENCES_SETTINGS_PROVIDER
 			public static void HandlePreferencesGUI () {
 				if (!preferencesLoaded)
 					Load();
@@ -418,11 +432,11 @@ namespace Spine.Unity.Editor {
 				showHierarchyIcons = EditorGUILayout.Toggle(new GUIContent("Show Hierarchy Icons", "Show relevant icons on GameObjects with Spine Components on them. Disable this if you have large, complex scenes."), showHierarchyIcons);
 				if (EditorGUI.EndChangeCheck()) {
 					EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, showHierarchyIcons);
-#if NEWPLAYMODECALLBACKS
+				#if NEWPLAYMODECALLBACKS
 					HierarchyHandler.IconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
-#else
+				#else
 					HierarchyHandler.IconsOnPlaymodeStateChanged();
-#endif
+				#endif
 				}
 
 				BoolPrefsField(ref autoReloadSceneSkeletons, AUTO_RELOAD_SCENESKELETONS_KEY, new GUIContent("Auto-reload scene components", "Reloads Skeleton components in the scene whenever their SkeletonDataAsset is modified. This makes it so changes in the SkeletonDataAsset inspector are immediately reflected. This may be slow when your scenes have large numbers of SkeletonRenderers or SkeletonGraphic."));
@@ -484,7 +498,7 @@ namespace Spine.Unity.Editor {
 						SpineTK2DEditorUtility.DisableTK2D();
 				}
 			}
-#endif // !NEW_PREFERENCES_SETTINGS_PROVIDER
+		#endif // !NEW_PREFERENCES_SETTINGS_PROVIDER
 		}
 
 		static void BoolPrefsField (ref bool currentValue, string editorPrefsKey, GUIContent label) {
@@ -520,11 +534,11 @@ namespace Spine.Unity.Editor {
 
 			internal static Dictionary<int, string> savedSkeletonDataAssetAtSKeletonGraphicID = new Dictionary<int, string>();
 
-#if NEWPLAYMODECALLBACKS
+		#if NEWPLAYMODECALLBACKS
 			internal static void OnPlaymodeStateChanged (PlayModeStateChange stateChange) {
-#else
+		#else
 			internal static void OnPlaymodeStateChanged () {
-#endif
+		#endif
 				ReloadAllActiveSkeletonsEditMode();
 			}
 
