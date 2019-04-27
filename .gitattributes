@@ -15,3 +15,7 @@
 *.asset             merge=unityyamlmerge text eol=lf
 *.meta              merge=unityyamlmerge text eol=lf
 *.controller        merge=unityyamlmerge text eol=lf
+
+# Prevent mixed line ending warnings created by Unity's code auto-updater
+*.cginc      text eol=lf
+*.shader     text eol=lf
