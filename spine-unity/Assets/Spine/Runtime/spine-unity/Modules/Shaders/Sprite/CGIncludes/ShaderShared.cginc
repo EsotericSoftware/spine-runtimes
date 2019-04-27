@@ -5,7 +5,11 @@
 
 #ifdef UNITY_INSTANCING_ENABLED
 
+#if UNITY_2017_3_OR_NEWER
+	UNITY_INSTANCING_BUFFER_START(PerDrawSprite)
+#else
     UNITY_INSTANCING_CBUFFER_START(PerDrawSprite)
+#endif
         // SpriteRenderer.Color while Non-Batched/Instanced.
         fixed4 unity_SpriteRendererColorArray[UNITY_INSTANCED_ARRAY_SIZE];
         // this could be smaller but that's how bit each entry is regardless of type
