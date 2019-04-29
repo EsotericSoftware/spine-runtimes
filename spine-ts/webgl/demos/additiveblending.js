@@ -88,12 +88,15 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 	function calculateBlend (x, y, isPageCoords) {
 		if (isPageCoords) {
 			var canvasBounds = canvas.getBoundingClientRect();
-			console.log(canvasBounds.x + ", " + canvasBounds.y + ", " + x + ", " + y);
 			x = Math.max(0, Math.min(canvasBounds.width, x - canvasBounds.x));
 			y = Math.max(0, Math.min(canvasBounds.height, y - canvasBounds.y));
 		}
 		x = x / canvas.width;
 		y = y / canvas.height;
+		if (x > 1) x = 1;
+		if (x < 0) x = 0;
+		if (y > 1) y = 1;
+		if (y < 0) y = 0;
 		left.alpha = (Math.max(x, 0.5) - 0.5) * 2;
 		right.alpha = (0.5 - Math.min(x, 0.5)) * 2;
 		up.alpha = (0.5 - Math.min(y, 0.5)) * 2;
@@ -119,7 +122,7 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 					dragging = false;
 				},
 				dragged: function(x, y) {
-					if (dragging) {
+					if (dragging && x > 0 && x < canvas.width && y > 0 && y < canvas.height) {
 						renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
 						handle.x = coords.x;
 						handle.y = coords.y;

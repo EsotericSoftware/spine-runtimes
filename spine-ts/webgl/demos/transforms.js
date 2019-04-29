@@ -110,7 +110,7 @@ var transformsDemo = function(canvas, bgColor) {
 				target = null;
 			},
 			dragged: function(x, y) {
-				if (target != null) {
+				if (target != null && x > 0 && x < canvas.width && y > 0 && y < canvas.height) {
 					if (target === rotateHandle) {
 						var rotation = getRotation(x, y);
 						var delta = rotation - lastRotation;
