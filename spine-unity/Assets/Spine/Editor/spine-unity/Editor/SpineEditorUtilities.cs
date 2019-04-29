@@ -1362,9 +1362,9 @@ namespace Spine.Unity.Editor {
 
 				bool pmaVertexColors = false;
 				bool tintBlack = false;
-				foreach (SpineAtlasAsset atlasAsset in skeletonDataAsset.atlasAssets) {
+				foreach (AtlasAssetBase atlasAsset in skeletonDataAsset.atlasAssets) {
 					if (!pmaVertexColors) {
-						foreach (Material m in atlasAsset.materials) {
+						foreach (Material m in atlasAsset.Materials) {
 							if (m.shader.name.Contains(PMAShaderQuery)) {
 								pmaVertexColors = true;
 								break;
@@ -1373,7 +1373,7 @@ namespace Spine.Unity.Editor {
 					}
 
 					if (!tintBlack) {
-						foreach (Material m in atlasAsset.materials) {
+						foreach (Material m in atlasAsset.Materials) {
 							if (m.shader.name.Contains(TintBlackShaderQuery)) {
 								tintBlack = true;
 								break;
