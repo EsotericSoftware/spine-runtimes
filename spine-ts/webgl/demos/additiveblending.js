@@ -15,6 +15,9 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 	var isPlaying = true;
 
 	var left, right, up, down;
+	var cursor;
+
+	var clientMouseX = 0, clientMouseY = 0;
 
 	var DEMO_NAME = "AdditiveBlendingDemo";
 
@@ -35,6 +38,8 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 		assetManager.loadText(DEMO_NAME, "atlas2.atlas");
 		assetManager.loadJson(DEMO_NAME, "demos.json");
 		timeKeeper = new spine.TimeKeeper();
+
+		cursor = document.getElementById("cursor");
 	}
 
 	function loadingComplete () {
@@ -83,6 +88,7 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 	function calculateBlend (x, y, isPageCoords) {
 		if (isPageCoords) {
 			var canvasBounds = canvas.getBoundingClientRect();
+			console.log(canvasBounds.x + ", " + canvasBounds.y + ", " + x + ", " + y);
 			x = Math.max(0, Math.min(canvasBounds.width, x - canvasBounds.x));
 			y = Math.max(0, Math.min(canvasBounds.height, y - canvasBounds.y));
 		}
@@ -97,7 +103,8 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 	function setupInput () {
 		if (!isMobileDevice()) {
 			document.addEventListener("mousemove", function (event) {
-				calculateBlend(event.clientX, event.clientY, true);
+				clientMouseX = event.clientX;
+				clientMouseY = event.clientY;
 			}, false);
 		} else {
 			var input = new spine.webgl.Input(canvas);
@@ -124,6 +131,10 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 	}
 
 	function render () {
+		if (!isMobileDevice()) {
+			calculateBlend(clientMouseX, clientMouseY, true);
+		}
+
 		timeKeeper.update();
 		var delta = timeKeeper.delta;
 
