@@ -49,5 +49,5 @@ abstract public class Attachment {
 	}
 
 	/** Returns a copy of the attachment. **/
-	public abstract Attachment copy ();
+	abstract public Attachment copy ();
 }

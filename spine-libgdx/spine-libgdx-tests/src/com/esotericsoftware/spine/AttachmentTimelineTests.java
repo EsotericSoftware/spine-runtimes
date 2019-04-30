@@ -50,8 +50,16 @@ public class AttachmentTimelineTests {
 
 		skeletonData.getSlots().add(new SlotData(0, "slot", boneData));
 
-		Attachment attachment1 = new Attachment("attachment1") {};
-		Attachment attachment2 = new Attachment("attachment2") {};
+		Attachment attachment1 = new Attachment("attachment1") {
+			public Attachment copy () {
+				return null;
+			}
+		};
+		Attachment attachment2 = new Attachment("attachment2") {
+			public Attachment copy () {
+				return null;
+			}
+		};
 
 		Skin skin = new Skin("skin");
 		skin.setAttachment(0, "attachment1", attachment1);
