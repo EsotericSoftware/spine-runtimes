@@ -276,8 +276,8 @@ public class RegionAttachment extends Attachment {
 		copy.rotation = rotation;
 		copy.width = width;
 		copy.height = height;
-		System.arraycopy(uvs, 0, copy.uvs, 0, uvs.length);
-		System.arraycopy(offset, 0, copy.offset, 0, offset.length);
+		System.arraycopy(uvs, 0, copy.uvs, 0, 8);
+		System.arraycopy(offset, 0, copy.offset, 0, 8);
 		copy.color.set(color);
 		return copy;
 	}

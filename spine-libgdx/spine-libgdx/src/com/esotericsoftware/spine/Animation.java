@@ -86,7 +86,7 @@ public class Animation {
 			timelines.get(i).apply(skeleton, lastTime, time, events, alpha, blend, direction);
 	}
 
-	/** The animation's name, which is unique within the skeleton. */
+	/** The animation's name, which is unique across all animations in the skeleton. */
 	public String getName () {
 		return name;
 	}

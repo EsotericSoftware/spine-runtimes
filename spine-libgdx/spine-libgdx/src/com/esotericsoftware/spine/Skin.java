@@ -32,6 +32,7 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.OrderedMap;
+
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 
@@ -68,7 +69,7 @@ public class Skin {
 			if (!constraints.contains(data, true)) constraints.add(data);
 
 		for (SkinEntry entry : skin.attachments.keys())
-			setAttachment(entry.getSlotIndex(), entry.getName(), entry.getAttachment());
+			setAttachment(entry.slotIndex, entry.name, entry.attachment);
 	}
 
 	/** Adds all attachments, bones, and constraints from the specified skin to this skin. Attachments are deep copied. */
@@ -80,16 +81,16 @@ public class Skin {
 			if (!constraints.contains(data, true)) constraints.add(data);
 
 		for (SkinEntry entry : skin.attachments.keys()) {
-			Attachment attachment = entry.getAttachment().copy();
-			setAttachment(entry.getSlotIndex(), entry.getName(), attachment);
+			Attachment attachment = entry.attachment.copy();
+			setAttachment(entry.slotIndex, entry.name, attachment);
 		}
 
 		for (SkinEntry entry : attachments.keys()) {
-			Attachment attachment = entry.getAttachment();
+			Attachment attachment = entry.attachment;
 			if (attachment instanceof MeshAttachment) {
 				MeshAttachment mesh = (MeshAttachment)attachment;
 				if (mesh.getParentMesh() != null) {
-					mesh.setParentMesh((MeshAttachment)getAttachment(entry.getSlotIndex(), mesh.getParentMesh().getName()));
+					mesh.setParentMesh((MeshAttachment)getAttachment(entry.slotIndex, mesh.getParentMesh().getName()));
 					mesh.updateUVs();
 				}
 			}
@@ -99,14 +100,14 @@ public class Skin {
 	/** Returns the attachment for the specified slot index and name, or null. */
 	public Attachment getAttachment (int slotIndex, String name) {
 		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
-		lookup.set(slotIndex, name, null);
+		lookup.set(slotIndex, name);
 		return attachments.get(lookup);
 	}
 
 	/** Removes the attachment in the skin for the specified slot index and name, if any. */
 	public void removeAttachment (int slotIndex, String name) {
 		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
-		lookup.set(slotIndex, name, null);
+		lookup.set(slotIndex, name);
 		attachments.remove(lookup);
 	}
 
@@ -115,12 +116,13 @@ public class Skin {
 		return attachments.orderedKeys();
 	}
 
-	/** Returns all attachments for the given slot in this skin. */
+	/** Returns all attachments in this skin for the specified slot index. */
 	public void getAttachments (int slotIndex, Array<SkinEntry> attachments) {
 		for (SkinEntry entry : this.attachments.keys())
-			if (entry.getSlotIndex() == slotIndex) attachments.add(entry);
+			if (entry.slotIndex == slotIndex) attachments.add(entry);
 	}
 
+	/** Clears all attachments, bones, and constraints. */
 	public void clear () {
 		attachments.clear(1024);
 		bones.clear();
@@ -135,11 +137,7 @@ public class Skin {
 		return constraints;
 	}
 
-	public int size () {
-		return attachments.size;
-	}
-
-	/** The skin's name, which is unique within the skeleton. */
+	/** The skin's name, which is unique across all skins in the skeleton. */
 	public String getName () {
 		return name;
 	}
@@ -151,35 +149,35 @@ public class Skin {
 	/** Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached. */
 	void attachAll (Skeleton skeleton, Skin oldSkin) {
 		for (SkinEntry entry : oldSkin.attachments.keys()) {
-			int slotIndex = entry.getSlotIndex();
+			int slotIndex = entry.slotIndex;
 			Slot slot = skeleton.slots.get(slotIndex);
-			if (slot.attachment == entry.getAttachment()) {
-				Attachment attachment = getAttachment(slotIndex, entry.getName());
+			if (slot.attachment == entry.attachment) {
+				Attachment attachment = getAttachment(slotIndex, entry.name);
 				if (attachment != null) slot.setAttachment(attachment);
 			}
 		}
 	}
 
 	/** Stores an entry in the skin consisting of the slot index, name, and attachment **/
-	public static class SkinEntry {
-		private int slotIndex;
-		private String name;
-		private Attachment attachment;
+	static public class SkinEntry {
+		int slotIndex;
+		String name;
+		Attachment attachment;
 		private int hashCode;
 
 		SkinEntry () {
-			set(0, "", null);
+			set(0, "");
 		}
 
 		SkinEntry (int slotIndex, String name, Attachment attachment) {
-			set(slotIndex, name, attachment);
+			set(slotIndex, name);
+			this.attachment = attachment;
 		}
 
-		void set (int slotIndex, String name, Attachment attachment) {
+		void set (int slotIndex, String name) {
 			if (name == null) throw new IllegalArgumentException("name cannot be null.");
 			this.slotIndex = slotIndex;
 			this.name = name;
-			this.attachment = attachment;
 			this.hashCode = name.hashCode() + slotIndex * 37;
 		}
 
@@ -187,6 +185,7 @@ public class Skin {
 			return slotIndex;
 		}
 
+		/** The name the attachment is associated with, equivalent to the skin placeholder name in the Spine editor. */
 		public String getName () {
 			return name;
 		}

@@ -98,7 +98,6 @@ public class PointAttachment extends Attachment {
 
 	public Attachment copy () {
 		PointAttachment copy = new PointAttachment(name);
-		copy.name = name;
 		copy.x = x;
 		copy.y = y;
 		copy.rotation = rotation;

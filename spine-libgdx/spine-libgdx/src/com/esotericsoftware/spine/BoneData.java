@@ -76,7 +76,7 @@ public class BoneData {
 		return index;
 	}
 
-	/** The name of the bone, which is unique within the skeleton. */
+	/** The name of the bone, which is unique across all bones in the skeleton. */
 	public String getName () {
 		return name;
 	}

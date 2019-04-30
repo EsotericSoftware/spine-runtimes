@@ -37,7 +37,7 @@ import com.esotericsoftware.spine.Slot;
 
 /** Base class for an attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
  * {@link Slot#getDeform()}. */
-public abstract class VertexAttachment extends Attachment {
+abstract public class VertexAttachment extends Attachment {
 	static private int nextID;
 
 	private final int id = (nextID() & 65535) << 11;
@@ -161,8 +161,7 @@ public abstract class VertexAttachment extends Attachment {
 		return id;
 	}
 
-	/** Internal method used by VertexAttachment subclasses to copy basic data. Does not copy id (generated) and name (set on
-	 * construction). **/
+	/** Does not copy id (generated) or name (set on construction). **/
 	void copyTo (VertexAttachment attachment) {
 		if (bones != null) {
 			attachment.bones = new int[bones.length];

@@ -56,7 +56,7 @@ public class SlotData {
 		return index;
 	}
 
-	/** The name of the slot, which is unique within the skeleton. */
+	/** The name of the slot, which is unique across all slots in the skeleton. */
 	public String getName () {
 		return name;
 	}

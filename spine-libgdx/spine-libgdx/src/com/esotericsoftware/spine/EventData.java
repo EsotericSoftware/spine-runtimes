@@ -93,7 +93,7 @@ public class EventData {
 		this.balance = balance;
 	}
 
-	/** The name of the event, which is unique within the skeleton. */
+	/** The name of the event, which is unique across all events in the skeleton. */
 	public String getName () {
 		return name;
 	}
