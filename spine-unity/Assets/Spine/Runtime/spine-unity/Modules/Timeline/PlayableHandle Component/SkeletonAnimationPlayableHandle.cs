@@ -59,7 +59,7 @@ namespace Spine.Unity.Playables {
 		public override Skeleton Skeleton {	get { return skeletonAnimation.Skeleton; } }
 		public override SkeletonData SkeletonData { get { return skeletonAnimation.Skeleton.data; } }
 
-		#if UNITY_2017 || UNITY_2018
+		#if UNITY_2017 || UNITY_2018 || (UNITY_2019_1_OR_NEWER && SPINE_TIMELINE_PACKAGE_DOWNLOADED)
 		void Awake () {
 			if (skeletonAnimation == null)
 				skeletonAnimation = GetComponent<SkeletonAnimation>();
