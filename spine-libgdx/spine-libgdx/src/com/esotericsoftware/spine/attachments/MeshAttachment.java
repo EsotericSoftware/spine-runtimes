@@ -278,8 +278,10 @@ public class MeshAttachment extends VertexAttachment {
 			}
 			copy.width = width;
 			copy.height = height;
-		} else
+		} else {
 			copy.setParentMesh(parentMesh);
+			copy.updateUVs();
+		}
 
 		return copy;
 	}

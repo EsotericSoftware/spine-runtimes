@@ -81,9 +81,18 @@ public class Skin {
 
 		for (SkinEntry entry : skin.attachments.keys()) {
 			Attachment attachment = entry.getAttachment().copy();
-			if (attachment instanceof MeshAttachment) {
-			}
 			setAttachment(entry.getSlotIndex(), entry.getName(), attachment);
+		}
+
+		for (SkinEntry entry : attachments.keys()) {
+			Attachment attachment = entry.getAttachment();
+			if (attachment instanceof MeshAttachment) {
+				MeshAttachment mesh = (MeshAttachment)attachment;
+				if (mesh.getParentMesh() != null) {
+					mesh.setParentMesh((MeshAttachment)getAttachment(entry.getSlotIndex(), mesh.getParentMesh().getName()));
+					mesh.updateUVs();
+				}
+			}
 		}
 	}
 
