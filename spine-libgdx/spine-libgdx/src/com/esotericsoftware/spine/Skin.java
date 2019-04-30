@@ -44,6 +44,8 @@ import com.esotericsoftware.spine.attachments.Attachment;
 public class Skin {
 	final String name;
 	final ObjectMap<Key, Attachment> attachments = new ObjectMap();
+	final Array<BoneData> bones = new Array();
+	final Array<ConstraintData> constraints = new Array();
 	private final Key lookup = new Key();
 	final Pool<Key> keyPool = new Pool(64) {
 		protected Object newObject () {
@@ -105,6 +107,16 @@ public class Skin {
 		for (Key key : attachments.keys())
 			keyPool.free(key);
 		attachments.clear(1024);
+		bones.clear();
+		constraints.clear();
+	}
+
+	public Array<BoneData> getBones () {
+		return bones;
+	}
+
+	public Array<ConstraintData> getConstraints () {
+		return constraints;
 	}
 
 	public int size () {

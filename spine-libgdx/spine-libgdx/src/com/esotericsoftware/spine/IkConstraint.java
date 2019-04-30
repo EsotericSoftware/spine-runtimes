@@ -38,7 +38,7 @@ import com.badlogic.gdx.utils.Array;
  * the last bone is as close to the target bone as possible.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide. */
-public class IkConstraint implements Constraint {
+public class IkConstraint implements Updatable {
 	final IkConstraintData data;
 	final Array<Bone> bones;
 	Bone target;
@@ -92,10 +92,6 @@ public class IkConstraint implements Constraint {
 			apply(bones.first(), bones.get(1), target.worldX, target.worldY, bendDirection, stretch, mix);
 			break;
 		}
-	}
-
-	public int getOrder () {
-		return data.order;
 	}
 
 	/** The bones that will be modified by this IK constraint. */

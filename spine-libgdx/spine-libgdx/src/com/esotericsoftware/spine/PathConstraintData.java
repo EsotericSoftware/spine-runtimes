@@ -35,9 +35,7 @@ import com.badlogic.gdx.utils.Array;
 /** Stores the setup pose for a {@link PathConstraint}.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-path-constraints">Path constraints</a> in the Spine User Guide. */
-public class PathConstraintData {
-	final String name;
-	int order;
+public class PathConstraintData extends ConstraintData {
 	final Array<BoneData> bones = new Array();
 	SlotData target;
 	PositionMode positionMode;
@@ -47,22 +45,7 @@ public class PathConstraintData {
 	float position, spacing, rotateMix, translateMix;
 
 	public PathConstraintData (String name) {
-		if (name == null) throw new IllegalArgumentException("name cannot be null.");
-		this.name = name;
-	}
-
-	/** The path constraint's name, which is unique within the skeleton. */
-	public String getName () {
-		return name;
-	}
-
-	/** See {@link Constraint#getOrder()}. */
-	public int getOrder () {
-		return order;
-	}
-
-	public void setOrder (int order) {
-		this.order = order;
+		super(name);
 	}
 
 	/** The bones that will be modified by this path constraint. */
@@ -149,10 +132,6 @@ public class PathConstraintData {
 
 	public void setTranslateMix (float translateMix) {
 		this.translateMix = translateMix;
-	}
-
-	public String toString () {
-		return name;
 	}
 
 	/** Controls how the first bone is positioned along the path.

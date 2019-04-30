@@ -43,7 +43,7 @@ import com.esotericsoftware.spine.utils.SpineUtils;
  * constrained bones so they follow a {@link PathAttachment}.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-path-constraints">Path constraints</a> in the Spine User Guide. */
-public class PathConstraint implements Constraint {
+public class PathConstraint implements Updatable {
 	static private final int NONE = -1, BEFORE = -2, AFTER = -3;
 	static private final float epsilon = 0.00001f;
 
@@ -447,10 +447,6 @@ public class PathConstraint implements Constraint {
 			else
 				out[o + 2] = (float)Math.atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
 		}
-	}
-
-	public int getOrder () {
-		return data.order;
 	}
 
 	/** The position along the path. */

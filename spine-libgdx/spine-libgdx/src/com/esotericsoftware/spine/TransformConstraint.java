@@ -39,7 +39,7 @@ import com.badlogic.gdx.utils.Array;
  * bones to match that of the target bone.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-transform-constraints">Transform constraints</a> in the Spine User Guide. */
-public class TransformConstraint implements Constraint {
+public class TransformConstraint implements Updatable {
 	final TransformConstraintData data;
 	final Array<Bone> bones;
 	Bone target;
@@ -287,10 +287,6 @@ public class TransformConstraint implements Constraint {
 
 			bone.updateWorldTransform(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY);
 		}
-	}
-
-	public int getOrder () {
-		return data.order;
 	}
 
 	/** The bones that will be modified by this transform constraint. */

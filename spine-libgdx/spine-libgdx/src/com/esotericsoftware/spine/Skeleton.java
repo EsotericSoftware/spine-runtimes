@@ -156,40 +156,44 @@ public class Skeleton {
 		updateCache();
 	}
 
-	/** Caches information about bones and constraints. Must be called if bones, constraints, or weighted path attachments are
-	 * added or removed. */
+	/** Caches information about bones and constraints. Must be called if the skin is changed or if bones, constraints, or weighted
+	 * path attachments are added or removed. */
 	public void updateCache () {
 		Array<Updatable> updateCache = this.updateCache;
 		updateCache.clear();
 		updateCacheReset.clear();
 
-		Array<Bone> bones = this.bones;
-		for (int i = 0, n = bones.size; i < n; i++)
-			bones.get(i).sorted = false;
+		int boneCount = bones.size;
+		Object[] bones = this.bones.items;
+		for (int i = 0; i < boneCount; i++) {
+			Bone bone = (Bone)bones[i];
+			bone.update = !bone.data.skinRequired || (skin != null && skin.bones.contains(bone.data, true));
+			bone.sorted = !bone.update;
+		}
 
-		Array<IkConstraint> ikConstraints = this.ikConstraints;
-		Array<TransformConstraint> transformConstraints = this.transformConstraints;
-		Array<PathConstraint> pathConstraints = this.pathConstraints;
 		int ikCount = ikConstraints.size, transformCount = transformConstraints.size, pathCount = pathConstraints.size;
+		Object[] ikConstraints = this.ikConstraints.items;
+		Object[] transformConstraints = this.transformConstraints.items;
+		Object[] pathConstraints = this.pathConstraints.items;
 		int constraintCount = ikCount + transformCount + pathCount;
 		outer:
 		for (int i = 0; i < constraintCount; i++) {
 			for (int ii = 0; ii < ikCount; ii++) {
-				IkConstraint constraint = ikConstraints.get(ii);
+				IkConstraint constraint = (IkConstraint)ikConstraints[ii];
 				if (constraint.data.order == i) {
 					sortIkConstraint(constraint);
 					continue outer;
 				}
 			}
 			for (int ii = 0; ii < transformCount; ii++) {
-				TransformConstraint constraint = transformConstraints.get(ii);
+				TransformConstraint constraint = (TransformConstraint)transformConstraints[ii];
 				if (constraint.data.order == i) {
 					sortTransformConstraint(constraint);
 					continue outer;
 				}
 			}
 			for (int ii = 0; ii < pathCount; ii++) {
-				PathConstraint constraint = pathConstraints.get(ii);
+				PathConstraint constraint = (PathConstraint)pathConstraints[ii];
 				if (constraint.data.order == i) {
 					sortPathConstraint(constraint);
 					continue outer;
@@ -197,11 +201,13 @@ public class Skeleton {
 			}
 		}
 
-		for (int i = 0, n = bones.size; i < n; i++)
-			sortBone(bones.get(i));
+		for (int i = 0; i < boneCount; i++)
+			sortBone((Bone)bones[i]);
 	}
 
 	private void sortIkConstraint (IkConstraint constraint) {
+		if (constraint.data.skinRequired && (skin == null || !skin.constraints.contains(constraint.data, true))) return;
+
 		Bone target = constraint.target;
 		sortBone(target);
 
@@ -221,14 +227,14 @@ public class Skeleton {
 	}
 
 	private void sortPathConstraint (PathConstraint constraint) {
+		if (constraint.data.skinRequired && (skin == null || !skin.constraints.contains(constraint.data, true))) return;
+
 		Slot slot = constraint.target;
 		int slotIndex = slot.getData().index;
 		Bone slotBone = slot.bone;
 		if (skin != null) sortPathConstraintAttachment(skin, slotIndex, slotBone);
 		if (data.defaultSkin != null && data.defaultSkin != skin)
 			sortPathConstraintAttachment(data.defaultSkin, slotIndex, slotBone);
-		for (int ii = 0, nn = data.skins.size; ii < nn; ii++)
-			sortPathConstraintAttachment(data.skins.get(ii), slotIndex, slotBone);
 
 		Attachment attachment = slot.attachment;
 		if (attachment instanceof PathAttachment) sortPathConstraintAttachment(attachment, slotBone);
@@ -247,6 +253,8 @@ public class Skeleton {
 	}
 
 	private void sortTransformConstraint (TransformConstraint constraint) {
+		if (constraint.data.skinRequired && (skin == null || !skin.constraints.contains(constraint.data, true))) return;
+
 		sortBone(constraint.target);
 
 		Array<Bone> constrained = constraint.bones;
@@ -302,6 +310,7 @@ public class Skeleton {
 	private void sortReset (Array<Bone> bones) {
 		for (int i = 0, n = bones.size; i < n; i++) {
 			Bone bone = bones.get(i);
+			if (!bone.update) continue;
 			if (bone.sorted) sortReset(bone.children);
 			bone.sorted = false;
 		}
@@ -332,8 +341,8 @@ public class Skeleton {
 			updateCache.get(i).update();
 	}
 
-	/** Updates the world transform for each bone and applies all constraints. The root bone will be temporarily parented to the
-	 * specified bone.
+	/** Temporarily sets the root bone as a child of the specified bone, then updates the world transform for each bone and applies
+	 * all constraints.
 	 * <p>
 	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide. */
@@ -354,8 +363,7 @@ public class Skeleton {
 			bone.appliedValid = true;
 		}
 
-		// Apply the parent bone transform to the root bone. The root bone
-		// always inherits scale, rotation and reflection.
+		// Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
 		Bone rootBone = getRootBone();
 		float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 		rootBone.worldX = pa * x + pb * y + parent.worldX;
@@ -515,6 +523,7 @@ public class Skeleton {
 	 * skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin.
 	 * @param newSkin May be null. */
 	public void setSkin (Skin newSkin) {
+		if (newSkin == skin) return;
 		if (newSkin != null) {
 			if (skin != null)
 				newSkin.attachAll(this, skin);
@@ -531,6 +540,7 @@ public class Skeleton {
 			}
 		}
 		skin = newSkin;
+		updateCache();
 	}
 
 	/** Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot name and attachment

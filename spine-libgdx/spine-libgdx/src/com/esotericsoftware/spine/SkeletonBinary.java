@@ -41,6 +41,7 @@ import com.badlogic.gdx.utils.DataInput;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.SerializationException;
+
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.ColorTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline;
@@ -206,6 +207,7 @@ public class SkeletonBinary {
 				data.shearY = input.readFloat();
 				data.length = input.readFloat() * scale;
 				data.transformMode = TransformMode.values[input.readInt(true)];
+				data.skinRequired = input.readBoolean();
 				if (nonessential) Color.rgba8888ToColor(data.color, input.readInt());
 				skeletonData.bones.add(data);
 			}
@@ -229,6 +231,7 @@ public class SkeletonBinary {
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				IkConstraintData data = new IkConstraintData(input.readString());
 				data.order = input.readInt(true);
+				data.skinRequired = input.readBoolean();
 				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++)
 					data.bones.add(skeletonData.bones.get(input.readInt(true)));
 				data.target = skeletonData.bones.get(input.readInt(true));
@@ -244,6 +247,7 @@ public class SkeletonBinary {
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				TransformConstraintData data = new TransformConstraintData(input.readString());
 				data.order = input.readInt(true);
+				data.skinRequired = input.readBoolean();
 				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++)
 					data.bones.add(skeletonData.bones.get(input.readInt(true)));
 				data.target = skeletonData.bones.get(input.readInt(true));
@@ -266,6 +270,7 @@ public class SkeletonBinary {
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				PathConstraintData data = new PathConstraintData(input.readString());
 				data.order = input.readInt(true);
+				data.skinRequired = input.readBoolean();
 				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++)
 					data.bones.add(skeletonData.bones.get(input.readInt(true)));
 				data.target = skeletonData.slots.get(input.readInt(true));
@@ -283,7 +288,7 @@ public class SkeletonBinary {
 			}
 
 			// Default skin.
-			Skin defaultSkin = readSkin(input, skeletonData, "default", nonessential);
+			Skin defaultSkin = readSkin(input, skeletonData, true, nonessential);
 			if (defaultSkin != null) {
 				skeletonData.defaultSkin = defaultSkin;
 				skeletonData.skins.add(defaultSkin);
@@ -291,7 +296,7 @@ public class SkeletonBinary {
 
 			// Skins.
 			for (int i = 0, n = input.readInt(true); i < n; i++)
-				skeletonData.skins.add(readSkin(input, skeletonData, input.readString(), nonessential));
+				skeletonData.skins.add(readSkin(input, skeletonData, false, nonessential));
 
 			// Linked meshes.
 			for (int i = 0, n = linkedMeshes.size; i < n; i++) {
@@ -341,12 +346,18 @@ public class SkeletonBinary {
 		return skeletonData;
 	}
 
-	/** @return May be null. */
-	private Skin readSkin (DataInput input, SkeletonData skeletonData, String skinName, boolean nonessential) throws IOException {
-		int slotCount = input.readInt(true);
-		if (slotCount == 0) return null;
-		Skin skin = new Skin(skinName);
-		for (int i = 0; i < slotCount; i++) {
+	private Skin readSkin (DataInput input, SkeletonData skeletonData, boolean defaultSkin, boolean nonessential)
+		throws IOException {
+		Skin skin = new Skin(defaultSkin ? "default" : input.readString());
+		for (int i = 0, n = input.readInt(true); i < n; i++)
+			skin.bones.add(skeletonData.bones.get(input.readInt(true)));
+		for (int i = 0, n = input.readInt(true); i < n; i++)
+			skin.constraints.add(skeletonData.ikConstraints.get(input.readInt(true)));
+		for (int i = 0, n = input.readInt(true); i < n; i++)
+			skin.constraints.add(skeletonData.transformConstraints.get(input.readInt(true)));
+		for (int i = 0, n = input.readInt(true); i < n; i++)
+			skin.constraints.add(skeletonData.pathConstraints.get(input.readInt(true)));
+		for (int i = 0, n = input.readInt(true); i < n; i++) {
 			int slotIndex = input.readInt(true);
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 				String name = input.readString();

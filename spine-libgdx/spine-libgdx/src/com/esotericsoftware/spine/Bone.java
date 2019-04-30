@@ -55,7 +55,7 @@ public class Bone implements Updatable {
 	float a, b, worldX;
 	float c, d, worldY;
 
-	boolean sorted;
+	boolean sorted, update;
 
 	/** @param parent May be null. */
 	public Bone (BoneData data, Skeleton skeleton, Bone parent) {

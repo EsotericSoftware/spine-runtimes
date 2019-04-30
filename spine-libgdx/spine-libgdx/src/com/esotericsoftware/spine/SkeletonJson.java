@@ -149,6 +149,7 @@ public class SkeletonJson {
 			data.shearX = boneMap.getFloat("shearX", 0);
 			data.shearY = boneMap.getFloat("shearY", 0);
 			data.transformMode = TransformMode.valueOf(boneMap.getString("transform", TransformMode.normal.name()));
+			data.skinRequired = boneMap.getBoolean("skin", false);
 
 			String color = boneMap.getString("color", null);
 			if (color != null) data.getColor().set(Color.valueOf(color));
@@ -179,11 +180,11 @@ public class SkeletonJson {
 		for (JsonValue constraintMap = root.getChild("ik"); constraintMap != null; constraintMap = constraintMap.next) {
 			IkConstraintData data = new IkConstraintData(constraintMap.getString("name"));
 			data.order = constraintMap.getInt("order", 0);
+			data.skinRequired = constraintMap.getBoolean("skin", false);
 
-			for (JsonValue boneMap = constraintMap.getChild("bones"); boneMap != null; boneMap = boneMap.next) {
-				String boneName = boneMap.asString();
-				BoneData bone = skeletonData.findBone(boneName);
-				if (bone == null) throw new SerializationException("IK bone not found: " + boneName);
+			for (JsonValue entry = constraintMap.getChild("bones"); entry != null; entry = entry.next) {
+				BoneData bone = skeletonData.findBone(entry.asString());
+				if (bone == null) throw new SerializationException("IK bone not found: " + entry);
 				data.bones.add(bone);
 			}
 
@@ -204,11 +205,11 @@ public class SkeletonJson {
 		for (JsonValue constraintMap = root.getChild("transform"); constraintMap != null; constraintMap = constraintMap.next) {
 			TransformConstraintData data = new TransformConstraintData(constraintMap.getString("name"));
 			data.order = constraintMap.getInt("order", 0);
+			data.skinRequired = constraintMap.getBoolean("skin", false);
 
-			for (JsonValue boneMap = constraintMap.getChild("bones"); boneMap != null; boneMap = boneMap.next) {
-				String boneName = boneMap.asString();
-				BoneData bone = skeletonData.findBone(boneName);
-				if (bone == null) throw new SerializationException("Transform constraint bone not found: " + boneName);
+			for (JsonValue entry = constraintMap.getChild("bones"); entry != null; entry = entry.next) {
+				BoneData bone = skeletonData.findBone(entry.asString());
+				if (bone == null) throw new SerializationException("Transform constraint bone not found: " + entry);
 				data.bones.add(bone);
 			}
 
@@ -238,11 +239,11 @@ public class SkeletonJson {
 		for (JsonValue constraintMap = root.getChild("path"); constraintMap != null; constraintMap = constraintMap.next) {
 			PathConstraintData data = new PathConstraintData(constraintMap.getString("name"));
 			data.order = constraintMap.getInt("order", 0);
+			data.skinRequired = constraintMap.getBoolean("skin", false);
 
-			for (JsonValue boneMap = constraintMap.getChild("bones"); boneMap != null; boneMap = boneMap.next) {
-				String boneName = boneMap.asString();
-				BoneData bone = skeletonData.findBone(boneName);
-				if (bone == null) throw new SerializationException("Path bone not found: " + boneName);
+			for (JsonValue entry = constraintMap.getChild("bones"); entry != null; entry = entry.next) {
+				BoneData bone = skeletonData.findBone(entry.asString());
+				if (bone == null) throw new SerializationException("Path bone not found: " + entry);
 				data.bones.add(bone);
 			}
 
@@ -266,8 +267,28 @@ public class SkeletonJson {
 
 		// Skins.
 		for (JsonValue skinMap = root.getChild("skins"); skinMap != null; skinMap = skinMap.next) {
-			Skin skin = new Skin(skinMap.name);
-			for (JsonValue slotEntry = skinMap.child; slotEntry != null; slotEntry = slotEntry.next) {
+			Skin skin = new Skin(skinMap.getString("name"));
+			for (JsonValue entry = skinMap.getChild("bones"); entry != null; entry = entry.next) {
+				BoneData bone = skeletonData.findBone(entry.asString());
+				if (bone == null) throw new SerializationException("Skin bone not found: " + entry);
+				skin.bones.add(bone);
+			}
+			for (JsonValue entry = skinMap.getChild("ik"); entry != null; entry = entry.next) {
+				IkConstraintData constraint = skeletonData.findIkConstraint(entry.asString());
+				if (constraint == null) throw new SerializationException("Skin IK constraint not found: " + entry);
+				skin.constraints.add(constraint);
+			}
+			for (JsonValue entry = skinMap.getChild("transform"); entry != null; entry = entry.next) {
+				TransformConstraintData constraint = skeletonData.findTransformConstraint(entry.asString());
+				if (constraint == null) throw new SerializationException("Skin transform constraint not found: " + entry);
+				skin.constraints.add(constraint);
+			}
+			for (JsonValue entry = skinMap.getChild("path"); entry != null; entry = entry.next) {
+				PathConstraintData constraint = skeletonData.findPathConstraint(entry.asString());
+				if (constraint == null) throw new SerializationException("Skin path constraint not found: " + entry);
+				skin.constraints.add(constraint);
+			}
+			for (JsonValue slotEntry = skinMap.getChild("attachments"); slotEntry != null; slotEntry = slotEntry.next) {
 				SlotData slot = skeletonData.findSlot(slotEntry.name);
 				if (slot == null) throw new SerializationException("Slot not found: " + slotEntry.name);
 				for (JsonValue entry = slotEntry.child; entry != null; entry = entry.next) {
@@ -608,7 +629,7 @@ public class SkeletonJson {
 		}
 
 		// Path constraint timelines.
-		for (JsonValue constraintMap = map.getChild("paths"); constraintMap != null; constraintMap = constraintMap.next) {
+		for (JsonValue constraintMap = map.getChild("path"); constraintMap != null; constraintMap = constraintMap.next) {
 			PathConstraintData data = skeletonData.findPathConstraint(constraintMap.name);
 			if (data == null) throw new SerializationException("Path constraint not found: " + constraintMap.name);
 			int index = skeletonData.pathConstraints.indexOf(data, true);
@@ -768,9 +789,8 @@ public class SkeletonJson {
 		if (curve == null) return;
 		if (curve.isString() && curve.asString().equals("stepped"))
 			timeline.setStepped(frameIndex);
-		else if (curve.isArray()) {
+		else if (curve.isArray())
 			timeline.setCurve(frameIndex, curve.getFloat(0), curve.getFloat(1), curve.getFloat(2), curve.getFloat(3));
-		}
 	}
 
 	static class LinkedMesh {
