@@ -31,14 +31,13 @@
 package com.esotericsoftware.spine.attachments;
 
 import com.badlogic.gdx.utils.FloatArray;
-
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.Slot;
 
 /** Base class for an attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
  * {@link Slot#getDeform()}. */
-public class VertexAttachment extends Attachment {
+public abstract class VertexAttachment extends Attachment {
 	static private int nextID;
 
 	private final int id = (nextID() & 65535) << 11;
@@ -160,6 +159,24 @@ public class VertexAttachment extends Attachment {
 	/** Returns a unique ID for this attachment. */
 	public int getId () {
 		return id;
+	}
+
+	/** Internal method used by VertexAttachment subclasses to copy basic data. Does not copy id (generated) and name (set on
+	 * construction). **/
+	void copyTo (VertexAttachment attachment) {
+		if (bones != null) {
+			attachment.bones = new int[bones.length];
+			System.arraycopy(bones, 0, attachment.bones, 0, bones.length);
+		} else
+			attachment.bones = null;
+
+		if (vertices != null) {
+			attachment.vertices = new float[vertices.length];
+			System.arraycopy(vertices, 0, attachment.vertices, 0, vertices.length);
+		} else
+			attachment.vertices = null;
+
+		attachment.worldVerticesLength = worldVerticesLength;
 	}
 
 	static private synchronized int nextID () {

@@ -264,4 +264,21 @@ public class RegionAttachment extends Attachment {
 	public void setPath (String path) {
 		this.path = path;
 	}
+
+	public Attachment copy () {
+		RegionAttachment copy = new RegionAttachment(name);
+		copy.region = region;
+		copy.path = path;
+		copy.x = x;
+		copy.y = y;
+		copy.scaleX = scaleX;
+		copy.scaleY = scaleY;
+		copy.rotation = rotation;
+		copy.width = width;
+		copy.height = height;
+		System.arraycopy(uvs, 0, copy.uvs, 0, uvs.length);
+		System.arraycopy(offset, 0, copy.offset, 0, offset.length);
+		copy.color.set(color);
+		return copy;
+	}
 }

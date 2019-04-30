@@ -54,8 +54,8 @@ public class AttachmentTimelineTests {
 		Attachment attachment2 = new Attachment("attachment2") {};
 
 		Skin skin = new Skin("skin");
-		skin.addAttachment(0, "attachment1", attachment1);
-		skin.addAttachment(0, "attachment2", attachment2);
+		skin.setAttachment(0, "attachment1", attachment1);
+		skin.setAttachment(0, "attachment2", attachment2);
 		skeletonData.setDefaultSkin(skin);
 
 		skeleton = new Skeleton(skeletonData);

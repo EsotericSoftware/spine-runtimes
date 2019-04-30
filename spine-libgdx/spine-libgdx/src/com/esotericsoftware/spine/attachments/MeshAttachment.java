@@ -33,7 +33,6 @@ package com.esotericsoftware.spine.attachments;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-
 import com.esotericsoftware.spine.Animation.DeformTimeline;
 
 /** An attachment that displays a textured mesh. A mesh has hull vertices and internal vertices within the hull. Holes are not
@@ -252,5 +251,36 @@ public class MeshAttachment extends VertexAttachment {
 
 	public void setInheritDeform (boolean inheritDeform) {
 		this.inheritDeform = inheritDeform;
+	}
+
+	public Attachment copy () {
+		MeshAttachment copy = new MeshAttachment(name);
+		copy.region = region;
+		copy.path = path;
+
+		if (parentMesh == null) {
+			copyTo(copy);
+			copy.regionUVs = new float[regionUVs.length];
+			System.arraycopy(regionUVs, 0, copy.regionUVs, 0, regionUVs.length);
+			copy.uvs = new float[uvs.length];
+			System.arraycopy(uvs, 0, copy.uvs, 0, uvs.length);
+			copy.triangles = new short[triangles.length];
+			System.arraycopy(triangles, 0, copy.triangles, 0, triangles.length);
+			copy.color.set(color);
+			copy.hullLength = hullLength;
+
+			copy.inheritDeform = inheritDeform;
+
+			// Nonessential.
+			if (edges != null) {
+				copy.edges = new short[edges.length];
+				System.arraycopy(edges, 0, copy.edges, 0, edges.length);
+			}
+			copy.width = width;
+			copy.height = height;
+		} else
+			copy.setParentMesh(parentMesh);
+
+		return copy;
 	}
 }

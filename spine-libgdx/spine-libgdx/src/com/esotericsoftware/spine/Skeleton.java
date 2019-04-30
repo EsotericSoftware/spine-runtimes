@@ -30,15 +30,14 @@
 
 package com.esotericsoftware.spine;
 
-import static com.esotericsoftware.spine.utils.SpineUtils.*;
+import static com.esotericsoftware.spine.utils.SpineUtils.cosDeg;
+import static com.esotericsoftware.spine.utils.SpineUtils.sinDeg;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
-import com.badlogic.gdx.utils.ObjectMap.Entry;
-
-import com.esotericsoftware.spine.Skin.Key;
+import com.esotericsoftware.spine.Skin.SkinEntry;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
@@ -279,8 +278,8 @@ public class Skeleton {
 	}
 
 	private void sortPathConstraintAttachment (Skin skin, int slotIndex, Bone slotBone) {
-		for (Entry<Key, Attachment> entry : skin.attachments.entries())
-			if (entry.key.slotIndex == slotIndex) sortPathConstraintAttachment(entry.value, slotBone);
+		for (SkinEntry entry : skin.attachments.keys())
+			if (entry.getSlotIndex() == slotIndex) sortPathConstraintAttachment(entry.getAttachment(), slotBone);
 	}
 
 	private void sortPathConstraintAttachment (Attachment attachment, Bone slotBone) {

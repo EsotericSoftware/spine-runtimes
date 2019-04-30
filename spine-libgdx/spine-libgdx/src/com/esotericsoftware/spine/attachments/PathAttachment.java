@@ -80,4 +80,14 @@ public class PathAttachment extends VertexAttachment {
 	public Color getColor () {
 		return color;
 	}
+
+	public Attachment copy () {
+		PathAttachment copy = new PathAttachment(name);
+		copyTo(copy);
+		copy.lengths = new float[lengths.length];
+		System.arraycopy(lengths, 0, copy.lengths, 0, lengths.length);
+		copy.closed = closed;
+		copy.constantSpeed = constantSpeed;
+		return copy;
+	}
 }

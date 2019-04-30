@@ -294,7 +294,7 @@ public class SkeletonJson {
 				for (JsonValue entry = slotEntry.child; entry != null; entry = entry.next) {
 					try {
 						Attachment attachment = readAttachment(entry, skin, slot.index, entry.name, skeletonData);
-						if (attachment != null) skin.addAttachment(slot.index, entry.name, attachment);
+						if (attachment != null) skin.setAttachment(slot.index, entry.name, attachment);
 					} catch (Throwable ex) {
 						throw new SerializationException("Error reading attachment: " + entry.name + ", skin: " + skin, ex);
 					}
