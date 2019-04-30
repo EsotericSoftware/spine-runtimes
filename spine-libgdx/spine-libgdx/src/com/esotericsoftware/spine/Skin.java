@@ -31,8 +31,9 @@
 package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.OrderedMap;
 import com.esotericsoftware.spine.attachments.Attachment;
+import com.esotericsoftware.spine.attachments.MeshAttachment;
 
 /** Stores attachments by slot index and attachment name.
  * <p>
@@ -40,7 +41,7 @@ import com.esotericsoftware.spine.attachments.Attachment;
  * <a href="http://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide. */
 public class Skin {
 	final String name;
-	final ObjectMap<SkinEntry, Attachment> attachments = new ObjectMap();
+	final OrderedMap<SkinEntry, Attachment> attachments = new OrderedMap();
 	final Array<BoneData> bones = new Array();
 	final Array<ConstraintData> constraints = new Array();
 	private final SkinEntry lookup = new SkinEntry();
@@ -48,6 +49,7 @@ public class Skin {
 	public Skin (String name) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.name = name;
+		this.attachments.orderedKeys().ordered = false;
 	}
 
 	/** Adds an attachment to the skin for the specified slot index and name. */
@@ -57,10 +59,32 @@ public class Skin {
 		attachments.put(new SkinEntry(slotIndex, name, attachment), attachment);
 	}
 
-	/** Adds all attachments from the specified skin to this skin. */
+	/** Adds all attachments, bones, and constraints from the specified skin to this skin. */
 	public void addSkin (Skin skin) {
+		for (BoneData data : skin.bones)
+			if (!bones.contains(data, true)) bones.add(data);
+
+		for (ConstraintData data : skin.constraints)
+			if (!constraints.contains(data, true)) constraints.add(data);
+
 		for (SkinEntry entry : skin.attachments.keys())
 			setAttachment(entry.getSlotIndex(), entry.getName(), entry.getAttachment());
+	}
+
+	/** Adds all attachments, bones, and constraints from the specified skin to this skin. Attachments are deep copied. */
+	public void copySkin (Skin skin) {
+		for (BoneData data : skin.bones)
+			if (!bones.contains(data, true)) bones.add(data);
+
+		for (ConstraintData data : skin.constraints)
+			if (!constraints.contains(data, true)) constraints.add(data);
+
+		for (SkinEntry entry : skin.attachments.keys()) {
+			Attachment attachment = entry.getAttachment().copy();
+			if (attachment instanceof MeshAttachment) {
+			}
+			setAttachment(entry.getSlotIndex(), entry.getName(), attachment);
+		}
 	}
 
 	/** Returns the attachment for the specified slot index and name, or null. */
@@ -77,20 +101,15 @@ public class Skin {
 		attachments.remove(lookup);
 	}
 
-	/** Returns all attachments contained in this skin. */
+	/** Returns all attachments in this skin. */
 	public Array<SkinEntry> getAttachments () {
-		Array<SkinEntry> entries = new Array();
-		for (SkinEntry entry : this.attachments.keys())
-			entries.add(entry);
-		return entries;
+		return attachments.orderedKeys();
 	}
 
-	/** Returns all {@link SkinEntry} instances for the given slot contained in this skin. */
-	public Array<SkinEntry> getEntries (int slotIndex) {
-		Array<SkinEntry> entries = new Array();
+	/** Returns all attachments for the given slot in this skin. */
+	public void getAttachments (int slotIndex, Array<SkinEntry> attachments) {
 		for (SkinEntry entry : this.attachments.keys())
-			if (entry.getSlotIndex() == slotIndex) entries.add(entry);
-		return entries;
+			if (entry.getSlotIndex() == slotIndex) attachments.add(entry);
 	}
 
 	public void clear () {
