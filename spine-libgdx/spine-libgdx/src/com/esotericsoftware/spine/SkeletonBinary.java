@@ -349,14 +349,16 @@ public class SkeletonBinary {
 	private Skin readSkin (DataInput input, SkeletonData skeletonData, boolean defaultSkin, boolean nonessential)
 		throws IOException {
 		Skin skin = new Skin(defaultSkin ? "default" : input.readString());
-		for (int i = 0, n = input.readInt(true); i < n; i++)
-			skin.bones.add(skeletonData.bones.get(input.readInt(true)));
-		for (int i = 0, n = input.readInt(true); i < n; i++)
-			skin.constraints.add(skeletonData.ikConstraints.get(input.readInt(true)));
-		for (int i = 0, n = input.readInt(true); i < n; i++)
-			skin.constraints.add(skeletonData.transformConstraints.get(input.readInt(true)));
-		for (int i = 0, n = input.readInt(true); i < n; i++)
-			skin.constraints.add(skeletonData.pathConstraints.get(input.readInt(true)));
+		if (!defaultSkin) {
+			for (int i = 0, n = input.readInt(true); i < n; i++)
+				skin.bones.add(skeletonData.bones.get(input.readInt(true)));
+			for (int i = 0, n = input.readInt(true); i < n; i++)
+				skin.constraints.add(skeletonData.ikConstraints.get(input.readInt(true)));
+			for (int i = 0, n = input.readInt(true); i < n; i++)
+				skin.constraints.add(skeletonData.transformConstraints.get(input.readInt(true)));
+			for (int i = 0, n = input.readInt(true); i < n; i++)
+				skin.constraints.add(skeletonData.pathConstraints.get(input.readInt(true)));
+		}
 		for (int i = 0, n = input.readInt(true); i < n; i++) {
 			int slotIndex = input.readInt(true);
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
