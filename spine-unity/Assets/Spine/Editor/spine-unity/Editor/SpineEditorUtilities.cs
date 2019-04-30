@@ -1865,6 +1865,9 @@ namespace Spine.Unity.Editor {
 
 			internal static void HandleSuccessfulTimelinePackageDownload () {
 
+				#if !SPINE_TK2D
+				SpineBuildEnvUtility.EnableSpineAsmdefFiles();
+				#endif
 				SpineBuildEnvUtility.AddDependencyToAsmdefFile(TIMELINE_ASMDEF_DEPENDENCY_STRING);
 				SpineBuildEnvUtility.EnableBuildDefine(SPINE_TIMELINE_PACKAGE_DOWNLOADED_DEFINE);
 			}
@@ -1958,7 +1961,14 @@ namespace Spine.Unity.Editor {
 
 			if (System.IO.File.Exists(filePath)) {
 				string fileContent = File.ReadAllText(filePath);
-				// this simple implementation shall suffice for now.
+				
+				if (!fileContent.Contains("references")) {
+					string nameLine = string.Concat("\"name\": \"", asmdefName, "\"");
+					fileContent = fileContent.Replace(nameLine,
+													nameLine +
+													@",\n""references"": []");
+				}
+
 				if (!fileContent.Contains(dependencyName)) {
 					fileContent = fileContent.Replace(@"""references"": [",
 													@"""references"": [" + dependencyName);

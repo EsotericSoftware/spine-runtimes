@@ -1,3 +1,4 @@
 ﻿{
-	"name": "spine-unity"
+	"name": "spine-unity",
+	"references": []
 }
