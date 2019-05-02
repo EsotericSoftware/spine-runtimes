@@ -181,12 +181,14 @@
   * `TrackEntry` has an additional field called `holdPrevious`. It can be used to counter act a limitation of `AnimationState` resulting in "dipping" of parts of the animation. For a full discussion of the problem and the solution we've implemented, see this [forum thread](http://esotericsoftware.com/forum/Probably-Easy-Animation-mixing-with-multiple-tracks-10682?p=48130&hilit=holdprevious#p48130).
 
 ### Unity
-
 * **Breaking Changes**
   * **Removed PoseSkeleton() and PoseWithAnimation()** extension methods to prevent issues where animations are not mixed out. Problem was that these methods did not set AnimationState, leaving incorrect state at e.g. attachments enabled at slots when starting subsequent animations. As a replacement you can use `AnimationState.ClearTrack(0);` followed by `var entry = AnimationState.SetAnimation(0, animation, loop); entry.TrackTime = time` to achieve similar behaviour.
 
-* **Runtime and Editor, and Assembly Definition** Files and folders have been reorganized into "Runtime" and "Editor". Each of these have an `.asmdef` file that defines these separately as their own assembly in Unity. For projects not using assembly definition, you may delete the `.asmdef` files. These assembly definitions will be ignored by older versions of Unity that don't support it.
+* **Runtime and Editor, and Assembly Definition** Files and folders have been reorganized into "Runtime" and "Editor". Each of these have an `.asmdef` file that defines these separately as their own assembly in Unity *(Note: Spine `.asmdef` files are currently deactivated to `.txt` extension, see below)*. For projects not using assembly definition, you may delete the `.asmdef` files. These assembly definitions will be ignored by older versions of Unity that don't support it.
 	* In this scheme, the entirety of the base spine-csharp runtime is inside the "Runtime" folder, to be compiled in the same assembly as spine-unity so they can continue to share internal members.
+* **Spine `.asmdef` files are now deactivated (using `.txt` extension) by default** This prevents problems when updating Spine through unitypackages, overwriting the Timeline reference entry in `spine-unity.asmdef` (added automatically when enabling Unity 2019 Timeline support, see `Timeline Support for Unity 2019`), causing compile errors. In case you want to enable the `.asmdef` files, rename the files:
+ `Spine/Runtime/spine-unity.txt` to `Spine/Runtime/spine-unity.asmdef` and
+ `Spine/Editor/spine-unity-editor.txt` to `Spine/Editor/spine-unity-editor.asmdef`.
 * **SkeletonAnimator is now SkeletonMecanim** The Spine-Unity Mecanim-driven component `SkeletonAnimator` has been renamed `SkeletonMecanim` to make it more autocomplete-friendly and more obvious at human-glance. The .meta files and guids should remain intact so existing projects and prefabs should not break. However, user code needs to be updated to use `SkeletonMecanim`.
 *  **SpineAtlasAsset** The existing `AtlasAsset` type has been renamed to `SpineAtlasAsset` to signify that it specifically uses a Spine/libGDX atlas as its source. Serialization should be intact but user code will need to be updated to refer to existing atlases as `SpineAtlasAsset`.
 	* **AtlasAssetBase** `SpineAtlasAsset` now has an abstract base class called `SpineAtlasAsset`. This is the base class to derive when using alternate atlas sources. Existing SkeletonDataAsset field "atlasAssets" now have the "AtlasAssetBase" type. Serialization should be intact, but user code will need to be updated to refer to the atlas assets accordingly.
@@ -226,6 +228,11 @@
     * `CompareFunction.LessEqual` for `Mask Interaction - Visible Inside Mask`
     * `CompareFunction.Greater` for `Mask Interaction - Visible Outside Mask`
 * **RectMask2D Support for SkeletonGraphic** Both `SkeletonGraphic` shaders '`Spine/SkeletonGraphic`' and '`Spine/SkeletonGraphic Tint Black`' now respect masking areas defined via Unity's `RectMask2D` component.
+* **Timeline Support for Unity 2019** using the existing Timeline components. By default, all Spine Timeline components are deactivated in Unity 2019 and **can be activated via the Spine Preferences menu**. This step became necessary because in Unity 2019, Timeline has been moved to a separate Package and is no longer included in the Unity core. Please visit `Edit - Preferences - Spine` and at `Timeline Package Support` hit `Enable` to automatically perform all necessary steps to activate the Timeline components.
+This will automatically:
+  1. download the Unity Timeline package
+  2. activate the Spine Timeline components by setting the compile definition `SPINE_TIMELINE_PACKAGE_DOWNLOADED` for all platforms
+  3. modify the `spine-unity.asmdef` file by adding the reference to the Unity Timeline library.
 * **Spine Preferences stored in Assets/Editor/SpineSettings.asset** Now Spine uses the new `SettingsProvider` API, storing settings in a SpineSettings.asset file which can be shared with team members. Your old preferences are automatically migrated to the new system.
 
 ### XNA/MonoGame
