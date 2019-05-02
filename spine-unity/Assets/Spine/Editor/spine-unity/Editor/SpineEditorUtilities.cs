@@ -1955,6 +1955,34 @@ namespace Spine.Unity.Editor {
 				#endif
 				SpineBuildEnvUtility.AddDependencyToAsmdefFile(TIMELINE_ASMDEF_DEPENDENCY_STRING);
 				SpineBuildEnvUtility.EnableBuildDefine(SPINE_TIMELINE_PACKAGE_DOWNLOADED_DEFINE);
+
+				ReimportTimelineScripts();
+			}
+
+			internal static void ReimportTimelineScripts () {
+				// Note: unfortunately AssetDatabase::Refresh is not enough and
+				// ImportAsset on a dir does not have the desired effect.
+				List<string> searchStrings = new List<string>();
+				searchStrings.Add("SpineAnimationStateBehaviour t:script");
+				searchStrings.Add("SpineAnimationStateClip t:script");
+				searchStrings.Add("SpineAnimationStateMixerBehaviour t:script");
+				searchStrings.Add("SpineAnimationStateTrack t:script");
+
+				searchStrings.Add("SpineSkeletonFlipBehaviour t:script");
+				searchStrings.Add("SpineSkeletonFlipClip t:script");
+				searchStrings.Add("SpineSkeletonFlipMixerBehaviour t:script");
+				searchStrings.Add("SpineSkeletonFlipTrack t:script");
+
+				searchStrings.Add("SkeletonAnimationPlayableHandle t:script");
+				searchStrings.Add("SpinePlayableHandleBase t:script");
+
+				foreach (string searchString in searchStrings) {
+					string[] guids = AssetDatabase.FindAssets(searchString);
+					foreach (string guid in guids) {
+						string currentPath = AssetDatabase.GUIDToAssetPath(guid);
+						AssetDatabase.ImportAsset(currentPath, ImportAssetOptions.ForceUpdate);
+					}
+				}
 			}
 			#endif
 		}
