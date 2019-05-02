@@ -34,6 +34,13 @@
 
 ### Unity
 
+* **Breaking changes**
+  * **Removed PoseSkeleton() and PoseWithAnimation()** extension methods to prevent issues where animations are not mixed out. Problem was that these methods did not set AnimationState, leaving incorrect state at e.g. attachments enabled at slots when starting subsequent animations. As a replacement you can use `AnimationState.ClearTrack(0);` followed by `var entry = AnimationState.SetAnimation(0, animation, loop); entry.TrackTime = time` to achieve similar behaviour.
+
+* **Additions**
+  * **Spine Preferences stored in Assets/Editor/SpineSettings.asset** Now Spine uses the new `SettingsProvider` API, storing settings in a SpineSettings.asset file which can be shared with team members. Your old preferences are automatically migrated to the new system.
+
+
 ### XNA/MonoGame
 
 ## Java
@@ -181,9 +188,6 @@
   * `TrackEntry` has an additional field called `holdPrevious`. It can be used to counter act a limitation of `AnimationState` resulting in "dipping" of parts of the animation. For a full discussion of the problem and the solution we've implemented, see this [forum thread](http://esotericsoftware.com/forum/Probably-Easy-Animation-mixing-with-multiple-tracks-10682?p=48130&hilit=holdprevious#p48130).
 
 ### Unity
-* **Breaking Changes**
-  * **Removed PoseSkeleton() and PoseWithAnimation()** extension methods to prevent issues where animations are not mixed out. Problem was that these methods did not set AnimationState, leaving incorrect state at e.g. attachments enabled at slots when starting subsequent animations. As a replacement you can use `AnimationState.ClearTrack(0);` followed by `var entry = AnimationState.SetAnimation(0, animation, loop); entry.TrackTime = time` to achieve similar behaviour.
-
 * **Runtime and Editor, and Assembly Definition** Files and folders have been reorganized into "Runtime" and "Editor". Each of these have an `.asmdef` file that defines these separately as their own assembly in Unity *(Note: Spine `.asmdef` files are currently deactivated to `.txt` extension, see below)*. For projects not using assembly definition, you may delete the `.asmdef` files. These assembly definitions will be ignored by older versions of Unity that don't support it.
 	* In this scheme, the entirety of the base spine-csharp runtime is inside the "Runtime" folder, to be compiled in the same assembly as spine-unity so they can continue to share internal members.
 * **Spine `.asmdef` files are now deactivated (using `.txt` extension) by default** This prevents problems when updating Spine through unitypackages, overwriting the Timeline reference entry in `spine-unity.asmdef` (added automatically when enabling Unity 2019 Timeline support, see `Timeline Support for Unity 2019`), causing compile errors. In case you want to enable the `.asmdef` files, rename the files:
@@ -233,7 +237,6 @@ This will automatically:
   1. download the Unity Timeline package
   2. activate the Spine Timeline components by setting the compile definition `SPINE_TIMELINE_PACKAGE_DOWNLOADED` for all platforms
   3. modify the `spine-unity.asmdef` file by adding the reference to the Unity Timeline library.
-* **Spine Preferences stored in Assets/Editor/SpineSettings.asset** Now Spine uses the new `SettingsProvider` API, storing settings in a SpineSettings.asset file which can be shared with team members. Your old preferences are automatically migrated to the new system.
 
 ### XNA/MonoGame
 * Added support for any `Effect` to be used by `SkeletonRenderer`
