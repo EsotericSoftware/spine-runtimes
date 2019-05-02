@@ -81,8 +81,12 @@ namespace Spine.Unity {
 			if (Application.isPlaying) {
 				translator.Apply(skeleton);
 			} else {
-				if (translatorAnimator != null && translatorAnimator.isInitialized)
+				if (translatorAnimator != null && translatorAnimator.isInitialized &&
+					translatorAnimator.isActiveAndEnabled && translatorAnimator.runtimeAnimatorController != null) {
+					// Note: Rebind is required to prevent warning "Animator is not playing an AnimatorController" with prefabs
+					translatorAnimator.Rebind();
 					translator.Apply(skeleton);
+				}
 			}
 			#else
 			translator.Apply(skeleton);
