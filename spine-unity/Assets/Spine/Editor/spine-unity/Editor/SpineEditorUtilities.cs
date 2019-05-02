@@ -489,7 +489,21 @@ namespace Spine.Unity.Editor {
 					}
 				}
 				
+				#if NEW_TIMELINE_AS_PACKAGE
+				GUILayout.Space(20);
+				EditorGUILayout.LabelField("Timeline Support", EditorStyles.boldLabel);
+				using (new GUILayout.HorizontalScope()) {
+					EditorGUILayout.PrefixLabel("Timeline Package Support");
 
+					var requestState = SpineEditorUtilities.SpinePackageDependencyUtility.HandlePendingAsyncTimelineRequest();
+					using (new EditorGUI.DisabledGroupScope(requestState != SpineEditorUtilities.SpinePackageDependencyUtility.RequestState.NoRequestIssued)) {
+						if (GUILayout.Button("Enable", GUILayout.Width(64)))
+							SpineEditorUtilities.SpinePackageDependencyUtility.EnableTimelineSupport();
+						if (GUILayout.Button("Disable", GUILayout.Width(64)))
+							SpineEditorUtilities.SpinePackageDependencyUtility.DisableTimelineSupport();
+					}
+				}
+				#endif
 
 				GUILayout.Space(20);
 				EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);
