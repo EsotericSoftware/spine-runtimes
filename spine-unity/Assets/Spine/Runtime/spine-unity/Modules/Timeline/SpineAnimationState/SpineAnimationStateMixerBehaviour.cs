@@ -29,7 +29,7 @@
 
 #define SPINE_EDITMODEPOSE
 
-#if UNITY_2017 || UNITY_2018
+#if UNITY_2017 || UNITY_2018 || (UNITY_2019_1_OR_NEWER && SPINE_TIMELINE_PACKAGE_DOWNLOADED)
 using System;
 using UnityEngine;
 using UnityEngine.Playables;
