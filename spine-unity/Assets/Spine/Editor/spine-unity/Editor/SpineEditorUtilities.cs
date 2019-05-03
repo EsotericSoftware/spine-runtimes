@@ -1,31 +1,30 @@
 /******************************************************************************
- * Spine Runtimes Software License v2.5
+ * Spine Runtimes License Agreement
+ * Last updated May 1, 2019. Replaces all prior versions.
  *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
+ * Copyright (c) 2013-2019, Esoteric Software LLC
  *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
+ * Integration of the Spine Runtimes into software or otherwise creating
+ * derivative works of the Spine Runtimes is permitted under the terms and
+ * conditions of Section 2 of the Spine Editor License Agreement:
+ * http://esotericsoftware.com/spine-editor-license
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software
+ * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * "Products"), provided that each user of the Products must obtain their own
+ * Spine Editor license and redistribution of the Products in any form must
+ * include this license and copyright notice.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
+ * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
+ * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #pragma warning disable 0219
@@ -46,8 +45,15 @@
 #define NEWHIERARCHYWINDOWCALLBACKS
 #endif
 
+<<<<<<< HEAD
 #if UNITY_2018_3_OR_NEWER
 #define NEW_PREFERENCES_SETTINGS_PROVIDER
+#endif
+
+=======
+>>>>>>> 3.7
+#if UNITY_2019_1_OR_NEWER
+#define NEW_TIMELINE_AS_PACKAGE
 #endif
 
 using UnityEngine;
@@ -486,7 +492,21 @@ namespace Spine.Unity.Editor {
 					}
 				}
 				
+				#if NEW_TIMELINE_AS_PACKAGE
+				GUILayout.Space(20);
+				EditorGUILayout.LabelField("Timeline Support", EditorStyles.boldLabel);
+				using (new GUILayout.HorizontalScope()) {
+					EditorGUILayout.PrefixLabel("Timeline Package Support");
 
+					var requestState = SpineEditorUtilities.SpinePackageDependencyUtility.HandlePendingAsyncTimelineRequest();
+					using (new EditorGUI.DisabledGroupScope(requestState != SpineEditorUtilities.SpinePackageDependencyUtility.RequestState.NoRequestIssued)) {
+						if (GUILayout.Button("Enable", GUILayout.Width(64)))
+							SpineEditorUtilities.SpinePackageDependencyUtility.EnableTimelineSupport();
+						if (GUILayout.Button("Disable", GUILayout.Width(64)))
+							SpineEditorUtilities.SpinePackageDependencyUtility.DisableTimelineSupport();
+					}
+				}
+				#endif
 
 				GUILayout.Space(20);
 				EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);
@@ -1433,9 +1453,9 @@ namespace Spine.Unity.Editor {
 
 				bool pmaVertexColors = false;
 				bool tintBlack = false;
-				foreach (SpineAtlasAsset atlasAsset in skeletonDataAsset.atlasAssets) {
+				foreach (AtlasAssetBase atlasAsset in skeletonDataAsset.atlasAssets) {
 					if (!pmaVertexColors) {
-						foreach (Material m in atlasAsset.materials) {
+						foreach (Material m in atlasAsset.Materials) {
 							if (m.shader.name.Contains(PMAShaderQuery)) {
 								pmaVertexColors = true;
 								break;
@@ -1444,7 +1464,7 @@ namespace Spine.Unity.Editor {
 					}
 
 					if (!tintBlack) {
-						foreach (Material m in atlasAsset.materials) {
+						foreach (Material m in atlasAsset.Materials) {
 							if (m.shader.name.Contains(TintBlackShaderQuery)) {
 								tintBlack = true;
 								break;
@@ -1860,94 +1880,440 @@ namespace Spine.Unity.Editor {
 		public static class SpineTK2DEditorUtility {
 			const string SPINE_TK2D_DEFINE = "SPINE_TK2D";
 
-			static bool IsInvalidGroup (BuildTargetGroup group) {
-				int gi = (int)group;
-				return
-					gi == 15 || gi == 16
-					||
-					group == BuildTargetGroup.Unknown;
-			}
-
 			internal static void EnableTK2D () {
-				bool added = false;
-
-				DisableSpineAsmdefFiles();
-
-				foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
-					if (IsInvalidGroup(group))
-						continue;
-
-					string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
-					if (!defines.Contains(SPINE_TK2D_DEFINE)) {
-						added = true;
-						if (defines.EndsWith(";", System.StringComparison.Ordinal))
-							defines = defines + SPINE_TK2D_DEFINE;
-						else
-							defines = defines + ";" + SPINE_TK2D_DEFINE;
-
-						PlayerSettings.SetScriptingDefineSymbolsForGroup(group, defines);
-					}
-				}
-
-				if (added) {
-					Debug.LogWarning("Setting Scripting Define Symbol " + SPINE_TK2D_DEFINE);
-				} else {
-					Debug.LogWarning("Already Set Scripting Define Symbol " + SPINE_TK2D_DEFINE);
-				}
+				SpineBuildEnvUtility.DisableSpineAsmdefFiles();
+				SpineBuildEnvUtility.EnableBuildDefine(SPINE_TK2D_DEFINE);
 			}
-
 
 			internal static void DisableTK2D () {
-				bool removed = false;
+				SpineBuildEnvUtility.EnableSpineAsmdefFiles();
+				SpineBuildEnvUtility.DisableBuildDefine(SPINE_TK2D_DEFINE);
+			}
+		}
 
-				EnableSpineAsmdefFiles();
+		public static class SpinePackageDependencyUtility
+		{
+			public enum RequestState {
+				NoRequestIssued = 0,
+				InProgress,
+				Success,
+				Failure
+			}
 
-				foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
-					if (IsInvalidGroup(group))
-						continue;
+			#if NEW_TIMELINE_AS_PACKAGE
+			const string SPINE_TIMELINE_PACKAGE_DOWNLOADED_DEFINE = "SPINE_TIMELINE_PACKAGE_DOWNLOADED";
+			const string TIMELINE_PACKAGE_NAME = "com.unity.timeline";
+			const string TIMELINE_ASMDEF_DEPENDENCY_STRING = "\"Unity.Timeline\"";
+			static UnityEditor.PackageManager.Requests.AddRequest timelineRequest = null;
+			
+			/// <summary>
+			/// Enables Spine's Timeline components by downloading the Timeline Package in Unity 2019 and newer
+			/// and setting respective compile definitions once downloaded.
+			/// </summary>
+			internal static void EnableTimelineSupport () {
+				Debug.Log("Downloading Timeline package " + TIMELINE_PACKAGE_NAME + ".");
+				timelineRequest = UnityEditor.PackageManager.Client.Add(TIMELINE_PACKAGE_NAME);
+				// Note: unfortunately there is no callback provided, only polling support.
+				// So polling HandlePendingAsyncTimelineRequest() is necessary.
 
-					string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
-					if (defines.Contains(SPINE_TK2D_DEFINE)) {
-						removed = true;
-						if (defines.Contains(SPINE_TK2D_DEFINE + ";"))
-							defines = defines.Replace(SPINE_TK2D_DEFINE + ";", "");
-						else
-							defines = defines.Replace(SPINE_TK2D_DEFINE, "");
+				EditorApplication.update -= UpdateAsyncTimelineRequest;
+				EditorApplication.update += UpdateAsyncTimelineRequest;
+			}
 
-						PlayerSettings.SetScriptingDefineSymbolsForGroup(group, defines);
+			public static void UpdateAsyncTimelineRequest () {
+				HandlePendingAsyncTimelineRequest();
+			}
+
+			public static RequestState HandlePendingAsyncTimelineRequest () {
+				if (timelineRequest == null)
+					return RequestState.NoRequestIssued;
+<<<<<<< HEAD
+
+				var status = timelineRequest.Status;
+				if (status == UnityEditor.PackageManager.StatusCode.InProgress) {
+					return RequestState.InProgress;
+				}
+				else {
+					EditorApplication.update -= UpdateAsyncTimelineRequest;
+					timelineRequest = null;
+					if (status == UnityEditor.PackageManager.StatusCode.Failure) {
+						Debug.LogError("Download of package " + TIMELINE_PACKAGE_NAME + " failed!");
+						return RequestState.Failure;
+					}
+					else { // status == UnityEditor.PackageManager.StatusCode.Success
+						HandleSuccessfulTimelinePackageDownload();
+						return RequestState.Success;
 					}
 				}
-
-				if (removed) {
-					Debug.LogWarning("Removing Scripting Define Symbol " + SPINE_TK2D_DEFINE);
-				} else {
-					Debug.LogWarning("Already Removed Scripting Define Symbol " + SPINE_TK2D_DEFINE);
-				}
 			}
 
-			internal static void DisableSpineAsmdefFiles() {
-				SetAsmdefFileActive("spine-unity-editor", false);
-				SetAsmdefFileActive("spine-unity", false);
+			internal static void DisableTimelineSupport () {
+				SpineBuildEnvUtility.DisableBuildDefine(SPINE_TIMELINE_PACKAGE_DOWNLOADED_DEFINE);
+				SpineBuildEnvUtility.RemoveDependencyFromAsmdefFile(TIMELINE_ASMDEF_DEPENDENCY_STRING);
 			}
 
-			internal static void EnableSpineAsmdefFiles() {
-				SetAsmdefFileActive("spine-unity-editor", true);
-				SetAsmdefFileActive("spine-unity", true);
+			internal static void HandleSuccessfulTimelinePackageDownload () {
+
+				#if !SPINE_TK2D
+				SpineBuildEnvUtility.EnableSpineAsmdefFiles();
+				#endif
+				SpineBuildEnvUtility.AddDependencyToAsmdefFile(TIMELINE_ASMDEF_DEPENDENCY_STRING);
+				SpineBuildEnvUtility.EnableBuildDefine(SPINE_TIMELINE_PACKAGE_DOWNLOADED_DEFINE);
+
+				ReimportTimelineScripts();
 			}
 
-			internal static void SetAsmdefFileActive(string filename, bool setActive) {
+			internal static void ReimportTimelineScripts () {
+				// Note: unfortunately AssetDatabase::Refresh is not enough and
+				// ImportAsset on a dir does not have the desired effect.
+				List<string> searchStrings = new List<string>();
+				searchStrings.Add("SpineAnimationStateBehaviour t:script");
+				searchStrings.Add("SpineAnimationStateClip t:script");
+				searchStrings.Add("SpineAnimationStateMixerBehaviour t:script");
+				searchStrings.Add("SpineAnimationStateTrack t:script");
 
-				string typeSearchString = setActive ? " t:TextAsset" : " t:AssemblyDefinitionAsset";
-				string[] guids = AssetDatabase.FindAssets(filename + typeSearchString);
-				foreach (string guid in guids) {
-					string currentPath = AssetDatabase.GUIDToAssetPath(guid);
-					string targetPath = System.IO.Path.ChangeExtension(currentPath, setActive ? "asmdef" : "txt");
-					if (System.IO.File.Exists(currentPath) && !System.IO.File.Exists(targetPath)) {
-						System.IO.File.Copy(currentPath, targetPath);
-						System.IO.File.Copy(currentPath + ".meta", targetPath + ".meta");
+				searchStrings.Add("SpineSkeletonFlipBehaviour t:script");
+				searchStrings.Add("SpineSkeletonFlipClip t:script");
+				searchStrings.Add("SpineSkeletonFlipMixerBehaviour t:script");
+				searchStrings.Add("SpineSkeletonFlipTrack t:script");
+
+				searchStrings.Add("SkeletonAnimationPlayableHandle t:script");
+				searchStrings.Add("SpinePlayableHandleBase t:script");
+
+				foreach (string searchString in searchStrings) {
+					string[] guids = AssetDatabase.FindAssets(searchString);
+					foreach (string guid in guids) {
+						string currentPath = AssetDatabase.GUIDToAssetPath(guid);
+						AssetDatabase.ImportAsset(currentPath, ImportAssetOptions.ForceUpdate);
 					}
-					AssetDatabase.DeleteAsset(currentPath);
 				}
+			}
+			#endif
+		}
+	}
+
+	public static class SpineBuildEnvUtility
+	{
+		static bool IsInvalidGroup (BuildTargetGroup group) {
+			int gi = (int)group;
+			return
+				gi == 15 || gi == 16
+				||
+				group == BuildTargetGroup.Unknown;
+		}
+
+		public static bool EnableBuildDefine (string define) {
+			
+			bool wasDefineAdded = false;
+			Debug.LogWarning("Please ignore errors \"PlayerSettings Validation: Requested build target group doesn't exist\" below");
+			foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
+				if (IsInvalidGroup(group))
+					continue;
+
+				string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
+				if (!defines.Contains(define)) {
+					wasDefineAdded = true;
+					if (defines.EndsWith(";", System.StringComparison.Ordinal))
+						defines += define;
+					else
+						defines += ";" + define;
+					
+					PlayerSettings.SetScriptingDefineSymbolsForGroup(group, defines);
+				}
+			}
+			Debug.LogWarning("Please ignore errors \"PlayerSettings Validation: Requested build target group doesn't exist\" above");
+
+			if (wasDefineAdded) {
+				Debug.LogWarning("Setting Scripting Define Symbol " + define);
+			}
+			else {
+				Debug.LogWarning("Already Set Scripting Define Symbol " + define);
+			}
+			return wasDefineAdded;
+		}
+
+		public static bool DisableBuildDefine (string define) {
+			
+			bool wasDefineRemoved = false;
+=======
+
+				var status = timelineRequest.Status;
+				if (status == UnityEditor.PackageManager.StatusCode.InProgress) {
+					return RequestState.InProgress;
+				}
+				else {
+					EditorApplication.update -= UpdateAsyncTimelineRequest;
+					timelineRequest = null;
+					if (status == UnityEditor.PackageManager.StatusCode.Failure) {
+						Debug.LogError("Download of package " + TIMELINE_PACKAGE_NAME + " failed!");
+						return RequestState.Failure;
+					}
+					else { // status == UnityEditor.PackageManager.StatusCode.Success
+						HandleSuccessfulTimelinePackageDownload();
+						return RequestState.Success;
+					}
+				}
+			}
+
+			internal static void DisableTimelineSupport () {
+				SpineBuildEnvUtility.DisableBuildDefine(SPINE_TIMELINE_PACKAGE_DOWNLOADED_DEFINE);
+				SpineBuildEnvUtility.RemoveDependencyFromAsmdefFile(TIMELINE_ASMDEF_DEPENDENCY_STRING);
+			}
+
+			internal static void HandleSuccessfulTimelinePackageDownload () {
+
+				#if !SPINE_TK2D
+				SpineBuildEnvUtility.EnableSpineAsmdefFiles();
+				#endif
+				SpineBuildEnvUtility.AddDependencyToAsmdefFile(TIMELINE_ASMDEF_DEPENDENCY_STRING);
+				SpineBuildEnvUtility.EnableBuildDefine(SPINE_TIMELINE_PACKAGE_DOWNLOADED_DEFINE);
+
+				ReimportTimelineScripts();
+			}
+
+			internal static void ReimportTimelineScripts () {
+				// Note: unfortunately AssetDatabase::Refresh is not enough and
+				// ImportAsset on a dir does not have the desired effect.
+				List<string> searchStrings = new List<string>();
+				searchStrings.Add("SpineAnimationStateBehaviour t:script");
+				searchStrings.Add("SpineAnimationStateClip t:script");
+				searchStrings.Add("SpineAnimationStateMixerBehaviour t:script");
+				searchStrings.Add("SpineAnimationStateTrack t:script");
+
+				searchStrings.Add("SpineSkeletonFlipBehaviour t:script");
+				searchStrings.Add("SpineSkeletonFlipClip t:script");
+				searchStrings.Add("SpineSkeletonFlipMixerBehaviour t:script");
+				searchStrings.Add("SpineSkeletonFlipTrack t:script");
+
+				searchStrings.Add("SkeletonAnimationPlayableHandle t:script");
+				searchStrings.Add("SpinePlayableHandleBase t:script");
+
+				foreach (string searchString in searchStrings) {
+					string[] guids = AssetDatabase.FindAssets(searchString);
+					foreach (string guid in guids) {
+						string currentPath = AssetDatabase.GUIDToAssetPath(guid);
+						AssetDatabase.ImportAsset(currentPath, ImportAssetOptions.ForceUpdate);
+					}
+				}
+			}
+			#endif
+		}
+	}
+
+	public static class SpineBuildEnvUtility
+	{
+		static bool IsInvalidGroup (BuildTargetGroup group) {
+			int gi = (int)group;
+			return
+				gi == 15 || gi == 16
+				||
+				group == BuildTargetGroup.Unknown;
+		}
+
+		public static bool EnableBuildDefine (string define) {
+			
+			bool wasDefineAdded = false;
+			Debug.LogWarning("Please ignore errors \"PlayerSettings Validation: Requested build target group doesn't exist\" below");
+>>>>>>> 3.7
+			foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
+				if (IsInvalidGroup(group))
+					continue;
+
+				string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
+<<<<<<< HEAD
+				if (defines.Contains(define)) {
+					wasDefineRemoved = true;
+					if (defines.Contains(define + ";"))
+						defines = defines.Replace(define + ";", "");
+					else
+						defines = defines.Replace(define, "");
+
+					PlayerSettings.SetScriptingDefineSymbolsForGroup(group, defines);
+				}
+			}
+
+			if (wasDefineRemoved) {
+				Debug.LogWarning("Removing Scripting Define Symbol " + define);
+			}
+			else {
+				Debug.LogWarning("Already Removed Scripting Define Symbol " + define);
+			}
+			return wasDefineRemoved;
+		}
+
+		public static void DisableSpineAsmdefFiles () {
+			SetAsmdefFileActive("spine-unity-editor", false);
+			SetAsmdefFileActive("spine-unity", false);
+		}
+
+		public static void EnableSpineAsmdefFiles () {
+			SetAsmdefFileActive("spine-unity-editor", true);
+			SetAsmdefFileActive("spine-unity", true);
+		}
+
+		public static void AddDependencyToAsmdefFile (string dependencyName) {
+			string asmdefName = "spine-unity";
+			string filePath = FindAsmdefFile(asmdefName);
+			if (string.IsNullOrEmpty(filePath))
+				return;
+
+			if (System.IO.File.Exists(filePath)) {
+				string fileContent = File.ReadAllText(filePath);
+				
+				if (!fileContent.Contains("references")) {
+					string nameLine = string.Concat("\"name\": \"", asmdefName, "\"");
+					fileContent = fileContent.Replace(nameLine,
+													nameLine +
+													@",\n""references"": []");
+=======
+				if (!defines.Contains(define)) {
+					wasDefineAdded = true;
+					if (defines.EndsWith(";", System.StringComparison.Ordinal))
+						defines += define;
+					else
+						defines += ";" + define;
+					
+					PlayerSettings.SetScriptingDefineSymbolsForGroup(group, defines);
+				}
+			}
+			Debug.LogWarning("Please ignore errors \"PlayerSettings Validation: Requested build target group doesn't exist\" above");
+
+			if (wasDefineAdded) {
+				Debug.LogWarning("Setting Scripting Define Symbol " + define);
+			}
+			else {
+				Debug.LogWarning("Already Set Scripting Define Symbol " + define);
+			}
+			return wasDefineAdded;
+		}
+
+		public static bool DisableBuildDefine (string define) {
+			
+			bool wasDefineRemoved = false;
+			foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
+				if (IsInvalidGroup(group))
+					continue;
+
+				string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
+				if (defines.Contains(define)) {
+					wasDefineRemoved = true;
+					if (defines.Contains(define + ";"))
+						defines = defines.Replace(define + ";", "");
+					else
+						defines = defines.Replace(define, "");
+
+					PlayerSettings.SetScriptingDefineSymbolsForGroup(group, defines);
+>>>>>>> 3.7
+				}
+			}
+
+<<<<<<< HEAD
+=======
+			if (wasDefineRemoved) {
+				Debug.LogWarning("Removing Scripting Define Symbol " + define);
+			}
+			else {
+				Debug.LogWarning("Already Removed Scripting Define Symbol " + define);
+			}
+			return wasDefineRemoved;
+		}
+
+		public static void DisableSpineAsmdefFiles () {
+			SetAsmdefFileActive("spine-unity-editor", false);
+			SetAsmdefFileActive("spine-unity", false);
+		}
+
+		public static void EnableSpineAsmdefFiles () {
+			SetAsmdefFileActive("spine-unity-editor", true);
+			SetAsmdefFileActive("spine-unity", true);
+		}
+
+		public static void AddDependencyToAsmdefFile (string dependencyName) {
+			string asmdefName = "spine-unity";
+			string filePath = FindAsmdefFile(asmdefName);
+			if (string.IsNullOrEmpty(filePath))
+				return;
+
+			if (System.IO.File.Exists(filePath)) {
+				string fileContent = File.ReadAllText(filePath);
+				
+				if (!fileContent.Contains("references")) {
+					string nameLine = string.Concat("\"name\": \"", asmdefName, "\"");
+					fileContent = fileContent.Replace(nameLine,
+													nameLine +
+													@",\n""references"": []");
+				}
+
+>>>>>>> 3.7
+				if (!fileContent.Contains(dependencyName)) {
+					fileContent = fileContent.Replace(@"""references"": [",
+													@"""references"": [" + dependencyName);
+					File.WriteAllText(filePath, fileContent);
+				}
+			}
+		}
+
+		public static void RemoveDependencyFromAsmdefFile (string dependencyName) {
+			string asmdefName = "spine-unity";
+			string filePath = FindAsmdefFile(asmdefName);
+			if (string.IsNullOrEmpty(filePath))
+				return;
+
+			if (System.IO.File.Exists(filePath)) {
+				string fileContent = File.ReadAllText(filePath);
+				// this simple implementation shall suffice for now.
+				if (fileContent.Contains(dependencyName)) {
+					fileContent = fileContent.Replace(dependencyName, "");
+					File.WriteAllText(filePath, fileContent);
+				}
+			}
+		}
+
+		internal static string FindAsmdefFile (string filename) {
+			string filePath = FindAsmdefFile(filename, isDisabledFile: false);
+			if (string.IsNullOrEmpty(filePath))
+				filePath = FindAsmdefFile(filename, isDisabledFile: true);
+			return filePath;
+		}
+<<<<<<< HEAD
+
+		internal static string FindAsmdefFile (string filename, bool isDisabledFile) {
+
+=======
+
+		internal static string FindAsmdefFile (string filename, bool isDisabledFile) {
+
+>>>>>>> 3.7
+			string typeSearchString = isDisabledFile ? " t:TextAsset" : " t:AssemblyDefinitionAsset";
+			string extension = isDisabledFile ? ".txt" : ".asmdef";
+			string filenameWithExtension = filename + (isDisabledFile ? ".txt" : ".asmdef");
+			string[] guids = AssetDatabase.FindAssets(filename + typeSearchString);
+			foreach (string guid in guids) {
+				string currentPath = AssetDatabase.GUIDToAssetPath(guid);
+				if (!string.IsNullOrEmpty(currentPath)) {
+					if (System.IO.Path.GetFileName(currentPath) == filenameWithExtension)
+						return currentPath;
+				}
+			}
+			return null;
+		}
+
+		internal static void SetAsmdefFileActive (string filename, bool setActive) {
+
+			string typeSearchString = setActive ? " t:TextAsset" : " t:AssemblyDefinitionAsset";
+			string extensionBeforeChange = setActive ? "txt" : "asmdef";
+			string[] guids = AssetDatabase.FindAssets(filename + typeSearchString);
+			foreach (string guid in guids) {
+				string currentPath = AssetDatabase.GUIDToAssetPath(guid);
+				if (!System.IO.Path.HasExtension(extensionBeforeChange)) // asmdef is also found as t:TextAsset, so check
+					continue;
+
+				string targetPath = System.IO.Path.ChangeExtension(currentPath, setActive ? "asmdef" : "txt");
+				if (System.IO.File.Exists(currentPath) && !System.IO.File.Exists(targetPath)) {
+					System.IO.File.Copy(currentPath, targetPath);
+					System.IO.File.Copy(currentPath + ".meta", targetPath + ".meta");
+				}
+				AssetDatabase.DeleteAsset(currentPath);
 			}
 		}
 	}
