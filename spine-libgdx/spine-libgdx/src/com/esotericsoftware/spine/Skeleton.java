@@ -29,13 +29,13 @@
 
 package com.esotericsoftware.spine;
 
-import static com.esotericsoftware.spine.utils.SpineUtils.cosDeg;
-import static com.esotericsoftware.spine.utils.SpineUtils.sinDeg;
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
+
 import com.esotericsoftware.spine.Skin.SkinEntry;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
@@ -154,8 +154,8 @@ public class Skeleton {
 		updateCache();
 	}
 
-	/** Caches information about bones and constraints. Must be called if the skin is modified or if bones, constraints, or
-	 * weighted path attachments are added or removed. */
+	/** Caches information about bones and constraints. Must be called if the {@link #getSkin()} is modified or if bones,
+	 * constraints, or weighted path attachments are added or removed. */
 	public void updateCache () {
 		Array<Updatable> updateCache = this.updateCache;
 		updateCache.clear();
@@ -165,8 +165,19 @@ public class Skeleton {
 		Object[] bones = this.bones.items;
 		for (int i = 0; i < boneCount; i++) {
 			Bone bone = (Bone)bones[i];
-			bone.update = !bone.data.skinRequired || (skin != null && skin.bones.contains(bone.data, true));
-			bone.sorted = !bone.update;
+			bone.sorted = bone.data.skinRequired;
+			bone.update = !bone.sorted;
+		}
+		if (skin != null) {
+			Object[] skinBones = skin.bones.items;
+			for (int i = 0, n = skin.bones.size; i < n; i++) {
+				Bone bone = (Bone)skinBones[i];
+				do {
+					bone.sorted = false;
+					bone.update = true;
+					bone = bone.parent;
+				} while (bone != null);
+			}
 		}
 
 		int ikCount = ikConstraints.size, transformCount = transformConstraints.size, pathCount = pathConstraints.size;
