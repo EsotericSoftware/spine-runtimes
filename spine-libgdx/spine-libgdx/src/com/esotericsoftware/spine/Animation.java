@@ -349,6 +349,7 @@ public class Animation {
 			MixDirection direction) {
 
 			Bone bone = skeleton.bones.get(boneIndex);
+			if (!bone.visible) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -446,6 +447,7 @@ public class Animation {
 			MixDirection direction) {
 
 			Bone bone = skeleton.bones.get(boneIndex);
+			if (!bone.visible) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -507,6 +509,7 @@ public class Animation {
 			MixDirection direction) {
 
 			Bone bone = skeleton.bones.get(boneIndex);
+			if (!bone.visible) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -609,6 +612,7 @@ public class Animation {
 			MixDirection direction) {
 
 			Bone bone = skeleton.bones.get(boneIndex);
+			if (!bone.visible) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
