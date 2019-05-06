@@ -166,15 +166,15 @@ public class Skeleton {
 		for (int i = 0; i < boneCount; i++) {
 			Bone bone = (Bone)bones[i];
 			bone.sorted = bone.data.skinRequired;
-			bone.update = !bone.sorted;
+			bone.visible = !bone.sorted;
 		}
 		if (skin != null) {
 			Object[] skinBones = skin.bones.items;
 			for (int i = 0, n = skin.bones.size; i < n; i++) {
-				Bone bone = (Bone)skinBones[i];
+				Bone bone = (Bone)bones[((BoneData)skinBones[i]).index];
 				do {
 					bone.sorted = false;
-					bone.update = true;
+					bone.visible = true;
 					bone = bone.parent;
 				} while (bone != null);
 			}
@@ -319,7 +319,7 @@ public class Skeleton {
 	private void sortReset (Array<Bone> bones) {
 		for (int i = 0, n = bones.size; i < n; i++) {
 			Bone bone = bones.get(i);
-			if (!bone.update) continue;
+			if (!bone.visible) continue;
 			if (bone.sorted) sortReset(bone.children);
 			bone.sorted = false;
 		}
