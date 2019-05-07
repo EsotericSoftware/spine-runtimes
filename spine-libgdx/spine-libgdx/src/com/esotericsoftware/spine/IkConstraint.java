@@ -45,6 +45,8 @@ public class IkConstraint implements Updatable {
 	boolean compress, stretch;
 	float mix = 1;
 
+	boolean active;
+
 	public IkConstraint (IkConstraintData data, Skeleton skeleton) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
@@ -142,6 +144,10 @@ public class IkConstraint implements Updatable {
 
 	public void setStretch (boolean stretch) {
 		this.stretch = stretch;
+	}
+
+	public boolean isActive () {
+		return active;
 	}
 
 	/** The IK constraint's setup pose data. */

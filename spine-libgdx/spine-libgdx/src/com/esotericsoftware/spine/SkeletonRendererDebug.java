@@ -84,7 +84,7 @@ public class SkeletonRendererDebug {
 		if (drawBones) {
 			for (int i = 0, n = bones.size; i < n; i++) {
 				Bone bone = bones.get(i);
-				if (bone.parent == null || !bone.visible) continue;
+				if (bone.parent == null || !bone.active) continue;
 				float length = bone.data.length, width = boneWidth;
 				if (length == 0) {
 					length = 8;
@@ -239,7 +239,7 @@ public class SkeletonRendererDebug {
 			shapes.setColor(boneOriginColor);
 			for (int i = 0, n = bones.size; i < n; i++) {
 				Bone bone = bones.get(i);
-				if (!bone.visible) continue;
+				if (!bone.active) continue;
 				shapes.circle(bone.worldX, bone.worldY, 3 * scale, 8);
 			}
 		}

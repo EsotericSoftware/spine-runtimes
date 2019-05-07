@@ -43,6 +43,8 @@ public class TransformConstraint implements Updatable {
 	final Array<Bone> bones;
 	Bone target;
 	float rotateMix, translateMix, scaleMix, shearMix;
+
+	boolean active;
 	final Vector2 temp = new Vector2();
 
 	public TransformConstraint (TransformConstraintData data, Skeleton skeleton) {
@@ -336,6 +338,10 @@ public class TransformConstraint implements Updatable {
 
 	public void setShearMix (float shearMix) {
 		this.shearMix = shearMix;
+	}
+
+	public boolean isActive () {
+		return active;
 	}
 
 	/** The transform constraint's setup pose data. */

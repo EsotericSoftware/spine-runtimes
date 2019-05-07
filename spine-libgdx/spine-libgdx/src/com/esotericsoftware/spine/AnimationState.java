@@ -348,7 +348,7 @@ public class AnimationState {
 		}
 
 		Bone bone = skeleton.bones.get(timeline.boneIndex);
-		if (!bone.visible) return;
+		if (!bone.active) return;
 		float[] frames = timeline.frames;
 		float r1, r2;
 		if (time < frames[0]) { // Time is before first frame.

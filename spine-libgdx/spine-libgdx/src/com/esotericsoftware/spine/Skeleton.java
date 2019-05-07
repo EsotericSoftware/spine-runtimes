@@ -166,7 +166,7 @@ public class Skeleton {
 		for (int i = 0; i < boneCount; i++) {
 			Bone bone = (Bone)bones[i];
 			bone.sorted = bone.data.skinRequired;
-			bone.visible = !bone.sorted;
+			bone.active = !bone.sorted;
 		}
 		if (skin != null) {
 			Object[] skinBones = skin.bones.items;
@@ -174,7 +174,7 @@ public class Skeleton {
 				Bone bone = (Bone)bones[((BoneData)skinBones[i]).index];
 				do {
 					bone.sorted = false;
-					bone.visible = true;
+					bone.active = true;
 					bone = bone.parent;
 				} while (bone != null);
 			}
@@ -215,7 +215,8 @@ public class Skeleton {
 	}
 
 	private void sortIkConstraint (IkConstraint constraint) {
-		if (constraint.data.skinRequired && (skin == null || !skin.constraints.contains(constraint.data, true))) return;
+		constraint.active = !constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true));
+		if (!constraint.active) return;
 
 		Bone target = constraint.target;
 		sortBone(target);
@@ -236,7 +237,8 @@ public class Skeleton {
 	}
 
 	private void sortPathConstraint (PathConstraint constraint) {
-		if (constraint.data.skinRequired && (skin == null || !skin.constraints.contains(constraint.data, true))) return;
+		constraint.active = !constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true));
+		if (!constraint.active) return;
 
 		Slot slot = constraint.target;
 		int slotIndex = slot.getData().index;
@@ -262,7 +264,8 @@ public class Skeleton {
 	}
 
 	private void sortTransformConstraint (TransformConstraint constraint) {
-		if (constraint.data.skinRequired && (skin == null || !skin.constraints.contains(constraint.data, true))) return;
+		constraint.active = !constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true));
+		if (!constraint.active) return;
 
 		sortBone(constraint.target);
 
@@ -319,7 +322,7 @@ public class Skeleton {
 	private void sortReset (Array<Bone> bones) {
 		for (int i = 0, n = bones.size; i < n; i++) {
 			Bone bone = bones.get(i);
-			if (!bone.visible) continue;
+			if (!bone.active) continue;
 			if (bone.sorted) sortReset(bone.children);
 			bone.sorted = false;
 		}

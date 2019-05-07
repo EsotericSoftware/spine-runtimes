@@ -51,6 +51,8 @@ public class PathConstraint implements Updatable {
 	Slot target;
 	float position, spacing, rotateMix, translateMix;
 
+	boolean active;
+
 	private final FloatArray spaces = new FloatArray(), positions = new FloatArray();
 	private final FloatArray world = new FloatArray(), curves = new FloatArray(), lengths = new FloatArray();
 	private final float[] segments = new float[10];
@@ -496,6 +498,10 @@ public class PathConstraint implements Updatable {
 
 	public void setTarget (Slot target) {
 		this.target = target;
+	}
+
+	public boolean isActive () {
+		return active;
 	}
 
 	/** The path constraint's setup pose data. */

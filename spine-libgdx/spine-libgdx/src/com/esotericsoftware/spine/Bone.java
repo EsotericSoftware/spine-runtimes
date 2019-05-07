@@ -54,7 +54,7 @@ public class Bone implements Updatable {
 	float a, b, worldX;
 	float c, d, worldY;
 
-	boolean sorted, visible;
+	boolean sorted, active;
 
 	/** @param parent May be null. */
 	public Bone (BoneData data, Skeleton skeleton, Bone parent) {
@@ -233,6 +233,12 @@ public class Bone implements Updatable {
 	/** The immediate children of this bone. */
 	public Array<Bone> getChildren () {
 		return children;
+	}
+
+	/** Returns false when the bone has not been computed because {@link BoneData#getSkinRequired()} is true and the
+	 * {@link Skeleton#getSkin() active skin} does not {@link Skin#getBones() contain} this bone. */
+	public boolean isActive () {
+		return active;
 	}
 
 	// -- Local transform
