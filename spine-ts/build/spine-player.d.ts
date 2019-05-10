@@ -781,7 +781,7 @@ declare module spine {
 		name: string;
 		attachments: Map<Attachment>[];
 		bones: BoneData[];
-		constraints: SlotData[];
+		constraints: Constraint[];
 		constructor(name: string);
 		setAttachment(slotIndex: number, name: string, attachment: Attachment): void;
 		addSkin(skin: Skin): void;

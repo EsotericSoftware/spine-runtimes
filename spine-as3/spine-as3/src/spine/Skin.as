@@ -42,7 +42,7 @@ package spine {
 			_name = name;
 		}
 
-		public function addAttachment(slotIndex : int, name : String, attachment : Attachment) : void {
+		public function setAttachment(slotIndex : int, name : String, attachment : Attachment) : void {
 			if (attachment == null) throw new ArgumentError("attachment cannot be null.");
 			if (slotIndex >= attachments.length) attachments.length = slotIndex + 1;
 			if (!attachments[slotIndex]) attachments[slotIndex] = new Dictionary();

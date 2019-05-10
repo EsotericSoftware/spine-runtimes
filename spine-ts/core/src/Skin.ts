@@ -36,7 +36,7 @@ module spine {
 		name: string;
 		attachments = new Array<Map<Attachment>>();
 		bones = Array<BoneData>();
-		constraints = new Array<SlotData>();
+		constraints = new Array<Constraint>();
 
 		constructor (name: string) {
 			if (name == null) throw new Error("name cannot be null.");
