@@ -100,19 +100,20 @@ Shader "Spine/Skeleton Tint Black" {
 
 			struct v2f { 
 				V2F_SHADOW_CASTER;
-				float2 uv : TEXCOORD1;
+				float4 uvAndAlpha : TEXCOORD1;
 			};
 
-			v2f vert (appdata_base v) {
+			v2f vert (appdata_base v, float4 vertexColor : COLOR) {
 				v2f o;
 				TRANSFER_SHADOW_CASTER(o)
-				o.uv = v.texcoord;
+				o.uvAndAlpha = v.texcoord;
+				o.uvAndAlpha.a = vertexColor.a;
 				return o;
 			}
 
 			float4 frag (v2f i) : COLOR {
-				fixed4 texcol = tex2D(_MainTex, i.uv);
-				clip(texcol.a - _Cutoff);
+				fixed4 texcol = tex2D(_MainTex, i.uvAndAlpha.xy);
+				clip(texcol.a * i.uvAndAlpha.a - _Cutoff);
 				SHADOW_CASTER_FRAGMENT(i)
 			}
 			ENDCG

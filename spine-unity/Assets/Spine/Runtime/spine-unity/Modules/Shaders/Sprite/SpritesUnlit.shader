@@ -80,7 +80,7 @@ Shader "Spine/Sprite/Unlit"
 			Cull Off
 			Lighting Off
 			
-			CGPROGRAM		
+			CGPROGRAM
 				#pragma fragmentoption ARB_precision_hint_fastest
 				#pragma multi_compile_shadowcaster
 				#pragma multi_compile _ PIXELSNAP_ON
