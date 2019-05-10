@@ -34,5 +34,12 @@ module spine {
 		constructor (name: string) {
 			super(name);
 		}
+
+		copy (): Attachment {
+			let copy = new BoundingBoxAttachment(name);
+			this.copyTo(copy);
+			copy.color.setFromColor(this.color);
+			return copy;
+		}
 	}
 }

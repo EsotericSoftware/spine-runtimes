@@ -214,7 +214,7 @@ module spine {
 						let slotMap = skinMap[slotName];
 						for (let entryName in slotMap) {
 							let attachment = this.readAttachment(slotMap[entryName], skin, slotIndex, entryName, skeletonData);
-							if (attachment != null) skin.addAttachment(slotIndex, entryName, attachment);
+							if (attachment != null) skin.setAttachment(slotIndex, entryName, attachment);
 						}
 					}
 					skeletonData.skins.push(skin);
@@ -306,6 +306,9 @@ module spine {
 					let color = this.getValue(map, "color", null);
 					if (color != null) mesh.color.setFromString(color);
 
+					mesh.width = this.getValue(map, "width", 0) * scale;
+					mesh.height = this.getValue(map, "height", 0) * scale;
+
 					let parent: string = this.getValue(map, "parent", null);
 					if (parent != null) {
 						mesh.inheritDeform = this.getValue(map, "deform", true);
@@ -319,6 +322,7 @@ module spine {
 					mesh.regionUVs = uvs;
 					mesh.updateUVs();
 
+					mesh.edges = this.getValue(map, "edges", null);
 					mesh.hullLength = this.getValue(map, "hull", 0) * 2;
 					return mesh;
 				}

@@ -35,6 +35,8 @@ module spine {
 			if (name == null) throw new Error("name cannot be null.");
 			this.name = name;
 		}
+
+		abstract copy (): Attachment;
 	}
 
 	export abstract class VertexAttachment extends Attachment {
@@ -115,6 +117,22 @@ module spine {
 		/** Returns true if a deform originally applied to the specified attachment should be applied to this attachment. */
 		applyDeform (sourceAttachment: VertexAttachment) {
 			return this == sourceAttachment;
+		}
+
+		copyTo (attachment: VertexAttachment) {
+			if (this.bones != null) {
+				attachment.bones = new Array<number>(this.bones.length);
+				Utils.arrayCopy(this.bones, 0, attachment.bones, 0, this.bones.length);
+			} else
+				attachment.bones = null;
+
+			if (this.vertices != null) {
+				attachment.vertices = Utils.newFloatArray(this.vertices.length);
+				Utils.arrayCopy(this.vertices, 0, attachment.vertices, 0, this.vertices.length);
+			} else
+				attachment.vertices = null;
+
+			attachment.worldVerticesLength = this.worldVerticesLength;
 		}
 	}
 }

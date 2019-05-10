@@ -164,7 +164,7 @@ var skinsDemo = function(canvas, bgColor) {
 			var skin = skins[(Math.random() * skins.length - 1) | 0];
 			var attachments = skin.attachments[slot];
 			for (var attachmentName in attachments) {
-				newSkin.addAttachment(slot, attachmentName, attachments[attachmentName]);
+				newSkin.setAttachment(slot, attachmentName, attachments[attachmentName]);
 			}
 		}
 		setSkin(newSkin);

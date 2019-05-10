@@ -87,6 +87,7 @@ public class PathAttachment extends VertexAttachment {
 		System.arraycopy(lengths, 0, copy.lengths, 0, lengths.length);
 		copy.closed = closed;
 		copy.constantSpeed = constantSpeed;
+		copy.color.set(color);
 		return copy;
 	}
 }

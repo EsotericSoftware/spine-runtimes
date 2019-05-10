@@ -34,7 +34,10 @@ module spine {
 		regionUVs: ArrayLike<number>; uvs: ArrayLike<number>;
 		triangles: Array<number>;
 		color = new Color(1, 1, 1, 1);
+		width: number;
+		height: number;
 		hullLength: number;
+		edges: Array<number>;
 		private parentMesh: MeshAttachment;
 		inheritDeform = false;
 		tempColor = new Color(0, 0, 0, 0);
@@ -102,33 +105,6 @@ module spine {
 			}
 		}
 
-		/*updateUVs () {
-			let u = 0, v = 0, width = 0, height = 0;
-			if (this.region == null) {
-				u = v = 0;
-				width = height = 1;
-			} else {
-				u = this.region.u;
-				v = this.region.v;
-				width = this.region.u2 - u;
-				height = this.region.v2 - v;
-			}
-			let regionUVs = this.regionUVs;
-			if (this.uvs == null || this.uvs.length != regionUVs.length) this.uvs = Utils.newFloatArray(regionUVs.length);
-			let uvs = this.uvs;
-			if (this.region.rotate) {
-				for (let i = 0, n = uvs.length; i < n; i += 2) {
-					uvs[i] = u + regionUVs[i + 1] * width;
-					uvs[i + 1] = v + height - regionUVs[i] * height;
-				}
-			} else {
-				for (let i = 0, n = uvs.length; i < n; i += 2) {
-					uvs[i] = u + regionUVs[i] * width;
-					uvs[i + 1] = v + regionUVs[i + 1] * height;
-				}
-			}
-		}*/
-
 		applyDeform (sourceAttachment: VertexAttachment): boolean {
 			return this == sourceAttachment || (this.inheritDeform && this.parentMesh == sourceAttachment);
 		}
@@ -149,6 +125,39 @@ module spine {
 				this.hullLength = parentMesh.hullLength;
 				this.worldVerticesLength = parentMesh.worldVerticesLength
 			}
+		}
+
+		copy (): Attachment {
+			let copy = new MeshAttachment(name);
+			copy.region = this.region;
+			copy.path = this.path;
+
+			if (this.parentMesh == null) {
+				this.copyTo(copy);
+				copy.regionUVs = new Array<number>(this.regionUVs.length);
+				Utils.arrayCopy(this.regionUVs, 0, copy.regionUVs, 0, this.regionUVs.length);
+				copy.uvs = new Array<number>(this.uvs.length);
+				Utils.arrayCopy(this.uvs, 0, copy.uvs, 0, this.uvs.length);
+				copy.triangles = new Array<number>(this.triangles.length);
+				Utils.arrayCopy(this.triangles, 0, copy.triangles, 0, this.triangles.length);
+				copy.color.setFromColor(this.color);
+				copy.hullLength = this.hullLength;
+
+				copy.inheritDeform = this.inheritDeform;
+
+				// Nonessential.
+				if (this.edges != null) {
+					copy.edges = new Array<number>(this.edges.length);
+					Utils.arrayCopy(this.edges, 0, copy.edges, 0, this.edges.length);
+				}
+				copy.width = this.width;
+				copy.height = this.height;
+			} else {
+				copy.setParentMesh(this.parentMesh);
+				copy.updateUVs();
+			}
+
+			return copy;
 		}
 	}
 
