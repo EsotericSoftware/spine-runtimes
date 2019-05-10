@@ -4675,7 +4675,7 @@ var spine;
 						for (var entryName in slotMap) {
 							var attachment = this.readAttachment(slotMap[entryName], skin, slotIndex, entryName, skeletonData);
 							if (attachment != null)
-								skin.addAttachment(slotIndex, entryName, attachment);
+								skin.setAttachment(slotIndex, entryName, attachment);
 						}
 					}
 					skeletonData.skins.push(skin);
@@ -4762,6 +4762,8 @@ var spine;
 					var color = this.getValue(map, "color", null);
 					if (color != null)
 						mesh.color.setFromString(color);
+					mesh.width = this.getValue(map, "width", 0) * scale;
+					mesh.height = this.getValue(map, "height", 0) * scale;
 					var parent_4 = this.getValue(map, "parent", null);
 					if (parent_4 != null) {
 						mesh.inheritDeform = this.getValue(map, "deform", true);
@@ -4773,6 +4775,7 @@ var spine;
 					mesh.triangles = map.triangles;
 					mesh.regionUVs = uvs;
 					mesh.updateUVs();
+					mesh.edges = this.getValue(map, "edges", null);
 					mesh.hullLength = this.getValue(map, "hull", 0) * 2;
 					return mesh;
 				}
@@ -5241,14 +5244,25 @@ var spine;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
+	var SkinEntry = (function () {
+		function SkinEntry(slotIndex, name, attachment) {
+			this.slotIndex = slotIndex;
+			this.name = name;
+			this.attachment = attachment;
+		}
+		return SkinEntry;
+	}());
+	spine.SkinEntry = SkinEntry;
 	var Skin = (function () {
 		function Skin(name) {
 			this.attachments = new Array();
+			this.bones = Array();
+			this.constraints = new Array();
 			if (name == null)
 				throw new Error("name cannot be null.");
 			this.name = name;
 		}
-		Skin.prototype.addAttachment = function (slotIndex, name, attachment) {
+		Skin.prototype.setAttachment = function (slotIndex, name, attachment) {
 			if (attachment == null)
 				throw new Error("attachment cannot be null.");
 			var attachments = this.attachments;
@@ -5258,9 +5272,117 @@ var spine;
 				attachments[slotIndex] = {};
 			attachments[slotIndex][name] = attachment;
 		};
+		Skin.prototype.addSkin = function (skin) {
+			for (var i = 0; i < skin.bones.length; i++) {
+				var bone = skin.bones[i];
+				var contained = false;
+				for (var j = 0; j < this.bones.length; j++) {
+					if (this.bones[j] == bone) {
+						contained = true;
+						break;
+					}
+				}
+				if (!contained)
+					this.bones.push(bone);
+			}
+			for (var i = 0; i < skin.constraints.length; i++) {
+				var constraint = skin.constraints[i];
+				var contained = false;
+				for (var j = 0; j < this.constraints.length; j++) {
+					if (this.constraints[j] == constraint) {
+						contained = true;
+						break;
+					}
+				}
+				if (!contained)
+					this.constraints.push(constraint);
+			}
+			var attachments = skin.getAttachments();
+			for (var i = 0; i < attachments.length; i++) {
+				var attachment = attachments[i];
+				this.setAttachment(attachment.slotIndex, attachment.name, attachment.attachment);
+			}
+		};
+		Skin.prototype.copySkin = function (skin) {
+			for (var i = 0; i < skin.bones.length; i++) {
+				var bone = skin.bones[i];
+				var contained = false;
+				for (var j = 0; j < this.bones.length; j++) {
+					if (this.bones[j] == bone) {
+						contained = true;
+						break;
+					}
+				}
+				if (!contained)
+					this.bones.push(bone);
+			}
+			for (var i = 0; i < skin.constraints.length; i++) {
+				var constraint = skin.constraints[i];
+				var contained = false;
+				for (var j = 0; j < this.constraints.length; j++) {
+					if (this.constraints[j] == constraint) {
+						contained = true;
+						break;
+					}
+				}
+				if (!contained)
+					this.constraints.push(constraint);
+			}
+			var attachments = skin.getAttachments();
+			for (var i = 0; i < attachments.length; i++) {
+				var attachment = attachments[i];
+				attachment.attachment = attachment.attachment.copy();
+				this.setAttachment(attachment.slotIndex, attachment.name, attachment.attachment);
+			}
+			attachments = this.getAttachments();
+			for (var i = 0; i < attachments.length; i++) {
+				var attachment_1 = attachments[i];
+				if (attachment_1.attachment instanceof spine.MeshAttachment) {
+					var mesh = attachment_1.attachment;
+					if (mesh.getParentMesh()) {
+						mesh.setParentMesh(this.getAttachment(attachment_1.slotIndex, mesh.getParentMesh().name));
+						mesh.updateUVs();
+					}
+				}
+			}
+		};
 		Skin.prototype.getAttachment = function (slotIndex, name) {
 			var dictionary = this.attachments[slotIndex];
 			return dictionary ? dictionary[name] : null;
+		};
+		Skin.prototype.removeAttachment = function (slotIndex, name) {
+			var dictionary = this.attachments[slotIndex];
+			if (dictionary)
+				dictionary[name] = null;
+		};
+		Skin.prototype.getAttachments = function () {
+			var entries = new Array();
+			for (var i = 0; i < this.attachments.length; i++) {
+				var slotAttachments = this.attachments[i];
+				if (slotAttachments) {
+					for (var name_2 in slotAttachments) {
+						var attachment = slotAttachments[name_2];
+						if (attachment)
+							entries.push(new SkinEntry(i, name_2, attachment));
+					}
+				}
+			}
+			return entries;
+		};
+		Skin.prototype.getAttachmentsForSlot = function (slotIndex, attachments) {
+			var slotAttachments = this.attachments[slotIndex];
+			if (slotAttachments) {
+				for (var name_3 in slotAttachments) {
+					var attachment = slotAttachments[name_3];
+					if (attachment)
+						attachments.push(new SkinEntry(slotIndex, name_3, attachment));
+				}
+			}
+		};
+		Skin.prototype.clear = function () {
+			this.attachments.length = 0;
+			this.bones.length = 0;
+			this.constraints.length = 0;
 		};
 		Skin.prototype.attachAll = function (skeleton, oldSkin) {
 			var slotIndex = 0;
@@ -6533,6 +6655,21 @@ var spine;
 		VertexAttachment.prototype.applyDeform = function (sourceAttachment) {
 			return this == sourceAttachment;
 		};
+		VertexAttachment.prototype.copyTo = function (attachment) {
+			if (this.bones != null) {
+				attachment.bones = new Array(this.bones.length);
+				spine.Utils.arrayCopy(this.bones, 0, attachment.bones, 0, this.bones.length);
+			}
+			else
+				attachment.bones = null;
+			if (this.vertices != null) {
+				attachment.vertices = spine.Utils.newFloatArray(this.vertices.length);
+				spine.Utils.arrayCopy(this.vertices, 0, attachment.vertices, 0, this.vertices.length);
+			}
+			else
+				attachment.vertices = null;
+			attachment.worldVerticesLength = this.worldVerticesLength;
+		};
 		VertexAttachment.nextID = 0;
 		return VertexAttachment;
 	}(Attachment));
@@ -6559,6 +6696,12 @@ var spine;
 			_this.color = new spine.Color(1, 1, 1, 1);
 			return _this;
 		}
+		BoundingBoxAttachment.prototype.copy = function () {
+			var copy = new BoundingBoxAttachment(name);
+			this.copyTo(copy);
+			copy.color.setFromColor(this.color);
+			return copy;
+		};
 		return BoundingBoxAttachment;
 	}(spine.VertexAttachment));
 	spine.BoundingBoxAttachment = BoundingBoxAttachment;
@@ -6572,6 +6715,13 @@ var spine;
 			_this.color = new spine.Color(0.2275, 0.2275, 0.8078, 1);
 			return _this;
 		}
+		ClippingAttachment.prototype.copy = function () {
+			var copy = new ClippingAttachment(name);
+			this.copyTo(copy);
+			copy.endSlot = this.endSlot;
+			copy.color.setFromColor(this.color);
+			return copy;
+		};
 		return ClippingAttachment;
 	}(spine.VertexAttachment));
 	spine.ClippingAttachment = ClippingAttachment;
@@ -6665,6 +6815,34 @@ var spine;
 				this.worldVerticesLength = parentMesh.worldVerticesLength;
 			}
 		};
+		MeshAttachment.prototype.copy = function () {
+			var copy = new MeshAttachment(name);
+			copy.region = this.region;
+			copy.path = this.path;
+			if (this.parentMesh == null) {
+				this.copyTo(copy);
+				copy.regionUVs = new Array(this.regionUVs.length);
+				spine.Utils.arrayCopy(this.regionUVs, 0, copy.regionUVs, 0, this.regionUVs.length);
+				copy.uvs = new Array(this.uvs.length);
+				spine.Utils.arrayCopy(this.uvs, 0, copy.uvs, 0, this.uvs.length);
+				copy.triangles = new Array(this.triangles.length);
+				spine.Utils.arrayCopy(this.triangles, 0, copy.triangles, 0, this.triangles.length);
+				copy.color.setFromColor(this.color);
+				copy.hullLength = this.hullLength;
+				copy.inheritDeform = this.inheritDeform;
+				if (this.edges != null) {
+					copy.edges = new Array(this.edges.length);
+					spine.Utils.arrayCopy(this.edges, 0, copy.edges, 0, this.edges.length);
+				}
+				copy.width = this.width;
+				copy.height = this.height;
+			}
+			else {
+				copy.setParentMesh(this.parentMesh);
+				copy.updateUVs();
+			}
+			return copy;
+		};
 		return MeshAttachment;
 	}(spine.VertexAttachment));
 	spine.MeshAttachment = MeshAttachment;
@@ -6680,6 +6858,16 @@ var spine;
 			_this.color = new spine.Color(1, 1, 1, 1);
 			return _this;
 		}
+		PathAttachment.prototype.copy = function () {
+			var copy = new PathAttachment(name);
+			this.copyTo(copy);
+			copy.lengths = new Array(this.lengths.length);
+			spine.Utils.arrayCopy(this.lengths, 0, copy.lengths, 0, this.lengths.length);
+			copy.closed = closed;
+			copy.constantSpeed = this.constantSpeed;
+			copy.color.setFromColor(this.color);
+			return copy;
+		};
 		return PathAttachment;
 	}(spine.VertexAttachment));
 	spine.PathAttachment = PathAttachment;
@@ -6703,6 +6891,14 @@ var spine;
 			var x = cos * bone.a + sin * bone.b;
 			var y = cos * bone.c + sin * bone.d;
 			return Math.atan2(y, x) * spine.MathUtils.radDeg;
+		};
+		PointAttachment.prototype.copy = function () {
+			var copy = new PointAttachment(name);
+			copy.x = this.x;
+			copy.y = this.y;
+			copy.rotation = this.rotation;
+			copy.color.setFromColor(this.color);
+			return copy;
 		};
 		return PointAttachment;
 	}(spine.VertexAttachment));
@@ -6803,6 +6999,23 @@ var spine;
 			offsetY = vertexOffset[RegionAttachment.OY4];
 			worldVertices[offset] = offsetX * a + offsetY * b + x;
 			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
+		};
+		RegionAttachment.prototype.copy = function () {
+			var copy = new RegionAttachment(name);
+			copy.region = this.region;
+			copy.rendererObject = this.rendererObject;
+			copy.path = this.path;
+			copy.x = this.x;
+			copy.y = this.y;
+			copy.scaleX = this.scaleX;
+			copy.scaleY = this.scaleY;
+			copy.rotation = this.rotation;
+			copy.width = this.width;
+			copy.height = this.height;
+			spine.Utils.arrayCopy(this.uvs, 0, copy.uvs, 0, 8);
+			spine.Utils.arrayCopy(this.offset, 0, copy.offset, 0, 8);
+			copy.color.setFromColor(this.color);
+			return copy;
 		};
 		RegionAttachment.OX1 = 0;
 		RegionAttachment.OY1 = 1;

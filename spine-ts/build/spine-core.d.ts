@@ -771,12 +771,26 @@ declare module spine {
 	}
 }
 declare module spine {
+	class SkinEntry {
+		slotIndex: number;
+		name: string;
+		attachment: Attachment;
+		constructor(slotIndex: number, name: string, attachment: Attachment);
+	}
 	class Skin {
 		name: string;
 		attachments: Map<Attachment>[];
+		bones: BoneData[];
+		constraints: SlotData[];
 		constructor(name: string);
-		addAttachment(slotIndex: number, name: string, attachment: Attachment): void;
+		setAttachment(slotIndex: number, name: string, attachment: Attachment): void;
+		addSkin(skin: Skin): void;
+		copySkin(skin: Skin): void;
 		getAttachment(slotIndex: number, name: string): Attachment;
+		removeAttachment(slotIndex: number, name: string): void;
+		getAttachments(): Array<SkinEntry>;
+		getAttachmentsForSlot(slotIndex: number, attachments: Array<SkinEntry>): void;
+		clear(): void;
 		attachAll(skeleton: Skeleton, oldSkin: Skin): void;
 	}
 }
@@ -1081,6 +1095,7 @@ declare module spine {
 	abstract class Attachment {
 		name: string;
 		constructor(name: string);
+		abstract copy(): Attachment;
 	}
 	abstract class VertexAttachment extends Attachment {
 		private static nextID;
@@ -1091,6 +1106,7 @@ declare module spine {
 		constructor(name: string);
 		computeWorldVertices(slot: Slot, start: number, count: number, worldVertices: ArrayLike<number>, offset: number, stride: number): void;
 		applyDeform(sourceAttachment: VertexAttachment): boolean;
+		copyTo(attachment: VertexAttachment): void;
 	}
 }
 declare module spine {
@@ -1117,6 +1133,7 @@ declare module spine {
 	class BoundingBoxAttachment extends VertexAttachment {
 		color: Color;
 		constructor(name: string);
+		copy(): Attachment;
 	}
 }
 declare module spine {
@@ -1124,6 +1141,7 @@ declare module spine {
 		endSlot: SlotData;
 		color: Color;
 		constructor(name: string);
+		copy(): Attachment;
 	}
 }
 declare module spine {
@@ -1134,7 +1152,10 @@ declare module spine {
 		uvs: ArrayLike<number>;
 		triangles: Array<number>;
 		color: Color;
+		width: number;
+		height: number;
 		hullLength: number;
+		edges: Array<number>;
 		private parentMesh;
 		inheritDeform: boolean;
 		tempColor: Color;
@@ -1143,6 +1164,7 @@ declare module spine {
 		applyDeform(sourceAttachment: VertexAttachment): boolean;
 		getParentMesh(): MeshAttachment;
 		setParentMesh(parentMesh: MeshAttachment): void;
+		copy(): Attachment;
 	}
 }
 declare module spine {
@@ -1152,6 +1174,7 @@ declare module spine {
 		constantSpeed: boolean;
 		color: Color;
 		constructor(name: string);
+		copy(): Attachment;
 	}
 }
 declare module spine {
@@ -1163,6 +1186,7 @@ declare module spine {
 		constructor(name: string);
 		computeWorldPosition(bone: Bone, point: Vector2): Vector2;
 		computeWorldRotation(bone: Bone): number;
+		copy(): Attachment;
 	}
 }
 declare module spine {
@@ -1225,6 +1249,7 @@ declare module spine {
 		updateOffset(): void;
 		setRegion(region: TextureRegion): void;
 		computeWorldVertices(bone: Bone, worldVertices: ArrayLike<number>, offset: number, stride: number): void;
+		copy(): Attachment;
 	}
 }
 declare module spine {
