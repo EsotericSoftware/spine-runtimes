@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 package spine {
+	import spine.attachments.MeshAttachment;
 	import flash.utils.Dictionary;
 
 	import spine.attachments.Attachment;
@@ -36,6 +37,8 @@ package spine {
 	public class Skin {
 		internal var _name : String;
 		private var _attachments : Vector.<Dictionary> = new Vector.<Dictionary>();
+		private var _bones: Vector.<BoneData> = new Vector.<BoneData>();
+		private var _constraints: Vector.<Constraint> = new Vector.<Constraint>();
 
 		public function Skin(name : String) {
 			if (name == null) throw new ArgumentError("name cannot be null.");
@@ -44,20 +47,148 @@ package spine {
 
 		public function setAttachment(slotIndex : int, name : String, attachment : Attachment) : void {
 			if (attachment == null) throw new ArgumentError("attachment cannot be null.");
-			if (slotIndex >= attachments.length) attachments.length = slotIndex + 1;
-			if (!attachments[slotIndex]) attachments[slotIndex] = new Dictionary();
-			attachments[slotIndex][name] = attachment;
+			if (slotIndex >= _attachments.length) _attachments.length = slotIndex + 1;
+			if (!_attachments[slotIndex]) _attachments[slotIndex] = new Dictionary();
+			_attachments[slotIndex][name] = attachment;
 		}
+		
+		public function addSkin (skin: Skin) : void {
+			var i : Number = 0, j : Number = 0;
+			var contained : Boolean = false;
+			
+			for(i = 0; i < skin._bones.length; i++) {
+				var bone : BoneData = skin._bones[i];
+				contained = false;
+				for (j = 0; j < _bones.length; j++) {
+					if (_bones[j] == bone) {
+						contained = true;
+						break;
+					}
+				}
+				if (!contained) _bones.push(bone);
+			}
 
-		/** @return May be null. */
+			for(i = 0; i < skin._constraints.length; i++) {
+				var constraint : Constraint = skin._constraints[i];
+				contained = false;
+				for (j = 0; j < this._constraints.length; j++) {
+					if (_constraints[j] == constraint) {
+						contained = true;
+						break;
+					}
+				}
+				if (!contained) _constraints.push(constraint);
+			}
+
+			var attachments : Vector.<SkinEntry> = skin.getAttachments();
+			for (i = 0; i < attachments.length; i++) {
+				var attachment : SkinEntry = attachments[i];
+				setAttachment(attachment.slotIndex, attachment.name, attachment.attachment);
+			}
+		}
+		
+		public function copySkin (skin: Skin) : void {
+			var i : Number = 0, j : Number = 0;
+			var contained : Boolean = false;
+			var attachment : SkinEntry;
+			
+			for(i = 0; i < skin._bones.length; i++) {
+				var bone : BoneData = skin._bones[i];
+				contained = false;
+				for (j = 0; j < _bones.length; j++) {
+					if (_bones[j] == bone) {
+						contained = true;
+						break;
+					}
+				}
+				if (!contained) _bones.push(bone);
+			}
+
+			for(i = 0; i < skin._constraints.length; i++) {
+				var constraint : Constraint = skin._constraints[i];
+				contained = false;
+				for (j = 0; j < this._constraints.length; j++) {
+					if (_constraints[j] == constraint) {
+						contained = true;
+						break;
+					}
+				}
+				if (!contained) _constraints.push(constraint);
+			}
+
+			var attachments : Vector.<SkinEntry> = skin.getAttachments();
+			for (i = 0; i < attachments.length; i++) {
+				attachment = attachments[i];
+				attachment.attachment = attachment.attachment.copy();
+				setAttachment(attachment.slotIndex, attachment.name, attachment.attachment);
+			}
+			
+			attachments = this.getAttachments();
+			for (i = 0; i < attachments.length; i++) {
+				attachment = attachments[i];
+				if (attachment.attachment instanceof MeshAttachment) {
+					var mesh : MeshAttachment = attachment.attachment as MeshAttachment;
+					if (mesh.parentMesh) {
+						mesh.parentMesh = this.getAttachment(attachment.slotIndex, mesh.parentMesh.name) as MeshAttachment;
+						mesh.updateUVs();
+					}
+				}
+			}
+		}
+				
 		public function getAttachment(slotIndex : int, name : String) : Attachment {
-			if (slotIndex >= attachments.length) return null;
-			var dictionary : Dictionary = attachments[slotIndex];
+			if (slotIndex >= _attachments.length) return null;
+			var dictionary : Dictionary = _attachments[slotIndex];
 			return dictionary ? dictionary[name] : null;
 		}
-
+		
+		public function removeAttachment (slotIndex : Number, name : String) : void {
+			var dictionary : Dictionary = _attachments[slotIndex];
+			if (dictionary) dictionary[name] = null;
+		}
+		
+		public function getAttachments() : Vector.<SkinEntry> {
+			var entries : Vector.<SkinEntry> = new Vector.<SkinEntry>();
+			for (var slotIndex : int = 0; slotIndex < _attachments.length; slotIndex++) {
+				var attachments : Dictionary = _attachments[slotIndex];
+				if (attachments) {
+					for (var name : String in attachments) {
+						var attachment : Attachment = attachments[name];
+						if (attachment) entries.push(new SkinEntry(slotIndex, name, attachment));
+					}
+				}
+			}
+			return entries;
+		}
+		
+		public function getAttachmentsForSlot(slotIndex: int) : Vector.<SkinEntry> {
+			var entries : Vector.<SkinEntry> = new Vector.<SkinEntry>();			
+			var attachments : Dictionary = _attachments[slotIndex];
+			if (attachments) {
+				for (var name : String in attachments) {
+					var attachment : Attachment = attachments[name];
+					if (attachment) entries.push(new SkinEntry(slotIndex, name, attachment));
+				}
+			}			
+			return entries;
+		}
+		
+		public function clear () : void {
+			_attachments.length = 0;
+			_bones.length = 0;
+			_constraints.length = 0;
+		}
+		
 		public function get attachments() : Vector.<Dictionary> {
 			return _attachments;
+		}
+		
+		public function get bones() : Vector.<BoneData> {
+			return _bones;
+		}
+		
+		public function get constraints() : Vector.<Constraint> {
+			return _constraints;
 		}
 
 		public function get name() : String {
@@ -73,8 +204,8 @@ package spine {
 			var slotIndex : int = 0;
 			for each (var slot : Slot in skeleton.slots) {
 				var slotAttachment : Attachment = slot.attachment;
-				if (slotAttachment && slotIndex < oldSkin.attachments.length) {
-					var dictionary : Dictionary = oldSkin.attachments[slotIndex];
+				if (slotAttachment && slotIndex < oldSkin._attachments.length) {
+					var dictionary : Dictionary = oldSkin._attachments[slotIndex];
 					for (var name : String in dictionary) {
 						var skinAttachment : Attachment = dictionary[name];
 						if (slotAttachment == skinAttachment) {
@@ -87,5 +218,5 @@ package spine {
 				slotIndex++;
 			}
 		}
-	}
+	}	
 }

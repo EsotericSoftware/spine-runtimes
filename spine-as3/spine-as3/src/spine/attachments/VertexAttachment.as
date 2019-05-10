@@ -129,5 +129,19 @@ package spine.attachments {
 		public function applyDeform(sourceAttachment : VertexAttachment) : Boolean {
 			return this == sourceAttachment;
 		}
+		
+		public function copyTo(attachment : VertexAttachment) : void {
+			if (bones != null) {
+				attachment.bones = bones.concat();				
+			} else
+				attachment.bones = null;
+
+			if (this.vertices != null) {
+				attachment.vertices = vertices.concat();				
+			} else
+				attachment.vertices = null;
+
+			attachment.worldVerticesLength = worldVerticesLength;
+		}
 	}
 }

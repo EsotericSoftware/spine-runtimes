@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 package spine.attachments {
+	import flash.errors.IllegalOperationError;
 	public class Attachment {
 		internal var _name : String;
 
@@ -44,5 +45,9 @@ package spine.attachments {
 		public function toString() : String {
 			return name;
 		}
-	}
+		
+		public function copy() : Attachment {
+			throw new IllegalOperationError("Not implemented");
+		}
+	}	
 }

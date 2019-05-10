@@ -238,7 +238,7 @@ package spine {
 					for (var attachmentName : String in slotEntry) {
 						var attachment : Attachment = readAttachment(slotEntry[attachmentName], skin, slotIndex, attachmentName, skeletonData);
 						if (attachment != null)
-							skin.addAttachment(slotIndex, attachmentName, attachment);
+							skin.setAttachment(slotIndex, attachmentName, attachment);
 					}
 				}
 				skeletonData.skins[skeletonData.skins.length] = skin;

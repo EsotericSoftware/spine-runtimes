@@ -32,5 +32,11 @@ package spine.attachments {
 		public function BoundingBoxAttachment(name : String) {
 			super(name);
 		}
+		
+		override public function copy (): Attachment {
+			var copy : BoundingBoxAttachment = new BoundingBoxAttachment(name);
+			copyTo(copy);			
+			return copy;
+		}
 	}
 }

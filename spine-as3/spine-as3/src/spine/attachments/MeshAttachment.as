@@ -121,34 +121,6 @@ package spine.attachments {
 					}
 				}
 			}
-			
-			/*var i : int, n : int = regionUVs.length;
-			var u: Number, v: Number, width: Number, height: Number;
-			var textureWidth: Number, textureHeight: Number;
-			if (!uvs || uvs.length != n) uvs = new Vector.<Number>(n, true);
-			if (regionRotate) {
-				textureHeight = regionWidth / (regionV2 - regionV);
-				textureWidth = regionHeight / (regionU2 - regionU);
-				u = regionU - (regionOriginalHeight - regionOffsetY - regionHeight) / textureWidth;
-				v = regionV - (regionOriginalWidth - regionOffsetX - regionWidth) / textureHeight;
-				width = regionOriginalHeight / textureWidth;
-				height = regionOriginalWidth / textureHeight;
-				for (i = 0; i < n; i += 2) {
-					uvs[i] = u + regionUVs[int(i + 1)] * width;
-					uvs[int(i + 1)] = v + height - regionUVs[i] * height;
-				}
-			} else {
-				textureWidth = regionWidth / (regionU2 - regionU);
-				textureHeight = regionHeight / (regionV2 - regionV);
-				u = regionU - regionOffsetX / textureWidth;
-				v = regionV - (regionOriginalHeight - regionOffsetY - regionHeight) / textureHeight;
-				width = regionOriginalWidth / textureWidth;
-				height = regionOriginalHeight / textureHeight;				
-				for (i = 0; i < n; i += 2) {
-					uvs[i] = u + regionUVs[i] * width;
-					uvs[int(i + 1)] = v + regionUVs[int(i + 1)] * height;
-				}
-			}*/
 		}
 
 		override public function applyDeform(sourceAttachment : VertexAttachment) : Boolean {
@@ -172,6 +144,46 @@ package spine.attachments {
 				width = parentMesh.width;
 				height = parentMesh.height;
 			}
+		};
+		
+		override public function copy (): Attachment {
+			var copy : MeshAttachment = new MeshAttachment(name);
+			copy.rendererObject = rendererObject;
+			copy.regionU = regionU;
+			copy.regionV = regionV;
+			copy.regionU2 = regionU2;
+			copy.regionV2 = regionV2;
+			copy.regionRotate = regionRotate;
+			copy.regionDegrees = regionDegrees;
+			copy.regionOffsetX =  regionOffsetX;
+			copy.regionOffsetY = regionOffsetY;
+			copy.regionWidth =  regionWidth;
+			copy.regionHeight = regionHeight;
+			copy.regionOriginalWidth = regionOriginalWidth;
+			copy.regionOriginalHeight = regionOriginalHeight;
+			copy.path = path;			
+
+			if (parentMesh == null) {
+				this.copyTo(copy);
+				copy.regionUVs = regionUVs.concat();				
+				copy.uvs = uvs.concat();				
+				copy.triangles = triangles.concat();				
+				copy.color.setFromColor(color);
+				copy.hullLength = hullLength;
+
+				copy.inheritDeform = inheritDeform;
+
+				// Nonessential.
+				if (edges != null)
+					copy.edges = edges.concat();									
+				copy.width = width;
+				copy.height = height;
+			} else {
+				copy.parentMesh = parentMesh;
+				copy.updateUVs();
+			}
+
+			return copy;
 		}
 	}
 }

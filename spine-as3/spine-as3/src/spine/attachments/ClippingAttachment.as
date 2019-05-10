@@ -38,5 +38,13 @@ package spine.attachments {
 		public function ClippingAttachment(name : String) {
 			super(name);
 		}
+		
+		override public function copy (): Attachment {
+			var copy : ClippingAttachment = new ClippingAttachment(name);
+			copyTo(copy);
+			copy.endSlot = endSlot;
+			copy.color.setFromColor(color);
+			return copy;
+		}
 	}
 }

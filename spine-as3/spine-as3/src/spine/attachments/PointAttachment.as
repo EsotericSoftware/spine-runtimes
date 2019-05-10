@@ -52,5 +52,14 @@ package spine.attachments {
 			var y : Number = cos * bone.c + sin * bone.d;
 			return Math.atan2(y, x) * MathUtils.radDeg;
 		}
+		
+		override public function copy (): Attachment {
+			var copy : PointAttachment = new PointAttachment(name);
+			copy.x = x;
+			copy.y = y;
+			copy.rotation = rotation;
+			copy.color.setFromColor(color);
+			return copy;
+		}
 	}
 }

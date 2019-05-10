@@ -35,5 +35,14 @@ package spine.attachments {
 		public function PathAttachment(name : String) {
 			super(name);
 		}
+		
+		override public function copy (): Attachment {
+			var copy : PathAttachment = new PathAttachment(name);
+			copyTo(copy);
+			copy.lengths = lengths.concat();			
+			copy.closed = closed;
+			copy.constantSpeed = constantSpeed;			
+			return copy;
+		}
 	}
 }
