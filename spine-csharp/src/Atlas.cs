@@ -1,31 +1,30 @@
 /******************************************************************************
- * Spine Runtimes Software License v2.5
+ * Spine Runtimes License Agreement
+ * Last updated May 1, 2019. Replaces all prior versions.
  *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
+ * Copyright (c) 2013-2019, Esoteric Software LLC
  *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
+ * Integration of the Spine Runtimes into software or otherwise creating
+ * derivative works of the Spine Runtimes is permitted under the terms and
+ * conditions of Section 2 of the Spine Editor License Agreement:
+ * http://esotericsoftware.com/spine-editor-license
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software
+ * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * "Products"), provided that each user of the Products must obtain their own
+ * Spine Editor license and redistribution of the Products in any form must
+ * include this license and copyright notice.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
+ * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
+ * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #if (UNITY_5 || UNITY_5_3_OR_NEWER || UNITY_WSA || UNITY_WP8 || UNITY_WP8_1)
@@ -34,6 +33,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 
@@ -124,8 +124,8 @@ namespace Spine {
 					page.name = line;
 
 					if (ReadTuple(reader, tuple) == 2) { // size is only optional for an atlas packed with an old TexturePacker.
-						page.width = int.Parse(tuple[0]);
-						page.height = int.Parse(tuple[1]);
+						page.width = int.Parse(tuple[0], CultureInfo.InvariantCulture);
+						page.height = int.Parse(tuple[1], CultureInfo.InvariantCulture);
 						ReadTuple(reader, tuple);
 					}
 					page.format = (Format)Enum.Parse(typeof(Format), tuple[0], false);
@@ -156,12 +156,12 @@ namespace Spine {
 					region.rotate = Boolean.Parse(ReadValue(reader));
 
 					ReadTuple(reader, tuple);
-					int x = int.Parse(tuple[0]);
-					int y = int.Parse(tuple[1]);
+					int x = int.Parse(tuple[0], CultureInfo.InvariantCulture);
+					int y = int.Parse(tuple[1], CultureInfo.InvariantCulture);
 
 					ReadTuple(reader, tuple);
-					int width = int.Parse(tuple[0]);
-					int height = int.Parse(tuple[1]);
+					int width = int.Parse(tuple[0], CultureInfo.InvariantCulture);
+					int height = int.Parse(tuple[1], CultureInfo.InvariantCulture);
 
 					region.u = x / (float)page.width;
 					region.v = y / (float)page.height;
@@ -178,25 +178,29 @@ namespace Spine {
 					region.height = Math.Abs(height);
 
 					if (ReadTuple(reader, tuple) == 4) { // split is optional
-						region.splits = new [] {int.Parse(tuple[0]), int.Parse(tuple[1]),
-								int.Parse(tuple[2]), int.Parse(tuple[3])};
+						region.splits = new [] {int.Parse(tuple[0], CultureInfo.InvariantCulture),
+												int.Parse(tuple[1], CultureInfo.InvariantCulture),
+												int.Parse(tuple[2], CultureInfo.InvariantCulture),
+												int.Parse(tuple[3], CultureInfo.InvariantCulture)};
 
 						if (ReadTuple(reader, tuple) == 4) { // pad is optional, but only present with splits
-							region.pads = new [] {int.Parse(tuple[0]), int.Parse(tuple[1]),
-									int.Parse(tuple[2]), int.Parse(tuple[3])};
+							region.pads = new [] {int.Parse(tuple[0], CultureInfo.InvariantCulture),
+												int.Parse(tuple[1], CultureInfo.InvariantCulture),
+												int.Parse(tuple[2], CultureInfo.InvariantCulture),
+												int.Parse(tuple[3], CultureInfo.InvariantCulture)};
 
 							ReadTuple(reader, tuple);
 						}
 					}
 
-					region.originalWidth = int.Parse(tuple[0]);
-					region.originalHeight = int.Parse(tuple[1]);
+					region.originalWidth = int.Parse(tuple[0], CultureInfo.InvariantCulture);
+					region.originalHeight = int.Parse(tuple[1], CultureInfo.InvariantCulture);
 
 					ReadTuple(reader, tuple);
-					region.offsetX = int.Parse(tuple[0]);
-					region.offsetY = int.Parse(tuple[1]);
+					region.offsetX = int.Parse(tuple[0], CultureInfo.InvariantCulture);
+					region.offsetY = int.Parse(tuple[1], CultureInfo.InvariantCulture);
 
-					region.index = int.Parse(ReadValue(reader));
+					region.index = int.Parse(ReadValue(reader), CultureInfo.InvariantCulture);
 
 					regions.Add(region);
 				}
