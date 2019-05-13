@@ -111,7 +111,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 	Skeleton skeleton;
 	AnimationState state;
 	FileHandle skeletonFile;
-	long lastModified;
+	long skeletonModified, atlasModified;
 	float lastModifiedCheck, reloadTimer;
 	StringBuilder status = new StringBuilder();
 	Preferences prefs;
@@ -144,9 +144,26 @@ public class SkeletonViewer extends ApplicationAdapter {
 		ui.prefsLoaded = true;
 	}
 
+	FileHandle atlasFile (FileHandle skeletonFile) {
+		String atlasFileName = skeletonFile.nameWithoutExtension();
+		if (atlasFileName.endsWith(".json") || atlasFileName.endsWith(".skel"))
+			atlasFileName = atlasFileName.substring(0, atlasFileName.length() - 5);
+		FileHandle atlasFile = skeletonFile.sibling(atlasFileName + ".atlas");
+		if (!atlasFile.exists()) {
+			if (atlasFileName.endsWith("-pro") || atlasFileName.endsWith("-ess"))
+				atlasFileName = atlasFileName.substring(0, atlasFileName.length() - 4);
+			for (String suffix : atlasSuffixes) {
+				atlasFile = skeletonFile.sibling(atlasFileName + suffix);
+				if (atlasFile.exists()) break;
+			}
+		}
+		return atlasFile;
+	}
+
 	void loadSkeleton (final FileHandle skeletonFile) {
 		if (skeletonFile == null) return;
 
+		FileHandle atlasFile = atlasFile(skeletonFile);
 		try {
 			// Setup a texture atlas that uses a white image for images not found in the atlas.
 			Pixmap pixmap = new Pixmap(32, 32, Format.RGBA8888);
@@ -155,24 +172,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 			final AtlasRegion fake = new AtlasRegion(new Texture(pixmap), 0, 0, 32, 32);
 			pixmap.dispose();
 
-			String atlasFileName = skeletonFile.nameWithoutExtension();
-			if (atlasFileName.endsWith(".json") || atlasFileName.endsWith(".skel"))
-				atlasFileName = atlasFileName.substring(0, atlasFileName.length() - 5);
-			FileHandle atlasFile = skeletonFile.sibling(atlasFileName + ".atlas");
-			if (!atlasFile.exists()) {
-				if (atlasFileName.endsWith("-pro") || atlasFileName.endsWith("-ess"))
-					atlasFileName = atlasFileName.substring(0, atlasFileName.length() - 4);
-				for (String suffix : atlasSuffixes) {
-					atlasFile = skeletonFile.sibling(atlasFileName + suffix);
-					if (atlasFile.exists()) break;
-				}
-			}
-			TextureAtlasData data = !atlasFile.exists() ? null : new TextureAtlasData(atlasFile, atlasFile.parent(), false);
-
-			if (data != null) {
+			TextureAtlasData atlasData = null;
+			if (atlasFile.exists()) {
+				atlasData = new TextureAtlasData(atlasFile, atlasFile.parent(), false);
 				boolean linear = true;
-				for (int i = 0, n = data.getPages().size; i < n; i++) {
-					Page page = data.getPages().get(i);
+				for (int i = 0, n = atlasData.getPages().size; i < n; i++) {
+					Page page = atlasData.getPages().get(i);
 					if (page.minFilter != TextureFilter.Linear || page.magFilter != TextureFilter.Linear) {
 						linear = false;
 						break;
@@ -181,7 +186,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				ui.linearCheckbox.setChecked(linear);
 			}
 
-			atlas = new TextureAtlas(data) {
+			atlas = new TextureAtlas(atlasData) {
 				public AtlasRegion findRegion (String name) {
 					AtlasRegion region = super.findRegion(name);
 					if (region == null) {
@@ -232,10 +237,11 @@ public class SkeletonViewer extends ApplicationAdapter {
 		});
 
 		this.skeletonFile = skeletonFile;
+		skeletonModified = skeletonFile.lastModified();
+		atlasModified = atlasFile.lastModified();
+		lastModifiedCheck = checkModifiedInterval;
 		prefs.putString("lastFile", skeletonFile.path());
 		prefs.flush();
-		lastModified = skeletonFile.lastModified();
-		lastModifiedCheck = checkModifiedInterval;
 
 		// Populate UI.
 
@@ -306,7 +312,9 @@ public class SkeletonViewer extends ApplicationAdapter {
 				if (lastModifiedCheck < 0) {
 					lastModifiedCheck = checkModifiedInterval;
 					long time = skeletonFile.lastModified();
-					if (time != 0 && lastModified != time) reloadTimer = reloadDelay;
+					if (time != 0 && skeletonModified != time) reloadTimer = reloadDelay;
+					time = atlasFile(skeletonFile).lastModified();
+					if (time != 0 && atlasModified != time) reloadTimer = reloadDelay;
 				}
 			} else {
 				reloadTimer -= delta;
