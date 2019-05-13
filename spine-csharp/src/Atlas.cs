@@ -33,6 +33,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 
@@ -123,8 +124,8 @@ namespace Spine {
 					page.name = line;
 
 					if (ReadTuple(reader, tuple) == 2) { // size is only optional for an atlas packed with an old TexturePacker.
-						page.width = int.Parse(tuple[0]);
-						page.height = int.Parse(tuple[1]);
+						page.width = int.Parse(tuple[0], CultureInfo.InvariantCulture);
+						page.height = int.Parse(tuple[1], CultureInfo.InvariantCulture);
 						ReadTuple(reader, tuple);
 					}
 					page.format = (Format)Enum.Parse(typeof(Format), tuple[0], false);
@@ -162,12 +163,12 @@ namespace Spine {
 					region.rotate = region.degrees == 90;
 
 					ReadTuple(reader, tuple);
-					int x = int.Parse(tuple[0]);
-					int y = int.Parse(tuple[1]);
+					int x = int.Parse(tuple[0], CultureInfo.InvariantCulture);
+					int y = int.Parse(tuple[1], CultureInfo.InvariantCulture);
 
 					ReadTuple(reader, tuple);
-					int width = int.Parse(tuple[0]);
-					int height = int.Parse(tuple[1]);
+					int width = int.Parse(tuple[0], CultureInfo.InvariantCulture);
+					int height = int.Parse(tuple[1], CultureInfo.InvariantCulture);
 
 					region.u = x / (float)page.width;
 					region.v = y / (float)page.height;
@@ -184,25 +185,29 @@ namespace Spine {
 					region.height = Math.Abs(height);
 
 					if (ReadTuple(reader, tuple) == 4) { // split is optional
-						region.splits = new [] {int.Parse(tuple[0]), int.Parse(tuple[1]),
-								int.Parse(tuple[2]), int.Parse(tuple[3])};
+						region.splits = new [] {int.Parse(tuple[0], CultureInfo.InvariantCulture),
+												int.Parse(tuple[1], CultureInfo.InvariantCulture),
+												int.Parse(tuple[2], CultureInfo.InvariantCulture),
+												int.Parse(tuple[3], CultureInfo.InvariantCulture)};
 
 						if (ReadTuple(reader, tuple) == 4) { // pad is optional, but only present with splits
-							region.pads = new [] {int.Parse(tuple[0]), int.Parse(tuple[1]),
-									int.Parse(tuple[2]), int.Parse(tuple[3])};
+							region.pads = new [] {int.Parse(tuple[0], CultureInfo.InvariantCulture),
+												int.Parse(tuple[1], CultureInfo.InvariantCulture),
+												int.Parse(tuple[2], CultureInfo.InvariantCulture),
+												int.Parse(tuple[3], CultureInfo.InvariantCulture)};
 
 							ReadTuple(reader, tuple);
 						}
 					}
 
-					region.originalWidth = int.Parse(tuple[0]);
-					region.originalHeight = int.Parse(tuple[1]);
+					region.originalWidth = int.Parse(tuple[0], CultureInfo.InvariantCulture);
+					region.originalHeight = int.Parse(tuple[1], CultureInfo.InvariantCulture);
 
 					ReadTuple(reader, tuple);
-					region.offsetX = int.Parse(tuple[0]);
-					region.offsetY = int.Parse(tuple[1]);
+					region.offsetX = int.Parse(tuple[0], CultureInfo.InvariantCulture);
+					region.offsetY = int.Parse(tuple[1], CultureInfo.InvariantCulture);
 
-					region.index = int.Parse(ReadValue(reader));
+					region.index = int.Parse(ReadValue(reader), CultureInfo.InvariantCulture);
 
 					regions.Add(region);
 				}
