@@ -215,7 +215,8 @@ public class Skeleton {
 	}
 
 	private void sortIkConstraint (IkConstraint constraint) {
-		constraint.active = !constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true));
+		constraint.active = constraint.target.active
+			&& (!constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true)));
 		if (!constraint.active) return;
 
 		Bone target = constraint.target;
@@ -237,7 +238,8 @@ public class Skeleton {
 	}
 
 	private void sortPathConstraint (PathConstraint constraint) {
-		constraint.active = !constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true));
+		constraint.active = constraint.target.bone.active
+			&& (!constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true)));
 		if (!constraint.active) return;
 
 		Slot slot = constraint.target;
@@ -264,7 +266,8 @@ public class Skeleton {
 	}
 
 	private void sortTransformConstraint (TransformConstraint constraint) {
-		constraint.active = !constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true));
+		constraint.active = constraint.target.active
+			&& (!constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true)));
 		if (!constraint.active) return;
 
 		sortBone(constraint.target);
