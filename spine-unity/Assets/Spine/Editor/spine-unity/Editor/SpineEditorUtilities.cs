@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 #pragma warning disable 0219
+#pragma warning disable 0618 // for 3.7 branch only. Avoids "PreferenceItem' is obsolete: '[PreferenceItem] is deprecated. Use [SettingsProvider] instead."
 
 // Original contribution by: Mitch Thompson
 
