@@ -707,6 +707,7 @@ public class Animation {
 			MixDirection direction) {
 
 			Slot slot = skeleton.slots.get(slotIndex);
+			if (!slot.bone.active) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -805,6 +806,7 @@ public class Animation {
 			MixDirection direction) {
 
 			Slot slot = skeleton.slots.get(slotIndex);
+			if (!slot.bone.active) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -918,6 +920,7 @@ public class Animation {
 			MixDirection direction) {
 
 			Slot slot = skeleton.slots.get(slotIndex);
+			if (!slot.bone.active) return;
 			if (direction == out && blend == setup) {
 				String attachmentName = slot.data.attachmentName;
 				slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slotIndex, attachmentName));
@@ -1001,6 +1004,7 @@ public class Animation {
 			MixDirection direction) {
 
 			Slot slot = skeleton.slots.get(slotIndex);
+			if (!slot.bone.active) return;
 			Attachment slotAttachment = slot.attachment;
 			if (!(slotAttachment instanceof VertexAttachment) || !((VertexAttachment)slotAttachment).applyDeform(attachment)) return;
 
@@ -1363,6 +1367,7 @@ public class Animation {
 			MixDirection direction) {
 
 			IkConstraint constraint = skeleton.ikConstraints.get(ikConstraintIndex);
+			if (!constraint.active) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -1479,6 +1484,7 @@ public class Animation {
 			MixDirection direction) {
 
 			TransformConstraint constraint = skeleton.transformConstraints.get(transformConstraintIndex);
+			if (!constraint.active) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				TransformConstraintData data = constraint.data;
@@ -1581,6 +1587,7 @@ public class Animation {
 			MixDirection direction) {
 
 			PathConstraint constraint = skeleton.pathConstraints.get(pathConstraintIndex);
+			if (!constraint.active) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -1627,6 +1634,7 @@ public class Animation {
 			MixDirection direction) {
 
 			PathConstraint constraint = skeleton.pathConstraints.get(pathConstraintIndex);
+			if (!constraint.active) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -1706,6 +1714,7 @@ public class Animation {
 			MixDirection direction) {
 
 			PathConstraint constraint = skeleton.pathConstraints.get(pathConstraintIndex);
+			if (!constraint.active) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
