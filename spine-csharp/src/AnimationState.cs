@@ -299,7 +299,10 @@ namespace Spine {
 					float alpha;
 					switch (timelineMode[i] & AnimationState.NotLast - 1) {
 						case AnimationState.Subsequent:
-							if (!attachments && timeline is AttachmentTimeline) continue;
+							if (!attachments && timeline is AttachmentTimeline) {
+								if ((timelineMode[i] & AnimationState.NotLast) == AnimationState.NotLast) continue;
+								blend = MixBlend.setup;
+							}
 							if (!drawOrder && timeline is DrawOrderTimeline) continue;
 							timelineBlend = blend;
 							alpha = alphaMix;
