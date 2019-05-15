@@ -166,4 +166,22 @@ function utils.randomTriangularWith(min, max, mode)
 	return max - math_sqrt((1 - u) * d * (max - mode))
 end
 
+function utils.testBit(value, bit)
+  return value % (2 * bit) >= bit
+end
+
+function utils.setBit(value, bit)
+  if value % (2 * bit) >= bit then
+    return value
+  end
+  return value + bit
+end
+
+function utils.clearBit(value, bit)
+  if value % (2 * bit) >= bit then
+    return value - bit
+  end
+  return value
+end
+
 return utils
