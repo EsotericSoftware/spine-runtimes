@@ -826,8 +826,8 @@ function Animation.DeformTimeline.new (frameCount)
 		if not slotAttachment:applyDeform(self.attachment) then return end
 
 		local frames = self.frames
-		local verticesArray = slot.attachmentVertices
-    if #(verticesArray) == 0 then blend = MixBlend.setup end
+		local deformArray = slot.deform
+    if #(deformArray) == 0 then blend = MixBlend.setup end
 
 		local frameVertices = self.frameVertices
 		local vertexCount = #(frameVertices[0])		
@@ -835,27 +835,27 @@ function Animation.DeformTimeline.new (frameCount)
 		if time < frames[0] then
 			local vertexAttachment = slotAttachment;
 			if blend == MixBlend.setup then
-        slot.attachmentVertices = {}
+        slot.deform = {}
         return;
 			elseif blend == MixBlend.first then
         if (alpha == 1) then
-          slot.attachmentVertices = {}
+          slot.deform = {}
           return;
         end
 
-        local vertices = utils.setArraySize(verticesArray, vertexCount)
+        local deform = utils.setArraySize(deformArray, vertexCount)
         if (vertexAttachment.bones == nil) then
           local setupVertices = vertexAttachment.vertices
           local i = 1
           while i <= vertexCount do
-            vertices[i] = vertices[i] + (setupVertices[i] - vertices[i]) * alpha
+            deform[i] = deform[i] + (setupVertices[i] - deform[i]) * alpha
             i = i + 1
           end
         else
           alpha = 1 - alpha
           local i = 1
           while i <= vertexCount do
-            vertices[i] = vertices[i] * alpha
+            deform[i] = deform[i] * alpha
             i = i + 1
           end
         end
@@ -863,7 +863,7 @@ function Animation.DeformTimeline.new (frameCount)
 			return
 		end
 
-    local vertices = utils.setArraySize(verticesArray, vertexCount)
+    local deform = utils.setArraySize(deformArray, vertexCount)
 		if time >= frames[zlen(frames) - 1] then -- Time is after last frame.
 			local lastVertices = frameVertices[zlen(frames) - 1]
 			if alpha == 1 then
@@ -874,21 +874,21 @@ function Animation.DeformTimeline.new (frameCount)
 						local setupVertices = vertexAttachment.vertices
 						local i = 1
 						while i <= vertexCount do
-							vertices[i] = vertices[i] + lastVertices[i] - setupVertices[i]
+							deform[i] = deform[i] + lastVertices[i] - setupVertices[i]
 							i = i + 1
 						end
 					else
 						-- Weighted deform offsets, with alpha.
 						local i = 1
 						while i <= vertexCount do
-							vertices[i] = vertices[i] + lastVertices[i]
+							deform[i] = deform[i] + lastVertices[i]
 							i = i + 1
 						end
 					end
 				else
 					local i = 1
 					while i <= vertexCount do
-						vertices[i] = lastVertices[i]
+						deform[i] = lastVertices[i]
 						i = i + 1
 					end
 				end
@@ -901,21 +901,21 @@ function Animation.DeformTimeline.new (frameCount)
 						local i = 1
 						while i <= vertexCount do
 							local setup = setupVertices[i]
-							vertices[i] = setup + (lastVertices[i] - setup) * alpha
+							deform[i] = setup + (lastVertices[i] - setup) * alpha
 							i = i + 1
 						end
 					else
 						-- Weighted deform offsets, with alpha.
 						local i = 1
 						while i <= vertexCount do
-							vertices[i] = lastVertices[i] * alpha
+							deform[i] = lastVertices[i] * alpha
 							i = i + 1
 						end
 					end
 				elseif blend == MixBlend.first or blend == MixBlend.replace then
 					local i = 1
 					while i <= vertexCount do
-						vertices[i] = vertices[i] + (lastVertices[i] - vertices[i]) * alpha
+						deform[i] = deform[i] + (lastVertices[i] - deform[i]) * alpha
 						i = i + 1
 					end
 					local vertexAttachment = slotAttachment
@@ -923,14 +923,14 @@ function Animation.DeformTimeline.new (frameCount)
 						local setupVertices = vertexAttachment.vertices
 						local i = 1
 						while i <= vertexCount do
-							vertices[i] = vertices[i] + (lastVertices[i] - setupVertices[i]) * alpha
+							deform[i] = deform[i] + (lastVertices[i] - setupVertices[i]) * alpha
 							i = i + 1
 						end
 					else
 						-- Weighted deform offsets, with alpha.
 						local i = 1
 						while i <= vertexCount do
-							vertices[i] = vertices[i] + lastVertices[i] * alpha
+							deform[i] = deform[i] + lastVertices[i] * alpha
 							i = i + 1
 						end
 					end
@@ -940,14 +940,14 @@ function Animation.DeformTimeline.new (frameCount)
 						local setupVertices = vertexAttachment.vertices
 						local i = 1
 						while i <= vertexCount do
-							vertices[i] = vertices[i] + (lastVertices[i] - setupVertices[i]) * alpha
+							deform[i] = deform[i] + (lastVertices[i] - setupVertices[i]) * alpha
 							i = i + 1
 						end
 					else
 						-- Weighted deform offsets, with alpha.
 						local i = 1
 						while i <= vertexCount do
-							vertices[i] = vertices[i] + lastVertices[i] * alpha
+							deform[i] = deform[i] + lastVertices[i] * alpha
 							i = i + 1
 						end
 					end
@@ -972,7 +972,7 @@ function Animation.DeformTimeline.new (frameCount)
 					local i = 1
 					while i <= vertexCount do
 						local prev = prevVertices[i]
-						vertices[i] = vertices[i] + prev + (nextVertices[i] - prev) * precent - setupVertices[i]
+						deform[i] = deform[i] + prev + (nextVertices[i] - prev) * precent - setupVertices[i]
 						i = i + 1
 					end
 				else
@@ -980,7 +980,7 @@ function Animation.DeformTimeline.new (frameCount)
 					local i = 1
 					while i <= vertexCount do
 						local prev = prevVertices[i]
-						vertices[i] = vertices[i] + prev + (nextVertices[i] - prev) * percent
+						deform[i] = deform[i] + prev + (nextVertices[i] - prev) * percent
 						i = i + 1
 					end
 				end
@@ -988,7 +988,7 @@ function Animation.DeformTimeline.new (frameCount)
 				local i = 1
 				while i <= vertexCount do
 					local prev = prevVertices[i]
-					vertices[i] = prev + (nextVertices[i] - prev) * percent
+					deform[i] = prev + (nextVertices[i] - prev) * percent
 					i = i + 1
 				end
 			end
@@ -1002,7 +1002,7 @@ function Animation.DeformTimeline.new (frameCount)
 					while i <= vertexCount do
 						local prev = prevVertices[i]
 						local setup = setupVertices[i]
-						vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha
+						deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha
 						i = i + 1
 					end
 				else
@@ -1010,7 +1010,7 @@ function Animation.DeformTimeline.new (frameCount)
 					local i = 1
 					while i <= vertexCount do
 						local prev = prevVertices[i]
-						vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha
+						deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha
 						i = i + 1
 					end
 				end
@@ -1018,7 +1018,7 @@ function Animation.DeformTimeline.new (frameCount)
 				local i = 1
 				while i <= vertexCount do
 					local prev = prevVertices[i]
-					vertices[i] = vertices[i] + (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha
+					deform[i] = deform[i] + (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha
 					i = i + 1
 				end
 			elseif blend == MixBlend.add then
@@ -1028,7 +1028,7 @@ function Animation.DeformTimeline.new (frameCount)
 					local i = 1
 					while i <= vertexCount do
 						local prev = prevVertices[i]
-						vertices[i] = vertices[i] + (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha
+						deform[i] = deform[i] + (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha
 						i = i + 1
 					end
 				else
@@ -1036,7 +1036,7 @@ function Animation.DeformTimeline.new (frameCount)
 					local i = 1
 					while i <= vertexCount do
 						local prev = prevVertices[i]
-						vertices[i] = vertices[i] + (prev + (nextVertices[i] - prev) * percent) * alpha
+						deform[i] = deform[i] + (prev + (nextVertices[i] - prev) * percent) * alpha
 						i = i + 1
 					end
 				end

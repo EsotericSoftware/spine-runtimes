@@ -816,7 +816,7 @@ function AnimationState:_animationsChanged ()
 	local highestIndex = -1
 	for i, entry in pairs(self.tracks) do
 		if i > highestIndex then highestIndex = i end
-		
+
 		if entry then
 			while entry.mixingFrom do
 				entry = entry.mixingFrom
@@ -830,7 +830,7 @@ function AnimationState:_animationsChanged ()
 			until (entry == nil)
 		end
 	end
-	
+
 	self.propertyIDs = {}
 	for i = highestIndex, 0, -1 do
 		entry = self.tracks[i]
@@ -846,7 +846,7 @@ function AnimationState:computeNotLast(entry)
 	local timelinesCount = #entry.animation.timelines
 	local timelineMode = entry.timelineMode
 	local propertyIDs = self.propertyIDs
-	
+ 
 	local i = 1
 	while i <= timelinesCount do
 		local timeline = timelines[i]
