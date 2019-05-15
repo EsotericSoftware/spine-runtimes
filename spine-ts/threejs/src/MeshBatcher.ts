@@ -98,11 +98,11 @@ module spine.threejs {
 		}
 
 		end () {
-			this.vertexBuffer.needsUpdate = true;
+			this.vertexBuffer.needsUpdate = this.verticesLength > 0;
 			this.vertexBuffer.updateRange.offset = 0;
 			this.vertexBuffer.updateRange.count = this.verticesLength;
 			let geo = (<THREE.BufferGeometry>this.geometry);
-			geo.getIndex().needsUpdate = true;
+			geo.getIndex().needsUpdate = this.indicesLength > 0;
 			geo.getIndex().updateRange.offset = 0;
 			geo.getIndex().updateRange.count = this.indicesLength;
 			geo.drawRange.start = 0;
