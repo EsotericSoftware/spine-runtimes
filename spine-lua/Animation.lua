@@ -278,7 +278,7 @@ function Animation.RotateTimeline.new (frameCount)
 				r = r - (16384 - math_floor(16384.499999999996 - r / 360)) * 360 -- Wrap within -180 and 180.
 				bone.rotation = bone.rotation + r * alpha;
 			elseif blend == MixBlend.add then
-				bone.rotation = bone.rotation + r * alpha;				
+				bone.rotation = bone.rotation + r * alpha;
 			end
 			return;
 		end
@@ -318,7 +318,7 @@ function Animation.TranslateTimeline.new (frameCount)
 	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.boneIndex = -1
 	self.type = TimelineType.translate
-	
+
 	function self:getPropertyId ()
 		return TimelineType.translate * SHL_24 + self.boneIndex
 	end
@@ -334,7 +334,7 @@ function Animation.TranslateTimeline.new (frameCount)
 		local frames = self.frames
 
 		local bone = skeleton.bones[self.boneIndex]
-		if time < frames[0] then 
+		if time < frames[0] then
 			if blend == MixBlend.setup then
 				bone.x = bone.data.x
 				bone.y = bone.data.y
@@ -389,7 +389,7 @@ function Animation.ScaleTimeline.new (frameCount)
 
 	local self = Animation.TranslateTimeline.new(frameCount)
 	self.type = TimelineType.scale
-	
+
 	function self:getPropertyId ()
 		return TimelineType.scale * SHL_24 + self.boneIndex
 	end
@@ -437,7 +437,7 @@ function Animation.ScaleTimeline.new (frameCount)
 		else
 			local bx = 0
 			local by = 0
-			if direction == MixDirection.out then 
+			if direction == MixDirection.out then
 				if blend == MixBlend.setup then
 					bx = bone.data.scaleX
 					by = bone.data.scaleY
@@ -490,7 +490,7 @@ function Animation.ShearTimeline.new (frameCount)
 
 	local self = Animation.TranslateTimeline.new(frameCount)
 	self.type = TimelineType.shear
-	
+
 	function self:getPropertyId ()
 		return TimelineType.shear * SHL_24 + self.boneIndex
 	end
@@ -560,7 +560,7 @@ function Animation.ColorTimeline.new (frameCount)
 	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.slotIndex = -1
 	self.type = TimelineType.color
-	
+
 	function self:getPropertyId ()
 		return TimelineType.color * SHL_24 + self.slotIndex
 	end
@@ -577,7 +577,7 @@ function Animation.ColorTimeline.new (frameCount)
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local frames = self.frames
 		local slot = skeleton.slots[self.slotIndex]
-		if time < frames[0] then 
+		if time < frames[0] then
 			if blend == MixBlend.setup then
 				slot.color:setFrom(slot.data.color)
 			elseif blend == MixBlend.first then
@@ -648,7 +648,7 @@ function Animation.TwoColorTimeline.new (frameCount)
 	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.slotIndex = -1
 	self.type = TimelineType.twoColor
-	
+
 	function self:getPropertyId ()
 		return TimelineType.twoColor * SHL_24 + self.slotIndex
 	end
@@ -668,7 +668,7 @@ function Animation.TwoColorTimeline.new (frameCount)
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local frames = self.frames
 		local slot = skeleton.slots[self.slotIndex]
-		if time < frames[0] then 
+		if time < frames[0] then
 			if blend == MixBlend.setup then
 				slot.color:setFrom(slot.data.color)
 				slot.darkColor:setFrom(slot.data.darkColor)
@@ -722,7 +722,7 @@ function Animation.TwoColorTimeline.new (frameCount)
 		else
 			local light = slot.color
 			local dark = slot.darkColor
-			if blend == MixBlend.setup then 
+			if blend == MixBlend.setup then
 				light:setFrom(slot.data.color)
 				dark:setFrom(slot.data.darkColor)
 			end
@@ -751,7 +751,7 @@ function Animation.AttachmentTimeline.new (frameCount)
 		self.frames[frameIndex] = time
 		self.attachmentNames[frameIndex] = attachmentName
 	end
-	
+
 	function self:getPropertyId ()
 		return TimelineType.attachment * SHL_24 + self.slotIndex
 	end
@@ -768,9 +768,9 @@ function Animation.AttachmentTimeline.new (frameCount)
 			end
 			return;
 		end
-		
+
 		local frames = self.frames
-		if time < frames[0] then 
+		if time < frames[0] then
 			if blend == MixBlend.setup or blend == MixBlend.first then
 				attachmentName = slot.data.attachmentName
 				if not attachmentName then
@@ -830,8 +830,8 @@ function Animation.DeformTimeline.new (frameCount)
     if #(verticesArray) == 0 then blend = MixBlend.setup end
 
 		local frameVertices = self.frameVertices
-		local vertexCount = #(frameVertices[0])		
-		
+		local vertexCount = #(frameVertices[0])
+
 		if time < frames[0] then
 			local vertexAttachment = slotAttachment;
 			if blend == MixBlend.setup then
@@ -1054,7 +1054,7 @@ function Animation.EventTimeline.new (frameCount)
 		events = {},
 		type = TimelineType.event
 	}
-	
+
 	function self:getPropertyId ()
 		return TimelineType.event * SHL_24
 	end
@@ -1111,7 +1111,7 @@ function Animation.DrawOrderTimeline.new (frameCount)
 		drawOrders = {},
 		type = TimelineType.drawOrder
 	}
-	
+
 	function self:getPropertyId ()
 		return TimelineType.drawOrder * SHL_24
 	end
@@ -1134,9 +1134,9 @@ function Animation.DrawOrderTimeline.new (frameCount)
 			end
 			return;
 		end
-		
+
 		local frames = self.frames
-		if time < frames[0] then 
+		if time < frames[0] then
 			if blend == MixBlend.setup or blend == MixBlend.first then
 				for i,slot in ipairs(slots) do
 					drawOrder[i] = slots[i]
@@ -1179,13 +1179,13 @@ function Animation.IkConstraintTimeline.new (frameCount)
 	local MIX = 1
 	local BEND_DIRECTION = 2
 	local COMPRESS = 3
-	local STRETCH = 1
+	local STRETCH = 4
 
 	local self = Animation.CurveTimeline.new(frameCount)
 	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES) -- time, mix, bendDirection, compress, stretch, ...
 	self.ikConstraintIndex = -1
 	self.type = TimelineType.ikConstraint
-	
+
 	function self:getPropertyId ()
 		return TimelineType.ikConstraint * SHL_24 + self.ikConstraintIndex
 	end
@@ -1229,7 +1229,7 @@ function Animation.IkConstraintTimeline.new (frameCount)
 		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
 			if blend == MixBlend.setup then
 				constraint.mix = constraint.data.mix + (frames[zlen(frames) + PREV_MIX] - constraint.data.mix) * alpha
-				if direction == MixDirection.out then 
+				if direction == MixDirection.out then
 					constraint.bendDirection = constraint.data.bendDirection
 					constraint.compress = constraint.data.compress
 					constraint.stretch = constraint.data.stretch
@@ -1240,7 +1240,7 @@ function Animation.IkConstraintTimeline.new (frameCount)
 				end
 			else
 				constraint.mix = constraint.mix + (frames[zlen(frames) + PREV_MIX] - constraint.mix) * alpha;
-				if direction == MixDirection._in then 
+				if direction == MixDirection._in then
 					constraint.bendDirection = math_floor(frames[zlen(frames) + PREV_BEND_DIRECTION])
 					if (math_floor(frames[zlen(frames) + PREV_COMPRESS]) == 1) then constraint.compress = true else constraint.compress = false end
 					if (math_floor(frames[zlen(frames) + PREV_STRETCH]) == 1) then constraint.stretch = true else constraint.stretch = false end
@@ -1269,7 +1269,7 @@ function Animation.IkConstraintTimeline.new (frameCount)
 			end
 		else
 			constraint.mix = constraint.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
-			if direction == MixDirection._in then 
+			if direction == MixDirection._in then
 				constraint.bendDirection = math_floor(frames[frame + PREV_BEND_DIRECTION])
 				if (math_floor(frames[frame + PREV_COMPRESS]) == 1) then constraint.compress = true else constraint.compress = false end
 				if (math_floor(frames[frame + PREV_STRETCH]) == 1) then constraint.stretch = true else constraint.stretch = false end
@@ -1298,7 +1298,7 @@ function Animation.TransformConstraintTimeline.new (frameCount)
 	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.transformConstraintIndex = -1
 	self.type = TimelineType.transformConstraint
-	
+
 	function self:getPropertyId ()
 		return TimelineType.transformConstraint * SHL_24 + self.transformConstraintIndex
 	end
@@ -1404,7 +1404,7 @@ function Animation.PathConstraintPositionTimeline.new (frameCount)
 		local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
 		if (time < frames[0]) then
 			if blend == MixBlend.setup then
-				constraint.position = constraint.data.position	
+				constraint.position = constraint.data.position
 			elseif blend == MixBlend.first then
 				constraint.position = constraint.position + (constraint.data.position - constraint.position) * alpha
 			end
@@ -1508,7 +1508,7 @@ function Animation.PathConstraintMixTimeline.new (frameCount)
 	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.pathConstraintIndex = -1
 	self.type = TimelineType.pathConstraintMix
-	
+
 	function self:getPropertyId ()
 		return TimelineType.pathConstraintMix * SHL_24 + self.pathConstraintIndex
 	end
