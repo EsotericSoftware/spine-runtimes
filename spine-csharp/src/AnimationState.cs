@@ -301,7 +301,7 @@ namespace Spine {
 						case AnimationState.Subsequent:
 							if (!attachments && timeline is AttachmentTimeline) {
 								if ((timelineMode[i] & AnimationState.NotLast) == AnimationState.NotLast) continue;
-								blend = MixBlend.setup;
+								blend = MixBlend.Setup;
 							}
 							if (!drawOrder && timeline is DrawOrderTimeline) continue;
 							timelineBlend = blend;
