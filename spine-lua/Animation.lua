@@ -1179,7 +1179,7 @@ function Animation.IkConstraintTimeline.new (frameCount)
 	local MIX = 1
 	local BEND_DIRECTION = 2
 	local COMPRESS = 3
-	local STRETCH = 1
+	local STRETCH = 4
 
 	local self = Animation.CurveTimeline.new(frameCount)
 	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES) -- time, mix, bendDirection, compress, stretch, ...
