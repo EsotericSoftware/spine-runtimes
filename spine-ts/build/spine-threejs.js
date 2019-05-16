@@ -1475,8 +1475,11 @@ var spine;
 					var alpha = 0;
 					switch (timelineMode[i] & (AnimationState.NOT_LAST - 1)) {
 						case AnimationState.SUBSEQUENT:
-							if (!attachments && timeline instanceof spine.AttachmentTimeline)
-								continue;
+							if (!attachments && timeline instanceof spine.AttachmentTimeline) {
+								if ((timelineMode[i] & AnimationState.NOT_LAST) == AnimationState.NOT_LAST)
+									continue;
+								blend = spine.MixBlend.setup;
+							}
 							if (!drawOrder && timeline instanceof spine.DrawOrderTimeline)
 								continue;
 							timelineBlend = blend;
@@ -7205,11 +7208,11 @@ var spine;
 				this.indicesLength += indicesLength;
 			};
 			MeshBatcher.prototype.end = function () {
-				this.vertexBuffer.needsUpdate = true;
+				this.vertexBuffer.needsUpdate = this.verticesLength > 0;
 				this.vertexBuffer.updateRange.offset = 0;
 				this.vertexBuffer.updateRange.count = this.verticesLength;
 				var geo = this.geometry;
-				geo.getIndex().needsUpdate = true;
+				geo.getIndex().needsUpdate = this.indicesLength > 0;
 				geo.getIndex().updateRange.offset = 0;
 				geo.getIndex().updateRange.count = this.indicesLength;
 				geo.drawRange.start = 0;

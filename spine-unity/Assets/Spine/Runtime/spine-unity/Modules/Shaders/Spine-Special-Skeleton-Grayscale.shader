@@ -91,19 +91,20 @@ Shader "Spine/Special/Skeleton Grayscale" {
 
 			struct VertexOutput { 
 				V2F_SHADOW_CASTER;
-				float2 uv : TEXCOORD1;
+				float4 uvAndAlpha : TEXCOORD1;
 			};
 
-			VertexOutput vert (appdata_base v) {
+			VertexOutput vert (appdata_base v, float4 vertexColor : COLOR) {
 				VertexOutput o;
-				o.uv = v.texcoord;
+				o.uvAndAlpha = v.texcoord;
+				o.uvAndAlpha.a = vertexColor.a;
 				TRANSFER_SHADOW_CASTER(o)
 				return o;
 			}
 
 			float4 frag (VertexOutput i) : COLOR {
-				fixed4 texcol = tex2D(_MainTex, i.uv);
-				clip(texcol.a - _Cutoff);
+				fixed4 texcol = tex2D(_MainTex, i.uvAndAlpha.xy);
+				clip(texcol.a * i.uvAndAlpha.a - _Cutoff);
 				SHADOW_CASTER_FRAGMENT(i)
 			}
 			ENDCG

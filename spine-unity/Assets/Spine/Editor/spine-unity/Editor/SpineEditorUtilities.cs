@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 #pragma warning disable 0219
+#pragma warning disable 0618 // for 3.7 branch only. Avoids "PreferenceItem' is obsolete: '[PreferenceItem] is deprecated. Use [SettingsProvider] instead."
 
 // Original contribution by: Mitch Thompson
 
@@ -60,6 +61,7 @@ using System.IO;
 using System.Text;
 using System.Linq;
 using System.Reflection;
+using System.Globalization;
 
 namespace Spine.Unity.Editor {
 	using EventType = UnityEngine.EventType;
@@ -1254,10 +1256,10 @@ namespace Spine.Unity.Editor {
 						string[] versionSplit = rawVersion.Split('.');
 						bool match = false;
 						foreach (var version in compatibleVersions) {
-							bool primaryMatch = version[0] == int.Parse(versionSplit[0]);
-							bool secondaryMatch = version[1] == int.Parse(versionSplit[1]);
+							bool primaryMatch = version[0] == int.Parse(versionSplit[0], CultureInfo.InvariantCulture);
+							bool secondaryMatch = version[1] == int.Parse(versionSplit[1], CultureInfo.InvariantCulture);
 
-							// if (isFixVersionRequired) secondaryMatch &= version[2] <= int.Parse(jsonVersionSplit[2]);
+							// if (isFixVersionRequired) secondaryMatch &= version[2] <= int.Parse(jsonVersionSplit[2], CultureInfo.InvariantCulture);
 
 							if (primaryMatch && secondaryMatch) {
 								match = true;

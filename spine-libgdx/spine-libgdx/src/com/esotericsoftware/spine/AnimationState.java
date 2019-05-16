@@ -293,7 +293,10 @@ public class AnimationState {
 				float alpha;
 				switch (timelineMode[i] & NOT_LAST - 1) {
 				case SUBSEQUENT:
-					if (!attachments && timeline instanceof AttachmentTimeline) continue;
+					if (!attachments && timeline instanceof AttachmentTimeline) {
+						if ((timelineMode[i] & NOT_LAST) == NOT_LAST) continue;
+						blend = MixBlend.setup;
+					}
 					if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
 					timelineBlend = blend;
 					alpha = alphaMix;
