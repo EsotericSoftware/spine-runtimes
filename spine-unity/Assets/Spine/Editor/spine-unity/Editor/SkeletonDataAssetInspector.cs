@@ -498,15 +498,25 @@ namespace Spine.Unity.Editor {
 
 						using (new SpineInspectorUtility.IndentScope()) {
 							{
-								skin.FindNamesForSlot(i, slotAttachmentNames);
-								skin.FindAttachmentsForSlot(i, slotAttachments);
+								var entries = skin.GetEntries(i);
+								foreach (var entry in entries) {
+									slotAttachments.Add(entry.Attachment);
+									slotAttachmentNames.Add(entry.Name);
+								}
 
 								if (skin != defaultSkin) {
-									defaultSkin.FindNamesForSlot(i, defaultSkinAttachmentNames);
-									defaultSkin.FindNamesForSlot(i, slotAttachmentNames);
-									defaultSkin.FindAttachmentsForSlot(i, slotAttachments);
+									entries = defaultSkin.GetEntries(i);
+									foreach (var entry in entries) {
+										slotAttachments.Add(entry.Attachment);
+										slotAttachmentNames.Add(entry.Name);
+										defaultSkinAttachmentNames.Add(entry.Name);
+									}
+
 								} else {
-									defaultSkin.FindNamesForSlot(i, defaultSkinAttachmentNames);
+									entries = defaultSkin.GetEntries(i);
+									foreach (var entry in entries) {
+										defaultSkinAttachmentNames.Add(entry.Name);
+									}
 								}
 							}
 

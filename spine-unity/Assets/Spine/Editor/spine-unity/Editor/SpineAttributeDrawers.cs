@@ -184,8 +184,12 @@ namespace Spine.Unity.Editor {
 					if (targetAttribute.containsBoundingBoxes) {
 						int slotIndex = i;
 						var attachments = new List<Attachment>();
-						foreach (var skin in data.Skins)
-							skin.FindAttachmentsForSlot(slotIndex, attachments);
+						foreach (var skin in data.Skins) {
+							var entries = skin.GetEntries(slotIndex);
+							foreach (var entry in entries) {
+								attachments.Add(entry.Attachment);
+							}
+						}
 
 						bool hasBoundingBox = false;
 						foreach (var attachment in attachments) {
@@ -470,10 +474,19 @@ namespace Spine.Unity.Editor {
 					attachmentNames.Clear();
 					placeholderNames.Clear();
 
-					skin.FindNamesForSlot(i, attachmentNames);
+					var entries = skin.GetEntries(i);
+					foreach (var entry in entries) {
+						attachmentNames.Add(entry.Name);
+					}
+
 					if (skin != defaultSkin) {
-						defaultSkin.FindNamesForSlot(i, attachmentNames);
-						skin.FindNamesForSlot(i, placeholderNames);
+						foreach (var entry in entries) {
+							placeholderNames.Add(entry.Name);
+						}
+						entries = defaultSkin.GetEntries(i);
+						foreach (var entry in entries) {
+							attachmentNames.Add(entry.Name);
+						}
 					}
 
 					for (int a = 0; a < attachmentNames.Count; a++) {

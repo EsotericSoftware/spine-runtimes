@@ -32,7 +32,7 @@ using System;
 namespace Spine {
 	/// <summary>>An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
 	/// <see cref="Slot.Deform"/>.</summary> 
-	public class VertexAttachment : Attachment {
+	public abstract class VertexAttachment : Attachment {
 		static int nextID = 0;
 		static readonly Object nextIdLock = new Object();
 
@@ -131,6 +131,26 @@ namespace Spine {
 		/// <summary>Returns true if a deform originally applied to the specified attachment should be applied to this attachment.</summary>
 		virtual public bool ApplyDeform (VertexAttachment sourceAttachment) {
 			return this == sourceAttachment;
-		}			
+		}
+
+		///<summary>Internal method used by VertexAttachment subclasses to copy basic data. Does not copy id (generated) and name (set on
+		/// construction).</summary>
+		internal void CopyTo (VertexAttachment attachment) {
+			if (bones != null) {
+				attachment.bones = new int[bones.Length];
+				Array.Copy(bones, 0, attachment.bones, 0, bones.Length);
+			}
+			else
+				attachment.bones = null;
+			
+			if (vertices != null) {
+				attachment.vertices = new float[vertices.Length];
+				Array.Copy(vertices, 0, attachment.vertices, 0, vertices.Length);
+			}
+			else
+				attachment.vertices = null;
+			
+			attachment.worldVerticesLength = worldVerticesLength;
+		}
 	}
 }

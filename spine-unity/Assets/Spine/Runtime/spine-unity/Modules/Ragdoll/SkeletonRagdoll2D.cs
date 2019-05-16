@@ -363,7 +363,9 @@ namespace Spine.Unity.Modules {
 			var attachments = new List<Attachment>();
 			foreach (Slot slot in skeleton.Slots) {
 				if (slot.bone == b) {
-					skin.FindAttachmentsForSlot(skeleton.Slots.IndexOf(slot), attachments);
+					var entries = skin.GetEntries(skeleton.Slots.IndexOf(slot));
+					foreach (var entry in entries)
+						attachments.Add(entry.Attachment);
 
 					bool bbAttachmentAdded = false;
 					foreach (var a in attachments) {

@@ -321,7 +321,7 @@ namespace Spine {
 				for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++) {
 					String name = ReadString(input);
 					Attachment attachment = ReadAttachment(input, skeletonData, skin, slotIndex, name, nonessential);
-					if (attachment != null) skin.AddAttachment(slotIndex, name, attachment);
+					if (attachment != null) skin.SetAttachment(slotIndex, name, attachment);
 				}
 			}
 			return skin;

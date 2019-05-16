@@ -114,7 +114,7 @@ namespace Spine.Unity.Editor {
 				var attachment = skinEntry.Value as PointAttachment;
 				if (attachment != null) {
 					var skinKey = skinEntry.Key;
-					var slot = skeleton.Slots.Items[skinKey.slotIndex];
+					var slot = skeleton.Slots.Items[skinKey.SlotIndex];
 					DrawPointAttachmentWithLabel(attachment, slot.Bone, transform);
 				}
 			}

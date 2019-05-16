@@ -140,7 +140,9 @@ namespace Spine.Unity {
 		void AddSkin (Skin skin, int slotIndex) {
 			if (skin == null) return;
 			var attachmentNames = new List<string>();
-			skin.FindNamesForSlot(slotIndex, attachmentNames);
+			var entries = skin.GetEntries(slotIndex);
+			foreach (var entry in entries)
+				attachmentNames.Add(entry.Name);
 
 			foreach (var skinKey in attachmentNames) {
 				var attachment = skin.GetAttachment(slotIndex, skinKey);

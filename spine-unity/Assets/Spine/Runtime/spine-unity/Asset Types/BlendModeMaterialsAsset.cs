@@ -54,14 +54,17 @@ namespace Spine.Unity {
 			using (var materialCache = new AtlasMaterialCache()) {
 				var attachmentBuffer = new List<Attachment>();
 				var slotsItems = skeletonData.Slots.Items;
-				for (int i = 0, slotCount = skeletonData.Slots.Count; i < slotCount; i++) {
-					var slot = slotsItems[i];
+				for (int slotIndex = 0, slotCount = skeletonData.Slots.Count; slotIndex < slotCount; slotIndex++) {
+					var slot = slotsItems[slotIndex];
 					if (slot.blendMode == BlendMode.Normal) continue;
 					if (!includeAdditiveSlots && slot.blendMode == BlendMode.Additive) continue;
 
 					attachmentBuffer.Clear();
-					foreach (var skin in skeletonData.Skins)
-						skin.FindAttachmentsForSlot(i, attachmentBuffer);
+					foreach (var skin in skeletonData.Skins) {
+						var entries = skin.GetEntries(slotIndex);
+						foreach (var entry in entries)
+							attachmentBuffer.Add(entry.Attachment);
+					}
 
 					Material templateMaterial = null;
 					switch (slot.blendMode) {

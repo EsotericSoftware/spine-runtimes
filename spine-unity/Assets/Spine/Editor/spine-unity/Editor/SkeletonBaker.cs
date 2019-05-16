@@ -229,7 +229,9 @@ namespace Spine.Unity.Editor {
 					for (int i = 0; i < skinCount; i++) {
 						var skin = skins.Items[i];
 						List<string> temp = new List<string>();
-						skin.FindNamesForSlot(s, temp);
+						var entries = skin.GetEntries(s);
+						foreach (var entry in entries)
+							temp.Add(entry.Name);
 						foreach (string str in temp) {
 							if (!attachmentNames.Contains(str))
 								attachmentNames.Add(str);
@@ -342,12 +344,18 @@ namespace Spine.Unity.Editor {
 					List<Attachment> attachments = new List<Attachment>();
 					List<string> attachmentNames = new List<string>();
 
-					skin.FindAttachmentsForSlot(i, attachments);
-					skin.FindNamesForSlot(i, attachmentNames);
+					var entries = skin.GetEntries(i);
+					foreach (var entry in entries) {
+						attachments.Add(entry.Attachment);
+						attachmentNames.Add(entry.Name);
+					}
 
 					if (skin != skeletonData.DefaultSkin) {
-						skeletonData.DefaultSkin.FindAttachmentsForSlot(i, attachments);
-						skeletonData.DefaultSkin.FindNamesForSlot(i, attachmentNames);
+						entries = skeletonData.DefaultSkin.GetEntries(i);
+						foreach (var entry in entries) {
+							attachments.Add(entry.Attachment);
+							attachmentNames.Add(entry.Name);
+						}
 					}
 
 					for (int a = 0; a < attachments.Count; a++) {

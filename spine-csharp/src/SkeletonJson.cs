@@ -266,7 +266,7 @@ namespace Spine {
 						foreach (KeyValuePair<string, Object> entry in ((Dictionary<string, Object>)slotEntry.Value)) {
 							try {
 								Attachment attachment = ReadAttachment((Dictionary<string, Object>)entry.Value, skin, slotIndex, entry.Key, skeletonData);
-								if (attachment != null) skin.AddAttachment(slotIndex, entry.Key, attachment);
+								if (attachment != null) skin.SetAttachment(slotIndex, entry.Key, attachment);
 							} catch (Exception e) {
 								throw new Exception("Error reading attachment: " + entry.Key + ", skin: " + skin, e);
 							}

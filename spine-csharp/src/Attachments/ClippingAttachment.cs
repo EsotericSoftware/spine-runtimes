@@ -37,5 +37,12 @@ namespace Spine {
 
         public ClippingAttachment(string name) : base(name) {
         }
-    }
+
+		public override Attachment Copy () {
+			ClippingAttachment copy = new ClippingAttachment(this.Name);
+			CopyTo(copy);
+			copy.endSlot = endSlot;
+			return copy;
+		}
+	}
 }

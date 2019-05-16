@@ -574,8 +574,17 @@ namespace Spine.Unity.Editor {
 			for (int i = skeleton.Slots.Count - 1; i >= 0; i--) {
 				var attachments = new List<Attachment>();
 				attachmentTable.Add(skeleton.Slots.Items[i], attachments);
-				skin.FindAttachmentsForSlot(i, attachments); // Add skin attachments.
-				if (notDefaultSkin) defaultSkin.FindAttachmentsForSlot(i, attachments); // Add default skin attachments.
+				// Add skin attachments.
+				var entries = skin.GetEntries(i);
+				foreach (var entry in entries) {
+					attachments.Add(entry.Attachment);
+				}
+				if (notDefaultSkin) { // Add default skin attachments.
+					entries = defaultSkin.GetEntries(i);
+					foreach (var entry in entries) {
+						attachments.Add(entry.Attachment);
+					}
+				}
 			}
 
 			activeSkin = skeleton.Skin;

@@ -55,5 +55,13 @@ namespace Spine {
 			float iy = cos * bone.c + sin * bone.d;
 			return MathUtils.Atan2(iy, ix) * MathUtils.RadDeg;
 		}
+
+		public override Attachment Copy () {
+			PointAttachment copy = new PointAttachment(this.Name);
+			copy.x = x;
+			copy.y = y;
+			copy.rotation = rotation;
+			return copy;
+		}
 	}
 }
