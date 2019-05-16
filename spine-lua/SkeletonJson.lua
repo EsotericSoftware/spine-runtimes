@@ -247,7 +247,7 @@ function SkeletonJson.new (attachmentLoader)
 					for attachmentName,attachmentMap in pairs(slotMap) do
 						local attachment = readAttachment(attachmentMap, skin, slotIndex, attachmentName, skeletonData)
 						if attachment then
-							skin:addAttachment(slotIndex, attachmentName, attachment)
+							skin:setAttachment(slotIndex, attachmentName, attachment)
 						end
 					end
 				end
@@ -349,6 +349,9 @@ function SkeletonJson.new (attachmentLoader)
 				               tonumber(color:sub(5, 6), 16) / 255,
 				               tonumber(color:sub(7, 8), 16) / 255)
 			end
+      
+      mesh.width = getValue(map, "width", 0) * scale
+      mesh.height = getValue(map, "height", 0) * scale
 
 			local parent = map.parent
 			if parent then

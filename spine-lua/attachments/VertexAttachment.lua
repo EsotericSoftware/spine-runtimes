@@ -32,7 +32,7 @@
 -- to 1-based indexing eventually.
 
 local setmetatable = setmetatable
-
+local utils = require "spine-lua.utils"
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local Attachment = require "spine-lua.attachments.Attachment"
 
@@ -149,6 +149,22 @@ end
 
 function VertexAttachment:applyDeform (sourceAttachment)
 	return self == sourceAttachment
+end
+
+function VertexAttachment:copyTo (attachment)
+  if self.bones then
+    attachment.bones = utils.copy(self.bones)
+  else
+    attachment.bones = nil
+  end
+  
+  if self.vertices then
+    attachment.vertices = utils.copy(self.vertices)
+  else
+    attachment.vertices = nil
+  end
+  
+  attachment.worldVerticesLength = self.worldVerticesLength
 end
 
 return VertexAttachment

@@ -51,6 +51,8 @@ function MeshAttachment.new (name)
 	self.parentMesh = nil
 	self.inheritDeform = false
 	self.tempColor = Color.newWith(1, 1, 1, 1)
+  self.width = 0
+  self.height = 0
 	setmetatable(self, MeshAttachment)
 	return self
 end
@@ -141,6 +143,33 @@ function MeshAttachment:setParentMesh (parentMesh)
 		self.triangles = parentMesh.triangles
 		self.hullLength = parentMesh.hullLength
 	end
+end
+
+function MeshAttachment:copy ()
+  local copy = MeshAttachment.new(self.name)  
+  copy.region = self.region
+  copy.path = self.path
+  
+  if not self.parentMesh then
+    self:copyTo(copy)
+    copy.regionUVs = utils.copy(self.regionUVs)
+    copy.uvs = utils.copy(self.uvs)
+    copy.triangles = utils.copy(self.triangles)
+    copy.color:setFrom(self.color)
+    copy.hullLength = self.hullLength
+    copy.inheritDeform = self.inheritDeform
+    copy.tempColor:setFrom(self.tempColor)
+    if self.edges then
+      copy.edges = utils.copy(edges)
+    end
+    copy.width = self.width
+    copy.height = self.height
+  else
+    copy:setParentMesh(self.parentMesh)
+    copy.updateUVs()
+  end
+  
+  return copy
 end
 
 return MeshAttachment

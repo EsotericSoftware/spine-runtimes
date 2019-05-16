@@ -30,6 +30,7 @@
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local VertexAttachment = require "spine-lua.attachments.VertexAttachment"
 local Color = require "spine-lua.Color"
+local utils = require "spine-lua.utils"
 
 local PathAttachment = {}
 PathAttachment.__index = PathAttachment
@@ -41,7 +42,20 @@ function PathAttachment.new (name)
 	local self = VertexAttachment.new(name, AttachmentType.path)
 	self.lengths = nil
 	self.color = Color.newWith(1, 1, 1, 1)
+  self.closed = false
+  self.constantSpeed = false
 	setmetatable(self, PathAttachment)
 	return self
 end
+
+function PathAttachment:copy ()
+  local copy = PathAttachment.new(self.name)
+  self.copyTo(copy)
+  copy.length = utils.copy(self.lengths)
+  copy.closed = self.closed
+  copy.constantSpeed = self.constantSpeed
+  copy.color:setFrom(self.color)
+  return copy
+end
+
 return PathAttachment

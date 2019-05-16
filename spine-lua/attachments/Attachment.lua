@@ -46,4 +46,8 @@ function Attachment.new (name, attachmentType)
 	return self
 end
 
+function Attachment:copy ()
+  error("Attachment copy not implemented.")
+end
+
 return Attachment
