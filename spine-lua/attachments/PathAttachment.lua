@@ -50,7 +50,7 @@ end
 
 function PathAttachment:copy ()
   local copy = PathAttachment.new(self.name)
-  self.copyTo(copy)
+  self:copyTo(copy)
   copy.length = utils.copy(self.lengths)
   copy.closed = self.closed
   copy.constantSpeed = self.constantSpeed
