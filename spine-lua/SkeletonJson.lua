@@ -164,7 +164,11 @@ function SkeletonJson.new (attachmentLoader)
 				if not data.target then error("Target bone not found: " .. targetName) end
 
 				data.mix = getValue(constraintMap, "mix", 1)
-				if constraintMap["bendPositive"] == nil or constraintMap["bendPositive"] == false then data.bendDirection = -1 else data.bendDirection = 1 end
+				if constraintMap["bendPositive"] == nil or constraintMap["bendPositive"] == true then
+          data.bendDirection = 1
+        else
+          data.bendDirection = -1
+        end
 				if constraintMap["compress"] == nil or constraintMap["compress"] == false then data.compress = false else data.compress = true end
 				if constraintMap["stretch"] == nil  or constraintMap["stretch"] == false then data.stretch = false else data.stretch = true end
 				if constraintMap["uniform"] == nil or  constraintMap["uniform"] == false then data.uniform = false else data.uniform = true end
