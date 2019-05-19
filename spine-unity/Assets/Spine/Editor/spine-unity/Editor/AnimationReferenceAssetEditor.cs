@@ -82,18 +82,23 @@ namespace Spine.Unity.Editor {
 
 					if (animationNotFound) {
 						animationNameProperty.stringValue = "";
-						preview.ClearAnimationSetupPose();
 					}
 				}
 
-				preview.ClearAnimationSetupPose();
+                if (ThisSkeletonDataAsset != null)
+                {
+                    preview.ClearAnimationSetupPose();
+                }
 
 				if (!string.IsNullOrEmpty(animationNameProperty.stringValue))
 					preview.PlayPauseAnimation(animationNameProperty.stringValue, true);
 			}
 
 			lastSkeletonDataAsset = ThisSkeletonDataAsset;
-			lastSkeletonData = ThisSkeletonDataAsset.GetSkeletonData(true);
+			if(ThisSkeletonDataAsset != null)
+			{
+				lastSkeletonData = ThisSkeletonDataAsset.GetSkeletonData(true);
+			}
 
 			//EditorGUILayout.HelpBox(AnimationReferenceAssetEditor.InspectorHelpText, MessageType.Info, true);
 			EditorGUILayout.Space();
