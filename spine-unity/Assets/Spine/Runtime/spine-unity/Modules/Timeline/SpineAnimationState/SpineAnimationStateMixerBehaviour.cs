@@ -41,17 +41,36 @@ namespace Spine.Unity.Playables {
 		float[] lastInputWeights;
 		public int trackIndex;
 
+		private SkeletonAnimation affectedSkeletonAnimation;
+
+        public override void OnPlayableDestroy(Playable playable)
+        {
+			//Reverse SkeletonAnimation's `skeleton` non-serialized property which can't be registered by the driver.
+			if(Application.isPlaying == false && affectedSkeletonAnimation != null)
+			{
+				affectedSkeletonAnimation.Initialize(overwrite: true);
+			}
+        }
+
 		// NOTE: This function is called at runtime and edit time. Keep that in mind when setting the values of properties.
 		public override void ProcessFrame (Playable playable, FrameData info, object playerData) {
-			var spineComponent = playerData as SkeletonAnimation;
-			if (spineComponent == null) return;
 
-			var skeleton = spineComponent.Skeleton;
-			var state = spineComponent.AnimationState;
+			var skeletonAnimation = playerData as SkeletonAnimation;
+			var skeletonGraphic = playerData as SkeletonGraphic;
+			var animationStateComponent = playerData as IAnimationStateComponent;
+			bool isSkeletonGraphic = skeletonGraphic != null;
+			if(!isSkeletonGraphic)
+			{
+				affectedSkeletonAnimation = skeletonAnimation;
+			}
+
+            if ((skeletonAnimation == null && skeletonGraphic == null) || animationStateComponent == null) return;
+
+			var state  = animationStateComponent.AnimationState;
 
 			if (!Application.isPlaying) {
 				#if SPINE_EDITMODEPOSE
-				PreviewEditModePose(playable, spineComponent);
+                PreviewEditModePose(playable, playerData);
 				#endif
 				return;
 			}
@@ -97,8 +116,16 @@ namespace Spine.Unity.Playables {
 					}
 
 					// Ensure that the first frame ends with an updated mesh.
-					spineComponent.Update(0);
-					spineComponent.LateUpdate();
+					if(isSkeletonGraphic)
+					{
+                        skeletonGraphic.Update(0);
+                        skeletonGraphic.LateUpdate();
+					}
+					else
+					{
+                        skeletonAnimation.Update(0);
+                        skeletonAnimation.LateUpdate();
+					}
 				}
 			}
 		}
@@ -107,9 +134,14 @@ namespace Spine.Unity.Playables {
 
 		AnimationState dummyAnimationState;
 
-		public void PreviewEditModePose (Playable playable, SkeletonAnimation spineComponent) {
+        public void PreviewEditModePose(Playable playable, object playerData)
+        {
+			var skeletonAnimation = playerData as ISkeletonAnimation;
+			var animationStateComponent = playerData as IAnimationStateComponent;
+			var hasSkeletonDataAsset = playerData as IHasSkeletonDataAsset;
+
 			if (Application.isPlaying) return;
-			if (spineComponent == null) return;
+			if (skeletonAnimation == null || hasSkeletonDataAsset == null) return;
 
 			int inputCount = playable.GetInputCount();
 			int lastOneWeight = -1;
@@ -123,11 +155,11 @@ namespace Spine.Unity.Playables {
 				ScriptPlayable<SpineAnimationStateBehaviour> inputPlayableClip = (ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(lastOneWeight);
 				SpineAnimationStateBehaviour clipData = inputPlayableClip.GetBehaviour();
 
-				var skeleton = spineComponent.Skeleton;
+				var skeleton = skeletonAnimation.Skeleton;
 
-				bool skeletonDataMismatch = clipData.animationReference != null && spineComponent.SkeletonDataAsset.GetSkeletonData(true) != clipData.animationReference.SkeletonDataAsset.GetSkeletonData(true);
+				bool skeletonDataMismatch = clipData.animationReference != null && hasSkeletonDataAsset.SkeletonDataAsset.GetSkeletonData(true) != clipData.animationReference.SkeletonDataAsset.GetSkeletonData(true);
 				if (skeletonDataMismatch) {
-					Debug.LogWarningFormat("SpineAnimationStateMixerBehaviour tried to apply an animation for the wrong skeleton. Expected {0}. Was {1}", spineComponent.SkeletonDataAsset, clipData.animationReference.SkeletonDataAsset);
+					Debug.LogWarningFormat("SpineAnimationStateMixerBehaviour tried to apply an animation for the wrong skeleton. Expected {0}. Was {1}", hasSkeletonDataAsset.SkeletonDataAsset, clipData.animationReference.SkeletonDataAsset);
 				}
 
 				// Getting the from-animation here because it's required to get the mix information from AnimationStateData.
@@ -147,12 +179,12 @@ namespace Spine.Unity.Playables {
 				float mixDuration = clipData.mixDuration;
 
 				if (!clipData.customDuration && fromAnimation != null && toAnimation != null) {
-					mixDuration = spineComponent.AnimationState.Data.GetMix(fromAnimation, toAnimation);
+					mixDuration = animationStateComponent.AnimationState.Data.GetMix(fromAnimation, toAnimation);
 				}
 
 				// Approximate what AnimationState might do at runtime.
 				if (fromAnimation != null && mixDuration > 0 && toClipTime < mixDuration) {
-					dummyAnimationState = dummyAnimationState ?? new AnimationState(spineComponent.skeletonDataAsset.GetAnimationStateData());
+					dummyAnimationState = dummyAnimationState ?? new AnimationState(hasSkeletonDataAsset.SkeletonDataAsset.GetAnimationStateData());
 
 					var toTrack = dummyAnimationState.GetCurrent(0);
 					var fromTrack = toTrack != null ? toTrack.mixingFrom : null;

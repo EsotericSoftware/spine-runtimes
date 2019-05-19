@@ -35,8 +35,8 @@ using UnityEngine.Timeline;
 namespace Spine.Unity.Playables {
 	[TrackColor(0.9960785f, 0.2509804f, 0.003921569f)]
 	[TrackClipType(typeof(SpineAnimationStateClip))]
-	[TrackBindingType(typeof(SkeletonAnimation))]
-	public class SpineAnimationStateTrack : TrackAsset {
+	[TrackBindingType(typeof(SkeletonGraphic))]
+	public class SpineGraphicAnimationStateTrack : TrackAsset {
 		public int trackIndex = 0;
 
 		public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount) {
@@ -48,10 +48,10 @@ namespace Spine.Unity.Playables {
 
         public override void GatherProperties(PlayableDirector director, IPropertyCollector driver)
 		{
-            SkeletonAnimation skeletonAnimation = (SkeletonAnimation)director.GetGenericBinding(this);
-			if(skeletonAnimation != null)
+            SkeletonGraphic skeletonGraphic = (SkeletonGraphic)director.GetGenericBinding(this);
+			if(skeletonGraphic != null)
 			{
-				driver.AddFromComponent(skeletonAnimation.gameObject, skeletonAnimation);
+				driver.AddFromComponent(skeletonGraphic.gameObject, skeletonGraphic);
 			}
 		}
 	}
