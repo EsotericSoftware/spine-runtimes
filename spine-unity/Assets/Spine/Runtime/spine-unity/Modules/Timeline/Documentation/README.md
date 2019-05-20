@@ -5,31 +5,37 @@ If this documentation contains mistakes or doesn't cover some questions, please 
 
 ![](add-menu.png)  
 
-## Spine Animation Track
-Controls the skeleton pose a given Spine component with animations.
+## Spine AnimationState Track
+![](animationstate-clip-inspector.png)  
+Sets animations on the target SkeletonAnimation's AnimationState.
 
 **Status:**
-- Currently only SkeletonAnimation (via SkeletonAnimationPlayableHandle)
-- Mixing has some significant bugs. It should work fine if you don't include mixing, or if all your animations have perfectly matching dopesheet properties.
+- Currently only SkeletonAnimation (directly)
 
 **To use:**
 1. Add `SkeletonAnimationPlayableHandle` component to your SkeletonAnimation GameObject.
-2. With an existing Unity Playable Direction, and in the Unity Timeline window, right-click on an empty space on the left and choose **Spine.Unity.Playables** > **Spine Animation Track**.
-3. Drag the SkeletonAnimation GameObject onto the empty reference property of the new Spine Skeleton Flip Track.
-4. Right-click on the row in an empty space in the Timeline dopesheet and choose **Add Spine Animation Clip Clip**.
+2. With an existing Unity Playable Director, and in the Unity Timeline window, right-click on an empty space on the left and choose **Spine.Unity.Playables** > **Spine Animation State Track**.
+3. Drag the SkeletonAnimation GameObject onto the empty reference property of the new Spine AnimationState Track.
+4. Right-click on the row in an empty space in the Timeline dopesheet and choose **Add Spine Animation State Clip Clip**.
 5. Adjust the start and end times of the new clip, name it appropriately at the top of the Inspector.
 6. Click on the clip inspector's SkeletonDataAsset field and choose your target skeleton's SkeletonDataAsset. This will enable the animation name dropdown to appear.
 7. Choose the appropriate animation name, loop, and mix settings.
-8. For easier readability, rename your clip to the animation name or something descriptive. 
+- For easier readability, rename your clip to the animation name or something descriptive.
+- To avoid having to do steps 4-6 repeatedly, use the Duplicate function (`CTRL`/`CMD` + `D`)  
 
 **Track Behavior**
-- Currently buggy
-- 
-
+- `AnimationState.SetAnimation` will be called at the beginning of every clip based on the animationName.
+- Clip durations don't matter. Animations won't be cleared where there is no active clip at certain slices of time.
+- **EMPTY ANIMATION**: If a clip has no name specified, it will call SetEmptyAnimation instead.
+- **ERROR HANDLING**: If the animation with the provided animationName is not found, it will do nothing (the previous animation will continue playing normally).
+- Animations playing before the timeline starts playing will not be interrupted until the first clip starts playing.
+- At the end of the last clip and at the end of the timeline, nothing happens. This means the effect of the last clip's SetAnimation call will persist until you give other commands to that AnimationState.
+- If "custom duration" is unchecked, it will do a normal lookup of the AnimationState data's specified transition-pair mix setting, or the default mix.
+- Edit mode preview mixing may look different from Play Mode mixing. Please check in actual Play Mode to see the real results.
 
 ## Spine Skeleton Flip Track
 ![](skeleton-flip-clip-inspector.png)  
-Controls skeleton flip a given Spine component.
+Controls skeleton flip at a given Spine component.
 
 **Status:**
 - Currently only SkeletonAnimation (via SkeletonAnimationPlayableHandle)
@@ -44,33 +50,6 @@ Controls skeleton flip a given Spine component.
 **Track Behavior**
 - The specified skeleton flip values will be applied for every frame within the duration of each track.
 - At the end of the timeline, the track will revert the skeleton flip to the flip values it captures when it starts playing that timeline. 
-
-## Spine AnimationState Track
-![](animationstate-clip-inspector.png)  
-Sets Animations on the target SkeletonAnimation's AnimationState (via SetAnimation).
-
-**Status:**
-- Currently only SkeletonAnimation (directly)
-
-**To use:**
-1. With an existing Unity Playable Director, and in the Unity Timeline window, right-click on an empty space on the left and choose **Spine.Unity.Playables** > **Spine Animation State Track**.
-2. Drag the SkeletonAnimation GameObject onto the empty reference property of the new Spine AnimationState Track.
-3. Right-click on the row in an empty space in the Timeline dopesheet and choose **Add Spine Animation State Clip Clip**.
-4. Adjust the start and end times of the new clip, name it appropriately at the top of the Inspector.
-5. Click on the clip inspector's SkeletonDataAsset field and choose your target skeleton's SkeletonDataAsset. This will enable the animation name dropdown to appear.
-6. Choose the appropriate animation name, loop, and mix settings.
-- For easier readability, rename your clip to the animation name or something descriptive.
-- To avoid having to do steps 4-6 repeatedly, use the Duplicate function (`CTRL`/`CMD` + `D`)  
-
-**Track Behavior**
-- `AnimationState.SetAnimation` will be called at the beginning of every clip based on the animationName.
-- Clip durations don't matter. Animations won't be cleared where there is no active clip at certain slices of time.
-- **EMPTY ANIMATION**: If a clip has no name specified, it will call SetEmptyAnimation instead.
-- **ERROR HANDLING**: If the animation with the provided animationName is not found, it will do nothing (the previous animation will continue playing normally).
-- Animations playing before the timeline starts playing will not be interrupted until the first clip starts playing.
-- At the end of the last clip and at the end of the timeline, nothing happens. This means the effect of the last clip's SetAnimation call will persist until you give other commands to that AnimationState.
-- If "custom duration" is unchecked, it will do a normal lookup of the AnimationState data's specified transition-pair mix setting, or the default mix.
-- Edit mode preview mixing may look different from Play Mode mixing. Please check in actual Play Mode to see the real results.
 
 ## Known Issues
 Spine Timeline support is currently experimental and has some known issues and inconveniences.
