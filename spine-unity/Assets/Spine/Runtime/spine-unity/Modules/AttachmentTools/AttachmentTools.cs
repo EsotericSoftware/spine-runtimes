@@ -29,6 +29,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace Spine.Unity.Modules.AttachmentTools {
 	public static class AttachmentRegionExtensions {
@@ -503,9 +504,10 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			var texturesToPack = new List<Texture2D>();
 			var originalRegions = new List<AtlasRegion>();
 			int newRegionIndex = 0;
-			foreach (var skinEntry in skinAttachments) {
-				var originalKey = skinEntry.Key;
-				var originalAttachment = skinEntry.Value;
+			
+			foreach (DictionaryEntry skinEntry in skinAttachments) {
+				var originalKey = (Skin.SkinEntry)skinEntry.Key;
+				var originalAttachment = (Attachment)skinEntry.Value;
 
 				Attachment newAttachment;
 				if (IsRenderable(originalAttachment)) {
@@ -793,7 +795,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			var newSkin = new Skin(original.name + " clone");
 			var newSkinAttachments = newSkin.Attachments;
 
-			foreach (var a in original.Attachments)
+			foreach (DictionaryEntry a in original.Attachments)
 				newSkinAttachments[a.Key] = a.Value;
 
 			return newSkin;
@@ -848,21 +850,21 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 			if (cloneAttachments) {
 				if (overwrite) {
-					foreach (var e in sourceAttachments)
-						destinationAttachments[e.Key] = e.Value.GetClone(cloneMeshesAsLinked);
+					foreach (DictionaryEntry e in sourceAttachments)
+						destinationAttachments[e.Key] = ((Attachment)e.Value).GetClone(cloneMeshesAsLinked);
 				} else {
-					foreach (var e in sourceAttachments) {
-						if (destinationAttachments.ContainsKey(e.Key)) continue;
-						destinationAttachments.Add(e.Key, e.Value.GetClone(cloneMeshesAsLinked));
+					foreach (DictionaryEntry e in sourceAttachments) {
+						if (destinationAttachments.Contains(e.Key)) continue;
+						destinationAttachments.Add(e.Key, ((Attachment)e.Value).GetClone(cloneMeshesAsLinked));
 					}
 				}
 			} else {
 				if (overwrite) {
-					foreach (var e in sourceAttachments)
+					foreach (DictionaryEntry e in sourceAttachments)
 						destinationAttachments[e.Key] = e.Value;
 				} else {
-					foreach (var e in sourceAttachments) {
-						if (destinationAttachments.ContainsKey(e.Key)) continue;
+					foreach (DictionaryEntry e in sourceAttachments) {
+						if (destinationAttachments.Contains(e.Key)) continue;
 						destinationAttachments.Add(e.Key, e.Value);
 					}
 				}

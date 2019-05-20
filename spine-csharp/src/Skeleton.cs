@@ -235,8 +235,10 @@ namespace Spine {
 		}
 
 		private void SortPathConstraintAttachment (Skin skin, int slotIndex, Bone slotBone) {
-			foreach (var entry in skin.Attachments.Keys)
+			foreach (var entryObj in skin.Attachments.Keys) {
+				var entry = (Skin.SkinEntry)entryObj;
 				if (entry.SlotIndex == slotIndex) SortPathConstraintAttachment(entry.Attachment, slotBone);
+			}
 		}
 
 		private void SortPathConstraintAttachment (Attachment attachment, Bone slotBone) {

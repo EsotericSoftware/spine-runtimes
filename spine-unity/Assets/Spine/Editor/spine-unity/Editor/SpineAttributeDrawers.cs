@@ -177,23 +177,19 @@ namespace Spine.Unity.Editor {
 			if (TargetAttribute.includeNone)
 				menu.AddItem(new GUIContent(NoneString), !property.hasMultipleDifferentValues && string.IsNullOrEmpty(property.stringValue), HandleSelect, new SpineDrawerValuePair(string.Empty, property));
 
-			for (int i = 0; i < data.Slots.Count; i++) {
-				string name = data.Slots.Items[i].Name;
+			for (int slotIndex = 0; slotIndex < data.Slots.Count; slotIndex++) {
+				string name = data.Slots.Items[slotIndex].Name;
 				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal)) {
 
 					if (targetAttribute.containsBoundingBoxes) {
-						int slotIndex = i;
-						var attachments = new List<Attachment>();
+						var skinEntries = new List<Skin.SkinEntry>();
 						foreach (var skin in data.Skins) {
-							var entries = skin.GetEntries(slotIndex);
-							foreach (var entry in entries) {
-								attachments.Add(entry.Attachment);
-							}
+							skin.GetAttachments(slotIndex, skinEntries);
 						}
 
 						bool hasBoundingBox = false;
-						foreach (var attachment in attachments) {
-							var bbAttachment = attachment as BoundingBoxAttachment;
+						foreach (var entry in skinEntries) {
+							var bbAttachment = entry.Attachment as BoundingBoxAttachment;
 							if (bbAttachment != null) {
 								string menuLabel = bbAttachment.IsWeighted() ? name + " (!)" : name;
 								menu.AddItem(new GUIContent(menuLabel), !property.hasMultipleDifferentValues && name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
@@ -474,17 +470,19 @@ namespace Spine.Unity.Editor {
 					attachmentNames.Clear();
 					placeholderNames.Clear();
 
-					var entries = skin.GetEntries(i);
-					foreach (var entry in entries) {
+					var skinEntries = new List<Skin.SkinEntry>();
+					skin.GetAttachments(i, skinEntries);
+					foreach (var entry in skinEntries) {
 						attachmentNames.Add(entry.Name);
 					}
 
 					if (skin != defaultSkin) {
-						foreach (var entry in entries) {
+						foreach (var entry in skinEntries) {
 							placeholderNames.Add(entry.Name);
 						}
-						entries = defaultSkin.GetEntries(i);
-						foreach (var entry in entries) {
+						skinEntries.Clear();
+						defaultSkin.GetAttachments(i, skinEntries);
+						foreach (var entry in skinEntries) {
 							attachmentNames.Add(entry.Name);
 						}
 					}

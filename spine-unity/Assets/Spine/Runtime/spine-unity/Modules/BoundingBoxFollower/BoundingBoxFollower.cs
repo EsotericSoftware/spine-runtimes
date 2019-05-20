@@ -139,13 +139,11 @@ namespace Spine.Unity {
 
 		void AddSkin (Skin skin, int slotIndex) {
 			if (skin == null) return;
-			var attachmentNames = new List<string>();
-			var entries = skin.GetEntries(slotIndex);
-			foreach (var entry in entries)
-				attachmentNames.Add(entry.Name);
-
-			foreach (var skinKey in attachmentNames) {
-				var attachment = skin.GetAttachment(slotIndex, skinKey);
+			var skinEntries = new List<Skin.SkinEntry>();
+			skin.GetAttachments(slotIndex, skinEntries);
+			
+			foreach (var entry in skinEntries) {
+				var attachment = skin.GetAttachment(slotIndex, entry.Name);
 				var boundingBoxAttachment = attachment as BoundingBoxAttachment;
 
 				if (BoundingBoxFollower.DebugMessages && attachment != null && boundingBoxAttachment == null)
@@ -159,7 +157,7 @@ namespace Spine.Unity {
 						bbCollider.hideFlags = HideFlags.NotEditable;
 						bbCollider.isTrigger = IsTrigger;
 						colliderTable.Add(boundingBoxAttachment, bbCollider);
-						nameTable.Add(boundingBoxAttachment, skinKey);
+						nameTable.Add(boundingBoxAttachment, entry.Name);
 					}
 				}
 			}

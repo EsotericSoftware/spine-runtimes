@@ -28,7 +28,9 @@
  *****************************************************************************/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace Spine {
 	/// <summary>Stores attachments by slot index and attachment name.
@@ -37,12 +39,11 @@ namespace Spine {
 	/// </summary>
 	public class Skin {
 		internal string name;
-		private Dictionary<SkinEntry, Attachment> attachments =
-			new Dictionary<SkinEntry, Attachment>(SkinEntryComparer.Instance);
+		private OrderedDictionary attachments = new OrderedDictionary(SkinEntryComparer.Instance); // contains <SkinEntry, Attachment>
 		
 		public string Name { get { return name; } }
-		public Dictionary<SkinEntry, Attachment> Attachments { get { return attachments; } }
-
+		public OrderedDictionary Attachments { get { return attachments; } }
+		
 		public Skin (string name) {
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
 			this.name = name;
@@ -56,19 +57,30 @@ namespace Spine {
 			attachments[new SkinEntry(slotIndex, name, attachment)] = attachment;
 		}
 
-		///<summary>Adds all attachments from the specified skin to this skin.</summary>
+		///<summary>Adds all attachments, bones, and constraints from the specified skin to this skin.</summary>
 		public void AddSkin (Skin skin) {
 			foreach (SkinEntry entry in skin.attachments.Keys)
 				SetAttachment(entry.SlotIndex, entry.Name, entry.Attachment);
 		}
 
+		///<summary>Adds all attachments from the specified skin to this skin. Attachments are deep copied.</summary>
+		public void CopySkin (Skin skin) {
+			// note: bones and constraints are added in a separate commit.
+
+			foreach (SkinEntry entry in skin.attachments.Keys) {
+				Attachment attachment = entry.Attachment.Copy();
+				if (attachment is MeshAttachment) {
+				}
+				SetAttachment(entry.SlotIndex, entry.Name, attachment);
+			}
+		}
+
 		/// <summary>Returns the attachment for the specified slot index and name, or null.</summary>
 		/// <returns>May be null.</returns>
 		public Attachment GetAttachment (int slotIndex, string name) {
-			Attachment attachment;
 			var lookup = new SkinEntry(slotIndex, name, null);
-			attachments.TryGetValue(lookup, out attachment);
-			return attachment;
+			var obj = attachments[lookup];
+			return (obj == null) ? null : (Attachment)obj;
 		}
 
 		/// <summary> Removes the attachment in the skin for the specified slot index and name, if any.</summary>
@@ -86,13 +98,11 @@ namespace Spine {
 			return entries;
 		}
 
-		/// <summary>Returns all <see cref="SkinEntry"/> instances for the given slot contained in this skin.</summary>
+		/// <summary>Returns all attachments for the given slot in this skin.</summary>
 		/// <param name="slotIndex">The target slotIndex. To find the slot index, use <see cref="Spine.Skeleton.FindSlotIndex"/> or <see cref="Spine.SkeletonData.FindSlotIndex"/>
-		public List<SkinEntry> GetEntries (int slotIndex) { 
-			List<SkinEntry> entries = new List<SkinEntry>();
+		public void GetAttachments (int slotIndex, List<SkinEntry> attachments) {
 			foreach (SkinEntry entry in this.attachments.Keys)
-				if (entry.SlotIndex == slotIndex) entries.Add(entry);
-			return entries;
+				if (entry.SlotIndex == slotIndex) attachments.Add(entry);
 		}
 
 		override public string ToString () {
@@ -144,18 +154,21 @@ namespace Spine {
 			}
 		}
 	
-		// Avoids boxing in the dictionary.
-		class SkinEntryComparer : IEqualityComparer<SkinEntry> {
+		// Avoids boxing in the dictionary and is necessary to omit entry.attachment in the comparison.
+		class SkinEntryComparer : IEqualityComparer {
 			internal static readonly SkinEntryComparer Instance = new SkinEntryComparer();
 
-			bool IEqualityComparer<SkinEntry>.Equals (SkinEntry o1, SkinEntry o2) {
-				if (o1.SlotIndex != o2.SlotIndex) return false;
-				if (!string.Equals(o1.Name, o2.Name, StringComparison.Ordinal)) return false;
+			bool IEqualityComparer.Equals (object o1, object o2) {
+				var e1 = (SkinEntry)o1;
+				var e2 = (SkinEntry)o2;
+				if (e1.SlotIndex != e2.SlotIndex) return false;
+				if (!string.Equals(e1.Name, e2.Name, StringComparison.Ordinal)) return false;
 				return true;
 			}
 
-			int IEqualityComparer<SkinEntry>.GetHashCode (SkinEntry o) {
-				return o.Name.GetHashCode() + o.SlotIndex * 37;
+			int IEqualityComparer.GetHashCode (object o) {
+				var e = (SkinEntry)o;
+				return e.Name.GetHashCode() + e.SlotIndex * 37;
 			}
 		}
 	}

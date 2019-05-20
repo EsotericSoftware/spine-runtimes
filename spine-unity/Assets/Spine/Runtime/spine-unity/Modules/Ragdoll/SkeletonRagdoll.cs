@@ -365,17 +365,15 @@ namespace Spine.Unity.Modules {
 			GameObject go = t.gameObject;
 			var skin = skeleton.Skin ?? skeleton.Data.DefaultSkin;
 
-			var attachments = new List<Attachment>();
+			var skinEntries = new List<Skin.SkinEntry>();
 			foreach (Slot s in skeleton.Slots) {
 				if (s.Bone == b) {
-					var entries = skin.GetEntries(skeleton.Slots.IndexOf(s));
-					foreach (var entry in entries)
-						attachments.Add(entry.Attachment);
-
-					foreach (var a in attachments) {
-						var bbAttachment = a as BoundingBoxAttachment;
+					skin.GetAttachments(skeleton.Slots.IndexOf(s), skinEntries);
+					
+					foreach (var entry in skinEntries) {
+						var bbAttachment = entry.Attachment as BoundingBoxAttachment;
 						if (bbAttachment != null) {
-							if (!a.Name.ToLower().Contains(AttachmentNameMarker))
+							if (!entry.Name.ToLower().Contains(AttachmentNameMarker))
 								continue;
 
 							var bbCollider = go.AddComponent<BoxCollider>();
