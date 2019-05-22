@@ -40,9 +40,13 @@ namespace Spine {
 	public class Skin {
 		internal string name;
 		private OrderedDictionary attachments = new OrderedDictionary(SkinEntryComparer.Instance); // contains <SkinEntry, Attachment>
-		
+		internal readonly ExposedList<BoneData> bones = new ExposedList<BoneData>();
+		internal readonly ExposedList<ConstraintData> constraints = new ExposedList<ConstraintData>();
+
 		public string Name { get { return name; } }
 		public OrderedDictionary Attachments { get { return attachments; } }
+		public ExposedList<BoneData> Bones { get { return bones; } }
+		public ExposedList<ConstraintData> Constraints { get { return constraints; } }
 		
 		public Skin (string name) {
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
@@ -59,13 +63,23 @@ namespace Spine {
 
 		///<summary>Adds all attachments, bones, and constraints from the specified skin to this skin.</summary>
 		public void AddSkin (Skin skin) {
+			foreach (BoneData data in skin.bones)
+				if (!bones.Contains(data)) bones.Add(data);
+
+			foreach (ConstraintData data in skin.constraints)
+				if (!constraints.Contains(data)) constraints.Add(data);
+
 			foreach (SkinEntry entry in skin.attachments.Keys)
 				SetAttachment(entry.SlotIndex, entry.Name, entry.Attachment);
 		}
 
 		///<summary>Adds all attachments from the specified skin to this skin. Attachments are deep copied.</summary>
 		public void CopySkin (Skin skin) {
-			// note: bones and constraints are added in a separate commit.
+			foreach (BoneData data in skin.bones)
+				if (!bones.Contains(data)) bones.Add(data);
+
+			foreach (ConstraintData data in skin.constraints)
+				if (!constraints.Contains(data)) constraints.Add(data);
 
 			foreach (SkinEntry entry in skin.attachments.Keys) {
 				Attachment attachment = entry.Attachment.Copy();
@@ -98,11 +112,18 @@ namespace Spine {
 			return entries;
 		}
 
-		/// <summary>Returns all attachments for the given slot in this skin.</summary>
+		/// <summary>Returns all attachments in this skin for the specified slot index.</summary>
 		/// <param name="slotIndex">The target slotIndex. To find the slot index, use <see cref="Spine.Skeleton.FindSlotIndex"/> or <see cref="Spine.SkeletonData.FindSlotIndex"/>
 		public void GetAttachments (int slotIndex, List<SkinEntry> attachments) {
 			foreach (SkinEntry entry in this.attachments.Keys)
 				if (entry.SlotIndex == slotIndex) attachments.Add(entry);
+		}
+
+		///<summary>Clears all attachments, bones, and constraints.</summary>
+		public void Clear () {
+			attachments.Clear();
+			bones.Clear();
+			constraints.Clear();
 		}
 
 		override public string ToString () {
@@ -141,6 +162,7 @@ namespace Spine {
 				}
 			}
 
+			/// <summary>The name the attachment is associated with, equivalent to the skin placeholder name in the Spine editor.</summary>
 			public String Name {
 				get {
 					return name;

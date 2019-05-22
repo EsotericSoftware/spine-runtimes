@@ -707,9 +707,10 @@ namespace Spine.Unity.Editor {
 				if (root == null || !root.ContainsKey("skins"))
 					return requiredPaths;
 
-				foreach (var skin in (Dictionary<string, object>)root["skins"]) {
-					foreach (var slot in (Dictionary<string, object>)skin.Value) {
-
+				foreach (Dictionary<string, object> skinMap in (List<object>)root["skins"]) {
+					if (!skinMap.ContainsKey("attachments"))
+						continue;
+					foreach (var slot in (Dictionary<string, object>)skinMap["attachments"]) {
 						foreach (var attachment in ((Dictionary<string, object>)slot.Value)) {
 							var data = ((Dictionary<string, object>)attachment.Value);
 

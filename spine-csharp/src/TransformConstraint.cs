@@ -37,7 +37,7 @@ namespace Spine {
 	/// <para>
 	/// See <a href="http://esotericsoftware.com/spine-transform-constraints">Transform constraints</a> in the Spine User Guide.</para>
 	/// </summary>
-	public class TransformConstraint : IConstraint {
+	public class TransformConstraint : IUpdatable {
 		internal TransformConstraintData data;
 		internal ExposedList<Bone> bones;
 		internal Bone target;
@@ -288,7 +288,6 @@ namespace Spine {
 			}
 		}
 
-		public int Order { get { return data.order; } }
 		/// <summary>The bones that will be modified by this transform constraint.</summary>
 		public ExposedList<Bone> Bones { get { return bones; } }
 		/// <summary>The target bone whose world transform will be copied to the constrained bones.</summary>

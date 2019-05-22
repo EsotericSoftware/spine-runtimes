@@ -37,7 +37,7 @@ namespace Spine {
 	/// <para>
 	/// See <a href="http://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide.</para>
 	/// </summary>
-	public class IkConstraint : IConstraint {
+	public class IkConstraint : IUpdatable {
 		internal IkConstraintData data;
 		internal ExposedList<Bone> bones = new ExposedList<Bone>();
 		internal Bone target;
@@ -91,11 +91,6 @@ namespace Spine {
 				Apply(bones.Items[0], bones.Items[1], target.worldX, target.worldY, bendDirection, stretch, mix);
 				break;
 			}
-		}
-
-
-		public int Order {
-			get { return data.order; }
 		}
 
 		/// <summary>The bones that will be modified by this IK constraint.</summary>

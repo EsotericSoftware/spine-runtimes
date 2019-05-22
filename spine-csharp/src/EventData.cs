@@ -34,7 +34,7 @@ namespace Spine {
 	public class EventData {
 		internal string name;
 
-		/// <summary>The name of the event, which is unique within the skeleton.</summary>
+		/// <summary>The name of the event, which is unique across all events in the skeleton.</summary>
 		public string Name { get { return name; } }
 		public int Int { get; set; }
 		public float Float { get; set; }

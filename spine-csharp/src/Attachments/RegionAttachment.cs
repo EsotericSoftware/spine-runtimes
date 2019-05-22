@@ -195,8 +195,8 @@ namespace Spine {
 			copy.rotation = rotation;
 			copy.width = width;
 			copy.height = height;
-			Array.Copy(uvs, 0, copy.uvs, 0, uvs.Length);
-			Array.Copy(offset, 0, copy.offset, 0, offset.Length);
+			Array.Copy(uvs, 0, copy.uvs, 0, 8);
+			Array.Copy(offset, 0, copy.offset, 0, 8);
 			return copy;
 		}
 	}

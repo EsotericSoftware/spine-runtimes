@@ -52,7 +52,7 @@ namespace Spine {
 		/// <summary>The duration of the animation in seconds, which is the highest time of all keys in the timeline.</summary>
 		public float Duration { get { return duration; } set { duration = value; } }
 
-		/// <summary>The animation's name, which is unique within the skeleton.</summary>
+		/// <summary>The animation's name, which is unique across all animations in the skeleton.</summary>
 		public string Name { get { return name; } }
 
 		/// <summary>Applies all the animation's timelines to the specified skeleton.</summary>

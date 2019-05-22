@@ -174,6 +174,7 @@ namespace Spine {
 				data.shearY = ReadFloat(input);
 				data.length = ReadFloat(input) * scale;
 				data.transformMode = TransformModeValues[ReadVarint(input, true)];
+				data.skinRequired = ReadBoolean(input);
 				if (nonessential) ReadInt(input); // Skip bone color.
 				skeletonData.bones.Add(data);
 			}
@@ -206,6 +207,7 @@ namespace Spine {
 			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {
 				IkConstraintData data = new IkConstraintData(ReadString(input));
 				data.order = ReadVarint(input, true);
+				data.skinRequired = ReadBoolean(input);
 				for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
 					data.bones.Add(skeletonData.bones.Items[ReadVarint(input, true)]);
 				data.target = skeletonData.bones.Items[ReadVarint(input, true)];
@@ -221,6 +223,7 @@ namespace Spine {
 			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {
 				TransformConstraintData data = new TransformConstraintData(ReadString(input));
 				data.order = ReadVarint(input, true);
+				data.skinRequired = ReadBoolean(input);
 				for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
 				    data.bones.Add(skeletonData.bones.Items[ReadVarint(input, true)]);
 				data.target = skeletonData.bones.Items[ReadVarint(input, true)];
@@ -243,6 +246,7 @@ namespace Spine {
 			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {
 				PathConstraintData data = new PathConstraintData(ReadString(input));
 				data.order = ReadVarint(input, true);
+				data.skinRequired = ReadBoolean(input);
 				for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
 					data.bones.Add(skeletonData.bones.Items[ReadVarint(input, true)]);
 				data.target = skeletonData.slots.Items[ReadVarint(input, true)];
@@ -260,7 +264,7 @@ namespace Spine {
 			}
 
 			// Default skin.
-			Skin defaultSkin = ReadSkin(input, skeletonData, "default", nonessential);
+			Skin defaultSkin = ReadSkin(input, skeletonData, true, nonessential);
 			if (defaultSkin != null) {
 				skeletonData.defaultSkin = defaultSkin;
 				skeletonData.skins.Add(defaultSkin);
@@ -268,7 +272,7 @@ namespace Spine {
 
 			// Skins.
 			for (int i = 0, n = ReadVarint(input, true); i < n; i++)
-				skeletonData.skins.Add(ReadSkin(input, skeletonData, ReadString(input), nonessential));
+				skeletonData.skins.Add(ReadSkin(input, skeletonData, false, nonessential));
 
 			// Linked meshes.
 			for (int i = 0, n = linkedMeshes.Count; i < n; i++) {
@@ -312,11 +316,19 @@ namespace Spine {
 
 
 		/// <returns>May be null.</returns>
-		private Skin ReadSkin (Stream input, SkeletonData skeletonData, String skinName, bool nonessential) {
-			int slotCount = ReadVarint(input, true);
-			if (slotCount == 0) return null;
-			Skin skin = new Skin(skinName);
-			for (int i = 0; i < slotCount; i++) {
+		private Skin ReadSkin (Stream input, SkeletonData skeletonData, bool defaultSkin, bool nonessential) {
+			Skin skin = new Skin(defaultSkin ? "default" : ReadString(input));
+			if (!defaultSkin) {
+				for (int i = 0, n = ReadVarint(input, true); i < n; i++)
+					skin.bones.Add(skeletonData.bones.Items[ReadVarint(input, true)]);
+				for (int i = 0, n = ReadVarint(input, true); i < n; i++)
+					skin.constraints.Add(skeletonData.ikConstraints.Items[ReadVarint(input, true)]);
+				for (int i = 0, n = ReadVarint(input, true); i < n; i++)
+					skin.constraints.Add(skeletonData.transformConstraints.Items[ReadVarint(input, true)]);
+				for (int i = 0, n = ReadVarint(input, true); i < n; i++)
+					skin.constraints.Add(skeletonData.pathConstraints.Items[ReadVarint(input, true)]);
+			}
+			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {
 				int slotIndex = ReadVarint(input, true);
 				for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++) {
 					String name = ReadString(input);

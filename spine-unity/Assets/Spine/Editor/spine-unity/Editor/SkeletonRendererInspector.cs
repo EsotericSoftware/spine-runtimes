@@ -504,8 +504,17 @@ namespace Spine.Unity.Editor {
 
 			if (!fieldMatchesSkin) {
 				Skin skinToSet = string.IsNullOrEmpty(componentSkinName) ? null : skeletonRenderer.Skeleton.Data.FindSkin(componentSkinName);
-				skeletonRenderer.Skeleton.Skin = skinToSet;
+				skeletonRenderer.Skeleton.SetSkin(skinToSet);
 				skeletonRenderer.Skeleton.SetSlotsToSetupPose();
+
+				// Note: the UpdateIfSkinMismatch concept shall be replaced with e.g. an OnValidate based
+				// solution or in a separate commit. The current solution does not repaint the Game view because
+				// it is first applying values and in the next editor pass is calling this skin-changing method.
+				if (skeletonRenderer is SkeletonAnimation)
+					((SkeletonAnimation) skeletonRenderer).Update(0f);
+				else if (skeletonRenderer is SkeletonMecanim)
+					((SkeletonMecanim) skeletonRenderer).Update();
+
 				skeletonRenderer.LateUpdate();
 				return true;
 			}

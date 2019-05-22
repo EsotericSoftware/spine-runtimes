@@ -133,8 +133,7 @@ namespace Spine {
 			return this == sourceAttachment;
 		}
 
-		///<summary>Internal method used by VertexAttachment subclasses to copy basic data. Does not copy id (generated) and name (set on
-		/// construction).</summary>
+		///<summary>Does not copy id (generated) or name (set on construction).</summary>
 		internal void CopyTo (VertexAttachment attachment) {
 			if (bones != null) {
 				attachment.bones = new int[bones.Length];
