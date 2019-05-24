@@ -163,6 +163,7 @@ namespace Spine.Unity.Editor {
 		override public void OnInspectorGUI () {
 			bool multi = serializedObject.isEditingMultipleObjects;
 			DrawInspectorGUI(multi);
+			HandleSkinChange();
 			if (serializedObject.ApplyModifiedProperties() || SpineInspectorUtility.UndoRedoPerformed(Event.current) ||
 				AreAnyMaskMaterialsMissing()) {
 				if (!Application.isPlaying) {
@@ -171,21 +172,6 @@ namespace Spine.Unity.Editor {
 					} else {
 						EditorForceInitializeComponent((SkeletonRenderer)target);
 					}
-					SceneView.RepaintAll();
-				}
-			}
-
-			if (!Application.isPlaying && Event.current.type == EventType.Layout) {
-				bool mismatchDetected = false;
-				if (multi) {
-					foreach (var o in targets)
-						mismatchDetected |= UpdateIfSkinMismatch((SkeletonRenderer)o);
-				} else {
-					mismatchDetected |= UpdateIfSkinMismatch(target as SkeletonRenderer);
-				}
-
-				if (mismatchDetected) {
-					mismatchDetected = false;
 					SceneView.RepaintAll();
 				}
 			}
@@ -493,12 +479,26 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		static bool UpdateIfSkinMismatch (SkeletonRenderer skeletonRenderer) {
+		void HandleSkinChange() {
+			if (!Application.isPlaying && Event.current.type == EventType.Layout && !initialSkinName.hasMultipleDifferentValues) {
+				bool mismatchDetected = false;
+				string newSkinName = initialSkinName.stringValue;
+				foreach (var o in targets) {
+					mismatchDetected |= UpdateIfSkinMismatch((SkeletonRenderer)o, newSkinName);
+				}
+
+				if (mismatchDetected) {
+					mismatchDetected = false;
+					SceneView.RepaintAll();
+				}
+			}
+		}
+
+		static bool UpdateIfSkinMismatch (SkeletonRenderer skeletonRenderer, string componentSkinName) {
 			if (!skeletonRenderer.valid) return false;
 
 			var skin = skeletonRenderer.Skeleton.Skin;
 			string skeletonSkinName = skin != null ? skin.Name : null;
-			string componentSkinName = skeletonRenderer.initialSkinName;
 			bool defaultCase = skin == null && string.IsNullOrEmpty(componentSkinName);
 			bool fieldMatchesSkin = defaultCase || string.Equals(componentSkinName, skeletonSkinName, System.StringComparison.Ordinal);
 
