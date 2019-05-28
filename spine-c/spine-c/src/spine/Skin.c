@@ -90,7 +90,7 @@ void spSkin_dispose (spSkin* self) {
 	FREE(self);
 }
 
-void spSkin_addAttachment (spSkin* self, int slotIndex, const char* name, spAttachment* attachment) {
+void spSkin_setAttachment (spSkin* self, int slotIndex, const char* name, spAttachment* attachment) {
 	_Entry* newEntry = _Entry_create(slotIndex, name, attachment);
 	newEntry->next = SUB_CAST(_spSkin, self)->entries;
 	SUB_CAST(_spSkin, self)->entries = newEntry;

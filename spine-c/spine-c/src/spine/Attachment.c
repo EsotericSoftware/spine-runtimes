@@ -43,6 +43,8 @@ void _spAttachment_init (spAttachment* self, const char* name, spAttachmentType 
 
 	MALLOC_STR(self->name, name);
 	CONST_CAST(spAttachmentType, self->type) = type;
+
+	self->refCount++;
 }
 
 void _spAttachment_deinit (spAttachment* self) {
@@ -52,5 +54,7 @@ void _spAttachment_deinit (spAttachment* self) {
 }
 
 void spAttachment_dispose (spAttachment* self) {
-	VTABLE(spAttachment, self) ->dispose(self);
+	self->refCount--;
+	if (self->refCount == 0)
+		VTABLE(spAttachment, self) ->dispose(self);
 }

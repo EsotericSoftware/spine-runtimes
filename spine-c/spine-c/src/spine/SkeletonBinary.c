@@ -831,7 +831,7 @@ spSkin* spSkeletonBinary_readSkin(spSkeletonBinary* self, _dataInput* input,
 		for (ii = 0, nn = readVarint(input, 1); ii < nn; ++ii) {
 			const char* name = readString(input);
 			spAttachment* attachment = spSkeletonBinary_readAttachment(self, input, skin, slotIndex, name, skeletonData, nonessential);
-			if (attachment) spSkin_addAttachment(skin, slotIndex, name, attachment);
+			if (attachment) spSkin_setAttachment(skin, slotIndex, name, attachment);
 			FREE(name);
 		}
 	}

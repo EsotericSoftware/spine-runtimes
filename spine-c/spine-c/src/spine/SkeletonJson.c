@@ -1054,7 +1054,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 					}
 					}
 
-					spSkin_addAttachment(skin, slotIndex, skinAttachmentName, attachment);
+					spSkin_setAttachment(skin, slotIndex, skinAttachmentName, attachment);
 				}
 			}
 		}

@@ -52,13 +52,15 @@ typedef struct spAttachment {
 	const char* const name;
 	const spAttachmentType type;
 	const void* const vtable;
+	int refCount;
 	struct spAttachmentLoader* attachmentLoader;
 
 #ifdef __cplusplus
 	spAttachment() :
 		name(0),
 		type(SP_ATTACHMENT_REGION),
-		vtable(0) {
+		vtable(0),
+		refCount(0) {
 	}
 #endif
 } spAttachment;
