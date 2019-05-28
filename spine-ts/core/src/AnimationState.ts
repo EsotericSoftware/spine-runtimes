@@ -527,7 +527,7 @@ module spine {
 
 		expandToIndex (index: number) {
 			if (index < this.tracks.length) return this.tracks[index];
-			Utils.ensureArrayCapacity(this.tracks, index - this.tracks.length + 1, null);
+			Utils.ensureArrayCapacity(this.tracks, index + 1, null);
 			this.tracks.length = index + 1;
 			return null;
 		}
