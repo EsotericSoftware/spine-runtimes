@@ -228,11 +228,11 @@ namespace Spine.Unity.Editor {
 					List<string> attachmentNames = new List<string>();
 					for (int i = 0; i < skinCount; i++) {
 						var skin = skins.Items[i];
-						List<string> temp = new List<string>();
-						skin.FindNamesForSlot(s, temp);
-						foreach (string str in temp) {
-							if (!attachmentNames.Contains(str))
-								attachmentNames.Add(str);
+						var skinEntries = new List<Skin.SkinEntry>();
+						skin.GetAttachments(s, skinEntries);
+						foreach (var entry in skinEntries) {
+							if (!attachmentNames.Contains(entry.Name))
+								attachmentNames.Add(entry.Name);
 						}
 					}
 					slotLookup.Add(s, attachmentNames);
@@ -333,8 +333,8 @@ namespace Spine.Unity.Editor {
 				}
 
 				//create slots and attachments
-				for (int i = 0; i < skeletonData.Slots.Count; i++) {
-					var slotData = skeletonData.Slots.Items[i];
+				for (int slotIndex = 0; slotIndex < skeletonData.Slots.Count; slotIndex++) {
+					var slotData = skeletonData.Slots.Items[slotIndex];
 					Transform slotTransform = SpineEditorUtilities.EditorInstantiation.NewGameObject(slotData.Name).transform;
 					slotTransform.parent = prefabRoot.transform;
 					slotTable.Add(slotData.Name, slotTransform);
@@ -342,12 +342,20 @@ namespace Spine.Unity.Editor {
 					List<Attachment> attachments = new List<Attachment>();
 					List<string> attachmentNames = new List<string>();
 
-					skin.FindAttachmentsForSlot(i, attachments);
-					skin.FindNamesForSlot(i, attachmentNames);
+					var skinEntries = new List<Skin.SkinEntry>();
+					skin.GetAttachments(slotIndex, skinEntries);
+					foreach (var entry in skinEntries) {
+						attachments.Add(entry.Attachment);
+						attachmentNames.Add(entry.Name);
+					}
 
 					if (skin != skeletonData.DefaultSkin) {
-						skeletonData.DefaultSkin.FindAttachmentsForSlot(i, attachments);
-						skeletonData.DefaultSkin.FindNamesForSlot(i, attachmentNames);
+						skinEntries.Clear();
+						skeletonData.DefaultSkin.GetAttachments(slotIndex, skinEntries);
+						foreach (var entry in skinEntries) {
+							attachments.Add(entry.Attachment);
+							attachmentNames.Add(entry.Name);
+						}
 					}
 
 					for (int a = 0; a < attachments.Count; a++) {
@@ -380,7 +388,7 @@ namespace Spine.Unity.Editor {
 							rotation = 0;
 
 							if (isWeightedMesh)
-								mesh = ExtractWeightedMeshAttachment(attachmentMeshName, meshAttachment, i, skeletonData, boneList, mesh);
+								mesh = ExtractWeightedMeshAttachment(attachmentMeshName, meshAttachment, slotIndex, skeletonData, boneList, mesh);
 							else
 								mesh = ExtractMeshAttachment(attachmentMeshName, meshAttachment, mesh);
 							
@@ -410,7 +418,7 @@ namespace Spine.Unity.Editor {
 						}
 
 						attachmentTransform.GetComponent<Renderer>().sharedMaterial = material;
-						attachmentTransform.GetComponent<Renderer>().sortingOrder = i;
+						attachmentTransform.GetComponent<Renderer>().sortingOrder = slotIndex;
 
 						if (attachmentName != slotData.AttachmentName)
 							attachmentTransform.gameObject.SetActive(false);

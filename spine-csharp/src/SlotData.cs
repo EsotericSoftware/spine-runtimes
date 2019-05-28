@@ -40,8 +40,11 @@ namespace Spine {
 		internal string attachmentName;
 		internal BlendMode blendMode;
 
+		/// <summary>The index of the slot in <see cref="Skeleton.Slots"/>.</summary>
 		public int Index { get { return index; } }
+		/// <summary>The name of the slot, which is unique across all slots in the skeleton.</summary>
 		public string Name { get { return name; } }
+		/// <summary>The bone this slot belongs to.</summary>
 		public BoneData BoneData { get { return boneData; } }
 		public float R { get { return r; } set { r = value; } }
 		public float G { get { return g; } set { g = value; } }
@@ -53,8 +56,9 @@ namespace Spine {
 		public float B2 { get { return b2; } set { b2 = value; } }
 		public bool HasSecondColor { get { return hasSecondColor; } set { hasSecondColor = value; } }
 
-		/// <summary>May be null.</summary>
+		/// <summary>The name of the attachment that is visible for this slot in the setup pose, or null if no attachment is visible.</summary>
 		public String AttachmentName { get { return attachmentName; } set { attachmentName = value; } }
+		/// <summary>The blend mode for drawing the slot's attachment.</summary>
 		public BlendMode BlendMode { get { return blendMode; } set { blendMode = value; } }
 
 		public SlotData (int index, String name, BoneData boneData) {

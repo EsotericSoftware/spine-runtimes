@@ -27,6 +27,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using System.Collections;
 using UnityEditor;
 using UnityEngine;
 
@@ -110,11 +111,11 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void DrawPointsInSkin (Skin skin, Skeleton skeleton, Transform transform) {
-			foreach (var skinEntry in skin.Attachments) {
+			foreach (DictionaryEntry skinEntry in skin.Attachments) {
 				var attachment = skinEntry.Value as PointAttachment;
 				if (attachment != null) {
-					var skinKey = skinEntry.Key;
-					var slot = skeleton.Slots.Items[skinKey.slotIndex];
+					var skinKey = (Skin.SkinEntry)skinEntry.Key;
+					var slot = skeleton.Slots.Items[skinKey.SlotIndex];
 					DrawPointAttachmentWithLabel(attachment, slot.Bone, transform);
 				}
 			}

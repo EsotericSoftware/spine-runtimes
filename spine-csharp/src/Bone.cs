@@ -52,7 +52,7 @@ namespace Spine {
 		internal float a, b, worldX;
 		internal float c, d, worldY;
 
-		internal bool sorted;
+		internal bool sorted, update;
 
 		public BoneData Data { get { return data; } }
 		public Skeleton Skeleton { get { return skeleton; } }

@@ -360,16 +360,16 @@ namespace Spine.Unity.Modules {
 			var colliders = new List<Collider2D>();
 			var skin = skeleton.Skin ?? skeleton.Data.DefaultSkin;
 
-			var attachments = new List<Attachment>();
+			var skinEntries = new List<Skin.SkinEntry>();
 			foreach (Slot slot in skeleton.Slots) {
 				if (slot.bone == b) {
-					skin.FindAttachmentsForSlot(skeleton.Slots.IndexOf(slot), attachments);
+					skin.GetAttachments(skeleton.Slots.IndexOf(slot), skinEntries);
 
 					bool bbAttachmentAdded = false;
-					foreach (var a in attachments) {
-						var bbAttachment = a as BoundingBoxAttachment;
+					foreach (var entry in skinEntries) {
+						var bbAttachment = entry.Attachment as BoundingBoxAttachment;
 						if (bbAttachment != null) {
-							if (!a.Name.ToLower().Contains(AttachmentNameMarker))
+							if (!entry.Name.ToLower().Contains(AttachmentNameMarker))
 								continue;
 
 							bbAttachmentAdded = true;

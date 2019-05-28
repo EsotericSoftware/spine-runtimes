@@ -29,6 +29,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace Spine.Unity.Modules.AttachmentTools {
 	public static class AttachmentRegionExtensions {
@@ -503,9 +504,10 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			var texturesToPack = new List<Texture2D>();
 			var originalRegions = new List<AtlasRegion>();
 			int newRegionIndex = 0;
-			foreach (var skinEntry in skinAttachments) {
-				var originalKey = skinEntry.Key;
-				var originalAttachment = skinEntry.Value;
+			
+			foreach (DictionaryEntry skinEntry in skinAttachments) {
+				var originalKey = (Skin.SkinEntry)skinEntry.Key;
+				var originalAttachment = (Attachment)skinEntry.Value;
 
 				Attachment newAttachment;
 				if (IsRenderable(originalAttachment)) {
@@ -523,9 +525,9 @@ namespace Spine.Unity.Modules.AttachmentTools {
 					}
 
 					repackedAttachments.Add(newAttachment);
-					newSkin.AddAttachment(originalKey.slotIndex, originalKey.name, newAttachment);
+					newSkin.SetAttachment(originalKey.SlotIndex, originalKey.Name, newAttachment);
 				} else {
-					newSkin.AddAttachment(originalKey.slotIndex, originalKey.name, useOriginalNonrenderables ? originalAttachment : originalAttachment.GetClone(true));
+					newSkin.SetAttachment(originalKey.SlotIndex, originalKey.Name, useOriginalNonrenderables ? originalAttachment : originalAttachment.GetClone(true));
 				}	
 			}
 
@@ -793,7 +795,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			var newSkin = new Skin(original.name + " clone");
 			var newSkinAttachments = newSkin.Attachments;
 
-			foreach (var a in original.Attachments)
+			foreach (DictionaryEntry a in original.Attachments)
 				newSkinAttachments[a.Key] = a.Value;
 
 			return newSkin;
@@ -804,7 +806,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			int slotIndex = skeleton.FindSlotIndex(slotName);
 			if (skeleton == null) throw new System.ArgumentNullException("skeleton", "skeleton cannot be null.");
 			if (slotIndex == -1) throw new System.ArgumentException(string.Format("Slot '{0}' does not exist in skeleton.", slotName), "slotName");
-			skin.AddAttachment(slotIndex, keyName, attachment);
+			skin.SetAttachment(slotIndex, keyName, attachment);
 		}
 
 		/// <summary>Adds skin items from another skin. For items that already exist, the previous values are replaced.</summary>
@@ -823,7 +825,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 		/// <summary>Adds an attachment to the skin for the specified slot index and name. If the name already exists for the slot, the previous value is replaced.</summary>
 		public static void SetAttachment (this Skin skin, int slotIndex, string keyName, Attachment attachment) {
-			skin.AddAttachment(slotIndex, keyName, attachment);
+			skin.SetAttachment(slotIndex, keyName, attachment);
 		}
 		
 		public static void RemoveAttachment (this Skin skin, string slotName, string keyName, SkeletonData skeletonData) {
@@ -848,21 +850,21 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 			if (cloneAttachments) {
 				if (overwrite) {
-					foreach (var e in sourceAttachments)
-						destinationAttachments[e.Key] = e.Value.GetClone(cloneMeshesAsLinked);
+					foreach (DictionaryEntry e in sourceAttachments)
+						destinationAttachments[e.Key] = ((Attachment)e.Value).GetClone(cloneMeshesAsLinked);
 				} else {
-					foreach (var e in sourceAttachments) {
-						if (destinationAttachments.ContainsKey(e.Key)) continue;
-						destinationAttachments.Add(e.Key, e.Value.GetClone(cloneMeshesAsLinked));
+					foreach (DictionaryEntry e in sourceAttachments) {
+						if (destinationAttachments.Contains(e.Key)) continue;
+						destinationAttachments.Add(e.Key, ((Attachment)e.Value).GetClone(cloneMeshesAsLinked));
 					}
 				}
 			} else {
 				if (overwrite) {
-					foreach (var e in sourceAttachments)
+					foreach (DictionaryEntry e in sourceAttachments)
 						destinationAttachments[e.Key] = e.Value;
 				} else {
-					foreach (var e in sourceAttachments) {
-						if (destinationAttachments.ContainsKey(e.Key)) continue;
+					foreach (DictionaryEntry e in sourceAttachments) {
+						if (destinationAttachments.Contains(e.Key)) continue;
 						destinationAttachments.Add(e.Key, e.Value);
 					}
 				}

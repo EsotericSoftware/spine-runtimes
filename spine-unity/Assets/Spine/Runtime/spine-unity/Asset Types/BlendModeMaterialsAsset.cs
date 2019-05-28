@@ -52,16 +52,16 @@ namespace Spine.Unity {
 			if (skeletonData == null) throw new ArgumentNullException("skeletonData");
 
 			using (var materialCache = new AtlasMaterialCache()) {
-				var attachmentBuffer = new List<Attachment>();
+				var entryBuffer = new List<Skin.SkinEntry>();
 				var slotsItems = skeletonData.Slots.Items;
-				for (int i = 0, slotCount = skeletonData.Slots.Count; i < slotCount; i++) {
-					var slot = slotsItems[i];
+				for (int slotIndex = 0, slotCount = skeletonData.Slots.Count; slotIndex < slotCount; slotIndex++) {
+					var slot = slotsItems[slotIndex];
 					if (slot.blendMode == BlendMode.Normal) continue;
 					if (!includeAdditiveSlots && slot.blendMode == BlendMode.Additive) continue;
 
-					attachmentBuffer.Clear();
+					entryBuffer.Clear();
 					foreach (var skin in skeletonData.Skins)
-						skin.FindAttachmentsForSlot(i, attachmentBuffer);
+						skin.GetAttachments(slotIndex, entryBuffer);
 
 					Material templateMaterial = null;
 					switch (slot.blendMode) {
@@ -77,8 +77,8 @@ namespace Spine.Unity {
 					}
 					if (templateMaterial == null) continue;
 
-					foreach (var attachment in attachmentBuffer) {
-						var renderableAttachment = attachment as IHasRendererObject;
+					foreach (var entry in entryBuffer) {
+						var renderableAttachment = entry.Attachment as IHasRendererObject;
 						if (renderableAttachment != null) {
 							renderableAttachment.RendererObject = materialCache.CloneAtlasRegionWithMaterial((AtlasRegion)renderableAttachment.RendererObject, templateMaterial);
 						}

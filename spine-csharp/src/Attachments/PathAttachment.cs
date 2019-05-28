@@ -42,6 +42,16 @@ namespace Spine {
 
 		public PathAttachment (String name)
 			: base(name) {
-		}			
+		}
+
+		public override Attachment Copy () {
+			PathAttachment copy = new PathAttachment(this.Name);
+			CopyTo(copy);
+			copy.lengths = new float[lengths.Length];
+			Array.Copy(lengths, 0, copy.lengths, 0, lengths.Length);
+			copy.closed = closed;
+			copy.constantSpeed = constantSpeed;
+			       return copy;
+		}
 	}
 }

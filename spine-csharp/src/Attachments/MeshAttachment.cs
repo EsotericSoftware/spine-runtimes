@@ -155,5 +155,42 @@ namespace Spine {
 		override public bool ApplyDeform (VertexAttachment sourceAttachment) {
 			return this == sourceAttachment || (inheritDeform && parentMesh == sourceAttachment);
 		}
+
+		public override Attachment Copy () {
+			MeshAttachment copy = new MeshAttachment(this.Name);
+			copy.regionOffsetX = regionOffsetX;
+			copy.regionOffsetY = regionOffsetY;
+			copy.regionWidth = regionWidth;
+			copy.regionHeight = regionHeight;
+			copy.regionOriginalWidth = regionOriginalWidth;
+			copy.regionOriginalHeight = regionOriginalHeight;
+
+			copy.Path = Path;
+			
+			if (parentMesh == null) {
+				CopyTo(copy);
+				copy.regionUVs = new float[regionUVs.Length];
+				Array.Copy(regionUVs, 0, copy.regionUVs, 0, regionUVs.Length);
+				copy.uvs = new float[uvs.Length];
+				Array.Copy(uvs, 0, copy.uvs, 0, uvs.Length);
+				copy.triangles = new int[triangles.Length];
+				Array.Copy(triangles, 0, copy.triangles, 0, triangles.Length);
+				copy.HullLength = HullLength;
+				
+				copy.inheritDeform = inheritDeform;
+				
+				// Nonessential.
+				if (Edges != null) {
+					copy.Edges = new int[Edges.Length];
+					Array.Copy(Edges, 0, copy.Edges, 0, Edges.Length);
+				}
+				copy.Width = Width;
+				copy.Height = Height;
+			}
+			else
+				copy.ParentMesh = parentMesh;
+			
+			return copy;
+		}
 	}
 }

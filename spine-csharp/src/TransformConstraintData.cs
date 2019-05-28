@@ -30,17 +30,13 @@
 using System;
 
 namespace Spine {
-	public class TransformConstraintData {
-		internal string name;
-		internal int order;
+	public class TransformConstraintData : ConstraintData {
 		internal ExposedList<BoneData> bones = new ExposedList<BoneData>();
 		internal BoneData target;
 		internal float rotateMix, translateMix, scaleMix, shearMix;
 		internal float offsetRotation, offsetX, offsetY, offsetScaleX, offsetScaleY, offsetShearY;
 		internal bool relative, local;
 
-		public string Name { get { return name; } }
-		public int Order { get { return order; } set { order = value; } }
 		public ExposedList<BoneData> Bones { get { return bones; } }
 		public BoneData Target { get { return target; } set { target = value; } }
 		public float RotateMix { get { return rotateMix; } set { rotateMix = value; } }
@@ -58,13 +54,7 @@ namespace Spine {
 		public bool Relative { get { return relative; } set { relative = value; } }
 		public bool Local { get { return local; } set { local = value; } }
 
-		public TransformConstraintData (string name) {
-			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
-			this.name = name;
-		}
-
-		override public string ToString () {
-			return name;
+		public TransformConstraintData (string name) : base(name) {
 		}
 	}
 }

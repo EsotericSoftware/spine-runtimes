@@ -32,23 +32,14 @@ using System.Collections.Generic;
 
 namespace Spine {
 	/// <summary>Stores the setup pose for an IkConstraint.</summary>
-	public class IkConstraintData {
-		internal string name;
-		internal int order;
+	public class IkConstraintData : ConstraintData {
 		internal List<BoneData> bones = new List<BoneData>();
 		internal BoneData target;
 		internal int bendDirection = 1;
 		internal bool compress, stretch, uniform;
 		internal float mix = 1;
 
-		/// <summary>The IK constraint's name, which is unique within the skeleton.</summary>
-		public string Name {
-			get { return name; }
-		}
-
-		public int Order {
-			get { return order; }
-			set { order = value; }
+		public IkConstraintData (string name) : base(name) {
 		}
 
 		/// <summary>The bones that are constrained by this IK Constraint.</summary>
@@ -97,15 +88,6 @@ namespace Spine {
 		public bool Uniform {
 			get { return uniform; }
 			set { uniform = value; }
-		}
-
-		public IkConstraintData (string name) {
-			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
-			this.name = name;
-		}
-
-		override public string ToString () {
-			return name;
 		}
 	}
 }

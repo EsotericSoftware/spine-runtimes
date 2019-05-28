@@ -37,11 +37,12 @@ namespace Spine {
 		internal float length;
 		internal float x, y, rotation, scaleX = 1, scaleY = 1, shearX, shearY;
 		internal TransformMode transformMode = TransformMode.Normal;
+		internal bool skinRequired;
 
 		/// <summary>The index of the bone in Skeleton.Bones</summary>
 		public int Index { get { return index; } }
 
-		/// <summary>The name of the bone, which is unique within the skeleton.</summary>
+		/// <summary>The name of the bone, which is unique across all bones in the skeleton.</summary>
 		public string Name { get { return name; } }
 
 		/// <summary>May be null.</summary>
@@ -72,6 +73,11 @@ namespace Spine {
 
 		/// <summary>The transform mode for how parent world transforms affect this bone.</summary>
 		public TransformMode TransformMode { get { return transformMode; } set { transformMode = value; } }
+
+		///<summary>When true, <see cref="Skeleton.UpdateWorldTransform()"/> only updates this bone if the <see cref="Skeleton.Skin"/> contains this
+		/// bone.</summary>
+		/// <seealso cref="Skin.Bones"/>
+		public bool SkinRequired { get { return skinRequired; } set { skinRequired = value; } }
 
 		/// <param name="parent">May be null.</param>
 		public BoneData (int index, string name, BoneData parent) {

@@ -41,6 +41,9 @@ namespace Spine {
 		override public string ToString () {
 			return Name;
 		}
+
+		///<summary>Returns a copy of the attachment.</summary>
+		public abstract Attachment Copy ();
 	}
 
 	public interface IHasRendererObject {
