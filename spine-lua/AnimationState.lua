@@ -326,7 +326,6 @@ function AnimationState:apply (skeleton)
 	if skeleton == nil then error("skeleton cannot be null.", 2) end
 	if self.animationsChanged then self:_animationsChanged() end
 
-	local events = self.events
 	local tracks = self.tracks
 	local queue = self.queue
   local applied = false
@@ -352,7 +351,7 @@ function AnimationState:apply (skeleton)
 			local timelines = current.animation.timelines
 			if (i == 0 and mix == 1) or blend == MixBlend.add then
 				for i,timeline in ipairs(timelines) do
-					timeline:apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection._in)
+					timeline:apply(skeleton, animationLast, animationTime, self.events, mix, blend, MixDirection._in)
 				end
 			else
 				local timelineMode = current.timelineMode
@@ -367,13 +366,12 @@ function AnimationState:apply (skeleton)
 						self:applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii * 2,
 							firstFrame)
 					else
-						timeline:apply(skeleton, animationLast, animationTime, events, mix, timelineBlend, MixDirection._in)
+						timeline:apply(skeleton, animationLast, animationTime, self.events, mix, timelineBlend, MixDirection._in)
 					end
 				end
 			end
 			self:queueEvents(current, animationTime)
 			self.events = {};
-			events = self.events;
 			current.nextAnimationLast = animationTime
 			current.nextTrackLast = current.trackTime
 		end
@@ -460,13 +458,15 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
               if drawOrder then direction = MixDirection._in end
             end
           end
-					timeline:apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, direction)
+					timeline:apply(skeleton, animationLast, animationTime, self.events, alpha, timelineBlend, direction)
 				end
 			end
 		end
 	end
 
-	if (to.mixDuration > 0) then 	self:queueEvents(from, animationTime) end
+	if (to.mixDuration > 0) then 
+    self:queueEvents(from, animationTime)
+  end
 	self.events = {};
 	from.nextAnimationLast = animationTime
 	from.nextTrackLast = from.trackTime
