@@ -1758,7 +1758,7 @@ var spine;
 		AnimationState.prototype.expandToIndex = function (index) {
 			if (index < this.tracks.length)
 				return this.tracks[index];
-			spine.Utils.ensureArrayCapacity(this.tracks, index - this.tracks.length + 1, null);
+			spine.Utils.ensureArrayCapacity(this.tracks, index + 1, null);
 			this.tracks.length = index + 1;
 			return null;
 		};
