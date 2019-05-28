@@ -8,7 +8,7 @@ Shader "Spine/Special/SkeletonGhost" {
 		[NoScaleOffset] _MainTex ("Base (RGB) Alpha (A)", 2D) = "white" {}
 		_TextureFade ("Texture Fade Out", Range(0,1)) = 0
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
-		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Compare", Float) = 0.0 // Disabled stencil test by default
+		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
     }
     SubShader {
 		Tags {
