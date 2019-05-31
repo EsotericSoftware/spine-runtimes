@@ -31,7 +31,6 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.OrderedMap;
-
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 
@@ -80,19 +79,10 @@ public class Skin {
 			if (!constraints.contains(data, true)) constraints.add(data);
 
 		for (SkinEntry entry : skin.attachments.keys()) {
-			Attachment attachment = entry.attachment.copy();
-			setAttachment(entry.slotIndex, entry.name, attachment);
-		}
-
-		for (SkinEntry entry : attachments.keys()) {
-			Attachment attachment = entry.attachment;
-			if (attachment instanceof MeshAttachment) {
-				MeshAttachment mesh = (MeshAttachment)attachment;
-				if (mesh.getParentMesh() != null) {
-					mesh.setParentMesh((MeshAttachment)getAttachment(entry.slotIndex, mesh.getParentMesh().getName()));
-					mesh.updateUVs();
-				}
-			}
+			if (entry.attachment instanceof MeshAttachment)
+				setAttachment(entry.slotIndex, entry.name, ((MeshAttachment)entry.attachment).newLinkedMesh());
+			else
+				setAttachment(entry.slotIndex, entry.name, entry.attachment.copy());
 		}
 	}
 

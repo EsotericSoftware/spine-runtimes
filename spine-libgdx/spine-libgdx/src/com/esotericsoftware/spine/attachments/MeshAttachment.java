@@ -256,6 +256,8 @@ public class MeshAttachment extends VertexAttachment {
 		MeshAttachment copy = new MeshAttachment(name);
 		copy.region = region;
 		copy.path = path;
+		copy.color.set(color);
+		copy.inheritDeform = inheritDeform;
 
 		if (parentMesh == null) {
 			copyTo(copy);
@@ -265,10 +267,7 @@ public class MeshAttachment extends VertexAttachment {
 			System.arraycopy(uvs, 0, copy.uvs, 0, uvs.length);
 			copy.triangles = new short[triangles.length];
 			System.arraycopy(triangles, 0, copy.triangles, 0, triangles.length);
-			copy.color.set(color);
 			copy.hullLength = hullLength;
-
-			copy.inheritDeform = inheritDeform;
 
 			// Nonessential.
 			if (edges != null) {
@@ -283,5 +282,17 @@ public class MeshAttachment extends VertexAttachment {
 		}
 
 		return copy;
+	}
+
+	/** returns a mesh linking to this mesh. **/
+	public MeshAttachment newLinkedMesh () {
+		MeshAttachment linkedMesh = new MeshAttachment(name);
+		linkedMesh.region = region;
+		linkedMesh.path = path;
+		linkedMesh.color.set(color);
+		linkedMesh.inheritDeform = inheritDeform;
+		linkedMesh.setParentMesh(parentMesh != null ? parentMesh : this);
+		linkedMesh.updateUVs();
+		return linkedMesh;
 	}
 }
