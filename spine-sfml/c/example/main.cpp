@@ -446,7 +446,48 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 	Skeleton_dispose(skeleton);
 }
 
+void testSkinsApi(SkeletonData* skeletonData, Atlas* atlas) {
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+	drawable->setUsePremultipliedAlpha(true);
+
+	Skeleton* skeleton = drawable->skeleton;
+
+	spSkin* skin = spSkin_create("test-skin");
+	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "goblingirl"));
+	spSkeleton_setSkin(skeleton, skin);
+	spSkeleton_setSlotsToSetupPose(skeleton);
+
+	skeleton->x = 320;
+	skeleton->y = 590;
+	Skeleton_updateWorldTransform(skeleton);
+
+	AnimationState_setAnimationByName(drawable->state, 0, "walk", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - skins api");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable->update(delta);
+
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+
+	spSkin_clear(skin);
+	spSkin_dispose(skin);
+}
+
 int main () {
+	testcase(testSkinsApi, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
 	testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 1.0f);
 	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(stretchyman, "data/stretchyman-stretchy-ik-pro.json", "data/stretchyman-stretchy-ik-pro.skel", "data/stretchyman-pma.atlas", 0.6f);

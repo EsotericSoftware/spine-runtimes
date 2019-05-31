@@ -39,9 +39,13 @@ void _spPathAttachment_dispose (spAttachment* attachment) {
 	FREE(self);
 }
 
+spAttachment* _spPathAttachment_copy (spAttachment* attachment) {
+
+}
+
 spPathAttachment* spPathAttachment_create (const char* name) {
 	spPathAttachment* self = NEW(spPathAttachment);
 	_spVertexAttachment_init(SUPER(self));
-	_spAttachment_init(SUPER(SUPER(self)), name, SP_ATTACHMENT_PATH, _spPathAttachment_dispose);
+	_spAttachment_init(SUPER(SUPER(self)), name, SP_ATTACHMENT_PATH, _spPathAttachment_dispose, _spPathAttachment_copy);
 	return self;
 }

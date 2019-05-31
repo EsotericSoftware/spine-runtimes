@@ -277,7 +277,7 @@ void _spAttachmentLoader_setUnknownTypeError (spAttachmentLoader* self, spAttach
 /**/
 
 void _spAttachment_init (spAttachment* self, const char* name, spAttachmentType type,
-void (*dispose) (spAttachment* self));
+void (*dispose) (spAttachment* self), spAttachment* (*copy) (spAttachment* self));
 void _spAttachment_deinit (spAttachment* self);
 void _spVertexAttachment_init (spVertexAttachment* self);
 void _spVertexAttachment_deinit (spVertexAttachment* self);

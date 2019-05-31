@@ -81,7 +81,7 @@ spAttachment* _spAtlasAttachmentLoader_createAttachment (spAttachmentLoader* loa
 	case SP_ATTACHMENT_PATH:
 		return SUPER(SUPER(spPathAttachment_create(name)));
 	case SP_ATTACHMENT_POINT:
-		return SUPER(SUPER(spPointAttachment_create(name)));
+		return SUPER(spPointAttachment_create(name));
 	case SP_ATTACHMENT_CLIPPING:
 		return SUPER(SUPER(spClippingAttachment_create(name)));
 	default:

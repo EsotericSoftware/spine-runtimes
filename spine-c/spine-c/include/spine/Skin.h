@@ -32,6 +32,10 @@
 
 #include <spine/dll.h>
 #include <spine/Attachment.h>
+#include <spine/IkConstraintData.h>
+#include <spine/TransformConstraintData.h>
+#include <spine/PathConstraintData.h>
+#include <spine/Array.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,18 +46,33 @@ extern "C" {
 
 struct spSkeleton;
 
+_SP_ARRAY_DECLARE_TYPE(spBoneDataArray, spBoneData*)
+_SP_ARRAY_DECLARE_TYPE(spIkConstraintDataArray, spIkConstraintData*)
+_SP_ARRAY_DECLARE_TYPE(spTransformConstraintDataArray, spTransformConstraintData*)
+_SP_ARRAY_DECLARE_TYPE(spPathConstraintDataArray, spPathConstraintData*)
+
 typedef struct spSkin {
 	const char* const name;
 
+	spBoneDataArray* bones;
+	spIkConstraintDataArray* ikConstraints;
+	spTransformConstraintDataArray* transformConstraints;
+	spPathConstraintDataArray* pathConstraints;
+
 #ifdef __cplusplus
 	spSkin() :
-		name(0) {
+		name(0),
+		bones(0),
+		ikConstraints(0),
+		transformConstraints(0),
+		pathConstraints(0) {
 	}
 #endif
 } spSkin;
 
 /* Private structs, needed by Skeleton */
 typedef struct _Entry _Entry;
+typedef struct _Entry spSkinEntry;
 struct _Entry {
 	int slotIndex;
 	const char* name;
@@ -64,7 +83,7 @@ struct _Entry {
 typedef struct _SkinHashTableEntry _SkinHashTableEntry;
 struct _SkinHashTableEntry {
 	_Entry* entry;
-	_SkinHashTableEntry* next;  /* list for elements with same hashes */
+	_SkinHashTableEntry* next;
 };
 
 typedef struct {
@@ -86,6 +105,15 @@ SP_API const char* spSkin_getAttachmentName (const spSkin* self, int slotIndex, 
 
 /** Attach each attachment in this skin if the corresponding attachment in oldSkin is currently attached. */
 SP_API void spSkin_attachAll (const spSkin* self, struct spSkeleton* skeleton, const spSkin* oldspSkin);
+
+/** Adds all attachments, bones, and constraints from the specified skin to this skin. */
+SP_API void spSkin_addSkin(spSkin* self, const spSkin* other);
+
+/** Returns all attachments in this skin. */
+SP_API spSkinEntry* spSkin_getAttachments(const spSkin* self);
+
+/** Clears all attachments, bones, and constraints. */
+SP_API void spSkin_clear(spSkin* self);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spSkin Skin;

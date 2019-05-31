@@ -1004,7 +1004,7 @@ void _spTrackEntry_computeNotLast(spTrackEntry* entry, spAnimationState* state) 
 	spTimeline** timelines ;
 	int timelinesCount;
 	int* timelineMode;
-	int i, n;
+	int i;
 
 	timelines = entry->animation->timelines;
 	timelinesCount = entry->animation->timelinesCount;

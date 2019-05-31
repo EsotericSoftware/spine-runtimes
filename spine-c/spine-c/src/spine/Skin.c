@@ -30,6 +30,11 @@
 #include <spine/Skin.h>
 #include <spine/extension.h>
 
+_SP_ARRAY_IMPLEMENT_TYPE(spBoneDataArray, spBoneData*)
+_SP_ARRAY_IMPLEMENT_TYPE(spIkConstraintDataArray, spIkConstraintData*)
+_SP_ARRAY_IMPLEMENT_TYPE(spTransformConstraintDataArray, spTransformConstraintData*)
+_SP_ARRAY_IMPLEMENT_TYPE(spPathConstraintDataArray, spPathConstraintData*)
+
 _Entry* _Entry_create (int slotIndex, const char* name, spAttachment* attachment) {
 	_Entry* self = NEW(_Entry);
 	self->slotIndex = slotIndex;
@@ -59,6 +64,10 @@ static void _SkinHashTableEntry_dispose (_SkinHashTableEntry* self) {
 spSkin* spSkin_create (const char* name) {
 	spSkin* self = SUPER(NEW(_spSkin));
 	MALLOC_STR(self->name, name);
+	self->bones = spBoneDataArray_create(4);
+	self->ikConstraints = spIkConstraintDataArray_create(4);
+	self->transformConstraints = spTransformConstraintDataArray_create(4);
+	self->pathConstraints = spPathConstraintDataArray_create(4);
 	return self;
 }
 
@@ -86,21 +95,42 @@ void spSkin_dispose (spSkin* self) {
 		}
 	}
 
+	spBoneDataArray_dispose(self->bones);
+	spIkConstraintDataArray_dispose(self->ikConstraints);
+	spTransformConstraintDataArray_dispose(self->transformConstraints);
+	spPathConstraintDataArray_dispose(self->pathConstraints);
 	FREE(self->name);
 	FREE(self);
 }
 
 void spSkin_setAttachment (spSkin* self, int slotIndex, const char* name, spAttachment* attachment) {
-	_Entry* newEntry = _Entry_create(slotIndex, name, attachment);
-	newEntry->next = SUB_CAST(_spSkin, self)->entries;
-	SUB_CAST(_spSkin, self)->entries = newEntry;
+	_SkinHashTableEntry* existingEntry = 0;
+	const _SkinHashTableEntry* hashEntry = SUB_CAST(_spSkin, self)->entriesHashTable[(unsigned int)slotIndex % SKIN_ENTRIES_HASH_TABLE_SIZE];
+	while (hashEntry) {
+		if (hashEntry->entry->slotIndex == slotIndex && strcmp(hashEntry->entry->name, name) == 0) {
+			existingEntry = hashEntry;
+			break;
+		}
+		hashEntry = hashEntry->next;
+	}
 
-	{
-		unsigned int hashTableIndex = (unsigned int)slotIndex % SKIN_ENTRIES_HASH_TABLE_SIZE;
+	if (attachment) attachment->refCount++;
 
-		_SkinHashTableEntry* newHashEntry = _SkinHashTableEntry_create(newEntry);
-		newHashEntry->next = SUB_CAST(_spSkin, self)->entriesHashTable[hashTableIndex];
-		SUB_CAST(_spSkin, self)->entriesHashTable[hashTableIndex] = newHashEntry;
+	if (existingEntry) {
+		if (hashEntry->entry->attachment) spAttachment_dispose(hashEntry->entry->attachment);
+		hashEntry->entry->attachment = attachment;
+	} else {
+		_Entry* newEntry = _Entry_create(slotIndex, name, attachment);
+		newEntry->next = SUB_CAST(_spSkin, self)->entries;
+		SUB_CAST(_spSkin, self)->entries = newEntry;
+		{
+			unsigned int hashTableIndex = (unsigned int)slotIndex % SKIN_ENTRIES_HASH_TABLE_SIZE;
+			_SkinHashTableEntry** hashTable = SUB_CAST(_spSkin, self)->entriesHashTable;
+
+			_SkinHashTableEntry* newHashEntry = _SkinHashTableEntry_create(newEntry);
+			newHashEntry->next = hashTable[hashTableIndex];
+			SUB_CAST(_spSkin, self)->entriesHashTable[hashTableIndex] = newHashEntry;
+		}
 	}
 }
 
@@ -136,4 +166,72 @@ void spSkin_attachAll (const spSkin* self, spSkeleton* skeleton, const spSkin* o
 		}
 		entry = entry->next;
 	}
+}
+
+void spSkin_addSkin(spSkin* self, const spSkin* other) {
+	int i = 0;
+
+	for (i = 0; i < other->bones->size; i++) {
+		if (!spBoneDataArray_contains(self->bones, other->bones->items[i]))
+			spBoneDataArray_add(self->bones, other->bones->items[i]);
+	}
+
+	for (i = 0; i < other->ikConstraints->size; i++) {
+		if (!spIkConstraintDataArray_contains(self->ikConstraints, other->ikConstraints->items[i]))
+			spIkConstraintDataArray_add(self->ikConstraints, other->ikConstraints->items[i]);
+	}
+
+	for (i = 0; i < other->transformConstraints->size; i++) {
+		if (!spTransformConstraintDataArray_contains(self->transformConstraints, other->transformConstraints->items[i]))
+			spTransformConstraintDataArray_add(self->transformConstraints, other->transformConstraints->items[i]);
+	}
+
+	for (i = 0; i < other->pathConstraints->size; i++) {
+		if (!spPathConstraintDataArray_contains(self->pathConstraints, other->pathConstraints->items[i]))
+			spPathConstraintDataArray_add(self->pathConstraints, other->pathConstraints->items[i]);
+	}
+
+	spSkinEntry* entry = spSkin_getAttachments(other);
+	while (entry) {
+		spSkin_setAttachment(self, entry->slotIndex, entry->name, entry->attachment);
+		entry = entry->next;
+	}
+}
+
+spSkinEntry* spSkin_getAttachments(const spSkin* self) {
+	return SUB_CAST(_spSkin, self)->entries;
+}
+
+void spSkin_clear(spSkin* self) {
+	_Entry* entry = SUB_CAST(_spSkin, self)->entries;
+
+	while (entry) {
+		_Entry* nextEntry = entry->next;
+		_Entry_dispose(entry);
+		entry = nextEntry;
+	}
+
+	SUB_CAST(_spSkin, self)->entries = 0;
+
+	{
+		_SkinHashTableEntry** currentHashtableEntry = SUB_CAST(_spSkin, self)->entriesHashTable;
+		int i;
+
+		for (i = 0; i < SKIN_ENTRIES_HASH_TABLE_SIZE; ++i, ++currentHashtableEntry) {
+			_SkinHashTableEntry* hashtableEntry = *currentHashtableEntry;
+
+			while (hashtableEntry) {
+				_SkinHashTableEntry* nextEntry = hashtableEntry->next;
+				_SkinHashTableEntry_dispose(hashtableEntry);
+				hashtableEntry = nextEntry;
+			}
+
+			SUB_CAST(_spSkin, self)->entriesHashTable[i] = 0;
+		}
+	}
+
+	spBoneDataArray_clear(self->bones);
+	spIkConstraintDataArray_clear(self->ikConstraints);
+	spTransformConstraintDataArray_clear(self->transformConstraints);
+	spPathConstraintDataArray_clear(self->pathConstraints);
 }

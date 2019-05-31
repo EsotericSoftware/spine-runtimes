@@ -41,7 +41,7 @@ extern "C" {
 #endif
 
 typedef struct spPointAttachment {
-	spVertexAttachment super;
+	spAttachment super;
 	float x, y, rotation;
 	spColor color;
 } spPointAttachment;

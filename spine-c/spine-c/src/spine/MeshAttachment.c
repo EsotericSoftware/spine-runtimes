@@ -44,19 +44,24 @@ void _spMeshAttachment_dispose (spAttachment* attachment) {
 	FREE(self);
 }
 
+spAttachment* _spMeshAttachment_copy (spAttachment* attachment) {
+
+}
+
 spMeshAttachment* spMeshAttachment_create (const char* name) {
 	spMeshAttachment* self = NEW(spMeshAttachment);
 	_spVertexAttachment_init(SUPER(self));
 	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
-	_spAttachment_init(SUPER(SUPER(self)), name, SP_ATTACHMENT_MESH, _spMeshAttachment_dispose);
+	_spAttachment_init(SUPER(SUPER(self)), name, SP_ATTACHMENT_MESH, _spMeshAttachment_dispose, _spMeshAttachment_copy);
 	return self;
 }
 
 void spMeshAttachment_updateUVs (spMeshAttachment* self) {
 	int i, n;
+	float* uvs;
 	int verticesLength = SUPER(self)->worldVerticesLength;
 	FREE(self->uvs);
-	float* uvs = self->uvs = MALLOC(float, verticesLength);
+	uvs = self->uvs = MALLOC(float, verticesLength);
 	n = verticesLength;
 	float u = self->regionU, v = self->regionV;
 	float width = 0, height = 0;
