@@ -587,7 +587,7 @@ public class Skeleton {
 
 	/** A convenience method to set an attachment by finding the slot with {@link #findSlot(String)}, finding the attachment with
 	 * {@link #getAttachment(int, String)}, then setting the slot's {@link Slot#attachment}.
-	 * @param attachmentName May be null to clear the slot. */
+	 * @param attachmentName May be null to clear the slot's attachment. */
 	public void setAttachment (String slotName, String attachmentName) {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
 		Slot slot = findSlot(slotName);

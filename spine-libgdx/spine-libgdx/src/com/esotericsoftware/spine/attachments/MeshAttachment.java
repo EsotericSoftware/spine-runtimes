@@ -233,46 +233,42 @@ public class MeshAttachment extends VertexAttachment {
 	}
 
 	public Attachment copy () {
+		if (parentMesh != null) return newLinkedMesh();
+
 		MeshAttachment copy = new MeshAttachment(name);
 		copy.region = region;
 		copy.path = path;
 		copy.color.set(color);
 		copy.deformAttachment = deformAttachment;
 
-		if (parentMesh == null) {
-			copyTo(copy);
-			copy.regionUVs = new float[regionUVs.length];
-			System.arraycopy(regionUVs, 0, copy.regionUVs, 0, regionUVs.length);
-			copy.uvs = new float[uvs.length];
-			System.arraycopy(uvs, 0, copy.uvs, 0, uvs.length);
-			copy.triangles = new short[triangles.length];
-			System.arraycopy(triangles, 0, copy.triangles, 0, triangles.length);
-			copy.hullLength = hullLength;
+		copyTo(copy);
+		copy.regionUVs = new float[regionUVs.length];
+		System.arraycopy(regionUVs, 0, copy.regionUVs, 0, regionUVs.length);
+		copy.uvs = new float[uvs.length];
+		System.arraycopy(uvs, 0, copy.uvs, 0, uvs.length);
+		copy.triangles = new short[triangles.length];
+		System.arraycopy(triangles, 0, copy.triangles, 0, triangles.length);
+		copy.hullLength = hullLength;
 
-			// Nonessential.
-			if (edges != null) {
-				copy.edges = new short[edges.length];
-				System.arraycopy(edges, 0, copy.edges, 0, edges.length);
-			}
-			copy.width = width;
-			copy.height = height;
-		} else {
-			copy.setParentMesh(parentMesh);
-			copy.updateUVs();
+		// Nonessential.
+		if (edges != null) {
+			copy.edges = new short[edges.length];
+			System.arraycopy(edges, 0, copy.edges, 0, edges.length);
 		}
-
+		copy.width = width;
+		copy.height = height;
 		return copy;
 	}
 
-	/** returns a mesh linking to this mesh. **/
+	/** Returns a new mesh with this mesh set as the {@link #parentMesh}. **/
 	public MeshAttachment newLinkedMesh () {
-		MeshAttachment linkedMesh = new MeshAttachment(name);
-		linkedMesh.region = region;
-		linkedMesh.path = path;
-		linkedMesh.color.set(color);
-		linkedMesh.deformAttachment = deformAttachment;
-		linkedMesh.setParentMesh(parentMesh != null ? parentMesh : this);
-		linkedMesh.updateUVs();
-		return linkedMesh;
+		MeshAttachment mesh = new MeshAttachment(name);
+		mesh.region = region;
+		mesh.path = path;
+		mesh.color.set(color);
+		mesh.deformAttachment = deformAttachment;
+		mesh.setParentMesh(parentMesh != null ? parentMesh : this);
+		mesh.updateUVs();
+		return mesh;
 	}
 }

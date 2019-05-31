@@ -30,6 +30,7 @@
 package com.esotericsoftware.spine.attachments;
 
 import com.badlogic.gdx.utils.FloatArray;
+
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.Slot;
@@ -43,11 +44,10 @@ abstract public class VertexAttachment extends Attachment {
 	int[] bones;
 	float[] vertices;
 	int worldVerticesLength;
-	VertexAttachment deformAttachment;
+	VertexAttachment deformAttachment = this;
 
 	public VertexAttachment (String name) {
 		super(name);
-		deformAttachment = this;
 	}
 
 	/** Transforms the attachment's local {@link #getVertices()} to world coordinates. If the slot's {@link Slot#getDeform()} is
@@ -118,10 +118,13 @@ abstract public class VertexAttachment extends Attachment {
 		}
 	}
 
+	/** Deform keys for the deform attachment are also applied to this attachment.
+	 * @return May be null if no deform keys should be applied. */
 	public VertexAttachment getDeformAttachment () {
 		return deformAttachment;
 	}
 
+	/** @param deformAttachment May be null if no deform keys should be applied. */
 	public void setDeformAttachment (VertexAttachment deformAttachment) {
 		this.deformAttachment = deformAttachment;
 	}
