@@ -40,7 +40,6 @@ import com.badlogic.gdx.utils.DataInput;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.SerializationException;
-
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.ColorTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline;
@@ -304,6 +303,7 @@ public class SkeletonBinary {
 				if (skin == null) throw new SerializationException("Skin not found: " + linkedMesh.skin);
 				Attachment parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
 				if (parent == null) throw new SerializationException("Parent mesh not found: " + linkedMesh.parent);
+				linkedMesh.mesh.setDeformAttachment(linkedMesh.inheritDeform ? (VertexAttachment)parent : linkedMesh.mesh);
 				linkedMesh.mesh.setParentMesh((MeshAttachment)parent);
 				linkedMesh.mesh.updateUVs();
 			}
@@ -469,12 +469,11 @@ public class SkeletonBinary {
 			if (mesh == null) return null;
 			mesh.setPath(path);
 			Color.rgba8888ToColor(mesh.getColor(), color);
-			mesh.setInheritDeform(inheritDeform);
 			if (nonessential) {
 				mesh.setWidth(width * scale);
 				mesh.setHeight(height * scale);
 			}
-			linkedMeshes.add(new LinkedMesh(mesh, skinName, slotIndex, parent));
+			linkedMeshes.add(new LinkedMesh(mesh, skinName, slotIndex, parent, inheritDeform));
 			return mesh;
 		}
 		case path: {

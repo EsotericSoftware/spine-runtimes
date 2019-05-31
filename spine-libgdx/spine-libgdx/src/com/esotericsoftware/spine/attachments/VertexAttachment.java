@@ -43,9 +43,11 @@ abstract public class VertexAttachment extends Attachment {
 	int[] bones;
 	float[] vertices;
 	int worldVerticesLength;
+	VertexAttachment deformAttachment;
 
 	public VertexAttachment (String name) {
 		super(name);
+		deformAttachment = this;
 	}
 
 	/** Transforms the attachment's local {@link #getVertices()} to world coordinates. If the slot's {@link Slot#getDeform()} is
@@ -116,10 +118,12 @@ abstract public class VertexAttachment extends Attachment {
 		}
 	}
 
-	/** Returns true if a deform originally applied to the specified attachment should be applied to this attachment. The default
-	 * implementation returns true only when <code>sourceAttachment</code> is this attachment. */
-	public boolean applyDeform (VertexAttachment sourceAttachment) {
-		return this == sourceAttachment;
+	public VertexAttachment getDeformAttachment () {
+		return deformAttachment;
+	}
+
+	public void setDeformAttachment (VertexAttachment deformAttachment) {
+		this.deformAttachment = deformAttachment;
 	}
 
 	/** The bones which affect the {@link #getVertices()}. The array entries are, for each vertex, the number of bones affecting

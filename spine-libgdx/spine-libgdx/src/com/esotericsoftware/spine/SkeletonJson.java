@@ -38,7 +38,6 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.SerializationException;
-
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.ColorTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline;
@@ -311,6 +310,7 @@ public class SkeletonJson {
 			if (skin == null) throw new SerializationException("Skin not found: " + linkedMesh.skin);
 			Attachment parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
 			if (parent == null) throw new SerializationException("Parent mesh not found: " + linkedMesh.parent);
+			linkedMesh.mesh.setDeformAttachment(linkedMesh.inheritDeform ? (VertexAttachment)parent : linkedMesh.mesh);
 			linkedMesh.mesh.setParentMesh((MeshAttachment)parent);
 			linkedMesh.mesh.updateUVs();
 		}
@@ -398,8 +398,8 @@ public class SkeletonJson {
 
 			String parent = map.getString("parent", null);
 			if (parent != null) {
-				mesh.setInheritDeform(map.getBoolean("deform", true));
-				linkedMeshes.add(new LinkedMesh(mesh, map.getString("skin", null), slotIndex, parent));
+				linkedMeshes
+					.add(new LinkedMesh(mesh, map.getString("skin", null), slotIndex, parent, map.getBoolean("deform", true)));
 				return mesh;
 			}
 
@@ -798,12 +798,14 @@ public class SkeletonJson {
 		String parent, skin;
 		int slotIndex;
 		MeshAttachment mesh;
+		boolean inheritDeform;
 
-		public LinkedMesh (MeshAttachment mesh, String skin, int slotIndex, String parent) {
+		public LinkedMesh (MeshAttachment mesh, String skin, int slotIndex, String parent, boolean inheritDeform) {
 			this.mesh = mesh;
 			this.skin = skin;
 			this.slotIndex = slotIndex;
 			this.parent = parent;
+			this.inheritDeform = inheritDeform;
 		}
 	}
 }

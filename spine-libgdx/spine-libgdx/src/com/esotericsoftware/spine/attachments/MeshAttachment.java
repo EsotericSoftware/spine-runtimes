@@ -32,7 +32,6 @@ package com.esotericsoftware.spine.attachments;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.esotericsoftware.spine.Animation.DeformTimeline;
 
 /** An attachment that displays a textured mesh. A mesh has hull vertices and internal vertices within the hull. Holes are not
  * supported. Each vertex has UVs (texture coordinates) and triangles are used to map an image on to the mesh.
@@ -46,7 +45,6 @@ public class MeshAttachment extends VertexAttachment {
 	private final Color color = new Color(1, 1, 1, 1);
 	private int hullLength;
 	private MeshAttachment parentMesh;
-	private boolean inheritDeform;
 
 	// Nonessential.
 	private short[] edges;
@@ -128,12 +126,6 @@ public class MeshAttachment extends VertexAttachment {
 			uvs[i] = u + regionUVs[i] * width;
 			uvs[i + 1] = v + regionUVs[i + 1] * height;
 		}
-	}
-
-	/** Returns true if the <code>sourceAttachment</code> is this mesh, else returns true if {@link #inheritDeform} is true and the
-	 * the <code>sourceAttachment</code> is the {@link #parentMesh}. */
-	public boolean applyDeform (VertexAttachment sourceAttachment) {
-		return this == sourceAttachment || (inheritDeform && parentMesh == sourceAttachment);
 	}
 
 	/** Triplets of vertex indices which describe the mesh's triangulation. */
@@ -240,24 +232,12 @@ public class MeshAttachment extends VertexAttachment {
 		}
 	}
 
-	/** When this is a linked mesh (see {@link #parentMesh}), if true, any {@link DeformTimeline} for the {@link #parentMesh} is
-	 * also applied to this mesh. If false, this linked mesh may have its own deform timelines.
-	 * <p>
-	 * See {@link #applyDeform(VertexAttachment)}. */
-	public boolean getInheritDeform () {
-		return inheritDeform;
-	}
-
-	public void setInheritDeform (boolean inheritDeform) {
-		this.inheritDeform = inheritDeform;
-	}
-
 	public Attachment copy () {
 		MeshAttachment copy = new MeshAttachment(name);
 		copy.region = region;
 		copy.path = path;
 		copy.color.set(color);
-		copy.inheritDeform = inheritDeform;
+		copy.deformAttachment = deformAttachment;
 
 		if (parentMesh == null) {
 			copyTo(copy);
@@ -290,7 +270,7 @@ public class MeshAttachment extends VertexAttachment {
 		linkedMesh.region = region;
 		linkedMesh.path = path;
 		linkedMesh.color.set(color);
-		linkedMesh.inheritDeform = inheritDeform;
+		linkedMesh.deformAttachment = deformAttachment;
 		linkedMesh.setParentMesh(parentMesh != null ? parentMesh : this);
 		linkedMesh.updateUVs();
 		return linkedMesh;

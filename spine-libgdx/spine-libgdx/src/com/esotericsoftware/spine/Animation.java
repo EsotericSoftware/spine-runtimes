@@ -29,14 +29,16 @@
 
 package com.esotericsoftware.spine;
 
-import static com.esotericsoftware.spine.Animation.MixBlend.*;
-import static com.esotericsoftware.spine.Animation.MixDirection.*;
+import static com.esotericsoftware.spine.Animation.MixBlend.add;
+import static com.esotericsoftware.spine.Animation.MixBlend.first;
+import static com.esotericsoftware.spine.Animation.MixBlend.setup;
+import static com.esotericsoftware.spine.Animation.MixDirection.in;
+import static com.esotericsoftware.spine.Animation.MixDirection.out;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
-
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
 
@@ -1006,7 +1008,8 @@ public class Animation {
 			Slot slot = skeleton.slots.get(slotIndex);
 			if (!slot.bone.active) return;
 			Attachment slotAttachment = slot.attachment;
-			if (!(slotAttachment instanceof VertexAttachment) || !((VertexAttachment)slotAttachment).applyDeform(attachment)) return;
+			if (!(slotAttachment instanceof VertexAttachment)
+				|| ((VertexAttachment)slotAttachment).getDeformAttachment() != attachment) return;
 
 			FloatArray deformArray = slot.getDeform();
 			if (deformArray.size == 0) blend = setup;
