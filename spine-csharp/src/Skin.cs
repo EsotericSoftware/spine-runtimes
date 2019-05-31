@@ -82,10 +82,10 @@ namespace Spine {
 				if (!constraints.Contains(data)) constraints.Add(data);
 
 			foreach (SkinEntry entry in skin.attachments.Keys) {
-				Attachment attachment = entry.Attachment.Copy();
-				if (attachment is MeshAttachment) {
-				}
-				SetAttachment(entry.SlotIndex, entry.Name, attachment);
+				if (entry.Attachment is MeshAttachment)
+					SetAttachment(entry.SlotIndex, entry.Name, ((MeshAttachment)entry.Attachment).NewLinkedMesh());
+				else
+					SetAttachment(entry.SlotIndex, entry.Name, entry.Attachment.Copy());
 			}
 		}
 

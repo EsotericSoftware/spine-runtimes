@@ -507,7 +507,7 @@ namespace Spine {
 		}
 
 		/// <summary>A convenience method to set an attachment by finding the slot with FindSlot, finding the attachment with GetAttachment, then setting the slot's slot.Attachment.</summary>
-		/// <param name="attachmentName">May be null.</param>
+		/// <param name="attachmentName">May be null to clear the slot's attachment.</param>
 		public void SetAttachment (string slotName, string attachmentName) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
 			ExposedList<Slot> slots = this.slots;

@@ -38,8 +38,7 @@ namespace Spine {
 		internal int[] triangles;
 		internal float r = 1, g = 1, b = 1, a = 1;
 		internal int hulllength;
-		internal bool inheritDeform;
-
+		
 		public int HullLength { get { return hulllength; } set { hulllength = value; } }
 		public float[] RegionUVs { get { return regionUVs; } set { regionUVs = value; } }
 		/// <summary>The UV pair for each vertex, normalized within the entire texture. <seealso cref="MeshAttachment.UpdateUVs"/></summary>
@@ -65,8 +64,6 @@ namespace Spine {
 		public float RegionHeight { get { return regionHeight; } set { regionHeight = value; } } // Unrotated, stripped size.
 		public float RegionOriginalWidth { get { return regionOriginalWidth; } set { regionOriginalWidth = value; } }
 		public float RegionOriginalHeight { get { return regionOriginalHeight; } set { regionOriginalHeight = value; } } // Unrotated, unstripped size.
-
-		public bool InheritDeform { get { return inheritDeform; } set { inheritDeform = value; } }
 
 		public MeshAttachment ParentMesh {
 			get { return parentMesh; }
@@ -152,11 +149,9 @@ namespace Spine {
 			}
 		}
 
-		override public bool ApplyDeform (VertexAttachment sourceAttachment) {
-			return this == sourceAttachment || (inheritDeform && parentMesh == sourceAttachment);
-		}
-
 		public override Attachment Copy () {
+			if (parentMesh != null) return NewLinkedMesh();
+
 			MeshAttachment copy = new MeshAttachment(this.Name);
 			copy.regionOffsetX = regionOffsetX;
 			copy.regionOffsetY = regionOffsetY;
@@ -164,33 +159,51 @@ namespace Spine {
 			copy.regionHeight = regionHeight;
 			copy.regionOriginalWidth = regionOriginalWidth;
 			copy.regionOriginalHeight = regionOriginalHeight;
-
 			copy.Path = Path;
+			copy.r = r;
+			copy.g = g;
+			copy.b = b;
+			copy.a = a;
+			copy.deformAttachment = deformAttachment;
+
+			CopyTo(copy);
+			copy.regionUVs = new float[regionUVs.Length];
+			Array.Copy(regionUVs, 0, copy.regionUVs, 0, regionUVs.Length);
+			copy.uvs = new float[uvs.Length];
+			Array.Copy(uvs, 0, copy.uvs, 0, uvs.Length);
+			copy.triangles = new int[triangles.Length];
+			Array.Copy(triangles, 0, copy.triangles, 0, triangles.Length);
+			copy.HullLength = HullLength;
 			
-			if (parentMesh == null) {
-				CopyTo(copy);
-				copy.regionUVs = new float[regionUVs.Length];
-				Array.Copy(regionUVs, 0, copy.regionUVs, 0, regionUVs.Length);
-				copy.uvs = new float[uvs.Length];
-				Array.Copy(uvs, 0, copy.uvs, 0, uvs.Length);
-				copy.triangles = new int[triangles.Length];
-				Array.Copy(triangles, 0, copy.triangles, 0, triangles.Length);
-				copy.HullLength = HullLength;
-				
-				copy.inheritDeform = inheritDeform;
-				
-				// Nonessential.
-				if (Edges != null) {
-					copy.Edges = new int[Edges.Length];
-					Array.Copy(Edges, 0, copy.Edges, 0, Edges.Length);
-				}
-				copy.Width = Width;
-				copy.Height = Height;
+			// Nonessential.
+			if (Edges != null) {
+				copy.Edges = new int[Edges.Length];
+				Array.Copy(Edges, 0, copy.Edges, 0, Edges.Length);
 			}
-			else
-				copy.ParentMesh = parentMesh;
-			
+			copy.Width = Width;
+			copy.Height = Height;
 			return copy;
+		}
+
+		///<summary>Returns a new mesh with this mesh set as the <see cref="ParentMesh"/>.
+		public MeshAttachment NewLinkedMesh () {
+			MeshAttachment mesh = new MeshAttachment(Name);
+			mesh.regionOffsetX = regionOffsetX;
+			mesh.regionOffsetY = regionOffsetY;
+			mesh.regionWidth = regionWidth;
+			mesh.regionHeight = regionHeight;
+			mesh.regionOriginalWidth = regionOriginalWidth;
+			mesh.regionOriginalHeight = regionOriginalHeight;
+
+			mesh.Path = Path;
+			mesh.r = r;
+			mesh.g = g;
+			mesh.b = b;
+			mesh.a = a;
+			mesh.deformAttachment = deformAttachment;
+			mesh.ParentMesh = parentMesh != null ? parentMesh : this;
+			mesh.UpdateUVs();
+			return mesh;
 		}
 	}
 }

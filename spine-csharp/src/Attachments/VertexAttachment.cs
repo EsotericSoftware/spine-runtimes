@@ -40,16 +40,21 @@ namespace Spine {
 		internal int[] bones;
 		internal float[] vertices;
 		internal int worldVerticesLength;
+		internal VertexAttachment deformAttachment;
 
 		/// <summary>Gets a unique ID for this attachment.</summary>
 		public int Id { get { return id; } }
 		public int[] Bones { get { return bones; } set { bones = value; } }
 		public float[] Vertices { get { return vertices; } set { vertices = value; } }
 		public int WorldVerticesLength { get { return worldVerticesLength; } set { worldVerticesLength = value; } }
+		///<summary>Deform keys for the deform attachment are also applied to this attachment.
+		/// May be null if no deform keys should be applied.</summary>
+		public VertexAttachment DeformAttachment { get { return deformAttachment; } set { deformAttachment = value; } }
 
 		public VertexAttachment (string name)
 			: base(name) {
 
+			deformAttachment = this;
 			lock (VertexAttachment.nextIdLock) {
 				id = (VertexAttachment.nextID++ & 65535) << 11;
 			}
@@ -126,11 +131,6 @@ namespace Spine {
 					worldVertices[w + 1] = wy;
 				}
 			}
-		}
-
-		/// <summary>Returns true if a deform originally applied to the specified attachment should be applied to this attachment.</summary>
-		virtual public bool ApplyDeform (VertexAttachment sourceAttachment) {
-			return this == sourceAttachment;
 		}
 
 		///<summary>Does not copy id (generated) or name (set on construction).</summary>

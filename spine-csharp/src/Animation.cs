@@ -1034,7 +1034,7 @@ namespace Spine {
 									MixDirection direction) {
 			Slot slot = skeleton.slots.Items[slotIndex];
 			VertexAttachment vertexAttachment = slot.attachment as VertexAttachment;
-			if (vertexAttachment == null || !vertexAttachment.ApplyDeform(attachment)) return;
+			if (vertexAttachment == null || vertexAttachment.DeformAttachment != attachment) return;
 
 			var deformArray = slot.Deform;
 			if (deformArray.Count == 0) blend = MixBlend.Setup;

@@ -427,8 +427,7 @@ namespace Spine {
 
 					string parent = GetString(map, "parent", null);
 					if (parent != null) {
-						mesh.InheritDeform = GetBoolean(map, "deform", true);
-						linkedMeshes.Add(new LinkedMesh(mesh, GetString(map, "skin", null), slotIndex, parent));
+						linkedMeshes.Add(new LinkedMesh(mesh, GetString(map, "skin", null), slotIndex, parent, GetBoolean(map, "deform", true)));
 						return mesh;
 					}
 
@@ -864,12 +863,14 @@ namespace Spine {
 			internal string parent, skin;
 			internal int slotIndex;
 			internal MeshAttachment mesh;
+			internal bool inheritDeform;
 
-			public LinkedMesh (MeshAttachment mesh, string skin, int slotIndex, string parent) {
+			public LinkedMesh (MeshAttachment mesh, string skin, int slotIndex, string parent, bool inheritDeform) {
 				this.mesh = mesh;
 				this.skin = skin;
 				this.slotIndex = slotIndex;
 				this.parent = parent;
+				this.inheritDeform = inheritDeform;
 			}
 		}
 
