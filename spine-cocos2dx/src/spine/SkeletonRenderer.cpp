@@ -120,7 +120,7 @@ namespace spine {
 			if (slot->getAttachment()->getRTTI().isExactly(RegionAttachment::rtti)) {
 				RegionAttachment* attachment = (RegionAttachment*)slot->getAttachment();
 				texture = static_cast<AttachmentVertices*>(attachment->getRendererObject())->_texture;
-			} else if (slot->getAttachment()->getRTTI().isExactly(RegionAttachment::rtti)) {
+			} else if (slot->getAttachment()->getRTTI().isExactly(MeshAttachment::rtti)) {
 				MeshAttachment* attachment = (MeshAttachment*)slot->getAttachment();
 				texture = static_cast<AttachmentVertices*>(attachment->getRendererObject())->_texture;
 			} else {
