@@ -239,7 +239,6 @@ public class MeshAttachment extends VertexAttachment {
 		copy.region = region;
 		copy.path = path;
 		copy.color.set(color);
-		copy.deformAttachment = deformAttachment;
 
 		copyTo(copy);
 		copy.regionUVs = new float[regionUVs.length];
