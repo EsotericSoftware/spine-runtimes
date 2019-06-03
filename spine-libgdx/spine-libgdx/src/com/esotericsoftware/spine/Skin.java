@@ -80,9 +80,10 @@ public class Skin {
 
 		for (SkinEntry entry : skin.attachments.keys()) {
 			if (entry.attachment instanceof MeshAttachment)
-				setAttachment(entry.slotIndex, entry.name, ((MeshAttachment)entry.attachment).newLinkedMesh());
+				setAttachment(entry.slotIndex, entry.name,
+					entry.attachment != null ? ((MeshAttachment)entry.attachment).newLinkedMesh() : null);
 			else
-				setAttachment(entry.slotIndex, entry.name, entry.attachment.copy());
+				setAttachment(entry.slotIndex, entry.name, entry.attachment != null ? entry.attachment.copy() : null);
 		}
 	}
 
