@@ -29,18 +29,9 @@
 
 package com.esotericsoftware.spine;
 
-import static com.badlogic.gdx.math.Interpolation.linear;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.delay;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveBy;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.removeActor;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
+import static com.badlogic.gdx.math.Interpolation.*;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
-import java.awt.FileDialog;
-import java.awt.Frame;
-import java.awt.Toolkit;
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
 
@@ -88,10 +79,15 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
 import com.esotericsoftware.spine.Animation.MixBlend;
 import com.esotericsoftware.spine.AnimationState.AnimationStateAdapter;
 import com.esotericsoftware.spine.AnimationState.TrackEntry;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
+
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.awt.Toolkit;
 
 public class SkeletonViewer extends ApplicationAdapter {
 	static final float checkModifiedInterval = 0.250f;

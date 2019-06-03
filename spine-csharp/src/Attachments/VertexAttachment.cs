@@ -150,6 +150,7 @@ namespace Spine {
 				attachment.vertices = null;
 			
 			attachment.worldVerticesLength = worldVerticesLength;
+			attachment.deformAttachment = deformAttachment;
 		}
 	}
 }
