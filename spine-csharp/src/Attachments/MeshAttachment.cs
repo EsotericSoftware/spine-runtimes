@@ -153,6 +153,7 @@ namespace Spine {
 			if (parentMesh != null) return NewLinkedMesh();
 
 			MeshAttachment copy = new MeshAttachment(this.Name);
+			copy.RendererObject = RendererObject;
 			copy.regionOffsetX = regionOffsetX;
 			copy.regionOffsetY = regionOffsetY;
 			copy.regionWidth = regionWidth;
@@ -187,6 +188,7 @@ namespace Spine {
 		///<summary>Returns a new mesh with this mesh set as the <see cref="ParentMesh"/>.
 		public MeshAttachment NewLinkedMesh () {
 			MeshAttachment mesh = new MeshAttachment(Name);
+			mesh.RendererObject = RendererObject;
 			mesh.regionOffsetX = regionOffsetX;
 			mesh.regionOffsetY = regionOffsetY;
 			mesh.regionWidth = regionWidth;

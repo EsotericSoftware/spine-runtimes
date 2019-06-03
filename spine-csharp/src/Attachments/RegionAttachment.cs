@@ -181,6 +181,7 @@ namespace Spine {
 
 		public override Attachment Copy () {
 			RegionAttachment copy = new RegionAttachment(this.Name);
+			copy.RendererObject = RendererObject;
 			copy.regionOffsetX = regionOffsetX;
 			copy.regionOffsetY = regionOffsetY;
 			copy.regionWidth = regionWidth;
