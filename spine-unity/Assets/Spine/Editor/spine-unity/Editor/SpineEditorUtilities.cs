@@ -636,8 +636,8 @@ namespace Spine.Unity.Editor {
 			public const string SkeletonDataSuffix = "_SkeletonData";
 			public const string AtlasSuffix = "_Atlas";
 
-			static readonly int[][] compatibleBinaryVersions = { new[] { 3, 7, 0 } };
-			static readonly int[][] compatibleJsonVersions = { new[] { 3, 7, 0 }, new[] { 3, 6, 0 }, new[] { 3, 5, 0 } };
+			static readonly int[][] compatibleBinaryVersions = { new[] { 3, 8, 0 } };
+			static readonly int[][] compatibleJsonVersions = { new[] { 3, 8, 0 } };
 			//static bool isFixVersionRequired = false;
 
 			/// HACK: This list keeps the asset reference temporarily during importing.
