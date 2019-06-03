@@ -119,19 +119,13 @@ package spine {
 			var attachments : Vector.<SkinEntry> = skin.getAttachments();
 			for (i = 0; i < attachments.length; i++) {
 				attachment = attachments[i];
-				attachment.attachment = attachment.attachment.copy();
-				setAttachment(attachment.slotIndex, attachment.name, attachment.attachment);
-			}
-			
-			attachments = this.getAttachments();
-			for (i = 0; i < attachments.length; i++) {
-				attachment = attachments[i];
-				if (attachment.attachment instanceof MeshAttachment) {
-					var mesh : MeshAttachment = attachment.attachment as MeshAttachment;
-					if (mesh.parentMesh) {
-						mesh.parentMesh = this.getAttachment(attachment.slotIndex, mesh.parentMesh.name) as MeshAttachment;
-						mesh.updateUVs();
-					}
+				if (attachment.attachment == null) continue;
+				if (attachment.attachment is MeshAttachment) {
+					attachment.attachment = MeshAttachment(attachment.attachment).newLinkedMesh();
+					setAttachment(attachment.slotIndex, attachment.name, attachment.attachment);
+				} else {
+					attachment.attachment = attachment.attachment.copy();
+					setAttachment(attachment.slotIndex, attachment.name, attachment.attachment);
 				}
 			}
 		}

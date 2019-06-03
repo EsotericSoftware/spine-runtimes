@@ -36,8 +36,7 @@ package spine.attachments {
 		public var triangles : Vector.<uint>;
 		public var color : Color = new Color(1, 1, 1, 1);
 		public var hullLength : int;
-		private var _parentMesh : MeshAttachment;
-		public var inheritDeform : Boolean;
+		private var _parentMesh : MeshAttachment;		
 		public var path : String;
 		public var rendererObject : Object;
 		public var regionU : Number;
@@ -123,10 +122,6 @@ package spine.attachments {
 			}
 		}
 
-		override public function applyDeform(sourceAttachment : VertexAttachment) : Boolean {
-			return this == sourceAttachment || (inheritDeform && _parentMesh == sourceAttachment);
-		}
-
 		public function get parentMesh() : MeshAttachment {
 			return _parentMesh;
 		}
@@ -161,17 +156,15 @@ package spine.attachments {
 			copy.regionHeight = regionHeight;
 			copy.regionOriginalWidth = regionOriginalWidth;
 			copy.regionOriginalHeight = regionOriginalHeight;
-			copy.path = path;			
+			copy.path = path;	
+			copy.color.setFromColor(color);		
 
 			if (parentMesh == null) {
 				this.copyTo(copy);
 				copy.regionUVs = regionUVs.concat();				
 				copy.uvs = uvs.concat();				
-				copy.triangles = triangles.concat();				
-				copy.color.setFromColor(color);
-				copy.hullLength = hullLength;
-
-				copy.inheritDeform = inheritDeform;
+				copy.triangles = triangles.concat();								
+				copy.hullLength = hullLength;				
 
 				// Nonessential.
 				if (edges != null)
@@ -183,6 +176,29 @@ package spine.attachments {
 				copy.updateUVs();
 			}
 
+			return copy;
+		}
+		
+		public function newLinkedMesh (): MeshAttachment {
+			var copy : MeshAttachment = new MeshAttachment(name);
+			copy.rendererObject = rendererObject;
+			copy.regionU = regionU;
+			copy.regionV = regionV;
+			copy.regionU2 = regionU2;
+			copy.regionV2 = regionV2;
+			copy.regionRotate = regionRotate;
+			copy.regionDegrees = regionDegrees;
+			copy.regionOffsetX =  regionOffsetX;
+			copy.regionOffsetY = regionOffsetY;
+			copy.regionWidth =  regionWidth;
+			copy.regionHeight = regionHeight;
+			copy.regionOriginalWidth = regionOriginalWidth;
+			copy.regionOriginalHeight = regionOriginalHeight;
+			copy.path = path;	
+			copy.color.setFromColor(color);
+			copy.deformAttachment = deformAttachment;
+			copy.parentMesh = parentMesh != null ? parentMesh : this;
+			copy.updateUVs();	
 			return copy;
 		}
 	}

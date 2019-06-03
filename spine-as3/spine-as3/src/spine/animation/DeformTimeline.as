@@ -61,7 +61,7 @@ package spine.animation {
 			var setupVertices : Vector.<Number>;
 			var slot : Slot = skeleton.slots[slotIndex];
 			var slotAttachment : Attachment = slot.attachment;
-			if (!(slotAttachment is VertexAttachment) || !(VertexAttachment(slotAttachment)).applyDeform(attachment)) return;
+			if (!(slotAttachment is VertexAttachment) || !(VertexAttachment(slotAttachment).deformAttachment == attachment)) return;
 			
 			var deformArray : Vector.<Number> = slot.deform;
 			if (deformArray.length == 0) blend = MixBlend.setup;

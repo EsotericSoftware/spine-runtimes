@@ -89,11 +89,6 @@ package spine.examples {
 			skeleton.state.update(0.25);
 			skeleton.state.apply(skeleton.skeleton);
 			skeleton.skeleton.updateWorldTransform();
-			
-			var skin : Skin = new Skin("test");
-			skin.addSkin(skeletonData.findSkin("default"));
-			skeleton.skeleton.skin = skin;
-			skeleton.skeleton.setToSetupPose();
 
 			addChild(skeleton);
 			Starling.juggler.add(skeleton);

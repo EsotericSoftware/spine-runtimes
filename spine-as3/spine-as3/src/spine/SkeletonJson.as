@@ -253,6 +253,7 @@ package spine {
 				if (!parentSkin) throw new Error("Skin not found: " + linkedMesh.skin);
 				var parentMesh : Attachment = parentSkin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
 				if (!parentMesh) throw new Error("Parent mesh not found: " + linkedMesh.parent);
+				linkedMesh.mesh.deformAttachment = linkedMesh.inheritDeform ? VertexAttachment(parentMesh) : linkedMesh.mesh;
 				linkedMesh.mesh.parentMesh = MeshAttachment(parentMesh);
 				linkedMesh.mesh.updateUVs();
 			}
@@ -322,8 +323,8 @@ package spine {
 					mesh.width = Number(map["width"] || 0) * scale;
 					mesh.height = Number(map["height"] || 0) * scale;
 					if (map["parent"]) {
-						mesh.inheritDeform = map.hasOwnProperty("deform") ? Boolean(map["deform"]) : true;
-						linkedMeshes.push(new LinkedMesh(mesh, map["skin"], slotIndex, map["parent"]));
+						var inheritDeform : Boolean = map.hasOwnProperty("deform") ? Boolean(map["deform"]) : true;
+						linkedMeshes.push(new LinkedMesh(mesh, map["skin"], slotIndex, map["parent"], inheritDeform));
 						return mesh;
 					}
 					var uvs : Vector.<Number> = getFloatArray(map, "uvs", 1);
@@ -786,11 +787,13 @@ class LinkedMesh {
 	internal var parent : String, skin : String;
 	internal var slotIndex : int;
 	internal var mesh : MeshAttachment;
+	internal var inheritDeform : Boolean;
 
-	public function LinkedMesh(mesh : MeshAttachment, skin : String, slotIndex : int, parent : String) {
+	public function LinkedMesh(mesh : MeshAttachment, skin : String, slotIndex : int, parent : String, inheritDeform : Boolean) {
 		this.mesh = mesh;
 		this.skin = skin;
 		this.slotIndex = slotIndex;
 		this.parent = parent;
+		this.inheritDeform = inheritDeform;
 	}
 }

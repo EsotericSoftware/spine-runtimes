@@ -37,7 +37,7 @@ package spine.examples {
 		private var _starling : Starling;
 
 		public function Main() {
-			_starling = new Starling(OwlExample, stage);			
+			_starling = new Starling(GoblinsExample, stage);			
 			_starling.enableErrorChecking = true;
 			_starling.showStats = true;
 			_starling.skipUnchangedFrames = false;

@@ -39,6 +39,7 @@ package spine.attachments {
 		public var vertices : Vector.<Number>;
 		public var worldVerticesLength : int;
 		public var id : int = (nextID++ & 65535) << 11;
+		public var deformAttachment : VertexAttachment = this;
 
 		public function VertexAttachment(name : String) {
 			super(name);
@@ -124,11 +125,6 @@ package spine.attachments {
 				}
 			}
 		}
-
-		/** Returns true if a deform originally applied to the specified attachment should be applied to this attachment. */
-		public function applyDeform(sourceAttachment : VertexAttachment) : Boolean {
-			return this == sourceAttachment;
-		}
 		
 		public function copyTo(attachment : VertexAttachment) : void {
 			if (bones != null) {
@@ -142,6 +138,7 @@ package spine.attachments {
 				attachment.vertices = null;
 
 			attachment.worldVerticesLength = worldVerticesLength;
+			attachment.deformAttachment = deformAttachment;
 		}
 	}
 }
