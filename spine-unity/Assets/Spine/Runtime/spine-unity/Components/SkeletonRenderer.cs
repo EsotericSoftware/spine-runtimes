@@ -122,6 +122,9 @@ namespace Spine.Unity {
 		public const UnityEngine.Rendering.CompareFunction STENCIL_COMP_MASKINTERACTION_VISIBLE_INSIDE = UnityEngine.Rendering.CompareFunction.LessEqual;
 		/// <summary>Shader property value used as Stencil comparison function for <see cref="SpriteMaskInteraction.VisibleOutsideMask"/>.</summary>
 		public const UnityEngine.Rendering.CompareFunction STENCIL_COMP_MASKINTERACTION_VISIBLE_OUTSIDE = UnityEngine.Rendering.CompareFunction.Greater;
+		#if UNITY_EDITOR
+		private static bool haveStencilParametersBeenFixed = false;
+		#endif
 		#endif // #if BUILT_IN_SPRITE_MASK_COMPONENT
 		#endregion
 
@@ -532,8 +535,10 @@ namespace Spine.Unity {
 
 		#if UNITY_EDITOR
 		private void EditorFixStencilCompParameters() {
-			if (HasAnyStencilComp0Material())
+			if (!haveStencilParametersBeenFixed && HasAnyStencilComp0Material()) {
+				haveStencilParametersBeenFixed = true;
 				FixAllProjectMaterialsStencilCompParameters();
+			}
 		}
 
 		private void FixAllProjectMaterialsStencilCompParameters() {
