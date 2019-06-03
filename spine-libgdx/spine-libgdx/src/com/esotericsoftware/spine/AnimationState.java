@@ -29,10 +29,7 @@
 
 package com.esotericsoftware.spine;
 
-import static com.esotericsoftware.spine.Animation.RotateTimeline.ENTRIES;
-import static com.esotericsoftware.spine.Animation.RotateTimeline.PREV_ROTATION;
-import static com.esotericsoftware.spine.Animation.RotateTimeline.PREV_TIME;
-import static com.esotericsoftware.spine.Animation.RotateTimeline.ROTATION;
+import static com.esotericsoftware.spine.Animation.RotateTimeline.*;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
@@ -40,6 +37,7 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
+
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
@@ -1096,6 +1094,9 @@ public class AnimationState {
 
 		/** Seconds for mixing from the previous animation to this animation. Defaults to the value provided by AnimationStateData
 		 * {@link AnimationStateData#getMix(Animation, Animation)} based on the animation before this animation (if any).
+		 * <p>
+		 * A mix duration of 0 still mixes out over one frame to provide the track entry being mixed out a chance to revert the
+		 * properties it was animating.
 		 * <p>
 		 * The <code>mixDuration</code> can be set manually rather than use the value from
 		 * {@link AnimationStateData#getMix(Animation, Animation)}. In that case, the <code>mixDuration</code> can be set for a new
