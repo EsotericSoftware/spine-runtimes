@@ -229,6 +229,7 @@ module spine {
 				if (skin == null) throw new Error("Skin not found: " + linkedMesh.skin);
 				let parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
 				if (parent == null) throw new Error("Parent mesh not found: " + linkedMesh.parent);
+				linkedMesh.mesh.deformAttachment = linkedMesh.inheritDeform ? <VertexAttachment>parent : <VertexAttachment>linkedMesh.mesh;
 				linkedMesh.mesh.setParentMesh(<MeshAttachment> parent);
 				linkedMesh.mesh.updateUVs();
 			}
@@ -311,8 +312,7 @@ module spine {
 
 					let parent: string = this.getValue(map, "parent", null);
 					if (parent != null) {
-						mesh.inheritDeform = this.getValue(map, "deform", true);
-						this.linkedMeshes.push(new LinkedMesh(mesh, <string> this.getValue(map, "skin", null), slotIndex, parent));
+						this.linkedMeshes.push(new LinkedMesh(mesh, <string> this.getValue(map, "skin", null), slotIndex, parent, this.getValue(map, "deform", true)));
 						return mesh;
 					}
 
@@ -794,12 +794,14 @@ module spine {
 		parent: string; skin: string;
 		slotIndex: number;
 		mesh: MeshAttachment;
+		inheritDeform: boolean;
 
-		constructor (mesh: MeshAttachment, skin: string, slotIndex: number, parent: string) {
+		constructor (mesh: MeshAttachment, skin: string, slotIndex: number, parent: string, inheritDeform: boolean) {
 			this.mesh = mesh;
 			this.skin = skin;
 			this.slotIndex = slotIndex;
 			this.parent = parent;
+			this.inheritDeform = inheritDeform;
 		}
 	}
 }

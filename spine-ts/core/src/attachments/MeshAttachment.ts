@@ -39,7 +39,6 @@ module spine {
 		hullLength: number;
 		edges: Array<number>;
 		private parentMesh: MeshAttachment;
-		inheritDeform = false;
 		tempColor = new Color(0, 0, 0, 0);
 
 		constructor (name: string) {
@@ -105,10 +104,6 @@ module spine {
 			}
 		}
 
-		applyDeform (sourceAttachment: VertexAttachment): boolean {
-			return this == sourceAttachment || (this.inheritDeform && this.parentMesh == sourceAttachment);
-		}
-
 		getParentMesh () {
 			return this.parentMesh;
 		}
@@ -128,35 +123,41 @@ module spine {
 		}
 
 		copy (): Attachment {
-			let copy = new MeshAttachment(name);
+			if (this.parentMesh != null) return this.newLinkedMesh();
+
+			let copy = new MeshAttachment(this.name);
 			copy.region = this.region;
 			copy.path = this.path;
+			copy.color.setFromColor(this.color);
 
-			if (this.parentMesh == null) {
-				this.copyTo(copy);
-				copy.regionUVs = new Array<number>(this.regionUVs.length);
-				Utils.arrayCopy(this.regionUVs, 0, copy.regionUVs, 0, this.regionUVs.length);
-				copy.uvs = new Array<number>(this.uvs.length);
-				Utils.arrayCopy(this.uvs, 0, copy.uvs, 0, this.uvs.length);
-				copy.triangles = new Array<number>(this.triangles.length);
-				Utils.arrayCopy(this.triangles, 0, copy.triangles, 0, this.triangles.length);
-				copy.color.setFromColor(this.color);
-				copy.hullLength = this.hullLength;
+			this.copyTo(copy);
+			copy.regionUVs = new Array<number>(this.regionUVs.length);
+			Utils.arrayCopy(this.regionUVs, 0, copy.regionUVs, 0, this.regionUVs.length);
+			copy.uvs = new Array<number>(this.uvs.length);
+			Utils.arrayCopy(this.uvs, 0, copy.uvs, 0, this.uvs.length);
+			copy.triangles = new Array<number>(this.triangles.length);
+			Utils.arrayCopy(this.triangles, 0, copy.triangles, 0, this.triangles.length);
+			copy.hullLength = this.hullLength;
 
-				copy.inheritDeform = this.inheritDeform;
-
-				// Nonessential.
-				if (this.edges != null) {
-					copy.edges = new Array<number>(this.edges.length);
-					Utils.arrayCopy(this.edges, 0, copy.edges, 0, this.edges.length);
-				}
-				copy.width = this.width;
-				copy.height = this.height;
-			} else {
-				copy.setParentMesh(this.parentMesh);
-				copy.updateUVs();
+			// Nonessential.
+			if (this.edges != null) {
+				copy.edges = new Array<number>(this.edges.length);
+				Utils.arrayCopy(this.edges, 0, copy.edges, 0, this.edges.length);
 			}
+			copy.width = this.width;
+			copy.height = this.height;
 
+			return copy;
+		}
+
+		newLinkedMesh (): MeshAttachment {
+			let copy = new MeshAttachment(this.name);
+			copy.region = this.region;
+			copy.path = this.path;
+			copy.color.setFromColor(this.color);
+			copy.deformAttachment = this.deformAttachment;
+			copy.setParentMesh(this.parentMesh != null ? this.parentMesh : this);
+			copy.updateUVs();
 			return copy;
 		}
 	}

@@ -111,19 +111,13 @@ module spine {
 			let attachments = skin.getAttachments();
 			for (let i = 0; i < attachments.length; i++) {
 				var attachment = attachments[i];
-				attachment.attachment = attachment.attachment.copy();
-				this.setAttachment(attachment.slotIndex, attachment.name, attachment.attachment);
-			}
-
-			attachments = this.getAttachments();
-			for (let i = 0; i < attachments.length; i++) {
-				let attachment = attachments[i];
+				if (attachment.attachment == null) continue;
 				if (attachment.attachment instanceof MeshAttachment) {
-					let mesh = attachment.attachment as MeshAttachment;
-					if (mesh.getParentMesh()) {
-						mesh.setParentMesh(this.getAttachment(attachment.slotIndex, mesh.getParentMesh().name) as MeshAttachment);
-						mesh.updateUVs();
-					}
+					attachment.attachment = attachment.attachment.newLinkedMesh();
+					this.setAttachment(attachment.slotIndex, attachment.name, attachment.attachment);
+				} else {
+					attachment.attachment = attachment.attachment.copy();
+					this.setAttachment(attachment.slotIndex, attachment.name, attachment.attachment);
 				}
 			}
 		}

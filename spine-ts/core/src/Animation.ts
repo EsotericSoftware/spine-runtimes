@@ -755,7 +755,7 @@ module spine {
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			let slot: Slot = skeleton.slots[this.slotIndex];
 			let slotAttachment: Attachment = slot.getAttachment();
-			if (!(slotAttachment instanceof VertexAttachment) || !(<VertexAttachment>slotAttachment).applyDeform(this.attachment)) return;
+			if (!(slotAttachment instanceof VertexAttachment) || !((<VertexAttachment>slotAttachment).deformAttachment == this.attachment)) return;
 
 			let deformArray: Array<number> = slot.deform;
 			if (deformArray.length == 0) blend = MixBlend.setup;

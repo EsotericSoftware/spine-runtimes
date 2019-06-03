@@ -698,7 +698,7 @@ var spine;
 		DeformTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha, blend, direction) {
 			var slot = skeleton.slots[this.slotIndex];
 			var slotAttachment = slot.getAttachment();
-			if (!(slotAttachment instanceof spine.VertexAttachment) || !slotAttachment.applyDeform(this.attachment))
+			if (!(slotAttachment instanceof spine.VertexAttachment) || !(slotAttachment.deformAttachment == this.attachment))
 				return;
 			var deformArray = slot.deform;
 			if (deformArray.length == 0)
@@ -4694,6 +4694,7 @@ var spine;
 				var parent_3 = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
 				if (parent_3 == null)
 					throw new Error("Parent mesh not found: " + linkedMesh.parent);
+				linkedMesh.mesh.deformAttachment = linkedMesh.inheritDeform ? parent_3 : linkedMesh.mesh;
 				linkedMesh.mesh.setParentMesh(parent_3);
 				linkedMesh.mesh.updateUVs();
 			}
@@ -4769,8 +4770,7 @@ var spine;
 					mesh.height = this.getValue(map, "height", 0) * scale;
 					var parent_4 = this.getValue(map, "parent", null);
 					if (parent_4 != null) {
-						mesh.inheritDeform = this.getValue(map, "deform", true);
-						this.linkedMeshes.push(new LinkedMesh(mesh, this.getValue(map, "skin", null), slotIndex, parent_4));
+						this.linkedMeshes.push(new LinkedMesh(mesh, this.getValue(map, "skin", null), slotIndex, parent_4, this.getValue(map, "deform", true)));
 						return mesh;
 					}
 					var uvs = map.uvs;
@@ -5236,11 +5236,12 @@ var spine;
 	}());
 	spine.SkeletonJson = SkeletonJson;
 	var LinkedMesh = (function () {
-		function LinkedMesh(mesh, skin, slotIndex, parent) {
+		function LinkedMesh(mesh, skin, slotIndex, parent, inheritDeform) {
 			this.mesh = mesh;
 			this.skin = skin;
 			this.slotIndex = slotIndex;
 			this.parent = parent;
+			this.inheritDeform = inheritDeform;
 		}
 		return LinkedMesh;
 	}());
@@ -5334,18 +5335,15 @@ var spine;
 			var attachments = skin.getAttachments();
 			for (var i = 0; i < attachments.length; i++) {
 				var attachment = attachments[i];
-				attachment.attachment = attachment.attachment.copy();
-				this.setAttachment(attachment.slotIndex, attachment.name, attachment.attachment);
-			}
-			attachments = this.getAttachments();
-			for (var i = 0; i < attachments.length; i++) {
-				var attachment_1 = attachments[i];
-				if (attachment_1.attachment instanceof spine.MeshAttachment) {
-					var mesh = attachment_1.attachment;
-					if (mesh.getParentMesh()) {
-						mesh.setParentMesh(this.getAttachment(attachment_1.slotIndex, mesh.getParentMesh().name));
-						mesh.updateUVs();
-					}
+				if (attachment.attachment == null)
+					continue;
+				if (attachment.attachment instanceof spine.MeshAttachment) {
+					attachment.attachment = attachment.attachment.newLinkedMesh();
+					this.setAttachment(attachment.slotIndex, attachment.name, attachment.attachment);
+				}
+				else {
+					attachment.attachment = attachment.attachment.copy();
+					this.setAttachment(attachment.slotIndex, attachment.name, attachment.attachment);
 				}
 			}
 		};
@@ -6594,6 +6592,7 @@ var spine;
 			var _this = _super.call(this, name) || this;
 			_this.id = (VertexAttachment.nextID++ & 65535) << 11;
 			_this.worldVerticesLength = 0;
+			_this.deformAttachment = _this;
 			return _this;
 		}
 		VertexAttachment.prototype.computeWorldVertices = function (slot, start, count, worldVertices, offset, stride) {
@@ -6655,9 +6654,6 @@ var spine;
 				}
 			}
 		};
-		VertexAttachment.prototype.applyDeform = function (sourceAttachment) {
-			return this == sourceAttachment;
-		};
 		VertexAttachment.prototype.copyTo = function (attachment) {
 			if (this.bones != null) {
 				attachment.bones = new Array(this.bones.length);
@@ -6672,6 +6668,7 @@ var spine;
 			else
 				attachment.vertices = null;
 			attachment.worldVerticesLength = this.worldVerticesLength;
+			attachment.deformAttachment = this.deformAttachment;
 		};
 		VertexAttachment.nextID = 0;
 		return VertexAttachment;
@@ -6736,7 +6733,6 @@ var spine;
 		function MeshAttachment(name) {
 			var _this = _super.call(this, name) || this;
 			_this.color = new spine.Color(1, 1, 1, 1);
-			_this.inheritDeform = false;
 			_this.tempColor = new spine.Color(0, 0, 0, 0);
 			return _this;
 		}
@@ -6800,9 +6796,6 @@ var spine;
 				uvs[i + 1] = v + regionUVs[i + 1] * height;
 			}
 		};
-		MeshAttachment.prototype.applyDeform = function (sourceAttachment) {
-			return this == sourceAttachment || (this.inheritDeform && this.parentMesh == sourceAttachment);
-		};
 		MeshAttachment.prototype.getParentMesh = function () {
 			return this.parentMesh;
 		};
@@ -6819,31 +6812,36 @@ var spine;
 			}
 		};
 		MeshAttachment.prototype.copy = function () {
-			var copy = new MeshAttachment(name);
+			if (this.parentMesh != null)
+				return this.newLinkedMesh();
+			var copy = new MeshAttachment(this.name);
 			copy.region = this.region;
 			copy.path = this.path;
-			if (this.parentMesh == null) {
-				this.copyTo(copy);
-				copy.regionUVs = new Array(this.regionUVs.length);
-				spine.Utils.arrayCopy(this.regionUVs, 0, copy.regionUVs, 0, this.regionUVs.length);
-				copy.uvs = new Array(this.uvs.length);
-				spine.Utils.arrayCopy(this.uvs, 0, copy.uvs, 0, this.uvs.length);
-				copy.triangles = new Array(this.triangles.length);
-				spine.Utils.arrayCopy(this.triangles, 0, copy.triangles, 0, this.triangles.length);
-				copy.color.setFromColor(this.color);
-				copy.hullLength = this.hullLength;
-				copy.inheritDeform = this.inheritDeform;
-				if (this.edges != null) {
-					copy.edges = new Array(this.edges.length);
-					spine.Utils.arrayCopy(this.edges, 0, copy.edges, 0, this.edges.length);
-				}
-				copy.width = this.width;
-				copy.height = this.height;
+			copy.color.setFromColor(this.color);
+			this.copyTo(copy);
+			copy.regionUVs = new Array(this.regionUVs.length);
+			spine.Utils.arrayCopy(this.regionUVs, 0, copy.regionUVs, 0, this.regionUVs.length);
+			copy.uvs = new Array(this.uvs.length);
+			spine.Utils.arrayCopy(this.uvs, 0, copy.uvs, 0, this.uvs.length);
+			copy.triangles = new Array(this.triangles.length);
+			spine.Utils.arrayCopy(this.triangles, 0, copy.triangles, 0, this.triangles.length);
+			copy.hullLength = this.hullLength;
+			if (this.edges != null) {
+				copy.edges = new Array(this.edges.length);
+				spine.Utils.arrayCopy(this.edges, 0, copy.edges, 0, this.edges.length);
 			}
-			else {
-				copy.setParentMesh(this.parentMesh);
-				copy.updateUVs();
-			}
+			copy.width = this.width;
+			copy.height = this.height;
+			return copy;
+		};
+		MeshAttachment.prototype.newLinkedMesh = function () {
+			var copy = new MeshAttachment(this.name);
+			copy.region = this.region;
+			copy.path = this.path;
+			copy.color.setFromColor(this.color);
+			copy.deformAttachment = this.deformAttachment;
+			copy.setParentMesh(this.parentMesh != null ? this.parentMesh : this);
+			copy.updateUVs();
 			return copy;
 		};
 		return MeshAttachment;

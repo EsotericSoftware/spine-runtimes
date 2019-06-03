@@ -1,0 +1,108 @@
+<html>
+<script src="../../build/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<style>
+	* { margin: 0; padding: 0; }
+	body, html { height: 100% }
+	canvas { position: absolute; width: 100% ;height: 100%; }
+</style>
+<body>
+<div id="label" style="position: absolute; top: 0; left: 0; color: #fff; z-index: 10"></div>
+<canvas id="canvas" style="background: red;"></canvas>
+</body>
+<script>
+
+var FILE = "goblins-pro";
+var ANIMATION = "walk";
+var SCALE = 0.5;
+
+var canvas, context, gl, renderer, input, assetManager;
+var skeletons = [];
+var timeKeeper;
+var label = document.getElementById("label");
+var updateMean = new spine.WindowedMean();
+var renderMean = new spine.WindowedMean();
+
+function init() {
+	canvas = document.getElementById("canvas");
+	canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
+	context = new spine.webgl.ManagedWebGLRenderingContext(canvas, { alpha: false });
+	gl = context.gl;
+
+	renderer = new spine.webgl.SceneRenderer(canvas, context);
+	assetManager = new spine.webgl.AssetManager(context, "../example/assets/");
+	input = new spine.webgl.Input(canvas);
+
+	assetManager.loadTextureAtlas(FILE.replace("-pro", "").replace("-ess", "") + "-pma.atlas");
+	assetManager.loadText(FILE + ".json");
+
+	timeKeeper = new spine.TimeKeeper();
+	requestAnimationFrame(load);
+}
+
+var run = true;
+
+function load() {
+	timeKeeper.update();
+	if (assetManager.isLoadingComplete()) {
+		var atlas = assetManager.get(FILE.replace("-pro", "").replace("-ess", "") + "-pma.atlas");
+		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+		var skeletonJson = new spine.SkeletonJson(atlasLoader);
+		skeletonJson.scale = SCALE;
+		var skeletonData = skeletonJson.readSkeletonData(JSON.parse(assetManager.get(FILE + ".json")));
+
+		skeleton = new spine.Skeleton(skeletonData);
+		var stateData = new spine.AnimationStateData(skeleton.data);
+		state = new spine.AnimationState(stateData);
+		stateData.defaultMix = 0;
+
+		var originalSkin = skeleton.data.findSkin("goblingirl");
+		var copy = new spine.Skin("test");
+		copy.copySkin(originalSkin);
+		skeleton.setSkin(copy);
+		skeleton.setSlotsToSetupPose();
+
+		state.setAnimation(0, ANIMATION, true);
+		skeletons.push({ skeleton: skeleton, state: state });
+
+		requestAnimationFrame(render);
+	} else {
+		requestAnimationFrame(load);
+	}
+}
+
+function render() {
+	var start = Date.now()
+	timeKeeper.update();
+	var delta = timeKeeper.delta;
+
+	for (var i = 0; i < skeletons.length; i++) {
+		var state = skeletons[i].state;
+		var skeleton = skeletons[i].skeleton;
+		state.update(delta);
+		state.apply(skeleton);
+		skeleton.updateWorldTransform();
+	}
+	updateMean.addValue(Date.now() - start);
+	start = Date.now();
+
+	gl.clearColor(0.2, 0.2, 0.2, 1);
+	gl.clear(gl.COLOR_BUFFER_BIT);
+
+	renderer.resize(spine.webgl.ResizeMode.Fit);
+	renderer.begin();
+	for (var i = 0; i < skeletons.length; i++) {
+		var skeleton = skeletons[i].skeleton;
+		renderer.drawSkeleton(skeleton, true);
+	}
+	renderer.end();
+
+	requestAnimationFrame(render)
+	renderMean.addValue(Date.now() - start);
+	label.innerHTML = ("Update time: " + Number(updateMean.getMean()).toFixed(2) + " ms\n" +
+					   "Render time: " + Number(renderMean.getMean()).toFixed(2) + " ms\n");
+}
+
+init();
+</script>
+</html>

@@ -1103,9 +1103,9 @@ declare module spine {
 		bones: Array<number>;
 		vertices: ArrayLike<number>;
 		worldVerticesLength: number;
+		deformAttachment: VertexAttachment;
 		constructor(name: string);
 		computeWorldVertices(slot: Slot, start: number, count: number, worldVertices: ArrayLike<number>, offset: number, stride: number): void;
-		applyDeform(sourceAttachment: VertexAttachment): boolean;
 		copyTo(attachment: VertexAttachment): void;
 	}
 }
@@ -1157,14 +1157,13 @@ declare module spine {
 		hullLength: number;
 		edges: Array<number>;
 		private parentMesh;
-		inheritDeform: boolean;
 		tempColor: Color;
 		constructor(name: string);
 		updateUVs(): void;
-		applyDeform(sourceAttachment: VertexAttachment): boolean;
 		getParentMesh(): MeshAttachment;
 		setParentMesh(parentMesh: MeshAttachment): void;
 		copy(): Attachment;
+		newLinkedMesh(): MeshAttachment;
 	}
 }
 declare module spine {

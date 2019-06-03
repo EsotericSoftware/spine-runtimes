@@ -46,6 +46,7 @@ module spine {
 		bones: Array<number>;
 		vertices: ArrayLike<number>;
 		worldVerticesLength = 0;
+		deformAttachment: VertexAttachment = this;
 
 		constructor (name: string) {
 			super(name);
@@ -114,11 +115,6 @@ module spine {
 			}
 		}
 
-		/** Returns true if a deform originally applied to the specified attachment should be applied to this attachment. */
-		applyDeform (sourceAttachment: VertexAttachment) {
-			return this == sourceAttachment;
-		}
-
 		copyTo (attachment: VertexAttachment) {
 			if (this.bones != null) {
 				attachment.bones = new Array<number>(this.bones.length);
@@ -133,6 +129,7 @@ module spine {
 				attachment.vertices = null;
 
 			attachment.worldVerticesLength = this.worldVerticesLength;
+			attachment.deformAttachment = this.deformAttachment;
 		}
 	}
 }
