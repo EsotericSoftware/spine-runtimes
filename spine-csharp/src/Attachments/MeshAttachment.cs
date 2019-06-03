@@ -164,8 +164,7 @@ namespace Spine {
 			copy.g = g;
 			copy.b = b;
 			copy.a = a;
-			copy.deformAttachment = deformAttachment;
-
+			
 			CopyTo(copy);
 			copy.regionUVs = new float[regionUVs.Length];
 			Array.Copy(regionUVs, 0, copy.regionUVs, 0, regionUVs.Length);
