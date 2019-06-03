@@ -43,6 +43,7 @@ typedef struct {
 	const char* skin;
 	int slotIndex;
 	spMeshAttachment* mesh;
+	int inheritDeform;
 } _spLinkedMesh;
 
 typedef struct {
@@ -120,7 +121,7 @@ static void readCurve (Json* frame, spCurveTimeline* timeline, int frameIndex) {
 }
 
 static void _spSkeletonJson_addLinkedMesh (spSkeletonJson* self, spMeshAttachment* mesh, const char* skin, int slotIndex,
-		const char* parent) {
+		const char* parent, int inheritDeform) {
 	_spLinkedMesh* linkedMesh;
 	_spSkeletonJson* internal = SUB_CAST(_spSkeletonJson, self);
 
@@ -139,6 +140,7 @@ static void _spSkeletonJson_addLinkedMesh (spSkeletonJson* self, spMeshAttachmen
 	linkedMesh->skin = skin;
 	linkedMesh->slotIndex = slotIndex;
 	linkedMesh->parent = parent;
+	linkedMesh->inheritDeform = inheritDeform;
 }
 
 static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* root, spSkeletonData *skeletonData) {
@@ -992,9 +994,9 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 
 							spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 						} else {
-							mesh->inheritDeform = Json_getInt(attachmentMap, "deform", 1);
+							int inheritDeform = Json_getInt(attachmentMap, "deform", 1);
 							_spSkeletonJson_addLinkedMesh(self, SUB_CAST(spMeshAttachment, attachment), Json_getString(attachmentMap, "skin", 0), slotIndex,
-									entry->valueString);
+									entry->valueString, inheritDeform);
 						}
 						break;
 					}
@@ -1076,6 +1078,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			_spSkeletonJson_setError(self, 0, "Parent mesh not found: ", linkedMesh->parent);
 			return 0;
 		}
+		linkedMesh->mesh->super.deformAttachment = linkedMesh->inheritDeform ? SUB_CAST(spVertexAttachment, parent) : SUB_CAST(spVertexAttachment, linkedMesh->mesh);
 		spMeshAttachment_setParentMesh(linkedMesh->mesh, SUB_CAST(spMeshAttachment, parent));
 		spMeshAttachment_updateUVs(linkedMesh->mesh);
 		spAttachmentLoader_configureAttachment(self->attachmentLoader, SUPER(SUPER(linkedMesh->mesh)));

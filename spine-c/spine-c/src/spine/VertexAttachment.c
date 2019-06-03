@@ -35,6 +35,7 @@ static int nextID = 0;
 
 void _spVertexAttachment_init (spVertexAttachment* attachment) {
 	attachment->id = (nextID++ & 65535) << 11;
+	attachment->deformAttachment = attachment;
 }
 
 void _spVertexAttachment_deinit (spVertexAttachment* attachment) {
@@ -110,4 +111,31 @@ void spVertexAttachment_computeWorldVertices (spVertexAttachment* self, spSlot* 
 			}
 		}
 	}
+}
+
+void spVertexAttachment_copyTo(spVertexAttachment* from, spVertexAttachment* to) {
+	if (from->bonesCount) {
+		to->bonesCount = from->bonesCount;
+		to->bones = MALLOC(int, from->bonesCount);
+		memcpy(to->bones, from->bones, from->bonesCount * sizeof(int));
+	} else {
+		to->bonesCount = 0;
+		if (to->bones) {
+			FREE(to->bones);
+			to->bones = 0;
+		}
+	}
+
+	if (from->verticesCount) {
+		to->verticesCount = from->verticesCount;
+		to->vertices = MALLOC(float, from->verticesCount);
+		memcpy(to->vertices, from->vertices, from->verticesCount * sizeof(float));
+	} else {
+		to->verticesCount = 0;
+		if (to->vertices) {
+			FREE(to->vertices);
+			to->vertices = 0;
+		}
+	}
+	to->worldVerticesLength = from->worldVerticesLength;
 }

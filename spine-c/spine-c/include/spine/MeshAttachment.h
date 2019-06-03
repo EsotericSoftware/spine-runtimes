@@ -65,7 +65,6 @@ struct spMeshAttachment {
 	int hullLength;
 
 	spMeshAttachment* const parentMesh;
-	int/*bool*/inheritDeform;
 
 	/* Nonessential. */
 	int edgesCount;
@@ -76,6 +75,7 @@ struct spMeshAttachment {
 SP_API spMeshAttachment* spMeshAttachment_create (const char* name);
 SP_API void spMeshAttachment_updateUVs (spMeshAttachment* self);
 SP_API void spMeshAttachment_setParentMesh (spMeshAttachment* self, spMeshAttachment* parentMesh);
+SP_API spMeshAttachment* spMeshAttachment_newLinkedMesh (spMeshAttachment* self);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spMeshAttachment MeshAttachment;

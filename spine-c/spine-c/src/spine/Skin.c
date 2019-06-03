@@ -29,6 +29,7 @@
 
 #include <spine/Skin.h>
 #include <spine/extension.h>
+#include <stdio.h>
 
 _SP_ARRAY_IMPLEMENT_TYPE(spBoneDataArray, spBoneData*)
 _SP_ARRAY_IMPLEMENT_TYPE(spIkConstraintDataArray, spIkConstraintData*)
@@ -105,7 +106,7 @@ void spSkin_dispose (spSkin* self) {
 
 void spSkin_setAttachment (spSkin* self, int slotIndex, const char* name, spAttachment* attachment) {
 	_SkinHashTableEntry* existingEntry = 0;
-	const _SkinHashTableEntry* hashEntry = SUB_CAST(_spSkin, self)->entriesHashTable[(unsigned int)slotIndex % SKIN_ENTRIES_HASH_TABLE_SIZE];
+	_SkinHashTableEntry* hashEntry = SUB_CAST(_spSkin, self)->entriesHashTable[(unsigned int)slotIndex % SKIN_ENTRIES_HASH_TABLE_SIZE];
 	while (hashEntry) {
 		if (hashEntry->entry->slotIndex == slotIndex && strcmp(hashEntry->entry->name, name) == 0) {
 			existingEntry = hashEntry;
@@ -170,6 +171,7 @@ void spSkin_attachAll (const spSkin* self, spSkeleton* skeleton, const spSkin* o
 
 void spSkin_addSkin(spSkin* self, const spSkin* other) {
 	int i = 0;
+	spSkinEntry* entry;
 
 	for (i = 0; i < other->bones->size; i++) {
 		if (!spBoneDataArray_contains(self->bones, other->bones->items[i]))
@@ -191,9 +193,46 @@ void spSkin_addSkin(spSkin* self, const spSkin* other) {
 			spPathConstraintDataArray_add(self->pathConstraints, other->pathConstraints->items[i]);
 	}
 
-	spSkinEntry* entry = spSkin_getAttachments(other);
+	entry = spSkin_getAttachments(other);
 	while (entry) {
 		spSkin_setAttachment(self, entry->slotIndex, entry->name, entry->attachment);
+		entry = entry->next;
+	}
+}
+
+void spSkin_copySkin(spSkin* self, const spSkin* other) {
+	int i = 0;
+	spSkinEntry* entry;
+
+	for (i = 0; i < other->bones->size; i++) {
+		if (!spBoneDataArray_contains(self->bones, other->bones->items[i]))
+			spBoneDataArray_add(self->bones, other->bones->items[i]);
+	}
+
+	for (i = 0; i < other->ikConstraints->size; i++) {
+		if (!spIkConstraintDataArray_contains(self->ikConstraints, other->ikConstraints->items[i]))
+			spIkConstraintDataArray_add(self->ikConstraints, other->ikConstraints->items[i]);
+	}
+
+	for (i = 0; i < other->transformConstraints->size; i++) {
+		if (!spTransformConstraintDataArray_contains(self->transformConstraints, other->transformConstraints->items[i]))
+			spTransformConstraintDataArray_add(self->transformConstraints, other->transformConstraints->items[i]);
+	}
+
+	for (i = 0; i < other->pathConstraints->size; i++) {
+		if (!spPathConstraintDataArray_contains(self->pathConstraints, other->pathConstraints->items[i]))
+			spPathConstraintDataArray_add(self->pathConstraints, other->pathConstraints->items[i]);
+	}
+
+	entry = spSkin_getAttachments(other);
+	while (entry) {
+		if  (entry->attachment->type == SP_ATTACHMENT_MESH) {
+			spMeshAttachment* attachment = spMeshAttachment_newLinkedMesh(SUB_CAST(spMeshAttachment, entry->attachment));
+			spSkin_setAttachment(self, entry->slotIndex, entry->name, SUPER(SUPER(attachment)));
+		} else {
+			spAttachment* attachment = entry->attachment ? spAttachment_copy(entry->attachment) : 0;
+			spSkin_setAttachment(self, entry->slotIndex, entry->name, attachment);
+		}
 		entry = entry->next;
 	}
 }

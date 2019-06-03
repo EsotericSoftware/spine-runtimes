@@ -44,6 +44,7 @@ typedef struct {
 	const char* skin;
 	int slotIndex;
 	spMeshAttachment* mesh;
+	int inheritDeform;
 } _spLinkedMesh;
 
 typedef struct {
@@ -221,7 +222,7 @@ static void readCurve (_dataInput* input, spCurveTimeline* timeline, int frameIn
 }
 
 static void _spSkeletonBinary_addLinkedMesh (spSkeletonBinary* self, spMeshAttachment* mesh,
-		const char* skin, int slotIndex, const char* parent) {
+		const char* skin, int slotIndex, const char* parent, int inheritDeform) {
 	_spLinkedMesh* linkedMesh;
 	_spSkeletonBinary* internal = SUB_CAST(_spSkeletonBinary, self);
 
@@ -241,6 +242,7 @@ static void _spSkeletonBinary_addLinkedMesh (spSkeletonBinary* self, spMeshAttac
 	linkedMesh->skin = skin;
 	linkedMesh->slotIndex = slotIndex;
 	linkedMesh->parent = parent;
+	linkedMesh->inheritDeform = inheritDeform;
 }
 
 _SP_ARRAY_DECLARE_TYPE(spTimelineArray, spTimeline*)
@@ -752,6 +754,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 			const char* parent;
 			spAttachment* attachment;
 			spMeshAttachment* mesh;
+			int inheritDeform;
 			const char* path = readString(input);
 			if (!path) MALLOC_STR(path, name);
 			attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path);
@@ -760,12 +763,12 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 			readColor(input, &mesh->color.r, &mesh->color.g, &mesh->color.b, &mesh->color.a);
 			skinName = readString(input);
 			parent = readString(input);
-			mesh->inheritDeform = readBoolean(input);
+			inheritDeform = readBoolean(input);
 			if (nonessential) {
 				mesh->width = readFloat(input) * self->scale;
 				mesh->height = readFloat(input) * self->scale;
 			}
-			_spSkeletonBinary_addLinkedMesh(self, mesh, skinName, slotIndex, parent);
+			_spSkeletonBinary_addLinkedMesh(self, mesh, skinName, slotIndex, parent, inheritDeform);
 			if (freeName) FREE(name);
 			return attachment;
 		}
@@ -1065,6 +1068,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 			_spSkeletonBinary_setError(self, "Parent mesh not found: ", linkedMesh->parent);
 			return 0;
 		}
+		linkedMesh->mesh->super.deformAttachment = linkedMesh->inheritDeform ? SUB_CAST(spVertexAttachment, parent) : SUB_CAST(spVertexAttachment, linkedMesh->mesh);
 		spMeshAttachment_setParentMesh(linkedMesh->mesh, SUB_CAST(spMeshAttachment, parent));
 		spMeshAttachment_updateUVs(linkedMesh->mesh);
 		spAttachmentLoader_configureAttachment(self->attachmentLoader, SUPER(SUPER(linkedMesh->mesh)));

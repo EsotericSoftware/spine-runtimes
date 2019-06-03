@@ -61,8 +61,8 @@ namespace spine {
 	/// Abstract class to inherit from to create a callback object
 	class SP_API AnimationStateListenerObject {
 	public:
-		AnimationStateListenerObject() = default;
-		virtual ~AnimationStateListenerObject() = default;
+		AnimationStateListenerObject() { };
+		virtual ~AnimationStateListenerObject() { };
 	public:
 		/// The callback function to be called
 		virtual void callback(AnimationState* state, EventType type, TrackEntry* entry, Event* event) = 0;

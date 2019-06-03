@@ -109,6 +109,9 @@ SP_API void spSkin_attachAll (const spSkin* self, struct spSkeleton* skeleton, c
 /** Adds all attachments, bones, and constraints from the specified skin to this skin. */
 SP_API void spSkin_addSkin(spSkin* self, const spSkin* other);
 
+/** Adds all attachments, bones, and constraints from the specified skin to this skin. Attachments are deep copied. */
+SP_API void spSkin_copySkin(spSkin* self, const spSkin* other);
+
 /** Returns all attachments in this skin. */
 SP_API spSkinEntry* spSkin_getAttachments(const spSkin* self);
 

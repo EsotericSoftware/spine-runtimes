@@ -29,6 +29,7 @@
 
 #include <spine/MeshAttachment.h>
 #include <spine/extension.h>
+#include <stdio.h>
 
 void _spMeshAttachment_dispose (spAttachment* attachment) {
 	spMeshAttachment* self = SUB_CAST(spMeshAttachment, attachment);
@@ -45,7 +46,69 @@ void _spMeshAttachment_dispose (spAttachment* attachment) {
 }
 
 spAttachment* _spMeshAttachment_copy (spAttachment* attachment) {
+	spMeshAttachment* copy;
+	spMeshAttachment* self = SUB_CAST(spMeshAttachment, attachment);
+	if (self->parentMesh)
+		return SUPER(SUPER(spMeshAttachment_newLinkedMesh(self)));
+	copy = spMeshAttachment_create(attachment->name);
+	copy->rendererObject = self->rendererObject;
+	copy->regionU = self->regionU;
+	copy->regionV = self->regionV;
+	copy->regionU2 = self->regionU2;
+	copy->regionV2 = self->regionV2;
+	copy->regionRotate = self->regionRotate;
+	copy->regionDegrees = self->regionDegrees;
+	copy->regionOffsetX = self->regionOffsetX;
+	copy->regionOffsetY = self->regionOffsetY;
+	copy->regionWidth = self->regionWidth;
+	copy->regionHeight = self->regionHeight;
+	copy->regionOriginalWidth = self->regionOriginalWidth;
+	copy->regionOriginalHeight = self->regionOriginalHeight;
+	MALLOC_STR(copy->path, self->path);
+	spColor_setFromColor(&copy->color, &self->color);
 
+	spVertexAttachment_copyTo(SUPER(self), SUPER(copy));
+	copy->regionUVs = MALLOC(float, SUPER(self)->worldVerticesLength);
+	memcpy(copy->regionUVs, self->regionUVs, SUPER(self)->worldVerticesLength * sizeof(float));
+	copy->uvs = MALLOC(float, SUPER(self)->worldVerticesLength);
+	memcpy(copy->uvs, self->uvs, SUPER(self)->worldVerticesLength * sizeof(float));
+	copy->trianglesCount = self->trianglesCount;
+	copy->triangles = MALLOC(unsigned short, self->trianglesCount);
+	memcpy(copy->triangles, self->triangles, self->trianglesCount * sizeof(short));
+	copy->hullLength = self->hullLength;
+	if (self->edgesCount > 0) {
+		copy->edgesCount = self->edgesCount;
+		copy->edges = MALLOC(int, self->edgesCount);
+		memcpy(copy->edges, self->edges, self->edgesCount * sizeof(int));
+	}
+	copy->width = self->width;
+	copy->height = self->height;
+
+	return SUPER(SUPER(copy));
+}
+
+spMeshAttachment* spMeshAttachment_newLinkedMesh (spMeshAttachment* self) {
+	spMeshAttachment* copy = spMeshAttachment_create(self->super.super.name);
+
+	copy->rendererObject = self->rendererObject;
+	copy->regionU = self->regionU;
+	copy->regionV = self->regionV;
+	copy->regionU2 = self->regionU2;
+	copy->regionV2 = self->regionV2;
+	copy->regionRotate = self->regionRotate;
+	copy->regionDegrees = self->regionDegrees;
+	copy->regionOffsetX = self->regionOffsetX;
+	copy->regionOffsetY = self->regionOffsetY;
+	copy->regionWidth = self->regionWidth;
+	copy->regionHeight = self->regionHeight;
+	copy->regionOriginalWidth = self->regionOriginalWidth;
+	copy->regionOriginalHeight = self->regionOriginalHeight;
+	MALLOC_STR(copy->path, self->path);
+	spColor_setFromColor(&copy->color, &self->color);
+	copy->super.deformAttachment = self->super.deformAttachment;
+	spMeshAttachment_setParentMesh(copy, self->parentMesh ? self->parentMesh : self);
+	spMeshAttachment_updateUVs(copy);
+	return copy;
 }
 
 spMeshAttachment* spMeshAttachment_create (const char* name) {
@@ -59,12 +122,12 @@ spMeshAttachment* spMeshAttachment_create (const char* name) {
 void spMeshAttachment_updateUVs (spMeshAttachment* self) {
 	int i, n;
 	float* uvs;
+	float u, v, width, height;
 	int verticesLength = SUPER(self)->worldVerticesLength;
 	FREE(self->uvs);
 	uvs = self->uvs = MALLOC(float, verticesLength);
 	n = verticesLength;
-	float u = self->regionU, v = self->regionV;
-	float width = 0, height = 0;
+	u = self->regionU; v = self->regionV;
 
 	switch (self->regionDegrees) {
 	case 90: {

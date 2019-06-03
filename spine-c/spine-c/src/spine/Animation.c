@@ -894,17 +894,18 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 
 	spSlot *slot = skeleton->slots[self->slotIndex];
 
-	if (slot->attachment != self->attachment) {
-		if (!slot->attachment) return;
-		switch (slot->attachment->type) {
-			case SP_ATTACHMENT_MESH: {
-				spMeshAttachment* mesh = SUB_CAST(spMeshAttachment, slot->attachment);
-				if (!mesh->inheritDeform || mesh->parentMesh != (void*)self->attachment) return;
-				break;
-			}
-			default:
-				return;
+	if (!slot->attachment) return;
+	switch (slot->attachment->type) {
+		case SP_ATTACHMENT_BOUNDING_BOX:
+		case SP_ATTACHMENT_CLIPPING:
+		case SP_ATTACHMENT_MESH:
+		case SP_ATTACHMENT_PATH: {
+			spVertexAttachment* vertexAttachment = SUB_CAST(spVertexAttachment, slot->attachment);
+			if (vertexAttachment->deformAttachment != SUB_CAST(spVertexAttachment, self->attachment)) return;
+			break;
 		}
+		default:
+			return;
 	}
 
 	frames = self->frames;

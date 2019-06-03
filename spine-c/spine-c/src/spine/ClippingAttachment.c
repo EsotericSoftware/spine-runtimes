@@ -39,7 +39,11 @@ void _spClippingAttachment_dispose (spAttachment* attachment) {
 }
 
 spAttachment* _spClippingAttachment_copy (spAttachment* attachment) {
-
+	spClippingAttachment* copy = spClippingAttachment_create(attachment->name);
+	spClippingAttachment* self = SUB_CAST(spClippingAttachment, attachment);
+	spVertexAttachment_copyTo(SUPER(self), SUPER(copy));
+	copy->endSlot = self->endSlot;
+	return SUPER(SUPER(copy));
 }
 
 spClippingAttachment* spClippingAttachment_create (const char* name) {

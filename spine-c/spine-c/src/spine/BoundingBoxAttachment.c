@@ -39,7 +39,10 @@ void _spBoundingBoxAttachment_dispose (spAttachment* attachment) {
 }
 
 spAttachment* _spBoundingBoxAttachment_copy (spAttachment* attachment) {
-
+	spBoundingBoxAttachment* copy = spBoundingBoxAttachment_create(attachment->name);
+	spBoundingBoxAttachment* self = SUB_CAST(spBoundingBoxAttachment, attachment);
+	spVertexAttachment_copyTo(SUPER(self), SUPER(copy));
+	return SUPER(SUPER(copy));
 }
 
 spBoundingBoxAttachment* spBoundingBoxAttachment_create (const char* name) {
