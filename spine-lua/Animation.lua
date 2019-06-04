@@ -823,7 +823,7 @@ function Animation.DeformTimeline.new (frameCount)
 		local slotAttachment = slot.attachment
 		if not slotAttachment then return end
 		if not (slotAttachment.type == AttachmentType.mesh or slotAttachment.type == AttachmentType.linkedmesh or slotAttachment.type == AttachmentType.path or slotAttachment.type == AttachmentType.boundingbox) then return end
-		if not slotAttachment:applyDeform(self.attachment) then return end
+		if slotAttachment.deformAttachment ~= self.attachment then return end
 
 		local frames = self.frames
 		local deformArray = slot.deform

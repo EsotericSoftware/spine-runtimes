@@ -52,6 +52,7 @@ function VertexAttachment.new (name, attachmentType)
 		nextID = nextID - 65535
 	end
 	self.id = nextID * SHL_11
+  self.deformAttachment = self
 	nextID = nextID + 1
 	setmetatable(self, VertexAttachment)
 	return self
@@ -147,10 +148,6 @@ function VertexAttachment:computeWorldVertices (slot, start, count, worldVertice
 	end
 end
 
-function VertexAttachment:applyDeform (sourceAttachment)
-	return self == sourceAttachment
-end
-
 function VertexAttachment:copyTo (attachment)
   if self.bones then
     attachment.bones = utils.copy(self.bones)
@@ -165,6 +162,7 @@ function VertexAttachment:copyTo (attachment)
   end
   
   attachment.worldVerticesLength = self.worldVerticesLength
+  attachment.deformAttachment = self.deformAttachment
 end
 
 return VertexAttachment

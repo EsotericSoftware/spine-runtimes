@@ -267,6 +267,12 @@ function SkeletonJson.new (attachmentLoader)
 			if not skin then error("Skin not found: " .. linkedMesh.skin) end
 			local parent = skin:getAttachment(linkedMesh.slotIndex, linkedMesh.parent)
 			if not parent then error("Parent mesh not found: " + linkedMesh.parent) end
+      if linkedMesh.inheritDeform then
+        linkedMesh.mesh.deformAttachment = parent
+      else
+        linkedMesh.mesh.deformAttachment = linkedMesh.mesh
+      end
+      
 			linkedMesh.mesh:setParentMesh(parent)
 			linkedMesh.mesh:updateUVs()
 		end
@@ -359,12 +365,12 @@ function SkeletonJson.new (attachmentLoader)
 
 			local parent = map.parent
 			if parent then
-				mesh.inheritDeform = getValue(map, "deform", true)
 				table_insert(self.linkedMeshes, {
 						mesh = mesh,
 						skin = getValue(map, "skin", nil),
 						slotIndex = slotIndex,
-						parent = parent
+						parent = parent,
+            inheritDeform = getValue(map, "deform", true)
 				})
 				return mesh
 			end

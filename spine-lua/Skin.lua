@@ -122,18 +122,12 @@ function Skin:copySkin (skin)
   
   local attachments = skin:getAttachments()
   for i, entry in ipairs(attachments) do
-    entry.attachment = entry.attachment:copy()
-    self:setAttachment(entry.slotIndex, entry.name, entry.attachment)
-  end
-  
-  attachments = self:getAttachments()
-  for i, entry in ipairs(attachments) do
     if entry.attachment.type == AttachmentType.mesh then
-      local mesh = entry.attachment
-      if mesh.parentMesh then        
-        mesh:setParentMesh(self:getAttachment(entry.slotIndex, mesh:getParentMesh().name))
-        mesh:updateUVs()
-      end
+      entry.attachment = entry.attachment:newLinkedMesh()
+      self:setAttachment(entry.slotIndex, entry.name, entry.attachment)
+    else
+      entry.attachment = entry.attachment:copy()
+      self:setAttachment(entry.slotIndex, entry.name, entry.attachment)
     end
   end
 end

@@ -49,7 +49,6 @@ function MeshAttachment.new (name)
 	self.color = Color.newWith(1, 1, 1, 1)
 	self.hullLength = 0
 	self.parentMesh = nil
-	self.inheritDeform = false
 	self.tempColor = Color.newWith(1, 1, 1, 1)
   self.width = 0
   self.height = 0
@@ -129,10 +128,6 @@ function MeshAttachment:updateUVs ()
 	end
 end
 
-function MeshAttachment:applyDeform (sourceAttachment)
-	return self == sourceAttachment or (self.inheritDeform and self.parentMesh == sourceAttachment)
-end
-
 function MeshAttachment:setParentMesh (parentMesh)
 	self.parentMesh = parentMesh
 	if parentMesh then
@@ -146,29 +141,39 @@ function MeshAttachment:setParentMesh (parentMesh)
 end
 
 function MeshAttachment:copy ()
+  if self.parentMesh then return self:newLinkedMesh() end
+  
   local copy = MeshAttachment.new(self.name)  
   copy.region = self.region
   copy.path = self.path
-  
-  if not self.parentMesh then
-    self:copyTo(copy)
-    copy.regionUVs = utils.copy(self.regionUVs)
-    copy.uvs = utils.copy(self.uvs)
-    copy.triangles = utils.copy(self.triangles)
-    copy.color:setFrom(self.color)
-    copy.hullLength = self.hullLength
-    copy.inheritDeform = self.inheritDeform
-    copy.tempColor:setFrom(self.tempColor)
-    if self.edges then
-      copy.edges = utils.copy(edges)
-    end
-    copy.width = self.width
-    copy.height = self.height
-  else
-    copy:setParentMesh(self.parentMesh)
-    copy.updateUVs()
+  copy.color:setFrom(self.color)
+
+  self:copyTo(copy)
+  copy.regionUVs = utils.copy(self.regionUVs)
+  copy.uvs = utils.copy(self.uvs)
+  copy.triangles = utils.copy(self.triangles)
+  copy.hullLength = self.hullLength
+  if self.edges then
+    copy.edges = utils.copy(edges)
   end
+  copy.width = self.width
+  copy.height = self.height
   
+  return copy
+end
+
+function MeshAttachment:newLinkedMesh ()
+  local copy = MeshAttachment.new(self.name)  
+  copy.region = self.region
+  copy.path = self.path
+  copy.color:setFrom(self.color)
+  if self.parentMesh then
+    copy.deformAttachment = self.parentMesh
+  else
+    copy.deformAttachment = self
+  end
+  copy:setParentMesh(self.parentMesh)
+  copy:updateUVs()
   return copy
 end
 
