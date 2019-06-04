@@ -47,6 +47,8 @@ namespace Spine {
 		internal Slot target;
 		internal float position, spacing, rotateMix, translateMix;
 
+		internal bool active;
+
 		internal ExposedList<float> spaces = new ExposedList<float>(), positions = new ExposedList<float>();
 		internal ExposedList<float> world = new ExposedList<float>(), curves = new ExposedList<float>(), lengths = new ExposedList<float>();
 		internal float[] segments = new float[10];
@@ -458,6 +460,7 @@ namespace Spine {
 		public ExposedList<Bone> Bones { get { return bones; } }
 		/// <summary>The slot whose path attachment will be used to constrained the bones.</summary>
 		public Slot Target { get { return target; } set { target = value; } }
+		public bool Active { get { return active; } }
 		/// <summary>The path constraint's setup pose data.</summary>
 		public PathConstraintData Data { get { return data; } }
 	}

@@ -118,8 +118,8 @@ namespace Spine {
 			UpdateWorldTransform();
 		}
 
-		/// <summary>Caches information about bones and constraints. Must be called if the skin is modified or if bones, constraints, or
-		/// weighted path attachments are added or removed.</summary>
+		/// <summary>Caches information about bones and constraints. Must be called if the <see cref="Skin"/> is modified or if bones, constraints, or
+		/// constraints, or weighted path attachments are added or removed.</summary>
 		public void UpdateCache () {
 			var updateCache = this.updateCache;
 			updateCache.Clear();
@@ -129,8 +129,19 @@ namespace Spine {
 			var bones = this.bones;
 			for (int i = 0; i < boneCount; i++) {
 				Bone bone = bones.Items[i];
-				bone.update = !bone.data.skinRequired || (skin != null && skin.bones.Contains(bone.data));
-				bone.sorted = !bone.update;
+				bone.sorted = bone.data.skinRequired;
+				bone.active = !bone.sorted;
+			}
+			if (skin != null) {
+				Object[] skinBones = skin.bones.Items;
+				for (int i = 0, n = skin.bones.Count; i < n; i++) {
+					Bone bone = (Bone)bones.Items[((BoneData)skinBones[i]).index];
+					do {
+						bone.sorted = false;
+						bone.active = true;
+						bone = bone.parent;
+					} while (bone != null);
+				}
 			}
 
 			int ikCount = this.ikConstraints.Count, transformCount = this.transformConstraints.Count, pathCount = this.pathConstraints.Count;
@@ -169,7 +180,9 @@ namespace Spine {
 		}
 
 		private void SortIkConstraint (IkConstraint constraint) {
-			if (constraint.data.skinRequired && (skin == null || !skin.constraints.Contains(constraint.data))) return;
+			constraint.active = constraint.target.active
+				&& (!constraint.data.skinRequired || (skin != null && skin.constraints.Contains(constraint.data)));
+			if (!constraint.active) return;
 
 			Bone target = constraint.target;
 			SortBone(target);
@@ -191,7 +204,9 @@ namespace Spine {
 		}
 
 		private void SortPathConstraint (PathConstraint constraint) {
-			if (constraint.data.skinRequired && (skin == null || !skin.constraints.Contains(constraint.data))) return;
+			constraint.active = constraint.target.bone.active
+				&& (!constraint.data.skinRequired || (skin != null && skin.constraints.Contains(constraint.data)));
+			if (!constraint.active) return;
 
 			Slot slot = constraint.target;
 			int slotIndex = slot.data.index;
@@ -217,7 +232,9 @@ namespace Spine {
 		}
 
 		private void SortTransformConstraint (TransformConstraint constraint) {
-			if (constraint.data.skinRequired && (skin == null || !skin.constraints.Contains(constraint.data))) return;
+			constraint.active = constraint.target.active
+				&& (!constraint.data.skinRequired || (skin != null && skin.constraints.Contains(constraint.data)));
+			if (!constraint.active) return;
 
 			SortBone(constraint.target);
 
@@ -277,7 +294,7 @@ namespace Spine {
 			var bonesItems = bones.Items;
 			for (int i = 0, n = bones.Count; i < n; i++) {
 				Bone bone = bonesItems[i];
-				if (!bone.update) continue;
+				if (!bone.active) continue;
 				if (bone.sorted) SortReset(bone.children);
 				bone.sorted = false;
 			}
@@ -574,8 +591,9 @@ namespace Spine {
 			temp = temp ?? new float[8];
 			var drawOrderItems = this.drawOrder.Items;
 			float minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
-			for (int i = 0, n = this.drawOrder.Count; i < n; i++) {
+			for (int i = 0, n = drawOrderItems.Length; i < n; i++) {
 				Slot slot = drawOrderItems[i];
+				if (!slot.bone.active) continue;
 				int verticesLength = 0;
 				float[] vertices = null;
 				Attachment attachment = slot.attachment;

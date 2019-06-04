@@ -211,6 +211,7 @@ namespace Spine.Unity {
 			var drawOrderItems = drawOrder.Items;
 			for (int i = 0; i < drawOrderCount; i++) {
 				Slot slot = drawOrderItems[i];
+				if (!slot.bone.active) continue;
 				Attachment attachment = slot.attachment;
 
 				workingAttachmentsItems[i] = attachment;
@@ -285,6 +286,7 @@ namespace Spine.Unity {
 			var drawOrderItems = drawOrder.Items;
 			for (int i = 0; i < drawOrderCount; i++) {
 				Slot slot = drawOrderItems[i];
+				if (!slot.bone.active) continue;
 				Attachment attachment = slot.attachment;
 				#if SPINE_TRIANGLECHECK
 				workingAttachmentsItems[i] = attachment;
@@ -495,6 +497,7 @@ namespace Spine.Unity {
 
 			for (int slotIndex = instruction.startSlot; slotIndex < instruction.endSlot; slotIndex++) {
 				var slot = drawOrderItems[slotIndex];
+				if (!slot.bone.active) continue;
 				var attachment = slot.attachment;
 				float z = zSpacing * slotIndex;
 
@@ -701,7 +704,7 @@ namespace Spine.Unity {
 			for (int si = 0, n = instruction.submeshInstructions.Count; si < n; si++) {
 				var submesh = instruction.submeshInstructions.Items[si];
 				var skeleton = submesh.skeleton;
-				var skeletonDrawOrderItems = skeleton.drawOrder.Items;
+				var drawOrderItems = skeleton.drawOrder.Items;
 				float a = skeleton.a * 255, r = skeleton.r, g = skeleton.g, b = skeleton.b;
 
 				int endSlot = submesh.endSlot;
@@ -729,7 +732,8 @@ namespace Spine.Unity {
 					var uv3i = uv3.Items;
 
 					for (int slotIndex = startSlot; slotIndex < endSlot; slotIndex++) {
-						var slot = skeletonDrawOrderItems[slotIndex];
+						var slot = drawOrderItems[slotIndex];
+						if (!slot.bone.active) continue;
 						var attachment = slot.attachment;
 
 						rg.x = slot.r2; //r
@@ -756,7 +760,8 @@ namespace Spine.Unity {
 				}
 
 				for (int slotIndex = startSlot; slotIndex < endSlot; slotIndex++) {
-					var slot = skeletonDrawOrderItems[slotIndex];
+					var slot = drawOrderItems[slotIndex];
+					if (!slot.bone.active) continue;
 					var attachment = slot.attachment;
 					float z = slotIndex * settings.zSpacing;
 
@@ -909,9 +914,12 @@ namespace Spine.Unity {
 					var tris = currentSubmeshBuffer.Items;
 					int triangleIndex = 0;
 					var skeleton = submeshInstruction.skeleton;
-					var skeletonDrawOrderItems = skeleton.drawOrder.Items;
-					for (int a = submeshInstruction.startSlot, endSlot = submeshInstruction.endSlot; a < endSlot; a++) {			
-						var attachment = skeletonDrawOrderItems[a].attachment;
+					var drawOrderItems = skeleton.drawOrder.Items;
+					for (int slotIndex = submeshInstruction.startSlot, endSlot = submeshInstruction.endSlot; slotIndex < endSlot; slotIndex++) {
+						var slot = drawOrderItems[slotIndex];
+						if (!slot.bone.active) continue;
+
+						var attachment = drawOrderItems[slotIndex].attachment;
 						if (attachment is RegionAttachment) {
 							tris[triangleIndex] = attachmentFirstVertex;
 							tris[triangleIndex + 1] = attachmentFirstVertex + 2;
@@ -1475,9 +1483,13 @@ namespace Spine.Unity {
 			attachments.Resize(attachmentCount);
 			var attachmentsItems = attachments.Items;
 
-			var drawOrder = instructionsItems[0].skeleton.drawOrder.Items;
-			for (int i = 0; i < attachmentCount; i++)
-			attachmentsItems[i] = drawOrder[startSlot + i].attachment;
+			var drawOrderItems = instructionsItems[0].skeleton.drawOrder.Items;
+			for (int i = 0; i < attachmentCount; i++) {
+				Slot slot = drawOrderItems[startSlot + i];
+				if (!slot.bone.active) continue;
+				attachmentsItems[i] = slot.attachment;
+			}
+			
 			#endif
 		}
 
