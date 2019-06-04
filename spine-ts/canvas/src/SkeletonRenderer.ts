@@ -57,6 +57,7 @@ module spine.canvas {
 			ctx.save();
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				let slot = drawOrder[i];
+				if (!slot.bone.active) continue;
 				let attachment = slot.getAttachment();
 				let regionAttachment: RegionAttachment = null;
 				let region: TextureAtlasRegion = null;

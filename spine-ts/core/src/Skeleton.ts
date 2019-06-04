@@ -100,8 +100,23 @@ module spine {
 			this.updateCacheReset.length = 0;
 
 			let bones = this.bones;
-			for (let i = 0, n = bones.length; i < n; i++)
-				bones[i].sorted = false;
+			for (let i = 0, n = bones.length; i < n; i++) {
+				let bone = bones[i];
+				bone.sorted = bone.data.skinRequired;
+				bone.active = !bone.sorted;
+			}
+
+			if (this.skin != null) {
+				let skinBones = this.skin.bones;
+				for (let i = 0, n = this.skin.bones.length; i < n; i++) {
+					let bone = this.bones[skinBones[i].index];
+					do {
+						bone.sorted = false;
+						bone.active = true;
+						bone = bone.parent;
+					} while (bone != null);
+				}
+			}
 
 			// IK first, lowest hierarchy depth first.
 			let ikConstraints = this.ikConstraints;
@@ -140,6 +155,9 @@ module spine {
 		}
 
 		sortIkConstraint (constraint: IkConstraint) {
+			constraint.active = constraint.target.isActive() && (!constraint.data.skinRequired || (this.skin != null && Utils.contains(this.skin.constraints, constraint.data, true)));
+			if (!constraint.active) return;
+
 			let target = constraint.target;
 			this.sortBone(target);
 
@@ -159,6 +177,9 @@ module spine {
 		}
 
 		sortPathConstraint (constraint: PathConstraint) {
+			constraint.active = constraint.target.bone.isActive() && (!constraint.data.skinRequired || (this.skin != null && Utils.contains(this.skin.constraints, constraint.data, true)));
+			if (!constraint.active) return;
+
 			let slot = constraint.target;
 			let slotIndex = slot.data.index;
 			let slotBone = slot.bone;
@@ -185,6 +206,9 @@ module spine {
 		}
 
 		sortTransformConstraint (constraint: TransformConstraint) {
+			constraint.active = constraint.target.isActive() && (!constraint.data.skinRequired || (this.skin != null && Utils.contains(this.skin.constraints, constraint.data, true)));
+			if (!constraint.active) return;
+
 			this.sortBone(constraint.target);
 
 			let constrained = constraint.bones;
@@ -246,6 +270,7 @@ module spine {
 		sortReset (bones: Array<Bone>) {
 			for (let i = 0, n = bones.length; i < n; i++) {
 				let bone = bones[i];
+				if (!bone.update) continue;
 				if (bone.sorted) this.sortReset(bone.children);
 				bone.sorted = false;
 			}
@@ -378,6 +403,7 @@ module spine {
 		 * old skin, each slot's setup mode attachment is attached from the new skin.
 		 * @param newSkin May be null. */
 		setSkin (newSkin: Skin) {
+			if (newSkin == this.skin) return;
 			if (newSkin != null) {
 				if (this.skin != null)
 					newSkin.attachAll(this, this.skin);
@@ -394,6 +420,7 @@ module spine {
 				}
 			}
 			this.skin = newSkin;
+			this.updateCache();
 		}
 
 		/** @return May be null. */

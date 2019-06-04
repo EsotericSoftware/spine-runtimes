@@ -219,6 +219,7 @@ module spine {
 			let frames = this.frames;
 
 			let bone = skeleton.bones[this.boneIndex];
+			if (!bone.active) return;
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -298,6 +299,7 @@ module spine {
 			let frames = this.frames;
 
 			let bone = skeleton.bones[this.boneIndex];
+			if (!bone.active) return;
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -357,6 +359,7 @@ module spine {
 			let frames = this.frames;
 
 			let bone = skeleton.bones[this.boneIndex];
+			if (!bone.active) return;
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -456,6 +459,7 @@ module spine {
 			let frames = this.frames;
 
 			let bone = skeleton.bones[this.boneIndex];
+			if (!bone.active) return;
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -531,6 +535,7 @@ module spine {
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			let slot = skeleton.slots[this.slotIndex];
+			if (!slot.bone.active) return;
 			let frames = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
@@ -611,6 +616,7 @@ module spine {
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			let slot = skeleton.slots[this.slotIndex];
+			if (!slot.bone.active) return;
 			let frames = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
@@ -700,6 +706,7 @@ module spine {
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			let slot = skeleton.slots[this.slotIndex];
+			if (!slot.bone.active) return;
 			if (direction == MixDirection.mixOut && blend == MixBlend.setup) {
 				let attachmentName = slot.data.attachmentName;
 				slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(this.slotIndex, attachmentName));
@@ -754,6 +761,7 @@ module spine {
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			let slot: Slot = skeleton.slots[this.slotIndex];
+			if (!slot.bone.active) return;
 			let slotAttachment: Attachment = slot.getAttachment();
 			if (!(slotAttachment instanceof VertexAttachment) || !((<VertexAttachment>slotAttachment).deformAttachment == this.attachment)) return;
 
@@ -1065,6 +1073,7 @@ module spine {
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			let frames = this.frames;
 			let constraint: IkConstraint = skeleton.ikConstraints[this.ikConstraintIndex];
+			if (!constraint.active) return;
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -1165,6 +1174,7 @@ module spine {
 			let frames = this.frames;
 
 			let constraint: TransformConstraint = skeleton.transformConstraints[this.transformConstraintIndex];
+			if (!constraint.active) return;
 			if (time < frames[0]) {
 				let data = constraint.data;
 				switch (blend) {
@@ -1249,6 +1259,7 @@ module spine {
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			let frames = this.frames;
 			let constraint: PathConstraint = skeleton.pathConstraints[this.pathConstraintIndex];
+			if (!constraint.active) return;
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -1292,6 +1303,7 @@ module spine {
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			let frames = this.frames;
 			let constraint: PathConstraint = skeleton.pathConstraints[this.pathConstraintIndex];
+			if (!constraint.active) return;
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -1353,7 +1365,7 @@ module spine {
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			let frames = this.frames;
 			let constraint: PathConstraint = skeleton.pathConstraints[this.pathConstraintIndex];
-
+			if (!constraint.active) return;
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:

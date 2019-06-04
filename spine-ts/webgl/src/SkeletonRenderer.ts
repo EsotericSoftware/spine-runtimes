@@ -79,6 +79,10 @@ module spine.webgl {
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				let clippedVertexSize = clipper.isClipping() ? 2 : vertexSize;
 				let slot = drawOrder[i];
+				if (!slot.bone.active) {
+					clipper.clipEndWithSlot(slot);
+					continue;
+				}
 
 				if (slotRangeStart >= 0 && slotRangeStart == slot.data.index) {
 					inRange = true;

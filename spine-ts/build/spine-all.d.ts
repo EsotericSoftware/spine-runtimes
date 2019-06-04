@@ -447,7 +447,9 @@ declare module spine {
 		d: number;
 		worldY: number;
 		sorted: boolean;
+		active: boolean;
 		constructor(data: BoneData, skeleton: Skeleton, parent: Bone);
+		isActive(): boolean;
 		update(): void;
 		updateWorldTransform(): void;
 		updateWorldTransformWith(x: number, y: number, rotation: number, scaleX: number, scaleY: number, shearX: number, shearY: number): void;
@@ -478,6 +480,7 @@ declare module spine {
 		shearX: number;
 		shearY: number;
 		transformMode: TransformMode;
+		skinRequired: boolean;
 		constructor(index: number, name: string, parent: BoneData);
 	}
 	enum TransformMode {
@@ -489,8 +492,11 @@ declare module spine {
 	}
 }
 declare module spine {
-	interface Constraint extends Updatable {
-		getOrder(): number;
+	abstract class ConstraintData {
+		name: string;
+		order: number;
+		skinRequired: boolean;
+		constructor(name: string, order: number, skinRequired: boolean);
 	}
 }
 declare module spine {
@@ -518,7 +524,7 @@ declare module spine {
 	}
 }
 declare module spine {
-	class IkConstraint implements Constraint {
+	class IkConstraint implements Updatable {
 		data: IkConstraintData;
 		bones: Array<Bone>;
 		target: Bone;
@@ -526,8 +532,9 @@ declare module spine {
 		compress: boolean;
 		stretch: boolean;
 		mix: number;
+		active: boolean;
 		constructor(data: IkConstraintData, skeleton: Skeleton);
-		getOrder(): number;
+		isActive(): boolean;
 		apply(): void;
 		update(): void;
 		apply1(bone: Bone, targetX: number, targetY: number, compress: boolean, stretch: boolean, uniform: boolean, alpha: number): void;
@@ -535,9 +542,7 @@ declare module spine {
 	}
 }
 declare module spine {
-	class IkConstraintData {
-		name: string;
-		order: number;
+	class IkConstraintData extends ConstraintData {
 		bones: BoneData[];
 		target: BoneData;
 		bendDirection: number;
@@ -549,7 +554,7 @@ declare module spine {
 	}
 }
 declare module spine {
-	class PathConstraint implements Constraint {
+	class PathConstraint implements Updatable {
 		static NONE: number;
 		static BEFORE: number;
 		static AFTER: number;
@@ -567,20 +572,19 @@ declare module spine {
 		curves: number[];
 		lengths: number[];
 		segments: number[];
+		active: boolean;
 		constructor(data: PathConstraintData, skeleton: Skeleton);
+		isActive(): boolean;
 		apply(): void;
 		update(): void;
 		computeWorldPositions(path: PathAttachment, spacesCount: number, tangents: boolean, percentPosition: boolean, percentSpacing: boolean): number[];
 		addBeforePosition(p: number, temp: Array<number>, i: number, out: Array<number>, o: number): void;
 		addAfterPosition(p: number, temp: Array<number>, i: number, out: Array<number>, o: number): void;
 		addCurvePosition(p: number, x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, out: Array<number>, o: number, tangents: boolean): void;
-		getOrder(): number;
 	}
 }
 declare module spine {
-	class PathConstraintData {
-		name: string;
-		order: number;
+	class PathConstraintData extends ConstraintData {
 		bones: BoneData[];
 		target: SlotData;
 		positionMode: PositionMode;
@@ -781,7 +785,7 @@ declare module spine {
 		name: string;
 		attachments: Map<Attachment>[];
 		bones: BoneData[];
-		constraints: Constraint[];
+		constraints: ConstraintData[];
 		constructor(name: string);
 		setAttachment(slotIndex: number, name: string, attachment: Attachment): void;
 		addSkin(skin: Skin): void;
@@ -899,7 +903,7 @@ declare module spine {
 	}
 }
 declare module spine {
-	class TransformConstraint implements Constraint {
+	class TransformConstraint implements Updatable {
 		data: TransformConstraintData;
 		bones: Array<Bone>;
 		target: Bone;
@@ -908,20 +912,19 @@ declare module spine {
 		scaleMix: number;
 		shearMix: number;
 		temp: Vector2;
+		active: boolean;
 		constructor(data: TransformConstraintData, skeleton: Skeleton);
+		isActive(): boolean;
 		apply(): void;
 		update(): void;
 		applyAbsoluteWorld(): void;
 		applyRelativeWorld(): void;
 		applyAbsoluteLocal(): void;
 		applyRelativeLocal(): void;
-		getOrder(): number;
 	}
 }
 declare module spine {
-	class TransformConstraintData {
-		name: string;
-		order: number;
+	class TransformConstraintData extends ConstraintData {
 		bones: BoneData[];
 		target: BoneData;
 		rotateMix: number;
@@ -958,6 +961,7 @@ declare module spine {
 declare module spine {
 	interface Updatable {
 		update(): void;
+		isActive(): boolean;
 	}
 }
 declare module spine {
@@ -1034,6 +1038,7 @@ declare module spine {
 		static toFloatArray(array: Array<number>): number[] | Float32Array;
 		static toSinglePrecision(value: number): number;
 		static webkit602BugfixHelper(alpha: number, blend: MixBlend): void;
+		static contains<T>(array: Array<T>, element: T, identity?: boolean): boolean;
 	}
 	class DebugUtils {
 		static logBones(skeleton: Skeleton): void;

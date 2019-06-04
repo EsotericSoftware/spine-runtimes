@@ -238,6 +238,7 @@ function setupUI () {
 function render () {
 	var now = Date.now() / 1000;
 	var delta = now - lastFrameTime;
+	delta = 0.016;
 	lastFrameTime = now;
 
 	// Update the MVP matrix to adjust for canvas size changes

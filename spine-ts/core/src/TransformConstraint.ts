@@ -28,12 +28,13 @@
  *****************************************************************************/
 
 module spine {
-	export class TransformConstraint implements Constraint {
+	export class TransformConstraint implements Updatable {
 		data: TransformConstraintData;
 		bones: Array<Bone>;
 		target: Bone;
 		rotateMix = 0; translateMix = 0; scaleMix = 0; shearMix = 0;
 		temp = new Vector2();
+		active = false;
 
 		constructor (data: TransformConstraintData, skeleton: Skeleton) {
 			if (data == null) throw new Error("data cannot be null.");
@@ -47,6 +48,10 @@ module spine {
 			for (let i = 0; i < data.bones.length; i++)
 				this.bones.push(skeleton.findBone(data.bones[i].name));
 			this.target = skeleton.findBone(data.target.name);
+		}
+
+		isActive () {
+			return this.active;
 		}
 
 		apply () {
@@ -266,10 +271,6 @@ module spine {
 
 				bone.updateWorldTransformWith(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY);
 			}
-		}
-
-		getOrder () {
-			return this.data.order;
 		}
 	}
 }

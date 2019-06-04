@@ -263,6 +263,13 @@ module spine {
 		static webkit602BugfixHelper (alpha: number, blend: MixBlend) {
 
 		}
+
+		static contains<T> (array: Array<T>, element: T, identity = true) {
+			for (var i = 0; i < array.length; i++) {
+				if (array[i] == element) return true;
+			}
+			return false;
+		}
 	}
 
 	export class DebugUtils {

@@ -28,9 +28,7 @@
  *****************************************************************************/
 
 module spine {
-	export class IkConstraintData {
-		name: string;
-		order = 0;
+	export class IkConstraintData extends ConstraintData {
 		bones = new Array<BoneData>();
 		target: BoneData;
 		bendDirection = 1;
@@ -40,7 +38,7 @@ module spine {
 		mix = 1;
 
 		constructor (name: string) {
-			this.name = name;
+			super(name, 0, false);
 		}
 	}
 }

@@ -291,6 +291,7 @@ module spine {
 			let rotateTimeline = timeline as RotateTimeline;
 			let frames = rotateTimeline.frames;
 			let bone = skeleton.bones[rotateTimeline.boneIndex];
+			if (!bone.active) return;
 			let r1 = 0, r2 = 0;
 			if (time < frames[0]) {
 				switch (blend) {
