@@ -45,8 +45,15 @@ public:
 
 	const String &getName() const;
 
+	virtual Attachment* copy() = 0;
+
+	int getRefCount();
+	void reference();
+	void dereference();
+
 private:
 	const String _name;
+	int _refCount;
 };
 }
 

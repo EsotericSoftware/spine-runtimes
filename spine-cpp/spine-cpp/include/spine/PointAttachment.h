@@ -63,6 +63,8 @@ namespace spine {
         
         float getRotation();
         void setRotation(float inValue);
+
+        virtual Attachment* copy();
         
     private:
         float _x, _y, _rotation;

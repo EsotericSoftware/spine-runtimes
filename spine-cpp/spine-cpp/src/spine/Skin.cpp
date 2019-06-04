@@ -33,6 +33,7 @@
 #include <spine/Skin.h>
 
 #include <spine/Attachment.h>
+#include <spine/MeshAttachment.h>
 #include <spine/Skeleton.h>
 
 #include <spine/Slot.h>
@@ -44,12 +45,20 @@ using namespace spine;
 Skin::AttachmentMap::AttachmentMap() {
 }
 
+static void disposeAttachment(Attachment* attachment) {
+	if (!attachment) return;
+	attachment->dereference();
+	if (attachment->getRefCount() == 0) delete attachment;
+}
+
 void Skin::AttachmentMap::put(size_t slotIndex, const String &attachmentName, Attachment *attachment) {
 	if (slotIndex >= _buckets.size())
 		_buckets.setSize(slotIndex + 1, Vector<Entry>());
 	Vector<Entry> &bucket = _buckets[slotIndex];
 	int existing = findInBucket(bucket, attachmentName);
+	attachment->reference();
 	if (existing >= 0) {
+		disposeAttachment(bucket[existing]._attachment);
 		bucket[existing]._attachment = attachment;
 	} else {
 		bucket.add(Entry(slotIndex, attachmentName, attachment));
@@ -65,7 +74,10 @@ Attachment *Skin::AttachmentMap::get(size_t slotIndex, const String &attachmentN
 void Skin::AttachmentMap::remove(size_t slotIndex, const String &attachmentName) {
 	if (slotIndex >= _buckets.size()) return;
 	int existing = findInBucket(_buckets[slotIndex], attachmentName);
-	if (existing >= 0) _buckets[slotIndex].removeAt(existing);
+	if (existing >= 0) {
+		disposeAttachment(_buckets[slotIndex][existing]._attachment);
+		_buckets[slotIndex].removeAt(existing);
+	}
 }
 
 int Skin::AttachmentMap::findInBucket(Vector<Entry> &bucket, const String &attachmentName) {
@@ -86,11 +98,11 @@ Skin::~Skin() {
 	Skin::AttachmentMap::Entries entries = _attachments.getEntries();
 	while (entries.hasNext()) {
 		Skin::AttachmentMap::Entry entry = entries.next();
-		delete entry._attachment;
+		disposeAttachment(entry._attachment);
 	}
 }
 
-void Skin::addAttachment(size_t slotIndex, const String &name, Attachment *attachment) {
+void Skin::setAttachment(size_t slotIndex, const String &name, Attachment *attachment) {
 	assert(attachment);
 	_attachments.put(slotIndex, name, attachment);
 }
@@ -140,6 +152,26 @@ void Skin::attachAll(Skeleton &skeleton, Skin &oldSkin) {
 			if (attachment) {
 				slot->setAttachment(attachment);
 			}
+		}
+	}
+}
+
+void Skin::addSkin(Skin* other) {
+	AttachmentMap::Entries entries = other->getAttachments();
+	while(entries.hasNext()) {
+		AttachmentMap::Entry& entry = entries.next();
+		setAttachment(entry._slotIndex, entry._name, entry._attachment);
+	}
+}
+
+void Skin::copySkin(Skin* other) {
+	AttachmentMap::Entries entries = other->getAttachments();
+	while(entries.hasNext()) {
+		AttachmentMap::Entry& entry = entries.next();
+		if (entry._attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
+			setAttachment(entry._slotIndex, entry._name, static_cast<MeshAttachment*>(entry._attachment)->newLinkedMesh());
+		} else {
+			setAttachment(entry._slotIndex, entry._name, entry._attachment->copy());
 		}
 	}
 }

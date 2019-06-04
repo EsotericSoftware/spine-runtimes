@@ -42,13 +42,14 @@ class SP_API LinkedMesh : public SpineObject {
 	friend class SkeletonJson;
 
 public:
-	LinkedMesh(MeshAttachment *mesh, const String &skin, size_t slotIndex, const String &parent);
+	LinkedMesh(MeshAttachment *mesh, const String &skin, size_t slotIndex, const String &parent, bool inheritDeform);
 
 private:
 	MeshAttachment *_mesh;
 	String _skin;
 	size_t _slotIndex;
 	String _parent;
+	bool _inheritDeform;
 };
 }
 

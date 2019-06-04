@@ -117,7 +117,7 @@ public:
 
 	/// Adds an attachment to the skin for the specified slot index and name.
 	/// If the name already exists for the slot, the previous value is replaced.
-	void addAttachment(size_t slotIndex, const String &name, Attachment *attachment);
+	void setAttachment(size_t slotIndex, const String &name, Attachment *attachment);
 
 	/// Returns the attachment for the specified slot index and name, or NULL.
 	Attachment *getAttachment(size_t slotIndex, const String &name);
@@ -133,6 +133,12 @@ public:
 	void findAttachmentsForSlot(size_t slotIndex, Vector<Attachment *> &attachments);
 
 	const String &getName();
+
+	/// Adds all attachments, bones, and constraints from the specified skin to this skin.
+	void addSkin(Skin* other);
+
+	/// Adds all attachments, bones, and constraints from the specified skin to this skin. Attachments are deep copied.
+	void copySkin(Skin* other);
 
 	AttachmentMap::Entries getAttachments();
 

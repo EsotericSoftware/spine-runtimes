@@ -300,6 +300,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 			setError("Parent mesh not found: ", linkedMesh->_parent.buffer());
 			return NULL;
 		}
+		linkedMesh->_mesh->_deformAttachment = linkedMesh->_inheritDeform ? static_cast<VertexAttachment*>(parent) : linkedMesh->_mesh;
 		linkedMesh->_mesh->setParentMesh(static_cast<MeshAttachment *>(parent));
 		linkedMesh->_mesh->updateUVs();
 		_attachmentLoader->configureAttachment(linkedMesh->_mesh);
@@ -455,7 +456,7 @@ SkeletonBinary::readSkin(DataInput *input, const String &skinName, SkeletonData 
 		for (int ii = 0, nn = readVarint(input, true); ii < nn; ++ii) {
 			String name(readString(input), true);
 			Attachment *attachment = readAttachment(input, skin, slotIndex, name, skeletonData, nonessential);
-			if (attachment) skin->addAttachment(slotIndex, String(name), attachment);
+			if (attachment) skin->setAttachment(slotIndex, String(name), attachment);
 		}
 	}
 	return skin;
@@ -531,14 +532,14 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			readColor(input, mesh->getColor());
 			String skinName(readString(input), true);
 			String parent(readString(input), true);
-			mesh->_inheritDeform = readBoolean(input);
+			bool inheritDeform = readBoolean(input);
 			if (nonessential) {
 				mesh->_width = readFloat(input) * _scale;
 				mesh->_height = readFloat(input) * _scale;
 			}
 
 			LinkedMesh *linkedMesh = new(__FILE__, __LINE__) LinkedMesh(mesh, String(skinName), slotIndex,
-																		String(parent));
+																		String(parent), inheritDeform);
 			_linkedMeshes.add(linkedMesh);
 			return mesh;
 		}

@@ -62,9 +62,6 @@ namespace spine {
 		void computeWorldVertices(Slot& slot, size_t start, size_t count, float* worldVertices, size_t offset, size_t stride = 2);
         void computeWorldVertices(Slot& slot, size_t start, size_t count, Vector<float>& worldVertices, size_t offset, size_t stride = 2);
         
-        /// @return true if a deform originally applied to the specified attachment should be applied to this attachment.
-        virtual bool applyDeform(VertexAttachment* sourceAttachment);
-        
         /// Gets a unique ID for this attachment.
         int getId();
         
@@ -74,11 +71,17 @@ namespace spine {
         
         size_t getWorldVerticesLength();
         void setWorldVerticesLength(size_t inValue);
+
+        VertexAttachment* getDeformAttachment();
+		void setDeformAttachment(VertexAttachment* attachment);
+
+		void copyTo(VertexAttachment* other);
         
     protected:
         Vector<size_t> _bones;
         Vector<float> _vertices;
         size_t _worldVerticesLength;
+        VertexAttachment* _deformAttachment;
         
     private:
         const int _id;

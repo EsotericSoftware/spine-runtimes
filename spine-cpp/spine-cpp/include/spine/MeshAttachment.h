@@ -50,8 +50,6 @@ namespace spine {
         virtual ~MeshAttachment();
 
         void updateUVs();
-
-        virtual bool applyDeform(VertexAttachment* sourceAttachment);
         
         int getHullLength();
         void setHullLength(int inValue);
@@ -104,9 +102,6 @@ namespace spine {
         float getRegionOriginalHeight();
         void setRegionOriginalHeight(float inValue);
         
-        bool getInheritDeform();
-        void setInheritDeform(bool inValue);
-        
         MeshAttachment* getParentMesh();
         void setParentMesh(MeshAttachment* inValue);
         
@@ -116,6 +111,10 @@ namespace spine {
         void setWidth(float inValue);
         float getHeight();
         void setHeight(float inValue);
+
+		virtual Attachment* copy();
+
+		MeshAttachment* newLinkedMesh();
 
     private:
         float _regionOffsetX, _regionOffsetY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight;
@@ -133,7 +132,6 @@ namespace spine {
         float _height;
         Color _color;
         int _hullLength;
-        bool _inheritDeform;
         bool _regionRotate;
         int _regionDegrees;
     };

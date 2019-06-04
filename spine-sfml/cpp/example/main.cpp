@@ -163,7 +163,13 @@ void goblins (SkeletonData* skeletonData, Atlas* atlas) {
 	drawable.setUsePremultipliedAlpha(true);
 
 	Skeleton* skeleton = drawable.skeleton;
-	skeleton->setSkin("goblin");
+
+	Skin* skin = skeleton->getData()->findSkin("goblingirl");
+	Skin copy("test");
+
+	copy.copySkin(skin);
+
+	skeleton->setSkin(&copy);
 	skeleton->setSlotsToSetupPose();
 
 	skeleton->setPosition(320, 590);
@@ -466,7 +472,8 @@ int main () {
 	DebugExtension dbgExtension(SpineExtension::getInstance());
 	SpineExtension::setInstance(&dbgExtension);
 
-	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);
+	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
+	/*testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);
 	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(stretchymanStrechyIk, "data/stretchyman-stretchy-ik-pro.json", "data/stretchyman-stretchy-ik-pro.skel", "data/stretchyman-pma.atlas", 0.6f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
@@ -474,8 +481,7 @@ int main () {
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
 	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 0.2f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
-	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
-	testcase(stretchyman, "data/stretchyman-pro.json", "data/stretchyman-pro.skel", "data/stretchyman-pma.atlas", 0.6f);
+	testcase(stretchyman, "data/stretchyman-pro.json", "data/stretchyman-pro.skel", "data/stretchyman-pma.atlas", 0.6f);*/
 
 	dbgExtension.reportLeaks();
 	return 0;

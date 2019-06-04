@@ -55,7 +55,6 @@ MeshAttachment::MeshAttachment(const String &name) : VertexAttachment(name), Has
 													 _height(0),
 													 _color(1, 1, 1, 1),
 													 _hullLength(0),
-													 _inheritDeform(false),
 													 _regionRotate(false),
 													 _regionDegrees(0) {
 }
@@ -124,10 +123,6 @@ void MeshAttachment::updateUVs() {
 			}
 		}
 	}
-}
-
-bool MeshAttachment::applyDeform(VertexAttachment *sourceAttachment) {
-	return this == sourceAttachment || (_inheritDeform && _parentMesh == sourceAttachment);
 }
 
 int MeshAttachment::getHullLength() {
@@ -246,14 +241,6 @@ void MeshAttachment::setRegionOriginalHeight(float inValue) {
 	_regionOriginalHeight = inValue;
 }
 
-bool MeshAttachment::getInheritDeform() {
-	return _inheritDeform;
-}
-
-void MeshAttachment::setInheritDeform(bool inValue) {
-	_inheritDeform = inValue;
-}
-
 MeshAttachment *MeshAttachment::getParentMesh() {
 	return _parentMesh;
 }
@@ -295,4 +282,60 @@ void MeshAttachment::setHeight(float inValue) {
 
 spine::Color &MeshAttachment::getColor() {
 	return _color;
+}
+
+Attachment* MeshAttachment::copy() {
+	if (_parentMesh) return newLinkedMesh();
+
+	MeshAttachment* copy = new (__FILE__, __LINE__) MeshAttachment(getName());
+	copy->setRendererObject(getRendererObject());
+	copy->_regionU = _regionU;
+	copy->_regionV = _regionV;
+	copy->_regionU2 = _regionU2;
+	copy->_regionV2 = _regionV2;
+	copy->_regionRotate = _regionRotate;
+	copy->_regionDegrees = _regionDegrees;
+	copy->_regionOffsetX =  _regionOffsetX;
+	copy->_regionOffsetY = _regionOffsetY;
+	copy->_regionWidth = _regionWidth;
+	copy->_regionHeight = _regionHeight;
+	copy->_regionOriginalWidth = _regionOriginalWidth;
+	copy->_regionOriginalHeight = _regionOriginalHeight;
+	copy->_path = _path;
+	copy->_color.set(_color);
+
+	copyTo(copy);
+	copy->_regionUVs.clearAndAddAll(_regionUVs);
+	copy->_uvs.clearAndAddAll(_uvs);
+	copy->_triangles.clearAndAddAll(_triangles);
+	copy->_hullLength = _hullLength;
+
+	// Nonessential.
+	copy->_edges.clearAndAddAll(copy->_edges);
+	copy->_width = _width;
+	copy->_height = _height;
+	return copy;
+}
+
+MeshAttachment* MeshAttachment::newLinkedMesh() {
+	MeshAttachment* copy = new (__FILE__, __LINE__) MeshAttachment(getName());
+	copy->setRendererObject(getRendererObject());
+	copy->_regionU = _regionU;
+	copy->_regionV = _regionV;
+	copy->_regionU2 = _regionU2;
+	copy->_regionV2 = _regionV2;
+	copy->_regionRotate = _regionRotate;
+	copy->_regionDegrees = _regionDegrees;
+	copy->_regionOffsetX =  _regionOffsetX;
+	copy->_regionOffsetY = _regionOffsetY;
+	copy->_regionWidth = _regionWidth;
+	copy->_regionHeight = _regionHeight;
+	copy->_regionOriginalWidth = _regionOriginalWidth;
+	copy->_regionOriginalHeight = _regionOriginalHeight;
+	copy->_path = _path;
+	copy->_color.set(_color);
+	copy->_deformAttachment = this->_deformAttachment;
+	copy->setParentMesh(_parentMesh ? _parentMesh : this);
+	copy->updateUVs();
+	return copy;
 }

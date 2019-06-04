@@ -39,6 +39,8 @@ namespace spine {
         RTTI_DECL
         
         explicit BoundingBoxAttachment(const String& name);
+
+		virtual Attachment* copy();
     };
 }
 

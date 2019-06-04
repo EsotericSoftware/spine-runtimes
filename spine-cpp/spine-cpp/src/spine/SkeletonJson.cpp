@@ -569,13 +569,13 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 								}
 								_attachmentLoader->configureAttachment(mesh);
 							} else {
-								mesh->_inheritDeform = Json::getInt(attachmentMap, "deform", 1) ? true : false;
+								bool inheritDeform = Json::getInt(attachmentMap, "deform", 1) ? true : false;
 								LinkedMesh *linkedMesh = new(__FILE__, __LINE__) LinkedMesh(mesh,
 																							String(Json::getString(
 																									attachmentMap,
 																									"skin", 0)),
 																							slotIndex,
-																							String(entry->_valueString));
+																							String(entry->_valueString), inheritDeform);
 								_linkedMeshes.add(linkedMesh);
 							}
 							break;
@@ -640,7 +640,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 						}
 					}
 
-					skin->addAttachment(slotIndex, skinAttachmentName, attachment);
+					skin->setAttachment(slotIndex, skinAttachmentName, attachment);
 				}
 			}
 		}
@@ -663,6 +663,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 			setError(root, "Parent mesh not found: ", linkedMesh->_parent.buffer());
 			return NULL;
 		}
+		linkedMesh->_mesh->_deformAttachment = linkedMesh->_inheritDeform ? static_cast<VertexAttachment*>(parent) : linkedMesh->_mesh;
 		linkedMesh->_mesh->setParentMesh(static_cast<MeshAttachment *>(parent));
 		linkedMesh->_mesh->updateUVs();
 		_attachmentLoader->configureAttachment(linkedMesh->_mesh);
