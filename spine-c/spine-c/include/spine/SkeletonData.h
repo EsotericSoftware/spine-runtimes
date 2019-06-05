@@ -49,6 +49,9 @@ typedef struct spSkeletonData {
 	const char* hash;
 	float x, y, width, height;
 
+	int stringsCount;
+	char** strings;
+
 	int bonesCount;
 	spBoneData** bones;
 

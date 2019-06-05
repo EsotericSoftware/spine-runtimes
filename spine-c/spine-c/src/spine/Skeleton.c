@@ -219,6 +219,7 @@ static void _sortReset(spBone** bones, int bonesCount) {
 	int i;
 	for (i = 0; i < bonesCount; ++i) {
 		spBone* bone = bones[i];
+		if (!bone->active) continue;
 		if (bone->sorted) _sortReset(bone->children, bone->childrenCount);
 		bone->sorted = 0;
 	}
@@ -230,6 +231,10 @@ static void _sortIkConstraint (_spSkeleton* const internal, spIkConstraint* cons
 	spBone* target = constraint->target;
 	spBone** constrained;
 	spBone* parent;
+
+	constraint->active = constraint->target->active && (!constraint->data->skinRequired || (internal->super.skin != 0 && spIkConstraintDataArray_contains(internal->super.skin->ikConstraints, constraint->data)));
+	if (!constraint->active) return;
+
 	_sortBone(internal, target);
 
 	constrained = constraint->bones;
@@ -264,6 +269,10 @@ static void _sortPathConstraint(_spSkeleton* const internal, spPathConstraint* c
 	spAttachment* attachment;
 	spBone** constrained;
 	spSkeleton* skeleton = SUPER_CAST(spSkeleton, internal);
+
+	constraint->active = constraint->target->bone->active && (!constraint->data->skinRequired || (internal->super.skin != 0 && spPathConstraintDataArray_contains(internal->super.skin->pathConstraints, constraint->data)));
+	if (!constraint->active) return;
+
 	if (skeleton->skin) _sortPathConstraintAttachment(internal, skeleton->skin, slotIndex, slotBone);
 	if (skeleton->data->defaultSkin && skeleton->data->defaultSkin != skeleton->skin)
 		_sortPathConstraintAttachment(internal, skeleton->data->defaultSkin, slotIndex, slotBone);
@@ -291,6 +300,10 @@ static void _sortTransformConstraint(_spSkeleton* const internal, spTransformCon
 	spBone** constrained;
 	spBone* child;
 	int /*boolean*/ contains = 0;
+
+	constraint->active = constraint->target->active && (!constraint->data->skinRequired || (internal->super.skin != 0 && spTransformConstraintDataArray_contains(internal->super.skin->transformConstraints, constraint->data)));
+	if (!constraint->active) return;
+
 	_sortBone(internal, constraint->target);
 
 	constrained = constraint->bones;
@@ -342,8 +355,23 @@ void spSkeleton_updateCache (spSkeleton* self) {
 	internal->updateCacheResetCount = 0;
 
 	bones = self->bones;
-	for (i = 0; i < self->bonesCount; ++i)
-		bones[i]->sorted = 0;
+	for (i = 0; i < self->bonesCount; ++i) {
+		spBone* bone = bones[i];
+		bone->sorted = bone->data->skinRequired;
+		bone->active = !bone->sorted;
+	}
+
+	if (self->skin) {
+		spBoneDataArray* skinBones = self->skin->bones;
+		for(i = 0; i < skinBones->size; i++) {
+			spBone* bone = self->bones[skinBones->items[i]->index];
+			do {
+				bone->sorted = 0;
+				bone->active = -1;
+				bone = bone->parent;
+			} while (bone != 0);
+		}
+	}
 
 	/* IK first, lowest hierarchy depth first. */
 	ikConstraints = self->ikConstraints;

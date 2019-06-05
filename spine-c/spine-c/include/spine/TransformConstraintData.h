@@ -40,6 +40,7 @@ extern "C" {
 typedef struct spTransformConstraintData {
 	const char* const name;
 	int order;
+	int/*bool*/ skinRequired;
 	int bonesCount;
 	spBoneData** const bones;
 	spBoneData* target;
@@ -51,6 +52,8 @@ typedef struct spTransformConstraintData {
 #ifdef __cplusplus
 	spTransformConstraintData() :
 		name(0),
+		order(0),
+		skinRequired(0),
 		bonesCount(0),
 		bones(0),
 		target(0),

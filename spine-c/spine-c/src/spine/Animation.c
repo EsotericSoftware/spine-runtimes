@@ -245,6 +245,7 @@ void _spRotateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 	spRotateTimeline* self = SUB_CAST(spRotateTimeline, timeline);
 
 	bone = skeleton->bones[self->boneIndex];
+	if (!bone->active) return;
 	if (time < self->frames[0]) {
 		switch (blend) {
 			case SP_MIX_BLEND_SETUP:
@@ -333,6 +334,7 @@ void _spTranslateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleto
 	spTranslateTimeline* self = SUB_CAST(spTranslateTimeline, timeline);
 
 	bone = skeleton->bones[self->boneIndex];
+	if (!bone->active) return;
 	if (time < self->frames[0]) {
 		switch (blend) {
 			case SP_MIX_BLEND_SETUP:
@@ -415,6 +417,7 @@ void _spScaleTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 	spScaleTimeline* self = SUB_CAST(spScaleTimeline, timeline);
 
 	bone = skeleton->bones[self->boneIndex];
+	if (!bone->active) return;
 	if (time < self->frames[0]) {
 		switch (blend) {
 			case SP_MIX_BLEND_SETUP:
@@ -533,6 +536,7 @@ void _spShearTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 	spShearTimeline* self = SUB_CAST(spShearTimeline, timeline);
 
 	bone = skeleton->bones[self->boneIndex];
+	if (!bone->active) return;
 	frames = self->frames;
 	framesCount = self->framesCount;
 	if (time < self->frames[0]) {
@@ -614,6 +618,7 @@ void _spColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 	spColor* setup;
 	spColorTimeline* self = (spColorTimeline*)timeline;
 	slot = skeleton->slots[self->slotIndex];
+	if (!slot->bone->active) return;
 
 	if (time < self->frames[0]) {
 		switch (blend) {
@@ -706,6 +711,7 @@ void _spTwoColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton
 	spColor* setupDark;
 	spColorTimeline* self = (spColorTimeline*)timeline;
 	slot = skeleton->slots[self->slotIndex];
+	if (!slot->bone->active) return;
 
 	if (time < self->frames[0]) {
 		switch (blend) {
@@ -809,6 +815,7 @@ void _spAttachmentTimeline_apply (const spTimeline* timeline, spSkeleton* skelet
 	spAttachmentTimeline* self = (spAttachmentTimeline*)timeline;
 	int frameIndex;
 	spSlot* slot = skeleton->slots[self->slotIndex];
+	if (!slot->bone->active) return;
 
 	if (direction == SP_MIX_DIRECTION_OUT && blend == SP_MIX_BLEND_SETUP) {
 		attachmentName = slot->data->attachmentName;
@@ -893,6 +900,7 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 	spDeformTimeline* self = (spDeformTimeline*)timeline;
 
 	spSlot *slot = skeleton->slots[self->slotIndex];
+	if (!slot->bone->active) return;
 
 	if (!slot->attachment) return;
 	switch (slot->attachment->type) {
@@ -1295,6 +1303,7 @@ void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skel
 	spIkConstraintTimeline* self = (spIkConstraintTimeline*)timeline;
 
 	constraint = skeleton->ikConstraints[self->ikConstraintIndex];
+	if (!constraint->active) return;
 
 	if (time < self->frames[0]) {
 		switch (blend) {
@@ -1410,6 +1419,8 @@ void _spTransformConstraintTimeline_apply (const spTimeline* timeline, spSkeleto
 	int framesCount;
 
 	constraint = skeleton->transformConstraints[self->transformConstraintIndex];
+	if (!constraint->active) return;
+
 	if (time < self->frames[0]) {
 		spTransformConstraintData* data = constraint->data;
 		switch (blend) {
@@ -1508,6 +1519,8 @@ void _spPathConstraintPositionTimeline_apply(const spTimeline* timeline, spSkele
 	int framesCount;
 
 	constraint = skeleton->pathConstraints[self->pathConstraintIndex];
+	if (!constraint->active) return;
+
 	if (time < self->frames[0]) {
 		switch (blend) {
 			case SP_MIX_BLEND_SETUP:
@@ -1576,6 +1589,8 @@ void _spPathConstraintSpacingTimeline_apply(const spTimeline* timeline, spSkelet
 	int framesCount;
 
 	constraint = skeleton->pathConstraints[self->pathConstraintIndex];
+	if (!constraint->active) return;
+
 	if (time < self->frames[0]) {
 		switch (blend) {
 			case SP_MIX_BLEND_SETUP:
@@ -1648,6 +1663,8 @@ void _spPathConstraintMixTimeline_apply(const spTimeline* timeline, spSkeleton* 
 	int framesCount;
 
 	constraint = skeleton->pathConstraints[self->pathConstraintIndex];
+	if (!constraint->active) return;
+
 	if (time < self->frames[0]) {
 		switch (blend) {
 			case SP_MIX_BLEND_SETUP:

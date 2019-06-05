@@ -541,6 +541,7 @@ void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* 
 	rotateTimeline = SUB_CAST(spRotateTimeline, timeline);
 	frames = rotateTimeline->frames;
 	bone = skeleton->bones[rotateTimeline->boneIndex];
+	if (!bone->active) return;
 	if (time < frames[0]) {
 		switch (blend) {
 			case SP_MIX_BLEND_SETUP:

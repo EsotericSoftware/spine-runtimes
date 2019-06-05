@@ -52,6 +52,8 @@ typedef struct spIkConstraint {
 	int /*boolean*/ stretch;
 	float mix;
 
+	int /*boolean*/ active;
+
 #ifdef __cplusplus
 	spIkConstraint() :
 		data(0),
@@ -60,7 +62,8 @@ typedef struct spIkConstraint {
 		target(0),
 		bendDirection(0),
 		stretch(0),
-		mix(0) {
+		mix(0),
+		active(0) {
 	}
 #endif
 } spIkConstraint;
