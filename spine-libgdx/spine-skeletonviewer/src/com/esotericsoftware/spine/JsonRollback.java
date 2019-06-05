@@ -132,10 +132,18 @@ public class JsonRollback {
 
 	static private void rollbackCurves (JsonValue map) {
 		if (map == null) return;
+
+		if (map.isObject() && map.parent.isArray()) { // Probably a key.
+			if (!map.has("time")) map.addChild("time", new JsonValue(0f));
+			if (map.parent.name != null && map.parent.name.equals("rotate") && !map.has("angle"))
+				map.addChild("angle", new JsonValue(0f));
+		}
+
 		JsonValue curve = map.get("curve");
 		if (curve == null) {
-			for (map = map.child; map != null; map = map.next)
-				rollbackCurves(map);
+			if (map.name != null && map.name.equals("color")) System.out.println();
+			for (JsonValue child = map.child; child != null; child = child.next)
+				rollbackCurves(child);
 			return;
 		}
 		if (curve.isNumber()) {
