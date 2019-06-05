@@ -775,7 +775,7 @@ module spine {
 			if (!map.curve) return;
 			if (map.curve == "stepped")
 				timeline.setStepped(frameIndex);
-			else if (Object.prototype.toString.call(map.curve) === '[object Array]') {
+			else {
 				let curve: number = map.curve;
 				timeline.setCurve(frameIndex, curve, this.getValue(map, "c2", 0), this.getValue(map, "c3", 1), this.getValue(map, "c4", 1));
 			}
