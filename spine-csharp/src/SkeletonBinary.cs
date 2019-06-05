@@ -128,9 +128,9 @@ namespace Spine {
 			if (skeletonData.hash.Length == 0) skeletonData.hash = null;
 			skeletonData.version = input.ReadString();
 			if (skeletonData.version.Length == 0) skeletonData.version = null;
-            skeletonData.x = input.ReadFloat();
-            skeletonData.y = input.ReadFloat();
-            skeletonData.width = input.ReadFloat();
+			skeletonData.x = input.ReadFloat();
+			skeletonData.y = input.ReadFloat();
+			skeletonData.width = input.ReadFloat();
 			skeletonData.height = input.ReadFloat();
 
 			bool nonessential = input.ReadBoolean();
@@ -171,7 +171,6 @@ namespace Spine {
 				data.transformMode = TransformModeValues[input.ReadInt(true)];
 				data.skinRequired = input.ReadBoolean();
 				if (nonessential) input.ReadInt(); // Skip bone color.
-				skeletonData.bones.Add(data);
 				o[i] = data;
 			}
 
@@ -396,13 +395,14 @@ namespace Spine {
 					if (box == null) return null;
 					box.worldVerticesLength = vertexCount << 1;
 					box.vertices = vertices.vertices;
-					box.bones = vertices.bones;                    
+					box.bones = vertices.bones;
+					// skipped porting: if (nonessential) Color.rgba8888ToColor(box.getColor(), color);
 					return box;
 				}
 			case AttachmentType.Mesh: {
 					String path = input.ReadStringRef();
 					int color = input.ReadInt();
-					int vertexCount = input.ReadInt(true);					
+					int vertexCount = input.ReadInt(true);
 					float[] uvs = ReadFloatArray(input, vertexCount << 1, 1);
 					int[] triangles = ReadShortArray(input);
 					Vertices vertices = ReadVertices(input, vertexCount);
@@ -482,6 +482,7 @@ namespace Spine {
 					path.vertices = vertices.vertices;
 					path.bones = vertices.bones;
 					path.lengths = lengths;
+					// skipped porting: if (nonessential) Color.rgba8888ToColor(path.getColor(), color);
 					return path;                    
 				}
 			case AttachmentType.Point: {
@@ -495,7 +496,7 @@ namespace Spine {
 					point.x = x * scale;
 					point.y = y * scale;
 					point.rotation = rotation;
-					//if (nonessential) point.color = color;
+					// skipped porting: if (nonessential) point.color = color;
 					return point;
 				}
 			case AttachmentType.Clipping: {
@@ -510,6 +511,7 @@ namespace Spine {
 					clip.worldVerticesLength = vertexCount << 1;
 					clip.vertices = vertices.vertices;
 					clip.bones = vertices.bones;
+					// skipped porting: if (nonessential) Color.rgba8888ToColor(clip.getColor(), color);
 					return clip;
 				}
 			}
@@ -597,7 +599,7 @@ namespace Spine {
 								if (frameIndex < frameCount - 1) ReadCurve(input, frameIndex, timeline);
 							}
 							timelines.Add(timeline);
-							duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * ColorTimeline.ENTRIES]);
+							duration = Math.Max(duration, timeline.frames[(frameCount - 1) * ColorTimeline.ENTRIES]);
 							break;
 						}
 					case SLOT_TWO_COLOR: {
@@ -619,7 +621,7 @@ namespace Spine {
 								if (frameIndex < frameCount - 1) ReadCurve(input, frameIndex, timeline);
 							}
 							timelines.Add(timeline);
-							duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * TwoColorTimeline.ENTRIES]);
+							duration = Math.Max(duration, timeline.frames[(frameCount - 1) * TwoColorTimeline.ENTRIES]);
 							break;
 						}
 					}
@@ -659,8 +661,8 @@ namespace Spine {
 							}
 							timeline.boneIndex = boneIndex;
 							for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-								timeline.SetFrame(frameIndex, input.ReadFloat(), input.ReadFloat() * timelineScale, input.ReadFloat()
-									* timelineScale);
+								timeline.SetFrame(frameIndex, input.ReadFloat(), input.ReadFloat() * timelineScale,
+									input.ReadFloat() * timelineScale);
 								if (frameIndex < frameCount - 1) ReadCurve(input, frameIndex, timeline);
 							}
 							timelines.Add(timeline);
@@ -671,15 +673,16 @@ namespace Spine {
 				}
 			}
 
-			// IK timelines.
-			for (int i = 0, n = input.ReadInt(true); i < n; i++) {				
+			// IK constraint timelines.
+			for (int i = 0, n = input.ReadInt(true); i < n; i++) {
 				int index = input.ReadInt(true);
 				int frameCount = input.ReadInt(true);
 				IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount) {
 					ikConstraintIndex = index
 				};
 				for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-					timeline.SetFrame(frameIndex, input.ReadFloat(), input.ReadFloat(), input.ReadSByte(), input.ReadBoolean(), input.ReadBoolean());
+					timeline.SetFrame(frameIndex, input.ReadFloat(), input.ReadFloat(), input.ReadSByte(), input.ReadBoolean(),
+						input.ReadBoolean());
 					if (frameIndex < frameCount - 1) ReadCurve(input, frameIndex, timeline);
 				}
 				timelines.Add(timeline);
@@ -693,7 +696,8 @@ namespace Spine {
 				TransformConstraintTimeline timeline = new TransformConstraintTimeline(frameCount);
 				timeline.transformConstraintIndex = index;
 				for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-					timeline.SetFrame(frameIndex, input.ReadFloat(), input.ReadFloat(), input.ReadFloat(), input.ReadFloat(), input.ReadFloat());
+					timeline.SetFrame(frameIndex, input.ReadFloat(), input.ReadFloat(), input.ReadFloat(), input.ReadFloat(),
+						input.ReadFloat());
 					if (frameIndex < frameCount - 1) ReadCurve(input, frameIndex, timeline);
 				}
 				timelines.Add(timeline);
@@ -720,7 +724,7 @@ namespace Spine {
 									if (data.positionMode == PositionMode.Fixed) timelineScale = scale;
 								}
 								timeline.pathConstraintIndex = index;
-								for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {                                    
+								for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
 									timeline.SetFrame(frameIndex, input.ReadFloat(), input.ReadFloat() * timelineScale);
 									if (frameIndex < frameCount - 1) ReadCurve(input, frameIndex, timeline);
 								}
@@ -784,7 +788,7 @@ namespace Spine {
 
 							timeline.SetFrame(frameIndex, time, deform);
 							if (frameIndex < frameCount - 1) ReadCurve(input, frameIndex, timeline);
-						}							
+						}
 						timelines.Add(timeline);
 						duration = Math.Max(duration, timeline.frames[frameCount - 1]);
 					}
@@ -859,6 +863,12 @@ namespace Spine {
 				timeline.SetCurve(frameIndex, input.ReadFloat(), input.ReadFloat(), input.ReadFloat(), input.ReadFloat());
 				break;
 			}
+		}
+
+		internal class Vertices
+		{
+			public int[] bones;
+			public float[] vertices;
 		}
 
 		internal class SkeletonInput {
@@ -966,11 +976,6 @@ namespace Spine {
 					throw new ArgumentException("Stream does not contain a valid binary Skeleton Data.\n" + e, "input");
 				}
 			}
-		}
-
-		internal class Vertices {
-			public int[] bones;
-			public float[] vertices;
 		}
 	}
 }
